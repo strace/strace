@@ -1,3 +1,14 @@
+2003-09-06  Dmitry V. Levin <ldv@altlinux.org>
+
+	* defs.h (ioctl_lookup): Prototype change.
+	* ioctl.c (ioctl_next_match): New function.
+	* defs.h: Declare it.
+	* io.c (sys_ioctl): Use it, to display all possible ioctl names
+	when there's more than one match.
+	* ioctl.c (ioctl_lookup): Likewise.
+	* stream.c (internal_stream_ioctl): Likewise.
+	Patch from Solar Designer <solar@openwall.com>.
+
 2003-11-13  Roland McGrath  <roland@redhat.com>
 
 	* linux/sh/syscallent.h: Use sys_setgroups32, sys_getgroups32.
