@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.4.94
+Version: 4.4.95
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -43,6 +43,9 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*
 
 %changelog
+* Mon Feb 24 2003 Roland McGrath <roland@redhat.com> 4.4.95-1
+- new upstream version, fixed getresuid/getresgid (#84959)
+
 * Wed Feb 19 2003 Roland McGrath <roland@redhat.com> 4.4.94-1
 - new upstream version, new option -E to set environment variables (#82392)
 

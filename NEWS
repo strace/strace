@@ -1,4 +1,4 @@
-Changes in 4.4.94 TEST release
+Changes in 4.4.95 TEST release
 ==============
 * New port to AMD's x86-64 architecture. One strace binary can
   handle both new x86-64 and old i386 processes.
