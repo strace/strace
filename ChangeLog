@@ -1,5 +1,11 @@
 2001-03-06  John Hughes <john@Calva.COM>
 
+  * dummy.h: add unimplemented UW sycalls
+  * syscall.h: we can do settimeofday for UW, whopee!
+  * syscallent.h: fix unimplemented UW syscalls
+
+2001-03-06  John Hughes <john@Calva.COM>
+
   * aclocal.m4: look for pr_syscall in pr_lwp if we HAVE_MP_PROCFS
   * defs.h: add PR_SYSCALL to allow use of pr_lwp.pr_syscall if it exists.
   * syscall.c: use PR_SYSCALL instead of pr_syscall, fix up UnixWare code
