@@ -643,7 +643,7 @@ printsiginfo(sip, verbose)
 siginfo_t *sip;
 int verbose;
 {
-	char *code;
+	const char *code;
 
 	if (sip->si_signo == 0) {
 		tprintf ("{}");

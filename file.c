@@ -555,12 +555,12 @@ static const struct xlat modetypes[] = {
 	{ 0,		NULL		},
 };
 
-static char *
+static const char *
 sprintmode(mode)
 int mode;
 {
 	static char buf[64];
-	char *s;
+	const char *s;
 
 	if ((mode & S_IFMT) == 0)
 		s = "";
@@ -1437,13 +1437,13 @@ static const struct xlat fsmagic[] = {
 
 #ifndef SVR4
 
-static char *
+static const char *
 sprintfstype(magic)
 int magic;
 {
 	static char buf[32];
 #ifdef LINUX
-	char *s;
+	const char *s;
 
 	s = xlookup(fsmagic, magic);
 	if (s) {
