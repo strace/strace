@@ -1,3 +1,52 @@
+2002-12-29  Roland McGrath  <roland@redhat.com>
+
+	* linux/alpha/Makefile.in: File removed.
+	* linux/hppa/Makefile.in: File removed.
+	* linux/ia64/Makefile.in: File removed.
+	* linux/powerpc/Makefile.in: File removed.
+	* linux/s390/Makefile.in: File removed.
+	* linux/s390x/Makefile.in: File removed.
+
+2002-12-26  Roland McGrath  <roland@redhat.com>
+
+	* syscallent.sh: Grok three flavors of #define line, uniquify.
+	* linux/hppa/syscallent.sh: File removed.
+	* linux/powerpc/syscallent.sh: File removed.
+
+	* linux/Makefile.am: New file.
+	* linux/Makefile.in: File removed.
+	* freebsd/Makefile.am: New file.
+	* freebsd/i386/Makefile.am: New file.
+	* freebsd/i386/Makefile.in: File removed.
+
+2002-12-22  Roland McGrath  <roland@redhat.com>
+
+	Update to Autoconf 2.57, and Automakify with version 1.7.
+	* Makefile.am: New file.
+	* Makefile.in: File removed.
+	* configure.in: Moved to ...
+	* configure.ac: ... here.  Update for Autoconf 2.5x and Automake.
+	* aclocal.m4: Moved to ...
+	* acinclude.m4: ... here.  Update for Autoconf 2.5x.
+	* AUTHORS: New file, makes automake happy.
+	* autogen.sh: File removed.
+	* README-CVS: Update to recommend autoreconf instead.
+	* file.c: HAVE_ST_* -> HAVE_STRUCT_STAT_ST_*.
+	* net.c: HAVE_SIN6_SCOPE_ID -> HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID,
+	HAVE_MSG_CONTROL -> HAVE_STRUCT_MSGHDR_MSG_CONTROL.
+	* strace.c: *_DECLARED -> HAVE_DECL_*
+	* stream.c: HAVE_* -> HAVE_STRUCT_*
+
+	* linux/Makefile.in (ioctldefs.h ioctls.h): Use $(SHELL) instead of
+	sh, and use $(srcdir) to find the script.
+	* linux/powerpc/Makefile.in (ioctlent.raw): Find ioctlent.sh in ../.
+	(ioctlsort.o): Use ../ioctlsort.c, not ../../ioctlsort.c.
+	* linux/x86_64/Makefile.in (headers): Renamed to all.
+	* linux/alpha/Makefile.in: Add empty install target.
+	* linux/x86_64/Makefile.in: Likewise.
+	* linux/powerpc/Makefile.in: Likewise.
+	* linux/Makefile.in: Likewise.
+
 2002-12-26  Roland McGrath  <roland@redhat.com>
 
 	* defs.h [LINUX && MIPS] (MAX_QUALS): Set to 5000, not 4999.
