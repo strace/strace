@@ -175,6 +175,10 @@ int osf_statfs(), osf_fstatfs();
 int sys_getpmsg(), sys_putpmsg();	/* STREAMS stuff */
 #endif
 
+#ifdef MIPS
+int sys_sysmips()
+#endif
+
 int sys_setpgrp(), sys_gethostname(), sys_getdtablesize(), sys_utimes();
 int sys_capget(), sys_capset();
 

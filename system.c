@@ -2000,4 +2000,43 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif
+#endif /* UNIXWARE > 2 */
+
+#ifdef MIPS
+
+static struct xlat_sysmips[] = {
+	{ SETNAME,		"SETNAME"	},
+	{ FLUSH_CACHE,		"FLUSH_CACHE"	},
+	{ MIPS_FIXADE,		"MIPS_FIXADE"	},
+	{ MIPS_RDNVRAM,		"MIPS_RDNVRAM"	},
+	{ MIPS_ATOMIC_SET,	"MIPS_ATOMIC_SET"	},
+	{ 0, NULL }
+};
+
+int sys_sysmips(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printxval(xlat_sysmips, tcp->u_arg[0], "???");
+		tprintf(", ");
+		if (!verbose(tcp)) {
+			tprintf("%d, %d, %d", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+		} else if (tcp->u_arg[0]==SETNAME) {
+			char nodename[__NEW_UTS_LEN_1];
+			if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN_1), nodename) < 0)
+				tprintf(", %#lx", tcp->u_arg[1]);
+			else
+				tprintf(", \"%s\"", nodename);
+		} else if (tcp->u_arg[0]==MIPS_ATOMIC_SET) {
+			tprintf(", %#lx, 0x%x", tcp->u_arg[1], tcp->u_arg[2]);
+		} else if (tcp->u_arg[0]==MIPS_FIXADE) {
+			tprintf(", 0x%x", tcp->u_arg[1]);
+		} else {
+			tprintf("%d, %d, %d", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+		}
+	}
+
+	return 0;
+}
+
+#endif /* MIPS */

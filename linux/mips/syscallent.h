@@ -4147,7 +4147,7 @@
 	{ 5,	0,	sys_writev,		"writev"	}, /* 4146 */
 	{ 3,	0,	printargs,		"cacheflush"	}, /* 4147 */
 	{ 3,	0,	printargs,		"cachectl"	}, /* 4148 */
-	{ 4,	0,	printargs,		"sysmips"	}, /* 4149 */
+	{ 4,	0,	sys_sysmips,		"sysmips"	}, /* 4149 */
 	{ 0,	0,	sys_setup,		"setup"		}, /* 4150 */
 	{ 0,	0,	sys_getsid,		"getsid"	}, /* 4151 */
 	{ 5,	0,	sys_fdatasync,		"fdatasync"	}, /* 4152 */
