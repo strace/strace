@@ -36,6 +36,9 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
+#ifdef FREEBSD
+#include <netinet/tcp.h>
+#endif
 #include <arpa/inet.h>
 #if defined(LINUX)
 #include <asm/types.h>

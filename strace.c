@@ -44,9 +44,12 @@
 #include <grp.h>
 #include <string.h>
 
+#ifdef USE_PROCFS
+#include <poll.h>
+#endif
+
 #ifdef SVR4
 #include <sys/stropts.h>
-#include <poll.h>
 #ifdef HAVE_MP_PROCFS
 #include <sys/uio.h>
 #endif
@@ -87,7 +90,7 @@ static int interrupted;
 #endif /* !__STDC__ */
 #endif /* !HAVE_SIG_ATOMIC_T */
 
-#ifdef SVR4
+#ifdef USE_PROCFS
 
 static struct tcb *pfd2tcb P((int pfd));
 static void reaper P((int sig));
@@ -115,7 +118,7 @@ static int proc_poll_pipe[2] = { -1, -1 };
 #else
 #define POLLWANT	POLLPRI
 #endif
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 
 static void
 usage(ofp, exitval)
@@ -334,19 +337,19 @@ char *argv[];
 		tcp->outf = outf;
 		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
 			continue;
-#ifdef SVR4
+#ifdef USE_PROCFS
 		if (proc_open(tcp, 1) < 0) {
 			fprintf(stderr, "trouble opening proc file\n");
 			droptcb(tcp);
 			continue;
 		}
-#else /* !SVR4 */
+#else /* !USE_PROCFS */
 		if (ptrace(PTRACE_ATTACH, tcp->pid, (char *) 1, 0) < 0) {
 			perror("attach: ptrace(PTRACE_ATTACH, ...)");
 			droptcb(tcp);
 			continue;
 		}
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 		if (!qflag)
 			fprintf(stderr,
 				"Process %u attached - interrupt to quit\n",
@@ -408,8 +411,8 @@ char *argv[];
 			exit(1);
 			break;
 		case 0: {
-#ifdef SVR4
-			if (outf != stderr) close (fileno (outf));
+#ifdef USE_PROCFS
+		        if (outf != stderr) close (fileno (outf));
 #ifdef MIPS
 			/* Kludge for SGI, see proc_open for details. */
 			sa.sa_handler = foobar;
@@ -417,8 +420,12 @@ char *argv[];
 			sigemptyset(&sa.sa_mask);
 			sigaction(SIGINT, &sa, NULL);
 #endif /* MIPS */
+#ifndef FREEBSD
 			pause();
-#else /* !SVR4 */
+#else /* FREEBSD */
+			kill(getpid(), SIGSTOP); /* stop HERE */
+#endif /* FREEBSD */			
+#else /* !USE_PROCFS */
 			if (outf!=stderr)	
 				close(fileno (outf));
 
@@ -459,7 +466,7 @@ char *argv[];
 			}
 			else
 				setreuid(run_uid, run_uid);
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 
 			execv(pathname, &argv[optind]);
 			perror("strace: exec");
@@ -472,16 +479,16 @@ char *argv[];
 				cleanup();
 				exit(1);
 			}
-#ifdef SVR4
+#ifdef USE_PROCFS
 			if (proc_open(tcp, 0) < 0) {
 				fprintf(stderr, "trouble opening proc file\n");
 				cleanup();
 				exit(1);
 			}
-#endif /* SVR4 */
-#ifndef SVR4
+#endif /* USE_PROCFS */
+#ifndef USE_PROCFS
 			fake_execve(tcp, pathname, &argv[optind], environ);
-#endif
+#endif /* !USE_PROCFS */
 			break;
 		}
 	}
@@ -512,10 +519,10 @@ char *argv[];
 	sigaction(SIGQUIT, &sa, NULL);
 	sigaction(SIGPIPE, &sa, NULL);
 	sigaction(SIGTERM, &sa, NULL);
-#ifdef SVR4
+#ifdef USE_PROCFS
 	sa.sa_handler = reaper;
 	sigaction(SIGCHLD, &sa, NULL);
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 
 	if (trace() < 0)
 		exit(1);
@@ -572,7 +579,7 @@ int pid;
 	return NULL;
 }
 
-#ifdef SVR4
+#ifdef USE_PROCFS
 int
 proc_open(tcp, attaching)
 struct tcb *tcp;
@@ -580,9 +587,11 @@ int attaching;
 {
 	char proc[32];
 	long arg;
+#ifdef SVR4
 	sysset_t sc_enter, sc_exit;
 	sigset_t signals;
 	fltset_t faults;
+#endif
 #ifndef HAVE_POLLABLE_PROCFS
 	static int last_pfd;
 #endif
@@ -630,8 +639,13 @@ int attaching;
 	}
 #else
 	/* Open the process pseudo-file in /proc. */
+#ifndef FREEBSD
 	sprintf(proc, "/proc/%d", tcp->pid);
 	if ((tcp->pfd = open(proc, O_RDWR|O_EXCL)) < 0) {
+#else /* FREEBSD */
+	sprintf(proc, "/proc/%d/mem", tcp->pid);
+	if ((tcp->pfd = open(proc, O_RDWR)) < 0) {
+#endif /* FREEBSD */
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
@@ -644,6 +658,21 @@ int attaching;
 		return -1;
 	}
 #endif
+#ifdef FREEBSD
+	sprintf(proc, "/proc/%d/regs", tcp->pid);
+	if ((tcp->pfd_reg = open(proc, O_RDONLY)) < 0) {
+		perror("strace: open(\"/proc/.../regs\", ...)");
+		return -1;
+	}
+	if (cflag) {
+		sprintf(proc, "/proc/%d/status", tcp->pid);
+		if ((tcp->pfd_status = open(proc, O_RDONLY)) < 0) {
+			perror("strace: open(\"/proc/.../status\", ...)");
+			return -1;
+		}
+	} else
+		tcp->pfd_status = -1;
+#endif /* FREEBSD */
 	rebuild_pollv();
 	if (!attaching) {
 		/*
@@ -655,15 +684,21 @@ int attaching;
 				perror("strace: PIOCSTATUS");
 				return -1;
 			}
+#ifndef FREEBSD			
 			if (tcp->status.PR_FLAGS & PR_ASLEEP)
-				break;
+#else
+			if (tcp->status.state == 1)
+#endif
+			    break;
 		}
 	}
+#ifndef FREEBSD
 	/* Stop the process so that we own the stop. */
 	if (IOCTL(tcp->pfd, PIOCSTOP, (char *)NULL) < 0) {
 		perror("strace: PIOCSTOP");
 		return -1;
 	}
+#endif	
 #ifdef PIOCSET
 	/* Set Run-on-Last-Close. */
 	arg = PR_RLC;
@@ -678,6 +713,7 @@ int attaching;
 		return -1;
 	}
 #else  /* !PIOCSET */
+#ifndef FREEBSD	
 	if (ioctl(tcp->pfd, PIOCSRLC) < 0) {
 		perror("PIOCSRLC");
 		return -1;
@@ -686,7 +722,20 @@ int attaching;
 		perror("PIOC{S,R}FORK");
 		return -1;
 	}
+#else /* FREEBSD */
+	/* just unset the PF_LINGER flag for the Run-on-Last-Close. */
+	if (ioctl(tcp->pfd, PIOCGFL, &arg) < 0) {
+	        perror("PIOCGFL");
+	        return -1;
+	}
+	arg &= ~PF_LINGER;
+	if (ioctl(tcp->pfd, PIOCSFL, arg) < 0) {
+	        perror("PIOCSFL");
+	        return -1;
+	}
+#endif /* FREEBSD */
 #endif /* !PIOCSET */
+#ifndef FREEBSD
 	/* Enable all syscall entries. */
 	prfillset(&sc_enter);
 	if (IOCTL(tcp->pfd, PIOCSENTRY, &sc_enter) < 0) {
@@ -711,6 +760,14 @@ int attaching;
 		perror("PIOCSFAULT");
 		return -1;
 	}
+#else /* FREEBSD */
+	/* set events flags. */
+	arg = S_SIG | S_SCE | S_SCX ;
+	if(ioctl(tcp->pfd, PIOCBIS, arg) < 0) {
+		perror("PIOCBIS");
+		return -1;
+	}
+#endif /* FREEBSD */
 	if (!attaching) {
 #ifdef MIPS
 		/*
@@ -719,13 +776,19 @@ int attaching;
 		 */
 		kill(tcp->pid, SIGINT);
 #else /* !MIPS */
+#ifdef PRSABORT	
 		/* The child is in a pause(), abort it. */
 		arg = PRSABORT;
 		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
 			perror("PIOCRUN");
 			return -1;
 		}
-#endif /* !MIPS */
+#endif		
+#endif /* !MIPS*/
+#ifdef FREEBSD
+		/* wake up the child if it received the SIGSTOP */
+		kill(tcp->pid, SIGCONT);
+#endif		
 		for (;;) {
 			/* Wait for the child to do something. */
 			if (IOCTL_WSTOP (tcp) < 0) {
@@ -733,22 +796,40 @@ int attaching;
 				return -1;
 			}
 			if (tcp->status.PR_WHY == PR_SYSENTRY) {
-#ifdef HAVE_PR_SYSCALL
-				int scno = tcp->status.pr_syscall;
-#else /* !HAVE_PR_SYSCALL */
-				int scno = tcp->status.PR_WHAT;
-#endif /* !HAVE_PR_SYSCALL */
-				if (scno == SYS_execve)
+				tcp->flags &= ~TCB_INSYSCALL;
+				get_scno(tcp);
+				if (tcp->scno == SYS_execve)
 					break;
 			}
 			/* Set it running: maybe execve will be next. */
+#ifndef FREEBSD
 			arg = 0;
 			if (IOCTL(tcp->pfd, PIOCRUN, &arg) < 0) {
+#else /* FREEBSD */
+			if (IOCTL(tcp->pfd, PIOCRUN, 0) < 0) {
+#endif /* FREEBSD */			  
 				perror("PIOCRUN");
 				return -1;
 			}
+#ifdef FREEBSD
+			/* handle the case where we "opened" the child before
+			   it did the kill -STOP */
+			if (tcp->status.PR_WHY == PR_SIGNALLED &&
+			    tcp->status.PR_WHAT == SIGSTOP)
+			        kill(tcp->pid, SIGCONT);
+#endif			
 		}
+#ifndef FREEBSD
 	}
+#else /* FREEBSD */
+	} else {
+	       /* little hack to show the current syscall */
+	       IOCTL_STATUS(tcp);
+	       tcp->flags &= ~TCB_INSYSCALL;
+	       tcp->status.why = PR_SYSENTRY;
+	       trace_syscall(tcp);
+	}
+#endif /* FREEBSD */
 #ifndef HAVE_POLLABLE_PROCFS
 	if (proc_poll_pipe[0] != -1)
 		proc_poller(tcp->pfd);
@@ -762,7 +843,7 @@ int attaching;
 	return 0;
 }
 
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 
 static struct tcb *
 pid2tcb(pid)
@@ -780,7 +861,7 @@ int pid;
 	return NULL;
 }
 
-#ifdef SVR4
+#ifdef USE_PROCFS
 
 static struct tcb *
 pfd2tcb(pfd)
@@ -798,7 +879,7 @@ int pfd;
 	return NULL;
 }
 
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 
 void
 droptcb(tcp)
@@ -812,7 +893,17 @@ struct tcb *tcp;
 	if (tcp->pfd != -1) {
 		close(tcp->pfd);
 		tcp->pfd = -1;
-#ifdef SVR4
+#ifdef FREEBSD
+		if (tcp->pfd_reg != -1) {
+		        close(tcp->pfd_reg);
+		        tcp->pfd_reg = -1;
+		}
+		if (tcp->pfd_status != -1) {
+			close(tcp->pfd_status);
+			tcp->pfd_status = -1;
+		}
+#endif /* !FREEBSD */		
+#ifdef USE_PROCFS
 		rebuild_pollv();
 #endif
 	}
@@ -827,7 +918,7 @@ struct tcb *tcp;
 	tcp->outf = 0;
 }
 
-#ifndef SVR4
+#ifndef USE_PROCFS
 
 static int
 resume(tcp)
@@ -852,7 +943,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 
 /* detach traced process; continue with sig */
 
@@ -934,10 +1025,10 @@ int sig;
 		perror("detach: ptrace(PTRACE_DETACH, ...)");
 #endif /* SUNOS4 */
 
-#ifndef SVR4
+#ifndef USE_PROCFS
 	if (waiting_parent(tcp))
 		error = resume(tcp->parent);
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 
 	if (!qflag)
 		fprintf(stderr, "Process %u detached\n", tcp->pid);
@@ -946,7 +1037,7 @@ int sig;
 	return error;
 }
 
-#ifdef SVR4
+#ifdef USE_PROCFS
 
 static void
 reaper(sig)
@@ -966,7 +1057,7 @@ int sig;
 	}
 }
 
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 
 static void
 cleanup()
@@ -1054,7 +1145,7 @@ int sig;
 
 #endif /* HAVE_STRSIGNAL */
 
-#ifdef SVR4
+#ifdef USE_PROCFS
 
 static void
 rebuild_pollv()
@@ -1141,6 +1232,9 @@ int pfd;
 	int i;
 	int n;
 	struct rlimit rl;
+#ifdef FREEBSD
+	struct procfs_status pfs;
+#endif /* FREEBSD */
 
 	switch (fork()) {
 	case -1:
@@ -1180,7 +1274,11 @@ int pfd;
 	pollinfo.fd = pfd;
 	pollinfo.pid = getpid();
 	for (;;) {
-		if (ioctl(pfd, PIOCWSTOP, NULL) < 0)
+#ifndef FREEBSD
+	        if (ioctl(pfd, PIOCWSTOP, NULL) < 0)
+#else /* FREEBSD */
+	        if (ioctl(pfd, PIOCWSTOP, &pfs) < 0)
+#endif /* FREEBSD */
 		{
 			switch (errno) {
 			case EINTR:
@@ -1331,7 +1429,17 @@ trace()
 	FOUND:
 		/* Get the status of the process. */
 		if (!interrupted) {
+#ifndef FREEBSD
 			ioctl_result = IOCTL_WSTOP (tcp);
+#else /* FREEBSD */
+			/* Thanks to some scheduling mystery, the first poller
+			   sometimes waits for the already processed end of fork
+			   event. Doing a non blocking poll here solves the problem. */
+			if (proc_poll_pipe[0] != -1)
+				ioctl_result = IOCTL_STATUS (tcp);
+			else
+			  	ioctl_result = IOCTL_WSTOP (tcp);
+#endif /* FREEBSD */			  
 			ioctl_errno = errno;
 #ifndef HAVE_POLLABLE_PROCFS
 			if (proc_poll_pipe[0] != -1) {
@@ -1354,6 +1462,9 @@ trace()
 			case EINTR:
 			case EBADF:
 				continue;
+#ifdef FREEBSD
+			case ENOTTY:
+#endif			  
 			case ENOENT:
 				droptcb(tcp);
 				continue;
@@ -1371,15 +1482,27 @@ trace()
 
 		if (cflag) {
 			struct timeval stime;
+#ifdef FREEBSD
+			char buf[1024];
+			int len;
 
+			if ((len = pread(tcp->pfd_status, buf, sizeof(buf) - 1, 0)) > 0) {
+				buf[len] = '\0';
+				sscanf(buf,
+				       "%*s %*d %*d %*d %*d %*d,%*d %*s %*d,%*d %*d,%*d %ld,%ld",
+				       &stime.tv_sec, &stime.tv_usec);
+			} else
+				stime.tv_sec = stime.tv_usec = 0;
+#else /* !FREEBSD */			
 			stime.tv_sec = tcp->status.pr_stime.tv_sec;
 			stime.tv_usec = tcp->status.pr_stime.tv_nsec/1000;
+#endif /* !FREEBSD */
 			tv_sub(&tcp->dtime, &stime, &tcp->stime);
 			tcp->stime = stime;
 		}
-
 		what = tcp->status.PR_WHAT;
 		switch (tcp->status.PR_WHY) {
+#ifndef FREEBSD
 		case PR_REQUESTED:
 			if (tcp->status.PR_FLAGS & PR_ASLEEP) {
 				tcp->status.PR_WHY = PR_SYSENTRY;
@@ -1389,6 +1512,7 @@ trace()
 				}
 			}
 			break;
+#endif /* !FREEBSD */
 		case PR_SYSENTRY:
 #ifdef POLL_HACK
 		        in_syscall = tcp;
@@ -1414,13 +1538,21 @@ trace()
 				printtrailer(tcp);
 			}
 			break;
+#ifdef FREEBSD
+		case 0: /* handle case we polled for nothing */
+		  	continue;
+#endif			
 		default:
 			fprintf(stderr, "odd stop %d\n", tcp->status.PR_WHY);
 			exit(1);
 			break;
 		}
 		arg = 0;
+#ifndef FREEBSD		
 		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
+#else		  
+		if (IOCTL (tcp->pfd, PIOCRUN, 0) < 0) {
+#endif		  
 			perror("PIOCRUN");
 			exit(1);
 		}
@@ -1428,7 +1560,7 @@ trace()
 	return 0;
 }
 
-#else /* !SVR4 */
+#else /* !USE_PROCFS */
 
 static int
 trace()
@@ -1667,7 +1799,7 @@ trace()
 	return 0;
 }
 
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 
 static int curcol;
 

@@ -49,6 +49,10 @@
 #include <machine/reg.h>
 #endif /* SUNOS4 */
 
+#ifdef FREEBSD
+#include <sys/ptrace.h>
+#endif
+
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
@@ -333,7 +337,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef SVR4
+#ifdef USE_PROCFS
 
 int
 sys_fork(tcp)
@@ -372,12 +376,13 @@ struct tcb *tcp;
 			fprintf(stderr, "sys_fork: tcb table full\n");
 			return 0;
 		}
-		proc_open(tcpchild, 1);
+		if (proc_open(tcpchild, 1) < 0)
+		  	droptcb(tcpchild);
 	}
 	return 0;
 }
 
-#else /* !SVR4 */
+#else /* !USE_PROCFS */
 
 #ifdef LINUX
 
@@ -673,9 +678,9 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 
-#if defined(SUNOS4) || defined(LINUX)
+#if defined(SUNOS4) || defined(LINUX) || defined(FREEBSD)
 
 int
 sys_vfork(tcp)
@@ -686,7 +691,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* SUNOS4 || LINUX */
+#endif /* SUNOS4 || LINUX || FREEBSD */
 
 #ifndef LINUX
 
@@ -832,7 +837,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef LINUX
+#if defined(LINUX) || defined(FREEBSD)
 int
 sys_setresuid(tcp)
      struct tcb *tcp;
@@ -858,7 +863,7 @@ sys_setresgid(tcp)
 	return 0;
 }
 
-#endif /* LINUX */
+#endif /* LINUX || FREEBSD */
 
 int
 sys_setgroups(tcp)
@@ -1280,6 +1285,25 @@ struct tcb *tcp;
 
 #endif /* SVR4 */
 
+#ifdef FREEBSD
+int
+sys_wait(tcp)
+struct tcb *tcp;
+{
+	int status;
+	
+	if (exiting(tcp)) {
+		if (!syserror(tcp)) {
+			if (umove(tcp, tcp->u_arg[0], &status) < 0)
+				tprintf("%#lx", tcp->u_arg[0]);
+			else
+				printstatus(status);
+		}
+	}
+	return 0;
+}
+#endif
+
 int
 sys_waitpid(tcp)
 struct tcb *tcp;
@@ -1608,6 +1632,7 @@ struct tcb *tcp;
 #ifndef SVR4
 
 static struct xlat ptrace_cmds[] = {
+#ifndef FREEBSD	
 	{ PTRACE_TRACEME,	"PTRACE_TRACEME"	},
 	{ PTRACE_PEEKTEXT,	"PTRACE_PEEKTEXT",	},
 	{ PTRACE_PEEKDATA,	"PTRACE_PEEKDATA",	},
@@ -1653,9 +1678,29 @@ static struct xlat ptrace_cmds[] = {
 #endif /* !I386 */
 	{ PTRACE_GETUCODE,	"PTRACE_GETUCODE"	},
 #endif /* SUNOS4 */
+#else /* FREEBSD */
+	{ PT_TRACE_ME,		"PT_TRACE_ME"		},
+	{ PT_READ_I,		"PT_READ_I"		},
+	{ PT_READ_D,		"PT_READ_D"		},
+	{ PT_WRITE_I,		"PT_WRITE_I"		},
+	{ PT_WRITE_D,		"PT_WRITE_D"		},
+	{ PT_READ_U,		"PT_WRITE_U"		},
+	{ PT_CONTINUE,		"PT_CONTINUE"		},
+	{ PT_KILL,		"PT_KILL"		},
+	{ PT_STEP,		"PT_STEP"		},
+	{ PT_ATTACH,		"PT_ATTACH"		},
+	{ PT_DETACH,		"PT_DETACH"		},
+	{ PT_GETREGS,		"PT_GETREGS"		},
+	{ PT_SETREGS,		"PT_SETREGS"		},
+	{ PT_GETFPREGS,		"PT_GETFPREGS"		},
+	{ PT_SETFPREGS,		"PT_SETFPREGS"		},
+	{ PT_GETDBREGS,		"PT_GETDBREGS"		},
+	{ PT_SETDBREGS,		"PT_SETDBREGS"		},
+#endif /* FREEBSD */
 	{ 0,			NULL			},
 };
 
+#ifndef FREEBSD
 #ifndef SUNOS4_KERNEL_ARCH_KLUDGE
 static
 #endif /* !SUNOS4_KERNEL_ARCH_KLUDGE */
@@ -2038,6 +2083,7 @@ struct xlat struct_user_offsets[] = {
 	{ sizeof(struct user),	"sizeof(struct user)"			},
 	{ 0,			NULL					},
 };
+#endif
 
 int
 sys_ptrace(tcp)
@@ -2049,10 +2095,15 @@ struct tcb *tcp;
 
 	cmd = xlookup(ptrace_cmds, tcp->u_arg[0]);
 	if (!cmd)
+#ifndef FREEBSD
 		cmd = "PTRACE_???";
+#else
+		cmd = "PT_???";
+#endif		
 	if (entering(tcp)) {
 		tprintf("%s, %lu, ", cmd, tcp->u_arg[1]);
 		addr = tcp->u_arg[2];
+#ifndef FREEBSD
 		if (tcp->u_arg[0] == PTRACE_PEEKUSER
 			|| tcp->u_arg[0] == PTRACE_POKEUSER) {
 			for (x = struct_user_offsets; x->str; x++) {
@@ -2069,6 +2120,7 @@ struct tcb *tcp;
 				tprintf("%s, ", x->str);
 		}
 		else
+#endif
 			tprintf("%#lx, ", tcp->u_arg[2]);
 #ifdef LINUX
 		switch (tcp->u_arg[0]) {
@@ -2113,6 +2165,10 @@ struct tcb *tcp;
 		}
 	}
 #endif /* SUNOS4 */
+#ifdef FREEBSD
+		tprintf("%lu", tcp->u_arg[3]);
+	}
+#endif /* FREEBSD */
 	return 0;
 }
 

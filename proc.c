@@ -186,3 +186,88 @@ int code, arg;
 #endif /* HAVE_MP_PROCFS */
 #endif /* SVR4 */
 
+#ifdef FREEBSD
+#include <sys/pioctl.h>
+
+static struct xlat proc_status_why[] = {
+	{ S_EXEC,	"S_EXEC"	},
+	{ S_SIG,	"S_SIG"		},
+	{ S_SCE,	"S_SCE"		},
+	{ S_SCX,	"S_SCX"		},
+	{ S_CORE,	"S_CORE"	},
+	{ S_EXIT,	"S_EXIT"	},
+	{ 0,		NULL		}
+};
+
+static struct xlat proc_status_flags[] = {
+	{ PF_LINGER,	"PF_LINGER"	},
+	{ PF_ISUGID,	"PF_ISUGID"	},
+	{ 0,		NULL		}
+};
+
+int
+proc_ioctl(tcp, code, arg)
+struct tcb *tcp;
+int code, arg;
+{
+	int val;
+	struct procfs_status status;
+
+	if (entering(tcp))
+		return 0;
+
+	switch (code) {
+	case PIOCSTATUS:
+	case PIOCWAIT:
+		if (arg == 0)
+			tprintf(", NULL");
+		else if (syserror(tcp))
+			tprintf(", %x", arg);
+		else if (umove(tcp, arg, &status) < 0)
+			tprintf(", {...}");
+		else {
+			tprintf(", {state=%d, flags=", status.state);
+			if (!printflags(proc_status_flags, status.flags))
+				tprintf("0");
+			tprintf(", events=");
+			printflags(proc_status_why, status.events);
+			tprintf(", why=");
+			printxval(proc_status_why, status.why, "S_???");
+			tprintf(", val=%lu}", status.val);
+		}
+		return 1;
+	case PIOCBIS:
+		if (arg) {
+			tprintf(", ");
+			printflags(proc_status_why, arg);
+		} else
+			tprintf(", 0");
+		return 1;
+		return 1;
+	case PIOCSFL:
+		if (arg) {
+			tprintf(", ");
+			printflags(proc_status_flags, arg);
+		} else
+			tprintf(", 0");
+		return 1;
+	case PIOCGFL:
+	        if (syserror(tcp))
+			tprintf(", %#x", arg);
+		else if (umove(tcp, arg, &val) < 0)
+			tprintf(", {...}");
+		else {
+			tprintf(", [");
+			if (val)
+				printflags(proc_status_flags, val);
+			else
+				tprintf("0");
+			tprintf("]");
+		}
+		return 1;
+	default:
+		/* ad naseum */
+		return 0;
+	}
+}
+#endif

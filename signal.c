@@ -146,7 +146,7 @@ int nsignals2 = sizeof signalent2 / sizeof signalent2[0];
 char **signalent;
 int nsignals;
 
-#ifdef SUNOS4
+#if defined(SUNOS4) || defined(FREEBSD)
 
 static struct xlat sigvec_flags[] = {
 	{ SV_ONSTACK,	"SV_ONSTACK"	},
@@ -156,7 +156,7 @@ static struct xlat sigvec_flags[] = {
 	{ 0,		NULL		},
 };
 
-#endif /* SUNOS4 */
+#endif /* SUNOS4 || FREEBSD */
 
 #ifdef HAVE_SIGACTION
 
@@ -429,7 +429,7 @@ int sig;
 #endif /* !SVR4 */
 }
 
-#if defined(SUNOS4)
+#if defined(SUNOS4) || defined(FREEBSD)
 
 int
 sys_sigvec(tcp)
@@ -534,7 +534,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* SUNOS4 */
+#endif /* SUNOS4 || FREEBSD */
 
 #ifndef SVR4
 
@@ -546,12 +546,14 @@ struct tcb *tcp;
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[0], &sigm);
 		printsigmask(&sigm, 0);
+#ifndef USE_PROCFS
 		if ((tcp->u_arg[0] & sigmask(SIGTRAP))) {
 			/* Mark attempt to block SIGTRAP */
 			tcp->flags |= TCB_SIGTRAPPED;
 			/* Send unblockable signal */
 			kill(tcp->pid, SIGSTOP);
 		}
+#endif /* !USE_PROCFS */		
 	}
 	else if (!syserror(tcp)) {
 		sigset_t sigm;
@@ -622,21 +624,21 @@ struct tcb *tcp;
 			tprintf("{SIG_DFL}");
 			break;
 		case (long) SIG_IGN:
-#ifndef SVR4
+#ifndef USE_PROCFS
 			if (tcp->u_arg[0] == SIGTRAP) {
 				tcp->flags |= TCB_SIGTRAPPED;
 				kill(tcp->pid, SIGSTOP);
 			}
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 			tprintf("{SIG_IGN}");
 			break;
 		default:
-#ifndef SVR4
+#ifndef USE_PROCFS
 			if (tcp->u_arg[0] == SIGTRAP) {
 				tcp->flags |= TCB_SIGTRAPPED;
 				kill(tcp->pid, SIGSTOP);
 			}
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 			tprintf("{%#lx, ", (long) sa.SA_HANDLER);
 #ifndef LINUX
 			printsigmask (&sa.sa_mask, 0);
@@ -674,21 +676,21 @@ struct tcb *tcp;
 			tprintf("SIG_DFL");
 			break;
 		case (int) SIG_IGN:
-#ifndef SVR4
+#ifndef USE_PROCFS
 			if (tcp->u_arg[0] == SIGTRAP) {
 				tcp->flags |= TCB_SIGTRAPPED;
 				kill(tcp->pid, SIGSTOP);
 			}
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 			tprintf("SIG_IGN");
 			break;
 		default:
-#ifndef SVR4
+#ifndef USE_PROCFS
 			if (tcp->u_arg[0] == SIGTRAP) {
 				tcp->flags |= TCB_SIGTRAPPED;
 				kill(tcp->pid, SIGSTOP);
 			}
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 			tprintf("%#lx", tcp->u_arg[1]);
 		}
 		return 0;
@@ -960,7 +962,7 @@ struct tcb *tcp;
 
 #endif /* LINUX */
 
-#ifdef SVR4
+#if defined(SVR4) || defined(FREEBSD)
 
 int
 sys_sigsuspend(tcp)
@@ -976,6 +978,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#ifndef FREEBSD
 static struct xlat ucontext_flags[] = {
 	{ UC_SIGMASK,	"UC_SIGMASK"	},
 	{ UC_STACK,	"UC_STACK"	},
@@ -988,10 +991,10 @@ static struct xlat ucontext_flags[] = {
 #endif
 	{ 0,		NULL		},
 };
+#endif /* !FREEBSD */
+#endif /* SVR4 || FREEBSD */
 
-#endif
-
-#if defined SVR4 || defined LINUX
+#if defined SVR4 || defined LINUX || defined FREEBSD
 #if defined LINUX && !defined SS_ONSTACK
 #define SS_ONSTACK      1
 #define SS_DISABLE      2
@@ -1003,6 +1006,9 @@ typedef struct
 	size_t ss_size;
 } stack_t;
 #endif
+#endif
+#ifdef FREEBSD
+#define stack_t struct sigaltstack
 #endif
 
 static struct xlat sigaltstack_flags[] = {
@@ -1082,7 +1088,7 @@ struct tcb *tcp;
 
 #endif /* SVR4 */
 
-#ifdef LINUX
+#if defined(LINUX) || defined(FREEBSD)
 
 static int
 print_stack_t(tcp, addr)

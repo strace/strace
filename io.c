@@ -63,13 +63,47 @@ struct tcb *tcp;
 	return 0;
 }
 
+void
+tprint_iov(tcp, len, addr)
+struct tcb * tcp;
+int len;
+char * addr;
+{
+	struct iovec *iov;
+	int i;
+
+
+	if (!len) {
+		tprintf("[]");
+		return;
+	}
+	  
+	if ((iov = (struct iovec *) malloc(len * sizeof *iov)) == NULL) {
+		fprintf(stderr, "No memory");
+		return;
+	}
+	if (umoven(tcp, (int) addr,
+		   len * sizeof *iov, (char *) iov) < 0) {
+		tprintf("%#lx", tcp->u_arg[1]);
+	} else {
+		tprintf("[");
+		for (i = 0; i < len; i++) {
+			if (i)
+				tprintf(", ");
+			tprintf("{");
+			printstr(tcp, (long) iov[i].iov_base,
+				iov[i].iov_len);
+			tprintf(", %lu}", (unsigned long)iov[i].iov_len);
+		}
+		tprintf("]");
+	}
+	free((char *) iov);
+}
+
 int
 sys_readv(tcp)
 struct tcb *tcp;
 {
-	struct iovec *iov;
-	int i, len;
-
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 	} else {
@@ -78,27 +112,7 @@ struct tcb *tcp;
 					tcp->u_arg[1], tcp->u_arg[2]);
 			return 0;
 		}
-		len = tcp->u_arg[2];
-		if ((iov = (struct iovec *) malloc(len * sizeof *iov)) == NULL) {
-			fprintf(stderr, "No memory");
-			return 0;
-		}
-		if (umoven(tcp, tcp->u_arg[1],
-				len * sizeof *iov, (char *) iov) < 0) {
-			tprintf("%#lx", tcp->u_arg[1]);
-		} else {
-			tprintf("[");
-			for (i = 0; i < len; i++) {
-				if (i)
-					tprintf(", ");
-				tprintf("{");
-				printstr(tcp, (long) iov[i].iov_base,
-					iov[i].iov_len);
-				tprintf(", %lu}", (unsigned long)iov[i].iov_len);
-			}
-			tprintf("]");
-		}
-		free((char *) iov);
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
@@ -108,39 +122,15 @@ int
 sys_writev(tcp)
 struct tcb *tcp;
 {
-	struct iovec *iov;
-	int i, len;
-
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		len = tcp->u_arg[2];
-		iov = (struct iovec *) malloc(len * sizeof *iov);
-		if (iov == NULL) {
-			fprintf(stderr, "No memory");
-			return 0;
-		}
-		if (umoven(tcp, tcp->u_arg[1],
-				len * sizeof *iov, (char *) iov) < 0) {
-			tprintf("%#lx", tcp->u_arg[1]);
-		} else {
-			tprintf("[");
-			for (i = 0; i < len; i++) {
-				if (i)
-					tprintf(", ");
-				tprintf("{");
-				printstr(tcp, (long) iov[i].iov_base,
-					iov[i].iov_len);
-				tprintf(", %lu}", (unsigned long)iov[i].iov_len);
-			}
-			tprintf("]");
-		}
-		free((char *) iov);
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
 }
 
-#ifdef SVR4
+#if defined(SVR4) || defined(FREEBSD)
 
 int
 sys_pread(tcp)
@@ -157,9 +147,14 @@ struct tcb *tcp;
 		/* off_t is signed int */
 		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 #else
+#ifndef FREEBSD
 		tprintf(", %lu, %llu", tcp->u_arg[2],
 				(((unsigned long long) tcp->u_arg[4]) << 32
 				 | tcp->u_arg[3]));
+#else
+		tprintf(", %lu, %llu", tcp->u_arg[2], 
+				(((off_t) tcp->u_arg[3]) << 32) +  tcp->u_arg[4]);
+#endif
 #endif
 	}
 	return 0;
@@ -176,14 +171,61 @@ struct tcb *tcp;
 		/* off_t is signed int */
 		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 #else
+#ifndef FREEBSD
 		tprintf(", %lu, %llu", tcp->u_arg[2],
 				(((unsigned long long) tcp->u_arg[4]) << 32
 				 | tcp->u_arg[3]));
+#else
+		tprintf(", %lu, %llu", tcp->u_arg[2],
+				(((off_t) tcp->u_arg[3]) << 32) + tcp->u_arg[4]);
+#endif
 #endif
 	}
 	return 0;
 }
-#endif /* SVR4 */
+#endif /* SVR4 || FREEBSD */
+
+#ifdef FREEBSD
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int
+sys_sendfile(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, %ld, %llu, %lu", tcp->u_arg[0], tcp->u_arg[1],
+			(((unsigned long long) tcp->u_arg[3]) << 32 |
+			 tcp->u_arg[2]), tcp->u_arg[4]);
+	} else {
+		off_t offset;
+
+		if (!tcp->u_arg[5])
+			tprintf(", NULL");
+		else {
+			struct sf_hdtr hdtr;
+
+			if (umove(tcp, tcp->u_arg[5], &hdtr) < 0)
+				tprintf(", %#lx", tcp->u_arg[5]);
+			else {
+				tprintf(", { ");
+				tprint_iov(tcp, hdtr.hdr_cnt, hdtr.headers);
+				tprintf(", %u, ", hdtr.hdr_cnt);
+				tprint_iov(tcp, hdtr.trl_cnt, hdtr.trailers);
+				tprintf(", %u }", hdtr.hdr_cnt);
+			}
+		}
+		if (!tcp->u_arg[6])
+			tprintf(", NULL");
+		else if (umove(tcp, tcp->u_arg[6], &offset) < 0)
+			tprintf(", %#lx", tcp->u_arg[6]);
+		else
+			tprintf(", [%llu]", offset);
+		tprintf(", %lu", tcp->u_arg[7]);
+	}
+	return 0;
+}
+#endif /* FREEBSD */
 
 #ifdef LINUX
 int

@@ -134,6 +134,22 @@ static struct xlat mmap_flags[] = {
 #ifdef MAP_LOCKED
 	{ MAP_LOCKED,"MAP_LOCKED"},
 #endif
+	/* FreeBSD ones */
+#ifdef MAP_ANON
+	{ MAP_ANON,		"MAP_ANON"	},
+#endif
+#ifdef MAP_HASSEMAPHORE
+	{ MAP_HASSEMAPHORE,	"MAP_HASSEMAPHORE"	},
+#endif
+#ifdef MAP_STACK
+	{ MAP_STACK,		"MAP_STACK"	},
+#endif
+#ifdef MAP_NOSYNC
+	{ MAP_NOSYNC,		"MAP_NOSYNC"	},
+#endif
+#ifdef MAP_NOCORE
+	{ MAP_NOCORE,		"MAP_NOCORE"	},
+#endif
 	{ 0,		NULL		},
 };
 
@@ -155,8 +171,12 @@ long *u_arg;
 		printflags(mmap_prot, u_arg[2]);
 		tprintf(", ");
 		/* flags */
+#ifdef MAP_TYPE
 		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
 		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
+#else
+		printflags(mmap_flags, u_arg[3]);
+#endif
 		/* fd */
 		tprintf(", %ld, ", u_arg[4]);
 		/* offset */

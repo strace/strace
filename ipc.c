@@ -32,7 +32,7 @@
 
 #include "defs.h"
 
-#if defined(LINUX) || defined(SUNOS4)
+#if defined(LINUX) || defined(SUNOS4) || defined(FREEBSD)
 
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -98,8 +98,12 @@ static struct xlat shmctl_flags[] = {
 	{ SHM_STAT,	"SHM_STAT"	},
 	{ SHM_INFO,	"SHM_INFO"	},
 #endif /* LINUX */
+#ifdef SHM_LOCK	
 	{ SHM_LOCK,	"SHM_LOCK"	},
+#endif
+#ifdef SHM_UNLOCK	
 	{ SHM_UNLOCK,	"SHM_UNLOCK"	},
+#endif	
 	{ 0,		NULL		},
 };
 
@@ -352,4 +356,4 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* defined(LINUX) || defined(SUNOS4) */
+#endif /* defined(LINUX) || defined(SUNOS4) || defined(FREEBSD) */

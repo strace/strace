@@ -630,7 +630,7 @@ char *laddr;
 #endif /* !oldway */
 #endif /* SUNOS4 */
 
-#ifdef SVR4
+#ifdef USE_PROCFS
 #ifdef HAVE_MP_PROCFS
 	if (pread(tcp->pfd_as, laddr, len, addr) == -1)
 		return -1;
@@ -651,7 +651,7 @@ char *laddr;
 		return -1;
 #endif /* !HAVE_PREAD */
 #endif /* HAVE_MP_PROCFS */
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 
 	return 0;
 }
@@ -667,9 +667,9 @@ long addr;
 int len;
 char *laddr;
 {
-#ifdef SVR4
+#ifdef USE_PROCFS
 	return umoven(tcp, addr, len, laddr);
-#else /* !SVR4 */
+#else /* !USE_PROCFS */
 	int started = 0;
 	int pid = tcp->pid;
 	int i, n, m;
@@ -719,7 +719,7 @@ char *laddr;
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 	return 0;
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 }
 
 #ifdef LINUX
@@ -821,7 +821,7 @@ char *laddr;
 
 #endif /* SUNOS4 */
 
-#ifndef SVR4
+#ifndef USE_PROCFS
 
 int
 upeek(pid, off, res)
@@ -865,7 +865,7 @@ long *res;
 	return 0;
 }
 
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 
 long
 getpc(tcp)
@@ -925,6 +925,11 @@ struct tcb *tcp;
 	return 0;
 #endif /* SVR4 */
 
+#ifdef FREEBSD
+	struct reg regs;
+	pread(tcp->pfd_reg, &regs, sizeof(regs), 0);
+	return regs.r_eip;
+#endif /* FREEBSD */
 }
 
 void
@@ -999,9 +1004,14 @@ struct tcb *tcp;
 	tprintf("[????????] ");
 #endif
 
+#ifdef FREEBSD
+	struct reg regs;
+	pread(tcp->pfd_reg, &regs, sizeof(regs), 0);
+	tprintf("[%08x] ", regs.r_eip);
+#endif /* FREEBSD */
 }
 
-#ifndef SVR4
+#ifndef USE_PROCFS
 
 int
 setbpt(tcp)
@@ -1388,7 +1398,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* !SVR4 */
+#endif /* !USE_PROCFS */
 
 #ifdef SUNOS4
 

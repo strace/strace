@@ -543,6 +543,19 @@ static struct xlat sysconflimits[] = {
 	{ 0,		NULL		},
 };
 
+int
+sys_sysconf(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printxval(sysconflimits, tcp->u_arg[0], "_SC_???");
+	}
+	return 0;
+}
+
+#endif /* SUNOS4 */
+
+#if defined(SUNOS4) || defined(FREEBSD)
 static struct xlat pathconflimits[] = {
 #ifdef	_PC_LINK_MAX
 	{ _PC_LINK_MAX,	"_PC_LINK_MAX"	},	/* max links to file/dir */
@@ -574,15 +587,6 @@ static struct xlat pathconflimits[] = {
 	{ 0,		NULL		},
 };
 
-int
-sys_sysconf(tcp)
-struct tcb *tcp;
-{
-	if (entering(tcp)) {
-		printxval(sysconflimits, tcp->u_arg[0], "_SC_???");
-	}
-	return 0;
-}
 
 int
 sys_pathconf(tcp)
@@ -591,7 +595,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
 		tprintf(", ");
-		printxval(pathconflimits, tcp->u_arg[1], "_SC_???");
+		printxval(pathconflimits, tcp->u_arg[1], "_PC_???");
 	}
 	return 0;
 }
@@ -602,12 +606,12 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
-		printxval(pathconflimits, tcp->u_arg[1], "_SC_???");
+		printxval(pathconflimits, tcp->u_arg[1], "_PC_???");
 	}
 	return 0;
 }
 
-#endif /* SUNOS4 */
+#endif /* SUNOS4 || FREEBSD */
 
 #ifdef SVR4
 
@@ -1903,6 +1907,55 @@ struct tcb *tcp;
 }
 #endif
 
+#ifdef FREEBSD
+#include <sys/sysctl.h>
+
+int sys___sysctl(tcp)
+struct tcb *tcp;
+{
+	int qoid[CTL_MAXNAME+2];
+	char ctl[1024];
+	size_t len;
+	int i, numeric;
+	
+	if (entering(tcp)) {
+		if (tcp->u_arg[1] < 0 || tcp->u_arg[1] > CTL_MAXNAME ||
+		    (umoven(tcp, tcp->u_arg[0], tcp->u_arg[1] * sizeof(int),
+			    (char *) (qoid + 2)) < 0))
+			tprintf("[...], ");
+		else {
+			/* Use sysctl to ask the name of the current MIB
+			   This uses the undocumented "Staff-functions" used
+			   by the sysctl program. See kern_sysctl.c for
+			   details. */
+			qoid[0] = 0; /* sysctl */
+			qoid[1] = 1; /* name */
+			i = sizeof(ctl);
+			tprintf("[");
+			if (sysctl(qoid, tcp->u_arg[1] + 2, ctl, &i, 0, 0) >= 0) {
+				numeric = !abbrev(tcp);
+				tprintf("%s%s", ctl, numeric ? ", " : "");
+			} else
+				numeric = 1;
+			if (numeric) {
+				for (i = 0; i < tcp->u_arg[1]; i++)
+					tprintf("%s%d", i ? "." : "", qoid[i + 2]);
+			}
+			tprintf("], ");
+			tprintf("%lu, ", tcp->u_arg[1]);
+		}
+	} else {
+		if (!syserror(tcp) && (umove(tcp, tcp->u_arg[3], &len) >= 0)) {
+			printstr(tcp, tcp->u_arg[2], len);
+			tprintf(", [%u], ", len);
+		} else 
+			tprintf("%#lx, %#lx, ", tcp->u_arg[2], tcp->u_arg[3]);
+		printstr(tcp, tcp->u_arg[4], tcp->u_arg[5]);
+		tprintf(", %lu", tcp->u_arg[5]);
+	}
+	return 0;
+}
+#endif
 
 #if UNIXWARE >= 2
 

@@ -410,7 +410,23 @@ struct tcb *tcp;
 	}
 }
 
+#ifndef FREEBSD
 enum subcall_style { shift_style, deref_style, mask_style, door_style };
+#else /* FREEBSD */
+enum subcall_style { shift_style, deref_style, mask_style, door_style, table_style };
+
+struct subcall {
+  int call;
+  int nsubcalls;
+  int subcalls[5];
+};
+
+const struct subcall subcalls_table[] = {
+  { SYS_shmsys, 5, { SYS_shmat, SYS_shmctl, SYS_shmdt, SYS_shmget, SYS_shmctl } },
+  { SYS_semsys, 4, { SYS___semctl, SYS_semget, SYS_semop, SYS_semconfig } },
+  { SYS_msgsys, 4, { SYS_msgctl, SYS_msgget, SYS_msgsnd, SYS_msgrcv } },
+};
+#endif /* FREEBSD */
 
 #if !(defined(LINUX) && ( defined(ALPHA) || defined(IA64) || defined(MIPS) ))
 
@@ -464,6 +480,11 @@ int nsubcalls;
 enum subcall_style style;
 {
 	int i, addr, mask, arg;
+
+#ifndef FREEBSD
+	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
+		return;
+#endif	
 	switch (style) {
 	case shift_style:
 		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
@@ -513,6 +534,18 @@ enum subcall_style style;
 		else
 			tcp->u_nargs--;
 		break;
+#ifdef FREEBSD
+	case table_style:
+		for (i = 0; i < sizeof(subcalls_table) / sizeof(struct subcall); i++)
+			if (subcalls_table[i].call == tcp->scno) break;
+		if (i < sizeof(subcalls_table) / sizeof(struct subcall) &&
+		    tcp->u_arg[0] >= 0 && tcp->u_arg[0] < subcalls_table[i].nsubcalls) {
+			tcp->scno = subcalls_table[i].subcalls[tcp->u_arg[0]];
+			for (i = 0; i < tcp->u_nargs; i++)
+				tcp->u_arg[i] = tcp->u_arg[i + 1];
+		}
+		break;
+#endif /* FREEBSD */
 	}
 }
 #endif
@@ -602,13 +635,18 @@ struct tcb *tcp;
 	static long pc;
 #endif 
 #endif /* LINUX */
+#ifdef FREEBSD
+	struct reg regs;
+#endif /* FREEBSD */	
 
 int
 get_scno(tcp)
 struct tcb *tcp;
 {
 	long scno = 0;
+#ifndef USE_PROCFS
 	int pid = tcp->pid;
+#endif /* !PROCFS */	
 
 #ifdef LINUX
 #if defined(S390)
@@ -774,13 +812,29 @@ struct tcb *tcp;
 	if (upeek(pid, uoff(u_arg[7]), &scno) < 0)
 		return -1;
 #endif
-#ifdef SVR4
+#ifdef USE_PROCFS
 #ifdef HAVE_PR_SYSCALL
 	scno = tcp->status.pr_syscall;
 #else /* !HAVE_PR_SYSCALL */
+#ifndef FREEBSD
 	scno = tcp->status.PR_WHAT;
+#else /* FREEBSD */
+	if (pread(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
+	        perror("pread");
+                return -1;
+        }
+	switch (regs.r_eax) {
+	case SYS_syscall:
+	case SYS___syscall:
+    	        pread(tcp->pfd, &scno, sizeof(scno), regs.r_esp + sizeof(int));
+	        break;
+	default:
+	        scno = regs.r_eax;
+	        break;
+	}
+#endif /* FREEBSD */
 #endif /* !HAVE_PR_SYSCALL */
-#endif
+#endif /* USE_PROCFS */
 	if (!(tcp->flags & TCB_INSYSCALL))
 		tcp->scno = scno;
 	return 1;
@@ -791,9 +845,11 @@ int
 syscall_fixup(tcp)
 struct tcb *tcp;
 {
+#ifndef USE_PROCFS
 	int pid = tcp->pid;
+#else /* USE_PROCFS */	
+	int scno = tcp->scno;
 
-#ifdef SVR4
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		if (tcp->status.PR_WHY != PR_SYSENTRY) {
 			if (
@@ -819,7 +875,7 @@ struct tcb *tcp;
 			tcp->flags &= ~TCB_INSYSCALL;
 		}
 	}
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 #ifdef SUNOS4
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		if (scno == 0) {
@@ -1054,6 +1110,17 @@ struct tcb *tcp;
 		}
 #endif /* MIPS */
 #endif /* SVR4 */
+#ifdef FREEBSD
+		if (regs.r_eflags & PSL_C) {
+ 		        tcp->u_rval = -1;
+		        u_error = regs.r_eax;
+		} else {
+		        tcp->u_rval = regs.r_eax;
+			tcp->u_lrval =
+			  ((unsigned long long) regs.r_edx << 32) +  regs.r_eax;
+		        u_error = 0;
+		}
+#endif /* FREEBSD */	
 	tcp->u_error = u_error;
 	return 1;
 }
@@ -1061,12 +1128,17 @@ struct tcb *tcp;
 int syscall_enter(tcp)
 struct tcb *tcp;
 {
+#ifndef USE_PROCFS
 	int pid = tcp->pid;
+#endif /* !USE_PROCFS */	
 #ifdef LINUX
 #if defined(S390)
 	{
 		int i;
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			if (upeek(pid,i==0 ? PT_ORIGGPR2:PT_GPR2+(i<<2), &tcp->u_arg[i]) < 0)
 				return -1;
@@ -1075,7 +1147,10 @@ struct tcb *tcp;
 #elif defined (ALPHA)
 	{
 		int i;
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			/* WTA: if scno is out-of-bounds this will bomb. Add range-check
 			 * for scno somewhere above here!
@@ -1095,7 +1170,10 @@ struct tcb *tcp;
 
 		bsp = ia64_rse_skip_regs(bsp, -(cfm & 0x7f));
 
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; ++i) {
 			if (umoven(tcp, (unsigned long) ia64_rse_skip_regs(bsp, i), sizeof(long),
 				   (char *) &tcp->u_arg[i])
@@ -1108,7 +1186,10 @@ struct tcb *tcp;
 	  	long sp;
 	  	int i, nargs;
 
-		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	nargs = tcp->u_nargs = MAX_ARGS;
 		if(nargs > 4) {
 		  	if(upeek(pid, REG_SP, &sp) < 0)
 			  	return -1;
@@ -1128,7 +1209,10 @@ struct tcb *tcp;
 #elif defined (POWERPC)
 	{
 		int i;
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			if (upeek(pid, (i==0) ? (4*PT_ORIG_R3) : ((i+PT_R3)*4), &tcp->u_arg[i]) < 0)
 				return -1;
@@ -1137,15 +1221,21 @@ struct tcb *tcp;
 #elif defined (SPARC)
 	{
 		int i;
-	         
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = *((&regs.r_o0) + i);
 	}
 #else /* Other architecture (like i386) (32bits specific) */
 	{
 		int i;
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			if (upeek(pid, i*4, &tcp->u_arg[i]) < 0)
 				return -1;
@@ -1156,7 +1246,10 @@ struct tcb *tcp;
 #ifdef SUNOS4
 	{
 		int i;
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			struct user *u;
 
@@ -1172,7 +1265,7 @@ struct tcb *tcp;
 	 * SGI is broken: even though it has pr_sysarg, it doesn't
 	 * set them on system call entry.  Get a clue.
 	 */
-	if (sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_nsysarg;
@@ -1188,7 +1281,7 @@ struct tcb *tcp;
 	}
 #else /* !MIPS */
 #ifdef HAVE_PR_SYSCALL
-	if (sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_nsysarg;
@@ -1199,7 +1292,7 @@ struct tcb *tcp;
 	}
 #else /* !HAVE_PR_SYSCALL */
 #ifdef I386
-	if (sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 #if UNIXWARE >= 2
@@ -1213,6 +1306,31 @@ struct tcb *tcp;
 #endif /* !HAVE_PR_SYSCALL */
 #endif /* !MIPS */
 #endif /* SVR4 */
+#ifdef FREEBSD
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	    sysent[tcp->scno].nargs > tcp->status.val)
+		tcp->u_nargs = sysent[tcp->scno].nargs;
+	else 
+	  	tcp->u_nargs = tcp->status.val;
+	if (tcp->u_nargs < 0)
+		tcp->u_nargs = 0;
+	if (tcp->u_nargs > MAX_ARGS)
+		tcp->u_nargs = MAX_ARGS;
+	switch(regs.r_eax) {
+	case SYS___syscall:
+		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
+		      regs.r_esp + sizeof(int) + sizeof(quad_t));
+	  break;
+        case SYS_syscall:
+		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
+		      regs.r_esp + 2 * sizeof(int));
+	  break;
+        default:
+		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
+		      regs.r_esp + sizeof(int));
+	  break;
+	}
+#endif /* FREEBSD */
 	return 1;
 }
 
@@ -1245,7 +1363,8 @@ struct tcb *tcp;
 
 
 		internal_syscall(tcp);
-		if (!(qual_flags[tcp->scno] & QUAL_TRACE)) {
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls &&
+		    !(qual_flags[tcp->scno] & QUAL_TRACE)) {
 			tcp->flags &= ~TCB_INSYSCALL;
 			return 0;
 		}
@@ -1253,14 +1372,14 @@ struct tcb *tcp;
 		if (tcp->flags & TCB_REPRINT) {
 			printleader(tcp);
 			tprintf("<... ");
-			if (tcp->scno >= nsyscalls)
+			if (tcp->scno >= nsyscalls || tcp->scno < 0)
 				tprintf("syscall_%lu", tcp->scno);
 			else
 				tprintf("%s", sysent[tcp->scno].sys_name);
 			tprintf(" resumed> ");
 		}
 
-		if (cflag) {
+		if (cflag && tcp->scno < nsyscalls && tcp->scno >= 0) {
 			call_count[tcp->scno]++;
 			if (tcp->u_error)
 				error_count[tcp->scno]++;
@@ -1288,7 +1407,7 @@ struct tcb *tcp;
 			return 0;
 		}
 
-		if (tcp->scno >= nsyscalls
+		if (tcp->scno >= nsyscalls || tcp->scno < 0
 		    || (qual_flags[tcp->scno] & QUAL_RAW))
 			sys_res = printargs(tcp);
 		else
@@ -1296,7 +1415,8 @@ struct tcb *tcp;
 		u_error = tcp->u_error;
 		tprintf(") ");
 		tabto(acolumn);
-		if (qual_flags[tcp->scno] & QUAL_RAW) {
+		if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
+		    qual_flags[tcp->scno] & QUAL_RAW) {
 			if (u_error)
 				tprintf("= -1 (errno %ld)", u_error);
 			else
@@ -1349,10 +1469,18 @@ struct tcb *tcp;
 					tprintf("= %ld", tcp->u_rval);
 					break;
 #ifdef HAVE_LONG_LONG
-				case RVAL_LDECIMAL:
-					tprintf ("= %lld", tcp->u_lrval);
+				case RVAL_LHEX:
+					tprintf("= %#llx", tcp->u_lrval);
 					break;
-					/* LHEX, LOCTAL, LUDECIMAL... */
+				case RVAL_LOCTAL:
+					tprintf("= %#llo", tcp->u_lrval);
+					break;
+				case RVAL_LUDECIMAL:
+					tprintf("= %llu", tcp->u_lrval);
+					break;
+				case RVAL_LDECIMAL:
+					tprintf("= %lld", tcp->u_lrval);
+					break;
 #endif
 				default:
 					fprintf(stderr,
@@ -1452,6 +1580,13 @@ struct tcb *tcp;
 		break;
 #endif /* SYS_door_subcall */
 #endif /* SVR4 */
+#ifdef FREEBSD
+	case SYS_msgsys:
+	case SYS_shmsys:
+	case SYS_semsys:
+		decode_subcall(tcp, 0, 0, table_style);
+		break;
+#endif		
 #ifdef SUNOS4
 	case SYS_semsys:
 		decode_subcall(tcp, SYS_semsys_subcall,
@@ -1469,7 +1604,7 @@ struct tcb *tcp;
 	}
 
 	internal_syscall(tcp);
-	if (!(qual_flags[tcp->scno] & QUAL_TRACE)) {
+	if (tcp->scno >=0 && tcp->scno < nsyscalls && !(qual_flags[tcp->scno] & QUAL_TRACE)) {
 		tcp->flags |= TCB_INSYSCALL;
 		return 0;
 	}
@@ -1483,11 +1618,11 @@ struct tcb *tcp;
 	printleader(tcp);
 	tcp->flags &= ~TCB_REPRINT;
 	tcp_last = tcp;
-	if (tcp->scno >= nsyscalls)
+	if (tcp->scno >= nsyscalls || tcp->scno < 0)
 		tprintf("syscall_%lu(", tcp->scno);
 	else
 		tprintf("%s(", sysent[tcp->scno].sys_name);
-	if (tcp->scno >= nsyscalls ||
+	if (tcp->scno >= nsyscalls || tcp->scno < 0 || 
 	    ((qual_flags[tcp->scno] & QUAL_RAW) && tcp->scno != SYS_exit))
 		sys_res = printargs(tcp);
 	else
@@ -1545,7 +1680,11 @@ struct tcb *tcp;
 	val = tcp->status.PR_REG[CTX_V1];
 #endif /* MIPS */
 #endif /* SVR4 */
-
+#ifdef FREEBSD
+	struct reg regs;
+	pread(tcp->pfd_reg, &regs, sizeof(regs), 0);
+	val = regs.r_edx;
+#endif	
 	return val;
 }
 

@@ -105,15 +105,22 @@ long code, arg;
 #ifdef LINUX
 	case 0x89:
 #else /* !LINUX */
-	case 'r': case 's': case 'i': case 'p':
+	case 'r': case 's': case 'i':
+#ifndef FREEBSD		
+	case 'p':
+#endif		
 #endif /* !LINUX */
 		return sock_ioctl(tcp, code, arg);
-#ifdef SVR4
+#ifdef USE_PROCFS
 #ifndef HAVE_MP_PROCFS
+#ifndef FREEBSD
 	case 'q':
+#else
+	case 'p':
+#endif		
 		return proc_ioctl(tcp, code, arg);
 #endif
-#endif /* SVR4 */
+#endif /* USE_PROCFS */
 #ifdef HAVE_SYS_STREAM_H
 	case 'S':
 		return stream_ioctl(tcp, code, arg);

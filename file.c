@@ -120,7 +120,15 @@ struct stat {
 #  include <sys/cred.h>
 #endif /* SVR4 */
 
+#ifdef HAVE_SYS_VFS_H
 #include <sys/vfs.h>
+#endif
+
+#ifdef FREEBSD
+#include <sys/param.h>
+#include <sys/mount.h>
+#include <sys/stat.h>
+#endif
 
 #ifdef MAJOR_IN_SYSMACROS
 #include <sys/sysmacros.h>
@@ -222,6 +230,12 @@ struct xlat openmodes[] = {
 #endif
 #ifdef FNOCTTY
 	{ FNOCTTY,	"FNOCTTY"	},
+#endif	
+#ifdef O_SHLOCK
+	{ O_SHLOCK,	"O_SHLOCK"	},
+#endif
+#ifdef O_EXLOCK
+	{ O_EXLOCK,	"O_EXLOCK"	},
 #endif
 	{ 0,		NULL		},
 };
@@ -339,14 +353,33 @@ int
 sys_lseek(tcp)
 struct tcb *tcp;
 {
+	off_t offset;
+	int _whence;
+
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		if (tcp->u_arg[2] == SEEK_SET)
-			tprintf("%lu, ", tcp->u_arg[1]);
+#ifndef FREEBSD
+		offset = tcp->u_arg[1];
+		_whence = tcp->u_arg[2];
+		if (_whence == SEEK_SET)
+			tprintf("%lu, ", offset);
 		else
-			tprintf("%ld, ", tcp->u_arg[1]);
-		printxval(whence, tcp->u_arg[2], "SEEK_???");
-	}
+			tprintf("%ld, ", offset);		
+#else /* FREEBSD */
+		offset = ((off_t) tcp->u_arg[1] << 32) +  tcp->u_arg[2];
+		_whence = tcp->u_arg[4];
+		if (_whence == SEEK_SET)
+			tprintf("%llu, ", offset);
+		else
+			tprintf("%lld, ", offset);		
+#endif		
+		printxval(whence, _whence, "SEEK_???");
+	} 
+#ifdef FREEBSD
+	else
+		if (!syserror(tcp))
+			return RVAL_LUDECIMAL;
+#endif /* FREEBSD */
 	return RVAL_UDECIMAL;
 }
 
@@ -383,7 +416,11 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
+#ifndef FREEBSD
 		tprintf(", %lu", tcp->u_arg[1]);
+#else
+		tprintf(", %llu", ((off_t) tcp->u_arg[1] << 32) + tcp->u_arg[2]);
+#endif		
 	}
 	return 0;
 }
@@ -393,7 +430,12 @@ sys_ftruncate(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
+#ifndef FREEBSD
 		tprintf("%ld, %lu", tcp->u_arg[0], tcp->u_arg[1]);
+#else
+		tprintf("%ld, %llu", tcp->u_arg[0],
+			((off_t) tcp->u_arg[1] << 32) + tcp->u_arg[2]);
+#endif		
 	}
 	return 0;
 }
@@ -534,6 +576,50 @@ long addr;
 }
 #endif /* LINUXSPARC */
 
+#ifdef FREEBSD
+static struct xlat fileflags[] = {
+	{ UF_NODUMP,	"UF_NODUMP"	},
+	{ UF_IMMUTABLE,	"UF_IMMUTABLE"	},
+	{ UF_APPEND,	"UF_APPEND"	},
+	{ UF_OPAQUE,	"UF_OPAQUE"	},
+	{ UF_NOUNLINK,	"UF_NOUNLINK"	},
+	{ SF_ARCHIVED,	"SF_ARCHIVED"	},
+	{ SF_IMMUTABLE,	"SF_IMMUTABLE"	},
+	{ SF_APPEND,	"SF_APPEND"	},
+	{ SF_NOUNLINK,	"SF_NOUNLINK"	},
+	{ 0,		NULL		},
+};
+
+int
+sys_chflags(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		if (tcp->u_arg[1])
+			printflags(fileflags, tcp->u_arg[1]);
+		else
+			tprintf("0");
+	}
+	return 0;
+}
+
+int
+sys_fchflags(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		if (tcp->u_arg[1])
+			printflags(fileflags, tcp->u_arg[1]);
+		else
+			tprintf("0");
+	}
+	return 0;
+}
+#endif
+
 static void
 realprintstat(tcp, statbuf)
 struct tcb *tcp;
@@ -577,7 +663,17 @@ struct stat *statbuf;
     if (!abbrev(tcp)) {
 	    tprintf("st_atime=%s, ", sprinttime(statbuf->st_atime));
 	    tprintf("st_mtime=%s, ", sprinttime(statbuf->st_mtime));
+#ifndef FREEBSD
 	    tprintf("st_ctime=%s}", sprinttime(statbuf->st_ctime));
+#else /* FREEBSD */
+	    tprintf("st_ctime=%s, ", sprinttime(statbuf->st_ctime));
+	    tprintf("st_flags=");
+	    if (statbuf->st_flags) {
+		    printflags(fileflags, statbuf->st_flags);
+	    } else
+		    tprintf("0");
+	    tprintf(", st_gen=%u}", statbuf->st_gen);
+#endif /* FREEBSD */
     }
     else
 	    tprintf("...}");
@@ -1581,6 +1677,21 @@ struct tcb *tcp;
 
 #endif /* linux */
 
+#ifdef FREEBSD
+struct xlat direnttypes[] = {
+	{ DT_FIFO,	"DT_FIFO" 	},
+	{ DT_CHR,	"DT_CHR" 	},
+	{ DT_DIR,	"DT_DIR" 	},
+	{ DT_BLK,	"DT_BLK" 	},
+	{ DT_REG,	"DT_REG" 	},
+	{ DT_LNK,	"DT_LNK" 	},
+	{ DT_SOCK,	"DT_SOCK" 	},
+	{ DT_WHT,	"DT_WHT" 	},
+	{ 0,		NULL		},
+};
+
+#endif
+
 int
 sys_getdents(tcp)
 struct tcb *tcp;
@@ -1635,6 +1746,15 @@ struct tcb *tcp;
 				d->d_namlen, d->d_namlen, d->d_name);
 		}
 #endif /* SUNOS4 */
+#ifdef FREEBSD
+		if (!abbrev(tcp)) {
+			tprintf("%s{d_fileno=%u, d_reclen=%u, d_type=",
+				i ? " " : "", d->d_fileno, d->d_reclen);
+			printxval(direnttypes, d->d_type, "DT_???");
+			tprintf(", d_namlen=%u, d_name=\"%.*s\"}",
+				d->d_namlen, d->d_namlen, d->d_name);
+		}
+#endif /* FREEBSD */		
 		if (!d->d_reclen) {
 			tprintf("/* d_reclen == 0, problem here */");
 			break;
@@ -1651,8 +1771,62 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef linux
+#ifdef FREEBSD
+int
+sys_getdirentries(tcp)
+struct tcb * tcp;
+{
+	int i, len, dents = 0;
+	long basep;
+	char *buf;
 
+	if (entering(tcp)) {
+		tprintf("%lu, ", tcp->u_arg[0]);
+		return 0;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+		return 0;
+	}
+	len = tcp->u_rval;
+	if ((buf = malloc(len)) == NULL) {
+		tprintf("out of memory\n");
+		return 0;
+	}
+	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
+		tprintf("{...}, %lu, %#lx", tcp->u_arg[2], tcp->u_arg[3]);
+		free(buf);
+		return 0;
+	}
+	if (!abbrev(tcp))
+		tprintf("{");
+	for (i = 0; i < len;) {
+		struct kernel_dirent *d = (struct kernel_dirent *) &buf[i];
+		if (!abbrev(tcp)) {
+			tprintf("%s{d_fileno=%u, d_reclen=%u, d_type=",
+				i ? " " : "", d->d_fileno, d->d_reclen);
+			printxval(direnttypes, d->d_type, "DT_???");
+			tprintf(", d_namlen=%u, d_name=\"%.*s\"}",
+				d->d_namlen, d->d_namlen, d->d_name);
+		}
+		i += d->d_reclen;
+		dents++;
+	}
+	if (!abbrev(tcp))
+		tprintf("}");
+	else
+		tprintf("/* %u entries */", dents);
+	free(buf);
+	tprintf(", %lu", tcp->u_arg[2]);
+	if (umove(tcp, tcp->u_arg[3], &basep) < 0)
+		tprintf(", %#lx", tcp->u_arg[3]);
+	else
+		tprintf(", [%lu]", basep);
+	return 0;
+}
+#endif
+
+#ifdef linux
 int
 sys_getcwd(tcp)
 struct tcb *tcp;
@@ -1667,6 +1841,22 @@ struct tcb *tcp;
     return 0;
 }
 #endif /* linux */
+
+#ifdef FREEBSD
+int
+sys___getcwd(tcp)
+struct tcb *tcp;
+{
+    if (exiting(tcp)) {
+	if (syserror(tcp))
+	    tprintf("%#lx", tcp->u_arg[0]);
+	else
+	    printpathn(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf(", %lu", tcp->u_arg[1]);
+    }
+    return 0;
+}
+#endif
 
 #ifdef HAVE_SYS_ASYNCH_H
 

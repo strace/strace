@@ -9,6 +9,9 @@
    or a derivative like Solaris 2.x or Irix 5.x.  */
 #undef SVR4
 
+/* Define if this is running the FreeBSD operating system.  */
+#undef FREEBSD
+
 /* Define for UnixWare systems. */
 #undef UNIXWARE
 

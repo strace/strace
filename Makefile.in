@@ -20,7 +20,7 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 WARNFLAGS = @WARNFLAGS@
 
-# OS is one of `linux', `sunos4', or `svr4'.
+# OS is one of `linux', `sunos4', `svr4', or `freebsd'.
 OS = @opsys@
 # ARCH is one of `i386', `m68k', `sparc', `arm', `mips' or `ia64'.
 ARCH = @arch@
@@ -47,7 +47,7 @@ SHELL = /bin/sh
 
 INCLUDES = -I. -I$(OS)/$(ARCH) -I$(srcdir)/$(OS)/$(ARCH) -I$(OS) -I$(srcdir)/$(OS)
 SUBDIRS = $(OSARCH)
-ALL_SUBDIRS = test linux linux/alpha linux/powerpc sunos4 svr4
+ALL_SUBDIRS = test linux linux/alpha linux/powerpc sunos4 svr4 freebsd/i386
 OBJ = strace.o version.o syscall.o util.o \
 	desc.o file.o ipc.o io.o ioctl.o mem.o net.o process.o bjm.o \
 	resource.o signal.o sock.o system.o term.o time.o proc.o stream.o

@@ -47,12 +47,14 @@ static struct xlat tcxonc_options[] = {
 	{ 0,		NULL		},
 };
 
+#ifdef TCLFLSH
 static struct xlat tcflsh_options[] = {
 	{ TCIFLUSH,	"TCIFLUSH"	},
 	{ TCOFLUSH,	"TCOFLUSH"	},
 	{ TCIOFLUSH,	"TCIOFLUSH"	},
 	{ 0,		NULL		},
 };
+#endif
 
 static struct xlat baud_options[] = {
 	{ B0,		"B0"		},
@@ -173,7 +175,11 @@ struct tcb *tcp;
 long code, arg;
 {
 	struct termios tios;
+#ifndef FREEBSD
 	struct termio tio;
+#else
+	struct termios tio;
+#endif	
 	struct winsize ws;
 #ifdef TIOCGSIZE
 	struct  ttysize ts;
@@ -290,15 +296,18 @@ long code, arg;
 #endif
 
 	/* ioctls with a direct decodable arg */
-
+#ifdef TCXONC
 	case TCXONC:
 		tprintf(", ");
 		printxval(tcxonc_options, arg, "TC???");
 		return 1;
+#endif
+#ifdef TCLFLSH
 	case TCFLSH:
 		tprintf(", ");
 		printxval(tcflsh_options, arg, "TC???");
 		return 1;
+#endif
 
 	/* ioctls with an indirect parameter displayed as modem flags */
 

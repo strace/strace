@@ -84,12 +84,30 @@
 #  endif
 #endif 
 
-#ifdef SVR4
+#if defined(SVR4) || defined(FREEBSD)
+#define USE_PROCFS
+#else
+#undef USE_PROCFS
+#endif
+
+#ifdef FREEBSD
+#ifndef I386
+#error "FreeBSD support is only for i386 arch right now."
+#endif
+#include <machine/psl.h>
+#include <machine/reg.h>
+#include <sys/syscall.h>
+#endif
+
+#ifdef USE_PROCFS
 #include <sys/procfs.h>
 #ifdef HAVE_MP_PROCFS
 #include <sys/uio.h>
 #endif
-#else /* !SVR4 */
+#ifdef FREEBSD
+#include <sys/pioctl.h>
+#endif /* FREEBSD */
+#else /* !USE_PROCFS */
 #if defined(LINUXSPARC) && defined(__GLIBC__)
 #include <sys/ptrace.h>
 #else
@@ -184,6 +202,22 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PR_FLAGS	pr_flags
 #endif
 #endif
+#ifdef FREEBSD
+#define IOCTL		ioctl
+#define IOCTL_STATUS(t)	ioctl (t->pfd, PIOCSTATUS, &t->status)
+#define IOCTL_WSTOP(t)	ioctl (t->pfd, PIOCWAIT, &t->status)
+#define PIOCRUN         PIOCCONT
+#define PIOCWSTOP       PIOCWAIT
+#define PR_WHY		why
+#define PR_WHAT		val
+#define PR_FLAGS	flags
+/* from /usr/src/sys/miscfs/procfs/procfs_vnops.c,
+   status.state = 0 for running, 1 for stopped */
+#define PR_SYSENTRY     S_SCE
+#define PR_SYSEXIT      S_SCX
+#define PR_SIGNALLED    S_SIG
+#define PR_FAULTED      S_CORE
+#endif
 
 /* Trace Control Block */
 struct tcb {
@@ -218,6 +252,11 @@ struct tcb {
 #else
 	prstatus_t status;	/* procfs status structure */
 #endif
+#endif
+#ifdef FREEBSD
+	struct procfs_status status;
+	int pfd_reg;
+	int pfd_status;
 #endif
 };
 
@@ -269,8 +308,10 @@ struct xlat {
 #define RVAL_HEX	001	/* hex format */
 #define RVAL_OCTAL	002	/* octal format */
 #define RVAL_UDECIMAL	003	/* unsigned decimal format */
-#define RVAL_LDECIMAL	004	/* long long format */
-				/* Maybe add long long hex, octal, unsigned */
+#define RVAL_LDECIMAL	004	/* long decimal format */
+#define RVAL_LHEX	005	/* long hex format */
+#define RVAL_LOCTAL	006	/* long octal format */
+#define RVAL_LUDECIMAL	007	/* long unsigned decimal format */
 #define RVAL_MASK	007	/* mask for these values */
 
 #define RVAL_STR	010	/* Print `auxstr' field after return val */
@@ -315,6 +356,7 @@ extern void set_sortby P((char *));
 extern void set_overhead P((int));
 extern void qualify P((char *));
 extern void newoutf P((struct tcb *));
+extern int get_scno P((struct tcb *));
 extern int trace_syscall P((struct tcb *));
 extern void printxval P((struct xlat *, int, char *));
 extern int printargs P((struct tcb *));
@@ -375,7 +417,7 @@ extern int fixvfork P((struct tcb *));
 #if !(defined(LINUX) && !defined(SPARC))
 extern long getrval2 P((struct tcb *));
 #endif
-#ifdef SVR4
+#ifdef USE_PROCFS
 extern int proc_open P((struct tcb *tcp, int attaching));
 #endif
 

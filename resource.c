@@ -41,7 +41,7 @@
 #ifdef SUNOS4
 #include <ufs/quota.h>
 #endif /* SUNOS4 */
-#ifdef SVR4
+#if defined(SVR4) || defined(FREEBSD)
 #include <sys/times.h>
 #include <sys/time.h>
 #endif
@@ -439,14 +439,23 @@ struct tcb *tcp;
 
 #endif /* Linux */
 
-#ifdef SUNOS4
+#if defined(SUNOS4) || defined(FREEBSD)
+
+#ifdef FREEBSD
+#include <ufs/ufs/quota.h>
+#endif
 
 static struct xlat quotacmds[] = {
 	{ Q_QUOTAON,	"Q_QUOTAON"	},
 	{ Q_QUOTAOFF,	"Q_QUOTAOFF"	},
 	{ Q_GETQUOTA,	"Q_GETQUOTA"	},
 	{ Q_SETQUOTA,	"Q_SETQUOTA"	},
+#ifdef Q_SETQLIM
 	{ Q_SETQLIM,	"Q_SETQLIM"	},
+#endif
+#ifdef Q_SETUSE
+	{ Q_SETUSE,	"Q_SETUSE"	},
+#endif
 	{ Q_SYNC,	"Q_SYNC"	},
 	{ 0,		NULL		},
 };
@@ -457,12 +466,19 @@ struct tcb *tcp;
 {
 	/* fourth arg (addr) not interpreted here */
 	if (entering(tcp)) {
+#ifdef SUNOS4
 		printxval(quotacmds, tcp->u_arg[0], "Q_???");
 		tprintf(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
+#endif
+#ifdef FREEBSD
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		printxval(quotacmds, tcp->u_arg[1], "Q_???");
+#endif		
 		tprintf(", %lu, %#lx", tcp->u_arg[2], tcp->u_arg[3]);
 	}
 	return 0;
 }
 
-#endif /* SUNOS4 */
+#endif /* SUNOS4 || FREEBSD */

@@ -1,3 +1,8 @@
+2000-09-01  Wichert Akkerman <wakkerma@debian.org>
+
+  *  lots of files: merge patch from Gaël Roualland to add
+     support for FreeBSD.
+
 2000-08-09  Wichert Akkerman <wakkerma@debian.org>
 
   * file.c: update to reflect that st_ino suddenly became a long long

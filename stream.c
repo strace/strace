@@ -30,7 +30,7 @@
 
 #include "defs.h"
 
-#if defined(HAVE_SYS_STREAM_H) || defined(linux)
+#if defined(HAVE_SYS_STREAM_H) || defined(linux) || defined(FREEBSD)
 
 #if defined(linux)
 #ifdef HAVE_SYS_POLL_H
@@ -48,11 +48,15 @@ struct strbuf {
 
 #else /* linux */
 
+#ifndef FREEBSD
 #include <stropts.h>
 #include <poll.h>
 #include <sys/conf.h>
 #include <sys/stream.h>
 #include <sys/tihdr.h>
+#else /* FREEBSD */
+#include <poll.h>
+#endif /* FREEBSD */
 
 #endif /* linux */
 
@@ -62,6 +66,7 @@ struct strbuf {
 #include <sys/timod.h>
 #endif /* HAVE_SYS_TIUSER_H */
 
+#ifndef FREEBSD
 static struct xlat msgflags[] = {
 	{ RS_HIPRI,	"RS_HIPRI"	},
 	{ 0,		NULL		},
@@ -252,6 +257,7 @@ struct tcb *tcp;
 }
 
 #endif /* HAVE_PUTPMSG */
+#endif /* !FREEBSD */
 
 
 #ifdef HAVE_SYS_POLL_H
@@ -349,7 +355,7 @@ struct tcb *tcp;
 }
 #endif
 
-#ifndef linux
+#if !defined(linux) && !defined(FREEBSD)
 
 static struct xlat stream_flush_options[] = {
 	{ FLUSHR,	"FLUSHR"	},
@@ -824,7 +830,7 @@ int code, arg;
 	}
 }
 
-#endif /* linux */
+#endif /* !linux && !FREEBSD */ 
 
-#endif /* LINUXSPARC && linux */
+#endif /* HAVE_SYS_STREAM_H || linux || FREEBSD */
 

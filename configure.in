@@ -22,6 +22,9 @@ sysv5*)
 irix[56]*)
 	opsys=svr4
 	;;
+freebsd*)
+	opsys=freebsd
+	;;
 *)
 	AC_MSG_ERROR(this operating system is not yet supported by strace)
 	;;
@@ -30,7 +33,7 @@ AC_MSG_RESULT($opsys)
 
 # Autoheader trick.  Heh, heh.
 opsys_list='
-@@@syms="$syms LINUX SUNOS4 SVR4"@@@
+@@@syms="$syms LINUX SUNOS4 SVR4 FREEBSD"@@@
 '
 
 AC_MSG_CHECKING(for supported architecture)
@@ -148,7 +151,7 @@ if test x$OPSYS != xLINUX; then
 AC_CHECK_LIB(nsl, main)
 fi
 AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl putpmsg prctl sendmsg inet_ntop)
-AC_CHECK_HEADERS(sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h sys/stream.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h linux/icmp.h linux/in6.h sys/uio.h linux/netlink.h linux/if_packet.h sys/poll.h)
+AC_CHECK_HEADERS(sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h sys/stream.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h linux/icmp.h linux/in6.h sys/uio.h linux/netlink.h linux/if_packet.h sys/poll.h sys/vfs.h)
 AC_DECL_SYS_ERRLIST
 AC_DECL_SYS_SIGLIST
 AC_DECL__SYS_SIGLIST
