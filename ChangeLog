@@ -1,5 +1,9 @@
 2002-04-01  Wichert Akkerman <wichert@deephackmode.org>
 
+	* strace.c: close tcp->outf in droptcb()
+
+2002-04-01  Wichert Akkerman <wichert@deephackmode.org>
+
 	* net.c: decode packet options
 
 2002-03-31  Wichert Akkerman <wichert@deephackmode.org>

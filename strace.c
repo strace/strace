@@ -953,6 +953,7 @@ struct tcb *tcp;
 	nprocs--;
 	tcp->pid = 0;
 	tcp->flags = 0;
+
 	if (tcp->pfd != -1) {
 		close(tcp->pfd);
 		tcp->pfd = -1;
@@ -974,10 +975,10 @@ struct tcb *tcp;
 		tcp->parent->nchildren--;
 		tcp->parent = NULL;
 	}
-#if 0
-	if (tcp->outf != stderr)
+
+	if (outfname && tcp->outf)
 		fclose(tcp->outf);
-#endif
+
 	tcp->outf = 0;
 }
 
