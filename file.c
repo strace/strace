@@ -860,7 +860,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#if defined(linux) && defined(alpha)
+#if defined(linux) && defined(__alpha)
 
 int
 osf_statfs(tcp)
@@ -888,7 +888,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-#endif /* linux && alpha */
+#endif /* linux && __alpha */
 
 #endif /* !SVR4 */
 
