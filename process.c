@@ -82,7 +82,15 @@
 
 #ifdef HAVE_LINUX_PTRACE_H
 #undef PTRACE_SYSCALL
+# ifdef HAVE_STRUCT_IA64_FPREG
+#  define ia64_fpreg XXX_ia64_fpreg
+# endif
+# ifdef HAVE_STRUCT_PT_ALL_USER_REGS
+#  define pt_all_user_regs XXX_pt_all_user_regs
+# endif
 #include <linux/ptrace.h>
+# undef ia64_fpreg
+# undef pt_all_user_regs
 #endif
 
 #ifdef HAVE_LINUX_FUTEX_H
@@ -2459,7 +2467,12 @@ struct xlat struct_user_offsets[] = {
 	{ PT_AR_CCV, "ar.ccv" }, { PT_AR_FPSR, "ar.fpsr" },
 	{ PT_B0, "b0" }, { PT_B7, "b7" }, { PT_F6, "f6" },
 	{ PT_F7, "f7" }, { PT_F8, "f8" }, { PT_F9, "f9" },
-	{ PT_AR_CSD, "ar.csd" }, { PT_AR_SSD, "ar.ssd" },
+# ifdef PT_AR_CSD
+	{ PT_AR_CSD, "ar.csd" },
+# endif
+# ifdef PT_AR_SSD
+	{ PT_AR_SSD, "ar.ssd" },
+# endif
 	{ PT_DBR, "dbr" }, { PT_IBR, "ibr" }, { PT_PMD, "pmd" },
 #else /* !IA64 */
 #ifdef I386
