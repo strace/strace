@@ -1592,8 +1592,6 @@ force_result(tcp, error, rval)
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
 	gpr2 = error ? -error : rval;
-	if (upeek(tcp->pid, PT_GPR2, &gpr2) < 0)
-		return -1;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)PT_GPR2, gpr2) < 0)
 		return -1;
 #else /* !S390 && !S390X */
