@@ -1,3 +1,8 @@
+2003-06-26  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c (get_scno) [S390 || S390X]: Fix old vs new mode detection.
+	From Michael Holzheu <HOLZHEU@de.ibm.com>.
+
 2003-06-23  Roland McGrath  <roland@redhat.com>
 
 	* net.c (sys_socket): Decode protocol for PF_INET6 same as PF_INET.
