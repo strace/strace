@@ -643,10 +643,18 @@ long addr;
 	}
 
 	if (!abbrev(tcp)) {
+#ifdef HAVE_LONG_LONG
+		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%llu, st_mode=%s, ",
+#else
 		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%lu, st_mode=%s, ",
+#endif
 			(unsigned long) major(statbuf.st_dev),
 			(unsigned long) minor(statbuf.st_dev),
+#ifdef HAVE_LONG_LONG
+			(unsigned long long) statbuf.st_ino,
+#else
 			(unsigned long) statbuf.st_ino,
+#endif
 			sprintmode(statbuf.st_mode));
 		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
 			(unsigned long) statbuf.st_nlink,
