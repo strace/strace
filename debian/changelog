@@ -1,3 +1,11 @@
+strace (4.4.94-1) unstable; urgency=low
+
+  * New upstream version.
+    + New option -E to set environment variables.
+    + Build fixes for sparc, closes: #178636.
+
+ -- Roland McGrath <frob@debian.org>  Wed, 19 Feb 2003 19:12:40 -0800
+
 strace (4.4.93-1) unstable; urgency=low
 
   * New upstream version.

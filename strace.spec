@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.4.93
+Version: 4.4.94
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -43,6 +43,12 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*
 
 %changelog
+* Wed Feb 19 2003 Roland McGrath <roland@redhat.com> 4.4.94-1
+- new upstream version, new option -E to set environment variables (#82392)
+
+* Wed Jan 22 2003 Tim Powers <timp@redhat.com> 4.4.93-2
+- rebuilt
+
 * Tue Jan 21 2003 Roland McGrath <roland@redhat.com> 4.4.93-1
 - new upstream version, fixes ppc and s390 bugs, adds missing ptrace requests
 
