@@ -130,6 +130,9 @@ struct stat {
 #include <sys/param.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
+
+#define stat64 stat
+#define HAVE_STAT64 1	/* Ugly hack */
 #endif
 
 #ifdef MAJOR_IN_SYSMACROS
@@ -652,6 +655,7 @@ struct tcb *tcp;
 }
 #endif
 
+#ifndef FREEBSD
 static void
 realprintstat(tcp, statbuf)
 struct tcb *tcp;
@@ -695,17 +699,7 @@ struct stat *statbuf;
     if (!abbrev(tcp)) {
 	    tprintf("st_atime=%s, ", sprinttime(statbuf->st_atime));
 	    tprintf("st_mtime=%s, ", sprinttime(statbuf->st_mtime));
-#ifndef FREEBSD
 	    tprintf("st_ctime=%s}", sprinttime(statbuf->st_ctime));
-#else /* FREEBSD */
-	    tprintf("st_ctime=%s, ", sprinttime(statbuf->st_ctime));
-	    tprintf("st_flags=");
-	    if (statbuf->st_flags) {
-		    printflags(fileflags, statbuf->st_flags);
-	    } else
-		    tprintf("0");
-	    tprintf(", st_gen=%u}", statbuf->st_gen);
-#endif /* FREEBSD */
     }
     else
 	    tprintf("...}");
@@ -741,6 +735,7 @@ long addr;
 
 	realprintstat(tcp, &statbuf);
 }
+#endif	/* !FREEBSD */
 
 #ifdef HAVE_STAT64
 static void
@@ -817,7 +812,17 @@ long addr;
 	if (!abbrev(tcp)) {
 		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
 		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
+#ifndef FREEBSD
 		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
+#else /* FREEBSD */
+		tprintf("st_ctime=%s, ", sprinttime(statbuf.st_ctime));
+		tprintf("st_flags=");
+		if (statbuf.st_flags) {
+			printflags(fileflags, statbuf.st_flags);
+		} else
+			tprintf("0");
+		tprintf(", st_gen=%u}", statbuf.st_gen);
+#endif /* FREEBSD */
 	}
 	else
 		tprintf("...}");
@@ -879,7 +884,7 @@ long addr;
 }
 #endif /* linux && !IA64 */
 
-
+#ifndef FREEBSD
 int
 sys_stat(tcp)
 struct tcb *tcp;
@@ -892,6 +897,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif
 
 int
 sys_stat64(tcp)
@@ -927,6 +933,7 @@ struct tcb *tcp;
 # endif /* !IA64 */
 #endif /* linux */
 
+#ifndef FREEBSD
 int
 sys_fstat(tcp)
 struct tcb *tcp;
@@ -938,6 +945,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif
 
 int
 sys_fstat64(tcp)
@@ -971,6 +979,7 @@ struct tcb *tcp;
 # endif /* !IA64 */
 #endif
 
+#ifndef FREEBSD
 int
 sys_lstat(tcp)
 struct tcb *tcp;
@@ -983,6 +992,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif
 
 int
 sys_lstat64(tcp)

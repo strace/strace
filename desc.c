@@ -35,6 +35,12 @@
 #include <fcntl.h>
 #include <sys/file.h>
 
+#if FREEBSD
+#define flock64	flock		/* Horrid hack */
+#define printflock printflock64	/* Horrider hack */
+#endif
+
+
 static struct xlat fcntlcmds[] = {
 	{ F_DUPFD,	"F_DUPFD"	},
 	{ F_GETFD,	"F_GETFD"	},
@@ -172,6 +178,7 @@ static struct xlat whence[] = {
 	{ 0,		NULL		},
 };
 
+#ifndef FREEBSD
 /* fcntl/lockf */
 static void
 printflock(tcp, addr, getlk)
@@ -195,8 +202,9 @@ int getlk;
 	else
 		tprintf("}");
 }
+#endif
 
-#if _LFS64_LARGEFILE
+#if _LFS64_LARGEFILE || FREEBSD
 /* fcntl/lockf */
 static void
 printflock64(tcp, addr, getlk)

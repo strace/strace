@@ -64,7 +64,7 @@ fcntl
 flock
 fork
 fpathconf
-fstat
+fstat		sys_fstat64
 fstatfs
 fsync
 ftruncate	sys_ftruncate64
@@ -97,7 +97,7 @@ killpg
 link
 listen
 lseek		sys_lseek64
-lstat
+lstat		sys_lstat64
 mincore
 mkdir
 mkfifo
@@ -171,7 +171,7 @@ sigsuspend
 sigvec
 socket
 socketpair
-stat
+stat		sys_stat64
 statfs
 stime
 symlink

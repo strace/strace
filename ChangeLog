@@ -1,5 +1,13 @@
 2001-03-07  John Hughes <john@Calva.COM>
 
+  * desc.c: On FreeBSD flock structure uses 64 bit offsets.
+  * file.c: On FreeBSD use stat64 and pals instead of stat.
+  * freebsd/syscalls.print: use stat64, lstat64 and fstat64.
+  * freebsd/i386/syscall.h: ditto.
+  * freebsd/i386/syscallent.h: ditto.
+
+2001-03-07  John Hughes <john@Calva.COM>
+
   * file.c: merge missing part of Harald Böhme's solaris patches,
     was only declaring sys_{stat64,lstat64,fstat64} on linux!
 
