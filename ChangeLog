@@ -1,5 +1,8 @@
 2003-02-19  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.4.94.
+	* strace.spec, debian/changelog: 4.4.94-1.
+
 	* version.c: Removed.
 	* Makefile.am (strace_SOURCES): Remove it.
 	* strace.c: Use PACKAGE_NAME and VERSION macros instead of version var.
