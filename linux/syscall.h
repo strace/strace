@@ -81,7 +81,8 @@ int sys_getresuid(), sys_getresgid(), sys_pread(), sys_pwrite(), sys_getcwd();
 int sys_sigaltstack(), sys_rt_sigprocmask(), sys_rt_sigaction();
 int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
-int sys_sendfile(), sys_old_mmap();
+int sys_sendfile(), sys_old_mmap(), sys_stat64(), sys_lstat64(), sys_fstat64();
+int sys_truncate64(), sys_ftruncate64();
 
 
 /* sys_socketcall subcalls */
