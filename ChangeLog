@@ -1,3 +1,8 @@
+2001-03-28  Wichert Akkerman <wakkerma@debian.org>
+
+  * strace.c: use __WALL as wait4 flag if it exists so we can properly
+    trace threaded programs
+
 2001-03-27  John Hughes <john@Calva.COM>
 
   * aclocal.m4: add check for endianness of long long.

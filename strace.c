@@ -1595,13 +1595,36 @@ trace()
 	struct tcb *tcp;
 #ifdef LINUX
 	struct rusage ru;
+#ifdef __WALL
+	static int wait4_options = __WALL;
+#endif
 #endif /* LINUX */
 
 	while (nprocs != 0) {
 		if (interactive)
 			sigprocmask(SIG_SETMASK, &empty_set, NULL);
 #ifdef LINUX
+#ifdef __WALL
+		pid = wait4(-1, &status, wait4_options, cflag ? &ru : NULL);
+		if ((wait4_options & __WALL) && errno == EINVAL) {
+			/* this kernel does not support __WALL */
+			wait4_options &= ~__WALL;
+			errno = 0;
+			pid = wait4(-1, &status, wait4_options,
+					cflag ? &ru : NULL);
+		}
+		if (!(wait4_options & __WALL) && errno == ECHILD) {
+			/* most likely a "cloned" process */
+			pid = wait4(-1, &status, __WCLONE,
+					cflag ? &ru : NULL);
+			if (pid == -1) {
+				fprintf(stderr, "strace: clone wait4 "
+						"failed: %s\n", strerror(errno));
+			}
+		}
+#else
 		pid = wait4(-1, &status, 0, cflag ? &ru : NULL);
+#endif /* __WALL */
 #endif /* LINUX */
 #ifdef SUNOS4
 		pid = wait(&status);
