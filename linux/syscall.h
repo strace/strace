@@ -148,11 +148,7 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 # endif /* IA64 */
-# if defined POWERPC
-#  define SYS_socket_subcall	256
-# else
 #  define SYS_socket_subcall	300
-# endif
 #define SYS_socket		(SYS_socket_subcall + 1)
 #define SYS_bind		(SYS_socket_subcall + 2)
 #define SYS_connect		(SYS_socket_subcall + 3)
