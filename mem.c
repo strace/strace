@@ -35,7 +35,7 @@
 #include "defs.h"
 
 #ifdef LINUX
-#include <linux/mman.h>
+#include <asm/mman.h>
 #endif
 #include <sys/mman.h>
 
