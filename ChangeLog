@@ -1,5 +1,8 @@
 2004-06-03  Roland McGrath  <roland@redhat.com>
 
+	* debian/control (Architecture): Add amd64.
+	Fixes Debian bug #246568.
+
 	* strace.c (main) [LINUX]: Expand TCBTAB as necessary for threads
 	attached.  Attach threads only under -f.  Set TCB_FOLLOWFORK in them.
 	(expand_tcbtab): New function, broken out of ...
