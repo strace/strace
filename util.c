@@ -35,6 +35,8 @@
 
 #include "defs.h"
 
+#include <signal.h>
+#include <sys/syscall.h>
 #include <sys/user.h>
 #include <sys/param.h>
 #include <fcntl.h>
@@ -52,7 +54,8 @@
 #endif
 
 #if defined(LINUX) && defined(IA64)
-#include <asm/ptrace_offsets.h>
+# include <asm/ptrace_offsets.h>
+# include <asm/rse.h>
 #endif
 
 #ifdef HAVE_SYS_REG_H
@@ -1107,6 +1110,198 @@ struct tcb *tcp;
 
 #ifndef USE_PROCFS
 
+#if defined LINUX
+
+#include <sys/syscall.h>
+#ifndef CLONE_PTRACE
+# define CLONE_PTRACE    0x00002000
+#endif
+
+#ifdef IA64
+
+typedef unsigned long *arg_setup_state;
+
+static int
+arg_setup(struct tcb *tcp, arg_setup_state *state)
+{
+	unsigned long *bsp, cfm, sof, sol;
+
+	if (upeek(tcp->pid, PT_AR_BSP, (long *) &bsp) < 0)
+		return -1;
+	if (upeek(tcp->pid, PT_CFM, (long *) &cfm) < 0)
+		return -1;
+
+	sof = (cfm >> 0) & 0x7f;
+	sol = (cfm >> 7) & 0x7f;
+	bsp = ia64_rse_skip_regs(bsp, -sof + sol);
+
+	*state = bsp;
+	return 0;
+}
+
+# define arg_finish_change(tcp, state)	0
+
+#ifdef SYS_fork
+static int
+get_arg0 (struct tcb *tcp, arg_setup_state *state, long *valp)
+{
+	return umoven (tcp, (unsigned long) ia64_rse_skip_regs(*state, 0),
+		       sizeof(long), (void *) valp);
+}
+
+static int
+get_arg1 (struct tcb *tcp, arg_setup_state *state, long *valp)
+{
+	return umoven (tcp, (unsigned long) ia64_rse_skip_regs(*state, 1),
+		       sizeof(long), (void *) valp);
+}
+#endif
+
+static int
+set_arg0 (struct tcb *tcp, arg_setup_state *state, long val)
+{
+	unsigned long *ap;
+	ap = ia64_rse_skip_regs(*state, 0);
+	errno = 0;
+	ptrace(PTRACE_POKEDATA, tcp->pid, (void *) ap, val);
+	return errno ? -1 : 0;
+}
+
+static int
+set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
+{
+	unsigned long *ap;
+	ap = ia64_rse_skip_regs(*state, 1);
+	errno = 0;
+	ptrace(PTRACE_POKEDATA, tcp->pid, (void *) ap, val);
+	return errno ? -1 : 0;
+}
+
+#elif defined (SPARC)
+
+typedef struct regs arg_setup_state;
+
+# define arg_setup(tcp, state) \
+  (ptrace (PTRACE_GETREGS, tcp->pid, (char *) (state), 0))
+# define arg_finish_change(tcp, state) \
+  (ptrace (PTRACE_SETREGS, tcp->pid, (char *) (state), 0))
+
+# define get_arg0(tcp, state, valp) (*(valp) = (state)->r_o0, 0)
+# define get_arg1(tcp, state, valp) (*(valp) = (state)->r_o1, 0)
+# define set_arg0(tcp, state, val) ((state)->r_o0 = (val), 0)
+# define set_arg1(tcp, state, val) ((state)->r_o1 = (val), 0)
+
+#else
+
+# if defined S390 || defined S390X
+#  define arg0_offset	PT_ORIGGPR2
+#  define arg1_offset	PT_GPR2
+# elif defined (ALPHA) || defined (MIPS)
+#  define arg0_offset	REG_A0
+#  define arg1_offset	(REG_A0+1)
+# elif defined (POWERPC)
+#  define arg0_offset	(4*PT_ORIG_R3)
+#  define arg1_offset	(4*(1+PT_R3))
+# elif defined (HPPA)
+#  define arg0_offset	 PT_GR26
+#  define arg1_offset	 (PT_GR26-4)
+# else
+#  define arg0_offset	0
+#  define arg1_offset	4
+# endif
+
+typedef int arg_setup_state;
+
+# define arg_setup(tcp, state) (0)
+# define arg_finish_change(tcp, state)	0
+# define get_arg0(tcp, cookie, valp) \
+  (upeek ((tcp)->pid, arg0_offset, (valp)))
+# define get_arg1(tcp, cookie, valp) \
+  (upeek ((tcp)->pid, arg1_offset, (valp)))
+
+static int
+set_arg0 (struct tcb *tcp, void *cookie, long val)
+{
+	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val);
+}
+
+static int
+set_arg1 (struct tcb *tcp, void *cookie, long val)
+{
+	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg1_offset, val);
+}
+
+#endif
+
+
+int
+setbpt(tcp)
+struct tcb *tcp;
+{
+	extern int change_syscall(struct tcb *, int);
+	arg_setup_state state;
+
+	if (tcp->flags & TCB_BPTSET) {
+		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
+		return -1;
+	}
+
+	switch (tcp->scno) {
+#ifdef SYS_fork
+	case SYS_fork:
+		if (arg_setup (tcp, &state) < 0
+		    || get_arg0 (tcp, &state, &tcp->inst[0]) < 0
+		    || get_arg1 (tcp, &state, &tcp->inst[1]) < 0
+		    || change_syscall(tcp, SYS_clone) < 0
+		    || set_arg0 (tcp, &state, CLONE_PTRACE|SIGCHLD) < 0
+		    || set_arg1 (tcp, &state, 0) < 0
+		    || arg_finish_change (tcp, &state) < 0)
+			return -1;
+		tcp->u_arg[0] = CLONE_PTRACE|SIGCHLD;
+		tcp->u_arg[1] = 0;
+		tcp->flags |= TCB_BPTSET;
+		return 0;
+#endif
+
+	case SYS_clone:
+#ifdef SYS_clone2
+	case SYS_clone2:
+#endif
+		if ((tcp->u_arg[0] & CLONE_PTRACE) == 0
+		    && (arg_setup (tcp, &state) < 0
+			|| set_arg0 (tcp, &state, tcp->u_arg[0] | CLONE_PTRACE) < 0
+			|| arg_finish_change (tcp, &state) < 0))
+			return -1;
+		tcp->flags |= TCB_BPTSET;
+		tcp->inst[0] = tcp->u_arg[0];
+		tcp->inst[1] = tcp->u_arg[1];
+		return 0;
+
+	default:
+		fprintf(stderr, "PANIC: setbpt for syscall %ld on %u???\n",
+			tcp->scno, tcp->pid);
+		break;
+	}
+
+	return -1;
+}
+
+int
+clearbpt(tcp)
+struct tcb *tcp;
+{
+	arg_setup_state state;
+	if (arg_setup (tcp, &state) < 0
+	    || set_arg0 (tcp, &state, tcp->inst[0]) < 0
+	    || set_arg1 (tcp, &state, tcp->inst[1]) < 0
+	    || arg_finish_change (tcp, &state))
+		return -1;
+	tcp->flags &= ~TCB_BPTSET;
+	return 0;
+}
+
+#else
+
 int
 setbpt(tcp)
 struct tcb *tcp;
@@ -1181,8 +1376,6 @@ struct tcb *tcp;
 		tcp->flags |= TCB_BPTSET;
 	} else {
 		/*
-		 * XXX Use break instead!
-		 *
 		 * Our strategy here is to replace the bundle that
 		 * contained the clone() syscall with a bundle of the
 		 * form:
@@ -1612,6 +1805,8 @@ struct tcb *tcp;
 
 	return 0;
 }
+
+#endif
 
 #endif /* !USE_PROCFS */
 
