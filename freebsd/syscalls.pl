@@ -110,7 +110,7 @@ while (<MASTER>) {
 	$_ = "$_$line";
     }
 
-    if (/^(\d+)\s+\w+\s+\w+\s+\{\s*([^}]+)\s*\}([^}]*)$/) {
+    if (/^(\d+)\s+(?:MPSAFE\s+)?\w+\s+\w+\s+\{\s*([^}]+)\s*\}([^}]*)$/) {
 	my($proto, $ext, $name, $nargs, @args, $pfunc, $cat);
 	
 	$proto = $2;
