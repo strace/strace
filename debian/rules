@@ -45,9 +45,6 @@ binary-arch: checkroot
 	install -p -o root -g root -m 644 strace.1 debian/tmp/usr/share/man/man1/strace.1
 	gzip -9 debian/tmp/usr/share/man/man1/strace.1
 
-	install -p -o root -g root -m 755 debian/prerm debian/tmp/DEBIAN/
-	install -p -o root -g root -m 755 debian/postinst debian/tmp/DEBIAN/
-
 	dpkg-shlibdeps strace
 	dpkg-gencontrol -isp
 	dpkg --build debian/tmp ..

@@ -1,3 +1,9 @@
+2003-01-09  Wichert Akkerman  <wichert@deephackmode.org>
+
+	* debian/postinst, debian/prerm: removed, /usr/doc symlink is no
+	longer used
+	* debian/rules: no longer install postinst and prerm
+
 2002-12-30  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (bin_SCRIPTS): New variable, list strace-graph.
