@@ -1,3 +1,8 @@
+2003-02-23  Roland McGrath  <roland@redhat.com>
+
+	* process.c (sys_getresuid): Fix typos in argument access.
+	Reported by Anton Blanchard <anton@samba.org>.
+
 2003-02-19  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.4.94.
