@@ -1,3 +1,9 @@
+2003-01-09  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c (force_result) [S390 || S390X]: Fix typo.
+
+	* debian/control: Update Maintainer: field.
+
 2003-01-08  Roland McGrath  <roland@redhat.com>
 
 	* NEWS: Update for 4.4.90 test release.
