@@ -86,7 +86,7 @@ long code;
 
 	ioent.code = code;
 #ifdef LINUX
-	ioent.code &= (_IOC_NRMASK|_IOC_TYPEMASK);
+	ioent.code &= (_IOC_NRMASK<<_IOC_NRSHIFT) | (_IOC_TYPEMASK<<_IOC_TYPESHIFT);
 #endif
 	iop = (struct ioctlent *) bsearch((char *) &ioent, (char *) ioctlent,
 			nioctlents, sizeof(struct ioctlent), compare);
