@@ -1,0 +1,333 @@
+strace (4.4-1) unstable; urgency=low
+
+  * New upstream version
+    + Added S390 support. Closes: Bug#104594
+    + New config.{guess,sub}. Closes: Bug#92532
+    + LFS support for Linux/sparc. Closes: Bug#99215
+    * Works on IA64 again. Closes: Bug#103854
+  * Don't override CFLAGS in debian/rules
+  * Remove rules to create configure & friends. Closes: Bug#92483
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Sun, 19 Aug 2001 14:10:58 +0200
+
+strace (4.3-3.1) unstable; urgency=low
+
+  * copy in new config.{guess,sub} to get support for new architectures.
+    Closes: #94725
+
+ -- LaMont Jones <lamont@debian.org>  Mon,  9 Jul 2001 21:39:34 -0600
+
+strace (4.3-3) unstable; urgency=low
+
+  * Update architecture list
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Sat, 14 Apr 2001 10:42:19 +0200
+
+strace (4.3-2) unstable; urgency=low
+
+  * Run cvsbuild so we don't need to run autohead & friends
+  * Sync to current CVS
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri, 13 Apr 2001 19:08:53 +0200
+
+strace (4.3-1) unstable; urgency=low
+
+  * New upstream version
+  * Updated Build-Depends to use a recent glibc so we get the 2.4 kernel
+    headers
+  * Changed Architecture so we only build on Linux
+  * Include section and priority in control info
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Sun,  1 Apr 2001 16:35:32 +0200
+
+strace (4.2-4) frozen unstable; urgency=low
+
+  * Actually install postinst and prerm so we get the proper /usr/doc/strace
+    symlink
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Thu, 17 Feb 2000 21:49:17 +0100
+
+strace (4.2-3) frozen unstable; urgency=low
+
+  * Fix typo in aclocal.m4 that prevented compilation on architectures without
+    LFS
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Sun, 13 Feb 2000 01:19:11 +0100
+
+strace (4.2-2) frozen unstable; urgency=low
+
+  * only include linux/ptrace.h if sys/reg.h hasn't been found by configure,
+    Closes: Bug# 39556
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Thu, 27 Jan 2000 03:22:55 +0100
+
+strace (4.2-1) frozen  unstable; urgency=low
+
+  * New upstream version:
+    + Builds correctly on glibc2.0 again, Closes: Bug# 51648
+    + Small y2k fix in printtimes, Closes: Bug# 54592
+    + semop is handled now, Closes: Bug# 52684
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri, 21 Jan 2000 21:45:41 +0100
+
+strace (4.1-1) unstable; urgency=low
+
+  * New upstream version
+  * Bump standards-version to 3.1.0
+  * FHS 2.1 compliant
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri, 26 Nov 1999 01:42:07 +0100
+
+strace (4.0-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri,  9 Jul 1999 16:12:34 +0200
+
+strace (3.99.1-1) unstable; urgency=low
+
+  * New upstream version, second pre-release for 4.0
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Wed,  9 Jun 1999 15:20:42 +0200
+
+strace (3.99-1) unstable; urgency=low
+
+  * New upstream maintainer (me :)
+  * New upstream version, pre-release for strace 4.0
+  * See upstream changelog for changes
+  * Build with glibc2.1
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Tue, 27 Apr 1999 14:00:15 +0200
+
+strace (3.1.0.1-12) unstable; urgency=low
+
+  * Only i386 has a LDT, so check for architecture in mem.c (Bug# 32798)
+  * Check for nsignals properly, closes: #34445
+  * Fix check for overruns in umove*, patch by Nate Eldredge <nate@cartsys.com>
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Mon, 15 Mar 1999 00:43:14 +0100
+
+strace (3.1.0.1-11) unstable; urgency=low
+
+  * Merge some ARM stuff that got stuck in my mailbox
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Sun, 31 Jan 1999 13:04:13 +0100
+
+strace (3.1.0.1-10) unstable; urgency=low
+
+  * Move sys_poll to the DONE section in linux/dummy.h
+  * Support subarchitectures for alpha (Bug# 32147)
+  * Incorporate changes from Ulrich Drepper
+    + up number of supported personalities on Linux sparc to 3
+    + add O_DIRECT, O_LARGEFILE and O_DIRECTORY to openmodes
+    + change prefix for printxval to SEEK_ in sys_lseek
+    + add a support for a whole bunch of syscalls
+    + updated sys_pread and sys_pwrite for SVR4
+    + handle sys_delete_module properly
+    + change SYS_socket_subcall to 230 for non-powerpc architectures
+    + sys_chown is now lchown
+    + looks like a whole lot of syscalls is moved from 180 to 230
+    + Revamp a lot of the signal handling code
+    + handle sys_clone
+    + Lots more (it was a 6494-line patch and I'm too lazy to put all
+      changes in here..)
+  * Please note you need to have 2.1 or 2.2 kernel sources in /usr/src/linux
+    in order to compile this.
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri, 29 Jan 1999 02:04:12 +0100
+ 
+strace (3.1.0.1-9) unstable; urgency=low
+
+  * Add support for poll() systemcall
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Thu, 31 Dec 1998 16:03:44 +0100
+
+strace (3.1.0.1-8) frozen unstable; urgency=low
+
+  * Use new_stat from libc6 now, except for powerpc and sparc
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Thu, 24 Dec 1998 11:35:32 +0100
+
+strace (3.1.0.1-7) frozen unstable; urgency=low
+
+  * Fix sparc support
+  * Display nanosleep call correctly (Bug# 25904)
+  * Honour -v flag in printargs (Bug# 10426)
+  * Play with #define to get proper kernel struct stat 
+  * Compile with 2.1.131 kernel source
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Sat, 19 Dec 1998 15:02:14 +0100
+
+strace (3.1.0.1-6) frozen unstable; urgency=low
+  
+  * Set NSIG correctly for ARM
+  * Include strace-graph script from Richard Braakman <dark@debian.org>
+    as an example. Try it and be amazed!
+  * Fix sigaction problem, patch from Topi Miettinen
+    <Topi.Miettinen@medialab.sonera.net>
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Mon,  7 Dec 1998 02:10:30 +0100
+
+strace (3.1.0.1-5) unstable; urgency=low
+
+  * Patched from Richard Braakman <dark@debian.org>:
+    + use correct dirent.h on Linux
+    + remove debugging code left from the powerpc patch
+    + fix output for execve when -v is used
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri, 13 Nov 1998 15:59:17 +0100
+
+strace (3.1.0.1-5) unstable; urgency=low
+
+  * Add location of upstream sources to the copyright
+  * Merged ARM architecture support from Jim Studt <jim@federated.com>
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Mon,  9 Nov 1998 16:43:24 +0100
+
+strace (3.1.0.1-4) unstable; urgency=low
+
+  * More ppc patches from Daniel Jacobowitz <dan@debian.org>
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Mon, 12 Oct 1998 00:59:44 +0200
+
+strace (3.1.0.1-3) unstable; urgency=low
+
+  * Added support for sys_query_module, patch from Brian J. Murrell
+    <brian@interlinx.bc.ca>
+  * Preserve timestamps for documentation when installed
+  * Incorporate patches from Daniel Jacobowitz <dan@debian.org>:
+    + powerpc patches
+    + Patches include changing SYS_socket_subcall and SYS_ipc_subcall,
+      check for stray syscall exit after execv, and completely regenerated
+      syscall, errno, and ioctl lists.
+    + Decode capget and capset arguments.
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Sun, 11 Oct 1998 22:42:56 +0200
+
+strace (3.1.0.1-2) unstable; urgency=low
+
+  * Patch to support sparc, courtesy of RedHat
+  * Cleaned up some stuff the patch left broken
+  * Fix some more compilation-issues for IPX with current kernels
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri, 24 Jul 1998 22:53:43 +0200
+
+strace (3.1.0.1-1) unstable; urgency=low
+
+  * New (actually very old) upstream version. Fixes something we
+    already had fixed
+  * Compiled with current kernel-headers from libc6-dev
+  * Fixed spelling-error
+  * Compress changelog
+  * Bumped standard-version to 2.4.1.0
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Wed, 22 Jul 1998 15:53:23 +0200
+
+strace (3.1-14) unstable; urgency=low
+
+  * Don't let libc6 trick us anymore with {f,l,}stat() calls
+  * Fix configure.in to support PentiumII processors
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Mon, 22 Jun 1998 20:17:20 +0200
+
+strace (3.1-13) unstable; urgency=low
+
+  * Corrected error on PowerPC patch that broke other archictectures
+  		(Bug# 13837)
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Tue, 14 Oct 1997 15:41:29 +0200
+
+strace (3.1-12) unstable; urgency=low
+
+  * PowerPC patches by Klee Dienes (Bug# 10788, 10790)
+  * Create correct md5sums (Bug# 13363)
+  * Put changelog in correct place (Bug# 13363)
+  * Pristine sources
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Mon,  6 Oct 1997 15:42:25 +0200
+
+strace (3.1-11) unstable; urgency=LOW
+
+  * Ported to libc6 / glibc2 (Bug# 11729)
+  * Compress manpage
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Fri,  1 Aug 1997 00:13:38 +02
+
+strace (3.1-10) unstable; urgency=LOW
+
+  * Install upstream changelog
+  * Added dependencies to control file for libc
+  * Added md5sums to .deb file
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Fri, 11 Jul 1997 12:26:12 +0200
+
+strace (3.1-9) stable; urgency=LOW
+  
+  * Fixed bug with hanging children. Patch by Matthias Urlichs
+  * Added some more constants to net.c.
+  * glibc patches, courtesy of Klee Dienes (Bug# 7735)
+
+ -- Wichert Akkerman <wakkerma@debian.org>  Mon, 21 Apr 1997 11:59:45 +0200
+
+strace (3.1-8) frozen unstable; urgency=LOW
+
+  * Added detection of ROSE networking
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Tue, 12 Nov 1996 22:21:22 +0100
+
+strace (3.1-7) stable; urgency=LOW
+
+  * Install manpage with correct mode (0644) (Bug#4813)
+  * Renamed debian changelog to changelog.Debian
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Sat, 26 Oct 1996 18:15:41 +0200
+
+strace (3.1-6) stable; urgency=LOW
+
+  * Small patch for compilation on kernels 2.1.0 and later (see signal.c)
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Fri, 18 Oct 1996 00:28:47 +0200
+strace (3.1-5) stable unstable; urgency=LOW
+
+  * Moved to new packagingformat
+  * Fixed umoven bug (Bug# 4523)
+  * Corrected number of parameters for mmap systemcall (bug# 4508)
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Sat, 23 Sep 1996 23:33:58 +0200
+
+strace (3.1-4) unstable; urgency=LOW
+
+  * Fixed changestemplate
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>, Thu Sep 12 14:59:44 MET DST 1996
+
+
+strace (3.1-3) unstable; priority=LOW
+
+  * Revamped debian files
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>, Thu Jul 11 20:19:11 MET DST 1996
+
+
+strace (3.1-2) unstable; priority=LOW
+  * Added some #ifdef's around IPX stuff to make it compilable on non-Linux
+    systems.
+  * changed debian.control and debian.rules to conform to new debian naming
+    schemes
+  * added architecture-option to debian.rules and debian.control
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>
+
+
+strace (3.1-1) unstable; priority=LOW
+
+  * Moved to new upstream version
+  * added more protocol families to domains
+  * added IPIP-protocol to protocols
+  * added MSG_PROXY and MSG_CTRUNC to msg_flags
+  * added SO_BSDCOMPAT and SO_REUSEPORT to sockoptions
+  * added IP, IPX and TCP-options
+  * added IP, IPX and TCP support to get-/setsockopt()
+  * added IPX support
+
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>

@@ -1,3 +1,7 @@
+2002-03-31  Wichert Akkerman <wichert@deephackmode.org>
+
+	* debian/*: added
+
 2001-12-17  Wichert Akkerman <wakkerma@debian.org>
 
 	* net.c: add new TCP socket options

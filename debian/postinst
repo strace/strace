@@ -1,0 +1,15 @@
+#! /bin/sh
+ 
+pkg=strace
+
+set -e
+
+if [ ! "$1" = "configure" ]; then
+	exit 0
+fi
+
+if [ -d /usr/doc -a ! -e /usr/doc/$pkg -a -d /usr/share/doc/$pkg ] ; then
+	ln -s ../share/doc/$pkg /usr/doc/$pkg
+fi
+
+

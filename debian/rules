@@ -1,0 +1,57 @@
+#! /usr/bin/make -f
+
+# Debian package information
+package		= strace
+
+all build: Makefile
+	$(MAKE) $(MFLAGS) 
+	touch stamp-build
+
+Makefile:
+	sh configure --prefix=/usr
+clean:
+	-make -f Makefile.in distclean
+	rm -f stamp-build
+	rm -rf debian/tmp debian/substvars debian/files
+
+binary: binary-indep binary-arch
+
+binary-indep:
+
+binary-arch: checkroot
+	test -f stamp-build || make $(MFLAGS) -f debian/rules build
+	-rm -rf debian/tmp debian/files debian/substvars
+
+	install -d -m 755 -o root -g root debian/tmp
+	# reset the mode to work around a bug in install
+	chown 755 debian/tmp
+	install -d -m 755 -o root -g root debian/tmp/DEBIAN
+
+# Install documentation
+	install -d -o root -g root -m 755 debian/tmp/usr/share/doc/$(package)
+	install -p -o root -g root -m 644 debian/changelog \
+			debian/tmp/usr/share/doc/$(package)/changelog.Debian
+	install -p -o root -g root -m 644 TODO \
+			debian/tmp/usr/share/doc/$(package)/TODO
+	install -p -o root -g root -m 644 NEWS \
+			debian/tmp/usr/share/doc/$(package)/changelog
+	gzip -9 debian/tmp/usr/share/doc/$(package)/*
+	install -p -o root -g root -m 644 debian/copyright \
+			debian/tmp/usr/share/doc/$(package)/copyright
+
+# Install strace
+	install -d -o root -g root -m 755 debian/tmp/usr/bin debian/tmp/usr/share/man/man1
+	install -s -o root -g root -m 755 strace debian/tmp/usr/bin/strace
+	install -p -o root -g root -m 644 strace.1 debian/tmp/usr/share/man/man1/strace.1
+	gzip -9 debian/tmp/usr/share/man/man1/strace.1
+
+	install -p -o root -g root -m 755 debian/prerm debian/tmp/DEBIAN/
+	install -p -o root -g root -m 755 debian/postinst debian/tmp/DEBIAN/
+
+	dpkg-shlibdeps strace
+	dpkg-gencontrol -isp
+	dpkg --build debian/tmp ..
+
+checkroot:
+	test root = "`whoami`"
+

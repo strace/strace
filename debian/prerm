@@ -1,0 +1,14 @@
+#! /bin/sh
+
+pkg=strace
+
+set -e
+
+if [ ! \( "$1" = "upgrade" -o "$1" = "remove" \) ]; then
+	exit 0
+fi
+
+if [ -L /usr/doc/$pkg ]; then
+	rm -f /usr/doc/$pkg
+fi
+
