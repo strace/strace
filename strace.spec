@@ -1,7 +1,7 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
 Version: 4.5.7
-Release: 1
+Release: 2
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
