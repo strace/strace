@@ -2658,7 +2658,7 @@ FILE *outf;
 		error_cum += counts[i].errors;
 		tv_add(&tv_cum, &tv_cum, &counts[i].time);
 	}
-	if (sortfun)
+	if (counts && sortfun)
 		qsort((void *) sorted_count, nsyscalls, sizeof(int), sortfun);
 	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
 		"% time", "seconds", "usecs/call",
