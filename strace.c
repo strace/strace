@@ -2213,8 +2213,14 @@ va_dcl
 	va_list args;
 
 	VA_START(args, fmt);
-	if (outf)
-		curcol += vfprintf(outf, fmt, args);
+	if (outf) {
+		int n = vfprintf(outf, fmt, args);
+		if (n < 0 && outf != stderr)
+			perror(outfname == NULL
+			       ? "<writing to pipe>" : outfname);
+		else
+			curcol += n;
+	}
 	va_end(args);
 	return;
 }
