@@ -1137,7 +1137,7 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"},/* 1232 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 1233 */
-	{ 8,	0,	printargs,		"SYS_1234"	}, /* 1234 */
+	{ 5,	TF,	sys_fadvise64,		"fadvise64"	}, /* 1234 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 1235 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 1237 */
@@ -1149,31 +1149,31 @@
 	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 1243 */
 	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 1244 */
 	{ 4,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 1245 */
-	{ 8,	0,	printargs,		"SYS_1246"	}, /* 1246 */
-	{ 8,	0,	printargs,		"SYS_1247"	}, /* 1247 */
-	{ 8,	0,	printargs,		"SYS_1248"	}, /* 1248 */
-	{ 8,	0,	printargs,		"SYS_1249"	}, /* 1249 */
-	{ 8,	0,	printargs,		"SYS_1250"	}, /* 1250 */
-	{ 8,	0,	printargs,		"SYS_1251"	}, /* 1251 */
-	{ 8,	0,	printargs,		"SYS_1252"	}, /* 1252 */
-	{ 8,	0,	printargs,		"SYS_1253"	}, /* 1253 */
-	{ 8,	0,	printargs,		"SYS_1254"	}, /* 1254 */
-	{ 8,	0,	printargs,		"SYS_1255"	}, /* 1255 */
-	{ 8,	0,	printargs,		"SYS_1256"	}, /* 1256 */
-	{ 8,	0,	printargs,		"SYS_1257"	}, /* 1257 */
-	{ 8,	0,	printargs,		"SYS_1258"	}, /* 1258 */
-	{ 8,	0,	printargs,		"SYS_1259"	}, /* 1259 */
-	{ 8,	0,	printargs,		"SYS_1260"	}, /* 1260 */
-	{ 8,	0,	printargs,		"SYS_1261"	}, /* 1261 */
-	{ 8,	0,	printargs,		"SYS_1262"	}, /* 1262 */
-	{ 8,	0,	printargs,		"SYS_1263"	}, /* 1263 */
-	{ 8,	0,	printargs,		"SYS_1264"	}, /* 1264 */
-	{ 8,	0,	printargs,		"SYS_1265"	}, /* 1265 */
-	{ 8,	0,	printargs,		"SYS_1266"	}, /* 1266 */
-	{ 8,	0,	printargs,		"SYS_1267"	}, /* 1267 */
-	{ 8,	0,	printargs,		"SYS_1268"	}, /* 1268 */
-	{ 8,	0,	printargs,		"SYS_1269"	}, /* 1269 */
-	{ 8,	0,	printargs,		"SYS_1270"	}, /* 1270 */
+	{ 0,	0,	printargs,		"restart_syscall"}, /* 1246 */
+	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 1247 */
+	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 1248 */
+	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 1249 */
+	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 1250 */
+	{ 1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 1251 */
+	{ 1,	0,	sys_timer_delete,	"timer_delete"	}, /* 1252 */
+	{ 2,	0,	sys_clock_settime,	"clock_settime"	}, /* 1253 */
+	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 1254 */
+	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 1255 */
+	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 1256 */
+	{ 8,	0,	printargs,		"fstatfs64"	}, /* 1257 */
+	{ 8,	0,	printargs,		"statfs64"	}, /* 1258 */
+	{ 6,	0,	sys_mbind,		"mbind"		}, /* 1259 */
+	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 1260 */
+	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"	}, /* 1261 */
+	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 1262 */
+	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 1263 */
+	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 1264 */
+	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 1265 */
+	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 1266 */
+	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 1267 */
+	{ 5,	0,	printargs,		"sys_kexec_load" }, /* 1268 */
+	{ 5,	0,	printargs,		"vserver"	}, /* 1269 */
+	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 1270 */
 	{ 8,	0,	printargs,		"SYS_1271"	}, /* 1271 */
 	{ 8,	0,	printargs,		"SYS_1272"	}, /* 1272 */
 	{ 8,	0,	printargs,		"SYS_1273"	}, /* 1273 */
