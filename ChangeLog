@@ -1,4 +1,13 @@
+2004-03-18  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* resource.c (sys_quotactl) [LINUX]: Cast arithmetic shift operand
+	from long to unsigned long, to fix output of the quotactl command
+	parser.
+
 2004-04-16  Roland McGrath  <roland@redhat.com>
+
+	* linux/s390/ioctlent.h, linux/s390x/ioctlent.h: Update DASD ioctls.
+	From Maxim Shchetynin <maxim@de.ibm.com>.
 
 	* configure.ac: Check for <mqueue.h>.
 	* ipc.c (sys_mq_open, printmqattr) [! HAVE_MQUEUE_H]: Don't try to
