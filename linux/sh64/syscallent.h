@@ -233,8 +233,8 @@
 	{ 0,	0,	printargs,		"getegid32"	}, /* 202 */
 	{ 2,	0,	printargs,		"setreuid32"	}, /* 203 */
 	{ 2,	0,	printargs,		"setregid32"	}, /* 204 */
-	{ 2,	0,	printargs,		"getgroups32"	}, /* 205 */
-	{ 2,	0,	printargs,		"setgroups32"	}, /* 206 */
+	{ 2,	0,	sys_getgroups32,	"getgroups32"	}, /* 205 */
+	{ 2,	0,	sys_setgroups32,	"setgroups32"	}, /* 206 */
 	{ 3,	0,	printargs,		"fchown32"	}, /* 207 */
 	{ 3,	0,	printargs,		"setresuid32"	}, /* 208 */
 	{ 3,	0,	printargs,		"getresuid32"	}, /* 209 */
