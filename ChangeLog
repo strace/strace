@@ -1,3 +1,18 @@
+Wed Oct  6 02:00:33 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Update cvsbuild to give a better error if autoconf isn't installed
+  * Add test for linux/ptrace.h to configure
+  * Since we define GNU_SOURCE in the Makefile we don't need to define
+    USE_GNU in file.c anymore
+
+Fri Sep 10 04:35:16 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * #define USE_GNU before including file.c so we get some extra O_* flags
+
+Tue Aug 31 16:27:21 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Add missing } in IPv6 output
+
 Tue Aug 31 01:23:08 CEST 1999  Wichert Akkerman <wakkerma@debian.org>
 
   * Update copyright for strace-graph to BSD to be consistent with

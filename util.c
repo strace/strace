@@ -40,7 +40,7 @@
 #include <link.h>
 #endif /* SUNOS4 */
 
-#if defined(linux) && !defined(__GLIBC__)
+#if defined(linux)
 #include <linux/ptrace.h>
 #endif 
 

@@ -352,7 +352,7 @@ long addr;
 		{
 			tprintf("{sin6_family=AF_INET6, ");
 			inet_ntop(AF_INET6, &sa6.sin6_addr, string_addr, sizeof(string_addr));
-			tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)",
+			tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)}",
 				ntohs(sa6.sin6_port), string_addr, ntohl(sa6.sin6_flowinfo));
 		}
 		break;	

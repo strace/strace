@@ -38,18 +38,21 @@
 #include <sys/syscall.h>
 #include <sys/param.h>
 
-#if defined(LINUX) && defined(SPARC)
+#if HAVE_ASM_REG_H
 #include <asm/reg.h>
 #endif
 
-#ifdef HAVE_SYS_REG_H
-#include <sys/reg.h>
-# define PTRACE_PEEKUSR PTRACE_PEEKUSER
-#endif
-
-#if defined(linux) && !defined(__GLIBC__)
+#if HAVE_LINUX_PTRACE_H
+#undef PTRACE_SYSCALL
 #include <linux/ptrace.h>
 #endif 
+
+#ifdef HAVE_SYS_REG_H
+#include <sys/reg.h>
+#ifndef PTRACE_PEEKUSR
+# define PTRACE_PEEKUSR PTRACE_PEEKUSER
+#endif
+#endif
 
 #ifndef SYS_ERRLIST_DECLARED
 extern int sys_nerr;
