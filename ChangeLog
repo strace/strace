@@ -1,5 +1,12 @@
 2001-03-06  John Hughes <john@Calva.COM>
 
+  * configure.in, defs.h, desc.c, file.c, io.c, mem.c, net.c, resource.c,
+    signal.c, syscall.c, svr4/dummy.h, svr4/syscall.h, svr4/syscallent.h:
+    merge Harald Böhme's solaris patches (_LFS64_LARGEFILE and kernel aio
+    mostly).
+
+2001-03-06  John Hughes <john@Calva.COM>
+
   * dummy.h: add unimplemented UW sycalls
   * syscall.h: we can do settimeofday for UW, whopee!
   * syscallent.h: fix unimplemented UW syscalls
