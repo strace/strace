@@ -1,5 +1,7 @@
 2004-03-01  Roland McGrath  <roland@redhat.com>
 
+	* linux/sparc/syscall.h: Copy linux/syscall.h defns of sys_sched_*.
+
 	* configure.ac: Check for `struct user_desc' in <asm/ldt.h>.
 	* process.c [HAVE_STRUCT_USER_DESC]: Use struct user_desc in place of
 	struct modify_ldt_ldt_s.
