@@ -2335,6 +2335,37 @@ struct xlat xattrflags[] = {
 	{ 0,		 NULL }
 };
 
+static void
+print_xattr_val(tcp, failed, arg, insize, size)
+struct tcb *tcp;
+int failed;
+unsigned long arg;
+size_t size;
+{
+    unsigned char buf[4 * size + 1];
+    if (!failed && umoven(tcp, arg, size, &buf[3 * size]) >= 0) {
+	unsigned char *out = buf;
+	unsigned char *in = &buf[3 * size];
+	size_t i;
+	for (i = 0; i < size; ++i)
+	    if (isprint(in[i]))
+		*out++ = in[i];
+	    else {
+#define tohex(n) "0123456789abcdef"[n]
+		*out++ = '\\';
+		*out++ = 'x';
+		*out++ = tohex(in[i] / 16);
+		*out++ = tohex(in[i] % 16);
+	    }
+	/* Don't print terminating NUL if there is one.  */
+	if (in[i - 1] == '\0')
+	    out -= 4;
+	*out = '\0';
+	tprintf(", \"%s\", %zd", buf, insize);
+    } else
+	tprintf(", 0x%lx, %zd", arg, insize);
+}
+
 int
 sys_setxattr(tcp)
 struct tcb *tcp;
@@ -2343,8 +2374,8 @@ struct tcb *tcp;
 	printpath(tcp, tcp->u_arg[0]);
 	tprintf(", ");
 	printstr(tcp, tcp->u_arg[1], -1);
-	/* XXX Print value in format */
-	tprintf(", %p, %ld, ", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+	print_xattr_val(tcp, 0, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
+	tprintf(", ");
 	printflags(xattrflags, tcp->u_arg[4]);
     }
     return 0;
@@ -2357,8 +2388,8 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	tprintf("%ld, ", tcp->u_arg[0]);
 	printstr(tcp, tcp->u_arg[1], -1);
-	/* XXX Print value in format */
-	tprintf(", %p, %ld, ", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+	print_xattr_val(tcp, 0, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
+	tprintf(", ");
 	printflags(xattrflags, tcp->u_arg[4]);
     }
     return 0;
@@ -2373,8 +2404,8 @@ struct tcb *tcp;
 	tprintf(", ");
 	printstr(tcp, tcp->u_arg[1], -1);
     } else {
-	/* XXX Print value in format */
-	tprintf(", %p, %ld", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+	print_xattr_val(tcp, syserror(tcp), tcp->u_arg[2], tcp->u_arg[3],
+			tcp->u_rval);
     }
     return 0;
 }
@@ -2387,8 +2418,8 @@ struct tcb *tcp;
 	tprintf("%ld, ", tcp->u_arg[0]);
 	printstr(tcp, tcp->u_arg[1], -1);
     } else {
-	/* XXX Print value in format */
-	tprintf(", %p, %ld", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+	print_xattr_val(tcp, syserror(tcp), tcp->u_arg[2], tcp->u_arg[3],
+			tcp->u_rval);
     }
     return 0;
 }
