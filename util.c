@@ -1303,11 +1303,6 @@ typedef struct regs arg_setup_state;
 #  endif
 # endif
 
-# ifndef arg0_index
-#  define arg0_index 0
-#  define arg1_index 1
-# endif
-
 typedef int arg_setup_state;
 
 # define arg_setup(tcp, state) (0)
@@ -1336,6 +1331,11 @@ set_arg1 (struct tcb *tcp, void *cookie, long val)
 #endif
 #ifndef restore_arg1
 # define restore_arg1(tcp, state, val) set_arg1((tcp), (state), (val))
+#endif
+
+#ifndef arg0_index
+# define arg0_index 0
+# define arg1_index 1
 #endif
 
 int
