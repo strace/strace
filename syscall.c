@@ -713,7 +713,7 @@ struct tcb *tcp;
 	static long r28;
 #elif defined(SH)
        static long r0;
-#elif defined(SHMEDIA)
+#elif defined(SH64)
        static long r9;
 #elif defined(X86_64)
        static long rax;
@@ -1144,7 +1144,7 @@ struct tcb *tcp;
                        return 0;
                }
        }
-#elif defined(SHMEDIA)
+#elif defined(SH64)
 	if (upeek(pid, REG_SYSCALL, &scno) < 0)
 		return -1;
         scno &= 0xFFFF;
@@ -1156,7 +1156,7 @@ struct tcb *tcp;
 			return 0;
 		}
 	}
-#endif /* SHMEDIA */
+#endif /* SH64 */
 #endif /* LINUX */
 #ifdef SUNOS4
 	if (upeek(pid, uoff(u_arg[7]), &scno) < 0)
@@ -1165,7 +1165,7 @@ struct tcb *tcp;
         /* new syscall ABI returns result in R0 */
         if (upeek(pid, 4*REG_REG0, (long *)&r0) < 0)
                 return -1;
-#elif defined(SHMEDIA)
+#elif defined(SH64)
         /* ABI defines result returned in r9 */
         if (upeek(pid, REG_GENERAL(9), (long *)&r9) < 0)
                 return -1;
@@ -1481,7 +1481,7 @@ struct tcb *tcp;
                        u_error = 0;
                }
 #else
-#ifdef SHMEDIA
+#ifdef SH64
                 /* interpret result as return value or error number */
                 if (r9 && (unsigned) -r9 < nerrnos) {
 	                tcp->u_rval = -1;
@@ -1491,7 +1491,7 @@ struct tcb *tcp;
                         tcp->u_rval = r9;
 	                u_error = 0;
                 }
-#endif /* SHMEDIA */
+#endif /* SH64 */
 #endif /* SH */
 #endif /* HPPA */
 #endif /* SPARC */
@@ -1699,11 +1699,11 @@ force_result(tcp, error, rval)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*REG_REG0), r0) < 0)
 		return -1;
 #else
-#ifdef SHMEDIA
+#ifdef SH64
         r9 = error ? -error : rval;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)REG_GENERAL(9), r9) < 0)
 		return -1;
-#endif /* SHMEDIA */
+#endif /* SH64 */
 #endif /* SH */
 #endif /* HPPA */
 #endif /* SPARC */
@@ -1934,7 +1934,7 @@ struct tcb *tcp;
                                return -1;
                }
         }
-#elif defined(SHMEDIA)
+#elif defined(SH64)
 	{
 		int i;
                 /* Registers used by SH5 Linux system calls for parameters */

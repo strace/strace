@@ -666,7 +666,7 @@ int new;
        if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new)<0)
                return -1;
        return 0;
-#elif defined(SHMEDIA)
+#elif defined(SH64)
        /* Top half of reg encodes the no. of args n as 0x1n.
           Assume 0 args as kernel never actually checks... */
        if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_SYSCALL),
@@ -2475,7 +2475,7 @@ struct xlat struct_user_offsets[] = {
        { 4*REG_XDREG14,        "4*REG_XDREG14"                         },
        { 4*REG_FPSCR,          "4*REG_FPSCR"                           },
 #endif /* SH */
-#ifdef SHMEDIA
+#ifdef SH64
 	{ 0,		        "PC(L)"				        },
 	{ 4,	                "PC(U)"				        },
 	{ 8, 	                "SR(L)"	  	         		},
@@ -2663,12 +2663,12 @@ struct xlat struct_user_offsets[] = {
 	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
 	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
-#ifdef SHMEDIA
+#ifdef SH64
 	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
 #endif
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SHMEDIA)
+#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
 #endif
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},

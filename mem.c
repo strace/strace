@@ -42,7 +42,7 @@
 #if defined(LINUX) && defined(I386)
 #include <asm/ldt.h>
 #endif
-#if defined(LINUX) && defined(SHMEDIA)
+#if defined(LINUX) && defined(SH64)
 #include <asm/page.h>	    /* for PAGE_SHIFT */
 #endif
 
@@ -227,7 +227,7 @@ struct tcb *tcp;
 		return 0;
 	else
 		u_arg[i] = v;
-#elif defined(SH) || defined(SHMEDIA)
+#elif defined(SH) || defined(SH64)
     /* SH has always passed the args in registers */
     int i;
     for (i=0; i<6; i++)
@@ -245,7 +245,7 @@ int
 sys_mmap(tcp)
 struct tcb *tcp;
 {
-#if defined(LINUX) && defined(SHMEDIA)
+#if defined(LINUX) && defined(SH64)
     /*
      * Old mmap differs from new mmap in specifying the
      * offset in units of bytes rather than pages.  We

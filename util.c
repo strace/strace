@@ -974,7 +974,7 @@ struct tcb *tcp;
 #elif defined(SH)
        if (upeek(tcp->pid, 4*REG_PC ,&pc) < 0)
                return -1;
-#elif defined(SHMEDIA)
+#elif defined(SH64)
        if (upeek(tcp->pid, REG_PC ,&pc) < 0)
                return -1;
 #endif
@@ -1092,7 +1092,7 @@ struct tcb *tcp;
                return;
        }
        tprintf("[%08lx] ", pc);
-#elif defined(SHMEDIA)
+#elif defined(SH64)
 	long pc;
 
 	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
@@ -1245,7 +1245,7 @@ typedef struct regs arg_setup_state;
 # elif defined (SH)
 #  define arg0_offset	(4*(REG_REG0+4))
 #  define arg1_offset	(4*(REG_REG0+5))
-# elif defined (SHMEDIA)
+# elif defined (SH64)
    /* ABI defines arg0 & 1 in r2 & r3 */
 #  define arg0_offset   (REG_OFFSET+16)
 #  define arg1_offset   (REG_OFFSET+24)
