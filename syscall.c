@@ -1590,7 +1590,9 @@ struct tcb *tcp;
 #endif /* LINUX */
 			default:
 				tprintf("= -1 ");
-				if (u_error < nerrnos && u_error < sys_nerr)
+				if (u_error < 0)
+					tprintf("E??? (errno %ld)", u_error);
+				else if (u_error < nerrnos && u_error < sys_nerr)
 					tprintf("%s (%s)", errnoent[u_error],
 						sys_errlist[u_error]);
 				else if (u_error < nerrnos)
