@@ -1,5 +1,10 @@
 2003-01-23  Roland McGrath  <roland@redhat.com>
 
+	* linux/sparc/syscall.h: Declare sys_getdents64.
+
+	* linux/dummy.h [! SYS_getpmsg] (sys_getpmsg): #define to printargs.
+	[! SYS_putpmsg] (sys_putpmsg): Likewise.
+
 	* process.c: Reorder includes to put sys/reg.h before linux/ptrace.h,
 	since they can conflict.
 
