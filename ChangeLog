@@ -1,3 +1,7 @@
+2004-09-07  Michal Ludvig  <mludvig@suse.cz>
+
+	* defs.h (nioctlents1, nsignals2): Fix typos in decls.
+
 2004-09-03  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c (qual_options): Add const to defn.

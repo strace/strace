@@ -551,7 +551,7 @@ extern const int nsignals0;
 
 #if SUPPORTED_PERSONALITIES >= 2
 extern const struct ioctlent ioctlent1[];
-extern constint nioctlents1;
+extern const int nioctlents1;
 extern const char *const signalent1[];
 extern const int nsignals1;
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
@@ -560,7 +560,7 @@ extern const int nsignals1;
 extern const struct ioctlent ioctlent2[];
 extern const int nioctlents2;
 extern const char *const signalent2[];
-extern constint nsignals2;
+extern const int nsignals2;
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 #if defined(FREEBSD) || (defined(LINUX) \
