@@ -98,6 +98,9 @@
 # ifndef FUTEX_FD
 #  define FUTEX_FD 2
 # endif
+# ifndef FUTEX_REQUEUE
+#  define FUTEX_REQUEUE 3
+# endif
 #endif
 
 #ifdef LINUX
@@ -2828,6 +2831,7 @@ static struct xlat futexops[] = {
 	{ FUTEX_WAIT,	"FUTEX_WAIT" },
 	{ FUTEX_WAKE,	"FUTEX_WAKE" },
 	{ FUTEX_FD,	"FUTEX_FD" },
+	{ FUTEX_REQUEUE,"FUTEX_REQUEUE" },
 	{ 0,		NULL }
 };
 
@@ -2837,12 +2841,13 @@ struct tcb *tcp;
 {
     if (entering(tcp)) {
 	tprintf("%p, ", (void *) tcp->u_arg[0]);
-	printflags(futexops, tcp->u_arg[1]);
+	printxval(futexops, tcp->u_arg[1], "FUTEX_???");
 	tprintf(", %ld", tcp->u_arg[2]);
 	if (tcp->u_arg[1] == FUTEX_WAIT) {
 		tprintf(", ");
 		printtv(tcp, tcp->u_arg[3]);
-	}
+	} else if (tcp->u_arg[1] == FUTEX_REQUEUE)
+		tprintf(", %ld, %p", tcp->u_arg[3], (void *) tcp->u_arg[4]);
     }
     return 0;
 }
