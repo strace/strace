@@ -216,7 +216,7 @@ int sig;
 		return signalent[sig];
 #ifdef SIGRTMIN
 	} else if (sig >= __SIGRTMIN && sig <= __SIGRTMAX) {
-		sprintf(buf, "SIGRT_%d", sig);
+		sprintf(buf, "SIGRT_%d", sig - __SIGRTMIN);
 		return buf;
 #endif /* SIGRTMIN */
 	} else {
