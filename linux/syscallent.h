@@ -122,7 +122,7 @@
 	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 87 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 88 */
 	{ 3,	0,	sys_readdir,		"readdir"	}, /* 89 */
-	{ 6,	0,	sys_mmap,		"mmap"		}, /* 90 */
+	{ 6,	0,	sys_old_mmap,		"old_mmap"	}, /* 90 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 91 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 92 */
 	{ 2,	0,	sys_ftruncate,		"ftruncate"	}, /* 93 */
@@ -236,10 +236,10 @@
 	{ 5,	0,	printargs,		"SYS_188"	}, /* 188 */
 	{ 5,	0,	printargs,		"SYS_189"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
-	{ 5,	0,	printargs,		"SYS_191"	}, /* 191 */
-	{ 5,	0,	printargs,		"SYS_192"	}, /* 192 */
-	{ 5,	0,	printargs,		"SYS_193"	}, /* 193 */
-	{ 5,	0,	printargs,		"SYS_194"	}, /* 194 */
+	{ 5,	0,	printargs,		"getrlimit"	}, /* 191 */
+	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 192 */
+	{ 5,	0,	printargs,		"truncate64"	}, /* 193 */
+	{ 5,	0,	printargs,		"ftruncate64"	}, /* 194 */
 	{ 5,	0,	printargs,		"SYS_195"	}, /* 195 */
 	{ 5,	0,	printargs,		"SYS_196"	}, /* 196 */
 	{ 5,	0,	printargs,		"SYS_197"	}, /* 197 */

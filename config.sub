@@ -155,7 +155,7 @@ case $basic_machine in
 		| alpha | alphaev5 | alphaev56 | alphapca56 | we32k | ns16k | clipper \
 		| i370 | sh | powerpc | powerpcle | 1750a | dsp16xx | pdp11 \
 		| mips64 | mipsel | mips64el | mips64orion | mips64orionel \
-		| mipstx39 | mipstx39el \
+		| mipstx39 | mipstx39el | s390 \
 		| sparc | sparclet | sparclite | sparc64 | v850)
 		basic_machine=$basic_machine-unknown
 		;;
@@ -182,7 +182,7 @@ case $basic_machine in
 	      | sparc64-* | mips64-* | mipsel-* \
 	      | mips64el-* | mips64orion-* | mips64orionel-*  \
 	      | mipstx39-* | mipstx39el-* \
-	      | f301-*)
+	      | f301-* | s390-*)
 		;;
 	# Recognize the various machine names and aliases which stand
 	# for a CPU type and a company and sometimes even an OS.
@@ -510,6 +510,9 @@ case $basic_machine in
 		;;
 	rtpc | rtpc-*)
 		basic_machine=romp-ibm
+		;;
+	s390)
+		basic_machine=s390-ibm
 		;;
 	sequent)
 		basic_machine=i386-sequent

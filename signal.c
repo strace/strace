@@ -2,6 +2,10 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
+ * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
+ * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
+ *                     Linux for s390 port by D.J. Barrow
+ *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -692,6 +696,27 @@ int
 sys_sigreturn(tcp)
 struct tcb *tcp;
 {
+#ifdef S390
+    long usp;
+    struct sigcontext_struct sc;
+
+    if (entering(tcp)) {
+	    tcp->u_arg[0] = 0;
+	    if (upeek(tcp->pid,PT_GPR15,&usp)<0)
+		    return 0;
+	    if (umove(tcp, usp+__SIGNAL_FRAMESIZE, &sc) < 0)
+		    return 0;
+	    tcp->u_arg[0] = 1;
+	    memcpy(&tcp->u_arg[1],&sc.oldmask[0],sizeof(sigset_t));
+    } else {
+	    tcp->u_rval = tcp->u_error = 0;
+	    if (tcp->u_arg[0] == 0)
+		    return 0;
+	    tcp->auxstr = sprintsigmask("mask now ",(sigset_t *)&tcp->u_arg[1]);
+	    return RVAL_NONE | RVAL_STR;
+    }
+    return 0;
+#else
 #ifdef I386
 	long esp;
 	struct sigcontext_struct sc;
@@ -843,6 +868,7 @@ struct tcb *tcp;
 #endif /* !M68K */
 #endif /* !POWERPC */
 #endif /* !I386 */
+#endif /* S390 */
 }
 
 int

@@ -2,6 +2,10 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
+ * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
+ * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
+ *                     Linux for s390 port by D.J. Barrow
+ *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -590,6 +594,9 @@ struct tcb *tcp;
 #elif defined (SPARC)
 	struct regs regs;
 	unsigned long trap;
+#elif defined(S390)
+	long gpr2;
+	long pc;
 #endif 
 #endif /* LINUX */
 
@@ -601,7 +608,14 @@ struct tcb *tcp;
 	if (dtime && (tcp->flags & TCB_INSYSCALL))
 		gettimeofday(&tv, NULL);
 #ifdef LINUX
-#if defined (POWERPC)
+#if defined(S390)
+	if (upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
+		return -1;
+	scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(pc-4),0);
+	if (errno)
+		return -1;
+	scno&=0xFF;
+#elif defined (POWERPC)
 	if (upeek(pid, 4*PT_R0, &scno) < 0)
 		return -1;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
@@ -1086,7 +1100,16 @@ struct tcb *tcp;
 	/* Entering system call */
 	tcp->scno = scno;
 #ifdef LINUX
-#if defined (ALPHA)
+#if defined(S390)
+	{
+		int i;
+		tcp->u_nargs = sysent[tcp->scno].nargs;
+		for (i = 0; i < tcp->u_nargs; i++) {
+			if (upeek(pid,i==0 ? PT_ORIGGPR2:PT_GPR2+(i<<2), &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
+#elif defined (ALPHA)
 	{
 		int i;
 		tcp->u_nargs = sysent[tcp->scno].nargs;

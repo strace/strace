@@ -2,6 +2,7 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
+ * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -136,27 +137,13 @@ static struct xlat mmap_flags[] = {
 	{ 0,		NULL		},
 };
 
+static
 int
-sys_mmap(tcp)
+print_mmap(tcp,u_arg)
 struct tcb *tcp;
+long *u_arg;
 {
-#ifdef LINUX
-#  if defined(ALPHA) || defined(sparc) || defined(POWERPC) || defined(MIPS)
-	long *u_arg = tcp->u_arg;
-#  else /* !ALPHA */
-	long u_arg[6];
-#  endif /* !ALPHA */
-#else /* !LINUX */
-	long *u_arg = tcp->u_arg;
-#endif /* !LINUX */
-
 	if (entering(tcp)) {
-#if defined(LINUX) && !defined(ALPHA) && !defined(sparc) && !defined(POWERPC) && !defined(MIPS)
-		if (umoven(tcp, tcp->u_arg[0], sizeof u_arg,
-				(char *) u_arg) == -1)
-			return 0;
-#endif /* LINUX && !ALPHA && !sparc && !POWERPC */
-
 		/* addr */
 		if (!u_arg[0])
 			tprintf("NULL, ");
@@ -176,6 +163,26 @@ struct tcb *tcp;
 		tprintf("%#lx", u_arg[5]);
 	}
 	return RVAL_HEX;
+}
+
+#ifdef LINUX
+int sys_old_mmap(tcp)
+struct tcb *tcp;
+{
+    long u_arg[6];
+
+    if (umoven(tcp, tcp->u_arg[0], sizeof u_arg, (char *) u_arg) == -1)
+	    return 0;
+    return print_mmap(tcp, u_arg);
+   
+}
+#endif
+
+int
+sys_mmap(tcp)
+struct tcb *tcp;
+{
+    return print_mmap(tcp, tcp->u_arg);
 }
 
 int

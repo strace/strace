@@ -2,6 +2,10 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
+ * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
+ * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
+ *                     Linux for s390 port by D.J. Barrow
+ *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -891,7 +895,11 @@ struct tcb *tcp;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
 	pc = regs.r_pc;
-#endif
+#elif defined(S390)
+	if(upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
+		return -1;
+
+#else
 	return pc;
 #endif /* LINUX */
 
@@ -1045,13 +1053,15 @@ struct tcb *tcp;
 #elif defined (M68K)
 #define LOOP	0x60fe0000
 #elif defined (ALPHA)
-#define LOOP    0xc3ffffff
+#define LOOP	0xc3ffffff
 #elif defined (POWERPC)
-#define LOOP 0x0000feeb
+#define LOOP	0x0000feeb
 #elif defined(ARM)
-#define LOOP -1  /* almost certainly wrong, jws */
+#define LOOP	-1		/* almost certainly wrong, jws */
 #elif defined(MIPS)
-#define LOOP 0x1000ffff
+#define LOOP	0x1000ffff
+#elif defined(S390)
+#define LOOP	0xa7f40000	/* BRC 15,0 */
 #else
 #error unknown architecture
 #endif
@@ -1074,6 +1084,9 @@ struct tcb *tcp;
 	return -1;		/* FIXME: I do not know what i do - Flo */
 #elif defined (POWERPC)
 	if (upeek(tcp->pid, 4*PT_NIP, &tcp->baddr) < 0)
+		return -1;
+#elif defined(S390)
+	if (upeek(tcp->pid,PT_PSWADDR, &tcp->baddr) < 0)
 		return -1;
 #else
 #error unknown architecture

@@ -1,6 +1,19 @@
+Thu Dec 23 15:01:37 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge patch from ftp://oss.software.ibm.com/linux390/ to add
+    support for Linux on the IBM S/390 architecture
+
+Mon Dec 20 00:27:50 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Rewrite mmap-handling to support mmap2 on Linux
+
 Tue Dec 14 11:35:16 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Note that Linux can handle sys_semop() as well
+
+Tue Nov 30 11:05:26 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Include linux/in6.h for glibc2.0 and older
 
 Mon Nov 29 16:33:04 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 

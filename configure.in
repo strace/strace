@@ -56,6 +56,9 @@ ppc|powerpc)
 arm)
 	arch=arm
 	;;
+s390)
+	arch=s390
+	;;
 *)
 	AC_MSG_ERROR(this architecture is not yet supported by strace)
 	;;
