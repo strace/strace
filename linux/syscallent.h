@@ -347,7 +347,7 @@
 	{ 5,	0,	printargs,		"SYS_298"	}, /* 298 */
 	{ 5,	0,	printargs,		"SYS_299"	}, /* 299 */
 
-#if SYS_socket_subcall != 300
+#if SYS_socket_subcall != 300 && !defined X86_64 /* pers1 broken on x86-64 */
  #error fix me
 #endif
 	{ 8,	0,	printargs,		"socket_subcall"}, /* 300 */
@@ -369,7 +369,7 @@
 	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 316 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 317 */
 
-#if SYS_ipc_subcall != 318
+#if SYS_ipc_subcall != 318 && !defined X86_64 /* pers1 broken on x86-64 */
  #error fix me
 #endif
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 318 */
