@@ -1,4 +1,4 @@
-strace (4.5.9-1) unstable; urgency=low
+strace (4.5.9-2) unstable; urgency=low
 
   * New upstream version.
     + Fix potential crash in getxattr printing, closes: #283704.
@@ -12,7 +12,7 @@ strace (4.5.9-1) unstable; urgency=low
     + Support symbolic printing of x86_64 arch_prctl parameters.
     + Add strace-udeb package for Debian installer debugging, closes: #268294.
 
- -- Roland McGrath <frob@debian.org>  Fri,  4 Feb 2005 01:28:21 -0800
+ -- Roland McGrath <frob@debian.org>  Fri,  4 Feb 2005 01:53:01 -0800
 
 strace (4.5.8-1) unstable; urgency=low
 

@@ -1,7 +1,7 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
 Version: 4.5.9
-Release: 1
+Release: 2
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
@@ -75,7 +75,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Fri Feb  4 2005 Roland McGrath <roland@frob.com> - 4.5.9-1
+* Fri Feb  4 2005 Roland McGrath <roland@frob.com> - 4.5.9-2
 - update ia64 syscall list (#146245)
 - fix x86_64 syscall argument extraction for 32-bit processes (#146093)
 - fix -e signal=NAME parsing (#143362)
