@@ -2034,10 +2034,10 @@ struct tcb *tcp;
 		struct dirent64 *d = (struct dirent64 *) &buf[i];
 #if defined(LINUX) || defined(SVR4)
 		if (!abbrev(tcp)) {
-			tprintf("%s{d_ino=%lu, d_off=%lu, ",
+			tprintf("%s{d_ino=%llu, d_off=%llu, ",
 				i ? " " : "",
-				(unsigned long)d->d_ino,
-				(unsigned long)d->d_off);
+				d->d_ino,
+				d->d_off);
 #ifdef LINUX
 			tprintf("d_type=");
 			printxval(direnttypes, d->d_type, "DT_???");
