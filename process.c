@@ -70,6 +70,11 @@
 #endif
 #endif /* HAVE_ASM_REG_H */
 
+#ifdef HAVE_LINUX_PTRACE_H
+#undef PTRACE_SYSCALL
+#include <linux/ptrace.h>
+#endif
+
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
@@ -78,9 +83,6 @@
 #ifndef PTRACE_POKEUSR
 # define PTRACE_POKEUSR PTRACE_POKEUSER
 #endif
-#elif defined(HAVE_LINUX_PTRACE_H)
-#undef PTRACE_SYSCALL
-#include <linux/ptrace.h>
 #endif
 
 #ifdef HAVE_LINUX_FUTEX_H
@@ -1945,11 +1947,25 @@ static struct xlat ptrace_cmds[] = {
 	{ PTRACE_SINGLESTEP,	"PTRACE_SINGLESTEP"	},
 	{ PTRACE_ATTACH,	"PTRACE_ATTACH"		},
 	{ PTRACE_DETACH,	"PTRACE_DETACH"		},
-#ifdef SUNOS4
+#ifdef PTRACE_GETREGS
 	{ PTRACE_GETREGS,	"PTRACE_GETREGS"	},
+#endif
+#ifdef PTRACE_SETREGS
 	{ PTRACE_SETREGS,	"PTRACE_SETREGS"	},
+#endif
+#ifdef PTRACE_GETFPREGS
 	{ PTRACE_GETFPREGS,	"PTRACE_GETFPREGS",	},
+#endif
+#ifdef PTRACE_SETFPREGS
 	{ PTRACE_SETFPREGS,	"PTRACE_SETFPREGS",	},
+#endif
+#ifdef PTRACE_GETFPXREGS
+	{ PTRACE_GETFPXREGS,	"PTRACE_GETFPXREGS",	},
+#endif
+#ifdef PTRACE_SETFPXREGS
+	{ PTRACE_SETFPXREGS,	"PTRACE_SETFPXREGS",	},
+#endif
+#ifdef SUNOS4
 	{ PTRACE_READDATA,	"PTRACE_READDATA"	},
 	{ PTRACE_WRITEDATA,	"PTRACE_WRITEDATA"	},
 	{ PTRACE_READTEXT,	"PTRACE_READTEXT"	},
@@ -2500,19 +2516,18 @@ int
 sys_ptrace(tcp)
 struct tcb *tcp;
 {
-	char *cmd;
 	struct xlat *x;
 	long addr;
 
-	cmd = xlookup(ptrace_cmds, tcp->u_arg[0]);
-	if (!cmd)
-#ifndef FREEBSD
-		cmd = "PTRACE_???";
-#else
-		cmd = "PT_???";
-#endif
 	if (entering(tcp)) {
-		tprintf("%s, %lu, ", cmd, tcp->u_arg[1]);
+		printxval(ptrace_cmds, tcp->u_arg[0],
+#ifndef FREEBSD
+			  "PTRACE_???"
+#else
+			  "PT_???"
+#endif
+			);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 		addr = tcp->u_arg[2];
 #ifndef FREEBSD
 		if (tcp->u_arg[0] == PTRACE_PEEKUSER
