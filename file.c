@@ -130,9 +130,22 @@ struct stat {
 #include <sys/param.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
+#endif
+
+#if HAVE_LONG_LONG_OFF_T
+/*
+ * Ugly hacks for systems that have typedef long long off_t
+ */
 
 #define stat64 stat
 #define HAVE_STAT64 1	/* Ugly hack */
+
+#define	sys_stat64	sys_stat
+#define sys_fstat64	sys_fstat
+#define sys_lstat64	sys_lstat
+#define sys_lseek64	sys_lseek
+#define sys_truncate64	sys_truncate
+#define sys_ftruncate64	sys_ftruncate
 #endif
 
 #ifdef MAJOR_IN_SYSMACROS
@@ -354,7 +367,7 @@ static struct xlat whence[] = {
 	{ 0,		NULL		},
 };
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_lseek(tcp)
 struct tcb *tcp;
@@ -403,7 +416,7 @@ struct tcb *tcp;
 }
 #endif
 
-#if _LFS64_LARGEFILE || FREEBSD
+#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 int
 sys_lseek64 (tcp)
 struct tcb *tcp;
@@ -422,7 +435,7 @@ struct tcb *tcp;
 }
 #endif
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_truncate(tcp)
 struct tcb *tcp;
@@ -435,7 +448,7 @@ struct tcb *tcp;
 }
 #endif
 
-#if _LFS64_LARGEFILE || FREEBSD
+#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 int
 sys_truncate64(tcp)
 struct tcb *tcp;
@@ -449,7 +462,7 @@ struct tcb *tcp;
 }
 #endif
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_ftruncate(tcp)
 struct tcb *tcp;
@@ -461,7 +474,7 @@ struct tcb *tcp;
 }
 #endif
 
-#if _LFS64_LARGEFILE || FREEBSD
+#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 int
 sys_ftruncate64(tcp)
 struct tcb *tcp;
@@ -655,7 +668,7 @@ struct tcb *tcp;
 }
 #endif
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 static void
 realprintstat(tcp, statbuf)
 struct tcb *tcp;
@@ -735,7 +748,7 @@ long addr;
 
 	realprintstat(tcp, &statbuf);
 }
-#endif	/* !FREEBSD */
+#endif	/* !HAVE_LONG_LONG_OFF_T */
 
 #ifdef HAVE_STAT64
 static void
@@ -884,7 +897,7 @@ long addr;
 }
 #endif /* linux && !IA64 */
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_stat(tcp)
 struct tcb *tcp;
@@ -933,7 +946,7 @@ struct tcb *tcp;
 # endif /* !IA64 */
 #endif /* linux */
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_fstat(tcp)
 struct tcb *tcp;
@@ -979,7 +992,7 @@ struct tcb *tcp;
 # endif /* !IA64 */
 #endif
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_lstat(tcp)
 struct tcb *tcp;

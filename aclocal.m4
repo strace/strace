@@ -325,6 +325,56 @@ then
 fi
 ])
 
+dnl ### A macro to determine if off_t is a long long
+AC_DEFUN(AC_OFF_T_IS_LONG_LONG,
+[AC_MSG_CHECKING(for long long off_t)
+AC_CACHE_VAL(ac_cv_have_long_long_off_t,
+[AC_TRY_RUN([#include <sys/types.h>
+main () {
+	if (sizeof (off_t) == sizeof (long long) &&
+	    sizeof (off_t) > sizeof (long))
+	    return 0;
+	return 1;
+}
+],
+ac_cv_have_long_long_off_t=yes,
+ac_cv_have_long_long_off_t=no,
+[# Should try to guess here
+ac_cv_have_long_long_off_t=no
+])])
+AC_MSG_RESULT($ac_cv_have_long_long_off_t)
+if test "$ac_cv_have_long_long_off_t" = yes
+then
+	AC_DEFINE(HAVE_LONG_LONG_OFF_T)
+fi
+])
+
+dnl ### A macro to determine if rlim_t is a long long
+AC_DEFUN(AC_RLIM_T_IS_LONG_LONG,
+[AC_MSG_CHECKING(for long long rlim_t)
+AC_CACHE_VAL(ac_cv_have_long_long_rlim_t,
+[AC_TRY_RUN([#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+main () {
+	if (sizeof (rlim_t) == sizeof (long long) &&
+	    sizeof (rlim_t) > sizeof (long))
+	    return 0;
+	return 1;
+}
+],
+ac_cv_have_long_long_rlim_t=yes,
+ac_cv_have_long_long_rlim_t=no,
+[# Should try to guess here
+ac_cv_have_long_long_rlim_t=no
+])])
+AC_MSG_RESULT($ac_cv_have_long_long_rlim_t)
+if test "$ac_cv_have_long_long_rlim_t" = yes
+then
+	AC_DEFINE(HAVE_LONG_LONG_RLIM_T)
+fi
+])
+
 dnl ### A macro to determine whether sin6_scope_id is available.
 AC_DEFUN(AC_SIN6_SCOPE_ID,
 [AC_MSG_CHECKING(for sin6_scope_id in sockaddr_in6)

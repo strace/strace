@@ -1,3 +1,20 @@
+2001-03-08  John Hughes <john@Calva.COM>
+
+  * acconfig.h: new #defines HAVE_LONG_LONG_OFF_T and HAVE_LONG_LONG_RLIM_T.
+  * aclocal.m4: routines to check for long long off_t and rlim_t.
+  * configure.in: check for long long off_t and rlim_t.
+  * desc.c: if HAVE_LONG_LONG_OFF_T treat flock as flock64
+  * file.c: if HAVE_LONG_LONG_OFF_T treat stat,lstat,fstat and lseek as 64
+    bit versions.
+  * io.c: if HAVE_LONG_LONG_OFF_T use 64 bit versions of pread and pwrite.
+  * mem.c: if HAVE_LONG_LONG_OFF_T use 64 bit version of mmap
+  * resource.c: if HAVE_LONG_LONG_OFF_T use 64 bit versions of getrlimit
+    and setrlimit.
+  * freebsd/syscalls.print: don't explicitly use 64 bit versions of calls,
+    now done automaticaly for us.
+  * freebsd/i386/syscall.h: ditto.
+  * freebsd/i386/syscallent.h ditto.
+
 2001-03-07  John Hughes <john@Calva.COM>
 
   * desc.c: On FreeBSD flock structure uses 64 bit offsets.

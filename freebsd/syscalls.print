@@ -64,10 +64,10 @@ fcntl
 flock
 fork
 fpathconf
-fstat		sys_fstat64
+fstat
 fstatfs
 fsync
-ftruncate	sys_ftruncate64
+ftruncate
 getdents
 getdirentries
 getdomainname
@@ -96,13 +96,13 @@ kill
 killpg
 link
 listen
-lseek		sys_lseek64
-lstat		sys_lstat64
+lseek
+lstat
 mincore
 mkdir
 mkfifo
 mknod
-mmap		sys_mmap64
+mmap
 mprotect
 msgctl
 msgget
@@ -116,9 +116,9 @@ open
 pathconf
 pipe
 poll
-pread		sys_pread64
+pread
 ptrace
-pwrite		sys_pwrite64
+pwrite
 quotactl
 read
 readlink
@@ -171,14 +171,14 @@ sigsuspend
 sigvec
 socket
 socketpair
-stat		sys_stat64
+stat
 statfs
 stime
 symlink
 sysctl
 time
 times
-truncate	sys_truncate64
+truncate
 umask
 uname
 unlink

@@ -46,6 +46,19 @@
 #include <sys/time.h>
 #endif
 
+#if HAVE_LONG_LONG_RLIM_T
+/*
+ * Hacks for systems that have a long long rlim_t
+ */
+
+#define rlimit64 rlimit			/* Ugly hack */
+#define rlim64_t rlim_t			/* Ugly hack */
+#define RLIM64_INFINITY RLIM_INFINITY	/* You guessed it */
+
+#define sys_getrlimit64	sys_getrlimit
+#define sys_setrlimit64	sys_setrlimit
+#endif
+
 static struct xlat resources[] = {
 #ifdef RLIMIT_CPU
 	{ RLIMIT_CPU,	"RLIMIT_CPU"	},
@@ -83,6 +96,7 @@ static struct xlat resources[] = {
 	{ 0,		NULL		},
 };
 
+#if !HAVE_LONG_LONG_RLIM_T
 static char *
 sprintrlim(lim)
 long lim;
@@ -141,8 +155,9 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* !HAVE_LONG_LONG_RLIM_T */
 
-#if _LFS64_LARGEFILE
+#if _LFS64_LARGEFILE || HAVE_LONG_LONG_RLIM_T
 static char *
 sprintrlim64(lim)
 rlim64_t lim;
@@ -201,7 +216,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-#endif
+#endif /* _LFS64_LARGEFILES || HAVE_LONG_LONG_RLIM_T */
 
 #ifndef SVR4
 

@@ -35,6 +35,15 @@
 #include <fcntl.h>
 #include <sys/uio.h>
 
+#ifdef HAVE_LONG_LONG_OFF_T
+/*
+ * Hacks for systems that have a long long off_t
+ */
+
+#define sys_pread64	sys_pread
+#define sys_pwrite64	sys_pwrite
+#endif
+
 int
 sys_read(tcp)
 struct tcb *tcp;
@@ -269,7 +278,7 @@ struct tcb *tcp;
 
 #endif /* LINUX */
 
-#if _LFS64_LARGEFILE || FREEBSD
+#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 int
 sys_pread64(tcp)
 struct tcb *tcp;

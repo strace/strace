@@ -41,6 +41,13 @@
 #include <asm/ldt.h>
 #endif
 
+#ifdef HAVE_LONG_LONG_OFF_T
+/*
+ * Ugly hacks for systems that have a long long off_t
+ */
+#define sys_mmap64	sys_mmap
+#endif
+
 int
 sys_brk(tcp)
 struct tcb *tcp;
@@ -153,6 +160,7 @@ static struct xlat mmap_flags[] = {
 	{ 0,		NULL		},
 };
 
+#if !HAVE_LONG_LONG_OFF_T
 static
 int
 print_mmap(tcp,u_arg)
@@ -223,8 +231,9 @@ struct tcb *tcp;
 {
     return print_mmap(tcp, tcp->u_arg);
 }
+#endif /* !HAVE_LONG_LONG_OFF_T */
 
-#if _LFS64_LARGEFILE || FREEBSD
+#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 int
 sys_mmap64(tcp)
 struct tcb *tcp;

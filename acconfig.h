@@ -75,8 +75,14 @@
 /* Define if stat64 is available in asm/stat.h.  */
 #undef HAVE_STAT64
 
-/* Define if yor compilers know abuot long long */
+/* Define if your compiler knows about long long */
 #undef HAVE_LONG_LONG
+
+/* Define if off_t is a long long */
+#undef HAVE_LONG_LONG_OFF_T
+
+/* Define if rlim_t is a long long */
+#undef HAVE_LONG_LONG_RLIM_T
 
 /* Define if struct sockaddr_in6 contains sin6_scope_id field. */
 #undef HAVE_SIN6_SCOPE_ID

@@ -35,7 +35,10 @@
 #include <fcntl.h>
 #include <sys/file.h>
 
-#if FREEBSD
+#if HAVE_LONG_LONG_OFF_T
+/*
+ * Hacks for systems that have a long long off_t
+ */
 #define flock64	flock		/* Horrid hack */
 #define printflock printflock64	/* Horrider hack */
 #endif
@@ -178,7 +181,7 @@ static struct xlat whence[] = {
 	{ 0,		NULL		},
 };
 
-#ifndef FREEBSD
+#ifndef HAVE_LONG_LONG_OFF_T
 /* fcntl/lockf */
 static void
 printflock(tcp, addr, getlk)
@@ -204,7 +207,7 @@ int getlk;
 }
 #endif
 
-#if _LFS64_LARGEFILE || FREEBSD
+#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 /* fcntl/lockf */
 static void
 printflock64(tcp, addr, getlk)
