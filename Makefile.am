@@ -14,19 +14,58 @@ strace_SOURCES = strace.c version.c syscall.c util.c desc.c file.c ipc.c \
 		 io.c ioctl.c mem.c net.c process.c bjm.c \
 		 resource.c signal.c sock.c system.c term.c time.c \
 		 proc.c stream.c
+noinst_HEADERS = defs.h
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/ioctlsort.c \
 	     linux/ioctlent.h linux/errnoent.h linux/signalent.h \
 	     linux/syscall.h linux/syscallent.h linux/dummy.h \
-	     linux/*/errnoent.h linux/*/ioctlent.h \
-	     linux/*/signalent.h linux/*/syscallent.h \
+	     linux/alpha/errnoent.h linux/alpha/ioctlent.h \
+	     linux/alpha/signalent.h linux/alpha/syscallent.h linux/dummy.h \
+	     linux/errnoent.h linux/ioctlent.h linux/signalent.h \
+	     linux/syscall.h linux/syscallent.h linux/hppa/errnoent.h \
+	     linux/hppa/ioctlent.h linux/hppa/signalent.h \
+	     linux/hppa/syscallent.h linux/ia64/syscallent.h \
+	     linux/ia64/errnoent.h linux/ia64/ioctlent.h \
+	     linux/ia64/signalent.h linux/mips/errnoent.h \
+	     linux/mips/ioctlent.h linux/mips/signalent.h \
+	     linux/mips/syscallent.h linux/powerpc/syscallent.h \
+	     linux/powerpc/errnoent.h linux/powerpc/ioctlent.h \
+	     linux/powerpc/signalent.h linux/s390/errnoent.h \
+	     linux/s390/ioctlent.h linux/s390/signalent.h \
+	     linux/s390/syscallent.h linux/s390x/errnoent.h \
+	     linux/s390x/ioctlent.h linux/s390x/signalent.h \
+	     linux/s390x/syscallent.h linux/sparc/dummy2.h \
+	     linux/sparc/errnoent.h linux/sparc/errnoent1.h \
+	     linux/sparc/ioctlent.h linux/sparc/ioctlent1.h \
+	     linux/sparc/signalent.h linux/sparc/signalent1.h \
+	     linux/sparc/syscall.h linux/sparc/syscall1.h \
+	     linux/sparc/syscallent.h linux/sparc/syscallent1.h \
+	     linux/x86_64/syscallent.h linux/x86_64/gentab.pl \
+	     linux/x86_64/i386-headers.diff linux/x86_64/makeheaders.sh \
 	     freebsd/ioctlent.sh \
 	     freebsd/syscalls.cat freebsd/syscalls.pl freebsd/syscalls.print \
-	     freebsd/*/errnoent.h freebsd/*/ioctlent.h \
-	     freebsd/*/signalent.h freebsd/*/syscall.h freebsd/*/syscallent.h
+	     freebsd/i386/errnoent.h freebsd/i386/ioctlent.h \
+	     freebsd/i386/signalent.h \
+	     freebsd/i386/syscall.h freebsd/i386/syscallent.h \
 	     sunos4/dummy.h sunos4/errnoent.h \
 	     sunos4/ioctlent.h sunos4/ioctlent.sh sunos4/signalent.h \
 	     sunos4/syscall.h sunos4/syscallent.h \
 	     svr4/dummy.h svr4/errnoent.h svr4/ioctlent.h svr4/ioctlent.sh \
-	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h
+	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
+	     debian/changelog debian/control debian/copyright \
+	     debian/postinst debian/prerm debian/rules strace.spec
+
+if LINUX
+if X86_64
+
+BUILT_SOURCES = linux/x86_64/syscallent1.h linux/x86_64/syscall1.h \
+		linux/x86_64/signalent1.h linux/x86_64/ioctls1.h \
+		linux/x86_64/ioctlent1.h linux/x86_64/ioctldefs1.h \
+		linux/x86_64/errnoent1.h linux/x86_64/dummy1.h
+
+$(BUILT_SOURCES): $(srcdir)/linux/x86_64/makeheaders.sh
+	cd linux/x86_64 && $(SHELL) ./makeheaders.sh
+
+endif X86_64
+endif LINUX
