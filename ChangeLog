@@ -1,3 +1,13 @@
+2004-09-13  Ulrich Drepper <drepper@redhat.com>
+	    Dmitry V. Levin <ldv@altlinux.org>
+
+	* time.c [LINUX] (print_rtc): New function, for printing rtc_time
+	structure.
+	[LINUX] (rtc_ioctl): New function, for parsing RTC_* ioctls.
+	* ioctl.c [LINUX] (ioctl_decode): Call rtc_ioctl.
+	* defs.h [LINUX]: Declare rtc_ioctl.
+	Fixes RH#58606.
+
 2004-10-06  Roland McGrath  <roland@redhat.com>
 
 	* desc.c [LINUX] (sys_epoll_create, sys_epoll_ctl, sys_epoll_wait):
