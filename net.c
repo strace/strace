@@ -1559,7 +1559,7 @@ struct tcb *tcp;
 			break;
 		}
 	} else {
-		long len;
+		int len;
 		if (syserror(tcp) || umove (tcp, tcp->u_arg[4], &len) < 0) {
 			tprintf(", %#lx, %#lx",
 				tcp->u_arg[3], tcp->u_arg[4]);
@@ -1597,7 +1597,7 @@ struct tcb *tcp;
 		else {
 			printstr (tcp, tcp->u_arg[3], len);
 		}
-		tprintf(", [%ld]", len);
+		tprintf(", [%d]", len);
 	}
 	return 0;
 }
