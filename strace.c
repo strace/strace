@@ -304,6 +304,9 @@ char *argv[];
 		}
 	}
 
+	if (optind == argc && !pflag_seen)
+		usage(stderr, 1);
+
 	/* See if they want to run as another user. */
 	if (username != NULL) {
 		struct passwd *pent;
@@ -408,7 +411,7 @@ char *argv[];
 				pid);
 	}
 
-	if (optind < argc) {
+	if (!pflag_seen) {
 		struct stat statbuf;
 		char *filename;
 		char pathname[MAXPATHLEN];
@@ -549,8 +552,6 @@ char *argv[];
 			break;
 		}
 	}
-	else if (pflag_seen == 0)
-		usage(stderr, 1);
 
 	sigemptyset(&empty_set);
 	sigemptyset(&blocked_set);
