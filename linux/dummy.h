@@ -43,7 +43,6 @@
 #define	sys_afs_syscall		printargs
 
 #define sys_fdatasync		printargs
-#define sys_sysctl		printargs
 #define sys_mlock		printargs
 #define sys_munlock		printargs
 #define sys_mlockall		printargs

@@ -1,3 +1,7 @@
+Thu May 27 13:59:27 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Add some sysctl support, patch from Ulrich Drepper
+
 Wed May 26 01:04:34 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Use kernel dirent structure for Linux

@@ -61,6 +61,10 @@
 #include <asm/cachectl.h>
 #endif
 
+#ifdef LINUX
+#include <linux/sysctl.h>
+#endif
+
 static struct xlat mount_flags[] = {
 	{ MS_RDONLY,	"MS_RDONLY"	},
 	{ MS_NOSUID,	"MS_NOSUID"	},
@@ -933,5 +937,336 @@ struct tcb *tcp;
 	return printargs(tcp);
 }
 
+#endif
+
+#ifdef LINUX
+static struct xlat sysctl_root[] = {
+	{ CTL_KERN, "CTL_KERN" },
+	{ CTL_VM, "CTL_VM" },
+	{ CTL_NET, "CTL_NET" },
+	{ CTL_PROC, "CTL_PROC" },
+	{ CTL_FS, "CTL_FS" },
+	{ CTL_DEBUG, "CTL_DEBUG" },
+	{ CTL_DEV, "CTL_DEV" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_kern[] = {
+	{ KERN_OSTYPE, "KERN_OSTYPE" },
+	{ KERN_OSRELEASE, "KERN_OSRELEASE" },
+	{ KERN_OSREV, "KERN_OSREV" },
+	{ KERN_VERSION, "KERN_VERSION" },
+	{ KERN_SECUREMASK, "KERN_SECUREMASK" },
+	{ KERN_PROF, "KERN_PROF" },
+	{ KERN_NODENAME, "KERN_NODENAME" },
+	{ KERN_DOMAINNAME, "KERN_DOMAINNAME" },
+	{ KERN_SECURELVL, "KERN_SECURELVL" },
+	{ KERN_PANIC, "KERN_PANIC" },
+	{ KERN_REALROOTDEV, "KERN_REALROOTDEV" },
+	{ KERN_JAVA_INTERPRETER, "KERN_JAVA_INTERPRETER" },
+	{ KERN_JAVA_APPLETVIEWER, "KERN_JAVA_APPLETVIEWER" },
+	{ KERN_SPARC_REBOOT, "KERN_SPARC_REBOOT" },
+	{ KERN_CTLALTDEL, "KERN_CTLALTDEL" },
+	{ KERN_PRINTK, "KERN_PRINTK" },
+	{ KERN_NAMETRANS, "KERN_NAMETRANS" },
+	{ KERN_PPC_HTABRECLAIM, "KERN_PPC_HTABRECLAIM" },
+	{ KERN_PPC_ZEROPAGED, "KERN_PPC_ZEROPAGED" },
+	{ KERN_PPC_POWERSAVE_NAP, "KERN_PPC_POWERSAVE_NAP" },
+	{ KERN_MODPROBE, "KERN_MODPROBE" },
+	{ KERN_SG_BIG_BUFF, "KERN_SG_BIG_BUFF" },
+	{ KERN_ACCT, "KERN_ACCT" },
+	{ KERN_PPC_L2CR, "KERN_PPC_L2CR" },
+	{ KERN_RTSIGNR, "KERN_RTSIGNR" },
+	{ KERN_RTSIGMAX, "KERN_RTSIGMAX" },
+	{ KERN_SHMMAX, "KERN_SHMMAX" },
+	{ KERN_MSGMAX, "KERN_MSGMAX" },
+	{ KERN_MSGMNB, "KERN_MSGMNB" },
+	{ KERN_MSGPOOL, "KERN_MSGPOOL" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_vm[] = {
+	{ VM_SWAPCTL, "VM_SWAPCTL" },
+	{ VM_SWAPOUT, "VM_SWAPOUT" },
+	{ VM_FREEPG, "VM_FREEPG" },
+	{ VM_BDFLUSH, "VM_BDFLUSH" },
+	{ VM_OVERCOMMIT_MEMORY, "VM_OVERCOMMIT_MEMORY" },
+	{ VM_BUFFERMEM, "VM_BUFFERMEM" },
+	{ VM_PAGECACHE, "VM_PAGECACHE" },
+	{ VM_PAGERDAEMON, "VM_PAGERDAEMON" },
+	{ VM_PGT_CACHE, "VM_PGT_CACHE" },
+	{ VM_PAGE_CLUSTER, "VM_PAGE_CLUSTER" },
+	{ 0, NULL },
+};
+
+static struct xlat sysctl_net[] = {
+	{ NET_CORE, "NET_CORE" },
+	{ NET_ETHER, "NET_ETHER" },
+	{ NET_802, "NET_802" },
+	{ NET_UNIX, "NET_UNIX" },
+	{ NET_IPV4, "NET_IPV4" },
+	{ NET_IPX, "NET_IPX" },
+	{ NET_ATALK, "NET_ATALK" },
+	{ NET_NETROM, "NET_NETROM" },
+	{ NET_AX25, "NET_AX25" },
+	{ NET_BRIDGE, "NET_BRIDGE" },
+	{ NET_ROSE, "NET_ROSE" },
+	{ NET_IPV6, "NET_IPV6" },
+	{ NET_X25, "NET_X25" },
+	{ NET_TR, "NET_TR" },
+	{ NET_DECNET, "NET_DECNET" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_net_core[] = {
+	{ NET_CORE_WMEM_MAX, "NET_CORE_WMEM_MAX" },
+	{ NET_CORE_RMEM_MAX, "NET_CORE_RMEM_MAX" },
+	{ NET_CORE_WMEM_DEFAULT, "NET_CORE_WMEM_DEFAULT" },
+	{ NET_CORE_RMEM_DEFAULT, "NET_CORE_RMEM_DEFAULT" },
+	{ NET_CORE_MAX_BACKLOG, "NET_CORE_MAX_BACKLOG" },
+	{ NET_CORE_FASTROUTE, "NET_CORE_FASTROUTE" },
+	{ NET_CORE_MSG_COST, "NET_CORE_MSG_COST" },
+	{ NET_CORE_MSG_BURST, "NET_CORE_MSG_BURST" },
+	{ NET_CORE_OPTMEM_MAX, "NET_CORE_OPTMEM_MAX" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_net_unix[] = {
+	{ NET_UNIX_DESTROY_DELAY, "NET_UNIX_DESTROY_DELAY" },
+	{ NET_UNIX_DELETE_DELAY, "NET_UNIX_DELETE_DELAY" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_net_ipv4[] = {
+	{ NET_IPV4_FORWARD, "NET_IPV4_FORWARD" },
+	{ NET_IPV4_DYNADDR, "NET_IPV4_DYNADDR" },
+	{ NET_IPV4_CONF, "NET_IPV4_CONF" },
+	{ NET_IPV4_NEIGH, "NET_IPV4_NEIGH" },
+	{ NET_IPV4_ROUTE, "NET_IPV4_ROUTE" },
+	{ NET_IPV4_FIB_HASH, "NET_IPV4_FIB_HASH" },
+	{ NET_IPV4_TCP_TIMESTAMPS, "NET_IPV4_TCP_TIMESTAMPS" },
+	{ NET_IPV4_TCP_WINDOW_SCALING, "NET_IPV4_TCP_WINDOW_SCALING" },
+	{ NET_IPV4_TCP_SACK, "NET_IPV4_TCP_SACK" },
+	{ NET_IPV4_TCP_RETRANS_COLLAPSE, "NET_IPV4_TCP_RETRANS_COLLAPSE" },
+	{ NET_IPV4_DEFAULT_TTL, "NET_IPV4_DEFAULT_TTL" },
+	{ NET_IPV4_AUTOCONFIG, "NET_IPV4_AUTOCONFIG" },
+	{ NET_IPV4_NO_PMTU_DISC, "NET_IPV4_NO_PMTU_DISC" },
+	{ NET_IPV4_TCP_SYN_RETRIES, "NET_IPV4_TCP_SYN_RETRIES" },
+	{ NET_IPV4_IPFRAG_HIGH_THRESH, "NET_IPV4_IPFRAG_HIGH_THRESH" },
+	{ NET_IPV4_IPFRAG_LOW_THRESH, "NET_IPV4_IPFRAG_LOW_THRESH" },
+	{ NET_IPV4_IPFRAG_TIME, "NET_IPV4_IPFRAG_TIME" },
+	{ NET_IPV4_TCP_MAX_KA_PROBES, "NET_IPV4_TCP_MAX_KA_PROBES" },
+	{ NET_IPV4_TCP_KEEPALIVE_TIME, "NET_IPV4_TCP_KEEPALIVE_TIME" },
+	{ NET_IPV4_TCP_KEEPALIVE_PROBES, "NET_IPV4_TCP_KEEPALIVE_PROBES" },
+	{ NET_IPV4_TCP_RETRIES1, "NET_IPV4_TCP_RETRIES1" },
+	{ NET_IPV4_TCP_RETRIES2, "NET_IPV4_TCP_RETRIES2" },
+	{ NET_IPV4_TCP_FIN_TIMEOUT, "NET_IPV4_TCP_FIN_TIMEOUT" },
+	{ NET_IPV4_IP_MASQ_DEBUG, "NET_IPV4_IP_MASQ_DEBUG" },
+	{ NET_TCP_SYNCOOKIES, "NET_TCP_SYNCOOKIES" },
+	{ NET_TCP_STDURG, "NET_TCP_STDURG" },
+	{ NET_TCP_RFC1337, "NET_TCP_RFC1337" },
+	{ NET_TCP_SYN_TAILDROP, "NET_TCP_SYN_TAILDROP" },
+	{ NET_TCP_MAX_SYN_BACKLOG, "NET_TCP_MAX_SYN_BACKLOG" },
+	{ NET_IPV4_LOCAL_PORT_RANGE, "NET_IPV4_LOCAL_PORT_RANGE" },
+	{ NET_IPV4_ICMP_ECHO_IGNORE_ALL, "NET_IPV4_ICMP_ECHO_IGNORE_ALL" },
+	{ NET_IPV4_ICMP_ECHO_IGNORE_BROADCASTS, "NET_IPV4_ICMP_ECHO_IGNORE_BROADCASTS" },
+	{ NET_IPV4_ICMP_SOURCEQUENCH_RATE, "NET_IPV4_ICMP_SOURCEQUENCH_RATE" },
+	{ NET_IPV4_ICMP_DESTUNREACH_RATE, "NET_IPV4_ICMP_DESTUNREACH_RATE" },
+	{ NET_IPV4_ICMP_TIMEEXCEED_RATE, "NET_IPV4_ICMP_TIMEEXCEED_RATE" },
+	{ NET_IPV4_ICMP_PARAMPROB_RATE, "NET_IPV4_ICMP_PARAMPROB_RATE" },
+	{ NET_IPV4_ICMP_ECHOREPLY_RATE, "NET_IPV4_ICMP_ECHOREPLY_RATE" },
+	{ NET_IPV4_ICMP_IGNORE_BOGUS_ERROR_RESPONSES, "NET_IPV4_ICMP_IGNORE_BOGUS_ERROR_RESPONSES" },
+	{ NET_IPV4_IGMP_MAX_MEMBERSHIPS, "NET_IPV4_IGMP_MAX_MEMBERSHIPS" },
+	{  0, NULL }
+};
+
+static struct xlat sysctl_net_ipv4_route[] = {
+	{ NET_IPV4_ROUTE_FLUSH, "NET_IPV4_ROUTE_FLUSH" },
+	{ NET_IPV4_ROUTE_MIN_DELAY, "NET_IPV4_ROUTE_MIN_DELAY" },
+	{ NET_IPV4_ROUTE_MAX_DELAY, "NET_IPV4_ROUTE_MAX_DELAY" },
+	{ NET_IPV4_ROUTE_GC_THRESH, "NET_IPV4_ROUTE_GC_THRESH" },
+	{ NET_IPV4_ROUTE_MAX_SIZE, "NET_IPV4_ROUTE_MAX_SIZE" },
+	{ NET_IPV4_ROUTE_GC_MIN_INTERVAL, "NET_IPV4_ROUTE_GC_MIN_INTERVAL" },
+	{ NET_IPV4_ROUTE_GC_TIMEOUT, "NET_IPV4_ROUTE_GC_TIMEOUT" },
+	{ NET_IPV4_ROUTE_GC_INTERVAL, "NET_IPV4_ROUTE_GC_INTERVAL" },
+	{ NET_IPV4_ROUTE_REDIRECT_LOAD, "NET_IPV4_ROUTE_REDIRECT_LOAD" },
+	{ NET_IPV4_ROUTE_REDIRECT_NUMBER, "NET_IPV4_ROUTE_REDIRECT_NUMBER" },
+	{ NET_IPV4_ROUTE_REDIRECT_SILENCE, "NET_IPV4_ROUTE_REDIRECT_SILENCE" },
+	{ NET_IPV4_ROUTE_ERROR_COST, "NET_IPV4_ROUTE_ERROR_COST" },
+	{ NET_IPV4_ROUTE_ERROR_BURST, "NET_IPV4_ROUTE_ERROR_BURST" },
+	{ NET_IPV4_ROUTE_GC_ELASTICITY, "NET_IPV4_ROUTE_GC_ELASTICITY" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_net_ipv4_conf[] = {
+	{ NET_IPV4_CONF_FORWARDING, "NET_IPV4_CONF_FORWARDING" },
+	{ NET_IPV4_CONF_MC_FORWARDING, "NET_IPV4_CONF_MC_FORWARDING" },
+	{ NET_IPV4_CONF_PROXY_ARP, "NET_IPV4_CONF_PROXY_ARP" },
+	{ NET_IPV4_CONF_ACCEPT_REDIRECTS, "NET_IPV4_CONF_ACCEPT_REDIRECTS" },
+	{ NET_IPV4_CONF_SECURE_REDIRECTS, "NET_IPV4_CONF_SECURE_REDIRECTS" },
+	{ NET_IPV4_CONF_SEND_REDIRECTS, "NET_IPV4_CONF_SEND_REDIRECTS" },
+	{ NET_IPV4_CONF_SHARED_MEDIA, "NET_IPV4_CONF_SHARED_MEDIA" },
+	{ NET_IPV4_CONF_RP_FILTER, "NET_IPV4_CONF_RP_FILTER" },
+	{ NET_IPV4_CONF_ACCEPT_SOURCE_ROUTE, "NET_IPV4_CONF_ACCEPT_SOURCE_ROUTE" },
+	{ NET_IPV4_CONF_BOOTP_RELAY, "NET_IPV4_CONF_BOOTP_RELAY" },
+	{ NET_IPV4_CONF_LOG_MARTIANS, "NET_IPV4_CONF_LOG_MARTIANS" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_net_ipv6[] = {
+	{ NET_IPV6_CONF, "NET_IPV6_CONF" },
+	{ NET_IPV6_NEIGH, "NET_IPV6_NEIGH" },
+	{ NET_IPV6_ROUTE, "NET_IPV6_ROUTE" },
+	{ 0, NULL }
+};
+
+static struct xlat sysctl_net_ipv6_route[] = {
+	{ NET_IPV6_ROUTE_FLUSH, "NET_IPV6_ROUTE_FLUSH" },
+	{ NET_IPV6_ROUTE_GC_THRESH, "NET_IPV6_ROUTE_GC_THRESH" },
+	{ NET_IPV6_ROUTE_MAX_SIZE, "NET_IPV6_ROUTE_MAX_SIZE" },
+	{ NET_IPV6_ROUTE_GC_MIN_INTERVAL, "NET_IPV6_ROUTE_GC_MIN_INTERVAL" },
+	{ NET_IPV6_ROUTE_GC_TIMEOUT, "NET_IPV6_ROUTE_GC_TIMEOUT" },
+	{ NET_IPV6_ROUTE_GC_INTERVAL, "NET_IPV6_ROUTE_GC_INTERVAL" },
+	{ NET_IPV6_ROUTE_GC_ELASTICITY, "NET_IPV6_ROUTE_GC_ELASTICITY" },
+	{ 0, NULL }
+};
+
+int
+sys_sysctl(tcp)
+struct tcb *tcp;
+{
+	struct __sysctl_args info;
+	int *name;
+	umove (tcp, tcp->u_arg[0], &info);
+
+	name = alloca (sizeof (int) * info.nlen);
+	umoven(tcp, (size_t) info.name, sizeof (int) * info.nlen, (char *) name);
+
+	if (entering(tcp)) {
+		int cnt = 0;
+
+		tprintf("{{");
+
+		if (info.nlen == 0)
+			goto out;
+		printxval(sysctl_root, name[0], "CTL_???");
+		++cnt;
+
+		if (info.nlen == 1)
+			goto out;
+		switch (name[0]) {
+		case CTL_KERN:
+			tprintf(", ");
+			printxval(sysctl_kern, name[1], "KERN_???");
+			++cnt;
+			break;
+		case CTL_VM:
+			tprintf(", ");
+			printxval(sysctl_vm, name[1], "VM_???");
+			++cnt;
+			break;
+		case CTL_NET:
+			tprintf(", ");
+			printxval(sysctl_net, name[1], "NET_???");
+			++cnt;
+
+			if (info.nlen == 2)
+				goto out;
+			switch (name[1]) {
+			case NET_CORE:
+				tprintf(", ");
+				printxval(sysctl_net_core, name[2],
+					  "NET_CORE_???");
+				break;
+			case NET_UNIX:
+				tprintf(", ");
+				printxval(sysctl_net_unix, name[2],
+					  "NET_UNIX_???");
+				break;
+			case NET_IPV4:
+				tprintf(", ");
+				printxval(sysctl_net_ipv4, name[2],
+					  "NET_IPV4_???");
+
+				if (info.nlen == 3)
+					goto out;
+				switch (name[2]) {
+				case NET_IPV4_ROUTE:
+					tprintf(", ");
+					printxval(sysctl_net_ipv4_route,
+						  name[3],
+						  "NET_IPV4_ROUTE_???");
+					break;
+				case NET_IPV4_CONF:
+					tprintf(", ");
+					printxval(sysctl_net_ipv4_conf,
+						  name[3],
+						  "NET_IPV4_CONF_???");
+					break;
+				default:
+					goto out;
+				}
+				break;
+			case NET_IPV6:
+				tprintf(", ");
+				printxval(sysctl_net_ipv6, name[2],
+					  "NET_IPV6_???");
+
+				if (info.nlen == 3)
+					goto out;
+				switch (name[2]) {
+				case NET_IPV6_ROUTE:
+					tprintf(", ");
+					printxval(sysctl_net_ipv6_route,
+						  name[3],
+						  "NET_IPV6_ROUTE_???");
+					break;
+				default:
+					goto out;
+				}
+				break;
+			default:
+				goto out;
+			}
+			break;
+		default:
+			goto out;
+		}
+	out:
+		while (cnt < info.nlen)
+			tprintf(", %x", name[cnt++]);
+		tprintf("}, %d, ", info.nlen);
+	} else {
+		size_t oldlen;
+		umove(tcp, (size_t)info.oldlenp, &oldlen);
+		if (info.nlen >= 2
+		    && ((name[0] == CTL_KERN
+			 && (name[1] == KERN_OSRELEASE
+			     || name[1] == KERN_OSTYPE
+			     || name[1] == KERN_JAVA_INTERPRETER
+			     || name[1] == KERN_JAVA_APPLETVIEWER)))) {
+			printpath(tcp, (size_t)info.oldval);
+			tprintf(", %d, ", oldlen);
+			if (info.newval == 0)
+				tprintf("NULL");
+			else if (syserror(tcp))
+				tprintf("%p", info.newval);
+			else
+				printpath(tcp, (size_t)info.newval);
+			tprintf(", %Zd", info.newlen);
+		} else {
+			tprintf("%p, %d, %p, %Zd", info.oldval, oldlen,
+				info.newval, info.newlen);
+		}
+		tprintf("}");
+	}
+	return 0;
+}
+#else
+int sys_sysctl(tcp)
+struct tcb *tcp;
+{
+	return printargs(tcp);
+}
 #endif
 
