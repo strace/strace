@@ -526,13 +526,22 @@ sys_clone(tcp)
 struct tcb *tcp;
 {
 	if (exiting(tcp)) {
-		tprintf("child_stack=%#lx, flags=", tcp->u_arg[1]);
-		if (printflags(clone_flags, tcp->u_arg[0]) == 0)
+		long flags, stack;
+# if defined S390 || defined S390X
+		/* For some reason, S390 has the stack argument first.  */
+		stack = tcp->u_arg[0];
+		flags = tcp->u_arg[1];
+# else
+		flags = tcp->u_arg[0];
+		stack = tcp->u_arg[1];
+# endif
+		tprintf("child_stack=%#lx, flags=", stack);
+		if (printflags(clone_flags, flags) == 0)
 			tprintf("0");
-		if ((tcp->u_arg[0] & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
+		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
 				      |CLONE_SETTLS)) == 0)
 			return 0;
-		if (tcp->u_arg[0] & CLONE_PARENT_SETTID) {
+		if (flags & CLONE_PARENT_SETTID) {
 			int pid;
 			if (umove(tcp, tcp->u_arg[2], &pid) == 0)
 				tprintf(", [%d]", pid);
@@ -542,7 +551,7 @@ struct tcb *tcp;
 		else
 			tprintf(", <ignored>");
 #ifdef I386
-		if (tcp->u_arg[0] & CLONE_SETTLS) {
+		if (flags & CLONE_SETTLS) {
 			struct modify_ldt_ldt_s copy;
 			if (umove(tcp, tcp->u_arg[3], &copy) != -1) {
 				tprintf(", {entry_number:%d, ",
@@ -561,7 +570,7 @@ struct tcb *tcp;
 #else
 # define TIDARG 3
 #endif
-		if (tcp->u_arg[0] & CLONE_CHILD_SETTID)
+		if (flags & CLONE_CHILD_SETTID)
 			tprintf(", %#lx", tcp->u_arg[TIDARG]);
 #undef TIDARG
 	}
@@ -1570,11 +1579,9 @@ struct tcb *tcp;
 			tprintf("]");
 		}
 	}
-#ifdef LINUX
-#if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH)
+#if defined LINUX && defined TCB_WAITEXECVE
 	tcp->flags |= TCB_WAITEXECVE;
-#endif /* ALPHA || SPARC || POWERPC || IA64 || HPPA || SH */
-#endif /* LINUX */
+#endif /* LINUX && TCB_WAITEXECVE */
 	return 0;
 }
 
