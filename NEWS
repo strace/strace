@@ -1,3 +1,9 @@
+Changes in CVS (not yet released)
+==============
+* New port to AMD's x86-64 architecture. One strace binary can 
+  handle both new x86-64 and old i386 processes.
+* Fixed support for LFS64 calls.
+
 Changes in 4.4
 ==============
 * Fix Linux/ia64 support, looks like someone renamed a few things on us

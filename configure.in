@@ -1,7 +1,6 @@
 AC_INIT(strace.c)
 AC_CANONICAL_SYSTEM()
 AC_MSG_CHECKING(for supported operating system)
-changequote(,)dnl
 
 case "$host_os" in
 linux*)
@@ -19,7 +18,7 @@ sysv4*)
 sysv5*)
 	opsys=svr4
 	;;
-irix[56]*)
+irix[[56]]*)
 	opsys=svr4
 	;;
 freebsd*)
@@ -38,7 +37,7 @@ opsys_list='
 
 AC_MSG_CHECKING(for supported architecture)
 case "$target_cpu" in
-i[3456]86|pentium)
+i[[3456]]86|pentium)
 	arch=i386
 	;;
 ia64)
@@ -83,14 +82,13 @@ arch_list='
 '
 
 osarch="$opsys"
-if [ -d "$srcdir/$opsys/$arch" ]; then
+if test -d "$srcdir/$opsys/$arch"; then
 	osarch="$opsys/$arch"
 fi
 
-OPSYS=`echo $opsys | tr '[a-z]' '[A-Z]'`
-ARCH=`echo $arch | tr '[a-z]' '[A-Z]'`
+OPSYS=`echo $opsys | tr '[[a-z]]' '[[A-Z]]'`
+ARCH=`echo $arch | tr '[[a-z]]' '[[A-Z]]'`
 
-changequote([,])dnl
 CFLAGS="-D_GNU_SOURCE $CFLAGS"
 AC_CONFIG_HEADER(config.h)
 AC_SUBST(opsys)

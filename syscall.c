@@ -890,8 +890,8 @@ struct tcb *tcp;
            long correct_scno = (scno & 0xff);
            if (debug)
                fprintf(stderr,
-                   "Detected glibc bug: bogus system call number = %ld,
-correcting to %ld\n",
+                   "Detected glibc bug: bogus system call number = %ld, "
+		   "correcting to %ld\n",
                    scno,
                    correct_scno);
            scno = correct_scno;

@@ -1,3 +1,14 @@
+2002-09-23  Michal Ludvig  <mludvig@suse.cz>
+
+	* configure.in: Fix regular expressions.
+	* linux/syscall.h: Added missing braces in prototype of 
+	sys_getdents64().
+	* file.c: Use '#ifdef LINUX' instead of '#ifdef linux'.
+	(struct fileflags): Made extern to inhibit compiation warnings.
+	(sys_getdents64): Merged LINUX and SVR4 part.
+	* syscall.c(get_scno): Split multiline string into two distinct 
+	strings.
+
 2002-05-24  John Hughes <john@calva.com>
 
 	* stream.h, net.h: Avoid possible infinite loop caused by

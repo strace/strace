@@ -1,5 +1,5 @@
 /*
-#ifdef linux
+#ifdef LINUX
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
@@ -34,7 +34,7 @@
 #include "defs.h"
 
 #include <dirent.h>
-#ifdef linux
+#ifdef LINUX
 #define dirent kernel_dirent
 #define dirent64 kernel_dirent64
 #include <linux/types.h>
@@ -44,7 +44,7 @@
 #define kernel_dirent dirent
 #endif
 
-#ifdef linux
+#ifdef LINUX
 #  ifdef LINUXSPARC
 struct stat {
 	unsigned short	st_dev;
@@ -395,7 +395,7 @@ struct tcb *tcp;
 }
 #endif
 
-#ifdef linux
+#ifdef LINUX
 int
 sys_llseek (tcp)
 struct tcb *tcp;
@@ -630,7 +630,7 @@ long addr;
 }
 #endif /* LINUXSPARC */
 
-static struct xlat fileflags[] = {
+struct xlat fileflags[] = {
 #ifdef FREEBSD
 	{ UF_NODUMP,	"UF_NODUMP"	},
 	{ UF_IMMUTABLE,	"UF_IMMUTABLE"	},
@@ -889,7 +889,7 @@ long addr;
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(linux) && !defined(IA64) && !defined(HPPA)
+#if defined(LINUX) && !defined(IA64) && !defined(HPPA)
 static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
@@ -942,7 +942,7 @@ long addr;
 	convertoldstat(&statbuf, &newstatbuf);
 	realprintstat(tcp, &newstatbuf);
 }
-#endif /* linux && !IA64 */
+#endif /* LINUX && !IA64 */
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -976,7 +976,7 @@ struct tcb *tcp;
 #endif
 }
 
-#ifdef linux
+#ifdef LINUX
 # if !defined(IA64) && !defined(HPPA)
 int
 sys_oldstat(tcp)
@@ -991,7 +991,7 @@ struct tcb *tcp;
 	return 0;
 }
 # endif /* !IA64 && !HPPA*/
-#endif /* linux */
+#endif /* LINUX */
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -1023,7 +1023,7 @@ struct tcb *tcp;
 #endif
 }
 
-#ifdef linux
+#ifdef LINUX
 # if !defined(IA64) && !defined(HPPA)
 int
 sys_oldfstat(tcp)
@@ -1071,7 +1071,7 @@ struct tcb *tcp;
 #endif
 }
 
-#ifdef linux
+#ifdef LINUX
 # if !defined(IA64) && !defined(HPPA)
 int
 sys_oldlstat(tcp)
@@ -1285,7 +1285,7 @@ struct tcb *tcp;
 
 #endif /* SVR4 || LINUXSPARC */
 
-#ifdef linux
+#ifdef LINUX
 
 static struct xlat fsmagic[] = {
 	{ 0x73757245,	"CODA_SUPER_MAGIC"	},
@@ -1319,7 +1319,7 @@ static struct xlat fsmagic[] = {
 	{ 0,		NULL			},
 };
 
-#endif /* linux */
+#endif /* LINUX */
 
 #ifndef SVR4
 
@@ -1328,7 +1328,7 @@ sprintfstype(magic)
 int magic;
 {
 	static char buf[32];
-#ifdef linux
+#ifdef LINUX
 	char *s;
 
 	s = xlookup(fsmagic, magic);
@@ -1336,7 +1336,7 @@ int magic;
 		sprintf(buf, "\"%s\"", s);
 		return buf;
 	}
-#endif /* linux */
+#endif /* LINUX */
 	sprintf(buf, "%#x", magic);
 	return buf;
 }
@@ -1372,9 +1372,9 @@ long addr;
 	tprintf("f_files=%lu, f_ffree=%lu",
 		(unsigned long)statbuf.f_files,
 		(unsigned long)statbuf.f_ffree);
-#ifdef linux
+#ifdef LINUX
 	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
-#endif /* linux */
+#endif /* LINUX */
 #endif /* !ALPHA */
 	tprintf("}");
 }
@@ -1404,7 +1404,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#if defined(linux) && defined(__alpha)
+#if defined(LINUX) && defined(__alpha)
 
 int
 osf_statfs(tcp)
@@ -1432,7 +1432,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-#endif /* linux && __alpha */
+#endif /* LINUX && __alpha */
 
 #endif /* !SVR4 */
 
@@ -1751,7 +1751,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef linux
+#ifdef LINUX
 
 static void
 printdir(tcp, addr)
@@ -1792,7 +1792,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* linux */
+#endif /* LINUX */
 
 #ifdef FREEBSD
 struct xlat direnttypes[] = {
@@ -1838,14 +1838,14 @@ struct tcb *tcp;
 		tprintf("{");
 	for (i = 0; i < len;) {
 		struct kernel_dirent *d = (struct kernel_dirent *) &buf[i];
-#ifdef linux
+#ifdef LINUX
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
 				i ? " " : "", d->d_ino, d->d_off);
 			tprintf("d_reclen=%u, d_name=\"%s\"}",
 				d->d_reclen, d->d_name);
 		}
-#endif /* linux */
+#endif /* LINUX */
 #ifdef SVR4
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
@@ -1919,22 +1919,16 @@ struct tcb *tcp;
 		tprintf("{");
 	for (i = 0; i < len;) {
 		struct dirent64 *d = (struct dirent64 *) &buf[i];
-#ifdef linux
+#if defined(LINUX) || defined(SVR4)
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
-				i ? " " : "", d->d_ino, d->d_off);
+				i ? " " : "", 
+				(unsigned long)d->d_ino, 
+				(unsigned long)d->d_off);
 			tprintf("d_reclen=%u, d_name=\"%s\"}",
 				d->d_reclen, d->d_name);
 		}
-#endif /* linux */
-#ifdef SVR4
-		if (!abbrev(tcp)) {
-			tprintf("%s{d_ino=%llu, d_off=%llu, ",
-				i ? " " : "", d->d_ino, d->d_off);
-			tprintf("d_reclen=%u, d_name=\"%s\"}",
-				d->d_reclen, d->d_name);
-		}
-#endif /* SVR4 */
+#endif /* LINUX || SVR4 */
 #ifdef SUNOS4
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_off=%lu, d_fileno=%lu, d_reclen=%u, ",
@@ -2012,7 +2006,7 @@ struct tcb * tcp;
 }
 #endif
 
-#ifdef linux
+#ifdef LINUX
 int
 sys_getcwd(tcp)
 struct tcb *tcp;
@@ -2026,7 +2020,7 @@ struct tcb *tcp;
     }
     return 0;
 }
-#endif /* linux */
+#endif /* LINUX */
 
 #ifdef FREEBSD
 int
