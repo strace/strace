@@ -1,4 +1,13 @@
+Changes in 4.0
+==============
+* Get stat structure properly on Linux 64bit archs
+* Personalities work again
+* Compile correctly on SunOS again
+* IRIX64 updates
+* Solaris updates
+
 Changes in 3.99.1
+=================
 * Linux (ultra)sparc fixes
 * Linux alpha fixes
 * Minor cleanups

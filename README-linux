@@ -9,13 +9,12 @@ the proper data structures used by the kernel, since these can be
 different from the structures that the C library uses. Currently
 you will need a 2.2.7 or newer kernel.
 
-To compile strace using your kernel source you need to tell make where
-you put the sources. For example if you have your kernelsource in
-/usr/src/linux, you should invoke make like this:
+There are two ways to do this:
+* you can link /usr/include/linux and /usr/include/asm to the corresponding
+  directories in your kernel source-tree.
+
+* you can tell make where your kernel sources are. For example if you have your
+  kernelsource in /usr/src/linux, you should invoke make like this:
 
      make CFLAGS=-I/usr/src/linux/include
-
-Please note that it is possible to symlink /usr/include/{asm,linux,scsi}
-to your kernel source, but for programs that don't need the actual kernel
-structures that is highly discouraged.
 

@@ -5,3 +5,4 @@ config.status
 config.h.in
 config.log
 Makefile
+tags
