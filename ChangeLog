@@ -1,3 +1,11 @@
+2002-12-16  Roland McGrath  <roland@redhat.com>
+
+	* process.c [LINUX] (wait4_options): Fix __WCLONE value.  Add
+	__WNOTHREAD and __WALL.
+
+	* strace.c (trace) [LINUX]: Only check errno if wait4 actually fails,
+	so we don't repeat a wait and thus drop a status.  Fixes RH#62591.
+
 2002-12-15  Roland McGrath  <roland@redhat.com>
 
 	* process.c (setarg) [POWERPC]: Support it.
