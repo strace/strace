@@ -1,3 +1,8 @@
+2004-08-31  Roland McGrath  <roland@redhat.com>
+
+	* net.c (sockoptions): Add all SO_* macros known in Linux 2.6.9.
+	Fixes Debian bug #171653.
+
 2004-07-12  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* signal.c [LINUX] (parse_sigset_t): Fix hex strings parser.
@@ -22,7 +27,7 @@
 
 	* system.c (personality_options): Hard-code values here.
 	Don't #include <linux/personality.h> at all.
-	Fixes RH#130965.
+	Fixes RH#130965 and Debian bug #40588.
 
 	* file.c (print_xattr_val): New function to show attribute values.
 	(sys_setxattr, sys_fsetxattr, sys_getxattr, sys_fgetxattr): Use it.
