@@ -85,6 +85,9 @@
 #ifndef ENOIOCTLCMD
 #define ENOIOCTLCMD	515	/* No ioctl command */
 #endif
+#ifndef ERESTART_RESTARTBLOCK
+#define ERESTART_RESTARTBLOCK 516	/* restart by calling sys_restart_syscall */
+#endif
 #ifndef NSIG
 #define NSIG 32
 #endif
@@ -2182,6 +2185,9 @@ struct tcb *tcp;
 				break;
 			case ERESTARTNOHAND:
 				tprintf("= ? ERESTARTNOHAND (To be restarted)");
+				break;
+			case ERESTART_RESTARTBLOCK:
+				tprintf("= ? ERESTART_RESTARTBLOCK (To be restarted)");
 				break;
 #endif /* LINUX */
 			default:

@@ -28,7 +28,7 @@
  *	$Id$
  */
 
-	{ 5,	0,	printargs,		"SYS_0"			}, /* 0 */
+	{ 6,	0,	printargs,		"osf_syscall"		}, /* 0, not implemented */
 	{ 1,	TP,	sys_exit,		"exit"			}, /* 1 */
 	{ 0,	TP,	sys_fork,		"fork"			}, /* 2 */
 	{ 3,	TF,	sys_read,		"read"			}, /* 3 */
@@ -71,7 +71,7 @@
 	{ 5,	0,	printargs,		"osf_old_lstat"		}, /* 40, not implemented */
 	{ 1,	0,	sys_dup,		"dup"			}, /* 41 */
 	{ 1,	0,	sys_pipe,		"pipe"			}, /* 42 */
-	{ 5,	0,	printargs,		"osf_set_program_attributed"	}, /* 43 */
+	{ 5,	0,	printargs,		"osf_set_program_attributes"	}, /* 43 */
 	{ 5,	0,	printargs,		"osf_profil"		}, /* 44, not implemented */
 	{ 3,	TF,	sys_open,		"open"			}, /* 45 */
 	{ 5,	0,	printargs,		"osf_old_sigaction"	}, /* 46, not implemented */
@@ -186,7 +186,7 @@
 	{ 5,	0,	printargs,		"SYS_155"		}, /* 155 */
 	{ 3,	TS,	sys_sigaction,		"sigaction"		}, /* 156 */
 	{ 5,	0,	printargs,		"osf_sigwaitprim"	}, /* 157, not implemented */
-	{ 5,	0,	printargs,		"osf_sigwaitprim"	}, /* 158, not implemented */
+	{ 5,	0,	printargs,		"osf_nfssvc"		}, /* 158, not implemented */
 	{ 4,	0,	printargs,		"osf_getdirentries"	}, /* 159 */
 	{ 3,	0,	osf_statfs,		"osf_statfs"		}, /* 160 */
 	{ 3,	0,	osf_fstatfs,		"osf_fstatfs"		}, /* 161 */
@@ -266,7 +266,7 @@
 	{ 5,	0,	sys_sigaltstack,	"sigaltstack"		}, /* 235 */
 	{ 5,	0,	printargs,		"osf_waitid"		}, /* 236, not implemented */
 	{ 5,	0,	printargs,		"osf_priocntlset"	}, /* 237, not implemented */
-	{ 5,	0,	printargs,		"osf_getsendset"	}, /* 238, not implemented */
+	{ 5,	0,	printargs,		"osf_sigsendset"	}, /* 238, not implemented */
 	{ 5,	0,	printargs,		"osf_set_speculative"	}, /* 239, not implemented */
 	{ 5,	0,	printargs,		"osf_msfs_syscall"	}, /* 240, not implemented */
 	{ 5,	0,	printargs,		"osf_sysinfo"		}, /* 241 */
@@ -378,7 +378,6 @@
 	{ 5,	0,	sys_query_module,	"query_module"		}, /* 347 */
 	{ 5,	0,	printargs,		"prctl"			}, /* 348 */
 	{ 5,	TF,	sys_pread,		"pread"			}, /* 349 */
-
 	{ 5,	TF,	sys_pwrite,		"pwrite"		}, /* 350 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"		}, /* 351 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"		}, /* 352 */
@@ -406,3 +405,50 @@
 	{ 2,	TF,	printargs,		"pivot_root"		}, /* 374 */
 	{ 3,	0,	printargs,		"mincore"		}, /* 375 */
 	{ 4,	0,	printargs,		"pciconfig_iobase"	}, /* 376 */
+	{ 4,	0,	sys_getdents64,		"getdents64"		}, /* 377 */
+	{ 0,	0,	printargs,		"gettid"		}, /* 378 */
+	{ 4,	0,	sys_readahead,		"readahead"		}, /* 379 */
+	{ 5,	0,	printargs,		"SYS_380"		}, /* 380 */
+	{ 2,	TS,	sys_kill,		"tkill"			}, /* 381 */
+	{ 5,	TF,	sys_setxattr,		"setxattr"		}, /* 382 */
+	{ 5,	TF,	sys_setxattr,		"lsetxattr"		}, /* 383 */
+	{ 5,	0,	sys_fsetxattr,		"fsetxattr"		}, /* 384 */
+	{ 4,	TF,	sys_getxattr,		"getxattr"		}, /* 385 */
+	{ 4,	TF,	sys_getxattr,		"lgetxattr"		}, /* 386 */
+	{ 4,	0,	sys_fgetxattr,		"fgetxattr"		}, /* 387 */
+	{ 3,	TF,	sys_listxattr,		"listxattr"		}, /* 388 */
+	{ 3,	TF,	sys_listxattr,		"llistxattr"		}, /* 389 */
+	{ 3,	0,	sys_flistxattr,		"flistxattr"		}, /* 390 */
+	{ 2,	TF,	sys_removexattr,	"removexattr"		}, /* 391 */
+	{ 2,	TF,	sys_removexattr,	"lremovexattr"		}, /* 392 */
+	{ 2,	0,	sys_fremovexattr,	"fremovexattr"		}, /* 393 */
+	{ 5,	0,	sys_futex,		"futex"			}, /* 394 */
+	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"	}, /* 395 */
+	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"	}, /* 396 */
+	{ 5,	0,	printargs,		"tuxcall"		}, /* 397 */
+	{ 2,	0,	printargs,		"io_setup"		}, /* 398 */
+	{ 1,	0,	printargs,		"io_destroy"		}, /* 399 */
+	{ 5,	0,	printargs,		"io_getevents"		}, /* 400 */
+	{ 3,	0,	printargs,		"io_submit"		}, /* 401 */
+	{ 3,	0,	printargs,		"io_cancel"		}, /* 402 */
+	{ 5,	0,	printargs,		"SYS_403"		}, /* 403 */
+	{ 5,	0,	printargs,		"SYS_404"		}, /* 404 */
+	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 405 */
+	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 406 */
+	{ 1,	0,	printargs,		"epoll_create"		}, /* 407 */
+	{ 4,	0,	printargs,		"epoll_ctl"		}, /* 408 */
+	{ 4,	0,	printargs,		"epoll_wait"		}, /* 409 */
+	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"	}, /* 410 */
+	{ 1,	0,	printargs,		"set_tid_address"	}, /* 411 */
+	{ 0,	0,	printargs,		"restart_syscall"	}, /* 412 */
+	{ 4,	0,	printargs,		"fadvise"		}, /* 413 */
+	{ 3,	0,	sys_timer_create,	"timer_create"		}, /* 414 */
+	{ 4,	0,	sys_timer_settime,	"timer_settime"		}, /* 415 */
+	{ 2,	0,	sys_timer_gettime,	"timer_gettime"		}, /* 416 */
+	{ 1,	0,	sys_timer_getoverrun,	"timer_getoverrun"	}, /* 417 */
+	{ 1,	0,	sys_timer_delete,	"timer_delete"		}, /* 418 */
+	{ 2,	0,	sys_clock_settime,	"clock_settime"		}, /* 419 */
+	{ 2,	0,	sys_clock_gettime,	"clock_gettime"		}, /* 420 */
+	{ 2,	0,	sys_clock_getres,	"clock_getres"		}, /* 421 */
+	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"	}, /* 422 */
+	{ 5,	TI,	sys_semtimedop,		"semtimedop"		}, /* 423 */
