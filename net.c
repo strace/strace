@@ -45,9 +45,10 @@
 #endif
 #endif /* LINUX */
 
-
+#if defined(LINUX) && defined(MIPS)
 #if defined( HAVE_LINUX_IN6_H)
 #include <linux/in6.h>
+#endif
 #endif
 
 #ifndef PF_UNSPEC

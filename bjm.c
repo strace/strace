@@ -62,5 +62,15 @@ struct tcb *tcp;
 	return RVAL_HEX;
 }
 
+int
+sys_init_module(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", %#lx", tcp->u_arg[1]);
+	}
+	return 0;
+}
 #endif /* LINUX */
 
