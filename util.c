@@ -908,7 +908,9 @@ long *res;
 	errno = 0;
 	val = ptrace(PTRACE_PEEKUSER, pid, (char *) off, 0);
 	if (val == -1 && errno) {
-		perror("upeek: ptrace(PTRACE_PEEKUSER, ... )");
+		char buf[60]; 
+		sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)",pid,off);
+		perror(buf);	
 		return -1;
 	}
 	*res = val;
@@ -926,6 +928,9 @@ struct tcb *tcp;
 	long pc;
 #if defined(I386)
 	if (upeek(tcp->pid, 4*EIP, &pc) < 0)
+		return -1;
+#elif defined(X86_64)
+	if (upeek(tcp->pid, 8*RIP, &pc) < 0)
 		return -1;
 #elif defined(IA64)
 	if (upeek(tcp->pid, PT_B0, &pc) < 0)
@@ -1002,6 +1007,14 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", eip);
+#elif defined(X86_64)
+	long rip;
+
+	if (upeek(tcp->pid, 8*RIP, &rip) < 0) {
+		tprintf("[????????] ");
+		return;
+	}
+	tprintf("[%16lx] ", rip);
 #elif defined(IA62)
 	long ip;
 
@@ -1212,7 +1225,7 @@ struct tcb *tcp;
 	}
 #else /* !IA64 */
 
-#if defined (I386)
+#if defined (I386) || defined(X86_64)
 #define LOOP	0x0000feeb
 #elif defined (M68K)
 #define LOOP	0x60fe0000
@@ -1244,6 +1257,9 @@ struct tcb *tcp;
 	}
 #if defined (I386)
 	if (upeek(tcp->pid, 4*EIP, &tcp->baddr) < 0)
+		return -1;
+#elif defined (X86_64)
+	if (upeek(tcp->pid, 8*RIP, &tcp->baddr) < 0)
 		return -1;
 #elif defined (M68K)
 	if (upeek(tcp->pid, 4*PT_PC, &tcp->baddr) < 0)
@@ -1346,7 +1362,7 @@ struct tcb *tcp;
 {
 
 #ifdef LINUX
-#if defined(I386)
+#if defined(I386) || defined(X86_64)
 	long eip;
 #elif defined(POWERPC)
 	long pc;
@@ -1458,6 +1474,17 @@ struct tcb *tcp;
 
 #ifdef I386
 	if (upeek(tcp->pid, 4*EIP, &eip) < 0)
+		return -1;
+	if (eip != tcp->baddr) {
+		/* The breakpoint has not been reached yet.  */
+		if (debug)
+			fprintf(stderr,
+				"NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
+					eip, tcp->baddr);
+		return 0;
+	}
+#elif defined(X86_64)
+	if (upeek(tcp->pid, 8*RIP, &eip) < 0)
 		return -1;
 	if (eip != tcp->baddr) {
 		/* The breakpoint has not been reached yet.  */

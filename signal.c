@@ -83,7 +83,7 @@ typedef struct {
 	struct regs		si_regs;
 	int			si_mask;
 } m_siginfo_t;
-#elif !defined(IA64)
+#elif !defined(IA64) && !defined(X86_64)
 #include <asm/sigcontext.h>
 #endif /* SPARC */
 #else /* !HAVE_ASM_SIGCONTEXT_H */
@@ -1357,10 +1357,9 @@ struct tcb *tcp;
 	}
 	return 0;
 #else
-#ifdef HPPA
-#warning NO sys_sigreturn DECODE FOR HPPA
+#warning No sys_sigreturn() for this architecture
+#warning         (no problem, just a reminder :-)
 	return 0;
-#endif /* HPPA */
 #endif /* MIPS */
 #endif /* SPARC */
 #endif /* ALPHA */

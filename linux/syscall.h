@@ -110,7 +110,7 @@ int sys_osf_utimes();
 #endif
 
 
-#if !defined(ALPHA) && !defined(MIPS) &&!defined(HPPA)
+#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && !defined(X86_64)
 # ifdef	IA64
 /*
  *  IA64 syscall numbers (the only ones available from standard header
@@ -161,7 +161,7 @@ int sys_osf_utimes();
 #define SYS_recvmsg		(SYS_socket_subcall + 17)
 
 #define SYS_socket_nsubcalls	18
-#endif /* !(ALPHA || MIPS || HPPA) */
+#endif /* !(ALPHA || MIPS || HPPA || X86_64) */
 
 /* sys_ipc subcalls */
 
@@ -169,7 +169,7 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) &&!defined(HPPA)
+#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) && !defined(HPPA) && !defined(X86_64)
 # ifdef	IA64
    /*
     * IA64 syscall numbers (the only ones available from standard
@@ -210,7 +210,7 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #define SYS_shmctl		(SYS_ipc_subcall + 24)
 
 #define SYS_ipc_nsubcalls	25
-#endif /* !(ALPHA || MIPS || HPPA) */
+#endif /* !(ALPHA || MIPS || SPARC || HPPA || X86_64) */
 
 #ifdef IA64
   /*

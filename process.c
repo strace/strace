@@ -495,6 +495,11 @@ int new;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0) 
 		return -1;
 	return 0;
+#elif defined(X86_64)
+	/* Attempt to make vfork into fork, which we can follow. */
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0) 
+		return -1;
+	return 0;
 #elif defined(POWERPC)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R0), new) < 0)
 		return -1;
@@ -566,6 +571,12 @@ setarg(tcp, argnum)
 #elif defined(I386)
 	{
 		ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*argnum), tcp->u_arg[argnum]);
+		if (errno)
+			return -1;
+	}
+#elif defined(X86_64)
+	{
+		ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(8*(long)argnum), tcp->u_arg[argnum]);
 		if (errno)
 			return -1;
 	}
@@ -2033,6 +2044,35 @@ struct xlat struct_user_offsets[] = {
 	{ 4*UESP,		"4*UESP"				},
 	{ 4*SS,			"4*SS"					},
 #else /* !I386 */
+#ifdef X86_64
+	{ 8*RDI,		"8*RDI"					},
+	{ 8*RSI,		"8*RSI"					},
+	{ 8*RDX,		"8*RDX"					},
+	{ 8*R10, 		"8*R10" },
+	{ 8*R8, 		"8*R8" },
+	{ 8*R9, 		"8*R9" },
+	{ 8*RBX,		"8*RBX"					},
+	{ 8*RCX,		"8*RCX"					},
+	{ 8*RBP,		"8*RBP"					},
+	{ 8*RAX,		"8*RAX"					},
+#if 0
+	{ 8*DS,			"8*DS"					},
+	{ 8*ES,			"8*ES"					},
+	{ 8*FS,			"8*FS"					},
+	{ 8*GS,			"8*GS"					},
+#endif
+	{ 8*ORIG_RAX,		"8*ORIG_EAX"				},
+	{ 8*RIP,		"8*RIP"					},
+	{ 8*CS,			"8*CS"					},
+	{ 8*EFLAGS,		"8*EFL"					},
+	{ 8*RSP,		"8*RSP"				},
+	{ 8*SS,			"8*SS"					},
+	{ 8*R11, 		"8*R11" },
+	{ 8*R12, 		"8*R12" },
+	{ 8*R13, 		"8*R13" },
+	{ 8*R14, 		"8*R14" },
+	{ 8*R15, 		"8*R15" },
+#endif
 #ifdef M68K
 	{ 4*PT_D1,		"4*PT_D1"				},
 	{ 4*PT_D2,		"4*PT_D2"				},
@@ -2110,7 +2150,7 @@ struct xlat struct_user_offsets[] = {
 #if !defined(S390) && !defined(MIPS)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #endif
-#ifdef I386
+#if  defined(I386) || defined(X86_64)
 	{ uoff(i387),		"offsetof(struct user, i387)"		},
 #else /* !I386 */
 #ifdef M68K
@@ -2132,7 +2172,7 @@ struct xlat struct_user_offsets[] = {
 #endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
 	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
-#ifdef I386
+#if defined(I386) || defined(X86_64)
 	{ uoff(u_debugreg),	"offsetof(struct user, u_debugreg)"	},
 #endif /* I386 */
 #endif /* !IA64 */

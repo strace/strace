@@ -70,6 +70,9 @@ hppa*|parisc*)
 sh)
 	arch=sh
 	;;
+x86?64*)
+	arch=x86_64
+	;;
 *)
 	AC_MSG_ERROR(this architecture is not yet supported by strace)
 	;;
@@ -78,7 +81,7 @@ AC_MSG_RESULT($arch)
 
 # Autoheader trick.  Heh, heh.
 arch_list='
-@@@syms="$syms I386 IA64 M68K SPARC MIPS ALPHA ARM POWERPC S390 HPPA SH"@@@
+@@@syms="$syms I386 IA64 M68K SPARC MIPS ALPHA ARM POWERPC S390 HPPA SH X86_64"@@@
 '
 
 osarch="$opsys"

@@ -58,7 +58,10 @@ OBJ		= strace.o version.o syscall.o util.o desc.o file.o ipc.o \
 
 all: strace
 
-strace: $(OBJ)
+headers:
+	-$(MAKE) -C $(OSARCH) headers
+
+strace: headers $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 install: all

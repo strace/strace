@@ -499,7 +499,7 @@ struct tcb *tcp;
 	}
 }
 
-static void
+void
 decode_subcall(tcp, subcall, nsubcalls, style)
 struct tcb *tcp;
 int subcall;
@@ -686,7 +686,8 @@ struct tcb *tcp;
 	static long r28;
 #elif defined(SH)
        static long r0;
-
+#elif defined(X86_64)
+       static long rax;
 #endif 
 #endif /* LINUX */
 #ifdef FREEBSD
@@ -698,6 +699,7 @@ get_scno(tcp)
 struct tcb *tcp;
 {
 	long scno = 0;
+	static int currpers=-1;
 #ifndef USE_PROCFS
 	int pid = tcp->pid;
 #endif /* !PROCFS */	
@@ -723,6 +725,73 @@ struct tcb *tcp;
 #elif defined (I386)
 	if (upeek(pid, 4*ORIG_EAX, &scno) < 0)
 		return -1;
+#elif defined (X86_64)
+	if (upeek(pid, 8*ORIG_RAX, &scno) < 0)
+		return -1;
+
+	if (!(tcp->flags & TCB_INSYSCALL)) { 
+		long val;
+
+		/* Check CS register value. On x86-64 linux it is:
+		 * 	0x33	for long mode (64 bit)
+		 * 	0x23	for compatibility mode (32 bit)
+		 * It takes only one ptrace and thus doesn't need 
+		 * to be cached.
+		 */
+		if (upeek(pid, 8*CS, &val) < 0)
+			return -1;
+		switch(val)
+		{
+			case 0x23: currpers = 1; break;
+			case 0x33: currpers = 0; break;
+			default:
+				fprintf(stderr, "Unknown value CS=0x%02X while "
+					 "detecting personality of process "
+					 "PID=%d\n", (int)val, pid);
+				currpers = current_personality;
+				break;
+		}
+#if 0
+		/* This version analyzes the opcode of a syscall instruction.
+		 * (int 0x80 on i386 vs. syscall on x86-64)
+		 * It works, but is too complicated.
+		 */
+		unsigned long val, rip, i;
+
+		if(upeek(pid, 8*RIP, &rip)<0)
+			perror("upeek(RIP)");
+		
+		/* sizeof(syscall) == sizeof(int 0x80) == 2 */
+		rip-=2;
+		errno = 0;
+
+		call = ptrace(PTRACE_PEEKTEXT,pid,(char *)rip,0); 
+		if (errno) 
+			printf("ptrace_peektext failed: %s\n", 
+					strerror(errno));
+		switch (call & 0xffff)
+		{
+			/* x86-64: syscall = 0x0f 0x05 */
+			case 0x050f: currpers = 0; break;
+			/* i386: int 0x80 = 0xcd 0x80 */
+			case 0x80cd: currpers = 1; break;
+			default:
+				currpers = current_personality;
+				fprintf(stderr, 
+					"Unknown syscall opcode (0x%04X) while "
+					"detecting personality of process "
+					"PID=%d\n", (int)call, pid);
+				break;
+		}
+#endif
+		if(currpers != current_personality)
+		{
+			char *names[]={"64 bit", "32 bit"};
+			set_personality(currpers);
+			printf("[ Process PID=%d runs in %s mode. ]\n", 
+					pid, names[current_personality]);
+		}
+	} 
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek (pid, PT_CR_IPSR, &psr) >= 0)
@@ -1021,6 +1090,14 @@ struct tcb *tcp;
 			fprintf(stderr, "stray syscall exit: eax = %ld\n", eax);
 		return 0;
 	}
+#elif defined (X86_64)
+	if (upeek(pid, 8*RAX, &rax) < 0)
+		return -1;
+	if (rax != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
+		if (debug)
+			fprintf(stderr, "stray syscall exit: rax = %ld\n", rax);
+		return 0;
+	}
 #elif defined (S390)
 	if (upeek(pid, PT_GPR2, &gpr2) < 0)
 		return -1;
@@ -1097,6 +1174,16 @@ struct tcb *tcp;
 			u_error = 0;
 		}
 #else /* !I386 */
+#ifdef X86_64
+		if (rax < 0 && -rax < nerrnos) {
+			tcp->u_rval = -1;
+			u_error = -rax;
+		}
+		else {
+			tcp->u_rval = rax;
+			u_error = 0;
+		}
+#else
 #ifdef IA64
 		if (ia32) {
 			int err;
@@ -1208,6 +1295,7 @@ struct tcb *tcp;
 #endif /* POWERPC */
 #endif /* MIPS */
 #endif /* IA64 */
+#endif /* X86_64 */
 #endif /* I386 */
 #endif /* S390 */
 #endif /* LINUX */
@@ -1249,6 +1337,17 @@ struct tcb *tcp;
 			u_error = 0;
 		}
 #endif /* I386 */
+#ifdef X86_64
+		/* Wanna know how to kill an hour single-stepping? */
+		if (tcp->status.PR_REG[EFLAGS] & 0x1) {
+			tcp->u_rval = -1;
+			u_error = tcp->status.PR_REG[RAX];
+		}
+		else {
+			tcp->u_rval = tcp->status.PR_REG[RAX];
+			u_error = 0;
+		}
+#endif /* X86_64 */
 #ifdef MIPS
 		if (tcp->status.pr_reg[CTX_A3]) {
 			tcp->u_rval = -1;
@@ -1440,6 +1539,23 @@ struct tcb *tcp;
                                return -1;
                }
         }
+#elif defined(X86_64)
+	{
+		int i;
+		static int argreg[SUPPORTED_PERSONALITIES][MAX_ARGS] = {
+			{RDI,RSI,RDX,R10,R8,R9},	/* x86-64 ABI */
+			{RBX,RCX,RDX,RDX,RSI,RDI,RBP}	/* i386 ABI */
+		};
+		
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
+		for (i = 0; i < tcp->u_nargs; i++) {
+			if (upeek(pid, argreg[current_personality][i]*8, &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
 #else /* Other architecture (like i386) (32bits specific) */
 	{
 		int i;
@@ -1729,7 +1845,7 @@ struct tcb *tcp;
 
 	switch (tcp->scno + NR_SYSCALL_BASE) {
 #ifdef LINUX
-#if !defined (ALPHA) && !defined(SPARC) && !defined(MIPS) && !defined(HPPA)
+#if !defined (ALPHA) && !defined(SPARC) && !defined(MIPS) && !defined(HPPA) && !defined(X86_64)
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);
@@ -1738,7 +1854,7 @@ struct tcb *tcp;
 		decode_subcall(tcp, SYS_ipc_subcall,
 			SYS_ipc_nsubcalls, shift_style);
 		break;
-#endif /* !ALPHA && !MIPS && !SPARC */
+#endif /* !ALPHA && !MIPS && !SPARC && !HPPA && !X86_64 */
 #ifdef SPARC
 	case SYS_socketcall:
 		sparc_socket_decode (tcp);
@@ -1899,6 +2015,9 @@ struct tcb *tcp;
 #ifdef I386
 	val = tcp->status.PR_REG[EDX];
 #endif /* I386 */
+#ifdef X86_64
+	val = tcp->status.PR_REG[RDX];
+#endif /* X86_64 */
 #ifdef MIPS
 	val = tcp->status.PR_REG[CTX_V1];
 #endif /* MIPS */

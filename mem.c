@@ -185,8 +185,8 @@ long *u_arg;
 #else
 		printflags(mmap_flags, u_arg[3]);
 #endif
-		/* fd */
-		tprintf(", %ld, ", u_arg[4]);
+		/* fd (is always int, not long) */
+		tprintf(", %d, ", (int)u_arg[4]);
 		/* offset */
 		tprintf("%#lx", u_arg[5]);
 	}

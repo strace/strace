@@ -889,7 +889,7 @@ long addr;
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(LINUX) && !defined(IA64) && !defined(HPPA)
+#if defined(LINUX) && !defined(IA64) && !defined(HPPA) && !defined(X86_64)
 static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
@@ -977,7 +977,7 @@ struct tcb *tcp;
 }
 
 #ifdef LINUX
-# if !defined(IA64) && !defined(HPPA)
+# if !defined(IA64) && !defined(HPPA) && !defined(X86_64)
 int
 sys_oldstat(tcp)
 struct tcb *tcp;
@@ -1024,7 +1024,7 @@ struct tcb *tcp;
 }
 
 #ifdef LINUX
-# if !defined(IA64) && !defined(HPPA)
+# if !defined(IA64) && !defined(HPPA) && !defined(X86_64)
 int
 sys_oldfstat(tcp)
 struct tcb *tcp;
@@ -1072,7 +1072,7 @@ struct tcb *tcp;
 }
 
 #ifdef LINUX
-# if !defined(IA64) && !defined(HPPA)
+# if !defined(IA64) && !defined(HPPA) && !defined(X86_64)
 int
 sys_oldlstat(tcp)
 struct tcb *tcp;

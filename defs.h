@@ -87,6 +87,9 @@
 #  if defined(ALPHA)
 #     define LINUX_64BIT
 #  endif
+#  if defined(X86_64)
+#     define LINUX_X86_64
+#  endif
 #endif 
 
 #if defined(SVR4) || defined(FREEBSD)
@@ -113,7 +116,7 @@
 #include <sys/pioctl.h>
 #endif /* FREEBSD */
 #else /* !USE_PROCFS */
-#if defined(LINUXSPARC) && defined(__GLIBC__)
+#if (defined(LINUXSPARC) || defined (LINUX_X86_64)) && defined(__GLIBC__)
 #include <sys/ptrace.h>
 #else
 /* Work around awkward prototype in ptrace.h. */
@@ -180,6 +183,11 @@ extern int ptrace();
 #define SUPPORTED_PERSONALITIES 2
 #endif /* LINUXSPARC */
 
+#ifdef X86_64
+#undef SUPPORTED_PERSONALITIES
+#define SUPPORTED_PERSONALITIES 2
+#endif 
+  
 #ifdef SVR4
 #ifdef HAVE_MP_PROCFS
 extern int mp_ioctl (int f, int c, void *a, int s);
