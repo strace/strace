@@ -673,9 +673,78 @@ static struct xlat sockipoptions[] = {
 #ifdef IP_RECVIFINDEX
 	{ IP_RECVIFINDEX,	"IP_RECVIFINDEX"	},
 #endif
+#ifdef IP_MSFILTER
+	{ IP_MSFILTER,		"IP_MSFILTER"		},
+#endif
+#ifdef MCAST_MSFILTER
+	{ MCAST_MSFILTER,	"MCAST_MSFILTER"	},
+#endif
+#ifdef IP_FREEBIND
+	{ IP_FREEBIND,		"IP_FREEBIND"		},
+#endif
 	{ 0,			NULL			},
 };
 #endif /* SOL_IP */
+
+#ifdef SOL_IPV6
+static struct xlat sockipv6options[] = {
+#ifdef IPV6_ADDRFORM
+	{ IPV6_ADDRFORM,	"IPV6_ADDRFORM"		},
+#endif
+#ifdef MCAST_FILTER
+	{ MCAST_FILTER,		"MCAST_FILTER"		},
+#endif
+#ifdef IPV6_PKTOPTIONS
+	{ IPV6_PKTOPTIONS,	"IPV6_PKTOPTIONS"	},
+#endif
+#ifdef IPV6_MTU
+	{ IPV6_MTU,		"IPV6_MTU"		},
+#endif
+#ifdef IPV6_V6ONLY
+	{ IPV6_V6ONLY,		"IPV6_V6ONLY"		},
+#endif
+#ifdef IPV6_PKTINFO
+	{ IPV6_PKTINFO,		"IPV6_PKTINFO"		},
+#endif
+#ifdef IPV6_HOPLIMIT
+	{ IPV6_HOPLIMIT,	"IPV6_HOPLIMIT"		},
+#endif
+#ifdef IPV6_RTHDR
+	{ IPV6_RTHDR,		"IPV6_RTHDR"		},
+#endif
+#ifdef IPV6_HOPOPTS
+	{ IPV6_HOPOPTS,		"IPV6_HOPOPTS"		},
+#endif
+#ifdef IPV6_DSTOPTS
+	{ IPV6_DSTOPTS,		"IPV6_DSTOPTS"		},
+#endif
+#ifdef IPV6_FLOWINFO
+	{ IPV6_FLOWINFO,	"IPV6_FLOWINFO"		},
+#endif
+#ifdef IPV6_UNICAST_HOPS
+	{ IPV6_UNICAST_HOPS,	"IPV6_UNICAST_HOPS"	},
+#endif
+#ifdef IPV6_MULTICAST_HOPS
+	{ IPV6_MULTICAST_HOPS,	"IPV6_MULTICAST_HOPS"	},
+#endif
+#ifdef IPV6_MULTICAST_LOOP
+	{ IPV6_MULTICAST_LOOP,	"IPV6_MULTICAST_LOOP"	},
+#endif
+#ifdef IPV6_MULTICAST_IF
+	{ IPV6_MULTICAST_IF,	"IPV6_MULTICAST_IF"	},
+#endif
+#ifdef IPV6_MTU_DISCOVER
+	{ IPV6_MTU_DISCOVER,	"IPV6_MTU_DISCOVER"	},
+#endif
+#ifdef IPV6_RECVERR
+	{ IPV6_RECVERR,		"IPV6_RECVERR"		},
+#endif
+#ifdef IPV6_FLOWINFO_SEND
+	{ IPV6_FLOWINFO_SEND,	"IPV6_FLOWINFO_SEND"	},
+#endif
+	{ 0,			NULL			},
+};
+#endif /* SOL_IPV6 */
 
 #ifdef SOL_IPX
 static struct xlat sockipxoptions[] = {
@@ -1378,6 +1447,11 @@ struct tcb *tcp;
 			printxval(sockipoptions, tcp->u_arg[2], "IP_???");
 			break;
 #endif
+#ifdef SOL_IPV6
+		case SOL_IPV6:
+			printxval(sockipv6options, tcp->u_arg[2], "IPV6_???");
+			break;
+#endif
 #ifdef SOL_IPX
 		case SOL_IPX:
 			printxval(sockipxoptions, tcp->u_arg[2], "IPX_???");
@@ -1503,6 +1577,11 @@ int len;
 #ifdef SOL_IP
 	    case SOL_IP:
 		printxval(sockipoptions, name, "IP_???");
+		break;
+#endif
+#ifdef SOL_IPV6
+	    case SOL_IPV6:
+		printxval(sockipv6options, name, "IPV6_???");
 		break;
 #endif
 #ifdef SOL_IPX
