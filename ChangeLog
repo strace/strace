@@ -1,5 +1,10 @@
 2004-08-30  Roland McGrath  <roland@redhat.com>
 
+	* time.c (clocknames): New variable, symbolic names for clock_t.
+	(sys_clock_settime, sys_clock_gettime, sys_clock_nanosleep): Use it.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#129378.
+
 	* system.c (personality_options): Hard-code values here.
 	Don't #include <linux/personality.h> at all.
 	Fixes RH#130965.
