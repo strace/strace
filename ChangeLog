@@ -1,3 +1,8 @@
+2004-06-27  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.5.5.
+	* strace.spec, debian/changelog: 4.5.5-1.
+
 2004-06-22  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c (syscall_fixup) [LINUX && X86_64]: For 32-bit process,
