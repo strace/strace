@@ -37,7 +37,7 @@ regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\
 	sed -ne 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x54..\).*/	{ "\1",	"\2",	\3	},/p' \
 	> ioctls.h
 
-files="linux/* asm/* scsi/*"
+files="linux/* asm/* scsi/* sound/*"
 
 # Build the list of all ioctls
 regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+_S\?\(IO\|IOW\|IOR\|IOWR\)\>'
@@ -55,5 +55,3 @@ for base in $bases ; do
 	(cd $dir ; grep -h $regexp 2>/dev/null $files ) | \
 		grep -v '\<_IO' >> ioctldefs.h
 done
-
-
