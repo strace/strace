@@ -9,6 +9,7 @@ OS		= @opsys@
 # ARCH is `i386', `m68k', `sparc', etc.
 ARCH		= @arch@
 
+AM_CFLAGS = $(WARNFLAGS)
 INCLUDES = -I$(OS)/$(ARCH) -I$(srcdir)/$(OS)/$(ARCH) -I$(OS) -I$(srcdir)/$(OS)
 
 strace_SOURCES = strace.c version.c syscall.c util.c desc.c file.c ipc.c \
@@ -18,8 +19,8 @@ strace_SOURCES = strace.c version.c syscall.c util.c desc.c file.c ipc.c \
 noinst_HEADERS = defs.h
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
-     	     debian/changelog debian/control debian/copyright \
-	     debian/postinst debian/prerm debian/rules strace.spec \
+     	     debian/changelog debian/control debian/copyright debian/rules \
+	     strace.spec \
 	     strace-graph COPYRIGHT CREDITS PORTING \
 	     README-CVS README-freebsd README-linux README-sunos4 README-svr4 \
 	     linux/ioctlsort.c linux/ioctlent.sh \
