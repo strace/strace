@@ -708,8 +708,13 @@ int len;
 #ifdef T_CONN_RES
 	    case T_CONN_RES:	/* connect response   */
 		GET (T_CONN_RES, conn_res);
+#ifdef HAVE_STRUCT_T_CONN_RES_QUEUE_PTR
 		COMMA ();
 		tprintf ("QUEUE=%p", m.conn_res.QUEUE_ptr);
+#elif defined HAVE_STRUCT_T_CONN_RES_ACCEPTOR_ID
+		COMMA ();
+		tprintf ("QUEUE=%p", m.conn_res.ACCEPTOR_id);
+#endif
 		ADDR (conn_res, OPT);
 		COMMA ();
 		tprintf ("SEQ=%ld", m.conn_res.SEQ_number);
