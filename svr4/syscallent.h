@@ -550,8 +550,8 @@
 	{ -1,	0,	sys_lwp_cond_wait,	"lwp_cond_wait"}, /* 170 */
 	{ -1,	0,	sys_lwp_cond_signal,	"lwp_cond_signal"}, /* 171 */
 	{ -1,	0,	sys_lwp_cond_broadcast,	"lwp_cond_broadcast"}, /* 172 */
-	{ -1,	0,	sys_pread,		"pread"		}, /* 173 */
-	{ -1,	0,	sys_pwrite,		"pwrite"	}, /* 174 */
+	{ -1,	TF,	sys_pread,		"pread"		}, /* 173 */
+	{ -1,	TF,	sys_pwrite,		"pwrite"	}, /* 174 */
 	{ -1,	0,	sys_llseek,		"llseek"	}, /* 175 */
 	{ -1,	0,	sys_inst_sync,		"inst_sync"	}, /* 176 */
 	{ -1,	0,	printargs,		"srmlimitsys"	}, /* 177 */

@@ -109,9 +109,6 @@
 #define sys_lwp_cond_wait printargs
 #define sys_lwp_cond_signal printargs
 #define sys_lwp_cond_broadcast printargs
-#if !_LFS64_LARGEFILE
-#define sys_llseek printargs
-#endif
 #define sys_inst_sync printargs
 #define sys_auditsys printargs
 #define sys_processor_bind printargs
@@ -273,6 +270,7 @@
 #define sys_pwrite64 printargs
 #define sys_ftruncate64 printargs
 #define sys_truncate64 printargs
+#define sys_lseek64 printargs
 #endif
 
 /* unimplemented 64-bit stuff */

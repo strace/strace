@@ -1,5 +1,10 @@
 2001-03-07  John Hughes <john@Calva.COM>
 
+  * svr4/dummy.h: fix multiple define warning on non LFS64 systems.
+  * svr4/syscallent.h: pread/pwrite are TF calls.
+
+2001-03-07  John Hughes <john@Calva.COM>
+
   * defs.h: add ALIGN64 macro to cope with FreeBSD's strange insistence
     on alignment for off_t (64 bit) arguments.  Also simplify get64 so
     we don't need to know endianness of long long.
