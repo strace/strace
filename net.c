@@ -218,7 +218,7 @@ static struct xlat domains[] = {
 #endif
 	{ 0,		NULL		},
 };
-static struct xlat addrfams[] = {
+struct xlat addrfams[] = {
 #ifdef AF_APPLETALK
 	{ AF_APPLETALK,	"AF_APPLETALK"	},
 #endif

@@ -31,9 +31,11 @@
 
 #ifdef LINUX
 #include <sys/socket.h>
+#include <linux/sockios.h>
 #else
 #include <sys/sockio.h>
 #endif
+#include <arpa/inet.h>
 
 #if defined (ALPHA) || defined(SH) || defined(SH64)
 #ifdef HAVE_SYS_IOCTL_H
@@ -42,14 +44,28 @@
 #include <ioctls.h>
 #endif
 #endif
+#include <net/if.h>
+
+extern struct xlat addrfams[];
 
 int
 sock_ioctl(tcp, code, arg)
 struct tcb *tcp;
 long code, arg;
 {
-	if (entering(tcp))
+	struct ifreq ifr;
+	struct ifconf ifc;
+
+	if (entering(tcp)) {
+		if (code == SIOCGIFCONF) {
+			umove(tcp, tcp->u_arg[2], &ifc);
+			if (ifc.ifc_buf == NULL)
+				tprintf(", {%d -> ", ifc.ifc_len);
+			else
+				tprintf(", {");
+		}
 		return 0;
+	}
 
 	switch (code) {
 #ifdef SIOCSHIWAT
@@ -81,6 +97,61 @@ long code, arg;
 #endif
 		printnum(tcp, arg, ", %#d");
 		return 1;
+#ifdef LINUX
+	case SIOCGIFNAME:
+	case SIOCGIFINDEX:
+		umove(tcp, tcp->u_arg[2], &ifr);
+                if (syserror(tcp)) {
+			if (code == SIOCGIFNAME)
+				tprintf(", {%d, ???}", ifr.ifr_ifindex);
+			else if (code == SIOCGIFINDEX)
+				tprintf(", {???, \"%s\"}", ifr.ifr_name);
+		} else
+			tprintf(", {%d, \"%s\"}",
+				ifr.ifr_ifindex, ifr.ifr_name);
+		return 1;
+	case SIOCGIFCONF:
+		umove(tcp, tcp->u_arg[2], &ifc);
+		tprintf("%d, ", ifc.ifc_len);
+                if (syserror(tcp)) {
+			tprintf("%lx", (unsigned long) ifc.ifc_buf);
+		} else if (ifc.ifc_buf == NULL) {
+			tprintf("NULL");
+		} else {
+			int i;
+			unsigned nifra = ifc.ifc_len / sizeof(struct ifreq);
+			struct ifreq ifra[nifra];
+			umoven(tcp, (unsigned long) ifc.ifc_buf, sizeof(ifra),
+			       (char *) ifra);
+			tprintf("{");
+			for (i = 0; i < nifra; ++i ) {
+				if (i > 0)
+					tprintf(", ");
+				tprintf("{\"%s\", {",
+					ifra[i].ifr_name);
+				if (verbose(tcp)) {
+					printxval(addrfams,
+						  ifra[i].ifr_addr.sa_family,
+						  "AF_???");
+					tprintf(", ");
+					if (ifra[i].ifr_addr.sa_family == AF_INET) {
+						struct sockaddr_in *sinp;
+						sinp = (struct sockaddr_in *) &ifra[i].ifr_addr;
+						tprintf("inet_addr(\"%s\")",
+							inet_ntoa(sinp->sin_addr));
+					} else
+						printstr(tcp,
+							 (long) &ifra[i].ifr_addr.sa_data,
+							 sizeof(ifra[i].ifr_addr.sa_data));
+				} else
+					tprintf("...");
+				tprintf("}}");
+			}
+			tprintf("}");
+		}
+		tprintf("}");
+		return 1;
+#endif
 	default:
 		return 0;
 	}
