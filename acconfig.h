@@ -89,3 +89,18 @@
 
 /* Define if linux struct sockaddr_in6 contains sin6_scope_id fiels. */
 #undef HAVE_SIN6_SCOPE_ID_LINUX
+
+/* Define if have st_flags in struct stat */
+#undef HAVE_ST_FLAGS
+
+/* Define if have st_aclcnt in struct stat */
+#undef HAVE_ST_ACLCNT
+
+/* Define if have st_level in struct stat */
+#undef HAVE_ST_LEVEL
+
+/* Define if have st_fstype in struct stat */
+#undef HAVE_ST_FSTYPE
+
+/* Define if have st_gen in struct stat */
+#undef HAVE_ST_GEN

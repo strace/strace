@@ -1,5 +1,12 @@
 2001-03-08  John Hughes <john@Calva.COM>
 
+  * acconfig.h: add new ST_xxx defines.
+  * aclocal.m4: macros to check for more fields in struct stat.
+  * configure.in: use new macros to check for fields in struct stat.
+  * file.c: use new defines to replace #ifdef FREEBSD by #if HAVE_ST_xxx.
+
+2001-03-08  John Hughes <john@Calva.COM>
+
   * defs.h: rename wimpy get64 as powerful new LONG_LONG
   * file.c: use LONG_LONG
   * io.c: use LONG_LONG

@@ -401,3 +401,83 @@ else
 fi
 ])
 
+dnl ### A macro to check for st_flags in struct stat
+AC_DEFUN(AC_ST_FLAGS,
+[AC_MSG_CHECKING(for st_flags in struct stat)
+AC_CACHE_VAL(ac_cv_have_st_flags,
+[AC_TRY_COMPILE([#include <sys/stat.h>],
+[struct stat buf;
+buf.st_flags = 0;],
+ac_cv_have_st_flags=yes,
+ac_cv_have_st_flags=no)])
+AC_MSG_RESULT($ac_cv_have_st_flags)
+if test "$ac_cv_have_st_flags" = yes
+then
+	AC_DEFINE(HAVE_ST_FLAGS)
+fi
+])
+
+dnl ### A macro to check for st_aclcnt in struct stat
+AC_DEFUN(AC_ST_ACLCNT,
+[AC_MSG_CHECKING(for st_aclcnt in struct stat)
+AC_CACHE_VAL(ac_cv_have_st_aclcnt,
+[AC_TRY_COMPILE([#include <sys/stat.h>],
+[struct stat buf;
+buf.st_aclcnt = 0;],
+ac_cv_have_st_aclcnt=yes,
+ac_cv_have_st_aclcnt=no)])
+AC_MSG_RESULT($ac_cv_have_st_aclcnt)
+if test "$ac_cv_have_st_aclcnt" = yes
+then
+	AC_DEFINE(HAVE_ST_ACLCNT)
+fi
+])
+
+dnl ### A macro to check for st_level in struct stat
+AC_DEFUN(AC_ST_LEVEL,
+[AC_MSG_CHECKING(for st_level in struct stat)
+AC_CACHE_VAL(ac_cv_have_st_level,
+[AC_TRY_COMPILE([#include <sys/stat.h>],
+[struct stat buf;
+buf.st_level = 0;],
+ac_cv_have_st_level=yes,
+ac_cv_have_st_level=no)])
+AC_MSG_RESULT($ac_cv_have_st_level)
+if test "$ac_cv_have_st_level" = yes
+then
+	AC_DEFINE(HAVE_ST_LEVEL)
+fi
+])
+
+dnl ### A macro to check for st_fstype in struct stat
+AC_DEFUN(AC_ST_FSTYPE,
+[AC_MSG_CHECKING(for st_fstype in struct stat)
+AC_CACHE_VAL(ac_cv_have_st_fstype,
+[AC_TRY_COMPILE([#include <sys/stat.h>],
+[struct stat buf;
+buf.st_fstype[0] = 0;],
+ac_cv_have_st_fstype=yes,
+ac_cv_have_st_fstype=no)])
+AC_MSG_RESULT($ac_cv_have_st_fstype)
+if test "$ac_cv_have_st_fstype" = yes
+then
+	AC_DEFINE(HAVE_ST_FSTYPE)
+fi
+])
+
+dnl ### A macro to check for st_gen in struct stat
+AC_DEFUN(AC_ST_GEN,
+[AC_MSG_CHECKING(for st_gen in struct stat)
+AC_CACHE_VAL(ac_cv_have_st_gen,
+[AC_TRY_COMPILE([#include <sys/stat.h>],
+[struct stat buf;
+buf.st_gen = 0;],
+ac_cv_have_st_gen=yes,
+ac_cv_have_st_gen=no)])
+AC_MSG_RESULT($ac_cv_have_st_gen)
+if test "$ac_cv_have_st_gen" = yes
+then
+	AC_DEFINE(HAVE_ST_GEN)
+fi
+])
+

@@ -624,8 +624,8 @@ long addr;
 }
 #endif /* LINUXSPARC */
 
-#ifdef FREEBSD
 static struct xlat fileflags[] = {
+#ifdef FREEBSD
 	{ UF_NODUMP,	"UF_NODUMP"	},
 	{ UF_IMMUTABLE,	"UF_IMMUTABLE"	},
 	{ UF_APPEND,	"UF_APPEND"	},
@@ -635,9 +635,18 @@ static struct xlat fileflags[] = {
 	{ SF_IMMUTABLE,	"SF_IMMUTABLE"	},
 	{ SF_APPEND,	"SF_APPEND"	},
 	{ SF_NOUNLINK,	"SF_NOUNLINK"	},
+#elif UNIXWARE >= 2
+#ifdef 	_S_ISMLD
+	{ _S_ISMLD, 	"_S_ISMLD"	},
+#endif
+#ifdef 	_S_ISMOUNTED
+	{ _S_ISMOUNTED, "_S_ISMOUNTED"	},
+#endif
+#endif
 	{ 0,		NULL		},
 };
 
+#ifdef FREEBSD
 int
 sys_chflags(tcp)
 struct tcb *tcp;
@@ -712,7 +721,28 @@ struct stat *statbuf;
     if (!abbrev(tcp)) {
 	    tprintf("st_atime=%s, ", sprinttime(statbuf->st_atime));
 	    tprintf("st_mtime=%s, ", sprinttime(statbuf->st_mtime));
-	    tprintf("st_ctime=%s}", sprinttime(statbuf->st_ctime));
+	    tprintf("st_ctime=%s", sprinttime(statbuf->st_ctime));
+#if HAVE_ST_FLAGS
+		tprintf(", st_flags=");
+		if (statbuf->st_flags) {
+			printflags(fileflags, statbuf->st_flags);
+		} else
+			tprintf("0");
+#endif
+#if HAVE_ST_ACLCNT
+		tprintf(", st_aclcnt=%d", statbuf->st_aclcnt);
+#endif
+#if HAVE_ST_LEVEL
+		tprintf(", st_level=%ld", statbuf->st_level);
+#endif
+#if HAVE_ST_FSTYPE
+		tprintf(", st_fstype=%.*s",
+			(int) sizeof statbuf->st_fstype, statbuf->st_fstype);
+#endif
+#if HAVE_ST_GEN
+		tprintf(", st_gen=%u", statbuf->st_gen);
+#endif
+		tprintf("}");
     }
     else
 	    tprintf("...}");
@@ -825,17 +855,28 @@ long addr;
 	if (!abbrev(tcp)) {
 		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
 		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-#ifndef FREEBSD
-		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
-#else /* FREEBSD */
-		tprintf("st_ctime=%s, ", sprinttime(statbuf.st_ctime));
-		tprintf("st_flags=");
+		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
+#if HAVE_ST_FLAGS
+		tprintf(", st_flags=");
 		if (statbuf.st_flags) {
 			printflags(fileflags, statbuf.st_flags);
 		} else
 			tprintf("0");
-		tprintf(", st_gen=%u}", statbuf.st_gen);
-#endif /* FREEBSD */
+#endif
+#if HAVE_ST_ACLCNT
+		tprintf(", st_aclcnt=%d", statbuf.st_aclcnt);
+#endif
+#if HAVE_ST_LEVEL
+		tprintf(", st_level=%ld", statbuf.st_level);
+#endif
+#if HAVE_ST_FSTYPE
+		tprintf(", st_fstype=%.*s",
+			(int) sizeof statbuf.st_fstype, statbuf.st_fstype);
+#endif
+#if HAVE_ST_GEN
+		tprintf(", st_gen=%u", statbuf.st_gen);
+#endif
+		tprintf("}");
 	}
 	else
 		tprintf("...}");
