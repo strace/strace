@@ -59,6 +59,7 @@ int	sys_getitimer(),sys_setitimer();
 /* 1.5 descriptors */
 int	sys_getdtablesize(),sys_dup(),sys_dup2(),sys_close();
 int	sys_oldselect(),sys_select(),sys_getdopt(),sys_setdopt(),sys_fcntl(),sys_flock();
+int	sys_epoll_create(), sys_epoll_ctl(), sys_epoll_wait();
 
 /* 1.6 resource controls */
 int	sys_getpriority(),sys_setpriority(),sys_getrusage(),sys_getrlimit(),sys_setrlimit();

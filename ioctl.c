@@ -62,7 +62,7 @@ const struct ioctlent ioctlent2[] = {
 #include "ioctlent2.h"
 };
 
-int nioctlents2 = sizeof ioctlent2 / sizeof ioctlent2[0];
+const int nioctlents2 = sizeof ioctlent2 / sizeof ioctlent2[0];
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 const struct ioctlent *ioctlent;
