@@ -707,11 +707,14 @@ long addr;
 #else /* !ALPHA */
 	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%lu, f_bfree=%lu, ",
 		sprintfstype(statbuf.f_type),
-		statbuf.f_bsize, statbuf.f_blocks, statbuf.f_bfree);
+		(unsigned long)statbuf.f_bsize,
+		(unsigned long)statbuf.f_blocks,
+		(unsigned long)statbuf.f_bfree);
 	tprintf("f_files=%lu, f_ffree=%lu",
-		statbuf.f_files, statbuf.f_ffree);
+		(unsigned long)statbuf.f_files,
+		(unsigned long)statbuf.f_ffree);
 #ifdef LINUX
-	tprintf(", f_namelen=%lu}", statbuf.f_namelen);
+	tprintf(", f_namelen=%lu}", (unsigned long)statbuf.f_namelen);
 #endif /* LINUX */
 #endif /* !ALPHA */
 	tprintf("}");
