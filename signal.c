@@ -197,6 +197,33 @@ static struct xlat sigprocmaskcmds[] = {
 
 #endif /* HAVE_SIGACTION */
 
+/* Anonymous realtime signals. */
+/* Under glibc 2.1, SIGRTMIN et al are functions, but __SIGRTMIN is a
+   constant.  This is what we want.  Otherwise, just use SIGRTMIN. */
+#ifdef SIGRTMIN
+#ifndef __SIGRTMIN
+#define __SIGRTMIN SIGRTMIN
+#define __SIGRTMAX SIGRTMAX /* likewise */
+#endif
+#endif
+
+char *
+signame(sig)
+int sig;
+{
+	static char buf[30];
+	if (sig < nsignals) {
+		return signalent[sig];
+#ifdef SIGRTMIN
+	} else if (sig <= __SIGRTMIN && sig <= __SIGRTMAX) {
+		sprintf(buf, "SIGRT_%d", sig);
+		return buf;
+#endif /* SIGRTMIN */
+	} else {
+		sprintf(buf, "%d", sig);
+		return buf;
+	}
+}
 
 static char *
 sprintsigmask(s, mask)
@@ -231,7 +258,7 @@ sigset_t *mask;
 	*s++ = '[';
 	for (i = 1; i < nsignals; i++) {
 		if (sigismember(mask, i) == 1) {
-			sprintf(s, format, signalent[i] + 3); s += strlen(s);
+			sprintf(s, format, signame(i) + 3); s += strlen(s);
 			format = " %s";
 		}
 	}
@@ -251,10 +278,7 @@ void
 printsignal(nr)
 int nr;
 {
-	if (nr > 0 && nr < nsignals)
-		tprintf("%s", signalent[nr]);
-	else
-		tprintf("%d", nr);
+	tprintf(signame(nr));
 }
 
 /*
@@ -1027,12 +1051,7 @@ sys_kill(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		long sig = tcp->u_arg[1];
-
-		if (sig >= 0 && sig < NSIG)
-			tprintf("%ld, %s", tcp->u_arg[0], signalent[sig]);
-		else
-			tprintf("%ld, %ld", tcp->u_arg[0], sig);
+		tprintf("%ld, %s", tcp->u_arg[0], signame(tcp->u_arg[1]));
 	}
 	return 0;
 }

@@ -890,10 +890,10 @@ int status;
 	 */
 	if (WIFSTOPPED(status))
 		tprintf("[WIFSTOPPED(s) && WSTOPSIG(s) == %s]",
-			signalent[WSTOPSIG(status)]);
+			signame(WSTOPSIG(status)));
 	else if WIFSIGNALED(status)
 		tprintf("[WIFSIGNALED(s) && WTERMSIG(s) == %s%s]",
-			signalent[WTERMSIG(status)],
+			signame(WTERMSIG(status)),
 			WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
 	else if WIFEXITED(status) {
 		tprintf("[WIFEXITED(s) && WEXITSTATUS(s) == %d]",

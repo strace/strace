@@ -1314,7 +1314,7 @@ trace()
 			if (!cflag && (qual_flags[what] & QUAL_SIGNAL)) {
 				printleader(tcp);
 				tprintf("--- %s (%s) ---",
-					signalent[what], strsignal(what));
+					signame(what), strsignal(what));
 				printtrailer(tcp);
 			}
 			break;
@@ -1426,7 +1426,7 @@ trace()
 			    && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)) {
 				printleader(tcp);
 				tprintf("+++ killed by %s +++",
-					signalent[WTERMSIG(status)]);
+					signame(WTERMSIG(status)));
 				printtrailer(tcp);
 			}
 			droptcb(tcp);
@@ -1449,7 +1449,7 @@ trace()
 		}
 		if (debug)
 			fprintf(stderr, "pid %u stopped, [%s]\n",
-				pid, signalent[WSTOPSIG(status)]);
+				pid, signame(WSTOPSIG(status)));
 
 		if (tcp->flags & TCB_STARTUP) {
 			/*
@@ -1509,7 +1509,7 @@ trace()
 			    && (qual_flags[WSTOPSIG(status)] & QUAL_SIGNAL)) {
 				printleader(tcp);
 				tprintf("--- %s (%s) ---",
-					signalent[WSTOPSIG(status)],
+					signame(WSTOPSIG(status)),
 					strsignal(WSTOPSIG(status)));
 				printtrailer(tcp);
 			}

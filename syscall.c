@@ -252,7 +252,7 @@ char *s;
 	if (strncmp(s, "SIG", 3) == 0)
 		s += 3;
 	for (i = 0; i <= NSIG; i++) {
-		if (strcmp(s, signalent[i] + 3) == 0)
+		if (strcmp(s, signame(i) + 3) == 0)
 			return i;
 	}
 	return -1;
