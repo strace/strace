@@ -919,10 +919,14 @@ struct tcb *tcp;
 		if (ia32) {
 			if (upeek(pid, PT_R1, &scno) < 0)	/* orig eax */
 				return -1;
-			/* Check if we return from execve. */
 		} else {
 			if (upeek (pid, PT_R15, &scno) < 0)
 				return -1;
+		}
+		/* Check if we return from execve. */
+		if (tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
 		}
 	} else {
 		/* syscall in progress */
@@ -931,11 +935,6 @@ struct tcb *tcp;
 		if (upeek (pid, PT_R10, &r10) < 0)
 			return -1;
 	}
-	if (tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
-
 #elif defined (ARM)
 	{
 	    long pc;
