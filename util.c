@@ -1029,7 +1029,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%16lx] ", rip);
-#elif defined(IA62)
+#elif defined(IA64)
 	long ip;
 
 	if (upeek(tcp->pid, PT_B0, &ip) < 0) {
@@ -1100,7 +1100,14 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
+#elif defined(ARM)
+	long pc;
 
+	if (upeek(tcp->pid, 4*15, &pc) < 0) {
+		tprintf("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
 #endif /* !architecture */
 #endif /* LINUX */
 
