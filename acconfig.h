@@ -62,3 +62,6 @@
 
 /* Define if the msghdr structure has a msg_control member.  */
 #undef HAVE_MSG_CONTROL
+
+/* Define if stat64 is available in asm/stat.h.  */
+#undef HAVE_STAT64
