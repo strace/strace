@@ -1,3 +1,7 @@
+Fri Jul  9 02:28:16 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Add a corrected patch from Daniel Jacobowitz
+
 Thu Jul  8 16:00:04 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge patch from Daniel Jacobowitz to allow us to use the kernel types
