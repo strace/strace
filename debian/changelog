@@ -1,3 +1,10 @@
+strace (4.4.91-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fixes -f on x86-64.
+
+ -- Roland McGrath <frob@debian.org>  Fri, 10 Jan 2003 12:55:34 -0800
+
 strace (4.4.90-1) unstable; urgency=low
 
   * New maintainer.
