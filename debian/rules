@@ -3,6 +3,7 @@
 # Debian package information
 package		= strace
 
+DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_HOST_GNU_TYPE := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 ifeq ($(DEB_HOST_GNU_TYPE),sparc-linux)
@@ -11,8 +12,20 @@ ifeq ($(DEB_HOST_GNU_TYPE),sparc-linux)
   CC64 = gcc -m64
 endif
 
+ifeq ($(DEB_HOST_GNU_TYPE),s390-linux)
+  build64 = yes
+  HOST64 = s390x-linux
+  CC64 = gcc -m64
+endif
+
 ifeq ($(build64),yes)
    extra_build_targets += stamp-build64
+endif
+
+ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+  CONFIG_OPTS = --build=$(DEB_BUILD_GNU_TYPE)
+else
+  CONFIG_OPTS = --build=$(DEB_BUILD_GNU_TYPE) --host=$(DEB_HOST_GNU_TYPE)
 endif
 
 all build: stamp-build
@@ -23,11 +36,11 @@ stamp-%: %/Makefile
 
 build/Makefile:
 	mkdir -p $(@D)
-	cd $(@D); sh ../configure --prefix=/usr
+	cd $(@D); sh ../configure --prefix=/usr $(CONFIG_OPTS)
 
 build64/Makefile:
 	mkdir -p $(@D)
-	cd $(@D); CC="$(CC64)" sh ../configure --prefix=/usr --build=$(HOST64)
+	cd $(@D); CC="$(CC64)" sh ../configure --prefix=/usr --build=$(DEB_BUILD_GNU_TYPE) --host=$(HOST64)
 
 clean:
 	rm -rf debian/tmp debian/substvars debian/files
