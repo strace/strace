@@ -4,13 +4,13 @@
 package		= strace
 
 all build: Makefile
-	$(MAKE) $(MFLAGS) 
+	$(MAKE) $(MFLAGS)
 	touch stamp-build
 
 Makefile:
 	sh configure --prefix=/usr
 clean:
-	-make -f Makefile.in distclean
+	test ! -f Makefile || $(MAKE) distclean
 	rm -f stamp-build
 	rm -rf debian/tmp debian/substvars debian/files
 
@@ -18,7 +18,7 @@ binary: binary-indep binary-arch
 
 binary-indep:
 
-binary-arch: checkroot
+binary-arch: build checkroot
 	test -f stamp-build || make $(MFLAGS) -f debian/rules build
 	-rm -rf debian/tmp debian/files debian/substvars
 
@@ -51,4 +51,3 @@ binary-arch: checkroot
 
 checkroot:
 	test root = "`whoami`"
-

@@ -1,3 +1,29 @@
+strace (4.4.90-1) unstable; urgency=low
+
+  * New maintainer.
+  * New upstream version.
+
+ -- Roland McGrath <frob@debian.org>  Fri, 10 Jan 2003 01:58:40 -0800
+
+strace (4.4-1.2) unstable; urgency=low
+
+  * NMU
+  * Quick one-liner to allow building on the ARM. Closes: #109993.
+  * Re-ran autoconf, hopefully I didn't break other arches.
+
+ -- Anand Kumria <wildfire@progsoc.org>  Mon,  1 Oct 2001 14:22:25 +1000
+
+strace (4.4-1.1) unstable; urgency=low
+
+  * NMU.
+  * Added patch from David Mosberger which fixes some ia64 issues.
+    Closes: #113087.
+  * Added ia64-specific Build-Depends on libc6.1-dev.  Closes:
+    #109815.
+  * Ran autoheader, so the s390 patch applies.  Closes: #104594.
+
+ -- Jeff Licquia <jlicquia@progeny.com>  Tue, 25 Sep 2001 13:15:28 -0500
+
 strace (4.4-1) unstable; urgency=low
 
   * New upstream version
@@ -135,7 +161,7 @@ strace (3.1.0.1-10) unstable; urgency=low
     in order to compile this.
 
  -- Wichert Akkerman <wakkerma@debian.org>  Fri, 29 Jan 1999 02:04:12 +0100
- 
+
 strace (3.1.0.1-9) unstable; urgency=low
 
   * Add support for poll() systemcall
@@ -153,13 +179,13 @@ strace (3.1.0.1-7) frozen unstable; urgency=low
   * Fix sparc support
   * Display nanosleep call correctly (Bug# 25904)
   * Honour -v flag in printargs (Bug# 10426)
-  * Play with #define to get proper kernel struct stat 
+  * Play with #define to get proper kernel struct stat
   * Compile with 2.1.131 kernel source
 
  -- Wichert Akkerman <wakkerma@debian.org>  Sat, 19 Dec 1998 15:02:14 +0100
 
 strace (3.1.0.1-6) frozen unstable; urgency=low
-  
+
   * Set NSIG correctly for ARM
   * Include strace-graph script from Richard Braakman <dark@debian.org>
     as an example. Try it and be amazed!
@@ -262,7 +288,7 @@ strace (3.1-10) unstable; urgency=LOW
  -- Wichert Akkerman <wakkerma@debian.org>  Fri, 11 Jul 1997 12:26:12 +0200
 
 strace (3.1-9) stable; urgency=LOW
-  
+
   * Fixed bug with hanging children. Patch by Matthias Urlichs
   * Added some more constants to net.c.
   * glibc patches, courtesy of Klee Dienes (Bug# 7735)
