@@ -1,5 +1,12 @@
 2003-03-12  Roland McGrath  <roland@redhat.com>
 
+	* linux/ia64/syscallent.h: Fix arg counts for clone and clone2.
+	Use sys_clone for clone2.
+	* linux/syscall.h: Don't declare sys_clone2.
+	* process.c (sys_clone): Rewritten to handle both flavors,
+	print all extra args depending on flag bits.
+	(sys_clone2): Function removed.
+
 	* linux/ia64/syscallent.h: Add a bunch of 2.5 syscalls.
 
 2003-03-04  Roland McGrath  <roland@redhat.com>
