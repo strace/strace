@@ -217,6 +217,7 @@ struct tcb *tcp;
 			printstrbufarg(tcp, tcp->u_arg[i], 1);
 		/* pointer to band */
 		printnum(tcp, tcp->u_arg[3], "%d");
+		tprintf(", ");
 		/* pointer to flags */
 		if (tcp->u_arg[4] == 0)
 			tprintf("NULL");
