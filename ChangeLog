@@ -1,5 +1,12 @@
 2003-05-22  Roland McGrath  <roland@redhat.com>
 
+	* process.c (sys_clone): Mask CSIGNAL out of flags and print that
+	separately using signame.
+
+	* process.c (internal_clone) [TCB_CLONE_THREAD]: Use ARG_FLAGS instead
+	of literal 0 for index.  Consult the right flags without clobbering
+	anything when we reparent the new child to the caller's parent thread.
+
 	* linux/s390/syscallent.h: Fix sys_clone argument count.
 	* linux/s390x/syscallent.h: Likewise.
 	* linux/mips/syscallent.h: Likewise.
