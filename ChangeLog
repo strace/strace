@@ -4,6 +4,7 @@
 	* linux/syscallent.h: fix typo and add the reserved stream syscalls
 	* defs.h, file.c, io.c: fix signed/unsigned issues
 	* syscall.c: check for negative u_errors
+	* cvsbuild: renamed to autogen.sh
 
 2001-12-17  Wichert Akkerman <wakkerma@debian.org>
 
