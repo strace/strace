@@ -241,7 +241,7 @@ char *argv[];
 				break;
 			}
 			if (pid == getpid()) {
-				fprintf(stderr, "%s: I'm sorry, I can't let you do that, Dave.", progname);
+				fprintf(stderr, "%s: I'm sorry, I can't let you do that, Dave.\n", progname);
 				break;
 			}
 			if ((tcp = alloctcb(pid)) == NULL) {
