@@ -108,6 +108,10 @@ int sys_create_module(), sys_init_module();
 
 int	sys_umask();		/* XXX */
 
+int sys_sched_setparam(), sys_sched_getparam();
+int sys_sched_setscheduler(), sys_sched_getscheduler(), sys_sched_yield();
+int sys_sched_get_priority_max(), sys_sched_get_priority_min();
+
 /* 2.3.1 SystemV-compatible IPC */
 int	sys_semsys(), sys_semctl(), sys_semget();
 #define SYS_semsys_subcall	200
