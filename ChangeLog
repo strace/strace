@@ -1,5 +1,16 @@
 2002-12-21  Roland McGrath  <roland@redhat.com>
 
+	* linux/syscallent.h: Add some new 2.5 syscall names.
+	Now clone takes 5 args.
+	* process.c [LINUX] (clone_flags): Update with 2.5 flag bits.
+	[LINUX] (sys_clone): Print new args.
+	* mem.c (print_ldt_entry): Make global.
+
+	* linux/syscall.h [I386 || IA64] (SYS_socket_subcall): Bump to 300 for
+	safety, since up to 260 are already used in 2.5 kernels.
+	* linux/syscallent.h: Update the table.
+	* linux/ia64/syscallent.h: Likewise.
+
 	* syscall.c (force_result): New function.
 	* process.c (internal_wait): Handle ECHILD exit from wait call with
 	WNOHANG flag set; force the return value to 0 in the inferior when it
