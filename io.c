@@ -242,7 +242,7 @@ struct tcb *tcp;
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		ALIGN64 (tcp, 2); /* PowerPC alignment restriction */
+		ALIGN64 (tcp, 3); /* PowerPC alignment restriction */
 		tprintf(", %lu, %llu", tcp->u_arg[2],
 			*(unsigned long long *)&tcp->u_arg[3]);
 	}
@@ -256,7 +256,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		ALIGN64 (tcp, 2); /* PowerPC alignment restriction */
+		ALIGN64 (tcp, 3); /* PowerPC alignment restriction */
 		tprintf(", %lu, %llu", tcp->u_arg[2],
 			*(unsigned long long *)&tcp->u_arg[3]);
 	}
