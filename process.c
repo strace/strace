@@ -107,6 +107,8 @@
 #include <asm/posix_types.h>
 #undef GETGROUPS_T
 #define GETGROUPS_T __kernel_gid_t
+#undef GETGROUPS32_T
+#define GETGROUPS32_T __kernel_gid32_t
 #endif /* LINUX */
 
 #if defined(LINUX) && defined(IA64)
@@ -1109,15 +1111,15 @@ sys_getresuid(tcp)
 			if (umove(tcp, tcp->u_arg[0], &uid) < 0)
 				tprintf("%#lx, ", tcp->u_arg[0]);
 			else
-				tprintf("ruid %lu, ", (unsigned long) uid);
+				tprintf("[%lu], ", (unsigned long) uid);
 			if (umove(tcp, tcp->u_arg[1], &uid) < 0)
 				tprintf("%#lx, ", tcp->u_arg[1]);
 			else
-				tprintf("euid %lu, ", (unsigned long) uid);
+				tprintf("[%lu], ", (unsigned long) uid);
 			if (umove(tcp, tcp->u_arg[2], &uid) < 0)
 				tprintf("%#lx", tcp->u_arg[2]);
 			else
-				tprintf("suid %lu", (unsigned long) uid);
+				tprintf("[%lu]", (unsigned long) uid);
 		}
 	}
 	return 0;
@@ -1136,15 +1138,15 @@ struct tcb *tcp;
 			if (umove(tcp, tcp->u_arg[0], &gid) < 0)
 				tprintf("%#lx, ", tcp->u_arg[0]);
 			else
-				tprintf("rgid %lu, ", (unsigned long) gid);
+				tprintf("[%lu], ", (unsigned long) gid);
 			if (umove(tcp, tcp->u_arg[1], &gid) < 0)
 				tprintf("%#lx, ", tcp->u_arg[1]);
 			else
-				tprintf("egid %lu, ", (unsigned long) gid);
+				tprintf("[%lu], ", (unsigned long) gid);
 			if (umove(tcp, tcp->u_arg[2], &gid) < 0)
 				tprintf("%#lx", tcp->u_arg[2]);
 			else
-				tprintf("sgid %lu", (unsigned long) gid);
+				tprintf("[%lu]", (unsigned long) gid);
 		}
 	}
 	return 0;
@@ -1157,9 +1159,8 @@ sys_setreuid(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%lu, %lu",
-			(unsigned long) (uid_t) tcp->u_arg[0],
-			(unsigned long) (uid_t) tcp->u_arg[1]);
+		printuid("", tcp->u_arg[0]);
+		printuid(", ", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -1169,9 +1170,8 @@ sys_setregid(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%lu, %lu",
-			(unsigned long) (gid_t) tcp->u_arg[0],
-			(unsigned long) (gid_t) tcp->u_arg[1]);
+		printuid("", tcp->u_arg[0]);
+		printuid(", ", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -1182,10 +1182,9 @@ sys_setresuid(tcp)
      struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("ruid %u, euid %u, suid %u",
-				(uid_t) tcp->u_arg[0],
-				(uid_t) tcp->u_arg[1],
-				(uid_t) tcp->u_arg[2]);
+		printuid("", tcp->u_arg[0]);
+		printuid(", ", tcp->u_arg[1]);
+		printuid(", ", tcp->u_arg[2]);
 	}
 	return 0;
 }
@@ -1194,10 +1193,9 @@ sys_setresgid(tcp)
      struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("rgid %u, egid %u, sgid %u",
-				(uid_t) tcp->u_arg[0],
-				(uid_t) tcp->u_arg[1],
-				(uid_t) tcp->u_arg[2]);
+		printuid("", tcp->u_arg[0]);
+		printuid(", ", tcp->u_arg[1]);
+		printuid(", ", tcp->u_arg[2]);
 	}
 	return 0;
 }
@@ -1279,6 +1277,84 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef LINUX
+int
+sys_setgroups32(tcp)
+struct tcb *tcp;
+{
+	int i, len;
+	GETGROUPS32_T *gidset;
+
+	if (entering(tcp)) {
+		len = tcp->u_arg[0];
+		tprintf("%u, ", len);
+		if (len <= 0) {
+			tprintf("[]");
+			return 0;
+		}
+		gidset = (GETGROUPS32_T *) malloc(len * sizeof(GETGROUPS32_T));
+		if (gidset == NULL) {
+			fprintf(stderr, "sys_setgroups32: out of memory\n");
+			return -1;
+		}
+		if (!verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else if (umoven(tcp, tcp->u_arg[1],
+		    len * sizeof(GETGROUPS32_T), (char *) gidset) < 0)
+			tprintf("[?]");
+		else {
+			tprintf("[");
+			for (i = 0; i < len; i++)
+				tprintf("%s%lu", i ? ", " : "",
+					(unsigned long) gidset[i]);
+			tprintf("]");
+		}
+		free((char *) gidset);
+	}
+	return 0;
+}
+
+int
+sys_getgroups32(tcp)
+struct tcb *tcp;
+{
+	int i, len;
+	GETGROUPS32_T *gidset;
+
+	if (entering(tcp)) {
+		len = tcp->u_arg[0];
+		tprintf("%u, ", len);
+	} else {
+		len = tcp->u_rval;
+		if (len <= 0) {
+			tprintf("[]");
+			return 0;
+		}
+		gidset = (GETGROUPS32_T *) malloc(len * sizeof(GETGROUPS32_T));
+		if (gidset == NULL) {
+			fprintf(stderr, "sys_getgroups32: out of memory\n");
+			return -1;
+		}
+		if (!tcp->u_arg[1])
+			tprintf("NULL");
+		else if (!verbose(tcp) || tcp->u_arg[0] == 0)
+			tprintf("%#lx", tcp->u_arg[1]);
+		else if (umoven(tcp, tcp->u_arg[1],
+		    len * sizeof(GETGROUPS32_T), (char *) gidset) < 0)
+			tprintf("[?]");
+		else {
+			tprintf("[");
+			for (i = 0; i < len; i++)
+				tprintf("%s%lu", i ? ", " : "",
+					(unsigned long) gidset[i]);
+			tprintf("]");
+		}
+		free((char *)gidset);
+	}
+	return 0;
+}
+#endif /* LINUX */
 
 int
 sys_setpgrp(tcp)
