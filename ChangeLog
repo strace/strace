@@ -1,3 +1,7 @@
+2005-03-01  Roland McGrath  <roland@redhat.com>
+
+	* file.c (print_xattr_val): Add a cast.
+
 2005-02-05  Roland McGrath  <roland@redhat.com>
 
 	* desc.c (decode_select): Calculate size of passed fd_set vectors and
