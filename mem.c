@@ -3,6 +3,8 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
+ * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
+ *                    port by Greg Banks <gbanks@pocketpenguins.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +41,9 @@
 
 #if defined(LINUX) && defined(I386)
 #include <asm/ldt.h>
+#endif
+#if defined(LINUX) && defined(SHMEDIA)
+#include <asm/page.h>	    /* for PAGE_SHIFT */
 #endif
 
 #ifdef HAVE_LONG_LONG_OFF_T
@@ -222,7 +227,7 @@ struct tcb *tcp;
 		return 0;
 	else
 		u_arg[i] = v;
-#elif defined(SH)
+#elif defined(SH) || defined(SHMEDIA)
     /* SH has always passed the args in registers */
     int i;
     for (i=0; i<6; i++)
@@ -240,6 +245,15 @@ int
 sys_mmap(tcp)
 struct tcb *tcp;
 {
+#if defined(LINUX) && defined(SHMEDIA)
+    /*
+     * Old mmap differs from new mmap in specifying the
+     * offset in units of bytes rather than pages.  We
+     * pretend it's in byte units so the user only ever
+     * sees bytes in the printout.
+     */
+    tcp->u_arg[5] <<= PAGE_SHIFT;
+#endif
     return print_mmap(tcp, tcp->u_arg);
 }
 #endif /* !HAVE_LONG_LONG_OFF_T */

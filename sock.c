@@ -35,7 +35,7 @@
 #include <sys/sockio.h>
 #endif
 
-#if defined (ALPHA) || defined(SH)
+#if defined (ALPHA) || defined(SH) || defined(SHMEDIA)
 #ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #elif defined(HAVE_IOCTLS_H)

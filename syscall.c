@@ -713,6 +713,8 @@ struct tcb *tcp;
 	static long r28;
 #elif defined(SH)
        static long r0;
+#elif defined(SHMEDIA)
+       static long r9;	
 #elif defined(X86_64)
        static long rax;
 #endif
@@ -1093,15 +1095,32 @@ struct tcb *tcp;
                        return 0;
                }
        }
-#endif /* SH */
+#elif defined(SHMEDIA)
+	if (upeek(pid, REG_SYSCALL, &scno) < 0)
+		return -1;
+        scno &= 0xFFFF;
+
+	if (!(tcp->flags & TCB_INSYSCALL)) {
+		/* Check if we return from execve. */
+		if (tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
+		}
+	}
+#endif /* SHMEDIA */
 #endif /* LINUX */
 #ifdef SUNOS4
 	if (upeek(pid, uoff(u_arg[7]), &scno) < 0)
 		return -1;
 #elif defined(SH)
-       /* new syscall ABI returns result in R0 */
-       if (upeek(pid, 4*REG_REG0, (long *)&r0) < 0)
-               return -1;
+        /* new syscall ABI returns result in R0 */
+        if (upeek(pid, 4*REG_REG0, (long *)&r0) < 0)
+                return -1;
+#elif defined(SHMEDIA)
+        /* ABI defines result returned in r9 */
+        if (upeek(pid, REG_GENERAL(9), (long *)&r9) < 0)
+                return -1;
+
 #endif
 #ifdef USE_PROCFS
 #ifdef HAVE_PR_SYSCALL
@@ -1416,6 +1435,18 @@ struct tcb *tcp;
                        tcp->u_rval = r0;
                        u_error = 0;
                }
+#else
+#ifdef SHMEDIA
+                /* interpret result as return value or error number */
+                if (r9 && (unsigned) -r9 < nerrnos) {
+	                tcp->u_rval = -1;
+	                u_error = -r9;
+                }
+                else {
+                        tcp->u_rval = r9;
+	                u_error = 0;
+                }
+#endif /* SHMEDIA */
 #endif /* SH */
 #endif /* HPPA */
 #endif /* SPARC */
@@ -1622,6 +1653,12 @@ force_result(tcp, error, rval)
 	r0 = error ? -error : rval;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*REG_REG0), r0) < 0)
 		return -1;
+#else
+#ifdef SHMEDIA
+        r9 = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)REG_GENERAL(9), r9) < 0)
+		return -1;
+#endif /* SHMEDIA */
 #endif /* SH */
 #endif /* HPPA */
 #endif /* SPARC */
@@ -1841,6 +1878,28 @@ struct tcb *tcp;
                                return -1;
                }
         }
+#elif defined(SHMEDIA)
+	{
+		int i;
+                /* Registers used by SH5 Linux system calls for parameters */
+		static int syscall_regs[] = { 2, 3, 4, 5, 6, 7 };
+
+		/*
+		 * TODO: should also check that the number of arguments encoded
+		 *       in the trap number matches the number strace expects.
+		 */
+		/*
+		    assert(sysent[tcp->scno].nargs <
+		    	sizeof(syscall_regs)/sizeof(syscall_regs[0]));
+		 */
+
+		tcp->u_nargs = sysent[tcp->scno].nargs;
+		for (i = 0; i < tcp->u_nargs; i++) {
+			if (upeek(pid, REG_GENERAL(syscall_regs[i]), &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
+
 #elif defined(X86_64)
 	{
 		int i;

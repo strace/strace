@@ -91,6 +91,10 @@ sh)
 	arch=sh
 	AC_DEFINE([SH], 1, [Define for the SH architecture.])
 	;;
+shmedia)
+	arch=shmedia
+	AC_DEFINE([SHMEDIA], 1, [Define for the SHmedia architecture.])
+	;;
 x86?64*)
 	arch=x86_64
 	AC_DEFINE([X86_64], 1, [Define for the AMD x86-64 architecture.])

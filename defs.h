@@ -170,6 +170,22 @@ extern int ptrace();
 #  define PT_IAOQ0 (106*4)
 #  define PT_IAOQ1 (107*4)
 #endif /* HPPA */
+#ifdef SHMEDIA
+   /* SHmedia Linux - this code assumes the following kernel API for system calls:
+          PC           Offset 0
+          System Call  Offset 16 (actually, (syscall no.) | (0x1n << 16),
+                       where n = no. of parameters.
+          Other regs   Offset 24+
+
+          On entry:    R2-7 = parameters 1-6 (as many as necessary)
+          On return:   R9   = result. */
+
+   /* Offset for peeks of registers */
+#  define REG_OFFSET         (24)
+#  define REG_GENERAL(x)     (8*(x)+REG_OFFSET)
+#  define REG_PC             (0*8)
+#  define REG_SYSCALL        (2*8)
+#endif /* SHMEDIA */
 #endif /* LINUX */
 
 #define SUPPORTED_PERSONALITIES 1
@@ -302,7 +318,7 @@ struct tcb {
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-# if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(S390) || defined(S390X)
+# if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SHMEDIA) || defined(S390) || defined(S390X)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
 # endif
 # define TCB_CLONE_DETACHED 04000 /* CLONE_DETACHED set in creating syscall */
