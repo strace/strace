@@ -66,7 +66,7 @@
 #ifdef SPARC
 #  undef fpq
 #  undef fq
-#  undef fpu 
+#  undef fpu
 #endif
 #endif /* HAVE_ASM_REG_H */
 
@@ -83,6 +83,20 @@
 #include <linux/ptrace.h>
 #endif
 
+#ifdef HAVE_LINUX_FUTEX_H
+#include <linux/futex.h>
+#endif
+#if defined LINUX
+# ifndef FUTEX_WAIT
+#  define FUTEX_WAIT 0
+# endif
+# ifndef FUTEX_WAKE
+#  define FUTEX_WAKE 1
+# endif
+# ifndef FUTEX_FD
+#  define FUTEX_FD 2
+# endif
+#endif
 
 #ifdef LINUX
 #include <asm/posix_types.h>
@@ -492,12 +506,12 @@ int new;
 #if defined(LINUX)
 #if defined(I386)
 	/* Attempt to make vfork into fork, which we can follow. */
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0) 
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0)
 		return -1;
 	return 0;
 #elif defined(X86_64)
 	/* Attempt to make vfork into fork, which we can follow. */
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0) 
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0)
 		return -1;
 	return 0;
 #elif defined(POWERPC)
@@ -600,8 +614,8 @@ setarg(tcp, argnum)
         {
 		if(argnum <= 5)
 			ptrace(PTRACE_POKEUSER, tcp->pid,
-			       (char *) (argnum==0 ? PT_ORIGGPR2 : 
-			       PT_GPR2 + argnum*sizeof(long)), 
+			       (char *) (argnum==0 ? PT_ORIGGPR2 :
+			       PT_GPR2 + argnum*sizeof(long)),
 			       tcp->u_arg[argnum]);
 		else
 			return -E2BIG;
@@ -696,7 +710,7 @@ struct tcb *tcp;
 #ifdef SYS_vfork
 	if (tcp->scno == SYS_vfork) {
 		/* Attempt to make vfork into fork, which we can follow. */
-		if (!followvfork || 
+		if (!followvfork ||
 		    change_syscall(tcp, SYS_fork) < 0)
 			dont_follow = 1;
 	}
@@ -1196,9 +1210,9 @@ struct xlat *opt;
 	int max = verbose (tcp) ? sizeof buf / sizeof buf [0] : 10;
 	int dots = len > max;
 	int i;
-	
+
 	if (len > max) len = max;
-	
+
 	if (len <= 0 ||
 	    umoven (tcp, addr, len * sizeof buf[0], (char *) buf) < 0)
 	{
@@ -1259,7 +1273,7 @@ struct tcb *tcp;
 			tprintf (", %ld", tcp->u_arg[2]);
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -1569,7 +1583,7 @@ sys_wait(tcp)
 struct tcb *tcp;
 {
 	int status;
-	
+
 	if (exiting(tcp)) {
 		if (!syserror(tcp)) {
 			if (umove(tcp, tcp->u_arg[0], &status) < 0)
@@ -1703,7 +1717,7 @@ struct tcb *tcp;
 #ifndef SVR4
 
 static struct xlat ptrace_cmds[] = {
-#ifndef FREEBSD	
+#ifndef FREEBSD
 	{ PTRACE_TRACEME,	"PTRACE_TRACEME"	},
 	{ PTRACE_PEEKTEXT,	"PTRACE_PEEKTEXT",	},
 	{ PTRACE_PEEKDATA,	"PTRACE_PEEKDATA",	},
@@ -1878,6 +1892,9 @@ struct xlat struct_user_offsets[] = {
 #elif defined(HPPA)
 	/* XXX No support for these offsets yet. */
 #elif defined(POWERPC)
+#ifndef PT_ORIG_R3
+#define PT_ORIG_R3 34
+#endif
 	{ 4*PT_R0,		"4*PT_R0"				},
 	{ 4*PT_R1,		"4*PT_R1"				},
 	{ 4*PT_R2,		"4*PT_R2"				},
@@ -1918,7 +1935,7 @@ struct xlat struct_user_offsets[] = {
 	{ 4*PT_XER,		"4*PT_XER"				},
 	{ 4*PT_CCR,		"4*PT_CCR"				},
 	{ 4*PT_FPR0,		"4*PT_FPR0"				},
-#else	
+#else
 #ifdef ALPHA
 	{ 0,			"r0"					},
 	{ 1,			"r1"					},
@@ -2278,7 +2295,7 @@ struct tcb *tcp;
 		cmd = "PTRACE_???";
 #else
 		cmd = "PT_???";
-#endif		
+#endif
 	if (entering(tcp)) {
 		tprintf("%s, %lu, ", cmd, tcp->u_arg[1]);
 		addr = tcp->u_arg[2];
@@ -2352,3 +2369,63 @@ struct tcb *tcp;
 }
 
 #endif /* !SVR4 */
+
+#ifdef LINUX
+static struct xlat futexops[] = {
+	{ FUTEX_WAIT,	"FUTEX_WAIT" },
+	{ FUTEX_WAKE,	"FUTEX_WAKE" },
+	{ FUTEX_FD,	"FUTEX_FD" },
+	{ 0,		NULL }
+};
+
+int
+sys_futex(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%p, ", (void *) tcp->u_arg[0]);
+	printflags(futexops, tcp->u_arg[1]);
+	tprintf(", %ld, ", tcp->u_arg[2]);
+	printtv(tcp, tcp->u_arg[3]);
+    }
+    return 0;
+}
+
+static void
+print_affinitylist(list, len)
+unsigned long *list;
+unsigned int len;
+{
+    int first = 1;
+    tprintf(" {");
+    while (len > sizeof (unsigned long)) {
+	tprintf("%s %lx", first ? "" : ",", *list++);
+	first = 0;
+	len -= sizeof (unsigned long);
+    }
+    tprintf(" }");
+}
+
+int
+sys_sched_setaffinity(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	print_affinitylist((unsigned long *) tcp->u_arg[2], tcp->u_arg[1]);
+    }
+    return 0;
+}
+
+int
+sys_sched_getaffinity(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+    } else {
+	print_affinitylist((unsigned long *) tcp->u_arg[2], tcp->u_rval);
+    }
+    return 0;
+}
+#endif
