@@ -1,3 +1,8 @@
+2000-01-21 Wichert Akkerman  <wakkerma@debian.org>
+
+  * Release version 4.2 to get the current updates out and so
+    we can concentrate in finishing the clone support.
+
 2000-01-11 Wichert Akkerman  <wakkerma@debian.org>
 
   * Add 1900 to tm_year in sprinttime
