@@ -52,7 +52,8 @@ lookup_ioctls()
 	# Build the list of all ioctls
 	regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+0x'"$type"'..\>'
 	(cd "$dir" ; grep "$regexp" "$@" /dev/null 2>/dev/null ) |
-		sed -ne 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x'"$type"'..\).*/	{ "\1",	"\2",	\3	},/p' \
+		sed -ne "s,$asm/,asm/,g"'
+s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x'"$type"'..\).*/	{ "\1",	"\2",	\3	},/p' \
 		>> ioctls.h
 }
 
@@ -71,7 +72,7 @@ files="linux/* $asm/* scsi/* sound/*"
 # Build the list of all ioctls
 regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+_S\?\(IO\|IOW\|IOR\|IOWR\)\>'
 (cd $dir ; grep $regexp $files 2>/dev/null ) | \
-	sed -ne "s,$asm/,asm/,"'
+	sed -ne "s,$asm/,asm/,g"'
 s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_S\?I.*(\([^[,]*\)[[:space:]]*,[[:space:]]*\([^,)]*\).*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\3,\4,0)	},/p' \
 	>> ioctls.h
 
