@@ -1,5 +1,8 @@
 2004-07-12  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.5.6.
+	* strace.spec, debian/changelog: 4.5.6-1.
+
 	* Makefile.am (EXTRA_DIST): Add linux/sparc64 files.
 
 	* debian/rules: On sparc-linux, build strace64 as well.
