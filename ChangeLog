@@ -1,5 +1,7 @@
 2005-02-01  Roland McGrath  <roland@redhat.com>
 
+	* linux/x86_64/syscallent.h: Fix exit_group entry.
+
 	* util.c (getpc) [S390 || S390X]: Implement it.
 	Patch by David Wilder <wilder@us.ibm.com>.
 
