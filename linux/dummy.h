@@ -35,7 +35,6 @@
 #define	sys_iopl		printargs
 #define	sys_vm86old		printargs
 #define	sys_modify_ldt		printargs
-#define	sys_init_module		printargs
 #define	sys_get_kernel_syms	printargs
 #define	sys_quotactl		printargs
 #define	sys_bdflush		printargs
@@ -62,7 +61,6 @@
 #define	sys_swapon		sys_chdir
 #define	sys_swapoff		sys_chdir
 #define	sys_clone		sys_fork
-#define	sys_create_module	sys_sethostname
 #define	sys_delete_module	sys_chdir
 #define	sys_fchdir		sys_close
 #define	sys_setfsuid		sys_setuid
@@ -206,4 +204,6 @@
 #define	sys_fstat		printargs
 #define	sys_personality		printargs
 #define sys_poll		printargs
+#define	sys_create_module	printargs
+#define	sys_init_module		printargs
 #endif

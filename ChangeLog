@@ -1,3 +1,9 @@
+Thu Jul 15 23:00:32 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge patch from Maciej W. Rozycki <macro@ds2.pg.gda.pl>:
+    + Correctly implement fix sys_createmodule (Linux)
+    + Add limited handlig of sys_initmodule (Linux)
+
 Tue Jul 13 17:07:50 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Add configure-test for sys/reg.h and use that
