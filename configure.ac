@@ -12,10 +12,12 @@ case "$host_os" in
 linux*)
 	opsys=linux
 	AC_DEFINE([LINUX], 1, [Define for the Linux operating system.])
+	AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
 	;;
 sunos4*)
 	opsys=sunos4
 	AC_DEFINE([SUNOS4], 1, [Define for the SunOS 4.x operating system.])
+	AM_CONDITIONAL([SUNOS4], [test x$opsys = xsunos4])
 	;;
 solaris2* | sysv[[45]]* | irix[[56]]*)
 	opsys=svr4
@@ -29,10 +31,12 @@ system or a derivative like Solaris 2.x or Irix 5.x.])
 		AC_DEFINE(UNIXWARE, 7, [Define for UnixWare systems.])
 		;;
 	esac
+	AM_CONDITIONAL([SVR4], [test x$opsys = xsvr4])
 	;;
 freebsd*)
 	opsys=freebsd
 	AC_DEFINE([FREEBSD], 1, [Define for the FreeBSD operating system.])
+	AM_CONDITIONAL([FREEBSD], [test x$opsys = xfreebsd])
 	;;
 *)
 	AC_MSG_RESULT([NO!])
@@ -102,14 +106,8 @@ x86?64*)
 esac
 AC_MSG_RESULT($arch)
 
-osarch="$opsys"
-if test -r "$srcdir/$opsys/$arch/Makefile.in"; then
-	osarch="$opsys/$arch"
-fi
-
 AC_SUBST(opsys)
 AC_SUBST(arch)
-AC_SUBST(osarch)
 
 CFLAGS="-D_GNU_SOURCE $CFLAGS"
 AC_PROG_CC
@@ -194,5 +192,5 @@ AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
 
 AC_PATH_PROG([PERL], [perl])
 
-AC_CONFIG_FILES([Makefile $osarch/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
