@@ -1,3 +1,8 @@
+2001-10-16  John Hughes  <john@Calva.COM>
+
+	* util.c (umovestr): UnixWare (svr4?) returns 0 when trying
+	to read unmapped page.  Make it possible to strace ksh.
+
 2001-10-03  David Mosberger  <davidm@hpl.hp.com>
 
 	* process.c (internal_clone): Avoid race condition by clearing

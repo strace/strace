@@ -711,7 +711,7 @@ char *laddr;
 
 	while (left) {
 		if (move > left) move = left;
-		if ((move = read(fd, laddr, move)) == -1)
+		if ((move = read(fd, laddr, move)) <= 0)
 			return left != len ? 0 : -1;
 		if (memchr (laddr, 0, move)) break;
 		left -= move;
