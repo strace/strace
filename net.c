@@ -887,6 +887,9 @@ struct tcb *tcp;
 		tprintf(", ");
 		switch (tcp->u_arg[0]) {
 		case PF_INET:
+#ifdef PF_INET6
+		case PF_INET6:
+#endif
 			printxval(protocols, tcp->u_arg[2], "IPPROTO_???");
 			break;
 #ifdef PF_IPX
