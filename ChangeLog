@@ -1,3 +1,16 @@
+1999-12-23  Ulrich Drepper  <drepper@cygnus.com>
+
+ * file.c: Use ugly libc_stat trick also for stat64.
+   Implement sys_stat64, sys_fstat64, sys_lstat64, and printstat64.
+ * process.c (internal_clone): Fix a few typos and add definitions to make
+   it at least compile.
+ * linux/syscall.h: Declare sys_stat64, sys_lstat64, and sys_fstat64.
+ * linux/syscallent.h: Define table entries for sys_stat64, sys_lstat64,
+   and sys_fstat64.
+ * aclocal.m4: Define AC_STAT64.
+ * acconfig.h: Define HAVE_STAT64.
+ * configure.in: Add AC_STAT64.
+
 Thu Dec 23 15:01:37 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge patch from ftp://oss.software.ibm.com/linux390/ to add
@@ -207,7 +220,7 @@ Sun May  9 02:18:30 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 Sun Apr 18 22:32:42 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Update syscalls for linux alpha, patch from Bart Warmerdam
-    <bartw@debian.org> 
+    <bartw@debian.org>
   * Update sparc code so it actually compiles
 
 Fri Apr 16 02:18:05 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
@@ -282,7 +295,7 @@ Mon May 20 23:17:14 1996  J. Richard Sladkey  <jrs@world.std.com>
 	* util.c (umoven, umovestr): Move data in long-sized chunks
 	at a time, instead of hard coding it to be 4.
 	From David Mosberger-Tang <davidm@AZStarNet.com>.
-	
+
 Mon May 20 01:19:36 1996  J. Richard Sladkey  <jrs@world.std.com>
 
 	* version.c: Version 3.0.13 is released.
@@ -306,7 +319,7 @@ Mon May 20 01:19:36 1996  J. Richard Sladkey  <jrs@world.std.com>
  	Use versions built by {ioctlent,errnoent,signaltent}.sh.
   	* sunos4/ioctlent.sh: Work around sprintf troubles with SunOS
  	4.1.4 and gcc 2.7.2.
-	
+
 Sun May 19 17:14:09 1996  J. Richard Sladkey  <jrs@world.std.com>
 
 	* configure.in, Makefile.in: Add OSARCH concept to finish
@@ -319,14 +332,14 @@ Sun May 19 17:14:09 1996  J. Richard Sladkey  <jrs@world.std.com>
 	complement numbers isn't an order relation (it isn't transitive)!
 	* linux/Makefile.in: Add rules for the signalent.h file.
 	* linux/alpha/Makefile.in: New file.
-	
+
 Sun May 19 01:12:28 1996  J. Richard Sladkey  <jrs@world.std.com>
 
 	* version.c: Version 3.0.12 is released.
 
 	* linux{,alpha}/ioctlent.sh: Tweak for recent kernels.
 	From Michael E Chastain <mec@duracef.shout.net>.
-	
+
 	* defs.h (SUPPORTED_PERSONALITES, DEFAULT_PERSONALITY): New.
 	* syscall.c (set_personality): New.
 	* strace.c (main): Call set_personality.
@@ -353,7 +366,7 @@ Fri May 17 21:03:36 1996  J. Richard Sladkey  <jrs@world.std.com>
 
 	* linux/syscall.h (sys_utimes): Fix a typo in the declaration.
 	From Thomas Bogendoerfer <tsbogend@bigbug.franken.de>.
-	
+
 Fri May 17 00:50:06 1996  J. Richard Sladkey  <jrs@world.std.com>
 
 	* version.c: Version 3.0.10 is released.
