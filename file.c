@@ -245,7 +245,9 @@ const struct xlat openmodes[] = {
 #   define O_LARGEFILE	0100000
 #  endif
 # endif
+# ifdef O_LARGEFILE
 	{ O_LARGEFILE,	"O_LARGEFILE"   },
+# endif
 #endif
 #ifdef O_DIRECTORY
 	{ O_DIRECTORY,	"O_DIRECTORY"   },
