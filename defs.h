@@ -33,6 +33,13 @@
 #include <features.h>
 #endif
 
+#ifdef _LARGEFILE64_SOURCE
+/* This is the macro everything checks before using foo64 names.  */
+# ifndef _LFS64_LARGEFILE
+#  define _LFS64_LARGEFILE 1
+# endif
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -537,18 +544,12 @@ extern char *signalent2[];
 extern int nsignals2;
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
-#if FREEBSD
+#if defined(FREEBSD) || (defined(LINUX) \
+			 && defined(POWERPC) && !defined(__powerpc64__))
 /* ARRGH!  off_t args are aligned on 64 bit boundaries! */
 #define ALIGN64(tcp,arg)						\
 do {									\
 	if (arg % 2)							\
-	    memmove (&tcp->u_arg[arg], &tcp->u_arg[arg + 1],		\
-		     (tcp->u_nargs - arg - 1) * sizeof tcp->u_arg[0]);	\
-} while (0)
-#elif defined(LINUX) && defined(POWERPC) && !defined(__powerpc64__)
-#define ALIGN64(tcp,arg)						\
-do {									\
-	if (!(arg % 2))							\
 	    memmove (&tcp->u_arg[arg], &tcp->u_arg[arg + 1],		\
 		     (tcp->u_nargs - arg - 1) * sizeof tcp->u_arg[0]);	\
 } while (0)
