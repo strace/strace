@@ -69,6 +69,7 @@ if MAINTAINER_MODE
 if LINUX
 
 IOCTLDIR = /usr/include
+IOCTLASM = asm
 
 if I386
 ioctlent_h = linux/ioctlent.h
@@ -81,9 +82,10 @@ BUILT_SOURCES = $(ioctlent_h)
 $(srcdir)/$(ioctlent_h): ioctlsort
 	$(<D)/$(<F) > $@
 ioctlsort: $(srcdir)/linux/ioctlsort.c ioctls.h ioctldefs.h
-	$(LINK.c) -I. -o $@ $<
+	$(filter-out -I%,$(LINK.c)) -I. -I$(IOCTLDIR) $(filter -I%,$(LINK.c)) \
+	  -o $@ $<
 ioctls.h: $(srcdir)/linux/ioctlent.sh
-	$(SHELL) $< $(IOCTLDIR)
+	$(SHELL) $< $(IOCTLDIR) $(IOCTLASM)
 ioctldefs.h: ioctls.h ;
 
 endif
