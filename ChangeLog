@@ -5,13 +5,13 @@
 
 2003-09-06  Dmitry V. Levin <ldv@altlinux.org>
 
+	Fixes for RH#105359.
 	* util.c (printuid): New function.
 	* defs.h: Declare it.
 	* file.c (sys_chown): Use it.
 	* file.c (sys_fchown): Likewise.
 	* process.c (sys_setreuid, sys_setregid, sys_setresuid,
 	sys_setresgid): Likewise.
-
 	* linux/syscallent.h: Better handle getgid32, geteuid32, getegid32,
 	setreuid32, setregid32, getgroups32, setgroups32, fchown32,
 	setresuid32, getresuid32, setresgid32, getresgid32, chown32,
