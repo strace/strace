@@ -37,7 +37,7 @@
 #include <sys/user.h>
 #include <sys/syscall.h>
 #include <sys/param.h>
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 && (defined(I386) || defined(M68K))
 # include <sys/reg.h>
 #endif
 

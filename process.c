@@ -44,7 +44,7 @@
 #include <machine/reg.h>
 #endif /* SUNOS4 */
 
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 && (defined(I386) || defined(M68K))
 # include <sys/reg.h>
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
 # define PTRACE_POKEUSR PTRACE_POKEUSER
