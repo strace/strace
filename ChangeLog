@@ -1,5 +1,12 @@
 2004-10-19  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.5.8.
+	* debian/changelog, strace.spec: 4.5.8-1.
+
+	* configure.ac: Check for sys/epoll.h.
+	* desc.c: Protect #include <sys/epoll.h> with [HAVE_SYS_EPOLL_H].
+	(epollctls, epollevents): Protect each entry with #ifdef on its macro.
+
 	* strace.c (handle_group_exit): Don't detach leader that wasn't
 	TCB_ATTACHED.  Instead mark it with TCB_GROUP_EXITING.
 	Remove droptcb loop at end, no longer required since 2.6 reports each
