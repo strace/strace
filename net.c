@@ -516,12 +516,39 @@ static struct xlat sockpacketoptions[] = {
 
 #ifdef SOL_TCP
 static struct xlat socktcpoptions[] = {
-	{ TCP_NODELAY,	"TCP_NODELAY"	},
-	{ TCP_MAXSEG,	"TCP_MAXSEG"	},
+	{ TCP_NODELAY,		"TCP_NODELAY"	},
+	{ TCP_MAXSEG,		"TCP_MAXSEG"	},
 #if defined(TCP_CORK)
-	{ TCP_CORK,	"TCP_CORK"	},
+	{ TCP_CORK,		"TCP_CORK"	},
 #endif
-	{ 0,		NULL		},
+#if defined(TCP_KEEPIDLE)
+	{ TCP_KEEPIDLE,		"TCP_KEEPIDLE" },
+#endif
+#if defined(TCP_KEEPINTVL)
+	{ TCP_KEEPINTVL,	"TCP_KEEPINTVL" },
+#endif
+#if defined(TCP_KEEPCNT)
+	{ TCP_KEEPCNT,		"TCP_KEEPCNT" },
+#endif
+#if defined(TCP_SYNCNT)
+	{ TCP_SYNCNT,		"TCP_SYNCNT" },
+#endif
+#if defined(TCP_LINGER2)
+	{ TCP_LINGER2,		"TCP_LINGER2" },
+#endif
+#if defined(TCP_DEFER_ACCEPT)
+	{ TCP_DEFER_ACCEPT,	"TCP_DEFER_ACCEPT" },
+#endif
+#if defined(TCP_WINDOW_CLAMP)
+	{ TCP_WINDOW_CLAMP,	"TCP_WINDOW_CLAMP" },
+#endif
+#if defined(TCP_INFO)
+	{ TCP_INFO,		"TCP_INFO" },
+#endif
+#if defined(TCP_QUICKACK)
+	{ TCP_QUICKACK,		"TCP_QUICKACK" },
+#endif
+	{ 0,			NULL		},
 };
 #endif /* SOL_TCP */
 
