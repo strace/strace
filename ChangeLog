@@ -1,3 +1,8 @@
+2004-12-20  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* syscall.c (call_summary): Fix potential NULL dereference.
+	Fixes RH#143369.
+
 2004-12-19  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* syscall.c (qual_signal): Check bounds for numeric signal names.
