@@ -2643,7 +2643,7 @@ unsigned int len;
 {
     int first = 1;
     tprintf(" {");
-    while (len > sizeof (unsigned long)) {
+    while (len >= sizeof (unsigned long)) {
 	tprintf("%s %lx", first ? "" : ",", *list++);
 	first = 0;
 	len -= sizeof (unsigned long);
