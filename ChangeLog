@@ -1,3 +1,15 @@
+2003-06-02  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.4.97.
+	* strace.spec, debian/changelog: 4.4.97-1.
+
+	* configure.ac, defs.h, mem.c, process.c, sock.c, syscall.c, util.c:
+	Merged in SHmedia port from Stephen Thomas <stephen.thomas@superh.com>.
+
+	* config.guess: Update from ftp://ftp.gnu.org/pub/gnu/config/,
+	timestamp 2003-05-22.
+	* config.sub: Likewise, timestamp 2003-05-24.
+
 2003-05-22  Roland McGrath  <roland@redhat.com>
 
 	* defs.h (struct tcb): New member `nzombies'.
