@@ -1,5 +1,9 @@
 2001-08-03   Wichert Akkerman <wakkerma@debian.org>
 
+  * linux/hppa/syscallent.h: updated from Matthew Wilcox
+
+2001-08-03   Wichert Akkerman <wakkerma@debian.org>
+
   * process.c: seems Linux/IA64 changed register names on us, switch to
     using new names.
 
