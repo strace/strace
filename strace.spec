@@ -43,7 +43,7 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*
 
 %changelog
-* Mon Jun  2 2003 Roland McGrath <roland@redhat.com> 4.4.98-1
+* Mon Jun 10 2003 Roland McGrath <roland@redhat.com> 4.4.98-1
 - new upstream version, more fixes (#90754, #91085)
 
 * Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com>
