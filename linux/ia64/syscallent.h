@@ -1031,7 +1031,7 @@
 	{ 5,	0,	printargs,		"vm86"		}, /* 1125 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 1126 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 1127 */
-	{ 4,	TP,	sys_clone,		"clone"		}, /* 1128 */
+	{ 5,	TP,	sys_clone,		"clone"		}, /* 1128 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 1129 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 1130 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 1131 */
