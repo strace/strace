@@ -322,6 +322,7 @@ qual_desc(s, opt, not)
 {
 	if (s && *s && isdigit((unsigned char)*s)) {
 		qualify_one(atoi(s), opt, not);
+		return 0;
 	}
 	return -1;
 }
