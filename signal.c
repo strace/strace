@@ -73,7 +73,7 @@
 #ifdef SPARC
 #  undef fpq
 #  undef fq
-#  undef fpu 
+#  undef fpu
 #endif
 
 #endif /* HAVE_ASM_REG_H */
@@ -307,7 +307,7 @@ int rt; /* set might include realtime sigs */
 	int i, nsigs;
 	int maxsigs;
 	char *format;
-	static char outstr[256];
+	static char outstr[8 * sizeof(sigset_t) * 8];
 
 	strcpy(outstr, s);
 	s = outstr + strlen(outstr);
@@ -736,7 +736,7 @@ int verbose;
 						(unsigned long) sip->si_ptr);
 				}
 #endif
-				
+
 			}
 		}
 	}
@@ -996,7 +996,7 @@ struct tcb *tcp;
 			/* Send unblockable signal */
 			kill(tcp->pid, SIGSTOP);
 		}
-#endif /* !USE_PROCFS */		
+#endif /* !USE_PROCFS */
 	}
 	else if (!syserror(tcp)) {
 		sigset_t sigm;
@@ -1029,8 +1029,8 @@ struct old_sigaction {
 #define SA_HANDLER __sa_handler
 #endif /* LINUX */
 
-#ifndef SA_HANDLER                                                           
-#define SA_HANDLER sa_handler                                                
+#ifndef SA_HANDLER
+#define SA_HANDLER sa_handler
 #endif
 
 int
@@ -1347,7 +1347,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else  
+#else
 #ifdef MIPS
 	long sp;
 	struct sigcontext sc;
@@ -1856,7 +1856,7 @@ int sys_rt_sigtimedwait(tcp)
 	if (entering(tcp)) {
 		sigset_t sigset;
 
-		if (copy_sigset_len(tcp, tcp->u_arg[0], 
+		if (copy_sigset_len(tcp, tcp->u_arg[0],
 				    &sigset, tcp->u_arg[3]) < 0)
 			tprintf("[?]");
 		else
