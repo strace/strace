@@ -1,5 +1,15 @@
 2003-01-10  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: Fix siginfo_t/sig_atomic_t checks.
+	Use prerequisite #include <netinet/in.h> for netinet/*.h checks.
+
+	* strace.c (pfd2tcb): Fix for new tcbtab type.
+	(rebuild_pollv): Likewise.
+	(detach): Put variables used under [LINUX] inside #ifdef.
+
+	* process.c (change_syscall) [POWERPC]: Add missing return.
+	* util.c [POWERPC] (arg0_offset): Set to 4*PT_R3, not 4*PT_ORIG_R3.
+
 	* strace.spec: New file.
 	* debian/changelog: 4.4.90-1
 	* debian/rules (binary-arch): Depend on build.
