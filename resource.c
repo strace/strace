@@ -498,10 +498,18 @@ int
 sys_quotactl(tcp)
 struct tcb *tcp;
 {
+	/*
+	 * The Linux kernel only looks at the low 32 bits of the command
+	 * argument, but on some 64-bit architectures (s390x) this word
+	 * will have been sign-extended when we see it.  The high 1 bits
+	 * don't mean anything, so don't confuse the output with them.
+	 */
+	unsigned int cmd = tcp->u_arg[0];
+
 	if (entering(tcp)) {
-		printxval(quotacmds, (unsigned long) tcp->u_arg[0] >> SUBCMDSHIFT, "Q_???");
+		printxval(quotacmds, cmd >> SUBCMDSHIFT, "Q_???");
 		tprintf("|");
-		printxval(quotatypes, tcp->u_arg[0] & SUBCMDMASK, "???QUOTA");
+		printxval(quotatypes, cmd & SUBCMDMASK, "???QUOTA");
 		tprintf(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
@@ -511,7 +519,7 @@ struct tcb *tcp;
 
 		if (!tcp->u_arg[3])
 			tprintf("NULL");
-               else if (!verbose(tcp) || !OLD_COMMAND(tcp->u_arg[0]))
+               else if (!verbose(tcp) || !OLD_COMMAND(cmd))
 			tprintf("%#lx", tcp->u_arg[3]);
                 else if (umoven(tcp, tcp->u_arg[3], sizeof(struct dqblk),
                     (char *) &dq) < 0)
