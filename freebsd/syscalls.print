@@ -67,7 +67,7 @@ fpathconf
 fstat
 fstatfs
 fsync
-ftruncate
+ftruncate	sys_ftruncate64
 getdents
 getdirentries
 getdomainname
@@ -96,13 +96,13 @@ kill
 killpg
 link
 listen
-lseek
+lseek		sys_lseek64
 lstat
 mincore
 mkdir
 mkfifo
 mknod
-mmap
+mmap		sys_mmap64
 mprotect
 msgctl
 msgget
@@ -116,9 +116,9 @@ open
 pathconf
 pipe
 poll
-pread
+pread		sys_pread64
 ptrace
-pwrite
+pwrite		sys_pwrite64
 quotactl
 read
 readlink
@@ -178,7 +178,7 @@ symlink
 sysctl
 time
 times
-truncate
+truncate	sys_truncate64
 umask
 uname
 unlink

@@ -1,3 +1,16 @@
+2001-03-07  John Hughes <john@Calva.COM>
+
+  * defs.h: add ALIGN64 macro to cope with FreeBSD's strange insistence
+    on alignment for off_t (64 bit) arguments.  Also simplify get64 so
+    we don't need to know endianness of long long.
+  * file.c: FreeBSD now uses 64 bit versions of lseek, truncate,
+    ftruncate, allows reduction in numvber of horrid #if's
+  * io.c: FreeBSD now uses 64 bit versions of pread, pwrite.
+  * mem.c: FreeBSD now uses 64 bit version of mmap.
+  * freebsd/syscalls.print: use 64 bit versions of various syscalls.
+  * freebsd/i386/syscall.h: use 64 bit versions of various syscalls.
+  * freebsd/i386/syscallent.h: use 64 bit versions of various syscalls.
+
 2001-03-06  John Hughes <john@Calva.COM>
 
   * file.c: Implement truncate64 and ftruncate64

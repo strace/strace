@@ -130,7 +130,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#if defined(SVR4) || defined(FREEBSD)
+#if defined(SVR4)
 
 int
 sys_pread(tcp)
@@ -147,14 +147,9 @@ struct tcb *tcp;
 		/* off_t is signed int */
 		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 #else
-#ifndef FREEBSD
 		tprintf(", %lu, %llu", tcp->u_arg[2],
 				(((unsigned long long) tcp->u_arg[4]) << 32
 				 | tcp->u_arg[3]));
-#else
-		tprintf(", %lu, %llu", tcp->u_arg[2], 
-				(((off_t) tcp->u_arg[3]) << 32) +  tcp->u_arg[4]);
-#endif
 #endif
 	}
 	return 0;
@@ -171,19 +166,14 @@ struct tcb *tcp;
 		/* off_t is signed int */
 		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 #else
-#ifndef FREEBSD
 		tprintf(", %lu, %llu", tcp->u_arg[2],
 				(((unsigned long long) tcp->u_arg[4]) << 32
 				 | tcp->u_arg[3]));
-#else
-		tprintf(", %lu, %llu", tcp->u_arg[2],
-				(((off_t) tcp->u_arg[3]) << 32) + tcp->u_arg[4]);
-#endif
 #endif
 	}
 	return 0;
 }
-#endif /* SVR4 || FREEBSD */
+#endif /* SVR4 */
 
 #ifdef FREEBSD
 #include <sys/types.h>
@@ -279,7 +269,7 @@ struct tcb *tcp;
 
 #endif /* LINUX */
 
-#if _LFS64_LARGEFILE
+#if _LFS64_LARGEFILE || FREEBSD
 int
 sys_pread64(tcp)
 struct tcb *tcp;
@@ -287,11 +277,13 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 	} else {
+		ALIGN64 (tcp, 3);
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %lu, %#llx", tcp->u_arg[2], get64(tcp->u_arg[3], tcp->u_arg[4]));
+		tprintf(", %lu, %#llx", tcp->u_arg[2],
+			get64(tcp->u_arg[3], tcp->u_arg[4]));
 	}
 	return 0;
 }
@@ -301,9 +293,11 @@ sys_pwrite64(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
+		ALIGN64 (tcp, 3);
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, %#llx", tcp->u_arg[2], get64(tcp->u_arg[3], tcp->u_arg[4]));
+		tprintf(", %lu, %#llx", tcp->u_arg[2],
+			get64(tcp->u_arg[3], tcp->u_arg[4]));
 	}
 	return 0;
 }

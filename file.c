@@ -350,6 +350,7 @@ static struct xlat whence[] = {
 	{ 0,		NULL		},
 };
 
+#ifndef FREEBSD
 int
 sys_lseek(tcp)
 struct tcb *tcp;
@@ -359,30 +360,17 @@ struct tcb *tcp;
 
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-#ifndef FREEBSD
 		offset = tcp->u_arg[1];
 		_whence = tcp->u_arg[2];
 		if (_whence == SEEK_SET)
 			tprintf("%lu, ", offset);
 		else
 			tprintf("%ld, ", offset);		
-#else /* FREEBSD */
-		offset = ((off_t) tcp->u_arg[1] << 32) +  tcp->u_arg[2];
-		_whence = tcp->u_arg[4];
-		if (_whence == SEEK_SET)
-			tprintf("%llu, ", offset);
-		else
-			tprintf("%lld, ", offset);		
-#endif		
 		printxval(whence, _whence, "SEEK_???");
 	} 
-#ifdef FREEBSD
-	else
-		if (!syserror(tcp))
-			return RVAL_LUDECIMAL;
-#endif /* FREEBSD */
 	return RVAL_UDECIMAL;
 }
+#endif
 
 #ifdef linux
 int
@@ -411,13 +399,15 @@ struct tcb *tcp;
 }
 #endif
 
-#if _LFS64_LARGEFILE
+#if _LFS64_LARGEFILE || FREEBSD
 int
 sys_lseek64 (tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		long long offset = get64(tcp->u_arg [1], tcp->u_arg[2]);
+		long long offset;
+		ALIGN64 (tcp, 1);	/* FreeBSD aligns off_t args */
+		offset = get64(tcp->u_arg [1], tcp->u_arg[2]);
 		if (tcp->u_arg[3] == SEEK_SET)
 			tprintf("%ld, %llu, ", tcp->u_arg[0], offset);
 		else
@@ -428,27 +418,26 @@ struct tcb *tcp;
 }
 #endif
 
+#ifndef FREEBSD
 int
 sys_truncate(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
-#ifndef FREEBSD
 		tprintf(", %lu", tcp->u_arg[1]);
-#else
-		tprintf(", %llu", ((off_t) tcp->u_arg[1] << 32) + tcp->u_arg[2]);
-#endif		
 	}
 	return 0;
 }
+#endif
 
-#if _LFS64_LARGEFILE
+#if _LFS64_LARGEFILE || FREEBSD
 int
 sys_truncate64(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
+		ALIGN64 (tcp, 1);
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", %llu", get64(tcp->u_arg[1],tcp->u_arg[2]));
 	}
@@ -456,27 +445,25 @@ struct tcb *tcp;
 }
 #endif
 
+#ifndef FREEBSD
 int
 sys_ftruncate(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-#ifndef FREEBSD
 		tprintf("%ld, %lu", tcp->u_arg[0], tcp->u_arg[1]);
-#else
-		tprintf("%ld, %llu", tcp->u_arg[0],
-			((off_t) tcp->u_arg[1] << 32) + tcp->u_arg[2]);
-#endif		
 	}
 	return 0;
 }
+#endif
 
-#if _LFS64_LARGEFILE
+#if _LFS64_LARGEFILE || FREEBSD
 int
 sys_ftruncate64(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
+		ALIGN64 (tcp, 1);
 		tprintf("%ld, %llu", tcp->u_arg[0],
 			get64(tcp->u_arg[1] ,tcp->u_arg[2]));
 	}

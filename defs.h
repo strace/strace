@@ -497,14 +497,38 @@ extern char *signalent2[];
 extern int nsignals2;
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
-#if _LFS64_LARGEFILE
+#if FREEBSD
+/* ARRGH!  off_t args are aligned on 64 bit boundaries! */
+#define ALIGN64(tcp,arg)						\
+do {									\
+	if (arg % 2)							\
+	    memmove (&tcp->u_arg[arg], &tcp->u_arg[arg + 1],		\
+		     (tcp->u_nargs - arg - 1) * sizeof tcp->u_arg[0]);	\
+} while (0)
+#else
+#define ALIGN64(tcp,arg) do { } while (0)
+#endif
+
+#if _LFS64_LARGEFILE || FREEBSD
+
 /* _l refers to the lower numbered u_arg,
  * _h refers to the higher numbered u_arg
  */
-#if _LITTLE_ENDIAN || I386	/* FIXME! */
+
+#if 1
+/* This should work, assuming we can do non-aligned 64 bit fetches.
+ * if not we'll have to figure out how which of the other versions to use.
+ */
+
+#define get64(_l,_h) (*(long long *) &(_l))
+
+#else
+
+#if _LITTLE_ENDIAN
 #define get64(_l,_h) ((long long)((unsigned long long)(_l) | ((unsigned long long)(_h)<<32)))
 #else
 #define get64(_l,_h) ((long long)((unsigned long long)(_h) | ((unsigned long long)(_l)<<32)))
+#endif
 #endif
 #endif
 

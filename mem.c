@@ -224,7 +224,7 @@ struct tcb *tcp;
     return print_mmap(tcp, tcp->u_arg);
 }
 
-#if _LFS64_LARGEFILE
+#if _LFS64_LARGEFILE || FREEBSD
 int
 sys_mmap64(tcp)
 struct tcb *tcp;
@@ -247,6 +247,7 @@ struct tcb *tcp;
 			return 0;
 #endif /* ALPHA */
 #endif /* linux */
+		ALIGN64 (tcp, 5);	/* FreeBSD wierdies */
 
 		/* addr */
 		tprintf("%#lx, ", u_arg[0]);
@@ -256,8 +257,12 @@ struct tcb *tcp;
 		printflags(mmap_prot, u_arg[2]);
 		tprintf(", ");
 		/* flags */
+#ifdef MAP_TYPE
 		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
 		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
+#else
+		printflags(mmap_flags, u_arg[3]);
+#endif
 		/* fd */
 		tprintf(", %ld, ", u_arg[4]);
 		/* offset */
