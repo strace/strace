@@ -2034,8 +2034,8 @@ struct tcb *tcp;
 		if (!verbose(tcp)) {
 			tprintf("%d, %d, %d", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		} else if (tcp->u_arg[0]==SETNAME) {
-			char nodename[__NEW_UTS_LEN_1];
-			if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN_1), nodename) < 0)
+			char nodename[__NEW_UTS_LEN+1];
+			if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN+1), nodename) < 0)
 				tprintf(", %#lx", tcp->u_arg[1]);
 			else
 				tprintf(", \"%s\"", nodename);
