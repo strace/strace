@@ -292,7 +292,7 @@ AC_CACHE_VAL(ac_cv_type_stat64,
 [AC_TRY_COMPILE([#include <asm/stat.h>],
 [struct stat64 st;],
 ac_cv_type_stat64=yes,
-ac_cv_type_stat64no)])
+ac_cv_type_stat64=no)])
 AC_MSG_RESULT($ac_cv_type_stat64)
 if test "$ac_cv_type_stat64" = yes
 then
