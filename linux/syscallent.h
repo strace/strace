@@ -108,7 +108,7 @@
 	{ 1,	TS,	sys_sigpending,		"sigpending"	}, /* 73 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 74 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 75 */
-	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 76 */
+	{ 2,	0,	sys_getrlimit,		"old_getrlimit"	}, /* 76 */
 	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 77 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 78 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */
@@ -236,7 +236,7 @@
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 188 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
-	{ 2,	0,	printargs,		"getrlimit"	}, /* 191 */
+	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
 	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 192 */
 	{ 2,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
 	{ 2,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
@@ -305,15 +305,15 @@
 	{ 4,	0,	printargs,		"epoll_wait"	}, /* 256 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 257 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 258 */
-	{ 5,	0,	printargs,		"SYS_259"	}, /* 259 */
-	{ 5,	0,	printargs,		"SYS_260"	}, /* 260 */
-	{ 5,	0,	printargs,		"SYS_261"	}, /* 261 */
-	{ 5,	0,	printargs,		"SYS_262"	}, /* 262 */
-	{ 5,	0,	printargs,		"SYS_263"	}, /* 263 */
-	{ 5,	0,	printargs,		"SYS_264"	}, /* 264 */
-	{ 5,	0,	printargs,		"SYS_265"	}, /* 265 */
-	{ 5,	0,	printargs,		"SYS_266"	}, /* 266 */
-	{ 5,	0,	printargs,		"SYS_267"	}, /* 267 */
+	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 259 */
+	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 260 */
+	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 261 */
+	{ 1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 262 */
+	{ 1,	0,	sys_timer_delete,	"timer_delete"	}, /* 263 */
+	{ 2,	0,	sys_clock_settime,	"clock_settime"	}, /* 264 */
+	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 265 */
+	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 266 */
+	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 267 */
 	{ 5,	0,	printargs,		"SYS_268"	}, /* 268 */
 	{ 5,	0,	printargs,		"SYS_269"	}, /* 269 */
 	{ 5,	0,	printargs,		"SYS_270"	}, /* 270 */
