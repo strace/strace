@@ -100,7 +100,7 @@ long code, arg;
 {
 	switch ((code >> 8) & 0xff) {
 #ifdef LINUX
-#ifdef ALPHA
+#if defined(ALPHA) || defined(POWERPC)
 	case 'f': case 't': case 'T':
 #else /* !ALPHA */
 	case 0x54:
