@@ -231,7 +231,7 @@ int n;
 
 char *
 xlookup(xlat, val)
-struct xlat *xlat;
+const struct xlat *xlat;
 int val;
 {
 	for (; xlat->str != NULL; xlat++)
@@ -245,7 +245,7 @@ int val;
  */
 void
 printxval(xlat, val, dflt)
-struct xlat *xlat;
+const struct xlat *xlat;
 int val;
 char *dflt;
 {
@@ -264,7 +264,7 @@ char *dflt;
  */
 int
 addflags(xlat, flags)
-struct xlat *xlat;
+const struct xlat *xlat;
 int flags;
 {
 	int n;
@@ -285,7 +285,7 @@ int flags;
 
 int
 printflags(xlat, flags)
-struct xlat *xlat;
+const struct xlat *xlat;
 int flags;
 {
 	int n;
@@ -933,8 +933,8 @@ long *res;
 			}
 			is_sun4m = strcmp(name.machine, "sun4m") == 0;
 			if (is_sun4m) {
-				extern struct xlat struct_user_offsets[];
-				struct xlat *x;
+				extern const struct xlat struct_user_offsets[];
+				const struct xlat *x;
 
 				for (x = struct_user_offsets; x->str; x++)
 					x->val += 1024;

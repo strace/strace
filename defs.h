@@ -413,7 +413,7 @@ extern struct tcb *tcp_last;
 #endif
 
 extern int set_personality P((int personality));
-extern char *xlookup P((struct xlat *, int));
+extern char *xlookup P((const struct xlat *, int));
 extern struct tcb *alloctcb P((int));
 extern struct tcb *pid2tcb P((int));
 extern void droptcb P((struct tcb *));
@@ -425,10 +425,10 @@ extern void qualify P((char *));
 extern void newoutf P((struct tcb *));
 extern int get_scno P((struct tcb *));
 extern int trace_syscall P((struct tcb *));
-extern void printxval P((struct xlat *, int, char *));
+extern void printxval P((const struct xlat *, int, char *));
 extern int printargs P((struct tcb *));
-extern int addflags P((struct xlat *, int));
-extern int printflags P((struct xlat *, int));
+extern int addflags P((const struct xlat *, int));
+extern int printflags P((const struct xlat *, int));
 extern int umoven P((struct tcb *, long, int, char *));
 extern int umovestr P((struct tcb *, long, int, char *));
 extern int upeek P((int, long, long *));

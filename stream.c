@@ -70,7 +70,7 @@ struct strbuf {
 #endif /* HAVE_SYS_TIUSER_H */
 
 #ifndef FREEBSD
-static struct xlat msgflags[] = {
+static const struct xlat msgflags[] = {
 	{ RS_HIPRI,	"RS_HIPRI"	},
 	{ 0,		NULL		},
 };
@@ -179,7 +179,7 @@ struct tcb *tcp;
 }
 
 #if defined SYS_putpmsg || defined SYS_getpmsg
-static struct xlat pmsgflags[] = {
+static const struct xlat pmsgflags[] = {
 #ifdef MSG_HIPRI
 	{ MSG_HIPRI,	"MSG_HIPRI"	},
 #endif
@@ -274,7 +274,7 @@ struct tcb *tcp;
 
 #ifdef HAVE_SYS_POLL_H
 
-static struct xlat pollflags[] = {
+static const struct xlat pollflags[] = {
 #ifdef POLLIN
 	{ POLLIN,	"POLLIN"	},
 	{ POLLPRI,	"POLLPRI"	},
@@ -369,7 +369,7 @@ struct tcb *tcp;
 
 #if !defined(LINUX) && !defined(FREEBSD)
 
-static struct xlat stream_flush_options[] = {
+static const struct xlat stream_flush_options[] = {
 	{ FLUSHR,	"FLUSHR"	},
 	{ FLUSHW,	"FLUSHW"	},
 	{ FLUSHRW,	"FLUSHRW"	},
@@ -379,7 +379,7 @@ static struct xlat stream_flush_options[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat stream_setsig_flags[] = {
+static const struct xlat stream_setsig_flags[] = {
 	{ S_INPUT,	"S_INPUT"	},
 	{ S_HIPRI,	"S_HIPRI"	},
 	{ S_OUTPUT,	"S_OUTPUT"	},
@@ -408,14 +408,14 @@ static struct xlat stream_setsig_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat stream_read_options[] = {
+static const struct xlat stream_read_options[] = {
 	{ RNORM,	"RNORM"		},
 	{ RMSGD,	"RMSGD"		},
 	{ RMSGN,	"RMSGN"		},
 	{ 0,		NULL		},
 };
 
-static struct xlat stream_read_flags[] = {
+static const struct xlat stream_read_flags[] = {
 #ifdef RPROTDAT
 	{ RPROTDAT,	"RPROTDAT"	},
 #endif
@@ -433,7 +433,7 @@ static struct xlat stream_read_flags[] = {
 #endif
 
 #ifdef I_SWROPT
-static struct xlat stream_write_flags[] = {
+static const struct xlat stream_write_flags[] = {
 	{ SNDZERO,	"SNDZERO"	},
 	{ SNDPIPE,	"SNDPIPE"	},
 	{ 0,		NULL		},
@@ -441,7 +441,7 @@ static struct xlat stream_write_flags[] = {
 #endif /* I_SWROPT */
 
 #ifdef I_ATMARK
-static struct xlat stream_atmark_options[] = {
+static const struct xlat stream_atmark_options[] = {
 	{ ANYMARK,	"ANYMARK"	},
 	{ LASTMARK,	"LASTMARK"	},
 	{ 0,		NULL		},
@@ -449,7 +449,7 @@ static struct xlat stream_atmark_options[] = {
 #endif /* I_ATMARK */
 
 #ifdef TI_BIND
-static struct xlat transport_user_options[] = {
+static const struct xlat transport_user_options[] = {
 	{ T_CONN_REQ,	"T_CONN_REQ"	},
 	{ T_CONN_RES,	"T_CONN_RES"	},
 	{ T_DISCON_REQ,	"T_DISCON_REQ"	},
@@ -464,7 +464,7 @@ static struct xlat transport_user_options[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat transport_user_flags [] = {
+static const struct xlat transport_user_flags [] = {
 	{ 0,		"0"		},
 	{ T_MORE,	"T_MORE"	},
 	{ T_EXPEDITED,	"T_EXPEDITED"	},
@@ -483,12 +483,12 @@ static struct xlat transport_user_flags [] = {
 
 #ifdef HAVE_STRUCT_T_OPTHDR
 
-static struct xlat xti_level [] = {
+static const struct xlat xti_level [] = {
 	{ XTI_GENERIC,	"XTI_GENERIC"	},
 	{ 0,		NULL		},
 };
 
-static struct xlat xti_generic [] = {
+static const struct xlat xti_generic [] = {
 	{ XTI_DEBUG,	"XTI_DEBUG"	},
 	{ XTI_LINGER,	"XTI_LINGER"	},
 	{ XTI_RCVBUF,	"XTI_RCVBUF"	},
@@ -574,14 +574,14 @@ int len;
 
 
 
-static struct xlat service_type [] = {
+static const struct xlat service_type [] = {
 	{ T_COTS,	"T_COTS"	},
 	{ T_COTS_ORD,	"T_COTS_ORD"	},
 	{ T_CLTS,	"T_CLTS"	},
 	{ 0,		NULL		},
 };
 
-static struct xlat ts_state [] = {
+static const struct xlat ts_state [] = {
 	{ TS_UNBND,	"TS_UNBND"	},
 	{ TS_WACK_BREQ,	"TS_WACK_BREQ"	},
 	{ TS_WACK_UREQ,	"TS_WACK_UREQ"	},
@@ -602,7 +602,7 @@ static struct xlat ts_state [] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat provider_flags [] = {
+static const struct xlat provider_flags [] = {
 	{ 0,		"0"		},
 	{ SENDZERO,	"SENDZERO"	},
 	{ EXPINLINE,	"EXPINLINE"	},
@@ -611,7 +611,7 @@ static struct xlat provider_flags [] = {
 };
 
 
-static struct xlat tli_errors [] = {
+static const struct xlat tli_errors [] = {
 	{ TBADADDR,	"TBADADDR"	},
 	{ TBADOPT,	"TBADOPT"	},
 	{ TACCES,	"TACCES"	},

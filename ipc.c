@@ -67,10 +67,10 @@
 # define IPC_64 0x100
 #endif
 
-extern struct xlat openmodes[];
+extern const struct xlat openmodes[];
 extern void printsigevent(struct tcb *tcp, long arg);
 
-static struct xlat msgctl_flags[] = {
+static const struct xlat msgctl_flags[] = {
 	{ IPC_RMID,	"IPC_RMID"	},
 	{ IPC_SET,	"IPC_SET"	},
 	{ IPC_STAT,	"IPC_STAT"	},
@@ -82,7 +82,7 @@ static struct xlat msgctl_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat semctl_flags[] = {
+static const struct xlat semctl_flags[] = {
 	{ IPC_RMID,	"IPC_RMID"	},
 	{ IPC_SET,	"IPC_SET"	},
 	{ IPC_STAT,	"IPC_STAT"	},
@@ -101,7 +101,7 @@ static struct xlat semctl_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat shmctl_flags[] = {
+static const struct xlat shmctl_flags[] = {
 	{ IPC_RMID,	"IPC_RMID"	},
 	{ IPC_SET,	"IPC_SET"	},
 	{ IPC_STAT,	"IPC_STAT"	},
@@ -119,7 +119,7 @@ static struct xlat shmctl_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat resource_flags[] = {
+static const struct xlat resource_flags[] = {
 	{ IPC_CREAT,	"IPC_CREAT"	},
 	{ IPC_EXCL,	"IPC_EXCL"	},
 	{ IPC_NOWAIT,	"IPC_NOWAIT"	},
@@ -129,7 +129,7 @@ static struct xlat resource_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat shm_flags[] = {
+static const struct xlat shm_flags[] = {
 #ifdef LINUX
 	{ SHM_REMAP,	"SHM_REMAP"	},
 #endif /* LINUX */
@@ -138,7 +138,7 @@ static struct xlat shm_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat msg_flags[] = {
+static const struct xlat msg_flags[] = {
 	{ MSG_NOERROR,	"MSG_NOERROR"	},
 #ifdef LINUX
 	{ MSG_EXCEPT,	"MSG_EXCEPT"	},

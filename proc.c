@@ -32,7 +32,7 @@
 #ifdef SVR4
 #ifndef HAVE_MP_PROCFS
 
-static struct xlat proc_status_flags[] = {
+static const struct xlat proc_status_flags[] = {
 	{ PR_STOPPED,	"PR_STOPPED"	},
 	{ PR_ISTOP,	"PR_ISTOP"	},
 	{ PR_DSTOP,	"PR_DSTOP"	},
@@ -57,7 +57,7 @@ static struct xlat proc_status_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat proc_status_why[] = {
+static const struct xlat proc_status_why[] = {
 	{ PR_REQUESTED,	"PR_REQUESTED"	},
 	{ PR_SIGNALLED,	"PR_SIGNALLED"	},
 	{ PR_SYSENTRY,	"PR_SYSENTRY"	},
@@ -73,7 +73,7 @@ static struct xlat proc_status_why[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat proc_run_flags[] = {
+static const struct xlat proc_run_flags[] = {
 	{ PRCSIG,	"PRCSIG"	},
 	{ PRCFAULT,	"PRCFAULT"	},
 	{ PRSTRACE,	"PRSTRACE"	},
@@ -189,7 +189,7 @@ int code, arg;
 #ifdef FREEBSD
 #include <sys/pioctl.h>
 
-static struct xlat proc_status_why[] = {
+static const struct xlat proc_status_why[] = {
 	{ S_EXEC,	"S_EXEC"	},
 	{ S_SIG,	"S_SIG"		},
 	{ S_SCE,	"S_SCE"		},
@@ -199,7 +199,7 @@ static struct xlat proc_status_why[] = {
 	{ 0,		NULL		}
 };
 
-static struct xlat proc_status_flags[] = {
+static const struct xlat proc_status_flags[] = {
 	{ PF_LINGER,	"PF_LINGER"	},
 	{ PF_ISUGID,	"PF_ISUGID"	},
 	{ 0,		NULL		}

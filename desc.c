@@ -44,7 +44,7 @@
 #endif
 
 
-static struct xlat fcntlcmds[] = {
+static const struct xlat fcntlcmds[] = {
 	{ F_DUPFD,	"F_DUPFD"	},
 	{ F_GETFD,	"F_GETFD"	},
 	{ F_SETFD,	"F_SETFD"	},
@@ -142,7 +142,7 @@ static struct xlat fcntlcmds[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat fdflags[] = {
+static const struct xlat fdflags[] = {
 #ifdef FD_CLOEXEC
 	{ FD_CLOEXEC,	"FD_CLOEXEC"	},
 #endif
@@ -151,7 +151,7 @@ static struct xlat fdflags[] = {
 
 #ifdef LOCK_SH
 
-static struct xlat flockcmds[] = {
+static const struct xlat flockcmds[] = {
 	{ LOCK_SH,	"LOCK_SH"	},
 	{ LOCK_EX,	"LOCK_EX"	},
 	{ LOCK_NB,	"LOCK_NB"	},
@@ -161,7 +161,7 @@ static struct xlat flockcmds[] = {
 
 #endif /* LOCK_SH */
 
-static struct xlat lockfcmds[] = {
+static const struct xlat lockfcmds[] = {
 	{ F_RDLCK,	"F_RDLCK"	},
 	{ F_WRLCK,	"F_WRLCK"	},
 	{ F_UNLCK,	"F_UNLCK"	},
@@ -174,7 +174,7 @@ static struct xlat lockfcmds[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat whence[] = {
+static const struct xlat whence[] = {
 	{ SEEK_SET,	"SEEK_SET"	},
 	{ SEEK_CUR,	"SEEK_CUR"	},
 	{ SEEK_END,	"SEEK_END"	},
@@ -235,7 +235,7 @@ int getlk;
 
 static char *
 sprintflags(xlat, flags)
-struct xlat *xlat;
+const struct xlat *xlat;
 int flags;
 {
 	static char outstr[1024];
@@ -261,7 +261,7 @@ int
 sys_fcntl(tcp)
 struct tcb *tcp;
 {
-	extern struct xlat openmodes[];
+	extern const struct xlat openmodes[];
 
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);

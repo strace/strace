@@ -67,7 +67,7 @@
 
 #include <linux/sysctl.h>
 
-static struct xlat mount_flags[] = {
+static const struct xlat mount_flags[] = {
 	{ MS_RDONLY,	"MS_RDONLY"	},
 	{ MS_NOSUID,	"MS_NOSUID"	},
 	{ MS_NODEV,	"MS_NODEV"	},
@@ -115,7 +115,7 @@ struct tcb *tcp;
 
 /* These are not macros, but enums.  We just copy the values by hand
    from Linux 2.6.9 here.  */
-static struct xlat personality_options[] = {
+static const struct xlat personality_options[] = {
 	{ 0,		"PER_LINUX"	},
 	{ 0x00800000,	"PER_LINUX_32BIT"},
 	{ 0x04100001,	"PER_SVR4"	},
@@ -150,19 +150,19 @@ struct tcb *tcp;
 }
 
 #include <linux/reboot.h>
-static struct xlat bootflags1[] = {
+static const struct xlat bootflags1[] = {
 	{ LINUX_REBOOT_MAGIC1,	"LINUX_REBOOT_MAGIC1"	},
 	{ 0,			NULL			},
 };
 
-static struct xlat bootflags2[] = {
+static const struct xlat bootflags2[] = {
 	{ LINUX_REBOOT_MAGIC2,	"LINUX_REBOOT_MAGIC2"	},
 	{ LINUX_REBOOT_MAGIC2A,	"LINUX_REBOOT_MAGIC2A"	},
 	{ LINUX_REBOOT_MAGIC2B,	"LINUX_REBOOT_MAGIC2B"	},
 	{ 0,			NULL			},
 };
 
-static struct xlat bootflags3[] = {
+static const struct xlat bootflags3[] = {
 	{ LINUX_REBOOT_CMD_CAD_OFF,	"LINUX_REBOOT_CMD_CAD_OFF"	},
 	{ LINUX_REBOOT_CMD_RESTART,	"LINUX_REBOOT_CMD_RESTART"	},
 	{ LINUX_REBOOT_CMD_HALT,	"LINUX_REBOOT_CMD_HALT"		},
@@ -194,7 +194,7 @@ struct tcb *tcp;
 }
 
 #ifdef M68K
-static struct xlat cacheflush_scope[] = {
+static const struct xlat cacheflush_scope[] = {
 #ifdef FLUSH_SCOPE_LINE
 	{ FLUSH_SCOPE_LINE,	"FLUSH_SCOPE_LINE" },
 #endif
@@ -207,7 +207,7 @@ static struct xlat cacheflush_scope[] = {
 	{ 0,			NULL },
 };
 
-static struct xlat cacheflush_flags[] = {
+static const struct xlat cacheflush_flags[] = {
 #ifdef FLUSH_CACHE_BOTH
 	{ FLUSH_CACHE_BOTH,	"FLUSH_CACHE_BOTH" },
 #endif
@@ -262,7 +262,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-static struct xlat bootflags[] = {
+static const struct xlat bootflags[] = {
 	{ RB_AUTOBOOT,	"RB_AUTOBOOT"	},	/* for system auto-booting itself */
 	{ RB_ASKNAME,	"RB_ASKNAME"	},	/* ask for file name to reboot from */
 	{ RB_SINGLE,	"RB_SINGLE"	},	/* reboot to single user only */
@@ -321,7 +321,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-static struct xlat mountflags[] = {
+static const struct xlat mountflags[] = {
 	{ M_RDONLY,	"M_RDONLY"	},
 	{ M_NOSUID,	"M_NOSUID"	},
 	{ M_NEWTYPE,	"M_NEWTYPE"	},
@@ -341,7 +341,7 @@ static struct xlat mountflags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat nfsflags[] = {
+static const struct xlat nfsflags[] = {
 	{ NFSMNT_SOFT,		"NFSMNT_SOFT"		},
 	{ NFSMNT_WSIZE,		"NFSMNT_WSIZE"		},
 	{ NFSMNT_RSIZE,		"NFSMNT_RSIZE"		},
@@ -462,7 +462,7 @@ struct tcb *tcp;
 	return printargs(tcp);
 }
 
-static struct xlat ex_auth_flags[] = {
+static const struct xlat ex_auth_flags[] = {
 	{ AUTH_UNIX,	"AUTH_UNIX"	},
 	{ AUTH_DES,	"AUTH_DES"	},
 	{ 0,		NULL		},
@@ -508,7 +508,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-static struct xlat sysconflimits[] = {
+static const struct xlat sysconflimits[] = {
 #ifdef	_SC_ARG_MAX
 	{ _SC_ARG_MAX,	"_SC_ARG_MAX"	},	/* space for argv & envp */
 #endif
@@ -549,7 +549,7 @@ struct tcb *tcp;
 #endif /* SUNOS4 */
 
 #if defined(SUNOS4) || defined(FREEBSD)
-static struct xlat pathconflimits[] = {
+static const struct xlat pathconflimits[] = {
 #ifdef	_PC_LINK_MAX
 	{ _PC_LINK_MAX,	"_PC_LINK_MAX"	},	/* max links to file/dir */
 #endif
@@ -616,7 +616,7 @@ struct tcb *tcp;
 #include <sys/systeminfo.h>
 #include <sys/utsname.h>
 
-static struct xlat sysconfig_options[] = {
+static const struct xlat sysconfig_options[] = {
 #ifdef _CONFIG_NGROUPS
 	{ _CONFIG_NGROUPS,		"_CONFIG_NGROUPS"		},
 #endif
@@ -704,7 +704,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-static struct xlat sysinfo_options[] = {
+static const struct xlat sysinfo_options[] = {
 	{ SI_SYSNAME,		"SI_SYSNAME"		},
 	{ SI_HOSTNAME,		"SI_HOSTNAME"		},
 	{ SI_RELEASE,		"SI_RELEASE"		},
@@ -752,7 +752,7 @@ struct tcb *tcp;
 
 #include <sys/syssgi.h>
 
-static struct xlat syssgi_options[] = {
+static const struct xlat syssgi_options[] = {
 	{ SGI_SYSID,		"SGI_SYSID"		},
 #ifdef SGI_RDUBLK
 	{ SGI_RDUBLK,		"SGI_RDUBLK"		},
@@ -1141,7 +1141,7 @@ struct uio;
 #include <sys/fs/nfs.h>
 #include <sys/fs/nfs_clnt.h>
 
-static struct xlat mount_flags[] = {
+static const struct xlat mount_flags[] = {
 	{ MS_RDONLY,	"MS_RDONLY"	},
 	{ MS_FSS,	"MS_FSS"	},
 	{ MS_DATA,	"MS_DATA"	},
@@ -1155,7 +1155,7 @@ static struct xlat mount_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat nfs_flags[] = {
+static const struct xlat nfs_flags[] = {
 	{ NFSMNT_SOFT,		"NFSMNT_SOFT"		},
 	{ NFSMNT_WSIZE,		"NFSMNT_WSIZE"		},
 	{ NFSMNT_RSIZE,		"NFSMNT_RSIZE"		},
@@ -1242,7 +1242,7 @@ struct tcb *tcp;
 
 #include <sys/fs/vx_ioctl.h>
 
-static struct xlat mount_flags[] = {
+static const struct xlat mount_flags[] = {
 	{ MS_RDONLY,	"MS_RDONLY"	},
 	{ MS_FSS,	"MS_FSS"	},
 	{ MS_DATA,	"MS_DATA"	},
@@ -1256,7 +1256,7 @@ static struct xlat mount_flags[] = {
 };
 
 #ifdef VX_MS_MASK
-static struct xlat vxfs_flags[] = {
+static const struct xlat vxfs_flags[] = {
 	{ VX_MS_NOLOG,		"VX_MS_NOLOG"		},
 	{ VX_MS_BLKCLEAR,	"VX_MS_BLKCLEAR"	},
 	{ VX_MS_SNAPSHOT,	"VX_MS_SNAPSHOT"	},
@@ -1278,7 +1278,7 @@ static struct xlat vxfs_flags[] = {
 };
 #endif
 
-static struct xlat nfs_flags[] = {
+static const struct xlat nfs_flags[] = {
 	{ NFSMNT_SOFT,		"NFSMNT_SOFT"		},
 	{ NFSMNT_WSIZE,		"NFSMNT_WSIZE"		},
 	{ NFSMNT_RSIZE,		"NFSMNT_RSIZE"		},
@@ -1404,7 +1404,7 @@ struct tcb *tcp;
 
 #ifdef SYS_capget
 
-static struct xlat capabilities[] = {
+static const struct xlat capabilities[] = {
 	{ 1<<CAP_CHOWN,		"CAP_CHOWN"	},
 	{ 1<<CAP_DAC_OVERRIDE,	"CAP_DAC_OVERRIDE"},
 	{ 1<<CAP_DAC_READ_SEARCH,"CAP_DAC_READ_SEARCH"},
@@ -1557,7 +1557,7 @@ struct tcb *tcp;
 #endif
 
 #ifdef LINUX
-static struct xlat sysctl_root[] = {
+static const struct xlat sysctl_root[] = {
 	{ CTL_KERN, "CTL_KERN" },
 	{ CTL_VM, "CTL_VM" },
 	{ CTL_NET, "CTL_NET" },
@@ -1568,7 +1568,7 @@ static struct xlat sysctl_root[] = {
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_kern[] = {
+static const struct xlat sysctl_kern[] = {
 	{ KERN_OSTYPE, "KERN_OSTYPE" },
 	{ KERN_OSRELEASE, "KERN_OSRELEASE" },
 	{ KERN_OSREV, "KERN_OSREV" },
@@ -1610,7 +1610,7 @@ static struct xlat sysctl_kern[] = {
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_vm[] = {
+static const struct xlat sysctl_vm[] = {
 #ifdef VM_SWAPCTL
 	{ VM_SWAPCTL, "VM_SWAPCTL" },
 #endif
@@ -1664,7 +1664,7 @@ static struct xlat sysctl_vm[] = {
 	{ 0, NULL },
 };
 
-static struct xlat sysctl_net[] = {
+static const struct xlat sysctl_net[] = {
 	{ NET_CORE, "NET_CORE" },
 	{ NET_ETHER, "NET_ETHER" },
 	{ NET_802, "NET_802" },
@@ -1683,7 +1683,7 @@ static struct xlat sysctl_net[] = {
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_net_core[] = {
+static const struct xlat sysctl_net_core[] = {
 	{ NET_CORE_WMEM_MAX, "NET_CORE_WMEM_MAX" },
 	{ NET_CORE_RMEM_MAX, "NET_CORE_RMEM_MAX" },
 	{ NET_CORE_WMEM_DEFAULT, "NET_CORE_WMEM_DEFAULT" },
@@ -1696,13 +1696,13 @@ static struct xlat sysctl_net_core[] = {
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_net_unix[] = {
+static const struct xlat sysctl_net_unix[] = {
 	{ NET_UNIX_DESTROY_DELAY, "NET_UNIX_DESTROY_DELAY" },
 	{ NET_UNIX_DELETE_DELAY, "NET_UNIX_DELETE_DELAY" },
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_net_ipv4[] = {
+static const struct xlat sysctl_net_ipv4[] = {
 	{ NET_IPV4_FORWARD, "NET_IPV4_FORWARD" },
 	{ NET_IPV4_DYNADDR, "NET_IPV4_DYNADDR" },
 	{ NET_IPV4_CONF, "NET_IPV4_CONF" },
@@ -1745,7 +1745,7 @@ static struct xlat sysctl_net_ipv4[] = {
 	{  0, NULL }
 };
 
-static struct xlat sysctl_net_ipv4_route[] = {
+static const struct xlat sysctl_net_ipv4_route[] = {
 	{ NET_IPV4_ROUTE_FLUSH, "NET_IPV4_ROUTE_FLUSH" },
 	{ NET_IPV4_ROUTE_MIN_DELAY, "NET_IPV4_ROUTE_MIN_DELAY" },
 	{ NET_IPV4_ROUTE_MAX_DELAY, "NET_IPV4_ROUTE_MAX_DELAY" },
@@ -1763,7 +1763,7 @@ static struct xlat sysctl_net_ipv4_route[] = {
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_net_ipv4_conf[] = {
+static const struct xlat sysctl_net_ipv4_conf[] = {
 	{ NET_IPV4_CONF_FORWARDING, "NET_IPV4_CONF_FORWARDING" },
 	{ NET_IPV4_CONF_MC_FORWARDING, "NET_IPV4_CONF_MC_FORWARDING" },
 	{ NET_IPV4_CONF_PROXY_ARP, "NET_IPV4_CONF_PROXY_ARP" },
@@ -1778,14 +1778,14 @@ static struct xlat sysctl_net_ipv4_conf[] = {
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_net_ipv6[] = {
+static const struct xlat sysctl_net_ipv6[] = {
 	{ NET_IPV6_CONF, "NET_IPV6_CONF" },
 	{ NET_IPV6_NEIGH, "NET_IPV6_NEIGH" },
 	{ NET_IPV6_ROUTE, "NET_IPV6_ROUTE" },
 	{ 0, NULL }
 };
 
-static struct xlat sysctl_net_ipv6_route[] = {
+static const struct xlat sysctl_net_ipv6_route[] = {
 	{ NET_IPV6_ROUTE_FLUSH, "NET_IPV6_ROUTE_FLUSH" },
 	{ NET_IPV6_ROUTE_GC_THRESH, "NET_IPV6_ROUTE_GC_THRESH" },
 	{ NET_IPV6_ROUTE_MAX_SIZE, "NET_IPV6_ROUTE_MAX_SIZE" },
@@ -1995,7 +1995,7 @@ struct tcb *tcp;
 #include <sys/ksym.h>
 #include <sys/elf.h>
 
-static struct xlat ksym_flags[] = {
+static const struct xlat ksym_flags[] = {
 	{ STT_NOTYPE,	"STT_NOTYPE"	},
 	{ STT_FUNC,	"STT_FUNC"	},
 	{ STT_OBJECT,	"STT_OBJECT"	},
@@ -2038,7 +2038,7 @@ struct tcb *tcp;
 struct cred;
 #include <sys/nscsys.h>
 
-static struct xlat ssi_cmd [] = {
+static const struct xlat ssi_cmd [] = {
 	{ SSISYS_BADOP,	"SSISYS_BADOP"	},
 	{ SSISYS_LDLVL_INIT,"SSISYS_LDLVL_INIT"},
 	{ SSISYS_LDLVL_GETVEC,"SSISYS_LDLVL_GETVEC"},
@@ -2167,7 +2167,7 @@ struct tcb *tcp;
 #define __NEW_UTS_LEN 64
 #endif
 
-static struct xlat sysmips_operations[] = {
+static const struct xlat sysmips_operations[] = {
 	{ SETNAME,		"SETNAME"	},
 	{ FLUSH_CACHE,		"FLUSH_CACHE"	},
 	{ MIPS_FIXADE,		"MIPS_FIXADE"	},

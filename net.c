@@ -116,7 +116,7 @@
 #define IPPROTO_MAX IPPROTO_MAX
 #endif
 
-static struct xlat domains[] = {
+static const struct xlat domains[] = {
 #ifdef PF_AAL5
 	{ PF_AAL5,	"PF_AAL5"	},
 #endif
@@ -218,7 +218,7 @@ static struct xlat domains[] = {
 #endif
 	{ 0,		NULL		},
 };
-struct xlat addrfams[] = {
+const struct xlat addrfams[] = {
 #ifdef AF_APPLETALK
 	{ AF_APPLETALK,	"AF_APPLETALK"	},
 #endif
@@ -314,7 +314,7 @@ struct xlat addrfams[] = {
 #endif
 	{ 0,		NULL		},
 };
-static struct xlat socktypes[] = {
+static const struct xlat socktypes[] = {
 	{ SOCK_STREAM,	"SOCK_STREAM"	},
 	{ SOCK_DGRAM,	"SOCK_DGRAM"	},
 #ifdef SOCK_RAW
@@ -331,7 +331,7 @@ static struct xlat socktypes[] = {
 #endif
 	{ 0,		NULL		},
 };
-static struct xlat socketlayers[] = {
+static const struct xlat socketlayers[] = {
 #if defined(SOL_IP)
 	{ SOL_IP,	"SOL_IP"	},
 #endif
@@ -393,7 +393,7 @@ static struct xlat socketlayers[] = {
 };
 /*** WARNING: DANGER WILL ROBINSON: NOTE "socketlayers" array above
      falls into "protocols" array below!!!!   This is intended!!! ***/
-static struct xlat protocols[] = {
+static const struct xlat protocols[] = {
 	{ IPPROTO_IP,	"IPPROTO_IP"	},
 	{ IPPROTO_ICMP,	"IPPROTO_ICMP"	},
 	{ IPPROTO_TCP,	"IPPROTO_TCP"	},
@@ -436,7 +436,7 @@ static struct xlat protocols[] = {
 #endif
 	{ 0,		NULL		},
 };
-static struct xlat msg_flags[] = {
+static const struct xlat msg_flags[] = {
 	{ MSG_OOB,	"MSG_OOB"	},
 #ifdef MSG_DONTROUTE
 	{ MSG_DONTROUTE,"MSG_DONTROUTE"	},
@@ -492,7 +492,7 @@ static struct xlat msg_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat sockoptions[] = {
+static const struct xlat sockoptions[] = {
 #ifdef SO_ACCEPTCONN
 	{ SO_ACCEPTCONN,	"SO_ACCEPTCONN"	},
 #endif
@@ -627,7 +627,7 @@ static struct xlat sockoptions[] = {
 #endif
 
 #ifdef SOL_IP
-static struct xlat sockipoptions[] = {
+static const struct xlat sockipoptions[] = {
 #ifdef IP_TOS
 	{ IP_TOS,		"IP_TOS"		},
 #endif
@@ -714,7 +714,7 @@ static struct xlat sockipoptions[] = {
 #endif /* SOL_IP */
 
 #ifdef SOL_IPV6
-static struct xlat sockipv6options[] = {
+static const struct xlat sockipv6options[] = {
 #ifdef IPV6_ADDRFORM
 	{ IPV6_ADDRFORM,	"IPV6_ADDRFORM"		},
 #endif
@@ -774,14 +774,14 @@ static struct xlat sockipv6options[] = {
 #endif /* SOL_IPV6 */
 
 #ifdef SOL_IPX
-static struct xlat sockipxoptions[] = {
+static const struct xlat sockipxoptions[] = {
 	{ IPX_TYPE,     "IPX_TYPE"      },
 	{ 0,            NULL            },
 };
 #endif /* SOL_IPX */
 
 #ifdef SOL_RAW
-static struct xlat sockrawoptions[] = {
+static const struct xlat sockrawoptions[] = {
 #if defined(ICMP_FILTER)
 	{ ICMP_FILTER,		"ICMP_FILTER"	},
 #endif
@@ -790,7 +790,7 @@ static struct xlat sockrawoptions[] = {
 #endif /* SOL_RAW */
 
 #ifdef SOL_PACKET
-static struct xlat sockpacketoptions[] = {
+static const struct xlat sockpacketoptions[] = {
 	{ PACKET_ADD_MEMBERSHIP,	"PACKET_ADD_MEMBERSHIP"	},
 	{ PACKET_DROP_MEMBERSHIP,	"PACKET_DROP_MEMBERSHIP"},
 #if defined(PACKET_RECV_OUTPUT)
@@ -811,7 +811,7 @@ static struct xlat sockpacketoptions[] = {
 #endif
 
 #ifdef SOL_TCP
-static struct xlat socktcpoptions[] = {
+static const struct xlat socktcpoptions[] = {
 	{ TCP_NODELAY,		"TCP_NODELAY"	},
 	{ TCP_MAXSEG,		"TCP_MAXSEG"	},
 #if defined(TCP_CORK)
@@ -852,7 +852,7 @@ static struct xlat socktcpoptions[] = {
 #endif /* SOL_TCP */
 
 #ifdef SOL_RAW
-static struct xlat icmpfilterflags[] = {
+static const struct xlat icmpfilterflags[] = {
 #if defined(ICMP_ECHOREPLY)
 	{ (1<<ICMP_ECHOREPLY),		"ICMP_ECHOREPLY"	},
 #endif
@@ -897,7 +897,7 @@ static struct xlat icmpfilterflags[] = {
 #endif /* SOL_RAW */
 
 #if defined(AF_PACKET) /* from e.g. linux/if_packet.h */
-static struct xlat af_packet_types[] = {
+static const struct xlat af_packet_types[] = {
 #if defined(PACKET_HOST)
 	{ PACKET_HOST,			"PACKET_HOST"		},
 #endif
@@ -1715,7 +1715,7 @@ struct tcb *tcp;
 
 #if UNIXWARE >= 7
 
-static struct xlat sock_version[] = {
+static const struct xlat sock_version[] = {
 	{ __NETLIB_UW211_SVR4,	"UW211_SVR4" },
 	{ __NETLIB_UW211_XPG4,	"UW211_XPG4" },
 	{ __NETLIB_GEMINI_SVR4,	"GEMINI_SVR4" },

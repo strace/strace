@@ -188,7 +188,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-static struct xlat which[] = {
+static const struct xlat which[] = {
 	{ ITIMER_REAL,	"ITIMER_REAL"	},
 	{ ITIMER_VIRTUAL,"ITIMER_VIRTUAL"},
 	{ ITIMER_PROF,	"ITIMER_PROF"	},
@@ -359,12 +359,12 @@ struct tcb *tcp;
 	return 0;
 }
 
-static struct xlat clockflags[] = {
+static const struct xlat clockflags[] = {
   { TIMER_ABSTIME, "TIMER_ABSTIME" },
   { 0,             NULL }
 };
 
-static struct xlat clocknames[] = {
+static const struct xlat clocknames[] = {
 #ifdef CLOCK_REALTIME
   { CLOCK_REALTIME, "CLOCK_REALTIME" },
 #endif
@@ -425,7 +425,7 @@ struct tcb *tcp;
 #ifndef SIGEV_THREAD_ID
 # define SIGEV_THREAD_ID 4
 #endif
-static struct xlat sigev_value[] = {
+static const struct xlat sigev_value[] = {
 	{ SIGEV_SIGNAL+1, "SIGEV_SIGNAL" },
 	{ SIGEV_NONE+1, "SIGEV_NONE" },
 	{ SIGEV_THREAD+1, "SIGEV_THREAD" },

@@ -77,7 +77,7 @@ struct module_info
 	long usecount;
 };
 
-static struct xlat which[] = {
+static const struct xlat which[] = {
 	{ 0,		"0"		},
 	{ QM_MODULES,	"QM_MODULES"	},
 	{ QM_DEPS,	"QM_DEPS"	},
@@ -87,7 +87,7 @@ static struct xlat which[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat modflags[] = {
+static const struct xlat modflags[] = {
 	{ MOD_UNINITIALIZED,	"MOD_UNINITIALIZED"	},
 	{ MOD_RUNNING,		"MOD_RUNNING"		},
 	{ MOD_DELETED,		"MOD_DELETED"		},
@@ -148,7 +148,7 @@ struct tcb *tcp;
 					}
 					free(data);
 				}
-			} else 
+			} else
 				tprintf(" /* %Zu entries */ ", ret);
 			tprintf("}, %Zu", ret);
 		} else if (tcp->u_arg[1]==QM_SYMBOLS) {
@@ -204,4 +204,3 @@ struct tcb *tcp;
 	return 0;
 }
 #endif /* LINUX */
-

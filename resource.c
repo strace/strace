@@ -59,7 +59,7 @@
 #define sys_setrlimit64	sys_setrlimit
 #endif
 
-static struct xlat resources[] = {
+static const struct xlat resources[] = {
 #ifdef RLIMIT_CPU
 	{ RLIMIT_CPU,	"RLIMIT_CPU"	},
 #endif
@@ -220,7 +220,7 @@ struct tcb *tcp;
 
 #ifndef SVR4
 
-static struct xlat usagewho[] = {
+static const struct xlat usagewho[] = {
 	{ RUSAGE_SELF,		"RUSAGE_SELF"		},
 	{ RUSAGE_CHILDREN,	"RUSAGE_CHILDREN"	},
 #ifdef RUSAGE_BOTH
@@ -388,7 +388,7 @@ struct tcb *tcp;
 
 #endif /* LINUX */
 
-static struct xlat priorities[] = {
+static const struct xlat priorities[] = {
 	{ PRIO_PROCESS,	"PRIO_PROCESS"	},
 	{ PRIO_PGRP,	"PRIO_PGRP"	},
 	{ PRIO_USER,	"PRIO_USER"	},
@@ -461,7 +461,7 @@ struct tcb *tcp;
 #define XQM_COMMAND(c) (( ((c) >> SUBCMDSHIFT) & ('X' << 8)) == ('X' << 8))
 #define OLD_COMMAND(c) (!NEW_COMMAND(c) && !XQM_COMMAND(c))
 
-static struct xlat quotacmds[] = {
+static const struct xlat quotacmds[] = {
 	{ Q_QUOTAON,	"Q_QUOTAON"	},
 	{ Q_QUOTAOFF,	"Q_QUOTAOFF"	},
 	{ Q_GETQUOTA,	"Q_GETQUOTA"	},
@@ -488,7 +488,7 @@ static struct xlat quotacmds[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat quotatypes[] = {
+static const struct xlat quotatypes[] = {
 	{ USRQUOTA,	"USRQUOTA"	},
 	{ GRPQUOTA,	"GRPQUOTA"	},
 	{ 0,		NULL		},
@@ -549,7 +549,7 @@ struct tcb *tcp;
 #include <ufs/ufs/quota.h>
 #endif
 
-static struct xlat quotacmds[] = {
+static const struct xlat quotacmds[] = {
 	{ Q_QUOTAON,	"Q_QUOTAON"	},
 	{ Q_QUOTAOFF,	"Q_QUOTAOFF"	},
 	{ Q_GETQUOTA,	"Q_GETQUOTA"	},

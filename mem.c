@@ -80,7 +80,7 @@ struct tcb *tcp;
 	return RVAL_HEX;
 }
 
-static struct xlat mmap_prot[] = {
+static const struct xlat mmap_prot[] = {
 	{ PROT_NONE,	"PROT_NONE",	},
 	{ PROT_READ,	"PROT_READ"	},
 	{ PROT_WRITE,	"PROT_WRITE"	},
@@ -97,7 +97,7 @@ static struct xlat mmap_prot[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat mmap_flags[] = {
+static const struct xlat mmap_flags[] = {
 	{ MAP_SHARED,	"MAP_SHARED"	},
 	{ MAP_PRIVATE,	"MAP_PRIVATE"	},
 	{ MAP_FIXED,	"MAP_FIXED"	},
@@ -345,7 +345,7 @@ struct tcb *tcp;
 
 #ifdef LINUX
 
-static struct xlat mremap_flags[] = {
+static const struct xlat mremap_flags[] = {
 	{ MREMAP_MAYMOVE,	"MREMAP_MAYMOVE"	},
 	{ 0,			NULL			}
 };
@@ -362,7 +362,7 @@ struct tcb *tcp;
 	return RVAL_HEX;
 }
 
-static struct xlat madvise_flags[] = {
+static const struct xlat madvise_flags[] = {
 #ifdef MADV_NORMAL
 	{ MADV_NORMAL,		"MADV_NORMAL" },
 #endif
@@ -394,7 +394,7 @@ struct tcb *tcp;
 }
 
 
-static struct xlat mlockall_flags[] = {
+static const struct xlat mlockall_flags[] = {
 #ifdef MCL_CURRENT
 	{ MCL_CURRENT,	"MCL_CURRENT" },
 #endif
@@ -419,7 +419,7 @@ struct tcb *tcp;
 
 #ifdef MS_ASYNC
 
-static struct xlat mctl_sync[] = {
+static const struct xlat mctl_sync[] = {
 #ifdef MS_SYNC
 	{ MS_SYNC,	"MS_SYNC"	},
 #endif
@@ -448,7 +448,7 @@ struct tcb *tcp;
 
 #ifdef MC_SYNC
 
-static struct xlat mctl_funcs[] = {
+static const struct xlat mctl_funcs[] = {
 	{ MC_LOCK,	"MC_LOCK"	},
 	{ MC_LOCKAS,	"MC_LOCKAS"	},
 	{ MC_SYNC,	"MC_SYNC"	},
@@ -457,7 +457,7 @@ static struct xlat mctl_funcs[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat mctl_lockas[] = {
+static const struct xlat mctl_lockas[] = {
 	{ MCL_CURRENT,	"MCL_CURRENT"	},
 	{ MCL_FUTURE,	"MCL_FUTURE"	},
 	{ 0,		NULL		},

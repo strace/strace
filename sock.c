@@ -46,7 +46,7 @@
 #endif
 #include <net/if.h>
 
-extern struct xlat addrfams[];
+extern const struct xlat addrfams[];
 
 int
 sock_ioctl(tcp, code, arg)

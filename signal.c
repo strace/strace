@@ -177,7 +177,7 @@ int nsignals;
 
 #if defined(SUNOS4) || defined(FREEBSD)
 
-static struct xlat sigvec_flags[] = {
+static const struct xlat sigvec_flags[] = {
 	{ SV_ONSTACK,	"SV_ONSTACK"	},
 	{ SV_INTERRUPT,	"SV_INTERRUPT"	},
 	{ SV_RESETHAND,	"SV_RESETHAND"	},
@@ -197,7 +197,7 @@ static struct xlat sigvec_flags[] = {
 # endif
 #endif
 
-static struct xlat sigact_flags[] = {
+static const struct xlat sigact_flags[] = {
 #ifdef SA_RESTORER
 	{ SA_RESTORER,	"SA_RESTORER"	},
 #endif
@@ -240,7 +240,7 @@ static struct xlat sigact_flags[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat sigprocmaskcmds[] = {
+static const struct xlat sigprocmaskcmds[] = {
 	{ SIG_BLOCK,	"SIG_BLOCK"	},
 	{ SIG_UNBLOCK,	"SIG_UNBLOCK"	},
 	{ SIG_SETMASK,	"SIG_SETMASK"	},
@@ -528,7 +528,7 @@ typedef struct siginfo
 
 #if defined (SVR4) || defined (LINUX)
 
-static struct xlat siginfo_codes[] = {
+static const struct xlat siginfo_codes[] = {
 #ifdef SI_NOINFO
 	{ SI_NOINFO,	"SI_NOINFO"	},
 #endif
@@ -559,7 +559,7 @@ static struct xlat siginfo_codes[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat sigill_codes[] = {
+static const struct xlat sigill_codes[] = {
 	{ ILL_ILLOPC,	"ILL_ILLOPC"	},
 	{ ILL_ILLOPN,	"ILL_ILLOPN"	},
 	{ ILL_ILLADR,	"ILL_ILLADR"	},
@@ -571,7 +571,7 @@ static struct xlat sigill_codes[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat sigfpe_codes[] = {
+static const struct xlat sigfpe_codes[] = {
 	{ FPE_INTDIV,	"FPE_INTDIV"	},
 	{ FPE_INTOVF,	"FPE_INTOVF"	},
 	{ FPE_FLTDIV,	"FPE_FLTDIV"	},
@@ -583,13 +583,13 @@ static struct xlat sigfpe_codes[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat sigtrap_codes[] = {
+static const struct xlat sigtrap_codes[] = {
 	{ TRAP_BRKPT,	"TRAP_BRKPT"	},
 	{ TRAP_TRACE,	"TRAP_TRACE"	},
 	{ 0,		NULL		},
 };
 
-static struct xlat sigchld_codes[] = {
+static const struct xlat sigchld_codes[] = {
 	{ CLD_EXITED,	"CLD_EXITED"	},
 	{ CLD_KILLED,	"CLD_KILLED"	},
 	{ CLD_DUMPED,	"CLD_DUMPED"	},
@@ -599,7 +599,7 @@ static struct xlat sigchld_codes[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat sigpoll_codes[] = {
+static const struct xlat sigpoll_codes[] = {
 	{ POLL_IN,	"POLL_IN"	},
 	{ POLL_OUT,	"POLL_OUT"	},
 	{ POLL_MSG,	"POLL_MSG"	},
@@ -609,7 +609,7 @@ static struct xlat sigpoll_codes[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat sigprof_codes[] = {
+static const struct xlat sigprof_codes[] = {
 #ifdef PROF_SIG
 	{ PROF_SIG,	"PROF_SIG"	},
 #endif
@@ -617,7 +617,7 @@ static struct xlat sigprof_codes[] = {
 };
 
 #ifdef SIGEMT
-static struct xlat sigemt_codes[] = {
+static const struct xlat sigemt_codes[] = {
 #ifdef EMT_TAGOVF
 	{ EMT_TAGOVF,	"EMT_TAGOVF"	},
 #endif
@@ -625,13 +625,13 @@ static struct xlat sigemt_codes[] = {
 };
 #endif
 
-static struct xlat sigsegv_codes[] = {
+static const struct xlat sigsegv_codes[] = {
 	{ SEGV_MAPERR,	"SEGV_MAPERR"	},
 	{ SEGV_ACCERR,	"SEGV_ACCERR"	},
 	{ 0,		NULL		},
 };
 
-static struct xlat sigbus_codes[] = {
+static const struct xlat sigbus_codes[] = {
 	{ BUS_ADRALN,	"BUS_ADRALN"	},
 	{ BUS_ADRERR,	"BUS_ADRERR"	},
 	{ BUS_OBJERR,	"BUS_OBJERR"	},
@@ -1493,7 +1493,7 @@ struct tcb *tcp;
 	return 0;
 }
 #ifndef FREEBSD
-static struct xlat ucontext_flags[] = {
+static const struct xlat ucontext_flags[] = {
 	{ UC_SIGMASK,	"UC_SIGMASK"	},
 	{ UC_STACK,	"UC_STACK"	},
 	{ UC_CPU,	"UC_CPU"	},
@@ -1525,7 +1525,7 @@ typedef struct
 #define stack_t struct sigaltstack
 #endif
 
-static struct xlat sigaltstack_flags[] = {
+static const struct xlat sigaltstack_flags[] = {
 	{ SS_ONSTACK,	"SS_ONSTACK"	},
 	{ SS_DISABLE,	"SS_DISABLE"	},
 	{ 0,		NULL		},

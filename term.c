@@ -48,7 +48,7 @@
 #include <sys/filio.h>
 #endif
 
-static struct xlat tcxonc_options[] = {
+static const struct xlat tcxonc_options[] = {
 	{ TCOOFF,	"TCOOFF"	},
 	{ TCOON,	"TCOON"		},
 	{ TCIOFF,	"TCIOFF"	},
@@ -57,7 +57,7 @@ static struct xlat tcxonc_options[] = {
 };
 
 #ifdef TCLFLSH
-static struct xlat tcflsh_options[] = {
+static const struct xlat tcflsh_options[] = {
 	{ TCIFLUSH,	"TCIFLUSH"	},
 	{ TCOFLUSH,	"TCOFLUSH"	},
 	{ TCIOFLUSH,	"TCIOFLUSH"	},
@@ -65,7 +65,7 @@ static struct xlat tcflsh_options[] = {
 };
 #endif
 
-static struct xlat baud_options[] = {
+static const struct xlat baud_options[] = {
 	{ B0,		"B0"		},
 	{ B50,		"B50"		},
 	{ B75,		"B75"		},
@@ -140,7 +140,7 @@ static struct xlat baud_options[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat modem_flags[] = {
+static const struct xlat modem_flags[] = {
 #ifdef TIOCM_LE
 	{ TIOCM_LE,	"TIOCM_LE",	},
 #endif

@@ -143,7 +143,7 @@
 
 /* WTA: this was `&& !defined(LINUXSPARC)', this seems unneeded though? */
 #if defined(HAVE_PRCTL)
-static struct xlat prctl_options[] = {
+static const struct xlat prctl_options[] = {
 #ifdef PR_MAXPROCS
 	{ PR_MAXPROCS,		"PR_MAXPROCS"		},
 #endif
@@ -510,7 +510,7 @@ struct tcb *tcp;
 #define CLONE_UNTRACED		0x00800000	/* set if the tracing process can't force CLONE_PTRACE on this clone */
 #define CLONE_CHILD_SETTID	0x01000000	/* set the TID in the child */
 
-static struct xlat clone_flags[] = {
+static const struct xlat clone_flags[] = {
     { CLONE_VM,		"CLONE_VM"	},
     { CLONE_FS,		"CLONE_FS"	},
     { CLONE_FILES,	"CLONE_FILES"	},
@@ -1442,7 +1442,7 @@ struct tcb *tcp;
 #include <sys/privilege.h>
 
 
-static struct xlat procpriv_cmds [] = {
+static const struct xlat procpriv_cmds [] = {
 	{ SETPRV,	"SETPRV"	},
 	{ CLRPRV,	"CLRPRV"	},
 	{ PUTPRV,	"PUTPRV"	},
@@ -1452,7 +1452,7 @@ static struct xlat procpriv_cmds [] = {
 };
 
 
-static struct xlat procpriv_priv [] = {
+static const struct xlat procpriv_priv [] = {
 	{ P_OWNER,	"P_OWNER"	},
 	{ P_AUDIT,	"P_AUDIT"	},
 	{ P_COMPAT,	"P_COMPAT"	},
@@ -1485,7 +1485,7 @@ static struct xlat procpriv_priv [] = {
 };
 
 
-static struct xlat procpriv_type [] = {
+static const struct xlat procpriv_type [] = {
 	{ PS_FIX,	"PS_FIX"	},
 	{ PS_INH,	"PS_INH"	},
 	{ PS_MAX,	"PS_MAX"	},
@@ -1499,7 +1499,7 @@ printpriv(tcp, addr, len, opt)
 struct tcb *tcp;
 long addr;
 int len;
-struct xlat *opt;
+const struct xlat *opt;
 {
 	priv_t buf [128];
 	int max = verbose (tcp) ? sizeof buf / sizeof buf [0] : 10;
@@ -1743,7 +1743,7 @@ struct tcb *tcp;
 #endif
 #endif /* LINUX */
 
-static struct xlat wait4_options[] = {
+static const struct xlat wait4_options[] = {
 	{ WNOHANG,	"WNOHANG"	},
 #ifndef WSTOPPED
 	{ WUNTRACED,	"WUNTRACED"	},
@@ -2015,7 +2015,7 @@ struct tcb *tcp;
 
 #if defined SVR4 || defined LINUX
 
-static struct xlat waitid_types[] = {
+static const struct xlat waitid_types[] = {
 	{ P_PID,	"P_PID"		},
 #ifdef P_PPID
 	{ P_PPID,	"P_PPID"	},
@@ -2115,7 +2115,7 @@ struct tcb *tcp;
 
 #ifndef SVR4
 
-static struct xlat ptrace_cmds[] = {
+static const struct xlat ptrace_cmds[] = {
 #ifndef FREEBSD
 	{ PTRACE_TRACEME,	"PTRACE_TRACEME"	},
 	{ PTRACE_PEEKTEXT,	"PTRACE_PEEKTEXT",	},
@@ -2204,7 +2204,7 @@ static struct xlat ptrace_cmds[] = {
 #ifndef SUNOS4_KERNEL_ARCH_KLUDGE
 static
 #endif /* !SUNOS4_KERNEL_ARCH_KLUDGE */
-struct xlat struct_user_offsets[] = {
+const struct xlat struct_user_offsets[] = {
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
 	{ PT_PSWMASK,		"psw_mask"				},
@@ -2887,7 +2887,7 @@ int
 sys_ptrace(tcp)
 struct tcb *tcp;
 {
-	struct xlat *x;
+	const struct xlat *x;
 	long addr;
 
 	if (entering(tcp)) {
@@ -2972,7 +2972,7 @@ struct tcb *tcp;
 #endif /* !SVR4 */
 
 #ifdef LINUX
-static struct xlat futexops[] = {
+static const struct xlat futexops[] = {
 	{ FUTEX_WAIT,	"FUTEX_WAIT" },
 	{ FUTEX_WAKE,	"FUTEX_WAKE" },
 	{ FUTEX_FD,	"FUTEX_FD" },
@@ -3042,7 +3042,7 @@ struct tcb *tcp;
     return 0;
 }
 
-static struct xlat schedulers[] = {
+static const struct xlat schedulers[] = {
 	{ SCHED_OTHER,	"SCHED_OTHER" },
 	{ SCHED_RR,	"SCHED_RR" },
 	{ SCHED_FIFO,	"SCHED_FIFO" },

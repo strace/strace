@@ -205,7 +205,7 @@ struct stat_sparc64 {
  * Unix says r/w/rw are 0/1/2, so we make them true flags 1/2/3 by
  * adding 1.  Just remember to add 1 to any arg decoded with openmodes.
  */
-struct xlat openmodes[] = {
+const struct xlat openmodes[] = {
 	{ O_RDWR+1,	"O_RDWR"	},
 	{ O_RDONLY+1,	"O_RDONLY"	},
 	{ O_WRONLY+1,	"O_WRONLY"	},
@@ -312,7 +312,7 @@ struct tcb *tcp;
 }
 
 #ifdef LINUXSPARC
-struct xlat openmodessol[] = {
+const struct xlat openmodessol[] = {
 	{ 0,		"O_RDWR"	},
 	{ 1,		"O_RDONLY"	},
 	{ 2,		"O_WRONLY"	},
@@ -360,7 +360,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-static struct xlat access_flags[] = {
+static const struct xlat access_flags[] = {
 	{ F_OK,		"F_OK",		},
 	{ R_OK,		"R_OK"		},
 	{ W_OK,		"W_OK"		},
@@ -396,7 +396,7 @@ struct tcb *tcp;
 	return RVAL_OCTAL;
 }
 
-static struct xlat whence[] = {
+static const struct xlat whence[] = {
 	{ SEEK_SET,	"SEEK_SET"	},
 	{ SEEK_CUR,	"SEEK_CUR"	},
 	{ SEEK_END,	"SEEK_END"	},
@@ -544,7 +544,7 @@ struct tcb *tcp;
 
 /* several stats */
 
-static struct xlat modetypes[] = {
+static const struct xlat modetypes[] = {
 	{ S_IFREG,	"S_IFREG"	},
 	{ S_IFSOCK,	"S_IFSOCK"	},
 	{ S_IFIFO,	"S_IFIFO"	},
@@ -737,7 +737,7 @@ long addr;
 #endif /* SPARC64 */
 #endif /* LINUXSPARC */
 
-struct xlat fileflags[] = {
+const struct xlat fileflags[] = {
 #ifdef FREEBSD
 	{ UF_NODUMP,	"UF_NODUMP"	},
 	{ UF_IMMUTABLE,	"UF_IMMUTABLE"	},
@@ -1292,7 +1292,7 @@ struct tcb *tcp;
 
 #include <sys/acl.h>
 
-struct xlat aclcmds[] = {
+const struct xlat aclcmds[] = {
 #ifdef SETACL
 	{ SETACL,	"SETACL"	},
 #endif
@@ -1357,7 +1357,7 @@ struct tcb *tcp;
 }
 
 
-struct xlat aclipc[] = {
+const struct xlat aclipc[] = {
 #ifdef IPC_SHM
 	{ IPC_SHM,	"IPC_SHM"	},
 #endif
@@ -1400,7 +1400,7 @@ struct tcb *tcp;
 
 #ifdef LINUX
 
-static struct xlat fsmagic[] = {
+static const struct xlat fsmagic[] = {
 	{ 0x73757245,	"CODA_SUPER_MAGIC"	},
 	{ 0x012ff7b7,	"COH_SUPER_MAGIC"	},
 	{ 0x1373,	"DEVFS_SUPER_MAGIC"	},
@@ -1994,7 +1994,7 @@ struct tcb *tcp;
 #endif /* LINUX */
 
 #if defined FREEBSD || defined LINUX
-struct xlat direnttypes[] = {
+const struct xlat direnttypes[] = {
 	{ DT_UNKNOWN,	"DT_UNKNOWN" 	},
 	{ DT_FIFO,	"DT_FIFO" 	},
 	{ DT_CHR,	"DT_CHR" 	},
@@ -2327,7 +2327,7 @@ struct tcb *tcp;
 
 #endif /* HAVE_SYS_ASYNCH_H */
 
-struct xlat xattrflags[] = {
+const struct xlat xattrflags[] = {
 #ifdef XATTR_CREATE
 	{ XATTR_CREATE,	 "XATTR_CREATE" },
 	{ XATTR_REPLACE, "XATTR_REPLACE" },
