@@ -355,7 +355,7 @@ long addr;
 			 * Anyways, feel free if you don't like
 			 * this way.. :) 
 			 */
-			tprintf("%08lx:", ntohl(sipx.sipx_network));
+			tprintf("%08lx:", (unsigned long)ntohl(sipx.sipx_network));
 			for (i = 0; i<IPX_NODE_LEN; i++)
 				tprintf("%02x", sipx.sipx_node[i]);
 			tprintf("/[%02x]", sipx.sipx_type);
