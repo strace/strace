@@ -76,7 +76,7 @@ AC_MSG_RESULT($arch)
 
 # Autoheader trick.  Heh, heh.
 arch_list='
-@@@syms="$syms I386 IA64 M68K SPARC MIPS ALPHA ARM POWERPC HPPA"@@@
+@@@syms="$syms I386 IA64 M68K SPARC MIPS ALPHA ARM POWERPC S390 HPPA"@@@
 '
 
 osarch="$opsys"

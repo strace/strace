@@ -1,3 +1,7 @@
+2001-07-13  Wichert Akkerman <wakkerma@debian.org>
+
+  * configure.in: add S390 to architecture list
+
 2001-07-10  John Hughes <john@Calva.COM>
 
   * TODO, defs.h, io.h, net.c, strace.c, syscall.c, util.c: Merge fixes
@@ -30,6 +34,7 @@
   * svr4/dummy.h, svr4/syscall.h: now we handle rfork{1,all}, ssisys and
     rexecve calls.
 
+>>>>>>> 1.119
 2001-04-12  Wichert Akkerman <wakkerma@debian.org>
 
   * process.c: fix cast for powerpc code
