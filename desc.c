@@ -405,7 +405,9 @@ long *args;
 int bitness;
 {
 	int i, j, nfds;
-	fd_set fds;
+	unsigned int fdsize = ((((args[0] + 7) / 8) + sizeof(long) - 1)
+			       & -sizeof(long));
+	fd_set *fds;
 	struct timeval tv;
 #ifdef ALPHA
 	struct timeval32 {
@@ -418,6 +420,11 @@ int bitness;
 	long arg;
 
 	if (entering(tcp)) {
+		fds = (fd_set *) malloc(fdsize);
+		if (fds == NULL) {
+			tprintf("out of memory\n");
+			return 0;
+		}
 		nfds = args[0];
 		tprintf("%d", nfds);
 		for (i = 0; i < 3; i++) {
@@ -430,19 +437,20 @@ int bitness;
 				tprintf(", %#lx", arg);
 				continue;
 			}
-			if (umove(tcp, arg, &fds) < 0) {
+			if (umoven(tcp, arg, fdsize, (char *) fds) < 0) {
 				tprintf(", [?]");
 				continue;
 			}
 			tprintf(", [");
 			for (j = 0, sep = ""; j < nfds; j++) {
-				if (FD_ISSET(j, &fds)) {
+				if (FD_ISSET(j, fds)) {
 					tprintf("%s%u", sep, j);
 					sep = " ";
 				}
 			}
 			tprintf("]");
 		}
+		free(fds);
 		if (!args[4])
 			tprintf(", NULL");
 		else if (!verbose(tcp))
@@ -472,6 +480,13 @@ int bitness;
 			tcp->auxstr = "Timeout";
 			return RVAL_STR;
 		}
+
+		fds = (fd_set *) malloc(fdsize);
+		if (fds == NULL) {
+			tprintf("out of memory\n");
+			return 0;
+		}
+
 		outstr[0] = '\0';
 		for (i = 0; i < 3; i++) {
 			int first = 1;
@@ -479,10 +494,10 @@ int bitness;
 
 			tcp->auxstr = outstr;
 			arg = args[i+1];
-			if (!arg || umove(tcp, arg, &fds) < 0)
+			if (!arg || umoven(tcp, arg, fdsize, (char *) fds) < 0)
 				continue;
 			for (j = 0; j < args[0]; j++) {
-				if (FD_ISSET(j, &fds)) {
+				if (FD_ISSET(j, fds)) {
 					if (first) {
 						sprintf(str, "%s%s [%u", sep,
 							i == 0 ? "in" :
@@ -504,6 +519,7 @@ int bitness;
 			if (nfds == 0)
 				break;
 		}
+		free(fds);
 #ifdef LINUX
 		/* This contains no useful information on SunOS.  */
 		if (args[4]) {
