@@ -179,24 +179,42 @@
 	{ 5,	0,	sys_query_module,	"query_module"	},  /* 178 */
 	{ 4,	0,	sys_quotactl,		"quotactl"	},  /* 179 */
 	{ 3,	0,	printargs,		"nfsservctl"	},  /* 180 */
-	{ 3,	0,	printargs,		"getpmsg" }, /* 181 */
-	{ 3,	0,	printargs,		"putpmsg" }, /* 182 */
+	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 181 */
+	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 182 */
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	},  /* 183 */
-	{ 3,	0,	printargs,		"tuxcall" }, /* 184 */
-	{ 3,	0,	printargs,		"security" }, /* 185 */
-	{ 0,	0,	printargs,		"gettid" }, /* 186 */
-	{ 3,	0,	printargs,		"readahead" }, /* 187 */
-	{ 5,	0,	printargs,		"setxattr" }, /* 188 */
-	{ 5,	0,	printargs,		"lsetxattr" }, /* 189 */
-	{ 5,	0,	printargs,		"fsetxattr" }, /* 190 */
-	{ 4,	0,	printargs,		"getxattr" }, /* 191 */
-	{ 4,	0,	printargs,		"lgetxattr" }, /* 192 */
-	{ 4,	0,	printargs,		"fgetxattr" }, /* 193 */
-	{ 3,	0,	printargs,		"listxattr" }, /* 194 */
-	{ 3,	0,	printargs,		"llistxattr" }, /* 195 */
-	{ 3,	0,	printargs,		"flistxattr" }, /* 196 */
-	{ 2,	0,	printargs,		"removexattr" }, /* 197 */
-	{ 2,	0,	printargs,		"lremovexattr" }, /* 198 */
-	{ 2,	0,	printargs,		"fremovexattr" }, /* 199 */
-	{ 2,	0,	printargs,		"tkill" }, /* 200 */
+	{ 3,	0,	printargs,		"tuxcall"	}, /* 184 */
+	{ 3,	0,	printargs,		"security"	}, /* 185 */
+	{ 0,	0,	printargs,		"gettid"	}, /* 186 */
+	{ 4,	0,	sys_readahead,		"readahead"	}, /* 187 */
+	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 188 */
+	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 189 */
+	{ 5,	0,	sys_fsetxattr,		"fsetxattr"	}, /* 190 */
+	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 191 */
+	{ 4,	TF,	sys_getxattr,		"lgetxattr"	}, /* 192 */
+	{ 4,	0,	sys_fgetxattr,		"fgetxattr"	}, /* 193 */
+	{ 3,	TF,	sys_listxattr,		"listxattr"	}, /* 194 */
+	{ 3,	TF,	sys_listxattr,		"llistxattr"	}, /* 195 */
+	{ 3,	0,	sys_flistxattr,		"flistxattr"	}, /* 196 */
+	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 197 */
+	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 198 */
+	{ 2,	0,	sys_fremovexattr,	"fremovexattr"	}, /* 199 */
+	{ 2,	0,	sys_kill,		"tkill"		}, /* 200 */
 	{ 1,	0,	sys_time,		"time"		},  /* 201 */
+	{ 4,	0,	sys_futex,		"futex"		}, /* 202 */
+	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 203 */
+	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 204 */
+	{ 1,	0,	sys_set_thread_area,	"set_thread_area" }, /* 205 */
+	{ 2,	0,	printargs,		"io_setup"	}, /* 206 */
+	{ 1,	0,	printargs,		"io_destroy"	}, /* 207 */
+	{ 5,	0,	printargs,		"io_getevents"	}, /* 208 */
+	{ 3,	0,	printargs,		"io_submit"	}, /* 209 */
+	{ 3,	0,	printargs,		"io_cancel"	}, /* 210 */
+	{ 1,	0,	sys_get_thread_area,	"get_thread_area" }, /* 211 */
+	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 212 */
+	{ 1,	0,	printargs,		"epoll_create"	}, /* 213 */
+	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 214 */
+	{ 4,	0,	printargs,		"epoll_wait"	}, /* 215 */
+	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 216 */
+	{ 1,	0,	printargs,		"set_tid_address"}, /* 217 */
+	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 18 */
+	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
