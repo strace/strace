@@ -29,7 +29,7 @@
 
 #include "defs.h"
 
-#ifdef linux
+#ifdef LINUX
 #include <sys/socket.h>
 #else
 #include <sys/sockio.h>

@@ -50,7 +50,7 @@
 #include <sys/tihdr.h>
 #endif
 
-#if defined(HAVE_SYS_STREAM_H) || defined(linux) || defined(FREEBSD)
+#if defined(HAVE_SYS_STREAM_H) || defined(LINUX) || defined(FREEBSD)
 
 #ifndef HAVE_STROPTS_H
 #define RS_HIPRI 1
@@ -367,7 +367,7 @@ struct tcb *tcp;
 }
 #endif
 
-#if !defined(linux) && !defined(FREEBSD)
+#if !defined(LINUX) && !defined(FREEBSD)
 
 static struct xlat stream_flush_options[] = {
 	{ FLUSHR,	"FLUSHR"	},
@@ -1296,6 +1296,6 @@ int code, arg;
 	}
 }
 
-#endif /* !linux && !FREEBSD */
+#endif /* !LINUX && !FREEBSD */
 
-#endif /* HAVE_SYS_STREAM_H || linux || FREEBSD */
+#endif /* HAVE_SYS_STREAM_H || LINUX || FREEBSD */

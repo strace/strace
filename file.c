@@ -2156,11 +2156,11 @@ struct tcb *tcp;
 
 #endif /* HAVE_SYS_ASYNCH_H */
 
-#ifdef XATTR_CREATE
-
 struct xlat xattrflags[] = {
+#ifdef XATTR_CREATE
 	{ XATTR_CREATE,	 "XATTR_CREATE" },
 	{ XATTR_REPLACE, "XATTR_REPLACE" },
+#endif
 	{ 0,		 NULL }
 };
 
@@ -2270,5 +2270,3 @@ struct tcb *tcp;
     }
     return 0;
 }
-
-#endif
