@@ -1,5 +1,11 @@
 2004-07-12  Roland McGrath  <roland@redhat.com>
 
+	* net.c (addrfams): Make variable global.
+	* sock.c (sock_ioctl): Decode the arguments for SIOCGIFNAME,
+	SIOCGIFINDEX, and SIOCGIFCONF.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#126917.
+
 	* linux/ioctlsort.c: Add some #includes.
 	[POWERPC]: Kludge out high bits.
 	* linux/ia64/ioctlent.h: Regenerated using RHEL3 headers.
