@@ -1791,10 +1791,30 @@ struct tcb *tcp;
 			 * we shouldn't block if there are zombies to reap.
 			 * XXX doesn't handle pgrp matches (u_arg[0]==0,<-1)
 			 */
+			struct tcb *child = NULL;
 			if (tcp->nzombies > 0 &&
 			    (tcp->u_arg[0] == -1 ||
-			     pid2tcb(tcp->u_arg[0]) == NULL))
+			     (child = pid2tcb(tcp->u_arg[0])) == NULL))
 				return 0;
+			if (tcp->u_arg[0] > 0) {
+				/*
+				 * If the parent waits for a specified child
+				 * PID, then it must get ECHILD right away
+				 * if that PID is not one of its children.
+				 * Make sure that the requested PID matches
+				 * one of the parent's children that we are
+				 * tracing, and don't suspend it otherwise.
+				 */
+				if (child == NULL)
+					child = pid2tcb(tcp->u_arg[0]);
+				if (child == NULL || child->parent != (
+#ifdef TCB_CLONE_THREAD
+					    (tcp->flags & TCB_CLONE_THREAD)
+					    ? tcp->parent :
+#endif
+					    tcp))
+					return 0;
+			}
 			tcp->flags |= TCB_SUSPENDED;
 			tcp->waitpid = tcp->u_arg[0];
 #ifdef TCB_CLONE_THREAD
@@ -1810,10 +1830,6 @@ struct tcb *tcp;
 			extern int force_result();
 			return force_result(tcp, 0, 0);
 		}
-		else
-			fprintf(stderr,
-				"internal_wait: should not have resumed %d\n",
-				tcp->pid);
 	}
 	else if (exiting(tcp) && tcp->u_error == 0 && tcp->u_rval > 0 &&
 		 tcp->nzombies > 0 && pid2tcb(tcp->u_rval) == NULL) {
