@@ -136,8 +136,10 @@ int exitval;
 {
 	fprintf(ofp, "\
 usage: strace [-dffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
-              [-p pid] ... [-s strsize] [-u username] [command [arg ...]]\n\
-   or: strace -c [-e expr] ... [-O overhead] [-S sortby] [command [arg ...]]\n\
+              [-p pid] ... [-s strsize] [-u username] [-E var=val] ...\n\
+              [command [arg ...]]\n\
+   or: strace -c [-e expr] ... [-O overhead] [-S sortby] [-E var=val] ...\n\
+              [command [arg ...]]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
 -f -- follow forks, -ff -- with output into separate files\n\
 -F -- attempt to follow vforks, -h -- print help message\n\
@@ -156,8 +158,12 @@ usage: strace [-dffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
 -s strsize -- limit length of print strings to STRSIZE chars (default %d)\n\
 -S sortby -- sort syscall counts by: time, calls, name, nothing (default %s)\n\
 -u username -- run command as username handling setuid and/or setgid\n\
+-E var=val -- put var=val in the environment for command\n\
+-E var -- remove var from the environment for command\n\
+" /* this is broken, so don't document it
 -z -- print only succeeding syscalls\n\
-", DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
+  */
+, DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(exitval);
 }
 
@@ -200,7 +206,7 @@ char *argv[];
 	set_sortby(DEFAULT_SORTBY);
 	set_personality(DEFAULT_PERSONALITY);
 	while ((c = getopt(argc, argv,
-		"+cdfFhiqrtTvVxza:e:o:O:p:s:S:u:")) != EOF) {
+		"+cdfFhiqrtTvVxza:e:o:O:p:s:S:u:E:")) != EOF) {
 		switch (c) {
 		case 'c':
 			cflag++;
@@ -260,7 +266,7 @@ char *argv[];
 			set_overhead(atoi(optarg));
 			break;
 		case 'p':
-			if ((pid = atoi(optarg)) == 0) {
+			if ((pid = atoi(optarg)) <= 0) {
 				fprintf(stderr, "%s: Invalid process id: %s\n",
 					progname, optarg);
 				break;
@@ -270,7 +276,7 @@ char *argv[];
 				break;
 			}
 			if ((tcp = alloctcb(pid)) == NULL) {
-				fprintf(stderr, "%s: tcb table full, please recompile strace\n",
+				fprintf(stderr, "%s: out of memory\n",
 					progname);
 				exit(1);
 			}
@@ -285,6 +291,13 @@ char *argv[];
 			break;
 		case 'u':
 			username = strdup(optarg);
+			break;
+		case 'E':
+			if (putenv(optarg) < 0) {
+				fprintf(stderr, "%s: out of memory\n",
+					progname);
+				exit(1);
+			}
 			break;
 		default:
 			usage(stderr, 1);
