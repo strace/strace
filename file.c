@@ -32,6 +32,14 @@
 #include "defs.h"
 
 #include <dirent.h>
+#ifdef linux
+#define dirent kernel_dirent
+#include <linux/types.h>
+#include <linux/dirent.h>
+#undef dirent
+#else
+#define kernel_dirent dirent
+#endif
 
 #ifdef linux
 #  include <asm/stat.h>
@@ -1247,7 +1255,7 @@ struct tcb *tcp;
 	if (!abbrev(tcp))
 		tprintf("{");
 	for (i = 0; i < len;) {
-		struct dirent *d = (struct dirent *) &buf[i];
+		struct kernel_dirent *d = (struct kernel_dirent *) &buf[i];
 #ifdef linux
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",

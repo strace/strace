@@ -1,3 +1,7 @@
+Wed May 26 01:04:34 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Use kernel dirent structure for Linux
+
 Sun May  9 02:18:30 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge in patches from Andreas Schwab <schwab@issan.cs.uni-dortmund.de>
