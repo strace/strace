@@ -649,7 +649,7 @@ long addr;
 int len;
 char *laddr;
 {
-#ifdef SRVR4
+#ifdef SVR4
 	return umoven(tcp, addr, len, laddr);
 #else /* !SVR4 */
 	int started = 0;
