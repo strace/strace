@@ -316,7 +316,18 @@ int rt; /* set might include realtime sigs */
 	*s++ = '[';
 	for (i = 1; i < maxsigs; i++) {
 		if (sigismember(mask, i) == 1) {
-			sprintf(s, format, signame(i) + 3); s += strlen(s);
+			/* real-time signals on solaris don't have
+			 * signalent entries
+			 */
+			if (i < nsignals) {
+				sprintf(s, format, signalent[i] + 3);
+			}
+			else {
+				char tsig[32];
+				sprintf(tsig, "%u", i);
+				sprintf(s, format, tsig);
+			}
+			s += strlen(s);
 			format = " %s";
 		}
 	}

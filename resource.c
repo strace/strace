@@ -142,6 +142,67 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if _LFS64_LARGEFILE
+static char *
+sprintrlim64(lim)
+rlim64_t lim;
+{
+	static char buf[64];
+
+	if (lim == RLIM64_INFINITY)
+		sprintf(buf, "RLIM64_INFINITY");
+	else if (lim > 1024 && lim%1024 == 0)
+		sprintf(buf, "%lld*1024", lim/1024);
+	else
+		sprintf(buf, "%lld", lim);
+	return buf;
+}
+
+int
+sys_getrlimit64(tcp)
+struct tcb *tcp;
+{
+	struct rlimit64 rlim;
+
+	if (entering(tcp)) {
+		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
+		tprintf(", ");
+	}
+	else {
+		if (syserror(tcp) || !verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else if (umove(tcp, tcp->u_arg[1], &rlim) < 0)
+			tprintf("{...}");
+		else {
+			tprintf("{rlim_cur=%s,", sprintrlim64(rlim.rlim_cur));
+			tprintf(" rlim_max=%s}", sprintrlim64(rlim.rlim_max));
+		}
+	}
+	return 0;
+}
+
+int
+sys_setrlimit64(tcp)
+struct tcb *tcp;
+{
+	struct rlimit64 rlim;
+
+	if (entering(tcp)) {
+		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
+		tprintf(", ");
+		if (!verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else if (umove(tcp, tcp->u_arg[1], &rlim) < 0)
+			tprintf("{...}");
+		else {
+			tprintf("{rlim_cur=%s,", sprintrlim64(rlim.rlim_cur));
+			tprintf(" rlim_max=%s}", sprintrlim64(rlim.rlim_max));
+		}
+	}
+	return 0;
+}
+#endif
+
 #ifndef SVR4
 
 static struct xlat usagewho[] = {

@@ -807,6 +807,33 @@ struct tcb *tcp;
 }
 
 int
+sys_so_socket(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		/* not sure really what these args are... but this
+		 * is how truss prints it
+		 */
+		tprintf("%ld, %ld, %ld, ",
+		  tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
+		printpath(tcp, tcp->u_arg[3]);
+		tprintf(", %ld", tcp->u_arg[4]);
+	}
+	return 0;
+}
+
+int
+sys_so_socketpair(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+	  	/* not sure what this arg is */
+		tprintf("0x%lx", tcp->u_arg[0]);
+	}
+	return 0;
+}
+
+int
 sys_bind(tcp)
 struct tcb *tcp;
 {

@@ -411,6 +411,23 @@ struct tcb *tcp;
 }
 #endif
 
+#if _LFS_LARGEFILE
+int
+sys_lseek64 (tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		long long offset = get64(tcp->u_arg [1], tcp->u_arg[2]);
+		if (tcp->u_arg[3] == SEEK_SET)
+			tprintf("%ld, %llu, ", tcp->u_arg[0], offset);
+		else
+			tprintf("%ld, %lld, ", tcp->u_arg[0], offset);
+		printxval(whence, tcp->u_arg[3], "SEEK_???");
+	}
+	return RVAL_LUDECIMAL;
+}
+#endif
+
 int
 sys_truncate(tcp)
 struct tcb *tcp;
@@ -1787,6 +1804,75 @@ struct tcb *tcp;
 	return 0;
 }
 
+
+#if _LFS64_LARGEFILE
+int
+sys_getdents64(tcp)
+struct tcb *tcp;
+{
+	int i, len, dents = 0;
+	char *buf;
+
+	if (entering(tcp)) {
+		tprintf("%lu, ", tcp->u_arg[0]);
+		return 0;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		return 0;
+	}
+	len = tcp->u_rval;
+	if ((buf = malloc(len)) == NULL) {
+		tprintf("out of memory\n");
+		return 0;
+	}
+	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
+		tprintf("{...}, %lu", tcp->u_arg[2]);
+		free(buf);
+		return 0;
+	}
+	if (!abbrev(tcp))
+		tprintf("{");
+	for (i = 0; i < len;) {
+		struct dirent64 *d = (struct dirent64 *) &buf[i];
+#ifdef linux
+		if (!abbrev(tcp)) {
+			tprintf("%s{d_ino=%lu, d_off=%lu, ",
+				i ? " " : "", d->d_ino, d->d_off);
+			tprintf("d_reclen=%u, d_name=\"%s\"}",
+				d->d_reclen, d->d_name);
+		}
+#endif /* linux */
+#ifdef SVR4
+		if (!abbrev(tcp)) {
+			tprintf("%s{d_ino=%llu, d_off=%llu, ",
+				i ? " " : "", d->d_ino, d->d_off);
+			tprintf("d_reclen=%u, d_name=\"%s\"}",
+				d->d_reclen, d->d_name);
+		}
+#endif /* SVR4 */
+#ifdef SUNOS4
+		if (!abbrev(tcp)) {
+			tprintf("%s{d_off=%lu, d_fileno=%lu, d_reclen=%u, ",
+				i ? " " : "", d->d_off, d->d_fileno,
+				d->d_reclen);
+			tprintf("d_namlen=%u, d_name=\"%.*s\"}",
+				d->d_namlen, d->d_namlen, d->d_name);
+		}
+#endif /* SUNOS4 */
+		i += d->d_reclen;
+		dents++;
+	}
+	if (!abbrev(tcp))
+		tprintf("}");
+	else
+		tprintf("/* %u entries */", dents);
+	tprintf(", %lu", tcp->u_arg[2]);
+	free(buf);
+	return 0;
+}
+#endif
+ 
 #ifdef FREEBSD
 int
 sys_getdirentries(tcp)
@@ -1955,20 +2041,3 @@ struct tcb *tcp;
 }
 
 #endif /* HAVE_SYS_ASYNCH_H */
-
-#if UNIXWARE >= 7
-int
-sys_lseek64 (tcp)
-struct tcb *tcp;
-{
-	if (entering(tcp)) {
-		long long offset = * (long long *) & tcp->u_arg [1];
-		if (tcp->u_arg[3] == SEEK_SET)
-			tprintf("%ld, %llu, ", tcp->u_arg[0], offset);
-		else
-			tprintf("%ld, %lld, ", tcp->u_arg[0], offset);
-		printxval(whence, tcp->u_arg[3], "SEEK_???");
-	}
-	return RVAL_LDECIMAL;
-}
-#endif

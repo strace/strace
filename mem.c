@@ -224,6 +224,50 @@ struct tcb *tcp;
     return print_mmap(tcp, tcp->u_arg);
 }
 
+#if _LFS64_LARGEFILE
+int
+sys_mmap64(tcp)
+struct tcb *tcp;
+{
+#ifdef linux
+#ifdef ALPHA
+	long *u_arg = tcp->u_arg;
+#else /* !ALPHA */
+	long u_arg[7];
+#endif /* !ALPHA */
+#else /* !linux */
+	long *u_arg = tcp->u_arg;
+#endif /* !linux */
+
+	if (entering(tcp)) {
+#ifdef linux
+#ifndef ALPHA
+		if (umoven(tcp, tcp->u_arg[0], sizeof u_arg,
+				(char *) u_arg) == -1)
+			return 0;
+#endif /* ALPHA */
+#endif /* linux */
+
+		/* addr */
+		tprintf("%#lx, ", u_arg[0]);
+		/* len */
+		tprintf("%lu, ", u_arg[1]);
+		/* prot */
+		printflags(mmap_prot, u_arg[2]);
+		tprintf(", ");
+		/* flags */
+		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
+		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
+		/* fd */
+		tprintf(", %ld, ", u_arg[4]);
+		/* offset */
+		tprintf("%#llx", get64(u_arg[5], u_arg[6]));
+	}
+	return RVAL_HEX;
+}
+#endif
+
+ 
 int
 sys_munmap(tcp)
 struct tcb *tcp;

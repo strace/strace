@@ -106,27 +106,28 @@ extern int sys_getmsg();
 extern int sys_putmsg();
 extern int sys_poll();
 extern int sys_dup2();
-#ifdef MIPS
-extern int sys_sigreturn();
-extern int sys_accept();
 extern int sys_bind();
+extern int sys_listen();
+extern int sys_accept();
 extern int sys_connect();
-extern int sys_gethostid();
+extern int sys_shutdown();
+extern int sys_recv();
+extern int sys_recvfrom();
+extern int sys_send();
+extern int sys_sendto();
 extern int sys_getpeername();
 extern int sys_getsockname();
 extern int sys_getsockopt();
-extern int sys_listen();
-extern int sys_recv();
-extern int sys_recvfrom();
+extern int sys_setsockopt();
+#ifdef MIPS
+extern int sys_sigreturn();
+extern int sys_gethostid();
 extern int sys_recvmsg();
 extern int sys_select();
-extern int sys_send();
 extern int sys_sendmsg();
-extern int sys_sendto();
 extern int sys_sethostid();
-extern int sys_setsockopt();
-extern int sys_shutdown();
 extern int sys_socket();
+extern int sys_listen();
 extern int sys_gethostname();
 extern int sys_sethostname();
 extern int sys_getdomainname();
@@ -278,7 +279,6 @@ extern int sys_lwp_cond_signal();
 extern int sys_lwp_cond_broadcast();
 extern int sys_pread();
 extern int sys_pwrite();
-extern int sys_llseek();
 extern int sys_inst_sync();
 extern int sys_auditsys();
 extern int sys_processor_bind();
@@ -294,6 +294,8 @@ extern int sys_timer_settime();
 extern int sys_timer_gettime();
 extern int sys_timer_getoverrun();
 extern int sys_nanosleep();
+extern int sys_setreuid();
+extern int sys_setregid();
 #ifdef HAVE_SYS_ACL_H
 extern int sys_acl();
 extern int sys_facl();
@@ -460,6 +462,33 @@ extern int sys_getcontext(), sys_setcontext();
 
 #endif /* !MIPS */
 
+
+#ifdef HAVE_SYS_AIO_H
+extern int sys_aioread();
+extern int sys_aiowrite();
+extern int sys_aiowait();
+extern int sys_aiocancel();
+#endif /* HAVE_SYS_AIO_H */
+
+/* 64-bit file stuff */
+
+#if _LFS64_LARGEFILE
+extern int sys_getdents64();
+extern int sys_mmap64();
+extern int sys_stat64();
+extern int sys_lstat64();
+extern int sys_fstat64();
+extern int sys_setrlimit64();
+extern int sys_getrlimit64();
+extern int sys_pread64();
+extern int sys_pwrite64();
+extern int sys_lseek64();
+#endif
+
+/* solaris 2.6 stuff */
+extern int sys_so_socket();
+extern int sys_so_socketpair();
+
 #ifdef HAVE_SYS_DOOR_H
 
 #define SYS_door_subcall	390 + SGI_KLUDGE
@@ -473,3 +502,32 @@ extern int sys_getcontext(), sys_setcontext();
 #define SYS_door_nsubcalls	6
 
 #endif /* HAVE_SYS_DOOR_H */
+
+#ifdef HAVE_SYS_AIO_H
+
+#define SYS_kaio_subcall	400 + SGI_KLUDGE
+#define SYS_aioread		(SYS_kaio_subcall + 0)
+#define SYS_aiowrite		(SYS_kaio_subcall + 1)
+#define SYS_aiowait		(SYS_kaio_subcall + 2)
+#define SYS_aiocancel		(SYS_kaio_subcall + 3)
+#define SYS_aionotify		(SYS_kaio_subcall + 4)
+#define SYS_aioinit		(SYS_kaio_subcall + 5)
+#define SYS_aiostart		(SYS_kaio_subcall + 6)
+#define SYS_aiolio		(SYS_kaio_subcall + 7)
+#define SYS_aiosuspend		(SYS_kaio_subcall + 8)
+#define SYS_aioerror		(SYS_kaio_subcall + 9)
+#define SYS_aioliowait		(SYS_kaio_subcall + 10)
+#define SYS_aioaread		(SYS_kaio_subcall + 11)
+#define SYS_aioawrite		(SYS_kaio_subcall + 12)
+#define SYS_aiolio64		(SYS_kaio_subcall + 13)
+#define SYS_aiosuspend64	(SYS_kaio_subcall + 14)
+#define SYS_aioerror64		(SYS_kaio_subcall + 15)
+#define SYS_aioliowait64	(SYS_kaio_subcall + 16)
+#define SYS_aioaread64		(SYS_kaio_subcall + 17)
+#define SYS_aioawrite64		(SYS_kaio_subcall + 18)
+#define SYS_aiocancel64		(SYS_kaio_subcall + 19)
+#define SYS_aiofsync		(SYS_kaio_subcall + 20)
+
+#define SYS_kaio_nsubcalls	21
+
+#endif /* HAVE_SYS_AIO_H */

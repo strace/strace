@@ -64,6 +64,72 @@ static struct xlat fcntlcmds[] = {
 #ifdef F_GETSIG
 	{ F_GETSIG,	"F_GETSIG"	},
 #endif
+#ifdef F_CHKFL
+	{ F_CHKFL,	"F_CHKFL"	},
+#endif
+#ifdef F_DUP2FD
+	{ F_DUP2FD,	"F_DUP2FD"	},
+#endif
+#ifdef F_ALLOCSP
+	{ F_ALLOCSP,	"F_ALLOCSP"	},
+#endif
+#ifdef F_ISSTREAM
+	{ F_ISSTREAM,	"F_ISSTREAM"	},
+#endif
+#ifdef F_PRIV
+	{ F_PRIV,	"F_PRIV"	},
+#endif
+#ifdef F_NPRIV
+	{ F_NPRIV,	"F_NPRIV"	},
+#endif
+#ifdef F_QUOTACL
+	{ F_QUOTACL,	"F_QUOTACL"	},
+#endif
+#ifdef F_BLOCKS
+	{ F_BLOCKS,	"F_BLOCKS"	},
+#endif
+#ifdef F_BLKSIZE
+	{ F_BLKSIZE,	"F_BLKSIZE"	},
+#endif
+#ifdef F_GETOWN
+	{ F_GETOWN,	"F_GETOWN"	},
+#endif
+#ifdef F_SETOWN
+	{ F_SETOWN,	"F_SETOWN"	},
+#endif
+#ifdef F_REVOKE
+	{ F_REVOKE,	"F_REVOKE"	},
+#endif
+#ifdef F_SETLK
+	{ F_SETLK,	"F_SETLK"	},
+#endif
+#ifdef F_SETLKW
+	{ F_SETLKW,	"F_SETLKW"	},
+#endif
+#ifdef F_FREESP
+	{ F_FREESP,	"F_FREESP"	},
+#endif
+#ifdef F_GETLK
+	{ F_GETLK,	"F_GETLK"	},
+#endif
+#ifdef F_SETLK64
+	{ F_SETLK64,	"F_SETLK64"	},
+#endif
+#ifdef F_SETLKW64
+	{ F_SETLKW64,	"F_SETLKW64"	},
+#endif
+#ifdef F_FREESP64
+	{ F_FREESP64,	"F_FREESP64"	},
+#endif
+#ifdef F_GETLK64
+	{ F_GETLK64,	"F_GETLK64"	},
+#endif
+#ifdef F_SHARE
+	{ F_SHARE,	"F_SHARE"	},
+#endif
+#ifdef F_UNSHARE
+	{ F_UNSHARE,	"F_UNSHARE"	},
+#endif
 	{ 0,		NULL		},
 };
 
@@ -130,6 +196,32 @@ int getlk;
 		tprintf("}");
 }
 
+#if _LFS64_LARGEFILE
+/* fcntl/lockf */
+static void
+printflock64(tcp, addr, getlk)
+struct tcb *tcp;
+int addr;
+int getlk;
+{
+	struct flock64 fl;
+
+	if (umove(tcp, addr, &fl) < 0) {
+		tprintf("{...}");
+		return;
+	}
+	tprintf("{type=");
+	printxval(lockfcmds, fl.l_type, "F_???");
+	tprintf(", whence=");
+	printxval(whence, fl.l_whence, "SEEK_???");
+	tprintf(", start=%lld, len=%lld", fl.l_start, fl.l_len);
+	if (getlk)
+		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);
+	else
+		tprintf("}");
+}
+#endif
+
 static char *
 sprintflags(xlat, flags)
 struct xlat *xlat;
@@ -178,10 +270,29 @@ struct tcb *tcp;
 				tprintf("0");
 			break;
 		case F_SETLK: case F_SETLKW:
+#ifdef F_FREESP
+		case F_FREESP:
+#endif
 			tprintf(", ");
 			printflock(tcp, tcp->u_arg[2], 0);
 			break;
-		}
+#if _LFS64_LARGEFILE
+#ifdef F_FREESP64
+		case F_FREESP64:
+#endif
+		/* Linux glibc defines SETLK64 as SETLK, 
+		   even though the kernel has different values - as does Solaris. */
+#if defined(F_SETLK64) && F_SETLK64+0!=F_SETLK
+		case F_SETLK64:
+#endif
+#if defined(F_SETLKW64) && F_SETLKW64+0!=F_SETLKW
+		case F_SETLKW64:
+#endif
+			tprintf(", ");
+			printflock64(tcp, tcp->u_arg[2], 0);
+			break;
+#endif
+ 		}
 	}
 	else {
 		switch (tcp->u_arg[1]) {
@@ -202,7 +313,15 @@ struct tcb *tcp;
 			tprintf(", ");
 			printflock(tcp, tcp->u_arg[2], 1);
 			break;
-		default:
+#if _LFS64_LARGEFILE
+#if defined(F_GETLK64) && F_GETLK64+0!=F_GETLK
+		case F_GETLK64:
+#endif
+			tprintf(", ");
+			printflock64(tcp, tcp->u_arg[2], 1);
+			break;
+#endif
+ 		default:
 			tprintf(", %#lx", tcp->u_arg[2]);
 			break;
 		}

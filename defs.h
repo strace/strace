@@ -496,3 +496,15 @@ extern int nioctlents2;
 extern char *signalent2[];
 extern int nsignals2;
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
+
+#if _LFS64_LARGEFILE
+/* _l refers to the lower numbered u_arg,
+ * _h refers to the higher numbered u_arg
+ */
+#if _LITTLE_ENDIAN || I386	/* FIXME! */
+#define get64(_l,_h) ((long long)((unsigned long long)(_l) | ((unsigned long long)(_h)<<32)))
+#else
+#define get64(_l,_h) ((long long)((unsigned long long)(_h) | ((unsigned long long)(_l)<<32)))
+#endif
+#endif
+

@@ -58,6 +58,7 @@
 #define sys_priocntl printargs
 #define sys_ksigqueue printargs
 #define sys_lwp_sema_wait printargs
+#define sys_lwp_sema_trywait printargs
 #define sys_memcntl printargs
 #define sys_syscall printargs
 #define sys_clocal printargs
@@ -108,7 +109,9 @@
 #define sys_lwp_cond_wait printargs
 #define sys_lwp_cond_signal printargs
 #define sys_lwp_cond_broadcast printargs
+#if !_LFS64_LARGEFILE
 #define sys_llseek printargs
+#endif
 #define sys_inst_sync printargs
 #define sys_auditsys printargs
 #define sys_processor_bind printargs
@@ -183,16 +186,6 @@
 #define sys_priocntllst printargs
 #define sys_lwp_sema_trywait printargs
 #define sys_xsetsockaddr printargs
-#define sys_fstatvfs64 printargs
-#define sys_statvfs64 printargs
-#define sys_ftruncate64 printargs
-#define sys_truncate64 printargs
-#define sys_getrlimit64 printargs
-#define sys_setrlimit64 printargs
-#define sys_mmap64 printargs
-#define sys_pread64 printargs
-#define sys_pwrite64 printargs
-#define sys_creat64 printargs
 #define sys_dshmsys printargs
 #define sys_invlpg printargs
 #define sys_rfork1 printargs
@@ -202,6 +195,25 @@
 #define sys_kill3 printargs
 #define sys_ssisys printargs
 #define sys_xbindresvport printargs
+#define sys_lwp_sema_trywait printargs
+#define sys_tsolsys printargs
+#ifndef HAVE_SYS_ACL_H
+#define sys_acl printargs
+#define sys_facl printargs
+#define sys_aclipc printargs
+#endif
+#define sys_install_utrap printargs
+#define sys_signotify printargs
+#define sys_schedctl printargs
+#define sys_pset printargs
+#define sys_resolvepath printargs
+#define sys_signotifywait printargs
+#define sys_lwp_sigredirect printargs
+#define sys_lwp_alarm printargs
+#define sys_rpcsys printargs
+#define sys_sockconfig printargs
+#define sys_ntp_gettime printargs
+#define sys_ntp_adjtime printargs
 
 /* like another call */
 #define sys_lchown sys_chown
@@ -227,6 +239,51 @@
 #define sys_fork1 sys_fork
 #define sys_forkall sys_fork
 
+/* aio */
+#define sys_aionotify printargs
+#define sys_aioinit printargs
+#define sys_aiostart printargs
+#define sys_aiolio printargs
+#define sys_aiosuspend printargs
+#define sys_aioerror printargs
+#define sys_aioliowait printargs
+#define sys_aioaread printargs
+#define sys_aioawrite printargs
+#define sys_aiolio64 printargs
+#define sys_aiosuspend64 printargs
+#define sys_aioerror64 printargs
+#define sys_aioliowait64 printargs
+#define sys_aioaread64 printargs
+#define sys_aioaread64 printargs
+#define sys_aioawrite64 printargs
+#define sys_aiocancel64 printargs
+#define sys_aiofsync printargs
+
+/* the various 64-bit file stuff */
+#if !_LFS64_LARGEFILE
+/* we've implemented these */
+#define sys_getdents64 printargs
+#define sys_mmap64 printargs
+#define sys_stat64 printargs
+#define sys_lstat64 printargs
+#define sys_fstat64 printargs
+#define sys_setrlimit64 printargs
+#define sys_getrlimit64 printargs
+#define sys_pread64 printargs
+#define sys_pwrite64 printargs
+#endif
+
+/* unimplemented 64-bit stuff */
+#define sys_statvfs64 printargs
+#define sys_fstatvfs64 printargs
+#define sys_ftruncate64 printargs
+#define sys_truncate64 printargs
+
+/* like another call */
+#define sys_creat64 sys_creat
+#define sys_open64 sys_open
+#define sys_llseek sys_lseek64
+
 /* printargs does the right thing */
 #define sys_sync printargs
 #define sys_profil printargs
@@ -245,6 +302,7 @@
 #define sys_spcall printargs
 #define sys_context printargs
 #define sys_door printargs
+#define sys_kaio printargs
 
 #if DONE
 #define sys_mount printargs

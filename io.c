@@ -279,6 +279,36 @@ struct tcb *tcp;
 
 #endif /* LINUX */
 
+#if _LFS64_LARGEFILE
+int
+sys_pread64(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else
+			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+		tprintf(", %lu, %#llx", tcp->u_arg[2], get64(tcp->u_arg[3], tcp->u_arg[4]));
+	}
+	return 0;
+}
+
+int
+sys_pwrite64(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		tprintf(", %lu, %#llx", tcp->u_arg[2], get64(tcp->u_arg[3], tcp->u_arg[4]));
+	}
+	return 0;
+}
+#endif
+ 
 int
 sys_ioctl(tcp)
 struct tcb *tcp;

@@ -1583,6 +1583,12 @@ struct tcb *tcp;
 			SYS_door_nsubcalls, door_style);
 		break;
 #endif /* SYS_door_subcall */
+#ifdef SYS_kaio_subcall
+	case SYS_kaio:
+		decode_subcall(tcp, SYS_kaio_subcall,
+			SYS_kaio_nsubcalls, shift_style);
+		break;
+#endif	
 #endif /* SVR4 */
 #ifdef FREEBSD
 	case SYS_msgsys:

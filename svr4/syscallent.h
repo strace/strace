@@ -302,6 +302,11 @@
 	{ -1,	0,	printargs,		"SYS_248"	}, /* 248 */
 	{ -1,	0,	printargs,		"SYS_249"	}, /* 249 */
 	{ -1,	0,	printargs,		"SYS_250"	}, /* 250 */
+	{ -1,	0,	printargs,		"SYS_251"	}, /* 251 */
+	{ -1,	0,	printargs,		"SYS_252"	}, /* 252 */
+	{ -1,	0,	printargs,		"SYS_253"	}, /* 253 */
+	{ -1,	0,	printargs,		"SYS_254"	}, /* 254 */
+	{ -1,	0,	printargs,		"SYS_255"	}, /* 255 */
 #else /* !MIPS */
 	{ -1,	TF,	sys_lstat,		"lstat"		}, /* 88 */
 	{ -1,	TF,	sys_symlink,		"symlink"	}, /* 89 */
@@ -430,89 +435,6 @@
 	{ -1,	0,	sys_lwp_sema_wait,	"lwp_sema_wait"	}, /* 207 */
 	{ -1,	0,	sys_lwp_sema_post,	"lwp_sema_post"	}, /* 208 */
 	{ -1,	0,	sys_lwp_sema_trywait,	"lwp_sema_trywait"}, /* 209 */
-#else
-	{ -1,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
-	{ -1,	0,	sys_vtrace,		"vtrace"	}, /* 142 */
-	{ -1,	TP,	sys_fork1,		"fork1"		}, /* 143 */
-	{ -1,	TS,	sys_sigtimedwait,	"sigtimedwait"	}, /* 144 */
-	{ -1,	0,	sys_lwp_info,		"lwp_info"	}, /* 145 */
-	{ -1,	0,	sys_yield,		"yield"		}, /* 146 */
-	{ -1,	0,	sys_lwp_sema_wait,	"lwp_sema_wait"	}, /* 147 */
-	{ -1,	0,	sys_lwp_sema_post,	"lwp_sema_post"	}, /* 148 */
-	{ -1,	0,	printargs,		"SYS_149"	}, /* 149 */
-	{ -1,	0,	printargs,		"SYS_150"	}, /* 150 */
-	{ -1,	0,	printargs,		"SYS_151"	}, /* 151 */
-	{ -1,	0,	sys_modctl,		"modctl"	}, /* 152 */
-	{ -1,	0,	sys_fchroot,		"fchroot"	}, /* 153 */
-	{ -1,	TF,	sys_utimes,		"utimes"	}, /* 154 */
-	{ -1,	0,	sys_vhangup,		"vhangup"	}, /* 155 */
-	{ -1,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 156 */
-	{ -1,	0,	sys_getitimer,		"getitimer"	}, /* 157 */
-	{ -1,	0,	sys_setitimer,		"setitimer"	}, /* 158 */
-	{ -1,	0,	sys_lwp_create,		"lwp_create"	}, /* 159 */
-	{ -1,	0,	sys_lwp_exit,		"lwp_exit"	}, /* 160 */
-	{ -1,	0,	sys_lwp_suspend,	"lwp_suspend"	}, /* 161 */
-	{ -1,	0,	sys_lwp_continue,	"lwp_continue"	}, /* 162 */
-	{ -1,	0,	sys_lwp_kill,		"lwp_kill"	}, /* 163 */
-	{ -1,	0,	sys_lwp_self,		"lwp_self"	}, /* 164 */
-	{ -1,	0,	sys_lwp_setprivate,	"lwp_setprivate"}, /* 165 */
-	{ -1,	0,	sys_lwp_getprivate,	"lwp_getprivate"}, /* 166 */
-	{ -1,	0,	sys_lwp_wait,		"lwp_wait"	}, /* 167 */
-	{ -1,	0,	sys_lwp_mutex_unlock,	"lwp_mutex_unlock"}, /* 168 */
-	{ -1,	0,	sys_lwp_mutex_lock,	"lwp_mutex_lock"}, /* 169 */
-	{ -1,	0,	sys_lwp_cond_wait,	"lwp_cond_wait"}, /* 170 */
-	{ -1,	0,	sys_lwp_cond_signal,	"lwp_cond_signal"}, /* 171 */
-	{ -1,	0,	sys_lwp_cond_broadcast,	"lwp_cond_broadcast"}, /* 172 */
-	{ -1,	0,	sys_pread,		"pread"		}, /* 173 */
-	{ -1,	0,	sys_pwrite,		"pwrite"	}, /* 174 */
-	{ -1,	0,	sys_llseek,		"llseek"	}, /* 175 */
-	{ -1,	0,	sys_inst_sync,		"inst_sync"	}, /* 176 */
-	{ -1,	0,	printargs,		"SYS_177"	}, /* 177 */
-	{ -1,	0,	printargs,		"SYS_178"	}, /* 178 */
-	{ -1,	0,	printargs,		"SYS_179"	}, /* 179 */
-	{ -1,	0,	printargs,		"SYS_180"	}, /* 180 */
-	{ -1,	0,	printargs,		"SYS_181"	}, /* 181 */
-	{ -1,	0,	printargs,		"SYS_182"	}, /* 182 */
-	{ -1,	0,	printargs,		"SYS_183"	}, /* 183 */
-	{ -1,	0,	printargs,		"SYS_184"	}, /* 184 */
-#ifdef HAVE_SYS_ACL_H
-	{ -1,	TF,	sys_acl,		"acl"		}, /* 185 */
-#else
-	{ -1,	0,	printargs,		"SYS_185"	}, /* 185 */
-#endif
-	{ -1,	0,	sys_auditsys,		"auditsys"	}, /* 186 */
-	{ -1,	0,	sys_processor_bind,	"processor_bind"}, /* 187 */
-	{ -1,	0,	sys_processor_info,	"processor_info"}, /* 188 */
-	{ -1,	0,	sys_p_online,		"p_online"	}, /* 189 */
-	{ -1,	0,	sys_sigqueue,		"sigqueue"	}, /* 190 */
-	{ -1,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 191 */
-	{ -1,	0,	sys_clock_settime,	"clock_settime"	}, /* 192 */
-	{ -1,	0,	sys_clock_getres,	"clock_getres"	}, /* 193 */
-	{ -1,	0,	sys_timer_create,	"timer_create"	}, /* 194 */
-	{ -1,	0,	sys_timer_delete,	"timer_delete"	}, /* 195 */
-	{ -1,	0,	sys_timer_settime,	"timer_settime"	}, /* 196 */
-	{ -1,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 197 */
-	{ -1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 198 */
-	{ -1,	0,	sys_nanosleep,		"nanosleep"	}, /* 199 */
-#ifdef HAVE_SYS_ACL_H
-	{ -1,	0,	sys_facl,		"facl"		}, /* 200 */
-#else
-	{ -1,	0,	printargs,		"SYS_200"	}, /* 200 */
-#endif
-#ifdef HAVE_SYS_DOOR_H
-	{ -1,	0,	sys_door,		"door"		}, /* 201 */
-#else
-	{ -1,	0,	printargs,		"SYS_201"	}, /* 201 */
-#endif
-	{ -1,	0,	sys_setreuid,		"setreuid"	}, /* 202 */
-	{ -1,	0,	sys_setregid,		"setregid"	}, /* 203 */
-	{ -1,	0,	printargs,		"SYS_204"	}, /* 204 */
-	{ -1,	0,	printargs,		"SYS_205"	}, /* 205 */
-	{ -1,	0,	printargs,		"SYS_206"	}, /* 206 */
-	{ -1,	0,	printargs,		"SYS_207"	}, /* 207 */
-	{ -1,	0,	printargs,		"SYS_208"	}, /* 208 */
-	{ -1,	0,	printargs,		"SYS_209"	}, /* 209 */
-#endif
 	{ -1,	0,	printargs,		"SYS_210"	}, /* 210 */
 	{ -1,	0,	printargs,		"SYS_211"	}, /* 211 */
 	{ -1,	0,	printargs,		"SYS_212"	}, /* 212 */
@@ -553,7 +475,7 @@
 	{ -1,	TN,	sys_xshutdown,		"xshutdown"	}, /* 246 */
 	{ -1,	TN,	sys_xsocket,		"xsocket"	}, /* 247 */
 	{ -1,	TN,	sys_xsocketpair,	"xsocketpair"	}, /* 248 */
-#else
+#else	/* UNIXWARE 2 */
 	{ -1,	0,	printargs,		"SYS_216"	}, /* 216 */
 	{ -1,	0,	printargs,		"SYS_217"	}, /* 217 */
 	{ -1,	0,	printargs,		"SYS_218"	}, /* 218 */
@@ -587,15 +509,145 @@
 	{ -1,	0,	printargs,		"SYS_246"	}, /* 246 */
 	{ -1,	0,	printargs,		"SYS_247"	}, /* 247 */
 	{ -1,	0,	printargs,		"SYS_248"	}, /* 248 */
-#endif
+#endif	/* UNIXWARE 2 */
 	{ -1,	0,	printargs,		"SYS_249"	}, /* 249 */
 	{ -1,	0,	printargs,		"SYS_250"	}, /* 250 */
-#endif /* !MIPS */
 	{ -1,	0,	printargs,		"SYS_251"	}, /* 251 */
 	{ -1,	0,	printargs,		"SYS_252"	}, /* 252 */
 	{ -1,	0,	printargs,		"SYS_253"	}, /* 253 */
 	{ -1,	0,	printargs,		"SYS_254"	}, /* 254 */
 	{ -1,	0,	printargs,		"SYS_255"	}, /* 255 */
+#else   /* !UNIXWARE */
+	{ -1,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
+	{ -1,	0,	sys_vtrace,		"vtrace"	}, /* 142 */
+	{ -1,	TP,	sys_fork1,		"fork1"		}, /* 143 */
+	{ -1,	TS,	sys_sigtimedwait,	"sigtimedwait"	}, /* 144 */
+	{ -1,	0,	sys_lwp_info,		"lwp_info"	}, /* 145 */
+	{ -1,	0,	sys_yield,		"yield"		}, /* 146 */
+	{ -1,	0,	sys_lwp_sema_wait,	"lwp_sema_wait"	}, /* 147 */
+	{ -1,	0,	sys_lwp_sema_post,	"lwp_sema_post"	}, /* 148 */
+	{ -1,	0,	sys_lwp_sema_trywait,"lwp_sema_trywait"	}, /* 149 */
+	{ -1,	0,	printargs,		"SYS_150"	}, /* 150 */
+	{ -1,	0,	printargs,		"SYS_151"	}, /* 151 */
+	{ -1,	0,	sys_modctl,		"modctl"	}, /* 152 */
+	{ -1,	0,	sys_fchroot,		"fchroot"	}, /* 153 */
+	{ -1,	TF,	sys_utimes,		"utimes"	}, /* 154 */
+	{ -1,	0,	sys_vhangup,		"vhangup"	}, /* 155 */
+	{ -1,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 156 */
+	{ -1,	0,	sys_getitimer,		"getitimer"	}, /* 157 */
+	{ -1,	0,	sys_setitimer,		"setitimer"	}, /* 158 */
+	{ -1,	0,	sys_lwp_create,		"lwp_create"	}, /* 159 */
+	{ -1,	0,	sys_lwp_exit,		"lwp_exit"	}, /* 160 */
+	{ -1,	0,	sys_lwp_suspend,	"lwp_suspend"	}, /* 161 */
+	{ -1,	0,	sys_lwp_continue,	"lwp_continue"	}, /* 162 */
+	{ -1,	0,	sys_lwp_kill,		"lwp_kill"	}, /* 163 */
+	{ -1,	0,	sys_lwp_self,		"lwp_self"	}, /* 164 */
+	{ -1,	0,	sys_lwp_setprivate,	"lwp_setprivate"}, /* 165 */
+	{ -1,	0,	sys_lwp_getprivate,	"lwp_getprivate"}, /* 166 */
+	{ -1,	0,	sys_lwp_wait,		"lwp_wait"	}, /* 167 */
+	{ -1,	0,	sys_lwp_mutex_unlock,	"lwp_mutex_unlock"}, /* 168 */
+	{ -1,	0,	sys_lwp_mutex_lock,	"lwp_mutex_lock"}, /* 169 */
+	{ -1,	0,	sys_lwp_cond_wait,	"lwp_cond_wait"}, /* 170 */
+	{ -1,	0,	sys_lwp_cond_signal,	"lwp_cond_signal"}, /* 171 */
+	{ -1,	0,	sys_lwp_cond_broadcast,	"lwp_cond_broadcast"}, /* 172 */
+	{ -1,	0,	sys_pread,		"pread"		}, /* 173 */
+	{ -1,	0,	sys_pwrite,		"pwrite"	}, /* 174 */
+	{ -1,	0,	sys_llseek,		"llseek"	}, /* 175 */
+	{ -1,	0,	sys_inst_sync,		"inst_sync"	}, /* 176 */
+	{ -1,	0,	printargs,		"srmlimitsys"	}, /* 177 */
+	{ -1,	0,	sys_kaio,		"kaio"		}, /* 178 */
+	{ -1,	0,	printargs,		"cpc"		}, /* 179 */
+	{ -1,	0,	printargs,		"SYS_180"	}, /* 180 */
+	{ -1,	0,	printargs,		"SYS_181"	}, /* 181 */
+	{ -1,	0,	printargs,		"SYS_182"	}, /* 182 */
+	{ -1,	0,	printargs,		"SYS_183"	}, /* 183 */
+	{ -1,	0,	sys_tsolsys,		"tsolsys"	}, /* 184 */
+#ifdef HAVE_SYS_ACL_H
+	{ -1,	TF,	sys_acl,		"acl"		}, /* 185 */
+#else
+	{ -1,	0,	printargs,		"SYS_185"	}, /* 185 */
+#endif
+	{ -1,	0,	sys_auditsys,		"auditsys"	}, /* 186 */
+	{ -1,	0,	sys_processor_bind,	"processor_bind"}, /* 187 */
+	{ -1,	0,	sys_processor_info,	"processor_info"}, /* 188 */
+	{ -1,	0,	sys_p_online,		"p_online"	}, /* 189 */
+	{ -1,	0,	sys_sigqueue,		"sigqueue"	}, /* 190 */
+	{ -1,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 191 */
+	{ -1,	0,	sys_clock_settime,	"clock_settime"	}, /* 192 */
+	{ -1,	0,	sys_clock_getres,	"clock_getres"	}, /* 193 */
+	{ -1,	0,	sys_timer_create,	"timer_create"	}, /* 194 */
+	{ -1,	0,	sys_timer_delete,	"timer_delete"	}, /* 195 */
+	{ -1,	0,	sys_timer_settime,	"timer_settime"	}, /* 196 */
+	{ -1,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 197 */
+	{ -1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 198 */
+	{ -1,	0,	sys_nanosleep,		"nanosleep"	}, /* 199 */
+#ifdef HAVE_SYS_ACL_H
+	{ -1,	0,	sys_facl,		"facl"		}, /* 200 */
+#else
+	{ -1,	0,	printargs,		"SYS_200"	}, /* 200 */
+#endif
+#ifdef HAVE_SYS_DOOR_H
+	{ -1,	0,	sys_door,		"door"		}, /* 201 */
+#else
+	{ -1,	0,	printargs,		"SYS_201"	}, /* 201 */
+#endif
+	{ -1,	0,	sys_setreuid,		"setreuid"	}, /* 202 */
+	{ -1,	0,	sys_setregid,		"setregid"	}, /* 203 */
+	{ -1,	0,	sys_install_utrap,	"install_utrap"	}, /* 204 */
+	{ -1,	0,	sys_signotify,		"signotify"	}, /* 205 */
+	{ -1,	0,	sys_schedctl,		"schedctl"	}, /* 206 */
+	{ -1,	0,	sys_pset,		"pset"	}, /* 207 */
+	{ -1,	0,	printargs,		"__sparc_utrap_install"	}, /* 208 */
+	{ -1,	0,	sys_resolvepath,	"resolvepath"	}, /* 209 */
+	{ -1,	0,	sys_signotifywait,	"signotifywait"	}, /* 210 */
+	{ -1,	0,	sys_lwp_sigredirect,	"lwp_sigredirect"	}, /* 211 */
+	{ -1,	0,	sys_lwp_alarm,		"lwp_alarm"	}, /* 212 */
+	{ -1,	0,	sys_getdents64,		"getdents64"	}, /* 213 */
+	{ -1,	0,	sys_mmap64,		"mmap64"	}, /* 214 */
+	{ -1,	0,	sys_stat64,		"stat64"	}, /* 215 */
+	{ -1,	0,	sys_lstat64,		"lstat64"	}, /* 216 */
+	{ -1,	0,	sys_fstat64,		"fstat64"	}, /* 217 */
+	{ -1,	0,	sys_statvfs64,		"statvfs64"	}, /* 218 */
+	{ -1,	0,	sys_fstatvfs64,		"fstatvfs64"	}, /* 219 */
+	{ -1,	0,	sys_setrlimit64,	"setrlimit64"	}, /* 220 */
+	{ -1,	0,	sys_getrlimit64,	"getrlimit64"	}, /* 221 */
+	{ -1,	0,	sys_pread64,		"pread64"	}, /* 222 */
+	{ -1,	0,	sys_pwrite64,		"pwrite64"	}, /* 223 */
+	{ -1,	0,	sys_creat64,		"creat64"	}, /* 224 */
+	{ -1,	0,	sys_open64,		"open64"	}, /* 225 */
+	{ -1,	0,	sys_rpcsys,		"rpcsys"	}, /* 226 */
+	{ -1,	0,	printargs,		"SYS_227"	}, /* 227 */
+	{ -1,	0,	printargs,		"SYS_228"	}, /* 228 */
+	{ -1,	0,	printargs,		"SYS_229"	}, /* 229 */
+	{ -1,	TN,	sys_so_socket,		"so_socket"	}, /* 230 */
+	{ -1,	TN,	sys_so_socketpair,	"so_socketpair"	}, /* 231 */
+	{ -1,	TN,	sys_bind,		"bind"		}, /* 232 */
+	{ -1,	TN,	sys_listen,		"listen"	}, /* 233 */
+	{ -1,	TN,	sys_accept,		"accept"	}, /* 234 */
+	{ -1,	TN,	sys_connect,		"connect"	}, /* 235 */
+	{ -1,	TN,	sys_shutdown,		"shutdown"	}, /* 236 */
+	{ -1,	TN,	sys_recv,		"recv"		}, /* 237 */
+	{ -1,	TN,	sys_recvfrom,		"recvfrom"	}, /* 238 */
+	{ -1,	TN,	sys_recvmsg,		"recvmsg"	}, /* 239 */
+	{ -1,	TN,	sys_send,		"send"		}, /* 240 */
+	{ -1,	TN,	sys_sendmsg,		"sendmsg"	}, /* 241 */
+	{ -1,	TN,	sys_sendto,		"sendto"	}, /* 242 */
+	{ -1,	TN,	sys_getpeername,	"getpeername"	}, /* 243 */
+	{ -1,	TN,	sys_getsockname,	"getsockname"	}, /* 244 */
+	{ -1,	TN,	sys_getsockopt,		"getsockopt"	}, /* 245 */
+	{ -1,	TN,	sys_setsockopt,		"setsockopt"	}, /* 246 */
+	{ -1,	TN,	sys_sockconfig,		"sockconfig"	}, /* 247 */
+	{ -1,	0,	sys_ntp_gettime,	"ntp_gettime"	}, /* 248 */
+	{ -1,	0,	sys_ntp_adjtime,	"ntp_adjtime"	}, /* 249 */
+	{ -1,	0,	sys_ntp_adjtime,	"ntp_adjtime"	}, /* 249 */
+	{ -1,	0,	printargs,		"lwp_mutex_unlock"	}, /* 250 */
+	{ -1,	0,	printargs,		"lwp_mutex_trylock"	}, /* 251 */
+	{ -1,	0,	printargs,		"lwp_mutex_init"	}, /* 252 */
+	{ -1,	0,	printargs,		"cladm"		}, /* 253 */
+	{ -1,	0,	printargs,		"lwp_sig_timedwait"	}, /* 254 */
+	{ -1,	0,	printargs,		"umount2"	}, /* 255 */
+#endif /* !UNIXWARE */
+#endif /* !MIPS */
 	{ -1,	0,	printargs,		"SYS_256"	}, /* 256 */
 	{ -1,	0,	printargs,		"SYS_257"	}, /* 257 */
 	{ -1,	0,	printargs,		"SYS_258"	}, /* 258 */
@@ -750,3 +802,27 @@
 	{ -1,	0,	printargs,		"SYS_397"	}, /* 397 */
 	{ -1,	0,	printargs,		"SYS_398"	}, /* 398 */
 	{ -1,	0,	printargs,		"SYS_399"	}, /* 399 */
+
+#ifdef HAVE_SYS_AIO_H
+	{ -1,	TF,	sys_aioread,		"aioread"	}, /* 400 */
+	{ -1,	TF,	sys_aiowrite,		"aiowrite"	}, /* 401 */
+	{ -1,	TF,	sys_aiowait,		"aiowait"	}, /* 402 */
+	{ -1,	TF,	sys_aiocancel,		"aiocancel"	}, /* 403 */
+	{ -1,	TF,	sys_aionotify,		"aionotify"	}, /* 404 */
+	{ -1,	TF,	sys_aioinit,		"aioinit"	}, /* 405 */
+	{ -1,	TF,	sys_aiostart,		"aiostart"	}, /* 406 */
+	{ -1,	TF,	sys_aiolio,		"aiolio"	}, /* 407 */
+	{ -1,	TF,	sys_aiosuspend,		"aiosuspend"	}, /* 408 */
+	{ -1,	TF,	sys_aioerror,		"aioerror"	}, /* 409 */
+	{ -1,	TF,	sys_aioliowait,		"aioliowait"	}, /* 410 */
+	{ -1,	TF,	sys_aioaread,		"aioaread"	}, /* 411 */
+	{ -1,	TF,	sys_aioawrite,		"aioawrite"	}, /* 412 */
+	{ -1,	TF,	sys_aiolio64,		"aiolio64"	}, /* 413 */
+	{ -1,	TF,	sys_aiosuspend64,	"aiosuspend64"	}, /* 414 */
+	{ -1,	TF,	sys_aioerror64,		"aioerror64"	}, /* 415 */
+	{ -1,	TF,	sys_aioliowait64,	"aioliowait64"	}, /* 416 */
+	{ -1,	TF,	sys_aioaread64,		"aioaread64"	}, /* 417 */
+	{ -1,	TF,	sys_aioawrite64,	"aioawrite64"	}, /* 418 */
+	{ -1,	TF,	sys_aiocancel64,	"aiocancel64"	}, /* 419 */
+	{ -1,	TF,	sys_aiofsync,		"aiofsync"	}, /* 420 */ 
+#endif
