@@ -976,7 +976,7 @@ struct tcb *tcp;
 		tcp->parent = NULL;
 	}
 
-	if (outfname && tcp->outf)
+	if (outfname && followfork > 1 && tcp->outf)
 		fclose(tcp->outf);
 
 	tcp->outf = 0;
