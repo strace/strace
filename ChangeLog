@@ -1,7 +1,7 @@
 2005-02-04  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.9.
-	* debian/changelog, strace.spec: 4.5.9-1.
+	* debian/changelog, strace.spec: 4.5.9-2.
 
 	* file.c (O_LARGEFILE): Omit when #undef'd because it was zero.
 
