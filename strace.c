@@ -991,6 +991,18 @@ struct tcb *tcp;
 	nprocs--;
 	tcp->pid = 0;
 
+	if (tcp->parent != NULL) {
+		tcp->parent->nchildren--;
+#ifdef TCB_CLONE_THREAD
+		if (tcp->flags & TCB_CLONE_DETACHED)
+			tcp->parent->nclone_detached--;
+		if (tcp->flags & TCB_CLONE_THREAD)
+			tcp->parent->nclone_threads--;
+#endif
+		tcp->parent = NULL;
+	}
+
+	tcp->flags = 0;
 	if (tcp->pfd != -1) {
 		close(tcp->pfd);
 		tcp->pfd = -1;
@@ -1005,25 +1017,14 @@ struct tcb *tcp;
 		}
 #endif /* !FREEBSD */
 #ifdef USE_PROCFS
-		rebuild_pollv();
+		rebuild_pollv(); /* Note, flags needs to be cleared by now.  */
 #endif
-	}
-	if (tcp->parent != NULL) {
-		tcp->parent->nchildren--;
-#ifdef TCB_CLONE_THREAD
-		if (tcp->flags & TCB_CLONE_DETACHED)
-			tcp->parent->nclone_detached--;
-		if (tcp->flags & TCB_CLONE_THREAD)
-			tcp->parent->nclone_threads--;
-#endif
-		tcp->parent = NULL;
 	}
 
 	if (outfname && followfork > 1 && tcp->outf)
 		fclose(tcp->outf);
 
 	tcp->outf = 0;
-	tcp->flags = 0;
 }
 
 #ifndef USE_PROCFS
