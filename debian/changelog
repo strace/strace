@@ -1,3 +1,16 @@
+strace (4.5.7-1) unstable; urgency=low
+
+  * New upstream version.
+    + Update man page about -c, closes: #254438.
+    + Include pread/pwrite calls in -e read/write tracing, closes: #239947.
+    + Update SO_* and IP_* value lists, closes: #171653.
+    + Print attribute values in *xattr system calls.
+    + Print clock_t values symbolically in Linux clock_* system calls.
+    + Show PER_* values correctly, closes: #40588.
+    + Punt `strace64' for sparc for now, closes: #254728.
+
+ -- Roland McGrath <frob@debian.org>  Tue, 31 Aug 2004 01:16:41 -0700
+
 strace (4.5.6-1) unstable; urgency=low
 
   * New upstream version.

@@ -1,3 +1,11 @@
+Changes in 4.5.7
+==============
+* Bug fixes.
+* Print attribute values in *xattr system calls on Linux.
+* Include pread and pwrite calls in -e read and -e write tracing.
+* Update SO_* and IP_* value lists and add IPV6_* values for socket options.
+* Print clock_t values symbolically in Linux clock_* system calls.
+
 Changes in 4.5.6
 ==============
 * Bug fixes, Linux ioctl updates.
