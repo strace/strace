@@ -75,7 +75,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Tue Aug 31 2004 Roland McGrath <roland@redhat.com> - 4.5.7-1
+* Tue Aug 31 2004 Roland McGrath <roland@redhat.com> - 4.5.7-2
 - new upstream version, misc fixes and updates (#128091, #129166, #128391, #129378, #130965, #131177)
 
 * Mon Jul 12 2004 Roland McGrath <roland@redhat.com> 4.5.6-1
