@@ -47,7 +47,7 @@
 #ifdef M68K
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 16 */
 #else
-	{ 3,	TF,	sys_chown,		"lchown"		}, /* 16 */
+	{ 3,	TF,	sys_chown,		"lchown"	}, /* 16 */
 #endif
 	{ 0,	0,	sys_break,		"break"		}, /* 17 */
 	{ 2,	TF,	sys_oldstat,		"oldstat"	}, /* 18 */
@@ -228,7 +228,7 @@
 #else
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 182 */
 #endif
-	{ 2,	0,	sys_getcwd,		"getcwd"	}, /* 183 */
+	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
@@ -236,41 +236,41 @@
 	{ 5,	0,	printargs,		"SYS_188"	}, /* 188 */
 	{ 5,	0,	printargs,		"SYS_189"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
-	{ 5,	0,	printargs,		"getrlimit"	}, /* 191 */
+	{ 2,	0,	printargs,		"getrlimit"	}, /* 191 */
 	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 192 */
-	{ 5,	0,	printargs,		"truncate64"	}, /* 193 */
-	{ 5,	0,	printargs,		"ftruncate64"	}, /* 194 */
+	{ 2,	TF,	printargs,		"truncate64"	}, /* 193 */
+	{ 2,	TF,	printargs,		"ftruncate64"	}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
 	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 197 */
-	{ 5,	0,	printargs,		"SYS_198"	}, /* 198 */
-	{ 5,	0,	printargs,		"SYS_199"	}, /* 199 */
+/*TODO*/{ 3,	TF,	printargs,		"lchown32"	}, /* 198 */
+/*TODO*/{ 0,	0,	printargs,		"getuid32"	}, /* 199 */
 
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 200 */
-	{ 4,	TI,	sys_semop,		"semop"		}, /* 201 */
-	{ 4,	TI,	sys_semget,		"semget"	}, /* 202 */
-	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 203 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 204 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 205 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 206 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 207 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 208 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 209 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 210 */
-	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 211 */
-	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 212 */
-	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 213 */
-	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 214 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 215 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 216 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 217 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 218 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 219 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 220 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 221 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 222 */
-	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 223 */
-	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 224 */
+	{ 0,	0,	printargs,		"getgid32"	}, /* 200 */
+	{ 0,	0,	printargs,		"geteuid32"	}, /* 201 */
+	{ 0,	0,	printargs,		"getegid32"	}, /* 202 */
+	{ 2,	0,	printargs,		"setreuid32"	}, /* 203 */
+	{ 2,	0,	printargs,		"setregid32"	}, /* 204 */
+	{ 2,	0,	printargs,		"getgroups32"	}, /* 205 */
+	{ 2,	0,	printargs,		"setgroups32"	}, /* 206 */
+	{ 3,	0,	printargs,		"fchown32"	}, /* 207 */
+	{ 3,	0,	printargs,		"setresuid32"	}, /* 208 */
+	{ 3,	0,	printargs,		"getresuid32"	}, /* 209 */
+	{ 3,	0,	printargs,		"setresgid32"	}, /* 210 */
+	{ 3,	0,	printargs,		"getsetgid32"	}, /* 211 */
+	{ 3,	TF,	printargs,		"chown32"	}, /* 212 */
+	{ 1,	0,	printargs,		"setuid32"	}, /* 213 */
+	{ 1,	0,	printargs,		"setgid32"	}, /* 214 */
+	{ 1,	0,	printargs,		"setfsuid32"	}, /* 215 */
+	{ 1,	0,	printargs,		"setfsgid32"	}, /* 216 */
+	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
+	{ 3,	0,	printargs,		"mincore"	}, /* 218 */
+	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
+	{ 4,	0,	printargs,		"SYS_220"	}, /* 220 */
+	{ 4,	0,	printargs,		"SYS_221"	}, /* 221 */
+	{ 4,	0,	printargs,		"SYS_222"	}, /* 222 */
+	{ 4,	0,	printargs,		"SYS_223"	}, /* 223 */
+	{ 4,	0,	printargs,		"SYS_224"	}, /* 224 */
 	{ 5,	0,	printargs,		"SYS_225"	}, /* 225 */
 	{ 5,	0,	printargs,		"SYS_226"	}, /* 226 */
 	{ 5,	0,	printargs,		"SYS_227"	}, /* 227 */
@@ -297,4 +297,31 @@
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 247 */
 	{ 5,	0,	printargs,		"SYS_248"	}, /* 248 */
 	{ 5,	0,	printargs,		"SYS_249"	}, /* 249 */
+
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 250 */
+	{ 4,	TI,	sys_semop,		"semop"		}, /* 251 */
+	{ 4,	TI,	sys_semget,		"semget"	}, /* 252 */
+	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 253 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 254 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 255 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 256 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 257 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 258 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 259 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 260 */
+	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 261 */
+	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 262 */
+	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 263 */
+	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 264 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 265 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 266 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 267 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 268 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 269 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 270 */
+	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 271 */
+	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 272 */
+	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 273 */
+	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 274 */
+
 

@@ -1,3 +1,22 @@
+2000-04-09  Wichert Akkerman <wakkerma@debian.org>
+
+  * README-linux: updated to note that strace might not compile
+    with development kernels
+  * bjm.c: sys_query_module: check if malloc succeeds
+  * system.c: sys_cap[gs]et(): check if malloc succeeds, only malloc once
+  * linux/syscallent.h: updated for 2.3.99pre3
+  * linux/alpha/syscallent.h: updated for 2.3.99pre3, add all osf syscalls
+    even though Linux doesn't implement them
+  * syscall.c: add global variables for MIPS registers as well
+  * syscall.c: move global variables to before get_scno since that uses them
+  * util.c: oops, misspelled defined
+  * process.c: fix ptrace calls in change_syscall
+  * mem.c: decode sys_madvise
+  * Merge patch from Topi Miettinen <Topi.Miettinen@nic.fi>
+    + add support for quotactl, fdatasync, mlock, mlockall, munlockall & acct
+    + small fix for RLIMIT_* and RUSAGE_BOTH
+    + enhace support for capget and capset
+
 2000-02-19 Wichert Akkerman <wakkerma@debian.org>
 
   * test/vfork.c: new file to test vfork traces

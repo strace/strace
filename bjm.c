@@ -102,14 +102,19 @@ struct tcb *tcp;
 				char*	mod	= data;
 				size_t	idx;
 
-				umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
-				for (idx=0; idx<ret; idx++) {
-					if (idx!=0)
-						tprintf(",");
-					tprintf(mod);
-					mod+=strlen(mod)+1;
+				if (data==NULL) {
+					fprintf(stderr, "sys_query_module: No memory\n");
+					tprintf(" /* %Zu entries */ ", ret);
+				} else {
+					umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
+					for (idx=0; idx<ret; idx++) {
+						if (idx!=0)
+							tprintf(",");
+						tprintf(mod);
+						mod+=strlen(mod)+1;
+					}
+					free(data);
 				}
-				free(data);
 			} else 
 				tprintf(" /* %Zu entries */ ", ret);
 			tprintf("}, %Zu", ret);
@@ -122,12 +127,17 @@ struct tcb *tcp;
 				struct module_symbol*	sym	= (struct module_symbol*)data;
 				size_t			idx;
 
-				umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
-				for (idx=0; idx<ret; idx++) {
-					tprintf("{name=%s, value=%lu} ", data+(long)sym->name, sym->value);
-					sym++;
+				if (data==NULL) {
+					fprintf(stderr, "sys_query_module: No memory\n");
+					tprintf(" /* %Zu entries */ ", ret);
+				} else {
+					umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
+					for (idx=0; idx<ret; idx++) {
+						tprintf("{name=%s, value=%lu} ", data+(long)sym->name, sym->value);
+						sym++;
+					}
+					free(data);
 				}
-				free(data);
 			} else
 				tprintf(" /* %Zu entries */ ", ret);
 			tprintf("}, %Zd", ret);

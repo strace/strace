@@ -161,6 +161,9 @@ static struct xlat sigvec_flags[] = {
 #ifdef HAVE_SIGACTION
 
 static struct xlat sigact_flags[] = {
+#ifdef SA_RESTORER
+	{ SA_RESTORER,	"SA_RESTORER"	},
+#endif
 #ifdef SA_STACK
 	{ SA_STACK,	"SA_STACK"	},
 #endif

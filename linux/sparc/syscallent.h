@@ -73,10 +73,10 @@
 	{ 1,	0,	printargs,	"vadvise" },		/* 72 */
 	{ 2,	0,	sys_munmap,	"munmap" },		/* 73 */
 	{ 3,	0,	sys_mprotect,	"mprotect" },		/* 74 */
-	{ 3,	0,	printargs,	"madvise" },		/* 75 */
+	{ 3,	0,	sys_madvise,	"madvise" },		/* 75 */
 	{ 1,	0,	sys_vhangup,	"vhangup" },		/* 76 */
-	{ 2,	0,	printargs,	"SYS_77" },		/* 77 */
-	{ 3,   0,	sys_mincore,	"mincore" },		/* 78 */
+	{ 2,	TF,	printargs,	"truncate64" },		/* 77 */
+	{ 3,	0,	sys_mincore,	"mincore" },		/* 78 */
 	{ 2,	0,	sys_getgroups,	"getgroups" },		/* 79 */
 	{ 2,	0,	sys_setgroups,	"setgroups" },		/* 80 */
 	{ 1,	0,	sys_getpgrp,	"getpgrp" },		/* 81 */
@@ -144,7 +144,8 @@
 	{ 0,	0,	printargs,	"SYS_143" },		/* 143 */
 	{ 2,	0,	sys_getrlimit,	"getrlimit" },		/* 144 */
 	{ 2,	0,	sys_setrlimit,	"setrlimit" },		/* 145 */
-	{ 2,	TS,	sys_killpg,	"killpg" },		/* 146 */
+	{ 2,	TF,	sys_pivotroot,	"pivot_root" },		/* 146 */
+/*	{ 2,	TS,	sys_killpg,	"killpg" },		   146 SunOS killpkg, overridden by Linux pivot_root */
 	{ 5,	0,	printargs,	"prctl" },		/* 147 */
 	{ 5,	0,	printargs,	"pciconfig_read" },	/* 148 */
 	{ 5,	0,	printargs,	"pciconfig_write" },	/* 149 */

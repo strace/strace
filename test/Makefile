@@ -2,8 +2,8 @@
 # $Id$
 #
 
-all: vfork fork sig skodic
+all: vfork fork sig skodic clone
 
 clean distclean:
-	rm -f vfork fork sig *.o core
+	rm -f clone vfork fork sig *.o core
 

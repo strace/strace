@@ -232,6 +232,7 @@ struct tcb *tcp;
 
 static struct xlat mremap_flags[] = {
 	{ MREMAP_MAYMOVE, "MREMAP_MAYMOVE" },
+	{ 0,		NULL		}
 };
 
 int
@@ -245,6 +246,59 @@ struct tcb *tcp;
 	}
 	return RVAL_HEX;
 }
+
+static struct xlat madvise_flags[] = {
+#ifdef MADV_NORMAL
+	{ MADV_NORMAL,		"MADV_NORMAL" },
+#endif
+#ifdef MADZV_RANDOM
+	{ MADV_RANDOM,		"MADV_RANDOM" },
+#endif
+#ifdef MADV_SEQUENTIAL
+	{ MADV_SEQUENTIAL,	"MADV_SEQUENTIAL" },
+#endif
+#ifdef MADV_WILLNEED
+	{ MADV_WILLNEED,	"MADV_WILLNEED" },
+#endif
+#ifdef MADV_DONTNED
+	{ MADV_DONTNEED,	"MADV_DONTNEED" },
+#endif
+	{ 0,			NULL },
+};
+
+
+int
+sys_madvise(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printflags(madvise_flags, tcp->u_arg[2]);
+	}
+	return 0;
+}
+
+
+static struct xlat mlockall_flags[] = {
+#ifdef MCL_CURRENT
+	{ MCL_CURRENT,	"MCL_CURRENT" },
+#endif
+#ifdef MCL_FUTURE
+	{ MCL_FUTURE,	"MCL_FUTURE" },
+#endif
+	{ 0,		NULL}
+};
+
+int
+sys_mlockall(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printflags(mlockall_flags, tcp->u_arg[0]);
+	}
+	return 0;
+}
+
 
 #endif /* LINUX */
 

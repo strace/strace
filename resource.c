@@ -36,6 +36,7 @@
 #ifdef LINUX
 #include <sys/times.h>
 #include <linux/kernel.h>
+#include <sys/quota.h>
 #endif /* LINUX */
 #ifdef SUNOS4
 #include <ufs/quota.h>
@@ -64,8 +65,14 @@ static struct xlat resources[] = {
 #ifdef RLIMIT_RSS
 	{ RLIMIT_RSS,	"RLIMIT_RSS"	},
 #endif
+#ifdef RLIMIT_NPROC
+	{ RLIMIT_NPROC,"RLIMIT_NPROC"	},
+#endif
 #ifdef RLIMIT_NOFILE
 	{ RLIMIT_NOFILE,"RLIMIT_NOFILE"	},
+#endif
+#ifdef RLIMIT_MEMLOCK
+	{ RLIMIT_MEMLOCK,	"RLIMIT_MEMLOCK"	},
 #endif
 #ifdef RLIMIT_VMEM
 	{ RLIMIT_VMEM,	"RLIMIT_VMEM"	},
@@ -140,6 +147,9 @@ struct tcb *tcp;
 static struct xlat usagewho[] = {
 	{ RUSAGE_SELF,		"RUSAGE_SELF"		},
 	{ RUSAGE_CHILDREN,	"RUSAGE_CHILDREN"	},
+#ifdef RUSAGE_BOTH
+	{ RUSAGE_BOTH,		"RUSAGE_BOTH"		},
+#endif
 	{ 0,			NULL			},
 };
 
@@ -366,6 +376,68 @@ struct tcb *tcp;
 }
 
 #endif /* !SUNOS4 */
+
+#ifdef LINUX
+
+static struct xlat quotacmds[] = {
+	{ Q_QUOTAON,	"Q_QUOTAON"	},
+	{ Q_QUOTAOFF,	"Q_QUOTAOFF"	},
+	{ Q_GETQUOTA,	"Q_GETQUOTA"	},
+	{ Q_SETQUOTA,	"Q_SETQUOTA"	},
+	{ Q_SETUSE,	"Q_SETUSE"	},
+	{ Q_SYNC,	"Q_SYNC"	},
+	{ Q_SETQLIM,	"Q_SETQLIM"	},
+	{ Q_GETSTATS,	"Q_GETSTATS"	},
+	{ Q_RSQUASH,	"Q_RSQUASH"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat quotatypes[] = {
+	{ USRQUOTA,	"USRQUOTA"	},
+	{ GRPQUOTA,	"GRPQUOTA"	},
+	{ 0,		NULL		},
+};
+
+int
+sys_quotactl(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printxval(quotacmds, tcp->u_arg[0] >> SUBCMDSHIFT, "Q_???");
+		tprintf("|");
+		printxval(quotatypes, tcp->u_arg[0] & SUBCMDMASK, "???QUOTA");
+		tprintf(", ");
+		printstr(tcp, tcp->u_arg[1], -1);
+		tprintf(", %lu, ", tcp->u_arg[2]);
+	}
+	else {
+		struct dqblk dq;
+
+		if (!tcp->u_arg[3])
+			tprintf("NULL");
+		else if (!verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[3]);
+                else if (umoven(tcp, tcp->u_arg[3], sizeof(struct dqblk),   
+                    (char *) &dq) < 0)
+                        tprintf("???");
+		else {
+                        tprintf("{");
+			tprintf("%u, ", dq.dqb_bhardlimit);
+			tprintf("%u, ", dq.dqb_bsoftlimit);
+			tprintf("%u, ", dq.dqb_curblocks);
+			tprintf("%u, ", dq.dqb_ihardlimit);
+			tprintf("%u, ", dq.dqb_isoftlimit);
+			tprintf("%u, ", dq.dqb_curinodes);
+			tprintf("%lu, ", dq.dqb_btime);
+			tprintf("%lu", dq.dqb_itime);
+                        tprintf("}");
+		}
+
+	}
+	return 0;
+}
+
+#endif /* Linux */
 
 #ifdef SUNOS4
 

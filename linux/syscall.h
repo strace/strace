@@ -71,7 +71,7 @@ int sys_setfsuid(), sys_setfsgid(), sys_llseek();
 int sys_getdents(), sys_flock(), sys_msync();
 int sys_readv(), sys_writev(), sys_select();
 int sys_getsid(), sys_fdatasync(), sys_sysctl();
-int sys_mlock(), sys_munlock(), sys_mlockall(), sys_munlockall();
+int sys_mlock(), sys_munlock(), sys_mlockall(), sys_munlockall(), sys_madvise();
 int sys_sched_setparam(), sys_sched_getparam();
 int sys_sched_setscheduler(), sys_sched_getscheduler(), sys_sched_yield();
 int sys_sched_get_priority_max(), sys_sched_get_priority_min();
@@ -82,7 +82,7 @@ int sys_sigaltstack(), sys_rt_sigprocmask(), sys_rt_sigaction();
 int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
 int sys_sendfile(), sys_old_mmap(), sys_stat64(), sys_lstat64(), sys_fstat64();
-int sys_truncate64(), sys_ftruncate64();
+int sys_truncate64(), sys_ftruncate64(), sys_pivotroot();
 
 
 /* sys_socketcall subcalls */
@@ -142,11 +142,11 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS)
+#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS) && !defined(SPARC)
 #ifdef POWERPC
 #  define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #else
-#  define SYS_ipc_subcall		200
+#  define SYS_ipc_subcall		250
 #endif
 #define SYS_semop		(SYS_ipc_subcall + 1)
 #define SYS_semget		(SYS_ipc_subcall + 2)
@@ -168,7 +168,7 @@ int sys_getpagesize();
 #endif
 
 #ifdef ALPHA
-int osf_statfs(), osf_fstatfs(), sys_madvise();
+int osf_statfs(), osf_fstatfs();
 #endif
 
 #ifdef IA64

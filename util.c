@@ -1301,7 +1301,7 @@ struct tcb *tcp;
 					eip, tcp->baddr);
 		return 0;
 	}
-#elif defied(POWERPC)
+#elif defined(POWERPC)
 	if (upeek(tcp->pid, 4*PT_NIP, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {

@@ -22,7 +22,7 @@ WARNFLAGS = @WARNFLAGS@
 
 # OS is one of `linux', `sunos4', or `svr4'.
 OS = @opsys@
-# ARCH is one of `i386', `m68k', `sparc', `arm' or `mips'.
+# ARCH is one of `i386', `m68k', `sparc', `arm', `mips' or `ia64'.
 ARCH = @arch@
 # OSARCH is OS/ARCH if it exists, otherwise just OS.
 OSARCH = @osarch@

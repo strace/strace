@@ -611,7 +611,7 @@ long addr;
 	realprintstat(tcp, &statbuf);
 }
 
-#ifdef STAT64
+#ifdef HAVE_STAT64
 static void
 printstat64(tcp, addr)
 struct tcb *tcp;
@@ -683,7 +683,7 @@ long addr;
 	else
 		tprintf("...}");
 }
-#endif /* STAT64 */
+#endif /* HAVE_STAT64 */
 
 #if defined(linux) && !defined(IA64)
 static void
@@ -1229,6 +1229,19 @@ struct tcb *tcp;
 }
 
 #endif /* SUNOS4 */
+
+int
+sys_pivotroot(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		printpath(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
 
 /* directory */
 int

@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-void
+int
 main(void)
 {
   char *c = (char*)0x94000000;
@@ -29,4 +29,5 @@ main(void)
     while (1)
       if ((fd=open( c, 0 ))!=-1)
 	  close(fd);
+  return 0;
 }

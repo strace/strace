@@ -36,16 +36,10 @@
 #define	sys_vm86old		printargs
 #define	sys_modify_ldt		printargs
 #define	sys_get_kernel_syms	printargs
-#define	sys_quotactl		printargs
 #define	sys_bdflush		printargs
 #define	sys_sysfs		printargs
 #define	sys_afs_syscall		printargs
 
-#define sys_fdatasync		printargs
-#define sys_mlock		printargs
-#define sys_munlock		printargs
-#define sys_mlockall		printargs
-#define sys_munlockall		printargs
 #define sys_sched_setparam	printargs
 #define sys_sched_getparam	printargs
 #define sys_sched_setscheduler	printargs
@@ -65,6 +59,10 @@
 #define	sys_setfsuid		sys_setuid
 #define	sys_setfsgid		sys_setgid
 #define sys_nanosleep		sys_adjtime
+#define	sys_acct		sys_chdir
+#define sys_fdatasync		sys_close
+#define sys_mlock		sys_munmap
+#define sys_munlock		sys_munmap
 
 /* printargs does the right thing */
 #define	sys_setup		printargs
@@ -81,6 +79,7 @@
 #define	sys_vhangup		printargs
 #define	sys_idle		printargs
 #define	sys_getpgid		printargs
+#define sys_munlockall		printargs
 
 /* subcall entry points */
 #define	sys_socketcall		printargs
@@ -91,7 +90,6 @@
 #define	sys_gtty		printargs
 #define	sys_ftime		printargs
 #define	sys_prof		printargs
-#define	sys_acct		printargs
 #define	sys_phys		printargs
 #define	sys_lock		printargs
 #define	sys_mpx			printargs
@@ -205,4 +203,6 @@
 #define sys_poll		printargs
 #define	sys_create_module	printargs
 #define	sys_init_module		printargs
+#define	sys_quotactl		printargs
+#define sys_mlockall		printargs
 #endif

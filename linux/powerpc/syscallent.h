@@ -118,7 +118,7 @@
 	{ 1,	0,	sys_swapon,		"swapon"		}, /* 87 */
 	{ 3,	0,	sys_reboot,		"reboot"		}, /* 88 */
 	{ 3,	0,	sys_readdir,		"readdir"		}, /* 89 */
-	{ 6,	0,	sys_mmap,		"mmap"			}, /* 90 */
+	{ 6,	0,	sys_old_mmap,		"mmap"			}, /* 90 */
 	{ 2,	0,	sys_munmap,		"munmap"		}, /* 91 */
 	{ 2,	TF,	sys_truncate,		"truncate"		}, /* 92 */
 	{ 2,	0,	sys_ftruncate,		"ftruncate"		}, /* 93 */
@@ -215,17 +215,17 @@
 	{ 2,	0,	sys_capset,		"capset"		}, /* 184 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"		}, /* 185 */
 	{ 4,	TF,	sys_sendfile,		"sendfile"		}, /* 186 */
-	{ 5,	0,	printargs,		"streams1"		}, /* 187 */
-	{ 5,	0,	printargs,		"streams2"		}, /* 188 */
-	{ 5,	0,	printargs,		"SYS_189"		}, /* 189 */
-	{ 5,	0,	printargs,		"SYS_190"		}, /* 190 */
-	{ 5,	0,	printargs,		"SYS_191"		}, /* 191 */
-	{ 5,	0,	printargs,		"SYS_192"		}, /* 192 */
-	{ 5,	0,	printargs,		"SYS_193"		}, /* 193 */
-	{ 5,	0,	printargs,		"SYS_194"		}, /* 194 */
-	{ 5,	0,	printargs,		"SYS_195"		}, /* 195 */
-	{ 5,	0,	printargs,		"SYS_196"		}, /* 196 */
-	{ 5,	0,	printargs,		"SYS_197"		}, /* 197 */
+	{ 5,	0,	printargs,		"getpmsg"		}, /* 187 */
+	{ 5,	0,	printargs,		"putpmsg"		}, /* 188 */
+	{ 0,	TP,	sys_vfork,		"vfork"			}, /* 189 */
+	{ -1,	0,	printargs,		"SYS_190"		}, /* 190 */
+	{ 2,	0,	printargs,		"ugetrlimit"		}, /* 191 */
+	{ 5,	0,	sys_mmap,		"mmap2"			}, /* 192 */
+	{ 2,	TF,	printargs,		"truncate64"		}, /* 193 */
+	{ 5,	0,	printargs,		"ftruncate64"		}, /* 194 */
+	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 195 */
+	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 196 */
+	{ 2,	TF,	sys_fstat64,		"fstat64"		}, /* 197 */
 	{ 5,	0,	printargs,		"SYS_198"		}, /* 198 */
 	{ 5,	0,	printargs,		"SYS_199"		}, /* 199 */
 	{ 5,	0,	printargs,		"SYS_200"		}, /* 200 */

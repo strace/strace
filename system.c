@@ -1364,19 +1364,87 @@ struct tcb *tcp;
 #endif /* SVR4 */
 
 #ifdef SYS_capget
+
+static struct xlat capabilities[] = {
+	{ 1<<CAP_CHOWN,		"CAP_CHOWN"	},
+	{ 1<<CAP_DAC_OVERRIDE,	"CAP_DAC_OVERRIDE"},
+	{ 1<<CAP_DAC_READ_SEARCH,"CAP_DAC_READ_SEARCH"},
+	{ 1<<CAP_FOWNER,	"CAP_FOWNER"	},
+	{ 1<<CAP_FSETID,	"CAP_FSETID"	},
+	{ 1<<CAP_KILL,		"CAP_KILL"	},
+	{ 1<<CAP_SETGID,	"CAP_SETGID"	},
+	{ 1<<CAP_SETUID,	"CAP_SETUID"	},
+	{ 1<<CAP_SETPCAP,	"CAP_SETPCAP"	},
+	{ 1<<CAP_LINUX_IMMUTABLE,"CAP_LINUX_IMMUTABLE"},
+	{ 1<<CAP_NET_BIND_SERVICE,"CAP_NET_BIND_SERVICE"},
+	{ 1<<CAP_NET_BROADCAST,	"CAP_NET_BROADCAST"},
+	{ 1<<CAP_NET_ADMIN,	"CAP_NET_ADMIN"	},
+	{ 1<<CAP_NET_RAW,	"CAP_NET_RAW"	},
+	{ 1<<CAP_IPC_LOCK,	"CAP_IPC_LOCK"	},
+	{ 1<<CAP_IPC_OWNER,	"CAP_IPC_OWNER"	},
+	{ 1<<CAP_SYS_MODULE,	"CAP_SYS_MODULE"},
+	{ 1<<CAP_SYS_RAWIO,	"CAP_SYS_RAWIO"	},
+	{ 1<<CAP_SYS_CHROOT,	"CAP_SYS_CHROOT"},
+	{ 1<<CAP_SYS_PTRACE,	"CAP_SYS_PTRACE"},
+	{ 1<<CAP_SYS_PACCT,	"CAP_SYS_PACCT"	},
+	{ 1<<CAP_SYS_ADMIN,	"CAP_SYS_ADMIN"	},
+	{ 1<<CAP_SYS_BOOT,	"CAP_SYS_BOOT"	},
+	{ 1<<CAP_SYS_NICE,	"CAP_SYS_NICE"	},
+	{ 1<<CAP_SYS_RESOURCE,	"CAP_SYS_RESOURCE"},
+	{ 1<<CAP_SYS_TIME,	"CAP_SYS_TIME"	},
+	{ 1<<CAP_SYS_TTY_CONFIG,"CAP_SYS_TTY_CONFIG"},
+	{ 0,                    NULL            },
+};
+
+
 int
 sys_capget(tcp)
 struct tcb *tcp;
 {
-	cap_user_header_t       arg0;
-	cap_user_data_t         arg1;
+	static cap_user_header_t       arg0 = NULL;
+	static cap_user_data_t         arg1 = NULL;
 
 	if(!entering(tcp)) {
-		arg0 = (cap_user_header_t)tcp->u_arg[0];
-		arg1 = (cap_user_data_t)tcp->u_arg[1];
-		tprintf("{%lx, %d}, ", (unsigned long)arg0->version, arg0->pid);
-		tprintf("{%lx, %lx, %lx}", (unsigned long)arg1->effective,
-			(unsigned long)arg1->permitted, (unsigned long)arg1->inheritable);
+		if (!arg0) {
+			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
+				fprintf(stderr, "sys_capget: no memory\n");
+				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
+				return;l
+			}
+		}
+		if (!arg1) {
+			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
+				fprintf(stderr, "sys_capget: no memory\n");
+				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
+				return;
+			}
+		}
+
+		if (!tcp->u_arg[0])
+			tprintf("NULL");
+		else if (!verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[0]);
+		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0), (char *) arg0) < 0)
+			tprintf("???");
+		else {
+			tprintf("%#x, %d", arg0->version, arg0->pid);
+		}
+		tprintf(", ");
+		if (!tcp->u_arg[1])
+			tprintf("NULL");
+		else if (!verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1), (char *) arg1) < 0)
+			tprintf("???");
+		else {
+			tprintf("{");
+			printflags(capabilities, arg1->effective);
+			tprintf(", ");
+			printflags(capabilities, arg1->permitted);
+			tprintf(", ");
+			printflags(capabilities, arg1->inheritable);
+			tprintf("}");
+		} 
 	}
 	return 0;
 }
@@ -1385,15 +1453,50 @@ int
 sys_capset(tcp)
 struct tcb *tcp;
 {
-	cap_user_header_t       arg0;
-	cap_user_data_t         arg1;
+	static cap_user_header_t       arg0 = NULL;
+	static cap_user_data_t         arg1 = NULL;
 
-   	if(entering(tcp)) {
-		arg0 = (cap_user_header_t)tcp->u_arg[0];
-		arg1 = (cap_user_data_t)tcp->u_arg[1];
-		tprintf("{%lx, %d}, ", (unsigned long)arg0->version, arg0->pid);
-		tprintf("{%lx, %lx, %lx}", (unsigned long)arg1->effective,
-			(unsigned long)arg1->permitted, (unsigned long)arg1->inheritable);
+	if(entering(tcp)) {
+		if (!arg0) {
+			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
+				fprintf(stderr, "sys_capset: no memory\n");
+				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
+				return;l
+			}
+		}
+		if (!arg1) {
+			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
+				fprintf(stderr, "sys_capset: no memory\n");
+				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
+				return;
+			}
+		}
+
+		if (!tcp->u_arg[0])
+			tprintf("NULL");
+		else if (!verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[0]);
+		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0), (char *) arg0) < 0)
+			tprintf("???");
+		else {
+			tprintf("%#x, %d", arg0->version, arg0->pid);
+		}
+		tprintf(", ");
+		if (!tcp->u_arg[1])
+			tprintf("NULL");
+		else if (!verbose(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1), (char *) arg1) < 0)
+			tprintf("???");
+		else {
+			tprintf("{");
+			printflags(capabilities, arg1->effective);
+			tprintf(", ");
+			printflags(capabilities, arg1->permitted);
+			tprintf(", ");
+			printflags(capabilities, arg1->inheritable);
+			tprintf("}");
+		} 
 	}
 	return 0;
 }

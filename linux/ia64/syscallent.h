@@ -1236,7 +1236,7 @@
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 1204 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 1205 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 1206 */
-	{ 8,	0,	printargs,		"SYS_1207"	}, /* 1207 */
+	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 1207 */
 	{ 8,	0,	printargs,		"SYS_1208"	}, /* 1208 */
 	{ 8,	0,	printargs,		"SYS_1209"	}, /* 1209 */
 	{ 8,	0,	printargs,		"SYS_1210"	}, /* 1210 */

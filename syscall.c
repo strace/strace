@@ -569,6 +569,34 @@ struct tcb *tcp;
 	return 0;
 }
 
+
+#ifdef LINUX
+#if defined (I386)
+	static long eax;
+#elif defined (IA64)
+	long r8, r10, psr;
+	long ia32 = 0;
+#elif defined (POWERPC)
+	static long result,flags;
+#elif defined (M68K)
+	static int d0;
+#elif defined (ARM)
+	static int r0;
+#elif defined (ALPHA)
+	static long r0;
+	static long a3;
+#elif defined (SPARC)
+	static struct pt_regs regs;
+	static unsigned long trap;
+#elif defined(MIPS)
+	static long a3;
+	static long r2;
+#elif defined(S390)
+	static long gpr2;
+	static long pc;
+#endif 
+#endif /* LINUX */
+
 int
 get_scno(tcp)
 struct tcb *tcp;
@@ -751,29 +779,6 @@ struct tcb *tcp;
 	return 1;
 }
 
-#ifdef LINUX
-#if defined (I386)
-	static long eax;
-#elif defined (IA64)
-	long r8, r10, psr;
-	long ia32 = 0;
-#elif defined (POWERPC)
-	static long result,flags;
-#elif defined (M68K)
-	static int d0;
-#elif defined (ARM)
-	static int r0;
-#elif defined (ALPHA)
-	static long r0;
-	static long a3;
-#elif defined (SPARC)
-	static struct pt_regs regs;
-	static unsigned long trap;
-#elif defined(S390)
-	static long gpr2;
-	static long pc;
-#endif 
-#endif /* LINUX */
 
 int
 syscall_fixup(tcp)

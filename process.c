@@ -392,15 +392,15 @@ int new;
 	    	return -1;
 	return 0;
 #elif defined(M68K)
-	if (ptrace(PTRACE_POKEUSER, (char*)(4*PT_ORIG_D0), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new)<0)
 	    	return -1;
 	return 0;
 #elif defined(MIPS)
-	if (ptrace(PTRACE_POKEUSER, (char*)(REG_V0), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), new)<0)
 	    	return -1;
 	return 0;
 #elif defined(ALPHA)
-	if (ptrace(PTRACE_POKEUSER, (char*)(REG_A3), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new)<0)
 	    	return -1;
 	return 0;
 #else
