@@ -39,7 +39,7 @@ bad_defines='cg[48]var\.h|READSLICE|I_E_RECVFD|FBIOGPIXRECT|JTIMO|TTYTYPE|TIOCCO
 	cd $1 || exit
 	find sys -name '*.h' -print |
 		xargs grep '^[	 ]*#[	 ]*define[	 ][ 	]*[A-Z_][A-Za-z0-9_]*[ 	][	 ]*([A-Za-z_][A-Za-z0-9_]*|[0-9][0-9]*)' /dev/null |
-		sed 's/\(.*\):#[ 	]*define[ 	]*\([A-Z_][A-Za-z0-9_]*\)[ 	]*\(([^)]*)\)[ 	]*\(.*\)/	{ "\1",	"\2",	\2	},	\4/'
+		sed 's/\(.*\):#[ 	]*define[ 	]*\([A-Z_][A-Za-z0-9_]*\)[ 	]*\(([^)]*)\)[ 	]*\(.*\)/	{ "\1",	"\2",	\2	},	\4 \/**\//'
 ) >ioctlent.tmp
 cat ioctlent.tmp |
 	awk '{ print "#include <" substr($2, 2, length($2) - 3) ">" }' |
