@@ -1,5 +1,17 @@
 2002-12-15  Roland McGrath  <roland@redhat.com>
 
+	* process.c (setarg) [POWERPC]: Support it.
+
+	* util.c [POWERPC] (LOOP): Fix value, now 0x48000000 (0: b 0b).
+	Old value was bogus, not even a proper instruction.
+	From Guy M. Streeter <streeter@redhat.com>.
+
+	* strace.c (main) [! USE_PROCFS]: Always reset SIGCHLD to SIG_DFL.
+
+	* configure.in: Don't check for putpmsg.
+	* stream.c (sys_getpmsg, sys_putpmsg): Make these conditional on
+	#ifdef SYS_*, rather than on HAVE_PUTPMSG.
+
 	* aclocal.m4 (AC_STAT64): Include <linux/types.h> before <asm/stat.h>
 	in test.  Test our own #ifdef LINUX rather than predefined `linux'.
 
