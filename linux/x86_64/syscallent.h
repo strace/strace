@@ -230,3 +230,39 @@
 	{ 5,	0,	printargs,		"SYS_229"	}, /* 229 */
 	{ 5,	0,	printargs,		"SYS_230"	}, /* 230 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 231 */
+	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
+	{ 5,	0,	printargs,		"restart_syscall"}, /* 219 */
+	{ 5,	0,	printargs,		"semtimedop"	}, /* 220 */
+	{ 5,	0,	printargs,		"fadvise64"	}, /* 221 */
+	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 222 */
+	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 223 */
+	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 224 */
+	{ 1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 225 */
+	{ 1,	0,	sys_timer_delete,	"timer_delete"	}, /* 226 */
+	{ 2,	0,	sys_clock_settime,	"clock_settime"	}, /* 227 */
+	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 228 */
+	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 229 */
+	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 230 */
+	{ 5,	0,	printargs,		"exit_group"	}, /* 231 */
+	{ 5,	0,	printargs,		"epoll_wait"	}, /* 232 */
+	{ 5,	0,	printargs,		"epoll_ctl"	}, /* 233 */
+	{ 5,	0,	printargs,		"tgkill"	}, /* 234 */
+	{ 5,	0,	printargs,		"utimes"	}, /* 235 */
+	{ 5,	0,	printargs,		"vserver"	}, /* 236 */
+	{ 5,	0,	printargs,		"mbind"		}, /* 237 */
+	{ 5,	0,	printargs,		"set_mempolicy"	}, /* 238 */
+	{ 5,	0,	printargs,		"get_mempolicy"	}, /* 239 */
+	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 240 */
+	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 241 */
+	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 242 */
+	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 243 */
+	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 244 */
+	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 245 */
+	{ 5,	0,	printargs,		"kexec_load"	}, /* 246 */
+	{ 5,	0,	printargs,		"SYS_247"	}, /* 247 */
+	{ 5,	0,	printargs,		"SYS_248"	}, /* 248 */
+	{ 5,	0,	printargs,		"SYS_249"	}, /* 249 */
+	{ 5,	0,	printargs,		"SYS_250"	}, /* 250 */
+	{ 5,	0,	printargs,		"SYS_251"	}, /* 251 */
+	{ 5,	0,	printargs,		"SYS_252"	}, /* 252 */
+	{ 5,	0,	printargs,		"waitid"	}, /* 253 */
