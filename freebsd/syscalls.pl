@@ -110,11 +110,15 @@ while (<MASTER>) {
 	$_ = "$_$line";
     }
 
-    if (/^(\d+)\s+(?:MPSAFE\s+)?\w+\s+\w+\s+\{\s*([^}]+)\s*\}([^}]*)$/) {
-	my($proto, $ext, $name, $nargs, @args, $pfunc, $cat);
-	
-	$proto = $2;
-	$ext = $3;
+    if (/^(\d+)\s+(?:MPSAFE\s+)?(\w+)\s+\w+\s+\{\s*([^}]+)\s*\}([^}]*)$/) {
+	my($compat, $proto, $ext, $name, $nargs, @args, $pfunc, $cat);
+
+	next if $2 eq 'OBSOL' || $2 eq 'UNIMPL';
+
+	$compat = $2 eq 'COMPAT' ? '?' : "";
+
+	$proto = $3;
+	$ext = $4;
 	
 	if ($1 > $sysnum) { # syscall gap
 	    while($sysnum < $1) {
@@ -142,6 +146,7 @@ while (<MASTER>) {
 	    } else {
 		$cat = "0";
 	    }
+	    $name .= $compat;
 	    print "  { $nargs,\t$cat,\t$pfunc,\t\"$name\"\t}, /* $sysnum */\n";
 	    $sysnum++;
 	} else {

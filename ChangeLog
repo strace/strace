@@ -1,5 +1,13 @@
 2001-03-08  John Hughes <john@Calva.COM>
 
+  * freebsd/syscalls.pl: On FreeBSD we must cope with COMPATibility syscalls,
+    pretend they have names ending with "?" so that -e trace=stat (for
+    example) will work.
+  * freebsd/i386/syscallent.h: add ? to compatability syscalls.
+  * freebsd/i386/syscall.h: consistency.
+
+2001-03-08  John Hughes <john@Calva.COM>
+
   * acconfig.h: add new ST_xxx defines.
   * aclocal.m4: macros to check for more fields in struct stat.
   * configure.in: use new macros to check for fields in struct stat.
