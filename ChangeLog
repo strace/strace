@@ -1,3 +1,8 @@
+2005-03-06  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (trace) [PTRACE_GETSIGINFO]: Fetch siginfo_t for SIGSEGV
+	and SIGBUS signals, use si_addr in output.
+
 2005-03-01  Roland McGrath  <roland@redhat.com>
 
 	* file.c (print_xattr_val): Add a cast.
