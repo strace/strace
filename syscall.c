@@ -124,26 +124,26 @@
 #define TP TRACE_PROCESS
 #define TS TRACE_SIGNAL
 
-struct sysent sysent0[] = {
+static const struct sysent sysent0[] = {
 #include "syscallent.h"
 };
-int nsyscalls0 = sizeof sysent0 / sizeof sysent0[0];
+static const int nsyscalls0 = sizeof sysent0 / sizeof sysent0[0];
 
 #if SUPPORTED_PERSONALITIES >= 2
-struct sysent sysent1[] = {
+static const struct sysent sysent1[] = {
 #include "syscallent1.h"
 };
-int nsyscalls1 = sizeof sysent1 / sizeof sysent1[0];
+static const int nsyscalls1 = sizeof sysent1 / sizeof sysent1[0];
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
-struct sysent sysent2[] = {
+static const struct sysent sysent2[] = {
 #include "syscallent2.h"
 };
-int nsyscalls2 = sizeof sysent2 / sizeof sysent2[0];
+static const int nsyscalls2 = sizeof sysent2 / sizeof sysent2[0];
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
-struct sysent *sysent;
+const struct sysent *sysent;
 int nsyscalls;
 
 /* Now undef them since short defines cause wicked namespace pollution. */
@@ -153,26 +153,26 @@ int nsyscalls;
 #undef TP
 #undef TS
 
-char *errnoent0[] = {
+static const char *const errnoent0[] = {
 #include "errnoent.h"
 };
-int nerrnos0 = sizeof errnoent0 / sizeof errnoent0[0];
+static const int nerrnos0 = sizeof errnoent0 / sizeof errnoent0[0];
 
 #if SUPPORTED_PERSONALITIES >= 2
-char *errnoent1[] = {
+static const char *const errnoent1[] = {
 #include "errnoent1.h"
 };
-int nerrnos1 = sizeof errnoent1 / sizeof errnoent1[0];
+static const int nerrnos1 = sizeof errnoent1 / sizeof errnoent1[0];
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
-char *errnoent2[] = {
+static const char *const errnoent2[] = {
 #include "errnoent2.h"
 };
-int nerrnos2 = sizeof errnoent2 / sizeof errnoent2[0];
+static const int nerrnos2 = sizeof errnoent2 / sizeof errnoent2[0];
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
-char **errnoent;
+const char *const *errnoent;
 int nerrnos;
 
 int current_personality;

@@ -153,26 +153,26 @@ struct sigcontext
 #endif
 #endif /* LINUX */
 
-char *signalent0[] = {
+const char *const signalent0[] = {
 #include "signalent.h"
 };
-int nsignals0 = sizeof signalent0 / sizeof signalent0[0];
+const int nsignals0 = sizeof signalent0 / sizeof signalent0[0];
 
 #if SUPPORTED_PERSONALITIES >= 2
-char *signalent1[] = {
+const char *const signalent1[] = {
 #include "signalent1.h"
 };
-int nsignals1 = sizeof signalent1 / sizeof signalent1[0];
+const int nsignals1 = sizeof signalent1 / sizeof signalent1[0];
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
-char *signalent2[] = {
+const char *const signalent2[] = {
 #include "signalent2.h"
 };
-int nsignals2 = sizeof signalent2 / sizeof signalent2[0];
+const int nsignals2 = sizeof signalent2 / sizeof signalent2[0];
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
-char **signalent;
+const char *const *signalent;
 int nsignals;
 
 #if defined(SUNOS4) || defined(FREEBSD)
@@ -262,7 +262,7 @@ static const struct xlat sigprocmaskcmds[] = {
 #endif
 #endif
 
-char *
+const char *
 signame(sig)
 int sig;
 {

@@ -451,7 +451,7 @@ extern int clearbpt P((struct tcb *));
 extern int setbpt P((struct tcb *));
 extern int sigishandled P((struct tcb *, int));
 extern void printcall P((struct tcb *));
-extern char *signame P((int));
+extern const char *signame P((int));
 extern void printsignal P((int));
 extern void printleader P((struct tcb *));
 extern void printtrailer P((struct tcb *));
@@ -469,8 +469,8 @@ extern int internal_exec P((struct tcb *));
 extern int internal_wait P((struct tcb *, int));
 extern int internal_exit P((struct tcb *));
 
-extern struct ioctlent *ioctl_lookup P((long));
-extern struct ioctlent *ioctl_next_match P((struct ioctlent *));
+extern const struct ioctlent *ioctl_lookup P((long));
+extern const struct ioctlent *ioctl_next_match P((const struct ioctlent *));
 extern int ioctl_decode P((struct tcb *, long, long));
 extern int term_ioctl P((struct tcb *, long, long));
 extern int sock_ioctl P((struct tcb *, long, long));
@@ -523,49 +523,44 @@ struct sysent {
 	int	nargs;
 	int	sys_flags;
 	int	(*sys_func)();
-	char	*sys_name;
+	const char *sys_name;
 };
 
-extern struct sysent *sysent;
+extern const struct sysent *sysent;
 extern int nsyscalls;
 
-extern char **errnoent;
+extern const char *const *errnoent;
 extern int nerrnos;
 
 struct ioctlent {
-	char *doth;
-	char *symbol;
+	const char *doth;
+	const char *symbol;
 	unsigned long code;
 };
 
-extern struct ioctlent *ioctlent;
-extern int nioctlent;
-
-extern char **signalent;
-extern int nsignals;
-
-extern struct ioctlent *ioctlent;
+extern const struct ioctlent *ioctlent;
 extern int nioctlents;
-extern char **signalent;
+
+extern const char *const *signalent;
 extern int nsignals;
 
-extern struct ioctlent ioctlent0[];
-extern int nioctlents0;
-extern char *signalent0[];
-extern int nsignals0;
+extern const struct ioctlent ioctlent0[];
+extern const int nioctlents0;
+extern const char *const signalent0[];
+extern const int nsignals0;
 
 #if SUPPORTED_PERSONALITIES >= 2
-extern struct ioctlent ioctlent1[];
-extern int nioctlents1;
-extern char *signalent1[];
-extern int nsignals1;
+extern const struct ioctlent ioctlent1[];
+extern constint nioctlents1;
+extern const char *const signalent1[];
+extern const int nsignals1;
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
-extern struct ioctlent ioctlent2[];
-extern int nioctlents2;
-extern char *signalent2[];
-extern int nsignals2;
+extern const struct ioctlent ioctlent2[];
+extern const int nioctlents2;
+extern const char *const signalent2[];
+extern constint nsignals2;
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 #if defined(FREEBSD) || (defined(LINUX) \

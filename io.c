@@ -353,7 +353,7 @@ int
 sys_ioctl(tcp)
 struct tcb *tcp;
 {
-	struct ioctlent *iop;
+	const struct ioctlent *iop;
 
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
