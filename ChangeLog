@@ -1,5 +1,10 @@
 2001-03-31  Wichert Akkerman <wakkerma@debian.org>
 
+  * linux/{alpha,ia64,powerpc}/ioctlent.sh: removed, all archs use the
+    general Linux ioctlent.sh
+
+2001-03-31  Wichert Akkerman <wakkerma@debian.org>
+
   * linux/ioctlent.sh: add dir variable for location of kernel headers
 
 2001-03-29  Wichert Akkerman <wakkerma@debian.org>
