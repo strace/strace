@@ -116,6 +116,10 @@ struct stat {
 #  include <sys/stat.h>
 #  undef stat
 #  undef stat64
+   /* These might be macros. */
+#  undef st_atime
+#  undef st_mtime
+#  undef st_ctime
 #  ifdef HPPA
 #    define stat64 hpux_stat64
 #  endif
