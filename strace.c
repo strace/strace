@@ -621,6 +621,7 @@ int pid;
 			tcp->pid = pid;
 			tcp->parent = NULL;
 			tcp->nchildren = 0;
+			tcp->nzombies = 0;
 #ifdef TCB_CLONE_THREAD
 			tcp->nclone_threads = tcp->nclone_detached = 0;
 			tcp->nclone_waiting = 0;
@@ -1011,6 +1012,10 @@ struct tcb *tcp;
 		if (tcp->flags & TCB_CLONE_THREAD)
 			tcp->parent->nclone_threads--;
 #endif
+#ifdef TCB_CLONE_DETACHED
+		if (!(tcp->flags & TCB_CLONE_DETACHED))
+#endif
+			tcp->parent->nzombies++;
 		tcp->parent = NULL;
 	}
 

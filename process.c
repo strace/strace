@@ -1774,7 +1774,17 @@ struct tcb *tcp;
 		/* ??? WTA: fix bug with hanging children */
 
 		if (!(tcp->u_arg[2] & WNOHANG)) {
-			/* There are traced children */
+			/*
+			 * There are traced children.  We'll make the parent
+			 * block to avoid a false ECHILD error due to our
+			 * ptrace having stolen the children.  However,
+			 * we shouldn't block if there are zombies to reap.
+			 * XXX doesn't handle pgrp matches (u_arg[0]==0,<-1)
+			 */
+			if (tcp->nzombies > 0 &&
+			    (tcp->u_arg[0] == -1 ||
+			     pid2tcb(tcp->u_arg[0]) == NULL))
+				return 0;
 			tcp->flags |= TCB_SUSPENDED;
 			tcp->waitpid = tcp->u_arg[0];
 #ifdef TCB_CLONE_THREAD
@@ -1794,6 +1804,14 @@ struct tcb *tcp;
 			fprintf(stderr,
 				"internal_wait: should not have resumed %d\n",
 				tcp->pid);
+	}
+	else if (exiting(tcp) && tcp->u_error == 0 && tcp->u_rval > 0 &&
+		 tcp->nzombies > 0 && pid2tcb(tcp->u_rval) == NULL) {
+		/*
+		 * We just reaped a child we don't know about,
+		 * presumably a zombie we already droptcb'd.
+		 */
+		tcp->nzombies--;
 	}
 	return 0;
 }

@@ -263,6 +263,7 @@ struct tcb {
 	struct tcb *parent;	/* Parent of this process */
 	int nchildren;		/* # of traced children */
 	int waitpid;		/* pid(s) this process is waiting for */
+	int nzombies;		/* # of formerly traced children now dead */
 #ifdef LINUX
 	int nclone_threads;	/* # of nchildren with CLONE_THREAD */
 	int nclone_detached;	/* # of nchildren with CLONE_DETACHED */
