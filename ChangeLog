@@ -1,3 +1,7 @@
+Fri Nov 26 01:28:09 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Release 4.1 to get all the changes made out there
+
 Thu Nov 18 18:04:04 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge stracefork from Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>

@@ -1,3 +1,10 @@
+Changes in 4.1
+================
+* Linux/MIPS port added
+* Lots of Linux updates again
+* Improved IPv6 support
+* Add strace-graph
+
 Changes in 4.0.1
 ================
 * Minor bugfixes
