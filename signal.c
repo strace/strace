@@ -765,16 +765,24 @@ int verbose;
 static void
 parse_sigset_t (const char *str, sigset_t *set)
 {
+	const char *p;
 	unsigned int digit;
 	int i;
 
 	sigemptyset(set);
 
-	for (i = _NSIG - 4; i >= 0; i -= 4, ++str) {
-		if (*str >= 'a')
-			digit = (*str - 'a') + 10;
+	p = strchr(str, '\n');
+	if (p == NULL)
+		p = strchr(str, '\0');
+	for (i = 0; p-- > str; i += 4) {
+		if (*p >= '0' && *p <= '9')
+			digit = *p - '0';
+		else if (*p >= 'a' && *p <= 'f')
+			digit = *p - 'a';
+		else if (*p >= 'A' && *p <= 'F')
+			digit = *p - 'A';
 		else
-			digit = *str - '0';
+			break;
 		if (digit & 1)
 			sigaddset(set, i + 1);
 		if (digit & 2)
