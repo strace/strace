@@ -1,3 +1,9 @@
+2004-07-11  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Add I386 as AM_CONDITIONAL.
+	* Makefile.am [LINUX]: Add maintainer-mode rules to regenerate
+	the ioctlent.h file.
+
 2004-07-08  Roland McGrath  <roland@redhat.com>
 
 	* resource.c (sys_quotactl): Truncate first argument to 32 bits, since
