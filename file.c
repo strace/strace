@@ -2488,7 +2488,7 @@ static const struct xlat advise[] = {
 };
 
 
-#if defined LINUX && (defined I386 || defined X86_64)
+#ifdef LINUX
 int
 sys_fadvise64(tcp)
 struct tcb *tcp;
