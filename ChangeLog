@@ -1,3 +1,8 @@
+2003-09-25  Roland McGrath  <roland@redhat.com>
+
+	* mem.c (mmap_prot) [PROT_SEM, PROT_GROWSDOWN, PROT_GROWSUP]: Include
+	these in the table if they are defined.
+
 2003-09-24  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.
