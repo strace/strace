@@ -42,7 +42,8 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/sparc/syscall.h linux/sparc/syscall1.h \
 	     linux/sparc/syscallent.h linux/sparc/syscallent1.h \
 	     linux/x86_64/syscallent.h linux/x86_64/gentab.pl \
-	     linux/x86_64/i386-headers.diff linux/x86_64/makeheaders.sh \
+	     linux/x86_64/errnoent1.h linux/x86_64/ioctlent1.h \
+	     linux/x86_64/signalent1.h linux/x86_64/syscallent1.h \
 	     freebsd/ioctlent.sh \
 	     freebsd/syscalls.cat freebsd/syscalls.pl freebsd/syscalls.print \
 	     freebsd/i386/errnoent.h freebsd/i386/ioctlent.h \
@@ -55,17 +56,3 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
 	     debian/changelog debian/control debian/copyright \
 	     debian/postinst debian/prerm debian/rules strace.spec
-
-if LINUX
-if X86_64
-
-BUILT_SOURCES = linux/x86_64/syscallent1.h linux/x86_64/syscall1.h \
-		linux/x86_64/signalent1.h linux/x86_64/ioctls1.h \
-		linux/x86_64/ioctlent1.h linux/x86_64/ioctldefs1.h \
-		linux/x86_64/errnoent1.h linux/x86_64/dummy1.h
-
-$(BUILT_SOURCES): $(srcdir)/linux/x86_64/makeheaders.sh
-	cd linux/x86_64 && $(SHELL) ./makeheaders.sh
-
-endif X86_64
-endif LINUX
