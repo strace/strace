@@ -1040,13 +1040,16 @@ void
 printcall(tcp)
 struct tcb *tcp;
 {
+#define PRINTBADPC tprintf(sizeof(long) == 4 ? "[????????] " : \
+			   sizeof(long) == 8 ? "[????????????????] " : \
+			   NULL /* crash */)
 
 #ifdef LINUX
 #ifdef I386
 	long eip;
 
 	if (upeek(tcp->pid, 4*EIP, &eip) < 0) {
-		tprintf("[????????] ");
+		PRINTBADPC;
 		return;
 	}
 	tprintf("[%08lx] ", eip);
@@ -1054,7 +1057,7 @@ struct tcb *tcp;
 #elif defined(S390) || defined(S390X)
          long psw;
          if(upeek(tcp->pid,PT_PSWADDR,&psw) < 0) {
-                 tprintf("[????????] ");
+                 PRINTBADPC;
                  return;
          }
 #ifdef S390
@@ -1067,7 +1070,7 @@ struct tcb *tcp;
 	long rip;
 
 	if (upeek(tcp->pid, 8*RIP, &rip) < 0) {
-		tprintf("[????????] ");
+		PRINTBADPC;
 		return;
 	}
 	tprintf("[%16lx] ", rip);
@@ -1075,7 +1078,7 @@ struct tcb *tcp;
 	long ip;
 
 	if (upeek(tcp->pid, PT_B0, &ip) < 0) {
-		tprintf("[????????] ");
+		PRINTBADPC;
 		return;
 	}
 	tprintf("[%08lx] ", ip);
@@ -1099,14 +1102,14 @@ struct tcb *tcp;
 	long pc;
 
 	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
-		tprintf ("[????????] ");
+		tprintf ("[????????????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
 #elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0) {
-		tprintf("[????????] ");
+		PRINTBADPC;
 		return;
 	}
 	tprintf("[%08lx] ", regs.r_pc);
@@ -1138,7 +1141,7 @@ struct tcb *tcp;
 	long pc;
 
 	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
-		tprintf ("[????????] ");
+		tprintf ("[????????????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1146,7 +1149,7 @@ struct tcb *tcp;
 	long pc;
 
 	if (upeek(tcp->pid, 4*15, &pc) < 0) {
-		tprintf("[????????] ");
+		PRINTBADPC;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1158,7 +1161,7 @@ struct tcb *tcp;
 
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *) &regs, 0) < 0) {
 		perror("printcall: ptrace(PTRACE_GETREGS, ...)");
-		tprintf("[????????] ");
+		PRINTBADPC;
 		return;
 	}
 	tprintf("[%08x] ", regs.r_o7);
@@ -1166,7 +1169,7 @@ struct tcb *tcp;
 
 #ifdef SVR4
 	/* XXX */
-	tprintf("[????????] ");
+	PRINTBADPC;
 #endif
 
 #ifdef FREEBSD
