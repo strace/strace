@@ -1092,12 +1092,12 @@ sys_getresuid(tcp)
 				tprintf("%#lx, ", tcp->u_arg[0]);
 			else
 				tprintf("ruid %lu, ", (unsigned long) uid);
-			if (umove(tcp, tcp->u_arg[0], &uid) < 0)
-				tprintf("%#lx, ", tcp->u_arg[0]);
+			if (umove(tcp, tcp->u_arg[1], &uid) < 0)
+				tprintf("%#lx, ", tcp->u_arg[1]);
 			else
 				tprintf("euid %lu, ", (unsigned long) uid);
-			if (umove(tcp, tcp->u_arg[0], &uid) < 0)
-				tprintf("%#lx", tcp->u_arg[0]);
+			if (umove(tcp, tcp->u_arg[2], &uid) < 0)
+				tprintf("%#lx", tcp->u_arg[2]);
 			else
 				tprintf("suid %lu", (unsigned long) uid);
 		}
