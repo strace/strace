@@ -364,12 +364,19 @@ static struct xlat clockflags[] = {
   { 0,             NULL }
 };
 
+static struct xlat clocknames[] = {
+  { CLOCK_REALTIME, "CLOCK_REALTIME" },
+  { CLOCK_MONOTONIC, "CLOCK_MONOTONIC" },
+  { 0,             NULL }
+};
+
 int
 sys_clock_settime(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, ", tcp->u_arg[0]);
+		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		tprintf(", ");
 		printtv(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -380,7 +387,8 @@ sys_clock_gettime(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, ", tcp->u_arg[0]);
+		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		tprintf(", ");
 	} else {
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
@@ -395,7 +403,8 @@ sys_clock_nanosleep(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, ", tcp->u_arg[0]);
+		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		tprintf(", ");
 		printflags(clockflags, tcp->u_arg[1]);
 		tprintf(", ");
 		printtv(tcp, tcp->u_arg[2]);
