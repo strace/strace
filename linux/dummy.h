@@ -37,7 +37,6 @@
 #define	sys_bdflush		printargs
 #define	sys_sysfs		printargs
 #define	sys_afs_syscall		printargs
-#define sys_migrate		printargs
 
 /* machine-specific */
 #ifndef I386
@@ -73,6 +72,7 @@
 #define sys_mlock		sys_munmap
 #define sys_munlock		sys_munmap
 #define sys_clock_getres	sys_clock_gettime
+#define sys_migrate		sys_alarm
 
 /* printargs does the right thing */
 #define	sys_setup		printargs

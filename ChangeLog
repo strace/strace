@@ -1,3 +1,7 @@
+2004-02-05  John Hughes  <john@calva.com>
+
+	* linux/dummy.h: better sys_migrate
+
 2004-01-29  John Hughes  <john@calva.com>
 
 	* README-linux: Document method for finding OpenSSI includes.
