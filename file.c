@@ -453,12 +453,21 @@ int addr;
 }
 #endif
 
+#ifdef LINUX
+/* Get the kernel's idea of struct stat. */
+#define stat kernel_stat
+#include <asm/stat.h>
+#undef stat
+#else /* LINUX */
+#define kernel_stat stat
+#endif /* LINUX */
+
 static void
 printstat(tcp, addr)
 struct tcb *tcp;
 int addr;
 {
-	struct stat statbuf;
+	struct kernel_stat statbuf;
 
 #ifdef LINUXSPARC
  	if (current_personality == 1) {
