@@ -1,3 +1,11 @@
+2003-11-06  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (tprintf): Check result of vfprintf and use perror when it
+	fails while not writing to stderr itself.  Fixes Debian bug #218762.
+
+	* net.c (printsock): Fix typo in #ifdef AF_NETLINK.
+	From Ulrich Drepper <drepper@redhat.com>.
+
 2003-11-01  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c (trace_syscall) [LINUX]: Calculate ONE_TICK once using
