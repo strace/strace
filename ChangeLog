@@ -1,3 +1,7 @@
+2002-05-21  John Hughes <john@calva.com>
+
+	* strace.c: Fix warning if POLL_HACK is used.
+
 2002-05-17  John Hughes <john@calva.com>
 
 	* svr4/ioctlent.sh: Some defines on UW come with too many spaces.

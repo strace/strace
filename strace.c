@@ -1412,7 +1412,7 @@ static int
 trace()
 {
 #ifdef POLL_HACK
-	struct tcb *in_syscall;
+	struct tcb *in_syscall = NULL;
 #endif
 	struct tcb *tcp;
 	int pfd;
