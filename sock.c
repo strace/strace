@@ -49,6 +49,40 @@
 
 extern const struct xlat addrfams[];
 
+static const struct xlat iffflags[] = {
+	{ IFF_UP,		"IFF_UP"		},
+	{ IFF_BROADCAST,	"IFF_BROADCAST"		},
+	{ IFF_DEBUG,		"IFF_DEBUG"		},
+	{ IFF_LOOPBACK,		"IFF_LOOPBACK"		},
+	{ IFF_POINTOPOINT,	"IFF_POINTOPOINT"	},
+	{ IFF_NOTRAILERS,	"IFF_NOTRAILERS"	},
+	{ IFF_RUNNING,		"IFF_RUNNING"		},
+	{ IFF_NOARP,		"IFF_NOARP"		},
+	{ IFF_PROMISC,		"IFF_PROMISC"		},
+	{ IFF_ALLMULTI,		"IFF_ALLMULTI"		},
+	{ IFF_MASTER,		"IFF_MASTER"		},
+	{ IFF_SLAVE,		"IFF_SLAVE"		},
+	{ IFF_MULTICAST,	"IFF_MULTICAST"		},
+	{ IFF_PORTSEL,		"IFF_PORTSEL"		},
+	{ IFF_AUTOMEDIA,	"IFF_AUTOMEDIA"		},
+	{ 0,			NULL			}
+};
+
+
+static void
+print_addr(tcp, addr, ifr)
+struct tcb *tcp;
+long addr;
+struct ifreq *ifr;
+{
+	if (ifr->ifr_addr.sa_family == AF_INET) {
+		struct sockaddr_in *sinp;
+		sinp = (struct sockaddr_in *) &ifr->ifr_addr;
+		tprintf("inet_addr(\"%s\")", inet_ntoa(sinp->sin_addr));
+	} else
+		printstr(tcp, addr, sizeof(ifr->ifr_addr.sa_data));
+}
+
 int
 sock_ioctl(tcp, code, arg)
 struct tcb *tcp;
@@ -56,6 +90,8 @@ long code, arg;
 {
 	struct ifreq ifr;
 	struct ifconf ifc;
+	const char *str = NULL;
+	unsigned char *bytes;
 
 	if (entering(tcp)) {
 		if (code == SIOCGIFCONF) {
@@ -101,15 +137,76 @@ long code, arg;
 #ifdef LINUX
 	case SIOCGIFNAME:
 	case SIOCGIFINDEX:
+	case SIOCGIFADDR:
+	case SIOCGIFDSTADDR:
+	case SIOCGIFBRDADDR:
+	case SIOCGIFNETMASK:
+	case SIOCGIFFLAGS:
+	case SIOCGIFMETRIC:
+	case SIOCGIFMTU:
+	case SIOCGIFSLAVE:
+	case SIOCGIFHWADDR:
 		umove(tcp, tcp->u_arg[2], &ifr);
                 if (syserror(tcp)) {
 			if (code == SIOCGIFNAME)
-				tprintf(", {%d, ???}", ifr.ifr_ifindex);
-			else if (code == SIOCGIFINDEX)
-				tprintf(", {???, \"%s\"}", ifr.ifr_name);
-		} else
-			tprintf(", {%d, \"%s\"}",
+				tprintf(", {ifr_index=%d, ifr_name=???}", ifr.ifr_ifindex);
+			else
+				tprintf(", {ifr_name=\"%s\", ???}", ifr.ifr_name);
+		} else if (code == SIOCGIFNAME)
+			tprintf(", {ifr_index=%d, ifr_name=\"%s\"}",
 				ifr.ifr_ifindex, ifr.ifr_name);
+		else {
+			tprintf(", {ifr_name=\"%s\", ", ifr.ifr_name);
+			switch (code) {
+			case SIOCGIFINDEX:
+				tprintf("ifr_index=%d", ifr.ifr_ifindex);
+				break;
+			case SIOCGIFADDR:
+				str = "ifr_addr";
+			case SIOCGIFDSTADDR:
+				if (str == NULL)
+					str = "ifr_dstaddr";
+			case SIOCGIFBRDADDR:
+				if (str == NULL)
+					str = "ifr_broadaddr";
+			case SIOCGIFNETMASK:
+				if (str == NULL)
+					str = "ifr_netmask";
+				tprintf("%s={", str);
+				printxval(addrfams,
+					  ifr.ifr_addr.sa_family,
+                    			  "AF_???");
+				tprintf(", ");
+				print_addr(tcp, ((long) tcp->u_arg[2]
+						 + offsetof (struct ifreq,
+							     ifr_addr.sa_data)),
+					   &ifr);
+				tprintf("}");
+				break;
+			case SIOCGIFHWADDR:
+				/* XXX Are there other hardware addresses
+				   than 6-byte MACs?  */
+				bytes = (unsigned char *) &ifr.ifr_hwaddr.sa_data;
+				tprintf("ifr_hwaddr=%02x:%02x:%02x:%02x:%02x:%02x",
+					bytes[0], bytes[1], bytes[2],
+					bytes[3], bytes[4], bytes[5]);
+				break;
+			case SIOCGIFFLAGS:
+				tprintf("ifr_flags=");
+				printflags(iffflags, ifr.ifr_flags);
+				break;
+			case SIOCGIFMETRIC:
+				tprintf("ifr_metric=%d", ifr.ifr_metric);
+				break;
+			case SIOCGIFMTU:
+				tprintf("ifr_mtu=%d", ifr.ifr_mtu);
+				break;
+			case SIOCGIFSLAVE:
+				tprintf("ifr_slave=\"%s\"", ifr.ifr_slave);
+				break;
+			}
+			tprintf("}");
+		}
 		return 1;
 	case SIOCGIFCONF:
 		umove(tcp, tcp->u_arg[2], &ifc);
@@ -135,15 +232,12 @@ long code, arg;
 						  ifra[i].ifr_addr.sa_family,
 						  "AF_???");
 					tprintf(", ");
-					if (ifra[i].ifr_addr.sa_family == AF_INET) {
-						struct sockaddr_in *sinp;
-						sinp = (struct sockaddr_in *) &ifra[i].ifr_addr;
-						tprintf("inet_addr(\"%s\")",
-							inet_ntoa(sinp->sin_addr));
-					} else
-						printstr(tcp,
-							 (long) &ifra[i].ifr_addr.sa_data,
-							 sizeof(ifra[i].ifr_addr.sa_data));
+					print_addr(tcp, ((long) tcp->u_arg[2]
+							 + offsetof (struct ifreq,
+								     ifr_addr.sa_data)
+							 + ((char *) &ifra[i]
+							    - (char *) &ifra[0])),
+						   &ifra[i]);
 				} else
 					tprintf("...");
 				tprintf("}}");
