@@ -1078,7 +1078,7 @@ ucontext_t *ucp;
 		tprintf(", uc_link=%#lx, ", (unsigned long) ucp->uc_link);
 	}
 	tprintf("uc_sigmask=");
-	printsigmask(ucp->uc_sigmask, 0);
+	printsigmask(&ucp->uc_sigmask, 0);
 	if (!abbrev(tcp)) {
 		tprintf(", uc_stack={ss_sp=%#lx, ss_size=%d, ss_flags=",
 			(unsigned long) ucp->uc_stack.ss_sp,

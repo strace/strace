@@ -1,5 +1,10 @@
 2001-05-15  John Hughes <john@Calva.COM>
 
+  * signal.c: pass a pointer to sigmask to printsigmask from printcontext,
+    it was just passing the sigmask (ucp->uc_sigmask).
+
+2001-05-15  John Hughes <john@Calva.COM>
+
   * util.c: Don't run off the end of valid memory in umovestr when
     USE_PROCFS.  Important for FREEBSD systems (which seem to have an
     unmapped page just after the args/env area).
