@@ -376,7 +376,7 @@ struct tcb *tcp;
 			fprintf(stderr, "sys_fork: tcb table full\n");
 			return 0;
 		}
-		if (proc_open(tcpchild, 1) < 0)
+		if (proc_open(tcpchild, 2) < 0)
 		  	droptcb(tcpchild);
 	}
 	return 0;

@@ -684,11 +684,7 @@ int attaching;
 				perror("strace: PIOCSTATUS");
 				return -1;
 			}
-#ifndef FREEBSD			
 			if (tcp->status.PR_FLAGS & PR_ASLEEP)
-#else
-			if (tcp->status.state == 1)
-#endif
 			    break;
 		}
 	}
@@ -823,11 +819,31 @@ int attaching;
 	}
 #else /* FREEBSD */
 	} else {
-	       /* little hack to show the current syscall */
-	       IOCTL_STATUS(tcp);
-	       tcp->flags &= ~TCB_INSYSCALL;
-	       tcp->status.why = PR_SYSENTRY;
-	       trace_syscall(tcp);
+		if (attaching < 2) { 
+			/* We are attaching to an already running process.
+			 * Try to figure out the state of the process in syscalls,
+			 * to handle the first event well.
+			 * This is done by having a look at the "wchan" property of the
+			 * process, which tells where it is stopped (if it is). */
+			FILE * status;
+			char wchan[20]; /* should be enough */
+			
+			sprintf(proc, "/proc/%d/status", tcp->pid);
+			status = fopen(proc, "r");
+			if (status &&
+			    (fscanf(status, "%*s %*d %*d %*d %*d %*d,%*d %*s %*d,%*d"
+				    "%*d,%*d %*d,%*d %19s", wchan) == 1) &&
+			    strcmp(wchan, "nochan") && strcmp(wchan, "spread") &&
+			    strcmp(wchan, "stopevent")) {
+				/* The process is asleep in the middle of a syscall.
+				   Fake the syscall entry event */
+				tcp->flags &= ~(TCB_INSYSCALL|TCB_STARTUP);
+				tcp->status.PR_WHY = PR_SYSENTRY;
+				trace_syscall(tcp);
+			}
+			if (status)
+				fclose(status);
+		} /* otherwise it's a fork being followed */
 	}
 #endif /* FREEBSD */
 #ifndef HAVE_POLLABLE_PROCFS
@@ -1474,6 +1490,14 @@ trace()
 			}
 		}
 
+#ifdef FREEBSD
+		if ((tcp->flags & TCB_STARTUP) && (tcp->status.PR_WHY == PR_SYSEXIT)) {
+			/* discard first event for a syscall we never entered */
+			IOCTL (tcp->pfd, PIOCRUN, 0);
+			continue;
+		}
+#endif		
+		
 		/* clear the just started flag */
 		tcp->flags &= ~TCB_STARTUP;
 

@@ -943,7 +943,7 @@ struct tcb *tcp;
 		else
 			tprintf("[%u, %u]", fds[0], fds[1]);
 	}
-#elif defined(SPARC) || defined(SVR4)
+#elif defined(SPARC) || defined(SVR4) || defined(FREEBSD)
 	if (exiting(tcp))
 		tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
 #endif
@@ -990,12 +990,9 @@ struct tcb *tcp;
 		else
 			tprintf(", [%u, %u]", fds[0], fds[1]);
 #endif /* LINUX */
-#ifdef SUNOS4
+#if defined(SUNOS4) || defined(SVR4) || defined(FREEBSD)
 		tprintf(", [%lu, %lu]", tcp->u_rval, getrval2(tcp));
-#endif /* SUNOS4 */
-#ifdef SVR4
-		tprintf(", [%lu, %lu]", tcp->u_rval, getrval2(tcp));
-#endif /* SVR4 */
+#endif /* SUNOS4 || SVR4 || FREEBSD */
 	}
 	return 0;
 }

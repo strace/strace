@@ -210,9 +210,10 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PIOCWSTOP       PIOCWAIT
 #define PR_WHY		why
 #define PR_WHAT		val
-#define PR_FLAGS	flags
+#define PR_FLAGS	state
 /* from /usr/src/sys/miscfs/procfs/procfs_vnops.c,
    status.state = 0 for running, 1 for stopped */
+#define PR_ASLEEP	1
 #define PR_SYSENTRY     S_SCE
 #define PR_SYSEXIT      S_SCX
 #define PR_SIGNALLED    S_SIG

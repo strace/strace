@@ -5,6 +5,7 @@
   *  file.c: rename dirent64 struct to kernel_dirent64 so things compile
      again with newer libcs
   *  test/clone.c: improve our testcase a bit
+  *  Merge another patch from Gäel Roualland with FreeBSD updates
 
 2000-09-01  Wichert Akkerman <wakkerma@debian.org>
 

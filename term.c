@@ -178,7 +178,10 @@ long code, arg;
 #ifndef FREEBSD
 	struct termio tio;
 #else
-	struct termios tio;
+	#define TCGETS	TIOCGETA
+	#define TCSETS	TIOCSETA
+	#define TCSETSW	TIOCSETAW
+	#define TCSETSF	TIOCSETAF
 #endif	
 	struct winsize ws;
 #ifdef TIOCGSIZE
@@ -204,7 +207,16 @@ long code, arg;
 			return 0;
 		if (abbrev(tcp)) {
 			tprintf(", {");
+#ifndef FREEBSD			
 			printxval(baud_options, tios.c_cflag & CBAUD, "B???");
+#else
+			printxval(baud_options, tios.c_ispeed, "B???");
+			if (tios.c_ispeed != tios.c_ospeed) {
+				tprintf(" (in)");
+				printxval(baud_options, tios.c_ospeed, "B???");
+				tprintf(" (out)");
+			}
+#endif			
 			tprintf(" %sopost %sisig %sicanon %secho ...}",
 				(tios.c_oflag & OPOST) ? "" : "-",
 				(tios.c_lflag & ISIG) ? "" : "-",
@@ -216,7 +228,7 @@ long code, arg;
 			(long) tios.c_iflag, (long) tios.c_oflag);
 		tprintf("c_cflags=%#lx, c_lflags=%#lx, ",
 			(long) tios.c_cflag, (long) tios.c_lflag);
-#ifndef SVR4
+#if !defined(SVR4) && !defined(FREEBSD)
 		tprintf("c_line=%u, ", tios.c_line);
 #endif
 		if (!(tios.c_lflag & ICANON))
