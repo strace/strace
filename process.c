@@ -70,11 +70,6 @@
 #endif
 #endif /* HAVE_ASM_REG_H */
 
-#ifdef HAVE_LINUX_PTRACE_H
-#undef PTRACE_SYSCALL
-#include <linux/ptrace.h>
-#endif
-
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
@@ -83,6 +78,11 @@
 #ifndef PTRACE_POKEUSR
 # define PTRACE_POKEUSR PTRACE_POKEUSER
 #endif
+#endif
+
+#ifdef HAVE_LINUX_PTRACE_H
+#undef PTRACE_SYSCALL
+#include <linux/ptrace.h>
 #endif
 
 #ifdef HAVE_LINUX_FUTEX_H
