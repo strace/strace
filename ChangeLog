@@ -1,3 +1,13 @@
+2003-03-30  Roland McGrath  <roland@redhat.com>
+
+	* time.c [LINUX]: Handle new Linux 2.5 clock/timer syscalls.
+	* linux/syscall.h, linux/syscallent.h, linux/dummy.h: Likewise.
+	From Ulrich Drepper <drepper@redhat.com>.
+
+	* linux/syscallent.h: Use sys_getrlimit for 191.
+	Use name "old_getrlimit" for 76.
+	Reported by Ulrich Drepper <drepper@redhat.com>.
+
 2003-03-18  Roland McGrath  <roland@redhat.com>
 
 	* process.c [LINUX] (sys_clone): Don't dereference parent_tid argument.
