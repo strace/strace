@@ -1414,7 +1414,7 @@ struct tcb *tcp;
 		}
 #else
 #ifdef POWERPC
-		if (result && (unsigned) -result < nerrnos) {
+		if (result && (unsigned long) -result < nerrnos) {
 			tcp->u_rval = -1;
 			u_error = -result;
 		}
