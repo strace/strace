@@ -1,3 +1,11 @@
+2004-06-03  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (main) [LINUX]: Expand TCBTAB as necessary for threads
+	attached.  Attach threads only under -f.  Set TCB_FOLLOWFORK in them.
+	(expand_tcbtab): New function, broken out of ...
+	* process.c (fork_tcb): ... here, call that.
+	* defs.h: Declare expand_tcbtab.
+
 2004-04-19  Roland McGrath  <roland@redhat.com>
 
 	* process.c (printstatus): Add a space before | in output.
