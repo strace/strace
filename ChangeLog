@@ -1,5 +1,13 @@
 2001-08-03   Wichert Akkerman <wakkerma@debian.org>
 
+  * linux/ioctlent.sh: change regexps so we catch sound ioctls as well in
+    Linux
+  * linux/Makefile.in: fix a few things so the ioctl list is generated
+    properly
+  * ioctl.c: remember to shift ioctl masks as well
+
+2001-08-03   Wichert Akkerman <wakkerma@debian.org>
+
   * Linux/**/syscallent.h: synchronize section for fcntl and use sys_fcntl
     for sys_fcntl as well
 
