@@ -1,3 +1,24 @@
+2003-01-14  Roland McGrath  <roland@redhat.com>
+
+	* defs.h (ALIGN64): Fix defn for PPC, same as FreeBSD one.
+
+	* util.c [LINUX] (restore_arg0, restore_arg1): New macros, defined
+	appropriately via set_arg0 or no-ops for each architecture.
+	(clearbpt): Use those instead of set_arg0 and set_arg1.
+
+	* defs.h [_LARGEFILE64_SOURCE] (_LFS64_LARGEFILE): Define it.
+	* linux/syscallent.h: Use sys_getdents64, sys_truncate64,
+	sys_ftruncate64, instead of printargs, for those syscalls.
+
+	* process.c: Use <linux/ptrace.h> regardless of <sys/reg.h>.
+	(sys_ptrace): Use printxval.
+	(ptrace_cmds): Make PTRACE_GETREGS et al conditional on #ifdef PTRACE_*
+	instead of only #ifdef SUNOS4.  Add PTRACE_[GS]ETFPXREGS.
+
+	* ipc.c (PRINTCTL): New macro.  #ifdef IPC_64, factor out the flag and
+	print it before using printxval.
+	(sys_msgctl, sys_semctl, sys_shmctl): Use it.
+
 2003-01-13  Roland McGrath  <roland@redhat.com>
 
 	* config.guess: Update from ftp://ftp.gnu.org/pub/gnu/config/,
