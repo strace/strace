@@ -932,7 +932,7 @@ struct tcb *tcp;
 int arg;
 {
 	struct strioctl si;
-	strict ioctlent *iop;
+	struct ioctlent *iop;
 	int in_and_out;
 	int timod = 0;
 #ifdef SI_GETUDATA
