@@ -202,18 +202,18 @@
 	{ 4,	TI,	sys_shmget,		"shmget"		}, /* 194 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"		}, /* 195 */
 
-	{ 5,	0,	printargs,		"SYS_196"		}, /* 196 */
-	{ 5,	0,	printargs,		"SYS_197"		}, /* 197 */
+	{ 5,	0,	printargs,		"getpmsg"		}, /* 196 */
+	{ 5,	0,	printargs,		"putpmsg"		}, /* 197 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 198 */
 	{ 3,	TF,	printargs,		"truncate64"		}, /* 199 */
 	{ 3,	TF,	printargs,		"ftruncate64"		}, /* 200 */
 	{ 3,	0,	printargs,		"getdents64"		}, /* 201 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"		}, /* 202 */
-	{ 5,	0,	printargs,		"SYS_203"		}, /* 203 */
-	{ 5,	0,	printargs,		"SYS_204"		}, /* 204 */
-	{ 5,	0,	printargs,		"SYS_205"		}, /* 205 */
-	{ 5,	0,	printargs,		"SYS_206"		}, /* 206 */
-	{ 5,	0,	printargs,		"SYS_207"		}, /* 207 */
+	{ 5,	0,	printargs,		"attrctl"		}, /* 203 */
+	{ 5,	0,	printargs,		"acl_get"		}, /* 204 */
+	{ 5,	0,	printargs,		"acl_set"		}, /* 205 */
+	{ 5,	0,	printargs,		"gettid"		}, /* 206 */
+	{ 5,	0,	printargs,		"readahead"		}, /* 207 */
 	{ 5,	0,	printargs,		"SYS_208"		}, /* 208 */
 	{ 5,	0,	printargs,		"SYS_209"		}, /* 209 */
 	{ 5,	0,	printargs,		"SYS_210"		}, /* 210 */
