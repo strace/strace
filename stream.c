@@ -505,7 +505,7 @@ int len;
 	int c = 0;
 	struct t_opthdr hdr;
 
-	while (len >= sizeof hdr) {
+	while (len >= (int) sizeof hdr) {
 		if (umove(tcp, addr, &hdr) < 0) break;
 		if (c++) {
 			tprintf (", ");

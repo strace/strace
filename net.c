@@ -1436,7 +1436,7 @@ int len;
 	int c = 0;
 	struct opthdr hdr;
 
-	while (len >= sizeof hdr) {
+	while (len >= (int) sizeof hdr) {
 		if (umove(tcp, addr, &hdr) < 0) break;
 		if (c++) {
 			tprintf (", ");
@@ -1448,8 +1448,10 @@ int len;
 		addr += sizeof hdr;
 		len -= sizeof hdr;
 		printsockopt (tcp, hdr.level, hdr.name, addr, hdr.len);
-		addr += hdr.len;
-		len -= hdr.len;
+		if (hdr.len > 0) {
+			addr += hdr.len;
+			len -= hdr.len;
+		}
 		tprintf ("}");
 	}
 	if (len > 0) {
