@@ -713,7 +713,7 @@ int len;
 		tprintf ("QUEUE=%p", m.conn_res.QUEUE_ptr);
 #elif defined HAVE_STRUCT_T_CONN_RES_ACCEPTOR_ID
 		COMMA ();
-		tprintf ("QUEUE=%p", m.conn_res.ACCEPTOR_id);
+		tprintf ("ACCEPTOR=%#lx", m.conn_res.ACCEPTOR_id);
 #endif
 		ADDR (conn_res, OPT);
 		COMMA ();
