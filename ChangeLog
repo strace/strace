@@ -1,5 +1,13 @@
 2005-02-01  Roland McGrath  <roland@redhat.com>
 
+	* system.c [LINUX] (MS_MANDLOCK, MS_NOATIME, MS_NODIRATIME, MS_BIND,
+	MS_MOVE, MS_REC, MS_VERBOSE, MS_POSIXACL, MS_ACTIVE, MS_NOUSER):
+	New macros.
+	[LINUX] (mount_flags): Add them.
+	[LINUX] (sys_mount): If any of (MS_BIND|MS_MOVE|MS_REMOUNT) bits are
+	set in the flags argument, don't try to fetch the filesystem string.
+	Fixes RH#141932.
+
 	* config.guess: Update from canonical version, timestamp 2004-11-12.
 	* config.sub: Likewise, timestamp 2004-11-30.
 
