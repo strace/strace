@@ -311,7 +311,7 @@ qual_signal(s, opt, not)
 
 	if (s && *s && isdigit((unsigned char)*s)) {
 		qualify_one(atoi(s), opt, not);
-		return 1;
+		return 0;
 	}
 	if (strlen(s) >= sizeof buf)
 		return 0;
@@ -323,10 +323,10 @@ qual_signal(s, opt, not)
 		s += 3;
 	for (i = 0; i <= NSIG; i++)
 		if (strcmp(s, signame(i) + 3) == 0) {
-			qualify_one(atoi(s), opt, not);
-			return 1;
+			qualify_one(i, opt, not);
+			return 0;
 		}
-	return 0;
+	return -1;
 }
 
 static int
