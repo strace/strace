@@ -33,7 +33,7 @@
 
 #ifdef LINUX
 #include <linux/version.h>
-#include <linux/timex.h>
+#include <sys/timex.h>
 #endif /* LINUX */
 
 void

@@ -1,3 +1,8 @@
+2000-10-12  Wichert Akkerman <wakkerma@debian.org> 
+
+  * time.c: use sys/timex.h so things compile with 2.2 kernels
+  * stream.c: test if MSG_* constants are #defined
+
 2000-09-03  Wichert Akkerman <wakkerma@debian.org>
 
   *  process.c: perform bpt trick for clone as well so we can get the

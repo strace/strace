@@ -178,9 +178,15 @@ struct tcb *tcp;
 #ifdef HAVE_PUTPMSG
 
 static struct xlat pmsgflags[] = {
+#ifdef MSG_HIPRI
 	{ MSG_HIPRI,	"MSG_HIPRI"	},
+#endif
+#ifdef MSG_AND
 	{ MSG_ANY,	"MSG_ANY"	},
+#endif
+#ifdef MSG_BAND
 	{ MSG_BAND,	"MSG_BAND"	},
+#endif
 	{ 0,		NULL		},
 };
 
