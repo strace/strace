@@ -1,5 +1,8 @@
 2003-02-24  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.4.95.
+	* strace.spec, debian/changelog: 4.4.95-1.
+
 	* process.c (sys_getresgid): Fix typos in argument access.
 
 2003-02-23  Roland McGrath  <roland@redhat.com>
