@@ -1,3 +1,19 @@
+strace (4.5.9-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fix potential crash in getxattr printing, closes: #283704.
+    + Improve socket ioctl printing, closes: #192164.
+    + Fix sparc build, closes: #278449.
+    + Update ia64 syscall list.
+    + Fix x86_64 syscall argument extraction for 32-bit processes.
+    + Fix -e signal=NAME parsing.
+    + Fix x86_64 exit_group syscall handling.
+    + Improve mount flags printing.
+    + Support symbolic printing of x86_64 arch_prctl parameters.
+    + Add strace-udeb package for Debian installer debugging, closes: #268294.
+
+ -- Roland McGrath <frob@debian.org>  Fri,  4 Feb 2005 01:28:21 -0800
+
 strace (4.5.8-1) unstable; urgency=low
 
   * New upstream version.

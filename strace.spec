@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5.8
+Version: 4.5.9
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -75,6 +75,17 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Feb  4 2005 Roland McGrath <roland@frob.com> - 4.5.9-1
+- update ia64 syscall list (#146245)
+- fix x86_64 syscall argument extraction for 32-bit processes (#146093)
+- fix -e signal=NAME parsing (#143362)
+- fix x86_64 exit_group syscall handling
+- improve socket ioctl printing (#138223)
+- code cleanups (#143369, #143370)
+- improve mount flags printing (#141932)
+- support symbolic printing of x86_64 arch_prctl parameters (#142667)
+- fix potential crash in getxattr printing
+
 * Tue Oct 19 2004 Roland McGrath <roland@redhat.com> - 4.5.8-1
 - fix multithreaded exit handling (#132150, #135254)
 - fix ioctl name matching (#129808)

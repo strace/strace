@@ -1,3 +1,12 @@
+Changes in 4.5.9
+==============
+* Bug fixes.
+* Improve socket ioctl printing.
+* Update Linux/IA64 syscall list.
+* Fix Linux/x86-64 syscall argument extraction for 32-bit processes.
+* Improve mount flags printing.
+* Support symbolic printing of x86_64 arch_prctl parameters.
+
 Changes in 4.5.8
 ==============
 * Bug fixes.
