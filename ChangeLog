@@ -1,5 +1,8 @@
 2004-03-01  Roland McGrath  <roland@redhat.com>
 
+	* process.c (sys_execve): Clear instead of set TCB_WAITEXECVE on
+	erring syscall.
+
 	* configure.ac: Check for `struct pt_all_user_regs'
 	and `struct ia64_fpreg' in <sys/ptrace.h>.
 	* util.c, process.c, syscall.c, signal.c: Work around conflicts between
