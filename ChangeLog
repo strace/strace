@@ -1,3 +1,8 @@
+2003-03-30  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.4.96.
+	* strace.spec, debian/changelog: 4.4.96-1.
+
 2003-02-26  Stuart Menefy <stuart.menefy@st.com>
 
 	Various fixes for SuperH [SH]:
