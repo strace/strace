@@ -33,11 +33,17 @@
 #define	sys_syslog		printargs
 #define	sys_iopl		printargs
 #define	sys_vm86old		printargs
-#define	sys_modify_ldt		printargs
 #define	sys_get_kernel_syms	printargs
 #define	sys_bdflush		printargs
 #define	sys_sysfs		printargs
 #define	sys_afs_syscall		printargs
+
+/* machine-specific */
+#ifndef I386
+#define	sys_modify_ldt		printargs
+#define sys_get_thread_area	printargs
+#define sys_set_thread_area	printargs
+#endif
 
 #define sys_sched_setparam	printargs
 #define sys_sched_getparam	printargs
