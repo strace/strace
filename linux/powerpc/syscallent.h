@@ -118,7 +118,7 @@
 	{ 1,	0,	sys_swapon,		"swapon"		}, /* 87 */
 	{ 3,	0,	sys_reboot,		"reboot"		}, /* 88 */
 	{ 3,	0,	sys_readdir,		"readdir"		}, /* 89 */
-	{ 6,	0,	sys_old_mmap,		"mmap"			}, /* 90 */
+	{ 6,	0,	sys_mmap,		"mmap"			}, /* 90 */
 	{ 2,	0,	sys_munmap,		"munmap"		}, /* 91 */
 	{ 2,	TF,	sys_truncate,		"truncate"		}, /* 92 */
 	{ 2,	0,	sys_ftruncate,		"ftruncate"		}, /* 93 */
@@ -187,9 +187,9 @@
 	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"	}, /* 156 */ 
 	{ 2,	0,	sys_sched_getscheduler,	"sched_getscheduler"	}, /* 157 */ 
 	{ 0,	0,	sys_sched_yield,	"sched_yield"		}, /* 158 */
-	{ 5,	0,	printargs,		"SYS_189"		}, /* 159 */
-	{ 5,	0,	printargs,		"SYS_189"		}, /* 160 */
-	{ 5,	0,	printargs,		"SYS_189"		}, /* 161 */
+	{ 5,	0,	printargs,		"SYS_159"		}, /* 159 */
+	{ 5,	0,	printargs,		"SYS_160"		}, /* 160 */
+	{ 5,	0,	printargs,		"SYS_161"		}, /* 161 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"		}, /* 162 */
 	{ 4,	0,	sys_mremap,		"mremap"		}, /* 163 */
 	{ 3,	0,	sys_setresuid,		"setresuid"		}, /* 164 */
@@ -220,21 +220,21 @@
 	{ 0,	TP,	sys_vfork,		"vfork"			}, /* 189 */
 	{ -1,	0,	printargs,		"SYS_190"		}, /* 190 */
 	{ 2,	0,	printargs,		"ugetrlimit"		}, /* 191 */
-	{ 5,	0,	sys_mmap,		"mmap2"			}, /* 192 */
-	{ 2,	TF,	printargs,		"truncate64"		}, /* 193 */
-	{ 5,	0,	printargs,		"ftruncate64"		}, /* 194 */
+	{ 8,	0,	sys_mmap,		"mmap2"			}, /* 192 */
+	{ 4,	TF,	printargs,		"truncate64"		}, /* 193 */
+	{ 4,	TF,	printargs,		"ftruncate64"		}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 196 */
 	{ 2,	TF,	sys_fstat64,		"fstat64"		}, /* 197 */
-	{ 5,	0,	printargs,		"SYS_198"		}, /* 198 */
-	{ 5,	0,	printargs,		"SYS_199"		}, /* 199 */
-	{ 5,	0,	printargs,		"SYS_200"		}, /* 200 */
-	{ 5,	0,	printargs,		"SYS_201"		}, /* 201 */
-	{ 5,	0,	printargs,		"SYS_202"		}, /* 202 */
-	{ 5,	0,	printargs,		"SYS_203"		}, /* 203 */
-	{ 5,	0,	printargs,		"SYS_204"		}, /* 204 */
-	{ 5,	0,	printargs,		"SYS_205"		}, /* 205 */
-	{ 5,	0,	printargs,		"SYS_206"		}, /* 206 */
+	{ 5,	0,	printargs,		"pciconfig_read"	}, /* 198 */
+	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 199 */
+	{ 3,	0,	printargs,		"pciconfig_iobase"	}, /* 200 */
+	{ 8,	0,	printargs,		"MOL"			}, /* 201 */
+	{ 3,	0,	printargs,		"getdents64"		}, /* 202 */
+	{ 2,	0,	sys_pivotroot,		"pivot_root"		}, /* 203 */
+	{ 3,	TF,	printargs,		"fcntl64"		}, /* 204 */
+	{ 3,	0,	sys_madvise,		"madvise"		}, /* 205 */
+	{ 3,	0,	printargs,		"mincore"		}, /* 206 */
 	{ 5,	0,	printargs,		"SYS_207"		}, /* 207 */
 	{ 5,	0,	printargs,		"SYS_208"		}, /* 208 */
 	{ 5,	0,	printargs,		"SYS_209"		}, /* 209 */
