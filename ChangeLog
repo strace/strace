@@ -1,5 +1,8 @@
 2003-06-26  Roland McGrath  <roland@redhat.com>
 
+	* syscall.c (force_result) [LINUX] [ARM]: Fix variable usage.
+	From: Joshua Neal <tinara@netpipeline.net>.
+
 	* process.c [LINUX] (sys_futex): Grok FUTEX_REQUEUE and print 5th arg.
 	* linux/syscallent.h: sys_futex argument count is now 5, not 4.
 	* linux/ia64/syscallent.h: Likewise.
