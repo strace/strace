@@ -72,7 +72,13 @@
 
 #if defined(LINUX) && defined(SPARC)
 
-#include <asm/reg.h>
+# define fpq kernel_fpq
+# define fq kernel_fq
+# define fpu kernel_fpu
+# include <asm/reg.h>
+# undef fpq
+# undef fq
+# undef fpu
 
 #if !defined(__GLIBC__)
 
@@ -608,7 +614,8 @@ char *laddr;
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
-			perror("ptrace: umoven");
+			if (addr != 0)
+				perror("ptrace: umoven");
 			return -1;
 		}
 		started = 1;
