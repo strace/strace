@@ -104,7 +104,7 @@ static struct xlat whence[] = {
 static void
 printflock(tcp, addr, getlk)
 struct tcb *tcp;
-int addr;
+long addr;
 int getlk;
 {
 	struct flock fl;

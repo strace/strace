@@ -170,9 +170,28 @@ int sys_old_mmap(tcp)
 struct tcb *tcp;
 {
     long u_arg[6];
+    int i, v;
 
+#if	defined(IA64)
+    /*
+     *  IA64 processes never call this routine, they only use the
+     *  new `sys_mmap' interface.  This code converts the integer
+     *  arguments that the IA32 process pushed onto the stack into
+     *  longs.
+     *
+     *  Note that addresses with bit 31 set will be sign extended.
+     *  Fortunately, those addresses are not currently being generated
+     *  for IA32 processes so it's not a problem.
+     */
+    for (i = 0; i < 6; i++)
+	if (umove(tcp, tcp->u_arg[0] + (i * sizeof(int)), &v) == -1)
+		return 0;
+	else
+		u_arg[i] = v;
+#else	// defined(IA64)
     if (umoven(tcp, tcp->u_arg[0], sizeof u_arg, (char *) u_arg) == -1)
 	    return 0;
+#endif	// defined(IA64)
     return print_mmap(tcp, u_arg);
    
 }

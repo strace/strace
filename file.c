@@ -480,7 +480,7 @@ struct solstat {
 static void
 printstatsol(tcp, addr)
 struct tcb *tcp;
-int addr;
+long addr;
 {
 	struct solstat statbuf;
 
@@ -489,7 +489,7 @@ int addr;
 		return;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#x", addr);
+		tprintf("%#lx", addr);
 		return;
 	}
 	if (umove(tcp, addr, &statbuf) < 0) {
@@ -584,7 +584,7 @@ struct stat *statbuf;
 static void
 printstat(tcp, addr)
 struct tcb *tcp;
-int addr;
+long addr;
 {
 	struct stat statbuf;
 
@@ -600,7 +600,7 @@ int addr;
 		return;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#x", addr);
+		tprintf("%#lx", addr);
 		return;
 	}
 	if (umove(tcp, addr, &statbuf) < 0) {
@@ -615,7 +615,7 @@ int addr;
 static void
 printstat64(tcp, addr)
 struct tcb *tcp;
-int addr;
+long addr;
 {
 	struct stat64 statbuf;
 
@@ -631,7 +631,7 @@ int addr;
 		return;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#x", addr);
+		tprintf("%#lx", addr);
 		return;
 	}
 	if (umove(tcp, addr, &statbuf) < 0) {
@@ -685,7 +685,7 @@ int addr;
 }
 #endif /* STAT64 */
 
-#ifdef linux
+#if defined(linux) && !defined(IA64)
 static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
@@ -710,7 +710,7 @@ struct stat *newbuf;
 static void
 printoldstat(tcp, addr)
 struct tcb *tcp;
-int addr;
+long addr;
 {
 	struct __old_kernel_stat statbuf;
 	struct stat newstatbuf;
@@ -727,7 +727,7 @@ int addr;
 		return;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#x", addr);
+		tprintf("%#lx", addr);
 		return;
 	}
 	if (umove(tcp, addr, &statbuf) < 0) {
@@ -738,7 +738,7 @@ int addr;
 	convertoldstat(&statbuf, &newstatbuf);
 	realprintstat(tcp, &newstatbuf);
 }
-#endif
+#endif /* linux && !IA64 */
 
 
 int
@@ -772,6 +772,7 @@ struct tcb *tcp;
 #endif
 }
 
+# if !defined(IA64)
 int
 sys_oldstat(tcp)
 struct tcb *tcp;
@@ -784,7 +785,8 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-#endif
+# endif /* !IA64 */
+#endif /* linux */
 
 int
 sys_fstat(tcp)
@@ -815,6 +817,7 @@ struct tcb *tcp;
 #endif
 }
 
+# if !defined(IA64)
 int
 sys_oldfstat(tcp)
 struct tcb *tcp;
@@ -826,6 +829,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+# endif /* !IA64 */
 #endif
 
 int
@@ -859,6 +863,7 @@ struct tcb *tcp;
 #endif
 }
 
+# if !defined(IA64)
 int
 sys_oldlstat(tcp)
 struct tcb *tcp;
@@ -871,6 +876,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+# endif /* !IA64 */
 #endif
 
 

@@ -48,6 +48,10 @@
 #include <linux/ptrace.h>
 #endif 
 
+#if defined(LINUX) && defined(IA64)
+#include <asm/ptrace_offsets.h>
+#endif
+
 #ifdef HAVE_SYS_REG_H
 #include <sys/reg.h>
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
@@ -874,6 +878,9 @@ struct tcb *tcp;
 #if defined(I386)
 	if (upeek(tcp->pid, 4*EIP, &pc) < 0)
 		return -1;
+#elif defined(IA64)
+	if (upeek(tcp->pid, PT_B0, &pc) < 0)
+		return -1;
 #elif defined(ARM)
 	if (upeek(tcp->pid, 4*15, &pc) < 0)
 		return -1;
@@ -936,6 +943,15 @@ struct tcb *tcp;
 	}
 	tprintf("[%08lx] ", eip);
 #else /* !I386K */
+#ifdef IA64
+	long ip;
+
+	if (upeek(tcp->pid, PT_B0, &ip) < 0) {
+		tprintf("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", ip);
+#else /* !IA64 */
 #ifdef POWERPC
 	long pc;
 
@@ -974,6 +990,7 @@ struct tcb *tcp;
 #endif /* ALPHA */
 #endif /* !M68K */
 #endif /* !POWERPC */
+#endif /* !IA64 */
 #endif /* !I386 */
 #endif /* LINUX */
 
@@ -1044,6 +1061,47 @@ struct tcb *tcp;
 	tcp->flags |= TCB_BPTSET;
 
 #else /* !SPARC */
+#ifdef IA64
+	/*
+	 * Our strategy here is to replace the bundle that contained
+	 * the clone() syscall with a bundle of the form:
+	 *
+	 *	{ 1: br 1b; br 1b; br 1b }
+	 *
+	 * This ensures that the newly forked child will loop
+	 * endlessly until we've got a chance to attach to it.
+	 */
+	{
+#		define LOOP0	0x0000100000000017
+#		define LOOP1	0x4000000000200000
+		unsigned long addr, ipsr;
+		pid_t pid;
+
+		pid = tcp->pid;
+		if (upeek(pid, PT_CR_IPSR, &ipsr) < 0)
+			return -1;
+		if (upeek(pid, PT_CR_IIP, &addr) < 0)
+			return -1;
+		tcp->baddr = addr | ((ipsr >> 41) & 0x3);	/* store "ri" in low two bits */
+
+		errno = 0;
+		tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, pid, (char *) addr + 0, 0);
+		tcp->inst[1] = ptrace(PTRACE_PEEKTEXT, pid, (char *) addr + 8, 0);
+		if (errno) {
+			perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
+			return -1;
+		}
+
+		errno = 0;
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 0, LOOP0);
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 8, LOOP1);
+		if (errno) {
+			perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
+			return -1;
+		}
+		tcp->flags |= TCB_BPTSET;
+	}
+#else /* !IA64 */
 
 #if defined (I386)
 #define LOOP	0x0000feeb
@@ -1102,6 +1160,7 @@ struct tcb *tcp;
 	}
 	tcp->flags |= TCB_BPTSET;
 
+#endif /* !IA64 */
 #endif /* SPARC */
 #endif /* LINUX */
 
@@ -1193,6 +1252,47 @@ struct tcb *tcp;
 	}
 	tcp->flags &= ~TCB_BPTSET;
 #else /* !SPARC */
+#ifdef IA64
+	{
+		unsigned long addr, ipsr;
+		pid_t pid;
+
+		pid = tcp->pid;
+
+		if (upeek(pid, PT_CR_IPSR, &ipsr) < 0)
+			return -1;
+		if (upeek(pid, PT_CR_IIP, &addr) < 0)
+			return -1;
+
+		/* restore original bundle: */
+		errno = 0;
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 0, tcp->inst[0]);
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 8, tcp->inst[1]);
+		if (errno) {
+			perror("clearbpt: ptrace(PTRACE_POKETEXT, ...)");
+			return -1;
+		}
+
+		/* restore original "ri" in ipsr: */
+		ipsr = (ipsr & ~(0x3ul << 41)) | ((tcp->baddr & 0x3) << 41);
+		errno = 0;
+		ptrace(PTRACE_POKEUSER, pid, (char *) PT_CR_IPSR, ipsr);
+		if (errno) {
+			perror("clrbpt: ptrace(PTRACE_POKEUSER, ...)");
+			return -1;
+		}
+
+		tcp->flags &= ~TCB_BPTSET;
+
+		if (addr != (tcp->baddr & ~0x3)) {
+			/* the breakpoint has not been reached yet.  */
+			if (debug)
+				fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
+					addr, tcp->baddr);
+			return 0;
+		}
+	}
+#else /* !IA64 */
 
 	if (debug)
 		fprintf(stderr, "[%d] clearing bpt\n", tcp->pid);
@@ -1256,6 +1356,7 @@ struct tcb *tcp;
 #endif /* !M68K */
 #endif /* !POWERPC */
 #endif /* !I386 */
+#endif /* !IA64 */
 #endif /* !SPARC */
 #endif /* LINUX */
 

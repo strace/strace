@@ -70,6 +70,11 @@
 #define GETGROUPS_T __kernel_gid_t
 #endif /* LINUX */
 
+#if defined(LINUX) && defined(IA64)
+# include <asm/ptrace_offsets.h>
+# include <asm/rse.h>
+#endif
+
 #ifdef HAVE_PRCTL
 #include <sys/prctl.h>
 #endif
@@ -358,6 +363,18 @@ static struct xlat clone_flags[] = {
     { 0,		NULL		},
 };
 
+int
+sys_clone(tcp)
+struct tcb *tcp;
+{
+	if (exiting(tcp)) {
+		tprintf("child_stack=%#lx, flags=", tcp->u_arg[1]);
+		if (printflags(clone_flags, tcp->u_arg[0]) == 0)
+			tprintf("0");
+	}
+	return 0;
+}
+
 #endif
 
 int
@@ -369,6 +386,31 @@ struct tcb *tcp;
 	return 0;
 }
 
+int
+setarg(tcp, argnum)
+	struct tcb *tcp;
+	int argnum;
+{
+#if defined (IA64)
+	{
+		unsigned long *bsp, *ap;
+
+		if (upeek(tcp->pid, PT_AR_BSP, (long *) &bsp) , 0)
+			return -1;
+
+		ap = ia64_rse_skip_regs(bsp, argnum);
+		errno = 0;
+		ptrace(PTRACE_POKEDATA, tcp->pid, ap, tcp->u_arg[argnum]);
+		if (errno)
+			return -1;
+
+	}
+#else
+# error Sorry, not done yet.
+#endif
+	return 0;
+}
+
 #ifdef SYS_clone
 int
 internal_clone(tcp)
@@ -376,18 +418,8 @@ struct tcb *tcp;
 {
 	struct tcb *tcpchild;
 	int pid;
-	int dont_follow = 0;
 	if (entering(tcp)) {
-		tprintf("fn=%#lx, child_stack=%#lx, flags=",
-				tcp->u_arg[0], tcp->u_arg[1]);
-		if (printflags(clone_flags, tcp->u_arg[2]) == 0)
-			tprintf("0");
-		tprintf(", args=%#lx", tcp->u_arg[3]);
-
-		/* For now we don't follow clone yet.. we're just preparing the code */
-		dont_follow = 1;
-
-		if (!followfork || dont_follow)
+		if (!followfork)
 			return 0;
 		if (nprocs == MAX_PROCS) {
 			tcp->flags &= ~TCB_FOLLOWFORK;
@@ -396,15 +428,8 @@ struct tcb *tcp;
 		}
 		tcp->flags |= TCB_FOLLOWFORK;
 
-		/* XXX 
-		 * We will take the simple approach and add CLONE_PTRACE to the clone
-		 * options. This only works on Linux 2.2.x and later. This means that
-		 * we break all programs using clone on older kernels..
-		 * We should try to fallback to the bpt-trick if this fails, but right
-		 * now we don't.
-		 */
-
-		/* TODO: actually change the flags */
+		tcp->u_arg[0] |= CLONE_PTRACE;
+		setarg(tcp, 0);
 	} else {
 		if (!(tcp->flags & TCB_FOLLOWFORK))
 			return 0;
@@ -446,20 +471,6 @@ struct tcb *tcp;
 		if (!followvfork || 
 		    change_syscall(tcp, SYS_fork) < 0)
 			dont_follow = 1;
-	}
-#endif
-#ifdef SYS_clone
-	/* clone can do many things, not all of which we know how to handle.
-	   Don't do much for now. */
-	if (tcp->scno == SYS_clone) {
-	    	if (entering(tcp)) {
-			tprintf("fn=%#lx, child_stack=%#lx, flags=",
-					tcp->u_arg[0], tcp->u_arg[1]);
-			if (printflags(clone_flags, tcp->u_arg[2]) == 0)
-			    tprintf("0");
-			tprintf(", args=%#lx", tcp->u_arg[3]);
-		}
-		dont_follow = 1;
 	}
 #endif
 	if (entering(tcp)) {
@@ -1719,6 +1730,76 @@ struct xlat struct_user_offsets[] = {
 	{ 63,			"fp31"					},
 	{ 64,			"pc"					},
 #else /* !ALPHA */
+#ifdef IA64
+	{ PT_F32, "f32" }, { PT_F33, "f33" }, { PT_F34, "f34" },
+	{ PT_F35, "f35" }, { PT_F36, "f36" }, { PT_F37, "f37" },
+	{ PT_F38, "f38" }, { PT_F39, "f39" }, { PT_F40, "f40" },
+	{ PT_F41, "f41" }, { PT_F42, "f42" }, { PT_F43, "f43" },
+	{ PT_F44, "f44" }, { PT_F45, "f45" }, { PT_F46, "f46" },
+	{ PT_F47, "f47" }, { PT_F48, "f48" }, { PT_F49, "f49" },
+	{ PT_F50, "f50" }, { PT_F51, "f51" }, { PT_F52, "f52" },
+	{ PT_F53, "f53" }, { PT_F54, "f54" }, { PT_F55, "f55" },
+	{ PT_F56, "f56" }, { PT_F57, "f57" }, { PT_F58, "f58" },
+	{ PT_F59, "f59" }, { PT_F60, "f60" }, { PT_F61, "f61" },
+	{ PT_F62, "f62" }, { PT_F63, "f63" }, { PT_F64, "f64" },
+	{ PT_F65, "f65" }, { PT_F66, "f66" }, { PT_F67, "f67" },
+	{ PT_F68, "f68" }, { PT_F69, "f69" }, { PT_F70, "f70" },
+	{ PT_F71, "f71" }, { PT_F72, "f72" }, { PT_F73, "f73" },
+	{ PT_F74, "f74" }, { PT_F75, "f75" }, { PT_F76, "f76" },
+	{ PT_F77, "f77" }, { PT_F78, "f78" }, { PT_F79, "f79" },
+	{ PT_F80, "f80" }, { PT_F81, "f81" }, { PT_F82, "f82" },
+	{ PT_F83, "f83" }, { PT_F84, "f84" }, { PT_F85, "f85" },
+	{ PT_F86, "f86" }, { PT_F87, "f87" }, { PT_F88, "f88" },
+	{ PT_F89, "f89" }, { PT_F90, "f90" }, { PT_F91, "f91" },
+	{ PT_F92, "f92" }, { PT_F93, "f93" }, { PT_F94, "f94" },
+	{ PT_F95, "f95" }, { PT_F96, "f96" }, { PT_F97, "f97" },
+	{ PT_F98, "f98" }, { PT_F99, "f99" }, { PT_F100, "f100" },
+	{ PT_F101, "f101" }, { PT_F102, "f102" }, { PT_F103, "f103" },
+	{ PT_F104, "f104" }, { PT_F105, "f105" }, { PT_F106, "f106" },
+	{ PT_F107, "f107" }, { PT_F108, "f108" }, { PT_F109, "f109" },
+	{ PT_F110, "f110" }, { PT_F111, "f111" }, { PT_F112, "f112" },
+	{ PT_F113, "f113" }, { PT_F114, "f114" }, { PT_F115, "f115" },
+	{ PT_F116, "f116" }, { PT_F117, "f117" }, { PT_F118, "f118" },
+	{ PT_F119, "f119" }, { PT_F120, "f120" }, { PT_F121, "f121" },
+	{ PT_F122, "f122" }, { PT_F123, "f123" }, { PT_F124, "f124" },
+	{ PT_F125, "f125" }, { PT_F126, "f126" }, { PT_F127, "f127" },
+	/* switch stack: */
+	{ PT_F2, "f2" }, { PT_F3, "f3" }, { PT_F4, "f4" },
+	{ PT_F5, "f5" }, { PT_F10, "f10" }, { PT_F11, "f11" },
+	{ PT_F12, "f12" }, { PT_F13, "f13" }, { PT_F14, "f14" },
+	{ PT_F15, "f15" }, { PT_F16, "f16" }, { PT_F17, "f17" },
+	{ PT_F18, "f18" }, { PT_F19, "f19" }, { PT_F20, "f20" },
+	{ PT_F21, "f21" }, { PT_F22, "f22" }, { PT_F23, "f23" },
+	{ PT_F24, "f24" }, { PT_F25, "f25" }, { PT_F26, "f26" },
+	{ PT_F27, "f27" }, { PT_F28, "f28" }, { PT_F29, "f29" },
+	{ PT_F30, "f30" }, { PT_F31, "f31" }, { PT_R4, "r4" },
+	{ PT_R5, "r5" }, { PT_R6, "r6" }, { PT_R7, "r7" },
+	{ PT_K_B0, "kb0" },
+	{ PT_B1, "b1" }, { PT_B2, "b2" }, { PT_B3, "b3" },
+	{ PT_B4, "b4" }, { PT_B5, "b5" },
+	{ PT_K_AR_PFS, "kar.pfs" },
+	{ PT_AR_LC, "ar.lc" }, { PT_K_AR_UNAT, "kar.unat" },
+	{ PT_K_AR_RNAT, "kar.rnat" }, { PT_K_AR_BSPSTORE, "kar.bspstore" },
+	{ PT_K_PR, "k.pr" },
+	/* pt_regs */
+	{ PT_CR_IPSR, "cr.ipsr" }, { PT_CR_IIP, "cr.iip" },
+	{ PT_CR_IFS, "cr.ifs" }, { PT_AR_UNAT, "ar.unat" },
+	{ PT_AR_PFS, "ar.pfs" }, { PT_AR_RSC, "ar.rsc" },
+	{ PT_AR_RNAT, "ar.rnat" }, { PT_AR_BSPSTORE, "ar.bspstore" },
+	{ PT_PR, "pr" }, { PT_B6, "b6" }, { PT_AR_BSP, "ar.bsp" },
+	{ PT_R1, "r1" }, { PT_R2, "r2" }, { PT_R3, "r3" },
+	{ PT_R12, "r12" }, { PT_R13, "r13" }, { PT_R14, "r14" },
+	{ PT_R15, "r15" }, { PT_R8, "r8" }, { PT_R9, "r9" },
+	{ PT_R10, "r10" }, { PT_R11, "r11" }, { PT_R16, "r16" },
+	{ PT_R17, "r17" }, { PT_R18, "r18" }, { PT_R19, "r19" },
+	{ PT_R20, "r20" }, { PT_R21, "r21" }, { PT_R22, "r22" },
+	{ PT_R23, "r23" }, { PT_R24, "r24" }, { PT_R25, "r25" },
+	{ PT_R26, "r26" }, { PT_R27, "r27" }, { PT_R28, "r28" },
+	{ PT_R29, "r29" }, { PT_R30, "r30" }, { PT_R31, "r31" },
+	{ PT_AR_CCV, "ar.ccv" }, { PT_AR_FPSR, "ar.fpsr" },
+	{ PT_B0, "b0" }, { PT_B7, "b7" }, { PT_F6, "f6" },
+	{ PT_F7, "f7" }, { PT_F8, "f8" }, { PT_F9, "f9" },
+#else /* !IA64 */
 #ifdef I386
 	{ 4*EBX,		"4*EBX"					},
 	{ 4*ECX,		"4*ECX"					},
@@ -1791,6 +1872,7 @@ struct xlat struct_user_offsets[] = {
 #ifdef I386
 	{ uoff(u_debugreg),	"offsetof(struct user, u_debugreg)"	},
 #endif /* I386 */
+#endif /* !IA64 */
 #endif /* !ALPHA */
 #endif /* !POWERPC/!SPARC */
 #endif /* LINUX */

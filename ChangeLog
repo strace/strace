@@ -1,3 +1,7 @@
+2000-02-03 Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge Trillian (ia64) patches
+
 2000-01-02 Pavel Machek	     <pavel@ucw.cz>
 
   * probe if sys/poll.h exists in configure + minor cleanups

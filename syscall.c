@@ -58,6 +58,11 @@
 #endif
 #endif
 
+#if defined(LINUX) && defined(IA64)
+# include <asm/ptrace_offsets.h>
+# include <asm/rse.h>
+#endif
+
 #ifndef SYS_ERRLIST_DECLARED
 extern int sys_nerr;
 extern char *sys_errlist[];
@@ -409,7 +414,7 @@ struct tcb *tcp;
 
 enum subcall_style { shift_style, deref_style, mask_style, door_style };
 
-#if !(defined(LINUX) && ( defined(ALPHA) || defined(MIPS) ))
+#if !(defined(LINUX) && ( defined(ALPHA) || defined(IA64) || defined(MIPS) ))
 
 const int socket_map [] = {
 	       /* SYS_SOCKET      */ 97,
@@ -594,6 +599,25 @@ struct tcb *tcp;
 #elif defined (I386)
 	if (upeek(pid, 4*ORIG_EAX, &scno) < 0)
 		return -1;
+#elif defined(IA64)
+#define IA64_PSR_IS	((long)1 << 34)
+	if (upeek (pid, PT_CR_IPSR, &psr) >= 0)
+		ia32 = (psr & IA64_PSR_IS);
+	if (!(tcp->flags & TCB_INSYSCALL)) {
+		if (ia32) {
+			if (upeek(pid, PT_R8, &scno) < 0)
+				return -1;
+		} else {
+			if (upeek (pid, PT_R15, &scno) < 0)
+				return -1;
+		}
+	} else {
+		/* syscall in progress */
+		if (upeek (pid, PT_R8, &r8) < 0)
+			return -1;
+		if (upeek (pid, PT_R10, &r10) < 0)
+			return -1;
+	}
 #elif defined (ARM)
 	{ 
 	    long pc;
@@ -732,6 +756,9 @@ struct tcb *tcp;
 #ifdef LINUX
 #if defined (I386)
 	static long eax;
+#elif defined (IA64)
+	long r8, r10, psr;
+	long ia32 = 0;
 #elif defined (POWERPC)
 	static long result,flags;
 #elif defined (M68K)
@@ -859,6 +886,29 @@ struct tcb *tcp;
 			u_error = 0;
 		}
 #else /* !I386 */
+#ifdef IA64
+		if (ia32) {
+			int err;
+
+			err = (int)r8;
+			if (err < 0 && -err < nerrnos) {
+				tcp->u_rval = -1;
+				u_error = -err;
+			}
+			else {
+				tcp->u_rval = err;
+				u_error = 0;
+			}
+		} else {
+			if (r10) {
+				tcp->u_rval = -1;
+				u_error = r8;
+			} else {
+				tcp->u_rval = r8;
+				u_error = 0;
+			}
+		}
+#else /* !IA64 */
 #ifdef MIPS
 		if (a3) {
 		  	tcp->u_rval = -1;
@@ -923,6 +973,7 @@ struct tcb *tcp;
 #endif /* M68K */
 #endif /* POWERPC */
 #endif /* MIPS */
+#endif /* IA64 */
 #endif /* I386 */
 #endif /* LINUX */
 #ifdef SUNOS4
@@ -996,6 +1047,21 @@ struct tcb *tcp;
 			 * for scno somewhere above here!
 			 */
 			if (upeek(pid, REG_A0+i, &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
+#elif defined (IA64)
+	{
+		unsigned long *bsp, i;
+
+		if (upeek(pid, PT_AR_BSP, (long *) &bsp) < 0)
+			return -1;
+
+		tcp->u_nargs = sysent[tcp->scno].nargs;
+		for (i = 0; i < tcp->u_nargs; ++i) {
+			if (umoven(tcp, (unsigned long) ia64_rse_skip_regs(bsp, i), sizeof(long),
+				   (char *) &tcp->u_arg[i])
+			    < 0)
 				return -1;
 		}
 	}
@@ -1274,7 +1340,7 @@ struct tcb *tcp;
 
 	switch (tcp->scno + NR_SYSCALL_BASE) {
 #ifdef LINUX
-#if !defined (ALPHA) && !defined(SPARC) && !defined(MIPS)
+#if !defined (ALPHA) && !defined(IA64) && !defined(SPARC) && !defined(MIPS)
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);

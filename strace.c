@@ -1481,10 +1481,25 @@ trace()
 
 		/* Look up `pid' in our table. */
 		if ((tcp = pid2tcb(pid)) == NULL) {
+#if 1 /* XXX davidm */
+			struct tcb *tcpchild;
+
+			if ((tcpchild = alloctcb(pid)) == NULL) {
+				fprintf(stderr, " [tcb table full]\n");
+				kill(pid, SIGKILL); /* XXX */
+				return 0;
+			}
+			tcpchild->flags |= TCB_ATTACHED;
+			newoutf(tcpchild);
+			tcp->nchildren++;
+			if (!qflag)
+				fprintf(stderr, "Process %d attached\n", pid);
+#else
 			fprintf(stderr, "unknown pid: %u\n", pid);
 			if (WIFSTOPPED(status))
 				ptrace(PTRACE_CONT, pid, (char *) 1, 0);
 			exit(1);
+#endif
 		}
 		/* set current output file */
 		outf = tcp->outf;

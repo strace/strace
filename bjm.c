@@ -80,7 +80,7 @@ struct tcb *tcp;
 		} else if (tcp->u_rval!=0) {
 			size_t	ret;
 			umove(tcp, tcp->u_arg[4], &ret);
-			tprintf("%#lx, %lu, %d", tcp->u_arg[2], tcp->u_arg[3], ret);
+			tprintf("%#lx, %lu, %Zu", tcp->u_arg[2], tcp->u_arg[3], ret);
 		} else if (tcp->u_arg[1]==QM_INFO) {
 			struct module_info	mi;
 			size_t			ret;
@@ -89,7 +89,7 @@ struct tcb *tcp;
 			printflags(modflags, mi.flags);
 			tprintf(", usecount=%lu}", mi.usecount);
 			umove(tcp, tcp->u_arg[4], &ret);
-			tprintf(", %d", ret);
+			tprintf(", %Zu", ret);
 		} else if ((tcp->u_arg[1]==QM_MODULES) ||
 			       	(tcp->u_arg[1]==QM_DEPS) ||
 			       	(tcp->u_arg[1]==QM_REFS)) {
@@ -111,8 +111,8 @@ struct tcb *tcp;
 				}
 				free(data);
 			} else 
-				tprintf(" /* %d entries */ ", ret);
-			tprintf("}, %d", ret);
+				tprintf(" /* %Zu entries */ ", ret);
+			tprintf("}, %Zu", ret);
 		} else if (tcp->u_arg[1]==QM_SYMBOLS) {
 			size_t	ret;
 			umove(tcp, tcp->u_arg[4], &ret);
@@ -129,8 +129,8 @@ struct tcb *tcp;
 				}
 				free(data);
 			} else
-				tprintf(" /* %d entries */ ", ret);
-			tprintf("}, %d", ret);
+				tprintf(" /* %Zu entries */ ", ret);
+			tprintf("}, %Zd", ret);
 		} else {
 			printstr(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 			tprintf(", %#lx", tcp->u_arg[4]);

@@ -39,7 +39,7 @@
 
 /* configuration section */
 #ifndef MAX_QUALS
-#define MAX_QUALS	1024	/* maximum number of syscalls, signals, etc. */
+#define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
 #endif
 #ifndef MAX_PROCS
 #define MAX_PROCS	32	/* maximum number of processes tracable */

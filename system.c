@@ -1734,7 +1734,7 @@ struct tcb *tcp;
 #endif
 				 )))) {
 			printpath(tcp, (size_t)info.oldval);
-			tprintf(", %d, ", oldlen);
+			tprintf(", %Zu, ", oldlen);
 			if (info.newval == 0)
 				tprintf("NULL");
 			else if (syserror(tcp))
@@ -1743,7 +1743,7 @@ struct tcb *tcp;
 				printpath(tcp, (size_t)info.newval);
 			tprintf(", %Zd", info.newlen);
 		} else {
-			tprintf("%p, %d, %p, %Zd", info.oldval, oldlen,
+			tprintf("%p, %Zd, %p, %Zd", info.oldval, oldlen,
 				info.newval, info.newlen);
 		}
 		tprintf("}");

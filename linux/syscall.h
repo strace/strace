@@ -109,7 +109,7 @@ int sys_osf_utimes();
 #endif
 
 
-#if !defined(ALPHA) && !defined(MIPS)
+#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS)
 #ifdef POWERPC
 #  define SYS_socket_subcall	256
 #else
@@ -134,7 +134,7 @@ int sys_osf_utimes();
 #define SYS_recvmsg		(SYS_socket_subcall + 17)
 
 #define SYS_socket_nsubcalls	18
-#endif /* !ALPHA */
+#endif /* !(ALPHA || IA64 || MIPS) */
 
 /* sys_ipc subcalls */
 
@@ -142,7 +142,7 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(MIPS)
+#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS)
 #ifdef POWERPC
 #  define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #else
@@ -161,10 +161,18 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #define SYS_shmctl		(SYS_ipc_subcall + 24)
 
 #define SYS_ipc_nsubcalls	25
-#endif /* ALPHA */
+#endif /* !(ALPHA || IA64 || MIPS) */
+
+#if defined(ALPHA) || defined(IA64)
+int sys_getpagesize();
+#endif
 
 #ifdef ALPHA
-int osf_statfs(), osf_fstatfs(), sys_getpagesize(), sys_madvise();
+int osf_statfs(), osf_fstatfs(), sys_madvise();
+#endif
+
+#ifdef IA64
+int sys_getpmsg(), sys_putpmsg();	/* STREAMS stuff */
 #endif
 
 int sys_setpgrp(), sys_gethostname(), sys_getdtablesize(), sys_utimes();

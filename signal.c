@@ -60,6 +60,10 @@
 
 #ifdef LINUX
 
+#ifdef IA64
+# include <asm/ptrace_offsets.h>
+#endif /* !IA64 */
+
 #ifdef HAVE_ASM_SIGCONTEXT_H
 #include <asm/sigcontext.h>
 #ifdef SPARC
@@ -251,7 +255,7 @@ sigset_t *s;
 static int
 copy_sigset_len(tcp, addr, s, len)
 struct tcb *tcp;
-int addr;
+long addr;
 sigset_t *s;
 int len;
 {
@@ -741,6 +745,28 @@ struct tcb *tcp;
 	}
 	return 0;
 #else /* !I386 */
+#ifdef IA64
+	struct sigcontext sc;
+	long sp;
+
+	if (entering(tcp)) {
+		tcp->u_arg[0] = 0;
+		if (upeek(tcp->pid, PT_R12, &sp) < 0)
+			return 0;
+		if (umove(tcp, sp + 16, &sc) < 0)
+			return 0;
+		tcp->u_arg[0] = 1;
+		memcpy(tcp->u_arg + 1, &sc.sc_mask, sizeof(tcp->u_arg[1]));
+	}
+	else {
+		tcp->u_rval = tcp->u_error = 0;
+		if (tcp->u_arg[0] == 0)
+			return 0;
+		tcp->auxstr = sprintsigmask("mask now ", tcp->u_arg[1]);
+		return RVAL_NONE | RVAL_STR;
+	}
+	return 0;
+#else /* !IA64 */
 #ifdef POWERPC
        long esp;
        struct sigcontext_struct sc;
@@ -867,6 +893,7 @@ struct tcb *tcp;
 #endif /* ALPHA */
 #endif /* !M68K */
 #endif /* !POWERPC */
+#endif /* !IA64 */
 #endif /* !I386 */
 #endif /* S390 */
 }

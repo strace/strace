@@ -38,6 +38,9 @@ case "$host_cpu" in
 i[3456]86|pentium)
 	arch=i386
 	;;
+ia64)
+	arch=ia64
+	;;
 m68k)
 	arch=m68k
 	;;
@@ -67,7 +70,7 @@ AC_MSG_RESULT($arch)
 
 # Autoheader trick.  Heh, heh.
 arch_list='
-@@@syms="$syms I386 M68K SPARC MIPS ALPHA ARM POWERPC"@@@
+@@@syms="$syms I386 IA64 M68K SPARC MIPS ALPHA ARM POWERPC"@@@
 '
 
 osarch="$opsys"
