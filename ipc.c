@@ -261,6 +261,20 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef LINUX
+int sys_semtimedop(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%lu", tcp->u_arg[0]);
+		tprintf(", %#lx", tcp->u_arg[3]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
+		printtv(tcp, tcp->u_arg[5]);
+	}
+	return 0;
+}
+#endif
+
 int sys_semget(tcp)
 struct tcb *tcp;
 {
@@ -271,7 +285,7 @@ struct tcb *tcp;
 			tprintf("IPC_PRIVATE");
 		tprintf(", %lu", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(resource_flags, tcp->u_arg[2]) != 0)
+		if (printflags(resource_flags, tcp->u_arg[2] & ~0666) != 0)
 			tprintf("|");
 		tprintf("%#lo", tcp->u_arg[2] & 0666);
 	}
