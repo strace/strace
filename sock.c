@@ -33,6 +33,7 @@
 #include <sys/socket.h>
 #include <linux/sockios.h>
 #else
+#include <sys/socket.h>
 #include <sys/sockio.h>
 #endif
 #include <arpa/inet.h>
