@@ -73,7 +73,7 @@ OPSYS=`echo $opsys | tr '[a-z]' '[A-Z]'`
 ARCH=`echo $arch | tr '[a-z]' '[A-Z]'`
 
 changequote([,])dnl
-CFLAG="-D_GNU_SOURCE $CFLAGS"
+CFLAGS="-D_GNU_SOURCE $CFLAGS"
 AC_CONFIG_HEADER(config.h)
 AC_SUBST(opsys)
 AC_DEFINE_UNQUOTED($OPSYS)
