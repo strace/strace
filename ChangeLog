@@ -1,5 +1,18 @@
 2003-06-26  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: SHMEDIA -> SH64
+	* defs.h: Likewise.
+	* mem.c: Likewise.
+	* process.c: Likewise.
+	* sock.c: Likewise.
+	* syscall.c: Likewise.
+	* util.c: Likewise.
+	* linux/shmedia/syscallent.h: Moved to ...
+	* linux/sh64/syscallent.h: ... here.
+
+	* config.guess: Update from canonical version, timestamp 2003-06-17.
+	* config.sub: Likewise.
+
 	* syscall.c (force_result) [LINUX] [ARM]: Fix variable usage.
 	From: Joshua Neal <tinara@netpipeline.net>.
 
