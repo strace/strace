@@ -1385,21 +1385,28 @@ long addr;
 	tprintf("{f_type=%s, f_fbsize=%u, f_blocks=%u, f_bfree=%u, ",
 		sprintfstype(statbuf.f_type),
 		statbuf.f_bsize, statbuf.f_blocks, statbuf.f_bfree);
-	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_namelen=%u",
-		statbuf.f_bavail,statbuf.f_files, statbuf.f_ffree, statbuf.f_namelen);
+	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_fsid={%d, %d}, f_namelen=%u",
+		statbuf.f_bavail,statbuf.f_files, statbuf.f_ffree,
+		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1],
+		statbuf.f_namelen);
 #else /* !ALPHA */
 	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%lu, f_bfree=%lu, ",
 		sprintfstype(statbuf.f_type),
 		(unsigned long)statbuf.f_bsize,
 		(unsigned long)statbuf.f_blocks,
 		(unsigned long)statbuf.f_bfree);
-	tprintf("f_files=%lu, f_ffree=%lu",
+	tprintf("f_bavail=%lu, f_files=%lu, f_ffree=%lu, f_fsid={%d, %d}",
+		(unsigned long)statbuf.f_bavail,
 		(unsigned long)statbuf.f_files,
-		(unsigned long)statbuf.f_ffree);
+		(unsigned long)statbuf.f_ffree,
+		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
 #ifdef LINUX
 	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
 #endif /* LINUX */
 #endif /* !ALPHA */
+#ifdef _STATFS_F_FRSIZE
+	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
+#endif
 	tprintf("}");
 }
 
@@ -1427,6 +1434,82 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef LINUX
+static void
+printstatfs64(tcp, addr)
+struct tcb *tcp;
+long addr;
+{
+	struct statfs64 statbuf;
+
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprintf("{...}");
+		return;
+	}
+#ifdef ALPHA
+
+	tprintf("{f_type=%s, f_fbsize=%u, f_blocks=%u, f_bfree=%u, ",
+		sprintfstype(statbuf.f_type),
+		statbuf.f_bsize, statbuf.f_blocks, statbuf.f_bfree);
+	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_fsid={%d, %d}, f_namelen=%u",
+		statbuf.f_bavail,statbuf.f_files, statbuf.f_ffree,
+		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1],
+		statbuf.f_namelen);
+#else /* !ALPHA */
+	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%lu, f_bfree=%lu, ",
+		sprintfstype(statbuf.f_type),
+		(unsigned long)statbuf.f_bsize,
+		(unsigned long)statbuf.f_blocks,
+		(unsigned long)statbuf.f_bfree);
+	tprintf("f_bavail=%lu, f_files=%lu, f_ffree=%lu, f_fsid={%d, %d}",
+		(unsigned long)statbuf.f_bavail,
+		(unsigned long)statbuf.f_files,
+		(unsigned long)statbuf.f_ffree,
+		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
+	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
+#endif /* !ALPHA */
+#ifdef _STATFS_F_FRSIZE
+	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
+#endif
+	tprintf("}");
+}
+
+int
+sys_statfs64(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
+	} else {
+		if (tcp->u_arg[1] == sizeof (struct statfs64))
+			printstatfs64(tcp, tcp->u_arg[2]);
+		else
+			tprintf("{???}");
+	}
+	return 0;
+}
+
+int
+sys_fstatfs64(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	} else {
+		if (tcp->u_arg[1] == sizeof (struct statfs64))
+			printstatfs64(tcp, tcp->u_arg[2]);
+		else
+			tprintf("{???}");
+	}
+	return 0;
+}
+#endif
 
 #if defined(LINUX) && defined(__alpha)
 
