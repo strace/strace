@@ -29,6 +29,10 @@
  *	$Id$
  */
 
+#ifdef linux
+#include <features.h>
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -104,7 +108,7 @@ extern int ptrace();
 #endif /* !SVR4 */
 
 #ifdef LINUX
-#if !defined(LINUXSPARC) || !defined(__GLIBC__)
+#if !defined(__GLIBC__)
 #define	PTRACE_PEEKUSER	PTRACE_PEEKUSR
 #define	PTRACE_POKEUSER	PTRACE_POKEUSR
 #endif
@@ -124,7 +128,7 @@ extern int ptrace();
 #include <linux/a.out.h>
 #include <asm/psr.h>
 #undef  SUPPORTED_PERSONALITIES
-#define SUPPORTED_PERSONALITIES 3
+#define SUPPORTED_PERSONALITIES 2
 #endif /* LINUXSPARC */
 
 /* Trace Control Block */

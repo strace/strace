@@ -1038,6 +1038,9 @@ struct tcb *tcp;
 		int i;
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 		for (i = 0; i < tcp->u_nargs; i++) {
+			/* WTA: if scno is out-of-bounds this will bomb. Add range-check
+			 * for scno somewhere above here!
+			 */
 			if (upeek(pid, REG_A0+i, &tcp->u_arg[i]) < 0)
 				return -1;
 		}

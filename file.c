@@ -457,7 +457,7 @@ int addr;
 	else
 		tprintf("...}");
 }
-#endif
+#endif /* LINUXSPARC */
 
 static void
 realprintstat(tcp, statbuf)

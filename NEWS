@@ -1,5 +1,5 @@
-Changes in 4.0
-==============
+Changes in 3.99
+===============
 * New maintainer
 * add support for more Linux architectures (powerpc, sparc, arm)
 * support lots more Linux syscalls
