@@ -378,54 +378,12 @@ int sig;
 #ifdef LINUX
 	int sfd;
 	char sname[32];
-	char buf[1024];
+	char buf[2048];
 	char *s;
 	int i;
-	unsigned int signalled, blocked, ignored, caught;
-
-	/* This is incredibly costly but it's worth it. */
-	sprintf(sname, "/proc/%d/stat", tcp->pid);
-	if ((sfd = open(sname, O_RDONLY)) == -1) {
-		perror(sname);
-		return 1;
-	}
-	i = read(sfd, buf, 1024);
-	buf[i] = '\0';
-	close(sfd);
-	/*
-	 * Skip the extraneous fields. This loses if the
-	 * command name has any spaces in it.  So be it.
-	 */
-	for (i = 0, s = buf; i < 30; i++) {
-		while (*++s != ' ') {
-			if (!*s)
-				break;
-		}
-	}
-	if (sscanf(s, "%u%u%u%u",
-		   &signalled, &blocked, &ignored, &caught) != 4) {
-		fprintf(stderr, "/proc/pid/stat format error\n");
-		return 1;
-	}
-#ifdef DEBUG
-	fprintf(stderr, "sigs: %08x %08x %08x %08x\n",
-		signalled, blocked, ignored, caught);
+	/* We also need to handle RT signals */
+	unsigned long long signalled, blocked, ignored, caught;
 #endif
-	if ((ignored & sigmask(sig)) || (caught & sigmask(sig)))
-		return 1;
-#endif /* LINUX */
-
-#ifdef SUNOS4
-	void (*u_signal)();
-
-	if (upeek(tcp->pid, uoff(u_signal[0]) + sig*sizeof(u_signal),
-	    (long *) &u_signal) < 0) {
-		return 0;
-	}
-	if (u_signal != SIG_DFL)
-		return 1;
-#endif /* SUNOS4 */
-
 #ifdef SVR4
 	/*
 	 * Since procfs doesn't interfere with wait I think it is safe
@@ -450,8 +408,66 @@ int sig;
 	default:
 		break;
 	}
-	return 0;
 #endif /* !SVR4 */
+#ifdef LINUX
+
+	/* This is incredibly costly but it's worth it. */
+	/* NOTE: LinuxThreads internally uses SIGRTMIN, SIGRTMIN + 1 and
+	   SIGRTMIN + 2, so we can't use the obsolete /proc/%d/stat which
+	   doesn't handle real-time signals). */
+	sprintf(sname, "/proc/%d/status", tcp->pid);
+	if ((sfd = open(sname, O_RDONLY)) == -1) {
+		perror(sname);
+		return 1;
+	}
+	i = read(sfd, buf, sizeof(buf));
+	buf[i] = '\0';
+	close(sfd);
+	/*
+	 * Skip the extraneous fields. We need to skip
+	 * command name has any spaces in it.  So be it.
+	 */
+	s = strstr(buf, "SigPnd:\t");
+
+	if (!s)
+	{
+		fprintf(stderr, "/proc/pid/status format error\n");
+		return 1;
+	}
+
+	while (*s && *s++ != '\t')
+		;
+	s += sscanf(s, "%qx", &signalled);
+	while (*s && *s++ != '\t')
+		;
+	s += sscanf(s, "%qx", &blocked);
+	while (*s && *s++ != '\t')
+		;
+	s += sscanf(s, "%qx", &ignored);
+	while (*s && *s++ != '\t')
+		;
+	s += sscanf(s, "%qx", &caught);
+
+#ifdef DEBUG
+	fprintf(stderr, "sigs: %08x %08x %08x %08x\n",
+		signalled, blocked, ignored, caught);
+#endif
+	if ((ignored & (1ULL << sig)) || (caught & (1ULL << sig)))
+		return 1;
+#endif /* LINUX */
+
+#ifdef SUNOS4
+	void (*u_signal)();
+
+	if (upeek(tcp->pid, uoff(u_signal[0]) + sig*sizeof(u_signal),
+	    (long *) &u_signal) < 0) {
+		return 0;
+	}
+	if (u_signal != SIG_DFL)
+		return 1;
+#endif /* SUNOS4 */
+
+	return 0;
 }
 
 #if defined(SUNOS4) || defined(FREEBSD)
