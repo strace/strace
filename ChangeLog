@@ -1,5 +1,9 @@
 2003-06-02  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (main): Set -q when given -o and not -p, and not when not
+	given -o, to match what the man page always said.
+	Fixes Debian bug #47113, #153678.
+
 	* configure.ac, NEWS: Version 4.4.97.
 	* strace.spec, debian/changelog: 4.4.97-1.
 
