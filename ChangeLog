@@ -1,7 +1,11 @@
 2003-01-14  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.4.92.
+	* strace.spec, debian/changelog: 4.4.92-1.
+
 	* configure.ac: Match powerpc* (includes powerpc64), and don't match
 	ppc (never comes out of config.sub).
+
 	* process.c (sys_ptrace): Use #lx format for address argument.
 	[POWERPC]: Use sizeof(unsigned long) in place of 4 for multipliers.
 	* process.c [POWERPC]: Likewise.
