@@ -413,6 +413,7 @@ extern char *xlookup P((struct xlat *, int));
 extern struct tcb *alloctcb P((int));
 extern struct tcb *pid2tcb P((int));
 extern void droptcb P((struct tcb *));
+extern int expand_tcbtab P((void));
 
 extern void set_sortby P((char *));
 extern void set_overhead P((int));

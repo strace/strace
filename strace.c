@@ -403,7 +403,7 @@ char *argv[];
 # ifdef LINUX
 		if (tcp->flags & TCB_CLONE_THREAD)
 			continue;
-		{
+		if (followfork) {
 			char procdir[MAXPATHLEN];
 			DIR *dir;
 			sprintf(procdir, "/proc/%d/task", tcp->pid);
@@ -424,13 +424,17 @@ char *argv[];
 						   (char *) 1, 0) < 0)
 						++nerr;
 					else if (tid != tcbtab[c]->pid) {
-						tcp = alloctcb(tid);
+						if (nprocs == tcbtabsize &&
+						    expand_tcbtab())
+							tcp = NULL;
+						else
+							tcp = alloctcb(tid);
 						if (tcp == NULL) {
 							fprintf(stderr, "%s: out of memory\n",
 								progname);
 							exit(1);
 						}
-						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED;
+						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
 						tcbtab[c]->nchildren++;
 						tcbtab[c]->nclone_threads++;
 						tcbtab[c]->nclone_detached++;
@@ -687,6 +691,33 @@ struct tcb *tcp;
 	}
 	return;
 }
+
+int
+expand_tcbtab()
+{
+	/* Allocate some more TCBs and expand the table.
+	   We don't want to relocate the TCBs because our
+	   callers have pointers and it would be a pain.
+	   So tcbtab is a table of pointers.  Since we never
+	   free the TCBs, we allocate a single chunk of many.  */
+	struct tcb **newtab = (struct tcb **)
+		realloc(tcbtab, 2 * tcbtabsize * sizeof tcbtab[0]);
+	struct tcb *newtcbs = (struct tcb *) calloc(tcbtabsize,
+						    sizeof *newtcbs);
+	int i;
+	if (newtab == NULL || newtcbs == NULL) {
+		if (newtab != NULL)
+			free(newtab);
+		return 1;
+	}
+	for (i = tcbtabsize; i < 2 * tcbtabsize; ++i)
+		newtab[i] = &newtcbs[i - tcbtabsize];
+	tcbtabsize *= 2;
+	tcbtab = newtab;
+
+	return 0;
+}
+
 
 struct tcb *
 alloctcb(pid)

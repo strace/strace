@@ -402,27 +402,10 @@ static int
 fork_tcb(struct tcb *tcp)
 {
 	if (nprocs == tcbtabsize) {
-		/* Allocate some more TCBs and expand the table.
-		   We don't want to relocate the TCBs because our
-		   callers have pointers and it would be a pain.
-		   So tcbtab is a table of pointers.  Since we never
-		   free the TCBs, we allocate a single chunk of many.  */
-		struct tcb **newtab = (struct tcb **)
-			realloc(tcbtab, 2 * tcbtabsize * sizeof tcbtab[0]);
-		struct tcb *newtcbs = (struct tcb *) calloc(tcbtabsize,
-							    sizeof *newtcbs);
-		int i;
-		if (newtab == NULL || newtcbs == NULL) {
-			if (newtab != NULL)
-				free(newtab);
+		if (expand_tcbtab()) {
 			tcp->flags &= ~TCB_FOLLOWFORK;
 			fprintf(stderr, "sys_fork: tcb table full\n");
-			return 1;
 		}
-		for (i = tcbtabsize; i < 2 * tcbtabsize; ++i)
-			newtab[i] = &newtcbs[i - tcbtabsize];
-		tcbtabsize *= 2;
-		tcbtab = newtab;
 	}
 
 	tcp->flags |= TCB_FOLLOWFORK;
