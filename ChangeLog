@@ -1,3 +1,8 @@
+Sat Jul 10 01:46:10 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Remove hack in signal.c for arm architecture
+  * Add hack so we compile correctly on powerpc
+
 Fri Jul  9 02:28:16 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Add a corrected patch from Daniel Jacobowitz

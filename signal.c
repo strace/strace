@@ -31,11 +31,6 @@
 
 #include "defs.h"
 
-/* ugly hack to make header file do what I want - davidw  */
-#ifdef __arm__
-#undef __USE_POSIX199309
-#endif
-
 #include <signal.h>
 #include <sys/user.h>
 #include <fcntl.h>
