@@ -1,3 +1,10 @@
+strace (4.5.5-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fix support for 32-bit (i386) binaries on Linux/AMD64.
+
+ -- Roland McGrath <frob@debian.org>  Sun, 27 Jun 2004 22:19:15 -0700
+
 strace (4.5.4-1) unstable; urgency=low
 
   * Build package on amd64, closes: #246568.
