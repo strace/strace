@@ -97,14 +97,14 @@ int sys_poll();
 
 /* architecture-specific calls */
 #ifdef ALPHA
-sys_osf_select();
-sys_osf_gettimeofday();
-sys_osf_settimeofday();
-sys_osf_getitimer();
-sys_osf_setitimer();
-sys_osf_getrusage();
-sys_osf_wait4();
-sys_osf_utimes();
+int sys_osf_select();
+int sys_osf_gettimeofday();
+int sys_osf_settimeofday();
+int sys_osf_getitimer();
+int sys_osf_setitimer();
+int sys_osf_getrusage();
+int sys_osf_wait4();
+int sys_osf_utimes();
 #endif
 
 

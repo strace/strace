@@ -54,16 +54,18 @@ long addr;
 }
 
 #ifdef ALPHA
+struct timeval32 
+{
+    unsigned tv_sec;
+    unsigned tv_usec;
+};
+
 void
 printtv32(tcp, addr)
 struct tcb *tcp;
 long addr;
 {
-    struct timeval32 
-    {
-	    unsigned tv_sec;
-	    unsigned tv_usec;
-    };
+    struct timeval32  tv;
 
     if (addr == 0)
 	tprintf("NULL");

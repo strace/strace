@@ -310,7 +310,7 @@ int bitness;
 #ifdef ALPHA
 			if (bitness) {
 				tv32=(struct timeval32*)&tv;
-				tprintf(", {%u, %u}", tv32.tv_sec, tv32.tv_usec);
+				tprintf(", {%u, %u}", tv32->tv_sec, tv32->tv_usec);
 			} else
 #endif
 				tprintf(", {%lu, %lu}",

@@ -334,6 +334,7 @@ extern void printtrailer P((struct tcb *));
 extern void tabto P((int));
 extern void call_summary P((FILE *));
 extern void fake_execve P((struct tcb *, char *, char *[], char *[]));
+extern void printtv32 P((struct tcb*, long));
 
 extern int internal_fork P((struct tcb *));
 extern int internal_exec P((struct tcb *));

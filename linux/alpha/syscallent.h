@@ -236,7 +236,7 @@
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 205 */
 	{ 4,	TI,	printargs,		"semop"		}, /* 206 */
 	{ 1,	0,	printargs,		"osf_utsname"	}, /* 207 */
-	{ 3,	TF,	sys_lchown,		"lchown"	}, /* 208 */
+	{ 3,	TF,	sys_chown,		"lchown"	}, /* 208 */
 	{ 3,	TI,	printargs,		"osf_shmat"	}, /* 209 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 210 */
 	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 211 */
