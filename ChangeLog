@@ -2,6 +2,13 @@
 
   * strace.c: close outf before we exec a child process
 
+2000-06-09  Ulrich Drepper  <drepper@redhat.com>
+
+  * configure.in: Don't link against libnsl on Linux, it's unnecessary.
+  * defs.h (struct tcb): Make auxstr member const.
+  * file.c (fsmagic): And many more magic numbers.
+  * util.c: Don't include <linux/ptrace.h> for glibc 2.1 and up.
+
 2000-04-26  Wichert Akkerman <wakkerma@debian.org>
 
   * defs.h: balance #if/#endif again

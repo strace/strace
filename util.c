@@ -44,7 +44,7 @@
 #include <link.h>
 #endif /* SUNOS4 */
 
-#if defined(linux)
+#if defined(linux) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
 #include <linux/ptrace.h>
 #endif 
 

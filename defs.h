@@ -195,7 +195,7 @@ struct tcb {
 	int u_error;		/* Error code */
 	long u_rval;		/* (first) return value */
 	FILE *outf;		/* Output file for this process */
-	char *auxstr;		/* Auxiliary info from syscall (see RVAL_STR) */
+	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
