@@ -75,7 +75,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Fri Feb  4 2005 Roland McGrath <roland@frob.com> - 4.5.9-2
+* Fri Feb  4 2005 Roland McGrath <roland@redhat.com> - 4.5.9-2
 - update ia64 syscall list (#146245)
 - fix x86_64 syscall argument extraction for 32-bit processes (#146093)
 - fix -e signal=NAME parsing (#143362)
