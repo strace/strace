@@ -1,3 +1,9 @@
+2004-06-03  Roland McGrath  <roland@redhat.com>
+
+	* net.c (domains): Add many PF_* values #ifdef PF_*.
+	(addrfams): Add many AF_* values #ifdef AF_*.
+	Fixes Debian bug #250506.
+
 2004-05-02  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* linux/ioctlsort.c (compare): When ioctl codes equal, compare
