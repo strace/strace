@@ -1,5 +1,9 @@
 2004-10-07  Roland McGrath  <roland@redhat.com>
 
+	* file.c (sys_llssek, sys_readahead, sys_fadvise64, sys_fadvise64_64):
+	Use LONG_LONG macro.
+	* io.c (sys_pread, sys_pwrite, sys_sendfile): Likewise.
+
 	* linux/x86_64/syscallent.h: Fix botched table entries.
 	From Ulrich Drepper <drepper@redhat.com>.
 
