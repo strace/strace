@@ -1066,11 +1066,34 @@ int sig;
 	}
 	else {
 		for (;;) {
-			if (waitpid(tcp->pid, &status, 0) < 0) {
-				if (errno != ECHILD)
+#ifdef __WALL
+			if (wait4(tcp->pid, &status, __WALL, NULL) < 0) {
+				if (errno == ECHILD) /* Already gone.  */
+					break;
+				if (errno != EINVAL) {
 					perror("detach: waiting");
-				break;
+					break;
+				}
+#endif /* __WALL */
+				/* No __WALL here.  */
+				if (waitpid(tcp->pid, &status, 0) < 0) {
+					if (errno != ECHILD) {
+						perror("detach: waiting");
+						break;
+					}
+#ifdef __WCLONE
+					/* If no processes, try clones.  */
+					if (wait4(tcp->pid, &status, __WCLONE,
+						  NULL) < 0) {
+						if (errno != ECHILD)
+							perror("detach: waiting");
+						break;
+					}
+#endif /* __WCLONE */
+				}
+#ifdef __WALL
 			}
+#endif
 			if (!WIFSTOPPED(status)) {
 				/* Au revoir, mon ami. */
 				break;
