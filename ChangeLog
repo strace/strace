@@ -1,3 +1,28 @@
+2003-07-05  Richard Henderson  <rth@twiddle.net>
+
+	* process.c (sys_clone): Order arguments for alpha the same as x86_64.
+	* syscall.c (ERESTART_RESTARTBLOCK): New.
+	(trace_syscall): Print it.
+	* linux/alpha/syscallent.h (osf_syscall): Name properly.
+	(osf_set_program_attributes): Fix typo.
+	(osf_nfssvc): Likewise.
+	(osf_sigsendset): Likewise.
+	(getdents64, gettid, readahead, tkill, setxattr, lsetxattr, fsetxattr,
+	getxattr, lgetxattr, fgetxattr, listxattr, llistxattr, flistxattr,
+	removexattr, lremovexattr, fremovexattr, futex, sched_setaffinity,
+	sched_getaffinity, tuxcall, io_setup, io_destroy, io_getevents,
+	io_submit, io_cancel, exit_group, lookup_dcookie, epoll_create,
+	epoll_ctl, epoll_wait, remap_file_pages, set_tid_address,
+	restart_syscall, fadvise, timer_create, timer_settime, timer_gettime,
+	timer_getoverrun, timer_delete, clock_settime, clock_gettime,
+	clock_getres, clock_nanosleep, semtimedop): New.
+
+2003-07-08  Roland McGrath  <roland@redhat.com>
+
+	* signal.c (sys_tgkill): New function.
+	* linux/syscall.h: Declare it.
+	* linux/syscallent.h: Add tgkill.
+
 2003-06-27  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: Check for type `struct __old_kernel_stat'.
