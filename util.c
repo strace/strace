@@ -632,25 +632,13 @@ char *laddr;
 
 #ifdef USE_PROCFS
 #ifdef HAVE_MP_PROCFS
-	if (pread(tcp->pfd_as, laddr, len, addr) == -1)
-		return -1;
+	int fd = tcp->pfd_as;
 #else
-/*
- * We would like to use pread preferentially for speed
- * but even though SGI has it in their library, it no longer works.
- */
-#ifdef MIPS
-#undef HAVE_PREAD
+	int fd = tcp->pfd;
 #endif
-#ifdef HAVE_PREAD
-	if (pread(tcp->pfd, laddr, len, addr) == -1)
+	lseek(fd, addr, SEEK_SET);
+	if (read(fd, laddr, len) == -1)
 		return -1;
-#else /* !HAVE_PREAD */
-	lseek(tcp->pfd, addr, SEEK_SET);
-	if (read(tcp->pfd, laddr, len) == -1)
-		return -1;
-#endif /* !HAVE_PREAD */
-#endif /* HAVE_MP_PROCFS */
 #endif /* USE_PROCFS */
 
 	return 0;
@@ -668,7 +656,34 @@ int len;
 char *laddr;
 {
 #ifdef USE_PROCFS
-	return umoven(tcp, addr, len, laddr);
+#ifdef HAVE_MP_PROCFS
+	int fd = tcp->pfd_as;
+#else
+	int fd = tcp->pfd;
+#endif
+	/* Some systems (e.g. FreeBSD) can be upset if we read off the
+	   end of valid memory,  avoid this by trying to read up
+	   to page boundaries.  But we don't know what a page is (and
+	   getpagesize(2) (if it exists) doesn't necessarily return
+	   hardware page size).  Assume all pages >= 1024 (a-historical
+	   I know) */
+
+	int page = 1024; 	/* How to find this? */
+	int move = page - (addr & (page - 1));
+	int left = len;
+
+	lseek(fd, addr, SEEK_SET);
+
+	while (left) {
+		if (move > left) move = left;
+		if ((move = read(fd, laddr, move)) == -1)
+			return left != len ? 0 : -1;
+		if (memchr (laddr, 0, move)) break;
+		left -= move;
+		laddr += move;
+		addr += move;
+		move = page;
+	}
 #else /* !USE_PROCFS */
 	int started = 0;
 	int pid = tcp->pid;
@@ -718,8 +733,8 @@ char *laddr;
 
 		addr += sizeof(long), laddr += m, len -= m;
 	}
-	return 0;
 #endif /* !USE_PROCFS */
+	return 0;
 }
 
 #ifdef LINUX

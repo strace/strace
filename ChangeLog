@@ -1,3 +1,9 @@
+2001-05-15  John Hughes <john@Calva.COM>
+
+  * util.c: Don't run off the end of valid memory in umovestr when
+    USE_PROCFS.  Important for FREEBSD systems (which seem to have an
+    unmapped page just after the args/env area).
+
 2001-04-18  John Hughes <john@Calva.COM>
 
   * configure.in: test for sys/nscsys.h, the non-stop clusters includes.
