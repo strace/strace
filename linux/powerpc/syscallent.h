@@ -265,9 +265,9 @@
 	{ 6,	0,	printargs,		"fadvise64"		}, /* 233 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 234 */
 	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 235 */
-	{ 1,	0,	printargs,		"epoll_create"		}, /* 236 */
-	{ 4,	0,	printargs,		"epoll_ctl"		}, /* 237 */
-	{ 4,	0,	printargs,		"epoll_wait"		}, /* 238 */
+	{ 1,	0,	sys_epoll_create,	"epoll_create"		}, /* 236 */
+	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"		}, /* 237 */
+	{ 4,	0,	sys_epoll_wait,		"epoll_wait"		}, /* 238 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"	}, /* 239 */
 	{ 3,	0,	sys_timer_create,	"timer_create"		}, /* 240 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"		}, /* 241 */

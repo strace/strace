@@ -300,9 +300,9 @@
 	{ 5,	0,	printargs,		"SYS_251"	}, /* 251 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 252 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 253 */
-	{ 1,	0,	printargs,		"epoll_create"	}, /* 254 */
-	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 255 */
-	{ 4,	0,	printargs,		"epoll_wait"	}, /* 256 */
+	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 254 */
+	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 255 */
+	{ 4,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 256 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 257 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 258 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 259 */

@@ -96,6 +96,7 @@ int sys_clock_gettime(), sys_clock_getres(), sys_clock_nanosleep();
 int sys_semtimedop(), sys_statfs64(), sys_fstatfs64(), sys_tgkill();
 int sys_mq_open(), sys_mq_timedsend(), sys_mq_timedreceive();
 int sys_mq_notify(), sys_mq_getsetattr();
+int sys_epoll_create(), sys_epoll_ctl(), sys_epoll_wait();
 int sys_waitid();
 
 /* sys_socketcall subcalls */

@@ -211,9 +211,9 @@
 	{ 3,	0,	printargs,		"io_cancel"	}, /* 210 */
 	{ 1,	0,	sys_get_thread_area,	"get_thread_area" }, /* 211 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 212 */
-	{ 1,	0,	printargs,		"epoll_create"	}, /* 213 */
-	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 214 */
-	{ 4,	0,	printargs,		"epoll_wait"	}, /* 215 */
+	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 213 */
+	{ 4,	0,	printargs,		"epoll_ctl_old"	}, /* 214 */
+	{ 4,	0,	printargs,		"epoll_wait_old"}, /* 215 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 216 */
 	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 217 */
 	{ 5,	0,	printargs,		"SYS_218"	}, /* 218 */
@@ -244,8 +244,8 @@
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 229 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 230 */
 	{ 5,	0,	printargs,		"exit_group"	}, /* 231 */
-	{ 5,	0,	printargs,		"epoll_wait"	}, /* 232 */
-	{ 5,	0,	printargs,		"epoll_ctl"	}, /* 233 */
+	{ 5,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 232 */
+	{ 5,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 233 */
 	{ 5,	0,	printargs,		"tgkill"	}, /* 234 */
 	{ 5,	0,	printargs,		"utimes"	}, /* 235 */
 	{ 5,	0,	printargs,		"vserver"	}, /* 236 */

@@ -191,9 +191,9 @@
 	{ 2,	0,	sys_init_module,"init_module" },	/* 190 */
 	{ 1,	0,	sys_personality,"personality" },	/* 191 */
 	{ 5,	0,	sys_remap_file_pages,"remap_file_pages" },/* 192 */
-	{ 1,	0,	printargs,	"epoll_create" },		/* 193 */
-	{ 4,	0,	printargs,	"epoll_ctl" },		/* 194 */
-	{ 4,	0,	printargs,	"epoll_wait" },		/* 195 */
+	{ 1,	0,	sys_epoll_create,"epoll_create" },	/* 193 */
+	{ 4,	0,	sys_epoll_ctl,	"epoll_ctl" },		/* 194 */
+	{ 4,	0,	sys_epoll_wait,	"epoll_wait" },		/* 195 */
 	{ 2,	0,	sys_ulimit,	"ulimit" },		/* 196 */
 	{ 0,	0,	sys_getppid,	"getppid" },		/* 197 */
 	{ 3,	TS,	sys_sigaction,	"sigaction" },		/* 198 */

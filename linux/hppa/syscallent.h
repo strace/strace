@@ -229,9 +229,9 @@
 	{ 1,	0,	printargs,		"free_hugepages"	}, /* 221 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 222 */
 	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 223 */
-	{ 1,	0,	printargs,		"epoll_create"		}, /* 224 */
-	{ 4,	0,	printargs,		"epoll_ctl"		}, /* 225 */
-	{ 4,	0,	printargs,		"epoll_wait"		}, /* 226 */
+	{ 1,	0,	sys_epoll_create,	"epoll_create"		}, /* 224 */
+	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"		}, /* 225 */
+	{ 4,	0,	sys_epoll_wait,		"epoll_wait"		}, /* 226 */
 	{ 5,	0,	printargs,		"remap_file_pages"	}, /* 227 */
 	{ 5,	0,	printargs,		"semtimedop"		}, /* 228 */
 	{ 5,	0,	printargs,		"SYS_229"		}, /* 229 */

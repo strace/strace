@@ -1146,9 +1146,9 @@
 	{ 5,	0,	printargs,		"io_getevents"	}, /* 1240 */
 	{ 3,	0,	printargs,		"io_submit"	}, /* 1241 */
 	{ 3,	0,	printargs,		"io_cancel"	}, /* 1242 */
-	{ 1,	0,	printargs,		"epoll_create"	}, /* 1243 */
-	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 1244 */
-	{ 4,	0,	printargs,		"epoll_wait"	}, /* 1245 */
+	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 1243 */
+	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 1244 */
+	{ 4,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 1245 */
 	{ 8,	0,	printargs,		"SYS_1246"	}, /* 1246 */
 	{ 8,	0,	printargs,		"SYS_1247"	}, /* 1247 */
 	{ 8,	0,	printargs,		"SYS_1248"	}, /* 1248 */

@@ -34,6 +34,10 @@
 
 #include <fcntl.h>
 #include <sys/file.h>
+#ifdef LINUX
+#include <inttypes.h>
+#include <sys/epoll.h>
+#endif
 
 #if HAVE_LONG_LONG_OFF_T
 /*
@@ -549,6 +553,100 @@ struct tcb *tcp;
 }
 #endif
 
+static struct xlat epollctls[] = {
+	{ EPOLL_CTL_ADD,	"EPOLL_CTL_ADD"	},
+	{ EPOLL_CTL_MOD,	"EPOLL_CTL_MOD"	},
+	{ EPOLL_CTL_DEL,	"EPOLL_CTL_DEL"	},
+	{ 0,			NULL		}
+};
+
+static struct xlat epollevents[] = {
+	{ EPOLLIN,	"EPOLLIN"	},
+	{ EPOLLPRI,	"EPOLLPRI"	},
+	{ EPOLLOUT,	"EPOLLOUT"	},
+	{ EPOLLRDNORM,	"EPOLLRDNORM"	},
+	{ EPOLLRDBAND,	"EPOLLRDBAND"	},
+	{ EPOLLWRNORM,	"EPOLLWRNORM"	},
+	{ EPOLLWRBAND,	"EPOLLWRBAND"	},
+	{ EPOLLMSG,	"EPOLLMSG"	},
+	{ EPOLLERR,	"EPOLLERR"	},
+	{ EPOLLHUP,	"EPOLLHUP"	},
+	{ EPOLLONESHOT,	"EPOLLONESHOT"	},
+	{ EPOLLET,	"EPOLLET"	},
+	{ 0,		NULL		}
+};
+
+int
+sys_epoll_create(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("%ld", tcp->u_arg[0]);
+	return 0;
+}
+
+static void
+print_epoll_event(ev)
+struct epoll_event *ev;
+{
+	tprintf("{");
+	if (printflags(epollevents, ev->events) == 0)
+		tprintf("0");
+	/* We cannot know what format the program uses, so print u32 and u64
+	   which will cover every value.  */
+	tprintf(", {u32=%" PRIu32 ", u64=%" PRIu64 "}}",
+		ev->data.u32, ev->data.u64);
+}
+
+int
+sys_epoll_ctl(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		struct epoll_event ev;
+		tprintf("%ld, ", tcp->u_arg[0]);
+                printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
+		tprintf(", %ld, ", tcp->u_arg[2]);
+		if (tcp->u_arg[3] == 0)
+			tprintf("NULL");
+		else if (umove(tcp, tcp->u_arg[3], &ev) < 0)
+			tprintf("{...}");
+		else
+			print_epoll_event(&ev);
+	}
+	return 0;
+}
+
+int
+sys_epoll_wait(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("%ld, ", tcp->u_arg[0]);
+	else {
+		if (syserror(tcp))
+			tprintf("%lx", tcp->u_arg[1]);
+		else if (tcp->u_rval == 0)
+			tprintf("{}");
+		else {
+			struct epoll_event evs[tcp->u_rval];
+			if (umove(tcp, tcp->u_arg[1], evs) < 0)
+				tprintf("{...}");
+			else {
+				unsigned long i;
+				tprintf("{");
+				for (i = 0; i < tcp->u_rval; ++i) {
+					if (i > 0)
+						tprintf(", ");
+					print_epoll_event(&evs[i]);
+				}
+				tprintf("}");
+			}
+		}
+		tprintf(", %ld, %ld", tcp->u_arg[2], tcp->u_arg[3]);
+	}
+	return 0;
+}
 #endif /* LINUX */
 
 int

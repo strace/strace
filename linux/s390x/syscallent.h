@@ -276,9 +276,9 @@
 	{ 3,	0,	printargs,		"io_submit"	}, /* 246 */
 	{ 3,	0,	printargs,		"io_cancel"	}, /* 247 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 248 */
-	{ 1,	0,	printargs,		"epoll_create"	}, /* 249 */
-	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 250 */
-	{ 4,	0,	printargs,		"epoll_wait"	}, /* 251 */
+	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 249 */
+	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
+	{ 4,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 251 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 252 */
 	{ 5,	0,	printargs,		"fadvise64"	}, /* 253 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 254 */
