@@ -1122,7 +1122,7 @@
 	{ 4,	0,	sys_readahead,		"readahead"	}, /* 1216 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 1217 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 1218 */
-	{ 5,	0,	sys_xsetattr,		"fsetxattr"	}, /* 1219 */
+	{ 5,	0,	sys_setxattr,		"fsetxattr"	}, /* 1219 */
 	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 1220 */
 	{ 4,	TF,	sys_getxattr,		"lgetxattr"	}, /* 1221 */
 	{ 4,	0,	sys_getxattr,		"fgetxattr"	}, /* 1222 */
