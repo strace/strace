@@ -2240,6 +2240,15 @@ Process %d attached (waiting for parent)\n",
 				pc += (psr >> PSR_RI) & 0x3;
 				ptrace(PT_GETSIGINFO, pid, 0, (long) &si);
 				addr = (unsigned long) si.si_addr;
+#elif defined PTRACE_GETSIGINFO
+				if (WSTOPSIG(status) == SIGSEGV ||
+				    WSTOPSIG(status) == SIGBUS) {
+					siginfo_t si;
+					if (ptrace(PTRACE_GETSIGINFO, pid,
+						   0, &si) == 0)
+						addr = (unsigned long)
+							si.si_addr;
+				}
 #endif
 				printleader(tcp);
 				tprintf("--- %s (%s) @ %lx (%lx) ---",
