@@ -1,3 +1,13 @@
+2003-04-07  Roland McGrath  <roland@redhat.com>
+
+	* linux/syscallent.h: Handle semtimedop subcall of ipc syscall.
+	* linux/syscall.h: Likewise.
+	* ipc.c [LINUX] (sys_semtimedop): New function.
+	From Ulrich Drepper <drepper@redhat.com>.
+
+	* ipc.c (sys_semget): Mask off permission bits for resource_flags.
+	From Ulrich Drepper <drepper@redhat.com>.
+
 2003-04-01  Philippe De Muyter  <phdm@macqel.be>
 
 	* sock.c, stream.c: Check #ifdef LINUX, not linux.
