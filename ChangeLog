@@ -1,6 +1,11 @@
+2003-09-23  Roland McGrath  <roland@redhat.com>
+
+	* signal.c (sprintsigmask): Print RT_%u for __SIGRTMIN..__SIGRTMAX.
+	Fixes RH#104365.
+
 2003-08-21  Roland McGrath  <roland@redhat.com>
 
-	* linux/syscallent.h: Fix mlock argument count.
+	* linux/syscallent.h: Fix mlock argument count.  Fixes RH#101499.
 	* linux/x86_64/syscallent.h: Likewise.
 	* linux/s390/syscallent.h: Likewise.
 	* linux/s390x/syscallent.h: Likewise.
