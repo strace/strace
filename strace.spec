@@ -75,6 +75,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Sep 24 2003 Roland McGrath <roland@redhat.com> 4.5-1
+- new upstream version, more fixes (#101499, #104365)
+
 * Thu Jul 17 2003 Roland McGrath <roland@redhat.com> 4.4.99-2
 - rebuilt
 
