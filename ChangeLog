@@ -1,5 +1,8 @@
 2005-02-02  Roland McGrath  <roland@redhat.com>
 
+	* file.c (openmodes) [O_LARGEFILE] [O_LARGEFILE == 0]: Redefine to
+	known values for Linux.
+
 	* util.c (printcall): Print 16 ?s when long is 8 bytes.
 	Fixes RH#146932.
 
