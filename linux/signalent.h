@@ -29,4 +29,5 @@
 	"SIGWINCH",	/* 28 */
 	"SIGIO",	/* 29 */
 	"SIGPWR",	/* 30 */
-	"SIGUNUSED",	/* 31 */
+	"SIGSYS",	/* 31 */
+	"SIGRTMIN",	/* 32 */

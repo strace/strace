@@ -56,7 +56,7 @@
 	"ENOANO", /* 55 */
 	"EBADRQC", /* 56 */
 	"EBADSLT", /* 57 */
-	"EDEADLOCK", /* 58 */
+	"ERRNO_58", /* 58 */
 	"EBFONT", /* 59 */
 	"ENOSTR", /* 60 */
 	"ENODATA", /* 61 */
@@ -121,8 +121,8 @@
 	"EISNAM", /* 120 */
 	"EREMOTEIO", /* 121 */
 	"EDQUOT", /* 122 */
-	"ERRNO_123", /* 123 */
-	"ERRNO_124", /* 124 */
+	"ENOMEDIUM", /* 123 */
+	"EMEDIUMTYPE", /* 124 */
 	"ERRNO_125", /* 125 */
 	"ERRNO_126", /* 126 */
 	"ERRNO_127", /* 127 */
@@ -514,3 +514,16 @@
 	"ERESTARTNOINTR", /* 513 */
 	"ERESTARTNOHAND", /* 514 */
 	"ENOIOCTLCMD", /* 515 */
+	"ERRNO_516", /* 516 */
+	"ERRNO_517", /* 517 */
+	"ERRNO_518", /* 518 */
+	"ERRNO_519", /* 519 */
+	"ERRNO_520", /* 520 */
+	"EBADHANDLE", /* 521 */
+	"ENOTSYNC", /* 522 */
+	"EBADCOOKIE", /* 523 */
+	"ENOTSUPP", /* 524 */
+	"ETOOSMALL", /* 525 */
+	"ESERVERFAULT", /* 526 */
+	"EBADTYPE", /* 527 */
+	"EJUKEBOX", /* 528 */
