@@ -35,6 +35,13 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+
+#if defined(HAVE_SIN6_SCOPE_ID_LINUX)
+#define in6_addr in6_addr_libc
+#define ipv6_mreq ipv6_mreq_libc
+#define sockaddr_in6 sockaddr_in6_libc
+#endif
+
 #include <netinet/in.h>
 #ifdef HAVE_NETINET_TCP_H
 #include <netinet/tcp.h>
@@ -43,6 +50,7 @@
 #include <netinet/udp.h>
 #endif
 #include <arpa/inet.h>
+#include <net/if.h>
 #if defined(LINUX)
 #include <asm/types.h>
 #if defined(__GLIBC__) && (__GLIBC__ >= 2) && (__GLIBC__ + __GLIBC_MINOR__ >= 3)
@@ -52,9 +60,25 @@
 #endif
 #endif /* LINUX */
 
-#if defined (__GLIBC__) && ((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
+#if defined (__GLIBC__) && (((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)) || defined(HAVE_SIN6_SCOPE_ID_LINUX))
 #if defined(HAVE_LINUX_IN6_H)
+#if defined(HAVE_SIN6_SCOPE_ID_LINUX)
+#undef in6_addr
+#undef ipv6_mreq
+#undef sockaddr_in6
+#define in6_addr in6_addr_kernel
+#define ipv6_mreq ipv6_mreq_kernel
+#define sockaddr_in6 sockaddr_in6_kernel
+#endif
 #include <linux/in6.h>
+#if defined(HAVE_SIN6_SCOPE_ID_LINUX)
+#undef in6_addr
+#undef ipv6_mreq
+#undef sockaddr_in6
+#define in6_addr in6_addr_libc
+#define ipv6_mreq ipv6_mreq_libc
+#define sockaddr_in6 sockaddr_in6_kernel
+#endif
 #endif
 #endif
 
@@ -603,9 +627,30 @@ int addrlen;
 #ifdef HAVE_INET_NTOP
 	case AF_INET6:
 		inet_ntop(AF_INET6, &addrbuf.sa6.sin6_addr, string_addr, sizeof(string_addr));
-		tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)}",
-			ntohs(addrbuf.sa6.sin6_port), string_addr, ntohl(addrbuf.sa6.sin6_flowinfo));
-		break;	
+		tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=%u",
+				ntohs(addrbuf.sa6.sin6_port), string_addr,
+				addrbuf.sa6.sin6_flowinfo);
+#ifdef HAVE_SIN6_SCOPE_ID
+		{
+#if defined(HAVE_IF_INDEXTONAME) && defined(IN6_IS_ADDR_LINKLOCAL) && defined(IN6_IS_ADDR_MC_LINKLOCAL)
+		    int numericscope = 0;
+		    if (IN6_IS_ADDR_LINKLOCAL (&addrbuf.sa6.sin6_addr)
+			    || IN6_IS_ADDR_MC_LINKLOCAL (&addrbuf.sa6.sin6_addr)) {
+			char scopebuf[IFNAMSIZ + 1];
+			
+			if (if_indextoname (addrbuf.sa6.sin6_scope_id, scopebuf) == NULL)
+			    numericscope++;
+			else
+			    tprintf(", sin6_scope_id=if_nametoindex(\"%s\")", scopebuf);
+		    } else
+			numericscope++;
+		    
+		    if (numericscope)
+#endif
+			tprintf(", sin6_scope_id=%u", addrbuf.sa6.sin6_scope_id);
+		}
+#endif
+		    break;
 #endif
 #if defined(AF_IPX) && defined(linux)
 	case AF_IPX:

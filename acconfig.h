@@ -77,3 +77,9 @@
 
 /* Define if yor compilers know abuot long long */
 #undef HAVE_LONG_LONG
+
+/* Define if struct sockaddr_in6 contains sin6_scope_id field. */
+#undef HAVE_SIN6_SCOPE_ID
+
+/* Define if linux struct sockaddr_in6 contains sin6_scope_id fiels. */
+#undef HAVE_SIN6_SCOPE_ID_LINUX

@@ -1,5 +1,15 @@
 2001-02-16  Wichert Akkerman <wakkerma@debian.org>
 
+  * CREDITS: add Arkadiusz Miskiewicz <misiek@pld.org.pl> who
+    submitted the IP6 scope ID updates
+  * acconfig.h: add HAVE_SIN6_SCOPE_ID and HAVE_SIN6_SCOPE_ID_LINUX
+  * aclocal.m4: add AC_SIN6_SCOPE_ID to check if sin6_scope_id is
+    available
+  * configure.in: check for if_indextoname function and sin6_scope_id
+  * net.c: teach printsock about IP6 scope ids
+
+2001-02-16  Wichert Akkerman <wakkerma@debian.org>
+
   * configure.in: test for netinet/tcp.h and netinet/udp.h existance
   * net.c: include netinet/tcp.h and netinet/udp.h if they exist
   * Makefile.in: use @mandir@ and @bindir@

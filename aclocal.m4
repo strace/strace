@@ -314,3 +314,30 @@ then
 	AC_DEFINE(HAVE_LONG_LONG)
 fi
 ])
+
+dnl ### A macro to determine whether sin6_scope_id is available.
+AC_DEFUN(AC_SIN6_SCOPE_ID,
+[AC_MSG_CHECKING(for sin6_scope_id in sockaddr_in6)
+AC_CACHE_VAL(ac_cv_have_sin6_scope_id,
+[AC_TRY_COMPILE([#include <netinet/in.h>],
+[ struct sockaddr_in6 s; s.sin6_scope_id = 0; ],
+ac_cv_have_sin6_scope_id=yes,
+ac_cv_have_sin6_scope_id=no)])
+AC_MSG_RESULT($ac_cv_have_sin6_scope_id)
+if test "$ac_cv_have_sin6_scope_id" = "yes" ; then
+       AC_DEFINE(HAVE_SIN6_SCOPE_ID)
+else
+       AC_MSG_CHECKING(for sin6_scope_id in linux sockaddr_in6)
+       AC_CACHE_VAL(ac_cv_have_sin6_scope_id_linux,
+       [AC_TRY_COMPILE([#include <linux/in6.h>],
+       [ struct sockaddr_in6 s; s.sin6_scope_id = 0; ],
+       ac_cv_have_sin6_scope_id_linux=yes,
+       ac_cv_have_sin6_scope_id_linux=no)])
+       AC_MSG_RESULT($ac_cv_have_sin6_scope_id_linux)
+       if test "$ac_cv_have_sin6_scope_id_linux" = "yes" ; then
+               AC_DEFINE(HAVE_SIN6_SCOPE_ID)
+               AC_DEFINE(HAVE_SIN6_SCOPE_ID_LINUX)
+       fi
+fi
+])
+
