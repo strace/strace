@@ -1,5 +1,97 @@
 2004-07-12  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (EXTRA_DIST): Add linux/sparc64 files.
+
+	* debian/rules: On sparc-linux, build strace64 as well.
+	From Ben Collins <bcollins@debian.org>.
+	Fixes Debian bug #254728.
+
+2004-07-07  David S. Miller  <davem@nuts.davemloft.net>
+
+	* linux/sparc/syscallent.h: Sync with reality.
+	* linux/sparc/syscall.h (sys_sendfile64, sys_futex, sys_gettid,
+	sys_sched_setaffinity, sys_sched_getaffinity, sys_setxattr,
+	sys_lsetxattr, sys_fsetxattr, sys_getxattr, sys_lgetxattr,
+	sys_fgetxattr, sys_listxattr, sys_llistxattr, sys_flistxattr,
+	sys_removexattr, sys_lremovexattr, sys_fremovexattr,
+	sys_remap_file_pages, sys_readahead, sys_tgkill, sys_statfs64,
+	sys_fstatfs64, sys_clock_settime, sys_clock_gettime,
+	sys_clock_getres, sys_clock_nanosleep, sys_timer_create,
+	sys_timer_settime, sys_timer_gettime): New declarations.
+	* linux/sparc64/dummy2.h, linux/sparc64/syscallent2.h,
+	linux/sparc64/syscall.h, linux/sparc64/errnoent.h,
+	linux/sparc64/errnoent1.h, linux/sparc64/errnoent2.h,
+	linux/sparc64/ioctlent.h, linux/sparc64/ioctlent1.h,
+	linux/sparc64/ioctlent2.h, linux/sparc64/signalent.h,
+	linux/sparc64/signalent.h, linux/sparc64/signalent.h,
+	linux/sparc64/signalent1.h, linux/sparc64/signalent2.h,
+	linux/sparc64/syscall1.h, linux/sparc64/syscallent.h,
+	linux/sparc64/syscallent1.h: New files.
+	* defs.h (LINUXSPARC): Define also when SPARC64.
+	(LINUX && SPARC64): Set SUPPORTED_PERSONALITIES to 3.
+	Ignore SIGTRAP after execve by defining TCB_WAITEXECVE.
+	Define possibly missing __NR_exit_group.  Declare getrval2.
+	* configure.ac (sparc64): New architecture case.
+	* file.c (stat_sparc64): New structure.
+	(printstat_sparc64): New output routine for that.
+	(printstat): Call it, if personality is 2.
+	(printstat64): Likewise.
+	* util.c: Conditionalize ptrace defines on LINUXSPARC
+	not LINUX && SPARC.
+	(SPARC64 && LINUX): Define r_pc to r_tpc, and PTRACE_FOOREGS
+	to PTRACE_FOOREGS64 so that more sparc code can be shared
+	between 64-bit and 32-bit.
+	(_hack_syscall5): Correct trap number when SPARC64.
+	(PTRACE_WRITE{TEXT,DATA}): Add SPARC64 to ifdef guard.
+	(getpc): Handle SPARC64 && LINUX.
+	(printcall): Likewise.
+	(arg fetching/setting): Use same code for SPARC64 LINUX
+	as for SPARC.
+	(setbpt): Handle SPARC64 && LINUX.
+	(clearbpt): Likewise.
+	* signal.c: Conditionalize ptrace defines on SPARC and
+	SPARC64.
+	(SPARC64 && LINUX): Define r_pc to r_tpc, and PTRACE_FOOREGS
+	to PTRACE_FOOREGS64 so that more sparc code can be shared
+	between 64-bit and 32-bit.
+	(m_siginfo): Use same definition on SPARC64 as SPARC.
+	(sys_sigreturn): Handle LINUX && SPARC64.
+	* syscall.c: Conditionalize ptrace defines on SPARC and
+	SPARC64.
+	(SPARC64 && LINUX): Define r_pc to r_tpc, and PTRACE_FOOREGS
+	to PTRACE_FOOREGS64 so that more sparc code can be shared
+	between 64-bit and 32-bit.
+	(getscno): Use same static state on SPARC64 as SPARC,
+	and add SPARC64 handling.
+	(get_error): Handle LINUX && SPARC64.
+	(force_result): Likewise.
+	(syscall_enter): Likewise.
+	(trace_syscall): Handle sys_socketcall and sys_ipc on SPARC64
+	just like SPARC.
+	(getrval2): Handle LINUX && SPARC64.
+	* process.c: Conditionalize ptrace defines on SPARC and
+	SPARC64.
+	(SPARC64 && LINUX): Define r_pc to r_tpc, and PTRACE_FOOREGS
+	to PTRACE_FOOREGS64 so that more sparc code can be shared
+	between 64-bit and 32-bit.
+	(change_syscall): Handle LINUX && SPARC64.
+	(struct_user_offsets): Ifdef out those which do not exist
+	on SPARC64.
+	* net.c (sys_pipe): Handle LINUX && SPARC64.
+	* ioctl.c: Fix initializer typo for nioctlents2, was
+	nioctlents1 by accident.
+
+2004-06-28  Andreas Schwab  <schwab@suse.de>
+
+	* process.c (internal_exec): Move TCB_WAITEXECVE handling here.
+	(sys_execve): Remove it here.
+
+2004-07-12  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add linux/sh64/syscallent.h.
+
+	* debian/control (Section): Move to utils, matching Debian override.
+
 	* net.c (addrfams): Make variable global.
 	* sock.c (sock_ioctl): Decode the arguments for SIOCGIFNAME,
 	SIOCGIFINDEX, and SIOCGIFCONF.
