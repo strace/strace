@@ -4,6 +4,9 @@
 
 2003-12-14 Anton Blanchard <anton@samba.org>
 
+	* file.c (sys_getdents64): Don't cast d_ino and d_off to unsigned long.
+	Use %llu formats for them.
+
 	* file.c [LINUX] (fsmagic): Add SYSFS_MAGIC.
 
 	* linux/powerpc/syscallent.h: Update to include recently added
