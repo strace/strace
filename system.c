@@ -45,19 +45,24 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#ifdef __NR_personality
+#include <sys/syscall.h>
+
+#ifdef SYS_personality
 /* Workaround for kernel namespace pollution. */
 #define _LINUX_PTRACE_H
+/* Yuck yuck yuck.  We can't include linux/ptrace.h, but personality.h
+   makes a declaration with struct pt_regs, which is defined there. */
+struct pt_regs;
 #define sys_personality kernel_sys_personality
 #include <linux/personality.h>
 #undef sys_personality
-#endif /* __NR_personality */
+#endif /* SYS_personality */
 
-#ifdef __NR_capget
+#ifdef SYS_capget
 #include <linux/capability.h>
 #endif
 
-#ifdef __NR_cacheflush
+#ifdef SYS_cacheflush
 #include <asm/cachectl.h>
 #endif
 
@@ -1201,7 +1206,7 @@ struct tcb *tcp;
 
 #endif /* SVR4 */
 
-#ifdef __NR_capget
+#ifdef SYS_capget
 int
 sys_capget(tcp)
 struct tcb *tcp;
