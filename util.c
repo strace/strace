@@ -1205,6 +1205,9 @@ typedef struct regs arg_setup_state;
 # elif defined (HPPA)
 #  define arg0_offset	 PT_GR26
 #  define arg1_offset	 (PT_GR26-4)
+# elif defined (X86_64)
+#  define arg0_offset	((long)(8*(current_personality ? RBX : RDI)))
+#  define arg1_offset	((long)(8*(current_personality ? RCX : RSI)))
 # else
 #  define arg0_offset	0
 #  define arg1_offset	4
