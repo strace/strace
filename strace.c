@@ -331,22 +331,31 @@ char *argv[];
 	setreuid(geteuid(), getuid());
 #endif
 
-	/* See if they want to pipe the output. */
-	if (outfname && (outfname[0] == '|' || outfname[0] == '!')) {
-		if ((outf = popen(outfname + 1, "w")) == NULL) {
-			fprintf(stderr, "%s: can't popen '%s': %s\n",
-				progname, outfname + 1, strerror(errno));
-			exit(1);
-		}
-		free(outfname);
-		outfname = NULL;
-	}
-
 	/* Check if they want to redirect the output. */
 	if (outfname) {
 		long f;
 
-		if ((outf = fopen(outfname, "w")) == NULL) {
+		/* See if they want to pipe the output. */
+		if (outfname[0] == '|' || outfname[0] == '!') {
+			/*
+			 * We can't do the <outfname>.PID funny business
+			 * when using popen, so prohibit it.
+			 */
+			if (followfork > 1) {
+				fprintf(stderr, "\
+%s: piping the output and -ff are mutually exclusive options\n",
+					progname);
+				exit(1);
+			}
+
+			if ((outf = popen(outfname + 1, "w")) == NULL) {
+				fprintf(stderr, "%s: can't popen '%s': %s\n",
+					progname, outfname + 1,
+					strerror(errno));
+				exit(1);
+			}
+		}
+		else if ((outf = fopen(outfname, "w")) == NULL) {
 			fprintf(stderr, "%s: can't fopen '%s': %s\n",
 				progname, outfname, strerror(errno));
 			exit(1);
@@ -367,10 +376,9 @@ char *argv[];
 	setreuid(geteuid(), getuid());
 #endif
 
-	if (!outfname) {
+	if (!outfname || outfname[0] == '|' || outfname[0] == '!')
 		setvbuf(outf, buf, _IOLBF, BUFSIZ);
-	}
-	else if (optind < argc) {
+	if (outfname && optind < argc) {
 		interactive = 0;
 		qflag = 1;
 	}
