@@ -1209,10 +1209,10 @@ int sig;
 
 #ifndef HAVE_STRERROR
 
-#ifndef SYS_ERRLIST_DECLARED
+#if !HAVE_DECL_SYS_ERRLIST
 extern int sys_nerr;
 extern char *sys_errlist[];
-#endif /* SYS_ERRLIST_DECLARED */
+#endif /* HAVE_DECL_SYS_ERRLIST */
 
 const char *
 strerror(errno)
@@ -1231,11 +1231,11 @@ int errno;
 
 #ifndef HAVE_STRSIGNAL
 
-#ifndef SYS_SIGLIST_DECLARED
 #ifdef HAVE__SYS_SIGLIST
+#if !HAVE_DECL_SYS_SIGLIST
+extern char *sys_siglist[];
 	extern char *_sys_siglist[];
 #else
-	extern char *sys_siglist[];
 #endif
 #endif /* SYS_SIGLIST_DECLARED */
 

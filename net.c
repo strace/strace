@@ -766,21 +766,21 @@ int addrlen;
 		tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=%u",
 				ntohs(addrbuf.sa6.sin6_port), string_addr,
 				addrbuf.sa6.sin6_flowinfo);
-#ifdef HAVE_SIN6_SCOPE_ID
+#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
 		{
 #if defined(HAVE_IF_INDEXTONAME) && defined(IN6_IS_ADDR_LINKLOCAL) && defined(IN6_IS_ADDR_MC_LINKLOCAL)
 		    int numericscope = 0;
 		    if (IN6_IS_ADDR_LINKLOCAL (&addrbuf.sa6.sin6_addr)
 			    || IN6_IS_ADDR_MC_LINKLOCAL (&addrbuf.sa6.sin6_addr)) {
 			char scopebuf[IFNAMSIZ + 1];
-			
+
 			if (if_indextoname (addrbuf.sa6.sin6_scope_id, scopebuf) == NULL)
 			    numericscope++;
 			else
 			    tprintf(", sin6_scope_id=if_nametoindex(\"%s\")", scopebuf);
 		    } else
 			numericscope++;
-		    
+
 		    if (numericscope)
 #endif
 			tprintf(", sin6_scope_id=%u", addrbuf.sa6.sin6_scope_id);
@@ -798,7 +798,7 @@ int addrlen;
 			 * strace-ish, but otherwise the IPX
 			 * addresses just look monstrous...
 			 * Anyways, feel free if you don't like
-			 * this way.. :) 
+			 * this way.. :)
 			 */
 			tprintf("%08lx:", (unsigned long)ntohl(addrbuf.sipx.sipx_network));
 			for (i = 0; i<IPX_NODE_LEN; i++)
@@ -818,7 +818,7 @@ int addrlen;
 			tprintf(", addr(%d)={%d, ",
 					addrbuf.ll.sll_halen,
 					addrbuf.ll.sll_hatype);
-			for (i=0; i<addrbuf.ll.sll_halen; i++) 
+			for (i=0; i<addrbuf.ll.sll_halen; i++)
 				tprintf("%02x", addrbuf.ll.sll_addr[i]);
 		}
 		break;
@@ -860,17 +860,17 @@ long addr;
 	tprintf(", msg_iov(%lu)=", (unsigned long)msg.msg_iovlen);
 	tprint_iov(tcp, msg.msg_iovlen, (long) msg.msg_iov);
 
-#ifdef HAVE_MSG_CONTROL
+#ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
 	tprintf(", msg_controllen=%lu", (unsigned long)msg.msg_controllen);
-	if (msg.msg_controllen) 
+	if (msg.msg_controllen)
 		tprintf(", msg_control=%#lx, ", (unsigned long) msg.msg_control);
 	tprintf(", msg_flags=");
 	if (printflags(msg_flags, msg.msg_flags)==0)
 		tprintf("0");
-#else /* !HAVE_MSG_CONTROL */
+#else /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
 	tprintf("msg_accrights=%#lx, msg_accrightslen=%u",
 		(unsigned long) msg.msg_accrights, msg.msg_accrightslen);
-#endif /* !HAVE_MSG_CONTROL */
+#endif /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
 	tprintf("}");
 }
 
@@ -1208,7 +1208,7 @@ struct tcb *tcp;
 			tprintf("]");
 			break;
 #endif /* PF_IPX */
-		default:	
+		default:
 			tprintf("%lu", tcp->u_arg[2]);
 			break;
 		}
@@ -1265,7 +1265,7 @@ struct tcb *tcp;
 
 		/* SOL_AX25 SOL_ROSE SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25
 		 * etc. still need work */
-		default: 
+		default:
 			tprintf("%lu", tcp->u_arg[2]);
 			break;
 		}
@@ -1404,7 +1404,7 @@ int len;
 		break;
 #endif
 
-		/* SOL_AX25 SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25 
+		/* SOL_AX25 SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25
 		 * etc. still need work  */
 
 	    default:
@@ -1414,7 +1414,7 @@ int len;
 	/* default arg printing */
 
 	tprintf (", ");
-		
+
 	if (len == sizeof (int)) {
 		printnum(tcp, addr, "%ld");
 	}
@@ -1502,7 +1502,7 @@ int (*func) ();
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = tcp->u_arg[i + 1];
 		return func (tcp);
-		
+
 	}
 
 	return func (tcp);
@@ -1581,7 +1581,7 @@ struct tcb *tcp;
 			tprintf ("%ld, ", tcp->u_arg [1]);
 		}
 		tprintf ("%ld, ", tcp->u_arg [2]);
-	} 
+	}
 	else {
 		if (tcp->u_arg[3] == 0 || syserror(tcp)) {
 			tprintf("%#lx", tcp->u_arg[3]);

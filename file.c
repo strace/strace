@@ -725,26 +725,26 @@ struct stat *statbuf;
 		    (unsigned long) statbuf->st_nlink,
 		    (unsigned long) statbuf->st_uid,
 		    (unsigned long) statbuf->st_gid);
-#ifdef HAVE_ST_BLKSIZE
+#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
 	    tprintf("st_blksize=%lu, ", (unsigned long) statbuf->st_blksize);
-#endif /* HAVE_ST_BLKSIZE */
-#ifdef HAVE_ST_BLOCKS
+#endif /* HAVE_STRUCT_STAT_ST_BLKSIZE */
+#ifdef HAVE_STRUCT_STAT_ST_BLOCKS
 	    tprintf("st_blocks=%lu, ", (unsigned long) statbuf->st_blocks);
-#endif /* HAVE_ST_BLOCKS */
+#endif /* HAVE_STRUCT_STAT_ST_BLOCKS */
     }
     else
 	    tprintf("{st_mode=%s, ", sprintmode(statbuf->st_mode));
     switch (statbuf->st_mode & S_IFMT) {
     case S_IFCHR: case S_IFBLK:
-#ifdef HAVE_ST_RDEV
+#ifdef HAVE_STRUCT_STAT_ST_RDEV
 	    tprintf("st_rdev=makedev(%lu, %lu), ",
 		    (unsigned long) major(statbuf->st_rdev),
 		    (unsigned long) minor(statbuf->st_rdev));
-#else /* !HAVE_ST_RDEV */
+#else /* !HAVE_STRUCT_STAT_ST_RDEV */
 	    tprintf("st_size=makedev(%lu, %lu), ",
 		    (unsigned long) major(statbuf->st_size),
 		    (unsigned long) minor(statbuf->st_size));
-#endif /* !HAVE_ST_RDEV */
+#endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 	    break;
     default:
 	    tprintf("st_size=%lu, ", statbuf->st_size);
@@ -754,24 +754,24 @@ struct stat *statbuf;
 	    tprintf("st_atime=%s, ", sprinttime(statbuf->st_atime));
 	    tprintf("st_mtime=%s, ", sprinttime(statbuf->st_mtime));
 	    tprintf("st_ctime=%s", sprinttime(statbuf->st_ctime));
-#if HAVE_ST_FLAGS
+#if HAVE_STRUCT_STAT_ST_FLAGS
 		tprintf(", st_flags=");
 		if (statbuf->st_flags) {
 			printflags(fileflags, statbuf->st_flags);
 		} else
 			tprintf("0");
 #endif
-#if HAVE_ST_ACLCNT
+#if HAVE_STRUCT_STAT_ST_ACLCNT
 		tprintf(", st_aclcnt=%d", statbuf->st_aclcnt);
 #endif
-#if HAVE_ST_LEVEL
+#if HAVE_STRUCT_STAT_ST_LEVEL
 		tprintf(", st_level=%ld", statbuf->st_level);
 #endif
-#if HAVE_ST_FSTYPE
+#if HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
 			(int) sizeof statbuf->st_fstype, statbuf->st_fstype);
 #endif
-#if HAVE_ST_GEN
+#if HAVE_STRUCT_STAT_ST_GEN
 		tprintf(", st_gen=%u", statbuf->st_gen);
 #endif
 		tprintf("}");
@@ -858,27 +858,27 @@ long addr;
 			(unsigned long) statbuf.st_nlink,
 			(unsigned long) statbuf.st_uid,
 			(unsigned long) statbuf.st_gid);
-#ifdef HAVE_ST_BLKSIZE
+#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
 		tprintf("st_blksize=%lu, ",
 			(unsigned long) statbuf.st_blksize);
-#endif /* HAVE_ST_BLKSIZE */
-#ifdef HAVE_ST_BLOCKS
+#endif /* HAVE_STRUCT_STAT_ST_BLKSIZE */
+#ifdef HAVE_STRUCT_STAT_ST_BLOCKS
 		tprintf("st_blocks=%lu, ", (unsigned long) statbuf.st_blocks);
-#endif /* HAVE_ST_BLOCKS */
+#endif /* HAVE_STRUCT_STAT_ST_BLOCKS */
 	}
 	else
 		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
 	switch (statbuf.st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-#ifdef HAVE_ST_RDEV
+#ifdef HAVE_STRUCT_STAT_ST_RDEV
 		tprintf("st_rdev=makedev(%lu, %lu), ",
 			(unsigned long) major(statbuf.st_rdev),
 			(unsigned long) minor(statbuf.st_rdev));
-#else /* !HAVE_ST_RDEV */
+#else /* !HAVE_STRUCT_STAT_ST_RDEV */
 		tprintf("st_size=makedev(%lu, %lu), ",
 			(unsigned long) major(statbuf.st_size),
 			(unsigned long) minor(statbuf.st_size));
-#endif /* !HAVE_ST_RDEV */
+#endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 		break;
 	default:
 		tprintf("st_size=%llu, ", statbuf.st_size);
@@ -888,24 +888,24 @@ long addr;
 		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
 		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
 		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
-#if HAVE_ST_FLAGS
+#if HAVE_STRUCT_STAT_ST_FLAGS
 		tprintf(", st_flags=");
 		if (statbuf.st_flags) {
 			printflags(fileflags, statbuf.st_flags);
 		} else
 			tprintf("0");
 #endif
-#if HAVE_ST_ACLCNT
+#if HAVE_STRUCT_STAT_ST_ACLCNT
 		tprintf(", st_aclcnt=%d", statbuf.st_aclcnt);
 #endif
-#if HAVE_ST_LEVEL
+#if HAVE_STRUCT_STAT_ST_LEVEL
 		tprintf(", st_level=%ld", statbuf.st_level);
 #endif
-#if HAVE_ST_FSTYPE
+#if HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
 			(int) sizeof statbuf.st_fstype, statbuf.st_fstype);
 #endif
-#if HAVE_ST_GEN
+#if HAVE_STRUCT_STAT_ST_GEN
 		tprintf(", st_gen=%u", statbuf.st_gen);
 #endif
 		tprintf("}");

@@ -481,7 +481,7 @@ static struct xlat transport_user_flags [] = {
 };
 
 
-#ifdef HAVE_T_OPTHDR
+#ifdef HAVE_STRUCT_T_OPTHDR
 
 static struct xlat xti_level [] = {
 	{ XTI_GENERIC,	"XTI_GENERIC"	},
@@ -562,9 +562,9 @@ int len;
 {
 	/* We don't know how to tell if TLI (socket) or XTI
 	   optmgmt is being used yet, assume TLI. */
-#if defined (HAVE_OPTHDR)
+#if defined (HAVE_STRUCT_OPTHDR)
 	print_sock_optmgmt (tcp, addr, len);
-#elif defined (HAVE_T_OPTHDR)
+#elif defined (HAVE_STRUCT_T_OPTHDR)
 	print_xti_optmgmt (tcp, addr, len);
 #else
 	printstr (tcp, addr, len);
