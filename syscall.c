@@ -734,14 +734,6 @@ struct tcb *tcp;
 
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
-	if (upeek(pid, PT_GPR2, &syscall_mode) < 0)
-		return -1;
-	if (syscall_mode != -ENOSYS) {
-		/*
-		 * Since kernel version 2.5.44 the scno gets passed in gpr2.
-		 */
-		scno = syscall_mode;
-	}
 	if (tcp->flags & TCB_WAITEXECVE) {
 		/*
 		 * When the execve system call completes successfully, the
@@ -761,7 +753,16 @@ struct tcb *tcp;
 		tcp->flags &= ~TCB_WAITEXECVE;
 		return 0;
 	}
-	else {
+
+	if (upeek(pid, PT_GPR2, &syscall_mode) < 0)
+			return -1;
+
+	if (syscall_mode != -ENOSYS) {
+		/*
+ 		 * Since kernel version 2.5.44 the scno gets passed in gpr2.
+		 */
+		scno = syscall_mode;
+	} else {
 	       	/*
 		 * Old style of "passing" the scno via the SVC instruction.
 		 */
