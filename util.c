@@ -1223,10 +1223,13 @@ typedef struct regs arg_setup_state;
 # elif defined (X86_64)
 #  define arg0_offset	((long)(8*(current_personality ? RBX : RDI)))
 #  define arg1_offset	((long)(8*(current_personality ? RCX : RSI)))
+# elif defined (SH)
+#  define arg0_offset	(4*(REG_REG0+4))
+#  define arg1_offset	(4*(REG_REG0+5))
 # else
 #  define arg0_offset	0
 #  define arg1_offset	4
-#  if defined SH || defined ARM
+#  if defined ARM
 #   define restore_arg0(tcp, state, val) 0
 #  endif
 # endif

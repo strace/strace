@@ -658,7 +658,7 @@ int new;
 	    	return -1;
 	return 0;
 #elif defined(SH)
-       if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_SYSCALL), new)<0)
+       if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new)<0)
                return -1;
        return 0;
 #else
