@@ -433,12 +433,10 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	if (tcp->u_arg[4] == SEEK_SET)
 	    tprintf("%ld, %llu, ", tcp->u_arg[0],
-		    (((long long int) tcp->u_arg[1]) << 32
-		     | (unsigned long long) (unsigned) tcp->u_arg[2]));
+		    LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]));
 	else
 	    tprintf("%ld, %lld, ", tcp->u_arg[0],
-		    (((long long int) tcp->u_arg[1]) << 32
-		     | (unsigned long long) (unsigned) tcp->u_arg[2]));
+		    LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]));
     }
     else {
 	long long int off;
@@ -460,9 +458,7 @@ struct tcb *tcp;
 # if defined IA64 || defined X86_64 || defined ALPHA
 		(long long int) tcp->u_arg[1], tcp->u_arg[2]
 # else
-		(((long long int) tcp->u_arg[1]) << 32
-		 | ((unsigned long *) tcp->u_arg)[2]),
-		tcp->u_arg[3]
+		LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]), tcp->u_arg[3]
 # endif
 		);
     }
@@ -2497,9 +2493,8 @@ struct tcb *tcp;
 		(long long int) tcp->u_arg[1], tcp->u_arg[2]);
 	printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
 #else
-		((long long int) tcp->u_arg[2] << 32) | tcp->u_arg[1],
-		tcp->u_arg[3]);
-	printxval (advise, tcp->u_arg[4], "POSIX_FADV_???");
+		LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]), tcp->u_arg[3]);
+	printxval(advise, tcp->u_arg[4], "POSIX_FADV_???");
 #endif
     }
     return 0;
@@ -2518,8 +2513,8 @@ struct tcb *tcp;
 		(long long int) tcp->u_arg[1], (long long int) tcp->u_arg[2]);
 	printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
 #else
-		((long long int) tcp->u_arg[2] << 32) | tcp->u_arg[1],
-		((long long int) tcp->u_arg[4] << 32) | tcp->u_arg[3]);
+		LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]),
+		LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
 	printxval(advise, tcp->u_arg[5], "POSIX_FADV_???");
 #endif
     }

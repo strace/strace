@@ -161,8 +161,7 @@ struct tcb *tcp;
 		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 #else
 		tprintf(", %lu, %llu", tcp->u_arg[2],
-				(((unsigned long long) tcp->u_arg[4]) << 32
-				 | (unsigned) tcp->u_arg[3]));
+			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
 #endif
 	}
 	return 0;
@@ -180,8 +179,7 @@ struct tcb *tcp;
 		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 #else
 		tprintf(", %lu, %llu", tcp->u_arg[2],
-				(((unsigned long long) tcp->u_arg[4]) << 32
-				 | (unsigned) tcp->u_arg[3]));
+			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
 #endif
 	}
 	return 0;
@@ -198,8 +196,8 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld, %llu, %lu", tcp->u_arg[0], tcp->u_arg[1],
-			(((unsigned long long) tcp->u_arg[3]) << 32 |
-			 (unsigned) tcp->u_arg[2]), tcp->u_arg[4]);
+			LONG_LONG(tcp->u_arg[2], tcp->u_arg[3]),
+			tcp->u_arg[4]);
 	} else {
 		off_t offset;
 
