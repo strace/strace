@@ -1,3 +1,9 @@
+2003-02-19  Roland McGrath  <roland@redhat.com>
+
+	FreeBSD rfork support changes from Russ Cox <rsc@plan9.bell-labs.com>:
+	* syscall.c (internal_syscall): Handle SYS_rfork with internal_fork.
+	* process.c (internal_fork) [SYS_rfork]: Bail if RFPROC flag not set.
+
 2003-01-23  Roland McGrath  <roland@redhat.com>
 
 	* signal.c: Reorder #ifdefs so HAVE_ASM_SIGCONTEXT_H doesn't matter on
