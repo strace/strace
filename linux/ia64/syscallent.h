@@ -246,50 +246,6 @@
    starts where that one leaves off.
 */
 
-	{ 8,	0,	printargs,		"SYS_299"	}, /* 299 */
-	{ 8,	0,	printargs,		"SYS_300"	}, /* 300 */
-	{ 8,	0,	printargs,		"SYS_301"	}, /* 301 */
-	{ 8,	0,	printargs,		"SYS_302"	}, /* 302 */
-	{ 8,	0,	printargs,		"SYS_303"	}, /* 303 */
-	{ 8,	0,	printargs,		"SYS_304"	}, /* 304 */
-	{ 8,	0,	printargs,		"SYS_305"	}, /* 305 */
-	{ 8,	0,	printargs,		"SYS_306"	}, /* 306 */
-	{ 8,	0,	printargs,		"SYS_307"	}, /* 307 */
-	{ 8,	0,	printargs,		"SYS_308"	}, /* 308 */
-	{ 8,	0,	printargs,		"SYS_309"	}, /* 309 */
-	{ 8,	0,	printargs,		"SYS_310"	}, /* 310 */
-	{ 8,	0,	printargs,		"SYS_311"	}, /* 311 */
-	{ 8,	0,	printargs,		"SYS_312"	}, /* 312 */
-	{ 8,	0,	printargs,		"SYS_313"	}, /* 313 */
-	{ 8,	0,	printargs,		"SYS_314"	}, /* 314 */
-	{ 8,	0,	printargs,		"SYS_315"	}, /* 315 */
-	{ 8,	0,	printargs,		"SYS_316"	}, /* 316 */
-	{ 8,	0,	printargs,		"SYS_317"	}, /* 317 */
-	{ 8,	0,	printargs,		"SYS_318"	}, /* 318 */
-	{ 8,	0,	printargs,		"SYS_319"	}, /* 319 */
-	{ 8,	0,	printargs,		"SYS_320"	}, /* 320 */
-	{ 8,	0,	printargs,		"SYS_321"	}, /* 321 */
-	{ 8,	0,	printargs,		"SYS_322"	}, /* 322 */
-	{ 8,	0,	printargs,		"SYS_323"	}, /* 323 */
-	{ 8,	0,	printargs,		"SYS_324"	}, /* 324 */
-	{ 8,	0,	printargs,		"SYS_325"	}, /* 325 */
-	{ 8,	0,	printargs,		"SYS_326"	}, /* 326 */
-	{ 8,	0,	printargs,		"SYS_327"	}, /* 327 */
-	{ 8,	0,	printargs,		"SYS_328"	}, /* 328 */
-	{ 8,	0,	printargs,		"SYS_329"	}, /* 329 */
-	{ 8,	0,	printargs,		"SYS_330"	}, /* 330 */
-	{ 8,	0,	printargs,		"SYS_331"	}, /* 331 */
-	{ 8,	0,	printargs,		"SYS_332"	}, /* 332 */
-	{ 8,	0,	printargs,		"SYS_333"	}, /* 333 */
-	{ 8,	0,	printargs,		"SYS_334"	}, /* 334 */
-	{ 8,	0,	printargs,		"SYS_335"	}, /* 335 */
-	{ 8,	0,	printargs,		"SYS_336"	}, /* 336 */
-	{ 8,	0,	printargs,		"SYS_337"	}, /* 337 */
-	{ 8,	0,	printargs,		"SYS_338"	}, /* 338 */
-	{ 8,	0,	printargs,		"SYS_339"	}, /* 339 */
-	{ 8,	0,	printargs,		"SYS_340"	}, /* 340 */
-	{ 8,	0,	printargs,		"SYS_341"	}, /* 341 */
-	{ 8,	0,	printargs,		"SYS_342"	}, /* 342 */
 	{ 8,	0,	printargs,		"SYS_343"	}, /* 343 */
 	{ 8,	0,	printargs,		"SYS_344"	}, /* 344 */
 	{ 8,	0,	printargs,		"SYS_345"	}, /* 345 */

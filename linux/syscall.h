@@ -142,8 +142,12 @@ int sys_osf_utimes();
 #  undef SYS_getsockopt
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
-#endif /* IA64 */
-#define SYS_socket_subcall	256
+# endif /* IA64 */
+# if defined I386 || defined IA64
+#  define SYS_socket_subcall	300
+# else
+#  define SYS_socket_subcall	256
+# endif
 #define SYS_socket		(SYS_socket_subcall + 1)
 #define SYS_bind		(SYS_socket_subcall + 2)
 #define SYS_connect		(SYS_socket_subcall + 3)
