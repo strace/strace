@@ -609,6 +609,7 @@ int new;
 #elif defined(POWERPC)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R0), new) < 0)
 		return -1;
+       return 0;
 #elif defined(S390) || defined(S390X)
 	/* s390 linux after 2.4.7 has a hook in entry.S to allow this */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new)<0)

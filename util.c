@@ -1200,8 +1200,8 @@ typedef struct regs arg_setup_state;
 #  define arg0_offset	REG_A0
 #  define arg1_offset	(REG_A0+1)
 # elif defined (POWERPC)
-#  define arg0_offset	(4*PT_ORIG_R3)
-#  define arg1_offset	(4*(1+PT_R3))
+#  define arg0_offset	(4*PT_R3)
+#  define arg1_offset	(4*PT_R4)
 # elif defined (HPPA)
 #  define arg0_offset	 PT_GR26
 #  define arg1_offset	 (PT_GR26-4)
