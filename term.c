@@ -29,11 +29,20 @@
 
 #include "defs.h"
 
+#ifdef LINUX
+/*
+ * The C library's definition of struct termios might differ from
+ * the kernel one, and we need to use the kernel layout.
+ */
+#include <linux/termios.h>
+#else
+
 #ifdef HAVE_TERMIO_H
 #include <termio.h>
 #endif /* HAVE_TERMIO_H */
 
 #include <termios.h>
+#endif
 
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
@@ -182,7 +191,7 @@ long code, arg;
 	#define TCSETS	TIOCSETA
 	#define TCSETSW	TIOCSETAW
 	#define TCSETSF	TIOCSETAF
-#endif	
+#endif
 	struct winsize ws;
 #ifdef TIOCGSIZE
 	struct  ttysize ts;
@@ -207,7 +216,7 @@ long code, arg;
 			return 0;
 		if (abbrev(tcp)) {
 			tprintf(", {");
-#ifndef FREEBSD			
+#ifndef FREEBSD
 			printxval(baud_options, tios.c_cflag & CBAUD, "B???");
 #else
 			printxval(baud_options, tios.c_ispeed, "B???");
@@ -216,7 +225,7 @@ long code, arg;
 				printxval(baud_options, tios.c_ospeed, "B???");
 				tprintf(" (out)");
 			}
-#endif			
+#endif
 			tprintf(" %sopost %sisig %sicanon %secho ...}",
 				(tios.c_oflag & OPOST) ? "" : "-",
 				(tios.c_lflag & ISIG) ? "" : "-",
@@ -451,4 +460,3 @@ long code, arg;
 		return 0;
 	}
 }
-
