@@ -1,5 +1,9 @@
 2003-11-06  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (main): Treat piped output more like file output.
+	Disallow -ff with piped output.  Fixes RH#105366.
+	Reported by Dmitry V. Levin <ldv@altlinux.org>
+
 	* strace.c (tprintf): Check result of vfprintf and use perror when it
 	fails while not writing to stderr itself.  Fixes Debian bug #218762.
 
