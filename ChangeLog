@@ -1,3 +1,10 @@
+1999-12-24  Wichert Akkerman  <wakkerma@debian.org>
+
+ * file.c: protect printstat64 with STAT64 instead of linux so we can
+   compile on Linux architectures that don't have it
+
+Fri Dec 24 18:05:00 EST 1999
+
 1999-12-23  Ulrich Drepper  <drepper@cygnus.com>
 
  * file.c: Use ugly libc_stat trick also for stat64.

@@ -611,7 +611,7 @@ int addr;
 	realprintstat(tcp, &statbuf);
 }
 
-#ifdef linux
+#ifdef STAT64
 static void
 printstat64(tcp, addr)
 struct tcb *tcp;
@@ -683,7 +683,9 @@ int addr;
 	else
 		tprintf("...}");
 }
+#endif /* STAT64 */
 
+#ifdef linux
 static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
@@ -703,10 +705,8 @@ struct stat *newbuf;
     newbuf->st_blksize=0;	/* not supported in old_stat */
     newbuf->st_blocks=0;		/* not supported in old_stat */
 }
-#endif
 
 
-#ifdef linux
 static void
 printoldstat(tcp, addr)
 struct tcb *tcp;
