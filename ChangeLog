@@ -1,5 +1,8 @@
 2005-02-01  Roland McGrath  <roland@redhat.com>
 
+	* config.guess: Update from canonical version, timestamp 2004-11-12.
+	* config.sub: Likewise, timestamp 2004-11-30.
+
 	* process.c [LINUX] [X86_64] (sys_arch_prctl): New function.
 	* linux/syscall.h: Declare it.
 	* linux/x86_64/syscallent.h: Use it.
