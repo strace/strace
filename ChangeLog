@@ -1,5 +1,12 @@
 2003-05-22  Roland McGrath  <roland@redhat.com>
 
+	* defs.h (struct tcb): New member `nzombies'.
+	* strace.c (alloctcb): Initialize it.
+	(droptcb): Increment our parent's zombie count.
+	* process.c (internal_wait): Don't go into TCB_SUSPENDED if the
+	process has zombies it can reap.  On the way out, if we reaped
+	an untraced process, decrement the zombie count.
+
 	* process.c (sys_clone): Mask CSIGNAL out of flags and print that
 	separately using signame.
 
