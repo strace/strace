@@ -1,8 +1,14 @@
+2004-04-16  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Version 4.5.3.
+	* strace.spec, debian/changelog: 4.5.3-1.
+
 2004-03-18  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* resource.c (sys_quotactl) [LINUX]: Cast arithmetic shift operand
 	from long to unsigned long, to fix output of the quotactl command
 	parser.
+	Fixes RH#118694.
 
 2004-04-16  Roland McGrath  <roland@redhat.com>
 
@@ -58,7 +64,7 @@
 2004-03-01  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.2.
-	* strace.spec, debian/changelog: 4.5.1-1.
+	* strace.spec, debian/changelog: 4.5.2-1.
 
 	* strace.c (main): Avoid potential buffer overruns from ludicrous
 	arguments or PATH values.
