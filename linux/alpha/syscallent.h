@@ -452,3 +452,18 @@
 	{ 2,	0,	sys_clock_getres,	"clock_getres"		}, /* 421 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"	}, /* 422 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"		}, /* 423 */
+	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 424 */
+	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 425 */
+	{ 2,	0,	sys_fstat64,		"fstat64"		}, /* 426 */
+	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 427 */
+	{ 5,	0,	printargs,		"vserver"		}, /* 428 ??? */
+	{ 5,	0,	printargs,		"mbind"			}, /* 429 ??? */
+	{ 5,	0,	printargs,		"get_mempolicy"		}, /* 430 ??? */
+	{ 5,	0,	printargs,		"set_mempolicy"		}, /* 431 ??? */
+	{ 4,	0,	sys_mq_open,		"mq_open"		}, /* 432 */
+	{ 1,	0,	sys_mq_unlink,		"mq_unlink"		}, /* 433 */
+	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"		}, /* 434 */
+	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive"	}, /* 435 */
+	{ 2,	0,	sys_mq_notify,		"mq_notify"		}, /* 436 */
+	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"		}, /* 437 */
+	{ 4,	0,	printargs,		"waitid"		}, /* 438 */
