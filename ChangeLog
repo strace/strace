@@ -1,3 +1,7 @@
+2001-07-23  Wichert Akkerman <wakkerma@debian.org>
+
+  * configure.in: Support cross-compiling between architectures
+
 2001-07-13  Wichert Akkerman <wakkerma@debian.org>
 
   * configure.in: add S390 to architecture list

@@ -1,5 +1,5 @@
 AC_INIT(strace.c)
-AC_CANONICAL_HOST()
+AC_CANONICAL_SYSTEM()
 AC_MSG_CHECKING(for supported operating system)
 changequote(,)dnl
 
@@ -37,7 +37,7 @@ opsys_list='
 '
 
 AC_MSG_CHECKING(for supported architecture)
-case "$host_cpu" in
+case "$target_cpu" in
 i[3456]86|pentium)
 	arch=i386
 	;;
