@@ -1,3 +1,16 @@
+2005-02-01  Roland McGrath  <roland@redhat.com>
+
+	* util.c (getpc) [S390 || S390X]: Implement it.
+	Patch by David Wilder <wilder@us.ibm.com>.
+
+	* linux/ia64/syscallent.h: Add fadvise64, fstatfs64, statfs64, mbind,
+	[gs]et_mempolicy, mq_*, sys_kexec_load, vserver, and waitid.
+	Fixes RH#146245.
+
+2005-01-22  Andreas Schwab  <schwab@suse.de>
+
+	* net.c (sys_getsockopt): Change type of len to int.
+
 2004-10-19  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.8.
