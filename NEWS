@@ -1,3 +1,8 @@
+Changes in 4.5.6
+==============
+* Bug fixes, Linux ioctl updates.
+* David Miller contributed support for Linux/SPARC64.
+
 Changes in 4.5.5
 ==============
 * Just bug fixes.

@@ -1,3 +1,12 @@
+strace (4.5.6-1) unstable; urgency=low
+
+  * New upstream version.
+    + Update Linux ioctl lists and decode some more network ioctls.
+    + Fix `quotactl' argument decoding on 64-bit.
+    + Linux/SPARC64 support, closes: #254728.
+
+ -- Roland McGrath <frob@debian.org>  Mon, 12 Jul 2004 00:18:32 -0700
+
 strace (4.5.5-1) unstable; urgency=low
 
   * New upstream version.
