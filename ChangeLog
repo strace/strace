@@ -1,5 +1,17 @@
 2002-12-30  Roland McGrath  <roland@redhat.com>
 
+	* version.c (version): Make const, bump to 4.4.90.
+	* strace.c: Update decl.
+
+	* Makefile.am [LINUX && X86_64]: Remove cruft.
+	* linux/x86_64/errnoent1.h: New file.
+	* linux/x86_64/ioctlent1.h: New file.
+	* linux/x86_64/signalent1.h: New file.
+	* linux/x86_64/syscallent1.h: New file.
+	* linux/x86_64/i386-headers.diff: File removed.
+	* linux/x86_64/makeheaders.sh: File removed.
+	* linux/x86_64/Makefile.in: File removed.
+
 	* linux/syscallent.h [X86_64]: Disable sanity checks, subcall stuff is
 	already broken for 32-bit personality on x86-64.
 
