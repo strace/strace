@@ -1,3 +1,8 @@
+2002-11-09  Heiko Carstens <heiko.carstens@de.ibm.com>
+
+	Bugfix for s390/s390x:
+	* syscall.c: Fixed scno derivation for s390/s390x.
+
 2002-11-06  Michal Ludvig  <mludvig@suse.cz>
 
 	Merged patch from Steven J. Hill <sjhill@realitydiluted.com>
@@ -6,7 +11,7 @@
 2002-11-06  Michal Ludvig  <mludvig@suse.cz>
 
 	From Marty Leisner <leisner@rochester.rr.com>, 
-	rewritten my mludvig:
+	rewritten by mludvig:
 	* strace.c (not_failing_only): New.
 	(usage): Added -z switch description.
 	(main): Added -z switch parsing to not_failing_only variable.

@@ -683,6 +683,7 @@ struct tcb *tcp;
 #elif defined(S390) || defined(S390X)
 	static long gpr2;
 	static long pc;
+	static long syscall_mode;
 #elif defined(HPPA)
 	static long r28;
 #elif defined(SH)
@@ -707,12 +708,83 @@ struct tcb *tcp;
 
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
-	if (upeek(pid,PT_PSWADDR,&pc) < 0)
+	if (upeek(pid, PT_GPR2, &syscall_mode) < 0)
 		return -1;
-	scno = ptrace(PTRACE_PEEKTEXT, pid, (char *)(pc-sizeof(long)),0);
-	if (errno)
-		return -1;
-	scno&=0xFF;
+	if (syscall_mode != -ENOSYS){
+		/*
+		 * Since kernel version 2.5.44 the scno gets passed in gpr2.
+		 */
+		scno = syscall_mode;
+	}
+	else {
+	       	/*
+		 * Old style of "passing" the scno via the SVC instruction.
+		 */
+
+		long opcode, offset_reg, tmp;
+		void * svc_addr;
+		int gpr_offset[16] = {PT_GPR0,  PT_GPR1,  PT_ORIGGPR2, PT_GPR3,
+				      PT_GPR4,  PT_GPR5,  PT_GPR6,     PT_GPR7,
+				      PT_GPR8,  PT_GPR9,  PT_GPR10,    PT_GPR11,
+				      PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15};
+	  
+		if (upeek(pid, PT_PSWADDR, &pc) < 0)
+			return -1;
+		opcode = ptrace(PTRACE_PEEKTEXT, pid, (char *)(pc-sizeof(long)), 0);
+		if (errno)
+			return -1;
+
+		/*
+		 *  We have to check if the SVC got executed directly or via an
+		 *  EXECUTE instruction. In case of EXECUTE it is necessary to do
+		 *  instruction decoding to derive the system call number.
+		 *  Unfortunately the opcode sizes of EXECUTE and SVC are differently,
+		 *  so that this doesn't work if a SVC opcode is part of an EXECUTE
+		 *  opcode. Since there is no way to find out the opcode size this
+		 *  is the best we can do...
+		 */
+
+		if ((opcode & 0xff00) == 0x0a00) {
+			/* SVC opcode */
+			scno = opcode & 0xff;
+		} 
+		else {
+			/* SVC got executed by EXECUTE instruction */
+
+			/*
+			 *  Do instruction decoding of EXECUTE. If you really want to
+			 *  understand this, read the Principles of Operations.
+			 */
+			svc_addr = (void *) (opcode & 0xfff);
+
+			tmp = 0;
+			offset_reg = (opcode & 0x000f0000) >> 16;
+			if (offset_reg && (upeek(pid, gpr_offset[offset_reg], &tmp) < 0))
+				return -1;
+			svc_addr += tmp;
+
+			tmp = 0;
+			offset_reg = (opcode & 0x0000f000) >> 12;
+			if (offset_reg && (upeek(pid, gpr_offset[offset_reg], &tmp) < 0))
+				return -1;
+			svc_addr += tmp;
+
+			scno = ptrace(PTRACE_PEEKTEXT, pid, svc_addr, 0);
+			if (errno)
+				return -1;
+#if defined(S390X)
+			scno >>= 48;
+#else
+			scno >>= 16;
+#endif
+			tmp = 0;
+			offset_reg = (opcode & 0x00f00000) >> 20;
+			if (offset_reg && (upeek(pid, gpr_offset[offset_reg], &tmp) < 0))
+				return -1;
+
+			scno = (scno | tmp) & 0xff;
+		}
+	}
 #elif defined (POWERPC)
 	if (upeek(pid, 4*PT_R0, &scno) < 0)
 		return -1;
@@ -1102,7 +1174,9 @@ struct tcb *tcp;
 #elif defined (S390) || defined (S390X)
 	if (upeek(pid, PT_GPR2, &gpr2) < 0)
 		return -1;
-	if (gpr2 != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
+	if (syscall_mode != -ENOSYS)
+		syscall_mode = tcp->scno;
+	if (gpr2 != syscall_mode && !(tcp->flags & TCB_INSYSCALL)) {
 		if (debug)
 			fprintf(stderr, "stray syscall exit: gpr2 = %ld\n", gpr2);
 		return 0;
