@@ -1,3 +1,9 @@
+2003-01-17  Anton Blanchard <anton@samba.org>
+
+	* util.c [LINUX] (setbpt): Handle SYS_vfork like SYS_fork.
+
+	* linux/syscall.h (SYS_socket_subcall): 256 also for POWERPC.
+
 2003-01-14  Roland McGrath  <roland@redhat.com>
 
 	* linux/powerpc/errnoent.h: Add missing errnos.
