@@ -1,5 +1,8 @@
 2002-12-16  Roland McGrath  <roland@redhat.com>
 
+	* signal.c (sprintsigmask): Increase static buffer size to account for
+	worst possible case.  Reported by Daniel Jacobowitz <drow@false.org>.
+
 	* process.c [LINUX] (wait4_options): Fix __WCLONE value.  Add
 	__WNOTHREAD and __WALL.
 
