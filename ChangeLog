@@ -2,6 +2,7 @@
 
   * configure.in: test for netinet/tcp.h and netinet/udp.h existance
   * net.c: include netinet/tcp.h and netinet/udp.h if they exist
+  * Makefile.in: use @mandir@ and @bindir@
 
 2000-11-26  Wichert Akkerman <wakkerma@debian.org>
 
