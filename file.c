@@ -33,10 +33,13 @@
 
 #include <dirent.h>
 
-#include <sys/stat.h>
 #ifdef linux
+#define stat libc_stat
+#include <statbuf.h>
+#undef stat
 #include <asm/stat.h>
 #endif
+#include <sys/stat.h>
 #include <fcntl.h>
 
 #ifdef SVR4
@@ -459,11 +462,7 @@ int addr;
 static void
 realprintstat(tcp, statbuf)
 struct tcb *tcp;
-#ifdef linux
-struct new_stat *statbuf;
-#else
 struct stat *statbuf;
-#endif
 {
     if (!abbrev(tcp)) {
 	    tprintf("{st_dev=makedev(%lu, %lu), st_ino=%lu, st_mode=%s, ",
@@ -515,11 +514,7 @@ printstat(tcp, addr)
 struct tcb *tcp;
 int addr;
 {
-#ifdef linux
-	struct new_stat statbuf;
-#else
 	struct stat statbuf;
-#endif
 
 #ifdef LINUXSPARC
  	if (current_personality == 1) {
@@ -547,8 +542,8 @@ int addr;
 #ifdef linux
 static void
 convertoldstat(oldbuf, newbuf)
-const struct old_stat *oldbuf;
-struct new_stat *newbuf;
+const struct __old_kernel_stat *oldbuf;
+struct stat *newbuf;
 {
     newbuf->st_dev=oldbuf->st_dev;
     newbuf->st_ino=oldbuf->st_ino;
@@ -573,8 +568,8 @@ printoldstat(tcp, addr)
 struct tcb *tcp;
 int addr;
 {
-	struct old_stat statbuf;
-	struct new_stat newstatbuf;
+	struct __old_kernel_stat statbuf;
+	struct stat newstatbuf;
 
 #ifdef LINUXSPARC
  	if (current_personality == 1) {
