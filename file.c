@@ -411,7 +411,7 @@ struct tcb *tcp;
 }
 #endif
 
-#if _LFS_LARGEFILE
+#if _LFS64_LARGEFILE
 int
 sys_lseek64 (tcp)
 struct tcb *tcp;
@@ -443,6 +443,19 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if _LFS64_LARGEFILE
+int
+sys_truncate64(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", %llu", get64(tcp->u_arg[1],tcp->u_arg[2]));
+	}
+	return 0;
+}
+#endif
+
 int
 sys_ftruncate(tcp)
 struct tcb *tcp;
@@ -457,6 +470,19 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#if _LFS64_LARGEFILE
+int
+sys_ftruncate64(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, %llu", tcp->u_arg[0],
+			get64(tcp->u_arg[1] ,tcp->u_arg[2]));
+	}
+	return 0;
+}
+#endif
 
 /* several stats */
 

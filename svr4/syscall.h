@@ -311,6 +311,8 @@ extern int sys_getksym ();
 #endif
 #if UNIXWARE >= 7
 extern int sys_lseek64 ();
+extern int sys_truncate64 ();
+extern int sys_ftruncate64 ();
 extern int sys_xsocket ();
 extern int sys_xsocketpair ();
 extern int sys_xbind ();

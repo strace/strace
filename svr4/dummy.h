@@ -271,13 +271,13 @@
 #define sys_getrlimit64 printargs
 #define sys_pread64 printargs
 #define sys_pwrite64 printargs
+#define sys_ftruncate64 printargs
+#define sys_truncate64 printargs
 #endif
 
 /* unimplemented 64-bit stuff */
 #define sys_statvfs64 printargs
 #define sys_fstatvfs64 printargs
-#define sys_ftruncate64 printargs
-#define sys_truncate64 printargs
 
 /* like another call */
 #define sys_creat64 sys_creat
