@@ -1575,39 +1575,6 @@ struct tcb *tcp;
 #endif
 
 
-void
-fake_execve(tcp, program, argv, envp)
-struct tcb *tcp;
-char *program;
-char *argv[];
-char *envp[];
-{
-	int i;
-
-#ifdef ARM
-	if (!(qual_flags[SYS_execve - __NR_SYSCALL_BASE] & QUAL_TRACE))
-		return;
-#else
-	if (!(qual_flags[SYS_execve] & QUAL_TRACE))
-		return;
-#endif /* !ARM */
-	printleader(tcp);
-	tprintf("execve(");
-	string_quote(program);
-	tprintf(", [");
-	for (i = 0; argv[i] != NULL; i++) {
-		if (i != 0)
-			tprintf(", ");
-		string_quote(argv[i]);
-	}
-	for (i = 0; envp[i] != NULL; i++)
-		;
-	tprintf("], [/* %d var%s */]) ", i, (i != 1) ? "s" : "");
-	tabto(acolumn);
-	tprintf("= 0");
-	printtrailer(tcp);
-}
-
 static void
 printargv(tcp, addr)
 struct tcb *tcp;

@@ -597,6 +597,13 @@ Process %u attached - interrupt to quit\n",
 			}
 			else
 				setreuid(run_uid, run_uid);
+
+			/*
+			 * Induce an immediate stop so that the parent
+			 * will resume us with PTRACE_SYSCALL and display
+			 * this execve call normally.
+			 */
+			kill(getpid(), SIGSTOP);
 #endif /* !USE_PROCFS */
 
 			execv(pathname, &argv[optind]);
@@ -617,11 +624,6 @@ Process %u attached - interrupt to quit\n",
 				exit(1);
 			}
 #endif /* USE_PROCFS */
-#ifndef USE_PROCFS
-			if (!cflag)
-				fake_execve(tcp, pathname,
-					    &argv[optind], environ);
-#endif /* !USE_PROCFS */
 			break;
 		}
 	}
