@@ -1,5 +1,8 @@
 2005-02-01  Roland McGrath  <roland@redhat.com>
 
+	* syscall.c (qual_signal): Fix inverted return value and bogus
+	argument to qualify_one in the named case.
+
 	* file.c (print_xattr_val): Don't use auto array sized by syscall
 	argument.  Use malloc instead, so it can fail for insane values.
 	Fixes Debian bug #283704.
