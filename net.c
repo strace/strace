@@ -278,6 +278,8 @@ static struct xlat socketlayers[] = {
 #endif
 	{ SOL_SOCKET,	"SOL_SOCKET"	},	/* Never used! */
 };
+/*** WARNING: DANGER WILL ROBINSON: NOTE "socketlayers" array above
+     falls into "protocols" array below!!!!   This is intended!!! ***/
 static struct xlat protocols[] = {
 	{ IPPROTO_IP,	"IPPROTO_IP"	},
 	{ IPPROTO_ICMP,	"IPPROTO_ICMP"	},
@@ -447,36 +449,84 @@ static struct xlat sockoptions[] = {
 	{ 0,		NULL		},
 };
 
+#if !defined (SOL_IP) && defined (IPPROTO_IP)
+#define SOL_IP IPPROTO_IP
+#endif
+
 #ifdef SOL_IP
 static struct xlat sockipoptions[] = {
+#ifdef IP_TOS
 	{ IP_TOS,		"IP_TOS"		},
+#endif
+#ifdef IP_TTL
 	{ IP_TTL,		"IP_TTL"		},
-#if defined(IP_HDRINCL)
+#endif
+#ifdef IP_HDRINCL
 	{ IP_HDRINCL,		"IP_HDRINCL"		},
 #endif
-#if defined(IP_OPTIONS)
+#ifdef IP_OPTIONS
 	{ IP_OPTIONS,		"IP_OPTIONS"		},
 #endif
+#ifdef IP_ROUTER_ALERT
 	{ IP_ROUTER_ALERT,	"IP_ROUTER_ALERT"	},
-#if defined(IP_RECVOPTIONS)
+#endif
+#ifdef IP_RECVOPTIONS
 	{ IP_RECVOPTIONS,	"IP_RECVOPTIONS"	},
 #endif
+#ifdef IP_RECVOPTS
+	{ IP_RECVOPTS,		"IP_RECVOPTS"		},
+#endif
+#ifdef IP_RECVRETOPTS
+	{ IP_RECVRETOPTS,	"IP_RECVRETOPTS"	},
+#endif
+#ifdef IP_RECVDSTADDR
+	{ IP_RECVDSTADDR,	"IP_RECVDSTADDR"	},
+#endif
+#ifdef IP_RETOPTS
 	{ IP_RETOPTS,		"IP_RETOPTS"		},
+#endif
+#ifdef IP_PKTINFO
 	{ IP_PKTINFO,		"IP_PKTINFO"		},
-	{ IP_PKTOPTIONS,	"IP_PKTOPTIONS"	},
+#endif
+#ifdef IP_PKTOPTIONS
+	{ IP_PKTOPTIONS,	"IP_PKTOPTIONS"		},
+#endif
+#ifdef IP_MTU_DISCOVER
 	{ IP_MTU_DISCOVER,	"IP_MTU_DISCOVER"	},
-	{ IP_MTU_DISCOVER,	"IP_MTU_DISCOVER"	},
+#endif
+#ifdef IP_RECVERR
 	{ IP_RECVERR,		"IP_RECVERR"		},
+#endif
+#ifdef IP_RECVTTL
 	{ IP_RECVTTL,		"IP_RECRECVTTL"		},
+#endif
+#ifdef IP_RECVTOS
 	{ IP_RECVTOS,		"IP_RECRECVTOS"		},
-#if defined(IP_MTU)
+#endif
+#ifdef IP_MTU
 	{ IP_MTU,		"IP_MTU"		},
 #endif
+#ifdef IP_MULTICAST_IF
 	{ IP_MULTICAST_IF,	"IP_MULTICAST_IF"	},
+#endif
+#ifdef IP_MULTICAST_TTL
 	{ IP_MULTICAST_TTL,	"IP_MULTICAST_TTL"	},
+#endif
+#ifdef IP_MULTICAST_LOOP
 	{ IP_MULTICAST_LOOP,	"IP_MULTICAST_LOOP"	},
+#endif
+#ifdef IP_ADD_MEMBERSHIP
 	{ IP_ADD_MEMBERSHIP,	"IP_ADD_MEMBERSHIP"	},
+#endif
+#ifdef IP_DROP_MEMBERSHIP
 	{ IP_DROP_MEMBERSHIP,	"IP_DROP_MEMBERSHIP"	},
+#endif
+#ifdef IP_BROADCAST_IF
+	{ IP_BROADCAST_IF,	"IP_BROADCAST_IF"	},
+#endif
+#ifdef IP_RECVIFINDEX
+	{ IP_RECVIFINDEX,	"IP_RECVIFINDEX"	},
+#endif
 	{ 0,			NULL			},
 };
 #endif /* SOL_IP */
@@ -513,6 +563,10 @@ static struct xlat sockpacketoptions[] = {
 	{ 0,				NULL			},
 };
 #endif /* SOL_PACKET */
+
+#if  !defined (SOL_TCP) && defined (IPPROTO_TCP)
+#define SOL_TCP IPPROTO_TCP
+#endif
 
 #ifdef SOL_TCP
 static struct xlat socktcpoptions[] = {
@@ -1161,58 +1215,79 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
+		printxval(socketlayers, tcp->u_arg[1], "SOL_???");
+		tprintf (", ");
 		switch (tcp->u_arg[1]) {
 		case SOL_SOCKET:
-			tprintf("SOL_SOCKET, ");
 			printxval(sockoptions, tcp->u_arg[2], "SO_???");
-			tprintf(", ");
 			break;
 #ifdef SOL_IP
 		case SOL_IP:
-			tprintf("SOL_IP, ");
 			printxval(sockipoptions, tcp->u_arg[2], "IP_???");
-			tprintf(", ");
 			break;
 #endif
 #ifdef SOL_IPX
 		case SOL_IPX:
-			tprintf("SOL_IPX, ");
 			printxval(sockipxoptions, tcp->u_arg[2], "IPX_???");
-			tprintf(", ");
 			break;
 #endif
 #ifdef SOL_PACKET
 		case SOL_PACKET:
-			tprintf("SOL_PACKET, ");
 			printxval(sockpacketoptions, tcp->u_arg[2], "PACKET_???");
-			tprintf(", ");
 			break;
 #endif
 #ifdef SOL_TCP
 		case SOL_TCP:
-			tprintf("SOL_TCP, ");
 			printxval(socktcpoptions, tcp->u_arg[2], "TCP_???");
-			tprintf(", ");
 			break;
 #endif
 
 		/* SOL_AX25 SOL_ROSE SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25
 		 * etc. still need work */
 		default: 
-			/* XXX - should know socket family here */
-			printxval(socketlayers, tcp->u_arg[1], "SOL_???");
-			tprintf(", %lu, ", tcp->u_arg[2]);
+			tprintf("%lu", tcp->u_arg[2]);
 			break;
 		}
 	} else {
-		if (syserror(tcp)) {
-			tprintf("%#lx, %#lx",
+		long len;
+		if (syserror(tcp) || umove (tcp, tcp->u_arg[4], &len) < 0) {
+			tprintf(", %#lx, %#lx",
 				tcp->u_arg[3], tcp->u_arg[4]);
 			return 0;
 		}
-		printnum(tcp, tcp->u_arg[3], "%ld");
-		tprintf(", ");
-		printnum(tcp, tcp->u_arg[4], "%ld");
+
+		switch (tcp->u_arg[1]) {
+		case SOL_SOCKET:
+			switch (tcp->u_arg[2]) {
+#ifdef SO_LINGER
+			case SO_LINGER:
+			        if (len == sizeof (struct linger)) {
+					struct linger linger;
+					if (umove (tcp,
+						   tcp->u_arg[3],
+						   &linger) < 0)
+						break;
+					tprintf(", {onoff=%d, linger=%d}, "
+						"[%ld]",
+						linger.l_onoff,
+						linger.l_linger,
+						len);
+					return 0;
+				}
+				break;
+#endif
+			}
+			break;
+		}
+
+		tprintf (", ");
+		if (len == sizeof (int)) {
+			printnum(tcp, tcp->u_arg[3], "%ld");
+		}
+		else {
+			printstr (tcp, tcp->u_arg[3], len);
+		}
+		tprintf(", [%ld]", len);
 	}
 	return 0;
 }
@@ -1250,80 +1325,85 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
+		printxval(socketlayers, tcp->u_arg[1], "IPPROTO_???");
+		tprintf (", ");
 		switch (tcp->u_arg[1]) {
 		case SOL_SOCKET:
-			tprintf("SOL_SOCKET, ");
 			printxval(sockoptions, tcp->u_arg[2], "SO_???");
-			tprintf(", ");
-			printnum(tcp, tcp->u_arg[3], "%ld");
-			tprintf(", %lu", tcp->u_arg[4]);
+			switch (tcp->u_arg[2]) {
+#if defined(SO_LINGER)
+			case SO_LINGER:
+			        if (tcp->u_arg[4] == sizeof (struct linger)) {
+					struct linger linger;
+					if (umove (tcp,
+						   tcp->u_arg[3],
+						   &linger) < 0)
+						break;
+					tprintf(", {onoff=%d, linger=%d}, %lu",
+						linger.l_onoff,
+						linger.l_linger,
+						tcp->u_arg[4]);
+					return 0;
+				}
+				break;
+#endif
+			}
 			break;
 #ifdef SOL_IP
 		case SOL_IP:
-			tprintf("SOL_IP, ");
 			printxval(sockipoptions, tcp->u_arg[2], "IP_???");
-			tprintf(", ");
-			printnum(tcp, tcp->u_arg[3], "%ld");
-			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 #ifdef SOL_IPX
 		case SOL_IPX:
-			tprintf("SOL_IPX, ");
 			printxval(sockipxoptions, tcp->u_arg[2], "IPX_???");
-			tprintf(", ");
-			printnum(tcp, tcp->u_arg[3], "%ld");
-			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 #ifdef SOL_PACKET
 		case SOL_PACKET:
-			tprintf("SOL_PACKET, ");
 			printxval(sockpacketoptions, tcp->u_arg[2], "PACKET_???");
-			tprintf(", ");
 			/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
-			printnum(tcp, tcp->u_arg[3], "%ld");
-			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 #ifdef SOL_TCP
 		case SOL_TCP:
-			tprintf("SOL_TCP, ");
 			printxval(socktcpoptions, tcp->u_arg[2], "TCP_???");
-			tprintf(", ");
-			printnum(tcp, tcp->u_arg[3], "%ld");
-			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 #ifdef SOL_RAW
 		case SOL_RAW:
-			tprintf("SOL_RAW, ");
 			printxval(sockrawoptions, tcp->u_arg[2], "RAW_???");
-			tprintf(", ");
 			switch (tcp->u_arg[2]) {
 #if defined(ICMP_FILTER)
-				case ICMP_FILTER:
-					printicmpfilter(tcp, tcp->u_arg[3]);
-					break;
+			case ICMP_FILTER:
+				tprintf(", ");
+				printicmpfilter(tcp, tcp->u_arg[3]);
+				tprintf(", %lu", tcp->u_arg[4]);
+				return 0;
 #endif
-				default:
-					printnum(tcp, tcp->u_arg[3], "%ld");
-					break;
 			}
-			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 
 		/* SOL_AX25 SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25 
 		 * etc. still need work  */
+
 		default:
-			/* XXX - should know socket family here */
-			printxval(socketlayers, tcp->u_arg[1], "IPPROTO_???");
-			tprintf(", %lu, ", tcp->u_arg[2]);
-			printnum(tcp, tcp->u_arg[3], "%ld");
-			tprintf(", %lu", tcp->u_arg[4]);
-			break;
+			tprintf("%lu", tcp->u_arg[2]);
 		}
+
+		/* default arg printing */
+
+		tprintf (", ");
+		
+		if (tcp->u_arg[4] == sizeof (int)) {
+			printnum(tcp, tcp->u_arg[3], "%ld");
+		}
+		else {
+			printstr (tcp, tcp->u_arg[3], tcp->u_arg[4]);
+		}
+		
+		tprintf(", %lu", tcp->u_arg[4]);
 	}
 	return 0;
 }
