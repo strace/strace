@@ -3,6 +3,8 @@
 	* configure.ac, NEWS: Version 4.5.9.
 	* debian/changelog, strace.spec: 4.5.9-1.
 
+	* file.c (O_LARGEFILE): Omit when #undef'd because it was zero.
+
 2005-02-02  Roland McGrath  <roland@redhat.com>
 
 	* debian/control: Add strace-udeb package for installer debugging.
