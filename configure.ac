@@ -110,6 +110,7 @@ AC_SUBST(opsys)
 AC_SUBST(arch)
 
 AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
+AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
 AM_CONDITIONAL([SUNOS4], [test x$opsys = xsunos4])
 AM_CONDITIONAL([SVR4], [test x$opsys = xsvr4])

@@ -64,3 +64,27 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     sunos4/syscall.h sunos4/syscallent.h \
 	     svr4/dummy.h svr4/errnoent.h svr4/ioctlent.h svr4/ioctlent.sh \
 	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h
+
+if MAINTAINER_MODE
+if LINUX
+
+IOCTLDIR = /usr/include
+
+if I386
+ioctlent_h = linux/ioctlent.h
+else
+ioctlent_h = linux/$(ARCH)/ioctlent.h
+endif
+
+BUILT_SOURCES = $(ioctlent_h)
+
+$(srcdir)/$(ioctlent_h): ioctlsort
+	$(<D)/$(<F) > $@
+ioctlsort: $(srcdir)/linux/ioctlsort.c ioctls.h ioctldefs.h
+	$(LINK.c) -I. -o $@ $<
+ioctls.h: $(srcdir)/linux/ioctlent.sh
+	$(SHELL) $< $(IOCTLDIR)
+ioctldefs.h: ioctls.h ;
+
+endif
+endif
