@@ -523,7 +523,7 @@ int bitness;
 #ifdef LINUX
 		/* This contains no useful information on SunOS.  */
 		if (args[4]) {
-			char str[20];
+			char str[64];
 
 			if (umove(tcp, args[4], &tv) >= 0) {
 #ifdef ALPHA
