@@ -1926,8 +1926,6 @@ handle_group_exit(struct tcb *tcp, int sig)
 			      ? tcp->parent
 			      : tcp->nclone_detached > 0
 			      ? tcp : NULL);
-	fprintf(stderr,"handle_group_exit (%d [%d], %d)\n", tcp->pid,
-		leader? leader->pid:-1, sig);
 
 	if (sig < 0) {
 		if (leader != NULL && leader != tcp &&
@@ -1939,23 +1937,29 @@ handle_group_exit(struct tcb *tcp, int sig)
 	}
 	else {
 		if (tcp->flags & TCB_ATTACHED) {
-			if (leader != NULL && leader != tcp &&
-				(leader->flags & TCB_ATTACHED)) {
-				/* We need to detach the leader so that the
-				   process death will be reported to its real
-				   parent.  But we kill it first to prevent
-				   it doing anything before we kill the whole
-				   process in a moment.  We can use
-				   PTRACE_KILL on a thread that's not already
-				   stopped.  Then the value we pass in
-				   PTRACE_DETACH just sets the death
-				   signal reported to the real parent.  */
-				ptrace(PTRACE_KILL, leader->pid, 0, 0);
-				if (debug)
-					fprintf(stderr,
-						" [%d exit %d kills %d]\n",
-						tcp->pid, sig, leader->pid);
-				detach(leader, sig);
+		  	if (leader != NULL && leader != tcp) {
+				if (leader->flags & TCB_ATTACHED) {
+					/* We need to detach the leader so
+					   that the process death will be
+					   reported to its real parent.
+					   But we kill it first to prevent
+					   it doing anything before we kill
+					   the whole process in a moment.
+					   We can use PTRACE_KILL on a
+					   thread that's not already
+					   stopped.  Then the value we pass
+					   in PTRACE_DETACH just sets the
+					   death signal reported to the
+					   real parent.  */
+					ptrace(PTRACE_KILL, leader->pid, 0, 0);
+					if (debug)
+						fprintf(stderr,
+							" [%d exit %d kills %d]\n",
+							tcp->pid, sig, leader->pid);
+					detach(leader, sig);
+				}
+				else
+					leader->flags |= TCB_GROUP_EXITING;
 			}
 			detach(tcp, sig);
 		}
@@ -1972,18 +1976,6 @@ handle_group_exit(struct tcb *tcp, int sig)
 			/* The leader will report to us as parent now,
 			   and then we'll get to the SIG==-1 case.  */
 			return 0;
-		}
-	}
-
-	/* Note that TCP and LEADER are no longer valid,
-	   but we can still compare against them.  */
-	if (leader != NULL) {
-		unsigned int i;
-		for (i = 0; i < tcbtabsize; i++) {
-			struct tcb *t = tcbtab[i];
-			if (t != tcp && (t->flags & TCB_CLONE_DETACHED)
-			    && t->parent == leader)
-				droptcb(t);
 		}
 	}
 
