@@ -29,6 +29,7 @@
  */
 
 #include "defs.h"
+#include <sys/syscall.h>
 
 #ifdef HAVE_POLL_H
 #include <poll.h>
@@ -177,8 +178,7 @@ struct tcb *tcp;
 	return RVAL_HEX | RVAL_STR;
 }
 
-#ifdef HAVE_PUTPMSG
-
+#if defined SYS_putpmsg || defined SYS_getpmsg
 static struct xlat pmsgflags[] = {
 #ifdef MSG_HIPRI
 	{ MSG_HIPRI,	"MSG_HIPRI"	},
@@ -191,7 +191,9 @@ static struct xlat pmsgflags[] = {
 #endif
 	{ 0,		NULL		},
 };
+#endif
 
+#ifdef SYS_putpmsg
 int
 sys_putpmsg(tcp)
 struct tcb *tcp;
@@ -212,7 +214,9 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* SYS_putpmsg */
 
+#ifdef SYS_getpmsg
 int
 sys_getpmsg(tcp)
 struct tcb *tcp;
@@ -263,8 +267,8 @@ struct tcb *tcp;
 	}
 	return RVAL_HEX | RVAL_STR;
 }
+#endif /* SYS_getpmsg */
 
-#endif /* HAVE_PUTPMSG */
 #endif /* !FREEBSD */
 
 
@@ -556,7 +560,7 @@ struct tcb *tcp;
 long addr;
 int len;
 {
-	/* We don't know how to tell if TLI (socket) or XTI 
+	/* We don't know how to tell if TLI (socket) or XTI
 	   optmgmt is being used yet, assume TLI. */
 #if defined (HAVE_OPTHDR)
 	print_sock_optmgmt (tcp, addr, len);
@@ -668,8 +672,8 @@ int len;
 	while (0)
 
 #define COMMA() \
-	do { if (c++) tprintf (", "); } while (0) 
-		 
+	do { if (c++) tprintf (", "); } while (0)
+
 
 #define STRUCT(struct, elem, print)					\
 	do {								\
@@ -692,7 +696,7 @@ int len;
 	while (0)
 
 #define ADDR(struct, elem) STRUCT (struct, elem, printstr)
-	
+
 	switch (m.type) {
 #ifdef T_CONN_REQ
 	    case T_CONN_REQ:	/* connect request   */
@@ -909,7 +913,7 @@ int len;
 #undef ADDR
 #undef COMMA
 #undef STRUCT
-	
+
 	return 0;
 }
 
@@ -1064,7 +1068,7 @@ int arg;
 			return RVAL_STR + 1;
 		}
 	}
-	
+
 	return 1;
 }
 
@@ -1287,7 +1291,6 @@ int code, arg;
 	}
 }
 
-#endif /* !linux && !FREEBSD */ 
+#endif /* !linux && !FREEBSD */
 
 #endif /* HAVE_SYS_STREAM_H || linux || FREEBSD */
-

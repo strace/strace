@@ -172,7 +172,7 @@ AC_STRUCT_T_OPTHDR
 if test x$OPSYS != xLINUX; then
 AC_CHECK_LIB(nsl, main)
 fi
-AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl putpmsg prctl sendmsg inet_ntop if_indextoname)
+AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl prctl sendmsg inet_ntop if_indextoname)
 AC_CHECK_HEADERS(sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h stropts.h sys/conf.h sys/stream.h sys/tihdr.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h linux/icmp.h linux/in6.h sys/uio.h sys/aio.h linux/netlink.h linux/if_packet.h poll.h sys/poll.h sys/vfs.h netinet/tcp.h netinet/udp.h asm/sysmips.h linux/utsname.h sys/nscsys.h)
 AC_DECL_SYS_ERRLIST
 AC_DECL_SYS_SIGLIST
