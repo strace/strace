@@ -1,3 +1,13 @@
+2004-12-19  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* syscall.c (qual_signal): Check bounds for numeric signal names.
+	Fix parser of symbolic signal names.
+	Fix return code, as required by qualify() function.
+	* syscall.c (qual_desc): Check bounds for descriptor number.
+	* syscall.c (qual_syscall): Correct return code, to be consistent
+	with qualify() and other qual_* functions.
+	Fixes RH#143362.
+
 2005-02-01  Roland McGrath  <roland@redhat.com>
 
 	* system.c [LINUX] (MS_MANDLOCK, MS_NOATIME, MS_NODIRATIME, MS_BIND,
