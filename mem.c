@@ -383,11 +383,11 @@ struct tcb *tcp;
 #ifdef MS_ASYNC
 
 static struct xlat mctl_sync[] = {
-	{ MS_ASYNC,	"MS_ASYNC"	},
-	{ MS_INVALIDATE,"MS_INVALIDATE"	},
 #ifdef MS_SYNC
 	{ MS_SYNC,	"MS_SYNC"	},
 #endif
+	{ MS_ASYNC,	"MS_ASYNC"	},
+	{ MS_INVALIDATE,"MS_INVALIDATE"	},
 	{ 0,		NULL		},
 };
 

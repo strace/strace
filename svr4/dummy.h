@@ -59,7 +59,6 @@
 #define sys_ksigqueue printargs
 #define sys_lwp_sema_wait printargs
 #define sys_lwp_sema_trywait printargs
-#define sys_memcntl printargs
 #define sys_syscall printargs
 #define sys_clocal printargs
 #define sys_syssun printargs
@@ -231,6 +230,7 @@
 #define sys_sleep sys_alarm
 #define sys_fork1 sys_fork
 #define sys_forkall sys_fork
+#define sys_memcntl sys_mctl
 #if UNIXWARE > 2
 #define sys_rfork1 sys_rfork
 #define sys_rforkall sys_rfork
