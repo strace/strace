@@ -499,7 +499,7 @@ sys_quotactl(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		printxval(quotacmds, tcp->u_arg[0] >> SUBCMDSHIFT, "Q_???");
+		printxval(quotacmds, (unsigned long) tcp->u_arg[0] >> SUBCMDSHIFT, "Q_???");
 		tprintf("|");
 		printxval(quotatypes, tcp->u_arg[0] & SUBCMDMASK, "???QUOTA");
 		tprintf(", ");
