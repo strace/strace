@@ -1,3 +1,13 @@
+strace (4.4.99-1) unstable; urgency=low
+
+  * New upstream version.
+    + Alpha updates.
+    + Add a few more new Linux 2.5 system calls.
+    + Stephen Thomas contributed a port to Linux/SH64.
+    + Print protocol names for PF_INET6 sockets.
+
+ -- Roland McGrath <frob@debian.org>  Thu, 17 Jul 2003 02:04:43 -0700
+
 strace (4.4.98-1) unstable; urgency=low
 
   * New upstream version.
