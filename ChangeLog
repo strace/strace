@@ -1,8 +1,13 @@
-Thu Jun 24 15:54:18 CEST 1999
+Thu Jul  8 16:00:04 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge patch from Daniel Jacobowitz to allow us to use the kernel types
+    for the stat structure
+
+Thu Jun 24 15:54:18 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Fix test for sys/reg include
 
-Tue Jun 22 17:26:33 CEST 1999
+Tue Jun 22 17:26:33 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Fixed some Linux/powerpc sillyness, thanks to Daniel Jacobowitz
   * Fixed some SunOS compile problems earlier that I forgot to include

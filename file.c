@@ -66,7 +66,25 @@ struct stat {
 #    include <asm/stat.h>
 #    undef stat
 #  else
+#    define dev_t __kernel_dev_t
+#    define ino_t __kernel_ino_t
+#    define mode_t __kernel_mode_t
+#    define nlink_t __kernel_nlink_t
+#    define uid_t __kernel_uid_t
+#    define gid_t __kernel_gid_t
+#    define off_t __kernel_off_t
+#    define loff_t __kernel_loff_t
+
 #    include <asm/stat.h>
+
+#    undef dev_t
+#    undef ino_t
+#    undef mode_t
+#    undef nlink_t
+#    undef uid_t
+#    undef gid_t
+#    undef off_t
+#    undef loff_t
 #  endif
 #  define stat libc_stat
 #  include <sys/stat.h>
