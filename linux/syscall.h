@@ -95,6 +95,19 @@ int sys_shutdown(), sys_setsockopt(), sys_getsockopt();
 int sys_query_module();
 int sys_poll();
 
+/* architecture-specific calls */
+#ifdef ALPHA
+sys_osf_select();
+sys_osf_gettimeofday();
+sys_osf_settimeofday();
+sys_osf_getitimer();
+sys_osf_setitimer();
+sys_osf_getrusage();
+sys_osf_wait4();
+sys_osf_utimes();
+#endif
+
+
 #if !defined(ALPHA) && !defined(MIPS)
 #ifdef POWERPC
 #  define SYS_socket_subcall	256
@@ -116,8 +129,10 @@ int sys_poll();
 #define SYS_shutdown		(SYS_socket_subcall + 13)
 #define SYS_setsockopt		(SYS_socket_subcall + 14)
 #define SYS_getsockopt		(SYS_socket_subcall + 15)
+#define SYS_sendmsg		(SYS_socket_subcall + 16)
+#define SYS_recvmsg		(SYS_socket_subcall + 17)
 
-#define SYS_socket_nsubcalls	16
+#define SYS_socket_nsubcalls	18
 #endif /* !ALPHA */
 
 /* sys_ipc subcalls */
