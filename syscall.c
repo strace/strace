@@ -289,15 +289,15 @@ qual_syscall(s, opt, not)
 	int not;
 {
 	int i;
-	int any = 0;
+	int rc = -1;
 
 	for (i = 0; i < nsyscalls; i++) {
 		if (strcmp(s, sysent[i].sys_name) == 0) {
 			qualify_one(i, opt, not);
-			any = 1;
+			rc = 0;
 		}
 	}
-	return !any;
+	return rc;
 }
 
 static int
@@ -309,12 +309,15 @@ qual_signal(s, opt, not)
 	int i;
 	char buf[32];
 
-	if (s && *s && isdigit((unsigned char)*s)) {
-		qualify_one(atoi(s), opt, not);
-		return 0;
+  	if (s && *s && isdigit((unsigned char)*s)) {
+ 		int signo = atoi(s);
+ 		if (signo < 0 || signo >= MAX_QUALS)
+ 			return -1;
+ 		qualify_one(signo, opt, not);
+ 		return 0;
 	}
 	if (strlen(s) >= sizeof buf)
-		return 0;
+		return -1;
 	strcpy(buf, s);
 	s = buf;
 	for (i = 0; s[i]; i++)
@@ -345,7 +348,10 @@ qual_desc(s, opt, not)
 	int not;
 {
 	if (s && *s && isdigit((unsigned char)*s)) {
-		qualify_one(atoi(s), opt, not);
+		int desc = atoi(s);
+		if (desc < 0 || desc >= MAX_QUALS)
+			return -1;
+		qualify_one(desc, opt, not);
 		return 0;
 	}
 	return -1;
