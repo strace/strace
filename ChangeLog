@@ -1,5 +1,8 @@
 2003-01-10  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.4.91.
+	* strace.spec, debian/changelog: 4.4.91-1
+
 	* util.c [LINUX && X86_64] (arg0_offset, arg1_offset): Use correct
 	values for x86-64, conditional on current_personality.
 
