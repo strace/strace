@@ -1,5 +1,22 @@
 2004-10-06  Roland McGrath  <roland@redhat.com>
 
+	* desc.c [LINUX] (sys_epoll_create, sys_epoll_ctl, sys_epoll_wait):
+	New functions.
+	* linux/syscall.h: Declare them.
+	* linux/syscallent.h: Use those for epoll_* syscalls.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+	* linux/sparc64/syscallent2.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#134463.
+
 	* resource.c (resources): Add RLIMIT_LOCKS, RLIMIT_SIGPENDING,
 	and RLIMIT_MSGQUEUE, if defined.
 	From Ulrich Drepper <drepper@redhat.com>.
