@@ -417,6 +417,19 @@ struct tcb *tcp;
 		if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		break;
+#ifdef SYS_readv
+        case SYS_readv:
+                if (qual_flags[tcp->u_arg[0]] & QUAL_READ)
+                        dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+                break;
+#endif
+#ifdef SYS_writev
+        case SYS_writev:
+
+                if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE)
+                        dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+                break;
+#endif
 	}
 }
 

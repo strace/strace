@@ -51,7 +51,9 @@
 #ifdef SVR4
 #include <sys/stropts.h>
 #ifdef HAVE_MP_PROCFS
+#ifdef HAVE_SYS_UIO_H
 #include <sys/uio.h>
+#endif
 #endif
 #endif
 

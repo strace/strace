@@ -38,6 +38,9 @@
 #include <sys/user.h>
 #include <sys/param.h>
 #include <fcntl.h>
+#if HAVE_SYS_UIO_H
+#include <sys/uio.h>
+#endif
 #ifdef SUNOS4
 #include <machine/reg.h>
 #include <a.out.h>
@@ -463,6 +466,38 @@ int len;
 	*s = '\0';
 	tprintf("%s", outstr);
 }
+
+#if HAVE_SYS_UIO_H
+void
+dumpiov(tcp, len, addr)
+struct tcb * tcp;
+int len;
+long addr;
+{
+	struct iovec *iov;
+	int i;
+
+	  
+	if ((iov = (struct iovec *) malloc(len * sizeof *iov)) == NULL) {
+		fprintf(stderr, "dump: No memory");
+		return;
+	}
+	if (umoven(tcp, addr,
+		   len * sizeof *iov, (char *) iov) >= 0) {
+                
+		for (i = 0; i < len; i++) {
+                        /* include the buffer number to make it easy to
+                         * match up the trace with the source */
+                        tprintf(" * %lu bytes in buffer %d\n",
+                                (unsigned long)iov[i].iov_len, i);
+                        dumpstr(tcp, (long) iov[i].iov_base,
+                                iov[i].iov_len);
+                }
+	}
+	free((char *) iov);
+        
+}
+#endif
 
 void
 dumpstr(tcp, addr, len)

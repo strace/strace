@@ -376,6 +376,7 @@ extern int printflags P((struct xlat *, int));
 extern int umoven P((struct tcb *, long, int, char *));
 extern int umovestr P((struct tcb *, long, int, char *));
 extern int upeek P((int, long, long *));
+extern void dumpiov P((struct tcb *, int, long));
 extern void dumpstr P((struct tcb *, long, int));
 extern void string_quote P((char *str));
 extern void printstr P((struct tcb *, long, int));
@@ -397,6 +398,7 @@ extern void tabto P((int));
 extern void call_summary P((FILE *));
 extern void fake_execve P((struct tcb *, char *, char *[], char *[]));
 extern void printtv32 P((struct tcb*, long));
+extern void tprint_iov P((struct tcb *, int, long));
 
 #ifdef LINUX
 extern int internal_clone P((struct tcb *));

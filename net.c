@@ -714,38 +714,6 @@ int addrlen;
 #if HAVE_SENDMSG
 
 static void
-printiovec(tcp, iovec, len)
-struct tcb *tcp;
-struct iovec *iovec;
-long   len;
-{
-	struct iovec *iov;
-	int i;
-
-	iov = (struct iovec *) malloc(len * sizeof *iov);
-	if (iov == NULL) {
-		fprintf(stderr, "No memory");
-		return;
-	}
-	if (umoven(tcp, (long)iovec,
-				len * sizeof *iov, (char *) iov) < 0) {
-		tprintf("%#lx", (unsigned long)iovec);
-	} else {
-		tprintf("[");
-		for (i = 0; i < len; i++) {
-			if (i)
-				tprintf(", ");
-			tprintf("{");
-			printstr(tcp, (long) iov[i].iov_base,
-					iov[i].iov_len);
-			tprintf(", %lu}", (unsigned long)iov[i].iov_len);
-		}
-		tprintf("]");
-	}
-	free((char *) iov);
-}
-
-static void
 printmsghdr(tcp, addr)
 struct tcb *tcp;
 long addr;
@@ -760,7 +728,7 @@ long addr;
 	printsock(tcp, (long)msg.msg_name, msg.msg_namelen);
 
 	tprintf(", msg_iov(%lu)=", (unsigned long)msg.msg_iovlen);
-	printiovec(tcp, msg.msg_iov, msg.msg_iovlen);
+	tprint_iov(tcp, msg.msg_iovlen, (long) msg.msg_iov);
 
 #ifdef HAVE_MSG_CONTROL
 	tprintf(", msg_controllen=%lu", (unsigned long)msg.msg_controllen);

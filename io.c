@@ -33,7 +33,9 @@
 #include "defs.h"
 
 #include <fcntl.h>
+#if HAVE_SYS_UIO_H
 #include <sys/uio.h>
+#endif
 
 #ifdef HAVE_LONG_LONG_OFF_T
 /*
@@ -72,11 +74,12 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if HAVE_SYS_UIO_H
 void
 tprint_iov(tcp, len, addr)
 struct tcb * tcp;
 int len;
-char * addr;
+long addr;
 {
 	struct iovec *iov;
 	int i;
@@ -91,7 +94,7 @@ char * addr;
 		fprintf(stderr, "No memory");
 		return;
 	}
-	if (umoven(tcp, (int) addr,
+	if (umoven(tcp, addr,
 		   len * sizeof *iov, (char *) iov) < 0) {
 		tprintf("%#lx", tcp->u_arg[1]);
 	} else {
@@ -138,6 +141,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif
 
 #if defined(SVR4)
 

@@ -1,3 +1,10 @@
+2001-07-10  John Hughes <john@Calva.COM>
+
+  * TODO, defs.h, io.h, net.c, strace.c, syscall.c, util.c: Merge fixes
+    from Richard Kettlewell <rkettlewell@zeus.com> which add I/O dumping
+    of args to readv/writev.  Also gets rid of redundant printiovec
+    routine from net.c (duplicate of tprint_iov in util.c).
+
 2001-07-02  Wichert Akkerman <wakkerma@debian.org>
 
   * config.{guess,sub}: updated

@@ -18,7 +18,6 @@ I don't like run on last close, change it?
 parse long options?
 count signals too with -c
 treat attach, detach messages like signals
-add readv, writev to I/O dumping
 add pread, pwrite to I/O dumping
 add system assist for qualifiers on svr4
 change printcall to getcaller and fix for linux and svr4
