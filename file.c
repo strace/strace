@@ -613,6 +613,78 @@ int addr;
 
 #ifdef linux
 static void
+printstat64(tcp, addr)
+struct tcb *tcp;
+int addr;
+{
+	struct stat64 statbuf;
+
+#ifdef LINUXSPARC
+ 	if (current_personality == 1) {
+ 		printstatsol(tcp, addr);
+ 		return;
+ 	}
+#endif /* LINUXSPARC */
+
+	if (!addr) {
+		tprintf("NULL");
+		return;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#x", addr);
+		return;
+	}
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprintf("{...}");
+		return;
+	}
+
+	if (!abbrev(tcp)) {
+		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%lu, st_mode=%s, ",
+			(unsigned long) major(statbuf.st_dev),
+			(unsigned long) minor(statbuf.st_dev),
+			(unsigned long) statbuf.st_ino,
+			sprintmode(statbuf.st_mode));
+		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
+			(unsigned long) statbuf.st_nlink,
+			(unsigned long) statbuf.st_uid,
+			(unsigned long) statbuf.st_gid);
+#ifdef HAVE_ST_BLKSIZE
+		tprintf("st_blksize=%lu, ",
+			(unsigned long) statbuf.st_blksize);
+#endif /* HAVE_ST_BLKSIZE */
+#ifdef HAVE_ST_BLOCKS
+		tprintf("st_blocks=%lu, ", (unsigned long) statbuf.st_blocks);
+#endif /* HAVE_ST_BLOCKS */
+	}
+	else
+		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
+	switch (statbuf.st_mode & S_IFMT) {
+	case S_IFCHR: case S_IFBLK:
+#ifdef HAVE_ST_RDEV
+		tprintf("st_rdev=makedev(%lu, %lu), ",
+			(unsigned long) major(statbuf.st_rdev),
+			(unsigned long) minor(statbuf.st_rdev));
+#else /* !HAVE_ST_RDEV */
+		tprintf("st_size=makedev(%lu, %lu), ",
+			(unsigned long) major(statbuf.st_size),
+			(unsigned long) minor(statbuf.st_size));
+#endif /* !HAVE_ST_RDEV */
+		break;
+	default:
+		tprintf("st_size=%llu, ", statbuf.st_size);
+		break;
+	}
+	if (!abbrev(tcp)) {
+		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
+		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
+		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
+	}
+	else
+		tprintf("...}");
+}
+
+static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
 struct stat *newbuf;
@@ -684,6 +756,23 @@ struct tcb *tcp;
 
 #ifdef linux
 int
+sys_stat64(tcp)
+struct tcb *tcp;
+{
+#ifdef HAVE_STAT64
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
+		printstat64(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+#else
+	return printargs(tcp);
+#endif
+}
+
+int
 sys_oldstat(tcp)
 struct tcb *tcp;
 {
@@ -711,6 +800,22 @@ struct tcb *tcp;
 
 #ifdef linux
 int
+sys_fstat64(tcp)
+struct tcb *tcp;
+{
+#ifdef HAVE_STAT64
+	if (entering(tcp))
+		tprintf("%ld, ", tcp->u_arg[0]);
+	else {
+		printstat64(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+#else
+	return printargs(tcp);
+#endif
+}
+
+int
 sys_oldfstat(tcp)
 struct tcb *tcp;
 {
@@ -737,6 +842,23 @@ struct tcb *tcp;
 }
 
 #ifdef linux
+int
+sys_lstat64(tcp)
+struct tcb *tcp;
+{
+#ifdef HAVE_STAT64
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
+		printstat64(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+#else
+	return printargs(tcp);
+#endif
+}
+
 int
 sys_oldlstat(tcp)
 struct tcb *tcp;
