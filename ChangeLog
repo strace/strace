@@ -1,3 +1,8 @@
+2002-12-26  Roland McGrath  <roland@redhat.com>
+
+	* defs.h [LINUX && MIPS] (MAX_QUALS): Set to 5000, not 4999.
+	From Daniel Jacobowitz <drow@false.org>.
+
 2002-12-21  Roland McGrath  <roland@redhat.com>
 
 	* linux/syscallent.h: Add some new 2.5 syscall names.
