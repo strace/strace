@@ -137,7 +137,7 @@ int sys_osf_utimes();
 
 /* sys_ipc subcalls */
 
-int sys_semget(), sys_semctl();
+int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 

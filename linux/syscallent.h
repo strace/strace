@@ -247,7 +247,7 @@
 	{ 5,	0,	printargs,		"SYS_199"	}, /* 199 */
 
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 200 */
-	{ 4,	TI,	printargs,		"semop"		}, /* 201 */
+	{ 4,	TI,	sys_semop,		"semop"		}, /* 201 */
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 202 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 203 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 204 */
