@@ -399,6 +399,7 @@ char *argv[];
 			break;
 		case 0: {
 #ifdef SVR4
+			if (outf != stderr) close (fileno (outf));
 #ifdef MIPS
 			/* Kludge for SGI, see proc_open for details. */
 			sa.sa_handler = foobar;
