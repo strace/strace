@@ -1,3 +1,14 @@
+2004-03-01  Roland McGrath  <roland@redhat.com>
+
+	* linux/dummy.h (sys_sched_getscheduler, sys_sched_setparam,
+	sys_sched_getparam, sys_sched_setscheduler, sys_sched_getscheduler,
+	sys_sched_get_priority_max, sys_sched_get_priority_min): Remove macros.
+	* process.c [LINUX] (sys_sched_getscheduler, sys_sched_setparam,
+	sys_sched_getparam, sys_sched_setscheduler, sys_sched_getscheduler,
+	sys_sched_get_priority_min): New functions.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#116990.
+
 2004-02-20  Roland McGrath  <roland@redhat.com>
 
 	* linux/hppa/syscallent.h: Update some syscalls.
