@@ -171,7 +171,6 @@
 #define sys_unblock printargs
 #define sys_cancelblock printargs
 #define sys_lwpkill printargs
-#define sys_sigwait printargs
 #define sys_modload printargs
 #define sys_moduload printargs
 #define sys_modpath printargs
@@ -306,6 +305,7 @@
 #define sys_kaio printargs
 
 #if DONE
+#define sys_sigwait printargs
 #define sys_mount printargs
 #define sys_sysinfo printargs
 #define sys_sysconfig printargs

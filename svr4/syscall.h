@@ -305,6 +305,7 @@ extern int sys_aclipc();
 extern int sys_door();
 #endif
 #if UNIXWARE >= 2
+extern int sys_sigwait();
 extern int sys_truncate();
 extern int sys_ftruncate();
 extern int sys_getksym ();

@@ -1280,6 +1280,26 @@ struct tcb *tcp;
 	return 0;
 }
 
+int sys_sigwait(tcp)
+struct tcb *tcp;
+{
+	sigset_t sigset;
+
+	if (entering(tcp)) {
+		if (copy_sigset(tcp, tcp->u_arg[0], &sigset) < 0)
+			tprintf("[?]");
+		else
+			printsigmask(&sigset, 0);
+	}
+	else {
+		if (!syserror(tcp)) {
+			tcp->auxstr = signalent[tcp->u_rval];
+			return RVAL_DECIMAL | RVAL_STR;
+		}
+	}
+	return 0;
+}
+
 #ifdef LINUX
 
 	int
