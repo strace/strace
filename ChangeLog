@@ -1,5 +1,12 @@
 2001-03-06  John Hughes <john@Calva.COM>
 
+  * file.c: Implement truncate64 and ftruncate64
+  * svr4/dummy.h: add dummies for truncate64 and ftruncate64 for non
+    LFS64 systems.
+  * svr4/syscall.h: add declarations for truncate64 and ftruncate64.
+
+2001-03-06  John Hughes <john@Calva.COM>
+
   * freebsd/syscalls.pl: fix for FreeBSD 4.1 (new optional field in
     syscall master file).
 
