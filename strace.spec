@@ -1,11 +1,11 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.4.92
+Version: 4.4.93
 Release: 1
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
-Source0: %{name}_%{version}-%{release}.tar.gz
+Source0: %{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-root
 
 %description
@@ -43,6 +43,9 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*
 
 %changelog
+* Tue Jan 21 2003 Roland McGrath <roland@redhat.com> 4.4.93-1
+- new upstream version, fixes ppc and s390 bugs, adds missing ptrace requests
+
 * Fri Jan 10 2003 Roland McGrath <roland@redhat.com> 4.4.91-1
 - new upstream version, fixes -f on x86-64
 

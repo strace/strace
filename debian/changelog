@@ -1,10 +1,21 @@
+strace (4.4.93-1) unstable; urgency=low
+
+  * New upstream version.
+    + Grok new quotactl arguments, closes: #154067.
+    + Fix m68k build problem, closes: #176528.
+    + Old bugs prior release actually closes: #154068.
+    + Fix S390 bugs with -f, and bugs with execve.
+  * Switched to non-native packaging (empty .diff), closes: #176388.
+
+ -- Roland McGrath <frob@debian.org>  Tue, 21 Jan 2003 12:22:08 -0800
+
 strace (4.4.92-1) unstable; urgency=low
 
   * New upstream version.
     + Updated config.guess and config.sub, closes: #176241.
     + Several fixes for PPC, closes: #144326.
     + Fixed ptrace output for unknown requests, closes: #77728.
-    + Fixed output of getdents64, truncate64, ftruncate64, closes: #169258.
+    + Fixed output of getdents64, truncate64, ftruncate64, closes: #169528.
     + Old bugs the last release actually closes: #153750, #38467, #109993,
       #109815, #104594, #113087, #134803, #166622, #96356, #94725, #32147,
       #32798, #36801, #41066, #81637, #138300, #143791.
