@@ -30,11 +30,14 @@
 /* Define if this is an alpha architecture.  */
 #undef ALPHA
 
-/* Define if this is a arm architecture.  */
+/* Define if this is an arm architecture.  */
 #undef ARM
 
-/* Define if this is an powerpc architecture.  */
+/* Define if this is a powerpc architecture.  */
 #undef POWERPC
+
+/* Define if this is a S390 architecture.  */
+#undef S390
 
 /* Define if you have a SVR4 MP type procfs.  I.E. /dev/xxx/ctl,
    /dev/xxx/status.  Also implies that you have the pr_lwp

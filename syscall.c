@@ -840,6 +840,14 @@ struct tcb *tcp;
 			fprintf(stderr, "stray syscall exit: eax = %ld\n", eax);
 		return 0;
 	}
+#elif defined (S390)
+	if (upeek(pid, PT_GPR2, &gpr2) < 0)
+		return -1;
+	if (gpr2 != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
+		if (debug)
+			fprintf(stderr, "stray syscall exit: gpr2 = %ld\n", gpr2);
+		return 0;
+	}
 #elif defined (POWERPC)
 # define SO_MASK 0x10000000
 	if (upeek(pid, 4*PT_CCR, &flags) < 0)
@@ -876,6 +884,16 @@ struct tcb *tcp;
 {
 	int u_error = 0;
 #ifdef LINUX
+#ifdef S390
+		if (gpr2 && (unsigned) -gpr2 < nerrnos) {
+			tcp->u_rval = -1;
+			u_error = -gpr2;
+		}
+		else {
+			tcp->u_rval = gpr2;
+			u_error = 0;
+		}
+#else /* !S390 */
 #ifdef I386
 		if (eax < 0 && -eax < nerrnos) {
 			tcp->u_rval = -1;
@@ -975,6 +993,7 @@ struct tcb *tcp;
 #endif /* MIPS */
 #endif /* IA64 */
 #endif /* I386 */
+#endif /* S390 */
 #endif /* LINUX */
 #ifdef SUNOS4
 		/* get error code from user struct */
@@ -1349,7 +1368,7 @@ struct tcb *tcp;
 		decode_subcall(tcp, SYS_ipc_subcall,
 			SYS_ipc_nsubcalls, shift_style);
 		break;
-#endif /* !ALPHA && !SPARC */
+#endif /* !ALPHA && !IA64 && !MIPS && !SPARC */
 #ifdef SPARC
 	case SYS_socketcall:
 		sparc_socket_decode (tcp);

@@ -405,6 +405,14 @@ setarg(tcp, argnum)
 			return -1;
 
 	}
+#elif defined(I386)
+	{
+		/* TODO: finish this */
+		errno=0;
+//		ptrace(PTRACE_POKEDATA, tcp->pid, , tcp->u_arg[argnum]);
+		if (errno)
+			return -1;
+	}
 #else
 # error Sorry, not done yet.
 #endif
@@ -1841,10 +1849,7 @@ struct xlat struct_user_offsets[] = {
 	{ 4*PT_PC,		"4*PT_PC"				},
 #endif /* M68K */
 #endif /* !I386 */
-#ifdef S390
-	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
-#endif
-#ifndef MIPS
+#if !defined(S390) && !defined(MIPS)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #endif
 #ifdef I386
@@ -1860,7 +1865,7 @@ struct xlat struct_user_offsets[] = {
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#ifndef MIPS
+#if !defined(S390) && !defined(MIPS)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
 #endif
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},

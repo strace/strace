@@ -1,11 +1,10 @@
 -- new entries from wta
 clone doesn't work; cloned processes can hang
-replace printargs with something that reads a configuration-file
--> rescheduled for strace rewrite
+- partially done: finish up change_syscall using new setargs
+- do setargs for non-ia64
 rename functions that are used for general things:
   sys_chdir -> general_1stringarg
 generate syscallent.h from the kernel sources
-add IPv6 support
 
 
 -- old entries from jrs

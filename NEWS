@@ -1,3 +1,7 @@
+Changes in 4.3
+==============
+* Linux/ia64 port added
+
 Changes in 4.2
 ==============
 * Compiles on glibc2.0 systems again

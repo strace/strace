@@ -170,9 +170,9 @@ int sys_old_mmap(tcp)
 struct tcb *tcp;
 {
     long u_arg[6];
-    int i, v;
 
 #if	defined(IA64)
+    int i, v;
     /*
      *  IA64 processes never call this routine, they only use the
      *  new `sys_mmap' interface.  This code converts the integer

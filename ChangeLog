@@ -1,3 +1,7 @@
+2000-02-14 Wichert Akkerman <wakkerma@debian.org>
+
+  * S390 updates
+
 2000-02-03 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge Trillian (ia64) patches
