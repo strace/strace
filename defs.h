@@ -85,7 +85,7 @@
 #endif
 
 #if defined(LINUX)
-#  if defined(SPARC)
+#  if defined(SPARC) || defined(SPARC64)
 #     define LINUXSPARC
 #  endif
 #  if defined(ALPHA)
@@ -195,7 +195,11 @@ extern int ptrace();
 #include <linux/a.out.h>
 #include <asm/psr.h>
 #undef  SUPPORTED_PERSONALITIES
+#if defined(SPARC64)
+#define SUPPORTED_PERSONALITIES 3
+#else
 #define SUPPORTED_PERSONALITIES 2
+#endif /* SPARC64 */
 #endif /* LINUXSPARC */
 
 #ifdef X86_64
@@ -318,7 +322,7 @@ struct tcb {
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-# if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM)
+# if defined(ALPHA) || defined(SPARC) || defined(SPARC64) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
 # endif
 # define TCB_CLONE_DETACHED 04000 /* CLONE_DETACHED set in creating syscall */
@@ -337,7 +341,7 @@ struct tcb {
 #   define __NR_exit_group 234
 #  elif defined S390 || defined S390X
 #   define __NR_exit_group 248
-#  elif defined SPARC
+#  elif defined SPARC || defined SPARC64
 #   define __NR_exit_group 188
 #  endif /* ALPHA et al */
 # endif	/* !__NR_exit_group */
@@ -485,7 +489,7 @@ extern void tv_div P((struct timeval *, struct timeval *, int));
 #ifdef SUNOS4
 extern int fixvfork P((struct tcb *));
 #endif
-#if !(defined(LINUX) && !defined(SPARC) && !defined(IA64))
+#if !(defined(LINUX) && !defined(SPARC) && !defined(SPARC64) && !defined(IA64))
 extern long getrval2 P((struct tcb *));
 #endif
 #ifdef USE_PROCFS

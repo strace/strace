@@ -1294,7 +1294,7 @@ sys_pipe(tcp)
 struct tcb *tcp;
 {
 
-#if defined(LINUX) && !defined(SPARC) && !defined(SH) && !defined(IA64)
+#if defined(LINUX) && !defined(SPARC) && !defined(SPARC64) && !defined(SH) && !defined(IA64)
 	int fds[2];
 
 	if (exiting(tcp)) {
@@ -1307,7 +1307,7 @@ struct tcb *tcp;
 		else
 			tprintf("[%u, %u]", fds[0], fds[1]);
 	}
-#elif defined(SPARC) || defined(SH) || defined(SVR4) || defined(FREEBSD) || defined(IA64)
+#elif defined(SPARC) || defined(SPARC64) || defined(SH) || defined(SVR4) || defined(FREEBSD) || defined(IA64)
 	if (exiting(tcp))
 		tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
 #endif

@@ -43,13 +43,13 @@
 #include <sys/param.h>
 
 #if HAVE_ASM_REG_H
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 #  define fpq kernel_fpq
 #  define fq kernel_fq
 #  define fpu kernel_fpu
 #endif
 #include <asm/reg.h>
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 #  undef fpq
 #  undef fq
 #  undef fpu
@@ -73,6 +73,14 @@
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif
+
+#if defined (LINUX) && defined (SPARC64)
+# define r_pc r_tpc
+# undef PTRACE_GETREGS
+# define PTRACE_GETREGS PTRACE_GETREGS64
+# undef PTRACE_SETREGS
+# define PTRACE_SETREGS PTRACE_SETREGS64
+#endif /* LINUX && SPARC64 */
 
 #if defined(LINUX) && defined(IA64)
 # include <asm/ptrace_offsets.h>
@@ -715,7 +723,7 @@ struct tcb *tcp;
 #elif defined (ALPHA)
 	static long r0;
 	static long a3;
-#elif defined (SPARC)
+#elif defined (SPARC) || defined (SPARC64)
 	static struct regs regs;
 	static unsigned long trap;
 #elif defined(MIPS)
@@ -1062,7 +1070,7 @@ struct tcb *tcp;
 		if (upeek(pid, REG_R0, &r0) < 0)
 			return -1;
 	}
-#elif defined (SPARC)
+#elif defined (SPARC) || defined (SPARC64)
 	/* Everything we need is in the current register set. */
 	if (ptrace(PTRACE_GETREGS,pid,(char *)&regs,0) < 0)
 		return -1;
@@ -1072,6 +1080,9 @@ struct tcb *tcp;
 		/* Retrieve the syscall trap instruction. */
 		errno = 0;
 		trap = ptrace(PTRACE_PEEKTEXT,pid,(char *)regs.r_pc,0);
+#if defined(SPARC64)
+		trap >>= 32;
+#endif
 		if (errno)
 			return -1;
 
@@ -1083,8 +1094,8 @@ struct tcb *tcp;
 			break;
 		case 0x91d0206d:
 			/* Linux/SPARC64 syscall trap. */
-			fprintf(stderr,"syscall: Linux/SPARC64 not supported yet\n");
-			return -1;
+			set_personality(2);
+			break;
 		case 0x91d02000:
 			/* SunOS syscall trap. (pers 1) */
 			fprintf(stderr,"syscall: SunOS no support\n");
@@ -1107,7 +1118,11 @@ struct tcb *tcp;
 				tcp->flags &= ~TCB_WAITEXECVE;
 				return 0;
 			}
+#if defined (SPARC64)
+			fprintf(stderr,"syscall: unknown syscall trap %08lx %016lx\n", trap, regs.r_tpc);
+#else
 			fprintf(stderr,"syscall: unknown syscall trap %08x %08x\n", trap, regs.r_pc);
+#endif
 			return -1;
 		}
 
@@ -1478,6 +1493,16 @@ struct tcb *tcp;
 			u_error = 0;
 		}
 #else /* !SPARC */
+#ifdef SPARC64
+		if (regs.r_tstate & 0x1100000000UL) {
+			tcp->u_rval = -1;
+			u_error = regs.r_o0;
+		}
+		else {
+			tcp->u_rval = regs.r_o0;
+			u_error = 0;
+		}
+#else /* !SPARC64 */
 #ifdef HPPA
 		if (r28 && (unsigned) -r28 < nerrnos) {
 			tcp->u_rval = -1;
@@ -1513,6 +1538,7 @@ struct tcb *tcp;
 #endif /* SH */
 #endif /* HPPA */
 #endif /* SPARC */
+#endif /* SPARC64 */
 #endif /* ALPHA */
 #endif /* ARM */
 #endif /* M68K */
@@ -1705,6 +1731,20 @@ force_result(tcp, error, rval)
 	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
 #else /* !SPARC */
+#ifdef SPARC64
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
+		return -1;
+	if (error) {
+		regs.r_tstate |= 0x1100000000UL;
+		regs.r_o0 = error;
+	}
+	else {
+		regs.r_tstate &= ~0x1100000000UL;
+		regs.r_o0 = rval;
+	}
+	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0)
+		return -1;
+#else /* !SPARC64 */
 #ifdef HPPA
 	r28 = error ? -error : rval;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR28), r28) < 0)
@@ -1723,6 +1763,7 @@ force_result(tcp, error, rval)
 #endif /* SH */
 #endif /* HPPA */
 #endif /* SPARC */
+#endif /* SPARC64 */
 #endif /* ALPHA */
 #endif /* ARM */
 #endif /* M68K */
@@ -1901,7 +1942,7 @@ struct tcb *tcp;
 				return -1;
 		}
 	}
-#elif defined (SPARC)
+#elif defined (SPARC) || defined (SPARC64)
 	{
 		int i;
 
@@ -2285,7 +2326,7 @@ struct tcb *tcp;
 
 	switch (tcp->scno + NR_SYSCALL_BASE) {
 #ifdef LINUX
-#if !defined (ALPHA) && !defined(SPARC) && !defined(MIPS) && !defined(HPPA) && !defined(X86_64)
+#if !defined (ALPHA) && !defined(SPARC) && !defined(SPARC64) && !defined(MIPS) && !defined(HPPA) && !defined(X86_64)
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);
@@ -2294,8 +2335,8 @@ struct tcb *tcp;
 		decode_subcall(tcp, SYS_ipc_subcall,
 			SYS_ipc_nsubcalls, shift_style);
 		break;
-#endif /* !ALPHA && !MIPS && !SPARC && !HPPA && !X86_64 */
-#ifdef SPARC
+#endif /* !ALPHA && !MIPS && !SPARC && !SPARC64 && !HPPA && !X86_64 */
+#if defined (SPARC) || defined (SPARC64)
 	case SYS_socketcall:
 		sparc_socket_decode (tcp);
 		break;
@@ -2435,7 +2476,7 @@ struct tcb *tcp;
 	long val = -1;
 
 #ifdef LINUX
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
@@ -2443,7 +2484,7 @@ struct tcb *tcp;
 #elif defined(SH)
 	if (upeek(tcp->pid, 4*(REG_REG0+1), &val) < 0)
 		return -1;
-#endif /* SPARC */
+#endif /* SPARC || SPARC64 */
 #elif defined(IA64)
 	if (upeek(tcp->pid, PT_R9, &val) < 0)
 		return -1;

@@ -55,6 +55,10 @@ m68k)
 	arch=m68k
 	AC_DEFINE([M68K], 1, [Define for the m68k architecture.])
 	;;
+sparc64*)
+	arch=sparc64
+	AC_DEFINE([SPARC64], 1, [Define for the SPARC64 architecture.])
+	;;
 sparc*)
 	arch=sparc
 	AC_DEFINE([SPARC], 1, [Define for the SPARC architecture.])

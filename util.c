@@ -78,7 +78,7 @@
 #include <sys/utsname.h>
 #endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
 
-#if defined(LINUX) && defined(SPARC)
+#if defined(LINUXSPARC)
 
 # define fpq kernel_fpq
 # define fq kernel_fq
@@ -87,6 +87,14 @@
 # undef fpq
 # undef fq
 # undef fpu
+
+#if defined (SPARC64)
+# define r_pc r_tpc
+# undef PTRACE_GETREGS
+# define PTRACE_GETREGS PTRACE_GETREGS64
+# undef PTRACE_SETREGS
+# define PTRACE_SETREGS PTRACE_SETREGS64
+#endif /* SPARC64 */
 
 #if !defined(__GLIBC__)
 
@@ -104,7 +112,11 @@ __asm__ volatile ("or %%g0, %1, %%o0\n\t" \
                   "or %%g0, %4, %%o3\n\t" \
                   "or %%g0, %5, %%o4\n\t" \
                   "or %%g0, %6, %%g1\n\t" \
+#if defined (SPARC64)
+                  "t 0x6d\n\t" \
+#else
                   "t 0x10\n\t" \
+#endif
                   "bcc 1f\n\t" \
                   "or %%g0, %%o0, %0\n\t" \
                   "sub %%g0, %%o0, %0\n\t" \
@@ -800,10 +812,10 @@ char *laddr;
 }
 
 #ifdef LINUX
-#ifndef SPARC
+#if !defined (SPARC) && !defined(SPARC64)
 #define PTRACE_WRITETEXT	101
 #define PTRACE_WRITEDATA	102
-#endif /* !SPARC */
+#endif /* !SPARC && !SPARC64 */
 #endif /* LINUX */
 
 #ifdef SUNOS4
@@ -977,7 +989,7 @@ struct tcb *tcp;
 #elif defined(MIPS)
  	if (upeek(tcp->pid, REG_EPC, &pc) < 0)
  		return -1;
-#elif defined(SPARC)
+#elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
@@ -1078,7 +1090,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(SPARC)
+#elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0) {
 		tprintf("[????????] ");
@@ -1254,7 +1266,7 @@ set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
 	return errno ? -1 : 0;
 }
 
-#elif defined (SPARC)
+#elif defined (SPARC) || defined (SPARC64)
 
 typedef struct regs arg_setup_state;
 
@@ -1426,10 +1438,11 @@ struct tcb *tcp;
 {
 
 #ifdef LINUX
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 	/* We simply use the SunOS breakpoint code. */
 
 	struct regs regs;
+	unsigned long inst;
 #define LOOPA	0x30800000	/* ba,a	0 */
 
 	if (tcp->flags & TCB_BPTSET) {
@@ -1459,14 +1472,19 @@ struct tcb *tcp;
 	 * Of cause, if we evaporate ourselves in the middle of all this...
 	 */
 	errno = 0;
-	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, LOOPA);
+	inst = LOOPA;
+#if defined (SPARC64)
+	inst <<= 32;
+	inst |= (tcp->inst[0] & 0xffffffffUL);
+#endif
+	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, inst);
 	if(errno) {
 		perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
 		return -1;
 	}
 	tcp->flags |= TCB_BPTSET;
 
-#else /* !SPARC */
+#else /* !SPARC && !SPARC64 */
 #ifdef IA64
 	if (ia32) {
 #		define LOOP	0x0000feeb
@@ -1615,7 +1633,7 @@ struct tcb *tcp;
 	tcp->flags |= TCB_BPTSET;
 
 #endif /* !IA64 */
-#endif /* SPARC */
+#endif /* SPARC || SPARC64 */
 #endif /* LINUX */
 
 #ifdef SUNOS4
@@ -1690,7 +1708,7 @@ struct tcb *tcp;
        long pc;
 #endif /* architecture */
 
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 	/* Again, we borrow the SunOS breakpoint code. */
 	if (!(tcp->flags & TCB_BPTSET)) {
 		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
@@ -1770,7 +1788,7 @@ struct tcb *tcp;
 			return 0;
 		}
 	}
-#else /* !IA64  && ! SPARC */
+#else /* !IA64  && !SPARC && !SPARC64 */
 
 	if (debug)
 		fprintf(stderr, "[%d] clearing bpt\n", tcp->pid);
@@ -1868,7 +1886,7 @@ struct tcb *tcp;
         }
 
 #endif /* arch */
-#endif /* !SPARC && !IA64 */
+#endif /* !SPARC && !SPARC64 && !IA64 */
 #endif /* LINUX */
 
 #ifdef SUNOS4

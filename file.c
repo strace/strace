@@ -66,6 +66,24 @@ struct stat {
 	int		st_blocks;
 	unsigned int	__unused4[2];
 };
+#if defined(SPARC64)
+struct stat_sparc64 {
+	unsigned int	st_dev;
+	unsigned long	st_ino;
+	unsigned int	st_mode;
+	unsigned int	st_nlink;
+	unsigned int	st_uid;
+	unsigned int	st_gid;
+	unsigned int	st_rdev;
+	long		st_size;
+	long		st_atime;
+	long		st_mtime;
+	long		st_ctime;
+	long		st_blksize;
+	long		st_blocks;
+	unsigned long	__unused4[2];
+};
+#endif /* SPARC64 */
 #    define stat kernel_stat
 #    include <asm/stat.h>
 #    undef stat
@@ -658,6 +676,65 @@ long addr;
 	else
 		tprintf("...}");
 }
+
+#if defined (SPARC64)
+static void
+printstat_sparc64(tcp, addr)
+struct tcb *tcp;
+long addr;
+{
+	struct stat_sparc64 statbuf;
+
+	if (!addr) {
+		tprintf("NULL");
+		return;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprintf("{...}");
+		return;
+	}
+
+	if (!abbrev(tcp)) {
+		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%lu, st_mode=%s, ",
+			(unsigned long) major(statbuf.st_dev),
+			(unsigned long) minor(statbuf.st_dev),
+			(unsigned long) statbuf.st_ino,
+			sprintmode(statbuf.st_mode));
+		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
+			(unsigned long) statbuf.st_nlink,
+			(unsigned long) statbuf.st_uid,
+			(unsigned long) statbuf.st_gid);
+		tprintf("st_blksize=%lu, ",
+			(unsigned long) statbuf.st_blksize);
+		tprintf("st_blocks=%lu, ",
+			(unsigned long) statbuf.st_blocks);
+	}
+	else
+		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
+	switch (statbuf.st_mode & S_IFMT) {
+	case S_IFCHR: case S_IFBLK:
+		tprintf("st_rdev=makedev(%lu, %lu), ",
+			(unsigned long) major(statbuf.st_rdev),
+			(unsigned long) minor(statbuf.st_rdev));
+		break;
+	default:
+		tprintf("st_size=%lu, ", statbuf.st_size);
+		break;
+	}
+	if (!abbrev(tcp)) {
+		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
+		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
+		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
+		tprintf("}");
+	}
+	else
+		tprintf("...}");
+}
+#endif /* SPARC64 */
 #endif /* LINUXSPARC */
 
 struct xlat fileflags[] = {
@@ -797,6 +874,12 @@ long addr;
  		printstatsol(tcp, addr);
  		return;
  	}
+#ifdef SPARC64
+	else if (current_personality == 2) {
+		printstat_sparc64(tcp, addr);
+		return;
+	}
+#endif
 #endif /* LINUXSPARC */
 
 	if (!addr) {
@@ -829,6 +912,12 @@ long addr;
  		printstatsol(tcp, addr);
  		return;
  	}
+#ifdef SPARC64
+	else if (current_personality == 2) {
+		printstat_sparc64(tcp, addr);
+		return;
+	}
+#endif
 #endif /* LINUXSPARC */
 
 	if (!addr) {

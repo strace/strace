@@ -72,20 +72,27 @@
 #endif /* !IA64 */
 
 #if HAVE_ASM_REG_H
-# ifdef SPARC
+# if defined (SPARC) || defined (SPARC64)
 #  define fpq kernel_fpq
 #  define fq kernel_fq
 #  define fpu kernel_fpu
 # endif
 # include <asm/reg.h>
-# ifdef SPARC
+# if defined (SPARC) || defined (SPARC64)
 #  undef fpq
 #  undef fq
 #  undef fpu
 # endif
+#if defined (LINUX) && defined (SPARC64)
+# define r_pc r_tpc
+# undef PTRACE_GETREGS
+# define PTRACE_GETREGS PTRACE_GETREGS64
+# undef PTRACE_SETREGS
+# define PTRACE_SETREGS PTRACE_SETREGS64
+#endif /* LINUX && SPARC64 */
 #endif /* HAVE_ASM_REG_H */
 
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 typedef struct {
 	struct regs		si_regs;
 	int			si_mask;
@@ -1375,7 +1382,7 @@ struct tcb *tcp;
 	}
 	return 0;
 #else
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 	long i1;
 	struct regs regs;
 	m_siginfo_t si;
@@ -1429,7 +1436,7 @@ struct tcb *tcp;
 #warning         (no problem, just a reminder :-)
 	return 0;
 #endif /* MIPS */
-#endif /* SPARC */
+#endif /* SPARC || SPARC64 */
 #endif /* ALPHA */
 #endif /* !M68K */
 #endif /* !POWERPC */

@@ -57,17 +57,17 @@
 #endif
 
 #if HAVE_ASM_REG_H
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 #  define fpq kernel_fpq
 #  define fq kernel_fq
 #  define fpu kernel_fpu
-#endif
+#endif /* SPARC || SPARC64 */
 #include <asm/reg.h>
-#ifdef SPARC
+#if defined (SPARC) || defined (SPARC64)
 #  undef fpq
 #  undef fq
 #  undef fpu
-#endif
+#endif /* SPARC || SPARC64 */
 #endif /* HAVE_ASM_REG_H */
 
 #ifdef HAVE_SYS_REG_H
@@ -92,6 +92,14 @@
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif
+
+#if defined (LINUX) && defined (SPARC64)
+# define r_pc r_tpc
+# undef PTRACE_GETREGS
+# define PTRACE_GETREGS PTRACE_GETREGS64
+# undef PTRACE_SETREGS
+# define PTRACE_SETREGS PTRACE_SETREGS64
+#endif /* LINUX && SPARC64 */
 
 #ifdef HAVE_LINUX_FUTEX_H
 #include <linux/futex.h>
@@ -641,7 +649,7 @@ int new;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new)<0)
 	    	return -1;
 	return 0;
-#elif defined(SPARC)
+#elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char*)&regs, 0)<0)
 		return -1;
@@ -2774,7 +2782,7 @@ struct xlat struct_user_offsets[] = {
 	{ uoff(regs.ARM_cpsr),	"cpsr"					},
 #endif
 
-#if !defined(S390) && !defined(S390X) && !defined(MIPS)
+#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #endif
 #if  defined(I386) || defined(X86_64)
@@ -2787,17 +2795,23 @@ struct xlat struct_user_offsets[] = {
 	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
 	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
 	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+#if !defined(SPARC64)
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+#endif
 #ifdef SH64
 	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
 #endif
+#if !defined(SPARC64)
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+#endif
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64)
+#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
 #endif
+#if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-#if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X)
+#endif
+#if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
 #endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},

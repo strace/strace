@@ -62,7 +62,7 @@ struct ioctlent ioctlent2[] = {
 #include "ioctlent2.h"
 };
 
-int nioctlents1 = sizeof ioctlent2 / sizeof ioctlent2[0];
+int nioctlents2 = sizeof ioctlent2 / sizeof ioctlent2[0];
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 struct ioctlent *ioctlent;
