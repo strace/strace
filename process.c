@@ -359,6 +359,9 @@ int
 internal_clone(tcp)
 struct tcb *tcp;
 {
+	struct tcb *tcpchild;
+	int pid;
+	int dont_follow = 0;
 	if (entering(tcp)) {
 		tprintf("fn=%#lx, child_stack=%#lx, flags=",
 				tcp->u_arg[0], tcp->u_arg[1]);
@@ -379,7 +382,7 @@ struct tcb *tcp;
 		tcp->flags |= TCB_FOLLOWFORK;
 
 		/* XXX 
-		/* We will take the simple approach and add CLONE_PTRACE to the clone
+		 * We will take the simple approach and add CLONE_PTRACE to the clone
 		 * options. This only works on Linux 2.2.x and later. This means that
 		 * we break all programs using clone on older kernels..
 		 * We should try to fallback to the bpt-trick if this fails, but right
@@ -404,8 +407,8 @@ struct tcb *tcp;
 		/* For fork we need to re-attach, but thanks to CLONE_PTRACE we're
 		 * already attached.
 		 */
-		tcphild->flags |= TCB_ATTACHED;
-		newoutf(tcpfhild);
+		tcpchild->flags |= TCB_ATTACHED;
+		newoutf(tcpchild);
 		tcp->nchildren++;
 		if (!qflag)
 			fprintf(stderr, "Process %d attached\n", pid);
