@@ -143,7 +143,7 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 # endif /* IA64 */
-# if defined I386 || defined IA64
+# if defined I386 || defined IA64 || defined ARM
 #  define SYS_socket_subcall	300
 # else
 #  define SYS_socket_subcall	256
