@@ -1,5 +1,10 @@
 2003-01-10  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: Check struct T_conn_res for QUEUE_ptr or ACCEPTOR_id.
+	* stream.c (print_transport_message): Use #ifdefs for those members.
+
+	* strace.c (rebuild_pollv): Fix typo: struct poll -> struct pollfd.
+
 	* configure.ac: Fix siginfo_t/sig_atomic_t checks.
 	Use prerequisite #include <netinet/in.h> for netinet/*.h checks.
 
