@@ -1,5 +1,13 @@
 2004-03-01  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: Check for `struct user_desc' in <asm/ldt.h>.
+	* process.c [HAVE_STRUCT_USER_DESC]: Use struct user_desc in place of
+	struct modify_ldt_ldt_s.
+	* mem.c [HAVE_STRUCT_USER_DESC]: Likewise.
+
+	* system.c (sysctl_vm): Conditionalize VM_* macro uses, add some more.
+	From Tim Yamin <plasmaroo@gentoo.org>.
+
 	* process.c (sys_execve): Clear instead of set TCB_WAITEXECVE on
 	erring syscall.
 
