@@ -409,7 +409,8 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
 		tprintf(", ");
-		printflags(clockflags, tcp->u_arg[1]);
+		if (printflags(clockflags, tcp->u_arg[1]) == 0)
+			tprintf("0");
 		tprintf(", ");
 		printtv(tcp, tcp->u_arg[2]);
 		tprintf(", ");
@@ -442,8 +443,11 @@ long arg;
 	if (umove (tcp, arg, &sev) < 0)
 		tprintf("{...}");
 	else {
-		tprintf("{%p, %u, ", sev.sigev_value.sival_ptr,
-			sev.sigev_signo);
+		tprintf("{%p, ", sev.sigev_value.sival_ptr);
+		if (sev.sigev_notify == SIGEV_SIGNAL)
+			tprintf("%s, ", signame(sev.sigev_signo));
+		else
+			tprintf("%u, ", sev.sigev_signo);
 		printxval(sigev_value, sev.sigev_notify+1, "SIGEV_???");
 		tprintf(", ");
 		if (sev.sigev_notify == SIGEV_THREAD_ID)
@@ -465,7 +469,8 @@ sys_timer_create(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, ", tcp->u_arg[0]);
+		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		tprintf(", ");
 		printsigevent(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
@@ -486,7 +491,8 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, ", tcp->u_arg[0]);
-		printflags(clockflags, tcp->u_arg[1]);
+		if (printflags(clockflags, tcp->u_arg[1]) == 0)
+			tprintf("0");
 		tprintf(", ");
 		printitv(tcp, tcp->u_arg[2]);
 		tprintf(", ");
