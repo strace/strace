@@ -1,3 +1,10 @@
+2002-12-21  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c (force_result): New function.
+	* process.c (internal_wait): Handle ECHILD exit from wait call with
+	WNOHANG flag set; force the return value to 0 in the inferior when it
+	has live children we are tracing.
+
 2002-12-17  Roland McGrath  <roland@redhat.com>
 
 	* linux/ia64/syscallent.h: Remove placeholders 275-298 to catch up
