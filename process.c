@@ -104,6 +104,7 @@
 #endif
 
 #ifdef LINUX
+#include <sched.h>
 #include <asm/posix_types.h>
 #undef GETGROUPS_T
 #define GETGROUPS_T __kernel_gid_t
@@ -2995,6 +2996,83 @@ struct tcb *tcp;
 	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
     } else {
 	print_affinitylist((unsigned long *) tcp->u_arg[2], tcp->u_rval);
+    }
+    return 0;
+}
+
+static struct xlat schedulers[] = {
+	{ SCHED_OTHER,	"SCHED_OTHER" },
+	{ SCHED_RR,	"SCHED_RR" },
+	{ SCHED_FIFO,	"SCHED_FIFO" },
+	{ 0,		NULL }
+};
+
+int
+sys_sched_getscheduler(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%d", (int) tcp->u_arg[0]);
+    } else if (! syserror(tcp)) {
+	tcp->auxstr = xlookup (schedulers, tcp->u_rval);
+	if (tcp->auxstr != NULL)
+	    return RVAL_STR;
+    }
+    return 0;
+}
+
+int
+sys_sched_setscheduler(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	struct sched_param p;
+	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printxval(schedulers, tcp->u_arg[1], "SCHED_???");
+	if (umove(tcp, tcp->u_arg[2], &p) < 0)
+	    tprintf(", %lx", tcp->u_arg[2]);
+	else
+	    tprintf(", { %d }", p.__sched_priority);
+    }
+    return 0;
+}
+
+int
+sys_sched_getparam(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	    tprintf("%d, ", (int) tcp->u_arg[0]);
+    } else {
+	struct sched_param p;
+	if (umove(tcp, tcp->u_arg[1], &p) < 0)
+	    tprintf("%lx", tcp->u_arg[1]);
+	else
+	    tprintf("{ %d }", p.__sched_priority);
+    }
+    return 0;
+}
+
+int
+sys_sched_setparam(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	struct sched_param p;
+	if (umove(tcp, tcp->u_arg[1], &p) < 0)
+	    tprintf("%d, %lx", (int) tcp->u_arg[0], tcp->u_arg[1]);
+	else
+	    tprintf("%d, { %d }", (int) tcp->u_arg[0], p.__sched_priority);
+    }
+    return 0;
+}
+
+int
+sys_sched_get_priority_min(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printxval(schedulers, tcp->u_arg[0], "SCHED_???");
     }
     return 0;
 }

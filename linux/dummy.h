@@ -45,13 +45,8 @@
 #define sys_set_thread_area	printargs
 #endif
 
-#define sys_sched_setparam	printargs
-#define sys_sched_getparam	printargs
-#define sys_sched_setscheduler	printargs
-#define sys_sched_getscheduler	printargs
 #define sys_sched_yield		printargs
-#define sys_sched_get_priority_max printargs
-#define sys_sched_get_priority_min printargs
+#define sys_sched_get_priority_max sys_sched_get_priority_min
 #define sys_sched_rr_get_interval printargs
 
 /* like another call */
