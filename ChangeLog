@@ -1,3 +1,15 @@
+2003-07-28  Daniel Jacobowitz  <drow@mvista.com>
+
+	* defs.h (ALIGN64): Define for MIPS.
+	* io.c (PREAD_OFFSET_ARG): Define.
+	(sys_pread, sys_pwrite): Use it.
+	* process.c (struct_user_offsets) [SH]: Check whether REG_XDREG0
+	is defined.
+	* linux/sh/syscallent.h (pread, pwrite): Take six arguments.
+	(truncate64, ftruncate64): Pretty-print.
+	* linux/mips/syscallent.h (pread, pwrite): Take six arguments.
+	(truncate64, ftruncate64): Take four arguments.
+
 2003-07-17  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.4.99.
