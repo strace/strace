@@ -1,5 +1,16 @@
 2001-10-18  John Hughes  <john@Calva.COM>
 
+	* acconfig.h: Add HAS_SIGINFO_T.
+	* aclocal.m4: add check for siginfo_t in signal.h.
+	* configure.in: use check for siginfo_t.
+	* defs.h: if HAVE_SIGINFO_T the declare printsiginfo.  On SVR4
+	  allow access to siginfo when signal recieved.
+	* process.c: Remove SVR4 only version of printsiginfo.
+	* signal.c: merge SVR4 and LINUX versions of printsiginfo.
+	* strace.c: on SVR4 print siginfo when signal recieved.
+
+2001-10-18  John Hughes  <john@Calva.COM>
+
 	* system.c(sys_ssisys): handle return values for ssisys
 
 2001-10-18  John Hughes  <john@Calva.COM>
