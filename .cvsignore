@@ -1,0 +1,5 @@
+configure
+config.h
+config.cache
+config.status
+config.h.in
