@@ -565,8 +565,10 @@ struct tcb *tcp;
 				tcp->u_arg[ARG_STACKSIZE]);
 # endif
 		tprintf("flags=");
-		if (printflags(clone_flags, flags) == 0)
+		if (printflags(clone_flags, flags &~ CSIGNAL) == 0)
 			tprintf("0");
+		if ((flags & CSIGNAL) != 0)
+			tprintf("|%s", signame(flags & CSIGNAL));
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
 			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
 			return 0;
@@ -845,29 +847,37 @@ Process %u resumed (parent %d ready)\n",
 		}
 
 #ifdef TCB_CLONE_THREAD
-		if ((tcp->flags & TCB_CLONE_THREAD) && tcp->parent != NULL) {
-			/* The parent in this clone is itself a thread
-			   belonging to another process.  There is no
-			   meaning to the parentage relationship of the new
-			   child with the thread, only with the process.
-			   We associate the new thread with our parent.
-			   Since this is done for every new thread, there
-			   will never be a TCB_CLONE_THREAD process that
-			   has children.  */
-			--tcp->nchildren;
-			tcp->u_arg[0] = tcp->parent->u_arg[0];
-			tcp = tcp->parent;
-			tcpchild->parent = tcp;
-			++tcp->nchildren;
-		}
-
-		if (tcp->u_arg[0] & CLONE_THREAD) {
-			tcpchild->flags |= TCB_CLONE_THREAD;
-			++tcp->nclone_threads;
-		}
-		if (tcp->u_arg[0] & CLONE_DETACHED) {
-			tcpchild->flags |= TCB_CLONE_DETACHED;
-			++tcp->nclone_detached;
+		{
+			/*
+			 * Save the flags used in this call,
+			 * in case we point TCP to our parent below.
+			 */
+			int call_flags = tcp->u_arg[ARG_FLAGS];
+			if ((tcp->flags & TCB_CLONE_THREAD) &&
+			    tcp->parent != NULL) {
+				/* The parent in this clone is itself a
+				   thread belonging to another process.
+				   There is no meaning to the parentage
+				   relationship of the new child with the
+				   thread, only with the process.  We
+				   associate the new thread with our
+				   parent.  Since this is done for every
+				   new thread, there will never be a
+				   TCB_CLONE_THREAD process that has
+				   children.  */
+				--tcp->nchildren;
+				tcp = tcp->parent;
+				tcpchild->parent = tcp;
+				++tcp->nchildren;
+			}
+			if (call_flags & CLONE_THREAD) {
+				tcpchild->flags |= TCB_CLONE_THREAD;
+				++tcp->nclone_threads;
+			}
+			if (call_flags & CLONE_DETACHED) {
+				tcpchild->flags |= TCB_CLONE_DETACHED;
+				++tcp->nclone_detached;
+			}
 		}
 #endif
 
