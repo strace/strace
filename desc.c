@@ -212,7 +212,7 @@ int getlk;
 static void
 printflock64(tcp, addr, getlk)
 struct tcb *tcp;
-int addr;
+long addr;
 int getlk;
 {
 	struct flock64 fl;
