@@ -1,3 +1,21 @@
+2003-02-26  Stuart Menefy <stuart.menefy@st.com>
+
+	Various fixes for SuperH [SH]:
+	* mem.c (sys_old_mmap): mmap() parameters passed in registers
+	* net.c (sys_pipe), syscall.c (getrval2): pipe() results returned
+	in registers
+	* process.c (change_syscall): Fixed register which holds system
+	call number
+	* util.c (arg0_offset, arg1_offset): provide definition
+	* Makefile.am: Added new files in linux/sh
+	* linux/sh/syscallent.h: New file.
+	* linux/sh/errnoent.h: New file.
+	* linux/sh/ioctlent.h: New file.
+	* linux/sh/signalent.h: New file.
+
+	* linux/ioctlent.sh: Take an arg for location of header files
+	* syscallent.sh: Replaced lost $
+
 2003-03-30  Roland McGrath  <roland@redhat.com>
 
 	* time.c [LINUX]: Handle new Linux 2.5 clock/timer syscalls.
