@@ -1626,15 +1626,55 @@ static struct xlat sysctl_kern[] = {
 };
 
 static struct xlat sysctl_vm[] = {
+#ifdef VM_SWAPCTL
 	{ VM_SWAPCTL, "VM_SWAPCTL" },
+#endif
+#ifdef VM_UNUSED1
+	{ VM_UNUSED1, "VM_UNUSED1" },
+#endif
+#ifdef VM_SWAPOUT
 	{ VM_SWAPOUT, "VM_SWAPOUT" },
+#endif
+#ifdef VM_UNUSED2
+	{ VM_UNUSED2, "VM_UNUSED2" },
+#endif
+#ifdef VM_FREEPG
 	{ VM_FREEPG, "VM_FREEPG" },
+#endif
+#ifdef VM_UNUSED3
+	{ VM_UNUSED3, "VM_UNUSED3" },
+#endif
+#ifdef VM_BDFLUSH
 	{ VM_BDFLUSH, "VM_BDFLUSH" },
+#endif
+#ifdef VM_UNUSED4
+	{ VM_UNUSED4, "VM_UNUSED4" },
+#endif
 	{ VM_OVERCOMMIT_MEMORY, "VM_OVERCOMMIT_MEMORY" },
+#ifdef VM_BUFFERMEM
 	{ VM_BUFFERMEM, "VM_BUFFERMEM" },
+#endif
+#ifdef VM_UNUSED5
+	{ VM_UNUSED5, "VM_UNUSED5" },
+#endif
+#ifdef VM_PAGECACHE
 	{ VM_PAGECACHE, "VM_PAGECACHE" },
+#endif
+#ifdef VM_UNUSED7
+	{ VM_UNUSED7, "VM_UNUSED7" },
+#endif
+#ifdef VM_PAGERDAEMON
 	{ VM_PAGERDAEMON, "VM_PAGERDAEMON" },
+#endif
+#ifdef VM_UNUSED8
+	{ VM_UNUSED8, "VM_UNUSED8" },
+#endif
+#ifdef VM_PGT_CACHE
 	{ VM_PGT_CACHE, "VM_PGT_CACHE" },
+#endif
+#ifdef VM_UNUSED9
+	{ VM_UNUSED9, "VM_UNUSED9" },
+#endif
 	{ VM_PAGE_CLUSTER, "VM_PAGE_CLUSTER" },
 	{ 0, NULL },
 };
