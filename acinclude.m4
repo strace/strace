@@ -4,7 +4,7 @@ dnl automake uses this file to generate aclocal.m4, which is used by autoconf.
 dnl
 
 dnl ### A macro to find the include directory, useful for cross-compiling.
-AC_DEFUN(AC_INCLUDEDIR,
+AC_DEFUN([AC_INCLUDEDIR],
 [AC_REQUIRE([AC_PROG_AWK])dnl
 AC_SUBST(includedir)
 AC_MSG_CHECKING(for primary include directory)
@@ -41,7 +41,7 @@ fi
 ])
 
 dnl ### A macro to determine if we have a "MP" type procfs
-AC_DEFUN(AC_MP_PROCFS,
+AC_DEFUN([AC_MP_PROCFS],
 [AC_MSG_CHECKING(for MP procfs)
 AC_CACHE_VAL(ac_cv_mp_procfs,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -101,7 +101,7 @@ fi
 ])
 
 dnl ### A macro to determine if procfs is pollable.
-AC_DEFUN(AC_POLLABLE_PROCFS,
+AC_DEFUN([AC_POLLABLE_PROCFS],
 [AC_MSG_CHECKING(for pollable procfs)
 AC_CACHE_VAL(ac_cv_pollable_procfs,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -174,7 +174,7 @@ fi
 ])
 
 dnl ### A macro to determine if the prstatus structure has a pr_syscall member.
-AC_DEFUN(AC_STRUCT_PR_SYSCALL,
+AC_DEFUN([AC_STRUCT_PR_SYSCALL],
 [AC_MSG_CHECKING(for pr_syscall in struct prstatus)
 AC_CACHE_VAL(ac_cv_struct_pr_syscall,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/procfs.h>]], [[#ifdef HAVE_MP_PROCFS
@@ -193,7 +193,7 @@ fi
 ])
 
 dnl ### A macro to determine whether stat64 is defined.
-AC_DEFUN(AC_STAT64,
+AC_DEFUN([AC_STAT64],
 [AC_MSG_CHECKING(for stat64 in (asm|sys)/stat.h)
 AC_CACHE_VAL(ac_cv_type_stat64,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifdef LINUX
@@ -211,7 +211,7 @@ fi
 ])
 
 dnl ### A macro to determine if off_t is a long long
-AC_DEFUN(AC_OFF_T_IS_LONG_LONG,
+AC_DEFUN([AC_OFF_T_IS_LONG_LONG],
 [AC_MSG_CHECKING(for long long off_t)
 AC_CACHE_VAL(ac_cv_have_long_long_off_t,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
@@ -232,7 +232,7 @@ fi
 ])
 
 dnl ### A macro to determine if rlim_t is a long long
-AC_DEFUN(AC_RLIM_T_IS_LONG_LONG,
+AC_DEFUN([AC_RLIM_T_IS_LONG_LONG],
 [AC_MSG_CHECKING(for long long rlim_t)
 AC_CACHE_VAL(ac_cv_have_long_long_rlim_t,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
@@ -255,7 +255,7 @@ fi
 ])
 
 dnl ### A macro to determine endianness of long long
-AC_DEFUN(AC_LITTLE_ENDIAN_LONG_LONG,
+AC_DEFUN([AC_LITTLE_ENDIAN_LONG_LONG],
 [AC_MSG_CHECKING(for little endian long long)
 AC_CACHE_VAL(ac_cv_have_little_endian_long_long,
 [AC_RUN_IFELSE([AC_LANG_SOURCE([[
