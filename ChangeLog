@@ -3,6 +3,8 @@
 	* configure.ac, NEWS: Version 4.5.8.
 	* debian/changelog, strace.spec: 4.5.8-1.
 
+	* file.c (sys_fadvise64): Conditionalize just on [LINUX].
+
 	* configure.ac: Check for sys/epoll.h.
 	* desc.c: Protect #include <sys/epoll.h> with [HAVE_SYS_EPOLL_H].
 	(epollctls, epollevents): Protect each entry with #ifdef on its macro.
