@@ -1,3 +1,8 @@
+Changes in 4.5.3
+==============
+* Bug fixes.
+* On Linux using NPTL threads, -p will now attach to all threads in a process.
+
 Changes in 4.5.2
 ==============
 * Bug fixes.
