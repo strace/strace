@@ -1,3 +1,53 @@
+2003-01-08  Roland McGrath  <roland@redhat.com>
+
+	* NEWS: Update for 4.4.90 test release.
+
+	Support for new Linux 2.5 thread features.
+	* defs.h [LINUX]: Define __NR_exit_group if not defined.
+	(struct tcb): New members nclone_threads, nclone_detached,
+	and nclone_waiting.
+	(TCB_CLONE_DETACHED, TCB_CLONE_THREAD, TCB_GROUP_EXITING): New macros.
+	(waiting_parent): Macro removed.
+	(pid2tcb): Declare it.
+	* process.c (internal_clone) [TCB_CLONE_THREAD]: Reparent the new
+	child to our parent if we are a CLONE_THREAD child ourselves.
+	Maintain TCB_CLONE_THREAD and TCB_CLONE_DETACHED flags and counts.
+	(internal_wait) [TCB_CLONE_THREAD]: Factor out detached children when
+	determining if we have any.  If TCB_CLONE_THREAD is set, check
+	parent's children instead of our own, and bump nclone_waiting count.
+	(internal_exit) [__NR_exit_group]: Set the TCB_GROUP_EXITING flag if
+	the syscall was exit_group.
+	* syscall.c (internal_syscall): Use internal_exit for exit_group.
+	* strace.c (pid2tcb): No longer static.
+	(alloctcb) [TCB_CLONE_THREAD]: Initialize new fields.
+	(droptcb) [TCB_CLONE_THREAD]: Maintain new fields.
+	If we have thread children, set TCB_EXITING and don't clear the TCB.
+	(resume) [TCB_CLONE_THREAD]: Decrement parent's nclone_waiting.
+	(detach) [TCB_CLONE_THREAD]: When calling resume, check all thread
+	children of our parent that might be waiting for us too.
+	[TCB_GROUP_EXITING] (handle_group_exit): New function.
+	(trace) [TCB_GROUP_EXITING]: Use that in place of detach or droptcb.
+
+	Revamp -f support for Linux.
+	* util.c [LINUX] (setbpt, clearbpt): New implementations that tweak
+	the system call to be clone with CLONE_PTRACE set.  Various new static
+	helper functions.
+	* process.c (internal_clone): Define also #ifdef SYS_clone2.
+	Initialize TCPCHILD->parent field.
+	[CLONE_PTRACE]: Don't do PTRACE_ATTACH here, because it's preattached.
+	Check in case the new child is in the tcb already.
+	(internal_fork) [LINUX]: Just call internal_clone.
+	* strace.c (trace) [LINUX]: Under -f/-F, grok an unknown pid
+	reporting to wait, put it in the TCB with TCB_ATTACHED|TCB_SUSPENDED.
+
+	* linux/x86_64/syscallent1.h (sys_oldlstat): #define as printargs.
+
+	* file.c [LINUX]: #undef st_[amc]time in case they are macros.
+
+	* Makefile.am (AM_CFLAGS): New variable, define to $(WARNFLAGS).
+
+	* Makefile.am (EXTRA_DIST): Remove debian/postinst and debian/prerm.
+
 2003-01-09  Wichert Akkerman  <wichert@deephackmode.org>
 
 	* debian/postinst, debian/prerm: removed, /usr/doc symlink is no

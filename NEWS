@@ -1,4 +1,4 @@
-Changes in CVS (not yet released)
+Changes in 4.4.90 TEST release
 ==============
 * New port to AMD's x86-64 architecture. One strace binary can
   handle both new x86-64 and old i386 processes.
@@ -6,7 +6,7 @@ Changes in CVS (not yet released)
 * New switch (-z) for printing only non-failing syscalls.
 * Merged s390/s390x port.
 * Trace an unbounded number of processes.
-* Handle numerous new system calls in Linux 2.5.
+* Handle numerous new system calls in Linux 2.5, and new threads semantics.
 * Fixed bugs with attach/detach leaving things stopped.
 * Fixed traced process seeing ECHILD despite live, traced children
   in waitpid calls with WNOHANG.
