@@ -1,5 +1,8 @@
 2005-03-22  Roland McGrath  <roland@redhat.com>
 
+	* desc.c (decode_select): Increase local buffer size.
+	Fixes RH#151570.
+
 	* configure.ac, NEWS: Version 4.5.11.
 	* debian/changelog, strace.spec: 4.5.11-1.
 
