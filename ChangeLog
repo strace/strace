@@ -1,3 +1,8 @@
+2003-11-11  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (main): Bail with usage error for missing command before we
+	open the -o file or fiddle uids.
+
 2003-11-06  Roland McGrath  <roland@redhat.com>
 
 	* strace.c (main): Treat piped output more like file output.
