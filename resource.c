@@ -455,6 +455,12 @@ struct tcb *tcp;
 
 #ifdef LINUX
 
+#define NEW_CMD(c)      ((0x80<<16)+(c))
+#define XQM_CMD(c)      (('X'<<8)+(c))
+#define NEW_COMMAND(c) (( ((c) >> SUBCMDSHIFT) & (0x80 << 16)))
+#define XQM_COMMAND(c) (( ((c) >> SUBCMDSHIFT) & ('X' << 8)) == ('X' << 8))
+#define OLD_COMMAND(c) (!NEW_COMMAND(c) && !XQM_COMMAND(c))
+
 static struct xlat quotacmds[] = {
 	{ Q_QUOTAON,	"Q_QUOTAON"	},
 	{ Q_QUOTAOFF,	"Q_QUOTAOFF"	},
@@ -465,6 +471,20 @@ static struct xlat quotacmds[] = {
 	{ Q_SETQLIM,	"Q_SETQLIM"	},
 	{ Q_GETSTATS,	"Q_GETSTATS"	},
 	{ Q_RSQUASH,	"Q_RSQUASH"	},
+	{ NEW_CMD(0x1), "Q_SYNC"        },
+	{ NEW_CMD(0x2), "Q_QUOTAON"     },
+	{ NEW_CMD(0x3), "Q_QUOTAOFF"    },
+	{ NEW_CMD(0x4), "Q_GETFMT"      },
+	{ NEW_CMD(0x5), "Q_GETINFO"     },
+	{ NEW_CMD(0x6), "Q_SETINFO"     },
+	{ NEW_CMD(0x7), "Q_GETQUOTA"    },
+	{ NEW_CMD(0x8), "Q_SETQUOTA"    },
+	{ XQM_CMD(0x1), "Q_XQUOTAON"    },
+	{ XQM_CMD(0x2), "Q_XQUOTAOFF"   },
+	{ XQM_CMD(0x3), "Q_XGETQUOTA"   },
+	{ XQM_CMD(0x4), "Q_XSETQLIM"    },
+	{ XQM_CMD(0x5), "Q_XGETQSTAT"   },
+	{ XQM_CMD(0x6), "Q_XQUOTARM"    },
 	{ 0,		NULL		},
 };
 
@@ -491,9 +511,9 @@ struct tcb *tcp;
 
 		if (!tcp->u_arg[3])
 			tprintf("NULL");
-		else if (!verbose(tcp))
+               else if (!verbose(tcp) || !OLD_COMMAND(tcp->u_arg[0]))
 			tprintf("%#lx", tcp->u_arg[3]);
-                else if (umoven(tcp, tcp->u_arg[3], sizeof(struct dqblk),   
+                else if (umoven(tcp, tcp->u_arg[3], sizeof(struct dqblk),
                     (char *) &dq) < 0)
                         tprintf("???");
 		else {
@@ -551,7 +571,7 @@ struct tcb *tcp;
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
 		printxval(quotacmds, tcp->u_arg[1], "Q_???");
-#endif		
+#endif
 		tprintf(", %lu, %#lx", tcp->u_arg[2], tcp->u_arg[3]);
 	}
 	return 0;
