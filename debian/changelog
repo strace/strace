@@ -1,3 +1,16 @@
+strace (4.4.92-1) unstable; urgency=low
+
+  * New upstream version.
+    + Updated config.guess and config.sub, closes: #176241.
+    + Several fixes for PPC, closes: #144326.
+    + Fixed ptrace output for unknown requests, closes: #77728.
+    + Fixed output of getdents64, truncate64, ftruncate64, closes: #169258.
+    + Old bugs the last release actually closes: #153750, #38467, #109993,
+      #109815, #104594, #113087, #134803, #166622, #96356, #94725, #32147,
+      #32798, #36801, #41066, #81637, #138300, #143791.
+
+ -- Roland McGrath <frob@debian.org>  Tue, 14 Jan 2003 02:02:44 -0800
+
 strace (4.4.91-1) unstable; urgency=low
 
   * New upstream version.

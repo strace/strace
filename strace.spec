@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.4.91
+Version: 4.4.92
 Release: 1
 License: BSD
 Group: Development/Debuggers
