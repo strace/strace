@@ -63,6 +63,7 @@ extern int sys_nerr;
 extern char *sys_errlist[];
 #endif /* SYS_ERRLIST_DECLARED */
 
+#define NR_SYSCALL_BASE 0
 #ifdef LINUX
 #ifndef ERESTARTSYS
 #define ERESTARTSYS	512
@@ -82,6 +83,8 @@ extern char *sys_errlist[];
 #ifdef ARM
 #undef NSIG
 #define NSIG 32
+#undef NR_SYSCALL_BASE
+#define NR_SYSCALL_BASE __NR_SYSCALL_BASE
 #endif
 #endif /* LINUX */
 
@@ -380,11 +383,7 @@ struct tcb *tcp;
 		return;
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= MAX_QUALS)
 		return;
-#ifdef __arm__
-	switch (tcp->scno + __NR_SYSCALL_BASE) {
-#else
-	switch (tcp->scno) {
-#endif
+	switch (tcp->scno + NR_SYSCALL_BASE) {
 	case SYS_read:
 #ifdef SYS_recv
 	case SYS_recv:
@@ -520,11 +519,7 @@ struct tcb *tcp;
 	 * correctly support following forks in the presence of tracing
 	 * qualifiers.
 	 */
-#ifdef __arm__
-	switch (tcp->scno + __NR_SYSCALL_BASE) {
-#else
-	switch (tcp->scno) {
-#endif
+	switch (tcp->scno + NR_SYSCALL_BASE) {
 #ifdef SYS_fork
 	case SYS_fork:
 #endif
@@ -1232,11 +1227,7 @@ struct tcb *tcp;
 #endif /* !HAVE_PR_SYSCALL */
 #endif /* !MIPS */
 #endif /* SVR4 */
-#ifdef __arm__
-	switch (tcp->scno + __NR_SYSCALL_BASE) {
-#else
-	switch (tcp->scno) {
-#endif
+	switch (tcp->scno + NR_SYSCALL_BASE) {
 #ifdef LINUX
 #if !defined (ALPHA) && !defined(SPARC) && !defined(MIPS)
 	case SYS_socketcall:
