@@ -217,91 +217,118 @@ static int sorted_count[MAX_QUALS];
 
 static struct timeval shortest = { 1000000, 0 };
 
-static int lookup_syscall(), lookup_signal(), lookup_fault(), lookup_desc();
+static int qual_syscall(), qual_signal(), qual_fault(), qual_desc();
 
 static struct qual_options {
 	int bitflag;
 	char *option_name;
-	int (*lookup)();
+	int (*qualify)();
 	char *argument_name;
 } qual_options[] = {
-	{ QUAL_TRACE,	"trace",	lookup_syscall,	"system call"	},
-	{ QUAL_TRACE,	"t",		lookup_syscall,	"system call"	},
-	{ QUAL_ABBREV,	"abbrev",	lookup_syscall,	"system call"	},
-	{ QUAL_ABBREV,	"a",		lookup_syscall,	"system call"	},
-	{ QUAL_VERBOSE,	"verbose",	lookup_syscall,	"system call"	},
-	{ QUAL_VERBOSE,	"v",		lookup_syscall,	"system call"	},
-	{ QUAL_RAW,	"raw",		lookup_syscall,	"system call"	},
-	{ QUAL_RAW,	"x",		lookup_syscall,	"system call"	},
-	{ QUAL_SIGNAL,	"signal",	lookup_signal,	"signal"	},
-	{ QUAL_SIGNAL,	"signals",	lookup_signal,	"signal"	},
-	{ QUAL_SIGNAL,	"s",		lookup_signal,	"signal"	},
-	{ QUAL_FAULT,	"fault",	lookup_fault,	"fault"		},
-	{ QUAL_FAULT,	"faults",	lookup_fault,	"fault"		},
-	{ QUAL_FAULT,	"m",		lookup_fault,	"fault"		},
-	{ QUAL_READ,	"read",		lookup_desc,	"descriptor"	},
-	{ QUAL_READ,	"reads",	lookup_desc,	"descriptor"	},
-	{ QUAL_READ,	"r",		lookup_desc,	"descriptor"	},
-	{ QUAL_WRITE,	"write",	lookup_desc,	"descriptor"	},
-	{ QUAL_WRITE,	"writes",	lookup_desc,	"descriptor"	},
-	{ QUAL_WRITE,	"w",		lookup_desc,	"descriptor"	},
+	{ QUAL_TRACE,	"trace",	qual_syscall,	"system call"	},
+	{ QUAL_TRACE,	"t",		qual_syscall,	"system call"	},
+	{ QUAL_ABBREV,	"abbrev",	qual_syscall,	"system call"	},
+	{ QUAL_ABBREV,	"a",		qual_syscall,	"system call"	},
+	{ QUAL_VERBOSE,	"verbose",	qual_syscall,	"system call"	},
+	{ QUAL_VERBOSE,	"v",		qual_syscall,	"system call"	},
+	{ QUAL_RAW,	"raw",		qual_syscall,	"system call"	},
+	{ QUAL_RAW,	"x",		qual_syscall,	"system call"	},
+	{ QUAL_SIGNAL,	"signal",	qual_signal,	"signal"	},
+	{ QUAL_SIGNAL,	"signals",	qual_signal,	"signal"	},
+	{ QUAL_SIGNAL,	"s",		qual_signal,	"signal"	},
+	{ QUAL_FAULT,	"fault",	qual_fault,	"fault"		},
+	{ QUAL_FAULT,	"faults",	qual_fault,	"fault"		},
+	{ QUAL_FAULT,	"m",		qual_fault,	"fault"		},
+	{ QUAL_READ,	"read",		qual_desc,	"descriptor"	},
+	{ QUAL_READ,	"reads",	qual_desc,	"descriptor"	},
+	{ QUAL_READ,	"r",		qual_desc,	"descriptor"	},
+	{ QUAL_WRITE,	"write",	qual_desc,	"descriptor"	},
+	{ QUAL_WRITE,	"writes",	qual_desc,	"descriptor"	},
+	{ QUAL_WRITE,	"w",		qual_desc,	"descriptor"	},
 	{ 0,		NULL,		NULL,		NULL		},
 };
 
-static int
-lookup_syscall(s)
-char *s;
+static void
+qualify_one(n, opt, not)
+	int n;
+	struct qual_options *opt;
+	int not;
 {
-	int i;
-
-	for (i = 0; i < nsyscalls; i++) {
-		if (strcmp(s, sysent[i].sys_name) == 0)
-			return i;
-	}
-	return -1;
+	if (not)
+		qual_flags[n] &= ~opt->bitflag;
+	else
+		qual_flags[n] |= opt->bitflag;
 }
 
 static int
-lookup_signal(s)
-char *s;
+qual_syscall(s, opt, not)
+	char *s;
+	struct qual_options *opt;
+	int not;
+{
+	int i;
+	int any = 0;
+
+	for (i = 0; i < nsyscalls; i++) {
+		if (strcmp(s, sysent[i].sys_name) == 0) {
+			qualify_one(i, opt, not);
+			any = 1;
+		}
+	}
+	return !any;
+}
+
+static int
+qual_signal(s, opt, not)
+	char *s;
+	struct qual_options *opt;
+	int not;
 {
 	int i;
 	char buf[32];
 
-	if (s && *s && isdigit((unsigned char)*s))
-		return atoi(s);
+	if (s && *s && isdigit((unsigned char)*s)) {
+		qualify_one(atoi(s), opt, not);
+		return 1;
+	}
 	strcpy(buf, s);
 	s = buf;
 	for (i = 0; s[i]; i++)
 		s[i] = toupper((unsigned char)(s[i]));
 	if (strncmp(s, "SIG", 3) == 0)
 		s += 3;
-	for (i = 0; i <= NSIG; i++) {
-		if (strcmp(s, signame(i) + 3) == 0)
-			return i;
+	for (i = 0; i <= NSIG; i++)
+		if (strcmp(s, signame(i) + 3) == 0) {
+			qualify_one(atoi(s), opt, not);
+			return 1;
+		}
+	return 0;
+}
+
+static int
+qual_fault(s, opt, not)
+	char *s;
+	struct qual_options *opt;
+	int not;
+{
+	return -1;
+}
+
+static int
+qual_desc(s, opt, not)
+	char *s;
+	struct qual_options *opt;
+	int not;
+{
+	if (s && *s && isdigit((unsigned char)*s)) {
+		qualify_one(atoi(s), opt, not);
 	}
 	return -1;
 }
 
 static int
-lookup_fault(s)
-char *s;
-{
-	return -1;
-}
-
-static int
-lookup_desc(s)
-char *s;
-{
-	if (s && *s && isdigit((unsigned char)*s))
-		return atoi(s);
-	return -1;
-}
-
-static int
 lookup_class(s)
-char *s;
+	char *s;
 {
 	if (strcmp(s, "file") == 0)
 		return TRACE_FILE;
@@ -370,15 +397,11 @@ char *s;
 			}
 			continue;
 		}
-		if ((n = (*opt->lookup)(p)) < 0) {
+		if (opt->qualify(p, opt, not)) {
 			fprintf(stderr, "strace: invalid %s `%s'\n",
 				opt->argument_name, p);
 			exit(1);
 		}
-		if (not)
-			qual_flags[n] &= ~opt->bitflag;
-		else
-			qual_flags[n] |= opt->bitflag;
 	}
 	return;
 }
