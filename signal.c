@@ -174,6 +174,14 @@ static struct xlat sigvec_flags[] = {
 
 #ifdef HAVE_SIGACTION
 
+#if defined LINUX && defined I386
+/* The libc headers do not define this constant since it should only be
+   used by the implementation.  So wwe define it here.  */
+# ifndef SA_RESTORER
+#  define SA_RESTORER 0x04000000
+# endif
+#endif
+
 static struct xlat sigact_flags[] = {
 #ifdef SA_RESTORER
 	{ SA_RESTORER,	"SA_RESTORER"	},
@@ -1084,6 +1092,10 @@ struct tcb *tcp;
 			tprintf(", ");
 			if (!printflags(sigact_flags, sa.sa_flags))
 				tprintf("0");
+#ifdef SA_RESTORER
+			if (sa.sa_flags & SA_RESTORER)
+				tprintf(", %p", sa.sa_restorer);
+#endif
 			tprintf("}");
 		}
 	}
@@ -1771,6 +1783,10 @@ sys_rt_sigaction(tcp)
 				tprintf(", ");
 				if (!printflags(sigact_flags, sa.sa_flags))
 					tprintf("0");
+#ifdef SA_RESTORER
+				if (sa.sa_flags & SA_RESTORER)
+					tprintf(", %p", sa.sa_restorer);
+#endif
 				tprintf("}");
 		}
 	}
