@@ -1,3 +1,7 @@
+2001-03-29  Wichert Akkerman <wakkerma@debian.org>
+
+  * linux/alpha/ioctlent.h: updated using new Linux ioctl setup
+
 2001-03-28  Wichert Akkerman <wakkerma@debian.org>
 
   * configure.in: use sparc* so we can compile on sparc64 as well
