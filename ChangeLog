@@ -1,3 +1,17 @@
+2005-02-05  Roland McGrath  <roland@redhat.com>
+
+	* debian/control (Build-Depends): Fix for s390 and sparc.
+	From Bastian Blank <waldi@debian.org>.
+	Fixes Debian bug #293564.
+
+2004-12-19  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* strace.c (main) [!USE_PROCFS]: In child process, raise SIGSTOP
+	right before execv() call.  Remove fake_execve() call.
+	* defs.h (fake_execve): Remove unused declaration.
+	* process.c (fake_execve): Remove unused function.
+	Fixes RH#143365.
+
 2005-02-04  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.9.
