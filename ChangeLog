@@ -1,5 +1,8 @@
 2004-03-02  Roland McGrath  <roland@redhat.com>
 
+	* util.c (setbpt): Fix one missed spot to use new arg0_index macro.
+	From Michael Holzheu <HOLZHEU@de.ibm.com>.
+
 	* debian/control (Standards-Version): Update to 3.6.1.
 
 2004-03-01  Roland McGrath  <roland@redhat.com>
