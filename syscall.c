@@ -777,6 +777,12 @@ struct tcb *tcp;
 				      PT_GPR8,  PT_GPR9,  PT_GPR10,    PT_GPR11,
 				      PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15};
 
+		/* Bail out since if we stopped for a signal after the last
+		   system call return, we might not be looking at the kind
+		   of instruction stream we expect.  */
+		if (!(tcp->flags & TCB_INSYSCALL))
+			return 1;
+
 		if (upeek(pid, PT_PSWADDR, &pc) < 0)
 			return -1;
 		errno = 0;
