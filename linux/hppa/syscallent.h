@@ -125,7 +125,7 @@
 	{ 2,	TN,	sys_shutdown,		"shutdown"		}, /* 117 */
 	{ 1,	0,	sys_fsync,		"fsync"			}, /* 118 */
 	{ 5,	0,	printargs,		"madvise"		}, /* 119 */
-	{ 2,	TP,	sys_clone,		"clone"			}, /* 120 */
+	{ 5,	TP,	sys_clone,		"clone"			}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"		}, /* 121 */
 	{ 4,	TF,	sys_sendfile,		"sendfile"		}, /* 122 */
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"		}, /* 123 */

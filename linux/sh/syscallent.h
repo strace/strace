@@ -150,7 +150,7 @@
 	{ 5,	0,	sys_ipc,		"ipc"		}, /* 117 */
 	{ 1,	0,	sys_fsync,		"fsync"		}, /* 118 */
 	{ 1,	TS,	sys_sigreturn,		"sigreturn"	}, /* 119 */
-	{ 2,	TP,	sys_clone,		"clone"		}, /* 120 */
+	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
 	{ 3,	0,	sys_modify_ldt,		"modify_ldt"	}, /* 123 */

@@ -219,7 +219,7 @@
 	{ 1,	0,	sys_sysinfo,	"sysinfo" },		/* 214 */
 	{ 5,	0,	sys_ipc,	"ipc" },		/* 215 */
 	{ 1,	TS,	sys_sigreturn,	"sigreturn" },		/* 216 */
-	{ 2,	TP,	sys_clone,	"clone" },		/* 217 */
+	{ 5,	TP,	sys_clone,	"clone" },		/* 217 */
 	{ 3,	0,	sys_modify_ldt,	"modify_ldt" },		/* 218 */
 	{ 1,	0,	sys_adjtimex,	"adjtimex" },		/* 219 */
 	{ 3,	TS,	sys_sigprocmask,"sigprocmask" },	/* 220 */
