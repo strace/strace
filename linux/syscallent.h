@@ -330,7 +330,7 @@
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 281 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 282 */
 	{ 5,	0,	printargs,		"SYS_283"	}, /* 283 */
-	{ 4,	0,	sys_waitid,		"waitid"	}, /* 284 */
+	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 284 */
 	{ 5,	0,	printargs,		"SYS_285"	}, /* 285 */
 	{ 5,	0,	printargs,		"SYS_286"	}, /* 286 */
 	{ 5,	0,	printargs,		"SYS_287"	}, /* 287 */

@@ -2066,6 +2066,16 @@ struct tcb *tcp;
 		tprintf(", ");
 		if (!printflags(wait4_options, tcp->u_arg[3]))
 			tprintf("0");
+		if (tcp->u_nargs > 4) {
+			/* usage */
+			tprintf(", ");
+			if (!tcp->u_arg[4])
+				tprintf("NULL");
+			else if (tcp->u_error)
+				tprintf("%#lx", tcp->u_arg[4]);
+			else
+				printrusage(tcp, tcp->u_arg[4]);
+		}
 	}
 	return 0;
 }
