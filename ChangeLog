@@ -1,3 +1,7 @@
+Thu Jun 24 15:54:18 CEST 1999
+
+  * Fix test for sys/reg include
+
 Tue Jun 22 17:26:33 CEST 1999
 
   * Fixed some Linux/powerpc sillyness, thanks to Daniel Jacobowitz

@@ -37,13 +37,14 @@
 #include <sys/user.h>
 #include <sys/syscall.h>
 #include <sys/param.h>
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 && (defined(I386) || defined(M68K))
-# include <sys/reg.h>
-#endif
 
-#if defined LINUX && __GLIBC__ < 2
-#include <linux/ptrace.h>
-#endif /* LINUX */
+#if __GLIBC__ == 2 && ((defined(I386) && __GLIBC_MINOR__ >= 0) || (defined(M68K) && __GLIBC_MINOR__ >= 1))
+# include <sys/reg.h>
+#else
+# if defined LINUX
+#  include <linux/ptrace.h>
+# endif /* LINUX */
+#endif
 
 #ifndef SYS_ERRLIST_DECLARED
 extern int sys_nerr;
