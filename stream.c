@@ -33,7 +33,9 @@
 #if defined(HAVE_SYS_STREAM_H) || defined(linux)
 
 #if defined(linux)
+#ifdef HAVE_SYS_POLL_H
 #include <sys/poll.h>
+#endif
 
 #define RS_HIPRI 1
 struct strbuf {
@@ -253,6 +255,7 @@ struct tcb *tcp;
 
 
 static struct xlat pollflags[] = {
+#ifdef POLLIN
 	{ POLLIN,	"POLLIN"	},
 	{ POLLPRI,	"POLLPRI"	},
 	{ POLLOUT,	"POLLOUT"	},
@@ -271,6 +274,7 @@ static struct xlat pollflags[] = {
 	{ POLLERR,	"POLLERR"	},
 	{ POLLHUP,	"POLLHUP"	},
 	{ POLLNVAL,	"POLLNVAL"	},
+#endif
 	{ 0,		NULL		},
 };
 
@@ -280,6 +284,7 @@ struct tcb *tcp;
 {
 	struct pollfd *pollp;
 
+#ifdef HAVE_SYS_POLL_H
 	if (exiting(tcp)) {
 		int i;
 		int nfds = tcp->u_arg[1];
@@ -331,6 +336,7 @@ struct tcb *tcp;
 			tprintf("%ld", tcp->u_arg[2]);
 		free(pollp);
 	}
+#endif
 	return 0;
 }
 
