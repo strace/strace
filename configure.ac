@@ -67,7 +67,7 @@ alpha*)
 	arch=alpha
 	AC_DEFINE([ALPHA], 1, [Define for the Alpha architecture.])
 	;;
-ppc|powerpc)
+powerpc*)
 	arch=powerpc
 	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
 	;;

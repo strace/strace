@@ -609,7 +609,8 @@ int new;
 		return -1;
 	return 0;
 #elif defined(POWERPC)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R0), new) < 0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid,
+		   (char*)(sizeof(unsigned long)*PT_R0), new) < 0)
 		return -1;
        return 0;
 #elif defined(S390) || defined(S390X)
@@ -693,7 +694,7 @@ setarg(tcp, argnum)
 #endif
 	{
 		ptrace(PTRACE_POKEUSER, tcp->pid,
-		       (char*)((argnum==0 ? PT_ORIG_R3 : argnum+PT_R3)*4),
+		       (char*)((argnum==0 ? PT_ORIG_R3 : argnum+PT_R3)*sizeof(unsigned long)),
 		       tcp->u_arg[argnum]);
 		if (errno)
 			return -1;
@@ -2126,46 +2127,48 @@ struct xlat struct_user_offsets[] = {
 #ifndef PT_ORIG_R3
 #define PT_ORIG_R3 34
 #endif
-	{ 4*PT_R0,		"4*PT_R0"				},
-	{ 4*PT_R1,		"4*PT_R1"				},
-	{ 4*PT_R2,		"4*PT_R2"				},
-	{ 4*PT_R3,		"4*PT_R3"				},
-	{ 4*PT_R4,		"4*PT_R4"				},
-	{ 4*PT_R5,		"4*PT_R5"				},
-	{ 4*PT_R6,		"4*PT_R6"				},
-	{ 4*PT_R7,		"4*PT_R7"				},
-	{ 4*PT_R8,		"4*PT_R8"				},
-	{ 4*PT_R9,		"4*PT_R9"				},
-	{ 4*PT_R10,		"4*PT_R10"				},
-	{ 4*PT_R11,		"4*PT_R11"				},
-	{ 4*PT_R12,		"4*PT_R12"				},
-	{ 4*PT_R13,		"4*PT_R13"				},
-	{ 4*PT_R14,		"4*PT_R14"				},
-	{ 4*PT_R15,		"4*PT_R15"				},
-	{ 4*PT_R16,		"4*PT_R16"				},
-	{ 4*PT_R17,		"4*PT_R17"				},
-	{ 4*PT_R18,		"4*PT_R18"				},
-	{ 4*PT_R19,		"4*PT_R19"				},
-	{ 4*PT_R20,		"4*PT_R20"				},
-	{ 4*PT_R21,		"4*PT_R21"				},
-	{ 4*PT_R22,		"4*PT_R22"				},
-	{ 4*PT_R23,		"4*PT_R23"				},
-	{ 4*PT_R24,		"4*PT_R24"				},
-	{ 4*PT_R25,		"4*PT_R25"				},
-	{ 4*PT_R26,		"4*PT_R26"				},
-	{ 4*PT_R27,		"4*PT_R27"				},
-	{ 4*PT_R28,		"4*PT_R28"				},
-	{ 4*PT_R29,		"4*PT_R29"				},
-	{ 4*PT_R30,		"4*PT_R30"				},
-	{ 4*PT_R31,		"4*PT_R31"				},
-	{ 4*PT_NIP,		"4*PT_NIP"				},
-	{ 4*PT_MSR,		"4*PT_MSR"				},
-	{ 4*PT_ORIG_R3,		"4*PT_ORIG_R3"				},
-	{ 4*PT_CTR,		"4*PT_CTR"				},
-	{ 4*PT_LNK,		"4*PT_LNK"				},
-	{ 4*PT_XER,		"4*PT_XER"				},
-	{ 4*PT_CCR,		"4*PT_CCR"				},
-	{ 4*PT_FPR0,		"4*PT_FPR0"				},
+#define REGSIZE (sizeof(unsigned long))
+	{ REGSIZE*PT_R0,		"r0"				},
+	{ REGSIZE*PT_R1,		"r1"				},
+	{ REGSIZE*PT_R2,		"r2"				},
+	{ REGSIZE*PT_R3,		"r3"				},
+	{ REGSIZE*PT_R4,		"r4"				},
+	{ REGSIZE*PT_R5,		"r5"				},
+	{ REGSIZE*PT_R6,		"r6"				},
+	{ REGSIZE*PT_R7,		"r7"				},
+	{ REGSIZE*PT_R8,		"r8"				},
+	{ REGSIZE*PT_R9,		"r9"				},
+	{ REGSIZE*PT_R10,		"r10"				},
+	{ REGSIZE*PT_R11,		"r11"				},
+	{ REGSIZE*PT_R12,		"r12"				},
+	{ REGSIZE*PT_R13,		"r13"				},
+	{ REGSIZE*PT_R14,		"r14"				},
+	{ REGSIZE*PT_R15,		"r15"				},
+	{ REGSIZE*PT_R16,		"r16"				},
+	{ REGSIZE*PT_R17,		"r17"				},
+	{ REGSIZE*PT_R18,		"r18"				},
+	{ REGSIZE*PT_R19,		"r19"				},
+	{ REGSIZE*PT_R20,		"r20"				},
+	{ REGSIZE*PT_R21,		"r21"				},
+	{ REGSIZE*PT_R22,		"r22"				},
+	{ REGSIZE*PT_R23,		"r23"				},
+	{ REGSIZE*PT_R24,		"r24"				},
+	{ REGSIZE*PT_R25,		"r25"				},
+	{ REGSIZE*PT_R26,		"r26"				},
+	{ REGSIZE*PT_R27,		"r27"				},
+	{ REGSIZE*PT_R28,		"r28"				},
+	{ REGSIZE*PT_R29,		"r29"				},
+	{ REGSIZE*PT_R30,		"r30"				},
+	{ REGSIZE*PT_R31,		"r31"				},
+	{ REGSIZE*PT_NIP,		"NIP"				},
+	{ REGSIZE*PT_MSR,		"MSR"				},
+	{ REGSIZE*PT_ORIG_R3,		"ORIG_R3"			},
+	{ REGSIZE*PT_CTR,		"CTR"				},
+	{ REGSIZE*PT_LNK,		"LNK"				},
+	{ REGSIZE*PT_XER,		"XER"				},
+	{ REGSIZE*PT_CCR,		"CCR"				},
+	{ REGSIZE*PT_FPR0,		"FPR0"				},
+#undef REGSIZE
 #else
 #ifdef ALPHA
 	{ 0,			"r0"					},
@@ -2569,7 +2572,7 @@ struct tcb *tcp;
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
-			printnum(tcp, tcp->u_arg[3], "%#x");
+			printnum(tcp, tcp->u_arg[3], "%#lx");
 			break;
 		}
 	}

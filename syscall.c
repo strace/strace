@@ -806,7 +806,7 @@ struct tcb *tcp;
 		}
 	}
 #elif defined (POWERPC)
-	if (upeek(pid, 4*PT_R0, &scno) < 0)
+	if (upeek(pid, sizeof(unsigned long)*PT_R0, &scno) < 0)
 		return -1;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Check if we return from execve. */
@@ -1204,9 +1204,9 @@ struct tcb *tcp;
 	}
 #elif defined (POWERPC)
 # define SO_MASK 0x10000000
-	if (upeek(pid, 4*PT_CCR, &flags) < 0)
+	if (upeek(pid, sizeof(unsigned long)*PT_CCR, &flags) < 0)
 		return -1;
-	if (upeek(pid, 4*PT_R3, &result) < 0)
+	if (upeek(pid, sizeof(unsigned long)*PT_R3, &result) < 0)
 		return -1;
 	if (flags & SO_MASK)
 		result = -result;
@@ -1528,7 +1528,7 @@ force_result(tcp, error, rval)
 	    	return -1;
 #else
 #ifdef POWERPC
-	if (upeek(tcp->pid, 4*PT_CCR, &flags) < 0)
+	if (upeek(tcp->pid, sizeof(unsigned long)*PT_CCR, &flags) < 0)
 		return -1;
 	if (error) {
 		flags |= SO_MASK;
@@ -1538,8 +1538,8 @@ force_result(tcp, error, rval)
 		flags &= ~SO_MASK;
 		result = rval;
 	}
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_CCR), flags) < 0 ||
-	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R3), result) < 0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(sizeof(unsigned long)*PT_CCR), flags) < 0 ||
+	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(sizeof(unsigned long)*PT_R3), result) < 0)
 		return -1;
 #else /* !POWERPC */
 #ifdef M68K
@@ -1762,7 +1762,10 @@ struct tcb *tcp;
 		else
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid, (i==0) ? (4*PT_ORIG_R3) : ((i+PT_R3)*4), &tcp->u_arg[i]) < 0)
+			if (upeek(pid, (i==0) ?
+				(sizeof(unsigned long)*PT_ORIG_R3) :
+				((i+PT_R3)*sizeof(unsigned long)),
+					&tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}

@@ -292,7 +292,7 @@ struct tcb *tcp;
 long addr;
 char *fmt;
 {
-	int num;
+	long num;
 
 	if (!addr) {
 		tprintf("NULL");
@@ -942,7 +942,7 @@ struct tcb *tcp;
 	if (upeek(tcp->pid, 4*15, &pc) < 0)
 		return -1;
 #elif defined(POWERPC)
-	if (upeek(tcp->pid, 4*PT_NIP, &pc) < 0)
+	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &pc) < 0)
 		return -1;
 #elif defined(M68k)
 	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0)
@@ -1030,7 +1030,7 @@ struct tcb *tcp;
 #elif defined(POWERPC)
 	long pc;
 
-	if (upeek(tcp->pid, 4*PT_NIP, &pc) < 0) {
+	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
 		tprintf ("[????????] ");
 		return;
 	}
@@ -1203,8 +1203,8 @@ typedef struct regs arg_setup_state;
 #  define arg0_offset	REG_A0
 #  define arg1_offset	(REG_A0+1)
 # elif defined (POWERPC)
-#  define arg0_offset	(4*PT_R3)
-#  define arg1_offset	(4*PT_R4)
+#  define arg0_offset	(sizeof(unsigned long)*PT_R3)
+#  define arg1_offset	(sizeof(unsigned long)*PT_R4)
 #  define restore_arg0(tcp, state, val) 0
 # elif defined (HPPA)
 #  define arg0_offset	 PT_GR26
@@ -1483,7 +1483,7 @@ struct tcb *tcp;
 #elif defined (MIPS)
 	return -1;		/* FIXME: I do not know what i do - Flo */
 #elif defined (POWERPC)
-	if (upeek(tcp->pid, 4*PT_NIP, &tcp->baddr) < 0)
+	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &tcp->baddr) < 0)
 		return -1;
 #elif defined(S390) || defined(S390X)
 	if (upeek(tcp->pid,PT_PSWADDR, &tcp->baddr) < 0)
@@ -1707,7 +1707,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined(POWERPC)
-	if (upeek(tcp->pid, 4*PT_NIP, &pc) < 0)
+	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
 		/* The breakpoint has not been reached yet.  */

@@ -1253,7 +1253,7 @@ struct tcb *tcp;
 
        if (entering(tcp)) {
 		   tcp->u_arg[0] = 0;
-		   if (upeek(tcp->pid, 4*PT_R1, &esp) < 0)
+		   if (upeek(tcp->pid, sizeof(unsigned long)*PT_R1, &esp) < 0)
 			   return 0;
 		   if (umove(tcp, esp, &sc) < 0)
 			   return 0;
