@@ -5,6 +5,10 @@ package		= strace
 
 DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_HOST_GNU_TYPE := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+VERSION := $(shell dpkg-parsechangelog | awk '/^Version: / { print $$2 }')
+UDEB := strace-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
 
 ifeq ($(DEB_HOST_GNU_TYPE),sparc-linux)
   build64 = yes
@@ -43,7 +47,7 @@ build64/Makefile:
 	cd $(@D); CC="$(CC64)" sh ../configure --prefix=/usr --build=$(DEB_BUILD_GNU_TYPE) --host=$(HOST64)
 
 clean:
-	rm -rf debian/tmp debian/substvars debian/files
+	rm -rf debian/tmp debian/substvars debian/files debian/files~
 	rm -rf build64 stamp-build64
 	rm -rf build stamp-build
 
@@ -60,8 +64,17 @@ binary-arch: $(extra_build_targets) build checkroot
 	chown 755 debian/tmp
 	install -d -m 755 -o root -g root debian/tmp/DEBIAN
 
+# Install strace
+	install -d -o root -g root -m 755 debian/tmp/usr/bin
+	install -s -o root -g root -m 755 build/strace debian/tmp/usr/bin/strace
+
+	dpkg-gencontrol -is -pstrace-udeb -fdebian/files~
+	dpkg-deb --build debian/tmp ../$(UDEB)
+	dpkg-distaddfile $(UDEB) debian-installer extra
+	
 # Install documentation
 	install -d -o root -g root -m 755 debian/tmp/usr/share/doc/$(package)
+	install -d -o root -g root -m 755 debian/tmp/usr/share/man/man1
 	install -p -o root -g root -m 644 debian/changelog \
 			debian/tmp/usr/share/doc/$(package)/changelog.Debian
 	install -p -o root -g root -m 644 TODO \
@@ -71,10 +84,6 @@ binary-arch: $(extra_build_targets) build checkroot
 	gzip -9 debian/tmp/usr/share/doc/$(package)/*
 	install -p -o root -g root -m 644 debian/copyright \
 			debian/tmp/usr/share/doc/$(package)/copyright
-
-# Install strace
-	install -d -o root -g root -m 755 debian/tmp/usr/bin debian/tmp/usr/share/man/man1
-	install -s -o root -g root -m 755 build/strace debian/tmp/usr/bin/strace
 	install -p -o root -g root -m 644 strace.1 debian/tmp/usr/share/man/man1/strace.1
 	gzip -9 debian/tmp/usr/share/man/man1/strace.1
 
@@ -85,8 +94,8 @@ endif
 
 	dpkg-shlibdeps build/strace $(patsubst yes,build64/strace,$(build64))
 
-	dpkg-gencontrol -isp
-	dpkg --build debian/tmp ..
+	dpkg-gencontrol -is -pstrace
+	dpkg-deb --build debian/tmp ..
 
 checkroot:
 	test root = "`whoami`"

@@ -18,3 +18,21 @@ Description: A system call tracer
  System calls and signals are events that happen at the user/kernel
  interface. A close examination of this boundary is very useful for bug
  isolation, sanity checking and attempting to capture race conditions.
+
+Package: strace-udeb
+Section: debian-installer
+Priority: extra
+Architecture: alpha amd64 arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh sparc
+Depends: ${shlibs:Depends}
+Description: A system call tracer
+ strace is a system call tracer, i.e. a debugging tool which prints out
+ a trace of all the system calls made by a another process/program.
+ The program to be traced need not be recompiled for this, so you can
+ use it on binaries for which you don't have source.
+ .
+ System calls and signals are events that happen at the user/kernel
+ interface. A close examination of this boundary is very useful for bug
+ isolation, sanity checking and attempting to capture race conditions.
+ .
+ This is a stripped down package intended for debugging use in the Debian
+ installer.
