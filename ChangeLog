@@ -2,6 +2,8 @@ Fri May 28 21:09:00 PST Ulrich Drepper <drepper@cygnus.com>
 
   * configure.in: Fix typo (CFLAG -> CFLAGS).
 
+  * syscall.c: Don't include linux/ptrace.h explicitly for glibc.
+
 Thu May 27 13:59:27 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Add some sysctl support, patch from Ulrich Drepper

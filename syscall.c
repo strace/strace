@@ -41,7 +41,7 @@
 # include <sys/reg.h>
 #endif
 
-#ifdef LINUX
+#if defined LINUX && __GLIBC__ < 2
 #include <linux/ptrace.h>
 #endif /* LINUX */
 
