@@ -1,5 +1,8 @@
 2002-12-15  Roland McGrath  <roland@redhat.com>
 
+	* aclocal.m4 (AC_STAT64): Include <linux/types.h> before <asm/stat.h>
+	in test.  Test our own #ifdef LINUX rather than predefined `linux'.
+
 	* linux/powerpc/syscallent.h: Use sys_llseek for _llseek.
 	* linux/sparc/syscallent.h: Likewise.
 	* linux/hppa/syscallent.h: Likewise.
