@@ -1,7 +1,7 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5.7
-Release: 2
+Version: 4.5.8
+Release: 1
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
@@ -75,6 +75,15 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Oct 19 2004 Roland McGrath <roland@redhat.com> - 4.5.8-1
+- fix multithreaded exit handling (#132150, #135254)
+- fix ioctl name matching (#129808)
+- print RTC_* ioctl structure contents (#58606)
+- grok epoll_* syscalls (#134463)
+- grok new RLIMIT_* values (#133594)
+- print struct cmsghdr contents for sendmsg (#131689)
+- fix clock_* and timer_* argument output (#131420)
+
 * Tue Aug 31 2004 Roland McGrath <roland@redhat.com> - 4.5.7-2
 - new upstream version, misc fixes and updates (#128091, #129166, #128391, #129378, #130965, #131177)
 

@@ -1,3 +1,19 @@
+strace (4.5.8-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fix strace64 man page symlink, closes: #269220.
+    + Update syscall tables for Alpha, ARM, HPPA, closes: #273887.
+    + Build strace64 for s390, closes: #271500.
+    + Fix some endian issues in 64-bit argument output on 32-bit machines.
+    + Support new Linux syscalls mbind, set_mempolicy, get_mempolicy, waitid.
+    + Support Linux syscalls fadvise64, fadvise64_64, and epoll_*.
+    + Improve ioctl command name matching.
+    + Print RTC_* ioctl structure contents.
+    + Support newer RLIMIT_* values.
+    + Print struct cmsghdr details in sendmsg.
+
+ -- Roland McGrath <frob@debian.org>  Tue, 19 Oct 2004 18:05:28 -0700
+
 strace (4.5.7-1) unstable; urgency=low
 
   * New upstream version.

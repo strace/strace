@@ -1,3 +1,14 @@
+Changes in 4.5.8
+==============
+* Bug fixes.
+* Update syscall tables for Alpha, ARM, HPPA.
+* Support new Linux syscalls mbind, set_mempolicy, get_mempolicy, waitid.
+* Support Linux syscalls fadvise64, fadvise64_64, and epoll_*.
+* Improve ioctl command name matching.
+* Print RTC_* ioctl structure contents.
+* Support newer RLIMIT_* values.
+* Print struct cmsghdr details in sendmsg.
+
 Changes in 4.5.7
 ==============
 * Bug fixes.
