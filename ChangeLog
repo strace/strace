@@ -1,5 +1,11 @@
 2005-02-02  Roland McGrath  <roland@redhat.com>
 
+	* linux/sparc/syscall.h: Declare sys_epoll_create, sys_epoll_ctl,
+	sys_epoll_wait.
+	* linux/sparc64/syscall.h: Just #include "../sparc/syscall.h" here.
+	* ioctl.c (nioctlents2): Add const to type.
+	Fixes Debian bug #278449.
+
 	* sock.c (iffflags): New variable, table of IFF_* values.
 	(print_addr): New function.
 	(sock_ioctl): Handle SIOCGIFADDR, SIOCGIFDSTADDR, SIOCGIFBRDADDR,
