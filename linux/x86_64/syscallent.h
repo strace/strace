@@ -147,7 +147,7 @@
 	{ 1,	0,	sys_sched_get_priority_max,	"sched_get_priority_max"	},  /* 146 */
 	{ 1,	0,	sys_sched_get_priority_min,	"sched_get_priority_min"	},  /* 147 */
 	{ 2,	0,	sys_sched_rr_get_interval,	"sched_rr_get_interval"	},  /* 148 */
-	{ 1,	0,	sys_mlock,		"mlock"		},  /* 149 */
+	{ 2,	0,	sys_mlock,		"mlock"		},  /* 149 */
 	{ 2,	0,	sys_munlock,		"munlock"	},  /* 150 */
 	{ 2,	0,	sys_mlockall,		"mlockall"	},  /* 151 */
 	{ 0,	0,	sys_munlockall,		"munlockall"	},  /* 152 */
