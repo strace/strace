@@ -264,7 +264,7 @@
 	{ 1,	0,	sys_setfsuid,		"setfsuid32"	}, /* 215 */
 	{ 1,	0,	sys_setfsgid,		"setfsgid32"	}, /* 216 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 218 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 218 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
 	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"	}, /* 221 */
