@@ -1,5 +1,10 @@
 2005-02-02  Roland McGrath  <roland@redhat.com>
 
+	* debian/control: Add strace-udeb package for installer debugging.
+	* debian/rules (binary-arch): Build it.
+	From Joshua Kwan <joshk@triplehelix.org>.
+	Fixes Debian bug #268294.
+
 	* file.c (openmodes) [O_LARGEFILE] [O_LARGEFILE == 0]: Redefine to
 	known values for Linux.
 
