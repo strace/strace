@@ -639,7 +639,6 @@
 	{ -1,	TN,	sys_sockconfig,		"sockconfig"	}, /* 247 */
 	{ -1,	0,	sys_ntp_gettime,	"ntp_gettime"	}, /* 248 */
 	{ -1,	0,	sys_ntp_adjtime,	"ntp_adjtime"	}, /* 249 */
-	{ -1,	0,	sys_ntp_adjtime,	"ntp_adjtime"	}, /* 249 */
 	{ -1,	0,	printargs,		"lwp_mutex_unlock"	}, /* 250 */
 	{ -1,	0,	printargs,		"lwp_mutex_trylock"	}, /* 251 */
 	{ -1,	0,	printargs,		"lwp_mutex_init"	}, /* 252 */
