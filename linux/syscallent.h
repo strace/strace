@@ -296,7 +296,7 @@
 	{ 5,	0,	printargs,		"io_getevents"	}, /* 247 */
 	{ 3,	0,	printargs,		"io_submit"	}, /* 248 */
 	{ 3,	0,	printargs,		"io_cancel"	}, /* 249 */
-	{ 5,	0,	printargs,		"SYS_250"	}, /* 250 */
+	{ 5,	TF,	sys_fadvise64,		"fadvise64"	}, /* 250 */
 	{ 5,	0,	printargs,		"SYS_251"	}, /* 251 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 252 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 253 */
@@ -315,10 +315,10 @@
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 266 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 267 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 268 */
-	{ 3,	0,	sys_fstatfs64,		"fstatfs64"	}, /* 269 */
+	{ 3,	TF,	sys_fstatfs64,		"fstatfs64"	}, /* 269 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 270 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 271 */
-	{ 5,	0,	printargs,		"SYS_272"	}, /* 272 */
+	{ 6,	TF,	sys_fadvise64_64,	"fadvise64_64"	}, /* 272 */
 	{ 5,	0,	printargs,		"SYS_273"	}, /* 273 */
 	{ 5,	0,	printargs,		"SYS_274"	}, /* 274 */
 	{ 5,	0,	printargs,		"SYS_275"	}, /* 275 */

@@ -2472,3 +2472,56 @@ struct tcb *tcp;
     }
     return 0;
 }
+
+
+static const struct xlat advise[] = {
+  { POSIX_FADV_NORMAL,		"POSIX_FADV_NORMAL"	},
+  { POSIX_FADV_RANDOM,		"POSIX_FADV_RANDOM"	},
+  { POSIX_FADV_SEQUENTIAL,	"POSIX_FADV_SEQUENTIAL"	},
+  { POSIX_FADV_WILLNEED,	"POSIX_FADV_WILLNEED"	},
+  { POSIX_FADV_DONTNEED,	"POSIX_FADV_DONTNEED"	},
+  { POSIX_FADV_NOREUSE,		"POSIX_FADV_NOREUSE"	},
+  { 0,				NULL			}
+};
+
+
+#if defined LINUX && (defined I386 || defined X86_64)
+int
+sys_fadvise64(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, %lld, %ld, ",
+		tcp->u_arg[0],
+# if defined IA64 || defined X86_64 || defined ALPHA
+		(long long int) tcp->u_arg[1], tcp->u_arg[2]);
+	printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
+#else
+		((long long int) tcp->u_arg[2] << 32) | tcp->u_arg[1],
+		tcp->u_arg[3]);
+	printxval (advise, tcp->u_arg[4], "POSIX_FADV_???");
+#endif
+    }
+    return 0;
+}
+#endif
+
+
+int
+sys_fadvise64_64(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, %lld, %lld, ",
+		tcp->u_arg[0],
+# if defined IA64 || defined X86_64 || defined ALPHA
+		(long long int) tcp->u_arg[1], (long long int) tcp->u_arg[2]);
+	printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
+#else
+		((long long int) tcp->u_arg[2] << 32) | tcp->u_arg[1],
+		((long long int) tcp->u_arg[4] << 32) | tcp->u_arg[3]);
+	printxval(advise, tcp->u_arg[5], "POSIX_FADV_???");
+#endif
+    }
+    return 0;
+}
