@@ -824,7 +824,7 @@ int addrlen;
 		break;
 
 #endif /* AF_APACKET */
-#ifdef AF_NETLINLK
+#ifdef AF_NETLINK
 	case AF_NETLINK:
 		tprintf("pid=%d, groups=%08x", addrbuf.nl.nl_pid, addrbuf.nl.nl_groups);
 		break;
