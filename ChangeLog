@@ -1,4 +1,8 @@
-2001-03-29  Wichert Akkerman <wakkerma@debian.org>
+2001-03-31  Wichert Akkerman <wakkerma@debian.org>
+
+  * linux/mips/ioctlent.h: updated using new Linux ioctl setup
+
+2001-03-31  Wichert Akkerman <wakkerma@debian.org>
 
   * linux/ia64/ioctlent.h: regenerated
 
