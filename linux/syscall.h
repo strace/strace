@@ -194,6 +194,7 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #  undef SYS_semop
 #  undef SYS_semget
 #  undef SYS_semctl
+#  undef SYS_semtimedop
 #  undef SYS_msgsnd
 #  undef SYS_msgrcv
 #  undef SYS_msgget
