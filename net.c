@@ -615,9 +615,9 @@ int addrlen;
 		if (addrlen==2) {
 			tprintf("<nil>");
 		} else if (addrbuf.sau.sun_path[0]) {
-			tprintf("path=\"%*.*s\"", addrlen-2, addrlen-2, addrbuf.sau.sun_path);
+			tprintf("path=\"%-.*s\"", addrlen-2, addrbuf.sau.sun_path);
 		} else {
-			tprintf("path=@%*.*s", addrlen-3, addrlen-3, addrbuf.sau.sun_path+1);
+			tprintf("path=@%-.*s", addrlen-3, addrbuf.sau.sun_path+1);
 		}
 		break;
 	case AF_INET:

@@ -1,3 +1,7 @@
+2001-02-21  Wichert Akkerman <wakkerma@debian.org>
+
+  * net.c: fix format for printing Unix domain sockets
+
 2001-02-19  Wichert Akkerman <wakkerma@debian.org>
 
   * linux/mips/syscallent.h: use new sys_sysmips
