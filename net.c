@@ -1097,7 +1097,7 @@ unsigned long len;
 
 	if (u.cmsg.cmsg_level == SOL_SOCKET) {
 		printxval(scmvals, u.cmsg.cmsg_type, "SCM_???");
-			
+
 		if (u.cmsg.cmsg_type == SCM_RIGHTS) {
 			int *fds = (int *) CMSG_DATA (&u.cmsg);
 			int first = 1;
@@ -1578,7 +1578,7 @@ struct tcb *tcp;
 						   &linger) < 0)
 						break;
 					tprintf(", {onoff=%d, linger=%d}, "
-						"[%ld]",
+						"[%d]",
 						linger.l_onoff,
 						linger.l_linger,
 						len);
