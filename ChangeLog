@@ -3,6 +3,10 @@
 	* configure.ac, NEWS: Version 4.5.2.
 	* strace.spec, debian/changelog: 4.5.1-1.
 
+	* strace.c (main): Avoid potential buffer overruns from ludicrous
+	arguments or PATH values.
+	* syscall.c (qual_signal): Bail out for too-long string.
+
 	* mem.c [LINUX]: <asm/mman.h> -> <linux/mman.h>
 	Fixes Debian bug #223207.
 
