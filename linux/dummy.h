@@ -106,9 +106,6 @@
 #define	sys_break		printargs
 
 /* deprecated */
-#define	sys_oldstat		printargs
-#define	sys_oldlstat		printargs
-#define	sys_oldfstat		printargs
 #define	sys_olduname		printargs
 #define	sys_oldolduname		printargs
 

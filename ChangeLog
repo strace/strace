@@ -1,3 +1,9 @@
+Fri Apr 16 02:18:05 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Add support for old_*stat functions for Linux. Note to self:
+    check osf_*stat functions for Linux alpha.
+  * Change references to LINUX into linux in file.c
+  * Fix include for LDT in mem.c
 
 Thu Apr 15 22:28:15 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
