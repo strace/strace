@@ -1,3 +1,9 @@
+Changes in 4.4
+==============
+* Fix Linux/ia64 support, looks like someone renamed a few things on us
+* Fix the ioctl setup for Linux, turned out it did not really work.
+  Improve the ioctl extracter as well so we decode some more ones.
+
 Changes in 4.3.1
 ================
 * compile fixes for Linux/mips
