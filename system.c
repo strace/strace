@@ -2030,7 +2030,6 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		printxval(xlat_sysmips, tcp->u_arg[0], "???");
-		tprintf(", ");
 		if (!verbose(tcp)) {
 			tprintf("%d, %d, %d", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		} else if (tcp->u_arg[0]==SETNAME) {
