@@ -1,5 +1,10 @@
 2001-03-27  John Hughes <john@Calva.COM>
 
+  * net.c: Make compilable by SCO UDK compiler (doesn't like empty
+    initialisation list for array).
+
+2001-03-27  John Hughes <john@Calva.COM>
+
   * svr4/syscallent.h: ntp_adjtime entry was duplicated on Solaris
     systems - bad merge of Harald Boehme's patch by me.
 

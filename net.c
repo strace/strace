@@ -276,6 +276,7 @@ static struct xlat socketlayers[] = {
 #if defined(SOL_IRDA)
 	{ SOL_IRDA,	"SOL_IRDA"	},
 #endif
+	{ SOL_SOCKET,	"SOL_SOCKET"	},	/* Never used! */
 };
 static struct xlat protocols[] = {
 	{ IPPROTO_IP,	"IPPROTO_IP"	},
