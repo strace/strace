@@ -53,7 +53,15 @@
 #endif
 #elif defined(HAVE_LINUX_PTRACE_H)
 #undef PTRACE_SYSCALL
+# ifdef HAVE_STRUCT_IA64_FPREG
+#  define ia64_fpreg XXX_ia64_fpreg
+# endif
+# ifdef HAVE_STRUCT_PT_ALL_USER_REGS
+#  define pt_all_user_regs XXX_pt_all_user_regs
+# endif
 #include <linux/ptrace.h>
+# undef ia64_fpreg
+# undef pt_all_user_regs
 #endif
 
 
