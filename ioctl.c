@@ -108,7 +108,7 @@ long code, arg;
 #endif /* !LINUX */
 		return sock_ioctl(tcp, code, arg);
 #ifdef SVR4
-#ifndef SVR4_MP
+#ifndef HAVE_MP_PROCFS
 	case 'q':
 		return proc_ioctl(tcp, code, arg);
 #endif

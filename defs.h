@@ -82,7 +82,7 @@
 
 #ifdef SVR4
 #include <sys/procfs.h>
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 #include <sys/uio.h>
 #endif
 #else /* !SVR4 */
@@ -148,7 +148,7 @@ extern int ptrace();
 
 
 #ifdef SVR4
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 extern int mp_ioctl (int f, int c, void *a, int s);
 #define IOCTL(f,c,a)	mp_ioctl (f, c, a, sizeof *a)
 #define IOCTL_STATUS(t) \
@@ -204,7 +204,7 @@ struct tcb {
 	long inst[2];		/* Instructions on above */
 	int pfd;		/* proc file descriptor */
 #ifdef SVR4
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 	int pfd_stat;
 	int pfd_as;
 	pstatus_t status;

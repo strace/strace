@@ -45,7 +45,7 @@
 #ifdef SVR4
 #include <sys/stropts.h>
 #include <poll.h>
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 #include <sys/uio.h>
 #endif
 #endif
@@ -108,7 +108,7 @@ static int proc_poll_pipe[2] = { -1, -1 };
 
 #endif /* !HAVE_POLLABLE_PROCFS */
 
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 #define POLLWANT	POLLWRNORM
 #else
 #define POLLWANT	POLLPRI
@@ -581,7 +581,7 @@ int attaching;
 	static int last_pfd;
 #endif
 
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 	/* Open the process pseudo-files in /proc. */
 	sprintf(proc, "/proc/%d/ctl", tcp->pid);
 	if ((tcp->pfd = open(proc, O_WRONLY|O_EXCL)) < 0) {
@@ -1736,7 +1736,7 @@ struct tcb *tcp;
 	tcp_last = NULL;
 }
 
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 
 int mp_ioctl (int fd, int cmd, void *arg, int size) {
 

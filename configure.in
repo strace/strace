@@ -16,6 +16,9 @@ solaris2*)
 sysv4*)
 	opsys=svr4
 	;;
+sysv5*)
+	opsys=svr4
+	;;
 irix[56]*)
 	opsys=svr4
 	;;
@@ -77,11 +80,20 @@ CFLAGS="-D_GNU_SOURCE $CFLAGS"
 AC_CONFIG_HEADER(config.h)
 AC_SUBST(opsys)
 AC_DEFINE_UNQUOTED($OPSYS)
+case "$host_os" in
+sysv4.2uw*)
+	AC_DEFINE(UNIXWARE, 2)
+	;;
+sysv5*)
+	AC_DEFINE(UNIXWARE, 7)
+	;;
+esac
 AC_SUBST(arch)
 AC_DEFINE_UNQUOTED($ARCH)
 AC_SUBST(osarch)
 AC_PROG_CC
 AC_PROG_HOSTCC($host_alias $host)
+AC_MP_PROCFS
 AC_POLLABLE_PROCFS
 AC_STRUCT_PR_SYSCALL
 AC_STRUCT_MSG_CONTROL

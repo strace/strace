@@ -624,7 +624,7 @@ char *laddr;
 #endif /* SUNOS4 */
 
 #ifdef SVR4
-#ifdef SVR4_MP
+#ifdef HAVE_MP_PROCFS
 	if (pread(tcp->pfd_as, laddr, len, addr) == -1)
 		return -1;
 #else
@@ -643,7 +643,7 @@ char *laddr;
 	if (read(tcp->pfd, laddr, len) == -1)
 		return -1;
 #endif /* !HAVE_PREAD */
-#endif /* SVR4_MP */
+#endif /* HAVE_MP_PROCFS */
 #endif /* SVR4 */
 
 	return 0;

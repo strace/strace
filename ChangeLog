@@ -1,3 +1,7 @@
+Mon Nov 29 16:33:04 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge patches from John Hughes to make configure support UnixWare
+
 Sat Nov 27 21:38:17 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Enhance sys_query_module

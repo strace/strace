@@ -9,6 +9,9 @@
    or a derivative like Solaris 2.x or Irix 5.x.  */
 #undef SVR4
 
+/* Define for UnixWare systems. */
+#undef UNIXWARE
+
 /* Define if this is an i386, i486 or pentium architecture.  */
 #undef I386
 
@@ -30,8 +33,17 @@
 /* Define if this is an powerpc architecture.  */
 #undef POWERPC
 
+/* Define if you have a SVR4 MP type procfs.  I.E. /dev/xxx/ctl,
+   /dev/xxx/status.  Also implies that you have the pr_lwp
+   member in prstatus. */
+#undef HAVE_MP_PROCFS
+
 /* Define if you have SVR4 and the poll system call works on /proc files.  */
 #undef HAVE_POLLABLE_PROCFS
+
+/* Define if you have SVR4_MP and you need to use the poll hack
+   to avoid unfinished system calls. */
+#undef POLL_HACK
 
 /* Define if the prstatus structure in sys/procfs.h has a pr_syscall member.  */
 #undef HAVE_PR_SYSCALL

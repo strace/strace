@@ -1356,7 +1356,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-#endif /* !SVR4_MP */
+#endif /* !UNIXWARE */
 
 #endif /* !MIPS */
 
