@@ -3096,7 +3096,7 @@ struct tcb *tcp;
 	tprintf("%d, ", (int) tcp->u_arg[0]);
 	printxval(schedulers, tcp->u_arg[1], "SCHED_???");
 	if (umove(tcp, tcp->u_arg[2], &p) < 0)
-	    tprintf(", %lx", tcp->u_arg[2]);
+	    tprintf(", %#lx", tcp->u_arg[2]);
 	else
 	    tprintf(", { %d }", p.__sched_priority);
     }
@@ -3112,7 +3112,7 @@ struct tcb *tcp;
     } else {
 	struct sched_param p;
 	if (umove(tcp, tcp->u_arg[1], &p) < 0)
-	    tprintf("%lx", tcp->u_arg[1]);
+	    tprintf("%#lx", tcp->u_arg[1]);
 	else
 	    tprintf("{ %d }", p.__sched_priority);
     }
@@ -3126,7 +3126,7 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	struct sched_param p;
 	if (umove(tcp, tcp->u_arg[1], &p) < 0)
-	    tprintf("%d, %lx", (int) tcp->u_arg[0], tcp->u_arg[1]);
+	    tprintf("%d, %#lx", (int) tcp->u_arg[0], tcp->u_arg[1]);
 	else
 	    tprintf("%d, { %d }", (int) tcp->u_arg[0], p.__sched_priority);
     }
@@ -3142,4 +3142,39 @@ struct tcb *tcp;
     }
     return 0;
 }
+
+#ifdef X86_64
+#include <asm/prctl.h>
+
+static const struct xlat archvals[] = {
+	{ ARCH_SET_GS,		"ARCH_SET_GS"		},
+	{ ARCH_SET_FS,		"ARCH_SET_FS"		},
+	{ ARCH_GET_FS,		"ARCH_GET_FS"		},
+	{ ARCH_GET_GS,		"ARCH_GET_GS"		},
+	{ 0,			NULL			},
+};
+
+int
+sys_arch_prctl(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printxval(archvals, tcp->u_arg[0], "ARCH_???");
+	if (tcp->u_arg[0] == ARCH_SET_GS
+	    || tcp->u_arg[0] == ARCH_SET_FS)
+	    tprintf(", %#lx", tcp->u_arg[1]);
+    } else {
+	if (tcp->u_arg[0] == ARCH_GET_GS
+	    || tcp->u_arg[0] == ARCH_GET_FS) {
+	    long int v;
+	    if (!syserror(tcp) && umove(tcp, tcp->u_arg[1], &v) != -1)
+		tprintf(", [%#lx]", v);
+	    else
+		tprintf(", %#lx", tcp->u_arg[1]);
+	}
+    }
+    return 0;
+}
+#endif
+
 #endif
