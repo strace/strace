@@ -1775,6 +1775,20 @@ static const struct xlat wait4_options[] = {
 	{ 0,		NULL		},
 };
 
+#if !defined WCOREFLAG && defined WCOREFLG
+# define WCOREFLAG WCOREFLG
+#endif
+#ifndef WCOREFLAG
+#define WCOREFLAG 0x80
+#endif
+
+#ifndef W_STOPCODE
+#define W_STOPCODE(sig)		((sig) << 8 | 0x7f)
+#endif
+#ifndef W_EXITCODE
+#define W_EXITCODE(ret, sig)	((ret) << 8 | (sig))
+#endif
+
 static int
 printstatus(status)
 int status;
