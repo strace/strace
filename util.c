@@ -955,6 +955,9 @@ struct tcb *tcp;
 #elif defined(HPPA)
 	if(upeek(tcp->pid,PT_IAOQ0,&pc) < 0)
 		return -1;
+#elif defined(SH)
+       if (upeek(tcp->pid, 4*REG_PC ,&pc) < 0)
+               return -1;
 #endif
 	return pc;
 #endif /* LINUX */
@@ -1054,6 +1057,14 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
+#elif defined(SH)
+       long pc;
+
+       if (upeek(tcp->pid, 4*REG_PC, &pc) < 0) {
+               tprintf ("[????????] ");
+               return;
+       }
+       tprintf("[%08lx] ", pc);
 #endif /* !architecture */
 #endif /* LINUX */
 
@@ -1217,6 +1228,12 @@ struct tcb *tcp;
 #define LOOP	0xa7f40000	/* BRC 15,0 */
 #elif defined(HPPA)
 #define LOOP	0xe81f1ff7	/* b,l,n <loc>,r0 */
+#elif defined(SH)
+#ifdef __LITTLE_ENDIAN__
+#define LOOP   0x0000affe
+#else
+#define LOOP   0xfeaf0000
+#endif
 #else
 #error unknown architecture
 #endif
@@ -1247,6 +1264,9 @@ struct tcb *tcp;
 	if (upeek(tcp->pid, PT_IAOQ0, &tcp->baddr) < 0)
 		return -1;
 	tcp->baddr &= ~0x03;
+#elif defined(SH)
+       if (upeek(tcp->pid, 4*REG_PC, &tcp->baddr) < 0)
+               return -1;
 #else
 #error unknown architecture
 #endif
@@ -1336,6 +1356,8 @@ struct tcb *tcp;
 	long pc;
 #elif defined(HPPA)
 	long iaoq;
+#elif defined(SH)
+       long pc;
 #endif /* architecture */
 
 #ifdef SPARC
@@ -1493,6 +1515,17 @@ struct tcb *tcp;
 	 */
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ0, iaoq);
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ1, iaoq);
+#elif defined(SH)
+       if (upeek(tcp->pid, 4*REG_PC, &pc) < 0)
+               return -1;
+        if (pc != tcp->baddr) {
+                /* The breakpoint has not been reached yet.  */
+                if (debug)
+                        fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
+                                pc, tcp->baddr);
+                return 0;
+        }
+
 #endif /* arch */
 #endif /* !SPARC && !IA64 */
 #endif /* LINUX */

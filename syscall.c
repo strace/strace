@@ -684,6 +684,9 @@ struct tcb *tcp;
 	static long pc;
 #elif defined(HPPA)
 	static long r28;
+#elif defined(SH)
+       static long r0;
+
 #endif 
 #endif /* LINUX */
 #ifdef FREEBSD
@@ -873,11 +876,44 @@ struct tcb *tcp;
 			return 0;
 		}
 	}
-#endif 
+#elif defined(SH)
+       /*
+        * In the new syscall ABI, the system call number is in R3.
+        */
+       if (upeek(pid, 4*(REG_REG0+3), &scno) < 0)
+               return -1;
+
+       if (scno < 0) {
+           /* Odd as it may seem, a glibc bug has been known to cause
+              glibc to issue bogus negative syscall numbers.  So for
+              our purposes, make strace print what it *should* have been */
+           long correct_scno = (scno & 0xff);
+           if (debug)
+               fprintf(stderr,
+                   "Detected glibc bug: bogus system call number = %ld,
+correcting to %ld\n",
+                   scno,
+                   correct_scno);
+           scno = correct_scno;
+       }
+
+
+       if (!(tcp->flags & TCB_INSYSCALL)) {
+               /* Check if we return from execve. */
+               if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+                       tcp->flags &= ~TCB_WAITEXECVE;
+                       return 0;
+               }
+       }
+#endif /* SH */
 #endif /* LINUX */
 #ifdef SUNOS4
 	if (upeek(pid, uoff(u_arg[7]), &scno) < 0)
 		return -1;
+#elif defined(SH)
+       /* new syscall ABI returns result in R0 */
+       if (upeek(pid, 4*REG_REG0, (long *)&r0) < 0)
+               return -1;
 #endif
 #ifdef USE_PROCFS
 #ifdef HAVE_PR_SYSCALL
@@ -1152,6 +1188,18 @@ struct tcb *tcp;
 			tcp->u_rval = r28;
 			u_error = 0;
 		}
+#else
+#ifdef SH
+               /* interpret R0 as return value or error number */
+               if (r0 && (unsigned) -r0 < nerrnos) {
+                       tcp->u_rval = -1;
+                       u_error = -r0;
+               }
+               else {
+                       tcp->u_rval = r0;
+                       u_error = 0;
+               }
+#endif /* SH */
 #endif /* HPPA */
 #endif /* SPARC */
 #endif /* ALPHA */
@@ -1378,6 +1426,20 @@ struct tcb *tcp;
 				return -1;
 		}
 	}
+#elif defined(SH)
+       {
+               int i; 
+               static int syscall_regs[] = {
+                   REG_REG0+4, REG_REG0+5, REG_REG0+6, REG_REG0+7,
+                   REG_REG0, REG_REG0+1, REG_REG0+2
+                   };
+
+               tcp->u_nargs = sysent[tcp->scno].nargs;
+               for (i = 0; i < tcp->u_nargs; i++) {
+                       if (upeek(pid, 4*syscall_regs[i], &tcp->u_arg[i]) < 0)
+                               return -1;
+               }
+        }
 #else /* Other architecture (like i386) (32bits specific) */
 	{
 		int i;

@@ -1,3 +1,9 @@
+2002-05-01  Wichert Akkerman <wichert@deephackmode.org>
+
+	* configure.in, defs.h, process.c, sock.c, syscall.c, util.c: merge
+	  patch from Greg Banks <gbanks@pocketpenguins.com> for Linux/SuperH
+	  support
+
 2002-04-01  Wichert Akkerman <wichert@deephackmode.org>
 
 	* strace.c: close tcp->outf in droptcb()
