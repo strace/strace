@@ -44,8 +44,14 @@
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
 #endif
 #ifdef LINUX
+#ifndef __GLIBC__
 #include <linux/ptrace.h>
+#endif
 #endif /* LINUX */
+
+#ifdef HAVE_SYS_PTRACE_H
+#include <sys/ptrace.h>
+#endif
 
 #ifdef SUNOS4_KERNEL_ARCH_KLUDGE
 #include <sys/utsname.h>
@@ -356,7 +362,7 @@ int len;
 			return;
 		}
 	}
-	outend = outstr + max_strlen;
+	outend = outstr + max_strlen * 2 - 10;
 	if (len < 0) {
 		n = max_strlen;
 		if (umovestr(tcp, addr, n, (char *) str) < 0) {

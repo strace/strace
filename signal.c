@@ -48,7 +48,9 @@
 #endif /* SVR4 */
 
 #ifdef LINUX
+#ifndef __GLIBC__
 #include <linux/ptrace.h>
+#endif
 #ifdef HAVE_ASM_SIGCONTEXT_H
 #include <asm/sigcontext.h>
 #ifdef SPARC
@@ -85,7 +87,7 @@ struct sigcontext_struct {
 };
 #else /* !I386 */
 #ifdef M68K
-struct sigcontext_struct
+struct sigcontext
 {
 	unsigned long sc_mask;
 	unsigned long sc_usp;
@@ -216,7 +218,7 @@ int sig;
 		return signalent[sig];
 #ifdef SIGRTMIN
 	} else if (sig >= __SIGRTMIN && sig <= __SIGRTMAX) {
-		sprintf(buf, "SIGRT_%d", sig - __SIGRTMIN);
+		sprintf(buf, "SIGRT_%ld", (long)(sig - __SIGRTMIN));
 		return buf;
 #endif /* SIGRTMIN */
 	} else {
@@ -336,7 +338,7 @@ int sig;
 	char buf[1024];
 	char *s;
 	int i;
-	int signalled, blocked, ignored, caught;
+	unsigned int signalled, blocked, ignored, caught;
 
 	/* This is incredibly costly but it's worth it. */
 	sprintf(sname, "/proc/%d/stat", tcp->pid);
@@ -357,7 +359,7 @@ int sig;
 				break;
 		}
 	}
-	if (sscanf(s, "%d%d%d%d",
+	if (sscanf(s, "%u%u%u%u",
 		   &signalled, &blocked, &ignored, &caught) != 4) {
 		fprintf(stderr, "/proc/pid/stat format error\n");
 		return 1;
@@ -561,6 +563,11 @@ struct old_sigaction {
 	unsigned long sa_flags;
 	void (*sa_restorer)(void);
 };
+#define SA_HANDLER __sa_handler
+#endif /* LINUX */
+
+#ifndef SA_HANDLER                                                           
+#define SA_HANDLER sa_handler                                                
 #endif
 
 int
@@ -589,7 +596,7 @@ struct tcb *tcp;
 	else if (umove(tcp, addr, &sa) < 0)
 		tprintf("{...}");
 	else {
-		switch ((long) sa.__sa_handler) {
+		switch ((long) sa.SA_HANDLER) {
 		case (long) SIG_ERR:
 			tprintf("{SIG_ERR}");
 			break;
@@ -612,7 +619,7 @@ struct tcb *tcp;
 				kill(tcp->pid, SIGSTOP);
 			}
 #endif /* !SVR4 */
-			tprintf("{%#lx, ", (long) sa.__sa_handler);
+			tprintf("{%#lx, ", (long) sa.SA_HANDLER);
 			long_to_sigset(sa.sa_mask, &sigset);
 			printsigmask(&sigset, 0);
 			tprintf(", ");
@@ -723,7 +730,7 @@ struct tcb *tcp;
 #else /* !POWERPC */
 #ifdef M68K
 	long usp;
-	struct sigcontext_struct sc;
+	struct sigcontext sc;
 
 	if (entering(tcp)) {
 	    tcp->u_arg[0] = 0;

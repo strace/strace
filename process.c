@@ -51,7 +51,12 @@
 #endif
 
 #ifdef LINUX
+#ifndef __GLIBC__
 #include <linux/ptrace.h>
+#endif
+#include <asm/posix_types.h>
+#undef GETGROUPS_T
+#define GETGROUPS_T __kernel_gid_t
 #endif /* LINUX */
 
 #ifdef HAVE_PRCTL
@@ -476,18 +481,24 @@ sys_getresuid(tcp)
     struct tcb *tcp;
 {
 	if (exiting(tcp)) {
-		uid_t res[3];
-		if (umoven(tcp, tcp->u_arg[0], sizeof(pid_t),
-					(char *) &res[0]) < 0
-				|| umoven(tcp, tcp->u_arg[2], sizeof(pid_t),
-					(char *) &res[1]) < 0
-				|| umoven(tcp, tcp->u_arg[2], sizeof(pid_t),
-					(char *) &res[2]) < 0)
-			return -1;
-		tprintf("ruid %lu, euid %lu, suid %lu",
-				(unsigned long) res[0],
-				(unsigned long) res[1],
-				(unsigned long) res[2]);
+		__kernel_uid_t uid;
+		if (syserror(tcp))
+			tprintf("%#lx, %#lx, %#lx", tcp->u_arg[0],
+				tcp->u_arg[1], tcp->u_arg[2]);
+		else {
+			if (umove(tcp, tcp->u_arg[0], &uid) < 0)
+				tprintf("%#lx, ", tcp->u_arg[0]);
+			else
+				tprintf("ruid %lu, ", (unsigned long) uid);
+			if (umove(tcp, tcp->u_arg[0], &uid) < 0)
+				tprintf("%#lx, ", tcp->u_arg[0]);
+			else
+				tprintf("euid %lu, ", (unsigned long) uid);
+			if (umove(tcp, tcp->u_arg[0], &uid) < 0)
+				tprintf("%#lx", tcp->u_arg[0]);
+			else
+				tprintf("suid %lu", (unsigned long) uid);
+		}
 	}
 	return 0;
 }
@@ -497,18 +508,24 @@ sys_getresgid(tcp)
 struct tcb *tcp;
 {
 	if (exiting(tcp)) {
-		uid_t res[3];
-		if (umoven(tcp, tcp->u_arg[0], sizeof(pid_t),
-					(char *) &res[0]) < 0
-				|| umoven(tcp, tcp->u_arg[2], sizeof(pid_t),
-					(char *) &res[1]) < 0
-				|| umoven(tcp, tcp->u_arg[2], sizeof(pid_t),
-					(char *) &res[2]) < 0)
-			return -1;
-		tprintf("rgid %lu, egid %lu, sgid %lu",
-				(unsigned long) res[0],
-				(unsigned long) res[1],
-				(unsigned long) res[2]);
+		__kernel_gid_t gid;
+		if (syserror(tcp))
+			tprintf("%#lx, %#lx, %#lx", tcp->u_arg[0],
+				tcp->u_arg[1], tcp->u_arg[2]);
+		else {
+			if (umove(tcp, tcp->u_arg[0], &gid) < 0)
+				tprintf("%#lx, ", tcp->u_arg[0]);
+			else
+				tprintf("rgid %lu, ", (unsigned long) gid);
+			if (umove(tcp, tcp->u_arg[0], &gid) < 0)
+				tprintf("%#lx, ", tcp->u_arg[0]);
+			else
+				tprintf("egid %lu, ", (unsigned long) gid);
+			if (umove(tcp, tcp->u_arg[0], &gid) < 0)
+				tprintf("%#lx", tcp->u_arg[0]);
+			else
+				tprintf("sgid %lu", (unsigned long) gid);
+		}
 	}
 	return 0;
 }

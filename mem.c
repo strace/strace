@@ -31,11 +31,10 @@
 
 #include "defs.h"
 
-#ifdef LINUXSPARC
+#ifdef LINUX
 #include <linux/mman.h>
-#else
-#include <sys/mman.h>
 #endif
+#include <sys/mman.h>
 
 #if defined(LINUX) && defined(__i386__)
 #include <asm/ldt.h>
@@ -169,6 +168,26 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef LINUX
+
+static struct xlat mremap_flags[] = {
+	{ MREMAP_MAYMOVE, "MREMAP_MAYMOVE" },
+};
+
+int
+sys_mremap(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, %lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1],
+			tcp->u_arg[2]);
+		printflags(mremap_flags, tcp->u_arg[3]);
+	}
+	return RVAL_HEX;
+}
+
+#endif /* LINUX */
 
 #ifdef MS_ASYNC
 

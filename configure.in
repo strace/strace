@@ -61,7 +61,7 @@ AC_MSG_RESULT($arch)
 
 # Autoheader trick.  Heh, heh.
 arch_list='
-@@@syms="$syms I386 M68K SPARC MIPS ALPHA ARM"@@@
+@@@syms="$syms I386 M68K SPARC MIPS ALPHA ARM POWERPC"@@@
 '
 
 osarch="$opsys"
@@ -73,6 +73,7 @@ OPSYS=`echo $opsys | tr '[a-z]' '[A-Z]'`
 ARCH=`echo $arch | tr '[a-z]' '[A-Z]'`
 
 changequote([,])dnl
+CFLAG="-D_GNU_SOURCE $CFLAGS"
 AC_CONFIG_HEADER(config.h)
 AC_SUBST(opsys)
 AC_DEFINE_UNQUOTED($OPSYS)
@@ -125,7 +126,7 @@ AC_HEADER_MAJOR
 AC_SIG_ATOMIC_T
 AC_CHECK_LIB(nsl, main)
 AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl putpmsg prctl sendmsg)
-AC_CHECK_HEADERS(sys/filio.h sys/asynch.h sys/stream.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h)
+AC_CHECK_HEADERS(sys/filio.h sys/asynch.h sys/stream.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h)
 AC_DECL_SYS_ERRLIST
 AC_DECL_SYS_SIGLIST
 AC_DECL__SYS_SIGLIST

@@ -384,9 +384,14 @@ long addr;
 {
 	struct msghdr msg;
 
-	umove(tcp, addr, &msg);
-	tprintf("{msg_name=%s, msg_namelen=%u, msg_iov=%#lx, msg_iovlen=%u, ",
-		(char *) msg.msg_name, msg.msg_namelen,
+	if (umove(tcp, addr, &msg) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	tprintf("{msg_name=");
+	printstr(tcp, (long) msg.msg_name, msg.msg_namelen);
+	tprintf(", msg_namelen=%u, msg_iov=%#lx, msg_iovlen=%u, ",
+		msg.msg_namelen,
 		(unsigned long) msg.msg_iov, msg.msg_iovlen);
 #ifdef HAVE_MSG_CONTROL
 	tprintf("msg_control=%#lx, msg_controllen=%u, msg_flags=%#x}",
@@ -706,17 +711,17 @@ struct tcb *tcp;
 			break;
 #endif /* PF_IPX */
 		default:	
-			tprintf(", %lu", tcp->u_arg[2]);
+			tprintf("%lu", tcp->u_arg[2]);
 			break;
 		}
 	} else {
 		if (syserror(tcp)) {
-			tprintf("%#lx", tcp->u_arg[3]);
+			tprintf(", %#lx", tcp->u_arg[3]);
 			return 0;
 		}
 #ifdef LINUX
 		if (umoven(tcp, tcp->u_arg[3], sizeof fds, (char *) fds) < 0)
-			tprintf("[...]");
+			tprintf(", [...]");
 		else
 			tprintf(", [%u, %u]", fds[0], fds[1]);
 #endif /* LINUX */

@@ -45,8 +45,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#ifdef LINUX
+#ifdef __NR_personality
 /* Workaround for kernel namespace pollution. */
+#define _LINUX_PTRACE_H
 #define sys_personality kernel_sys_personality
 #include <linux/personality.h>
 #undef sys_personality
@@ -54,6 +55,10 @@
 
 #ifdef __NR_capget
 #include <linux/capability.h>
+#endif
+
+#ifdef __NR_cacheflush
+#include <asm/cachectl.h>
 #endif
 
 static struct xlat mount_flags[] = {
@@ -126,6 +131,52 @@ struct tcb *tcp;
 		printxval(personality_options, tcp->u_arg[0], "PER_???");
 	return 0;
 }
+
+#ifdef M68K
+static struct xlat cacheflush_scope[] = {
+#ifdef FLUSH_SCOPE_LINE
+	{ FLUSH_SCOPE_LINE,	"FLUSH_SCOPE_LINE" },
+#endif
+#ifdef FLUSH_SCOPE_PAGE
+	{ FLUSH_SCOPE_PAGE,	"FLUSH_SCOPE_PAGE" },
+#endif
+#ifdef FLUSH_SCOPE_ALL
+	{ FLUSH_SCOPE_ALL,	"FLUSH_SCOPE_ALL" },
+#endif
+	{ 0,			NULL },
+};
+
+static struct xlat cacheflush_flags[] = {
+#ifdef FLUSH_CACHE_BOTH
+	{ FLUSH_CACHE_BOTH,	"FLUSH_CACHE_BOTH" },
+#endif
+#ifdef FLUSH_CACHE_DATA
+	{ FLUSH_CACHE_DATA,	"FLUSH_CACHE_DATA" },
+#endif
+#ifdef FLUSH_CACHE_INSN
+	{ FLUSH_CACHE_INSN,	"FLUSH_CACHE_INSN" },
+#endif
+	{ 0,			NULL },
+};
+
+int
+sys_cacheflush(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		/* addr */
+		tprintf("%#lx, ", tcp->u_arg[0]);
+		/* scope */
+		printxval(cacheflush_scope, tcp->u_arg[1], "FLUSH_SCOPE_???");
+		tprintf(", ");
+		/* flags */
+		printflags(cacheflush_flags, tcp->u_arg[2]);
+		/* len */
+		tprintf(", %lu", tcp->u_arg[3]);
+	}
+	return 0;
+}
+#endif /* M68K */
 
 #endif /* LINUX */
 

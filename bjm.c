@@ -1,5 +1,7 @@
 #include "defs.h"
 
+#if defined(LINUX)
+
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -49,13 +51,5 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_delete_module(tcp)
-struct tcb *tcp;
-{
+#endif /* LINUX */
 
-	if (entering(tcp)) {
-		printstr(tcp, tcp->u_arg[0], -1);
-	}
-	return 0;
-}

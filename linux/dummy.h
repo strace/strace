@@ -56,7 +56,6 @@
 #define sys_sched_get_priority_max printargs
 #define sys_sched_get_priority_min printargs
 #define sys_sched_rr_get_interval printargs
-#define sys_mremap		printargs
 
 /* like another call */
 #define	sys_uselib		sys_chdir

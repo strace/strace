@@ -44,7 +44,11 @@
 	{ 1,	0,	sys_time,		"time"		}, /* 13 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 14 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 15 */
+#ifdef M68K
+	{ 3,	TF,	sys_chown,		"chown"		}, /* 16 */
+#else
 	{ 3,	TF,	sys_chown,		"lchown"		}, /* 16 */
+#endif
 	{ 0,	0,	sys_break,		"break"		}, /* 17 */
 	{ 2,	TF,	sys_oldstat,		"oldstat"	}, /* 18 */
 	{ 3,	0,	sys_lseek,		"lseek"		}, /* 19 */
@@ -151,12 +155,16 @@
 	{ 2,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
+#ifdef M68K
+	{ 4,	0,	sys_cacheflush,		"cacheflush"	}, /* 123 */
+#else
 	{ 3,	0,	sys_modify_ldt,		"modify_ldt"	}, /* 123 */
+#endif
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
 	{ 2,	0,	sys_create_module,	"create_module"	}, /* 127 */
-	{ 4,	0,	sys_init_module,	"init_module"	}, /* 128 */
+	{ 2,	0,	sys_init_module,	"init_module"	}, /* 128 */
 	{ 1,	0,	sys_delete_module,	"delete_module"	}, /* 129 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 130 */
 	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 131 */
@@ -173,31 +181,35 @@
 	{ 5,	0,	sys_select,		"select"	}, /* 142 */
 	{ 2,	0,	sys_flock,		"flock"		}, /* 143 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 144 */
-	{ 5,	0,	sys_readv,		"readv"		}, /* 145 */
-	{ 5,	0,	sys_writev,		"writev"	}, /* 146 */
-	{ 5,	0,	sys_getsid,		"getsid"	}, /* 147 */
-	{ 5,	0,	sys_fdatasync,		"fdatasync"	}, /* 148 */
-	{ 5,	0,	sys_sysctl,		"_sysctl"	}, /* 149 */
-	{ 5,	0,	sys_mlock,		"mlock"		}, /* 150 */
-	{ 5,	0,	sys_munlock,		"munlock"	}, /* 151 */
-	{ 5,	0,	sys_mlockall,		"mlockall"	}, /* 152 */
-	{ 5,	0,	sys_munlockall,		"munlockall"	}, /* 153 */
-	{ 5,	0,	sys_sched_setparam,	"sched_setparam"}, /* 154 */
-	{ 5,	0,	sys_sched_getparam,	"sched_getparam"}, /* 155 */
-	{ 5,	0,	sys_sched_setscheduler,	"sched_setscheduler"}, /* 156 */
-	{ 5,	0,	sys_sched_getscheduler,	"sched_getscheduler"}, /* 157 */
-	{ 5,	0,	sys_sched_yield,	"sched_yield"}, /* 158 */
-	{ 5,	0,	sys_sched_get_priority_max,"sched_get_priority_max"}, /* 159 */
-	{ 5,	0,	sys_sched_get_priority_min,"sched_get_priority_min"}, /* 160 */
-	{ 5,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 161 */
-	{ 5,	0,	sys_nanosleep,		"nanosleep"	}, /* 162 */
-	{ 5,	0,	sys_mremap,		"mremap"	}, /* 163 */
+	{ 3,	0,	sys_readv,		"readv"		}, /* 145 */
+	{ 3,	0,	sys_writev,		"writev"	}, /* 146 */
+	{ 1,	0,	sys_getsid,		"getsid"	}, /* 147 */
+	{ 1,	0,	sys_fdatasync,		"fdatasync"	}, /* 148 */
+	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 149 */
+	{ 1,	0,	sys_mlock,		"mlock"		}, /* 150 */
+	{ 2,	0,	sys_munlock,		"munlock"	}, /* 151 */
+	{ 2,	0,	sys_mlockall,		"mlockall"	}, /* 152 */
+	{ 1,	0,	sys_munlockall,		"munlockall"	}, /* 153 */
+	{ 0,	0,	sys_sched_setparam,	"sched_setparam"}, /* 154 */
+	{ 2,	0,	sys_sched_getparam,	"sched_getparam"}, /* 155 */
+	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"}, /* 156 */
+	{ 1,	0,	sys_sched_getscheduler,	"sched_getscheduler"}, /* 157 */
+	{ 0,	0,	sys_sched_yield,	"sched_yield"}, /* 158 */
+	{ 1,	0,	sys_sched_get_priority_max,"sched_get_priority_max"}, /* 159 */
+	{ 1,	0,	sys_sched_get_priority_min,"sched_get_priority_min"}, /* 160 */
+	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 161 */
+	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 162 */
+	{ 4,	0,	sys_mremap,		"mremap"	}, /* 163 */
 	{ 3,	0,	sys_setresuid,		"setresuid"	}, /* 164 */
 	{ 3,	0,	sys_getresuid,		"getresuid"	}, /* 165 */
+#ifdef M68K
+	{ 5,	0,	printargs,		"SYS_166"	}, /* 166 */
+#else
 	{ 5,	0,	printargs,		"vm86"		}, /* 166 */
+#endif
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 167 */
 	{ 3,	0,	sys_poll,		"poll"		}, /* 168 */
-	{ 5,	0,	printargs,		"nfsservctl"	}, /* 169 */
+	{ 3,	0,	printargs,		"nfsservctl"	}, /* 169 */
 	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 170 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 171 */
 	{ 5,	0,	printargs,		"prctl"		}, /* 172 */
@@ -211,12 +223,16 @@
 
 	{ 5,	TF,	sys_pread,		"pread"		}, /* 180 */
 	{ 5,	TF,	sys_pwrite,		"pwrite"	}, /* 181 */
+#ifdef M68K
+	{ 3,	TF,	sys_chown,		"lchown"	}, /* 182 */
+#else
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 182 */
+#endif
 	{ 2,	0,	sys_getcwd,		"getcwd"	}, /* 183 */
-	{ 5,	0,	printargs,		"capget"	}, /* 184 */
-	{ 5,	0,	printargs,		"capset"	}, /* 185 */
-	{ 5,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
-	{ 5,	TF,	printargs,		"sendfile"	}, /* 187 */
+	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
+	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
+	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
+	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 187 */
 	{ 5,	0,	printargs,		"SYS_188"	}, /* 188 */
 	{ 5,	0,	printargs,		"SYS_189"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */

@@ -283,21 +283,19 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	if (tcp->u_arg[4] == SEEK_SET)
 	    tprintf("%ld, %llu, ", tcp->u_arg[0],
-		    (((unsigned long long int) tcp->u_arg[1]) << 32
-		     | (unsigned long) tcp->u_arg[2]));
+		    (((long long int) tcp->u_arg[1]) << 32
+		     | (unsigned long long) tcp->u_arg[2]));
 	else
 	    tprintf("%ld, %lld, ", tcp->u_arg[0],
 		    (((long long int) tcp->u_arg[1]) << 32
-		     | (unsigned long) tcp->u_arg[2]));
+		     | (unsigned long long) tcp->u_arg[2]));
     }
     else {
-	if (syserror(tcp))
+	long long int off;
+	if (syserror(tcp) || umove(tcp, tcp->u_arg[3], &off) < 0)
 	    tprintf("%#lx, ", tcp->u_arg[3]);
-	else {
-	    long long int off;
-	    umove(tcp, tcp->u_arg[3], &off);
-	    tprintf("{%lld}, ", off);
-	}
+	else
+	    tprintf("[%llu], ", off);
 	printxval(whence, tcp->u_arg[4], "SEEK_???");
     }
     return 0;
@@ -764,7 +762,8 @@ static struct xlat fsmagic[] = {
 	{ 0x9660,	"ISOFS_SUPER_MAGIC"	},
 	{ 0x137f,	"MINIX_SUPER_MAGIC"	},
 	{ 0x138f,	"MINIX_SUPER_MAGIC2"	},
-	{ 0x2468,	"NEW_MINIX_SUPER_MAGIC"	},
+	{ 0x2468,	"MINIX2_SUPER_MAGIC"	},
+	{ 0x2478,	"MINIX2_SUPER_MAGIC2"	},
 	{ 0x4d44,	"MSDOS_SUPER_MAGIC"	},
 	{ 0x6969,	"NFS_SUPER_MAGIC"	},
 	{ 0x9fa0,	"PROC_SUPER_MAGIC"	},
@@ -814,7 +813,7 @@ long addr;
 	tprintf("{f_type=%s, f_fbsize=%u, f_blocks=%u, f_bfree=%u, ",
 		sprintfstype(statbuf.f_type),
 		statbuf.f_bsize, statbuf.f_blocks, statbuf.f_bfree);
-	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_namelen=%u}",
+	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_namelen=%u",
 		statbuf.f_bavail,statbuf.f_files, statbuf.f_ffree, statbuf.f_namelen);
 #else /* !ALPHA */
 	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%lu, f_bfree=%lu, ",
@@ -826,7 +825,7 @@ long addr;
 		(unsigned long)statbuf.f_files,
 		(unsigned long)statbuf.f_ffree);
 #ifdef linux
-	tprintf(", f_namelen=%lu}", (unsigned long)statbuf.f_namelen);
+	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
 #endif /* linux */
 #endif /* !ALPHA */
 	tprintf("}");
@@ -1296,7 +1295,7 @@ struct tcb *tcp;
 	if (syserror(tcp))
 	    tprintf("%#lx", tcp->u_arg[0]);
 	else
-	    printstr(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+	    printpathn(tcp, tcp->u_arg[0], tcp->u_rval - 1);
 	tprintf(", %lu", tcp->u_arg[1]);
     }
     return 0;

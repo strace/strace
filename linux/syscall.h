@@ -81,6 +81,7 @@ int sys_getresuid(), sys_getresgid(), sys_pread(), sys_pwrite(), sys_getcwd();
 int sys_sigaltstack(), sys_rt_sigprocmask(), sys_rt_sigaction();
 int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
+int sys_sendfile();
 
 
 /* sys_socketcall subcalls */
@@ -153,3 +154,6 @@ int osf_statfs(), osf_fstatfs(), sys_getpagesize(), sys_madvise();
 int sys_setpgrp(), sys_gethostname(), sys_getdtablesize(), sys_utimes();
 int sys_capget(), sys_capset();
 
+#ifdef M68K
+int sys_cacheflush();
+#endif

@@ -24,6 +24,12 @@
 /* Define if this is an alpha architecture.  */
 #undef ALPHA
 
+/* Define if this is a arm architecture.  */
+#undef ARM
+
+/* Define if this is an powerpc architecture.  */
+#undef POWERPC
+
 /* Define if you have SVR4 and the poll system call works on /proc files.  */
 #undef HAVE_POLLABLE_PROCFS
 

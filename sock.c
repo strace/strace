@@ -36,7 +36,11 @@
 #endif
 
 #ifdef ALPHA
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#elif defined(HAVE_IOCTLS_H)
 #include <ioctls.h>
+#endif
 #endif
 
 int

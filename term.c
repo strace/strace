@@ -29,10 +29,12 @@
 
 #include "defs.h"
 
-#ifdef __GLIBC__
+#ifdef HAVE_TERMIO_H
 #include <termio.h>
-#endif /* __GLIBC__ */
+#endif /* HAVE_TERMIO_H */
+
 #include <termios.h>
+
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
@@ -330,6 +332,12 @@ long code, arg;
 #endif
 #ifdef TIOCSINTR
 	case TIOCSINTR:
+#endif
+#ifdef TIOCSPTLCK
+	case TIOCSPTLCK:
+#endif
+#ifdef TIOCGPTN
+	case TIOCGPTN:
 #endif
 		tprintf(", ");
 		printnum(tcp, arg, "%d");

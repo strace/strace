@@ -1,3 +1,21 @@
+Sun May  9 02:18:30 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge in patches from Andreas Schwab <schwab@issan.cs.uni-dortmund.de>
+    + some layout and other minor fixes
+    + add some m68k-specific things to linux/syscallent.h. Note that m68k
+      is similar enough to i386 to not need it's own subdirectory
+    + add support for sendfile and mremap syscalls for Linux
+  * Merge in patches from Sascha Schumann <sascha@schumann.2ns.de>
+    + ioctls.h vs sys/ioctl.h on Alpha platform
+    + pointer was casted to an int in stream.c
+    + strsignal() needs -D_GNU_SOURCE in CFLAGS
+    + several other casts changed
+    + correct ARM/POWERPC architecture defines in acconfig.h
+  * Merge in patches from Morten Welinder <terra@diku.dk>
+    + add some autoconf-tests for includefiles
+    + handle solaris version of sigcontext struct (actually I hacked this
+      up again, but the idea is his :)
+
 Sun Apr 18 22:32:42 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Update syscalls for linux alpha, patch from Bart Warmerdam

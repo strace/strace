@@ -93,7 +93,7 @@ struct tcb *tcp;
 				tprintf("{");
 				printstr(tcp, (long) iov[i].iov_base,
 					iov[i].iov_len);
-				tprintf(", %u}", iov[i].iov_len);
+				tprintf(", %lu}", (unsigned long)iov[i].iov_len);
 			}
 			tprintf("]");
 		}
@@ -129,7 +129,7 @@ struct tcb *tcp;
 				tprintf("{");
 				printstr(tcp, (long) iov[i].iov_base,
 					iov[i].iov_len);
-				tprintf(", %u}", iov[i].iov_len);
+				tprintf(", %lu}", (unsigned long)iov[i].iov_len);
 			}
 			tprintf("]");
 		}
@@ -186,7 +186,8 @@ struct tcb *tcp;
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %lu, %lu", tcp->u_arg[2], tcp->u_arg[3]);
+		tprintf(", %lu, %llu", tcp->u_arg[2],
+			*(unsigned long long *)&tcp->u_arg[3]);
 	}
 	return 0;
 }
@@ -198,7 +199,27 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, %lu", tcp->u_arg[2], tcp->u_arg[3]);
+		tprintf(", %lu, %llu", tcp->u_arg[2],
+			*(unsigned long long *)&tcp->u_arg[3]);
+	}
+	return 0;
+}
+
+int
+sys_sendfile(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		off_t offset;
+
+		tprintf("%ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1]);
+		if (!tcp->u_arg[2])
+			tprintf("NULL");
+		else if (umove(tcp, tcp->u_arg[2], &offset) < 0)
+			tprintf("%#lx", tcp->u_arg[2]);
+		else
+			tprintf("[%lu]", offset);
+		tprintf(", %lu", tcp->u_arg[3]);
 	}
 	return 0;
 }

@@ -75,11 +75,11 @@
 /* Define if this is an alpha architecture.  */
 #undef ALPHA
 
-/* Define if this is an powerpc architecture.  */
-#undef POWERPC
-
 /* Define if this is a arm architecture.  */
 #undef ARM
+
+/* Define if this is an powerpc architecture.  */
+#undef POWERPC
 
 /* Define if you have SVR4 and the poll system call works on /proc files.  */
 #undef HAVE_POLLABLE_PROCFS
@@ -141,6 +141,9 @@
 /* Define if you have the <dirent.h> header file.  */
 #undef HAVE_DIRENT_H
 
+/* Define if you have the <ioctls.h> header file.  */
+#undef HAVE_IOCTLS_H
+
 /* Define if you have the <ndir.h> header file.  */
 #undef HAVE_NDIR_H
 
@@ -153,8 +156,14 @@
 /* Define if you have the <sys/filio.h> header file.  */
 #undef HAVE_SYS_FILIO_H
 
+/* Define if you have the <sys/ioctl.h> header file.  */
+#undef HAVE_SYS_IOCTL_H
+
 /* Define if you have the <sys/ndir.h> header file.  */
 #undef HAVE_SYS_NDIR_H
+
+/* Define if you have the <sys/ptrace.h> header file.  */
+#undef HAVE_SYS_PTRACE_H
 
 /* Define if you have the <sys/stream.h> header file.  */
 #undef HAVE_SYS_STREAM_H
@@ -164,6 +173,9 @@
 
 /* Define if you have the <sys/tiuser.h> header file.  */
 #undef HAVE_SYS_TIUSER_H
+
+/* Define if you have the <termio.h> header file.  */
+#undef HAVE_TERMIO_H
 
 /* Define if you have the nsl library (-lnsl).  */
 #undef HAVE_LIBNSL

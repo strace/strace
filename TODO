@@ -1,9 +1,13 @@
 -- new entries from wta
 getdents has wrong structure; track down kernel version
+clone doesn't work; cloned processes can hang
+replace printargs with something that reads a configuration-file
+rename functions that are used for general things:
+  sys_chdir -> general_1stringarg
+generate syscallent.h from the kernel sources
 
 
 -- old entries from jrs
-require override to run suid and/or sgid executables normally
 attempt reopen of /proc file if we get EAGAIN from any /proc ioctl
 kill procs we error out of on svr4
 enclose "total x dents" in a comment
@@ -18,7 +22,6 @@ add pread, pwrite to I/O dumping
 add system assist for qualifiers on svr4
 change printcall to getcaller and fix for linux and svr4
 fix fork hang for svr4 without pollable procfs
-add thread support
 print events on entry to and revents on exit from poll
 monitor procfs open and release the other child if the process wants to own it
 fix incorrect syscall number if exit without entry on svr4 without pr_syscall
@@ -27,4 +30,3 @@ ignore faults which occur before exec
 look for more ioctls on solaris, used in nslookup for example
 consider adding backtrace support
 consider adding general purpose interpreter
-rename program to sctrace to avoid conflict with svr4 strace?

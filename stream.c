@@ -78,7 +78,7 @@ int getting;
 		if (getting)
 			tprintf("maxlen=%d, ", sbp->maxlen);
 		tprintf("len=%d, buf=", sbp->len);
-		printstr(tcp, (int) sbp->buf, sbp->len);
+		printstr(tcp, (unsigned long) sbp->buf, sbp->len);
 		tprintf("}");
 	}
 }
