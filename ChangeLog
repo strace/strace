@@ -1,5 +1,18 @@
 2003-06-03  Roland McGrath  <roland@redhat.com>
 
+	* util.c (printcall) [LINUX]: Fix typo [IA62] -> [IA64].
+
+	Linux/ARM improvements from Russell King <rmk@arm.linux.org.uk>:
+	* defs.h [LINUX] (TCB_WAITEXECVE): Define for [ARM] too.
+	* process.c (struct_user_offsets) [LINUX] [ARM]: Add ARM registers.
+	* signal.c [LINUX] (sys_sigreturn) [ARM]: New case.
+	* syscall.c (get_scno, syscall_fixup) [LINUX] [ARM]: Case rewritten.
+	(get_error) [LINUX] [ARM]: Update.
+	(syscall_enter) [LINUX] [ARM]: New case.
+	* util.c (printcall) [LINUX] [ARM]: New case.
+
+	* debian/control (Standards-Version): Update to 3.5.10.
+
 	* strace.c (main): In PATH search, accept only a regular file with
 	execute bits set.  Fixes Debian bug #137103.
 
@@ -11,8 +24,6 @@
 
 	* configure.ac, NEWS: Version 4.4.97.
 	* strace.spec, debian/changelog: 4.4.97-1.
-
-	* debian/control (Architecture): Add shmedia.
 
 	* configure.ac, defs.h, mem.c, process.c, sock.c, syscall.c, util.c:
 	Merged in SHmedia port from Stephen Thomas <stephen.thomas@superh.com>.
