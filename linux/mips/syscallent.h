@@ -4066,8 +4066,8 @@
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 4065 */
 	{ 0,	0,	sys_setsid,		"setsid"	}, /* 4066 */
 	{ 3,	TS,	sys_sigaction,		"sigaction"	}, /* 4067 */
-	{ 0,	TS,	sys_siggetmask,		"sgetmask"	}, /* 4068 */
-	{ 1,	TS,	sys_sigsetmask,		"ssetmask"	}, /* 4069 */
+	{ 0,	TS,	sys_siggetmask,		"siggetmask"	}, /* 4068 */
+	{ 1,	TS,	sys_sigsetmask,		"sigsetmask"	}, /* 4069 */
 	{ 2,	0,	sys_setreuid,		"setreuid"	}, /* 4070 */
 	{ 2,	0,	sys_setregid,		"setregid"	}, /* 4071 */
 	{ 3,	TS,	sys_sigsuspend,		"sigsuspend"	}, /* 4072 */
