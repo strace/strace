@@ -1,12 +1,16 @@
-strace (4.5.1-1) unstable; urgency=low
+strace (4.5.2-1) unstable; urgency=low
 
   * New upstream version.
     + Check for errors writing to -o file, closes: #218762
-    + Fix typos in man page, closes: #217008
     + Print multiple ioctl code matches on Linux.
     + Various other fixes.
+    + Update typos and obsolete bits in man page, closes: #217008, #223390
+    + Fix compilation problems with newer kernel headers, closes: #223207
+    + Update HPPA system calls, closes: #231632
+    + Fix PID in messages, closes: #229802
+    + Fix s390 brokenness in 4.5, closes: #226098
 
- -- Roland McGrath <frob@debian.org>  Thu, 13 Nov 2003 14:37:51 -0800
+ -- Roland McGrath <frob@debian.org>  Mon,  1 Mar 2004 22:44:55 -0800
 
 strace (4.5-1) unstable; urgency=low
 
