@@ -68,6 +68,7 @@
 #define sys_fdatasync		sys_close
 #define sys_mlock		sys_munmap
 #define sys_munlock		sys_munmap
+#define sys_clock_getres	sys_clock_gettime
 
 /* printargs does the right thing */
 #define	sys_setup		printargs
@@ -85,6 +86,8 @@
 #define	sys_idle		printargs
 #define	sys_getpgid		printargs
 #define sys_munlockall		printargs
+#define sys_timer_getoverrun	printargs
+#define sys_timer_delete	printargs
 
 /* subcall entry points */
 #define	sys_socketcall		printargs

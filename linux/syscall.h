@@ -89,6 +89,9 @@ int sys_setxattr(), sys_fsetxattr(), sys_getxattr(), sys_fgetxattr();
 int sys_listxattr(), sys_flistxattr(), sys_removexattr(), sys_fremovexattr();
 int sys_sched_setaffinity(), sys_sched_getaffinity(), sys_futex();
 int sys_set_thread_area(), sys_get_thread_area(), sys_remap_file_pages();
+int sys_timer_create(), sys_timer_delete(), sys_timer_getoverrun();
+int sys_timer_gettime(), sys_timer_settime(), sys_clock_settime();
+int sys_clock_gettime(), sys_clock_getres(), sys_clock_nanosleep();
 
 
 /* sys_socketcall subcalls */

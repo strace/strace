@@ -358,5 +358,144 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+static struct xlat clockflags[] = {
+  { TIMER_ABSTIME, "TIMER_ABSTIME" },
+  { 0,             NULL }
+};
+
+int
+sys_clock_settime(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, ", tcp->u_arg[0]);
+		printtv(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
+int
+sys_clock_gettime(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, ", tcp->u_arg[0]);
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else
+			printtv(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
+int
+sys_clock_nanosleep(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, ", tcp->u_arg[0]);
+		printflags(clockflags, tcp->u_arg[1]);
+		tprintf(", ");
+		printtv(tcp, tcp->u_arg[2]);
+		tprintf(", ");
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[3]);
+		else
+			printtv(tcp, tcp->u_arg[3]);
+	}
+	return 0;
+}
+
+#ifndef SIGEV_THREAD_ID
+# define SIGEV_THREAD_ID 4
+#endif
+static struct xlat sigev_value[] = {
+	{ SIGEV_SIGNAL+1, "SIGEV_SIGNAL" },
+	{ SIGEV_NONE+1, "SIGEV_NONE" },
+	{ SIGEV_THREAD+1, "SIGEV_THREAD" },
+	{ SIGEV_THREAD_ID+1, "SIGEV_THREAD_ID" },
+	{ 0, NULL }
+};
+
+void
+printsigevent(tcp, arg)
+struct tcb *tcp;
+long arg;
+{
+	struct sigevent sev;
+	if (umove (tcp, arg, &sev) < 0)
+		tprintf("{...}");
+	else {
+		tprintf("{%p, %u, ", sev.sigev_value.sival_ptr,
+			sev.sigev_signo);
+		printxval(sigev_value, sev.sigev_notify+1, "SIGEV_???");
+		tprintf(", ");
+		if (sev.sigev_notify == SIGEV_THREAD_ID)
+			/* _pad[0] is the _tid field which might not be
+			   present in the userlevel definition of the
+			   struct.  */
+			tprintf("{%d}", sev._sigev_un._pad[0]);
+		else
+			tprintf("{...}");
+		tprintf("}");
+	}
+}
+
+int
+sys_timer_create(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, ", tcp->u_arg[0]);
+		printsigevent(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[2]);
+		else {
+			void *p;
+			umove(tcp, tcp->u_arg[2], &p);
+			tprintf("{%p}", p);
+		}
+	}
+	return 0;
+}
+
+int
+sys_timer_settime(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, ", tcp->u_arg[0]);
+		printflags(clockflags, tcp->u_arg[1]);
+		tprintf(", ");
+		printitv(tcp, tcp->u_arg[2]);
+		tprintf(", ");
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[3]);
+		else
+			printitv(tcp, tcp->u_arg[3]);
+	}
+	return 0;
+}
+
+int
+sys_timer_gettime(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, ", tcp->u_arg[0]);
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else
+			printitv(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
 #endif /* LINUX */
 
