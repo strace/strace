@@ -417,8 +417,14 @@ char *argv[];
 		char pathname[MAXPATHLEN];
 
 		filename = argv[optind];
-		if (strchr(filename, '/'))
+		if (strchr(filename, '/')) {
+			if (strlen(filename) > sizeof pathname - 1) {
+				errno = ENAMETOOLONG;
+				perror("strace: exec");
+				exit(1);
+			}
 			strcpy(pathname, filename);
+		}
 #ifdef USE_DEBUGGING_EXEC
 		/*
 		 * Debuggers customarily check the current directory
@@ -443,6 +449,8 @@ char *argv[];
 					getcwd(pathname, MAXPATHLEN);
 					len = strlen(pathname);
 				}
+				else if (n > sizeof pathname - 1)
+					continue;
 				else {
 					strncpy(pathname, path, n);
 					len = n;
