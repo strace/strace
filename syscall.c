@@ -1296,6 +1296,8 @@ struct tcb *tcp;
 #elif defined (X86_64)
 	if (upeek(pid, 8*RAX, &rax) < 0)
 		return -1;
+	if (current_personality == 1)
+		rax = (long int)(int)rax; /* sign extend from 32 bits */
 	if (rax != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
 		if (debug)
 			fprintf(stderr, "stray syscall exit: rax = %ld\n", rax);
@@ -1615,7 +1617,7 @@ force_result(tcp, error, rval)
 #else /* !I386 */
 #ifdef X86_64
 	rax = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(RAX * 4), rax) < 0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(RAX * 8), rax) < 0)
 		return -1;
 #else
 #ifdef IA64
