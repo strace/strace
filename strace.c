@@ -44,6 +44,7 @@
 #include <grp.h>
 #include <string.h>
 #include <limits.h>
+#include <dirent.h>
 
 #if defined(IA64) && defined(LINUX)
 # include <asm/ptrace_offsets.h>
@@ -399,6 +400,64 @@ char *argv[];
 			continue;
 		}
 #else /* !USE_PROCFS */
+# ifdef LINUX
+		if (tcp->flags & TCB_CLONE_THREAD)
+			continue;
+		{
+			char procdir[MAXPATHLEN];
+			DIR *dir;
+			sprintf(procdir, "/proc/%d/task", tcp->pid);
+			dir = opendir(procdir);
+			if (dir != NULL) {
+				unsigned int ntid = 0, nerr = 0;
+				struct dirent *de;
+				int tid;
+				while ((de = readdir(dir)) != NULL) {
+					if (de->d_fileno == 0 ||
+					    de->d_name[0] == '.')
+						continue;
+					tid = atoi(de->d_name);
+					if (tid <= 0)
+						continue;
+					++ntid;
+					if (ptrace(PTRACE_ATTACH, tid,
+						   (char *) 1, 0) < 0)
+						++nerr;
+					else if (tid != tcbtab[c]->pid) {
+						tcp = alloctcb(tid);
+						if (tcp == NULL) {
+							fprintf(stderr, "%s: out of memory\n",
+								progname);
+							exit(1);
+						}
+						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED;
+						tcbtab[c]->nchildren++;
+						tcbtab[c]->nclone_threads++;
+						tcbtab[c]->nclone_detached++;
+						tcp->parent = tcbtab[c];
+					}
+				}
+				closedir(dir);
+				if (nerr == ntid) {
+					perror("attach: ptrace(PTRACE_ATTACH, ...)");
+					droptcb(tcp);
+					continue;
+				}
+				if (!qflag) {
+					ntid -= nerr;
+					if (ntid > 1)
+						fprintf(stderr, "\
+Process %u attached with %u threads - interrupt to quit\n",
+							tcp->pid, ntid);
+					else
+						fprintf(stderr, "\
+Process %u attached - interrupt to quit\n",
+							tcp->pid);
+				}
+				continue;
+			}
+		}
+# endif
 		if (ptrace(PTRACE_ATTACH, tcp->pid, (char *) 1, 0) < 0) {
 			perror("attach: ptrace(PTRACE_ATTACH, ...)");
 			droptcb(tcp);
