@@ -1,3 +1,8 @@
+2003-06-10  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.4.98.
+	* strace.spec, debian/changelog: 4.4.98-1.
+
 2003-06-09  Roland McGrath  <roland@redhat.com>
 
 	* linux/s390x/syscallent.h: Update many syscalls.
