@@ -1136,19 +1136,19 @@
 	{ 4,	0,	sys_futex,		"futex"		}, /* 1230 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"},/* 1232 */
-	{ 8,	0,	printargs,		"set_tid_address"}, /* 1233 */
+	{ 1,	0,	printargs,		"set_tid_address"}, /* 1233 */
 	{ 8,	0,	printargs,		"SYS_1234"	}, /* 1234 */
 	{ 8,	0,	printargs,		"SYS_1235"	}, /* 1235 */
-	{ 8,	0,	printargs,		"exit_group"	}, /* 1236 */
-	{ 8,	0,	printargs,		"lookup_dcookie"}, /* 1237 */
+	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
+	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 1237 */
 	{ 2,	0,	printargs,		"io_setup"	}, /* 1238 */
 	{ 1,	0,	printargs,		"io_destroy"	}, /* 1239 */
 	{ 5,	0,	printargs,		"io_getevents"	}, /* 1240 */
 	{ 3,	0,	printargs,		"io_submit"	}, /* 1241 */
 	{ 3,	0,	printargs,		"io_cancel"	}, /* 1242 */
-	{ 8,	0,	printargs,		"epoll_create"	}, /* 1243 */
-	{ 8,	0,	printargs,		"epoll_ctl"	}, /* 1244 */
-	{ 8,	0,	printargs,		"epoll_wait"	}, /* 1245 */
+	{ 1,	0,	printargs,		"epoll_create"	}, /* 1243 */
+	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 1244 */
+	{ 4,	0,	printargs,		"epoll_wait"	}, /* 1245 */
 	{ 8,	0,	printargs,		"SYS_1246"	}, /* 1246 */
 	{ 8,	0,	printargs,		"SYS_1247"	}, /* 1247 */
 	{ 8,	0,	printargs,		"SYS_1248"	}, /* 1248 */
