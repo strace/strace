@@ -218,8 +218,9 @@ Here the second argument represents the full set of all signals.
 .TP 12
 .TP
 .B \-c
-Count time, calls, and errors for each system call and report a
-summary on program exit.
+Count time, calls, and errors for each system call and report a summary on
+program exit.  On Linux, this attempts to show system time (CPU time spent
+running in the kernel) independent of wall clock time.
 .TP
 .B \-d
 Show some debugging output of
