@@ -1,3 +1,9 @@
+2000-01-02 Pavel Machek	     <pavel@ucw.cz>
+
+  * probe if sys/poll.h exists in configure + minor cleanups
+
+  * syscall.c: split trace_syscall into few pieces to make code readable
+
 2000-01-21 Wichert Akkerman  <wakkerma@debian.org>
 
   * Release version 4.2 to get the current updates out and so

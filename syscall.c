@@ -567,42 +567,12 @@ struct tcb *tcp;
 }
 
 int
-trace_syscall(tcp)
+get_scno(tcp)
 struct tcb *tcp;
 {
-	int sys_res;
-	struct timeval tv;
 	long scno = 0;
-#ifdef LINUX
-#if defined (I386)
-	long eax;
-#elif defined (POWERPC)
-	long result,flags;
-#elif defined (M68K)
-	int d0;
-#elif defined (ARM)
-	int r0;
-#elif defined (ALPHA)
-	long r0;
-	long a3;
-#elif defined(MIPS)
-	long r2,a3;
-#elif defined (SPARC)
-	struct regs regs;
-	unsigned long trap;
-#elif defined(S390)
-	long gpr2;
-	long pc;
-#endif 
-#endif /* LINUX */
-
-#ifndef SVR4
 	int pid = tcp->pid;
-#endif /* !SVR4 */
 
-	/* Measure the exit time as early as possible to avoid errors. */
-	if (dtime && (tcp->flags & TCB_INSYSCALL))
-		gettimeofday(&tv, NULL);
 #ifdef LINUX
 #if defined(S390)
 	if (upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
@@ -754,6 +724,39 @@ struct tcb *tcp;
 #else /* !HAVE_PR_SYSCALL */
 	scno = tcp->status.PR_WHAT;
 #endif /* !HAVE_PR_SYSCALL */
+#endif
+	tcp->scno = scno;
+	return 1;
+}
+
+#ifdef LINUX
+#if defined (I386)
+	static long eax;
+#elif defined (POWERPC)
+	static long result,flags;
+#elif defined (M68K)
+	static int d0;
+#elif defined (ARM)
+	static int r0;
+#elif defined (ALPHA)
+	static long r0;
+	static long a3;
+#elif defined (SPARC)
+	static struct pt_regs regs;
+	static unsigned long trap;
+#elif defined(S390)
+	static long gpr2;
+	static long pc;
+#endif 
+#endif /* LINUX */
+
+int
+syscall_fixup(tcp)
+struct tcb *tcp;
+{
+	int pid = tcp->pid;
+
+#ifdef SVR4
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		if (tcp->status.PR_WHY != PR_SYSENTRY) {
 			if (
@@ -837,10 +840,14 @@ struct tcb *tcp;
 #else
 #endif
 #endif /* LINUX */
+	return 1;
+}
 
-	if (tcp->flags & TCB_INSYSCALL) {
-		long u_error;
-
+int
+get_error(tcp)
+struct tcb *tcp;
+{
+	int u_error = 0;
 #ifdef LINUX
 #ifdef I386
 		if (eax < 0 && -eax < nerrnos) {
@@ -962,139 +969,14 @@ struct tcb *tcp;
 		}
 #endif /* MIPS */
 #endif /* SVR4 */
-		tcp->u_error = u_error;
+	tcp->u_error = u_error;
+	return 1;
+}
 
-		internal_syscall(tcp);
-		if (!(qual_flags[tcp->scno] & QUAL_TRACE)) {
-			tcp->flags &= ~TCB_INSYSCALL;
-			return 0;
-		}
-
-		if (tcp->flags & TCB_REPRINT) {
-			printleader(tcp);
-			tprintf("<... ");
-			if (tcp->scno >= nsyscalls)
-				tprintf("syscall_%lu", tcp->scno);
-			else
-				tprintf("%s", sysent[tcp->scno].sys_name);
-			tprintf(" resumed> ");
-		}
-
-		if (cflag) {
-			call_count[tcp->scno]++;
-			if (u_error)
-				error_count[tcp->scno]++;
-			tv_sub(&tv, &tv, &tcp->etime);
-#ifdef LINUX
-			if (tv_cmp(&tv, &tcp->dtime) > 0) {
-				static struct timeval one_tick =
-					{ 0, 1000000 / HZ };
-
-				if (tv_nz(&tcp->dtime))
-					tv = tcp->dtime;
-				else if (tv_cmp(&tv, &one_tick) > 0) {
-					if (tv_cmp(&shortest, &one_tick) < 0)
-						tv = shortest;
-					else
-						tv = one_tick;
-				}
-			}
-#endif /* LINUX */
-			if (tv_cmp(&tv, &shortest) < 0)
-				shortest = tv;
-			tv_add(&tv_count[tcp->scno],
-				&tv_count[tcp->scno], &tv);
-			tcp->flags &= ~TCB_INSYSCALL;
-			return 0;
-		}
-
-		if (tcp->scno >= nsyscalls
-		    || (qual_flags[tcp->scno] & QUAL_RAW))
-			sys_res = printargs(tcp);
-		else
-			sys_res = (*sysent[tcp->scno].sys_func)(tcp);
-		u_error = tcp->u_error;
-		tprintf(") ");
-		tabto(acolumn);
-		if (qual_flags[tcp->scno] & QUAL_RAW) {
-			if (u_error)
-				tprintf("= -1 (errno %ld)", u_error);
-			else
-				tprintf("= %#lx", tcp->u_rval);
-		}
-		else if (!(sys_res & RVAL_NONE) && u_error) {
-#ifdef LINUX
-			switch (u_error) {
-			case ERESTARTSYS:
-				tprintf("= ? ERESTARTSYS (To be restarted)");
-				break;
-			case ERESTARTNOINTR:
-				tprintf("= ? ERESTARTNOINTR (To be restarted)");
-				break;
-			case ERESTARTNOHAND:
-				tprintf("= ? ERESTARTNOHAND (To be restarted)");
-				break;
-			default:
-#endif /* LINUX */
-				tprintf("= -1 ");
-				if (u_error < nerrnos && u_error < sys_nerr)
-					tprintf("%s (%s)", errnoent[u_error],
-						sys_errlist[u_error]);
-				else if (u_error < nerrnos)
-					tprintf("%s (errno %ld)",
-						errnoent[u_error], u_error);
-				else if (u_error < sys_nerr)
-					tprintf("ERRNO_%ld (%s)", u_error,
-						sys_errlist[u_error]);
-				else
-					tprintf("E??? (errno %ld)", u_error);
-#ifdef LINUX
-				break;
-			}
-#endif /* LINUX */
-		}
-		else {
-			if (sys_res & RVAL_NONE)
-				tprintf("= ?");
-			else {
-				switch (sys_res & RVAL_MASK) {
-				case RVAL_HEX:
-					tprintf("= %#lx", tcp->u_rval);
-					break;
-				case RVAL_OCTAL:
-					tprintf("= %#lo", tcp->u_rval);
-					break;
-				case RVAL_UDECIMAL:
-					tprintf("= %lu", tcp->u_rval);
-					break;
-				case RVAL_DECIMAL:
-					tprintf("= %ld", tcp->u_rval);
-					break;
-				default:
-					fprintf(stderr,
-						"invalid rval format\n");
-					break;
-				}
-			}
-			if ((sys_res & RVAL_STR) && tcp->auxstr)
-				tprintf(" (%s)", tcp->auxstr);
-		}
-		if (dtime) {
-			tv_sub(&tv, &tv, &tcp->etime);
-			tprintf(" <%ld.%06ld>",
-				(long) tv.tv_sec, (long) tv.tv_usec);
-		}
-		printtrailer(tcp);
-
-		dumpio(tcp);
-		if (fflush(tcp->outf) == EOF)
-			return -1;
-		tcp->flags &= ~TCB_INSYSCALL;
-		return 0;
-	}
-
-	/* Entering system call */
-	tcp->scno = scno;
+int syscall_enter(tcp)
+struct tcb *tcp;
+{
+	int pid = tcp->pid;
 #ifdef LINUX
 #if defined(S390)
 	{
@@ -1227,6 +1109,169 @@ struct tcb *tcp;
 #endif /* !HAVE_PR_SYSCALL */
 #endif /* !MIPS */
 #endif /* SVR4 */
+	return 1;
+}
+
+int
+trace_syscall(tcp)
+struct tcb *tcp;
+{
+	int sys_res;
+	struct timeval tv;
+	int res;
+
+	/* Measure the exit time as early as possible to avoid errors. */
+	if (dtime && (tcp->flags & TCB_INSYSCALL))
+		gettimeofday(&tv, NULL);
+
+	res = get_scno(tcp);
+	if (res != 1)
+		return res;
+
+	res = syscall_fixup(tcp);
+	if (res != 1)
+		return res;
+
+	if (tcp->flags & TCB_INSYSCALL) {
+		long u_error;
+		res = get_error(tcp);
+		if (res != 1)
+			return res;
+		u_error = tcp->u_error;
+
+
+		internal_syscall(tcp);
+		if (!(qual_flags[tcp->scno] & QUAL_TRACE)) {
+			tcp->flags &= ~TCB_INSYSCALL;
+			return 0;
+		}
+
+		if (tcp->flags & TCB_REPRINT) {
+			printleader(tcp);
+			tprintf("<... ");
+			if (tcp->scno >= nsyscalls)
+				tprintf("syscall_%lu", tcp->scno);
+			else
+				tprintf("%s", sysent[tcp->scno].sys_name);
+			tprintf(" resumed> ");
+		}
+
+		if (cflag) {
+			call_count[tcp->scno]++;
+			if (tcp->u_error)
+				error_count[tcp->scno]++;
+			tv_sub(&tv, &tv, &tcp->etime);
+#ifdef LINUX
+			if (tv_cmp(&tv, &tcp->dtime) > 0) {
+				static struct timeval one_tick =
+					{ 0, 1000000 / HZ };
+
+				if (tv_nz(&tcp->dtime))
+					tv = tcp->dtime;
+				else if (tv_cmp(&tv, &one_tick) > 0) {
+					if (tv_cmp(&shortest, &one_tick) < 0)
+						tv = shortest;
+					else
+						tv = one_tick;
+				}
+			}
+#endif /* LINUX */
+			if (tv_cmp(&tv, &shortest) < 0)
+				shortest = tv;
+			tv_add(&tv_count[tcp->scno],
+				&tv_count[tcp->scno], &tv);
+			tcp->flags &= ~TCB_INSYSCALL;
+			return 0;
+		}
+
+		if (tcp->scno >= nsyscalls
+		    || (qual_flags[tcp->scno] & QUAL_RAW))
+			sys_res = printargs(tcp);
+		else
+			sys_res = (*sysent[tcp->scno].sys_func)(tcp);
+		u_error = tcp->u_error;
+		tprintf(") ");
+		tabto(acolumn);
+		if (qual_flags[tcp->scno] & QUAL_RAW) {
+			if (u_error)
+				tprintf("= -1 (errno %ld)", u_error);
+			else
+				tprintf("= %#lx", tcp->u_rval);
+		}
+		else if (!(sys_res & RVAL_NONE) && u_error) {
+			switch (u_error) {
+#ifdef LINUX
+			case ERESTARTSYS:
+				tprintf("= ? ERESTARTSYS (To be restarted)");
+				break;
+			case ERESTARTNOINTR:
+				tprintf("= ? ERESTARTNOINTR (To be restarted)");
+				break;
+			case ERESTARTNOHAND:
+				tprintf("= ? ERESTARTNOHAND (To be restarted)");
+				break;
+#endif /* LINUX */
+			default:
+				tprintf("= -1 ");
+				if (u_error < nerrnos && u_error < sys_nerr)
+					tprintf("%s (%s)", errnoent[u_error],
+						sys_errlist[u_error]);
+				else if (u_error < nerrnos)
+					tprintf("%s (errno %ld)",
+						errnoent[u_error], u_error);
+				else if (u_error < sys_nerr)
+					tprintf("ERRNO_%ld (%s)", u_error,
+						sys_errlist[u_error]);
+				else
+					tprintf("E??? (errno %ld)", u_error);
+				break;
+			}
+		}
+		else {
+			if (sys_res & RVAL_NONE)
+				tprintf("= ?");
+			else {
+				switch (sys_res & RVAL_MASK) {
+				case RVAL_HEX:
+					tprintf("= %#lx", tcp->u_rval);
+					break;
+				case RVAL_OCTAL:
+					tprintf("= %#lo", tcp->u_rval);
+					break;
+				case RVAL_UDECIMAL:
+					tprintf("= %lu", tcp->u_rval);
+					break;
+				case RVAL_DECIMAL:
+					tprintf("= %ld", tcp->u_rval);
+					break;
+				default:
+					fprintf(stderr,
+						"invalid rval format\n");
+					break;
+				}
+			}
+			if ((sys_res & RVAL_STR) && tcp->auxstr)
+				tprintf(" (%s)", tcp->auxstr);
+		}
+		if (dtime) {
+			tv_sub(&tv, &tv, &tcp->etime);
+			tprintf(" <%ld.%06ld>",
+				(long) tv.tv_sec, (long) tv.tv_usec);
+		}
+		printtrailer(tcp);
+
+		dumpio(tcp);
+		if (fflush(tcp->outf) == EOF)
+			return -1;
+		tcp->flags &= ~TCB_INSYSCALL;
+		return 0;
+	}
+
+	/* Entering system call */
+	res = syscall_enter(tcp);
+	if (res != 1)
+		return res;
+
 	switch (tcp->scno + NR_SYSCALL_BASE) {
 #ifdef LINUX
 #if !defined (ALPHA) && !defined(SPARC) && !defined(MIPS)
