@@ -78,7 +78,6 @@
 #define sys_fstatfs printargs
 #define sys_statvfs printargs
 #define sys_fstatvfs printargs
-#define sys_fork1 printargs
 #define sys_sigsendsys printargs
 #define sys_gtty printargs
 #define sys_vtrace printargs
@@ -142,7 +141,67 @@
 #define sys_sysfs1 printargs
 #define sys_sysfs2 printargs
 #define sys_sysfs3 printargs
+#define sys_keyctl printargs
+#define sys_secsys printargs
+#define sys_filepriv printargs
+#define sys_procpriv printargs
+#define sys_devstat printargs
+#define sys_fdevstat printargs
+#define sys_flvlfile printargs
+#define sys_lvlfile printargs
+#define sys_lvlequal printargs
+#define sys_lvlproc printargs
+#define sys_lvlipc printargs
+#define sys_auditevt printargs
+#define sys_auditctl printargs
+#define sys_auditdmp printargs
+#define sys_auditlog printargs
+#define sys_auditbuf printargs
+#define sys_lvldom printargs
+#define sys_lvlvfs printargs
+#define sys_mkmld printargs
+#define sys_mldmode printargs
+#define sys_secadvise printargs
+#define sys_online printargs
+#define sys_lwpinfo printargs
+#define sys_lwpprivate printargs
+#define sys_processor_exbind printargs
+#define sys_prepblock printargs
+#define sys_block printargs
+#define sys_rdblock printargs
+#define sys_unblock printargs
+#define sys_cancelblock printargs
+#define sys_lwpkill printargs
+#define sys_sigwait printargs
+#define sys_modload printargs
+#define sys_moduload printargs
+#define sys_modpath printargs
+#define sys_modstat printargs
+#define sys_modadm printargs
+#define sys_lwpsuspend printargs
+#define sys_lwpcontinue printargs
+#define sys_priocntllst printargs
+#define sys_lwp_sema_trywait printargs
 #define sys_xsetsockaddr printargs
+#define sys_fstatvfs64 printargs
+#define sys_statvfs64 printargs
+#define sys_ftruncate64 printargs
+#define sys_truncate64 printargs
+#define sys_getrlimit64 printargs
+#define sys_setrlimit64 printargs
+#define sys_mmap64 printargs
+#define sys_pread64 printargs
+#define sys_pwrite64 printargs
+#define sys_creat64 printargs
+#define sys_dshmsys printargs
+#define sys_invlpg printargs
+#define sys_rfork1 printargs
+#define sys_rforkall printargs
+#define sys_rexecve printargs
+#define sys_migrate printargs
+#define sys_kill3 printargs
+#define sys_ssisys printargs
+#define sys_xbindresvport printargs
 
 /* like another call */
 #define sys_lchown sys_chown
@@ -164,6 +223,9 @@
 #define sys_sigrelse sys_sighold
 #define sys_sigignore sys_sighold
 #define sys_sigpause sys_sighold
+#define sys_sleep sys_alarm
+#define sys_fork1 sys_fork
+#define sys_forkall sys_fork
 
 /* printargs does the right thing */
 #define sys_sync printargs
@@ -275,4 +337,5 @@
 #define sys_gettimeofday printargs
 #define sys_getitimer printargs
 #define sys_setitimer printargs
+#define sys_settimeofday printargs
 #endif

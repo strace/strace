@@ -43,6 +43,7 @@ extern int sys_unlink();
 extern int sys_exec();
 extern int sys_chdir();
 extern int sys_time();
+extern int sys_settimeofday();
 extern int sys_mknod();
 extern int sys_chmod();
 extern int sys_chown();

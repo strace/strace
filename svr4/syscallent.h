@@ -363,73 +363,73 @@
 #if UNIXWARE >= 2
 	{ -1,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
 	{ -1,	0, 	printargs,		"SYS_142"	}, /* 142 */
-	{ -1,	0,	printargs,		"keyctl"	}, /* 143 */
-	{ -1,	0,	printargs,		"secsys"	}, /* 144 */
-	{ -1,	0,	printargs,		"filepriv"	}, /* 145 */
-	{ -1,	0,	printargs,		"procpriv"	}, /* 146 */
-	{ -1,	0,	printargs,		"devstat"	}, /* 147 */
+	{ -1,	0,	sys_keyctl,		"keyctl"	}, /* 143 */
+	{ -1,	0,	sys_secsys,		"secsys"	}, /* 144 */
+	{ -1,	0,	sys_filepriv,		"filepriv"	}, /* 145 */
+	{ -1,	0,	sys_procpriv,		"procpriv"	}, /* 146 */
+	{ -1,	0,	sys_devstat,		"devstat"	}, /* 147 */
 	{ -1,	0,	sys_aclipc,		"aclipc"	}, /* 148 */
-	{ -1,	0,	printargs,		"fdevstat"	}, /* 149 */
-	{ -1,	0,	printargs,		"flvlfile"	}, /* 150 */
-	{ -1,	0,	printargs,		"lvlfile"	}, /* 151 */
+	{ -1,	0,	sys_fdevstat,		"fdevstat"	}, /* 149 */
+	{ -1,	0,	sys_flvlfile,		"flvlfile"	}, /* 150 */
+	{ -1,	0,	sys_lvlfile,		"lvlfile"	}, /* 151 */
 	{ -1,	0, 	printargs,		"SYS_152"	}, /* 152 */
-	{ -1,	0,	printargs,		"lvlequal"	}, /* 153 */
-	{ -1,	0,	printargs,		"lvlproc"	}, /* 154 */
+	{ -1,	0,	sys_lvlequal,		"lvlequal"	}, /* 153 */
+	{ -1,	0,	sys_lvlproc,		"lvlproc"	}, /* 154 */
 	{ -1,	0, 	printargs,		"SYS_155"	}, /* 155 */
-	{ -1,	0,	printargs,		"lvlipc"	}, /* 156 */
+	{ -1,	0,	sys_lvlipc,		"lvlipc"	}, /* 156 */
 	{ -1,	0,	sys_acl,		"acl"		}, /* 157 */
-	{ -1,	0,	printargs,		"auditevt"	}, /* 158 */
-	{ -1,	0,	printargs,		"auditctl"	}, /* 159 */
-	{ -1,	0,	printargs,		"auditdmp"	}, /* 160 */
-	{ -1,	0,	printargs,		"auditlog"	}, /* 161 */
-	{ -1,	0,	printargs,		"auditbuf"	}, /* 162 */
-	{ -1,	0,	printargs,		"lvldom"	}, /* 163 */
-	{ -1,	0,	printargs,		"lvlvfs"	}, /* 164 */
-	{ -1,	0,	printargs,		"mkmld"		}, /* 165 */
-	{ -1,	0,	printargs,		"mldmode"	}, /* 166 */
-	{ -1,	0,	printargs,		"secadvise"	}, /* 167 */
-	{ -1,	0,	printargs,		"online"	}, /* 168 */
+	{ -1,	0,	sys_auditevt,		"auditevt"	}, /* 158 */
+	{ -1,	0,	sys_auditctl,		"auditctl"	}, /* 159 */
+	{ -1,	0,	sys_auditdmp,		"auditdmp"	}, /* 160 */
+	{ -1,	0,	sys_auditlog,		"auditlog"	}, /* 161 */
+	{ -1,	0,	sys_auditbuf,		"auditbuf"	}, /* 162 */
+	{ -1,	0,	sys_lvldom,		"lvldom"	}, /* 163 */
+	{ -1,	0,	sys_lvlvfs,		"lvlvfs"	}, /* 164 */
+	{ -1,	0,	sys_mkmld,		"mkmld"		}, /* 165 */
+	{ -1,	0,	sys_mldmode,		"mldmode"	}, /* 166 */
+	{ -1,	0,	sys_secadvise,		"secadvise"	}, /* 167 */
+	{ -1,	0,	sys_online,		"online"	}, /* 168 */
 	{ -1,	0,	sys_setitimer,		"setitimer"	}, /* 169 */
 	{ -1,	0,	sys_getitimer,		"getitimer"	}, /* 170 */
 	{ -1,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 171 */
-	{ -1,	0,	printargs,		"settimeofday"	}, /* 172 */
+	{ -1,	0,	sys_settimeofday,	"settimeofday"	}, /* 172 */
 	{ -1,	0,	sys_lwp_create,		"lwpcreate"	}, /* 173 */
 	{ -1,	0,	sys_lwp_exit,		"lwpexit"	}, /* 174 */
 	{ -1,	0,	sys_lwp_wait,		"lwpwait"	}, /* 175 */
 	{ -1,	0,	sys_lwp_self,		"lwpself"	}, /* 176 */
-	{ -1,	0,	printargs,		"lwpinfo"	}, /* 177 */
-	{ -1,	0,	printargs,		"lwpprivate"	}, /* 178 */
+	{ -1,	0,	sys_lwpinfo,		"lwpinfo"	}, /* 177 */
+	{ -1,	0,	sys_lwpprivate,		"lwpprivate"	}, /* 178 */
 	{ -1,	0,	sys_processor_bind,	"processor_bind"}, /* 179 */
-	{ -1,	0,	printargs,		"processor_exbind"}, /* 180 */
+	{ -1,	0,	sys_processor_exbind,	"processor_exbind"}, /* 180 */
 	{ -1,	0, 	printargs,		"SYS_181"	}, /* 181 */
 	{ -1,	0, 	printargs,		"SYS_182"	}, /* 182 */
-	{ -1,	0,	printargs,		"prepblock"	}, /* 183 */
-	{ -1,	0,	printargs,		"block"		}, /* 184 */
-	{ -1,	0,	printargs,		"rdblock"	}, /* 185 */
-	{ -1,	0,	printargs,		"unblock"	}, /* 186 */
-	{ -1,	0,	printargs,		"cancelblock"	}, /* 187 */
+	{ -1,	0,	sys_prepblock,		"prepblock"	}, /* 183 */
+	{ -1,	0,	sys_block,		"block"		}, /* 184 */
+	{ -1,	0,	sys_rdblock,		"rdblock"	}, /* 185 */
+	{ -1,	0,	sys_unblock,		"unblock"	}, /* 186 */
+	{ -1,	0,	sys_cancelblock,	"cancelblock"	}, /* 187 */
 	{ -1,	0, 	printargs,		"SYS_188"	}, /* 188 */
 	{ -1,	TF,	sys_pread,		"pread"		}, /* 189 */
 	{ -1,	TF,	sys_pwrite,		"pwrite"	}, /* 190 */
 	{ -1,	TF,	sys_truncate,		"truncate"	}, /* 191 */
 	{ -1,	TF,	sys_ftruncate,		"ftruncate"	}, /* 192 */
-	{ -1,	0,	printargs,		"lwpkill"	}, /* 193 */
-	{ -1,	0,	printargs,		"sigwait"	}, /* 194 */
-	{ -1,	0,	printargs,		"fork1"		}, /* 195 */
-	{ -1,	0,	printargs,		"forkall"	}, /* 196 */
-	{ -1,	0,	printargs,		"modload"	}, /* 197 */
-	{ -1,	0,	printargs,		"moduload"	}, /* 198 */
-	{ -1,	0,	printargs,		"modpath"	}, /* 199 */
-	{ -1,	0,	printargs,		"modstat"	}, /* 200 */
-	{ -1,	0,	printargs,		"modadm"	}, /* 201 */
+	{ -1,	0,	sys_lwpkill,		"lwpkill"	}, /* 193 */
+	{ -1,	0,	sys_sigwait,		"sigwait"	}, /* 194 */
+	{ -1,	0,	sys_fork1,		"fork1"		}, /* 195 */
+	{ -1,	0,	sys_forkall,		"forkall"	}, /* 196 */
+	{ -1,	0,	sys_modload,		"modload"	}, /* 197 */
+	{ -1,	0,	sys_moduload,		"moduload"	}, /* 198 */
+	{ -1,	0,	sys_modpath,		"modpath"	}, /* 199 */
+	{ -1,	0,	sys_modstat,		"modstat"	}, /* 200 */
+	{ -1,	0,	sys_modadm,		"modadm"	}, /* 201 */
 	{ -1,	0,	sys_getksym,		"getksym"	}, /* 202 */
-	{ -1,	0,	printargs,		"lwpsuspend"	}, /* 203 */
-	{ -1,	0,	printargs,		"lwpcontinue"	}, /* 204 */
-	{ -1,	0,	printargs,		"priocntllst"	}, /* 205 */
-	{ -1,	0,	printargs,		"sleep"		}, /* 206 */
-	{ -1,	0,	printargs,		"lwp_sema_wait"	}, /* 207 */
-	{ -1,	0,	printargs,		"lwp_sema_post"	}, /* 208 */
-	{ -1,	0,	printargs,		"lwp_sema_trywait"}, /* 209 */
+	{ -1,	0,	sys_lwpsuspend,		"lwpsuspend"	}, /* 203 */
+	{ -1,	0,	sys_lwpcontinue,	"lwpcontinue"	}, /* 204 */
+	{ -1,	0,	sys_priocntllst,	"priocntllst"	}, /* 205 */
+	{ -1,	0,	sys_sleep,		"sleep"		}, /* 206 */
+	{ -1,	0,	sys_lwp_sema_wait,	"lwp_sema_wait"	}, /* 207 */
+	{ -1,	0,	sys_lwp_sema_post,	"lwp_sema_post"	}, /* 208 */
+	{ -1,	0,	sys_lwp_sema_trywait,	"lwp_sema_trywait"}, /* 209 */
 #else
 	{ -1,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
 	{ -1,	0,	sys_vtrace,		"vtrace"	}, /* 142 */
@@ -520,28 +520,28 @@
 	{ -1,	0,	printargs,		"SYS_214"	}, /* 214 */
 	{ -1,	0,	printargs,		"SYS_215"	}, /* 215 */
 #if UNIXWARE >= 7
-	{ -1,	0,	printargs,		"fstatvfs64"	}, /* 216 */
-	{ -1,	0,	printargs,		"statvfs64"	}, /* 217 */
-	{ -1,	0,	printargs,		"ftruncate64"	}, /* 218 */
-	{ -1,	0,	printargs,		"truncate64"	}, /* 219 */
-	{ -1,	0,	printargs,		"getrlimit64"	}, /* 220 */
-	{ -1,	0,	printargs,		"setrlimit64"	}, /* 221 */
+	{ -1,	TF,	sys_fstatvfs64,		"fstatvfs64"	}, /* 216 */
+	{ -1,	TF,	sys_statvfs64,		"statvfs64"	}, /* 217 */
+	{ -1,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 218 */
+	{ -1,	TF,	sys_truncate64,		"truncate64"	}, /* 219 */
+	{ -1,	0,	sys_getrlimit64,	"getrlimit64"	}, /* 220 */
+	{ -1,	0,	sys_setrlimit64,	"setrlimit64"	}, /* 221 */
 	{ -1,	TF,	sys_lseek64,		"lseek64"	}, /* 222 */
-	{ -1,	0,	printargs,		"mmap64"	}, /* 223 */
-	{ -1,	0,	printargs,		"pread64"	}, /* 224 */
-	{ -1,	0,	printargs,		"pwrite64"	}, /* 225 */
-	{ -1,	0,	printargs,		"creat64"	}, /* 226 */
-	{ -1,	0,	printargs,		"dshmsys"	}, /* 227 */
-	{ -1,	0,	printargs,		"invlpg"	}, /* 228 */
-	{ -1,	0,	printargs,		"rfork1"	}, /* 229 */
-	{ -1,	0,	printargs,		"rforkall"	}, /* 230 */
-	{ -1,	0,	printargs,		"rexecve"	}, /* 231 */
-	{ -1,	0,	printargs,		"migrate"	}, /* 232 */
-	{ -1,	0,	printargs,		"kill3"		}, /* 233 */
-	{ -1,	0,	printargs,		"ssisys"	}, /* 234 */
+	{ -1,	TF,	sys_mmap64,		"mmap64"	}, /* 223 */
+	{ -1,	TF,	sys_pread64,		"pread64"	}, /* 224 */
+	{ -1,	TF,	sys_pwrite64,		"pwrite64"	}, /* 225 */
+	{ -1,	TF,	sys_creat64,		"creat64"	}, /* 226 */
+	{ -1,	0,	sys_dshmsys,		"dshmsys"	}, /* 227 */
+	{ -1,	0,	sys_invlpg,		"invlpg"	}, /* 228 */
+	{ -1,	0,	sys_rfork1,		"rfork1"	}, /* 229 */
+	{ -1,	0,	sys_rforkall,		"rforkall"	}, /* 230 */
+	{ -1,	0,	sys_rexecve,		"rexecve"	}, /* 231 */
+	{ -1,	0,	sys_migrate,		"migrate"	}, /* 232 */
+	{ -1,	0,	sys_kill3,		"kill3"		}, /* 233 */
+	{ -1,	0,	sys_ssisys,		"ssisys"	}, /* 234 */
 	{ -1,	TN,	sys_xaccept,		"xaccept"	}, /* 235 */
 	{ -1,	TN,	sys_xbind,		"xbind"		}, /* 236 */
-	{ -1,	TN,	sys_xbind,		"xbindresport"	}, /* 237 */
+	{ -1,	TN,	sys_xbindresvport,	"xbindresvport"	}, /* 237 */
 	{ -1,	TN,	sys_xconnect,		"xconnect"	}, /* 238 */
 	{ -1,	TN,	sys_xgetsockaddr,	"xgetsockaddr"	}, /* 239 */
 	{ -1,	TN,	sys_xgetsockopt,	"xgetsockopt"	}, /* 240 */
