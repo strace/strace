@@ -1,3 +1,7 @@
+2002-05-23  John Hughes <john@calva.com>
+
+	* strace.c: Get rid of warning if not using POLL_HACK
+
 2002-05-22  John Hughes <john@calva.com>
 
 	* net.c: Simplify {get,set}sockopt, decode SO_LINGER, cope with

@@ -1490,7 +1490,9 @@ trace()
 			fprintf(stderr, "unknown pfd: %u\n", pfd);
 			exit(1);
 		}
+#ifdef POLL_HACK
 	FOUND:
+#endif
 		/* Get the status of the process. */
 		if (!interrupted) {
 #ifndef FREEBSD
