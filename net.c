@@ -493,104 +493,131 @@ static struct xlat msg_flags[] = {
 };
 
 static struct xlat sockoptions[] = {
-#ifdef SO_PEERCRED
-	{ SO_PEERCRED,	"SO_PEERCRED"	},
-#endif
-#ifdef SO_PASSCRED
-	{ SO_PASSCRED,	"SO_PASSCRED"	},
-#endif
-#ifdef SO_DEBUG
-	{ SO_DEBUG,	"SO_DEBUG"	},
-#endif
-#ifdef SO_REUSEADDR
-	{ SO_REUSEADDR,	"SO_REUSEADDR"	},
-#endif
-#ifdef SO_KEEPALIVE
-	{ SO_KEEPALIVE,	"SO_KEEPALIVE"	},
-#endif
-#ifdef SO_DONTROUTE
-	{ SO_DONTROUTE,	"SO_DONTROUTE"	},
-#endif
-#ifdef SO_BROADCAST
-	{ SO_BROADCAST,	"SO_BROADCAST"	},
-#endif
-#ifdef SO_LINGER
-	{ SO_LINGER,	"SO_LINGER"	},
-#endif
-#ifdef SO_OOBINLINE
-	{ SO_OOBINLINE,	"SO_OOBINLINE"	},
-#endif
-#ifdef SO_TYPE
-	{ SO_TYPE,	"SO_TYPE"	},
-#endif
-#ifdef SO_ERROR
-	{ SO_ERROR,	"SO_ERROR"	},
-#endif
-#ifdef SO_SNDBUF
-	{ SO_SNDBUF,	"SO_SNDBUF"	},
-#endif
-#ifdef SO_RCVBUF
-	{ SO_RCVBUF,	"SO_RCVBUF"	},
-#endif
-#ifdef SO_NO_CHECK
-	{ SO_NO_CHECK,	"SO_NO_CHECK"	},
-#endif
-#ifdef SO_PRIORITY
-	{ SO_PRIORITY,	"SO_PRIORITY"	},
-#endif
 #ifdef SO_ACCEPTCONN
-	{ SO_ACCEPTCONN,"SO_ACCEPTCONN"	},
-#endif
-#ifdef SO_USELOOPBACK
-	{ SO_USELOOPBACK,"SO_USELOOPBACK"},
-#endif
-#ifdef SO_SNDLOWAT
-	{ SO_SNDLOWAT,	"SO_SNDLOWAT"	},
-#endif
-#ifdef SO_RCVLOWAT
-	{ SO_RCVLOWAT,	"SO_RCVLOWAT"	},
-#endif
-#ifdef SO_SNDTIMEO
-	{ SO_SNDTIMEO,	"SO_SNDTIMEO"	},
-#endif
-#ifdef SO_RCVTIMEO
-	{ SO_RCVTIMEO,	"SO_RCVTIMEO"	},
-#endif
-#ifdef SO_BSDCOMPAT
-	{ SO_BSDCOMPAT,	"SO_BSDCOMPAT"	},
-#endif
-#ifdef SO_REUSEPORT
-	{ SO_REUSEPORT,	"SO_REUSEPORT"	},
-#endif
-#ifdef SO_ORDREL
-	{ SO_ORDREL,	"SO_ORDREL"	},
-#endif
-#ifdef SO_IMASOCKET
-	{ SO_IMASOCKET,	"SO_IMASOCKET"	},
-#endif
-#ifdef SO_MGMT
-	{ SO_MGMT,	"SO_MGMT"	},
-#endif
-#ifdef SO_LISTENING
-	{ SO_LISTENING,	"SO_LISTENING"	},
-#endif
-#ifdef SO_RDWR
-	{ SO_RDWR,	"SO_RDWR"	},
-#endif
-#ifdef SO_SEMA
-	{ SO_SEMA,	"SO_SEMA"	},
-#endif
-#ifdef SO_PARALLELSVR
-	{ SO_PARALLELSVR,"SO_PARALLELSVR"},
-#endif
-#ifdef SO_PROTOTYPE
-	{ SO_PROTOTYPE,	"SO_PROTOTYPE"	},
+	{ SO_ACCEPTCONN,	"SO_ACCEPTCONN"	},
 #endif
 #ifdef SO_ALLRAW
 	{ SO_ALLRAW,	"SO_ALLRAW"	},
 #endif
+#ifdef SO_ATTACH_FILTER
+	{ SO_ATTACH_FILTER,	"SO_ATTACH_FILTER"	},
+#endif
+#ifdef SO_BINDTODEVICE
+	{ SO_BINDTODEVICE,	"SO_BINDTODEVICE"	},
+#endif
+#ifdef SO_BROADCAST
+	{ SO_BROADCAST,	"SO_BROADCAST"	},
+#endif
+#ifdef SO_BSDCOMPAT
+	{ SO_BSDCOMPAT,	"SO_BSDCOMPAT"	},
+#endif
+#ifdef SO_DEBUG
+	{ SO_DEBUG,	"SO_DEBUG"	},
+#endif
+#ifdef SO_DETACH_FILTER
+	{ SO_DETACH_FILTER,	"SO_DETACH_FILTER"	},
+#endif
+#ifdef SO_DONTROUTE
+	{ SO_DONTROUTE,	"SO_DONTROUTE"	},
+#endif
+#ifdef SO_ERROR
+	{ SO_ERROR,	"SO_ERROR"	},
+#endif
 #ifdef SO_ICS
 	{ SO_ICS,	"SO_ICS"	},
+#endif
+#ifdef SO_IMASOCKET
+	{ SO_IMASOCKET,	"SO_IMASOCKET"	},
+#endif
+#ifdef SO_KEEPALIVE
+	{ SO_KEEPALIVE,	"SO_KEEPALIVE"	},
+#endif
+#ifdef SO_LINGER
+	{ SO_LINGER,	"SO_LINGER"	},
+#endif
+#ifdef SO_LISTENING
+	{ SO_LISTENING,	"SO_LISTENING"	},
+#endif
+#ifdef SO_MGMT
+	{ SO_MGMT,	"SO_MGMT"	},
+#endif
+#ifdef SO_NO_CHECK
+	{ SO_NO_CHECK,	"SO_NO_CHECK"	},
+#endif
+#ifdef SO_OOBINLINE
+	{ SO_OOBINLINE,	"SO_OOBINLINE"	},
+#endif
+#ifdef SO_ORDREL
+	{ SO_ORDREL,	"SO_ORDREL"	},
+#endif
+#ifdef SO_PARALLELSVR
+	{ SO_PARALLELSVR,	"SO_PARALLELSVR"	},
+#endif
+#ifdef SO_PASSCRED
+	{ SO_PASSCRED,	"SO_PASSCRED"	},
+#endif
+#ifdef SO_PEERCRED
+	{ SO_PEERCRED,	"SO_PEERCRED"	},
+#endif
+#ifdef SO_PEERNAME
+	{ SO_PEERNAME,	"SO_PEERNAME"	},
+#endif
+#ifdef SO_PEERSEC
+	{ SO_PEERSEC,	"SO_PEERSEC"	},
+#endif
+#ifdef SO_PRIORITY
+	{ SO_PRIORITY,	"SO_PRIORITY"	},
+#endif
+#ifdef SO_PROTOTYPE
+	{ SO_PROTOTYPE,	"SO_PROTOTYPE"	},
+#endif
+#ifdef SO_RCVBUF
+	{ SO_RCVBUF,	"SO_RCVBUF"	},
+#endif
+#ifdef SO_RCVLOWAT
+	{ SO_RCVLOWAT,	"SO_RCVLOWAT"	},
+#endif
+#ifdef SO_RCVTIMEO
+	{ SO_RCVTIMEO,	"SO_RCVTIMEO"	},
+#endif
+#ifdef SO_RDWR
+	{ SO_RDWR,	"SO_RDWR"	},
+#endif
+#ifdef SO_REUSEADDR
+	{ SO_REUSEADDR,	"SO_REUSEADDR"	},
+#endif
+#ifdef SO_REUSEPORT
+	{ SO_REUSEPORT,	"SO_REUSEPORT"	},
+#endif
+#ifdef SO_SECURITY_AUTHENTICATION
+	{ SO_SECURITY_AUTHENTICATION,"SO_SECURITY_AUTHENTICATION"},
+#endif
+#ifdef SO_SECURITY_ENCRYPTION_NETWORK
+	{ SO_SECURITY_ENCRYPTION_NETWORK,"SO_SECURITY_ENCRYPTION_NETWORK"},
+#endif
+#ifdef SO_SECURITY_ENCRYPTION_TRANSPORT
+	{ SO_SECURITY_ENCRYPTION_TRANSPORT,"SO_SECURITY_ENCRYPTION_TRANSPORT"},
+#endif
+#ifdef SO_SEMA
+	{ SO_SEMA,	"SO_SEMA"	},
+#endif
+#ifdef SO_SNDBUF
+	{ SO_SNDBUF,	"SO_SNDBUF"	},
+#endif
+#ifdef SO_SNDLOWAT
+	{ SO_SNDLOWAT,	"SO_SNDLOWAT"	},
+#endif
+#ifdef SO_SNDTIMEO
+	{ SO_SNDTIMEO,	"SO_SNDTIMEO"	},
+#endif
+#ifdef SO_TIMESTAMP
+	{ SO_TIMESTAMP,	"SO_TIMESTAMP"	},
+#endif
+#ifdef SO_TYPE
+	{ SO_TYPE,	"SO_TYPE"	},
+#endif
+#ifdef SO_USELOOPBACK
+	{ SO_USELOOPBACK,	"SO_USELOOPBACK"	},
 #endif
 	{ 0,		NULL		},
 };
