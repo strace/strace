@@ -1,6 +1,12 @@
+2003-11-01  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c (trace_syscall) [LINUX]: Calculate ONE_TICK once using
+	setitimer rather than hard-coding a value based on HZ.
+
 2003-10-21  Roland McGrath  <roland@redhat.com>
 
 	* strace.1: Fixed a few spelling errors.
+	Fixes Debian bug #217008.
 
 	* syscall.c: Revert last change, was broken.
 
