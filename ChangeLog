@@ -1,3 +1,11 @@
+2001-04-12  Wichert Akkerman <wakkerma@debian.org>
+
+  * process.c: fix cast for powerpc code
+  * linux/powerpc/syscallent.h: update syscall list
+  * README: fix address for the strace mailinglist
+  * signal.c: switch to using /proc/<pid>/status on Linux so we can get
+    the realtime signals as well
+
 2001-04-10  Wichert Akkerman <wakkerma@debian.org>
 
   * Merge patches from Maciej W. Rozycki:
