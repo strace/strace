@@ -1,3 +1,8 @@
+2003-11-13  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.5.1.
+	* strace.spec, debian/changelog: 4.5.1-1.
+
 2003-09-06  Dmitry V. Levin <ldv@altlinux.org>
 
 	* defs.h (ioctl_lookup): Prototype change.
