@@ -54,7 +54,7 @@ long addr;
 }
 
 #ifdef ALPHA
-struct timeval32 
+struct timeval32
 {
     unsigned tv_sec;
     unsigned tv_usec;
@@ -365,8 +365,12 @@ static struct xlat clockflags[] = {
 };
 
 static struct xlat clocknames[] = {
+#ifdef CLOCK_REALTIME
   { CLOCK_REALTIME, "CLOCK_REALTIME" },
+#endif
+#ifdef CLOCK_MONOTONIC
   { CLOCK_MONOTONIC, "CLOCK_MONOTONIC" },
+#endif
   { 0,             NULL }
 };
 
@@ -510,4 +514,3 @@ struct tcb *tcp;
 	return 0;
 }
 #endif /* LINUX */
-
