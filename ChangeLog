@@ -1,3 +1,18 @@
+2003-12-31  David Mosberger  <davidm@hpl.hp.com>
+
+	* process.c (struct_user_offsets) [IA64]: Fix up register name list.
+
+2003-12-14 Anton Blanchard <anton@samba.org>
+
+	* file.c [LINUX] (fsmagic): Add SYSFS_MAGIC.
+
+	* linux/powerpc/syscallent.h: Update to include recently added
+	syscalls.
+
+	* syscall.c (get_error) [POWERPC]: Cast result to unsigned long for
+	ppc64, we were misreporting syscalls that really succeeded as having
+	failed.
+
 2004-01-13  Roland McGrath  <roland@redhat.com>
 
 	* strace.1: Remove comment about vfork on Linux.
@@ -9,7 +24,7 @@
 2003-12-15  Dmitry V. Levin <ldv@altlinux.org>
 
 	* strace.c (trace) [WCOREDUMP]: Show coredump status of the
-	killed process if available.
+	killed process if available.  Fixes RH#112117.
 
 2003-11-13  Roland McGrath  <roland@redhat.com>
 
