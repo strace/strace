@@ -1,5 +1,12 @@
 2001-03-08  John Hughes <john@Calva.COM>
 
+  * defs.h: rename wimpy get64 as powerful new LONG_LONG
+  * file.c: use LONG_LONG
+  * io.c: use LONG_LONG
+  * mem.c use LONG_LONG
+
+2001-03-08  John Hughes <john@Calva.COM>
+
   * acconfig.h: new #defines HAVE_LONG_LONG_OFF_T and HAVE_LONG_LONG_RLIM_T.
   * aclocal.m4: routines to check for long long off_t and rlim_t.
   * configure.in: check for long long off_t and rlim_t.

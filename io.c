@@ -292,7 +292,7 @@ struct tcb *tcp;
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %lu, %#llx", tcp->u_arg[2],
-			get64(tcp->u_arg[3], tcp->u_arg[4]));
+			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
 	}
 	return 0;
 }
@@ -306,7 +306,7 @@ struct tcb *tcp;
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, %#llx", tcp->u_arg[2],
-			get64(tcp->u_arg[3], tcp->u_arg[4]));
+			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
 	}
 	return 0;
 }

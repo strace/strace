@@ -275,7 +275,7 @@ struct tcb *tcp;
 		/* fd */
 		tprintf(", %ld, ", u_arg[4]);
 		/* offset */
-		tprintf("%#llx", get64(u_arg[5], u_arg[6]));
+		tprintf("%#llx", LONG_LONG(u_arg[5], u_arg[6]));
 	}
 	return RVAL_HEX;
 }

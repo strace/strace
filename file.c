@@ -424,7 +424,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		long long offset;
 		ALIGN64 (tcp, 1);	/* FreeBSD aligns off_t args */
-		offset = get64(tcp->u_arg [1], tcp->u_arg[2]);
+		offset = LONG_LONG(tcp->u_arg [1], tcp->u_arg[2]);
 		if (tcp->u_arg[3] == SEEK_SET)
 			tprintf("%ld, %llu, ", tcp->u_arg[0], offset);
 		else
@@ -456,7 +456,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		ALIGN64 (tcp, 1);
 		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", %llu", get64(tcp->u_arg[1],tcp->u_arg[2]));
+		tprintf(", %llu", LONG_LONG(tcp->u_arg[1],tcp->u_arg[2]));
 	}
 	return 0;
 }
@@ -482,7 +482,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		ALIGN64 (tcp, 1);
 		tprintf("%ld, %llu", tcp->u_arg[0],
-			get64(tcp->u_arg[1] ,tcp->u_arg[2]));
+			LONG_LONG(tcp->u_arg[1] ,tcp->u_arg[2]));
 	}
 	return 0;
 }
