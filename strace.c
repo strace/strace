@@ -43,6 +43,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <string.h>
+#include <limits.h>
 
 #if defined(IA64) && defined(LINUX)
 # include <asm/ptrace_offsets.h>
@@ -606,7 +607,8 @@ int attaching;
 	char proc[32];
 	long arg;
 #ifdef SVR4
-	sysset_t sc_enter, sc_exit;
+	int i;
+	sysset_t syscalls;
 	sigset_t signals;
 	fltset_t faults;
 #endif
@@ -750,26 +752,53 @@ int attaching;
 #endif /* FREEBSD */
 #endif /* !PIOCSET */
 #ifndef FREEBSD
-	/* Enable all syscall entries. */
-	prfillset(&sc_enter);
-	if (IOCTL(tcp->pfd, PIOCSENTRY, &sc_enter) < 0) {
+	/* Enable all syscall entries we care about. */
+	premptyset(&syscalls);
+	for (i = 1; i < MAX_QUALS; ++i) {
+		if (i > (sizeof syscalls) * CHAR_BIT) break;
+		if (qual_flags [i] & QUAL_TRACE) praddset (&syscalls, i);
+	}
+	praddset (&syscalls, SYS_execve);
+	if (followfork) {
+		praddset (&syscalls, SYS_fork);
+#ifdef SYS_forkall
+		praddset (&syscalls, SYS_forkall);
+#endif
+#ifdef SYS_fork1 
+		praddset (&syscalls, SYS_fork1);
+#endif
+#ifdef SYS_rfork1
+		praddset (&syscalls, SYS_rfork1);
+#endif
+#ifdef SYS_rforkall
+		praddset (&syscalls, SYS_rforkall);
+#endif
+	}
+	if (IOCTL(tcp->pfd, PIOCSENTRY, &syscalls) < 0) {
 		perror("PIOCSENTRY");
 		return -1;
 	}
-	/* Enable all syscall exits. */
-	prfillset(&sc_exit);
-	if (IOCTL(tcp->pfd, PIOCSEXIT, &sc_exit) < 0) {
+	/* Enable the syscall exits. */
+	if (IOCTL(tcp->pfd, PIOCSEXIT, &syscalls) < 0) {
 		perror("PIOSEXIT");
 		return -1;
 	}
-	/* Enable all signals. */
-	prfillset(&signals);
+	/* Enable signals we care about. */
+	premptyset(&signals);
+	for (i = 1; i < MAX_QUALS; ++i) {
+		if (i > (sizeof signals) * CHAR_BIT) break;
+		if (qual_flags [i] & QUAL_SIGNAL) praddset (&signals, i);
+	}
 	if (IOCTL(tcp->pfd, PIOCSTRACE, &signals) < 0) {
 		perror("PIOCSTRACE");
 		return -1;
 	}
-	/* Enable all faults. */
-	prfillset(&faults);
+	/* Enable faults we care about */
+	premptyset(&faults);
+	for (i = 1; i < MAX_QUALS; ++i) {
+		if (i > (sizeof faults) * CHAR_BIT) break;
+		if (qual_flags [i] & QUAL_FAULT) praddset (&faults, i);
+	}
 	if (IOCTL(tcp->pfd, PIOCSFAULT, &faults) < 0) {
 		perror("PIOCSFAULT");
 		return -1;

@@ -1,3 +1,8 @@
+2001-10-19  John Hughes  <john@Calva.COM>
+
+	* strace.c(proc_open): On SVR4 only trace the syscalls,
+	signals and faults we care about.
+
 2001-10-18  John Hughes  <john@Calva.COM>
 
 	* acconfig.h: Add HAS_SIGINFO_T.
