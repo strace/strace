@@ -49,17 +49,6 @@
 
 #include <sys/syscall.h>
 
-#ifdef SYS_personality
-/* Workaround for kernel namespace pollution. */
-#define _LINUX_PTRACE_H
-/* Yuck yuck yuck.  We can't include linux/ptrace.h, but personality.h
-   makes a declaration with struct pt_regs, which is defined there. */
-struct pt_regs;
-#define sys_personality kernel_sys_personality
-#include <linux/personality.h>
-#undef sys_personality
-#endif /* SYS_personality */
-
 #ifdef SYS_capget
 #include <linux/capability.h>
 #endif
@@ -124,34 +113,30 @@ struct tcb *tcp;
 	return 0;
 }
 
+/* These are not macros, but enums.  We just copy the values by hand
+   from Linux 2.6.9 here.  */
 static struct xlat personality_options[] = {
-#ifdef PER_LINUX
-	{ PER_LINUX,	"PER_LINUX"	},
-#endif
-#ifdef PER_LINUX_32BIT
-	{ PER_LINUX_32BIT,	"PER_LINUX"	},
-#endif
-#ifdef PER_SVR4
-	{ PER_SVR4,	"PER_SVR4"	},
-#endif
-#ifdef PER_SVR3
-	{ PER_SVR3,	"PER_SVR3"	},
-#endif
-#ifdef PER_SCOSVR3
-	{ PER_SCOSVR3,	"PER_SCOSVR3"	},
-#endif
-#ifdef PER_WYSEV386
-	{ PER_WYSEV386,	"PER_WYSEV386"	},
-#endif
-#ifdef PER_ISCR4
-	{ PER_ISCR4,	"PER_ISCR4"	},
-#endif
-#ifdef PER_BSD
-	{ PER_BSD,	"PER_BSD"	},
-#endif
-#ifdef PER_XENIX
-	{ PER_XENIX,	"PER_XENIX"	},
-#endif
+	{ 0,		"PER_LINUX"	},
+	{ 0x00800000,	"PER_LINUX_32BIT"},
+	{ 0x04100001,	"PER_SVR4"	},
+	{ 0x05000002,	"PER_SVR3"	},
+	{ 0x07000003,	"PER_SCOSVR3"	},
+	{ 0x06000003,	"PER_OSR5"	},
+	{ 0x05000004,	"PER_WYSEV386"	},
+	{ 0x04000005,	"PER_ISCR4"	},
+	{ 0x00000006,	"PER_BSD"	},
+	{ 0x04000006,	"PER_SUNOS"	},
+	{ 0x05000007,	"PER_XENIX"	},
+	{ 0x00000008,	"PER_LINUX32"	},
+	{ 0x08000008,	"PER_LINUX32_3GB"},
+	{ 0x04000009,	"PER_IRIX32"	},
+	{ 0x0400000a,	"PER_IRIXN32"	},
+	{ 0x0400000b,	"PER_IRIX64"	},
+	{ 0x0000000c,	"PER_RISCOS"	},
+	{ 0x0400000d,	"PER_SOLARIS"	},
+	{ 0x0410000e,	"PER_UW7"	},
+	{ 0x0000000f,	"PER_OSF4"	},
+	{ 0x00000010,	"PER_HPUX"	},
 	{ 0,		NULL		},
 };
 
@@ -883,247 +868,247 @@ static struct xlat syssgi_options[] = {
 #ifdef SGI_GET_FP_PRECISE
 	{ SGI_GET_FP_PRECISE,	"SGI_GET_FP_PRECISE"	},
 #endif
-#ifdef SGI_GET_CONFIG_SMM	
+#ifdef SGI_GET_CONFIG_SMM
 	{ SGI_GET_CONFIG_SMM,	"SGI_GET_CONFIG_SMM"	},
 #endif
-#ifdef SGI_FP_IMPRECISE_SUPP	
+#ifdef SGI_FP_IMPRECISE_SUPP
 	{ SGI_FP_IMPRECISE_SUPP,"SGI_FP_IMPRECISE_SUPP"	},
 #endif
-#ifdef SGI_CONFIG_NSMM_SUPP	
+#ifdef SGI_CONFIG_NSMM_SUPP
 	{ SGI_CONFIG_NSMM_SUPP,	"SGI_CONFIG_NSMM_SUPP"	},
 #endif
-#ifdef SGI_RT_TSTAMP_CREATE    
+#ifdef SGI_RT_TSTAMP_CREATE
 	{ SGI_RT_TSTAMP_CREATE,	"SGI_RT_TSTAMP_CREATE"	},
 #endif
-#ifdef SGI_RT_TSTAMP_DELETE    
+#ifdef SGI_RT_TSTAMP_DELETE
 	{ SGI_RT_TSTAMP_DELETE,	"SGI_RT_TSTAMP_DELETE"	},
 #endif
-#ifdef SGI_RT_TSTAMP_START     
+#ifdef SGI_RT_TSTAMP_START
 	{ SGI_RT_TSTAMP_START,	"SGI_RT_TSTAMP_START"	},
 #endif
-#ifdef SGI_RT_TSTAMP_STOP      
+#ifdef SGI_RT_TSTAMP_STOP
 	{ SGI_RT_TSTAMP_STOP,	"SGI_RT_TSTAMP_STOP"	},
 #endif
-#ifdef SGI_RT_TSTAMP_ADDR      
+#ifdef SGI_RT_TSTAMP_ADDR
 	{ SGI_RT_TSTAMP_ADDR,	"SGI_RT_TSTAMP_ADDR"	},
 #endif
-#ifdef SGI_RT_TSTAMP_MASK      
+#ifdef SGI_RT_TSTAMP_MASK
 	{ SGI_RT_TSTAMP_MASK,	"SGI_RT_TSTAMP_MASK"	},
 #endif
-#ifdef SGI_RT_TSTAMP_EOB_MODE  
+#ifdef SGI_RT_TSTAMP_EOB_MODE
 	{ SGI_RT_TSTAMP_EOB_MODE,"SGI_RT_TSTAMP_EOB_MODE"},
 #endif
-#ifdef SGI_USE_FP_BCOPY	
+#ifdef SGI_USE_FP_BCOPY
 	{ SGI_USE_FP_BCOPY,	"SGI_USE_FP_BCOPY"	},
 #endif
-#ifdef SGI_GET_UST		
+#ifdef SGI_GET_UST
 	{ SGI_GET_UST,		"SGI_GET_UST"		},
 #endif
-#ifdef SGI_SPECULATIVE_EXEC	
+#ifdef SGI_SPECULATIVE_EXEC
 	{ SGI_SPECULATIVE_EXEC,	"SGI_SPECULATIVE_EXEC"	},
 #endif
-#ifdef SGI_XLV_NEXT_RQST	
+#ifdef SGI_XLV_NEXT_RQST
 	{ SGI_XLV_NEXT_RQST,	"SGI_XLV_NEXT_RQST"	},
 #endif
-#ifdef SGI_XLV_ATTR_CURSOR	
+#ifdef SGI_XLV_ATTR_CURSOR
 	{ SGI_XLV_ATTR_CURSOR,	"SGI_XLV_ATTR_CURSOR"	},
 #endif
-#ifdef SGI_XLV_ATTR_GET	
+#ifdef SGI_XLV_ATTR_GET
 	{ SGI_XLV_ATTR_GET,	"SGI_XLV_ATTR_GET"	},
 #endif
-#ifdef SGI_XLV_ATTR_SET	
+#ifdef SGI_XLV_ATTR_SET
 	{ SGI_XLV_ATTR_SET,	"SGI_XLV_ATTR_SET"	},
 #endif
 #ifdef SGI_BTOOLSIZE
 	{ SGI_BTOOLSIZE,	"SGI_BTOOLSIZE"		},
 #endif
-#ifdef SGI_BTOOLGET		
+#ifdef SGI_BTOOLGET
 	{ SGI_BTOOLGET,		"SGI_BTOOLGET"		},
 #endif
-#ifdef SGI_BTOOLREINIT		
+#ifdef SGI_BTOOLREINIT
 	{ SGI_BTOOLREINIT,	"SGI_BTOOLREINIT"	},
 #endif
-#ifdef SGI_CREATE_UUID		
+#ifdef SGI_CREATE_UUID
 	{ SGI_CREATE_UUID,	"SGI_CREATE_UUID"	},
 #endif
-#ifdef SGI_NOFPE		
+#ifdef SGI_NOFPE
 	{ SGI_NOFPE,		"SGI_NOFPE"		},
 #endif
-#ifdef SGI_OLD_SOFTFP		
+#ifdef SGI_OLD_SOFTFP
 	{ SGI_OLD_SOFTFP,	"SGI_OLD_SOFTFP"	},
 #endif
-#ifdef SGI_FS_INUMBERS		
+#ifdef SGI_FS_INUMBERS
 	{ SGI_FS_INUMBERS,	"SGI_FS_INUMBERS"	},
 #endif
-#ifdef SGI_FS_BULKSTAT		
+#ifdef SGI_FS_BULKSTAT
 	{ SGI_FS_BULKSTAT,	"SGI_FS_BULKSTAT"	},
 #endif
-#ifdef SGI_RT_TSTAMP_WAIT	
+#ifdef SGI_RT_TSTAMP_WAIT
 	{ SGI_RT_TSTAMP_WAIT,	"SGI_RT_TSTAMP_WAIT"	},
 #endif
-#ifdef SGI_RT_TSTAMP_UPDATE    
+#ifdef SGI_RT_TSTAMP_UPDATE
 	{ SGI_RT_TSTAMP_UPDATE,	"SGI_RT_TSTAMP_UPDATE"	},
 #endif
-#ifdef SGI_PATH_TO_HANDLE	
+#ifdef SGI_PATH_TO_HANDLE
 	{ SGI_PATH_TO_HANDLE,	"SGI_PATH_TO_HANDLE"	},
 #endif
-#ifdef SGI_PATH_TO_FSHANDLE	
+#ifdef SGI_PATH_TO_FSHANDLE
 	{ SGI_PATH_TO_FSHANDLE,	"SGI_PATH_TO_FSHANDLE"	},
 #endif
-#ifdef SGI_FD_TO_HANDLE	
+#ifdef SGI_FD_TO_HANDLE
 	{ SGI_FD_TO_HANDLE,	"SGI_FD_TO_HANDLE"	},
 #endif
-#ifdef SGI_OPEN_BY_HANDLE	
+#ifdef SGI_OPEN_BY_HANDLE
 	{ SGI_OPEN_BY_HANDLE,	"SGI_OPEN_BY_HANDLE"	},
 #endif
-#ifdef SGI_READLINK_BY_HANDLE	
+#ifdef SGI_READLINK_BY_HANDLE
 	{ SGI_READLINK_BY_HANDLE,"SGI_READLINK_BY_HANDLE"},
 #endif
-#ifdef SGI_READ_DANGID		
+#ifdef SGI_READ_DANGID
 	{ SGI_READ_DANGID,	"SGI_READ_DANGID"	},
 #endif
-#ifdef SGI_CONST		
+#ifdef SGI_CONST
 	{ SGI_CONST,		"SGI_CONST"		},
 #endif
-#ifdef SGI_XFS_FSOPERATIONS	
+#ifdef SGI_XFS_FSOPERATIONS
 	{ SGI_XFS_FSOPERATIONS,	"SGI_XFS_FSOPERATIONS"	},
 #endif
-#ifdef SGI_SETASH		
+#ifdef SGI_SETASH
 	{ SGI_SETASH,		"SGI_SETASH"		},
 #endif
-#ifdef SGI_GETASH		
+#ifdef SGI_GETASH
 	{ SGI_GETASH,		"SGI_GETASH"		},
 #endif
-#ifdef SGI_SETPRID		
+#ifdef SGI_SETPRID
 	{ SGI_SETPRID,		"SGI_SETPRID"		},
 #endif
-#ifdef SGI_GETPRID		
+#ifdef SGI_GETPRID
 	{ SGI_GETPRID,		"SGI_GETPRID"		},
 #endif
-#ifdef SGI_SETSPINFO		
+#ifdef SGI_SETSPINFO
 	{ SGI_SETSPINFO,	"SGI_SETSPINFO"		},
 #endif
-#ifdef SGI_GETSPINFO		
+#ifdef SGI_GETSPINFO
 	{ SGI_GETSPINFO,	"SGI_GETSPINFO"		},
 #endif
-#ifdef SGI_SHAREII		
+#ifdef SGI_SHAREII
 	{ SGI_SHAREII,		"SGI_SHAREII"		},
 #endif
-#ifdef SGI_NEWARRAYSESS	
+#ifdef SGI_NEWARRAYSESS
 	{ SGI_NEWARRAYSESS,	"SGI_NEWARRAYSESS"	},
 #endif
-#ifdef SGI_GETDFLTPRID		
+#ifdef SGI_GETDFLTPRID
 	{ SGI_GETDFLTPRID,	"SGI_GETDFLTPRID"	},
 #endif
-#ifdef SGI_SET_DISMISSED_EXC_CNT 
+#ifdef SGI_SET_DISMISSED_EXC_CNT
 	{ SGI_SET_DISMISSED_EXC_CNT,"SGI_SET_DISMISSED_EXC_CNT"	},
 #endif
-#ifdef SGI_GET_DISMISSED_EXC_CNT 
+#ifdef SGI_GET_DISMISSED_EXC_CNT
 	{ SGI_GET_DISMISSED_EXC_CNT,"SGI_GET_DISMISSED_EXC_CNT"	},
 #endif
-#ifdef SGI_CYCLECNTR_SIZE	
+#ifdef SGI_CYCLECNTR_SIZE
 	{ SGI_CYCLECNTR_SIZE,	"SGI_CYCLECNTR_SIZE"	},
 #endif
-#ifdef SGI_QUERY_FASTTIMER	
+#ifdef SGI_QUERY_FASTTIMER
 	{ SGI_QUERY_FASTTIMER,	"SGI_QUERY_FASTTIMER"	},
 #endif
-#ifdef SGI_PIDSINASH		
+#ifdef SGI_PIDSINASH
 	{ SGI_PIDSINASH,	"SGI_PIDSINASH"		},
 #endif
-#ifdef SGI_ULI			
+#ifdef SGI_ULI
 	{ SGI_ULI,		"SGI_ULI"		},
 #endif
-#ifdef SGI_LPG_SHMGET          
+#ifdef SGI_LPG_SHMGET
 	{ SGI_LPG_SHMGET,	"SGI_LPG_SHMGET"	},
 #endif
-#ifdef SGI_LPG_MAP             
+#ifdef SGI_LPG_MAP
 	{ SGI_LPG_MAP,		"SGI_LPG_MAP"		},
 #endif
-#ifdef SGI_CACHEFS_SYS		
+#ifdef SGI_CACHEFS_SYS
 	{ SGI_CACHEFS_SYS,	"SGI_CACHEFS_SYS"	},
 #endif
-#ifdef SGI_NFSNOTIFY		
+#ifdef SGI_NFSNOTIFY
 	{ SGI_NFSNOTIFY,	"SGI_NFSNOTIFY"		},
 #endif
-#ifdef SGI_LOCKDSYS		
+#ifdef SGI_LOCKDSYS
 	{ SGI_LOCKDSYS,		"SGI_LOCKDSYS"		},
 #endif
-#ifdef SGI_EVENTCTR            
+#ifdef SGI_EVENTCTR
 	{ SGI_EVENTCTR,		"SGI_EVENTCTR"		},
 #endif
-#ifdef SGI_GETPRUSAGE          
+#ifdef SGI_GETPRUSAGE
 	{ SGI_GETPRUSAGE,	"SGI_GETPRUSAGE"	},
 #endif
-#ifdef SGI_PROCMASK_LOCATION	
+#ifdef SGI_PROCMASK_LOCATION
 	{ SGI_PROCMASK_LOCATION,"SGI_PROCMASK_LOCATION"	},
 #endif
-#ifdef SGI_UNUSED		
+#ifdef SGI_UNUSED
 	{ SGI_UNUSED,		"SGI_UNUSED"		},
 #endif
-#ifdef SGI_CKPT_SYS		
+#ifdef SGI_CKPT_SYS
 	{ SGI_CKPT_SYS,		"SGI_CKPT_SYS"		},
 #endif
-#ifdef SGI_CKPT_SYS		
+#ifdef SGI_CKPT_SYS
 	{ SGI_CKPT_SYS,		"SGI_CKPT_SYS"		},
 #endif
-#ifdef SGI_GETGRPPID		
+#ifdef SGI_GETGRPPID
 	{ SGI_GETGRPPID,	"SGI_GETGRPPID"		},
 #endif
-#ifdef SGI_GETSESPID		
+#ifdef SGI_GETSESPID
 	{ SGI_GETSESPID,	"SGI_GETSESPID"		},
 #endif
-#ifdef SGI_ENUMASHS		
+#ifdef SGI_ENUMASHS
 	{ SGI_ENUMASHS,		"SGI_ENUMASHS"		},
 #endif
-#ifdef SGI_SETASMACHID		
+#ifdef SGI_SETASMACHID
 	{ SGI_SETASMACHID,	"SGI_SETASMACHID"	},
 #endif
-#ifdef SGI_GETASMACHID		
+#ifdef SGI_GETASMACHID
 	{ SGI_GETASMACHID,	"SGI_GETASMACHID"	},
 #endif
-#ifdef SGI_GETARSESS		
+#ifdef SGI_GETARSESS
 	{ SGI_GETARSESS,	"SGI_GETARSESS"		},
 #endif
-#ifdef SGI_JOINARRAYSESS	
+#ifdef SGI_JOINARRAYSESS
 	{ SGI_JOINARRAYSESS,	"SGI_JOINARRAYSESS"	},
 #endif
-#ifdef SGI_SPROC_KILL		
+#ifdef SGI_SPROC_KILL
 	{ SGI_SPROC_KILL,	"SGI_SPROC_KILL"	},
 #endif
-#ifdef SGI_DBA_CONFIG		
+#ifdef SGI_DBA_CONFIG
 	{ SGI_DBA_CONFIG,	"SGI_DBA_CONFIG"	},
 #endif
-#ifdef SGI_RELEASE_NAME	
+#ifdef SGI_RELEASE_NAME
 	{ SGI_RELEASE_NAME,	"SGI_RELEASE_NAME"	},
 #endif
-#ifdef SGI_SYNCH_CACHE_HANDLER 
+#ifdef SGI_SYNCH_CACHE_HANDLER
 	{ SGI_SYNCH_CACHE_HANDLER,"SGI_SYNCH_CACHE_HANDLER"},
 #endif
-#ifdef SGI_SWASH_INIT		
+#ifdef SGI_SWASH_INIT
 	{ SGI_SWASH_INIT,	"SGI_SWASH_INIT"	},
 #endif
-#ifdef SGI_NUMA_MIGR_PAGE	
+#ifdef SGI_NUMA_MIGR_PAGE
 	{ SGI_NUMA_MIGR_PAGE,	"SGI_NUMA_MIGR_PAGE"	},
 #endif
-#ifdef SGI_NUMA_MIGR_PAGE_ALT	
+#ifdef SGI_NUMA_MIGR_PAGE_ALT
 	{ SGI_NUMA_MIGR_PAGE_ALT,"SGI_NUMA_MIGR_PAGE_ALT"},
 #endif
-#ifdef SGI_KAIO_USERINIT	
+#ifdef SGI_KAIO_USERINIT
 	{ SGI_KAIO_USERINIT,	"SGI_KAIO_USERINIT"	},
 #endif
-#ifdef SGI_KAIO_READ		
+#ifdef SGI_KAIO_READ
 	{ SGI_KAIO_READ,	"SGI_KAIO_READ"		},
 #endif
-#ifdef SGI_KAIO_WRITE		
+#ifdef SGI_KAIO_WRITE
 	{ SGI_KAIO_WRITE,	"SGI_KAIO_WRITE"	},
 #endif
-#ifdef SGI_KAIO_SUSPEND	
+#ifdef SGI_KAIO_SUSPEND
 	{ SGI_KAIO_SUSPEND,	"SGI_KAIO_SUSPEND"	},
 #endif
-#ifdef SGI_KAIO_STATS		
+#ifdef SGI_KAIO_STATS
 	{ SGI_KAIO_STATS,	"SGI_KAIO_STATS"	},
 #endif
-#ifdef SGI_INITIAL_PT_SPROC	
+#ifdef SGI_INITIAL_PT_SPROC
 	{ SGI_INITIAL_PT_SPROC,	"SGI_INITIAL_PT_SPROC"	},
 #endif
 	{ 0,			NULL			},
@@ -1353,7 +1338,7 @@ struct tcb *tcp;
 					if (args.mflags & VX_MS_SNAPSHOT) {
 						tprintf (", snapof=");
 						printstr (tcp,
-							  (long) args.primaryspec, 
+							  (long) args.primaryspec,
 							  -1);
 						if (args.snapsize > 0)
 							tprintf (", snapsize=%ld", args.snapsize);
@@ -1498,7 +1483,7 @@ struct tcb *tcp;
 			tprintf(", ");
 			printflags(capabilities, arg1->inheritable);
 			tprintf("}");
-		} 
+		}
 	}
 	return 0;
 }
@@ -1550,7 +1535,7 @@ struct tcb *tcp;
 			tprintf(", ");
 			printflags(capabilities, arg1->inheritable);
 			tprintf("}");
-		} 
+		}
 	}
 	return 0;
 }
@@ -1965,7 +1950,7 @@ struct tcb *tcp;
 	char ctl[1024];
 	size_t len;
 	int i, numeric;
-	
+
 	if (entering(tcp)) {
 		if (tcp->u_arg[1] < 0 || tcp->u_arg[1] > CTL_MAXNAME ||
 		    (umoven(tcp, tcp->u_arg[0], tcp->u_arg[1] * sizeof(int),
@@ -1996,7 +1981,7 @@ struct tcb *tcp;
 		if (!syserror(tcp) && (umove(tcp, tcp->u_arg[3], &len) >= 0)) {
 			printstr(tcp, tcp->u_arg[2], len);
 			tprintf(", [%u], ", len);
-		} else 
+		} else
 			tprintf("%#lx, %#lx, ", tcp->u_arg[2], tcp->u_arg[3]);
 		printstr(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 		tprintf(", %lu", tcp->u_arg[5]);
@@ -2011,9 +1996,9 @@ struct tcb *tcp;
 #include <sys/elf.h>
 
 static struct xlat ksym_flags[] = {
-	{ STT_NOTYPE,	"STT_NOTYPE"	},	
-	{ STT_FUNC,	"STT_FUNC"	},	
-	{ STT_OBJECT,	"STT_OBJECT"	},	
+	{ STT_NOTYPE,	"STT_NOTYPE"	},
+	{ STT_FUNC,	"STT_FUNC"	},
+	{ STT_OBJECT,	"STT_OBJECT"	},
 	{ 0,		NULL		},
 };
 
@@ -2150,7 +2135,7 @@ struct tcb *tcp;
 			if (iov.tio_udatainlen != sizeof cni ||
 			    umove (tcp, (long) iov.tio_udatain, &cni) < 0)
 				goto bad_out;
-			if (cni.info_len != sizeof info || 
+			if (cni.info_len != sizeof info ||
 			    iov.tio_udataoutlen != sizeof &info ||
 			    umove (tcp, (long) iov.tio_udataout, &info) < 0)
 				goto bad_out;
@@ -2158,7 +2143,7 @@ struct tcb *tcp;
 				 info.node_num, info.node_totalcpus,
 				 info.node_onlinecpus);
 			break;
-			
+
 		    default:
 		    bad_out:
 			if (iov.tio_udataoutlen) {
