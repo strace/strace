@@ -1,3 +1,7 @@
+2000-04-22  Wichert Akkerman <wakkerma@debian.org>
+
+  * linux/mips/syscallent.h: fix some typos
+
 2000-04-14  Wichert Akkerman <wakkerma@debian.org>
 
   * linux/mips/syscallent.h: added names for SVR4, SYSV, BSD4.3 and POSIX

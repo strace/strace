@@ -4014,7 +4014,7 @@
 	{ 1,	0,	sys_time,		"time"		}, /* 4013 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 4014 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 4015 */
-	{ 3,	TF,	sys_lchown,		"lchown"	}, /* 4016 */
+	{ 3,	TF,	sys_chown,		"chown"		}, /* 4016 */
 	{ 0,	0,	sys_break,		"break"		}, /* 4017 */
 	{ 2,	TF,	sys_oldstat,		"oldstat"	}, /* 4018 */
 	{ 3,	0,	sys_lseek,		"lseek"		}, /* 4019 */
@@ -4188,7 +4188,7 @@
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 4187 */
 	{ 3,	0,	sys_poll,		"poll"		}, /* 4188 */
 	{ 3,	0,	printargs,		"nfsservctl"	}, /* 4189 */
-	{ 3,	0,	sys_detresgid,		"setresgid"	}, /* 4190 */
+	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 4190 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 4191 */
 	{ 5,	0,	printargs,		"prctl"		}, /* 4192 */
 	{ 5,	TS,	printargs,		"rt_sigreturn"	}, /* 4193 */
@@ -4198,10 +4198,10 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"},/* 4197 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"},/* 4198 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_siguspend"	}, /* 4199 */
-	{ 5,	TF	sys_pread,		"pread"		}, /* 4200 */
+	{ 5,	TF,	sys_pread,		"pread"		}, /* 4200 */
 	{ 5,	TF,	sys_pwrite,		"pwrite"	}, /* 4201 */
 	{ -1,	TF,	sys_chown,		"chown"		}, /* 4202 */
-	{ 2,	TF,	sys_getcdw,		"getcwd"	}, /* 4203 */
+	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 4203 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 4204 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 4205 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstatck"	}, /* 4206 */
