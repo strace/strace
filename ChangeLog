@@ -1,3 +1,14 @@
+2001-03-17  Wichert Akkerman <wakkerma@debian.org>
+
+  * linux/ioclsort.c: new file
+  * linux/ioctlent.sh: complete rewrite to use a more sane approach to get
+    the ioctl list that doesn't involve attempting to #include all kernel
+    headers
+  * linux/.cvsignore: added ioctdefs.h and ioctls.h which are generated
+    by the new ioctlent.sh
+  * ioctl.c: only look at the number and type bits for linux, since
+    ioctlent.sh no longer supplies the others
+
 2001-03-08  John Hughes <john@Calva.COM>
 
   * freebsd/syscalls.pl: On FreeBSD we must cope with COMPATibility syscalls,

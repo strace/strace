@@ -43,6 +43,10 @@ struct ioctlent ioctlent0[] = {
 #include "ioctlent.h"
 };
 
+#ifdef LINUX
+#include <asm/ioctl.h>
+#endif
+
 int nioctlents0 = sizeof ioctlent0 / sizeof ioctlent0[0];
 
 #if SUPPORTED_PERSONALITIES >= 2
@@ -81,6 +85,9 @@ long code;
 	struct ioctlent *iop, ioent;
 
 	ioent.code = code;
+#ifdef LINUX
+	ioent.code &= (_IOC_NRMASK|_IOC_TYPEMASK);
+#endif
 	iop = (struct ioctlent *) bsearch((char *) &ioent, (char *) ioctlent,
 			nioctlents, sizeof(struct ioctlent), compare);
 	return iop ? iop->symbol : NULL;

@@ -2,6 +2,7 @@ Changes in 4.3
 ==============
 * Linux/ia64 port added
 * The usual Linux syscall updates (includes 32bit uid/gid support),
+* Linux ioctl list updated
 * Support IPv6 scope ids
   see ChangeLog for details
 

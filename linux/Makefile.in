@@ -23,19 +23,17 @@ includedir = @includedir@
 
 all: ioctlent.h errnoent.h signalent.h syscallent.h
 
-ioctlent.raw: ioctlent.sh
-	$(SHELL) $(srcdir)/ioctlent.sh $(includedir) >$@
-
-ioctlent.h: ioctlent.raw ioctlsort
+ioctlent.h: ioctlsort
 	./ioctlsort >$@
 
 ioctlsort: ioctlsort.o
 	$(CC) $(LDFLAGS) ioctlsort.o -o ioctlsort
 
-ioctlsort.o: ../ioctlsort.c
+ioctlsort.o: ioctlsort.c ioctdefs.h ioctls.h
 	$(CC) $(WARNFLAGS) $(DEFS) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $(srcdir)/../ioctlsort.c
 
-ioctlsort.o: ioctlent.raw
+ioctldefs.h ioctls.h: ioctlent.sh
+	sh ioctlent.sh
 
 errnoent.h: ../errnoent.sh $(includedir)/linux/errno.h
 	$(SHELL) $(srcdir)/../errnoent.sh $(includedir)/*/errno.h >$@
