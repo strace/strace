@@ -303,7 +303,7 @@
 	{ 1,	0,	printargs,		"epoll_create"	}, /* 254 */
 	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 255 */
 	{ 4,	0,	printargs,		"epoll_wait"	}, /* 256 */
-	{ 5,	0,	printargs,		"remap_file_pages"}, /* 257 */
+	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 257 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 258 */
 	{ 5,	0,	printargs,		"SYS_259"	}, /* 259 */
 	{ 5,	0,	printargs,		"SYS_260"	}, /* 260 */

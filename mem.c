@@ -93,6 +93,12 @@ static struct xlat mmap_flags[] = {
 #ifdef MAP_NORESERVE
 	{ MAP_NORESERVE,"MAP_NORESERVE"	},
 #endif
+#ifdef MAP_POPULATE
+	{ MAP_POPULATE, "MAP_POPULATE" },
+#endif
+#ifdef MAP_NONBLOCK
+	{ MAP_NONBLOCK, "MAP_NONBLOCK" },
+#endif
 	/*
 	 * XXX - this was introduced in SunOS 4.x to distinguish between
 	 * the old pre-4.x "mmap()", which:
@@ -601,3 +607,23 @@ struct tcb *tcp;
 
 }
 #endif /* LINUX && __i386__ */
+
+#if defined(LINUX)
+int
+sys_remap_file_pages(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printflags(mmap_prot, tcp->u_arg[2]);
+		tprintf(", %lu, ", tcp->u_arg[3]);
+#ifdef MAP_TYPE
+		printxval(mmap_flags, tcp->u_arg[4] & MAP_TYPE, "MAP_???");
+		addflags(mmap_flags, tcp->u_arg[4] & ~MAP_TYPE);
+#else
+		printflags(mmap_flags, tcp->u_arg[4]);
+#endif
+	}
+	return 0;
+}
+#endif

@@ -88,7 +88,7 @@ int sys_getpmsg(), sys_putpmsg(), sys_readahead(), sys_sendfile64();
 int sys_setxattr(), sys_fsetxattr(), sys_getxattr(), sys_fgetxattr();
 int sys_listxattr(), sys_flistxattr(), sys_removexattr(), sys_fremovexattr();
 int sys_sched_setaffinity(), sys_sched_getaffinity(), sys_futex();
-int sys_set_thread_area(), sys_get_thread_area();
+int sys_set_thread_area(), sys_get_thread_area(), sys_remap_file_pages();
 
 
 /* sys_socketcall subcalls */
