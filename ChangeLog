@@ -1,5 +1,12 @@
 2001-03-06  John Hughes <john@Calva.COM>
 
+  * aclocal.m4: look for pr_syscall in pr_lwp if we HAVE_MP_PROCFS
+  * defs.h: add PR_SYSCALL to allow use of pr_lwp.pr_syscall if it exists.
+  * syscall.c: use PR_SYSCALL instead of pr_syscall, fix up UnixWare code
+    so it doesn't try to use pr_sysarg.
+
+2001-03-06  John Hughes <john@Calva.COM>
+
   * aclocal.m4: on systems other than linux look for stat64 in sys/stat.h
   * file.c: handle xstat version _STAT64_VER, aka stat64.
 
