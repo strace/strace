@@ -1,3 +1,8 @@
+2001-02-16  Wichert Akkerman <wakkerma@debian.org>
+
+  * configure.in: test for netinet/tcp.h and netinet/udp.h existance
+  * net.c: include netinet/tcp.h and netinet/udp.h if they exist
+
 2000-11-26  Wichert Akkerman <wakkerma@debian.org>
 
   *  net.c: fix formating error in sys_setsockopt

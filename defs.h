@@ -68,6 +68,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
 #include <sys/time.h>
 #include <errno.h>
 
