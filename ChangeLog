@@ -1,3 +1,7 @@
+2001-03-29  Wichert Akkerman <wakkerma@debian.org>
+
+  * linux/ia64/ioctlent.h: regenerated
+
 2001-03-31  Wichert Akkerman <wakkerma@debian.org>
 
   * linux/{alpha,ia64,powerpc}/ioctlent.sh: removed, all archs use the
