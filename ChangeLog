@@ -1,3 +1,12 @@
+2003-06-27  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Check for type `struct __old_kernel_stat'.
+	* file.c (convertoldstat, printoldstat): Define under
+	[LINUX && HAVE_STRUCT___OLD_KERNEL_STAT] rather than a list of archs.
+	(sys_oldstat, sys_oldfstat, sys_oldlstat): Likewise.
+	* linux/dummy.h [! HAVE_STRUCT___OLD_KERNEL_STAT]
+	(sys_oldstat, sys_oldfstat, sys_oldlstat): #define to printargs.
+
 2003-06-26  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: SHMEDIA -> SH64
