@@ -570,14 +570,8 @@ struct tcb *tcp;
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
 			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
 			return 0;
-		if (flags & CLONE_PARENT_SETTID) {
-			int pid;
-			if (umove(tcp, tcp->u_arg[ARG_PTID], &pid) == 0)
-				tprintf(", parent_tidptr=[%d]", pid);
-			else
-				tprintf(", parent_tidptr=%#lx",
-					tcp->u_arg[ARG_PTID]);
-		}
+		if (flags & CLONE_PARENT_SETTID)
+			tprintf(", parent_tidptr=%#lx", tcp->u_arg[ARG_PTID]);
 		if (flags & CLONE_SETTLS) {
 # ifdef I386
 			struct modify_ldt_ldt_s copy;
