@@ -1,3 +1,10 @@
+2005-03-22  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.5.11.
+	* debian/changelog, strace.spec: 4.5.11-1.
+
+	* linux/arm/syscallent.h: Fix 113 entry (syscall, not vm86old).
+
 2005-03-14  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.10.
