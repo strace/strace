@@ -72,7 +72,7 @@ struct pt_regs;
 #include <linux/utsname.h>
 #endif
 
-#ifdef HAVE_ASM_SYSMIPS_H
+#ifdef MIPS
 #include <asm/sysmips.h>
 #endif
 

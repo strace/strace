@@ -1,5 +1,10 @@
 2002-11-06  Michal Ludvig  <mludvig@suse.cz>
 
+	Merged patch from Steven J. Hill <sjhill@realitydiluted.com>
+	to allow the compilation of a native MIPS strace.
+
+2002-11-06  Michal Ludvig  <mludvig@suse.cz>
+
 	From Marty Leisner <leisner@rochester.rr.com>, 
 	rewritten my mludvig:
 	* strace.c (not_failing_only): New.
