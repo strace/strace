@@ -2,6 +2,7 @@
 
 	* syscall.c (syscall_fixup) [LINUX && X86_64]: For 32-bit process,
 	sign extend the low 32 bits of RAX to 64 bits.
+	Fixes RH#126547.
 
 	* syscall.c (force_result): [LINUX && X86_64]: Fix RAX*4 -> RAX*8.
 
