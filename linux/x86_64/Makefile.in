@@ -21,12 +21,10 @@ INCLUDES = -I. -I.. -I$(srcdir)/.. -I../.. -I$(srcdir)
 
 includedir = @includedir@
 
-all: ioctlent.h errnoent.h signalent.h syscallent.h
-
 ia32headers= syscallent1.h syscall1.h signalent1.h ioctls1.h \
 	ioctlent1.h ioctldefs1.h errnoent1.h dummy1.h
 
-headers: $(ia32headers)
+all: $(ia32headers)
 
 $(ia32headers):
 	$(SHELL) ./makeheaders.sh
@@ -38,3 +36,5 @@ distclean: clean
 	rm -f Makefile
 
 maintainer-clean: distclean
+
+install:
