@@ -538,6 +538,12 @@ extern void print_ldt_entry();
 #  define ARG_PTID	2
 #  define ARG_TLS	3
 #  define ARG_CTID	4
+# elif defined X86_64
+#  define ARG_FLAGS	0
+#  define ARG_STACK	1
+#  define ARG_PTID	2
+#  define ARG_CTID	3
+#  define ARG_TLS	4
 # else
 #  define ARG_FLAGS	0
 #  define ARG_STACK	1

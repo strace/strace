@@ -54,7 +54,7 @@
 	{ 4,	TN,	sys_socketpair,		"socketpair"	},  /* 53 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	},  /* 54 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	},  /* 55 */
-	{ 2,	TP,	sys_clone,		"clone"		},  /* 56 */
+	{ 5,	TP,	sys_clone,		"clone"		},  /* 56 */
 	{ 0,	TP,	sys_fork,		"fork"		},  /* 57 */
 	{ 0,	TP,	sys_vfork,		"vfork"		},  /* 58 */
 	{ 3,	TF|TP,	sys_execve,		"execve"	},  /* 59 */
