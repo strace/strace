@@ -70,7 +70,8 @@ ifeq ($(build64),yes)
 	ln -s strace.1 debian/tmp/usr/share/man/man1/strace64.1
 endif
 
-	dpkg-shlibdeps strace
+	dpkg-shlibdeps build/strace $(patsubst yes,build64/strace,$(build64))
+
 	dpkg-gencontrol -isp
 	dpkg --build debian/tmp ..
 
