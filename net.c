@@ -219,12 +219,18 @@ static struct xlat socktypes[] = {
 	{ 0,		NULL		},
 };
 static struct xlat socketlayers[] = {
+#if defined(SOL_IP)
 	{ SOL_IP,	"SOL_IP"	},
+#endif
 #if defined(SOL_ICMP)
 	{ SOL_ICMP,	"SOL_ICMP"	},
 #endif
+#if defined(SOL_TCP)
 	{ SOL_TCP,	"SOL_TCP"	},
+#endif
+#if defined(SOL_UDP)
 	{ SOL_UDP,	"SOL_UDP"	},
+#endif
 #if defined(SOL_IPV6)
 	{ SOL_IPV6,	"SOL_IPV6"	},
 #endif

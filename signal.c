@@ -595,8 +595,8 @@ sys_sigaction(tcp)
 struct tcb *tcp;
 {
 	long addr;
-	sigset_t sigset;
 #ifdef LINUX
+	sigset_t sigset;
 	struct old_sigaction sa;
 #else
 	struct sigaction sa;
