@@ -47,6 +47,7 @@ cat ioctlent.tmp |
 	egrep -v "$bad_includes"
 echo xyzzy
 echo "struct ioctlent ioctlent[] = {"
-egrep -v "$bad_defines" ioctlent.tmp
+egrep -v "$bad_defines" ioctlent.tmp |
+awk '{ print "#ifdef " $4; print $0; print "#endif" }'
 echo "};"
 rm -f ioctlent.tmp
