@@ -1,5 +1,14 @@
 2004-09-03  Roland McGrath  <roland@redhat.com>
 
+	* syscall.c (qual_options): Add const to defn.
+	Update all uses.
+	(call_count, error_count, tv_count): Variables removed.
+	(struct call_counts, counts): New type and variable.
+	Update all users of the old three to use the new array of structs.
+	(trace_syscall): Allocate counts on first use.
+	(sorted_count): Variable removed.
+	(call_summary): Allocate locally.
+
 	* syscall.c (sysent0, sysent1, sysent2, sysent): Add const to defn.
 	(nsyscalls0, nsyscalls1, nsyscalls2): Likewise.
 	(errnoent0, errnoent1, errnoent2, errnoent): Likewise.
