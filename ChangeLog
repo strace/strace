@@ -1,6 +1,39 @@
 2004-10-19  Roland McGrath  <roland@redhat.com>
 
+	* process.c (WCOREFLAG): Define if not defined.
+	(W_STOPCODE, W_EXITCODE): Likewise.
+	Reported by Marty Leisner <mleisner@eng.mc.xerox.com>.
+
+	* sock.c [! LINUX]: Include <sys/socket.h> before <sys/sockio.h>.
+	Reported by Marty Leisner <mleisner@eng.mc.xerox.com>.
+
+	* debian/rules: Make strace64.1.gz symlink to strace.1.gz instead of
+	strace64.1 to strace.1, which doesn't exist.
+	Fixes Debian bug #269220.
+
+2004-09-05  Phil Blundell  <pb@nexus.co.uk>
+
+	* linux/arm/syscallent.h: New file.
+
+2004-10-19  Roland McGrath  <roland@redhat.com>
+
+	* debian/rules (DEB_BUILD_GNU_TYPE, CONFIG_OPTS): New variables.
+	[$(DEB_HOST_GNU_TYPE) == s390-linux] (build64, HOST64, CC64): Set them.
+	(build/Makefile): Use $(CONFIG_OPTS).
+	(build64/Makefile): Pass --host as well as --build.
+	From Bastian Blank <waldi@debian.org>.
+	Fixes Debian bug #271500.
+
+	* linux/hppa/syscallent.h: Update for 2.6.9 syscalls.
+	From Randolph Chung <tausq@debian.org>
+	Fixes Debian bug #273887.
+
 	* file.c (sys_llseek): Revert last change.
+
+2004-09-14  Richard Henderson  <rth@twiddle.net>
+
+	* linux/alpha/syscallent.h: Add tgkill, *stat64, vserver, mbind,
+	[gs]et_mempolicy, mq_*, waitid.
 
 2004-10-07  Roland McGrath  <roland@redhat.com>
 
