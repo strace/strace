@@ -1054,7 +1054,7 @@ struct tcb *tcp;
 #elif defined (POWERPC)
 #define LOOP	0x0000feeb
 #elif defined(ARM)
-#define LOOP	0xfeffffea
+#define LOOP	0xEAFFFFFE
 #elif defined(MIPS)
 #define LOOP	0x1000ffff
 #elif defined(S390)
