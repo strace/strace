@@ -2,6 +2,7 @@
 
 	* syscall.c (trace_syscall) [LINUX]: Calculate ONE_TICK once using
 	setitimer rather than hard-coding a value based on HZ.
+	Fixes RH#108012, reported by Florian La Roche <laroche@redhat.com>.
 
 2003-10-21  Roland McGrath  <roland@redhat.com>
 
