@@ -78,8 +78,8 @@ int acolumn = DEFAULT_ACOLUMN;
 int max_strlen = DEFAULT_STRLEN;
 char *outfname = NULL;
 FILE *outf;
-struct tcb tcbtab[MAX_PROCS];
-int nprocs;
+struct tcb **tcbtab;
+unsigned int nprocs, tcbtabsize;
 char *progname;
 extern char version[];
 extern char **environ;
@@ -105,7 +105,7 @@ static int interrupted;
 static struct tcb *pfd2tcb P((int pfd));
 static void reaper P((int sig));
 static void rebuild_pollv P((void));
-struct pollfd pollv[MAX_PROCS];
+static struct pollfd *pollv;
 
 #ifndef HAVE_POLLABLE_PROCFS
 
@@ -183,6 +183,13 @@ char *argv[];
 	struct sigaction sa;
 
 	static char buf[BUFSIZ];
+
+	/* Allocate the initial tcbtab.  */
+	tcbtabsize = argc;	/* Surely enough for all -p args.  */
+	tcbtab = (struct tcb **) malloc (tcbtabsize * sizeof tcbtab[0]);
+	tcbtab[0] = (struct tcb *) calloc (tcbtabsize, sizeof *tcbtab[0]);
+	for (tcp = tcbtab[0]; tcp < &tcbtab[0][tcbtabsize]; ++tcp)
+		tcbtab[tcp - tcbtab[0]] = &tcbtab[0][tcp - tcbtab[0]];
 
 	progname = argv[0];
 	outf = stderr;
@@ -358,7 +365,8 @@ char *argv[];
 	else
 		qflag = 1;
 
-	for (c = 0, tcp = tcbtab; c < MAX_PROCS; c++, tcp++) {
+	for (c = 0; c < tcbtabsize; c++) {
+		tcp = tcbtab[c];
 		/* Reinitialize the output since it may have changed. */
 		tcp->outf = outf;
 		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
@@ -596,7 +604,8 @@ int pid;
 	int i;
 	struct tcb *tcp;
 
-	for (i = 0, tcp = tcbtab; i < MAX_PROCS; i++, tcp++) {
+	for (i = 0; i < tcbtabsize; i++) {
+		tcp = tcbtab[i];
 		if ((tcp->flags & TCB_INUSE) == 0) {
 			tcp->pid = pid;
 			tcp->parent = NULL;
@@ -930,7 +939,8 @@ int pid;
 	int i;
 	struct tcb *tcp;
 
-	for (i = 0, tcp = tcbtab; i < MAX_PROCS; i++, tcp++) {
+	for (i = 0; i < tcbtabsize; i++) {
+		tcp = tcbtab[i];
 		if (pid && tcp->pid != pid)
 			continue;
 		if (tcp->flags & TCB_INUSE)
@@ -948,7 +958,7 @@ int pfd;
 	int i;
 	struct tcb *tcp;
 
-	for (i = 0, tcp = tcbtab; i < MAX_PROCS; i++, tcp++) {
+	for (i = 0, tcp = tcbtab; i < tcbtabsize; i++, tcp++) {
 		if (tcp->pfd != pfd)
 			continue;
 		if (tcp->flags & TCB_INUSE)
@@ -1167,7 +1177,8 @@ cleanup()
 	int i;
 	struct tcb *tcp;
 
-	for (i = 0, tcp = tcbtab; i < MAX_PROCS; i++, tcp++) {
+	for (i = 0; i < tcbtabsize; i++) {
+		tcp = tcbtab[i];
 		if (!(tcp->flags & TCB_INUSE))
 			continue;
 		if (debug)
@@ -1255,7 +1266,15 @@ rebuild_pollv()
 	int i, j;
 	struct tcb *tcp;
 
-	for (i = j = 0, tcp = tcbtab; i < MAX_PROCS; i++, tcp++) {
+	if (pollv != NULL)
+		free (pollv);
+	pollv = (struct poll *) malloc(nprocs * sizeof pollv[0]);
+	if (pollv == NULL) {
+		fprintf(stderr, "strace: out of memory for poll vector\n");
+		exit(1);
+	}
+
+	for (i = j = 0, tcp = tcbtab; i < tcbtabsize; i++, tcp++) {
 		if (!(tcp->flags & TCB_INUSE))
 			continue;
 		pollv[j].fd = tcp->pfd;

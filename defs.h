@@ -45,9 +45,6 @@
 #define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
 #endif
 #endif
-#ifndef MAX_PROCS
-#define MAX_PROCS	64	/* maximum number of processes tracable */
-#endif
 #ifndef DEFAULT_STRLEN
 #define DEFAULT_STRLEN	32	/* default maximum # of bytes printed in
 				  `printstr', change with `-s' switch */
@@ -90,7 +87,7 @@
 #  if defined(X86_64)
 #     define LINUX_X86_64
 #  endif
-#endif 
+#endif
 
 #if defined(SVR4) || defined(FREEBSD)
 #define USE_PROCFS
@@ -186,8 +183,8 @@ extern int ptrace();
 #ifdef X86_64
 #undef SUPPORTED_PERSONALITIES
 #define SUPPORTED_PERSONALITIES 2
-#endif 
-  
+#endif
+
 #ifdef SVR4
 #ifdef HAVE_MP_PROCFS
 extern int mp_ioctl (int f, int c, void *a, int s);
@@ -216,7 +213,7 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #else
 #define IOCTL		ioctl
 #define IOCTL_STATUS(t)	ioctl (t->pfd, PIOCSTATUS, &t->status)
-#define IOCTL_WSTOP(t)	ioctl (t->pfd, PIOCWSTOP, &t->status)	
+#define IOCTL_WSTOP(t)	ioctl (t->pfd, PIOCWSTOP, &t->status)
 #define PR_WHY		pr_why
 #define PR_WHAT		pr_what
 #define PR_REG		pr_reg
@@ -355,13 +352,13 @@ struct xlat {
 #define TRACE_PROCESS	010	/* Trace process-related syscalls. */
 #define TRACE_SIGNAL	020	/* Trace signal-related syscalls. */
 
-extern struct tcb tcbtab[];
+extern struct tcb **tcbtab;
 extern int qual_flags[];
 extern int debug, followfork, followvfork;
 extern int rflag, tflag, dtime, cflag, xflag, qflag;
 extern int acolumn;
 extern char *outfname;
-extern int nprocs;
+extern unsigned int nprocs, tcbtabsize;
 extern int max_strlen;
 extern struct tcb *tcp_last;
 
