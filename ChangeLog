@@ -1,5 +1,8 @@
 2003-01-10  Roland McGrath  <roland@redhat.com>
 
+	* util.c [LINUX && X86_64] (arg0_offset, arg1_offset): Use correct
+	values for x86-64, conditional on current_personality.
+
 	* strace.c (droptcb): Clear flags word before calling rebuild_pollv.
 
 	* configure.ac: Check struct T_conn_res for QUEUE_ptr or ACCEPTOR_id.
