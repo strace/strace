@@ -1,3 +1,10 @@
+2001-04-10  Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge patches from Maciej W. Rozycki:
+    + util.c: add code to print PC for MIPS
+    + linux/mips/syscallent.h: updated
+    + system.c: formating fixes for sys_sysmips
+
 2001-04-07  Wichert Akkerman <wakkerma@debian.org>
 
   * NEWS: start 4.3.1 items
