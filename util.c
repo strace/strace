@@ -1263,6 +1263,9 @@ struct tcb *tcp;
 	}
 
 	switch (tcp->scno) {
+#ifdef SYS_vfork
+	case SYS_vfork:
+#endif
 #ifdef SYS_fork
 	case SYS_fork:
 		if (arg_setup (tcp, &state) < 0
