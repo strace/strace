@@ -1771,7 +1771,9 @@ static struct xlat ptrace_cmds[] = {
 	{ PT_READ_D,		"PT_READ_D"		},
 	{ PT_WRITE_I,		"PT_WRITE_I"		},
 	{ PT_WRITE_D,		"PT_WRITE_D"		},
-	{ PT_READ_U,		"PT_WRITE_U"		},
+#ifdef PT_READ_U
+	{ PT_READ_U,		"PT_READ_U"		},
+#endif
 	{ PT_CONTINUE,		"PT_CONTINUE"		},
 	{ PT_KILL,		"PT_KILL"		},
 	{ PT_STEP,		"PT_STEP"		},

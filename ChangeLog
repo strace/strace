@@ -1,3 +1,8 @@
+2001-09-28   John Hughes <john@Calva.COM>
+
+  * process.c: FreeBSD-CURRENT no longer has PT_READ_U, and anyway we
+    were showing it as PT_WRITE_U!  Fix from Maxime Henrion.
+
 2001-09-18   John Hughes <john@Calva.COM>
 
   * net.c: fix display of sockaddr structures, sometimes too many "}",
