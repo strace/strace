@@ -82,6 +82,15 @@ static struct xlat mmap_prot[] = {
 	{ PROT_READ,	"PROT_READ"	},
 	{ PROT_WRITE,	"PROT_WRITE"	},
 	{ PROT_EXEC,	"PROT_EXEC"	},
+#ifdef PROT_SEM
+	{ PROT_SEM,	"PROT_SEM"	},
+#endif
+#ifdef PROT_GROWSDOWN
+	{ PROT_GROWSDOWN,"PROT_GROWSDOWN"},
+#endif
+#ifdef PROT_GROWSUP
+	{ PROT_GROWSUP, "PROT_GROWSUP"	},
+#endif
 	{ 0,		NULL		},
 };
 
