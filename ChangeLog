@@ -1,8 +1,11 @@
 2003-10-01  Roland McGrath  <roland@redhat.com>
 
+	* process.c (internal_clone): Don't suspend parent when call requested
+	a specific PID that is not a traced child.
+
 	* signal.c [LINUX] (parse_sigset_t): Rewrite to process hex strings
 	from right to left so we don't have to presume the size.
-	Fixes RH#105995.  Reported by David Woodhouse <dwmw2@redhat.com>.
+	Reported by David Woodhouse <dwmw2@redhat.com>.
 
 2003-09-25  Roland McGrath  <roland@redhat.com>
 
