@@ -645,7 +645,7 @@ struct tcb *tcp;
 		else {
 #ifdef HAVE_SYS_EPOLL_H
 			struct epoll_event ev;
-			else if (umove(tcp, tcp->u_arg[3], &ev) == 0)
+			if (umove(tcp, tcp->u_arg[3], &ev) == 0)
 				print_epoll_event(&ev);
 			else
 #endif
