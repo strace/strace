@@ -1,3 +1,10 @@
+2003-08-21  Roland McGrath  <roland@redhat.com>
+
+	* linux/syscallent.h: Fix mlock argument count.
+	* linux/x86_64/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+
 2003-07-28  Daniel Jacobowitz  <drow@mvista.com>
 
 	* defs.h (ALIGN64): Define for MIPS.
