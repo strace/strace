@@ -2629,8 +2629,11 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	tprintf("%p, ", (void *) tcp->u_arg[0]);
 	printflags(futexops, tcp->u_arg[1]);
-	tprintf(", %ld, ", tcp->u_arg[2]);
-	printtv(tcp, tcp->u_arg[3]);
+	tprintf(", %ld", tcp->u_arg[2]);
+	if (tcp->u_arg[1] == FUTEX_WAIT) {
+		tprintf(", ");
+		printtv(tcp, tcp->u_arg[3]);
+	}
     }
     return 0;
 }
