@@ -1,3 +1,9 @@
+2004-02-20  Roland McGrath  <roland@redhat.com>
+
+	* linux/hppa/syscallent.h: Update some syscalls.
+	From Randolph Chung <tausq@debian.org>.
+	Fixes Debian bug #231632.
+
 2003-12-31  David Mosberger  <davidm@hpl.hp.com>
 
 	* process.c (internal_exit): For ia64, also recognize IA-32 252
