@@ -1704,7 +1704,10 @@ struct tcb *tcp;
 		}
 	}
 #if defined LINUX && defined TCB_WAITEXECVE
-	tcp->flags |= TCB_WAITEXECVE;
+	if (exiting(tcp) && syserror(tcp))
+		tcp->flags &= ~TCB_WAITEXECVE;
+	else
+		tcp->flags |= TCB_WAITEXECVE;
 #endif /* LINUX && TCB_WAITEXECVE */
 	return 0;
 }
