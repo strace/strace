@@ -1742,8 +1742,11 @@ struct tcb *tcp;
 		if (tcp->scno >= nsyscalls || tcp->scno < 0
 		    || (qual_flags[tcp->scno] & QUAL_RAW))
 			sys_res = printargs(tcp);
-		else
+		else {
+			if (not_failing_only && tcp->u_error)
+				return;	/* ignore failed syscalls */
 			sys_res = (*sysent[tcp->scno].sys_func)(tcp);
+		}	
 		u_error = tcp->u_error;
 		tprintf(") ");
 		tabto(acolumn);

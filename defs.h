@@ -553,3 +553,5 @@ do {									\
 #ifdef IA64
 extern long ia32;
 #endif
+
+extern int not_failing_only;

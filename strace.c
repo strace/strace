@@ -67,6 +67,9 @@ int rflag = 0, tflag = 0, dtime = 0, cflag = 0;
 int iflag = 0, xflag = 0, qflag = 0;
 int pflag_seen = 0;
 
+/* Sometimes we want to print only succeeding syscalls. */
+int not_failing_only = 0;
+
 char *username = NULL;
 uid_t run_uid;
 gid_t run_gid;
@@ -154,6 +157,7 @@ usage: strace [-dffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
 -s strsize -- limit length of print strings to STRSIZE chars (default %d)\n\
 -S sortby -- sort syscall counts by: time, calls, name, nothing (default %s)\n\
 -u username -- run command as username handling setuid and/or setgid\n\
+-z -- print only succeeding syscalls\n\
 ", DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(exitval);
 }
@@ -190,7 +194,7 @@ char *argv[];
 	set_sortby(DEFAULT_SORTBY);
 	set_personality(DEFAULT_PERSONALITY);
 	while ((c = getopt(argc, argv,
-		"+cdfFhiqrtTvVxa:e:o:O:p:s:S:u:")) != EOF) {
+		"+cdfFhiqrtTvVxza:e:o:O:p:s:S:u:")) != EOF) {
 		switch (c) {
 		case 'c':
 			cflag++;
@@ -233,6 +237,9 @@ char *argv[];
 		case 'V':
 			printf("%s\n", version);
 			exit(0);
+			break;
+		case 'z':
+			not_failing_only = 1;
 			break;
 		case 'a':
 			acolumn = atoi(optarg);

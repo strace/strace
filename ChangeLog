@@ -1,3 +1,12 @@
+2002-11-06  Michal Ludvig  <mludvig@suse.cz>
+
+	From Marty Leisner <leisner@rochester.rr.com>, 
+	rewritten my mludvig:
+	* strace.c (not_failing_only): New.
+	(usage): Added -z switch description.
+	(main): Added -z switch parsing to not_failing_only variable.
+	* syscall.c (trace_syscall): Added not_failing_only handling.
+
 2002-10-08  Heiko Carstens <heiko.carstens@de.ibm.com>
 
 	Missing complete changelog for 2002-10-07 commit:
