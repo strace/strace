@@ -93,6 +93,15 @@ static const struct xlat resources[] = {
 #ifdef RLIMIT_AS
 	{ RLIMIT_AS,	"RLIMIT_AS"	},
 #endif
+#ifdef RLIMIT_LOCKS
+	{ RLIMIT_LOCKS,	"RLIMIT_LOCKS"	},
+#endif
+#ifdef RLIMIT_SIGPENDING
+	{ RLIMIT_SIGPENDING,	"RLIMIT_SIGPENDING"	},
+#endif
+#ifdef RLIMIT_MSGQUEUE
+	{ RLIMIT_MSGQUEUE,	"RLIMIT_MSGQUEUE"	},
+#endif
 	{ 0,		NULL		},
 };
 
