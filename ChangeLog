@@ -1,4 +1,15 @@
+2002-12-30  Roland McGrath  <roland@redhat.com>
+
+	* linux/syscallent.h [X86_64]: Disable sanity checks, subcall stuff is
+	already broken for 32-bit personality on x86-64.
+
 2002-12-29  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, Makefile.am: Punt subdirs, handle everything here.
+	* linux/Makefile.am: File removed.
+	* freebsd/Makefile.am: File removed.
+	* sunos4/Makefile.in: File removed.
+	* svr4/Makefile.in: File removed.
 
 	* linux/alpha/Makefile.in: File removed.
 	* linux/hppa/Makefile.in: File removed.
@@ -28,6 +39,7 @@
 	* configure.ac: ... here.  Update for Autoconf 2.5x and Automake.
 	* aclocal.m4: Moved to ...
 	* acinclude.m4: ... here.  Update for Autoconf 2.5x.
+	* acconfig.h: File removed.
 	* AUTHORS: New file, makes automake happy.
 	* autogen.sh: File removed.
 	* README-CVS: Update to recommend autoreconf instead.
