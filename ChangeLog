@@ -14,6 +14,7 @@
 	SIOCGIFINDEX, and fix their output.
 	From Ulrich Drepper <drepper@redhat.com>.
 	Fixes RH#138223.
+	Fixes Debian bug #192164.
 
 2004-12-20  Dmitry V. Levin  <ldv@altlinux.org>
 
