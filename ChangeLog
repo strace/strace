@@ -1,3 +1,8 @@
+2001-03-06  John Hughes <john@Calva.COM>
+
+  * net.c: make sure SOL_ options are defined before using.
+  * signal.c: declare sigset variable, only used on linux, inside #ifdef.
+
 2001-02-21  Wichert Akkerman <wakkerma@debian.org>
 
   * net.c: fix format for printing Unix domain sockets
