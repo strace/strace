@@ -215,6 +215,18 @@
 	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 214 */
 	{ 4,	0,	printargs,		"epoll_wait"	}, /* 215 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 216 */
-	{ 1,	0,	printargs,		"set_tid_address"}, /* 217 */
-	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 18 */
-	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
+	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 217 */
+	{ 5,	0,	printargs,		"SYS_218"	}, /* 218 */
+	{ 5,	0,	printargs,		"SYS_219"	}, /* 219 */
+	{ 5,	0,	printargs,		"SYS_220"	}, /* 220 */
+	{ 5,	0,	printargs,		"SYS_221"	}, /* 221 */
+	{ 5,	0,	printargs,		"SYS_222"	}, /* 222 */
+	{ 5,	0,	printargs,		"SYS_223"	}, /* 223 */
+	{ 5,	0,	printargs,		"SYS_224"	}, /* 224 */
+	{ 5,	0,	printargs,		"SYS_225"	}, /* 225 */
+	{ 5,	0,	printargs,		"SYS_226"	}, /* 226 */
+	{ 5,	0,	printargs,		"SYS_227"	}, /* 227 */
+	{ 5,	0,	printargs,		"SYS_228"	}, /* 228 */
+	{ 5,	0,	printargs,		"SYS_229"	}, /* 229 */
+	{ 5,	0,	printargs,		"SYS_230"	}, /* 230 */
+	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 231 */
