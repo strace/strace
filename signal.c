@@ -1118,7 +1118,7 @@ sys_rt_sigprocmask(tcp)
 			tprintf("[?]");
 		else
 			printsigmask(&sigset);
-		tprintf(", %lu", tcp->u_arg[4]);
+		tprintf(", %lu", tcp->u_arg[3]);
 	}
 	return 0;
 }
