@@ -242,30 +242,10 @@
 
 #include "../dummy.h"
 
-	{ 8,	0,	printargs,		"SYS_275"	}, /* 275 */
-	{ 8,	0,	printargs,		"SYS_276"	}, /* 276 */
-	{ 8,	0,	printargs,		"SYS_277"	}, /* 277 */
-	{ 8,	0,	printargs,		"SYS_278"	}, /* 278 */
-	{ 8,	0,	printargs,		"SYS_279"	}, /* 279 */
-	{ 8,	0,	printargs,		"SYS_280"	}, /* 280 */
-	{ 8,	0,	printargs,		"SYS_281"	}, /* 281 */
-	{ 8,	0,	printargs,		"SYS_282"	}, /* 282 */
-	{ 8,	0,	printargs,		"SYS_283"	}, /* 283 */
-	{ 8,	0,	printargs,		"SYS_284"	}, /* 284 */
-	{ 8,	0,	printargs,		"SYS_285"	}, /* 285 */
-	{ 8,	0,	printargs,		"SYS_286"	}, /* 286 */
-	{ 8,	0,	printargs,		"SYS_287"	}, /* 287 */
-	{ 8,	0,	printargs,		"SYS_288"	}, /* 288 */
-	{ 8,	0,	printargs,		"SYS_289"	}, /* 289 */
-	{ 8,	0,	printargs,		"SYS_290"	}, /* 290 */
-	{ 8,	0,	printargs,		"SYS_291"	}, /* 291 */
-	{ 8,	0,	printargs,		"SYS_292"	}, /* 292 */
-	{ 8,	0,	printargs,		"SYS_293"	}, /* 293 */
-	{ 8,	0,	printargs,		"SYS_294"	}, /* 294 */
-	{ 8,	0,	printargs,		"SYS_295"	}, /* 295 */
-	{ 8,	0,	printargs,		"SYS_296"	}, /* 296 */
-	{ 8,	0,	printargs,		"SYS_297"	}, /* 297 */
-	{ 8,	0,	printargs,		"SYS_298"	}, /* 298 */
+/* You must be careful to check ../syscallent.h so that this table
+   starts where that one leaves off.
+*/
+
 	{ 8,	0,	printargs,		"SYS_299"	}, /* 299 */
 	{ 8,	0,	printargs,		"SYS_300"	}, /* 300 */
 	{ 8,	0,	printargs,		"SYS_301"	}, /* 301 */
