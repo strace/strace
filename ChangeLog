@@ -1,3 +1,8 @@
+2003-05-22  Roland McGrath  <roland@redhat.com>
+
+	* process.c (print_affinitylist): Fix loop condition.
+	Reported by Ian Wienand <ianw@gelato.unsw.edu.au>.
+
 2003-04-10  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c (qual_desc): Return zero after parsing number.
