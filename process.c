@@ -548,11 +548,17 @@ struct tcb *tcp;
 		}
 		tcp->flags |= TCB_FOLLOWFORK;
 
-		tcp->u_arg[0] |= CLONE_PTRACE;
-		setarg(tcp, 0);
+
+		if (setbpt(tcp) < 0)
+			return 0;
 	} else {
+		int bpt = tcp->flags & TCB_BPTSET;
+
 		if (!(tcp->flags & TCB_FOLLOWFORK))
 			return 0;
+
+		if (bpt)
+			clearbpt(tcp);
 
 		if (syserror(tcp))
 			return 0;
@@ -564,10 +570,21 @@ struct tcb *tcp;
 			return 0;
 		}
 
-		/* For fork we need to re-attach, but thanks to CLONE_PTRACE we're
-		 * already attached.
-		 */
+		/* Attach to the new child */
+		if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
+			perror("PTRACE_ATTACH");
+			fprintf(stderr, "Too late?\n");
+			droptcb(tcpchild);
+			return 0;
+		}
+
 		tcpchild->flags |= TCB_ATTACHED;
+		if (bpt) {
+			tcpchild->flags |= TCB_BPTSET;
+			tcpchild->baddr = tcp->baddr;
+			memcpy(tcpchild->inst, tcp->inst,
+				sizeof tcpchild->inst);
+		}
 		newoutf(tcpchild);
 		tcp->nchildren++;
 		if (!qflag)

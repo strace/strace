@@ -35,6 +35,7 @@
 #include <dirent.h>
 #ifdef linux
 #define dirent kernel_dirent
+#define dirent64 kernel_dirent64
 #include <linux/types.h>
 #include <linux/dirent.h>
 #undef dirent

@@ -1,3 +1,10 @@
+2000-09-03  Wichert Akkerman <wakkerma@debian.org>
+
+  *  process.c: perform bpt trick for clone as well so we can get the
+     pid of the child before it starts doing something
+  *  file.c: rename dirent64 struct to kernel_dirent64 so things compile
+     again with newer libcs
+
 2000-09-01  Wichert Akkerman <wakkerma@debian.org>
 
   *  lots of files: merge patch from Gaël Roualland to add

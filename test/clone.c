@@ -10,7 +10,7 @@ int
 main()
 {
     	char	stack[4096];
-	if (clone(child, stack+4000, CLONE_VM|CLONE_FS|CLONE_FILES, NULL) != 0)
-		write(1, "original\n", 9);
+	clone(child, stack+4000, CLONE_VM|CLONE_FS|CLONE_FILES, NULL);
+	write(1, "original\n", 9);
 	exit(0);
 }
