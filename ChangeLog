@@ -1,0 +1,595 @@
+Sun Oct 27 22:28:00 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* util.c (umovestr) [LINUX]: Handle Linux like SunOS4
+	instead of SVR4.  That is, read a few bytes at a time
+	to avoid overrunning the end of the stack.
+
+Fri May 31 01:48:49 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.1 is released.
+
+Thu May 23 01:04:43 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* aclocal.m4 (AC_DECL_SYS_ERRLIST): Try looking in stdio.h
+	as well since that's where glibc declares it.  Go figure.
+	* signal.c (sys_sigreturn) [ALPHA]: Use sigcontext
+	instead of sigcontext_struct since glibc v5+ apparently
+	plays games with the native OS namespace.
+	From David Mosberger-Tang <davidm@AZStarNet.com>.
+
+Mon May 20 23:17:14 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.14 is released.
+
+	* aclocal.m4 (AC_STRUCT_MSG_CONTROL): New macro.
+	* configure.in: Add call to AC_STRUCT_MSG_CONTROL.
+	* net.c (printmsghdr): Handle BSD 4.3 and 4.4 msghdr members
+ 	differently.
+	Reported by Henrik Storner <storner@osiris.ping.dk>.
+
+	* configure.in: (AC_CHECK_{HEADERS,FUNCS}): Add checks for
+ 	sys/filio.h and sys/stream.h and remove check for poll.
+	* desc.c (decode_select, sys_select, sys_oldselect) [LINUX]:
+ 	Handle old and new styles of argument passing for select on Linux.
+	* ioctl.c, stream.c: Conditionalize stream code on presence of
+	sys/stream.h instead of poll because glibc implements poll but
+	not the rest of the stream interface.
+	* signal.c [LINUX]: Standardize on the name sigcontext_struct.
+	(sys_sigprocmask) [ALPHA]: Handle OSF flavor which is more like
+	sigsetmask.
+	* term.c (term_ioctl): Use _VMIN, if present, for TC{G,S}ETA*.
+	* util.c (umoven, umovestr): Move data in long-sized chunks
+	at a time, instead of hard coding it to be 4.
+	From David Mosberger-Tang <davidm@AZStarNet.com>.
+	
+Mon May 20 01:19:36 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.13 is released.
+
+	* configure.in (AC_CHECK_HEADERS): Add check for asm/sigcontext.h.
+	* signal.c [HAVE_ASM_SIGCONTEXT_H]: Conditionally include
+	asm/sigcontext.h to define sigcontext_struct and don't define it
+	locally if the header is present.
+
+	* syscall.c (nerrnos{0,2}): Correct size computation.
+
+	* Makefile.in: Remove dependencies and rules relating to files
+ 	normally found in the os directory.  Because of the new scheme we
+ 	don't know precisely where they come from.  Sigh.
+	* signalent.sh: Make it work for sunos4, linux, and svr4.
+	* {sunos4,linux{,/alpha},svr4}/Makefile.in: Make rules correspond
+ 	to traditional make syntax.  Add signalent.h to files which can
+ 	unconditionally be rebuilt.  Prevent signalent.h from being
+ 	unconditionally being rebuilt since it's customized.
+	* {sunos4,linux{,/alpha},svr4}/{ioctlent,errnoent,signalent}.h:
+ 	Use versions built by {ioctlent,errnoent,signaltent}.sh.
+  	* sunos4/ioctlent.sh: Work around sprintf troubles with SunOS
+ 	4.1.4 and gcc 2.7.2.
+	
+Sun May 19 17:14:09 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* configure.in, Makefile.in: Add OSARCH concept to finish
+	build support for the alpha.
+	* Makefile.in, linux/Makefile.in: Rewrite clean, distclean,
+	and maintainer-clean rules.
+	* defs.h, ioctlsort.c: Make ioctl code member unsigned.
+	* ioctl.c, ioctlsort.c (compare): Perform explicit checking
+	for less, greater, and equal since subtraction on two's
+	complement numbers isn't an order relation (it isn't transitive)!
+	* linux/Makefile.in: Add rules for the signalent.h file.
+	* linux/alpha/Makefile.in: New file.
+	
+Sun May 19 01:12:28 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.12 is released.
+
+	* linux{,alpha}/ioctlent.sh: Tweak for recent kernels.
+	From Michael E Chastain <mec@duracef.shout.net>.
+	
+	* defs.h (SUPPORTED_PERSONALITES, DEFAULT_PERSONALITY): New.
+	* syscall.c (set_personality): New.
+	* strace.c (main): Call set_personality.
+ 	* defs.h, syscall.c, ioctl.c, signal.c: Make sysent, errnoent,
+ 	ioctlent, and signalent indirect pointers and redirect them
+	based on personality.
+	* {sunos4,svr4,linux{,/alpha}}/signalent.h: New files.
+	Suggested by Tom Dyas <tdyas@eden.rutgers.edu>.
+
+	* util.c (upeek): Handle case where ptrace returns a long
+	and sizeof(long) != sizeof(int).
+	From Richard Henderson <richard@twiddle.tamu.edu>
+
+Fri May 17 21:03:36 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.11 is released.
+
+	* many files: Fix more printf warnings for other platforms.
+
+	* ipc.c (sys_msgrcv) [LINUX]: Conditionalize definition of ipc_wrapper.
+
+	* linux/dummy.h: Handle missing library support for {send,recv}msg.
+	Reported by Thomas Bogendoerfer <tsbogend@bigbug.franken.de>.
+
+	* linux/syscall.h (sys_utimes): Fix a typo in the declaration.
+	From Thomas Bogendoerfer <tsbogend@bigbug.franken.de>.
+	
+Fri May 17 00:50:06 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.10 is released.
+
+	* Makfile.in: Add os/arch to includes so that a given arch
+	(like alpha) can override the native arch (like i386).
+	* configure.in: Check for sendmsg.
+
+	* net.c: Make sendmsg and recvmsg dependent on an autoconf
+	test.  Reported by Michael E Chastain <mec@duracef.shout.net>.
+
+	* acconfig.h, configure.in: Detect the alpha.
+	* ioctl.c: Handle the alpha.
+	* defs.h: Make some members long for the alpha.  Define
+	some register nicknames.  Add support for WAITEXECVE.
+	* file.c [ALPHA]: Support the alpha for statfs.  Add
+	osf_statfs and osf_fstatfs for the alpha.  Make damn sure
+	major and minor results are suitable for passing to printf.
+	* signal.c, syscall.c: Support the alpha.
+	* process.c: Add alpha user offsets.
+	* most files: Use %l? for printf arguments since
+	most are now longs for the alpha.
+	* linux/alpha/{errnoent.h,ioctlent.{h,sh},syscallent.h}:
+	New for the alpha.
+	From Thomas Bogendoerfer <tsbogend@bigbug.franken.de>.
+
+Wed May 15 00:29:37 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.9 is released.
+
+	* config.in, config.sub, install-sh: Upgrade to autoconf 2.10.
+
+	* linux/dummy.h, linux/syscallent.h, linux/syscall.h: Add recent
+	Linux kernel version system calls.
+
+Wed Mar 13 01:03:38 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* ipc.c [SUNOS4]: Add SunOS support for decoding IPC calls.
+	* syscall.c [SUNOS4]: Compile decode_subcall on SunOS and
+	decode IPC calls using it.
+	* sunos4/dummy.h: Alias sys_semop to printargs.
+	* sunos4/syscall.h: Add new pseudo syscalls for IPC.
+	* sunos4/syscallent.h: Include new subcalls for IPC.
+	From Matthias Pfaller <leo@dachau.marco.de>.
+
+Tue Feb 13 22:08:25 1996  J. Richard Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.8 is released.
+
+	* time.c [LINUX]: Explicitly include linux/version.h.
+
+	* strace.c (main): Don't let them even *try* to
+	get strace to attach to itself since some systems
+	don't handle this case very gracefully.
+	Reported by David S. Miller <davem@caip.rutgers.edu>.
+
+	* Makefile.in (distclean): Fix it for subdirectories.
+
+	* sunos4/syscallent.h, svr4/syscallent.h: Fill in the new
+	sys_flags member for each defined system call.
+
+Fri Dec  8 01:17:28 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* defs.h (TRACE_*): New flags to describe what class
+	of system call each system call is.
+	(sysent): Add sys_flags member.
+	* syscall.c (sysent): Define (and later undef) abbreviations
+	for the system call class flags.
+	(lookup_class): New function to translate strings to
+	system call class flags.
+	(qualify): Handle new system call class mechanism.
+	* linux/syscallent.h: Fill in the new sys_flags member
+	for each defined system call.
+
+	* defs.h (print_sock): Remove redundant and non-K&R C
+	compatible prototype.  From Juergen Weigert
+	<jnweiger@immd4.informatik.uni-erlangen.de>.
+
+Thu Dec  7 01:17:40 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* linux/ioctlent.sh: Tweak to improve ioctl accuracy.
+	From Michael E Chastain <mec@duracef.shout.net>.
+
+	* system.c (includes) [LINUX]: Add linux/nfs.h for recent
+	kernels.  From Michael E Chastain <mec@duracef.shout.net>.
+
+Wed Dec  6 21:52:28 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* file.c (sprintfstype): Enclose string result in double
+	quotes.
+
+	* time.c (sys_adjtimex) [LINUX]: Conditionalize
+	constantly evolving timex structure.
+	From Aaron Ucko <UCKO@VAX1.ROCKHURST.EDU>.
+
+	* defs.h, syscall.c, strace.c: Rename syscall to
+	trace_syscall and change prototype and all callers
+	because of broken Linux shared libraries.
+	From Aaron Ucko <UCKO@VAX1.ROCKHURST.EDU>.
+
+	* Makefile.in (clean): Check for a file with test -f not
+	test -d.  From Aaron Ucko <UCKO@VAX1.ROCKHURST.EDU>.
+
+Tue Sep 26 02:32:31 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.7 is released.
+
+	* util.c (string_quote): Fix thinko which caused core
+	dumps for strings with quotes in them.
+	Reported by Marty Leisner <leisner@sdsp.mc.xerox.com>.
+
+	* linux/Makefile.in (errnoent.h rule): Grab all errno.h
+	files from /usr/include, not just the linux one.
+	From Michael E Chastain <mec@duracef.shout.net>.
+
+	* linux/errnoent.sh: Total rewrite to handle more ioctls with
+	fewer false positives on more kernel flavors.
+	From Michael E Chastain <mec@duracef.shout.net>.
+
+Mon Sep  4 01:29:22 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.6 is released.
+
+	* linux/dummy.h, linux/syscall.h, linux/syscallent.h: Add
+	sys_msync.
+	* mem.c (mctl_funcs, mctl_lockas, sys_mctl): Conditionalize
+	on MC_SYNC instead of HAVE_MCTL.
+	(mctl_sync): Conditionalize on MS_ASYNC instead of HAVE_MCTL.
+	(sys_msync): New function.
+
+Sat Sep  2 12:06:04 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* linux/dummy.h, linux/syscall.h, linux/syscallent.h: Add
+	sys_flock and sys_getdents.
+	* desc.c (flockcmds, sys_flock): Conditionalize on LOCK_SH
+	not SUNOS4.
+	* file.c (sys_getdents): Define unconditionally and handle
+	LINUX case.
+	* strace.c (main): Disallow username option unless both real
+	and effective uids are root.
+
+Wed Aug 30 01:29:58 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* strace.c (main): Ensure that run_uid and run_gid are
+	always set to something meaningful.
+	(main, newoutf) [!SVR4]: Swap real and effective uids while
+	opening any output files.
+	(main) [!SVR4]: Treat effective uid of root as a request
+	to handle suid binaries correctly using the real uid of
+	the invoking user.
+
+Sat Aug 19 00:06:08 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* Makefile.in: Add `|| true' to clean rule because
+	although GNU make 3.74 uses `sh -c' to invoke commands
+	every other make in the world uses `sh -ec'.
+
+	* syscall.c (syscall) [SVR4, MIPS]: The fifth and subsequent
+	arguments appear to be stored on the stack, not in the
+	registers following A3 (empirical result).
+
+	* defs.h: Add prototype for printsock.
+	* svr4/dummy.h: Remove generic handling of sys_mount.
+	* system.c [SVR4, MIPS]: Include several system headers to cleanly
+	get access to SGI mount information.
+	(mount_flags, nfs_flags) [SVR4, MIPS]: New objects.
+	(sys_mount) [SVR4, MIPS]: New function.
+	(sys_mount) [SVR4, !MIPS]: New function.
+
+Tue Jul  4 00:30:34 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.5 is released.
+
+	* desc.c, resource.c, strace.c, syscall.c, time.c: Cast tv_sec and
+ 	tv_usec members to long when using printf.
+
+	* ipc.c: Omit define of __KERNEL__.
+	({MSG,SEM,SHM}_{STAT,INFO}): Explicitly define those things we
+ 	want which __KERNEL__ used to provide.
+	(sys_msgrcv): Change reference to ipc_kludge structure to
+	look-alike ipc_wrapper to avoid dependence on __KERNEL__.
+
+	mem.c (mmap_flags) [MAP_{GROWSDOWN,DENYWRITE,EXECUTABLE}]: Add
+ 	Linux specific options.
+
+	syscall.c: Use SYS_ERRLIST_DECLARED instead of guessing.
+  	[E{RESTART{SYS,NO{INTR,HAND}},NOIOCTLCMD}]: Explicitly define
+ 	instead of depending of __KERNEL__.
+
+	term.c: Cast c_{i,o,c,l}flag to long when using printf.
+
+Tue Jun  6 00:27:48 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* aclocal.m4 (AC_DECL_SYS_ERRLIST, AC_DECL__SYS_SIGLIST): New.
+	* configure.in: Call AC_DECL_SYS_ERRLIST, AC_DECL_SYS_SIGLIST,
+	and AC_DECL__SYS_SIGLIST.
+	* acconfig.h (SYS_ERRLIST_DECLARED): New.
+	* strace.c (strerror): Use SYS_ERRLIST_DECLARED.
+	(strsignal): Use SYS_SIGLIST_DECLARED.
+
+	net.c (sys_socket): Omit inadvertent surplus comma when
+	protocol family isn't PF_INET.
+
+	util.c (dumpstr): Fix incorrect printing of one too many
+	characters when the length is not an even multiple of 16 bytes.
+	Reported by Juergen Weigert
+	<jnweiger@immd4.informatik.uni-erlangen.de>.
+
+Thu May  4 23:37:47 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* ioctl.c (compare): Change prototype to match POSIX qsort.
+	* signal.c (sigishandled) [SVR4]: Omit everything after return.
+	* strace.c (trace) [SVR4]: Break out of for loop instead of
+	returning when finished so final return statement is executed.
+	* syscall.c (internal_syscall): Add more SYS_wait* variations.
+	(syscall) [LINUX]: Correct typo which commented out the M68K
+	argument to ifdef.
+	* util.c (printstr): Cast unsigned char pointer argument
+	to char pointer in umovestr call.
+	(dumpstr): Likewise for umoven.
+
+Wed May  3 01:10:56 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.4 is released.
+
+	* signal.c (sys_sigblock): Move after the definition of
+	sys_sigsetmask that it calls to avoid an implicit declaration.
+	* stream.c (transport_user_options, transport_server_options):
+	Only needed if TI_BIND is defined.
+	* configure.in: Add -Wno-implicit to WARNFLAGS on SunOS 4.x.
+
+	* process.c (internal_fork) [SVR4]: Fix a typo that omitted
+	the tcp arguement from the call to exiting.  Add getrval2
+	check so no fork processing is done in the child.
+	(printwaitn): Initialize exited so that its value is defined
+	for all flows of execution.
+
+Tue May  2 22:39:42 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* linux/dummy.h: Add aliases for sysfs, personality, afs_syscall,
+	setfsuid, setfsgid, and _llseek syscalls.
+	* linux/syscall.h: Add prototypes for them.
+	* linux/syscallent.h: Add them to the syscall entries table.
+	* system.c (headers) [LINUX]: Include linux/unistd.h to get __NR_*
+	defines and conditionally include linux/personality.h if
+	__NR_personality is defined.
+	(personality_options) [LINUX]: New table.
+	(sys_personality) [LINUX]: New function.
+
+Tue May  2 00:20:39 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* strace.c (trace) [!SVR4]: Change forever loop to one predicated
+	on the number of traced processes so that we can have untraced
+	children (e.g. via popen).
+
+	* strace (main) [!SVR4]: Call fake_execve to get the actual
+	exec and its arguments into the trace.
+	(environ): Declare it.
+	* process.c (fake_execve): New function.
+	(headers): Include sys/syscall.h to get SYS_* defines.
+
+	* process.c (sys_execv, sys_execve): Surround argument annotations
+	with C comment delimiters.
+	(printargv, printargc): The arg vector is an array of char pointers
+	not ints.
+
+	* strace.c (printleader): Also check for multiple -p arguments
+	when deciding whether to print the pid field.
+
+	* strace.c (strerror) [!HAVE_STRERROR]: New function.
+	* defs.h (strerror, strsignal): Add these prototypes if we provide
+	the functions.
+	* configure.in (AC_CHECK_FUNCS): Add strerror.
+
+	* strace.c (main, proc_poller): Add SIGPIPE to the list of caught
+	and blocked signals.
+
+	* strace.c (main): Add username option.  Verify they are root before
+	letting them use it.  Look up the ids in the password file.  Set
+	them just before executing the program.
+	From Reuben Sumner <rasumner@undergrad.math.uwaterloo.ca>.
+
+Sat Apr 29 00:09:56 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.3 is released.
+
+	* system.c (mount_flags) [LINUX]: Omit duplicated MS_NOSUID entry.
+	From Reuben Sumner <rasumner@undergrad.math.uwaterloo.ca>.
+
+	* strace.c (outfname): Initialize to NULL.
+	(main): Defer output file processing until after arguments.
+	Allow either a pipe or a bang for command arguments.
+	Check if outfname is NULL instead of checking outf for stderr.
+	Reinitialize each startup TCB's outf to fix -p/-o ordering bug.
+	(droptcb): Reset close TCB's outf to NULL instead of stderr.
+	(tprintf): Avoid calling vfprintf if outf is NULL.
+
+	* strace.c (main): Use popen if -o argument begins with a pipe.
+	From Marty Leisner <leisner@sdsp.mc.xerox.com>.
+
+	* process.c (printstatus): Fix a typo where WIFSIGNALED was meant
+	but WIFSTOPPED was used.
+
+	* Makefile.in: Add an EXTRA_DEFS variable and use it in the .c.o
+	rule to prevent the comment from being untrue.
+
+Fri Apr 28 22:01:56 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* strace.c (sys_exit): Move follow fork code to internal_exit.
+	(sys_fork): Move follow fork code to internal_fork.
+	(sys_execv, sys_execve): Move follow fork code to internal_exec.
+	(sys_waitpid, sys_wait4): Move follow fork code to internal_wait.
+	(vforking): Remove this static variable and check scno in
+	internal_fork instead.
+	(internal_exit, internal_fork, internal_exec, internal_wait): New
+	functions.
+	* defs.h: Add prototypes for the new internal_* functions.
+	* syscall.c (syscall): Move syscall entering trace qualifier check
+	and reprint checking after context decoding and precede them with
+	a call to internal_syscall.  Precede syscall exiting trace
+	qualifier check with a call to internal_syscall.
+	(internal_syscall): New function.
+
+	* defs.h (struct tcb): Make scno signed.
+	* strace.c (syscall) Make u_error signed.
+	[LINUX, I386]: Avoid unsigned cast in eax check.
+	* syscall.c (sys_indir): Make i, scno, and nargs signed.
+	* desc.c (sys_select): Make cumlen unsigned
+
+Mon Apr 24 23:52:47 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* net.c (socktypes): Add SOCK_PACKET.
+
+Sun Apr  2 23:50:39 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* Makefile (clean): Check explicitly for a Makefile in subdirs
+	before running make in them.
+
+Sun Mar 26 12:37:21 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* strace.c [MIPS] (proc_open): Conditionalize run on MIPS.
+	[MIPS] (detach): Initialize error for MIPS case.
+	(trace): Initialize ioctl_result and ioctl_errno for overly helpful
+	compilers.
+	* syscall.c (decode_subcall): Move variable i into conditionals
+	that use use it.
+	* system.c (syssgi_options): Conditionalize SGI_RECVLMSG and
+	SGI_SET_FPDEBUG that SGI decided to drop.  I don't have the stomach
+	to change them all.
+	* term.c (term_ioctl): Force [c_[iocl]flags members to long before
+	printing since we don't know what the size of their type is.
+	* util.c [SVR4, MIPS] (umoven): Prevent MIPS from using pread even
+	if autoconf detects it since it seems to either not work or do
+	something else entirely on Irix 5.3.
+
+Sun Mar 26 00:01:11 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.2 is released.
+	* linux/dummy.h: Make sys_fchdir like sys_close instead of printargs
+	so that the file descriptor arg is decimal.
+
+Sat Mar 25 22:50:13 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* net.c [LINUX] (protocols): Explicitly define all IPPROTO_* entries
+	because on Linux they are enumerators.
+
+	* system.c [LINUX] (mount_flags): Handle renaming of MS_SYNC to
+	MS_SYNCHRONOUS.
+
+	* util.c (printxval): When there is no translation, print the actual
+	number first and the the default value as a C comment.
+
+	* net.c (sys_send, sys_sendto, sys_sendmsg, sys_getsockopt,
+	sys_setsockopt): Change first argument from unsigned to signed to
+	cater to the frequent practice of calling system calls with a file
+	descriptor of -1.
+	* mem.c (sys_mmap): Likewise.
+
+Sun Mar 19 13:53:52 1995  Rick Sladkey  <jrs@world.std.com>
+
+	* signal.c [LINUX] (signalent): Handle old and new values of SIGIO.
+
+Sun Dec 11 22:51:51 1994  Rick Sladkey  <jrs@world.std.com>
+
+	* version.c: Version 3.0.1 is released.
+	* Makefile.in, configure.in, aclocal.m4: Changes for autoconf 2.0.
+	* config.guess, config.guess: Update from the FSF.
+	* install-sh: New from the FSF.
+
+Mon Dec  5 20:51:29 1994  Rick Sladkey  <jrs@world.std.com>
+
+	* Makefile.in: Add m68k arch.
+	* acconfig.h (M68K): Add m68k define.
+	* configure.in: Add detection of arch m68k.
+	* process.c [M68K] (struct_user_offsets): Support m68k registers and
+	offsets.
+	* signal.c [M68K] (sigcontext_struct): Support m68k sigcontext
+	structure.
+	[M68K] (sys_sigreturn): Support m68k sigreturn handling.
+	* syscall.c [M68K] (syscall): Support m68k syscall number register
+	and errno in d0 instead of eax.
+	* util.c [M68K] (getpc, printcall, setbpt, clearbpt): Support m68k
+	program counter in PT_PC instead of EIP.
+	[M68K] (LOOP): Support m68k loop instruction.
+	From Andreas Schwab <schwab@issan.informatik.uni-dortmund.de>.
+
+	* mem.c [MAP_ANONYMOUS] (mmap_flags): Correct inadvertent reference
+	to MAP_FIXED instead of MAP_ANONYMOUS.
+	From Andreas Schwab <schwab@issan.informatik.uni-dortmund.de>.
+
+	* signal.c [LINUX] (signalent): Signal 30 is now SIGPWR.
+	From Andreas Schwab <schwab@issan.informatik.uni-dortmund.de>.
+
+Mon Dec  5 01:05:46 1994  Rick Sladkey  <jrs@world.std.com>
+
+	* defs.h (tprintf): Fix typo in non-gcc ansi prototype for tprintf.
+	Reported by Thanh Ma <tma@encore.com>.
+
+	* strace.c (cleanup): Send SIGCONT before SIGTERM because Linux
+	1.1.62 doesn't continue a traced child when the parent exits.
+	Reported by Matt Day <mday@artisoft.com>.
+
+	* system.c [LINUX]: Include netinet/in.h before arpa/inet.h.
+
+	* util.c (printstr): Fix longstanding bug in notating string
+	continuation.
+
+	* strace.c [SVR4] (proc_open): Specifically wait for the child the
+	child to go into the execve syscall to avoid spurious traces.
+	[LINUX] (detach): Conditionalize the status variable.
+
+Sun Dec  4 23:21:42 1994  Rick Sladkey  <jrs@world.std.com>
+
+	* Makefile.in: Add mips arch.
+	* acconfig.h (MIPS): Add mips define.
+	* configure.in: Add detection of opsys irix5 and arch mips.  Check
+	for prctl function.
+	Check for sys/sysconfig.h header.
+	* defs.h (MAX_ARGS): Bump maximum syscall arguments from 8 to 32.
+	* file.c [SVR4]: Include sys/cred.h.
+	(access_flags): Update access flags for SGI.
+	(sprinttime): Change type of sprinttime argument from unsigned
+	long to time_t.
+	* process.c [HAVE_PRCTL]: Include sys/prctl.h.
+	[HAVE_PRCTL] (prctl_options, sys_prctl): New for SGI.
+	(printsiginfo): Conditionally compile SI_TIMER and SI_MESGQ.
+	Cast si_band member to long before printing.
+	* signal.c (sigact_flags): Add _SA_BSDCALL for SGI.
+	(sigprocmaskcmds): Add SIG_SETMASK32 for SGI.
+	* strace.c [SVR4] [MIPS]:
+	(foobar): New dummy signal handler.
+	(main): Install a dummy signal handler in the child before pausing
+	to work around an SGI bug in PRSABORT.
+	(proc_open): Send a interrupt to the child instead of aborting the
+	syscall which doesn't work on Irix5.2.
+	* svr4/dummy.h: Add new unfinished SGI syscalls
+	(e.g. sys_sysmp, sys_sginap, etc.).  Handle some SGI syscalls like
+	existing calls (e.g. sys_ksigaction like sys_sigaction).
+	Printargs does the print thing for sys_sethostid.
+	* svr4/syscall.h: Declare all new SGI syscalls.
+	(SGI_KLUDGE): Define syscall table starting index to be 1 for SGI
+	and add it to all subcall entry points.
+	(SYS_pgrpsys_subcall, SYS_sigcall_subcall, SYS_context): Don't
+	decode as subcalls on MIPS. Instead, use the normal syscalls.
+	* svr4/syscallent.h [MIPS]: Lead syscall table with a dummy entry
+	since SGI syscall numbers are off by one.
+	[MIPS] (sys_pgrpsys): Rename to sys_setpgrp on SGI.
+	[MIPS] (sys_xenix): Rename to sys_syssgi on SGI.
+	[MIPS] (sys_sysmachine): Rename to sys_sysmips on SGI.
+	[MIPS]: Conditionalize SVR4 extension into SGI and Solaris classes.
+	* syscall.c (dumpio): Validate descriptor against MAX_QUALS.
+	[HAVE_PR_SYSCALL] (syscall): Conditionalize SYS_vfork.
+	[MIPS] (syscall): Add SGI section for decoding u_error and u_rval.
+	Add workaround for broken SGI pr_sysarg on syscall entry.
+	[SVR4] (syscall): Conditionalize subcall decoding for
+	SYS_ptrpsys_subcall, SYS_sigcall_subcall and SYS_context_subcall.
+	[SVR4] [MIPS] (getrval2): Handle SGI.
+	* syscallent.sh: Dork the sed line to be choosier about SYS_ lines.
+	* system.c [HAVE_SYSCONFIG_H]: Include sys/sysconfig.h.
+	[MIPS] (syssgi_options, sys_syssgi): New for SGI.

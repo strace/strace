@@ -1,0 +1,169 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define to empty if the keyword does not work.  */
+#undef const
+
+/* Define to the type of elements in the array set by `getgroups'.
+   Usually this is either `int' or `gid_t'.  */
+#undef GETGROUPS_T
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef gid_t
+
+/* Define if your struct stat has st_blksize.  */
+#undef HAVE_ST_BLKSIZE
+
+/* Define if your struct stat has st_blocks.  */
+#undef HAVE_ST_BLOCKS
+
+/* Define if your struct stat has st_rdev.  */
+#undef HAVE_ST_RDEV
+
+/* Define if major, minor, and makedev are declared in <mkdev.h>.  */
+#undef MAJOR_IN_MKDEV
+
+/* Define if major, minor, and makedev are declared in <sysmacros.h>.  */
+#undef MAJOR_IN_SYSMACROS
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef mode_t
+
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+/* Define if the `S_IS*' macros in <sys/stat.h> do not work properly.  */
+#undef STAT_MACROS_BROKEN
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define on System V Release 4.  */
+#undef SVR4
+
+/* Define if `sys_siglist' is declared by <signal.h>.  */
+#undef SYS_SIGLIST_DECLARED
+
+/* Define to `int' if <sys/types.h> doesn't define.  */
+#undef uid_t
+
+/* Define if your processor stores words with the most significant
+   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
+#undef WORDS_BIGENDIAN
+
+/* Define if this is running the Linux operating system.  */
+#undef LINUX
+
+/* Define if this is running the SunOS 4.x operating system.  */
+#undef SUNOS4
+
+/* Define if this is running the System V release 4 operating system
+   or a derivative like Solaris 2.x or Irix 5.x.  */
+#undef SVR4
+
+/* Define if this is an i386, i486 or pentium architecture.  */
+#undef I386
+
+/* Define if this is an m68k architecture.  */
+#undef M68K
+
+/* Define if this is a sparc architecture.  */
+#undef SPARC
+
+/* Define if this is a mips architecture.  */
+#undef MIPS
+
+/* Define if this is an alpha architecture.  */
+#undef ALPHA
+
+/* Define if this is an powerpc architecture.  */
+#undef POWERPC
+
+/* Define if this is a arm architecture.  */
+#undef ARM
+
+/* Define if you have SVR4 and the poll system call works on /proc files.  */
+#undef HAVE_POLLABLE_PROCFS
+
+/* Define if the prstatus structure in sys/procfs.h has a pr_syscall member.  */
+#undef HAVE_PR_SYSCALL
+
+/* Define if you are have a SPARC with SUNOS4 and your want a version
+   of strace that will work on sun4, sun4c and sun4m kernel architectures.
+   Only useful if you have a symbolic link from machine to /usr/include/sun4
+   in the compilation directory. */
+#undef SUNOS4_KERNEL_ARCH_KLUDGE
+
+/* Define if signal.h defines the type sig_atomic_t.  */
+#undef HAVE_SIG_ATOMIC_T
+
+/* Define if sys_errlist is declared.  */
+#undef SYS_ERRLIST_DECLARED
+
+/* Define if the msghdr structure has a msg_control member.  */
+#undef HAVE_MSG_CONTROL
+
+/* Define if you have the _sys_siglist function.  */
+#undef HAVE__SYS_SIGLIST
+
+/* Define if you have the getdents function.  */
+#undef HAVE_GETDENTS
+
+/* Define if you have the mctl function.  */
+#undef HAVE_MCTL
+
+/* Define if you have the prctl function.  */
+#undef HAVE_PRCTL
+
+/* Define if you have the pread function.  */
+#undef HAVE_PREAD
+
+/* Define if you have the putpmsg function.  */
+#undef HAVE_PUTPMSG
+
+/* Define if you have the sendmsg function.  */
+#undef HAVE_SENDMSG
+
+/* Define if you have the sigaction function.  */
+#undef HAVE_SIGACTION
+
+/* Define if you have the strerror function.  */
+#undef HAVE_STRERROR
+
+/* Define if you have the strsignal function.  */
+#undef HAVE_STRSIGNAL
+
+/* Define if you have the sys_siglist function.  */
+#undef HAVE_SYS_SIGLIST
+
+/* Define if you have the <asm/sigcontext.h> header file.  */
+#undef HAVE_ASM_SIGCONTEXT_H
+
+/* Define if you have the <dirent.h> header file.  */
+#undef HAVE_DIRENT_H
+
+/* Define if you have the <ndir.h> header file.  */
+#undef HAVE_NDIR_H
+
+/* Define if you have the <sys/asynch.h> header file.  */
+#undef HAVE_SYS_ASYNCH_H
+
+/* Define if you have the <sys/dir.h> header file.  */
+#undef HAVE_SYS_DIR_H
+
+/* Define if you have the <sys/filio.h> header file.  */
+#undef HAVE_SYS_FILIO_H
+
+/* Define if you have the <sys/ndir.h> header file.  */
+#undef HAVE_SYS_NDIR_H
+
+/* Define if you have the <sys/stream.h> header file.  */
+#undef HAVE_SYS_STREAM_H
+
+/* Define if you have the <sys/sysconfig.h> header file.  */
+#undef HAVE_SYS_SYSCONFIG_H
+
+/* Define if you have the <sys/tiuser.h> header file.  */
+#undef HAVE_SYS_TIUSER_H
+
+/* Define if you have the nsl library (-lnsl).  */
+#undef HAVE_LIBNSL

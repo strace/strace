@@ -1,0 +1,52 @@
+========================================================================
+This is the unmodified README from Branko Lankester's release of strace
+for Linux.  Some of the notes and instructions are no longer valid
+however the file has been retained for its historical value. -- jrs
+========================================================================
+
+This is the second release of strace for linux, it requires linux
+version 0.99.10 or newer.  strace was written by Paul Kranenburg for
+SunOS, I have modified it to work with linux.  Read the file README and
+the strace.1 for more info on strace.
+
+
+Changes for this release are:
+- bugfixes
+- support for new system calls and ioctls
+- symbolic output for: termio ioctls, sysv ipc, fcntl file locking,
+  statfs and ptrace
+- microsecond time stamps
+
+A lot of the changes and bugfixes for this version were done by
+Rick Sladkey <jrs@world.std.com>, System V IPC support was added
+by Ulrich Pegelow <pegelow@moorea.uni-muenster.de>.
+
+
+FILES:
+
+README.first	this file
+README		the original readme file for SunOS strace
+getioctls	script to create the ioctlents.h file for linux.
+Sun/*		files from the original package I didn't use
+
+
+Notes:
+
+- With older versions of Linux (before 0.99.10) signals can get lost
+for a traced process.
+
+- strace works best if you have a proc fs mounted on /proc, the
+/proc/##/mem frame buffers are used for reading system call arguments.
+You can use /dev/ram or some other unused block device for mounting
+the proc fs:
+
+	mount -t proc /dev/ram /proc
+
+or in /etc/fstab:
+
+/dev/hda	/proc		proc	defaults
+
+
+
+Branko Lankester					Jun 18 1993
+branko@hacktic.nl || lankeste@fwi.uva.nl

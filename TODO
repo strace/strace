@@ -1,0 +1,25 @@
+require override to run suid and/or sgid executables normally
+attempt reopen of /proc file if we get EAGAIN from any /proc ioctl
+kill procs we error out of on svr4
+enclose "total x dents" in a comment
+declare gettimeofday and pread for solaris2
+update automatic remaking of autoconf targets
+I don't like run on last close, change it?
+parse long options?
+count signals too with -c
+treat attach, detach messages like signals
+add readv, writev to I/O dumping
+add pread, pwrite to I/O dumping
+add system assist for qualifiers on svr4
+change printcall to getcaller and fix for linux and svr4
+fix fork hang for svr4 without pollable procfs
+add thread support
+print events on entry to and revents on exit from poll
+monitor procfs open and release the other child if the process wants to own it
+fix incorrect syscall number if exit without entry on svr4 without pr_syscall
+fix clean targets so config.h and config.status can be removed
+ignore faults which occur before exec
+look for more ioctls on solaris, used in nslookup for example
+consider adding backtrace support
+consider adding general purpose interpreter
+rename program to sctrace to avoid conflict with svr4 strace?

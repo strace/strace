@@ -1,0 +1,45 @@
+Changes in version 3.1
+======================
+
+* Irix5 is supported
+* Linux 68k is supported
+* Linux alpha is supported
+* configure is upgraded to autoconf 2.x
+* using -f in combination with -e now works correctly
+* output can be piped to a program
+* tracing setuid programs works better
+* it is now reasonable to install strace setuid to root in some circumstances
+* new useful tracing names like file and process to trace whole
+  classes of system calls, e.g. -efile traces all system calls that
+  take a file name as an argument
+* IPC calls on SunOS 4.1.x are decoded
+* Linux program memory is reliably dereferenced
+* Linux decodes at least the name of all syscalls as of pre2.0.4
+* various cosmetic changes and bug fixes
+
+Changes from versions 2.x to version 3.0
+========================================
+
+* filename arguments are neither abbreviated nor stringified
+* string arguments are now true C strings using octal instead of hex by default
+* preprocessor constants are never shortened (e.g. was RDONLY => now O_RDONLY)
+* by default the output for multiple processes now goes into one file
+* all structures, vectors, bitsets, etc. use consistent output formats
+* the -c option now means count calls, -i does what the old -c used to do
+
+New Features in version 3.0
+===========================
+
+* non-ascii strings can be optionally printed entirely in hex
+* the output format is readable when mutiple processes are generating output
+* exit values are printed in an alignment column
+* is is possible to suppress messages about attaching and detaching
+* various tracing features can be enabled on a per syscall/signal/desc basis
+* selective tracing of syscalls
+* selective printing of syscall structures
+* selective abbreviation of long structures on a per syscall basis
+* selective printing of raw syscall arguments and results
+* selective tracing of signals
+* selective dumping of all I/O read from file descriptors
+* selective dumping of all I/O written to file descriptors
+* optional counting of time, calls, and errors for each syscall

@@ -1,0 +1,252 @@
+/*
+ * Copyright (c) 1993, 1994, 1995 Rick Sladkey <jrs@world.std.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *	$Id$
+ */
+
+#include "defs.h"
+
+#ifdef SVR4
+
+static struct xlat proc_status_flags[] = {
+	{ PR_STOPPED,	"PR_STOPPED"	},
+	{ PR_ISTOP,	"PR_ISTOP"	},
+	{ PR_DSTOP,	"PR_DSTOP"	},
+	{ PR_ASLEEP,	"PR_ASLEEP"	},
+	{ PR_FORK,	"PR_FORK"	},
+	{ PR_RLC,	"PR_RLC"	},
+	{ PR_PTRACE,	"PR_PTRACE"	},
+	{ PR_PCINVAL,	"PR_PCINVAL"	},
+	{ PR_ISSYS,	"PR_ISSYS"	},
+#ifdef PR_STEP
+	{ PR_STEP,	"PR_STEP"	},
+#endif
+#ifdef PR_KLC
+	{ PR_KLC,	"PR_KLC"	},
+#endif
+#ifdef PR_ASYNC
+	{ PR_ASYNC,	"PR_ASYNC"	},
+#endif
+#ifdef PR_PCOMPAT
+	{ PR_PCOMPAT,	"PR_PCOMPAT"	},
+#endif
+	{ 0,		NULL		},
+};
+
+static struct xlat proc_status_why[] = {
+	{ PR_REQUESTED,	"PR_REQUESTED"	},
+	{ PR_SIGNALLED,	"PR_SIGNALLED"	},
+	{ PR_SYSENTRY,	"PR_SYSENTRY"	},
+	{ PR_SYSEXIT,	"PR_SYSEXIT"	},
+	{ PR_JOBCONTROL,"PR_JOBCONTROL"	},
+	{ PR_FAULTED,	"PR_FAULTED"	},
+#ifdef PR_SUSPENDED
+	{ PR_SUSPENDED,	"PR_SUSPENDED"	},
+#endif
+#ifdef PR_CHECKPOINT
+	{ PR_CHECKPOINT,"PR_CHECKPOINT"	},
+#endif
+	{ 0,		NULL		},
+};
+
+static struct xlat proc_run_flags[] = {
+	{ PRCSIG,	"PRCSIG"	},
+	{ PRCFAULT,	"PRCFAULT"	},
+	{ PRSTRACE,	"PRSTRACE"	},
+	{ PRSHOLD,	"PRSHOLD"	},
+	{ PRSFAULT,	"PRSFAULT"	},
+	{ PRSVADDR,	"PRSVADDR"	},
+	{ PRSTEP,	"PRSTEP"	},
+	{ PRSABORT,	"PRSABORT"	},
+	{ PRSTOP,	"PRSTOP"	},
+	{ 0,		NULL		},
+};
+
+#if 0
+
+static struct xlat proc_map_flags[] = {
+	{ MA_READ,	"MA_READ"	},
+	{ MA_WRITE,	"MA_WRITE"	},
+	{ MA_EXEC,	"MA_EXEC"	},
+	{ MA_SHARED,	"MA_SHARED"	},
+	{ MA_BREAK,	"MA_BREAK"	},
+	{ MA_STACK,	"MA_STACK"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat proc_page_flags[] = {
+	{ PG_REFERENCED,"PG_REFERENCED"	},
+	{ PG_MODIFIED,	"PG_MODIFIED"	},
+	{ PG_HWMAPPED,	"PG_HWMAPPED"	},
+	{ 0,		NULL		},
+};
+
+#ifdef SPARC
+
+static struct xlat proc_regs[] = {
+	{ R_G0,		"R_G0"		},
+	{ R_G1,		"R_G1"		},
+	{ R_G2,		"R_G2"		},
+	{ R_G3,		"R_G3"		},
+	{ R_G4,		"R_G4"		},
+	{ R_G5,		"R_G5"		},
+	{ R_G6,		"R_G6"		},
+	{ R_G7,		"R_G7"		},
+	{ R_O0,		"R_O0"		},
+	{ R_O1,		"R_O1"		},
+	{ R_O2,		"R_O2"		},
+	{ R_O3,		"R_O3"		},
+	{ R_O4,		"R_O4"		},
+	{ R_O5,		"R_O5"		},
+	{ R_O6,		"R_O6"		},
+	{ R_O7,		"R_O7"		},
+	{ R_L0,		"R_L0"		},
+	{ R_L1,		"R_L1"		},
+	{ R_L2,		"R_L2"		},
+	{ R_L3,		"R_L3"		},
+	{ R_L4,		"R_L4"		},
+	{ R_L5,		"R_L5"		},
+	{ R_L6,		"R_L6"		},
+	{ R_L7,		"R_L7"		},
+	{ R_I0,		"R_I0"		},
+	{ R_I1,		"R_I1"		},
+	{ R_I2,		"R_I2"		},
+	{ R_I3,		"R_I3"		},
+	{ R_I4,		"R_I4"		},
+	{ R_I5,		"R_I5"		},
+	{ R_I6,		"R_I6"		},
+	{ R_I7,		"R_I7"		},
+	{ R_PSR,	"R_PSR"		},
+	{ R_PC,		"R_PC"		},
+	{ R_nPC,	"R_nPC"		},
+	{ R_Y,		"R_Y"		},
+	{ R_WIM,	"R_WIM"		},
+	{ R_TBR,	"R_TBR"		},
+	{ 0,		NULL		},
+};
+
+#endif /* SPARC */
+
+#endif /* 0 */
+
+int
+proc_ioctl(tcp, code, arg)
+struct tcb *tcp;
+int code, arg;
+{
+	int val;
+	prstatus_t status;
+	prrun_t run;
+
+	if (entering(tcp))
+		return 0;
+
+	switch (code) {
+	case PIOCSTATUS:
+	case PIOCSTOP:
+	case PIOCWSTOP:
+		if (arg == 0)
+			tprintf(", NULL");
+		else if (syserror(tcp))
+			tprintf(", %#x", arg);
+		else if (umove(tcp, arg, &status) < 0)
+			tprintf(", {...}");
+		else {
+			tprintf(", {pr_flags=");
+			if (!printflags(proc_status_flags, status.pr_flags))
+				tprintf("0");
+			if (status.pr_why) {
+				tprintf(", pr_why=");
+				printxval(proc_status_why, status.pr_why,
+					  "PR_???");
+			}
+			switch (status.pr_why) {
+			case PR_SIGNALLED:
+			case PR_JOBCONTROL:
+				tprintf(", pr_what=");
+				printsignal(status.pr_what);
+				break;
+			case PR_FAULTED:
+				tprintf(", pr_what=%d", status.pr_what);
+				break;
+			case PR_SYSENTRY:
+			case PR_SYSEXIT:
+				tprintf(", pr_what=SYS_%s",
+					sysent[status.pr_what].sys_name);
+				break;
+			}
+			tprintf(", ...}");
+		}
+		return 1;
+	case PIOCRUN:
+		if (arg == 0)
+			tprintf(", NULL");
+		else if (umove(tcp, arg, &run) < 0)
+			tprintf(", {...}");
+		else {
+			tprintf(", {pr_flags=");
+			if (!printflags(proc_run_flags, run.pr_flags))
+				tprintf("0");
+			tprintf(", ...}");
+		}
+		return 1;
+#ifdef PIOCSET
+	case PIOCSET:
+	case PIOCRESET:
+		if (umove(tcp, arg, &val) < 0)
+			tprintf(", [?]");
+		else {
+			tprintf(", [");
+			if (!printflags(proc_status_flags, val))
+				tprintf("0");
+			tprintf("]");
+		}
+		return 1;
+#endif /* PIOCSET */
+	case PIOCKILL:
+	case PIOCUNKILL:
+		/* takes a pointer to a signal */
+		if (umove(tcp, arg, &val) < 0)
+			tprintf(", [?]");
+		else {
+			tprintf(", [");
+			printsignal(val);
+			tprintf("]");
+		}
+		return 1;
+	case PIOCSFORK:
+	case PIOCRFORK:
+	case PIOCSRLC:
+	case PIOCRRLC:
+		/* doesn't take an arg */
+		return 1;
+	default:
+		/* ad naseum */
+		return 0;
+	}
+}
+
+#endif /* SVR4 */

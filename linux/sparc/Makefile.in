@@ -1,0 +1,57 @@
+#
+# $Id$
+#
+
+srcdir = @srcdir@
+VPATH = $(srcdir)
+
+CC = @CC@
+CPP = @CPP@
+SHELL = /bin/sh
+
+DEFS = @DEFS@
+LDLIBS = @LIBS@
+
+CFLAGS = -g
+LDFLAGS = -g
+WARNFLAGS = @WARNFLAGS@
+
+CPPFLAGS =
+INCLUDES = -I. -I.. -I$(srcdir)/.. -I../.. -I$(srcdir)
+
+includedir = @includedir@
+
+all: ioctlent.h errnoent.h signalent.h syscallent.h
+
+ioctlent.raw: ioctlent.sh
+	$(SHELL) $(srcdir)/ioctlent.sh $(includedir) >$@
+
+ioctlent.h: ioctlent.raw ioctlsort
+	./ioctlsort >$@
+
+ioctlsort: ioctlsort.o
+	$(CC) $(LDFLAGS) ioctlsort.o -o ioctlsort
+
+ioctlsort.o: ../../ioctlsort.c
+	$(CC) $(WARNFLAGS) $(DEFS) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $(srcdir)/../../ioctlsort.c
+
+ioctlsort.o: ioctlent.raw
+
+errnoent.h: ../../errnoent.sh $(includedir)/asm/errno.h
+	$(SHELL) $(srcdir)/../../errnoent.sh $(includedir)/asm/errno.h >$@
+
+signalent.h: ../../signalent.sh $(includedir)/asm/signal.h
+	$(SHELL) $(srcdir)/../../signalent.sh $(includedir)/asm/signal.h >$@
+
+#syscallent.h: ../../syscallent.sh $(includedir)/sys/syscall.h
+syscallent.h:
+	$(SHELL) $(srcdir)/../../syscallent.sh $(includedir)/sys/syscall.h >$@
+
+clean:
+	rm -f ioctlent.c *.raw *.tmp *.o ioctlsort
+
+distclean: clean
+	rm -f Makefile
+
+maintainer-clean: distclean
+	rm -f ioctlent.h errnoent.h signalent.h

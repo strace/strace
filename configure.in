@@ -1,0 +1,133 @@
+AC_INIT(strace.c)
+AC_CANONICAL_HOST()
+AC_MSG_CHECKING(for supported operating system)
+changequote(,)dnl
+
+case "$host_os" in
+linux*)
+	opsys=linux
+	;;
+sunos4*)
+	opsys=sunos4
+	;;
+solaris2*)
+	opsys=svr4
+	;;
+sysv4*)
+	opsys=svr4
+	;;
+irix5*)
+	opsys=svr4
+	;;
+*)
+	AC_MSG_ERROR(this operating system is not yet supported by strace)
+	;;
+esac
+AC_MSG_RESULT($opsys)
+
+# Autoheader trick.  Heh, heh.
+opsys_list='
+@@@syms="$syms LINUX SUNOS4 SVR4"@@@
+'
+
+AC_MSG_CHECKING(for supported architecture)
+case "$host_cpu" in
+i[3456]86|pentium)
+	arch=i386
+	;;
+m68k)
+	arch=m68k
+	;;
+sparc)
+	arch=sparc
+	;;
+mips)
+	arch=mips
+	;;
+alpha*)
+	arch=alpha
+	;;
+ppc|powerpc)
+	arch=powerpc
+	;;
+arm)
+	arch=arm
+	;;
+*)
+	AC_MSG_ERROR(this architecture is not yet supported by strace)
+	;;
+esac
+AC_MSG_RESULT($arch)
+
+# Autoheader trick.  Heh, heh.
+arch_list='
+@@@syms="$syms I386 M68K SPARC MIPS ALPHA ARM"@@@
+'
+
+osarch="$opsys"
+if [ -d "$srcdir/$opsys/$arch" ]; then
+	osarch="$opsys/$arch"
+fi
+
+OPSYS=`echo $opsys | tr '[a-z]' '[A-Z]'`
+ARCH=`echo $arch | tr '[a-z]' '[A-Z]'`
+
+changequote([,])dnl
+AC_CONFIG_HEADER(config.h)
+AC_SUBST(opsys)
+AC_DEFINE_UNQUOTED($OPSYS)
+AC_SUBST(arch)
+AC_DEFINE_UNQUOTED($ARCH)
+AC_SUBST(osarch)
+AC_PROG_CC
+AC_PROG_HOSTCC($host_alias $host)
+AC_C_CROSS
+AC_POLLABLE_PROCFS
+AC_STRUCT_PR_SYSCALL
+AC_STRUCT_MSG_CONTROL
+AC_INCLUDEDIR
+if test "x$OPSYS" = "xSUNOS4" && test "x$ARCH" = "xSPARC"
+then
+	AC_MSG_CHECKING(for valid machine include directory)
+	if test -d "$includedir/sun4"
+	then
+		rm -f machine
+		ln -s $includedir/sun4 machine
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(SUNOS4_KERNEL_ARCH_KLUDGE)
+	else
+		AC_MSG_RESULT(no)
+	fi
+fi
+AC_WARNFLAGS
+if test "x$OPSYS" = "xSUNOS4"
+then
+	if test -n "$GCC"
+	then
+		# SunOS 4.x header files don't declare int functions.
+		WARNFLAGS="$WARNFLAGS -Wno-implicit"
+	fi
+fi
+AC_PROG_CPP
+AC_PROG_GCC_TRADITIONAL
+AC_PROG_INSTALL
+AC_C_CONST
+AC_HEADER_STDC
+AC_HEADER_DIRENT
+AC_TYPE_SIGNAL
+AC_STRUCT_ST_BLKSIZE
+AC_STRUCT_ST_BLOCKS
+AC_STRUCT_ST_RDEV
+AC_HEADER_STAT
+AC_TYPE_UID_T
+AC_TYPE_MODE_T
+AC_TYPE_GETGROUPS
+AC_HEADER_MAJOR
+AC_SIG_ATOMIC_T
+AC_CHECK_LIB(nsl, main)
+AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl putpmsg prctl sendmsg)
+AC_CHECK_HEADERS(sys/filio.h sys/asynch.h sys/stream.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h)
+AC_DECL_SYS_ERRLIST
+AC_DECL_SYS_SIGLIST
+AC_DECL__SYS_SIGLIST
+AC_OUTPUT(Makefile $osarch/Makefile)

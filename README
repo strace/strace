@@ -1,0 +1,37 @@
+This is strace 3.1, a system call tracer for SunOS 4.x, Linux, System
+V release 4, Solaris 2.x and Irix 5.x.  strace is released under a
+Berkeley-style license at the request of Paul Kranenburg; see the file
+COPYRIGHT for details.
+
+Read the INSTALL file for generic instructions on how to install
+strace.  If configure cannot guess your system configuration, you can
+specify it on the command line after the other options like this:
+
+	./configure --prefix=/usr i486-linux
+
+The following configurations are supposed to work (in porting order):
+
+	sparc-sun-sunos4.1
+	i486-linux
+	sparc-sun-solaris2
+	i486-ncr-sysv4
+	i486-sun-solaris2
+	m68k-linux
+	mips-sgi-irix5
+	alpha-linux
+
+A single sunos4.1 binary should work on all the sun4, sun4c and sun4m
+kernel architectures.  Let me know if sun4d doesn't work.  Other
+i486-*-sysv4 systems may work with little or no tweaking.
+
+See the file NEWS for information on what has changed in recent
+versions.
+
+See the file PORTING if you like strace but it doesn't work on an
+operating system you use frequently.
+
+See the file CREDITS to see who has contributed to strace.
+
+See the file TODO if you feel like helping out.
+
+Please send bug reports and enhancements to Rick Sladkey <jrs@world.std.com>.
