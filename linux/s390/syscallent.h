@@ -221,8 +221,8 @@
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
 	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 192 */
-	{ 2,	TF,	printargs,		"truncate64"	}, /* 193 */
-	{ 2,	TF,	printargs,		"ftruncate64"	}, /* 194 */
+	{ 2,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
+	{ 2,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
 	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 197 */

@@ -200,7 +200,7 @@
 	{ 0,	0,	printargs,		"SYS_199",	}, /* 199 */
 	{ 0,	0,	printargs,		"SYS_200",	}, /* 200 */
 	{ 0,	0,	printargs,		"svr4_aread"	}, /*  0201 */
-	{ 0,	0,	printargs,		"svr4_awrite"	}, /*  0202 */	
+	{ 0,	0,	printargs,		"svr4_awrite"	}, /*  0202 */
 	{ 0,	0,	printargs,		"svr4_listio"	}, /*  0203 */
 	{ 0,	0,	printargs,		"svr4_mips_acancel"	}, /*  0204 */
 	{ 0,	0,	printargs,		"svr4_astatus"	}, /*  0205 */
@@ -4209,15 +4209,15 @@
 	{ 0,	0,	printargs,		"SYS_4208"	}, /* 4208 */
 	{ 0,	0,	printargs,		"SYS_4209"	}, /* 4209 */
 	{ 6,	0,	sys_mmap,		"mmap"		}, /* 4210 */
-	{ 2,	TF,	printargs,		"truncate64"	}, /* 4211 */
-	{ 2,	TF,	printargs,		"ftruncate64"	}, /* 4212 */
+	{ 2,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
+	{ 2,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
 	{ 2,	TF,	printargs,		"stat64"	}, /* 4213 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 4214 */
 	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 4215 */
 	{ 2,	0,	sys_pivotroot,		"pivot_root"	}, /* 4216 */
 	{ 3,	0,	printargs,		"mincore"	}, /* 4217 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 4218 */
-	{ 3,	0,	printargs,		"getdents64"	}, /* 4219 */
+	{ 3,	TF,	sys_getdents64,		"getdents64"	}, /* 4219 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"	}, /* 4220 */
 	{ 0,	0,	printargs,		"SYS_4221"	}, /* 4221 */
 	{ 0,	0,	printargs,		"SYS_4222"	}, /* 4222 */
@@ -4998,4 +4998,3 @@
 	{ 0,	0,	printargs,		"SYS_4997"	}, /* 4997 */
 	{ 0,	0,	printargs,		"SYS_4998"	}, /* 4998 */
 	{ 0,	0,	printargs,		"SYS_4999"	}, /* 4999 */ /* end of Linux */
-

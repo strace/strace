@@ -75,7 +75,7 @@
 	{ 3,	0,	sys_mprotect,	"mprotect" },		/* 74 */
 	{ 3,	0,	sys_madvise,	"madvise" },		/* 75 */
 	{ 1,	0,	sys_vhangup,	"vhangup" },		/* 76 */
-	{ 2,	TF,	printargs,	"truncate64" },		/* 77 */
+	{ 2,	TF,	sys_truncate64,	"truncate64" },		/* 77 */
 	{ 3,	0,	sys_mincore,	"mincore" },		/* 78 */
 	{ 2,	0,	sys_getgroups,	"getgroups" },		/* 79 */
 	{ 2,	0,	sys_setgroups,	"setgroups" },		/* 80 */
@@ -153,7 +153,7 @@
 	{ 4,	TN,	sys_getmsg,	"getmsg" },		/* 151 */
 	{ 4,	TN,	sys_putmsg,	"putmsg" },		/* 152 */
 	{ 3,	0,	sys_poll,	"poll" },		/* 153 */
-	{ 4,	0,	printargs,	"getdents64" },		/* 154 */
+	{ 4,	0,	sys_getdents64,	"getdents64" },		/* 154 */
 	{ 1,	0,	printargs,	"nfssvc" },		/* 155 */
 	{ 4,	0,	printargs,	"getdirentries" },	/* 156 */
 	{ 2,	TF,	sys_statfs,	"statfs" },		/* 157 */

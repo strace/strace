@@ -221,8 +221,8 @@
 	{ 2,	0,	printargs,		"ugetrlimit"		}, /* 190 */
 	{ 4,	0,	sys_readahead,		"readahead"		}, /* 190 */
 	{ 6,	0,	sys_mmap,		"mmap2"			}, /* 192 */
-	{ 4,	TF,	printargs,		"truncate64"		}, /* 193 */
-	{ 4,	TF,	printargs,		"ftruncate64"		}, /* 194 */
+	{ 4,	TF,	sys_truncate64,		"truncate64"		}, /* 193 */
+	{ 4,	TF,	sys_ftruncate64,	"ftruncate64"		}, /* 194 */
 
 	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 196 */
@@ -231,7 +231,7 @@
 	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 199 */
 	{ 3,	0,	printargs,		"pciconfig_iobase"	}, /* 200 */
 	{ 8,	0,	printargs,		"MOL"			}, /* 201 */
-	{ 3,	0,	printargs,		"getdents64"		}, /* 202 */
+	{ 3,	0,	sys_getdents64,		"getdents64"		}, /* 202 */
 	{ 2,	0,	sys_pivotroot,		"pivot_root"		}, /* 203 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"		}, /* 204 */
 	{ 3,	0,	sys_madvise,		"madvise"		}, /* 205 */

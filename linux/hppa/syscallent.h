@@ -205,9 +205,9 @@
 	{ 5,	0,	printargs,		"getpmsg"		}, /* 196 */
 	{ 5,	0,	printargs,		"putpmsg"		}, /* 197 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 198 */
-	{ 3,	TF,	printargs,		"truncate64"		}, /* 199 */
-	{ 3,	TF,	printargs,		"ftruncate64"		}, /* 200 */
-	{ 3,	0,	printargs,		"getdents64"		}, /* 201 */
+	{ 3,	TF,	sys_truncate64,		"truncate64"		}, /* 199 */
+	{ 3,	TF,	sys_ftruncate64,	"ftruncate64"		}, /* 200 */
+	{ 3,	0,	sys_getdents64,		"getdents64"		}, /* 201 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"		}, /* 202 */
 	{ 5,	0,	printargs,		"attrctl"		}, /* 203 */
 	{ 5,	0,	printargs,		"acl_get"		}, /* 204 */
