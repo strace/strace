@@ -49,7 +49,7 @@
 
 #if defined(linux) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
 #include <linux/ptrace.h>
-#endif 
+#endif
 
 #if defined(LINUX) && defined(IA64)
 #include <asm/ptrace_offsets.h>
@@ -477,14 +477,14 @@ long addr;
 	struct iovec *iov;
 	int i;
 
-	  
+
 	if ((iov = (struct iovec *) malloc(len * sizeof *iov)) == NULL) {
 		fprintf(stderr, "dump: No memory");
 		return;
 	}
 	if (umoven(tcp, addr,
 		   len * sizeof *iov, (char *) iov) >= 0) {
-                
+
 		for (i = 0; i < len; i++) {
                         /* include the buffer number to make it easy to
                          * match up the trace with the source */
@@ -495,7 +495,7 @@ long addr;
                 }
 	}
 	free((char *) iov);
-        
+
 }
 #endif
 
@@ -908,9 +908,9 @@ long *res;
 	errno = 0;
 	val = ptrace(PTRACE_PEEKUSER, pid, (char *) off, 0);
 	if (val == -1 && errno) {
-		char buf[60]; 
+		char buf[60];
 		sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)",pid,off);
-		perror(buf);	
+		perror(buf);
 		return -1;
 	}
 	*res = val;
@@ -1233,7 +1233,7 @@ struct tcb *tcp;
 #elif defined (ALPHA)
 #define LOOP	0xc3ffffff
 #elif defined (POWERPC)
-#define LOOP	0x0000feeb
+#define LOOP	0x48000000
 #elif defined(ARM)
 #define LOOP	0xEAFFFFFE
 #elif defined(MIPS)
