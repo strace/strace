@@ -126,7 +126,7 @@ AC_HEADER_MAJOR
 AC_SIG_ATOMIC_T
 AC_CHECK_LIB(nsl, main)
 AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl putpmsg prctl sendmsg inet_ntop)
-AC_CHECK_HEADERS(sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h sys/stream.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h)
+AC_CHECK_HEADERS(sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h sys/stream.h sys/tiuser.h sys/sysconfig.h asm/sigcontext.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h linux/in6.h)
 AC_DECL_SYS_ERRLIST
 AC_DECL_SYS_SIGLIST
 AC_DECL__SYS_SIGLIST
