@@ -340,7 +340,7 @@ long addr;
 		tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")}",
 			ntohs(sin->sin_port), inet_ntoa(sin->sin_addr));
 		break;
-#ifdef AF_IPX
+#if defined(AF_IPX) && defined(linux)
 	case AF_IPX:
 		if (umove(tcp, addr, &sipx)<0)
 			tprintf("{sipx_family=AF_IPX, ...}");
@@ -362,7 +362,7 @@ long addr;
 			tprintf("}");
 		}
 		break;
-#endif /* AF_IPX */
+#endif /* AF_IPX  && linux */
 	/* AF_AX25 AF_APPLETALK AF_NETROM AF_BRIDGE AF_AAL5
 	AF_X25 AF_INET6 AF_ROSE still need to be done */
 
