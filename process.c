@@ -363,8 +363,13 @@ int
 internal_exit(tcp)
 struct tcb *tcp;
 {
-	if (entering(tcp))
+	if (entering(tcp)) {
 		tcp->flags |= TCB_EXITING;
+#ifdef __NR_exit_group
+		if (tcp->scno == __NR_exit_group)
+			tcp->flags |= TCB_GROUP_EXITING;
+#endif
+	}
 	return 0;
 }
 
@@ -726,7 +731,7 @@ setarg(tcp, argnum)
 	return 0;
 }
 
-#ifdef SYS_clone
+#if defined SYS_clone || defined SYS_clone2
 int
 internal_clone(tcp)
 struct tcb *tcp;
@@ -753,6 +758,21 @@ struct tcb *tcp;
 		}
 
 		pid = tcp->u_rval;
+
+#ifdef CLONE_PTRACE		/* See new setbpt code.  */
+		tcpchild = pid2tcb(pid);
+		if (tcpchild != NULL) {
+			/* The child already reported its startup trap
+			   before the parent reported its syscall return.  */
+			if ((tcpchild->flags
+			     & (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
+			    != (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
+				fprintf(stderr, "\
+[preattached child %d of %d in weird state!]\n",
+					pid, tcp->pid);
+		}
+		else
+#endif
 		if ((tcpchild = alloctcb(pid)) == NULL) {
 			if (bpt)
 				clearbpt(tcp);
@@ -761,6 +781,7 @@ struct tcb *tcp;
 			return 0;
 		}
 
+#ifndef CLONE_PTRACE
 		/* Attach to the new child */
 		if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
 			if (bpt)
@@ -770,23 +791,72 @@ struct tcb *tcp;
 			droptcb(tcpchild);
 			return 0;
 		}
+#endif
 
 		if (bpt)
 			clearbpt(tcp);
 
 		tcpchild->flags |= TCB_ATTACHED;
+		/* Child has BPT too, must be removed on first occasion.  */
 		if (bpt) {
 			tcpchild->flags |= TCB_BPTSET;
 			tcpchild->baddr = tcp->baddr;
 			memcpy(tcpchild->inst, tcp->inst,
 				sizeof tcpchild->inst);
 		}
-		newoutf(tcpchild);
 		tcpchild->parent = tcp;
-		tcp->nchildren++;
-		if (!qflag)
-			fprintf(stderr, "Process %d attached\n", pid);
-	}
+ 		tcp->nchildren++;
+		if (tcpchild->flags & TCB_SUSPENDED) {
+			/* The child was born suspended, due to our having
+			   forced CLONE_PTRACE.  */
+			if (bpt)
+				clearbpt(tcpchild);
+
+			tcpchild->flags &= ~(TCB_SUSPENDED|TCB_STARTUP);
+			if (ptrace(PTRACE_SYSCALL, pid, (char *) 1, 0) < 0) {
+				perror("resume: ptrace(PTRACE_SYSCALL, ...)");
+				return -1;
+			}
+
+			if (!qflag)
+				fprintf(stderr, "\
+Process %u resumed (parent %d ready)\n",
+					pid, tcp->pid);
+		}
+		else {
+			newoutf(tcpchild);
+			if (!qflag)
+				fprintf(stderr, "Process %d attached\n", pid);
+		}
+
+#ifdef TCB_CLONE_THREAD
+		if ((tcp->flags & TCB_CLONE_THREAD) && tcp->parent != NULL) {
+			/* The parent in this clone is itself a thread
+			   belonging to another process.  There is no
+			   meaning to the parentage relationship of the new
+			   child with the thread, only with the process.
+			   We associate the new thread with our parent.
+			   Since this is done for every new thread, there
+			   will never be a TCB_CLONE_THREAD process that
+			   has children.  */
+			--tcp->nchildren;
+			tcp->u_arg[0] = tcp->parent->u_arg[0];
+			tcp = tcp->parent;
+			tcpchild->parent = tcp;
+			++tcp->nchildren;
+		}
+
+		if (tcp->u_arg[0] & CLONE_THREAD) {
+			tcpchild->flags |= TCB_CLONE_THREAD;
+			++tcp->nclone_threads;
+		}
+		if (tcp->u_arg[0] & CLONE_DETACHED) {
+			tcpchild->flags |= TCB_CLONE_DETACHED;
+			++tcp->nclone_detached;
+		}
+#endif
+
+ 	}
 	return 0;
 }
 #endif
@@ -795,6 +865,11 @@ int
 internal_fork(tcp)
 struct tcb *tcp;
 {
+#ifdef LINUX
+	/* We do special magic with clone for any clone or fork.  */
+	return internal_clone(tcp);
+#else
+
 	struct tcb *tcpchild;
 	int pid;
 	int dont_follow = 0;
@@ -904,6 +979,7 @@ struct tcb *tcp;
 			fprintf(stderr, "Process %d attached\n", pid);
 	}
 	return 0;
+#endif
 }
 
 #endif /* !USE_PROCFS */
@@ -1650,7 +1726,20 @@ int
 internal_wait(tcp)
 struct tcb *tcp;
 {
-	if (entering(tcp) && tcp->nchildren > 0) {
+	int got_kids;
+
+#ifdef TCB_CLONE_THREAD
+	if (tcp->flags & TCB_CLONE_THREAD)
+		/* The children we wait for are our parent's children.  */
+		got_kids = (tcp->parent->nchildren
+			    > tcp->parent->nclone_detached);
+	else
+		got_kids = (tcp->nchildren > tcp->nclone_detached);
+#else
+	got_kids = tcp->nchildren > 0;
+#endif
+
+	if (entering(tcp) && got_kids) {
 		/* There are children that this parent should block for.
 		   But ptrace made us the parent of the traced children
 		   and the real parent will get ECHILD from the wait call.
@@ -1665,9 +1754,13 @@ struct tcb *tcp;
 			/* There are traced children */
 			tcp->flags |= TCB_SUSPENDED;
 			tcp->waitpid = tcp->u_arg[0];
+#ifdef TCB_CLONE_THREAD
+			if (tcp->flags & TCB_CLONE_THREAD)
+				tcp->parent->nclone_waiting++;
+#endif
 		}
 	}
-	if (exiting(tcp) && tcp->u_error == ECHILD && tcp->nchildren > 0) {
+	if (exiting(tcp) && tcp->u_error == ECHILD && got_kids) {
 		if (tcp->u_arg[2] & WNOHANG) {
 			/* We must force a fake result of 0 instead of
 			   the ECHILD error.  */

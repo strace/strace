@@ -84,7 +84,6 @@ char *progname;
 extern const char version[];
 extern char **environ;
 
-static struct tcb *pid2tcb P((int pid));
 static int trace P((void));
 static void cleanup P((void));
 static void interrupt P((int sig));
@@ -610,6 +609,10 @@ int pid;
 			tcp->pid = pid;
 			tcp->parent = NULL;
 			tcp->nchildren = 0;
+#ifdef TCB_CLONE_THREAD
+			tcp->nclone_threads = tcp->nclone_detached = 0;
+			tcp->nclone_waiting = 0;
+#endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
 			tcp->outf = outf; /* Initialise to current out file */
 			tcp->stime.tv_sec = 0;
@@ -932,7 +935,7 @@ int attaching;
 
 #endif /* USE_PROCFS */
 
-static struct tcb *
+struct tcb *
 pid2tcb(pid)
 int pid;
 {
@@ -975,9 +978,18 @@ struct tcb *tcp;
 {
 	if (tcp->pid == 0)
 		return;
+#ifdef TCB_CLONE_THREAD
+	if (tcp->nclone_threads > 0) {
+		/* There are other threads left in this process, but this
+		   is the one whose PID represents the whole process.
+		   We need to keep this record around as a zombie until
+		   all the threads die.  */
+		tcp->flags |= TCB_EXITING;
+		return;
+	}
+#endif
 	nprocs--;
 	tcp->pid = 0;
-	tcp->flags = 0;
 
 	if (tcp->pfd != -1) {
 		close(tcp->pfd);
@@ -998,6 +1010,12 @@ struct tcb *tcp;
 	}
 	if (tcp->parent != NULL) {
 		tcp->parent->nchildren--;
+#ifdef TCB_CLONE_THREAD
+		if (tcp->flags & TCB_CLONE_DETACHED)
+			tcp->parent->nclone_detached--;
+		if (tcp->flags & TCB_CLONE_THREAD)
+			tcp->parent->nclone_threads--;
+#endif
 		tcp->parent = NULL;
 	}
 
@@ -1005,6 +1023,7 @@ struct tcb *tcp;
 		fclose(tcp->outf);
 
 	tcp->outf = 0;
+	tcp->flags = 0;
 }
 
 #ifndef USE_PROCFS
@@ -1021,6 +1040,10 @@ struct tcb *tcp;
 		return -1;
 	}
 	tcp->flags &= ~TCB_SUSPENDED;
+#ifdef TCB_CLONE_THREAD
+	if (tcp->flags & TCB_CLONE_THREAD)
+		tcp->parent->nclone_waiting--;
+#endif
 
 	if (ptrace(PTRACE_SYSCALL, tcp->pid, (char *) 1, 0) < 0) {
 		perror("resume: ptrace(PTRACE_SYSCALL, ...)");
@@ -1042,9 +1065,7 @@ struct tcb *tcp;
 int sig;
 {
 	int error = 0;
-#ifdef LINUX
-	int status;
-#endif
+	int status, resumed;
 
 	if (tcp->flags & TCB_BPTSET)
 		sig = SIGKILL;
@@ -1138,8 +1159,64 @@ int sig;
 #endif /* SUNOS4 */
 
 #ifndef USE_PROCFS
-	if (waiting_parent(tcp))
-		error = resume(tcp->parent);
+	resumed = 0;
+
+	/* XXX This won't always be quite right (but it never was).
+	   A waiter with argument 0 or < -1 is waiting for any pid in
+	   a particular pgrp, which this child might or might not be
+	   in.  The waiter will only wake up if it's argument is -1
+	   or if it's waiting for tcp->pid's pgrp.  It makes a
+	   difference to wake up a waiter when there might be more
+	   traced children, because it could get a false ECHILD
+	   error.  OTOH, if this was the last child in the pgrp, then
+	   it ought to wake up and get ECHILD.  We would have to
+	   search the system for all pid's in the pgrp to be sure.
+
+	     && (t->waitpid == -1 ||
+		 (t->waitpid == 0 && getpgid (tcp->pid) == getpgid (t->pid))
+		 || (t->waitpid < 0 && t->waitpid == -getpid (t->pid)))
+	*/
+
+	if (tcp->parent &&
+	    (tcp->parent->flags & TCB_SUSPENDED) &&
+	    (tcp->parent->waitpid <= 0 || tcp->parent->waitpid == tcp->pid)) {
+ 		error = resume(tcp->parent);
+		++resumed;
+	}
+#ifdef TCB_CLONE_THREAD
+	if (tcp->parent && tcp->parent->nclone_waiting > 0) {
+		/* Some other threads of our parent are waiting too.  */
+		unsigned int i;
+
+		/* Resume all the threads that were waiting for this PID.  */
+		for (i = 0; i < tcbtabsize; i++) {
+			struct tcb *t = tcbtab[i];
+			if (t->parent == tcp->parent && t != tcp
+			    && ((t->flags & (TCB_CLONE_THREAD|TCB_SUSPENDED))
+				== (TCB_CLONE_THREAD|TCB_SUSPENDED))
+			    && t->waitpid == tcp->pid) {
+				error |= resume (t);
+				++resumed;
+			}
+		}
+		if (resumed == 0)
+			/* Noone was waiting for this PID in particular,
+			   so now we might need to resume some wildcarders.  */
+			for (i = 0; i < tcbtabsize; i++) {
+				struct tcb *t = tcbtab[i];
+				if (t->parent == tcp->parent && t != tcp
+				    && ((t->flags
+					 & (TCB_CLONE_THREAD|TCB_SUSPENDED))
+					== (TCB_CLONE_THREAD|TCB_SUSPENDED))
+				    && t->waitpid <= 0
+					) {
+					error |= resume (t);
+					break;
+				}
+			}
+	}
+#endif
+
 #endif /* !USE_PROCFS */
 
 	if (!qflag)
@@ -1701,6 +1778,81 @@ trace()
 
 #else /* !USE_PROCFS */
 
+#ifdef TCB_GROUP_EXITING
+/* Handle an exit detach or death signal that is taking all the
+   related clone threads with it.  This is called in three circumstances:
+   SIG == -1	TCP has already died (TCB_ATTACHED is clear, strace is parent).
+   SIG == 0	Continuing TCP will perform an exit_group syscall.
+   SIG == other	Continuing TCP with SIG will kill the process.
+*/
+static int
+handle_group_exit(struct tcb *tcp, int sig)
+{
+	/* We need to locate our records of all the clone threads
+	   related to TCP, either its children or siblings.  */
+	struct tcb *leader = ((tcp->flags & TCB_CLONE_THREAD)
+			      ? tcp->parent
+			      : tcp->nclone_detached > 0
+			      ? tcp : NULL);
+
+	if (sig < 0) {
+		if (leader != NULL && leader != tcp)
+			fprintf(stderr,
+				"PANIC: handle_group_exit: %d leader %d\n",
+				tcp->pid, leader ? leader->pid : -1);
+		droptcb(tcp);	/* Already died.  */
+	}
+	else {
+		if (tcp->flags & TCB_ATTACHED) {
+			if (leader != NULL && leader != tcp) {
+				/* We need to detach the leader so that the
+				   process death will be reported to its real
+				   parent.  But we kill it first to prevent
+				   it doing anything before we kill the whole
+				   process in a moment.  We can use
+				   PTRACE_KILL on a thread that's not already
+				   stopped.  Then the value we pass in
+				   PTRACE_DETACH just sets the death
+				   signal reported to the real parent.  */
+				ptrace(PTRACE_KILL, leader->pid, 0, 0);
+				if (debug)
+					fprintf(stderr,
+						" [%d exit %d kills %d]\n",
+						tcp->pid, sig, leader->pid);
+				detach(leader, sig);
+			}
+			detach(tcp, sig);
+		}
+		else if (ptrace(PTRACE_CONT, tcp->pid, (char *) 1, sig) < 0) {
+			perror("strace: ptrace(PTRACE_CONT, ...)");
+			cleanup();
+			return -1;
+		}
+		else {
+			if (leader != NULL && leader != tcp)
+				droptcb(tcp);
+			/* The leader will report to us as parent now,
+			   and then we'll get to the SIG==-1 case.  */
+			return 0;
+		}
+	}
+
+	/* Note that TCP and LEADER are no longer valid,
+	   but we can still compare against them.  */
+	if (leader != NULL) {
+		unsigned int i;
+		for (i = 0; i < tcbtabsize; i++) {
+			struct tcb *t = tcbtab[i];
+			if (t != tcp && (t->flags & TCB_CLONE_DETACHED)
+			    && t->parent == leader)
+				droptcb(t);
+		}
+	}
+
+	return 0;
+}
+#endif
+
 static int
 trace()
 {
@@ -1780,25 +1932,39 @@ trace()
 
 		/* Look up `pid' in our table. */
 		if ((tcp = pid2tcb(pid)) == NULL) {
-#if 0 /* XXX davidm */ /* WTA: disabled again */
-			struct tcb *tcpchild;
-
-			if ((tcpchild = alloctcb(pid)) == NULL) {
-				fprintf(stderr, " [tcb table full]\n");
-				kill(pid, SIGKILL); /* XXX */
-				return 0;
+#ifdef LINUX
+			if (followfork || followvfork) {
+				/* This is needed to go with the CLONE_PTRACE
+				   changes in process.c/util.c: we might see
+				   the child's initial trap before we see the
+				   parent return from the clone syscall.
+				   Leave the child suspended until the parent
+				   returns from its system call.  Only then
+				   will we have the association of parent and
+				   child so that we know how to do clearbpt
+				   in the child.  */
+				if ((tcp = alloctcb(pid)) == NULL) {
+					fprintf(stderr, " [tcb table full]\n");
+					kill(pid, SIGKILL); /* XXX */
+					return 0;
+				}
+				tcp->flags |= TCB_ATTACHED | TCB_SUSPENDED;
+				newoutf(tcp);
+				if (!qflag)
+					fprintf(stderr, "\
+Process %d attached (waiting for parent)\n",
+						pid);
 			}
-			tcpchild->flags |= TCB_ATTACHED;
-			newoutf(tcpchild);
-			tcp->nchildren++;
-			if (!qflag)
-				fprintf(stderr, "Process %d attached\n", pid);
-#else
-			fprintf(stderr, "unknown pid: %u\n", pid);
-			if (WIFSTOPPED(status))
-				ptrace(PTRACE_CONT, pid, (char *) 1, 0);
-			exit(1);
+			else
+				/* This can happen if a clone call used
+				   CLONE_PTRACE itself.  */
 #endif
+			{
+				fprintf(stderr, "unknown pid: %u\n", pid);
+				if (WIFSTOPPED(status))
+					ptrace(PTRACE_CONT, pid, (char *) 1, 0);
+				exit(1);
+			}
 		}
 		/* set current output file */
 		outf = tcp->outf;
@@ -1828,7 +1994,11 @@ trace()
 					signame(WTERMSIG(status)));
 				printtrailer(tcp);
 			}
+#ifdef TCB_GROUP_EXITING
+			handle_group_exit(tcp, -1);
+#else
 			droptcb(tcp);
+#endif
 			continue;
 		}
 		if (WIFEXITED(status)) {
@@ -1838,7 +2008,11 @@ trace()
 				fprintf(stderr,
 					"PANIC: attached pid %u exited\n",
 					pid);
+#ifdef TCB_GROUP_EXITING
+			handle_group_exit(tcp, -1);
+#else
 			droptcb(tcp);
+#endif
 			continue;
 		}
 		if (!WIFSTOPPED(status)) {
@@ -1927,7 +2101,11 @@ trace()
 			}
 			if ((tcp->flags & TCB_ATTACHED) &&
 				!sigishandled(tcp, WSTOPSIG(status))) {
+#ifdef TCB_GROUP_EXITING
+				handle_group_exit(tcp, WSTOPSIG(status));
+#else
 				detach(tcp, WSTOPSIG(status));
+#endif
 				continue;
 			}
 			if (ptrace(PTRACE_SYSCALL, pid, (char *) 1,
@@ -1950,6 +2128,13 @@ trace()
 			continue;
 		}
 		if (tcp->flags & TCB_EXITING) {
+#ifdef TCB_GROUP_EXITING
+			if (tcp->flags & TCB_GROUP_EXITING) {
+				if (handle_group_exit(tcp, 0) < 0)
+					return -1;
+				continue;
+			}
+#endif
 			if (tcp->flags & TCB_ATTACHED)
 				detach(tcp, 0);
 			else if (ptrace(PTRACE_CONT, pid, (char *) 1, 0) < 0) {
