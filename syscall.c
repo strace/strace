@@ -406,7 +406,7 @@ struct tcb *tcp;
 
 enum subcall_style { shift_style, deref_style, mask_style, door_style };
 
-#if !(defined(LINUX) && defined(ALPHA))
+#if !(defined(LINUX) && ( defined(ALPHA) || defined(MIPS) ))
 
 const int socket_map [] = {
 	       /* SYS_SOCKET      */ 97,
@@ -585,6 +585,8 @@ struct tcb *tcp;
 #elif defined (ALPHA)
 	long r0;
 	long a3;
+#elif defined(MIPS)
+	long r2,a3;
 #elif defined (SPARC)
 	struct regs regs;
 	unsigned long trap;
@@ -622,6 +624,25 @@ struct tcb *tcp;
 #elif defined (M68K)
 	if (upeek(pid, 4*PT_ORIG_D0, &scno) < 0)
 		return -1;
+#elif defined (MIPS)
+	if (upeek(pid, REG_A3, &a3) < 0)
+	  	return -1;
+
+	if(!(tcp->flags & TCB_INSYSCALL)) {
+	  	if (upeek(pid, REG_V0, &scno) < 0)
+		  	return -1;
+
+		if (scno < 0 || scno > nsyscalls) {
+			if(a3 == 0 || a3 == -1) {
+				if(debug)
+					fprintf (stderr, "stray syscall exit: v0 = %ld\n", scno);
+				return 0;
+			}
+		}
+	} else {
+	  	if (upeek(pid, REG_V0, &r2) < 0)
+	    		return -1;
+	}
 #elif defined (ALPHA)
 	if (upeek(pid, REG_A3, &a3) < 0)
 		return -1;
@@ -821,6 +842,15 @@ struct tcb *tcp;
 			u_error = 0;
 		}
 #else /* !I386 */
+#ifdef MIPS
+		if (a3) {
+		  	tcp->u_rval = -1;
+			u_error = r2;
+		} else {
+		  	tcp->u_rval = r2;
+			u_error = 0;
+		}
+#else
 #ifdef POWERPC
 		if (result && (unsigned) -result < nerrnos) {
 			tcp->u_rval = -1;
@@ -875,6 +905,7 @@ struct tcb *tcp;
 #endif /* ARM */
 #endif /* M68K */
 #endif /* POWERPC */
+#endif /* MIPS */
 #endif /* I386 */
 #endif /* LINUX */
 #ifdef SUNOS4
@@ -1067,6 +1098,28 @@ struct tcb *tcp;
 				return -1;
 		}
 	}
+#elif defined (MIPS)
+	{
+	  	long sp;
+	  	int i, nargs;
+
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
+		if(nargs > 4) {
+		  	if(upeek(pid, REG_SP, &sp) < 0)
+			  	return -1;
+			for(i = 0; i < 4; i++) {
+			  	if (upeek(pid, REG_A0 + i, &tcp->u_arg[i])<0)
+				  	return -1;
+			}
+			umoven(tcp, sp+16, (nargs-4) * sizeof(tcp->u_arg[0]),
+			       (char *)(tcp->u_arg + 4));
+		} else {
+		  	for(i = 0; i < nargs; i++) {
+			  	if (upeek(pid, REG_A0 + i, &tcp->u_arg[i]) < 0)
+				  	return -1;
+			}
+		}
+	}
 #elif defined (POWERPC)
 	{
 		int i;
@@ -1161,7 +1214,7 @@ struct tcb *tcp;
 	switch (tcp->scno) {
 #endif
 #ifdef LINUX
-#if !defined (ALPHA) && !defined(SPARC)
+#if !defined (ALPHA) && !defined(SPARC) && !defined(MIPS)
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);

@@ -95,7 +95,7 @@ int sys_shutdown(), sys_setsockopt(), sys_getsockopt();
 int sys_query_module();
 int sys_poll();
 
-#ifndef ALPHA
+#if !defined(ALPHA) && !defined(MIPS)
 #ifdef POWERPC
 #  define SYS_socket_subcall	256
 #else
@@ -126,7 +126,7 @@ int sys_semget(), sys_semctl();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#ifndef ALPHA
+#if !defined(ALPHA) && !defined(MIPS)
 #ifdef POWERPC
 #  define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #else

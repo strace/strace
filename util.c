@@ -868,37 +868,30 @@ struct tcb *tcp;
 #ifdef LINUX
 	long pc;
 
-#ifdef I386
+#if defined(I386)
 	if (upeek(tcp->pid, 4*EIP, &pc) < 0)
 		return -1;
-#else /* !I386 */
-#ifdef ARM
+#elif defined(ARM)
 	if (upeek(tcp->pid, 4*15, &pc) < 0)
 		return -1;
-#else /* !ARM */
-#ifdef POWERPC
+#elif defined(POWERPC)
 	if (upeek(tcp->pid, 4*PT_NIP, &pc) < 0)
 		return -1;
-#else
-#ifdef M68K
+#elif defined(M68k)
 	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0)
 		return -1;
-#else /* !M68K */
-#ifdef ALPHA
+#elif defined(ALPHA)
 	if (upeek(tcp->pid, REG_PC, &pc) < 0)
 		return -1;
-#else /* !ALPHA */
-#ifdef SPARC
+#elif defined(MIPS)
+ 	if (upeek(tcp->pid, REG_EPC, &pc) < 0)
+ 		return -1;
+#elif defined(SPARC)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
 	pc = regs.r_pc;
-#endif /* SPARC */
-#endif /* ALPHA */
-#endif /* !M68K */
-#endif /* !POWERPC */
-#endif /* !ARM */
-#endif /* !I386 */
+#endif
 	return pc;
 #endif /* LINUX */
 
@@ -1057,6 +1050,8 @@ struct tcb *tcp;
 #define LOOP 0x0000feeb
 #elif defined(ARM)
 #define LOOP -1  /* almost certainly wrong, jws */
+#elif defined(MIPS)
+#define LOOP 0x1000ffff
 #else
 #error unknown architecture
 #endif
@@ -1075,6 +1070,8 @@ struct tcb *tcp;
 	return -1;
 #elif defined (ARM)
 	return -1;
+#elif defined (MIPS)
+	return -1;		/* FIXME: I do not know what i do - Flo */
 #elif defined (POWERPC)
 	if (upeek(tcp->pid, 4*PT_NIP, &tcp->baddr) < 0)
 		return -1;

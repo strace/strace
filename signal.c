@@ -812,6 +812,28 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
+#else  
+#ifdef MIPS
+	long sp;
+	struct sigcontext sc;
+
+	if(entering(tcp)) {
+	  	tcp->u_arg[0] = 0;
+		if (upeek(tcp->pid, REG_SP, &sp) < 0)
+		  	return 0;
+		if (umove(tcp, sp, &sc) < 0)
+		  	return 0;
+		tcp->u_arg[0] = 1;
+		tcp->u_arg[1] = sc.sc_sigset;
+	} else {
+	  	tcp->u_rval = tcp->u_error = 0;
+		if(tcp->u_arg[0] == 0)
+		  	return 0;
+		tcp->auxstr = sprintsigmask("mask now ", tcp->u_arg[1]);
+		return RVAL_NONE | RVAL_STR;
+	}
+	return 0;
+#endif /* MIPS */
 #endif /* SPARC */
 #endif /* ALPHA */
 #endif /* !M68K */

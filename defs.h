@@ -116,12 +116,19 @@ extern int ptrace();
 #define	PTRACE_POKEUSER	PTRACE_POKEUSR
 #endif
 #ifdef ALPHA
-#define REG_R0 0
-#define REG_A0 16
-#define REG_A3 19
-#define REG_FP 30
-#define REG_PC 64
+#  define REG_R0 0
+#  define REG_A0 16
+#  define REG_A3 19
+#  define REG_FP 30
+#  define REG_PC 64
 #endif /* ALPHA */
+#ifdef MIPS
+#  define REG_V0 2
+#  define REG_A0 4
+#  define REG_A3 7
+#  define REG_SP 29
+#  define REG_EPC 64
+#endif /* MIPS */
 #endif /* LINUX */
 
 #define SUPPORTED_PERSONALITIES 1

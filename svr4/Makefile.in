@@ -3,7 +3,7 @@
 #
 
 srcdir = @srcdir@
-VPATH = $(srcdir)
+VPATH = @srcdir@
 
 CC = @CC@
 CPP = @CPP@

@@ -1536,7 +1536,9 @@ struct xlat struct_user_offsets[] = {
 	{ 4*PT_PC,		"4*PT_PC"				},
 #endif /* M68K */
 #endif /* !I386 */
+#ifndef MIPS
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
+#endif
 #ifdef I386
 	{ uoff(i387),		"offsetof(struct user, i387)"		},
 #else /* !I386 */
@@ -1550,9 +1552,11 @@ struct xlat struct_user_offsets[] = {
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
+#ifndef MIPS
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
+#endif
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-#ifndef ARM
+#if !defined(ARM) && !defined(MIPS)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
 #endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},

@@ -41,7 +41,7 @@ m68k)
 sparc)
 	arch=sparc
 	;;
-mips)
+mips*)
 	arch=mips
 	;;
 alpha*)
