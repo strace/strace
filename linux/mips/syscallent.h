@@ -4198,8 +4198,8 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"},/* 4197 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"},/* 4198 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_siguspend"	}, /* 4199 */
-	{ 5,	TF,	sys_pread,		"pread"		}, /* 4200 */
-	{ 5,	TF,	sys_pwrite,		"pwrite"	}, /* 4201 */
+	{ 6,	TF,	sys_pread,		"pread"		}, /* 4200 */
+	{ 6,	TF,	sys_pwrite,		"pwrite"	}, /* 4201 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 4202 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 4203 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 4204 */
@@ -4209,8 +4209,8 @@
 	{ 0,	0,	printargs,		"SYS_4208"	}, /* 4208 */
 	{ 0,	0,	printargs,		"SYS_4209"	}, /* 4209 */
 	{ 6,	0,	sys_mmap,		"mmap"		}, /* 4210 */
-	{ 2,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
-	{ 2,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
+	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
+	{ 4,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
 	{ 2,	TF,	printargs,		"stat64"	}, /* 4213 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 4214 */
 	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 4215 */

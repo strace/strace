@@ -562,7 +562,8 @@ extern int nsignals2;
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 #if defined(FREEBSD) || (defined(LINUX) \
-			 && defined(POWERPC) && !defined(__powerpc64__))
+			 && defined(POWERPC) && !defined(__powerpc64__)) \
+  || (defined (LINUX) && defined (MIPS) && !defined(__mips64))
 /* ARRGH!  off_t args are aligned on 64 bit boundaries! */
 #define ALIGN64(tcp,arg)						\
 do {									\

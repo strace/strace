@@ -231,6 +231,18 @@ struct tcb *tcp;
 #endif /* FREEBSD */
 
 #ifdef LINUX
+
+/* The SH4 ABI does allow long longs in odd-numbered registers, but
+   does not allow them to be split between registers and memory - and
+   there are only four argument registers for normal functions.  As a
+   result pread takes an extra padding argument before the offset.  This
+   was changed late in the 2.4 series (around 2.4.20).  */
+#if defined(SH)
+#define PREAD_OFFSET_ARG 4
+#else
+#define PREAD_OFFSET_ARG 3
+#endif
+
 int
 sys_pread(tcp)
 struct tcb *tcp;
@@ -242,9 +254,9 @@ struct tcb *tcp;
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		ALIGN64 (tcp, 3); /* PowerPC alignment restriction */
+		ALIGN64 (tcp, PREAD_OFFSET_ARG); /* PowerPC alignment restriction */
 		tprintf(", %lu, %llu", tcp->u_arg[2],
-			*(unsigned long long *)&tcp->u_arg[3]);
+			*(unsigned long long *)&tcp->u_arg[PREAD_OFFSET_ARG]);
 	}
 	return 0;
 }
@@ -256,9 +268,9 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		ALIGN64 (tcp, 3); /* PowerPC alignment restriction */
+		ALIGN64 (tcp, PREAD_OFFSET_ARG); /* PowerPC alignment restriction */
 		tprintf(", %lu, %llu", tcp->u_arg[2],
-			*(unsigned long long *)&tcp->u_arg[3]);
+			*(unsigned long long *)&tcp->u_arg[PREAD_OFFSET_ARG]);
 	}
 	return 0;
 }

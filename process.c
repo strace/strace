@@ -2465,6 +2465,7 @@ struct xlat struct_user_offsets[] = {
        { 4*(REG_FPREG0+13),    "4*REG_FPREG13"                         },
        { 4*(REG_FPREG0+14),    "4*REG_FPREG14"                         },
        { 4*REG_FPREG15,        "4*REG_FPREG15"                         },
+#ifdef REG_XDREG0
        { 4*REG_XDREG0,         "4*REG_XDREG0"                          },
        { 4*(REG_XDREG0+2),     "4*REG_XDREG2"                          },
        { 4*(REG_XDREG0+4),     "4*REG_XDREG4"                          },
@@ -2473,6 +2474,7 @@ struct xlat struct_user_offsets[] = {
        { 4*(REG_XDREG0+10),    "4*REG_XDREG10"                         },
        { 4*(REG_XDREG0+12),    "4*REG_XDREG12"                         },
        { 4*REG_XDREG14,        "4*REG_XDREG14"                         },
+#endif
        { 4*REG_FPSCR,          "4*REG_FPSCR"                           },
 #endif /* SH */
 #ifdef SH64
