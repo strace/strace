@@ -1119,12 +1119,12 @@ struct tcb *tcp;
 				tprintf("%#lx, ", tcp->u_arg[0]);
 			else
 				tprintf("rgid %lu, ", (unsigned long) gid);
-			if (umove(tcp, tcp->u_arg[0], &gid) < 0)
-				tprintf("%#lx, ", tcp->u_arg[0]);
+			if (umove(tcp, tcp->u_arg[1], &gid) < 0)
+				tprintf("%#lx, ", tcp->u_arg[1]);
 			else
 				tprintf("egid %lu, ", (unsigned long) gid);
-			if (umove(tcp, tcp->u_arg[0], &gid) < 0)
-				tprintf("%#lx", tcp->u_arg[0]);
+			if (umove(tcp, tcp->u_arg[2], &gid) < 0)
+				tprintf("%#lx", tcp->u_arg[2]);
 			else
 				tprintf("sgid %lu", (unsigned long) gid);
 		}
