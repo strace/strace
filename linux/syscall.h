@@ -84,6 +84,11 @@ int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
 int sys_sendfile(), sys_old_mmap(), sys_stat64(), sys_lstat64(), sys_fstat64();
 int sys_truncate64(), sys_ftruncate64(), sys_pivotroot();
 int sys_getdents64(), sys_clone2();
+int sys_getpmsg(), sys_putpmsg(), sys_readahead(), sys_sendfile64();
+int sys_setxattr(), sys_fsetxattr(), sys_getxattr(), sys_fgetxattr();
+int sys_listxattr(), sys_flistxattr(), sys_removexattr(), sys_fremovexattr();
+int sys_sched_setaffinity(), sys_sched_getaffinity(), sys_futex();
+int sys_set_thread_area(), sys_get_thread_area();
 
 
 /* sys_socketcall subcalls */
@@ -138,11 +143,7 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 #endif /* IA64 */
-#if defined(POWERPC) || defined(S390) || defined(S390X)
-#  define SYS_socket_subcall	256
-#else
-#  define SYS_socket_subcall	230
-#endif /* (POWERPC || S390 || S390X) */
+#define SYS_socket_subcall	256
 #define SYS_socket		(SYS_socket_subcall + 1)
 #define SYS_bind		(SYS_socket_subcall + 2)
 #define SYS_connect		(SYS_socket_subcall + 3)
@@ -193,11 +194,7 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #  undef SYS_shmget
 #  undef SYS_shmctl
 # endif /* IA64 */
-#if defined(POWERPC) || defined(S390) || defined(S390X)
-#  define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
-#else
-#  define SYS_ipc_subcall		250
-#endif /* (POWERPC || S390 || S390X) */
+#define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #define SYS_semop		(SYS_ipc_subcall + 1)
 #define SYS_semget		(SYS_ipc_subcall + 2)
 #define SYS_semctl		(SYS_ipc_subcall + 3)
