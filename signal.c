@@ -367,6 +367,378 @@ int nr;
 
 #ifdef LINUX
 
+#ifndef ILL_ILLOPC
+#define ILL_ILLOPC      1       /* illegal opcode */
+#define ILL_ILLOPN      2       /* illegal operand */
+#define ILL_ILLADR      3       /* illegal addressing mode */
+#define ILL_ILLTRP      4       /* illegal trap */
+#define ILL_PRVOPC      5       /* privileged opcode */
+#define ILL_PRVREG      6       /* privileged register */
+#define ILL_COPROC      7       /* coprocessor error */
+#define ILL_BADSTK      8       /* internal stack error */
+#define FPE_INTDIV      1       /* integer divide by zero */
+#define FPE_INTOVF      2       /* integer overflow */
+#define FPE_FLTDIV      3       /* floating point divide by zero */
+#define FPE_FLTOVF      4       /* floating point overflow */
+#define FPE_FLTUND      5       /* floating point underflow */
+#define FPE_FLTRES      6       /* floating point inexact result */
+#define FPE_FLTINV      7       /* floating point invalid operation */
+#define FPE_FLTSUB      8       /* subscript out of range */
+#define SEGV_MAPERR     1       /* address not mapped to object */
+#define SEGV_ACCERR     2       /* invalid permissions for mapped object */
+#define BUS_ADRALN      1       /* invalid address alignment */
+#define BUS_ADRERR      2       /* non-existant physical address */
+#define BUS_OBJERR      3       /* object specific hardware error */
+#define TRAP_BRKPT      1       /* process breakpoint */
+#define TRAP_TRACE      2       /* process trace trap */
+#define CLD_EXITED      1       /* child has exited */
+#define CLD_KILLED      2       /* child was killed */
+#define CLD_DUMPED      3       /* child terminated abnormally */
+#define CLD_TRAPPED     4       /* traced child has trapped */
+#define CLD_STOPPED     5       /* child has stopped */
+#define CLD_CONTINUED   6       /* stopped child has continued */
+#define POLL_IN         1       /* data input available */
+#define POLL_OUT        2       /* output buffers available */
+#define POLL_MSG        3       /* input message available */
+#define POLL_ERR        4       /* i/o error */
+#define POLL_PRI        5       /* high priority input available */
+#define POLL_HUP        6       /* device disconnected */
+#define SI_USER         0       /* sent by kill, sigsend, raise */
+#define SI_QUEUE        -1      /* sent by sigqueue */
+#define SI_TIMER        -2      /* sent by timer expiration */
+#define SI_MESGQ        -3      /* sent by real time mesq state change */
+#define SI_ASYNCIO      -4      /* sent by AIO completion */
+#endif
+
+#if __GLIBC_MINOR__ < 1
+/* Type for data associated with a signal.  */
+typedef union sigval
+{
+	int sival_int;
+	void *sival_ptr;
+} sigval_t;
+
+# define __SI_MAX_SIZE     128
+# define __SI_PAD_SIZE     ((__SI_MAX_SIZE / sizeof (int)) - 3)
+
+typedef struct siginfo
+{
+	int si_signo;               /* Signal number.  */
+	int si_errno;               /* If non-zero, an errno value associated with
+								   this signal, as defined in <errno.h>.  */
+	int si_code;                /* Signal code.  */
+
+	union
+	{
+		int _pad[__SI_PAD_SIZE];
+
+		/* kill().  */
+		struct
+		{
+			__pid_t si_pid;     /* Sending process ID.  */
+			__uid_t si_uid;     /* Real user ID of sending process.  */
+		} _kill;
+
+		/* POSIX.1b timers.  */
+		struct
+		{
+			unsigned int _timer1;
+			unsigned int _timer2;
+		} _timer;
+
+		/* POSIX.1b signals.  */
+		struct
+		{
+			__pid_t si_pid;     /* Sending process ID.  */
+			__uid_t si_uid;     /* Real user ID of sending process.  */
+			sigval_t si_sigval; /* Signal value.  */
+		} _rt;
+
+		/* SIGCHLD.  */
+		struct
+		{
+			__pid_t si_pid;     /* Which child.  */
+			int si_status;      /* Exit value or signal.  */
+			__clock_t si_utime;
+			__clock_t si_stime;
+		} _sigchld;
+
+		/* SIGILL, SIGFPE, SIGSEGV, SIGBUS.  */
+		struct
+		{
+			void *si_addr;      /* Faulting insn/memory ref.  */
+		} _sigfault;
+
+		/* SIGPOLL.  */
+		struct
+		{
+			int si_band;        /* Band event for SIGPOLL.  */
+			int si_fd;
+		} _sigpoll;
+	} _sifields;
+} siginfo_t;
+
+#define si_pid		_sifields._kill.si_pid
+#define si_uid		_sifields._kill.si_uid
+#define si_status	_sifields._sigchld.si_status
+#define si_utime	_sifields._sigchld.si_utime
+#define si_stime	_sifields._sigchld.si_stime
+#define si_value	_sifields._rt.si_sigval
+#define si_int		_sifields._rt.si_sigval.sival_int
+#define si_ptr		_sifields._rt.si_sigval.sival_ptr
+#define si_addr		_sifields._sigfault.si_addr
+#define si_band		_sifields._sigpoll.si_band
+#define si_fd		_sifields._sigpoll.si_fd
+
+#endif
+
+#endif
+
+#if defined (SVR4) || defined (LINUX)
+
+static struct xlat siginfo_codes[] = {
+#ifdef SI_NOINFO
+	{ SI_NOINFO,	"SI_NOINFO"	},
+#endif
+#ifdef SI_USER
+	{ SI_USER,	"SI_USER"	},
+#endif
+#ifdef SI_LWP
+	{ SI_LWP,	"SI_LWP"	},
+#endif
+#ifdef SI_QUEUE
+	{ SI_QUEUE,	"SI_QUEUE"	},
+#endif
+#ifdef SI_TIMER
+	{ SI_TIMER,	"SI_TIMER"	},
+#endif
+#ifdef SI_ASYNCIO
+	{ SI_ASYNCIO,	"SI_ASYNCIO"	},
+#endif
+#ifdef SI_MESGQ
+	{ SI_MESGQ,	"SI_MESGQ"	},
+#endif
+	{ 0,		NULL		},
+};
+
+static struct xlat sigill_codes[] = {
+	{ ILL_ILLOPC,	"ILL_ILLOPC"	},
+	{ ILL_ILLOPN,	"ILL_ILLOPN"	},
+	{ ILL_ILLADR,	"ILL_ILLADR"	},
+	{ ILL_ILLTRP,	"ILL_ILLTRP"	},
+	{ ILL_PRVOPC,	"ILL_PRVOPC"	},
+	{ ILL_PRVREG,	"ILL_PRVREG"	},
+	{ ILL_COPROC,	"ILL_COPROC"	},
+	{ ILL_BADSTK,	"ILL_BADSTK"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat sigfpe_codes[] = {
+	{ FPE_INTDIV,	"FPE_INTDIV"	},
+	{ FPE_INTOVF,	"FPE_INTOVF"	},
+	{ FPE_FLTDIV,	"FPE_FLTDIV"	},
+	{ FPE_FLTOVF,	"FPE_FLTOVF"	},
+	{ FPE_FLTUND,	"FPE_FLTUND"	},
+	{ FPE_FLTRES,	"FPE_FLTRES"	},
+	{ FPE_FLTINV,	"FPE_FLTINV"	},
+	{ FPE_FLTSUB,	"FPE_FLTSUB"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat sigtrap_codes[] = {
+	{ TRAP_BRKPT,	"TRAP_BRKPT"	},
+	{ TRAP_TRACE,	"TRAP_TRACE"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat sigchld_codes[] = {
+	{ CLD_EXITED,	"CLD_EXITED"	},
+	{ CLD_KILLED,	"CLD_KILLED"	},
+	{ CLD_DUMPED,	"CLD_DUMPED"	},
+	{ CLD_TRAPPED,	"CLD_TRAPPED"	},
+	{ CLD_STOPPED,	"CLD_STOPPED"	},
+	{ CLD_CONTINUED,"CLD_CONTINUED"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat sigpoll_codes[] = {
+	{ POLL_IN,	"POLL_IN"	},
+	{ POLL_OUT,	"POLL_OUT"	},
+	{ POLL_MSG,	"POLL_MSG"	},
+	{ POLL_ERR,	"POLL_ERR"	},
+	{ POLL_PRI,	"POLL_PRI"	},
+	{ POLL_HUP,	"POLL_HUP"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat sigprof_codes[] = {
+#ifdef PROF_SIG
+	{ PROF_SIG,	"PROF_SIG"	},
+#endif
+	{ 0,		NULL		},
+};
+
+#ifdef SIGEMT
+static struct xlat sigemt_codes[] = {
+#ifdef EMT_TAGOVF
+	{ EMT_TAGOVF,	"EMT_TAGOVF"	},
+#endif
+	{ 0,		NULL		},
+};
+#endif
+
+static struct xlat sigsegv_codes[] = {
+	{ SEGV_MAPERR,	"SEGV_MAPERR"	},
+	{ SEGV_ACCERR,	"SEGV_ACCERR"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat sigbus_codes[] = {
+	{ BUS_ADRALN,	"BUS_ADRALN"	},
+	{ BUS_ADRERR,	"BUS_ADRERR"	},
+	{ BUS_OBJERR,	"BUS_OBJERR"	},
+	{ 0,		NULL		},
+};
+
+void
+printsiginfo(sip, verbose)
+siginfo_t *sip;
+int verbose;
+{
+	char *code;
+
+	if (sip->si_signo == 0) {
+		tprintf ("{}");
+		return;
+	}
+	tprintf("{si_signo=");
+	printsignal(sip->si_signo);
+	code = xlookup(siginfo_codes, sip->si_code);
+	if (!code) {
+		switch (sip->si_signo) {
+		case SIGTRAP:
+			code = xlookup(sigtrap_codes, sip->si_code);
+			break;
+		case SIGCHLD:
+			code = xlookup(sigchld_codes, sip->si_code);
+			break;
+		case SIGPOLL:
+			code = xlookup(sigpoll_codes, sip->si_code);
+			break;
+		case SIGPROF:
+			code = xlookup(sigprof_codes, sip->si_code);
+			break;
+		case SIGILL:
+			code = xlookup(sigill_codes, sip->si_code);
+			break;
+#ifdef SIGEMT
+		case SIGEMT:
+			code = xlookup(sigemt_codes, sip->si_code);
+			break;
+#endif
+		case SIGFPE:
+			code = xlookup(sigfpe_codes, sip->si_code);
+			break;
+		case SIGSEGV:
+			code = xlookup(sigsegv_codes, sip->si_code);
+			break;
+		case SIGBUS:
+			code = xlookup(sigbus_codes, sip->si_code);
+			break;
+		}
+	}
+	if (code)
+		tprintf(", si_code=%s", code);
+	else
+		tprintf(", si_code=%#x", sip->si_code);
+#ifdef SI_NOINFO
+	if (sip->si_code != SI_NOINFO)
+#endif
+	{
+		if (sip->si_errno) {
+			if (sip->si_errno < 0 || sip->si_errno >= nerrnos)
+				tprintf(", si_errno=%d", sip->si_errno);
+			else
+				tprintf(", si_errno=%s",
+					errnoent[sip->si_errno]);
+		}
+#ifdef SI_FROMUSER
+		if (SI_FROMUSER(sip)) {
+			tprintf(", si_pid=%ld, si_uid=%ld",
+				sip->si_pid, sip->si_uid);
+#ifdef SI_QUEUE
+			switch (sip->si_code) {
+			case SI_QUEUE:
+#ifdef SI_TIMER
+			case SI_TIMER:
+#endif /* SI_QUEUE */
+			case SI_ASYNCIO:
+#ifdef SI_MESGQ
+			case SI_MESGQ:
+#endif /* SI_MESGQ */
+				tprintf(", si_value=%d",
+					sip->si_value.sival_int);
+				break;
+			}
+#endif /* SI_QUEUE */
+		}
+		else
+#endif /* SI_FROMUSER */
+		{
+			switch (sip->si_signo) {
+			case SIGCHLD:
+				tprintf(", si_pid=%ld, si_status=",
+					(long) sip->si_pid);
+				if (sip->si_code == CLD_EXITED)
+					tprintf("%d", sip->si_status);
+				else
+					printsignal(sip->si_status);
+#if LINUX
+				if (!verbose)
+					tprintf(", ...");
+				else
+					tprintf(", si_utime=%lu, si_stime=%lu",
+						sip->si_utime,
+						sip->si_stime);
+#endif
+				break;
+			case SIGILL: case SIGFPE:
+			case SIGSEGV: case SIGBUS:
+				tprintf(", si_addr=%#lx",
+					(unsigned long) sip->si_addr);
+				break;
+			case SIGPOLL:
+				switch (sip->si_code) {
+				case POLL_IN: case POLL_OUT: case POLL_MSG:
+					tprintf(", si_band=%ld",
+						(long) sip->si_band);
+					break;
+				}
+				break;
+#ifdef LINUX
+			default:
+			        tprintf(", si_pid=%lu, si_uid=%lu, ",
+					(unsigned long) sip->si_pid,
+					(unsigned long) sip->si_uid);
+				if (!verbose)
+					tprintf("...");
+				else {
+					tprintf("si_value={int=%u, ptr=%#lx}",
+						sip->si_int,
+						(unsigned long) sip->si_ptr);
+				}
+#endif
+				
+			}
+		}
+	}
+	tprintf("}");
+}
+
+#endif /* SVR4 || LINUX */
+
+#ifdef LINUX
+
 static void
 parse_sigset_t (const char *str, sigset_t *set)
 {
@@ -1336,74 +1708,6 @@ sys_rt_sigprocmask(tcp)
 	return 0;
 }
 
-#if __GLIBC_MINOR__ < 1
-/* Type for data associated with a signal.  */
-typedef union sigval
-{
-	int sival_int;
-	void *sival_ptr;
-} sigval_t;
-
-# define __SI_MAX_SIZE     128
-# define __SI_PAD_SIZE     ((__SI_MAX_SIZE / sizeof (int)) - 3)
-
-typedef struct siginfo
-{
-	int si_signo;               /* Signal number.  */
-	int si_errno;               /* If non-zero, an errno value associated with
-								   this signal, as defined in <errno.h>.  */
-	int si_code;                /* Signal code.  */
-
-	union
-	{
-		int _pad[__SI_PAD_SIZE];
-
-		/* kill().  */
-		struct
-		{
-			__pid_t si_pid;     /* Sending process ID.  */
-			__uid_t si_uid;     /* Real user ID of sending process.  */
-		} _kill;
-
-		/* POSIX.1b timers.  */
-		struct
-		{
-			unsigned int _timer1;
-			unsigned int _timer2;
-		} _timer;
-
-		/* POSIX.1b signals.  */
-		struct
-		{
-			__pid_t si_pid;     /* Sending process ID.  */
-			__uid_t si_uid;     /* Real user ID of sending process.  */
-			sigval_t si_sigval; /* Signal value.  */
-		} _rt;
-
-		/* SIGCHLD.  */
-		struct
-		{
-			__pid_t si_pid;     /* Which child.  */
-			int si_status;      /* Exit value or signal.  */
-			__clock_t si_utime;
-			__clock_t si_stime;
-		} _sigchld;
-
-		/* SIGILL, SIGFPE, SIGSEGV, SIGBUS.  */
-		struct
-		{
-			void *si_addr;      /* Faulting insn/memory ref.  */
-		} _sigfault;
-
-		/* SIGPOLL.  */
-		struct
-		{
-			int si_band;        /* Band event for SIGPOLL.  */
-			int si_fd;
-		} _sigpoll;
-	} _sifields;
-} siginfo_t;
-#endif
 
 /* Structure describing the action to be taken when a signal arrives.  */
 struct new_sigaction
@@ -1514,213 +1818,6 @@ sys_rt_sigsuspend(tcp)
 	}
 	return 0;
 }
-#ifndef ILL_ILLOPC
-#define ILL_ILLOPC      1       /* illegal opcode */
-#define ILL_ILLOPN      2       /* illegal operand */
-#define ILL_ILLADR      3       /* illegal addressing mode */
-#define ILL_ILLTRP      4       /* illegal trap */
-#define ILL_PRVOPC      5       /* privileged opcode */
-#define ILL_PRVREG      6       /* privileged register */
-#define ILL_COPROC      7       /* coprocessor error */
-#define ILL_BADSTK      8       /* internal stack error */
-#define FPE_INTDIV      1       /* integer divide by zero */
-#define FPE_INTOVF      2       /* integer overflow */
-#define FPE_FLTDIV      3       /* floating point divide by zero */
-#define FPE_FLTOVF      4       /* floating point overflow */
-#define FPE_FLTUND      5       /* floating point underflow */
-#define FPE_FLTRES      6       /* floating point inexact result */
-#define FPE_FLTINV      7       /* floating point invalid operation */
-#define FPE_FLTSUB      8       /* subscript out of range */
-#define SEGV_MAPERR     1       /* address not mapped to object */
-#define SEGV_ACCERR     2       /* invalid permissions for mapped object */
-#define BUS_ADRALN      1       /* invalid address alignment */
-#define BUS_ADRERR      2       /* non-existant physical address */
-#define BUS_OBJERR      3       /* object specific hardware error */
-#define TRAP_BRKPT      1       /* process breakpoint */
-#define TRAP_TRACE      2       /* process trace trap */
-#define CLD_EXITED      1       /* child has exited */
-#define CLD_KILLED      2       /* child was killed */
-#define CLD_DUMPED      3       /* child terminated abnormally */
-#define CLD_TRAPPED     4       /* traced child has trapped */
-#define CLD_STOPPED     5       /* child has stopped */
-#define CLD_CONTINUED   6       /* stopped child has continued */
-#define POLL_IN         1       /* data input available */
-#define POLL_OUT        2       /* output buffers available */
-#define POLL_MSG        3       /* input message available */
-#define POLL_ERR        4       /* i/o error */
-#define POLL_PRI        5       /* high priority input available */
-#define POLL_HUP        6       /* device disconnected */
-#define SI_USER         0       /* sent by kill, sigsend, raise */
-#define SI_QUEUE        -1      /* sent by sigqueue */
-#define SI_TIMER        -2      /* sent by timer expiration */
-#define SI_MESGQ        -3      /* sent by real time mesq state change */
-#define SI_ASYNCIO      -4      /* sent by AIO completion */
-#else
-#undef si_pid
-#undef si_uid
-#undef si_status
-#undef si_utime
-#undef si_stime
-#undef si_value
-#undef si_int
-#undef si_ptr
-#undef si_addr
-#undef si_band
-#undef si_fd
-#endif
-
-static struct xlat sigill_flags[] = {
-	{ILL_ILLOPC, "ILL_ILLOPC"},
-	{ILL_ILLOPN, "ILL_ILLOPN"},
-	{ILL_ILLADR, "ILL_ILLADR"},
-	{ILL_ILLTRP, "ILL_ILLTRP"},
-	{ILL_PRVOPC, "ILL_PRVOPC"},
-	{ILL_PRVREG, "ILL_PRVREG"},
-	{ILL_COPROC, "ILL_COPROC"},
-	{ILL_BADSTK, "ILL_BADSTK"},
-	{0, NULL}
-};
-
-static struct xlat sigfpe_flags[] = {
-	{FPE_INTDIV, "FPE_INTDIV"},
-	{FPE_INTOVF, "FPE_INTOVF"},
-	{FPE_FLTDIV, "FPE_FLTDIV"},
-	{FPE_FLTOVF, "FPE_FLTOVF"},
-	{FPE_FLTUND, "FPE_FLTUND"},
-	{FPE_FLTRES, "FPE_FLTRES"},
-	{FPE_FLTINV, "FPE_FLTINV"},
-	{FPE_FLTSUB, "FPE_FLTSUB"},
-	{0, NULL}
-};
-
-static struct xlat sigsegv_flags[] = {
-	{SEGV_MAPERR, "SEGV_MAPERR"},
-	{SEGV_ACCERR, "SEGV_ACCERR"},
-	{0, NULL}
-};
-
-static struct xlat sigbus_flags[] = {
-	{BUS_ADRALN, "BUS_ADRALN"},
-	{BUS_ADRERR, "BUS_ADRERR"},
-	{BUS_OBJERR, "BUS_OBJERR"},
-	{0, NULL}
-};
-
-static struct xlat sigtrap_flags[] = {
-	{TRAP_BRKPT, "TRAP_BRKPT"},
-	{TRAP_TRACE, "TRAP_TRACE"},
-	{0, NULL}
-};
-
-static struct xlat sigchld_flags[] = {
-	{CLD_EXITED, "CLD_EXITED"},
-	{CLD_KILLED, "CLD_KILLED"},
-	{CLD_DUMPED, "CLD_DUMPED"},
-	{CLD_TRAPPED, "CLD_TRAPPED"},
-	{CLD_STOPPED, "CLD_STOPPED"},
-	{CLD_CONTINUED, "CLD_CONTINUED"},
-	{0, NULL}
-};
-
-static struct xlat sigpoll_flags[] = {
-	{POLL_IN, "POLL_IN"},
-	{POLL_OUT, "POLL_OUT"},
-	{POLL_MSG, "POLL_MSG"},
-	{POLL_ERR, "POLL_ERR"},
-	{POLL_PRI, "POLL_PRI"},
-	{POLL_HUP, "POLL_HUP"},
-	{0, NULL}
-};
-
-static struct xlat siginfo_flags[] = {
-	{SI_USER, "SI_USER"},
-	{SI_QUEUE, "SI_QUEUE"},
-	{SI_TIMER, "SI_TIMER"},
-	{SI_MESGQ, "SI_MESGQ"},
-	{SI_ASYNCIO, "SI_ASYNCIO"},
-	{0, NULL}
-};
-
-	static void
-printsiginfo(tcp, si)
-	struct tcb *tcp;
-	siginfo_t *si;
-{
-	tprintf("{si_signo=");
-	printsignal(si->si_signo);
-	tprintf(", si_errno=%d, si_code=", si->si_errno);
-	switch(si->si_signo)
-	{
-		case SIGILL:
-			if (!printflags(sigill_flags, si->si_code))
-				tprintf("%d /* ILL_??? */", si->si_code);
-			tprintf(", si_addr=%lx",
-					(unsigned long) si->_sifields._sigfault.si_addr);
-			break;
-		case SIGFPE:
-			if (!printflags(sigfpe_flags, si->si_code))
-				tprintf("%d /* FPE_??? */", si->si_code);
-			tprintf(", si_addr=%lx",
-					(unsigned long) si->_sifields._sigfault.si_addr);
-			break;
-		case SIGSEGV:
-			if (!printflags(sigsegv_flags, si->si_code))
-				tprintf("%d /* SEGV_??? */", si->si_code);
-			tprintf(", si_addr=%lx",
-					(unsigned long) si->_sifields._sigfault.si_addr);
-			break;
-		case SIGBUS:
-			if (!printflags(sigbus_flags, si->si_code))
-				tprintf("%d /* BUS_??? */", si->si_code);
-			tprintf(", si_addr=%lx",
-					(unsigned long) si->_sifields._sigfault.si_addr);
-			break;
-		case SIGTRAP:
-			if (!printflags(sigtrap_flags, si->si_code))
-				tprintf("%d /* TRAP_??? */", si->si_code);
-			break;
-		case SIGCHLD:
-			if (!printflags(sigchld_flags, si->si_code))
-				tprintf("%d /* CLD_??? */", si->si_code);
-			if (!verbose(tcp))
-				tprintf(", ...");
-			else
-				tprintf(", si_pid=%d, si_uid=%d, si_status=%d, si_utime=%lu, si_stime=%lu",
-						si->_sifields._kill.si_pid,
-						si->_sifields._kill.si_uid,
-						si->_sifields._sigchld.si_status,
-						si->_sifields._sigchld.si_utime,
-						si->_sifields._sigchld.si_stime);
-			break;
-		case SIGPOLL:
-			if (!printflags(sigpoll_flags, si->si_code))
-				tprintf("%d /* POLL_??? */", si->si_code);
-			if (si->si_code == POLL_IN
-					|| si->si_code == POLL_OUT
-					|| si->si_code == POLL_MSG)
-				tprintf(", si_bind=%lu, si_fd=%d",
-						(unsigned long) si->_sifields._sigpoll.si_band,
-						si->_sifields._sigpoll.si_fd);
-			break;
-		default:
-			if (!printflags(siginfo_flags, si->si_code))
-				tprintf("%d /* SI_??? */", si->si_code);
-			tprintf(", si_pid=%lu, si_uid=%lu, si_value={",
-					(unsigned long) si->_sifields._rt.si_pid,
-					(unsigned long) si->_sifields._rt.si_uid);
-			if (!verbose(tcp))
-				tprintf("...");
-			else {
-				tprintf("sival_int=%u, sival_ptr=%#lx",
-						si->_sifields._rt.si_sigval.sival_int,
-						(unsigned long) si->_sifields._rt.si_sigval.sival_ptr);
-			}
-			tprintf("}");
-			break;
-	}
-	tprintf("}");
-}
-
 	int
 sys_rt_sigqueueinfo(tcp)
 	struct tcb *tcp;
@@ -1733,7 +1830,7 @@ sys_rt_sigqueueinfo(tcp)
 		if (umove(tcp, tcp->u_arg[2], &si) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
 		else
-			printsiginfo(&si);
+			printsiginfo(&si, verbose (tcp));
 	}
 	return 0;
 }
@@ -1759,7 +1856,7 @@ int sys_rt_sigtimedwait(tcp)
 			if (umove(tcp, tcp->u_arg[1], &si) < 0)
 				tprintf("%#lx", tcp->u_arg[1]);
 			else
-				printsiginfo(&si);
+				printsiginfo(&si, verbose (tcp));
 			/* XXX For now */
 			tprintf(", %#lx", tcp->u_arg[2]);
 			tprintf(", %d", (int) tcp->u_arg[3]);
@@ -1769,4 +1866,3 @@ int sys_rt_sigtimedwait(tcp)
 };
 
 #endif /* LINUX */
-

@@ -1571,6 +1571,14 @@ trace()
 				tprintf("--- %s (%s) ---",
 					signame(what), strsignal(what));
 				printtrailer(tcp);
+#ifdef PR_INFO
+				if (tcp->status.PR_INFO.si_signo == what) {
+					printleader(tcp);
+					tprintf("    siginfo=");
+					printsiginfo(&tcp->status.PR_INFO, 1);
+					printtrailer(tcp);
+				}
+#endif
 			}
 			break;
 		case PR_FAULTED:

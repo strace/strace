@@ -76,6 +76,10 @@
 #include <stddef.h>
 #endif /* STDC_HEADERS */
 
+#ifdef HAVE_SIGINFO_T
+#include <signal.h>
+#endif
+
 #if defined(LINUX)
 #  if defined(SPARC)
 #     define LINUXSPARC
@@ -190,6 +194,7 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PR_REG		pr_lwp.pr_context.uc_mcontext.gregs
 #define PR_FLAGS	pr_lwp.pr_flags
 #define PR_SYSCALL	pr_lwp.pr_syscall
+#define PR_INFO		pr_lwp.pr_info
 #define PIOCSTIP	PCSTOP
 #define PIOCSET		PCSET
 #define PIOCRESET	PCRESET
@@ -209,6 +214,7 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PR_REG		pr_reg
 #define PR_FLAGS	pr_flags
 #define PR_SYSCALL	pr_syscall
+#define PR_INFO		pr_info
 #endif
 #endif
 #ifdef FREEBSD
@@ -383,6 +389,9 @@ extern void printnum P((struct tcb *, long, char *));
 extern void printpath P((struct tcb *, long));
 extern void printpathn P((struct tcb *, long, int));
 extern void printtv P((struct tcb *, long));
+#ifdef HAVE_SIGINFO_T
+extern void printsiginfo P((siginfo_t *, int));
+#endif
 extern void printsock P((struct tcb *, long, int));
 extern void printrusage P((struct tcb *, long));
 extern int clearbpt P((struct tcb *));

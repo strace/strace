@@ -239,6 +239,21 @@ then
 fi
 ])
 
+dnl ### A macro to detect the presence of the siginfo_t in signal.h
+AC_DEFUN(AC_SIGINFO_T,
+[AC_MSG_CHECKING(for siginfo_t in signal.h)
+AC_CACHE_VAL(ac_cv_siginfo_t,
+[AC_TRY_COMPILE([#include <signal.h>],
+[siginfo_t x;],
+ac_cv_siginfo_t=yes,
+ac_cv_siginfo_t=no)])
+AC_MSG_RESULT($ac_cv_siginfo_t)
+if test "$ac_cv_siginfo_t" = yes
+then
+	AC_DEFINE(HAVE_SIGINFO_T)
+fi
+])
+
 dnl ### A macro to determine if sys_errlist is declared.
 AC_DEFUN(AC_DECL_SYS_ERRLIST,
 [AC_MSG_CHECKING([for sys_errlist declaration])

@@ -69,6 +69,9 @@
 /* Define if signal.h defines the type sig_atomic_t.  */
 #undef HAVE_SIG_ATOMIC_T
 
+/* Define if signal.h defines the type siginfo_t.  */
+#undef HAVE_SIGINFO_T
+
 /* Define if sys_errlist is declared.  */
 #undef SYS_ERRLIST_DECLARED
 
