@@ -167,7 +167,7 @@ AC_TYPE_UID_T
 AC_TYPE_MODE_T
 AC_TYPE_GETGROUPS
 AC_HEADER_MAJOR
-AC_CHECK_TYPES(sig_atomic_t siginfo_t,,, [#include <signal.h>])
+AC_CHECK_TYPES([sig_atomic_t. siginfo_t],,, [#include <signal.h>])
 AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,, [#include <netinet/in.h])
 AC_CHECK_TYPES([long long])
 AC_LITTLE_ENDIAN_LONG_LONG
@@ -181,16 +181,22 @@ AC_CHECK_LIB(nsl, main)
 fi
 
 AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl prctl sendmsg inet_ntop if_indextoname)
-AC_CHECK_HEADERS([sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h stropts.h sys/conf.h sys/stream.h sys/tihdr.h sys/tiuser.h sys/sysconfig.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h sys/uio.h sys/aio.h  poll.h sys/poll.h sys/vfs.h netinet/tcp.h netinet/udp.h asm/sysmips.h linux/utsname.h sys/nscsys.h], [], [])
+AC_CHECK_HEADERS([sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h stropts.h sys/conf.h sys/stream.h sys/tihdr.h sys/tiuser.h sys/sysconfig.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h sys/uio.h sys/aio.h  poll.h sys/poll.h sys/vfs.h asm/sysmips.h linux/utsname.h sys/nscsys.h], [], [])
 AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
                  [], [], [#include <linux/socket.h>])
 AC_CHECK_HEADERS([asm/sigcontext.h], [], [], [#include <signal.h>])
+AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
 AC_MP_PROCFS
 AC_POLLABLE_PROCFS
 
 AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
 AC_STRUCT_PR_SYSCALL
+
+AC_CHECK_MEMBERS([struct T_conn_res.QUEUE_ptr,
+                  struct T_conn_res.ACCEPTOR_id],,,
+[#include <sys/stream.h>
+#include <sys/tihdr.h>])
 
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
