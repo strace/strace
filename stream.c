@@ -705,8 +705,10 @@ int code, arg;
 		printstrbuf(tcp, &sp.ctlbuf, 1);
 		tprintf(", databuf=");
 		printstrbuf(tcp, &sp.databuf, 1);
+		tprintf(", flags=");
 		if (!printflags(msgflags, sp.flags))
 			tprintf("0");
+		tprintf("}");
 		return 1;
 	case I_SRDOPT:
 		/* argument is an option with flags */
@@ -756,6 +758,7 @@ int code, arg;
 		printstrbuf(tcp, &sfi.ctlbuf, 1);
 		tprintf(", databuf=");
 		printstrbuf(tcp, &sfi.databuf, 1);
+		tprintf(", flags=");
 		if (!printflags(msgflags, sfi.flags))
 			tprintf("0");
 		tprintf(", filedes=%d, offset=%d}", sfi.fildes, sfi.offset);

@@ -1,5 +1,9 @@
 2002-05-17  John Hughes <john@calva.com>
 
+	* stream.c: tidy up output a little.
+
+2002-05-17  John Hughes <john@calva.com>
+
 	* process.c, svr4/dummy.h, svr4/syscall.h: decode arguments
 	to procpriv syscall.
 
