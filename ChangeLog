@@ -1,3 +1,8 @@
+2003-04-10  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c (qual_desc): Return zero after parsing number.
+	From Rob Leslie <rob@mars.org>, fixes Debian bug #188379.
+
 2003-04-07  Roland McGrath  <roland@redhat.com>
 
 	* linux/syscallent.h: Handle semtimedop subcall of ipc syscall.
