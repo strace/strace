@@ -64,28 +64,28 @@
 #endif /* !IA64 */
 
 #if HAVE_ASM_REG_H
-#ifdef SPARC
+# ifdef SPARC
 #  define fpq kernel_fpq
 #  define fq kernel_fq
 #  define fpu kernel_fpu
-#endif
-#include <asm/reg.h>
-#ifdef SPARC
+# endif
+# include <asm/reg.h>
+# ifdef SPARC
 #  undef fpq
 #  undef fq
 #  undef fpu
-#endif
-
+# endif
 #endif /* HAVE_ASM_REG_H */
-#ifdef HAVE_ASM_SIGCONTEXT_H
+
 #ifdef SPARC
 typedef struct {
 	struct regs		si_regs;
 	int			si_mask;
 } m_siginfo_t;
-#elif !defined(IA64) && !defined(X86_64)
+#elif defined HAVE_ASM_SIGCONTEXT_H
+#if !defined(IA64) && !defined(X86_64)
 #include <asm/sigcontext.h>
-#endif /* SPARC */
+#endif /* !IA64 && !X86_64 */
 #else /* !HAVE_ASM_SIGCONTEXT_H */
 #ifdef I386
 struct sigcontext_struct {
