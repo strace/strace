@@ -1,7 +1,15 @@
 2004-01-13  Roland McGrath  <roland@redhat.com>
 
+	* strace.1: Remove comment about vfork on Linux.
+	Fixes Debian bug #223390.
+
 	* file.c (direnttypes): Define under [LINUX] as well.  Add DT_UNKNOWN.
 	(sys_getdents64) [LINUX]: Print d_type field.
+
+2003-12-15  Dmitry V. Levin <ldv@altlinux.org>
+
+	* strace.c (trace) [WCOREDUMP]: Show coredump status of the
+	killed process if available.
 
 2003-11-13  Roland McGrath  <roland@redhat.com>
 
