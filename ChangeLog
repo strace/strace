@@ -3,6 +3,7 @@
 	* configure.ac: Check for <mqueue.h>.
 	* ipc.c (sys_mq_open, printmqattr) [! HAVE_MQUEUE_H]: Don't try to
 	decode struct mq_attr.
+	* NEWS: Mention mq support.
 
 	* linux/syscall.h: Support new mq_* syscalls on Linux.
 	* linux/syscallent.h: Likewise.
