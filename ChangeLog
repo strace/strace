@@ -1,3 +1,7 @@
+2003-02-24  Roland McGrath  <roland@redhat.com>
+
+	* process.c (sys_getresgid): Fix typos in argument access.
+
 2003-02-23  Roland McGrath  <roland@redhat.com>
 
 	* process.c (sys_getresuid): Fix typos in argument access.
