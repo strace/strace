@@ -1,3 +1,10 @@
+Fri Nov 26 10:51:55 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Patches from John Hughes:
+    + cosmectic fix in sys_getpmsg
+	+ ACL fixes for UnixWare
+	+ allow net.c to compile on systems without AF_INET6
+
 Fri Nov 26 01:28:09 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Release 4.1 to get all the changes made out there

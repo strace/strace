@@ -825,9 +825,24 @@ struct tcb *tcp;
 #include <sys/acl.h>
 
 struct xlat aclcmds[] = {
+#ifdef SETACL
 	{ SETACL,	"SETACL"	},
+#endif
+#ifdef GETACL
 	{ GETACL,	"GETACL"	},
+#endif
+#ifdef GETACLCNT
 	{ GETACLCNT,	"GETACLCNT"	},
+#endif
+#ifdef ACL_GET
+	{ ACL_GET,	"ACL_GET"	},
+#endif	
+#ifdef ACL_SET
+	{ ACL_SET,	"ACL_SET"	},
+#endif	
+#ifdef ACL_CNT
+	{ ACL_CNT,	"ACL_CNT"	},
+#endif	
 	{ 0,		NULL		},
 };
 
@@ -872,6 +887,44 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+
+struct xlat aclipc[] = {
+#ifdef IPC_SHM
+	{ IPC_SHM,	"IPC_SHM"	},
+#endif	
+#ifdef IPC_SEM
+	{ IPC_SEM,	"IPC_SEM"	},
+#endif	
+#ifdef IPC_MSG
+	{ IPC_MSG,	"IPC_MSG"	},
+#endif	
+	{ 0,		NULL		},
+};
+
+
+int
+sys_aclipc(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printxval(aclipc, tcp->u_arg[0], "???IPC???");
+		tprintf(", %#lx, ", tcp->u_arg[1]);
+		printxval(aclcmds, tcp->u_arg[2], "???ACL???");
+		tprintf(", %ld", tcp->u_arg[3]);
+		/*
+		 * FIXME - dump out the list of aclent_t's pointed to
+		 * by "tcp->u_arg[4]" if it's not NULL.
+		 */
+		if (tcp->u_arg[4])
+			tprintf(", %#lx", tcp->u_arg[4]);
+		else
+			tprintf(", NULL");
+	}
+	return 0;
+}
+
+
 
 #endif /* HAVE_SYS_ACL_H */
 

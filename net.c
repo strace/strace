@@ -141,17 +141,23 @@ static struct xlat addrfams[] = {
 	{ AF_UNSPEC,	"AF_UNSPEC"	},
 	{ AF_UNIX,	"AF_UNIX"	},
 	{ AF_INET,	"AF_INET"	},
+#ifdef AF_INET6
 	{ AF_INET6,	"AF_INET6"	},
+#endif
 	{ AF_DECnet,	"AF_DECnet"	},
 #ifdef PF_ATMSVC
 	{ AF_ATMSVC,	"AF_ATMSVC"	},
 #endif
+#ifdef AF_PACKET
 	{ AF_PACKET,	"AF_PACKET"	},
+#endif
+#ifdef AF_NETLINK
 	{ AF_NETLINK,	"AF_NETLINK"	},
-#ifdef PF_ISO
+#endif
+#ifdef AF_ISO
 	{ AF_ISO,	"AF_ISO"	},
 #endif
-#ifdef PF_IMPLINK
+#ifdef AF_IMPLINK
 	{ AF_IMPLINK,	"AF_IMPLINK"	},
 #endif
 	{ 0,		NULL		},

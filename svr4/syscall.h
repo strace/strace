@@ -296,6 +296,7 @@ extern int sys_nanosleep();
 #ifdef HAVE_SYS_ACL_H
 extern int sys_acl();
 extern int sys_facl();
+extern int sys_aclipc();
 #endif
 #ifdef HAVE_SYS_DOOR_H
 extern int sys_door();

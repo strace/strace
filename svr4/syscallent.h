@@ -368,7 +368,7 @@
 	{ -1,	0,	printargs,		"filepriv"	}, /* 145 */
 	{ -1,	0,	printargs,		"procpriv"	}, /* 146 */
 	{ -1,	0,	printargs,		"devstat"	}, /* 147 */
-	{ -1,	0,	printargs,		"aclipc"	}, /* 148 */
+	{ -1,	0,	sys_aclipc,		"aclipc"	}, /* 148 */
 	{ -1,	0,	printargs,		"fdevstat"	}, /* 149 */
 	{ -1,	0,	printargs,		"flvlfile"	}, /* 150 */
 	{ -1,	0,	printargs,		"lvlfile"	}, /* 151 */
@@ -377,7 +377,7 @@
 	{ -1,	0,	printargs,		"lvlproc"	}, /* 154 */
 	{ -1,	0, 	printargs,		"SYS_155"	}, /* 155 */
 	{ -1,	0,	printargs,		"lvlipc"	}, /* 156 */
-	{ -1,	0,	printargs,		"acl"		}, /* 157 */
+	{ -1,	0,	sys_acl,		"acl"		}, /* 157 */
 	{ -1,	0,	printargs,		"auditevt"	}, /* 158 */
 	{ -1,	0,	printargs,		"auditctl"	}, /* 159 */
 	{ -1,	0,	printargs,		"auditdmp"	}, /* 160 */
