@@ -15,6 +15,9 @@
 /* Define if this is an i386, i486 or pentium architecture.  */
 #undef I386
 
+/* Define if this is an ia64 architecture.  */
+#undef IA64
+
 /* Define if this is an m68k architecture.  */
 #undef M68K
 
