@@ -1,5 +1,12 @@
 2004-08-31  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.5.7.
+	* strace.spec, debian/changelog: 4.5.7-1.
+
+	* debian/rules: Revert sparc64 change of 2004-07-12.
+	It does not build properly.
+	Fixes Debian bug #254728.
+
 	* strace.1: Say that -c shows system CPU time, not real time.
 	Fixes Debian bug #254438.
 
