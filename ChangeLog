@@ -1,5 +1,10 @@
 2001-04-07  Wichert Akkerman <wakkerma@debian.org>
 
+  * NEWS: start 4.3.1 items
+  * version.c: updated to say 4.3.1 (was still 4.2, oops!)
+
+2001-04-07  Wichert Akkerman <wakkerma@debian.org>
+
   * configure.in: test for asm/sysmips.h and linux/utsname.h
   * linux/syscall.h: fix a typo for sys_sysmips
   * system.c: include asm/sysmips.h and linux/utsname.h if they exist,

@@ -1,3 +1,7 @@
+Changes in 4.3.1
+================
+* compile fixes for Linux/mips
+
 Changes in 4.3
 ==============
 * Linux ia64 and hppa ports added
