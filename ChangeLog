@@ -1,3 +1,51 @@
+2002-12-15  Roland McGrath  <roland@redhat.com>
+
+	* linux/powerpc/syscallent.h: Use sys_llseek for _llseek.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+
+	* syscall.c (syscall_enter) [LINUX && POWERPC]: Define PT_ORIG_R3 if
+	not defined, since <asm/ptrace.h> defines it only #ifdef __KERNEL__.
+	* process.c: Likewise.
+
+	* desc.c (sys_osf_select): Add missing return type.
+
+	* syscall.c (trace_syscall): Use strerror, not sys_errlist/sys_nerr.
+
+	* linux/ia64/syscallent.h: Remove macros for sys_delete_module,
+	sys_nanosleep, both already in linux/dummy.h.
+
+	* syscall.c (get_scno): Move static `currpers' inside #ifdef X86_64.
+	(trace_syscall): Fix return without value.
+
+	* linux/syscallent.h: Update table with names of new syscalls
+	io_setup, io_destroy, io_getvents, io_submit, io_cancel.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+
+	* signal.c [LINUX && I386]: Provide SA_RESTORER constant if not
+	defined.  If the bit is set, print the sa_restorer field of sigaction.
+
+	* mem.c: Add sys_{get,set}_thread_area.
+	* linux/syscall.h: Declare them.
+	* linux/syscallent.h: Update the table for these.
+	* linux/dummy.h (sys_modify_ldt): Define only #ifndef I386.
+	(sys_get_thread_area, sys_set_thread_area): New macros #ifndef I386.
+
+	* configure.in: Check for linux/xattr.h and linux/futex.h headers.
+	* linux/syscall.h: Add sys_* decls for new syscalls getpmsg, putpmsg,
+	readahead, sendfile64, setxattr, fsetxattr, getxattr, fgetxattr, int
+	listxattr, flistxattr, removexattr, fremovexattr, sched_setaffinity,
+	sched_getaffinity, futex.
+	* linux/syscallent.h: Update the table.
+	* io.c: Add sys_sendfile64.
+	* file.c: Add sys_readahead, sys_*xattr.
+	* process.c: Add sys_futex, sys_*affinity.
+
+	* linux/syscall.h (SYS_socket_subcall): Define to 256 on all machines.
+	(SYS_ipc_subcall): Always SYS_socket_subcall + SYS_socket_nsubcalls.
+	* linux/syscallent.h: Update the table for socket and ipc subcalls.
+
 2002-11-09  Heiko Carstens <heiko.carstens@de.ibm.com>
 
 	Bugfix for s390/s390x:
@@ -10,7 +58,7 @@
 
 2002-11-06  Michal Ludvig  <mludvig@suse.cz>
 
-	From Marty Leisner <leisner@rochester.rr.com>, 
+	From Marty Leisner <leisner@rochester.rr.com>,
 	rewritten by mludvig:
 	* strace.c (not_failing_only): New.
 	(usage): Added -z switch description.
@@ -60,7 +108,7 @@
 
 2002-09-23  Michal Ludvig  <mludvig@suse.cz>
 
-	Merged x86-64 port by Andi Kleen <ak@suse.de> 
+	Merged x86-64 port by Andi Kleen <ak@suse.de>
 	and Michal Ludvig <mludvig@suse.cz>
 	* Makefile.in: New target 'headers'. Failure ignored.
 	* acconfig.h: New defines for x86-64.
@@ -83,12 +131,12 @@
 2002-09-23  Michal Ludvig  <mludvig@suse.cz>
 
 	* configure.in: Fix regular expressions.
-	* linux/syscall.h: Added missing braces in prototype of 
+	* linux/syscall.h: Added missing braces in prototype of
 	sys_getdents64().
 	* file.c: Use '#ifdef LINUX' instead of '#ifdef linux'.
 	(struct fileflags): Made extern to inhibit compiation warnings.
 	(sys_getdents64): Merged LINUX and SVR4 part.
-	* syscall.c (get_scno): Split multiline string into two distinct 
+	* syscall.c (get_scno): Split multiline string into two distinct
 	strings.
 
 2002-05-24  John Hughes <john@calva.com>
@@ -649,7 +697,7 @@
   *  net.c: fix formating error in sys_setsockopt
   *  net.c: add list of socketlayers and use that for [gs]etsockopt
 
-2000-10-12  Wichert Akkerman <wakkerma@debian.org> 
+2000-10-12  Wichert Akkerman <wakkerma@debian.org>
 
   * time.c: use sys/timex.h so things compile with 2.2 kernels
   * stream.c: test if MSG_* constants are #defined
@@ -768,7 +816,7 @@
   * test/vfork.c: new file to test vfork traces
   * test/.cvsignore: new file
   * defs.h: Up maximum number of traced processed to 64
-  * strace.c: Disable some debugging code from davidm 
+  * strace.c: Disable some debugging code from davidm
   * implement setarg for more architectures
   * implement change_syscall
 
