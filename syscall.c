@@ -2135,8 +2135,16 @@ struct tcb *tcp;
 			tv_sub(&tv, &tv, &tcp->etime);
 #ifdef LINUX
 			if (tv_cmp(&tv, &tcp->dtime) > 0) {
-				static struct timeval one_tick =
-					{ 0, 1000000 / HZ };
+				static struct timeval one_tick;
+				if (one_tick.tv_usec == 0) {
+					/* Initialize it.  */
+					struct itimerval it;
+					memset(&it, 0, sizeof it);
+					it.it_interval.tv_usec = 1;
+					setitimer(ITIMER_REAL, &it, NULL);
+					getitimer(ITIMER_REAL, &it);
+					one_tick = it.it_interval;
+				}
 
 				if (tv_nz(&tcp->dtime))
 					tv = tcp->dtime;
