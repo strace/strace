@@ -597,6 +597,33 @@ static struct xlat icmpfilterflags[] = {
 };
 #endif /* SOL_RAW */
 
+#if defined(AF_PACKET) /* from e.g. linux/if_packet.h */
+static struct xlat af_packet_types[] = {
+#if defined(PACKET_HOST)
+	{ PACKET_HOST,			"PACKET_HOST"		},
+#endif
+#if defined(PACKET_BROADCAST)
+	{ PACKET_BROADCAST,		"PACKET_BROADCAST"	},
+#endif
+#if defined(PACKET_MULTICAST)
+	{ PACKET_MULTICAST,		"PACKET_MULTICAST"	},
+#endif
+#if defined(PACKET_OTHERHOST)
+	{ PACKET_OTHERHOST,		"PACKET_OTHERHOST"	},
+#endif
+#if defined(PACKET_OUTGOING)
+	{ PACKET_OUTGOING,		"PACKET_OUTGOING"	},
+#endif
+#if defined(PACKET_LOOPBACK)
+	{ PACKET_LOOPBACK,		"PACKET_LOOPBACK"	},
+#endif
+#if defined(PACKET_FASTROUTE)
+	{ PACKET_FASTROUTE,		"PACKET_FASTROUTE"	},
+#endif
+	{ 0,				NULL			},
+};
+#endif /* defined(AF_PACKET) */
+
 
 void
 printsock(tcp, addr, addrlen)
@@ -709,13 +736,14 @@ int addrlen;
 	case AF_PACKET:
 		{
 			int i;
-			tprintf("proto=%#04x, if%d, pkttype=%d, addr(%d)={%d, ",
+			tprintf("proto=%#04x, if%d, pkttype=",
 					ntohs(addrbuf.ll.sll_protocol),
-					addrbuf.ll.sll_ifindex,
-					addrbuf.ll.sll_pkttype,
+					addrbuf.ll.sll_ifindex);
+			printxval(af_packet_types, addrbuf.ll.sll_pkttype, "?");
+			tprintf(", addr(%d)={%d, ",
 					addrbuf.ll.sll_halen,
 					addrbuf.ll.sll_hatype);
-			for (i=0; i<addrbuf.ll.sll_addr[i]; i++) 
+			for (i=0; i<addrbuf.ll.sll_halen; i++) 
 				tprintf("%02x", addrbuf.ll.sll_addr[i]);
 		}
 		break;

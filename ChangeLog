@@ -1,3 +1,7 @@
+2002-04-01  Wichert Akkerman <wichert@deephackmode.org>
+
+	* net.c: decode packet options
+
 2002-03-31  Wichert Akkerman <wichert@deephackmode.org>
 
 	* linux/{alpha,hppa,ia64,mips,powerpc,sparc}/syscallent.h: regenerated
