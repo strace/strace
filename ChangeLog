@@ -1,3 +1,8 @@
+2004-01-13  Roland McGrath  <roland@redhat.com>
+
+	* stream.c (internal_stream_ioctl): Fix typo strict -> struct.
+	Reported by Petter Reinholdtsen <pere@hungry.com>.
+
 2003-12-31  David Mosberger  <davidm@hpl.hp.com>
 
 	* process.c (struct_user_offsets) [IA64]: Fix up register name list.
