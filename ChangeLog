@@ -1,3 +1,8 @@
+2003-06-23  Roland McGrath  <roland@redhat.com>
+
+	* net.c (sys_socket): Decode protocol for PF_INET6 same as PF_INET.
+	From Ulrich Drepper <drepper@redhat.com>.
+
 2003-06-10  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.4.98.
