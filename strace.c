@@ -1926,9 +1926,12 @@ handle_group_exit(struct tcb *tcp, int sig)
 			      ? tcp->parent
 			      : tcp->nclone_detached > 0
 			      ? tcp : NULL);
+	fprintf(stderr,"handle_group_exit (%d [%d], %d)\n", tcp->pid,
+		leader? leader->pid:-1, sig);
 
 	if (sig < 0) {
-		if (leader != NULL && leader != tcp)
+		if (leader != NULL && leader != tcp &&
+		    !(leader->flags & TCB_GROUP_EXITING))
 			fprintf(stderr,
 				"PANIC: handle_group_exit: %d leader %d\n",
 				tcp->pid, leader ? leader->pid : -1);
@@ -1936,7 +1939,8 @@ handle_group_exit(struct tcb *tcp, int sig)
 	}
 	else {
 		if (tcp->flags & TCB_ATTACHED) {
-			if (leader != NULL && leader != tcp) {
+			if (leader != NULL && leader != tcp &&
+				(leader->flags & TCB_ATTACHED)) {
 				/* We need to detach the leader so that the
 				   process death will be reported to its real
 				   parent.  But we kill it first to prevent
@@ -1961,6 +1965,8 @@ handle_group_exit(struct tcb *tcp, int sig)
 			return -1;
 		}
 		else {
+			if (leader != NULL)
+				leader->flags |= TCB_GROUP_EXITING;
 			if (leader != NULL && leader != tcp)
 				droptcb(tcp);
 			/* The leader will report to us as parent now,
@@ -2140,7 +2146,12 @@ Process %d attached (waiting for parent)\n",
 		if (WIFEXITED(status)) {
 			if (debug)
 				fprintf(stderr, "pid %u exited\n", pid);
-			if (tcp->flags & TCB_ATTACHED)
+			if ((tcp->flags & TCB_ATTACHED)
+#ifdef TCB_GROUP_EXITING
+			    && !(tcp->parent && (tcp->parent->flags &
+						 TCB_GROUP_EXITING))
+#endif
+				)
 				fprintf(stderr,
 					"PANIC: attached pid %u exited\n",
 					pid);
@@ -2242,7 +2253,8 @@ Process %d attached (waiting for parent)\n",
 					strsignal(WSTOPSIG(status)), pc, addr);
 				printtrailer(tcp);
 			}
-			if ((tcp->flags & TCB_ATTACHED) &&
+			if (((tcp->flags & TCB_ATTACHED) ||
+			     tcp->nclone_threads > 0) &&
 				!sigishandled(tcp, WSTOPSIG(status))) {
 #ifdef TCB_GROUP_EXITING
 				handle_group_exit(tcp, WSTOPSIG(status));
