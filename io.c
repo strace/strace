@@ -89,7 +89,7 @@ long addr;
 		tprintf("[]");
 		return;
 	}
-	  
+
 	if ((iov = (struct iovec *) malloc(len * sizeof *iov)) == NULL) {
 		fprintf(stderr, "No memory");
 		return;
@@ -280,6 +280,25 @@ struct tcb *tcp;
 	return 0;
 }
 
+int
+sys_sendfile64(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		loff_t offset;
+
+		tprintf("%ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1]);
+		if (!tcp->u_arg[2])
+			tprintf("NULL");
+		else if (umove(tcp, tcp->u_arg[2], &offset) < 0)
+			tprintf("%#lx", tcp->u_arg[2]);
+		else
+			tprintf("[%llu]", (unsigned long long int) offset);
+		tprintf(", %lu", tcp->u_arg[3]);
+	}
+	return 0;
+}
+
 #endif /* LINUX */
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
@@ -315,7 +334,7 @@ struct tcb *tcp;
 	return 0;
 }
 #endif
- 
+
 int
 sys_ioctl(tcp)
 struct tcb *tcp;

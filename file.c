@@ -133,6 +133,13 @@ struct stat {
 #include <sys/vfs.h>
 #endif
 
+#ifdef HAVE_LINUX_XATTR_H
+#include <linux/xattr.h>
+#elif defined linux
+#define XATTR_CREATE 1
+#define XATTR_REPLACE 2
+#endif
+
 #ifdef FREEBSD
 #include <sys/param.h>
 #include <sys/mount.h>
@@ -255,7 +262,7 @@ struct xlat openmodes[] = {
 #endif
 #ifdef FNOCTTY
 	{ FNOCTTY,	"FNOCTTY"	},
-#endif	
+#endif
 #ifdef O_SHLOCK
 	{ O_SHLOCK,	"O_SHLOCK"	},
 #endif
@@ -389,9 +396,9 @@ struct tcb *tcp;
 		if (_whence == SEEK_SET)
 			tprintf("%lu, ", offset);
 		else
-			tprintf("%ld, ", offset);		
+			tprintf("%ld, ", offset);
 		printxval(whence, _whence, "SEEK_???");
-	} 
+	}
 	return RVAL_UDECIMAL;
 }
 #endif
@@ -418,6 +425,24 @@ struct tcb *tcp;
 	else
 	    tprintf("[%llu], ", off);
 	printxval(whence, tcp->u_arg[4], "SEEK_???");
+    }
+    return 0;
+}
+
+int
+sys_readahead (tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, %lld, %ld", tcp->u_arg[0],
+# if defined IA64 || defined X86_64 || defined ALPHA
+		(long long int) tcp->u_arg[1], tcp->u_arg[2]
+# else
+		(((long long int) tcp->u_arg[1]) << 32
+		 | ((unsigned long *) tcp->u_arg)[2]),
+		tcp->u_arg[3]
+# endif
+		);
     }
     return 0;
 }
@@ -1167,11 +1192,11 @@ struct tcb *tcp;
 			tprintf(", makedev(%lu, %lu)",
 				(unsigned long) ((tcp->u_arg[3] >> 18) & 0x3fff),
 				(unsigned long) (tcp->u_arg[3] & 0x3ffff));
-#else		
+#else
 			tprintf(", makedev(%lu, %lu)",
 				(unsigned long) major(tcp->u_arg[3]),
 				(unsigned long) minor(tcp->u_arg[3]));
-#endif				
+#endif
 			break;
 		default:
 			break;
@@ -1196,13 +1221,13 @@ struct xlat aclcmds[] = {
 #endif
 #ifdef ACL_GET
 	{ ACL_GET,	"ACL_GET"	},
-#endif	
+#endif
 #ifdef ACL_SET
 	{ ACL_SET,	"ACL_SET"	},
-#endif	
+#endif
 #ifdef ACL_CNT
 	{ ACL_CNT,	"ACL_CNT"	},
-#endif	
+#endif
 	{ 0,		NULL		},
 };
 
@@ -1252,13 +1277,13 @@ struct tcb *tcp;
 struct xlat aclipc[] = {
 #ifdef IPC_SHM
 	{ IPC_SHM,	"IPC_SHM"	},
-#endif	
+#endif
 #ifdef IPC_SEM
 	{ IPC_SEM,	"IPC_SEM"	},
-#endif	
+#endif
 #ifdef IPC_MSG
 	{ IPC_MSG,	"IPC_MSG"	},
-#endif	
+#endif
 	{ 0,		NULL		},
 };
 
@@ -1723,7 +1748,7 @@ struct tcb *tcp;
 				(unsigned long) ((tcp->u_arg[2] >> 18) & 0x3fff),
 				(unsigned long) (tcp->u_arg[2] & 0x3ffff));
 			else
-#endif	
+#endif
 			tprintf(", makedev(%lu, %lu)",
 				(unsigned long) major(tcp->u_arg[2]),
 				(unsigned long) minor(tcp->u_arg[2]));
@@ -1854,7 +1879,9 @@ struct tcb *tcp;
 #ifdef SVR4
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
-				i ? " " : "", d->d_ino, d->d_off);
+				i ? " " : "",
+				(unsigned long) d->d_ino,
+				(unsigned long) d->d_off);
 			tprintf("d_reclen=%u, d_name=\"%s\"}",
 				d->d_reclen, d->d_name);
 		}
@@ -1876,7 +1903,7 @@ struct tcb *tcp;
 			tprintf(", d_namlen=%u, d_name=\"%.*s\"}",
 				d->d_namlen, d->d_namlen, d->d_name);
 		}
-#endif /* FREEBSD */		
+#endif /* FREEBSD */
 		if (!d->d_reclen) {
 			tprintf("/* d_reclen == 0, problem here */");
 			break;
@@ -1927,8 +1954,8 @@ struct tcb *tcp;
 #if defined(LINUX) || defined(SVR4)
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
-				i ? " " : "", 
-				(unsigned long)d->d_ino, 
+				i ? " " : "",
+				(unsigned long)d->d_ino,
 				(unsigned long)d->d_off);
 			tprintf("d_reclen=%u, d_name=\"%s\"}",
 				d->d_reclen, d->d_name);
@@ -1955,7 +1982,7 @@ struct tcb *tcp;
 	return 0;
 }
 #endif
- 
+
 #ifdef FREEBSD
 int
 sys_getdirentries(tcp)
@@ -2124,3 +2151,120 @@ struct tcb *tcp;
 }
 
 #endif /* HAVE_SYS_ASYNCH_H */
+
+#ifdef XATTR_CREATE
+
+struct xlat xattrflags[] = {
+	{ XATTR_CREATE,	 "XATTR_CREATE" },
+	{ XATTR_REPLACE, "XATTR_REPLACE" },
+	{ 0,		 NULL }
+};
+
+int
+sys_setxattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printpath(tcp, tcp->u_arg[0]);
+	tprintf(", ");
+	printstr(tcp, tcp->u_arg[1], -1);
+	/* XXX Print value in format */
+	tprintf(", %p, %ld, ", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+	printflags(xattrflags, tcp->u_arg[4]);
+    }
+    return 0;
+}
+
+int
+sys_fsetxattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, ", tcp->u_arg[0]);
+	printstr(tcp, tcp->u_arg[1], -1);
+	/* XXX Print value in format */
+	tprintf(", %p, %ld, ", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+	printflags(xattrflags, tcp->u_arg[4]);
+    }
+    return 0;
+}
+
+int
+sys_getxattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printpath(tcp, tcp->u_arg[0]);
+	tprintf(", ");
+	printstr(tcp, tcp->u_arg[1], -1);
+    } else {
+	/* XXX Print value in format */
+	tprintf(", %p, %ld", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+    }
+    return 0;
+}
+
+int
+sys_fgetxattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, ", tcp->u_arg[0]);
+	printstr(tcp, tcp->u_arg[1], -1);
+    } else {
+	/* XXX Print value in format */
+	tprintf(", %p, %ld", (void *) tcp->u_arg[2], tcp->u_arg[3]);
+    }
+    return 0;
+}
+
+int
+sys_listxattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printpath(tcp, tcp->u_arg[0]);
+    } else {
+	/* XXX Print value in format */
+	tprintf(", %p, %lu", (void *) tcp->u_arg[1], tcp->u_arg[2]);
+    }
+    return 0;
+}
+
+int
+sys_flistxattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld", tcp->u_arg[0]);
+    } else {
+	/* XXX Print value in format */
+	tprintf(", %p, %lu", (void *) tcp->u_arg[1], tcp->u_arg[2]);
+    }
+    return 0;
+}
+
+int
+sys_removexattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printpath(tcp, tcp->u_arg[0]);
+	tprintf(", ");
+	printstr(tcp, tcp->u_arg[1], -1);
+    }
+    return 0;
+}
+
+int
+sys_fremovexattr(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	tprintf("%ld, ", tcp->u_arg[0]);
+	printstr(tcp, tcp->u_arg[1], -1);
+    }
+    return 0;
+}
+
+#endif
