@@ -83,7 +83,7 @@ typedef struct {
 	struct regs		si_regs;
 	int			si_mask;
 } m_siginfo_t;
-#else
+#elif !defined(IA64)
 #include <asm/sigcontext.h>
 #endif /* SPARC */
 #else /* !HAVE_ASM_SIGCONTEXT_H */

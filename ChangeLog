@@ -1,3 +1,8 @@
+2001-08-19   Wichert Akkerman <wakkerma@debian.org>
+
+  * signal.c: do not include asm/sigcontext.h on IA64 since it gets
+    the struct from bits/sigcontext.h already which signal.h includes.
+
 2001-08-03   Wichert Akkerman <wakkerma@debian.org>
 
   * linux/ioctlent.sh: change regexps so we catch sound ioctls as well in
