@@ -113,6 +113,13 @@
 #define sys_recvmsg		printargs
 #endif
 
+#ifndef SYS_getpmsg
+#define sys_getpmsg		printargs
+#endif
+#ifndef SYS_putpmsg
+#define sys_putpmsg		printargs
+#endif
+
 #if DONE
 #define sys_oldselect		printargs
 #define	sys_msync		printargs
