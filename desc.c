@@ -291,7 +291,7 @@ struct tcb *tcp;
 #ifdef F_FREESP64
 		case F_FREESP64:
 #endif
-		/* Linux glibc defines SETLK64 as SETLK, 
+		/* Linux glibc defines SETLK64 as SETLK,
 		   even though the kernel has different values - as does Solaris. */
 #if defined(F_SETLK64) && F_SETLK64+0!=F_SETLK
 		case F_SETLK64:
@@ -540,6 +540,7 @@ struct tcb *tcp;
 }
 
 #ifdef ALPHA
+int
 sys_osf_select(tcp)
 struct tcb *tcp;
 {
