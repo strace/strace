@@ -81,7 +81,6 @@ FILE *outf;
 struct tcb **tcbtab;
 unsigned int nprocs, tcbtabsize;
 char *progname;
-extern const char version[];
 extern char **environ;
 
 static int trace P((void));
@@ -247,7 +246,7 @@ char *argv[];
 			qualify("abbrev=none");
 			break;
 		case 'V':
-			printf("%s\n", version);
+			printf("%s -- version %s\n", PACKAGE_NAME, VERSION);
 			exit(0);
 			break;
 		case 'z':
