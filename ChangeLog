@@ -1,3 +1,7 @@
+2003-03-15  Roland McGrath  <roland@redhat.com>
+
+	* linux/x86_64/syscallent.h: Add exit_group syscall at 231.
+
 2003-03-14  Roland McGrath  <roland@redhat.com>
 
 	* linux/x86_64/syscallent.h: Update and add many 2.5 syscalls.
