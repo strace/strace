@@ -1,3 +1,8 @@
+2003-06-09  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (trace): Print a message and newline for a WIFEXITED report
+	from the process we just printed an unterminated syscall line for.
+
 2003-06-03  Roland McGrath  <roland@redhat.com>
 
 	* util.c (printcall) [LINUX]: Fix typo [IA62] -> [IA64].
