@@ -13,14 +13,6 @@
 #include <signal.h>
 #include <linux/module.h>
 
-#if !defined(QM_MODULES)
-#define QM_MODULES	1
-#define QM_DEPS		2
-#define QM_REFS		3
-#define QM_SYMBOLS	4
-#define QM_INFO		5
-#endif
-
 static struct xlat which[] = {
 	{ 0,		"0"		},
 	{ QM_MODULES,	"QM_MODULES"	},
@@ -42,27 +34,6 @@ static struct xlat modflags[] = {
 	{ 0,			NULL			},
 };
 
-void
-printstringlist(addr,num)
-char* addr;
-int num;
-{
-	int first;
-
-	first=1;
-	tprintf("{");
-	while (num--) {
-		if (first)
-			first=0;
-		else
-			tprintf(",");
-		tprintf(addr);
-		addr+=strlen(addr)+1;
-	}
-	tprintf("}");
-}
-
-
 int
 sys_query_module(tcp)
 struct tcb *tcp;
@@ -73,7 +44,9 @@ struct tcb *tcp;
 		tprintf(", ");
 		printxval(which, tcp->u_arg[1], "QM_???");
 		tprintf(", ");
-		if (tcp->u_rval!=0) {
+		if (!verbose(tcp)) {
+			tprintf("%#lx, %lu, %#lx", tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[4]);
+		} else if (tcp->u_rval!=0) {
 			size_t	ret;
 			umove(tcp, tcp->u_arg[4], &ret);
 			tprintf("%#lx, %lu, %d", tcp->u_arg[2], tcp->u_arg[3], ret);
@@ -89,36 +62,44 @@ struct tcb *tcp;
 		} else if ((tcp->u_arg[1]==QM_MODULES) ||
 			       	(tcp->u_arg[1]==QM_DEPS) ||
 			       	(tcp->u_arg[1]==QM_REFS)) {
-			char*	data	= (char*)malloc(tcp->u_arg[3]);
-			char*	mod	= data;
 			size_t	ret;
-			int	first	= 0;
 
-			umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
 			umove(tcp, tcp->u_arg[4], &ret);
 			tprintf("{");
-			while (ret--) {
-				if (first)
-					first=0;
-				else
-					tprintf(",");
-				tprintf(mod);
-				mod+=strlen(mod)+1;
-			}
+			if (!abbrev(tcp)) {
+				char*	data	= (char*)malloc(tcp->u_arg[3]);
+				char*	mod	= data;
+				size_t	idx;
+
+				umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
+				for (idx=0; idx<ret; idx++) {
+					if (idx!=0)
+						tprintf(",");
+					tprintf(mod);
+					mod+=strlen(mod)+1;
+				}
+				free(data);
+			} else 
+				tprintf(" /* %d entries */ ", ret);
 			tprintf("}, %d", ret);
-			free(data);
 		} else if (tcp->u_arg[1]==QM_SYMBOLS) {
-			char*			data	= (char *)malloc(tcp->u_arg[3]);
-			struct module_symbol*	sym	= (struct module_symbol*)data;
-			size_t			ret;
-			umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
+			size_t	ret;
+			umove(tcp, tcp->u_arg[4], &ret);
 			tprintf("{");
-			while (ret--) {
-				tprintf("{name=%#lx, value=%lu} ", sym->name, sym->value);
-				sym++;
-			}
+			if (!abbrev(tcp)) {
+				char*			data	= (char *)malloc(tcp->u_arg[3]);
+				struct module_symbol*	sym	= (struct module_symbol*)data;
+				size_t			idx;
+
+				umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
+				for (idx=0; idx<ret; idx++) {
+					tprintf("{name=%s, value=%lu} ", data+(long)sym->name, sym->value);
+					sym++;
+				}
+				free(data);
+			} else
+				tprintf(" /* %d entries */ ", ret);
 			tprintf("}, %d", ret);
-			free(data);
 		} else {
 			printstr(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 			tprintf(", %#lx", tcp->u_arg[4]);
