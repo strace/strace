@@ -1,3 +1,8 @@
+1999-12-27  Morten Welinder  <terra@diku.dk>
+
+	* syscall.c (lookup_signal, lookup_desc): isdigit requires an
+ 	_unsigned_ char parameter.
+
 2000-02-14 Wichert Akkerman <wakkerma@debian.org>
 
   * S390 updates

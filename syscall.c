@@ -265,12 +265,12 @@ char *s;
 	int i;
 	char buf[32];
 
-	if (s && *s && isdigit(*s))
+	if (s && *s && isdigit((unsigned char)*s))
 		return atoi(s);
 	strcpy(buf, s);
 	s = buf;
 	for (i = 0; s[i]; i++)
-		s[i] = toupper(s[i]);
+		s[i] = toupper((unsigned char)(s[i]));
 	if (strncmp(s, "SIG", 3) == 0)
 		s += 3;
 	for (i = 0; i <= NSIG; i++) {
@@ -291,7 +291,7 @@ static int
 lookup_desc(s)
 char *s;
 {
-	if (s && *s && isdigit(*s))
+	if (s && *s && isdigit((unsigned char)*s))
 		return atoi(s);
 	return -1;
 }

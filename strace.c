@@ -30,6 +30,7 @@
  *	$Id$
  */
 
+#include <sys/types.h>
 #include "defs.h"
 
 #include <signal.h>
