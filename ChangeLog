@@ -1,4 +1,18 @@
+2003-09-24  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.5.
+	* strace.spec, debian/changelog: 4.5-1.
+
+	* syscall.c (get_scno) [LINUX] [S390 || S390X]: Bail out of
+	instruction decoding branch if TCB_INSYSCALL is clear.
+	Reported by <jochen@penguin-breeder.org>.
+
+	* linux/ioctlent.h: Swap order of overloaded TC* and SNDCTL_* values.
+
 2003-09-23  Roland McGrath  <roland@redhat.com>
+
+	* strace.spec: On ppc64 (maybe others later), create an strace64
+	package as well containing just /usr/bin/strace64.
 
 	* signal.c (sprintsigmask): Print RT_%u for __SIGRTMIN..__SIGRTMAX.
 	Fixes RH#104365.
