@@ -279,7 +279,7 @@
 	{ 5,	0,	printargs,		"SYS_247"		}, /* 247 */
 	{ 5,	0,	printargs,		"SYS_248"		}, /* 248 */
 	{ 5,	0,	printargs,		"SYS_249"		}, /* 249 */
-	{ 5,	0,	printargs,		"SYS_250"		}, /* 250 */
+	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 250 */
 	{ 5,	0,	printargs,		"SYS_251"		}, /* 251 */
 	{ 5,	0,	printargs,		"SYS_252"		}, /* 252 */
 	{ 5,	0,	printargs,		"SYS_253"		}, /* 253 */
