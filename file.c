@@ -33,13 +33,21 @@
 
 #include <dirent.h>
 
-#ifdef linux
-#define stat libc_stat
-#include <statbuf.h>
-#undef stat
-#include <asm/stat.h>
+#ifdef LINUXSPARC
+#  include <asm/stat.h>
+#  define stat libc_stat
+#  include <sys/stat.h>
+#  undef stat
+#elif defined(linux)
+#  define stat libc_stat
+#  include <statbuf.h>
+#  undef stat
+#  include <asm/stat.h>
+#  include <sys/stat.h>
+#else
+#  include <sys/stat.h>
 #endif
-#include <sys/stat.h>
+
 #include <fcntl.h>
 
 #ifdef SVR4
@@ -1233,12 +1241,6 @@ struct tcb *tcp;
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		return 0;
 	}
-#ifdef linux
-#ifdef __sparc__
-        tprintf (" = Unknown value\n");
-        return 0;
-#endif
-#endif
 	len = tcp->u_rval;
 	if ((buf = malloc(len)) == NULL) {
 		tprintf("out of memory\n");

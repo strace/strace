@@ -29,9 +29,9 @@
 
 #include "defs.h"
 
-#if defined(HAVE_SYS_STREAM_H) || defined(LINUXSPARC) || defined(linux)
+#if defined(HAVE_SYS_STREAM_H) || defined(linux)
 
-#if defined(LINUXSPARC) || defined(linux)
+#if defined(linux)
 #include <sys/poll.h>
 
 #define RS_HIPRI 1
@@ -43,7 +43,7 @@ struct strbuf {
 #define MORECTL 1
 #define MOREDATA 2
 
-#else /* LINUXSPARC */
+#else /* linux */
 
 #include <stropts.h>
 #include <poll.h>
@@ -51,7 +51,7 @@ struct strbuf {
 #include <sys/stream.h>
 #include <sys/tihdr.h>
 
-#endif /* LINUXSPARC */
+#endif /* linux */
 
 #ifdef HAVE_SYS_TIUSER_H
 #include <sys/tiuser.h>
@@ -64,13 +64,6 @@ static struct xlat msgflags[] = {
 	{ 0,		NULL		},
 };
 
-#if 0
-static struct xlat getmsgflags[] = {
-	{ MORECTL,	"MORECTL"	},
-	{ MOREDATA,	"MOREDATA"	},
-	{ 0,		NULL		},
-};
-#endif
 
 static void
 printstrbuf(tcp, sbp, getting)
@@ -256,7 +249,6 @@ struct tcb *tcp;
 
 #endif /* HAVE_PUTPMSG */
 
-#if !defined(LINUXSPARC)
 
 static struct xlat pollflags[] = {
 	{ POLLIN,	"POLLIN"	},
@@ -819,4 +811,3 @@ int code, arg;
 
 #endif /* LINUXSPARC && linux */
 
-#endif /* HAVE_SYS_STREAM_H */

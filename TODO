@@ -1,3 +1,8 @@
+-- new entries from wta
+getdents has wrong structure; track down kernel version
+
+
+-- old entries from jrs
 require override to run suid and/or sgid executables normally
 attempt reopen of /proc file if we get EAGAIN from any /proc ioctl
 kill procs we error out of on svr4

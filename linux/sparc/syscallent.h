@@ -203,7 +203,7 @@
 	{ 5,	0,	printargs,	"sgetmask" },		/* 199 */
 	{ 5,	0,	printargs,	"ssetmask" },		/* 200 */
 	{ 3,	TS,	sys_sigsuspend,	"sigsuspend" },		/* 201 */
-	{ 2,	TF,	sys_oldlstat,	"oldlstat" },		/* 202 */
+	{ 2,	TF,	sys_lstat,	"lstat" },		/* 202 */
 	{ 1,	TF,	sys_uselib,	"uselib" },		/* 203 */
 	{ 3,	0,	sys_readdir,	"readdir" },		/* 204 */
 	{ 3,	0,	sys_ioperm,	"ioperm" },		/* 205 */
@@ -212,7 +212,7 @@
 	{ 1,	0,	sys_olduname,	"olduname" },		/* 208 */
 	{ 1,	0,	sys_iopl,	"iopl" },		/* 209 */
 	{ 0,	0,	sys_idle,	"idle" },		/* 210 */
-	{ 1,	0,	sys_vm86,	"vm86" },		/* 211 */
+	{ 1,	0,	sys_vm86old,	"vm86" },		/* 211 */
 	{ 3,	TP,	sys_waitpid,	"waitpid" },		/* 212 */
 	{ 1,	0,	sys_swapoff,	"swapoff" },		/* 213 */
 	{ 1,	0,	sys_sysinfo,	"sysinfo" },		/* 214 */
@@ -233,10 +233,10 @@
 	{ 1,	0,	sys_setfsgid,	"setfsgid" },		/* 229 */
 	{ 5,	0,	printargs,	"_newselect" },		/* 230 */
 	{ 1,	0,	sys_time,	"time" },		/* 231 */
-	{ 2,	TF,	sys_oldstat,	"oldstat" },		/* 232 */
+	{ 2,	TF,	printargs,	"nis_syscall" },	/* 232 */
 	{ 1,	0,	sys_stime,	"stime" },		/* 233 */
-	{ 2,	0,	sys_oldfstat,	"oldfstat" },		/* 234 */
-	{ 0,	0,	sys_phys,	"phys" },		/* 235 */
+	{ 2,	0,	printargs,	"nis_syscall" },	/* 234 */
+	{ 2,	0,	printargs,	"nis_syscall" },	/* 235 */
 	{ 5,	0,	printargs,	"_llseek" },		/* 236 */
 	{ 5,	0,	sys_mlock,	"mlock" },		/* 237 */
 	{ 5,	0,	sys_munlock,	"munlock" },		/* 238 */
@@ -255,9 +255,9 @@
 	{ 5,	0,	sys_sysctl,	"_sysctl" },		/* 251 */
 	{ 5,	0,	sys_getsid,	"getsid" },		/* 252 */
 	{ 5,	0,	sys_fdatasync,	"fdatasync" },		/* 253 */
-	{ 5,	0,	printargs,	"SYS_254" },		/* 254 */
-	{ 5,	0,	printargs,	"SYS_255" },		/* 255 */
-	{ 5,	0,	printargs,	"SYS_256" },		/* 256 */
+	{ 5,	0,	printargs,	"nfsservctl" },		/* 254 */
+	{ 5,	0,	printargs,	"aplib" },		/* 255 */
+	{ 5,	0,	printargs,	"nis_syscall" },	/* 256 */
 	{ 5,	0,	printargs,	"SYS_257" },		/* 257 */
 	{ 5,	0,	printargs,	"SYS_258" },		/* 258 */
 	{ 5,	0,	printargs,	"SYS_259" },		/* 259 */
