@@ -1,3 +1,8 @@
+2005-03-14  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.5.10.
+	* debian/changelog, strace.spec: 4.5.10-1.
+
 2005-02-26  GOTO Masanori  <gotom@debian.or.jp>
 
 	* linux/alpha/syscallent.h: Fix the reversed order of lstat64 and
