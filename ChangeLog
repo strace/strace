@@ -1,7 +1,25 @@
+2004-09-01  Roland McGrath  <roland@redhat.com>
+
+	* linux/x86_64/syscallent.h: Add new entries for timer_*, clock_*, and
+	mq_* syscalls, and names only for new calls up to 252.
+	* linux/syscallent.h: Add waitid.
+	* linux/x86_64/syscallent.h: Likewise.
+	* linux/syscall.h: Declare sys_waitid.
+
+	* process.c (internal_wait): Take second arg giving index of flags
+	argument.
+	* defs.h: Update prototype.
+	* syscall.c (internal_syscall): Update caller.
+	Also use internal_wait for SYS_waitid.
+	* process.c (sys_waitid): Define for [LINUX] as well.
+	Don't tweak TCB_SUSPENDED--internal_wait does that.
+	(waitid_types): Conditionalize use of nonstandard P_* macros.
+
 2004-08-31  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.7.
-	* strace.spec, debian/changelog: 4.5.7-1.
+	* debian/changelog: 4.5.7-1.
+	* strace.spec: 4.5.7-2.
 
 	* debian/rules: Rewrite sparc64 change of 2004-07-12.
 	Always do each build in a separate build directory.
