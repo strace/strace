@@ -1,3 +1,8 @@
+2004-07-12  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* signal.c [LINUX] (parse_sigset_t): Fix hex strings parser.
+	Fixes RH#128091.
+
 2004-08-30  Roland McGrath  <roland@redhat.com>
 
 	* strace.c (main): Don't call fake_execve under -c.
