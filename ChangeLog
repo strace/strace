@@ -1,3 +1,8 @@
+2001-09-18   John Hughes <john@Calva.COM>
+
+  * net.c: fix display of sockaddr structures, sometimes too many "}",
+    sometimes too few.  Fix suggested by Richard Kettlewell.
+
 2001-08-19   Wichert Akkerman <wakkerma@debian.org>
 
   * signal.c: do not include asm/sigcontext.h on IA64 since it gets

@@ -613,7 +613,7 @@ int addrlen;
 		return;
 	}
 
-	tprintf("{sin_family=");
+	tprintf("{sa_family=");
 	printxval(addrfams, addrbuf.sa.sa_family, "AF_???");
 	tprintf(", ");
 
@@ -628,7 +628,7 @@ int addrlen;
 		}
 		break;
 	case AF_INET:
-		tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")}",
+		tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")",
 			ntohs(addrbuf.sin.sin_port), inet_ntoa(addrbuf.sin.sin_addr));
 		break;
 #ifdef HAVE_INET_NTOP
@@ -663,7 +663,7 @@ int addrlen;
 	case AF_IPX:
 		{
 			int i;
-			tprintf("{sipx_port=htons(%u), ",
+			tprintf("sipx_port=htons(%u), ",
 					ntohs(addrbuf.sipx.sipx_port));
 			/* Yes, I know, this does not look too
 			 * strace-ish, but otherwise the IPX
@@ -703,7 +703,7 @@ int addrlen;
 	AF_X25 AF_ROSE etc. still need to be done */
 
 	default:
-		tprintf("{sa_family=%u, sa_data=", addrbuf.sa.sa_family);
+		tprintf("sa_data=");
 		printstr(tcp, (long) &((struct sockaddr *) addr)->sa_data,
 			sizeof addrbuf.sa.sa_data);
 		break;
