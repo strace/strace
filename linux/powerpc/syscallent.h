@@ -158,7 +158,7 @@
 	{ 2,	0,	sys_create_module,	"create_module"		}, /* 127 */
 	{ 4,	0,	sys_init_module,	"init_module"		}, /* 128 */
 	{ 1,	0,	sys_delete_module,	"delete_module"		}, /* 129 */
-	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"	}, /* 130 */ 
+	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"	}, /* 130 */
 	{ 4,	0,	sys_quotactl,		"quotactl"		}, /* 131 */
 	{ 1,	0,	sys_getpgid,		"getpgid"		}, /* 132 */
 	{ 1,	TF,	sys_fchdir,		"fchdir"		}, /* 133 */
@@ -168,7 +168,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"		}, /* 137 */
 	{ 1,	0,	sys_setfsuid,		"setfsuid"		}, /* 138 */
 	{ 1,	0,	sys_setfsgid,		"setfsgid"		}, /* 139 */
-	{ 5,	TF,	printargs,		"_llseek"		}, /* 140 */
+	{ 5,	TF,	sys_llseek,		"_llseek"		}, /* 140 */
 	{ 3,	0,	sys_getdents,		"getdents"		}, /* 141 */
 	{ 5,	0,	printargs,		"_newselect"		}, /* 142 */
 	{ 2,	0,	sys_flock,		"flock"			}, /* 143 */
@@ -182,10 +182,10 @@
 	{ 2,	0,	sys_munlock,		"munlock"		}, /* 151 */
 	{ 1,	0,	sys_mlockall,		"mlockall"		}, /* 152 */
 	{ 0,	0,	sys_munlockall,		"munlockall"		}, /* 153 */
-	{ 2,	0,	sys_sched_setparam,	"sched_setparam"	}, /* 154 */ 
-	{ 2,	0,	sys_sched_getparam,	"sched_getparam"	}, /* 155 */ 
-	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"	}, /* 156 */ 
-	{ 2,	0,	sys_sched_getscheduler,	"sched_getscheduler"	}, /* 157 */ 
+	{ 2,	0,	sys_sched_setparam,	"sched_setparam"	}, /* 154 */
+	{ 2,	0,	sys_sched_getparam,	"sched_getparam"	}, /* 155 */
+	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"	}, /* 156 */
+	{ 2,	0,	sys_sched_getscheduler,	"sched_getscheduler"	}, /* 157 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"		}, /* 158 */
 	{ 5,	0,	printargs,		"SYS_159"		}, /* 159 */
 	{ 5,	0,	printargs,		"SYS_160"		}, /* 160 */
@@ -202,10 +202,10 @@
 	{ 5,	0,	printargs,		"prctl"			}, /* 171 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"		}, /* 172 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"		}, /* 173 */
-	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"	}, /* 174 */ 
+	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"	}, /* 174 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"		}, /* 175 */
-	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"	}, /* 176 */ 
-	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"	}, /* 177 */ 
+	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"	}, /* 176 */
+	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"	}, /* 177 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"		}, /* 178 */
 	{ 5,	TF,	sys_pread,		"pread"			}, /* 179 */
 	{ 5,	TF,	sys_pwrite,		"pwrite"		}, /* 180 */
@@ -255,11 +255,11 @@
 	{ 5,	0,	printargs,		"SYS_224"		}, /* 224 */
 	{ 5,	0,	printargs,		"SYS_225"		}, /* 225 */
 	{ 5,	0,	printargs,		"SYS_226"		}, /* 226 */
-	{ 5,	0,	printargs,		"SYS_227"		}, /* 227 */
-	{ 5,	0,	printargs,		"SYS_228"		}, /* 228 */
-	{ 5,	0,	printargs,		"SYS_229"		}, /* 229 */
-	{ 5,	0,	printargs,		"SYS_230"		}, /* 230 */
-	{ 5,	0,	printargs,		"SYS_231"		}, /* 231 */
+	{ 2,	0,	printargs,		"io_setup"		}, /* 227 */
+	{ 1,	0,	printargs,		"io_destroy"		}, /* 228 */
+	{ 5,	0,	printargs,		"io_getevents"		}, /* 229 */
+	{ 3,	0,	printargs,		"io_submit"		}, /* 230 */
+	{ 3,	0,	printargs,		"io_cancel"		}, /* 231 */
 	{ 5,	0,	printargs,		"SYS_232"		}, /* 232 */
 	{ 5,	0,	printargs,		"SYS_233"		}, /* 233 */
 	{ 5,	0,	printargs,		"SYS_234"		}, /* 234 */
