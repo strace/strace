@@ -50,7 +50,7 @@
 	{ 3,	TF,	sys_lseek,		"lseek"		}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getxpid"	}, /* 20 */
 	{ 4,	0,	printargs,		"osf_mount"	}, /* 21 */
-	{ 2,	0,	printargs,		"osf_umount"	}, /* 22 */
+	{ 2,	0,	sys_umount,		"umount"	}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 23 */
 	{ 0,	0,	sys_getuid,		"getxuid"	}, /* 24 */
 	{ 5,	0,	printargs,		"SYS_25"	}, /* 25 */
@@ -349,7 +349,7 @@
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 318 */
 	{ 1,	0,	sys_sysctl,		"sysctl"	}, /* 319 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 320 */
-	{ 1,	0,	sys_umount,		"umount"	}, /* 321 */
+	{ 1,	0,	printargs,		"oldumount"	}, /* 321 */
 	{ 1,	0,	sys_swapon,		"swapon"	}, /* 322 */
 	{ 1,	0,	sys_times,		"times"		}, /* 323 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 324 */
@@ -378,3 +378,25 @@
 	{ 5,	0,	printargs,		"SYS_347"	}, /* 347 */
 	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
 	{ 5,	0,	printargs,		"SYS_349"	}, /* 349 */
+
+	{ 5,	0,	printargs,		"SYS_350"	}, /* 350 */
+	{ 5,	0,	printargs,		"SYS_351"	}, /* 351 */
+	{ 5,	0,	printargs,		"SYS_352"	}, /* 352 */
+	{ 5,	0,	printargs,		"SYS_353"	}, /* 353 */
+	{ 5,	0,	printargs,		"SYS_354"	}, /* 354 */
+	{ 5,	0,	printargs,		"SYS_355"	}, /* 355 */
+	{ 5,	0,	printargs,		"SYS_356"	}, /* 356 */
+	{ 5,	0,	printargs,		"SYS_357"	}, /* 357 */
+	{ 5,	0,	sys_select,		"select"	}, /* 358 */
+	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 359 */
+	{ 3,	0,	sys_settimeofday,	"settimeofday"	}, /* 360 */
+	{ 2,	0,	sys_getitimer,		"getitimer"	}, /* 361 */
+	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 362 */
+	{ 2,	0,	sys_utimes,		"utimes"	}, /* 363 */
+	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 364 */
+	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 365 */
+	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 366 */
+	{ 2,	0,	printargs,		"getcwd"	}, /* 367 */
+	{ 5,	0,	printargs,		"SYS_368"	}, /* 368 */
+	{ 5,	0,	printargs,		"SYS_369"	}, /* 369 */
+	{ 5,	0,	printargs,		"SYS_370"	}, /* 370 */

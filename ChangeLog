@@ -1,3 +1,8 @@
+Sun Apr 18 22:32:42 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Update syscalls for linux alpha, patch from Bart Warmerdam
+    <bartw@debian.org> 
+
 Fri Apr 16 02:18:05 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Add support for old_*stat functions for Linux. Please note you need
