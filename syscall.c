@@ -229,16 +229,19 @@ int personality;
 
 int qual_flags[MAX_QUALS];
 
-static int call_count[MAX_QUALS];
-static int error_count[MAX_QUALS];
-static struct timeval tv_count[MAX_QUALS];
-static int sorted_count[MAX_QUALS];
+
+struct call_counts {
+	struct timeval time;
+	int calls, errors;
+};
+
+static struct call_counts *counts;
 
 static struct timeval shortest = { 1000000, 0 };
 
 static int qual_syscall(), qual_signal(), qual_fault(), qual_desc();
 
-static struct qual_options {
+static const struct qual_options {
 	int bitflag;
 	char *option_name;
 	int (*qualify)();
@@ -270,7 +273,7 @@ static struct qual_options {
 static void
 qualify_one(n, opt, not)
 	int n;
-	struct qual_options *opt;
+	const struct qual_options *opt;
 	int not;
 {
 	if (not)
@@ -282,7 +285,7 @@ qualify_one(n, opt, not)
 static int
 qual_syscall(s, opt, not)
 	char *s;
-	struct qual_options *opt;
+	const struct qual_options *opt;
 	int not;
 {
 	int i;
@@ -300,7 +303,7 @@ qual_syscall(s, opt, not)
 static int
 qual_signal(s, opt, not)
 	char *s;
-	struct qual_options *opt;
+	const struct qual_options *opt;
 	int not;
 {
 	int i;
@@ -329,7 +332,7 @@ qual_signal(s, opt, not)
 static int
 qual_fault(s, opt, not)
 	char *s;
-	struct qual_options *opt;
+	const struct qual_options *opt;
 	int not;
 {
 	return -1;
@@ -338,7 +341,7 @@ qual_fault(s, opt, not)
 static int
 qual_desc(s, opt, not)
 	char *s;
-	struct qual_options *opt;
+	const struct qual_options *opt;
 	int not;
 {
 	if (s && *s && isdigit((unsigned char)*s)) {
@@ -369,7 +372,7 @@ void
 qualify(s)
 char *s;
 {
-	struct qual_options *opt;
+	const struct qual_options *opt;
 	int not;
 	char *p;
 	int i, n;
@@ -2200,9 +2203,18 @@ struct tcb *tcp;
 		}
 
 		if (cflag && tcp->scno < nsyscalls && tcp->scno >= 0) {
-			call_count[tcp->scno]++;
+			if (counts == NULL) {
+				counts = calloc(sizeof *counts, nsyscalls);
+				if (counts == NULL) {
+					fprintf(stderr, "\
+strace: out of memory for call counts\n");
+					exit(1);
+				}
+			}
+
+			counts[tcp->scno].calls++;
 			if (tcp->u_error)
-				error_count[tcp->scno]++;
+				counts[tcp->scno].errors++;
 			tv_sub(&tv, &tv, &tcp->etime);
 #ifdef LINUX
 			if (tv_cmp(&tv, &tcp->dtime) > 0) {
@@ -2229,8 +2241,8 @@ struct tcb *tcp;
 #endif /* LINUX */
 			if (tv_cmp(&tv, &shortest) < 0)
 				shortest = tv;
-			tv_add(&tv_count[tcp->scno],
-				&tv_count[tcp->scno], &tv);
+			tv_add(&counts[tcp->scno].time,
+				&counts[tcp->scno].time, &tv);
 			tcp->flags &= ~TCB_INSYSCALL;
 			return 0;
 		}
@@ -2562,7 +2574,7 @@ time_cmp(a, b)
 void *a;
 void *b;
 {
-	return -tv_cmp(&tv_count[*((int *) a)], &tv_count[*((int *) b)]);
+	return -tv_cmp(&counts[*((int *) a)].time, &counts[*((int *) b)].time);
 }
 
 static int
@@ -2579,7 +2591,7 @@ count_cmp(a, b)
 void *a;
 void *b;
 {
-	int m = call_count[*((int *) a)], n = call_count[*((int *) b)];
+	int m = counts[*((int *) a)].calls, n = counts[*((int *) b)].calls;
 
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
@@ -2623,6 +2635,8 @@ FILE *outf;
 	char *dashes = "-------------------------";
 	char error_str[16];
 
+	int *sorted_count = malloc(nsyscalls * sizeof(int));
+
 	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
 	if (overhead.tv_sec == -1) {
 		tv_mul(&overhead, &shortest, 8);
@@ -2630,13 +2644,13 @@ FILE *outf;
 	}
 	for (i = 0; i < nsyscalls; i++) {
 		sorted_count[i] = i;
-		if (call_count[i] == 0)
+		if (counts == NULL || counts[i].calls == 0)
 			continue;
-		tv_mul(&dtv, &overhead, call_count[i]);
-		tv_sub(&tv_count[i], &tv_count[i], &dtv);
-		call_cum += call_count[i];
-		error_cum += error_count[i];
-		tv_add(&tv_cum, &tv_cum, &tv_count[i]);
+		tv_mul(&dtv, &overhead, counts[i].calls);
+		tv_sub(&counts[i].time, &counts[i].time, &dtv);
+		call_cum += counts[i].calls;
+		error_cum += counts[i].errors;
+		tv_add(&tv_cum, &tv_cum, &counts[i].time);
 	}
 	if (sortfun)
 		qsort((void *) sorted_count, nsyscalls, sizeof(int), sortfun);
@@ -2645,22 +2659,28 @@ FILE *outf;
 		"calls", "errors", "syscall");
 	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %-16.16s\n",
 		dashes, dashes, dashes, dashes, dashes, dashes);
-	for (i = 0; i < nsyscalls; i++) {
-		j = sorted_count[i];
-		if (call_count[j] == 0)
-			continue;
-		tv_div(&dtv, &tv_count[j], call_count[j]);
-		if (error_count[j])
-			sprintf(error_str, "%d", error_count[j]);
-		else
-			error_str[0] = '\0';
-		percent = 100.0*tv_float(&tv_count[j])/tv_float(&tv_cum);
-		fprintf(outf, "%6.2f %4ld.%06ld %11ld %9d %9.9s %s\n",
-			percent, (long) tv_count[j].tv_sec,
-			(long) tv_count[j].tv_usec,
-			(long) 1000000 * dtv.tv_sec + dtv.tv_usec,
-			call_count[j], error_str, sysent[j].sys_name);
+	if (counts) {
+		for (i = 0; i < nsyscalls; i++) {
+			j = sorted_count[i];
+			if (counts[j].calls == 0)
+				continue;
+			tv_div(&dtv, &counts[j].time, counts[j].calls);
+			if (counts[j].errors)
+				sprintf(error_str, "%d", counts[j].errors);
+			else
+				error_str[0] = '\0';
+			percent = (100.0 * tv_float(&counts[j].time)
+				   / tv_float(&tv_cum));
+			fprintf(outf, "%6.2f %4ld.%06ld %11ld %9d %9.9s %s\n",
+				percent, (long) counts[j].time.tv_sec,
+				(long) counts[j].time.tv_usec,
+				(long) 1000000 * dtv.tv_sec + dtv.tv_usec,
+				counts[j].calls,
+				error_str, sysent[j].sys_name);
+		}
 	}
+	free(sorted_count);
+
 	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %-16.16s\n",
 		dashes, dashes, dashes, dashes, dashes, dashes);
 	if (error_cum)
@@ -2670,4 +2690,5 @@ FILE *outf;
 	fprintf(outf, "%6.6s %4ld.%06ld %11.11s %9d %9.9s %s\n",
 		"100.00", (long) tv_cum.tv_sec, (long) tv_cum.tv_usec, "",
 		call_cum, error_str, "total");
+
 }
