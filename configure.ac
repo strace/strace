@@ -153,7 +153,7 @@ AC_HEADER_STDC
 AC_HEADER_DIRENT
 AC_HEADER_STAT
 AC_CHECK_MEMBERS([struct stat.st_blksize,
-	          struct stat.st_blocks,
+		  struct stat.st_blocks,
 		  struct stat.st_aclcnt,
 		  struct stat.st_flags,
 		  struct stat.st_fstype,
@@ -168,7 +168,10 @@ AC_TYPE_MODE_T
 AC_TYPE_GETGROUPS
 AC_HEADER_MAJOR
 AC_CHECK_TYPES([sig_atomic_t, siginfo_t],,, [#include <signal.h>])
-AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,, [#include <netinet/in.h])
+AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
+[#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>])
 AC_CHECK_TYPES([long long])
 AC_LITTLE_ENDIAN_LONG_LONG
 AC_OFF_T_IS_LONG_LONG
