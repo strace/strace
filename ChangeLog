@@ -1,3 +1,7 @@
+2003-10-21  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c: Revert last change, was broken.
+
 2003-10-01  Roland McGrath  <roland@redhat.com>
 
 	* process.c (internal_clone): Don't suspend parent when call requested
