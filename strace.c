@@ -618,7 +618,9 @@ Process %u attached - interrupt to quit\n",
 			}
 #endif /* USE_PROCFS */
 #ifndef USE_PROCFS
-			fake_execve(tcp, pathname, &argv[optind], environ);
+			if (!cflag)
+				fake_execve(tcp, pathname,
+					    &argv[optind], environ);
 #endif /* !USE_PROCFS */
 			break;
 		}
