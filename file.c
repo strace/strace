@@ -1721,7 +1721,8 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", %lu, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		printuid(", ", tcp->u_arg[1]);
+		printuid(", ", tcp->u_arg[2]);
 	}
 	return 0;
 }
@@ -1731,8 +1732,9 @@ sys_fchown(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %lu, %lu",
-			tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
+		tprintf("%ld", tcp->u_arg[0]);
+		printuid(", ", tcp->u_arg[1]);
+		printuid(", ", tcp->u_arg[2]);
 	}
 	return 0;
 }

@@ -313,6 +313,15 @@ char *fmt;
 	tprintf("]");
 }
 
+void
+printuid(text, uid)
+const char *text;
+unsigned long uid;
+{
+	tprintf("%s", text);
+	tprintf((uid == -1) ? "%ld" : "%lu", uid);
+}
+
 static char path[MAXPATHLEN + 1];
 
 void

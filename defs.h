@@ -441,6 +441,7 @@ extern void printsiginfo P((siginfo_t *, int));
 extern void printsock P((struct tcb *, long, int));
 extern void print_sock_optmgmt P((struct tcb *, long, int));
 extern void printrusage P((struct tcb *, long));
+extern void printuid P((const char *, unsigned long));
 extern int clearbpt P((struct tcb *));
 extern int setbpt P((struct tcb *));
 extern int sigishandled P((struct tcb *, int));
