@@ -1,8 +1,13 @@
+Tue Aug 31 01:23:08 CEST 1999  Wichert Akkerman <wakkerma@debian.org>
+
+  * Update copyright for strace-graph to BSD to be consistent with
+    the rest of strace
+
 Mon Aug 30 00:53:57 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge patch from Daniel Jacobowitz: KERN_JAVA_* and KERN_SECURELVL aren't
     defined for all kernelversions
-  * Add strace-graph
+  * Add strace-graph, written by Richard Braakman <dark@xs4all.nl>
 
 Thu Aug 19 13:10:15 CEST 1999 Jakub Jelinek <jj@ultra.linux.cz>
 
