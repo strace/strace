@@ -502,6 +502,24 @@ setarg(tcp, argnum)
 		if (errno)
 			return -1;
 	}
+#elif defined(MIPS)
+	{
+		errno = 0;
+		if (argnum < 4)
+			ptrace(PTRACE_POKEUSER, tcp->pid,
+			       (char*)(REG_A0 + argnum), tcp->u_arg[argnum]);
+		else {
+			unsigned long *sp;
+
+			if (upeek(tcp->pid, REG_SP, (long *) &sp) , 0)
+				return -1;
+
+			ptrace(PTRACE_POKEDATA, tcp->pid,
+			       (char*)(sp + argnum - 4), tcp->u_arg[argnum]);
+		}
+		if (errno)
+			return -1;
+	}
 #else
 # warning Sorry, setargs not implemented for this architecture.
 #endif
