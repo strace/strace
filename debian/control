@@ -4,10 +4,10 @@ Priority: standard
 Maintainer: Roland McGrath <frob@debian.org>
 Uploaders: Wichert Akkerman <wakkerma@debian.org>
 Build-Depends: libc6-dev (>= 2.2.2-1) [!alpha !ia64], libc6.1-dev (>= 2.2.2-1) [alpha ia64]
-Standards-Version: 3.5.8
+Standards-Version: 3.5.10
 
 Package: strace
-Architecture: alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh shmedia sparc
+Architecture: alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh sparc
 Depends: ${shlibs:Depends}
 Description: A system call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
