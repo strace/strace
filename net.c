@@ -117,87 +117,200 @@
 #endif
 
 static struct xlat domains[] = {
-	{ PF_UNSPEC,	"PF_UNSPEC"	},
-	{ PF_UNIX,	"PF_UNIX"	},
-	{ PF_INET,	"PF_INET"	},
-#ifdef PF_NETLINK
-	{ PF_NETLINK,	"PF_NETLINK"	},
-#endif
-#ifdef PF_PACKET
-	{ PF_PACKET,	"PF_PACKET"	},
-#endif
-#ifdef PF_INET6
-	{ PF_INET6,	"PF_INET6"	},
-#endif
-#ifdef PF_ATMSVC
-	{ PF_ATMSVC,	"PF_INET6"	},
-#endif
-#ifdef PF_INET6
-	{ PF_INET6,	"PF_INET6"	},
-#endif
-#ifdef PF_LOCAL
-	{ PF_LOCAL,	"PS_LOCAL"	},
-#endif
-#ifdef PF_ISO
-	{ PF_ISO,	"PF_ISO"	},
-#endif
-#ifdef PF_AX25
-	{ PF_AX25,	"PF_AX25"	},
-#endif
-#ifdef PF_IPX
-	{ PF_IPX,	"PF_IPX"	},
+#ifdef PF_AAL5
+	{ PF_AAL5,	"PF_AAL5"	},
 #endif
 #ifdef PF_APPLETALK
 	{ PF_APPLETALK,	"PF_APPLETALK"	},
 #endif
-#ifdef PF_NETROM
-	{ PF_NETROM,	"PF_NETROM"	},
+#ifdef PF_ASH
+	{ PF_ASH,	"PF_ASH"	},
+#endif
+#ifdef PF_ATMPVC
+	{ PF_ATMPVC,	"PF_ATMPVC"	},
+#endif
+#ifdef PF_ATMSVC
+	{ PF_ATMSVC,	"PF_ATMSVC"	},
+#endif
+#ifdef PF_AX25
+	{ PF_AX25,	"PF_AX25"	},
+#endif
+#ifdef PF_BLUETOOTH
+	{ PF_BLUETOOTH,	"PF_BLUETOOTH"	},
 #endif
 #ifdef PF_BRIDGE
 	{ PF_BRIDGE,	"PF_BRIDGE"	},
 #endif
-#ifdef PF_AAL5
-	{ PF_AAL5,	"PF_AAL5"	},
-#endif
-#ifdef PF_X25
-	{ PF_X25,	"PF_X25"	},
-#endif
-#ifdef PF_ROSE
-	{ PF_ROSE,	"PF_ROSE"	},
+#ifdef PF_DECnet
+	{ PF_DECnet,	"PF_DECnet"	},
 #endif
 #ifdef PF_DECNET
 	{ PF_DECNET,	"PF_DECNET"	},
 #endif
-#ifdef PF_NETBEUI
-	{ PF_NETBEUI,	"PF_NETBEUI"	},
+#ifdef PF_ECONET
+	{ PF_ECONET,	"PF_ECONET"	},
+#endif
+#ifdef PF_FILE
+	{ PF_FILE,	"PF_FILE"	},
 #endif
 #ifdef PF_IMPLINK
 	{ PF_IMPLINK,	"PF_IMPLINK"	},
 #endif
+#ifdef PF_INET
+	{ PF_INET,	"PF_INET"	},
+#endif
+#ifdef PF_INET6
+	{ PF_INET6,	"PF_INET6"	},
+#endif
+#ifdef PF_IPX
+	{ PF_IPX,	"PF_IPX"	},
+#endif
+#ifdef PF_IRDA
+	{ PF_IRDA,	"PF_IRDA"	},
+#endif
+#ifdef PF_ISO
+	{ PF_ISO,	"PF_ISO"	},
+#endif
+#ifdef PF_KEY
+	{ PF_KEY,	"PF_KEY"	},
+#endif
+#ifdef PF_UNIX
+	{ PF_UNIX,	"PF_UNIX"	},
+#endif
+#ifdef PF_LOCAL
+	{ PF_LOCAL,	"PF_LOCAL"	},
+#endif
+#ifdef PF_NETBEUI
+	{ PF_NETBEUI,	"PF_NETBEUI"	},
+#endif
+#ifdef PF_NETLINK
+	{ PF_NETLINK,	"PF_NETLINK"	},
+#endif
+#ifdef PF_NETROM
+	{ PF_NETROM,	"PF_NETROM"	},
+#endif
+#ifdef PF_PACKET
+	{ PF_PACKET,	"PF_PACKET"	},
+#endif
+#ifdef PF_PPPOX
+	{ PF_PPPOX,	"PF_PPPOX"	},
+#endif
+#ifdef PF_ROSE
+	{ PF_ROSE,	"PF_ROSE"	},
+#endif
+#ifdef PF_ROUTE
+	{ PF_ROUTE,	"PF_ROUTE"	},
+#endif
+#ifdef PF_SECURITY
+	{ PF_SECURITY,	"PF_SECURITY"	},
+#endif
+#ifdef PF_SNA
+	{ PF_SNA,	"PF_SNA"	},
+#endif
+#ifdef PF_UNSPEC
+	{ PF_UNSPEC,	"PF_UNSPEC"	},
+#endif
+#ifdef PF_WANPIPE
+	{ PF_WANPIPE,	"PF_WANPIPE"	},
+#endif
+#ifdef PF_X25
+	{ PF_X25,	"PF_X25"	},
+#endif
 	{ 0,		NULL		},
 };
 static struct xlat addrfams[] = {
-	{ AF_UNSPEC,	"AF_UNSPEC"	},
-	{ AF_UNIX,	"AF_UNIX"	},
+#ifdef AF_APPLETALK
+	{ AF_APPLETALK,	"AF_APPLETALK"	},
+#endif
+#ifdef AF_ASH
+	{ AF_ASH,	"AF_ASH"	},
+#endif
+#ifdef AF_ATMPVC
+	{ AF_ATMPVC,	"AF_ATMPVC"	},
+#endif
+#ifdef AF_ATMSVC
+	{ AF_ATMSVC,	"AF_ATMSVC"	},
+#endif
+#ifdef AF_AX25
+	{ AF_AX25,	"AF_AX25"	},
+#endif
+#ifdef AF_BLUETOOTH
+	{ AF_BLUETOOTH,	"AF_BLUETOOTH"	},
+#endif
+#ifdef AF_BRIDGE
+	{ AF_BRIDGE,	"AF_BRIDGE"	},
+#endif
+#ifdef AF_DECnet
+	{ AF_DECnet,	"AF_DECnet"	},
+#endif
+#ifdef AF_ECONET
+	{ AF_ECONET,	"AF_ECONET"	},
+#endif
+#ifdef AF_FILE
+	{ AF_FILE,	"AF_FILE"	},
+#endif
+#ifdef AF_IMPLINK
+	{ AF_IMPLINK,	"AF_IMPLINK"	},
+#endif
+#ifdef AF_INET
 	{ AF_INET,	"AF_INET"	},
+#endif
 #ifdef AF_INET6
 	{ AF_INET6,	"AF_INET6"	},
 #endif
-	{ AF_DECnet,	"AF_DECnet"	},
-#ifdef PF_ATMSVC
-	{ AF_ATMSVC,	"AF_ATMSVC"	},
+#ifdef AF_IPX
+	{ AF_IPX,	"AF_IPX"	},
 #endif
-#ifdef AF_PACKET
-	{ AF_PACKET,	"AF_PACKET"	},
-#endif
-#ifdef AF_NETLINK
-	{ AF_NETLINK,	"AF_NETLINK"	},
+#ifdef AF_IRDA
+	{ AF_IRDA,	"AF_IRDA"	},
 #endif
 #ifdef AF_ISO
 	{ AF_ISO,	"AF_ISO"	},
 #endif
-#ifdef AF_IMPLINK
-	{ AF_IMPLINK,	"AF_IMPLINK"	},
+#ifdef AF_KEY
+	{ AF_KEY,	"AF_KEY"	},
+#endif
+#ifdef AF_UNIX
+	{ AF_UNIX,	"AF_UNIX"	},
+#endif
+#ifdef AF_LOCAL
+	{ AF_LOCAL,	"AF_LOCAL"	},
+#endif
+#ifdef AF_NETBEUI
+	{ AF_NETBEUI,	"AF_NETBEUI"	},
+#endif
+#ifdef AF_NETLINK
+	{ AF_NETLINK,	"AF_NETLINK"	},
+#endif
+#ifdef AF_NETROM
+	{ AF_NETROM,	"AF_NETROM"	},
+#endif
+#ifdef AF_PACKET
+	{ AF_PACKET,	"AF_PACKET"	},
+#endif
+#ifdef AF_PPPOX
+	{ AF_PPPOX,	"AF_PPPOX"	},
+#endif
+#ifdef AF_ROSE
+	{ AF_ROSE,	"AF_ROSE"	},
+#endif
+#ifdef AF_ROUTE
+	{ AF_ROUTE,	"AF_ROUTE"	},
+#endif
+#ifdef AF_SECURITY
+	{ AF_SECURITY,	"AF_SECURITY"	},
+#endif
+#ifdef AF_SNA
+	{ AF_SNA,	"AF_SNA"	},
+#endif
+#ifdef AF_UNSPEC
+	{ AF_UNSPEC,	"AF_UNSPEC"	},
+#endif
+#ifdef AF_WANPIPE
+	{ AF_WANPIPE,	"AF_WANPIPE"	},
+#endif
+#ifdef AF_X25
+	{ AF_X25,	"AF_X25"	},
 #endif
 	{ 0,		NULL		},
 };
