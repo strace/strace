@@ -996,6 +996,14 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
+#elif defined(MIPS)
+	long pc;
+
+	if (upeek(tcp->pid, REG_EPC, &pc) < 0) {
+		tprintf ("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
 #endif /* !architecture */
 #endif /* LINUX */
 
