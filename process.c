@@ -288,7 +288,7 @@ struct tcb *tcp;
 	int vforking = 0;
 
 #ifdef SYS_vfork
-	vforking = (tcp->scno == EXEC_vfork);
+	vforking = (tcp->scno == SYS_vfork);
 #endif
 	if (entering(tcp)) {
 		if (!followfork || vforking)
