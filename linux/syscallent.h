@@ -238,8 +238,8 @@
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
 	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 192 */
-	{ 2,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
-	{ 2,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
+	{ 3,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
+	{ 3,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
 	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 197 */
@@ -314,10 +314,10 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 265 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 266 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 267 */
-	{ 5,	0,	printargs,		"statfs64"	}, /* 268 */
-	{ 5,	0,	printargs,		"fstatfs64"	}, /* 269 */
+	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 268 */
+	{ 3,	0,	sys_fstatfs64,		"fstatfs64"	}, /* 269 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 270 */
-	{ 5,	0,	printargs,		"SYS_271"	}, /* 271 */
+	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 271 */
 	{ 5,	0,	printargs,		"SYS_272"	}, /* 272 */
 	{ 5,	0,	printargs,		"SYS_273"	}, /* 273 */
 	{ 5,	0,	printargs,		"SYS_274"	}, /* 274 */
