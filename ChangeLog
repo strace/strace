@@ -1,3 +1,9 @@
+2004-02-26  Andreas Schwab  <schwab@suse.de>
+
+	* defs.h [LINUX && IA64]: Declare getrval2 also on IA64.
+	* net.c (sys_pipe) [LINUX && IA64]: For IA64 use the two return values.
+	* syscall.c (getrval2) [LINUX && IA64]: Implement for IA64.
+
 2004-03-01  Roland McGrath  <roland@redhat.com>
 
 	* linux/dummy.h (sys_sched_getscheduler, sys_sched_setparam,
