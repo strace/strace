@@ -1,3 +1,7 @@
+2004-04-19  Roland McGrath  <roland@redhat.com>
+
+	* process.c (printstatus): Add a space before | in output.
+
 2004-04-16  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: Version 4.5.3.
