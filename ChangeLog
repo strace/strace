@@ -2,7 +2,9 @@ Mon Nov  1 20:52:08 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Move Linux kernelmodule-functions from system.c to bjm.c and
     remove duplicate for sys_create_module
-  * Play with #ifdef's in net.c to get IPv6 right on Linux MIPS
+  * Linux MIPS updates:
+    + Play with #ifdef's in net.c to get IPv6 right
+    + Use printargs for vm86-syscall
 
 Sun Oct 31 22:03:00 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 

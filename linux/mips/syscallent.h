@@ -4111,7 +4111,7 @@
 	{ 0,	0,	sys_iopl,		"iopl"		}, /* 4110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 4111 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 4112 */
-	{ 0,	0,	sys_vm86,		"vm86"		}, /* 4113 */
+	{ 5,	0,	printargs,		"vm86"		}, /* 4113 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 4114 */
 	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 4115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 4116 */
