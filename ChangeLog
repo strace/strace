@@ -1,3 +1,17 @@
+2004-04-16  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Check for <mqueue.h>.
+	* ipc.c (sys_mq_open, printmqattr) [! HAVE_MQUEUE_H]: Don't try to
+	decode struct mq_attr.
+
+	* linux/syscall.h: Support new mq_* syscalls on Linux.
+	* linux/syscallent.h: Likewise.
+	* linux/dummy.h: Likewise.
+	* ipc.c: Likewise.
+	* time.c (printsigevent): Handle SIGEV_THREAD.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#120701.
+
 2004-04-13  Roland McGrath  <roland@redhat.com>
 
 	* net.c (msg_flags): Grok MSG_FIX, MSG_SYN, MSG_RST, MSG_NOSIGNAL,
