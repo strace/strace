@@ -423,7 +423,11 @@ struct subcall {
 
 const struct subcall subcalls_table[] = {
   { SYS_shmsys, 5, { SYS_shmat, SYS_shmctl, SYS_shmdt, SYS_shmget, SYS_shmctl } },
+#ifdef SYS_semconfig
   { SYS_semsys, 4, { SYS___semctl, SYS_semget, SYS_semop, SYS_semconfig } },
+#else
+  { SYS_semsys, 3, { SYS___semctl, SYS_semget, SYS_semop } },
+#endif
   { SYS_msgsys, 4, { SYS_msgctl, SYS_msgget, SYS_msgsnd, SYS_msgrcv } },
 };
 #endif /* FREEBSD */
@@ -481,10 +485,6 @@ enum subcall_style style;
 {
 	int i, addr, mask, arg;
 
-#ifndef FREEBSD
-	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
-		return;
-#endif	
 	switch (style) {
 	case shift_style:
 		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
