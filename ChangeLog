@@ -1,5 +1,17 @@
 2002-12-30  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (bin_SCRIPTS): New variable, list strace-graph.
+	(EXTRA_DIST): Add missing files.
+
+	* configure.ac: Fix asm/sigcontext.h check to include prerequisite.
+
+	* syscall.c (qualify_one): New function.
+	(qual_options): Replace lookup field with qualify, update initializer.
+	(qualify): Update caller.
+	(qual_signal, qual_fault, qual_desc): Rewritten from lookup_*.
+	(qual_syscall): Rewritten lookup_syscall, match name more than once.
+	Fixes RH#70579, bites IA64 -efoo when foo exists on IA32.
+
 	* version.c (version): Make const, bump to 4.4.90.
 	* strace.c: Update decl.
 
