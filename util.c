@@ -1050,6 +1050,19 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", eip);
+
+#elif defined(S390) || defined(S390X)
+         long psw;
+         if(upeek(tcp->pid,PT_PSWADDR,&psw) < 0) {
+                 tprintf("[????????] ");
+                 return;
+         }
+#ifdef S390
+         tprintf("[%08lx] ", psw);
+#elif S390X
+       tprintf("[%16lx] ", psw);
+#endif
+
 #elif defined(X86_64)
 	long rip;
 
