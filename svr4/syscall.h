@@ -309,6 +309,7 @@ extern int sys_sigwait();
 extern int sys_truncate();
 extern int sys_ftruncate();
 extern int sys_getksym ();
+extern int sys_procpriv();
 #endif
 #if UNIXWARE >= 7
 extern int sys_lseek64 ();

@@ -143,7 +143,6 @@
 #define sys_keyctl printargs
 #define sys_secsys printargs
 #define sys_filepriv printargs
-#define sys_procpriv printargs
 #define sys_devstat printargs
 #define sys_fdevstat printargs
 #define sys_flvlfile printargs

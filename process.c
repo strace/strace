@@ -1107,6 +1107,144 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if UNIXWARE >= 2
+
+#include <sys/privilege.h>
+
+
+static struct xlat procpriv_cmds [] = {
+	{ SETPRV,	"SETPRV"	},
+	{ CLRPRV,	"CLRPRV"	},
+	{ PUTPRV,	"PUTPRV"	},
+	{ GETPRV,	"GETPRV"	},
+	{ CNTPRV,	"CNTPRV"	},
+	{ 0,		NULL		},
+};
+
+
+static struct xlat procpriv_priv [] = {
+	{ P_OWNER,	"P_OWNER"	},
+	{ P_AUDIT,	"P_AUDIT"	},
+	{ P_COMPAT,	"P_COMPAT"	},
+	{ P_DACREAD,	"P_DACREAD"	},
+	{ P_DACWRITE,	"P_DACWRITE"	},
+	{ P_DEV,	"P_DEV"		},
+	{ P_FILESYS,	"P_FILESYS"	},
+	{ P_MACREAD,	"P_MACREAD"	},
+	{ P_MACWRITE,	"P_MACWRITE"	},
+	{ P_MOUNT,	"P_MOUNT"	},
+	{ P_MULTIDIR,	"P_MULTIDIR"	},
+	{ P_SETPLEVEL,	"P_SETPLEVEL"	},
+	{ P_SETSPRIV,	"P_SETSPRIV"	},
+	{ P_SETUID,	"P_SETUID"	},
+	{ P_SYSOPS,	"P_SYSOPS"	},
+	{ P_SETUPRIV,	"P_SETUPRIV"	},
+	{ P_DRIVER,	"P_DRIVER"	},
+	{ P_RTIME,	"P_RTIME"	},
+	{ P_MACUPGRADE,	"P_MACUPGRADE"	},
+	{ P_FSYSRANGE,	"P_FSYSRANGE"	},
+	{ P_SETFLEVEL,	"P_SETFLEVEL"	},
+	{ P_AUDITWR,	"P_AUDITWR"	},
+	{ P_TSHAR,	"P_TSHAR"	},
+	{ P_PLOCK,	"P_PLOCK"	},
+	{ P_CORE,	"P_CORE"	},
+	{ P_LOADMOD,	"P_LOADMOD"	},
+	{ P_BIND,	"P_BIND"	},
+	{ P_ALLPRIVS,	"P_ALLPRIVS"	},
+	{ 0,		NULL		},
+};
+
+
+static struct xlat procpriv_type [] = {
+	{ PS_FIX,	"PS_FIX"	},
+	{ PS_INH,	"PS_INH"	},
+	{ PS_MAX,	"PS_MAX"	},
+	{ PS_WKG,	"PS_WKG"	},
+	{ 0,		NULL		},
+};
+
+
+static void
+printpriv(tcp, addr, len, opt)
+struct tcb *tcp;
+long addr;
+int len;
+struct xlat *opt;
+{
+	priv_t buf [128];
+	int max = verbose (tcp) ? sizeof buf / sizeof buf [0] : 10;
+	int dots = len > max;
+	int i;
+	
+	if (len > max) len = max;
+	
+	if (len <= 0 ||
+	    umoven (tcp, addr, len * sizeof buf[0], (char *) buf) < 0)
+	{
+		tprintf ("%#lx", addr);
+		return;
+	}
+
+	tprintf ("[");
+
+	for (i = 0; i < len; ++i) {
+		char *t, *p;
+
+		if (i) tprintf (", ");
+
+		if ((t = xlookup (procpriv_type, buf [i] & PS_TYPE)) &&
+		    (p = xlookup (procpriv_priv, buf [i] & ~PS_TYPE)))
+		{
+			tprintf ("%s|%s", t, p);
+		}
+		else {
+			tprintf ("%#lx", buf [i]);
+		}
+	}
+
+	if (dots) tprintf (" ...");
+
+	tprintf ("]");
+}
+
+
+int
+sys_procpriv(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printxval(procpriv_cmds, tcp->u_arg[0], "???PRV");
+		switch (tcp->u_arg[0]) {
+		    case CNTPRV:
+			tprintf(", %#lx, %ld", tcp->u_arg[1], tcp->u_arg[2]);
+			break;
+
+		    case GETPRV:
+			break;
+
+		    default:
+			tprintf (", ");
+			printpriv (tcp, tcp->u_arg[1], tcp->u_arg[2]);
+			tprintf (", %ld", tcp->u_arg[2]);
+		}
+	}
+	else if (tcp->u_arg[0] == GETPRV) {
+		if (syserror (tcp)) {
+			tprintf(", %#lx, %ld", tcp->u_arg[1], tcp->u_arg[2]);
+		}
+		else {
+			tprintf (", ");
+			printpriv (tcp, tcp->u_arg[1], tcp->u_rval);
+			tprintf (", %ld", tcp->u_arg[2]);
+		}
+	}
+	
+	return 0;
+}
+
+#endif
+
+
 void
 fake_execve(tcp, program, argv, envp)
 struct tcb *tcp;

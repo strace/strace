@@ -1,3 +1,8 @@
+2002-05-17  John Hughes <john@calva.com>
+
+	* process.c, svr4/dummy.h, svr4/syscall.h: decode arguments
+	to procpriv syscall.
+
 2002-05-01  Wichert Akkerman <wichert@deephackmode.org>
 
 	* configure.in, defs.h, process.c, sock.c, syscall.c, util.c: merge
