@@ -33,17 +33,11 @@
 
 #include <dirent.h>
 
-#ifdef LINUXSPARC
+#ifdef linux
 #  include <asm/stat.h>
 #  define stat libc_stat
 #  include <sys/stat.h>
 #  undef stat
-#elif defined(linux)
-#  define stat libc_stat
-#  include <statbuf.h>
-#  undef stat
-#  include <asm/stat.h>
-#  include <sys/stat.h>
 #else
 #  include <sys/stat.h>
 #endif

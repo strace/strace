@@ -38,7 +38,7 @@
 #endif
 
 #if defined(LINUX) && defined(__i386__)
-#include <linux/ldt.h>
+#include <asm/ldt.h>
 #endif
 
 int
