@@ -37,7 +37,7 @@
 .fi
 .sp
 ..
-.TH STRACE 1 "99/06/11"
+.TH STRACE 1 "2003-01-21"
 .SH NAME
 strace \- trace system calls and signals
 .SH SYNOPSIS
@@ -65,6 +65,14 @@ strace \- trace system calls and signals
 [
 .BI \-u username
 ]
+[
+.BI \-E var=val
+]
+\&...
+[
+.BI \-E var
+]
+\&...
 [
 .I command
 [
@@ -510,6 +518,17 @@ This option is only useful when running as root and enables the
 correct execution of setuid and/or setgid binaries.
 Unless this option is used setuid and setgid programs are executed
 without effective privileges.
+.TP
+.BI "\-E " var=val
+Run command with
+.IR var=val
+in its list of environment variables.
+.TP
+.BI "\-E " var
+Remove
+.IR var
+from the inherited list of environment variables before passing it on to
+the command.
 .SH "SETUID INSTALLATION"
 If
 .B strace
