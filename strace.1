@@ -117,7 +117,7 @@ option.
 .LP
 .B strace
 is a useful diagnostic, instructional, and debugging tool.
-System adminstrators, diagnosticians and trouble-shooters will find
+System administrators, diagnosticians and trouble-shooters will find
 it invaluable for solving problems with
 programs for which the source is not readily available since
 they do not need to be recompiled in order to trace them.
@@ -148,7 +148,7 @@ sigsuspend([] <unfinished ...>
 +++ killed by SIGINT +++
 .CE
 Arguments are printed in symbolic form with a passion.
-This example shows the shell peforming ``>>xyzzy'' output redirection:
+This example shows the shell performing ``>>xyzzy'' output redirection:
 .CW
 open("xyzzy", O_WRONLY|O_APPEND|O_CREAT, 0666) = 3
 .CE
@@ -410,7 +410,7 @@ default is
 .BR verbose=all .
 .TP
 .BI "\-e raw=" set
-Print raw, undecoded arguments for the specifed set of system calls.
+Print raw, undecoded arguments for the specified set of system calls.
 This option has the effect of causing all arguments to be printed
 in hexadecimal.  This is mostly useful if you don't trust the
 decoding or you need to know the actual numeric value of an
@@ -467,7 +467,7 @@ This is useful for overriding the default heuristic for guessing
 how much time is spent in mere measuring when timing system calls using
 the
 .B \-c
-option.  The acuracy of the heuristic can be gauged by timing a given
+option.  The accuracy of the heuristic can be gauged by timing a given
 program run without tracing (using
 .BR time (1))
 and comparing the accumulated
@@ -501,7 +501,7 @@ full.
 .BI "\-S " sortby
 Sort the output of the histogram printed by the
 .B \-c
-option by the specified critereon.  Legal values are
+option by the specified criterion.  Legal values are
 .BR time ,
 .BR calls ,
 .BR name ,
