@@ -15,6 +15,7 @@
 	* process.c (internal_wait): Handle ECHILD exit from wait call with
 	WNOHANG flag set; force the return value to 0 in the inferior when it
 	has live children we are tracing.
+	* NEWS: Mention the bug fix.
 
 2002-12-17  Roland McGrath  <roland@redhat.com>
 

@@ -8,6 +8,8 @@ Changes in CVS (not yet released)
 * Trace an unbounded number of processes.
 * Handle numerous new system calls in Linux 2.5.
 * Fixed bugs with attach/detach leaving things stopped.
+* Fixed traced process seeing ECHILD despite live, traced children
+  in waitpid calls with WNOHANG.
 
 Changes in 4.4
 ==============
