@@ -30,13 +30,28 @@
 
 #include "defs.h"
 
-#if defined(HAVE_SYS_STREAM_H) || defined(linux) || defined(FREEBSD)
-
-#if defined(linux)
+#ifdef HAVE_POLL_H
+#include <poll.h>
+#endif
 #ifdef HAVE_SYS_POLL_H
 #include <sys/poll.h>
 #endif
+#ifdef HAVE_STROPTS_H
+#include <stropts.h>
+#endif
+#ifdef HAVE_SYS_CONF_H
+#include <sys/conf.h>
+#endif
+#ifdef HAVE_SYS_STREAM_H
+#include <sys/stream.h>
+#endif
+#ifdef HAVE_SYS_TIHDR_H
+#include <sys/tihdr.h>
+#endif
 
+#if defined(HAVE_SYS_STREAM_H) || defined(linux) || defined(FREEBSD)
+
+#ifndef HAVE_STROPTS_H
 #define RS_HIPRI 1
 struct strbuf {
         int     maxlen;                 /* no. of bytes in buffer */
@@ -45,20 +60,7 @@ struct strbuf {
 };
 #define MORECTL 1
 #define MOREDATA 2
-
-#else /* linux */
-
-#ifndef FREEBSD
-#include <stropts.h>
-#include <poll.h>
-#include <sys/conf.h>
-#include <sys/stream.h>
-#include <sys/tihdr.h>
-#else /* FREEBSD */
-#include <poll.h>
-#endif /* FREEBSD */
-
-#endif /* linux */
+#endif /* !HAVE_STROPTS_H */
 
 #ifdef HAVE_SYS_TIUSER_H
 #include <sys/tiuser.h>

@@ -4,6 +4,8 @@
     + util.c: add code to print PC for MIPS
     + linux/mips/syscallent.h: updated
     + system.c: formating fixes for sys_sysmips
+    + configure.in: test for yet more headers
+    + stream.c: use configure-headertests instead of relying on OS hints
 
 2001-04-07  Wichert Akkerman <wakkerma@debian.org>
 
