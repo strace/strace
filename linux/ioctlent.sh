@@ -37,12 +37,27 @@ fi
 
 dir=$1
 
-files="asm/ioctls.h /dev/null"
-# Build the list of all ioctls
-regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+0x54..\>'
-(cd $dir ; grep $regexp $files 2>/dev/null ) | \
-	sed -ne 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x54..\).*/	{ "\1",	"\2",	\3	},/p' \
-	> ioctls.h
+lookup_ioctls()
+{
+	type="$1"
+	shift
+
+	# Build the list of all ioctls
+	regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+0x'"$type"'..\>'
+	(cd "$dir" ; grep "$regexp" "$@" /dev/null 2>/dev/null ) |
+		sed -ne 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x'"$type"'..\).*/	{ "\1",	"\2",	\3	},/p' \
+		>> ioctls.h
+}
+
+: > ioctls.h
+lookup_ioctls 46 linux/fb.h
+lookup_ioctls 4B linux/kd.h
+lookup_ioctls 53 linux/cdrom.h
+lookup_ioctls 54 asm/ioctls.h
+lookup_ioctls 56 linux/vt.h
+lookup_ioctls '7[12]' linux/videotext.h
+lookup_ioctls 89 asm/sockios.h linux/sockios.h
+lookup_ioctls 8B linux/wireless.h
 
 files="linux/* asm/* scsi/* sound/*"
 
