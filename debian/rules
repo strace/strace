@@ -3,22 +3,42 @@
 # Debian package information
 package		= strace
 
-all build: Makefile
-	$(MAKE) $(MFLAGS)
-	touch stamp-build
+DEB_HOST_GNU_TYPE := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
-Makefile:
-	sh configure --prefix=/usr
+ifeq ($(DEB_HOST_GNU_TYPE),sparc-linux)
+  build64 = yes
+  HOST64 = sparc64-linux
+  CC64 = gcc -m64
+endif
+
+ifeq ($(build64),yes)
+   extra_build_targets += stamp-build64
+endif
+
+all build: stamp-build
+
+stamp-%: %/Makefile
+	$(MAKE) -C $*
+	touch $@
+
+build/Makefile:
+	mkdir -p $(@D)
+	cd $(@D); sh ../configure --prefix=/usr
+
+build64/Makefile:
+	mkdir -p $(@D)
+	cd $(@D); CC="$(CC64)" sh ../configure --prefix=/usr --build=$(HOST64)
+
 clean:
-	test ! -f Makefile || $(MAKE) distclean
-	rm -f stamp-build
 	rm -rf debian/tmp debian/substvars debian/files
+	rm -rf build64 stamp-build64
+	rm -rf build stamp-build
 
 binary: binary-indep binary-arch
 
 binary-indep:
 
-binary-arch: build checkroot
+binary-arch: $(extra_build_targets) build checkroot
 	test -f stamp-build || make $(MFLAGS) -f debian/rules build
 	-rm -rf debian/tmp debian/files debian/substvars
 
@@ -41,9 +61,14 @@ binary-arch: build checkroot
 
 # Install strace
 	install -d -o root -g root -m 755 debian/tmp/usr/bin debian/tmp/usr/share/man/man1
-	install -s -o root -g root -m 755 strace debian/tmp/usr/bin/strace
+	install -s -o root -g root -m 755 build/strace debian/tmp/usr/bin/strace
 	install -p -o root -g root -m 644 strace.1 debian/tmp/usr/share/man/man1/strace.1
 	gzip -9 debian/tmp/usr/share/man/man1/strace.1
+
+ifeq ($(build64),yes)
+	install -s -o root -g root -m 755 build64/strace debian/tmp/usr/bin/strace64
+	ln -s strace.1 debian/tmp/usr/share/man/man1/strace64.1
+endif
 
 	dpkg-shlibdeps strace
 	dpkg-gencontrol -isp
