@@ -1,3 +1,8 @@
+Changes in 4.5.10
+==============
+* Bug fixes.
+* Print fault address for SIGSEGV/SIGBUS signals when available.
+
 Changes in 4.5.9
 ==============
 * Bug fixes.

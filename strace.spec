@@ -1,7 +1,7 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5.9
-Release: 2
+Version: 4.5.10
+Release: 1
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
@@ -75,6 +75,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Mar 14 2005 Roland McGrath <roland@redhat.com> - 4.5.10-1
+- Fix select handling on nonstandard fd_set sizes.
+- Don't print errors for null file name pointers.
+- Fix initial execve output with -i (#143365).
+
 * Fri Feb  4 2005 Roland McGrath <roland@redhat.com> - 4.5.9-2
 - update ia64 syscall list (#146245)
 - fix x86_64 syscall argument extraction for 32-bit processes (#146093)

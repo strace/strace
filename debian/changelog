@@ -1,3 +1,14 @@
+strace (4.5.10-1) unstable; urgency=low
+
+  * New upstream version.
+    + Update MIPS system call table, closes: #256684.
+    + Fix build on s390 and sparc, closes: #294172, #293564.
+    + Fix select handling on nonstandard fd_set sizes, closes: #65654, #284290.
+    + Don't print errors for null file name pointers, closes: #63093.
+    + Fix initial execve output with -i.
+
+ -- Roland McGrath <frob@debian.org>  Mon, 14 Mar 2005 18:28:37 -0800
+
 strace (4.5.9-2) unstable; urgency=low
 
   * New upstream version.
