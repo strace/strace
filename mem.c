@@ -222,7 +222,12 @@ struct tcb *tcp;
 		return 0;
 	else
 		u_arg[i] = v;
-#else	// defined(IA64)
+#elif defined(SH)
+    /* SH has always passed the args in registers */
+    int i;
+    for (i=0; i<6; i++)
+        u_arg[i] = tcp->u_arg[i];
+#else
     if (umoven(tcp, tcp->u_arg[0], sizeof u_arg, (char *) u_arg) == -1)
 	    return 0;
 #endif	// defined(IA64)

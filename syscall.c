@@ -2297,6 +2297,9 @@ struct tcb *tcp;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
 	val = regs.r_o1;
+#elif defined(SH)
+	if (upeek(tcp->pid, 4*(REG_REG0+1), &val) < 0)
+		return -1;
 #endif /* SPARC */
 #endif /* LINUX */
 
