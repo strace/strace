@@ -955,8 +955,9 @@ struct tcb *tcp;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
 	pc = regs.r_pc;
-#elif defined(S390)
+#elif defined(S390) || defined(S390X)
 	if(upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
+		return -1;
 #elif defined(HPPA)
 	if(upeek(tcp->pid,PT_IAOQ0,&pc) < 0)
 		return -1;
@@ -1239,6 +1240,8 @@ struct tcb *tcp;
 #define LOOP	0x1000ffff
 #elif defined(S390)
 #define LOOP	0xa7f40000	/* BRC 15,0 */
+#elif defined(S390X)
+#define LOOP   0xa7f4000000000000UL /* BRC 15,0 */
 #elif defined(HPPA)
 #define LOOP	0xe81f1ff7	/* b,l,n <loc>,r0 */
 #elif defined(SH)
@@ -1273,7 +1276,7 @@ struct tcb *tcp;
 #elif defined (POWERPC)
 	if (upeek(tcp->pid, 4*PT_NIP, &tcp->baddr) < 0)
 		return -1;
-#elif defined(S390)
+#elif defined(S390) || defined(S390X)
 	if (upeek(tcp->pid,PT_PSWADDR, &tcp->baddr) < 0)
 		return -1;
 #elif defined(HPPA)

@@ -1,3 +1,8 @@
+2002-10-07  Michal Ludvig  <mludvig@suse.cz>
+
+	Merged s390x port by Heiko Carstens <Heiko.Carstens@de.ibm.com>
+	and bugfixes to s390 by D.J. Barrow.
+
 2002-09-23  Michal Ludvig  <mludvig@suse.cz>
 
 	Merged x86-64 port by Andi Kleen <ak@suse.de> 

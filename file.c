@@ -40,6 +40,7 @@
 #include <linux/types.h>
 #include <linux/dirent.h>
 #undef dirent
+#undef dirent64
 #else
 #define kernel_dirent dirent
 #endif
@@ -889,7 +890,8 @@ long addr;
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(LINUX) && !defined(IA64) && !defined(HPPA) && !defined(X86_64)
+#if defined(LINUX) && !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
+    && !defined(S390) && !defined(S390X)
 static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
@@ -942,7 +944,7 @@ long addr;
 	convertoldstat(&statbuf, &newstatbuf);
 	realprintstat(tcp, &newstatbuf);
 }
-#endif /* LINUX && !IA64 */
+#endif /* LINUX && !IA64 && !HPPA && !X86_64 && !S390 && !S390X */
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -977,7 +979,8 @@ struct tcb *tcp;
 }
 
 #ifdef LINUX
-# if !defined(IA64) && !defined(HPPA) && !defined(X86_64)
+# if !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
+     && !defined(S390) && !defined(S390X)
 int
 sys_oldstat(tcp)
 struct tcb *tcp;
@@ -1024,7 +1027,8 @@ struct tcb *tcp;
 }
 
 #ifdef LINUX
-# if !defined(IA64) && !defined(HPPA) && !defined(X86_64)
+# if !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
+     && !defined(S390) && !defined(S390X)
 int
 sys_oldfstat(tcp)
 struct tcb *tcp;
@@ -1036,7 +1040,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 && !HPPA*/
+# endif /* !IA64 && !HPPA && !X86_64 && !S390 && !S390X */
 #endif
 
 #ifndef HAVE_LONG_LONG_OFF_T
@@ -1072,7 +1076,8 @@ struct tcb *tcp;
 }
 
 #ifdef LINUX
-# if !defined(IA64) && !defined(HPPA) && !defined(X86_64)
+# if !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
+     && !defined(S390) && !defined(S390X)
 int
 sys_oldlstat(tcp)
 struct tcb *tcp;
@@ -1085,7 +1090,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 && !HPPA */
+# endif /* !IA64 && !HPPA && !X86_64 && !S390 && !S390X */
 #endif
 
 

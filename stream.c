@@ -1054,7 +1054,7 @@ int arg;
 		break;
 #endif /* SI_GETUDATA */
 	default:
-		printstr(tcp, (int) si.ic_dp, si.ic_len);
+		printstr(tcp, (long) si.ic_dp, si.ic_len);
 		break;
 	}
 	if (exiting(tcp)) {

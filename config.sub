@@ -756,6 +756,12 @@ case $basic_machine in
 		basic_machine=a29k-amd
 		os=-udi
 		;;
+	s390)
+		basic_machine=s390-ibm
+		;;
+	s390x)
+		basic_machine=s390x-ibm
+		;;
 	sequent)
 		basic_machine=i386-sequent
 		;;

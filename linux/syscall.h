@@ -96,6 +96,7 @@ int sys_shutdown(), sys_setsockopt(), sys_getsockopt();
 /* new ones */
 int sys_query_module();
 int sys_poll();
+int sys_mincore();
 
 /* architecture-specific calls */
 #ifdef ALPHA
@@ -137,11 +138,11 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 #endif /* IA64 */
-#ifdef POWERPC
+#if defined(POWERPC) || defined(S390) || defined(S390X)
 #  define SYS_socket_subcall	256
 #else
 #  define SYS_socket_subcall	230
-#endif
+#endif /* (POWERPC || S390 || S390X) */
 #define SYS_socket		(SYS_socket_subcall + 1)
 #define SYS_bind		(SYS_socket_subcall + 2)
 #define SYS_connect		(SYS_socket_subcall + 3)
@@ -192,11 +193,11 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #  undef SYS_shmget
 #  undef SYS_shmctl
 # endif /* IA64 */
-#ifdef POWERPC
+#if defined(POWERPC) || defined(S390) || defined(S390X)
 #  define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #else
 #  define SYS_ipc_subcall		250
-#endif
+#endif /* (POWERPC || S390 || S390X) */
 #define SYS_semop		(SYS_ipc_subcall + 1)
 #define SYS_semget		(SYS_ipc_subcall + 2)
 #define SYS_semctl		(SYS_ipc_subcall + 3)

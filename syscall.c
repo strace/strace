@@ -506,7 +506,8 @@ int subcall;
 int nsubcalls;
 enum subcall_style style;
 {
-	int i, addr, mask, arg;
+	long addr, mask, arg;
+	int i;
 
 	switch (style) {
 	case shift_style:
@@ -679,7 +680,7 @@ struct tcb *tcp;
 #elif defined(MIPS)
 	static long a3;
 	static long r2;
-#elif defined(S390)
+#elif defined(S390) || defined(S390X)
 	static long gpr2;
 	static long pc;
 #elif defined(HPPA)
@@ -705,10 +706,10 @@ struct tcb *tcp;
 #endif /* !PROCFS */	
 
 #ifdef LINUX
-#if defined(S390)
-	if (upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
+#if defined(S390) || defined(S390X)
+	if (upeek(pid,PT_PSWADDR,&pc) < 0)
 		return -1;
-	scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(pc-4),0);
+	scno = ptrace(PTRACE_PEEKTEXT, pid, (char *)(pc-sizeof(long)),0);
 	if (errno)
 		return -1;
 	scno&=0xFF;
@@ -1098,7 +1099,7 @@ struct tcb *tcp;
 			fprintf(stderr, "stray syscall exit: rax = %ld\n", rax);
 		return 0;
 	}
-#elif defined (S390)
+#elif defined (S390) || defined (S390X)
 	if (upeek(pid, PT_GPR2, &gpr2) < 0)
 		return -1;
 	if (gpr2 != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
@@ -1154,7 +1155,7 @@ struct tcb *tcp;
 {
 	int u_error = 0;
 #ifdef LINUX
-#ifdef S390
+#if defined(S390) || defined(S390X)
 		if (gpr2 && (unsigned) -gpr2 < nerrnos) {
 			tcp->u_rval = -1;
 			u_error = -gpr2;
@@ -1163,7 +1164,7 @@ struct tcb *tcp;
 			tcp->u_rval = gpr2;
 			u_error = 0;
 		}
-#else /* !S390 */
+#else /* !S390 && !S390X */
 #ifdef I386
 		if (eax < 0 && -eax < nerrnos) {
 			tcp->u_rval = -1;
@@ -1297,7 +1298,7 @@ struct tcb *tcp;
 #endif /* IA64 */
 #endif /* X86_64 */
 #endif /* I386 */
-#endif /* S390 */
+#endif /* S390 || S390X */
 #endif /* LINUX */
 #ifdef SUNOS4
 		/* get error code from user struct */
@@ -1381,7 +1382,7 @@ struct tcb *tcp;
 	int pid = tcp->pid;
 #endif /* !USE_PROCFS */	
 #ifdef LINUX
-#if defined(S390)
+#if defined(S390) || defined(S390X)
 	{
 		int i;
 		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
@@ -1389,7 +1390,7 @@ struct tcb *tcp;
 		else 
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid,i==0 ? PT_ORIGGPR2:PT_GPR2+(i<<2), &tcp->u_arg[i]) < 0)
+			if (upeek(pid,i==0 ? PT_ORIGGPR2:PT_GPR2+i*sizeof(long), &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}

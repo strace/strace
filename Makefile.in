@@ -50,7 +50,8 @@ INCLUDES	= -I. -I$(OS)/$(ARCH) -I$(srcdir)/$(OS)/$(ARCH) -I$(OS) \
 			-I$(srcdir)/$(OS)
 SUBDIRS		= $(OSARCH)
 
-ALL_SUBDIRS	= test linux linux/alpha linux/powerpc sunos4 svr4 freebsd/i386
+ALL_SUBDIRS	= test linux linux/alpha linux/powerpc sunos4 svr4 \
+			linux/s390 linux/s390x freebsd/i386
 OBJ		= strace.o version.o syscall.o util.o desc.o file.o ipc.o \
 			io.o ioctl.o mem.o net.o process.o bjm.o \
 			resource.o signal.o sock.o system.o term.o time.o \

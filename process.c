@@ -503,12 +503,10 @@ int new;
 #elif defined(POWERPC)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R0), new) < 0)
 		return -1;
-#elif defined(S390)
-	long	pc;
-	if (upeek(tcp->pid, PT_PSWADDR,&pc)<0)
-	    	return -1;
-	if (ptrace(PTRACE_POKETEXT, tcp->pid, (char*)(pc-4), new)<0)
-	    	return -1;
+#elif defined(S390) || defined(S390X)
+	/* s390 linux after 2.4.7 has a hook in entry.S to allow this */
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new)<0)
+	        return -1;
 	return 0;
 #elif defined(M68K)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new)<0)
@@ -598,6 +596,18 @@ setarg(tcp, argnum)
 		if (errno)
 			return -1;
 	}
+#elif defined(S390) || defined(S390X)
+        {
+		if(argnum <= 5)
+			ptrace(PTRACE_POKEUSER, tcp->pid,
+			       (char *) (argnum==0 ? PT_ORIGGPR2 : 
+			       PT_GPR2 + argnum*sizeof(long)), 
+			       tcp->u_arg[argnum]);
+		else
+			return -E2BIG;
+		if (errno)
+			return -1;
+        }
 #else
 # warning Sorry, setargs not implemented for this architecture.
 #endif
@@ -1769,7 +1779,7 @@ static
 #endif /* !SUNOS4_KERNEL_ARCH_KLUDGE */
 struct xlat struct_user_offsets[] = {
 #ifdef LINUX
-#ifdef S390
+#if defined(S390) || defined(S390X)
 	{ PT_PSWMASK,		"psw_mask"				},
 	{ PT_PSWADDR,		"psw_addr"				},
 	{ PT_GPR0,		"gpr0"					},
@@ -1806,6 +1816,7 @@ struct xlat struct_user_offsets[] = {
 	{ PT_ACR15,		"acr15"					},
 	{ PT_ORIGGPR2,		"orig_gpr2"				},
 	{ PT_FPC,		"fpc"					},
+#if defined(S390)
 	{ PT_FPR0_HI,		"fpr0.hi"				},
 	{ PT_FPR0_LO,		"fpr0.lo"				},
 	{ PT_FPR1_HI,		"fpr1.hi"				},
@@ -1838,9 +1849,29 @@ struct xlat struct_user_offsets[] = {
 	{ PT_FPR14_LO,		"fpr14.lo"				},
 	{ PT_FPR15_HI,		"fpr15.hi"				},
 	{ PT_FPR15_LO,		"fpr15.lo"				},
+#endif
+#if defined(S390X)
+	{ PT_FPR0,		"fpr0"					},
+	{ PT_FPR1,		"fpr1"					},
+	{ PT_FPR2,		"fpr2"					},
+	{ PT_FPR3,		"fpr3"					},
+	{ PT_FPR4,		"fpr4"					},
+	{ PT_FPR5,		"fpr5"					},
+	{ PT_FPR6,		"fpr6"					},
+	{ PT_FPR7,		"fpr7"					},
+	{ PT_FPR8,		"fpr8"					},
+	{ PT_FPR9,		"fpr9"					},
+	{ PT_FPR10,		"fpr10"					},
+	{ PT_FPR11,		"fpr11"					},
+	{ PT_FPR12,		"fpr12"					},
+	{ PT_FPR13,		"fpr13"					},
+	{ PT_FPR14,		"fpr14"					},
+	{ PT_FPR15,		"fpr15"					},
+#endif
 	{ PT_CR_9,		"cr9"					},
 	{ PT_CR_10,		"cr10"					},
 	{ PT_CR_11,		"cr11"					},
+	{ PT_IEEE_IP,           "ieee_exception_ip"                     },
 #endif
 #if defined(SPARC)
 	/* XXX No support for these offsets yet. */
@@ -2147,7 +2178,7 @@ struct xlat struct_user_offsets[] = {
        { 4*REG_FPSCR,          "4*REG_FPSCR"                           },
 #endif /* SH */
 
-#if !defined(S390) && !defined(MIPS)
+#if !defined(S390) && !defined(S390X) && !defined(MIPS)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #endif
 #if  defined(I386) || defined(X86_64)
@@ -2163,11 +2194,11 @@ struct xlat struct_user_offsets[] = {
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#if !defined(S390) && !defined(MIPS) && !defined(SH)
+#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
 #endif
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-#if !defined(ARM) && !defined(MIPS) && !defined(S390)
+#if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
 #endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},

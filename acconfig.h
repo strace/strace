@@ -51,6 +51,9 @@
 /* Define if this is a x86-64 architecture.  */
 #undef X86_64
 
+/* Define if this is a S390X architecture.  */
+#undef S390X
+
 /* Define if you have a SVR4 MP type procfs.  I.E. /dev/xxx/ctl,
    /dev/xxx/status.  Also implies that you have the pr_lwp
    member in prstatus. */
