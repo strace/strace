@@ -1,5 +1,11 @@
 2004-08-31  Roland McGrath  <roland@redhat.com>
 
+	* strace.1: Say that -c shows system CPU time, not real time.
+	Fixes Debian bug #254438.
+
+	* syscall.c (dumpio): Match pread and pwrite system calls too.
+	Fixes Debian bug #239947.
+
 	* net.c (sockoptions): Add all SO_* macros known in Linux 2.6.9.
 	Fixes Debian bug #171653.
 
