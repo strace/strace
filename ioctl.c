@@ -108,8 +108,10 @@ long code, arg;
 #endif /* !LINUX */
 		return sock_ioctl(tcp, code, arg);
 #ifdef SVR4
+#ifndef SVR4_MP
 	case 'q':
 		return proc_ioctl(tcp, code, arg);
+#endif
 #endif /* SVR4 */
 #ifdef HAVE_SYS_STREAM_H
 	case 'S':

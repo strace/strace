@@ -99,6 +99,7 @@ int sys_sigaltstack(), sys_rt_sigprocmask(), sys_rt_sigaction();
 int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll();
 int sys_sendfile(), sys_query_module(), sys_capget(), sys_capset();
+int sys_create_module(), sys_init_module();
 
 int	sys_umask();		/* XXX */
 

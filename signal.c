@@ -54,8 +54,9 @@
 #ifdef HAVE_ASM_SIGCONTEXT_H
 #include <asm/sigcontext.h>
 #ifdef SPARC
+#include <asm/reg.h>
 typedef struct {
-	struct pt_regs		si_regs;
+	struct regs		si_regs;
 	int			si_mask;
 } m_siginfo_t;
 #endif
@@ -227,6 +228,7 @@ int sig;
 	}
 }
 
+#ifndef UNIXWARE
 static void
 long_to_sigset(l, s)
 long l;
@@ -235,6 +237,7 @@ sigset_t *s;
 	sigemptyset(s);
 	*(long *)s = l;
 }
+#endif
 
 static int
 copy_sigset_len(tcp, addr, s, len)
@@ -778,18 +781,16 @@ struct tcb *tcp;
 #else
 #ifdef SPARC
 	long i1;
-	struct pt_regs regs;
+	struct regs regs;
 	m_siginfo_t si;
 
 	if(ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
 	    perror("sigreturn: PTRACE_GETREGS ");
 	    return 0;
 	}
-	memmove (&regs.u_regs [1], &regs.u_regs [0],
-			sizeof (regs.u_regs) - sizeof (regs.u_regs [0]));
 	if(entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		i1 = regs.u_regs[UREG_I1];
+		i1 = regs.r_o1;
 		if(umove(tcp, i1, &si) < 0) {
 			perror("sigreturn: umove ");
 			return 0;

@@ -9,4 +9,12 @@ lot of processes at once.
 
 There is no thread support but it wouldn't be very difficult to add it.
 
-Rick Sladkey <jrs@world.std.com>
+There is currently no configure-support yet for UnixWare system. To compile
+on UnixWare 2.1 you need to add the following to config.h yourself:
+
+    #define SVR4_MP 1
+    #define UNIXWARE 2
+    #define HAVE_POLLABLE_PROCFS 1
+
+Wichert Akkerman <wakkerma@debian.org>
+

@@ -30,6 +30,7 @@
 #include "defs.h"
 
 #ifdef SVR4
+#ifndef SVR4_MP
 
 static struct xlat proc_status_flags[] = {
 	{ PR_STOPPED,	"PR_STOPPED"	},
@@ -182,5 +183,6 @@ int code, arg;
 	}
 }
 
+#endif /* SVR4_MP */
 #endif /* SVR4 */
 

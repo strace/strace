@@ -59,6 +59,7 @@ strace: $(OBJ)
 
 install: all
 	$(INSTALL_PROGRAM) strace $(bindir)/strace
+	$(INSTALL_PROGRAM) strace-graph $(bindir)/strace-graph
 	$(INSTALL_DATA) $(srcdir)/strace.1 $(man1dir)/strace$(man1ext)
 
 clean: clean-local

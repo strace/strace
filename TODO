@@ -5,6 +5,7 @@ replace printargs with something that reads a configuration-file
 rename functions that are used for general things:
   sys_chdir -> general_1stringarg
 generate syscallent.h from the kernel sources
+add IPv6 support
 
 
 -- old entries from jrs

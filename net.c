@@ -311,6 +311,10 @@ long addr;
 	struct sockaddr sa;
 	struct sockaddr_in *sin = (struct sockaddr_in *) &sa;
 	struct sockaddr_un sau;
+#ifdef HAVE_INET_NTOP
+	struct sockaddr_in6 sa6;
+	char string_addr[100];
+#endif
 #ifdef LINUX
 	struct sockaddr_ipx sipx;
 #endif
@@ -340,6 +344,19 @@ long addr;
 		tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")}",
 			ntohs(sin->sin_port), inet_ntoa(sin->sin_addr));
 		break;
+#ifdef HAVE_INET_NTOP
+	case AF_INET6:
+		if (umove(tcp, addr, &sa6) < 0)
+			tprintf("{sin6_family=AF_INET6, ...}");
+		else
+		{
+			tprintf("{sin6_family=AF_INET6, ");
+			inet_ntop(AF_INET6, &sa6.sin6_addr, string_addr, sizeof(string_addr));
+			tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)",
+				ntohs(sa6.sin6_port), string_addr, ntohl(sa6.sin6_flowinfo));
+		}
+		break;	
+#endif
 #if defined(AF_IPX) && defined(linux)
 	case AF_IPX:
 		if (umove(tcp, addr, &sipx)<0)

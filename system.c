@@ -1279,11 +1279,19 @@ static struct xlat sysctl_kern[] = {
 	{ KERN_PROF, "KERN_PROF" },
 	{ KERN_NODENAME, "KERN_NODENAME" },
 	{ KERN_DOMAINNAME, "KERN_DOMAINNAME" },
+#ifdef KERN_SECURELVL
 	{ KERN_SECURELVL, "KERN_SECURELVL" },
+#endif
 	{ KERN_PANIC, "KERN_PANIC" },
+#ifdef KERN_REALROOTDEV
 	{ KERN_REALROOTDEV, "KERN_REALROOTDEV" },
+#endif
+#ifdef KERN_JAVA_INTERPRETER
 	{ KERN_JAVA_INTERPRETER, "KERN_JAVA_INTERPRETER" },
+#endif
+#ifdef KERN_JAVA_APPLETVIEWER
 	{ KERN_JAVA_APPLETVIEWER, "KERN_JAVA_APPLETVIEWER" },
+#endif
 	{ KERN_SPARC_REBOOT, "KERN_SPARC_REBOOT" },
 	{ KERN_CTLALTDEL, "KERN_CTLALTDEL" },
 	{ KERN_PRINTK, "KERN_PRINTK" },
@@ -1562,8 +1570,13 @@ struct tcb *tcp;
 		    && ((name[0] == CTL_KERN
 			 && (name[1] == KERN_OSRELEASE
 			     || name[1] == KERN_OSTYPE
+#ifdef KERN_JAVA_INTERPRETER
 			     || name[1] == KERN_JAVA_INTERPRETER
-			     || name[1] == KERN_JAVA_APPLETVIEWER)))) {
+#endif
+#ifdef KERN_JAVA_APPLETVIEWER
+			     || name[1] == KERN_JAVA_APPLETVIEWER
+#endif
+				 )))) {
 			printpath(tcp, (size_t)info.oldval);
 			tprintf(", %d, ", oldlen);
 			if (info.newval == 0)

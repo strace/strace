@@ -221,7 +221,7 @@
 	{ -1,	0,	sys_swapctl,		"swapctl"	}, /* 167 */
 	{ -1,	0,	sys_getcontext,		"getcontext"	}, /* 168 */
 	{ -1,	0,	sys_setcontext,		"setcontext"	}, /* 169 */
-	{ -1,	TP,	sys_waitsys,		"waitid"	}, /* 170 */
+	{ -1,	TP,	sys_waitid,		"waitid"	}, /* 170 */
 	{ -1,	TS,	sys_sigstack,		"sigstack"	}, /* 171 */
 	{ -1,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 172 */
 	{ -1,	TS,	sys_sigsendset,		"sigsendset"	}, /* 173 */
@@ -322,7 +322,11 @@
 	{ -1,	0,	sys_fstatvfs,		"fstatvfs"	}, /* 104 */
 	{ -1,	0,	printargs,		"SYS_105"	}, /* 105 */
 	{ -1,	0,	sys_nfssys,		"nfssys"	}, /* 106 */
+#if UNIXWARE
+	{ -1,	TP,	sys_waitsys,		"waitsys"	}, /* 107 */
+#else
 	{ -1,	TP,	sys_waitid,		"waitid"	}, /* 107 */
+#endif
 	{ -1,	0,	sys_sigsendsys,		"sigsendsys"	}, /* 108 */
 	{ -1,	0,	sys_hrtsys,		"hrtsys"	}, /* 109 */
 	{ -1,	0,	sys_acancel,		"acancel"	}, /* 110 */
@@ -356,6 +360,77 @@
 	{ -1,	0,	sys_adjtime,		"adjtime"	}, /* 138 */
 	{ -1,	0,	sys_sysinfo,		"sysinfo"	}, /* 139 */
 	{ -1,	0,	printargs,		"SYS_140"	}, /* 140 */
+#if UNIXWARE >= 2
+	{ -1,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
+	{ -1,	0, 	printargs,		"SYS_142"	}, /* 142 */
+	{ -1,	0,	printargs,		"keyctl"	}, /* 143 */
+	{ -1,	0,	printargs,		"secsys"	}, /* 144 */
+	{ -1,	0,	printargs,		"filepriv"	}, /* 145 */
+	{ -1,	0,	printargs,		"procpriv"	}, /* 146 */
+	{ -1,	0,	printargs,		"devstat"	}, /* 147 */
+	{ -1,	0,	printargs,		"aclipc"	}, /* 148 */
+	{ -1,	0,	printargs,		"fdevstat"	}, /* 149 */
+	{ -1,	0,	printargs,		"flvlfile"	}, /* 150 */
+	{ -1,	0,	printargs,		"lvlfile"	}, /* 151 */
+	{ -1,	0, 	printargs,		"SYS_152"	}, /* 152 */
+	{ -1,	0,	printargs,		"lvlequal"	}, /* 153 */
+	{ -1,	0,	printargs,		"lvlproc"	}, /* 154 */
+	{ -1,	0, 	printargs,		"SYS_155"	}, /* 155 */
+	{ -1,	0,	printargs,		"lvlipc"	}, /* 156 */
+	{ -1,	0,	printargs,		"acl"		}, /* 157 */
+	{ -1,	0,	printargs,		"auditevt"	}, /* 158 */
+	{ -1,	0,	printargs,		"auditctl"	}, /* 159 */
+	{ -1,	0,	printargs,		"auditdmp"	}, /* 160 */
+	{ -1,	0,	printargs,		"auditlog"	}, /* 161 */
+	{ -1,	0,	printargs,		"auditbuf"	}, /* 162 */
+	{ -1,	0,	printargs,		"lvldom"	}, /* 163 */
+	{ -1,	0,	printargs,		"lvlvfs"	}, /* 164 */
+	{ -1,	0,	printargs,		"mkmld"		}, /* 165 */
+	{ -1,	0,	printargs,		"mldmode"	}, /* 166 */
+	{ -1,	0,	printargs,		"secadvise"	}, /* 167 */
+	{ -1,	0,	printargs,		"online"	}, /* 168 */
+	{ -1,	0,	sys_setitimer,		"setitimer"	}, /* 169 */
+	{ -1,	0,	sys_getitimer,		"getitimer"	}, /* 170 */
+	{ -1,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 171 */
+	{ -1,	0,	printargs,		"settimeofday"	}, /* 172 */
+	{ -1,	0,	sys_lwp_create,		"lwpcreate"	}, /* 173 */
+	{ -1,	0,	sys_lwp_exit,		"lwpexit"	}, /* 174 */
+	{ -1,	0,	sys_lwp_wait,		"lwpwait"	}, /* 175 */
+	{ -1,	0,	sys_lwp_self,		"lwpself"	}, /* 176 */
+	{ -1,	0,	printargs,		"lwpinfo"	}, /* 177 */
+	{ -1,	0,	printargs,		"lwpprivate"	}, /* 178 */
+	{ -1,	0,	sys_processor_bind,	"processor_bind"}, /* 179 */
+	{ -1,	0,	printargs,		"processor_exbind"}, /* 180 */
+	{ -1,	0, 	printargs,		"SYS_181"	}, /* 181 */
+	{ -1,	0, 	printargs,		"SYS_182"	}, /* 182 */
+	{ -1,	0,	printargs,		"prepblock"	}, /* 183 */
+	{ -1,	0,	printargs,		"block"		}, /* 184 */
+	{ -1,	0,	printargs,		"rdblock"	}, /* 185 */
+	{ -1,	0,	printargs,		"unblock"	}, /* 186 */
+	{ -1,	0,	printargs,		"cancelblock"	}, /* 187 */
+	{ -1,	0, 	printargs,		"SYS_188"	}, /* 188 */
+	{ -1,	0,	sys_pread,		"pread"		}, /* 189 */
+	{ -1,	0,	sys_pwrite,		"pwrite"	}, /* 190 */
+	{ -1,	0,	printargs,		"truncate"	}, /* 191 */
+	{ -1,	0,	printargs,		"ftruncate"	}, /* 192 */
+	{ -1,	0,	printargs,		"lwpkill"	}, /* 193 */
+	{ -1,	0,	printargs,		"sigwait"	}, /* 194 */
+	{ -1,	0,	printargs,		"fork1"		}, /* 195 */
+	{ -1,	0,	printargs,		"forkall"	}, /* 196 */
+	{ -1,	0,	printargs,		"modload"	}, /* 197 */
+	{ -1,	0,	printargs,		"moduload"	}, /* 198 */
+	{ -1,	0,	printargs,		"modpath"	}, /* 199 */
+	{ -1,	0,	printargs,		"modstat"	}, /* 200 */
+	{ -1,	0,	printargs,		"modadm"	}, /* 201 */
+	{ -1,	0,	printargs,		"getksym"	}, /* 202 */
+	{ -1,	0,	printargs,		"lwpsuspend"	}, /* 203 */
+	{ -1,	0,	printargs,		"lwpcontinue"	}, /* 204 */
+	{ -1,	0,	printargs,		"priocntllst"	}, /* 205 */
+	{ -1,	0,	printargs,		"sleep"		}, /* 206 */
+	{ -1,	0,	printargs,		"lwp_sema_wait"	}, /* 207 */
+	{ -1,	0,	printargs,		"lwp_sema_post"	}, /* 208 */
+	{ -1,	0,	printargs,		"lwp_sema_trywait"}, /* 209 */
+#else
 	{ -1,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
 	{ -1,	0,	sys_vtrace,		"vtrace"	}, /* 142 */
 	{ -1,	TP,	sys_fork1,		"fork1"		}, /* 143 */
@@ -437,6 +512,7 @@
 	{ -1,	0,	printargs,		"SYS_207"	}, /* 207 */
 	{ -1,	0,	printargs,		"SYS_208"	}, /* 208 */
 	{ -1,	0,	printargs,		"SYS_209"	}, /* 209 */
+#endif
 	{ -1,	0,	printargs,		"SYS_210"	}, /* 210 */
 	{ -1,	0,	printargs,		"SYS_211"	}, /* 211 */
 	{ -1,	0,	printargs,		"SYS_212"	}, /* 212 */

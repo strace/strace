@@ -45,6 +45,9 @@
 #ifdef SVR4
 #include <sys/stropts.h>
 #include <poll.h>
+#ifdef SVR4_MP
+#include <sys/uio.h>
+#endif
 #endif
 
 int debug = 0, followfork = 0, followvfork = 0, interactive = 0;
@@ -105,6 +108,11 @@ static int proc_poll_pipe[2] = { -1, -1 };
 
 #endif /* !HAVE_POLLABLE_PROCFS */
 
+#ifdef SVR4_MP
+#define POLLWANT	POLLWRNORM
+#else
+#define POLLWANT	POLLPRI
+#endif
 #endif /* SVR4 */
 
 static void
@@ -559,7 +567,6 @@ int pid;
 }
 
 #ifdef SVR4
-
 int
 proc_open(tcp, attaching)
 struct tcb *tcp;
@@ -570,37 +577,15 @@ int attaching;
 	sysset_t sc_enter, sc_exit;
 	sigset_t signals;
 	fltset_t faults;
-#ifndef MIPS
-	prrun_t run;
-#endif
 #ifndef HAVE_POLLABLE_PROCFS
 	static int last_pfd;
 #endif
 
-	/* Open the process pseudo-file in /proc. */
-	sprintf(proc, "/proc/%d", tcp->pid);
-	if ((tcp->pfd = open(proc, O_RDWR|O_EXCL)) < 0) {
+#ifdef SVR4_MP
+	/* Open the process pseudo-files in /proc. */
+	sprintf(proc, "/proc/%d/ctl", tcp->pid);
+	if ((tcp->pfd = open(proc, O_WRONLY|O_EXCL)) < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
-		return -1;
-	}
-	rebuild_pollv();
-	if (!attaching) {
-		/*
-		 * Wait for the child to pause.  Because of a race
-		 * condition we have to poll for the event.
-		 */
-		for (;;) {
-			if (ioctl(tcp->pfd, PIOCSTATUS, &tcp->status) < 0) {
-				perror("strace: PIOCSTATUS");
-				return -1;
-			}
-			if (tcp->status.pr_flags & PR_ASLEEP)
-				break;
-		}
-	}
-	/* Stop the process so that we own the stop. */
-	if (ioctl(tcp->pfd, PIOCSTOP, &tcp->status) < 0) {
-		perror("strace: PIOCSTOP");
 		return -1;
 	}
 	if ((arg = fcntl(tcp->pfd, F_GETFD)) < 0) {
@@ -611,16 +596,78 @@ int attaching;
 		perror("F_SETFD");
 		return -1;
 	}
+	sprintf(proc, "/proc/%d/status", tcp->pid);
+	if ((tcp->pfd_stat = open(proc, O_RDONLY|O_EXCL)) < 0) {
+		perror("strace: open(\"/proc/...\", ...)");
+		return -1;
+	}
+	if ((arg = fcntl(tcp->pfd_stat, F_GETFD)) < 0) {
+		perror("F_GETFD");
+		return -1;
+	}
+	if (fcntl(tcp->pfd_stat, F_SETFD, arg|FD_CLOEXEC) < 0) {
+		perror("F_SETFD");
+		return -1;
+	}
+	sprintf(proc, "/proc/%d/as", tcp->pid);
+	if ((tcp->pfd_as = open(proc, O_RDONLY|O_EXCL)) < 0) {
+		perror("strace: open(\"/proc/...\", ...)");
+		return -1;
+	}
+	if ((arg = fcntl(tcp->pfd_as, F_GETFD)) < 0) {
+		perror("F_GETFD");
+		return -1;
+	}
+	if (fcntl(tcp->pfd_as, F_SETFD, arg|FD_CLOEXEC) < 0) {
+		perror("F_SETFD");
+		return -1;
+	}
+#else
+	/* Open the process pseudo-file in /proc. */
+	sprintf(proc, "/proc/%d", tcp->pid);
+	if ((tcp->pfd = open(proc, O_RDWR|O_EXCL)) < 0) {
+		perror("strace: open(\"/proc/...\", ...)");
+		return -1;
+	}
+	if ((arg = fcntl(tcp->pfd, F_GETFD)) < 0) {
+		perror("F_GETFD");
+		return -1;
+	}
+	if (fcntl(tcp->pfd, F_SETFD, arg|FD_CLOEXEC) < 0) {
+		perror("F_SETFD");
+		return -1;
+	}
+#endif
+	rebuild_pollv();
+	if (!attaching) {
+		/*
+		 * Wait for the child to pause.  Because of a race
+		 * condition we have to poll for the event.
+		 */
+		for (;;) {
+			if (IOCTL_STATUS (tcp) < 0) {
+				perror("strace: PIOCSTATUS");
+				return -1;
+			}
+			if (tcp->status.PR_FLAGS & PR_ASLEEP)
+				break;
+		}
+	}
+	/* Stop the process so that we own the stop. */
+	if (IOCTL(tcp->pfd, PIOCSTOP, NULL) < 0) {
+		perror("strace: PIOCSTOP");
+		return -1;
+	}
 #ifdef PIOCSET
 	/* Set Run-on-Last-Close. */
 	arg = PR_RLC;
-	if (ioctl(tcp->pfd, PIOCSET, &arg) < 0) {
+	if (IOCTL(tcp->pfd, PIOCSET, &arg) < 0) {
 		perror("PIOCSET PR_RLC");
 		return -1;
 	}
 	/* Set or Reset Inherit-on-Fork. */
 	arg = PR_FORK;
-	if (ioctl(tcp->pfd, followfork ? PIOCSET : PIOCRESET, &arg) < 0) {
+	if (IOCTL(tcp->pfd, followfork ? PIOCSET : PIOCRESET, &arg) < 0) {
 		perror("PIOC{SET,RESET} PR_FORK");
 		return -1;
 	}
@@ -636,25 +683,25 @@ int attaching;
 #endif /* !PIOCSET */
 	/* Enable all syscall entries. */
 	prfillset(&sc_enter);
-	if (ioctl(tcp->pfd, PIOCSENTRY, &sc_enter) < 0) {
+	if (IOCTL(tcp->pfd, PIOCSENTRY, &sc_enter) < 0) {
 		perror("PIOCSENTRY");
 		return -1;
 	}
 	/* Enable all syscall exits. */
 	prfillset(&sc_exit);
-	if (ioctl(tcp->pfd, PIOCSEXIT, &sc_exit) < 0) {
+	if (IOCTL(tcp->pfd, PIOCSEXIT, &sc_exit) < 0) {
 		perror("PIOSEXIT");
 		return -1;
 	}
 	/* Enable all signals. */
 	prfillset(&signals);
-	if (ioctl(tcp->pfd, PIOCSTRACE, &signals) < 0) {
+	if (IOCTL(tcp->pfd, PIOCSTRACE, &signals) < 0) {
 		perror("PIOCSTRACE");
 		return -1;
 	}
 	/* Enable all faults. */
 	prfillset(&faults);
-	if (ioctl(tcp->pfd, PIOCSFAULT, &faults) < 0) {
+	if (IOCTL(tcp->pfd, PIOCSFAULT, &faults) < 0) {
 		perror("PIOCSFAULT");
 		return -1;
 	}
@@ -667,29 +714,30 @@ int attaching;
 		kill(tcp->pid, SIGINT);
 #else /* !MIPS */
 		/* The child is in a pause(), abort it. */
-		run.pr_flags = PRSABORT;
-		if (ioctl(tcp->pfd, PIOCRUN, &run) < 0) {
+		arg = PRSABORT;
+		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
 			perror("PIOCRUN");
 			return -1;
 		}
 #endif /* !MIPS */
 		for (;;) {
 			/* Wait for the child to do something. */
-			if (ioctl(tcp->pfd, PIOCWSTOP, &tcp->status) < 0) {
+			if (IOCTL_WSTOP (tcp) < 0) {
 				perror("PIOCWSTOP");
 				return -1;
 			}
-			if (tcp->status.pr_why == PR_SYSENTRY) {
+			if (tcp->status.PR_WHY == PR_SYSENTRY) {
 #ifdef HAVE_PR_SYSCALL
 				int scno = tcp->status.pr_syscall;
 #else /* !HAVE_PR_SYSCALL */
-				int scno = tcp->status.pr_what;
+				int scno = tcp->status.PR_WHAT;
 #endif /* !HAVE_PR_SYSCALL */
 				if (scno == SYS_execve)
 					break;
 			}
 			/* Set it running: maybe execve will be next. */
-			if (ioctl(tcp->pfd, PIOCRUN, NULL) < 0) {
+			arg = 0;
+			if (IOCTL(tcp->pfd, PIOCRUN, &arg) < 0) {
 				perror("PIOCRUN");
 				return -1;
 			}
@@ -1012,7 +1060,7 @@ rebuild_pollv()
 		if (!(tcp->flags & TCB_INUSE))
 			continue;
 		pollv[j].fd = tcp->pfd;
-		pollv[j].events = POLLPRI;
+		pollv[j].events = POLLWANT;
 		j++;
 	}
 	if (j != nprocs) {
@@ -1126,7 +1174,8 @@ int pfd;
 	pollinfo.fd = pfd;
 	pollinfo.pid = getpid();
 	for (;;) {
-		if (ioctl(pfd, PIOCWSTOP, NULL) < 0) {
+		if (ioctl(pfd, PIOCWSTOP, NULL) < 0)
+		{
 			switch (errno) {
 			case EINTR:
 				continue;
@@ -1142,7 +1191,7 @@ int pfd;
 			write(proc_poll_pipe[1], &pollinfo, sizeof(pollinfo));
 			_exit(0);
 		}
-		pollinfo.revents = POLLPRI;
+		pollinfo.revents = POLLWANT;
 		write(proc_poll_pipe[1], &pollinfo, sizeof(pollinfo));
 		sigsuspend(&empty_set);
 	}
@@ -1159,7 +1208,7 @@ choose_pfd()
 	static int last;
 
 	if (followfork < 2 &&
-	    last < nprocs && (pollv[last].revents & POLLPRI)) {
+	    last < nprocs && (pollv[last].revents & POLLWANT)) {
 		/*
 		 * The previous process is ready to run again.  We'll
 		 * let it do so if it is currently in a syscall.  This
@@ -1182,7 +1231,7 @@ choose_pfd()
 			droptcb(tcp);
 			return -1;
 		}
-		if (pollv[j].revents & POLLPRI) {
+		if (pollv[j].revents & POLLWANT) {
 			last = j;
 			return pollv[j].fd;
 		}
@@ -1198,6 +1247,7 @@ trace()
 	int pfd;
 	int what;
 	int ioctl_result = 0, ioctl_errno = 0;
+	long arg;
 
 	for (;;) {
 		if (interactive)
@@ -1249,8 +1299,7 @@ trace()
 		}
 		/* Get the status of the process. */
 		if (!interrupted) {
-			ioctl_result = ioctl(tcp->pfd, PIOCWSTOP,
-				&tcp->status);
+			ioctl_result = IOCTL_WSTOP (tcp);
 			ioctl_errno = errno;
 #ifndef HAVE_POLLABLE_PROCFS
 			if (proc_poll_pipe[0] != -1) {
@@ -1297,11 +1346,11 @@ trace()
 			tcp->stime = stime;
 		}
 
-		what = tcp->status.pr_what;
-		switch (tcp->status.pr_why) {
+		what = tcp->status.PR_WHAT;
+		switch (tcp->status.PR_WHY) {
 		case PR_REQUESTED:
-			if (tcp->status.pr_flags & PR_ASLEEP) {
-				tcp->status.pr_why = PR_SYSENTRY;
+			if (tcp->status.PR_FLAGS & PR_ASLEEP) {
+				tcp->status.PR_WHY = PR_SYSENTRY;
 				if (trace_syscall(tcp) < 0) {
 					fprintf(stderr, "syscall trouble\n");
 					exit(1);
@@ -1331,11 +1380,12 @@ trace()
 			}
 			break;
 		default:
-			fprintf(stderr, "odd stop %d\n", tcp->status.pr_why);
+			fprintf(stderr, "odd stop %d\n", tcp->status.PR_WHY);
 			exit(1);
 			break;
 		}
-		if (ioctl(tcp->pfd, PIOCRUN, NULL) < 0) {
+		arg = 0;
+		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
 			perror("PIOCRUN");
 			exit(1);
 		}
@@ -1656,3 +1706,23 @@ struct tcb *tcp;
 	tprintf("\n");
 	tcp_last = NULL;
 }
+
+#ifdef SVR4_MP
+
+int mp_ioctl (int fd, int cmd, void *arg, int size) {
+
+	struct iovec iov[2];
+	int n = 1;
+	
+	iov[0].iov_base = &cmd;
+	iov[0].iov_len = sizeof cmd;
+	if (arg) {
+		++n;
+		iov[1].iov_base = arg;
+		iov[1].iov_len = size;
+	}
+	
+	return writev (fd, iov, n);
+}
+
+#endif

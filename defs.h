@@ -77,6 +77,9 @@
 
 #ifdef SVR4
 #include <sys/procfs.h>
+#ifdef SVR4_MP
+#include <sys/uio.h>
+#endif
 #else /* !SVR4 */
 #if defined(LINUXSPARC) && defined(__GLIBC__)
 #include <sys/ptrace.h>
@@ -131,6 +134,41 @@ extern int ptrace();
 #define SUPPORTED_PERSONALITIES 2
 #endif /* LINUXSPARC */
 
+
+#ifdef SVR4
+#ifdef SVR4_MP
+extern int mp_ioctl (int f, int c, void *a, int s);
+#define IOCTL(f,c,a)	mp_ioctl (f, c, a, sizeof *a)
+#define IOCTL_STATUS(t) \
+	 pread (t->pfd_stat, &t->status, sizeof t->status, 0)
+#define IOCTL_WSTOP(t)						\
+	(IOCTL (t->pfd, PCWSTOP, NULL) < 0 ? -1 :		\
+	 IOCTL_STATUS (t))
+#define PR_WHY		pr_lwp.pr_why
+#define PR_WHAT		pr_lwp.pr_what
+#define PR_REG		pr_lwp.pr_context.uc_mcontext.gregs
+#define PR_FLAGS	pr_lwp.pr_flags
+#define PIOCSTIP	PCSTOP
+#define PIOCSET		PCSET
+#define PIOCRESET	PCRESET
+#define PIOCSTRACE	PCSTRACE
+#define PIOCSFAULT	PCSFAULT
+#define PIOCWSTOP	PCWSTOP
+#define PIOCSTOP	PCSTOP
+#define PIOCSENTRY	PCSENTRY
+#define PIOCSEXIT	PCSEXIT
+#define PIOCRUN		PCRUN
+#else
+#define IOCTL		ioctl
+#define IOCTL_STATUS(t)	ioctl (t->pfd, PIOCSTATUS, &t->status)
+#define IOCTL_WSTOP(t)	ioctl (t->pfd, PIOCWSTOP, &t->status)	
+#define PR_WHY		pr_why
+#define PR_WHAT		pr_what
+#define PR_REG		pr_reg
+#define PR_FLAGS	pr_flags
+#endif
+#endif
+
 /* Trace Control Block */
 struct tcb {
 	short flags;		/* See below for TCB_ values */
@@ -154,7 +192,13 @@ struct tcb {
 	long inst[2];		/* Instructions on above */
 	int pfd;		/* proc file descriptor */
 #ifdef SVR4
+#ifdef SVR4_MP
+	int pfd_stat;
+	int pfd_as;
+	pstatus_t status;
+#else
 	prstatus_t status;	/* procfs status structure */
+#endif
 #endif
 };
 

@@ -38,6 +38,10 @@
 #include <sys/syscall.h>
 #include <sys/param.h>
 
+#if defined(LINUX) && defined(SPARC)
+#include <asm/reg.h>
+#endif
+
 #ifdef HAVE_SYS_REG_H
 #include <sys/reg.h>
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
@@ -579,7 +583,7 @@ struct tcb *tcp;
 	long r0;
 	long a3;
 #elif defined (SPARC)
-	struct pt_regs regs;
+	struct regs regs;
 	unsigned long trap;
 #endif 
 #endif /* LINUX */
@@ -650,14 +654,11 @@ struct tcb *tcp;
 	if (ptrace(PTRACE_GETREGS,pid,(char *)&regs,0) < 0)
 		return -1;
 
-	memmove (&regs.u_regs [1], &regs.u_regs [0],
-		 sizeof (regs.u_regs) - sizeof (regs.u_regs [0]));
-
         /* If we are entering, then disassemble the syscall trap. */
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Retrieve the syscall trap instruction. */
 		errno = 0;
-		trap = ptrace(PTRACE_PEEKTEXT,pid,(char *)regs.pc,0);
+		trap = ptrace(PTRACE_PEEKTEXT,pid,(char *)regs.r_pc,0);
 		if (errno)
 			return -1;
 
@@ -693,7 +694,7 @@ struct tcb *tcp;
 				tcp->flags &= ~TCB_WAITEXECVE;
 				return 0;
 			}
-			fprintf(stderr,"syscall: unknown syscall trap %08x %08x\n", trap, regs.pc);
+			fprintf(stderr,"syscall: unknown syscall trap %08x %08x\n", trap, regs.r_pc);
 			return -1;
 		}
 
@@ -701,10 +702,10 @@ struct tcb *tcp;
 		if (trap == 0x91d02027)
 			scno = 156;
 		else
-			scno = regs.u_regs[UREG_G1];
+			scno = regs.r_g1;
 		if (scno == 0) {
-			scno = regs.u_regs[UREG_I0];
-			memmove (&regs.u_regs[UREG_I0], &regs.u_regs[UREG_I1], 7*sizeof(regs.u_regs[0]));
+			scno = regs.r_o0;
+			memmove (&regs.r_o0, &regs.r_o1, 7*sizeof(regs.r_o0));
 		}
 	}
 #endif 
@@ -717,10 +718,10 @@ struct tcb *tcp;
 #ifdef HAVE_PR_SYSCALL
 	scno = tcp->status.pr_syscall;
 #else /* !HAVE_PR_SYSCALL */
-	scno = tcp->status.pr_what;
+	scno = tcp->status.PR_WHAT;
 #endif /* !HAVE_PR_SYSCALL */
 	if (!(tcp->flags & TCB_INSYSCALL)) {
-		if (tcp->status.pr_why != PR_SYSENTRY) {
+		if (tcp->status.PR_WHY != PR_SYSENTRY) {
 			if (
 			    scno == SYS_fork
 #ifdef SYS_vfork
@@ -728,9 +729,9 @@ struct tcb *tcp;
 #endif /* SYS_vfork */
 			    ) {
 				/* We are returning in the child, fake it. */
-				tcp->status.pr_why = PR_SYSENTRY;
+				tcp->status.PR_WHY = PR_SYSENTRY;
 				trace_syscall(tcp);
-				tcp->status.pr_why = PR_SYSEXIT;
+				tcp->status.PR_WHY = PR_SYSEXIT;
 			}
 			else {
 				fprintf(stderr, "syscall: missing entry\n");
@@ -739,7 +740,7 @@ struct tcb *tcp;
 		}
 	}
 	else {
-		if (tcp->status.pr_why != PR_SYSEXIT) {
+		if (tcp->status.PR_WHY != PR_SYSEXIT) {
 			fprintf(stderr, "syscall: missing exit\n");
 			tcp->flags &= ~TCB_INSYSCALL;
 		}
@@ -858,12 +859,12 @@ struct tcb *tcp;
 		}
 #else /* !ALPHA */
 #ifdef SPARC
-		if (regs.psr & PSR_C) {
+		if (regs.r_psr & PSR_C) {
 			tcp->u_rval = -1;
-			u_error = regs.u_regs[UREG_I0];
+			u_error = regs.r_o0;
 		}
 		else {
-			tcp->u_rval = regs.u_regs[UREG_I0];
+			tcp->u_rval = regs.r_o0;
 			u_error = 0;
 		}
 #endif /* SPARC */
@@ -897,12 +898,12 @@ struct tcb *tcp;
 #endif /* SPARC */
 #ifdef I386
 		/* Wanna know how to kill an hour single-stepping? */
-		if (tcp->status.pr_reg[EFL] & 0x1) {
+		if (tcp->status.PR_REG[EFL] & 0x1) {
 			tcp->u_rval = -1;
-			u_error = tcp->status.pr_reg[EAX];
+			u_error = tcp->status.PR_REG[EAX];
 		}
 		else {
-			tcp->u_rval = tcp->status.pr_reg[EAX];
+			tcp->u_rval = tcp->status.PR_REG[EAX];
 			u_error = 0;
 		}
 #endif /* I386 */
@@ -1074,12 +1075,11 @@ struct tcb *tcp;
 	}
 #elif defined (SPARC)
 	{
-		int i, offset;
+		int i;
 	         
-	        offset = UREG_I0;
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 		for (i = 0; i < tcp->u_nargs; i++)
-			tcp->u_arg[i] = regs.u_regs[offset + i];
+			tcp->u_arg[i] = *((&regs.r_o0) + i);
 	}
 #else 
 	{
@@ -1141,8 +1141,12 @@ struct tcb *tcp;
 	if (sysent[tcp->scno].nargs != -1)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
+#if UNIXWARE >= 2
+		tcp->u_nargs = tcp->status.pr_lwp.pr_nsysarg;
+#else
 		tcp->u_nargs = 5;
-	umoven(tcp, tcp->status.pr_reg[UESP] + 4,
+#endif
+	umoven(tcp, tcp->status.PR_REG[UESP] + 4,
 		tcp->u_nargs*sizeof(tcp->u_arg[0]), (char *) tcp->u_arg);
 #endif /* I386 */
 #endif /* !HAVE_PR_SYSCALL */
@@ -1292,10 +1296,10 @@ struct tcb *tcp;
 
 #ifdef LINUX
 #ifdef SPARC
-	struct pt_regs regs;
+	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
-	val = regs.u_regs[UREG_I1];
+	val = regs.r_o1;
 #endif /* SPARC */
 #endif /* LINUX */
 
@@ -1306,13 +1310,13 @@ struct tcb *tcp;
 
 #ifdef SVR4
 #ifdef SPARC
-	val = tcp->status.pr_reg[R_O1];
+	val = tcp->status.PR_REG[R_O1];
 #endif /* SPARC */
 #ifdef I386
-	val = tcp->status.pr_reg[EDX];
+	val = tcp->status.PR_REG[EDX];
 #endif /* I386 */
 #ifdef MIPS
-	val = tcp->status.pr_reg[CTX_V1];
+	val = tcp->status.PR_REG[CTX_V1];
 #endif /* MIPS */
 #endif /* SVR4 */
 
