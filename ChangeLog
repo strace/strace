@@ -1,5 +1,7 @@
 2003-10-21  Roland McGrath  <roland@redhat.com>
 
+	* strace.1: Fixed a few spelling errors.
+
 	* syscall.c: Revert last change, was broken.
 
 2003-10-01  Roland McGrath  <roland@redhat.com>
