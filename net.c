@@ -1425,7 +1425,7 @@ int len;
 }
 
 
-#ifdef HAVE_OPTHDR
+#ifdef HAVE_STRUCT_OPTHDR
 
 void
 print_sock_optmgmt (tcp, addr, len)
