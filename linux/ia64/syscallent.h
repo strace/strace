@@ -1121,17 +1121,17 @@
 	{ 2,	0,	printargs,		"getunwind"	}, /* 1215 */
 	{ 4,	0,	sys_readahead,		"readahead"	}, /* 1216 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 1217 */
-	{ 5,	TF,	sys_lsetxattr,		"lsetxattr"	}, /* 1218 */
-	{ 5,	0,	sys_fxsetattr,		"fsetxattr"	}, /* 1219 */
+	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 1218 */
+	{ 5,	0,	sys_xsetattr,		"fsetxattr"	}, /* 1219 */
 	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 1220 */
-	{ 4,	TF,	sys_lgetxattr,		"lgetxattr"	}, /* 1221 */
-	{ 4,	0,	sys_fgetxattr,		"fgetxattr"	}, /* 1222 */
+	{ 4,	TF,	sys_getxattr,		"lgetxattr"	}, /* 1221 */
+	{ 4,	0,	sys_getxattr,		"fgetxattr"	}, /* 1222 */
 	{ 3,	TF,	sys_listxattr,		"listxattr"	}, /* 1223 */
-	{ 3,	TF,	sys_llistxattr,		"llistxattr"	}, /* 1224 */
-	{ 3,	0,	sys_flistxattr,		"flistxattr"	}, /* 1225 */
+	{ 3,	TF,	sys_listxattr,		"llistxattr"	}, /* 1224 */
+	{ 3,	0,	sys_listxattr,		"flistxattr"	}, /* 1225 */
 	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 1226 */
-	{ 2,	TF,	sys_lremovexattr,	"lremovexattr"	}, /* 1227 */
-	{ 2,	0,	sys_fremovexattr,	"fremovexattr"	}, /* 1228 */
+	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 1227 */
+	{ 2,	0,	sys_removexattr,	"fremovexattr"	}, /* 1228 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 1229 */
 	{ 4,	0,	sys_futex,		"futex"		}, /* 1230 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */
