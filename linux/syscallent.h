@@ -240,9 +240,9 @@
 	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 192 */
 	{ 5,	0,	printargs,		"truncate64"	}, /* 193 */
 	{ 5,	0,	printargs,		"ftruncate64"	}, /* 194 */
-	{ 5,	0,	printargs,		"SYS_195"	}, /* 195 */
-	{ 5,	0,	printargs,		"SYS_196"	}, /* 196 */
-	{ 5,	0,	printargs,		"SYS_197"	}, /* 197 */
+	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
+	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
+	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 197 */
 	{ 5,	0,	printargs,		"SYS_198"	}, /* 198 */
 	{ 5,	0,	printargs,		"SYS_199"	}, /* 199 */
 
