@@ -44,6 +44,7 @@
 #else
 #define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
 #endif
+#endif
 #ifndef MAX_PROCS
 #define MAX_PROCS	64	/* maximum number of processes tracable */
 #endif

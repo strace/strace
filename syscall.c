@@ -775,7 +775,8 @@ struct tcb *tcp;
 	scno = tcp->status.PR_WHAT;
 #endif /* !HAVE_PR_SYSCALL */
 #endif
-	tcp->scno = scno;
+	if (!(tcp->flags & TCB_INSYSCALL))
+		tcp->scno = scno;
 	return 1;
 }
 
@@ -1074,10 +1075,14 @@ struct tcb *tcp;
 	}
 #elif defined (IA64)
 	{
-		unsigned long *bsp, i;
+		unsigned long *bsp, cfm, i;
 
 		if (upeek(pid, PT_AR_BSP, (long *) &bsp) < 0)
 			return -1;
+		if (upeek(pid, PT_CFM, (long *) &cfm) < 0)
+			return -1;
+
+		bsp = ia64_rse_skip_regs(bsp, -(cfm & 0x7f));
 
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 		for (i = 0; i < tcp->u_nargs; ++i) {

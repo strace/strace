@@ -4155,7 +4155,7 @@
 	{ 5,	0,	sys_mlock,		"mlock"		}, /* 4154 */
 	{ 5,	0,	sys_munlock,		"munlock"	}, /* 4155 */
 	{ 5,	0,	sys_mlockall,		"mlockall"	}, /* 4156 */
-	{ 5,	0,	sys_munlockall,		"munlockall"	}, /* 4157 */
+	{ 0,	0,	sys_munlockall,		"munlockall"	}, /* 4157 */
 	{ 5,	0,	sys_sched_setparam,	"sched_setparam"}, /* 4158 */
 	{ 5,	0,	sys_sched_getparam,	"sched_getparam"}, /* 4159 */
 	{ 5,	0,	sys_sched_setscheduler,	"sched_setscheduler"}, /* 4160 */

@@ -145,8 +145,43 @@ static struct xlat prctl_options[] = {
 #ifdef PR_GET_PDEATHSIG
 	{ PR_GET_PDEATHSIG,	"PR_GET_PDEATHSIG"	},
 #endif
+#ifdef PR_GET_UNALIGN
+	{ PR_GET_UNALIGN,	"PR_GET_UNALIGN"	},
+#endif
+#ifdef PR_SET_UNALIGN
+	{ PR_SET_UNALIGN,	"PR_SET_UNALIGN"	},
+#endif
+#ifdef PR_GET_KEEPCAPS
+	{ PR_GET_KEEPCAPS,	"PR_GET_KEEP_CAPS"	},
+#endif
+#ifdef PR_SET_KEEPCAPS
+	{ PR_SET_KEEPCAPS,	"PR_SET_KEEP_CAPS"	},
+#endif
 	{ 0,			NULL			},
 };
+
+
+const char *
+unalignctl_string (unsigned int ctl)
+{
+	static char buf[16];
+
+	switch (ctl) {
+#ifdef PR_UNALIGN_NOPRINT
+	      case PR_UNALIGN_NOPRINT:
+		return "NOPRINT";
+#endif
+#ifdef PR_UNALIGN_SIGBUS
+	      case PR_UNALIGN_SIGBUS:
+		return "SIGBUS";
+#endif
+	      default:
+		break;
+	}
+	sprintf(buf, "%x", ctl);
+	return buf;
+}
+
 
 int
 sys_prctl(tcp)
@@ -165,6 +200,16 @@ struct tcb *tcp;
 		case PR_GET_PDEATHSIG:
 			break;
 #endif
+#ifdef PR_SET_UNALIGN
+		case PR_SET_UNALIGN:
+			tprintf(", %s", unalignctl_string(tcp->u_arg[1]));
+			break;
+#endif
+#ifdef PR_GET_UNALIGN
+		case PR_GET_UNALIGN:
+			tprintf(", %#lx", tcp->u_arg[1]);
+			break;
+#endif
 		default:
 			for (i = 1; i < tcp->u_nargs; i++)
 				tprintf(", %#lx", tcp->u_arg[i]);
@@ -177,6 +222,20 @@ struct tcb *tcp;
 			for (i=1; i<tcp->u_nargs; i++)
 				tprintf(", %#lx", tcp->u_arg[i]);
 			break;
+#endif
+#ifdef PR_SET_UNALIGN
+		case PR_SET_UNALIGN:
+			break;
+#endif
+#ifdef PR_GET_UNALIGN
+		case PR_GET_UNALIGN:
+		{
+			int ctl;
+
+			umove(tcp, tcp->u_arg[1], &ctl);
+			tcp->auxstr = unalignctl_string(ctl);
+			return RVAL_STR;
+		}
 #endif
 		default:
 			break;
@@ -393,6 +452,14 @@ int new;
 	return 0;
 #elif defined(M68K)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new)<0)
+	    	return -1;
+	return 0;
+#elif defined(SPARC)
+	struct pt_regs regs;
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char*)&regs, 0)<0)
+		return -1;
+	reg.r_g1=new;
+	if (ptrace(PTRACE_SETREGS, tcp->pid, (char*)&regs, 0)<0)
 	    	return -1;
 	return 0;
 #elif defined(MIPS)

@@ -172,13 +172,16 @@ struct xlat openmodes[] = {
 	{ O_PRIV,	"O_PRIV"	},
 #endif
 #ifdef O_DIRECT
-   { O_DIRECT, "O_DIRECT"  },
+	{ O_DIRECT,	"O_DIRECT"	},
 #endif
 #ifdef O_LARGEFILE
-   { O_LARGEFILE,  "O_LARGEFILE"   },
+	{ O_LARGEFILE,	"O_LARGEFILE"   },
 #endif
 #ifdef O_DIRECTORY
-   { O_DIRECTORY,  "O_DIRECTORY"   },
+	{ O_DIRECTORY,	"O_DIRECTORY"   },
+#endif
+#ifdef O_NOFOLLOW
+	{ O_NOFOLLOW, 	"O_NOFOLLOW"	},
 #endif
 
 #ifdef FNDELAY

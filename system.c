@@ -68,9 +68,7 @@ struct pt_regs;
 #include <asm/cachectl.h>
 #endif
 
-#ifdef LINUX
 #include <linux/sysctl.h>
-#endif
 
 static struct xlat mount_flags[] = {
 	{ MS_RDONLY,	"MS_RDONLY"	},
@@ -155,6 +153,50 @@ struct tcb *tcp;
 {
 	if (entering(tcp))
 		printxval(personality_options, tcp->u_arg[0], "PER_???");
+	return 0;
+}
+
+#include <linux/reboot.h>
+static struct xlat bootflags1[] = {
+	{ LINUX_REBOOT_MAGIC1,	"LINUX_REBOOT_MAGIC1"	},
+	{ 0,			NULL			},
+};
+
+static struct xlat bootflags2[] = {
+	{ LINUX_REBOOT_MAGIC2,	"LINUX_REBOOT_MAGIC2"	},
+	{ LINUX_REBOOT_MAGIC2A,	"LINUX_REBOOT_MAGIC2A"	},
+	{ LINUX_REBOOT_MAGIC2B,	"LINUX_REBOOT_MAGIC2B"	},
+	{ 0,			NULL			},
+};
+
+static struct xlat bootflags3[] = {
+	{ LINUX_REBOOT_CMD_CAD_OFF,	"LINUX_REBOOT_CMD_CAD_OFF"	},
+	{ LINUX_REBOOT_CMD_RESTART,	"LINUX_REBOOT_CMD_RESTART"	},
+	{ LINUX_REBOOT_CMD_HALT,	"LINUX_REBOOT_CMD_HALT"		},
+	{ LINUX_REBOOT_CMD_CAD_ON,	"LINUX_REBOOT_CMD_CAD_ON"	},
+	{ LINUX_REBOOT_CMD_POWER_OFF,	"LINUX_REBOOT_CMD_POWER_OFF"	},
+	{ LINUX_REBOOT_CMD_RESTART2,	"LINUX_REBOOT_CMD_RESTART2"	},
+	{ 0,				NULL				},
+};
+
+int
+sys_reboot(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		if (!printflags(bootflags1, tcp->u_arg[0]))
+			tprintf("LINUX_REBOOT_MAGIC???");
+		tprintf(", ");
+		if (!printflags(bootflags2, tcp->u_arg[1]))
+			tprintf("LINUX_REBOOT_MAGIC???");
+		tprintf(", ");
+		if (!printflags(bootflags3, tcp->u_arg[2]))
+			tprintf("LINUX_REBOOT_CMD_???");
+		if (tcp->u_arg[2] == LINUX_REBOOT_CMD_RESTART2) {
+			tprintf(", ");
+			printstr(tcp, tcp->u_arg[3], -1);
+		}
+	}
 	return 0;
 }
 
@@ -1409,14 +1451,14 @@ struct tcb *tcp;
 			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
 				fprintf(stderr, "sys_capget: no memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return;l
+				return -1;
 			}
 		}
 		if (!arg1) {
 			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
 				fprintf(stderr, "sys_capget: no memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return;
+				return -1;
 			}
 		}
 
@@ -1461,14 +1503,14 @@ struct tcb *tcp;
 			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
 				fprintf(stderr, "sys_capset: no memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return;l
+				return -1;
 			}
 		}
 		if (!arg1) {
 			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
 				fprintf(stderr, "sys_capset: no memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return;
+				return -1;
 			}
 		}
 

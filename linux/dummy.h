@@ -29,7 +29,6 @@
  */
 
 /* still unfinished */
-#define	sys_reboot		printargs
 #define	sys_ioperm		printargs
 #define	sys_syslog		printargs
 #define	sys_iopl		printargs
@@ -205,4 +204,5 @@
 #define	sys_init_module		printargs
 #define	sys_quotactl		printargs
 #define sys_mlockall		printargs
+#define	sys_reboot		printargs
 #endif

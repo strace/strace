@@ -345,7 +345,7 @@
 	{ 2,	0,	sys_mlock,		"mlock"			}, /* 314 */
 	{ 2,	0,	sys_munlock,		"munlock"		}, /* 315 */
 	{ 1,	0,	sys_mlockall,		"mlockall"		}, /* 316 */
-	{ 1,	0,	sys_munlockall,		"munlockall"		}, /* 317 */
+	{ 0,	0,	sys_munlockall,		"munlockall"		}, /* 317 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"		}, /* 318 */
 	{ 1,	0,	sys_sysctl,		"sysctl"		}, /* 319 */
 	{ 0,	0,	sys_idle,		"idle"			}, /* 320 */

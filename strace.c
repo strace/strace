@@ -439,18 +439,19 @@ char *argv[];
 				 * It is important to set groups before we
 				 * lose privileges on setuid.
 				 */
-				if (username != NULL
-				    && initgroups(username, run_gid) < 0) {
-					perror("initgroups");
-					exit(1);
-				}
-				if (setregid(run_gid, run_egid) < 0) {
-					perror("setregid");
-					exit(1);
-				}
-				if (setreuid(run_uid, run_euid) < 0) {
-					perror("setreuid");
-					exit(1);
+				if (username != NULL) {
+					if (initgroups(username, run_gid) < 0) {
+						perror("initgroups");
+						exit(1);
+					}
+					if (setregid(run_gid, run_egid) < 0) {
+						perror("setregid");
+						exit(1);
+					}
+					if (setreuid(run_uid, run_euid) < 0) {
+						perror("setreuid");
+						exit(1);
+					}
 				}
 			}
 			else

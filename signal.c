@@ -752,19 +752,24 @@ struct tcb *tcp;
 	long sp;
 
 	if (entering(tcp)) {
+		/* offset of sigcontext in the kernel's sigframe structure: */
+#		define SIGFRAME_SC_OFFSET	0x90
 		tcp->u_arg[0] = 0;
 		if (upeek(tcp->pid, PT_R12, &sp) < 0)
 			return 0;
-		if (umove(tcp, sp + 16, &sc) < 0)
+		if (umove(tcp, sp + 16 + SIGFRAME_SC_OFFSET, &sc) < 0)
 			return 0;
 		tcp->u_arg[0] = 1;
-		memcpy(tcp->u_arg + 1, &sc.sc_mask, sizeof(tcp->u_arg[1]));
+		memcpy(tcp->u_arg + 1, &sc.sc_mask, sizeof(sc.sc_mask));
 	}
 	else {
+		sigset_t sigm;
+
+		memcpy(&sigm, tcp->u_arg + 1, sizeof (sigm));
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;
-		tcp->auxstr = sprintsigmask("mask now ", tcp->u_arg[1]);
+		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;

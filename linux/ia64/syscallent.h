@@ -198,7 +198,7 @@
 	{ 3,	0,	printargs,		"nfsservctl"	}, /* 169 */
 	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 170 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 171 */
-	{ 5,	0,	printargs,		"prctl"		}, /* 172 */
+	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 173 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"  }, /* 174 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 175 */
@@ -1199,18 +1199,18 @@
 	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 1167 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 1168 */
 	{ 3,	0,	printargs,		"nfsservctl"	}, /* 1169 */
-	{ 5,	0,	printargs,		"prctl"		}, /* 1170 */
+	{ 5,	0,	sys_prctl,		"prctl"		}, /* 1170 */
 	{ 1,	0,	sys_getpagesize,	"getpagesize"	}, /* 1171 */
 	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 1172 */
 	{ 5,	0,	printargs,		"pciconfig_read"}, /* 1173 */
 	{ 5,	0,	printargs,		"pciconfig_write"}, /* 1174 */
-	{ 8,	0,	printargs,		"SYS_1175"	}, /* 1175 */
+	{ 8,	0,	printargs,		"perfmonctl"	}, /* 1175 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 1176 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 1177 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 1178 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 1179 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"}, /* 1180 */
-	{ 0,	TS,	printargs,		"rt_sigreturn"	}, /* 1181 */
+	{ 0,	TS,	sys_sigreturn,		"rt_sigreturn"	}, /* 1181 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 1182 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 1183 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 1184 */
@@ -1237,8 +1237,8 @@
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 1205 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 1206 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 1207 */
-	{ 8,	0,	printargs,		"SYS_1208"	}, /* 1208 */
-	{ 8,	0,	printargs,		"SYS_1209"	}, /* 1209 */
+	{ 3,	0,	printargs,		"mincore"	}, /* 1208 */
+	{ 3,	0,	sys_madvise,		"madvise"	}, /* 1209 */
 	{ 8,	0,	printargs,		"SYS_1210"	}, /* 1210 */
 	{ 8,	0,	printargs,		"SYS_1211"	}, /* 1211 */
 	{ 8,	0,	printargs,		"SYS_1212"	}, /* 1212 */

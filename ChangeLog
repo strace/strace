@@ -1,3 +1,31 @@
+2000-04-26  Wichert Akkerman <wakkerma@debian.org>
+
+  * defs.h: balance #if/#endif again
+  * system.c: fix return statements in sys_capget()
+  * Merge updates from Topi Miettinen <Topi.Miettinen@nic.fi>:
+    + file.c: add F_[SG]ETSIG to fcntl flags
+    + strace.c: don't setre[gu]id if not needed
+    + system.c: handle sys_reboot for Linux
+    + term.c: add baudrate constants up to B4000000
+    + linux/**/syscallent.h: note that munlockall has no arguments
+
+2000-04-25  David Mosberger  <davidm@hpl.hp.com>
+
+  * CREDITS: fix email address
+  * process.c: handle PR_[GS]ET_UNALIGN and PR_[GS]ET_KEEPCAPS
+  * signal.c: honour offset of sigconfig in sigframe structure for
+    Linux/ia64
+  * linux/ia64/syscallent.h: Add perfmonctl, pivotroot, mincore, and
+    madvise syscalls.
+  * syscall.c (syscall_enter): With Kevin's latest ptrace patches,
+    AR_BSP points to the _end_ of the active register frame, so we need
+    to adjust bsp by moving it back by the size of the active frame
+    before using it.
+
+2000-04-24  Wichert Akkerman <wakkerma@debian.org>
+
+  * process.c: add sparc support to change_syscall
+
 2000-04-22  Wichert Akkerman <wakkerma@debian.org>
 
   * linux/mips/syscallent.h: fix some typos
@@ -51,7 +79,7 @@
 
 2000-02-03 Wichert Akkerman <wakkerma@debian.org>
 
-  * Merge Trillian (ia64) patches
+  * Merge Linux/ia64 patches
 
 2000-01-02 Pavel Machek	     <pavel@ucw.cz>
 

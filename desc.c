@@ -58,6 +58,12 @@ static struct xlat fcntlcmds[] = {
 #ifdef F_CNVT
 	{ F_CNVT,	"F_CNVT"	},
 #endif
+#ifdef F_SETSIG
+	{ F_SETSIG,	"F_SETSIG"	},
+#endif
+#ifdef F_GETSIG
+	{ F_GETSIG,	"F_GETSIG"	},
+#endif
 	{ 0,		NULL		},
 };
 

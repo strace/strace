@@ -231,8 +231,8 @@ struct tcb *tcp;
 #ifdef LINUX
 
 static struct xlat mremap_flags[] = {
-	{ MREMAP_MAYMOVE, "MREMAP_MAYMOVE" },
-	{ 0,		NULL		}
+	{ MREMAP_MAYMOVE,	"MREMAP_MAYMOVE"	},
+	{ 0,			NULL			}
 };
 
 int
