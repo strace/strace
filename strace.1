@@ -236,9 +236,10 @@ option is in effect, each processes trace is written to
 where pid is the numeric process id of each process.
 .TP
 .B \-F
-On SunOS 4.x, this option has the effect of attempting to follow
-vforks by performing some dynamic linking trickery.  Otherwise,
-vforks will not be followed even if
+Attempt to follow vforks.  (On SunOS 4.x, this is accomplished with
+some dynamic linking trickery.  On Linux, it requires some kernel
+functionality not yet in the standard kernel.)  Otherwise, vforks will
+not be followed even if
 .B \-f
 has been given.
 .TP

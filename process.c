@@ -285,13 +285,24 @@ struct tcb *tcp;
 {
 	struct tcb *tcpchild;
 	int pid;
-	int vforking = 0;
+	int dont_follow = 0;
 
 #ifdef SYS_vfork
-	vforking = (tcp->scno == SYS_vfork);
+	if (tcp->scno == SYS_vfork) {
+#if defined(I386) && defined(LINUX)
+		/* Attempt to make vfork into fork, which we can follow. */
+		if (!followvfork || 
+		    ptrace(PTRACE_POKEUSR, tcp->pid, 
+			   (void *)(ORIG_EAX * 4), SYS_fork) < 0) 
+			dont_follow = 1;
+		
+#else
+		dont_follow = 1;
+#endif
+	}
 #endif
 	if (entering(tcp)) {
-		if (!followfork || vforking)
+		if (!followfork || dont_follow)
 			return 0;
 		if (nprocs == MAX_PROCS) {
 			tcp->flags &= ~TCB_FOLLOWFORK;
