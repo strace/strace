@@ -476,6 +476,9 @@ extern int term_ioctl P((struct tcb *, long, long));
 extern int sock_ioctl P((struct tcb *, long, long));
 extern int proc_ioctl P((struct tcb *, int, int));
 extern int stream_ioctl P((struct tcb *, int, int));
+#ifdef LINUX
+extern int rtc_ioctl P((struct tcb *, long, long));
+#endif
 
 extern void tv_tv P((struct timeval *, int, int));
 extern int tv_nz P((struct timeval *));

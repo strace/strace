@@ -149,6 +149,10 @@ long code, arg;
 	case 'S':
 		return stream_ioctl(tcp, code, arg);
 #endif /* HAVE_SYS_STREAM_H */
+#ifdef LINUX
+	case 'p':
+		return rtc_ioctl(tcp, code, arg);
+#endif
 	default:
 		break;
 	}
