@@ -1,5 +1,10 @@
 2004-12-20  Dmitry V. Levin  <ldv@altlinux.org>
 
+	* configure.ac: Use AC_GNU_SOURCE macro instead of changing CFLAGS.
+	* defs.h [HAVE_CONFIG_H]: Include config.h first.
+	* strace.c: Include "defs.h" first.
+	Fixes RH#143370.
+
 	* syscall.c (call_summary): Fix potential NULL dereference.
 	Fixes RH#143369.
 
