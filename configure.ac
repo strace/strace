@@ -167,7 +167,7 @@ AC_TYPE_UID_T
 AC_TYPE_MODE_T
 AC_TYPE_GETGROUPS
 AC_HEADER_MAJOR
-AC_CHECK_TYPES([sig_atomic_t. siginfo_t],,, [#include <signal.h>])
+AC_CHECK_TYPES([sig_atomic_t, siginfo_t],,, [#include <signal.h>])
 AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,, [#include <netinet/in.h])
 AC_CHECK_TYPES([long long])
 AC_LITTLE_ENDIAN_LONG_LONG
