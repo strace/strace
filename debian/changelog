@@ -1,9 +1,15 @@
-strace (4.4.97-1) unstable; urgency=low
+strace (4.4.98-1) unstable; urgency=low
 
   * New upstream version.
     + Fixes clone argument bugs.
     + Fixes sem* printing bugs.
     + Fixes -e argument parsing, closes: #188379.
+    + Fixes hanging parent in odd wait cases, closes: #47608, #109656.
+    + Fixes -q defaulting, closes: #47113, #153678.
+    + Fixes trying to execute directories, closes: #137103.
+    + Updates ARM support, thanks to Russell King.
+    + Updates S390/S390x support.
+  * Bump standards-version to 3.5.10
 
  -- Roland McGrath <frob@debian.org>  Mon,  2 Jun 2003 12:26:29 -0700
 
