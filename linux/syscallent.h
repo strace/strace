@@ -319,17 +319,17 @@
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 270 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 271 */
 	{ 6,	TF,	sys_fadvise64_64,	"fadvise64_64"	}, /* 272 */
-	{ 5,	0,	printargs,		"SYS_273"	}, /* 273 */
-	{ 5,	0,	printargs,		"SYS_274"	}, /* 274 */
-	{ 5,	0,	printargs,		"SYS_275"	}, /* 275 */
-	{ 5,	0,	printargs,		"SYS_276"	}, /* 276 */
+	{ 5,	0,	printargs,		"vserver"	}, /* 273 */
+	{ 6,	0,	sys_mbind,		"mbind"		}, /* 274 */
+	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 275 */
+	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"	}, /* 276 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 277 */
 	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 278 */
 	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 279 */
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 280 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 281 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 282 */
-	{ 5,	0,	printargs,		"SYS_283"	}, /* 283 */
+	{ 5,	0,	printargs,		"sys_kexec_load" }, /* 283 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 284 */
 	{ 5,	0,	printargs,		"SYS_285"	}, /* 285 */
 	{ 5,	0,	printargs,		"SYS_286"	}, /* 286 */

@@ -219,7 +219,7 @@
 	{ 5,	0,	printargs,		"SYS_218"	}, /* 218 */
 	{ 5,	0,	printargs,		"SYS_219"	}, /* 219 */
 	{ 5,	0,	printargs,		"SYS_220"	}, /* 220 */
-	{ 5,	0,	printargs,		"SYS_221"	}, /* 221 */
+	{ 5,	0,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
 	{ 5,	0,	printargs,		"SYS_222"	}, /* 222 */
 	{ 5,	0,	printargs,		"SYS_223"	}, /* 223 */
 	{ 5,	0,	printargs,		"SYS_224"	}, /* 224 */
@@ -249,9 +249,9 @@
 	{ 5,	0,	printargs,		"tgkill"	}, /* 234 */
 	{ 5,	0,	printargs,		"utimes"	}, /* 235 */
 	{ 5,	0,	printargs,		"vserver"	}, /* 236 */
-	{ 5,	0,	printargs,		"mbind"		}, /* 237 */
-	{ 5,	0,	printargs,		"set_mempolicy"	}, /* 238 */
-	{ 5,	0,	printargs,		"get_mempolicy"	}, /* 239 */
+	{ 6,	0,	sys_mbind,		"mbind"		}, /* 237 */
+	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"	}, /* 238 */
+	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 239 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 240 */
 	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 241 */
 	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 242 */

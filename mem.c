@@ -657,4 +657,112 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+
+#define MPOL_DEFAULT    0
+#define MPOL_PREFERRED  1
+#define MPOL_BIND       2
+#define MPOL_INTERLEAVE 3
+
+#define MPOL_F_NODE     (1<<0)
+#define MPOL_F_ADDR     (1<<1)
+
+#define MPOL_MF_STRICT  (1<<0)
+
+
+static const struct xlat policies[] = {
+	{ MPOL_DEFAULT,		"MPOL_DEFAULT"		},
+	{ MPOL_PREFERRED,	"MPOL_PREFERRED"	},
+	{ MPOL_BIND,		"MPOL_BIND"		},
+	{ MPOL_INTERLEAVE,	"MPOL_INTERLEAVE"	},
+	{ 0,			NULL			}
+};
+
+static const struct xlat mbindflags[] = {
+	{ MPOL_MF_STRICT,	"MPOL_MF_STRICT"	},
+	{ 0,			NULL			}
+};
+
+static const struct xlat mempolicyflags[] = {
+	{ MPOL_F_NODE,		"MPOL_F_NODE"		},
+	{ MPOL_F_ADDR,		"MPOL_F_ADDR"		},
+	{ 0,			NULL			}
+};
+
+
+static void
+get_nodes(tcp, ptr, maxnodes, err)
+struct tcb *tcp;
+unsigned long ptr;
+unsigned long maxnodes;
+int err;
+{
+	int nlongs = (maxnodes + 8 * sizeof(long) - 1) / (8 * sizeof(long));
+	if (err || !abbrev(tcp) || nlongs > getpagesize() / sizeof(long)
+	    || nlongs == 0) {
+		long buf[nlongs];
+		if (umoven(tcp, ptr, nlongs * sizeof(long),
+			   (char *) buf) < 0)
+			tprintf(", %lx", ptr);
+		else {
+			int i;
+			tprintf(", {");
+			for (i = 0; i < nlongs; ++i) {
+				if (i > 0)
+					tprintf(", ");
+				tprintf("%#0*lx", (int) sizeof(long) * 2 + 2,
+					buf[i]);
+			}
+			tprintf("}");
+		}
+	} else
+		tprintf(", %lx", ptr);
+	tprintf(", %lu", maxnodes);
+}
+
+int
+sys_mbind(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printxval(policies, tcp->u_arg[2], "MPOL_???");
+		get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[4], 0);
+		tprintf(", ");
+		if (printflags(mbindflags, tcp->u_arg[5]) == 0)
+			tprintf("0");
+	}
+	return 0;
+}
+
+int
+sys_set_mempolicy(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printxval(policies, tcp->u_arg[0], "MPOL_???");
+		get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], 0);
+	}
+	return 0;
+}
+
+int
+sys_get_mempolicy(tcp)
+struct tcb *tcp;
+{
+	if (exiting(tcp)) {
+		int pol;
+		if (tcp->u_arg[0] == 0)
+			tprintf("NULL");
+		else if (syserror(tcp) || umove(tcp, tcp->u_arg[0], &pol) < 0)
+			tprintf("%#lx", tcp->u_arg[0]);
+		else
+			printxval(policies, pol, "MPOL_???");
+		get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], syserror(tcp));
+		tprintf(", %#lx, ", tcp->u_arg[3]);
+		if (printflags(mempolicyflags, tcp->u_arg[4]) == 0)
+			tprintf("0");
+	}
+	return 0;
+}
 #endif

@@ -98,6 +98,7 @@ int sys_mq_open(), sys_mq_timedsend(), sys_mq_timedreceive();
 int sys_mq_notify(), sys_mq_getsetattr();
 int sys_epoll_create(), sys_epoll_ctl(), sys_epoll_wait();
 int sys_waitid(), sys_fadvise64(), sys_fadvise64_64();
+int sys_mbind(), sys_get_mempolicy(), sys_set_mempolicy();
 
 /* sys_socketcall subcalls */
 
