@@ -29,8 +29,8 @@ ioctlent.h: ioctlsort
 ioctlsort: ioctlsort.o
 	$(CC) $(LDFLAGS) ioctlsort.o -o ioctlsort
 
-ioctlsort.o: ioctlsort.c ioctdefs.h ioctls.h
-	$(CC) $(WARNFLAGS) $(DEFS) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $(srcdir)/../ioctlsort.c
+ioctlsort.o: ioctlsort.c ioctldefs.h ioctls.h
+	$(CC) $(WARNFLAGS) $(DEFS) $(CPPFLAGS) $(INCLUDES) $(CFLAGS) -c $<
 
 ioctldefs.h ioctls.h: ioctlent.sh
 	sh ioctlent.sh
