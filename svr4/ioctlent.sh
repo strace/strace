@@ -32,13 +32,13 @@ then
 	exit 1
 fi
 
-bad_includes='cg[48]var\.h'
+bad_includes='cg[48]var\.h|sys/spad\.h'
 bad_defines='cg[48]var\.h|READSLICE|I_E_RECVFD|FBIOGPIXRECT|JTIMO|TTYTYPE|TIOCCONS|TCL_LINK|TCL_UNLINK'
 
 (
 	cd $1 || exit
 	find sys -name '*.h' -print |
-		xargs grep '^[	 ]*#[	 ]*define[	 ][ 	]*[A-Z_][A-Za-z0-9_]*[ 	][	 ]*([A-Za-z_][A-Za-z0-9_]*|[0-9][0-9]*)' /dev/null |
+		xargs grep '^[	 ]*#[	 ]*define[	 ][ 	]*[A-Z_][A-Za-z0-9_]*[ 	][	 ]*( *[A-Za-z_][A-Za-z0-9_]* *| *[0-9][0-9]* *)' /dev/null |
 		sed 's/\(.*\):#[ 	]*define[ 	]*\([A-Z_][A-Za-z0-9_]*\)[ 	]*\(([^)]*)\)[ 	]*\(.*\)/	{ "\1",	"\2",	\2	},	\4 \/**\//'
 ) >ioctlent.tmp
 cat ioctlent.tmp |

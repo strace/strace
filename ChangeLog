@@ -1,5 +1,9 @@
 2002-05-17  John Hughes <john@calva.com>
 
+	* svr4/ioctlent.sh: Some defines on UW come with too many spaces.
+
+2002-05-17  John Hughes <john@calva.com>
+
 	* svr4/ioctlent.sh: Cope with #defines wrapped in #ifdefs.
 
 2002-05-17  John Hughes <john@calva.com>
