@@ -1190,6 +1190,160 @@ struct tcb *tcp;
 
 #else /* !MIPS */
 
+#if UNIXWARE
+
+#include <sys/types.h>
+#include <sys/fstyp.h>
+#include <sys/mount.h>
+#include <sys/xti.h>
+
+#define NFSCLIENT	1
+#include <nfs/mount.h>
+
+#include <sys/fs/vx_ioctl.h>
+
+static struct xlat mount_flags[] = {
+	{ MS_RDONLY,	"MS_RDONLY"	},
+	{ MS_FSS,	"MS_FSS"	},
+	{ MS_DATA,	"MS_DATA"	},
+	{ MS_HADBAD,	"MS_HADBAD"	},
+	{ MS_NOSUID,	"MS_NOSUID"	},
+	{ MS_REMOUNT,	"MS_REMOUNT"	},
+	{ MS_NOTRUNC,	"MS_NOTRUNC"	},
+	{ MS_SOFTMNT,	"MS_SOFTMNT"	},
+	{ MS_SYSSPACE,	"MS_SYSSPACE"	},
+	{ 0,		NULL		},
+};
+
+#ifdef VX_MS_MASK
+static struct xlat vxfs_flags[] = {
+	{ VX_MS_NOLOG,		"VX_MS_NOLOG"		},
+	{ VX_MS_BLKCLEAR,	"VX_MS_BLKCLEAR"	},
+	{ VX_MS_SNAPSHOT,	"VX_MS_SNAPSHOT"	},
+	{ VX_MS_NODATAINLOG,	"VX_MS_NODATAINLOG"	},
+	{ VX_MS_DELAYLOG,	"VX_MS_DELAYLOG"	},
+	{ VX_MS_TMPLOG,		"VX_MS_TMPLOG"		},
+	{ VX_MS_FILESET,	"VX_MS_FILESET"		},
+
+	{ VX_MS_CACHE_DIRECT,	"VX_MS_CACHE_DIRECT"	},
+	{ VX_MS_CACHE_DSYNC,	"VX_MS_CACHE_DSYNC"	},
+	{ VX_MS_CACHE_CLOSESYNC,"VX_MS_CACHE_CLOSESYNC"	},
+	{ VX_MS_CACHE_TMPCACHE,	"VX_MS_CACHE_TMPCACHE"	},
+
+	{ VX_MS_OSYNC_DIRECT,	"VX_MS_OSYNC_DIRECT"	},
+	{ VX_MS_OSYNC_DSYNC,	"VX_MS_OSYNC_DSYNC"	},
+	{ VX_MS_OSYNC_CLOSESYNC,"VX_MS_OSYNC_CLOSESYNC"	},
+	{ VX_MS_OSYNC_DELAY,	"VX_MS_OSYNC_DELAY"	},
+	{ 0,			NULL,			},
+};
+#endif
+
+static struct xlat nfs_flags[] = {
+	{ NFSMNT_SOFT,		"NFSMNT_SOFT"		},
+	{ NFSMNT_WSIZE,		"NFSMNT_WSIZE"		},
+	{ NFSMNT_RSIZE,		"NFSMNT_RSIZE"		},
+	{ NFSMNT_TIMEO,		"NFSMNT_TIMEO"		},
+	{ NFSMNT_RETRANS,	"NFSMNT_RETRANS"	},
+	{ NFSMNT_HOSTNAME,	"NFSMNT_HOSTNAME"	},
+	{ NFSMNT_INT,		"NFSMNT_INT"		},
+	{ NFSMNT_NOAC,		"NFSMNT_NOAC"		},
+	{ NFSMNT_ACREGMIN,	"NFSMNT_ACREGMIN"	},
+	{ NFSMNT_ACREGMAX,	"NFSMNT_ACREGMAX"	},
+	{ NFSMNT_ACDIRMIN,	"NFSMNT_ACDIRMIN"	},
+	{ NFSMNT_ACDIRMAX,	"NFSMNT_ACDIRMAX"	},
+	{ NFSMNT_SECURE,	"NFSMNT_SECURE"		},
+	{ NFSMNT_NOCTO,		"NFSMNT_NOCTO"		},
+	{ NFSMNT_GRPID,		"NFSMNT_GRPID"		},
+	{ NFSMNT_RPCTIMESYNC,	"NFSMNT_RPCTIMESYNC"	},
+	{ NFSMNT_LWPSMAX,	"NFSMNT_LWPSMAX"	},
+	{ 0,			NULL			},
+};
+
+int
+sys_mount(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		char fstyp [FSTYPSZ];
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		printpath(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+		printflags(mount_flags, tcp->u_arg[2]);
+		/* The doc sez that the file system type is given as a
+		   fsindex, and we should use sysfs to work out the name.
+		   This appears to be untrue for UW.  Maybe it's untrue
+		   for all SVR4's? */
+		if (tcp->u_arg[2] & (MS_FSS | MS_DATA)) {
+			if (umovestr(tcp, tcp->u_arg[3], FSTYPSZ, fstyp) < 0) {
+				*fstyp = 0;
+				tprintf(", %ld", tcp->u_arg[3]);
+			}
+			else
+				tprintf(", \"%s\"", fstyp);
+		}
+		if (tcp->u_arg[2] & MS_DATA) {
+			tprintf(", ");
+#ifdef VX_MS_MASK
+			/* On UW7 they don't give us the defines and structs
+			   we need to see what is going on.  Bummer. */
+			if (strcmp (fstyp, "vxfs") == 0) {
+				struct vx_mountargs5 args;
+				if (umove(tcp, tcp->u_arg[4], &args) < 0)
+					tprintf("%#lx", tcp->u_arg[4]);
+				else {
+					tprintf("{ flags=");
+					if (!printflags(vxfs_flags, args.mflags))
+						tprintf("0x%08x", args.mflags);
+					if (args.mflags & VX_MS_SNAPSHOT) {
+						tprintf (", snapof=");
+						printstr (tcp,
+							  (long) args.primaryspec, 
+							  -1);
+						if (args.snapsize > 0)
+							tprintf (", snapsize=%ld", args.snapsize);
+					}
+					tprintf(" }");
+				}
+			}
+			else
+#endif
+			if (strcmp (fstyp, "specfs") == 0) {
+				tprintf ("dev=");
+				printstr (tcp, tcp->u_arg[4], -1);
+			}
+			else
+			if (strcmp (fstyp, "nfs") == 0) {
+				struct nfs_args args;
+				if (umove(tcp, tcp->u_arg[4], &args) < 0)
+					tprintf("%#lx", tcp->u_arg[4]);
+				else {
+					struct netbuf addr;
+					tprintf("{ addr=");
+					if (umove (tcp, (int) args.addr, &addr) < 0) {
+						tprintf ("%#lx", (long) args.addr);
+					}
+					else {
+						printsock(tcp, (int) addr.buf, addr.len);
+					}
+					tprintf(", flags=");
+					if (!printflags(nfs_flags, args.flags))
+						tprintf("NFSMNT_???");
+					tprintf(", hostname=");
+					printstr(tcp, (int) args.hostname, -1);
+					tprintf(", ...}");
+				}
+			}
+			else
+				tprintf("%#lx", tcp->u_arg[4]);
+			tprintf(", %ld", tcp->u_arg[5]);
+		}
+	}
+	return 0;
+}
+
+#else /* !UNIXWARE */
+
 int
 sys_mount(tcp)
 struct tcb *tcp;
@@ -1202,6 +1356,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* !SVR4_MP */
 
 #endif /* !MIPS */
 
