@@ -7,3 +7,4 @@ config.log
 Makefile
 tags
 strace
+autom4te.cache
