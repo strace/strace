@@ -431,12 +431,19 @@ sys_llseek (tcp)
 struct tcb *tcp;
 {
     if (entering(tcp)) {
+	/*
+	 * This one call takes explicitly two 32-bit arguments hi, lo,
+	 * rather than one 64-bit argument for which LONG_LONG works
+	 * appropriate for the native byte order.
+	 */
 	if (tcp->u_arg[4] == SEEK_SET)
 	    tprintf("%ld, %llu, ", tcp->u_arg[0],
-		    LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]));
+		    (((long long int) tcp->u_arg[1]) << 32
+		     | (unsigned long long) (unsigned) tcp->u_arg[2]));
 	else
 	    tprintf("%ld, %lld, ", tcp->u_arg[0],
-		    LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]));
+		    (((long long int) tcp->u_arg[1]) << 32
+		     | (unsigned long long) (unsigned) tcp->u_arg[2]));
     }
     else {
 	long long int off;
