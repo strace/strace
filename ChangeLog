@@ -1,5 +1,8 @@
 2002-12-17  Roland McGrath  <roland@redhat.com>
 
+	* linux/ia64/syscallent.h: Remove placeholders 275-298 to catch up
+	with linux/syscallent.h additions.
+
 	* strace.c (tcbtab): Make this a pointer to pointers, not an array.
 	(tcbtabsize): New variable.
 	(main): Initialize them using dynamic allocation.

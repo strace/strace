@@ -1,10 +1,13 @@
 Changes in CVS (not yet released)
 ==============
-* New port to AMD's x86-64 architecture. One strace binary can 
+* New port to AMD's x86-64 architecture. One strace binary can
   handle both new x86-64 and old i386 processes.
 * Fixed support for LFS64 calls.
 * New switch (-z) for printing only non-failing syscalls.
 * Merged s390/s390x port.
+* Trace an unbounded number of processes.
+* Handle numerous new system calls in Linux 2.5.
+* Fixed bugs with attach/detach leaving things stopped.
 
 Changes in 4.4
 ==============
@@ -30,7 +33,7 @@ Changes in 4.2
 ==============
 * Compiles on glibc2.0 systems again
 * Linux/S390 port added
-* The usual Linux syscall updates 
+* The usual Linux syscall updates
 * we can follow fork on arm now
 
 Changes in 4.1
