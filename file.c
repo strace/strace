@@ -106,8 +106,10 @@ struct stat {
 #    define loff_t loff_t
 #  endif
 #  define stat libc_stat
+#  define stat64 libc_stat64
 #  include <sys/stat.h>
 #  undef stat
+#  undef stat64
 #else
 #  include <sys/stat.h>
 #endif
