@@ -33,6 +33,7 @@
 
 #ifdef LINUX
 #define _LINUX_SOCKET_H
+#define _LINUX_FS_H
 
 #define MS_RDONLY   1  /* Mount read-only */
 #define MS_NOSUID   2  /* Ignore suid and sgid bits */
