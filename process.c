@@ -532,12 +532,12 @@ extern void print_ldt_entry();
 #  define ARG_PTID	(tcp->scno == SYS_clone2 ? 3 : 2)
 #  define ARG_CTID	(tcp->scno == SYS_clone2 ? 4 : 3)
 #  define ARG_TLS	(tcp->scno == SYS_clone2 ? 5 : 4)
-# elif defined S390
+# elif defined S390 || defined S390X
 #  define ARG_STACK	0
 #  define ARG_FLAGS	1
 #  define ARG_PTID	2
-#  define ARG_TLS	3
-#  define ARG_CTID	4
+#  define ARG_CTID	3
+#  define ARG_TLS	4
 # elif defined X86_64
 #  define ARG_FLAGS	0
 #  define ARG_STACK	1
