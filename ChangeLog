@@ -1,5 +1,9 @@
 2005-02-01  Roland McGrath  <roland@redhat.com>
 
+	* net.c (sys_getsockopt): Fix a format %ld -> %d.
+
+	* linux/syscall.h [IA64] (SYS_semtimedop): #undef it.
+
 	* syscall.c (syscall_enter) [X86_64]: Fix 32-bit argument register map
 	not to double the middle entry!
 	Fixes RH#146093.
