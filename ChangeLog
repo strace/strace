@@ -1,5 +1,13 @@
 2005-02-05  Roland McGrath  <roland@redhat.com>
 
+	* desc.c (decode_select): Calculate size of passed fd_set vectors and
+	copy in the user's size rather than the standard sizeof(fd_set).
+	Fixes Debian bug #65654.
+
+	* util.c (printpath, printpathn): Print NULL and don't try any fetch
+	when ADDR is zero.
+	Fixes Debian bug #63093.
+
 	* debian/control (Build-Depends): Fix for s390 and sparc.
 	From Bastian Blank <waldi@debian.org>.
 	Fixes Debian bug #293564.
