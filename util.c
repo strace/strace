@@ -1195,17 +1195,21 @@ typedef struct regs arg_setup_state;
 #else
 
 # if defined S390 || defined S390X
-#  define arg0_offset	PT_ORIGGPR2
-#  define arg1_offset	PT_GPR2
-#  define restore_arg0(tcp, state, val) 0
-#  define restore_arg1(tcp, state, val) 0
+/* Note: this is only true for the `clone' system call, which handles
+   arguments specially.  We could as well say that its first two arguments
+   are swapped relative to other architectures, but that would just be
+   another #ifdef in the calls.  */
+#  define arg0_offset	PT_GPR3
+#  define arg1_offset	PT_ORIGGPR2
+#  define restore_arg0(tcp, state, val) ((void) (state), 0)
+#  define restore_arg1(tcp, state, val) ((void) (state), 0)
 # elif defined (ALPHA) || defined (MIPS)
 #  define arg0_offset	REG_A0
 #  define arg1_offset	(REG_A0+1)
 # elif defined (POWERPC)
 #  define arg0_offset	(sizeof(unsigned long)*PT_R3)
 #  define arg1_offset	(sizeof(unsigned long)*PT_R4)
-#  define restore_arg0(tcp, state, val) 0
+#  define restore_arg0(tcp, state, val) ((void) (state), 0)
 # elif defined (HPPA)
 #  define arg0_offset	 PT_GR26
 #  define arg1_offset	 (PT_GR26-4)
