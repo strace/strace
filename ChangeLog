@@ -1,5 +1,8 @@
 2004-06-03  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.5.4.
+	* strace.spec, debian/changelog: 4.5.4-1.
+
 	* net.c (domains): Add many PF_* values #ifdef PF_*.
 	(addrfams): Add many AF_* values #ifdef AF_*.
 	Fixes Debian bug #250506.
