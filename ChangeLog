@@ -1,3 +1,8 @@
+2000-07-04  Wichert Akkerman <wakkerma@debian.org>
+
+  * net.c: add SOL_PACKET and SOL_RAW socket options, update
+    SOL_IP and SOL_TCP
+
 2000-06-23  Wichert Akkerman <wakkerma@debian.org>
 
   * strace.c: close outf before we exec a child process

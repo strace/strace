@@ -2,7 +2,7 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
- * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
+ * Copyright (c) 1996-2000 Wichert Akkerman <wichert@cistron.nl>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -62,6 +62,10 @@
 
 #if defined(HAVE_LINUX_IF_PACKET_H)
 #include <linux/if_packet.h>
+#endif
+
+#if defined(HAVE_LINUX_ICMP_H)
+#include <linux/icmp.h>
 #endif
 
 #ifndef PF_UNSPEC
@@ -351,20 +355,35 @@ static struct xlat sockoptions[] = {
 
 #ifdef SOL_IP
 static struct xlat sockipoptions[] = {
-	{ IP_TOS,       "IP_TOS"        },
-	{ IP_TTL,       "IP_TTL"        },
+	{ IP_TOS,		"IP_TOS"		},
+	{ IP_TTL,		"IP_TTL"		},
 #if defined(IP_HDRINCL)
-	{ IP_HDRINCL,   "IP_HDRINCL"    },
+	{ IP_HDRINCL,		"IP_HDRINCL"		},
 #endif
 #if defined(IP_OPTIONS)
-	{ IP_OPTIONS,   "IP_OPTIONS"    },
+	{ IP_OPTIONS,		"IP_OPTIONS"		},
 #endif
-	{ IP_MULTICAST_IF,      "IP_MULTICAST_IF"       },
-	{ IP_MULTICAST_TTL,     "IP_MULTICAST_TTL"      },
-	{ IP_MULTICAST_LOOP,    "IP_MULTICAST_LOOP"     },
-	{ IP_ADD_MEMBERSHIP,    "IP_ADD_MEMBERSHIP"     },
-	{ IP_DROP_MEMBERSHIP,   "IP_DROP_MEMBERSHIP"    },
-	{ 0,            NULL            },
+	{ IP_ROUTER_ALERT,	"IP_ROUTER_ALERT"	},
+#if defined(IP_RECVOPTIONS)
+	{ IP_RECVOPTIONS,	"IP_RECVOPTIONS"	},
+#endif
+	{ IP_RETOPTS,		"IP_RETOPTS"		},
+	{ IP_PKTINFO,		"IP_PKTINFO"		},
+	{ IP_PKTOPTIONS,	"IP_PKTOPTIONS"	},
+	{ IP_MTU_DISCOVER,	"IP_MTU_DISCOVER"	},
+	{ IP_MTU_DISCOVER,	"IP_MTU_DISCOVER"	},
+	{ IP_RECVERR,		"IP_RECVERR"		},
+	{ IP_RECVTTL,		"IP_RECRECVTTL"		},
+	{ IP_RECVTOS,		"IP_RECRECVTOS"		},
+#if defined(IP_MTU)
+	{ IP_MTU,		"IP_MTU"		},
+#endif
+	{ IP_MULTICAST_IF,	"IP_MULTICAST_IF"	},
+	{ IP_MULTICAST_TTL,	"IP_MULTICAST_TTL"	},
+	{ IP_MULTICAST_LOOP,	"IP_MULTICAST_LOOP"	},
+	{ IP_ADD_MEMBERSHIP,	"IP_ADD_MEMBERSHIP"	},
+	{ IP_DROP_MEMBERSHIP,	"IP_DROP_MEMBERSHIP"	},
+	{ 0,			NULL			},
 };
 #endif /* SOL_IP */
 
@@ -375,13 +394,87 @@ static struct xlat sockipxoptions[] = {
 };
 #endif /* SOL_IPX */
 
+#ifdef SOL_RAW
+static struct xlat sockrawoptions[] = {
+#if defined(ICMP_FILTER)
+	{ ICMP_FILTER,		"ICMP_FILTER"	},
+#endif
+	{ 0,			NULL		},
+};
+#endif /* SOL_RAW */
+
+#ifdef SOL_PACKET
+static struct xlat sockpacketoptions[] = {
+	{ PACKET_ADD_MEMBERSHIP,	"PACKET_ADD_MEMBERSHIP"	},
+	{ PACKET_DROP_MEMBERSHIP,	"PACKET_DROP_MEMBERSHIP"},
+#if defined(PACKET_RECV_OUTPUT)
+	{ PACKET_RECV_OUTPUT,		"PACKET_RECV_OUTPUT"	},
+#endif
+#if defined(PACKET_RX_RING)
+	{ PACKET_RX_RING,		"PACKET_RX_RING"	},
+#endif
+#if defined(PACKET_STATISTICS)
+	{ PACKET_STATISTICS,		"PACKET_STATISTICS"	},
+#endif
+	{ 0,				NULL			},
+};
+#endif /* SOL_PACKET */
+
 #ifdef SOL_TCP
 static struct xlat socktcpoptions[] = {
-	{ TCP_NODELAY,  "TCP_NODELAY"   },
-	{ TCP_MAXSEG,   "TCP_MAXSEG"    },
-	{ 0,            NULL            },
+	{ TCP_NODELAY,	"TCP_NODELAY"	},
+	{ TCP_MAXSEG,	"TCP_MAXSEG"	},
+#if defined(TCP_CORK)
+	{ TCP_CORK,	"TCP_CORK"	},
+#endif
+	{ 0,		NULL		},
 };
 #endif /* SOL_TCP */
+
+#ifdef SOL_RAW
+static struct xlat icmpfilterflags[] = {
+#if defined(ICMP_ECHOREPLY)
+	{ (1<<ICMP_ECHOREPLY),		"ICMP_ECHOREPLY"	},
+#endif
+#if defined(ICMP_DEST_UNREACH)
+	{ (1<<ICMP_DEST_UNREACH),	"ICMP_DEST_UNREACH"	},
+#endif
+#if defined(ICMP_SOURCE_QUENCH)
+	{ (1<<ICMP_SOURCE_QUENCH),	"ICMP_SOURCE_QUENCH"	},
+#endif
+#if defined(ICMP_REDIRECT)
+	{ (1<<ICMP_REDIRECT),		"ICMP_REDIRECT"		},
+#endif
+#if defined(ICMP_ECHO)
+	{ (1<<ICMP_ECHO),		"ICMP_ECHO"		},
+#endif
+#if defined(ICMP_TIME_EXCEEDED)
+	{ (1<<ICMP_TIME_EXCEEDED),	"ICMP_TIME_EXCEEDED"	},
+#endif
+#if defined(ICMP_PARAMETERPROB)
+	{ (1<<ICMP_PARAMETERPROB),	"ICMP_PARAMETERPROB"	},
+#endif
+#if defined(ICMP_TIMESTAMP)
+	{ (1<<ICMP_TIMESTAMP),		"ICMP_TIMESTAMP"	},
+#endif
+#if defined(ICMP_TIMESTAMPREPLY)
+	{ (1<<ICMP_TIMESTAMPREPLY),	"ICMP_TIMESTAMPREPLY"	},
+#endif
+#if defined(ICMP_INFO_REQUEST)
+	{ (1<<ICMP_INFO_REQUEST),	"ICMP_INFO_REQUEST"	},
+#endif
+#if defined(ICMP_INFO_REPLY)
+	{ (1<<ICMP_INFO_REPLY),		"ICMP_INFO_REPLY"	},
+#endif
+#if defined(ICMP_ADDRESS)
+	{ (1<<ICMP_ADDRESS),		"ICMP_ADDRESS"		},
+#endif
+#if defined(ICMP_ADDRESSREPLY)
+	{ (1<<ICMP_ADDRESSREPLY),	"ICMP_ADDRESSREPLY"	},
+#endif
+	{ 0,				NULL			},
+};
+#endif /* SOL_RAW */
 
 void
 printsock(tcp, addr, addrlen)
@@ -925,6 +1018,13 @@ struct tcb *tcp;
 			tprintf(", ");
 			break;
 #endif
+#ifdef SOL_PACKET
+		case SOL_PACKET:
+			tprintf("SOL_PACKET, ");
+			printxval(sockpacketoptions, tcp->u_arg[2], "PACKET_???");
+			tprintf(", ");
+			break;
+#endif
 #ifdef SOL_TCP
 		case SOL_TCP:
 			tprintf("SOL_TCP, ");
@@ -954,6 +1054,33 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if defined(ICMP_FILTER)
+static void printicmpfilter(tcp, addr)
+struct tcb *tcp;
+long addr;
+{
+	struct icmp_filter	filter;
+
+	if (!addr) {
+		tprintf("NULL");
+		return;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	if (umove(tcp, addr, &filter) < 0) {
+		tprintf("{...}");
+		return;
+	}
+
+	tprintf("~(");
+	if (printflags(icmpfilterflags, ~filter.data) == 0)
+		tprintf("0");
+	tprintf(")");
+}
+#endif /* ICMP_FILTER */
+
 int
 sys_setsockopt(tcp)
 struct tcb *tcp;
@@ -965,12 +1092,16 @@ struct tcb *tcp;
 			tprintf("SOL_SOCKET, ");
 			printxval(sockoptions, tcp->u_arg[2], "SO_???");
 			tprintf(", ");
+			printnum(tcp, tcp->u_arg[3], "%ld");
+			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #ifdef SOL_IP
 		case SOL_IP:
 			tprintf("SOL_IP, ");
 			printxval(sockipoptions, tcp->u_arg[2], "IP_???");
 			tprintf(", ");
+			printnum(tcp, tcp->u_arg[3], "%ld");
+			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 #ifdef SOL_IPX
@@ -978,6 +1109,18 @@ struct tcb *tcp;
 			tprintf("SOL_IPX, ");
 			printxval(sockipxoptions, tcp->u_arg[2], "IPX_???");
 			tprintf(", ");
+			printnum(tcp, tcp->u_arg[3], "%ld");
+			tprintf(", %lu", tcp->u_arg[4]);
+			break;
+#endif
+#ifdef SOL_PACKET
+		case SOL_PACKET:
+			tprintf("SOL_PACKET, ");
+			printxval(sockpacketoptions, tcp->u_arg[2], "PACKET_???");
+			tprintf(", ");
+			/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
+			printnum(tcp, tcp->u_arg[3], "%ld");
+			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 #ifdef SOL_TCP
@@ -985,6 +1128,26 @@ struct tcb *tcp;
 			tprintf("SOL_TCP, ");
 			printxval(socktcpoptions, tcp->u_arg[2], "TCP_???");
 			tprintf(", ");
+			printnum(tcp, tcp->u_arg[3], "%ld");
+			tprintf(", %lu", tcp->u_arg[4]);
+			break;
+#endif
+#ifdef SOL_RAW
+		case SOL_RAW:
+			tprintf("SOL_RAW, ");
+			printxval(sockrawoptions, tcp->u_arg[2], "RAW_???");
+			tprintf(", ");
+			switch (tcp->u_arg[2]) {
+#if defined(ICMP_FILTER)
+				case ICMP_FILTER:
+					printicmpfilter(tcp, tcp->u_arg[3]);
+					break;
+#endif
+				default:
+					printnum(tcp, tcp->u_arg[3], "%ld");
+					break;
+			}
+			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 #endif
 
@@ -994,10 +1157,10 @@ struct tcb *tcp;
 			/* XXX - should know socket family here */
 			printxval(protocols, tcp->u_arg[1], "IPPROTO_???");
 			tprintf("%lu, ", tcp->u_arg[2]);
+			printnum(tcp, tcp->u_arg[3], "%ld");
+			tprintf(", %lu", tcp->u_arg[4]);
 			break;
 		}
-		printnum(tcp, tcp->u_arg[3], "%ld");
-		tprintf(", %lu", tcp->u_arg[4]);
 	}
 	return 0;
 }

@@ -420,7 +420,7 @@ char *argv[];
 			pause();
 #else /* !SVR4 */
 			if (outf!=stderr)	
-				close(outf);
+				close(fileno (outf));
 
 			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
 				perror("strace: ptrace(PTRACE_TRACEME, ...)");

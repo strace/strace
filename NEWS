@@ -1,7 +1,8 @@
 Changes in 4.3
 ==============
 * Linux/ia64 port added
-* The usual Linux syscall updates (includes 32bit uid/gid support)
+* The usual Linux syscall updates (includes 32bit uid/gid support),
+  see ChangeLog for details
 
 Changes in 4.2
 ==============
