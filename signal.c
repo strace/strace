@@ -344,6 +344,13 @@ int rt; /* set might include realtime sigs */
 			if (i < nsignals) {
 				sprintf(s, format, signalent[i] + 3);
 			}
+#ifdef SIGRTMIN
+			else if (i >= __SIGRTMIN && i <= __SIGRTMAX) {
+				char tsig[40];
+				sprintf(tsig, "RT_%u", i - __SIGRTMIN);
+				sprintf(s, format, tsig);
+			}
+#endif /* SIGRTMIN */
 			else {
 				char tsig[32];
 				sprintf(tsig, "%u", i);
