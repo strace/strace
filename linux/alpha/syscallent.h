@@ -76,7 +76,7 @@
 	{ 3,	TF,	sys_open,		"open"		}, /* 45 */
 	{ 5,	0,	printargs,		"SYS_46"	}, /* 46 */
 	{ 1,	0,	sys_getgid,		"getxgid"	}, /* 47 */
-	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 48 */
+	{ 3,	TS,	printargs,		"osf_sigprocmask"}, /* 48 */
 	{ 5,	0,	printargs,		"SYS_49"	}, /* 49 */
 	{ 5,	0,	printargs,		"SYS_50"	}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
@@ -370,23 +370,23 @@
 	{ 1,	0,	sys_uname,		"uname"		}, /* 339 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 340 */
 	{ 5,	0,	sys_mremap,		"mremap"	}, /* 341 */
-	{ 5,	0,	printargs,		"SYS_342"	}, /* 342 */
-	{ 5,	0,	printargs,		"SYS_343"	}, /* 343 */
-	{ 5,	0,	printargs,		"SYS_344"	}, /* 344 */
-	{ 5,	0,	printargs,		"SYS_345"	}, /* 345 */
-	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
-	{ 5,	0,	printargs,		"SYS_347"	}, /* 347 */
-	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
-	{ 5,	0,	printargs,		"SYS_349"	}, /* 349 */
+	{ 5,	0,	printargs,		"nfsservctl"	}, /* 342 */
+	{ 3,	0,	sys_setresuid,		"setresuid"	}, /* 343 */
+	{ 3,	0,	sys_getresuid,		"getresuid"	}, /* 344 */
+	{ 5,	0,	printargs,		"pciconfig_read"}, /* 345 */
+	{ 5,	0,	printargs,		"pciconfig_write"}, /* 346 */
+	{ 5,	0,	sys_query_module,	"query_module"	}, /* 347 */
+	{ 5,	0,	printargs,		"prctl"		}, /* 348 */
+	{ 5,	TF,	sys_pread,		"pread"		}, /* 349 */
 
-	{ 5,	0,	printargs,		"SYS_350"	}, /* 350 */
-	{ 5,	0,	printargs,		"SYS_351"	}, /* 351 */
-	{ 5,	0,	printargs,		"SYS_352"	}, /* 352 */
-	{ 5,	0,	printargs,		"SYS_353"	}, /* 353 */
-	{ 5,	0,	printargs,		"SYS_354"	}, /* 354 */
-	{ 5,	0,	printargs,		"SYS_355"	}, /* 355 */
-	{ 5,	0,	printargs,		"SYS_356"	}, /* 356 */
-	{ 5,	0,	printargs,		"SYS_357"	}, /* 357 */
+	{ 5,	TF,	sys_pwrite,		"pwrite"	}, /* 350 */
+	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 351 */
+	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 352 */
+	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 353 */
+	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 354 */
+	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 355 */
+	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"}, /* 356 */
+	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 357 */
 	{ 5,	0,	sys_select,		"select"	}, /* 358 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 359 */
 	{ 3,	0,	sys_settimeofday,	"settimeofday"	}, /* 360 */
@@ -396,7 +396,7 @@
 	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 364 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 365 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 366 */
-	{ 2,	0,	printargs,		"getcwd"	}, /* 367 */
-	{ 5,	0,	printargs,		"SYS_368"	}, /* 368 */
-	{ 5,	0,	printargs,		"SYS_369"	}, /* 369 */
-	{ 5,	0,	printargs,		"SYS_370"	}, /* 370 */
+	{ 2,	0,	sys_getcwd,		"getcwd"	}, /* 367 */
+	{ 2,	0,	sys_capget,		"capget"	}, /* 368 */
+	{ 2,	0,	sys_capset,		"capset"	}, /* 369 */
+	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 370 */
