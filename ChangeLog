@@ -1,3 +1,28 @@
+2003-07-15  Anton Blanchard  <anton@samba.org>
+
+	* ipc.c: Add SHM_HUGETLB field.
+	Mask out permission bits in msgget, semget and shmget before
+		printing resource_flags.
+	Mask execute permission bits (even though we dont currently
+		use them).
+
+2003-07-17  Roland McGrath  <roland@redhat.com>
+
+	* linux/powerpc/syscallent.h (tgkill): New at 250.
+
+	* linux/syscallent.h: truncate64/ftruncate64 need 3 args.
+	From Ulrich Drepper <drepper@redhat.com>.
+
+	* linux/syscallent.h: Handle statfs64, fstatfs64, utimes.
+	* file.c (printstatfs): Print f_fsid and f_frsize.
+	[LINUX] (printstatfs64, sys_statfs64, sys_fstatfs64): New functions.
+	* linux/syscall.h: Add decls.
+	From Ulrich Drepper <drepper@redhat.com>.
+
+2003-07-09  Roland McGrath  <roland@redhat.com>
+
+	* linux/ia64/syscallent.h (tgkill): New at 1235.
+
 2003-07-05  Richard Henderson  <rth@twiddle.net>
 
 	* process.c (sys_clone): Order arguments for alpha the same as x86_64.
