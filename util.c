@@ -372,7 +372,9 @@ printpath(tcp, addr)
 struct tcb *tcp;
 long addr;
 {
-	if (umovestr(tcp, addr, MAXPATHLEN, path) < 0)
+	if (addr == 0)
+		tprintf("NULL");
+	else if (umovestr(tcp, addr, MAXPATHLEN, path) < 0)
 		tprintf("%#lx", addr);
 	else
 		string_quote(path);
@@ -385,7 +387,9 @@ struct tcb *tcp;
 long addr;
 int n;
 {
-	if (umovestr(tcp, addr, n, path) < 0)
+	if (addr == 0)
+		tprintf("NULL");
+	else 	if (umovestr(tcp, addr, n, path) < 0)
 		tprintf("%#lx", addr);
 	else {
 		path[n] = '\0';
