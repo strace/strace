@@ -1,5 +1,8 @@
 2004-03-01  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.5.2.
+	* strace.spec, debian/changelog: 4.5.1-1.
+
 	* mem.c [LINUX]: <asm/mman.h> -> <linux/mman.h>
 	Fixes Debian bug #223207.
 
