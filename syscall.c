@@ -814,7 +814,7 @@ struct tcb *tcp;
 #endif
 #ifdef USE_PROCFS
 #ifdef HAVE_PR_SYSCALL
-	scno = tcp->status.pr_syscall;
+	scno = tcp->status.PR_SYSCALL;
 #else /* !HAVE_PR_SYSCALL */
 #ifndef FREEBSD
 	scno = tcp->status.PR_WHAT;
@@ -1279,8 +1279,17 @@ struct tcb *tcp;
 		memcpy(tcp->u_arg, &tcp->status.pr_reg[CTX_A0],
 			tcp->u_nargs*sizeof(tcp->u_arg[0]));
 	}
-#else /* !MIPS */
-#ifdef HAVE_PR_SYSCALL
+#elif UNIXWARE >= 2
+	/*
+	 * Like SGI, UnixWare doesn't set pr_sysarg until system call exit
+	 */
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+		tcp->u_nargs = sysent[tcp->scno].nargs;
+	else
+		tcp->u_nargs = tcp->status.pr_lwp.pr_nsysarg;
+	umoven(tcp, tcp->status.PR_REG[UESP] + 4,
+		tcp->u_nargs*sizeof(tcp->u_arg[0]), (char *) tcp->u_arg);
+#elif defined (HAVE_PR_SYSCALL)
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
@@ -1290,21 +1299,16 @@ struct tcb *tcp;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = tcp->status.pr_sysarg[i];
 	}
-#else /* !HAVE_PR_SYSCALL */
-#ifdef I386
+#elif defined (I386)
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-#if UNIXWARE >= 2
-		tcp->u_nargs = tcp->status.pr_lwp.pr_nsysarg;
-#else
 		tcp->u_nargs = 5;
-#endif
 	umoven(tcp, tcp->status.PR_REG[UESP] + 4,
 		tcp->u_nargs*sizeof(tcp->u_arg[0]), (char *) tcp->u_arg);
-#endif /* I386 */
+#else
+	I DONT KNOW WHAT TO DO
 #endif /* !HAVE_PR_SYSCALL */
-#endif /* !MIPS */
 #endif /* SVR4 */
 #ifdef FREEBSD
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls &&

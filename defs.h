@@ -183,6 +183,7 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PR_WHAT		pr_lwp.pr_what
 #define PR_REG		pr_lwp.pr_context.uc_mcontext.gregs
 #define PR_FLAGS	pr_lwp.pr_flags
+#define PR_SYSCALL	pr_lwp.pr_syscall
 #define PIOCSTIP	PCSTOP
 #define PIOCSET		PCSET
 #define PIOCRESET	PCRESET
@@ -201,6 +202,7 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PR_WHAT		pr_what
 #define PR_REG		pr_reg
 #define PR_FLAGS	pr_flags
+#define PR_SYSCALL	pr_syscall
 #endif
 #endif
 #ifdef FREEBSD

@@ -208,7 +208,13 @@ AC_DEFUN(AC_STRUCT_PR_SYSCALL,
 [AC_MSG_CHECKING(for pr_syscall in struct prstatus)
 AC_CACHE_VAL(ac_cv_struct_pr_syscall,
 [AC_TRY_COMPILE([#include <sys/procfs.h>],
-[struct prstatus s; s.pr_syscall;],
+[#ifdef HAVE_MP_PROCFS
+pstatus_t s;
+s.pr_lwp.pr_syscall
+#else
+prstatus_t s;
+s.pr_syscall
+#endif],
 ac_cv_struct_pr_syscall=yes,
 ac_cv_struct_pr_syscall=no)])
 AC_MSG_RESULT($ac_cv_struct_pr_syscall)
