@@ -81,7 +81,7 @@ FILE *outf;
 struct tcb **tcbtab;
 unsigned int nprocs, tcbtabsize;
 char *progname;
-extern char version[];
+extern const char version[];
 extern char **environ;
 
 static struct tcb *pid2tcb P((int pid));
