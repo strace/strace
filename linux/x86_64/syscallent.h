@@ -229,7 +229,7 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 228 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 229 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 230 */
-	{ 5,	0,	printargs,		"exit_group"	}, /* 231 */
+	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 231 */
 	{ 5,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 232 */
 	{ 5,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 233 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 234 */
