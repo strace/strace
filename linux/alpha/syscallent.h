@@ -55,12 +55,12 @@
 	{ 0,	0,	sys_getuid,		"getxuid"		}, /* 24 */
 	{ 5,	0,	printargs,		"exec_with_loader"	}, /* 25, not implemented */
 	{ 4,	0,	sys_ptrace,		"ptrace"		}, /* 26 */
-	{ 5,	0,	printargs,		"osf_nrecmsg"		}, /* 27, not implemented */
+	{ 5,	0,	printargs,		"osf_nrecvmsg"		}, /* 27, not implemented */
 	{ 5,	0,	printargs,		"osf_nsendmsg"		}, /* 28, not implemented */
 	{ 5,	0,	printargs,		"osf_nrecvfrom"		}, /* 29, not implemented */
 	{ 5,	0,	printargs,		"osf_naccept"		}, /* 30, not implemented */
 	{ 5,	0,	printargs,		"osf_ngetpeername"	}, /* 31, not implemented */
-	{ 5,	0,	printargs,		"osf_ngetsocketname"	}, /* 32, not implemented */
+	{ 5,	0,	printargs,		"osf_ngetsockname"	}, /* 32, not implemented */
 	{ 2,	TF,	sys_access,		"access"		}, /* 33 */
 	{ 5,	0,	printargs,		"osf_chflags"		}, /* 34, not implemented */
 	{ 5,	0,	printargs,		"osf_fchflags"		}, /* 35, not implemented */
@@ -454,8 +454,8 @@
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"		}, /* 423 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 424 */
 	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 425 */
-	{ 2,	0,	sys_fstat64,		"fstat64"		}, /* 426 */
-	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 427 */
+	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 426 */
+	{ 2,	0,	sys_fstat64,		"fstat64"		}, /* 427 */
 	{ 5,	0,	printargs,		"vserver"		}, /* 428 ??? */
 	{ 5,	0,	printargs,		"mbind"			}, /* 429 ??? */
 	{ 5,	0,	printargs,		"get_mempolicy"		}, /* 430 ??? */
