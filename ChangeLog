@@ -2,6 +2,7 @@
 
  * file.c: protect printstat64 with STAT64 instead of linux so we can
    compile on Linux architectures that don't have it
+ * util.c: fix LOOP for ARM
 
 Fri Dec 24 18:05:00 EST 1999
 

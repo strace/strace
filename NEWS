@@ -3,6 +3,7 @@ Changes in 4.2
 * Compiles on glibc2.0 systems again
 * Linux/S390 port added
 * The usual Linux syscall updates 
+* we can follow fork on arm now
 
 Changes in 4.1
 ================
