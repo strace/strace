@@ -505,6 +505,28 @@ struct tcb *tcp;
 }
 
 #if defined(LINUX) && defined(__i386__)
+static void
+print_ldt_entry (ldt_entry)
+struct modify_ldt_ldt_s *ldt_entry;
+{
+	tprintf("base_addr:%#08lx, "
+		"limit:%d, "
+		"seg_32bit:%d, "
+		"contents:%d, "
+		"read_exec_only:%d, "
+		"limit_in_pages:%d, "
+		"seg_not_present:%d, "
+		"useable:%d}",
+		ldt_entry->base_addr,
+		ldt_entry->limit,
+		ldt_entry->seg_32bit,
+		ldt_entry->contents,
+		ldt_entry->read_exec_only,
+		ldt_entry->limit_in_pages,
+		ldt_entry->seg_not_present,
+		ldt_entry->useable);
+}
+
 int
 sys_modify_ldt(tcp)
 struct tcb *tcp;
@@ -521,27 +543,62 @@ struct tcb *tcp;
 			if (!verbose(tcp))
 				tprintf("...}");
 			else {
-				tprintf("base_addr:%#08lx, "
-						"limit:%d, "
-						"seg_32bit:%d, "
-						"contents:%d, "
-						"read_exec_only:%d, "
-						"limit_in_pages:%d, "
-						"seg_not_present:%d, "
-						"useable:%d}",
-						copy.base_addr,
-						copy.limit,
-						copy.seg_32bit,
-						copy.contents,
-						copy.read_exec_only,
-						copy.limit_in_pages,
-						copy.seg_not_present,
-						copy.useable);
+				print_ldt_entry(&copy);
 			}
 		}
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
+}
+
+int
+sys_set_thread_area(tcp)
+struct tcb *tcp;
+{
+	struct modify_ldt_ldt_s copy;
+	if (entering(tcp)) {
+		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
+			if (copy.entry_number == -1)
+				tprintf("{entry_number:%d -> ",
+					copy.entry_number);
+			else
+				tprintf("{entry_number:");
+		}
+	} else {
+		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
+			tprintf("%d, ", copy.entry_number);
+			if (!verbose(tcp))
+				tprintf("...}");
+			else {
+				print_ldt_entry(&copy);
+			}
+		} else {
+			tprintf("%lx", tcp->u_arg[0]);
+		}
+	}
+	return 0;
+			
+}
+
+int
+sys_get_thread_area(tcp)
+struct tcb *tcp;
+{
+	struct modify_ldt_ldt_s copy;
+	if (exiting(tcp)) {
+		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
+			tprintf("{entry_number:%d, ", copy.entry_number);
+			if (!verbose(tcp))
+				tprintf("...}");
+			else {
+				print_ldt_entry(&copy);
+			}
+		} else {
+			tprintf("%lx", tcp->u_arg[0]);
+		}
+	}
+	return 0;
+			
 }
 #endif /* LINUX && __i386__ */
 
