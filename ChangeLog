@@ -1,3 +1,8 @@
+2003-07-17  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.4.99.
+	* strace.spec, debian/changelog: 4.4.99-1.
+
 2003-07-15  Anton Blanchard  <anton@samba.org>
 
 	* ipc.c: Add SHM_HUGETLB field.
