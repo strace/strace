@@ -1,3 +1,40 @@
+2003-01-13  Roland McGrath  <roland@redhat.com>
+
+	* linux/powerpc/signalent.h: Add SIGRTMIN.
+	From Anton Blanchard <anton@samba.org>.
+
+	* linux/powerpc/syscallent.h: Add missing system calls.
+	Decode more system calls, we were just printargs for many things.
+	Remove some x86-specific system calls.
+	Remove two syscalls between the socket and ipc syscalls,
+	it was resulting in all IPC syscalls being off by two.
+
+	* ioctl.c (ioctl_decode) [POWERPC]: Decode term ioctls like Alpha.
+	From Anton Blanchard <anton@samba.org>.
+
+	* defs.h [POWERPC] (UESP, EIP, EAX, ORIG_EAX): Remove this cruft.
+	[LINUX && POWERPC && !__powerpc64__] (ALIGN64): New macro.
+	* io.c (sys_pread, sys_pwrite): Use ALIGN64.
+	From Anton Blanchard <anton@samba.org>.
+
+	* term.c [LINUX]: Get kernel definition of struct termios.
+	From Anton Blanchard <anton@samba.org>.
+
+	* linux/ioctlent.sh: Look in sound/ directory too.
+	From Anton Blanchard <anton@samba.org>.
+
+	* desc.c (printflock64): Fix ADDR argument type.
+	From Anton Blanchard <anton@samba.org>.
+
+	* strace.c [! HAVE_STRSIGNAL]: Clean up #ifdefs on decls for
+	sys_siglist and _sys_siglist.
+	Reported by John Hughes <john@Calva.COM>.
+
+	* net.c: HAVE_OPTHDR -> HAVE_STRUCT_OPTHDR
+	Reported by John Hughes <john@Calva.COM>.
+
+	* linux/syscall.h [ARM] (SYS_socket_subcall): Set to 300.
+
 2003-01-10  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.4.91.
