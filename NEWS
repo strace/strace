@@ -1,3 +1,8 @@
+Changes in 4.5.1
+==============
+* Bug fixes.
+* Display multiple ioctl name matches on Linux.
+
 Changes in 4.5
 ==============
 * New port to AMD's x86-64 architecture. One strace binary can

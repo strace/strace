@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5
+Version: 4.5.1
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -75,6 +75,18 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Nov 13 2003 Roland McGrath <roland@redhat.com> 4.5.1-1
+- new upstream version, more fixes (#108012, #105366, #105359, #105358)
+
+* Tue Sep 30 2003 Roland McGrath <roland@redhat.com> 4.5-3
+- revert bogus s390 fix
+
+* Thu Sep 25 2003 Roland McGrath <roland@redhat.com> 4.5-1.2.1AS
+- rebuilt for 2.1AS erratum
+
+* Wed Sep 24 2003 Roland McGrath <roland@redhat.com> 4.5-2
+- rebuilt
+
 * Wed Sep 24 2003 Roland McGrath <roland@redhat.com> 4.5-1
 - new upstream version, more fixes (#101499, #104365)
 

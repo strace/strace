@@ -1,3 +1,13 @@
+strace (4.5.1-1) unstable; urgency=low
+
+  * New upstream version.
+    + Check for errors writing to -o file, closes: #218762
+    + Fix typos in man page, closes: #217008
+    + Print multiple ioctl code matches on Linux.
+    + Various other fixes.
+
+ -- Roland McGrath <frob@debian.org>  Thu, 13 Nov 2003 14:37:51 -0800
+
 strace (4.5-1) unstable; urgency=low
 
   * New upstream version.
