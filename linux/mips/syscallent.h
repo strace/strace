@@ -4218,7 +4218,7 @@
 	{ 3,	0,	printargs,		"mincore"	}, /* 4217 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 4218 */
 	{ 3,	0,	printargs,		"getdents64"	}, /* 4219 */
-	{ 3,	0,	printargs,		"fcntl64"	}, /* 4220 */
+	{ 3,	0,	sys_fcntl,		"fcntl64"	}, /* 4220 */
 	{ 0,	0,	printargs,		"SYS_4221"	}, /* 4221 */
 	{ 0,	0,	printargs,		"SYS_4222"	}, /* 4222 */
 	{ 0,	0,	printargs,		"SYS_4223"	}, /* 4223 */

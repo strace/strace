@@ -208,7 +208,7 @@
 	{ 3,	TF,	printargs,		"truncate64"		}, /* 199 */
 	{ 3,	TF,	printargs,		"ftruncate64"		}, /* 200 */
 	{ 3,	0,	printargs,		"getdents64"		}, /* 201 */
-	{ 3,	TF,	sys_fcntl,		"fcntl64"		}, /* 202 */
+	{ 3,	0,	sys_fcntl,		"fcntl64"		}, /* 202 */
 	{ 5,	0,	printargs,		"SYS_203"		}, /* 203 */
 	{ 5,	0,	printargs,		"SYS_204"		}, /* 204 */
 	{ 5,	0,	printargs,		"SYS_205"		}, /* 205 */

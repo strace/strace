@@ -232,7 +232,7 @@
 	{ 8,	0,	printargs,		"MOL"			}, /* 201 */
 	{ 3,	0,	printargs,		"getdents64"		}, /* 202 */
 	{ 2,	0,	sys_pivotroot,		"pivot_root"		}, /* 203 */
-	{ 3,	TF,	printargs,		"fcntl64"		}, /* 204 */
+	{ 3,	0,	sys_fcntl,		"fcntl64"		}, /* 204 */
 	{ 3,	0,	sys_madvise,		"madvise"		}, /* 205 */
 	{ 3,	0,	printargs,		"mincore"		}, /* 206 */
 	{ 5,	0,	printargs,		"SYS_207"		}, /* 207 */

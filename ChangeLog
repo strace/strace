@@ -1,5 +1,10 @@
 2001-08-03   Wichert Akkerman <wakkerma@debian.org>
 
+  * Linux/**/syscallent.h: synchronize section for fcntl and use sys_fcntl
+    for sys_fcntl as well
+
+2001-08-03   Wichert Akkerman <wakkerma@debian.org>
+
   * linux/hppa/syscallent.h: updated from Matthew Wilcox
 
 2001-08-03   Wichert Akkerman <wakkerma@debian.org>
