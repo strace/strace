@@ -409,10 +409,10 @@
 	{ -1,	0,	printargs,		"unblock"	}, /* 186 */
 	{ -1,	0,	printargs,		"cancelblock"	}, /* 187 */
 	{ -1,	0, 	printargs,		"SYS_188"	}, /* 188 */
-	{ -1,	0,	sys_pread,		"pread"		}, /* 189 */
-	{ -1,	0,	sys_pwrite,		"pwrite"	}, /* 190 */
-	{ -1,	0,	printargs,		"truncate"	}, /* 191 */
-	{ -1,	0,	printargs,		"ftruncate"	}, /* 192 */
+	{ -1,	TF,	sys_pread,		"pread"		}, /* 189 */
+	{ -1,	TF,	sys_pwrite,		"pwrite"	}, /* 190 */
+	{ -1,	TF,	sys_truncate,		"truncate"	}, /* 191 */
+	{ -1,	TF,	sys_ftruncate,		"ftruncate"	}, /* 192 */
 	{ -1,	0,	printargs,		"lwpkill"	}, /* 193 */
 	{ -1,	0,	printargs,		"sigwait"	}, /* 194 */
 	{ -1,	0,	printargs,		"fork1"		}, /* 195 */
@@ -422,7 +422,7 @@
 	{ -1,	0,	printargs,		"modpath"	}, /* 199 */
 	{ -1,	0,	printargs,		"modstat"	}, /* 200 */
 	{ -1,	0,	printargs,		"modadm"	}, /* 201 */
-	{ -1,	0,	printargs,		"getksym"	}, /* 202 */
+	{ -1,	0,	sys_getksym,		"getksym"	}, /* 202 */
 	{ -1,	0,	printargs,		"lwpsuspend"	}, /* 203 */
 	{ -1,	0,	printargs,		"lwpcontinue"	}, /* 204 */
 	{ -1,	0,	printargs,		"priocntllst"	}, /* 205 */
@@ -519,6 +519,41 @@
 	{ -1,	0,	printargs,		"SYS_213"	}, /* 213 */
 	{ -1,	0,	printargs,		"SYS_214"	}, /* 214 */
 	{ -1,	0,	printargs,		"SYS_215"	}, /* 215 */
+#if UNIXWARE >= 7
+	{ -1,	0,	printargs,		"fstatvfs64"	}, /* 216 */
+	{ -1,	0,	printargs,		"statvfs64"	}, /* 217 */
+	{ -1,	0,	printargs,		"ftruncate64"	}, /* 218 */
+	{ -1,	0,	printargs,		"truncate64"	}, /* 219 */
+	{ -1,	0,	printargs,		"getrlimit64"	}, /* 220 */
+	{ -1,	0,	printargs,		"setrlimit64"	}, /* 221 */
+	{ -1,	TF,	sys_lseek64,		"lseek64"	}, /* 222 */
+	{ -1,	0,	printargs,		"mmap64"	}, /* 223 */
+	{ -1,	0,	printargs,		"pread64"	}, /* 224 */
+	{ -1,	0,	printargs,		"pwrite64"	}, /* 225 */
+	{ -1,	0,	printargs,		"creat64"	}, /* 226 */
+	{ -1,	0,	printargs,		"dshmsys"	}, /* 227 */
+	{ -1,	0,	printargs,		"invlpg"	}, /* 228 */
+	{ -1,	0,	printargs,		"rfork1"	}, /* 229 */
+	{ -1,	0,	printargs,		"rforkall"	}, /* 230 */
+	{ -1,	0,	printargs,		"rexecve"	}, /* 231 */
+	{ -1,	0,	printargs,		"migrate"	}, /* 232 */
+	{ -1,	0,	printargs,		"kill3"		}, /* 233 */
+	{ -1,	0,	printargs,		"ssisys"	}, /* 234 */
+	{ -1,	TN,	sys_xaccept,		"xaccept"	}, /* 235 */
+	{ -1,	TN,	sys_xbind,		"xbind"		}, /* 236 */
+	{ -1,	TN,	sys_xbind,		"xbindresport"	}, /* 237 */
+	{ -1,	TN,	sys_xconnect,		"xconnect"	}, /* 238 */
+	{ -1,	TN,	sys_xgetsockaddr,	"xgetsockaddr"	}, /* 239 */
+	{ -1,	TN,	sys_xgetsockopt,	"xgetsockopt"	}, /* 240 */
+	{ -1,	TN,	sys_xlisten,		"xlisten"	}, /* 241 */
+	{ -1,	TN,	sys_xrecvmsg,		"xrecvmsg"	}, /* 242 */
+	{ -1,	TN,	sys_xsendmsg,		"xsendmsg"	}, /* 243 */
+	{ -1,	TN,	sys_xsetsockaddr,	"xsetsockaddr"	}, /* 244 */
+	{ -1,	TN,	sys_xsetsockopt,	"xsetsockopt"	}, /* 245 */
+	{ -1,	TN,	sys_xshutdown,		"xshutdown"	}, /* 246 */
+	{ -1,	TN,	sys_xsocket,		"xsocket"	}, /* 247 */
+	{ -1,	TN,	sys_xsocketpair,	"xsocketpair"	}, /* 248 */
+#else
 	{ -1,	0,	printargs,		"SYS_216"	}, /* 216 */
 	{ -1,	0,	printargs,		"SYS_217"	}, /* 217 */
 	{ -1,	0,	printargs,		"SYS_218"	}, /* 218 */
@@ -552,6 +587,7 @@
 	{ -1,	0,	printargs,		"SYS_246"	}, /* 246 */
 	{ -1,	0,	printargs,		"SYS_247"	}, /* 247 */
 	{ -1,	0,	printargs,		"SYS_248"	}, /* 248 */
+#endif
 	{ -1,	0,	printargs,		"SYS_249"	}, /* 249 */
 	{ -1,	0,	printargs,		"SYS_250"	}, /* 250 */
 #endif /* !MIPS */

@@ -72,6 +72,10 @@
 #define PF_UNSPEC AF_UNSPEC
 #endif
 
+#if UNIXWARE >= 7
+#define HAVE_SENDMSG		1		/* HACK - *FIXME* */
+#endif
+
 #ifdef LINUX
 /* Under Linux these are enums so we can't test for them with ifdef. */
 #define IPPROTO_EGP IPPROTO_EGP
@@ -475,6 +479,7 @@ static struct xlat icmpfilterflags[] = {
 	{ 0,				NULL			},
 };
 #endif /* SOL_RAW */
+
 
 void
 printsock(tcp, addr, addrlen)
@@ -1164,3 +1169,157 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#if UNIXWARE >= 7
+
+static struct xlat sock_version[] = {
+	{ __NETLIB_UW211_SVR4,	"UW211_SVR4" },
+	{ __NETLIB_UW211_XPG4,	"UW211_XPG4" },
+	{ __NETLIB_GEMINI_SVR4,	"GEMINI_SVR4" },
+	{ __NETLIB_GEMINI_XPG4,	"GEMINI_XPG4" },
+	{ __NETLIB_FP1_SVR4,	"FP1_SVR4" },
+	{ __NETLIB_FP1_XPG4,	"FP1_XPG4" },
+	{ 0,            NULL            },
+};
+
+
+int
+netlib_call(tcp, func)
+struct tcb *tcp;
+int (*func) ();
+{
+	if (entering(tcp)) {
+		int i;
+		printxval (sock_version, tcp->u_arg[0], "__NETLIB_???");
+		tprintf(", ");
+		--tcp->u_nargs;
+		for (i = 0; i < tcp->u_nargs; i++)
+			tcp->u_arg[i] = tcp->u_arg[i + 1];
+		return func (tcp);
+		
+	}
+
+	return func (tcp);
+}
+
+int
+sys_xsocket(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_socket);
+}
+
+int
+sys_xsocketpair(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_socketpair);
+}
+
+int
+sys_xbind(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_bind);
+}
+
+int
+sys_xconnect(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_connect);
+}
+
+int
+sys_xlisten(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_listen);
+}
+
+int
+sys_xaccept(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_accept);
+}
+
+int
+sys_xsendmsg(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_sendmsg);
+}
+
+int
+sys_xrecvmsg(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_recvmsg);
+}
+
+int
+sys_xgetsockaddr(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printxval (sock_version, tcp->u_arg[0], "__NETLIB_???");
+		tprintf(", ");
+		if (tcp->u_arg[1] == 0) {
+			tprintf ("LOCALNAME, ");
+		}
+		else if (tcp->u_arg[1] == 1) {
+			tprintf ("REMOTENAME, ");
+		}
+		else {
+			tprintf ("%ld, ", tcp->u_arg [1]);
+		}
+		tprintf ("%ld, ", tcp->u_arg [2]);
+	} 
+	else {
+		if (tcp->u_arg[3] == 0 || syserror(tcp)) {
+			tprintf("%#lx", tcp->u_arg[3]);
+		} else {
+			printsock(tcp, tcp->u_arg[3], tcp->u_arg[4]);
+		}
+		tprintf(", ");
+		printnum(tcp, tcp->u_arg[4], "%lu");
+	}
+
+	return 0;
+
+}
+
+#if 0
+
+int
+sys_xsetsockaddr(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_setsockaddr);
+}
+
+#endif
+
+int
+sys_xgetsockopt(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_getsockopt);
+}
+
+int
+sys_xsetsockopt(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_setsockopt);
+}
+
+int
+sys_xshutdown(tcp)
+struct tcb *tcp;
+{
+	return netlib_call (tcp, sys_shutdown);
+}
+
+#endif

@@ -158,7 +158,7 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define IOCTL_STATUS(t) \
 	 pread (t->pfd_stat, &t->status, sizeof t->status, 0)
 #define IOCTL_WSTOP(t)						\
-	(IOCTL (t->pfd, PCWSTOP, NULL) < 0 ? -1 :		\
+	(IOCTL (t->pfd, PCWSTOP, (char *)NULL) < 0 ? -1 :		\
 	 IOCTL_STATUS (t))
 #define PR_WHY		pr_lwp.pr_why
 #define PR_WHAT		pr_lwp.pr_what
@@ -194,6 +194,9 @@ struct tcb {
 	long u_arg[MAX_ARGS];	/* System call arguments */
 	int u_error;		/* Error code */
 	long u_rval;		/* (first) return value */
+#ifdef HAVE_LONG_LONG
+	long long u_lrval;	/* long long return value */
+#endif
 	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	struct timeval stime;	/* System time usage as of last process wait */
@@ -266,6 +269,8 @@ struct xlat {
 #define RVAL_HEX	001	/* hex format */
 #define RVAL_OCTAL	002	/* octal format */
 #define RVAL_UDECIMAL	003	/* unsigned decimal format */
+#define RVAL_LDECIMAL	004	/* long long format */
+				/* Maybe add long long hex, octal, unsigned */
 #define RVAL_MASK	007	/* mask for these values */
 
 #define RVAL_STR	010	/* Print `auxstr' field after return val */

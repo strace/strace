@@ -1903,3 +1903,48 @@ struct tcb *tcp;
 }
 #endif
 
+
+#if UNIXWARE >= 2
+
+#include <sys/ksym.h>
+#include <sys/elf.h>
+
+static struct xlat ksym_flags[] = {
+	{ STT_NOTYPE,	"STT_NOTYPE"	},	
+	{ STT_FUNC,	"STT_FUNC"	},	
+	{ STT_OBJECT,	"STT_OBJECT"	},	
+	{ 0,		NULL		},
+};
+
+int
+sys_getksym(tcp)
+struct tcb *tcp;
+{
+	if (entering (tcp)) {
+		printstr(tcp, tcp->u_arg[0], -1);
+		tprintf(", ");
+	}
+	else {
+		if (syserror(tcp)) {
+			tprintf("%#lx, %#lx",
+				tcp->u_arg[1], tcp->u_arg[2]);
+		}
+		else {
+			int val;
+			printnum (tcp, tcp->u_arg[1], "%#lx");
+			tprintf(", ");
+			if (umove(tcp, tcp->u_arg[2], &val) < 0) {
+				tprintf("%#lx", tcp->u_arg[2]);
+			}
+			else {
+				tprintf("[");
+				printxval (ksym_flags, val, "STT_???");
+				tprintf("]");
+			}
+		}
+	}
+
+	return 0;
+}
+
+#endif

@@ -464,11 +464,10 @@ int nsubcalls;
 enum subcall_style style;
 {
 	int i, addr, mask, arg;
-
-	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
-		return;
 	switch (style) {
 	case shift_style:
+		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
+			return;
 		tcp->scno = subcall + tcp->u_arg[0];
 		if (sysent[tcp->scno].nargs != -1)
 			tcp->u_nargs = sysent[tcp->scno].nargs;
@@ -478,6 +477,8 @@ enum subcall_style style;
 			tcp->u_arg[i] = tcp->u_arg[i + 1];
 		break;
 	case deref_style:
+		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
+			return;
 		tcp->scno = subcall + tcp->u_arg[0];
 		addr = tcp->u_arg[1];
 		for (i = 0; i < sysent[tcp->scno].nargs; i++) {
@@ -490,9 +491,11 @@ enum subcall_style style;
 		break;
 	case mask_style:
 		mask = (tcp->u_arg[0] >> 8) & 0xff;
-		tcp->u_arg[0] &= 0xff;
 		for (i = 0; mask; i++)
 			mask >>= 1;
+		if (i >= nsubcalls)
+			return;
+		tcp->u_arg[0] &= 0xff;
 		tcp->scno = subcall + i;
 		if (sysent[tcp->scno].nargs != -1)
 			tcp->u_nargs = sysent[tcp->scno].nargs;
@@ -500,7 +503,10 @@ enum subcall_style style;
 	case door_style:
 		/*
 		 * Oh, yuck.  The call code is the *sixth* argument.
+		 * (don't you mean the *last* argument? - JH)
 		 */
+		if (tcp->u_arg[5] < 0 || tcp->u_arg[5] >= nsubcalls)
+			return;
 		tcp->scno = subcall + tcp->u_arg[5];
 		if (sysent[tcp->scno].nargs != -1)
 			tcp->u_nargs = sysent[tcp->scno].nargs;
@@ -1029,6 +1035,11 @@ struct tcb *tcp;
 		}
 		else {
 			tcp->u_rval = tcp->status.PR_REG[EAX];
+#ifdef HAVE_LONG_LONG
+			tcp->u_lrval =
+				((unsigned long long) tcp->status.PR_REG[EDX] << 32) +
+				tcp->status.PR_REG[EAX];
+#endif
 			u_error = 0;
 		}
 #endif /* I386 */
@@ -1337,6 +1348,12 @@ struct tcb *tcp;
 				case RVAL_DECIMAL:
 					tprintf("= %ld", tcp->u_rval);
 					break;
+#ifdef HAVE_LONG_LONG
+				case RVAL_LDECIMAL:
+					tprintf ("= %lld", tcp->u_lrval);
+					break;
+					/* LHEX, LOCTAL, LUDECIMAL... */
+#endif
 				default:
 					fprintf(stderr,
 						"invalid rval format\n");

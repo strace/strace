@@ -1,3 +1,16 @@
+2000-08-09  Wichert Akkerman <wakkerma@debian.org>
+
+  * test/clone.c: minor fixup
+  * Another bunch of patches from John Hughes merged:
+  * signal.c:
+    + SVR4 printcontext(): sigset_t != sigset_t*
+    + getcontext returns a value, so print on exit of syscall
+    + add UC_FP to ucontext_flags for OS writers that can't spell
+    + sys_signal(): special case SIG_{ERR,DFL,IGN}
+    + decode_subcall(): only do subcall range checking when needed
+  * bunch of UnixWare updates
+  * aclocal.m4, acconfig.h, configure.in: add test for long long type
+
 2000-07-04  Wichert Akkerman <wakkerma@debian.org>
 
   * net.c: add SOL_PACKET and SOL_RAW socket options, update

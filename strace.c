@@ -660,7 +660,7 @@ int attaching;
 		}
 	}
 	/* Stop the process so that we own the stop. */
-	if (IOCTL(tcp->pfd, PIOCSTOP, NULL) < 0) {
+	if (IOCTL(tcp->pfd, PIOCSTOP, (char *)NULL) < 0) {
 		perror("strace: PIOCSTOP");
 		return -1;
 	}

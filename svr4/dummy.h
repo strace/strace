@@ -125,12 +125,6 @@
 #define sys_timer_settime printargs
 #define sys_timer_gettime printargs
 #define sys_timer_getoverrun printargs
-#define sys_signal printargs
-#define sys_sigset printargs
-#define sys_sighold printargs
-#define sys_sigrelse printargs
-#define sys_sigignore printargs
-#define sys_sigpause printargs
 #define sys_msgctl printargs
 #define sys_msgget printargs
 #define sys_msgrcv printargs
@@ -148,6 +142,7 @@
 #define sys_sysfs1 printargs
 #define sys_sysfs2 printargs
 #define sys_sysfs3 printargs
+#define sys_xsetsockaddr printargs
 
 /* like another call */
 #define sys_lchown sys_chown
@@ -165,6 +160,10 @@
 #define sys_BSDgetpgrp sys_getpgrp
 #define sys_BSDsetpgrp sys_setpgrp
 #define sys_waitsys sys_waitid
+#define sys_sigset sys_signal
+#define sys_sigrelse sys_sighold
+#define sys_sigignore sys_sighold
+#define sys_sigpause sys_sighold
 
 /* printargs does the right thing */
 #define sys_sync printargs

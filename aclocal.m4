@@ -299,3 +299,18 @@ then
 	AC_DEFINE(HAVE_STAT64)
 fi
 ])
+
+dnl ### A macro to determine whether we have long long
+AC_DEFUN(AC_LONG_LONG,
+[AC_MSG_CHECKING(for long long)
+AC_CACHE_VAL(ac_cv_type_long_long,
+[AC_TRY_COMPILE([],
+[long long x = 20;],
+ac_cv_type_long_long=yes,
+ac_cv_type_long_long=no)])
+AC_MSG_RESULT($ac_cv_type_long_long)
+if test "$ac_cv_type_long_long" = yes
+then
+	AC_DEFINE(HAVE_LONG_LONG)
+fi
+])

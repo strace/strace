@@ -1741,3 +1741,20 @@ struct tcb *tcp;
 }
 
 #endif /* HAVE_SYS_ASYNCH_H */
+
+#if UNIXWARE >= 7
+int
+sys_lseek64 (tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		long long offset = * (long long *) & tcp->u_arg [1];
+		if (tcp->u_arg[3] == SEEK_SET)
+			tprintf("%ld, %llu, ", tcp->u_arg[0], offset);
+		else
+			tprintf("%ld, %lld, ", tcp->u_arg[0], offset);
+		printxval(whence, tcp->u_arg[3], "SEEK_???");
+	}
+	return RVAL_LDECIMAL;
+}
+#endif

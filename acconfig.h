@@ -71,3 +71,6 @@
 
 /* Define if stat64 is available in asm/stat.h.  */
 #undef HAVE_STAT64
+
+/* Define if yor compilers know abuot long long */
+#undef HAVE_LONG_LONG

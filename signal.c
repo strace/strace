@@ -665,6 +665,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
+		tprintf(", ");
 		switch (tcp->u_arg[1]) {
 		case (int) SIG_ERR:
 			tprintf("SIG_ERR");
@@ -690,6 +691,29 @@ struct tcb *tcp;
 #endif /* !SVR4 */
 			tprintf("%#lx", tcp->u_arg[1]);
 		}
+		return 0;
+	}
+	else {
+		switch (tcp->u_rval) {
+		    case (int) SIG_ERR:
+			tcp->auxstr = "SIG_ERR"; break;
+		    case (int) SIG_DFL:
+			tcp->auxstr = "SIG_DFL"; break;
+		    case (int) SIG_IGN:
+			tcp->auxstr = "SIG_IGN"; break;
+		    default:
+			tcp->auxstr = NULL;
+		}
+		return RVAL_HEX | RVAL_STR;
+	}
+}
+
+int
+sys_sighold(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printsignal(tcp->u_arg[0]);
 	}
 	return 0;
 }
@@ -1020,8 +1044,10 @@ struct tcb *tcp;
 {
 	ucontext_t uc;
 
-	if (entering(tcp)) {
-		if (!tcp->u_arg[0])
+	if (exiting(tcp)) {
+		if (tcp->u_error)
+			tprintf("%#lx", tcp->u_arg[0]);
+		else if (!tcp->u_arg[0])
 			tprintf("NULL");
 		else if (umove(tcp, tcp->u_arg[0], &uc) < 0)
 			tprintf("{...}");
