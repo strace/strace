@@ -1,3 +1,7 @@
+2000-01-11 Wichert Akkerman  <wakkerma@debian.org>
+
+  * Add 1900 to tm_year in sprinttime
+
 1999-12-24  Wichert Akkerman  <wakkerma@debian.org>
 
  * file.c: protect printstat64 with STAT64 instead of linux so we can
