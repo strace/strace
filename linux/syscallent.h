@@ -233,8 +233,8 @@
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
 	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 187 */
-	{ 5,	0,	printargs,		"SYS_188"	}, /* 188 */
-	{ 5,	0,	printargs,		"SYS_189"	}, /* 189 */
+	{ 5,	0,	printargs,		"getpmsg"	}, /* 188 */
+	{ 5,	0,	printargs,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	printargs,		"getrlimit"	}, /* 191 */
 	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 192 */
@@ -257,7 +257,7 @@
 	{ 3,	0,	printargs,		"setresuid32"	}, /* 208 */
 	{ 3,	0,	printargs,		"getresuid32"	}, /* 209 */
 	{ 3,	0,	printargs,		"setresgid32"	}, /* 210 */
-	{ 3,	0,	printargs,		"getsetgid32"	}, /* 211 */
+	{ 3,	0,	printargs,		"getresgid32"	}, /* 211 */
 	{ 3,	TF,	printargs,		"chown32"	}, /* 212 */
 	{ 1,	0,	printargs,		"setuid32"	}, /* 213 */
 	{ 1,	0,	printargs,		"setgid32"	}, /* 214 */
