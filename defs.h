@@ -39,6 +39,9 @@
 
 /* configuration section */
 #ifndef MAX_QUALS
+#if defined(linux) && defined(MIPS)
+#define MAX_QUALS	4999	/* maximum number of syscalls, signals, etc. */
+#else
 #define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
 #endif
 #ifndef MAX_PROCS

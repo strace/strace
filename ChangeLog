@@ -1,3 +1,8 @@
+2000-04-13  Wichert Akkerman <wakkerma@debian.org>
+
+  * defs.h: Linux/MIPS uses syscalls up to >4k, so set MAX_QUALS to
+    4999
+
 2000-04-09  Wichert Akkerman <wakkerma@debian.org>
 
   * README-linux: updated to note that strace might not compile
