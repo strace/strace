@@ -1,4 +1,19 @@
+2004-02-15  Anton Blanchard  <anton@samba.org>
+
+	* linux/powerpc/syscallent.h: Add rtas call.
+	Shift multiplexed syscalls to start at 300, we are already about
+	to hit 256 real syscalls.
+	* linux/syscall.h: SYS_socket_subcall is now 300 for [POWERPC].
+
+2004-02-19  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (main): Use TCP->pid, not PID, in -p message.
+	Fixes Debian bug #229802.
+
 2004-01-13  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c (force_result) [LINUX] [S390 || S390X]: Remove bogus upeek
+	call.
 
 	* stream.c (internal_stream_ioctl): Fix typo strict -> struct.
 	Reported by Petter Reinholdtsen <pere@hungry.com>.
@@ -7,7 +22,7 @@
 
 	* process.c (struct_user_offsets) [IA64]: Fix up register name list.
 
-2003-12-14 Anton Blanchard <anton@samba.org>
+2003-12-14  Anton Blanchard  <anton@samba.org>
 
 	* file.c (sys_getdents64): Don't cast d_ino and d_off to unsigned long.
 	Use %llu formats for them.
@@ -29,7 +44,7 @@
 	* file.c (direnttypes): Define under [LINUX] as well.  Add DT_UNKNOWN.
 	(sys_getdents64) [LINUX]: Print d_type field.
 
-2003-12-15  Dmitry V. Levin <ldv@altlinux.org>
+2003-12-15  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* strace.c (trace) [WCOREDUMP]: Show coredump status of the
 	killed process if available.  Fixes RH#112117.
@@ -39,7 +54,7 @@
 	* configure.ac, NEWS: Version 4.5.1.
 	* strace.spec, debian/changelog: 4.5.1-1.
 
-2003-09-06  Dmitry V. Levin <ldv@altlinux.org>
+2003-09-06  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* defs.h (ioctl_lookup): Prototype change.
 	* ioctl.c (ioctl_next_match): New function.
@@ -55,7 +70,7 @@
 	* linux/sh/syscallent.h: Use sys_setgroups32, sys_getgroups32.
 	* linux/sh64/syscallent.h: Likewise.
 
-2003-09-06  Dmitry V. Levin <ldv@altlinux.org>
+2003-09-06  Dmitry V. Levin  <ldv@altlinux.org>
 
 	Fixes for RH#105359.
 	* util.c (printuid): New function.
