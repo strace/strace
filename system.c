@@ -2008,55 +2008,197 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef HAVE_SYS_NSCSYS_H
+#endif /* UNIXWARE > 2 */
 
+#if defined (HAVE_SYS_NSCSYS_H)
 struct cred;
 #include <sys/nscsys.h>
+#define SSISYS 1
+#elif defined (HAVE_CLUSTER_SSISYS_H)
+#include <cluster/ssisys.h>
+#define SSISYS 1
+#endif
+
+#ifdef SSISYS
 
 static struct xlat ssi_cmd [] = {
+#ifdef SSISYS_BADOP
 	{ SSISYS_BADOP,	"SSISYS_BADOP"	},
+#endif
+#ifdef SSISYS_LDLVL_INIT
 	{ SSISYS_LDLVL_INIT,"SSISYS_LDLVL_INIT"},
+#endif
+#ifdef SSISYS_LDLVL_GETVEC
 	{ SSISYS_LDLVL_GETVEC,"SSISYS_LDLVL_GETVEC"},
+#endif
+#ifdef SSISYS_LDLVL_PUTVEC
 	{ SSISYS_LDLVL_PUTVEC,"SSISYS_LDLVL_PUTVEC"},
+#endif
+#ifdef SSISYS_LDLVL_PUTRCMDS
 	{ SSISYS_LDLVL_PUTRCMDS,"SSISYS_LDLVL_PUTRCMDS"},
+#endif
+#ifdef SSISYS_LDLVL_SETREXEC
 	{ SSISYS_LDLVL_SETREXEC,"SSISYS_LDLVL_SETREXEC"},
+#endif
+#ifdef SSISYS_CMS_CLUSTERID
 	{ SSISYS_CMS_CLUSTERID,"SSISYS_CMS_CLUSTERID"},
+#endif
+#ifdef SSISYS_CFS_STATVFS
 	{ SSISYS_CFS_STATVFS,"SSISYS_CFS_STATVFS"},
+#endif
+#ifdef SSISYS_NODE_GETNUM
 	{ SSISYS_NODE_GETNUM,"SSISYS_NODE_GETNUM"},
+#endif
+#ifdef SSISYS_NODE_TABLE
 	{ SSISYS_NODE_TABLE,"SSISYS_NODE_TABLE"},
+#endif
+#ifdef SSISYS_NODE_DOWN
 	{ SSISYS_NODE_DOWN,"SSISYS_NODE_DOWN"},
+#endif
+#ifdef SSISYS_RECLAIM_CHILD
 	{ SSISYS_RECLAIM_CHILD,"SSISYS_RECLAIM_CHILD"},
+#endif
+#ifdef SSISYS_IPC_GETINFO
 	{ SSISYS_IPC_GETINFO,"SSISYS_IPC_GETINFO"},
+#endif
+#ifdef SSISYS_ICS_TEST
 	{ SSISYS_ICS_TEST,"SSISYS_ICS_TEST"},
+#endif
+#ifdef SSISYS_NODE_PID
 	{ SSISYS_NODE_PID,"SSISYS_NODE_PID"},
+#endif
+#ifdef SSISYS_ISLOCAL
 	{ SSISYS_ISLOCAL,"SSISYS_ISLOCAL"},
+#endif
+#ifdef SSISYS_CFS_ISSTACKED
 	{ SSISYS_CFS_ISSTACKED,"SSISYS_CFS_ISSTACKED"},
+#endif
+#ifdef SSISYS_DNET_SYNC
 	{ SSISYS_DNET_SYNC,"SSISYS_DNET_SYNC"},
+#endif
+#ifdef SSISYS_CFS_WAIT_MODE
 	{ SSISYS_CFS_WAIT_MODE,"SSISYS_CFS_WAIT_MODE"},
+#endif
+#ifdef SSISYS_CFS_UMOUNT
 	{ SSISYS_CFS_UMOUNT,"SSISYS_CFS_UMOUNT"},
+#endif
+#ifdef SSISYS_LLSTAT
 	{ SSISYS_LLSTAT,"SSISYS_LLSTAT"	},
+#endif
+#ifdef SSISYS_LTS_PERFTEST
 	{ SSISYS_LTS_PERFTEST,"SSISYS_LTS_PERFTEST"},
+#endif
+#ifdef SSISYS_LTS_CONFIG
 	{ SSISYS_LTS_CONFIG,"SSISYS_LTS_CONFIG"},
+#endif
+#ifdef SSISYS_SNET_PERFTEST
 	{ SSISYS_SNET_PERFTEST,"SSISYS_SNET_PERFTEST"},
+#endif
+#ifdef SSISYS_IGNORE_HALFUP
 	{ SSISYS_IGNORE_HALFUP,"SSISYS_IGNORE_HALFUP"},
+#endif
+#ifdef SSISYS_NODE_ROOTDEV
 	{ SSISYS_NODE_ROOTDEV,"SSISYS_NODE_ROOTDEV"},
+#endif
+#ifdef SSISYS_GET_PRIMARY
 	{ SSISYS_GET_PRIMARY,"SSISYS_GET_PRIMARY"},
+#endif
+#ifdef SSISYS_GET_SECONDARY
 	{ SSISYS_GET_SECONDARY,"SSISYS_GET_SECONDARY"},
+#endif
+#ifdef SSISYS_GET_ROOTDISK
 	{ SSISYS_GET_ROOTDISK,"SSISYS_GET_ROOTDISK"},
+#endif
+#ifdef SSISYS_CLUSTERNODE_NUM
 	{ SSISYS_CLUSTERNODE_NUM,"SSISYS_CLUSTERNODE_NUM"},
+#endif
+#ifdef SSISYS_CLUSTER_MEMBERSHIP
 	{ SSISYS_CLUSTER_MEMBERSHIP,"SSISYS_CLUSTER_MEMBERSHIP"},
+#endif
+#ifdef SSISYS_CLUSTER_DETAILEDTRANS
 	{ SSISYS_CLUSTER_DETAILEDTRANS,"SSISYS_CLUSTER_DETAILEDTRANS"},
+#endif
+#ifdef SSISYS_CLUSTERNODE_INFO
 	{ SSISYS_CLUSTERNODE_INFO,"SSISYS_CLUSTERNODE_INFO"},
+#endif
+#ifdef SSISYS_CLUSTERNODE_SETINFO
 	{ SSISYS_CLUSTERNODE_SETINFO,"SSISYS_CLUSTERNODE_SETINFO"},
+#endif
+#ifdef SSISYS_CLUSTERNODE_AVAIL
 	{ SSISYS_CLUSTERNODE_AVAIL,"SSISYS_CLUSTERNODE_AVAIL"},
+#endif
+#ifdef SSISYS_CLUSTER_MAXNODES
 	{ SSISYS_CLUSTER_MAXNODES,"SSISYS_CLUSTER_MAXNODES"},
+#endif
+#ifdef SSISYS_SET_MEMPRIO
 	{ SSISYS_SET_MEMPRIO,"SSISYS_SET_MEMPRIO"},
+#endif
+#ifdef SSISYS_GET_USERS
 	{ SSISYS_GET_USERS,"SSISYS_GET_USERS"},
+#endif
+#ifdef SSISYS_FORCE_ROOT_NODE
 	{ SSISYS_FORCE_ROOT_NODE,"SSISYS_FORCE_ROOT_NODE"},
+#endif
+#ifdef SSISYS_CVIP_SET
 	{ SSISYS_CVIP_SET,"SSISYS_CVIP_SET"},
+#endif
+#ifdef SSISYS_CVIP_GET
 	{ SSISYS_CVIP_GET,"SSISYS_CVIP_GET"},
+#endif
+#ifdef SSISYS_GET_NODE_COUNTS
 	{ SSISYS_GET_NODE_COUNTS,"SSISYS_GET_NODE_COUNTS"},
+#endif
+#ifdef SSISYS_GET_TRANSPORT
 	{ SSISYS_GET_TRANSPORT,"SSISYS_GET_TRANSPORT"},
+#endif
+#ifdef SSISYS_CLUSTER_SET_CONFIG
+	{ SSISYS_CLUSTER_SET_CONFIG,"SSISYS_CLUSTER_SET_CONFIG"},
+#endif
+#ifdef SSISYS_CLUSTER_INIT_PREROOT
+	{ SSISYS_CLUSTER_INIT_PREROOT,"SSISYS_CLUSTER_INIT_PREROOT"},
+#endif
+#ifdef SSISYS_CLUSTER_INIT_POSTROOT
+	{ SSISYS_CLUSTER_INIT_POSTROOT,"SSISYS_CLUSTER_INIT_POSTROOT"},
+#endif
+#ifdef SSISYS_CLUSTER_INITPROC
+	{ SSISYS_CLUSTER_INITPROC,"SSISYS_CLUSTER_INITPROC"},
+#endif
+#ifdef SSISYS_MOUNT_REMOTE_ROOT
+	{ SSISYS_MOUNT_REMOTE_ROOT,"SSISYS_MOUNT_REMOTE_ROOT"},
+#endif
+#ifdef SSISYS_DISCOVER_MOUNTS
+	{ SSISYS_DISCOVER_MOUNTS,"SSISYS_DISCOVER_MOUNTS"},
+#endif
+#ifdef SSISYS_CFS_MOUNT
+	{ SSISYS_CFS_MOUNT,"SSISYS_CFS_MOUNT"},
+#endif
+#ifdef SSISYS_SET_LVSDIRECTOR
+	{ SSISYS_SET_LVSDIRECTOR,"SSISYS_SET_LVSDIRECTOR"},
+#endif
+#ifdef SSISYS_CFS_REMOUNT
+	{ SSISYS_CFS_REMOUNT,"SSISYS_CFS_REMOUNT"},
+#endif
+#ifdef SSISYS_CFS_SETROOT
+	{ SSISYS_CFS_SETROOT,"SSISYS_CFS_SETROOT"},
+#endif
+#ifdef SSISYS_SET_NODE_CONTEXT
+	{ SSISYS_SET_NODE_CONTEXT,"SSISYS_SET_NODE_CONTEXT"},
+#endif
+#ifdef SSISYS_SET_NODENAME
+	{ SSISYS_SET_NODENAME,"SSISYS_SET_NODENAME"},
+#endif
+#ifdef SSISYS_SET_IPVSPORTWEIGHT
+	{ SSISYS_SET_IPVSPORTWEIGHT,"SSISYS_SET_IPVSPORTWEIGHT"},
+#endif
+#ifdef SSISYS_GET_NODENAME
+	{ SSISYS_GET_NODENAME,"SSISYS_GET_NODENAME"},
+#endif
+#ifdef SSISYS_SET_CLUSTERNAME
+	{ SSISYS_SET_CLUSTERNAME,"SSISYS_SET_CLUSTERNAME"},
+#endif
+#ifdef SSISYS_GET_CLUSTERNAME
+	{ SSISYS_GET_CLUSTERNAME,"SSISYS_GET_CLUSTERNAME"},
+#endif
 	{ 0,		NULL		},
 };
 
@@ -2066,6 +2208,7 @@ struct tcb *tcp;
 	struct ssisys_iovec iov;
 	cls_nodeinfo_args_t cni;
 	clusternode_info_t info;
+	clusternode_t node;
 
 	if (entering (tcp)) {
 		ts_reclaim_child_inargs_t trc;
@@ -2084,7 +2227,7 @@ struct tcb *tcp;
 			    umove (tcp, (long) iov.tio_udatain, &trc) < 0)
 				goto bad;
 			tprintf (", in={pid=%ld, start=%ld}",
-				 trc.trc_pid, trc.trc_start);
+				 (long) trc.trc_pid, trc.trc_start);
 			break;
 		    case SSISYS_CLUSTERNODE_INFO:
 			if (iov.tio_udatainlen != sizeof cni ||
@@ -2092,6 +2235,15 @@ struct tcb *tcp;
 				goto bad;
 			tprintf (", in={node=%ld, len=%d}",
 				 cni.nodenum, cni.info_len);
+			break;
+		    case SSISYS_CLUSTERNODE_AVAIL:
+#ifdef SSISYS_SET_NODE_CONTEXT
+		    case SSISYS_SET_NODE_CONTEXT:
+#endif
+			if (iov.tio_udatainlen != sizeof node ||
+			    umove (tcp, (long) iov.tio_udatain, &node) < 0)
+				goto bad;
+			tprintf (", node=%ld", node);
 			break;
 		    default:
 		    bad:
@@ -2111,7 +2263,7 @@ struct tcb *tcp;
 			    umove (tcp, (long) iov.tio_udatain, &cni) < 0)
 				goto bad_out;
 			if (cni.info_len != sizeof info || 
-			    iov.tio_udataoutlen != sizeof &info ||
+			    /* iov.tio_udataoutlen != sizeof info || */
 			    umove (tcp, (long) iov.tio_udataout, &info) < 0)
 				goto bad_out;
 			tprintf (", out={node=%ld, cpus=%d, online=%d}",
@@ -2132,9 +2284,8 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif
+#endif	/* SSISYS */
 
-#endif /* UNIXWARE > 2 */
 
 #ifdef MIPS
 

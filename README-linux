@@ -30,3 +30,16 @@ There are three ways to compile strace with other kernel headers:
 * you can link /usr/include/linux and /usr/include/asm to the
   corresponding directories in your kernel source-tree.
 
+
+OpenSSI:
+--------
+
+If you want to compile strace with support for the OpenSSI clustering
+software the easy way is to use the CPPFLAGS to point configure to your
+ci source code:
+
+CPPFLAGS="-I path-to-ci/kernel/include" ./configure
+
+Note that I don't know how to strace across rfork.
+
+	- John Hughes <john@calva.com>

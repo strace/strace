@@ -336,10 +336,11 @@
 	{ 5,	0,	printargs,		"SYS_287"	}, /* 287 */
 	{ 5,	0,	printargs,		"SYS_288"	}, /* 288 */
 	{ 5,	0,	printargs,		"SYS_289"	}, /* 289 */
-	{ 5,	0,	printargs,		"SYS_290"	}, /* 290 */
-	{ 5,	0,	printargs,		"SYS_291"	}, /* 291 */
-	{ 5,	0,	printargs,		"SYS_292"	}, /* 292 */
-	{ 5,	0,	printargs,		"SYS_293"	}, /* 293 */
+	  /* OpenSSI syscalls */
+	{ 2,	0,	sys_ssisys,		"ssisys"	}, /* 290 */
+	{ 1,	0,	sys_rfork,		"rfork"		}, /* 291 */
+	{ 4,	0,	sys_rexecve,		"rexecve"	}, /* 292 */
+	{ 1,	0,	sys_migrate,		"migrate"	}, /* 293 */
 	{ 5,	0,	printargs,		"SYS_294"	}, /* 294 */
 	{ 5,	0,	printargs,		"SYS_295"	}, /* 295 */
 	{ 5,	0,	printargs,		"SYS_296"	}, /* 296 */

@@ -611,6 +611,19 @@ struct tcb *tcp;
 }
 
 int
+sys_rfork(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf ("%ld", tcp->u_arg[0]);
+	}
+	else {
+		return RVAL_UDECIMAL;
+	}
+	return 0;
+}
+
+int
 change_syscall(tcp, new)
 struct tcb *tcp;
 int new;
@@ -1683,7 +1696,6 @@ struct tcb *tcp;
 	return 0;
 }
 
-#if UNIXWARE > 2
 
 int sys_rexecve(tcp)
 struct tcb *tcp;
@@ -1695,7 +1707,6 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif
 
 int
 internal_exec(tcp)

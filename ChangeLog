@@ -1,3 +1,19 @@
+2004-01-29  John Hughes  <john@calva.com>
+
+	* README-linux: Document method for finding OpenSSI includes.
+
+	* linux/syscallent.h: Add OpenSSI syscalls.
+
+	* linux/syscall.h: Add OpenSSI syscalls.
+
+	* linux/dummy.h: Add OpenSSI syscalls.
+
+	* system.c (tcp;): make sys_ssisys work on Linux.
+
+	* process.c (sys_rfork, sys_rexecve): Add cluster syscalls for Linux.
+
+	* configure.ac: check for cluster/ssisys.h.
+
 2004-01-13  Roland McGrath  <roland@redhat.com>
 
 	* stream.c (internal_stream_ioctl): Fix typo strict -> struct.

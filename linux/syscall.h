@@ -96,6 +96,18 @@ int sys_clock_gettime(), sys_clock_getres(), sys_clock_nanosleep();
 int sys_semtimedop(), sys_statfs64(), sys_fstatfs64(), sys_tgkill();
 
 
+/* OpenSSI cluster syscalls */
+
+int sys_ssisys(), sys_rfork(), sys_rexecve(), sys_migrate();
+
+/* Where are the silly numbers defined? */
+
+#define SYS_ssisys	290
+#define SYS_rfork	(SYS_ssisys + 1)
+#define SYS_rexecve	(SYS_ssisys + 2)
+#define SYS_migrate	(SYS_ssisys + 3)
+
+
 /* sys_socketcall subcalls */
 
 int sys_socket(), sys_bind(), sys_connect(), sys_listen();
