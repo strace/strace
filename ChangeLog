@@ -1,5 +1,13 @@
 2004-03-01  Roland McGrath  <roland@redhat.com>
 
+	* process.c (struct_user_offsets) [LINUX && IA64]: Conditionalize
+	PT_AR_CSD and PT_AR_SSD uses in case of older kernel headers.
+
+	* configure.ac: Check for `struct pt_all_user_regs'
+	and `struct ia64_fpreg' in <sys/ptrace.h>.
+	* util.c, process.c, syscall.c: Work around conflicts between
+	<sys/ptrace.h> and <linux/ptrace.h> for defining those types.
+
 	* util.c [LINUX] (arg0_index, arg1_index): New macros.
 	[S390 || S390X]: Define them with inverted values.
 	(setbpt): Use them for u_arg indices.
