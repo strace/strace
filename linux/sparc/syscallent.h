@@ -238,7 +238,7 @@
 	{ 1,	0,	sys_stime,	"stime" },		/* 233 */
 	{ 2,	0,	printargs,	"nis_syscall" },	/* 234 */
 	{ 2,	0,	printargs,	"nis_syscall" },	/* 235 */
-	{ 5,	0,	printargs,	"_llseek" },		/* 236 */
+	{ 5,	0,	sys_llseek,	"_llseek" },		/* 236 */
 	{ 5,	0,	sys_mlock,	"mlock" },		/* 237 */
 	{ 5,	0,	sys_munlock,	"munlock" },		/* 238 */
 	{ 5,	0,	sys_mlockall,	"mlockall" },		/* 239 */
@@ -355,4 +355,3 @@
 	{ 5,	0,	printargs,	"SYS_350" },		/* 350 */
 	{ 5,	0,	printargs,	"SYS_351" },		/* 351 */
 	{ 5,	0,	printargs,	"SYS_352" },		/* 352 */
-

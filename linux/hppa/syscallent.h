@@ -135,7 +135,7 @@
 	{ 2,	0,	sys_create_module,	"create_module"		}, /* 127 */
 	{ 4,	0,	sys_init_module,	"init_module"		}, /* 128 */
 	{ 1,	0,	sys_delete_module,	"delete_module"		}, /* 129 */
-	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"	}, /* 130 */ 
+	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"	}, /* 130 */
 	{ 4,	0,	sys_quotactl,		"quotactl"		}, /* 131 */
 	{ 1,	0,	sys_getpgid,		"getpgid"		}, /* 132 */
 	{ 1,	TF,	sys_fchdir,		"fchdir"		}, /* 133 */
@@ -145,7 +145,7 @@
 	{ 5,	0,	printargs,		"SYS_137"		}, /* 137 */
 	{ 1,	0,	sys_setfsuid,		"setfsuid"		}, /* 138 */
 	{ 1,	0,	sys_setfsgid,		"setfsgid"		}, /* 139 */
-	{ 5,	TF,	printargs,		"_llseek"		}, /* 140 */
+	{ 5,	TF,	sys_llseek,		"_llseek"		}, /* 140 */
 	{ 3,	0,	sys_getdents,		"getdents"		}, /* 141 */
 	{ 5,	0,	printargs,		"_newselect"		}, /* 142 */
 	{ 2,	0,	sys_flock,		"flock"			}, /* 143 */
@@ -159,10 +159,10 @@
 	{ 2,	0,	sys_munlock,		"munlock"		}, /* 151 */
 	{ 1,	0,	sys_mlockall,		"mlockall"		}, /* 152 */
 	{ 1,	0,	sys_munlockall,		"munlockall"		}, /* 153 */
-	{ 2,	0,	sys_sched_setparam,	"sched_setparam"	}, /* 154 */ 
-	{ 2,	0,	sys_sched_getparam,	"sched_getparam"	}, /* 155 */ 
-	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"	}, /* 156 */ 
-	{ 2,	0,	sys_sched_getscheduler,	"sched_getscheduler"	}, /* 157 */ 
+	{ 2,	0,	sys_sched_setparam,	"sched_setparam"	}, /* 154 */
+	{ 2,	0,	sys_sched_getparam,	"sched_getparam"	}, /* 155 */
+	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"	}, /* 156 */
+	{ 2,	0,	sys_sched_getscheduler,	"sched_getscheduler"	}, /* 157 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"		}, /* 158 */
 	{ 1,	0,	sys_sched_get_priority_max,"sched_get_priority_max"}, /* 159 */
 	{ 1,	0,	sys_sched_get_priority_min,"sched_get_priority_min"}, /* 160 */
@@ -180,10 +180,10 @@
 	{ 5,	0,	sys_prctl,		"prctl"			}, /* 172 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"		}, /* 173 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"		}, /* 174 */
-	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"	}, /* 175 */ 
+	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"	}, /* 175 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"		}, /* 176 */
-	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"	}, /* 177 */ 
-	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"	}, /* 178 */ 
+	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"	}, /* 177 */
+	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"	}, /* 178 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"		}, /* 179 */
 	{ 3,	TF,	sys_chown,		"chown"			}, /* 180 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"		}, /* 181 */
