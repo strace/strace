@@ -301,6 +301,12 @@ struct tcb *tcp;
 #endif
 	}
 #endif
+#ifdef SYS_clone
+	/* clone can do many things, not all of which we know how to handle.
+	   Don't do it for now. */
+	if (tcp->scno == SYS_clone)
+		dont_follow = 1;
+#endif
 	if (entering(tcp)) {
 		if (!followfork || dont_follow)
 			return 0;
