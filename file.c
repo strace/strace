@@ -919,8 +919,7 @@ long addr;
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(LINUX) && !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
-    && !defined(S390) && !defined(S390X)
+#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
@@ -1007,9 +1006,7 @@ struct tcb *tcp;
 #endif
 }
 
-#ifdef LINUX
-# if !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
-     && !defined(S390) && !defined(S390X)
+#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 int
 sys_oldstat(tcp)
 struct tcb *tcp;
@@ -1022,8 +1019,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 && !HPPA*/
-#endif /* LINUX */
+#endif /* LINUX && HAVE_STRUCT___OLD_KERNEL_STAT */
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -1055,9 +1051,7 @@ struct tcb *tcp;
 #endif
 }
 
-#ifdef LINUX
-# if !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
-     && !defined(S390) && !defined(S390X)
+#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 int
 sys_oldfstat(tcp)
 struct tcb *tcp;
@@ -1069,8 +1063,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 && !HPPA && !X86_64 && !S390 && !S390X */
-#endif
+#endif /* LINUX && HAVE_STRUCT___OLD_KERNEL_STAT */
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -1104,9 +1097,7 @@ struct tcb *tcp;
 #endif
 }
 
-#ifdef LINUX
-# if !defined(IA64) && !defined(HPPA) && !defined(X86_64) \
-     && !defined(S390) && !defined(S390X)
+#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 int
 sys_oldlstat(tcp)
 struct tcb *tcp;
@@ -1119,8 +1110,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 && !HPPA && !X86_64 && !S390 && !S390X */
-#endif
+#endif /* LINUX && HAVE_STRUCT___OLD_KERNEL_STAT */
 
 
 #if defined(SVR4) || defined(LINUXSPARC)

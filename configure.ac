@@ -205,6 +205,8 @@ AC_CHECK_MEMBERS([struct T_conn_res.QUEUE_ptr,
 [#include <sys/stream.h>
 #include <sys/tihdr.h>])
 
+AC_CHECK_TYPES([struct __old_kernel_stat],,, [#include <asm/stat.h>])
+
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
 

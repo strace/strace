@@ -123,6 +123,12 @@
 #define sys_putpmsg		printargs
 #endif
 
+#ifndef HAVE_STRUCT___OLD_KERNEL_STAT
+#define sys_oldstat		printargs
+#define sys_oldfstat		printargs
+#define sys_oldlstat		printargs
+#endif
+
 #if DONE
 #define sys_oldselect		printargs
 #define	sys_msync		printargs
