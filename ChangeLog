@@ -1,9 +1,17 @@
 2004-10-07  Roland McGrath  <roland@redhat.com>
 
+	* mem.c [LINUX] (sys_mbind, sys_set_mempolicy, sys_get_mempolicy):
+	New functions.
+	* linux/syscall.h: Declare them.
+	* linux/x86_64/syscallent.h: Likewise.
+	* linux/syscallent.h: Handle mbind, set_mempolicy, get_mempolicy.
+	From Ulrich Drepper <drepper@redhat.com>.
+
 	* file.c [LINUX && (I386 || X86_64)] (sys_fadvise64, sys_fadvise64_64):
 	New functions.
 	* linux/syscall.h: Declare them.
 	* linux/syscallent.h: Handle fadvise64 and fadvise64_64 using those.
+	* linux/x86_64/syscallent.h: Likewise.
 	From Ulrich Drepper <drepper@redhat.com>.
 
 2004-09-13  Dmitry V. Levin  <ldv@altlinux.org>
