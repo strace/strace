@@ -404,11 +404,11 @@ struct tcb *tcp;
 	if (tcp->u_arg[4] == SEEK_SET)
 	    tprintf("%ld, %llu, ", tcp->u_arg[0],
 		    (((long long int) tcp->u_arg[1]) << 32
-		     | (unsigned long long) tcp->u_arg[2]));
+		     | (unsigned long long) (unsigned) tcp->u_arg[2]));
 	else
 	    tprintf("%ld, %lld, ", tcp->u_arg[0],
 		    (((long long int) tcp->u_arg[1]) << 32
-		     | (unsigned long long) tcp->u_arg[2]));
+		     | (unsigned long long) (unsigned) tcp->u_arg[2]));
     }
     else {
 	long long int off;

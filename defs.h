@@ -534,10 +534,10 @@ do {									\
 
 #if HAVE_LITTLE_ENDIAN_LONG_LONG
 #define LONG_LONG(_l,_h) \
-    ((long long)((unsigned long long)(_l) | ((unsigned long long)(_h)<<32)))
+    ((long long)((unsigned long long)(unsigned)(_l) | ((unsigned long long)(_h)<<32)))
 #else
 #define LONG_LONG(_l,_h) \
-    ((long long)((unsigned long long)(_h) | ((unsigned long long)(_l)<<32)))
+    ((long long)((unsigned long long)(unsigned)(_h) | ((unsigned long long)(_l)<<32)))
 #endif
 #endif
 

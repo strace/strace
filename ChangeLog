@@ -1,6 +1,8 @@
 2002-03-31  Wichert Akkerman <wichert@deephackmode.org>
 
 	* debian/*: added
+	* linux/syscallent.h: fix typo and add the reserved stream syscalls
+	* defs.h, file.c, io.c: fix signed/unsigned issues
 
 2001-12-17  Wichert Akkerman <wakkerma@debian.org>
 
