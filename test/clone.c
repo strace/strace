@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <sched.h>
+
+int child(void* arg) {
+    write(1, "clone\n", 6);
+    return 0;
+}
+
+int
+main()
+{
+    	char	stack[4096];
+	if (clone(child, stack+4000, CLONE_VM|CLONE_FS|CLONE_FILES, NULL) == 0)
+		write(1, "original\n", 9);
+	exit(0);
+}
