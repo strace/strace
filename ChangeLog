@@ -1,3 +1,10 @@
+2004-08-30  Roland McGrath  <roland@redhat.com>
+
+	* file.c (print_xattr_val): New function to show attribute values.
+	(sys_setxattr, sys_fsetxattr, sys_getxattr, sys_fgetxattr): Use it.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#131177.
+
 2004-07-12  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.6.
