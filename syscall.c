@@ -1658,8 +1658,8 @@ force_result(tcp, error, rval)
 		return -1;
 #else /* !M68K */
 #ifdef ARM
-	r0 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*0), r0) < 0)
+       regs.ARM_r0 = error ? -error : rval;
+       if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*0), regs.ARM_r0) < 0)
 		return -1;
 #else /* !ARM */
 #ifdef ALPHA
