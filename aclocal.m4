@@ -287,9 +287,13 @@ fi
 
 dnl ### A macro to determine whether stat64 is defined.
 AC_DEFUN(AC_STAT64,
-[AC_MSG_CHECKING(for stat64 in asm/stat.h)
+[AC_MSG_CHECKING(for stat64 in (asm|sys)/stat.h)
 AC_CACHE_VAL(ac_cv_type_stat64,
-[AC_TRY_COMPILE([#include <asm/stat.h>],
+[AC_TRY_COMPILE([#ifdef linux
+#include <asm/stat.h>
+#else
+#include <sys/stat.h>
+#endif],
 [struct stat64 st;],
 ac_cv_type_stat64=yes,
 ac_cv_type_stat64=no)])

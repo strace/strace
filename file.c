@@ -999,6 +999,11 @@ struct tcb *tcp;
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
+#ifdef _STAT64_VER
+		if (tcp->u_arg[0] == _STAT64_VER)
+			printstat64 (tcp, tcp->u_arg[2]);
+		else
+#endif
 		printstat(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -1011,6 +1016,11 @@ struct tcb *tcp;
 	if (entering(tcp))
 		tprintf("%ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1]);
 	else {
+#ifdef _STAT64_VER
+		if (tcp->u_arg[0] == _STAT64_VER)
+			printstat64 (tcp, tcp->u_arg[2]);
+		else
+#endif
 		printstat(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -1025,6 +1035,11 @@ struct tcb *tcp;
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
+#ifdef _STAT64_VER
+		if (tcp->u_arg[0] == _STAT64_VER)
+			printstat64 (tcp, tcp->u_arg[2]);
+		else
+#endif
 		printstat(tcp, tcp->u_arg[2]);
 	}
 	return 0;
