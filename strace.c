@@ -1679,14 +1679,14 @@ trace()
 #ifdef LINUX
 #ifdef __WALL
 		pid = wait4(-1, &status, wait4_options, cflag ? &ru : NULL);
-		if ((wait4_options & __WALL) && errno == EINVAL) {
+		if (pid < 0 && (wait4_options & __WALL) && errno == EINVAL) {
 			/* this kernel does not support __WALL */
 			wait4_options &= ~__WALL;
 			errno = 0;
 			pid = wait4(-1, &status, wait4_options,
 					cflag ? &ru : NULL);
 		}
-		if (!(wait4_options & __WALL) && errno == ECHILD) {
+		if (pid < 0 && !(wait4_options & __WALL) && errno == ECHILD) {
 			/* most likely a "cloned" process */
 			pid = wait4(-1, &status, __WCLONE,
 					cflag ? &ru : NULL);
