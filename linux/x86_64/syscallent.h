@@ -164,7 +164,7 @@
 	{ 1,	TF,	sys_acct,		"acct"		},  /* 163 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	},  /* 164 */
 	{ 5,	TF,	sys_mount,		"mount"		},  /* 165 */
-	{ 3,	0,	printargs,		"umount2" }, /* 166 */
+	{ 3,	0,	printargs,		"umount2"	},  /* 166 */
 	{ 1,	TF,	sys_swapon,		"swapon"	},  /* 167 */
 	{ 1,	0,	sys_swapoff,		"swapoff"	},  /* 168 */
 	{ 3,	0,	sys_reboot,		"reboot"	},  /* 169 */
@@ -216,24 +216,10 @@
 	{ 4,	0,	printargs,		"epoll_wait_old"}, /* 215 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 216 */
 	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 217 */
-	{ 5,	0,	printargs,		"SYS_218"	}, /* 218 */
-	{ 5,	0,	printargs,		"SYS_219"	}, /* 219 */
-	{ 5,	0,	printargs,		"SYS_220"	}, /* 220 */
-	{ 5,	0,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
-	{ 5,	0,	printargs,		"SYS_222"	}, /* 222 */
-	{ 5,	0,	printargs,		"SYS_223"	}, /* 223 */
-	{ 5,	0,	printargs,		"SYS_224"	}, /* 224 */
-	{ 5,	0,	printargs,		"SYS_225"	}, /* 225 */
-	{ 5,	0,	printargs,		"SYS_226"	}, /* 226 */
-	{ 5,	0,	printargs,		"SYS_227"	}, /* 227 */
-	{ 5,	0,	printargs,		"SYS_228"	}, /* 228 */
-	{ 5,	0,	printargs,		"SYS_229"	}, /* 229 */
-	{ 5,	0,	printargs,		"SYS_230"	}, /* 230 */
-	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 231 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
 	{ 5,	0,	printargs,		"restart_syscall"}, /* 219 */
 	{ 5,	0,	printargs,		"semtimedop"	}, /* 220 */
-	{ 5,	0,	printargs,		"fadvise64"	}, /* 221 */
+	{ 4,	TF,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 222 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 223 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 224 */
@@ -246,8 +232,8 @@
 	{ 5,	0,	printargs,		"exit_group"	}, /* 231 */
 	{ 5,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 232 */
 	{ 5,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 233 */
-	{ 5,	0,	printargs,		"tgkill"	}, /* 234 */
-	{ 5,	0,	printargs,		"utimes"	}, /* 235 */
+	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 234 */
+	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 235 */
 	{ 5,	0,	printargs,		"vserver"	}, /* 236 */
 	{ 6,	0,	sys_mbind,		"mbind"		}, /* 237 */
 	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"	}, /* 238 */
@@ -259,10 +245,10 @@
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 244 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 245 */
 	{ 5,	0,	printargs,		"kexec_load"	}, /* 246 */
-	{ 5,	0,	printargs,		"SYS_247"	}, /* 247 */
+	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 247 */
 	{ 5,	0,	printargs,		"SYS_248"	}, /* 248 */
 	{ 5,	0,	printargs,		"SYS_249"	}, /* 249 */
 	{ 5,	0,	printargs,		"SYS_250"	}, /* 250 */
 	{ 5,	0,	printargs,		"SYS_251"	}, /* 251 */
 	{ 5,	0,	printargs,		"SYS_252"	}, /* 252 */
-	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 253 */
+	{ 5,	0,	printargs,		"SYS_253"	}, /* 253 */
