@@ -1,6 +1,12 @@
 2003-01-23  Roland McGrath  <roland@redhat.com>
 
-	* linux/sparc/syscall.h: Declare sys_getdents64.
+	* signal.c: Reorder #ifdefs so HAVE_ASM_SIGCONTEXT_H doesn't matter on
+	SPARC, which doesn't use the header regardless.
+
+	* util.c [LINUX && SPARC]: Do renaming kludges around <asm/reg.h>
+	like signal.c does.
+
+	* linux/sparc/syscall.h: Declare sys_getdents64, sys_llseek.
 
 	* linux/dummy.h [! SYS_getpmsg] (sys_getpmsg): #define to printargs.
 	[! SYS_putpmsg] (sys_putpmsg): Likewise.
