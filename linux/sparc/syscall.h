@@ -80,7 +80,8 @@ int	sys_aioread(), sys_aiowrite(), sys_aiowait(), sys_aiocancel();
 /* 2.2 file system */
 int	sys_chdir(),sys_chroot();
 int	sys_fchdir(),sys_fchroot();
-int	sys_mkdir(),sys_rmdir(),sys_getdirentries(), sys_getdents(),sys_readdir();
+int	sys_mkdir(),sys_rmdir(),sys_getdirentries();
+int	sys_getdents(), sys_getdents64(), sys_readdir();
 int	sys_creat(),sys_open(),sys_mknod(),sys_unlink(),sys_stat(),sys_fstat(),sys_lstat();
 int	sys_chown(),sys_fchown(),sys_chmod(),sys_fchmod(),sys_utimes();
 int	sys_link(),sys_symlink(),sys_readlink(),sys_rename();
