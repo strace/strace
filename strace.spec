@@ -1,12 +1,14 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.4.99
+Version: 4.5
 Release: 1
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
 Source0: %{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-root
+
+%define strace64_arches ppc64
 
 %description
 The strace program intercepts and records the system calls called and
@@ -17,6 +19,25 @@ purposes.
 
 Install strace if you need a tool to track the system calls made and
 received by a process.
+
+%ifarch %{strace64_arches}
+%package -n strace64
+Summary: Tracks and displays system calls associated with a running process.
+Group: Development/Debuggers
+
+%description -n strace64
+The strace program intercepts and records the system calls called and
+received by a running process.  Strace can print a record of each
+system call, its arguments and its return value.  Strace is useful for
+diagnosing problems and debugging, as well as for instructional
+purposes.
+
+Install strace if you need a tool to track the system calls made and
+received by a process.
+
+This package provides the `strace64' program to trace 64-bit processes.
+The `strace' program in the `strace' package is for 32-bit processes.
+%endif
 
 %prep
 %setup -q
@@ -34,6 +55,10 @@ mkdir -p %{buildroot}%{_bindir}
 # remove unpackaged files from the buildroot
 rm -f %{buildroot}%{_bindir}/strace-graph
 
+%ifarch %{strace64_arches}
+ln %{buildroot}%{_bindir}/strace %{buildroot}%{_bindir}/strace64
+%endif
+
 %clean
 rm -rf %{buildroot}
 
@@ -42,7 +67,17 @@ rm -rf %{buildroot}
 %{_bindir}/strace
 %{_mandir}/man1/*
 
+%ifarch %{strace64_arches}
+%files -n strace64
+%defattr(-,root,root)
+%{_bindir}/strace64
+%endif
+
+
 %changelog
+* Thu Jul 17 2003 Roland McGrath <roland@redhat.com> 4.4.99-2
+- rebuilt
+
 * Thu Jul 17 2003 Roland McGrath <roland@redhat.com> 4.4.99-1
 - new upstream version, groks more new system calls, PF_INET6 sockets
 
