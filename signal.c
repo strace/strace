@@ -225,25 +225,63 @@ int sig;
 	}
 }
 
+static void
+long_to_sigset(l, s)
+long l;
+sigset_t *s;
+{
+	sigemptyset(s);
+	*(long *)s = l;
+}
+
+static int
+copy_sigset_len(tcp, addr, s, len)
+struct tcb *tcp;
+int addr;
+sigset_t *s;
+int len;
+{
+	if (len > sizeof(*s))
+		len = sizeof(*s);
+	sigemptyset(s);
+	if (umoven(tcp, addr, len, (char *)s) < 0)
+		return -1;
+	return 0;
+}
+
+#ifdef LINUX
+/* Original sigset is unsigned long */
+#define copy_sigset(tcp, addr, s) copy_sigset_len(tcp, addr, s, sizeof(long))
+#else
+#define copy_sigset(tcp, addr, s) copy_sigset_len(tcp, addr, s, sizeof(sigset_t))
+#endif
+
 static char *
-sprintsigmask(s, mask)
+sprintsigmask(s, mask, rt)
 char *s;
 sigset_t *mask;
+int rt; /* set might include realtime sigs */
 {
 	int i, nsigs;
+	int maxsigs;
 	char *format;
 	static char outstr[256];
 
 	strcpy(outstr, s);
 	s = outstr + strlen(outstr);
 	nsigs = 0;
-	for (i = 1; i < nsignals; i++) {
+	maxsigs = nsignals;
+#ifdef __SIGRTMAX
+	if (rt)
+		maxsigs = __SIGRTMAX; /* instead */
+#endif
+	for (i = 1; i < maxsigs; i++) {
 		if (sigismember(mask, i) == 1)
 			nsigs++;
 	}
 	if (nsigs >= nsignals * 2 / 3) {
 		*s++ = '~';
-		for (i = 1; i < nsignals; i++) {
+		for (i = 1; i < maxsigs; i++) {
 			switch (sigismember(mask, i)) {
 			case 1:
 				sigdelset(mask, i);
@@ -256,7 +294,7 @@ sigset_t *mask;
 	}
 	format = "%s";
 	*s++ = '[';
-	for (i = 1; i < nsignals; i++) {
+	for (i = 1; i < maxsigs; i++) {
 		if (sigismember(mask, i) == 1) {
 			sprintf(s, format, signame(i) + 3); s += strlen(s);
 			format = " %s";
@@ -268,10 +306,11 @@ sigset_t *mask;
 }
 
 static void
-printsigmask(mask)
+printsigmask(mask, rt)
 sigset_t *mask;
+int rt;
 {
-	tprintf("%s", sprintsigmask("", mask));
+	tprintf("%s", sprintsigmask("", mask, rt));
 }
 
 void
@@ -420,7 +459,7 @@ struct tcb *tcp;
 				kill(tcp->pid, SIGSTOP);
 			}
 			tprintf("{%#lx, ", (unsigned long) sv.sv_handler);
-			printsigmask(&sv.sv_mask);
+			printsigmask(&sv.sv_mask, 0);
 			tprintf(", ");
 			if (!printflags(sigvec_flags, sv.sv_flags))
 				tprintf("0");
@@ -437,8 +476,9 @@ sys_sigpause(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {	/* WTA: UD had a bug here: he forgot the braces */
-		sigset_t sigm = tcp->u_arg[0];
-		printsigmask(&sigm);
+		sigset_t sigm;
+		long_to_sigset(tcp->u_arg[0], &sigm);
+		printsigmask(&sigm, 0);
 	}
 	return 0;
 }
@@ -483,14 +523,9 @@ sys_sigsetmask(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-#ifdef LINUX
 		sigset_t sigm;
-		sigemptyset(&sigm);
-		sigm.__val[0] = tcp->u_arg[0];
-#else
-		sigset_t sigm = tcp->u_arg[0];
-#endif
-		printsigmask(&sigm);
+		long_to_sigset(tcp->u_arg[0], &sigm);
+		printsigmask(&sigm, 0);
 		if ((tcp->u_arg[0] & sigmask(SIGTRAP))) {
 			/* Mark attempt to block SIGTRAP */
 			tcp->flags |= TCB_SIGTRAPPED;
@@ -499,14 +534,9 @@ struct tcb *tcp;
 		}
 	}
 	else if (!syserror(tcp)) {
-#ifdef LINUX
 		sigset_t sigm;
-		sigemptyset(&sigm);
-		sigm.__val[0] = tcp->u_rval;
-#else
-		sigset_t sigm = tcp->u_rval;
-#endif
-		tcp->auxstr = sprintsigmask("old mask ", &sigm);
+		long_to_sigset(tcp->u_rval, &sigm);
+		tcp->auxstr = sprintsigmask("old mask ", &sigm, 0);
 
 		return RVAL_HEX | RVAL_STR;
 	}
@@ -538,10 +568,9 @@ sys_sigaction(tcp)
 struct tcb *tcp;
 {
 	long addr;
-#ifdef LINUX
 	sigset_t sigset;
+#ifdef LINUX
 	struct old_sigaction sa;
-	sigemptyset(&sigset);
 #else
 	struct sigaction sa;
 #endif
@@ -584,12 +613,8 @@ struct tcb *tcp;
 			}
 #endif /* !SVR4 */
 			tprintf("{%#lx, ", (long) sa.__sa_handler);
-#ifdef LINUX
-			sigset.__val[0] = sa.sa_mask;
-			printsigmask(&sigset);
-#else
-			printsigmask(&sa.sa_mask);
-#endif
+			long_to_sigset(sa.sa_mask, &sigset);
+			printsigmask(&sigset, 0);
 			tprintf(", ");
 			if (!printflags(sigact_flags, sa.sa_flags))
 				tprintf("0");
@@ -663,12 +688,11 @@ struct tcb *tcp;
 	}
 	else {
 		sigset_t sigm;
-		sigemptyset(&sigm);
-		sigm.__val[0] = tcp->u_arg[1];
+		long_to_sigset(tcp->u_arg[1], &sigm);
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;
-		tcp->auxstr = sprintsigmask("mask now ", &sigm);
+		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
@@ -688,12 +712,11 @@ struct tcb *tcp;
        }
        else {
 		   sigset_t sigm;
-		   sigemptyset(&sigm);
-		   sigm.__val[0] = tcp->u_arg[1];
+		   long_to_sigset(tcp->u_arg[1], &sigm);
 		   tcp->u_rval = tcp->u_error = 0;
 		   if (tcp->u_arg[0] == 0)
 			   return 0;
-		   tcp->auxstr = sprintsigmask("mask now ", &sigm);
+		   tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		   return RVAL_NONE | RVAL_STR;
        }
        return 0;
@@ -713,12 +736,11 @@ struct tcb *tcp;
 	}
 	else {
 	    sigset_t sigm;
-	    sigemptyset(&sigm);
-	    sigm.__val[0] = tcp->u_arg[1];
+	    long_to_sigset(tcp->u_arg[1], &sigm);
 	    tcp->u_rval = tcp->u_error = 0;
 	    if (tcp->u_arg[0] == 0)
 			return 0;
-	    tcp->auxstr = sprintsigmask("mask now ", &sigm);
+	    tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 	    return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
@@ -738,12 +760,11 @@ struct tcb *tcp;
 	}
 	else {
 	    sigset_t sigm;
-	    sigemptyset(&sigm);
-	    sigm.__val[0] = tcp->u_arg[1];
+	    long_to_sigset(tcp->u_arg[1], &sigm);
 	    tcp->u_rval = tcp->u_error = 0;
 	    if (tcp->u_arg[0] == 0)
 			return 0;
-	    tcp->auxstr = sprintsigmask("mask now ", &sigm);
+	    tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 	    return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
@@ -770,12 +791,11 @@ struct tcb *tcp;
 		tcp->u_arg[1] = si.si_mask;
 	} else {
 		sigset_t sigm;
-		sigemptyset(&sigm);
-		sigm.__val[0] = tcp->u_arg[1];
+		long_to_sigset(tcp->u_arg[1], &sigm);
 		tcp->u_rval = tcp->u_error = 0;
 		if(tcp->u_arg[0] == 0)
 			return 0;
-		tcp->auxstr = sprintsigmask("mask now ", &sigm);
+		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
@@ -791,14 +811,9 @@ sys_siggetmask(tcp)
 struct tcb *tcp;
 {
 	if (exiting(tcp)) {
-#ifdef LINUX
 		sigset_t sigm;
-		sigemptyset(&sigm);
-		sigm.__val[0] = tcp->u_rval;
-#else
-		sigset_t sigm = tcp->u_rval;
-#endif
-		tcp->auxstr = sprintsigmask("mask ", &sigm);
+		long_to_sigset(tcp->u_rval, &sigm);
+		tcp->auxstr = sprintsigmask("mask ", &sigm, 0);
 	}
 	return RVAL_HEX | RVAL_STR;
 }
@@ -809,14 +824,13 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		sigset_t sigm;
-		sigemptyset(&sigm);
-		sigm.__val[0] = tcp->u_arg[2];
+		long_to_sigset(tcp->u_arg[2], &sigm);
 #if 0
 		/* first two are not really arguments, but print them anyway */
 		/* nevermind, they are an anachronism now, too bad... */
 		tprintf("%d, %#x, ", tcp->u_arg[0], tcp->u_arg[1]);
 #endif
-		printsigmask(&sigm);
+		printsigmask(&sigm, 0);
 	}
 	return 0;
 }
@@ -835,7 +849,7 @@ struct tcb *tcp;
 		if (umove(tcp, tcp->u_arg[0], &sigset) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(sigset);
+			printsigmask(sigset, 0);
 	}
 	return 0;
 }
@@ -889,7 +903,7 @@ ucontext_t *ucp;
 		tprintf(", uc_link=%#lx, ", (unsigned long) ucp->uc_link);
 	}
 	tprintf("uc_sigmask=");
-	printsigmask(ucp->uc_sigmask);
+	printsigmask(ucp->uc_sigmask, 0);
 	if (!abbrev(tcp)) {
 		tprintf(", uc_stack={ss_sp=%#lx, ss_size=%d, ss_flags=",
 			(unsigned long) ucp->uc_stack.ss_sp,
@@ -991,17 +1005,14 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprintf(", ");
-		printsigmask(tcp->u_arg[1]);
+		printsigmask(tcp->u_arg[1], 0);
 	}
 	else if (!syserror(tcp)) {
-		tcp->auxstr = sprintsigmask("old mask ", tcp->u_rval);
+		tcp->auxstr = sprintsigmask("old mask ", tcp->u_rval, 0);
 		return RVAL_HEX | RVAL_STR;
 	}
 #else /* !ALPHA */
 	sigset_t sigset;
-#ifdef LINUX
-	sigemptyset(&sigset);
-#endif
 
 	if (entering(tcp)) {
 #ifdef SVR4
@@ -1013,15 +1024,10 @@ struct tcb *tcp;
 		tprintf(", ");
 		if (!tcp->u_arg[1])
 			tprintf("NULL, ");
-#ifdef LINUX
-		else if (umoven(tcp, tcp->u_arg[1], 4, (char *) &sigset.__val[0]) < 0)
+		else if (copy_sigset(tcp, tcp->u_arg[1], &sigset) < 0)
 			tprintf("%#lx, ", tcp->u_arg[1]);
-#else
-		else if (umove(tcp, tcp->u_arg[1], &sigset) < 0)
-			tprintf("%#lx, ", tcp->u_arg[1]);
-#endif
 		else {
-			printsigmask(&sigset);
+			printsigmask(&sigset, 0);
 			tprintf(", ");
 		}
 	}
@@ -1030,15 +1036,10 @@ struct tcb *tcp;
 			tprintf("NULL");
 		else if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[2]);
-#ifdef LINUX
-		else if (umoven(tcp, tcp->u_arg[2], 4, (char *) &sigset.__val[0]) < 0)
+		else if (copy_sigset(tcp, tcp->u_arg[2], &sigset) < 0)
 			tprintf("[?]");
-#else
-		else if (umove(tcp, tcp->u_arg[2], &sigset) < 0)
-			tprintf("[?]");
-#endif
 		else
-			printsigmask(&sigset);
+			printsigmask(&sigset, 0);
 	}
 #endif /* !ALPHA */
 	return 0;
@@ -1068,22 +1069,14 @@ sys_sigpending(tcp)
 struct tcb *tcp;
 {
 	sigset_t sigset;
-#ifdef LINUX
-   sigemptyset(&sigset);
-#endif
 
 	if (exiting(tcp)) {
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
-#ifdef LINUX
-		else if (umoven(tcp, tcp->u_arg[0], 4, (char *) &sigset.__val[0]) < 0)
+		else if (copy_sigset(tcp, tcp->u_arg[0], &sigset) < 0)
 			tprintf("[?]");
-#else
-		else if (umove(tcp, tcp->u_arg[0], &sigset) < 0)
-			tprintf("[?]");
-#endif
 		else
-			printsigmask(sigset);
+			printsigmask(sigset, 0);
 	}
 	return 0;
 }
@@ -1096,15 +1089,16 @@ sys_rt_sigprocmask(tcp)
 {
 	sigset_t sigset;
 
+	/* Note: arg[3] is the length of the sigset. */
 	if (entering(tcp)) {
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprintf(", ");
 		if (!tcp->u_arg[1])
 			tprintf("NULL, ");
-		else if (umove(tcp, tcp->u_arg[1], &sigset) < 0)
+		else if (copy_sigset_len(tcp, tcp->u_arg[1], &sigset, tcp->u_arg[3]) < 0)
 			tprintf("%#lx, ", tcp->u_arg[1]);
 		else {
-			printsigmask(&sigset);
+			printsigmask(&sigset, 1);
 			tprintf(", ");
 		}
 	}
@@ -1114,10 +1108,10 @@ sys_rt_sigprocmask(tcp)
 			tprintf("NULL");
 		else if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[2]);
-		else if (umove(tcp, tcp->u_arg[2], &sigset) < 0)
+		else if (copy_sigset_len(tcp, tcp->u_arg[2], &sigset, tcp->u_arg[3]) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(&sigset);
+			printsigmask(&sigset, 1);
 		tprintf(", %lu", tcp->u_arg[3]);
 	}
 	return 0;
@@ -1214,7 +1208,6 @@ sys_rt_sigaction(tcp)
 	struct new_sigaction sa;
 	sigset_t sigset;
 	long addr;
-	sigemptyset(&sigset);
 
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -1242,9 +1235,12 @@ sys_rt_sigaction(tcp)
 			default:
 				tprintf("{%#lx, ",
 						(long) sa.__sigaction_handler.__sa_handler);
-				sigset.__val[0] = sa.sa_mask[0];
-				sigset.__val[1] = sa.sa_mask[1];
-				printsigmask(&sigset);
+				sigemptyset(&sigset);
+				if (tcp->u_arg[3] <= sizeof(sigset))
+					memcpy(&sigset, &sa.sa_mask, tcp->u_arg[3]);
+				else
+					memcpy(&sigset, &sa.sa_mask, sizeof(sigset));
+				printsigmask(&sigset, 1);
 				tprintf(", ");
 				if (!printflags(sigact_flags, sa.sa_flags))
 					tprintf("0");
@@ -1263,16 +1259,15 @@ sys_rt_sigpending(tcp)
 	struct tcb *tcp;
 {
 	sigset_t sigset;
-	sigemptyset(&sigset);
 
 	if (exiting(tcp)) {
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
-		else if (umoven(tcp, tcp->u_arg[0], tcp->u_arg[1],
-					(char *) &sigset.__val[0]) < 0)
+		else if (copy_sigset_len(tcp, tcp->u_arg[0],
+					 &sigset, tcp->u_arg[1]) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(sigset);
+			printsigmask(sigset, 1);
 	}
 	return 0;
 }
@@ -1282,9 +1277,10 @@ sys_rt_sigsuspend(tcp)
 {
 	if (entering(tcp)) {
 		sigset_t sigm;
-		sigemptyset(&sigm);
-		umoven(tcp, tcp->u_arg[0], tcp->u_arg[1], (char *) &sigm);
-		printsigmask(&sigm);
+		if (copy_sigset_len(tcp, tcp->u_arg[0], &sigm, tcp->u_arg[1]) < 0)
+			tprintf("[?]");
+		else
+			printsigmask(&sigm, 1);
 	}
 	return 0;
 }
@@ -1517,13 +1513,12 @@ int sys_rt_sigtimedwait(tcp)
 {
 	if (entering(tcp)) {
 		sigset_t sigset;
-		sigemptyset(&sigset);
 
-		if (umoven(tcp, tcp->u_arg[0], tcp->u_arg[3],
-					(char *) &sigset.__val[0]) < 0)
+		if (copy_sigset_len(tcp, tcp->u_arg[0], 
+				    &sigset, tcp->u_arg[3]) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(sigset);
+			printsigmask(sigset, 1);
 		tprintf(", ");
 	}
 	else {
