@@ -1,5 +1,9 @@
 2002-05-23  John Hughes <john@calva.com>
 
+	* acconfig.h: Make autoheader happy about Linux/SuperH
+
+2002-05-23  John Hughes <john@calva.com>
+
 	* strace.c: Get rid of warning if not using POLL_HACK
 
 2002-05-22  John Hughes <john@calva.com>
