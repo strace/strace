@@ -36,6 +36,7 @@
 #else
 #include <sys/mman.h>
 #endif
+
 #if defined(LINUX) && defined(__i386__)
 #include <asm/ldt.h>
 #endif
@@ -47,7 +48,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%#lx", tcp->u_arg[0]);
 	}
-#ifdef linux
+#ifdef LINUX
 	return RVAL_HEX;
 #else
 	return 0;
@@ -111,23 +112,21 @@ sys_mmap(tcp)
 struct tcb *tcp;
 {
 #ifdef LINUX
-#if defined(ALPHA) || defined(sparc)
+#  if defined(ALPHA) || defined(sparc)
 	long *u_arg = tcp->u_arg;
-#else /* !ALPHA */
+#  else /* !ALPHA */
 	long u_arg[6];
-#endif /* !ALPHA */
+#  endif /* !ALPHA */
 #else /* !LINUX */
 	long *u_arg = tcp->u_arg;
 #endif /* !LINUX */
 
 	if (entering(tcp)) {
-#ifdef LINUX
-#if !defined(ALPHA) && !defined(__sparc__)
+#if defined(LINUX) && !defined(ALPHA) && !defined(__sparc__)
 		if (umoven(tcp, tcp->u_arg[0], sizeof u_arg,
 				(char *) u_arg) == -1)
 			return 0;
-#endif /* ALPHA/sparc */
-#endif /* LINUX */
+#endif /* LINUX && !ALPHA && !sparc */
 
 		/* addr */
 		tprintf("%#lx, ", u_arg[0]);

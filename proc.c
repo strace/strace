@@ -85,73 +85,6 @@ static struct xlat proc_run_flags[] = {
 	{ 0,		NULL		},
 };
 
-#if 0
-
-static struct xlat proc_map_flags[] = {
-	{ MA_READ,	"MA_READ"	},
-	{ MA_WRITE,	"MA_WRITE"	},
-	{ MA_EXEC,	"MA_EXEC"	},
-	{ MA_SHARED,	"MA_SHARED"	},
-	{ MA_BREAK,	"MA_BREAK"	},
-	{ MA_STACK,	"MA_STACK"	},
-	{ 0,		NULL		},
-};
-
-static struct xlat proc_page_flags[] = {
-	{ PG_REFERENCED,"PG_REFERENCED"	},
-	{ PG_MODIFIED,	"PG_MODIFIED"	},
-	{ PG_HWMAPPED,	"PG_HWMAPPED"	},
-	{ 0,		NULL		},
-};
-
-#ifdef SPARC
-
-static struct xlat proc_regs[] = {
-	{ R_G0,		"R_G0"		},
-	{ R_G1,		"R_G1"		},
-	{ R_G2,		"R_G2"		},
-	{ R_G3,		"R_G3"		},
-	{ R_G4,		"R_G4"		},
-	{ R_G5,		"R_G5"		},
-	{ R_G6,		"R_G6"		},
-	{ R_G7,		"R_G7"		},
-	{ R_O0,		"R_O0"		},
-	{ R_O1,		"R_O1"		},
-	{ R_O2,		"R_O2"		},
-	{ R_O3,		"R_O3"		},
-	{ R_O4,		"R_O4"		},
-	{ R_O5,		"R_O5"		},
-	{ R_O6,		"R_O6"		},
-	{ R_O7,		"R_O7"		},
-	{ R_L0,		"R_L0"		},
-	{ R_L1,		"R_L1"		},
-	{ R_L2,		"R_L2"		},
-	{ R_L3,		"R_L3"		},
-	{ R_L4,		"R_L4"		},
-	{ R_L5,		"R_L5"		},
-	{ R_L6,		"R_L6"		},
-	{ R_L7,		"R_L7"		},
-	{ R_I0,		"R_I0"		},
-	{ R_I1,		"R_I1"		},
-	{ R_I2,		"R_I2"		},
-	{ R_I3,		"R_I3"		},
-	{ R_I4,		"R_I4"		},
-	{ R_I5,		"R_I5"		},
-	{ R_I6,		"R_I6"		},
-	{ R_I7,		"R_I7"		},
-	{ R_PSR,	"R_PSR"		},
-	{ R_PC,		"R_PC"		},
-	{ R_nPC,	"R_nPC"		},
-	{ R_Y,		"R_Y"		},
-	{ R_WIM,	"R_WIM"		},
-	{ R_TBR,	"R_TBR"		},
-	{ 0,		NULL		},
-};
-
-#endif /* SPARC */
-
-#endif /* 0 */
-
 int
 proc_ioctl(tcp, code, arg)
 struct tcb *tcp;
@@ -250,3 +183,4 @@ int code, arg;
 }
 
 #endif /* SVR4 */
+

@@ -210,13 +210,13 @@ sigset_t *mask;
 	strcpy(outstr, s);
 	s = outstr + strlen(outstr);
 	nsigs = 0;
-	for (i = 1; i <= nsignals; i++) {
+	for (i = 1; i < nsignals; i++) {
 		if (sigismember(mask, i) == 1)
 			nsigs++;
 	}
 	if (nsigs >= nsignals * 2 / 3) {
 		*s++ = '~';
-		for (i = 1; i <= nsignals; i++) {
+		for (i = 1; i < nsignals; i++) {
 			switch (sigismember(mask, i)) {
 			case 1:
 				sigdelset(mask, i);
@@ -229,7 +229,7 @@ sigset_t *mask;
 	}
 	format = "%s";
 	*s++ = '[';
-	for (i = 1; i <= nsignals; i++) {
+	for (i = 1; i < nsignals; i++) {
 		if (sigismember(mask, i) == 1) {
 			sprintf(s, format, signalent[i] + 3); s += strlen(s);
 			format = " %s";

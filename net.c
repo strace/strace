@@ -673,11 +673,9 @@ struct tcb *tcp;
 		else
 			tprintf("[%u, %u]", fds[0], fds[1]);
 	}
-#else
-#if defined(SPARC) || defined(SVR4)
+#elif defined(SPARC) || defined(SVR4)
 	if (exiting(tcp))
 		tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
-#endif 
 #endif
 	return 0;
 }

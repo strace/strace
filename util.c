@@ -518,6 +518,7 @@ char *laddr;
 #ifdef LINUX
 	int pid = tcp->pid;
 	int n, m;
+	int started = 0;
 	union {
 		long val;
 		char x[sizeof(long)];
@@ -530,13 +531,15 @@ char *laddr;
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
 		if (errno) {
-			if (errno==EPERM || errno==EIO) {
+			if (started && (errno==EPERM || errno==EIO)) {
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
+			/* But if not started, we had a bogus address. */
 			perror("ptrace: umoven");
 			return -1;
 		}
+		started = 1;
 		memcpy(laddr, &u.x[n], m = MIN(sizeof(long) - n, len));
 		addr += sizeof(long), laddr += m, len -= m;
 	}
@@ -544,13 +547,14 @@ char *laddr;
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
 		if (errno) {
-			if (errno==EPERM || errno==EIO) {
+			if (started && (errno==EPERM || errno==EIO)) {
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
 			perror("ptrace: umoven");
 			return -1;
 		}
+		started = 1;
 		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
 		addr += sizeof(long), laddr += m, len -= m;
 	}
@@ -642,6 +646,7 @@ char *laddr;
 #ifdef SRVR4
 	return umoven(tcp, addr, len, laddr);
 #else /* !SVR4 */
+	int started = 0;
 	int pid = tcp->pid;
 	int i, n, m;
 	union {
@@ -656,13 +661,14 @@ char *laddr;
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
 		if (errno) {
-			if (errno==EPERM || errno==EIO) {
+			if (started && (errno==EPERM || errno==EIO)) {
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
 			perror("umovestr");
 			return -1;
 		}
+		started = 1;
 		memcpy(laddr, &u.x[n], m = MIN(sizeof(long)-n,len));
 		while (n & (sizeof(long) - 1))
 			if (u.x[n++] == '\0')
@@ -673,13 +679,14 @@ char *laddr;
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
 		if (errno) {
-			if (errno==EPERM || errno==EIO) {
+			if (started && (errno==EPERM || errno==EIO)) {
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
 			perror("umovestr");
 			return -1;
 		}
+		started = 1;
 		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
 		for (i = 0; i < sizeof(long); i++)
 			if (u.x[i] == '\0')

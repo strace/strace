@@ -62,7 +62,7 @@
 #define WCOREDUMP(status) ((status) & 0200)
 #endif
 
-/* WTA: this has `&& !defined(LINUXSPARC', this seems unneeded though? */
+/* WTA: this has `&& !defined(LINUXSPARC)', this seems unneeded though? */
 #if defined(HAVE_PRCTL)
 static struct xlat prctl_options[] = {
 #ifdef PR_MAXPROCS
@@ -182,7 +182,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifndef LINUX
+#if !defined(LINUX)
 
 int
 sys_getdomainname(tcp)
@@ -937,7 +937,7 @@ internal_wait(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-/* WTA: fix bug with hanging children */
+		/* WTA: fix bug with hanging children */
 		if (!(tcp->u_arg[2] & WNOHANG) && tcp->nchildren > 0) {
 			/* There are traced children */
 			tcp->flags |= TCB_SUSPENDED;
