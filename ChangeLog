@@ -1,5 +1,10 @@
 2001-03-06  John Hughes <john@Calva.COM>
 
+  * aclocal.m4: on systems other than linux look for stat64 in sys/stat.h
+  * file.c: handle xstat version _STAT64_VER, aka stat64.
+
+2001-03-06  John Hughes <john@Calva.COM>
+
   * net.c: make sure SOL_ options are defined before using.
   * signal.c: declare sigset variable, only used on linux, inside #ifdef.
 
