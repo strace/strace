@@ -104,6 +104,7 @@ extern int sys_sysfs();
 extern int sys_getmsg();
 extern int sys_putmsg();
 extern int sys_poll();
+extern int sys_dup2();
 #ifdef MIPS
 extern int sys_sigreturn();
 extern int sys_accept();
@@ -292,6 +293,13 @@ extern int sys_timer_settime();
 extern int sys_timer_gettime();
 extern int sys_timer_getoverrun();
 extern int sys_nanosleep();
+#ifdef HAVE_SYS_ACL_H
+extern int sys_acl();
+extern int sys_facl();
+#endif
+#ifdef HAVE_SYS_DOOR_H
+extern int sys_door();
+#endif
 #endif /* !MIPS */
 
 #ifdef MIPS
@@ -428,3 +436,17 @@ extern int sys_getcontext(), sys_setcontext();
 #define SYS_context_nsubcalls	2
 
 #endif /* !MIPS */
+
+#ifdef HAVE_SYS_DOOR_H
+
+#define SYS_door_subcall	390 + SGI_KLUDGE
+#define SYS_door_create		(SYS_door_subcall + 0)
+#define SYS_door_revoke		(SYS_door_subcall + 1)
+#define SYS_door_info		(SYS_door_subcall + 2)
+#define SYS_door_call		(SYS_door_subcall + 3)
+#define SYS_door_return		(SYS_door_subcall + 4)
+#define SYS_door_cred		(SYS_door_subcall + 5)
+
+#define SYS_door_nsubcalls	6
+
+#endif /* HAVE_SYS_DOOR_H */

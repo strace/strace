@@ -400,7 +400,11 @@
 	{ -1,	0,	printargs,		"SYS_182"	}, /* 182 */
 	{ -1,	0,	printargs,		"SYS_183"	}, /* 183 */
 	{ -1,	0,	printargs,		"SYS_184"	}, /* 184 */
+#ifdef HAVE_SYS_ACL_H
+	{ -1,	TF,	sys_acl,		"acl"		}, /* 185 */
+#else
 	{ -1,	0,	printargs,		"SYS_185"	}, /* 185 */
+#endif
 	{ -1,	0,	sys_auditsys,		"auditsys"	}, /* 186 */
 	{ -1,	0,	sys_processor_bind,	"processor_bind"}, /* 187 */
 	{ -1,	0,	sys_processor_info,	"processor_info"}, /* 188 */
@@ -415,10 +419,18 @@
 	{ -1,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 197 */
 	{ -1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 198 */
 	{ -1,	0,	sys_nanosleep,		"nanosleep"	}, /* 199 */
+#ifdef HAVE_SYS_ACL_H
+	{ -1,	0,	sys_facl,		"facl"		}, /* 200 */
+#else
 	{ -1,	0,	printargs,		"SYS_200"	}, /* 200 */
+#endif
+#ifdef HAVE_SYS_DOOR_H
+	{ -1,	0,	sys_door,		"door"		}, /* 201 */
+#else
 	{ -1,	0,	printargs,		"SYS_201"	}, /* 201 */
-	{ -1,	0,	printargs,		"SYS_202"	}, /* 202 */
-	{ -1,	0,	printargs,		"SYS_203"	}, /* 203 */
+#endif
+	{ -1,	0,	sys_setreuid,		"setreuid"	}, /* 202 */
+	{ -1,	0,	sys_setregid,		"setregid"	}, /* 203 */
 	{ -1,	0,	printargs,		"SYS_204"	}, /* 204 */
 	{ -1,	0,	printargs,		"SYS_205"	}, /* 205 */
 	{ -1,	0,	printargs,		"SYS_206"	}, /* 206 */
@@ -616,12 +628,12 @@
 	{ -1,	0,	printargs,		"SYS_388"	}, /* 388 */
 	{ -1,	0,	printargs,		"SYS_389"	}, /* 389 */
 
-	{ -1,	0,	printargs,		"SYS_390"	}, /* 390 */
-	{ -1,	0,	printargs,		"SYS_391"	}, /* 391 */
-	{ -1,	0,	printargs,		"SYS_392"	}, /* 392 */
-	{ -1,	0,	printargs,		"SYS_393"	}, /* 393 */
-	{ -1,	0,	printargs,		"SYS_394"	}, /* 394 */
-	{ -1,	0,	printargs,		"SYS_395"	}, /* 395 */
+	{ -1,	0,	printargs,		"door_create"	}, /* 390 */
+	{ -1,	0,	printargs,		"door_revoke"	}, /* 391 */
+	{ -1,	0,	printargs,		"door_info"	}, /* 392 */
+	{ -1,	0,	printargs,		"door_call"	}, /* 393 */
+	{ -1,	0,	printargs,		"door_return"	}, /* 394 */
+	{ -1,	0,	printargs,		"door_cred"	}, /* 395 */
 	{ -1,	0,	printargs,		"SYS_396"	}, /* 396 */
 	{ -1,	0,	printargs,		"SYS_397"	}, /* 397 */
 	{ -1,	0,	printargs,		"SYS_398"	}, /* 398 */

@@ -1,3 +1,8 @@
+Fri Jun 11 14:54:47 CEST 1999
+
+  * Applied IRIX64 patch from Thomas E. Dickey <dickey@clark.net>
+  * Applied Solaris and manpage updates from Guy Harris <guy@netapp.com>
+
 Wed Jun  9 14:48:49 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Brought syscall list for alpha up to date

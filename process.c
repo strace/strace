@@ -115,6 +115,15 @@ static struct xlat prctl_options[] = {
 #if defined(PR_SET_PDEATHSIG)
 	{ PR_SET_PDEATHSIG,	"PR_SET_PDEATHSIG"	},
 #endif
+#ifdef PR_COREPID
+	{ PR_COREPID,		"PR_COREPID"		},
+#endif
+#ifdef PR_ATTACHADDRPERM
+	{ PR_ATTACHADDRPERM,	"PR_ATTACHADDRPERM"	},
+#endif
+#ifdef PR_PTHREADEXIT
+	{ PR_PTHREADEXIT,	"PR_PTHREADEXIT"	},
+#endif
 	{ 0,			NULL			},
 };
 

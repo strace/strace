@@ -784,6 +784,61 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef HAVE_SYS_ACL_H
+
+#include <sys/acl.h>
+
+struct xlat aclcmds[] = {
+	{ SETACL,	"SETACL"	},
+	{ GETACL,	"GETACL"	},
+	{ GETACLCNT,	"GETACLCNT"	},
+	{ 0,		NULL		},
+};
+
+int
+sys_acl(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		printxval(aclcmds, tcp->u_arg[1], "???ACL???");
+		tprintf(", %ld", tcp->u_arg[2]);
+		/*
+		 * FIXME - dump out the list of aclent_t's pointed to
+		 * by "tcp->u_arg[3]" if it's not NULL.
+		 */
+		if (tcp->u_arg[3])
+			tprintf(", %#lx", tcp->u_arg[3]);
+		else
+			tprintf(", NULL");
+	}
+	return 0;
+}
+
+
+int
+sys_facl(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printxval(aclcmds, tcp->u_arg[1], "???ACL???");
+		tprintf(", %ld", tcp->u_arg[2]);
+		/*
+		 * FIXME - dump out the list of aclent_t's pointed to
+		 * by "tcp->u_arg[3]" if it's not NULL.
+		 */
+		if (tcp->u_arg[3])
+			tprintf(", %#lx", tcp->u_arg[3]);
+		else
+			tprintf(", NULL");
+	}
+	return 0;
+}
+
+#endif /* HAVE_SYS_ACL_H */
+
 #endif /* SVR4 || LINUXSPARC */
 
 #ifdef linux

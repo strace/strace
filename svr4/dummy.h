@@ -157,6 +157,8 @@
 #define sys_setegid sys_close
 #define sys_vhangup sys_close
 #define sys_fdsync sys_close
+#define sys_setreuid sys_dup2
+#define sys_setregid sys_dup2
 #define sys_sigfillset sys_sigpending
 #define sys_vfork sys_fork
 #define sys_ksigaction sys_sigaction
@@ -181,6 +183,7 @@
 #define sys_sysfs printargs
 #define sys_spcall printargs
 #define sys_context printargs
+#define sys_door printargs
 
 #if DONE
 #define sys_mount printargs

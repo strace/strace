@@ -394,7 +394,7 @@ struct tcb *tcp;
 	}
 }
 
-enum subcall_style { shift_style, deref_style, mask_style };
+enum subcall_style { shift_style, deref_style, mask_style, door_style };
 
 #if !(defined(LINUX) && defined(ALPHA))
 
@@ -479,6 +479,16 @@ enum subcall_style style;
 		tcp->scno = subcall + i;
 		if (sysent[tcp->scno].nargs != -1)
 			tcp->u_nargs = sysent[tcp->scno].nargs;
+		break;
+	case door_style:
+		/*
+		 * Oh, yuck.  The call code is the *sixth* argument.
+		 */
+		tcp->scno = subcall + tcp->u_arg[5];
+		if (sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else
+			tcp->u_nargs--;
 		break;
 	}
 }
@@ -1201,6 +1211,12 @@ struct tcb *tcp;
 			SYS_context_nsubcalls, shift_style);
 		break;
 #endif /* SYS_context_subcall */
+#ifdef SYS_door_subcall
+	case SYS_door:
+		decode_subcall(tcp, SYS_door_subcall,
+			SYS_door_nsubcalls, door_style);
+		break;
+#endif /* SYS_door_subcall */
 #endif /* SVR4 */
 #ifdef SUNOS4
 	case SYS_semsys:

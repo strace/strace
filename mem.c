@@ -85,6 +85,33 @@ static struct xlat mmap_flags[] = {
 #ifdef MAP_NORESERVE
 	{ MAP_NORESERVE,"MAP_NORESERVE"	},
 #endif
+	/*
+	 * XXX - this was introduced in SunOS 4.x to distinguish between
+	 * the old pre-4.x "mmap()", which:
+	 *
+	 *	only let you map devices with an "mmap" routine (e.g.,
+	 *	frame buffers) in;
+	 *
+	 *	required you to specify the mapping address;
+	 *
+	 *	returned 0 on success and -1 on failure;
+	 *
+	 * memory and which, and the 4.x "mmap()" which:
+	 *
+	 *	can map plain files;
+	 *
+	 *	can be asked to pick where to map the file;
+	 *
+	 *	returns the address where it mapped the file on success
+	 *	and -1 on failure.
+	 *
+	 * It's not actually used in source code that calls "mmap()"; the
+	 * "mmap()" routine adds it for you.
+	 *
+	 * It'd be nice to come up with some way of eliminating it from
+	 * the flags, e.g. reporting calls *without* it as "old_mmap()"
+	 * and calls with it as "mmap()".
+	 */
 #ifdef _MAP_NEW
 	{ _MAP_NEW,	"_MAP_NEW"	},
 #endif
@@ -128,7 +155,10 @@ struct tcb *tcp;
 #endif /* LINUX && !ALPHA && !sparc */
 
 		/* addr */
-		tprintf("%#lx, ", u_arg[0]);
+		if (!u_arg[0])
+			tprintf("NULL, ");
+		else
+			tprintf("%#lx, ", u_arg[0]);
 		/* len */
 		tprintf("%lu, ", u_arg[1]);
 		/* prot */

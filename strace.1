@@ -33,7 +33,7 @@
 .ft CW
 ..
 .de CE
-.ft
+.ft R
 .fi
 .sp
 ..
@@ -148,8 +148,9 @@ Here the three argument form of open is decoded by breaking down the
 flag argument into its three bitwise-OR constituents and printing the
 mode value in octal by tradition.  Where traditional or native
 usage differs from ANSI or POSIX, the latter forms are preferred.
-In some cases, strace output has proven to be more readable than
-the source.
+In some cases,
+.B strace
+output has proven to be more readable than the source.
 .LP
 Structure pointers are dereferenced and the members are displayed
 as appropriate.  In all cases arguments are formatted in the most C-like
@@ -163,7 +164,7 @@ displayed symbolically.  In particular, observe how the st_mode member
 is carefully decoded into a bitwise-OR of symbolic and numeric values.
 Also notice in this example that the first argument to lstat is an input
 to the system call and the second argument is an output.  Since output
-arguments not modified if the system call fails, arguments may not
+arguments are not modified if the system call fails, arguments may not
 always be dereferenced.  For example, retrying the ``ls \-l'' example
 with a non-existent file produces the following line:
 .CW
@@ -178,8 +179,9 @@ Only the first
 .I strsize
 (32 by default) bytes of strings are printed;
 longer strings have an ellipsis appended following the closing quote.
-Here is a line from ``ls \-l'' where the getpwuid library routine is
-reading the password file:
+Here is a line from ``ls \-l'' where the
+.B getpwuid
+library routine is reading the password file:
 .CW
 read(3, "root::0:0:System Administrator:/"..., 1024) = 422
 .CE
@@ -212,17 +214,26 @@ Count time, calls, and errors for each system call and report a
 summary on program exit.
 .TP
 .B \-d
-Show some debugging output of strace itself on
-.I stderr .
+Show some debugging output of
+.B strace
+itself on the standard error.
 .TP
 .B \-f
 Trace child processes as they are created by currently traced
-processes as a result of the fork(2) system call.  The new process is
+processes as a result of the
+.BR fork (2)
+system call.  The new process is
 attached to as soon as its pid is known (through the return value of
-fork(2) in the parent process). This means that such children may run
-uncontrolled for a while (especially in the case of a vfork(2)), until
-the parent is scheduled again to complete its (v)fork(2) call.
-If the parent process decides to wait(2) for a child that is currently
+.BR fork (2)
+in the parent process). This means that such children may run
+uncontrolled for a while (especially in the case of a
+.BR vfork (2)),
+until the parent is scheduled again to complete its
+.RB ( v ) fork (2)
+call.
+If the parent process decides to
+.BR wait (2)
+for a child that is currently
 being traced, it is suspended until an appropriate child process either
 terminates or incurs a signal that would cause it to terminate (as
 determined from the child's current signal disposition).
@@ -236,9 +247,13 @@ option is in effect, each processes trace is written to
 where pid is the numeric process id of each process.
 .TP
 .B \-F
-Attempt to follow vforks.  (On SunOS 4.x, this is accomplished with
+Attempt to follow
+.BR vfork s.
+(On SunOS 4.x, this is accomplished with
 some dynamic linking trickery.  On Linux, it requires some kernel
-functionality not yet in the standard kernel.)  Otherwise, vforks will
+functionality not yet in the standard kernel.)  Otherwise,
+.BR vfork s
+will
 not be followed even if
 .B \-f
 has been given.
@@ -281,10 +296,11 @@ behavior displays a reasonable subset of structure members.  Use
 this option to get all of the gory details.
 .TP
 .B \-V
-Print the version number of strace.
+Print the version number of
+.BR strace .
 .TP
 .B \-x
-Print all non-ascii strings in hexadecimal string format.
+Print all non-ASCII strings in hexadecimal string format.
 .TP
 .B \-xx
 Print all strings in hexadecimal string format.
@@ -295,34 +311,63 @@ Align return values in a secific column (default column 40).
 .BI "\-e " expr
 A qualifying expression which modifies which events to trace
 or how to trace them.  The format of the expression is:
-.br
-[qualifier=][!]value1[,value2]...
-.br
-where qualifier is one of trace, abbrev, verbose, raw, signal, read, or write
-and value is a qualifier-dependent symbol or number.  The default
-qualifier is trace.  Using an exclamation mark negates the set of values.
-For example \-eopen means literally \-e trace=open which in turn means
-trace only the open system call.  By contrast, \-etrace=!open means
-to trace every system call except open.  In addition the special values
-all and none have the obvious meanings.
-.LP
+.RS 15
+.IP
+[\fIqualifier\fB=\fR][\fB!\fR]\fIvalue1\fR[\fB,\fIvalue2\fR]...
+.RE
+.IP
+where
+.I qualifier
+is one of
+.BR trace ,
+.BR abbrev ,
+.BR verbose ,
+.BR raw ,
+.BR signal ,
+.BR read ,
+or
+.B write
+and
+.I value
+is a qualifier-dependent symbol or number.  The default
+qualifier is
+.BR trace .
+Using an exclamation mark negates the set of values.  For example,
+.B \-eopen
+means literally
+.B "\-e trace=open"
+which in turn means trace only the
+.B open
+system call.  By contrast,
+.B "\-etrace=!open"
+means to trace every system call except
+.BR open .
+In addition, the special values
+.B all
+and
+.B none
+have the obvious meanings.
+.IP
 Note that some shells use the exclamation point for history
-expansion; even inside quoted arguments.  If so, you must escape
+expansion even inside quoted arguments.  If so, you must escape
 the exclamation point with a backslash.
 .TP
 .BI "\-e trace=" set
 Trace only the specified set of system calls.  The
 .B \-c
 option is useful for determining which system calls might be useful
-to trace.  For example, trace=open,close,read,write means to only
+to trace.  For example,
+.B trace=open,close,read,write
+means to only
 trace those four system calls.  Be careful when making inferences
 about the user/kernel boundary if only a subset of system calls
-are being monitored.  The default is trace=all.
+are being monitored.  The default is
+.BR trace=all .
 .TP
 .B "\-e trace=file"
 Trace all system calls which take a file name as an argument.  You
 can think of this as an abbreviation for
-.BR "\-e trace=open,stat,chmod,unlink," ...
+.BR "\-e\ trace=open,stat,chmod,unlink," ...
 which is useful to seeing what files the process is referencing.
 Furthermore, using the abbreviation will ensure that you don't
 accidentally forget to include a call like
@@ -344,13 +389,17 @@ Trace all IPC related system calls.
 .TP
 .BI "\-e abbrev=" set
 Abbreviate the output from printing each member of large structures.
-The default is abbrev=all.  The
+The default is
+.BR abbrev=all .
+The
 .B \-v
-option has the effect of abbrev=none.
+option has the effect of
+.BR abbrev=none .
 .TP
 .BI "\-e verbose=" set
 Dereference structures for the specified set of system calls.  The
-default is verbose=all.
+default is
+.BR verbose=all .
 .TP
 .BI "\-e raw=" set
 Print raw, undecoded arguments for the specifed set of system calls.
@@ -360,25 +409,31 @@ decoding or you need to know the actual numeric value of an
 argument.
 .TP
 .BI "\-e signal=" set
-Trace only the specified subset of signals.  The default is signal=all.
-For example signal=!SIGIO (or signal=!io) causes SIGIO signals not to
-be traced.
+Trace only the specified subset of signals.  The default is
+.BR signal=all .
+For example,
+.B signal=!SIGIO
+(or
+.BR signal=!io )
+causes SIGIO signals not to be traced.
 .TP
 .BI "\-e read=" set
-Perform a full hexadecimal and ascii dump of all the data read from
+Perform a full hexadecimal and ASCII dump of all the data read from
 file descriptors listed in the specified set.  For example, to see
 all input activity on file descriptors 3 and 5 use
 .BR "\-e read=3,5" .
-Note that this is independent from the normal tracing of the read
+Note that this is independent from the normal tracing of the
+.BR read (2)
 system call which is controlled by the option
 .BR "\-e trace=read" .
 .TP
 .BI "\-e write=" set
-Perform a full hexadecimal and ascii dump of all the data written to
+Perform a full hexadecimal and ASCII dump of all the data written to
 file descriptors listed in the specified set.  For example, to see
 all output activity on file descriptors 3 and 5 use
 .BR "\-e write=3,5" .
-Note that this is independent from the normal tracing of the write
+Note that this is independent from the normal tracing of the
+.BR write (2)
 system call which is controlled by the option
 .BR "\-e trace=write" .
 .TP
@@ -397,15 +452,19 @@ This is convenient for piping the debugging output to a program
 without affecting the redirections of executed programs.
 .TP
 .BI "\-O " overhead
-Set the overhead for tracing system calls to overhead microseconds.
+Set the overhead for tracing system calls to
+.I overhead
+microseconds.
 This is useful for overriding the default heuristic for guessing
 how much time is spent in mere measuring when timing system calls using
 the
 .B \-c
 option.  The acuracy of the heuristic can be gauged by timing a given
-program run without tracing (using time(1)) and comparing the accumulated
+program run without tracing (using
+.BR time (1))
+and comparing the accumulated
 system call time to the total produced using
-.B \-c .
+.BR \-c .
 .TP
 .BI "\-p " pid
 Attach to the process with the process
@@ -435,10 +494,17 @@ full.
 Sort the output of the histogram printed by the
 .B \-c
 option by the specified critereon.  Legal values are
-time, calls, name, and nothing (default time).
+.BR time ,
+.BR calls ,
+.BR name ,
+and
+.B nothing
+(default
+.BR time ).
 .TP
 .BI "\-u " username
-Run command with the userid, groupid and supplementary groups of
+Run command with the user \s-1ID\s0, group \s-2ID\s0, and
+supplementary groups of
 .IR username .
 This option is only useful when running as root and enables the
 correct execution of setuid and/or setgid binaries.
@@ -458,18 +524,24 @@ it only makes sense to install
 as setuid to root when the users who can execute it are restricted
 to those users who have this trust.
 For example, it makes sense to install a special version of
-.B
-strace
-with mode `rwsr-xr--', user root and group trace,
-where members of the trace group are trusted users.
+.B strace
+with mode `rwsr-xr--', user
+.B root
+and group
+.BR trace ,
+where members of the
+.B trace
+group are trusted users.
 If you do use this feature, please remember to install
-a non-setuid version of strace for ordinary lusers to use.
+a non-setuid version of
+.B strace
+for ordinary lusers to use.
 .SH "SEE ALSO"
-.BR ptrace(2) ,
-.BR proc(4) ,
-.BR time(1) ,
-.BR trace(1) ,
-.BR truss(1)
+.BR ptrace (2),
+.BR proc (4),
+.BR time (1),
+.BR trace (1),
+.BR truss (1)
 .SH NOTES
 It is a pity that so much tracing clutter is produced by systems
 employing shared libraries.
@@ -481,9 +553,14 @@ sometimes possible to make deductive inferences about process
 behavior using inputs and outputs as propositions.
 .LP
 In some cases, a system call will differ from the documented behavior
-or have a different name.  For example, on System V derived systems
-the true time(2) system call does not take an argument and the stat
-function is called xstat and takes an extra leading argument.  These
+or have a different name.  For example, on System V-derived systems
+the true
+.BR time (2)
+system call does not take an argument and the
+.B stat
+function is called
+.B xstat
+and takes an extra leading argument.  These
 discrepancies are normal but idiosyncratic characteristics of the
 system call interface and are accounted for by C library wrapper
 functions.
@@ -525,17 +602,34 @@ The
 option is weakly supported.
 .SH HISTORY
 .B strace
-The original strace was written by Paul Kranenburg
+The original
+.B strace
+was written by Paul Kranenburg
 for SunOS and was inspired by its trace utility.
-The SunOS version of strace was ported to Linux and enhanced
+The SunOS version of
+.B strace
+was ported to Linux and enhanced
 by Branko Lankester, who also wrote the Linux kernel support.
-Even though Paul released strace 2.5 in 1992,
-Branko's work was based on Paul's strace 1.5 release from 1991.
-In 1993, Rick Sladkey merged strace 2.5 for SunOS and the
-second release of strace for Linux, added many of the features of
-truss from SVR4, and produced an strace that worked on both platforms.
-In 1994 Rick ported strace to SVR4 and Solaris and wrote the
-automatic configuration support.  In 1995 he ported strace to Irix
+Even though Paul released
+.B strace
+2.5 in 1992,
+Branko's work was based on Paul's
+.B strace
+1.5 release from 1991.
+In 1993, Rick Sladkey merged
+.B strace
+2.5 for SunOS and the second release of
+.B strace
+for Linux, added many of the features of
+.BR truss (1)
+from SVR4, and produced an
+.B strace
+that worked on both platforms.  In 1994 Rick ported
+.B strace
+to SVR4 and Solaris and wrote the
+automatic configuration support.  In 1995 he ported
+.B strace
+to Irix
 and tired of writing about himself in the third person.
 .SH PROBLEMS
 Problems with
