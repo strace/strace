@@ -1,3 +1,8 @@
+2005-02-26  GOTO Masanori  <gotom@debian.or.jp>
+
+	* linux/alpha/syscallent.h: Fix the reversed order of lstat64 and
+	fstat64.  Clean up osf_nrecvmsg and osf_ngetsockname.
+
 2005-02-28  Andreas Schwab  <schwab@suse.de>
 
 	* syscall.c (getrval2): Move #ifdef IA64 inside #ifdef LINUX.
