@@ -36,7 +36,7 @@ int sys_setup(), sys_exit(), sys_fork(), sys_read(), sys_write();
 int sys_open(), sys_close(), sys_waitpid(), sys_creat(), sys_link();
 int sys_unlink(), sys_execve(), sys_chdir(), sys_time(), sys_mknod();
 int sys_chmod(), sys_chown(), sys_break(), sys_oldstat();
-int sys_lseek(), sys_getpid(), sys_mount(), sys_umount();
+int sys_lseek(), sys_getpid(), sys_mount(), sys_umount(), sys_umount2();
 int sys_setuid(), sys_getuid(), sys_stime(), sys_ptrace();
 int sys_alarm(), sys_oldfstat(), sys_pause(), sys_utime();
 int sys_stty(), sys_gtty(), sys_access(), sys_nice(), sys_ftime();

@@ -653,6 +653,10 @@ struct tcb *tcp;
 			/* Linux/SPARC syscall trap. */
 			set_personality(0);
 			break;
+		case 0x91d0206d:
+			/* Linux/SPARC64 syscall trap. */
+			fprintf(stderr,"syscall: Linux/SPARC64 not supported yet\n");
+			return -1;
 		case 0x91d02000:
 			/* SunOS syscall trap. (pers 1) */
 			fprintf(stderr,"syscall: SunOS no support\n");

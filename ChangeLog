@@ -1,3 +1,17 @@
+Wed Jun  2 18:30:12 CEST 1999 Jakub Jelinek <jj@ultra.linux.cz>
+
+  * system.c: sys_umount2 syscall support.
+  * linux/sparc/errnoent.h: Update sparc-linux errnos.
+  * linux/sparc/syscall.h: Update used sparc-linux syscalls.
+  * linux/sparc/syscallent.h: Match 2.2.9 system calls.
+  * file.c: sparc-linux asm/stat.h uses dev_t etc. types,
+    so it needs strace's own copy of the stat structure.
+  * util.c: Make it compile on sparc-linux.
+  * strace.c: Fix strace -f and -ff operation on sparc-linux.
+  * signal.c: rt_sigaction has different arguments on sparc*-linux
+    and alpha-linux.
+  * syscall.c: Recognize sparc64-linux binaries.
+
 Fri May 28 21:09:00 PST Ulrich Drepper <drepper@cygnus.com>
 
   * configure.in: Fix typo (CFLAG -> CFLAGS).

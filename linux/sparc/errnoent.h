@@ -123,3 +123,5 @@
 	"EILSEQ", /* 122 */
 	"ELIBMAX", /* 123 */
 	"ELIBSCN", /* 124 */
+	"ENOMEDIUM", /* 125 */
+	"EMEDIUMTYPE", /* 126 */

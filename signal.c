@@ -1243,8 +1243,13 @@ sys_rt_sigaction(tcp)
 				tprintf("{%#lx, ",
 						(long) sa.__sigaction_handler.__sa_handler);
 				sigemptyset(&sigset);
+#ifdef LINUXSPARC
+				if (tcp->u_arg[4] <= sizeof(sigset))
+					memcpy(&sigset, &sa.sa_mask, tcp->u_arg[4]);
+#else
 				if (tcp->u_arg[3] <= sizeof(sigset))
 					memcpy(&sigset, &sa.sa_mask, tcp->u_arg[3]);
+#endif
 				else
 					memcpy(&sigset, &sa.sa_mask, sizeof(sigset));
 				printsigmask(&sigset, 1);
@@ -1257,7 +1262,13 @@ sys_rt_sigaction(tcp)
 	if (entering(tcp))
 		tprintf(", ");
 	else
+#ifdef LINUXSPARC
+		tprintf(", %#lx, %lu", tcp->u_arg[3], tcp->u_arg[4]);
+#elif defined(ALPHA)
+		tprintf(", %lu, %#lx", tcp->u_arg[3], tcp->u_arg[4]);
+#else
 		tprintf(", %lu", addr = tcp->u_arg[3]);
+#endif
 	return 0;
 }
 

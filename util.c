@@ -44,7 +44,7 @@
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
 #endif
 #ifdef LINUX
-#ifndef __GLIBC__
+#if !defined(__GLIBC__) || defined(SPARC)
 #include <linux/ptrace.h>
 #endif
 #endif /* LINUX */

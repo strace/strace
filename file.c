@@ -42,7 +42,32 @@
 #endif
 
 #ifdef linux
-#  include <asm/stat.h>
+#  ifdef LINUXSPARC
+struct stat {
+	unsigned short	st_dev;
+	unsigned int	st_ino;
+	unsigned short	st_mode;
+	short		st_nlink;
+	unsigned short	st_uid;
+	unsigned short	st_gid;
+	unsigned short	st_rdev;
+	unsigned int	st_size;
+	int		st_atime;
+	unsigned int	__unused1;
+	int		st_mtime;
+	unsigned int	__unused2;
+	int		st_ctime;
+	unsigned int	__unused3;
+	int		st_blksize;
+	int		st_blocks;
+	unsigned int	__unused4[2];
+};
+#    define stat kernel_stat
+#    include <asm/stat.h>
+#    undef stat
+#  else
+#    include <asm/stat.h>
+#  endif
 #  define stat libc_stat
 #  include <sys/stat.h>
 #  undef stat

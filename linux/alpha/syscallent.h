@@ -50,7 +50,7 @@
 	{ 3,	TF,	sys_lseek,		"lseek"		}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getxpid"	}, /* 20 */
 	{ 4,	0,	printargs,		"osf_mount"	}, /* 21 */
-	{ 2,	0,	sys_umount,		"umount"	}, /* 22 */
+	{ 2,	0,	sys_umount2,		"umount"	}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 23 */
 	{ 0,	0,	sys_getuid,		"getxuid"	}, /* 24 */
 	{ 5,	0,	printargs,		"SYS_25"	}, /* 25 */
@@ -349,7 +349,7 @@
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 318 */
 	{ 1,	0,	sys_sysctl,		"sysctl"	}, /* 319 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 320 */
-	{ 1,	0,	printargs,		"oldumount"	}, /* 321 */
+	{ 1,	0,	sys_umount,		"oldumount"	}, /* 321 */
 	{ 1,	0,	sys_swapon,		"swapon"	}, /* 322 */
 	{ 1,	0,	sys_times,		"times"		}, /* 323 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 324 */

@@ -96,6 +96,21 @@ struct tcb *tcp;
 	return 0;
 }
 
+int
+sys_umount2(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printstr(tcp, tcp->u_arg[0], -1);
+		tprintf(", ");
+		if (tcp->u_arg[1] & 1)
+			tprintf("MNT_FORCE");
+		else
+			tprintf("0");
+	}
+	return 0;
+}
+
 static struct xlat personality_options[] = {
 #ifdef PER_LINUX
 	{ PER_LINUX,	"PER_LINUX"	},

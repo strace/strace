@@ -54,7 +54,7 @@
 	{ 3,	0,	sys_lseek,		"lseek"		}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
-	{ 1,	TF,	sys_umount,		"umount"	}, /* 22 */
+	{ 1,	TF,	sys_umount,		"oldumount"	}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 23 */
 	{ 0,	0,	sys_getuid,		"getuid"	}, /* 24 */
 	{ 1,	0,	sys_stime,		"stime"		}, /* 25 */
@@ -84,7 +84,7 @@
 	{ 0,	0,	sys_geteuid,		"geteuid"	}, /* 49 */
 	{ 0,	0,	sys_getegid,		"getegid"	}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
-	{ 0,	0,	sys_phys,		"phys"		}, /* 52 */
+	{ 2,	TF,	sys_umount2,		"umount"	}, /* 52 */
 	{ 0,	0,	sys_lock,		"lock"		}, /* 53 */
 	{ 3,	0,	sys_ioctl,		"ioctl"		}, /* 54 */
 	{ 3,	0,	sys_fcntl,		"fcntl"		}, /* 55 */
@@ -145,7 +145,7 @@
 	{ 1,	0,	sys_iopl,		"iopl"		}, /* 110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 111 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 112 */
-	{ 1,	0,	sys_vm86old,		"vm86old"		}, /* 113 */
+	{ 1,	0,	sys_vm86old,		"vm86old"	}, /* 113 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 114 */
 	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */

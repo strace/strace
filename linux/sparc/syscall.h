@@ -44,7 +44,7 @@ int	sys_uname(), sys_sysinfo();
 
 /* 1.2 memory management */
 int	sys_brk(),sys_sbrk(),sys_sstk();
-int	sys_getpagesize(),sys_mmap(),sys_mctl(),sys_munmap(),sys_mprotect(),sys_mincore();
+int	sys_getpagesize(),sys_mmap(),sys_mctl(),sys_munmap(),sys_mprotect(),sys_mincore(), sys_mremap();
 int	sys_omsync(),sys_omadvise();
 
 /* 1.3 signals */
@@ -58,7 +58,7 @@ int	sys_getitimer(),sys_setitimer();
 
 /* 1.5 descriptors */
 int	sys_getdtablesize(),sys_dup(),sys_dup2(),sys_close();
-int	sys_select(),sys_getdopt(),sys_setdopt(),sys_fcntl(),sys_flock();
+int	sys_oldselect(),sys_select(),sys_getdopt(),sys_setdopt(),sys_fcntl(),sys_flock();
 
 /* 1.6 resource controls */
 int	sys_getpriority(),sys_setpriority(),sys_getrusage(),sys_getrlimit(),sys_setrlimit();
@@ -84,7 +84,7 @@ int	sys_mkdir(),sys_rmdir(),sys_getdirentries(), sys_getdents(),sys_readdir();
 int	sys_creat(),sys_open(),sys_mknod(),sys_unlink(),sys_stat(),sys_fstat(),sys_lstat();
 int	sys_chown(),sys_fchown(),sys_chmod(),sys_fchmod(),sys_utimes();
 int	sys_link(),sys_symlink(),sys_readlink(),sys_rename();
-int	sys_lseek(),sys_truncate(),sys_ftruncate(),sys_access(),sys_fsync();
+int	sys_lseek(),sys_truncate(),sys_ftruncate(),sys_access(),sys_fsync(),sys_sysctl();
 int	sys_statfs(),sys_fstatfs(),sys_msync();
 
 /* 2.3 communications */
@@ -92,6 +92,13 @@ int	sys_socket(),sys_bind(),sys_listen(),sys_accept(),sys_connect();
 int	sys_socketpair(),sys_sendto(),sys_send(),sys_recvfrom(),sys_recv();
 int	sys_sendmsg(),sys_recvmsg(),sys_shutdown(),sys_setsockopt(),sys_getsockopt();
 int	sys_getsockname(),sys_getpeername(),sys_pipe();
+
+int sys_setresuid(), sys_setresgid(), sys_getresuid(), sys_getresgid(), sys_pread();
+int sys_pwrite(), sys_getcwd();
+int sys_sigaltstack(), sys_rt_sigprocmask(), sys_rt_sigaction();
+int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
+int sys_rt_sigtimedwait(), sys_prctl(), sys_poll();
+int sys_sendfile(), sys_query_module(), sys_capget(), sys_capset();
 
 int	sys_umask();		/* XXX */
 
@@ -150,6 +157,7 @@ int	sys_ustat();		/* System V compatibility */
 int	sys_owait();		/* should use wait4 interface */
 int	sys_owait3();		/* should use wait4 interface */
 int	sys_umount();		/* still more Sys V (and 4.2?) compatibility */
+int	sys_umount2();
 int	sys_pathconf();		/* posix */
 int	sys_fpathconf();		/* posix */
 int	sys_sysconf();		/* posix */

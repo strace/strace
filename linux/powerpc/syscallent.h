@@ -50,7 +50,7 @@
 	{ 3,	TF,	sys_lseek,		"lseek"			}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"		}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"			}, /* 21 */
-	{ 1,	0,	sys_umount,		"umount"		}, /* 22 */
+	{ 1,	0,	sys_umount,		"oldumount"		}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"		}, /* 23 */
 	{ 0,	0,	sys_getuid,		"getuid"		}, /* 24 */
 	{ 1,	0,	sys_stime,		"stime"			}, /* 25 */
@@ -80,7 +80,7 @@
 	{ 0,	0,	printargs,		"geteuid"		}, /* 49 */
 	{ 0,	0,	printargs,		"getegid"		}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"			}, /* 51 */
-	{ 2,	0,	printargs,		"umount2"		}, /* 52 */
+	{ 2,	0,	sys_umount2,		"umount"		}, /* 52 */
 	{ 5,	0,	printargs,		"lock"			}, /* 53 */
 	{ 3,	0,	sys_ioctl,		"ioctl"			}, /* 54 */
 	{ 3,	0,	sys_fcntl,		"fcntl"			}, /* 55 */

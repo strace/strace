@@ -11,22 +11,22 @@
 	{ 1,	TF,	sys_unlink,	"unlink" },		/* 10 */
 	{ 2,    TF|TP,	sys_execv,	"execv" },		/* 11 */
 	{ 1,	TF,	sys_chdir,	"chdir" },		/* 12 */
-        { 0,    0,      printargs,      "sunos-time!"},		/* 13 */
+        { 3,    TF,     sys_chown,      "chown"},		/* 13 */
 	{ 3,	TF,	sys_mknod,	"mknod" },		/* 14 */
 	{ 2,	TF,	sys_chmod,	"chmod" },		/* 15 */
-	{ 3,	TF,	sys_chown,	"chown" },		/* 16 */
+	{ 3,	TF,	sys_chown,	"lchown" },		/* 16 */
 	{ 1,	0,	sys_brk,	"brk" },		/* 17 */
-	{ 2,	0,	printargs,	"SYS_18" },		/* 18 */
+	{ 2,	0,	printargs,	"perfctr" },		/* 18 */
 	{ 3,	0,	sys_lseek,	"lseek" },		/* 19 */
 	{ 0,	0,	sys_getpid,	"getpid" },		/* 20 */
-	{ 0,	0,	printargs,	"SYS_21" },		/* 21 */
-	{ 1,	TF,	printargs,	"SYS_22" },		/* 22 */
+	{ 2,	0,	sys_capget,	"capget" },		/* 21 */
+	{ 2,	0,	sys_capset,	"capset" },		/* 22 */
 	{ 1,	0,	sys_setuid,	"setuid" },		/* 23 */
 	{ 0,	0,	sys_getuid,	"getuid" },		/* 24 */
-	{ 1,	0,	printargs,	"SYS_25" },		/* 25 */
+	{ 1,	0,	sys_time,	"time" },		/* 25 */
 	{ 5,	0,	sys_ptrace,	"ptrace" },		/* 26 */
 	{ 1,	0,	sys_alarm,	"alarm" },		/* 27 */
-	{ 2,	0,	printargs,	"SYS_28" },		/* 28 */
+	{ 2,	TS,	sys_sigaltstack,"sigaltstack" },	/* 28 */
 	{ 0,	TS,	sys_pause,	"pause" },		/* 29 */
 	{ 2,	TF,	sys_utime,	"utime" },		/* 30 */
 	{ 2,	0,	sys_stty,	"stty" },		/* 31 */
@@ -37,13 +37,13 @@
 	{ 0,	0,	sys_sync,	"sync" },		/* 36 */
 	{ 2,	TS,	sys_kill,	"kill" },		/* 37 */
 	{ 2,	TF,	sys_stat,	"stat" },		/* 38 */
-	{ 2,	0,	printargs,	"SYS_39" },		/* 39 */
+	{ 4,	TF,	sys_sendfile,	"sendfile" },		/* 39 */
 	{ 2,	TF,	sys_lstat,	"lstat" },		/* 40 */
 	{ 2,	0,	sys_dup,	"dup" },		/* 41 */
 	{ 0,	0,	sys_pipe,	"pipe" },		/* 42 */
 	{ 1,	0,	sys_times,	"times" },		/* 43 */
 	{ 4,	0,	sys_profil,	"profil" },		/* 44 */
-	{ 0,	0,	printargs,	"SYS_45" },		/* 45 */
+	{ 2,	TF,	sys_umount2,	"umount" },		/* 45 */
 	{ 1,	0,	sys_setgid,	"setgid" },		/* 46 */
 	{ 0,	0,	sys_getgid,	"getgid" },		/* 47 */
 	{ 2,	0,	sys_signal,	"signal" },		/* 48 */
@@ -64,10 +64,10 @@
 	{ 0,	0,	printargs,	"SYS_63" },		/* 63 */
 	{ 1,	0,	sys_getpagesize,"getpagesize" },	/* 64 */
 	{ 3,	0,	sys_msync,	"msync" },		/* 65 */
-	{ 0,	TP,	printargs,	"SYS_66" },		/* 66 */
-	{ 0,	0,	printargs,	"SYS_67" },		/* 67 */
-	{ 0,	0,	printargs,	"SYS_68" },		/* 68 */
-	{ 1,   0,	sys_sbrk,	"sbrk" },		/* 69 */
+	{ 0,	TP,	sys_vfork,	"vfork" },		/* 66 */
+	{ 5,	TF,	sys_pread,	"pread" },		/* 67 */
+	{ 5,	TF,	sys_pwrite,	"pwrite" },		/* 68 */
+	{ 1,    0,	sys_sbrk,	"sbrk" },		/* 69 */
 	{ 1,	0,	printargs,	"sstk" },		/* 70 */
 	{ 6,	0,	sys_mmap,	"mmap" },		/* 71 */
 	{ 1,	0,	printargs,	"vadvise" },		/* 72 */
@@ -91,7 +91,7 @@
 	{ 2,	0,	sys_dup2,	"dup2" },		/* 90 */
 	{ 2,	0,	printargs,	"getdopt" },		/* 91 */
 	{ 3,	0,	sys_fcntl,	"fcntl" },		/* 92 */
-	{ 5,	0,	sys_select,	"select" },		/* 93 */
+	{ 5,	0,	sys_oldselect,	"select" },		/* 93 */
 	{ 2,	0,	printargs,	"setdopt" },		/* 94 */
 	{ 1,	0,	sys_fsync,	"fsync" },		/* 95 */
 	{ 3,	0,	sys_setpriority,"setpriority" },	/* 96 */
@@ -99,13 +99,13 @@
 	{ 3,	TN,	sys_connect,	"connect" },		/* 98 */
 	{ 3,	TN,	sys_accept,	"accept" },		/* 99 */
 	{ 2,	0,	sys_getpriority,"getpriority" },	/* 100 */
-	{ 4,	TN,	sys_send,	"send" },		/* 101 */
-	{ 4,	TN,	sys_recv,	"recv" },		/* 102 */
-	{ 0,	0,	printargs,	"SYS_103" },		/* 103 */
-	{ 3,	TN,	sys_bind,	"bind" },		/* 104 */
-	{ 5,	TN,	sys_setsockopt,	"setsockopt" },		/* 105 */
-	{ 2,	TN,	sys_listen,	"listen" },		/* 106 */
-	{ 2,	0,	printargs,	"SYS_107" },		/* 107 */
+	{ 0,	TS,	printargs,	"rt_sigreturn" },	/* 101 */
+	{ 5,	TS,	sys_rt_sigaction,"rt_sigaction" },	/* 102 */
+	{ 4,	TS,	sys_rt_sigprocmask,"rt_sigprocmask" },	/* 103 */
+	{ 2,	TS,	sys_rt_sigpending,"rt_sigpending" },	/* 104 */
+	{ 4,	TS,	sys_rt_sigtimedwait,"rt_sigtimedwait" },/* 105 */
+	{ 3,	TS,	sys_rt_sigqueueinfo,"rt_sigqueueinfo" },/* 106 */
+	{ 2,	TS,	sys_rt_sigsuspend,"rt_sigsuspend" },	/* 107 */
 	{ 3,	TS,	printargs,	"sigvec" },		/* 108 */
 	{ 1,    TS,	sys_sigblock,	"sigblock" },		/* 109 */
 	{ 1,	TS,	sys_sigsetmask,	"sigsetmask" },		/* 110 */
@@ -117,7 +117,7 @@
 	{ 2,	0,	sys_gettimeofday,"gettimeofday" },	/* 116 */
 	{ 2,	0,	sys_getrusage,	"getrusage" },		/* 117 */
 	{ 5,	TN,	sys_getsockopt,	"getsockopt" },		/* 118 */
-	{ 0,	0,	printargs,	"SYS_119" },		/* 119 */
+	{ 2,	0,	sys_getcwd,	"getcwd" },		/* 119 */
 	{ 3,	0,	sys_readv,	"readv" },		/* 120 */
 	{ 3,	0,	sys_writev,	"writev" },		/* 121 */
 	{ 2,	0,	sys_settimeofday,"settimeofday" },	/* 122 */
@@ -145,19 +145,19 @@
 	{ 2,	0,	sys_getrlimit,	"getrlimit" },		/* 144 */
 	{ 2,	0,	sys_setrlimit,	"setrlimit" },		/* 145 */
 	{ 2,	TS,	sys_killpg,	"killpg" },		/* 146 */
-	{ 0,	0,	printargs,	"SYS_147" },		/* 147 */
-	{ 0,	0,	printargs,	"SYS_148" },		/* 148 */
-	{ 0,	0,	printargs,	"SYS_149" },		/* 149 */
+	{ 5,	0,	printargs,	"prctl" },		/* 147 */
+	{ 5,	0,	printargs,	"pciconfig_read" },	/* 148 */
+	{ 5,	0,	printargs,	"pciconfig_write" },	/* 149 */
 	{ 3,	TN,	sys_getsockname,"getsockname" },	/* 150 */
 	{ 4,	TN,	sys_getmsg,	"getmsg" },		/* 151 */
 	{ 4,	TN,	sys_putmsg,	"putmsg" },		/* 152 */
-	{ 4,	TN,	printargs,	"poll" },		/* 153 */
+	{ 3,	0,	sys_poll,	"poll" },		/* 153 */
 	{ 0,	0,	printargs,	"SYS_154" },		/* 154 */
 	{ 1,	0,	printargs,	"nfssvc" },		/* 155 */
 	{ 4,	0,	printargs,	"getdirentries" },	/* 156 */
 	{ 2,	TF,	sys_statfs,	"statfs" },		/* 157 */
 	{ 2,	0,	sys_fstatfs,	"fstatfs" },		/* 158 */
-	{ 1,	TF,	sys_umount,	"umount" },		/* 159 */
+	{ 1,	TF,	sys_umount,	"oldumount" },		/* 159 */
 	{ 0,	0,	printargs,	"async_daemon" },	/* 160 */
 	{ 2,	0,	printargs,	"getfh" },		/* 161 */
 	{ 2,	0,	printargs,	"getdomainname" },	/* 162 */
@@ -182,7 +182,7 @@
 	{ 1,	0,	printargs,	"aiowait" },		/* 181 */
 	{ 1,	0,	printargs,	"aiocancel" },		/* 182 */
 	{ 1,	TS,	sys_sigpending,	"sigpending" },		/* 183 */
-	{ 0,	0,	printargs,	"SYS_184" },		/* 184 */
+	{ 5,	0,	sys_query_module,"query_module" },	/* 184 */
 	{ 2,	0,	sys_setpgid,	"setpgid" },		/* 185 */
 	{ 2,	TF,	printargs,	"pathconf" },		/* 186 */
 	{ 2,	0,	printargs,	"fpathconf" },		/* 187 */
@@ -231,7 +231,7 @@
 	{ 5,	0,	sys_afs_syscall,"afs_syscall" },	/* 227 */
 	{ 1,	0,	sys_setfsuid,	"setfsuid" },		/* 228 */
 	{ 1,	0,	sys_setfsgid,	"setfsgid" },		/* 229 */
-	{ 5,	0,	printargs,	"_newselect" },		/* 230 */
+	{ 5,	0,	sys_select,	"select" },		/* 230 */
 	{ 1,	0,	sys_time,	"time" },		/* 231 */
 	{ 2,	TF,	printargs,	"nis_syscall" },	/* 232 */
 	{ 1,	0,	sys_stime,	"stime" },		/* 233 */
