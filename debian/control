@@ -9,7 +9,7 @@ Standards-Version: 3.5.2
 Package: strace
 Architecture: alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh sparc
 Depends: ${shlibs:Depends}
-Description: A system call tracer.
+Description: A system call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
  a trace of all the system calls made by a another process/program.
  The program to be traced need not be recompiled for this, so you can

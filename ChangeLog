@@ -3,6 +3,7 @@
 	* debian/postinst, debian/prerm: removed, /usr/doc symlink is no
 	longer used
 	* debian/rules: no longer install postinst and prerm
+	* debian/control: do not end summary with full stop (lintian)
 
 2002-12-30  Roland McGrath  <roland@redhat.com>
 
