@@ -1,5 +1,17 @@
 2002-12-17  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (tcbtab): Make this a pointer to pointers, not an array.
+	(tcbtabsize): New variable.
+	(main): Initialize them using dynamic allocation.
+	(alloctcb, main): Use tcbtabsize in place of MAX_PROCS; indirect.
+	(pid2tcb, cleanup): Likewise.
+	[USE_PROCFS] (pollv): Make this a pointer, not an array; make static.
+	(rebuild_pollv): Dynamically allocate the vector.
+	* defs.h (tcbtab): Update decls.
+	(MAX_PROCS): Macro removed, no more static limit on this.
+	* process.c (fork_tcb): New function.
+	(internal_clone, internal_fork): Use it instead of checking nprocs.
+
 	* strace.c (detach) [LINUX]: Use __WALL (or a second try with __WCLONE)
 	in wait after sending SIGSTOP.
 
