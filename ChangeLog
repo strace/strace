@@ -1,3 +1,9 @@
+2003-01-21  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.4.93.
+	* strace.spec, debian/changelog: 4.4.93-1.
+	* strace.spec (Source0): Use strace-VERSION.tar.bz2 now.
+
 2003-01-20  Roland McGrath  <roland@redhat.com>
 
 	* defs.h [LINUX] [S390 || S390X] (TCB_WAITEXECVE): Define it.
