@@ -3,6 +3,8 @@
 	* configure.ac, NEWS: Version 4.4.97.
 	* strace.spec, debian/changelog: 4.4.97-1.
 
+	* debian/control (Architecture): Add shmedia.
+
 	* configure.ac, defs.h, mem.c, process.c, sock.c, syscall.c, util.c:
 	Merged in SHmedia port from Stephen Thomas <stephen.thomas@superh.com>.
 
