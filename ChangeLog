@@ -1,3 +1,8 @@
+2002-12-17  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (detach) [LINUX]: Use __WALL (or a second try with __WCLONE)
+	in wait after sending SIGSTOP.
+
 2002-12-16  Roland McGrath  <roland@redhat.com>
 
 	* signal.c (sprintsigmask): Increase static buffer size to account for
