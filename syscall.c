@@ -670,6 +670,9 @@ struct tcb *tcp;
 #ifdef SYS32_exit
 	case SYS32_exit:
 #endif
+#ifdef __NR_exit_group
+	case __NR_exit_group:
+#endif
 		internal_exit(tcp);
 		break;
 	}

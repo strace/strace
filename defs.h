@@ -261,6 +261,11 @@ struct tcb {
 	struct tcb *parent;	/* Parent of this process */
 	int nchildren;		/* # of traced children */
 	int waitpid;		/* pid(s) this process is waiting for */
+#ifdef LINUX
+	int nclone_threads;	/* # of nchildren with CLONE_THREAD */
+	int nclone_detached;	/* # of nchildren with CLONE_DETACHED */
+	int nclone_waiting;	/* clone threads in wait4 (TCB_SUSPENDED) */
+#endif
 				/* (1st arg of wait4()) */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
@@ -297,6 +302,26 @@ struct tcb {
 # if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
 # endif
+# define TCB_CLONE_DETACHED 04000 /* CLONE_DETACHED set in creating syscall */
+# define TCB_CLONE_THREAD  010000 /* CLONE_THREAD set in creating syscall */
+# define TCB_GROUP_EXITING 020000 /* TCB_EXITING was exit_group, not _exit */
+# include <sys/syscall.h>
+# ifndef __NR_exit_group
+# /* Hack: Most headers around are too old to have __NR_exit_group.  */
+#  ifdef ALPHA
+#   define __NR_exit_group 405
+#  elif defined I386
+#   define __NR_exit_group 252
+#  elif defined IA64
+#   define __NR_exit_group 1236
+#  elif defined POWERPC
+#   define __NR_exit_group 234
+#  elif defined S390 || defined S390X
+#   define __NR_exit_group 248
+#  elif defined SPARC
+#   define __NR_exit_group 188
+#  endif /* ALPHA et al */
+# endif	/* !__NR_exit_group */
 #endif /* LINUX */
 
 /* qualifier flags */
@@ -314,10 +339,6 @@ struct tcb {
 #define syserror(tcp)	((tcp)->u_error != 0)
 #define verbose(tcp)	(qual_flags[(tcp)->scno] & QUAL_VERBOSE)
 #define abbrev(tcp)	(qual_flags[(tcp)->scno] & QUAL_ABBREV)
-#define waiting_parent(tcp) \
-		(tcp->parent && \
-		(tcp->parent->flags & TCB_SUSPENDED) && \
-		(tcp->parent->waitpid <= 0 || tcp->parent->waitpid == tcp->pid))
 
 struct xlat {
 	int val;
@@ -371,6 +392,7 @@ extern struct tcb *tcp_last;
 extern int set_personality P((int personality));
 extern char *xlookup P((struct xlat *, int));
 extern struct tcb *alloctcb P((int));
+extern struct tcb *pid2tcb P((int));
 extern void droptcb P((struct tcb *));
 
 extern void set_sortby P((char *));
