@@ -1795,20 +1795,33 @@ int status;
 	 * is still not entirely satisfactory but since there
 	 * are no wait status constructors it will have to do.
 	 */
-	if (WIFSTOPPED(status))
-		tprintf("[WIFSTOPPED(s) && WSTOPSIG(s) == %s]",
+	if (WIFSTOPPED(status)) {
+		tprintf("[{WIFSTOPPED(s) && WSTOPSIG(s) == %s}",
 			signame(WSTOPSIG(status)));
-	else if WIFSIGNALED(status)
-		tprintf("[WIFSIGNALED(s) && WTERMSIG(s) == %s%s]",
+		status &= ~W_STOPCODE(WSTOPSIG(status));
+	}
+	else if (WIFSIGNALED(status)) {
+		tprintf("[{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
 			signame(WTERMSIG(status)),
 			WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
-	else if WIFEXITED(status) {
-		tprintf("[WIFEXITED(s) && WEXITSTATUS(s) == %d]",
+		status &= ~(W_EXITCODE(0, WTERMSIG(status)) | WCOREFLAG);
+	}
+	else if (WIFEXITED(status)) {
+		tprintf("[{WIFEXITED(s) && WEXITSTATUS(s) == %d}",
 			WEXITSTATUS(status));
 		exited = 1;
+		status &= ~W_EXITCODE(WEXITSTATUS(status), 0);
 	}
-	else
+	else {
 		tprintf("[%#x]", status);
+		return 0;
+	}
+
+	if (status == 0)
+		tprintf("]");
+	else
+		tprintf("| %#x]", status);
+
 	return exited;
 }
 
@@ -2982,16 +2995,20 @@ struct tcb *tcp;
 }
 
 static void
-print_affinitylist(list, len)
-unsigned long *list;
+print_affinitylist(tcp, list, len)
+struct tcb *tcp;
+long list;
 unsigned int len;
 {
     int first = 1;
     tprintf(" {");
     while (len >= sizeof (unsigned long)) {
-	tprintf("%s %lx", first ? "" : ",", *list++);
+	unsigned long w;
+	umove(tcp, list, &w);
+	tprintf("%s %lx", first ? "" : ",", w);
 	first = 0;
 	len -= sizeof (unsigned long);
+	list += sizeof(unsigned long);
     }
     tprintf(" }");
 }
@@ -3002,7 +3019,7 @@ struct tcb *tcp;
 {
     if (entering(tcp)) {
 	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-	print_affinitylist((unsigned long *) tcp->u_arg[2], tcp->u_arg[1]);
+	print_affinitylist(tcp, tcp->u_arg[2], tcp->u_arg[1]);
     }
     return 0;
 }
@@ -3014,7 +3031,10 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
     } else {
-	print_affinitylist((unsigned long *) tcp->u_arg[2], tcp->u_rval);
+	if (tcp->u_rval == -1)
+	    tprintf("%#lx", tcp->u_arg[2]);
+	else
+	    print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
     }
     return 0;
 }
