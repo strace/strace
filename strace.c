@@ -408,7 +408,7 @@ char *argv[];
 		if (!qflag)
 			fprintf(stderr,
 				"Process %u attached - interrupt to quit\n",
-				pid);
+				tcp->pid);
 	}
 
 	if (!pflag_seen) {
