@@ -1679,6 +1679,19 @@ struct tcb *tcp;
 	return sys_kill(tcp);
 }
 
+#ifdef LINUX
+int
+sys_tgkill(tcp)
+	struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, %ld, %s",
+			tcp->u_arg[0], tcp->u_arg[1], signame(tcp->u_arg[2]));
+	}
+	return 0;
+}
+#endif
+
 int
 sys_sigpending(tcp)
 struct tcb *tcp;

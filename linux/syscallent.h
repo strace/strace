@@ -314,9 +314,9 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 265 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 266 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 267 */
-	{ 5,	0,	printargs,		"SYS_268"	}, /* 268 */
-	{ 5,	0,	printargs,		"SYS_269"	}, /* 269 */
-	{ 5,	0,	printargs,		"SYS_270"	}, /* 270 */
+	{ 5,	0,	printargs,		"statfs64"	}, /* 268 */
+	{ 5,	0,	printargs,		"fstatfs64"	}, /* 269 */
+	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 270 */
 	{ 5,	0,	printargs,		"SYS_271"	}, /* 271 */
 	{ 5,	0,	printargs,		"SYS_272"	}, /* 272 */
 	{ 5,	0,	printargs,		"SYS_273"	}, /* 273 */
