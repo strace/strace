@@ -1589,6 +1589,10 @@ struct tcb *tcp;
 				d->d_namlen, d->d_namlen, d->d_name);
 		}
 #endif /* SUNOS4 */
+		if (!d->d_reclen) {
+			tprintf("/* d_reclen == 0, problem here */");
+			break;
+		}
 		i += d->d_reclen;
 		dents++;
 	}

@@ -286,6 +286,21 @@ struct tcb *tcp;
 }
 
 int
+change_syscall(tcp, new)
+struct tcb *tcp;
+int new;
+{
+#if defined(I386) && defined(LINUX)
+	/* Attempt to make vfork into fork, which we can follow. */
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, 
+		   (void *)(ORIG_EAX * 4), new) < 0) 
+		return -1;
+	return 0;
+#endif
+	return -1;
+}
+
+int
 internal_fork(tcp)
 struct tcb *tcp;
 {
@@ -427,16 +442,10 @@ struct tcb *tcp;
 
 #ifdef SYS_vfork
 	if (tcp->scno == SYS_vfork) {
-#if defined(I386) && defined(LINUX)
 		/* Attempt to make vfork into fork, which we can follow. */
 		if (!followvfork || 
-		    ptrace(PTRACE_POKEUSR, tcp->pid, 
-			   (void *)(ORIG_EAX * 4), SYS_fork) < 0) 
+		    change_syscall(tcp, SYS_fork) < 0)
 			dont_follow = 1;
-		
-#else
-		dont_follow = 1;
-#endif
 	}
 #endif
 #ifdef SYS_clone
