@@ -1,3 +1,12 @@
+2004-10-06  Roland McGrath  <roland@redhat.com>
+
+	* net.c [HAVE_SENDMSG] (printcmsghdr): New function.
+	(printmsghdr): Use it.
+
+	* file.c (sprintmode): Add const to return type.
+	(sprintfstype): Likewise.
+	* signal.c (printsiginfo): Add a const.
+
 2004-09-15  Roland McGrath  <roland@redhat.com>
 
 	* linux/x86_64/syscallent.h: Use sys_waitid.
