@@ -1,3 +1,8 @@
+2003-06-03  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (main): In PATH search, accept only a regular file with
+	execute bits set.  Fixes Debian bug #137103.
+
 2003-06-02  Roland McGrath  <roland@redhat.com>
 
 	* strace.c (main): Set -q when given -o and not -p, and not when not
