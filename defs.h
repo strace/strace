@@ -124,11 +124,6 @@
 #define __KERNEL__
 #include <asm/ptrace.h>
 #undef __KERNEL__
-/* TEMP */
-#define UESP	PT_R1
-#define EIP	PT_NIP
-#define EAX	PT_R3
-#define ORIG_EAX PT_ORIG_R3
 #endif
 #ifdef __STDC__
 #ifdef LINUX
@@ -547,6 +542,13 @@ extern int nsignals2;
 #define ALIGN64(tcp,arg)						\
 do {									\
 	if (arg % 2)							\
+	    memmove (&tcp->u_arg[arg], &tcp->u_arg[arg + 1],		\
+		     (tcp->u_nargs - arg - 1) * sizeof tcp->u_arg[0]);	\
+} while (0)
+#elif defined(LINUX) && defined(POWERPC) && !defined(__powerpc64__)
+#define ALIGN64(tcp,arg)						\
+do {									\
+	if (!(arg % 2))							\
 	    memmove (&tcp->u_arg[arg], &tcp->u_arg[arg + 1],		\
 		     (tcp->u_nargs - arg - 1) * sizeof tcp->u_arg[0]);	\
 } while (0)
