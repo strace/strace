@@ -1268,6 +1268,8 @@ struct tcb *tcp;
 #endif
 #ifdef SYS_fork
 	case SYS_fork:
+#endif
+#if defined SYS_fork || defined SYS_vfork
 		if (arg_setup (tcp, &state) < 0
 		    || get_arg0 (tcp, &state, &tcp->inst[0]) < 0
 		    || get_arg1 (tcp, &state, &tcp->inst[1]) < 0
