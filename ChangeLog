@@ -1,3 +1,16 @@
+2003-01-20  Roland McGrath  <roland@redhat.com>
+
+	* process.c [LINUX] (sys_clone) [S390 || S390X]: Argument order is
+	reversed from other architectures.
+
+	* process.c (sys_execve) [LINUX]: Make setting TCB_WAITEXECVE flag
+	conditional on [TCB_WAITEXECVE] instead of list of processors.
+
+	* util.c (restore_arg0): Evaluate args in no-op defns.
+
+	* util.c [S390 || S390X] (arg0_offset, arg1_offset): Fix definitions
+	for clone call on S390.  From Michael Holzheu <holzheu@de.ibm.com>.
+
 2003-01-17  Anton Blanchard <anton@samba.org>
 
 	* util.c [LINUX] (setbpt): Handle SYS_vfork like SYS_fork.
