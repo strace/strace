@@ -29,13 +29,20 @@
 #
 
 # Validate arg count.
-if [ $# -ne 1 ]
-then
-        echo "usage: $0 include-directory" >&2
+case $# in
+1)
+	dir="$1"
+	asm=asm
+	;;
+2)
+	dir="$1"
+	asm="$2"
+	;;
+*)
+        echo "usage: $0 include-directory [asm-subdirectory]" >&2
         exit 1
-fi
-
-dir=$1
+	;;
+esac
 
 lookup_ioctls()
 {
@@ -53,18 +60,19 @@ lookup_ioctls()
 lookup_ioctls 46 linux/fb.h
 lookup_ioctls 4B linux/kd.h
 lookup_ioctls 53 linux/cdrom.h
-lookup_ioctls 54 asm/ioctls.h
+lookup_ioctls 54 $asm/ioctls.h
 lookup_ioctls 56 linux/vt.h
 lookup_ioctls '7[12]' linux/videotext.h
-lookup_ioctls 89 asm/sockios.h linux/sockios.h
+lookup_ioctls 89 $asm/sockios.h linux/sockios.h
 lookup_ioctls 8B linux/wireless.h
 
-files="linux/* asm/* scsi/* sound/*"
+files="linux/* $asm/* scsi/* sound/*"
 
 # Build the list of all ioctls
 regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+_S\?\(IO\|IOW\|IOR\|IOWR\)\>'
 (cd $dir ; grep $regexp $files 2>/dev/null ) | \
-	sed -ne 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_S\?I.*(\([^[,]*\)[[:space:]]*,[[:space:]]*\([^,)]*\).*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\3,\4,0)	},/p' \
+	sed -ne "s,$asm/,asm/,"'
+s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_S\?I.*(\([^[,]*\)[[:space:]]*,[[:space:]]*\([^,)]*\).*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\3,\4,0)	},/p' \
 	>> ioctls.h
 
 # Some use a special base to offset their ioctls on. Extract that as well.
