@@ -1,5 +1,16 @@
 2003-01-14  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: Match powerpc* (includes powerpc64), and don't match
+	ppc (never comes out of config.sub).
+	* process.c (sys_ptrace): Use #lx format for address argument.
+	[POWERPC]: Use sizeof(unsigned long) in place of 4 for multipliers.
+	* process.c [POWERPC]: Likewise.
+	* signal.c (sys_sigreturn) [POWERPC]: Likewise.
+	* syscall.c (get_scno) [POWERPC]: Likewise.
+	* util.c [POWERPC]: Likewise.
+	(printnum): Use long for NUM.
+	From Anton Blanchard <anton@samba.org>.
+
 	* defs.h (ALIGN64): Fix defn for PPC, same as FreeBSD one.
 
 	* util.c [LINUX] (restore_arg0, restore_arg1): New macros, defined
