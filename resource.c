@@ -167,9 +167,9 @@ rlim64_t lim;
 	if (lim == RLIM64_INFINITY)
 		sprintf(buf, "RLIM64_INFINITY");
 	else if (lim > 1024 && lim%1024 == 0)
-		sprintf(buf, "%lld*1024", lim/1024);
+		sprintf(buf, "%lld*1024", (long long) lim/1024);
 	else
-		sprintf(buf, "%lld", lim);
+		sprintf(buf, "%lld", (long long) lim);
 	return buf;
 }
 

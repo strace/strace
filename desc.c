@@ -225,7 +225,7 @@ int getlk;
 	printxval(lockfcmds, fl.l_type, "F_???");
 	tprintf(", whence=");
 	printxval(whence, fl.l_whence, "SEEK_???");
-	tprintf(", start=%lld, len=%lld", fl.l_start, fl.l_len);
+	tprintf(", start=%lld, len=%lld", (long long) fl.l_start, (long long) fl.l_len);
 	if (getlk)
 		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);
 	else

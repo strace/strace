@@ -42,7 +42,39 @@
 #include <sys/user.h>
 #include <sys/syscall.h>
 #include <signal.h>
-#include <linux/module.h>
+
+/* Bits of module.flags.  */
+
+#define MOD_UNINITIALIZED	0
+#define MOD_RUNNING		1
+#define MOD_DELETED		2
+#define MOD_AUTOCLEAN		4
+#define MOD_VISITED  		8
+#define MOD_USED_ONCE		16
+#define MOD_JUST_FREED		32
+#define MOD_INITIALIZING	64
+
+/* Values for query_module's which.  */
+
+#define QM_MODULES	1
+#define QM_DEPS		2
+#define QM_REFS		3
+#define QM_SYMBOLS	4
+#define QM_INFO		5
+
+struct module_symbol
+{
+	unsigned long value;
+	const char *name;
+};
+
+struct module_info
+{
+	unsigned long addr;
+	unsigned long size;
+	unsigned long flags;
+	long usecount;
+};
 
 static struct xlat which[] = {
 	{ 0,		"0"		},

@@ -83,6 +83,7 @@ int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
 int sys_sendfile(), sys_old_mmap(), sys_stat64(), sys_lstat64(), sys_fstat64();
 int sys_truncate64(), sys_ftruncate64(), sys_pivotroot();
+int sys_clone2();
 
 
 /* sys_socketcall subcalls */
@@ -109,7 +110,33 @@ int sys_osf_utimes();
 #endif
 
 
-#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS) &&!defined(HPPA)
+#if !defined(ALPHA) && !defined(MIPS) &&!defined(HPPA)
+# ifdef	IA64
+/*
+ *  IA64 syscall numbers (the only ones available from standard header
+ *  files) are disjoint from IA32 syscall numbers.  We need to define
+ *  the IA32 socket call number here.
+ */
+#  define SYS_socketcall	102
+
+#  undef SYS_socket
+#  undef SYS_bind
+#  undef SYS_connect
+#  undef SYS_listen
+#  undef SYS_accept
+#  undef SYS_getsockname
+#  undef SYS_getpeername
+#  undef SYS_socketpair
+#  undef SYS_send
+#  undef SYS_recv
+#  undef SYS_sendto
+#  undef SYS_recvfrom
+#  undef SYS_shutdown
+#  undef SYS_setsockopt
+#  undef SYS_getsockopt
+#  undef SYS_sendmsg
+#  undef SYS_recvmsg
+#endif /* IA64 */
 #ifdef POWERPC
 #  define SYS_socket_subcall	256
 #else
@@ -134,7 +161,7 @@ int sys_osf_utimes();
 #define SYS_recvmsg		(SYS_socket_subcall + 17)
 
 #define SYS_socket_nsubcalls	18
-#endif /* !(ALPHA || IA64 || MIPS || HPPA) */
+#endif /* !(ALPHA || MIPS || HPPA) */
 
 /* sys_ipc subcalls */
 
@@ -142,7 +169,29 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS) && !defined(SPARC) &&!defined(HPPA)
+#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) &&!defined(HPPA)
+# ifdef	IA64
+   /*
+    * IA64 syscall numbers (the only ones available from standard
+    * header files) are disjoint from IA32 syscall numbers.  We need
+    * to define the IA32 socket call number here.  Fortunately, this
+    * symbol, `SYS_ipc', is not used by any of the IA64 code so
+    * re-defining this symbol will not cause a problem.
+   */
+#  undef SYS_ipc
+#  define SYS_ipc		117
+#  undef SYS_semop
+#  undef SYS_semget
+#  undef SYS_semctl
+#  undef SYS_msgsnd
+#  undef SYS_msgrcv
+#  undef SYS_msgget
+#  undef SYS_msgctl
+#  undef SYS_shmat
+#  undef SYS_shmdt
+#  undef SYS_shmget
+#  undef SYS_shmctl
+# endif /* IA64 */
 #ifdef POWERPC
 #  define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #else
@@ -161,7 +210,21 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #define SYS_shmctl		(SYS_ipc_subcall + 24)
 
 #define SYS_ipc_nsubcalls	25
-#endif /* !(ALPHA || IA64 || MIPS || HPPA) */
+#endif /* !(ALPHA || MIPS || HPPA) */
+
+#ifdef IA64
+  /*
+   * IA64 syscall numbers (the only ones available from standard header
+   * files) are disjoint from IA32 syscall numbers.  We need to define
+   * some IA32 specific syscalls here.
+   */
+# define SYS_fork	2
+# define SYS_vfork	190
+# define SYS32_exit	1
+# define SYS_waitpid	7
+# define SYS32_wait4	114
+# define SYS32_execve	11
+#endif /* IA64 */
 
 #if defined(ALPHA) || defined(IA64)
 int sys_getpagesize();

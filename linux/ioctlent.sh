@@ -29,13 +29,21 @@
 #
 
 dir="/usr/include"
+
+files="asm/ioctls.h /dev/null"
+# Build the list of all ioctls
+regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+0x54..\>'
+(cd $dir ; grep $regexp $files 2>/dev/null ) | \
+	sed -ne 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x54..\).*/	{ "\1",	"\2",	\3	},/p' \
+	> ioctls.h
+
 files="linux/* asm/* scsi/*"
 
 # Build the list of all ioctls
 regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+_S\?\(IO\|IOW\|IOR\|IOWR\)\>'
 (cd $dir ; grep $regexp $files 2>/dev/null ) | \
 	sed -ne 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_S\?I.*(\([^[,]*\)[[:space:]]*,[[:space:]]*\([^,)]*\).*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\3,\4,0)	},/p' \
-	> ioctls.h
+	>> ioctls.h
 
 # Some use a special base to offset their ioctls on. Extract that as well.
 : > ioctldefs.h

@@ -990,7 +990,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 */
+# endif /* !IA64 && !HPPA*/
 #endif /* linux */
 
 #ifndef HAVE_LONG_LONG_OFF_T
@@ -1036,7 +1036,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 */
+# endif /* !IA64 && !HPPA*/
 #endif
 
 #ifndef HAVE_LONG_LONG_OFF_T
@@ -1085,7 +1085,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-# endif /* !IA64 */
+# endif /* !IA64 && !HPPA */
 #endif
 
 

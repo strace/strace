@@ -365,6 +365,34 @@ int nr;
 	tprintf(signame(nr));
 }
 
+#ifdef LINUX
+
+static void
+parse_sigset_t (const char *str, sigset_t *set)
+{
+	unsigned int digit;
+	int i;
+
+	sigemptyset(set);
+
+	for (i = _NSIG - 4; i >= 0; i -= 4, ++str) {
+		if (*str >= 'a')
+			digit = (*str - 'a') + 10;
+		else
+			digit = *str - '0';
+		if (digit & 1)
+			sigaddset(set, i + 1);
+		if (digit & 2)
+			sigaddset(set, i + 2);
+		if (digit & 4)
+			sigaddset(set, i + 3);
+		if (digit & 8)
+			sigaddset(set, i + 4);
+	}
+}
+
+#endif
+
 /*
  * Check process TCP for the disposition of signal SIG.
  * Return 1 if the process would somehow manage to  survive signal SIG,
@@ -381,8 +409,7 @@ int sig;
 	char buf[2048];
 	char *s;
 	int i;
-	/* We also need to handle RT signals */
-	unsigned long long signalled, blocked, ignored, caught;
+	sigset_t ignored, caught;
 #endif
 #ifdef SVR4
 	/*
@@ -427,32 +454,27 @@ int sig;
 	 * Skip the extraneous fields. We need to skip
 	 * command name has any spaces in it.  So be it.
 	 */
-	s = strstr(buf, "SigPnd:\t");
-
+	s = strstr(buf, "SigIgn:\t");
 	if (!s)
 	{
 		fprintf(stderr, "/proc/pid/status format error\n");
 		return 1;
 	}
+	parse_sigset_t(s + 8, &ignored);
 
-	while (*s && *s++ != '\t')
-		;
-	s += sscanf(s, "%qx", &signalled);
-	while (*s && *s++ != '\t')
-		;
-	s += sscanf(s, "%qx", &blocked);
-	while (*s && *s++ != '\t')
-		;
-	s += sscanf(s, "%qx", &ignored);
-	while (*s && *s++ != '\t')
-		;
-	s += sscanf(s, "%qx", &caught);
+	s = strstr(buf, "SigCgt:\t");
+	if (!s)
+	{
+		fprintf(stderr, "/proc/pid/status format error\n");
+		return 1;
+	}
+	parse_sigset_t(s + 8, &caught);
 
 #ifdef DEBUG
-	fprintf(stderr, "sigs: %08x %08x %08x %08x\n",
-		signalled, blocked, ignored, caught);
+	fprintf(stderr, "sigs: %016qx %016qx (sig=%d)\n",
+		*(long long *) &ignored, *(long long *) &caught, sig);
 #endif
-	if ((ignored & (1ULL << sig)) || (caught & (1ULL << sig)))
+	if (sigismember(&ignored, sig) || sigismember(&caught, sig))
 		return 1;
 #endif /* LINUX */
 

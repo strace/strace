@@ -44,6 +44,10 @@
 #include <grp.h>
 #include <string.h>
 
+#if defined(IA64) && defined(LINUX)
+# include <asm/ptrace_offsets.h>
+#endif
+
 #ifdef USE_PROCFS
 #include <poll.h>
 #endif
@@ -1805,10 +1809,23 @@ trace()
 			}
 			if (!cflag
 			    && (qual_flags[WSTOPSIG(status)] & QUAL_SIGNAL)) {
+				unsigned long addr = 0, pc = 0;
+#ifdef PT_GETSIGINFO
+#				define PSR_RI	41
+				struct siginfo si;
+				unsigned long psr;
+
+				upeek(pid, PT_CR_IPSR, &psr);
+				upeek(pid, PT_CR_IIP, &pc);
+
+				pc += (psr >> PSR_RI) & 0x3;
+				ptrace(PT_GETSIGINFO, pid, 0, (long) &si);
+				addr = (unsigned long) si.si_addr;
+#endif
 				printleader(tcp);
-				tprintf("--- %s (%s) ---",
+				tprintf("--- %s (%s) @ %lx (%lx) ---",
 					signame(WSTOPSIG(status)),
-					strsignal(WSTOPSIG(status)));
+					strsignal(WSTOPSIG(status)), pc, addr);
 				printtrailer(tcp);
 			}
 			if ((tcp->flags & TCB_ATTACHED) &&

@@ -1,3 +1,70 @@
+2001-10-03  David Mosberger  <davidm@hpl.hp.com>
+
+	* process.c (internal_clone): Avoid race condition by clearing
+	breakpoint after attaching to child.
+
+2001-10-02  David Mosberger  <davidm@hpl.hp.com>
+
+	* linux/ia64/syscallent.h: Define ia32 syscall numbers (originally
+	by Don Dugger, with my refinements).
+
+	* linux/ia64/ioctlent.h: Regenerate and manually merge conflicting
+	ioctls (TCGETS & SNDCTL_TMR_TIMEBASE, etc.).
+
+	* linux/ia64/Makefile.in (ioctldefs.h ioctls.h): Update for
+	new ioctlent.h generation scheme.
+
+	* linux/syscall.h (sys_clone2): Declare.
+	[IA64] Define ia32 socket, ipc, and extra syscall numbers.
+
+	* linux/ioctlent.sh (regexp): Also handle <asm/ioctls.h> so we
+	don't miss the tty ioctls (unfortunately, some of the sound timer
+	ioctls are in conflict with them!).
+
+	* util.c (setbpt) [IA64]: Add ia32 support (by Don Dugger).
+	(clrbpt) [IA64]: Ditto.
+
+	* syscall.c (internal_syscall): Handle SYS_clone2, SYS32_wait4,
+	and SYS32_exit.
+	(get_scno): Get ia32 syscall number from r1 (orig eax) instead of
+	r8 (eax).  Handle TCB_WAITEXECVE.
+	(syscall_fixup): Handle ia64.
+	(syscall_enter): Fix argument fetching for ia64.
+
+	* strace.c [IA64 && LINUX]: Include <asm/ptrace_offsets.h>.
+	(trace) [PT_GETSIGINFO]: Print signal address and pc if possible.
+
+	* process.c (tcp): New function.
+	(change_syscall): Add support for ia64 linux.
+	(sys_execve): Turn on TCB_WAITEXECVE for ia64 linux.
+
+	* desc.c (getlk): Cast l_len to "long long" to avoid warnings when
+	type is narrower.
+	* resource.c (sprintrlim64): Ditto.
+
+	* defs.h (TCB_WAITEXECVE) [IA64]: Define.
+	[IA64]: Declare "ia32" variable.
+
+	* bjm.c: Do not include <linux/module.h>.  It's not safe to include
+	kernel headers.  Declare the necessary constants and structures
+	directly instead.
+
+2001-10-01  David Mosberger  <davidm@hpl.hp.com>
+
+	* signal.c (parse_sigset_t): New function.
+	(sigishandled): Fix off-by-one bug by using parse_sigset_t() and
+	avoiding relying on internal layout of sigset_t datastructure.
+
+2001-04-26  David Mosberger  <davidm@hpl.hp.com>
+
+	* linux/ia64/syscallent.h: Add getunwind().
+
+2001-04-11  David Mosberger  <davidm@hpl.hp.com>
+
+	* syscall.c (syscall_enter): Use PT_RBS_END instead of deprecated
+	PT_AR_BSP.  Pick up arguments starting with out0, which is not
+	always the same as r32 (e.g., consider inlined syscalls).
+
 2001-09-28   John Hughes <john@Calva.COM>
 
   * process.c: FreeBSD-CURRENT no longer has PT_READ_U, and anyway we

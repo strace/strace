@@ -176,7 +176,6 @@ extern int ptrace();
 #define SUPPORTED_PERSONALITIES 2
 #endif /* LINUXSPARC */
 
-
 #ifdef SVR4
 #ifdef HAVE_MP_PROCFS
 extern int mp_ioctl (int f, int c, void *a, int s);
@@ -284,9 +283,9 @@ struct tcb {
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-#if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(HPPA)
-#define TCB_WAITEXECVE	02000	/* ignore SIGTRAP after exceve */
-#endif /* ALPHA */
+# if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(IA64) || defined(HPPA)
+#  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
+# endif
 #endif /* LINUX */
 
 /* qualifier flags */
@@ -531,4 +530,8 @@ do {									\
 #define LONG_LONG(_l,_h) \
     ((long long)((unsigned long long)(_h) | ((unsigned long long)(_l)<<32)))
 #endif
+#endif
+
+#ifdef IA64
+extern long ia32;
 #endif

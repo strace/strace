@@ -457,6 +457,19 @@ struct tcb *tcp;
 	return 0;
 }
 
+int
+sys_clone2(tcp)
+struct tcb *tcp;
+{
+       if (exiting(tcp)) {
+               tprintf("child_stack=%#lx, stack_size=%#lx, flags=",
+                       tcp->u_arg[1], tcp->u_arg[2]);
+               if (printflags(clone_flags, tcp->u_arg[0]) == 0)
+                       tprintf("0");
+       }
+       return 0;
+}
+
 #endif
 
 int
@@ -509,6 +522,10 @@ int new;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new)<0)
 	    	return -1;
 	return 0;
+#elif defined(IA64)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R15), new)<0)
+		return -1;
+	return 0;
 #elif defined(HPPA)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR20), new)<0)
 	    	return -1;
@@ -534,7 +551,7 @@ setarg(tcp, argnum)
 
 		ap = ia64_rse_skip_regs(bsp, argnum);
 		errno = 0;
-		ptrace(PTRACE_POKEDATA, tcp->pid, ap, tcp->u_arg[argnum]);
+		ptrace(PTRACE_POKEDATA, tcp->pid, (char *) ap, tcp->u_arg[argnum]);
 		if (errno)
 			return -1;
 
@@ -595,14 +612,16 @@ struct tcb *tcp;
 		if (!(tcp->flags & TCB_FOLLOWFORK))
 			return 0;
 
-		if (bpt)
-			clearbpt(tcp);
-
-		if (syserror(tcp))
+		if (syserror(tcp)) {
+			if (bpt)
+				clearbpt(tcp);
 			return 0;
+		}
 
 		pid = tcp->u_rval;
 		if ((tcpchild = alloctcb(pid)) == NULL) {
+			if (bpt)
+				clearbpt(tcp);
 			fprintf(stderr, " [tcb table full]\n");
 			kill(pid, SIGKILL); /* XXX */
 			return 0;
@@ -610,11 +629,16 @@ struct tcb *tcp;
 
 		/* Attach to the new child */
 		if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
+			if (bpt)
+				clearbpt(tcp);
 			perror("PTRACE_ATTACH");
 			fprintf(stderr, "Too late?\n");
 			droptcb(tcpchild);
 			return 0;
 		}
+
+		if (bpt)
+			clearbpt(tcp);
 
 		tcpchild->flags |= TCB_ATTACHED;
 		if (bpt) {
@@ -624,6 +648,7 @@ struct tcb *tcp;
 				sizeof tcpchild->inst);
 		}
 		newoutf(tcpchild);
+		tcpchild->parent = tcp;
 		tcp->nchildren++;
 		if (!qflag)
 			fprintf(stderr, "Process %d attached\n", pid);
@@ -1198,7 +1223,7 @@ struct tcb *tcp;
 		}
 	}
 #ifdef LINUX
-#if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(HPPA)
+#if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(IA64) || defined(HPPA)
 	tcp->flags |= TCB_WAITEXECVE;
 #endif /* ALPHA || SPARC || POWERPC */
 #endif /* LINUX */
