@@ -1,5 +1,8 @@
 2003-06-09  Roland McGrath  <roland@redhat.com>
 
+	* linux/shmedia/syscallent.h: New file.
+	From Stephen Thomas <stephen.thomas@superh.com>.
+
 	* strace.c (trace): Print a message and newline for a WIFEXITED report
 	from the process we just printed an unterminated syscall line for.
 
