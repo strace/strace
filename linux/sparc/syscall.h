@@ -86,6 +86,9 @@ int	sys_chown(),sys_fchown(),sys_chmod(),sys_fchmod(),sys_utimes();
 int	sys_link(),sys_symlink(),sys_readlink(),sys_rename();
 int	sys_lseek(),sys_truncate(),sys_ftruncate(),sys_access(),sys_fsync(),sys_sysctl();
 int	sys_statfs(),sys_fstatfs(),sys_msync();
+int sys_stat64(), sys_lstat64(), sys_fstat64();
+int sys_truncate64(), sys_ftruncate64();
+
 
 /* 2.3 communications */
 int	sys_socket(),sys_bind(),sys_listen(),sys_accept(),sys_connect();

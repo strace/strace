@@ -61,7 +61,7 @@
 	{ 1,	0,	sys_umask,	"umask" },		/* 60 */
 	{ 1,	TF,	sys_chroot,	"chroot" },		/* 61 */
 	{ 2,	0,	sys_fstat,	"fstat" },		/* 62 */
-	{ 0,	0,	printargs,	"SYS_63" },		/* 63 */
+	{ 2,	TF,	sys_fstat64,	"fstat64" },		/* 63 */
 	{ 1,	0,	sys_getpagesize,"getpagesize" },	/* 64 */
 	{ 3,	0,	sys_msync,	"msync" },		/* 65 */
 	{ 0,	TP,	sys_vfork,	"vfork" },		/* 66 */
@@ -130,14 +130,14 @@
 	{ 2,	TF,	sys_truncate,	"truncate" },		/* 129 */
 	{ 2,	0,	sys_ftruncate,	"ftruncate" },		/* 130 */
 	{ 2,	0,	sys_flock,	"flock" },		/* 131 */
-	{ 0,	0,	printargs,	"SYS_132" },		/* 132 */
+	{ 2,	TF,	sys_lstat64,	"lstat64" },		/* 132 */
 	{ 6,	TN,	sys_sendto,	"sendto" },		/* 133 */
 	{ 2,	TN,	sys_shutdown,	"shutdown" },		/* 134 */
 	{ 5,	TN,	sys_socketpair,	"socketpair" },		/* 135 */
 	{ 2,	TF,	sys_mkdir,	"mkdir" },		/* 136 */
 	{ 1,	TF,	sys_rmdir,	"rmdir" },		/* 137 */
 	{ 2,	TF,	sys_utimes,	"utimes" },		/* 138 */
-	{ 0,	TS,	printargs,	"SYS_139" },		/* 139 */
+	{ 2,	TF,	sys_stat64,	"stat64" },		/* 139 */
 	{ 2,   0,	sys_adjtime,	"adjtime" },		/* 140 */
 	{ 3,	TN,	sys_getpeername,"getpeername" },	/* 141 */
 	{ 2,   0,	sys_gethostid,	"gethostid" },		/* 142 */
@@ -153,7 +153,7 @@
 	{ 4,	TN,	sys_getmsg,	"getmsg" },		/* 151 */
 	{ 4,	TN,	sys_putmsg,	"putmsg" },		/* 152 */
 	{ 3,	0,	sys_poll,	"poll" },		/* 153 */
-	{ 0,	0,	printargs,	"SYS_154" },		/* 154 */
+	{ 4,	0,	printargs,	"getdents64" },		/* 154 */
 	{ 1,	0,	printargs,	"nfssvc" },		/* 155 */
 	{ 4,	0,	printargs,	"getdirentries" },	/* 156 */
 	{ 2,	TF,	sys_statfs,	"statfs" },		/* 157 */
