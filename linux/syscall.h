@@ -52,6 +52,7 @@ int sys_setreuid(), sys_setregid(), sys_sigsuspend();
 int sys_sigpending(), sys_sethostname(), sys_setrlimit();
 int sys_getrlimit(), sys_getrusage(), sys_gettimeofday();
 int sys_settimeofday(), sys_getgroups(), sys_setgroups();
+int sys_setgroups32(), sys_getgroups32();
 int sys_oldselect(), sys_symlink(), sys_oldlstat(), sys_readlink();
 int sys_uselib(), sys_swapon(), sys_reboot(), sys_readdir();
 int sys_mmap(), sys_munmap(), sys_truncate(), sys_ftruncate();
