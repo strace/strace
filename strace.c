@@ -419,6 +419,9 @@ char *argv[];
 #endif /* MIPS */
 			pause();
 #else /* !SVR4 */
+			if (outf!=stderr)	
+				close(outf);
+
 			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
 				perror("strace: ptrace(PTRACE_TRACEME, ...)");
 				return -1;
