@@ -1,3 +1,12 @@
+strace (4.5.4-1) unstable; urgency=low
+
+  * Build package on amd64, closes: #246568.
+  * New upstream version.
+    + Recognize more PF_* and AF_* values, closes: #250506.
+    + Other  fixes.
+
+ -- Roland McGrath <frob@debian.org>  Thu,  3 Jun 2004 19:35:37 -0700
+
 strace (4.5.3-1) unstable; urgency=low
 
   * New upstream version.

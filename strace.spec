@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5.3
+Version: 4.5.4
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -75,6 +75,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Jun  3 2004 Roland McGrath <roland@redhat.com> 4.5.4-1
+- new upstream version, more ioctls (#122257), minor fixes
+
 * Fri Apr 16 2004 Roland McGrath <roland@redhat.com> 4.5.3-1
 - new upstream version, mq_* calls (#120701), -p vs NPTL (#120462), more fixes (#118694, #120541, #118685)
 

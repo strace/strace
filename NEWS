@@ -1,3 +1,9 @@
+Changes in 4.5.4
+==============
+* Update Linux ioctl lists.
+* Update PF_* and AF_* value lists.
+* The 4.5.3 -p behavior for NPTL threads applies only under -f, and got fixed.
+
 Changes in 4.5.3
 ==============
 * Bug fixes.
