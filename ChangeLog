@@ -1,5 +1,14 @@
 2003-06-26  Roland McGrath  <roland@redhat.com>
 
+	* process.c [LINUX] (sys_futex): Grok FUTEX_REQUEUE and print 5th arg.
+	* linux/syscallent.h: sys_futex argument count is now 5, not 4.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+	From Jakub Jelinek <jakub@redhat.com>.
+
 	* syscall.c (get_scno) [S390 || S390X]: Fix old vs new mode detection.
 	From Michael Holzheu <HOLZHEU@de.ibm.com>.
 
