@@ -416,6 +416,8 @@ int nr;
 #define SI_TIMER        -2      /* sent by timer expiration */
 #define SI_MESGQ        -3      /* sent by real time mesq state change */
 #define SI_ASYNCIO      -4      /* sent by AIO completion */
+#define SI_SIGIO	-5	/* Sent by SIGIO */
+#define SI_TKILL	-6	/* Sent by tkill */
 #endif
 
 #if __GLIBC_MINOR__ < 1
@@ -525,6 +527,12 @@ static struct xlat siginfo_codes[] = {
 #endif
 #ifdef SI_MESGQ
 	{ SI_MESGQ,	"SI_MESGQ"	},
+#endif
+#ifdef SI_SIGIO
+	{ SI_SIGIO,	"SI_SIGIO"	},
+#endif
+#ifdef SI_TKILL
+	{ SI_TKILL,	"SI_TKILL"	},
 #endif
 	{ 0,		NULL		},
 };
