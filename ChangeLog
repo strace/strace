@@ -1,5 +1,9 @@
 2001-03-29  Wichert Akkerman <wakkerma@debian.org>
 
+  * linux/ia64/ioctlent.h: updated using new Linux ioctl setup
+
+2001-03-29  Wichert Akkerman <wakkerma@debian.org>
+
   * linux/powerpc/ioctlent.h: updated using new Linux ioctl setup
 
 2001-03-29  Wichert Akkerman <wakkerma@debian.org>
