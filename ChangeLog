@@ -1,3 +1,19 @@
+2003-12-31  David Mosberger  <davidm@hpl.hp.com>
+
+	* process.c (internal_exit): For ia64, also recognize IA-32 252
+	as exit_group().
+	(change_syscall): For IA64, also support changing IA-32 syscalls.
+	* syscall.c (internal_syscall): For IA64, also recognize IA-32
+        syscall 252 (exit_group) as an internal_exit() syscall.
+	* util.c (SYS_fork): For IA64, define them to the IA-32 syscall
+	number.
+	(SYS_vfork): Likewise.
+	(arg_setup): For IA64 version, also support IA-32 syscalls.
+	(get_arg0): Likewise.
+	(get_arg1): Likewise.
+	(set_arg0): Likewise.
+	(set_arg1): Likewise.
+
 2004-02-15  Anton Blanchard  <anton@samba.org>
 
 	* linux/powerpc/syscallent.h: Add rtas call.
