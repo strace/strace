@@ -3,9 +3,8 @@ strace (4.5.3-1) unstable; urgency=low
   * New upstream version.
     + Finish fix for -f on Linux/S390(x).
     + Print extra wait status bits, closes: #240062.
-    + Print extra wait status bits, closes: #240062.
 
-  -- Roland McGrath <frob@debian.org>  Fri, 16 Apr 2004 15:27:43 -0700
+ -- Roland McGrath <frob@debian.org>  Fri, 16 Apr 2004 15:27:43 -0700
 
 strace (4.5.2-1) unstable; urgency=low
 
