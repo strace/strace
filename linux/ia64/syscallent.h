@@ -1119,36 +1119,36 @@
 	{ 2,	TP,	sys_clone2,		"clone2"	}, /* 1213 */
 	{ 3,	0,	printargs,		"getdents64"	}, /* 1214 */
 	{ 2,	0,	printargs,		"getunwind"	}, /* 1215 */
-	{ 8,	0,	printargs,		"SYS_1216"	}, /* 1216 */
-	{ 8,	0,	printargs,		"SYS_1217"	}, /* 1217 */
-	{ 8,	0,	printargs,		"SYS_1218"	}, /* 1218 */
-	{ 8,	0,	printargs,		"SYS_1219"	}, /* 1219 */
-	{ 8,	0,	printargs,		"SYS_1220"	}, /* 1220 */
-	{ 8,	0,	printargs,		"SYS_1221"	}, /* 1221 */
-	{ 8,	0,	printargs,		"SYS_1222"	}, /* 1222 */
-	{ 8,	0,	printargs,		"SYS_1223"	}, /* 1223 */
-	{ 8,	0,	printargs,		"SYS_1224"	}, /* 1224 */
-	{ 8,	0,	printargs,		"SYS_1225"	}, /* 1225 */
-	{ 8,	0,	printargs,		"SYS_1226"	}, /* 1226 */
-	{ 8,	0,	printargs,		"SYS_1227"	}, /* 1227 */
-	{ 8,	0,	printargs,		"SYS_1228"	}, /* 1228 */
-	{ 8,	0,	printargs,		"SYS_1229"	}, /* 1229 */
-	{ 8,	0,	printargs,		"SYS_1230"	}, /* 1230 */
-	{ 8,	0,	printargs,		"SYS_1231"	}, /* 1231 */
-	{ 8,	0,	printargs,		"SYS_1232"	}, /* 1232 */
-	{ 8,	0,	printargs,		"SYS_1233"	}, /* 1233 */
+	{ 4,	0,	sys_readahead,		"readahead"	}, /* 1216 */
+	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 1217 */
+	{ 5,	TF,	sys_lsetxattr,		"lsetxattr"	}, /* 1218 */
+	{ 5,	0,	sys_fxsetattr,		"fsetxattr"	}, /* 1219 */
+	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 1220 */
+	{ 4,	TF,	sys_lgetxattr,		"lgetxattr"	}, /* 1221 */
+	{ 4,	0,	sys_fgetxattr,		"fgetxattr"	}, /* 1222 */
+	{ 3,	TF,	sys_listxattr,		"listxattr"	}, /* 1223 */
+	{ 3,	TF,	sys_llistxattr,		"llistxattr"	}, /* 1224 */
+	{ 3,	0,	sys_flistxattr,		"flistxattr"	}, /* 1225 */
+	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 1226 */
+	{ 2,	TF,	sys_lremovexattr,	"lremovexattr"	}, /* 1227 */
+	{ 2,	0,	sys_fremovexattr,	"fremovexattr"	}, /* 1228 */
+	{ 2,	TS,	sys_kill,		"tkill"		}, /* 1229 */
+	{ 4,	0,	sys_futex,		"futex"		}, /* 1230 */
+	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */
+	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"},/* 1232 */
+	{ 8,	0,	printargs,		"set_tid_address"}, /* 1233 */
 	{ 8,	0,	printargs,		"SYS_1234"	}, /* 1234 */
 	{ 8,	0,	printargs,		"SYS_1235"	}, /* 1235 */
-	{ 8,	0,	printargs,		"SYS_1236"	}, /* 1236 */
-	{ 8,	0,	printargs,		"SYS_1237"	}, /* 1237 */
+	{ 8,	0,	printargs,		"exit_group"	}, /* 1236 */
+	{ 8,	0,	printargs,		"lookup_dcookie"}, /* 1237 */
 	{ 2,	0,	printargs,		"io_setup"	}, /* 1238 */
 	{ 1,	0,	printargs,		"io_destroy"	}, /* 1239 */
 	{ 5,	0,	printargs,		"io_getevents"	}, /* 1240 */
 	{ 3,	0,	printargs,		"io_submit"	}, /* 1241 */
 	{ 3,	0,	printargs,		"io_cancel"	}, /* 1242 */
-	{ 8,	0,	printargs,		"SYS_1243"	}, /* 1243 */
-	{ 8,	0,	printargs,		"SYS_1244"	}, /* 1244 */
-	{ 8,	0,	printargs,		"SYS_1245"	}, /* 1245 */
+	{ 8,	0,	printargs,		"epoll_create"	}, /* 1243 */
+	{ 8,	0,	printargs,		"epoll_ctl"	}, /* 1244 */
+	{ 8,	0,	printargs,		"epoll_wait"	}, /* 1245 */
 	{ 8,	0,	printargs,		"SYS_1246"	}, /* 1246 */
 	{ 8,	0,	printargs,		"SYS_1247"	}, /* 1247 */
 	{ 8,	0,	printargs,		"SYS_1248"	}, /* 1248 */
