@@ -5,6 +5,7 @@ Fri Nov 26 10:51:55 CET 1999 Wichert Akkerman <wakkerma@debian.org>
     + ACL fixes for UnixWare
     + allow net.c to compile on systems without AF_INET6
     + Only use long_to_sigset on Linux systems
+    + UnixWare treats sigmask_t and sigmask_t* as the same thing
 
 Fri Nov 26 01:28:09 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 

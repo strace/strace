@@ -888,7 +888,7 @@ struct tcb *tcp;
 		if (umove(tcp, tcp->u_arg[0], &sigset) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(sigset, 0);
+			printsigmask(&sigset, 0);
 	}
 	return 0;
 }
@@ -1115,7 +1115,7 @@ struct tcb *tcp;
 		else if (copy_sigset(tcp, tcp->u_arg[0], &sigset) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(sigset, 0);
+			printsigmask(&sigset, 0);
 	}
 	return 0;
 }
@@ -1317,7 +1317,7 @@ sys_rt_sigpending(tcp)
 					 &sigset, tcp->u_arg[1]) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(sigset, 1);
+			printsigmask(&sigset, 1);
 	}
 	return 0;
 }
@@ -1568,7 +1568,7 @@ int sys_rt_sigtimedwait(tcp)
 				    &sigset, tcp->u_arg[3]) < 0)
 			tprintf("[?]");
 		else
-			printsigmask(sigset, 1);
+			printsigmask(&sigset, 1);
 		tprintf(", ");
 	}
 	else {
