@@ -1,5 +1,8 @@
 2003-06-09  Roland McGrath  <roland@redhat.com>
 
+	* linux/s390x/syscallent.h: Update many syscalls.
+	* linux/syscall.h (SYS_socket_subcall): Update [S390X] value.
+
 	* linux/s390/syscallent.h: Update many syscalls.
 	* linux/syscall.h (SYS_socket_subcall): Update [S390] value.
 
