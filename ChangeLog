@@ -1,3 +1,13 @@
+2004-09-13  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* linux/ioctlsort.c (main): Omit duplicate lines
+	(with same name and code) from output.
+	* linux/ioctlent.sh: Build the list of ioctls defined in
+	scsi/sg.h (0x22..), scsi/scsi.h and scsi/scsi_ioctl.h (0x53..),
+	as suggested by Peter Jones <pjones@redhat.com>
+	* linux/ioctlent.h: Regenerated.
+	Fixes RH#129808.
+
 2004-09-13  Ulrich Drepper <drepper@redhat.com>
 	    Dmitry V. Levin <ldv@altlinux.org>
 
