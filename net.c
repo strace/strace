@@ -191,6 +191,59 @@ static struct xlat socktypes[] = {
 #endif
 	{ 0,		NULL		},
 };
+static struct xlat socketlayers[] = {
+	{ SOL_IP,	"SOL_IP"	},
+#if defined(SOL_ICMP)
+	{ SOL_ICMP,	"SOL_ICMP"	},
+#endif
+	{ SOL_TCP,	"SOL_TCP"	},
+	{ SOL_UDP,	"SOL_UDP"	},
+#if defined(SOL_IPV6)
+	{ SOL_IPV6,	"SOL_IPV6"	},
+#endif
+#if defined(SOL_ICMPV6)
+	{ SOL_ICMPV6,	"SOL_ICMPV6"	},
+#endif
+#if defined(SOL_RAW)
+	{ SOL_RAW,	"SOL_RAW"	},
+#endif
+#if defined(SOL_IPX)
+	{ SOL_IPX,	"SOL_IPX"	},
+#endif
+#if defined(SOL_IPX)
+	{ SOL_IPX,	"SOL_IPX"	},
+#endif
+#if defined(SOL_AX25)
+	{ SOL_AX25,	"SOL_AX25"	},
+#endif
+#if defined(SOL_ATALK)
+	{ SOL_ATALK,	"SOL_ATALK"	},
+#endif
+#if defined(SOL_NETROM)
+	{ SOL_NETROM,	"SOL_NETROM"	},
+#endif
+#if defined(SOL_ROSE)
+	{ SOL_ROSE,	"SOL_ROSE"	},
+#endif
+#if defined(SOL_DECNET)
+	{ SOL_DECNET,	"SOL_DECNET"	},
+#endif
+#if defined(SOL_X25)
+	{ SOL_X25,	"SOL_X25"	},
+#endif
+#if defined(SOL_PACKET)
+	{ SOL_PACKET,	"SOL_PACKET"	},
+#endif
+#if defined(SOL_ATM)
+	{ SOL_ATM,	"SOL_ATM"	},
+#endif
+#if defined(SOL_AAL)
+	{ SOL_AAL,	"SOL_AAL"	},
+#endif
+#if defined(SOL_IRDA)
+	{ SOL_IRDA,	"SOL_IRDA"	},
+#endif
+};
 static struct xlat protocols[] = {
 	{ IPPROTO_IP,	"IPPROTO_IP"	},
 	{ IPPROTO_ICMP,	"IPPROTO_ICMP"	},
@@ -1042,7 +1095,7 @@ struct tcb *tcp;
 		 * etc. still need work */
 		default: 
 			/* XXX - should know socket family here */
-			printxval(protocols, tcp->u_arg[1], "IPPROTO_???");
+			printxval(socketlayers, tcp->u_arg[1], "SOL_???");
 			tprintf(", %lu, ", tcp->u_arg[2]);
 			break;
 		}
@@ -1160,8 +1213,8 @@ struct tcb *tcp;
 		 * etc. still need work  */
 		default:
 			/* XXX - should know socket family here */
-			printxval(protocols, tcp->u_arg[1], "IPPROTO_???");
-			tprintf("%lu, ", tcp->u_arg[2]);
+			printxval(socketlayers, tcp->u_arg[1], "IPPROTO_???");
+			tprintf(", %lu, ", tcp->u_arg[2]);
 			printnum(tcp, tcp->u_arg[3], "%ld");
 			tprintf(", %lu", tcp->u_arg[4]);
 			break;

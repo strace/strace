@@ -1,3 +1,8 @@
+2000-11-26  Wichert Akkerman <wakkerma@debian.org>
+
+  *  net.c: fix formating error in sys_setsockopt
+  *  net.c: add list of socketlayers and use that for [gs]etsockopt
+
 2000-10-12  Wichert Akkerman <wakkerma@debian.org> 
 
   * time.c: use sys/timex.h so things compile with 2.2 kernels
@@ -5,17 +10,17 @@
 
 2000-09-03  Wichert Akkerman <wakkerma@debian.org>
 
-  *  process.c: perform bpt trick for clone as well so we can get the
-     pid of the child before it starts doing something
-  *  file.c: rename dirent64 struct to kernel_dirent64 so things compile
-     again with newer libcs
-  *  test/clone.c: improve our testcase a bit
-  *  Merge another patch from Gäel Roualland with FreeBSD updates
+  * process.c: perform bpt trick for clone as well so we can get the
+    pid of the child before it starts doing something
+  * file.c: rename dirent64 struct to kernel_dirent64 so things compile
+    again with newer libcs
+  * test/clone.c: improve our testcase a bit
+  * Merge another patch from Gäel Roualland with FreeBSD updates
 
 2000-09-01  Wichert Akkerman <wakkerma@debian.org>
 
-  *  lots of files: merge patch from Gaël Roualland to add
-     support for FreeBSD.
+  * lots of files: merge patch from Gaël Roualland to add
+    support for FreeBSD.
 
 2000-08-09  Wichert Akkerman <wakkerma@debian.org>
 
