@@ -100,7 +100,6 @@
 #define sys_sigprocmask		printargs
 #define sys_create_module	printargs
 #define sys_init_module		printargs
-#define sys_delete_module	printargs
 #define sys_get_kernel_syms	printargs
 #define sys_quotactl		printargs
 #define sys_bdflush		printargs
@@ -112,7 +111,6 @@
 #define sys_writev		printargs
 #define sys__sysctl		printargs
 #define sys_sched_rr_get_interval printargs
-#define sys_nanosleep		printargs
 #define sys_getresuid		printargs
 #define sys_vm86		printargs
 #define sys_query_module	printargs
@@ -1207,11 +1205,11 @@
 	{ 8,	0,	printargs,		"SYS_1235"	}, /* 1235 */
 	{ 8,	0,	printargs,		"SYS_1236"	}, /* 1236 */
 	{ 8,	0,	printargs,		"SYS_1237"	}, /* 1237 */
-	{ 8,	0,	printargs,		"SYS_1238"	}, /* 1238 */
-	{ 8,	0,	printargs,		"SYS_1239"	}, /* 1239 */
-	{ 8,	0,	printargs,		"SYS_1240"	}, /* 1240 */
-	{ 8,	0,	printargs,		"SYS_1241"	}, /* 1241 */
-	{ 8,	0,	printargs,		"SYS_1242"	}, /* 1242 */
+	{ 2,	0,	printargs,		"io_setup"	}, /* 1238 */
+	{ 1,	0,	printargs,		"io_destroy"	}, /* 1239 */
+	{ 5,	0,	printargs,		"io_getevents"	}, /* 1240 */
+	{ 3,	0,	printargs,		"io_submit"	}, /* 1241 */
+	{ 3,	0,	printargs,		"io_cancel"	}, /* 1242 */
 	{ 8,	0,	printargs,		"SYS_1243"	}, /* 1243 */
 	{ 8,	0,	printargs,		"SYS_1244"	}, /* 1244 */
 	{ 8,	0,	printargs,		"SYS_1245"	}, /* 1245 */
