@@ -1,3 +1,7 @@
+Sat Nov 27 21:38:17 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Enhance sys_query_module
+
 Fri Nov 26 10:51:55 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Patches from John Hughes:
