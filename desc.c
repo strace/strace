@@ -36,6 +36,8 @@
 #include <sys/file.h>
 #ifdef LINUX
 #include <inttypes.h>
+#endif
+#ifdef HAVE_SYS_EPOLL_H
 #include <sys/epoll.h>
 #endif
 
@@ -554,25 +556,55 @@ struct tcb *tcp;
 #endif
 
 static struct xlat epollctls[] = {
+#ifdef EPOLL_CTL_ADD
 	{ EPOLL_CTL_ADD,	"EPOLL_CTL_ADD"	},
+#endif
+#ifdef EPOLL_CTL_MOD
 	{ EPOLL_CTL_MOD,	"EPOLL_CTL_MOD"	},
+#endif
+#ifdef EPOLL_CTL_DEL
 	{ EPOLL_CTL_DEL,	"EPOLL_CTL_DEL"	},
+#endif
 	{ 0,			NULL		}
 };
 
 static struct xlat epollevents[] = {
+#ifdef EPOLLIN
 	{ EPOLLIN,	"EPOLLIN"	},
+#endif
+#ifdef EPOLLPRI
 	{ EPOLLPRI,	"EPOLLPRI"	},
+#endif
+#ifdef EPOLLOUT
 	{ EPOLLOUT,	"EPOLLOUT"	},
+#endif
+#ifdef EPOLLRDNORM
 	{ EPOLLRDNORM,	"EPOLLRDNORM"	},
+#endif
+#ifdef EPOLLRDBAND
 	{ EPOLLRDBAND,	"EPOLLRDBAND"	},
+#endif
+#ifdef EPOLLWRNORM
 	{ EPOLLWRNORM,	"EPOLLWRNORM"	},
+#endif
+#ifdef EPOLLWRBAND
 	{ EPOLLWRBAND,	"EPOLLWRBAND"	},
+#endif
+#ifdef EPOLLMSG
 	{ EPOLLMSG,	"EPOLLMSG"	},
+#endif
+#ifdef EPOLLERR
 	{ EPOLLERR,	"EPOLLERR"	},
+#endif
+#ifdef EPOLLHUP
 	{ EPOLLHUP,	"EPOLLHUP"	},
+#endif
+#ifdef EPOLLONESHOT
 	{ EPOLLONESHOT,	"EPOLLONESHOT"	},
+#endif
+#ifdef EPOLLET
 	{ EPOLLET,	"EPOLLET"	},
+#endif
 	{ 0,		NULL		}
 };
 
@@ -585,6 +617,7 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef HAVE_SYS_EPOLL_H
 static void
 print_epoll_event(ev)
 struct epoll_event *ev;
@@ -597,22 +630,27 @@ struct epoll_event *ev;
 	tprintf(", {u32=%" PRIu32 ", u64=%" PRIu64 "}}",
 		ev->data.u32, ev->data.u64);
 }
+#endif
 
 int
 sys_epoll_ctl(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		struct epoll_event ev;
 		tprintf("%ld, ", tcp->u_arg[0]);
                 printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
 		tprintf(", %ld, ", tcp->u_arg[2]);
 		if (tcp->u_arg[3] == 0)
 			tprintf("NULL");
-		else if (umove(tcp, tcp->u_arg[3], &ev) < 0)
-			tprintf("{...}");
-		else
-			print_epoll_event(&ev);
+		else {
+#ifdef HAVE_SYS_EPOLL_H
+			struct epoll_event ev;
+			else if (umove(tcp, tcp->u_arg[3], &ev) == 0)
+				print_epoll_event(&ev);
+			else
+#endif
+				tprintf("{...}");
+		}
 	}
 	return 0;
 }
@@ -629,10 +667,9 @@ struct tcb *tcp;
 		else if (tcp->u_rval == 0)
 			tprintf("{}");
 		else {
+#ifdef HAVE_SYS_EPOLL_H
 			struct epoll_event evs[tcp->u_rval];
-			if (umove(tcp, tcp->u_arg[1], evs) < 0)
-				tprintf("{...}");
-			else {
+			if (umove(tcp, tcp->u_arg[1], evs) == 0) {
 				unsigned long i;
 				tprintf("{");
 				for (i = 0; i < tcp->u_rval; ++i) {
@@ -642,6 +679,9 @@ struct tcb *tcp;
 				}
 				tprintf("}");
 			}
+			else
+#endif
+				tprintf("{...}");
 		}
 		tprintf(", %ld, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 	}
