@@ -450,9 +450,9 @@ char *argv[];
 			pause();
 #else /* FREEBSD */
 			kill(getpid(), SIGSTOP); /* stop HERE */
-#endif /* FREEBSD */			
+#endif /* FREEBSD */
 #else /* !USE_PROCFS */
-			if (outf!=stderr)	
+			if (outf!=stderr)
 				close(fileno (outf));
 
 			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
@@ -547,6 +547,14 @@ char *argv[];
 	sigaction(SIGTERM, &sa, NULL);
 #ifdef USE_PROCFS
 	sa.sa_handler = reaper;
+	sigaction(SIGCHLD, &sa, NULL);
+#else
+	/* Make sure SIGCHLD has the default action so that waitpid
+	   definitely works without losing track of children.  The user
+	   should not have given us a bogus state to inherit, but he might
+	   have.  Arguably we should detect SIG_IGN here and pass it on
+	   to children, but probably noone really needs that.  */
+	sa.sa_handler = SIG_DFL;
 	sigaction(SIGCHLD, &sa, NULL);
 #endif /* USE_PROCFS */
 
@@ -721,7 +729,7 @@ int attaching;
 		perror("strace: PIOCSTOP");
 		return -1;
 	}
-#endif	
+#endif
 #ifdef PIOCSET
 	/* Set Run-on-Last-Close. */
 	arg = PR_RLC;
@@ -736,7 +744,7 @@ int attaching;
 		return -1;
 	}
 #else  /* !PIOCSET */
-#ifndef FREEBSD	
+#ifndef FREEBSD
 	if (ioctl(tcp->pfd, PIOCSRLC) < 0) {
 		perror("PIOCSRLC");
 		return -1;
@@ -771,7 +779,7 @@ int attaching;
 #ifdef SYS_forkall
 		praddset (&syscalls, SYS_forkall);
 #endif
-#ifdef SYS_fork1 
+#ifdef SYS_fork1
 		praddset (&syscalls, SYS_fork1);
 #endif
 #ifdef SYS_rfork1
@@ -826,19 +834,19 @@ int attaching;
 		 */
 		kill(tcp->pid, SIGINT);
 #else /* !MIPS */
-#ifdef PRSABORT	
+#ifdef PRSABORT
 		/* The child is in a pause(), abort it. */
 		arg = PRSABORT;
 		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
 			perror("PIOCRUN");
 			return -1;
 		}
-#endif		
+#endif
 #endif /* !MIPS*/
 #ifdef FREEBSD
 		/* wake up the child if it received the SIGSTOP */
 		kill(tcp->pid, SIGCONT);
-#endif		
+#endif
 		for (;;) {
 			/* Wait for the child to do something. */
 			if (IOCTL_WSTOP (tcp) < 0) {
@@ -857,7 +865,7 @@ int attaching;
 			if (IOCTL(tcp->pfd, PIOCRUN, &arg) < 0) {
 #else /* FREEBSD */
 			if (IOCTL(tcp->pfd, PIOCRUN, 0) < 0) {
-#endif /* FREEBSD */			  
+#endif /* FREEBSD */
 				perror("PIOCRUN");
 				return -1;
 			}
@@ -867,13 +875,13 @@ int attaching;
 			if (tcp->status.PR_WHY == PR_SIGNALLED &&
 			    tcp->status.PR_WHAT == SIGSTOP)
 			        kill(tcp->pid, SIGCONT);
-#endif			
+#endif
 		}
 #ifndef FREEBSD
 	}
 #else /* FREEBSD */
 	} else {
-		if (attaching < 2) { 
+		if (attaching < 2) {
 			/* We are attaching to an already running process.
 			 * Try to figure out the state of the process in syscalls,
 			 * to handle the first event well.
@@ -881,7 +889,7 @@ int attaching;
 			 * process, which tells where it is stopped (if it is). */
 			FILE * status;
 			char wchan[20]; /* should be enough */
-			
+
 			sprintf(proc, "/proc/%d/status", tcp->pid);
 			status = fopen(proc, "r");
 			if (status &&
@@ -973,7 +981,7 @@ struct tcb *tcp;
 			close(tcp->pfd_status);
 			tcp->pfd_status = -1;
 		}
-#endif /* !FREEBSD */		
+#endif /* !FREEBSD */
 #ifdef USE_PROCFS
 		rebuild_pollv();
 #endif
@@ -1034,58 +1042,110 @@ int sig;
 #ifdef LINUX
 	/*
 	 * Linux wrongly insists the child be stopped
-	 * before detaching.  Arghh.  We go through hoops
-	 * to make a clean break of things.
+	 * before detaching.  This creates numerous headaches
+	 * as the process we are tracing may be running.
+	 *
+	 * First try to simply detach from the process; if it was
+	 * already stopped, this will succeed and we're done.
+	 *
+	 * Otherwise stop the process by sending it a SIGSTOP
+	 * signal.
+	 *
+	 * Once the process is stopped we have to make sure it
+	 * received the SIGSTOP (it may have received a SIGTRAP or
+	 * other signal).  If it did not receive the SIGSTOP, 
+	 * restart the process and try again. 
+	 *
+	 * Once stopped with a SIGSTOP, we can detach from the
+	 * process via PTRACE_DETACH. 
+	 *
 	 */
-#if defined(SPARC)
-#undef PTRACE_DETACH
-#define PTRACE_DETACH PTRACE_SUNDETACH
-#endif
+	
 	if ((error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig)) == 0) {
 		/* On a clear day, you can see forever. */
-	}
-	else if (errno != ESRCH) {
-		/* Shouldn't happen. */
-		perror("detach: ptrace(PTRACE_DETACH, ...)");
-	}
-	else if (kill(tcp->pid, 0) < 0) {
-		if (errno != ESRCH)
-			perror("detach: checking sanity");
-	}
-	else if (kill(tcp->pid, SIGSTOP) < 0) {
-		if (errno != ESRCH)
-			perror("detach: stopping child");
-	}
-	else {
+	} else {
+
 		for (;;) {
-			if (waitpid(tcp->pid, &status, 0) < 0) {
-				if (errno != ECHILD)
-					perror("detach: waiting");
-				break;
+			if (kill(tcp->pid, 0) < 0) {
+				if (errno != ESRCH)
+					perror("detach: checking sanity");
 			}
+			else if (kill(tcp->pid, SIGSTOP) < 0) {
+				if (errno != ESRCH)
+				perror("detach: stopping child");
+			}
+	
+			/*
+		 	* At this point the child should be stopped.  Try to
+		 	* wait on it so we can get its stop status.  Use WNOHANG
+		 	* to avoid this wait hanging.
+		 	*/
+			if (waitpid (tcp->pid, &status, (WUNTRACED | WNOHANG)) < 0) {
+				if (errno != ECHILD) {
+					perror("detach: waiting");
+				} else {
+	
+					/*
+				 	* Try again, this time with the __WCLONE
+				 	* flag.  Note we may get notifications
+				 	* for other processes/threads!
+				 	*/
+					errno = 0;
+					while (1) {
+						int x;
+
+						x = waitpid (-1, &status, __WCLONE);
+						if (x == tcp->pid || x < 0 || errno != 0)
+							break;
+					}
+				}
+	
+				if (errno) {
+					perror ("Unable to wait on inferior");
+					return -1;
+				}
+			}
+			
+			/*
+		 	* At this point we have wait status for the
+		 	* inferior.  If it did not stop, then all 
+		 	* bets are off.
+		 	*/
 			if (!WIFSTOPPED(status)) {
 				/* Au revoir, mon ami. */
 				break;
 			}
+	
+			/*
+		 	* If the process/thread has stopped with a
+		 	* SIGSTOP, then we can continue and detach
+		 	* with PTRACE_DETACH.
+		 	*/
 			if (WSTOPSIG(status) == SIGSTOP) {
 				if ((error = ptrace(PTRACE_DETACH,
-				    tcp->pid, (char *) 1, sig)) < 0) {
+			    	tcp->pid, (char *) 1, sig)) < 0) {
 					if (errno != ESRCH)
 						perror("detach: ptrace(PTRACE_DETACH, ...)");
 					/* I died trying. */
 				}
 				break;
 			}
+	
+			/*
+		 	* The process/thread did not stop with a SIGSTOP,
+		 	* so let it continue and try again to stop it with
+		 	* a SIGSTOP.
+		 	*/
 			if ((error = ptrace(PTRACE_CONT, tcp->pid, (char *) 1,
-			    WSTOPSIG(status) == SIGTRAP ?
-			    0 : WSTOPSIG(status))) < 0) {
+		    	WSTOPSIG(status) == SIGTRAP ?
+		    	0 : WSTOPSIG(status))) < 0) {
 				if (errno != ESRCH)
 					perror("detach: ptrace(PTRACE_CONT, ...)");
 				break;
 			}
 		}
 	}
-#endif /* LINUX */
+#endif
 
 #if defined(SUNOS4)
 	/* PTRACE_DETACH won't respect `sig' argument, so we post it here. */
@@ -1456,7 +1516,7 @@ trace()
 		        /* On some systems (e.g. UnixWare) we get too much ugly
 			   "unfinished..." stuff when multiple proceses are in
 			   syscalls.  Here's a nasty hack */
-		    
+
 			if (in_syscall) {
 				struct pollfd pv;
 				tcp = in_syscall;
@@ -1512,7 +1572,7 @@ trace()
 				ioctl_result = IOCTL_STATUS (tcp);
 			else
 			  	ioctl_result = IOCTL_WSTOP (tcp);
-#endif /* FREEBSD */			  
+#endif /* FREEBSD */
 			ioctl_errno = errno;
 #ifndef HAVE_POLLABLE_PROCFS
 			if (proc_poll_pipe[0] != -1) {
@@ -1537,7 +1597,7 @@ trace()
 				continue;
 #ifdef FREEBSD
 			case ENOTTY:
-#endif			  
+#endif
 			case ENOENT:
 				droptcb(tcp);
 				continue;
@@ -1553,8 +1613,8 @@ trace()
 			IOCTL (tcp->pfd, PIOCRUN, 0);
 			continue;
 		}
-#endif		
-		
+#endif
+
 		/* clear the just started flag */
 		tcp->flags &= ~TCB_STARTUP;
 
@@ -1574,7 +1634,7 @@ trace()
 				       &stime.tv_sec, &stime.tv_usec);
 			} else
 				stime.tv_sec = stime.tv_usec = 0;
-#else /* !FREEBSD */			
+#else /* !FREEBSD */
 			stime.tv_sec = tcp->status.pr_stime.tv_sec;
 			stime.tv_usec = tcp->status.pr_stime.tv_nsec/1000;
 #endif /* !FREEBSD */
@@ -1630,18 +1690,18 @@ trace()
 #ifdef FREEBSD
 		case 0: /* handle case we polled for nothing */
 		  	continue;
-#endif			
+#endif
 		default:
 			fprintf(stderr, "odd stop %d\n", tcp->status.PR_WHY);
 			exit(1);
 			break;
 		}
 		arg = 0;
-#ifndef FREEBSD		
+#ifndef FREEBSD
 		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
-#else		  
+#else
 		if (IOCTL (tcp->pfd, PIOCRUN, 0) < 0) {
-#endif		  
+#endif
 			perror("PIOCRUN");
 			exit(1);
 		}
@@ -2020,7 +2080,7 @@ int mp_ioctl (int fd, int cmd, void *arg, int size) {
 
 	struct iovec iov[2];
 	int n = 1;
-	
+
 	iov[0].iov_base = &cmd;
 	iov[0].iov_len = sizeof cmd;
 	if (arg) {
@@ -2028,7 +2088,7 @@ int mp_ioctl (int fd, int cmd, void *arg, int size) {
 		iov[1].iov_base = arg;
 		iov[1].iov_len = size;
 	}
-	
+
 	return writev (fd, iov, n);
 }
 
