@@ -1,3 +1,14 @@
+2005-02-02  Roland McGrath  <roland@redhat.com>
+
+	* sock.c (iffflags): New variable, table of IFF_* values.
+	(print_addr): New function.
+	(sock_ioctl): Handle SIOCGIFADDR, SIOCGIFDSTADDR, SIOCGIFBRDADDR,
+	SIOCGIFNETMASK, SIOCGIFFLAGS, SIOCGIFMETRIC, SIOCGIFMTU, SIOCGIFSLAVE,
+	SIOCGIFHWADDR.	Use print_addr for SIOCGIFCONF, SIOCGIFNAME, and
+	SIOCGIFINDEX, and fix their output.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#138223.
+
 2004-12-20  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* configure.ac: Use AC_GNU_SOURCE macro instead of changing CFLAGS.
