@@ -25,7 +25,7 @@
 	{ 0,	0,	sys_sched_yield,	"sched_yield"},  /* 24 */
 	{ 4,	0,	sys_mremap,		"mremap"	},  /* 25 */
 	{ 3,	0,	sys_msync,		"msync"		},  /* 26 */
-	{ 3,	0,	printargs,		"mincore"	},  /* 27 */
+	{ 3,	0,	sys_mincore,		"mincore"	},  /* 27 */
 	{ 3,	0,	sys_madvise,		"madvise"	},  /* 28 */
 	{ 4,	TI,	sys_shmget,		"shmget"	},  /* 29 */
 	{ 4,	TI,	sys_shmat,		"shmat"		},  /* 30 */
@@ -95,7 +95,7 @@
 	{ 3,	TF,	sys_chown,		"lchown"	},  /* 94 */
 	{ 1,	0,	sys_umask,		"umask"		},  /* 95 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	},  /* 96 */
-	{ 2,	0,	printargs,		"getrlimit"	},  /* 97 */
+	{ 2,	0,	sys_getrlimit,		"getrlimit"	},  /* 97 */
 	{ 2,	0,	sys_getrusage,		"getrusage"	},  /* 98 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	},  /* 99 */
 	{ 1,	0,	sys_times,		"times"		},  /* 100 */
@@ -156,7 +156,7 @@
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	},  /* 155 */
 	{ 1,	0,	sys_sysctl,		"_sysctl"	},  /* 156 */
 	{ 5,	0,	printargs,		"prctl"		},  /* 157 */
-	{ 2,	0,	printargs,		"arch_prctl" }, /* 158 */
+	{ 2,	TP,	sys_arch_prctl,		"arch_prctl"	},  /* 158 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	},  /* 159 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	},  /* 160 */
 	{ 1,	TF,	sys_chroot,		"chroot"	},  /* 161 */
@@ -164,7 +164,7 @@
 	{ 1,	TF,	sys_acct,		"acct"		},  /* 163 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	},  /* 164 */
 	{ 5,	TF,	sys_mount,		"mount"		},  /* 165 */
-	{ 3,	0,	printargs,		"umount2"	},  /* 166 */
+	{ 2,	TF,	sys_umount2,		"umount"	}, /* 166 */
 	{ 1,	TF,	sys_swapon,		"swapon"	},  /* 167 */
 	{ 1,	0,	sys_swapoff,		"swapoff"	},  /* 168 */
 	{ 3,	0,	sys_reboot,		"reboot"	},  /* 169 */
@@ -218,7 +218,7 @@
 	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 217 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
 	{ 5,	0,	printargs,		"restart_syscall"}, /* 219 */
-	{ 5,	0,	printargs,		"semtimedop"	}, /* 220 */
+	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 220 */
 	{ 4,	TF,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 222 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 223 */
