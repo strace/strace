@@ -1384,7 +1384,7 @@ struct tcb *tcp;
 #ifdef SYS_clone2
 	case SYS_clone2:
 #endif
-		if ((tcp->u_arg[0] & CLONE_PTRACE) == 0
+		if ((tcp->u_arg[arg0_index] & CLONE_PTRACE) == 0
 		    && (arg_setup (tcp, &state) < 0
 			|| set_arg0 (tcp, &state,
 				     tcp->u_arg[arg0_index] | CLONE_PTRACE) < 0
