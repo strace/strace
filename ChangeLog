@@ -1,5 +1,10 @@
 2004-04-13  Roland McGrath  <roland@redhat.com>
 
+	* net.c (msg_flags): Grok MSG_FIX, MSG_SYN, MSG_RST, MSG_NOSIGNAL,
+	MSG_MORE.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#120541.
+
 	* process.c (printstatus): Mask out bits presented symbolically, and
 	print "| 0xnnn" if the remaining bits are not all zero.
 	Fixes Debian bug #240062.
@@ -17,6 +22,7 @@
 	/proc/PID/task for all threads and attach them as presumed
 	CLONE_THREAD children.
 	* NEWS: Mention the feature.
+	Fixes RH#120462.
 
 2004-03-02  Roland McGrath  <roland@redhat.com>
 
