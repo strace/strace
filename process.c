@@ -2420,16 +2420,12 @@ struct xlat struct_user_offsets[] = {
 	{ PT_F27, "f27" }, { PT_F28, "f28" }, { PT_F29, "f29" },
 	{ PT_F30, "f30" }, { PT_F31, "f31" }, { PT_R4, "r4" },
 	{ PT_R5, "r5" }, { PT_R6, "r6" }, { PT_R7, "r7" },
-	{ PT_B0, "kb0" },
 	{ PT_B1, "b1" }, { PT_B2, "b2" }, { PT_B3, "b3" },
 	{ PT_B4, "b4" }, { PT_B5, "b5" },
-	{ PT_AR_PFS, "kar.pfs" },
-	{ PT_AR_LC, "ar.lc" }, { PT_AR_UNAT, "kar.unat" },
-	{ PT_AR_RNAT, "kar.rnat" }, { PT_AR_BSPSTORE, "kar.bspstore" },
-	{ PT_PR, "k.pr" },
+	{ PT_AR_EC, "ar.ec" }, { PT_AR_LC, "ar.lc" },
 	/* pt_regs */
-	{ PT_CR_IPSR, "cr.ipsr" }, { PT_CR_IIP, "cr.iip" },
-	/*{ PT_CR_IFS, "cr.ifs" },*/ { PT_AR_UNAT, "ar.unat" },
+	{ PT_CR_IPSR, "psr" }, { PT_CR_IIP, "ip" },
+	{ PT_CFM, "cfm" }, { PT_AR_UNAT, "ar.unat" },
 	{ PT_AR_PFS, "ar.pfs" }, { PT_AR_RSC, "ar.rsc" },
 	{ PT_AR_RNAT, "ar.rnat" }, { PT_AR_BSPSTORE, "ar.bspstore" },
 	{ PT_PR, "pr" }, { PT_B6, "b6" }, { PT_AR_BSP, "ar.bsp" },
@@ -2445,6 +2441,8 @@ struct xlat struct_user_offsets[] = {
 	{ PT_AR_CCV, "ar.ccv" }, { PT_AR_FPSR, "ar.fpsr" },
 	{ PT_B0, "b0" }, { PT_B7, "b7" }, { PT_F6, "f6" },
 	{ PT_F7, "f7" }, { PT_F8, "f8" }, { PT_F9, "f9" },
+	{ PT_AR_CSD, "ar.csd" }, { PT_AR_SSD, "ar.ssd" },
+	{ PT_DBR, "dbr" }, { PT_IBR, "ibr" }, { PT_PMD, "pmd" },
 #else /* !IA64 */
 #ifdef I386
 	{ 4*EBX,		"4*EBX"					},
