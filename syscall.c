@@ -698,8 +698,13 @@ struct tcb *tcp;
 #ifdef SYS_waitsys
 	case SYS_waitsys:
 #endif
-		internal_wait(tcp);
+		internal_wait(tcp, 2);
 		break;
+#ifdef SYS_waitid
+	case SYS_waitid:
+		internal_wait(tcp, 3);
+		break;
+#endif
 
 #ifdef SYS_exit
 	case SYS_exit:

@@ -1868,8 +1868,9 @@ int bitness;
 }
 
 int
-internal_wait(tcp)
+internal_wait(tcp, flagarg)
 struct tcb *tcp;
+int flagarg;
 {
 	int got_kids;
 
@@ -1895,7 +1896,7 @@ struct tcb *tcp;
 
 		/* ??? WTA: fix bug with hanging children */
 
-		if (!(tcp->u_arg[2] & WNOHANG)) {
+		if (!(tcp->u_arg[flagarg] & WNOHANG)) {
 			/*
 			 * There are traced children.  We'll make the parent
 			 * block to avoid a false ECHILD error due to our
@@ -1936,7 +1937,7 @@ struct tcb *tcp;
 		}
 	}
 	if (exiting(tcp) && tcp->u_error == ECHILD && got_kids) {
-		if (tcp->u_arg[2] & WNOHANG) {
+		if (tcp->u_arg[flagarg] & WNOHANG) {
 			/* We must force a fake result of 0 instead of
 			   the ECHILD error.  */
 			extern int force_result();
@@ -2012,16 +2013,26 @@ struct tcb *tcp;
 }
 #endif
 
-#ifdef SVR4
+#if defined SVR4 || defined LINUX
 
 static struct xlat waitid_types[] = {
 	{ P_PID,	"P_PID"		},
+#ifdef P_PPID
 	{ P_PPID,	"P_PPID"	},
+#endif
 	{ P_PGID,	"P_PGID"	},
+#ifdef P_SID
 	{ P_SID,	"P_SID"		},
+#endif
+#ifdef P_CID
 	{ P_CID,	"P_CID"		},
+#endif
+#ifdef P_UID
 	{ P_UID,	"P_UID"		},
+#endif
+#ifdef P_GID
 	{ P_GID,	"P_GID"		},
+#endif
 	{ P_ALL,	"P_ALL"		},
 #ifdef P_LWPID
 	{ P_LWPID,	"P_LWPID"	},
@@ -2039,11 +2050,6 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printxval(waitid_types, tcp->u_arg[0], "P_???");
 		tprintf(", %ld, ", tcp->u_arg[1]);
-		if (tcp->nchildren > 0) {
-			/* There are traced children */
-			tcp->flags |= TCB_SUSPENDED;
-			tcp->waitpid = tcp->u_arg[0];
-		}
 	}
 	else {
 		/* siginfo */
@@ -2064,7 +2070,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif /* SVR4 */
+#endif /* SVR4 or LINUX */
 
 int
 sys_alarm(tcp)

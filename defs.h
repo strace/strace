@@ -466,7 +466,7 @@ extern int internal_clone P((struct tcb *));
 #endif
 extern int internal_fork P((struct tcb *));
 extern int internal_exec P((struct tcb *));
-extern int internal_wait P((struct tcb *));
+extern int internal_wait P((struct tcb *, int));
 extern int internal_exit P((struct tcb *));
 
 extern struct ioctlent *ioctl_lookup P((long));
