@@ -215,7 +215,7 @@ int sig;
 	if (sig < nsignals) {
 		return signalent[sig];
 #ifdef SIGRTMIN
-	} else if (sig <= __SIGRTMIN && sig <= __SIGRTMAX) {
+	} else if (sig >= __SIGRTMIN && sig <= __SIGRTMAX) {
 		sprintf(buf, "SIGRT_%d", sig);
 		return buf;
 #endif /* SIGRTMIN */
