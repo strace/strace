@@ -1903,8 +1903,9 @@ struct tcb *tcp;
 
 #endif /* LINUX */
 
-#ifdef FREEBSD
+#if defined FREEBSD || defined LINUX
 struct xlat direnttypes[] = {
+	{ DT_UNKNOWN,	"DT_UNKNOWN" 	},
 	{ DT_FIFO,	"DT_FIFO" 	},
 	{ DT_CHR,	"DT_CHR" 	},
 	{ DT_DIR,	"DT_DIR" 	},
@@ -2036,6 +2037,11 @@ struct tcb *tcp;
 				i ? " " : "",
 				(unsigned long)d->d_ino,
 				(unsigned long)d->d_off);
+#ifdef LINUX
+			tprintf("d_type=");
+			printxval(direnttypes, d->d_type, "DT_???");
+			tprintf(", ");
+#endif
 			tprintf("d_reclen=%u, d_name=\"%s\"}",
 				d->d_reclen, d->d_name);
 		}
