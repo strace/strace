@@ -87,7 +87,7 @@ static int interrupted;
 static struct tcb *pfd2tcb P((int pfd));
 static void reaper P((int sig));
 static void rebuild_pollv P((void));
-struct pollfd pollv[MAX_PR\(^[^.-]\+$\|[.-]0\+\)OCS];
+struct pollfd pollv[MAX_PROCS];
 
 #ifndef HAVE_POLLABLE_PROCFS
 
