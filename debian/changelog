@@ -1,3 +1,12 @@
+strace (4.4.97-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fixes clone argument bugs.
+    + Fixes sem* printing bugs.
+    + Fixes -e argument parsing, closes: #188379.
+
+ -- Roland McGrath <frob@debian.org>  Mon,  2 Jun 2003 12:26:29 -0700
+
 strace (4.4.96-1) unstable; urgency=low
 
   * New upstream version.

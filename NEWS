@@ -1,4 +1,4 @@
-Changes in 4.4.96 TEST release
+Changes in 4.4.97 TEST release
 ==============
 * New port to AMD's x86-64 architecture. One strace binary can
   handle both new x86-64 and old i386 processes.
@@ -11,6 +11,7 @@ Changes in 4.4.96 TEST release
 * Fixed traced process seeing ECHILD despite live, traced children
   in waitpid calls with WNOHANG.
 * Stuart Menefy contributed a port to Linux/SH.
+* Stephen Thomas contributed a port to Linux/SHmedia.
 
 Changes in 4.4
 ==============
