@@ -522,21 +522,11 @@ do {									\
  * _h refers to the higher numbered u_arg
  */
 
-#if 1
-/* This should work, assuming we can do non-aligned 64 bit fetches.
- * if not we'll have to figure out how which of the other versions to use.
- */
-
-#define LONG_LONG(_l,_h) (*(long long *) &(_l))
-
-#else
-
-#if _LITTLE_ENDIAN
+#if HAVE_LITTLE_ENDIAN_LONG_LONG
 #define LONG_LONG(_l,_h) \
     ((long long)((unsigned long long)(_l) | ((unsigned long long)(_h)<<32)))
 #else
 #define LONG_LONG(_l,_h) \
     ((long long)((unsigned long long)(_h) | ((unsigned long long)(_l)<<32)))
-#endif
 #endif
 #endif

@@ -107,3 +107,6 @@
 
 /* Define if have st_gen in struct stat */
 #undef HAVE_ST_GEN
+
+/* Define if have little endiang long long */
+#undef HAVE_LITTLE_ENDIAN_LONG_LONG

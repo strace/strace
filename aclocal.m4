@@ -481,3 +481,31 @@ then
 fi
 ])
 
+dnl ### A macro to determine endianness of long long
+AC_DEFUN(AC_LITTLE_ENDIAN_LONG_LONG,
+[AC_MSG_CHECKING(for little endian long long)
+AC_CACHE_VAL(ac_cv_have_little_endian_long_long,
+[AC_TRY_RUN([
+int main () {
+	union {
+		long long ll;
+		long l [2];
+	} u;
+	u.ll = 0x12345678;
+	if (u.l[0] == 0x12345678) 
+		return 0;
+	return 1;
+}
+],
+ac_cv_have_little_endian_long_long=yes,
+ac_cv_have_little_endian_long_long=no,
+[# Should try to guess here
+ac_cv_have_little_endian_long_long=no
+])])
+AC_MSG_RESULT($ac_cv_have_little_endian_long_long)
+if test "$ac_cv_have_little_endian_long_long" = yes
+then
+	AC_DEFINE(HAVE_LITTLE_ENDIAN_LONG_LONG)
+fi
+])
+

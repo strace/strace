@@ -1,5 +1,13 @@
 2001-03-27  John Hughes <john@Calva.COM>
 
+  * aclocal.m4: add check for endianness of long long.
+  * acconfig.h: add #define for LITTLE_ENDIAN_LONG_LONG.
+  * configure.in: check for endianness of long long.
+  * defs.h: change LONG_LONG macro to wirk with either endianness of
+    long long.
+
+2001-03-27  John Hughes <john@Calva.COM>
+
   * net.c: Make compilable by SCO UDK compiler (doesn't like empty
     initialisation list for array).
 
