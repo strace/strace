@@ -2038,7 +2038,7 @@ struct tcb *tcp;
 		int i;
 		static int argreg[SUPPORTED_PERSONALITIES][MAX_ARGS] = {
 			{RDI,RSI,RDX,R10,R8,R9},	/* x86-64 ABI */
-			{RBX,RCX,RDX,RDX,RSI,RDI,RBP}	/* i386 ABI */
+			{RBX,RCX,RDX,RSI,RDI,RBP}	/* i386 ABI */
 		};
 
 		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
