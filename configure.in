@@ -47,7 +47,7 @@ ia64)
 m68k)
 	arch=m68k
 	;;
-sparc)
+sparc*)
 	arch=sparc
 	;;
 mips*)

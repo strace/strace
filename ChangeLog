@@ -1,5 +1,12 @@
 2001-03-28  Wichert Akkerman <wakkerma@debian.org>
 
+  * configure.in: use sparc* so we can compile on sparc64 as well
+  * process.c, syscall.c: work around double define of fpq, fq and fpu
+    structs on Linux/sparc, and use regs instead of pt_regs
+  * don't use asm/sigcontext.h on Linux/sparc
+
+2001-03-28  Wichert Akkerman <wakkerma@debian.org>
+
   * linux/sparc/ioctlent.h: updated using new Linux ioctl setup
 
 2001-03-28  Wichert Akkerman <wakkerma@debian.org>

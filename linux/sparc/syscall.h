@@ -36,7 +36,7 @@ int	sys_errsys();
 /* 1.1 processes and protection */
 int	sys_gethostid(),sys_sethostname(),sys_gethostname(),sys_getpid();
 int	sys_setdomainname(),sys_getdomainname();
-int	sys_fork(),sys_exit(),sys_execv(),sys_execve(),sys_wait4(),sys_waitpid();
+int	sys_fork(),sys_clone(),sys_exit(),sys_execv(),sys_execve(),sys_wait4(),sys_waitpid();
 int	sys_setuid(),sys_setgid(),sys_getuid(),sys_setreuid(),sys_getgid(),sys_getgroups(),sys_setregid(),sys_setgroups();
 int	sys_getpgrp(),sys_setpgrp();
 int	sys_setsid(), sys_setpgid();
@@ -45,7 +45,7 @@ int	sys_uname(), sys_sysinfo();
 /* 1.2 memory management */
 int	sys_brk(),sys_sbrk(),sys_sstk();
 int	sys_getpagesize(),sys_mmap(),sys_mctl(),sys_munmap(),sys_mprotect(),sys_mincore(), sys_mremap();
-int	sys_omsync(),sys_omadvise();
+int	sys_omsync(),sys_omadvise(), sys_madvise(),sys_mlockall();
 
 /* 1.3 signals */
 int	sys_sigvec(),sys_sigblock(),sys_sigsetmask(),sys_sigpause(),sys_sigstack(),sys_sigcleanup(), sys_sigreturn();
@@ -66,7 +66,7 @@ int	sys_oldquota(), sys_quotactl();
 int	sys_rtschedule(), sys_personality();
 
 /* 1.7 system operation support */
-int	sys_mount(),sys_unmount(),sys_swapon();
+int	sys_mount(),sys_unmount(),sys_swapon(),sys_pivotroot();
 int	sys_sync(),sys_reboot();
 int	sys_sysacct();
 int	sys_auditsys();

@@ -43,7 +43,17 @@
 #include <sys/param.h>
 
 #if HAVE_ASM_REG_H
+#ifdef SPARC
+#  define fpq kernel_fpq
+#  define fq kernel_fq
+#  define fpu kernel_fpu
+#endif
 #include <asm/reg.h>
+#ifdef SPARC
+#  undef fpq
+#  undef fq
+#  undef fpu 
+#endif
 #endif
 
 #ifdef HAVE_SYS_REG_H
@@ -625,7 +635,7 @@ struct tcb *tcp;
 	static long r0;
 	static long a3;
 #elif defined (SPARC)
-	static struct pt_regs regs;
+	static struct regs regs;
 	static unsigned long trap;
 #elif defined(MIPS)
 	static long a3;

@@ -53,6 +53,20 @@
 #include <sys/ptrace.h>
 #endif
 
+#if HAVE_ASM_REG_H
+#ifdef SPARC
+#  define fpq kernel_fpq
+#  define fq kernel_fq
+#  define fpu kernel_fpu
+#endif
+#include <asm/reg.h>
+#ifdef SPARC
+#  undef fpq
+#  undef fq
+#  undef fpu 
+#endif
+#endif /* HAVE_ASM_REG_H */
+
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
@@ -460,10 +474,10 @@ int new;
 	    	return -1;
 	return 0;
 #elif defined(SPARC)
-	struct pt_regs regs;
+	struct regs regs;
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char*)&regs, 0)<0)
 		return -1;
-	reg.r_g1=new;
+	regs.r_g1=new;
 	if (ptrace(PTRACE_SETREGS, tcp->pid, (char*)&regs, 0)<0)
 	    	return -1;
 	return 0;

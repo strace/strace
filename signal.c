@@ -63,15 +63,29 @@
 # include <asm/ptrace_offsets.h>
 #endif /* !IA64 */
 
-#ifdef HAVE_ASM_SIGCONTEXT_H
-#include <asm/sigcontext.h>
+#if HAVE_ASM_REG_H
 #ifdef SPARC
+#  define fpq kernel_fpq
+#  define fq kernel_fq
+#  define fpu kernel_fpu
+#endif
 #include <asm/reg.h>
+#ifdef SPARC
+#  undef fpq
+#  undef fq
+#  undef fpu 
+#endif
+
+#endif /* HAVE_ASM_REG_H */
+#ifdef HAVE_ASM_SIGCONTEXT_H
+#ifdef SPARC
 typedef struct {
 	struct regs		si_regs;
 	int			si_mask;
 } m_siginfo_t;
-#endif
+#else
+#include <asm/sigcontext.h>
+#endif /* SPARC */
 #else /* !HAVE_ASM_SIGCONTEXT_H */
 #ifdef I386
 struct sigcontext_struct {
