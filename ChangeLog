@@ -1,3 +1,16 @@
+2004-04-13  Roland McGrath  <roland@redhat.com>
+
+	* process.c (printstatus): Mask out bits presented symbolically, and
+	print "| 0xnnn" if the remaining bits are not all zero.
+	Fixes Debian bug #240062.
+
+	* process.c (print_affinitylist): Rewritten to handle indirect values.
+	(sys_sched_setaffinity, sys_sched_getaffinity): Update callers.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#118685.
+
+	* acinclude.m4: Quote first argument to AC_DEFUN in all cases.
+
 2004-04-08  Roland McGrath  <roland@redhat.com>
 
 	* strace.c (main) [LINUX]: When attaching for -p, look in
