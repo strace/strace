@@ -439,7 +439,12 @@ char *argv[];
 				if (len && pathname[len - 1] != '/')
 					pathname[len++] = '/';
 				strcpy(pathname + len, filename);
-				if (stat(pathname, &statbuf) == 0)
+				if (stat(pathname, &statbuf) == 0 &&
+				    /* Accept only regular files
+				       with some execute bits set.
+				       XXX not perfect, might still fail */
+				    S_ISREG(statbuf.st_mode) &&
+				    (statbuf.st_mode & 0111))
 					break;
 			}
 		}
