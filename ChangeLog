@@ -1,5 +1,15 @@
 2004-08-30  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (main): Don't call fake_execve under -c.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#129166.
+
+	* net.c (sockipoptions): Add some options.
+	[SOL_IPV6] (sockipv6options): New variable.
+	(sys_getsockopt, printsockopt): Use it for SOL_IPV6 level.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#128391.
+
 	* time.c (clocknames): New variable, symbolic names for clock_t.
 	(sys_clock_settime, sys_clock_gettime, sys_clock_nanosleep): Use it.
 	From Ulrich Drepper <drepper@redhat.com>.
