@@ -34,6 +34,11 @@
 
 #if defined(LINUX) || defined(SUNOS4) || defined(FREEBSD)
 
+# ifdef HAVE_MQUEUE_H
+#  include <mqueue.h>
+# endif
+
+#include <fcntl.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/msg.h>
@@ -61,6 +66,9 @@
 #if defined LINUX && !defined IPC_64
 # define IPC_64 0x100
 #endif
+
+extern struct xlat openmodes[];
+extern void printsigevent(struct tcb *tcp, long arg);
 
 static struct xlat msgctl_flags[] = {
 	{ IPC_RMID,	"IPC_RMID"	},
@@ -384,3 +392,101 @@ struct tcb *tcp;
 }
 
 #endif /* defined(LINUX) || defined(SUNOS4) || defined(FREEBSD) */
+
+#ifdef LINUX
+int sys_mq_open(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		/* flags */
+		printflags(openmodes, tcp->u_arg[1] + 1);
+		if (tcp->u_arg[1] & O_CREAT) {
+# ifndef HAVE_MQUEUE_H
+			tprintf(", %lx", tcp->u_arg[2]);
+# else
+			struct mq_attr attr;
+			/* mode */
+			tprintf(", %#lo, ", tcp->u_arg[2]);
+			if (umove(tcp, tcp->u_arg[3], &attr) < 0)
+				tprintf("{ ??? }");
+			else
+				tprintf("{mq_maxmsg=%ld, mq_msgsize=%ld}",
+					attr.mq_maxmsg, attr.mq_msgsize);
+# endif
+		}
+	}
+	return 0;
+}
+
+int sys_mq_timedsend(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
+		printtv(tcp, tcp->u_arg[4]);
+	}
+	return 0;
+}
+
+int sys_mq_timedreceive(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("%ld, ", tcp->u_arg[0]);
+	else {
+		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
+		printtv(tcp, tcp->u_arg[4]);
+	}
+	return 0;
+}
+
+int sys_mq_notify(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printsigevent(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
+static void printmqattr(tcp, addr)
+struct tcb *tcp;
+long addr;
+{
+	if (addr == 0)
+		tprintf("NULL");
+	else {
+# ifndef HAVE_MQUEUE_H
+		tprintf("%#lx", addr);
+# else
+		struct mq_attr attr;
+		if (umove(tcp, addr, &attr) < 0) {
+			tprintf("{...}");
+			return;
+		}
+		tprintf("{mq_flags=");
+		printflags(openmodes, attr.mq_flags + 1);
+		tprintf(", mq_maxmsg=%ld, mq_msgsize=%ld, mq_curmsg=%ld}",
+			attr.mq_maxmsg, attr.mq_msgsize, attr.mq_curmsgs);
+# endif
+	}
+}
+
+int sys_mq_getsetattr(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printmqattr(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+	} else
+		printmqattr(tcp, tcp->u_arg[2]);
+	return 0;
+}
+#endif
