@@ -2064,10 +2064,11 @@ int sys_ssisys (tcp)
 struct tcb *tcp;
 {
 	struct ssisys_iovec iov;
-	
+	cls_nodeinfo_args_t cni;
+	clusternode_info_t info;
+
 	if (entering (tcp)) {
 		ts_reclaim_child_inargs_t trc;
-		cls_nodeinfo_args_t cni;
 		if (tcp->u_arg[1] != sizeof iov ||
 		    umove (tcp, tcp->u_arg[0], &iov) < 0)
 		{
@@ -2101,13 +2102,31 @@ struct tcb *tcp;
 		}
 	}
 	else {
+		if (tcp->u_arg[1] != sizeof iov ||
+		    umove (tcp, tcp->u_arg[0], &iov) < 0)
+		    goto done;
 		switch (iov.tio_id.id_cmd) {
+		    case SSISYS_CLUSTERNODE_INFO:
+			if (iov.tio_udatainlen != sizeof cni ||
+			    umove (tcp, (long) iov.tio_udatain, &cni) < 0)
+				goto bad_out;
+			if (cni.info_len != sizeof info || 
+			    iov.tio_udataoutlen != sizeof &info ||
+			    umove (tcp, (long) iov.tio_udataout, &info) < 0)
+				goto bad_out;
+			tprintf (", out={node=%ld, cpus=%d, online=%d}",
+				 info.node_num, info.node_totalcpus,
+				 info.node_onlinecpus);
+			break;
+			
 		    default:
+		    bad_out:
 			if (iov.tio_udataoutlen) {
 				tprintf (", out=[/* %d bytes */]",
 					 iov.tio_udataoutlen);
 			}
 		}
+	    done:
 		tprintf ("}, %ld", tcp->u_arg[1]);
 	}
 	return 0;

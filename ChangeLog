@@ -1,5 +1,9 @@
 2001-10-18  John Hughes  <john@Calva.COM>
 
+	* system.c(sys_ssisys): handle return values for ssisys
+
+2001-10-18  John Hughes  <john@Calva.COM>
+
 	* signal.c: handle sigwait
 	* svr4/dummy.c: Move sigwait to done
 	* svr4/syscall.h: handle sigwait
