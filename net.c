@@ -1066,6 +1066,62 @@ int addrlen;
 }
 
 #if HAVE_SENDMSG
+static const struct xlat scmvals[] = {
+#ifdef SCM_RIGHTS
+	{ SCM_RIGHTS,		"SCM_RIGHTS"		},
+#endif
+#ifdef SCM_CREDENTIALS
+	{ SCM_CREDENTIALS,	"SCM_CREDENTIALS"	},
+#endif
+	{ 0,			NULL			}
+};
+
+static void
+printcmsghdr(tcp, addr, len)
+struct tcb *tcp;
+unsigned long addr;
+unsigned long len;
+{
+	union {
+		char msg_control[len];
+		struct cmsghdr cmsg;
+	} u;
+	if (umoven(tcp, addr, len, u.msg_control) < 0) {
+		tprintf(", msg_control=%#lx", addr);
+		return;
+	}
+
+	tprintf(", {cmsg_len=%zu, cmsg_level=", u.cmsg.cmsg_len);
+	printxval(socketlayers, u.cmsg.cmsg_level, "SOL_???");
+	tprintf(", cmsg_type=");
+
+	if (u.cmsg.cmsg_level == SOL_SOCKET) {
+		printxval(scmvals, u.cmsg.cmsg_type, "SCM_???");
+			
+		if (u.cmsg.cmsg_type == SCM_RIGHTS) {
+			int *fds = (int *) CMSG_DATA (&u.cmsg);
+			int first = 1;
+			tprintf(", {");
+			while ((char *) fds < (u.msg_control
+					       + u.cmsg.cmsg_len)) {
+				if (!first)
+					tprintf(", ");
+				tprintf("%d", *fds++);
+				first = 0;
+			}
+			tprintf("}}");
+			return;
+		}
+		if (u.cmsg.cmsg_type == SCM_CREDENTIALS
+		    && CMSG_LEN(sizeof(struct ucred)) <= u.cmsg.cmsg_len) {
+			struct ucred *uc = (struct ucred *) CMSG_DATA (&u.cmsg);
+			tprintf("{pid=%ld, uid=%ld, gid=%ld}}",
+				(long)uc->pid, (long)uc->uid, (long)uc->gid);
+			return;
+		}
+	}
+	tprintf(", ...}");
+}
 
 static void
 printmsghdr(tcp, addr)
@@ -1087,7 +1143,8 @@ long addr;
 #ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
 	tprintf(", msg_controllen=%lu", (unsigned long)msg.msg_controllen);
 	if (msg.msg_controllen)
-		tprintf(", msg_control=%#lx, ", (unsigned long) msg.msg_control);
+		printcmsghdr(tcp, (unsigned long) msg.msg_control,
+			     msg.msg_controllen);
 	tprintf(", msg_flags=");
 	if (printflags(msg_flags, msg.msg_flags)==0)
 		tprintf("0");
