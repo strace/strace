@@ -1,3 +1,7 @@
+2001-03-31  Wichert Akkerman <wakkerma@debian.org>
+
+  * linux/ioctlent.sh: add dir variable for location of kernel headers
+
 2001-03-29  Wichert Akkerman <wakkerma@debian.org>
 
   * linux/ia64/ioctlent.h: updated using new Linux ioctl setup
