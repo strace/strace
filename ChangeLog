@@ -1,3 +1,8 @@
+2000-04-14  Wichert Akkerman <wakkerma@debian.org>
+
+  * linux/mips/syscallent.h: added names for SVR4, SYSV, BSD4.3 and POSIX
+    syscalls
+
 2000-04-13  Wichert Akkerman <wakkerma@debian.org>
 
   * defs.h: Linux/MIPS uses syscalls up to >4k, so set MAX_QUALS to
