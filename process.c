@@ -1689,12 +1689,6 @@ struct tcb *tcp;
 			tprintf("]");
 		}
 	}
-#if defined LINUX && defined TCB_WAITEXECVE
-	if (exiting(tcp) && syserror(tcp))
-		tcp->flags &= ~TCB_WAITEXECVE;
-	else
-		tcp->flags |= TCB_WAITEXECVE;
-#endif /* LINUX && TCB_WAITEXECVE */
 	return 0;
 }
 
@@ -1720,6 +1714,12 @@ struct tcb *tcp;
 	if (exiting(tcp) && !syserror(tcp) && followfork)
 		fixvfork(tcp);
 #endif /* SUNOS4 */
+#if defined LINUX && defined TCB_WAITEXECVE
+	if (exiting(tcp) && syserror(tcp))
+		tcp->flags &= ~TCB_WAITEXECVE;
+	else
+		tcp->flags |= TCB_WAITEXECVE;
+#endif /* LINUX && TCB_WAITEXECVE */
 	return 0;
 }
 
