@@ -28,7 +28,14 @@
 #	$Id$
 #
 
-dir="/usr/include"
+# Validate arg count.
+if [ $# -ne 1 ]
+then
+        echo "usage: $0 include-directory" >&2
+        exit 1
+fi
+
+dir=$1
 
 files="asm/ioctls.h /dev/null"
 # Build the list of all ioctls
