@@ -1,3 +1,39 @@
+2002-10-08  Heiko Carstens <heiko.carstens@de.ibm.com>
+
+	Missing complete changelog for 2002-10-07 commit:
+	* Makefile.in: Added linux/s390, linux/s390x to ALL_SUBDIRS.
+	* acconfig.h: New define for s390x.
+	* config.sub: Added missing define for s390 and new one for s390x.
+	* configure.in: Added new define for s390x.
+	* file.c: Added missing #undef dirent64 and new defines for s390x.
+	* linux/s390: New directory.
+	* linux/s390/Makefile.in: New file.
+	* linux/s390/errnoent.h: New file.
+	* linux/s390/ioctlent.h: New file.
+	* linux/s390/signalent.h: New file.
+	* linux/s390/syscallent.h: New file.
+	* linux/s390x: New directoy.
+	* linux/s390x/Makefile.in: New file.
+	* linux/s390x/errnoent.h: New file.
+	* linux/s390x/ioctlent.h: New file.
+	* linux/s390x/signalent.h: New file.
+	* linux/s390x/syscallent.h: New file.
+	* linux/syscall.h: Added sys_mincore() prototype and added new
+	s390x defines.
+	* process.c: Added s390x defines.
+	(change_syscall): Changed handling for s390.
+	(setarg): Added missing s390/s390x code in setarg().
+	* signal.c: Added s390x define.
+	(sys_sigreturn): Bugfix in s390/s390x code (wrong number of
+	arguments to sprintsigmask()).
+	* stream.c (internal_stream_ioctl): Changed int cast to long cast,
+	since printstr() expects a long.
+	* syscall.c (decode_subcall): Changed several variables to be long
+	instead of int to match 64 bit requirements. Added s390x defines.
+	(syscall_enter): Changed upeek() call to match s390 and s390x
+	requirements.
+	* util.c: Added s390x defines.
+
 2002-10-07  Michal Ludvig  <mludvig@suse.cz>
 
 	Merged s390x port by Heiko Carstens <Heiko.Carstens@de.ibm.com>
