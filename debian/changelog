@@ -1,4 +1,4 @@
-strace (4.5.10-1) unstable; urgency=low
+strace (4.5.11-1) unstable; urgency=low
 
   * New upstream version.
     + Update MIPS system call table, closes: #256684.
@@ -6,10 +6,11 @@ strace (4.5.10-1) unstable; urgency=low
     + Fix select handling on nonstandard fd_set sizes, closes: #65654, #284290.
     + Don't print errors for null file name pointers, closes: #63093.
     + Fix initial execve output with -i.
+    + Fix build nits, closes: #300598.
 
- -- Roland McGrath <frob@debian.org>  Mon, 14 Mar 2005 18:28:37 -0800
+ -- Roland McGrath <frob@debian.org>  Tue, 22 Mar 2005 15:12:22 -0800
 
-strace (4.5.9-2) unstable; urgency=low
+strace (4.5.9-1) unstable; urgency=low
 
   * New upstream version.
     + Fix potential crash in getxattr printing, closes: #283704.

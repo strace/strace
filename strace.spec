@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5.10
+Version: 4.5.11
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -75,6 +75,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Mar 22 2005 Roland McGrath <roland@redhat.com> - 4.5.11-1
+- Build tweaks.
+- Note 4.5.10 select fix (#151570).
+
 * Mon Mar 14 2005 Roland McGrath <roland@redhat.com> - 4.5.10-1
 - Fix select handling on nonstandard fd_set sizes.
 - Don't print errors for null file name pointers.
