@@ -27,6 +27,6 @@ You can get the latest version of strace from its homepage at
 http://www.liacs.nl/~wichert/strace/ .
 
 Please send bug reports and enhancements to the strace
-mailinglist at strace@lists.wiggy.net, or to Wichert Akkerman
-<wakkerma@debian.org>
+mailinglist at strace-devel@lists.sourceforge.net, or directly to
+Wichert Akkerman <wakkerma@debian.org>
 
