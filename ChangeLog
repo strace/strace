@@ -1,5 +1,9 @@
 2003-01-20  Roland McGrath  <roland@redhat.com>
 
+	* defs.h [LINUX] [S390 || S390X] (TCB_WAITEXECVE): Define it.
+	* syscall.c (get_scno, syscall_fixup) [LINUX] [S390 || S390X]: Handle
+	TCB_WAITEXECVE state with special kludges.
+
 	* process.c [LINUX] (sys_clone) [S390 || S390X]: Argument order is
 	reversed from other architectures.
 
