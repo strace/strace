@@ -460,7 +460,7 @@ int new;
 		return -1;
 	return 0;
 #elif defined(POWERPC)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (CHAR*)(4*PT_R0), new) < 0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R0), new) < 0)
 		return -1;
 #elif defined(S390)
 	long	pc;
