@@ -1272,6 +1272,8 @@ typedef struct regs arg_setup_state;
 #  define arg1_offset	PT_ORIGGPR2
 #  define restore_arg0(tcp, state, val) ((void) (state), 0)
 #  define restore_arg1(tcp, state, val) ((void) (state), 0)
+#  define arg0_index	1
+#  define arg1_index	0
 # elif defined (ALPHA) || defined (MIPS)
 #  define arg0_offset	REG_A0
 #  define arg1_offset	(REG_A0+1)
@@ -1299,6 +1301,11 @@ typedef struct regs arg_setup_state;
 #  if defined ARM
 #   define restore_arg0(tcp, state, val) 0
 #  endif
+# endif
+
+# ifndef arg0_index
+#  define arg0_index 0
+#  define arg1_index 1
 # endif
 
 typedef int arg_setup_state;
@@ -1359,8 +1366,8 @@ struct tcb *tcp;
 		    || set_arg1 (tcp, &state, 0) < 0
 		    || arg_finish_change (tcp, &state) < 0)
 			return -1;
-		tcp->u_arg[0] = CLONE_PTRACE|SIGCHLD;
-		tcp->u_arg[1] = 0;
+		tcp->u_arg[arg0_index] = CLONE_PTRACE|SIGCHLD;
+		tcp->u_arg[arg1_index] = 0;
 		tcp->flags |= TCB_BPTSET;
 		return 0;
 #endif
@@ -1371,12 +1378,13 @@ struct tcb *tcp;
 #endif
 		if ((tcp->u_arg[0] & CLONE_PTRACE) == 0
 		    && (arg_setup (tcp, &state) < 0
-			|| set_arg0 (tcp, &state, tcp->u_arg[0] | CLONE_PTRACE) < 0
+			|| set_arg0 (tcp, &state,
+				     tcp->u_arg[arg0_index] | CLONE_PTRACE) < 0
 			|| arg_finish_change (tcp, &state) < 0))
 			return -1;
 		tcp->flags |= TCB_BPTSET;
-		tcp->inst[0] = tcp->u_arg[0];
-		tcp->inst[1] = tcp->u_arg[1];
+		tcp->inst[0] = tcp->u_arg[arg0_index];
+		tcp->inst[1] = tcp->u_arg[arg1_index];
 		return 0;
 
 	default:
