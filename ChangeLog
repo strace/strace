@@ -1,10 +1,13 @@
 2004-10-19  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (handle_group_exit): Don't detach leader that wasn't
+	TCB_ATTACHED.  Instead mark it with TCB_GROUP_EXITING.
+	Remove droptcb loop at end, no longer required since 2.6 reports each
+	thread death.
+	Fixes RH#135254.
+
 	* strace.c (trace): Use handle_group_exit for non-TCB_ATTACHED child
 	taking signal when it has nclone_threads > 0.
-
-	* strace.c (handle_group_exit): Don't detach leader that wasn't
-	TCB_ATTACHED.
 
 	* strace.c (handle_group_exit, trace): Mark leader with
 	TCB_GROUP_EXITING and don't be surprised at child deaths when their
