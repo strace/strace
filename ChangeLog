@@ -1,3 +1,10 @@
+2003-03-14  Roland McGrath  <roland@redhat.com>
+
+	* linux/x86_64/syscallent.h: Update and add many 2.5 syscalls.
+
+	* linux/ia64/syscallent.h: clone takes 5 arguments.
+	* process.c [LINUX && IA64] (ARG_*): Update for 2.5 clone calls.
+
 2003-03-12  Roland McGrath  <roland@redhat.com>
 
 	* linux/ia64/syscallent.h: Fix arg counts for clone and clone2.
