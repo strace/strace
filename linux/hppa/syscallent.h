@@ -1,5 +1,8 @@
 /*
  * Copyright (c) 2001 Hewlett-Packard, Matthew Wilcox
+ *
+ * $Id$
+ *
  */
 
 	{ 5,	0,	printargs,		"SYS_0"			}, /* 0 */
