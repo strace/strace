@@ -1,3 +1,13 @@
+Changes in 4.0
+==============
+* New maintainer
+* add support for more Linux architectures (powerpc, sparc, arm)
+* support lots more Linux syscalls
+* fix signal handling
+* add IPX and IPIP support
+* check stray syscall after execv
+* fix hanging children
+
 Changes in version 3.1
 ======================
 

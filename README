@@ -34,4 +34,5 @@ See the file CREDITS to see who has contributed to strace.
 
 See the file TODO if you feel like helping out.
 
-Please send bug reports and enhancements to Rick Sladkey <jrs@world.std.com>.
+Please send bug reports and enhancements to Wichert Akkerman
+<wakkerma@debian.org>

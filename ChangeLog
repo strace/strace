@@ -1,3 +1,26 @@
+
+Thu Apr 15 22:28:15 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Change in strace maintainership, jrs passed the torch to me.
+  * Use autoconf 2.13
+  * Incorporate all changes already made in the Debian strace package:
+    + compiles with more Linux kernels
+    + added support for more Linux architectures
+    + add support for a lot of extra syscalls
+    + fix some problems with hanging children
+    + check stray syscall after execv
+    + decode capget and capset arguments
+    + add more constants to net.c
+    + detect ROSE networking
+    + add more protocol families to domains
+    + add IPIP protocol
+    + added MSG_PROXY and MSG_CTRUNC to msg_flags
+    + added SO_BSDCOMPAT and SO_REUSEPORT to sockoptions
+    + added IP, IPX and TCP-options
+    + added IP, IPX and TCP support to get-/setsockopt()
+    + added IPX support
+    + updated handling of signals
+
 Sun Oct 27 22:28:00 1996  J. Richard Sladkey  <jrs@world.std.com>
 
 	* util.c (umovestr) [LINUX]: Handle Linux like SunOS4
