@@ -34,7 +34,6 @@
   * svr4/dummy.h, svr4/syscall.h: now we handle rfork{1,all}, ssisys and
     rexecve calls.
 
->>>>>>> 1.119
 2001-04-12  Wichert Akkerman <wakkerma@debian.org>
 
   * process.c: fix cast for powerpc code
