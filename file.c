@@ -1340,6 +1340,7 @@ static struct xlat fsmagic[] = {
 	{ 0x54190100,	"UFS_CIGAM"		},
 	{ 0x012ff7b4,	"XENIX_SUPER_MAGIC"	},
 	{ 0x012fd16d,	"XIAFS_SUPER_MAGIC"	},
+	{ 0x62656572,	"SYSFS_MAGIC"		},
 	{ 0,		NULL			},
 };
 
