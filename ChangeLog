@@ -1,4 +1,13 @@
+2004-07-12  Roland McGrath  <roland@redhat.com>
+
+	* linux/ioctlsort.c: Add some #includes.
+	[POWERPC]: Kludge out high bits.
+	* linux/ia64/ioctlent.h: Regenerated using RHEL3 headers.
+	* linux/powerpc/ioctlent.h: Likewise.
+
 2004-07-11  Roland McGrath  <roland@redhat.com>
+
+	* linux/ioctlent.sh: Replace asm with $asm in all places.
 
 	* configure.ac: Add I386 as AM_CONDITIONAL.
 	* Makefile.am [LINUX]: Add maintainer-mode rules to regenerate
