@@ -1,3 +1,9 @@
+2003-02-26  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Fix typo in netinet/in.h check.
+	Also include <sys/types.h> and <sys/socket.h> before <netinet/in.h>.
+	Reported by Alex Semenyaka <alexs@snark.rinet.ru>.
+
 2003-02-24  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.4.95.
