@@ -373,6 +373,12 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tcp->flags |= TCB_EXITING;
 #ifdef __NR_exit_group
+# ifdef IA64
+		if (ia32) {
+			if (tcp->scno == 252)
+				tcp->flags |= TCB_GROUP_EXITING;
+		} else
+# endif
 		if (tcp->scno == __NR_exit_group)
 			tcp->flags |= TCB_GROUP_EXITING;
 #endif
@@ -657,7 +663,18 @@ int new;
 	    	return -1;
 	return 0;
 #elif defined(IA64)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R15), new)<0)
+	if (ia32) {
+		switch (new) {
+		      case 2: break;	/* x86 SYS_fork */
+		      case SYS_clone:	new = 120; break;
+		      default:
+			fprintf(stderr, "%s: unexpected syscall %d\n",
+				__FUNCTION__, new);
+			return -1;
+		}
+		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R1), new)<0)
+			return -1;
+	} else if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R15), new)<0)
 		return -1;
 	return 0;
 #elif defined(HPPA)

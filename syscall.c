@@ -680,6 +680,9 @@ struct tcb *tcp;
 #ifdef __NR_exit_group
 	case __NR_exit_group:
 #endif
+#ifdef IA64
+	case 252: /* IA-32 __NR_exit_group */
+#endif
 		internal_exit(tcp);
 		break;
 	}

@@ -1154,12 +1154,20 @@ struct tcb *tcp;
 
 #ifdef IA64
 
+/* We don't have fork()/vfork() syscalls on ia64 itself, but the ia32
+   subsystem has them for x86... */
+#define SYS_fork	2
+#define SYS_vfork	190
+
 typedef unsigned long *arg_setup_state;
 
 static int
 arg_setup(struct tcb *tcp, arg_setup_state *state)
 {
 	unsigned long *bsp, cfm, sof, sol;
+
+	if (ia32)
+		return 0;
 
 	if (upeek(tcp->pid, PT_AR_BSP, (long *) &bsp) < 0)
 		return -1;
@@ -1180,35 +1188,61 @@ arg_setup(struct tcb *tcp, arg_setup_state *state)
 static int
 get_arg0 (struct tcb *tcp, arg_setup_state *state, long *valp)
 {
-	return umoven (tcp, (unsigned long) ia64_rse_skip_regs(*state, 0),
-		       sizeof(long), (void *) valp);
+	int ret;
+
+	if (ia32)
+		ret = upeek (tcp->pid, PT_R11, valp);
+	else
+		ret = umoven (tcp,
+			      (unsigned long) ia64_rse_skip_regs(*state, 0),
+			      sizeof(long), (void *) valp);
+	return ret;
 }
 
 static int
 get_arg1 (struct tcb *tcp, arg_setup_state *state, long *valp)
 {
-	return umoven (tcp, (unsigned long) ia64_rse_skip_regs(*state, 1),
-		       sizeof(long), (void *) valp);
+	int ret;
+
+	if (ia32)
+		ret = upeek (tcp->pid, PT_R9, valp);
+	else
+		ret = umoven (tcp,
+			      (unsigned long) ia64_rse_skip_regs(*state, 1),
+			      sizeof(long), (void *) valp);
+	return ret;
 }
 #endif
 
 static int
 set_arg0 (struct tcb *tcp, arg_setup_state *state, long val)
 {
-	unsigned long *ap;
-	ap = ia64_rse_skip_regs(*state, 0);
+	int req = PTRACE_POKEDATA;
+	void *ap;
+
+	if (ia32) {
+		ap = (void *) (intptr_t) PT_R11;	 /* r11 == EBX */
+		req = PTRACE_POKEUSER;
+	} else
+		ap = ia64_rse_skip_regs(*state, 0);
 	errno = 0;
-	ptrace(PTRACE_POKEDATA, tcp->pid, (void *) ap, val);
+	ptrace(req, tcp->pid, ap, val);
 	return errno ? -1 : 0;
 }
 
 static int
 set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
 {
-	unsigned long *ap;
-	ap = ia64_rse_skip_regs(*state, 1);
+	int req = PTRACE_POKEDATA;
+	void *ap;
+
+	if (ia32) {
+		ap = (void *) (intptr_t) PT_R9;		/* r9 == ECX */
+		req = PTRACE_POKEUSER;
+	} else
+		ap = ia64_rse_skip_regs(*state, 1);
 	errno = 0;
-	ptrace(PTRACE_POKEDATA, tcp->pid, (void *) ap, val);
+	ptrace(req, tcp->pid, ap, val);
 	return errno ? -1 : 0;
 }
 
