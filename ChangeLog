@@ -1,3 +1,13 @@
+2004-07-08  Roland McGrath  <roland@redhat.com>
+
+	* resource.c (sys_quotactl): Truncate first argument to 32 bits, since
+	that's what the kernel will do.
+
+2004-07-07  Roland McGrath  <roland@redhat.com>
+
+	* linux/ioctlent.sh: Take optional second argument to use as directory
+	name in place of `asm'.
+
 2004-06-27  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.5.
