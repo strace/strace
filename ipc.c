@@ -115,6 +115,9 @@ static struct xlat resource_flags[] = {
 	{ IPC_CREAT,	"IPC_CREAT"	},
 	{ IPC_EXCL,	"IPC_EXCL"	},
 	{ IPC_NOWAIT,	"IPC_NOWAIT"	},
+#ifdef SHM_HUGETLB
+	{ SHM_HUGETLB,	"SHM_HUGETLB"	},
+#endif
 	{ 0,		NULL		},
 };
 
@@ -145,9 +148,9 @@ struct tcb *tcp;
 		else
 			tprintf("IPC_PRIVATE");
 		tprintf(", ");
-		if (printflags(resource_flags, tcp->u_arg[1]) != 0)
+		if (printflags(resource_flags, tcp->u_arg[1] & ~0777) != 0)
 			tprintf("|");
-		tprintf("%#lo", tcp->u_arg[1] & 0666);
+		tprintf("%#lo", tcp->u_arg[1] & 0777);
 	}
 	return 0;
 }
@@ -285,9 +288,9 @@ struct tcb *tcp;
 			tprintf("IPC_PRIVATE");
 		tprintf(", %lu", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(resource_flags, tcp->u_arg[2] & ~0666) != 0)
+		if (printflags(resource_flags, tcp->u_arg[2] & ~0777) != 0)
 			tprintf("|");
-		tprintf("%#lo", tcp->u_arg[2] & 0666);
+		tprintf("%#lo", tcp->u_arg[2] & 0777);
 	}
 	return 0;
 }
@@ -314,9 +317,9 @@ struct tcb *tcp;
 			tprintf("IPC_PRIVATE");
 		tprintf(", %lu", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(resource_flags, tcp->u_arg[2]) != 0)
+		if (printflags(resource_flags, tcp->u_arg[2] & ~0777) != 0)
 			tprintf("|");
-		tprintf("%#lo", tcp->u_arg[2] & 0666);
+		tprintf("%#lo", tcp->u_arg[2] & 0777);
 	}
 	return 0;
 }
