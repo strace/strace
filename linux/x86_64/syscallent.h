@@ -265,4 +265,4 @@
 	{ 5,	0,	printargs,		"SYS_250"	}, /* 250 */
 	{ 5,	0,	printargs,		"SYS_251"	}, /* 251 */
 	{ 5,	0,	printargs,		"SYS_252"	}, /* 252 */
-	{ 5,	0,	printargs,		"waitid"	}, /* 253 */
+	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 253 */
