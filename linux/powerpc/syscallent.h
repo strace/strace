@@ -254,36 +254,36 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"	}, /* 222 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"	}, /* 223 */
 	{ 5,	0,	printargs,		"SYS_224"		}, /* 224 */
-	{ 5,	0,	printargs,		"SYS_225"		}, /* 225 */
+	{ 5,	0,	printargs,		"tux"			}, /* 225 */
 	{ 4,	TF,	sys_sendfile64,		"sendfile64"		}, /* 226 */
 	{ 2,	0,	printargs,		"io_setup"		}, /* 227 */
 	{ 1,	0,	printargs,		"io_destroy"		}, /* 228 */
 	{ 5,	0,	printargs,		"io_getevents"		}, /* 229 */
 	{ 3,	0,	printargs,		"io_submit"		}, /* 230 */
 	{ 3,	0,	printargs,		"io_cancel"		}, /* 231 */
-	{ 5,	0,	printargs,		"SYS_232"		}, /* 232 */
-	{ 5,	0,	printargs,		"SYS_233"		}, /* 233 */
+	{ 1,	0,	printargs,		"set_tid_address"	}, /* 232 */
+	{ 6,	0,	printargs,		"fadvise64"		}, /* 233 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 234 */
 	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 235 */
 	{ 1,	0,	printargs,		"epoll_create"		}, /* 236 */
 	{ 4,	0,	printargs,		"epoll_ctl"		}, /* 237 */
 	{ 4,	0,	printargs,		"epoll_wait"		}, /* 238 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"	}, /* 239 */
-	{ 1,	0,	printargs,		"set_tid_address"	}, /* 240 */
-	{ 5,	0,	printargs,		"SYS_241"		}, /* 241 */
-	{ 5,	0,	printargs,		"SYS_242"		}, /* 242 */
-	{ 5,	0,	printargs,		"SYS_243"		}, /* 243 */
-	{ 5,	0,	printargs,		"SYS_244"		}, /* 244 */
-	{ 5,	0,	printargs,		"SYS_245"		}, /* 245 */
-	{ 5,	0,	printargs,		"SYS_246"		}, /* 246 */
-	{ 5,	0,	printargs,		"SYS_247"		}, /* 247 */
-	{ 5,	0,	printargs,		"SYS_248"		}, /* 248 */
-	{ 5,	0,	printargs,		"SYS_249"		}, /* 249 */
+	{ 3,	0,	sys_timer_create,	"timer_create"		}, /* 240 */
+	{ 4,	0,	sys_timer_settime,	"timer_settime"		}, /* 241 */
+	{ 2,	0,	sys_timer_gettime,	"timer_gettime"		}, /* 242 */
+	{ 1,	0,	sys_timer_getoverrun,	"timer_getoverrun"	}, /* 243 */
+	{ 1,	0,	sys_timer_delete,	"timer_delete"		}, /* 244 */
+	{ 2,	0,	sys_clock_settime,	"clock_settime"		}, /* 245 */
+	{ 2,	0,	sys_clock_gettime,	"clock_gettime"		}, /* 246 */
+	{ 2,	0,	sys_clock_getres,	"clock_getres"		}, /* 247 */
+	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"	}, /* 248 */
+	{ 2,	0,	printargs,		"swapcontext"		}, /* 249 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 250 */
-	{ 5,	0,	printargs,		"SYS_251"		}, /* 251 */
-	{ 5,	0,	printargs,		"SYS_252"		}, /* 252 */
-	{ 5,	0,	printargs,		"SYS_253"		}, /* 253 */
-	{ 5,	0,	printargs,		"SYS_254"		}, /* 254 */
+	{ 2,	TF,	sys_utimes,		"utimes"		}, /* 251 */
+	{ 3,	TF,	sys_statfs64,		"statfs64"		}, /* 252 */
+	{ 3,	0,	sys_fstatfs64,		"fstatfs64"		}, /* 253 */
+	{ 6,	0,	printargs,		"fadvise64_64"		}, /* 254 */
 	{ 5,	0,	printargs,		"SYS_255"		}, /* 255 */
 
 	{ 8,	0,	printargs,		"socket_subcall"}, /* 256 */
