@@ -2358,7 +2358,7 @@ long insize, size;
     if (!failed) {
 	unsigned char *buf = malloc(4 * size + 1);
 	if (buf == NULL || /* probably a bogus size argument */
-	    umoven(tcp, arg, size, &buf[3 * size]) < 0) {
+	    umoven(tcp, arg, size, (char *) &buf[3 * size]) < 0) {
 	    failed = 1;
 	}
 	else {
