@@ -138,7 +138,7 @@ sys_mmap(tcp)
 struct tcb *tcp;
 {
 #ifdef LINUX
-#  if defined(ALPHA) || defined(sparc)
+#  if defined(ALPHA) || defined(sparc) || defined(POWERPC)
 	long *u_arg = tcp->u_arg;
 #  else /* !ALPHA */
 	long u_arg[6];
@@ -148,11 +148,11 @@ struct tcb *tcp;
 #endif /* !LINUX */
 
 	if (entering(tcp)) {
-#if defined(LINUX) && !defined(ALPHA) && !defined(__sparc__)
+#if defined(LINUX) && !defined(ALPHA) && !defined(sparc) || defined(POWERPC)
 		if (umoven(tcp, tcp->u_arg[0], sizeof u_arg,
 				(char *) u_arg) == -1)
 			return 0;
-#endif /* LINUX && !ALPHA && !sparc */
+#endif /* LINUX && !ALPHA && !sparc && !powerpc*/
 
 		/* addr */
 		if (!u_arg[0])
