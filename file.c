@@ -2343,30 +2343,38 @@ print_xattr_val(tcp, failed, arg, insize, size)
 struct tcb *tcp;
 int failed;
 unsigned long arg;
-size_t size;
+long insize, size;
 {
-    unsigned char buf[4 * size + 1];
-    if (!failed && umoven(tcp, arg, size, &buf[3 * size]) >= 0) {
-	unsigned char *out = buf;
-	unsigned char *in = &buf[3 * size];
-	size_t i;
-	for (i = 0; i < size; ++i)
-	    if (isprint(in[i]))
-		*out++ = in[i];
-	    else {
+    if (!failed) {
+	unsigned char *buf = malloc(4 * size + 1);
+	if (buf == NULL || /* probably a bogus size argument */
+	    umoven(tcp, arg, size, &buf[3 * size]) < 0) {
+	    failed = 1;
+	}
+	else {
+	    unsigned char *out = buf;
+	    unsigned char *in = &buf[3 * size];
+	    size_t i;
+	    for (i = 0; i < size; ++i)
+		if (isprint(in[i]))
+		    *out++ = in[i];
+		else {
 #define tohex(n) "0123456789abcdef"[n]
-		*out++ = '\\';
-		*out++ = 'x';
-		*out++ = tohex(in[i] / 16);
-		*out++ = tohex(in[i] % 16);
-	    }
-	/* Don't print terminating NUL if there is one.  */
-	if (in[i - 1] == '\0')
-	    out -= 4;
-	*out = '\0';
-	tprintf(", \"%s\", %zd", buf, insize);
-    } else
-	tprintf(", 0x%lx, %zd", arg, insize);
+		    *out++ = '\\';
+		    *out++ = 'x';
+		    *out++ = tohex(in[i] / 16);
+		    *out++ = tohex(in[i] % 16);
+		}
+	    /* Don't print terminating NUL if there is one.  */
+	    if (in[i - 1] == '\0')
+		out -= 4;
+	    *out = '\0';
+	    tprintf(", \"%s\", %ld", buf, insize);
+	}
+	free(buf);
+    }
+    if (failed)
+	tprintf(", 0x%lx, %ld", arg, insize);
 }
 
 int
