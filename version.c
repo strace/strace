@@ -1,1 +1,1 @@
-char version[] = "strace -- version 4.0";
+char version[] = "strace -- version 4.1";

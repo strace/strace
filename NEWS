@@ -1,3 +1,8 @@
+Changes in 4.0.1
+================
+* Minor bugfixes
+* Compiles on glibc2.0 systems again
+
 Changes in 4.0
 ==============
 * Get stat structure properly on Linux 64bit archs
