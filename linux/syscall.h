@@ -143,10 +143,10 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 # endif /* IA64 */
-# if defined I386 || defined IA64 || defined ARM
-#  define SYS_socket_subcall	300
-# else
+# if defined S390 || defined S390X
 #  define SYS_socket_subcall	256
+# else
+#  define SYS_socket_subcall	300
 # endif
 #define SYS_socket		(SYS_socket_subcall + 1)
 #define SYS_bind		(SYS_socket_subcall + 2)
