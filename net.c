@@ -361,6 +361,21 @@ static struct xlat msg_flags[] = {
 #ifdef MSG_PROBE
 	{ MSG_PROBE,	"MSG_PROBE"	},
 #endif
+#ifdef MSG_FIN
+	{ MSG_FIN,	"MSG_FIN"	},
+#endif
+#ifdef MSG_SYN
+	{ MSG_SYN,	"MSG_SYN"	},
+#endif
+#ifdef MSG_RST
+	{ MSG_RST,	"MSG_RST"	},
+#endif
+#ifdef MSG_NOSIGNAL
+	{ MSG_NOSIGNAL,	"MSG_NOSIGNAL"	},
+#endif
+#ifdef MSG_MORE
+	{ MSG_MORE,	"MSG_MORE"	},
+#endif
 	{ 0,		NULL		},
 };
 
