@@ -58,6 +58,10 @@
 #define SEM_INFO 19
 #endif
 
+#if defined LINUX && !defined IPC_64
+# define IPC_64 0x100
+#endif
+
 static struct xlat msgctl_flags[] = {
 	{ IPC_RMID,	"IPC_RMID"	},
 	{ IPC_SET,	"IPC_SET"	},
@@ -98,12 +102,12 @@ static struct xlat shmctl_flags[] = {
 	{ SHM_STAT,	"SHM_STAT"	},
 	{ SHM_INFO,	"SHM_INFO"	},
 #endif /* LINUX */
-#ifdef SHM_LOCK	
+#ifdef SHM_LOCK
 	{ SHM_LOCK,	"SHM_LOCK"	},
 #endif
-#ifdef SHM_UNLOCK	
+#ifdef SHM_UNLOCK
 	{ SHM_UNLOCK,	"SHM_UNLOCK"	},
-#endif	
+#endif
 	{ 0,		NULL		},
 };
 
@@ -148,14 +152,20 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef IPC_64
+# define PRINTCTL(flagset, arg, dflt) \
+	if ((arg) & IPC_64) tprintf("IPC_64|"); \
+	printxval((flagset), (arg) &~ IPC_64, dflt)
+#else
+# define PRINTCTL printxval
+#endif
+
 int sys_msgctl(tcp)
 struct tcb *tcp;
 {
-	char *cmd = xlookup(msgctl_flags, tcp->u_arg[1]);
-
 	if (entering(tcp)) {
-		tprintf("%lu", tcp->u_arg[0]);
-		tprintf(", %s", cmd == NULL ? "MSG_???" : cmd);
+		tprintf("%lu, ", tcp->u_arg[0]);
+		PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
 #ifdef LINUX
 		tprintf(", %#lx", tcp->u_arg[3]);
 #else /* !LINUX */
@@ -274,7 +284,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
 		tprintf(", %lu, ", tcp->u_arg[1]);
-		printxval(semctl_flags, tcp->u_arg[2], "SEM_???");
+		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 		tprintf(", %#lx", tcp->u_arg[3]);
 	}
 	return 0;
@@ -302,7 +312,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
-		printxval(shmctl_flags, tcp->u_arg[1], "SHM_???");
+		PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
 #ifdef LINUX
 		tprintf(", %#lx", tcp->u_arg[3]);
 #else /* !LINUX */
