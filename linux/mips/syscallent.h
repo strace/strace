@@ -4088,7 +4088,7 @@
 	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 4087 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 4088 */
 	{ 3,	0,	sys_readdir,		"readdir"	}, /* 4089 */
-	{ 6,	0,	sys_old_mmap,		"mmap"		}, /* 4090 */
+	{ 6,	0,	sys_mmap,		"mmap"		}, /* 4090 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 4091 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 4092 */
 	{ 2,	0,	sys_ftruncate,		"ftruncate"	}, /* 4093 */
