@@ -1,3 +1,27 @@
+2003-11-13  Roland McGrath  <roland@redhat.com>
+
+	* linux/sh/syscallent.h: Use sys_setgroups32, sys_getgroups32.
+	* linux/sh64/syscallent.h: Likewise.
+
+2003-09-06  Dmitry V. Levin <ldv@altlinux.org>
+
+	* util.c (printuid): New function.
+	* defs.h: Declare it.
+	* file.c (sys_chown): Use it.
+	* file.c (sys_fchown): Likewise.
+	* process.c (sys_setreuid, sys_setregid, sys_setresuid,
+	sys_setresgid): Likewise.
+
+	* linux/syscallent.h: Better handle getgid32, geteuid32, getegid32,
+	setreuid32, setregid32, getgroups32, setgroups32, fchown32,
+	setresuid32, getresuid32, setresgid32, getresgid32, chown32,
+	setuid32, setgid32, setfsuid32, setfsgid32.
+	* process.c [LINUX]: Define GETGROUPS32_T.
+	* process.c [LINUX] (sys_setgroups32, sys_getgroups32):
+	New functions.
+	* linux/syscall.h (sys_setgroups32, sys_getgroups32):
+	Declare them.
+
 2003-11-11  Roland McGrath  <roland@redhat.com>
 
 	* strace.c (main): Bail with usage error for missing command before we
