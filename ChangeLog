@@ -1,9 +1,14 @@
 2004-10-07  Roland McGrath  <roland@redhat.com>
 
+	* linux/x86_64/syscallent.h: Fix botched table entries.
+	From Ulrich Drepper <drepper@redhat.com>.
+
 	* mem.c [LINUX] (sys_mbind, sys_set_mempolicy, sys_get_mempolicy):
 	New functions.
 	* linux/syscall.h: Declare them.
 	* linux/x86_64/syscallent.h: Likewise.
+	From Ulrich Drepper <drepper@redhat.com>.
+
 	* linux/syscallent.h: Handle mbind, set_mempolicy, get_mempolicy.
 	From Ulrich Drepper <drepper@redhat.com>.
 
