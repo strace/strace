@@ -633,6 +633,8 @@ struct tcb *tcp;
 #elif defined(S390)
 	static long gpr2;
 	static long pc;
+#elif defined(HPPA)
+	static long r28;
 #endif 
 #endif /* LINUX */
 #ifdef FREEBSD
@@ -806,6 +808,16 @@ struct tcb *tcp;
 			memmove (&regs.r_o0, &regs.r_o1, 7*sizeof(regs.r_o0));
 		}
 	}
+#elif defined(HPPA)
+	if (upeek(pid, PT_GR20, &scno) < 0)
+		return -1;
+	if (!(tcp->flags & TCB_INSYSCALL)) {
+		/* Check if we return from execve. */
+		if ((tcp->flags & TCB_WAITEXECVE)) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
+		}
+	}
 #endif 
 #endif /* LINUX */
 #ifdef SUNOS4
@@ -938,7 +950,9 @@ struct tcb *tcp;
 			fprintf(stderr, "stray syscall exit: d0 = %ld\n", r0);
 		return 0;
 	}
-#else
+#elif defined (HPPA)
+	if (upeek(pid, PT_GR28, &r28) < 0)
+		return -1;
 #endif
 #endif /* LINUX */
 	return 1;
@@ -1051,6 +1065,17 @@ struct tcb *tcp;
 			tcp->u_rval = regs.r_o0;
 			u_error = 0;
 		}
+#else /* !SPARC */
+#ifdef HPPA
+		if (r28 && (unsigned) -r28 < nerrnos) {
+			tcp->u_rval = -1;
+			u_error = -r28;
+		}
+		else {
+			tcp->u_rval = r28;
+			u_error = 0;
+		}
+#endif /* HPPA */
 #endif /* SPARC */
 #endif /* ALPHA */
 #endif /* ARM */
@@ -1228,6 +1253,19 @@ struct tcb *tcp;
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = *((&regs.r_o0) + i);
+	}
+#elif defined (HPPA)
+	{
+		int i;
+
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	tcp->u_nargs = MAX_ARGS;
+		for (i = 0; i < tcp->u_nargs; i++) {
+			if (upeek(pid, PT_GR26-4*i, &tcp->u_arg[i]) < 0)
+				return -1;
+		}
 	}
 #else /* Other architecture (like i386) (32bits specific) */
 	{
@@ -1516,7 +1554,7 @@ struct tcb *tcp;
 
 	switch (tcp->scno + NR_SYSCALL_BASE) {
 #ifdef LINUX
-#if !defined (ALPHA) && !defined(IA64) && !defined(SPARC) && !defined(MIPS)
+#if !defined (ALPHA) && !defined(IA64) && !defined(SPARC) && !defined(MIPS) && !defined(HPPA)
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);

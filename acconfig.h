@@ -15,6 +15,9 @@
 /* Define for UnixWare systems. */
 #undef UNIXWARE
 
+/* Define if this is an hppa architecture */
+#undef HPPA
+
 /* Define if this is an i386, i486 or pentium architecture.  */
 #undef I386
 

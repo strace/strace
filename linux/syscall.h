@@ -109,7 +109,7 @@ int sys_osf_utimes();
 #endif
 
 
-#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS)
+#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS) &&!defined(HPPA)
 #ifdef POWERPC
 #  define SYS_socket_subcall	256
 #else
@@ -142,7 +142,7 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS) && !defined(SPARC)
+#if !defined(ALPHA) && !defined(IA64) && !defined(MIPS) && !defined(SPARC) &&!defined(HPPA)
 #ifdef POWERPC
 #  define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #else

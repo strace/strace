@@ -107,11 +107,17 @@ struct stat {
 #    define off_t off_t
 #    define loff_t loff_t
 #  endif
+#  ifdef HPPA	/* asm-parisc/stat.h defines stat64 */
+#    undef stat64
+#  endif
 #  define stat libc_stat
 #  define stat64 libc_stat64
 #  include <sys/stat.h>
 #  undef stat
 #  undef stat64
+#  ifdef HPPA
+#    define stat64 hpux_stat64
+#  endif
 #else
 #  include <sys/stat.h>
 #endif
@@ -883,7 +889,7 @@ long addr;
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(linux) && !defined(IA64)
+#if defined(linux) && !defined(IA64) && !defined(HPPA)
 static void
 convertoldstat(oldbuf, newbuf)
 const struct __old_kernel_stat *oldbuf;
@@ -971,7 +977,7 @@ struct tcb *tcp;
 }
 
 #ifdef linux
-# if !defined(IA64)
+# if !defined(IA64) && !defined(HPPA)
 int
 sys_oldstat(tcp)
 struct tcb *tcp;
@@ -1018,7 +1024,7 @@ struct tcb *tcp;
 }
 
 #ifdef linux
-# if !defined(IA64)
+# if !defined(IA64) && !defined(HPPA)
 int
 sys_oldfstat(tcp)
 struct tcb *tcp;
@@ -1066,7 +1072,7 @@ struct tcb *tcp;
 }
 
 #ifdef linux
-# if !defined(IA64)
+# if !defined(IA64) && !defined(HPPA)
 int
 sys_oldlstat(tcp)
 struct tcb *tcp;

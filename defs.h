@@ -157,6 +157,13 @@ extern int ptrace();
 #  define REG_SP 29
 #  define REG_EPC 64
 #endif /* MIPS */
+#ifdef HPPA
+#  define PT_GR20 (20*4)
+#  define PT_GR26 (26*4)
+#  define PT_GR28 (28*4)
+#  define PT_IAOQ0 (106*4)
+#  define PT_IAOQ1 (107*4)
+#endif /* HPPA */
 #endif /* LINUX */
 
 #define SUPPORTED_PERSONALITIES 1
@@ -277,7 +284,7 @@ struct tcb {
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-#if defined(ALPHA) || defined(SPARC) || defined(POWERPC)
+#if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(HPPA)
 #define TCB_WAITEXECVE	02000	/* ignore SIGTRAP after exceve */
 #endif /* ALPHA */
 #endif /* LINUX */

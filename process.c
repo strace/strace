@@ -475,6 +475,10 @@ int new;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new)<0)
 	    	return -1;
 	return 0;
+#elif defined(HPPA)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR20), new)<0)
+	    	return -1;
+	return 0;
 #else
 #warning Do not know how to handle change_syscall for this architecture
 #endif /* architecture */
@@ -640,6 +644,24 @@ struct tcb *tcp;
 			return 0;
 		}
 #ifdef LINUX
+#ifdef HPPA
+		/* The child must have run before it can be attached. */
+		/* This must be a bug in the parisc kernel, but I havn't
+		 * identified it yet.  Seems to be an issue associated
+		 * with attaching to a process (which sends it a signal)
+		 * before that process has ever been scheduled.  When
+		 * debugging, I started seeing crashes in
+		 * arch/parisc/kernel/signal.c:do_signal(), apparently
+		 * caused by r8 getting corrupt over the dequeue_signal()
+		 * call.  Didn't make much sense though...
+		 */
+		{
+			struct timeval tv;
+			tv.tv_sec = 0;
+			tv.tv_usec = 10000;
+			select(0, NULL, NULL, NULL, &tv);
+		}
+#endif
 		if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
 			perror("PTRACE_ATTACH");
 			fprintf(stderr, "Too late?\n");
@@ -1142,7 +1164,7 @@ struct tcb *tcp;
 		}
 	}
 #ifdef LINUX
-#if defined(ALPHA) || defined(SPARC) || defined(POWERPC)
+#if defined(ALPHA) || defined(SPARC) || defined(POWERPC) || defined(HPPA)
 	tcp->flags |= TCB_WAITEXECVE;
 #endif /* ALPHA || SPARC || POWERPC */
 #endif /* LINUX */
@@ -1798,6 +1820,8 @@ struct xlat struct_user_offsets[] = {
 #endif
 #if defined(SPARC)
 	/* XXX No support for these offsets yet. */
+#elif defined(HPPA)
+	/* XXX No support for these offsets yet. */
 #elif defined(POWERPC)
 	{ 4*PT_R0,		"4*PT_R0"				},
 	{ 4*PT_R1,		"4*PT_R1"				},
@@ -2097,7 +2121,9 @@ struct xlat struct_user_offsets[] = {
 	{ uoff(u_exdata.ux_shell[0]),"offsetof(struct user, u_exdata.ux_shell[0])"},
 	{ uoff(u_lofault),	"offsetof(struct user, u_lofault)"	},
 #endif /* SUNOS4 */
+#ifndef HPPA
 	{ sizeof(struct user),	"sizeof(struct user)"			},
+#endif
 	{ 0,			NULL					},
 };
 #endif

@@ -902,6 +902,9 @@ struct tcb *tcp;
 	pc = regs.r_pc;
 #elif defined(S390)
 	if(upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
+#elif defined(HPPA)
+	if(upeek(tcp->pid,PT_IAOQ0,&pc) < 0)
+		return -1;
 #endif
 	return pc;
 #endif /* LINUX */
@@ -985,6 +988,14 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", regs.r_pc);
+#elif defined(HPPA)
+	long pc;
+
+	if(upeek(tcp->pid,PT_IAOQ0,&pc) < 0) {
+		tprintf ("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
 #endif /* !architecture */
 #endif /* LINUX */
 
@@ -1116,6 +1127,8 @@ struct tcb *tcp;
 #define LOOP	0x1000ffff
 #elif defined(S390)
 #define LOOP	0xa7f40000	/* BRC 15,0 */
+#elif defined(HPPA)
+#define LOOP	0xe81f1ff7	/* b,l,n <loc>,r0 */
 #else
 #error unknown architecture
 #endif
@@ -1142,6 +1155,10 @@ struct tcb *tcp;
 #elif defined(S390)
 	if (upeek(tcp->pid,PT_PSWADDR, &tcp->baddr) < 0)
 		return -1;
+#elif defined(HPPA)
+	if (upeek(tcp->pid, PT_IAOQ0, &tcp->baddr) < 0)
+		return -1;
+	tcp->baddr &= ~0x03;
 #else
 #error unknown architecture
 #endif
@@ -1229,6 +1246,8 @@ struct tcb *tcp;
 	long pc;
 #elif defined(ALPHA)
 	long pc;
+#elif defined(HPPA)
+	long iaoq;
 #endif /* architecture */
 
 #ifdef SPARC
@@ -1341,6 +1360,24 @@ struct tcb *tcp;
 				pc, tcp->baddr);
 		return 0;
 	}
+#elif defined(HPPA)
+	if (upeek(tcp->pid, PT_IAOQ0, &iaoq) < 0)
+		return -1;
+	iaoq &= ~0x03;
+	if (iaoq != tcp->baddr && iaoq != tcp->baddr + 4) {
+		/* The breakpoint has not been reached yet.  */
+		if (debug)
+			fprintf(stderr, "NOTE: PC not at bpt (iaoq %#lx baddr %#lx)\n",
+				iaoq, tcp->baddr);
+		return 0;
+	}
+	iaoq = tcp->baddr | 3;
+	/* We should be pointing at a 'ldi -1000,r1' in glibc, so it is
+	 * safe to set both IAOQ0 and IAOQ1 to that so the PSW N bit
+	 * has no significant effect.
+	 */
+	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ0, iaoq);
+	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ1, iaoq);
 #endif /* arch */
 #endif /* !SPARC && !IA64 */
 #endif /* LINUX */

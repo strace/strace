@@ -932,6 +932,11 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
+#else
+#ifdef HPPA
+#warning NO sys_sigreturn DECODE FOR HPPA
+	return 0;
+#endif /* HPPA */
 #endif /* MIPS */
 #endif /* SPARC */
 #endif /* ALPHA */
