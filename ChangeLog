@@ -1,3 +1,25 @@
+2004-09-03  Roland McGrath  <roland@redhat.com>
+
+	* util.c (xlookup, printxval, addflags, printflags): Use const for
+	struct xlat * argument.
+	* defs.h (xlookup, printxval, addflags, printflags): Update decls.
+	* bjm.c: Add const to all struct xlat defns.
+	* desc.c: Likewise.
+	* file.c: Likewise.
+	* ipc.c: Likewise.
+	* mem.c: Likewise.
+	* net.c: Likewise.
+	* proc.c: Likewise.
+	* process.c: Likewise.
+	* resource.c: Likewise.
+	* signal.c: Likewise.
+	* sock.c: Likewise.
+	* stream.c: Likewise.
+	* system.c: Likewise.
+	* term.c: Likewise.
+	* time.c: Likewise.
+	* util.c: Likewise.
+
 2004-09-01  Roland McGrath  <roland@redhat.com>
 
 	* linux/x86_64/syscallent.h: Add new entries for timer_*, clock_*, and
