@@ -622,6 +622,9 @@ struct tcb *tcp;
 #ifdef SYS_rforkall
 	case SYS_rforkall:
 #endif
+#ifdef SYS_rfork
+	case SYS_rfork:
+#endif
 		internal_fork(tcp);
 		break;
 #ifdef SYS_clone

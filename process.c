@@ -451,6 +451,10 @@ struct tcb *tcp;
 	struct tcb *tcpchild;
 
 	if (exiting(tcp)) {
+#ifdef SYS_rfork
+		if (tcp->scno == SYS_rfork && !(tcp->u_arg[0]&RFPROC))
+			return 0;
+#endif
 		if (getrval2(tcp))
 			return 0;
 		if (!followfork)
