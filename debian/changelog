@@ -1,3 +1,12 @@
+strace (4.4.96-1) unstable; urgency=low
+
+  * New upstream version.
+    + Handles yet more new Linux 2.5 system calls.
+    + Fixes x86_64 and ia64 clone printing.
+    + Updates SH port.
+
+ -- Roland McGrath <frob@debian.org>  Sun, 30 Mar 2003 17:14:34 -0800
+
 strace (4.4.95-1) unstable; urgency=low
 
   * New upstream version.
