@@ -1,3 +1,8 @@
+Tue Jul 13 17:07:50 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Add configure-test for sys/reg.h and use that
+  * Use sys/reg.h instead of asm/ptrace.h
+
 Sat Jul 10 01:46:10 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Remove hack in signal.c for arm architecture

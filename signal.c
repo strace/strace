@@ -34,18 +34,23 @@
 #include <signal.h>
 #include <sys/user.h>
 #include <fcntl.h>
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 && (defined(I386) || defined(M68K))
-# include <sys/reg.h>
-#endif
 
 #ifdef SVR4
 #include <sys/ucontext.h>
 #endif /* SVR4 */
 
-#ifdef LINUX
-#ifndef __GLIBC__
+#if defined(linux) && !defined(__GLIBC__)
 #include <linux/ptrace.h>
+#endif 
+
+#ifdef HAVE_SYS_REG_H
+# include <sys/reg.h>
+# define PTRACE_PEEKUSR PTRACE_PEEKUSER
+# define PTRACE_POKEUSR PTRACE_POKEUSER
 #endif
+
+#ifdef LINUX
+
 #ifdef HAVE_ASM_SIGCONTEXT_H
 #include <asm/sigcontext.h>
 #ifdef SPARC

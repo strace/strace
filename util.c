@@ -39,15 +39,15 @@
 #include <a.out.h>
 #include <link.h>
 #endif /* SUNOS4 */
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 && (defined(I386) || defined(M68K))
-# include <sys/reg.h>
+
+#if defined(linux) && !defined(__GLIBC__)
+#include <linux/ptrace.h>
+#endif 
+
+#ifdef HAVE_SYS_REG_H
+#include <sys/reg.h>
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
 #endif
-#ifdef LINUX
-#if !defined(__GLIBC__) || defined(SPARC)
-#include <linux/ptrace.h>
-#endif
-#endif /* LINUX */
 
 #ifdef HAVE_SYS_PTRACE_H
 #include <sys/ptrace.h>
