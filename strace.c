@@ -30,9 +30,9 @@
  *	$Id$
  */
 
-#include <sys/types.h>
 #include "defs.h"
 
+#include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
 #include <sys/param.h>

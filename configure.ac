@@ -121,8 +121,7 @@ AM_CONDITIONAL([SVR4], [test x$opsys = xsvr4])
 AM_CONDITIONAL([FREEBSD], [test x$opsys = xfreebsd])
 
 AC_PROG_CC
-dnl That set the default CFLAGS value, which we don't want to diddle first.
-CFLAGS="-D_GNU_SOURCE $CFLAGS"
+AC_GNU_SOURCE
 
 AC_INCLUDEDIR
 

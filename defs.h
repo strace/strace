@@ -29,6 +29,10 @@
  *	$Id$
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef linux
 #include <features.h>
 #endif
@@ -38,10 +42,6 @@
 # ifndef _LFS64_LARGEFILE
 #  define _LFS64_LARGEFILE 1
 # endif
-#endif
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
 #endif
 
 /* configuration section */
