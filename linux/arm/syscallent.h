@@ -145,7 +145,7 @@
 	{ 1,	0,	sys_iopl,		"iopl"		}, /* 110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 111 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 112 */
-	{ 1,	0,	sys_vm86old,		"vm86old"	}, /* 113 */
+	{ 5,	0,	printargs,		"syscall"	}, /* 113 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 114 */
 	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
