@@ -147,7 +147,7 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 # endif /* IA64 */
-# if defined S390 || defined S390X || defined POWERPC
+# if defined S390X || defined POWERPC
 #  define SYS_socket_subcall	256
 # else
 #  define SYS_socket_subcall	300
