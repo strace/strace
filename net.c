@@ -46,9 +46,21 @@
 #endif /* LINUX */
 
 #if defined(LINUX) && defined(MIPS)
-#if defined( HAVE_LINUX_IN6_H)
+#if defined(HAVE_LINUX_IN6_H)
 #include <linux/in6.h>
 #endif
+#endif
+
+#if defined(HAVE_SYS_UIO_H)
+#include <sys/uio.h>
+#endif
+
+#if defined(HAVE_LINUX_NETLINK_H)
+#include <linux/netlink.h>
+#endif
+
+#if defined(HAVE_LINUX_IF_PACKET_H)
+#include <linux/if_packet.h>
 #endif
 
 #ifndef PF_UNSPEC
@@ -69,6 +81,21 @@ static struct xlat domains[] = {
 	{ PF_UNSPEC,	"PF_UNSPEC"	},
 	{ PF_UNIX,	"PF_UNIX"	},
 	{ PF_INET,	"PF_INET"	},
+#ifdef PF_NETLINK
+	{ PF_NETLINK,	"PF_NETLINK"	},
+#endif
+#ifdef PF_PACKET
+	{ PF_PACKET,	"PF_PACKET"	},
+#endif
+#ifdef PF_INET6
+	{ PF_INET6,	"PF_INET6"	},
+#endif
+#ifdef PF_ATMSVC
+	{ PF_ATMSVC,	"PF_INET6"	},
+#endif
+#ifdef PF_INET6
+	{ PF_INET6,	"PF_INET6"	},
+#endif
 #ifdef PF_LOCAL
 	{ PF_LOCAL,	"PS_LOCAL"	},
 #endif
@@ -96,9 +123,6 @@ static struct xlat domains[] = {
 #ifdef PF_X25
 	{ PF_X25,	"PF_X25"	},
 #endif
-#ifdef PF_INET6
-	{ PF_INET6,	"PF_INET6"	},
-#endif
 #ifdef PF_ROSE
 	{ PF_ROSE,	"PF_ROSE"	},
 #endif
@@ -110,6 +134,25 @@ static struct xlat domains[] = {
 #endif
 #ifdef PF_IMPLINK
 	{ PF_IMPLINK,	"PF_IMPLINK"	},
+#endif
+	{ 0,		NULL		},
+};
+static struct xlat addrfams[] = {
+	{ AF_UNSPEC,	"AF_UNSPEC"	},
+	{ AF_UNIX,	"AF_UNIX"	},
+	{ AF_INET,	"AF_INET"	},
+	{ AF_INET6,	"AF_INET6"	},
+	{ AF_DECnet,	"AF_DECnet"	},
+#ifdef PF_ATMSVC
+	{ AF_ATMSVC,	"AF_ATMSVC"	},
+#endif
+	{ AF_PACKET,	"AF_PACKET"	},
+	{ AF_NETLINK,	"AF_NETLINK"	},
+#ifdef PF_ISO
+	{ AF_ISO,	"AF_ISO"	},
+#endif
+#ifdef PF_IMPLINK
+	{ AF_IMPLINK,	"AF_IMPLINK"	},
 #endif
 	{ 0,		NULL		},
 };
@@ -193,10 +236,34 @@ static struct xlat msg_flags[] = {
 #ifdef MSG_WAITALL
 	{ MSG_WAITALL,	"MSG_WAITALL"	},
 #endif
+#ifdef MSG_TRUNC
+	{ MSG_TRUNC,	"MSG_TRUNC"	},
+#endif
+#ifdef MSG_CTRUNC
+	{ MSG_CTRUNC,	"MSG_CTRUNC"	},
+#endif
+#ifdef MSG_ERRQUEUE
+	{ MSG_ERRQUEUE,	"MSG_ERRQUEUE"	},
+#endif
+#ifdef MSG_DONTWAIT
+	{ MSG_DONTWAIT,	"MSG_DONTWAIT"	},
+#endif
+#ifdef MSG_CONFIRM
+	{ MSG_CONFIRM,	"MSG_CONFIRM"	},
+#endif
+#ifdef MSG_PROBE
+	{ MSG_PROBE,	"MSG_PROBE"	},
+#endif
 	{ 0,		NULL		},
 };
 
 static struct xlat sockoptions[] = {
+#ifdef SO_PEERCRED
+	{ SO_PEERCRED,	"SO_PEERCRED"	},
+#endif
+#ifdef SO_PASSCRED
+	{ SO_PASSCRED,	"SO_PASSCRED"	},
+#endif
 #ifdef SO_DEBUG
 	{ SO_DEBUG,	"SO_DEBUG"	},
 #endif
@@ -310,20 +377,30 @@ static struct xlat socktcpoptions[] = {
 #endif /* SOL_TCP */
 
 void
-printsock(tcp, addr)
+printsock(tcp, addr, addrlen)
 struct tcb *tcp;
 long addr;
+int addrlen;
 {
-	struct sockaddr sa;
-	struct sockaddr_in *sin = (struct sockaddr_in *) &sa;
-	struct sockaddr_un sau;
+	union {
+		char pad[128];
+		struct sockaddr sa;
+		struct sockaddr_in sin;
+		struct sockaddr_un sau;
 #ifdef HAVE_INET_NTOP
-	struct sockaddr_in6 sa6;
+		struct sockaddr_in6 sa6;
+#endif
+#if defined(LINUX) && defined(AF_IPX)
+		struct sockaddr_ipx sipx;
+#endif
+#ifdef AF_PACKET
+		struct sockaddr_ll ll;
+#endif
+#ifdef AF_NETLINK
+		struct sockaddr_nl nl;
+#endif
+	} addrbuf;
 	char string_addr[100];
-#endif
-#ifdef LINUX
-	struct sockaddr_ipx sipx;
-#endif
 
 	if (addr == 0) {
 		tprintf("NULL");
@@ -333,72 +410,124 @@ long addr;
 		tprintf("%#lx", addr);
 		return;
 	}
-	if (umove(tcp, addr, &sa) < 0) {
+	if ((addrlen<2) || (addrlen>sizeof(addrbuf)))
+		addrlen=sizeof(addrbuf);
+
+	if (umoven(tcp, addr, addrlen, (char*)&addrbuf) < 0) {
 		tprintf("{...}");
 		return;
 	}
-	switch (sa.sa_family) {
+
+	tprintf("{sin_family=");
+	printxval(addrfams, addrbuf.sa.sa_family, "AF_???");
+	tprintf(", ");
+
+	switch (addrbuf.sa.sa_family) {
 	case AF_UNIX:
-		if (umove(tcp, addr, &sau) < 0)
-			tprintf("{sun_family=AF_UNIX, ...}");
-		else
-			tprintf("{sun_family=AF_UNIX, sun_path=\"%s\"}",
-				sau.sun_path);
+		if (addrlen==2) {
+			tprintf("<nil>");
+		} else if (addrbuf.sau.sun_path[0]) {
+			tprintf("path=\"%*.*s\"", addrlen-2, addrlen-2, addrbuf.sau.sun_path);
+		} else {
+			tprintf("path=@%*.*s", addrlen-3, addrlen-3, addrbuf.sau.sun_path+1);
+		}
 		break;
 	case AF_INET:
-		tprintf("{sin_family=AF_INET, ");
 		tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")}",
-			ntohs(sin->sin_port), inet_ntoa(sin->sin_addr));
+			ntohs(addrbuf.sin.sin_port), inet_ntoa(addrbuf.sin.sin_addr));
 		break;
 #ifdef HAVE_INET_NTOP
 	case AF_INET6:
-		if (umove(tcp, addr, &sa6) < 0)
-			tprintf("{sin6_family=AF_INET6, ...}");
-		else
-		{
-			tprintf("{sin6_family=AF_INET6, ");
-			inet_ntop(AF_INET6, &sa6.sin6_addr, string_addr, sizeof(string_addr));
-			tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)}",
-				ntohs(sa6.sin6_port), string_addr, ntohl(sa6.sin6_flowinfo));
-		}
+		inet_ntop(AF_INET6, &addrbuf.sa6.sin6_addr, string_addr, sizeof(string_addr));
+		tprintf("sin6_port=htons(%u), inet_pton(AF_INET6, \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)}",
+			ntohs(addrbuf.sa6.sin6_port), string_addr, ntohl(addrbuf.sa6.sin6_flowinfo));
 		break;	
 #endif
 #if defined(AF_IPX) && defined(linux)
 	case AF_IPX:
-		if (umove(tcp, addr, &sipx)<0)
-			tprintf("{sipx_family=AF_IPX, ...}");
-		else {
+		{
 			int i;
-			tprintf("{sipx_family=AF_IPX, ");
 			tprintf("{sipx_port=htons(%u), ",
-				ntohs(sipx.sipx_port));
+					ntohs(addrbuf.sipx.sipx_port));
 			/* Yes, I know, this does not look too
 			 * strace-ish, but otherwise the IPX
 			 * addresses just look monstrous...
 			 * Anyways, feel free if you don't like
 			 * this way.. :) 
 			 */
-			tprintf("%08lx:", (unsigned long)ntohl(sipx.sipx_network));
+			tprintf("%08lx:", (unsigned long)ntohl(addrbuf.sipx.sipx_network));
 			for (i = 0; i<IPX_NODE_LEN; i++)
-				tprintf("%02x", sipx.sipx_node[i]);
-			tprintf("/[%02x]", sipx.sipx_type);
-			tprintf("}");
+				tprintf("%02x", addrbuf.sipx.sipx_node[i]);
+			tprintf("/[%02x]", addrbuf.sipx.sipx_type);
 		}
 		break;
-#endif /* AF_IPX  && linux */
+#endif /* AF_IPX && linux */
+#ifdef AF_PACKET
+	case AF_PACKET:
+		{
+			int i;
+			tprintf("proto=%#04x, if%d, pkttype=%d, addr(%d)={%d, ",
+					ntohs(addrbuf.ll.sll_protocol),
+					addrbuf.ll.sll_ifindex,
+					addrbuf.ll.sll_pkttype,
+					addrbuf.ll.sll_halen,
+					addrbuf.ll.sll_hatype);
+			for (i=0; i<addrbuf.ll.sll_addr[i]; i++) 
+				tprintf("%02x", addrbuf.ll.sll_addr[i]);
+		}
+		break;
+
+#endif /* AF_APACKET */
+#ifdef AF_NETLINLK
+	case AF_NETLINK:
+		tprintf("pid=%d, groups=%08x", addrbuf.nl.nl_pid, addrbuf.nl.nl_groups);
+		break;
+#endif /* AF_NETLINK */
 	/* AF_AX25 AF_APPLETALK AF_NETROM AF_BRIDGE AF_AAL5
-	AF_X25 AF_INET6 AF_ROSE still need to be done */
+	AF_X25 AF_ROSE etc. still need to be done */
 
 	default:
-		tprintf("{sa_family=%u, sa_data=", sa.sa_family);
+		tprintf("{sa_family=%u, sa_data=", addrbuf.sa.sa_family);
 		printstr(tcp, (long) &((struct sockaddr *) addr)->sa_data,
-			sizeof sa.sa_data);
-		tprintf("}");
+			sizeof addrbuf.sa.sa_data);
 		break;
 	}
+	tprintf("}");
 }
 
 #if HAVE_SENDMSG
+
+static void
+printiovec(tcp, iovec, len)
+struct tcb *tcp;
+struct iovec *iovec;
+long   len;
+{
+	struct iovec *iov;
+	int i;
+
+	iov = (struct iovec *) malloc(len * sizeof *iov);
+	if (iov == NULL) {
+		fprintf(stderr, "No memory");
+		return;
+	}
+	if (umoven(tcp, (long)iovec,
+				len * sizeof *iov, (char *) iov) < 0) {
+		tprintf("%#lx", (unsigned long)iovec);
+	} else {
+		tprintf("[");
+		for (i = 0; i < len; i++) {
+			if (i)
+				tprintf(", ");
+			tprintf("{");
+			printstr(tcp, (long) iov[i].iov_base,
+					iov[i].iov_len);
+			tprintf(", %lu}", (unsigned long)iov[i].iov_len);
+		}
+		tprintf("]");
+	}
+	free((char *) iov);
+}
 
 static void
 printmsghdr(tcp, addr)
@@ -411,19 +540,24 @@ long addr;
 		tprintf("%#lx", addr);
 		return;
 	}
-	tprintf("{msg_name=");
-	printstr(tcp, (long) msg.msg_name, msg.msg_namelen);
-	tprintf(", msg_namelen=%u, msg_iov=%#lx, msg_iovlen=%u, ",
-		msg.msg_namelen,
-		(unsigned long) msg.msg_iov, msg.msg_iovlen);
+	tprintf("{msg_name(%d)=", msg.msg_namelen);
+	printsock(tcp, (long)msg.msg_name, msg.msg_namelen);
+
+	tprintf(", msg_iov(%lu)=", (unsigned long)msg.msg_iovlen);
+	printiovec(tcp, msg.msg_iov, msg.msg_iovlen);
+
 #ifdef HAVE_MSG_CONTROL
-	tprintf("msg_control=%#lx, msg_controllen=%u, msg_flags=%#x}",
-		(unsigned long) msg.msg_control, msg.msg_controllen,
-		msg.msg_flags);
+	tprintf(", msg_controllen=%lu", (unsigned long)msg.msg_controllen);
+	if (msg.msg_controllen) 
+		tprintf(", msg_control=%#lx, ", (unsigned long) msg.msg_control);
+	tprintf(", msg_flags=");
+	if (printflags(msg_flags, msg.msg_flags)==0)
+		tprintf("0");
 #else /* !HAVE_MSG_CONTROL */
-	tprintf("msg_accrights=%#lx, msg_accrightslen=%u}",
+	tprintf("msg_accrights=%#lx, msg_accrightslen=%u",
 		(unsigned long) msg.msg_accrights, msg.msg_accrightslen);
 #endif /* !HAVE_MSG_CONTROL */
+	tprintf("}");
 }
 
 #endif /* HAVE_SENDMSG */
@@ -463,7 +597,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		printsock(tcp, tcp->u_arg[1]);
+		printsock(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
@@ -498,7 +632,7 @@ struct tcb *tcp;
 		if (tcp->u_arg[1] == 0 || syserror(tcp)) {
 			tprintf("%#lx", tcp->u_arg[1]);
 		} else {
-			printsock(tcp, tcp->u_arg[1]);
+			printsock(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		}
 		tprintf(", ");
 		printnum(tcp, tcp->u_arg[2], "%lu");
@@ -534,7 +668,7 @@ struct tcb *tcp;
 			tprintf("0");
 		/* to address */
 		tprintf(", ");
-		printsock(tcp, tcp->u_arg[4]);
+		printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 		/* to length */
 		tprintf(", %lu", tcp->u_arg[5]);
 	}
@@ -618,7 +752,7 @@ struct tcb *tcp;
 			return 0;
 		}
 		tprintf(", ");
-		printsock(tcp, tcp->u_arg[4]);
+		printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 		/* from length */
 		tprintf(", [%u]", fromlen);
 	}
@@ -797,7 +931,7 @@ struct tcb *tcp;
 		default: 
 			/* XXX - should know socket family here */
 			printxval(protocols, tcp->u_arg[1], "IPPROTO_???");
-			tprintf("%lu, ", tcp->u_arg[2]);
+			tprintf(", %lu, ", tcp->u_arg[2]);
 			break;
 		}
 	} else {

@@ -71,9 +71,14 @@
 #include <stddef.h>
 #endif /* STDC_HEADERS */
 
-#if defined(LINUX) && defined(SPARC)
-#define LINUXSPARC
-#endif /* LINUX && SPARC */
+#if defined(LINUX)
+#  if defined(SPARC)
+#     define LINUXSPARC
+#  endif
+#  if defined(ALPHA)
+#     define LINUX_64BIT
+#  endif
+#endif 
 
 #ifdef SVR4
 #include <sys/procfs.h>
@@ -316,7 +321,7 @@ extern void printnum P((struct tcb *, long, char *));
 extern void printpath P((struct tcb *, long));
 extern void printpathn P((struct tcb *, long, int));
 extern void printtv P((struct tcb *, long));
-extern void printsock P((struct tcb *, long));
+extern void printsock P((struct tcb *, long, int));
 extern void printrusage P((struct tcb *, long));
 extern int clearbpt P((struct tcb *));
 extern int setbpt P((struct tcb *));

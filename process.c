@@ -130,6 +130,12 @@ static struct xlat prctl_options[] = {
 #ifdef PR_PTHREADEXIT
 	{ PR_PTHREADEXIT,	"PR_PTHREADEXIT"	},
 #endif
+#ifdef PR_SET_PDEATHSIG
+	{ PR_SET_PDEATHSIG,	"PR_SET_PDEATHSIG"	},
+#endif
+#ifdef PR_GET_PDEATHSIG
+	{ PR_GET_PDEATHSIG,	"PR_GET_PDEATHSIG"	},
+#endif
 	{ 0,			NULL			},
 };
 
@@ -146,9 +152,24 @@ struct tcb *tcp;
 		case PR_GETNSHARE:
 			break;
 #endif
+#ifdef PR_SET_DEATHSIG
+		case PR_GET_PDEATHSIG:
+			break;
+#endif
 		default:
 			for (i = 1; i < tcp->u_nargs; i++)
 				tprintf(", %#lx", tcp->u_arg[i]);
+			break;
+		}
+	} else {
+		switch (tcp->u_arg[0]) {
+#ifdef PR_GET_PDEATHSIG
+		case PR_GET_PDEATHSIG:
+			for (i=1; i<tcp->u_nargs; i++)
+				tprintf(", %@lx", tcp->u_arg[i]);
+			break;
+#endif
+		default:
 			break;
 		}
 	}
@@ -938,9 +959,10 @@ int status;
 }
 
 static int
-printwaitn(tcp, n)
+printwaitn(tcp, n, bitness)
 struct tcb *tcp;
 int n;
+int bitness;
 {
 	int status;
 	int exited = 0;
@@ -967,8 +989,14 @@ int n;
 			if (!tcp->u_arg[3])
 				tprintf("NULL");
 #ifdef LINUX
-			else if (tcp->u_rval > 0)
-				printrusage(tcp, tcp->u_arg[3]);
+			else if (tcp->u_rval > 0) {
+#ifdef LINUX_64BIT
+				if (bitness)
+					printrusage32(tcp, tcp->u_arg[3]);
+				else
+#endif
+					printrusage(tcp, tcp->u_arg[3]);
+			}
 #endif /* LINUX */
 #ifdef SUNOS4
 			else if (tcp->u_rval > 0 && exited)
@@ -1016,15 +1044,24 @@ int
 sys_waitpid(tcp)
 struct tcb *tcp;
 {
-	return printwaitn(tcp, 3);
+	return printwaitn(tcp, 3, 0);
 }
 
 int
 sys_wait4(tcp)
 struct tcb *tcp;
 {
-	return printwaitn(tcp, 4);
+	return printwaitn(tcp, 4, 0);
 }
+
+#ifdef ALPHA
+int
+sys_osf_wait4(tcp)
+struct tcb *tcp;
+{
+	return printwaitn(tcp, 4, 1);
+}
+#endif
 
 #ifdef SVR4
 

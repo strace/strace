@@ -142,6 +142,68 @@ static struct xlat usagewho[] = {
 	{ 0,			NULL			},
 };
 
+#ifdef ALPHA
+void
+printrusage32(tcp, addr)
+struct tcb *tcp;
+long addr;
+{
+    struct timeval32
+    {
+	unsigned tv_sec;
+	unsigned tv_usec;
+    };
+    struct rusage32
+    {
+	struct timeval32 ru_utime;	/* user time used */
+	struct timeval32 ru_stime;	/* system time used */
+	long	ru_maxrss;		/* maximum resident set size */
+	long	ru_ixrss;		/* integral shared memory size */
+	long	ru_idrss;		/* integral unshared data size */
+	long	ru_isrss;		/* integral unshared stack size */
+	long	ru_minflt;		/* page reclaims */
+	long	ru_majflt;		/* page faults */
+	long	ru_nswap;		/* swaps */
+	long	ru_inblock;		/* block input operations */
+	long	ru_oublock;		/* block output operations */
+	long	ru_msgsnd;		/* messages sent */
+	long	ru_msgrcv;		/* messages received */
+	long	ru_nsignals;		/* signals received */
+	long	ru_nvcsw;		/* voluntary context switches */
+	long	ru_nivcsw;		/* involuntary " */
+    } ru;
+
+    if (!addr)
+	tprintf("NULL");
+    else if (syserror(tcp) || !verbose(tcp))
+	tprintf("%#lx", addr);
+    else if (umove(tcp, addr, &ru) < 0)
+	tprintf("{...}");
+    else if (!abbrev(tcp)) {
+	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
+		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
+		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+	tprintf("ru_maxrss=%lu, ru_ixrss=%lu, ",
+		ru.ru_maxrss, ru.ru_ixrss);
+	tprintf("ru_idrss=%lu, ru_isrss=%lu, ",
+		ru.ru_idrss, ru.ru_isrss);
+	tprintf("ru_minflt=%lu, ru_majflt=%lu, ru_nswap=%lu, ",
+		ru.ru_minflt, ru.ru_majflt, ru.ru_nswap);
+	tprintf("ru_inblock=%lu, ru_oublock=%lu, ",
+		ru.ru_inblock, ru.ru_oublock);
+	tprintf("ru_msgsnd=%lu, ru_msgrcv=%lu, ",
+		ru.ru_msgsnd, ru.ru_msgrcv);
+	tprintf("ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}",
+		ru.ru_nsignals, ru.ru_nvcsw, ru.ru_nivcsw);
+    }
+    else {
+	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ...}",
+		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
+		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+    }
+}
+#endif
+
 void
 printrusage(tcp, addr)
 struct tcb *tcp;
@@ -191,6 +253,21 @@ struct tcb *tcp;
 		printrusage(tcp, tcp->u_arg[1]);
 	return 0;
 }
+
+#ifdef ALPHA
+int
+sys_osf_getrusage(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
+	tprintf(", ");
+    }
+    else
+	printrusage32(tcp, tcp->u_arg[1]);
+    return 0;
+}
+#endif /* ALPHA */
 
 #endif /* !SVR4 */
 

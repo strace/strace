@@ -1214,6 +1214,20 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef ALPHA
+int
+sys_osf_utimes(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printpath(tcp, tcp->u_arg[0]);
+	tprintf(", ");
+	printtv32(tcp, tcp->u_arg[1]);
+    }
+    return 0;
+}
+#endif
+
 int
 sys_utimes(tcp)
 struct tcb *tcp;

@@ -53,6 +53,30 @@ long addr;
 		tprintf("{%lu, %lu}", (long) tv.tv_sec, (long) tv.tv_usec);
 }
 
+#ifdef ALPHA
+void
+printtv32(tcp, addr)
+struct tcb *tcp;
+long addr;
+{
+    struct timeval32 
+    {
+	    unsigned tv_sec;
+	    unsigned tv_usec;
+    };
+
+    if (addr == 0)
+	tprintf("NULL");
+    else if (!verbose(tcp))
+	tprintf("%#lx", addr);
+    else if (umove(tcp, addr, &tv) < 0)
+	tprintf("{...}");
+    else
+	tprintf("{%u, %u}", tv.tv_sec, tv.tv_usec);
+}
+#endif
+
+
 int
 sys_time(tcp)
 struct tcb *tcp;
@@ -94,6 +118,28 @@ struct tcb *tcp;
 	return 0;
 }
 
+
+#ifdef ALPHA
+int
+sys_osf_gettimeofday(tcp)
+struct tcb *tcp;
+{
+    if (exiting(tcp)) {
+	if (syserror(tcp)) {
+	    tprintf("%#lx, %#lx",
+		    tcp->u_arg[0], tcp->u_arg[1]);
+	    return 0;
+	}
+	printtv32(tcp, tcp->u_arg[0]);
+#ifndef SVR4
+	tprintf(", ");
+	printtv32(tcp, tcp->u_arg[1]);
+#endif /* !SVR4 */
+    }
+    return 0;
+}
+#endif
+
 int
 sys_settimeofday(tcp)
 struct tcb *tcp;
@@ -107,6 +153,22 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef ALPHA
+int
+sys_osf_settimeofday(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printtv32(tcp, tcp->u_arg[0]);
+#ifndef SVR4
+	tprintf(", ");
+	printtv32(tcp, tcp->u_arg[1]);
+#endif /* !SVR4 */
+    }
+    return 0;
+}
+#endif
 
 int
 sys_adjtime(tcp)
@@ -151,6 +213,33 @@ long addr;
 	}
 }
 
+
+#ifdef ALPHA
+static void
+printitv32(tcp, addr)
+struct tcb *tcp;
+long addr;
+{
+    struct itimerval32
+    {
+	struct timeval32 it_interval;
+	struct timeval32 it_value;
+    } itv;
+
+    if (addr == 0)
+	tprintf("NULL");
+    else if (!verbose(tcp))
+	tprintf("%#lx", addr);
+    else if (umove(tcp, addr, &itv) < 0)
+	tprintf("{...}");
+    else {
+	tprintf("{it_interval={%u, %u}, it_value={%u, %u}}",
+		itv.it_interval.tv_sec, itv.it_interval.tv_usec,
+		itv.it_value.tv_sec, itv.it_value.tv_usec);
+    }
+}
+#endif
+
 int
 sys_getitimer(tcp)
 struct tcb *tcp;
@@ -166,6 +255,25 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+
+#ifdef ALPHA
+int
+sys_osf_getitimer(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printxval(which, tcp->u_arg[0], "ITIMER_???");
+	tprintf(", ");
+    } else {
+	if (syserror(tcp))
+	    tprintf("%#lx", tcp->u_arg[1]);
+	else
+	    printitv32(tcp, tcp->u_arg[1]);
+    }
+    return 0;
+}
+#endif
 
 int
 sys_setitimer(tcp)
@@ -184,6 +292,26 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef ALPHA
+int
+sys_osf_setitimer(tcp)
+struct tcb *tcp;
+{
+    if (entering(tcp)) {
+	printxval(which, tcp->u_arg[0], "ITIMER_???");
+	tprintf(", ");
+	printitv32(tcp, tcp->u_arg[1]);
+	tprintf(", ");
+    } else {
+	if (syserror(tcp))
+	    tprintf("%#lx", tcp->u_arg[2]);
+	else
+	    printitv32(tcp, tcp->u_arg[2]);
+    }
+    return 0;
+}
+#endif
 
 #ifdef LINUX
 

@@ -1,3 +1,10 @@
+Thu Nov 18 18:04:04 CET 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Merge stracefork from Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+    + Socket calls parsed better
+	+ bunch of alpha OSF syscalls added
+	+ Fix alpha 32/64 bit issues
+
 Mon Nov  1 20:52:08 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Move Linux kernelmodule-functions from system.c to bjm.c and

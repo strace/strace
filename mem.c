@@ -124,6 +124,9 @@ static struct xlat mmap_flags[] = {
 #ifdef MAP_EXECUTABLE
 	{ MAP_EXECUTABLE,"MAP_EXECUTABLE"},
 #endif
+#ifdef MAP_INHERIT
+	{ MAP_INHERIT,"MAP_INHERIT"	},
+#endif
 #ifdef MAP_FILE
 	{ MAP_FILE,"MAP_FILE"},
 #endif

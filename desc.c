@@ -256,13 +256,20 @@ struct tcb *tcp;
 }
 
 static int
-decode_select(tcp, args)
+decode_select(tcp, args, bitness)
 struct tcb *tcp;
 long *args;
+int bitness;
 {
 	int i, j, nfds;
 	fd_set fds;
 	struct timeval tv;
+#ifdef ALPHA
+	struct timeval32 {
+		unsigned tv_sec;
+		unsigned tv_usec;
+	} *tv32;
+#endif
 	static char outstr[1024];
 	char *sep;
 	long arg;
@@ -300,11 +307,18 @@ long *args;
 		else if (umove(tcp, args[4], &tv) < 0)
 			tprintf(", {...}");
 		else {
-			tprintf(", {%lu, %lu}",
-				(long) tv.tv_sec, (long) tv.tv_usec);
+#ifdef ALPHA
+			if (bitness) {
+				tv32=(struct timeval32*)&tv;
+				tprintf(", {%u, %u}", tv32.tv_sec, tv32.tv_usec);
+			} else
+#endif
+				tprintf(", {%lu, %lu}",
+					(long) tv.tv_sec, (long) tv.tv_usec);
 		}
 	}
-	else {
+	else
+	{
 		unsigned int cumlen = 0;
 		char *sep = "";
 
@@ -352,11 +366,20 @@ long *args;
 		if (args[4]) {
 			char str[20];
 
-			if (umove(tcp, args[4], &tv) >= 0)
-				sprintf(str, "%sleft {%lu, %lu}", sep,
-					(long) tv.tv_sec, (long) tv.tv_usec);
-			if ((cumlen += strlen(str)) < sizeof(outstr))
-				strcat(outstr, str);
+			if (umove(tcp, args[4], &tv) >= 0) {
+#ifdef ALPHA
+				if (bitness) {
+					tv32=(struct timeval32*)&tv;
+					sprintf(str, "%sleft {%u, %u}", sep,
+						tv32->tv_sec, tv32->tv_usec);
+				} else
+#endif
+					sprintf(str, "%sleft {%lu, %lu}", sep,
+						(long) tv.tv_sec, (long) tv.tv_usec);
+
+				if ((cumlen += strlen(str)) < sizeof(outstr))
+					strcat(outstr, str);
+			}
 		}
 #endif /* LINUX */
 		return RVAL_STR;
@@ -376,8 +399,17 @@ struct tcb *tcp;
 		tprintf("[...]");
 		return 0;
 	}
-	return decode_select(tcp, args);
+	return decode_select(tcp, args, 0);
 }
+
+#ifdef ALPHA
+sys_osf_select(tcp)
+struct tcb *tcp;
+{
+	long *args = tcp->u_arg;
+	return decode_select(tcp, args, 1);
+}
+#endif
 
 #endif /* LINUX */
 
@@ -386,5 +418,5 @@ sys_select(tcp)
 struct tcb *tcp;
 {
 	long *args = tcp->u_arg;
-	return decode_select(tcp, args);
+	return decode_select(tcp, args, 0);
 }
