@@ -237,6 +237,14 @@ const struct xlat openmodes[] = {
 	{ O_DIRECT,	"O_DIRECT"	},
 #endif
 #ifdef O_LARGEFILE
+# if O_LARGEFILE == 0		/* biarch platforms in 64-bit mode */
+#  undef O_LARGEFILE
+#  ifdef SPARC64
+#   define O_LARGEFILE	0x40000
+#  elif defined X86_64 || defined S390X
+#   define O_LARGEFILE	0100000
+#  endif
+# endif
 	{ O_LARGEFILE,	"O_LARGEFILE"   },
 #endif
 #ifdef O_DIRECTORY
