@@ -111,8 +111,10 @@ AM_CONDITIONAL([SUNOS4], [test x$opsys = xsunos4])
 AM_CONDITIONAL([SVR4], [test x$opsys = xsvr4])
 AM_CONDITIONAL([FREEBSD], [test x$opsys = xfreebsd])
 
-CFLAGS="-D_GNU_SOURCE $CFLAGS"
 AC_PROG_CC
+dnl That set the default CFLAGS value, which we don't want to diddle first.
+CFLAGS="-D_GNU_SOURCE $CFLAGS"
+
 AC_INCLUDEDIR
 
 if test "x$opsys" = "xsunos4" && test "x$arch" = "xsparc"
