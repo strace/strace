@@ -1190,18 +1190,22 @@ typedef struct regs arg_setup_state;
 # define get_arg1(tcp, state, valp) (*(valp) = (state)->r_o1, 0)
 # define set_arg0(tcp, state, val) ((state)->r_o0 = (val), 0)
 # define set_arg1(tcp, state, val) ((state)->r_o1 = (val), 0)
+# define restore_arg0(tcp, state, val) 0
 
 #else
 
 # if defined S390 || defined S390X
 #  define arg0_offset	PT_ORIGGPR2
 #  define arg1_offset	PT_GPR2
+#  define restore_arg0(tcp, state, val) 0
+#  define restore_arg1(tcp, state, val) 0
 # elif defined (ALPHA) || defined (MIPS)
 #  define arg0_offset	REG_A0
 #  define arg1_offset	(REG_A0+1)
 # elif defined (POWERPC)
 #  define arg0_offset	(4*PT_R3)
 #  define arg1_offset	(4*PT_R4)
+#  define restore_arg0(tcp, state, val) 0
 # elif defined (HPPA)
 #  define arg0_offset	 PT_GR26
 #  define arg1_offset	 (PT_GR26-4)
@@ -1211,6 +1215,9 @@ typedef struct regs arg_setup_state;
 # else
 #  define arg0_offset	0
 #  define arg1_offset	4
+#  if defined SH || defined ARM
+#   define restore_arg0(tcp, state, val) 0
+#  endif
 # endif
 
 typedef int arg_setup_state;
@@ -1236,6 +1243,12 @@ set_arg1 (struct tcb *tcp, void *cookie, long val)
 
 #endif
 
+#ifndef restore_arg0
+# define restore_arg0(tcp, state, val) set_arg0((tcp), (state), (val))
+#endif
+#ifndef restore_arg1
+# define restore_arg1(tcp, state, val) set_arg1((tcp), (state), (val))
+#endif
 
 int
 setbpt(tcp)
@@ -1295,8 +1308,8 @@ struct tcb *tcp;
 {
 	arg_setup_state state;
 	if (arg_setup (tcp, &state) < 0
-	    || set_arg0 (tcp, &state, tcp->inst[0]) < 0
-	    || set_arg1 (tcp, &state, tcp->inst[1]) < 0
+	    || restore_arg0 (tcp, &state, tcp->inst[0]) < 0
+	    || restore_arg1 (tcp, &state, tcp->inst[1]) < 0
 	    || arg_finish_change (tcp, &state))
 		return -1;
 	tcp->flags &= ~TCB_BPTSET;
