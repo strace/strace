@@ -959,9 +959,9 @@ pfd2tcb(pfd)
 int pfd;
 {
 	int i;
-	struct tcb *tcp;
 
-	for (i = 0, tcp = tcbtab; i < tcbtabsize; i++, tcp++) {
+	for (i = 0; i < tcbtabsize; i++) {
+		struct tcb *tcp = tcbtab[i];
 		if (tcp->pfd != pfd)
 			continue;
 		if (tcp->flags & TCB_INUSE)
@@ -1065,7 +1065,9 @@ struct tcb *tcp;
 int sig;
 {
 	int error = 0;
+#ifdef LINUX
 	int status, resumed;
+#endif
 
 	if (tcp->flags & TCB_BPTSET)
 		sig = SIGKILL;
@@ -1341,7 +1343,6 @@ static void
 rebuild_pollv()
 {
 	int i, j;
-	struct tcb *tcp;
 
 	if (pollv != NULL)
 		free (pollv);
@@ -1351,7 +1352,8 @@ rebuild_pollv()
 		exit(1);
 	}
 
-	for (i = j = 0, tcp = tcbtab; i < tcbtabsize; i++, tcp++) {
+	for (i = j = 0; i < tcbtabsize; i++) {
+		struct tcb *tcp = tcbtab[i];
 		if (!(tcp->flags & TCB_INUSE))
 			continue;
 		pollv[j].fd = tcp->pfd;
