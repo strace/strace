@@ -592,6 +592,17 @@ setarg(tcp, argnum)
 		if (errno)
 			return -1;
 	}
+#elif defined(POWERPC)
+#ifndef PT_ORIG_R3
+#define PT_ORIG_R3 34
+#endif
+	{
+		ptrace(PTRACE_POKEUSER, tcp->pid,
+		       (char*)((argnum==0 ? PT_ORIG_R3 : argnum+PT_R3)*4),
+		       tcp->u_arg[argnum]);
+		if (errno)
+			return -1;
+	}
 #elif defined(MIPS)
 	{
 		errno = 0;
