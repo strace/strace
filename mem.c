@@ -41,6 +41,9 @@
 
 #if defined(LINUX) && defined(I386)
 #include <asm/ldt.h>
+# ifdef HAVE_STRUCT_USER_DESC
+#  define modify_ldt_ldt_s user_desc
+# endif
 #endif
 #if defined(LINUX) && defined(SH64)
 #include <asm/page.h>	    /* for PAGE_SHIFT */

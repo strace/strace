@@ -542,6 +542,9 @@ static struct xlat clone_flags[] = {
 
 # ifdef I386
 #  include <asm/ldt.h>
+#   ifdef HAVE_STRUCT_USER_DESC
+#    define modify_ldt_ldt_s user_desc
+#   endif
 extern void print_ldt_entry();
 # endif
 
