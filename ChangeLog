@@ -1,3 +1,10 @@
+2004-06-22  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c (syscall_fixup) [LINUX && X86_64]: For 32-bit process,
+	sign extend the low 32 bits of RAX to 64 bits.
+
+	* syscall.c (force_result): [LINUX && X86_64]: Fix RAX*4 -> RAX*8.
+
 2004-06-03  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.4.
