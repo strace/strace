@@ -1,5 +1,10 @@
 2003-01-13  Roland McGrath  <roland@redhat.com>
 
+	* config.guess: Update from ftp://ftp.gnu.org/pub/gnu/config/,
+	timestamp 2003-01-10.
+	* config.sub: Likewise, timestamp 2003-01-03.
+	* install-sh: Update from Automake 1.7.2.
+
 	* linux/powerpc/signalent.h: Add SIGRTMIN.
 	From Anton Blanchard <anton@samba.org>.
 
