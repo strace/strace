@@ -1,4 +1,17 @@
+2003-01-23  Roland McGrath  <roland@redhat.com>
+
+	* process.c: Reorder includes to put sys/reg.h before linux/ptrace.h,
+	since they can conflict.
+
 2003-01-21  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (usage): Omit -z, since it has never worked properly.
+	* NEWS: Likewise.
+
+	* strace.c (main): Grok new option `-E var=val' or `-E var' to put
+	var=val in environ or to remove var, respectively.
+	(usage): Mention it.
+	* strace.1, NEWS: Document it.
 
 	* configure.ac, NEWS: Version 4.4.93.
 	* strace.spec, debian/changelog: 4.4.93-1.
