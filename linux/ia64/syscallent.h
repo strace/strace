@@ -1138,7 +1138,7 @@
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"},/* 1232 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 1233 */
 	{ 8,	0,	printargs,		"SYS_1234"	}, /* 1234 */
-	{ 8,	0,	printargs,		"SYS_1235"	}, /* 1235 */
+	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 1235 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 1237 */
 	{ 2,	0,	printargs,		"io_setup"	}, /* 1238 */
