@@ -68,6 +68,14 @@ struct pt_regs;
 #include <asm/cachectl.h>
 #endif
 
+#ifdef HAVE_LINUX_USTNAME_H
+#include <linux/utsname.h>
+#endif
+
+#ifdef HAVE_ASM_SYSMIPS_H
+#include <asm/sysmips.h>
+#endif
+
 #include <linux/sysctl.h>
 
 static struct xlat mount_flags[] = {
@@ -2004,7 +2012,11 @@ struct tcb *tcp;
 
 #ifdef MIPS
 
-static struct xlat_sysmips[] = {
+#ifndef __NEW_UTS_LEN
+#define __NEW_UTS_LEN 64
+#endif
+
+static struct xlat xlat_sysmips[] = {
 	{ SETNAME,		"SETNAME"	},
 	{ FLUSH_CACHE,		"FLUSH_CACHE"	},
 	{ MIPS_FIXADE,		"MIPS_FIXADE"	},

@@ -134,7 +134,7 @@ int sys_osf_utimes();
 #define SYS_recvmsg		(SYS_socket_subcall + 17)
 
 #define SYS_socket_nsubcalls	18
-#endif /* !(ALPHA || IA64 || MIPS) */
+#endif /* !(ALPHA || IA64 || MIPS || HPPA) */
 
 /* sys_ipc subcalls */
 
@@ -161,7 +161,7 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #define SYS_shmctl		(SYS_ipc_subcall + 24)
 
 #define SYS_ipc_nsubcalls	25
-#endif /* !(ALPHA || IA64 || MIPS) */
+#endif /* !(ALPHA || IA64 || MIPS || HPPA) */
 
 #if defined(ALPHA) || defined(IA64)
 int sys_getpagesize();
@@ -176,7 +176,7 @@ int sys_getpmsg(), sys_putpmsg();	/* STREAMS stuff */
 #endif
 
 #ifdef MIPS
-int sys_sysmips()
+int sys_sysmips();
 #endif
 
 int sys_setpgrp(), sys_gethostname(), sys_getdtablesize(), sys_utimes();
