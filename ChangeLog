@@ -1,3 +1,8 @@
+2004-01-13  Roland McGrath  <roland@redhat.com>
+
+	* file.c (direnttypes): Define under [LINUX] as well.  Add DT_UNKNOWN.
+	(sys_getdents64) [LINUX]: Print d_type field.
+
 2003-11-13  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.1.
