@@ -730,11 +730,30 @@ struct tcb *tcp;
 #if defined(S390) || defined(S390X)
 	if (upeek(pid, PT_GPR2, &syscall_mode) < 0)
 		return -1;
-	if (syscall_mode != -ENOSYS){
+	if (syscall_mode != -ENOSYS) {
 		/*
 		 * Since kernel version 2.5.44 the scno gets passed in gpr2.
 		 */
 		scno = syscall_mode;
+	}
+	if (tcp->flags & TCB_WAITEXECVE) {
+		/*
+		 * When the execve system call completes successfully, the
+		 * new process still has -ENOSYS (old style) or __NR_execve
+		 * (new style) in gpr2.  We cannot recover the scno again
+		 * by disassembly, because the image that executed the
+		 * syscall is gone now.  Fortunately, we don't want it.  We
+		 * leave the flag set so that syscall_fixup can fake the
+		 * result.
+		 */
+		if (tcp->flags & TCB_INSYSCALL)
+			return 1;
+		/*
+		 * This is the SIGTRAP after execve.  We cannot try to read
+		 * the system call here either.
+		 */
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
 	else {
 	       	/*
@@ -750,9 +769,12 @@ struct tcb *tcp;
 
 		if (upeek(pid, PT_PSWADDR, &pc) < 0)
 			return -1;
+		errno = 0;
 		opcode = ptrace(PTRACE_PEEKTEXT, pid, (char *)(pc-sizeof(long)), 0);
-		if (errno)
+		if (errno) {
+			perror("peektext(pc-oneword)");
 			return -1;
+		}
 
 		/*
 		 *  We have to check if the SVC got executed directly or via an
@@ -1201,6 +1223,15 @@ struct tcb *tcp;
 		if (debug)
 			fprintf(stderr, "stray syscall exit: gpr2 = %ld\n", gpr2);
 		return 0;
+	}
+	else if (((tcp->flags & (TCB_INSYSCALL|TCB_WAITEXECVE))
+		  == (TCB_INSYSCALL|TCB_WAITEXECVE))
+		 && (gpr2 == -ENOSYS || gpr2 == tcp->scno)) {
+		/*
+		 * Fake a return value of zero.  We leave the TCB_WAITEXECVE
+		 * flag set for the post-execve SIGTRAP to see and reset.
+		 */
+		gpr2 = 0;
 	}
 #elif defined (POWERPC)
 # define SO_MASK 0x10000000
