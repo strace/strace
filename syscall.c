@@ -438,6 +438,12 @@ struct tcb *tcp;
 		return;
 	switch (tcp->scno + NR_SYSCALL_BASE) {
 	case SYS_read:
+#ifdef SYS_pread64
+	case SYS_pread64:
+#endif
+#if defined SYS_pread && SYS_pread64 != SYS_pread
+	case SYS_pread:
+#endif
 #ifdef SYS_recv
 	case SYS_recv:
 #endif
@@ -448,6 +454,12 @@ struct tcb *tcp;
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		break;
 	case SYS_write:
+#ifdef SYS_pwrite64
+	case SYS_pwrite64:
+#endif
+#if defined SYS_pwrite && SYS_pwrite64 != SYS_pwrite
+	case SYS_pwrite:
+#endif
 #ifdef SYS_send
 	case SYS_send:
 #endif
