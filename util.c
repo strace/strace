@@ -55,10 +55,9 @@
 #ifdef HAVE_SYS_REG_H
 #include <sys/reg.h>
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
-#endif
-
-#ifdef HAVE_SYS_PTRACE_H
-#include <sys/ptrace.h>
+#elif defined(HAVE_LINUX_PTRACE_H)
+#undef PTRACE_SYSCALL
+#include <linux/ptrace.h>
 #endif
 
 #ifdef SUNOS4_KERNEL_ARCH_KLUDGE
@@ -942,8 +941,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", eip);
-#else /* !I386K */
-#ifdef IA64
+#elif defined(IA62)
 	long ip;
 
 	if (upeek(tcp->pid, PT_B0, &ip) < 0) {
@@ -951,8 +949,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", ip);
-#else /* !IA64 */
-#ifdef POWERPC
+#elif defined(POWERPC)
 	long pc;
 
 	if (upeek(tcp->pid, 4*PT_NIP, &pc) < 0) {
@@ -960,8 +957,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#else /* !POWERPC */
-#ifdef M68K
+#elif defined(M68k)
 	long pc;
 
 	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0) {
@@ -969,8 +965,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#else /* !M68K */
-#ifdef ALPHA
+#elif defined(ALPHA)
 	long pc;
 
 	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
@@ -978,20 +973,14 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#else /* !ALPHA */
-#ifdef SPARC
+#elif defined(SPARC)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0) {
 		tprintf("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", regs.r_pc);
-#endif /* SPARC */
-#endif /* ALPHA */
-#endif /* !M68K */
-#endif /* !POWERPC */
-#endif /* !IA64 */
-#endif /* !I386 */
+#endif /* !architecture */
 #endif /* LINUX */
 
 #ifdef SUNOS4
@@ -1222,21 +1211,15 @@ struct tcb *tcp;
 {
 
 #ifdef LINUX
-#ifdef I386
+#if defined(I386)
 	long eip;
-#else /* !I386 */
-#ifdef POWERPC
+#elif defined(POWERPC)
 	long pc;
-#else /* !POWERPC */
-#ifdef M68K
+#elif defined(M68K)
 	long pc;
-#else /* !M68K */
-#ifdef ALPHA
+#elif defined(ALPHA)
 	long pc;
-#endif /* ALPHA */
-#endif /* !M68K */
-#endif /* !POWERPC */
-#endif /* !I386 */
+#endif /* architecture */
 
 #ifdef SPARC
 	/* Again, we borrow the SunOS breakpoint code. */
@@ -1251,8 +1234,7 @@ struct tcb *tcp;
 		return -1;
 	}
 	tcp->flags &= ~TCB_BPTSET;
-#else /* !SPARC */
-#ifdef IA64
+#elif defined(IA64)
 	{
 		unsigned long addr, ipsr;
 		pid_t pid;
@@ -1292,7 +1274,7 @@ struct tcb *tcp;
 			return 0;
 		}
 	}
-#else /* !IA64 */
+#else /* !IA64  && ! SPARC */
 
 	if (debug)
 		fprintf(stderr, "[%d] clearing bpt\n", tcp->pid);
@@ -1319,8 +1301,7 @@ struct tcb *tcp;
 					eip, tcp->baddr);
 		return 0;
 	}
-#else /* !I386 */
-#ifdef POWERPC
+#elif defied(POWERPC)
 	if (upeek(tcp->pid, 4*PT_NIP, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
@@ -1330,8 +1311,7 @@ struct tcb *tcp;
 				pc, tcp->baddr);
 		return 0;
 	}
-#else /* !POWERPC */
-#ifdef M68K
+#elif defined(M68K)
 	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
@@ -1341,8 +1321,7 @@ struct tcb *tcp;
 				pc, tcp->baddr);
 		return 0;
 	}
-#else /* !M68K */
-#ifdef ALPHA
+#elif defined(ALPHA)
 	if (upeek(tcp->pid, REG_PC, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
@@ -1352,12 +1331,8 @@ struct tcb *tcp;
 				pc, tcp->baddr);
 		return 0;
 	}
-#endif /* ALPHA */
-#endif /* !M68K */
-#endif /* !POWERPC */
-#endif /* !I386 */
-#endif /* !IA64 */
-#endif /* !SPARC */
+#endif /* arch */
+#endif /* !SPARC && !IA64 */
 #endif /* LINUX */
 
 #ifdef SUNOS4

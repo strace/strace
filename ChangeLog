@@ -1,3 +1,12 @@
+2000-02-19 Wichert Akkerman <wakkerma@debian.org>
+
+  * test/vfork.c: new file to test vfork traces
+  * test/.cvsignore: new file
+  * defs.h: Up maximum number of traced processed to 64
+  * strace.c: Disable some debugging code from davidm 
+  * implement setarg for more architectures
+  * implement change_syscall
+
 1999-12-27  Morten Welinder  <terra@diku.dk>
 
 	* syscall.c (lookup_signal, lookup_desc): isdigit requires an

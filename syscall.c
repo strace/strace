@@ -46,16 +46,14 @@
 #include <asm/reg.h>
 #endif
 
-#if HAVE_LINUX_PTRACE_H
-#undef PTRACE_SYSCALL
-#include <linux/ptrace.h>
-#endif 
-
 #ifdef HAVE_SYS_REG_H
 #include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
 #endif
+#elif defined(HAVE_LINUX_PTRACE_H)
+#undef PTRACE_SYSCALL
+#include <linux/ptrace.h>
 #endif
 
 #if defined(LINUX) && defined(IA64)
@@ -1123,7 +1121,7 @@ struct tcb *tcp;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = *((&regs.r_o0) + i);
 	}
-#else 
+#else /* Other architecture (like i386) (32bits specific) */
 	{
 		int i;
 		tcp->u_nargs = sysent[tcp->scno].nargs;

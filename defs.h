@@ -42,7 +42,7 @@
 #define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
 #endif
 #ifndef MAX_PROCS
-#define MAX_PROCS	32	/* maximum number of processes tracable */
+#define MAX_PROCS	64	/* maximum number of processes tracable */
 #endif
 #ifndef DEFAULT_STRLEN
 #define DEFAULT_STRLEN	32	/* default maximum # of bytes printed in

@@ -254,6 +254,8 @@ struct tcb *tcp;
 #endif /* HAVE_PUTPMSG */
 
 
+#ifdef HAVE_SYS_POLL_H
+
 static struct xlat pollflags[] = {
 #ifdef POLLIN
 	{ POLLIN,	"POLLIN"	},
@@ -284,7 +286,6 @@ struct tcb *tcp;
 {
 	struct pollfd *pollp;
 
-#ifdef HAVE_SYS_POLL_H
 	if (exiting(tcp)) {
 		int i;
 		int nfds = tcp->u_arg[1];
@@ -336,9 +337,17 @@ struct tcb *tcp;
 			tprintf("%ld", tcp->u_arg[2]);
 		free(pollp);
 	}
-#endif
 	return 0;
 }
+
+#else /* !HAVE_SYS_POLL_H */
+int
+sys_poll(tcp)
+struct tcb *tcp;
+{
+    	return 0;
+}
+#endif
 
 #ifndef linux
 

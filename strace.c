@@ -1482,7 +1482,7 @@ trace()
 
 		/* Look up `pid' in our table. */
 		if ((tcp = pid2tcb(pid)) == NULL) {
-#if 1 /* XXX davidm */
+#if 0 /* XXX davidm */ /* WTA: disabled again */
 			struct tcb *tcpchild;
 
 			if ((tcpchild = alloctcb(pid)) == NULL) {

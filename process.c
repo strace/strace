@@ -49,11 +49,6 @@
 #include <machine/reg.h>
 #endif /* SUNOS4 */
 
-#if HAVE_LINUX_PTRACE_H
-#undef PTRACE_SYSCALL
-#include <linux/ptrace.h>
-#endif 
-
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
@@ -62,7 +57,11 @@
 #ifndef PTRACE_POKEUSR
 # define PTRACE_POKEUSR PTRACE_POKEUSER
 #endif
+#elif defined(HAVE_LINUX_PTRACE_H)
+#undef PTRACE_SYSCALL
+#include <linux/ptrace.h>
 #endif
+
 
 #ifdef LINUX
 #include <asm/posix_types.h>
@@ -291,21 +290,6 @@ struct tcb *tcp;
 }
 
 int
-change_syscall(tcp, new)
-struct tcb *tcp;
-int new;
-{
-#if defined(I386) && defined(LINUX)
-	/* Attempt to make vfork into fork, which we can follow. */
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, 
-		   (void *)(ORIG_EAX * 4), new) < 0) 
-		return -1;
-	return 0;
-#endif
-	return -1;
-}
-
-int
 internal_fork(tcp)
 struct tcb *tcp;
 {
@@ -387,6 +371,46 @@ struct tcb *tcp;
 }
 
 int
+change_syscall(tcp, new)
+struct tcb *tcp;
+int new;
+{
+#if defined(LINUX)
+#if defined(I386)
+	/* Attempt to make vfork into fork, which we can follow. */
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0) 
+		return -1;
+	return 0;
+#elif defined(POWERPC)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (CHAR*)(4*PT_R0), new) < 0)
+		return -1;
+#elif defined(S390)
+	long	pc;
+	if (upeek(tcp->pid, PT_PSWADDR,&pc)<0)
+	    	return -1;
+	if (ptrace(PTRACE_POKETEXT, tcp->pid, (char*)(pc-4), new)<0)
+	    	return -1;
+	return 0;
+#elif defined(M68K)
+	if (ptrace(PTRACE_POKEUSER, (char*)(4*PT_ORIG_D0), new)<0)
+	    	return -1;
+	return 0;
+#elif defined(MIPS)
+	if (ptrace(PTRACE_POKEUSER, (char*)(REG_V0), new)<0)
+	    	return -1;
+	return 0;
+#elif defined(ALPHA)
+	if (ptrace(PTRACE_POKEUSER, (char*)(REG_A3), new)<0)
+	    	return -1;
+	return 0;
+#else
+#warning Do not know how to handle change_syscall for this architecture
+#endif /* architecture */
+#endif /* LINUX */
+	return -1;
+}
+
+int
 setarg(tcp, argnum)
 	struct tcb *tcp;
 	int argnum;
@@ -407,14 +431,12 @@ setarg(tcp, argnum)
 	}
 #elif defined(I386)
 	{
-		/* TODO: finish this */
-		errno=0;
-//		ptrace(PTRACE_POKEDATA, tcp->pid, , tcp->u_arg[argnum]);
+		ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*argnum), tcp->u_arg[argnum]);
 		if (errno)
 			return -1;
 	}
 #else
-# error Sorry, not done yet.
+# warning Sorry, setargs not implemented for this architecture.
 #endif
 	return 0;
 }

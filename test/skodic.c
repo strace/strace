@@ -15,7 +15,8 @@
 void
 main(void)
 {
-  char *c = 0x94000000;
+  char *c = (char*)0x94000000;
+  int fd;
   open( "/tmp/delme", O_RDWR );
   mmap( c, 4096, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, 3, 0 );
   *c = 0;
@@ -26,5 +27,6 @@ main(void)
     }
   } else
     while (1)
-      open( c, 0 );
+      if ((fd=open( c, 0 ))!=-1)
+	  close(fd);
 }
