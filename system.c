@@ -2010,6 +2010,7 @@ struct tcb *tcp;
 
 #ifdef HAVE_SYS_NSCSYS_H
 
+struct cred;
 #include <sys/nscsys.h>
 
 static struct xlat ssi_cmd [] = {
@@ -2065,6 +2066,8 @@ struct tcb *tcp;
 	struct ssisys_iovec iov;
 	
 	if (entering (tcp)) {
+		ts_reclaim_child_inargs_t trc;
+		cls_nodeinfo_args_t cni;
 		if (tcp->u_arg[1] != sizeof iov ||
 		    umove (tcp, tcp->u_arg[0], &iov) < 0)
 		{
@@ -2075,7 +2078,22 @@ struct tcb *tcp;
 		printxval(ssi_cmd, iov.tio_id.id_cmd, "SSISYS_???");
 		tprintf (":%d", iov.tio_id.id_ver);
 		switch (iov.tio_id.id_cmd) {
+		    case SSISYS_RECLAIM_CHILD:
+			if (iov.tio_udatainlen != sizeof trc ||
+			    umove (tcp, (long) iov.tio_udatain, &trc) < 0)
+				goto bad;
+			tprintf (", in={pid=%ld, start=%ld}",
+				 trc.trc_pid, trc.trc_start);
+			break;
+		    case SSISYS_CLUSTERNODE_INFO:
+			if (iov.tio_udatainlen != sizeof cni ||
+			    umove (tcp, (long) iov.tio_udatain, &cni) < 0)
+				goto bad;
+			tprintf (", in={node=%ld, len=%d}",
+				 cni.nodenum, cni.info_len);
+			break;
 		    default:
+		    bad:
 			if (iov.tio_udatainlen) {
 				tprintf (", in=[/* %d bytes */]",
 					 iov.tio_udatainlen);
