@@ -1,5 +1,10 @@
 2001-03-06  John Hughes <john@Calva.COM>
 
+  * freebsd/syscalls.pl: fix for FreeBSD 4.1 (new optional field in
+    syscall master file).
+
+2001-03-06  John Hughes <john@Calva.COM>
+
   * syscall.c: fix for FreeBSD 4.1 (SYS_semconfig has disappeared).  Also
     zap incorrect syscall subarg range check.
 
