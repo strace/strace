@@ -1,3 +1,16 @@
+2005-02-28  Andreas Schwab  <schwab@suse.de>
+
+	* syscall.c (getrval2): Move #ifdef IA64 inside #ifdef LINUX.
+
+2005-03-14  Roland McGrath  <roland@redhat.com>
+
+	* linux/mips/syscallent.h: Update various calls.
+	From Thiemo Seufer <ths@networkno.de>.
+	Fixes Debian bug #256684.
+
+	* debian/control (Architecture): Add s390.
+	Fixes Debian bug #294172.
+
 2005-03-06  Roland McGrath  <roland@redhat.com>
 
 	* strace.c (trace) [PTRACE_GETSIGINFO]: Fetch siginfo_t for SIGSEGV
@@ -11,7 +24,7 @@
 
 	* desc.c (decode_select): Calculate size of passed fd_set vectors and
 	copy in the user's size rather than the standard sizeof(fd_set).
-	Fixes Debian bug #65654.
+	Fixes Debian bug #65654, #284290.
 
 	* util.c (printpath, printpathn): Print NULL and don't try any fetch
 	when ADDR is zero.
