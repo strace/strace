@@ -2016,7 +2016,7 @@ struct tcb *tcp;
 #define __NEW_UTS_LEN 64
 #endif
 
-static struct xlat xlat_sysmips[] = {
+static struct xlat sysmips_operations[] = {
 	{ SETNAME,		"SETNAME"	},
 	{ FLUSH_CACHE,		"FLUSH_CACHE"	},
 	{ MIPS_FIXADE,		"MIPS_FIXADE"	},
@@ -2029,21 +2029,21 @@ int sys_sysmips(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		printxval(xlat_sysmips, tcp->u_arg[0], "???");
+		printxval(sysmips_operations, tcp->u_arg[0], "???");
 		if (!verbose(tcp)) {
-			tprintf("%d, %d, %d", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+			tprintf("%ld, %ld, %ld", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		} else if (tcp->u_arg[0]==SETNAME) {
-			char nodename[__NEW_UTS_LEN+1];
-			if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN+1), nodename) < 0)
+			char nodename[__NEW_UTS_LEN + 1];
+			if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN + 1), nodename) < 0)
 				tprintf(", %#lx", tcp->u_arg[1]);
 			else
 				tprintf(", \"%s\"", nodename);
-		} else if (tcp->u_arg[0]==MIPS_ATOMIC_SET) {
-			tprintf(", %#lx, 0x%x", tcp->u_arg[1], tcp->u_arg[2]);
-		} else if (tcp->u_arg[0]==MIPS_FIXADE) {
-			tprintf(", 0x%x", tcp->u_arg[1]);
+		} else if (tcp->u_arg[0] == MIPS_ATOMIC_SET) {
+			tprintf(", %#lx, 0x%lx", tcp->u_arg[1], tcp->u_arg[2]);
+		} else if (tcp->u_arg[0] == MIPS_FIXADE) {
+			tprintf(", 0x%lx", tcp->u_arg[1]);
 		} else {
-			tprintf("%d, %d, %d", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+			tprintf("%ld, %ld, %ld", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		}
 	}
 
