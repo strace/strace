@@ -1042,110 +1042,58 @@ int sig;
 #ifdef LINUX
 	/*
 	 * Linux wrongly insists the child be stopped
-	 * before detaching.  This creates numerous headaches
-	 * as the process we are tracing may be running.
-	 *
-	 * First try to simply detach from the process; if it was
-	 * already stopped, this will succeed and we're done.
-	 *
-	 * Otherwise stop the process by sending it a SIGSTOP
-	 * signal.
-	 *
-	 * Once the process is stopped we have to make sure it
-	 * received the SIGSTOP (it may have received a SIGTRAP or
-	 * other signal).  If it did not receive the SIGSTOP, 
-	 * restart the process and try again. 
-	 *
-	 * Once stopped with a SIGSTOP, we can detach from the
-	 * process via PTRACE_DETACH. 
-	 *
+	 * before detaching.  Arghh.  We go through hoops
+	 * to make a clean break of things.
 	 */
-	
+#if defined(SPARC)
+#undef PTRACE_DETACH
+#define PTRACE_DETACH PTRACE_SUNDETACH
+#endif
 	if ((error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig)) == 0) {
 		/* On a clear day, you can see forever. */
-	} else {
-
+	}
+	else if (errno != ESRCH) {
+		/* Shouldn't happen. */
+		perror("detach: ptrace(PTRACE_DETACH, ...)");
+	}
+	else if (kill(tcp->pid, 0) < 0) {
+		if (errno != ESRCH)
+			perror("detach: checking sanity");
+	}
+	else if (kill(tcp->pid, SIGSTOP) < 0) {
+		if (errno != ESRCH)
+			perror("detach: stopping child");
+	}
+	else {
 		for (;;) {
-			if (kill(tcp->pid, 0) < 0) {
-				if (errno != ESRCH)
-					perror("detach: checking sanity");
-			}
-			else if (kill(tcp->pid, SIGSTOP) < 0) {
-				if (errno != ESRCH)
-				perror("detach: stopping child");
-			}
-	
-			/*
-		 	* At this point the child should be stopped.  Try to
-		 	* wait on it so we can get its stop status.  Use WNOHANG
-		 	* to avoid this wait hanging.
-		 	*/
-			if (waitpid (tcp->pid, &status, (WUNTRACED | WNOHANG)) < 0) {
-				if (errno != ECHILD) {
+			if (waitpid(tcp->pid, &status, 0) < 0) {
+				if (errno != ECHILD)
 					perror("detach: waiting");
-				} else {
-	
-					/*
-				 	* Try again, this time with the __WCLONE
-				 	* flag.  Note we may get notifications
-				 	* for other processes/threads!
-				 	*/
-					errno = 0;
-					while (1) {
-						int x;
-
-						x = waitpid (-1, &status, __WCLONE);
-						if (x == tcp->pid || x < 0 || errno != 0)
-							break;
-					}
-				}
-	
-				if (errno) {
-					perror ("Unable to wait on inferior");
-					return -1;
-				}
+				break;
 			}
-			
-			/*
-		 	* At this point we have wait status for the
-		 	* inferior.  If it did not stop, then all 
-		 	* bets are off.
-		 	*/
 			if (!WIFSTOPPED(status)) {
 				/* Au revoir, mon ami. */
 				break;
 			}
-	
-			/*
-		 	* If the process/thread has stopped with a
-		 	* SIGSTOP, then we can continue and detach
-		 	* with PTRACE_DETACH.
-		 	*/
 			if (WSTOPSIG(status) == SIGSTOP) {
 				if ((error = ptrace(PTRACE_DETACH,
-			    	tcp->pid, (char *) 1, sig)) < 0) {
+				    tcp->pid, (char *) 1, sig)) < 0) {
 					if (errno != ESRCH)
 						perror("detach: ptrace(PTRACE_DETACH, ...)");
 					/* I died trying. */
 				}
 				break;
 			}
-	
-			/*
-		 	* The process/thread did not stop with a SIGSTOP,
-		 	* so let it continue and try again to stop it with
-		 	* a SIGSTOP.
-		 	*/
 			if ((error = ptrace(PTRACE_CONT, tcp->pid, (char *) 1,
-		    	WSTOPSIG(status) == SIGTRAP ?
-		    	0 : WSTOPSIG(status))) < 0) {
+			    WSTOPSIG(status) == SIGTRAP ?
+			    0 : WSTOPSIG(status))) < 0) {
 				if (errno != ESRCH)
 					perror("detach: ptrace(PTRACE_CONT, ...)");
 				break;
 			}
 		}
 	}
-#endif
+#endif /* LINUX */
 
 #if defined(SUNOS4)
 	/* PTRACE_DETACH won't respect `sig' argument, so we post it here. */
