@@ -326,6 +326,9 @@ extern int sys_xsetsockaddr ();
 extern int sys_xgetsockopt ();
 extern int sys_xsetsockopt ();
 extern int sys_xshutdown ();
+extern int sys_rfork ();
+extern int sys_ssisys ();
+extern int sys_rexecve ();
 #endif
 #endif /* !MIPS */
 

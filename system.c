@@ -2008,6 +2008,95 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef HAVE_SYS_NSCSYS_H
+
+#include <sys/nscsys.h>
+
+static struct xlat ssi_cmd [] = {
+	{ SSISYS_BADOP,	"SSISYS_BADOP"	},
+	{ SSISYS_LDLVL_INIT,"SSISYS_LDLVL_INIT"},
+	{ SSISYS_LDLVL_GETVEC,"SSISYS_LDLVL_GETVEC"},
+	{ SSISYS_LDLVL_PUTVEC,"SSISYS_LDLVL_PUTVEC"},
+	{ SSISYS_LDLVL_PUTRCMDS,"SSISYS_LDLVL_PUTRCMDS"},
+	{ SSISYS_LDLVL_SETREXEC,"SSISYS_LDLVL_SETREXEC"},
+	{ SSISYS_CMS_CLUSTERID,"SSISYS_CMS_CLUSTERID"},
+	{ SSISYS_CFS_STATVFS,"SSISYS_CFS_STATVFS"},
+	{ SSISYS_NODE_GETNUM,"SSISYS_NODE_GETNUM"},
+	{ SSISYS_NODE_TABLE,"SSISYS_NODE_TABLE"},
+	{ SSISYS_NODE_DOWN,"SSISYS_NODE_DOWN"},
+	{ SSISYS_RECLAIM_CHILD,"SSISYS_RECLAIM_CHILD"},
+	{ SSISYS_IPC_GETINFO,"SSISYS_IPC_GETINFO"},
+	{ SSISYS_ICS_TEST,"SSISYS_ICS_TEST"},
+	{ SSISYS_NODE_PID,"SSISYS_NODE_PID"},
+	{ SSISYS_ISLOCAL,"SSISYS_ISLOCAL"},
+	{ SSISYS_CFS_ISSTACKED,"SSISYS_CFS_ISSTACKED"},
+	{ SSISYS_DNET_SYNC,"SSISYS_DNET_SYNC"},
+	{ SSISYS_CFS_WAIT_MODE,"SSISYS_CFS_WAIT_MODE"},
+	{ SSISYS_CFS_UMOUNT,"SSISYS_CFS_UMOUNT"},
+	{ SSISYS_LLSTAT,"SSISYS_LLSTAT"	},
+	{ SSISYS_LTS_PERFTEST,"SSISYS_LTS_PERFTEST"},
+	{ SSISYS_LTS_CONFIG,"SSISYS_LTS_CONFIG"},
+	{ SSISYS_SNET_PERFTEST,"SSISYS_SNET_PERFTEST"},
+	{ SSISYS_IGNORE_HALFUP,"SSISYS_IGNORE_HALFUP"},
+	{ SSISYS_NODE_ROOTDEV,"SSISYS_NODE_ROOTDEV"},
+	{ SSISYS_GET_PRIMARY,"SSISYS_GET_PRIMARY"},
+	{ SSISYS_GET_SECONDARY,"SSISYS_GET_SECONDARY"},
+	{ SSISYS_GET_ROOTDISK,"SSISYS_GET_ROOTDISK"},
+	{ SSISYS_CLUSTERNODE_NUM,"SSISYS_CLUSTERNODE_NUM"},
+	{ SSISYS_CLUSTER_MEMBERSHIP,"SSISYS_CLUSTER_MEMBERSHIP"},
+	{ SSISYS_CLUSTER_DETAILEDTRANS,"SSISYS_CLUSTER_DETAILEDTRANS"},
+	{ SSISYS_CLUSTERNODE_INFO,"SSISYS_CLUSTERNODE_INFO"},
+	{ SSISYS_CLUSTERNODE_SETINFO,"SSISYS_CLUSTERNODE_SETINFO"},
+	{ SSISYS_CLUSTERNODE_AVAIL,"SSISYS_CLUSTERNODE_AVAIL"},
+	{ SSISYS_CLUSTER_MAXNODES,"SSISYS_CLUSTER_MAXNODES"},
+	{ SSISYS_SET_MEMPRIO,"SSISYS_SET_MEMPRIO"},
+	{ SSISYS_GET_USERS,"SSISYS_GET_USERS"},
+	{ SSISYS_FORCE_ROOT_NODE,"SSISYS_FORCE_ROOT_NODE"},
+	{ SSISYS_CVIP_SET,"SSISYS_CVIP_SET"},
+	{ SSISYS_CVIP_GET,"SSISYS_CVIP_GET"},
+	{ SSISYS_GET_NODE_COUNTS,"SSISYS_GET_NODE_COUNTS"},
+	{ SSISYS_GET_TRANSPORT,"SSISYS_GET_TRANSPORT"},
+	{ 0,		NULL		},
+};
+
+int sys_ssisys (tcp)
+struct tcb *tcp;
+{
+	struct ssisys_iovec iov;
+	
+	if (entering (tcp)) {
+		if (tcp->u_arg[1] != sizeof iov ||
+		    umove (tcp, tcp->u_arg[0], &iov) < 0)
+		{
+			tprintf ("%#lx, %ld", tcp->u_arg[0], tcp->u_arg[1]);
+			return 0;
+		}
+		tprintf ("{id=");
+		printxval(ssi_cmd, iov.tio_id.id_cmd, "SSISYS_???");
+		tprintf (":%d", iov.tio_id.id_ver);
+		switch (iov.tio_id.id_cmd) {
+		    default:
+			if (iov.tio_udatainlen) {
+				tprintf (", in=[/* %d bytes */]",
+					 iov.tio_udatainlen);
+			}
+		}
+	}
+	else {
+		switch (iov.tio_id.id_cmd) {
+		    default:
+			if (iov.tio_udataoutlen) {
+				tprintf (", out=[/* %d bytes */]",
+					 iov.tio_udataoutlen);
+			}
+		}
+		tprintf ("}, %ld", tcp->u_arg[1]);
+	}
+	return 0;
+}
+
+#endif
+
 #endif /* UNIXWARE > 2 */
 
 #ifdef MIPS

@@ -1,3 +1,13 @@
+2001-04-18  John Hughes <john@Calva.COM>
+
+  * configure.in: test for sys/nscsys.h, the non-stop clusters includes.
+  * process.c: handle rfork{1,all} and rexecve calls on non-stop clusters.
+  * syscall.c: treat rfork{1,all} and fork{1,all} as fork like calls.
+    Treat rexecve as an exec.
+  * system.c: decode arguments to ssisys call on nsc systems.
+  * svr4/dummy.h, svr4/syscall.h: now we handle rfork{1,all}, ssisys and
+    rexecve calls.
+
 2001-04-12  Wichert Akkerman <wakkerma@debian.org>
 
   * process.c: fix cast for powerpc code

@@ -366,6 +366,26 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if UNIXWARE > 2
+
+int
+sys_rfork(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf ("%ld", tcp->u_arg[0]);
+	}
+	else {
+		if (getrval2(tcp)) {
+			tcp->auxstr = "child process";
+			return RVAL_UDECIMAL | RVAL_STR;
+		}
+	}
+	return 0;
+}
+
+#endif
+
 int
 internal_fork(tcp)
 struct tcb *tcp;
@@ -1184,6 +1204,20 @@ struct tcb *tcp;
 #endif /* LINUX */
 	return 0;
 }
+
+#if UNIXWARE > 2
+
+int sys_rexecve(tcp)
+struct tcb *tcp;
+{
+	if (entering (tcp)) {
+		sys_execve (tcp);
+		tprintf (", %ld", tcp->u_arg[3]);
+	}
+	return 0;
+}
+
+#endif
 
 int
 internal_exec(tcp)

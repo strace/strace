@@ -578,6 +578,18 @@ struct tcb *tcp;
 #ifdef SYS_vfork
 	case SYS_vfork:
 #endif
+#ifdef SYS_fork1
+	case SYS_fork1:
+#endif
+#ifdef SYS_forkall
+	case SYS_forkall:
+#endif
+#ifdef SYS_rfork1
+	case SYS_rfork1:
+#endif
+#ifdef SYS_rforkall
+	case SYS_rforkall:
+#endif
 		internal_fork(tcp);
 		break;
 #ifdef SYS_clone
@@ -590,6 +602,9 @@ struct tcb *tcp;
 #endif
 #ifdef SYS_execve
 	case SYS_execve:
+#endif
+#ifdef SYS_rexecve
+	case SYS_rexecve:
 #endif
 		internal_exec(tcp);
 		break;
@@ -879,6 +894,18 @@ struct tcb *tcp;
 #ifdef SYS_vfork
 			    || scno == SYS_vfork
 #endif /* SYS_vfork */
+#ifdef SYS_fork1
+			    || scno == SYS_fork1
+#endif /* SYS_fork1 */
+#ifdef SYS_forkall
+			    || scno == SYS_forkall
+#endif /* SYS_forkall */
+#ifdef SYS_rfork1
+			    || scno == SYS_rfork1
+#endif /* SYS_fork1 */
+#ifdef SYS_rforkall
+			    || scno == SYS_rforkall
+#endif /* SYS_rforkall */
 			    ) {
 				/* We are returning in the child, fake it. */
 				tcp->status.PR_WHY = PR_SYSENTRY;

@@ -185,12 +185,8 @@
 #define sys_xsetsockaddr printargs
 #define sys_dshmsys printargs
 #define sys_invlpg printargs
-#define sys_rfork1 printargs
-#define sys_rforkall printargs
-#define sys_rexecve printargs
 #define sys_migrate printargs
 #define sys_kill3 printargs
-#define sys_ssisys printargs
 #define sys_xbindresvport printargs
 #define sys_lwp_sema_trywait printargs
 #define sys_tsolsys printargs
@@ -235,6 +231,13 @@
 #define sys_sleep sys_alarm
 #define sys_fork1 sys_fork
 #define sys_forkall sys_fork
+#if UNIXWARE > 2
+#define sys_rfork1 sys_rfork
+#define sys_rforkall sys_rfork
+#ifndef HAVE_SYS_NSCSYS_H
+#define sys_ssisys printargs
+#endif
+#endif
 
 /* aio */
 #define sys_aionotify printargs
