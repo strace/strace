@@ -1820,7 +1820,7 @@ int status;
 	if (status == 0)
 		tprintf("]");
 	else
-		tprintf("| %#x]", status);
+		tprintf(" | %#x]", status);
 
 	return exited;
 }
