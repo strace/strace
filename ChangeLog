@@ -1,3 +1,9 @@
+Tue Jun 22 17:26:33 CEST 1999
+
+  * Fixed some Linux/powerpc sillyness, thanks to Daniel Jacobowitz
+  * Fixed some SunOS compile problems earlier that I forgot to include
+    here
+
 Mon Jun 14 12:44:25 CEST 1999
 
   * Avoid leakint fd into child when forking, patch from

@@ -135,7 +135,8 @@ int nerrnos;
 int current_personality;
 
 int
-set_personality(int personality)
+set_personality(personality)
+int personality;
 {
 	switch (personality) {
 	case 0:
@@ -419,7 +420,8 @@ const int socket_map [] = {
 };
 
 void
-sparc_socket_decode (struct tcb *tcp)
+sparc_socket_decode (tcp)
+struct tcb *tcp;
 {
 	volatile long addr;
 	volatile int i, n;

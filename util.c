@@ -1092,7 +1092,7 @@ struct tcb *tcp;
 #ifdef SUNOS4
 #ifdef SPARC	/* This code is slightly sparc specific */
 
-	struct pt_regs regs;
+	struct regs regs;
 #define BPT	0x91d02001	/* ta	1 */
 #define LOOP	0x10800000	/* ba	0 */
 #define LOOPA	0x30800000	/* ba,a	0 */
@@ -1247,7 +1247,7 @@ struct tcb *tcp;
 #ifdef SPARC
 
 #if !LOOPA
-	struct pt_regs regs;
+	struct regs regs;
 #endif
 
 	if (!(tcp->flags & TCB_BPTSET)) {

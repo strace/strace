@@ -148,11 +148,11 @@ struct tcb *tcp;
 #endif /* !LINUX */
 
 	if (entering(tcp)) {
-#if defined(LINUX) && !defined(ALPHA) && !defined(sparc) || defined(POWERPC)
+#if defined(LINUX) && !defined(ALPHA) && !defined(sparc) && !defined(POWERPC)
 		if (umoven(tcp, tcp->u_arg[0], sizeof u_arg,
 				(char *) u_arg) == -1)
 			return 0;
-#endif /* LINUX && !ALPHA && !sparc && !powerpc*/
+#endif /* LINUX && !ALPHA && !sparc && !POWERPC */
 
 		/* addr */
 		if (!u_arg[0])
