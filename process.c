@@ -1447,8 +1447,14 @@ struct tcb *tcp;
 }
 
 #ifdef LINUX
+#ifndef __WNOTHREAD
+#define __WNOTHREAD	0x20000000
+#endif
+#ifndef __WALL
+#define __WALL		0x40000000
+#endif
 #ifndef __WCLONE
-#define __WCLONE	0x8000000
+#define __WCLONE	0x80000000
 #endif
 #endif /* LINUX */
 
@@ -1474,6 +1480,12 @@ static struct xlat wait4_options[] = {
 #endif
 #ifdef __WCLONE
 	{ __WCLONE,	"__WCLONE"	},
+#endif
+#ifdef __WALL
+	{ __WALL,	"__WALL"	},
+#endif
+#ifdef __WNOTHREAD
+	{ __WNOTHREAD,	"__WNOTHREAD"	},
 #endif
 	{ 0,		NULL		},
 };
