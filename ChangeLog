@@ -1,5 +1,20 @@
 2003-05-22  Roland McGrath  <roland@redhat.com>
 
+	* linux/s390/syscallent.h: Fix sys_clone argument count.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+
+	* process.c [LINUX] [S390 || S390X] (ARG_CTID, ARG_TLS): Fix swapped
+	indices.  Reported by Jakub Jelinek <jakub@redhat.com>.
+
+	* signal.c [LINUX] (SI_SIGIO, SI_TKILL): New macros.
+	[LINUX || SVR4] (siginfo_codes): Add strings for them.
+
 	* process.c (print_affinitylist): Fix loop condition.
 	Reported by Ian Wienand <ianw@gelato.unsw.edu.au>.
 
