@@ -1,5 +1,23 @@
 2005-02-01  Roland McGrath  <roland@redhat.com>
 
+	* process.c [LINUX] [X86_64] (sys_arch_prctl): New function.
+	* linux/syscall.h: Declare it.
+	* linux/x86_64/syscallent.h: Use it.
+	Part of RH#142667.
+
+	* process.c (sys_sched_setscheduler): Use %#lx format for bad pointer.
+	(sys_sched_getparam, sys_sched_setparam): Likewise.
+	Part of RH#142667.
+
+	* signal.c [HAVE_SIGACTION] [LINUX && X86_64] (SA_RESTORER): Define
+	here too.
+	Part of RH#142667.
+
+	* linux/syscallent.h: Use sys_mincore instead of printargs.
+	* linux/x86_64/syscallent.h: Likewise.  Also use sys_getrlimit,
+	sys_semtimedop, sys_umount2.
+	Part of RH#142667.
+
 	* syscall.c (qual_signal): Fix inverted return value and bogus
 	argument to qualify_one in the named case.
 
