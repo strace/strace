@@ -1,3 +1,10 @@
+2004-09-15  Roland McGrath  <roland@redhat.com>
+
+	* linux/x86_64/syscallent.h: Use sys_waitid.
+
+	* linux/syscallent.h: waitid takes 5 arguments, and is in TP category.
+	* process.c (sys_waitid): Handle fifth argument (struct rusage *).
+
 2004-09-11  Roland McGrath  <roland@redhat.com>
 
 	* time.c (sys_clock_nanosleep): Print zero flags arg correctly.
