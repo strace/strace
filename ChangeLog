@@ -4,6 +4,7 @@
      pid of the child before it starts doing something
   *  file.c: rename dirent64 struct to kernel_dirent64 so things compile
      again with newer libcs
+  *  test/clone.c: improve our testcase a bit
 
 2000-09-01  Wichert Akkerman <wakkerma@debian.org>
 
