@@ -1444,6 +1444,172 @@ struct tcb *tcp;
 	return 1;
 }
 
+int
+force_result(tcp, error, rval)
+	struct tcb *tcp;
+	int error;
+	long rval;
+{
+#ifdef LINUX
+#if defined(S390) || defined(S390X)
+	gpr2 = error ? -error : rval;
+	if (upeek(pid, PT_GPR2, &gpr2) < 0)
+		return -1;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)PT_GPR2, gpr2) < 0)
+		return -1;
+#else /* !S390 && !S390X */
+#ifdef I386
+	eax = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(EAX * 4), eax) < 0)
+		return -1;
+#else /* !I386 */
+#ifdef X86_64
+	rax = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(RAX * 4), rax) < 0)
+		return -1;
+#else
+#ifdef IA64
+	if (ia32) {
+		r8 = error ? -error : rval;
+		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R8), r8) < 0)
+			return -1;
+	}
+	else {
+		if (error) {
+			r8 = error;
+			r10 = -1;
+		}
+		else {
+			r8 = rval;
+			r10 = 0;
+		}
+		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R8), r8) < 0 ||
+		    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R10), r10) < 0)
+			return -1;
+	}
+#else /* !IA64 */
+#ifdef MIPS
+	if (error) {
+		r2 = error;
+		a3 = -1;
+	}
+	else {
+		r2 = rval;
+		a3 = 0;
+	}
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), a3) < 0 ||
+	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), r2) < 0)
+	    	return -1;
+#else
+#ifdef POWERPC
+	if (upeek(tcp->pid, 4*PT_CCR, &flags) < 0)
+		return -1;
+	if (error) {
+		flags |= SO_MASK;
+		result = error;
+	}
+	else {
+		flags &= ~SO_MASK;
+		result = rval;
+	}
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_CCR), flags) < 0 ||
+	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R3), result) < 0)
+		return -1;
+#else /* !POWERPC */
+#ifdef M68K
+	d0 = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_D0), d0) < 0)
+		return -1;
+#else /* !M68K */
+#ifdef ARM
+	r0 = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*0), r0) < 0)
+		return -1;
+#else /* !ARM */
+#ifdef ALPHA
+	if (error) {
+		a3 = -1;
+		r0 = error;
+	}
+	else {
+		a3 = 0;
+		r0 = rval;
+	}
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), a3) < 0 ||
+	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_R0), r0) < 0)
+		return -1;
+#else /* !ALPHA */
+#ifdef SPARC
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
+		return -1;
+	if (error) {
+		regs.r_psr |= PSR_C;
+		regs.r_o0 = error;
+	}
+	else {
+		regs.r_psr &= ~PSR_C;
+		regs.r_o0 = rval;
+	}
+	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0)
+		return -1;
+#else /* !SPARC */
+#ifdef HPPA
+	r28 = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR28), r28) < 0)
+		return -1;
+#else
+#ifdef SH
+	r0 = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*REG_REG0), r0) < 0)
+		return -1;
+#endif /* SH */
+#endif /* HPPA */
+#endif /* SPARC */
+#endif /* ALPHA */
+#endif /* ARM */
+#endif /* M68K */
+#endif /* POWERPC */
+#endif /* MIPS */
+#endif /* IA64 */
+#endif /* X86_64 */
+#endif /* I386 */
+#endif /* S390 || S390X */
+#endif /* LINUX */
+#ifdef SUNOS4
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_error),
+		   error << 24) < 0 ||
+	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_rval1), rval) < 0)
+		return -1;
+#endif /* SUNOS4 */
+#ifdef SVR4
+	/* XXX no clue */
+	return -1;
+#endif /* SVR4 */
+#ifdef FREEBSD
+	if (pread(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
+	        perror("pread");
+                return -1;
+        }
+	if (error) {
+		regs.r_eflags |= PSL_C;
+		regs.r_eax = error;
+	}
+	else {
+		regs.r_eflags &= ~PSL_C;
+		regs.r_eax = rval;
+	}
+	if (pwrite(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
+	        perror("pwrite");
+                return -1;
+        }
+#endif /* FREEBSD */
+
+	/* All branches reach here on success (only).  */
+	tcp->u_error = error;
+	tcp->u_rval = rval;
+	return 0;
+}
+
 int syscall_enter(tcp)
 struct tcb *tcp;
 {
@@ -1763,8 +1929,6 @@ struct tcb *tcp;
 		res = get_error(tcp);
 		if (res != 1)
 			return res;
-		u_error = tcp->u_error;
-
 
 		internal_syscall(tcp);
 		if (tcp->scno >= 0 && tcp->scno < nsyscalls &&

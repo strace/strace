@@ -1592,13 +1592,34 @@ int
 internal_wait(tcp)
 struct tcb *tcp;
 {
-	if (entering(tcp)) {
-		/* WTA: fix bug with hanging children */
-		if (!(tcp->u_arg[2] & WNOHANG) && tcp->nchildren > 0) {
+	if (entering(tcp) && tcp->nchildren > 0) {
+		/* There are children that this parent should block for.
+		   But ptrace made us the parent of the traced children
+		   and the real parent will get ECHILD from the wait call.
+
+		   XXX If we attached with strace -f -p PID, then there
+		   may be untraced dead children the parent could be reaping
+		   now, but we make him block.  */
+
+		/* ??? WTA: fix bug with hanging children */
+
+		if (!(tcp->u_arg[2] & WNOHANG)) {
 			/* There are traced children */
 			tcp->flags |= TCB_SUSPENDED;
 			tcp->waitpid = tcp->u_arg[0];
 		}
+	}
+	if (exiting(tcp) && tcp->u_error == ECHILD && tcp->nchildren > 0) {
+		if (tcp->u_arg[2] & WNOHANG) {
+			/* We must force a fake result of 0 instead of
+			   the ECHILD error.  */
+			extern int force_result();
+			return force_result(tcp, 0, 0);
+		}
+		else
+			fprintf(stderr,
+				"internal_wait: should not have resumed %d\n",
+				tcp->pid);
 	}
 	return 0;
 }
