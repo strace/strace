@@ -1,5 +1,25 @@
 2002-05-23  John Hughes <john@calva.com>
 
+	* acconfig.h: Add HAVE_OPTHDR and HAVE_T_OPTHDR defines.
+
+	* aclocal.m4: Add tests for struct opthdr in sys/socket.h and
+	struct t_opthdr in sys/tiuser.h, define HAVE_OPTHDR and HAVE_T_OPTHDR
+	if found.
+
+	* configure.in: use tests for struct opthdr and struct t_opthdr.
+
+	* defs.h: add new function print_sock_optmgmt.
+
+	* io.c: add hack that lets ioctl decode functions set auxilliary
+	string return.
+
+	* stream.c: better decoding for timod ioctls.
+
+	* net.c: add function print_sock_optmgmt, used by timod ioctl
+	decoding functions in stream.c.
+
+2002-05-23  John Hughes <john@calva.com>
+
 	* acconfig.h: Make autoheader happy about Linux/SuperH
 
 2002-05-23  John Hughes <john@calva.com>

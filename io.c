@@ -332,8 +332,11 @@ struct tcb *tcp;
 		ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
 	else {
-		if (ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]) == 0)
+		int ret;
+		if (!(ret = ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2])))
 			tprintf(", %#lx", tcp->u_arg[2]);
+		else
+			return ret - 1;
 	}
 	return 0;
 }

@@ -116,3 +116,9 @@
 
 /* Define if have little endiang long long */
 #undef HAVE_LITTLE_ENDIAN_LONG_LONG
+
+/* Define if sys/socket.h defines the struct opthdr.  */
+#undef HAVE_OPTHDR
+
+/* Define if sys/tiuser.h defines the struct t_opthdr.  */
+#undef HAVE_T_OPTHDR

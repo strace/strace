@@ -524,3 +524,34 @@ then
 fi
 ])
 
+dnl ### A macro to determine if we have struct opthdr in sys/socket.h
+AC_DEFUN(AC_STRUCT_OPTHDR,
+[AC_MSG_CHECKING(for struct opthdr in sys/socket.h)
+AC_CACHE_VAL(ac_cv_struct_opthdr,
+[AC_TRY_COMPILE([#include <sys/socket.h>],
+[struct opthdr fred;
+&fred;],
+ac_cv_struct_opthdr=yes,
+ac_cv_struct_opthdr=no)])
+AC_MSG_RESULT($ac_cv_struct_opthdr)
+if test "$ac_cv_struct_opthdr" = yes
+then
+	AC_DEFINE(HAVE_OPTHDR)
+fi
+])
+
+dnl ### A macro to determine if we have struct t_opthdr in sys/tiuser.h
+AC_DEFUN(AC_STRUCT_T_OPTHDR,
+[AC_MSG_CHECKING(for struct t_opthdr in sys/tiuser.h)
+AC_CACHE_VAL(ac_cv_struct_t_opthdr,
+[AC_TRY_COMPILE([#include <sys/tiuser.h>],
+[struct t_opthdr fred;
+&fred;],
+ac_cv_struct_t_opthdr=yes,
+ac_cv_struct_t_opthdr=no)])
+AC_MSG_RESULT($ac_cv_struct_t_opthdr)
+if test "$ac_cv_struct_t_opthdr" = yes
+then
+	AC_DEFINE(HAVE_T_OPTHDR)
+fi
+])

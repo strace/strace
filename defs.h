@@ -393,6 +393,7 @@ extern void printtv P((struct tcb *, long));
 extern void printsiginfo P((siginfo_t *, int));
 #endif
 extern void printsock P((struct tcb *, long, int));
+extern void print_sock_optmgmt P((struct tcb *, long, int));
 extern void printrusage P((struct tcb *, long));
 extern int clearbpt P((struct tcb *));
 extern int setbpt P((struct tcb *));

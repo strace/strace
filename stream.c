@@ -460,23 +460,462 @@ static struct xlat transport_user_options[] = {
 	{ 0,		NULL		},
 };
 
-static struct xlat transport_provider_options[] = {
-	{ T_CONN_IND,	"T_CONN_IND"	},
-	{ T_CONN_CON,	"T_CONN_CON"	},
-	{ T_DISCON_IND,	"T_DISCON_IND"	},
-	{ T_DATA_IND,	"T_DATA_IND"	},
-	{ T_EXDATA_IND,	"T_EXDATA_IND"	},
-	{ T_INFO_ACK,	"T_INFO_ACK"	},
-	{ T_BIND_ACK,	"T_BIND_ACK"	},
-	{ T_ERROR_ACK,	"T_ERROR_ACK"	},
-	{ T_OK_ACK,	"T_OK_ACK"	},
-	{ T_UNITDATA_IND,"T_UNITDATA_IND"},
-	{ T_UDERROR_IND,"T_UDERROR_IND"	},
-	{ T_OPTMGMT_ACK,"T_OPTMGMT_ACK"	},
-	{ T_ORDREL_IND,	"T_ORDREL_IND"	},
+static struct xlat transport_user_flags [] = {
+	{ 0,		"0"		},
+	{ T_MORE,	"T_MORE"	},
+	{ T_EXPEDITED,	"T_EXPEDITED"	},
+	{ T_NEGOTIATE,	"T_NEGOTIATE"	},
+	{ T_CHECK,	"T_CHECK"	},
+	{ T_DEFAULT,	"T_DEFAULT"	},
+	{ T_SUCCESS,	"T_SUCCESS"	},
+	{ T_FAILURE,	"T_FAILURE"	},
+	{ T_CURRENT,	"T_CURRENT"	},
+	{ T_PARTSUCCESS,"T_PARTSUCCESS"	},
+	{ T_READONLY,	"T_READONLY"	},
+	{ T_NOTSUPPORT,	"T_NOTSUPPORT"	},
 	{ 0,		NULL		},
 };
+
+
+#ifdef HAVE_T_OPTHDR
+
+static struct xlat xti_level [] = {
+	{ XTI_GENERIC,	"XTI_GENERIC"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat xti_generic [] = {
+	{ XTI_DEBUG,	"XTI_DEBUG"	},
+	{ XTI_LINGER,	"XTI_LINGER"	},
+	{ XTI_RCVBUF,	"XTI_RCVBUF"	},
+	{ XTI_RCVLOWAT,	"XTI_RCVLOWAT"	},
+	{ XTI_SNDBUF,	"XTI_SNDBUF"	},
+	{ XTI_SNDLOWAT,	"XTI_SNDLOWAT"	},
+	{ 0,		NULL		},
+};
+
+
+
+void
+print_xti_optmgmt (tcp, addr, len)
+struct tcb *tcp;
+long addr;
+int len;
+{
+	int c = 0;
+	struct t_opthdr hdr;
+
+	while (len >= sizeof hdr) {
+		if (umove(tcp, addr, &hdr) < 0) break;
+		if (c++) {
+			tprintf (", ");
+		}
+		else if (len > hdr.len + sizeof hdr) {
+			tprintf ("[");
+		}
+		tprintf ("{level=");
+		printxval (xti_level, hdr.level, "???");
+		tprintf (", name=");
+		switch (hdr.level) {
+		    case XTI_GENERIC:
+			printxval (xti_generic, hdr.name, "XTI_???");
+			break;
+		    default:
+			tprintf ("%ld", hdr.name);
+			break;
+		}
+		tprintf (", status=");
+		printxval (transport_user_flags,  hdr.status, "T_???");
+		addr += sizeof hdr;
+		len -= sizeof hdr;
+		if ((hdr.len -= sizeof hdr) > 0) {
+			if (hdr.len > len) break;
+			tprintf (", val=");
+			if (len == sizeof (int))
+				printnum (tcp, addr, "%d");
+			else
+				printstr (tcp, addr, hdr.len);
+			addr += hdr.len;
+			len -= hdr.len;
+		}
+		tprintf ("}");
+	}
+	if (len > 0) {
+		if (c++) tprintf (", ");
+		printstr (tcp, addr, len);
+	}
+	if (c > 1) tprintf ("]");
+}
+
+#endif
+
+
+static void
+print_optmgmt (tcp, addr, len)
+struct tcb *tcp;
+long addr;
+int len;
+{
+	/* We don't know how to tell if TLI (socket) or XTI 
+	   optmgmt is being used yet, assume TLI. */
+#if defined (HAVE_OPTHDR)
+	print_sock_optmgmt (tcp, addr, len);
+#elif defined (HAVE_T_OPTHDR)
+	print_xti_optmgmt (tcp, addr, len);
+#else
+	printstr (tcp, addr, len);
+#endif
+}
+
+
+
+
+static struct xlat service_type [] = {
+	{ T_COTS,	"T_COTS"	},
+	{ T_COTS_ORD,	"T_COTS_ORD"	},
+	{ T_CLTS,	"T_CLTS"	},
+	{ 0,		NULL		},
+};
+
+static struct xlat ts_state [] = {
+	{ TS_UNBND,	"TS_UNBND"	},
+	{ TS_WACK_BREQ,	"TS_WACK_BREQ"	},
+	{ TS_WACK_UREQ,	"TS_WACK_UREQ"	},
+	{ TS_IDLE,	"TS_IDLE"	},
+	{ TS_WACK_OPTREQ,"TS_WACK_OPTREQ"},
+	{ TS_WACK_CREQ,	"TS_WACK_CREQ"	},
+	{ TS_WCON_CREQ,	"TS_WCON_CREQ"	},
+	{ TS_WRES_CIND,	"TS_WRES_CIND"	},
+	{ TS_WACK_CRES,	"TS_WACK_CRES"	},
+	{ TS_DATA_XFER,	"TS_DATA_XFER"	},
+	{ TS_WIND_ORDREL,"TS_WIND_ORDREL"},
+	{ TS_WREQ_ORDREL,"TS_WREQ_ORDREL"},
+	{ TS_WACK_DREQ6,"TS_WACK_DREQ6"	},
+	{ TS_WACK_DREQ7,"TS_WACK_DREQ7"	},
+	{ TS_WACK_DREQ9,"TS_WACK_DREQ9"	},
+	{ TS_WACK_DREQ10,"TS_WACK_DREQ10"},
+	{ TS_WACK_DREQ11,"TS_WACK_DREQ11"},
+	{ 0,		NULL		},
+};
+
+static struct xlat provider_flags [] = {
+	{ 0,		"0"		},
+	{ SENDZERO,	"SENDZERO"	},
+	{ EXPINLINE,	"EXPINLINE"	},
+	{ XPG4_1,	"XPG4_1"	},
+	{ 0,		NULL		},
+};
+
+
+static struct xlat tli_errors [] = {
+	{ TBADADDR,	"TBADADDR"	},
+	{ TBADOPT,	"TBADOPT"	},
+	{ TACCES,	"TACCES"	},
+	{ TBADF,	"TBADF"		},
+	{ TNOADDR,	"TNOADDR"	},
+	{ TOUTSTATE,	"TOUTSTATE"	},
+	{ TBADSEQ,	"TBADSEQ"	},
+	{ TSYSERR,	"TSYSERR"	},
+	{ TLOOK,	"TLOOK"		},
+	{ TBADDATA,	"TBADDATA"	},
+	{ TBUFOVFLW,	"TBUFOVFLW"	},
+	{ TFLOW,	"TFLOW"		},
+	{ TNODATA,	"TNODATA"	},
+	{ TNODIS,	"TNODIS"	},
+	{ TNOUDERR,	"TNOUDERR"	},
+	{ TBADFLAG,	"TBADFLAG"	},
+	{ TNOREL,	"TNOREL"	},
+	{ TNOTSUPPORT,	"TNOTSUPPORT"	},
+	{ TSTATECHNG,	"TSTATECHNG"	},
+	{ TNOSTRUCTYPE,	"TNOSTRUCTYPE"	},
+	{ TBADNAME,	"TBADNAME"	},
+	{ TBADQLEN,	"TBADQLEN"	},
+	{ TADDRBUSY,	"TADDRBUSY"	},
+	{ TINDOUT,	"TINDOUT"	},
+	{ TPROVMISMATCH,"TPROVMISMATCH"	},
+	{ TRESQLEN,	"TRESQLEN"	},
+	{ TRESADDR,	"TRESADDR"	},
+	{ TQFULL,	"TQFULL"	},
+	{ TPROTO,	"TPROTO"	},
+	{ 0,		NULL		},
+};
+
+
+static int
+print_transport_message (tcp, expect, addr, len)
+struct tcb *tcp;
+int expect;
+long addr;
+int len;
+{
+	union T_primitives m;
+	int c = 0;
+
+	if (len < sizeof m.type) goto dump;
+
+	if (umove (tcp, addr, &m.type) < 0) goto dump;
+
+#define GET(type, struct)	\
+	do {							\
+		if (len < sizeof m.struct) goto dump;		\
+		if (umove (tcp, addr, &m.struct) < 0) goto dump;\
+		tprintf ("{");					\
+		if (expect != type) {				\
+			++c;					\
+			tprintf (#type);			\
+		}						\
+	}							\
+	while (0)
+
+#define COMMA() \
+	do { if (c++) tprintf (", "); } while (0) 
+		 
+
+#define STRUCT(struct, elem, print)					\
+	do {								\
+		COMMA ();						\
+		if (m.struct.elem##_length < 0 ||			\
+		    m.struct.elem##_offset < sizeof m.struct ||		\
+		    m.struct.elem##_offset + m.struct.elem##_length > len) \
+		{							\
+			tprintf (#elem "_length=%ld, " #elem "_offset=%ld",\
+				m.struct.elem##_length,			\
+				m.struct.elem##_offset);		\
+		}							\
+		else {							\
+			tprintf (#elem "=");				\
+			print (tcp,					\
+				 addr + m.struct.elem##_offset,		\
+				 m.struct.elem##_length);		\
+		}							\
+	}								\
+	while (0)
+
+#define ADDR(struct, elem) STRUCT (struct, elem, printstr)
+	
+	switch (m.type) {
+#ifdef T_CONN_REQ
+	    case T_CONN_REQ:	/* connect request   */
+		GET (T_CONN_REQ, conn_req);
+		ADDR (conn_req, DEST);
+		ADDR (conn_req, OPT);
+		break;
+#endif
+#ifdef T_CONN_RES
+	    case T_CONN_RES:	/* connect response   */
+		GET (T_CONN_RES, conn_res);
+		COMMA ();
+		tprintf ("QUEUE=%p", m.conn_res.QUEUE_ptr);
+		ADDR (conn_res, OPT);
+		COMMA ();
+		tprintf ("SEQ=%ld", m.conn_res.SEQ_number);
+		break;
+#endif
+#ifdef T_DISCON_REQ
+	    case T_DISCON_REQ:	/* disconnect request */
+		GET (T_DISCON_REQ, discon_req);
+		COMMA ();
+		tprintf ("SEQ=%ld", m.discon_req.SEQ_number);
+		break;
+#endif
+#ifdef T_DATA_REQ
+	    case T_DATA_REQ:	/* data request       */
+		GET (T_DATA_REQ, data_req);
+		COMMA ();
+		tprintf ("MORE=%ld", m.data_req.MORE_flag);
+		break;
+#endif
+#ifdef T_EXDATA_REQ
+	    case T_EXDATA_REQ:	/* expedited data req */
+		GET (T_EXDATA_REQ, exdata_req);
+		COMMA ();
+		tprintf ("MORE=%ld", m.exdata_req.MORE_flag);
+		break;
+#endif
+#ifdef T_INFO_REQ
+	    case T_INFO_REQ:	/* information req    */
+		GET (T_INFO_REQ, info_req);
+		break;
+#endif
+#ifdef T_BIND_REQ
+	    case T_BIND_REQ:	/* bind request       */
+#ifdef O_T_BIND_REQ
+	    case O_T_BIND_REQ:	/* Ugly xti/tli hack */
+#endif
+		GET (T_BIND_REQ, bind_req);
+		ADDR (bind_req, ADDR);
+		COMMA ();
+		tprintf ("CONIND=%ld", m.bind_req.CONIND_number);
+		break;
+#endif
+#ifdef T_UNBIND_REQ
+	    case T_UNBIND_REQ:	/* unbind request     */
+		GET (T_UNBIND_REQ, unbind_req);
+		break;
+#endif
+#ifdef T_UNITDATA_REQ
+	    case T_UNITDATA_REQ:	/* unitdata requset   */
+		GET (T_UNITDATA_REQ, unitdata_req);
+		ADDR (unitdata_req, DEST);
+		ADDR (unitdata_req, OPT);
+		break;
+#endif
+#ifdef T_OPTMGMT_REQ
+	    case T_OPTMGMT_REQ:	/* manage opt req     */
+		GET (T_OPTMGMT_REQ, optmgmt_req);
+		COMMA ();
+		tprintf ("MGMT=");
+		printflags (transport_user_flags, m.optmgmt_req.MGMT_flags);
+		STRUCT (optmgmt_req, OPT, print_optmgmt);
+		break;
+#endif
+#ifdef T_ORDREL_REQ
+	    case T_ORDREL_REQ:	/* orderly rel req    */
+		GET (T_ORDREL_REQ, ordrel_req);
+		break;
+#endif
+#ifdef T_CONN_IND
+	    case T_CONN_IND:	/* connect indication */
+		GET (T_CONN_IND, conn_ind);
+		ADDR (conn_ind, SRC);
+		ADDR (conn_ind, OPT);
+		tprintf (", SEQ=%ld", m.conn_ind.SEQ_number);
+		break;
+#endif
+#ifdef T_CONN_CON
+	    case T_CONN_CON:	/* connect corfirm    */
+		GET (T_CONN_CON, conn_con);
+		ADDR (conn_con, RES);
+		ADDR (conn_con, OPT);
+		break;
+#endif
+#ifdef T_DISCON_IND
+	    case T_DISCON_IND:	/* discon indication  */
+		GET (T_DISCON_IND, discon_ind);
+		COMMA ();
+		tprintf ("DISCON=%ld, SEQ=%ld",
+			 m.discon_ind.DISCON_reason, m.discon_ind.SEQ_number);
+		break;
+#endif
+#ifdef T_DATA_IND
+	    case T_DATA_IND:	/* data indication    */
+		GET (T_DATA_IND, data_ind);
+		COMMA ();
+		tprintf ("MORE=%ld", m.data_ind.MORE_flag);
+		break;
+#endif
+#ifdef T_EXDATA_IND
+	    case T_EXDATA_IND:	/* expedited data ind */
+		GET (T_EXDATA_IND, exdata_ind);
+		COMMA ();
+		tprintf ("MORE=%ld", m.exdata_ind.MORE_flag);
+		break;
+#endif
+#ifdef T_INFO_ACK
+	    case T_INFO_ACK:	/* info ack           */
+		GET (T_INFO_ACK, info_ack);
+		COMMA ();
+		tprintf ("TSDU=%ld, ETSDU=%ld, CDATA=%ld, DDATA=%ld, "
+			 "ADDR=%ld, OPT=%ld, TIDU=%ld, SERV=",
+			 m.info_ack.TSDU_size, m.info_ack.ETSDU_size,
+			 m.info_ack.CDATA_size, m.info_ack.DDATA_size,
+			 m.info_ack.ADDR_size, m.info_ack.OPT_size,
+			 m.info_ack.TIDU_size);
+		printxval (service_type, m.info_ack.SERV_type, "T_???");
+		tprintf (", CURRENT=");
+		printxval (ts_state, m.info_ack.CURRENT_state, "TS_???");
+		tprintf (", PROVIDER=");
+		printflags (provider_flags, m.info_ack.PROVIDER_flag);
+		break;
+#endif
+#ifdef T_BIND_ACK
+	    case T_BIND_ACK:	/* bind ack           */
+		GET (T_BIND_ACK, bind_ack);
+		ADDR (bind_ack, ADDR);
+		tprintf (", CONIND=%ld", m.bind_ack.CONIND_number);
+		break;
+#endif
+#ifdef T_ERROR_ACK
+	    case T_ERROR_ACK:	/* error ack          */
+		GET (T_ERROR_ACK, error_ack);
+		COMMA ();
+		tprintf ("ERROR=");
+		printxval (transport_user_options,
+			   m.error_ack.ERROR_prim, "TI_???");
+		tprintf (", TLI=");
+		printxval (tli_errors, m.error_ack.TLI_error, "T???");
+		tprintf ("UNIX=%s", strerror (m.error_ack.UNIX_error));
+		break;
+#endif
+#ifdef T_OK_ACK
+	    case T_OK_ACK:	/* ok ack             */
+		GET (T_OK_ACK, ok_ack);
+		COMMA ();
+		tprintf ("CORRECT=");
+		printxval (transport_user_options,
+			   m.ok_ack.CORRECT_prim, "TI_???");
+		break;
+#endif
+#ifdef T_UNITDATA_IND
+	    case T_UNITDATA_IND:	/* unitdata ind       */
+		GET (T_UNITDATA_IND, unitdata_ind);
+		ADDR (unitdata_ind, SRC);
+		ADDR (unitdata_ind, OPT);
+		break;
+#endif
+#ifdef T_UDERROR_IND
+	    case T_UDERROR_IND:	/* unitdata error ind */
+		GET (T_UDERROR_IND, uderror_ind);
+		ADDR (uderror_ind, DEST);
+		ADDR (uderror_ind, OPT);
+		tprintf (", ERROR=%ld", m.uderror_ind.ERROR_type);
+		break;
+#endif
+#ifdef T_OPTMGMT_ACK
+	    case T_OPTMGMT_ACK:	/* manage opt ack     */
+		GET (T_OPTMGMT_ACK, optmgmt_ack);
+		COMMA ();
+		tprintf ("MGMT=");
+		printflags (transport_user_flags, m.optmgmt_ack.MGMT_flags);
+		STRUCT (optmgmt_ack, OPT, print_optmgmt);
+		break;
+#endif
+#ifdef T_ORDREL_IND
+	case T_ORDREL_IND:	/* orderly rel ind    */
+		GET (T_ORDREL_IND, ordrel_ind);
+		break;
+#endif
+#ifdef T_ADDR_REQ
+	    case T_ADDR_REQ:	/* address req        */
+		GET (T_ADDR_REQ, addr_req);
+		break;
+#endif
+#ifdef T_ADDR_ACK
+	    case T_ADDR_ACK:	/* address response   */
+		GET (T_ADDR_ACK, addr_ack);
+		ADDR (addr_ack, LOCADDR);
+		ADDR (addr_ack, REMADDR);
+		break;
+#endif
+	    default:
+	    dump:
+		c = -1;
+		printstr(tcp, addr, len);
+		break;
+	}
+
+	if (c >= 0) tprintf ("}");
+
+#undef ADDR
+#undef COMMA
+#undef STRUCT
+	
+	return 0;
+}
+
+
 #endif /* TI_BIND */
+
 
 static int
 internal_stream_ioctl(tcp, arg)
@@ -486,6 +925,7 @@ int arg;
 	struct strioctl si;
 	char *name;
 	int in_and_out;
+	int timod = 0;
 #ifdef SI_GETUDATA
 	struct si_udata udata;
 #endif /* SI_GETUDATA */
@@ -528,67 +968,67 @@ int arg;
 #ifdef TI_BIND
 	case TI_BIND:
 		/* in T_BIND_REQ, out T_BIND_ACK */
+		++timod;
 		if (entering(tcp)) {
-			struct T_bind_req data;
-
-#if 0
-			tprintf("struct T_bind_req ");
-#endif
-			if (umove(tcp, (int) si.ic_dp, &data) < 0)
-				tprintf("{...}");
-			else {
-				tprintf("{PRIM_type=");
-				printxval(transport_user_options,
-					  data.PRIM_type, "T_???");
-				tprintf(", ADDR_length=%ld, ADDR_offset=%ld",
-					data.ADDR_length, data.ADDR_offset);
-				tprintf(", CONIND_number=%ld}",
-					data.CONIND_number);
-			}
+			print_transport_message (tcp,
+						 T_BIND_REQ,
+						 si.ic_dp, si.ic_len);
 		}
 		else {
-			struct T_bind_ack data;
-
-#if 0
-			tprintf("struct T_bind_ack ");
-#endif
-			if (umove(tcp, (int) si.ic_dp, &data) < 0)
-				tprintf("{...}");
-			else {
-				tprintf("[");
-				tprintf("{PRIM_type=");
-				printxval(transport_provider_options,
-					  data.PRIM_type, "T_???");
-				tprintf(", ADDR_length=%ld, ADDR_offset=%ld",
-					data.ADDR_length, data.ADDR_offset);
-				tprintf(", CONIND_number=%ld}",
-					data.CONIND_number);
-				tprintf(", ");
-				printstr(tcp,
-					 (int) si.ic_dp + data.ADDR_offset,
-					 data.ADDR_length);
-				tprintf("]");
-			}
+			print_transport_message (tcp,
+						 T_BIND_ACK,
+						 si.ic_dp, si.ic_len);
 		}
 		break;
 #endif /* TI_BIND */
-#if 0
 #ifdef TI_UNBIND
 	case TI_UNBIND:
 		/* in T_UNBIND_REQ, out T_OK_ACK */
+		++timod;
+		if (entering(tcp)) {
+			print_transport_message (tcp,
+						 T_UNBIND_REQ,
+						 si.ic_dp, si.ic_len);
+		}
+		else {
+			print_transport_message (tcp,
+						 T_OK_ACK,
+						 si.ic_dp, si.ic_len);
+		}
 		break;
 #endif /* TI_UNBIND */
 #ifdef TI_GETINFO
 	case TI_GETINFO:
 		/* in T_INFO_REQ, out T_INFO_ACK */
+		++timod;
+		if (entering(tcp)) {
+			print_transport_message (tcp,
+						 T_INFO_REQ,
+						 si.ic_dp, si.ic_len);
+		}
+		else {
+			print_transport_message (tcp,
+						 T_INFO_ACK,
+						 si.ic_dp, si.ic_len);
+		}
 		break;
 #endif /* TI_GETINFO */
 #ifdef TI_OPTMGMT
 	case TI_OPTMGMT:
 		/* in T_OPTMGMT_REQ, out T_OPTMGMT_ACK */
+		++timod;
+		if (entering(tcp)) {
+			print_transport_message (tcp,
+						 T_OPTMGMT_REQ,
+						 si.ic_dp, si.ic_len);
+		}
+		else {
+			print_transport_message (tcp,
+						 T_OPTMGMT_ACK,
+						 si.ic_dp, si.ic_len);
+		}
 		break;
 #endif /* TI_OPTMGMT */
-#endif
 #ifdef SI_GETUDATA
 	case SI_GETUDATA:
 		if (entering(tcp))
@@ -617,8 +1057,14 @@ int arg;
 		printstr(tcp, (int) si.ic_dp, si.ic_len);
 		break;
 	}
-	if (exiting(tcp))
+	if (exiting(tcp)) {
 		tprintf("}");
+		if (timod && tcp->u_rval) {
+			tcp->auxstr = xlookup (tli_errors, tcp->u_rval);
+			return RVAL_STR + 1;
+		}
+	}
+	
 	return 1;
 }
 

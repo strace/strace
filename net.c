@@ -434,17 +434,35 @@ static struct xlat sockoptions[] = {
 #ifdef SO_REUSEPORT
 	{ SO_REUSEPORT,	"SO_REUSEPORT"	},
 #endif
-#ifdef SO_RCVLOWAT
-	{ SO_RCVLOWAT, "SO_RCVLOWAT"	},
+#ifdef SO_ORDREL
+	{ SO_ORDREL,	"SO_ORDREL"	},
 #endif
-#ifdef SO_SNDLOWAT
-	{ SO_SNDLOWAT, "SO_SNDLOWAT"	},
+#ifdef SO_IMASOCKET
+	{ SO_IMASOCKET,	"SO_IMASOCKET"	},
 #endif
-#ifdef SO_RCVTIMEO
-	{ SO_RCVTIMEO, "SO_RCVTIMEO"	},
+#ifdef SO_MGMT
+	{ SO_MGMT,	"SO_MGMT"	},
 #endif
-#ifdef SO_SNDTIMEO
-	{ SO_SNDTIMEO, "SO_SNDTIMEO"	},
+#ifdef SO_LISTENING
+	{ SO_LISTENING,	"SO_LISTENING"	},
+#endif
+#ifdef SO_RDWR
+	{ SO_RDWR,	"SO_RDWR"	},
+#endif
+#ifdef SO_SEMA
+	{ SO_SEMA,	"SO_SEMA"	},
+#endif
+#ifdef SO_PARALLELSVR
+	{ SO_PARALLELSVR,"SO_PARALLELSVR"},
+#endif
+#ifdef SO_PROTOTYPE
+	{ SO_PROTOTYPE,	"SO_PROTOTYPE"	},
+#endif
+#ifdef SO_ALLRAW
+	{ SO_ALLRAW,	"SO_ALLRAW"	},
+#endif
+#ifdef SO_ICS
+	{ SO_ICS,	"SO_ICS"	},
 #endif
 	{ 0,		NULL		},
 };
@@ -583,6 +601,9 @@ static struct xlat socktcpoptions[] = {
 #endif
 #if defined(TCP_KEEPCNT)
 	{ TCP_KEEPCNT,		"TCP_KEEPCNT" },
+#endif
+#if defined(TCP_NKEEP)
+	{ TCP_NKEEP,		"TCP_NKEEP"	},
 #endif
 #if defined(TCP_SYNCNT)
 	{ TCP_SYNCNT,		"TCP_SYNCNT" },
@@ -1319,90 +1340,135 @@ long addr;
 }
 #endif /* ICMP_FILTER */
 
+static int
+printsockopt (tcp, level, name, addr, len)
+struct tcb *tcp;
+int level;
+int name;
+long addr;
+int len;
+{
+	printxval(socketlayers, level, "SOL_??");
+	tprintf (", ");
+	switch (level) {
+	    case SOL_SOCKET:
+		printxval(sockoptions, name, "SO_???");
+		switch (name) {
+#if defined(SO_LINGER)
+		    case SO_LINGER:
+			if (len == sizeof (struct linger)) {
+				struct linger linger;
+				if (umove (tcp, addr, &linger) < 0)
+					break;
+				tprintf(", {onoff=%d, linger=%d}",
+					linger.l_onoff,
+					linger.l_linger);
+				return 0;
+			}
+			break;
+#endif
+		}
+		break;
+#ifdef SOL_IP
+	    case SOL_IP:
+		printxval(sockipoptions, name, "IP_???");
+		break;
+#endif
+#ifdef SOL_IPX
+	    case SOL_IPX:
+		printxval(sockipxoptions, name, "IPX_???");
+		break;
+#endif
+#ifdef SOL_PACKET
+	    case SOL_PACKET:
+		printxval(sockpacketoptions, name, "PACKET_???");
+		/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
+		break;
+#endif
+#ifdef SOL_TCP
+	    case SOL_TCP:
+		printxval(socktcpoptions, name, "TCP_???");
+		break;
+#endif
+#ifdef SOL_RAW
+	    case SOL_RAW:
+		printxval(sockrawoptions, name, "RAW_???");
+		switch (name) {
+#if defined(ICMP_FILTER)
+		    case ICMP_FILTER:
+			tprintf(", ");
+			printicmpfilter(tcp, addr);
+			return 0;
+#endif
+		}
+		break;
+#endif
+
+		/* SOL_AX25 SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25 
+		 * etc. still need work  */
+
+	    default:
+		tprintf("%u", name);
+	}
+
+	/* default arg printing */
+
+	tprintf (", ");
+		
+	if (len == sizeof (int)) {
+		printnum(tcp, addr, "%ld");
+	}
+	else {
+		printstr (tcp, addr, len);
+	}
+	return 0;
+}
+
+
+#ifdef HAVE_OPTHDR
+
+void
+print_sock_optmgmt (tcp, addr, len)
+struct tcb *tcp;
+long addr;
+int len;
+{
+	int c = 0;
+	struct opthdr hdr;
+
+	while (len >= sizeof hdr) {
+		if (umove(tcp, addr, &hdr) < 0) break;
+		if (c++) {
+			tprintf (", ");
+		}
+		else if (len > hdr.len + sizeof hdr) {
+			tprintf ("[");
+		}
+		tprintf ("{");
+		addr += sizeof hdr;
+		len -= sizeof hdr;
+		printsockopt (tcp, hdr.level, hdr.name, addr, hdr.len);
+		addr += hdr.len;
+		len -= hdr.len;
+		tprintf ("}");
+	}
+	if (len > 0) {
+		if (c++) tprintf (", ");
+		printstr (tcp, addr, len);
+	}
+	if (c > 1) tprintf ("]");
+}
+
+#endif
+
 int
 sys_setsockopt(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		printxval(socketlayers, tcp->u_arg[1], "IPPROTO_???");
-		tprintf (", ");
-		switch (tcp->u_arg[1]) {
-		case SOL_SOCKET:
-			printxval(sockoptions, tcp->u_arg[2], "SO_???");
-			switch (tcp->u_arg[2]) {
-#if defined(SO_LINGER)
-			case SO_LINGER:
-			        if (tcp->u_arg[4] == sizeof (struct linger)) {
-					struct linger linger;
-					if (umove (tcp,
-						   tcp->u_arg[3],
-						   &linger) < 0)
-						break;
-					tprintf(", {onoff=%d, linger=%d}, %lu",
-						linger.l_onoff,
-						linger.l_linger,
-						tcp->u_arg[4]);
-					return 0;
-				}
-				break;
-#endif
-			}
-			break;
-#ifdef SOL_IP
-		case SOL_IP:
-			printxval(sockipoptions, tcp->u_arg[2], "IP_???");
-			break;
-#endif
-#ifdef SOL_IPX
-		case SOL_IPX:
-			printxval(sockipxoptions, tcp->u_arg[2], "IPX_???");
-			break;
-#endif
-#ifdef SOL_PACKET
-		case SOL_PACKET:
-			printxval(sockpacketoptions, tcp->u_arg[2], "PACKET_???");
-			/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
-			break;
-#endif
-#ifdef SOL_TCP
-		case SOL_TCP:
-			printxval(socktcpoptions, tcp->u_arg[2], "TCP_???");
-			break;
-#endif
-#ifdef SOL_RAW
-		case SOL_RAW:
-			printxval(sockrawoptions, tcp->u_arg[2], "RAW_???");
-			switch (tcp->u_arg[2]) {
-#if defined(ICMP_FILTER)
-			case ICMP_FILTER:
-				tprintf(", ");
-				printicmpfilter(tcp, tcp->u_arg[3]);
-				tprintf(", %lu", tcp->u_arg[4]);
-				return 0;
-#endif
-			}
-			break;
-#endif
-
-		/* SOL_AX25 SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25 
-		 * etc. still need work  */
-
-		default:
-			tprintf("%lu", tcp->u_arg[2]);
-		}
-
-		/* default arg printing */
-
-		tprintf (", ");
-		
-		if (tcp->u_arg[4] == sizeof (int)) {
-			printnum(tcp, tcp->u_arg[3], "%ld");
-		}
-		else {
-			printstr (tcp, tcp->u_arg[3], tcp->u_arg[4]);
-		}
-		
+		printsockopt (tcp, tcp->u_arg[1], tcp->u_arg[2],
+			      tcp->u_arg[3], tcp->u_arg[4]);
 		tprintf(", %lu", tcp->u_arg[4]);
 	}
 	return 0;
