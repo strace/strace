@@ -314,9 +314,21 @@ char *argv[];
 
 	/* Check if they want to redirect the output. */
 	if (outfname) {
+		long f;
+
 		if ((outf = fopen(outfname, "w")) == NULL) {
 			fprintf(stderr, "%s: can't fopen '%s': %s\n",
 				progname, outfname, strerror(errno));
+			exit(1);
+		}
+
+		if ((f=fcntl(fileno(outf), F_GETFD)) < 0 ) {
+			perror("failed to get flags for outputfile");
+			exit(1);
+		}
+
+		if (fcntl(fileno(outf), F_SETFD, f|FD_CLOEXEC) < 0 ) {
+			perror("failed to set flags for outputfile");
 			exit(1);
 		}
 	}

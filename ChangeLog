@@ -1,5 +1,9 @@
 2001-08-03   Wichert Akkerman <wakkerma@debian.org>
 
+  * strace.c: set CLOEXEC  flag for outputfile
+
+2001-08-03   Wichert Akkerman <wakkerma@debian.org>
+
   * linux/sparc/syscall.h, linux/sparc/syscallent.h: add some LFS calls
 
 2001-07-23  Wichert Akkerman <wakkerma@debian.org>
