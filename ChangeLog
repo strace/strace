@@ -1,5 +1,9 @@
 2003-02-19  Roland McGrath  <roland@redhat.com>
 
+	* version.c: Removed.
+	* Makefile.am (strace_SOURCES): Remove it.
+	* strace.c: Use PACKAGE_NAME and VERSION macros instead of version var.
+
 	FreeBSD rfork support changes from Russ Cox <rsc@plan9.bell-labs.com>:
 	* syscall.c (internal_syscall): Handle SYS_rfork with internal_fork.
 	* process.c (internal_fork) [SYS_rfork]: Bail if RFPROC flag not set.
