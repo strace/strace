@@ -122,7 +122,7 @@
 	{ 2,	0,	sys_fstat,		"fstat"		}, /* 91 */
 	{ 3,	0,	sys_fcntl,		"fcntl"		}, /* 92 */
 	{ 5,	0,	sys_select,		"select"	}, /* 93 */
-	{ 5,	0,	printargs,		"SYS_94"	}, /* 94 */
+	{ 3,	0,	sys_poll,		"poll"		}, /* 94 */
 	{ 1,	0,	sys_fsync,		"fsync"		}, /* 95 */
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 96 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 97 */

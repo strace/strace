@@ -1,3 +1,7 @@
+Wed Aug  4 18:01:50 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
+
+  * Syscall 94 on Linux alpha is sys_poll
+
 Thu Jul 15 23:00:32 CEST 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge patch from Maciej W. Rozycki <macro@ds2.pg.gda.pl>:
