@@ -474,22 +474,45 @@ struct tcb *tcp;
 #define CLONE_FS        0x00000200      /* set if fs info shared between processes */
 #define CLONE_FILES     0x00000400      /* set if open files shared between processes */
 #define CLONE_SIGHAND   0x00000800      /* set if signal handlers shared */
-#define CLONE_PID       0x00001000      /* set if pid shared */
+#define CLONE_IDLETASK  0x00001000      /* kernel-only flag */
 #define CLONE_PTRACE    0x00002000      /* set if we want to let tracing continue on the child too */
 #define CLONE_VFORK     0x00004000      /* set if the parent wants the child to wake it up on mm_release */
 #define CLONE_PARENT    0x00008000      /* set if we want to have the same parent as the cloner */
+#define CLONE_THREAD	0x00010000	/* Same thread group? */
+#define CLONE_NEWNS	0x00020000	/* New namespace group? */
+#define CLONE_SYSVSEM	0x00040000	/* share system V SEM_UNDO semantics */
+#define CLONE_SETTLS	0x00080000	/* create a new TLS for the child */
+#define CLONE_PARENT_SETTID	0x00100000	/* set the TID in the parent */
+#define CLONE_CHILD_CLEARTID	0x00200000	/* clear the TID in the child */
+#define CLONE_DETACHED		0x00400000	/* parent wants no child-exit signal */
+#define CLONE_UNTRACED		0x00800000	/* set if the tracing process can't force CLONE_PTRACE on this clone */
+#define CLONE_CHILD_SETTID	0x01000000	/* set the TID in the child */
 
 static struct xlat clone_flags[] = {
     { CLONE_VM,		"CLONE_VM"	},
     { CLONE_FS,		"CLONE_FS"	},
     { CLONE_FILES,	"CLONE_FILES"	},
     { CLONE_SIGHAND,	"CLONE_SIGHAND"	},
-    { CLONE_PID,	"CLONE_PID"	},
+    { CLONE_IDLETASK,	"CLONE_IDLETASK"},
     { CLONE_PTRACE,	"CLONE_PTRACE"	},
     { CLONE_VFORK,	"CLONE_VFORK"	},
     { CLONE_PARENT,	"CLONE_PARENT"	},
+    { CLONE_THREAD,	"CLONE_THREAD" },
+    { CLONE_NEWNS,	"CLONE_NEWNS" },
+    { CLONE_SYSVSEM,	"CLONE_SYSVSEM" },
+    { CLONE_SETTLS,	"CLONE_SETTLS" },
+    { CLONE_PARENT_SETTID,"CLONE_PARENT_SETTID" },
+    { CLONE_CHILD_CLEARTID,"CLONE_CHILD_CLEARTID" },
+    { CLONE_DETACHED,	"CLONE_DETACHED" },
+    { CLONE_UNTRACED,	"CLONE_UNTRACED" },
+    { CLONE_CHILD_SETTID,"CLONE_CHILD_SETTID" },
     { 0,		NULL		},
 };
+
+# ifdef I386
+#  include <asm/ldt.h>
+extern void print_ldt_entry();
+# endif
 
 int
 sys_clone(tcp)
@@ -499,6 +522,41 @@ struct tcb *tcp;
 		tprintf("child_stack=%#lx, flags=", tcp->u_arg[1]);
 		if (printflags(clone_flags, tcp->u_arg[0]) == 0)
 			tprintf("0");
+		if ((tcp->u_arg[0] & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
+				      |CLONE_SETTLS)) == 0)
+			return 0;
+		if (tcp->u_arg[0] & CLONE_PARENT_SETTID) {
+			int pid;
+			if (umove(tcp, tcp->u_arg[2], &pid) == 0)
+				tprintf(", [%d]", pid);
+			else
+				tprintf(", %#lx", tcp->u_arg[2]);
+		}
+		else
+			tprintf(", <ignored>");
+#ifdef I386
+		if (tcp->u_arg[0] & CLONE_SETTLS) {
+			struct modify_ldt_ldt_s copy;
+			if (umove(tcp, tcp->u_arg[3], &copy) != -1) {
+				tprintf(", {entry_number:%d, ",
+					copy.entry_number);
+				if (!verbose(tcp))
+					tprintf("...}");
+				else
+					print_ldt_entry(&copy);
+			}
+			else
+				tprintf(", %#lx", tcp->u_arg[3]);
+		}
+		else
+			tprintf(", <ignored>");
+# define TIDARG 4
+#else
+# define TIDARG 3
+#endif
+		if (tcp->u_arg[0] & CLONE_CHILD_SETTID)
+			tprintf(", %#lx", tcp->u_arg[TIDARG]);
+#undef TIDARG
 	}
 	return 0;
 }

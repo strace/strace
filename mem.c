@@ -37,7 +37,7 @@
 #endif
 #include <sys/mman.h>
 
-#if defined(LINUX) && defined(__i386__)
+#if defined(LINUX) && defined(I386)
 #include <asm/ldt.h>
 #endif
 
@@ -221,7 +221,7 @@ struct tcb *tcp;
 	    return 0;
 #endif	// defined(IA64)
     return print_mmap(tcp, u_arg);
-   
+
 }
 #endif
 
@@ -281,7 +281,7 @@ struct tcb *tcp;
 }
 #endif
 
- 
+
 int
 sys_munmap(tcp)
 struct tcb *tcp;
@@ -505,7 +505,7 @@ struct tcb *tcp;
 }
 
 #if defined(LINUX) && defined(__i386__)
-static void
+void
 print_ldt_entry (ldt_entry)
 struct modify_ldt_ldt_s *ldt_entry;
 {
@@ -577,7 +577,7 @@ struct tcb *tcp;
 		}
 	}
 	return 0;
-			
+
 }
 
 int
@@ -598,7 +598,6 @@ struct tcb *tcp;
 		}
 	}
 	return 0;
-			
+
 }
 #endif /* LINUX && __i386__ */
-
