@@ -1,7 +1,14 @@
 2004-10-06  Roland McGrath  <roland@redhat.com>
 
+	* resource.c (resources): Add RLIMIT_LOCKS, RLIMIT_SIGPENDING,
+	and RLIMIT_MSGQUEUE, if defined.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#133594.
+
 	* net.c [HAVE_SENDMSG] (printcmsghdr): New function.
 	(printmsghdr): Use it.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#131689.
 
 	* file.c (sprintmode): Add const to return type.
 	(sprintfstype): Likewise.
