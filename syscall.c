@@ -2432,6 +2432,9 @@ struct tcb *tcp;
 	if (upeek(tcp->pid, 4*(REG_REG0+1), &val) < 0)
 		return -1;
 #endif /* SPARC */
+#elif defined(IA64)
+	if (upeek(tcp->pid, PT_R9, &val) < 0)
+		return -1;
 #endif /* LINUX */
 
 #ifdef SUNOS4

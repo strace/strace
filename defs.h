@@ -484,7 +484,7 @@ extern void tv_div P((struct timeval *, struct timeval *, int));
 #ifdef SUNOS4
 extern int fixvfork P((struct tcb *));
 #endif
-#if !(defined(LINUX) && !defined(SPARC))
+#if !(defined(LINUX) && !defined(SPARC) && !defined(IA64))
 extern long getrval2 P((struct tcb *));
 #endif
 #ifdef USE_PROCFS
