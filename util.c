@@ -871,7 +871,6 @@ struct tcb *tcp;
 
 #ifdef LINUX
 	long pc;
-
 #if defined(I386)
 	if (upeek(tcp->pid, 4*EIP, &pc) < 0)
 		return -1;
@@ -897,9 +896,7 @@ struct tcb *tcp;
 	pc = regs.r_pc;
 #elif defined(S390)
 	if(upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
-		return -1;
-
-#else
+#endif
 	return pc;
 #endif /* LINUX */
 

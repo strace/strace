@@ -78,7 +78,7 @@
 #define WCOREDUMP(status) ((status) & 0200)
 #endif
 
-/* WTA: this has `&& !defined(LINUXSPARC)', this seems unneeded though? */
+/* WTA: this was `&& !defined(LINUXSPARC)', this seems unneeded though? */
 #if defined(HAVE_PRCTL)
 static struct xlat prctl_options[] = {
 #ifdef PR_MAXPROCS
@@ -316,6 +316,35 @@ struct tcb *tcp;
 
 #else /* !SVR4 */
 
+#ifdef LINUX
+
+/* defines copied from linux/sched.h since we can't include that
+ * ourselves (it conflicts with *lots* of libc includes)
+ */
+#define CSIGNAL         0x000000ff      /* signal mask to be sent at exit */
+#define CLONE_VM        0x00000100      /* set if VM shared between processes */
+#define CLONE_FS        0x00000200      /* set if fs info shared between processes */
+#define CLONE_FILES     0x00000400      /* set if open files shared between processes */
+#define CLONE_SIGHAND   0x00000800      /* set if signal handlers shared */
+#define CLONE_PID       0x00001000      /* set if pid shared */
+#define CLONE_PTRACE    0x00002000      /* set if we want to let tracing continue on the child too */
+#define CLONE_VFORK     0x00004000      /* set if the parent wants the child to wake it up on mm_release */
+#define CLONE_PARENT    0x00008000      /* set if we want to have the same parent as the cloner */
+
+static struct xlat clone_flags[] = {
+    { CLONE_VM,		"CLONE_VM"	},
+    { CLONE_FS,		"CLONE_FS"	},
+    { CLONE_FILES,	"CLONE_FILES"	},
+    { CLONE_SIGHAND,	"CLONE_SIGHAND"	},
+    { CLONE_PID,	"CLONE_PID"	},
+    { CLONE_PTRACE,	"CLONE_PTRACE"	},
+    { CLONE_VFORK,	"CLONE_VFORK"	},
+    { CLONE_PARENT,	"CLONE_PARENT"	},
+    { 0,		NULL		},
+};
+
+#endif
+
 int
 sys_fork(tcp)
 struct tcb *tcp;
@@ -324,6 +353,66 @@ struct tcb *tcp;
 		return RVAL_UDECIMAL;
 	return 0;
 }
+
+#ifdef SYS_clone
+int
+internal_clone(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("fn=%#lx, child_stack=%#lx, flags=",
+				tcp->u_arg[0], tcp->u_arg[1]);
+		if (printflags(clone_flags, tcp->u_arg[2]) == 0)
+			tprintf("0");
+		tprintf(", args=%#lx", tcp->u_arg[3]);
+
+		/* For now we don't follow clone yet.. we're just preparing the code */
+		dont_follow = 1;
+
+		if (!followfork || dont_follow)
+			return 0;
+		if (nprocs == MAX_PROCS) {
+			tcp->flags &= ~TCB_FOLLOWFORK;
+			fprintf(stderr, "sys_fork: tcb table full\n");
+			return 0;
+		}
+		tcp->flags |= TCB_FOLLOWFORK;
+
+		/* XXX 
+		/* We will take the simple approach and add CLONE_PTRACE to the clone
+		 * options. This only works on Linux 2.2.x and later. This means that
+		 * we break all programs using clone on older kernels..
+		 * We should try to fallback to the bpt-trick if this fails, but right
+		 * now we don't.
+		 */
+
+		/* TODO: actually change the flags */
+	} else {
+		if (!(tcp->flags & TCB_FOLLOWFORK))
+			return 0;
+
+		if (syserror(tcp))
+			return 0;
+
+		pid = tcp->u_rval;
+		if ((tcpchild = alloctcb(pid)) == NULL) {
+			fprintf(stderr, " [tcb table full]\n");
+			kill(pid, SIGKILL); /* XXX */
+			return 0;
+		}
+
+		/* For fork we need to re-attach, but thanks to CLONE_PTRACE we're
+		 * already attached.
+		 */
+		tcphild->flags |= TCB_ATTACHED;
+		newoutf(tcpfhild);
+		tcp->nchildren++;
+		if (!qflag)
+			fprintf(stderr, "Process %d attached\n", pid);
+	}
+	return 0;
+}
+#endif
 
 int
 internal_fork(tcp)
@@ -349,9 +438,17 @@ struct tcb *tcp;
 #endif
 #ifdef SYS_clone
 	/* clone can do many things, not all of which we know how to handle.
-	   Don't do it for now. */
-	if (tcp->scno == SYS_clone)
+	   Don't do much for now. */
+	if (tcp->scno == SYS_clone) {
+	    	if (entering(tcp)) {
+			tprintf("fn=%#lx, child_stack=%#lx, flags=",
+					tcp->u_arg[0], tcp->u_arg[1]);
+			if (printflags(clone_flags, tcp->u_arg[2]) == 0)
+			    tprintf("0");
+			tprintf(", args=%#lx", tcp->u_arg[3]);
+		}
 		dont_follow = 1;
+	}
 #endif
 	if (entering(tcp)) {
 		if (!followfork || dont_follow)
@@ -364,7 +461,7 @@ struct tcb *tcp;
 		tcp->flags |= TCB_FOLLOWFORK;
 		if (setbpt(tcp) < 0)
 			return 0;
-	}
+  	}
 	else {
 		int bpt = tcp->flags & TCB_BPTSET;
 

@@ -2,6 +2,8 @@ Thu Dec 23 15:01:37 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 
   * Merge patch from ftp://oss.software.ibm.com/linux390/ to add
     support for Linux on the IBM S/390 architecture
+  * process.c: add internal_clone(), currently only shows the options
+  * syscall.c: use internal_clone to handle SYS_clone
 
 Mon Dec 20 00:27:50 CET 1999 Wichert Akkerman <wakkerma@debian.org>
 

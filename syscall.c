@@ -531,12 +531,13 @@ struct tcb *tcp;
 #ifdef SYS_vfork
 	case SYS_vfork:
 #endif
-#ifdef SYS_clone
-	case SYS_clone:
-#endif
 		internal_fork(tcp);
 		break;
-
+#ifdef SYS_clone
+	case SYS_clone:
+		internal_clone(tcp);
+		break;
+#endif
 #ifdef SYS_execv
 	case SYS_execv:
 #endif
