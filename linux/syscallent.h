@@ -323,12 +323,12 @@
 	{ 5,	0,	printargs,		"SYS_274"	}, /* 274 */
 	{ 5,	0,	printargs,		"SYS_275"	}, /* 275 */
 	{ 5,	0,	printargs,		"SYS_276"	}, /* 276 */
-	{ 5,	0,	printargs,		"SYS_277"	}, /* 277 */
-	{ 5,	0,	printargs,		"SYS_278"	}, /* 278 */
-	{ 5,	0,	printargs,		"SYS_279"	}, /* 279 */
-	{ 5,	0,	printargs,		"SYS_280"	}, /* 280 */
-	{ 5,	0,	printargs,		"SYS_281"	}, /* 281 */
-	{ 5,	0,	printargs,		"SYS_282"	}, /* 282 */
+	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 277 */
+	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 278 */
+	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 279 */
+	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 280 */
+	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 281 */
+	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 282 */
 	{ 5,	0,	printargs,		"SYS_283"	}, /* 283 */
 	{ 5,	0,	printargs,		"SYS_284"	}, /* 284 */
 	{ 5,	0,	printargs,		"SYS_285"	}, /* 285 */

@@ -438,6 +438,9 @@ long arg;
 			   present in the userlevel definition of the
 			   struct.  */
 			tprintf("{%d}", sev._sigev_un._pad[0]);
+		else if (sev.sigev_notify == SIGEV_THREAD)
+			tprintf("{%p, %p}", sev.sigev_notify_function,
+				sev.sigev_notify_attributes);
 		else
 			tprintf("{...}");
 		tprintf("}");

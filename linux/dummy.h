@@ -64,6 +64,7 @@
 #define sys_mlock		sys_munmap
 #define sys_munlock		sys_munmap
 #define sys_clock_getres	sys_clock_gettime
+#define sys_mq_unlink		sys_unlink
 
 /* printargs does the right thing */
 #define	sys_setup		printargs
