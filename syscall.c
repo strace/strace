@@ -302,6 +302,8 @@ qual_signal(s, opt, not)
 		qualify_one(atoi(s), opt, not);
 		return 1;
 	}
+	if (strlen(s) >= sizeof buf)
+		return 0;
 	strcpy(buf, s);
 	s = buf;
 	for (i = 0; s[i]; i++)
