@@ -2031,6 +2031,13 @@ Process %d attached (waiting for parent)\n",
 				fprintf(stderr,
 					"PANIC: attached pid %u exited\n",
 					pid);
+			if (tcp == tcp_last) {
+				if ((tcp->flags & (TCB_INSYSCALL|TCB_REPRINT))
+				    == TCB_INSYSCALL)
+					tprintf(" <unfinished ... exit status %d>\n",
+						WEXITSTATUS(status));
+				tcp_last = NULL;
+			}
 #ifdef TCB_GROUP_EXITING
 			handle_group_exit(tcp, -1);
 #else
