@@ -142,7 +142,7 @@
 	{ 0,	0,	sys_bdflush,		"bdflush"		}, /* 134 */
 	{ 5,	0,	sys_sysfs,		"sysfs"			}, /* 135 */
 	{ 1,	0,	sys_personality,	"personality"		}, /* 136 */
-	{ 5,	0,	printargs,		"SYS_137"		}, /* 137 */
+	{ 5,	0,	printargs,		"afs_syscall"		}, /* 137 */
 	{ 1,	0,	sys_setfsuid,		"setfsuid"		}, /* 138 */
 	{ 1,	0,	sys_setfsgid,		"setfsgid"		}, /* 139 */
 	{ 5,	TF,	sys_llseek,		"_llseek"		}, /* 140 */
@@ -201,7 +201,6 @@
 	{ 4,	TI,	sys_shmdt,		"shmdt"			}, /* 193 */
 	{ 4,	TI,	sys_shmget,		"shmget"		}, /* 194 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"		}, /* 195 */
-
 	{ 5,	0,	printargs,		"getpmsg"		}, /* 196 */
 	{ 5,	0,	printargs,		"putpmsg"		}, /* 197 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 198 */
@@ -213,28 +212,28 @@
 	{ 5,	0,	printargs,		"acl_get"		}, /* 204 */
 	{ 5,	0,	printargs,		"acl_set"		}, /* 205 */
 	{ 5,	0,	printargs,		"gettid"		}, /* 206 */
-	{ 5,	0,	printargs,		"readahead"		}, /* 207 */
-	{ 5,	0,	printargs,		"SYS_208"		}, /* 208 */
-	{ 5,	0,	printargs,		"SYS_209"		}, /* 209 */
-	{ 5,	0,	printargs,		"SYS_210"		}, /* 210 */
-	{ 5,	0,	printargs,		"SYS_211"		}, /* 211 */
-	{ 5,	0,	printargs,		"SYS_212"		}, /* 212 */
-	{ 5,	0,	printargs,		"SYS_213"		}, /* 213 */
-	{ 5,	0,	printargs,		"SYS_214"		}, /* 214 */
-	{ 5,	0,	printargs,		"SYS_215"		}, /* 215 */
-	{ 5,	0,	printargs,		"SYS_216"		}, /* 216 */
-	{ 5,	0,	printargs,		"SYS_217"		}, /* 217 */
-	{ 5,	0,	printargs,		"SYS_218"		}, /* 218 */
-	{ 5,	0,	printargs,		"SYS_219"		}, /* 219 */
-	{ 5,	0,	printargs,		"SYS_220"		}, /* 220 */
-	{ 5,	0,	printargs,		"SYS_221"		}, /* 221 */
-	{ 5,	0,	printargs,		"SYS_222"		}, /* 222 */
-	{ 5,	0,	printargs,		"SYS_223"		}, /* 223 */
-	{ 5,	0,	printargs,		"SYS_224"		}, /* 224 */
-	{ 5,	0,	printargs,		"SYS_225"		}, /* 225 */
-	{ 5,	0,	printargs,		"SYS_226"		}, /* 226 */
-	{ 5,	0,	printargs,		"SYS_227"		}, /* 227 */
-	{ 5,	0,	printargs,		"SYS_228"		}, /* 228 */
+	{ 4,	0,	sys_readahead,		"readahead"		}, /* 207 */
+	{ 2,	TS,	sys_kill,		"tkill"			}, /* 208 */
+	{ 4,	TF,	sys_sendfile,		"sendfile64"		}, /* 209 */
+	{ 5,	0,	sys_futex,		"futex"			}, /* 210 */
+	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"	}, /* 211 */
+	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"	}, /* 212 */
+	{ 5,	0,	printargs,		"set_thread_area"	}, /* 213 */
+	{ 5,	0,	printargs,		"get_thread_area"	}, /* 214 */
+	{ 2,	0,	printargs,		"io_setup"		}, /* 215 */
+	{ 1,	0,	printargs,		"io_destroy"		}, /* 216 */
+	{ 5,	0,	printargs,		"io_getevents"		}, /* 217 */
+	{ 3,	0,	printargs,		"io_submit"		}, /* 218 */
+	{ 3,	0,	printargs,		"io_cancel"		}, /* 219 */
+	{ 5,	0,	printargs,		"alloc_hugepages"	}, /* 220 */
+	{ 1,	0,	printargs,		"free_hugepages"	}, /* 221 */
+	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 222 */
+	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 223 */
+	{ 1,	0,	printargs,		"epoll_create"		}, /* 224 */
+	{ 4,	0,	printargs,		"epoll_ctl"		}, /* 225 */
+	{ 4,	0,	printargs,		"epoll_wait"		}, /* 226 */
+	{ 5,	0,	printargs,		"remap_file_pages"	}, /* 227 */
+	{ 5,	0,	printargs,		"semtimedop"		}, /* 228 */
 	{ 5,	0,	printargs,		"SYS_229"		}, /* 229 */
 	{ 5,	0,	printargs,		"SYS_230"		}, /* 230 */
 	{ 5,	0,	printargs,		"SYS_231"		}, /* 231 */
