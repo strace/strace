@@ -1,3 +1,7 @@
+2003-03-12  Roland McGrath  <roland@redhat.com>
+
+	* linux/ia64/syscallent.h: Add a bunch of 2.5 syscalls.
+
 2003-03-04  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c (get_scno) [IA64]: Do TCB_WAITEXECVE check only when
