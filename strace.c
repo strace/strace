@@ -1311,13 +1311,12 @@ int errno;
 
 #ifndef HAVE_STRSIGNAL
 
-#ifdef HAVE__SYS_SIGLIST
-#if !HAVE_DECL_SYS_SIGLIST
+#if defined HAVE_SYS_SIGLIST && !defined HAVE_DECL_SYS_SIGLIST
 extern char *sys_siglist[];
-	extern char *_sys_siglist[];
-#else
 #endif
-#endif /* SYS_SIGLIST_DECLARED */
+#if defined HAVE_SYS__SIGLIST && !defined HAVE_DECL__SYS_SIGLIST
+extern char *_sys_siglist[];
+#endif
 
 const char *
 strsignal(sig)
