@@ -1,5 +1,27 @@
 2003-01-14  Roland McGrath  <roland@redhat.com>
 
+	* linux/powerpc/errnoent.h: Add missing errnos.
+	* linux/powerpc/ioctlent.h: Update ioctl values.
+	From Anton Blanchard <anton@samba.org>.
+
+	* io.c [LINUX] (sys_pread, sys_pwrite): Fix last change.
+	From Anton Blanchard <anton@samba.org>.
+
+	* linux/hppa/syscallent.h: Use sys_getdents64, sys_truncate64,
+	sys_ftruncate64, instead of printargs, for those syscalls.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+
+	* linux/syscall.h (SYS_socket_subcall): Only 256 for S390, S390X.
+	All others at the moment use linux/syscallent.h, where it's 300.
+
+	* strace.1: Update bug reporting info.
+
+	* resource.c [LINUX] (quotacmds): Grok new command encodings.
+	From Nathan Scott <nathans@debian.org>.
+
 	* configure.ac, NEWS: Version 4.4.92.
 	* strace.spec, debian/changelog: 4.4.92-1.
 
