@@ -80,7 +80,7 @@ binary-arch: $(extra_build_targets) build checkroot
 
 ifeq ($(build64),yes)
 	install -s -o root -g root -m 755 build64/strace debian/tmp/usr/bin/strace64
-	ln -s strace.1 debian/tmp/usr/share/man/man1/strace64.1
+	ln -s strace.1.gz debian/tmp/usr/share/man/man1/strace64.1.gz
 endif
 
 	dpkg-shlibdeps build/strace $(patsubst yes,build64/strace,$(build64))
