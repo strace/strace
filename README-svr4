@@ -16,5 +16,14 @@ on UnixWare 2.1 you need to add the following to config.h yourself:
     #define UNIXWARE 2
     #define HAVE_POLLABLE_PROCFS 1
 
+On UnixWare using the -f option to follow forked children sometimes shows
+many "unfinished" system calls as strace bounces between each runnable child.
+A crude workaround for this is available by adding
+
+    #define POLL_HACK 1
+
+to the config.h file.  This forces strace to check whether the last process
+has finished a system call before polling other processes for events.
+
 Wichert Akkerman <wakkerma@debian.org>
 

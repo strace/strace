@@ -1243,6 +1243,9 @@ choose_pfd()
 static int
 trace()
 {
+#ifdef POLL_HACK
+	struct tcb *in_syscall;
+#endif
 	struct tcb *tcp;
 	int pfd;
 	int what;
@@ -1274,6 +1277,28 @@ trace()
 #endif /* !HAVE_POLLABLE_PROCFS */
 		default:
 #ifdef HAVE_POLLABLE_PROCFS
+#ifdef POLL_HACK
+		        /* On some systems (e.g. UnixWare) we get too much ugly
+			   "unfinished..." stuff when multiple proceses are in
+			   syscalls.  Here's a nasty hack */
+		    
+			if (in_syscall) {
+				struct pollfd pv;
+				tcp = in_syscall;
+				in_syscall = NULL;
+				pv.fd = tcp->pfd;
+				pv.events = POLLWANT;
+				if ((what = poll (&pv, 1, 1)) < 0) {
+					if (interrupted)
+						return 0;
+					continue;
+				}
+				else if (what == 1 && pv.revents & POLLWANT) {
+					goto FOUND;
+				}
+			}
+#endif
+
 			if (poll(pollv, nprocs, INFTIM) < 0) {
 				if (interrupted)
 					return 0;
@@ -1297,6 +1322,7 @@ trace()
 			fprintf(stderr, "unknown pfd: %u\n", pfd);
 			exit(1);
 		}
+	FOUND:
 		/* Get the status of the process. */
 		if (!interrupted) {
 			ioctl_result = IOCTL_WSTOP (tcp);
@@ -1358,6 +1384,9 @@ trace()
 			}
 			break;
 		case PR_SYSENTRY:
+#ifdef POLL_HACK
+		        in_syscall = tcp;
+#endif
 		case PR_SYSEXIT:
 			if (trace_syscall(tcp) < 0) {
 				fprintf(stderr, "syscall trouble\n");
