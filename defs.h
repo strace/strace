@@ -464,7 +464,8 @@ extern int internal_exec P((struct tcb *));
 extern int internal_wait P((struct tcb *));
 extern int internal_exit P((struct tcb *));
 
-extern char *ioctl_lookup P((long));
+extern struct ioctlent *ioctl_lookup P((long));
+extern struct ioctlent *ioctl_next_match P((struct ioctlent *));
 extern int ioctl_decode P((struct tcb *, long, long));
 extern int term_ioctl P((struct tcb *, long, long));
 extern int sock_ioctl P((struct tcb *, long, long));

@@ -932,7 +932,7 @@ struct tcb *tcp;
 int arg;
 {
 	struct strioctl si;
-	char *name;
+	strict ioctlent *iop;
 	int in_and_out;
 	int timod = 0;
 #ifdef SI_GETUDATA
@@ -947,10 +947,12 @@ int arg;
 		return 1;
 	}
 	if (entering(tcp)) {
-		name = ioctl_lookup(si.ic_cmd);
-		if (name)
-			tprintf(", {ic_cmd=%s", name);
-		else
+		iop = ioctl_lookup(si.ic_cmd);
+		if (iop) {
+			tprintf(", {ic_cmd=%s", iop->symbol);
+			while ((iop = ioctl_next_match(iop)))
+				tprintf(" or %s", iop->symbol);
+		} else
 			tprintf(", {ic_cmd=%#x", si.ic_cmd);
 		if (si.ic_timout == INFTIM)
 			tprintf(", ic_timout=INFTIM, ");

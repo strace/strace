@@ -78,7 +78,7 @@ const void *b;
 	return (code1 > code2) ? 1 : (code1 < code2) ? -1 : 0;
 }
 
-char *
+struct ioctlent *
 ioctl_lookup(code)
 long code;
 {
@@ -90,7 +90,24 @@ long code;
 #endif
 	iop = (struct ioctlent *) bsearch((char *) &ioent, (char *) ioctlent,
 			nioctlents, sizeof(struct ioctlent), compare);
-	return iop ? iop->symbol : NULL;
+	while (iop > ioctlent)
+		if ((--iop)->code != ioent.code) {
+			iop++;
+			break;
+		}
+	return iop;
+}
+
+struct ioctlent *
+ioctl_next_match(iop)
+struct ioctlent *iop;
+{
+	long code;
+
+	code = (iop++)->code;
+	if (iop < ioctlent + nioctlents && iop->code == code)
+		return iop;
+	return NULL;
 }
 
 int

@@ -353,14 +353,16 @@ int
 sys_ioctl(tcp)
 struct tcb *tcp;
 {
-	char *symbol;
+	struct ioctlent *iop;
 
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		symbol = ioctl_lookup(tcp->u_arg[1]);
-		if (symbol)
-			tprintf("%s", symbol);
-		else
+		iop = ioctl_lookup(tcp->u_arg[1]);
+		if (iop) {
+			tprintf("%s", iop->symbol);
+			while ((iop = ioctl_next_match(iop)))
+				tprintf(" or %s", iop->symbol);
+		} else
 			tprintf("%#lx", tcp->u_arg[1]);
 		ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
