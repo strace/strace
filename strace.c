@@ -368,13 +368,12 @@ char *argv[];
 #endif
 
 	if (!outfname) {
-		qflag = 1;
 		setvbuf(outf, buf, _IOLBF, BUFSIZ);
 	}
-	else if (optind < argc)
+	else if (optind < argc) {
 		interactive = 0;
-	else
 		qflag = 1;
+	}
 
 	for (c = 0; c < tcbtabsize; c++) {
 		tcp = tcbtab[c];
