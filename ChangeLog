@@ -1,5 +1,9 @@
 2004-08-30  Roland McGrath  <roland@redhat.com>
 
+	* system.c (personality_options): Hard-code values here.
+	Don't #include <linux/personality.h> at all.
+	Fixes RH#130965.
+
 	* file.c (print_xattr_val): New function to show attribute values.
 	(sys_setxattr, sys_fsetxattr, sys_getxattr, sys_fgetxattr): Use it.
 	From Ulrich Drepper <drepper@redhat.com>.
