@@ -1,5 +1,18 @@
 2004-09-03  Roland McGrath  <roland@redhat.com>
 
+	* syscall.c (sysent0, sysent1, sysent2, sysent): Add const to defn.
+	(nsyscalls0, nsyscalls1, nsyscalls2): Likewise.
+	(errnoent0, errnoent1, errnoent2, errnoent): Likewise.
+	(nerrnos0, nerrnos1, nerrnos2): Likewise.
+	* signal.c (signalent0, signalent1, signalent2): Likewise.
+	(nsignals0, nsignals1, nsignals2): Likewise.
+	(signame): LIkewise.
+	* ioctl.c (ioctlent0, ioctlent1, ioctlent2): Likewise.
+	(nioctlents0, nioctlents1, nioctlents2): Likewise.
+	(ioctl_lookup, ioctl_next_match): Likewise.
+	* defs.h: Update decls.
+	* io.c (sys_ioctl): Update users.
+
 	* util.c (xlookup, printxval, addflags, printflags): Use const for
 	struct xlat * argument.
 	* defs.h (xlookup, printxval, addflags, printflags): Update decls.
