@@ -1,3 +1,13 @@
+2003-01-10  Roland McGrath  <roland@redhat.com>
+
+	* strace.spec: New file.
+	* debian/changelog: 4.4.90-1
+	* debian/rules (binary-arch): Depend on build.
+	(clean): Don't try to run Makefile.in.
+	* debian/control (Standards-Version): Now 3.5.8.
+
+	* configure.ac: Diddle CFLAGS after AC_PROG_CC, not before.
+
 2003-01-09  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c (force_result) [S390 || S390X]: Fix typo.
