@@ -1,3 +1,7 @@
+2003-03-18  Roland McGrath  <roland@redhat.com>
+
+	* process.c [LINUX] (sys_clone): Don't dereference parent_tid argument.
+
 2003-03-17  Roland McGrath  <roland@redhat.com>
 
 	* linux/x86_64/syscallent.h: clone takes 5 args.
