@@ -1,5 +1,5 @@
 Source: strace
-Section: devel
+Section: utils
 Priority: standard
 Maintainer: Roland McGrath <frob@debian.org>
 Uploaders: Wichert Akkerman <wakkerma@debian.org>
