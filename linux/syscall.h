@@ -92,6 +92,7 @@ int sys_set_thread_area(), sys_get_thread_area(), sys_remap_file_pages();
 int sys_timer_create(), sys_timer_delete(), sys_timer_getoverrun();
 int sys_timer_gettime(), sys_timer_settime(), sys_clock_settime();
 int sys_clock_gettime(), sys_clock_getres(), sys_clock_nanosleep();
+int sys_semtimedop();
 
 
 /* sys_socketcall subcalls */
@@ -205,6 +206,7 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #define SYS_semop		(SYS_ipc_subcall + 1)
 #define SYS_semget		(SYS_ipc_subcall + 2)
 #define SYS_semctl		(SYS_ipc_subcall + 3)
+#define SYS_semtimedop		(SYS_ipc_subcall + 4)
 #define SYS_msgsnd		(SYS_ipc_subcall + 11)
 #define SYS_msgrcv		(SYS_ipc_subcall + 12)
 #define SYS_msgget		(SYS_ipc_subcall + 13)

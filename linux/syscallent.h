@@ -149,7 +149,7 @@
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 114 */
 	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
-	{ 5,	0,	sys_ipc,		"ipc"		}, /* 117 */
+	{ 6,	0,	sys_ipc,		"ipc"		}, /* 117 */
 	{ 1,	0,	sys_fsync,		"fsync"		}, /* 118 */
 	{ 1,	TS,	sys_sigreturn,		"sigreturn"	}, /* 119 */
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
@@ -376,7 +376,7 @@
 	{ 4,	TI,	sys_semop,		"semop"		}, /* 319 */
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 320 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 321 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 322 */
+	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 322 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 323 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 324 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 325 */
