@@ -1,5 +1,10 @@
 2001-03-07  John Hughes <john@Calva.COM>
 
+  * file.c: merge missing part of Harald Böhme's solaris patches,
+    was only declaring sys_{stat64,lstat64,fstat64} on linux!
+
+2001-03-07  John Hughes <john@Calva.COM>
+
   * svr4/dummy.h: fix multiple define warning on non LFS64 systems.
   * svr4/syscallent.h: pread/pwrite are TF calls.
 

@@ -1,4 +1,5 @@
 /*
+#ifdef linux
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
@@ -892,7 +893,6 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef linux
 int
 sys_stat64(tcp)
 struct tcb *tcp;
@@ -910,6 +910,7 @@ struct tcb *tcp;
 #endif
 }
 
+#ifdef linux
 # if !defined(IA64)
 int
 sys_oldstat(tcp)
@@ -938,7 +939,6 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef linux
 int
 sys_fstat64(tcp)
 struct tcb *tcp;
@@ -955,6 +955,7 @@ struct tcb *tcp;
 #endif
 }
 
+#ifdef linux
 # if !defined(IA64)
 int
 sys_oldfstat(tcp)
@@ -983,7 +984,6 @@ struct tcb *tcp;
 	return 0;
 }
 
-#ifdef linux
 int
 sys_lstat64(tcp)
 struct tcb *tcp;
@@ -1001,6 +1001,7 @@ struct tcb *tcp;
 #endif
 }
 
+#ifdef linux
 # if !defined(IA64)
 int
 sys_oldlstat(tcp)
