@@ -83,7 +83,7 @@ int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
 int sys_sendfile(), sys_old_mmap(), sys_stat64(), sys_lstat64(), sys_fstat64();
 int sys_truncate64(), sys_ftruncate64(), sys_pivotroot();
-int sys_getdents64(), sys_clone2();
+int sys_getdents64();
 int sys_getpmsg(), sys_putpmsg(), sys_readahead(), sys_sendfile64();
 int sys_setxattr(), sys_fsetxattr(), sys_getxattr(), sys_fgetxattr();
 int sys_listxattr(), sys_flistxattr(), sys_removexattr(), sys_fremovexattr();

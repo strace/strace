@@ -1031,7 +1031,7 @@
 	{ 5,	0,	printargs,		"vm86"		}, /* 1125 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 1126 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 1127 */
-	{ 2,	TP,	sys_clone,		"clone"		}, /* 1128 */
+	{ 4,	TP,	sys_clone,		"clone"		}, /* 1128 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 1129 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 1130 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 1131 */
@@ -1116,7 +1116,7 @@
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 1210 */
 	{ 2,	0,	sys_lstat,		"lstat"		}, /* 1211 */
 	{ 2,	TF,	sys_fstat,		"fstat"		}, /* 1212 */
-	{ 2,	TP,	sys_clone2,		"clone2"	}, /* 1213 */
+	{ 6,	TP,	sys_clone,		"clone2"	}, /* 1213 */
 	{ 3,	0,	printargs,		"getdents64"	}, /* 1214 */
 	{ 2,	0,	printargs,		"getunwind"	}, /* 1215 */
 	{ 4,	0,	sys_readahead,		"readahead"	}, /* 1216 */

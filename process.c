@@ -525,39 +525,57 @@ static struct xlat clone_flags[] = {
 extern void print_ldt_entry();
 # endif
 
+# if defined IA64
+#  define ARG_FLAGS	0
+#  define ARG_STACK	1
+#  define ARG_STACKSIZE	(tcp->scno == SYS_clone2 ? 2 : -1)
+#  define ARG_PTID	(tcp->scno == SYS_clone2 ? 3 : -1)
+#  define ARG_CTID	(tcp->scno == SYS_clone2 ? 4 : 2)
+#  define ARG_TLS	(tcp->scno == SYS_clone2 ? 5 : 3)
+# elif defined S390
+#  define ARG_STACK	0
+#  define ARG_FLAGS	1
+#  define ARG_PTID	2
+#  define ARG_TLS	3
+#  define ARG_CTID	4
+# else
+#  define ARG_FLAGS	0
+#  define ARG_STACK	1
+#  define ARG_PTID	2
+#  define ARG_TLS	3
+#  define ARG_CTID	4
+# endif
+
 int
 sys_clone(tcp)
 struct tcb *tcp;
 {
 	if (exiting(tcp)) {
-		long flags, stack;
-# if defined S390 || defined S390X
-		/* For some reason, S390 has the stack argument first.  */
-		stack = tcp->u_arg[0];
-		flags = tcp->u_arg[1];
-# else
-		flags = tcp->u_arg[0];
-		stack = tcp->u_arg[1];
+		unsigned long flags = tcp->u_arg[ARG_FLAGS];
+		tprintf("child_stack=%#lx, ", tcp->u_arg[ARG_STACK]);
+# ifdef ARG_STACKSIZE
+		if (ARG_STACKSIZE != -1)
+			tprintf("stack_size=%#lx, ",
+				tcp->u_arg[ARG_STACKSIZE]);
 # endif
-		tprintf("child_stack=%#lx, flags=", stack);
+		tprintf("flags=");
 		if (printflags(clone_flags, flags) == 0)
 			tprintf("0");
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
-				      |CLONE_SETTLS)) == 0)
+			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
 			return 0;
 		if (flags & CLONE_PARENT_SETTID) {
 			int pid;
-			if (umove(tcp, tcp->u_arg[2], &pid) == 0)
-				tprintf(", [%d]", pid);
+			if (umove(tcp, tcp->u_arg[ARG_PTID], &pid) == 0)
+				tprintf(", parent_tidptr=[%d]", pid);
 			else
-				tprintf(", %#lx", tcp->u_arg[2]);
+				tprintf(", parent_tidptr=%#lx",
+					tcp->u_arg[ARG_PTID]);
 		}
-		else
-			tprintf(", <ignored>");
-#ifdef I386
 		if (flags & CLONE_SETTLS) {
+# ifdef I386
 			struct modify_ldt_ldt_s copy;
-			if (umove(tcp, tcp->u_arg[3], &copy) != -1) {
+			if (umove(tcp, tcp->u_arg[ARG_TLS], &copy) != -1) {
 				tprintf(", {entry_number:%d, ",
 					copy.entry_number);
 				if (!verbose(tcp))
@@ -566,34 +584,14 @@ struct tcb *tcp;
 					print_ldt_entry(&copy);
 			}
 			else
-				tprintf(", %#lx", tcp->u_arg[3]);
+# endif
+				tprintf(", %#lx", tcp->u_arg[ARG_TLS]);
 		}
-		else
-			tprintf(", <ignored>");
-# define TIDARG 4
-#else
-# define TIDARG 3
-#endif
-		if (flags & CLONE_CHILD_SETTID)
-			tprintf(", %#lx", tcp->u_arg[TIDARG]);
-#undef TIDARG
+		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID))
+			tprintf(", child_tidptr=%#lx", tcp->u_arg[ARG_CTID]);
 	}
 	return 0;
 }
-
-int
-sys_clone2(tcp)
-struct tcb *tcp;
-{
-       if (exiting(tcp)) {
-               tprintf("child_stack=%#lx, stack_size=%#lx, flags=",
-                       tcp->u_arg[1], tcp->u_arg[2]);
-               if (printflags(clone_flags, tcp->u_arg[0]) == 0)
-                       tprintf("0");
-       }
-       return 0;
-}
-
 #endif
 
 int
