@@ -2022,8 +2022,12 @@ Process %d attached (waiting for parent)\n",
 			if (!cflag
 			    && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)) {
 				printleader(tcp);
-				tprintf("+++ killed by %s +++",
-					signame(WTERMSIG(status)));
+				tprintf("+++ killed by %s %s+++",
+					signame(WTERMSIG(status)),
+#ifdef WCOREDUMP
+					WCOREDUMP(status) ? "(core dumped) " :
+#endif
+					"");
 				printtrailer(tcp);
 			}
 #ifdef TCB_GROUP_EXITING
