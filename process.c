@@ -585,7 +585,7 @@ struct tcb *tcp;
 			}
 			else
 # endif
-				tprintf(", %#lx", tcp->u_arg[ARG_TLS]);
+				tprintf(", tls=%#lx", tcp->u_arg[ARG_TLS]);
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID))
 			tprintf(", child_tidptr=%#lx", tcp->u_arg[ARG_CTID]);
