@@ -2,6 +2,7 @@ Changes in 4.5.3
 ==============
 * Bug fixes.
 * On Linux using NPTL threads, -p will now attach to all threads in a process.
+* Handle new mq_* system calls in Linux 2.6.6 and later.
 
 Changes in 4.5.2
 ==============
