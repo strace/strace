@@ -1,3 +1,9 @@
+2004-03-01  Roland McGrath  <roland@redhat.com>
+
+	* util.c [LINUX] (arg0_index, arg1_index): New macros.
+	[S390 || S390X]: Define them with inverted values.
+	(setbpt): Use them for u_arg indices.
+
 2004-02-26  Andreas Schwab  <schwab@suse.de>
 
 	* defs.h [LINUX && IA64]: Declare getrval2 also on IA64.
