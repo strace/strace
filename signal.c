@@ -628,8 +628,12 @@ struct tcb *tcp;
 			}
 #endif /* !SVR4 */
 			tprintf("{%#lx, ", (long) sa.SA_HANDLER);
+#ifndef LINUX
+			printsigmask (&sa.sa_mask, 0);
+#else
 			long_to_sigset(sa.sa_mask, &sigset);
 			printsigmask(&sigset, 0);
+#endif
 			tprintf(", ");
 			if (!printflags(sigact_flags, sa.sa_flags))
 				tprintf("0");
