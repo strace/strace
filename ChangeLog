@@ -1,3 +1,13 @@
+2005-05-05  Anton Blanchard  <anton@samba.org>
+
+	* process.c (ptrace_cmds): Add PTRACE_GETVRREGS and PTRACE_SETVRREGS
+	if defined.
+
+2005-05-09  Roland McGrath  <roland@redhat.com>
+
+	* strace.c (main): Refuse negative -s argument value.
+	Fixes Debian bug #303256.
+
 2005-04-25  Anton Blanchard  <anton@samba.org>
 
 	* file.c (openmodes): Add O_NOATIME flag if defined.
