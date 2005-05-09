@@ -1,3 +1,21 @@
+2005-04-25  Anton Blanchard  <anton@samba.org>
+
+	* file.c (openmodes): Add O_NOATIME flag if defined.
+
+2005-04-05  Anton Blanchard  <anton@samba.org>
+
+	* linux/powerpc/ioctlent.h: Regenerated.
+
+	* signal.c (signame): Don't try and dereference negative index.
+
+	* linux/powerpc/syscallent.h: Add debug_setcontext, vserver,
+	mbind, *_mempolicy, mq_*, sys_kexec_load, add_key, request_key,
+	keyctl, waitid, sys_semtimedop.  Fix various other syscalls.
+
+	* ipc.c (shm_resource_flags): New variable, table has SHM_HUGETLB
+	but not IPC_NOWAIT, which have the same value.
+	(sys_shmget): Use that instead of resource_flags.
+
 2005-03-22  Roland McGrath  <roland@redhat.com>
 
 	* desc.c (decode_select): Increase local buffer size.
