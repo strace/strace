@@ -285,6 +285,12 @@ char *argv[];
 			break;
 		case 's':
 			max_strlen = atoi(optarg);
+			if (max_strlen < 0) {
+				fprintf(stderr,
+					"%s: invalid -s argument: %s\n",
+					progname, optarg);
+				exit(1);
+			}
 			break;
 		case 'S':
 			set_sortby(optarg);
