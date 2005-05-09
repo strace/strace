@@ -1,3 +1,24 @@
+2005-05-09  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Check for libaio.h.
+	* desc.c (sys_io_setup, sys_io_submit, sys_io_cancel,
+	sys_io_getevents, sys_io_destroy): New functions.
+	* linux/syscall.h: Declare them.
+	* linux/syscallent.h: Use those for io_* syscalls.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+	From Zach Brown <zach.brown@oracle.com>.
+	Fixes RH#155065.
+
+	* debian/control (Architecture): Add ppc64.
+	Fixes Debian bug #301089.
+
 2005-05-05  Anton Blanchard  <anton@samba.org>
 
 	* process.c (ptrace_cmds): Add PTRACE_GETVRREGS and PTRACE_SETVRREGS
