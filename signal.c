@@ -267,7 +267,7 @@ signame(sig)
 int sig;
 {
 	static char buf[30];
-	if (sig < nsignals) {
+	if (sig >= 0 && sig < nsignals) {
 		return signalent[sig];
 #ifdef SIGRTMIN
 	} else if (sig >= __SIGRTMIN && sig <= __SIGRTMAX) {
