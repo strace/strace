@@ -291,11 +291,11 @@
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 242 */
 	{ 1,	0,	sys_set_thread_area,	"set_thread_area" }, /* 243 */
 	{ 1,	0,	sys_get_thread_area,	"get_thread_area" }, /* 244 */
-	{ 2,	0,	printargs,		"io_setup"	}, /* 245 */
-	{ 1,	0,	printargs,		"io_destroy"	}, /* 246 */
-	{ 5,	0,	printargs,		"io_getevents"	}, /* 247 */
-	{ 3,	0,	printargs,		"io_submit"	}, /* 248 */
-	{ 3,	0,	printargs,		"io_cancel"	}, /* 249 */
+	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 245 */
+	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 246 */
+	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 247 */
+	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 248 */
+	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 249 */
 	{ 5,	TF,	sys_fadvise64,		"fadvise64"	}, /* 250 */
 	{ 5,	0,	printargs,		"SYS_251"	}, /* 251 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 252 */

@@ -426,11 +426,11 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"	}, /* 395 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"	}, /* 396 */
 	{ 5,	0,	printargs,		"tuxcall"		}, /* 397 */
-	{ 2,	0,	printargs,		"io_setup"		}, /* 398 */
-	{ 1,	0,	printargs,		"io_destroy"		}, /* 399 */
-	{ 5,	0,	printargs,		"io_getevents"		}, /* 400 */
-	{ 3,	0,	printargs,		"io_submit"		}, /* 401 */
-	{ 3,	0,	printargs,		"io_cancel"		}, /* 402 */
+	{ 2,	0,	sys_io_setup,		"io_setup"		}, /* 398 */
+	{ 1,	0,	sys_io_destroy,		"io_destroy"		}, /* 399 */
+	{ 5,	0,	sys_io_getevents,		"io_getevents"		}, /* 400 */
+	{ 3,	0,	sys_io_submit,		"io_submit"		}, /* 401 */
+	{ 3,	0,	sys_io_cancel,		"io_cancel"		}, /* 402 */
 	{ 5,	0,	printargs,		"SYS_403"		}, /* 403 */
 	{ 5,	0,	printargs,		"SYS_404"		}, /* 404 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 405 */

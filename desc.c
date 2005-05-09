@@ -40,6 +40,9 @@
 #ifdef HAVE_SYS_EPOLL_H
 #include <sys/epoll.h>
 #endif
+#ifdef HAVE_LIBAIO_H
+#include <libaio.h>
+#endif
 
 #if HAVE_LONG_LONG_OFF_T
 /*
@@ -700,6 +703,163 @@ struct tcb *tcp;
 				tprintf("{...}");
 		}
 		tprintf(", %ld, %ld", tcp->u_arg[2], tcp->u_arg[3]);
+	}
+	return 0;
+}
+
+int
+sys_io_setup(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("%ld, ", tcp->u_arg[0]);
+	else {
+		if (syserror(tcp))
+			tprintf("0x%0lx", tcp->u_arg[1]);
+		else {
+			unsigned long user_id;
+			if (umove(tcp, tcp->u_arg[1], &user_id) == 0)
+				tprintf("{%lu}", user_id);
+			else
+				tprintf("{...}");
+		}
+	}
+	return 0;
+}
+
+int
+sys_io_destroy(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("%lu", tcp->u_arg[0]);
+	return 0;
+}
+
+int
+sys_io_submit(tcp)
+struct tcb *tcp;
+{
+	long nr;
+	if (entering(tcp)) {
+		tprintf("%lu, %ld, ", tcp->u_arg[0], tcp->u_arg[1]);
+		nr = tcp->u_arg[1];
+		/* and if nr is negative? */
+		if (nr == 0)
+			tprintf("{}");
+		else {
+#ifdef HAVE_LIBAIO_H
+			long i;
+			struct iocb *iocbp, **iocbs = (void *)tcp->u_arg[2];
+
+			for (i = 0; i < nr; i++, iocbs++) {
+				struct iocb iocb;
+				if (i == 0)
+					tprintf("{");
+				else
+					tprintf(", ");
+
+				if (umove(tcp, (unsigned long)iocbs, &iocbp) ||
+				    umove(tcp, (unsigned long)iocbp, &iocb)) {
+					tprintf("{...}");
+					continue;
+				}
+				tprintf("{%p, %u, %hu, %hu, %d}",
+					iocb.data, iocb.key,
+					iocb.aio_lio_opcode,
+					iocb.aio_reqprio, iocb.aio_fildes);
+			}
+			if (i)
+				tprintf("}");
+#else
+			tprintf("{...}");
+#endif
+		}
+	}
+	return 0;
+}
+
+int
+sys_io_cancel(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+#ifdef HAVE_LIBAIO_H
+		struct iocb iocb;
+#endif
+		tprintf("%lu, ", tcp->u_arg[0]);
+#ifdef HAVE_LIBAIO_H
+		if (umove(tcp, tcp->u_arg[1], &iocb) == 0) {
+			tprintf("{%p, %u, %hu, %hu, %d}, ",
+				iocb.data, iocb.key,
+				iocb.aio_lio_opcode,
+				iocb.aio_reqprio, iocb.aio_fildes);
+		} else
+#endif
+			tprintf("{...}, ");
+	} else {
+		if (tcp->u_rval < 0)
+			tprintf("{...}");
+		else {
+#ifdef HAVE_LIBAIO_H
+			struct io_event event;
+			if (umove(tcp, tcp->u_arg[2], &event) == 0)
+				tprintf("{%p, %p, %ld, %ld}",
+					event.data, event.obj,
+					event.res, event.res2);
+			else 
+#endif
+				tprintf("{...}");
+		}
+	}
+	return 0;
+}
+
+int
+sys_io_getevents(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, %ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1],
+			tcp->u_arg[2]);
+	} else {
+		if (tcp->u_rval == 0) {
+			tprintf("{}");
+		} else  {
+#ifdef HAVE_LIBAIO_H
+			struct io_event *events = (void *)tcp->u_arg[3];
+			long i, nr = tcp->u_rval;
+
+			for (i = 0; i < nr; i++, events++) {
+				struct io_event event;
+
+				if (i == 0)
+					tprintf("{");
+				else
+					tprintf(", ");
+
+				if (umove(tcp, (unsigned long)events, &event) != 0) {
+					tprintf("{...}");
+					continue;
+				}
+				tprintf("{%p, %p, %ld, %ld}", event.data,
+					event.obj, event.res, event.res2);
+			}
+			tprintf("}, ");
+#else
+				tprintf("{...}");
+#endif
+		}
+
+		if (tcp->u_arg[4] == 0)
+			tprintf("NULL");
+		else {
+			struct timespec to;
+			if (umove(tcp, tcp->u_arg[4], &to) == 0)
+				tprintf("{%lu, %lu}", to.tv_sec, to.tv_nsec);
+			else
+				tprintf("{...}");
+		}
 	}
 	return 0;
 }

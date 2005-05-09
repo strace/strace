@@ -1141,11 +1141,11 @@
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 1235 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 1237 */
-	{ 2,	0,	printargs,		"io_setup"	}, /* 1238 */
-	{ 1,	0,	printargs,		"io_destroy"	}, /* 1239 */
-	{ 5,	0,	printargs,		"io_getevents"	}, /* 1240 */
-	{ 3,	0,	printargs,		"io_submit"	}, /* 1241 */
-	{ 3,	0,	printargs,		"io_cancel"	}, /* 1242 */
+	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 1238 */
+	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 1239 */
+	{ 5,	0,	sys_io_getevents,		"io_getevents"	}, /* 1240 */
+	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 1241 */
+	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 1242 */
 	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 1243 */
 	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 1244 */
 	{ 4,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 1245 */

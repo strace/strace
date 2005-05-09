@@ -204,11 +204,11 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 203 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 204 */
 	{ 1,	0,	sys_set_thread_area,	"set_thread_area" }, /* 205 */
-	{ 2,	0,	printargs,		"io_setup"	}, /* 206 */
-	{ 1,	0,	printargs,		"io_destroy"	}, /* 207 */
-	{ 5,	0,	printargs,		"io_getevents"	}, /* 208 */
-	{ 3,	0,	printargs,		"io_submit"	}, /* 209 */
-	{ 3,	0,	printargs,		"io_cancel"	}, /* 210 */
+	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 206 */
+	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 207 */
+	{ 5,	0,	sys_io_getevents,		"io_getevents"	}, /* 208 */
+	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 209 */
+	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 210 */
 	{ 1,	0,	sys_get_thread_area,	"get_thread_area" }, /* 211 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 212 */
 	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 213 */

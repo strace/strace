@@ -256,11 +256,11 @@
 	{ 5,	0,	printargs,		"SYS_224"		}, /* 224 */
 	{ 5,	0,	printargs,		"tux"			}, /* 225 */
 	{ 4,	TF,	sys_sendfile64,		"sendfile64"		}, /* 226 */
-	{ 2,	0,	printargs,		"io_setup"		}, /* 227 */
-	{ 1,	0,	printargs,		"io_destroy"		}, /* 228 */
-	{ 5,	0,	printargs,		"io_getevents"		}, /* 229 */
-	{ 3,	0,	printargs,		"io_submit"		}, /* 230 */
-	{ 3,	0,	printargs,		"io_cancel"		}, /* 231 */
+	{ 2,	0,	sys_io_setup,		"io_setup"		}, /* 227 */
+	{ 1,	0,	sys_io_destroy,		"io_destroy"		}, /* 228 */
+	{ 5,	0,	sys_io_getevents,		"io_getevents"		}, /* 229 */
+	{ 3,	0,	sys_io_submit,		"io_submit"		}, /* 230 */
+	{ 3,	0,	sys_io_cancel,		"io_cancel"		}, /* 231 */
 	{ 1,	0,	printargs,		"set_tid_address"	}, /* 232 */
 	{ 6,	TF,	sys_fadvise64,		"fadvise64"		}, /* 233 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 234 */
