@@ -123,6 +123,12 @@ static const struct xlat resource_flags[] = {
 	{ IPC_CREAT,	"IPC_CREAT"	},
 	{ IPC_EXCL,	"IPC_EXCL"	},
 	{ IPC_NOWAIT,	"IPC_NOWAIT"	},
+	{ 0,		NULL		},
+};
+
+static const struct xlat shm_resource_flags[] = {
+	{ IPC_CREAT,	"IPC_CREAT"	},
+	{ IPC_EXCL,	"IPC_EXCL"	},
 #ifdef SHM_HUGETLB
 	{ SHM_HUGETLB,	"SHM_HUGETLB"	},
 #endif
@@ -325,7 +331,7 @@ struct tcb *tcp;
 			tprintf("IPC_PRIVATE");
 		tprintf(", %lu", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(resource_flags, tcp->u_arg[2] & ~0777) != 0)
+		if (printflags(shm_resource_flags, tcp->u_arg[2] & ~0777) != 0)
 			tprintf("|");
 		tprintf("%#lo", tcp->u_arg[2] & 0777);
 	}
