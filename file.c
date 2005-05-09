@@ -255,6 +255,9 @@ const struct xlat openmodes[] = {
 #ifdef O_NOFOLLOW
 	{ O_NOFOLLOW, 	"O_NOFOLLOW"	},
 #endif
+#ifdef O_NOATIME
+	{ O_NOATIME, 	"O_NOATIME"	},
+#endif
 
 #ifdef FNDELAY
 	{ FNDELAY,	"FNDELAY"	},
