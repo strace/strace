@@ -1,3 +1,8 @@
+2005-05-26  Roland McGrath  <roland@redhat.com>
+
+	* system.c (sys_sysctl): Check for errors accessing user pointers.
+	Use malloc instead of alloca in case size is insane.
+
 2005-05-09  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: Check for libaio.h.
