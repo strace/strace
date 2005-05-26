@@ -1822,10 +1822,20 @@ struct tcb *tcp;
 {
 	struct __sysctl_args info;
 	int *name;
-	umove (tcp, tcp->u_arg[0], &info);
+	if (umove (tcp, tcp->u_arg[0], &info) < 0)
+		return printargs(tcp);
 
-	name = alloca (sizeof (int) * info.nlen);
-	umoven(tcp, (size_t) info.name, sizeof (int) * info.nlen, (char *) name);
+	name = malloc (sizeof (int) * info.nlen);
+	if (name == NULL ||
+	    umoven(tcp, (unsigned long) info.name,
+		   sizeof (int) * info.nlen, (char *) name) < 0) {
+		if (name != NULL)
+			free(name);
+		tprintf("{%p, %d, %p, %p, %p, %Zu}",
+			info.name, info.nlen, info.oldval, info.oldlenp,
+			info.newval, info.newlen);
+		return 0;
+	}
 
 	if (entering(tcp)) {
 		int cnt = 0;
@@ -1950,6 +1960,8 @@ struct tcb *tcp;
 		}
 		tprintf("}");
 	}
+
+	free(name);
 	return 0;
 }
 #else
