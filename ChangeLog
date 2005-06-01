@@ -1,3 +1,21 @@
+2005-05-31  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* bjm.c (sys_query_module) [LINUX]: Unitize "out of memory"
+	errors reporting style.
+	* strace.c (rebuild_pollv) [USE_PROCFS]: Likewise.
+	* system.c (sys_capget, sys_capset) [SYS_capget]: Likewise.
+	* util.c (printstr): Likewise.
+	(dumpiov) [HAVE_SYS_UIO_H]: Likewise.
+	(fixvfork) [SUNOS4]: Likewise.
+	* desc.c (decode_select): Continue to decode syscall arguments
+	in case of OOM condition.
+	* file.c (sys_getdents): Likewise.
+	(sys_getdents64) [_LFS64_LARGEFILE]: Likewise.
+	(sys_getdirentries) [FREEBSD]: Likewise.
+	* mem.c (sys_mincore): Changed type of variables which deal with
+	malloc size from int to unsigned long.
+	Fixes RH#159308.
+
 2005-05-26  Roland McGrath  <roland@redhat.com>
 
 	* system.c (sys_sysctl): Check for errors accessing user pointers.
