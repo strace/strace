@@ -112,7 +112,7 @@ struct tcb *tcp;
 		else
 			tprintf("%#lx", tcp->u_arg[2]);
 		tprintf(", ");
-		printflags(mount_flags, tcp->u_arg[3]);
+		printflags(mount_flags, tcp->u_arg[3], "MS_???");
 		tprintf(", %#lx", tcp->u_arg[4]);
 	}
 	return 0;
@@ -197,14 +197,11 @@ sys_reboot(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		if (!printflags(bootflags1, tcp->u_arg[0]))
-			tprintf("LINUX_REBOOT_MAGIC???");
+		printflags(bootflags1, tcp->u_arg[0], "LINUX_REBOOT_MAGIC_???");
 		tprintf(", ");
-		if (!printflags(bootflags2, tcp->u_arg[1]))
-			tprintf("LINUX_REBOOT_MAGIC???");
+		printflags(bootflags2, tcp->u_arg[1], "LINUX_REBOOT_MAGIC_???");
 		tprintf(", ");
-		if (!printflags(bootflags3, tcp->u_arg[2]))
-			tprintf("LINUX_REBOOT_CMD_???");
+		printflags(bootflags3, tcp->u_arg[2], "LINUX_REBOOT_CMD_???");
 		if (tcp->u_arg[2] == LINUX_REBOOT_CMD_RESTART2) {
 			tprintf(", ");
 			printstr(tcp, tcp->u_arg[3], -1);
@@ -251,7 +248,7 @@ struct tcb *tcp;
 		printxval(cacheflush_scope, tcp->u_arg[1], "FLUSH_SCOPE_???");
 		tprintf(", ");
 		/* flags */
-		printflags(cacheflush_flags, tcp->u_arg[2]);
+		printflags(cacheflush_flags, tcp->u_arg[2], "FLUSH_CACHE_???");
 		/* len */
 		tprintf(", %lu", tcp->u_arg[3]);
 	}
@@ -302,8 +299,7 @@ sys_reboot(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		if (!printflags(bootflags, tcp->u_arg[0]))
-			tprintf("RB_???");
+		printflags(bootflags, tcp->u_arg[0], "RB_???");
 		if (tcp->u_arg[0] & RB_STRING) {
 			printstr(tcp, tcp->u_arg[1], -1);
 		}
@@ -401,8 +397,7 @@ struct tcb *tcp;
 		}
 		printstr(tcp, tcp->u_arg[1], -1);
 		tprintf(", ");
-		if (!printflags(mountflags, tcp->u_arg[2] & ~M_NEWTYPE))
-			tprintf("0");
+		printflags(mountflags, tcp->u_arg[2] & ~M_NEWTYPE, "M_???");
 		tprintf(", ");
 
 		if (strcmp(type, "4.2") == 0) {
@@ -422,8 +417,7 @@ struct tcb *tcp;
 			tprintf("[");
 			printsock(tcp, (int) a.addr);
 			tprintf(", ");
-			if (!printflags(nfsflags, a.flags))
-				tprintf("NFSMNT_???");
+			printflags(nfsflags, a.flags, "NFSMNT_???");
 			tprintf(", ws:%u,rs:%u,to:%u,re:%u,",
 				a.wsize, a.rsize, a.timeo, a.retrans);
 			if (a.flags & NFSMNT_HOSTNAME && a.hostname)
@@ -1216,7 +1210,7 @@ struct tcb *tcp;
 		tprintf(", ");
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
-		printflags(mount_flags, tcp->u_arg[2]);
+		printflags(mount_flags, tcp->u_arg[2], "MS_???");
 		if (tcp->u_arg[2] & (MS_FSS | MS_DATA)) {
 			tprintf(", ");
 			tprintf("%ld", tcp->u_arg[3]);
@@ -1233,8 +1227,7 @@ struct tcb *tcp;
 					tprintf("addr=");
 					printsock(tcp, (int) args.addr);
 					tprintf(", flags=");
-					if (!printflags(nfs_flags, args.flags))
-						tprintf("NFSMNT_???");
+					printflags(nfs_flags, args.flags, "NFSMNT_???");
 					tprintf(", hostname=");
 					printstr(tcp, (int) args.hostname, -1);
 					tprintf(", ...}");
@@ -1329,7 +1322,7 @@ struct tcb *tcp;
 		tprintf(", ");
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
-		printflags(mount_flags, tcp->u_arg[2]);
+		printflags(mount_flags, tcp->u_arg[2], "MS_???");
 		/* The doc sez that the file system type is given as a
 		   fsindex, and we should use sysfs to work out the name.
 		   This appears to be untrue for UW.  Maybe it's untrue
@@ -1353,8 +1346,7 @@ struct tcb *tcp;
 					tprintf("%#lx", tcp->u_arg[4]);
 				else {
 					tprintf("{ flags=");
-					if (!printflags(vxfs_flags, args.mflags))
-						tprintf("0x%08x", args.mflags);
+					printflags(vxfs_flags, args.mflags, "VX_MS_???");
 					if (args.mflags & VX_MS_SNAPSHOT) {
 						tprintf (", snapof=");
 						printstr (tcp,
@@ -1387,8 +1379,7 @@ struct tcb *tcp;
 						printsock(tcp, (int) addr.buf, addr.len);
 					}
 					tprintf(", flags=");
-					if (!printflags(nfs_flags, args.flags))
-						tprintf("NFSMNT_???");
+					printflags(nfs_flags, args.flags, "NFSMNT_???");
 					tprintf(", hostname=");
 					printstr(tcp, (int) args.hostname, -1);
 					tprintf(", ...}");
@@ -1497,11 +1488,11 @@ struct tcb *tcp;
 			tprintf("???");
 		else {
 			tprintf("{");
-			printflags(capabilities, arg1->effective);
+			printflags(capabilities, arg1->effective, "CAP_???");
 			tprintf(", ");
-			printflags(capabilities, arg1->permitted);
+			printflags(capabilities, arg1->permitted, "CAP_???");
 			tprintf(", ");
-			printflags(capabilities, arg1->inheritable);
+			printflags(capabilities, arg1->inheritable, "CAP_???");
 			tprintf("}");
 		}
 	}
@@ -1549,11 +1540,11 @@ struct tcb *tcp;
 			tprintf("???");
 		else {
 			tprintf("{");
-			printflags(capabilities, arg1->effective);
+			printflags(capabilities, arg1->effective, "CAP_???");
 			tprintf(", ");
-			printflags(capabilities, arg1->permitted);
+			printflags(capabilities, arg1->permitted, "CAP_???");
 			tprintf(", ");
-			printflags(capabilities, arg1->inheritable);
+			printflags(capabilities, arg1->inheritable, "CAP_???");
 			tprintf("}");
 		}
 	}

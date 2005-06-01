@@ -315,7 +315,7 @@ struct tcb *tcp;
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
 		/* flags */
-		printflags(openmodes, tcp->u_arg[1] + 1);
+		printflags(openmodes, tcp->u_arg[1] + 1, "O_???");
 		if (tcp->u_arg[1] & O_CREAT) {
 			/* mode */
 			tprintf(", %#lo", tcp->u_arg[2]);
@@ -351,7 +351,7 @@ struct tcb *tcp;
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
 		/* flags */
-		printflags(openmodessol, tcp->u_arg[1] + 1);
+		printflags(openmodessol, tcp->u_arg[1] + 1, "O_???");
 		if (tcp->u_arg[1] & 0x100) {
 			/* mode */
 			tprintf(", %#lo", tcp->u_arg[2]);
@@ -394,7 +394,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
-		printflags(access_flags, tcp->u_arg[1]);
+		printflags(access_flags, tcp->u_arg[1], "?_OK");
 	}
 	return 0;
 }
@@ -783,10 +783,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
-		if (tcp->u_arg[1])
-			printflags(fileflags, tcp->u_arg[1]);
-		else
-			tprintf("0");
+		printflags(fileflags, tcp->u_arg[1], "UF_???");
 	}
 	return 0;
 }
@@ -797,10 +794,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		if (tcp->u_arg[1])
-			printflags(fileflags, tcp->u_arg[1]);
-		else
-			tprintf("0");
+		printflags(fileflags, tcp->u_arg[1], "UF_???");
 	}
 	return 0;
 }
@@ -853,10 +847,7 @@ struct stat *statbuf;
 	    tprintf("st_ctime=%s", sprinttime(statbuf->st_ctime));
 #if HAVE_STRUCT_STAT_ST_FLAGS
 		tprintf(", st_flags=");
-		if (statbuf->st_flags) {
-			printflags(fileflags, statbuf->st_flags);
-		} else
-			tprintf("0");
+		printflags(fileflags, statbuf->st_flags, "UF_???");
 #endif
 #if HAVE_STRUCT_STAT_ST_ACLCNT
 		tprintf(", st_aclcnt=%d", statbuf->st_aclcnt);
@@ -999,10 +990,7 @@ long addr;
 		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
 #if HAVE_STRUCT_STAT_ST_FLAGS
 		tprintf(", st_flags=");
-		if (statbuf.st_flags) {
-			printflags(fileflags, statbuf.st_flags);
-		} else
-			tprintf("0");
+		printflags(fileflags, statbuf.st_flags, "UF_???");
 #endif
 #if HAVE_STRUCT_STAT_ST_ACLCNT
 		tprintf(", st_aclcnt=%d", statbuf.st_aclcnt);
@@ -2403,7 +2391,7 @@ struct tcb *tcp;
 	printstr(tcp, tcp->u_arg[1], -1);
 	print_xattr_val(tcp, 0, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
 	tprintf(", ");
-	printflags(xattrflags, tcp->u_arg[4]);
+	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
     }
     return 0;
 }
@@ -2417,7 +2405,7 @@ struct tcb *tcp;
 	printstr(tcp, tcp->u_arg[1], -1);
 	print_xattr_val(tcp, 0, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
 	tprintf(", ");
-	printflags(xattrflags, tcp->u_arg[4]);
+	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
     }
     return 0;
 }

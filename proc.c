@@ -110,8 +110,7 @@ int code, arg;
 			tprintf(", {...}");
 		else {
 			tprintf(", {pr_flags=");
-			if (!printflags(proc_status_flags, status.pr_flags))
-				tprintf("0");
+			printflags(proc_status_flags, status.pr_flags, "PR_???");
 			if (status.pr_why) {
 				tprintf(", pr_why=");
 				printxval(proc_status_why, status.pr_why,
@@ -142,8 +141,7 @@ int code, arg;
 			tprintf(", {...}");
 		else {
 			tprintf(", {pr_flags=");
-			if (!printflags(proc_run_flags, run.pr_flags))
-				tprintf("0");
+			printflags(proc_run_flags, run.pr_flags, "PR???");
 			tprintf(", ...}");
 		}
 		return 1;
@@ -154,8 +152,7 @@ int code, arg;
 			tprintf(", [?]");
 		else {
 			tprintf(", [");
-			if (!printflags(proc_status_flags, val))
-				tprintf("0");
+			printflags(proc_status_flags, val, "PR_???");
 			tprintf("]");
 		}
 		return 1;
@@ -227,29 +224,22 @@ int code, arg;
 			tprintf(", {...}");
 		else {
 			tprintf(", {state=%d, flags=", status.state);
-			if (!printflags(proc_status_flags, status.flags))
-				tprintf("0");
+			printflags(proc_status_flags, status.flags, "PF_???");
 			tprintf(", events=");
-			printflags(proc_status_why, status.events);
+			printflags(proc_status_why, status.events, "S_???");
 			tprintf(", why=");
 			printxval(proc_status_why, status.why, "S_???");
 			tprintf(", val=%lu}", status.val);
 		}
 		return 1;
 	case PIOCBIS:
-		if (arg) {
-			tprintf(", ");
-			printflags(proc_status_why, arg);
-		} else
-			tprintf(", 0");
+		tprintf(", ");
+		printflags(proc_status_why, arg, "S_???");
 		return 1;
 		return 1;
 	case PIOCSFL:
-		if (arg) {
-			tprintf(", ");
-			printflags(proc_status_flags, arg);
-		} else
-			tprintf(", 0");
+		tprintf(", ");
+		printflags(proc_status_flags, arg, "PF_???");
 		return 1;
 	case PIOCGFL:
 	        if (syserror(tcp))
@@ -258,10 +248,7 @@ int code, arg;
 			tprintf(", {...}");
 		else {
 			tprintf(", [");
-			if (val)
-				printflags(proc_status_flags, val);
-			else
-				tprintf("0");
+			printflags(proc_status_flags, val, "PF_???");
 			tprintf("]");
 		}
 		return 1;

@@ -193,7 +193,7 @@ long code, arg;
 				break;
 			case SIOCGIFFLAGS:
 				tprintf("ifr_flags=");
-				printflags(iffflags, ifr.ifr_flags);
+				printflags(iffflags, ifr.ifr_flags, "IFF_???");
 				break;
 			case SIOCGIFMETRIC:
 				tprintf("ifr_metric=%d", ifr.ifr_metric);

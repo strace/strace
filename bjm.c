@@ -118,7 +118,7 @@ struct tcb *tcp;
 			size_t			ret;
 			umove(tcp, tcp->u_arg[2], &mi);
 			tprintf("{address=%#lx, size=%lu, flags=", mi.addr, mi.size);
-			printflags(modflags, mi.flags);
+			printflags(modflags, mi.flags, "MOD_???");
 			tprintf(", usecount=%lu}", mi.usecount);
 			umove(tcp, tcp->u_arg[4], &ret);
 			tprintf(", %Zu", ret);

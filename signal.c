@@ -962,8 +962,7 @@ struct tcb *tcp;
 			tprintf("{%#lx, ", (unsigned long) sv.sv_handler);
 			printsigmask(&sv.sv_mask, 0);
 			tprintf(", ");
-			if (!printflags(sigvec_flags, sv.sv_flags))
-				tprintf("0");
+			printflags(sigvec_flags, sv.sv_flags, "SV_???");
 			tprintf("}");
 		}
 	}
@@ -1128,8 +1127,7 @@ struct tcb *tcp;
 			printsigmask(&sigset, 0);
 #endif
 			tprintf(", ");
-			if (!printflags(sigact_flags, sa.sa_flags))
-				tprintf("0");
+			printflags(sigact_flags, sa.sa_flags, "SA_???");
 #ifdef SA_RESTORER
 			if (sa.sa_flags & SA_RESTORER)
 				tprintf(", %p", sa.sa_restorer);
@@ -1541,8 +1539,7 @@ ucontext_t *ucp;
 	tprintf("{");
 	if (!abbrev(tcp)) {
 		tprintf("uc_flags=");
-		if (!printflags(ucontext_flags, ucp->uc_flags))
-			tprintf("0");
+		printflags(ucontext_flags, ucp->uc_flags, "UC_???");
 		tprintf(", uc_link=%#lx, ", (unsigned long) ucp->uc_link);
 	}
 	tprintf("uc_sigmask=");
@@ -1551,8 +1548,7 @@ ucontext_t *ucp;
 		tprintf(", uc_stack={ss_sp=%#lx, ss_size=%d, ss_flags=",
 			(unsigned long) ucp->uc_stack.ss_sp,
 			ucp->uc_stack.ss_size);
-		if (!printflags(sigaltstack_flags, ucp->uc_stack.ss_flags))
-			tprintf("0");
+		printflags(sigaltstack_flags, ucp->uc_stack.ss_flags, "SS_???");
 		tprintf("}");
 	}
 	tprintf(", ...}");
@@ -1613,8 +1609,7 @@ unsigned long addr;
 	if (umove(tcp, addr, &ss) < 0)
 		return -1;
 	tprintf("{ss_sp=%#lx, ss_flags=", (unsigned long) ss.ss_sp);
-	if (!printflags(sigaltstack_flags, ss.ss_flags))
-		tprintf("0");
+	printflags(sigaltstack_flags, ss.ss_flags, "SS_???");
 	tprintf(", ss_size=%lu}", (unsigned long) ss.ss_size);
 	return 0;
 }
@@ -1857,8 +1852,7 @@ sys_rt_sigaction(tcp)
 					memcpy(&sigset, &sa.sa_mask, sizeof(sigset));
 				printsigmask(&sigset, 1);
 				tprintf(", ");
-				if (!printflags(sigact_flags, sa.sa_flags))
-					tprintf("0");
+				printflags(sigact_flags, sa.sa_flags, "SA_???");
 #ifdef SA_RESTORER
 				if (sa.sa_flags & SA_RESTORER)
 					tprintf(", %p", sa.sa_restorer);

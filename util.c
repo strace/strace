@@ -247,7 +247,7 @@ void
 printxval(xlat, val, dflt)
 const struct xlat *xlat;
 int val;
-char *dflt;
+const char *dflt;
 {
 	char *str = xlookup(xlat, val);
 
@@ -284,9 +284,10 @@ int flags;
 }
 
 int
-printflags(xlat, flags)
+printflags(xlat, flags, dflt)
 const struct xlat *xlat;
 int flags;
+const char *dflt;
 {
 	int n;
 	char *sep;
@@ -305,10 +306,23 @@ int flags;
 			n++;
 		}
 	}
-	if (flags) {
-		tprintf("%s%#x", sep, flags);
-		n++;
+
+	if (n) {
+		if (flags) {
+			tprintf("%s%#x", sep, flags);
+			n++;
+		}
+	} else {
+		if (flags) {
+			tprintf("%#x", flags);
+			if (dflt)
+				tprintf(" /* %s */", dflt);
+		} else {
+			if (dflt)
+				tprintf("0");
+		}
 	}
+
 	return n;
 }
 

@@ -579,8 +579,7 @@ struct tcb *tcp;
 				tcp->u_arg[ARG_STACKSIZE]);
 # endif
 		tprintf("flags=");
-		if (printflags(clone_flags, flags &~ CSIGNAL) == 0)
-			tprintf("0");
+		printflags(clone_flags, flags &~ CSIGNAL, NULL);
 		if ((flags & CSIGNAL) != 0)
 			tprintf("|%s", signame(flags & CSIGNAL));
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
@@ -1820,8 +1819,7 @@ int bitness;
 			exited = printstatus(status);
 		/* options */
 		tprintf(", ");
-		if (!printflags(wait4_options, tcp->u_arg[2]))
-			tprintf("0");
+		printflags(wait4_options, tcp->u_arg[2], "W???");
 		if (n == 4) {
 			tprintf(", ");
 			/* usage */
@@ -2045,8 +2043,7 @@ struct tcb *tcp;
 			printsiginfo(&si, verbose (tcp));
 		/* options */
 		tprintf(", ");
-		if (!printflags(wait4_options, tcp->u_arg[3]))
-			tprintf("0");
+		printflags(wait4_options, tcp->u_arg[3], "W???");
 		if (tcp->u_nargs > 4) {
 			/* usage */
 			tprintf(", ");

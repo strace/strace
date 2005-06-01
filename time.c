@@ -411,8 +411,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
 		tprintf(", ");
-		if (printflags(clockflags, tcp->u_arg[1]) == 0)
-			tprintf("0");
+		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprintf(", ");
 		printtv(tcp, tcp->u_arg[2]);
 		tprintf(", ");
@@ -493,8 +492,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, ", tcp->u_arg[0]);
-		if (printflags(clockflags, tcp->u_arg[1]) == 0)
-			tprintf("0");
+		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprintf(", ");
 		printitv(tcp, tcp->u_arg[2]);
 		tprintf(", ");

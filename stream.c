@@ -124,8 +124,7 @@ struct tcb *tcp;
 		for (i = 1; i < 3; i++)
 			printstrbufarg(tcp, tcp->u_arg[i], 0);
 		/* flags */
-		if (!printflags(msgflags, tcp->u_arg[3]))
-			tprintf("0");
+		printflags(msgflags, tcp->u_arg[3], "RS_???");
 	}
 	return 0;
 }
@@ -155,8 +154,7 @@ struct tcb *tcp;
 			tprintf("[?]");
 		else {
 			tprintf("[");
-			if (!printflags(msgflags, flags))
-				tprintf("0");
+			printflags(msgflags, flags, "RS_???");
 			tprintf("]");
 		}
 		/* decode return value */
@@ -209,8 +207,7 @@ struct tcb *tcp;
 		/* band */
 		tprintf("%ld, ", tcp->u_arg[3]);
 		/* flags */
-		if (!printflags(pmsgflags, tcp->u_arg[4]))
-			tprintf("0");
+		printflags(pmsgflags, tcp->u_arg[4], "MSG_???");
 	}
 	return 0;
 }
@@ -245,8 +242,7 @@ struct tcb *tcp;
 			tprintf("[?]");
 		else {
 			tprintf("[");
-			if (!printflags(pmsgflags, flags))
-				tprintf("0");
+			printflags(pmsgflags, flags, "MSG_???");
 			tprintf("]");
 		}
 		/* decode return value */
@@ -334,13 +330,12 @@ struct tcb *tcp;
 					continue;
 				}
 				tprintf("{fd=%d, events=", pollp[i].fd);
-				if (!printflags(pollflags, pollp[i].events))
-					tprintf("0");
+				printflags(pollflags, pollp[i].events,
+					   "POLL???");
 				if (!syserror(tcp) && pollp[i].revents) {
 					tprintf(", revents=");
-					if (!printflags(pollflags,
-							pollp[i].revents))
-						tprintf("0");
+					printflags(pollflags, pollp[i].revents,
+						   "POLL???");
 				}
 				tprintf("}");
 			}
@@ -774,7 +769,8 @@ int len;
 		GET (T_OPTMGMT_REQ, optmgmt_req);
 		COMMA ();
 		tprintf ("MGMT=");
-		printflags (transport_user_flags, m.optmgmt_req.MGMT_flags);
+		printflags (transport_user_flags, m.optmgmt_req.MGMT_flags,
+			    "T_???");
 		STRUCT (optmgmt_req, OPT, print_optmgmt);
 		break;
 #endif
@@ -834,7 +830,7 @@ int len;
 		tprintf (", CURRENT=");
 		printxval (ts_state, m.info_ack.CURRENT_state, "TS_???");
 		tprintf (", PROVIDER=");
-		printflags (provider_flags, m.info_ack.PROVIDER_flag);
+		printflags (provider_flags, m.info_ack.PROVIDER_flag, "???");
 		break;
 #endif
 #ifdef T_BIND_ACK
@@ -885,7 +881,8 @@ int len;
 		GET (T_OPTMGMT_ACK, optmgmt_ack);
 		COMMA ();
 		tprintf ("MGMT=");
-		printflags (transport_user_flags, m.optmgmt_ack.MGMT_flags);
+		printflags (transport_user_flags, m.optmgmt_ack.MGMT_flags,
+			    "T_???");
 		STRUCT (optmgmt_ack, OPT, print_optmgmt);
 		break;
 #endif
@@ -1127,8 +1124,7 @@ int code, arg;
 			tprintf(", {...}");
 		else {
 			tprintf(", {bi_pri=%d, bi_flag=", bi.bi_pri);
-			if (!printflags(stream_flush_options, bi.bi_flag))
-				tprintf("0");
+			printflags(stream_flush_options, bi.bi_flag, "FLUSH???");
 			tprintf("}");
 		}
 		return 1;
@@ -1136,8 +1132,7 @@ int code, arg;
 	case I_SETSIG:
 		/* argument is a set of flags */
 		tprintf(", ");
-		if (!printflags(stream_setsig_flags, arg))
-			tprintf("0");
+		printflags(stream_setsig_flags, arg, "S_???");
 		return 1;
 	case I_GETSIG:
 		/* argument is a pointer to a set of flags */
@@ -1146,8 +1141,8 @@ int code, arg;
 		tprintf(", [");
 		if (umove(tcp, arg, &val) < 0)
 			tprintf("?");
-		else if (!printflags(stream_setsig_flags, val))
-			tprintf("0");
+		else
+			printflags(stream_setsig_flags, val, "S_???");
 		tprintf("]");
 		return 1;
 	case I_PEEK:
@@ -1163,8 +1158,7 @@ int code, arg;
 		tprintf(", databuf=");
 		printstrbuf(tcp, &sp.databuf, 1);
 		tprintf(", flags=");
-		if (!printflags(msgflags, sp.flags))
-			tprintf("0");
+		printflags(msgflags, sp.flags, "RS_???");
 		tprintf("}");
 		return 1;
 	case I_SRDOPT:
@@ -1216,16 +1210,14 @@ int code, arg;
 		tprintf(", databuf=");
 		printstrbuf(tcp, &sfi.databuf, 1);
 		tprintf(", flags=");
-		if (!printflags(msgflags, sfi.flags))
-			tprintf("0");
+		printflags(msgflags, sfi.flags, "RS_???");
 		tprintf(", filedes=%d, offset=%d}", sfi.fildes, sfi.offset);
 		return 1;
 #ifdef I_SWROPT
 	case I_SWROPT:
 		/* argument is a set of flags */
 		tprintf(", ");
-		if (!printflags(stream_write_flags, arg))
-			tprintf("0");
+		printflags(stream_write_flags, arg, "SND???");
 		return 1;
 #endif /* I_SWROPT */
 #ifdef I_GWROPT
@@ -1236,8 +1228,8 @@ int code, arg;
 		tprintf(", [");
 		if (umove(tcp, arg, &val) < 0)
 			tprintf("?");
-		else if (!printflags(stream_write_flags, arg))
-			tprintf("0");
+		else
+			printflags(stream_write_flags, arg, "SND???");
 		tprintf("]");
 		return 1;
 #endif /* I_GWROPT */

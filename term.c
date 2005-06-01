@@ -340,8 +340,7 @@ long code, arg;
 		if (umove(tcp, arg, &arg) < 0)
 			return 0;
 		tprintf(", [");
-		if (!printflags(modem_flags, arg))
-			tprintf("0");
+		printflags(modem_flags, arg, "TIOCM_???");
 		tprintf("]");
 		return 1;
 #endif /* TIOCMGET */

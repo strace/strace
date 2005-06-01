@@ -1146,8 +1146,7 @@ long addr;
 		printcmsghdr(tcp, (unsigned long) msg.msg_control,
 			     msg.msg_controllen);
 	tprintf(", msg_flags=");
-	if (printflags(msg_flags, msg.msg_flags)==0)
-		tprintf("0");
+	printflags(msg_flags, msg.msg_flags, "MSG_???");
 #else /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
 	tprintf("msg_accrights=%#lx, msg_accrightslen=%u",
 		(unsigned long) msg.msg_accrights, msg.msg_accrightslen);
@@ -1274,8 +1273,7 @@ struct tcb *tcp;
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
-		if (printflags(msg_flags, tcp->u_arg[3]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	}
 	return 0;
 }
@@ -1289,8 +1287,7 @@ struct tcb *tcp;
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
-		if (printflags(msg_flags, tcp->u_arg[3]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		/* to address */
 		tprintf(", ");
 		printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
@@ -1311,8 +1308,7 @@ struct tcb *tcp;
 		printmsghdr(tcp, tcp->u_arg[1]);
 		/* flags */
 		tprintf(", ");
-		if (printflags(msg_flags, tcp->u_arg[2]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 	}
 	return 0;
 }
@@ -1332,8 +1328,7 @@ struct tcb *tcp;
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		if (printflags(msg_flags, tcp->u_arg[3]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	}
 	return 0;
 }
@@ -1358,8 +1353,7 @@ struct tcb *tcp;
 		/* len */
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
-		if (printflags(msg_flags, tcp->u_arg[3]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		/* from address, len */
 		if (!tcp->u_arg[4] || !tcp->u_arg[5]) {
 			if (tcp->u_arg[4] == 0)
@@ -1399,8 +1393,7 @@ struct tcb *tcp;
 			printmsghdr(tcp, tcp->u_arg[1]);
 		/* flags */
 		tprintf(", ");
-		if (printflags(msg_flags, tcp->u_arg[2]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 	}
 	return 0;
 }
@@ -1623,8 +1616,7 @@ long addr;
 	}
 
 	tprintf("~(");
-	if (printflags(icmpfilterflags, ~filter.data) == 0)
-		tprintf("0");
+	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
 	tprintf(")");
 }
 #endif /* ICMP_FILTER */

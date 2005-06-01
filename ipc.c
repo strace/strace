@@ -162,7 +162,7 @@ struct tcb *tcp;
 		else
 			tprintf("IPC_PRIVATE");
 		tprintf(", ");
-		if (printflags(resource_flags, tcp->u_arg[1] & ~0777) != 0)
+		if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 			tprintf("|");
 		tprintf("%#lo", tcp->u_arg[1] & 0777);
 	}
@@ -206,8 +206,7 @@ struct tcb *tcp;
 			tcp->u_arg[1]);
 		tprintf("}, %lu", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(msg_flags, tcp->u_arg[2]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 #else /* !LINUX */
 		umove(tcp, tcp->u_arg[1], &mtype);
 		tprintf(", {%lu, ", mtype);
@@ -215,8 +214,7 @@ struct tcb *tcp;
 			tcp->u_arg[2]);
 		tprintf("}, %lu", tcp->u_arg[2]);
 		tprintf(", ");
-		if (printflags(msg_flags, tcp->u_arg[3]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 #endif /* !LINUX */
 	}
 	return 0;
@@ -245,8 +243,7 @@ struct tcb *tcp;
 		tprintf("}, %lu", tcp->u_arg[1]);
 		tprintf(", %ld", tmp.msgtyp);
 		tprintf(", ");
-		if (printflags(msg_flags, tcp->u_arg[2]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 #else /* !LINUX */
 		umove(tcp, tcp->u_arg[1], &mtype);
 		tprintf(", {%lu, ", mtype);
@@ -255,8 +252,7 @@ struct tcb *tcp;
 		tprintf("}, %lu", tcp->u_arg[2]);
 		tprintf(", %ld", tcp->u_arg[3]);
 		tprintf(", ");
-		if (printflags(msg_flags, tcp->u_arg[4]) == 0)
-			tprintf("0");
+		printflags(msg_flags, tcp->u_arg[4], "MSG_???");
 #endif /* !LINUX */
 	}
 	return 0;
@@ -302,7 +298,7 @@ struct tcb *tcp;
 			tprintf("IPC_PRIVATE");
 		tprintf(", %lu", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(resource_flags, tcp->u_arg[2] & ~0777) != 0)
+		if (printflags(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 			tprintf("|");
 		tprintf("%#lo", tcp->u_arg[2] & 0777);
 	}
@@ -331,7 +327,7 @@ struct tcb *tcp;
 			tprintf("IPC_PRIVATE");
 		tprintf(", %lu", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(shm_resource_flags, tcp->u_arg[2] & ~0777) != 0)
+		if (printflags(shm_resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 			tprintf("|");
 		tprintf("%#lo", tcp->u_arg[2] & 0777);
 	}
@@ -365,13 +361,11 @@ struct tcb *tcp;
 #ifdef LINUX
 		tprintf(", %#lx", tcp->u_arg[3]);
 		tprintf(", ");
-		if (printflags(shm_flags, tcp->u_arg[1]) == 0)
-			tprintf("0");
+		printflags(shm_flags, tcp->u_arg[1], "SHM_???");
 #else /* !LINUX */
 		tprintf(", %#lx", tcp->u_arg[1]);
 		tprintf(", ");
-		if (printflags(shm_flags, tcp->u_arg[2]) == 0)
-			tprintf("0");
+		printflags(shm_flags, tcp->u_arg[2], "SHM_???");
 #endif /* !LINUX */
 		if (syserror(tcp))
 			return 0;
@@ -407,7 +401,7 @@ struct tcb *tcp;
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
 		/* flags */
-		printflags(openmodes, tcp->u_arg[1] + 1);
+		printflags(openmodes, tcp->u_arg[1] + 1, "O_???");
 		if (tcp->u_arg[1] & O_CREAT) {
 # ifndef HAVE_MQUEUE_H
 			tprintf(", %lx", tcp->u_arg[2]);
@@ -477,7 +471,7 @@ long addr;
 			return;
 		}
 		tprintf("{mq_flags=");
-		printflags(openmodes, attr.mq_flags + 1);
+		printflags(openmodes, attr.mq_flags + 1, "O_???");
 		tprintf(", mq_maxmsg=%ld, mq_msgsize=%ld, mq_curmsg=%ld}",
 			attr.mq_maxmsg, attr.mq_msgsize, attr.mq_curmsgs);
 # endif

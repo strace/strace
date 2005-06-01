@@ -199,14 +199,14 @@ long *u_arg;
 		/* len */
 		tprintf("%lu, ", u_arg[1]);
 		/* prot */
-		printflags(mmap_prot, u_arg[2]);
+		printflags(mmap_prot, u_arg[2], "PROT_???");
 		tprintf(", ");
 		/* flags */
 #ifdef MAP_TYPE
 		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
 		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
 #else
-		printflags(mmap_flags, u_arg[3]);
+		printflags(mmap_flags, u_arg[3], "MAP_???");
 #endif
 		/* fd (is always int, not long) */
 		tprintf(", %d, ", (int)u_arg[4]);
@@ -300,14 +300,14 @@ struct tcb *tcp;
 		/* len */
 		tprintf("%lu, ", u_arg[1]);
 		/* prot */
-		printflags(mmap_prot, u_arg[2]);
+		printflags(mmap_prot, u_arg[2], "PROT_???");
 		tprintf(", ");
 		/* flags */
 #ifdef MAP_TYPE
 		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
 		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
 #else
-		printflags(mmap_flags, u_arg[3]);
+		printflags(mmap_flags, u_arg[3], "MAP_???");
 #endif
 		/* fd */
 		tprintf(", %ld, ", u_arg[4]);
@@ -337,8 +337,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ",
 			tcp->u_arg[0], tcp->u_arg[1]);
-		if (!printflags(mmap_prot, tcp->u_arg[2]))
-			tprintf("PROT_???");
+		printflags(mmap_prot, tcp->u_arg[2], "PROT_???");
 	}
 	return 0;
 }
@@ -357,7 +356,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1],
 			tcp->u_arg[2]);
-		printflags(mremap_flags, tcp->u_arg[3]);
+		printflags(mremap_flags, tcp->u_arg[3], "MREMAP_???");
 	}
 	return RVAL_HEX;
 }
@@ -388,7 +387,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-		printflags(madvise_flags, tcp->u_arg[2]);
+		printflags(madvise_flags, tcp->u_arg[2], "MADV_???");
 	}
 	return 0;
 }
@@ -409,7 +408,7 @@ sys_mlockall(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		printflags(mlockall_flags, tcp->u_arg[0]);
+		printflags(mlockall_flags, tcp->u_arg[0], "MCL_???");
 	}
 	return 0;
 }
@@ -438,8 +437,7 @@ struct tcb *tcp;
 		/* len */
 		tprintf(", %lu, ", tcp->u_arg[1]);
 		/* flags */
-		if (!printflags(mctl_sync, tcp->u_arg[2]))
-			tprintf("MS_???");
+		printflags(mctl_sync, tcp->u_arg[2], "MS_???");
 	}
 	return 0;
 }
@@ -476,19 +474,16 @@ struct tcb *tcp;
 		tprintf(", %lu, ", tcp->u_arg[1]);
 		/* function */
 		function = tcp->u_arg[2];
-		if (!printflags(mctl_funcs, function))
-			tprintf("MC_???");
+		printflags(mctl_funcs, function, "MC_???");
 		/* arg */
 		arg = tcp->u_arg[3];
 		tprintf(", ");
 		switch (function) {
 		case MC_SYNC:
-			if (!printflags(mctl_sync, arg))
-				tprintf("MS_???");
+			printflags(mctl_sync, arg, "MS_???");
 			break;
 		case MC_LOCKAS:
-			if (!printflags(mctl_lockas, arg))
-				tprintf("MCL_???");
+			printflags(mctl_lockas, arg, "MCL_???");
 			break;
 		default:
 			tprintf("%#x", arg);
@@ -646,13 +641,13 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-		printflags(mmap_prot, tcp->u_arg[2]);
+		printflags(mmap_prot, tcp->u_arg[2], "PROT_???");
 		tprintf(", %lu, ", tcp->u_arg[3]);
 #ifdef MAP_TYPE
 		printxval(mmap_flags, tcp->u_arg[4] & MAP_TYPE, "MAP_???");
 		addflags(mmap_flags, tcp->u_arg[4] & ~MAP_TYPE);
 #else
-		printflags(mmap_flags, tcp->u_arg[4]);
+		printflags(mmap_flags, tcp->u_arg[4], "MAP_???");
 #endif
 	}
 	return 0;
@@ -729,8 +724,7 @@ struct tcb *tcp;
 		printxval(policies, tcp->u_arg[2], "MPOL_???");
 		get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[4], 0);
 		tprintf(", ");
-		if (printflags(mbindflags, tcp->u_arg[5]) == 0)
-			tprintf("0");
+		printflags(mbindflags, tcp->u_arg[5], "MPOL_???");
 	}
 	return 0;
 }
@@ -760,8 +754,7 @@ struct tcb *tcp;
 			printxval(policies, pol, "MPOL_???");
 		get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], syserror(tcp));
 		tprintf(", %#lx, ", tcp->u_arg[3]);
-		if (printflags(mempolicyflags, tcp->u_arg[4]) == 0)
-			tprintf("0");
+		printflags(mempolicyflags, tcp->u_arg[4], "MPOL_???");
 	}
 	return 0;
 }

@@ -278,16 +278,14 @@ struct tcb *tcp;
 		switch (tcp->u_arg[1]) {
 		case F_SETFD:
 			tprintf(", ");
-			if (printflags(fdflags, tcp->u_arg[2]) == 0)
-				tprintf("0");
+			printflags(fdflags, tcp->u_arg[2], "FD_???");
 			break;
 		case F_SETOWN: case F_DUPFD:
 			tprintf(", %ld", tcp->u_arg[2]);
 			break;
 		case F_SETFL:
 			tprintf(", ");
-			if (printflags(openmodes, tcp->u_arg[2] + 1) == 0)
-				tprintf("0");
+			printflags(openmodes, tcp->u_arg[2] + 1, "O_???");
 			break;
 		case F_SETLK: case F_SETLKW:
 #ifdef F_FREESP
@@ -357,8 +355,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		if (!printflags(flockcmds, tcp->u_arg[1]))
-			tprintf("LOCK_???");
+		printflags(flockcmds, tcp->u_arg[1], "LOCK_???");
 	}
 	return 0;
 }
@@ -639,8 +636,7 @@ print_epoll_event(ev)
 struct epoll_event *ev;
 {
 	tprintf("{");
-	if (printflags(epollevents, ev->events) == 0)
-		tprintf("0");
+	printflags(epollevents, ev->events, "EPOLL???");
 	/* We cannot know what format the program uses, so print u32 and u64
 	   which will cover every value.  */
 	tprintf(", {u32=%" PRIu32 ", u64=%" PRIu64 "}}",
