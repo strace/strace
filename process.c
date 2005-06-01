@@ -1225,34 +1225,53 @@ int
 sys_setgroups(tcp)
 struct tcb *tcp;
 {
-	int i, len;
-	GETGROUPS_T *gidset;
-
 	if (entering(tcp)) {
+		unsigned long len, size, start, cur, end, abbrev_end;
+		GETGROUPS_T gid;
+		int failed = 0;
+
 		len = tcp->u_arg[0];
-		tprintf("%u, ", len);
-		if (len <= 0) {
+		tprintf("%lu, ", len);
+		if (len == 0) {
 			tprintf("[]");
 			return 0;
 		}
-		gidset = (GETGROUPS_T *) malloc(len * sizeof(GETGROUPS_T));
-		if (gidset == NULL) {
-			fprintf(stderr, "sys_setgroups: out of memory\n");
-			return -1;
+		start = tcp->u_arg[1];
+		if (start == 0) {
+			tprintf("NULL");
+			return 0;
 		}
-		if (!verbose(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1],
-		    len * sizeof(GETGROUPS_T), (char *) gidset) < 0)
-			tprintf("[?]");
-		else {
-			tprintf("[");
-			for (i = 0; i < len; i++)
-				tprintf("%s%lu", i ? ", " : "",
-					(unsigned long) gidset[i]);
-			tprintf("]");
+		size = len * sizeof(gid);
+		end = start + size;
+		if (!verbose(tcp) || size / sizeof(gid) != len || end < start) {
+			tprintf("%#lx", start);
+			return 0;
 		}
-		free((char *) gidset);
+		if (abbrev(tcp)) {
+			abbrev_end = start + max_strlen * sizeof(gid);
+			if (abbrev_end < start)
+				abbrev_end = end;
+		} else {
+			abbrev_end = end;
+		}
+		tprintf("[");
+		for (cur = start; cur < end; cur += sizeof(gid)) {
+			if (cur > start)
+				tprintf(", ");
+			if (cur >= abbrev_end) {
+				tprintf("...");
+				break;
+			}
+			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
+				tprintf("?");
+				failed = 1;
+				break;
+			}
+			tprintf("%lu", (unsigned long) gid);
+		}
+		tprintf("]");
+		if (failed)
+			tprintf(" %#lx", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -1261,38 +1280,62 @@ int
 sys_getgroups(tcp)
 struct tcb *tcp;
 {
-	int i, len;
-	GETGROUPS_T *gidset;
+	unsigned long len;
 
 	if (entering(tcp)) {
 		len = tcp->u_arg[0];
-		tprintf("%u, ", len);
+		tprintf("%lu, ", len);
 	} else {
+		unsigned long size, start, cur, end, abbrev_end;
+		GETGROUPS_T gid;
+		int failed = 0;
+
 		len = tcp->u_rval;
-		if (len <= 0) {
+		if (len == 0) {
 			tprintf("[]");
 			return 0;
 		}
-		gidset = (GETGROUPS_T *) malloc(len * sizeof(GETGROUPS_T));
-		if (gidset == NULL) {
-			fprintf(stderr, "sys_getgroups: out of memory\n");
-			return -1;
-		}
-		if (!tcp->u_arg[1])
+		start = tcp->u_arg[1];
+		if (start == 0) {
 			tprintf("NULL");
-		else if (!verbose(tcp) || tcp->u_arg[0] == 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1],
-		    len * sizeof(GETGROUPS_T), (char *) gidset) < 0)
-			tprintf("[?]");
-		else {
-			tprintf("[");
-			for (i = 0; i < len; i++)
-				tprintf("%s%lu", i ? ", " : "",
-					(unsigned long) gidset[i]);
-			tprintf("]");
+			return 0;
 		}
-		free((char *)gidset);
+		if (tcp->u_arg[0] == 0) {
+			tprintf("%#lx", start);
+			return 0;
+		}
+		size = len * sizeof(gid);
+		end = start + size;
+		if (!verbose(tcp) || tcp->u_arg[0] == 0 ||
+		    size / sizeof(gid) != len || end < start) {
+			tprintf("%#lx", start);
+			return 0;
+		}
+		if (abbrev(tcp)) {
+			abbrev_end = start + max_strlen * sizeof(gid);
+			if (abbrev_end < start)
+				abbrev_end = end;
+		} else {
+			abbrev_end = end;
+		}
+		tprintf("[");
+		for (cur = start; cur < end; cur += sizeof(gid)) {
+			if (cur > start)
+				tprintf(", ");
+			if (cur >= abbrev_end) {
+				tprintf("...");
+				break;
+			}
+			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
+				tprintf("?");
+				failed = 1;
+				break;
+			}
+			tprintf("%lu", (unsigned long) gid);
+		}
+		tprintf("]");
+		if (failed)
+			tprintf(" %#lx", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -1302,34 +1345,53 @@ int
 sys_setgroups32(tcp)
 struct tcb *tcp;
 {
-	int i, len;
-	GETGROUPS32_T *gidset;
-
 	if (entering(tcp)) {
+		unsigned long len, size, start, cur, end, abbrev_end;
+		GETGROUPS32_T gid;
+		int failed = 0;
+
 		len = tcp->u_arg[0];
-		tprintf("%u, ", len);
-		if (len <= 0) {
+		tprintf("%lu, ", len);
+		if (len == 0) {
 			tprintf("[]");
 			return 0;
 		}
-		gidset = (GETGROUPS32_T *) malloc(len * sizeof(GETGROUPS32_T));
-		if (gidset == NULL) {
-			fprintf(stderr, "sys_setgroups32: out of memory\n");
-			return -1;
+		start = tcp->u_arg[1];
+		if (start == 0) {
+			tprintf("NULL");
+			return 0;
 		}
-		if (!verbose(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1],
-		    len * sizeof(GETGROUPS32_T), (char *) gidset) < 0)
-			tprintf("[?]");
-		else {
-			tprintf("[");
-			for (i = 0; i < len; i++)
-				tprintf("%s%lu", i ? ", " : "",
-					(unsigned long) gidset[i]);
-			tprintf("]");
+		size = len * sizeof(gid);
+		end = start + size;
+		if (!verbose(tcp) || size / sizeof(gid) != len || end < start) {
+			tprintf("%#lx", start);
+			return 0;
 		}
-		free((char *) gidset);
+		if (abbrev(tcp)) {
+			abbrev_end = start + max_strlen * sizeof(gid);
+			if (abbrev_end < start)
+				abbrev_end = end;
+		} else {
+			abbrev_end = end;
+		}
+		tprintf("[");
+		for (cur = start; cur < end; cur += sizeof(gid)) {
+			if (cur > start)
+				tprintf(", ");
+			if (cur >= abbrev_end) {
+				tprintf("...");
+				break;
+			}
+			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
+				tprintf("?");
+				failed = 1;
+				break;
+			}
+			tprintf("%lu", (unsigned long) gid);
+		}
+		tprintf("]");
+		if (failed)
+			tprintf(" %#lx", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -1338,38 +1400,58 @@ int
 sys_getgroups32(tcp)
 struct tcb *tcp;
 {
-	int i, len;
-	GETGROUPS32_T *gidset;
+	unsigned long len;
 
 	if (entering(tcp)) {
 		len = tcp->u_arg[0];
-		tprintf("%u, ", len);
+		tprintf("%lu, ", len);
 	} else {
+		unsigned long size, start, cur, end, abbrev_end;
+		GETGROUPS32_T gid;
+		int failed = 0;
+
 		len = tcp->u_rval;
-		if (len <= 0) {
+		if (len == 0) {
 			tprintf("[]");
 			return 0;
 		}
-		gidset = (GETGROUPS32_T *) malloc(len * sizeof(GETGROUPS32_T));
-		if (gidset == NULL) {
-			fprintf(stderr, "sys_getgroups32: out of memory\n");
-			return -1;
-		}
-		if (!tcp->u_arg[1])
+		start = tcp->u_arg[1];
+		if (start == 0) {
 			tprintf("NULL");
-		else if (!verbose(tcp) || tcp->u_arg[0] == 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1],
-		    len * sizeof(GETGROUPS32_T), (char *) gidset) < 0)
-			tprintf("[?]");
-		else {
-			tprintf("[");
-			for (i = 0; i < len; i++)
-				tprintf("%s%lu", i ? ", " : "",
-					(unsigned long) gidset[i]);
-			tprintf("]");
+			return 0;
 		}
-		free((char *)gidset);
+		size = len * sizeof(gid);
+		end = start + size;
+		if (!verbose(tcp) || tcp->u_arg[0] == 0 ||
+		    size / sizeof(gid) != len || end < start) {
+			tprintf("%#lx", start);
+			return 0;
+		}
+		if (abbrev(tcp)) {
+			abbrev_end = start + max_strlen * sizeof(gid);
+			if (abbrev_end < start)
+				abbrev_end = end;
+		} else {
+			abbrev_end = end;
+		}
+		tprintf("[");
+		for (cur = start; cur < end; cur += sizeof(gid)) {
+			if (cur > start)
+				tprintf(", ");
+			if (cur >= abbrev_end) {
+				tprintf("...");
+				break;
+			}
+			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
+				tprintf("?");
+				failed = 1;
+				break;
+			}
+			tprintf("%lu", (unsigned long) gid);
+		}
+		tprintf("]");
+		if (failed)
+			tprintf(" %#lx", tcp->u_arg[1]);
 	}
 	return 0;
 }

@@ -1082,44 +1082,51 @@ struct tcb *tcp;
 unsigned long addr;
 unsigned long len;
 {
-	union {
-		char msg_control[len];
-		struct cmsghdr cmsg;
-	} u;
-	if (umoven(tcp, addr, len, u.msg_control) < 0) {
+	struct cmsghdr *cmsg = len < sizeof(struct cmsghdr) ?
+			       NULL : malloc(len);
+	if (cmsg == NULL || umoven(tcp, addr, len, (char *) cmsg) < 0) {
 		tprintf(", msg_control=%#lx", addr);
+		free(cmsg);
 		return;
 	}
 
-	tprintf(", {cmsg_len=%zu, cmsg_level=", u.cmsg.cmsg_len);
-	printxval(socketlayers, u.cmsg.cmsg_level, "SOL_???");
+	tprintf(", {cmsg_len=%zu, cmsg_level=", cmsg->cmsg_len);
+	printxval(socketlayers, cmsg->cmsg_level, "SOL_???");
 	tprintf(", cmsg_type=");
 
-	if (u.cmsg.cmsg_level == SOL_SOCKET) {
-		printxval(scmvals, u.cmsg.cmsg_type, "SCM_???");
+	if (cmsg->cmsg_level == SOL_SOCKET) {
+		unsigned long cmsg_len;
 
-		if (u.cmsg.cmsg_type == SCM_RIGHTS) {
-			int *fds = (int *) CMSG_DATA (&u.cmsg);
+		printxval(scmvals, cmsg->cmsg_type, "SCM_???");
+		cmsg_len = (len < cmsg->cmsg_len) ? len : cmsg->cmsg_len;
+
+		if (cmsg->cmsg_type == SCM_RIGHTS
+		    && CMSG_LEN(sizeof(int)) <= cmsg_len) {
+			int *fds = (int *) CMSG_DATA (cmsg);
 			int first = 1;
+
 			tprintf(", {");
-			while ((char *) fds < (u.msg_control
-					       + u.cmsg.cmsg_len)) {
+			while ((char *) fds < ((char *) cmsg + cmsg_len)) {
 				if (!first)
 					tprintf(", ");
 				tprintf("%d", *fds++);
 				first = 0;
 			}
 			tprintf("}}");
+			free(cmsg);
 			return;
 		}
-		if (u.cmsg.cmsg_type == SCM_CREDENTIALS
-		    && CMSG_LEN(sizeof(struct ucred)) <= u.cmsg.cmsg_len) {
-			struct ucred *uc = (struct ucred *) CMSG_DATA (&u.cmsg);
+		if (cmsg->cmsg_type == SCM_CREDENTIALS
+		    && CMSG_LEN(sizeof(struct ucred)) <= cmsg_len) {
+			struct ucred *uc = (struct ucred *) CMSG_DATA (cmsg);
+
 			tprintf("{pid=%ld, uid=%ld, gid=%ld}}",
 				(long)uc->pid, (long)uc->uid, (long)uc->gid);
+			free(cmsg);
 			return;
 		}
 	}
+	free(cmsg);
 	tprintf(", ...}");
 }
 
@@ -1138,7 +1145,8 @@ long addr;
 	printsock(tcp, (long)msg.msg_name, msg.msg_namelen);
 
 	tprintf(", msg_iov(%lu)=", (unsigned long)msg.msg_iovlen);
-	tprint_iov(tcp, msg.msg_iovlen, (long) msg.msg_iov);
+	tprint_iov(tcp, (unsigned long)msg.msg_iovlen,
+		   (unsigned long)msg.msg_iov);
 
 #ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
 	tprintf(", msg_controllen=%lu", (unsigned long)msg.msg_controllen);

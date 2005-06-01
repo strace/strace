@@ -1813,23 +1813,25 @@ struct tcb *tcp;
 {
 	struct __sysctl_args info;
 	int *name;
+	unsigned long size;
+
 	if (umove (tcp, tcp->u_arg[0], &info) < 0)
 		return printargs(tcp);
 
-	name = malloc (sizeof (int) * info.nlen);
+	size = sizeof (int) * (unsigned long) info.nlen;
+	name = (size / sizeof (int) != info.nlen) ? NULL : malloc (size);
 	if (name == NULL ||
-	    umoven(tcp, (unsigned long) info.name,
-		   sizeof (int) * info.nlen, (char *) name) < 0) {
-		if (name != NULL)
-			free(name);
-		tprintf("{%p, %d, %p, %p, %p, %Zu}",
-			info.name, info.nlen, info.oldval, info.oldlenp,
-			info.newval, info.newlen);
+	    umoven(tcp, (unsigned long) info.name, size, (char *) name) < 0) {
+		free(name);
+		if (entering(tcp))
+			tprintf("{%p, %d, %p, %p, %p, %Zu}",
+				info.name, info.nlen, info.oldval,
+				info.oldlenp, info.newval, info.newlen);
 		return 0;
 	}
 
 	if (entering(tcp)) {
-		int cnt = 0;
+		int cnt = 0, max_cnt;
 
 		tprintf("{{");
 
@@ -1919,13 +1921,16 @@ struct tcb *tcp;
 			goto out;
 		}
 	out:
-		while (cnt < info.nlen)
+		max_cnt = abbrev(tcp) ? max_strlen : info.nlen;
+		while (cnt < max_cnt)
 			tprintf(", %x", name[cnt++]);
+		if (cnt < info.nlen)
+			tprintf(", ...");
 		tprintf("}, %d, ", info.nlen);
 	} else {
 		size_t oldlen;
-		umove(tcp, (size_t)info.oldlenp, &oldlen);
-		if (info.nlen >= 2
+		if (umove(tcp, (size_t)info.oldlenp, &oldlen) >= 0
+		    && info.nlen >= 2
 		    && ((name[0] == CTL_KERN
 			 && (name[1] == KERN_OSRELEASE
 			     || name[1] == KERN_OSTYPE

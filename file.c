@@ -2347,10 +2347,11 @@ print_xattr_val(tcp, failed, arg, insize, size)
 struct tcb *tcp;
 int failed;
 unsigned long arg;
-long insize, size;
+unsigned long insize, size;
 {
     if (!failed) {
-	unsigned char *buf = malloc(4 * size + 1);
+	unsigned long capacity = 4 * size + 1;
+	unsigned char *buf = (capacity < size) ? NULL : malloc(capacity);
 	if (buf == NULL || /* probably a bogus size argument */
 	    umoven(tcp, arg, size, (char *) &buf[3 * size]) < 0) {
 	    failed = 1;

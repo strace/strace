@@ -78,38 +78,50 @@ struct tcb *tcp;
 void
 tprint_iov(tcp, len, addr)
 struct tcb * tcp;
-int len;
-long addr;
+unsigned long len;
+unsigned long addr;
 {
-	struct iovec *iov;
-	int i;
-
+	struct iovec iov;
+	unsigned long size, cur, end, abbrev_end;
+	int failed = 0;
 
 	if (!len) {
 		tprintf("[]");
 		return;
 	}
-
-	if ((iov = (struct iovec *) malloc(len * sizeof *iov)) == NULL) {
-		fprintf(stderr, "No memory");
+	size = len * sizeof(iov);
+	end = addr + size;
+	if (!verbose(tcp) || size / sizeof(iov) != len || end < addr) {
+		tprintf("%#lx", addr);
 		return;
 	}
-	if (umoven(tcp, addr,
-		   len * sizeof *iov, (char *) iov) < 0) {
-		tprintf("%#lx", tcp->u_arg[1]);
+	if (abbrev(tcp)) {
+		abbrev_end = addr + max_strlen * sizeof(iov);
+		if (abbrev_end < addr)
+			abbrev_end = end;
 	} else {
-		tprintf("[");
-		for (i = 0; i < len; i++) {
-			if (i)
-				tprintf(", ");
-			tprintf("{");
-			printstr(tcp, (long) iov[i].iov_base,
-				iov[i].iov_len);
-			tprintf(", %lu}", (unsigned long)iov[i].iov_len);
-		}
-		tprintf("]");
+		abbrev_end = end;
 	}
-	free((char *) iov);
+	tprintf("[");
+	for (cur = addr; cur < end; cur += sizeof(iov)) {
+		if (cur > addr)
+			tprintf(", ");
+		if (cur >= abbrev_end) {
+			tprintf("...");
+			break;
+		}
+		if (umoven(tcp, cur, sizeof iov, (char *) &iov) < 0) {
+			tprintf("?");
+			failed = 1;
+			break;
+		}
+		tprintf("{");
+		printstr(tcp, (long) iov.iov_base, iov.iov_len);
+		tprintf(", %lu}", (unsigned long)iov.iov_len);
+	}
+	tprintf("]");
+	if (failed)
+		tprintf(" %#lx", addr);
 }
 
 int

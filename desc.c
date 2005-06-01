@@ -680,20 +680,29 @@ struct tcb *tcp;
 			tprintf("{}");
 		else {
 #ifdef HAVE_SYS_EPOLL_H
-			struct epoll_event evs[tcp->u_rval];
-			if (umove(tcp, tcp->u_arg[1], evs) == 0) {
-				unsigned long i;
-				tprintf("{");
-				for (i = 0; i < tcp->u_rval; ++i) {
-					if (i > 0)
-						tprintf(", ");
-					print_epoll_event(&evs[i]);
+			struct epoll_event ev, *start, *cur, *end;
+			int failed = 0;
+
+			tprintf("{");
+			start = (struct epoll_event *) tcp->u_arg[1];
+			end = start + tcp->u_rval;
+			for (cur = start; cur < end; ++cur) {
+				if (cur > start)
+					tprintf(", ");
+				if (umove(tcp, (long) cur, &ev) == 0)
+					print_epoll_event(&ev);
+				else {
+					tprintf("?");
+					failed = 1;
+					break;
 				}
-				tprintf("}");
 			}
-			else
+			tprintf("}");
+			if (failed)
+				tprintf(" %#lx", (long) start);
+#else
+			tprintf("{...}");
 #endif
-				tprintf("{...}");
 		}
 		tprintf(", %ld, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 	}

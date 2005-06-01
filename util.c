@@ -532,15 +532,15 @@ long addr;
 {
 	struct iovec *iov;
 	int i;
+	unsigned long size;
 
-
-	if ((iov = (struct iovec *) malloc(len * sizeof *iov)) == NULL) {
-		fprintf(stderr, "dump: No memory");
+	size = sizeof(*iov) * (unsigned long) len;
+	if (size / sizeof(*iov) != len
+	    || (iov = (struct iovec *) malloc(size)) == NULL) {
+		fprintf(stderr, "out of memory\n");
 		return;
 	}
-	if (umoven(tcp, addr,
-		   len * sizeof *iov, (char *) iov) >= 0) {
-
+	if (umoven(tcp, addr, size, (char *) iov) >= 0) {
 		for (i = 0; i < len; i++) {
                         /* include the buffer number to make it easy to
                          * match up the trace with the source */

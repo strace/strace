@@ -692,26 +692,43 @@ unsigned long ptr;
 unsigned long maxnodes;
 int err;
 {
-	int nlongs = (maxnodes + 8 * sizeof(long) - 1) / (8 * sizeof(long));
-	if (err || !abbrev(tcp) || nlongs > getpagesize() / sizeof(long)
-	    || nlongs == 0) {
-		long buf[nlongs];
-		if (umoven(tcp, ptr, nlongs * sizeof(long),
-			   (char *) buf) < 0)
-			tprintf(", %lx", ptr);
-		else {
-			int i;
-			tprintf(", {");
-			for (i = 0; i < nlongs; ++i) {
-				if (i > 0)
-					tprintf(", ");
-				tprintf("%#0*lx", (int) sizeof(long) * 2 + 2,
-					buf[i]);
-			}
-			tprintf("}");
+	unsigned long nlongs, size, end;
+
+	nlongs = (maxnodes + 8 * sizeof(long) - 1) / (8 * sizeof(long));
+	size = nlongs * sizeof(long);
+	end = ptr + size;
+	if (nlongs == 0 || ((err || verbose(tcp)) && (size * 8 == maxnodes)
+			    && (end > ptr))) {
+		unsigned long n, cur, abbrev_end;
+		int failed = 0;
+
+		if (abbrev(tcp)) {
+			abbrev_end = ptr + max_strlen * sizeof(long);
+			if (abbrev_end < ptr)
+				abbrev_end = end;
+		} else {
+			abbrev_end = end;
 		}
+		tprintf(", {");
+		for (cur = ptr; cur < end; cur += sizeof(long)) {
+			if (cur > ptr)
+				tprintf(", ");
+			if (cur >= abbrev_end) {
+				tprintf("...");
+				break;
+			}
+			if (umoven(tcp, cur, sizeof(n), (char *) &n) < 0) {
+				tprintf("?");
+				failed = 1;
+				break;
+			}
+			tprintf("%#0*lx", (int) sizeof(long) * 2 + 2, n);
+		}
+		tprintf("}");
+		if (failed)
+			tprintf(" %#lx", ptr);
 	} else
-		tprintf(", %lx", ptr);
+		tprintf(", %#lx", ptr);
 	tprintf(", %lu", maxnodes);
 }
 

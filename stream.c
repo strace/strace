@@ -298,60 +298,68 @@ int
 sys_poll(tcp)
 struct tcb *tcp;
 {
-	struct pollfd *pollp;
+	struct pollfd fds;
+	unsigned nfds;
+	unsigned long size, start, cur, end, abbrev_end;
+	int failed = 0;
 
-	if (exiting(tcp)) {
-		int i;
-		int nfds = tcp->u_arg[1];
+	if (entering(tcp))
+		return 0;
 
-		if (nfds <= 0) {
-			tprintf("%#lx, %d, %ld\n",
-				tcp->u_arg[0], nfds, tcp->u_arg[2]);
-			return 0;
-		}
-		pollp = (struct pollfd *) malloc(nfds * sizeof(*pollp));
-		if (pollp == NULL) {
-			fprintf(stderr, "sys_poll: no memory\n");
-			tprintf("%#lx, %d, %ld",
-				tcp->u_arg[0], nfds, tcp->u_arg[2]);
-			return 0;
-		}
-		if (umoven(tcp, tcp->u_arg[0],
-			   (nfds * sizeof(*pollp)), (char *) pollp) < 0) {
-			tprintf("%#lx", tcp->u_arg[0]);
-		}
-		else {
-			tprintf("[");
-			for (i = 0; i < nfds; i++) {
-				if (i)
-					tprintf(", ");
-				if (pollp[i].fd < 0) {
-					tprintf("{fd=%d}", pollp[i].fd);
-					continue;
-				}
-				tprintf("{fd=%d, events=", pollp[i].fd);
-				printflags(pollflags, pollp[i].events,
-					   "POLL???");
-				if (!syserror(tcp) && pollp[i].revents) {
-					tprintf(", revents=");
-					printflags(pollflags, pollp[i].revents,
-						   "POLL???");
-				}
-				tprintf("}");
-			}
-			tprintf("]");
-		}
-		tprintf(", %d, ", nfds);
-#ifdef INFTIM
-		if (tcp->u_arg[2] == INFTIM)
-			tprintf("INFTIM");
-		else
-#endif
-			tprintf("%ld", tcp->u_arg[2]);
-		free(pollp);
+	nfds = tcp->u_arg[1];
+	size = sizeof(fds) * nfds;
+	start = tcp->u_arg[0];
+	end = start + size;
+	if (nfds == 0 || size / sizeof(fds) != nfds || end < start) {
+		tprintf("%#lx, %d, %ld",
+			tcp->u_arg[0], nfds, tcp->u_arg[2]);
+		return 0;
 	}
+	if (abbrev(tcp)) {
+		abbrev_end = start + max_strlen * sizeof(fds);
+		if (abbrev_end < start)
+			abbrev_end = end;
+	} else {
+		abbrev_end = end;
+	}
+	tprintf("[");
+	for (cur = start; cur < end; cur += sizeof(fds)) {
+		if (cur > start)
+			tprintf(", ");
+		if (cur >= abbrev_end) {
+			tprintf("...");
+			break;
+		}
+		if (umoven(tcp, cur, sizeof fds, (char *) &fds) < 0) {
+			tprintf("?");
+			failed = 1;
+			break;
+		}
+		if (fds.fd < 0) {
+			tprintf("{fd=%d}", fds.fd);
+			continue;
+		}
+		tprintf("{fd=%d, events=", fds.fd);
+		printflags(pollflags, fds.events, "POLL???");
+		if (!syserror(tcp) && fds.revents) {
+			tprintf(", revents=");
+			printflags(pollflags, fds.revents, "POLL???");
+		}
+		tprintf("}");
+	}
+	tprintf("]");
+	if (failed)
+		tprintf(" %#lx", start);
+	tprintf(", %d, ", nfds);
+#ifdef INFTIM
+	if (tcp->u_arg[2] == INFTIM)
+		tprintf("INFTIM");
+	else
+#endif
+		tprintf("%ld", tcp->u_arg[2]);
 	return 0;
 }
+
 
 #else /* !HAVE_SYS_POLL_H */
 int

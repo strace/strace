@@ -458,7 +458,7 @@ extern void printtrailer P((struct tcb *));
 extern void tabto P((int));
 extern void call_summary P((FILE *));
 extern void printtv32 P((struct tcb*, long));
-extern void tprint_iov P((struct tcb *, int, long));
+extern void tprint_iov P((struct tcb *, unsigned long, unsigned long));
 
 #ifdef LINUX
 extern int internal_clone P((struct tcb *));
