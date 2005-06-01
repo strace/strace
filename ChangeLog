@@ -16,6 +16,12 @@
 	malloc size from int to unsigned long.
 	Fixes RH#159308.
 
+2005-05-22  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* bjm.c [LINUX]: Do not include <linux/linkage.h>.  It is not
+	safe to include kernel headers, and this one is not used anyway.
+	Fixes RH#158488.
+
 2005-05-26  Roland McGrath  <roland@redhat.com>
 
 	* system.c (sys_sysctl): Check for errors accessing user pointers.
