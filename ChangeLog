@@ -1,5 +1,68 @@
 2005-05-31  Dmitry V. Levin  <ldv@altlinux.org>
 
+	* util.c (printxval): Change third argument from "char *" to
+	"const char *".
+	(printflags): Add third argument, "const char *", with similar
+	meaning to the third argument of printxval().
+	* defs.h (printxval): Change third argument from "char *" to
+	"const char *".
+	(printflags): Add third argument.
+	* bjm.c (sys_query_module) [LINUX]: Pass third argument to
+	printflags().
+	* desc.c (sys_fcntl): Likewise.
+	(sys_flock) [LOCK_SH]: Likewise.
+	(print_epoll_event) [HAVE_SYS_EPOLL_H]: Likewise.
+	* file.c (sys_open): Likewise.
+	(solaris_open) [LINUXSPARC]: Likewise.
+	(sys_access): Likewise.
+	(sys_chflags, sys_fchflags) [FREEBSD]: Likewise.
+	(realprintstat) [HAVE_LONG_LONG_OFF_T &&
+	HAVE_STRUCT_STAT_ST_FLAGS]: Likewise.
+	(printstat64) [HAVE_STAT64 &&
+	HAVE_STRUCT_STAT_ST_FLAGS]: Likewise.
+	(sys_setxattr, sys_fsetxattr): Likewise.
+	* ipc.c (sys_msgget, sys_msgsnd, sys_msgrcv, sys_semget,
+	sys_shmget, sys_shmat) [LINUX || SUNOS4 || FREEBSD]: Likewise.
+	(sys_mq_open) [LINUX]: Likewise.
+	(printmqattr) [HAVE_MQUEUE_H]: Likewise.
+	* mem.c (print_mmap) [!HAVE_LONG_LONG_OFF_T]: Likewise.
+	(sys_mmap64) [_LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T]: Likewise.
+	(sys_mprotect): Likewise.
+	(sys_mremap, sys_madvise, sys_mlockall) [LINUX]: Likewise.
+	(sys_msync) [MS_ASYNC]: Likewise.
+	(sys_mctl) [MC_SYNC]: Likewise.
+	(sys_remap_file_pages, sys_mbind, sys_get_mempolicy) [LINUX]:
+	Likewise.
+	* net.c (printmsghdr) [HAVE_STRUCT_MSGHDR_MSG_CONTROL]: Likewise.
+	(sys_send, sys_sendto): Likewise.
+	(sys_sendmsg) [HAVE_SENDMSG]: Likewise.
+	(sys_recv, sys_recvfrom): Likewise.
+	(sys_recvmsg) [HAVE_SENDMSG]: Likewise.
+	(printicmpfilter) [ICMP_FILTER]: Likewise.
+	* proc.c (proc_ioctl) [SVR4 && !HAVE_MP_PROCFS || FREEBSD]: Likewise.
+	* process.c (sys_clone) [LINUX]: Likewise.
+	(printwaitn): Likewise.
+	(sys_waitid) [SVR4 || LINUX]: Likewise.
+	* signal.c (sys_sigvec) [SUNOS4 || FREEBSD]: Likewise.
+	(sys_sigaction): Likewise.
+	(printcontext) [SVR4]: Likewise.
+	(print_stack_t) [LINUX) || FREEBSD]: Likewise.
+	(sys_rt_sigaction) [LINUX]: Likewise.
+	* sock.c (sock_ioctl) [LINUX]: Likewise.
+	* stream.c (sys_putmsg, sys_getmsg): Likewise.
+	(sys_putpmsg) [SYS_putpmsg]: Likewise.
+	(sys_getpmsg) [SYS_getpmsg]: Likewise.
+	(sys_poll): Likewise.
+	(print_transport_message) [TI_BIND]: Likewise.
+	(stream_ioctl): Likewise.
+	* system.c (sys_mount, sys_reboot): Likewise.
+	(sys_cacheflush) [LINUX && M68K]: Likewise.
+	(sys_capget, sys_capset) [SYS_capget]: Likewise.
+	* term.c (term_ioctl) [TIOCMGET]: Likewise.
+	* time.c (sys_clock_nanosleep, sys_timer_settime) [LINUX]:
+	Likewise.
+	Fixes RH#159310.
+
 	* bjm.c (sys_query_module) [LINUX]: Unitize "out of memory"
 	errors reporting style.
 	* strace.c (rebuild_pollv) [USE_PROCFS]: Likewise.
