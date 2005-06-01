@@ -1,5 +1,38 @@
 2005-05-31  Dmitry V. Levin  <ldv@altlinux.org>
 
+	Deal with memory management issues.
+	* defs.h (tprint_iov): Update prototype.
+	* desc.c (sys_epoll_wait) [HAVE_SYS_EPOLL_H]: Do not allocate
+	epoll_event array of arbitrary size on the stack, to avoid
+	stack overflow.
+	* file.c (print_xattr_val): Check for integer overflow during
+	malloc size calculation, to avoid heap corruption.
+	* io.c (tprint_iov) [HAVE_SYS_UIO_H]: Check for integer overflow
+	during malloc size calculation, to avoid heap corruption.
+	Change iovec array handling to avoid heap memory allocation.
+	* mem.c (get_nodes) [LINUX]: Check for integer overflow during
+	size calculation and do not allocate array of arbitrary size on
+	the stack, to avoid stack overflow.
+	* net.c (printcmsghdr) [HAVE_SENDMSG]: Do not allocate array of
+	arbitrary size on the stack, to avoid stack overflow.  Do not
+	trust cmsg.cmsg_len to avoid read beyond the end of allocated
+	object.
+	(printmsghdr) [HAVE_SENDMSG]: Update tprint_iov() usage.
+	* process.c (sys_setgroups): Check for integer overflow during
+	malloc size calculation, to avoid heap corruption.  Change gid_t
+	array handling to avoid heap memory allocation.
+	(sys_getgroups): Likewise.
+	(sys_setgroups32) [LINUX]: Likewise.
+	(sys_getgroups32) [LINUX]: Likewise.
+	* stream.c (sys_poll) [HAVE_SYS_POLL_H]: Check for integer
+	overflow during malloc size calculation, to avoid heap corruption.
+	Change pollfd array handling to avoid heap memory allocation.
+	* system.c (sys_sysctl) [LINUX]: Check for integer overflow
+	during malloc size calculation, to avoid heap corruption.
+	* util.c (dumpiov) [HAVE_SYS_UIO_H]: Check for integer overflow
+	during malloc size calculation, to avoid heap corruption.
+	Fixes RH#159196.
+
 	* util.c (printxval): Change third argument from "char *" to
 	"const char *".
 	(printflags): Add third argument, "const char *", with similar
