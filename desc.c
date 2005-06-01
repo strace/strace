@@ -424,10 +424,8 @@ int bitness;
 
 	if (entering(tcp)) {
 		fds = (fd_set *) malloc(fdsize);
-		if (fds == NULL) {
-			tprintf("out of memory\n");
-			return 0;
-		}
+		if (fds == NULL)
+			fprintf(stderr, "out of memory\n");
 		nfds = args[0];
 		tprintf("%d", nfds);
 		for (i = 0; i < 3; i++) {
@@ -436,7 +434,7 @@ int bitness;
 				tprintf(", NULL");
 				continue;
 			}
-			if (!verbose(tcp)) {
+			if (fds == NULL || !verbose(tcp)) {
 				tprintf(", %#lx", arg);
 				continue;
 			}
@@ -485,10 +483,8 @@ int bitness;
 		}
 
 		fds = (fd_set *) malloc(fdsize);
-		if (fds == NULL) {
-			tprintf("out of memory\n");
-			return 0;
-		}
+		if (fds == NULL)
+			fprintf(stderr, "out of memory\n");
 
 		outstr[0] = '\0';
 		for (i = 0; i < 3; i++) {
@@ -497,7 +493,8 @@ int bitness;
 
 			tcp->auxstr = outstr;
 			arg = args[i+1];
-			if (!arg || umoven(tcp, arg, fdsize, (char *) fds) < 0)
+			if (fds == NULL || !arg ||
+			    umoven(tcp, arg, fdsize, (char *) fds) < 0)
 				continue;
 			for (j = 0; j < args[0]; j++) {
 				if (FD_ISSET(j, fds)) {

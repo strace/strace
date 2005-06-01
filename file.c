@@ -2042,11 +2042,12 @@ struct tcb *tcp;
 	}
 	len = tcp->u_rval;
 	if ((buf = malloc(len)) == NULL) {
-		tprintf("out of memory\n");
+		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		fprintf(stderr, "out of memory\n");
 		return 0;
 	}
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-		tprintf("{...}, %lu", tcp->u_arg[2]);
+		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		free(buf);
 		return 0;
 	}
@@ -2125,11 +2126,12 @@ struct tcb *tcp;
 	}
 	len = tcp->u_rval;
 	if ((buf = malloc(len)) == NULL) {
-		tprintf("out of memory\n");
+		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		fprintf(stderr, "out of memory\n");
 		return 0;
 	}
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-		tprintf("{...}, %lu", tcp->u_arg[2]);
+		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		free(buf);
 		return 0;
 	}
@@ -2193,11 +2195,12 @@ struct tcb * tcp;
 	}
 	len = tcp->u_rval;
 	if ((buf = malloc(len)) == NULL) {
-		tprintf("out of memory\n");
+		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+		fprintf(stderr, "out of memory\n");
 		return 0;
 	}
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-		tprintf("{...}, %lu, %#lx", tcp->u_arg[2], tcp->u_arg[3]);
+		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		free(buf);
 		return 0;
 	}

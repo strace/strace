@@ -1466,14 +1466,14 @@ struct tcb *tcp;
 	if(!entering(tcp)) {
 		if (!arg0) {
 			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
-				fprintf(stderr, "sys_capget: no memory\n");
+				fprintf(stderr, "out of memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
 				return -1;
 			}
 		}
 		if (!arg1) {
 			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
-				fprintf(stderr, "sys_capget: no memory\n");
+				fprintf(stderr, "out of memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
 				return -1;
 			}
@@ -1518,14 +1518,14 @@ struct tcb *tcp;
 	if(entering(tcp)) {
 		if (!arg0) {
 			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
-				fprintf(stderr, "sys_capset: no memory\n");
+				fprintf(stderr, "out of memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
 				return -1;
 			}
 		}
 		if (!arg1) {
 			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
-				fprintf(stderr, "sys_capset: no memory\n");
+				fprintf(stderr, "out of memory\n");
 				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
 				return -1;
 			}

@@ -1486,7 +1486,7 @@ rebuild_pollv()
 		free (pollv);
 	pollv = (struct pollfd *) malloc(nprocs * sizeof pollv[0]);
 	if (pollv == NULL) {
-		fprintf(stderr, "strace: out of memory for poll vector\n");
+		fprintf(stderr, "%s: out of memory\n", progname);
 		exit(1);
 	}
 

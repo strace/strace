@@ -504,7 +504,7 @@ int
 sys_mincore(tcp)
 struct tcb *tcp;
 {
-	int i, len;
+	unsigned long i, len;
 	char *vec = NULL;
 
 	if (entering(tcp)) {
@@ -512,7 +512,7 @@ struct tcb *tcp;
 	} else {
 		len = tcp->u_arg[1];
 		if (syserror(tcp) || tcp->u_arg[2] == 0 ||
-			(vec = malloc((u_int)len)) == NULL ||
+			(vec = malloc(len)) == NULL ||
 			umoven(tcp, tcp->u_arg[2], len, vec) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
 		else {

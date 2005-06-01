@@ -415,7 +415,7 @@ int len;
 	if (!str) {
 		if ((str = malloc(max_strlen)) == NULL
 		    || (outstr = malloc(2*max_strlen)) == NULL) {
-			fprintf(stderr, "printstr: no memory\n");
+			fprintf(stderr, "out of memory\n");
 			tprintf("%#lx", addr);
 			return;
 		}
@@ -557,7 +557,7 @@ int len;
 		if (str)
 			free(str);
 		if ((str = malloc(len)) == NULL) {
-			fprintf(stderr, "dump: no memory\n");
+			fprintf(stderr, "out of memory\n");
 			return;
 		}
 		strsize = len;
@@ -2019,7 +2019,7 @@ struct tcb *tcp;
 		return -1;
 	}
 	if ((strtab = malloc((unsigned)ld.ld_symb_size)) == NULL) {
-		fprintf(stderr, "fixvfork: out of memory\n");
+		fprintf(stderr, "out of memory\n");
 		return -1;
 	}
 	if (umoven(tcp, (int)ld.ld_symbols+(int)N_TXTADDR(hdr),

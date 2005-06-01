@@ -136,7 +136,7 @@ struct tcb *tcp;
 				size_t	idx;
 
 				if (data==NULL) {
-					fprintf(stderr, "sys_query_module: No memory\n");
+					fprintf(stderr, "out of memory\n");
 					tprintf(" /* %Zu entries */ ", ret);
 				} else {
 					umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
@@ -161,7 +161,7 @@ struct tcb *tcp;
 				size_t			idx;
 
 				if (data==NULL) {
-					fprintf(stderr, "sys_query_module: No memory\n");
+					fprintf(stderr, "out of memory\n");
 					tprintf(" /* %Zu entries */ ", ret);
 				} else {
 					umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
