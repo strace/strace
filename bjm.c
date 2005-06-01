@@ -42,7 +42,6 @@
 #include <sys/user.h>
 #include <sys/syscall.h>
 #include <signal.h>
-#include <linux/linkage.h>
 
 /* Bits of module.flags.  */
 
