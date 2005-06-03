@@ -1,3 +1,9 @@
+2005-06-02  Roland McGrath  <roland@redhat.com>
+
+	* file.c (printstatfs64): Cast values to unsigned long long and use
+	%llu formats.
+	Fixes RH#158243.
+
 2005-05-31  Dmitry V. Levin  <ldv@altlinux.org>
 
 	Deal with memory management issues.
