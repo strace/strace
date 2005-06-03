@@ -1545,30 +1545,19 @@ long addr;
 		tprintf("{...}");
 		return;
 	}
-#ifdef ALPHA
-
-	tprintf("{f_type=%s, f_fbsize=%u, f_blocks=%u, f_bfree=%u, ",
+	tprintf("{f_type=%s, f_bsize=%llu, f_blocks=%llu, f_bfree=%llu, ",
 		sprintfstype(statbuf.f_type),
-		statbuf.f_bsize, statbuf.f_blocks, statbuf.f_bfree);
-	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_fsid={%d, %d}, f_namelen=%u",
-		statbuf.f_bavail,statbuf.f_files, statbuf.f_ffree,
-		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1],
-		statbuf.f_namelen);
-#else /* !ALPHA */
-	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%lu, f_bfree=%lu, ",
-		sprintfstype(statbuf.f_type),
-		(unsigned long)statbuf.f_bsize,
-		(unsigned long)statbuf.f_blocks,
-		(unsigned long)statbuf.f_bfree);
-	tprintf("f_bavail=%lu, f_files=%lu, f_ffree=%lu, f_fsid={%d, %d}",
-		(unsigned long)statbuf.f_bavail,
-		(unsigned long)statbuf.f_files,
-		(unsigned long)statbuf.f_ffree,
+		(unsigned long long)statbuf.f_bsize,
+		(unsigned long long)statbuf.f_blocks,
+		(unsigned long long)statbuf.f_bfree);
+	tprintf("f_bavail=%llu, f_files=%llu, f_ffree=%llu, f_fsid={%d, %d}",
+		(unsigned long long)statbuf.f_bavail,
+		(unsigned long long)statbuf.f_files,
+		(unsigned long long)statbuf.f_ffree,
 		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
 	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
-#endif /* !ALPHA */
 #ifdef _STATFS_F_FRSIZE
-	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
+	tprintf(", f_frsize=%llu", (unsigned long long)statbuf.f_frsize);
 #endif
 	tprintf("}");
 }
