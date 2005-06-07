@@ -445,7 +445,7 @@ struct tcb *tcp;
 		return;
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= MAX_QUALS)
 		return;
-	switch (tcp->scno + NR_SYSCALL_BASE) {
+	switch (known_scno(tcp)) {
 	case SYS_read:
 #ifdef SYS_pread64
 	case SYS_pread64:
@@ -455,9 +455,13 @@ struct tcb *tcp;
 #endif
 #ifdef SYS_recv
 	case SYS_recv:
+#elif defined SYS_sub_recv
+	case SYS_sub_recv:
 #endif
 #ifdef SYS_recvfrom
 	case SYS_recvfrom:
+#elif defined SYS_sub_recvfrom
+	case SYS_sub_recvfrom:
 #endif
 		if (qual_flags[tcp->u_arg[0]] & QUAL_READ)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
@@ -471,9 +475,13 @@ struct tcb *tcp;
 #endif
 #ifdef SYS_send
 	case SYS_send:
+#elif defined SYS_sub_send
+	case SYS_sub_send:
 #endif
 #ifdef SYS_sendto
 	case SYS_sendto:
+#elif defined SYS_sub_sendto
+	case SYS_sub_sendto:
 #endif
 		if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
@@ -646,7 +654,7 @@ struct tcb *tcp;
 	 * correctly support following forks in the presence of tracing
 	 * qualifiers.
 	 */
-	switch (tcp->scno + NR_SYSCALL_BASE) {
+	switch (known_scno(tcp)) {
 #ifdef SYS_fork
 	case SYS_fork:
 #endif
@@ -1257,6 +1265,18 @@ struct tcb *tcp;
 }
 
 
+long
+known_scno(tcp)
+struct tcb *tcp;
+{
+	long scno = tcp->scno;
+	if (scno >= 0 && scno < nsyscalls && sysent[scno].native_scno != 0)
+		scno = sysent[scno].native_scno;
+	else
+		scno += NR_SYSCALL_BASE;
+	return scno;
+}
+
 int
 syscall_fixup(tcp)
 struct tcb *tcp;
@@ -1264,7 +1284,7 @@ struct tcb *tcp;
 #ifndef USE_PROCFS
 	int pid = tcp->pid;
 #else /* USE_PROCFS */
-	int scno = tcp->scno;
+	int scno = known_scno(tcp);
 
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		if (tcp->status.PR_WHY != PR_SYSENTRY) {
@@ -2359,9 +2379,9 @@ strace: out of memory for call counts\n");
 	if (res != 1)
 		return res;
 
-	switch (tcp->scno + NR_SYSCALL_BASE) {
+	switch (known_scno(tcp)) {
 #ifdef LINUX
-#if !defined (ALPHA) && !defined(SPARC) && !defined(SPARC64) && !defined(MIPS) && !defined(HPPA) && !defined(X86_64)
+#if !defined (ALPHA) && !defined(SPARC) && !defined(SPARC64) && !defined(MIPS) && !defined(HPPA)
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);
@@ -2370,7 +2390,7 @@ strace: out of memory for call counts\n");
 		decode_subcall(tcp, SYS_ipc_subcall,
 			SYS_ipc_nsubcalls, shift_style);
 		break;
-#endif /* !ALPHA && !MIPS && !SPARC && !SPARC64 && !HPPA && !X86_64 */
+#endif /* !ALPHA && !MIPS && !SPARC && !SPARC64 && !HPPA */
 #if defined (SPARC) || defined (SPARC64)
 	case SYS_socketcall:
 		sparc_socket_decode (tcp);
