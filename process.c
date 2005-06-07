@@ -396,7 +396,7 @@ struct tcb *tcp;
 				tcp->flags |= TCB_GROUP_EXITING;
 		} else
 # endif
-		if (tcp->scno == __NR_exit_group)
+		if (known_scno(tcp) == __NR_exit_group)
 			tcp->flags |= TCB_GROUP_EXITING;
 #endif
 	}
@@ -463,7 +463,7 @@ struct tcb *tcp;
 
 	if (exiting(tcp)) {
 #ifdef SYS_rfork
-		if (tcp->scno == SYS_rfork && !(tcp->u_arg[0]&RFPROC))
+		if (known_scno(tcp) == SYS_rfork && !(tcp->u_arg[0]&RFPROC))
 			return 0;
 #endif
 		if (getrval2(tcp))
@@ -542,10 +542,10 @@ extern void print_ldt_entry();
 # if defined IA64
 #  define ARG_FLAGS	0
 #  define ARG_STACK	1
-#  define ARG_STACKSIZE	(tcp->scno == SYS_clone2 ? 2 : -1)
-#  define ARG_PTID	(tcp->scno == SYS_clone2 ? 3 : 2)
-#  define ARG_CTID	(tcp->scno == SYS_clone2 ? 4 : 3)
-#  define ARG_TLS	(tcp->scno == SYS_clone2 ? 5 : 4)
+#  define ARG_STACKSIZE	(known_scno(tcp) == SYS_clone2 ? 2 : -1)
+#  define ARG_PTID	(known_scno(tcp) == SYS_clone2 ? 3 : 2)
+#  define ARG_CTID	(known_scno(tcp) == SYS_clone2 ? 4 : 3)
+#  define ARG_TLS	(known_scno(tcp) == SYS_clone2 ? 5 : 4)
 # elif defined S390 || defined S390X
 #  define ARG_STACK	0
 #  define ARG_FLAGS	1
@@ -931,7 +931,7 @@ struct tcb *tcp;
 	int dont_follow = 0;
 
 #ifdef SYS_vfork
-	if (tcp->scno == SYS_vfork) {
+	if (known_scno(tcp) == SYS_vfork) {
 		/* Attempt to make vfork into fork, which we can follow. */
 		if (!followvfork ||
 		    change_syscall(tcp, SYS_fork) < 0)
@@ -2587,33 +2587,33 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*SS,			"4*SS"					},
 #else /* !I386 */
 #ifdef X86_64
-	{ 8*RDI,		"8*RDI"					},
-	{ 8*RSI,		"8*RSI"					},
-	{ 8*RDX,		"8*RDX"					},
-	{ 8*R10, 		"8*R10" },
-	{ 8*R8, 		"8*R8" },
-	{ 8*R9, 		"8*R9" },
-	{ 8*RBX,		"8*RBX"					},
-	{ 8*RCX,		"8*RCX"					},
+	{ 8*R15, 		"8*R15"					},
+	{ 8*R14, 		"8*R14"					},
+	{ 8*R13, 		"8*R13"					},
+	{ 8*R12, 		"8*R12"					},
 	{ 8*RBP,		"8*RBP"					},
+	{ 8*RBX,		"8*RBX"					},
+	{ 8*R11,		"8*R11"					},
+	{ 8*R10,		"8*R10"					},
+	{ 8*R9,			"8*R9"					},
+	{ 8*R8,			"8*R8"					},
 	{ 8*RAX,		"8*RAX"					},
+	{ 8*RCX,		"8*RCX"					},
+	{ 8*RDX,		"8*RDX"					},
+	{ 8*RSI,		"8*RSI"					},
+	{ 8*RDI,		"8*RDI"					},
 #if 0
-	{ 8*DS,			"8*DS"					},
-	{ 8*ES,			"8*ES"					},
-	{ 8*FS,			"8*FS"					},
-	{ 8*GS,			"8*GS"					},
+	{ DS,			"DS"					},
+	{ ES,			"ES"					},
+	{ FS,			"FS"					},
+	{ GS,			"GS"					},
 #endif
-	{ 8*ORIG_RAX,		"8*ORIG_EAX"				},
+	{ 8*ORIG_RAX,		"8*ORIG_RAX"				},
 	{ 8*RIP,		"8*RIP"					},
 	{ 8*CS,			"8*CS"					},
 	{ 8*EFLAGS,		"8*EFL"					},
-	{ 8*RSP,		"8*RSP"				},
+	{ 8*RSP,		"8*RSP"					},
 	{ 8*SS,			"8*SS"					},
-	{ 8*R11, 		"8*R11" },
-	{ 8*R12, 		"8*R12" },
-	{ 8*R13, 		"8*R13" },
-	{ 8*R14, 		"8*R14" },
-	{ 8*R15, 		"8*R15" },
 #endif
 #ifdef M68K
 	{ 4*PT_D1,		"4*PT_D1"				},
