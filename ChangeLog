@@ -1,3 +1,38 @@
+2005-06-06  Roland McGrath  <roland@redhat.com>
+
+	* process.c (struct_user_offsets) [X86_64]: Reorder elements so
+	matching works right.
+	Fixes RH#159787.
+
+	* linux/syscall.h (SYS_socket, SYS_bind, SYS_connect, SYS_listen)
+	(SYS_accept, SYS_getsockname, SYS_getpeername, SYS_socketpair)
+	(SYS_send, SYS_recv, SYS_sendto, SYS_recvfrom, SYS_shutdown)
+	(SYS_setsockopt, SYS_getsockopt, SYS_sendmsg, SYS_recvmsg)
+	(SYS_getsockname, SYS_semop, SYS_semgsub_et, SYS_semget, SYS_semctl)
+	(SYS_semtimedop, SYS_msgsnd, SYS_msgrcv, SYS_msgget)
+	(SYS_msgctl, SYS_shmat, SYS_shmdt, SYS_shmget)
+	(SYS_shmctl): Macros renamed to SYS_sub_*.
+	* syscall.c (dumpio): Match SYS_sub_* if defined instead of SYS_*.
+
+	* linux/syscall.h (SYS_waitid): Define if not defined.
+
+	* linux/syscallent.h: Fix pread/pwrite names to pread64/pwrite64.
+
+	* defs.h (struct sysent): New member `native_scno'.
+	(known_scno): Declare new function.
+	* linux/syscallent.h: Add new final field to interesting syscalls.
+	* syscall.c (known_scno): New function.
+	(dumpio, internal_syscall, syscall_fixup, trace_syscall): Use it.
+	* process.c (internal_fork, internal_exit): Likewise.
+	[IA64] (ARG_STACKSIZE, ARG_PTID, ARG_CTID, ARG_TLS): Likewise.
+	* strace.c (proc_open): Likewise.
+	* util.c [LINUX] (setbpt): Likewise.
+	* linux/syscall.h: Remove [!defined(X86_64)] from conditional
+	for defining SYS_socket_subcall et al.
+	* linux/syscallent.h: Likewise for #error check.
+	* syscall.c (trace_syscall): Likewise for SYS_{socketcall,ipc} cases.
+	Fixes RH#158934.
+
 2005-06-02  Roland McGrath  <roland@redhat.com>
 
 	* file.c (printstatfs64): Cast values to unsigned long long and use
@@ -116,7 +151,7 @@
 	(sys_getdirentries) [FREEBSD]: Likewise.
 	* mem.c (sys_mincore): Changed type of variables which deal with
 	malloc size from int to unsigned long.
-	Fixes RH#159308.
+n	Fixes RH#159308.
 
 2005-05-22  Dmitry V. Levin  <ldv@altlinux.org>
 
