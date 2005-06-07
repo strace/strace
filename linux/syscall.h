@@ -127,7 +127,35 @@ int sys_osf_utimes();
 #endif
 
 
-#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && !defined(X86_64)
+#ifndef SYS_waitid
+# ifdef I386
+#  define SYS_waitid 284
+# elif defined ALPHA
+#  define SYS_waitid 438
+# elif defined ARM
+#  define SYS_waitid (NR_SYSCALL_BASE + 280)
+# elif defined IA64
+#  define SYS_waitid 1270
+# elif defined M68K
+#  define SYS_waitid 277
+# elif defined POWERPC
+#  define SYS_waitid 272
+# elif defined S390 || defined S390X
+#  define SYS_waitid 281
+# elif defined SH64
+#  define SYS_waitid 312
+# elif defined SH64
+#  define SYS_waitid 312
+# elif defined SH
+#  define SYS_waitid 284
+# elif defined SPARC || defined SPARC64
+#  define SYS_waitid 279
+# elif defined X86_64
+#  define SYS_waitid 247
+# endif
+#endif
+
+#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA)
 # ifdef	IA64
 /*
  *  IA64 syscall numbers (the only ones available from standard header
@@ -155,26 +183,26 @@ int sys_osf_utimes();
 #  undef SYS_recvmsg
 # endif /* IA64 */
 #  define SYS_socket_subcall	300
-#define SYS_socket		(SYS_socket_subcall + 1)
-#define SYS_bind		(SYS_socket_subcall + 2)
-#define SYS_connect		(SYS_socket_subcall + 3)
-#define SYS_listen		(SYS_socket_subcall + 4)
-#define SYS_accept		(SYS_socket_subcall + 5)
-#define SYS_getsockname		(SYS_socket_subcall + 6)
-#define SYS_getpeername		(SYS_socket_subcall + 7)
-#define SYS_socketpair		(SYS_socket_subcall + 8)
-#define SYS_send		(SYS_socket_subcall + 9)
-#define SYS_recv		(SYS_socket_subcall + 10)
-#define SYS_sendto		(SYS_socket_subcall + 11)
-#define SYS_recvfrom		(SYS_socket_subcall + 12)
-#define SYS_shutdown		(SYS_socket_subcall + 13)
-#define SYS_setsockopt		(SYS_socket_subcall + 14)
-#define SYS_getsockopt		(SYS_socket_subcall + 15)
-#define SYS_sendmsg		(SYS_socket_subcall + 16)
-#define SYS_recvmsg		(SYS_socket_subcall + 17)
+#define SYS_sub_socket		(SYS_socket_subcall + 1)
+#define SYS_sub_bind		(SYS_socket_subcall + 2)
+#define SYS_sub_connect		(SYS_socket_subcall + 3)
+#define SYS_sub_listen		(SYS_socket_subcall + 4)
+#define SYS_sub_accept		(SYS_socket_subcall + 5)
+#define SYS_sub_getsockname	(SYS_socket_subcall + 6)
+#define SYS_sub_getpeername	(SYS_socket_subcall + 7)
+#define SYS_sub_socketpair	(SYS_socket_subcall + 8)
+#define SYS_sub_send		(SYS_socket_subcall + 9)
+#define SYS_sub_recv		(SYS_socket_subcall + 10)
+#define SYS_sub_sendto		(SYS_socket_subcall + 11)
+#define SYS_sub_recvfrom	(SYS_socket_subcall + 12)
+#define SYS_sub_shutdown	(SYS_socket_subcall + 13)
+#define SYS_sub_setsockopt	(SYS_socket_subcall + 14)
+#define SYS_sub_getsockopt	(SYS_socket_subcall + 15)
+#define SYS_sub_sendmsg		(SYS_socket_subcall + 16)
+#define SYS_sub_recvmsg		(SYS_socket_subcall + 17)
 
 #define SYS_socket_nsubcalls	18
-#endif /* !(ALPHA || MIPS || HPPA || X86_64) */
+#endif /* !(ALPHA || MIPS || HPPA) */
 
 /* sys_ipc subcalls */
 
@@ -182,7 +210,7 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) && !defined(HPPA) && !defined(X86_64)
+#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) && !defined(HPPA)
 # ifdef	IA64
    /*
     * IA64 syscall numbers (the only ones available from standard
@@ -207,21 +235,28 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #  undef SYS_shmctl
 # endif /* IA64 */
 #define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
-#define SYS_semop		(SYS_ipc_subcall + 1)
-#define SYS_semget		(SYS_ipc_subcall + 2)
-#define SYS_semctl		(SYS_ipc_subcall + 3)
-#define SYS_semtimedop		(SYS_ipc_subcall + 4)
-#define SYS_msgsnd		(SYS_ipc_subcall + 11)
-#define SYS_msgrcv		(SYS_ipc_subcall + 12)
-#define SYS_msgget		(SYS_ipc_subcall + 13)
-#define SYS_msgctl		(SYS_ipc_subcall + 14)
-#define SYS_shmat		(SYS_ipc_subcall + 21)
-#define SYS_shmdt		(SYS_ipc_subcall + 22)
-#define SYS_shmget		(SYS_ipc_subcall + 23)
-#define SYS_shmctl		(SYS_ipc_subcall + 24)
+#define SYS_sub_semop		(SYS_ipc_subcall + 1)
+#define SYS_sub_semget		(SYS_ipc_subcall + 2)
+#define SYS_sub_semctl		(SYS_ipc_subcall + 3)
+#define SYS_sub_semtimedop	(SYS_ipc_subcall + 4)
+#define SYS_sub_msgsnd		(SYS_ipc_subcall + 11)
+#define SYS_sub_msgrcv		(SYS_ipc_subcall + 12)
+#define SYS_sub_msgget		(SYS_ipc_subcall + 13)
+#define SYS_sub_msgctl		(SYS_ipc_subcall + 14)
+#define SYS_sub_shmat		(SYS_ipc_subcall + 21)
+#define SYS_sub_shmdt		(SYS_ipc_subcall + 22)
+#define SYS_sub_shmget		(SYS_ipc_subcall + 23)
+#define SYS_sub_shmctl		(SYS_ipc_subcall + 24)
 
 #define SYS_ipc_nsubcalls	25
-#endif /* !(ALPHA || MIPS || SPARC || HPPA || X86_64) */
+#endif /* !(ALPHA || MIPS || SPARC || HPPA) */
+
+#if defined SYS_ipc_subcall && !defined SYS_ipc
+# define SYS_ipc SYS_ipc_subcall
+#endif
+#if defined SYS_socket_subcall && !defined SYS_socketcall
+# define SYS_socketcall SYS_socket_subcall
+#endif
 
 #ifdef IA64
   /*
