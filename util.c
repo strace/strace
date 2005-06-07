@@ -1372,16 +1372,7 @@ typedef int arg_setup_state;
 static int
 set_arg0 (struct tcb *tcp, void *cookie, long val)
 {
-	long oldval,newval;
-	if (get_arg0(tcp, cookie, &oldval) < 0)
-		abort ();
-	if (ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val) < 0)
-		return -1;
-	if (get_arg0(tcp, cookie, &newval) < 0)
-		abort ();
-	fprintf(stderr, "XXX old %lx set %lx new %lx\n",
-		oldval,val,newval);
-	return 0;
+	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val);
 }
 
 static int
