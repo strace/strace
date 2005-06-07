@@ -1002,7 +1002,7 @@ int attaching;
 			if (tcp->status.PR_WHY == PR_SYSENTRY) {
 				tcp->flags &= ~TCB_INSYSCALL;
 				get_scno(tcp);
-				if (tcp->scno == SYS_execve)
+				if (known_scno(tcp) == SYS_execve)
 					break;
 			}
 			/* Set it running: maybe execve will be next. */

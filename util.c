@@ -1205,6 +1205,9 @@ struct tcb *tcp;
 #ifndef CLONE_PTRACE
 # define CLONE_PTRACE    0x00002000
 #endif
+#ifndef CLONE_STOPPED
+# define CLONE_STOPPED   0x02000000
+#endif
 
 #ifdef IA64
 
@@ -1369,7 +1372,16 @@ typedef int arg_setup_state;
 static int
 set_arg0 (struct tcb *tcp, void *cookie, long val)
 {
-	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val);
+	long oldval,newval;
+	if (get_arg0(tcp, cookie, &oldval) < 0)
+		abort ();
+	if (ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val) < 0)
+		return -1;
+	if (get_arg0(tcp, cookie, &newval) < 0)
+		abort ();
+	fprintf(stderr, "XXX old %lx set %lx new %lx\n",
+		oldval,val,newval);
+	return 0;
 }
 
 static int
@@ -1404,7 +1416,7 @@ struct tcb *tcp;
 		return -1;
 	}
 
-	switch (tcp->scno) {
+	switch (known_scno(tcp)) {
 #ifdef SYS_vfork
 	case SYS_vfork:
 #endif

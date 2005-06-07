@@ -424,6 +424,7 @@ extern void set_overhead P((int));
 extern void qualify P((char *));
 extern void newoutf P((struct tcb *));
 extern int get_scno P((struct tcb *));
+extern long known_scno P((struct tcb *));
 extern int trace_syscall P((struct tcb *));
 extern void printxval P((const struct xlat *, int, const char *));
 extern int printargs P((struct tcb *));
@@ -526,6 +527,7 @@ struct sysent {
 	int	sys_flags;
 	int	(*sys_func)();
 	const char *sys_name;
+	long	native_scno;	/* Match against SYS_* constants.  */
 };
 
 extern const struct sysent *sysent;
