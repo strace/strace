@@ -1,3 +1,26 @@
+2005-06-08  Dmitry V. Levin  <ldv@altlinux.org>
+
+	Minor namespace cleanup.
+	* defs.h (string_quote): Remove declaration.
+	* file.c (openmodessol) [LINUXSPARC]: Make static.
+	(fileflags): Likewise.
+	(aclcmds, aclipc) [HAVE_SYS_ACL_H]: Likewise.
+	(direnttypes) [FREEBSD || LINUX]: Likewise.
+	(xattrflags): Likewise.
+	* process.c (unalignctl_string): Make static.
+	(setarg): Disable.
+	* syscall.c (subcalls_table): Make static.
+	(socket_map) [!(LINUX && (ALPHA || MIPS))]: Likewise.
+	(sparc_socket_decode): Make static, define for [SPARC || SPARC64] only.
+	(decode_subcall): Make static.
+	(syscall_fixup): Likewise.
+	(get_error): Likewise.
+	(syscall_enter): Likewise.
+	* util.c (tv_tv): Disable.
+	(getpc): Likewise.
+	(string_quote): Make static.
+	Fixes RH#159688.
+
 2005-05-12  Philippe De Muyter  <phdm@macqel.be>
 
 	* util.c (getpc, printcall): Check #if defined(M68K), not M68k.
