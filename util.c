@@ -998,7 +998,7 @@ struct tcb *tcp;
 #elif defined(POWERPC)
 	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &pc) < 0)
 		return -1;
-#elif defined(M68k)
+#elif defined(M68K)
 	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0)
 		return -1;
 #elif defined(ALPHA)
@@ -1108,7 +1108,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(M68k)
+#elif defined(M68K)
 	long pc;
 
 	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0) {
