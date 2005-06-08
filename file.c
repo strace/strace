@@ -325,7 +325,7 @@ struct tcb *tcp;
 }
 
 #ifdef LINUXSPARC
-const struct xlat openmodessol[] = {
+static const struct xlat openmodessol[] = {
 	{ 0,		"O_RDWR"	},
 	{ 1,		"O_RDONLY"	},
 	{ 2,		"O_WRONLY"	},
@@ -753,7 +753,7 @@ long addr;
 #endif /* SPARC64 */
 #endif /* LINUXSPARC */
 
-const struct xlat fileflags[] = {
+static const struct xlat fileflags[] = {
 #ifdef FREEBSD
 	{ UF_NODUMP,	"UF_NODUMP"	},
 	{ UF_IMMUTABLE,	"UF_IMMUTABLE"	},
@@ -1296,7 +1296,7 @@ struct tcb *tcp;
 
 #include <sys/acl.h>
 
-const struct xlat aclcmds[] = {
+static const struct xlat aclcmds[] = {
 #ifdef SETACL
 	{ SETACL,	"SETACL"	},
 #endif
@@ -1361,7 +1361,7 @@ struct tcb *tcp;
 }
 
 
-const struct xlat aclipc[] = {
+static const struct xlat aclipc[] = {
 #ifdef IPC_SHM
 	{ IPC_SHM,	"IPC_SHM"	},
 #endif
@@ -1987,7 +1987,7 @@ struct tcb *tcp;
 #endif /* LINUX */
 
 #if defined FREEBSD || defined LINUX
-const struct xlat direnttypes[] = {
+static const struct xlat direnttypes[] = {
 	{ DT_UNKNOWN,	"DT_UNKNOWN" 	},
 	{ DT_FIFO,	"DT_FIFO" 	},
 	{ DT_CHR,	"DT_CHR" 	},
@@ -2323,7 +2323,7 @@ struct tcb *tcp;
 
 #endif /* HAVE_SYS_ASYNCH_H */
 
-const struct xlat xattrflags[] = {
+static const struct xlat xattrflags[] = {
 #ifdef XATTR_CREATE
 	{ XATTR_CREATE,	 "XATTR_CREATE" },
 	{ XATTR_REPLACE, "XATTR_REPLACE" },

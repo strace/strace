@@ -148,6 +148,7 @@ static _hack_syscall5(int,_ptrace,int,__request,int,__pid,int,__addr,int,__data,
 #define MIN(a,b)		(((a) < (b)) ? (a) : (b))
 #endif
 
+#if 0
 void
 tv_tv(tv, a, b)
 struct timeval *tv;
@@ -157,6 +158,7 @@ int b;
 	tv->tv_sec = a;
 	tv->tv_usec = b;
 }
+#endif
 
 int
 tv_nz(a)
@@ -358,9 +360,9 @@ unsigned long uid;
 
 static char path[MAXPATHLEN + 1];
 
-void
+static void
 string_quote(str)
-char *str;
+const char *str;
 {
 	char buf[2 * MAXPATHLEN + 1];
 	char *s;
@@ -976,6 +978,7 @@ long *res;
 
 #endif /* !USE_PROCFS */
 
+#if 0
 long
 getpc(tcp)
 struct tcb *tcp;
@@ -1053,6 +1056,7 @@ struct tcb *tcp;
 	return regs.r_eip;
 #endif /* FREEBSD */
 }
+#endif
 
 void
 printcall(tcp)

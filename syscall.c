@@ -513,7 +513,7 @@ struct subcall {
   int subcalls[5];
 };
 
-const struct subcall subcalls_table[] = {
+static const struct subcall subcalls_table[] = {
   { SYS_shmsys, 5, { SYS_shmat, SYS_shmctl, SYS_shmdt, SYS_shmget, SYS_shmctl } },
 #ifdef SYS_semconfig
   { SYS_semsys, 4, { SYS___semctl, SYS_semget, SYS_semop, SYS_semconfig } },
@@ -526,7 +526,7 @@ const struct subcall subcalls_table[] = {
 
 #if !(defined(LINUX) && ( defined(ALPHA) || defined(MIPS) ))
 
-const int socket_map [] = {
+static const int socket_map [] = {
 	       /* SYS_SOCKET      */ 97,
 	       /* SYS_BIND        */ 104,
 	       /* SYS_CONNECT     */ 98,
@@ -546,7 +546,8 @@ const int socket_map [] = {
 	       /* SYS_RECVMSG     */ 113
 };
 
-void
+#if defined (SPARC) || defined (SPARC64)
+static void
 sparc_socket_decode (tcp)
 struct tcb *tcp;
 {
@@ -567,8 +568,9 @@ struct tcb *tcp;
 		addr += sizeof (arg);
 	}
 }
+#endif
 
-void
+static void
 decode_subcall(tcp, subcall, nsubcalls, style)
 struct tcb *tcp;
 int subcall;
@@ -1277,7 +1279,7 @@ struct tcb *tcp;
 	return scno;
 }
 
-int
+static int
 syscall_fixup(tcp)
 struct tcb *tcp;
 {
@@ -1421,7 +1423,7 @@ struct tcb *tcp;
 	return 1;
 }
 
-int
+static int
 get_error(tcp)
 struct tcb *tcp;
 {
@@ -1855,7 +1857,8 @@ force_result(tcp, error, rval)
 	return 0;
 }
 
-int syscall_enter(tcp)
+static int
+syscall_enter(tcp)
 struct tcb *tcp;
 {
 #ifndef USE_PROCFS

@@ -220,7 +220,7 @@ static const struct xlat prctl_options[] = {
 };
 
 
-const char *
+static const char *
 unalignctl_string (unsigned int ctl)
 {
 	static char buf[16];
@@ -701,6 +701,7 @@ int new;
 	return -1;
 }
 
+#if 0
 int
 setarg(tcp, argnum)
 	struct tcb *tcp;
@@ -778,6 +779,7 @@ setarg(tcp, argnum)
 #endif
 	return 0;
 }
+#endif
 
 #if defined SYS_clone || defined SYS_clone2
 int

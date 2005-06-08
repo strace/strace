@@ -435,7 +435,6 @@ extern int umovestr P((struct tcb *, long, int, char *));
 extern int upeek P((int, long, long *));
 extern void dumpiov P((struct tcb *, int, long));
 extern void dumpstr P((struct tcb *, long, int));
-extern void string_quote P((char *str));
 extern void printstr P((struct tcb *, long, int));
 extern void printnum P((struct tcb *, long, char *));
 extern void printpath P((struct tcb *, long));
