@@ -151,7 +151,7 @@
 	(sys_getdirentries) [FREEBSD]: Likewise.
 	* mem.c (sys_mincore): Changed type of variables which deal with
 	malloc size from int to unsigned long.
-n	Fixes RH#159308.
+	Fixes RH#159308.
 
 2005-05-22  Dmitry V. Levin  <ldv@altlinux.org>
 
