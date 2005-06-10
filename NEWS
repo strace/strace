@@ -1,3 +1,10 @@
+Changes in 4.5.12
+==============
+* Bug fixes.
+* Better x86-64 support for IA32 processes.
+* Update PowerPC system calls.
+* Better printing for Linux aio system calls.
+
 Changes in 4.5.11
 ==============
 * Quick fix release for build issues.

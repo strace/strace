@@ -1,3 +1,19 @@
+strace (4.5.12-1) unstable; urgency=low
+
+  * New upstream version.
+    + Build on ppc64, closes: #301089.
+    + Refuse negative -s argument value, closes: #303256.
+    + Fix known syscall recognition for IA32 processes on x86-64.
+    + Fix bad output for ptrace on x86-64.
+    + Fix potential buffer overruns.
+    + Make some diagnostics more consistent.
+    + Update PowerPC system calls.
+    + Better printing for Linux aio system calls.
+    + Don't truncate statfs64 fields to 32 bits in output.
+    + Cosmetic code cleanups.
+
+ -- Roland McGrath <frob@debian.org>  Wed,  8 Jun 2005 13:52:39 -0700
+
 strace (4.5.11-1) unstable; urgency=low
 
   * New upstream version.

@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5.11
+Version: 4.5.12
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -75,6 +75,16 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Jun  8 2005 Roland McGrath <roland@redhat.com> - 4.5.12-1
+- Fix known syscall recognition for IA32 processes on x86-64 (#158934).
+- Fix bad output for ptrace on x86-64 (#159787).
+- Fix potential buffer overruns (#151570, #159196).
+- Make some diagnostics more consistent (#159308).
+- Update PowerPC system calls.
+- Better printing for Linux aio system calls.
+- Don't truncate statfs64 fields to 32 bits in output (#158243).
+- Cosmetic code cleanups (#159688).
+
 * Tue Mar 22 2005 Roland McGrath <roland@redhat.com> - 4.5.11-1
 - Build tweaks.
 - Note 4.5.10 select fix (#151570).
