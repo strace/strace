@@ -437,6 +437,7 @@ extern void dumpiov P((struct tcb *, int, long));
 extern void dumpstr P((struct tcb *, long, int));
 extern void printstr P((struct tcb *, long, int));
 extern void printnum P((struct tcb *, long, char *));
+extern void printnum_int P((struct tcb *, long, char *));
 extern void printpath P((struct tcb *, long));
 extern void printpathn P((struct tcb *, long, int));
 extern void printtv P((struct tcb *, long));

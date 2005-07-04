@@ -350,6 +350,27 @@ char *fmt;
 }
 
 void
+printnum_int(tcp, addr, fmt)
+struct tcb *tcp;
+long addr;
+char *fmt;
+{
+	int num;
+
+	if (!addr) {
+		tprintf("NULL");
+		return;
+	}
+	if (umove(tcp, addr, &num) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	tprintf("[");
+	tprintf(fmt, num);
+	tprintf("]");
+}
+
+void
 printuid(text, uid)
 const char *text;
 unsigned long uid;

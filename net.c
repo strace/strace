@@ -1710,7 +1710,7 @@ int len;
 	tprintf (", ");
 
 	if (len == sizeof (int)) {
-		printnum(tcp, addr, "%ld");
+		printnum_int (tcp, addr, "%d");
 	}
 	else {
 		printstr (tcp, addr, len);
