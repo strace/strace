@@ -769,6 +769,15 @@ static const struct xlat sockipv6options[] = {
 #ifdef IPV6_FLOWINFO_SEND
 	{ IPV6_FLOWINFO_SEND,	"IPV6_FLOWINFO_SEND"	},
 #endif
+#ifdef IPV6_ADD_MEMBERSHIP
+	{ IPV6_ADD_MEMBERSHIP,	"IPV6_ADD_MEMBERSHIP"	},
+#endif
+#ifdef IPV6_DROP_MEMBERSHIP
+	{ IPV6_DROP_MEMBERSHIP,	"IPV6_DROP_MEMBERSHIP"	},
+#endif
+#ifdef IPV6_ROUTER_ALERT
+	{ IPV6_ROUTER_ALERT,	"IPV6_ROUTER_ALERT"	},
+#endif
 	{ 0,			NULL			},
 };
 #endif /* SOL_IPV6 */
