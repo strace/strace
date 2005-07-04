@@ -1,3 +1,15 @@
+2005-07-04  Roland McGrath  <roland@redhat.com>
+
+	* net.c (sockipoptions): Fix typos.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#161578.
+
+	* util.c (printnum_int): New function, printnum with s/long/int/.
+	* defs.h: Declare it.
+	* net.c (printsockopt): Use it for int-sized option.
+	Fixes RH#162449.
+	Reported by Ulrich Drepper <drepper@redhat.com>.
+
 2005-06-09  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.12.
