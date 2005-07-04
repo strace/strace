@@ -1,5 +1,10 @@
 2005-07-04  Roland McGrath  <roland@redhat.com>
 
+	* net.c (sockipv6options): Add IPV6_ADD_MEMBERSHIP,
+	IPV6_DROP_MEMBERSHIP, IPV6_ROUTER_ALERT.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#162450.
+
 	* net.c (sockipoptions): Fix typos.
 	From Ulrich Drepper <drepper@redhat.com>.
 	Fixes RH#161578.
