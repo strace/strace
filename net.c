@@ -671,10 +671,10 @@ static const struct xlat sockipoptions[] = {
 	{ IP_RECVERR,		"IP_RECVERR"		},
 #endif
 #ifdef IP_RECVTTL
-	{ IP_RECVTTL,		"IP_RECRECVTTL"		},
+	{ IP_RECVTTL,		"IP_RECVTTL"		},
 #endif
 #ifdef IP_RECVTOS
-	{ IP_RECVTOS,		"IP_RECRECVTOS"		},
+	{ IP_RECVTOS,		"IP_RECVTOS"		},
 #endif
 #ifdef IP_MTU
 	{ IP_MTU,		"IP_MTU"		},
