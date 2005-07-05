@@ -1,3 +1,41 @@
+2005-06-08  Dmitry V. Levin  <ldv@altlinux.org>
+
+	Remove TF flag from those syscalls which have no filename argument.
+	* freebsd/i386/syscallent.h: Remove TF flag from fstat, pread,
+	pwrite, fstat, sendfile.
+	* linux/alpha/syscallent.h: Remove TF flag from read, write,
+	pread, pwrite, sendfile.
+	* linux/hppa/syscallent.h: Remove TF flag from read, write,
+	pread, pwrite, fstat64, sendfile, ftruncate64.
+	* linux/ia64/syscallent.h: Remove TF flag from read, write,
+	sendfile, fstat, fadvise64.
+	* linux/mips/syscallent.h: Remove TF flag from read, write,
+	fstatfs, fstat, pread, pwrite, sendfile, ftruncate64, fstat64,
+	sendfile64, fadvise64, fstatfs64.
+	* linux/powerpc/syscallent.h: Remove TF flag from read, write,
+	fstat, pread, pwrite, sendfile, ftruncate64, fstat64, sendfile64,
+	fadvise64, fstatfs64, fadvise64_64.
+	* linux/s390/syscallent.h: Remove TF flag from pread, pwrite,
+	sendfile, ftruncate64, fstat64, sendfile64.
+	* linux/s390x/syscallent.h: Remove TF flag from pread, pwrite,
+	sendfile, sendfile64.
+	* linux/sh/syscallent.h: Remove TF flag from pread, pwrite,
+	sendfile, fstat64.
+	* linux/sh64/syscallent.h: Remove TF flag from pread, pwrite,
+	sendfile, ftruncate64, fstat64.
+	* linux/sparc/syscallent.h: Remove TF flag from sendfile, fstat64,
+	pread, pwrite, sendfile64.
+	* linux/sparc64/syscallent2.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+	* linux/syscallent.h: Remove TF flag from pread, pwrite, sendfile,
+	ftruncate64, fstat64, sendfile64, fadvise64, fadvise64, fstatfs64,
+	fadvise64_64.
+	* linux/x86_64/syscallent.h: Remove TF flag from pread, pwrite,
+	sendfile, fadvise64_64.
+	* svr4/syscallent.h: Remove TF flag from pread, pwrite, ftruncate,
+	fstatvfs64, ftruncate64.
+	Fixes RH#159340.
+
 2005-07-04  Roland McGrath  <roland@redhat.com>
 
 	* net.c (sockipv6options): Add IPV6_ADD_MEMBERSHIP,
