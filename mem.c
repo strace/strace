@@ -245,6 +245,18 @@ struct tcb *tcp;
     for (i=0; i<6; i++)
         u_arg[i] = tcp->u_arg[i];
 #else
+# if defined(X86_64)
+    if (current_personality == 1) {
+	    int i;
+	    for (i = 0; i < 6; ++i) {
+		    unsigned int val;
+		    if (umove(tcp, tcp->u_arg[0] + i * 4, &val) == -1)
+			    return 0;
+		    u_arg[i] = val;
+	    }
+    }
+    else
+# endif
     if (umoven(tcp, tcp->u_arg[0], sizeof u_arg, (char *) u_arg) == -1)
 	    return 0;
 #endif	// defined(IA64)
