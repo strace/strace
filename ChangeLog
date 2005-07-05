@@ -1,5 +1,32 @@
 2005-06-08  Dmitry V. Levin  <ldv@altlinux.org>
 
+	Introduce "-e trace=desc".
+	* defs.h (TRACE_DESC): New flag.
+	* syscall.c: Define TD macro before include of syscallent files
+	and undefine it afterwards.
+	(lookup_class): Recognize "desc" keyword.
+	* strace.1: Document "-e trace=desc".
+	* freebsd/i386/syscallent.h: Mark those syscalls which take a
+	file descriptor as an argument or return a file descriptor with
+	TD flag.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent2.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+	* linux/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+	* sunos4/syscallent.h: Likewise.
+	* svr4/syscallent.h: Likewise.
+	Fixes RH#159400.
+
 	Remove TF flag from those syscalls which have no filename argument.
 	* freebsd/i386/syscallent.h: Remove TF flag from fstat, pread,
 	pwrite, fstat, sendfile.
