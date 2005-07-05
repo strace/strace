@@ -37,7 +37,7 @@
 	{ 0,	0,	sys_sync,	"sync" },		/* 36 */
 	{ 2,	TS,	sys_kill,	"kill" },		/* 37 */
 	{ 2,	TF,	sys_stat,	"stat" },		/* 38 */
-	{ 4,	TF,	sys_sendfile,	"sendfile" },		/* 39 */
+	{ 4,	0,	sys_sendfile,	"sendfile" },		/* 39 */
 	{ 2,	TF,	sys_lstat,	"lstat" },		/* 40 */
 	{ 2,	0,	sys_dup,	"dup" },		/* 41 */
 	{ 0,	0,	sys_pipe,	"pipe" },		/* 42 */
@@ -61,12 +61,12 @@
 	{ 1,	0,	sys_umask,	"umask" },		/* 60 */
 	{ 1,	TF,	sys_chroot,	"chroot" },		/* 61 */
 	{ 2,	0,	sys_fstat,	"fstat" },		/* 62 */
-	{ 2,	TF,	sys_fstat64,	"fstat64" },		/* 63 */
+	{ 2,	0,	sys_fstat64,	"fstat64" },		/* 63 */
 	{ 0,	0,	sys_getpagesize,"getpagesize" },	/* 64 */
 	{ 3,	0,	sys_msync,	"msync" },		/* 65 */
 	{ 0,	TP,	sys_vfork,	"vfork" },		/* 66 */
-	{ 5,	TF,	sys_pread,	"pread" },		/* 67 */
-	{ 5,	TF,	sys_pwrite,	"pwrite" },		/* 68 */
+	{ 5,	0,	sys_pread,	"pread" },		/* 67 */
+	{ 5,	0,	sys_pwrite,	"pwrite" },		/* 68 */
 	{ 0,    0,	sys_geteuid,	"geteuid32" },		/* 69 */
 	{ 0,	0,	sys_getegid,	"getegid32" },		/* 70 */
 	{ 6,	0,	sys_mmap,	"mmap" },		/* 71 */
@@ -138,7 +138,7 @@
 	{ 1,	TF,	sys_rmdir,	"rmdir" },		/* 137 */
 	{ 2,	TF,	sys_utimes,	"utimes" },		/* 138 */
 	{ 2,	TF,	sys_stat64,	"stat64" },		/* 139 */
-	{ 4,    TF,	sys_sendfile64,	"sendfile64" },		/* 140 */
+	{ 4,    0,	sys_sendfile64,	"sendfile64" },		/* 140 */
 	{ 3,	TN,	sys_getpeername,"getpeername" },	/* 141 */
 	{ 5,    0,	sys_futex,	"futex" },		/* 142 */
 	{ 0,	0,	printargs,	"gettid" },		/* 143 */

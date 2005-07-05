@@ -211,14 +211,14 @@
 	{ 3,	TS,	sys_rt_sigqueueinfo,    "rt_sigqueueinfo"}, /* 178 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 179 */
 
-	{ 6,	TF,	sys_pread,		"pread"		}, /* 180 */
-	{ 6,	TF,	sys_pwrite,		"pwrite"	}, /* 181 */
+	{ 6,	0,	sys_pread,		"pread"		}, /* 180 */
+	{ 6,	0,	sys_pwrite,		"pwrite"	}, /* 181 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 182 */
 	{ 2,	0,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 187 */
+	{ 4,	0,	sys_sendfile,		"sendfile"	}, /* 187 */
 	{ 5,	0,	printargs,		"SYS_188"	}, /* 188 */
 	{ 5,	0,	printargs,		"SYS_189"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
@@ -228,7 +228,7 @@
 	{ 5,	0,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
-	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 197 */
+	{ 2,	0,	sys_fstat64,		"fstat64"	}, /* 197 */
 /*TODO*/{ 3,	TF,	printargs,		"lchown32"	}, /* 198 */
 /*TODO*/{ 0,	0,	printargs,		"getuid32"	}, /* 199 */
 

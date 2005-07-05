@@ -31,8 +31,8 @@
 	{ 5,	0,	printargs,		"SYS_0"			}, /* 0 */
 	{ 1,	TP,	sys_exit,		"exit"			}, /* 1 */
 	{ 0,	TP,	sys_fork,		"fork"			}, /* 2 */
-	{ 3,	TF,	sys_read,		"read"			}, /* 3 */
-	{ 3,	TF,	sys_write,		"write"			}, /* 4 */
+	{ 3,	0,	sys_read,		"read"			}, /* 3 */
+	{ 3,	0,	sys_write,		"write"			}, /* 4 */
 	{ 3,	TF,	sys_open,		"open"			}, /* 5 */
 	{ 1,	0,	sys_close,		"close"			}, /* 6 */
 	{ 3,	TP,	sys_waitpid,		"waitpid"		}, /* 7 */
@@ -136,7 +136,7 @@
 	{ 2,	0,	sys_getitimer,		"getitimer"		}, /* 105 */
 	{ 2,	TF,	sys_stat,		"stat"			}, /* 106 */
 	{ 2,	TF,	sys_lstat,		"lstat"			}, /* 107 */
-	{ 2,	TF,	sys_fstat,		"fstat"			}, /* 108 */
+	{ 2,	0,	sys_fstat,		"fstat"			}, /* 108 */
 	{ 1,	0,	sys_olduname,		"olduname"		}, /* 109 */
 	{ 5,	0,	printargs,		"SYS_110"		}, /* 110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"		}, /* 111 */
@@ -207,14 +207,14 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"	}, /* 176 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"	}, /* 177 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"		}, /* 178 */
-	{ 6,	TF,	sys_pread,		"pread64"		}, /* 179 */
-	{ 6,	TF,	sys_pwrite,		"pwrite64"		}, /* 180 */
+	{ 6,	0,	sys_pread,		"pread64"		}, /* 179 */
+	{ 6,	0,	sys_pwrite,		"pwrite64"		}, /* 180 */
 	{ 3,	TF,	sys_chown,		"chown"			}, /* 181 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"		}, /* 182 */
 	{ 2,	0,	sys_capget,		"capget"		}, /* 183 */
 	{ 2,	0,	sys_capset,		"capset"		}, /* 184 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"		}, /* 185 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"		}, /* 186 */
+	{ 4,	0,	sys_sendfile,		"sendfile"		}, /* 186 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"		}, /* 187 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"		}, /* 188 */
 	{ 0,	TP,	sys_vfork,		"vfork"			}, /* 189 */
@@ -222,11 +222,11 @@
 	{ 4,	0,	sys_readahead,		"readahead"		}, /* 190 */
 	{ 6,	0,	sys_mmap,		"mmap2"			}, /* 192 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"		}, /* 193 */
-	{ 4,	TF,	sys_ftruncate64,	"ftruncate64"		}, /* 194 */
+	{ 4,	0,	sys_ftruncate64,	"ftruncate64"		}, /* 194 */
 
 	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 196 */
-	{ 2,	TF,	sys_fstat64,		"fstat64"		}, /* 197 */
+	{ 2,	0,	sys_fstat64,		"fstat64"		}, /* 197 */
 	{ 5,	0,	printargs,		"pciconfig_read"	}, /* 198 */
 	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 199 */
 	{ 3,	0,	printargs,		"pciconfig_iobase"	}, /* 200 */
@@ -255,14 +255,14 @@
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"	}, /* 223 */
 	{ 5,	0,	printargs,		"SYS_224"		}, /* 224 */
 	{ 5,	0,	printargs,		"tux"			}, /* 225 */
-	{ 4,	TF,	sys_sendfile64,		"sendfile64"		}, /* 226 */
+	{ 4,	0,	sys_sendfile64,		"sendfile64"		}, /* 226 */
 	{ 2,	0,	sys_io_setup,		"io_setup"		}, /* 227 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"		}, /* 228 */
 	{ 5,	0,	sys_io_getevents,		"io_getevents"		}, /* 229 */
 	{ 3,	0,	sys_io_submit,		"io_submit"		}, /* 230 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"		}, /* 231 */
 	{ 1,	0,	printargs,		"set_tid_address"	}, /* 232 */
-	{ 6,	TF,	sys_fadvise64,		"fadvise64"		}, /* 233 */
+	{ 6,	0,	sys_fadvise64,		"fadvise64"		}, /* 233 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 234 */
 	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 235 */
 	{ 1,	0,	sys_epoll_create,	"epoll_create"		}, /* 236 */
@@ -282,8 +282,8 @@
 	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 250 */
 	{ 2,	TF,	sys_utimes,		"utimes"		}, /* 251 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"		}, /* 252 */
-	{ 3,	TF,	sys_fstatfs64,		"fstatfs64"		}, /* 253 */
-	{ 6,	TF,	sys_fadvise64_64,	"fadvise64_64"		}, /* 254 */
+	{ 3,	0,	sys_fstatfs64,		"fstatfs64"		}, /* 253 */
+	{ 6,	0,	sys_fadvise64_64,	"fadvise64_64"		}, /* 254 */
 	{ 1,	0,	printargs,		"rtas"			}, /* 255 */
 	{ 5,	0,	printargs,		"debug_setcontext"	}, /* 256 */
 	{ 5,	0,	printargs,		"vserver"		}, /* 257 */

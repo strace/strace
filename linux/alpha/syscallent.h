@@ -31,8 +31,8 @@
 	{ 6,	0,	printargs,		"osf_syscall"		}, /* 0, not implemented */
 	{ 1,	TP,	sys_exit,		"exit"			}, /* 1 */
 	{ 0,	TP,	sys_fork,		"fork"			}, /* 2 */
-	{ 3,	TF,	sys_read,		"read"			}, /* 3 */
-	{ 3,	TF,	sys_write,		"write"			}, /* 4 */
+	{ 3,	0,	sys_read,		"read"			}, /* 3 */
+	{ 3,	0,	sys_write,		"write"			}, /* 4 */
 	{ 5,	0,	printargs,		"osf_old_open"		}, /* 5, not implemented */
 	{ 1,	0,	sys_close,		"close"			}, /* 6 */
 	{ 4,	TP,	sys_osf_wait4,		"osf_wait4"		}, /* 7 */
@@ -377,8 +377,8 @@
 	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 346 */
 	{ 5,	0,	sys_query_module,	"query_module"		}, /* 347 */
 	{ 5,	0,	printargs,		"prctl"			}, /* 348 */
-	{ 5,	TF,	sys_pread,		"pread"			}, /* 349 */
-	{ 5,	TF,	sys_pwrite,		"pwrite"		}, /* 350 */
+	{ 5,	0,	sys_pread,		"pread"			}, /* 349 */
+	{ 5,	0,	sys_pwrite,		"pwrite"		}, /* 350 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"		}, /* 351 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"		}, /* 352 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"	}, /* 353 */
@@ -398,7 +398,7 @@
 	{ 2,	0,	sys_getcwd,		"getcwd"		}, /* 367 */
 	{ 2,	0,	sys_capget,		"capget"		}, /* 368 */
 	{ 2,	0,	sys_capset,		"capset"		}, /* 369 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"		}, /* 370 */
+	{ 4,	0,	sys_sendfile,		"sendfile"		}, /* 370 */
 	{ 3,	0,	printargs,		"setresgid"		}, /* 371 */
 	{ 3,	0,	printargs,		"getresgid"		}, /* 372 */
 	{ 4,	0,	printargs,		"dipc"			}, /* 373, not implemented */

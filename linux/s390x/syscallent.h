@@ -207,14 +207,14 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 177 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"}, /* 178 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 179 */
-	{ 5,	TF,	sys_pread,		"pread"		}, /* 180 */
-	{ 5,	TF,	sys_pwrite,		"pwrite"	}, /* 181 */
+	{ 5,	0,	sys_pread,		"pread"		}, /* 180 */
+	{ 5,	0,	sys_pwrite,		"pwrite"	}, /* 181 */
 	{ -1,	0,	printargs,		"SYS_182"	}, /* 182 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 187 */
+	{ 4,	0,	sys_sendfile,		"sendfile"	}, /* 187 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 188 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
@@ -250,7 +250,7 @@
 	{ 3,	0,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ -1,	0,	printargs,		"SYS_221"	}, /* 221 */
 	{ 4,	0,	sys_readahead,		"readahead"	}, /* 222 */
-	{ 4,	TF,	sys_sendfile64,		"sendfile64"	}, /* 223 */
+	{ 4,	0,	sys_sendfile64,		"sendfile64"	}, /* 223 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 224 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 225 */
 	{ 5,	0,	sys_fsetxattr,		"fsetxattr"	}, /* 226 */

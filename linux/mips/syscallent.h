@@ -4001,8 +4001,8 @@
 	{ 8,	0,	printargs,		"syscall"	}, /* 4000 */ /* start of Linux o32 */
 	{ 1,	TP,	sys_exit,		"exit"		}, /* 4001 */
 	{ 0,	TP,	sys_fork,		"fork"		}, /* 4002 */
-	{ 3,	TF,	sys_read,		"read"		}, /* 4003 */
-	{ 3,	TF,	sys_write,		"write"		}, /* 4004 */
+	{ 3,	0,	sys_read,		"read"		}, /* 4003 */
+	{ 3,	0,	sys_write,		"write"		}, /* 4004 */
 	{ 3,	TF,	sys_open,		"open"		}, /* 4005 */
 	{ 1,	0,	sys_close,		"close"		}, /* 4006 */
 	{ 3,	TP,	sys_waitpid,		"waitpid"	}, /* 4007 */
@@ -4098,7 +4098,7 @@
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 4097 */
 	{ 0,	0,	sys_profil,		"profil"	}, /* 4098 */
 	{ 3,	TF,	sys_statfs,		"statfs"	}, /* 4099 */
-	{ 3,	TF,	sys_fstatfs,		"fstatfs"	}, /* 4100 */
+	{ 3,	0,	sys_fstatfs,		"fstatfs"	}, /* 4100 */
 	{ 0,	0,	sys_ioperm,		"ioperm"	}, /* 4101 */
 	{ 2,	0,	sys_socketcall,		"socketcall"	}, /* 4102 */
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 4103 */
@@ -4106,7 +4106,7 @@
 	{ 2,	0,	sys_getitimer,		"getitimer"	}, /* 4105 */
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 4106 */
 	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 4107 */
-	{ 2,	TF,	sys_fstat,		"fstat"		}, /* 4108 */
+	{ 2,	0,	sys_fstat,		"fstat"		}, /* 4108 */
 	{ 1,	0,	sys_olduname,		"olduname"	}, /* 4109 */
 	{ 0,	0,	sys_iopl,		"iopl"		}, /* 4110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 4111 */
@@ -4198,22 +4198,22 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"},/* 4197 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"},/* 4198 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 4199 */
-	{ 6,	TF,	sys_pread,		"pread"		}, /* 4200 */
-	{ 6,	TF,	sys_pwrite,		"pwrite"	}, /* 4201 */
+	{ 6,	0,	sys_pread,		"pread"		}, /* 4200 */
+	{ 6,	0,	sys_pwrite,		"pwrite"	}, /* 4201 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 4202 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 4203 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 4204 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 4205 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstatck"	}, /* 4206 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 4207 */
+	{ 4,	0,	sys_sendfile,		"sendfile"	}, /* 4207 */
 	{ 0,	0,	printargs,		"SYS_4208"	}, /* 4208 */
 	{ 0,	0,	printargs,		"SYS_4209"	}, /* 4209 */
 	{ 6,	0,	sys_mmap,		"mmap"		}, /* 4210 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
-	{ 4,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
+	{ 4,	0,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
 	{ 2,	TF,	printargs,		"stat64"	}, /* 4213 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 4214 */
-	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 4215 */
+	{ 2,	0,	sys_fstat64,		"fstat64"	}, /* 4215 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 4216 */
 	{ 3,	0,	printargs,		"mincore"	}, /* 4217 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 4218 */
@@ -4235,7 +4235,7 @@
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 4234 */
 	{ 2,	0,	sys_fremovexattr,	"fremovexattr"	}, /* 4235 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 4236 */
-	{ 5,	TF,	sys_sendfile64,		"sendfile64"	}, /* 4237 */
+	{ 5,	0,	sys_sendfile64,		"sendfile64"	}, /* 4237 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 4238 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"}, /* 4239 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"}, /* 4240 */
@@ -4252,9 +4252,9 @@
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 4251 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 4252 */
 	{ 0,	0,	printargs,		"restart_syscall"}, /* 4253 */
-	{ 7,	TF,	sys_fadvise64_64,	"fadvise64_64"	}, /* 4254 */
+	{ 7,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 4254 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 4255 */
-	{ 2,	TF,	sys_fstatfs64,		"fstatfs64"	}, /* 4256 */
+	{ 2,	0,	sys_fstatfs64,		"fstatfs64"	}, /* 4256 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 4257 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 4258 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 4259 */

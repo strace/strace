@@ -929,8 +929,8 @@
 	{ 8,	0,	printargs,		"SYS_1023"	}, /* 1023 */
 	{ 0,	0,	printargs,		"ni_syscall"	}, /* 1024 */
 	{ 1,	TP,	sys_exit,		"exit"		}, /* 1025 */
-	{ 3,	TF,	sys_read,		"read"		}, /* 1026 */
-	{ 3,	TF,	sys_write,		"write"		}, /* 1027 */
+	{ 3,	0,	sys_read,		"read"		}, /* 1026 */
+	{ 3,	0,	sys_write,		"write"		}, /* 1027 */
 	{ 3,	TF,	sys_open,		"open"		}, /* 1028 */
 	{ 1,	0,	sys_close,		"close"		}, /* 1029 */
 	{ 2,	0,	sys_creat,		"creat"		}, /* 1030 */
@@ -1090,7 +1090,7 @@
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 1184 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 1185 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 1186 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 1187 */
+	{ 4,	0,	sys_sendfile,		"sendfile"	}, /* 1187 */
 	{ 5,	TN,	printargs,		"getpmsg"	}, /* 1188 */
 	{ 5,	TN,	printargs,		"putpmsg"	}, /* 1189 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 1190 */
@@ -1115,7 +1115,7 @@
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 1209 */
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 1210 */
 	{ 2,	0,	sys_lstat,		"lstat"		}, /* 1211 */
-	{ 2,	TF,	sys_fstat,		"fstat"		}, /* 1212 */
+	{ 2,	0,	sys_fstat,		"fstat"		}, /* 1212 */
 	{ 6,	TP,	sys_clone,		"clone2"	}, /* 1213 */
 	{ 3,	0,	printargs,		"getdents64"	}, /* 1214 */
 	{ 2,	0,	printargs,		"getunwind"	}, /* 1215 */
@@ -1137,7 +1137,7 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"},/* 1232 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 1233 */
-	{ 5,	TF,	sys_fadvise64,		"fadvise64"	}, /* 1234 */
+	{ 5,	0,	sys_fadvise64,		"fadvise64"	}, /* 1234 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 1235 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 1237 */

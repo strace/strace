@@ -414,10 +414,10 @@
 	{ -1,	0,	sys_unblock,		"unblock"	}, /* 186 */
 	{ -1,	0,	sys_cancelblock,	"cancelblock"	}, /* 187 */
 	{ -1,	0, 	printargs,		"SYS_188"	}, /* 188 */
-	{ -1,	TF,	sys_pread,		"pread"		}, /* 189 */
-	{ -1,	TF,	sys_pwrite,		"pwrite"	}, /* 190 */
+	{ -1,	0,	sys_pread,		"pread"		}, /* 189 */
+	{ -1,	0,	sys_pwrite,		"pwrite"	}, /* 190 */
 	{ -1,	TF,	sys_truncate,		"truncate"	}, /* 191 */
-	{ -1,	TF,	sys_ftruncate,		"ftruncate"	}, /* 192 */
+	{ -1,	0,	sys_ftruncate,		"ftruncate"	}, /* 192 */
 	{ -1,	0,	sys_lwpkill,		"lwpkill"	}, /* 193 */
 	{ -1,	0,	sys_sigwait,		"sigwait"	}, /* 194 */
 	{ -1,	0,	sys_fork1,		"fork1"		}, /* 195 */
@@ -442,9 +442,9 @@
 	{ -1,	0,	printargs,		"SYS_214"	}, /* 214 */
 	{ -1,	0,	printargs,		"SYS_215"	}, /* 215 */
 #if UNIXWARE >= 7
-	{ -1,	TF,	sys_fstatvfs64,		"fstatvfs64"	}, /* 216 */
+	{ -1,	0,	sys_fstatvfs64,		"fstatvfs64"	}, /* 216 */
 	{ -1,	TF,	sys_statvfs64,		"statvfs64"	}, /* 217 */
-	{ -1,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 218 */
+	{ -1,	0,	sys_ftruncate64,	"ftruncate64"	}, /* 218 */
 	{ -1,	TF,	sys_truncate64,		"truncate64"	}, /* 219 */
 	{ -1,	0,	sys_getrlimit64,	"getrlimit64"	}, /* 220 */
 	{ -1,	0,	sys_setrlimit64,	"setrlimit64"	}, /* 221 */
@@ -550,8 +550,8 @@
 	{ -1,	0,	sys_lwp_cond_wait,	"lwp_cond_wait"}, /* 170 */
 	{ -1,	0,	sys_lwp_cond_signal,	"lwp_cond_signal"}, /* 171 */
 	{ -1,	0,	sys_lwp_cond_broadcast,	"lwp_cond_broadcast"}, /* 172 */
-	{ -1,	TF,	sys_pread,		"pread"		}, /* 173 */
-	{ -1,	TF,	sys_pwrite,		"pwrite"	}, /* 174 */
+	{ -1,	0,	sys_pread,		"pread"		}, /* 173 */
+	{ -1,	0,	sys_pwrite,		"pwrite"	}, /* 174 */
 	{ -1,	0,	sys_llseek,		"llseek"	}, /* 175 */
 	{ -1,	0,	sys_inst_sync,		"inst_sync"	}, /* 176 */
 	{ -1,	0,	printargs,		"srmlimitsys"	}, /* 177 */

@@ -15,8 +15,8 @@
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"},  /* 14 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	},  /* 15 */
 	{ 3,	0,	sys_ioctl,		"ioctl"		},  /* 16 */
-	{ 5,	TF,	sys_pread,		"pread"		},  /* 17 */
-	{ 5,	TF,	sys_pwrite,		"pwrite"	},  /* 18 */
+	{ 5,	0,	sys_pread,		"pread"		},  /* 17 */
+	{ 5,	0,	sys_pwrite,		"pwrite"	},  /* 18 */
 	{ 3,	0,	sys_readv,		"readv"		},  /* 19 */
 	{ 3,	0,	sys_writev,		"writev"	},  /* 20 */
 	{ 2,	TF,	sys_access,		"access"	},  /* 21 */
@@ -38,7 +38,7 @@
 	{ 1,	0,	sys_alarm,		"alarm"		},  /* 37 */
 	{ 3,	0,	sys_setitimer,		"setitimer"	},  /* 38 */
 	{ 0,	0,	sys_getpid,		"getpid"	},  /* 39 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	},  /* 40 */
+	{ 4,	0,	sys_sendfile,		"sendfile"	},  /* 40 */
 	{ 3,	TN,	sys_socket,		"socket"	},  /* 41 */
 	{ 3,	TN,	sys_connect,		"connect"	},  /* 42 */
 	{ 3,	TN,	sys_accept,		"accept"	},  /* 43 */
@@ -219,7 +219,7 @@
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
 	{ 5,	0,	printargs,		"restart_syscall"}, /* 219 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 220 */
-	{ 4,	TF,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
+	{ 4,	0,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 222 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 223 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 224 */
