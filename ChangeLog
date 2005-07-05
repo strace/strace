@@ -1,3 +1,9 @@
+2005-07-05  Roland McGrath  <roland@redhat.com>
+
+	* mem.c [LINUX] (sys_old_mmap) [X86_64]: Extract 32-bit values if
+	child is 32-bit.
+	Fixes RH#162467.
+
 2005-06-08  Dmitry V. Levin  <ldv@altlinux.org>
 
 	Introduce "-e trace=desc".
