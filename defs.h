@@ -395,6 +395,7 @@ struct xlat {
 #define TRACE_NETWORK	004	/* Trace network-related syscalls. */
 #define TRACE_PROCESS	010	/* Trace process-related syscalls. */
 #define TRACE_SIGNAL	020	/* Trace signal-related syscalls. */
+#define TRACE_DESC	040	/* Trace file descriptor-related syscalls. */
 
 extern struct tcb **tcbtab;
 extern int qual_flags[];

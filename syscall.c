@@ -118,6 +118,7 @@
 #include "syscall.h"
 
 /* Define these shorthand notations to simplify the syscallent files. */
+#define TD TRACE_DESC
 #define TF TRACE_FILE
 #define TI TRACE_IPC
 #define TN TRACE_NETWORK
@@ -147,6 +148,7 @@ const struct sysent *sysent;
 int nsyscalls;
 
 /* Now undef them since short defines cause wicked namespace pollution. */
+#undef TD
 #undef TF
 #undef TI
 #undef TN
@@ -371,6 +373,8 @@ lookup_class(s)
 		return TRACE_PROCESS;
 	if (strcmp(s, "signal") == 0)
 		return TRACE_SIGNAL;
+	if (strcmp(s, "desc") == 0)
+		return TRACE_DESC;
 	return -1;
 }
 
