@@ -343,6 +343,8 @@ struct tcb {
 #   define __NR_exit_group 248
 #  elif defined SPARC || defined SPARC64
 #   define __NR_exit_group 188
+#  elif defined M68K
+#   define __NR_exit_group 247
 #  endif /* ALPHA et al */
 # endif	/* !__NR_exit_group */
 #endif /* LINUX */
