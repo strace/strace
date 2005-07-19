@@ -1,3 +1,8 @@
+2005-07-19  Roland McGrath  <roland@redhat.com>
+
+	* defs.h [LINUX] [M68K] (__NR_exit_group): Define it if missing.
+	Fixes Debian#315500.
+
 2005-07-14  Heiko Carstens  <heiko.carstens@de.ibm.com>
 
 	* linux/s390/syscallent.h (sys_tgkill, vserver, fadvise64_64)
