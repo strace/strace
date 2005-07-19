@@ -167,7 +167,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
 	{ -1,	0,	printargs,		"SYS_138"	}, /* 138 */
 	{ -1,	0,	printargs,		"SYS_139"	}, /* 139 */
-	{ -1,	0,	printargs,		"SYS_140"	}, /* 140 */
+ 	{ 5,	0,	sys_llseek,		"_llseek"	}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
 	{ 2,	TD,	sys_flock,		"flock"		}, /* 143 */
@@ -268,11 +268,11 @@
 	{ 5,	0,	sys_futex,		"futex"		}, /* 238 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 239 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 240 */
-	{ -1,	0,	printargs,		"SYS_241"	}, /* 241 */
+	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 241 */
 	{ -1,	0,	printargs,		"SYS_242"	}, /* 242 */
 	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 243 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 244 */
-	{ 5,	0,	sys_io_getevents,		"io_getevents"	}, /* 245 */
+	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 245 */
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 246 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 247 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 248 */
@@ -290,26 +290,26 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 260 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 261 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 262 */
+	{ 5,	0,	printargs,		"vserver"	}, /* 263 */
+	{ 6,	TF,	sys_fadvise64_64,	"fadvise64_64"	}, /* 264 */
+	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 265 */
+	{ 3,	TF,	sys_fstatfs64,		"fstatfs64"	}, /* 266 */
+	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 267 */
+	{ 6,	0,	sys_mbind,		"mbind"		}, /* 268 */
+	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 269 */
+	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"	}, /* 270 */
+	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 271 */
+	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 272 */
+	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 273 */
+	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 274 */
+	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 275 */
+	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 276 */
+	{ 5,	0,	printargs,		"sys_kexec_load" }, /* 277 */
+	{ 5,	0,	printargs,		"add_key"	}, /* 278 */
+	{ 5,	0,	printargs,		"request_key"	}, /* 279 */
+	{ 5,	0,	printargs,		"keyctl"	}, /* 280 */
+	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 281 */
 
-	{ 5,	0,	printargs,		"SYS_263"	}, /* 263 */
-	{ 5,	0,	printargs,		"SYS_264"	}, /* 264 */
-	{ 5,	0,	printargs,		"SYS_265"	}, /* 265 */
-	{ 5,	0,	printargs,		"SYS_266"	}, /* 266 */
-	{ 5,	0,	printargs,		"SYS_267"	}, /* 267 */
-	{ 5,	0,	printargs,		"SYS_268"	}, /* 268 */
-	{ 5,	0,	printargs,		"SYS_269"	}, /* 269 */
-	{ 5,	0,	printargs,		"SYS_270"	}, /* 270 */
-	{ 5,	0,	printargs,		"SYS_271"	}, /* 271 */
-	{ 5,	0,	printargs,		"SYS_272"	}, /* 272 */
-	{ 5,	0,	printargs,		"SYS_273"	}, /* 273 */
-	{ 5,	0,	printargs,		"SYS_274"	}, /* 274 */
-	{ 5,	0,	printargs,		"SYS_275"	}, /* 275 */
-	{ 5,	0,	printargs,		"SYS_276"	}, /* 276 */
-	{ 5,	0,	printargs,		"SYS_277"	}, /* 277 */
-	{ 5,	0,	printargs,		"SYS_278"	}, /* 278 */
-	{ 5,	0,	printargs,		"SYS_279"	}, /* 279 */
-	{ 5,	0,	printargs,		"SYS_280"	}, /* 280 */
-	{ 5,	0,	printargs,		"SYS_281"	}, /* 281 */
 	{ 5,	0,	printargs,		"SYS_282"	}, /* 282 */
 	{ 5,	0,	printargs,		"SYS_283"	}, /* 283 */
 	{ 5,	0,	printargs,		"SYS_284"	}, /* 284 */

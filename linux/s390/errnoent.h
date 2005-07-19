@@ -123,3 +123,10 @@
 	"EDQUOT", /* 122 */
 	"ENOMEDIUM", /* 123 */
 	"EMEDIUMTYPE", /* 124 */
+	"ECANCELED", /* 125 */
+	"ENOKEY", /* 126 */
+	"EKEYEXPIRED", /* 127 */
+	"EKEYREVOKED", /* 128 */
+	"EKEYREJECTED", /* 129 */
+	"EOWNERDEAD", /* 130 */
+	"ENOTRECOVERABLE", /* 131 */
