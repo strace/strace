@@ -1,3 +1,15 @@
+2005-07-14  Heiko Carstens  <heiko.carstens@de.ibm.com>
+
+	* linux/s390/syscallent.h (sys_tgkill, vserver, fadvise64_64)
+	(statfs64, fstatfs64, remap_file_pages, mbind, get_mempolicy)
+	(set_mempolicy, mq_open, mq_unlink, mq_timedsend, mq_timedreceive)
+	(mq_notify, mq_getsetattr, sys_kexec_load, add_key, request_key)
+	(keyctl, waitid): Added.
+	* linux/s390x/syscallent.h: Likewise and added missing _llseek.
+	* linux/s390/errnoent.h (ECANCELED, ENOKEY, EKEYEXPIRED)
+	(EKEYREVOKED, EKEYREJECTED, EOWNERDEAD, ENOTRECOVERABLE): Added.
+	* linux/s390x/errnoent.h: Likewise.
+
 2005-07-05  Roland McGrath  <roland@redhat.com>
 
 	* mem.c [LINUX] (sys_old_mmap) [X86_64]: Extract 32-bit values if
