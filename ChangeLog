@@ -3,8 +3,11 @@
 	* configure.ac, NEWS: Version 4.5.13.
 	* debian/changelog, strace.spec: 4.5.13-1.
 
+	* configure.ac: Check for struct dqblk.dqb_curblocks field.
 	* resource.c [LINUX] (OLD_CMD): New macro.
 	(quotacmds): Use it to hard-wire old O_* values, don't use macros.
+	(sys_quotactl): If dqb_curblocks is not there, it's called
+	dqb_curspace instead.  Print dqb_* fields as unsigned long long.
 
 2005-07-19  Michael Schmitz  <schmitz@debian.org>
 
