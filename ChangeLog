@@ -3,6 +3,9 @@
 	* configure.ac, NEWS: Version 4.5.13.
 	* debian/changelog, strace.spec: 4.5.13-1.
 
+	* resource.c [LINUX] (OLD_CMD): New macro.
+	(quotacmds): Use it to hard-wire old O_* values, don't use macros.
+
 2005-07-19  Michael Schmitz  <schmitz@debian.org>
 
 	Long overdue m68k cleanup.
