@@ -1,3 +1,29 @@
+2005-07-19  Michael Schmitz  <schmitz@debian.org>
+
+	Long overdue m68k cleanup.
+	* linux/syscallent.h: remove m68k declarations.
+	* linux/m68k/syscallent.h: new file, fixed up declarations
+	to match kernel version 2.6.11. Newer syscalls are sufficiently
+	different from i386 to merit a separate file.
+
+2005-08-03  Roland McGrath  <roland@redhat.com>
+
+	* linux/x86_64/syscallent.h: Update init_module argument count.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent2.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/arm/syscallent.h: Likewise.
+
+2005-07-22  James Lentini  <jlentini@gmail.com>
+
+	* bjm.c (sys_init_module): Display all three arguments.
+	* linux/syscallent.h: Update argument count.
+
 2005-08-03  Roland McGrath  <roland@redhat.com>
 
 	* process.c (internal_wait): Don't suspend when known child is known
