@@ -188,7 +188,7 @@
 	{ 2,	TS,	sys_kill,	"tkill" },		/* 187 */
 	{ 1,	TP,	sys_exit,	"exit_group" },		/* 188 */
 	{ 1,	0,	sys_uname,	"uname" },		/* 189 */
-	{ 2,	0,	sys_init_module,"init_module" },	/* 190 */
+	{ 3,	0,	sys_init_module,"init_module" },	/* 190 */
 	{ 1,	0,	sys_personality,"personality" },	/* 191 */
 	{ 5,	0,	sys_remap_file_pages,"remap_file_pages" },/* 192 */
 	{ 1,	0,	sys_epoll_create,"epoll_create" },	/* 193 */
