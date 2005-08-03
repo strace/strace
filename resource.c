@@ -529,21 +529,29 @@ struct tcb *tcp;
 
 		if (!tcp->u_arg[3])
 			tprintf("NULL");
-               else if (!verbose(tcp) || !OLD_COMMAND(cmd))
+               else if (!verbose(tcp) ||
+#ifdef HAVE_STRUCT_DQBLK_DQB_CURBLOCKS
+			!
+#endif
+			OLD_COMMAND(cmd))
 			tprintf("%#lx", tcp->u_arg[3]);
                 else if (umoven(tcp, tcp->u_arg[3], sizeof(struct dqblk),
                     (char *) &dq) < 0)
                         tprintf("???");
 		else {
                         tprintf("{");
-			tprintf("%u, ", dq.dqb_bhardlimit);
-			tprintf("%u, ", dq.dqb_bsoftlimit);
-			tprintf("%u, ", dq.dqb_curblocks);
-			tprintf("%u, ", dq.dqb_ihardlimit);
-			tprintf("%u, ", dq.dqb_isoftlimit);
-			tprintf("%u, ", dq.dqb_curinodes);
-			tprintf("%lu, ", dq.dqb_btime);
-			tprintf("%lu", dq.dqb_itime);
+			tprintf("%llu, ", (unsigned long long) dq.dqb_bhardlimit);
+			tprintf("%llu, ", (unsigned long long) dq.dqb_bsoftlimit);
+#ifdef HAVE_STRUCT_DQBLK_DQB_CURBLOCKS
+			tprintf("%llu, ", (unsigned long long) dq.dqb_curblocks);
+#else
+			tprintf("%llu, ", (unsigned long long) dq.dqb_curspace);
+#endif
+			tprintf("%llu, ", (unsigned long long) dq.dqb_ihardlimit);
+			tprintf("%llu, ", (unsigned long long) dq.dqb_isoftlimit);
+			tprintf("%llu, ", (unsigned long long) dq.dqb_curinodes);
+			tprintf("%llu, ", (unsigned long long) dq.dqb_btime);
+			tprintf("%llu", (unsigned long long) dq.dqb_itime);
                         tprintf("}");
 		}
 

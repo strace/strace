@@ -216,6 +216,8 @@ AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg],,,
 
 AC_CHECK_TYPES([struct user_desc],,, [#include <asm/ldt.h>])
 
+AC_CHECK_MEMBERS([struct dqblk.dqb_curblocks],,, [#include <sys/quota.h>])
+
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
 
