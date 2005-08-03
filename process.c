@@ -1988,7 +1988,8 @@ int flagarg;
 					    (tcp->flags & TCB_CLONE_THREAD)
 					    ? tcp->parent :
 #endif
-					    tcp))
+					    tcp) ||
+				    (child->flags & TCB_EXITING))
 					return 0;
 			}
 			tcp->flags |= TCB_SUSPENDED;
