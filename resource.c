@@ -464,6 +464,7 @@ struct tcb *tcp;
 
 #ifdef LINUX
 
+#define OLD_CMD(c)	((c)<<8)
 #define NEW_CMD(c)      ((0x80<<16)+(c))
 #define XQM_CMD(c)      (('X'<<8)+(c))
 #define NEW_COMMAND(c) (( ((c) >> SUBCMDSHIFT) & (0x80 << 16)))
@@ -471,15 +472,15 @@ struct tcb *tcp;
 #define OLD_COMMAND(c) (!NEW_COMMAND(c) && !XQM_COMMAND(c))
 
 static const struct xlat quotacmds[] = {
-	{ Q_QUOTAON,	"Q_QUOTAON"	},
-	{ Q_QUOTAOFF,	"Q_QUOTAOFF"	},
-	{ Q_GETQUOTA,	"Q_GETQUOTA"	},
-	{ Q_SETQUOTA,	"Q_SETQUOTA"	},
-	{ Q_SETUSE,	"Q_SETUSE"	},
-	{ Q_SYNC,	"Q_SYNC"	},
-	{ Q_SETQLIM,	"Q_SETQLIM"	},
-	{ Q_GETSTATS,	"Q_GETSTATS"	},
-	{ Q_RSQUASH,	"Q_RSQUASH"	},
+	{ OLD_CMD(0x1),	"Q_QUOTAON"	},
+	{ OLD_CMD(0x2),	"Q_QUOTAOFF"	},
+	{ OLD_CMD(0x3),	"Q_GETQUOTA"	},
+	{ OLD_CMD(0x4),	"Q_SETQUOTA"	},
+	{ OLD_CMD(0x5),	"Q_SETUSE"	},
+	{ OLD_CMD(0x6),	"Q_SYNC"	},
+	{ OLD_CMD(0x7),	"Q_SETQLIM"	},
+	{ OLD_CMD(0x8),	"Q_GETSTATS"	},
+	{ OLD_CMD(0x10),"Q_RSQUASH"	},
 	{ NEW_CMD(0x1), "Q_SYNC"        },
 	{ NEW_CMD(0x2), "Q_QUOTAON"     },
 	{ NEW_CMD(0x3), "Q_QUOTAOFF"    },
