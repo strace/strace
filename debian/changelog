@@ -1,3 +1,18 @@
+strace (4.5.13-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fix m68k build, closes: #315500.
+    + Fix setsockopt decoding on 64-bit.
+    + Fix typos in socket option name strings.
+    + Display more IPV6 socket options by name.
+    + Don't display inappropriate syscalls for -e trace=file.
+    + New selector type -e trace=desc for file-descriptor using calls.
+    + Fix 32-bit old_mmap syscall decoding on x86-64.
+    + Fix errors detaching from multithreaded process on interrupt.
+    + Note 4.5.12 fix for crash handling bad signal numbers.
+
+ -- Roland McGrath <frob@debian.org>  Wed,  3 Aug 2005 04:41:49 -0700
+
 strace (4.5.12-1) unstable; urgency=low
 
   * New upstream version.

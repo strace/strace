@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process.
 Name: strace
-Version: 4.5.12
+Version: 4.5.13
 Release: 1
 License: BSD
 Group: Development/Debuggers
@@ -75,6 +75,16 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Aug  3 2005 Roland McGrath <roland@redhat.com> - 4.5.13-1
+- Fix setsockopt decoding on 64-bit (#162449).
+- Fix typos in socket option name strings (#161578).
+- Display more IPV6 socket options by name (#162450).
+- Don't display inappropriate syscalls for -e trace=file (#159340).
+- New selector type -e trace=desc for file-descriptor using calls (#159400).
+- Fix 32-bit old_mmap syscall decoding on x86-64 (#162467, #164215).
+- Fix errors detaching from multithreaded process on interrupt (#161919).
+- Note 4.5.12 fix for crash handling bad signal numbers (#162739).
+
 * Wed Jun  8 2005 Roland McGrath <roland@redhat.com> - 4.5.12-1
 - Fix known syscall recognition for IA32 processes on x86-64 (#158934).
 - Fix bad output for ptrace on x86-64 (#159787).

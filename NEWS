@@ -1,3 +1,8 @@
+Changes in 4.5.13
+==============
+* Bug fixes.
+* Introduce "-e trace=desc".
+
 Changes in 4.5.12
 ==============
 * Bug fixes.
