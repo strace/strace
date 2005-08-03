@@ -1,3 +1,14 @@
+2005-08-03  Roland McGrath  <roland@redhat.com>
+
+	* process.c (internal_wait): Don't suspend when known child is known
+	to be exiting already.
+
+	* strace.c (detach): If detaching the last live thread in a group with
+	a zombie leader, then detach the leader too.
+	(handle_group_exit): Use detach, not droptcb, for predeceased thread.
+	Mark process about to take a signal with TCB_GROUP_EXITING flag.
+	Fixes RH#161919.
+
 2005-07-19  Roland McGrath  <roland@redhat.com>
 
 	* defs.h [LINUX] [M68K] (__NR_exit_group): Define it if missing.
