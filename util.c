@@ -424,6 +424,9 @@ struct tcb *tcp;
 long addr;
 int n;
 {
+	if (n >= sizeof path)
+		n = sizeof path - 1;
+
 	if (addr == 0)
 		tprintf("NULL");
 	else 	if (umovestr(tcp, addr, n, path) < 0)
