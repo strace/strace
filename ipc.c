@@ -188,6 +188,10 @@ struct tcb *tcp;
 #if defined IA64
 	return tcp->scno < 1024; /* ia32 emulation syscalls are low */
 #endif
+#if !defined MIPS && !defined HPPA
+	return 1;
+#endif
+#endif	/* LINUX */
 	return 0;
 }
 
