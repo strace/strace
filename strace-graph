@@ -229,7 +229,7 @@ sub handle_trace {
 	push @$seq, ['EXEC', $filename, $argv];
 
 	$pr{$pid}{seq} = $seq;
-    } elsif ($call eq 'fork') {
+    } elsif ($call eq 'fork' || $call eq 'clone' || $call eq 'vfork') {
 	return if $result == 0;
 
 	my $seq = $pr{$pid}{seq};
