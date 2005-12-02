@@ -16,6 +16,13 @@
 	there.
 	Fixes RH#164757.
 
+2005-08-08  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* strace.1: Update "SEE ALSO" links to reference to valid
+	manpages.
+	Patch from Michail Litvak <mci@owl.openwall.com>.
+	Fixes RH#165375.
+
 2005-10-21  Roland McGrath  <roland@redhat.com>
 
 	* util.c (printpathn): Cap N at sizeof path - 1.
