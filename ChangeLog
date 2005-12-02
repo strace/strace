@@ -1,3 +1,19 @@
+2005-12-01  Roland McGrath  <roland@redhat.com>
+
+	* ipc.c (indirect_ipccall) [MIPS || HPPA]: Return false.
+	Fixes Debian#340239.
+
+	* Makefile.am (EXTRA_DIST): Add linux/arm/syscallent.h
+	and linux/m68k/syscallent.h.
+	Fixes Debian#336197.
+
+	* debian/control (Architecture): Add armeb.
+	Fixes Debian#335681.
+
+2005-11-02 Michal Marek  <mmarek@suse.cz>
+
+	* strace-graph (handle_trace): follow clone() and vfork() calls.
+
 2005-10-25  Heiko Carstens  <heiko.carstens@de.ibm.com>
 
 	* linux/s390/syscallent.h: Added ioprio_set, ioprio_get,
