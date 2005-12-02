@@ -1,5 +1,8 @@
 2005-12-01  Roland McGrath  <roland@redhat.com>
 
+	* resource.c (resources): Add RLIMIT_NICE, RLIMIT_RTPRIO.
+	Reported by Scott Tsai <scottt958@yahoo.com.tw>.
+
 	* ipc.c (indirect_ipccall): New function.
 	(sys_msgctl, sys_msgsnd, sys_msgrcv, sys_semop): Use that predicate
 	instead of #ifdef LINUX test.
