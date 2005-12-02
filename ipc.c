@@ -231,24 +231,25 @@ struct tcb *tcp;
 	} tmp;
 #endif
 
-
-	if (exiting(tcp)) {
+	if (entering(tcp)) {
+		tprintf("%lu, ", tcp->u_arg[0]);
+	} else {
 		tprintf("%lu", tcp->u_arg[0]);
 #ifdef LINUX
 		umove(tcp, tcp->u_arg[3], &tmp);
 		umove(tcp, (long) tmp.msgp, &mtype);
 		tprintf(", {%lu, ", mtype);
 		printstr(tcp, (long) (tmp.msgp) + sizeof(long),
-			tcp->u_arg[1]);
+			 tcp->u_arg[1]);
 		tprintf("}, %lu", tcp->u_arg[1]);
 		tprintf(", %ld", tmp.msgtyp);
 		tprintf(", ");
 		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 #else /* !LINUX */
 		umove(tcp, tcp->u_arg[1], &mtype);
-		tprintf(", {%lu, ", mtype);
+		tprintf("{%lu, ", mtype);
 		printstr(tcp, tcp->u_arg[1] + sizeof(long),
-			tcp->u_arg[2]);
+			 tcp->u_arg[2]);
 		tprintf("}, %lu", tcp->u_arg[2]);
 		tprintf(", %ld", tcp->u_arg[3]);
 		tprintf(", ");
