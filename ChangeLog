@@ -1,3 +1,19 @@
+2005-10-25  Heiko Carstens  <heiko.carstens@de.ibm.com>
+
+	* linux/s390/syscallent.h: Added ioprio_set, ioprio_get,
+	inotify_init, inotify_add_watch, inotify_rm_watch.
+	Corrected number of arguments for request_key.
+	* linux/s390x/syscallent.h: Likewise.
+
+2005-12-01  Roland McGrath  <roland@redhat.com>
+
+	* ipc.c (indirect_ipccall) [IA64]: Return false unless the syscall
+	number is in the low range of IA32 syscalls.
+
+2005-10-07  Andreas Schwab  <schwab@suse.de>
+
+	* linux/ia64/syscallent.h: Syscall 1105 is gettid, not ioperm.
+
 2005-12-01  Roland McGrath  <roland@redhat.com>
 
 	* resource.c (resources): Add RLIMIT_NICE, RLIMIT_RTPRIO.
