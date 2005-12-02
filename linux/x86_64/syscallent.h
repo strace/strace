@@ -68,8 +68,8 @@
 	{ 4,	TI,	sys_shmdt,		"shmdt"		},  /* 67 */
 	{ 4,	TI,	sys_msgget,		"msgget"	},  /* 68 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	},  /* 69 */
-	{ 4,	TI,	sys_msgrcv,		"msgrcv"	},  /* 70 */
-	{ 4,	TI,	sys_msgctl,		"msgctl"	},  /* 71 */
+	{ 5,	TI,	sys_msgrcv,		"msgrcv"	},  /* 70 */
+	{ 3,	TI,	sys_msgctl,		"msgctl"	},  /* 71 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"		},  /* 72 */
 	{ 2,	TD,	sys_flock,		"flock"		},  /* 73 */
 	{ 1,	TD,	sys_fsync,		"fsync"		},  /* 74 */
