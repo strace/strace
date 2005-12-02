@@ -306,15 +306,15 @@
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 276 */
 	{ 5,	0,	printargs,		"sys_kexec_load" }, /* 277 */
 	{ 5,	0,	printargs,		"add_key"	}, /* 278 */
-	{ 5,	0,	printargs,		"request_key"	}, /* 279 */
+	{ 4,	0,	printargs,		"request_key"	}, /* 279 */
 	{ 5,	0,	printargs,		"keyctl"	}, /* 280 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 281 */
+	{ 3,	0,	printargs,		"ioprio_set"	}, /* 282 */
+	{ 2,	0,	printargs,		"ioprio_get"	}, /* 283 */
+	{ 0,	0,	printargs,		"inotify_init"	}, /* 284 */
+	{ 3,	0,	printargs,		"inotify_add_watch" }, /* 285 */
+	{ 2,	0,	printargs,		"inotify_rm_watch" }, /* 286 */
 
-	{ 5,	0,	printargs,		"SYS_282"	}, /* 282 */
-	{ 5,	0,	printargs,		"SYS_283"	}, /* 283 */
-	{ 5,	0,	printargs,		"SYS_284"	}, /* 284 */
-	{ 5,	0,	printargs,		"SYS_285"	}, /* 285 */
-	{ 5,	0,	printargs,		"SYS_286"	}, /* 286 */
 	{ 5,	0,	printargs,		"SYS_287"	}, /* 287 */
 	{ 5,	0,	printargs,		"SYS_288"	}, /* 288 */
 	{ 5,	0,	printargs,		"SYS_289"	}, /* 289 */
