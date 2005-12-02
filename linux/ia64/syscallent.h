@@ -1008,7 +1008,7 @@
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 1102 */
 	{ 2,	TF,	sys_statfs,		"statfs"	}, /* 1103 */
 	{ 2,	TD,	sys_fstatfs,		"fstatfs"	}, /* 1104 */
-	{ 3,	0,	sys_ioperm,		"ioperm"	}, /* 1105 */
+	{ 3,	0,	printargs,		"gettid"	}, /* 1105 */
 	{ 3,	TI,	sys_semget,		"semget"	}, /* 1106 */
 	{ 3,	TI,	printargs,		"semop"		}, /* 1107 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 1108 */
