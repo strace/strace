@@ -1,4 +1,16 @@
+2005-12-01  Roland McGrath  <roland@redhat.com>
+
+	* ipc.c (indirect_ipccall): New function.
+	(sys_msgctl, sys_msgsnd, sys_msgrcv, sys_semop): Use that predicate
+	instead of #ifdef LINUX test.
+	[LINUX] (sys_semtimedop): Likewise.
+	(sys_shmctl, sys_shmat, sys_shmdt): Likewise.
+	Fixes RH#164755.
+
 2005-07-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* linux/x86_64/syscallent.h: Fix syscall parameter count for msgrcv and
+	msgctl.
 
 	* ipc.c (sys_msgrcv): Add entering handling and print first parameter
 	there.
