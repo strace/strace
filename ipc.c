@@ -185,7 +185,8 @@ struct tcb *tcp;
 #ifdef X86_64
 	return current_personality > 0;
 #endif
-	return 1;
+#if defined IA64
+	return tcp->scno < 1024; /* ia32 emulation syscalls are low */
 #endif
 	return 0;
 }
