@@ -29,6 +29,7 @@
  */
 #include "dummy.h"
 
+int	sys_restart_syscall();
 int	sys_nosys();
 int	sys_nullsys();
 int	sys_errsys();

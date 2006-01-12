@@ -32,6 +32,7 @@
 
 /* primary syscalls */
 
+int sys_restart_syscall();
 int sys_setup(), sys_exit(), sys_fork(), sys_read(), sys_write();
 int sys_open(), sys_close(), sys_waitpid(), sys_creat(), sys_link();
 int sys_unlink(), sys_execve(), sys_chdir(), sys_time(), sys_mknod();

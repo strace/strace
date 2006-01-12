@@ -1,4 +1,4 @@
-	{ 1,	0,	sys_setup,	"setup" },		/* 0 */
+	{ 01,	0,	sys_restart_syscall,"restart_syscall" },/* 0 */
 	{ 1,	TP,	sys_exit,	"exit" },		/* 1 */
 	{ 0,	TP,	sys_fork,	"fork" },		/* 2 */
 	{ 3,	TD,	sys_read,	"read" },		/* 3 */

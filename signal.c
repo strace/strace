@@ -1950,4 +1950,13 @@ int sys_rt_sigtimedwait(tcp)
 	return 0;
 };
 
+int
+sys_restart_syscall(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("<... resuming interrupted call ...>");
+	return 0;
+}
+
 #endif /* LINUX */

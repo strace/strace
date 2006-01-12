@@ -4251,7 +4251,7 @@
 	{ 3,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 4250 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 4251 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 4252 */
-	{ 0,	0,	printargs,		"restart_syscall"}, /* 4253 */
+	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 4253 */
 	{ 7,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 4254 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 4255 */
 	{ 2,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 4256 */

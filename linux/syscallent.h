@@ -28,7 +28,7 @@
  *	$Id$
  */
 
-	{ 0,	0,	sys_setup,		"setup"		}, /* 0 */
+	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 0 */
 	{ 1,	TP,	sys_exit,		"_exit", SYS_exit }, /* 1 */
 	{ 0,	TP,	sys_fork,		"fork", SYS_fork }, /* 2 */
 	{ 3,	TD,	sys_read,		"read", SYS_read }, /* 3 */

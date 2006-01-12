@@ -1149,7 +1149,7 @@
 	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 1243 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 1244 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 1245 */
-	{ 0,	0,	printargs,		"restart_syscall"}, /* 1246 */
+	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 1246 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 1247 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 1248 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 1249 */

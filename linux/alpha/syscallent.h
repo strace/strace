@@ -440,7 +440,7 @@
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"		}, /* 409 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"	}, /* 410 */
 	{ 1,	0,	printargs,		"set_tid_address"	}, /* 411 */
-	{ 0,	0,	printargs,		"restart_syscall"	}, /* 412 */
+	{ 0,	0,	sys_restart_syscall,	"restart_syscall"	}, /* 412 */
 	{ 4,	0,	printargs,		"fadvise"		}, /* 413 */
 	{ 3,	0,	sys_timer_create,	"timer_create"		}, /* 414 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"		}, /* 415 */
