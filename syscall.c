@@ -293,6 +293,13 @@ qual_syscall(s, opt, not)
 	int i;
 	int rc = -1;
 
+  	if (isdigit((unsigned char)*s)) {
+ 		int i = atoi(s);
+ 		if (i < 0 || i >= nsyscalls)
+ 			return -1;
+ 		qualify_one(i, opt, not);
+ 		return 0;
+	}
 	for (i = 0; i < nsyscalls; i++) {
 		if (strcmp(s, sysent[i].sys_name) == 0) {
 			qualify_one(i, opt, not);
@@ -311,7 +318,7 @@ qual_signal(s, opt, not)
 	int i;
 	char buf[32];
 
-  	if (s && *s && isdigit((unsigned char)*s)) {
+  	if (isdigit((unsigned char)*s)) {
  		int signo = atoi(s);
  		if (signo < 0 || signo >= MAX_QUALS)
  			return -1;
@@ -349,7 +356,7 @@ qual_desc(s, opt, not)
 	const struct qual_options *opt;
 	int not;
 {
-	if (s && *s && isdigit((unsigned char)*s)) {
+	if (isdigit((unsigned char)*s)) {
 		int desc = atoi(s);
 		if (desc < 0 || desc >= MAX_QUALS)
 			return -1;
