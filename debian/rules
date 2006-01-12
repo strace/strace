@@ -66,12 +66,13 @@ binary-arch: $(extra_build_targets) build checkroot
 
 # Install strace
 	install -d -o root -g root -m 755 debian/tmp/usr/bin
-	install -s -o root -g root -m 755 build/strace debian/tmp/usr/bin/strace
+	install -o root -g root -m 755 build/strace debian/tmp/usr/bin/strace
+	dh_strip
 
 	dpkg-gencontrol -is -pstrace-udeb -fdebian/files~
 	dpkg-deb --build debian/tmp ../$(UDEB)
 	dpkg-distaddfile $(UDEB) debian-installer extra
-	
+
 # Install documentation
 	install -d -o root -g root -m 755 debian/tmp/usr/share/doc/$(package)
 	install -d -o root -g root -m 755 debian/tmp/usr/share/man/man1
@@ -88,8 +89,9 @@ binary-arch: $(extra_build_targets) build checkroot
 	gzip -9 debian/tmp/usr/share/man/man1/strace.1
 
 ifeq ($(build64),yes)
-	install -s -o root -g root -m 755 build64/strace debian/tmp/usr/bin/strace64
+	install -o root -g root -m 755 build64/strace debian/tmp/usr/bin/strace64
 	ln -s strace.1.gz debian/tmp/usr/share/man/man1/strace64.1.gz
+	dh_strip
 endif
 
 	dpkg-shlibdeps build/strace $(patsubst yes,build64/strace,$(build64))
