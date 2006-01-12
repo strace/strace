@@ -1,5 +1,15 @@
 2006-01-12  Roland McGrath  <roland@redhat.com>
 
+	* system.c (sys_sysctl): Don't read off end of NAME when max_strlen
+	exceeds INFO.nlen.
+	From Timo Lindfors <timo.lindfors@iki.fi>.
+	Fixes Debian#339117.
+
+	* debian/rules (binary-arch): Don't pass -s to install.  Use dh_strip.
+	Fixes Debian#325132.
+
+	* debian/control (Standards-Version): Update to 3.6.2.
+
 	* defs.h [LINUXSPARC] (PERSONALITY0_WORDSIZE, PERSONALITY1_WORDSIZE):
 	New macros.
 	[SPARC64] (PERSONALITY2_WORDSIZE): New macro.
