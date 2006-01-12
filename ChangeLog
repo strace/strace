@@ -1,5 +1,31 @@
 2006-01-12  Roland McGrath  <roland@redhat.com>
 
+	* signal.c [LINUX] (sys_restart_syscall): New function.
+	* linux/syscall.h: Declare sys_restart_syscall.
+	* linux/sparc/syscall.h: Likewise.
+	* linux/syscallent.h: Call 0 is restart_syscall.
+	* linux/arm/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/m68k/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+	* linux/alpha/syscallent.h: Use sys_restart_syscall.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+
+2005-08-08  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* system.c [LINUX] (MS_MGC_VAL): New macro.
+	[LINUX] (mount_flags): Add it.
+	[LINUX] (sys_mount): If neither MS_BIND nor MS_MOVE bits are
+        set in the flags argument, try to fetch data string.
+	Fixes RH#165377.
+
+2006-01-12  Roland McGrath  <roland@redhat.com>
+
 	* system.c (sys_sysctl): Don't read off end of NAME when max_strlen
 	exceeds INFO.nlen.
 	From Timo Lindfors <timo.lindfors@iki.fi>.
@@ -98,7 +124,6 @@
 	[LINUX] (sys_semtimedop): Likewise.
 	(sys_shmctl, sys_shmat, sys_shmdt): Likewise.
 	Fixes RH#164755.
-	Fixes Debian#340239.
 
 2005-07-31  Ulrich Drepper  <drepper@redhat.com>
 
