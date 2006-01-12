@@ -1,3 +1,14 @@
+2006-01-12  Roland McGrath  <roland@redhat.com>
+
+	* defs.h [LINUXSPARC] (PERSONALITY0_WORDSIZE, PERSONALITY1_WORDSIZE):
+	New macros.
+	[SPARC64] (PERSONALITY2_WORDSIZE): New macro.
+	[X86_64] (PERSONALITY0_WORDSIZE, PERSONALITY1_WORDSIZE): New macros.
+	* syscall.c (PERSONALITY0_WORDSIZE): New macro if undefined.
+	(personality_wordsize): New variable.
+	(decode_subcall): Use it for size of argument words.
+	Fixes RH#174354.
+
 2005-11-17  Dmitry V. Levin  <ldv@altlinux.org>
 
 	Implement qual_flags support for each personality.
