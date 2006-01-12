@@ -1921,7 +1921,9 @@ struct tcb *tcp;
 			goto out;
 		}
 	out:
-		max_cnt = abbrev(tcp) ? max_strlen : info.nlen;
+		max_cnt = info.nlen;
+		if (abbrev(tcp) && max_cnt > max_strlen)
+			max_cnt = max_strlen;
 		while (cnt < max_cnt)
 			tprintf(", %x", name[cnt++]);
 		if (cnt < info.nlen)
