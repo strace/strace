@@ -400,7 +400,7 @@ struct xlat {
 #define TRACE_DESC	040	/* Trace file descriptor-related syscalls. */
 
 extern struct tcb **tcbtab;
-extern int qual_flags[];
+extern int *qual_flags;
 extern int debug, followfork, followvfork;
 extern int rflag, tflag, dtime, cflag, xflag, qflag;
 extern int acolumn;

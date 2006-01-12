@@ -199,12 +199,12 @@ char *argv[];
 	progname = argv[0];
 	outf = stderr;
 	interactive = 1;
+	set_sortby(DEFAULT_SORTBY);
+	set_personality(DEFAULT_PERSONALITY);
 	qualify("trace=all");
 	qualify("abbrev=all");
 	qualify("verbose=all");
 	qualify("signal=all");
-	set_sortby(DEFAULT_SORTBY);
-	set_personality(DEFAULT_PERSONALITY);
 	while ((c = getopt(argc, argv,
 		"+cdfFhiqrtTvVxza:e:o:O:p:s:S:u:E:")) != EOF) {
 		switch (c) {
