@@ -1,3 +1,31 @@
+2005-11-17  Dmitry V. Levin  <ldv@altlinux.org>
+
+	Implement qual_flags support for each personality.
+	* strace.c (main): Move qualify calls after set_personality call.
+	* syscall.c (qual_flags0): New variable..
+	[SUPPORTED_PERSONALITIES >= 2] (qual_flags1): New variable.
+	[SUPPORTED_PERSONALITIES >= 3] (qual_flags2): New variable.
+	(qual_flags): Change variable definition from array to pointer.
+	(set_personality): Initialize qual_flags variable.
+	(qualify_one): Add "pers" argument to specify personality.
+	[SUPPORTED_PERSONALITIES >= 2]: Set qual_flags1 if requested.
+	[SUPPORTED_PERSONALITIES >= 3]: Set qual_flags2 if requested.
+	(qual_syscall): Pass personality to qualify_one.
+	[SUPPORTED_PERSONALITIES >= 2]: Look for syscall also in sysent1
+	table.
+	[SUPPORTED_PERSONALITIES >= 3]: Look for syscall also in sysent2
+	table.
+	(qual_signal): Pass personality to qualify_one.
+	(qual_desc): Likewise.
+	(qualify): Use qualify_one instead of manual qual_flags
+	manipulations.
+	[SUPPORTED_PERSONALITIES >= 2]: Look for syscall also in sysent1
+	table.
+	[SUPPORTED_PERSONALITIES >= 3]: Look for syscall also in sysent2
+	table.
+	* defs.h: Update qual_flags declaration.
+	Fixes RH#173986.
+
 2005-11-14  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* syscall.c (qual_syscall): Handle numeric syscall specification.
