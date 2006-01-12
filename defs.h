@@ -194,9 +194,12 @@ extern int ptrace();
 #ifdef LINUXSPARC
 #include <linux/a.out.h>
 #include <asm/psr.h>
+#define PERSONALITY0_WORDSIZE 4
+#define PERSONALITY1_WORDSIZE 4
 #undef  SUPPORTED_PERSONALITIES
 #if defined(SPARC64)
 #define SUPPORTED_PERSONALITIES 3
+#define PERSONALITY2_WORDSIZE 8
 #else
 #define SUPPORTED_PERSONALITIES 2
 #endif /* SPARC64 */
@@ -205,6 +208,8 @@ extern int ptrace();
 #ifdef X86_64
 #undef SUPPORTED_PERSONALITIES
 #define SUPPORTED_PERSONALITIES 2
+#define PERSONALITY0_WORDSIZE 8
+#define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef SVR4

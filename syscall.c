@@ -183,6 +183,19 @@ int nerrnos;
 
 int current_personality;
 
+#ifndef PERSONALITY0_WORDSIZE
+# define PERSONALITY0_WORDSIZE sizeof(long)
+#endif
+const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
+	PERSONALITY0_WORDSIZE,
+#if SUPPORTED_PERSONALITIES > 1
+	PERSONALITY1_WORDSIZE,
+#endif
+#if SUPPORTED_PERSONALITIES > 2
+	PERSONALITY2_WORDSIZE,
+#endif
+};;
+
 int
 set_personality(personality)
 int personality;
@@ -628,8 +641,9 @@ int subcall;
 int nsubcalls;
 enum subcall_style style;
 {
-	long addr, mask, arg;
+	unsigned long addr, mask;
 	int i;
+	int size = personality_wordsize[current_personality];
 
 	switch (style) {
 	case shift_style:
@@ -649,10 +663,21 @@ enum subcall_style style;
 		tcp->scno = subcall + tcp->u_arg[0];
 		addr = tcp->u_arg[1];
 		for (i = 0; i < sysent[tcp->scno].nargs; i++) {
-			if (umove(tcp, addr, &arg) < 0)
-				arg = 0;
-			tcp->u_arg[i] = arg;
-			addr += sizeof(arg);
+			if (size == sizeof(int)) {
+				unsigned int arg;
+				if (umove(tcp, addr, &arg) < 0)
+					arg = 0;
+				tcp->u_arg[i] = arg;
+			}
+			else if (size == sizeof(long)) {
+				unsigned long arg;
+				if (umove(tcp, addr, &arg) < 0)
+					arg = 0;
+				tcp->u_arg[i] = arg;
+			}
+			else
+				abort();
+			addr += size;
 		}
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 		break;
