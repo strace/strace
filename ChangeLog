@@ -98,6 +98,7 @@
 	[LINUX] (sys_semtimedop): Likewise.
 	(sys_shmctl, sys_shmat, sys_shmdt): Likewise.
 	Fixes RH#164755.
+	Fixes Debian#340239.
 
 2005-07-31  Ulrich Drepper  <drepper@redhat.com>
 
