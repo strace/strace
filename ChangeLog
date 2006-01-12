@@ -1,3 +1,11 @@
+2005-11-14  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* syscall.c (qual_syscall): Handle numeric syscall specification.
+	Fixes RH#174798.
+
+	* syscall.c (qual_signal, qual_options): Remove redundant argument
+	check.
+
 2005-12-01  Roland McGrath  <roland@redhat.com>
 
 	* ipc.c (indirect_ipccall) [MIPS || HPPA]: Return false.
