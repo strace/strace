@@ -1,3 +1,7 @@
+2006-01-13  Roland McGrath  <roland@redhat.com>
+
+	* debian/control (Build-Depends): Add debhelper.
+
 2006-01-12  Roland McGrath  <roland@redhat.com>
 
 	* signal.c [LINUX] (sys_restart_syscall): New function.
@@ -15,6 +19,7 @@
 	* linux/ia64/syscallent.h: Likewise.
 	* linux/mips/syscallent.h: Likewise.
 	* linux/x86_64/syscallent.h: Likewise.
+	Fixes RH#165469.
 
 2005-08-08  Dmitry V. Levin  <ldv@altlinux.org>
 
