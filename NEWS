@@ -1,3 +1,8 @@
+Changes in 4.5.14
+==============
+* Bug fixes.
+* Accept numeric system calls in -e.
+
 Changes in 4.5.13
 ==============
 * Bug fixes.

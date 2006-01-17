@@ -1,3 +1,14 @@
+strace (4.5.14-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fix crash in printing sysctl, closes: #339117.
+    + Respect DEB_BUILD_OPTIONS=nostrip, closes: #325132.
+    + Fix ipc syscall decoding, closes: #340239.
+    + Add missing source files to tarball, closes: #336197.
+    + Build on armeb, closes: #335681.
+
+ -- Roland McGrath <frob@debian.org>  Mon, 16 Jan 2006 22:17:38 -0800
+
 strace (4.5.13-1) unstable; urgency=low
 
   * New upstream version.
