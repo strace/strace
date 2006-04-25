@@ -293,7 +293,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
-		if (!indirect_ipccall(tcp)) {
+		if (indirect_ipccall(tcp)) {
 			tprintf(", %#lx", tcp->u_arg[3]);
 			tprintf(", %lu, ", tcp->u_arg[1]);
 			printtv(tcp, tcp->u_arg[5]);
