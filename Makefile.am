@@ -74,7 +74,8 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     sunos4/ioctlent.h sunos4/ioctlent.sh sunos4/signalent.h \
 	     sunos4/syscall.h sunos4/syscallent.h \
 	     svr4/dummy.h svr4/errnoent.h svr4/ioctlent.h svr4/ioctlent.sh \
-	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h
+	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
+	     xlate.el
 
 if MAINTAINER_MODE
 if LINUX
