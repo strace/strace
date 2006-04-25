@@ -5,7 +5,7 @@ Release: 1
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
-Source0: %{name}-%{version}.tar.bz2
+Source0: http://dl.sourceforge.net/strace/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-root
 
 %define strace64_arches ppc64
