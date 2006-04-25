@@ -220,7 +220,8 @@ Here the second argument represents the full set of all signals.
 .B \-c
 Count time, calls, and errors for each system call and report a summary on
 program exit.  On Linux, this attempts to show system time (CPU time spent
-running in the kernel) independent of wall clock time.
+running in the kernel) independent of wall clock time.  If -c is used with
+-f or -F (below), only aggregate totals for all traced processes are kept.
 .TP
 .B \-d
 Show some debugging output of
@@ -254,6 +255,7 @@ If the
 option is in effect, each processes trace is written to
 .I filename.pid
 where pid is the numeric process id of each process.
+This is incompatible with -c, since no per-process counts are kept.
 .TP
 .B \-F
 Attempt to follow

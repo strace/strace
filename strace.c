@@ -314,6 +314,13 @@ char *argv[];
 	if ((optind == argc) == !pflag_seen)
 		usage(stderr, 1);
 
+	if (followfork > 1 && cflag) {
+		fprintf(stderr,
+			"%s: -c and -ff are mutually exclusive options\n",
+			progname);
+		exit(1);
+	}
+
 	/* See if they want to run as another user. */
 	if (username != NULL) {
 		struct passwd *pent;
