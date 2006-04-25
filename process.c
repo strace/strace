@@ -694,6 +694,16 @@ int new;
                                    0x100000 | new) < 0)
                        return -1;
        return 0;
+#elif defined(ARM)
+       /* Some kernels support this, some (pre-2.6.16 or so) don't.  */
+# ifndef PTRACE_SET_SYSCALL
+#  define PTRACE_SET_SYSCALL 23
+# endif
+
+       if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new) != 0)
+		return -1;
+
+       return 0;
 #else
 #warning Do not know how to handle change_syscall for this architecture
 #endif /* architecture */
