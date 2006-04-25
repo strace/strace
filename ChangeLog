@@ -1,5 +1,8 @@
 2006-04-25  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (main): Fail when nonoption args follow -p switches.
+	Fixes Debian#361302.
+
 	* Makefile.am (EXTRA_DIST): Add xlate.el.
 
 	* linux/mips/Makefile.in: File removed, unused cruft.
@@ -13,6 +16,10 @@
 	Fixes Debian#340239.
 
 2006-03-30  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* linux/arm/syscallent.h: Correct the name of exit.  Remove
+	M68K conditionals and sys_security.  Correct syscalls 243-282.
+	Fixes Debian#360154.
 
 	* process.c (change_syscall): Add ARM support.
 	* syscall.c (get_scno): Handle ARM EABI.
