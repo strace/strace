@@ -1,5 +1,9 @@
 2006-04-25  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (main): Fail when -c is given with -ff.
+	* strace.1: Note their incompatibility.
+	Fixes RH#187847.
+
 	* strace.c (main): Fail when nonoption args follow -p switches.
 	Fixes Debian#361302.
 
