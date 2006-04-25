@@ -1,3 +1,12 @@
+2006-04-25  Roland McGrath  <roland@redhat.com>
+
+	* strace.spec (Source0): Use http://dl.sourceforge.net URL.
+
+	* ipc.c (sys_semtimedop): Fixed inverted indirect_ipccall test.
+	* linux/hppa/syscallent.h: Fixed semtimedop entry.
+	From Mike Stroyan <mike.stroyan@hp.com>.
+	Fixes Debian#340239.
+
 2006-01-16  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.14.
