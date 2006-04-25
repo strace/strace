@@ -311,7 +311,7 @@ char *argv[];
 		}
 	}
 
-	if (optind == argc && !pflag_seen)
+	if ((optind == argc) == !pflag_seen)
 		usage(stderr, 1);
 
 	/* See if they want to run as another user. */
