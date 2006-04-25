@@ -1,5 +1,10 @@
 2006-04-25  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (EXTRA_DIST): Add xlate.el.
+
+	* linux/mips/Makefile.in: File removed, unused cruft.
+	* linux/sparc/Makefile.in: Likewise.
+
 	* strace.spec (Source0): Use http://dl.sourceforge.net URL.
 
 	* ipc.c (sys_semtimedop): Fixed inverted indirect_ipccall test.
