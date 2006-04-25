@@ -12,6 +12,12 @@
 	From Mike Stroyan <mike.stroyan@hp.com>.
 	Fixes Debian#340239.
 
+2006-03-30  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* process.c (change_syscall): Add ARM support.
+	* syscall.c (get_scno): Handle ARM EABI.
+	Fixes Debian#360152.
+
 2006-01-16  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.14.
