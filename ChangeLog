@@ -1,3 +1,8 @@
+2006-08-22  Roland McGrath  <roland@redhat.com>
+
+	* ipc.c (sys_msgget, sys_semget, sys_shmget): Show key values in hex.
+	Fixes RH#198179.
+
 2006-08-21  Roland McGrath  <roland@redhat.com>
 
 	* linux/syscall.h (SYS_socket_subcall): Bump to 400.
