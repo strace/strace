@@ -6,6 +6,9 @@
 	* linux/m68k/syscallent.h: Likewise.
 	* linux/s390/syscallent.h: Likewise.
 	* linux/s390x/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
 	Fixes RH#202620.
 
 2006-04-25  Roland McGrath  <roland@redhat.com>
