@@ -183,7 +183,7 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 # endif /* IA64 */
-#  define SYS_socket_subcall	300
+#  define SYS_socket_subcall	400
 #define SYS_sub_socket		(SYS_socket_subcall + 1)
 #define SYS_sub_bind		(SYS_socket_subcall + 2)
 #define SYS_sub_connect		(SYS_socket_subcall + 3)
