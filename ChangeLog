@@ -1,3 +1,13 @@
+2006-08-21  Roland McGrath  <roland@redhat.com>
+
+	* linux/syscall.h (SYS_socket_subcall): Bump to 400.
+	* linux/syscallent.h: Update table.
+	* linux/arm/syscallent.h: Likewise.
+	* linux/m68k/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	Fixes RH#202620.
+
 2006-04-25  Roland McGrath  <roland@redhat.com>
 
 	* strace.c (main): Fail when -c is given with -ff.
