@@ -14,7 +14,7 @@
 	* linux/powerpc/syscallent.h: Likewise.
 	* linux/sh/syscallent.h: Likewise.
 	* linux/sh64/syscallent.h: Likewise.
-	Fixes RH#202620.
+	Fixes RH#201462.
 
 2006-04-25  Roland McGrath  <roland@redhat.com>
 
