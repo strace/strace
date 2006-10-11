@@ -1,3 +1,8 @@
+2006-04-21  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* defs.h [LINUX && X86_64 && !__NR_exit_group]: Define
+	__NR_exit_group.
+
 2006-03-29  Dmitry V. Levin  <ldv@altlinux.org>
 
 	Fix race conditions in tcb allocation.

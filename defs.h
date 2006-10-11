@@ -340,6 +340,8 @@ struct tcb {
 #   define __NR_exit_group 405
 #  elif defined I386
 #   define __NR_exit_group 252
+#  elif defined X86_64
+#   define __NR_exit_group 231
 #  elif defined IA64
 #   define __NR_exit_group 1236
 #  elif defined POWERPC
