@@ -1,3 +1,9 @@
+2006-09-01  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* file.c (print_xattr_val): Fix memory corruption bug reported
+	by James Antill.
+	Fixes RH#200621.
+
 2006-04-21  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* defs.h [LINUX && X86_64 && !__NR_exit_group]: Define

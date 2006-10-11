@@ -2360,7 +2360,7 @@ unsigned long insize, size;
 		    *out++ = tohex(in[i] % 16);
 		}
 	    /* Don't print terminating NUL if there is one.  */
-	    if (in[i - 1] == '\0')
+	    if (i > 0 && in[i - 1] == '\0')
 		out -= 4;
 	    *out = '\0';
 	    tprintf(", \"%s\", %ld", buf, insize);
