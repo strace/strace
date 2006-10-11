@@ -442,11 +442,8 @@ char *argv[];
 							tcp = NULL;
 						else
 							tcp = alloctcb(tid);
-						if (tcp == NULL) {
-							fprintf(stderr, "%s: out of memory\n",
-								progname);
+						if (tcp == NULL)
 							exit(1);
-						}
 						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
 						tcbtab[c]->nchildren++;
 						tcbtab[c]->nclone_threads++;
@@ -626,7 +623,6 @@ Process %u attached - interrupt to quit\n",
 		}
 		default:
 			if ((tcp = alloctcb(pid)) == NULL) {
-				fprintf(stderr, "tcb table full\n");
 				cleanup();
 				exit(1);
 			}
@@ -725,6 +721,8 @@ expand_tcbtab()
 	if (newtab == NULL || newtcbs == NULL) {
 		if (newtab != NULL)
 			free(newtab);
+		fprintf(stderr, "%s: expand_tcbtab: out of memory\n",
+			progname);
 		return 1;
 	}
 	for (i = tcbtabsize; i < 2 * tcbtabsize; ++i)
@@ -763,6 +761,7 @@ int pid;
 			return tcp;
 		}
 	}
+	fprintf(stderr, "%s: alloctcb: tcb table full\n", progname);
 	return NULL;
 }
 
@@ -2104,8 +2103,12 @@ trace()
 				   will we have the association of parent and
 				   child so that we know how to do clearbpt
 				   in the child.  */
-				if ((tcp = alloctcb(pid)) == NULL) {
-					fprintf(stderr, " [tcb table full]\n");
+				if (nprocs == tcbtabsize &&
+				    expand_tcbtab())
+					tcp = NULL;
+				else
+					tcp = alloctcb(pid);
+				if (tcp == NULL) {
 					kill(pid, SIGKILL); /* XXX */
 					return 0;
 				}

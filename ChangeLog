@@ -1,3 +1,21 @@
+2006-03-29  Dmitry V. Levin  <ldv@altlinux.org>
+
+	Fix race conditions in tcb allocation.
+	* process.c (fork_tcb): Return error code as documented.  Do not
+	print "tcb table full" error message.
+	[USE_PROCFS] (internal_fork): Do not print "tcb table full"
+	error message.
+	[SYS_clone || SYS_clone2] (internal_clone, internal_fork): Call
+	fork_tcb() before alloctcb().  Do not print "tcb table full"
+	error message.
+	* strace.c (main): Do not print "tcb table full" error message.
+	(expand_tcbtab): Print error message in case of memory allocation
+	failure.
+	(alloctcb): Print error message when tcb table is full.
+	(trace): Expand tcb table if necessary prior to allocating
+	entry there.  Do not print "tcb table full" error message.
+	Fixes RH#180293.
+
 2006-08-22  Roland McGrath  <roland@redhat.com>
 
 	* ipc.c (sys_msgget, sys_semget, sys_shmget): Show key values in hex.
