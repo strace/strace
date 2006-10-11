@@ -1,3 +1,10 @@
+2006-10-06  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* strace.c [!USE_PROCFS] (trace): Presence of PT_GETSIGINFO
+	macro does not mean that PT_CR_IPSR and PT_CR_IIP macros are
+	also defined, so check them along with PT_GETSIGINFO.
+	Fixes RH#209856.
+
 2006-09-01  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* file.c (print_xattr_val): Fix memory corruption bug reported
