@@ -467,3 +467,11 @@
 	{ 2,	0,	sys_mq_notify,		"mq_notify"		}, /* 436 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"		}, /* 437 */
 	{ 4,	0,	printargs,		"waitid"		}, /* 438 */
+	{ 5,	0,	printargs,		"add_key"		}, /* 439 */
+	{ 4,	0,	printargs,		"request_key"		}, /* 440 */
+	{ 5,	0,	printargs,		"keyctl"		}, /* 441 */
+	{ 3,	0,	printargs,		"ioprio_set"		}, /* 442 */
+	{ 2,	0,	printargs,		"ioprio_get"		}, /* 443 */
+	{ 0,	TD,	printargs,		"inotify_init"		}, /* 444 */
+	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch"	}, /* 445 */
+	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch"	}, /* 446 */

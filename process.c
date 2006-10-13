@@ -605,6 +605,14 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+int
+sys_unshare(struct tcb *tcp)
+{
+	if (entering(tcp))
+		printflags(clone_flags, tcp->u_arg[0], "CLONE_???");
+	return 0;
+}
 #endif
 
 int

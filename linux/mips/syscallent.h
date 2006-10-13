@@ -4281,29 +4281,29 @@
 	{ 5,	0,	printargs,		"add_key"	}, /* 4280 */
 	{ 4,	0,	printargs,		"request_key"	}, /* 4281 */
 	{ 5,	0,	printargs,		"keyctl"	}, /* 4282 */
-	{ 0,	0,	printargs,		"SYS_4283"	}, /* 4283 */
-	{ 0,	0,	printargs,		"SYS_4284"	}, /* 4284 */
-	{ 0,	0,	printargs,		"SYS_4285"	}, /* 4285 */
-	{ 0,	0,	printargs,		"SYS_4286"	}, /* 4286 */
-	{ 0,	0,	printargs,		"SYS_4287"	}, /* 4287 */
-	{ 0,	0,	printargs,		"SYS_4288"	}, /* 4288 */
-	{ 0,	0,	printargs,		"SYS_4289"	}, /* 4289 */
-	{ 0,	0,	printargs,		"SYS_4290"	}, /* 4290 */
-	{ 0,	0,	printargs,		"SYS_4291"	}, /* 4291 */
-	{ 0,	0,	printargs,		"SYS_4292"	}, /* 4292 */
-	{ 0,	0,	printargs,		"SYS_4293"	}, /* 4293 */
-	{ 0,	0,	printargs,		"SYS_4294"	}, /* 4294 */
-	{ 0,	0,	printargs,		"SYS_4295"	}, /* 4295 */
-	{ 0,	0,	printargs,		"SYS_4296"	}, /* 4296 */
-	{ 0,	0,	printargs,		"SYS_4297"	}, /* 4297 */
-	{ 0,	0,	printargs,		"SYS_4298"	}, /* 4298 */
-	{ 0,	0,	printargs,		"SYS_4299"	}, /* 4299 */
-	{ 0,	0,	printargs,		"SYS_4300"	}, /* 4300 */
-	{ 0,	0,	printargs,		"SYS_4301"	}, /* 4301 */
-	{ 0,	0,	printargs,		"SYS_4302"	}, /* 4302 */
-	{ 0,	0,	printargs,		"SYS_4303"	}, /* 4303 */
-	{ 0,	0,	printargs,		"SYS_4304"	}, /* 4304 */
-	{ 0,	0,	printargs,		"SYS_4305"	}, /* 4305 */
+	{ 1,	0,	sys_set_thread_area,	"set_thread_area" }, /* 4283 */
+	{ 0,	TD,	printargs,		"inotify_init"	}, /* 4284 */
+	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 4285 */
+	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 4286 */
+	{ 4,	0,	printargs,		"migrate_pages"	}, /* 4287 */
+	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 4288 */
+	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"	}, /* 4289 */
+	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 4290 */
+	{ 5,	TD|TF,	sys_fchownat,		"fchownat"	}, /* 4291 */
+	{ 3,	TD|TF,	sys_futimesat,		"futimesat"	}, /* 4292 */
+	{ 4,	TD|TD,	sys_newfstatat,		"newfstatat"	}, /* 4293 */
+	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"	}, /* 4294 */
+	{ 4,	TD|TF,	sys_renameat,		"renameat"	}, /* 4295 */
+	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 4296 */
+	{ 3,	TD|TF,	sys_symlinkat,		"symlinkat"	}, /* 4297 */
+	{ 4,	TD|TF,	sys_readlinkat,		"readlinkat"	}, /* 4298 */
+	{ 3,	TD|TF,	sys_fchmodat,		"fchmodat"	}, /* 4299 */
+	{ 3,	TD|TF,	sys_faccessat,		"faccessat"	}, /* 4300 */
+	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 4301 */
+	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 4302 */
+	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 4303 */
+	{ 6,	TD,	printargs,		"splice"	}, /* 4304 */
+	{ 4,	TD,	printargs,		"sync_file_range" }, /* 4305 */
 	{ 0,	0,	printargs,		"SYS_4306"	}, /* 4306 */
 	{ 0,	0,	printargs,		"SYS_4307"	}, /* 4307 */
 	{ 0,	0,	printargs,		"SYS_4308"	}, /* 4308 */

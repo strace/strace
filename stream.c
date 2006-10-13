@@ -294,9 +294,8 @@ static const struct xlat pollflags[] = {
 	{ 0,		NULL		},
 };
 
-int
-sys_poll(tcp)
-struct tcb *tcp;
+static int
+decode_poll(struct tcb *tcp)
 {
 	struct pollfd fds;
 	unsigned nfds;
@@ -311,8 +310,8 @@ struct tcb *tcp;
 	start = tcp->u_arg[0];
 	end = start + size;
 	if (nfds == 0 || size / sizeof(fds) != nfds || end < start) {
-		tprintf("%#lx, %d, %ld",
-			tcp->u_arg[0], nfds, tcp->u_arg[2]);
+		tprintf("%#lx, %d, ",
+			tcp->u_arg[0], nfds);
 		return 0;
 	}
 	if (abbrev(tcp)) {
@@ -351,15 +350,41 @@ struct tcb *tcp;
 	if (failed)
 		tprintf(" %#lx", start);
 	tprintf(", %d, ", nfds);
-#ifdef INFTIM
-	if (tcp->u_arg[2] == INFTIM)
-		tprintf("INFTIM");
-	else
-#endif
-		tprintf("%ld", tcp->u_arg[2]);
 	return 0;
 }
 
+int
+sys_poll(struct tcb *tcp)
+{
+	int rc = decode_poll(tcp);
+	if (exiting(tcp)) {
+#ifdef INFTIM
+		if (tcp->u_arg[2] == INFTIM)
+			tprintf("INFTIM");
+		else
+#endif
+			tprintf("%ld", tcp->u_arg[2]);
+	}
+	return rc;
+}
+
+#ifdef LINUX
+int
+sys_ppoll(struct tcb *tcp)
+{
+	int rc = decode_poll(tcp);
+	if (exiting(tcp)) {
+		struct timespec ts;
+		if (umove(tcp, tcp->u_arg[2], &ts) == 0)
+			tprintf("{%lu, %lu}, ", ts.tv_sec, ts.tv_nsec);
+		else
+			tprintf("{...}, ");
+		print_sigset(tcp, tcp->u_arg[3], 0);
+		tprintf(", %lu", tcp->u_arg[4]);
+	}
+	return rc;
+}
+#endif
 
 #else /* !HAVE_SYS_POLL_H */
 int

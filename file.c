@@ -307,22 +307,53 @@ const struct xlat openmodes[] = {
 	{ 0,		NULL		},
 };
 
-int
-sys_open(tcp)
-struct tcb *tcp;
+#ifdef LINUX
+
+#ifndef AT_FDCWD
+# define AT_FDCWD                -100
+#endif
+
+static void
+print_dirfd(long fd)
+{
+	if (fd == AT_FDCWD)
+		tprintf("AT_FDCWD, ");
+	else
+		tprintf("%ld, ", fd);
+}
+#endif
+
+static int
+decode_open(struct tcb *tcp, int offset)
 {
 	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", ");
 		/* flags */
-		printflags(openmodes, tcp->u_arg[1] + 1, "O_???");
-		if (tcp->u_arg[1] & O_CREAT) {
+		printflags(openmodes, tcp->u_arg[offset + 1] + 1, "O_???");
+		if (tcp->u_arg[offset + 1] & O_CREAT) {
 			/* mode */
-			tprintf(", %#lo", tcp->u_arg[2]);
+			tprintf(", %#lo", tcp->u_arg[offset + 2]);
 		}
 	}
 	return 0;
 }
+
+int
+sys_open(struct tcb *tcp)
+{
+	return decode_open(tcp, 0);
+}
+
+#ifdef LINUX
+int
+sys_openat(struct tcb *tcp)
+{
+	if (entering(tcp))
+		print_dirfd(tcp->u_arg[0]);
+	return decode_open(tcp, 1);
+}
+#endif
 
 #ifdef LINUXSPARC
 static const struct xlat openmodessol[] = {
@@ -387,17 +418,32 @@ static const struct xlat access_flags[] = {
 	{ 0,		NULL		},
 };
 
-int
-sys_access(tcp)
-struct tcb *tcp;
+static int
+decode_access(struct tcb *tcp, int offset)
 {
 	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", ");
-		printflags(access_flags, tcp->u_arg[1], "?_OK");
+		printflags(access_flags, tcp->u_arg[offset + 1], "?_OK");
 	}
 	return 0;
 }
+
+int
+sys_access(struct tcb *tcp)
+{
+	return decode_access(tcp, 0);
+}
+
+#ifdef LINUX
+int
+sys_faccessat(struct tcb *tcp)
+{
+	if (entering(tcp))
+		print_dirfd(tcp->u_arg[0]);
+	return decode_access(tcp, 1);
+}
+#endif
 
 int
 sys_umask(tcp)
@@ -1099,6 +1145,35 @@ struct tcb *tcp;
 #endif
 }
 
+#ifdef LINUX
+static const struct xlat fstatatflags[] = {
+#ifndef AT_SYMLINK_NOFOLLOW
+# define AT_SYMLINK_NOFOLLOW     0x100
+#endif
+	{ AT_SYMLINK_NOFOLLOW,	"AT_SYMLINK_NOFOLLOW"	},
+	{ 0,			NULL			},
+};
+
+int
+sys_newfstatat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_dirfd(tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+	} else {
+#ifdef HAVE_STAT64
+		printstat64(tcp, tcp->u_arg[2]);
+#else
+		printstat(tcp, tcp->u_arg[2]);
+#endif
+		tprintf(", ");
+		printflags(fstatatflags, tcp->u_arg[3], "AT_???");
+	}
+	return 0;
+}
+#endif
+
 #if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 int
 sys_oldstat(tcp)
@@ -1684,16 +1759,31 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_mkdir(tcp)
-struct tcb *tcp;
+static int
+decode_mkdir(struct tcb *tcp, int offset)
 {
 	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", %#lo", tcp->u_arg[1]);
+		printpath(tcp, tcp->u_arg[offset]);
+		tprintf(", %#lo", tcp->u_arg[offset + 1]);
 	}
 	return 0;
 }
+
+int
+sys_mkdir(struct tcb *tcp)
+{
+	return decode_mkdir(tcp, 0);
+}
+
+#ifdef LINUX
+int
+sys_mkdirat(struct tcb *tcp)
+{
+	if (entering(tcp))
+		print_dirfd(tcp->u_arg[0]);
+	return decode_mkdir(tcp, 1);
+}
+#endif
 
 int
 sys_rmdir(tcp)
@@ -1747,6 +1837,22 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef LINUX
+int
+sys_linkat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_dirfd(tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+		print_dirfd(tcp->u_arg[2]);
+		printpath(tcp, tcp->u_arg[3]);
+		tprintf(", %ld", tcp->u_arg[4]);
+	}
+	return 0;
+}
+#endif
+
 int
 sys_unlink(tcp)
 struct tcb *tcp;
@@ -1756,6 +1862,28 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef LINUX
+static const struct xlat unlinkatflags[] = {
+#ifndef AT_REMOVEDIR
+# define AT_REMOVEDIR            0x200
+#endif
+	{ AT_REMOVEDIR,	"AT_REMOVEDIR"	},
+	{ 0,		NULL		},
+};
+
+int
+sys_unlinkat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_dirfd(tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+		printflags(unlinkatflags, tcp->u_arg[2], "AT_???");
+	}
+	return 0;
+}
+#endif
 
 int
 sys_symlink(tcp)
@@ -1769,22 +1897,51 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef LINUX
 int
-sys_readlink(tcp)
-struct tcb *tcp;
+sys_symlinkat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
-	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			printpathn(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %lu", tcp->u_arg[2]);
+		print_dirfd(tcp->u_arg[1]);
+		printpath(tcp, tcp->u_arg[2]);
 	}
 	return 0;
 }
+#endif
+
+static int
+decode_readlink(struct tcb *tcp, int offset)
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[offset]);
+		tprintf(", ");
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[offset + 1]);
+		else
+			printpathn(tcp, tcp->u_arg[offset + 1], tcp->u_rval);
+		tprintf(", %lu", tcp->u_arg[offset + 2]);
+	}
+	return 0;
+}
+
+int
+sys_readlink(struct tcb *tcp)
+{
+	return decode_readlink(tcp, 0);
+}
+
+#ifdef LINUX
+int
+sys_readlinkat(struct tcb *tcp)
+{
+	if (entering(tcp))
+		print_dirfd(tcp->u_arg[0]);
+	return decode_readlink(tcp, 1);
+}
+#endif
 
 int
 sys_rename(tcp)
@@ -1798,6 +1955,21 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef LINUX
+int
+sys_renameat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_dirfd(tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+		print_dirfd(tcp->u_arg[2]);
+		printpath(tcp, tcp->u_arg[3]);
+	}
+	return 0;
+}
+#endif
+
 int
 sys_chown(tcp)
 struct tcb *tcp;
@@ -1809,6 +1981,22 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef LINUX
+int
+sys_fchownat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_dirfd(tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[1]);
+		printuid(", ", tcp->u_arg[2]);
+		printuid(", ", tcp->u_arg[3]);
+		tprintf(", ");
+		printflags(fstatatflags, tcp->u_arg[4], "AT_???");
+	}
+	return 0;
+}
+#endif
 
 int
 sys_fchown(tcp)
@@ -1822,16 +2010,31 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_chmod(tcp)
-struct tcb *tcp;
+static int
+decode_chmod(struct tcb *tcp, int offset)
 {
 	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", %#lo", tcp->u_arg[1]);
+		printpath(tcp, tcp->u_arg[offset]);
+		tprintf(", %#lo", tcp->u_arg[offset + 1]);
 	}
 	return 0;
 }
+
+int
+sys_chmod(struct tcb *tcp)
+{
+	return decode_chmod(tcp, 0);
+}
+
+#ifdef LINUX
+int
+sys_fchmodat(struct tcb *tcp)
+{
+	if (entering(tcp))
+		print_dirfd(tcp->u_arg[0]);
+	return decode_chmod(tcp, 1);
+}
+#endif
 
 int
 sys_fchmod(tcp)
@@ -1857,17 +2060,32 @@ struct tcb *tcp;
 }
 #endif
 
-int
-sys_utimes(tcp)
-struct tcb *tcp;
+static int
+decode_utimes(struct tcb *tcp, int offset)
 {
 	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", ");
-		printtv(tcp, tcp->u_arg[1]);
+		printtv(tcp, tcp->u_arg[offset + 1]);
 	}
 	return 0;
 }
+
+int
+sys_utimes(struct tcb *tcp)
+{
+	return decode_utimes(tcp, 0);
+}
+
+#ifdef LINUX
+int
+sys_futimesat(struct tcb *tcp)
+{
+	if (entering(tcp))
+		print_dirfd(tcp->u_arg[0]);
+	return decode_utimes(tcp, 1);
+}
+#endif
 
 int
 sys_utime(tcp)
@@ -1893,27 +2111,26 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_mknod(tcp)
-struct tcb *tcp;
+static int
+decode_mknod(struct tcb *tcp, int offset)
 {
-	int mode = tcp->u_arg[1];
+	int mode = tcp->u_arg[offset + 1];
 
 	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", %s", sprintmode(mode));
 		switch (mode & S_IFMT) {
 		case S_IFCHR: case S_IFBLK:
 #ifdef LINUXSPARC
 			if (current_personality == 1)
 			tprintf(", makedev(%lu, %lu)",
-				(unsigned long) ((tcp->u_arg[2] >> 18) & 0x3fff),
-				(unsigned long) (tcp->u_arg[2] & 0x3ffff));
+				(unsigned long) ((tcp->u_arg[offset + 2] >> 18) & 0x3fff),
+				(unsigned long) (tcp->u_arg[offset + 2] & 0x3ffff));
 			else
 #endif
 			tprintf(", makedev(%lu, %lu)",
-				(unsigned long) major(tcp->u_arg[2]),
-				(unsigned long) minor(tcp->u_arg[2]));
+				(unsigned long) major(tcp->u_arg[offset + 2]),
+				(unsigned long) minor(tcp->u_arg[offset + 2]));
 			break;
 		default:
 			break;
@@ -1921,6 +2138,22 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+int
+sys_mknod(struct tcb *tcp)
+{
+	return decode_mknod(tcp, 0);
+}
+
+#ifdef LINUX
+int
+sys_mknodat(struct tcb *tcp)
+{
+	if (entering(tcp))
+		print_dirfd(tcp->u_arg[0]);
+	return decode_mknod(tcp, 1);
+}
+#endif
 
 int
 sys_mkfifo(tcp)
@@ -2529,3 +2762,49 @@ struct tcb *tcp;
     }
     return 0;
 }
+
+#ifdef LINUX
+static const struct xlat inotify_modes[] = {
+	{ 0x00000001, "IN_ACCESS" },
+	{ 0x00000002, "IN_MODIFY" },
+	{ 0x00000004, "IN_ATTRIB" },
+	{ 0x00000008, "IN_CLOSE_WRITE" },
+	{ 0x00000010, "IN_CLOSE_NOWRITE" },
+	{ 0x00000020, "IN_OPEN" },
+	{ 0x00000040, "IN_MOVED_FROM" },
+	{ 0x00000080, "IN_MOVED_TO" },
+	{ 0x00000100, "IN_CREATE" },
+	{ 0x00000200, "IN_DELETE" },
+	{ 0x00000400, "IN_DELETE_SELF" },
+	{ 0x00000800, "IN_MOVE_SELF" },
+	{ 0x00002000, "IN_UNMOUNT" },
+	{ 0x00004000, "IN_Q_OVERFLOW" },
+	{ 0x00008000, "IN_IGNORED" },
+	{ 0x01000000, "IN_ONLYDIR" },
+	{ 0x02000000, "IN_DONT_FOLLOW" },
+	{ 0x20000000, "IN_MASK_ADD" },
+	{ 0x40000000, "IN_ISDIR" },
+	{ 0x80000000, "IN_ONESHOT" }
+};
+
+int
+sys_inotify_add_watch(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printpath(tcp, tcp->u_arg[1]);
+		tprintf(", ");
+		printflags(inotify_modes, tcp->u_arg[2], "IN_???");
+	}
+	return 0;
+}
+
+int
+sys_inotify_rm_watch(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, %ld", tcp->u_arg[0], tcp->u_arg[1]);
+	}
+	return 0;
+}
+#endif

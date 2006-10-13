@@ -311,33 +311,33 @@
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 281 */
 	{ 3,	0,	printargs,		"ioprio_set"	}, /* 282 */
 	{ 2,	0,	printargs,		"ioprio_get"	}, /* 283 */
-	{ 0,	0,	printargs,		"inotify_init"	}, /* 284 */
-	{ 3,	0,	printargs,		"inotify_add_watch" }, /* 285 */
-	{ 2,	0,	printargs,		"inotify_rm_watch" }, /* 286 */
+	{ 0,	TD,	printargs,		"inotify_init"	}, /* 284 */
+	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 285 */
+	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 286 */
+	{ 4,	0,	printargs,		"migrate_pages"	}, /* 287 */
+	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 288 */
+	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"	}, /* 289 */
+	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 290 */
+	{ 5,	TD|TF,	sys_fchownat,		"fchownat"	}, /* 291 */
+	{ 3,	TD|TF,	sys_futimesat,		"futimesat"	}, /* 292 */
+	{ 4,	TD|TD,	sys_newfstatat,		"newfstatat"	}, /* 293 */
+	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"	}, /* 294 */
+	{ 4,	TD|TF,	sys_renameat,		"renameat"	}, /* 295 */
+	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 296 */
+	{ 3,	TD|TF,	sys_symlinkat,		"symlinkat"	}, /* 297 */
+	{ 4,	TD|TF,	sys_readlinkat,		"readlinkat"	}, /* 298 */
+	{ 3,	TD|TF,	sys_fchmodat,		"fchmodat"	}, /* 299 */
+	{ 3,	TD|TF,	sys_faccessat,		"faccessat"	}, /* 300 */
+	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 301 */
+	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 302 */
+	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 303 */
+	{ 2,	0,	printargs,		"set_robust_list" }, /* 304 */
+	{ 3,	0,	printargs,		"get_robust_list" }, /* 305 */
+	{ 6,	TD,	printargs,		"splice"	}, /* 306 */
+	{ 4,	TD,	printargs,		"sync_file_range" }, /* 307 */
+	{ 4,	TD,	printargs,		"tee"		}, /* 308 */
+	{ 4,	TD,	printargs,		"vmsplice"	}, /* 309 */
 
-	{ 5,	0,	printargs,		"SYS_287"	}, /* 287 */
-	{ 5,	0,	printargs,		"SYS_288"	}, /* 288 */
-	{ 5,	0,	printargs,		"SYS_289"	}, /* 289 */
-	{ 5,	0,	printargs,		"SYS_290"	}, /* 290 */
-	{ 5,	0,	printargs,		"SYS_291"	}, /* 291 */
-	{ 5,	0,	printargs,		"SYS_292"	}, /* 292 */
-	{ 5,	0,	printargs,		"SYS_293"	}, /* 293 */
-	{ 5,	0,	printargs,		"SYS_294"	}, /* 294 */
-	{ 5,	0,	printargs,		"SYS_295"	}, /* 295 */
-	{ 5,	0,	printargs,		"SYS_296"	}, /* 296 */
-	{ 5,	0,	printargs,		"SYS_297"	}, /* 297 */
-	{ 5,	0,	printargs,		"SYS_298"	}, /* 298 */
-	{ 5,	0,	printargs,		"SYS_299"	}, /* 299 */
-	{ 5,	0,	printargs,		"SYS_300"	}, /* 300 */
-	{ 5,	0,	printargs,		"SYS_301"	}, /* 301 */
-	{ 5,	0,	printargs,		"SYS_302"	}, /* 302 */
-	{ 5,	0,	printargs,		"SYS_303"	}, /* 303 */
-	{ 5,	0,	printargs,		"SYS_304"	}, /* 304 */
-	{ 5,	0,	printargs,		"SYS_305"	}, /* 305 */
-	{ 5,	0,	printargs,		"SYS_306"	}, /* 306 */
-	{ 5,	0,	printargs,		"SYS_307"	}, /* 307 */
-	{ 5,	0,	printargs,		"SYS_308"	}, /* 308 */
-	{ 5,	0,	printargs,		"SYS_309"	}, /* 309 */
 	{ 5,	0,	printargs,		"SYS_310"	}, /* 310 */
 	{ 5,	0,	printargs,		"SYS_311"	}, /* 311 */
 	{ 5,	0,	printargs,		"SYS_312"	}, /* 312 */

@@ -1,3 +1,45 @@
+2006-10-13  Ulrich Drepper  <drepper@redhat.com>
+	    Bernhard Kaindl <bk@suse.de>
+	    Dmitry V. Levin  <ldv@altlinux.org>
+	    Michael Holzheu <holzheu@de.ibm.com>
+
+	Add hooks for new syscalls.  Add decoders for *at, inotify*,
+	pselect6, ppoll and unshare syscalls.
+
+	* defs.h: Declare print_sigset.
+	* desc.c (sys_pselect6): New function.
+	* file.c (decode_open, decode_access, decode_mkdir,
+	decode_readlink, decode_chmod, decode_utimes, decode_mknod):
+	New functions.
+	(sys_open, sys_access, sys_mkdir, sys_readlink, sys_chmod,
+	sys_utimes, sys_mknod): Use them.
+	[LINUX] (fstatatflags, unlinkatflags, inotify_modes): New
+	variables.
+	[LINUX] (print_dirfd, sys_openat, sys_faccessat,
+	sys_newfstatat, sys_mkdirat, sys_linkat, sys_unlinkat,
+	sys_symlinkat, sys_readlinkat, sys_renameat, sys_fchownat,
+	sys_fchmodat, sys_futimesat, sys_mknodat, sys_inotify_add_watch,
+	sys_inotify_rm_watch): New functions.
+	* process.c [LINUX] (sys_unshare): New function.
+	* signal.c (print_sigset): New function.
+	(sys_sigprocmask): Use it.
+	* stream.c (decode_poll): New function.
+	(sys_poll): Use it.
+	[LINUX] (sys_ppoll): New function.
+	* linux/syscall.h: Delcare new syscall handlers.
+	* linux/syscallent.h: Hook up new syscalls.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+	Fixes RH#178633.
+
 2006-10-06  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* strace.c [!USE_PROCFS] (trace): Presence of PT_GETSIGINFO

@@ -246,9 +246,34 @@
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 245 */
 	{ 5,	0,	printargs,		"kexec_load"	}, /* 246 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 247 */
-	{ 5,	0,	printargs,		"SYS_248"	}, /* 248 */
-	{ 5,	0,	printargs,		"SYS_249"	}, /* 249 */
-	{ 5,	0,	printargs,		"SYS_250"	}, /* 250 */
-	{ 5,	0,	printargs,		"SYS_251"	}, /* 251 */
-	{ 5,	0,	printargs,		"SYS_252"	}, /* 252 */
-	{ 5,	0,	printargs,		"SYS_253"	}, /* 253 */
+	{ 5,	0,	printargs,		"add_key"	}, /* 248 */
+	{ 4,	0,	printargs,		"request_key"	}, /* 249 */
+	{ 5,	0,	printargs,		"keyctl"	}, /* 250 */
+	{ 3,	0,	printargs,		"ioprio_set"	}, /* 251 */
+	{ 2,	0,	printargs,		"ioprio_get"	}, /* 252 */
+	{ 0,	TD,	printargs,		"inotify_init"	}, /* 253 */
+	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 254 */
+	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 255 */
+	{ 4,	0,	printargs,		"migrate_pages"	}, /* 256 */
+	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 257 */
+	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"	}, /* 258 */
+	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 259 */
+	{ 5,	TD|TF,	sys_fchownat,		"fchownat"	}, /* 260 */
+	{ 3,	TD|TF,	sys_futimesat,		"futimesat"	}, /* 261 */
+	{ 4,	TD|TD,	sys_newfstatat,		"newfstatat"	}, /* 262 */
+	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"	}, /* 263 */
+	{ 4,	TD|TF,	sys_renameat,		"renameat"	}, /* 264 */
+	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 265 */
+	{ 3,	TD|TF,	sys_symlinkat,		"symlinkat"	}, /* 266 */
+	{ 4,	TD|TF,	sys_readlinkat,		"readlinkat"	}, /* 267 */
+	{ 3,	TD|TF,	sys_fchmodat,		"fchmodat"	}, /* 268 */
+	{ 3,	TD|TF,	sys_faccessat,		"faccessat"	}, /* 269 */
+	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 270 */
+	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 271 */
+	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 272 */
+	{ 2,	0,	printargs,		"set_robust_list" }, /* 273 */
+	{ 3,	0,	printargs,		"get_robust_list" }, /* 274 */
+	{ 6,	TD,	printargs,		"splice"	}, /* 275 */
+	{ 4,	TD,	printargs,		"sync_file_range" }, /* 276 */
+	{ 4,	TD,	printargs,		"tee"		}, /* 277 */
+	{ 4,	TD,	printargs,		"vmsplice"	}, /* 278 */

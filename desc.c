@@ -871,6 +871,30 @@ int
 sys_select(tcp)
 struct tcb *tcp;
 {
-	long *args = tcp->u_arg;
-	return decode_select(tcp, args, 0);
+	return decode_select(tcp, tcp->u_arg, 0);
 }
+
+#ifdef LINUX
+int
+sys_pselect6(struct tcb *tcp)
+{
+	int rc = decode_select(tcp, tcp->u_arg, 0);
+	if (exiting(tcp)) {
+		struct {
+			void *ss;
+			unsigned long len;
+		} data;
+		if (umove(tcp, tcp->u_arg[5], &data) < 0)
+			tprintf(", %#lx", tcp->u_arg[5]);
+		else {
+			tprintf(", {");
+			if (data.len < sizeof(sigset_t))
+				tprintf("%#lx", (long)data.ss);
+			else
+				print_sigset(tcp, (long)data.ss, 0);
+			tprintf(", %lu}", data.len);
+		}
+	}
+	return rc;
+}
+#endif

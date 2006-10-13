@@ -463,6 +463,7 @@ extern int setbpt P((struct tcb *));
 extern int sigishandled P((struct tcb *, int));
 extern void printcall P((struct tcb *));
 extern const char *signame P((int));
+extern void print_sigset P((struct tcb *, long, int));
 extern void printsignal P((int));
 extern void printleader P((struct tcb *));
 extern void printtrailer P((struct tcb *));

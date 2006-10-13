@@ -395,6 +395,19 @@ int nr;
 	tprintf(signame(nr));
 }
 
+void
+print_sigset(struct tcb *tcp, long addr, int rt)
+{
+	sigset_t ss;
+
+	if (!addr)
+		tprintf("NULL");
+	else if (copy_sigset(tcp, addr, &ss) < 0)
+		tprintf("%#lx", addr);
+	else
+		printsigmask(&ss, rt);
+}
+
 #ifdef LINUX
 
 #ifndef ILL_ILLOPC
@@ -1652,8 +1665,6 @@ struct tcb *tcp;
 		return RVAL_HEX | RVAL_STR;
 	}
 #else /* !ALPHA */
-	sigset_t sigset;
-
 	if (entering(tcp)) {
 #ifdef SVR4
 		if (tcp->u_arg[0] == 0)
@@ -1662,24 +1673,16 @@ struct tcb *tcp;
 #endif /* SVR4 */
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprintf(", ");
-		if (!tcp->u_arg[1])
-			tprintf("NULL, ");
-		else if (copy_sigset(tcp, tcp->u_arg[1], &sigset) < 0)
-			tprintf("%#lx, ", tcp->u_arg[1]);
-		else {
-			printsigmask(&sigset, 0);
-			tprintf(", ");
-		}
+		print_sigset(tcp, tcp->u_arg[1], 0);
+		tprintf(", ");
 	}
 	else {
 		if (!tcp->u_arg[2])
 			tprintf("NULL");
 		else if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[2]);
-		else if (copy_sigset(tcp, tcp->u_arg[2], &sigset) < 0)
-			tprintf("[?]");
 		else
-			printsigmask(&sigset, 0);
+			print_sigset(tcp, tcp->u_arg[2], 0);
 	}
 #endif /* !ALPHA */
 	return 0;

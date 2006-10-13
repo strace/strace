@@ -110,10 +110,30 @@ int sys_accept(), sys_getsockname(), sys_getpeername(), sys_socketpair();
 int sys_send(), sys_recv(), sys_sendto(), sys_recvfrom();
 int sys_shutdown(), sys_setsockopt(), sys_getsockopt();
 
+/* *at syscalls */
+int sys_fchmodat();
+int sys_newfstatat();
+int sys_unlinkat();
+int sys_fchownat();
+int sys_openat();
+int sys_renameat();
+int sys_symlinkat();
+int sys_readlinkat();
+int sys_linkat();
+int sys_faccessat();
+int sys_mkdirat();
+int sys_mknodat();
+int sys_futimesat();
+
 /* new ones */
 int sys_query_module();
 int sys_poll();
 int sys_mincore();
+int sys_inotify_add_watch();
+int sys_inotify_rm_watch();
+int sys_pselect6();
+int sys_ppoll();
+int sys_unshare();
 
 /* architecture-specific calls */
 #ifdef ALPHA
