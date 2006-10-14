@@ -519,7 +519,8 @@ Process %u attached - interrupt to quit\n",
 				else
 					m = n = strlen(path);
 				if (n == 0) {
-					getcwd(pathname, MAXPATHLEN);
+					if (!getcwd(pathname, MAXPATHLEN))
+						continue;
 					len = strlen(pathname);
 				}
 				else if (n > sizeof pathname - 1)
