@@ -1,5 +1,11 @@
 2006-10-14  Dmitry V. Levin  <ldv@altlinux.org>
 
+	* configure.ac(AC_CHECK_HEADERS): Add inttypes.h.
+	* file.c [_LFS64_LARGEFILE && (LINUX || SVR4)]:
+	Include <inttypes.h>.
+	(sys_getdents64): Use PRIu64/PRId64 to avoid gcc warnings on
+	64-bit platforms.
+
 	* strace.c (main): Check getcwd() return code.
 
 2006-10-13  Ulrich Drepper  <drepper@redhat.com>

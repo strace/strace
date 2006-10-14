@@ -168,6 +168,15 @@ struct stat_sparc64 {
 #include <sys/stat.h>
 #endif
 
+#if _LFS64_LARGEFILE && (defined(LINUX) || defined(SVR4))
+# ifdef HAVE_INTTYPES_H
+#  include <inttypes.h>
+# else
+#  define PRId64 "lld"
+#  define PRIu64 "llu"
+# endif
+#endif
+
 #if HAVE_LONG_LONG_OFF_T
 /*
  * Ugly hacks for systems that have typedef long long off_t
@@ -2351,7 +2360,7 @@ struct tcb *tcp;
 		struct dirent64 *d = (struct dirent64 *) &buf[i];
 #if defined(LINUX) || defined(SVR4)
 		if (!abbrev(tcp)) {
-			tprintf("%s{d_ino=%llu, d_off=%llu, ",
+			tprintf("%s{d_ino=%" PRIu64 ", d_off=%" PRId64 ", ",
 				i ? " " : "",
 				d->d_ino,
 				d->d_off);
