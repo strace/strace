@@ -1,3 +1,11 @@
+2006-10-16  Dmitry V. Levin  <ldv@altlinux.org>
+
+	Implement comprehensive quotactl(2) parser for Linux.
+	* Makefile.am (strace_SOURCES): Add quota.c.
+	* quota.c: New file.
+	* resource.c: Remove old quotactl(2) parser.
+	Fixes RH#118696.
+
 2006-10-14  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* configure.ac(AC_CHECK_HEADERS): Add inttypes.h.
