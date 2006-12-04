@@ -1574,6 +1574,8 @@ struct tcb *tcp;
 #endif
 
 #ifdef LINUX
+/* Linux 2.6.18+ headers removed CTL_PROC enum.  */
+# define CTL_PROC 4
 static const struct xlat sysctl_root[] = {
 	{ CTL_KERN, "CTL_KERN" },
 	{ CTL_VM, "CTL_VM" },
@@ -1582,6 +1584,9 @@ static const struct xlat sysctl_root[] = {
 	{ CTL_FS, "CTL_FS" },
 	{ CTL_DEBUG, "CTL_DEBUG" },
 	{ CTL_DEV, "CTL_DEV" },
+	{ CTL_BUS, "CTL_BUS" },
+	{ CTL_ABI, "CTL_ABI" },
+	{ CTL_CPU, "CTL_CPU" },
 	{ 0, NULL }
 };
 

@@ -1,3 +1,9 @@
+2006-11-27  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* system.c [LINUX]: Define CTL_PROC, since Linux 2.6.18+ headers
+	removed CTL_PROC enum.	Patch from Jakub Jelinek.
+	[LINUX] (sysctl_root): Add CTL_BUS, CTL_ABI and CTL_CPU.
+
 2006-11-20  Jakub Jelinek  <jakub@redhat.com>
 
 	* linux/ia64/syscallent.h: Add #if check to make sure that
