@@ -1,3 +1,8 @@
+2006-11-20  Jakub Jelinek  <jakub@redhat.com>
+
+	* linux/ia64/syscallent.h: Add #if check to make sure that
+	SYS_socket_subcall adjustment isn't forgotten again.
+
 2006-10-16  Dmitry V. Levin  <ldv@altlinux.org>
 
 	Implement comprehensive quotactl(2) parser for Linux.

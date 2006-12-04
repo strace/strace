@@ -245,6 +245,9 @@
 /* You must be careful to check ../syscallent.h so that this table
    starts where that one leaves off.
 */
+#if SYS_ipc_subcall + SYS_ipc_nsubcalls != 443
+# error fix me
+#endif
 
 	{ 8,	0,	printargs,		"SYS_443"	}, /* 443 */
 	{ 8,	0,	printargs,		"SYS_444"	}, /* 444 */
