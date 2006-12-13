@@ -2065,7 +2065,7 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	printpath(tcp, tcp->u_arg[0]);
 	tprintf(", ");
-	printtv32(tcp, tcp->u_arg[1]);
+	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
     }
     return 0;
 }

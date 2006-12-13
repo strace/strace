@@ -38,48 +38,84 @@
 #include <linux/rtc.h>
 #endif /* LINUX */
 
-void
-printtv(tcp, addr)
-struct tcb *tcp;
-long addr;
+struct timeval32
 {
-	struct timeval tv;
+	u_int32_t tv_sec, tv_usec;
+};
 
+void
+printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
+{
 	if (addr == 0)
 		tprintf("NULL");
 	else if (!verbose(tcp))
 		tprintf("%#lx", addr);
-	else if (umove(tcp, addr, &tv) < 0)
-		tprintf("{...}");
 	else
-		tprintf("{%lu, %lu}", (long) tv.tv_sec, (long) tv.tv_usec);
-}
+	{
+		int     rc;
 
-#ifdef ALPHA
-struct timeval32
-{
-    unsigned tv_sec;
-    unsigned tv_usec;
-};
+		if (bitness == BITNESS_32
+#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+		    || personality_wordsize[current_personality] == 4
+#endif
+			)
+		{
+			struct timeval32 tv;
+
+			if ((rc = umove(tcp, addr, &tv)) >= 0)
+				tprintf("{%u, %u}",
+					tv.tv_sec, tv.tv_usec);
+		} else
+		{
+			struct timeval tv;
+
+			if ((rc = umove(tcp, addr, &tv)) >= 0)
+				tprintf("{%lu, %lu}",
+					(unsigned long) tv.tv_sec,
+					(unsigned long) tv.tv_usec);
+		}
+
+		if (rc < 0)
+			tprintf("{...}");
+	}
+}
 
 void
-printtv32(tcp, addr)
-struct tcb *tcp;
-long addr;
+sprinttv(struct tcb *tcp, long addr, enum bitness_t bitness, char *buf)
 {
-    struct timeval32  tv;
+	if (addr == 0)
+		strcpy(buf, "NULL");
+	else if (!verbose(tcp))
+		sprintf(buf, "%#lx", addr);
+	else
+	{
+		int     rc;
 
-    if (addr == 0)
-	tprintf("NULL");
-    else if (!verbose(tcp))
-	tprintf("%#lx", addr);
-    else if (umove(tcp, addr, &tv) < 0)
-	tprintf("{...}");
-    else
-	tprintf("{%u, %u}", tv.tv_sec, tv.tv_usec);
-}
+		if (bitness == BITNESS_32
+#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+		    || personality_wordsize[current_personality] == 4
 #endif
+			)
+		{
+			struct timeval32 tv;
 
+			if ((rc = umove(tcp, addr, &tv)) >= 0)
+				sprintf(buf, "{%u, %u}",
+					tv.tv_sec, tv.tv_usec);
+		} else
+		{
+			struct timeval tv;
+
+			if ((rc = umove(tcp, addr, &tv)) >= 0)
+				sprintf(buf, "{%lu, %lu}",
+					(unsigned long) tv.tv_sec,
+					(unsigned long) tv.tv_usec);
+		}
+
+		if (rc < 0)
+			strcpy(buf, "{...}");
+	}
+}
 
 int
 sys_time(tcp)
@@ -134,10 +170,10 @@ struct tcb *tcp;
 		    tcp->u_arg[0], tcp->u_arg[1]);
 	    return 0;
 	}
-	printtv32(tcp, tcp->u_arg[0]);
+	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32);
 #ifndef SVR4
 	tprintf(", ");
-	printtv32(tcp, tcp->u_arg[1]);
+	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
 #endif /* !SVR4 */
     }
     return 0;
@@ -164,10 +200,10 @@ sys_osf_settimeofday(tcp)
 struct tcb *tcp;
 {
     if (entering(tcp)) {
-	printtv32(tcp, tcp->u_arg[0]);
+	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32);
 #ifndef SVR4
 	tprintf(", ");
-	printtv32(tcp, tcp->u_arg[1]);
+	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
 #endif /* !SVR4 */
     }
     return 0;

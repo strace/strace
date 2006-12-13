@@ -421,6 +421,8 @@ extern struct tcb *tcp_last;
 #define P(args) ()
 #endif
 
+enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
+
 extern int set_personality P((int personality));
 extern char *xlookup P((const struct xlat *, int));
 extern struct tcb *alloctcb P((int));
@@ -449,7 +451,8 @@ extern void printnum P((struct tcb *, long, char *));
 extern void printnum_int P((struct tcb *, long, char *));
 extern void printpath P((struct tcb *, long));
 extern void printpathn P((struct tcb *, long, int));
-extern void printtv P((struct tcb *, long));
+extern void printtv_bitness P((struct tcb *, long, enum bitness_t));
+extern void sprinttv P((struct tcb *, long, enum bitness_t, char *));
 #ifdef HAVE_SIGINFO_T
 extern void printsiginfo P((siginfo_t *, int));
 #endif
@@ -468,7 +471,6 @@ extern void printleader P((struct tcb *));
 extern void printtrailer P((struct tcb *));
 extern void tabto P((int));
 extern void call_summary P((FILE *));
-extern void printtv32 P((struct tcb*, long));
 extern void tprint_iov P((struct tcb *, unsigned long, unsigned long));
 
 #ifdef LINUX
@@ -511,6 +513,9 @@ extern int proc_open P((struct tcb *tcp, int attaching));
 
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof *(objp), (char *) (objp))
+
+#define printtv(tcp, addr)	\
+	printtv_bitness((tcp), (addr), BITNESS_CURRENT)
 
 #ifdef __STDC__
 #ifdef __GNUC__
