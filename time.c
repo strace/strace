@@ -366,43 +366,145 @@ struct tcb *tcp;
 
 #ifdef LINUX
 
+static const struct xlat adjtimex_modes[] = {
+  { 0, "0" },
+#ifdef ADJ_OFFSET
+  { ADJ_OFFSET, "ADJ_OFFSET" },
+#endif
+#ifdef ADJ_FREQUENCY
+  { ADJ_FREQUENCY, "ADJ_FREQUENCY" },
+#endif
+#ifdef ADJ_MAXERROR
+  { ADJ_MAXERROR, "ADJ_MAXERROR" },
+#endif
+#ifdef ADJ_ESTERROR
+  { ADJ_ESTERROR, "ADJ_ESTERROR" },
+#endif
+#ifdef ADJ_STATUS
+  { ADJ_STATUS, "ADJ_STATUS" },
+#endif
+#ifdef ADJ_TIMECONST
+  { ADJ_TIMECONST, "ADJ_TIMECONST" },
+#endif
+#ifdef ADJ_TICK
+  { ADJ_TICK, "ADJ_TICK" },
+#endif
+#ifdef ADJ_OFFSET_SINGLESHOT
+  { ADJ_OFFSET_SINGLESHOT, "ADJ_OFFSET_SINGLESHOT" },
+#endif
+  { 0,             NULL }
+};
+
+static const struct xlat adjtimex_status[] = {
+#ifdef STA_PLL
+  { STA_PLL, "STA_PLL" },
+#endif
+#ifdef STA_PPSFREQ
+  { STA_PPSFREQ, "STA_PPSFREQ" },
+#endif
+#ifdef STA_PPSTIME
+  { STA_PPSTIME, "STA_PPSTIME" },
+#endif
+#ifdef STA_FLL
+  { STA_FLL, "STA_FLL" },
+#endif
+#ifdef STA_INS
+  { STA_INS, "STA_INS" },
+#endif
+#ifdef STA_DEL
+  { STA_DEL, "STA_DEL" },
+#endif
+#ifdef STA_UNSYNC
+  { STA_UNSYNC, "STA_UNSYNC" },
+#endif
+#ifdef STA_FREQHOLD
+  { STA_FREQHOLD, "STA_FREQHOLD" },
+#endif
+#ifdef STA_PPSSIGNAL
+  { STA_PPSSIGNAL, "STA_PPSSIGNAL" },
+#endif
+#ifdef STA_PPSJITTER
+  { STA_PPSJITTER, "STA_PPSJITTER" },
+#endif
+#ifdef STA_PPSWANDER
+  { STA_PPSWANDER, "STA_PPSWANDER" },
+#endif
+#ifdef STA_PPSERROR
+  { STA_PPSERROR, "STA_PPSERROR" },
+#endif
+#ifdef STA_CLOCKERR
+  { STA_CLOCKERR, "STA_CLOCKERR" },
+#endif
+  { 0,             NULL }
+};
+
+static const struct xlat adjtimex_state[] = {
+#ifdef TIME_OK
+  { TIME_OK, "TIME_OK" },
+#endif
+#ifdef TIME_INS
+  { TIME_INS, "TIME_INS" },
+#endif
+#ifdef TIME_DEL
+  { TIME_DEL, "TIME_DEL" },
+#endif
+#ifdef TIME_OOP
+  { TIME_OOP, "TIME_OOP" },
+#endif
+#ifdef TIME_WAIT
+  { TIME_WAIT, "TIME_WAIT" },
+#endif
+#ifdef TIME_ERROR
+  { TIME_ERROR, "TIME_ERROR" },
+#endif
+  { 0,             NULL }
+};
+
 int
-sys_adjtimex(tcp)
-struct tcb *tcp;
+sys_adjtimex(struct tcb *tcp)
 {
-	struct timex txc;
+	struct timex tx;
 
 	if (exiting(tcp)) {
 		if (tcp->u_arg[0] == 0)
 			tprintf("NULL");
 		else if (syserror(tcp) || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
-		else if (umove(tcp, tcp->u_arg[0], &txc) < 0)
+		else if (umove(tcp, tcp->u_arg[0], &tx) < 0)
 			tprintf("{...}");
 		else {
 #if LINUX_VERSION_CODE < 66332
 			tprintf("{mode=%d, offset=%ld, frequency=%ld, ",
-				txc.mode, txc.offset, txc.frequency);
+				tx.mode, tx.offset, tx.frequency);
 			tprintf("maxerror=%ld, esterror=%lu, status=%u, ",
-				txc.maxerror, txc.esterror, txc.status);
+				tx.maxerror, tx.esterror, tx.status);
 			tprintf("time_constant=%ld, precision=%lu, ",
-				txc.time_constant, txc.precision);
-			tprintf("tolerance=%ld, time=", txc.tolerance);
-			tprint_timeval(tcp, &txc.time);
+				tx.time_constant, tx.precision);
+			tprintf("tolerance=%ld, time=", tx.tolerance);
+			tprint_timeval(tcp, &tx.time);
 #else
-			tprintf("{modes=%d, offset=%ld, freq=%ld, ",
-				txc.modes, txc.offset, txc.freq);
-			tprintf("maxerror=%ld, esterror=%lu, status=%u, ",
-				txc.maxerror, txc.esterror, txc.status);
-			tprintf("constant=%ld, precision=%lu, ",
-				txc.constant, txc.precision);
-			tprintf("tolerance=%ld, time=", txc.tolerance);
-			tprint_timeval(tcp, &txc.time);
-			/* there's a bunch of other stuff, but it's not
-			 * worth the time or the trouble to include */
+			tprintf("{modes=");
+			printxval(adjtimex_modes, tx.modes, "ADJ_???");
+			tprintf(", offset=%ld, freq=%ld, maxerror=%ld, ",
+				tx.offset, tx.freq, tx.maxerror);
+			tprintf("esterror=%lu, status=", tx.esterror);
+			printflags(adjtimex_status, tx.status, "STA_???");
+			tprintf(", constant=%ld, precision=%lu, ",
+				tx.constant, tx.precision);
+			tprintf("tolerance=%ld, time=", tx.tolerance);
+			tprint_timeval(tcp, &tx.time);
+			tprintf(", tick=%ld, ppsfreq=%ld, jitter=%ld",
+				tx.tick, tx.ppsfreq, tx.jitter);
+			tprintf(", shift=%d, stabil=%ld, jitcnt=%ld",
+				tx.shift, tx.stabil, tx.jitcnt);
+			tprintf(", calcnt=%ld, errcnt=%ld, stbcnt=%ld",
+				tx.calcnt, tx.errcnt, tx.stbcnt);
 #endif
 			tprintf("}");
 		}
+		tcp->auxstr = xlookup(adjtimex_state, tcp->u_rval);
+		if (tcp->auxstr)
+			return RVAL_STR;
 	}
 	return 0;
 }
