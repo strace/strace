@@ -645,12 +645,62 @@ static const struct xlat sigev_value[] = {
 	{ 0, NULL }
 };
 
+#if SUPPORTED_PERSONALITIES > 1
+static void
+printsigevent32(struct tcb *tcp, long arg)
+{
+	struct
+	{
+		int     sigev_value;
+		int     sigev_signo;
+		int     sigev_notify;
+
+		union
+		{
+			int     tid;
+			struct
+			{
+				int     function, attribute;
+			} thread;
+		} un;
+	} sev;
+
+	if (umove(tcp, arg, &sev) < 0)
+		tprintf("{...}");
+	else
+	{
+		tprintf("{%#x, ", sev.sigev_value);
+		if (sev.sigev_notify == SIGEV_SIGNAL)
+			tprintf("%s, ", signame(sev.sigev_signo));
+		else
+			tprintf("%u, ", sev.sigev_signo);
+		printxval(sigev_value, sev.sigev_notify + 1, "SIGEV_???");
+		tprintf(", ");
+		if (sev.sigev_notify == SIGEV_THREAD_ID)
+			tprintf("{%d}", sev.un.tid);
+		else if (sev.sigev_notify == SIGEV_THREAD)
+			tprintf("{%#x, %#x}",
+				sev.un.thread.function,
+				sev.un.thread.attribute);
+		else
+			tprintf("{...}");
+		tprintf("}");
+	}
+}
+#endif
+
 void
-printsigevent(tcp, arg)
-struct tcb *tcp;
-long arg;
+printsigevent(struct tcb *tcp, long arg)
 {
 	struct sigevent sev;
+
+#if SUPPORTED_PERSONALITIES > 1
+	if (personality_wordsize[current_personality] == 4)
+	{
+		printsigevent32(tcp, arg);
+		return;
+	}
+#endif
 	if (umove (tcp, arg, &sev) < 0)
 		tprintf("{...}");
 	else {
