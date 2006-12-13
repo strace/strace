@@ -1,5 +1,30 @@
 2006-12-10  Dmitry V. Levin <ldv@altlinux.org>
 
+	Add biarch support for "struct itimerval".
+	* time.c (printitv): Rename to printitv_bitness().
+	Add printitv() macro wrapper around printitv_bitness().
+	(printitv_bitness): Handle 32-bit personality.
+	[ALPHA] (sys_osf_getitimer, sys_osf_setitimer):
+	Use printitv_bitness().
+	(tprint_timeval, tprint_timeval32): New functions.
+	(printtv_bitness, printitv_bitness, sys_adjtimex): Use them.
+	(printitv32): Remove.
+
+	Add biarch support for "struct timeval".
+	* defs.h (bitness_t): New enum type.
+	(printtv_bitness, sprinttv): New function prototypes.
+	(printtv): Convert to macro wrapper around printtv_bitness().
+	(printtv32): Remove.
+	* desc.c (decode_select): Use printtv_bitness() and sprinttv().
+	(sys_oldselect, sys_osf_select, sys_select, sys_pselect6):
+	Update decode_select() use.
+	* file.c [ALPHA] (sys_osf_utimes): Use printtv_bitness().
+	* time.c (printtv_bitness, sprinttv): New functions.
+	(printtv, printtv32): Remove.
+	[ALPHA] (sys_osf_settimeofday, sys_osf_settimeofday):
+	Use printtv_bitness().
+	Fixes RH#171626, RH#173050.
+
 	Add biarch support for "struct iovec".
 	* defs.h (personality_wordsize): Add.
 	* io.c [HAVE_SYS_UIO_H] (tprint_iov): [LINUX &&

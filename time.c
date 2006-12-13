@@ -43,6 +43,19 @@ struct timeval32
 	u_int32_t tv_sec, tv_usec;
 };
 
+static void
+tprint_timeval32(struct tcb *tcp, const struct timeval32 *tv)
+{
+	tprintf("{%u, %u}", tv->tv_sec, tv->tv_usec);
+}
+
+static void
+tprint_timeval(struct tcb *tcp, const struct timeval *tv)
+{
+	tprintf("{%lu, %lu}",
+		(unsigned long) tv->tv_sec, (unsigned long) tv->tv_usec);
+}
+
 void
 printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 {
@@ -63,16 +76,13 @@ printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 			struct timeval32 tv;
 
 			if ((rc = umove(tcp, addr, &tv)) >= 0)
-				tprintf("{%u, %u}",
-					tv.tv_sec, tv.tv_usec);
+				tprint_timeval32(tcp, &tv);
 		} else
 		{
 			struct timeval tv;
 
 			if ((rc = umove(tcp, addr, &tv)) >= 0)
-				tprintf("{%lu, %lu}",
-					(unsigned long) tv.tv_sec,
-					(unsigned long) tv.tv_usec);
+				tprint_timeval(tcp, &tv);
 		}
 
 		if (rc < 0)
@@ -234,51 +244,52 @@ static const struct xlat which[] = {
 };
 
 static void
-printitv(tcp, addr)
-struct tcb *tcp;
-long addr;
+printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 {
-	struct itimerval itv;
-
 	if (addr == 0)
 		tprintf("NULL");
 	else if (!verbose(tcp))
 		tprintf("%#lx", addr);
-	else if (umove(tcp, addr, &itv) < 0)
-		tprintf("{...}");
-	else {
-		tprintf("{it_interval={%lu, %lu}, it_value={%lu, %lu}}",
-		(long) itv.it_interval.tv_sec, (long) itv.it_interval.tv_usec,
-		(long) itv.it_value.tv_sec, (long) itv.it_value.tv_usec);
+	else
+	{
+		int     rc;
+
+		if (bitness == BITNESS_32
+#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+		    || personality_wordsize[current_personality] == 4
+#endif
+			)
+		{
+			struct
+			{
+				struct timeval32 it_interval, it_value;
+			} itv;
+
+			if ((rc = umove(tcp, addr, &itv)) >= 0)
+				tprintf("{it_interval=");
+				tprint_timeval32(tcp, &itv.it_interval);
+				tprintf(", it_value=");
+				tprint_timeval32(tcp, &itv.it_value);
+				tprintf("}");
+		} else
+		{
+			struct itimerval itv;
+
+			if ((rc = umove(tcp, addr, &itv)) >= 0)
+				tprintf("{it_interval=");
+				tprint_timeval(tcp, &itv.it_interval);
+				tprintf(", it_value=");
+				tprint_timeval(tcp, &itv.it_value);
+				tprintf("}");
+		}
+
+		if (rc < 0)
+			tprintf("{...}");
 	}
 }
 
-
-#ifdef ALPHA
-static void
-printitv32(tcp, addr)
-struct tcb *tcp;
-long addr;
-{
-    struct itimerval32
-    {
-	struct timeval32 it_interval;
-	struct timeval32 it_value;
-    } itv;
-
-    if (addr == 0)
-	tprintf("NULL");
-    else if (!verbose(tcp))
-	tprintf("%#lx", addr);
-    else if (umove(tcp, addr, &itv) < 0)
-	tprintf("{...}");
-    else {
-	tprintf("{it_interval={%u, %u}, it_value={%u, %u}}",
-		itv.it_interval.tv_sec, itv.it_interval.tv_usec,
-		itv.it_value.tv_sec, itv.it_value.tv_usec);
-    }
-}
-#endif
+#define printitv(tcp, addr)	\
+	printitv_bitness((tcp), (addr), BITNESS_CURRENT)
 
 int
 sys_getitimer(tcp)
@@ -309,7 +320,7 @@ struct tcb *tcp;
 	if (syserror(tcp))
 	    tprintf("%#lx", tcp->u_arg[1]);
 	else
-	    printitv32(tcp, tcp->u_arg[1]);
+	    printitv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
     }
     return 0;
 }
@@ -341,13 +352,13 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	printxval(which, tcp->u_arg[0], "ITIMER_???");
 	tprintf(", ");
-	printitv32(tcp, tcp->u_arg[1]);
+	printitv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
 	tprintf(", ");
     } else {
 	if (syserror(tcp))
 	    tprintf("%#lx", tcp->u_arg[2]);
 	else
-	    printitv32(tcp, tcp->u_arg[2]);
+	    printitv_bitness(tcp, tcp->u_arg[2], BITNESS_32);
     }
     return 0;
 }
@@ -376,9 +387,8 @@ struct tcb *tcp;
 				txc.maxerror, txc.esterror, txc.status);
 			tprintf("time_constant=%ld, precision=%lu, ",
 				txc.time_constant, txc.precision);
-			tprintf("tolerance=%ld, time={%lu, %lu}}",
-				txc.tolerance, (long) txc.time.tv_sec,
-				(long) txc.time.tv_usec);
+			tprintf("tolerance=%ld, time=", txc.tolerance);
+			tprint_timeval(tcp, &txc.time);
 #else
 			tprintf("{modes=%d, offset=%ld, freq=%ld, ",
 				txc.modes, txc.offset, txc.freq);
@@ -386,12 +396,12 @@ struct tcb *tcp;
 				txc.maxerror, txc.esterror, txc.status);
 			tprintf("constant=%ld, precision=%lu, ",
 				txc.constant, txc.precision);
-			tprintf("tolerance=%ld, time={%lu, %lu}}",
-				txc.tolerance, (long) txc.time.tv_sec,
-				(long) txc.time.tv_usec);
+			tprintf("tolerance=%ld, time=", txc.tolerance);
+			tprint_timeval(tcp, &txc.time);
 			/* there's a bunch of other stuff, but it's not
 			 * worth the time or the trouble to include */
 #endif
+			tprintf("}");
 		}
 	}
 	return 0;
