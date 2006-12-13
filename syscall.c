@@ -2660,6 +2660,7 @@ struct tcb *tcp;
 	return val;
 }
 
+#ifdef SUNOS4
 /*
  * Apparently, indirect system calls have already be converted by ptrace(2),
  * so if you see "indir" this program has gone astray.
@@ -2682,6 +2683,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* SUNOS4 */
 
 static int
 time_cmp(a, b)

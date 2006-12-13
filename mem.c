@@ -70,6 +70,7 @@ struct tcb *tcp;
 #endif
 }
 
+#if defined(FREEBSD) || defined(SUNOS4)
 int
 sys_sbrk(tcp)
 struct tcb *tcp;
@@ -79,6 +80,7 @@ struct tcb *tcp;
 	}
 	return RVAL_HEX;
 }
+#endif /* FREEBSD || SUNOS4 */
 
 static const struct xlat mmap_prot[] = {
 	{ PROT_NONE,	"PROT_NONE",	},
@@ -539,6 +541,7 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if defined(ALPHA) || defined(FREEBSD) || defined(IA64) || defined(SUNOS4) || defined(SVR4)
 int
 sys_getpagesize(tcp)
 struct tcb *tcp;
@@ -547,6 +550,7 @@ struct tcb *tcp;
 		return RVAL_HEX;
 	return 0;
 }
+#endif /* ALPHA || FREEBSD || IA64 || SUNOS4 || SVR4 */
 
 #if defined(LINUX) && defined(__i386__)
 void

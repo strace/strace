@@ -305,6 +305,7 @@ struct tcb *tcp;
 
 #endif /* HAVE_PRCTL */
 
+#if defined(FREEBSD) || defined(SUNOS4) || defined(SVR4)
 int
 sys_gethostid(tcp)
 struct tcb *tcp;
@@ -313,6 +314,7 @@ struct tcb *tcp;
 		return RVAL_HEX;
 	return 0;
 }
+#endif /* FREEBSD || SUNOS4 || SVR4 */
 
 int
 sys_sethostname(tcp)
@@ -325,6 +327,7 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4) || defined(SVR4)
 int
 sys_gethostname(tcp)
 struct tcb *tcp;
@@ -338,6 +341,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* ALPHA || FREEBSD || SUNOS4 || SVR4 */
 
 int
 sys_setdomainname(tcp)
@@ -1473,6 +1477,7 @@ struct tcb *tcp;
 }
 #endif /* LINUX */
 
+#if defined(ALPHA) || defined(SUNOS4) || defined(SVR4)
 int
 sys_setpgrp(tcp)
 struct tcb *tcp;
@@ -1484,6 +1489,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* ALPHA || SUNOS4 || SVR4 */
 
 int
 sys_getpgrp(tcp)
@@ -1713,6 +1719,7 @@ long addr;
 	tprintf(fmt, count, count == 1 ? "" : "s");
 }
 
+#if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)
 int
 sys_execv(tcp)
 struct tcb *tcp;
@@ -1733,6 +1740,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* SPARC || SPARC64 || SUNOS4 */
 
 int
 sys_execve(tcp)

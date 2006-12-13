@@ -1,3 +1,31 @@
+2006-12-10  Dmitry V. Levin <ldv@altlinux.org>
+
+	Make several global variables static.
+	#ifdef definitions of rarely unused functions.
+	* defs.h (rflag, tflag, outfname): Remove.
+	* strace.c (iflag, interactive, pflag_seen, rflag, tflag,
+	outfname, username): Make static.
+	* desc.c (sys_getdtablesize): Define only for
+	ALPHA || FREEBSD || SUNOS4.
+	* file.c (sys_fchroot): Define only for SUNOS4 || SVR4.
+	(sys_mkfifo): Define only for FREEBSD.
+	* mem.c (sys_sbrk): Define only for FREEBSD || SUNOS4.
+	(sys_getpagesize): Define only for
+	ALPHA || FREEBSD || IA64 || SUNOS4 || SVR4.
+	* net.c (sys_so_socket): Define only for SVR4.
+	* process.c (sys_gethostid): Define only for
+	FREEBSD || SUNOS4 || SVR4.
+	(sys_gethostname): Define only for
+	ALPHA || FREEBSD || SUNOS4 || SVR4.
+	(sys_setpgrp): Define only for ALPHA || SUNOS4 || SVR4.
+	(sys_execv): Define only for SPARC || SPARC64 || SUNOS4.
+	* signal.c (sys_sigblock): Define only for FREEBSD || SUNOS4.
+	(sys_sighold, sys_sigwait): Define only for SVR4.
+	(sys_killpg): Define only for FREEBSD || SUNOS4.
+	* stream.c (sys_getmsg): Define only for
+	SPARC || SPARC64 || SUNOS4 || SVR4.
+	* syscall.c (sys_indir): Define only for SUNOS4.
+
 2006-11-27  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* system.c [LINUX]: Define CTL_PROC, since Linux 2.6.18+ headers

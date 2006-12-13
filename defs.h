@@ -409,9 +409,8 @@ struct xlat {
 extern struct tcb **tcbtab;
 extern int *qual_flags;
 extern int debug, followfork, followvfork;
-extern int rflag, tflag, dtime, cflag, xflag, qflag;
+extern int dtime, cflag, xflag, qflag;
 extern int acolumn;
-extern char *outfname;
 extern unsigned int nprocs, tcbtabsize;
 extern int max_strlen;
 extern struct tcb *tcp_last;

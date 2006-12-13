@@ -1205,6 +1205,7 @@ struct tcb *tcp;
 	return 0;
 }
 
+#ifdef SVR4
 int
 sys_so_socket(tcp)
 struct tcb *tcp;
@@ -1231,6 +1232,7 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+#endif /* SVR4 */
 
 int
 sys_bind(tcp)

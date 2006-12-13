@@ -63,21 +63,20 @@
 #endif
 #endif
 
-int debug = 0, followfork = 0, followvfork = 0, interactive = 0;
-int rflag = 0, tflag = 0, dtime = 0, cflag = 0;
-int iflag = 0, xflag = 0, qflag = 0;
-int pflag_seen = 0;
+int debug = 0, followfork = 0, followvfork = 0;
+int dtime = 0, cflag = 0, xflag = 0, qflag = 0;
+static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
 
 /* Sometimes we want to print only succeeding syscalls. */
 int not_failing_only = 0;
 
-char *username = NULL;
+static char *username = NULL;
 uid_t run_uid;
 gid_t run_gid;
 
 int acolumn = DEFAULT_ACOLUMN;
 int max_strlen = DEFAULT_STRLEN;
-char *outfname = NULL;
+static char *outfname = NULL;
 FILE *outf;
 struct tcb **tcbtab;
 unsigned int nprocs, tcbtabsize;

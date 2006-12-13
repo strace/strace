@@ -391,12 +391,14 @@ struct tcb *tcp;
 	return 0;
 }
 
+#if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4)
 int
 sys_getdtablesize(tcp)
 struct tcb *tcp;
 {
 	return 0;
 }
+#endif /* ALPHA || FREEBSD || SUNOS4 */
 
 static int
 decode_select(tcp, args, bitness)
