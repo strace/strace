@@ -893,7 +893,6 @@ Process %u resumed (parent %d ready)\n",
 					pid, tcp->pid);
 		}
 		else {
-			newoutf(tcpchild);
 			if (!qflag)
 				fprintf(stderr, "Process %d attached\n", pid);
 		}
@@ -1048,7 +1047,6 @@ struct tcb *tcp;
 			memcpy(tcpchild->inst, tcp->inst,
 				sizeof tcpchild->inst);
 		}
-		newoutf(tcpchild);
 		tcpchild->parent = tcp;
 		tcp->nchildren++;
 		if (!qflag)

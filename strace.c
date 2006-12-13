@@ -175,6 +175,150 @@ foobar()
 #endif /* MIPS */
 #endif /* SVR4 */
 
+static int
+set_cloexec_flag(int fd)
+{
+	int     flags, newflags;
+
+	if ((flags = fcntl(fd, F_GETFD, 0)) < 0)
+	{
+		fprintf(stderr, "%s: fcntl F_GETFD: %s\n",
+			progname, strerror(errno));
+		return -1;
+	}
+
+	newflags = flags | FD_CLOEXEC;
+	if (flags == newflags)
+		return 0;
+
+	if (fcntl(fd, F_SETFD, newflags) < 0)
+	{
+		fprintf(stderr, "%s: fcntl F_SETFD: %s\n",
+			progname, strerror(errno));
+		return -1;
+	}
+
+	return 0;
+}
+
+/*
+ * When strace is setuid executable, we have to swap uids
+ * before and after filesystem and process management operations.
+ */
+static void
+swap_uid(void)
+{
+#ifndef SVR4
+	int euid = geteuid(), uid = getuid();
+
+	if (euid != uid && setreuid(euid, uid) < 0)
+	{
+		fprintf(stderr, "%s: setreuid: %s\n",
+			progname, strerror(errno));
+		exit(1);
+	}
+#endif
+}
+
+static FILE *
+strace_fopen(const char *path, const char *mode)
+{
+	FILE *fp;
+
+	swap_uid();
+	if ((fp = fopen(path, mode)) == NULL)
+		fprintf(stderr, "%s: can't fopen '%s': %s\n",
+			progname, path, strerror(errno));
+	swap_uid();
+	if (fp && set_cloexec_flag(fileno(fp)) < 0)
+	{
+		fclose(fp);
+		fp = NULL;
+	}
+	return fp;
+}
+
+static int popen_pid = -1;
+
+#ifndef _PATH_BSHELL
+# define _PATH_BSHELL "/bin/sh"
+#endif
+
+/*
+ * We cannot use standard popen(3) here because we have to distinguish
+ * popen child process from other processes we trace, and standard popen(3)
+ * does not export its child's pid.
+ */
+static FILE *
+strace_popen(const char *command)
+{
+	int     fds[2];
+
+	swap_uid();
+	if (pipe(fds) < 0)
+	{
+		fprintf(stderr, "%s: pipe: %s\n",
+			progname, strerror(errno));
+		swap_uid();
+		return NULL;
+	}
+
+	if (set_cloexec_flag(fds[1]) < 0)
+	{
+		close(fds[0]);
+		close(fds[1]);
+		swap_uid();
+		return NULL;
+	}
+
+	if ((popen_pid = fork()) == -1)
+	{
+		fprintf(stderr, "%s: fork: %s\n",
+			progname, strerror(errno));
+		close(fds[0]);
+		close(fds[1]);
+		swap_uid();
+		return NULL;
+	}
+
+	if (popen_pid)
+	{
+		/* parent */
+		close(fds[0]);
+		swap_uid();
+		return fdopen(fds[1], "w");
+	} else
+	{
+		/* child */
+		close(fds[1]);
+		if (fds[0] && (dup2(fds[0], 0) || close(fds[0])))
+		{
+			fprintf(stderr, "%s: dup2: %s\n",
+				progname, strerror(errno));
+			_exit(1);
+		}
+		execl(_PATH_BSHELL, "sh", "-c", command, NULL);
+		fprintf(stderr, "%s: execl: %s: %s\n",
+			progname, _PATH_BSHELL, strerror(errno));
+		_exit(1);
+	}
+}
+
+static int
+newoutf(struct tcb *tcp)
+{
+	if (outfname && followfork > 1) {
+		char name[MAXPATHLEN];
+		FILE *fp;
+
+		sprintf(name, "%s.%u", outfname, tcp->pid);
+		if ((fp = strace_fopen(name, "w")) == NULL)
+			return -1;
+		tcp->outf = fp;
+	}
+	return 0;
+}
+
 int
 main(argc, argv)
 int argc;
@@ -274,7 +418,7 @@ char *argv[];
 				fprintf(stderr, "%s: I'm sorry, I can't let you do that, Dave.\n", progname);
 				break;
 			}
-			if ((tcp = alloctcb(pid)) == NULL) {
+			if ((tcp = alloc_tcb(pid, 0)) == NULL) {
 				fprintf(stderr, "%s: out of memory\n",
 					progname);
 				exit(1);
@@ -343,14 +487,8 @@ char *argv[];
 		run_gid = getgid();
 	}
 
-#ifndef SVR4
-	setreuid(geteuid(), getuid());
-#endif
-
 	/* Check if they want to redirect the output. */
 	if (outfname) {
-		long f;
-
 		/* See if they want to pipe the output. */
 		if (outfname[0] == '|' || outfname[0] == '!') {
 			/*
@@ -364,33 +502,13 @@ char *argv[];
 				exit(1);
 			}
 
-			if ((outf = popen(outfname + 1, "w")) == NULL) {
-				fprintf(stderr, "%s: can't popen '%s': %s\n",
-					progname, outfname + 1,
-					strerror(errno));
+			if ((outf = strace_popen(outfname + 1)) == NULL)
 				exit(1);
-			}
 		}
-		else if ((outf = fopen(outfname, "w")) == NULL) {
-			fprintf(stderr, "%s: can't fopen '%s': %s\n",
-				progname, outfname, strerror(errno));
+		else if (followfork <= 1 &&
+			 (outf = strace_fopen(outfname, "w")) == NULL)
 			exit(1);
-		}
-
-		if ((f=fcntl(fileno(outf), F_GETFD)) < 0 ) {
-			perror("failed to get flags for outputfile");
-			exit(1);
-		}
-
-		if (fcntl(fileno(outf), F_SETFD, f|FD_CLOEXEC) < 0 ) {
-			perror("failed to set flags for outputfile");
-			exit(1);
-		}
 	}
-
-#ifndef SVR4
-	setreuid(geteuid(), getuid());
-#endif
 
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!')
 		setvbuf(outf, buf, _IOLBF, BUFSIZ);
@@ -401,10 +519,17 @@ char *argv[];
 
 	for (c = 0; c < tcbtabsize; c++) {
 		tcp = tcbtab[c];
-		/* Reinitialize the output since it may have changed. */
-		tcp->outf = outf;
 		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
 			continue;
+#ifdef LINUX
+		if (tcp->flags & TCB_CLONE_THREAD)
+			continue;
+#endif
+		/* Reinitialize the output since it may have changed. */
+		tcp->outf = outf;
+		if (newoutf(tcp) < 0)
+			exit(1);
+
 #ifdef USE_PROCFS
 		if (proc_open(tcp, 1) < 0) {
 			fprintf(stderr, "trouble opening proc file\n");
@@ -413,11 +538,10 @@ char *argv[];
 		}
 #else /* !USE_PROCFS */
 # ifdef LINUX
-		if (tcp->flags & TCB_CLONE_THREAD)
-			continue;
 		if (followfork) {
 			char procdir[MAXPATHLEN];
 			DIR *dir;
+
 			sprintf(procdir, "/proc/%d/task", tcp->pid);
 			dir = opendir(procdir);
 			if (dir != NULL) {
@@ -680,31 +804,6 @@ Process %u attached - interrupt to quit\n",
 	exit(0);
 }
 
-void
-newoutf(tcp)
-struct tcb *tcp;
-{
-	char name[MAXPATHLEN];
-	FILE *fp;
-
-	if (outfname && followfork > 1) {
-		sprintf(name, "%s.%u", outfname, tcp->pid);
-#ifndef SVR4
-		setreuid(geteuid(), getuid());
-#endif
-		fp = fopen(name, "w");
-#ifndef SVR4
-		setreuid(geteuid(), getuid());
-#endif
-		if (fp == NULL) {
-			perror("fopen");
-			return;
-		}
-		tcp->outf = fp;
-	}
-	return;
-}
-
 int
 expand_tcbtab()
 {
@@ -735,8 +834,7 @@ expand_tcbtab()
 
 
 struct tcb *
-alloctcb(pid)
-int pid;
+alloc_tcb(int pid, int command_options_parsed)
 {
 	int i;
 	struct tcb *tcp;
@@ -758,10 +856,12 @@ int pid;
 			tcp->stime.tv_usec = 0;
 			tcp->pfd = -1;
 			nprocs++;
+			if (command_options_parsed)
+				newoutf(tcp);
 			return tcp;
 		}
 	}
-	fprintf(stderr, "%s: alloctcb: tcb table full\n", progname);
+	fprintf(stderr, "%s: alloc_tcb: tcb table full\n", progname);
 	return NULL;
 }
 
@@ -790,12 +890,7 @@ int attaching;
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if ((arg = fcntl(tcp->pfd, F_GETFD)) < 0) {
-		perror("F_GETFD");
-		return -1;
-	}
-	if (fcntl(tcp->pfd, F_SETFD, arg|FD_CLOEXEC) < 0) {
-		perror("F_SETFD");
+	if (set_cloexec_flag(tcp->pfd) < 0) {
 		return -1;
 	}
 	sprintf(proc, "/proc/%d/status", tcp->pid);
@@ -803,12 +898,7 @@ int attaching;
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if ((arg = fcntl(tcp->pfd_stat, F_GETFD)) < 0) {
-		perror("F_GETFD");
-		return -1;
-	}
-	if (fcntl(tcp->pfd_stat, F_SETFD, arg|FD_CLOEXEC) < 0) {
-		perror("F_SETFD");
+	if (set_cloexec_flag(tcp->pfd_stat) < 0) {
 		return -1;
 	}
 	sprintf(proc, "/proc/%d/as", tcp->pid);
@@ -816,12 +906,7 @@ int attaching;
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if ((arg = fcntl(tcp->pfd_as, F_GETFD)) < 0) {
-		perror("F_GETFD");
-		return -1;
-	}
-	if (fcntl(tcp->pfd_as, F_SETFD, arg|FD_CLOEXEC) < 0) {
-		perror("F_SETFD");
+	if (set_cloexec_flag(tcp->pfd_as) < 0) {
 		return -1;
 	}
 #else
@@ -836,12 +921,7 @@ int attaching;
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if ((arg = fcntl(tcp->pfd, F_GETFD)) < 0) {
-		perror("F_GETFD");
-		return -1;
-	}
-	if (fcntl(tcp->pfd, F_SETFD, arg|FD_CLOEXEC) < 0) {
-		perror("F_SETFD");
+	if (set_cloexec_flag(tcp->pfd) < 0) {
 		return -1;
 	}
 #endif
@@ -1529,7 +1609,6 @@ rebuild_pollv()
 static void
 proc_poll_open()
 {
-	int arg;
 	int i;
 
 	if (pipe(proc_poll_pipe) < 0) {
@@ -1537,12 +1616,7 @@ proc_poll_open()
 		exit(1);
 	}
 	for (i = 0; i < 2; i++) {
-		if ((arg = fcntl(proc_poll_pipe[i], F_GETFD)) < 0) {
-			perror("F_GETFD");
-			exit(1);
-		}
-		if (fcntl(proc_poll_pipe[i], F_SETFD, arg|FD_CLOEXEC) < 0) {
-			perror("F_SETFD");
+		if (set_cloexec_flag(proc_poll_pipe[i]) < 0) {
 			exit(1);
 		}
 	}
@@ -2087,6 +2161,11 @@ trace()
 				return -1;
 			}
 		}
+		if (pid == popen_pid) {
+			if (WIFEXITED(status) || WIFSIGNALED(status))
+				popen_pid = -1;
+			continue;
+		}
 		if (debug)
 			fprintf(stderr, " [wait(%#x) = %u]\n", status, pid);
 
@@ -2113,7 +2192,6 @@ trace()
 					return 0;
 				}
 				tcp->flags |= TCB_ATTACHED | TCB_SUSPENDED;
-				newoutf(tcp);
 				if (!qflag)
 					fprintf(stderr, "\
 Process %d attached (waiting for parent)\n",

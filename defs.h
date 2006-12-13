@@ -425,15 +425,16 @@ enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
 extern int set_personality P((int personality));
 extern char *xlookup P((const struct xlat *, int));
-extern struct tcb *alloctcb P((int));
+extern struct tcb *alloc_tcb P((int, int));
 extern struct tcb *pid2tcb P((int));
 extern void droptcb P((struct tcb *));
 extern int expand_tcbtab P((void));
 
+#define alloctcb(pid)	alloc_tcb((pid), 1)
+
 extern void set_sortby P((char *));
 extern void set_overhead P((int));
 extern void qualify P((char *));
-extern void newoutf P((struct tcb *));
 extern int get_scno P((struct tcb *));
 extern long known_scno P((struct tcb *));
 extern int trace_syscall P((struct tcb *));
