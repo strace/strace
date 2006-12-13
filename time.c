@@ -475,13 +475,12 @@ struct tcb *tcp;
 		printsigevent(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
-		if (syserror(tcp))
+		void *p;
+
+		if (syserror(tcp) || umove(tcp, tcp->u_arg[2], &p) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
-		else {
-			void *p;
-			umove(tcp, tcp->u_arg[2], &p);
+		else
 			tprintf("{%p}", p);
-		}
 	}
 	return 0;
 }
