@@ -1,5 +1,14 @@
 2006-12-10  Dmitry V. Levin <ldv@altlinux.org>
 
+	Add biarch support for "struct iovec".
+	* defs.h (personality_wordsize): Add.
+	* io.c [HAVE_SYS_UIO_H] (tprint_iov): [LINUX &&
+	SUPPORTED_PERSONALITIES > 1] Handle 32-bit personality.
+	* util.c [HAVE_SYS_UIO_H] (dumpiov): [LINUX &&
+	SUPPORTED_PERSONALITIES > 1] Likewise.
+	Patch from Jakub Jelinek.
+	Fixes RH#218433.
+
 	* time.c (sys_timer_create): Check umove() return code.
 
 	Make several global variables static.

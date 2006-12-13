@@ -531,6 +531,7 @@ const char *strsignal P((int));
 #endif
 
 extern int current_personality;
+extern const int personality_wordsize[];
 
 struct sysent {
 	int	nargs;

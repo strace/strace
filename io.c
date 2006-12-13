@@ -81,7 +81,26 @@ struct tcb * tcp;
 unsigned long len;
 unsigned long addr;
 {
+#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+	union {
+		struct { u_int32_t base; u_int32_t len; } iov32;
+		struct { u_int64_t base; u_int64_t len; } iov64;
+	} iov;
+#define sizeof_iov \
+  (personality_wordsize[current_personality] == 4 \
+   ? sizeof(iov.iov32) : sizeof(iov.iov64))
+#define iov_iov_base \
+  (personality_wordsize[current_personality] == 4 \
+   ? (u_int64_t) iov.iov32.base : iov.iov64.base)
+#define iov_iov_len \
+  (personality_wordsize[current_personality] == 4 \
+   ? (u_int64_t) iov.iov32.len : iov.iov64.len)
+#else
 	struct iovec iov;
+#define sizeof_iov sizeof(iov)
+#define iov_iov_base iov.iov_base
+#define iov_iov_len iov.iov_len
+#endif
 	unsigned long size, cur, end, abbrev_end;
 	int failed = 0;
 
@@ -89,39 +108,42 @@ unsigned long addr;
 		tprintf("[]");
 		return;
 	}
-	size = len * sizeof(iov);
+	size = len * sizeof_iov;
 	end = addr + size;
-	if (!verbose(tcp) || size / sizeof(iov) != len || end < addr) {
+	if (!verbose(tcp) || size / sizeof_iov != len || end < addr) {
 		tprintf("%#lx", addr);
 		return;
 	}
 	if (abbrev(tcp)) {
-		abbrev_end = addr + max_strlen * sizeof(iov);
+		abbrev_end = addr + max_strlen * sizeof_iov;
 		if (abbrev_end < addr)
 			abbrev_end = end;
 	} else {
 		abbrev_end = end;
 	}
 	tprintf("[");
-	for (cur = addr; cur < end; cur += sizeof(iov)) {
+	for (cur = addr; cur < end; cur += sizeof_iov) {
 		if (cur > addr)
 			tprintf(", ");
 		if (cur >= abbrev_end) {
 			tprintf("...");
 			break;
 		}
-		if (umoven(tcp, cur, sizeof iov, (char *) &iov) < 0) {
+		if (umoven(tcp, cur, sizeof_iov, (char *) &iov) < 0) {
 			tprintf("?");
 			failed = 1;
 			break;
 		}
 		tprintf("{");
-		printstr(tcp, (long) iov.iov_base, iov.iov_len);
-		tprintf(", %lu}", (unsigned long)iov.iov_len);
+		printstr(tcp, (long) iov_iov_base, iov_iov_len);
+		tprintf(", %lu}", (unsigned long)iov_iov_len);
 	}
 	tprintf("]");
 	if (failed)
 		tprintf(" %#lx", addr);
+#undef sizeof_iov
+#undef iov_iov_base
+#undef iov_iov_len
 }
 
 int
