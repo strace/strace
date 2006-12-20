@@ -1,3 +1,12 @@
+2006-12-20  Dmitry V. Levin <ldv@altlinux.org>
+
+	Show system call summary for each personality.
+	* syscall.c (countv): New call_counts pointers array.
+	(counts): Convert to macro wrapper around countv.
+	(call_summary_pers): New function.
+	(call_summary): Use it for each personality.
+	Fixes RH#192193.
+
 2006-12-12  Dmitry V. Levin <ldv@altlinux.org>
 
 	Fix -ff -o behaviour.  Fix piping trace output.

@@ -197,8 +197,7 @@ const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 };;
 
 int
-set_personality(personality)
-int personality;
+set_personality(int personality)
 {
 	switch (personality) {
 	case 0:
@@ -255,7 +254,8 @@ struct call_counts {
 	int calls, errors;
 };
 
-static struct call_counts *counts;
+static struct call_counts *countv[SUPPORTED_PERSONALITIES];
+#define counts (countv[current_personality])
 
 static struct timeval shortest = { 1000000, 0 };
 
@@ -2740,9 +2740,8 @@ int n;
 	overhead.tv_usec = n % 1000000;
 }
 
-void
-call_summary(outf)
-FILE *outf;
+static void
+call_summary_pers(FILE *outf)
 {
 	int i, j;
 	int call_cum, error_cum;
@@ -2807,4 +2806,27 @@ FILE *outf;
 		"100.00", (long) tv_cum.tv_sec, (long) tv_cum.tv_usec, "",
 		call_cum, error_str, "total");
 
+}
+
+void
+call_summary(FILE *outf)
+{
+	int     i, old_pers = current_personality;
+
+	for (i = 0; i < SUPPORTED_PERSONALITIES; ++i)
+	{
+		if (!countv[i])
+			continue;
+
+		if (current_personality != i)
+			set_personality(i);
+		if (i)
+			fprintf(outf,
+				"System call usage summary for %u bit mode:\n",
+				personality_wordsize[current_personality] * 8);
+		call_summary_pers(outf);
+	}
+
+	if (old_pers != current_personality)
+		set_personality(old_pers);
 }
