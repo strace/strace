@@ -1,5 +1,11 @@
 2006-12-20  Dmitry V. Levin <ldv@altlinux.org>
 
+	* syscall.c (internal_syscall): Change conditions for internal_exit,
+	internal_fork, internal_clone, internal_exec and internal_wait
+	calls from switching on known scno values to switching on known
+	sysent[tcp->scno].sys_func values.
+	Fixes RH#179740.
+
 	Show system call summary for each personality.
 	* syscall.c (countv): New call_counts pointers array.
 	(counts): Convert to macro wrapper around countv.

@@ -724,98 +724,64 @@ enum subcall_style style;
 struct tcb *tcp_last = NULL;
 
 static int
-internal_syscall(tcp)
-struct tcb *tcp;
+internal_syscall(struct tcb *tcp)
 {
 	/*
 	 * We must always trace a few critical system calls in order to
 	 * correctly support following forks in the presence of tracing
 	 * qualifiers.
 	 */
-	switch (known_scno(tcp)) {
-#ifdef SYS_fork
-	case SYS_fork:
-#endif
-#ifdef SYS_vfork
-	case SYS_vfork:
-#endif
-#ifdef SYS_fork1
-	case SYS_fork1:
-#endif
-#ifdef SYS_forkall
-	case SYS_forkall:
-#endif
-#ifdef SYS_rfork1
-	case SYS_rfork1:
-#endif
-#ifdef SYS_rforkall
-	case SYS_rforkall:
-#endif
-#ifdef SYS_rfork
-	case SYS_rfork:
-#endif
-		internal_fork(tcp);
-		break;
-#ifdef SYS_clone
-	case SYS_clone:
-		internal_clone(tcp);
-		break;
-#endif
-#ifdef SYS_clone2
-	case SYS_clone2:
-		internal_clone(tcp);
-		break;
-#endif
-#ifdef SYS_execv
-	case SYS_execv:
-#endif
-#ifdef SYS_execve
-	case SYS_execve:
-#endif
-#ifdef SYS_rexecve
-	case SYS_rexecve:
-#endif
-		internal_exec(tcp);
-		break;
+	int	(*func)();
 
-#ifdef SYS_wait
-	case SYS_wait:
+	if (tcp->scno < 0 || tcp->scno >= nsyscalls)
+		return 0;
+
+	func = sysent[tcp->scno].sys_func;
+
+	if (sys_exit == func)
+		return internal_exit(tcp);
+
+	if (   sys_fork == func
+#if defined(FREEBSD) || defined(LINUX) || defined(SUNOS4)
+	    || sys_vfork == func
 #endif
-#ifdef SYS_wait4
-	case SYS_wait4:
+#if UNIXWARE > 2
+	    || sys_rfork == func
 #endif
-#ifdef SYS32_wait4
-	case SYS32_wait4:
-#endif
-#ifdef SYS_waitpid
-	case SYS_waitpid:
-#endif
-#ifdef SYS_waitsys
-	case SYS_waitsys:
-#endif
-		internal_wait(tcp, 2);
-		break;
-#ifdef SYS_waitid
-	case SYS_waitid:
-		internal_wait(tcp, 3);
-		break;
+	   )
+		return internal_fork(tcp);
+
+#if defined(LINUX) && (defined SYS_clone || defined SYS_clone2)
+	if (sys_clone == func)
+		return internal_clone(tcp);
 #endif
 
-#ifdef SYS_exit
-	case SYS_exit:
+	if (   sys_execve == func
+#if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)
+	    || sys_execv == func
 #endif
-#ifdef SYS32_exit
-	case SYS32_exit:
+#if UNIXWARE > 2
+	    || sys_rexecve == func
 #endif
-#ifdef __NR_exit_group
-	case __NR_exit_group:
+	   )
+		return internal_exec(tcp);
+
+	if (   sys_waitpid == func
+	    || sys_wait4 == func
+#if defined(SVR4) || defined(FREEBSD) || defined(SUNOS4)
+	    || sys_wait == func
 #endif
-#ifdef IA64
-	case 252: /* IA-32 __NR_exit_group */
+#ifdef ALPHA
+	    || sys_osf_wait4 == func
 #endif
-		internal_exit(tcp);
-		break;
-	}
+	   )
+		return internal_wait(tcp, 2);
+
+#if defined(LINUX) || defined(SVR4)
+	if (sys_waitid == func)
+		return internal_wait(tcp, 3);
+#endif
+
 	return 0;
 }
 
