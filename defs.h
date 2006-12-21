@@ -438,6 +438,7 @@ extern void qualify P((char *));
 extern int get_scno P((struct tcb *));
 extern long known_scno P((struct tcb *));
 extern int trace_syscall P((struct tcb *));
+extern int count_syscall P((struct tcb *, struct timeval *));
 extern void printxval P((const struct xlat *, int, const char *));
 extern int printargs P((struct tcb *));
 extern int addflags P((const struct xlat *, int));

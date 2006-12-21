@@ -249,16 +249,6 @@ set_personality(int personality)
 }
 
 
-struct call_counts {
-	struct timeval time;
-	int calls, errors;
-};
-
-static struct call_counts *countv[SUPPORTED_PERSONALITIES];
-#define counts (countv[current_personality])
-
-static struct timeval shortest = { 1000000, 0 };
-
 static int qual_syscall(), qual_signal(), qual_fault(), qual_desc();
 
 static const struct qual_options {
@@ -2240,8 +2230,7 @@ struct tcb *tcp;
 }
 
 int
-trace_syscall(tcp)
-struct tcb *tcp;
+trace_syscall(struct tcb *tcp)
 {
 	int sys_res;
 	struct timeval tv;
@@ -2282,50 +2271,8 @@ struct tcb *tcp;
 			tprintf(" resumed> ");
 		}
 
-		if (cflag && tcp->scno < nsyscalls && tcp->scno >= 0) {
-			if (counts == NULL) {
-				counts = calloc(sizeof *counts, nsyscalls);
-				if (counts == NULL) {
-					fprintf(stderr, "\
-strace: out of memory for call counts\n");
-					exit(1);
-				}
-			}
-
-			counts[tcp->scno].calls++;
-			if (tcp->u_error)
-				counts[tcp->scno].errors++;
-			tv_sub(&tv, &tv, &tcp->etime);
-#ifdef LINUX
-			if (tv_cmp(&tv, &tcp->dtime) > 0) {
-				static struct timeval one_tick;
-				if (one_tick.tv_usec == 0) {
-					/* Initialize it.  */
-					struct itimerval it;
-					memset(&it, 0, sizeof it);
-					it.it_interval.tv_usec = 1;
-					setitimer(ITIMER_REAL, &it, NULL);
-					getitimer(ITIMER_REAL, &it);
-					one_tick = it.it_interval;
-				}
-
-				if (tv_nz(&tcp->dtime))
-					tv = tcp->dtime;
-				else if (tv_cmp(&tv, &one_tick) > 0) {
-					if (tv_cmp(&shortest, &one_tick) < 0)
-						tv = shortest;
-					else
-						tv = one_tick;
-				}
-			}
-#endif /* LINUX */
-			if (tv_cmp(&tv, &shortest) < 0)
-				shortest = tv;
-			tv_add(&counts[tcp->scno].time,
-				&counts[tcp->scno].time, &tv);
-			tcp->flags &= ~TCB_INSYSCALL;
-			return 0;
-		}
+		if (cflag)
+			return count_syscall(tcp, &tv);
 
 		if (tcp->scno >= nsyscalls || tcp->scno < 0
 		    || (qual_flags[tcp->scno] & QUAL_RAW))
@@ -2650,149 +2597,3 @@ struct tcb *tcp;
 	return 0;
 }
 #endif /* SUNOS4 */
-
-static int
-time_cmp(a, b)
-void *a;
-void *b;
-{
-	return -tv_cmp(&counts[*((int *) a)].time, &counts[*((int *) b)].time);
-}
-
-static int
-syscall_cmp(a, b)
-void *a;
-void *b;
-{
-	return strcmp(sysent[*((int *) a)].sys_name,
-		sysent[*((int *) b)].sys_name);
-}
-
-static int
-count_cmp(a, b)
-void *a;
-void *b;
-{
-	int m = counts[*((int *) a)].calls, n = counts[*((int *) b)].calls;
-
-	return (m < n) ? 1 : (m > n) ? -1 : 0;
-}
-
-static int (*sortfun)();
-static struct timeval overhead = { -1, -1 };
-
-void
-set_sortby(sortby)
-char *sortby;
-{
-	if (strcmp(sortby, "time") == 0)
-		sortfun = time_cmp;
-	else if (strcmp(sortby, "calls") == 0)
-		sortfun = count_cmp;
-	else if (strcmp(sortby, "name") == 0)
-		sortfun = syscall_cmp;
-	else if (strcmp(sortby, "nothing") == 0)
-		sortfun = NULL;
-	else {
-		fprintf(stderr, "invalid sortby: `%s'\n", sortby);
-		exit(1);
-	}
-}
-
-void set_overhead(n)
-int n;
-{
-	overhead.tv_sec = n / 1000000;
-	overhead.tv_usec = n % 1000000;
-}
-
-static void
-call_summary_pers(FILE *outf)
-{
-	int i, j;
-	int call_cum, error_cum;
-	struct timeval tv_cum, dtv;
-	double percent;
-	char *dashes = "-------------------------";
-	char error_str[16];
-
-	int *sorted_count = malloc(nsyscalls * sizeof(int));
-
-	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
-	if (overhead.tv_sec == -1) {
-		tv_mul(&overhead, &shortest, 8);
-		tv_div(&overhead, &overhead, 10);
-	}
-	for (i = 0; i < nsyscalls; i++) {
-		sorted_count[i] = i;
-		if (counts == NULL || counts[i].calls == 0)
-			continue;
-		tv_mul(&dtv, &overhead, counts[i].calls);
-		tv_sub(&counts[i].time, &counts[i].time, &dtv);
-		call_cum += counts[i].calls;
-		error_cum += counts[i].errors;
-		tv_add(&tv_cum, &tv_cum, &counts[i].time);
-	}
-	if (counts && sortfun)
-		qsort((void *) sorted_count, nsyscalls, sizeof(int), sortfun);
-	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
-		"% time", "seconds", "usecs/call",
-		"calls", "errors", "syscall");
-	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %-16.16s\n",
-		dashes, dashes, dashes, dashes, dashes, dashes);
-	if (counts) {
-		for (i = 0; i < nsyscalls; i++) {
-			j = sorted_count[i];
-			if (counts[j].calls == 0)
-				continue;
-			tv_div(&dtv, &counts[j].time, counts[j].calls);
-			if (counts[j].errors)
-				sprintf(error_str, "%d", counts[j].errors);
-			else
-				error_str[0] = '\0';
-			percent = (100.0 * tv_float(&counts[j].time)
-				   / tv_float(&tv_cum));
-			fprintf(outf, "%6.2f %4ld.%06ld %11ld %9d %9.9s %s\n",
-				percent, (long) counts[j].time.tv_sec,
-				(long) counts[j].time.tv_usec,
-				(long) 1000000 * dtv.tv_sec + dtv.tv_usec,
-				counts[j].calls,
-				error_str, sysent[j].sys_name);
-		}
-	}
-	free(sorted_count);
-
-	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %-16.16s\n",
-		dashes, dashes, dashes, dashes, dashes, dashes);
-	if (error_cum)
-		sprintf(error_str, "%d", error_cum);
-	else
-		error_str[0] = '\0';
-	fprintf(outf, "%6.6s %4ld.%06ld %11.11s %9d %9.9s %s\n",
-		"100.00", (long) tv_cum.tv_sec, (long) tv_cum.tv_usec, "",
-		call_cum, error_str, "total");
-
-}
-
-void
-call_summary(FILE *outf)
-{
-	int     i, old_pers = current_personality;
-
-	for (i = 0; i < SUPPORTED_PERSONALITIES; ++i)
-	{
-		if (!countv[i])
-			continue;
-
-		if (current_personality != i)
-			set_personality(i);
-		if (i)
-			fprintf(outf,
-				"System call usage summary for %u bit mode:\n",
-				personality_wordsize[current_personality] * 8);
-		call_summary_pers(outf);
-	}
-
-	if (old_pers != current_personality)
-		set_personality(old_pers);
-}

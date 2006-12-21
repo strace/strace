@@ -1,3 +1,15 @@
+2006-12-21  Dmitry V. Levin <ldv@altlinux.org>
+
+	Move counts code to separate file.
+	* count.c: New file.
+	* Makefile.am (strace_SOURCES): Add count.c.
+	* syscall.c (call_counts, countv, counts, shortest, time_cmp,
+	syscall_cmp, count_cmp, sortfun, overhead, set_sortby,
+	set_overhead, call_summary_pers, call_summary): Move to count.c
+	* count.c (count_syscall): New function.
+	* defs.h (count_syscall): Declare it.
+	* syscall.c (trace_syscall): Use it.
+
 2006-12-20  Dmitry V. Levin <ldv@altlinux.org>
 
 	* syscall.c (internal_syscall): Change conditions for internal_exit,
