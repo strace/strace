@@ -31,7 +31,7 @@
 	(alloctcb): Rename to alloc_tcb.  Use newoutf().
 	(trace): Check popen_pid.  Remove newoutf() call.
 	[USE_PROCFS] (proc_open, proc_poll_open): Use set_cloexec_flag().
-	Fixes RH#204950, RH#218435.
+	Fixes RH#204950, RH#218435, Debian#353935.
 
 2006-12-10  Dmitry V. Levin <ldv@altlinux.org>
 
@@ -297,7 +297,7 @@
 	* linux/ia64/syscallent.h: Likewise.
 	* linux/mips/syscallent.h: Likewise.
 	* linux/x86_64/syscallent.h: Likewise.
-	Fixes RH#165469.
+	Fixes RH#165469, Debian#350641.
 
 2005-08-08  Dmitry V. Levin  <ldv@altlinux.org>
 
