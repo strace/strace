@@ -3,6 +3,8 @@
 	* configure.ac, NEWS: Version 4.5.15.
 	* debian/changelog, strace.spec: 4.5.15-1.
 
+	* debian/control (Uploaders): Add Frederik Schueler <fs@debian.org>.
+
 	* strace.spec (Release): Use %{?dist}.
 
 	* system.c [LINUX] (CTL_CPU): Define in case header is missing it.
