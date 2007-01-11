@@ -2,7 +2,7 @@ Source: strace
 Section: utils
 Priority: standard
 Maintainer: Roland McGrath <frob@debian.org>
-Uploaders: Wichert Akkerman <wakkerma@debian.org>
+Uploaders: Wichert Akkerman <wakkerma@debian.org>, Frederik Schueler <fs@debian.org>
 Build-Depends: libc6-dev (>= 2.2.2-1) [!alpha !ia64], libc6.1-dev (>= 2.2.2-1) [alpha ia64], libc6-dev-s390x [s390], libc6-dev-sparc64 [sparc], debhelper
 Standards-Version: 3.6.2
 
