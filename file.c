@@ -209,21 +209,23 @@ struct stat_sparc64 {
 #include <ustat.h>
 #endif
 
-/*
- * This is a really dirty trick but it should always work.  Traditional
- * Unix says r/w/rw are 0/1/2, so we make them true flags 1/2/3 by
- * adding 1.  Just remember to add 1 to any arg decoded with openmodes.
- */
-const struct xlat openmodes[] = {
-	{ O_RDWR+1,	"O_RDWR"	},
-	{ O_RDONLY+1,	"O_RDONLY"	},
-	{ O_WRONLY+1,	"O_WRONLY"	},
-	{ O_NONBLOCK,	"O_NONBLOCK"	},
-	{ O_APPEND,	"O_APPEND"	},
+const struct xlat open_access_modes[] = {
+	{ O_RDONLY,	"O_RDONLY"	},
+	{ O_WRONLY,	"O_WRONLY"	},
+	{ O_RDWR,	"O_RDWR"	},
+#ifdef O_ACCMODE
+	{ O_ACCMODE,	"O_ACCMODE"	},
+#endif
+	{ 0,		NULL		},
+};
+
+const struct xlat open_mode_flags[] = {
 	{ O_CREAT,	"O_CREAT"	},
-	{ O_TRUNC,	"O_TRUNC"	},
 	{ O_EXCL,	"O_EXCL"	},
 	{ O_NOCTTY,	"O_NOCTTY"	},
+	{ O_TRUNC,	"O_TRUNC"	},
+	{ O_APPEND,	"O_APPEND"	},
+	{ O_NONBLOCK,	"O_NONBLOCK"	},
 #ifdef O_SYNC
 	{ O_SYNC,	"O_SYNC"	},
 #endif
@@ -332,6 +334,26 @@ print_dirfd(long fd)
 }
 #endif
 
+/*
+ * low bits of the open(2) flags define access mode,
+ * other bits are real flags.
+ */
+void
+tprint_open_modes(struct tcb *tcp, mode_t flags)
+{
+	const char *str = xlookup(open_access_modes, flags & 3);
+
+	if (str)
+	{
+		tprintf("%s", str);
+		flags &= ~3;
+		if (!flags)
+			return;
+		tprintf("|");
+	}
+	printflags(open_mode_flags, flags, "O_???");
+}
+
 static int
 decode_open(struct tcb *tcp, int offset)
 {
@@ -339,7 +361,7 @@ decode_open(struct tcb *tcp, int offset)
 		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", ");
 		/* flags */
-		printflags(openmodes, tcp->u_arg[offset + 1] + 1, "O_???");
+		tprint_open_modes(tcp, tcp->u_arg[offset + 1]);
 		if (tcp->u_arg[offset + 1] & O_CREAT) {
 			/* mode */
 			tprintf(", %#lo", tcp->u_arg[offset + 2]);

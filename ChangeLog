@@ -1,3 +1,16 @@
+2007-01-11  Dmitry V. Levin <ldv@altlinux.org>
+
+	Fix open(2) flags parser.
+	* defs.h (tprint_open_modes): New function.
+	* desc.c (sprint_open_modes): New function.
+	(sys_fcntl): Use tprint_open_modes() and sprint_open_modes().
+	* file.c (openmodes): Split xlat into open_access_modes and
+	open_mode_flags.
+	(tprint_open_modes): New function.
+	(decode_open): Use it.
+	* ipc.c (sys_mq_open, printmqattr): Likewise.
+	Fixes RH#222385.
+
 2007-01-11  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.15.

@@ -474,6 +474,7 @@ extern void printtrailer P((struct tcb *));
 extern void tabto P((int));
 extern void call_summary P((FILE *));
 extern void tprint_iov P((struct tcb *, unsigned long, unsigned long));
+extern void tprint_open_modes P((struct tcb *, mode_t));
 
 #ifdef LINUX
 extern int internal_clone P((struct tcb *));

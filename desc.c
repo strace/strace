@@ -264,12 +264,48 @@ sprintflags(const struct xlat *xlat, int flags)
 	return outstr;
 }
 
-int
-sys_fcntl(tcp)
-struct tcb *tcp;
+/*
+ * low bits of the open(2) flags define access mode,
+ * other bits are real flags.
+ */
+static const char *
+sprint_open_modes(mode_t flags)
 {
-	extern const struct xlat openmodes[];
+	extern const struct xlat open_access_modes[];
+	extern const struct xlat open_mode_flags[];
+	static char outstr[1024];
+	const char *str = xlookup(open_access_modes, flags & 3);
+	const char *sep = "";
+	const struct xlat *x;
 
+	strcpy(outstr, "flags ");
+	if (str)
+	{
+		strcat(outstr, str);
+		flags &= ~3;
+		if (!flags)
+			return outstr;
+		strcat(outstr, "|");
+	}
+
+	for (x = open_mode_flags; x->str; x++)
+	{
+		if ((flags & x->val) == x->val)
+		{
+			sprintf(outstr + strlen(outstr),
+				"%s%s", sep, x->str);
+			sep = "|";
+			flags &= ~x->val;
+		}
+	}
+	if (flags)
+		sprintf(outstr + strlen(outstr), "%s%#x", sep, flags);
+	return outstr;
+}
+
+int
+sys_fcntl(struct tcb *tcp)
+{
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printxval(fcntlcmds, tcp->u_arg[1], "F_???");
@@ -283,7 +319,7 @@ struct tcb *tcp;
 			break;
 		case F_SETFL:
 			tprintf(", ");
-			printflags(openmodes, tcp->u_arg[2] + 1, "O_???");
+			tprint_open_modes(tcp, tcp->u_arg[2]);
 			break;
 		case F_SETLK: case F_SETLKW:
 #ifdef F_FREESP
@@ -323,7 +359,7 @@ struct tcb *tcp;
 			tcp->auxstr = sprintflags(fdflags, tcp->u_rval);
 			return RVAL_HEX|RVAL_STR;
 		case F_GETFL:
-			tcp->auxstr = sprintflags(openmodes, tcp->u_rval + 1);
+			tcp->auxstr = sprint_open_modes(tcp->u_rval);
 			return RVAL_HEX|RVAL_STR;
 		case F_GETLK:
 			tprintf(", ");
