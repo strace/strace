@@ -5,6 +5,8 @@
 
 	* strace.spec (Release): Use %{?dist}.
 
+	* system.c [LINUX] (CTL_CPU): Define in case header is missing it.
+
 2006-12-27  Dmitry V. Levin <ldv@altlinux.org>
 
 	Add const qualifier to xlookup() return value.
