@@ -424,7 +424,7 @@ extern struct tcb *tcp_last;
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
 extern int set_personality P((int personality));
-extern char *xlookup P((const struct xlat *, int));
+extern const char *xlookup P((const struct xlat *, int));
 extern struct tcb *alloc_tcb P((int, int));
 extern struct tcb *pid2tcb P((int));
 extern void droptcb P((struct tcb *));

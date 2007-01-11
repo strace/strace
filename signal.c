@@ -313,18 +313,16 @@ int len;
 #define copy_sigset(tcp, addr, s) copy_sigset_len(tcp, addr, s, sizeof(sigset_t))
 #endif
 
-static char *
-sprintsigmask(s, mask, rt)
-char *s;
-sigset_t *mask;
-int rt; /* set might include realtime sigs */
+static const char *
+sprintsigmask(const char *str, sigset_t *mask, int rt)
+/* set might include realtime sigs */
 {
 	int i, nsigs;
 	int maxsigs;
-	char *format;
+	char *format, *s;
 	static char outstr[8 * sizeof(sigset_t) * 8];
 
-	strcpy(outstr, s);
+	strcpy(outstr, str);
 	s = outstr + strlen(outstr);
 	nsigs = 0;
 	maxsigs = nsignals;

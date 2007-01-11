@@ -1596,11 +1596,7 @@ static const struct xlat procpriv_type [] = {
 
 
 static void
-printpriv(tcp, addr, len, opt)
-struct tcb *tcp;
-long addr;
-int len;
-const struct xlat *opt;
+printpriv(struct tcb *tcp, long addr, int len, const struct xlat *opt)
 {
 	priv_t buf [128];
 	int max = verbose (tcp) ? sizeof buf / sizeof buf [0] : 10;
@@ -1619,7 +1615,7 @@ const struct xlat *opt;
 	tprintf ("[");
 
 	for (i = 0; i < len; ++i) {
-		char *t, *p;
+		const char *t, *p;
 
 		if (i) tprintf (", ");
 

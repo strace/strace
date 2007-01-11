@@ -242,13 +242,11 @@ int getlk;
 }
 #endif
 
-static char *
-sprintflags(xlat, flags)
-const struct xlat *xlat;
-int flags;
+static const char *
+sprintflags(const struct xlat *xlat, int flags)
 {
 	static char outstr[1024];
-	char *sep;
+	const char *sep;
 
 	strcpy(outstr, "flags ");
 	sep = "";

@@ -1,3 +1,14 @@
+2006-12-27  Dmitry V. Levin <ldv@altlinux.org>
+
+	Add const qualifier to xlookup() return value
+
+	* defs.h (xlookup): Add const qualifier to return value.
+	* desc.c (sprintflags): Likewise.
+	* process.c (printpriv): Update xlookup() use.
+	* signal.c (sprintsigmask): Add const qualifier to first argument and return value.
+	* util.c (xlookup): Add const qualifier to return value.
+	(printxval): Update xlookup() use.
+
 2006-12-21  Dmitry V. Levin <ldv@altlinux.org>
 
 	Move counts code to separate file.

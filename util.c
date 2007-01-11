@@ -231,10 +231,8 @@ int n;
 	tv->tv_usec %= 1000000;
 }
 
-char *
-xlookup(xlat, val)
-const struct xlat *xlat;
-int val;
+const char *
+xlookup(const struct xlat *xlat, int val)
 {
 	for (; xlat->str != NULL; xlat++)
 		if (xlat->val == val)
@@ -246,12 +244,9 @@ int val;
  * Print entry in struct xlat table, if there.
  */
 void
-printxval(xlat, val, dflt)
-const struct xlat *xlat;
-int val;
-const char *dflt;
+printxval(const struct xlat *xlat, int val, const char *dflt)
 {
-	char *str = xlookup(xlat, val);
+	const char *str = xlookup(xlat, val);
 
 	if (str)
 		tprintf("%s", str);
