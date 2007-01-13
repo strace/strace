@@ -491,7 +491,7 @@ tprint_timex32(struct tcb *tcp, long addr)
 		return -1;
 
 	tprintf("{modes=");
-	printxval(adjtimex_modes, tx.modes, "ADJ_???");
+	printflags(adjtimex_modes, tx.modes, "ADJ_???");
 	tprintf(", offset=%d, freq=%d, maxerror=%d, ",
 		tx.offset, tx.freq, tx.maxerror);
 	tprintf("esterror=%u, status=", tx.esterror);
@@ -534,7 +534,7 @@ tprint_timex(struct tcb *tcp, long addr)
 	tprint_timeval(tcp, &tx.time);
 #else
 	tprintf("{modes=");
-	printxval(adjtimex_modes, tx.modes, "ADJ_???");
+	printflags(adjtimex_modes, tx.modes, "ADJ_???");
 	tprintf(", offset=%ld, freq=%ld, maxerror=%ld, ",
 		tx.offset, tx.freq, tx.maxerror);
 	tprintf("esterror=%lu, status=", tx.esterror);

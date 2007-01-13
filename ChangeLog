@@ -1,3 +1,8 @@
+2007-01-12  Dmitry V. Levin <ldv@altlinux.org>
+
+	* time.c [LINUX] (tprint_timex32, tprint_timex): Decode adjtimex
+	modes as flags.
+
 2007-01-11  Dmitry V. Levin <ldv@altlinux.org>
 
 	Update umount parser.
