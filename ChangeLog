@@ -1,5 +1,10 @@
 2007-01-11  Dmitry V. Levin <ldv@altlinux.org>
 
+	Update umount parser.
+	* system.c [LINUX] (MNT_FORCE, MNT_DETACH, MNT_EXPIRE): New macros.
+	[LINUX] (umount_flags): New xlat structure with MNT_* entries.
+	[LINUX] (sys_umount2): Use umount_flags.
+
 	Fix open(2) flags parser.
 	* defs.h (tprint_open_modes): New function.
 	* desc.c (sprint_open_modes): New function.

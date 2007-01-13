@@ -124,17 +124,24 @@ struct tcb *tcp;
 	return 0;
 }
 
+#define MNT_FORCE	0x00000001	/* Attempt to forcibily umount */
+#define MNT_DETACH	0x00000002	/* Just detach from the tree */
+#define MNT_EXPIRE	0x00000004	/* Mark for expiry */
+
+static const struct xlat umount_flags[] = {
+	{ MNT_FORCE,	"MNT_FORCE"	},
+	{ MNT_DETACH,	"MNT_DETACH"	},
+	{ MNT_EXPIRE,	"MNT_EXPIRE"	},
+	{ 0,		NULL		},
+};
+
 int
-sys_umount2(tcp)
-struct tcb *tcp;
+sys_umount2(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
 		tprintf(", ");
-		if (tcp->u_arg[1] & 1)
-			tprintf("MNT_FORCE");
-		else
-			tprintf("0");
+		printflags(umount_flags, tcp->u_arg[1], "MNT_???");
 	}
 	return 0;
 }
