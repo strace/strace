@@ -1,3 +1,15 @@
+2007-01-16  Dmitry V. Levin <ldv@altlinux.org>
+
+	Update mount parser to match kernel behaviour.
+	* system.c [LINUX] (MS_VERBOSE): Rename to MS_SILENT.
+	[LINUX] (MS_UNBINDABLE, MS_PRIVATE, MS_SLAVE, MS_SHARED):
+	New macros.
+	[LINUX] (mount_flags): Add them.
+	[LINUX] (MS_MGC_MSK): New macro.
+	[LINUX] (sys_mount): Update parser to match kernel behaviour:
+	discard MS_MGC_VAL magic, do not decode type and/or data
+	strings when specified flags do not imply valid strings.
+
 2007-01-15  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac, NEWS: Version 4.5.15.
