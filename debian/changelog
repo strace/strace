@@ -6,7 +6,7 @@ strace (4.5.15-1) unstable; urgency=low
     + Fix semtimedop, closes: #340239.
     + ARM support fixes, closes: #360152, #360154.
 
- -- Roland McGrath <frob@debian.org>  Mon, 15 Jan 2007 16:58:32 -0800
+ -- Roland McGrath <frob@debian.org>  Tue, 16 Jan 2007 15:24:14 -0800
 
 strace (4.5.14-1) unstable; urgency=low
 
