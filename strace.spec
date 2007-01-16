@@ -75,7 +75,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Thu Jan 11 2007 Roland McGrath <roland@redhat.com> - 4.5.15-1
+* Mon Jan 15 2007 Roland McGrath <roland@redhat.com> - 4.5.15-1
 - biarch fixes (#179740, #192193, #171626, #173050, #218433, #218043)
 - fix -ff -o behavior (#204950, #218435, #193808, #219423)
 - better quotactl printing (#118696)

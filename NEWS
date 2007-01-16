@@ -2,7 +2,7 @@ Changes in 4.5.15
 ==============
 * Bug fixes.
 * Several biarch improvements.
-* Improved output for adjtimex, sysctl, quotactl.
+* Improved output for adjtimex, sysctl, quotactl, umount.
 * Support new Linux system calls *at, inotify*, pselect6, ppoll and unshare.
 
 Changes in 4.5.14

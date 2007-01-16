@@ -1,3 +1,8 @@
+2007-01-15  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.5.15.
+	* debian/changelog, strace.spec: 4.5.15-1.
+
 2007-01-12  Dmitry V. Levin <ldv@altlinux.org>
 
 	* time.c [LINUX] (tprint_timex32, tprint_timex): Decode adjtimex
@@ -193,7 +198,7 @@
 
 2006-10-14  Dmitry V. Levin  <ldv@altlinux.org>
 
-	* configure.ac(AC_CHECK_HEADERS): Add inttypes.h.
+	* configure.ac (AC_CHECK_HEADERS): Add inttypes.h.
 	* file.c [_LFS64_LARGEFILE && (LINUX || SVR4)]:
 	Include <inttypes.h>.
 	(sys_getdents64): Use PRIu64/PRId64 to avoid gcc warnings on
