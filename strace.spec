@@ -1,4 +1,4 @@
-Summary: Tracks and displays system calls associated with a running process.
+Summary: Tracks and displays system calls associated with a running process
 Name: strace
 Version: 4.5.15
 Release: 1%{?dist}
@@ -6,7 +6,7 @@ License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
 Source0: http://dl.sourceforge.net/strace/%{name}-%{version}.tar.bz2
-BuildRoot: %{_tmppath}/%{name}-root
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %define strace64_arches ppc64
 
@@ -48,9 +48,7 @@ make
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}%{_mandir}/man1
-mkdir -p %{buildroot}%{_bindir}
-%makeinstall man1dir=%{buildroot}%{_mandir}/man1
+make DESTDIR=%{buildroot} install
 
 # remove unpackaged files from the buildroot
 rm -f %{buildroot}%{_bindir}/strace-graph
@@ -64,6 +62,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
+%doc CREDITS ChangeLog COPYRIGHT NEWS PORTING README
 %{_bindir}/strace
 %{_mandir}/man1/*
 
@@ -372,7 +371,7 @@ rm -rf %{buildroot}
 - strace 3.1 patches carried along for now.
 
 * Sun May 16 1999 Jeff Johnson <jbj@redhat.com>
-- don't rely on (broken!) rpm %patch (#2735)
+- don't rely on (broken!) rpm %%patch (#2735)
 
 * Tue Apr 06 1999 Preston Brown <pbrown@redhat.com>
 - strip binary
