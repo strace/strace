@@ -44,7 +44,7 @@ The `strace' program in the `strace' package is for 32-bit processes.
 
 %build
 %configure
-make
+make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
