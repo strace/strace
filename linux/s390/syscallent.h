@@ -35,7 +35,7 @@
 	{ 3,	TD,	sys_write,		"write"		}, /* 4 */
 	{ 3,	TD|TF,	sys_open,		"open"		}, /* 5 */
 	{ 1,	TD,	sys_close,		"close"		}, /* 6 */
-	{ -1,	0,	printargs,		"SYS_7"		}, /* 7 */
+	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 7 */
 	{ 2,	TD|TF,	sys_creat,		"creat"		}, /* 8 */
 	{ 2,	TF,	sys_link,		"link"		}, /* 9 */
 	{ 1,	TF,	sys_unlink,		"unlink"	}, /* 10 */
