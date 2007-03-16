@@ -1,3 +1,8 @@
+2007-03-16  Roland McGrath  <roland@redhat.com>
+
+	* linux/s390/syscallent.h: Use sys_restart_syscall for 7.
+	* linux/s390x/syscallent.h: Likewise.
+
 2007-02-18  Roland McGrath  <roland@redhat.com>
 
 	* strace.spec (Summary): Remove trailing period.
