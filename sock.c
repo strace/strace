@@ -93,8 +93,8 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 
 	if (entering(tcp)) {
 		if (code == SIOCGIFCONF) {
-			umove(tcp, tcp->u_arg[2], &ifc);
-			if (ifc.ifc_buf == NULL)
+			if (umove(tcp, tcp->u_arg[2], &ifc) >= 0
+			    && ifc.ifc_buf == NULL)
 				tprintf(", {%d -> ", ifc.ifc_len);
 			else
 				tprintf(", {");
@@ -146,8 +146,9 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 	case SIOCGIFHWADDR:
 	case SIOCGIFTXQLEN:
 	case SIOCGIFMAP:
-		umove(tcp, tcp->u_arg[2], &ifr);
-                if (syserror(tcp)) {
+		if (umove(tcp, tcp->u_arg[2], &ifr) < 0)
+			tprintf(", %#lx", tcp->u_arg[2]);
+		else if (syserror(tcp)) {
 			if (code == SIOCGIFNAME)
 				tprintf(", {ifr_index=%d, ifr_name=???}", ifr.ifr_ifindex);
 			else
@@ -223,7 +224,10 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 		}
 		return 1;
 	case SIOCGIFCONF:
-		umove(tcp, tcp->u_arg[2], &ifc);
+		if (umove(tcp, tcp->u_arg[2], &ifc) < 0) {
+			tprintf("???}");
+			return 1;
+		}
 		tprintf("%d, ", ifc.ifc_len);
                 if (syserror(tcp)) {
 			tprintf("%lx", (unsigned long) ifc.ifc_buf);
