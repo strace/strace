@@ -1,6 +1,7 @@
 2007-01-12  Dmitry V. Levin <ldv@altlinux.org>
 
-	* sock.c (sock_ioctl) [LINUX]: Handle SIOCGIFTXQLEN.
+	* sock.c (sock_ioctl) [LINUX]: Handle SIOCGIFTXQLEN and
+	SIOCGIFMAP.
 
 2007-03-16  Roland McGrath  <roland@redhat.com>
 

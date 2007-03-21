@@ -145,6 +145,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 	case SIOCGIFSLAVE:
 	case SIOCGIFHWADDR:
 	case SIOCGIFTXQLEN:
+	case SIOCGIFMAP:
 		umove(tcp, tcp->u_arg[2], &ifr);
                 if (syserror(tcp)) {
 			if (code == SIOCGIFNAME)
@@ -205,6 +206,17 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 				break;
 			case SIOCGIFTXQLEN:
 				tprintf("ifr_qlen=%d", ifr.ifr_qlen);
+				break;
+			case SIOCGIFMAP:
+				tprintf("ifr_map={mem_start=%#lx, "
+					"mem_end=%#lx, base_addr=%#x, "
+					"irq=%u, dma=%u, port=%u}",
+					ifr.ifr_map.mem_start,
+					ifr.ifr_map.mem_end,
+					(unsigned) ifr.ifr_map.base_addr,
+					(unsigned) ifr.ifr_map.irq,
+					(unsigned) ifr.ifr_map.dma,
+					(unsigned) ifr.ifr_map.port);
 				break;
 			}
 			tprintf("}");
