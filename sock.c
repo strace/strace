@@ -84,9 +84,7 @@ struct ifreq *ifr;
 }
 
 int
-sock_ioctl(tcp, code, arg)
-struct tcb *tcp;
-long code, arg;
+sock_ioctl(struct tcb *tcp, long code, long arg)
 {
 	struct ifreq ifr;
 	struct ifconf ifc;
@@ -146,6 +144,7 @@ long code, arg;
 	case SIOCGIFMTU:
 	case SIOCGIFSLAVE:
 	case SIOCGIFHWADDR:
+	case SIOCGIFTXQLEN:
 		umove(tcp, tcp->u_arg[2], &ifr);
                 if (syserror(tcp)) {
 			if (code == SIOCGIFNAME)
@@ -203,6 +202,9 @@ long code, arg;
 				break;
 			case SIOCGIFSLAVE:
 				tprintf("ifr_slave=\"%s\"", ifr.ifr_slave);
+				break;
+			case SIOCGIFTXQLEN:
+				tprintf("ifr_qlen=%d", ifr.ifr_qlen);
 				break;
 			}
 			tprintf("}");

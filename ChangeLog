@@ -1,3 +1,7 @@
+2007-01-12  Dmitry V. Levin <ldv@altlinux.org>
+
+	* sock.c (sock_ioctl) [LINUX]: Handle SIOCGIFTXQLEN.
+
 2007-03-16  Roland McGrath  <roland@redhat.com>
 
 	* linux/s390/syscallent.h: Use sys_restart_syscall for 7.
