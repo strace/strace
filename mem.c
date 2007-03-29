@@ -106,6 +106,9 @@ static const struct xlat mmap_flags[] = {
 #ifdef MAP_ANONYMOUS
 	{ MAP_ANONYMOUS,"MAP_ANONYMOUS"	},
 #endif
+#ifdef MAP_32BIT
+	{ MAP_32BIT,	"MAP_32BIT"	},
+#endif
 #ifdef MAP_RENAME
 	{ MAP_RENAME,	"MAP_RENAME"	},
 #endif
