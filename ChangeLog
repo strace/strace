@@ -1,3 +1,9 @@
+2007-05-24  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* strace.c [LINUX] (my_tgkill): New macro.
+	[LINUX] (detach): Use my_tgkill () instead of kill(2).
+	Fixes RH#240962.
+
 2007-03-30  Dmitry V. Levin <ldv@altlinux.org>
 
 	* mem.c (mmap_flags): Add MAP_32BIT.
