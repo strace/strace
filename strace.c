@@ -46,6 +46,21 @@
 #include <limits.h>
 #include <dirent.h>
 
+#ifdef LINUX
+# include <asm/unistd.h>
+# if defined __NR_tgkill
+#  define my_tgkill(pid, tid, sig) syscall (__NR_tgkill, (pid), (tid), (sig))
+# elif defined __NR_tkill
+#  define my_tgkill(pid, tid, sig) syscall (__NR_tkill, (tid), (sig))
+# else
+   /* kill() may choose arbitrarily the target task of the process group
+      while we later wait on a that specific TID.  PID process waits become
+      TID task specific waits for a process under ptrace(2).  */
+#  warning "Neither tkill(2) nor tgkill(2) available, risk of strace hangs!"
+#  define my_tgkill(pid, tid, sig) kill ((tid), (sig))
+# endif
+#endif
+
 #if defined(IA64) && defined(LINUX)
 # include <asm/ptrace_offsets.h>
 #endif
@@ -1322,11 +1337,15 @@ int sig;
 		/* Shouldn't happen. */
 		perror("detach: ptrace(PTRACE_DETACH, ...)");
 	}
-	else if (kill(tcp->pid, 0) < 0) {
+	else if (my_tgkill((tcp->flags & TCB_CLONE_THREAD ? tcp->parent->pid
+							  : tcp->pid),
+			   tcp->pid, 0) < 0) {
 		if (errno != ESRCH)
 			perror("detach: checking sanity");
 	}
-	else if (kill(tcp->pid, SIGSTOP) < 0) {
+	else if (my_tgkill((tcp->flags & TCB_CLONE_THREAD ? tcp->parent->pid
+							  : tcp->pid),
+			   tcp->pid, SIGSTOP) < 0) {
 		if (errno != ESRCH)
 			perror("detach: stopping child");
 	}
