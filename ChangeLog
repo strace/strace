@@ -1,3 +1,24 @@
+2007-06-11  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Never interrupt when the attached traced process would be left stopped.
+	* strace.c (main): `-p' attaching moved to ...
+	(startup_attach): ... a new function, renamed a variable C to TCBI.
+	Block interrupting signals since the first tracee has been attached.
+	New comment about INTERRUPTED in the nonthreaded case.
+	[LINUX] (startup_attach): Check INTERRUPTED after each attached thread.
+	(main): Command spawning moved to ...
+	(startup_child): ... a new function, replaced RETURN with EXIT.
+	[LINUX] (detach): New variable CATCH_SIGSTOP, do not signal
+	new SIGSTOP for processes still in TCB_STARTUP.
+	(main): Move signals and BLOCKED_SET init before the tracees attaching,
+	[SUNOS4] (trace): Removed fixvfork () call as a dead code, SIGSTOP must
+	have been already caught before clearing TCB_STARTUP.
+	(trace): Removed the `!WIFSTOPPED(status)' dead code.
+	Clear TCB_STARTUP only in the case the received signal was SIGSTOP.
+	New comment when `TCB_BPTSET && TCB_STARTUP' combination can be set.
+	Code advisory: Roland McGrath
+	Fixes RH#240986.
+
 2007-05-24  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* strace.c [LINUX] (my_tgkill): New macro.
