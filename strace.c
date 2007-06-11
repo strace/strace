@@ -334,6 +334,280 @@ newoutf(struct tcb *tcp)
 	return 0;
 }
 
+static void
+startup_attach(void)
+{
+	int tcbi;
+	struct tcb *tcp;
+
+	/*
+	 * Block user interruptions as we would leave the traced
+	 * process stopped (process state T) if we would terminate in
+	 * between PTRACE_ATTACH and wait4 () on SIGSTOP.
+	 * We rely on cleanup () from this point on.
+	 */
+	if (interactive)
+		sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+
+	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
+		tcp = tcbtab[tcbi];
+		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
+			continue;
+#ifdef LINUX
+		if (tcp->flags & TCB_CLONE_THREAD)
+			continue;
+#endif
+		/* Reinitialize the output since it may have changed. */
+		tcp->outf = outf;
+		if (newoutf(tcp) < 0)
+			exit(1);
+
+#ifdef USE_PROCFS
+		if (proc_open(tcp, 1) < 0) {
+			fprintf(stderr, "trouble opening proc file\n");
+			droptcb(tcp);
+			continue;
+		}
+#else /* !USE_PROCFS */
+# ifdef LINUX
+		if (followfork) {
+			char procdir[MAXPATHLEN];
+			DIR *dir;
+
+			sprintf(procdir, "/proc/%d/task", tcp->pid);
+			dir = opendir(procdir);
+			if (dir != NULL) {
+				unsigned int ntid = 0, nerr = 0;
+				struct dirent *de;
+				int tid;
+				while ((de = readdir(dir)) != NULL) {
+					if (de->d_fileno == 0 ||
+					    de->d_name[0] == '.')
+						continue;
+					tid = atoi(de->d_name);
+					if (tid <= 0)
+						continue;
+					++ntid;
+					if (ptrace(PTRACE_ATTACH, tid,
+						   (char *) 1, 0) < 0)
+						++nerr;
+					else if (tid != tcbtab[tcbi]->pid) {
+						if (nprocs == tcbtabsize &&
+						    expand_tcbtab())
+							tcp = NULL;
+						else
+							tcp = alloctcb(tid);
+						if (tcp == NULL)
+							exit(1);
+						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
+						tcbtab[tcbi]->nchildren++;
+						tcbtab[tcbi]->nclone_threads++;
+						tcbtab[tcbi]->nclone_detached++;
+						tcp->parent = tcbtab[tcbi];
+					}
+					if (interactive) {
+						sigprocmask(SIG_SETMASK, &empty_set, NULL);
+						if (interrupted)
+							return;
+						sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+					}
+				}
+				closedir(dir);
+				if (nerr == ntid) {
+					perror("attach: ptrace(PTRACE_ATTACH, ...)");
+					droptcb(tcp);
+					continue;
+				}
+				if (!qflag) {
+					ntid -= nerr;
+					if (ntid > 1)
+						fprintf(stderr, "\
+Process %u attached with %u threads - interrupt to quit\n",
+							tcp->pid, ntid);
+					else
+						fprintf(stderr, "\
+Process %u attached - interrupt to quit\n",
+							tcp->pid);
+				}
+				continue;
+			}
+		}
+# endif
+		if (ptrace(PTRACE_ATTACH, tcp->pid, (char *) 1, 0) < 0) {
+			perror("attach: ptrace(PTRACE_ATTACH, ...)");
+			droptcb(tcp);
+			continue;
+		}
+		/* INTERRUPTED is going to be checked at the top of TRACE.  */
+#endif /* !USE_PROCFS */
+		if (!qflag)
+			fprintf(stderr,
+				"Process %u attached - interrupt to quit\n",
+				tcp->pid);
+	}
+
+	if (interactive)
+		sigprocmask(SIG_SETMASK, &empty_set, NULL);
+}
+
+static void
+startup_child (char **argv)
+{
+	struct stat statbuf;
+	const char *filename;
+	char pathname[MAXPATHLEN];
+	int pid = 0;
+	struct tcb *tcp;
+
+	filename = argv[0];
+	if (strchr(filename, '/')) {
+		if (strlen(filename) > sizeof pathname - 1) {
+			errno = ENAMETOOLONG;
+			perror("strace: exec");
+			exit(1);
+		}
+		strcpy(pathname, filename);
+	}
+#ifdef USE_DEBUGGING_EXEC
+	/*
+	 * Debuggers customarily check the current directory
+	 * first regardless of the path but doing that gives
+	 * security geeks a panic attack.
+	 */
+	else if (stat(filename, &statbuf) == 0)
+		strcpy(pathname, filename);
+#endif /* USE_DEBUGGING_EXEC */
+	else {
+		char *path;
+		int m, n, len;
+
+		for (path = getenv("PATH"); path && *path; path += m) {
+			if (strchr(path, ':')) {
+				n = strchr(path, ':') - path;
+				m = n + 1;
+			}
+			else
+				m = n = strlen(path);
+			if (n == 0) {
+				if (!getcwd(pathname, MAXPATHLEN))
+					continue;
+				len = strlen(pathname);
+			}
+			else if (n > sizeof pathname - 1)
+				continue;
+			else {
+				strncpy(pathname, path, n);
+				len = n;
+			}
+			if (len && pathname[len - 1] != '/')
+				pathname[len++] = '/';
+			strcpy(pathname + len, filename);
+			if (stat(pathname, &statbuf) == 0 &&
+			    /* Accept only regular files
+			       with some execute bits set.
+			       XXX not perfect, might still fail */
+			    S_ISREG(statbuf.st_mode) &&
+			    (statbuf.st_mode & 0111))
+				break;
+		}
+	}
+	if (stat(pathname, &statbuf) < 0) {
+		fprintf(stderr, "%s: %s: command not found\n",
+			progname, filename);
+		exit(1);
+	}
+	switch (pid = fork()) {
+	case -1:
+		perror("strace: fork");
+		cleanup();
+		exit(1);
+		break;
+	case 0: {
+#ifdef USE_PROCFS
+		if (outf != stderr) close (fileno (outf));
+#ifdef MIPS
+		/* Kludge for SGI, see proc_open for details. */
+		sa.sa_handler = foobar;
+		sa.sa_flags = 0;
+		sigemptyset(&sa.sa_mask);
+		sigaction(SIGINT, &sa, NULL);
+#endif /* MIPS */
+#ifndef FREEBSD
+		pause();
+#else /* FREEBSD */
+		kill(getpid(), SIGSTOP); /* stop HERE */
+#endif /* FREEBSD */
+#else /* !USE_PROCFS */
+		if (outf!=stderr)
+			close(fileno (outf));
+
+		if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
+			perror("strace: ptrace(PTRACE_TRACEME, ...)");
+			exit(1);
+		}
+		if (debug)
+			kill(getpid(), SIGSTOP);
+
+		if (username != NULL || geteuid() == 0) {
+			uid_t run_euid = run_uid;
+			gid_t run_egid = run_gid;
+
+			if (statbuf.st_mode & S_ISUID)
+				run_euid = statbuf.st_uid;
+			if (statbuf.st_mode & S_ISGID)
+				run_egid = statbuf.st_gid;
+
+			/*
+			 * It is important to set groups before we
+			 * lose privileges on setuid.
+			 */
+			if (username != NULL) {
+				if (initgroups(username, run_gid) < 0) {
+					perror("initgroups");
+					exit(1);
+				}
+				if (setregid(run_gid, run_egid) < 0) {
+					perror("setregid");
+					exit(1);
+				}
+				if (setreuid(run_uid, run_euid) < 0) {
+					perror("setreuid");
+					exit(1);
+				}
+			}
+		}
+		else
+			setreuid(run_uid, run_uid);
+
+		/*
+		 * Induce an immediate stop so that the parent
+		 * will resume us with PTRACE_SYSCALL and display
+		 * this execve call normally.
+		 */
+		kill(getpid(), SIGSTOP);
+#endif /* !USE_PROCFS */
+
+		execv(pathname, argv);
+		perror("strace: exec");
+		_exit(1);
+		break;
+	}
+	default:
+		if ((tcp = alloctcb(pid)) == NULL) {
+			cleanup();
+			exit(1);
+		}
+#ifdef USE_PROCFS
+		if (proc_open(tcp, 0) < 0) {
+			fprintf(stderr, "trouble opening proc file\n");
+			cleanup();
+			exit(1);
+		}
+#endif /* USE_PROCFS */
+		break;
+	}
+}
+
 int
 main(argc, argv)
 int argc;
@@ -532,250 +806,6 @@ char *argv[];
 		qflag = 1;
 	}
 
-	for (c = 0; c < tcbtabsize; c++) {
-		tcp = tcbtab[c];
-		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
-			continue;
-#ifdef LINUX
-		if (tcp->flags & TCB_CLONE_THREAD)
-			continue;
-#endif
-		/* Reinitialize the output since it may have changed. */
-		tcp->outf = outf;
-		if (newoutf(tcp) < 0)
-			exit(1);
-
-#ifdef USE_PROCFS
-		if (proc_open(tcp, 1) < 0) {
-			fprintf(stderr, "trouble opening proc file\n");
-			droptcb(tcp);
-			continue;
-		}
-#else /* !USE_PROCFS */
-# ifdef LINUX
-		if (followfork) {
-			char procdir[MAXPATHLEN];
-			DIR *dir;
-
-			sprintf(procdir, "/proc/%d/task", tcp->pid);
-			dir = opendir(procdir);
-			if (dir != NULL) {
-				unsigned int ntid = 0, nerr = 0;
-				struct dirent *de;
-				int tid;
-				while ((de = readdir(dir)) != NULL) {
-					if (de->d_fileno == 0 ||
-					    de->d_name[0] == '.')
-						continue;
-					tid = atoi(de->d_name);
-					if (tid <= 0)
-						continue;
-					++ntid;
-					if (ptrace(PTRACE_ATTACH, tid,
-						   (char *) 1, 0) < 0)
-						++nerr;
-					else if (tid != tcbtab[c]->pid) {
-						if (nprocs == tcbtabsize &&
-						    expand_tcbtab())
-							tcp = NULL;
-						else
-							tcp = alloctcb(tid);
-						if (tcp == NULL)
-							exit(1);
-						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
-						tcbtab[c]->nchildren++;
-						tcbtab[c]->nclone_threads++;
-						tcbtab[c]->nclone_detached++;
-						tcp->parent = tcbtab[c];
-					}
-				}
-				closedir(dir);
-				if (nerr == ntid) {
-					perror("attach: ptrace(PTRACE_ATTACH, ...)");
-					droptcb(tcp);
-					continue;
-				}
-				if (!qflag) {
-					ntid -= nerr;
-					if (ntid > 1)
-						fprintf(stderr, "\
-Process %u attached with %u threads - interrupt to quit\n",
-							tcp->pid, ntid);
-					else
-						fprintf(stderr, "\
-Process %u attached - interrupt to quit\n",
-							tcp->pid);
-				}
-				continue;
-			}
-		}
-# endif
-		if (ptrace(PTRACE_ATTACH, tcp->pid, (char *) 1, 0) < 0) {
-			perror("attach: ptrace(PTRACE_ATTACH, ...)");
-			droptcb(tcp);
-			continue;
-		}
-#endif /* !USE_PROCFS */
-		if (!qflag)
-			fprintf(stderr,
-				"Process %u attached - interrupt to quit\n",
-				tcp->pid);
-	}
-
-	if (!pflag_seen) {
-		struct stat statbuf;
-		char *filename;
-		char pathname[MAXPATHLEN];
-
-		filename = argv[optind];
-		if (strchr(filename, '/')) {
-			if (strlen(filename) > sizeof pathname - 1) {
-				errno = ENAMETOOLONG;
-				perror("strace: exec");
-				exit(1);
-			}
-			strcpy(pathname, filename);
-		}
-#ifdef USE_DEBUGGING_EXEC
-		/*
-		 * Debuggers customarily check the current directory
-		 * first regardless of the path but doing that gives
-		 * security geeks a panic attack.
-		 */
-		else if (stat(filename, &statbuf) == 0)
-			strcpy(pathname, filename);
-#endif /* USE_DEBUGGING_EXEC */
-		else {
-			char *path;
-			int m, n, len;
-
-			for (path = getenv("PATH"); path && *path; path += m) {
-				if (strchr(path, ':')) {
-					n = strchr(path, ':') - path;
-					m = n + 1;
-				}
-				else
-					m = n = strlen(path);
-				if (n == 0) {
-					if (!getcwd(pathname, MAXPATHLEN))
-						continue;
-					len = strlen(pathname);
-				}
-				else if (n > sizeof pathname - 1)
-					continue;
-				else {
-					strncpy(pathname, path, n);
-					len = n;
-				}
-				if (len && pathname[len - 1] != '/')
-					pathname[len++] = '/';
-				strcpy(pathname + len, filename);
-				if (stat(pathname, &statbuf) == 0 &&
-				    /* Accept only regular files
-				       with some execute bits set.
-				       XXX not perfect, might still fail */
-				    S_ISREG(statbuf.st_mode) &&
-				    (statbuf.st_mode & 0111))
-					break;
-			}
-		}
-		if (stat(pathname, &statbuf) < 0) {
-			fprintf(stderr, "%s: %s: command not found\n",
-				progname, filename);
-			exit(1);
-		}
-		switch (pid = fork()) {
-		case -1:
-			perror("strace: fork");
-			cleanup();
-			exit(1);
-			break;
-		case 0: {
-#ifdef USE_PROCFS
-		        if (outf != stderr) close (fileno (outf));
-#ifdef MIPS
-			/* Kludge for SGI, see proc_open for details. */
-			sa.sa_handler = foobar;
-			sa.sa_flags = 0;
-			sigemptyset(&sa.sa_mask);
-			sigaction(SIGINT, &sa, NULL);
-#endif /* MIPS */
-#ifndef FREEBSD
-			pause();
-#else /* FREEBSD */
-			kill(getpid(), SIGSTOP); /* stop HERE */
-#endif /* FREEBSD */
-#else /* !USE_PROCFS */
-			if (outf!=stderr)
-				close(fileno (outf));
-
-			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
-				perror("strace: ptrace(PTRACE_TRACEME, ...)");
-				return -1;
-			}
-			if (debug)
-				kill(getpid(), SIGSTOP);
-
-			if (username != NULL || geteuid() == 0) {
-				uid_t run_euid = run_uid;
-				gid_t run_egid = run_gid;
-
-				if (statbuf.st_mode & S_ISUID)
-					run_euid = statbuf.st_uid;
-				if (statbuf.st_mode & S_ISGID)
-					run_egid = statbuf.st_gid;
-
-				/*
-				 * It is important to set groups before we
-				 * lose privileges on setuid.
-				 */
-				if (username != NULL) {
-					if (initgroups(username, run_gid) < 0) {
-						perror("initgroups");
-						exit(1);
-					}
-					if (setregid(run_gid, run_egid) < 0) {
-						perror("setregid");
-						exit(1);
-					}
-					if (setreuid(run_uid, run_euid) < 0) {
-						perror("setreuid");
-						exit(1);
-					}
-				}
-			}
-			else
-				setreuid(run_uid, run_uid);
-
-			/*
-			 * Induce an immediate stop so that the parent
-			 * will resume us with PTRACE_SYSCALL and display
-			 * this execve call normally.
-			 */
-			kill(getpid(), SIGSTOP);
-#endif /* !USE_PROCFS */
-
-			execv(pathname, &argv[optind]);
-			perror("strace: exec");
-			_exit(1);
-			break;
-		}
-		default:
-			if ((tcp = alloctcb(pid)) == NULL) {
-				cleanup();
-				exit(1);
-			}
-#ifdef USE_PROCFS
-			if (proc_open(tcp, 0) < 0) {
-				fprintf(stderr, "trouble opening proc file\n");
-				cleanup();
-				exit(1);
-			}
-#endif /* USE_PROCFS */
-			break;
-		}
-	}
-
 	sigemptyset(&empty_set);
 	sigemptyset(&blocked_set);
 	sa.sa_handler = SIG_IGN;
@@ -812,6 +842,11 @@ Process %u attached - interrupt to quit\n",
 	sa.sa_handler = SIG_DFL;
 	sigaction(SIGCHLD, &sa, NULL);
 #endif /* USE_PROCFS */
+
+	if (pflag_seen)
+		startup_attach();
+	else
+		startup_child(&argv[optind]);
 
 	if (trace() < 0)
 		exit(1);
@@ -1306,7 +1341,7 @@ int sig;
 {
 	int error = 0;
 #ifdef LINUX
-	int status, resumed;
+	int status, resumed, catch_sigstop;
 	struct tcb *zombie = NULL;
 
 	/* If the group leader is lingering only because of this other
@@ -1330,6 +1365,12 @@ int sig;
 #undef PTRACE_DETACH
 #define PTRACE_DETACH PTRACE_SUNDETACH
 #endif
+	/*
+	 * On TCB_STARTUP we did PTRACE_ATTACH but still did not get the
+	 * expected SIGSTOP.  We must catch exactly one as otherwise the
+	 * detached process would be left stopped (process state T).
+	 */
+	catch_sigstop = (tcp->flags & TCB_STARTUP);
 	if ((error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig)) == 0) {
 		/* On a clear day, you can see forever. */
 	}
@@ -1343,13 +1384,15 @@ int sig;
 		if (errno != ESRCH)
 			perror("detach: checking sanity");
 	}
-	else if (my_tgkill((tcp->flags & TCB_CLONE_THREAD ? tcp->parent->pid
-							  : tcp->pid),
-			   tcp->pid, SIGSTOP) < 0) {
+	else if (!catch_sigstop && my_tgkill((tcp->flags & TCB_CLONE_THREAD
+					      ? tcp->parent->pid : tcp->pid),
+					     tcp->pid, SIGSTOP) < 0) {
 		if (errno != ESRCH)
 			perror("detach: stopping child");
 	}
-	else {
+	else
+		catch_sigstop = 1;
+	if (catch_sigstop)
 		for (;;) {
 #ifdef __WALL
 			if (wait4(tcp->pid, &status, __WALL, NULL) < 0) {
@@ -1400,7 +1443,6 @@ int sig;
 				break;
 			}
 		}
-	}
 #endif /* LINUX */
 
 #if defined(SUNOS4)
@@ -2121,6 +2163,8 @@ trace()
 #endif /* LINUX */
 
 	while (nprocs != 0) {
+		if (interrupted)
+			return 0;
 		if (interactive)
 			sigprocmask(SIG_SETMASK, &empty_set, NULL);
 #ifdef LINUX
@@ -2152,9 +2196,6 @@ trace()
 		wait_errno = errno;
 		if (interactive)
 			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
-
-		if (interrupted)
-			return 0;
 
 		if (pid == -1) {
 			switch (wait_errno) {
@@ -2301,35 +2342,24 @@ Process %d attached (waiting for parent)\n",
 			fprintf(stderr, "pid %u stopped, [%s]\n",
 				pid, signame(WSTOPSIG(status)));
 
-		if (tcp->flags & TCB_STARTUP) {
+		/*
+		 * Interestingly, the process may stop
+		 * with STOPSIG equal to some other signal
+		 * than SIGSTOP if we happend to attach
+		 * just before the process takes a signal.
+		 */
+		if ((tcp->flags & TCB_STARTUP) && WSTOPSIG(status) == SIGSTOP) {
 			/*
 			 * This flag is there to keep us in sync.
 			 * Next time this process stops it should
 			 * really be entering a system call.
 			 */
 			tcp->flags &= ~TCB_STARTUP;
-			if (tcp->flags & TCB_ATTACHED) {
-				/*
-				 * Interestingly, the process may stop
-				 * with STOPSIG equal to some other signal
-				 * than SIGSTOP if we happend to attach
-				 * just before the process takes a signal.
-				 */
-				if (!WIFSTOPPED(status)) {
-					fprintf(stderr,
-						"pid %u not stopped\n", pid);
-					detach(tcp, WSTOPSIG(status));
-					continue;
-				}
-			}
-			else {
-#ifdef SUNOS4
-				/* A child of us stopped at exec */
-				if (WSTOPSIG(status) == SIGTRAP && followvfork)
-					fixvfork(tcp);
-#endif /* SUNOS4 */
-			}
 			if (tcp->flags & TCB_BPTSET) {
+				/*
+				 * One example is a breakpoint inherited from
+				 * parent through fork ().
+				 */
 				if (clearbpt(tcp) < 0) /* Pretty fatal */ {
 					droptcb(tcp);
 					cleanup();
@@ -2404,6 +2434,9 @@ Process %d attached (waiting for parent)\n",
 			tcp->flags &= ~TCB_SUSPENDED;
 			continue;
 		}
+		/* we handled the STATUS, we are permitted to interrupt now. */
+		if (interrupted)
+			return 0;
 		if (trace_syscall(tcp) < 0) {
 			if (tcp->flags & TCB_ATTACHED)
 				detach(tcp, 0);
