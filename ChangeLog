@@ -1,3 +1,8 @@
+2007-06-28  Dmitry V. Levin <ldv@altlinux.org>
+
+	* util.c (tv_mul): Multiply tv_usec properly.
+	Patch from Cai Fei <caifei@cn.fujitsu.com>.
+
 2007-06-11  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Never interrupt when the attached traced process would be left stopped.

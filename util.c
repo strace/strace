@@ -227,7 +227,7 @@ struct timeval *tv, *a;
 int n;
 {
 	tv->tv_usec = a->tv_usec * n;
-	tv->tv_sec = a->tv_sec * n + a->tv_usec / 1000000;
+	tv->tv_sec = a->tv_sec * n + tv->tv_usec / 1000000;
 	tv->tv_usec %= 1000000;
 }
 
