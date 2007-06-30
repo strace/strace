@@ -15,7 +15,7 @@ INCLUDES = -I$(OS)/$(ARCH) -I$(srcdir)/$(OS)/$(ARCH) -I$(OS) -I$(srcdir)/$(OS)
 strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
 		 io.c ioctl.c mem.c net.c process.c bjm.c quota.c \
 		 resource.c signal.c sock.c system.c term.c time.c \
-		 proc.c stream.c
+		 proc.c scsi.c stream.c
 noinst_HEADERS = defs.h
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \

@@ -1,3 +1,12 @@
+2007-03-29  Vladimir Nadvornik <nadvornik@suse.cz>
+	    Dmitry V. Levin <ldv@altlinux.org>
+
+	Trace linux SG_IO ioctl arguments and results.
+	* scsi.c: New file.
+	* Makefile.am (strace_SOURCES): Add scsi.c
+	* defs.h (scsi_ioctl): New function.
+	* ioctl.c (ioctl_decode): Use scsi_ioctl().
+
 2007-06-28  Dmitry V. Levin <ldv@altlinux.org>
 
 	* util.c (tv_mul): Multiply tv_usec properly.
