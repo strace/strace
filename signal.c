@@ -1435,7 +1435,11 @@ struct tcb *tcp;
 		if (umove(tcp, sp, &sc) < 0)
 		  	return 0;
 		tcp->u_arg[0] = 1;
+# ifdef HAVE_STRUCT_SIGCONTEXT_SC_HI2
+		tcp->u_arg[1] = sc.sc_hi2;
+# else
 		tcp->u_arg[1] = sc.sc_sigset;
+# endif
 	} else {
 	  	tcp->u_rval = tcp->u_error = 0;
 		if(tcp->u_arg[0] == 0)
