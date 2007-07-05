@@ -1,5 +1,7 @@
 2007-07-05  Roland McGrath  <roland@redhat.com>
 
+	* .cvsignore: Add some automake-created files.
+
 	* file.c (sys_utime): Use personality_wordsize to handle biarch.
 	Fixes RH#247185.
 
