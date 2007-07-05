@@ -1193,7 +1193,7 @@ sys_newfstatat(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
-#ifdef HAVE_STAT64
+#if defined HAVE_STAT64 && !(defined POWERPC && defined __powerpc64__)
 		printstat64(tcp, tcp->u_arg[2]);
 #else
 		printstat(tcp, tcp->u_arg[2]);
