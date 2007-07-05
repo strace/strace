@@ -1,5 +1,24 @@
 2007-07-05  Roland McGrath  <roland@redhat.com>
 
+	* linux/syscallent.h: Fix sys_delete_module arg count.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/arm/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/m68k/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+	* linux/sparc64/syscallent2.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+	* linux/dummy.h (sys_delete_module): Use sys_open.
+	From Johannes Stezenbach <js@linuxtv.org>.
+
 	* configure.ac: Check for struct sigcontext.sc_hi2.
 	* signal.c (sys_sigreturn) [MIPS]: Use sc_hi2 vs sc_sigset if found.
 
