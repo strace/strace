@@ -1,5 +1,12 @@
 2007-07-05  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: Use <stddef.h> before <linux/socket.h>.
+
+	* debian/changelog: Harmonize with debian version.
+	* debian/control (Uploaders): Fix surname spelling.
+	(Build-Depends): Make debhelper requirement (>= 5.0.0).
+	(Standards-Version): Update to 3.7.2.
+
 	* .cvsignore: Add some automake-created files.
 
 	* file.c (sys_utime): Use personality_wordsize to handle biarch.
