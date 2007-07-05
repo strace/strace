@@ -8,3 +8,8 @@ Makefile
 tags
 strace
 autom4te.cache
+Makefile.in
+aclocal.m4
+depcomp
+missing
+mkinstalldirs
