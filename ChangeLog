@@ -1,4 +1,7 @@
-2007-07-05  Roland McGrath  <roland@frob.com>
+2007-07-05  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Check for struct sigcontext.sc_hi2.
+	* signal.c (sys_sigreturn) [MIPS]: Use sc_hi2 vs sc_sigset if found.
 
 	* process.c [LINUX] (futexops): Add many new values.
 	[LINUX] (futexwakeops, futexwakecmps): New tables.
