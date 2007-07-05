@@ -220,7 +220,7 @@
 	{ 1,	0,	sys_adjtimex,	"adjtimex" },		/* 219 */
 	{ 3,	TS,	sys_sigprocmask,"sigprocmask" },	/* 220 */
 	{ 2,	0,	sys_create_module,"create_module" },	/* 221 */
-	{ 1,	0,	sys_delete_module,"delete_module" },
+	{ 2,	0,	sys_delete_module,"delete_module" },
 	{ 1,	0,	sys_get_kernel_syms,"get_kernel_syms"},	/* 223 */
 	{ 1,	0,	sys_getpgid,	"getpgid" },		/* 224 */
 	{ 0,	0,	sys_bdflush,	"bdflush" },		/* 225 */

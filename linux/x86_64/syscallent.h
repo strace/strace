@@ -174,7 +174,7 @@
 	{ 3,	0,	sys_ioperm,		"ioperm"	},  /* 173 */
 	{ 2,	0,	sys_create_module,	"create_module"	},  /* 174 */
 	{ 3,	0,	sys_init_module,	"init_module"	},  /* 175 */
-	{ 1,	0,	sys_delete_module,	"delete_module"	},  /* 176 */
+	{ 2,	0,	sys_delete_module,	"delete_module"	},  /* 176 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"},  /* 177 */
 	{ 5,	0,	sys_query_module,	"query_module"	},  /* 178 */
 	{ 4,	0,	sys_quotactl,		"quotactl"	},  /* 179 */

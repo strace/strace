@@ -940,7 +940,7 @@
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 1131 */
 	{ 2,	0,	sys_create_module,	"create_module"	}, /* 1132 */
 	{ 4,	0,	sys_init_module,	"init_module"	}, /* 1133 */
-	{ 1,	0,	sys_delete_module,	"delete_module"	}, /* 1134 */
+	{ 2,	0,	sys_delete_module,	"delete_module"	}, /* 1134 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 1135 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 1136 */
 	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 1137 */

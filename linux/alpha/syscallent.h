@@ -336,7 +336,7 @@
 	{ 3,	TD,	sys_getdents,		"getdents"		}, /* 305 */
 	{ 2,	0,	sys_create_module,	"create_module"		}, /* 306 */
 	{ 4,	0,	sys_init_module,	"init_module"		}, /* 307 */
-	{ 1,	0,	sys_delete_module,	"delete_module"		}, /* 308 */
+	{ 2,	0,	sys_delete_module,	"delete_module"		}, /* 308 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"	}, /* 309 */
 	{ 3,	0,	sys_syslog,		"syslog"		}, /* 310 */
 	{ 3,	0,	sys_reboot,		"reboot"		}, /* 311 */
