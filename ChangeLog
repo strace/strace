@@ -20,6 +20,10 @@
 	* test/leaderkill.c: New file.
 	* test/.cvsignore, test/Makefile: Add it.
 
+2007-03-21  Andreas Schwab  <schwab@suse.de>
+
+	* file.c (sys_newfstatat): Don't use printstat64 on ppc64.
+
 2007-03-29  Vladimir Nadvornik <nadvornik@suse.cz>
 	    Dmitry V. Levin <ldv@altlinux.org>
 
