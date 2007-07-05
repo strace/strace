@@ -1,3 +1,11 @@
+2007-07-05  Roland McGrath  <roland@frob.com>
+
+	* process.c [LINUX] (futexops): Add many new values.
+	[LINUX] (futexwakeops, futexwakecmps): New tables.
+	[LINUX] (sys_futex): Use them.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#241467.
+
 2007-07-05  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* strace.c (detach): New prototype.  Extended the function comment.
