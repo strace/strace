@@ -1,12 +1,26 @@
-strace (4.5.15-1) unstable; urgency=low
+strace (4.5.15-1) unstable; urgency=high
 
+  [ Roland McGrath ]
   * New upstream version.
     + Fix -ff -o behavior, closes: #353935.
     + Fail when nonoption args follow -p switches, closes: #361302.
     + Fix semtimedop, closes: #340239.
     + ARM support fixes, closes: #360152, #360154.
 
- -- Roland McGrath <frob@debian.org>  Tue, 16 Jan 2007 15:24:14 -0800
+  [ Frederik Schüler ]
+  * Fix configure script, closes: #428997
+
+ -- Frederik Schüler <fs@debian.org>  Fri, 22 Jun 2007 16:28:08 +0000
+
+strace (4.5.14-2) unstable; urgency=low
+
+  * New comaintainer.
+  * Fix build failure with linux-2.6.18, thanks to Andreas Henriksson for the
+    patch, closes: #392556.
+  * Fix build with libc6 2.5.
+  * Acknowledge NMUs, closes: #315500, #355733
+
+ -- Frederik Schüler <fs@debian.org>  Thu, 26 Oct 2006 22:11:25 +0200
 
 strace (4.5.14-1) unstable; urgency=low
 
