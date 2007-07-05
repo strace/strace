@@ -1,5 +1,11 @@
 2007-07-05  Roland McGrath  <roland@redhat.com>
 
+	* file.c (sys_utime): Use personality_wordsize to handle biarch.
+	Fixes RH#247185.
+
+	* signal.c (sys_sigreturn) [MIPS]: Pass 3rd arg to sprintsigmask.
+	From Zhang Le <zhilg@users.sourceforge.net>.
+
 	* strace.c (strace_fopen): [_LFS64_LARGEFILE]: Use fopen64.
 	Fixes Debian#385310.
 
