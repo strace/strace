@@ -1,5 +1,7 @@
 2007-07-05  Roland McGrath  <roland@redhat.com>
 
+	* debian/rules: Use debian/$(package) instead of debian/tmp as temp dir.
+
 	* configure.ac: Use <stddef.h> before <linux/socket.h>.
 
 	* debian/changelog: Harmonize with debian version.
