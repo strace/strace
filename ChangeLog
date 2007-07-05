@@ -1,5 +1,8 @@
 2007-07-05  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (strace_fopen): [_LFS64_LARGEFILE]: Use fopen64.
+	Fixes Debian#385310.
+
 	* strace.c (main): Fix error message for unfound -u user.
 	From Srinivasa Ds <srinivasa@in.ibm.com>.
 	Fixes RH#247170.
