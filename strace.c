@@ -766,7 +766,7 @@ char *argv[];
 		}
 		if ((pent = getpwnam(username)) == NULL) {
 			fprintf(stderr, "%s: cannot find user `%s'\n",
-				progname, optarg);
+				progname, username);
 			exit(1);
 		}
 		run_uid = pent->pw_uid;
