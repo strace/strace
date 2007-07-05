@@ -98,6 +98,7 @@ unsigned int nprocs, tcbtabsize;
 char *progname;
 extern char **environ;
 
+static int detach P((struct tcb *tcp, int sig));
 static int trace P((void));
 static void cleanup P((void));
 static void interrupt P((int sig));
@@ -1332,7 +1333,10 @@ struct tcb *tcp;
 
 #endif /* !USE_PROCFS */
 
-/* detach traced process; continue with sig */
+/* detach traced process; continue with sig
+   Never call DETACH twice on the same process as both unattached and
+   attached-unstopped processes give the same ESRCH.  For unattached process we
+   would SIGSTOP it and wait for its SIGSTOP notification forever.  */
 
 static int
 detach(tcp, sig)
@@ -1521,8 +1525,10 @@ int sig;
 	droptcb(tcp);
 
 #ifdef LINUX
-	if (zombie != NULL)
-		error = detach(zombie) || error;
+	if (zombie != NULL) {
+		/* TCP no longer exists therefore you must not detach () it.  */
+		droptcb(zombie);
+	}
 #endif
 
 	return error;
@@ -2096,14 +2102,16 @@ handle_group_exit(struct tcb *tcp, int sig)
 			fprintf(stderr,
 				"PANIC: handle_group_exit: %d leader %d\n",
 				tcp->pid, leader ? leader->pid : -1);
-		detach(tcp);	/* Already died.  */
+		/* TCP no longer exists therefore you must not detach () it.  */
+		droptcb(tcp);	/* Already died.  */
 	}
 	else {
 		/* Mark that we are taking the process down.  */
 		tcp->flags |= TCB_EXITING | TCB_GROUP_EXITING;
 		if (tcp->flags & TCB_ATTACHED) {
 		  	if (leader != NULL && leader != tcp) {
-				if (leader->flags & TCB_ATTACHED) {
+				if ((leader->flags & TCB_ATTACHED) &&
+				    !(leader->flags & TCB_EXITING)) {
 					/* We need to detach the leader so
 					   that the process death will be
 					   reported to its real parent.
@@ -2115,7 +2123,10 @@ handle_group_exit(struct tcb *tcp, int sig)
 					   stopped.  Then the value we pass
 					   in PTRACE_DETACH just sets the
 					   death signal reported to the
-					   real parent.  */
+					   real parent.
+					   FIXME: This killing gets caught by
+					   WAITPID of the leader's parent.
+					   Testcase: test/leaderkill.c  */
 					ptrace(PTRACE_KILL, leader->pid, 0, 0);
 					if (debug)
 						fprintf(stderr,
