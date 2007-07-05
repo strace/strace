@@ -236,13 +236,19 @@ swap_uid(void)
 #endif
 }
 
+#if _LFS64_LARGEFILE
+# define fopen_for_output fopen64
+#else
+# define fopen_for_output fopen
+#endif
+
 static FILE *
 strace_fopen(const char *path, const char *mode)
 {
 	FILE *fp;
 
 	swap_uid();
-	if ((fp = fopen(path, mode)) == NULL)
+	if ((fp = fopen_for_output(path, mode)) == NULL)
 		fprintf(stderr, "%s: can't fopen '%s': %s\n",
 			progname, path, strerror(errno));
 	swap_uid();
