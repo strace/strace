@@ -1,5 +1,9 @@
 2007-07-11  Roland McGrath  <roland@redhat.com>
 
+	* count.c (call_summary_pers): Use tv_float conversion for output of
+	cumulative time, in case it is negative from bogus -O value.
+	From Lai JiangShan <laijs@cn.fujitsu.com>.
+
 	* strace.c (handle_group_exit): Detach TCP before LEADER.
 	Don't use PTRACE_KILL on LEADER.
 
