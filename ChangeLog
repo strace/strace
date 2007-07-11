@@ -1,5 +1,8 @@
 2007-07-11  Roland McGrath  <roland@redhat.com>
 
+	* strace.c (handle_group_exit): Detach TCP before LEADER.
+	Don't use PTRACE_KILL on LEADER.
+
 	* util.c (printstr): Fix size calculation for outstr allocation.
 
 	* configure.ac (struct sigcontext.sc_hi2): Use #ifdef around
