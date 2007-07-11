@@ -449,13 +449,14 @@ int len;
 	}
 	if (!str) {
 		if ((str = malloc(max_strlen)) == NULL
-		    || (outstr = malloc(2*max_strlen)) == NULL) {
+		    || (outstr = malloc(4*max_strlen
+					+ sizeof "\"\"...")) == NULL) {
 			fprintf(stderr, "out of memory\n");
 			tprintf("%#lx", addr);
 			return;
 		}
 	}
-	outend = outstr + max_strlen * 2 - 10;
+	outend = outstr + max_strlen * 4;
 	if (len < 0) {
 		n = max_strlen;
 		if (umovestr(tcp, addr, n, (char *) str) < 0) {
