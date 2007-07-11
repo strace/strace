@@ -205,9 +205,8 @@ call_summary_pers(FILE *outf)
 				error_str[0] = '\0';
 			percent = (100.0 * tv_float(&counts[j].time)
 				   / tv_float(&tv_cum));
-			fprintf(outf, "%6.2f %4ld.%06ld %11ld %9d %9.9s %s\n",
-				percent, (long) counts[j].time.tv_sec,
-				(long) counts[j].time.tv_usec,
+			fprintf(outf, "%6.2f %11.6f %11ld %9d %9.9s %s\n",
+				percent, tv_float(&counts[j].time),
 				(long) 1000000 * dtv.tv_sec + dtv.tv_usec,
 				counts[j].calls,
 				error_str, sysent[j].sys_name);
@@ -221,8 +220,8 @@ call_summary_pers(FILE *outf)
 		sprintf(error_str, "%d", error_cum);
 	else
 		error_str[0] = '\0';
-	fprintf(outf, "%6.6s %4ld.%06ld %11.11s %9d %9.9s %s\n",
-		"100.00", (long) tv_cum.tv_sec, (long) tv_cum.tv_usec, "",
+	fprintf(outf, "%6.6s %11.6f %11.11s %9d %9.9s %s\n",
+		"100.00", tv_float(&tv_cum), "",
 		call_cum, error_str, "total");
 }
 
