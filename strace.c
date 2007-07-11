@@ -2115,35 +2115,22 @@ handle_group_exit(struct tcb *tcp, int sig)
 		/* Mark that we are taking the process down.  */
 		tcp->flags |= TCB_EXITING | TCB_GROUP_EXITING;
 		if (tcp->flags & TCB_ATTACHED) {
+			detach(tcp, sig);
 		  	if (leader != NULL && leader != tcp) {
 				if ((leader->flags & TCB_ATTACHED) &&
 				    !(leader->flags & TCB_EXITING)) {
 					/* We need to detach the leader so
 					   that the process death will be
-					   reported to its real parent.
-					   But we kill it first to prevent
-					   it doing anything before we kill
-					   the whole process in a moment.
-					   We can use PTRACE_KILL on a
-					   thread that's not already
-					   stopped.  Then the value we pass
-					   in PTRACE_DETACH just sets the
-					   death signal reported to the
-					   real parent.
-					   FIXME: This killing gets caught by
-					   WAITPID of the leader's parent.
-					   Testcase: test/leaderkill.c  */
-					ptrace(PTRACE_KILL, leader->pid, 0, 0);
+					   reported to its real parent.  */
 					if (debug)
 						fprintf(stderr,
-							" [%d exit %d kills %d]\n",
+							" [%d exit %d detaches %d]\n",
 							tcp->pid, sig, leader->pid);
 					detach(leader, sig);
 				}
 				else
 					leader->flags |= TCB_GROUP_EXITING;
 			}
-			detach(tcp, sig);
 		}
 		else if (ptrace(PTRACE_CONT, tcp->pid, (char *) 1, sig) < 0) {
 			perror("strace: ptrace(PTRACE_CONT, ...)");
