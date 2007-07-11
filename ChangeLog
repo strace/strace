@@ -1,3 +1,8 @@
+2007-07-11  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (struct sigcontext.sc_hi2): Use #ifdef around
+	<asm/sigcontext.h> to match signal.c include conditions.
+
 2007-07-05  Roland McGrath  <roland@redhat.com>
 
 	* debian/rules: Use debian/$(package) instead of debian/tmp as temp dir.
