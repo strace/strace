@@ -220,7 +220,9 @@ AC_CHECK_TYPES([struct user_desc],,, [#include <asm/ldt.h>])
 AC_CHECK_MEMBERS([struct dqblk.dqb_curblocks],,, [#include <sys/quota.h>])
 
 AC_CHECK_MEMBERS([struct sigcontext.sc_hi2],,, [#include <signal.h>
-#include <asm/sigcontext.h>])
+#ifdef HAVE_ASM_SIGCONTEXT_H
+# include <asm/sigcontext.h>
+#endif])
 
 
 AC_CHECK_DECLS([sys_errlist])
