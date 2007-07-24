@@ -1,5 +1,7 @@
 2007-07-23  Roland McGrath  <roland@redhat.com>
 
+	* time.c (printtv_bitness): SPECIAL only counts when tv_sec == 0.
+
 	* linux/arm/syscallent.h: Add move_pages.
 	* linux/hppa/syscallent.h: Likewise.
 	* linux/ia64/syscallent.h: Likewise.
@@ -17,6 +19,30 @@
 	* linux/x86_64/syscallent.h: Likewise.
 
 2007-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* defs.h: Add new parameter to printtv_bitness prototype.
+	(printttv): Pass zero for the new parameter.
+	(printtv_special): New macro.
+	* desc.c (decode_select): Pass zero for the new parameter of
+	printtv_bitness.
+	* file.c (utimensatflags): New macro.
+	(sys_osf_utimes): Pass zero for the new parameter of
+	printtv_bitness.
+	(sys_utimes): Likewise.
+	(sys_futimesat): Likewise.
+	(decode_utimes): Add new parameter.  Pass it to the
+	printtv_bitness calls.  Fix printing of time values.
+	(sys_utimensat): New function.
+	* time.c (UTIME_NOW, UTIME_OMIT): Define if not already
+	happened.
+	(printtv_bitness): Add new parameter.  Print special UTIME_*
+	values as strings if set.
+	(sys_osf_gettimeofday): Pass zero for the new parameter of
+	printtv_bitness.
+	(sys_osf_settimeofday): Likewise.
+	* linux/syscall.h: Declare sys_utimensat.
+	* linux/syscallent.h: Add utimensat entry.
+	* linux/x86_64/syscallent.h: Likewise.
 
 	* mem.c (move_pages_flags): New variable.
 	(sys_move_pages): New function.
