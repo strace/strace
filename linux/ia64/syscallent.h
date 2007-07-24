@@ -1082,7 +1082,7 @@
 	{ 5,	0,	printargs,		"keyctl"	}, /* 1273 */
 	{ 3,	0,	printargs,		"ioprio_set"	}, /* 1274 */
 	{ 2,	0,	printargs,		"ioprio_get"	}, /* 1275 */
-	{ 8,	0,	printargs,		"SYS_1276"	}, /* 1276 */
+	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 1276 */
 	{ 0,	TD,	printargs,		"inotify_init"	}, /* 1277 */
 	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 1278 */
 	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 1279 */

@@ -339,7 +339,7 @@
 	{ 5,	0,	printargs,		"SYS_307"	}, /* 307 */
 	{ 5,	0,	printargs,		"SYS_308"	}, /* 308 */
 	{ 5,	0,	printargs,		"SYS_309"	}, /* 309 */
-	{ 5,	0,	printargs,		"SYS_310"	}, /* 310 */
+	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 310 */
 	{ 5,	0,	printargs,		"SYS_311"	}, /* 311 */
 	{ 5,	0,	printargs,		"SYS_312"	}, /* 312 */
 	{ 5,	0,	printargs,		"SYS_313"	}, /* 313 */

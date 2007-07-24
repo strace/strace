@@ -330,7 +330,7 @@
 	{ 3,	TD|TF,	sys_faccessat,		"faccessat"		}, /* 298 */
 	{ 2,	0,	printargs,		"set_robust_list"	}, /* 299 */
 	{ 3,	0,	printargs,		"get_robust_list"	}, /* 300 */
-	{ 5,	0,	printargs,		"SYS_301"		}, /* 301 */
+	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 301 */
 	{ 5,	0,	printargs,		"SYS_302"		}, /* 302 */
 	{ 5,	0,	printargs,		"SYS_303"		}, /* 303 */
 	{ 5,	0,	printargs,		"SYS_304"		}, /* 304 */

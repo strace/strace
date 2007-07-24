@@ -339,7 +339,7 @@
 	{ 4,	TD,	printargs,		"tee"		}, /* 308 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 309 */
 
-	{ 5,	0,	printargs,		"SYS_310"	}, /* 310 */
+	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 310 */
 	{ 5,	0,	printargs,		"SYS_311"	}, /* 311 */
 	{ 5,	0,	printargs,		"SYS_312"	}, /* 312 */
 	{ 5,	0,	printargs,		"SYS_313"	}, /* 313 */

@@ -4306,7 +4306,7 @@
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 4305 */
 	{ 0,	0,	printargs,		"SYS_4306"	}, /* 4306 */
 	{ 0,	0,	printargs,		"SYS_4307"	}, /* 4307 */
-	{ 0,	0,	printargs,		"SYS_4308"	}, /* 4308 */
+	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 4308 */
 	{ 0,	0,	printargs,		"SYS_4309"	}, /* 4309 */
 	{ 0,	0,	printargs,		"SYS_4310"	}, /* 4310 */
 	{ 0,	0,	printargs,		"SYS_4311"	}, /* 4311 */

@@ -300,3 +300,4 @@
 	{ 4,	TD,	printargs,		"sync_file_range"	}, /* 292 */
 	{ 4,	TD,	printargs,		"tee"			}, /* 293 */
 	{ 4,	TD,	printargs,		"vmsplice"		}, /* 294 */
+	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 295 */
