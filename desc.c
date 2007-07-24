@@ -476,7 +476,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		}
 		free(fds);
 		tprintf(", ");
-		printtv_bitness(tcp, args[4], bitness);
+		printtv_bitness(tcp, args[4], bitness, 0);
 	}
 	else
 	{

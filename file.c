@@ -1184,6 +1184,7 @@ static const struct xlat fstatatflags[] = {
 	{ AT_SYMLINK_NOFOLLOW,	"AT_SYMLINK_NOFOLLOW"	},
 	{ 0,			NULL			},
 };
+#define utimensatflags fstatatflags
 
 int
 sys_newfstatat(struct tcb *tcp)
@@ -2087,19 +2088,30 @@ struct tcb *tcp;
     if (entering(tcp)) {
 	printpath(tcp, tcp->u_arg[0]);
 	tprintf(", ");
-	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
+	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32,  0);
     }
     return 0;
 }
 #endif
 
 static int
-decode_utimes(struct tcb *tcp, int offset)
+decode_utimes(struct tcb *tcp, int offset, int special)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", ");
-		printtv(tcp, tcp->u_arg[offset + 1]);
+		if (tcp->u_arg[offset + 1] == 0)
+			tprintf("NULL");
+		else {
+			tprintf("{");
+			printtv_bitness(tcp, tcp->u_arg[offset + 1],
+					BITNESS_CURRENT, special);
+			tprintf(", ");
+			printtv_bitness(tcp, tcp->u_arg[offset + 1]	
+					+ sizeof (struct timeval),
+					BITNESS_CURRENT, special);
+			tprintf("}");
+		}
 	}
 	return 0;
 }
@@ -2107,7 +2119,7 @@ decode_utimes(struct tcb *tcp, int offset)
 int
 sys_utimes(struct tcb *tcp)
 {
-	return decode_utimes(tcp, 0);
+	return decode_utimes(tcp, 0, 0);
 }
 
 #ifdef LINUX
@@ -2116,7 +2128,19 @@ sys_futimesat(struct tcb *tcp)
 {
 	if (entering(tcp))
 		print_dirfd(tcp->u_arg[0]);
-	return decode_utimes(tcp, 1);
+	return decode_utimes(tcp, 1, 0);
+}
+
+int
+sys_utimensat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_dirfd(tcp->u_arg[0]);
+		decode_utimes(tcp, 1, 1);
+		tprintf(", ");
+		printflags(utimensatflags, tcp->u_arg[3], "AT_???");
+	}
+	return 0;
 }
 #endif
 

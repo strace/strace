@@ -278,3 +278,4 @@
 	{ 4,	TD,	printargs,		"tee"		}, /* 277 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 278 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 279 */
+	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 280 */

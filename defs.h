@@ -453,7 +453,7 @@ extern void printnum P((struct tcb *, long, char *));
 extern void printnum_int P((struct tcb *, long, char *));
 extern void printpath P((struct tcb *, long));
 extern void printpathn P((struct tcb *, long, int));
-extern void printtv_bitness P((struct tcb *, long, enum bitness_t));
+extern void printtv_bitness P((struct tcb *, long, enum bitness_t, int));
 extern void sprinttv P((struct tcb *, long, enum bitness_t, char *));
 #ifdef HAVE_SIGINFO_T
 extern void printsiginfo P((siginfo_t *, int));
@@ -519,7 +519,9 @@ extern int proc_open P((struct tcb *tcp, int attaching));
 	umoven((pid), (addr), sizeof *(objp), (char *) (objp))
 
 #define printtv(tcp, addr)	\
-	printtv_bitness((tcp), (addr), BITNESS_CURRENT)
+	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 0)
+#define printtv_special(tcp, addr)	\
+	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 
 #ifdef __STDC__
 #ifdef __GNUC__

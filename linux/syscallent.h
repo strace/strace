@@ -350,7 +350,7 @@
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 317 */
 	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
 	{ 5,	0,	printargs,		"SYS_319"	}, /* 319 */
-	{ 5,	0,	printargs,		"SYS_320"	}, /* 320 */
+	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 320 */
 	{ 5,	0,	printargs,		"SYS_321"	}, /* 321 */
 	{ 5,	0,	printargs,		"SYS_322"	}, /* 322 */
 	{ 5,	0,	printargs,		"SYS_323"	}, /* 323 */

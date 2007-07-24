@@ -36,6 +36,13 @@
 #include <sys/timex.h>
 #include <linux/ioctl.h>
 #include <linux/rtc.h>
+
+#ifndef UTIME_NOW
+#define UTIME_NOW ((1l << 30) - 1l)
+#endif
+#ifndef UTIME_OMIT
+#define UTIME_OMIT ((1l << 30) - 2l)
+#endif
 #endif /* LINUX */
 
 struct timeval32
@@ -57,7 +64,7 @@ tprint_timeval(struct tcb *tcp, const struct timeval *tv)
 }
 
 void
-printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
+printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 {
 	if (addr == 0)
 		tprintf("NULL");
@@ -75,14 +82,26 @@ printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 		{
 			struct timeval32 tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0)
-				tprint_timeval32(tcp, &tv);
+			if ((rc = umove(tcp, addr, &tv)) >= 0) {
+				if (special && tv.tv_usec == UTIME_NOW)
+					tprintf("UTIME_NOW");
+				else if (special && tv.tv_usec == UTIME_OMIT)
+					tprintf("UTIME_OMIT");
+				else
+					tprint_timeval32(tcp, &tv);
+			}
 		} else
 		{
 			struct timeval tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0)
-				tprint_timeval(tcp, &tv);
+			if ((rc = umove(tcp, addr, &tv)) >= 0) {
+				if (special && tv.tv_usec == UTIME_NOW)
+					tprintf("UTIME_NOW");
+				else if (special && tv.tv_usec == UTIME_OMIT)
+					tprintf("UTIME_OMIT");
+				else
+					tprint_timeval(tcp, &tv);
+			}
 		}
 
 		if (rc < 0)
@@ -180,10 +199,10 @@ struct tcb *tcp;
 		    tcp->u_arg[0], tcp->u_arg[1]);
 	    return 0;
 	}
-	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32);
+	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
 #ifndef SVR4
 	tprintf(", ");
-	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
+	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
 #endif /* !SVR4 */
     }
     return 0;
@@ -210,10 +229,10 @@ sys_osf_settimeofday(tcp)
 struct tcb *tcp;
 {
     if (entering(tcp)) {
-	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32);
+	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
 #ifndef SVR4
 	tprintf(", ");
-	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
+	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
 #endif /* !SVR4 */
     }
     return 0;
