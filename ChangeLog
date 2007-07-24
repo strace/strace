@@ -1,3 +1,8 @@
+2007-07-23  Roland McGrath  <roland@redhat.com>
+
+	* util.c (tv_add): Fix rounding comparison.
+	Reported by Bai Weidong <baiwd@cn.fujitsu.com>.
+
 2007-07-11  Roland McGrath  <roland@redhat.com>
 
 	* count.c (call_summary_pers): Use tv_float conversion for output of
