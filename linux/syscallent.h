@@ -347,7 +347,7 @@
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 314 */
 	{ 4,	TD,	printargs,		"tee"		}, /* 315 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 316 */
-	{ 5,	0,	printargs,		"SYS_317"	}, /* 317 */
+	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 317 */
 	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
 	{ 5,	0,	printargs,		"SYS_319"	}, /* 319 */
 	{ 5,	0,	printargs,		"SYS_320"	}, /* 320 */
