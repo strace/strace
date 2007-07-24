@@ -193,7 +193,7 @@ struct timeval *tv, *a, *b;
 {
 	tv->tv_sec = a->tv_sec + b->tv_sec;
 	tv->tv_usec = a->tv_usec + b->tv_usec;
-	if (tv->tv_usec > 1000000) {
+	if (tv->tv_usec >= 1000000) {
 		tv->tv_sec++;
 		tv->tv_usec -= 1000000;
 	}
