@@ -682,6 +682,8 @@ struct tcb *tcp;
 #define MPOL_F_ADDR     (1<<1)
 
 #define MPOL_MF_STRICT  (1<<0)
+#define MPOL_MF_MOVE	(1<<1)
+#define MPOL_MF_MOVE_ALL (1<<2)
 
 
 static const struct xlat policies[] = {
@@ -694,12 +696,20 @@ static const struct xlat policies[] = {
 
 static const struct xlat mbindflags[] = {
 	{ MPOL_MF_STRICT,	"MPOL_MF_STRICT"	},
+	{ MPOL_MF_MOVE,		"MPOL_MF_MOVE"		},
+	{ MPOL_MF_MOVE_ALL,	"MPOL_MF_MOVE_ALL"	},
 	{ 0,			NULL			}
 };
 
 static const struct xlat mempolicyflags[] = {
 	{ MPOL_F_NODE,		"MPOL_F_NODE"		},
 	{ MPOL_F_ADDR,		"MPOL_F_ADDR"		},
+	{ 0,			NULL			}
+};
+
+static const struct xlat move_pages_flags[] = {
+	{ MPOL_MF_MOVE,		"MPOL_MF_MOVE"		},
+	{ MPOL_MF_MOVE_ALL,	"MPOL_MF_MOVE_ALL"	},
 	{ 0,			NULL			}
 };
 
@@ -791,6 +801,78 @@ struct tcb *tcp;
 		get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], syserror(tcp));
 		tprintf(", %#lx, ", tcp->u_arg[3]);
 		printflags(mempolicyflags, tcp->u_arg[4], "MPOL_???");
+	}
+	return 0;
+}
+
+int
+sys_move_pages(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		unsigned long npages = tcp->u_arg[1];
+		tprintf("%ld, %lu, ", tcp->u_arg[0], npages);
+		if (tcp->u_arg[2] == 0)
+			tprintf("NULL, ");
+		else {
+			int i;
+			long puser = tcp->u_arg[2];
+			tprintf("{");
+			for (i = 0; i < npages; ++i) {
+				void *p;
+				if (i > 0)
+					tprintf(", ");
+				if (umove(tcp, puser, &p) < 0) {
+					tprintf("???");
+					break;
+				}
+				tprintf("%p", p);
+				puser += sizeof (void *);
+			}
+			tprintf("}, ");
+		}
+		if (tcp->u_arg[3] == 0)
+			tprintf("NULL, ");
+		else {
+			int i;
+			long nodeuser = tcp->u_arg[3];
+			tprintf("{");
+			for (i = 0; i < npages; ++i) {
+				int node;
+				if (i > 0)
+					tprintf(", ");
+				if (umove(tcp, nodeuser, &node) < 0) {
+					tprintf("???");
+					break;
+				}
+				tprintf("%#x", node);
+				nodeuser += sizeof (int);
+			}
+			tprintf("}, ");
+		}
+	}
+	if (exiting(tcp)) {
+		unsigned long npages = tcp->u_arg[1];
+		if (tcp->u_arg[4] == 0)
+			tprintf("NULL, ");
+		else {
+			int i;
+			long statususer = tcp->u_arg[4];
+			tprintf("{");
+			for (i = 0; i < npages; ++i) {
+				int status;
+				if (i > 0)
+					tprintf(", ");
+				if (umove(tcp, statususer, &status) < 0) {
+					tprintf("???");
+					break;
+				}
+				tprintf("%#x", status);
+				statususer += sizeof (int);
+			}
+			tprintf("}, ");
+		}
+		printflags(move_pages_flags, tcp->u_arg[5], "MPOL_???");
 	}
 	return 0;
 }
