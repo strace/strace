@@ -1,5 +1,34 @@
 2007-07-23  Roland McGrath  <roland@redhat.com>
 
+	* linux/arm/syscallent.h: Add move_pages.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/m68k/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+
+	* linux/syscallent.h: move_pages takes 6 args, not 5.
+	* linux/x86_64/syscallent.h: Likewise.
+
+2007-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* mem.c (move_pages_flags): New variable.
+	(sys_move_pages): New function.
+	* linux/syscall.h: Declare sys_move_pages.
+	* linux/syscallent.h: Add entry for sys_move_pages.
+	* linux/x86_64/syscallent.h: Likewise.
+
+	* mem.c (MPOL_MF_MOVE, MPOL_MF_MOVE_ALL): Define.
+	(mbindflags): Add MPOL_MF_MOVE and MPOL_MF_MOVE_ALL entries.
+
+2007-07-23  Roland McGrath  <roland@redhat.com>
+
 	* util.c (tv_add): Fix rounding comparison.
 	Reported by Bai Weidong <baiwd@cn.fujitsu.com>.
 
