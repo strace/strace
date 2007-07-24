@@ -83,9 +83,11 @@ printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 			struct timeval32 tv;
 
 			if ((rc = umove(tcp, addr, &tv)) >= 0) {
-				if (special && tv.tv_usec == UTIME_NOW)
+				if (special && tv.tv_sec == 0 &&
+				    tv.tv_usec == UTIME_NOW)
 					tprintf("UTIME_NOW");
-				else if (special && tv.tv_usec == UTIME_OMIT)
+				else if (special && tv.tv_sec == 0 &&
+					 tv.tv_usec == UTIME_OMIT)
 					tprintf("UTIME_OMIT");
 				else
 					tprint_timeval32(tcp, &tv);
@@ -95,9 +97,11 @@ printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 			struct timeval tv;
 
 			if ((rc = umove(tcp, addr, &tv)) >= 0) {
-				if (special && tv.tv_usec == UTIME_NOW)
+				if (special && tv.tv_sec == 0 &&
+				    tv.tv_usec == UTIME_NOW)
 					tprintf("UTIME_NOW");
-				else if (special && tv.tv_usec == UTIME_OMIT)
+				else if (special && tv.tv_sec == 0 &&
+					 tv.tv_usec == UTIME_OMIT)
 					tprintf("UTIME_OMIT");
 				else
 					tprint_timeval(tcp, &tv);
