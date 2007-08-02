@@ -337,7 +337,6 @@
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 307 */
 	{ 4,	TD,	printargs,		"tee"		}, /* 308 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 309 */
-
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 310 */
 	{ 5,	0,	printargs,		"SYS_311"	}, /* 311 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 312 */
@@ -345,7 +344,7 @@
 	{ 5,	0,	printargs,		"SYS_314"	}, /* 314 */
 	{ 5,	0,	printargs,		"SYS_315"	}, /* 315 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 316 */
-	{ 5,	0,	printargs,		"SYS_317"	}, /* 317 */
+	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 317 */
 	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
 	{ 5,	0,	printargs,		"SYS_319"	}, /* 319 */
 	{ 5,	0,	printargs,		"SYS_320"	}, /* 320 */
