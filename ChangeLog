@@ -1,5 +1,17 @@
 2007-08-01  Roland McGrath  <roland@redhat.com>
 
+	* linux/arm/syscallent.h: Add entry for getcpu.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+
 	* linux/arm/syscallent.h: Add entry for eventfd.
 	* linux/ia64/syscallent.h: Likewise.
 	* linux/mips/syscallent.h: Likewise.
