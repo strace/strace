@@ -46,6 +46,10 @@
 
 2007-07-23  Ulrich Drepper  <drepper@redhat.com>
 
+	* process.c (sys_getcpu): New function.
+	* linux/syscall.h: Declare sys_getcpu.
+	* linux/syscallent.h: Add entry for getcpu.
+
 	* desc.c (sys_eventfd): New function.
 	* linux/syscall.h: Declare sys_eventfd.
 	* linux/syscallent.h: Add entry for eventfd.
