@@ -916,4 +916,13 @@ sys_pselect6(struct tcb *tcp)
 	}
 	return rc;
 }
+
+int
+sys_eventfd(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("%lu", tcp->u_arg[0]);
+	return 0;
+}
 #endif
