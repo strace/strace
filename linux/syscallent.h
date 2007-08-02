@@ -351,7 +351,7 @@
 	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 319 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 320 */
-	{ 5,	0,	printargs,		"SYS_321"	}, /* 321 */
+	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 321 */
 	{ 5,	0,	printargs,		"SYS_322"	}, /* 322 */
 	{ 5,	0,	printargs,		"SYS_323"	}, /* 323 */
 	{ 5,	0,	printargs,		"SYS_324"	}, /* 324 */

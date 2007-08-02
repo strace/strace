@@ -1972,4 +1972,15 @@ struct tcb *tcp;
 	return 0;
 }
 
+int
+sys_signalfd(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		print_sigset(tcp, tcp->u_arg[1], 1);
+		tprintf("%lu", tcp->u_arg[2]);
+	}
+	return 0;
+}
 #endif /* LINUX */
