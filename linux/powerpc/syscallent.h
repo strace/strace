@@ -332,7 +332,7 @@
 	{ 3,	0,	printargs,		"get_robust_list"	}, /* 300 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 301 */
 	{ 5,	0,	printargs,		"SYS_302"		}, /* 302 */
-	{ 5,	0,	printargs,		"SYS_303"		}, /* 303 */
+	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 303 */
 	{ 5,	0,	printargs,		"SYS_304"		}, /* 304 */
 	{ 5,	0,	printargs,		"SYS_305"		}, /* 305 */
 	{ 5,	0,	printargs,		"SYS_306"		}, /* 306 */

@@ -4311,7 +4311,7 @@
 	{ 0,	0,	printargs,		"SYS_4310"	}, /* 4310 */
 	{ 0,	0,	printargs,		"SYS_4311"	}, /* 4311 */
 	{ 0,	0,	printargs,		"SYS_4312"	}, /* 4312 */
-	{ 0,	0,	printargs,		"SYS_4313"	}, /* 4313 */
+	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 4313 */
 	{ 0,	0,	printargs,		"SYS_4314"	}, /* 4314 */
 	{ 0,	0,	printargs,		"SYS_4315"	}, /* 4315 */
 	{ 0,	0,	printargs,		"SYS_4316"	}, /* 4316 */

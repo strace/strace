@@ -307,7 +307,7 @@
 	{ 5,	0,	printargs,	"SYS_306" },		/* 306 */
 	{ 6,	0,	sys_move_pages,		"move_pages" },	/* 307 */
 	{ 5,	0,	printargs,	"SYS_308" },		/* 308 */
-	{ 5,	0,	printargs,	"SYS_309" },		/* 309 */
+	{ 5,	TD,	sys_epoll_pwait,"epoll_pwait" },	/* 309 */
 	{ 5,	0,	printargs,	"SYS_310" },		/* 310 */
 	{ 5,	0,	printargs,	"SYS_311" },		/* 311 */
 	{ 5,	0,	printargs,	"SYS_312" },		/* 312 */

@@ -375,7 +375,7 @@
 	{ 5,	0,	printargs,		"SYS_344"	}, /* 344 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 345 */
 	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
-	{ 5,	0,	printargs,		"SYS_347"	}, /* 347 */
+	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 347 */
 	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
 	{ 5,	0,	printargs,		"SYS_349"	}, /* 349 */
 	{ 5,	0,	printargs,		"SYS_350"	}, /* 350 */

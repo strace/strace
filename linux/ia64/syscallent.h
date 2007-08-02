@@ -1111,4 +1111,4 @@
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 1302 */
 	{ 8,	0,	printargs,		"SYS_1303"	}, /* 1303 */
 	{ 8,	0,	printargs,		"SYS_1304"	}, /* 1304 */
-	{ 8,	0,	printargs,		"SYS_1305"	}, /* 1305 */
+	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 1305 */

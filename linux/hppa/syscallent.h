@@ -301,3 +301,5 @@
 	{ 4,	TD,	printargs,		"tee"			}, /* 293 */
 	{ 4,	TD,	printargs,		"vmsplice"		}, /* 294 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 295 */
+	{ 0,	0,	printargs,		"getcpu"		}, /* 296 */
+	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 297 */
