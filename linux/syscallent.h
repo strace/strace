@@ -349,7 +349,7 @@
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 316 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 317 */
 	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
-	{ 5,	0,	printargs,		"SYS_319"	}, /* 319 */
+	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 319 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 320 */
 	{ 5,	0,	printargs,		"SYS_321"	}, /* 321 */
 	{ 5,	0,	printargs,		"SYS_322"	}, /* 322 */

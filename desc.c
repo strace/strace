@@ -669,8 +669,8 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_epoll_wait(tcp)
+static void
+epoll_wait_common(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp))
@@ -708,6 +708,23 @@ struct tcb *tcp;
 		}
 		tprintf(", %ld, %ld", tcp->u_arg[2], tcp->u_arg[3]);
 	}
+}
+
+int
+sys_epoll_wait(tcp)
+struct tcb *tcp;
+{
+	epoll_wait_common(tcp);
+	return 0;
+}
+
+int
+sys_epoll_pwait(tcp)
+struct tcb *tcp;
+{
+	epoll_wait_common(tcp);
+	if (exiting(tcp))
+		print_sigset(tcp, tcp->u_arg[4], 0);
 	return 0;
 }
 

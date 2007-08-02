@@ -102,7 +102,7 @@ int sys_waitid(), sys_fadvise64(), sys_fadvise64_64();
 int sys_mbind(), sys_get_mempolicy(), sys_set_mempolicy(), sys_move_pages();
 int sys_arch_prctl();
 int sys_io_setup(), sys_io_submit(), sys_io_cancel(), sys_io_getevents(), sys_io_destroy();
-int sys_utimensat();
+int sys_utimensat(), sys_epoll_pwait();
 
 /* sys_socketcall subcalls */
 
