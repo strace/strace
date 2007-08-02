@@ -1677,25 +1677,31 @@ printargv(tcp, addr)
 struct tcb *tcp;
 long addr;
 {
-	char *cp;
+	union {
+		int p32;
+		long p64;
+		char data[sizeof(long)];
+	} cp;
 	char *sep;
-	int max = max_strlen / 2;
+	int n = 0;
 
-	for (sep = ""; --max >= 0; sep = ", ") {
-		if (!abbrev(tcp))
-			max++;
-		if (umove(tcp, addr, &cp) < 0) {
+	cp.p64 = 1;
+	for (sep = ""; !abbrev(tcp) || n < max_strlen / 2; sep = ", ", ++n) {
+		if (umoven(tcp, addr, personality_wordsize[current_personality],
+			   cp.data) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
-		if (cp == 0)
+		if (personality_wordsize[current_personality] == 4)
+			cp.p64 = cp.p32;
+		if (cp.p64 == 0)
 			break;
 		tprintf(sep);
-		printstr(tcp, (long) cp, -1);
-		addr += sizeof(char *);
+		printstr(tcp, cp.p64, -1);
+		addr += personality_wordsize[current_personality];
 	}
-	if (cp)
-		tprintf(", ...");
+	if (cp.p64)
+		tprintf("%s...", sep);
 }
 
 static void
