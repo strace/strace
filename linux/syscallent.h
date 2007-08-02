@@ -348,7 +348,7 @@
 	{ 4,	TD,	printargs,		"tee"		}, /* 315 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 316 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 317 */
-	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
+	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 318 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 319 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 320 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 321 */

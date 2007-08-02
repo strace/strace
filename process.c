@@ -3325,4 +3325,28 @@ struct tcb *tcp;
 }
 #endif
 
+
+int
+sys_getcpu(tcp)
+struct tcb *tcp;
+{
+	if (exiting(tcp)) {
+		unsigned u;
+		if (tcp->u_arg[0] == 0)
+			tprintf("NULL, ");
+		else if (umove(tcp, tcp->u_arg[0], &u) < 0)
+			tprintf("%#lx, ", tcp->u_arg[0]);
+		else
+			tprintf("[%u], ", u);
+		if (tcp->u_arg[1] == 0)
+			tprintf("NULL, ");
+		else if (umove(tcp, tcp->u_arg[1], &u) < 0)
+			tprintf("%#lx, ", tcp->u_arg[1]);
+		else
+			tprintf("[%u], ", u);
+		tprintf("%#lx", tcp->u_arg[2]);
+	}
+	return 0;
+}
+
 #endif
