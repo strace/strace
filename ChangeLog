@@ -1,5 +1,8 @@
 2007-08-01  Roland McGrath  <roland@redhat.com>
 
+	* util.c (umoven): Don't perror for EIO.
+	(umovestr): Likewise.
+
 	* process.c (printargv): Handle boundary cases correctly.
 	Handle biarch fetching correctly.
 
