@@ -352,7 +352,7 @@
 	{ 5,	0,	printargs,		"SYS_315"	}, /* 315 */
 	{ 5,	0,	printargs,		"SYS_316"	}, /* 316 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 317 */
-	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
+	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 318 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 319 */
 	{ 5,	0,	printargs,		"SYS_320"	}, /* 320 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 321 */

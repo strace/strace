@@ -375,7 +375,7 @@
 	{ 5,	0,	printargs,		"SYS_342"	}, /* 342 */
 	{ 5,	0,	printargs,		"SYS_343"	}, /* 343 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 344 */
-	{ 5,	0,	printargs,		"SYS_345"	}, /* 345 */
+	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 345 */
 	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
 	{ 5,	0,	printargs,		"SYS_347"	}, /* 347 */
 	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */

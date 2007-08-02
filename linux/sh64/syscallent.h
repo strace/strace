@@ -374,7 +374,7 @@
 	{ 5,	0,	printargs,		"SYS_343"	}, /* 343 */
 	{ 5,	0,	printargs,		"SYS_344"	}, /* 344 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 345 */
-	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
+	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 346 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 347 */
 	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 349 */

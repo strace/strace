@@ -331,7 +331,7 @@
 	{ 2,	0,	printargs,		"set_robust_list"	}, /* 299 */
 	{ 3,	0,	printargs,		"get_robust_list"	}, /* 300 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 301 */
-	{ 5,	0,	printargs,		"SYS_302"		}, /* 302 */
+	{ 3,	0,	sys_getcpu,		"getcpu"		}, /* 302 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 303 */
 	{ 5,	0,	printargs,		"SYS_304"		}, /* 304 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"		}, /* 305 */

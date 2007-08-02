@@ -305,14 +305,13 @@
 	{ 5,	0,	printargs,	"SYS_304" },		/* 304 */
 	{ 5,	0,	printargs,	"SYS_305" },		/* 305 */
 	{ 5,	0,	printargs,	"SYS_306" },		/* 306 */
-	{ 6,	0,	sys_move_pages,		"move_pages" },	/* 307 */
-	{ 5,	0,	printargs,	"SYS_308" },		/* 308 */
+	{ 6,	0,	sys_move_pages,	"move_pages" },		/* 307 */
+	{ 3,	0,	sys_getcpu,	"getcpu" },		/* 308 */
 	{ 5,	TD,	sys_epoll_pwait,"epoll_pwait" },	/* 309 */
 	{ 5,	0,	printargs,	"SYS_310" },		/* 310 */
 	{ 3,	TD|TS,	sys_signalfd,	"signalfd"},		/* 311 */
 	{ 4,	TD,	sys_timerfd,	"timerfd" },		/* 312 */
 	{ 1,	TD,	sys_eventfd,	"eventfd" },		/* 313 */
-	{ 5,	0,	printargs,	"SYS_313" },		/* 313 */
 	{ 5,	0,	printargs,	"SYS_314" },		/* 314 */
 	{ 5,	0,	printargs,	"SYS_315" },		/* 315 */
 	{ 5,	0,	printargs,	"SYS_316" },		/* 316 */

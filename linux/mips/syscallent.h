@@ -4310,7 +4310,7 @@
 	{ 0,	0,	printargs,		"SYS_4309"	}, /* 4309 */
 	{ 0,	0,	printargs,		"SYS_4310"	}, /* 4310 */
 	{ 0,	0,	printargs,		"SYS_4311"	}, /* 4311 */
-	{ 0,	0,	printargs,		"SYS_4312"	}, /* 4312 */
+	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 4312 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 4313 */
 	{ 0,	0,	printargs,		"SYS_4314"	}, /* 4314 */
 	{ 0,	0,	printargs,		"SYS_4315"	}, /* 4315 */
