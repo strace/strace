@@ -281,3 +281,4 @@
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 280 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 281 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 282 */
+	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 283 */

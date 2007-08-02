@@ -288,22 +288,24 @@ printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 				struct timeval32 it_interval, it_value;
 			} itv;
 
-			if ((rc = umove(tcp, addr, &itv)) >= 0)
+			if ((rc = umove(tcp, addr, &itv)) >= 0) {
 				tprintf("{it_interval=");
 				tprint_timeval32(tcp, &itv.it_interval);
 				tprintf(", it_value=");
 				tprint_timeval32(tcp, &itv.it_value);
 				tprintf("}");
+			}
 		} else
 		{
 			struct itimerval itv;
 
-			if ((rc = umove(tcp, addr, &itv)) >= 0)
+			if ((rc = umove(tcp, addr, &itv)) >= 0)	{
 				tprintf("{it_interval=");
 				tprint_timeval(tcp, &itv.it_interval);
 				tprintf(", it_value=");
 				tprint_timeval(tcp, &itv.it_value);
 				tprintf("}");
+			}
 		}
 
 		if (rc < 0)
@@ -891,5 +893,30 @@ long arg;
 		break;
 	}
 	return 1;
+}
+
+#ifndef TFD_TIMER_ABSTIME
+#define TFD_TIMER_ABSTIME (1 << 0)
+#endif
+
+static const struct xlat timerfdflags[] = {
+	{ TFD_TIMER_ABSTIME,	"TFD_TIMER_ABSTIME"	},
+	{ 0,			NULL			}
+};
+
+int
+sys_timerfd(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		/* It does not matter that the kernel uses itimerspec.  */
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printxval(clocknames, tcp->u_arg[1], "CLOCK_???");
+		tprintf(", ");
+		printflags(timerfdflags, tcp->u_arg[2], "TFD_???");
+		tprintf(", ");
+		printitv(tcp, tcp->u_arg[3]);
+	}
+	return 0;
 }
 #endif /* LINUX */
