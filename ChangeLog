@@ -1,15 +1,26 @@
 2007-08-01  Roland McGrath  <roland@redhat.com>
 
-	* linux/sparc/syscallent.h: Add entry for signalfd.
-	* linux/sparc64/syscallent.h: Likewise.
-	* linux/sh64/syscallent.h: Likewise.
-	* linux/sh/syscallent.h: Likewise.
-	* linux/s390x/syscallent.h: Likewise.
-	* linux/s390/syscallent.h: Likewise.
-	* linux/powerpc/syscallent.h: Likewise.
-	* linux/mips/syscallent.h: Likewise.
+	* linux/arm/syscallent.h: Add entry for timerfd.
 	* linux/ia64/syscallent.h: Likewise.
-	* linux/arm/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+
+	* linux/arm/syscallent.h: Add entry for signalfd.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
 
 	* linux/hppa/syscallent.h: Add entry for epoll_pwait.
 	* linux/ia64/syscallent.h: Likewise.
@@ -22,7 +33,16 @@
 	* linux/sparc/syscallent.h: Likewise.
 	* linux/sparc64/syscallent.h: Likewise.
 
-2007-07-23  Ulrich Drepper  <drepper@redhat.com>
+2007-02-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* time.c (printitv_bitness): Add missing braces to enclose
+	conditional code.
+	(TDF_TIMER_ABSTIME): Define if not already.
+	(timerfdflags): New variable.
+	(sys_timerfd): New function.
+	* linux/syscall.h: Declare sys_timerfd.
+	* linux/syscallent.h: Add timerfd entry.
+	* linux/x86_64/syscallent.h: Likewise.
 
 	* linux/syscall.h: Declare sys_signalfd.
 	* linux/syscallent.h: Add entry for signalfd.
