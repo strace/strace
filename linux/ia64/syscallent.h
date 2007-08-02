@@ -1115,3 +1115,4 @@
 	{ 8,	0,	printargs,		"SYS_1306"	}, /* 1306 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 1307 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 1308 */
+	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 1309 */

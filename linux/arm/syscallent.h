@@ -381,7 +381,7 @@
 	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 349 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 350 */
-	{ 5,	0,	printargs,		"SYS_351"	}, /* 351 */
+	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 351 */
 	{ 5,	0,	printargs,		"SYS_352"	}, /* 352 */
 	{ 5,	0,	printargs,		"SYS_353"	}, /* 353 */
 	{ 5,	0,	printargs,		"SYS_354"	}, /* 354 */

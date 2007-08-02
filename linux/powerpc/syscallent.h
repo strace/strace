@@ -336,7 +336,7 @@
 	{ 5,	0,	printargs,		"SYS_304"		}, /* 304 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"		}, /* 305 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"		}, /* 306 */
-	{ 5,	0,	printargs,		"SYS_307"		}, /* 307 */
+	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 307 */
 	{ 5,	0,	printargs,		"SYS_308"		}, /* 308 */
 	{ 5,	0,	printargs,		"SYS_309"		}, /* 309 */
 	{ 5,	0,	printargs,		"SYS_310"		}, /* 310 */

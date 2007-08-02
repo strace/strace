@@ -311,6 +311,7 @@
 	{ 5,	0,	printargs,	"SYS_310" },		/* 310 */
 	{ 3,	TD|TS,	sys_signalfd,	"signalfd"},		/* 311 */
 	{ 4,	TD,	sys_timerfd,	"timerfd" },		/* 312 */
+	{ 1,	TD,	sys_eventfd,	"eventfd" },		/* 313 */
 	{ 5,	0,	printargs,	"SYS_313" },		/* 313 */
 	{ 5,	0,	printargs,	"SYS_314" },		/* 314 */
 	{ 5,	0,	printargs,	"SYS_315" },		/* 315 */

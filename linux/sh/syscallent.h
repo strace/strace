@@ -356,8 +356,8 @@
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 319 */
 	{ 5,	0,	printargs,		"SYS_320"	}, /* 320 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 321 */
-	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 350 */
-	{ 5,	0,	printargs,		"SYS_323"	}, /* 323 */
+	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 322 */
+	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 323 */
 	{ 5,	0,	printargs,		"SYS_324"	}, /* 324 */
 	{ 5,	0,	printargs,		"SYS_325"	}, /* 325 */
 	{ 5,	0,	printargs,		"SYS_326"	}, /* 326 */
