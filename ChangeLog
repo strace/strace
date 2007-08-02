@@ -1,5 +1,9 @@
 2007-08-01  Roland McGrath  <roland@redhat.com>
 
+	* linux/sparc64/syscallent.h: Just #include the sparc file.
+	* linux/sparc64/syscallent1.h: Likewise.
+	* linux/sparc64/syscallent2.h: Likewise.
+
 	* linux/arm/syscallent.h: Add entry for getcpu.
 	* linux/hppa/syscallent.h: Likewise.
 	* linux/ia64/syscallent.h: Likewise.
