@@ -4315,7 +4315,7 @@
 	{ 0,	0,	printargs,		"SYS_4314"	}, /* 4314 */
 	{ 0,	0,	printargs,		"SYS_4315"	}, /* 4315 */
 	{ 0,	0,	printargs,		"SYS_4316"	}, /* 4316 */
-	{ 0,	0,	printargs,		"SYS_4317"	}, /* 4317 */
+	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 4317 */
 	{ 0,	0,	printargs,		"SYS_4318"	}, /* 4318 */
 	{ 0,	0,	printargs,		"SYS_4319"	}, /* 4319 */
 	{ 0,	0,	printargs,		"SYS_4320"	}, /* 4320 */

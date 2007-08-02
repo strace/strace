@@ -1112,3 +1112,5 @@
 	{ 8,	0,	printargs,		"SYS_1303"	}, /* 1303 */
 	{ 8,	0,	printargs,		"SYS_1304"	}, /* 1304 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 1305 */
+	{ 8,	0,	printargs,		"SYS_1306"	}, /* 1306 */
+	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 1307 */

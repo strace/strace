@@ -377,7 +377,7 @@
 	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 347 */
 	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
-	{ 5,	0,	printargs,		"SYS_349"	}, /* 349 */
+	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 349 */
 	{ 5,	0,	printargs,		"SYS_350"	}, /* 350 */
 	{ 5,	0,	printargs,		"SYS_351"	}, /* 351 */
 	{ 5,	0,	printargs,		"SYS_352"	}, /* 352 */

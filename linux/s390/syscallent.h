@@ -345,7 +345,7 @@
 	{ 5,	0,	printargs,		"SYS_313"	}, /* 313 */
 	{ 5,	0,	printargs,		"SYS_314"	}, /* 314 */
 	{ 5,	0,	printargs,		"SYS_315"	}, /* 315 */
-	{ 5,	0,	printargs,		"SYS_316"	}, /* 316 */
+	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 316 */
 	{ 5,	0,	printargs,		"SYS_317"	}, /* 317 */
 	{ 5,	0,	printargs,		"SYS_318"	}, /* 318 */
 	{ 5,	0,	printargs,		"SYS_319"	}, /* 319 */

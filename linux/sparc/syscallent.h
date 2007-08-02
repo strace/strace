@@ -309,7 +309,7 @@
 	{ 5,	0,	printargs,	"SYS_308" },		/* 308 */
 	{ 5,	TD,	sys_epoll_pwait,"epoll_pwait" },	/* 309 */
 	{ 5,	0,	printargs,	"SYS_310" },		/* 310 */
-	{ 5,	0,	printargs,	"SYS_311" },		/* 311 */
+	{ 3,	TD|TS,	sys_signalfd,	"signalfd"},		/* 311 */
 	{ 5,	0,	printargs,	"SYS_312" },		/* 312 */
 	{ 5,	0,	printargs,	"SYS_313" },		/* 313 */
 	{ 5,	0,	printargs,	"SYS_314" },		/* 314 */
