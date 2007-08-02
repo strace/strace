@@ -1,3 +1,25 @@
+2007-08-01  Roland McGrath  <roland@redhat.com>
+
+	* linux/hppa/syscallent.h: Add entry for epoll_pwait.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/mips/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/sparc64/syscallent.h: Likewise.
+
+2007-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* desc.c (sys_epoll_wait): Move body of function to ...
+	(epoll_wait_common): ...here.  New function.
+	(sys_epoll_pwait): New function.
+	* linux/syscall.h: Declare sys_epoll_pwait.
+	* linux/syscallent.h: Add entry for epoll_pwait.
+	* linux/x86_64/syscallent.h: Likewise.
+
 2007-07-23  Roland McGrath  <roland@redhat.com>
 
 	* time.c (printtv_bitness): SPECIAL only counts when tv_sec == 0.
