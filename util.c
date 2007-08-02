@@ -442,13 +442,14 @@ int len;
 	static char *outstr;
 	int i, n, c, usehex;
 	char *s, *outend;
+	int trunc;
 
 	if (!addr) {
 		tprintf("NULL");
 		return;
 	}
 	if (!str) {
-		if ((str = malloc(max_strlen)) == NULL
+		if ((str = malloc(max_strlen + 1)) == NULL
 		    || (outstr = malloc(4*max_strlen
 					+ sizeof "\"\"...")) == NULL) {
 			fprintf(stderr, "out of memory\n");
@@ -458,19 +459,21 @@ int len;
 	}
 	outend = outstr + max_strlen * 4;
 	if (len < 0) {
-		n = max_strlen;
+		n = max_strlen + 1;
 		if (umovestr(tcp, addr, n, (char *) str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
 	}
 	else {
-		n = MIN(len, max_strlen);
+		n = MIN(len, max_strlen + 1);
 		if (umoven(tcp, addr, n, (char *) str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
 	}
+
+	trunc = n > max_strlen && str[--n] != 0;
 
 	usehex = 0;
 	if (xflag > 1)
@@ -538,7 +541,7 @@ int len;
 	}
 
 	*s++ = '\"';
-	if (i < len || (len < 0 && (i == n || s > outend))) {
+	if (i < len || (len < 0 && (trunc || s > outend))) {
 		*s++ = '.'; *s++ = '.'; *s++ = '.';
 	}
 	*s = '\0';
