@@ -13,15 +13,23 @@
 #include <stdio.h>
 #include <sys/wait.h>
 
-static void *start (void *arg)
+static void *start0 (void *arg)
 {
   sleep (1);
 
   exit (42);
 }
 
+static void *start1 (void *arg)
+{
+  pause ();
+  /* NOTREACHED */
+  assert (0);
+}
+
 int main (void)
 {
+  pthread_t thread0;
   pthread_t thread1;
   int i;
   pid_t child, got_pid;
@@ -35,16 +43,13 @@ int main (void)
       case -1:
 	abort ();
       case 0:
-	i = pthread_create (&thread1, NULL, start, NULL);
+	i = pthread_create (&thread0, NULL, start0, NULL);
 	assert (i == 0);
-/* Two possible testcases; the second one passed even in the older versions.  */
-#if 1
+	i = pthread_create (&thread1, NULL, start1, NULL);
+	assert (i == 0);
 	pause ();
-#else
-	pthread_exit (NULL);
-#endif
 	/* NOTREACHED */
-	abort ();
+	assert (0);
 	break;
       default:
 	got_pid = waitpid (child, &status, 0);
