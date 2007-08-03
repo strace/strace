@@ -7,6 +7,19 @@
 	From Matthias Klose <doko@cs.tu-berlin.de>.
 	Fixes Debian#435303.
 
+2007-08-02  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* strace.c (detach): Moved the resume notification code to ...
+	(resume_from_tcp): ... a new function here.
+	(handle_group_exit): No longer detach also the thread group leader.
+	(trace): Fixed panic on exit of the TCB_GROUP_EXITING leader itself.
+	Fixes RH#247907.
+
+	* test/leaderkill.c (start): Renamed to ...
+	(start0): ... here.
+	(start1): New function.
+	(main): Created a new spare thread.
+
 2007-08-01  Roland McGrath  <roland@redhat.com>
 
 	* util.c (umoven): Don't perror for EIO.
