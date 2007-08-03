@@ -1,3 +1,12 @@
+2007-08-03  Roland McGrath  <roland@redhat.com>
+
+	* debian/control (Build-Depends): Replace libc6-dev-s390x and
+	libc6-dev-sparc64 with gcc-multilib.
+	* debian/rules: Replace sparc-linux, s390-linux conditionals with
+	general "arch64_map" hair, handle x86_64 and powerpc64 too.
+	From Matthias Klose <doko@cs.tu-berlin.de>.
+	Fixes Debian#435303.
+
 2007-08-01  Roland McGrath  <roland@redhat.com>
 
 	* util.c (umoven): Don't perror for EIO.
