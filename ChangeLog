@@ -1,5 +1,8 @@
 2007-08-03  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac, NEWS: Version 4.5.16.
+	* debian/changelog, strace.spec: 4.5.16-1.
+
 	* debian/control (Build-Depends): Replace libc6-dev-s390x and
 	libc6-dev-sparc64 with gcc-multilib.
 	* debian/rules: Replace sparc-linux, s390-linux conditionals with
@@ -320,7 +323,7 @@
 2007-01-12  Dmitry V. Levin <ldv@altlinux.org>
 
 	* sock.c (sock_ioctl): Check umove() return code.
-	[LINUX] Handle SIOCGIFTXQLEN and SIOCGIFMAP.
+	[LINUX]: Handle SIOCGIFTXQLEN and SIOCGIFMAP.
 
 2007-03-16  Roland McGrath  <roland@redhat.com>
 
