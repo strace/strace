@@ -1,3 +1,19 @@
+strace (4.5.16-1) unstable; urgency=low
+
+  * New upstream version.
+    + 64-bit builds, closes: #435303.
+    + LFS build fix, closes: #385310.
+    + Fix multithread issues
+    + Fix spurious SIGSTOP on early interrupt.
+    + Fix utime for biarch.
+    + Fix -u error message.
+    + Better futex syscall printing.
+    + Fix argv/envp printing with small -s settings, and for biarch.
+    + New syscalls: getcpu, eventfd, timerfd, signalfd, epoll_pwait,
+      move_pages, utimensat.
+
+ -- Roland McGrath <frob@debian.org>  Fri, 03 Aug 2007 03:24:21 -0700
+
 strace (4.5.15-1) unstable; urgency=high
 
   [ Roland McGrath ]

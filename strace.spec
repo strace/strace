@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.5.15
+Version: 4.5.16
 Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
@@ -74,6 +74,16 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Aug  3 2007 Roland McGrath <roland@redhat.com> - 4.5.16-1
+- fix multithread issues (#240962, #240961, #247907)
+- fix spurious SIGSTOP on early interrupt (#240986)
+- fix utime for biarch (#247185)
+- fix -u error message (#247170)
+- better futex syscall printing (##241467)
+- fix argv/envp printing with small -s settings, and for biarch
+- new syscalls: getcpu, eventfd, timerfd, signalfd, epoll_pwait,
+  move_pages, utimensat
+
 * Tue Jan 16 2007 Roland McGrath <roland@redhat.com> - 4.5.15-1
 - biarch fixes (#179740, #192193, #171626, #173050, #218433, #218043)
 - fix -ff -o behavior (#204950, #218435, #193808, #219423)

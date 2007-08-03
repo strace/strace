@@ -1,3 +1,11 @@
+Changes in 4.5.16
+==============
+* Bug fixes.
+* Improved output for delete_module, futex, and mbind system calls on Linux.
+* Improved output for SG_IO ioctls on Linux.
+* Support new Linux system calls move_pages, utimensat, signalfd, timerfd,
+  eventfd, getcpu, epoll_pwait.
+
 Changes in 4.5.15
 ==============
 * Bug fixes.
