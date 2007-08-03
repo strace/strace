@@ -10,20 +10,12 @@ DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 VERSION := $(shell dpkg-parsechangelog | awk '/^Version: / { print $$2 }')
 UDEB := strace-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
 
-ifeq ($(DEB_HOST_GNU_TYPE),sparc-linux)
-  build64 = yes
-  HOST64 = sparc64-linux
+arch64_map = i386=x86_64 powerpc=powerpc64 sparc=sparc64 s390=s390x
+ifneq (,$(filter $(DEB_HOST_ARCH)=%, $(arch64_map)))
+  HOST64 = $(strip $(patsubst $(DEB_HOST_ARCH)=%, %, \
+	     $(filter $(DEB_HOST_ARCH)=%, $(arch64_map))))-linux-gnu
   CC64 = gcc -m64
-endif
-
-ifeq ($(DEB_HOST_GNU_TYPE),s390-linux)
-  build64 = yes
-  HOST64 = s390x-linux
-  CC64 = gcc -m64
-endif
-
-ifeq ($(build64),yes)
-   extra_build_targets += stamp-build64
+  extra_build_targets += stamp-build64
 endif
 
 ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
@@ -32,7 +24,7 @@ else
   CONFIG_OPTS = --build=$(DEB_BUILD_GNU_TYPE) --host=$(DEB_HOST_GNU_TYPE)
 endif
 
-all build: stamp-build
+all build: stamp-build $(extra_build_targets)
 
 stamp-%: %/Makefile
 	$(MAKE) -C $*
@@ -55,7 +47,7 @@ binary: binary-indep binary-arch
 
 binary-indep:
 
-binary-arch: $(extra_build_targets) build checkroot
+binary-arch: build checkroot
 	test -f stamp-build || make $(MFLAGS) -f debian/rules build
 	-rm -rf debian/$(package) debian/files debian/substvars
 
@@ -91,7 +83,7 @@ binary-arch: $(extra_build_targets) build checkroot
 		debian/$(package)/usr/share/man/man1/strace.1
 	gzip -9 debian/$(package)/usr/share/man/man1/strace.1
 
-ifeq ($(build64),yes)
+ifneq (,$(HOST64))
 	install -o root -g root -m 755 build64/strace debian/$(package)/usr/bin/strace64
 	ln -s strace.1.gz debian/$(package)/usr/share/man/man1/strace64.1.gz
 	dh_strip
