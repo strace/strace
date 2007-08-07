@@ -986,6 +986,38 @@ long addr;
 }
 #endif	/* !HAVE_LONG_LONG_OFF_T */
 
+#if !defined HAVE_STAT64 && defined LINUX && defined X86_64
+/*
+ * Linux x86_64 has unified `struct stat' but its i386 biarch needs
+ * `struct stat64'.  Its <asm-i386/stat.h> definition expects 32-bit `long'.
+ * <linux/include/asm-x86_64/ia32.h> is not in the public includes set.
+ * __GNUC__ is needed for the required __attribute__ below.
+ */
+struct stat64 {
+	unsigned long long	st_dev;
+	unsigned char	__pad0[4];
+	unsigned int	__st_ino;
+	unsigned int	st_mode;
+	unsigned int	st_nlink;
+	unsigned int	st_uid;
+	unsigned int	st_gid;
+	unsigned long long	st_rdev;
+	unsigned char	__pad3[4];
+	long long	st_size;
+	unsigned int	st_blksize;
+	unsigned long long	st_blocks;
+	unsigned int	st_atime;
+	unsigned int	st_atime_nsec;
+	unsigned int	st_mtime;
+	unsigned int	st_mtime_nsec;
+	unsigned int	st_ctime;
+	unsigned int	st_ctime_nsec;
+	unsigned long long	st_ino;
+} __attribute__((packed));
+# define HAVE_STAT64	1
+# define STAT64_SIZE	96
+#endif
+
 #ifdef HAVE_STAT64
 static void
 printstat64(tcp, addr)
@@ -993,6 +1025,10 @@ struct tcb *tcp;
 long addr;
 {
 	struct stat64 statbuf;
+
+#ifdef	STAT64_SIZE
+	(void) sizeof(char[sizeof statbuf == STAT64_SIZE ? 1 : -1]);
+#endif
 
 #ifdef LINUXSPARC
  	if (current_personality == 1) {
@@ -2114,7 +2150,7 @@ decode_utimes(struct tcb *tcp, int offset, int special)
 			printtv_bitness(tcp, tcp->u_arg[offset + 1],
 					BITNESS_CURRENT, special);
 			tprintf(", ");
-			printtv_bitness(tcp, tcp->u_arg[offset + 1]	
+			printtv_bitness(tcp, tcp->u_arg[offset + 1]
 					+ sizeof (struct timeval),
 					BITNESS_CURRENT, special);
 			tprintf("}");
