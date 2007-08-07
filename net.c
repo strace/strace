@@ -437,59 +437,62 @@ static const struct xlat protocols[] = {
 	{ 0,		NULL		},
 };
 static const struct xlat msg_flags[] = {
-	{ MSG_OOB,	"MSG_OOB"	},
+	{ MSG_OOB,		"MSG_OOB"		},
 #ifdef MSG_DONTROUTE
-	{ MSG_DONTROUTE,"MSG_DONTROUTE"	},
+	{ MSG_DONTROUTE,	"MSG_DONTROUTE"		},
 #endif
 #ifdef MSG_PEEK
-	{ MSG_PEEK,	"MSG_PEEK"	},
+	{ MSG_PEEK,		"MSG_PEEK"		},
 #endif
 #ifdef MSG_CTRUNC
-	{ MSG_CTRUNC,	"MSG_CTRUNC"	},
+	{ MSG_CTRUNC,		"MSG_CTRUNC"		},
 #endif
 #ifdef MSG_PROXY
-	{ MSG_PROXY,	"MSG_PROXY"	},
+	{ MSG_PROXY,		"MSG_PROXY"		},
 #endif
 #ifdef MSG_EOR
-	{ MSG_EOR,	"MSG_EOR"	},
+	{ MSG_EOR,		"MSG_EOR"		},
 #endif
 #ifdef MSG_WAITALL
-	{ MSG_WAITALL,	"MSG_WAITALL"	},
+	{ MSG_WAITALL,		"MSG_WAITALL"		},
 #endif
 #ifdef MSG_TRUNC
-	{ MSG_TRUNC,	"MSG_TRUNC"	},
+	{ MSG_TRUNC,		"MSG_TRUNC"		},
 #endif
 #ifdef MSG_CTRUNC
-	{ MSG_CTRUNC,	"MSG_CTRUNC"	},
+	{ MSG_CTRUNC,		"MSG_CTRUNC"		},
 #endif
 #ifdef MSG_ERRQUEUE
-	{ MSG_ERRQUEUE,	"MSG_ERRQUEUE"	},
+	{ MSG_ERRQUEUE,		"MSG_ERRQUEUE"		},
 #endif
 #ifdef MSG_DONTWAIT
-	{ MSG_DONTWAIT,	"MSG_DONTWAIT"	},
+	{ MSG_DONTWAIT,		"MSG_DONTWAIT"		},
 #endif
 #ifdef MSG_CONFIRM
-	{ MSG_CONFIRM,	"MSG_CONFIRM"	},
+	{ MSG_CONFIRM,		"MSG_CONFIRM"		},
 #endif
 #ifdef MSG_PROBE
-	{ MSG_PROBE,	"MSG_PROBE"	},
+	{ MSG_PROBE,		"MSG_PROBE"		},
 #endif
 #ifdef MSG_FIN
-	{ MSG_FIN,	"MSG_FIN"	},
+	{ MSG_FIN,		"MSG_FIN"		},
 #endif
 #ifdef MSG_SYN
-	{ MSG_SYN,	"MSG_SYN"	},
+	{ MSG_SYN,		"MSG_SYN"		},
 #endif
 #ifdef MSG_RST
-	{ MSG_RST,	"MSG_RST"	},
+	{ MSG_RST,		"MSG_RST"		},
 #endif
 #ifdef MSG_NOSIGNAL
-	{ MSG_NOSIGNAL,	"MSG_NOSIGNAL"	},
+	{ MSG_NOSIGNAL,		"MSG_NOSIGNAL"		},
 #endif
 #ifdef MSG_MORE
-	{ MSG_MORE,	"MSG_MORE"	},
+	{ MSG_MORE,		"MSG_MORE"		},
 #endif
-	{ 0,		NULL		},
+#ifdef MSG_CMSG_CLOEXEC
+	{ MSG_CMSG_CLOEXEC,	"MSG_CMSG_CLOEXEC"	},
+#endif
+	{ 0,			NULL			},
 };
 
 static const struct xlat sockoptions[] = {

@@ -269,6 +269,9 @@ const struct xlat open_mode_flags[] = {
 #ifdef O_NOATIME
 	{ O_NOATIME, 	"O_NOATIME"	},
 #endif
+#ifdef O_CLOEXEC
+	{ O_CLOEXEC,	"O_CLOEXEC"	},
+#endif
 
 #ifdef FNDELAY
 	{ FNDELAY,	"FNDELAY"	},
