@@ -1,4 +1,10 @@
-2007-08-05  Jan Kratochvil  <jan.kratochvil@redhat.com>
+2007-08-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	    Roland McGrath  <roland@redhat.com>
+
+	* file.c [!HAVE_STAT64 && LINUX && X86_64] (struct stat64): Define it.
+	[!HAVE_STAT64 && LINUX && X86_64] (HAVE_STAT64, STAT64_SIZE): Define.
+	[HAVE_STAT64] (printstat64) [STAT64_SIZE]: Add compile-time assertion.
+	Fixes RH#222275.
 
 	* file.c (printstat64): Test [HAVE_LONG_LONG] for st_size printing
 	and cast to widest type available.
