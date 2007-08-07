@@ -1,3 +1,8 @@
+2007-08-05  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* file.c (printstat64): Test [HAVE_LONG_LONG] for st_size printing
+	and cast to widest type available.
+
 2007-08-03  Ulrich Drepper  <drepper@redhat.com>
 
 	* file.c (open_mode_flags): Add O_CLOEXEC.
