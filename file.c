@@ -1061,7 +1061,11 @@ long addr;
 #endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 		break;
 	default:
-		tprintf("st_size=%llu, ", statbuf.st_size);
+#ifdef HAVE_LONG_LONG
+		tprintf("st_size=%llu, ", (unsigned long long) statbuf.st_size);
+#else
+		tprintf("st_size=%lu, ", (unsigned long) statbuf.st_size);
+#endif
 		break;
 	}
 	if (!abbrev(tcp)) {
