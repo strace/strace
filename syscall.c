@@ -324,18 +324,19 @@ qual_syscall(s, opt, not)
 
   	if (isdigit((unsigned char)*s)) {
  		int i = atoi(s);
- 		if (i < 0 || i >= nsyscalls)
+		if (i < 0 || i >= MAX_QUALS)
  			return -1;
  		qualify_one(i, opt, not, -1);
  		return 0;
 	}
-	for (i = 0; i < nsyscalls; i++) {
+	for (i = 0; i < nsyscalls0; i++)
 		if (strcmp(s, sysent0[i].sys_name) == 0) {
 			qualify_one(i, opt, not, 0);
 			rc = 0;
 		}
 
 #if SUPPORTED_PERSONALITIES >= 2
+	for (i = 0; i < nsyscalls1; i++)
 		if (strcmp(s, sysent1[i].sys_name) == 0) {
 			qualify_one(i, opt, not, 1);
 			rc = 0;
@@ -343,12 +344,13 @@ qual_syscall(s, opt, not)
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
+	for (i = 0; i < nsyscalls2; i++)
 		if (strcmp(s, sysent2[i].sys_name) == 0) {
 			qualify_one(i, opt, not, 2);
 			rc = 0;
 		}
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
-	}
+
 	return rc;
 }
 
@@ -466,20 +468,22 @@ char *s;
 	}
 	for (p = strtok(s, ","); p; p = strtok(NULL, ",")) {
 		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {
-			for (i = 0; i < MAX_QUALS; i++) {
+			for (i = 0; i < nsyscalls0; i++)
 				if (sysent0[i].sys_flags & n)
 					qualify_one(i, opt, not, 0);
 
 #if SUPPORTED_PERSONALITIES >= 2
+			for (i = 0; i < nsyscalls1; i++)
 				if (sysent1[i].sys_flags & n)
 					qualify_one(i, opt, not, 1);
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
+			for (i = 0; i < nsyscalls2; i++)
 				if (sysent2[i].sys_flags & n)
 					qualify_one(i, opt, not, 2);
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
-			}
+
 			continue;
 		}
 		if (opt->qualify(p, opt, not)) {
