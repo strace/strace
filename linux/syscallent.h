@@ -232,7 +232,7 @@
 
 	{ 0,	0,	sys_getgid,		"getgid32"	}, /* 200 */
 	{ 0,	0,	sys_geteuid,		"geteuid32"	}, /* 201 */
-	{ 0,	0,	sys_geteuid,		"getegid32"	}, /* 202 */
+	{ 0,	0,	sys_getegid,		"getegid32"	}, /* 202 */
 	{ 2,	0,	sys_setreuid,		"setreuid32"	}, /* 203 */
 	{ 2,	0,	sys_setregid,		"setregid32"	}, /* 204 */
 	{ 2,	0,	sys_getgroups32,	"getgroups32"	}, /* 205 */
