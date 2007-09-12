@@ -1,3 +1,23 @@
+2007-09-11  Roland McGrath  <roland@redhat.com>
+
+	* linux/sparc/syscall.h: Add missing decls.
+	* linux/sparc/syscallent.h: Correct entries for setgroups32,
+	getgroups32, sys_getdents64.
+	From Jakub Bogusz <qboosh@pld-linux.org>.
+
+	* linux/alpha/syscallent.h: Correct entries for madvise, setresgid,
+	getresgid, pivot_root, mincore, pciconfig_iobase, getdents64.
+	From Jakub Bogusz <qboosh@pld-linux.org>.
+
+	* linux/syscallent.h: Fix getegid32 entry.
+	From Jakub Bogusz <qboosh@pld-linux.org>.
+
+	* defs.h [LINUXSPARC]: Use asm/psrcompat.h for [SPARC64], not asm/psr.h.
+	From Jakub Bogusz <qboosh@pld-linux.org>.
+
+	* mem.c (sys_getpagesize): Define for [SPARC || SPARC64] too.
+	From Jakub Bogusz <qboosh@pld-linux.org>.
+
 2007-08-20  Dmitry V. Levin <ldv@altlinux.org>
 
 	* syscall.c (qual_syscall, qualify): Fix nsyscalls and MAX_QUALS misuse.
