@@ -103,7 +103,7 @@
 	{ 5,	0,	printargs,		"osf_old_vadvise"	}, /* 72, not implemented */
 	{ 2,	0,	sys_munmap,		"munmap"		}, /* 73 */
 	{ 3,	0,	sys_mprotect,		"mprotect"		}, /* 74 */
-	{ 0,	0,	sys_madvise,		"madvise"		}, /* 75 */
+	{ 3,	0,	sys_madvise,		"madvise"		}, /* 75 */
 	{ 0,	0,	sys_vhangup,		"vhangup"		}, /* 76 */
 	{ 5,	0,	printargs,		"osf_kmodcall"		}, /* 77, not implemented */
 	{ 5,	0,	printargs,		"osf_mincore"		}, /* 78, not implemented */
@@ -399,13 +399,13 @@
 	{ 2,	0,	sys_capget,		"capget"		}, /* 368 */
 	{ 2,	0,	sys_capset,		"capset"		}, /* 369 */
 	{ 4,	TD,	sys_sendfile,		"sendfile"		}, /* 370 */
-	{ 3,	0,	printargs,		"setresgid"		}, /* 371 */
-	{ 3,	0,	printargs,		"getresgid"		}, /* 372 */
+	{ 3,	0,	sys_setresgid,		"setresgid"		}, /* 371 */
+	{ 3,	0,	sys_getresgid,		"getresgid"		}, /* 372 */
 	{ 4,	0,	printargs,		"dipc"			}, /* 373, not implemented */
-	{ 2,	TF,	printargs,		"pivot_root"		}, /* 374 */
-	{ 3,	0,	printargs,		"mincore"		}, /* 375 */
-	{ 4,	0,	printargs,		"pciconfig_iobase"	}, /* 376 */
-	{ 4,	TD,	sys_getdents64,		"getdents64"		}, /* 377 */
+	{ 2,	TF,	sys_pivotroot,		"pivot_root"		}, /* 374 */
+	{ 3,	0,	sys_mincore,		"mincore"		}, /* 375 */
+	{ 3,	0,	printargs,		"pciconfig_iobase"	}, /* 376 */
+	{ 3,	TD,	sys_getdents64,		"getdents64"		}, /* 377 */
 	{ 0,	0,	printargs,		"gettid"		}, /* 378 */
 	{ 4,	TD,	sys_readahead,		"readahead"		}, /* 379 */
 	{ 5,	0,	printargs,		"SYS_380"		}, /* 380 */
