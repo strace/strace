@@ -544,7 +544,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#if defined(ALPHA) || defined(FREEBSD) || defined(IA64) || defined(SUNOS4) || defined(SVR4)
+#if defined(ALPHA) || defined(FREEBSD) || defined(IA64) || defined(SUNOS4) || defined(SVR4) || defined(SPARC) || defined(SPARC64)
 int
 sys_getpagesize(tcp)
 struct tcb *tcp;
