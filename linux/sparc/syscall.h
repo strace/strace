@@ -107,6 +107,7 @@ int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll();
 int sys_sendfile(), sys_query_module(), sys_capget(), sys_capset();
 int sys_create_module(), sys_init_module();
+int sys_setgroups32(), sys_getgroups32();
 
 int	sys_umask();		/* XXX */
 
@@ -202,5 +203,15 @@ int	sys_remap_file_pages(), sys_readahead(), sys_tgkill(), sys_statfs64();
 int	sys_fstatfs64(), sys_clock_settime(), sys_clock_gettime();
 int	sys_clock_getres(), sys_clock_nanosleep();
 int	sys_timer_create(), sys_timer_settime(), sys_timer_gettime();
+
+int	sys_io_setup(), sys_io_destroy(), sys_io_submit(), sys_io_cancel(), sys_io_getevents();
+int	sys_mq_open(), sys_mq_unlink(), sys_mq_timedsend(), sys_mq_timedreceive(), sys_mq_notify(), sys_mq_getsetattr();
+int	sys_waitid();
+int	sys_openat(), sys_mkdirat(), sys_mknodat(), sys_fchownat(), sys_futimesat(), sys_newfstatat(), sys_unlinkat(), sys_renameat(), sys_linkat(), sys_symlinkat(), sys_readlinkat(), sys_fchmodat(),	sys_faccessat();
+int	sys_pselect6(), sys_ppoll();
+int	sys_unshare();
+int	sys_move_pages(), sys_getcpu();
+int	sys_epoll_pwait();
+int	sys_signalfd(), sys_timerfd(), sys_eventfd();
 
 #include "syscall1.h"

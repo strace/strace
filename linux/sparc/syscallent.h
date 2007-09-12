@@ -80,7 +80,7 @@
 	{ 2,	0,	sys_getgroups,	"getgroups" },		/* 79 */
 	{ 2,	0,	sys_setgroups,	"setgroups" },		/* 80 */
 	{ 0,	0,	sys_getpgrp,	"getpgrp" },		/* 81 */
-	{ 2,	0,	sys_setgroups,	"setgroups32" },	/* 82 */
+	{ 2,	0,	sys_setgroups32,"setgroups32" },	/* 82 */
 	{ 3,	0,	sys_setitimer,	"setitimer" },		/* 83 */
 	{ 2,	TD,	sys_ftruncate,	"ftruncate64" },	/* 84 */
 	{ 1,	TF,	sys_swapon,	"swapon" },		/* 85 */
@@ -113,7 +113,7 @@
 	{ 2,	TS,	sys_setresgid,	"setresgid32" },	/* 112 */
 	{ 5,	TN,	sys_recvmsg,	"recvmsg" },		/* 113 */
 	{ 5,	TN,	sys_sendmsg,	"sendmsg" },		/* 114 */
-	{ 2,	0,	sys_getgroups,	"getgroups32" },	/* 115 */
+	{ 2,	0,	sys_getgroups32,"getgroups32" },	/* 115 */
 	{ 2,	0,	sys_gettimeofday,"gettimeofday" },	/* 116 */
 	{ 2,	0,	sys_getrusage,	"getrusage" },		/* 117 */
 	{ 5,	TN,	sys_getsockopt,	"getsockopt" },		/* 118 */
@@ -152,7 +152,7 @@
 	{ 4,	TN,	sys_getmsg,	"getmsg" },		/* 151 */
 	{ 4,	TN,	sys_putmsg,	"putmsg" },		/* 152 */
 	{ 3,	TD,	sys_poll,	"poll" },		/* 153 */
-	{ 4,	TD,	sys_getdents64,	"getdents64" },		/* 154 */
+	{ 3,	TD,	sys_getdents64,	"getdents64" },		/* 154 */
 	{ 3,	TD,	sys_fcntl,	"fcntl64" },		/* 155 */
 	{ 4,	0,	printargs,	"getdirentries" },	/* 156 */
 	{ 2,	TF,	sys_statfs,	"statfs" },		/* 157 */
