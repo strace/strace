@@ -937,10 +937,7 @@ static const struct xlat af_packet_types[] = {
 
 
 void
-printsock(tcp, addr, addrlen)
-struct tcb *tcp;
-long addr;
-int addrlen;
+printsock(struct tcb *tcp, long addr, int addrlen)
 {
 	union {
 		char pad[128];
@@ -970,13 +967,16 @@ int addrlen;
 		tprintf("%#lx", addr);
 		return;
 	}
-	if ((addrlen<2) || (addrlen>sizeof(addrbuf)))
-		addrlen=sizeof(addrbuf);
 
-	if (umoven(tcp, addr, addrlen, (char*)&addrbuf) < 0) {
+	if (addrlen < 2 || addrlen > sizeof(addrbuf))
+		addrlen = sizeof(addrbuf);
+
+	memset(&addrbuf, 0, sizeof(addrbuf));
+	if (umoven(tcp, addr, addrlen, addrbuf.pad) < 0) {
 		tprintf("{...}");
 		return;
 	}
+	addrbuf.pad[sizeof(addrbuf.pad) - 1] = '\0';
 
 	tprintf("{sa_family=");
 	printxval(addrfams, addrbuf.sa.sa_family, "AF_???");
@@ -984,12 +984,14 @@ int addrlen;
 
 	switch (addrbuf.sa.sa_family) {
 	case AF_UNIX:
-		if (addrlen==2) {
-			tprintf("<nil>");
+		if (addrlen == 2) {
+			tprintf("NULL");
 		} else if (addrbuf.sau.sun_path[0]) {
-			tprintf("path=\"%-.*s\"", addrlen-2, addrbuf.sau.sun_path);
+			tprintf("path=");
+			printstr(tcp, addr + 2, strlen(addrbuf.sau.sun_path));
 		} else {
-			tprintf("path=@%-.*s", addrlen-3, addrbuf.sau.sun_path+1);
+			tprintf("path=@");
+			printstr(tcp, addr + 3, strlen(addrbuf.sau.sun_path + 1));
 		}
 		break;
 	case AF_INET:

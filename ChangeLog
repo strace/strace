@@ -1,5 +1,11 @@
 2007-10-01  Dmitry V. Levin <ldv@altlinux.org>
 
+	* net.c (printsock): Output AF_UNIX socket address using
+	printpathn() to avoid unprintable characters in output.
+	Suggested by Neil Campbell.
+
+2007-10-01  Dmitry V. Levin <ldv@altlinux.org>
+
 	* util.c (string_quote): Move quoting code from ...
 	(printstr) ... here.  Use string_quote.
 	(printpathn): Update for new string_quote interface.
