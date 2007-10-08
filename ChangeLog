@@ -1,3 +1,9 @@
+2007-09-25  Dmitry V. Levin <ldv@altlinux.org>
+
+	* strace (main): Use calloc for tcbtab allocation.
+	Check calloc return value.
+	Reported by Bai Weidong.
+
 2007-09-11  Roland McGrath  <roland@redhat.com>
 
 	* linux/sparc/syscall.h: Add missing decls.

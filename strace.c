@@ -616,9 +616,7 @@ startup_child (char **argv)
 }
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
 	extern int optind;
 	extern char *optarg;
@@ -628,14 +626,21 @@ char *argv[];
 
 	static char buf[BUFSIZ];
 
+	progname = argv[0] ? argv[0] : "strace";
+
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
-	tcbtab = (struct tcb **) malloc (tcbtabsize * sizeof tcbtab[0]);
-	tcbtab[0] = (struct tcb *) calloc (tcbtabsize, sizeof *tcbtab[0]);
+	if ((tcbtab = calloc (tcbtabsize, sizeof tcbtab[0])) == NULL) {
+		fprintf(stderr, "%s: out of memory\n", progname);
+		exit(1);
+	}
+	if ((tcbtab[0] = calloc (tcbtabsize, sizeof tcbtab[0][0])) == NULL) {
+		fprintf(stderr, "%s: out of memory\n", progname);
+		exit(1);
+	}
 	for (tcp = tcbtab[0]; tcp < &tcbtab[0][tcbtabsize]; ++tcp)
 		tcbtab[tcp - tcbtab[0]] = &tcbtab[0][tcp - tcbtab[0]];
 
-	progname = argv[0];
 	outf = stderr;
 	interactive = 1;
 	set_sortby(DEFAULT_SORTBY);
