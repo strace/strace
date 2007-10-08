@@ -377,72 +377,125 @@ unsigned long uid;
 static char path[MAXPATHLEN + 1];
 
 static void
-string_quote(str)
-const char *str;
+string_quote(const char *instr, char *outstr, int len, int size)
 {
-	char buf[2 * MAXPATHLEN + 1];
-	char *s;
+	const unsigned char *ustr = (const unsigned char *) instr;
+	char *s = outstr;
+	int usehex = 0, c, i;
 
-	if (!strpbrk(str, "\"\'\\")) {
-		tprintf("\"%s\"", str);
-		return;
-	}
-	for (s = buf; *str; str++) {
-		switch (*str) {
-		case '\"': case '\'': case '\\':
-			*s++ = '\\'; *s++ = *str; break;
-		default:
-			*s++ = *str; break;
+	if (xflag > 1)
+		usehex = 1;
+	else if (xflag) {
+		for (i = 0; i < size; ++i) {
+			c = ustr[i];
+			if (len < 0 && c == '\0')
+				break;
+			if (!isprint(c) && !isspace(c)) {
+				usehex = 1;
+				break;
+			}
 		}
 	}
+
+	*s++ = '\"';
+
+	if (usehex) {
+		for (i = 0; i < size; ++i) {
+			c = ustr[i];
+			if (len < 0 && c == '\0')
+				break;
+			sprintf(s, "\\x%02x", c);
+			s += 4;
+		}
+	} else {
+		for (i = 0; i < size; ++i) {
+			c = ustr[i];
+			if (len < 0 && c == '\0')
+				break;
+			switch (c) {
+				case '\"': case '\\':
+					*s++ = '\\';
+					*s++ = c;
+					break;
+				case '\f':
+					*s++ = '\\';
+					*s++ = 'f';
+					break;
+				case '\n':
+					*s++ = '\\';
+					*s++ = 'n';
+					break;
+				case '\r':
+					*s++ = '\\';
+					*s++ = 'r';
+					break;
+				case '\t':
+					*s++ = '\\';
+					*s++ = 't';
+					break;
+				case '\v':
+					*s++ = '\\';
+					*s++ = 'v';
+					break;
+				default:
+					if (isprint(c))
+						*s++ = c;
+					else if (i + 1 < size
+						 && isdigit(ustr[i + 1])) {
+						sprintf(s, "\\%03o", c);
+						s += 4;
+					} else {
+						sprintf(s, "\\%o", c);
+						s += strlen(s);
+					}
+					break;
+			}
+		}
+	}
+
+	*s++ = '\"';
 	*s = '\0';
-	tprintf("\"%s\"", buf);
 }
 
 void
-printpath(tcp, addr)
-struct tcb *tcp;
-long addr;
+printpathn(struct tcb *tcp, long addr, int n)
 {
-	if (addr == 0)
-		tprintf("NULL");
-	else if (umovestr(tcp, addr, MAXPATHLEN, path) < 0)
-		tprintf("%#lx", addr);
-	else
-		string_quote(path);
-	return;
-}
-
-void
-printpathn(tcp, addr, n)
-struct tcb *tcp;
-long addr;
-int n;
-{
-	if (n >= sizeof path)
+	if (n > sizeof path - 1)
 		n = sizeof path - 1;
 
-	if (addr == 0)
+	if (addr == 0) {
 		tprintf("NULL");
-	else 	if (umovestr(tcp, addr, n, path) < 0)
+		return;
+	}
+
+	path[n] = '\0';
+	if (umovestr(tcp, addr, n + 1, path) < 0)
 		tprintf("%#lx", addr);
 	else {
-		path[n] = '\0';
-		string_quote(path);
+		static char outstr[4*(sizeof path - 1) + sizeof "\"...\""];
+		int trunc = (path[n] != '\0');
+
+		if (trunc)
+			path[n] = '\0';
+		string_quote(path, outstr, -1, n);
+		if (trunc)
+			strcat(outstr, "...");
+		tprintf("%s", outstr);
 	}
 }
 
 void
-printstr(tcp, addr, len)
-struct tcb *tcp;
-long addr;
-int len;
+printpath(struct tcb *tcp, long addr)
 {
-	static unsigned char *str = NULL;
+	printpathn(tcp, addr, sizeof path - 1);
+}
+
+void
+printstr(struct tcb *tcp, long addr, int len)
+{
+	static char *str = NULL;
 	static char *outstr;
-	int i, n, c, usehex;
-	char *s, *outend;
-	int trunc;
+	int size, trunc;
 
 	if (!addr) {
 		tprintf("NULL");
@@ -457,94 +510,27 @@ int len;
 			return;
 		}
 	}
-	outend = outstr + max_strlen * 4;
+
 	if (len < 0) {
-		n = max_strlen + 1;
-		if (umovestr(tcp, addr, n, (char *) str) < 0) {
+		size = max_strlen + 1;
+		if (umovestr(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
 	}
 	else {
-		n = MIN(len, max_strlen + 1);
-		if (umoven(tcp, addr, n, (char *) str) < 0) {
+		size = MIN(len, max_strlen + 1);
+		if (umoven(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
 	}
 
-	trunc = n > max_strlen && str[--n] != 0;
+	trunc = size > max_strlen && str[--size] != 0;
+	string_quote(str, outstr, len, size);
+	if (size < len || (len < 0 && trunc))
+		strcat(outstr, "...");
 
-	usehex = 0;
-	if (xflag > 1)
-		usehex = 1;
-	else if (xflag) {
-		for (i = 0; i < n; i++) {
-			c = str[i];
-			if (len < 0 && c == '\0')
-				break;
-			if (!isprint(c) && !isspace(c)) {
-				usehex = 1;
-				break;
-			}
-		}
-	}
-
-	s = outstr;
-	*s++ = '\"';
-
-	if (usehex) {
-		for (i = 0; i < n; i++) {
-			c = str[i];
-			if (len < 0 && c == '\0')
-				break;
-			sprintf(s, "\\x%02x", c);
-			s += 4;
-			if (s > outend)
-				break;
-		}
-	}
-	else {
-		for (i = 0; i < n; i++) {
-			c = str[i];
-			if (len < 0 && c == '\0')
-				break;
-			switch (c) {
-			case '\"': case '\'': case '\\':
-				*s++ = '\\'; *s++ = c; break;
-			case '\f':
-				*s++ = '\\'; *s++ = 'f'; break;
-			case '\n':
-				*s++ = '\\'; *s++ = 'n'; break;
-			case '\r':
-				*s++ = '\\'; *s++ = 'r'; break;
-			case '\t':
-				*s++ = '\\'; *s++ = 't'; break;
-			case '\v':
-				*s++ = '\\'; *s++ = 'v'; break;
-			default:
-				if (isprint(c))
-					*s++ = c;
-				else if (i < n - 1 && isdigit(str[i + 1])) {
-					sprintf(s, "\\%03o", c);
-					s += 4;
-				}
-				else {
-					sprintf(s, "\\%o", c);
-					s += strlen(s);
-				}
-				break;
-			}
-			if (s > outend)
-				break;
-		}
-	}
-
-	*s++ = '\"';
-	if (i < len || (len < 0 && (trunc || s > outend))) {
-		*s++ = '.'; *s++ = '.'; *s++ = '.';
-	}
-	*s = '\0';
 	tprintf("%s", outstr);
 }
 

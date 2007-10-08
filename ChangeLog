@@ -1,3 +1,10 @@
+2007-10-01  Dmitry V. Levin <ldv@altlinux.org>
+
+	* util.c (string_quote): Move quoting code from ...
+	(printstr) ... here.  Use string_quote.
+	(printpathn): Update for new string_quote interface.
+	(printpath): Use printpathn.
+
 2007-09-25  Dmitry V. Levin <ldv@altlinux.org>
 
 	* strace.c (main): Use calloc for tcbtab allocation.
