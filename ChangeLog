@@ -1,3 +1,28 @@
+2007-09-22  Dmitry V. Levin <ldv@altlinux.org>
+
+	* time.c (print_timespec, sprint_timespec): New functions.
+	* defs.h (print_timespec, sprint_timespec): Declare them.
+	* desc.c (sys_io_getevents): Use print_timespec.
+	* stream.c (sys_ppoll): Likewise.
+	(decode_poll): Use sprint_timespec.
+
+2007-09-22  Alan Curry <pacman@world.std.com>
+	    Dmitry V. Levin <ldv@altlinux.org>
+
+	* stream.c (decode_poll): Rearrange so that arguments are decoded
+	and printed on syscall entry, except for revents and the output
+	timespec which are now printed in the auxstr.
+	(sys_poll): Print the input timeout argument on syscall entry.
+	[LINUX] (sys_ppoll): Likewise.
+	Fixes Debian#369651.
+
+2007-09-22  Dmitry V. Levin <ldv@altlinux.org>
+
+	* desc.c (sprintflags): Remove static qualifier, add "prefix"
+	argument, move function to ...
+	* util.c (sprintflags): ... here.
+	* defs.h (sprintflags): Declare it.
+
 2007-11-01  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c (get_scno) [ARM]: Check TCB_WAITEXECVE.
