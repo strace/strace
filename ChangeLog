@@ -1,3 +1,8 @@
+2007-11-01  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Match sh64* for SH64, sh* for SH.
+	Reported by Bernhard Fischer <rep.dot.nop@gmail.com>.
+
 2007-10-01  Dmitry V. Levin <ldv@altlinux.org>
 
 	* net.c (printsock): Output AF_UNIX socket address using
