@@ -1,4 +1,15 @@
+2007-11-01  Roland McGrath  <roland@redhat.com>
+
+	* linux/sh64/syscallent.h: Fix SYS_socket_subcall check.
+	From Paul Mundt <lethal@linux-sh.org>.
+
+	* linux/sh/syscallent.h: Update numerous calls.
+	From Paul Mundt <lethal@linux-sh.org>.
+
 2007-09-22  Dmitry V. Levin <ldv@altlinux.org>
+
+	* desc.c (sys_pselect6): Decode signal mask when entering syscall.
+	Relax signal mask size check.
 
 	* time.c (print_timespec, sprint_timespec): New functions.
 	* defs.h (print_timespec, sprint_timespec): Declare them.
