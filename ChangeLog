@@ -1,5 +1,9 @@
 2007-11-01  Roland McGrath  <roland@redhat.com>
 
+	* net.c (sockpacketoptions): Make PACKET_ADD_MEMBERSHIP and
+	PACKET_DROP_MEMBERSHIP conditional.
+	From Bernhard Fischer <rep.dot.nop@gmail.com>.
+
 	* configure.ac: Match sh64* for SH64, sh* for SH.
 	Reported by Bernhard Fischer <rep.dot.nop@gmail.com>.
 
