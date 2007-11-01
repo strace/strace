@@ -407,7 +407,7 @@ unsigned long uid;
 
 static char path[MAXPATHLEN + 1];
 
-static void
+static int
 string_quote(const char *instr, char *outstr, int len, int size)
 {
 	const unsigned char *ustr = (const unsigned char *) instr;
@@ -419,6 +419,8 @@ string_quote(const char *instr, char *outstr, int len, int size)
 	else if (xflag) {
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
+			if (len < 0 && i == size - 2 && c != '\0')
+				++i;
 			if (len < 0 && c == '\0')
 				break;
 			if (!isprint(c) && !isspace(c)) {
@@ -441,6 +443,8 @@ string_quote(const char *instr, char *outstr, int len, int size)
 	} else {
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
+			if (len < 0 && i == size - 2 && c != '\0')
+				++i;
 			if (len < 0 && c == '\0')
 				break;
 			switch (c) {
@@ -486,6 +490,9 @@ string_quote(const char *instr, char *outstr, int len, int size)
 
 	*s++ = '\"';
 	*s = '\0';
+
+	/* Return nonzero if the string was unterminated.  */
+	return i == size;
 }
 
 void
@@ -508,8 +515,7 @@ printpathn(struct tcb *tcp, long addr, int n)
 
 		if (trunc)
 			path[n] = '\0';
-		string_quote(path, outstr, -1, n);
-		if (trunc)
+		if (string_quote(path, outstr, -1, n + 1) || trunc)
 			strcat(outstr, "...");
 		tprintf("%s", outstr);
 	}
@@ -526,7 +532,7 @@ printstr(struct tcb *tcp, long addr, int len)
 {
 	static char *str = NULL;
 	static char *outstr;
-	int size, trunc;
+	int size;
 
 	if (!addr) {
 		tprintf("NULL");
@@ -557,9 +563,7 @@ printstr(struct tcb *tcp, long addr, int len)
 		}
 	}
 
-	trunc = size > max_strlen && str[--size] != 0;
-	string_quote(str, outstr, len, size);
-	if (size < len || (len < 0 && trunc))
+	if (string_quote(str, outstr, len, size))
 		strcat(outstr, "...");
 
 	tprintf("%s", outstr);
