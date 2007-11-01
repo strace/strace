@@ -91,13 +91,13 @@ hppa*|parisc*)
 	arch=hppa
 	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])
 	;;
-sh)
-	arch=sh
-	AC_DEFINE([SH], 1, [Define for the SH architecture.])
-	;;
-sh64)
+sh64*)
 	arch=sh64
 	AC_DEFINE([SH64], 1, [Define for the SH64 architecture.])
+	;;
+sh*)
+	arch=sh
+	AC_DEFINE([SH], 1, [Define for the SH architecture.])
 	;;
 x86?64*)
 	arch=x86_64
