@@ -280,6 +280,37 @@ int flags;
 	return n;
 }
 
+/*
+ * Interpret `xlat' as an array of flags/
+ * Print to static string the entries whose bits are on in `flags'
+ * Return static string.
+ */
+const char *
+sprintflags(const char *prefix, const struct xlat *xlat, int flags)
+{
+	static char outstr[1024];
+	int found = 0;
+
+	strcpy(outstr, prefix);
+
+	for (; xlat->str; xlat++) {
+		if ((flags & xlat->val) == xlat->val) {
+			if (found)
+				strcat(outstr, "|");
+			strcat(outstr, xlat->str);
+			flags &= ~xlat->val;
+			found = 1;
+		}
+	}
+	if (flags) {
+		if (found)
+			strcat(outstr, "|");
+		sprintf(outstr + strlen(outstr), "%#x", flags);
+	}
+
+	return outstr;
+}
+
 int
 printflags(xlat, flags, dflt)
 const struct xlat *xlat;

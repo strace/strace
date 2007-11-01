@@ -242,28 +242,6 @@ int getlk;
 }
 #endif
 
-static const char *
-sprintflags(const struct xlat *xlat, int flags)
-{
-	static char outstr[1024];
-	const char *sep;
-
-	strcpy(outstr, "flags ");
-	sep = "";
-	for (; xlat->str; xlat++) {
-		if ((flags & xlat->val) == xlat->val) {
-			sprintf(outstr + strlen(outstr),
-				"%s%s", sep, xlat->str);
-			sep = "|";
-			flags &= ~xlat->val;
-		}
-	}
-	if (flags)
-		sprintf(outstr + strlen(outstr),
-			"%s%#x", sep, flags);
-	return outstr;
-}
-
 /*
  * low bits of the open(2) flags define access mode,
  * other bits are real flags.
@@ -356,7 +334,8 @@ sys_fcntl(struct tcb *tcp)
 		case F_GETFD:
 			if (tcp->u_rval == 0)
 				return 0;
-			tcp->auxstr = sprintflags(fdflags, tcp->u_rval);
+			tcp->auxstr =
+				sprintflags("flags ", fdflags, tcp->u_rval);
 			return RVAL_HEX|RVAL_STR;
 		case F_GETFL:
 			tcp->auxstr = sprint_open_modes(tcp->u_rval);

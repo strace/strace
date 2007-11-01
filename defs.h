@@ -444,6 +444,7 @@ extern void printxval P((const struct xlat *, int, const char *));
 extern int printargs P((struct tcb *));
 extern int addflags P((const struct xlat *, int));
 extern int printflags P((const struct xlat *, int, const char *));
+extern const char *sprintflags P((const char *, const struct xlat *, int));
 extern int umoven P((struct tcb *, long, int, char *));
 extern int umovestr P((struct tcb *, long, int, char *));
 extern int upeek P((int, long, long *));
