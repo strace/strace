@@ -417,15 +417,10 @@ decode_poll(struct tcb *tcp, long pts)
 			strcat(outstr, "]");
 
 		if (pts) {
-			struct timespec ts;
 			char str[128];
 
 			sprintf(str, "%sleft ", cumlen ? ", " : "");
-			if (umove(tcp, pts, &ts) == 0)
-				sprintf(str + strlen(str), "{%lu, %lu}",
-					ts.tv_sec, ts.tv_nsec);
-			else
-				strcat(str, "{...}");
+			sprint_timespec(str + strlen(str), tcp, pts);
 			if ((cumlen += strlen(str)) < sizeof(outstr))
 				strcat(outstr, str);
 		}
@@ -459,11 +454,8 @@ sys_ppoll(struct tcb *tcp)
 {
 	int rc = decode_poll(tcp, tcp->u_arg[2]);
 	if (entering(tcp)) {
-		struct timespec ts;
-		if (umove(tcp, tcp->u_arg[2], &ts) == 0)
-			tprintf("{%lu, %lu}, ", ts.tv_sec, ts.tv_nsec);
-		else
-			tprintf("{...}, ");
+		print_timespec(tcp, tcp->u_arg[2]);
+		tprintf(", ");
 		print_sigset(tcp, tcp->u_arg[3], 0);
 		tprintf(", %lu", tcp->u_arg[4]);
 	}

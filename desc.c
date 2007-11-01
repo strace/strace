@@ -816,8 +816,7 @@ struct tcb *tcp;
 }
 
 int
-sys_io_getevents(tcp)
-struct tcb *tcp;
+sys_io_getevents(struct tcb * tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1],
@@ -851,15 +850,7 @@ struct tcb *tcp;
 #endif
 		}
 
-		if (tcp->u_arg[4] == 0)
-			tprintf("NULL");
-		else {
-			struct timespec to;
-			if (umove(tcp, tcp->u_arg[4], &to) == 0)
-				tprintf("{%lu, %lu}", to.tv_sec, to.tv_nsec);
-			else
-				tprintf("{...}");
-		}
+		print_timespec(tcp, tcp->u_arg[4]);
 	}
 	return 0;
 }

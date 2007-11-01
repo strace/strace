@@ -457,6 +457,8 @@ extern void printpath P((struct tcb *, long));
 extern void printpathn P((struct tcb *, long, int));
 extern void printtv_bitness P((struct tcb *, long, enum bitness_t, int));
 extern void sprinttv P((struct tcb *, long, enum bitness_t, char *));
+extern void print_timespec P((struct tcb *, long));
+extern void sprint_timespec P((char *, struct tcb *, long));
 #ifdef HAVE_SIGINFO_T
 extern void printsiginfo P((siginfo_t *, int));
 #endif
