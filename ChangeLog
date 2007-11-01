@@ -1,5 +1,16 @@
 2007-11-01  Roland McGrath  <roland@redhat.com>
 
+	* util.c (string_quote): Return nonzero if the string was unterminated.
+	(printstr): Use that value instead of just our own test.
+	(printpathn): Likewise.
+	Fixes RH#358241.
+
+	* linux/mips/syscallent.h: Fix argument count for fadvise64_64.
+	From Paul Mundt <lethal@linux-sh.org>.
+
+	* linux/mips/syscallent.h: Fix argument count for lookup_dcookie.
+	From Paul Mundt <lethal@linux-sh.org>.
+
 	* linux/sh64/syscallent.h: Fix SYS_socket_subcall check.
 	From Paul Mundt <lethal@linux-sh.org>.
 
