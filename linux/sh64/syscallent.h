@@ -429,7 +429,7 @@
 	{ 5,	0,	printargs,		"SYS_398"	}, /* 398 */
 	{ 5,	0,	printargs,		"SYS_399"	}, /* 399 */
 
-#if SYS_ipc_subcall != 400
+#if SYS_socket_subcall != 400
  #error fix me
 #endif
 	{ 8,	0,	printargs,		"socket_subcall"}, /* 400 */
