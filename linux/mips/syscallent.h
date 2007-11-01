@@ -4245,7 +4245,7 @@
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 4244 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 4245 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 4246 */
-	{ 3,	0,	printargs,		"lookup_dcookie"}, /* 4247 */
+	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 4247 */
 	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 4248 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 4249 */
 	{ 3,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 4250 */
