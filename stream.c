@@ -297,69 +297,152 @@ static const struct xlat pollflags[] = {
 };
 
 static int
-decode_poll(struct tcb *tcp)
+decode_poll(struct tcb *tcp, long pts)
 {
 	struct pollfd fds;
 	unsigned nfds;
 	unsigned long size, start, cur, end, abbrev_end;
 	int failed = 0;
 
-	if (entering(tcp))
-		return 0;
-
-	nfds = tcp->u_arg[1];
-	size = sizeof(fds) * nfds;
-	start = tcp->u_arg[0];
-	end = start + size;
-	if (nfds == 0 || size / sizeof(fds) != nfds || end < start) {
-		tprintf("%#lx, %d, ",
-			tcp->u_arg[0], nfds);
-		return 0;
-	}
-	if (abbrev(tcp)) {
-		abbrev_end = start + max_strlen * sizeof(fds);
-		if (abbrev_end < start)
+	if (entering(tcp)) {
+		nfds = tcp->u_arg[1];
+		size = sizeof(fds) * nfds;
+		start = tcp->u_arg[0];
+		end = start + size;
+		if (nfds == 0 || size / sizeof(fds) != nfds || end < start) {
+			tprintf("%#lx, %d, ",
+				tcp->u_arg[0], nfds);
+			return 0;
+		}
+		if (abbrev(tcp)) {
+			abbrev_end = start + max_strlen * sizeof(fds);
+			if (abbrev_end < start)
+				abbrev_end = end;
+		} else {
 			abbrev_end = end;
+		}
+		tprintf("[");
+		for (cur = start; cur < end; cur += sizeof(fds)) {
+			if (cur > start)
+				tprintf(", ");
+			if (cur >= abbrev_end) {
+				tprintf("...");
+				break;
+			}
+			if (umoven(tcp, cur, sizeof fds, (char *) &fds) < 0) {
+				tprintf("?");
+				failed = 1;
+				break;
+			}
+			if (fds.fd < 0) {
+				tprintf("{fd=%d}", fds.fd);
+				continue;
+			}
+			tprintf("{fd=%d, events=", fds.fd);
+			printflags(pollflags, fds.events, "POLL???");
+			tprintf("}");
+		}
+		tprintf("]");
+		if (failed)
+			tprintf(" %#lx", start);
+		tprintf(", %d, ", nfds);
+		return 0;
 	} else {
-		abbrev_end = end;
+		static char outstr[1024];
+		char str[64];
+                const char *flagstr;
+		unsigned int cumlen;
+
+		if (syserror(tcp))
+			return 0;
+		if (tcp->u_rval == 0) {
+			tcp->auxstr = "Timeout";
+			return RVAL_STR;
+		}
+
+		nfds = tcp->u_arg[1];
+		size = sizeof(fds) * nfds;
+		start = tcp->u_arg[0];
+		end = start + size;
+		if (nfds == 0 || size / sizeof(fds) != nfds || end < start)
+			return 0;
+		if (abbrev(tcp)) {
+			abbrev_end = start + max_strlen * sizeof(fds);
+			if (abbrev_end < start)
+				abbrev_end = end;
+		} else {
+			abbrev_end = end;
+		}
+
+		outstr[0] = '\0';
+		cumlen = 0;
+
+		for (cur = start; cur < end; cur += sizeof(fds)) {
+			if (umoven(tcp, cur, sizeof fds, (char *) &fds) < 0) {
+				++cumlen;
+				if (cumlen < sizeof(outstr))
+					strcat(outstr, "?");
+				failed = 1;
+				break;
+			}
+			if (!fds.revents)
+				continue;
+			if (!cumlen) {
+				++cumlen;
+				strcat(outstr, "[");
+			} else {
+				cumlen += 2;
+				if (cumlen < sizeof(outstr))
+					strcat(outstr, ", ");
+			}
+			if (cur >= abbrev_end) {
+				cumlen += 3;
+				if (cumlen < sizeof(outstr))
+					strcat(outstr, "...");
+				break;
+			}
+			sprintf(str, "{fd=%d, revents=", fds.fd);
+			flagstr=sprintflags("", pollflags, fds.revents);
+			cumlen += strlen(str) + strlen(flagstr) + 1;
+			if (cumlen < sizeof(outstr)) {
+				strcat(outstr, str);
+				strcat(outstr, flagstr);
+				strcat(outstr, "}");
+			}
+		}
+		if (failed)
+			return 0;
+
+		if (cumlen && ++cumlen < sizeof(outstr))
+			strcat(outstr, "]");
+
+		if (pts) {
+			struct timespec ts;
+			char str[128];
+
+			sprintf(str, "%sleft ", cumlen ? ", " : "");
+			if (umove(tcp, pts, &ts) == 0)
+				sprintf(str + strlen(str), "{%lu, %lu}",
+					ts.tv_sec, ts.tv_nsec);
+			else
+				strcat(str, "{...}");
+			if ((cumlen += strlen(str)) < sizeof(outstr))
+				strcat(outstr, str);
+		}
+
+		if (!outstr[0])
+			return 0;
+
+		tcp->auxstr = outstr;
+		return RVAL_STR;
 	}
-	tprintf("[");
-	for (cur = start; cur < end; cur += sizeof(fds)) {
-		if (cur > start)
-			tprintf(", ");
-		if (cur >= abbrev_end) {
-			tprintf("...");
-			break;
-		}
-		if (umoven(tcp, cur, sizeof fds, (char *) &fds) < 0) {
-			tprintf("?");
-			failed = 1;
-			break;
-		}
-		if (fds.fd < 0) {
-			tprintf("{fd=%d}", fds.fd);
-			continue;
-		}
-		tprintf("{fd=%d, events=", fds.fd);
-		printflags(pollflags, fds.events, "POLL???");
-		if (!syserror(tcp) && fds.revents) {
-			tprintf(", revents=");
-			printflags(pollflags, fds.revents, "POLL???");
-		}
-		tprintf("}");
-	}
-	tprintf("]");
-	if (failed)
-		tprintf(" %#lx", start);
-	tprintf(", %d, ", nfds);
-	return 0;
 }
 
 int
 sys_poll(struct tcb *tcp)
 {
-	int rc = decode_poll(tcp);
-	if (exiting(tcp)) {
+	int rc = decode_poll(tcp, 0);
+	if (entering(tcp)) {
 #ifdef INFTIM
 		if (tcp->u_arg[2] == INFTIM)
 			tprintf("INFTIM");
@@ -374,8 +457,8 @@ sys_poll(struct tcb *tcp)
 int
 sys_ppoll(struct tcb *tcp)
 {
-	int rc = decode_poll(tcp);
-	if (exiting(tcp)) {
+	int rc = decode_poll(tcp, tcp->u_arg[2]);
+	if (entering(tcp)) {
 		struct timespec ts;
 		if (umove(tcp, tcp->u_arg[2], &ts) == 0)
 			tprintf("{%lu, %lu}, ", ts.tv_sec, ts.tv_nsec);
