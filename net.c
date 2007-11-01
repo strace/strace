@@ -803,8 +803,12 @@ static const struct xlat sockrawoptions[] = {
 
 #ifdef SOL_PACKET
 static const struct xlat sockpacketoptions[] = {
+#ifdef PACKET_ADD_MEMBERSHIP
 	{ PACKET_ADD_MEMBERSHIP,	"PACKET_ADD_MEMBERSHIP"	},
+#endif
+#ifdef PACKET_DROP_MEMBERSHIP
 	{ PACKET_DROP_MEMBERSHIP,	"PACKET_DROP_MEMBERSHIP"},
+#endif
 #if defined(PACKET_RECV_OUTPUT)
 	{ PACKET_RECV_OUTPUT,		"PACKET_RECV_OUTPUT"	},
 #endif
