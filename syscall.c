@@ -1046,6 +1046,14 @@ struct tcb *tcp;
 	 * We only need to grab the syscall number on syscall entry.
 	 */
 	if (regs.ARM_ip == 0) {
+		if (!(tcp->flags & TCB_INSYSCALL)) {
+			/* Check if we return from execve. */
+			if (tcp->flags & TCB_WAITEXECVE) {
+				tcp->flags &= ~TCB_WAITEXECVE;
+				return 0;
+			}
+		}
+
 		/*
 		 * Note: we only deal with only 32-bit CPUs here.
 		 */
