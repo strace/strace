@@ -817,6 +817,20 @@ main(int argc, char *argv[])
 		interactive = 0;
 		qflag = 1;
 	}
+	/* Valid states here:
+	   optind < argc	pflag_seen	outfname	interactive
+	   1			0		0		1
+	   0			1		0		1
+	   1			0		1		0
+	   0			1		1		1
+	 */
+
+	/* STARTUP_CHILD must be called before the signal handlers get
+	   installed below as they are inherited into the spawned process.
+	   Also we do not need to be protected by them as during interruption
+	   in the STARTUP_CHILD mode we kill the spawned process anyway.  */
+	if (!pflag_seen)
+		startup_child(&argv[optind]);
 
 	sigemptyset(&empty_set);
 	sigemptyset(&blocked_set);
@@ -857,8 +871,6 @@ main(int argc, char *argv[])
 
 	if (pflag_seen)
 		startup_attach();
-	else
-		startup_child(&argv[optind]);
 
 	if (trace() < 0)
 		exit(1);
