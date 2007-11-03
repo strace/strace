@@ -1,3 +1,8 @@
+2007-11-03  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* strace.c (main): Move the STARTUP_CHILD call before setting up the
+	signal handlers.  New comment about the valid internal states.
+
 2007-11-01  Roland McGrath  <roland@redhat.com>
 
 	* util.c (string_quote): Return nonzero if the string was unterminated.
