@@ -216,6 +216,42 @@ static const struct xlat prctl_options[] = {
 #ifdef PR_SET_KEEPCAPS
 	{ PR_SET_KEEPCAPS,	"PR_SET_KEEP_CAPS"	},
 #endif
+#ifdef PR_GET_FPEMU
+	{ PR_GET_FPEMU,		"PR_GET_FPEMU"		},
+#endif
+#ifdef PR_SET_FPEMU
+	{ PR_SET_FPEMU,		"PR_SET_FPEMU"		},
+#endif
+#ifdef PR_GET_FPEXC
+	{ PR_GET_FPEXC,		"PR_GET_FPEXC"		},
+#endif
+#ifdef PR_SET_FPEXC
+	{ PR_SET_FPEXC,		"PR_SET_FPEXC"		},
+#endif
+#ifdef PR_GET_TIMING
+	{ PR_GET_TIMING,	"PR_GET_TIMING"		},
+#endif
+#ifdef PR_SET_TIMING
+	{ PR_SET_TIMING,	"PR_SET_TIMING"		},
+#endif
+#ifdef PR_SET_NAME
+	{ PR_SET_NAME,		"PR_SET_NAME"		},
+#endif
+#ifdef PR_GET_NAME
+	{ PR_GET_NAME,		"PR_GET_NAME"		},
+#endif
+#ifdef PR_GET_ENDIAN
+	{ PR_GET_ENDIAN,	"PR_GET_ENDIAN"		},
+#endif
+#ifdef PR_SET_ENDIAN
+	{ PR_SET_ENDIAN,	"PR_SET_ENDIAN"		},
+#endif
+#ifdef PR_GET_SECCOMP
+	{ PR_GET_SECCOMP,	"PR_GET_SECCOMP"	},
+#endif
+#ifdef PR_SET_SECCOMP
+	{ PR_SET_SECCOMP,	"PR_SET_SECCOMP"	},
+#endif
 	{ 0,			NULL			},
 };
 
