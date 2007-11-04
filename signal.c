@@ -97,6 +97,11 @@ typedef struct {
 	struct regs		si_regs;
 	int			si_mask;
 } m_siginfo_t;
+#elif defined (MIPS)
+typedef struct {
+	struct pt_regs		si_regs;
+	int			si_mask;
+} m_siginfo_t;
 #elif defined HAVE_ASM_SIGCONTEXT_H
 #if !defined(IA64) && !defined(X86_64)
 #include <asm/sigcontext.h>
@@ -1426,25 +1431,26 @@ struct tcb *tcp;
 #else
 #ifdef MIPS
 	long sp;
-	struct sigcontext sc;
+	struct pt_regs regs;
+	m_siginfo_t si;
 
+	if(ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+		perror("sigreturn: PTRACE_GETREGS ");
+		return 0;
+	}
 	if(entering(tcp)) {
 	  	tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid, REG_SP, &sp) < 0)
-		  	return 0;
-		if (umove(tcp, sp, &sc) < 0)
-		  	return 0;
+		sp = regs.regs[29];
+		if (umove(tcp, sp, &si) < 0)
 		tcp->u_arg[0] = 1;
-# ifdef HAVE_STRUCT_SIGCONTEXT_SC_HI2
-		tcp->u_arg[1] = sc.sc_hi2;
-# else
-		tcp->u_arg[1] = sc.sc_sigset;
-# endif
+		tcp->u_arg[1] = si.si_mask;
 	} else {
+		sigset_t sigm;
+		long_to_sigset(tcp->u_arg[1], &sigm);
 	  	tcp->u_rval = tcp->u_error = 0;
 		if(tcp->u_arg[0] == 0)
-		  	return 0;
-		tcp->auxstr = sprintsigmask("mask now ", tcp->u_arg[1], 0);
+			return 0;
+		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
