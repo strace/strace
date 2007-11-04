@@ -9,6 +9,13 @@
 	* strace.c (main): Move the STARTUP_CHILD call before setting up the
 	signal handlers.  New comment about the valid internal states.
 
+2007-11-02  Thiemo Seufer <ths@networkno.de>
+
+	* signal.c (m_siginfo_t): Add for MIPS.
+	(sys_sigreturn): struct sigcontext on MIPS has no sigset_t member,
+	acquire the signal mask with the same trick as on Sparc.
+	Fixes Debian#448802.
+
 2007-11-01  Roland McGrath  <roland@redhat.com>
 
 	* util.c (string_quote): Return nonzero if the string was unterminated.
