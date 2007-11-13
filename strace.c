@@ -1297,6 +1297,16 @@ struct tcb *tcp;
 		if (!(tcp->flags & TCB_CLONE_DETACHED))
 #endif
 			tcp->parent->nzombies++;
+#ifdef LINUX
+		/* Update `tcp->parent->parent->nchildren' and the other fields
+		   like NCLONE_DETACHED, only for zombie group leader that has
+		   already reported and been short-circuited at the top of this
+		   function.  The same condition as at the top of DETACH.  */
+		if ((tcp->flags & TCB_CLONE_THREAD) &&
+		    tcp->parent->nclone_threads == 0 &&
+		    (tcp->parent->flags & TCB_EXITING))
+			droptcb(tcp->parent);
+#endif
 		tcp->parent = NULL;
 	}
 
