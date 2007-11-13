@@ -1,3 +1,12 @@
+2007-11-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* strace.c [LINUX] (droptcb): Recurse on TCP->parent if it is a
+	TCB_EXITING zombie group leader.
+	* test/childthread.c: New file.
+	* test/.cvsignore, test/Makefile: Add it.
+	Code advisory: Roland McGrath
+	Fixes RH#354261.
+
 2007-11-03  Roland McGrath  <roland@redhat.com>
 
 	* process.c (prctl_options): Add numerous constants.
