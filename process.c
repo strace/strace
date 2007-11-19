@@ -3058,10 +3058,12 @@ struct tcb *tcp;
 			tprintf("%#lx, ", tcp->u_arg[2]);
 #ifdef LINUX
 		switch (tcp->u_arg[0]) {
+#ifndef IA64
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
 			break;
+#endif
 		case PTRACE_CONT:
 		case PTRACE_SINGLESTEP:
 		case PTRACE_SYSCALL:
@@ -3077,8 +3079,12 @@ struct tcb *tcp;
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
+#ifdef IA64
+			return RVAL_HEX;
+#else
 			printnum(tcp, tcp->u_arg[3], "%#lx");
 			break;
+#endif
 		}
 	}
 #endif /* LINUX */
