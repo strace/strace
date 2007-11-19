@@ -8,6 +8,8 @@ URL: http://sourceforge.net/projects/strace/
 Source0: http://dl.sourceforge.net/strace/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+BuildRequires: libaio-devel, libacl-devel
+
 %define strace64_arches ppc64
 
 %description
