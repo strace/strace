@@ -1,3 +1,7 @@
+2007-11-19  Roland McGrath  <roland@redhat.com>
+
+	* strace.spec: Add BuildRequires on libaio-devel, libacl-devel.
+
 2007-11-19  Andreas Schwab  <schwab@suse.de>
 
 	* process.c (sys_ptrace) [IA64]: For PTRACE_PEEKDATA,
