@@ -252,7 +252,7 @@
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
 	{ 3,	0,	printargs,		"mincore"	}, /* 218 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
-	{ 4,	0,	printargs,		"getdents64"	}, /* 220 */
+	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 221 */
 	{ 4,	0,	printargs,		"SYS_222"	}, /* 222 */
 	{ 4,	0,	printargs,		"SYS_223"	}, /* 223 */

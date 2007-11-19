@@ -1020,7 +1020,7 @@
 	{ 2,	0,	sys_lstat,		"lstat"		}, /* 1211 */
 	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 1212 */
 	{ 6,	TP,	sys_clone,		"clone2"	}, /* 1213 */
-	{ 3,	0,	printargs,		"getdents64"	}, /* 1214 */
+	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 1214 */
 	{ 2,	0,	printargs,		"getunwind"	}, /* 1215 */
 	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 1216 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 1217 */
