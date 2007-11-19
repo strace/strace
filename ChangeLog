@@ -160,6 +160,7 @@
 
 	* file.c (open_mode_flags): Add O_CLOEXEC.
 	* net.c (msg_flags): Add MSG_CMSG_CLOEXEC.
+	Fixes RH#365781.
 
 2007-08-03  Roland McGrath  <roland@redhat.com>
 
