@@ -1,3 +1,13 @@
+2007-11-19  Andreas Schwab  <schwab@suse.de>
+
+	* linux/syscallent.h: Fix argument count for getdents64.
+	* linux/arm/syscallent.h: Likewise.
+	* linux/m68k/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+
+	* linux/ia64/syscallent.h: Use sys_getdents64.
+	* linux/sh/syscallent.h: Likewise.
+
 2007-11-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* strace.c [LINUX] (droptcb): Recurse on TCP->parent if it is a
