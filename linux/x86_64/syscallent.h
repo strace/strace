@@ -215,7 +215,7 @@
 	{ 4,	0,	printargs,		"epoll_ctl_old"	}, /* 214 */
 	{ 4,	0,	printargs,		"epoll_wait_old"}, /* 215 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 216 */
-	{ 4,	TD,	sys_getdents64,		"getdents64"	}, /* 217 */
+	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 217 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 219 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 220 */

@@ -248,7 +248,7 @@
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
 	{ 5,	0,	printargs,		"SYS_218"	}, /* 218 */
 	{ 5,	0,	printargs,		"SYS_219"	}, /* 219 */
-	{ 4,	0,	sys_getdents64,		"getdents64"	}, /* 220 */
+	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ 0,	0,	printargs,		"gettid"	}, /* 221 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 222 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 223 */
