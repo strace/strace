@@ -1,5 +1,8 @@
 2007-11-19  Andreas Schwab  <schwab@suse.de>
 
+	* process.c (sys_ptrace) [IA64]: For PTRACE_PEEKDATA,
+	PTRACE_PEEKTEXT and PTRACE_PEEKUSER the data is returned directly.
+
 	* linux/syscallent.h: Fix argument count for getdents64.
 	* linux/arm/syscallent.h: Likewise.
 	* linux/m68k/syscallent.h: Likewise.
