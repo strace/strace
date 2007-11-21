@@ -1,3 +1,7 @@
+2007-11-20  Roland McGrath  <roland@redhat.com>
+
+	* CREDITS, ChangeLog: Converted contents to UTF8.
+
 2007-11-19  Roland McGrath  <roland@redhat.com>
 
 	* strace.spec: Add BuildRequires on libaio-devel, libacl-devel.
@@ -3667,7 +3671,7 @@
 
 2001-03-07  John Hughes <john@Calva.COM>
 
-  * file.c: merge missing part of Harald Böhme's solaris patches,
+  * file.c: merge missing part of Harald BÃ¶hme's solaris patches,
     was only declaring sys_{stat64,lstat64,fstat64} on linux!
 
 2001-03-07  John Hughes <john@Calva.COM>
@@ -3709,7 +3713,7 @@
 
   * configure.in, defs.h, desc.c, file.c, io.c, mem.c, net.c, resource.c,
     signal.c, syscall.c, svr4/dummy.h, svr4/syscall.h, svr4/syscallent.h:
-    merge Harald Böhme's solaris patches (_LFS64_LARGEFILE and kernel aio
+    merge Harald BÃ¶hme's solaris patches (_LFS64_LARGEFILE and kernel aio
     mostly).
 
 2001-03-06  John Hughes <john@Calva.COM>
@@ -3777,11 +3781,11 @@
   * file.c: rename dirent64 struct to kernel_dirent64 so things compile
     again with newer libcs
   * test/clone.c: improve our testcase a bit
-  * Merge another patch from Gäel Roualland with FreeBSD updates
+  * Merge another patch from GÃ¤el Roualland with FreeBSD updates
 
 2000-09-01  Wichert Akkerman <wakkerma@debian.org>
 
-  * lots of files: merge patch from Gaël Roualland to add
+  * lots of files: merge patch from GaÃ«l Roualland to add
     support for FreeBSD.
 
 2000-08-09  Wichert Akkerman <wakkerma@debian.org>
