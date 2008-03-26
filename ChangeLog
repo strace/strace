@@ -1,3 +1,7 @@
+2008-03-26  Roland McGrath  <roland@redhat.com>
+
+	* strace.spec (strace64_arches): Add sparc64.
+
 2007-11-20  Roland McGrath  <roland@redhat.com>
 
 	* CREDITS, ChangeLog: Converted contents to UTF8.
