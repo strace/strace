@@ -10,7 +10,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: libaio-devel, libacl-devel
 
-%define strace64_arches ppc64
+%define strace64_arches ppc64 sparc64
 
 %description
 The strace program intercepts and records the system calls called and
