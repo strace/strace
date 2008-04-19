@@ -1,5 +1,9 @@
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
+	* linux/errnoent.h: Update errno list based on latest
+	linux/errno.h and asm-generic/errno*.h files.
+	Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
 	* signalent.sh: Fix sort(1) old-style options.
 	* syscallent.sh: Likewise.
 	Signed-off-by: Mike Frysinger <vapier@gentoo.org>

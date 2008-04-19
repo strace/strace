@@ -123,13 +123,13 @@
 	"EDQUOT", /* 122 */
 	"ENOMEDIUM", /* 123 */
 	"EMEDIUMTYPE", /* 124 */
-	"ERRNO_125", /* 125 */
-	"ERRNO_126", /* 126 */
-	"ERRNO_127", /* 127 */
-	"ERRNO_128", /* 128 */
-	"ERRNO_129", /* 129 */
-	"ERRNO_130", /* 130 */
-	"ERRNO_131", /* 131 */
+	"ECANCELED", /* 125 */
+	"ENOKEY", /* 126 */
+	"EKEYEXPIRED", /* 127 */
+	"EKEYREVOKED", /* 128 */
+	"EKEYREJECTED", /* 129 */
+	"EOWNERDEAD", /* 130 */
+	"ENOTRECOVERABLE", /* 131 */
 	"ERRNO_132", /* 132 */
 	"ERRNO_133", /* 133 */
 	"ERRNO_134", /* 134 */
@@ -514,7 +514,7 @@
 	"ERESTARTNOINTR", /* 513 */
 	"ERESTARTNOHAND", /* 514 */
 	"ENOIOCTLCMD", /* 515 */
-	"ERRNO_516", /* 516 */
+	"ERESTART_RESTARTBLOCK", /* 516 */
 	"ERRNO_517", /* 517 */
 	"ERRNO_518", /* 518 */
 	"ERRNO_519", /* 519 */
@@ -527,3 +527,5 @@
 	"ESERVERFAULT", /* 526 */
 	"EBADTYPE", /* 527 */
 	"EJUKEBOX", /* 528 */
+	"EIOCBQUEUED", /* 529 */
+	"EIOCBRETRY", /* 530 */
