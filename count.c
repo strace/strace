@@ -164,8 +164,13 @@ call_summary_pers(FILE *outf)
 	double  percent;
 	char   *dashes = "-------------------------";
 	char    error_str[16];
-
 	int    *sorted_count = calloc(sizeof(int), nsyscalls);
+
+	if (!sorted_count)
+	{
+		fprintf(stderr, "strace: out of memory for call summary\n");
+		return;
+	}
 
 	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
 	if (overhead.tv_sec == -1)

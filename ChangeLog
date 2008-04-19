@@ -1,3 +1,8 @@
+2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
+
+	* count.c (call_summary_pers): Check calloc() return value.
+	Signed-off-by: "Yang Zhiguo" <yzgcsu@cn.fujitsu.com>
+
 2008-03-26  Roland McGrath  <roland@redhat.com>
 
 	* strace.spec (strace64_arches): Add sparc64.
