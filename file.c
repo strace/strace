@@ -676,20 +676,22 @@ int mode;
 }
 
 static char *
-sprinttime(t)
-time_t t;
+sprinttime(time_t t)
 {
 	struct tm *tmp;
 	static char buf[32];
 
 	if (t == 0) {
-		sprintf(buf, "0");
+		strcpy(buf, "0");
 		return buf;
 	}
-	tmp = localtime(&t);
-	sprintf(buf, "%02d/%02d/%02d-%02d:%02d:%02d",
-		tmp->tm_year + 1900, tmp->tm_mon + 1, tmp->tm_mday,
-		tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
+	if ((tmp = localtime(&t)))
+		snprintf(buf, sizeof buf, "%02d/%02d/%02d-%02d:%02d:%02d",
+			tmp->tm_year + 1900, tmp->tm_mon + 1, tmp->tm_mday,
+			tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
+	else
+		snprintf(buf, sizeof buf, "%lu", (unsigned long) t);
+
 	return buf;
 }
 
