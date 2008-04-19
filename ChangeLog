@@ -1,5 +1,11 @@
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
+	* file.c [_LFS64_LARGEFILE] (sys_getdents64): Do the same
+	d_reclen check as in sys_getdents: warn if d_reclen is 0 rather
+	than looping forever.
+	[FREEBSD] (sys_getdirentries): Likewise.
+	Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
 	* file.c [LINUXSPARC] (printstatsol): Fix sprinttime()
 	invocation.  The sprinttime() function takes a time_t argument,
 	but timestruct_t argument was given.
