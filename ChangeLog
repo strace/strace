@@ -1,5 +1,10 @@
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
+	* file.c [LINUXSPARC] (printstatsol): Fix sprinttime()
+	invocation.  The sprinttime() function takes a time_t argument,
+	but timestruct_t argument was given.
+	Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
 	* file.c (sprinttime): Check localtime() return value, to avoid
 	potential NULL dereference due to invalid time structures.
 	Signed-off-by: Harald van Dijk <truedfx@gentoo.org>

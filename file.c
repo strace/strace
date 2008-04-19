@@ -723,9 +723,7 @@ struct solstat {
 };
 
 static void
-printstatsol(tcp, addr)
-struct tcb *tcp;
-long addr;
+printstatsol(struct tcb *tcp, long addr)
 {
 	struct solstat statbuf;
 
@@ -767,9 +765,9 @@ long addr;
 		break;
 	}
 	if (!abbrev(tcp)) {
-		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
-		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
+		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime.tv_sec));
+		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime.tv_sec));
+		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime.tv_sec));
 	}
 	else
 		tprintf("...}");
