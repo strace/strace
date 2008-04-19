@@ -28,7 +28,7 @@
 
 cat $* |
 	sed -n -e 's/\/\*.*\*\// /' -e 's/^#[ 	]*define[ 	][ 	]*SIG\([^_ 	]*\)[ 	][ 	]*\([0-9][0-9]*\)[ 	]*$/\1 \2/p' |
-	sort +1n |
+	sort -k2n | uniq |
 	awk '
 	BEGIN {
 		tabs = "\t\t\t\t\t\t\t\t"

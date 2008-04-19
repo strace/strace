@@ -1,5 +1,9 @@
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
+	* signalent.sh: Fix sort(1) old-style options.
+	* syscallent.sh: Likewise.
+	Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
 	* count.c (call_summary_pers): Check calloc() return value.
 	Signed-off-by: "Yang Zhiguo" <yzgcsu@cn.fujitsu.com>
 
