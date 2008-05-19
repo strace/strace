@@ -1,3 +1,23 @@
+2008-05-08  David S. Miller  <davem@davemloft.net>
+
+	* syscall.c (socket_map, sparc_socket_decode): Delete.
+	(trace_syscall): Use common socketcall and ipc subcall
+	support on sparc.
+	* linux/sparc/syscall.h (sys_semtimedop): Declare.
+	(SYS_socket_subcall, SYS_sub_socket, SYS_sub_bind,
+	SYS_sub_connect, SYS_sub_listen, SYS_sub_accept,
+	SYS_sub_getsockname, SYS_sub_getpeername,
+	SYS_sub_socketpair, SYS_sub_send, SYS_sub_recv,
+	SYS_sub_sendto, SYS_sub_recvfrom, SYS_sub_shutdown,
+	SYS_sub_setsockopt, SYS_sub_getsockopt, SYS_sub_sendmsg,
+	SYS_sub_recvmsg, SYS_socket_nsubcalls, SYS_ipc_subcall,
+	SYS_sub_semop, SYS_sub_semget, SYS_sub_semctl,
+	SYS_sub_semtimedop, SYS_sub_msgsnd, SYS_sub_msgrcv,
+	SYS_sub_msgget, SYS_sub_msgctl, SYS_sub_shmat,
+	SYS_sub_shmdt, SYS_sub_shmget, SYS_sub_shmctl,
+	SYS_ipc_nsubcalls): Define
+	* linux/sparc/syscallent.h: Add socketcall and ipc entries.
+
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
 	* file.c [_LFS64_LARGEFILE] (sys_getdents64): Do the same
