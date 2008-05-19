@@ -584,50 +584,6 @@ static const struct subcall subcalls_table[] = {
 
 #if !(defined(LINUX) && ( defined(ALPHA) || defined(MIPS) ))
 
-static const int socket_map [] = {
-	       /* SYS_SOCKET      */ 97,
-	       /* SYS_BIND        */ 104,
-	       /* SYS_CONNECT     */ 98,
-	       /* SYS_LISTEN      */ 106,
-	       /* SYS_ACCEPT      */ 99,
-	       /* SYS_GETSOCKNAME */ 150,
-	       /* SYS_GETPEERNAME */ 141,
-	       /* SYS_SOCKETPAIR  */ 135,
-	       /* SYS_SEND        */ 101,
-	       /* SYS_RECV        */ 102,
-	       /* SYS_SENDTO      */ 133,
-	       /* SYS_RECVFROM    */ 125,
-	       /* SYS_SHUTDOWN    */ 134,
-	       /* SYS_SETSOCKOPT  */ 105,
-	       /* SYS_GETSOCKOPT  */ 118,
-	       /* SYS_SENDMSG     */ 114,
-	       /* SYS_RECVMSG     */ 113
-};
-
-#if defined (SPARC) || defined (SPARC64)
-static void
-sparc_socket_decode (tcp)
-struct tcb *tcp;
-{
-	volatile long addr;
-	volatile int i, n;
-
-	if (tcp->u_arg [0] < 1 || tcp->u_arg [0] > sizeof(socket_map)/sizeof(int)+1){
-		return;
-	}
-	tcp->scno = socket_map [tcp->u_arg [0]-1];
-	n = tcp->u_nargs = sysent [tcp->scno].nargs;
-	addr = tcp->u_arg [1];
-	for (i = 0; i < n; i++){
-	        int arg;
-		if (umoven (tcp, addr, sizeof (arg), (void *) &arg) < 0)
-			arg = 0;
-		tcp->u_arg [i] = arg;
-		addr += sizeof (arg);
-	}
-}
-#endif
-
 static void
 decode_subcall(tcp, subcall, nsubcalls, style)
 struct tcb *tcp;
@@ -2394,7 +2350,7 @@ trace_syscall(struct tcb *tcp)
 
 	switch (known_scno(tcp)) {
 #ifdef LINUX
-#if !defined (ALPHA) && !defined(SPARC) && !defined(SPARC64) && !defined(MIPS) && !defined(HPPA)
+#if !defined (ALPHA) && !defined(MIPS) && !defined(HPPA)
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);
@@ -2403,12 +2359,7 @@ trace_syscall(struct tcb *tcp)
 		decode_subcall(tcp, SYS_ipc_subcall,
 			SYS_ipc_nsubcalls, shift_style);
 		break;
-#endif /* !ALPHA && !MIPS && !SPARC && !SPARC64 && !HPPA */
-#if defined (SPARC) || defined (SPARC64)
-	case SYS_socketcall:
-		sparc_socket_decode (tcp);
-		break;
-#endif
+#endif /* !(ALPHA || MIPS || HPPA) */
 #endif /* LINUX */
 #ifdef SVR4
 #ifdef SYS_pgrpsys_subcall

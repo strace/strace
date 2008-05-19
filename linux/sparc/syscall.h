@@ -92,7 +92,7 @@ int	sys_truncate(),sys_ftruncate(),sys_access(),sys_fsync(),sys_sysctl();
 int	sys_statfs(),sys_fstatfs(),sys_msync();
 int sys_stat64(), sys_lstat64(), sys_fstat64();
 int sys_truncate64(), sys_ftruncate64();
-
+int sys_semtimedop();
 
 /* 2.3 communications */
 int	sys_socket(),sys_bind(),sys_listen(),sys_accept(),sys_connect();
@@ -213,5 +213,42 @@ int	sys_unshare();
 int	sys_move_pages(), sys_getcpu();
 int	sys_epoll_pwait();
 int	sys_signalfd(), sys_timerfd(), sys_eventfd();
+
+#  define SYS_socket_subcall	353
+#define SYS_sub_socket		(SYS_socket_subcall + 1)
+#define SYS_sub_bind		(SYS_socket_subcall + 2)
+#define SYS_sub_connect		(SYS_socket_subcall + 3)
+#define SYS_sub_listen		(SYS_socket_subcall + 4)
+#define SYS_sub_accept		(SYS_socket_subcall + 5)
+#define SYS_sub_getsockname	(SYS_socket_subcall + 6)
+#define SYS_sub_getpeername	(SYS_socket_subcall + 7)
+#define SYS_sub_socketpair	(SYS_socket_subcall + 8)
+#define SYS_sub_send		(SYS_socket_subcall + 9)
+#define SYS_sub_recv		(SYS_socket_subcall + 10)
+#define SYS_sub_sendto		(SYS_socket_subcall + 11)
+#define SYS_sub_recvfrom	(SYS_socket_subcall + 12)
+#define SYS_sub_shutdown	(SYS_socket_subcall + 13)
+#define SYS_sub_setsockopt	(SYS_socket_subcall + 14)
+#define SYS_sub_getsockopt	(SYS_socket_subcall + 15)
+#define SYS_sub_sendmsg		(SYS_socket_subcall + 16)
+#define SYS_sub_recvmsg		(SYS_socket_subcall + 17)
+
+#define SYS_socket_nsubcalls	18
+
+#define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
+#define SYS_sub_semop		(SYS_ipc_subcall + 1)
+#define SYS_sub_semget		(SYS_ipc_subcall + 2)
+#define SYS_sub_semctl		(SYS_ipc_subcall + 3)
+#define SYS_sub_semtimedop	(SYS_ipc_subcall + 4)
+#define SYS_sub_msgsnd		(SYS_ipc_subcall + 11)
+#define SYS_sub_msgrcv		(SYS_ipc_subcall + 12)
+#define SYS_sub_msgget		(SYS_ipc_subcall + 13)
+#define SYS_sub_msgctl		(SYS_ipc_subcall + 14)
+#define SYS_sub_shmat		(SYS_ipc_subcall + 21)
+#define SYS_sub_shmdt		(SYS_ipc_subcall + 22)
+#define SYS_sub_shmget		(SYS_ipc_subcall + 23)
+#define SYS_sub_shmctl		(SYS_ipc_subcall + 24)
+
+#define SYS_ipc_nsubcalls	25
 
 #include "syscall1.h"
