@@ -352,10 +352,11 @@
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 319 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 320 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 321 */
-	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 322 */
+	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"}, /* 322 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 323 */
-	{ 5,	0,	printargs,		"SYS_324"	}, /* 324 */
-	{ 5,	0,	printargs,		"SYS_325"	}, /* 325 */
+	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 324 */
+	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 325 */
+	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 326 */
 	{ 5,	0,	printargs,		"SYS_326"	}, /* 326 */
 	{ 5,	0,	printargs,		"SYS_327"	}, /* 327 */
 	{ 5,	0,	printargs,		"SYS_328"	}, /* 328 */

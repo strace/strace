@@ -104,6 +104,7 @@ int sys_arch_prctl();
 int sys_io_setup(), sys_io_submit(), sys_io_cancel(), sys_io_getevents(), sys_io_destroy();
 int sys_utimensat(), sys_epoll_pwait(), sys_signalfd(), sys_timerfd(), sys_eventfd();
 int sys_getcpu();
+int sys_fallocate(), sys_timerfd_create(), sys_timerfd_settime(), sys_timerfd_gettime();
 
 /* sys_socketcall subcalls */
 
