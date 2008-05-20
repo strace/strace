@@ -1,5 +1,12 @@
 2008-05-19  Roland McGrath  <roland@redhat.com>
 
+	* debian/rules (binary-arch): Fix chmod/chown typo.
+	Fixes Debian#459255.
+
+	* debian/rules (binary-arch): Install strace-graph in examples/
+	directory under package doc.
+	Fixes Debian#469068.
+
 	* signal.c (sys_kill): When current personality's wordsize is smaller
 	than native, sign-extend the PID argument from 32 bits.
 	Fixes RH#430585.
