@@ -1,5 +1,10 @@
 2008-05-19  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: Add check for struct sigcontext_struct in <signal.h>.
+	* signal.c [! HAVE_ASM_SIGCONTEXT_H] [I386] (struct sigcontext_struct):
+	Conditionalize definition on !HAVE_STRUCT_SIGCONTEXT_STRUCT.
+	Fixes Debian#456879.
+
 	* util.c [LINUX] (setbpt): Use correct SYS_clone number for current
 	personality.
 	Fixes RH#447475.
@@ -23,6 +28,23 @@
 	SYS_sub_shmdt, SYS_sub_shmget, SYS_sub_shmctl,
 	SYS_ipc_nsubcalls): Define
 	* linux/sparc/syscallent.h: Add socketcall and ipc entries.
+
+2008-01-25  Bruna Moreira <bruna.moreira@indt.org>
+
+	* defs.h [ARM]: Define SUPPORTED_PERSONALITIES to 2.
+	* syscall.c (get_scno) [ARM]: Add support for architecture specific
+	syscalls.
+	* linux/arm/syscallent.h: Update network syscalls list.
+	* linux/arm/syscallent1.h: New file. Add new architecture specific
+	syscalls.
+	* linux/arm/errnoent1.h: New file.
+	* linux/arm/ioctlent1.h: New file.
+	* linux/arm/signalent1.h: New file.
+	Fixes Debian#441000.
+
+2008-01-07  Paul Mundt  <lethal@linux-sh.org>
+
+	* linux/sh64/syscallent.h: Update numerous calls, fix others.
 
 2007-08-26  Daniel Jacobowitz  <dan@codesourcery.com>
 
