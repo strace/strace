@@ -1055,6 +1055,14 @@ struct tcb *tcp;
 				scno &= 0x000fffff;
 			}
 		}
+		if (scno & 0x0f0000) {
+			/*
+			 * Handle ARM specific syscall
+			 */
+			set_personality(1);
+			scno &= 0x0000ffff;
+		} else
+			set_personality(0);
 
 		if (tcp->flags & TCB_INSYSCALL) {
 			fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);

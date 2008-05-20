@@ -311,23 +311,23 @@
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 278 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 279 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 280 */
-	{ 5,	0,	printargs,		"SYS_281"	}, /* 281 */
-	{ 5,	0,	printargs,		"SYS_282"	}, /* 282 */
-	{ 5,	0,	printargs,		"SYS_283"	}, /* 283 */
-	{ 5,	0,	printargs,		"SYS_284"	}, /* 284 */
-	{ 5,	0,	printargs,		"SYS_285"	}, /* 285 */
-	{ 5,	0,	printargs,		"SYS_286"	}, /* 286 */
-	{ 5,	0,	printargs,		"SYS_287"	}, /* 287 */
-	{ 5,	0,	printargs,		"SYS_288"	}, /* 288 */
-	{ 5,	0,	printargs,		"SYS_289"	}, /* 289 */
-	{ 5,	0,	printargs,		"SYS_290"	}, /* 290 */
-	{ 5,	0,	printargs,		"SYS_291"	}, /* 291 */
-	{ 5,	0,	printargs,		"SYS_292"	}, /* 292 */
-	{ 5,	0,	printargs,		"SYS_293"	}, /* 293 */
-	{ 5,	0,	printargs,		"SYS_294"	}, /* 294 */
-	{ 5,	0,	printargs,		"SYS_295"	}, /* 295 */
-	{ 5,	0,	printargs,		"SYS_296"	}, /* 296 */
-	{ 5,	0,	printargs,		"SYS_297"	}, /* 297 */
+	{ 3,	TN,	sys_socket,		"socket"	}, /* 281 */
+	{ 3,	TN,	sys_bind,		"bind"		}, /* 282 */
+	{ 3,	TN,	sys_connect,		"connect"	}, /* 283 */
+	{ 2,	TN,	sys_listen,		"listen"	}, /* 284 */
+	{ 3,	TN,	sys_accept,		"accept"	}, /* 285 */
+	{ 3,	TN,	sys_getsockname,	"getsockname"	}, /* 286 */
+	{ 3,	TN,	sys_getpeername,	"getpeername"	}, /* 287 */
+	{ 4,	TN,	sys_socketpair,		"socketpair"	}, /* 288 */
+	{ 4,	TN,	sys_send,		"send"		}, /* 289 */
+	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 290 */
+	{ 4,	TN,	sys_recv,		"recv"		}, /* 291 */
+	{ 6,	TN,	sys_recvfrom,		"recvfrom"	}, /* 292 */
+	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 293 */
+	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 294 */
+	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 295 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 296 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 297 */
 	{ 5,	0,	printargs,		"SYS_298"	}, /* 298 */
 	{ 5,	0,	printargs,		"SYS_299"	}, /* 299 */
 	{ 5,	0,	printargs,		"SYS_300"	}, /* 300 */
