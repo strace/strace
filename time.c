@@ -989,4 +989,41 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+int
+sys_timerfd_create(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		tprintf(", ");
+		printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
+	}
+	return 0;
+}
+
+int
+sys_timerfd_settime(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
+		tprintf(", ");
+		printitv(tcp, tcp->u_arg[2]);
+		tprintf(", ");
+		printitv(tcp, tcp->u_arg[3]);
+	}
+	return 0;
+}
+
+int
+sys_timerfd_gettime(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		tprintf(", ");
+		printitv(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
 #endif /* LINUX */
