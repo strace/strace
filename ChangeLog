@@ -1,3 +1,9 @@
+2008-05-19  Roland McGrath  <roland@redhat.com>
+
+	* util.c [LINUX] (setbpt): Use correct SYS_clone number for current
+	personality.
+	Fixes RH#447475.
+
 2008-05-08  David S. Miller  <davem@davemloft.net>
 
 	* syscall.c (socket_map, sparc_socket_decode): Delete.
