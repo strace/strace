@@ -1275,6 +1275,8 @@ struct tcb *tcp;
 
 #if defined LINUX
 
+#include "syscall.h"
+
 #include <sys/syscall.h>
 #ifndef CLONE_PTRACE
 # define CLONE_PTRACE    0x00002000
@@ -1473,12 +1475,27 @@ int
 setbpt(tcp)
 struct tcb *tcp;
 {
+	static int clone_scno[SUPPORTED_PERSONALITIES] = { SYS_clone };
 	extern int change_syscall(struct tcb *, int);
 	arg_setup_state state;
 
 	if (tcp->flags & TCB_BPTSET) {
 		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
 		return -1;
+	}
+
+	/*
+	 * It's a silly kludge to initialize this with a search at runtime.
+	 * But it's better than maintaining another magic thing in the
+	 * godforsaken tables.
+	 */
+	if (clone_scno[current_personality] == 0) {
+		int i;
+		for (i = 0; i < nsyscalls; ++i)
+			if (sysent[i].sys_func == sys_clone) {
+				clone_scno[current_personality] = i;
+				break;
+			}
 	}
 
 	switch (known_scno(tcp)) {
@@ -1492,7 +1509,7 @@ struct tcb *tcp;
 		if (arg_setup (tcp, &state) < 0
 		    || get_arg0 (tcp, &state, &tcp->inst[0]) < 0
 		    || get_arg1 (tcp, &state, &tcp->inst[1]) < 0
-		    || change_syscall(tcp, SYS_clone) < 0
+		    || change_syscall(tcp, clone_scno[current_personality]) < 0
 		    || set_arg0 (tcp, &state, CLONE_PTRACE|SIGCHLD) < 0
 		    || set_arg1 (tcp, &state, 0) < 0
 		    || arg_finish_change (tcp, &state) < 0)
