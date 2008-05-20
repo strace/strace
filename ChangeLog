@@ -24,6 +24,31 @@
 	SYS_ipc_nsubcalls): Define
 	* linux/sparc/syscallent.h: Add socketcall and ipc entries.
 
+2007-08-26  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* defs.h [MIPS]: Include <sgidefs.h>.
+	(MAX_QUALS): Update for MIPS.
+	(LINUX_MIPSO32, LINUX_MIPSN32, LINUX_MIPSN64, LINUX_MIPS64): Define.
+	(struct tcb): Add ext_arg for MIPS N32.
+	(TCB_WAITEXECVE): Define for MIPS.
+	(ALIGN64): Use LINUX_MIPSO32.
+	* file.c (sys_lseek): Use ext_arg for MIPS N32.
+	(sys_readahead, sys_fadvise64_64): Likewise.
+	* io.c (sys_pread64, sys_pwrite64): Likewise.
+	* mem.c (print_mmap): Take OFFSET argument.
+	(sys_old_mmap): Update call to print_mmap.
+	(sys_mmap): Use ext_arg for MIPS N32.
+	* process.c (struct_user_offsets): Add MIPS registers.
+	* signal.c (sys_sigreturn): Handle MIPS N32 and MIPS N64.  Correct
+	MIPS O32 call to sprintsigmask.
+	* syscall.c (internal_syscall): Handle MIPS N32.  Check for
+	TCB_WAITEXECVE on MIPS.
+	(force_result): Add a comment about MIPS N32.
+	(syscall_enter): Handle MIPS N32 and MIPS N64.
+	* linux/syscall.h (sys_pread64, sys_pwrite64): Declare.
+	* linux/mips/syscallent.h: Include "dummy.h".  Handle alternate
+	MIPS ABIs.
+
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
 	* file.c [_LFS64_LARGEFILE] (sys_getdents64): Do the same
