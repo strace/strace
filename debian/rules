@@ -53,7 +53,7 @@ binary-arch: build checkroot
 
 	install -d -m 755 -o root -g root debian/$(package)
 	# reset the mode to work around a bug in install
-	chown 755 debian/$(package)
+	chmod 755 debian/$(package)
 	install -d -m 755 -o root -g root debian/$(package)/DEBIAN
 
 # Install strace
