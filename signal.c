@@ -1735,7 +1735,13 @@ sys_kill(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %s", tcp->u_arg[0], signame(tcp->u_arg[1]));
+		/*
+		 * Sign-extend a 32-bit value when that's what it is.
+		 */
+		long pid = tcp->u_arg[0];
+		if (personality_wordsize[current_personality] < sizeof pid)
+			pid = (long) (int) pid;
+		tprintf("%ld, %s", pid, signame(tcp->u_arg[1]));
 	}
 	return 0;
 }
