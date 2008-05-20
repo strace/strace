@@ -1,5 +1,18 @@
 2008-05-19  Roland McGrath  <roland@redhat.com>
 
+	* linux/x86_64/syscallent.h: Update entries for timerfd_* and fallocate.
+
+	* file.c (sys_fallocate): New function.
+	* linux/syscall.h: Declare it.
+	* linux/syscallent.h: Update entry.
+	From Kyle McMartin <kyle@mcmartin.ca>.
+
+	* time.c (sys_timerfd_create): New function.
+	(sys_timerfd_settime, sys_timerfd_gettime): New functions.
+	* linux/syscall.h: Declare them.
+	* linux/syscallent.h: Update entries for those syscalls.
+	From Kyle McMartin <kyle@mcmartin.ca>.
+
 	* debian/rules (binary-arch): Fix chmod/chown typo.
 	Fixes Debian#459255.
 
