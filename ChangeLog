@@ -53,7 +53,7 @@
 	SYS_ipc_nsubcalls): Define
 	* linux/sparc/syscallent.h: Add socketcall and ipc entries.
 
-2008-01-25  Bruna Moreira <bruna.moreira@indt.org>
+2008-01-25  Bruna Moreira  <bruna.moreira@indt.org>
 
 	* defs.h [ARM]: Define SUPPORTED_PERSONALITIES to 2.
 	* syscall.c (get_scno) [ARM]: Add support for architecture specific
