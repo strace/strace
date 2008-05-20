@@ -169,7 +169,7 @@
 	* strace.c (main): Move the STARTUP_CHILD call before setting up the
 	signal handlers.  New comment about the valid internal states.
 
-2007-11-02  Thiemo Seufer <ths@networkno.de>
+2007-11-02  Thiemo Seufer  <ths@networkno.de>
 
 	* signal.c (m_siginfo_t): Add for MIPS.
 	(sys_sigreturn): struct sigcontext on MIPS has no sigset_t member,
