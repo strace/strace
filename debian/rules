@@ -82,6 +82,10 @@ binary-arch: build checkroot
 	install -p -o root -g root -m 644 strace.1 \
 		debian/$(package)/usr/share/man/man1/strace.1
 	gzip -9 debian/$(package)/usr/share/man/man1/strace.1
+	install -d -o root -g root -m 755 \
+		debian/$(package)/usr/share/doc/$(package)/examples
+	install -p -o root -g root -m 755 strace-graph \
+		debian/$(package)/usr/share/doc/$(package)/examples
 
 ifneq (,$(HOST64))
 	install -o root -g root -m 755 build64/strace debian/$(package)/usr/bin/strace64
