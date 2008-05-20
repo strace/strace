@@ -1,5 +1,9 @@
 2008-05-19  Roland McGrath  <roland@redhat.com>
 
+	* signal.c (sys_kill): When current personality's wordsize is smaller
+	than native, sign-extend the PID argument from 32 bits.
+	Fixes RH#430585.
+
 	* configure.ac: Add check for struct sigcontext_struct in <signal.h>.
 	* signal.c [! HAVE_ASM_SIGCONTEXT_H] [I386] (struct sigcontext_struct):
 	Conditionalize definition on !HAVE_STRUCT_SIGCONTEXT_STRUCT.
