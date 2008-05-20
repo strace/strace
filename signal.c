@@ -107,7 +107,7 @@ typedef struct {
 #include <asm/sigcontext.h>
 #endif /* !IA64 && !X86_64 */
 #else /* !HAVE_ASM_SIGCONTEXT_H */
-#ifdef I386
+#if defined I386 && !defined HAVE_STRUCT_SIGCONTEXT_STRUCT
 struct sigcontext_struct {
 	unsigned short gs, __gsh;
 	unsigned short fs, __fsh;
