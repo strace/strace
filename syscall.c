@@ -754,6 +754,9 @@ internal_syscall(struct tcb *tcp)
 #elif defined (SPARC) || defined (SPARC64)
 	static struct regs regs;
 	static unsigned long trap;
+#elif defined(LINUX_MIPSN32)
+	static long long a3;
+	static long long r2;
 #elif defined(MIPS)
 	static long a3;
 	static long r2;
@@ -1066,13 +1069,43 @@ struct tcb *tcp;
 #elif defined (M68K)
 	if (upeek(pid, 4*PT_ORIG_D0, &scno) < 0)
 		return -1;
+#elif defined (LINUX_MIPSN32)
+	unsigned long long regs[38];
+
+	if (ptrace (PTRACE_GETREGS, pid, NULL, (long) &regs) < 0)
+		return -1;
+	a3 = regs[REG_A3];
+	r2 = regs[REG_V0];
+
+	if(!(tcp->flags & TCB_INSYSCALL)) {
+		scno = r2;
+
+		/* Check if we return from execve. */
+		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
+		}
+
+		if (scno < 0 || scno > nsyscalls) {
+			if(a3 == 0 || a3 == -1) {
+				if(debug)
+					fprintf (stderr, "stray syscall exit: v0 = %ld\n", scno);
+				return 0;
+			}
+		}
+	}
 #elif defined (MIPS)
 	if (upeek(pid, REG_A3, &a3) < 0)
 	  	return -1;
-
 	if(!(tcp->flags & TCB_INSYSCALL)) {
 	  	if (upeek(pid, REG_V0, &scno) < 0)
 		  	return -1;
+
+		/* Check if we return from execve. */
+		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
+		}
 
 		if (scno < 0 || scno > nsyscalls) {
 			if(a3 == 0 || a3 == -1) {
@@ -1732,6 +1765,7 @@ force_result(tcp, error, rval)
 		r2 = rval;
 		a3 = 0;
 	}
+	/* PTRACE_POKEUSER is OK even for n32 since rval is only a long.  */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), a3) < 0 ||
 	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), r2) < 0)
 	    	return -1;
@@ -1955,6 +1989,27 @@ struct tcb *tcp;
 				tcp->u_nargs = sysent[tcp->scno].nargs;
 			else
 				tcp->u_nargs = 5;
+		}
+	}
+#elif defined (LINUX_MIPSN32) || defined (LINUX_MIPSN64)
+	/* N32 and N64 both use up to six registers.  */
+	{
+		unsigned long long regs[38];
+	  	int i, nargs;
+
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
+		else 
+     	        	nargs = tcp->u_nargs = MAX_ARGS;
+
+		if (ptrace (PTRACE_GETREGS, pid, NULL, (long) &regs) < 0)
+			return -1;
+
+		for(i = 0; i < nargs; i++) {
+			tcp->u_arg[i] = regs[REG_A0 + i];
+# if defined (LINUX_MIPSN32)
+			tcp->ext_arg[i] = regs[REG_A0 + i];
+# endif
 		}
 	}
 #elif defined (MIPS)

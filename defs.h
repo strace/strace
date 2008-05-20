@@ -33,6 +33,10 @@
 #include "config.h"
 #endif
 
+#ifdef MIPS
+#include <sgidefs.h>
+#endif
+
 #ifdef linux
 #include <features.h>
 #endif
@@ -47,7 +51,7 @@
 /* configuration section */
 #ifndef MAX_QUALS
 #if defined(LINUX) && defined(MIPS)
-#define MAX_QUALS	5000	/* maximum number of syscalls, signals, etc. */
+#define MAX_QUALS	7000	/* maximum number of syscalls, signals, etc. */
 #else
 #define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
 #endif
@@ -93,6 +97,17 @@
 #  endif
 #  if defined(X86_64)
 #     define LINUX_X86_64
+#  endif
+#  if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI32
+#     define LINUX_MIPSO32
+#  endif
+#  if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_NABI32
+#     define LINUX_MIPSN32
+#     define LINUX_MIPS64
+#  endif
+#  if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI64
+#     define LINUX_MIPSN64
+#     define LINUX_MIPS64
 #  endif
 #endif
 
@@ -275,6 +290,9 @@ struct tcb {
 	long scno;		/* System call number */
 	int u_nargs;		/* System call arguments */
 	long u_arg[MAX_ARGS];	/* System call arguments */
+#if defined (LINUX_MIPSN32)
+	long long ext_arg[MAX_ARGS];	/* System call arguments */
+#endif
 	int u_error;		/* Error code */
 	long u_rval;		/* (first) return value */
 #ifdef HAVE_LONG_LONG
@@ -328,7 +346,7 @@ struct tcb {
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-# if defined(ALPHA) || defined(SPARC) || defined(SPARC64) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM)
+# if defined(ALPHA) || defined(SPARC) || defined(SPARC64) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM) || defined(MIPS)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
 # endif
 # define TCB_CLONE_DETACHED 04000 /* CLONE_DETACHED set in creating syscall */
@@ -595,7 +613,7 @@ extern const int nsignals2;
 
 #if defined(FREEBSD) || (defined(LINUX) \
 			 && defined(POWERPC) && !defined(__powerpc64__)) \
-  || (defined (LINUX) && defined (MIPS) && !defined(__mips64))
+  || defined (LINUX_MIPSO32)
 /* ARRGH!  off_t args are aligned on 64 bit boundaries! */
 #define ALIGN64(tcp,arg)						\
 do {									\

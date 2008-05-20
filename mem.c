@@ -191,9 +191,10 @@ static const struct xlat mmap_flags[] = {
 #if !HAVE_LONG_LONG_OFF_T
 static
 int
-print_mmap(tcp,u_arg)
+print_mmap(tcp,u_arg, offset)
 struct tcb *tcp;
 long *u_arg;
+long long offset;
 {
 	if (entering(tcp)) {
 		/* addr */
@@ -216,7 +217,7 @@ long *u_arg;
 		/* fd (is always int, not long) */
 		tprintf(", %d, ", (int)u_arg[4]);
 		/* offset */
-		tprintf("%#lx", u_arg[5]);
+		tprintf("%#llx", offset);
 	}
 	return RVAL_HEX;
 }
@@ -265,7 +266,7 @@ struct tcb *tcp;
     if (umoven(tcp, tcp->u_arg[0], sizeof u_arg, (char *) u_arg) == -1)
 	    return 0;
 #endif	// defined(IA64)
-    return print_mmap(tcp, u_arg);
+    return print_mmap(tcp, u_arg, u_arg[5]);
 
 }
 #endif
@@ -274,6 +275,8 @@ int
 sys_mmap(tcp)
 struct tcb *tcp;
 {
+    long long offset = tcp->u_arg[5];
+
 #if defined(LINUX) && defined(SH64)
     /*
      * Old mmap differs from new mmap in specifying the
@@ -281,9 +284,12 @@ struct tcb *tcp;
      * pretend it's in byte units so the user only ever
      * sees bytes in the printout.
      */
-    tcp->u_arg[5] <<= PAGE_SHIFT;
+    offset <<= PAGE_SHIFT;
 #endif
-    return print_mmap(tcp, tcp->u_arg);
+#if defined(LINUX_MIPSN32)
+    offset = tcp->ext_arg[5];
+#endif
+    return print_mmap(tcp, tcp->u_arg, offset);
 }
 #endif /* !HAVE_LONG_LONG_OFF_T */
 

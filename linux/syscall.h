@@ -317,3 +317,5 @@ int sys_capget(), sys_capset();
 #ifdef M68K
 int sys_cacheflush();
 #endif
+
+int sys_pread64(), sys_pwrite64();
