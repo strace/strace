@@ -2953,4 +2953,18 @@ sys_inotify_rm_watch(struct tcb *tcp)
 	}
 	return 0;
 }
+
+int
+sys_fallocate(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);	/* fd */
+		tprintf("%#lo, ", tcp->u_arg[1]);	/* mode */
+		tprintf("%llu, ", LONG_LONG(tcp->u_arg[2],
+			tcp->u_arg[3]));		/* offset */
+		tprintf("%llu", LONG_LONG(tcp->u_arg[4],
+			tcp->u_arg[5]));		/* len */
+	}
+	return 0;
+}
 #endif
