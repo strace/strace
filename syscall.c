@@ -1473,6 +1473,23 @@ struct tcb *tcp;
 	return 1;
 }
 
+#ifdef LINUX
+/*
+ * Check the syscall return value register value for whether it is
+ * a negated errno code indicating an error, or a success return value.
+ */
+static inline int
+is_negated_errno(unsigned long int val)
+{
+	unsigned long int max = -(long int) nerrnos;
+	if (personality_wordsize[current_personality] < sizeof(val)) {
+		val = (unsigned int) val;
+		max = (unsigned int) max;
+	}
+	return val > max;
+}
+#endif
+
 static int
 get_error(tcp)
 struct tcb *tcp;
@@ -1480,57 +1497,57 @@ struct tcb *tcp;
 	int u_error = 0;
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
-		if (gpr2 && (unsigned) -gpr2 < nerrnos) {
-			tcp->u_rval = -1;
-			u_error = -gpr2;
-		}
-		else {
-			tcp->u_rval = gpr2;
-			u_error = 0;
-		}
+	if (is_negated_errno(gpr2)) {
+		tcp->u_rval = -1;
+		u_error = -gpr2;
+	}
+	else {
+		tcp->u_rval = gpr2;
+		u_error = 0;
+	}
 #else /* !S390 && !S390X */
 #ifdef I386
-		if (eax < 0 && -eax < nerrnos) {
-			tcp->u_rval = -1;
-			u_error = -eax;
-		}
-		else {
-			tcp->u_rval = eax;
-			u_error = 0;
-		}
+	if (is_negated_errno(eax)) {
+		tcp->u_rval = -1;
+		u_error = -eax;
+	}
+	else {
+		tcp->u_rval = eax;
+		u_error = 0;
+	}
 #else /* !I386 */
 #ifdef X86_64
-		if (rax < 0 && -rax < nerrnos) {
-			tcp->u_rval = -1;
-			u_error = -rax;
-		}
-		else {
-			tcp->u_rval = rax;
-			u_error = 0;
-		}
+	if (is_negated_errno(rax)) {
+		tcp->u_rval = -1;
+		u_error = -rax;
+	}
+	else {
+		tcp->u_rval = rax;
+		u_error = 0;
+	}
 #else
 #ifdef IA64
-		if (ia32) {
-			int err;
+	if (ia32) {
+		int err;
 
-			err = (int)r8;
-			if (err < 0 && -err < nerrnos) {
-				tcp->u_rval = -1;
-				u_error = -err;
-			}
-			else {
-				tcp->u_rval = err;
-				u_error = 0;
-			}
-		} else {
-			if (r10) {
-				tcp->u_rval = -1;
-				u_error = r8;
-			} else {
-				tcp->u_rval = r8;
-				u_error = 0;
-			}
+		err = (int)r8;
+		if (is_negated_errno(err)) {
+			tcp->u_rval = -1;
+			u_error = -err;
 		}
+		else {
+			tcp->u_rval = err;
+			u_error = 0;
+		}
+	} else {
+		if (r10) {
+			tcp->u_rval = -1;
+			u_error = r8;
+		} else {
+			tcp->u_rval = r8;
+			u_error = 0;
+		}
+	}
 #else /* !IA64 */
 #ifdef MIPS
 		if (a3) {
@@ -1542,7 +1559,7 @@ struct tcb *tcp;
 		}
 #else
 #ifdef POWERPC
-		if (result && (unsigned long) -result < nerrnos) {
+		if (is_negated_errno(result)) {
 			tcp->u_rval = -1;
 			u_error = -result;
 		}
@@ -1552,7 +1569,7 @@ struct tcb *tcp;
 		}
 #else /* !POWERPC */
 #ifdef M68K
-		if (d0 && (unsigned) -d0 < nerrnos) {
+		if (is_negated_errno(d0)) {
 			tcp->u_rval = -1;
 			u_error = -d0;
 		}
@@ -1562,7 +1579,7 @@ struct tcb *tcp;
 		}
 #else /* !M68K */
 #ifdef ARM
-		if (regs.ARM_r0 && (unsigned) -regs.ARM_r0 < nerrnos) {
+		if (is_negated_errno(regs.ARM_r0)) {
 			tcp->u_rval = -1;
 			u_error = -regs.ARM_r0;
 		}
@@ -1602,7 +1619,7 @@ struct tcb *tcp;
 		}
 #else /* !SPARC64 */
 #ifdef HPPA
-		if (r28 && (unsigned) -r28 < nerrnos) {
+		if (is_negated_errno(r28)) {
 			tcp->u_rval = -1;
 			u_error = -r28;
 		}
@@ -1612,19 +1629,19 @@ struct tcb *tcp;
 		}
 #else
 #ifdef SH
-               /* interpret R0 as return value or error number */
-               if (r0 && (unsigned) -r0 < nerrnos) {
-                       tcp->u_rval = -1;
-                       u_error = -r0;
-               }
-               else {
-                       tcp->u_rval = r0;
-                       u_error = 0;
-               }
+		/* interpret R0 as return value or error number */
+		if (is_negated_errno(r0)) {
+			tcp->u_rval = -1;
+			u_error = -r0;
+		}
+		else {
+			tcp->u_rval = r0;
+			u_error = 0;
+		}
 #else
 #ifdef SH64
                 /* interpret result as return value or error number */
-                if (r9 && (unsigned) -r9 < nerrnos) {
+                if (is_negated_errno(r9)) {
 	                tcp->u_rval = -1;
 	                u_error = -r9;
                 }
@@ -2007,7 +2024,7 @@ struct tcb *tcp;
 
 		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 			nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
-		else 
+		else
      	        	nargs = tcp->u_nargs = MAX_ARGS;
 
 		if (ptrace (PTRACE_GETREGS, pid, NULL, (long) &regs) < 0)
