@@ -1,3 +1,9 @@
+2008-05-27  Roland McGrath  <roland@redhat.com>
+
+	* syscall.c [LINUX] (is_negated_errno): New function.
+	(get_error) [LINUX]: Use it for all such cases.
+	Fixes RH#447587.
+
 2008-05-19  Roland McGrath  <roland@redhat.com>
 
 	* linux/x86_64/syscallent.h: Update entries for timerfd_* and fallocate.
