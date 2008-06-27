@@ -357,7 +357,6 @@
 	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 324 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 325 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 326 */
-	{ 5,	0,	printargs,		"SYS_326"	}, /* 326 */
 	{ 5,	0,	printargs,		"SYS_327"	}, /* 327 */
 	{ 5,	0,	printargs,		"SYS_328"	}, /* 328 */
 	{ 5,	0,	printargs,		"SYS_329"	}, /* 329 */
