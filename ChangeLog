@@ -1,3 +1,7 @@
+2008-06-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* linux/syscallent.h: Remove a duplicite syscall stub #326.
+
 2008-05-27  Roland McGrath  <roland@redhat.com>
 
 	* syscall.c [LINUX] (is_negated_errno): New function.
