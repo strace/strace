@@ -1,3 +1,8 @@
+2008-06-29  Dmitry V. Levin <ldv@altlinux.org>
+
+	* linux/x86_64/syscallent.h: Remove duplicate syscall entries
+	for #283 and #284.
+
 2008-06-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* linux/syscallent.h: Remove a duplicite syscall stub #326.
