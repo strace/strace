@@ -1,3 +1,9 @@
+2008-07-17  Roland McGrath  <roland@redhat.com>
+
+	* signal.c (sigact_flags): Prefer SA_NODEFER to SA_NOMASK,
+	SA_RESETHAND to SA_ONESHOT.
+	Fixes RH#455821.
+
 2008-07-09  Frederik Schüler <fs@debian.org>
 
 	* debian/rules: Remove the broken udeb creation routines, and redo the
