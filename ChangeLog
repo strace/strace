@@ -1,5 +1,10 @@
 2008-07-17  Roland McGrath  <roland@redhat.com>
 
+	* process.c (futexops): Update table.
+	(sys_futex): Handle FUTEX_WAIT_BITSET correctly.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#448628.
+
 	* linux/syscallent.h: Fix "futex" argument count.
 	* linux/alpha/syscallent.h: Likewise.
 	* linux/arm/syscallent.h: Likewise.
