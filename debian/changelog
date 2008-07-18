@@ -1,6 +1,6 @@
-strace (4.5.17-1) unreleased; urgency=low
+strace (4.5.17-1) unstable; urgency=low
 
-  * New upstream version.
+  * New upstream release.
     + Fix chmod/chown typo in debian/rules, closes: #459255.
     + Install strace-graph too, closes: 469068.
     + Fix m68k build, closes: 456879.
@@ -15,6 +15,7 @@ strace (4.5.17-1) unreleased; urgency=low
     - Add Homepage field.
   * Add dh_md5sums call, closes: #439428.
   * Fix dpkg-gencontrol call.
+  * Update debian/copyright.
 
  -- Frederik Schüler <fs@debian.org>  Tue, 01 Jul 2008 23:05:51 +0200
 
