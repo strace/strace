@@ -1947,7 +1947,13 @@ int bitness;
 	int exited = 0;
 
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		/*
+		 * Sign-extend a 32-bit value when that's what it is.
+		 */
+		long pid = tcp->u_arg[0];
+		if (personality_wordsize[current_personality] < sizeof pid)
+			pid = (long) (int) pid;
+		tprintf("%ld, ", pid);
 	} else {
 		/* status */
 		if (!tcp->u_arg[1])
