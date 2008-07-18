@@ -47,6 +47,7 @@
 	* util.c (CLONE_VFORK): Define if not defined already.
 	(setbpt): Clear CLONE_VFORK for SYS_clone and SYS_clone2.
 	Reported by Vitaly Mayatskikh.
+	Fixes RH#455078.
 
 2008-06-29  Dmitry V. Levin <ldv@altlinux.org>
 
