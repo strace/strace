@@ -42,6 +42,12 @@
 	* debian/rules: Add dh_md5sums call.
 	Fixes Debian#439428.
 
+2008-06-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* util.c (CLONE_VFORK): Define if not defined already.
+	(setbpt): Clear CLONE_VFORK for SYS_clone and SYS_clone2.
+	Reported by Vitaly Mayatskikh.
+
 2008-06-29  Dmitry V. Levin <ldv@altlinux.org>
 
 	* linux/x86_64/syscallent.h: Remove duplicate syscall entries
