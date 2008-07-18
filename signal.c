@@ -215,10 +215,16 @@ static const struct xlat sigact_flags[] = {
 #ifdef SA_INTERRUPT
 	{ SA_INTERRUPT,	"SA_INTERRUPT"	},
 #endif
-#ifdef SA_NOMASK
+#ifdef SA_NODEFER
+	{ SA_NODEFER,	"SA_NODEFER"	},
+#endif
+#if defined SA_NOMASK && SA_NODEFER != SA_NOMASK
 	{ SA_NOMASK,	"SA_NOMASK"	},
 #endif
-#ifdef SA_ONESHOT
+#ifdef SA_RESETHAND
+	{ SA_RESETHAND,	"SA_RESETHAND"	},
+#endif
+#if defined SA_ONESHOT && SA_ONESHOT != SA_RESETHAND
 	{ SA_ONESHOT,	"SA_ONESHOT"	},
 #endif
 #ifdef SA_SIGINFO
