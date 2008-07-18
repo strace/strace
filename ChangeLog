@@ -1,3 +1,17 @@
+2008-07-09  Frederik Schüler <fs@debian.org>
+
+	* debian/rules: Remove the broken udeb creation routines, and redo the
+	complete install procedure using debhelper.
+	* debian/strace.docs: New file, list for dh_installdocs.
+	* debian/strace.examples: New file, list for dh_installexamples.
+	* debian/strace.install: New file, list for dh_install.
+	* debian/strace-udeb.install: New file, list for dh_install.
+	* debian/strace.manpages : New file, list for dh_installmanpages.
+	* debian/copyright: Update.
+	* debian/control: Fix libc6 build dependency for alpha and ia64.
+	(strace-udeb: XC-Package-Type): Add header.
+	* debian/changelog: Cosmetic changes.
+
 2008-07-03  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Trace even VFORK on -f on all the platforms.
