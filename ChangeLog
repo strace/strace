@@ -1,3 +1,15 @@
+2008-07-01  Frederik Schüler <fs@debian.org>
+
+	* debian/changelog: List all bugs closed since the last release.
+	* debian/control: Remove Wichert Akkerman from uploaders list.
+	* debian/control: Bump standards version to 3.8.0.
+	* debian/control: Add Homepage field.
+	* debian/rules: Fix dpkg-gencontrol call.
+	* debian/compat: New file, set to compatibility level 5.
+	* debian/rules: Call dh_clean on clean target.
+	* debian/rules: Add dh_md5sums call.
+	Fixes Debian#439428
+
 2008-06-29  Dmitry V. Levin <ldv@altlinux.org>
 
 	* linux/x86_64/syscallent.h: Remove duplicate syscall entries
