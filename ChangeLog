@@ -1,5 +1,19 @@
 2008-07-17  Roland McGrath  <roland@redhat.com>
 
+	* linux/syscallent.h: Fix "futex" argument count.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/arm/syscallent.h: Likewise.
+	* linux/hppa/syscallent.h: Likewise.
+	* linux/ia64/syscallent.h: Likewise.
+	* linux/m68k/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sparc/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+	From Ulrich Drepper <drepper@redhat.com>.
+	Fixes RH#448629.
+
 	* signal.c (sigact_flags): Prefer SA_NODEFER to SA_NOMASK,
 	SA_RESETHAND to SA_ONESHOT.
 	Fixes RH#455821.
