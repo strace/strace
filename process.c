@@ -3199,8 +3199,11 @@ struct tcb *tcp;
 #  define FUTEX_UNLOCK_PI 7
 #  define FUTEX_TRYLOCK_PI 8
 # endif
-# ifndef FUTEX_CMP_REQUEUE_PI
-#  define FUTEX_CMP_REQUEUE_PI 9
+# ifndef FUTEX_WAIT_BITSET
+#  define FUTEX_WAIT_BITSET 9
+# endif
+# ifndef FUTEX_WAKE_BITSET
+#  define FUTEX_WAKE_BITSET 10
 # endif
 # ifndef FUTEX_PRIVATE_FLAG
 #  define FUTEX_PRIVATE_FLAG 128
@@ -3215,7 +3218,8 @@ static const struct xlat futexops[] = {
 	{ FUTEX_LOCK_PI,				"FUTEX_LOCK_PI" },
 	{ FUTEX_UNLOCK_PI,				"FUTEX_UNLOCK_PI" },
 	{ FUTEX_TRYLOCK_PI,				"FUTEX_TRYLOCK_PI" },
-	{ FUTEX_CMP_REQUEUE_PI,				"FUTEX_CMP_REQUEUE_PI" },
+	{ FUTEX_WAIT_BITSET,				"FUTEX_WAIT_BITSET" },
+	{ FUTEX_WAKE_BITSET,				"FUTEX_WAKE_BITSET" },
 	{ FUTEX_WAIT|FUTEX_PRIVATE_FLAG,		"FUTEX_WAIT_PRIVATE" },
 	{ FUTEX_WAKE|FUTEX_PRIVATE_FLAG,		"FUTEX_WAKE_PRIVATE" },
 	{ FUTEX_FD|FUTEX_PRIVATE_FLAG,			"FUTEX_FD_PRIVATE" },
@@ -3225,7 +3229,8 @@ static const struct xlat futexops[] = {
 	{ FUTEX_LOCK_PI|FUTEX_PRIVATE_FLAG,		"FUTEX_LOCK_PI_PRIVATE" },
 	{ FUTEX_UNLOCK_PI|FUTEX_PRIVATE_FLAG,		"FUTEX_UNLOCK_PI_PRIVATE" },
 	{ FUTEX_TRYLOCK_PI|FUTEX_PRIVATE_FLAG,		"FUTEX_TRYLOCK_PI_PRIVATE" },
-	{ FUTEX_CMP_REQUEUE_PI|FUTEX_PRIVATE_FLAG,	"FUTEX_CMP_REQUEUE_PI_PRIVATE" },
+	{ FUTEX_WAIT_BITSET|FUTEX_PRIVATE_FLAG,		"FUTEX_WAIT_BITSET_PRIVATE" },
+	{ FUTEX_WAKE_BITSET|FUTEX_PRIVATE_FLAG,		"FUTEX_WAKE_BITSET_PRIVATE" },
 	{ 0,						NULL }
 };
 #ifndef FUTEX_OP_SET
@@ -3264,13 +3269,19 @@ sys_futex(tcp)
 struct tcb *tcp;
 {
     if (entering(tcp)) {
-	long int cmd = tcp->u_arg[1] & ~FUTEX_PRIVATE_FLAG;
+	long int cmd = tcp->u_arg[1] & 127;
 	tprintf("%p, ", (void *) tcp->u_arg[0]);
 	printxval(futexops, tcp->u_arg[1], "FUTEX_???");
 	tprintf(", %ld", tcp->u_arg[2]);
-	if (cmd == FUTEX_WAIT) {
+	if (cmd == FUTEX_WAKE_BITSET)
+		tprintf(", %lx", tcp->u_arg[5]);
+	else if (cmd == FUTEX_WAIT) {
 		tprintf(", ");
 		printtv(tcp, tcp->u_arg[3]);
+	} else if (cmd == FUTEX_WAIT_BITSET) {
+		tprintf(", ");
+		printtv(tcp, tcp->u_arg[3]);
+		tprintf(", %lx", tcp->u_arg[5]);
 	} else if (cmd == FUTEX_REQUEUE)
 		tprintf(", %ld, %p", tcp->u_arg[3], (void *) tcp->u_arg[4]);
 	else if (cmd == FUTEX_CMP_REQUEUE)
