@@ -232,7 +232,9 @@ itself on the standard error.
 Trace child processes as they are created by currently traced
 processes as a result of the
 .BR fork (2)
-system call.  The new process is
+system call.
+.IP
+On non-Linux platforms the new process is
 attached to as soon as its pid is known (through the return value of
 .BR fork (2)
 in the parent process). This means that such children may run
@@ -240,13 +242,17 @@ uncontrolled for a while (especially in the case of a
 .BR vfork (2)),
 until the parent is scheduled again to complete its
 .RB ( v ) fork (2)
-call.
+call.  On Linux the child is traced from its first instruction with no delay.
 If the parent process decides to
 .BR wait (2)
 for a child that is currently
 being traced, it is suspended until an appropriate child process either
 terminates or incurs a signal that would cause it to terminate (as
 determined from the child's current signal disposition).
+.IP
+On SunOS 4.x the tracing of
+.BR vfork s
+is accomplished with some dynamic linking trickery.
 .TP
 .B \-ff
 If the
@@ -258,16 +264,8 @@ where pid is the numeric process id of each process.
 This is incompatible with -c, since no per-process counts are kept.
 .TP
 .B \-F
-Attempt to follow
-.BR vfork s.
-(On SunOS 4.x, this is accomplished with
-some dynamic linking trickery.)
-Otherwise,
-.BR vfork s
-will
-not be followed even if
-.B \-f
-has been given.
+This option is now obsolete and it has the same functionality as
+.BR -f .
 .TP
 .B \-h
 Print the help summary.

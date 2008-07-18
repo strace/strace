@@ -989,8 +989,7 @@ struct tcb *tcp;
 #ifdef SYS_vfork
 	if (known_scno(tcp) == SYS_vfork) {
 		/* Attempt to make vfork into fork, which we can follow. */
-		if (!followvfork ||
-		    change_syscall(tcp, SYS_fork) < 0)
+		if (change_syscall(tcp, SYS_fork) < 0)
 			dont_follow = 1;
 	}
 #endif

@@ -78,7 +78,7 @@
 #endif
 #endif
 
-int debug = 0, followfork = 0, followvfork = 0;
+int debug = 0, followfork = 0;
 int dtime = 0, cflag = 0, xflag = 0, qflag = 0;
 static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
 
@@ -659,11 +659,10 @@ main(int argc, char *argv[])
 		case 'd':
 			debug++;
 			break;
+		case 'F':
+			/* Obsoleted, acts as `-f'.  */
 		case 'f':
 			followfork++;
-			break;
-		case 'F':
-			followvfork++;
 			break;
 		case 'h':
 			usage(stdout, 0);
@@ -2261,7 +2260,7 @@ trace()
 		/* Look up `pid' in our table. */
 		if ((tcp = pid2tcb(pid)) == NULL) {
 #ifdef LINUX
-			if (followfork || followvfork) {
+			if (followfork) {
 				/* This is needed to go with the CLONE_PTRACE
 				   changes in process.c/util.c: we might see
 				   the child's initial trap before we see the
