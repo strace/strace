@@ -39,6 +39,7 @@ build64/Makefile:
 	cd $(@D); CC="$(CC64)" sh ../configure --prefix=/usr --build=$(DEB_BUILD_GNU_TYPE) --host=$(HOST64)
 
 clean:
+	dh_clean
 	rm -rf debian/$(package) debian/substvars debian/files debian/files~
 	rm -rf build64 stamp-build64
 	rm -rf build stamp-build
@@ -62,7 +63,8 @@ binary-arch: build checkroot
 		debian/$(package)/usr/bin/strace
 	dh_strip
 
-	dpkg-gencontrol -is -pstrace-udeb -fdebian/files~
+	dpkg-gencontrol -is -pstrace-udeb -fdebian/files~ -Pdebian/$(package)
+	dh_md5sums
 	dpkg-deb --build debian/$(package) ../$(UDEB)
 	dpkg-distaddfile $(UDEB) debian-installer extra
 
@@ -95,7 +97,7 @@ endif
 
 	dpkg-shlibdeps build/strace $(patsubst yes,build64/strace,$(build64))
 
-	dpkg-gencontrol -is -pstrace
+	dpkg-gencontrol -is -pstrace -Pdebian/$(package)
 	dpkg-deb --build debian/$(package) ..
 
 checkroot:

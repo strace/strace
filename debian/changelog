@@ -1,3 +1,23 @@
+strace (4.5.17-1) unreleased; urgency=low
+
+  * New upstream version.
+    + Fix chmod/chown typo in debian/rules, closes: #459255.
+    + Install strace-graph too, closes: 469068.
+    + Fix m68k build, closes: 456879.
+    + Arm updates, closes: #441000.
+    + fix build on mips/mipsel, closes: #448802.
+    + show poll() parameters before blocking, closes: #369651.
+    + use dh_strip instead of install -s, closes: #438055, #396682.
+    + fix sparc build, closes: #469379.
+  * Acknowledge NMU, closes: #469380.
+  * Remove Wichert Akkerman from uploaders list.
+  * Bump standards version to 3.8.0.
+    - Add Homepage field.
+  * Add dh_md5sums call, closes: #439428.
+  * Fix dpkg-gencontrol call.
+
+ -- Frederik Schüler <fs@debian.org>  Tue, 01 Jul 2008 23:05:51 +0200
+
 strace (4.5.16-1) unstable; urgency=low
 
   * New upstream version.
