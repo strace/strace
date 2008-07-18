@@ -1,14 +1,10 @@
 #! /usr/bin/make -f
 
-# Debian package information
-package		= strace
+#export DH_VERBOSE=1
 
 DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_HOST_GNU_TYPE := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
-
-VERSION := $(shell dpkg-parsechangelog | awk '/^Version: / { print $$2 }')
-UDEB := strace-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
 
 arch64_map = i386=x86_64 powerpc=powerpc64 sparc=sparc64 s390=s390x
 ifneq (,$(filter $(DEB_HOST_ARCH)=%, $(arch64_map)))
@@ -40,7 +36,7 @@ build64/Makefile:
 
 clean:
 	dh_clean
-	rm -rf debian/$(package) debian/substvars debian/files debian/files~
+	rm -rf debian/strace debian/strace-udeb debian/substvars debian/files debian/files~
 	rm -rf build64 stamp-build64
 	rm -rf build stamp-build
 
@@ -50,55 +46,29 @@ binary-indep:
 
 binary-arch: build checkroot
 	test -f stamp-build || make $(MFLAGS) -f debian/rules build
-	-rm -rf debian/$(package) debian/files debian/substvars
-
-	install -d -m 755 -o root -g root debian/$(package)
-	# reset the mode to work around a bug in install
-	chmod 755 debian/$(package)
-	install -d -m 755 -o root -g root debian/$(package)/DEBIAN
-
-# Install strace
-	install -d -o root -g root -m 755 debian/$(package)/usr/bin
-	install -o root -g root -m 755 build/strace \
-		debian/$(package)/usr/bin/strace
-	dh_strip
-
-	dpkg-gencontrol -is -pstrace-udeb -fdebian/files~ -Pdebian/$(package)
-	dh_md5sums
-	dpkg-deb --build debian/$(package) ../$(UDEB)
-	dpkg-distaddfile $(UDEB) debian-installer extra
-
-# Install documentation
-	install -d -o root -g root -m 755 \
-		debian/$(package)/usr/share/doc/$(package)
-	install -d -o root -g root -m 755 debian/$(package)/usr/share/man/man1
-	install -p -o root -g root -m 644 debian/changelog \
- 		debian/$(package)/usr/share/doc/$(package)/changelog.Debian
-	install -p -o root -g root -m 644 TODO \
- 		debian/$(package)/usr/share/doc/$(package)/TODO
-	install -p -o root -g root -m 644 NEWS \
- 		debian/$(package)/usr/share/doc/$(package)/changelog
-	gzip -9 debian/$(package)/usr/share/doc/$(package)/*
-	install -p -o root -g root -m 644 debian/copyright \
- 		debian/$(package)/usr/share/doc/$(package)/copyright
-	install -p -o root -g root -m 644 strace.1 \
-		debian/$(package)/usr/share/man/man1/strace.1
-	gzip -9 debian/$(package)/usr/share/man/man1/strace.1
-	install -d -o root -g root -m 755 \
-		debian/$(package)/usr/share/doc/$(package)/examples
-	install -p -o root -g root -m 755 strace-graph \
-		debian/$(package)/usr/share/doc/$(package)/examples
-
-ifneq (,$(HOST64))
-	install -o root -g root -m 755 build64/strace debian/$(package)/usr/bin/strace64
-	ln -s strace.1.gz debian/$(package)/usr/share/man/man1/strace64.1.gz
-	dh_strip
-endif
-
-	dpkg-shlibdeps build/strace $(patsubst yes,build64/strace,$(build64))
-
-	dpkg-gencontrol -is -pstrace -Pdebian/$(package)
-	dpkg-deb --build debian/$(package) ..
+	dh_testdir -a
+	dh_testroot -a
+	dh_installdirs -a
+	dh_installdocs -a
+	dh_installman -a
+	dh_installexamples -a
+	dh_installchangelogs ChangeLog
+	dh_install -a
+	# install 64bit executable and manpage if it has been built
+	if test -f stamp-build64; then \
+	  mv build64/strace build64/strace64 ; \
+	  dh_install build64/strace64 usr/bin ; \
+	  dh_link usr/share/man/man1/strace.1 usr/share/man/man1/strace64.1; \
+	else : ; fi
+	dh_link -a
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
 
 checkroot:
 	test root = "`whoami`"

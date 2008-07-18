@@ -3,7 +3,7 @@ Section: utils
 Priority: standard
 Maintainer: Roland McGrath <frob@debian.org>
 Uploaders: Frederik Schüler <fs@debian.org>
-Build-Depends: libc6-dev (>= 2.2.2-1) [!alpha !ia64], libc6.1-dev (>= 2.2.2-1) [alpha ia64], gcc-multilib [i386 powerpc s390 sparc], debhelper (>= 5.0.0)
+Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [i386 powerpc s390 sparc], debhelper (>= 5.0.0)
 Standards-Version: 3.8.0
 Homepage: http://sourceforge.net/projects/strace/
 
@@ -22,6 +22,7 @@ Description: A system call tracer
 
 Package: strace-udeb
 Section: debian-installer
+XC-Package-Type: udeb
 Priority: extra
 Architecture: alpha amd64 arm armeb armel hppa i386 ia64 m68k mips mipsel powerpc ppc64 s390 sh sparc
 Depends: ${shlibs:Depends}
