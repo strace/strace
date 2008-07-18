@@ -1,5 +1,7 @@
 2008-07-17  Roland McGrath  <roland@redhat.com>
 
+	* NEWS, strace.spec: Updates in preparation for release.
+
 	* process.c (printwaitn): When current personality's wordsize is
 	smaller than native, sign-extend the PID argument from 32 bits.
 
