@@ -42,6 +42,12 @@
 	* debian/rules: Add dh_md5sums call.
 	Fixes Debian#439428.
 
+2008-06-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix ia64 `-f' on CLONE2 formerly crashing the child.
+	* util.c [IA64] (restore_arg0, restore_arg1): Define as empty.
+	Fixes RH#453438.
+
 2008-06-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* util.c (CLONE_VFORK): Define if not defined already.
