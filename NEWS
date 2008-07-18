@@ -1,3 +1,12 @@
+Changes in 4.5.17
+==============
+* Many bug fixes.
+* -F is now deprecated, -f has traced vfork too on Linux for a long time now.
+* Print O_CLOEXEC, MSG_CMSG_CLOEXEC flag bits.
+* Improved output for prctl system call on Linux.
+* Improved support for Linux/ARM.
+* SA_NOMASK is now spelled SA_NODEFER, and SA_ONESHOT is spelled SA_RESETHAND.
+
 Changes in 4.5.16
 ==============
 * Bug fixes.
