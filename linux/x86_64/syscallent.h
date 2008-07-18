@@ -200,7 +200,7 @@
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 199 */
 	{ 2,	0,	sys_kill,		"tkill"		}, /* 200 */
 	{ 1,	0,	sys_time,		"time"		},  /* 201 */
-	{ 5,	0,	sys_futex,		"futex"		}, /* 202 */
+	{ 6,	0,	sys_futex,		"futex"		}, /* 202 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 203 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 204 */
 	{ 1,	0,	sys_set_thread_area,	"set_thread_area" }, /* 205 */

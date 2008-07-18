@@ -270,7 +270,7 @@
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 237 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 238 */
 	{ 4,	TD,	sys_sendfile64,		"sendfile64"	}, /* 239 */
-	{ 5,	0,	sys_futex,		"futex"		}, /* 240 */
+	{ 6,	0,	sys_futex,		"futex"		}, /* 240 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 241 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 242 */
 	{ 1,	0,	sys_set_thread_area,	"set_thread_area" }, /* 243 */

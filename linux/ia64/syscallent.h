@@ -1036,7 +1036,7 @@
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 1227 */
 	{ 2,	0,	sys_removexattr,	"fremovexattr"	}, /* 1228 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 1229 */
-	{ 5,	0,	sys_futex,		"futex"		}, /* 1230 */
+	{ 6,	0,	sys_futex,		"futex"		}, /* 1230 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"},/* 1232 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 1233 */

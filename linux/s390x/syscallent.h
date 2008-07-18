@@ -265,7 +265,7 @@
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 235 */
 	{ 0,	0,	printargs,		"gettid"	}, /* 236 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 237 */
-	{ 5,	0,	sys_futex,		"futex"		}, /* 238 */
+	{ 6,	0,	sys_futex,		"futex"		}, /* 238 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 239 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 240 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 241 */

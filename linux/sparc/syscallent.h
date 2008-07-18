@@ -140,7 +140,7 @@
 	{ 2,	TF,	sys_stat64,	"stat64" },		/* 139 */
 	{ 4,    TD,	sys_sendfile64,	"sendfile64" },		/* 140 */
 	{ 3,	TN,	sys_getpeername,"getpeername" },	/* 141 */
-	{ 5,    0,	sys_futex,	"futex" },		/* 142 */
+	{ 6,    0,	sys_futex,	"futex" },		/* 142 */
 	{ 0,	0,	printargs,	"gettid" },		/* 143 */
 	{ 2,	0,	sys_getrlimit,	"getrlimit" },		/* 144 */
 	{ 2,	0,	sys_setrlimit,	"setrlimit" },		/* 145 */

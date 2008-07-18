@@ -422,7 +422,7 @@
 	{ 2,	TF,	sys_removexattr,	"removexattr"		}, /* 391 */
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"		}, /* 392 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"		}, /* 393 */
-	{ 5,	0,	sys_futex,		"futex"			}, /* 394 */
+	{ 6,	0,	sys_futex,		"futex"			}, /* 394 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"	}, /* 395 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"	}, /* 396 */
 	{ 5,	0,	printargs,		"tuxcall"		}, /* 397 */
