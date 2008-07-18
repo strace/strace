@@ -1,3 +1,15 @@
+2008-07-03  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Trace even VFORK on -f on all the platforms.
+	* strace.1 <-f>: Describe Linux catches new children immediately.
+	<-F>: Make the option obsolete.  Move the SunOS VFORK comment to the
+	`-f' option description.
+	* defs.h (followvfork): Declaration removed.
+	* strace.c (followvfork): Variable removed.
+	(main) <-F>: Merge with the `-f' option.
+	(trace): Make !FOLLOWVFORK unconditional.
+	* process.c (internal_fork): Make !FOLLOWVFORK unconditional.
+
 2008-07-01  Frederik Schüler <fs@debian.org>
 
 	* debian/changelog: List all bugs closed since the last release.
@@ -8,7 +20,7 @@
 	* debian/compat: New file, set to compatibility level 5.
 	* debian/rules: Call dh_clean on clean target.
 	* debian/rules: Add dh_md5sums call.
-	Fixes Debian#439428
+	Fixes Debian#439428.
 
 2008-06-29  Dmitry V. Levin <ldv@altlinux.org>
 
