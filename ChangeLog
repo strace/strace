@@ -1,5 +1,8 @@
 2008-07-17  Roland McGrath  <roland@redhat.com>
 
+	* process.c (printwaitn): When current personality's wordsize is
+	smaller than native, sign-extend the PID argument from 32 bits.
+
 	* process.c (futexops): Update table.
 	(sys_futex): Handle FUTEX_WAIT_BITSET correctly.
 	From Ulrich Drepper <drepper@redhat.com>.
@@ -39,7 +42,7 @@
 
 2008-07-03  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
-	Trace even VFORK on -f on all the platforms.
+	Trace vfork under -f on all the platforms.
 	* strace.1 <-f>: Describe Linux catches new children immediately.
 	<-F>: Make the option obsolete.  Move the SunOS VFORK comment to the
 	`-f' option description.
@@ -63,7 +66,7 @@
 
 2008-06-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
-	Fix ia64 `-f' on CLONE2 formerly crashing the child.
+	Fix ia64 `-f' on clone2 formerly crashing the child.
 	* util.c [IA64] (restore_arg0, restore_arg1): Define as empty.
 	Fixes RH#453438.
 
