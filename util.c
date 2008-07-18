@@ -1382,6 +1382,12 @@ set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
 	return errno ? -1 : 0;
 }
 
+/* ia64 does not return the input arguments from functions (and syscalls)
+   according to ia64 RSE (Register Stack Engine) behavior.  */
+
+# define restore_arg0(tcp, state, val) ((void) (state), 0)
+# define restore_arg1(tcp, state, val) ((void) (state), 0)
+
 #elif defined (SPARC) || defined (SPARC64)
 
 typedef struct regs arg_setup_state;
