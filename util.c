@@ -1281,6 +1281,9 @@ struct tcb *tcp;
 #ifndef CLONE_PTRACE
 # define CLONE_PTRACE    0x00002000
 #endif
+#ifndef CLONE_VFORK
+# define CLONE_VFORK     0x00004000
+#endif
 #ifndef CLONE_STOPPED
 # define CLONE_STOPPED   0x02000000
 #endif
@@ -1524,12 +1527,17 @@ struct tcb *tcp;
 #ifdef SYS_clone2
 	case SYS_clone2:
 #endif
-		if ((tcp->u_arg[arg0_index] & CLONE_PTRACE) == 0
-		    && (arg_setup (tcp, &state) < 0
-			|| set_arg0 (tcp, &state,
-				     tcp->u_arg[arg0_index] | CLONE_PTRACE) < 0
-			|| arg_finish_change (tcp, &state) < 0))
-			return -1;
+		/* ia64 calls directly `clone (CLONE_VFORK)' contrary to
+		   x86 SYS_vfork above.  Even on x86 we turn the vfork
+		   semantics into plain fork - each application must not
+		   depend on the vfork specifics according to POSIX.  We
+		   would hang waiting for the parent resume otherwise.  */
+		if ((arg_setup (tcp, &state) < 0
+		    || set_arg0 (tcp, &state,
+				 (tcp->u_arg[arg0_index] | CLONE_PTRACE)
+				 & ~CLONE_VFORK) < 0
+		    || arg_finish_change (tcp, &state) < 0))
+		    return -1;
 		tcp->flags |= TCB_BPTSET;
 		tcp->inst[0] = tcp->u_arg[arg0_index];
 		tcp->inst[1] = tcp->u_arg[arg1_index];
