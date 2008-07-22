@@ -1,3 +1,11 @@
+2008-07-18  Andreas Schwab  <schwab@suse.de>
+
+	* linux/ia64/syscallent.h: Decode mincore syscall.
+
+	* linux/powerpc/syscallent.h: Fix argument count for request_key.
+
+	* term.c (term_ioctl): Decode indirect parameter as int, not long.
+
 2008-07-17  Roland McGrath  <roland@redhat.com>
 
 	* NEWS, strace.spec: Updates in preparation for release.
