@@ -207,7 +207,6 @@ extern int ptrace();
 #define DEFAULT_PERSONALITY 0
 
 #ifdef LINUXSPARC
-#include <linux/a.out.h>
 #define PERSONALITY0_WORDSIZE 4
 #define PERSONALITY1_WORDSIZE 4
 #undef  SUPPORTED_PERSONALITIES
