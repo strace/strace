@@ -20,6 +20,9 @@ noinst_HEADERS = defs.h
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
      	     debian/changelog debian/control debian/copyright debian/rules \
+	     debian/compat debian/strace64.install debian/strace64.manpages \
+	     debian/strace.docs debian/strace.examples debian/strace.install \
+	     debian/strace.manpages debian/strace-udeb.install \
 	     strace.spec \
 	     strace-graph COPYRIGHT CREDITS PORTING \
 	     README-CVS README-freebsd README-linux README-sunos4 README-svr4 \
