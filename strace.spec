@@ -76,6 +76,7 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Jul 21 2008 Roland McGrath <roland@redhat.com> - 4.5.17-1
 - handle O_CLOEXEC, MSG_CMSG_CLOEXEC (#365781)
 - fix biarch stat64 decoding (#222275)
 - fix spurious "..." in printing of environment strings (#358241)
