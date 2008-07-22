@@ -337,10 +337,10 @@ long code, arg;
 	case TIOCMBIS:
 	case TIOCMBIC:
 	case TIOCMSET:
-		if (umove(tcp, arg, &arg) < 0)
+		if (umove(tcp, arg, &i) < 0)
 			return 0;
 		tprintf(", [");
-		printflags(modem_flags, arg, "TIOCM_???");
+		printflags(modem_flags, i, "TIOCM_???");
 		tprintf("]");
 		return 1;
 #endif /* TIOCMGET */
@@ -414,7 +414,7 @@ long code, arg;
 	case TIOCGPTN:
 #endif
 		tprintf(", ");
-		printnum(tcp, arg, "%d");
+		printnum_int(tcp, arg, "%d");
 		return 1;
 
 #if 0
