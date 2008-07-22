@@ -299,7 +299,7 @@
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"		}, /* 267 */
 	{ 5,	0,	printargs,		"sys_kexec_load"	}, /* 268 */
 	{ 5,	0,	printargs,		"add_key"		}, /* 269 */
-	{ 5,	0,	printargs,		"request_key"		}, /* 270 */
+	{ 4,	0,	printargs,		"request_key"		}, /* 270 */
 	{ 5,	0,	printargs,		"keyctl"		}, /* 271 */
 	{ 5,	TP,	sys_waitid,		"waitid"		}, /* 272 */
 	{ 3,	0,	printargs,		"ioprio_set"		}, /* 273 */
