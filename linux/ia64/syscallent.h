@@ -1014,7 +1014,7 @@
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 1205 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 1206 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 1207 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 1208 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 1208 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 1209 */
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 1210 */
 	{ 2,	0,	sys_lstat,		"lstat"		}, /* 1211 */
