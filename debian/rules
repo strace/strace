@@ -37,7 +37,7 @@ build64/Makefile:
 clean:
 	dh_clean
 	rm -rf debian/strace debian/strace-udeb debian/substvars debian/files debian/files~
-	rm -rf build64 stamp-build64
+	rm -rf build64 stamp-build64 strace64.1
 	rm -rf build stamp-build
 
 binary: binary-indep binary-arch
@@ -46,29 +46,28 @@ binary-indep:
 
 binary-arch: build checkroot
 	test -f stamp-build || make $(MFLAGS) -f debian/rules build
-	dh_testdir -a
-	dh_testroot -a
-	dh_installdirs -a
-	dh_installdocs -a
-	dh_installman -a
-	dh_installexamples -a
-	dh_installchangelogs ChangeLog
-	dh_install -a
-	# install 64bit executable and manpage if it has been built
-	if test -f stamp-build64; then \
-	  mv build64/strace build64/strace64 ; \
-	  dh_install build64/strace64 usr/bin ; \
-	  dh_link usr/share/man/man1/strace.1 usr/share/man/man1/strace64.1; \
-	else : ; fi
-	dh_link -a
-	dh_strip -a
-	dh_compress -a
-	dh_fixperms -a
-	dh_installdeb -a
-	dh_shlibdeps -a
-	dh_gencontrol -a
-	dh_md5sums -a
-	dh_builddeb -a
+	
+	# prepare 64bit executable and manpage, if it has been built
+	test -f stamp-build64 && ( mv build64/strace build64/strace64 ; \
+		cp strace.1 strace64.1 ) || true
+	
+	dh_testdir -s
+	dh_testroot -s
+	dh_installdirs -s
+	dh_installdocs -s
+	dh_installman -s
+	dh_installexamples -s
+	dh_installchangelogs -s ChangeLog
+	dh_install -s
+	dh_link -s
+	dh_strip -s
+	dh_compress -s
+	dh_fixperms -s
+	dh_installdeb -s
+	dh_shlibdeps -s
+	dh_gencontrol -s
+	dh_md5sums -s
+	dh_builddeb -s
 
 checkroot:
 	test root = "`whoami`"
