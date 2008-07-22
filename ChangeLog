@@ -1,3 +1,7 @@
+2008-07-21  Roland McGrath  <roland@redhat.com>
+
+	* defs.h [LINUXSPARC]: Don't #include <linux/a.out.h>.
+
 2008-07-19  Frederik Schüler <fs@debian.org>
 
 	* debian/control: Add strace64 package.
