@@ -1,16 +1,19 @@
 2008-07-21  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac: Version 4.5.17.
+	* strace.spec: 4.5.17-1.
+
 	* defs.h [LINUXSPARC]: Don't #include <linux/a.out.h>.
 
 2008-07-19  Frederik Schüler <fs@debian.org>
 
 	* debian/control: Add strace64 package.
-	Fixes Debian#491167, Debian#491188.
 	* debian/rules: Use debhelper flag --same-arch instead of --arch in
 	order to build strace64 only on the specified architectures.
 	* debian/strace64.install: New file, list for dh_install.
 	* debian/strace64.manpages: New file, list for dh_install.
 	* debian/changelog: Add prereleases entries.
+	Fixes Debian#491167, Debian#491188.
 
 2008-07-18  Andreas Schwab  <schwab@suse.de>
 
