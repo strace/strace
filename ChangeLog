@@ -1,3 +1,7 @@
+2008-07-24  Dmitry V. Levin <ldv@altlinux.org>
+
+	* strace.c (main): Fix -F option backwards compatibility.
+
 2008-07-22  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add new debian/ files.

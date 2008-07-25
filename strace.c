@@ -622,6 +622,7 @@ main(int argc, char *argv[])
 	extern char *optarg;
 	struct tcb *tcp;
 	int c, pid = 0;
+	int optF = 0;
 	struct sigaction sa;
 
 	static char buf[BUFSIZ];
@@ -660,7 +661,8 @@ main(int argc, char *argv[])
 			debug++;
 			break;
 		case 'F':
-			/* Obsoleted, acts as `-f'.  */
+			optF = 1;
+			break;
 		case 'f':
 			followfork++;
 			break;
@@ -756,6 +758,9 @@ main(int argc, char *argv[])
 
 	if ((optind == argc) == !pflag_seen)
 		usage(stderr, 1);
+
+	if (!followfork)
+		followfork = optF;
 
 	if (followfork > 1 && cflag) {
 		fprintf(stderr,
