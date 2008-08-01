@@ -1,5 +1,9 @@
 2008-07-31  Roland McGrath  <roland@redhat.com>
 
+	* file.c [LINUX] (struct kernel_dirent): Define it locally,
+	do not use <linux/dirent.h>.
+	Fixes RH#457291.
+
 	* configure.ac: Add AC_HEADER_STDBOOL.
 	* defs.h [HAVE_STDBOOL_H]: #include <stdbool.h>.
 	Fixes Debian##492774.
