@@ -1,3 +1,9 @@
+2008-07-31  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Add AC_HEADER_STDBOOL.
+	* defs.h [HAVE_STDBOOL_H]: #include <stdbool.h>.
+	Fixes Debian##492774.
+
 2008-07-24  Dmitry V. Levin <ldv@altlinux.org>
 
 	* strace.c (main): Fix -F option backwards compatibility.
