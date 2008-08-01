@@ -34,15 +34,16 @@
 #include "defs.h"
 
 #include <dirent.h>
+
 #ifdef LINUX
-#define dirent kernel_dirent
-#define dirent64 kernel_dirent64
-#include <linux/types.h>
-#include <linux/dirent.h>
-#undef dirent
-#undef dirent64
+struct kernel_dirent {
+	unsigned long   d_ino;
+	unsigned long   d_off;
+	unsigned short  d_reclen;
+	char            d_name[1];
+};
 #else
-#define kernel_dirent dirent
+# define kernel_dirent dirent
 #endif
 
 #ifdef LINUX
