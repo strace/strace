@@ -80,6 +80,10 @@
 #include <sys/time.h>
 #include <errno.h>
 
+#ifdef HAVE_STDBOOL_H
+#include <stdbool.h>
+#endif
+
 #ifdef STDC_HEADERS
 #include <stddef.h>
 #endif /* STDC_HEADERS */
