@@ -1,5 +1,7 @@
 2008-07-31  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (EXTRA_DIST): Add new linux/arm/ files.
+
 	* file.c [LINUX] (struct kernel_dirent): Define it locally,
 	do not use <linux/dirent.h>.
 	Fixes RH#457291.
