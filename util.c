@@ -1284,6 +1284,9 @@ struct tcb *tcp;
 #ifndef CLONE_VFORK
 # define CLONE_VFORK     0x00004000
 #endif
+#ifndef CLONE_VM
+# define CLONE_VM        0x00000100
+#endif
 #ifndef CLONE_STOPPED
 # define CLONE_STOPPED   0x02000000
 #endif
@@ -1537,15 +1540,19 @@ struct tcb *tcp;
 #ifdef SYS_clone2
 	case SYS_clone2:
 #endif
-		/* ia64 calls directly `clone (CLONE_VFORK)' contrary to
-		   x86 SYS_vfork above.  Even on x86 we turn the vfork
-		   semantics into plain fork - each application must not
-		   depend on the vfork specifics according to POSIX.  We
-		   would hang waiting for the parent resume otherwise.  */
+		/* ia64 calls directly `clone (CLONE_VFORK | CLONE_VM)'
+		   contrary to x86 SYS_vfork above.  Even on x86 we turn the
+		   vfork semantics into plain fork - each application must not
+		   depend on the vfork specifics according to POSIX.  We would
+		   hang waiting for the parent resume otherwise.  We need to
+		   clear also CLONE_VM but only in the CLONE_VFORK case as
+		   otherwise we would break pthread_create.  */
+
 		if ((arg_setup (tcp, &state) < 0
 		    || set_arg0 (tcp, &state,
 				 (tcp->u_arg[arg0_index] | CLONE_PTRACE)
-				 & ~CLONE_VFORK) < 0
+				 & ~(tcp->u_arg[arg0_index] & CLONE_VFORK
+				     ? CLONE_VFORK | CLONE_VM : 0)) < 0
 		    || arg_finish_change (tcp, &state) < 0))
 		    return -1;
 		tcp->flags |= TCB_BPTSET;
