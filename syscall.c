@@ -1963,20 +1963,21 @@ struct tcb *tcp;
 #elif defined (IA64)
 	{
 		if (!ia32) {
-			unsigned long *out0, *rbs_end, cfm, sof, sol, i;
+			unsigned long *out0, cfm, sof, sol, i;
+			long rbs_end;
 			/* be backwards compatible with kernel < 2.4.4... */
 #			ifndef PT_RBS_END
 #			  define PT_RBS_END	PT_AR_BSP
 #			endif
 
-			if (upeek(pid, PT_RBS_END, (long *) &rbs_end) < 0)
+			if (upeek(pid, PT_RBS_END, &rbs_end) < 0)
 				return -1;
 			if (upeek(pid, PT_CFM, (long *) &cfm) < 0)
 				return -1;
 
 			sof = (cfm >> 0) & 0x7f;
 			sol = (cfm >> 7) & 0x7f;
-			out0 = ia64_rse_skip_regs(rbs_end, -sof + sol);
+			out0 = ia64_rse_skip_regs((unsigned long *) rbs_end, -sof + sol);
 
 			if (tcp->scno >= 0 && tcp->scno < nsyscalls
 			    && sysent[tcp->scno].nargs != -1)

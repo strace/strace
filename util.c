@@ -1300,21 +1300,25 @@ typedef unsigned long *arg_setup_state;
 static int
 arg_setup(struct tcb *tcp, arg_setup_state *state)
 {
-	unsigned long *bsp, cfm, sof, sol;
+	unsigned long cfm, sof, sol;
+	long bsp;
 
-	if (ia32)
+	if (ia32) {
+		/* Satisfy a false GCC warning.  */
+		*state = NULL;
 		return 0;
+	}
 
-	if (upeek(tcp->pid, PT_AR_BSP, (long *) &bsp) < 0)
+	if (upeek(tcp->pid, PT_AR_BSP, &bsp) < 0)
 		return -1;
 	if (upeek(tcp->pid, PT_CFM, (long *) &cfm) < 0)
 		return -1;
 
 	sof = (cfm >> 0) & 0x7f;
 	sol = (cfm >> 7) & 0x7f;
-	bsp = ia64_rse_skip_regs(bsp, -sof + sol);
+	bsp = (long) ia64_rse_skip_regs((unsigned long *) bsp, -sof + sol);
 
-	*state = bsp;
+	*state = (unsigned long *) bsp;
 	return 0;
 }
 

@@ -1176,13 +1176,13 @@ struct tcb *tcp;
 		printsignal(tcp->u_arg[0]);
 		tprintf(", ");
 		switch (tcp->u_arg[1]) {
-		case (int) SIG_ERR:
+		case (long) SIG_ERR:
 			tprintf("SIG_ERR");
 			break;
-		case (int) SIG_DFL:
+		case (long) SIG_DFL:
 			tprintf("SIG_DFL");
 			break;
-		case (int) SIG_IGN:
+		case (long) SIG_IGN:
 #ifndef USE_PROCFS
 			if (tcp->u_arg[0] == SIGTRAP) {
 				tcp->flags |= TCB_SIGTRAPPED;
@@ -1204,11 +1204,11 @@ struct tcb *tcp;
 	}
 	else {
 		switch (tcp->u_rval) {
-		    case (int) SIG_ERR:
+		    case (long) SIG_ERR:
 			tcp->auxstr = "SIG_ERR"; break;
-		    case (int) SIG_DFL:
+		    case (long) SIG_DFL:
 			tcp->auxstr = "SIG_DFL"; break;
-		    case (int) SIG_IGN:
+		    case (long) SIG_IGN:
 			tcp->auxstr = "SIG_IGN"; break;
 		    default:
 			tcp->auxstr = NULL;

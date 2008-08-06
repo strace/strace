@@ -2421,11 +2421,12 @@ Process %d attached (waiting for parent)\n",
 			}
 			if (!cflag
 			    && (qual_flags[WSTOPSIG(status)] & QUAL_SIGNAL)) {
-				unsigned long addr = 0, pc = 0;
+				unsigned long addr = 0;
+				long pc = 0;
 #if defined(PT_CR_IPSR) && defined(PT_CR_IIP) && defined(PT_GETSIGINFO)
 #				define PSR_RI	41
 				struct siginfo si;
-				unsigned long psr;
+				long psr;
 
 				upeek(pid, PT_CR_IPSR, &psr);
 				upeek(pid, PT_CR_IIP, &pc);
