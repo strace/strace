@@ -1,5 +1,13 @@
 2008-08-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* util.c (CLONE_VM): Define if not defined already.
+	(setbpt): Clear CLONE_VM in the case we already clear CLONE_VFORK for
+	SYS_clone and SYS_clone2.
+	Reported by Michal Nowak.
+	Fixes RH#455078.
+
+2008-08-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	Fix compiler warnings.
 	* signal.c (sys_signal): Cast to SIG_* to the matching type LONG.
 	* strace.c (trace): Variables PSR and PC are now signed.
