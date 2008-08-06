@@ -1,3 +1,14 @@
+2008-08-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix compiler warnings.
+	* signal.c (sys_signal): Cast to SIG_* to the matching type LONG.
+	* strace.c (trace): Variables PSR and PC are now signed.
+	* syscall.c (syscall_enter): Variable RBS_END is now signed long.
+	Remove/add the RBS_END casts appropriately.
+	* util.c [IA64] (arg_setup): Variable BSP is now signed long.
+	Remove/add the BSP casts appropriately.
+	<ia32>: Initialize *STATE.
+
 2008-07-31  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add new linux/arm/ files.
