@@ -1,3 +1,9 @@
+2008-08-19  Roland McGrath  <roland@redhat.com>
+
+	* signal.c (sys_sigaction, sys_rt_sigaction): Don't omit the rest of
+	the struct after sa_handler is a known constant.  Some sa_flags bits
+	have meaning even for SIG_IGN/SIG_DFL.
+
 2008-08-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* util.c (CLONE_VM): Define if not defined already.
@@ -27,7 +33,7 @@
 
 	* configure.ac: Add AC_HEADER_STDBOOL.
 	* defs.h [HAVE_STDBOOL_H]: #include <stdbool.h>.
-	Fixes Debian##492774.
+	Fixes Debian#492774.
 
 2008-07-24  Dmitry V. Levin <ldv@altlinux.org>
 
