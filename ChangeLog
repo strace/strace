@@ -1,5 +1,10 @@
 2008-08-24  Roland McGrath  <roland@redhat.com>
 
+	* linux/powerpc/syscallent.h: Handle subpage_prot.
+	* mem.c [LINUX && POWERPC] (sys_subpage_prot): New function.
+	* linux/syscall.h [POWERPC]: Declare it.
+	From Simon Murray <simon@transitive.com>.
+
 	* mem.c (mmap_prot): Handle PROT_SAO.
 	From Simon Murray <simon@transitive.com>.
 
