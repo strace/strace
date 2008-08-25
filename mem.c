@@ -384,11 +384,11 @@ struct tcb *tcp;
 	return RVAL_HEX;
 }
 
-static const struct xlat madvise_flags[] = {
+static const struct xlat madvise_cmds[] = {
 #ifdef MADV_NORMAL
 	{ MADV_NORMAL,		"MADV_NORMAL" },
 #endif
-#ifdef MADZV_RANDOM
+#ifdef MADV_RANDOM
 	{ MADV_RANDOM,		"MADV_RANDOM" },
 #endif
 #ifdef MADV_SEQUENTIAL
@@ -397,7 +397,7 @@ static const struct xlat madvise_flags[] = {
 #ifdef MADV_WILLNEED
 	{ MADV_WILLNEED,	"MADV_WILLNEED" },
 #endif
-#ifdef MADV_DONTNED
+#ifdef MADV_DONTNEED
 	{ MADV_DONTNEED,	"MADV_DONTNEED" },
 #endif
 	{ 0,			NULL },
@@ -410,7 +410,7 @@ struct tcb *tcp;
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-		printflags(madvise_flags, tcp->u_arg[2], "MADV_???");
+		printxval(madvise_cmds, tcp->u_arg[2], "MADV_???");
 	}
 	return 0;
 }
