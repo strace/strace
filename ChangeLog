@@ -1,5 +1,12 @@
 2008-08-24  Roland McGrath  <roland@redhat.com>
 
+	* linux/syscall.h (SYS_socket_subcall et al, SYS_ipc_subcall et al):
+	Don't define these if [__ARM_EABI__].
+	Reported by Johannes Stezenbach <js@sig21.net>.
+
+	* syscall.c (trace_syscall): Conditionalize on [SYS_socket_subcall]
+	and [SYS_ipc_subcall] individually.
+
 	* linux/powerpc/syscallent.h: Handle subpage_prot.
 	* mem.c [LINUX && POWERPC] (sys_subpage_prot): New function.
 	* linux/syscall.h [POWERPC]: Declare it.
