@@ -179,7 +179,8 @@ int sys_osf_utimes();
 # endif
 #endif
 
-#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA)
+#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && \
+	!defined(__ARM_EABI__)
 # ifdef	IA64
 /*
  *  IA64 syscall numbers (the only ones available from standard header
@@ -234,7 +235,8 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) && !defined(HPPA)
+#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) && !defined(HPPA) && \
+	!defined(__ARM_EABI__)
 # ifdef	IA64
    /*
     * IA64 syscall numbers (the only ones available from standard
