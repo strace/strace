@@ -1,5 +1,8 @@
 2008-08-24  Roland McGrath  <roland@redhat.com>
 
+	* mem.c (mmap_prot): Handle PROT_SAO.
+	From Simon Murray <simon@transitive.com>.
+
 	* mem.c (madvise_flags): Typo fixes.  Rename to madvise_cmds.
 	(sys_madvise): Use printxval, not printflags.
 	Reported by Rajeev V. Pillai <rajeevvp@gmail.com>.
