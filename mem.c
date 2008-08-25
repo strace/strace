@@ -886,3 +886,53 @@ struct tcb *tcp;
 	return 0;
 }
 #endif
+
+#if defined(LINUX) && defined(POWERPC)
+int
+sys_subpage_prot(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		unsigned long cur, end, abbrev_end, entries;
+		unsigned int entry;
+
+		tprintf("%#lx, %#lx, ", tcp->u_arg[0], tcp->u_arg[1]);
+		entries = tcp->u_arg[1] >> 16;
+		if (!entries || !tcp->u_arg[2]) {
+			tprintf("{}");
+			return 0;
+		}
+		cur = tcp->u_arg[2];
+		end = cur + (sizeof(int) * entries);
+		if (!verbose(tcp) || end < tcp->u_arg[2]) {
+			tprintf("%#lx", tcp->u_arg[2]);
+			return 0;
+		}
+		if (abbrev(tcp)) {
+			abbrev_end = cur + (sizeof(int) * max_strlen);
+			if (abbrev_end > end)
+				abbrev_end = end;
+		}
+		else
+			abbrev_end = end;
+		tprintf("{");
+		for (; cur < end; cur += sizeof(int)) {
+			if (cur > tcp->u_arg[2])
+				tprintf(", ");
+			if (cur >= abbrev_end) {
+				tprintf("...");
+				break;
+			}
+			if (umove(tcp, cur, &entry) < 0) {
+				tprintf("??? [%#lx]", cur);
+				break;
+			}
+			else
+				tprintf("%#08x", entry);
+		}
+		tprintf("}");
+	}
+
+	return 0;
+}
+#endif
