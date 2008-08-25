@@ -96,6 +96,9 @@ static const struct xlat mmap_prot[] = {
 #ifdef PROT_GROWSUP
 	{ PROT_GROWSUP, "PROT_GROWSUP"	},
 #endif
+#ifdef PROT_SAO
+	{ PROT_SAO,	"PROT_SAO"	},
+#endif
 	{ 0,		NULL		},
 };
 
