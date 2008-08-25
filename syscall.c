@@ -2430,18 +2430,18 @@ trace_syscall(struct tcb *tcp)
 		return res;
 
 	switch (known_scno(tcp)) {
-#ifdef LINUX
-#if !defined (ALPHA) && !defined(MIPS) && !defined(HPPA)
+#ifdef SYS_socket_subcall
 	case SYS_socketcall:
 		decode_subcall(tcp, SYS_socket_subcall,
 			SYS_socket_nsubcalls, deref_style);
 		break;
+#endif
+#ifdef SYS_ipc_subcall
 	case SYS_ipc:
 		decode_subcall(tcp, SYS_ipc_subcall,
 			SYS_ipc_nsubcalls, shift_style);
 		break;
-#endif /* !(ALPHA || MIPS || HPPA) */
-#endif /* LINUX */
+#endif
 #ifdef SVR4
 #ifdef SYS_pgrpsys_subcall
 	case SYS_pgrpsys:
