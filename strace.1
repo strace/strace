@@ -653,6 +653,12 @@ automatic configuration support.  In 1995 he ported
 .B strace
 to Irix
 and tired of writing about himself in the third person.
+.SH BUGS
+The SIGTRAP signal is used internally by the kernel implementation of
+system call tracing.  When a traced process receives a SIGTRAP signal not
+associated with tracing, strace will not report that signal correctly.
+This signal is not normally used by programs, but could be via a hard-coded
+break instruction or via kill(2).
 .SH PROBLEMS
 Problems with
 .B strace
