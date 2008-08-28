@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.5.17
+Version: 4.5.18
 Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
@@ -76,6 +76,12 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Aug 28 2008 Roland McGrath <roland@redhat.com> - 4.5.18-1
+- build fix for newer kernel headers (#457291)
+- fix CLONE_VFORK handling (#455078)
+- Support new Linux/PPC system call subpage_prot and PROT_SAO flag.
+- In sigaction system call, display sa_flags value along with SIG_DFL/SIG_IGN.
+
 * Mon Jul 21 2008 Roland McGrath <roland@redhat.com> - 4.5.17-1
 - handle O_CLOEXEC, MSG_CMSG_CLOEXEC (#365781)
 - fix biarch stat64 decoding (#222275)

@@ -1,3 +1,8 @@
+2008-08-28  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac, NEWS: Version 4.5.18.
+	* strace.spec: 4.5.18-1.
+
 2008-08-24  Roland McGrath  <roland@redhat.com>
 
 	* linux/syscall.h (SYS_socket_subcall et al, SYS_ipc_subcall et al):

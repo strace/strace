@@ -1,3 +1,9 @@
+Changes in 4.5.18
+==============
+* Bug fixes.
+* Support new Linux/PPC system call subpage_prot and PROT_SAO flag.
+* In sigaction system call, display sa_flags value along with SIG_DFL/SIG_IGN.
+
 Changes in 4.5.17
 ==============
 * Many bug fixes.
