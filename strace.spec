@@ -55,8 +55,15 @@ make DESTDIR=%{buildroot} install
 # remove unpackaged files from the buildroot
 rm -f %{buildroot}%{_bindir}/strace-graph
 
+%define copy64 ln
+%if 0%{?rhel}
+%if 0%{?rhel} < 6
+%endif
+%define copy64 cp -p
+%endif
+
 %ifarch %{strace64_arches}
-ln %{buildroot}%{_bindir}/strace %{buildroot}%{_bindir}/strace64
+%{copy64} %{buildroot}%{_bindir}/strace %{buildroot}%{_bindir}/strace64
 %endif
 
 %clean
