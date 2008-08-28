@@ -1,5 +1,7 @@
 2008-08-28  Roland McGrath  <roland@redhat.com>
 
+	* strace.1 (BUGS): New section, mention SIGTRAP interference.
+
 	* strace.spec (%ifarch %{strace64_arches}): Use cp -p instead of ln
 	for %{rhel} < 6.
 
