@@ -297,8 +297,22 @@ struct tcb *tcp;
 		case PR_GETNSHARE:
 			break;
 #endif
-#ifdef PR_SET_DEATHSIG
+#ifdef PR_SET_PDEATHSIG
+		case PR_SET_PDEATHSIG:
+			tprintf(", %lu", tcp->u_arg[1]);
+			break;
+#endif
+#ifdef PR_GET_PDEATHSIG
 		case PR_GET_PDEATHSIG:
+			break;
+#endif
+#ifdef PR_SET_DUMPABLE
+		case PR_SET_DUMPABLE:
+			tprintf(", %lu", tcp->u_arg[1]);
+			break;
+#endif
+#ifdef PR_GET_DUMPABLE
+		case PR_GET_DUMPABLE:
 			break;
 #endif
 #ifdef PR_SET_UNALIGN
@@ -311,6 +325,15 @@ struct tcb *tcp;
 			tprintf(", %#lx", tcp->u_arg[1]);
 			break;
 #endif
+#ifdef PR_SET_KEEPCAPS
+		case PR_SET_KEEPCAPS:
+			tprintf(", %lu", tcp->u_arg[1]);
+			break;
+#endif
+#ifdef PR_GET_KEEPCAPS
+		case PR_GET_KEEPCAPS:
+			break;
+#endif
 		default:
 			for (i = 1; i < tcp->u_nargs; i++)
 				tprintf(", %#lx", tcp->u_arg[i]);
@@ -320,23 +343,26 @@ struct tcb *tcp;
 		switch (tcp->u_arg[0]) {
 #ifdef PR_GET_PDEATHSIG
 		case PR_GET_PDEATHSIG:
-			for (i=1; i<tcp->u_nargs; i++)
-				tprintf(", %#lx", tcp->u_arg[i]);
+			if (umove(tcp, tcp->u_arg[1], &i) < 0)
+				tprintf(", %#lx", tcp->u_arg[1]);
+			else
+				tprintf(", {%u}", i);
 			break;
 #endif
-#ifdef PR_SET_UNALIGN
-		case PR_SET_UNALIGN:
-			break;
+#ifdef PR_GET_DUMPABLE
+		case PR_GET_DUMPABLE:
+			return RVAL_UDECIMAL;
 #endif
 #ifdef PR_GET_UNALIGN
 		case PR_GET_UNALIGN:
-		{
-			int ctl;
-
-			umove(tcp, tcp->u_arg[1], &ctl);
-			tcp->auxstr = unalignctl_string(ctl);
+			if (syserror(tcp) || umove(tcp, tcp->u_arg[1], &i) < 0)
+				break;
+			tcp->auxstr = unalignctl_string(i);
 			return RVAL_STR;
-		}
+#endif
+#ifdef PR_GET_KEEPCAPS
+		case PR_GET_KEEPCAPS:
+			return RVAL_UDECIMAL;
 #endif
 		default:
 			break;
