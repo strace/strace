@@ -204,6 +204,12 @@ static const struct xlat prctl_options[] = {
 #ifdef PR_GET_PDEATHSIG
 	{ PR_GET_PDEATHSIG,	"PR_GET_PDEATHSIG"	},
 #endif
+#ifdef PR_GET_DUMPABLE
+	{ PR_GET_DUMPABLE,	"PR_GET_DUMPABLE"	},
+#endif
+#ifdef PR_SET_DUMPABLE
+	{ PR_SET_DUMPABLE,	"PR_SET_DUMPABLE"	},
+#endif
 #ifdef PR_GET_UNALIGN
 	{ PR_GET_UNALIGN,	"PR_GET_UNALIGN"	},
 #endif

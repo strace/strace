@@ -1,5 +1,7 @@
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
+	* process.c (prctl_options): Add more constants.
+
 	* linux/syscallent.h: Use sys_prctl() decoder for "prctl" syscall.
 	* linux/alpha/syscallent.h: Likewise.
 	* linux/arm/syscallent.h: Likewise.
