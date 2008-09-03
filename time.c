@@ -329,6 +329,21 @@ struct tcb *tcp;
 	return 0;
 }
 
+int
+sys_nanosleep(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_timespec(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
+		if (!tcp->u_arg[1] || is_restart_error(tcp))
+			print_timespec(tcp, tcp->u_arg[1]);
+		else
+			tprintf("%#lx", tcp->u_arg[1]);
+	}
+	return 0;
+}
+
 static const struct xlat which[] = {
 	{ ITIMER_REAL,	"ITIMER_REAL"	},
 	{ ITIMER_VIRTUAL,"ITIMER_VIRTUAL"},

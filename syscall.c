@@ -2641,3 +2641,22 @@ struct tcb *tcp;
 	return 0;
 }
 #endif /* SUNOS4 */
+
+int
+is_restart_error(struct tcb *tcp)
+{
+#ifdef LINUX
+	if (!syserror(tcp))
+		return 0;
+	switch (tcp->u_error) {
+		case ERESTARTSYS:
+		case ERESTARTNOINTR:
+		case ERESTARTNOHAND:
+		case ERESTART_RESTARTBLOCK:
+			return 1;
+		default:
+			break;
+	}
+#endif /* LINUX */
+	return 0;
+}

@@ -507,6 +507,7 @@ extern void tabto P((int));
 extern void call_summary P((FILE *));
 extern void tprint_iov P((struct tcb *, unsigned long, unsigned long));
 extern void tprint_open_modes P((struct tcb *, mode_t));
+extern int is_restart_error P((struct tcb *));
 
 #ifdef LINUX
 extern int internal_clone P((struct tcb *));

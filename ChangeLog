@@ -1,5 +1,11 @@
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
+	* syscall.c (is_restart_error): New function.
+	* defs.h (is_restart_error): Declare it.
+
+	* linux/dummy.h (sys_nanosleep): Uncouple from sys_adjtime().
+	* time.c (sys_nanosleep): New function, based on is_restart_error().
+
 	* process.c (sys_prctl): Decode PR_SET_PDEATHSIG, PR_GET_PDEATHSIG,
 	PR_SET_DUMPABLE, PR_GET_DUMPABLE, PR_SET_KEEPCAPS, PR_GET_KEEPCAPS.
 	Fix PR_GET_UNALIGN decoder.

@@ -58,7 +58,6 @@
 #define	sys_fchdir		sys_close
 #define	sys_setfsuid		sys_setuid
 #define	sys_setfsgid		sys_setgid
-#define sys_nanosleep		sys_adjtime
 #define	sys_acct		sys_chdir
 #define sys_fdatasync		sys_close
 #define sys_mlock		sys_munmap
