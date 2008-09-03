@@ -199,7 +199,7 @@
 	{ 3,	0,	printargs,		"nfsservctl"	}, /* 169 */
 	{ -1,	0,	printargs,		"SYS_170"	}, /* 170 */
 	{ -1,	0,	printargs,		"SYS_171"	}, /* 171 */
-	{ 5,	0,	printargs,		"prctl"		}, /* 172 */
+	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 1,	TS,	sys_sigreturn,		"rt_sigreturn"	}, /* 173 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 175 */

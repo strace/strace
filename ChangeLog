@@ -1,3 +1,16 @@
+2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
+
+	* linux/syscallent.h: Use sys_prctl() decoder for "prctl" syscall.
+	* linux/alpha/syscallent.h: Likewise.
+	* linux/arm/syscallent.h: Likewise.
+	* linux/m68k/syscallent.h: Likewise.
+	* linux/powerpc/syscallent.h: Likewise.
+	* linux/s390/syscallent.h: Likewise.
+	* linux/s390x/syscallent.h: Likewise.
+	* linux/sh/syscallent.h: Likewise.
+	* linux/sh64/syscallent.h: Likewise.
+	* linux/x86_64/syscallent.h: Likewise.
+
 2008-09-02  Dmitry V. Levin <ldv@altlinux.org>
 
 	* linux/x86_64/syscallent.h: Fix syscall numbers for "tee" and

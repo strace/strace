@@ -155,7 +155,7 @@
 	{ 3,	0,	sys_modify_ldt,		"modify_ldt"	},  /* 154 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	},  /* 155 */
 	{ 1,	0,	sys_sysctl,		"_sysctl"	},  /* 156 */
-	{ 5,	0,	printargs,		"prctl"		},  /* 157 */
+	{ 5,	0,	sys_prctl,		"prctl"		},  /* 157 */
 	{ 2,	TP,	sys_arch_prctl,		"arch_prctl"	},  /* 158 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	},  /* 159 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	},  /* 160 */

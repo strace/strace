@@ -376,7 +376,7 @@
 	{ 5,	0,	printargs,		"pciconfig_read"	}, /* 345 */
 	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 346 */
 	{ 5,	0,	sys_query_module,	"query_module"		}, /* 347 */
-	{ 5,	0,	printargs,		"prctl"			}, /* 348 */
+	{ 5,	0,	sys_prctl,		"prctl"			}, /* 348 */
 	{ 5,	TD,	sys_pread,		"pread"			}, /* 349 */
 	{ 5,	TD,	sys_pwrite,		"pwrite"		}, /* 350 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"		}, /* 351 */
