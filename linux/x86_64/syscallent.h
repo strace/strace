@@ -274,8 +274,8 @@
 	{ 2,	0,	printargs,		"set_robust_list" }, /* 273 */
 	{ 3,	0,	printargs,		"get_robust_list" }, /* 274 */
 	{ 6,	TD,	printargs,		"splice"	}, /* 275 */
-	{ 4,	TD,	printargs,		"sync_file_range" }, /* 276 */
-	{ 4,	TD,	printargs,		"tee"		}, /* 277 */
+	{ 4,	TD,	printargs,		"tee"		}, /* 276 */
+	{ 4,	TD,	printargs,		"sync_file_range" }, /* 277 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 278 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 279 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 280 */

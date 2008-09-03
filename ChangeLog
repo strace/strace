@@ -1,3 +1,9 @@
+2008-09-02  Dmitry V. Levin <ldv@altlinux.org>
+
+	* linux/x86_64/syscallent.h: Fix syscall numbers for "tee" and
+	"sync_file_range".
+	From Fernando Luis Vazquez Cao <fernando@oss.ntt.co.jp>
+
 2008-08-28  Roland McGrath  <roland@redhat.com>
 
 	* strace.1 (BUGS): New section, mention SIGTRAP interference.
