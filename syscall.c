@@ -2369,6 +2369,8 @@ trace_syscall(struct tcb *tcp)
 						strerror(u_error));
 				break;
 			}
+			if ((sys_res & RVAL_STR) && tcp->auxstr)
+				tprintf(" (%s)", tcp->auxstr);
 		}
 		else {
 			if (sys_res & RVAL_NONE)

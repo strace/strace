@@ -332,12 +332,14 @@ sys_fcntl(struct tcb *tcp)
 		case F_SETOWN: case F_GETOWN:
 			break;
 		case F_GETFD:
-			if (tcp->u_rval == 0)
+			if (syserror(tcp) || tcp->u_rval == 0)
 				return 0;
 			tcp->auxstr =
 				sprintflags("flags ", fdflags, tcp->u_rval);
 			return RVAL_HEX|RVAL_STR;
 		case F_GETFL:
+			if (syserror(tcp))
+				return 0;
 			tcp->auxstr = sprint_open_modes(tcp->u_rval);
 			return RVAL_HEX|RVAL_STR;
 		case F_GETLK:

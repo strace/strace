@@ -498,7 +498,7 @@ int
 sys_fork(tcp)
 struct tcb *tcp;
 {
-	if (exiting(tcp)) {
+	if (exiting(tcp) && !syserror(tcp)) {
 		if (getrval2(tcp)) {
 			tcp->auxstr = "child process";
 			return RVAL_UDECIMAL | RVAL_STR;
@@ -516,7 +516,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		tprintf ("%ld", tcp->u_arg[0]);
 	}
-	else {
+	else if (!syserror(tcp)) {
 		if (getrval2(tcp)) {
 			tcp->auxstr = "child process";
 			return RVAL_UDECIMAL | RVAL_STR;

@@ -1,5 +1,13 @@
 2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
 
+	* desc.c (sys_fcntl): Do not initialize auxstr for failed syscall.
+	* process.c (sys_fork, sys_rfork) [USE_PROCFS]: Likewise.
+	* signal.c (sys_signal): Likewise.
+	* stream.c (internal_stream_ioctl): Likewise.
+	* time.c (sys_adjtimex): Likewise.
+	* syscall.c (trace_syscall): If RVAL_STR is set, then
+	print auxstr for failed syscall as well.
+
 	* syscall.c (is_restart_error): New function.
 	* defs.h (is_restart_error): Declare it.
 
