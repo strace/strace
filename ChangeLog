@@ -1,4 +1,10 @@
-2008-04-19  Dmitry V. Levin <ldv@altlinux.org>
+2008-09-12  Tomas Pospisek  <tpo@sourcepole.ch>
+	    Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* strace.1 (DESCRIPTION): New description of unfinished system calls
+	and system calls restarting.
+
+2008-09-03  Dmitry V. Levin <ldv@altlinux.org>
 
 	* desc.c (sys_fcntl): Do not initialize auxstr for failed syscall.
 	* process.c (sys_fork, sys_rfork) [USE_PROCFS]: Likewise.

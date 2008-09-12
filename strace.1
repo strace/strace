@@ -147,6 +147,26 @@ sigsuspend([] <unfinished ...>
 --- SIGINT (Interrupt) ---
 +++ killed by SIGINT +++
 .CE
+If a system call is being executed and meanwhile another one is being called
+from a different thread/process then
+.B strace
+will try to preserve the order of those events and mark the ongoing call as
+being \fIunfinished\fP.  When the call returns it will be marked as
+\fIresumed\fP.
+.CW
+[pid 28772] select(4, [3], NULL, NULL, NULL <unfinished ...>
+[pid 28779] clock_gettime(CLOCK_REALTIME, {1130322148, 939977000}) = 0
+[pid 28772] <... select resumed> )      = 1 (in [3])
+.CE
+Interruption of a (restartable) system call by a signal delivery is processed
+differently as kernel terminates the system call and also arranges its
+immediate reexecution after the signal handler completes.
+.CW
+read(0, 0x7ffff72cf5cf, 1)              = ? ERESTARTSYS (To be restarted)
+--- SIGALRM (Alarm clock) @ 0 (0) ---
+rt_sigreturn(0xe)                       = 0
+read(0, ""..., 1)                       = 0
+.CE
 Arguments are printed in symbolic form with a passion.
 This example shows the shell performing ``>>xyzzy'' output redirection:
 .CW
