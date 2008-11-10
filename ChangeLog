@@ -1,3 +1,7 @@
+2008-09-18  Mike Frysinger <vapier@gentoo.org>
+
+	* configure.ac: Accept uclinux hosts as linux.
+
 2008-10-22  Dmitry V. Levin <ldv@altlinux.org>
 
 	Handle socket type flags introduced in linux 2.6.27.

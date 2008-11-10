@@ -9,7 +9,7 @@ AC_CANONICAL_HOST
 
 AC_MSG_CHECKING([for supported operating system])
 case "$host_os" in
-linux*)
+*linux*)
 	opsys=linux
 	AC_DEFINE([LINUX], 1, [Define for the Linux operating system.])
 	;;
