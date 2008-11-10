@@ -320,17 +320,32 @@ static const struct xlat socktypes[] = {
 #ifdef SOCK_RAW
 	{ SOCK_RAW,	"SOCK_RAW"	},
 #endif
+#ifdef SOCK_RDM
+	{ SOCK_RDM,	"SOCK_RDM"	},
+#endif
 #ifdef SOCK_SEQPACKET
 	{ SOCK_SEQPACKET,"SOCK_SEQPACKET"},
 #endif
-#ifdef SOCK_RDM
-	{ SOCK_RDM,	"SOCK_RDM"	},
+#ifdef SOCK_DCCP
+	{ SOCK_DCCP,	"SOCK_DCCP"	},
 #endif
 #ifdef SOCK_PACKET
 	{ SOCK_PACKET,	"SOCK_PACKET"	},
 #endif
 	{ 0,		NULL		},
 };
+const struct xlat sock_type_flags[] = {
+#ifdef SOCK_CLOEXEC
+	{ SOCK_CLOEXEC,	"SOCK_CLOEXEC"	},
+#endif
+#ifdef SOCK_NONBLOCK
+	{ SOCK_NONBLOCK,"SOCK_NONBLOCK"	},
+#endif
+	{ 0,		NULL		},
+};
+#ifndef SOCK_TYPE_MASK
+# define SOCK_TYPE_MASK 0xf
+#endif
 static const struct xlat socketlayers[] = {
 #if defined(SOL_IP)
 	{ SOL_IP,	"SOL_IP"	},
@@ -1182,14 +1197,33 @@ long addr;
 
 #endif /* HAVE_SENDMSG */
 
+/*
+ * low bits of the socket type define real socket type,
+ * other bits are socket type flags.
+ */
+static void
+tprint_sock_type(struct tcb *tcp, int flags)
+{
+	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
+
+	if (str)
+	{
+		tprintf("%s", str);
+		flags &= ~SOCK_TYPE_MASK;
+		if (!flags)
+			return;
+		tprintf("|");
+	}
+	printflags(sock_type_flags, flags, "SOCK_???");
+}
+
 int
-sys_socket(tcp)
-struct tcb *tcp;
+sys_socket(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
 		tprintf(", ");
-		printxval(socktypes, tcp->u_arg[1], "SOCK_???");
+		tprint_sock_type(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 		switch (tcp->u_arg[0]) {
 		case PF_INET:
@@ -1489,8 +1523,7 @@ struct tcb *tcp;
 }
 
 int
-sys_socketpair(tcp)
-struct tcb *tcp;
+sys_socketpair(struct tcb *tcp)
 {
 #ifdef LINUX
 	int fds[2];
@@ -1499,7 +1532,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
 		tprintf(", ");
-		printxval(socktypes, tcp->u_arg[1], "SOCK_???");
+		tprint_sock_type(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 		switch (tcp->u_arg[0]) {
 		case PF_INET:

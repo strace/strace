@@ -1,3 +1,12 @@
+2008-10-22  Dmitry V. Levin <ldv@altlinux.org>
+
+	Handle socket type flags introduced in linux 2.6.27.
+	* net.c (socktypes): Add SOCK_DCCP.
+	(sock_type_flags): New xlat structure.
+	(tprint_sock_type): New function.
+	(sys_socket, sys_socketpair): Use it to parse socket type and
+	socket type flags.
+
 2008-09-29  Dmitry V. Levin <ldv@altlinux.org>
 
 	* strace.c (startup_child): Save child pid for future use.
