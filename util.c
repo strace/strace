@@ -407,6 +407,12 @@ unsigned long uid;
 
 static char path[MAXPATHLEN + 1];
 
+/*
+ * Quote string `instr' of length `size'
+ * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
+ * If `len' < 0, treat `instr' as a NUL-terminated string
+ * and quote at most (`size' - 1) bytes.
+ */
 static int
 string_quote(const char *instr, char *outstr, int len, int size)
 {
@@ -417,12 +423,18 @@ string_quote(const char *instr, char *outstr, int len, int size)
 	if (xflag > 1)
 		usehex = 1;
 	else if (xflag) {
+		/* Check for presence of symbol which require
+		   to hex-quote the whole string. */
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
-			if (len < 0 && i == size - 2 && c != '\0')
-				++i;
-			if (len < 0 && c == '\0')
-				break;
+			/* Check for NUL-terminated string. */
+			if (len < 0) {
+				if (c == '\0')
+					break;
+				/* Quote at most size - 1 bytes. */
+				if (i == size - 1)
+					continue;
+			}
 			if (!isprint(c) && !isspace(c)) {
 				usehex = 1;
 				break;
@@ -433,20 +445,31 @@ string_quote(const char *instr, char *outstr, int len, int size)
 	*s++ = '\"';
 
 	if (usehex) {
+		/* Hex-quote the whole string. */
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
-			if (len < 0 && c == '\0')
-				break;
+			/* Check for NUL-terminated string. */
+			if (len < 0) {
+				if (c == '\0')
+					break;
+				/* Quote at most size - 1 bytes. */
+				if (i == size - 1)
+					continue;
+			}
 			sprintf(s, "\\x%02x", c);
 			s += 4;
 		}
 	} else {
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
-			if (len < 0 && i == size - 2 && c != '\0')
-				++i;
-			if (len < 0 && c == '\0')
-				break;
+			/* Check for NUL-terminated string. */
+			if (len < 0) {
+				if (c == '\0')
+					break;
+				/* Quote at most size - 1 bytes. */
+				if (i == size - 1)
+					continue;
+			}
 			switch (c) {
 				case '\"': case '\\':
 					*s++ = '\\';
@@ -495,18 +518,25 @@ string_quote(const char *instr, char *outstr, int len, int size)
 	return i == size;
 }
 
+/*
+ * Print path string specified by address `addr' and length `n'.
+ * If path length exceeds `n', append `...' to the output.
+ */
 void
 printpathn(struct tcb *tcp, long addr, int n)
 {
-	if (n > sizeof path - 1)
-		n = sizeof path - 1;
-
-	if (addr == 0) {
+	if (!addr) {
 		tprintf("NULL");
 		return;
 	}
 
+	/* Cap path length to the path buffer size,
+	   and NUL-terminate the buffer. */
+	if (n > sizeof path - 1)
+		n = sizeof path - 1;
 	path[n] = '\0';
+
+	/* Fetch one byte more to find out whether path length > n. */
 	if (umovestr(tcp, addr, n + 1, path) < 0)
 		tprintf("%#lx", addr);
 	else {
@@ -515,7 +545,8 @@ printpathn(struct tcb *tcp, long addr, int n)
 
 		if (trunc)
 			path[n] = '\0';
-		if (string_quote(path, outstr, -1, n + 1) || trunc)
+		(void) string_quote(path, outstr, -1, n + 1);
+		if (trunc)
 			strcat(outstr, "...");
 		tprintf("%s", outstr);
 	}
@@ -527,6 +558,11 @@ printpath(struct tcb *tcp, long addr)
 	printpathn(tcp, addr, sizeof path - 1);
 }
 
+/*
+ * Print string specified by address `addr' and length `len'.
+ * If `len' < 0, treat the string as a NUL-terminated string.
+ * If string length exceeds `max_strlen', append `...' to the output.
+ */
 void
 printstr(struct tcb *tcp, long addr, int len)
 {
@@ -538,32 +574,39 @@ printstr(struct tcb *tcp, long addr, int len)
 		tprintf("NULL");
 		return;
 	}
-	if (!str) {
-		if ((str = malloc(max_strlen + 1)) == NULL
-		    || (outstr = malloc(4*max_strlen
-					+ sizeof "\"\"...")) == NULL) {
-			fprintf(stderr, "out of memory\n");
-			tprintf("%#lx", addr);
-			return;
-		}
+	/* Allocate static buffers if they are not allocated yet. */
+	if (!str)
+		str = malloc(max_strlen + 1);
+	if (!outstr)
+		outstr = malloc(4 * max_strlen + sizeof "\"...\"");
+	if (!str || !outstr) {
+		fprintf(stderr, "out of memory\n");
+		tprintf("%#lx", addr);
+		return;
 	}
 
 	if (len < 0) {
+		/*
+		 * Treat as a NUL-terminated string: fetch one byte more
+		 * because string_quote() quotes one byte less.
+		 */
 		size = max_strlen + 1;
+		str[max_strlen] = '\0';
 		if (umovestr(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
 	}
 	else {
-		size = MIN(len, max_strlen + 1);
+		size = MIN(len, max_strlen);
 		if (umoven(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
 	}
 
-	if (string_quote(str, outstr, len, size))
+	if (string_quote(str, outstr, len, size) &&
+	    (len < 0 || len > max_strlen))
 		strcat(outstr, "...");
 
 	tprintf("%s", outstr);

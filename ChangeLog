@@ -1,3 +1,13 @@
+2008-11-09  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* util.c (string_quote): Fix support for NUL-terminated string.
+	Add comments.
+	(printpathn): Fix the case when "..." was appended to the output
+	but no truncation was actually made.  Add comments.
+	(printstr): Fix memory allocation.  Fix two cases when "..." was
+	appended to the output but no truncation was actually made.
+	Add comments.
+
 2008-10-23  Dmitry V. Levin  <ldv@altlinux.org>
 
 	Implement parsers for new linux syscalls.
