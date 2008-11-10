@@ -1,4 +1,27 @@
-2008-09-18  Mike Frysinger <vapier@gentoo.org>
+2008-10-23  Mike Frysinger  <vapier@gentoo.org>
+
+	Port strace to the Blackfin architecture.
+	* configure.ac: Add bfin to supported architectures.
+	* process.c: Skip u_fpvalid/u_fpstate for Blackfin architecture.
+	(change_syscall): Support Blackfin architecture.
+	* syscall.c: Declare r0 for Blackfin architecture.
+	(get_scno): Decode Blackfin syscall number.
+	(syscall_fixup): Extract Blackfin return value.
+	(get_error): Decode Blackfin return value.
+	(force_result): Poke Blackfin return value.
+	(syscall_enter): Extract Blackfin syscall arguments.
+	* defs.h: Define TCB_WAITEXECVE for Blackfin architecture.
+	* linux/syscall.h (sys_sram_alloc): Declare for Blackfin
+	architecture.
+	* system.c (sys_sram_alloc): Decode Blackfin sram_alloc() syscall.
+	* util.c (getpc): Handle PC on Blackfin architecture.
+	(printcall): Likewise.
+	* linux/bfin/ioctlent.h, linux/bfin/syscallent.h: New Blackfin
+	headers.
+	* Makefile.am (EXTRA_DIST): Add linux/bfin/ioctlent.h and
+	linux/bfin/syscallent.h.
+
+2008-09-18  Mike Frysinger  <vapier@gentoo.org>
 
 	* configure.ac: Accept uclinux hosts as linux.
 

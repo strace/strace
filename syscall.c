@@ -746,6 +746,8 @@ internal_syscall(struct tcb *tcp)
 	static long result,flags;
 #elif defined (M68K)
 	static int d0;
+#elif defined(BFIN)
+	static long r0;
 #elif defined (ARM)
 	static struct pt_regs regs;
 #elif defined (ALPHA)
@@ -899,6 +901,12 @@ struct tcb *tcp;
 			return 0;
 		}
 	}
+#elif defined(BFIN)
+	if (upeek(pid, PT_ORIG_P0, &scno))
+		return -1;
+	/* Check if we return from execve. */
+	if (tcp->flags & TCB_WAITEXECVE && tcp->flags & TCB_INSYSCALL)
+		tcp->flags &= ~(TCB_INSYSCALL | TCB_WAITEXECVE);
 #elif defined (I386)
 	if (upeek(pid, 4*ORIG_EAX, &scno) < 0)
 		return -1;
@@ -1455,6 +1463,9 @@ struct tcb *tcp;
 	/*
 	 * Nothing required
 	 */
+#elif defined(BFIN)
+	if (upeek(pid, PT_R0, &r0) < 0)
+		return -1;
 #elif defined (HPPA)
 	if (upeek(pid, PT_GR28, &r28) < 0)
 		return -1;
@@ -1588,6 +1599,15 @@ struct tcb *tcp;
 			u_error = 0;
 		}
 #else /* !ARM */
+#ifdef BFIN
+		if (is_negated_errno(r0)) {
+			tcp->u_rval = -1;
+			u_error = -r0;
+		} else {
+			tcp->u_rval = r0;
+			u_error = 0;
+		}
+#else /* !BFIN */
 #ifdef ALPHA
 		if (a3) {
 			tcp->u_rval = -1;
@@ -1655,6 +1675,7 @@ struct tcb *tcp;
 #endif /* SPARC */
 #endif /* SPARC64 */
 #endif /* ALPHA */
+#endif /* BFIN */
 #endif /* ARM */
 #endif /* M68K */
 #endif /* POWERPC */
@@ -1781,6 +1802,11 @@ force_result(tcp, error, rval)
 			return -1;
 	}
 #else /* !IA64 */
+#ifdef BFIN
+	r0 = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)PT_R0, r0) < 0)
+		return -1;
+#else /* !BFIN */
 #ifdef MIPS
 	if (error) {
 		r2 = error;
@@ -1885,6 +1911,7 @@ force_result(tcp, error, rval)
 #endif /* M68K */
 #endif /* POWERPC */
 #endif /* MIPS */
+#endif /* BFIN */
 #endif /* IA64 */
 #endif /* X86_64 */
 #endif /* I386 */
@@ -2116,6 +2143,20 @@ struct tcb *tcp;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = regs.uregs[i];
  	}
+#elif defined(BFIN)
+	{
+		int i;
+		int argreg[] = {PT_R0, PT_R1, PT_R2, PT_R3, PT_R4, PT_R5};
+
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else
+			tcp->u_nargs = sizeof(argreg) / sizeof(argreg[0]);
+
+		for (i = 0; i < tcp->u_nargs; ++i)
+			if (upeek(pid, argreg[i], &tcp->u_arg[i]) < 0)
+				return -1;
+	}
 #elif defined(SH)
        {
                int i;

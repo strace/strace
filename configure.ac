@@ -43,6 +43,10 @@ AC_MSG_RESULT($opsys)
 
 AC_MSG_CHECKING([for supported architecture])
 case "$host_cpu" in
+bfin)
+	arch=bfin
+	AC_DEFINE([BFIN], 1, [Define for the Blackfin architecture.])
+	;;
 i[[3456]]86|pentium)
 	arch=i386
 	AC_DEFINE([I386], 1, [Define for the i386 architecture.])

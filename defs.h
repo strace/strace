@@ -356,7 +356,7 @@ struct tcb {
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-# if defined(ALPHA) || defined(SPARC) || defined(SPARC64) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM) || defined(MIPS)
+# if defined(ALPHA) || defined(SPARC) || defined(SPARC64) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM) || defined(MIPS) || defined(BFIN)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
 # endif
 # define TCB_CLONE_DETACHED 04000 /* CLONE_DETACHED set in creating syscall */

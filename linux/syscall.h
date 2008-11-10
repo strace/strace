@@ -326,3 +326,7 @@ int sys_pread64(), sys_pwrite64();
 #ifdef POWERPC
 int sys_subpage_prot();
 #endif
+
+#ifdef BFIN
+int sys_sram_alloc();
+#endif

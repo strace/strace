@@ -293,6 +293,33 @@ struct tcb *tcp;
 }
 #endif /* M68K */
 
+#ifdef BFIN
+
+#include <bfin_sram.h>
+
+static const struct xlat sram_alloc_flags[] = {
+	{ L1_INST_SRAM,		"L1_INST_SRAM" },
+	{ L1_DATA_A_SRAM,	"L1_DATA_A_SRAM" },
+	{ L1_DATA_B_SRAM,	"L1_DATA_B_SRAM" },
+	{ L1_DATA_SRAM,		"L1_DATA_SRAM" },
+	{ 0,			NULL },
+};
+
+int
+sys_sram_alloc(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp)) {
+		/* size */
+		tprintf("%zu, ", tcp->u_arg[0]);
+		/* flags */
+		printxval(sram_alloc_flags, tcp->u_arg[1], "L1_???_SRAM");
+	}
+	return 1;
+}
+
+#endif
+
 #endif /* LINUX */
 
 #ifdef SUNOS4

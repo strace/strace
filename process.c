@@ -742,6 +742,10 @@ int new;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new)<0)
 	    	return -1;
 	return 0;
+#elif defined(BFIN)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_P0), new)<0)
+		return -1;
+	return 0;
 #elif defined(IA64)
 	if (ia32) {
 		switch (new) {
@@ -3036,7 +3040,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 70,			"fpeir"					},
 #endif
 
-#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64)
+#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(BFIN)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #endif
 #if  defined(I386) || defined(X86_64)
@@ -3065,7 +3069,7 @@ const struct xlat struct_user_offsets[] = {
 #if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
 #endif
-#if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64)
+#if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
 #endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
