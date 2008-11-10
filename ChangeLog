@@ -1,3 +1,21 @@
+2008-10-23  Dmitry V. Levin  <ldv@altlinux.org>
+
+	Implement parsers for new linux syscalls.
+	* desc.c (do_dup2, [LINUX] sys_dup3): New functions.
+	(sys_dup2): Use do_dup2.
+	[LINUX] (sys_epoll_create1): New function.
+	[LINUX] (do_eventfd, sys_eventfd2): New functions.
+	[LINUX] (sys_eventfd): Use do_eventfd.
+	* net.c (do_pipe, [LINUX] sys_pipe2): New functions.
+	(sys_pipe): Use do_pipe.
+	* signal.c [LINUX] (do_signalfd, sys_signalfd4): New functions.
+	[LINUX] (sys_signalfd): Use do_signalfd.
+	* linux/syscall.h: Declare new sys_* functions.
+	* linux/syscallent.h: Hook up signalfd4, eventfd2, epoll_create1,
+	dup3, pipe2, inotify_init1.
+	* linux/x86_64/syscallent.h: Hook up paccept, signalfd4, eventfd2,
+	epoll_create1, dup3, pipe2, inotify_init1.
+
 2008-10-23  Mike Frysinger  <vapier@gentoo.org>
 
 	Port strace to the Blackfin architecture.

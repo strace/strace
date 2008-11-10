@@ -1497,30 +1497,49 @@ struct tcb *tcp;
 	return sys_accept(tcp);
 }
 
-int
-sys_pipe(tcp)
-struct tcb *tcp;
+extern const struct xlat open_mode_flags[];
+
+static int
+do_pipe(struct tcb *tcp, int flags_arg)
 {
-
-#if defined(LINUX) && !defined(SPARC) && !defined(SPARC64) && !defined(SH) && !defined(IA64)
-	int fds[2];
-
 	if (exiting(tcp)) {
 		if (syserror(tcp)) {
 			tprintf("%#lx", tcp->u_arg[0]);
-			return 0;
-		}
-		if (umoven(tcp, tcp->u_arg[0], sizeof fds, (char *) fds) < 0)
-			tprintf("[...]");
-		else
-			tprintf("[%u, %u]", fds[0], fds[1]);
-	}
+		} else {
+#if defined(LINUX) && !defined(SPARC) && !defined(SPARC64) && !defined(SH) && !defined(IA64)
+			int fds[2];
+
+			if (umoven(tcp, tcp->u_arg[0], sizeof fds, (char *) fds) < 0)
+				tprintf("[...]");
+			else
+				tprintf("[%u, %u]", fds[0], fds[1]);
 #elif defined(SPARC) || defined(SPARC64) || defined(SH) || defined(SVR4) || defined(FREEBSD) || defined(IA64)
-	if (exiting(tcp))
-		tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
+			tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
+#else
+			tprintf("%#lx", tcp->u_arg[0]);
 #endif
+		}
+		if (flags_arg >= 0) {
+			tprintf(", ");
+			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
+		}
+	}
 	return 0;
 }
+
+int
+sys_pipe(struct tcb *tcp)
+{
+	return do_pipe(tcp, -1);
+}
+
+#ifdef LINUX
+int
+sys_pipe2(struct tcb *tcp)
+{
+	return do_pipe(tcp, 1);
+}
+#endif
 
 int
 sys_socketpair(struct tcb *tcp)

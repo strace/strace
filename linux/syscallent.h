@@ -357,12 +357,12 @@
 	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 324 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 325 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 326 */
-	{ 5,	0,	printargs,		"SYS_327"	}, /* 327 */
-	{ 5,	0,	printargs,		"SYS_328"	}, /* 328 */
-	{ 5,	0,	printargs,		"SYS_329"	}, /* 329 */
-	{ 5,	0,	printargs,		"SYS_330"	}, /* 330 */
-	{ 5,	0,	printargs,		"SYS_331"	}, /* 331 */
-	{ 5,	0,	printargs,		"SYS_332"	}, /* 332 */
+	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 327 */
+	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 328 */
+	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 329 */
+	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 330 */
+	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 331 */
+	{ 1,	TD,	printargs,		"inotify_init1"	}, /* 332 */
 	{ 5,	0,	printargs,		"SYS_333"	}, /* 333 */
 	{ 5,	0,	printargs,		"SYS_334"	}, /* 334 */
 	{ 5,	0,	printargs,		"SYS_335"	}, /* 335 */

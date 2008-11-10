@@ -242,6 +242,8 @@ int getlk;
 }
 #endif
 
+extern const struct xlat open_mode_flags[];
+
 /*
  * low bits of the open(2) flags define access mode,
  * other bits are real flags.
@@ -250,7 +252,6 @@ static const char *
 sprint_open_modes(mode_t flags)
 {
 	extern const struct xlat open_access_modes[];
-	extern const struct xlat open_mode_flags[];
 	static char outstr[1024];
 	const char *str = xlookup(open_access_modes, flags & 3);
 	const char *sep = "";
@@ -396,15 +397,32 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_dup2(tcp)
-struct tcb *tcp;
+static int
+do_dup2(struct tcb *tcp, int flags_arg)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld", tcp->u_arg[0], tcp->u_arg[1]);
+		if (flags_arg >= 0) {
+			tprintf(", ");
+			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
+		}
 	}
 	return 0;
 }
+
+int
+sys_dup2(struct tcb *tcp)
+{
+	return do_dup2(tcp, -1);
+}
+
+#ifdef LINUX
+int
+sys_dup3(struct tcb *tcp)
+{
+	return do_dup2(tcp, 2);
+}
+#endif
 
 #if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4)
 int
@@ -605,11 +623,18 @@ static struct xlat epollevents[] = {
 };
 
 int
-sys_epoll_create(tcp)
-struct tcb *tcp;
+sys_epoll_create(struct tcb *tcp)
 {
 	if (entering(tcp))
 		tprintf("%ld", tcp->u_arg[0]);
+	return 0;
+}
+
+int
+sys_epoll_create1(struct tcb *tcp)
+{
+	if (entering(tcp))
+		printflags(open_mode_flags, tcp->u_arg[0], "O_???");
 	return 0;
 }
 
@@ -889,12 +914,28 @@ sys_pselect6(struct tcb *tcp)
 	return rc;
 }
 
-int
-sys_eventfd(tcp)
-struct tcb *tcp;
+static int
+do_eventfd(struct tcb *tcp, int flags_arg)
 {
-	if (entering(tcp))
+	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
+		if (flags_arg >= 0) {
+			tprintf(", ");
+			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
+		}
+	}
 	return 0;
+}
+
+int
+sys_eventfd(struct tcb *tcp)
+{
+	return do_eventfd(tcp, -1);
+}
+
+int
+sys_eventfd2(struct tcb *tcp)
+{
+	return do_eventfd(tcp, 1);
 }
 #endif

@@ -286,3 +286,10 @@
 	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 285 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 286 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 287 */
+	{ 6,	TN,	printargs,		"paccept"	}, /* 288 */
+	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 289 */
+	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 290 */
+	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 291 */
+	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 292 */
+	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 293 */
+	{ 1,	TD,	printargs,		"inotify_init1"	}, /* 294 */

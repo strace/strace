@@ -2011,15 +2011,32 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_signalfd(tcp)
-struct tcb *tcp;
+extern const struct xlat open_mode_flags[];
+
+static int
+do_signalfd(struct tcb *tcp, int flags_arg)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		print_sigset(tcp, tcp->u_arg[1], 1);
 		tprintf("%lu", tcp->u_arg[2]);
+		if (flags_arg >= 0) {
+			tprintf(", ");
+			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
+		}
 	}
 	return 0;
+}
+
+int
+sys_signalfd(struct tcb *tcp)
+{
+	return do_signalfd(tcp, -1);
+}
+
+int
+sys_signalfd4(struct tcb *tcp)
+{
+	return do_signalfd(tcp, 3);
 }
 #endif /* LINUX */

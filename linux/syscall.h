@@ -105,6 +105,7 @@ int sys_io_setup(), sys_io_submit(), sys_io_cancel(), sys_io_getevents(), sys_io
 int sys_utimensat(), sys_epoll_pwait(), sys_signalfd(), sys_timerfd(), sys_eventfd();
 int sys_getcpu();
 int sys_fallocate(), sys_timerfd_create(), sys_timerfd_settime(), sys_timerfd_gettime();
+int sys_signalfd4(), sys_eventfd2(), sys_epoll_create1(), sys_dup3(), sys_pipe2();
 
 /* sys_socketcall subcalls */
 
