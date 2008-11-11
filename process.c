@@ -186,9 +186,6 @@ static const struct xlat prctl_options[] = {
 #ifdef PR_GETNSHARE
 	{ PR_GETNSHARE,		"PR_GETNSHARE"		},
 #endif
-#if defined(PR_SET_PDEATHSIG)
-	{ PR_SET_PDEATHSIG,	"PR_SET_PDEATHSIG"	},
-#endif
 #ifdef PR_COREPID
 	{ PR_COREPID,		"PR_COREPID"		},
 #endif
@@ -217,10 +214,10 @@ static const struct xlat prctl_options[] = {
 	{ PR_SET_UNALIGN,	"PR_SET_UNALIGN"	},
 #endif
 #ifdef PR_GET_KEEPCAPS
-	{ PR_GET_KEEPCAPS,	"PR_GET_KEEP_CAPS"	},
+	{ PR_GET_KEEPCAPS,	"PR_GET_KEEPCAPS"	},
 #endif
 #ifdef PR_SET_KEEPCAPS
-	{ PR_SET_KEEPCAPS,	"PR_SET_KEEP_CAPS"	},
+	{ PR_SET_KEEPCAPS,	"PR_SET_KEEPCAPS"	},
 #endif
 #ifdef PR_GET_FPEMU
 	{ PR_GET_FPEMU,		"PR_GET_FPEMU"		},
@@ -257,6 +254,18 @@ static const struct xlat prctl_options[] = {
 #endif
 #ifdef PR_SET_SECCOMP
 	{ PR_SET_SECCOMP,	"PR_SET_SECCOMP"	},
+#endif
+#ifdef PR_GET_TSC
+	{ PR_GET_TSC,		"PR_GET_TSC"		},
+#endif
+#ifdef PR_SET_TSC
+	{ PR_SET_TSC,		"PR_SET_TSC"		},
+#endif
+#ifdef PR_GET_SECUREBITS
+	{ PR_GET_SECUREBITS,	"PR_GET_SECUREBITS"	},
+#endif
+#ifdef PR_SET_SECUREBITS
+	{ PR_SET_SECUREBITS,	"PR_SET_SECUREBITS"	},
 #endif
 	{ 0,			NULL			},
 };
