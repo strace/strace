@@ -1507,6 +1507,21 @@ static const struct xlat capabilities[] = {
 	{ 1<<CAP_SYS_RESOURCE,	"CAP_SYS_RESOURCE"},
 	{ 1<<CAP_SYS_TIME,	"CAP_SYS_TIME"	},
 	{ 1<<CAP_SYS_TTY_CONFIG,"CAP_SYS_TTY_CONFIG"},
+#ifdef CAP_MKNOD
+	{ 1<<CAP_MKNOD,		"CAP_MKNOD"	},
+#endif
+#ifdef CAP_LEASE
+	{ 1<<CAP_LEASE,		"CAP_LEASE"	},
+#endif
+#ifdef CAP_AUDIT_WRITE
+	{ 1<<CAP_AUDIT_WRITE,	"CAP_AUDIT_WRITE"},
+#endif
+#ifdef CAP_AUDIT_CONTROL
+	{ 1<<CAP_AUDIT_CONTROL,	"CAP_AUDIT_CONTROL"},
+#endif
+#ifdef CAP_SETFCAP
+	{ 1<<CAP_SETFCAP,	"CAP_SETFCAP"	},
+#endif
 	{ 0,                    NULL            },
 };
 

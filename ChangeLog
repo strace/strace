@@ -1,5 +1,7 @@
 2008-11-09  Dmitry V. Levin  <ldv@altlinux.org>
 
+	* system.c (capabilities): Add more capability values.
+
 	* util.c (string_quote): Fix support for NUL-terminated string.
 	Add comments.
 	(printpathn): Fix the case when "..." was appended to the output
