@@ -22,7 +22,7 @@ main(void)
   *c = 0;
   if (fork()) {
     while(1) {
-      strcpy( c, "/etc/passwd" );    
+      strcpy( c, "/etc/passwd" );
       strcpy( c, "/etc/shadow" );
     }
   } else
