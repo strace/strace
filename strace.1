@@ -113,7 +113,8 @@ by a process and the signals which are received by a process.
 The name of each system call, its arguments and its return value
 are printed on standard error or to the file specified with the
 .B \-o
-option.
+option. When straced program exits, strace makes exit status
+available to the parent process of strace.
 .LP
 .B strace
 is a useful diagnostic, instructional, and debugging tool.
