@@ -113,8 +113,7 @@ by a process and the signals which are received by a process.
 The name of each system call, its arguments and its return value
 are printed on standard error or to the file specified with the
 .B \-o
-option. When straced program exits, strace makes exit status
-available to the parent process of strace.
+option.
 .LP
 .B strace
 is a useful diagnostic, instructional, and debugging tool.
@@ -554,6 +553,25 @@ Remove
 .IR var
 from the inherited list of environment variables before passing it on to
 the command.
+.SH DIAGNOSTICS
+When
+.I command
+exits,
+.B strace
+exits with the same exit status.
+If
+.I command
+is terminated by a signal,
+.B strace
+terminates itself with the same signal, so that
+.B strace
+can be used as a wrapper process transparent to the invoking parent process.
+.LP
+When using
+.BR -p ,
+the exit status of
+.B strace
+is zero unless there was an unexpected error in doing the tracing.
 .SH "SETUID INSTALLATION"
 If
 .B strace
