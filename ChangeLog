@@ -1,3 +1,7 @@
+2008-12-09  Roland McGrath  <roland@redhat.com>
+
+	* strace.1 (DIAGNOSTICS): New section, describe exit behavior.
+
 2008-11-09  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* process.c (prctl_options): Update constants from linux 2.6.27.
