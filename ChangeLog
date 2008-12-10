@@ -14,6 +14,7 @@
 	(printstr): Fix memory allocation.  Fix two cases when "..." was
 	appended to the output but no truncation was actually made.
 	Add comments.
+	Fixes RH#470529.
 
 2008-10-23  Dmitry V. Levin  <ldv@altlinux.org>
 
@@ -77,6 +78,7 @@
 	save the signal number.  If terminated process pid matches the
 	saved child pid, save its exit status.
 	Patch from Denys Vlasenko <dvlasenk@redhat.com>
+	Fixes RH#105371.
 
 2008-09-12  Tomas Pospisek  <tpo@sourcepole.ch>
 	    Jan Kratochvil  <jan.kratochvil@redhat.com>
