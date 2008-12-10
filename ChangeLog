@@ -1,3 +1,7 @@
+2008-11-11  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* sock.c [LINUX] (sock_ioctl): Parse more SIOCS* ioctls.
+
 2008-12-09  Roland McGrath  <roland@redhat.com>
 
 	* strace.1 (DIAGNOSTICS): New section, describe exit behavior.
