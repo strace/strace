@@ -1046,8 +1046,8 @@ char *laddr;
 #ifndef USE_PROCFS
 
 int
-upeek(pid, off, res)
-int pid;
+upeek(tcp, off, res)
+struct tcb *tcp;
 long off;
 long *res;
 {
@@ -1078,10 +1078,10 @@ long *res;
 	}
 #endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
 	errno = 0;
-	val = ptrace(PTRACE_PEEKUSER, pid, (char *) off, 0);
+	val = ptrace(PTRACE_PEEKUSER, tcp->pid, (char *) off, 0);
 	if (val == -1 && errno) {
 		char buf[60];
-		sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)",pid,off);
+		sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)", tcp->pid, off);
 		perror(buf);
 		return -1;
 	}
@@ -1100,31 +1100,31 @@ struct tcb *tcp;
 #ifdef LINUX
 	long pc;
 #if defined(I386)
-	if (upeek(tcp->pid, 4*EIP, &pc) < 0)
+	if (upeek(tcp, 4*EIP, &pc) < 0)
 		return -1;
 #elif defined(X86_64)
-	if (upeek(tcp->pid, 8*RIP, &pc) < 0)
+	if (upeek(tcp, 8*RIP, &pc) < 0)
 		return -1;
 #elif defined(IA64)
-	if (upeek(tcp->pid, PT_B0, &pc) < 0)
+	if (upeek(tcp, PT_B0, &pc) < 0)
 		return -1;
 #elif defined(ARM)
-	if (upeek(tcp->pid, 4*15, &pc) < 0)
+	if (upeek(tcp, 4*15, &pc) < 0)
 		return -1;
 #elif defined(BFIN)
-	if (upeek(tcp->pid, REG_PC, &pc) < 0)
+	if (upeek(tcp, REG_PC, &pc) < 0)
 		return -1;
 #elif defined(POWERPC)
-	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &pc) < 0)
+	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0)
 		return -1;
 #elif defined(M68K)
-	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0)
+	if (upeek(tcp, 4*PT_PC, &pc) < 0)
 		return -1;
 #elif defined(ALPHA)
-	if (upeek(tcp->pid, REG_PC, &pc) < 0)
+	if (upeek(tcp, REG_PC, &pc) < 0)
 		return -1;
 #elif defined(MIPS)
- 	if (upeek(tcp->pid, REG_EPC, &pc) < 0)
+ 	if (upeek(tcp, REG_EPC, &pc) < 0)
  		return -1;
 #elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
@@ -1132,16 +1132,16 @@ struct tcb *tcp;
 		return -1;
 	pc = regs.r_pc;
 #elif defined(S390) || defined(S390X)
-	if(upeek(tcp->pid,PT_PSWADDR,&pc) < 0)
+	if(upeek(tcp,PT_PSWADDR,&pc) < 0)
 		return -1;
 #elif defined(HPPA)
-	if(upeek(tcp->pid,PT_IAOQ0,&pc) < 0)
+	if(upeek(tcp,PT_IAOQ0,&pc) < 0)
 		return -1;
 #elif defined(SH)
-       if (upeek(tcp->pid, 4*REG_PC ,&pc) < 0)
+       if (upeek(tcp, 4*REG_PC ,&pc) < 0)
                return -1;
 #elif defined(SH64)
-       if (upeek(tcp->pid, REG_PC ,&pc) < 0)
+       if (upeek(tcp, REG_PC ,&pc) < 0)
                return -1;
 #endif
 	return pc;
@@ -1186,7 +1186,7 @@ struct tcb *tcp;
 #ifdef I386
 	long eip;
 
-	if (upeek(tcp->pid, 4*EIP, &eip) < 0) {
+	if (upeek(tcp, 4*EIP, &eip) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1194,7 +1194,7 @@ struct tcb *tcp;
 
 #elif defined(S390) || defined(S390X)
          long psw;
-         if(upeek(tcp->pid,PT_PSWADDR,&psw) < 0) {
+         if(upeek(tcp,PT_PSWADDR,&psw) < 0) {
                  PRINTBADPC;
                  return;
          }
@@ -1207,7 +1207,7 @@ struct tcb *tcp;
 #elif defined(X86_64)
 	long rip;
 
-	if (upeek(tcp->pid, 8*RIP, &rip) < 0) {
+	if (upeek(tcp, 8*RIP, &rip) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1215,7 +1215,7 @@ struct tcb *tcp;
 #elif defined(IA64)
 	long ip;
 
-	if (upeek(tcp->pid, PT_B0, &ip) < 0) {
+	if (upeek(tcp, PT_B0, &ip) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1223,7 +1223,7 @@ struct tcb *tcp;
 #elif defined(POWERPC)
 	long pc;
 
-	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
+	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
 		tprintf ("[????????] ");
 		return;
 	}
@@ -1231,7 +1231,7 @@ struct tcb *tcp;
 #elif defined(M68K)
 	long pc;
 
-	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0) {
+	if (upeek(tcp, 4*PT_PC, &pc) < 0) {
 		tprintf ("[????????] ");
 		return;
 	}
@@ -1239,7 +1239,7 @@ struct tcb *tcp;
 #elif defined(ALPHA)
 	long pc;
 
-	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
+	if (upeek(tcp, REG_PC, &pc) < 0) {
 		tprintf ("[????????????????] ");
 		return;
 	}
@@ -1254,7 +1254,7 @@ struct tcb *tcp;
 #elif defined(HPPA)
 	long pc;
 
-	if(upeek(tcp->pid,PT_IAOQ0,&pc) < 0) {
+	if(upeek(tcp,PT_IAOQ0,&pc) < 0) {
 		tprintf ("[????????] ");
 		return;
 	}
@@ -1262,7 +1262,7 @@ struct tcb *tcp;
 #elif defined(MIPS)
 	long pc;
 
-	if (upeek(tcp->pid, REG_EPC, &pc) < 0) {
+	if (upeek(tcp, REG_EPC, &pc) < 0) {
 		tprintf ("[????????] ");
 		return;
 	}
@@ -1270,7 +1270,7 @@ struct tcb *tcp;
 #elif defined(SH)
        long pc;
 
-       if (upeek(tcp->pid, 4*REG_PC, &pc) < 0) {
+       if (upeek(tcp, 4*REG_PC, &pc) < 0) {
                tprintf ("[????????] ");
                return;
        }
@@ -1278,7 +1278,7 @@ struct tcb *tcp;
 #elif defined(SH64)
 	long pc;
 
-	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
+	if (upeek(tcp, REG_PC, &pc) < 0) {
 		tprintf ("[????????????????] ");
 		return;
 	}
@@ -1286,7 +1286,7 @@ struct tcb *tcp;
 #elif defined(ARM)
 	long pc;
 
-	if (upeek(tcp->pid, 4*15, &pc) < 0) {
+	if (upeek(tcp, 4*15, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1294,7 +1294,7 @@ struct tcb *tcp;
 #elif defined(BFIN)
 	long pc;
 
-	if (upeek(tcp->pid, PT_PC, &pc) < 0) {
+	if (upeek(tcp, PT_PC, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1366,9 +1366,9 @@ arg_setup(struct tcb *tcp, arg_setup_state *state)
 		return 0;
 	}
 
-	if (upeek(tcp->pid, PT_AR_BSP, &bsp) < 0)
+	if (upeek(tcp, PT_AR_BSP, &bsp) < 0)
 		return -1;
-	if (upeek(tcp->pid, PT_CFM, (long *) &cfm) < 0)
+	if (upeek(tcp, PT_CFM, (long *) &cfm) < 0)
 		return -1;
 
 	sof = (cfm >> 0) & 0x7f;
@@ -1388,7 +1388,7 @@ get_arg0 (struct tcb *tcp, arg_setup_state *state, long *valp)
 	int ret;
 
 	if (ia32)
-		ret = upeek (tcp->pid, PT_R11, valp);
+		ret = upeek (tcp, PT_R11, valp);
 	else
 		ret = umoven (tcp,
 			      (unsigned long) ia64_rse_skip_regs(*state, 0),
@@ -1402,7 +1402,7 @@ get_arg1 (struct tcb *tcp, arg_setup_state *state, long *valp)
 	int ret;
 
 	if (ia32)
-		ret = upeek (tcp->pid, PT_R9, valp);
+		ret = upeek (tcp, PT_R9, valp);
 	else
 		ret = umoven (tcp,
 			      (unsigned long) ia64_rse_skip_regs(*state, 1),
@@ -1511,9 +1511,9 @@ typedef int arg_setup_state;
 # define arg_setup(tcp, state) (0)
 # define arg_finish_change(tcp, state)	0
 # define get_arg0(tcp, cookie, valp) \
-  (upeek ((tcp)->pid, arg0_offset, (valp)))
+  (upeek ((tcp), arg0_offset, (valp)))
 # define get_arg1(tcp, cookie, valp) \
-  (upeek ((tcp)->pid, arg1_offset, (valp)))
+  (upeek ((tcp), arg1_offset, (valp)))
 
 static int
 set_arg0 (struct tcb *tcp, void *cookie, long val)
@@ -1700,7 +1700,7 @@ struct tcb *tcp;
 				tcp->pid);
 			return -1;
 		}
-		if (upeek(tcp->pid, PT_CR_IIP, &tcp->baddr) < 0)
+		if (upeek(tcp, PT_CR_IIP, &tcp->baddr) < 0)
 			return -1;
 		if (debug)
 			fprintf(stderr, "[%d] setting bpt at %lx\n",
@@ -1734,9 +1734,9 @@ struct tcb *tcp;
 		pid_t pid;
 
 		pid = tcp->pid;
-		if (upeek(pid, PT_CR_IPSR, &ipsr) < 0)
+		if (upeek(tcp, PT_CR_IPSR, &ipsr) < 0)
 			return -1;
-		if (upeek(pid, PT_CR_IIP, &addr) < 0)
+		if (upeek(tcp, PT_CR_IIP, &addr) < 0)
 			return -1;
 		/* store "ri" in low two bits */
 		tcp->baddr = addr | ((ipsr >> 41) & 0x3);
@@ -1795,13 +1795,13 @@ struct tcb *tcp;
 		return -1;
 	}
 #if defined (I386)
-	if (upeek(tcp->pid, 4*EIP, &tcp->baddr) < 0)
+	if (upeek(tcp, 4*EIP, &tcp->baddr) < 0)
 		return -1;
 #elif defined (X86_64)
-	if (upeek(tcp->pid, 8*RIP, &tcp->baddr) < 0)
+	if (upeek(tcp, 8*RIP, &tcp->baddr) < 0)
 		return -1;
 #elif defined (M68K)
-	if (upeek(tcp->pid, 4*PT_PC, &tcp->baddr) < 0)
+	if (upeek(tcp, 4*PT_PC, &tcp->baddr) < 0)
 	  return -1;
 #elif defined (ALPHA)
 	return -1;
@@ -1810,17 +1810,17 @@ struct tcb *tcp;
 #elif defined (MIPS)
 	return -1;		/* FIXME: I do not know what i do - Flo */
 #elif defined (POWERPC)
-	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &tcp->baddr) < 0)
+	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &tcp->baddr) < 0)
 		return -1;
 #elif defined(S390) || defined(S390X)
-	if (upeek(tcp->pid,PT_PSWADDR, &tcp->baddr) < 0)
+	if (upeek(tcp,PT_PSWADDR, &tcp->baddr) < 0)
 		return -1;
 #elif defined(HPPA)
-	if (upeek(tcp->pid, PT_IAOQ0, &tcp->baddr) < 0)
+	if (upeek(tcp, PT_IAOQ0, &tcp->baddr) < 0)
 		return -1;
 	tcp->baddr &= ~0x03;
 #elif defined(SH)
-       if (upeek(tcp->pid, 4*REG_PC, &tcp->baddr) < 0)
+       if (upeek(tcp, 4*REG_PC, &tcp->baddr) < 0)
                return -1;
 #else
 #error unknown architecture
@@ -1946,7 +1946,7 @@ struct tcb *tcp;
 		}
 		tcp->flags &= ~TCB_BPTSET;
 
-		if (upeek(tcp->pid, PT_CR_IIP, &addr) < 0)
+		if (upeek(tcp, PT_CR_IIP, &addr) < 0)
 			return -1;
 		if (addr != tcp->baddr) {
 			/* The breakpoint has not been reached yet.  */
@@ -1962,9 +1962,9 @@ struct tcb *tcp;
 
 		pid = tcp->pid;
 
-		if (upeek(pid, PT_CR_IPSR, &ipsr) < 0)
+		if (upeek(tcp, PT_CR_IPSR, &ipsr) < 0)
 			return -1;
-		if (upeek(pid, PT_CR_IIP, &addr) < 0)
+		if (upeek(tcp, PT_CR_IIP, &addr) < 0)
 			return -1;
 
 		/* restore original bundle: */
@@ -2012,7 +2012,7 @@ struct tcb *tcp;
 	tcp->flags &= ~TCB_BPTSET;
 
 #ifdef I386
-	if (upeek(tcp->pid, 4*EIP, &eip) < 0)
+	if (upeek(tcp, 4*EIP, &eip) < 0)
 		return -1;
 	if (eip != tcp->baddr) {
 		/* The breakpoint has not been reached yet.  */
@@ -2023,7 +2023,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined(X86_64)
-	if (upeek(tcp->pid, 8*RIP, &eip) < 0)
+	if (upeek(tcp, 8*RIP, &eip) < 0)
 		return -1;
 	if (eip != tcp->baddr) {
 		/* The breakpoint has not been reached yet.  */
@@ -2034,7 +2034,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined(POWERPC)
-	if (upeek(tcp->pid, sizeof(unsigned long)*PT_NIP, &pc) < 0)
+	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
 		/* The breakpoint has not been reached yet.  */
@@ -2044,7 +2044,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined(M68K)
-	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0)
+	if (upeek(tcp, 4*PT_PC, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
 		/* The breakpoint has not been reached yet.  */
@@ -2054,7 +2054,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined(ALPHA)
-	if (upeek(tcp->pid, REG_PC, &pc) < 0)
+	if (upeek(tcp, REG_PC, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
 		/* The breakpoint has not been reached yet.  */
@@ -2064,7 +2064,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined(HPPA)
-	if (upeek(tcp->pid, PT_IAOQ0, &iaoq) < 0)
+	if (upeek(tcp, PT_IAOQ0, &iaoq) < 0)
 		return -1;
 	iaoq &= ~0x03;
 	if (iaoq != tcp->baddr && iaoq != tcp->baddr + 4) {
@@ -2082,7 +2082,7 @@ struct tcb *tcp;
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ0, iaoq);
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ1, iaoq);
 #elif defined(SH)
-       if (upeek(tcp->pid, 4*REG_PC, &pc) < 0)
+       if (upeek(tcp, 4*REG_PC, &pc) < 0)
                return -1;
         if (pc != tcp->baddr) {
                 /* The breakpoint has not been reached yet.  */
@@ -2156,15 +2156,15 @@ struct tcb *tcp;
 #ifdef SUNOS4
 
 static int
-getex(pid, hdr)
-int pid;
+getex(tcp, hdr)
+struct tcb *tcp;
 struct exec *hdr;
 {
 	int n;
 
 	for (n = 0; n < sizeof *hdr; n += 4) {
 		long res;
-		if (upeek(pid, uoff(u_exdata) + n, &res) < 0)
+		if (upeek(tcp, uoff(u_exdata) + n, &res) < 0)
 			return -1;
 		memcpy(((char *) hdr) + n, &res, 4);
 	}
@@ -2192,7 +2192,7 @@ struct tcb *tcp;
 	struct link_dynamic_2 ld;
 	char *strtab, *cp;
 
-	if (getex(pid, &hdr) < 0)
+	if (getex(tcp, &hdr) < 0)
 		return -1;
 	if (!hdr.a_dynamic)
 		return -1;

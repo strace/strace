@@ -811,7 +811,7 @@ struct tcb *tcp;
 		return 0;
 	}
 
-	if (upeek(pid, PT_GPR2, &syscall_mode) < 0)
+	if (upeek(tcp, PT_GPR2, &syscall_mode) < 0)
 			return -1;
 
 	if (syscall_mode != -ENOSYS) {
@@ -831,7 +831,7 @@ struct tcb *tcp;
 				      PT_GPR8,  PT_GPR9,  PT_GPR10,    PT_GPR11,
 				      PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15};
 
-		if (upeek(pid, PT_PSWADDR, &pc) < 0)
+		if (upeek(tcp, PT_PSWADDR, &pc) < 0)
 			return -1;
 		errno = 0;
 		opcode = ptrace(PTRACE_PEEKTEXT, pid, (char *)(pc-sizeof(long)), 0);
@@ -865,13 +865,13 @@ struct tcb *tcp;
 
 			tmp = 0;
 			offset_reg = (opcode & 0x000f0000) >> 16;
-			if (offset_reg && (upeek(pid, gpr_offset[offset_reg], &tmp) < 0))
+			if (offset_reg && (upeek(tcp, gpr_offset[offset_reg], &tmp) < 0))
 				return -1;
 			svc_addr += tmp;
 
 			tmp = 0;
 			offset_reg = (opcode & 0x0000f000) >> 12;
-			if (offset_reg && (upeek(pid, gpr_offset[offset_reg], &tmp) < 0))
+			if (offset_reg && (upeek(tcp, gpr_offset[offset_reg], &tmp) < 0))
 				return -1;
 			svc_addr += tmp;
 
@@ -885,14 +885,14 @@ struct tcb *tcp;
 #endif
 			tmp = 0;
 			offset_reg = (opcode & 0x00f00000) >> 20;
-			if (offset_reg && (upeek(pid, gpr_offset[offset_reg], &tmp) < 0))
+			if (offset_reg && (upeek(tcp, gpr_offset[offset_reg], &tmp) < 0))
 				return -1;
 
 			scno = (scno | tmp) & 0xff;
 		}
 	}
 #elif defined (POWERPC)
-	if (upeek(pid, sizeof(unsigned long)*PT_R0, &scno) < 0)
+	if (upeek(tcp, sizeof(unsigned long)*PT_R0, &scno) < 0)
 		return -1;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Check if we return from execve. */
@@ -902,16 +902,16 @@ struct tcb *tcp;
 		}
 	}
 #elif defined(BFIN)
-	if (upeek(pid, PT_ORIG_P0, &scno))
+	if (upeek(tcp, PT_ORIG_P0, &scno))
 		return -1;
 	/* Check if we return from execve. */
 	if (tcp->flags & TCB_WAITEXECVE && tcp->flags & TCB_INSYSCALL)
 		tcp->flags &= ~(TCB_INSYSCALL | TCB_WAITEXECVE);
 #elif defined (I386)
-	if (upeek(pid, 4*ORIG_EAX, &scno) < 0)
+	if (upeek(tcp, 4*ORIG_EAX, &scno) < 0)
 		return -1;
 #elif defined (X86_64)
-	if (upeek(pid, 8*ORIG_RAX, &scno) < 0)
+	if (upeek(tcp, 8*ORIG_RAX, &scno) < 0)
 		return -1;
 
 	if (!(tcp->flags & TCB_INSYSCALL)) {
@@ -924,7 +924,7 @@ struct tcb *tcp;
 		 * It takes only one ptrace and thus doesn't need
 		 * to be cached.
 		 */
-		if (upeek(pid, 8*CS, &val) < 0)
+		if (upeek(tcp, 8*CS, &val) < 0)
 			return -1;
 		switch(val)
 		{
@@ -944,7 +944,7 @@ struct tcb *tcp;
 		 */
 		unsigned long val, rip, i;
 
-		if(upeek(pid, 8*RIP, &rip)<0)
+		if(upeek(tcp, 8*RIP, &rip)<0)
 			perror("upeek(RIP)");
 
 		/* sizeof(syscall) == sizeof(int 0x80) == 2 */
@@ -980,14 +980,14 @@ struct tcb *tcp;
 	}
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
-	if (upeek (pid, PT_CR_IPSR, &psr) >= 0)
+	if (upeek (tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		if (ia32) {
-			if (upeek(pid, PT_R1, &scno) < 0)	/* orig eax */
+			if (upeek(tcp, PT_R1, &scno) < 0)	/* orig eax */
 				return -1;
 		} else {
-			if (upeek (pid, PT_R15, &scno) < 0)
+			if (upeek (tcp, PT_R15, &scno) < 0)
 				return -1;
 		}
 		/* Check if we return from execve. */
@@ -997,9 +997,9 @@ struct tcb *tcp;
 		}
 	} else {
 		/* syscall in progress */
-		if (upeek (pid, PT_R8, &r8) < 0)
+		if (upeek (tcp, PT_R8, &r8) < 0)
 			return -1;
-		if (upeek (pid, PT_R10, &r10) < 0)
+		if (upeek (tcp, PT_R10, &r10) < 0)
 			return -1;
 	}
 #elif defined (ARM)
@@ -1083,7 +1083,7 @@ struct tcb *tcp;
 		}
 	}
 #elif defined (M68K)
-	if (upeek(pid, 4*PT_ORIG_D0, &scno) < 0)
+	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
 		return -1;
 #elif defined (LINUX_MIPSN32)
 	unsigned long long regs[38];
@@ -1111,10 +1111,10 @@ struct tcb *tcp;
 		}
 	}
 #elif defined (MIPS)
-	if (upeek(pid, REG_A3, &a3) < 0)
+	if (upeek(tcp, REG_A3, &a3) < 0)
 	  	return -1;
 	if(!(tcp->flags & TCB_INSYSCALL)) {
-	  	if (upeek(pid, REG_V0, &scno) < 0)
+	  	if (upeek(tcp, REG_V0, &scno) < 0)
 		  	return -1;
 
 		/* Check if we return from execve. */
@@ -1131,15 +1131,15 @@ struct tcb *tcp;
 			}
 		}
 	} else {
-	  	if (upeek(pid, REG_V0, &r2) < 0)
+	  	if (upeek(tcp, REG_V0, &r2) < 0)
 	    		return -1;
 	}
 #elif defined (ALPHA)
-	if (upeek(pid, REG_A3, &a3) < 0)
+	if (upeek(tcp, REG_A3, &a3) < 0)
 		return -1;
 
 	if (!(tcp->flags & TCB_INSYSCALL)) {
-		if (upeek(pid, REG_R0, &scno) < 0)
+		if (upeek(tcp, REG_R0, &scno) < 0)
 			return -1;
 
 		/* Check if we return from execve. */
@@ -1161,7 +1161,7 @@ struct tcb *tcp;
 		}
 	}
 	else {
-		if (upeek(pid, REG_R0, &r0) < 0)
+		if (upeek(tcp, REG_R0, &r0) < 0)
 			return -1;
 	}
 #elif defined (SPARC) || defined (SPARC64)
@@ -1231,7 +1231,7 @@ struct tcb *tcp;
 		}
 	}
 #elif defined(HPPA)
-	if (upeek(pid, PT_GR20, &scno) < 0)
+	if (upeek(tcp, PT_GR20, &scno) < 0)
 		return -1;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Check if we return from execve. */
@@ -1244,7 +1244,7 @@ struct tcb *tcp;
        /*
         * In the new syscall ABI, the system call number is in R3.
         */
-       if (upeek(pid, 4*(REG_REG0+3), &scno) < 0)
+       if (upeek(tcp, 4*(REG_REG0+3), &scno) < 0)
                return -1;
 
        if (scno < 0) {
@@ -1270,7 +1270,7 @@ struct tcb *tcp;
                }
        }
 #elif defined(SH64)
-	if (upeek(pid, REG_SYSCALL, &scno) < 0)
+	if (upeek(tcp, REG_SYSCALL, &scno) < 0)
 		return -1;
         scno &= 0xFFFF;
 
@@ -1284,15 +1284,15 @@ struct tcb *tcp;
 #endif /* SH64 */
 #endif /* LINUX */
 #ifdef SUNOS4
-	if (upeek(pid, uoff(u_arg[7]), &scno) < 0)
+	if (upeek(tcp, uoff(u_arg[7]), &scno) < 0)
 		return -1;
 #elif defined(SH)
         /* new syscall ABI returns result in R0 */
-        if (upeek(pid, 4*REG_REG0, (long *)&r0) < 0)
+        if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
                 return -1;
 #elif defined(SH64)
         /* ABI defines result returned in r9 */
-        if (upeek(pid, REG_GENERAL(9), (long *)&r9) < 0)
+        if (upeek(tcp, REG_GENERAL(9), (long *)&r9) < 0)
                 return -1;
 
 #endif
@@ -1341,9 +1341,7 @@ static int
 syscall_fixup(tcp)
 struct tcb *tcp;
 {
-#ifndef USE_PROCFS
-	int pid = tcp->pid;
-#else /* USE_PROCFS */
+#ifdef USE_PROCFS
 	int scno = known_scno(tcp);
 
 	if (!(tcp->flags & TCB_INSYSCALL)) {
@@ -1407,7 +1405,7 @@ struct tcb *tcp;
 #endif /* SUNOS4 */
 #ifdef LINUX
 #if defined (I386)
-	if (upeek(pid, 4*EAX, &eax) < 0)
+	if (upeek(tcp, 4*EAX, &eax) < 0)
 		return -1;
 	if (eax != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
 		if (debug)
@@ -1415,7 +1413,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined (X86_64)
-	if (upeek(pid, 8*RAX, &rax) < 0)
+	if (upeek(tcp, 8*RAX, &rax) < 0)
 		return -1;
 	if (current_personality == 1)
 		rax = (long int)(int)rax; /* sign extend from 32 bits */
@@ -1425,7 +1423,7 @@ struct tcb *tcp;
 		return 0;
 	}
 #elif defined (S390) || defined (S390X)
-	if (upeek(pid, PT_GPR2, &gpr2) < 0)
+	if (upeek(tcp, PT_GPR2, &gpr2) < 0)
 		return -1;
 	if (syscall_mode != -ENOSYS)
 		syscall_mode = tcp->scno;
@@ -1445,14 +1443,14 @@ struct tcb *tcp;
 	}
 #elif defined (POWERPC)
 # define SO_MASK 0x10000000
-	if (upeek(pid, sizeof(unsigned long)*PT_CCR, &flags) < 0)
+	if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
 		return -1;
-	if (upeek(pid, sizeof(unsigned long)*PT_R3, &result) < 0)
+	if (upeek(tcp, sizeof(unsigned long)*PT_R3, &result) < 0)
 		return -1;
 	if (flags & SO_MASK)
 		result = -result;
 #elif defined (M68K)
-	if (upeek(pid, 4*PT_D0, &d0) < 0)
+	if (upeek(tcp, 4*PT_D0, &d0) < 0)
 		return -1;
 	if (d0 != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
 		if (debug)
@@ -1464,15 +1462,15 @@ struct tcb *tcp;
 	 * Nothing required
 	 */
 #elif defined(BFIN)
-	if (upeek(pid, PT_R0, &r0) < 0)
+	if (upeek(tcp, PT_R0, &r0) < 0)
 		return -1;
 #elif defined (HPPA)
-	if (upeek(pid, PT_GR28, &r28) < 0)
+	if (upeek(tcp, PT_GR28, &r28) < 0)
 		return -1;
 #elif defined(IA64)
-	if (upeek(pid, PT_R10, &r10) < 0)
+	if (upeek(tcp, PT_R10, &r10) < 0)
 		return -1;
-	if (upeek(pid, PT_R8, &r8) < 0)
+	if (upeek(tcp, PT_R8, &r8) < 0)
 		return -1;
 	if (ia32 && r8 != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
 		if (debug)
@@ -1687,12 +1685,12 @@ struct tcb *tcp;
 #endif /* LINUX */
 #ifdef SUNOS4
 		/* get error code from user struct */
-		if (upeek(pid, uoff(u_error), &u_error) < 0)
+		if (upeek(tcp, uoff(u_error), &u_error) < 0)
 			return -1;
 		u_error >>= 24; /* u_error is a char */
 
 		/* get system call return value */
-		if (upeek(pid, uoff(u_rval1), &tcp->u_rval) < 0)
+		if (upeek(tcp, uoff(u_rval1), &tcp->u_rval) < 0)
 			return -1;
 #endif /* SUNOS4 */
 #ifdef SVR4
@@ -1822,7 +1820,7 @@ force_result(tcp, error, rval)
 	    	return -1;
 #else
 #ifdef POWERPC
-	if (upeek(tcp->pid, sizeof(unsigned long)*PT_CCR, &flags) < 0)
+	if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
 		return -1;
 	if (error) {
 		flags |= SO_MASK;
@@ -1956,9 +1954,6 @@ static int
 syscall_enter(tcp)
 struct tcb *tcp;
 {
-#ifndef USE_PROCFS
-	int pid = tcp->pid;
-#endif /* !USE_PROCFS */
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
 	{
@@ -1968,7 +1963,7 @@ struct tcb *tcp;
 		else
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid,i==0 ? PT_ORIGGPR2:PT_GPR2+i*sizeof(long), &tcp->u_arg[i]) < 0)
+			if (upeek(tcp,i==0 ? PT_ORIGGPR2:PT_GPR2+i*sizeof(long), &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}
@@ -1983,7 +1978,7 @@ struct tcb *tcp;
 			/* WTA: if scno is out-of-bounds this will bomb. Add range-check
 			 * for scno somewhere above here!
 			 */
-			if (upeek(pid, REG_A0+i, &tcp->u_arg[i]) < 0)
+			if (upeek(tcp, REG_A0+i, &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}
@@ -1997,9 +1992,9 @@ struct tcb *tcp;
 #			  define PT_RBS_END	PT_AR_BSP
 #			endif
 
-			if (upeek(pid, PT_RBS_END, &rbs_end) < 0)
+			if (upeek(tcp, PT_RBS_END, &rbs_end) < 0)
 				return -1;
-			if (upeek(pid, PT_CFM, (long *) &cfm) < 0)
+			if (upeek(tcp, PT_CFM, (long *) &cfm) < 0)
 				return -1;
 
 			sof = (cfm >> 0) & 0x7f;
@@ -2020,17 +2015,17 @@ struct tcb *tcp;
 			int i;
 
 			if (/* EBX = out0 */
-			    upeek(pid, PT_R11, (long *) &tcp->u_arg[0]) < 0
+			    upeek(tcp, PT_R11, (long *) &tcp->u_arg[0]) < 0
 			    /* ECX = out1 */
-			    || upeek(pid, PT_R9,  (long *) &tcp->u_arg[1]) < 0
+			    || upeek(tcp, PT_R9,  (long *) &tcp->u_arg[1]) < 0
 			    /* EDX = out2 */
-			    || upeek(pid, PT_R10, (long *) &tcp->u_arg[2]) < 0
+			    || upeek(tcp, PT_R10, (long *) &tcp->u_arg[2]) < 0
 			    /* ESI = out3 */
-			    || upeek(pid, PT_R14, (long *) &tcp->u_arg[3]) < 0
+			    || upeek(tcp, PT_R14, (long *) &tcp->u_arg[3]) < 0
 			    /* EDI = out4 */
-			    || upeek(pid, PT_R15, (long *) &tcp->u_arg[4]) < 0
+			    || upeek(tcp, PT_R15, (long *) &tcp->u_arg[4]) < 0
 			    /* EBP = out5 */
-			    || upeek(pid, PT_R13, (long *) &tcp->u_arg[5]) < 0)
+			    || upeek(tcp, PT_R13, (long *) &tcp->u_arg[5]) < 0)
 				return -1;
 
 			for (i = 0; i < 6; ++i)
@@ -2075,17 +2070,17 @@ struct tcb *tcp;
 		else
      	        	nargs = tcp->u_nargs = MAX_ARGS;
 		if(nargs > 4) {
-		  	if(upeek(pid, REG_SP, &sp) < 0)
+		  	if(upeek(tcp, REG_SP, &sp) < 0)
 			  	return -1;
 			for(i = 0; i < 4; i++) {
-			  	if (upeek(pid, REG_A0 + i, &tcp->u_arg[i])<0)
+			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i])<0)
 				  	return -1;
 			}
 			umoven(tcp, sp+16, (nargs-4) * sizeof(tcp->u_arg[0]),
 			       (char *)(tcp->u_arg + 4));
 		} else {
 		  	for(i = 0; i < nargs; i++) {
-			  	if (upeek(pid, REG_A0 + i, &tcp->u_arg[i]) < 0)
+			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i]) < 0)
 				  	return -1;
 			}
 		}
@@ -2101,7 +2096,7 @@ struct tcb *tcp;
 		else
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid, (i==0) ?
+			if (upeek(tcp, (i==0) ?
 				(sizeof(unsigned long)*PT_ORIG_R3) :
 				((i+PT_R3)*sizeof(unsigned long)),
 					&tcp->u_arg[i]) < 0)
@@ -2128,7 +2123,7 @@ struct tcb *tcp;
 		else
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid, PT_GR26-4*i, &tcp->u_arg[i]) < 0)
+			if (upeek(tcp, PT_GR26-4*i, &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}
@@ -2154,7 +2149,7 @@ struct tcb *tcp;
 			tcp->u_nargs = sizeof(argreg) / sizeof(argreg[0]);
 
 		for (i = 0; i < tcp->u_nargs; ++i)
-			if (upeek(pid, argreg[i], &tcp->u_arg[i]) < 0)
+			if (upeek(tcp, argreg[i], &tcp->u_arg[i]) < 0)
 				return -1;
 	}
 #elif defined(SH)
@@ -2167,7 +2162,7 @@ struct tcb *tcp;
 
                tcp->u_nargs = sysent[tcp->scno].nargs;
                for (i = 0; i < tcp->u_nargs; i++) {
-                       if (upeek(pid, 4*syscall_regs[i], &tcp->u_arg[i]) < 0)
+                       if (upeek(tcp, 4*syscall_regs[i], &tcp->u_arg[i]) < 0)
                                return -1;
                }
         }
@@ -2188,7 +2183,7 @@ struct tcb *tcp;
 
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid, REG_GENERAL(syscall_regs[i]), &tcp->u_arg[i]) < 0)
+			if (upeek(tcp, REG_GENERAL(syscall_regs[i]), &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}
@@ -2206,7 +2201,7 @@ struct tcb *tcp;
 		else
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid, argreg[current_personality][i]*8, &tcp->u_arg[i]) < 0)
+			if (upeek(tcp, argreg[current_personality][i]*8, &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}
@@ -2218,7 +2213,7 @@ struct tcb *tcp;
 		else
      	        	tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(pid, i*4, &tcp->u_arg[i]) < 0)
+			if (upeek(tcp, i*4, &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}
@@ -2234,7 +2229,7 @@ struct tcb *tcp;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			struct user *u;
 
-			if (upeek(pid, uoff(u_arg[0]) +
+			if (upeek(tcp, uoff(u_arg[0]) +
 			    (i*sizeof(u->u_arg[0])), &tcp->u_arg[i]) < 0)
 				return -1;
 		}
@@ -2625,16 +2620,16 @@ struct tcb *tcp;
 		return -1;
 	val = regs.r_o1;
 #elif defined(SH)
-	if (upeek(tcp->pid, 4*(REG_REG0+1), &val) < 0)
+	if (upeek(tcp, 4*(REG_REG0+1), &val) < 0)
 		return -1;
 #elif defined(IA64)
-	if (upeek(tcp->pid, PT_R9, &val) < 0)
+	if (upeek(tcp, PT_R9, &val) < 0)
 		return -1;
 #endif /* SPARC || SPARC64 */
 #endif /* LINUX */
 
 #ifdef SUNOS4
-	if (upeek(tcp->pid, uoff(u_rval2), &val) < 0)
+	if (upeek(tcp, uoff(u_rval2), &val) < 0)
 		return -1;
 #endif /* SUNOS4 */
 

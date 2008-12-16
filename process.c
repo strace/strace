@@ -812,7 +812,7 @@ setarg(tcp, argnum)
 	{
 		unsigned long *bsp, *ap;
 
-		if (upeek(tcp->pid, PT_AR_BSP, (long *) &bsp) , 0)
+		if (upeek(tcp, PT_AR_BSP, (long *) &bsp) , 0)
 			return -1;
 
 		ap = ia64_rse_skip_regs(bsp, argnum);
@@ -854,7 +854,7 @@ setarg(tcp, argnum)
 		else {
 			unsigned long *sp;
 
-			if (upeek(tcp->pid, REG_SP, (long *) &sp) , 0)
+			if (upeek(tcp, REG_SP, (long *) &sp) , 0)
 				return -1;
 
 			ptrace(PTRACE_POKEDATA, tcp->pid,

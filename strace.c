@@ -2446,8 +2446,8 @@ Process %d attached (waiting for parent)\n",
 				struct siginfo si;
 				long psr;
 
-				upeek(pid, PT_CR_IPSR, &psr);
-				upeek(pid, PT_CR_IIP, &pc);
+				upeek(tcp, PT_CR_IPSR, &psr);
+				upeek(tcp, PT_CR_IIP, &pc);
 
 				pc += (psr >> PSR_RI) & 0x3;
 				ptrace(PT_GETSIGINFO, pid, 0, (long) &si);

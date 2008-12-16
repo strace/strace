@@ -1,3 +1,13 @@
+2008-12-16  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* defs.h: Modify declaration of upeek to take struct tcb *
+	parameter instead of pid_t.
+	* process.c: Change all upeek calls accordingly.
+	* signal.c: Likewise.
+	* strace.c: Likewise.
+	* syscall.c: Likewise.
+	* util.c: Likewise.
+
 2008-11-11  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* sock.c [LINUX] (sock_ioctl): Parse more SIOCS* ioctls.

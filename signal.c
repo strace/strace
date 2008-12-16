@@ -921,7 +921,7 @@ int sig;
 #ifdef SUNOS4
 	void (*u_signal)();
 
-	if (upeek(tcp->pid, uoff(u_signal[0]) + sig*sizeof(u_signal),
+	if (upeek(tcp, uoff(u_signal[0]) + sig*sizeof(u_signal),
 	    (long *) &u_signal) < 0) {
 		return 0;
 	}
@@ -1266,7 +1266,7 @@ struct tcb *tcp;
 
 	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid,PT_GPR15,&usp)<0)
+		if (upeek(tcp,PT_GPR15,&usp)<0)
 			return 0;
 		if (umove(tcp, usp+__SIGNAL_FRAMESIZE, &sc) < 0)
 			return 0;
@@ -1287,7 +1287,7 @@ struct tcb *tcp;
 
 	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid, 4*UESP, &esp) < 0)
+		if (upeek(tcp, 4*UESP, &esp) < 0)
 			return 0;
 		if (umove(tcp, esp, &sc) < 0)
 			return 0;
@@ -1313,7 +1313,7 @@ struct tcb *tcp;
 		/* offset of sigcontext in the kernel's sigframe structure: */
 #		define SIGFRAME_SC_OFFSET	0x90
 		tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid, PT_R12, &sp) < 0)
+		if (upeek(tcp, PT_R12, &sp) < 0)
 			return 0;
 		if (umove(tcp, sp + 16 + SIGFRAME_SC_OFFSET, &sc) < 0)
 			return 0;
@@ -1338,7 +1338,7 @@ struct tcb *tcp;
 
 	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid, sizeof(unsigned long)*PT_R1, &esp) < 0)
+		if (upeek(tcp, sizeof(unsigned long)*PT_R1, &esp) < 0)
 			return 0;
 		if (umove(tcp, esp, &sc) < 0)
 			return 0;
@@ -1362,7 +1362,7 @@ struct tcb *tcp;
 
 	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid, 4*PT_USP, &usp) < 0)
+		if (upeek(tcp, 4*PT_USP, &usp) < 0)
 			return 0;
 		if (umove(tcp, usp, &sc) < 0)
 			return 0;
@@ -1386,7 +1386,7 @@ struct tcb *tcp;
 
 	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid, REG_FP, &fp) < 0)
+		if (upeek(tcp, REG_FP, &fp) < 0)
 			return 0;
 		if (umove(tcp, fp, &sc) < 0)
 			return 0;
@@ -1441,7 +1441,7 @@ struct tcb *tcp;
 
 	if(entering(tcp)) {
 	  	tcp->u_arg[0] = 0;
-		if (upeek(tcp->pid, REG_SP, &sp) < 0)
+		if (upeek(tcp, REG_SP, &sp) < 0)
 		  	return 0;
 		/* There are six words followed by a 128-byte siginfo.  */
 		sp = sp + 6 * 4 + 128;

@@ -475,7 +475,7 @@ extern int printflags P((const struct xlat *, int, const char *));
 extern const char *sprintflags P((const char *, const struct xlat *, int));
 extern int umoven P((struct tcb *, long, int, char *));
 extern int umovestr P((struct tcb *, long, int, char *));
-extern int upeek P((int, long, long *));
+extern int upeek P((struct tcb *, long, long *));
 extern void dumpiov P((struct tcb *, int, long));
 extern void dumpstr P((struct tcb *, long, int));
 extern void printstr P((struct tcb *, long, int));
