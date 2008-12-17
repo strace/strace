@@ -241,6 +241,61 @@ xlookup(const struct xlat *xlat, int val)
 }
 
 /*
+ * Generic ptrace wrapper which tracks ESRCH errors
+ * by setting tcp->ptrace_errno to ESRCH.
+ *
+ * We assume that ESRCH indicates likely process death (SIGKILL?),
+ * modulo bugs where process somehow ended up not stopped.
+ * Unfortunately kernel uses ESRCH for that case too. Oh well.
+ *
+ * Currently used by upeek() only.
+ * TODO: use this in all other ptrace() calls while decoding.
+ */
+long
+do_ptrace(int request, struct tcb *tcp, void *addr, void *data)
+{
+	long l;
+
+	errno = 0;
+	l = ptrace(request, tcp->pid, addr, data);
+	/* Non-ESRCH errors might be our invalid reg/mem accesses,
+	 * we do not record them. */
+	if (errno == ESRCH)
+		tcp->ptrace_errno = ESRCH;
+	return l;
+}
+
+/*
+ * Used when we want to unblock stopped traced process.
+ * Should be only used with PTRACE_CONT, PTRACE_DETACH and PTRACE_SYSCALL.
+ * Returns 0 on success or if error was ESRCH
+ * (presumably process was killed while we talk to it).
+ * Otherwise prints error message and returns -1.
+ */
+int
+ptrace_restart(int op, struct tcb *tcp, int sig)
+{
+	int err;
+	const char *msg;
+
+	errno = 0;
+	ptrace(op, tcp->pid, (void *) 1, (void *) (long) sig);
+	err = errno;
+	if (!err || err == ESRCH)
+		return 0;
+
+	tcp->ptrace_errno = err;
+	msg = "SYSCALL";
+	if (op == PTRACE_CONT)
+		msg = "CONT";
+	if (op == PTRACE_DETACH)
+		msg = "DETACH";
+	fprintf(stderr, "strace: ptrace(PTRACE_%s,1,%d): %s\n",
+			msg, sig, strerror(err));
+	return -1;
+}
+
+/*
  * Print entry in struct xlat table, if there.
  */
 void
@@ -1078,11 +1133,13 @@ long *res;
 	}
 #endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
 	errno = 0;
-	val = ptrace(PTRACE_PEEKUSER, tcp->pid, (char *) off, 0);
+	val = do_ptrace(PTRACE_PEEKUSER, tcp, (char *) off, 0);
 	if (val == -1 && errno) {
-		char buf[60];
-		sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)", tcp->pid, off);
-		perror(buf);
+		if (errno != ESRCH) {
+			char buf[60];
+			sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)", tcp->pid, off);
+			perror(buf);
+		}
 		return -1;
 	}
 	*res = val;

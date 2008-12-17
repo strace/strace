@@ -1372,10 +1372,8 @@ struct tcb *tcp;
 		tcp->parent->nclone_waiting--;
 #endif
 
-	if (ptrace(PTRACE_SYSCALL, tcp->pid, (char *) 1, 0) < 0) {
-		perror("resume: ptrace(PTRACE_SYSCALL, ...)");
+	if (ptrace_restart(PTRACE_SYSCALL, tcp, 0) < 0)
 		return -1;
-	}
 
 	if (!qflag)
 		fprintf(stderr, "Process %u resumed\n", tcp->pid);
@@ -1547,21 +1545,14 @@ int sig;
 				break;
 			}
 			if (WSTOPSIG(status) == SIGSTOP) {
-				if ((error = ptrace(PTRACE_DETACH,
-				    tcp->pid, (char *) 1, sig)) < 0) {
-					if (errno != ESRCH)
-						perror("detach: ptrace(PTRACE_DETACH, ...)");
-					/* I died trying. */
-				}
+				ptrace_restart(PTRACE_DETACH, tcp, sig);
 				break;
 			}
-			if ((error = ptrace(PTRACE_CONT, tcp->pid, (char *) 1,
-			    WSTOPSIG(status) == SIGTRAP ?
-			    0 : WSTOPSIG(status))) < 0) {
-				if (errno != ESRCH)
-					perror("detach: ptrace(PTRACE_CONT, ...)");
+			error = ptrace_restart(PTRACE_CONT, tcp,
+					WSTOPSIG(status) == SIGTRAP ? 0
+					: WSTOPSIG(status));
+			if (error < 0)
 				break;
-			}
 		}
 #endif /* LINUX */
 
@@ -1570,8 +1561,7 @@ int sig;
 	if (sig && kill(tcp->pid, sig) < 0)
 		perror("detach: kill");
 	sig = 0;
-	if ((error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig)) < 0)
-		perror("detach: ptrace(PTRACE_DETACH, ...)");
+	error = ptrace_restart(PTRACE_DETACH, tcp, sig);
 #endif /* SUNOS4 */
 
 #ifndef USE_PROCFS
@@ -2174,17 +2164,16 @@ handle_group_exit(struct tcb *tcp, int sig)
 			detach(tcp, sig);
 		  	if (leader != NULL && leader != tcp)
 				leader->flags |= TCB_GROUP_EXITING;
-		}
-		else if (ptrace(PTRACE_CONT, tcp->pid, (char *) 1, sig) < 0) {
-			perror("strace: ptrace(PTRACE_CONT, ...)");
-			cleanup();
-			return -1;
-		}
-		else {
-			if (leader != NULL)
+		} else {
+			if (ptrace_restart(PTRACE_CONT, tcp, sig) < 0) {
+				cleanup();
+				return -1;
+			}
+			if (leader != NULL) {
 				leader->flags |= TCB_GROUP_EXITING;
-			if (leader != NULL && leader != tcp)
-				droptcb(tcp);
+				if (leader != tcp)
+					droptcb(tcp);
+			}
 			/* The leader will report to us as parent now,
 			   and then we'll get to the SIG==-1 case.  */
 			return 0;
@@ -2429,9 +2418,7 @@ Process %d attached (waiting for parent)\n",
 				 * Hope we are back in control now.
 				 */
 				tcp->flags &= ~(TCB_INSYSCALL | TCB_SIGTRAPPED);
-				if (ptrace(PTRACE_SYSCALL,
-						pid, (char *) 1, 0) < 0) {
-					perror("trace: ptrace(PTRACE_SYSCALL, ...)");
+				if (ptrace_restart(PTRACE_SYSCALL, tcp, 0) < 0) {
 					cleanup();
 					return -1;
 				}
@@ -2478,9 +2465,7 @@ Process %d attached (waiting for parent)\n",
 #endif
 				continue;
 			}
-			if (ptrace(PTRACE_SYSCALL, pid, (char *) 1,
-				   WSTOPSIG(status)) < 0) {
-				perror("trace: ptrace(PTRACE_SYSCALL, ...)");
+			if (ptrace_restart(PTRACE_SYSCALL, tcp, WSTOPSIG(status)) < 0) {
 				cleanup();
 				return -1;
 			}
@@ -2490,7 +2475,7 @@ Process %d attached (waiting for parent)\n",
 		/* we handled the STATUS, we are permitted to interrupt now. */
 		if (interrupted)
 			return 0;
-		if (trace_syscall(tcp) < 0) {
+		if (trace_syscall(tcp) < 0 && !tcp->ptrace_errno) {
 			if (tcp->flags & TCB_ATTACHED)
 				detach(tcp, 0);
 			else {
@@ -2510,8 +2495,7 @@ Process %d attached (waiting for parent)\n",
 #endif
 			if (tcp->flags & TCB_ATTACHED)
 				detach(tcp, 0);
-			else if (ptrace(PTRACE_CONT, pid, (char *) 1, 0) < 0) {
-				perror("strace: ptrace(PTRACE_CONT, ...)");
+			else if (ptrace_restart(PTRACE_CONT, tcp, 0) < 0) {
 				cleanup();
 				return -1;
 			}
@@ -2523,8 +2507,7 @@ Process %d attached (waiting for parent)\n",
 			continue;
 		}
 	tracing:
-		if (ptrace(PTRACE_SYSCALL, pid, (char *) 1, 0) < 0) {
-			perror("trace: ptrace(PTRACE_SYSCALL, ...)");
+		if (ptrace_restart(PTRACE_SYSCALL, tcp, 0) < 0) {
 			cleanup();
 			return -1;
 		}
@@ -2572,9 +2555,18 @@ void
 printleader(tcp)
 struct tcb *tcp;
 {
-	if (tcp_last && (!outfname || followfork < 2 || tcp_last == tcp)) {
-		tcp_last->flags |= TCB_REPRINT;
-		tprintf(" <unfinished ...>\n");
+	if (tcp_last) {
+		if (tcp_last->ptrace_errno) {
+			if (tcp_last->flags & TCB_INSYSCALL) {
+				tprintf(" <unavailable>)");
+				tabto(acolumn);
+			}
+			tprintf("= ? <unavailable>\n");
+			tcp_last->ptrace_errno = 0;
+		} else if (!outfname || followfork < 2 || tcp_last == tcp) {
+			tcp_last->flags |= TCB_REPRINT;
+			tprintf(" <unfinished ...>\n");
+		}
 	}
 	curcol = 0;
 	if ((followfork == 1 || pflag_seen > 1) && outfname)

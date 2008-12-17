@@ -336,6 +336,7 @@ struct tcb {
 	prstatus_t status;	/* procfs status structure */
 #endif
 #endif
+	int ptrace_errno;
 #ifdef FREEBSD
 	struct procfs_status status;
 	int pfd_reg;
@@ -466,6 +467,8 @@ extern void set_overhead P((int));
 extern void qualify P((char *));
 extern int get_scno P((struct tcb *));
 extern long known_scno P((struct tcb *));
+extern long do_ptrace P((int request, struct tcb *tcp, void *addr, void *data));
+extern int ptrace_restart P((int request, struct tcb *tcp, int sig));
 extern int trace_syscall P((struct tcb *));
 extern int count_syscall P((struct tcb *, struct timeval *));
 extern void printxval P((const struct xlat *, int, const char *));

@@ -1,5 +1,21 @@
 2008-12-17  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	Make strace detect when traced process suddenly disappeared
+	(prime example is randomly arriving SIGKILL).
+	* defs.h (do_ptrace, ptrace_restart): Declare new functions
+	* process.c: Use ptrace_restart instead of bare ptrace.
+	This catches and records ESRCH errors.
+	Print "<unavailable>" if syscall decode or result can't be
+	determined because of an earlier error in ptrace()
+	* syscall.c (trace_syscall): Stop indiscriminately bailing out
+	on errors, print "syscall(????" or even "????(????" but continue.
+	* util.c (do_ptrace, ptrace_restart): Define new functions.
+	(upeek): use do_ptrace in order to catch and record ESRCH.
+	Do not print error message in this case.
+	Fixes RH#472053.
+
+2008-12-17  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	* signal.c (sys_sigaction, sys_rt_sigaction): Fix typo
 	in (sa_handler == SIG_IGN) comparison, it was using SIG_DFL
 	instead.

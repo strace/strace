@@ -963,10 +963,8 @@ struct tcb *tcp;
 				clearbpt(tcpchild);
 
 			tcpchild->flags &= ~(TCB_SUSPENDED|TCB_STARTUP);
-			if (ptrace(PTRACE_SYSCALL, pid, (char *) 1, 0) < 0) {
-				perror("resume: ptrace(PTRACE_SYSCALL, ...)");
+			if (ptrace_restart(PTRACE_SYSCALL, tcpchild, 0) < 0)
 				return -1;
-			}
 
 			if (!qflag)
 				fprintf(stderr, "\

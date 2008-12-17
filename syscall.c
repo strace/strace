@@ -2319,28 +2319,30 @@ trace_syscall(struct tcb *tcp)
 {
 	int sys_res;
 	struct timeval tv;
-	int res;
-
-	/* Measure the exit time as early as possible to avoid errors. */
-	if (dtime && (tcp->flags & TCB_INSYSCALL))
-		gettimeofday(&tv, NULL);
-
-	res = get_scno(tcp);
-	if (res != 1)
-		return res;
-
-	res = syscall_fixup(tcp);
-	if (res != 1)
-		return res;
+	int res, scno_good;
 
 	if (tcp->flags & TCB_INSYSCALL) {
 		long u_error;
-		res = get_error(tcp);
-		if (res != 1)
-			return res;
 
-		internal_syscall(tcp);
-		if (tcp->scno >= 0 && tcp->scno < nsyscalls &&
+		/* Measure the exit time as early as possible to avoid errors. */
+		if (dtime)
+			gettimeofday(&tv, NULL);
+
+		scno_good = res = get_scno(tcp);
+		if (res == 0)
+			return res;
+		if (res == 1)
+			res = syscall_fixup(tcp);
+		if (res == 0)
+			return res;
+		if (res == 1)
+			res = get_error(tcp);
+		if (res == 0)
+			return res;
+		if (res == 1)
+			internal_syscall(tcp);
+
+		if (res == 1 && tcp->scno >= 0 && tcp->scno < nsyscalls &&
 		    !(qual_flags[tcp->scno] & QUAL_TRACE)) {
 			tcp->flags &= ~TCB_INSYSCALL;
 			return 0;
@@ -2349,7 +2351,9 @@ trace_syscall(struct tcb *tcp)
 		if (tcp->flags & TCB_REPRINT) {
 			printleader(tcp);
 			tprintf("<... ");
-			if (tcp->scno >= nsyscalls || tcp->scno < 0)
+			if (scno_good != 1)
+				tprintf("????");
+			else if (tcp->scno >= nsyscalls || tcp->scno < 0)
 				tprintf("syscall_%lu", tcp->scno);
 			else
 				tprintf("%s", sysent[tcp->scno].sys_name);
@@ -2358,6 +2362,13 @@ trace_syscall(struct tcb *tcp)
 
 		if (cflag)
 			return count_syscall(tcp, &tv);
+
+		if (res != 1) {
+			tprintf(") ");
+			tabto(acolumn);
+			tcp->flags &= ~TCB_INSYSCALL;
+			return res;
+		}
 
 		if (tcp->scno >= nsyscalls || tcp->scno < 0
 		    || (qual_flags[tcp->scno] & QUAL_RAW))
@@ -2463,9 +2474,35 @@ trace_syscall(struct tcb *tcp)
 	}
 
 	/* Entering system call */
-	res = syscall_enter(tcp);
-	if (res != 1)
+	scno_good = res = get_scno(tcp);
+	if (res == 0)
 		return res;
+	if (res == 1)
+		res = syscall_fixup(tcp);
+	if (res == 0)
+		return res;
+	if (res == 1)
+		res = syscall_enter(tcp);
+	if (res == 0)
+		return res;
+
+	if (res != 1) {
+		printleader(tcp);
+		tcp->flags &= ~TCB_REPRINT;
+		tcp_last = tcp;
+		if (scno_good != 1)
+			tprintf("????" /* anti-trigraph gap */ "(");
+		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
+			tprintf("syscall_%lu(", tcp->scno);
+		else
+			tprintf("%s(", sysent[tcp->scno].sys_name);
+		/*
+		 * " <unavailable>" will be added later by the code which
+		 * detects ptrace errors.
+		 */
+		tcp->flags |= TCB_INSYSCALL;
+		return res;
+	}
 
 	switch (known_scno(tcp)) {
 #ifdef SYS_socket_subcall
