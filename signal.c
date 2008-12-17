@@ -1124,7 +1124,7 @@ struct tcb *tcp;
 			tprintf("{SIG_ERR, ");
 		else if (sa.SA_HANDLER == SIG_DFL)
 			tprintf("{SIG_DFL, ");
-		else if (sa.SA_HANDLER == SIG_DFL) {
+		else if (sa.SA_HANDLER == SIG_IGN) {
 #ifndef USE_PROCFS
 			if (tcp->u_arg[0] == SIGTRAP) {
 				tcp->flags |= TCB_SIGTRAPPED;
@@ -1888,7 +1888,7 @@ sys_rt_sigaction(tcp)
 			tprintf("{SIG_ERR, ");
 		else if (sa.__sigaction_handler.__sa_handler == SIG_DFL)
 			tprintf("{SIG_DFL, ");
-		else if (sa.__sigaction_handler.__sa_handler == SIG_DFL)
+		else if (sa.__sigaction_handler.__sa_handler == SIG_IGN)
 			tprintf("{SIG_IGN, ");
 		else
 			tprintf("{%#lx, ",

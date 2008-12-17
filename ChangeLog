@@ -1,3 +1,9 @@
+2008-12-17  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* signal.c (sys_sigaction, sys_rt_sigaction): Fix typo
+	in (sa_handler == SIG_IGN) comparison, it was using SIG_DFL
+	instead.
+
 2008-12-16  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* defs.h: Modify declaration of upeek to take struct tcb *
