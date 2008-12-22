@@ -943,6 +943,7 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->nclone_waiting = 0;
 #endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
+			tcp->sigtrap80 = SIGTRAP;
 			tcp->outf = outf; /* Initialise to current out file */
 			tcp->stime.tv_sec = 0;
 			tcp->stime.tv_usec = 0;
@@ -1549,7 +1550,7 @@ int sig;
 				break;
 			}
 			error = ptrace_restart(PTRACE_CONT, tcp,
-					WSTOPSIG(status) == SIGTRAP ? 0
+					WSTOPSIG(status) == tcp->sigtrap80 ? 0
 					: WSTOPSIG(status));
 			if (error < 0)
 				break;
@@ -2407,10 +2408,77 @@ Process %d attached (waiting for parent)\n",
 					return -1;
 				}
 			}
+#ifdef LINUX /* add more OSes after you verified it works for them */
+			/*
+			 * Ask kernel to set signo to SIGTRAP | 0x80
+			 * on ptrace-generated SIGTRAPs, and mark
+			 * execve's SIGTRAP with PTRACE_EVENT_EXEC.
+			 */
+			if (tcp->sigtrap80 == SIGTRAP
+			 && ptrace(PTRACE_SETOPTIONS, pid, (char *) 0,
+					(void *) (PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC)) == 0) {
+				tcp->sigtrap80 = SIGTRAP | 0x80;
+			}
+#endif
 			goto tracing;
 		}
 
-		if (WSTOPSIG(status) != SIGTRAP) {
+#ifdef LINUX
+		if (tcp->sigtrap80 != SIGTRAP && WSTOPSIG(status) == SIGTRAP) {
+			/*
+			 * We told ptrace to report SIGTRAP | 0x80 on this process
+			 * but got bare SIGTRAP. This can be a genuine SIGTRAP:
+			 * kill(pid, SIGTRAP), trap insn, etc;
+			 * but be paranoid about it.
+			 */
+			if (((unsigned)status >> 16) == PTRACE_EVENT_EXEC) {
+				/* It's post-exec ptrace stop.  */
+				/* Set WSTOPSIG(status) = (SIGTRAP | 0x80).  */
+				status |= 0x8000;
+			} else {
+				/* Take a better look...  */
+				siginfo_t si;
+				ptrace(PTRACE_GETSIGINFO, pid, (void*) 0, (void*) &si);
+				/*
+				 * Check some fields to make sure we see
+				 * real SIGTRAP.
+				 * Otherwise interpret it as ptrace stop.
+				 * Real SIGTRAPs (int3 insn on x86, kill() etc)
+				 * have these values:
+				 * int3:                   kill -TRAP $pid:
+				 * si_signo:5 (SIGTRAP)    si_signo:5 (SIGTRAP)
+				 * si_errno:0              si_errno:(?)
+				 * si_code:128 (SI_KERNEL) si_code:0 (SI_USER)
+				 * si_pid:0                si_pid:(>0?)
+				 * si_band:0               si_band:(?)
+				 * Ptrace stops have garbage there instead.
+				 */
+				if (si.si_signo != SIGTRAP
+				 || (si.si_code != SI_KERNEL && si.si_code != SI_USER)
+				) {
+					fprintf(stderr, "bogus SIGTRAP (si_code:%x), assuming it's ptrace stop\n", si.si_code);
+					/* Set WSTOPSIG(status) = (SIGTRAP | 0x80).  */
+					status |= 0x8000;
+				}
+			}
+		}
+
+		if (WSTOPSIG(status) == (SIGTRAP | 0x80)
+		 /* && tcp->sigtrap80 == SIGTRAP - redundant */
+		) {
+			/*
+			 * If tcp->sigtrap80 == SIGTRAP but we got it
+			 * ORed with 0x80, it's a CLONE_PTRACEd child
+			 * which inherited "SIGTRAP | 0x80" setting.
+			 * Whee. Just record this remarkable fact.
+			 */
+			tcp->sigtrap80 = (SIGTRAP | 0x80);
+		}
+#endif
+
+		if (WSTOPSIG(status) != tcp->sigtrap80) {
+			/* This isn't a ptrace stop.  */
+
 			if (WSTOPSIG(status) == SIGSTOP &&
 					(tcp->flags & TCB_SIGTRAPPED)) {
 				/*

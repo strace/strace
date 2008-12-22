@@ -1,3 +1,15 @@
+2008-12-22  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Make strace correctly handle SIGTRAP produced by e.g.
+	kill(2) and by trapping instruction.
+	* defs.h: Add sigtrap80 field to struct tcb.
+	* strace.c (alloc_tcb): Initialize it to SIGTRAP.
+	(detach): Use tcp->sigtrap80 instead of SIGTRAP constant.
+	(trace): Attempt to set PTRACE_O_TRACESYSGOOD and
+	PTRACE_O_TRACEEXEC options on each newly attached process,
+	distinquish between SIGTRAP and (SIGTRAP | 0x80) stops.
+	Fixes RH#162774 "strace ignores int3 SIGTRAP".
+
 2008-12-17  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Make strace detect when traced process suddenly disappeared
