@@ -834,7 +834,7 @@ struct tcb *tcp;
 				tprintf("{%p, %p, %ld, %ld}",
 					event.data, event.obj,
 					event.res, event.res2);
-			else 
+			else
 #endif
 				tprintf("{...}");
 		}

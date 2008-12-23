@@ -1,7 +1,7 @@
 /* Test exit of a child of a TCB_EXITING child where the toplevel process starts
  * waiting on it.  The middle one gets detached and strace must update the
  * toplevel process'es number of attached children to 0.
- * 
+ *
  * gcc -o test/childthread test/childthread.c -Wall -ggdb2 -pthread;./strace -f ./test/childthread
  * It must print: write(1, "OK\n", ...
  */

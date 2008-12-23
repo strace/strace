@@ -2408,7 +2408,9 @@ Process %d attached (waiting for parent)\n",
 					return -1;
 				}
 			}
-#ifdef LINUX /* add more OSes after you verified it works for them */
+/* PTRACE_SETOPTIONS is not a #define. PT_SETOPTIONS is. */
+/* Add more OSes after you verified it works for them. */
+#if defined LINUX && defined PT_SETOPTIONS
 			/*
 			 * Ask kernel to set signo to SIGTRAP | 0x80
 			 * on ptrace-generated SIGTRAPs, and mark
@@ -2423,7 +2425,7 @@ Process %d attached (waiting for parent)\n",
 			goto tracing;
 		}
 
-#ifdef LINUX
+#if defined LINUX && defined PT_SETOPTIONS
 		if (tcp->sigtrap80 != SIGTRAP && WSTOPSIG(status) == SIGTRAP) {
 			/*
 			 * We told ptrace to report SIGTRAP | 0x80 on this process
