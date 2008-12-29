@@ -77,6 +77,8 @@
 #endif
 #endif
 #endif
+extern char **environ;
+
 
 int debug = 0, followfork = 0;
 int dtime = 0, cflag = 0, xflag = 0, qflag = 0;
@@ -87,6 +89,8 @@ int not_failing_only = 0;
 
 static int exit_code = 0;
 static int strace_child = 0;
+static int ptrace_stop_sig = SIGTRAP;
+static bool ptrace_opts_set;
 
 static char *username = NULL;
 uid_t run_uid;
@@ -99,7 +103,6 @@ FILE *outf;
 struct tcb **tcbtab;
 unsigned int nprocs, tcbtabsize;
 char *progname;
-extern char **environ;
 
 static int detach P((struct tcb *tcp, int sig));
 static int trace P((void));
@@ -943,7 +946,6 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->nclone_waiting = 0;
 #endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
-			tcp->sigtrap80 = SIGTRAP;
 			tcp->outf = outf; /* Initialise to current out file */
 			tcp->stime.tv_sec = 0;
 			tcp->stime.tv_usec = 0;
@@ -1550,7 +1552,7 @@ int sig;
 				break;
 			}
 			error = ptrace_restart(PTRACE_CONT, tcp,
-					WSTOPSIG(status) == tcp->sigtrap80 ? 0
+					WSTOPSIG(status) == ptrace_stop_sig ? 0
 					: WSTOPSIG(status));
 			if (error < 0)
 				break;
@@ -2416,17 +2418,24 @@ Process %d attached (waiting for parent)\n",
 			 * on ptrace-generated SIGTRAPs, and mark
 			 * execve's SIGTRAP with PTRACE_EVENT_EXEC.
 			 */
-			if (tcp->sigtrap80 == SIGTRAP
-			 && ptrace(PTRACE_SETOPTIONS, pid, (char *) 0,
-					(void *) (PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC)) == 0) {
-				tcp->sigtrap80 = SIGTRAP | 0x80;
+			if (!ptrace_opts_set) {
+				ptrace_opts_set = 1;
+				/*
+				 * NB: even if this "succeeds", we can
+				 * revert back to SIGTRAP if we later see
+				 * that it didnt really work.
+				 * Old kernels are known to lie here.
+				 */
+				if (ptrace(PTRACE_SETOPTIONS, pid, (char *) 0,
+					(void *) (PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC)) == 0)
+					ptrace_stop_sig = SIGTRAP | 0x80;
 			}
 #endif
 			goto tracing;
 		}
 
 #if defined LINUX && defined PT_SETOPTIONS
-		if (tcp->sigtrap80 != SIGTRAP && WSTOPSIG(status) == SIGTRAP) {
+		if (ptrace_stop_sig != SIGTRAP && WSTOPSIG(status) == SIGTRAP) {
 			/*
 			 * We told ptrace to report SIGTRAP | 0x80 on this process
 			 * but got bare SIGTRAP. This can be a genuine SIGTRAP:
@@ -2458,27 +2467,14 @@ Process %d attached (waiting for parent)\n",
 				if (si.si_signo != SIGTRAP
 				 || (si.si_code != SI_KERNEL && si.si_code != SI_USER)
 				) {
-					fprintf(stderr, "bogus SIGTRAP (si_code:%x), assuming it's ptrace stop\n", si.si_code);
-					/* Set WSTOPSIG(status) = (SIGTRAP | 0x80).  */
-					status |= 0x8000;
+					fprintf(stderr, "bogus SIGTRAP (si_code:%x), assuming old kernel\n", si.si_code);
+					ptrace_stop_sig = SIGTRAP;
 				}
 			}
 		}
-
-		if (WSTOPSIG(status) == (SIGTRAP | 0x80)
-		 /* && tcp->sigtrap80 == SIGTRAP - redundant */
-		) {
-			/*
-			 * If tcp->sigtrap80 == SIGTRAP but we got it
-			 * ORed with 0x80, it's a CLONE_PTRACEd child
-			 * which inherited "SIGTRAP | 0x80" setting.
-			 * Whee. Just record this remarkable fact.
-			 */
-			tcp->sigtrap80 = (SIGTRAP | 0x80);
-		}
 #endif
 
-		if (WSTOPSIG(status) != tcp->sigtrap80) {
+		if (WSTOPSIG(status) != ptrace_stop_sig) {
 			/* This isn't a ptrace stop.  */
 
 			if (WSTOPSIG(status) == SIGSTOP &&

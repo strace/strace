@@ -324,8 +324,6 @@ struct tcb {
 	int nclone_waiting;	/* clone threads in wait4 (TCB_SUSPENDED) */
 				/* (1st arg of wait4()) */
 #endif
-	int sigtrap80;		/* What sig we consider to be ptrace stop */
-				/* (can be SIGTRAP or (SIGTRAP|0x80) only) */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
 	int pfd;		/* proc file descriptor */

@@ -1,3 +1,14 @@
+2008-12-29  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* defs.h: Remove sigtrap80 field from struct tcb.
+	* strace.c: Add ptrace_stop_sig static variable
+	and use it in place of tcp->sigtrap80.
+	Add ptrace_opts_set static flag variable.
+	(trace): Set ptrace options once, not per-process.
+	If unexpected SIGTRAP is later received,
+	revert back to using SIGTRAP
+	(assume old, broken kernel).
+
 2008-12-22  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Make strace correctly handle SIGTRAP produced by e.g.
