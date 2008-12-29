@@ -4209,7 +4209,7 @@
 	{ 2,	0,	sys_capget,		"capget"	}, /* 4204 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 4205 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstatck"	}, /* 4206 */
-	{ 4,	TD,	sys_sendfile,		"sendfile"	}, /* 4207 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 4207 */
 	{ 0,	0,	printargs,		"SYS_4208"	}, /* 4208 */
 	{ 0,	0,	printargs,		"SYS_4209"	}, /* 4209 */
 	{ 6,	0,	sys_mmap,		"mmap"		}, /* 4210 */
@@ -4239,7 +4239,7 @@
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 4234 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 4235 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 4236 */
-	{ 5,	TD,	sys_sendfile64,		"sendfile64"	}, /* 4237 */
+	{ 5,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 4237 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 4238 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"}, /* 4239 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"}, /* 4240 */
@@ -4560,7 +4560,7 @@
 	{ 2,	TF,	printargs,		"o32_lremovexattr"	}, /* 4234 */
 	{ 2,	TD,	printargs,		"o32_fremovexattr"	}, /* 4235 */
 	{ 2,	TS,	printargs,		"o32_tkill"		}, /* 4236 */
-	{ 5,	TD,	printargs,		"o32_sendfile64"	}, /* 4237 */
+	{ 5,	TD|TN,	printargs,		"o32_sendfile64"	}, /* 4237 */
 	{ 6,	0,	printargs,		"o32_futex"		}, /* 4238 */
 	{ 3,	0,	printargs,		"o32_sched_setaffinity"}, /* 4239 */
 	{ 3,	0,	printargs,		"o32_sched_getaffinity"}, /* 4240 */
@@ -5365,7 +5365,7 @@
 	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 5036 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 5037 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 5038 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 5039 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 5039 */
 	{ 2,	0,	sys_socketcall,		"socketcall"	}, /* 5040 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 5041 */
 	{ 3,	TN,	sys_accept,		"accept"	}, /* 5042 */
@@ -6591,7 +6591,7 @@
 	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 6036 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 6037 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 6038 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 6039 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 6039 */
 	{ 2,	0,	sys_socketcall,		"socketcall"	}, /* 6040 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 6041 */
 	{ 3,	TN,	sys_accept,		"accept"	}, /* 6042 */
@@ -6771,7 +6771,7 @@
 	{ 0,	0,	printargs,		"fadvise64"	}, /* 6216 */
 	{ 0,	0,	printargs,		"statfs64"	}, /* 6217 */
 	{ 0,	0,	printargs,		"fstatfs64"	}, /* 6218 */
-	{ 4,	0,	printargs,		"sendfile64"	}, /* 6219 */
+	{ 4,	TD|TN,	printargs,		"sendfile64"	}, /* 6219 */
 	{ 3,	0,	printargs,		"timer_create"	}, /* 6220 */
 	{ 4,	0,	printargs,		"timer_settime"	}, /* 6221 */
 	{ 2,	0,	printargs,		"timer_gettime"	}, /* 6222 */

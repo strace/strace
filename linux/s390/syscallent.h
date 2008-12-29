@@ -215,7 +215,7 @@
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
-	{ 4,	TD,	sys_sendfile,		"sendfile"	}, /* 187 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 187 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 188 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
@@ -251,7 +251,7 @@
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 221 */
 	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 222 */
-	{ 4,	TD,	sys_sendfile64,		"sendfile64"	}, /* 223 */
+	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 223 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 224 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 225 */
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 226 */

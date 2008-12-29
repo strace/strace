@@ -1,3 +1,8 @@
+2008-12-29  Nick Black  <dankamongmen@acm.org>
+
+	* linux/syscallent.h: Mark sendfile(2) as network syscall.
+	* linux/*/syscallent.h: Same, for all architectures.
+
 2008-12-29  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* defs.h: Remove sigtrap80 field from struct tcb.

@@ -398,7 +398,7 @@
 	{ 2,	0,	sys_getcwd,		"getcwd"		}, /* 367 */
 	{ 2,	0,	sys_capget,		"capget"		}, /* 368 */
 	{ 2,	0,	sys_capset,		"capset"		}, /* 369 */
-	{ 4,	TD,	sys_sendfile,		"sendfile"		}, /* 370 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile"		}, /* 370 */
 	{ 3,	0,	sys_setresgid,		"setresgid"		}, /* 371 */
 	{ 3,	0,	sys_getresgid,		"getresgid"		}, /* 372 */
 	{ 4,	0,	printargs,		"dipc"			}, /* 373, not implemented */

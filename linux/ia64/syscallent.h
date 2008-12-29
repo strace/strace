@@ -993,7 +993,7 @@
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 1184 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 1185 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 1186 */
-	{ 4,	TD,	sys_sendfile,		"sendfile"	}, /* 1187 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 1187 */
 	{ 5,	TN,	printargs,		"getpmsg"	}, /* 1188 */
 	{ 5,	TN,	printargs,		"putpmsg"	}, /* 1189 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 1190 */

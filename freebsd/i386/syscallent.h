@@ -338,7 +338,7 @@
   { 1,	0,	sys_sched_get_priority_min,	"sched_get_priority_min"	}, /* 333 */
   { 2,	0,	sys_sched_rr_get_interval,	"sched_rr_get_interval"	}, /* 334 */
   { 2,	0,	sys_utrace,	"utrace"	}, /* 335 */
-  { 7,	TD,	sys_sendfile,	"sendfile"	}, /* 336 */
+  { 7,	TD|TN,	sys_sendfile,	"sendfile"	}, /* 336 */
   { 3,	0,	sys_kldsym,	"kldsym"	}, /* 337 */
   { 1,	0,	sys_jail,	"jail"	}, /* 338 */
   { -1,	0,	printargs,	"SYS_339"	}, /* 339 */

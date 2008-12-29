@@ -37,7 +37,7 @@
 	{ 0,	0,	sys_sync,	"sync" },		/* 36 */
 	{ 2,	TS,	sys_kill,	"kill" },		/* 37 */
 	{ 2,	TF,	sys_stat,	"stat" },		/* 38 */
-	{ 4,	TD,	sys_sendfile,	"sendfile" },		/* 39 */
+	{ 4,	TD|TN,	sys_sendfile,	"sendfile" },		/* 39 */
 	{ 2,	TF,	sys_lstat,	"lstat" },		/* 40 */
 	{ 2,	TD,	sys_dup,	"dup" },		/* 41 */
 	{ 0,	TD,	sys_pipe,	"pipe" },		/* 42 */
@@ -138,7 +138,7 @@
 	{ 1,	TF,	sys_rmdir,	"rmdir" },		/* 137 */
 	{ 2,	TF,	sys_utimes,	"utimes" },		/* 138 */
 	{ 2,	TF,	sys_stat64,	"stat64" },		/* 139 */
-	{ 4,    TD,	sys_sendfile64,	"sendfile64" },		/* 140 */
+	{ 4,    TD|TN,	sys_sendfile64,	"sendfile64" },		/* 140 */
 	{ 3,	TN,	sys_getpeername,"getpeername" },	/* 141 */
 	{ 6,    0,	sys_futex,	"futex" },		/* 142 */
 	{ 0,	0,	printargs,	"gettid" },		/* 143 */

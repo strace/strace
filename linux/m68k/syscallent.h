@@ -215,7 +215,7 @@
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
-	{ 4,	TF,	sys_sendfile,		"sendfile"	}, /* 187 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 187 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 188 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork", SYS_vfork }, /* 190 */
