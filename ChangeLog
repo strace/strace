@@ -1,3 +1,23 @@
+2008-12-30  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Experimental support for -D option.
+	Unlike normal case, with -D *grandparent* process exec's,
+	becoming a traced process. Child exits (this prevents traced process
+	from having children it doesn't expect to have), and grandchild
+	attaches to grandparent similarly to strace -p PID.
+	This allows for more transparent interaction in cases
+	when process and its parent are communicating via signals,
+	wait() etc. Without -D, strace process gets lodged in between,
+	disrupting parent<->child link.
+	* strace.c: Add global flag variable daemonized_tracer for -D option.
+	(startup_attach): If -D, fork and block parent in pause().
+	In this case we are already a child, we in fact created a grandchild.
+	After attaching to grandparent, grandchild SIGKILLs parent.
+	(startup_child): If -D, parent blocks in wait(), then
+	execs the program to strace. Normally (w/o -D), it is child
+	who execs the program.
+	(main): Detect -D option, call startup_attach() if it is given.
+
 2008-12-30  Kirill A. Shutemov  <kirill@shutemov.name>
 
 	Fix some warnings on ARM build.

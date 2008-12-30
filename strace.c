@@ -83,6 +83,19 @@ extern char **environ;
 int debug = 0, followfork = 0;
 int dtime = 0, cflag = 0, xflag = 0, qflag = 0;
 static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
+/*
+ * daemonized_tracer supports -D option.
+ * With this option, strace forks twice.
+ * Unlike normal case, with -D *grandparent* process exec's,
+ * becoming a traced process. Child exits (this prevents traced process
+ * from having children it doesn't expect to have), and grandchild
+ * attaches to grandparent similarly to strace -p PID.
+ * This allows for more transparent interaction in cases
+ * when process and its parent are communicating via signals,
+ * wait() etc. Without -D, strace process gets lodged in between,
+ * disrupting parent<->child link.
+ */
+static bool daemonized_tracer = 0;
 
 /* Sometimes we want to print only succeeding syscalls. */
 int not_failing_only = 0;
@@ -159,7 +172,7 @@ int exitval;
 usage: strace [-dffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
               [-p pid] ... [-s strsize] [-u username] [-E var=val] ...\n\
               [command [arg ...]]\n\
-   or: strace -c [-e expr] ... [-O overhead] [-S sortby] [-E var=val] ...\n\
+   or: strace -c -D [-e expr] ... [-O overhead] [-S sortby] [-E var=val] ...\n\
               [command [arg ...]]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
 -f -- follow forks, -ff -- with output into separate files\n\
@@ -176,6 +189,7 @@ usage: strace [-dffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
 -o file -- send trace output to FILE instead of stderr\n\
 -O overhead -- set overhead for tracing syscalls to OVERHEAD usecs\n\
 -p pid -- trace process with process id PID, may be repeated\n\
+-D -- run tracer process as a detached grandchild, not as parent\n\
 -s strsize -- limit length of print strings to STRSIZE chars (default %d)\n\
 -S sortby -- sort syscall counts by: time, calls, name, nothing (default %s)\n\
 -u username -- run command as username handling setuid and/or setgid\n\
@@ -362,6 +376,23 @@ startup_attach(void)
 	if (interactive)
 		sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 
+	if (daemonized_tracer) {
+		pid_t pid = fork();
+		if (pid < 0) {
+			_exit(1);
+		}
+		if (pid) { /* parent */
+			/*
+			 * Wait for child to attach to straced process
+			 * (our parent). Child SIGKILLs us after it attached.
+			 * Parent's wait() is unblocked by our death,
+			 * it proceeds to exec the straced program.
+			 */
+			pause();
+			_exit(0); /* paranoia */
+		}
+	}
+
 	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
 		tcp = tcbtab[tcbi];
 		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
@@ -383,7 +414,7 @@ startup_attach(void)
 		}
 #else /* !USE_PROCFS */
 # ifdef LINUX
-		if (followfork) {
+		if (followfork && !daemonized_tracer) {
 			char procdir[MAXPATHLEN];
 			DIR *dir;
 
@@ -452,6 +483,20 @@ Process %u attached - interrupt to quit\n",
 			continue;
 		}
 		/* INTERRUPTED is going to be checked at the top of TRACE.  */
+
+		if (daemonized_tracer) {
+			/*
+			 * It is our grandparent we trace, not a -p PID.
+			 * Don't want to just detach on exit, so...
+			 */
+			tcp->flags &= ~TCB_ATTACHED;
+			/*
+			 * Make parent go away.
+			 * Also makes grandparent's wait() unblock.
+			 */
+			kill(getppid(), SIGKILL);
+		}
+
 #endif /* !USE_PROCFS */
 		if (!qflag)
 			fprintf(stderr,
@@ -530,13 +575,15 @@ startup_child (char **argv)
 		exit(1);
 	}
 	strace_child = pid = fork();
-	switch (pid) {
-	case -1:
+	if (pid < 0) {
 		perror("strace: fork");
 		cleanup();
 		exit(1);
-		break;
-	case 0: {
+	}
+	if ((pid != 0 && daemonized_tracer) /* parent: to become a traced process */
+	 || (pid == 0 && !daemonized_tracer) /* child: to become a traced process */
+	) {
+		pid = getpid();
 #ifdef USE_PROCFS
 		if (outf != stderr) close (fileno (outf));
 #ifdef MIPS
@@ -549,18 +596,20 @@ startup_child (char **argv)
 #ifndef FREEBSD
 		pause();
 #else /* FREEBSD */
-		kill(getpid(), SIGSTOP); /* stop HERE */
+		kill(pid, SIGSTOP); /* stop HERE */
 #endif /* FREEBSD */
 #else /* !USE_PROCFS */
 		if (outf!=stderr)
 			close(fileno (outf));
 
-		if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
-			perror("strace: ptrace(PTRACE_TRACEME, ...)");
-			exit(1);
+		if (!daemonized_tracer) {
+			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
+				perror("strace: ptrace(PTRACE_TRACEME, ...)");
+				exit(1);
+			}
+			if (debug)
+				kill(pid, SIGSTOP);
 		}
-		if (debug)
-			kill(getpid(), SIGSTOP);
 
 		if (username != NULL || geteuid() == 0) {
 			uid_t run_euid = run_uid;
@@ -593,33 +642,54 @@ startup_child (char **argv)
 		else
 			setreuid(run_uid, run_uid);
 
-		/*
-		 * Induce an immediate stop so that the parent
-		 * will resume us with PTRACE_SYSCALL and display
-		 * this execve call normally.
-		 */
-		kill(getpid(), SIGSTOP);
+		if (!daemonized_tracer) {
+			/*
+			 * Induce an immediate stop so that the parent
+			 * will resume us with PTRACE_SYSCALL and display
+			 * this execve call normally.
+			 */
+			kill(getpid(), SIGSTOP);
+		} else {
+			struct sigaction sv_sigchld;
+			sigaction(SIGCHLD, NULL, &sv_sigchld);
+			/*
+			 * Make sure it is not SIG_IGN, otherwise wait
+			 * will not block.
+			 */
+			signal(SIGCHLD, SIG_DFL);
+			/*
+			 * Wait for grandchild to attach to us.
+			 * It kills child after that, and wait() unblocks.
+			 */
+			alarm(3);
+			wait(NULL);
+			alarm(0);
+			sigaction(SIGCHLD, &sv_sigchld, NULL);
+		}
 #endif /* !USE_PROCFS */
 
 		execv(pathname, argv);
 		perror("strace: exec");
 		_exit(1);
-		break;
 	}
-	default:
-		if ((tcp = alloctcb(pid)) == NULL) {
-			cleanup();
-			exit(1);
-		}
+
+	/* We are the tracer.  */
+	tcp = alloctcb(daemonized_tracer ? getppid() : pid);
+	if (tcp == NULL) {
+		cleanup();
+		exit(1);
+	}
+	if (daemonized_tracer) {
+		/* We want subsequent startup_attach() to attach to it.  */
+		tcp->flags |= TCB_ATTACHED;
+	}
 #ifdef USE_PROCFS
-		if (proc_open(tcp, 0) < 0) {
-			fprintf(stderr, "trouble opening proc file\n");
-			cleanup();
-			exit(1);
-		}
-#endif /* USE_PROCFS */
-		break;
+	if (proc_open(tcp, 0) < 0) {
+		fprintf(stderr, "trouble opening proc file\n");
+		cleanup();
+		exit(1);
 	}
+#endif /* USE_PROCFS */
 }
 
 int
@@ -658,7 +728,11 @@ main(int argc, char *argv[])
 	qualify("verbose=all");
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
-		"+cdfFhiqrtTvVxza:e:o:O:p:s:S:u:E:")) != EOF) {
+		"+cdfFhiqrtTvVxz"
+#ifndef USE_PROCFS
+		"D"
+#endif
+		"a:e:o:O:p:s:S:u:E:")) != EOF) {
 		switch (c) {
 		case 'c':
 			cflag++;
@@ -667,6 +741,12 @@ main(int argc, char *argv[])
 		case 'd':
 			debug++;
 			break;
+#ifndef USE_PROCFS
+		/* Experimental, not documented in manpage yet. */
+		case 'D':
+			daemonized_tracer = 1;
+			break;
+#endif
 		case 'F':
 			optF = 1;
 			break;
@@ -880,7 +960,7 @@ main(int argc, char *argv[])
 	sigaction(SIGCHLD, &sa, NULL);
 #endif /* USE_PROCFS */
 
-	if (pflag_seen)
+	if (pflag_seen || daemonized_tracer)
 		startup_attach();
 
 	if (trace() < 0)
