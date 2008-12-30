@@ -55,9 +55,9 @@
 #ifndef HAVE_STROPTS_H
 #define RS_HIPRI 1
 struct strbuf {
-        int     maxlen;                 /* no. of bytes in buffer */
-        int     len;                    /* no. of bytes returned */
-        char    *buf;                   /* pointer to data */
+	int     maxlen;                 /* no. of bytes in buffer */
+	int     len;                    /* no. of bytes returned */
+	char    *buf;                   /* pointer to data */
 };
 #define MORECTL 1
 #define MOREDATA 2
@@ -350,7 +350,7 @@ decode_poll(struct tcb *tcp, long pts)
 	} else {
 		static char outstr[1024];
 		char str[64];
-                const char *flagstr;
+		const char *flagstr;
 		unsigned int cumlen;
 
 		if (syserror(tcp))

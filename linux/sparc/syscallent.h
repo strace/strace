@@ -11,7 +11,7 @@
 	{ 1,	TF,	sys_unlink,	"unlink" },		/* 10 */
 	{ 2,    TF|TP,	sys_execv,	"execv" },		/* 11 */
 	{ 1,	TF,	sys_chdir,	"chdir" },		/* 12 */
-        { 3,    TF,     sys_chown,      "chown"},		/* 13 */
+	{ 3,    TF,     sys_chown,      "chown"},		/* 13 */
 	{ 3,	TF,	sys_mknod,	"mknod" },		/* 14 */
 	{ 2,	TF,	sys_chmod,	"chmod" },		/* 15 */
 	{ 3,	TF,	sys_chown,	"lchown" },		/* 16 */

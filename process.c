@@ -725,7 +725,7 @@ int new;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid,
 		   (char*)(sizeof(unsigned long)*PT_R0), new) < 0)
 		return -1;
-       return 0;
+	return 0;
 #elif defined(S390) || defined(S390X)
 	/* s390 linux after 2.4.7 has a hook in entry.S to allow this */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new)<0)
@@ -775,26 +775,26 @@ int new;
 	    	return -1;
 	return 0;
 #elif defined(SH)
-       if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new)<0)
-               return -1;
-       return 0;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new)<0)
+		return -1;
+	return 0;
 #elif defined(SH64)
-       /* Top half of reg encodes the no. of args n as 0x1n.
-          Assume 0 args as kernel never actually checks... */
-       if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_SYSCALL),
-                                   0x100000 | new) < 0)
-                       return -1;
-       return 0;
+	/* Top half of reg encodes the no. of args n as 0x1n.
+	   Assume 0 args as kernel never actually checks... */
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_SYSCALL),
+				0x100000 | new) < 0)
+		return -1;
+	return 0;
 #elif defined(ARM)
-       /* Some kernels support this, some (pre-2.6.16 or so) don't.  */
+	/* Some kernels support this, some (pre-2.6.16 or so) don't.  */
 # ifndef PTRACE_SET_SYSCALL
 #  define PTRACE_SET_SYSCALL 23
 # endif
 
-       if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new) != 0)
+	if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new) != 0)
 		return -1;
 
-       return 0;
+	return 0;
 #else
 #warning Do not know how to handle change_syscall for this architecture
 #endif /* architecture */
@@ -864,7 +864,7 @@ setarg(tcp, argnum)
 			return -1;
 	}
 #elif defined(S390) || defined(S390X)
-        {
+	{
 		if(argnum <= 5)
 			ptrace(PTRACE_POKEUSER, tcp->pid,
 			       (char *) (argnum==0 ? PT_ORIGGPR2 :
@@ -874,7 +874,7 @@ setarg(tcp, argnum)
 			return -E2BIG;
 		if (errno)
 			return -1;
-        }
+	}
 #else
 # warning Sorry, setargs not implemented for this architecture.
 #endif
@@ -2747,57 +2747,57 @@ const struct xlat struct_user_offsets[] = {
 #endif /* M68K */
 #endif /* !I386 */
 #ifdef SH
-       { 4*REG_REG0,           "4*REG_REG0"                            },
-       { 4*(REG_REG0+1),       "4*REG_REG1"                            },
-       { 4*(REG_REG0+2),       "4*REG_REG2"                            },
-       { 4*(REG_REG0+3),       "4*REG_REG3"                            },
-       { 4*(REG_REG0+4),       "4*REG_REG4"                            },
-       { 4*(REG_REG0+5),       "4*REG_REG5"                            },
-       { 4*(REG_REG0+6),       "4*REG_REG6"                            },
-       { 4*(REG_REG0+7),       "4*REG_REG7"                            },
-       { 4*(REG_REG0+8),       "4*REG_REG8"                            },
-       { 4*(REG_REG0+9),       "4*REG_REG9"                            },
-       { 4*(REG_REG0+10),      "4*REG_REG10"                           },
-       { 4*(REG_REG0+11),      "4*REG_REG11"                           },
-       { 4*(REG_REG0+12),      "4*REG_REG12"                           },
-       { 4*(REG_REG0+13),      "4*REG_REG13"                           },
-       { 4*(REG_REG0+14),      "4*REG_REG14"                           },
-       { 4*REG_REG15,          "4*REG_REG15"                           },
-       { 4*REG_PC,             "4*REG_PC"                              },
-       { 4*REG_PR,             "4*REG_PR"                              },
-       { 4*REG_SR,             "4*REG_SR"                              },
-       { 4*REG_GBR,            "4*REG_GBR"                             },
-       { 4*REG_MACH,           "4*REG_MACH"                            },
-       { 4*REG_MACL,           "4*REG_MACL"                            },
-       { 4*REG_SYSCALL,        "4*REG_SYSCALL"                         },
-       { 4*REG_FPUL,           "4*REG_FPUL"                            },
-       { 4*REG_FPREG0,         "4*REG_FPREG0"                          },
-       { 4*(REG_FPREG0+1),     "4*REG_FPREG1"                          },
-       { 4*(REG_FPREG0+2),     "4*REG_FPREG2"                          },
-       { 4*(REG_FPREG0+3),     "4*REG_FPREG3"                          },
-       { 4*(REG_FPREG0+4),     "4*REG_FPREG4"                          },
-       { 4*(REG_FPREG0+5),     "4*REG_FPREG5"                          },
-       { 4*(REG_FPREG0+6),     "4*REG_FPREG6"                          },
-       { 4*(REG_FPREG0+7),     "4*REG_FPREG7"                          },
-       { 4*(REG_FPREG0+8),     "4*REG_FPREG8"                          },
-       { 4*(REG_FPREG0+9),     "4*REG_FPREG9"                          },
-       { 4*(REG_FPREG0+10),    "4*REG_FPREG10"                         },
-       { 4*(REG_FPREG0+11),    "4*REG_FPREG11"                         },
-       { 4*(REG_FPREG0+12),    "4*REG_FPREG12"                         },
-       { 4*(REG_FPREG0+13),    "4*REG_FPREG13"                         },
-       { 4*(REG_FPREG0+14),    "4*REG_FPREG14"                         },
-       { 4*REG_FPREG15,        "4*REG_FPREG15"                         },
+	{ 4*REG_REG0,           "4*REG_REG0"                            },
+	{ 4*(REG_REG0+1),       "4*REG_REG1"                            },
+	{ 4*(REG_REG0+2),       "4*REG_REG2"                            },
+	{ 4*(REG_REG0+3),       "4*REG_REG3"                            },
+	{ 4*(REG_REG0+4),       "4*REG_REG4"                            },
+	{ 4*(REG_REG0+5),       "4*REG_REG5"                            },
+	{ 4*(REG_REG0+6),       "4*REG_REG6"                            },
+	{ 4*(REG_REG0+7),       "4*REG_REG7"                            },
+	{ 4*(REG_REG0+8),       "4*REG_REG8"                            },
+	{ 4*(REG_REG0+9),       "4*REG_REG9"                            },
+	{ 4*(REG_REG0+10),      "4*REG_REG10"                           },
+	{ 4*(REG_REG0+11),      "4*REG_REG11"                           },
+	{ 4*(REG_REG0+12),      "4*REG_REG12"                           },
+	{ 4*(REG_REG0+13),      "4*REG_REG13"                           },
+	{ 4*(REG_REG0+14),      "4*REG_REG14"                           },
+	{ 4*REG_REG15,          "4*REG_REG15"                           },
+	{ 4*REG_PC,             "4*REG_PC"                              },
+	{ 4*REG_PR,             "4*REG_PR"                              },
+	{ 4*REG_SR,             "4*REG_SR"                              },
+	{ 4*REG_GBR,            "4*REG_GBR"                             },
+	{ 4*REG_MACH,           "4*REG_MACH"                            },
+	{ 4*REG_MACL,           "4*REG_MACL"                            },
+	{ 4*REG_SYSCALL,        "4*REG_SYSCALL"                         },
+	{ 4*REG_FPUL,           "4*REG_FPUL"                            },
+	{ 4*REG_FPREG0,         "4*REG_FPREG0"                          },
+	{ 4*(REG_FPREG0+1),     "4*REG_FPREG1"                          },
+	{ 4*(REG_FPREG0+2),     "4*REG_FPREG2"                          },
+	{ 4*(REG_FPREG0+3),     "4*REG_FPREG3"                          },
+	{ 4*(REG_FPREG0+4),     "4*REG_FPREG4"                          },
+	{ 4*(REG_FPREG0+5),     "4*REG_FPREG5"                          },
+	{ 4*(REG_FPREG0+6),     "4*REG_FPREG6"                          },
+	{ 4*(REG_FPREG0+7),     "4*REG_FPREG7"                          },
+	{ 4*(REG_FPREG0+8),     "4*REG_FPREG8"                          },
+	{ 4*(REG_FPREG0+9),     "4*REG_FPREG9"                          },
+	{ 4*(REG_FPREG0+10),    "4*REG_FPREG10"                         },
+	{ 4*(REG_FPREG0+11),    "4*REG_FPREG11"                         },
+	{ 4*(REG_FPREG0+12),    "4*REG_FPREG12"                         },
+	{ 4*(REG_FPREG0+13),    "4*REG_FPREG13"                         },
+	{ 4*(REG_FPREG0+14),    "4*REG_FPREG14"                         },
+	{ 4*REG_FPREG15,        "4*REG_FPREG15"                         },
 #ifdef REG_XDREG0
-       { 4*REG_XDREG0,         "4*REG_XDREG0"                          },
-       { 4*(REG_XDREG0+2),     "4*REG_XDREG2"                          },
-       { 4*(REG_XDREG0+4),     "4*REG_XDREG4"                          },
-       { 4*(REG_XDREG0+6),     "4*REG_XDREG6"                          },
-       { 4*(REG_XDREG0+8),     "4*REG_XDREG8"                          },
-       { 4*(REG_XDREG0+10),    "4*REG_XDREG10"                         },
-       { 4*(REG_XDREG0+12),    "4*REG_XDREG12"                         },
-       { 4*REG_XDREG14,        "4*REG_XDREG14"                         },
+	{ 4*REG_XDREG0,         "4*REG_XDREG0"                          },
+	{ 4*(REG_XDREG0+2),     "4*REG_XDREG2"                          },
+	{ 4*(REG_XDREG0+4),     "4*REG_XDREG4"                          },
+	{ 4*(REG_XDREG0+6),     "4*REG_XDREG6"                          },
+	{ 4*(REG_XDREG0+8),     "4*REG_XDREG8"                          },
+	{ 4*(REG_XDREG0+10),    "4*REG_XDREG10"                         },
+	{ 4*(REG_XDREG0+12),    "4*REG_XDREG12"                         },
+	{ 4*REG_XDREG14,        "4*REG_XDREG14"                         },
 #endif
-       { 4*REG_FPSCR,          "4*REG_FPSCR"                           },
+	{ 4*REG_FPSCR,          "4*REG_FPSCR"                           },
 #endif /* SH */
 #ifdef SH64
 	{ 0,		        "PC(L)"				        },
@@ -2948,8 +2948,8 @@ const struct xlat struct_user_offsets[] = {
 	{ 580,                  "TR6(U)"                                },
 	{ 584,                  "TR7(L)"                                },
 	{ 588,                  "TR7(U)"                                },
-        /* This entry is in case pt_regs contains dregs (depends on
-           the kernel build options). */
+	/* This entry is in case pt_regs contains dregs (depends on
+	   the kernel build options). */
 	{ uoff(regs),	        "offsetof(struct user, regs)"	        },
 	{ uoff(fpu),	        "offsetof(struct user, fpu)"	        },
 #endif

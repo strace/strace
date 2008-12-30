@@ -545,17 +545,16 @@ struct tcb *tcp;
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		break;
 #ifdef SYS_readv
-        case SYS_readv:
-                if (qual_flags[tcp->u_arg[0]] & QUAL_READ)
-                        dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-                break;
+	case SYS_readv:
+		if (qual_flags[tcp->u_arg[0]] & QUAL_READ)
+			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		break;
 #endif
 #ifdef SYS_writev
-        case SYS_writev:
-
-                if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE)
-                        dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-                break;
+	case SYS_writev:
+		if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE)
+			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		break;
 #endif
 	}
 }
@@ -769,11 +768,11 @@ internal_syscall(struct tcb *tcp)
 #elif defined(HPPA)
 	static long r28;
 #elif defined(SH)
-       static long r0;
+	static long r0;
 #elif defined(SH64)
-       static long r9;
+	static long r9;
 #elif defined(X86_64)
-       static long rax;
+	static long rax;
 #endif
 #endif /* LINUX */
 #ifdef FREEBSD
@@ -1169,7 +1168,7 @@ struct tcb *tcp;
 	if (ptrace(PTRACE_GETREGS,pid,(char *)&regs,0) < 0)
 		return -1;
 
-        /* If we are entering, then disassemble the syscall trap. */
+	/* If we are entering, then disassemble the syscall trap. */
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Retrieve the syscall trap instruction. */
 		errno = 0;
@@ -1241,38 +1240,37 @@ struct tcb *tcp;
 		}
 	}
 #elif defined(SH)
-       /*
-        * In the new syscall ABI, the system call number is in R3.
-        */
-       if (upeek(tcp, 4*(REG_REG0+3), &scno) < 0)
-               return -1;
+	/*
+	 * In the new syscall ABI, the system call number is in R3.
+	 */
+	if (upeek(tcp, 4*(REG_REG0+3), &scno) < 0)
+		return -1;
 
-       if (scno < 0) {
-           /* Odd as it may seem, a glibc bug has been known to cause
-              glibc to issue bogus negative syscall numbers.  So for
-              our purposes, make strace print what it *should* have been */
-           long correct_scno = (scno & 0xff);
-           if (debug)
-               fprintf(stderr,
-                   "Detected glibc bug: bogus system call number = %ld, "
-		   "correcting to %ld\n",
-                   scno,
-                   correct_scno);
-           scno = correct_scno;
-       }
+	if (scno < 0) {
+		/* Odd as it may seem, a glibc bug has been known to cause
+		   glibc to issue bogus negative syscall numbers.  So for
+		   our purposes, make strace print what it *should* have been */
+		long correct_scno = (scno & 0xff);
+		if (debug)
+	    		fprintf(stderr,
+				"Detected glibc bug: bogus system call"
+				" number = %ld, correcting to %ld\n",
+				scno,
+				correct_scno);
+		scno = correct_scno;
+	}
 
-
-       if (!(tcp->flags & TCB_INSYSCALL)) {
-               /* Check if we return from execve. */
-               if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-                       tcp->flags &= ~TCB_WAITEXECVE;
-                       return 0;
-               }
-       }
+	if (!(tcp->flags & TCB_INSYSCALL)) {
+		/* Check if we return from execve. */
+		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
+		}
+	}
 #elif defined(SH64)
 	if (upeek(tcp, REG_SYSCALL, &scno) < 0)
 		return -1;
-        scno &= 0xFFFF;
+	scno &= 0xFFFF;
 
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Check if we return from execve. */
@@ -1287,13 +1285,13 @@ struct tcb *tcp;
 	if (upeek(tcp, uoff(u_arg[7]), &scno) < 0)
 		return -1;
 #elif defined(SH)
-        /* new syscall ABI returns result in R0 */
-        if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
-                return -1;
+	/* new syscall ABI returns result in R0 */
+	if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
+		return -1;
 #elif defined(SH64)
-        /* ABI defines result returned in r9 */
-        if (upeek(tcp, REG_GENERAL(9), (long *)&r9) < 0)
-                return -1;
+	/* ABI defines result returned in r9 */
+	if (upeek(tcp, REG_GENERAL(9), (long *)&r9) < 0)
+		return -1;
 
 #endif
 #ifdef USE_PROCFS
@@ -1304,17 +1302,17 @@ struct tcb *tcp;
 	scno = tcp->status.PR_WHAT;
 #else /* FREEBSD */
 	if (pread(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
-	        perror("pread");
-                return -1;
-        }
+		perror("pread");
+		return -1;
+	}
 	switch (regs.r_eax) {
 	case SYS_syscall:
 	case SYS___syscall:
-    	        pread(tcp->pfd, &scno, sizeof(scno), regs.r_esp + sizeof(int));
-	        break;
+		pread(tcp->pfd, &scno, sizeof(scno), regs.r_esp + sizeof(int));
+		break;
 	default:
-	        scno = regs.r_eax;
-	        break;
+		scno = regs.r_eax;
+		break;
 	}
 #endif /* FREEBSD */
 #endif /* !HAVE_PR_SYSCALL */
@@ -1658,15 +1656,15 @@ struct tcb *tcp;
 		}
 #else
 #ifdef SH64
-                /* interpret result as return value or error number */
-                if (is_negated_errno(r9)) {
-	                tcp->u_rval = -1;
-	                u_error = -r9;
-                }
-                else {
-                        tcp->u_rval = r9;
-	                u_error = 0;
-                }
+		/* interpret result as return value or error number */
+		if (is_negated_errno(r9)) {
+			tcp->u_rval = -1;
+			u_error = -r9;
+		}
+		else {
+			tcp->u_rval = r9;
+			u_error = 0;
+		}
 #endif /* SH64 */
 #endif /* SH */
 #endif /* HPPA */
@@ -1840,8 +1838,8 @@ force_result(tcp, error, rval)
 		return -1;
 #else /* !M68K */
 #ifdef ARM
-       regs.ARM_r0 = error ? -error : rval;
-       if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*0), regs.ARM_r0) < 0)
+	regs.ARM_r0 = error ? -error : rval;
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*0), regs.ARM_r0) < 0)
 		return -1;
 #else /* !ARM */
 #ifdef ALPHA
@@ -1896,7 +1894,7 @@ force_result(tcp, error, rval)
 		return -1;
 #else
 #ifdef SH64
-        r9 = error ? -error : rval;
+	r9 = error ? -error : rval;
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)REG_GENERAL(9), r9) < 0)
 		return -1;
 #endif /* SH64 */
@@ -1927,9 +1925,9 @@ force_result(tcp, error, rval)
 #endif /* SVR4 */
 #ifdef FREEBSD
 	if (pread(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
-	        perror("pread");
-                return -1;
-        }
+		perror("pread");
+		return -1;
+	}
 	if (error) {
 		regs.r_eflags |= PSL_C;
 		regs.r_eax = error;
@@ -1939,9 +1937,9 @@ force_result(tcp, error, rval)
 		regs.r_eax = rval;
 	}
 	if (pwrite(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
-	        perror("pwrite");
-                return -1;
-        }
+		perror("pwrite");
+		return -1;
+	}
 #endif /* FREEBSD */
 
 	/* All branches reach here on success (only).  */
@@ -2153,23 +2151,23 @@ struct tcb *tcp;
 				return -1;
 	}
 #elif defined(SH)
-       {
-               int i;
-               static int syscall_regs[] = {
-                   REG_REG0+4, REG_REG0+5, REG_REG0+6, REG_REG0+7,
-                   REG_REG0, REG_REG0+1, REG_REG0+2
-                   };
+	{
+		int i;
+		static int syscall_regs[] = {
+			REG_REG0+4, REG_REG0+5, REG_REG0+6, REG_REG0+7,
+			REG_REG0, REG_REG0+1, REG_REG0+2
+		};
 
-               tcp->u_nargs = sysent[tcp->scno].nargs;
-               for (i = 0; i < tcp->u_nargs; i++) {
-                       if (upeek(tcp, 4*syscall_regs[i], &tcp->u_arg[i]) < 0)
-                               return -1;
-               }
-        }
+		tcp->u_nargs = sysent[tcp->scno].nargs;
+		for (i = 0; i < tcp->u_nargs; i++) {
+			if (upeek(tcp, 4*syscall_regs[i], &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
 #elif defined(SH64)
 	{
 		int i;
-                /* Registers used by SH5 Linux system calls for parameters */
+		/* Registers used by SH5 Linux system calls for parameters */
 		static int syscall_regs[] = { 2, 3, 4, 5, 6, 7 };
 
 		/*
@@ -2300,15 +2298,15 @@ struct tcb *tcp;
 	case SYS___syscall:
 		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
 		      regs.r_esp + sizeof(int) + sizeof(quad_t));
-	  break;
-        case SYS_syscall:
+		break;
+	case SYS_syscall:
 		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
 		      regs.r_esp + 2 * sizeof(int));
-	  break;
-        default:
+		break;
+	default:
 		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
 		      regs.r_esp + sizeof(int));
-	  break;
+		break;
 	}
 #endif /* FREEBSD */
 	return 1;

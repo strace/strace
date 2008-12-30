@@ -233,7 +233,7 @@
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"		}, /* 225 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"		}, /* 226 */
 	{ 5,	0,	printargs,		"remap_file_pages"	}, /* 227 */
-       { 5,    TI,     sys_semtimedop,         "semtimedop"            }, /* 228 */
+	{ 5,    TI,     sys_semtimedop,         "semtimedop"            }, /* 228 */
 	{ 5,	0,	printargs,		"mq_open"		}, /* 229 */
 	{ 5,	0,	printargs,		"mq_unlink"		}, /* 230 */
 	{ 5,	0,	printargs,		"mq_timedsend"		}, /* 231 */

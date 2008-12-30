@@ -127,7 +127,7 @@ __asm__ volatile ("or %%g0, %1, %%o0\n\t" \
                     "i" (__NR_##syscall)  \
                   : "g1", "o0", "o1", "o2", "o3", "o4"); \
 if (__res>=0) \
-        return (type) __res; \
+	return (type) __res; \
 errno = -__res; \
 return -1; \
 }
@@ -706,13 +706,13 @@ long addr;
 	}
 	if (umoven(tcp, addr, size, (char *) iov) >= 0) {
 		for (i = 0; i < len; i++) {
-                        /* include the buffer number to make it easy to
-                         * match up the trace with the source */
-                        tprintf(" * %lu bytes in buffer %d\n",
-                                (unsigned long)iov_iov_len(i), i);
-                        dumpstr(tcp, (long) iov_iov_base(i),
-                                iov_iov_len(i));
-                }
+			/* include the buffer number to make it easy to
+			 * match up the trace with the source */
+			tprintf(" * %lu bytes in buffer %d\n",
+				(unsigned long)iov_iov_len(i), i);
+			dumpstr(tcp, (long) iov_iov_base(i),
+				iov_iov_len(i));
+		}
 	}
 	free((char *) iov);
 #undef sizeof_iov
@@ -1195,11 +1195,11 @@ struct tcb *tcp;
 	if(upeek(tcp,PT_IAOQ0,&pc) < 0)
 		return -1;
 #elif defined(SH)
-       if (upeek(tcp, 4*REG_PC ,&pc) < 0)
-               return -1;
+	if (upeek(tcp, 4*REG_PC ,&pc) < 0)
+		return -1;
 #elif defined(SH64)
-       if (upeek(tcp, REG_PC ,&pc) < 0)
-               return -1;
+	if (upeek(tcp, REG_PC ,&pc) < 0)
+		return -1;
 #endif
 	return pc;
 #endif /* LINUX */
@@ -1250,15 +1250,15 @@ struct tcb *tcp;
 	tprintf("[%08lx] ", eip);
 
 #elif defined(S390) || defined(S390X)
-         long psw;
-         if(upeek(tcp,PT_PSWADDR,&psw) < 0) {
-                 PRINTBADPC;
-                 return;
-         }
+	long psw;
+	if(upeek(tcp,PT_PSWADDR,&psw) < 0) {
+		PRINTBADPC;
+		return;
+	}
 #ifdef S390
-         tprintf("[%08lx] ", psw);
+	tprintf("[%08lx] ", psw);
 #elif S390X
-       tprintf("[%16lx] ", psw);
+	tprintf("[%16lx] ", psw);
 #endif
 
 #elif defined(X86_64)
@@ -1325,13 +1325,13 @@ struct tcb *tcp;
 	}
 	tprintf("[%08lx] ", pc);
 #elif defined(SH)
-       long pc;
+	long pc;
 
-       if (upeek(tcp, 4*REG_PC, &pc) < 0) {
-               tprintf ("[????????] ");
-               return;
-       }
-       tprintf("[%08lx] ", pc);
+	if (upeek(tcp, 4*REG_PC, &pc) < 0) {
+		tprintf ("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
 #elif defined(SH64)
 	long pc;
 
@@ -1877,8 +1877,8 @@ struct tcb *tcp;
 		return -1;
 	tcp->baddr &= ~0x03;
 #elif defined(SH)
-       if (upeek(tcp, 4*REG_PC, &tcp->baddr) < 0)
-               return -1;
+	if (upeek(tcp, 4*REG_PC, &tcp->baddr) < 0)
+		return -1;
 #else
 #error unknown architecture
 #endif
@@ -1969,7 +1969,7 @@ struct tcb *tcp;
 #elif defined(HPPA)
 	long iaoq;
 #elif defined(SH)
-       long pc;
+	long pc;
 #endif /* architecture */
 
 #if defined (SPARC) || defined (SPARC64)
@@ -2139,15 +2139,15 @@ struct tcb *tcp;
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ0, iaoq);
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ1, iaoq);
 #elif defined(SH)
-       if (upeek(tcp, 4*REG_PC, &pc) < 0)
-               return -1;
-        if (pc != tcp->baddr) {
-                /* The breakpoint has not been reached yet.  */
-                if (debug)
-                        fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-                                pc, tcp->baddr);
-                return 0;
-        }
+	if (upeek(tcp, 4*REG_PC, &pc) < 0)
+		return -1;
+	if (pc != tcp->baddr) {
+		/* The breakpoint has not been reached yet.  */
+		if (debug)
+			fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
+				pc, tcp->baddr);
+		return 0;
+	}
 
 #endif /* arch */
 #endif /* !SPARC && !SPARC64 && !IA64 */

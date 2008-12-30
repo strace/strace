@@ -192,7 +192,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 				tprintf("%s={", str);
 				printxval(addrfams,
 					  ifr.ifr_addr.sa_family,
-                    			  "AF_???");
+					  "AF_???");
 				tprintf(", ");
 				print_addr(tcp, ((long) tcp->u_arg[2]
 						 + offsetof (struct ifreq,
@@ -252,7 +252,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 			return 1;
 		}
 		tprintf("%d, ", ifc.ifc_len);
-                if (syserror(tcp)) {
+		if (syserror(tcp)) {
 			tprintf("%lx", (unsigned long) ifc.ifc_buf);
 		} else if (ifc.ifc_buf == NULL) {
 			tprintf("NULL");

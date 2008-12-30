@@ -722,29 +722,29 @@ sprinttime(time_t t)
 
 #ifdef LINUXSPARC
 typedef struct {
-        int     tv_sec;
-        int     tv_nsec;
+	int     tv_sec;
+	int     tv_nsec;
 } timestruct_t;
 
 struct solstat {
-        unsigned        st_dev;
-        int             st_pad1[3];     /* network id */
-        unsigned        st_ino;
-        unsigned        st_mode;
-        unsigned        st_nlink;
-        unsigned        st_uid;
-        unsigned        st_gid;
-        unsigned        st_rdev;
-        int             st_pad2[2];
-        int             st_size;
-        int             st_pad3;        /* st_size, off_t expansion */
-        timestruct_t    st_atime;
-        timestruct_t    st_mtime;
-        timestruct_t    st_ctime;
-        int             st_blksize;
-        int             st_blocks;
-        char            st_fstype[16];
-        int             st_pad4[8];     /* expansion area */
+	unsigned        st_dev;
+	int             st_pad1[3];     /* network id */
+	unsigned        st_ino;
+	unsigned        st_mode;
+	unsigned        st_nlink;
+	unsigned        st_uid;
+	unsigned        st_gid;
+	unsigned        st_rdev;
+	int             st_pad2[2];
+	int             st_size;
+	int             st_pad3;        /* st_size, off_t expansion */
+	timestruct_t    st_atime;
+	timestruct_t    st_mtime;
+	timestruct_t    st_ctime;
+	int             st_blksize;
+	int             st_blocks;
+	char            st_fstype[16];
+	int             st_pad4[8];     /* expansion area */
 };
 
 static void
