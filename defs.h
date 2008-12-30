@@ -113,6 +113,9 @@
 #     define LINUX_MIPSN64
 #     define LINUX_MIPS64
 #  endif
+#  if defined(ARM)
+#     define LINUX_ARM
+#  endif
 #endif
 
 #if defined(SVR4) || defined(FREEBSD)
@@ -139,7 +142,7 @@
 #include <sys/pioctl.h>
 #endif /* FREEBSD */
 #else /* !USE_PROCFS */
-#if (defined(LINUXSPARC) || defined (LINUX_X86_64)) && defined(__GLIBC__)
+#if (defined(LINUXSPARC) || defined(LINUX_X86_64) || defined(LINUX_ARM)) && defined(__GLIBC__)
 #include <sys/ptrace.h>
 #else
 /* Work around awkward prototype in ptrace.h. */
