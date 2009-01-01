@@ -1,5 +1,8 @@
 2008-11-13  Kirill A. Shutemov  <kirill@shutemov.name>
 
+	* linux/arm/syscallent.h: Update syscalls.
+	Based on patch by Enrico Scholz.
+
 	* linux/arm/syscallent.h: Fix build on ARM EABI which does not
 	provide syscalls socketcall and ipc.
 
