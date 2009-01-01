@@ -1,3 +1,8 @@
+2008-11-13  Kirill A. Shutemov  <kirill@shutemov.name>
+
+	* linux/arm/syscallent.h: Fix build on ARM EABI which does not
+	provide syscalls socketcall and ipc.
+
 2009-01-01  Andreas Schwab  <schwab@suse.de>
 
 	* net.c (sys_accept): Properly decode third argument as pointer to
