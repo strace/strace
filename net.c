@@ -1315,13 +1315,15 @@ struct tcb *tcp;
 	} else if (!tcp->u_arg[2])
 		tprintf("%#lx, NULL", tcp->u_arg[1]);
 	else {
-		if (tcp->u_arg[1] == 0 || syserror(tcp)) {
+		int len;
+		if (tcp->u_arg[1] == 0 || syserror(tcp)
+		    || umove (tcp, tcp->u_arg[2], &len) < 0) {
 			tprintf("%#lx", tcp->u_arg[1]);
 		} else {
-			printsock(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+			printsock(tcp, tcp->u_arg[1], len);
 		}
 		tprintf(", ");
-		printnum(tcp, tcp->u_arg[2], "%lu");
+		printnum_int(tcp, tcp->u_arg[2], "%u");
 	}
 	return 0;
 }

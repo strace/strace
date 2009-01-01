@@ -1,3 +1,8 @@
+2009-01-01  Andreas Schwab  <schwab@suse.de>
+
+	* net.c (sys_accept): Properly decode third argument as pointer to
+	int.
+
 2008-12-30  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Experimental support for -D option.
