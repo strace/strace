@@ -7,7 +7,7 @@ strace (4.5.17-1) unstable; urgency=low
 strace (4.5.16+cvs20080708-2) unstable; urgency=low
 
   * Rerun autotools in correct order.
-  * Add strace64 package on i386, powerpc, s390 and sparc, 
+  * Add strace64 package on i386, powerpc, s390 and sparc,
     closes: #491167, #491188
 
  -- Frederik Schüler <fs@debian.org>  Thu, 17 Jul 2008 17:21:27 +0200

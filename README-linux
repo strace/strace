@@ -7,7 +7,7 @@ If you want to compile strace on a Linux system please make sure that
 you use recent kernel headers. Strace needs those to get the proper data
 structures and constatns used by the kernel, since these can be
 different from the structures that the C library uses. Currently you
-will need at least a 2.2.7 or newer kernel. 
+will need at least a 2.2.7 or newer kernel.
 
 To complicate things a bit further strace might not compile if you are
 using development kernels. These tend to have headers that conflict with

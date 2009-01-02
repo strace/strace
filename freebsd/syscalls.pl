@@ -40,14 +40,14 @@ use POSIX;
 use vars qw(%sysprint %syscat);
 
 sub usage() {
-    print STDERR 
+    print STDERR
 	"usage: $0 syscalls.master [<syscalls.print>] [<syscalls.cat>]\n";
     exit 1;
 }
 
 sub readprint ($) {
     my($fprint) = @_;
-    
+
     open (PRINT, "< $fprint") || die "can't open $fprint: $!";
     while(<PRINT>) {
 	chomp;
@@ -68,7 +68,7 @@ sub readprint ($) {
 
 sub readcat ($) {
     my($fcat) = @_;
-    
+
     open (CAT, "< $fcat") || die "can't open $fcat: $!";
     while(<CAT>) {
 	chomp;
@@ -119,7 +119,7 @@ while (<MASTER>) {
 
 	$proto = $3;
 	$ext = $4;
-	
+
 	if ($1 > $sysnum) { # syscall gap
 	    while($sysnum < $1) {
 		print "  { -1,\t0,\tprintargs,\t\"SYS_$sysnum\"\t}, /* $sysnum */\n";
@@ -128,7 +128,7 @@ while (<MASTER>) {
 	} elsif ($1 < $sysnum) {
 	    warn "error in master file: syscall $1 found, expecting $sysnum.";
 	}
-	
+
 	if ($proto =~ /^[^\s]+\s+([^\s]+)\s*\(([^)]*)\);/) {
 	    my @args = split(/,/, $2);
 	    $nargs = @args;

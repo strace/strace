@@ -115,7 +115,7 @@ sub parse_str {
 	    return (undef, $in);
 	}
     }
-}    
+}
 
 sub parse_one {
     my ($in) = @_;
@@ -188,19 +188,19 @@ sub parseargs {
 	unless (length($in) == 0 or $in =~ s/^, //) {
 	    print STDERR "$0: $ARGV: $.: missing comma.\n";
 	    return undef;
-	}	    
+	}
     }
     return @args;
 }
-	    
+
 
 my $depth = "";
 
 # process info, indexed by pid.
-# fields: 
+# fields:
 #    parent         pid number
 #    seq            forks and execs for this pid, in sequence  (array)
- 
+
 #  filename and argv (from latest exec)
 #  basename (derived from filename)
 # argv[0] is modified to add the basename if it differs from the 0th argument.
@@ -336,4 +336,4 @@ sub display_trace {
 
     display_pid_trace($startpid, "");
 }
-    
+
