@@ -914,7 +914,7 @@ struct tcb *tcp;
 		return -1;
 
 	if (!(tcp->flags & TCB_INSYSCALL)) {
-	  	static int currpers=-1;
+	  	static int currpers = -1;
 		long val;
 
 		/* Check CS register value. On x86-64 linux it is:
@@ -925,8 +925,7 @@ struct tcb *tcp;
 		 */
 		if (upeek(tcp, 8*CS, &val) < 0)
 			return -1;
-		switch(val)
-		{
+		switch (val) {
 			case 0x23: currpers = 1; break;
 			case 0x33: currpers = 0; break;
 			default:
@@ -943,19 +942,18 @@ struct tcb *tcp;
 		 */
 		unsigned long val, rip, i;
 
-		if(upeek(tcp, 8*RIP, &rip)<0)
+		if (upeek(tcp, 8*RIP, &rip) < 0)
 			perror("upeek(RIP)");
 
 		/* sizeof(syscall) == sizeof(int 0x80) == 2 */
-		rip-=2;
+		rip -= 2;
 		errno = 0;
 
-		call = ptrace(PTRACE_PEEKTEXT,pid,(char *)rip,0);
+		call = ptrace(PTRACE_PEEKTEXT, pid, (char *)rip, (char *)0);
 		if (errno)
 			printf("ptrace_peektext failed: %s\n",
 					strerror(errno));
-		switch (call & 0xffff)
-		{
+		switch (call & 0xffff) {
 			/* x86-64: syscall = 0x0f 0x05 */
 			case 0x050f: currpers = 0; break;
 			/* i386: int 0x80 = 0xcd 0x80 */
@@ -969,9 +967,8 @@ struct tcb *tcp;
 				break;
 		}
 #endif
-		if(currpers != current_personality)
-		{
-			char *names[]={"64 bit", "32 bit"};
+		if (currpers != current_personality) {
+			static const char *const names[] = {"64 bit", "32 bit"};
 			set_personality(currpers);
 			printf("[ Process PID=%d runs in %s mode. ]\n",
 					pid, names[current_personality]);
