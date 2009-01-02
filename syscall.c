@@ -1335,6 +1335,13 @@ struct tcb *tcp;
 	return scno;
 }
 
+/* Called in trace_syscall() at each syscall entry and exit.
+ * Returns:
+ * 0: "ignore this syscall", bail out of trace_syscall() silently.
+ * 1: ok, continue in trace_syscall().
+ * other: error, trace_syscall() should print error indicator
+ *    ("????" etc) and bail out.
+ */
 static int
 syscall_fixup(tcp)
 struct tcb *tcp;
