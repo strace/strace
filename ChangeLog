@@ -1,3 +1,12 @@
+2009-01-02  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* strace.c: Fix compile failure: on some systems PTRACE_O_xxx
+	and PTRACE_EVENT_xxx constants are not defined because
+	those system have old kernel headers.
+	OTOH, if PT_SETOPTIONS is not defined too,
+	I don't risk using ptrace options, the kernel is too old.
+	I've seen problems on RHEL4 ia64 when I tried to.
+
 2008-11-13  Kirill A. Shutemov  <kirill@shutemov.name>
 
 	* linux/arm/syscallent.h: Update syscalls.

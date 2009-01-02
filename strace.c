@@ -2490,9 +2490,18 @@ Process %d attached (waiting for parent)\n",
 					return -1;
 				}
 			}
-/* PTRACE_SETOPTIONS is not a #define. PT_SETOPTIONS is. */
 /* Add more OSes after you verified it works for them. */
+/* PTRACE_SETOPTIONS is not a #define. PT_SETOPTIONS is. */
 #if defined LINUX && defined PT_SETOPTIONS
+# ifndef PTRACE_O_TRACESYSGOOD
+#  define PTRACE_O_TRACESYSGOOD 0x00000001
+# endif
+# ifndef PTRACE_O_TRACEEXEC
+#  define PTRACE_O_TRACEEXEC    0x00000010
+# endif
+# ifndef PTRACE_EVENT_EXEC
+#  define PTRACE_EVENT_EXEC     4
+# endif
 			/*
 			 * Ask kernel to set signo to SIGTRAP | 0x80
 			 * on ptrace-generated SIGTRAPs, and mark
