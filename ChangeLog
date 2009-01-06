@@ -1,5 +1,28 @@
 2009-01-06  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	Output format fixes, improving the situation after recent
+	change which added beeter handling of processes suddenly
+	disappearing. Now we often do not finish last line
+	before exiting in those cases.
+	The only change affecting something other than output
+	is change in umovestr where we were calling
+	abort() on ptrace error.
+
+	* strace.c (trace): If trace_syscall() failed with ESRCH,
+	finish current output line with " <unfinished ...>".
+	(mp_ioctl): While we are at it, fix gross style mismatch
+	in this function definition. No code chages.
+	* syscall.c (trace_syscall): If decode fails on syscall exit,
+	finish current output line with "= ? <unavailable>".
+	* util.c (umoven): Do not complain if error is ESRCH.
+	(umovestr): Do not complain and do not abort() if error is ESRCH.
+	* defs.h: Remove unused tcp parameter from printtrailer().
+	* process.c: Adjust printtrailer() calls accordingly.
+	* strace.c: Adjust printtrailer() calls accordingly.
+	* syscall.c: Adjust printtrailer() calls accordingly.
+
+2009-01-06  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	* desc.c (printflock): Fix display of fcntl(F_SETLK) on
 	non-native 32-bit architecture.
 	Fixes RH#471169 "format fcntl64() system calls for

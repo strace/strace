@@ -785,13 +785,8 @@ int len;
  * at address `addr' to our space at `laddr'
  */
 int
-umoven(tcp, addr, len, laddr)
-struct tcb *tcp;
-long addr;
-int len;
-char *laddr;
+umoven(struct tcb *tcp, long addr, int len, char *laddr)
 {
-
 #ifdef LINUX
 	int pid = tcp->pid;
 	int n, m;
@@ -813,7 +808,7 @@ char *laddr;
 				return 0;
 			}
 			/* But if not started, we had a bogus address. */
-			if (addr != 0 && errno != EIO)
+			if (addr != 0 && errno != EIO && errno != ESRCH)
 				perror("ptrace: umoven");
 			return -1;
 		}
@@ -829,7 +824,7 @@ char *laddr;
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
-			if (addr != 0 && errno != EIO)
+			if (addr != 0 && errno != EIO && errno != ESRCH)
 				perror("ptrace: umoven");
 			return -1;
 		}
@@ -855,7 +850,8 @@ char *laddr;
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
 		if (errno) {
-			perror("umoven");
+			if (errno != ESRCH)
+				perror("umoven");
 			return -1;
 		}
 		memcpy(laddr, &u.x[n], m = MIN(sizeof(long) - n, len));
@@ -865,7 +861,8 @@ char *laddr;
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
 		if (errno) {
-			perror("umoven");
+			if (errno != ESRCH)
+				perror("umoven");
 			return -1;
 		}
 		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
@@ -879,8 +876,10 @@ char *laddr;
 		n = MIN(n, ((addr + PAGSIZ) & PAGMASK) - addr);
 		if (ptrace(PTRACE_READDATA, pid,
 			   (char *) addr, len, laddr) < 0) {
-			perror("umoven: ptrace(PTRACE_READDATA, ...)");
-			abort();
+			if (errno != ESRCH) {
+				perror("umoven: ptrace(PTRACE_READDATA, ...)");
+				abort();
+			}
 			return -1;
 		}
 		len -= n;
@@ -909,11 +908,7 @@ char *laddr;
  * for a terminating zero byte.
  */
 int
-umovestr(tcp, addr, len, laddr)
-struct tcb *tcp;
-long addr;
-int len;
-char *laddr;
+umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 {
 #ifdef USE_PROCFS
 #ifdef HAVE_MP_PROCFS
@@ -964,7 +959,7 @@ char *laddr;
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
-			if (addr != 0 && errno != EIO)
+			if (addr != 0 && errno != EIO && errno != ESRCH)
 				perror("umovestr");
 			return -1;
 		}
@@ -983,7 +978,7 @@ char *laddr;
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
-			if (addr != 0 && errno != EIO)
+			if (addr != 0 && errno != EIO && errno != ESRCH)
 				perror("umovestr");
 			return -1;
 		}

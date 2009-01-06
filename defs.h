@@ -512,7 +512,7 @@ extern const char *signame P((int));
 extern void print_sigset P((struct tcb *, long, int));
 extern void printsignal P((int));
 extern void printleader P((struct tcb *));
-extern void printtrailer P((struct tcb *));
+extern void printtrailer P((void));
 extern void tabto P((int));
 extern void call_summary P((FILE *));
 extern void tprint_iov P((struct tcb *, unsigned long, unsigned long));

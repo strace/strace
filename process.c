@@ -460,7 +460,7 @@ struct tcb *tcp;
 	tprintf("%ld) ", tcp->u_arg[0]);
 	tabto(acolumn);
 	tprintf("= ?");
-	printtrailer(tcp);
+	printtrailer();
 	return 0;
 }
 

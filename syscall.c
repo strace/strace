@@ -2330,6 +2330,9 @@ trace_syscall(struct tcb *tcp)
 		if (dtime)
 			gettimeofday(&tv, NULL);
 
+		/* BTW, why we don't just memorize syscall no. on entry
+		 * in tcp->something?
+		 */
 		scno_good = res = get_scno(tcp);
 		if (res == 0)
 			return res;
@@ -2368,6 +2371,8 @@ trace_syscall(struct tcb *tcp)
 		if (res != 1) {
 			tprintf(") ");
 			tabto(acolumn);
+			tprintf("= ? <unavailable>");
+			printtrailer();
 			tcp->flags &= ~TCB_INSYSCALL;
 			return res;
 		}
@@ -2466,7 +2471,7 @@ trace_syscall(struct tcb *tcp)
 			tprintf(" <%ld.%06ld>",
 				(long) tv.tv_sec, (long) tv.tv_usec);
 		}
-		printtrailer(tcp);
+		printtrailer();
 
 		dumpio(tcp);
 		if (fflush(tcp->outf) == EOF)
