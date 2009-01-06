@@ -193,15 +193,37 @@ static const struct xlat whence[] = {
 #ifndef HAVE_LONG_LONG_OFF_T
 /* fcntl/lockf */
 static void
-printflock(tcp, addr, getlk)
-struct tcb *tcp;
-long addr;
-int getlk;
+printflock(struct tcb *tcp, long addr, int getlk)
 {
 	struct flock fl;
 
-	if (umove(tcp, addr, &fl) < 0) {
-		tprintf("{...}");
+	if (personality_wordsize[current_personality] == sizeof(fl.l_start)) {
+		if (umove(tcp, addr, &fl) < 0) {
+			tprintf("{...}");
+			return;
+		}
+	} else if (personality_wordsize[current_personality] == 4) {
+		/* 32-bit x86 app on x86_64 and similar cases */
+		struct {
+			short int l_type;
+			short int l_whence;
+			int32_t l_start; /* off_t */
+			int32_t l_len; /* off_t */
+			int32_t l_pid; /* pid_t */
+		} fl32;
+		if (umove(tcp, addr, &fl32) < 0) {
+			tprintf("{...}");
+			return;
+		}
+		fl.l_type = fl32.l_type;
+		fl.l_whence = fl32.l_whence;
+		fl.l_start = fl32.l_start;
+		fl.l_len = fl32.l_len;
+		fl.l_pid = fl32.l_pid;
+	} else {
+		/* let people know we have a problem here */
+		tprintf("{ <decode error: unsupported wordsize %d> }",
+				personality_wordsize[current_personality]);
 		return;
 	}
 	tprintf("{type=");
@@ -219,10 +241,7 @@ int getlk;
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 /* fcntl/lockf */
 static void
-printflock64(tcp, addr, getlk)
-struct tcb *tcp;
-long addr;
-int getlk;
+printflock64(struct tcb *tcp, long addr, int getlk)
 {
 	struct flock64 fl;
 
@@ -258,8 +277,7 @@ sprint_open_modes(mode_t flags)
 	const struct xlat *x;
 
 	strcpy(outstr, "flags ");
-	if (str)
-	{
+	if (str) {
 		strcat(outstr, str);
 		flags &= ~3;
 		if (!flags)
@@ -267,10 +285,8 @@ sprint_open_modes(mode_t flags)
 		strcat(outstr, "|");
 	}
 
-	for (x = open_mode_flags; x->str; x++)
-	{
-		if ((flags & x->val) == x->val)
-		{
+	for (x = open_mode_flags; x->str; x++) {
+		if ((flags & x->val) == x->val) {
 			sprintf(outstr + strlen(outstr),
 				"%s%s", sep, x->str);
 			sep = "|";
@@ -366,8 +382,7 @@ sys_fcntl(struct tcb *tcp)
 #ifdef LOCK_SH
 
 int
-sys_flock(tcp)
-struct tcb *tcp;
+sys_flock(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -378,8 +393,7 @@ struct tcb *tcp;
 #endif /* LOCK_SH */
 
 int
-sys_close(tcp)
-struct tcb *tcp;
+sys_close(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld", tcp->u_arg[0]);
@@ -388,8 +402,7 @@ struct tcb *tcp;
 }
 
 int
-sys_dup(tcp)
-struct tcb *tcp;
+sys_dup(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld", tcp->u_arg[0]);
@@ -426,8 +439,7 @@ sys_dup3(struct tcb *tcp)
 
 #if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4)
 int
-sys_getdtablesize(tcp)
-struct tcb *tcp;
+sys_getdtablesize(struct tcb *tcp)
 {
 	return 0;
 }
@@ -547,8 +559,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 #ifdef LINUX
 
 int
-sys_oldselect(tcp)
-struct tcb *tcp;
+sys_oldselect(struct tcb *tcp)
 {
 	long args[5];
 
@@ -561,15 +572,14 @@ struct tcb *tcp;
 
 #ifdef ALPHA
 int
-sys_osf_select(tcp)
-struct tcb *tcp;
+sys_osf_select(struct tcb *tcp)
 {
 	long *args = tcp->u_arg;
 	return decode_select(tcp, args, BITNESS_32);
 }
 #endif
 
-static struct xlat epollctls[] = {
+static const struct xlat epollctls[] = {
 #ifdef EPOLL_CTL_ADD
 	{ EPOLL_CTL_ADD,	"EPOLL_CTL_ADD"	},
 #endif
@@ -582,7 +592,7 @@ static struct xlat epollctls[] = {
 	{ 0,			NULL		}
 };
 
-static struct xlat epollevents[] = {
+static const struct xlat epollevents[] = {
 #ifdef EPOLLIN
 	{ EPOLLIN,	"EPOLLIN"	},
 #endif
@@ -640,8 +650,7 @@ sys_epoll_create1(struct tcb *tcp)
 
 #ifdef HAVE_SYS_EPOLL_H
 static void
-print_epoll_event(ev)
-struct epoll_event *ev;
+print_epoll_event(struct epoll_event *ev)
 {
 	tprintf("{");
 	printflags(epollevents, ev->events, "EPOLL???");
@@ -653,8 +662,7 @@ struct epoll_event *ev;
 #endif
 
 int
-sys_epoll_ctl(tcp)
-struct tcb *tcp;
+sys_epoll_ctl(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -676,8 +684,7 @@ struct tcb *tcp;
 }
 
 static void
-epoll_wait_common(tcp)
-struct tcb *tcp;
+epoll_wait_common(struct tcb *tcp)
 {
 	if (entering(tcp))
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -717,16 +724,14 @@ struct tcb *tcp;
 }
 
 int
-sys_epoll_wait(tcp)
-struct tcb *tcp;
+sys_epoll_wait(struct tcb *tcp)
 {
 	epoll_wait_common(tcp);
 	return 0;
 }
 
 int
-sys_epoll_pwait(tcp)
-struct tcb *tcp;
+sys_epoll_pwait(struct tcb *tcp)
 {
 	epoll_wait_common(tcp);
 	if (exiting(tcp))
@@ -735,8 +740,7 @@ struct tcb *tcp;
 }
 
 int
-sys_io_setup(tcp)
-struct tcb *tcp;
+sys_io_setup(struct tcb *tcp)
 {
 	if (entering(tcp))
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -755,8 +759,7 @@ struct tcb *tcp;
 }
 
 int
-sys_io_destroy(tcp)
-struct tcb *tcp;
+sys_io_destroy(struct tcb *tcp)
 {
 	if (entering(tcp))
 		tprintf("%lu", tcp->u_arg[0]);
@@ -764,8 +767,7 @@ struct tcb *tcp;
 }
 
 int
-sys_io_submit(tcp)
-struct tcb *tcp;
+sys_io_submit(struct tcb *tcp)
 {
 	long nr;
 	if (entering(tcp)) {
@@ -807,8 +809,7 @@ struct tcb *tcp;
 }
 
 int
-sys_io_cancel(tcp)
-struct tcb *tcp;
+sys_io_cancel(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 #ifdef HAVE_LIBAIO_H
@@ -843,7 +844,7 @@ struct tcb *tcp;
 }
 
 int
-sys_io_getevents(struct tcb * tcp)
+sys_io_getevents(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1],
@@ -884,8 +885,7 @@ sys_io_getevents(struct tcb * tcp)
 #endif /* LINUX */
 
 int
-sys_select(tcp)
-struct tcb *tcp;
+sys_select(struct tcb *tcp)
 {
 	return decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
 }
