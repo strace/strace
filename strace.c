@@ -2268,8 +2268,8 @@ handle_group_exit(struct tcb *tcp, int sig)
 }
 #endif
 
-static int
-trace()
+static struct tcb *
+collect_stopped_tcbs(void)
 {
 	int pid;
 	int wait_errno;
@@ -2277,38 +2277,35 @@ trace()
 	struct tcb *tcp;
 #ifdef LINUX
 	struct rusage ru;
+	struct rusage* ru_ptr = cflag ? &ru : NULL;
+	int wnohang = 0;
+	struct tcb *found_tcps = NULL;
 #ifdef __WALL
-	static int wait4_options = __WALL;
+	int wait4_options = __WALL;
 #endif
 #endif /* LINUX */
 
-	while (nprocs != 0) {
-		if (interrupted)
-			return 0;
-		if (interactive)
-			sigprocmask(SIG_SETMASK, &empty_set, NULL);
+	while (1) {
 #ifdef LINUX
 #ifdef __WALL
-		pid = wait4(-1, &status, wait4_options, cflag ? &ru : NULL);
+		pid = wait4(-1, &status, wait4_options | wnohang, ru_ptr);
 		if (pid < 0 && (wait4_options & __WALL) && errno == EINVAL) {
 			/* this kernel does not support __WALL */
 			wait4_options &= ~__WALL;
 			errno = 0;
-			pid = wait4(-1, &status, wait4_options,
-					cflag ? &ru : NULL);
+			pid = wait4(-1, &status, wait4_options | wnohang, ru_ptr);
 		}
 		if (pid < 0 && !(wait4_options & __WALL) && errno == ECHILD) {
 			/* most likely a "cloned" process */
-			pid = wait4(-1, &status, __WCLONE,
-					cflag ? &ru : NULL);
-			if (pid == -1) {
-				fprintf(stderr, "strace: clone wait4 "
+			pid = wait4(-1, &status, __WCLONE | wnohang, ru_ptr);
+			if (pid < 0 && errno != ECHILD) {
+				fprintf(stderr, "strace: wait4(WCLONE) "
 						"failed: %s\n", strerror(errno));
 			}
 		}
-#else
-		pid = wait4(-1, &status, 0, cflag ? &ru : NULL);
-#endif /* __WALL */
+#else /* !__WALL */
+		pid = wait4(-1, &status, wnohang, ru_ptr);
+#endif
 #endif /* LINUX */
 #ifdef SUNOS4
 		pid = wait(&status);
@@ -2317,6 +2314,15 @@ trace()
 		if (interactive)
 			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 
+		if (pid == 0 && wnohang) {
+			/* We had at least one successful
+			 * wait() before. We waited
+			 * with WNOHANG second time.
+			 * Stop collecting more tracees,
+			 * process what we already have.
+			 */
+			break;
+		}
 		if (pid == -1) {
 			switch (wait_errno) {
 			case EINTR:
@@ -2330,15 +2336,15 @@ trace()
 				 */
 #if 0
 				if (nprocs == 0)
-					return 0;
+					return NULL;
 				fprintf(stderr, "strace: proc miscount\n");
 				exit(1);
 #endif
-				return 0;
+				return NULL;
 			default:
 				errno = wait_errno;
 				perror("strace: wait");
-				return -1;
+				exit(1);
 			}
 		}
 		if (pid == popen_pid) {
@@ -2369,7 +2375,7 @@ trace()
 					tcp = alloctcb(pid);
 				if (tcp == NULL) {
 					kill(pid, SIGKILL); /* XXX */
-					return 0;
+					return NULL;
 				}
 				tcp->flags |= TCB_ATTACHED | TCB_SUSPENDED;
 				if (!qflag)
@@ -2380,7 +2386,7 @@ Process %d attached (waiting for parent)\n",
 			else
 				/* This can happen if a clone call used
 				   CLONE_PTRACE itself.  */
-#endif
+#endif /* LINUX */
 			{
 				fprintf(stderr, "unknown pid: %u\n", pid);
 				if (WIFSTOPPED(status))
@@ -2388,14 +2394,36 @@ Process %d attached (waiting for parent)\n",
 				exit(1);
 			}
 		}
-		/* set current output file */
-		outf = tcp->outf;
+
 		if (cflag) {
 #ifdef LINUX
 			tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
 			tcp->stime = ru.ru_stime;
-#endif /* !LINUX */
+#endif
 		}
+		tcp->wait_status = status;
+#ifdef LINUX
+		tcp->next_need_service = found_tcps;
+		found_tcps = tcp;
+		wnohang = WNOHANG;
+#endif
+#ifdef SUNOS4
+		/* Probably need to replace wait with waitpid
+		 * and loop on Sun too, but I can't test it. Volunteers?
+		 */
+		break;
+#endif
+	} /* while (1) - collecting all stopped/exited tracees */
+
+	return tcp;
+}
+
+static int
+handle_stopped_tcbs(struct tcb *tcp)
+{
+	for (; tcp; tcp = tcp->next_need_service) {
+		int pid;
+		int status;
 
 		if (tcp->flags & TCB_SUSPENDED) {
 			/*
@@ -2408,6 +2436,11 @@ Process %d attached (waiting for parent)\n",
 			 */
 			continue;
 		}
+
+		outf = tcp->outf;
+		status = tcp->wait_status;
+		pid = tcp->pid;
+
 		if (WIFSIGNALED(status)) {
 			if (pid == strace_child)
 				exit_code = 0x100 | WTERMSIG(status);
@@ -2682,6 +2715,37 @@ Process %d attached (waiting for parent)\n",
 			cleanup();
 			return -1;
 		}
+	} /* for each tcp */
+
+	return 0;
+}
+
+static int
+trace()
+{
+	int rc;
+	struct tcb *tcbs;
+
+	while (nprocs != 0) {
+		if (interrupted)
+			return 0;
+		if (interactive)
+			sigprocmask(SIG_SETMASK, &empty_set, NULL);
+
+		/* The loop of "wait for one tracee, serve it, repeat"
+		 * may leave some tracees never served.
+		 * Kernel provides no guarantees of fairness when you have
+		 * many waitable tasks.
+		 * Try strace -f with test/many_looping_threads.c example.
+		 * To fix it, we collect *all* waitable tasks, then handle
+		 * them all, then repeat.
+		 */
+		tcbs = collect_stopped_tcbs();
+		if (!tcbs)
+			break;
+		rc = handle_stopped_tcbs(tcbs);
+		if (rc)
+			return rc;
 	}
 	return 0;
 }

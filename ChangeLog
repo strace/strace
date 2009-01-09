@@ -1,3 +1,16 @@
+2009-01-09  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* defs.h: Add new struct tcb fields: wait_status, next_need_service.
+	make flags field wider (ints are easier to work with on many CPUs).
+	* strace.c (trace): Split this function into two:
+	collect_stopped_tcbs() and handle_stopped_tcbs().
+	Now we collect *all* waitable tasks, then handle them all,
+	then repeat.
+	Fixes RH#478419 "Some threads stop when strace with -f option
+	is executed on a multi-thread process"
+	* test/many_looping_threads.c: example program which cna't be straced
+	successfully without this fix.
+
 2009-01-06  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Output format fixes, improving the situation after recent

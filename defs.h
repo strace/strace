@@ -298,8 +298,11 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 
 /* Trace Control Block */
 struct tcb {
-	short flags;		/* See below for TCB_ values */
+	int flags;		/* See below for TCB_ values */
 	int pid;		/* Process Id of this entry */
+	int wait_status;	/* Status from last wait() */
+	struct tcb *next_need_service;
+				/* Linked list of tracees found by wait()s */
 	long scno;		/* System call number */
 	int u_nargs;		/* System call arguments */
 	long u_arg[MAX_ARGS];	/* System call arguments */
