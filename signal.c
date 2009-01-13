@@ -1967,7 +1967,7 @@ sys_rt_sigqueueinfo(tcp)
 		if (umove(tcp, tcp->u_arg[2], &si) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
 		else
-			printsiginfo(&si, verbose (tcp));
+			printsiginfo(&si, verbose(tcp));
 	}
 	return 0;
 }
@@ -1993,7 +1993,7 @@ int sys_rt_sigtimedwait(tcp)
 			if (umove(tcp, tcp->u_arg[1], &si) < 0)
 				tprintf("%#lx", tcp->u_arg[1]);
 			else
-				printsiginfo(&si, verbose (tcp));
+				printsiginfo(&si, verbose(tcp));
 			/* XXX For now */
 			tprintf(", %#lx", tcp->u_arg[2]);
 			tprintf(", %d", (int) tcp->u_arg[3]);
@@ -2010,8 +2010,6 @@ struct tcb *tcp;
 		tprintf("<... resuming interrupted call ...>");
 	return 0;
 }
-
-extern const struct xlat open_mode_flags[];
 
 static int
 do_signalfd(struct tcb *tcp, int flags_arg)

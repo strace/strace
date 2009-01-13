@@ -1499,8 +1499,6 @@ struct tcb *tcp;
 	return sys_accept(tcp);
 }
 
-extern const struct xlat open_mode_flags[];
-
 static int
 do_pipe(struct tcb *tcp, int flags_arg)
 {

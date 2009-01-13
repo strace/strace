@@ -2231,7 +2231,7 @@ struct tcb *tcp;
 		else if (umove(tcp, tcp->u_arg[2], &si) < 0)
 			tprintf("{???}");
 		else
-			printsiginfo(&si, verbose (tcp));
+			printsiginfo(&si, verbose(tcp));
 		/* options */
 		tprintf(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
@@ -2332,6 +2332,18 @@ static const struct xlat ptrace_cmds[] = {
 #ifdef PTRACE_SETVRREGS
 	{ PTRACE_SETVRREGS,	"PTRACE_SETVRREGS",	},
 #endif
+#ifdef PTRACE_SETOPTIONS
+	{ PTRACE_SETOPTIONS,	"PTRACE_SETOPTIONS",	},
+#endif
+#ifdef PTRACE_GETEVENTMSG
+	{ PTRACE_GETEVENTMSG,	"PTRACE_GETEVENTMSG",	},
+#endif
+#ifdef PTRACE_GETSIGINFO
+	{ PTRACE_GETSIGINFO,	"PTRACE_GETSIGINFO",	},
+#endif
+#ifdef PTRACE_SETSIGINFO
+	{ PTRACE_SETSIGINFO,	"PTRACE_SETSIGINFO",	},
+#endif
 #ifdef SUNOS4
 	{ PTRACE_READDATA,	"PTRACE_READDATA"	},
 	{ PTRACE_WRITEDATA,	"PTRACE_WRITEDATA"	},
@@ -2361,7 +2373,9 @@ static const struct xlat ptrace_cmds[] = {
 #endif /* !I386 */
 	{ PTRACE_GETUCODE,	"PTRACE_GETUCODE"	},
 #endif /* SUNOS4 */
+
 #else /* FREEBSD */
+
 	{ PT_TRACE_ME,		"PT_TRACE_ME"		},
 	{ PT_READ_I,		"PT_READ_I"		},
 	{ PT_READ_D,		"PT_READ_D"		},
@@ -2386,9 +2400,35 @@ static const struct xlat ptrace_cmds[] = {
 };
 
 #ifndef FREEBSD
-#ifndef SUNOS4_KERNEL_ARCH_KLUDGE
-static
-#endif /* !SUNOS4_KERNEL_ARCH_KLUDGE */
+#ifdef PTRACE_SETOPTIONS
+static const struct xlat ptrace_setoptions_flags[] = {
+#ifdef PTRACE_O_TRACESYSGOOD
+	{ PTRACE_O_TRACESYSGOOD,"PTRACE_O_TRACESYSGOOD"	},
+#endif
+#ifdef PTRACE_O_TRACEFORK
+	{ PTRACE_O_TRACEFORK,	"PTRACE_O_TRACEFORK"	},
+#endif
+#ifdef PTRACE_O_TRACEVFORK
+	{ PTRACE_O_TRACEVFORK,	"PTRACE_O_TRACEVFORK"	},
+#endif
+#ifdef PTRACE_O_TRACECLONE
+	{ PTRACE_O_TRACECLONE,	"PTRACE_O_TRACECLONE"	},
+#endif
+#ifdef PTRACE_O_TRACEEXEC
+	{ PTRACE_O_TRACEEXEC,	"PTRACE_O_TRACEEXEC"	},
+#endif
+#ifdef PTRACE_O_TRACEVFORKDONE
+	{ PTRACE_O_TRACEVFORKDONE,"PTRACE_O_TRACEVFORKDONE"},
+#endif
+#ifdef PTRACE_O_TRACEEXIT
+	{ PTRACE_O_TRACEEXIT,	"PTRACE_O_TRACEEXIT"	},
+#endif
+	{ 0,			NULL			},
+};
+#endif
+#endif
+
+#ifndef FREEBSD
 const struct xlat struct_user_offsets[] = {
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
@@ -3192,6 +3232,30 @@ struct tcb *tcp;
 		case PTRACE_DETACH:
 			printsignal(tcp->u_arg[3]);
 			break;
+#ifdef PTRACE_SETOPTIONS
+		case PTRACE_SETOPTIONS:
+			printflags(ptrace_setoptions_flags, tcp->u_arg[3], "PTRACE_O_???");
+			break;
+#endif
+#ifdef PTRACE_SETSIGINFO
+		case PTRACE_SETSIGINFO: {
+			siginfo_t si;
+			if (!tcp->u_arg[3])
+				tprintf("NULL");
+			else if (syserror(tcp))
+				tprintf("%#lx", tcp->u_arg[3]);
+			else if (umove(tcp, tcp->u_arg[3], &si) < 0)
+				tprintf("{???}");
+			else
+				printsiginfo(&si, verbose(tcp));
+			break;
+		}
+#endif
+#ifdef PTRACE_GETSIGINFO
+		case PTRACE_GETSIGINFO:
+			/* Don't print anything, do it at syscall return. */
+			break;
+#endif
 		default:
 			tprintf("%#lx", tcp->u_arg[3]);
 			break;
@@ -3206,6 +3270,20 @@ struct tcb *tcp;
 #else
 			printnum(tcp, tcp->u_arg[3], "%#lx");
 			break;
+#endif
+#ifdef PTRACE_GETSIGINFO
+		case PTRACE_GETSIGINFO: {
+			siginfo_t si;
+			if (!tcp->u_arg[3])
+				tprintf("NULL");
+			else if (syserror(tcp))
+				tprintf("%#lx", tcp->u_arg[3]);
+			else if (umove(tcp, tcp->u_arg[3], &si) < 0)
+				tprintf("{???}");
+			else
+				printsiginfo(&si, verbose(tcp));
+			break;
+		}
 #endif
 		}
 	}

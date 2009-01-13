@@ -1,3 +1,18 @@
+2009-01-13  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Fixes for ptrace() argument parsing.
+	* process.c: Add parsing of PTRACE_SETOPTIONS, PTRACE_GETEVENTMSG,
+	PTRACE_GETSIGINFO, PTRACE_SETSIGINFO.
+	* strace.c (handle_stopped_tcbs): Make PTRACE_SETOPTIONS
+	define check more robust.
+	* defs.h: Declare several "extern const struct xlat" arrays here.
+	* desc.c: Remove open_mode_flags[] and open_access_modes[]
+	extern declarations.
+	* net.c: Remove open_mode_flags[] extern declaration.
+	* sock.c: Remove addrfams[] extern declaration.
+	* util.c: Remove struct_user_offsets[] extern declaration.
+	* signal.c: Remove open_mode_flags[] extern declaration.
+
 2009-01-09  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* defs.h: Add new struct tcb fields: wait_status, next_need_service.

@@ -261,8 +261,6 @@ printflock64(struct tcb *tcp, long addr, int getlk)
 }
 #endif
 
-extern const struct xlat open_mode_flags[];
-
 /*
  * low bits of the open(2) flags define access mode,
  * other bits are real flags.
@@ -270,7 +268,6 @@ extern const struct xlat open_mode_flags[];
 static const char *
 sprint_open_modes(mode_t flags)
 {
-	extern const struct xlat open_access_modes[];
 	static char outstr[1024];
 	const char *str = xlookup(open_access_modes, flags & 3);
 	const char *sep = "";

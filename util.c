@@ -1116,7 +1116,6 @@ long *res;
 			}
 			is_sun4m = strcmp(name.machine, "sun4m") == 0;
 			if (is_sun4m) {
-				extern const struct xlat struct_user_offsets[];
 				const struct xlat *x;
 
 				for (x = struct_user_offsets; x->str; x++)

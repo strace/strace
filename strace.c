@@ -2525,8 +2525,10 @@ handle_stopped_tcbs(struct tcb *tcp)
 				}
 			}
 /* Add more OSes after you verified it works for them. */
-/* PTRACE_SETOPTIONS is not a #define. PT_SETOPTIONS is. */
-#if defined LINUX && defined PT_SETOPTIONS
+/* PTRACE_SETOPTIONS may be an enum, not a #define.
+ * But sometimes we can test for it by checking PT_SETOPTIONS.
+ */
+#if defined LINUX && (defined PTRACE_SETOPTIONS || defined PT_SETOPTIONS)
 # ifndef PTRACE_O_TRACESYSGOOD
 #  define PTRACE_O_TRACESYSGOOD 0x00000001
 # endif
@@ -2557,7 +2559,7 @@ handle_stopped_tcbs(struct tcb *tcp)
 			goto tracing;
 		}
 
-#if defined LINUX && defined PT_SETOPTIONS
+#if defined LINUX && (defined PTRACE_SETOPTIONS || defined PT_SETOPTIONS)
 		if (ptrace_stop_sig != SIGTRAP && WSTOPSIG(status) == SIGTRAP) {
 			/*
 			 * We told ptrace to report SIGTRAP | 0x80 on this process

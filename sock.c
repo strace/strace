@@ -47,8 +47,6 @@
 #endif
 #include <net/if.h>
 
-extern const struct xlat addrfams[];
-
 static const struct xlat iffflags[] = {
 	{ IFF_UP,		"IFF_UP"		},
 	{ IFF_BROADCAST,	"IFF_BROADCAST"		},
