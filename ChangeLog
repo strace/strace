@@ -1,3 +1,7 @@
+2009-01-14  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* linux/bfin/syscallent.h: sys_futex has 6 parameters, not 5.
+
 2009-01-13  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Fixes for ptrace() argument parsing.
