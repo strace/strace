@@ -1,3 +1,15 @@
+2009-01-17  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* process.c: Add a comment. No code changes.
+	* strace.c (collect_stopped_tcbs): Stop reversing list of stopped
+	tcp's. I'm not totally convinced it is crucial, but this is surely
+	fits the concept of "least surprise".
+	Do not collect TCB_SUSPENDED tcp's (this is closer to how
+	it was before).
+	(handle_stopped_tcbs): Remove the code to reject TCB_SUSPENDED tcp's,
+	it's done earlier now. In an unobvious way, this was causing
+	SIGSTOPs from freshly attached children to be misinterpreted.
+
 2009-01-14  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* linux/bfin/syscallent.h: sys_futex has 6 parameters, not 5.

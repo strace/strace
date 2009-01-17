@@ -963,6 +963,9 @@ struct tcb *tcp;
 				clearbpt(tcpchild);
 
 			tcpchild->flags &= ~(TCB_SUSPENDED|TCB_STARTUP);
+			/* TCB_SUSPENDED tasks are not collected by waitpid
+			 * loop, and left stopped. Restart it:
+			 */
 			if (ptrace_restart(PTRACE_SYSCALL, tcpchild, 0) < 0)
 				return -1;
 

@@ -2279,7 +2279,8 @@ collect_stopped_tcbs(void)
 	struct rusage ru;
 	struct rusage* ru_ptr = cflag ? &ru : NULL;
 	int wnohang = 0;
-	struct tcb *found_tcps = NULL;
+	struct tcb *found_tcps;
+	struct tcb **nextp = &found_tcps;
 #ifdef __WALL
 	int wait4_options = __WALL;
 #endif
@@ -2401,30 +2402,6 @@ Process %d attached (waiting for parent)\n",
 			tcp->stime = ru.ru_stime;
 #endif
 		}
-		tcp->wait_status = status;
-#ifdef LINUX
-		tcp->next_need_service = found_tcps;
-		found_tcps = tcp;
-		wnohang = WNOHANG;
-#endif
-#ifdef SUNOS4
-		/* Probably need to replace wait with waitpid
-		 * and loop on Sun too, but I can't test it. Volunteers?
-		 */
-		break;
-#endif
-	} /* while (1) - collecting all stopped/exited tracees */
-
-	return tcp;
-}
-
-static int
-handle_stopped_tcbs(struct tcb *tcp)
-{
-	for (; tcp; tcp = tcp->next_need_service) {
-		int pid;
-		int status;
-
 		if (tcp->flags & TCB_SUSPENDED) {
 			/*
 			 * Apparently, doing any ptrace() call on a stopped
@@ -2436,6 +2413,37 @@ handle_stopped_tcbs(struct tcb *tcp)
 			 */
 			continue;
 		}
+
+		tcp->wait_status = status;
+#ifdef LINUX
+		/* It is important to not invert the order of tasks
+		 * to process. For one, alloc_tcb() above picks newly forked
+		 * threads in some order, processing of them and their parent
+		 * should be in the same order, otherwise bad things happen
+		 * (misinterpreted SIGSTOPs and such).
+		 */
+		*nextp = tcp;
+		nextp = &tcp->next_need_service;
+		wnohang = WNOHANG;
+#endif
+#ifdef SUNOS4
+		/* Probably need to replace wait with waitpid
+		 * and loop on Sun too, but I can't test it. Volunteers?
+		 */
+		break;
+#endif
+	}
+
+	*nextp = NULL;
+	return found_tcps;
+}
+
+static int
+handle_stopped_tcbs(struct tcb *tcp)
+{
+	for (; tcp; tcp = tcp->next_need_service) {
+		int pid;
+		int status;
 
 		outf = tcp->outf;
 		status = tcp->wait_status;
