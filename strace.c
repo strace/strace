@@ -2576,12 +2576,17 @@ handle_stopped_tcbs(struct tcb *tcp)
 			 * but be paranoid about it.
 			 */
 			if (((unsigned)status >> 16) == PTRACE_EVENT_EXEC) {
-				/* It's post-exec ptrace stop.  */
-				/* Set WSTOPSIG(status) = (SIGTRAP | 0x80).  */
-				status |= 0x8000;
+				/* It's post-exec ptrace stop. Ignore it,
+				 * we will get syscall exit ptrace stop later.
+				 */
+#ifdef TCB_WAITEXECVE
+				tcp->flags &= ~TCB_WAITEXECVE;
+#endif
+				goto tracing;
 			} else {
 				/* Take a better look...  */
 				siginfo_t si;
+				si.si_signo = 0;
 				ptrace(PTRACE_GETSIGINFO, pid, (void*) 0, (void*) &si);
 				/*
 				 * Check some fields to make sure we see

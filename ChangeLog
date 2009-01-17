@@ -1,5 +1,15 @@
 2009-01-17  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	* defs.h: Update a comment. No code changes.
+	* strace.c (handle_stopped_tcbs): Discard all execve stops
+	and clear TCB_WAITEXECVE bit.
+	* syscall.c (get_scno): Add the code to not mistakenly
+	treat ptrace stop as execve stop (execve stops can be blocked
+	by traced program).
+	Fixes RH#477775 "strace hangs if the target process blocks SIGTRAP".
+
+2009-01-17  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	* process.c: Add a comment. No code changes.
 	* strace.c (collect_stopped_tcbs): Stop reversing list of stopped
 	tcp's. I'm not totally convinced it is crucial, but this is surely

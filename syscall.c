@@ -976,26 +976,47 @@ struct tcb *tcp;
 	}
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
-	if (upeek (tcp, PT_CR_IPSR, &psr) >= 0)
+	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		if (ia32) {
 			if (upeek(tcp, PT_R1, &scno) < 0)	/* orig eax */
 				return -1;
 		} else {
-			if (upeek (tcp, PT_R15, &scno) < 0)
+			if (upeek(tcp, PT_R15, &scno) < 0)
 				return -1;
 		}
 		/* Check if we return from execve. */
 		if (tcp->flags & TCB_WAITEXECVE) {
+#if defined PTRACE_GETSIGINFO
+			siginfo_t si;
+
+			tcp->flags &= ~TCB_WAITEXECVE;
+			/* If SIGTRAP is masked, execve's magic SIGTRAP
+			 * is not delivered. We end up here on a subsequent
+			 * ptrace stop instead. Luckily, we can check
+			 * for the type of this SIGTRAP. execve's magic one
+			 * has 0 (SI_USER) in si.si_code, ptrace stop has 5.
+			 * (I don't know why 5).
+			 */
+			si.si_code = SI_USER;
+			/* If PTRACE_GETSIGINFO fails, we assume it's
+			 * magic SIGTRAP. Moot anyway, PTRACE_GETSIGINFO
+			 * doesn't fail.
+			 */
+			ptrace(PTRACE_GETSIGINFO, pid, (void*) 0, (void*) &si);
+			if (si.si_code == SI_USER)
+				return 0;
+#else
 			tcp->flags &= ~TCB_WAITEXECVE;
 			return 0;
+#endif
 		}
 	} else {
 		/* syscall in progress */
-		if (upeek (tcp, PT_R8, &r8) < 0)
+		if (upeek(tcp, PT_R8, &r8) < 0)
 			return -1;
-		if (upeek (tcp, PT_R10, &r10) < 0)
+		if (upeek(tcp, PT_R10, &r10) < 0)
 			return -1;
 	}
 #elif defined (ARM)

@@ -363,9 +363,17 @@ struct tcb {
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-/* x86 does not need TCB_WAITEXECVE.
+/* TCB_WAITEXECVE bit means "ignore next SIGTRAP, it's execve exit stop".
+ * it is not reliable if traced program masks SIGTRAP.
+ *
+ * x86 does not need TCB_WAITEXECVE.
  * It can detect execve's SIGTRAP by looking at eax/rax.
  * See "stray syscall exit: eax = " message in syscall_fixup().
+ *
+ * Note that on newer kernels, we use ptrace options and therefore
+ * can filter out execve stops reliably on any architecture,
+ * without using TCB_WAITEXECVE flag.
+ * I guess we can remove it from the source somewhere around year 2010 :)
  */
 # if defined(ALPHA) || defined(SPARC) || defined(SPARC64) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM) || defined(MIPS) || defined(BFIN)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
