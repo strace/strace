@@ -1,5 +1,27 @@
 2009-01-17  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	Two cleanups: tcb table expansion failure is not really a survivable
+	event, we do not have any viable way to continue. No wonder most
+	places where that is detected have FIXMEs.
+	It's way simpler to treat as fatal failure, and handle it inside
+	tcb table expansion finctions.
+	Second cleanup: tidy up haphazard locations of a few externs.
+
+	* defs.h: Change return type of expand_tcbtab() to void.
+	Declare change_syscall().
+	* process.c: Change all callsites of alloctcb(), alloc_tcb() and
+	fork_tcb(), removing now-redundant error checks.
+	(fork_tcb): Change return type to void - it can't fail now.
+	* strace.c: Move extern declarations out of function bodies.
+	Change all callsites of alloctcb(), alloc_tcb() and
+        fork_tcb(), removing now-redundant error checks.
+	(expand_tcbtab): Change return type to void - it can't fail now.
+	On failure to expand, print a message, clean up, and exit.
+	(alloc_tcb): On failure to expand, print a message, clean up, and exit.
+	* util.c (setbpt): Remove extern declaration from function body.
+
+2009-01-17  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	* defs.h: Update a comment. No code changes.
 	* strace.c (handle_stopped_tcbs): Discard all execve stops
 	and clear TCB_WAITEXECVE bit.

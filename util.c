@@ -1593,11 +1593,9 @@ set_arg1 (struct tcb *tcp, void *cookie, long val)
 #endif
 
 int
-setbpt(tcp)
-struct tcb *tcp;
+setbpt(struct tcb *tcp)
 {
 	static int clone_scno[SUPPORTED_PERSONALITIES] = { SYS_clone };
-	extern int change_syscall(struct tcb *, int);
 	arg_setup_state state;
 
 	if (tcp->flags & TCB_BPTSET) {

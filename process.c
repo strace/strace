@@ -487,25 +487,19 @@ struct tcb *tcp;
 /* TCP is creating a child we want to follow.
    If there will be space in tcbtab for it, set TCB_FOLLOWFORK and return 0.
    If not, clear TCB_FOLLOWFORK, print an error, and return 1.  */
-static int
+static void
 fork_tcb(struct tcb *tcp)
 {
-	if (nprocs == tcbtabsize) {
-		if (expand_tcbtab()) {
-			tcp->flags &= ~TCB_FOLLOWFORK;
-			return 1;
-		}
-	}
+	if (nprocs == tcbtabsize)
+		expand_tcbtab();
 
 	tcp->flags |= TCB_FOLLOWFORK;
-	return 0;
 }
 
 #ifdef USE_PROCFS
 
 int
-sys_fork(tcp)
-struct tcb *tcp;
+sys_fork(struct tcb *tcp)
 {
 	if (exiting(tcp) && !syserror(tcp)) {
 		if (getrval2(tcp)) {
@@ -551,12 +545,10 @@ struct tcb *tcp;
 			return 0;
 		if (!followfork)
 			return 0;
-		if (fork_tcb(tcp))
-			return 0;
+		fork_tcb(tcp);
 		if (syserror(tcp))
 			return 0;
-		if ((tcpchild = alloctcb(tcp->u_rval)) == NULL)
-			return 0;
+		tcpchild = alloctcb(tcp->u_rval);
 		if (proc_open(tcpchild, 2) < 0)
 		  	droptcb(tcpchild);
 	}
@@ -706,9 +698,7 @@ struct tcb *tcp;
 }
 
 int
-change_syscall(tcp, new)
-struct tcb *tcp;
-int new;
+change_syscall(struct tcb *tcp, int new)
 {
 #if defined(LINUX)
 #if defined(I386)
@@ -758,9 +748,12 @@ int new;
 #elif defined(IA64)
 	if (ia32) {
 		switch (new) {
-		      case 2: break;	/* x86 SYS_fork */
-		      case SYS_clone:	new = 120; break;
-		      default:
+		case 2:
+			break;	/* x86 SYS_fork */
+		case SYS_clone:
+			new = 120;
+			break;
+		default:
 			fprintf(stderr, "%s: unexpected syscall %d\n",
 				__FUNCTION__, new);
 			return -1;
@@ -892,8 +885,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		if (!followfork)
 			return 0;
-		if (fork_tcb(tcp))
-			return 0;
+		fork_tcb(tcp);
 		if (setbpt(tcp) < 0)
 			return 0;
 	} else {
@@ -924,12 +916,8 @@ struct tcb *tcp;
 		}
 		else
 #endif
-		if (fork_tcb(tcp) || (tcpchild = alloctcb(pid)) == NULL) {
-			if (bpt)
-				clearbpt(tcp);
-			kill(pid, SIGKILL); /* XXX */
-			return 0;
-		}
+		fork_tcb(tcp);
+		tcpchild = alloctcb(pid);
 
 #ifndef CLONE_PTRACE
 		/* Attach to the new child */
@@ -1042,8 +1030,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		if (!followfork || dont_follow)
 			return 0;
-		if (fork_tcb(tcp))
-			return 0;
+		fork_tcb(tcp);
 		if (setbpt(tcp) < 0)
 			return 0;
   	}
@@ -1059,10 +1046,8 @@ struct tcb *tcp;
 			return 0;
 
 		pid = tcp->u_rval;
-		if (fork_tcb(tcp) || (tcpchild = alloctcb(pid)) == NULL) {
-			kill(pid, SIGKILL); /* XXX */
-			return 0;
-		}
+		fork_tcb(tcp);
+		tcpchild = alloctcb(pid);
 #ifdef LINUX
 #ifdef HPPA
 		/* The child must have run before it can be attached. */

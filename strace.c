@@ -78,6 +78,8 @@
 #endif
 #endif
 extern char **environ;
+extern int optind;
+extern char *optarg;
 
 
 int debug = 0, followfork = 0;
@@ -436,13 +438,7 @@ startup_attach(void)
 						   (char *) 1, 0) < 0)
 						++nerr;
 					else if (tid != tcbtab[tcbi]->pid) {
-						if (nprocs == tcbtabsize &&
-						    expand_tcbtab())
-							tcp = NULL;
-						else
-							tcp = alloctcb(tid);
-						if (tcp == NULL)
-							exit(1);
+						tcp = alloctcb(tid);
 						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
 						tcbtab[tcbi]->nchildren++;
 						tcbtab[tcbi]->nclone_threads++;
@@ -675,10 +671,6 @@ startup_child (char **argv)
 
 	/* We are the tracer.  */
 	tcp = alloctcb(daemonized_tracer ? getppid() : pid);
-	if (tcp == NULL) {
-		cleanup();
-		exit(1);
-	}
 	if (daemonized_tracer) {
 		/* We want subsequent startup_attach() to attach to it.  */
 		tcp->flags |= TCB_ATTACHED;
@@ -695,8 +687,6 @@ startup_child (char **argv)
 int
 main(int argc, char *argv[])
 {
-	extern int optind;
-	extern char *optarg;
 	struct tcb *tcp;
 	int c, pid = 0;
 	int optF = 0;
@@ -708,11 +698,11 @@ main(int argc, char *argv[])
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
-	if ((tcbtab = calloc (tcbtabsize, sizeof tcbtab[0])) == NULL) {
+	if ((tcbtab = calloc(tcbtabsize, sizeof tcbtab[0])) == NULL) {
 		fprintf(stderr, "%s: out of memory\n", progname);
 		exit(1);
 	}
-	if ((tcbtab[0] = calloc (tcbtabsize, sizeof tcbtab[0][0])) == NULL) {
+	if ((tcbtab[0] = calloc(tcbtabsize, sizeof tcbtab[0][0])) == NULL) {
 		fprintf(stderr, "%s: out of memory\n", progname);
 		exit(1);
 	}
@@ -807,11 +797,7 @@ main(int argc, char *argv[])
 				fprintf(stderr, "%s: I'm sorry, I can't let you do that, Dave.\n", progname);
 				break;
 			}
-			if ((tcp = alloc_tcb(pid, 0)) == NULL) {
-				fprintf(stderr, "%s: out of memory\n",
-					progname);
-				exit(1);
-			}
+			tcp = alloc_tcb(pid, 0);
 			tcp->flags |= TCB_ATTACHED;
 			pflag_seen++;
 			break;
@@ -979,8 +965,8 @@ main(int argc, char *argv[])
 	exit(exit_code);
 }
 
-int
-expand_tcbtab()
+void
+expand_tcbtab(void)
 {
 	/* Allocate some more TCBs and expand the table.
 	   We don't want to relocate the TCBs because our
@@ -993,26 +979,25 @@ expand_tcbtab()
 						    sizeof *newtcbs);
 	int i;
 	if (newtab == NULL || newtcbs == NULL) {
-		if (newtab != NULL)
-			free(newtab);
 		fprintf(stderr, "%s: expand_tcbtab: out of memory\n",
 			progname);
-		return 1;
+		cleanup();
+		exit(1);
 	}
 	for (i = tcbtabsize; i < 2 * tcbtabsize; ++i)
 		newtab[i] = &newtcbs[i - tcbtabsize];
 	tcbtabsize *= 2;
 	tcbtab = newtab;
-
-	return 0;
 }
-
 
 struct tcb *
 alloc_tcb(int pid, int command_options_parsed)
 {
 	int i;
 	struct tcb *tcp;
+
+	if (nprocs == tcbtabsize)
+		expand_tcbtab();
 
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
@@ -1036,15 +1021,14 @@ alloc_tcb(int pid, int command_options_parsed)
 			return tcp;
 		}
 	}
-	fprintf(stderr, "%s: alloc_tcb: tcb table full\n", progname);
-	return NULL;
+	fprintf(stderr, "%s: bug in alloc_tcb\n", progname);
+	cleanup();
+	exit(1);
 }
 
 #ifdef USE_PROCFS
 int
-proc_open(tcp, attaching)
-struct tcb *tcp;
-int attaching;
+proc_open(struct tcb *tcp, int attaching)
 {
 	char proc[32];
 	long arg;
@@ -2369,15 +2353,7 @@ collect_stopped_tcbs(void)
 				   will we have the association of parent and
 				   child so that we know how to do clearbpt
 				   in the child.  */
-				if (nprocs == tcbtabsize &&
-				    expand_tcbtab())
-					tcp = NULL;
-				else
-					tcp = alloctcb(pid);
-				if (tcp == NULL) {
-					kill(pid, SIGKILL); /* XXX */
-					return NULL;
-				}
+				tcp = alloctcb(pid);
 				tcp->flags |= TCB_ATTACHED | TCB_SUSPENDED;
 				if (!qflag)
 					fprintf(stderr, "\

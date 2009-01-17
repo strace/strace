@@ -481,7 +481,7 @@ extern const char *xlookup P((const struct xlat *, int));
 extern struct tcb *alloc_tcb P((int, int));
 extern struct tcb *pid2tcb P((int));
 extern void droptcb P((struct tcb *));
-extern int expand_tcbtab P((void));
+extern void expand_tcbtab P((void));
 
 #define alloctcb(pid)	alloc_tcb((pid), 1)
 
@@ -535,6 +535,7 @@ extern void tprint_iov P((struct tcb *, unsigned long, unsigned long));
 extern void tprint_open_modes P((struct tcb *, mode_t));
 extern int is_restart_error P((struct tcb *));
 
+extern int change_syscall P((struct tcb *, int));
 #ifdef LINUX
 extern int internal_clone P((struct tcb *));
 #endif
