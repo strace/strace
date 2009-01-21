@@ -2309,10 +2309,9 @@ collect_stopped_tcbs(void)
 			break;
 		}
 		if (pid == -1) {
-			switch (wait_errno) {
-			case EINTR:
+			if (wait_errno == EINTR)
 				continue;
-			case ECHILD:
+			if (wait_errno == ECHILD) {
 				/*
 				 * We would like to verify this case
 				 * but sometimes a race in Solbourne's
@@ -2320,17 +2319,16 @@ collect_stopped_tcbs(void)
 				 * ECHILD before sending us SIGCHILD.
 				 */
 #if 0
-				if (nprocs == 0)
-					return NULL;
-				fprintf(stderr, "strace: proc miscount\n");
-				exit(1);
+				if (nprocs != 0) {
+					fprintf(stderr, "strace: proc miscount\n");
+					exit(1);
+				}
 #endif
-				return NULL;
-			default:
-				errno = wait_errno;
-				perror("strace: wait");
-				exit(1);
+				break;
 			}
+			errno = wait_errno;
+			perror("strace: wait");
+			exit(1);
 		}
 		if (pid == popen_pid) {
 			if (WIFEXITED(status) || WIFSIGNALED(status))
