@@ -780,13 +780,9 @@ internal_syscall(struct tcb *tcp)
 #endif /* FREEBSD */
 
 int
-get_scno(tcp)
-struct tcb *tcp;
+get_scno(struct tcb *tcp)
 {
 	long scno = 0;
-#ifndef USE_PROCFS
-	int pid = tcp->pid;
-#endif /* !PROCFS */
 
 #ifdef LINUX
 #if defined(S390) || defined(S390X)
@@ -833,7 +829,7 @@ struct tcb *tcp;
 		if (upeek(tcp, PT_PSWADDR, &pc) < 0)
 			return -1;
 		errno = 0;
-		opcode = ptrace(PTRACE_PEEKTEXT, pid, (char *)(pc-sizeof(long)), 0);
+		opcode = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(pc-sizeof(long)), 0);
 		if (errno) {
 			perror("peektext(pc-oneword)");
 			return -1;
@@ -874,7 +870,7 @@ struct tcb *tcp;
 				return -1;
 			svc_addr += tmp;
 
-			scno = ptrace(PTRACE_PEEKTEXT, pid, svc_addr, 0);
+			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, svc_addr, 0);
 			if (errno)
 				return -1;
 #if defined(S390X)
@@ -916,6 +912,7 @@ struct tcb *tcp;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 	  	static int currpers = -1;
 		long val;
+		int pid = tcp->pid;
 
 		/* Check CS register value. On x86-64 linux it is:
 		 * 	0x33	for long mode (64 bit)
@@ -1004,7 +1001,7 @@ struct tcb *tcp;
 			 * magic SIGTRAP. Moot anyway, PTRACE_GETSIGINFO
 			 * doesn't fail.
 			 */
-			ptrace(PTRACE_GETSIGINFO, pid, (void*) 0, (void*) &si);
+			ptrace(PTRACE_GETSIGINFO, tcp->pid, (void*) 0, (void*) &si);
 			if (si.si_code == SI_USER)
 				return 0;
 #else
@@ -1023,7 +1020,7 @@ struct tcb *tcp;
 	/*
 	 * Read complete register set in one go.
 	 */
-	if (ptrace(PTRACE_GETREGS, pid, NULL, (void *)&regs) == -1)
+	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 		return -1;
 
 	/*
@@ -1051,7 +1048,7 @@ struct tcb *tcp;
 			 * Get the ARM-mode system call number
 			 */
 			errno = 0;
-			scno = ptrace(PTRACE_PEEKTEXT, pid, (void *)(regs.ARM_pc - 4), NULL);
+			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(regs.ARM_pc - 4), NULL);
 			if (errno)
 				return -1;
 
@@ -1105,7 +1102,7 @@ struct tcb *tcp;
 #elif defined (LINUX_MIPSN32)
 	unsigned long long regs[38];
 
-	if (ptrace (PTRACE_GETREGS, pid, NULL, (long) &regs) < 0)
+	if (ptrace (PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
 		return -1;
 	a3 = regs[REG_A3];
 	r2 = regs[REG_V0];
@@ -1183,14 +1180,14 @@ struct tcb *tcp;
 	}
 #elif defined (SPARC) || defined (SPARC64)
 	/* Everything we need is in the current register set. */
-	if (ptrace(PTRACE_GETREGS,pid,(char *)&regs,0) < 0)
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
 
 	/* If we are entering, then disassemble the syscall trap. */
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Retrieve the syscall trap instruction. */
 		errno = 0;
-		trap = ptrace(PTRACE_PEEKTEXT,pid,(char *)regs.r_pc,0);
+		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.r_pc, 0);
 #if defined(SPARC64)
 		trap >>= 32;
 #endif

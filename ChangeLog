@@ -1,4 +1,8 @@
-2009-01-20  Michal Nowak  <mnowak@redhat.com>
+2009-01-23  Michal Nowak  <mnowak@redhat.com>
+
+	* syscall.c (get_scno): Fix warnings about unused variable 'pid'.
+
+2009-01-23  Michal Nowak  <mnowak@redhat.com>
 
 	* mem.c (print_ldt_entry): Fix warning:
 	Format '%#08lx' expects type 'long unsigned int', but
