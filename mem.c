@@ -565,8 +565,7 @@ struct tcb *tcp;
 
 #if defined(LINUX) && defined(__i386__)
 void
-print_ldt_entry (ldt_entry)
-struct modify_ldt_ldt_s *ldt_entry;
+print_ldt_entry(struct modify_ldt_ldt_s *ldt_entry)
 {
 	tprintf("base_addr:%#08lx, "
 		"limit:%d, "
@@ -576,7 +575,7 @@ struct modify_ldt_ldt_s *ldt_entry;
 		"limit_in_pages:%d, "
 		"seg_not_present:%d, "
 		"useable:%d}",
-		ldt_entry->base_addr,
+		(long) ldt_entry->base_addr,
 		ldt_entry->limit,
 		ldt_entry->seg_32bit,
 		ldt_entry->contents,

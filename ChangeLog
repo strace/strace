@@ -1,3 +1,9 @@
+2009-01-20  Michal Nowak  <mnowak@redhat.com>
+
+	* mem.c (print_ldt_entry): Fix warning:
+	Format '%#08lx' expects type 'long unsigned int', but
+	argument 2 was type 'unsigned int'.
+
 2009-01-21  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* strace.c (collect_stopped_tcbs): Do not return NULL when ECHILD
