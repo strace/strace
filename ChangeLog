@@ -1,3 +1,9 @@
+2009-01-26  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* process.c (internal_clone): fix fallout from tcb table expansion
+	simplification. Due to overlooked else, I forgot to group
+	fork_tcb(tcp) and alloctcb(pid) in a block.
+
 2009-01-23  Michal Nowak  <mnowak@redhat.com>
 
 	* syscall.c (get_scno): Fix warnings about unused variable 'pid'.

@@ -916,8 +916,10 @@ struct tcb *tcp;
 		}
 		else
 #endif
-		fork_tcb(tcp);
-		tcpchild = alloctcb(pid);
+		{
+			fork_tcb(tcp);
+			tcpchild = alloctcb(pid);
+		}
 
 #ifndef CLONE_PTRACE
 		/* Attach to the new child */
