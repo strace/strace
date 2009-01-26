@@ -357,13 +357,13 @@ int
 sys_osf_getrusage(tcp)
 struct tcb *tcp;
 {
-    if (entering(tcp)) {
-	printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
-	tprintf(", ");
-    }
-    else
-	printrusage32(tcp, tcp->u_arg[1]);
-    return 0;
+	if (entering(tcp)) {
+		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
+		tprintf(", ");
+	}
+	else
+		printrusage32(tcp, tcp->u_arg[1]);
+	return 0;
 }
 #endif /* ALPHA */
 

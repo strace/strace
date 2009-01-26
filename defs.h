@@ -96,9 +96,6 @@
 #  if defined(SPARC) || defined(SPARC64)
 #     define LINUXSPARC
 #  endif
-#  if defined(ALPHA)
-#     define LINUX_64BIT
-#  endif
 #  if defined(X86_64)
 #     define LINUX_X86_64
 #  endif

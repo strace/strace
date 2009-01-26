@@ -1,6 +1,14 @@
 2009-01-26  Denys Vlasenko  <dvlasenk@redhat.com>
 
-	* process.c (internal_clone): fix fallout from tcb table expansion
+	* process.c (printwaitn): Add comment about wait4() pid expansion.
+	Use #ifdef ALPHA instead of LINUX_64BIT, it was misleading
+	(by implying "any 64-bit platform").
+	* defs.h: Remove now-unused LINUX_64BIT define.
+	* resource.c (sys_osf_getrusage): Fix indentation.
+
+2009-01-26  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* process.c (internal_clone): Fix fallout from tcb table expansion
 	simplification. Due to overlooked else, I forgot to group
 	fork_tcb(tcp) and alloctcb(pid) in a block.
 
