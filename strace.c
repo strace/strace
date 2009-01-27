@@ -2255,21 +2255,39 @@ handle_group_exit(struct tcb *tcp, int sig)
 static struct tcb *
 collect_stopped_tcbs(void)
 {
+#ifdef LINUX
+	static int remembered_pid;
+	static int remembered_status;
+#endif
 	int pid;
 	int wait_errno;
 	int status;
 	struct tcb *tcp;
+	struct tcb *found_tcps;
 #ifdef LINUX
+	struct tcb **nextp;
 	struct rusage ru;
 	struct rusage* ru_ptr = cflag ? &ru : NULL;
 	int wnohang = 0;
-	struct tcb *found_tcps;
-	struct tcb **nextp = &found_tcps;
 #ifdef __WALL
 	int wait4_options = __WALL;
 #endif
+
+	if (remembered_pid > 0) {
+		pid = remembered_pid;
+		remembered_pid = 0;
+		if (debug)
+			fprintf(stderr, " [remembered wait(%#x) = %u]\n",
+						remembered_status, pid);
+		tcp = pid2tcb(pid); /* can't be NULL */
+		tcp->wait_status = remembered_status;
+		tcp->next_need_service = NULL;
+		return tcp;
+	}
+	nextp = &found_tcps;
 #endif /* LINUX */
 
+	found_tcps = NULL;
 	while (1) {
 #ifdef LINUX
 #ifdef __WALL
@@ -2338,6 +2356,14 @@ collect_stopped_tcbs(void)
 		if (debug)
 			fprintf(stderr, " [wait(%#x) = %u]\n", status, pid);
 
+		/* RHEL5 bug workaround.
+		 * It can re-report stopped tasks. Happens on SIGSTOPs here.
+		 * Second (bogus) report has signal# set to 0.
+		 * Stop collecting and process what we have.
+		 */
+		if (WIFSTOPPED(status) && WSTOPSIG(status) == 0)
+			break;
+
 		/* Look up `pid' in our table. */
 		if ((tcp = pid2tcb(pid)) == NULL) {
 #ifdef LINUX
@@ -2384,31 +2410,58 @@ Process %d attached (waiting for parent)\n",
 			 * process has not been actually restarted.
 			 * Since we have inspected the arguments of suspended
 			 * processes we end up here testing for this case.
+			 *
+			 * We also end up here when we catch new pid of
+			 * CLONE_PTRACEd process. Do not process/restart it
+			 * until we see corresponding clone() syscall exit
+			 * in its parent.
 			 */
 			continue;
 		}
 
-		tcp->wait_status = status;
 #ifdef LINUX
+		/* So far observed only on RHEL5 ia64, but I imagine this
+		 * can legitimately happen elsewhere.
+		 * If we waited and got a stopped task notification,
+		 * subsequent wait may return the same pid again, for example,
+		 * with SIGKILL notification. SIGKILL kills even stopped tasks.
+		 * We must not add it to the list
+		 * (one task can't be inserted twice in the list).
+		 */
+		{
+			struct tcb *f = found_tcps;
+			while (f) {
+				if (f == tcp) {
+					remembered_pid = pid;
+					remembered_status = status;
+					return found_tcps;
+				}
+				f = f->next_need_service;
+			}
+		}
 		/* It is important to not invert the order of tasks
 		 * to process. For one, alloc_tcb() above picks newly forked
 		 * threads in some order, processing of them and their parent
 		 * should be in the same order, otherwise bad things happen
 		 * (misinterpreted SIGSTOPs and such).
 		 */
+		tcp->wait_status = status;
 		*nextp = tcp;
 		nextp = &tcp->next_need_service;
+		*nextp = NULL;
 		wnohang = WNOHANG;
 #endif
 #ifdef SUNOS4
 		/* Probably need to replace wait with waitpid
 		 * and loop on Sun too, but I can't test it. Volunteers?
 		 */
+		tcp->wait_status = status;
+		tcp->next_need_service = NULL;
+		found_tcps = tcp;
 		break;
 #endif
-	}
+	} /* while (1) - collecting all stopped/exited tracees */
 
-	*nextp = NULL;
 	return found_tcps;
 }
 

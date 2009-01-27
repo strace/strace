@@ -1,3 +1,8 @@
+2009-01-27  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* strace.c (collect_stopped_tcbs): Guard against the case when
+	waitpid() reports the same task multiple times.
+
 2009-01-26  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* process.c (printwaitn): Add comment about wait4() pid expansion.
