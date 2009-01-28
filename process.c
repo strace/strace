@@ -877,19 +877,19 @@ setarg(tcp, argnum)
 
 #if defined SYS_clone || defined SYS_clone2
 int
-internal_clone(tcp)
-struct tcb *tcp;
+internal_clone(struct tcb *tcp)
 {
 	struct tcb *tcpchild;
-	int pid;
+	int pid, bpt;
+
 	if (entering(tcp)) {
 		if (!followfork)
 			return 0;
 		fork_tcb(tcp);
-		if (setbpt(tcp) < 0)
-			return 0;
+		setbpt(tcp);
+		return 0;
 	} else {
-		int bpt = tcp->flags & TCB_BPTSET;
+		bpt = tcp->flags & TCB_BPTSET;
 
 		if (!(tcp->flags & TCB_FOLLOWFORK))
 			return 0;
@@ -901,6 +901,15 @@ struct tcb *tcp;
 		}
 
 		pid = tcp->u_rval;
+		/* Should not happen, but bugs often cause bogus value here */
+		if (pid <= 1
+		 || (sizeof(pid) != sizeof(tcp->u_rval) && pid != tcp->u_rval)
+		) {
+			if (bpt)
+				clearbpt(tcp);
+			fprintf(stderr, "bogus clone() return value %lx!\n", tcp->u_rval);
+			return 0;
+		}
 
 #ifdef CLONE_PTRACE		/* See new setbpt code.  */
 		tcpchild = pid2tcb(pid);
@@ -1003,7 +1012,6 @@ Process %u resumed (parent %d ready)\n",
 			}
 		}
 #endif
-
  	}
 	return 0;
 }

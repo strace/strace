@@ -40,6 +40,7 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include <pwd.h>
 #include <grp.h>
 #include <string.h>
@@ -98,6 +99,8 @@ static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
  * disrupting parent<->child link.
  */
 static bool daemonized_tracer = 0;
+
+static struct utsname utsname_buf;
 
 /* Sometimes we want to print only succeeding syscalls. */
 int not_failing_only = 0;
@@ -696,6 +699,8 @@ main(int argc, char *argv[])
 
 	progname = argv[0] ? argv[0] : "strace";
 
+	uname(&utsname_buf);
+
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
 	if ((tcbtab = calloc(tcbtabsize, sizeof tcbtab[0])) == NULL) {
@@ -1002,18 +1007,10 @@ alloc_tcb(int pid, int command_options_parsed)
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
 		if ((tcp->flags & TCB_INUSE) == 0) {
+			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
-			tcp->parent = NULL;
-			tcp->nchildren = 0;
-			tcp->nzombies = 0;
-#ifdef TCB_CLONE_THREAD
-			tcp->nclone_threads = tcp->nclone_detached = 0;
-			tcp->nclone_waiting = 0;
-#endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
 			tcp->outf = outf; /* Initialise to current out file */
-			tcp->stime.tv_sec = 0;
-			tcp->stime.tv_usec = 0;
 			tcp->pfd = -1;
 			nprocs++;
 			if (command_options_parsed)
@@ -2579,7 +2576,18 @@ handle_stopped_tcbs(struct tcb *tcp)
 			 * execve's SIGTRAP with PTRACE_EVENT_EXEC.
 			 */
 			if (!ptrace_opts_set) {
+				char *p;
 				ptrace_opts_set = 1;
+
+				/* RHEL 2.6.18 definitely has crippling bugs */
+				/* Vanilla and Fedora 2.6.29 seems to work */
+				p = utsname_buf.release;
+				if (strtoul(p, &p, 10) < 2 || *p != '.')
+					goto tracing;
+				if (strtoul(++p, &p, 10) < 6 || *p != '.')
+					goto tracing;
+				if (strtoul(++p, &p, 10) < 29)
+					goto tracing;
 				/*
 				 * NB: even if this "succeeds", we can
 				 * revert back to SIGTRAP if we later see
@@ -2829,20 +2837,20 @@ va_dcl
 }
 
 void
-printleader(tcp)
-struct tcb *tcp;
+printleader(struct tcb *tcp)
 {
 	if (tcp_last) {
 		if (tcp_last->ptrace_errno) {
-			if (tcp_last->flags & TCB_INSYSCALL) {
-				tprintf(" <unavailable>)");
-				tabto(acolumn);
-			}
-			tprintf("= ? <unavailable>\n");
 			tcp_last->ptrace_errno = 0;
+			if (tcp_last->flags & TCB_INSYSCALL) {
+				tprintf(" <unavailable ...>\n");
+				tcp_last->flags |= TCB_REPRINT;
+			} else {
+				tprintf("= ? <unavailable>\n");
+			}
 		} else if (!outfname || followfork < 2 || tcp_last == tcp) {
-			tcp_last->flags |= TCB_REPRINT;
 			tprintf(" <unfinished ...>\n");
+			tcp_last->flags |= TCB_REPRINT;
 		}
 	}
 	curcol = 0;
