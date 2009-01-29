@@ -1,9 +1,18 @@
+2009-01-29  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* strace.c (newoutf): Prevent -o FILENAME overflowing the stack.
+	(startup_attach): Fix wrong pid in "Process <PID> attached".
+	(handle_group_exit): Do not consider exit to be spurious if
+	tcb has TCB_STARTUP bit set - we can attach to the task
+	right before its death, it can legitimately happen.
+	(handle_stopped_tcbs): Ditto.
+
 2009-01-28  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* process.c (internal_clone): Check and complain if pid value
 	looks insane.
 	* strace.c (alloc_tcb): Clear *all* fields in reused tcb.
-	(main): Query and rememeber uname() info on startup.
+	(main): Query and remember uname() info on startup.
 	(handle_stopped_tcbs): Do not use PTRACE_SETOPTIONS on Linux < 2.6.29.
 	(printleader): Correct printing of "<unavailable>" markers.
 

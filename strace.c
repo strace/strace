@@ -355,10 +355,10 @@ static int
 newoutf(struct tcb *tcp)
 {
 	if (outfname && followfork > 1) {
-		char name[MAXPATHLEN];
+		char name[520 + sizeof(int) * 3];
 		FILE *fp;
 
-		sprintf(name, "%s.%u", outfname, tcp->pid);
+		sprintf(name, "%.512s.%u", outfname, tcp->pid);
 		if ((fp = strace_fopen(name, "w")) == NULL)
 			return -1;
 		tcp->outf = fp;
@@ -420,7 +420,7 @@ startup_attach(void)
 #else /* !USE_PROCFS */
 # ifdef LINUX
 		if (followfork && !daemonized_tracer) {
-			char procdir[MAXPATHLEN];
+			char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
 			DIR *dir;
 
 			sprintf(procdir, "/proc/%d/task", tcp->pid);
@@ -430,15 +430,13 @@ startup_attach(void)
 				struct dirent *de;
 				int tid;
 				while ((de = readdir(dir)) != NULL) {
-					if (de->d_fileno == 0 ||
-					    de->d_name[0] == '.')
+					if (de->d_fileno == 0)
 						continue;
 					tid = atoi(de->d_name);
 					if (tid <= 0)
 						continue;
 					++ntid;
-					if (ptrace(PTRACE_ATTACH, tid,
-						   (char *) 1, 0) < 0)
+					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0)
 						++nerr;
 					else if (tid != tcbtab[tcbi]->pid) {
 						tcp = alloctcb(tid);
@@ -456,25 +454,21 @@ startup_attach(void)
 					}
 				}
 				closedir(dir);
-				if (nerr == ntid) {
+				ntid -= nerr;
+				if (ntid == 0) {
 					perror("attach: ptrace(PTRACE_ATTACH, ...)");
 					droptcb(tcp);
 					continue;
 				}
 				if (!qflag) {
-					ntid -= nerr;
-					if (ntid > 1)
-						fprintf(stderr, "\
-Process %u attached with %u threads - interrupt to quit\n",
-							tcp->pid, ntid);
-					else
-						fprintf(stderr, "\
-Process %u attached - interrupt to quit\n",
-							tcp->pid);
+					fprintf(stderr, ntid > 1
+? "Process %u attached with %u threads - interrupt to quit\n"
+: "Process %u attached - interrupt to quit\n",
+						tcbtab[tcbi]->pid, ntid);
 				}
 				continue;
-			}
-		}
+			} /* if (opendir worked) */
+		} /* if (-f) */
 # endif
 		if (ptrace(PTRACE_ATTACH, tcp->pid, (char *) 1, 0) < 0) {
 			perror("attach: ptrace(PTRACE_ATTACH, ...)");
@@ -2205,20 +2199,25 @@ handle_group_exit(struct tcb *tcp, int sig)
 {
 	/* We need to locate our records of all the clone threads
 	   related to TCP, either its children or siblings.  */
-	struct tcb *leader = ((tcp->flags & TCB_CLONE_THREAD)
-			      ? tcp->parent
-			      : tcp->nclone_detached > 0
-			      ? tcp : NULL);
+	struct tcb *leader = NULL;
+
+	if (tcp->flags & TCB_CLONE_THREAD)
+		leader = tcp->parent;
+	else if (tcp->nclone_detached > 0)
+		leader = tcp;
 
 	if (sig < 0) {
-		if (leader != NULL && leader != tcp &&
-		    !(leader->flags & TCB_GROUP_EXITING))
+		if (leader != NULL && leader != tcp
+		 && !(leader->flags & TCB_GROUP_EXITING)
+		 && !(tcp->flags & TCB_STARTUP)
+		) {
 			fprintf(stderr,
 				"PANIC: handle_group_exit: %d leader %d\n",
 				tcp->pid, leader ? leader->pid : -1);
-		/* TCP no longer exists therefore you must not detach () it.  */
+		}
+		/* TCP no longer exists therefore you must not detach() it.  */
 #ifndef USE_PROCFS
-		resume_from_tcp (tcp);
+		resume_from_tcp(tcp);
 #endif
 		droptcb(tcp);	/* Already died.  */
 	}
@@ -2498,20 +2497,19 @@ handle_stopped_tcbs(struct tcb *tcp)
 			if (pid == strace_child)
 				exit_code = WEXITSTATUS(status);
 			if (debug)
-				fprintf(stderr, "pid %u exited\n", pid);
-			if ((tcp->flags & TCB_ATTACHED)
+				fprintf(stderr, "pid %u exited with %d\n", pid, WEXITSTATUS(status));
+			if ((tcp->flags & (TCB_ATTACHED|TCB_STARTUP)) == TCB_ATTACHED
 #ifdef TCB_GROUP_EXITING
-			    && !(tcp->parent && (tcp->parent->flags &
-						 TCB_GROUP_EXITING))
+			    && !(tcp->parent && (tcp->parent->flags & TCB_GROUP_EXITING))
 			    && !(tcp->flags & TCB_GROUP_EXITING)
 #endif
-				)
+			) {
 				fprintf(stderr,
-					"PANIC: attached pid %u exited\n",
-					pid);
+					"PANIC: attached pid %u exited with %d\n",
+					pid, WEXITSTATUS(status));
+			}
 			if (tcp == tcp_last) {
-				if ((tcp->flags & (TCB_INSYSCALL|TCB_REPRINT))
-				    == TCB_INSYSCALL)
+				if ((tcp->flags & (TCB_INSYSCALL|TCB_REPRINT)) == TCB_INSYSCALL)
 					tprintf(" <unfinished ... exit status %d>\n",
 						WEXITSTATUS(status));
 				tcp_last = NULL;
