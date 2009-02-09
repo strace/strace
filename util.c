@@ -995,10 +995,10 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 }
 
 #ifdef LINUX
-#if !defined (SPARC) && !defined(SPARC64)
-#define PTRACE_WRITETEXT	101
-#define PTRACE_WRITEDATA	102
-#endif /* !SPARC && !SPARC64 */
+# if !defined (SPARC) && !defined(SPARC64)
+#  define PTRACE_WRITETEXT	101
+#  define PTRACE_WRITEDATA	102
+# endif /* !SPARC && !SPARC64 */
 #endif /* LINUX */
 
 #ifdef SUNOS4
@@ -1011,7 +1011,7 @@ long addr;
 int len;
 char *laddr;
 {
-#if 0
+# if 0
 	int n;
 
 	while (len) {
@@ -1025,7 +1025,7 @@ char *laddr;
 		addr += n;
 		laddr += n;
 	}
-#else
+# else
 	int peek, poke;
 	int n, m;
 	union {
@@ -1068,7 +1068,7 @@ char *laddr;
 		}
 		addr += sizeof(long), laddr += m, len -= m;
 	}
-#endif
+# endif
 	return 0;
 }
 
@@ -1103,7 +1103,7 @@ long *res;
 {
 	long val;
 
-#ifdef SUNOS4_KERNEL_ARCH_KLUDGE
+# ifdef SUNOS4_KERNEL_ARCH_KLUDGE
 	{
 		static int is_sun4m = -1;
 		struct utsname name;
@@ -1125,7 +1125,7 @@ long *res;
 		if (is_sun4m)
 			off += 1024;
 	}
-#endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
+# endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
 	errno = 0;
 	val = do_ptrace(PTRACE_PEEKUSER, tcp, (char *) off, 0);
 	if (val == -1 && errno) {
@@ -1150,51 +1150,51 @@ struct tcb *tcp;
 
 #ifdef LINUX
 	long pc;
-#if defined(I386)
+# if defined(I386)
 	if (upeek(tcp, 4*EIP, &pc) < 0)
 		return -1;
-#elif defined(X86_64)
+# elif defined(X86_64)
 	if (upeek(tcp, 8*RIP, &pc) < 0)
 		return -1;
-#elif defined(IA64)
+# elif defined(IA64)
 	if (upeek(tcp, PT_B0, &pc) < 0)
 		return -1;
-#elif defined(ARM)
+# elif defined(ARM)
 	if (upeek(tcp, 4*15, &pc) < 0)
 		return -1;
-#elif defined(BFIN)
+# elif defined(BFIN)
 	if (upeek(tcp, REG_PC, &pc) < 0)
 		return -1;
-#elif defined(POWERPC)
+# elif defined(POWERPC)
 	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0)
 		return -1;
-#elif defined(M68K)
+# elif defined(M68K)
 	if (upeek(tcp, 4*PT_PC, &pc) < 0)
 		return -1;
-#elif defined(ALPHA)
+# elif defined(ALPHA)
 	if (upeek(tcp, REG_PC, &pc) < 0)
 		return -1;
-#elif defined(MIPS)
- 	if (upeek(tcp, REG_EPC, &pc) < 0)
- 		return -1;
-#elif defined(SPARC) || defined(SPARC64)
+# elif defined(MIPS)
+	if (upeek(tcp, REG_EPC, &pc) < 0)
+		return -1;
+# elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
 	pc = regs.r_pc;
-#elif defined(S390) || defined(S390X)
+# elif defined(S390) || defined(S390X)
 	if(upeek(tcp,PT_PSWADDR,&pc) < 0)
 		return -1;
-#elif defined(HPPA)
+# elif defined(HPPA)
 	if(upeek(tcp,PT_IAOQ0,&pc) < 0)
 		return -1;
-#elif defined(SH)
+# elif defined(SH)
 	if (upeek(tcp, 4*REG_PC ,&pc) < 0)
 		return -1;
-#elif defined(SH64)
+# elif defined(SH64)
 	if (upeek(tcp, REG_PC ,&pc) < 0)
 		return -1;
-#endif
+# endif
 	return pc;
 #endif /* LINUX */
 
@@ -1223,7 +1223,7 @@ struct tcb *tcp;
 	return regs.r_eip;
 #endif /* FREEBSD */
 }
-#endif
+#endif /* 0 */
 
 void
 printcall(tcp)
@@ -1234,7 +1234,7 @@ struct tcb *tcp;
 			   NULL /* crash */)
 
 #ifdef LINUX
-#ifdef I386
+# ifdef I386
 	long eip;
 
 	if (upeek(tcp, 4*EIP, &eip) < 0) {
@@ -1243,19 +1243,19 @@ struct tcb *tcp;
 	}
 	tprintf("[%08lx] ", eip);
 
-#elif defined(S390) || defined(S390X)
+# elif defined(S390) || defined(S390X)
 	long psw;
 	if(upeek(tcp,PT_PSWADDR,&psw) < 0) {
 		PRINTBADPC;
 		return;
 	}
-#ifdef S390
+#  ifdef S390
 	tprintf("[%08lx] ", psw);
-#elif S390X
+#  elif S390X
 	tprintf("[%16lx] ", psw);
-#endif
+#  endif
 
-#elif defined(X86_64)
+# elif defined(X86_64)
 	long rip;
 
 	if (upeek(tcp, 8*RIP, &rip) < 0) {
@@ -1263,7 +1263,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%16lx] ", rip);
-#elif defined(IA64)
+# elif defined(IA64)
 	long ip;
 
 	if (upeek(tcp, PT_B0, &ip) < 0) {
@@ -1271,7 +1271,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", ip);
-#elif defined(POWERPC)
+# elif defined(POWERPC)
 	long pc;
 
 	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
@@ -1279,7 +1279,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(M68K)
+# elif defined(M68K)
 	long pc;
 
 	if (upeek(tcp, 4*PT_PC, &pc) < 0) {
@@ -1287,7 +1287,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(ALPHA)
+# elif defined(ALPHA)
 	long pc;
 
 	if (upeek(tcp, REG_PC, &pc) < 0) {
@@ -1295,14 +1295,14 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(SPARC) || defined(SPARC64)
+# elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0) {
 		PRINTBADPC;
 		return;
 	}
 	tprintf("[%08lx] ", regs.r_pc);
-#elif defined(HPPA)
+# elif defined(HPPA)
 	long pc;
 
 	if(upeek(tcp,PT_IAOQ0,&pc) < 0) {
@@ -1310,7 +1310,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(MIPS)
+# elif defined(MIPS)
 	long pc;
 
 	if (upeek(tcp, REG_EPC, &pc) < 0) {
@@ -1318,7 +1318,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(SH)
+# elif defined(SH)
 	long pc;
 
 	if (upeek(tcp, 4*REG_PC, &pc) < 0) {
@@ -1326,7 +1326,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(SH64)
+# elif defined(SH64)
 	long pc;
 
 	if (upeek(tcp, REG_PC, &pc) < 0) {
@@ -1334,7 +1334,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(ARM)
+# elif defined(ARM)
 	long pc;
 
 	if (upeek(tcp, 4*15, &pc) < 0) {
@@ -1342,7 +1342,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(BFIN)
+# elif defined(BFIN)
 	long pc;
 
 	if (upeek(tcp, PT_PC, &pc) < 0) {
@@ -1350,7 +1350,7 @@ struct tcb *tcp;
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#endif /* !architecture */
+# endif /* architecture */
 #endif /* LINUX */
 
 #ifdef SUNOS4
@@ -1376,32 +1376,37 @@ struct tcb *tcp;
 #endif /* FREEBSD */
 }
 
+
+/*
+ * These #if's are huge, please indent them correctly.
+ * It's easy to get confused otherwise.
+ */
 #ifndef USE_PROCFS
 
-#if defined LINUX
+# if defined LINUX
 
-#include "syscall.h"
+#  include "syscall.h"
 
-#include <sys/syscall.h>
-#ifndef CLONE_PTRACE
-# define CLONE_PTRACE    0x00002000
-#endif
-#ifndef CLONE_VFORK
-# define CLONE_VFORK     0x00004000
-#endif
-#ifndef CLONE_VM
-# define CLONE_VM        0x00000100
-#endif
-#ifndef CLONE_STOPPED
-# define CLONE_STOPPED   0x02000000
-#endif
+#  include <sys/syscall.h>
+#  ifndef CLONE_PTRACE
+#   define CLONE_PTRACE    0x00002000
+#  endif
+#  ifndef CLONE_VFORK
+#   define CLONE_VFORK     0x00004000
+#  endif
+#  ifndef CLONE_VM
+#   define CLONE_VM        0x00000100
+#  endif
+#  ifndef CLONE_STOPPED
+#   define CLONE_STOPPED   0x02000000
+#  endif
 
-#ifdef IA64
+#  ifdef IA64
 
 /* We don't have fork()/vfork() syscalls on ia64 itself, but the ia32
    subsystem has them for x86... */
-#define SYS_fork	2
-#define SYS_vfork	190
+#   define SYS_fork	2
+#   define SYS_vfork	190
 
 typedef unsigned long *arg_setup_state;
 
@@ -1430,9 +1435,9 @@ arg_setup(struct tcb *tcp, arg_setup_state *state)
 	return 0;
 }
 
-# define arg_finish_change(tcp, state)	0
+#   define arg_finish_change(tcp, state)	0
 
-#ifdef SYS_fork
+#   ifdef SYS_fork
 static int
 get_arg0 (struct tcb *tcp, arg_setup_state *state, long *valp)
 {
@@ -1460,7 +1465,7 @@ get_arg1 (struct tcb *tcp, arg_setup_state *state, long *valp)
 			      sizeof(long), (void *) valp);
 	return ret;
 }
-#endif
+#   endif
 
 static int
 set_arg0 (struct tcb *tcp, arg_setup_state *state, long val)
@@ -1497,74 +1502,74 @@ set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
 /* ia64 does not return the input arguments from functions (and syscalls)
    according to ia64 RSE (Register Stack Engine) behavior.  */
 
-# define restore_arg0(tcp, state, val) ((void) (state), 0)
-# define restore_arg1(tcp, state, val) ((void) (state), 0)
+#   define restore_arg0(tcp, state, val) ((void) (state), 0)
+#   define restore_arg1(tcp, state, val) ((void) (state), 0)
 
-#elif defined (SPARC) || defined (SPARC64)
+#  elif defined (SPARC) || defined (SPARC64)
 
 typedef struct regs arg_setup_state;
 
-# define arg_setup(tcp, state) \
-  (ptrace (PTRACE_GETREGS, tcp->pid, (char *) (state), 0))
-# define arg_finish_change(tcp, state) \
-  (ptrace (PTRACE_SETREGS, tcp->pid, (char *) (state), 0))
+#   define arg_setup(tcp, state) \
+    (ptrace (PTRACE_GETREGS, tcp->pid, (char *) (state), 0))
+#   define arg_finish_change(tcp, state) \
+    (ptrace (PTRACE_SETREGS, tcp->pid, (char *) (state), 0))
 
-# define get_arg0(tcp, state, valp) (*(valp) = (state)->r_o0, 0)
-# define get_arg1(tcp, state, valp) (*(valp) = (state)->r_o1, 0)
-# define set_arg0(tcp, state, val) ((state)->r_o0 = (val), 0)
-# define set_arg1(tcp, state, val) ((state)->r_o1 = (val), 0)
-# define restore_arg0(tcp, state, val) 0
+#   define get_arg0(tcp, state, valp) (*(valp) = (state)->r_o0, 0)
+#   define get_arg1(tcp, state, valp) (*(valp) = (state)->r_o1, 0)
+#   define set_arg0(tcp, state, val) ((state)->r_o0 = (val), 0)
+#   define set_arg1(tcp, state, val) ((state)->r_o1 = (val), 0)
+#   define restore_arg0(tcp, state, val) 0
 
-#else
+#  else /* other architectures */
 
-# if defined S390 || defined S390X
+#   if defined S390 || defined S390X
 /* Note: this is only true for the `clone' system call, which handles
    arguments specially.  We could as well say that its first two arguments
    are swapped relative to other architectures, but that would just be
    another #ifdef in the calls.  */
-#  define arg0_offset	PT_GPR3
-#  define arg1_offset	PT_ORIGGPR2
-#  define restore_arg0(tcp, state, val) ((void) (state), 0)
-#  define restore_arg1(tcp, state, val) ((void) (state), 0)
-#  define arg0_index	1
-#  define arg1_index	0
-# elif defined (ALPHA) || defined (MIPS)
-#  define arg0_offset	REG_A0
-#  define arg1_offset	(REG_A0+1)
-# elif defined (POWERPC)
-#  define arg0_offset	(sizeof(unsigned long)*PT_R3)
-#  define arg1_offset	(sizeof(unsigned long)*PT_R4)
-#  define restore_arg0(tcp, state, val) ((void) (state), 0)
-# elif defined (HPPA)
-#  define arg0_offset	 PT_GR26
-#  define arg1_offset	 (PT_GR26-4)
-# elif defined (X86_64)
-#  define arg0_offset	((long)(8*(current_personality ? RBX : RDI)))
-#  define arg1_offset	((long)(8*(current_personality ? RCX : RSI)))
-# elif defined (SH)
-#  define arg0_offset	(4*(REG_REG0+4))
-#  define arg1_offset	(4*(REG_REG0+5))
-# elif defined (SH64)
-   /* ABI defines arg0 & 1 in r2 & r3 */
-#  define arg0_offset   (REG_OFFSET+16)
-#  define arg1_offset   (REG_OFFSET+24)
-#  define restore_arg0(tcp, state, val) 0
-# else
-#  define arg0_offset	0
-#  define arg1_offset	4
-#  if defined ARM
-#   define restore_arg0(tcp, state, val) 0
-#  endif
-# endif
+#    define arg0_offset	PT_GPR3
+#    define arg1_offset	PT_ORIGGPR2
+#    define restore_arg0(tcp, state, val) ((void) (state), 0)
+#    define restore_arg1(tcp, state, val) ((void) (state), 0)
+#    define arg0_index	1
+#    define arg1_index	0
+#   elif defined (ALPHA) || defined (MIPS)
+#    define arg0_offset	REG_A0
+#    define arg1_offset	(REG_A0+1)
+#   elif defined (POWERPC)
+#    define arg0_offset	(sizeof(unsigned long)*PT_R3)
+#    define arg1_offset	(sizeof(unsigned long)*PT_R4)
+#    define restore_arg0(tcp, state, val) ((void) (state), 0)
+#   elif defined (HPPA)
+#    define arg0_offset	 PT_GR26
+#    define arg1_offset	 (PT_GR26-4)
+#   elif defined (X86_64)
+#    define arg0_offset	((long)(8*(current_personality ? RBX : RDI)))
+#    define arg1_offset	((long)(8*(current_personality ? RCX : RSI)))
+#   elif defined (SH)
+#    define arg0_offset	(4*(REG_REG0+4))
+#    define arg1_offset	(4*(REG_REG0+5))
+#   elif defined (SH64)
+    /* ABI defines arg0 & 1 in r2 & r3 */
+#    define arg0_offset   (REG_OFFSET+16)
+#    define arg1_offset   (REG_OFFSET+24)
+#    define restore_arg0(tcp, state, val) 0
+#   else
+#    define arg0_offset	0
+#    define arg1_offset	4
+#    if defined ARM
+#     define restore_arg0(tcp, state, val) 0
+#    endif
+#   endif
 
 typedef int arg_setup_state;
 
-# define arg_setup(tcp, state) (0)
-# define arg_finish_change(tcp, state)	0
-# define get_arg0(tcp, cookie, valp) \
-  (upeek ((tcp), arg0_offset, (valp)))
-# define get_arg1(tcp, cookie, valp) \
-  (upeek ((tcp), arg1_offset, (valp)))
+#   define arg_setup(tcp, state) (0)
+#   define arg_finish_change(tcp, state)	0
+#   define get_arg0(tcp, cookie, valp) \
+    (upeek ((tcp), arg0_offset, (valp)))
+#   define get_arg1(tcp, cookie, valp) \
+    (upeek ((tcp), arg1_offset, (valp)))
 
 static int
 set_arg0 (struct tcb *tcp, void *cookie, long val)
@@ -1578,19 +1583,19 @@ set_arg1 (struct tcb *tcp, void *cookie, long val)
 	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg1_offset, val);
 }
 
-#endif
+#  endif /* architectures */
 
-#ifndef restore_arg0
-# define restore_arg0(tcp, state, val) set_arg0((tcp), (state), (val))
-#endif
-#ifndef restore_arg1
-# define restore_arg1(tcp, state, val) set_arg1((tcp), (state), (val))
-#endif
+#  ifndef restore_arg0
+#   define restore_arg0(tcp, state, val) set_arg0((tcp), (state), (val))
+#  endif
+#  ifndef restore_arg1
+#   define restore_arg1(tcp, state, val) set_arg1((tcp), (state), (val))
+#  endif
 
-#ifndef arg0_index
-# define arg0_index 0
-# define arg1_index 1
-#endif
+#  ifndef arg0_index
+#   define arg0_index 0
+#   define arg1_index 1
+#  endif
 
 int
 setbpt(struct tcb *tcp)
@@ -1618,13 +1623,13 @@ setbpt(struct tcb *tcp)
 	}
 
 	switch (known_scno(tcp)) {
-#ifdef SYS_vfork
+#  ifdef SYS_vfork
 	case SYS_vfork:
-#endif
-#ifdef SYS_fork
+#  endif
+#  ifdef SYS_fork
 	case SYS_fork:
-#endif
-#if defined SYS_fork || defined SYS_vfork
+#  endif
+#  if defined SYS_fork || defined SYS_vfork
 		if (arg_setup (tcp, &state) < 0
 		    || get_arg0 (tcp, &state, &tcp->inst[0]) < 0
 		    || get_arg1 (tcp, &state, &tcp->inst[1]) < 0
@@ -1637,12 +1642,12 @@ setbpt(struct tcb *tcp)
 		tcp->u_arg[arg1_index] = 0;
 		tcp->flags |= TCB_BPTSET;
 		return 0;
-#endif
+#  endif
 
 	case SYS_clone:
-#ifdef SYS_clone2
+#  ifdef SYS_clone2
 	case SYS_clone2:
-#endif
+#  endif
 		/* ia64 calls directly `clone (CLONE_VFORK | CLONE_VM)'
 		   contrary to x86 SYS_vfork above.  Even on x86 we turn the
 		   vfork semantics into plain fork - each application must not
@@ -1686,20 +1691,20 @@ struct tcb *tcp;
 	return 0;
 }
 
-#else
+# else /* !defined LINUX */
 
 int
 setbpt(tcp)
 struct tcb *tcp;
 {
-
-#ifdef LINUX
-#if defined (SPARC) || defined (SPARC64)
+#  ifdef LINUX
+	DEAD CODE HERE? WE ARE IN 'else !defined LINUX'
+#   if defined (SPARC) || defined (SPARC64)
 	/* We simply use the SunOS breakpoint code. */
 
 	struct regs regs;
 	unsigned long inst;
-#define LOOPA	0x30800000	/* ba,a	0 */
+#    define LOOPA	0x30800000	/* ba,a	0 */
 
 	if (tcp->flags & TCB_BPTSET) {
 		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
@@ -1724,15 +1729,15 @@ struct tcb *tcp;
 	 * die with a core dump.
 	 * Thus, we are force our way in by taking out two instructions
 	 * and insert an eternal loop instead, in expectance of the SIGSTOP
-	 * generated by out PTRACE_ATTACH.
+	 * generated by our PTRACE_ATTACH.
 	 * Of cause, if we evaporate ourselves in the middle of all this...
 	 */
 	errno = 0;
 	inst = LOOPA;
-#if defined (SPARC64)
+#    if defined (SPARC64)
 	inst <<= 32;
 	inst |= (tcp->inst[0] & 0xffffffffUL);
-#endif
+#    endif
 	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, inst);
 	if(errno) {
 		perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
@@ -1740,8 +1745,8 @@ struct tcb *tcp;
 	}
 	tcp->flags |= TCB_BPTSET;
 
-#else /* !SPARC && !SPARC64 */
-#ifdef IA64
+#   else /* !SPARC && !SPARC64 */
+#    ifdef IA64
 	if (ia32) {
 #		define LOOP	0x0000feeb
 		if (tcp->flags & TCB_BPTSET) {
@@ -1777,8 +1782,8 @@ struct tcb *tcp;
 		 * This ensures that the newly forked child will loop
 		 * endlessly until we've got a chance to attach to it.
 		 */
-#		define LOOP0	0x0000100000000017
-#		define LOOP1	0x4000000000200000
+# 			define LOOP0	0x0000100000000017
+# 			define LOOP1	0x4000000000200000
 		unsigned long addr, ipsr;
 		pid_t pid;
 
@@ -1809,71 +1814,71 @@ struct tcb *tcp;
 		}
 		tcp->flags |= TCB_BPTSET;
 	}
-#else /* !IA64 */
+#    else /* !IA64 */
 
-#if defined (I386) || defined(X86_64)
-#define LOOP	0x0000feeb
-#elif defined (M68K)
-#define LOOP	0x60fe0000
-#elif defined (ALPHA)
-#define LOOP	0xc3ffffff
-#elif defined (POWERPC)
-#define LOOP	0x48000000
-#elif defined(ARM)
-#define LOOP	0xEAFFFFFE
-#elif defined(MIPS)
-#define LOOP	0x1000ffff
-#elif defined(S390)
-#define LOOP	0xa7f40000	/* BRC 15,0 */
-#elif defined(S390X)
-#define LOOP   0xa7f4000000000000UL /* BRC 15,0 */
-#elif defined(HPPA)
-#define LOOP	0xe81f1ff7	/* b,l,n <loc>,r0 */
-#elif defined(SH)
-#ifdef __LITTLE_ENDIAN__
-#define LOOP   0x0000affe
-#else
-#define LOOP   0xfeaf0000
-#endif
-#else
-#error unknown architecture
-#endif
+#     if defined (I386) || defined(X86_64)
+#      define LOOP	0x0000feeb
+#     elif defined (M68K)
+#      define LOOP	0x60fe0000
+#     elif defined (ALPHA)
+#      define LOOP	0xc3ffffff
+#     elif defined (POWERPC)
+#      define LOOP	0x48000000
+#     elif defined(ARM)
+#      define LOOP	0xEAFFFFFE
+#     elif defined(MIPS)
+#      define LOOP	0x1000ffff
+#     elif defined(S390)
+#      define LOOP	0xa7f40000	/* BRC 15,0 */
+#     elif defined(S390X)
+#      define LOOP   0xa7f4000000000000UL /* BRC 15,0 */
+#     elif defined(HPPA)
+#      define LOOP	0xe81f1ff7	/* b,l,n <loc>,r0 */
+#     elif defined(SH)
+#      ifdef __LITTLE_ENDIAN__
+#       define LOOP   0x0000affe
+#      else
+#       define LOOP   0xfeaf0000
+#      endif
+#     else
+#      error unknown architecture
+#     endif
 
 	if (tcp->flags & TCB_BPTSET) {
 		fprintf(stderr, "PANIC: bpt already set in pid %u\n", tcp->pid);
 		return -1;
 	}
-#if defined (I386)
+#     if defined (I386)
 	if (upeek(tcp, 4*EIP, &tcp->baddr) < 0)
 		return -1;
-#elif defined (X86_64)
+#     elif defined (X86_64)
 	if (upeek(tcp, 8*RIP, &tcp->baddr) < 0)
 		return -1;
-#elif defined (M68K)
+#     elif defined (M68K)
 	if (upeek(tcp, 4*PT_PC, &tcp->baddr) < 0)
 	  return -1;
-#elif defined (ALPHA)
+#     elif defined (ALPHA)
 	return -1;
-#elif defined (ARM)
+#     elif defined (ARM)
 	return -1;
-#elif defined (MIPS)
+#     elif defined (MIPS)
 	return -1;		/* FIXME: I do not know what i do - Flo */
-#elif defined (POWERPC)
+#     elif defined (POWERPC)
 	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &tcp->baddr) < 0)
 		return -1;
-#elif defined(S390) || defined(S390X)
+#     elif defined(S390) || defined(S390X)
 	if (upeek(tcp,PT_PSWADDR, &tcp->baddr) < 0)
 		return -1;
-#elif defined(HPPA)
+#     elif defined(HPPA)
 	if (upeek(tcp, PT_IAOQ0, &tcp->baddr) < 0)
 		return -1;
 	tcp->baddr &= ~0x03;
-#elif defined(SH)
+#     elif defined(SH)
 	if (upeek(tcp, 4*REG_PC, &tcp->baddr) < 0)
 		return -1;
-#else
-#error unknown architecture
-#endif
+#     else
+#      error unknown architecture
+#     endif
 	if (debug)
 		fprintf(stderr, "[%d] setting bpt at %lx\n", tcp->pid, tcp->baddr);
 	tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *) tcp->baddr, 0);
@@ -1888,23 +1893,23 @@ struct tcb *tcp;
 	}
 	tcp->flags |= TCB_BPTSET;
 
-#endif /* !IA64 */
-#endif /* SPARC || SPARC64 */
-#endif /* LINUX */
+#    endif /* !IA64 */
+#   endif /* !SPARC && !SPARC64 */
+#  endif /* LINUX */
 
-#ifdef SUNOS4
-#ifdef SPARC	/* This code is slightly sparc specific */
+#  ifdef SUNOS4
+#   ifdef SPARC	/* This code is slightly sparc specific */
 
 	struct regs regs;
-#define BPT	0x91d02001	/* ta	1 */
-#define LOOP	0x10800000	/* ba	0 */
-#define LOOPA	0x30800000	/* ba,a	0 */
-#define NOP	0x01000000
-#if LOOPA
+#    define BPT	0x91d02001	/* ta	1 */
+#    define LOOP	0x10800000	/* ba	0 */
+#    define LOOPA	0x30800000	/* ba,a	0 */
+#    define NOP	0x01000000
+#    if LOOPA
 	static int loopdeloop[1] = {LOOPA};
-#else
+#    else
 	static int loopdeloop[2] = {LOOP, NOP};
-#endif
+#    endif
 
 	if (tcp->flags & TCB_BPTSET) {
 		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
@@ -1938,8 +1943,8 @@ struct tcb *tcp;
 	}
 	tcp->flags |= TCB_BPTSET;
 
-#endif /* SPARC */
-#endif /* SUNOS4 */
+#   endif /* SPARC */
+#  endif /* SUNOS4 */
 
 	return 0;
 }
@@ -1949,22 +1954,23 @@ clearbpt(tcp)
 struct tcb *tcp;
 {
 
-#ifdef LINUX
-#if defined(I386) || defined(X86_64)
+#  ifdef LINUX
+	DEAD CODE HERE? WE ARE IN 'else !defined LINUX'
+#   if defined(I386) || defined(X86_64)
 	long eip;
-#elif defined(POWERPC)
+#   elif defined(POWERPC)
 	long pc;
-#elif defined(M68K)
+#   elif defined(M68K)
 	long pc;
-#elif defined(ALPHA)
+#   elif defined(ALPHA)
 	long pc;
-#elif defined(HPPA)
+#   elif defined(HPPA)
 	long iaoq;
-#elif defined(SH)
+#   elif defined(SH)
 	long pc;
-#endif /* architecture */
+#   endif /* architecture */
 
-#if defined (SPARC) || defined (SPARC64)
+#   if defined (SPARC) || defined (SPARC64)
 	/* Again, we borrow the SunOS breakpoint code. */
 	if (!(tcp->flags & TCB_BPTSET)) {
 		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
@@ -1977,7 +1983,7 @@ struct tcb *tcp;
 		return -1;
 	}
 	tcp->flags &= ~TCB_BPTSET;
-#elif defined(IA64)
+#   elif defined(IA64)
 	if (ia32) {
 		unsigned long addr;
 
@@ -2044,7 +2050,7 @@ struct tcb *tcp;
 			return 0;
 		}
 	}
-#else /* !IA64  && !SPARC && !SPARC64 */
+#   else /* !IA64 && !SPARC && !SPARC64 */
 
 	if (debug)
 		fprintf(stderr, "[%d] clearing bpt\n", tcp->pid);
@@ -2060,7 +2066,7 @@ struct tcb *tcp;
 	}
 	tcp->flags &= ~TCB_BPTSET;
 
-#ifdef I386
+#    ifdef I386
 	if (upeek(tcp, 4*EIP, &eip) < 0)
 		return -1;
 	if (eip != tcp->baddr) {
@@ -2071,7 +2077,7 @@ struct tcb *tcp;
 					eip, tcp->baddr);
 		return 0;
 	}
-#elif defined(X86_64)
+#    elif defined(X86_64)
 	if (upeek(tcp, 8*RIP, &eip) < 0)
 		return -1;
 	if (eip != tcp->baddr) {
@@ -2082,7 +2088,7 @@ struct tcb *tcp;
 					eip, tcp->baddr);
 		return 0;
 	}
-#elif defined(POWERPC)
+#    elif defined(POWERPC)
 	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
@@ -2092,7 +2098,7 @@ struct tcb *tcp;
 				pc, tcp->baddr);
 		return 0;
 	}
-#elif defined(M68K)
+#    elif defined(M68K)
 	if (upeek(tcp, 4*PT_PC, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
@@ -2102,7 +2108,7 @@ struct tcb *tcp;
 				pc, tcp->baddr);
 		return 0;
 	}
-#elif defined(ALPHA)
+#    elif defined(ALPHA)
 	if (upeek(tcp, REG_PC, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
@@ -2112,7 +2118,7 @@ struct tcb *tcp;
 				pc, tcp->baddr);
 		return 0;
 	}
-#elif defined(HPPA)
+#    elif defined(HPPA)
 	if (upeek(tcp, PT_IAOQ0, &iaoq) < 0)
 		return -1;
 	iaoq &= ~0x03;
@@ -2130,7 +2136,7 @@ struct tcb *tcp;
 	 */
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ0, iaoq);
 	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ1, iaoq);
-#elif defined(SH)
+#    elif defined(SH)
 	if (upeek(tcp, 4*REG_PC, &pc) < 0)
 		return -1;
 	if (pc != tcp->baddr) {
@@ -2141,16 +2147,16 @@ struct tcb *tcp;
 		return 0;
 	}
 
-#endif /* arch */
-#endif /* !SPARC && !SPARC64 && !IA64 */
-#endif /* LINUX */
+#    endif /* arch */
+#   endif /* !SPARC && !SPARC64 && !IA64 */
+#  endif /* LINUX */
 
-#ifdef SUNOS4
-#ifdef SPARC
+#  ifdef SUNOS4
+#   ifdef SPARC
 
-#if !LOOPA
+#    if !LOOPA
 	struct regs regs;
-#endif
+#    endif
 
 	if (!(tcp->flags & TCB_BPTSET)) {
 		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
@@ -2163,10 +2169,10 @@ struct tcb *tcp;
 	}
 	tcp->flags &= ~TCB_BPTSET;
 
-#if !LOOPA
+#    if !LOOPA
 	/*
 	 * Since we don't have a single instruction breakpoint, we may have
-	 * to adjust the program counter after removing the our `breakpoint'.
+	 * to adjust the program counter after removing our `breakpoint'.
 	 */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
 		perror("clearbpt: ptrace(PTRACE_GETREGS, ...)");
@@ -2178,7 +2184,7 @@ struct tcb *tcp;
 		if (debug)
 			fprintf(stderr,
 				"NOTE: PC not at bpt (pc %#x baddr %#x)\n",
-					regs.r_pc, tcp->parent->baddr);
+					regs.r_pc, tcp->baddr);
 		return 0;
 	}
 	if (regs.r_pc != tcp->baddr)
@@ -2191,16 +2197,17 @@ struct tcb *tcp;
 		perror("clearbpt: ptrace(PTRACE_SETREGS, ...)");
 		return -1;
 	}
-#endif /* LOOPA */
-#endif /* SPARC */
-#endif /* SUNOS4 */
+#    endif /* LOOPA */
+#   endif /* SPARC */
+#  endif /* SUNOS4 */
 
 	return 0;
 }
 
-#endif
+# endif /* !defined LINUX */
 
 #endif /* !USE_PROCFS */
+
 
 #ifdef SUNOS4
 
@@ -2262,13 +2269,13 @@ struct tcb *tcp;
 					(int)ld.ld_symb_size, strtab) < 0)
 		goto err;
 
-#if 0
+# if 0
 	for (cp = strtab; cp < strtab + ld.ld_symb_size; ) {
 		fprintf(stderr, "[symbol: %s]\n", cp);
 		cp += strlen(cp)+1;
 	}
 	return 0;
-#endif
+# endif
 	for (cp = strtab; cp < strtab + ld.ld_symb_size; ) {
 		if (strcmp(cp, "_vfork") == 0) {
 			if (debug)

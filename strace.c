@@ -1498,10 +1498,10 @@ resume_from_tcp (struct tcb *tcp)
 				}
 			}
 	}
+#endif
 
 	return error;
 }
-#endif
 
 #endif /* !USE_PROCFS */
 

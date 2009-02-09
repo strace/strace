@@ -353,8 +353,7 @@ struct tcb {
 #define TCB_INSYSCALL	00004	/* A system call is in progress */
 #define TCB_ATTACHED	00010	/* Process is not our own child */
 #define TCB_EXITING	00020	/* As far as we know, this process is exiting */
-#define TCB_SUSPENDED	00040	/* Process has done a wait(4), that can
-				   not be allowed to complete just now */
+#define TCB_SUSPENDED	00040	/* Process can not be allowed to resume just now */
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
