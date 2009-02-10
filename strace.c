@@ -440,7 +440,7 @@ startup_attach(void)
 						++nerr;
 					else if (tid != tcbtab[tcbi]->pid) {
 						tcp = alloctcb(tid);
-						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
+						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED;
 						tcbtab[tcbi]->nchildren++;
 						tcbtab[tcbi]->nclone_threads++;
 						tcbtab[tcbi]->nclone_detached++;
@@ -2392,12 +2392,12 @@ Process %d attached (waiting for parent)\n",
 			}
 		}
 
-		if (cflag) {
 #ifdef LINUX
+		if (cflag) {
 			tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
 			tcp->stime = ru.ru_stime;
-#endif
 		}
+#endif
 		if (tcp->flags & TCB_SUSPENDED) {
 			/*
 			 * Apparently, doing any ptrace() call on a stopped
@@ -2533,7 +2533,7 @@ handle_stopped_tcbs(struct tcb *tcp)
 		/*
 		 * Interestingly, the process may stop
 		 * with STOPSIG equal to some other signal
-		 * than SIGSTOP if we happend to attach
+		 * than SIGSTOP if we happen to attach
 		 * just before the process takes a signal.
 		 */
 		if ((tcp->flags & TCB_STARTUP) && WSTOPSIG(status) == SIGSTOP) {

@@ -1,3 +1,14 @@
+2009-02-10  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Cleanup after tcb table expansion simplification.
+	There was code which was trying to continue tracing
+	even if table expansion fails. Now we treat it as fatal
+	failure, so this code is removed by this change.
+	* defs.h: Delete TCB_FOLLOWFORK constant.
+	* process.c: Delete fork_tcb() and all calls of it.
+	* strace.c (startup_attach): Remove usage of TCB_FOLLOWFORK.
+	* syscall.c: Indent preprocessor directives.
+
 2009-02-09  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* defs.h: Correct the comment about TCB_SUSPENDED.

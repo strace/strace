@@ -38,38 +38,39 @@
 #include <signal.h>
 #include <time.h>
 #include <errno.h>
+#include <sched.h>
 #include <sys/user.h>
 #include <sys/syscall.h>
 #include <sys/param.h>
 
 #if HAVE_ASM_REG_H
-#if defined (SPARC) || defined (SPARC64)
+# if defined (SPARC) || defined (SPARC64)
 #  define fpq kernel_fpq
 #  define fq kernel_fq
 #  define fpu kernel_fpu
-#endif
-#include <asm/reg.h>
-#if defined (SPARC) || defined (SPARC64)
+# endif
+# include <asm/reg.h>
+# if defined (SPARC) || defined (SPARC64)
 #  undef fpq
 #  undef fq
 #  undef fpu
-#endif
+# endif
 #endif
 
 #ifdef HAVE_SYS_REG_H
-#include <sys/reg.h>
-#ifndef PTRACE_PEEKUSR
-# define PTRACE_PEEKUSR PTRACE_PEEKUSER
-#endif
+# include <sys/reg.h>
+# ifndef PTRACE_PEEKUSR
+#  define PTRACE_PEEKUSR PTRACE_PEEKUSER
+# endif
 #elif defined(HAVE_LINUX_PTRACE_H)
-#undef PTRACE_SYSCALL
+# undef PTRACE_SYSCALL
 # ifdef HAVE_STRUCT_IA64_FPREG
 #  define ia64_fpreg XXX_ia64_fpreg
 # endif
 # ifdef HAVE_STRUCT_PT_ALL_USER_REGS
 #  define pt_all_user_regs XXX_pt_all_user_regs
 # endif
-#include <linux/ptrace.h>
+# include <linux/ptrace.h>
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif

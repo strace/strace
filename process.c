@@ -484,18 +484,6 @@ struct tcb *tcp;
 	return 0;
 }
 
-/* TCP is creating a child we want to follow.
-   If there will be space in tcbtab for it, set TCB_FOLLOWFORK and return 0.
-   If not, clear TCB_FOLLOWFORK, print an error, and return 1.  */
-static void
-fork_tcb(struct tcb *tcp)
-{
-	if (nprocs == tcbtabsize)
-		expand_tcbtab();
-
-	tcp->flags |= TCB_FOLLOWFORK;
-}
-
 #ifdef USE_PROCFS
 
 int
@@ -545,7 +533,6 @@ struct tcb *tcp;
 			return 0;
 		if (!followfork)
 			return 0;
-		fork_tcb(tcp);
 		if (syserror(tcp))
 			return 0;
 		tcpchild = alloctcb(tcp->u_rval);
@@ -882,17 +869,13 @@ internal_clone(struct tcb *tcp)
 	struct tcb *tcpchild;
 	int pid, bpt;
 
+	if (!followfork)
+		return 0;
 	if (entering(tcp)) {
-		if (!followfork)
-			return 0;
-		fork_tcb(tcp);
 		setbpt(tcp);
 		return 0;
 	} else {
 		bpt = tcp->flags & TCB_BPTSET;
-
-		if (!(tcp->flags & TCB_FOLLOWFORK))
-			return 0;
 
 		if (syserror(tcp)) {
 			if (bpt)
@@ -901,7 +884,7 @@ internal_clone(struct tcb *tcp)
 		}
 
 		pid = tcp->u_rval;
-		/* Should not happen, but bugs often cause bogus value here */
+		/* Should not happen, but bugs often cause bogus value here. */
 		if (pid <= 1
 		 || (sizeof(pid) != sizeof(tcp->u_rval) && pid != tcp->u_rval)
 		) {
@@ -926,7 +909,6 @@ internal_clone(struct tcb *tcp)
 		else
 #endif
 		{
-			fork_tcb(tcp);
 			tcpchild = alloctcb(pid);
 		}
 
@@ -1028,27 +1010,25 @@ struct tcb *tcp;
 
 	struct tcb *tcpchild;
 	int pid;
-	int dont_follow = 0;
+	int follow = 1;
 
 #ifdef SYS_vfork
 	if (known_scno(tcp) == SYS_vfork) {
 		/* Attempt to make vfork into fork, which we can follow. */
 		if (change_syscall(tcp, SYS_fork) < 0)
-			dont_follow = 1;
+			follow = 0;
 	}
 #endif
+	if (!followfork || !follow)
+		return 0;
+
 	if (entering(tcp)) {
-		if (!followfork || dont_follow)
-			return 0;
-		fork_tcb(tcp);
 		if (setbpt(tcp) < 0)
 			return 0;
   	}
 	else {
 		int bpt = tcp->flags & TCB_BPTSET;
 
-		if (!(tcp->flags & TCB_FOLLOWFORK))
-			return 0;
 		if (bpt)
 			clearbpt(tcp);
 
@@ -1056,7 +1036,6 @@ struct tcb *tcp;
 			return 0;
 
 		pid = tcp->u_rval;
-		fork_tcb(tcp);
 		tcpchild = alloctcb(pid);
 #ifdef LINUX
 #ifdef HPPA
