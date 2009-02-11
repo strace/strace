@@ -133,7 +133,7 @@ struct sigcontext_struct {
 	unsigned long cr2;
 };
 #else /* !I386 */
-#ifdef M68K
+#if defined M68K && !defined HAVE_STRUCT_SIGCONTEXT
 struct sigcontext
 {
 	unsigned long sc_mask;
