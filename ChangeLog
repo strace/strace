@@ -1,3 +1,10 @@
+2009-02-10  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Check for struct sigcontext.
+	* signal.c [LINUX] [M68K] (struct sigcontext): Don't define it if
+	[HAVE_STRUCT_SIGCONTEXT].
+	From Muttley Meen <muttley.meen@gmail.com>.
+
 2009-02-10  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Cleanup after tcb table expansion simplification.
