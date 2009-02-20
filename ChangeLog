@@ -1,10 +1,16 @@
 2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Patch by Mike Frysinger (vapier AT gentoo.org).
+	* linux/errnoent.h: Make ERRNO_58 show EDEADLOCK for POWERPC.
+	* Makefile.am: Remove reference to linux/powerpc/errnoent.h.
+	* linux/powerpc/errnoent.h: Remove, we can use common errnoent.h now.
+
+2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Patch by Mike Frysinger (vapier AT gentoo.org).
 	Removing redundant errnoent.h files.
-	* Makefile.am: Remove references to linux/ia64/errnoent.h,
 	linux/s390/errnoent.h, linux/s390x/errnoent.h and linux/sh/errnoent.h.
-	* linux/ia64/errnoent.h: Remove, this arch uses common errnoent.h
+	* linux/ia64/errnoent.h: Remove, this arch uses common errnoent.h.
 	* linux/s390/errnoent.h: Ditto.
 	* linux/s390x/errnoent.h: Ditto.
 	* linux/sh/errnoent.h: Ditto.

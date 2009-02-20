@@ -19,7 +19,7 @@ strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
 noinst_HEADERS = defs.h
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
-     	     debian/changelog debian/control debian/copyright debian/rules \
+	     debian/changelog debian/control debian/copyright debian/rules \
 	     debian/compat debian/strace64.install debian/strace64.manpages \
 	     debian/strace.docs debian/strace.examples debian/strace.install \
 	     debian/strace.manpages debian/strace-udeb.install \
@@ -40,11 +40,11 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/ia64/syscallent.h \
 	     linux/ia64/ioctlent.h linux/ia64/signalent.h \
 	     linux/m68k/syscallent.h \
-     	     linux/mips/ioctlent.sh linux/mips/errnoent.h \
+	     linux/mips/ioctlent.sh linux/mips/errnoent.h \
 	     linux/mips/ioctlent.h linux/mips/signalent.h \
 	     linux/mips/syscallent.h \
 	     linux/powerpc/syscallent.h \
-	     linux/powerpc/errnoent.h linux/powerpc/ioctlent.h \
+	     linux/powerpc/ioctlent.h \
 	     linux/powerpc/signalent.h \
 	     linux/s390/ioctlent.h \
 	     linux/s390/signalent.h linux/s390/syscallent.h \
