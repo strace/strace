@@ -1,5 +1,16 @@
 2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	Further signalent.h cleanup.
+	* linux/ia64/signalent.h: Remove, it is identical to common signalent.h
+	sans "SIGRTnn" definitions which are redundant.
+	* linux/powerpc/signalent.h: Remove, it is identical to common signalent.h
+	sans outdated "SIGUNUSED" which should be "SIGSYS".
+	* linux/s390/signalent.h: Ditto.
+	* linux/s390x/signalent.h: Ditto.
+	* Makefile.am: Remove references to the above files.
+
+2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	Patch by Mike Frysinger (vapier AT gentoo.org).
 	* linux/ioctlent.sh: Update sed machinery to parse _IOC() macros
 	with two constants.
