@@ -1,6 +1,12 @@
 2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Patch by Mike Frysinger (vapier AT gentoo.org).
+	* Makefile.am: Remove reference to linux/sh/signalent.h.
+	* linux/sh/signalent.h: Remove, it is identical to common signalent.h.
+
+2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Patch by Mike Frysinger (vapier AT gentoo.org).
 	* linux/errnoent.h: Make ERRNO_58 show EDEADLOCK for POWERPC.
 	* Makefile.am: Remove reference to linux/powerpc/errnoent.h.
 	* linux/powerpc/errnoent.h: Remove, we can use common errnoent.h now.
