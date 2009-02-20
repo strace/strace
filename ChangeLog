@@ -1,6 +1,12 @@
 2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Patch by Mike Frysinger (vapier AT gentoo.org).
+	* linux/ioctlent.sh: Update sed machinery to parse _IOC() macros
+	with two constants.
+
+2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Patch by Mike Frysinger (vapier AT gentoo.org).
 	* Makefile.am: Remove reference to linux/sh/signalent.h.
 	* linux/sh/signalent.h: Remove, it is identical to common signalent.h.
 
