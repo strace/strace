@@ -37,7 +37,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/bfin/ioctlent.h linux/bfin/syscallent.h \
 	     linux/hppa/errnoent.h linux/hppa/ioctlent.h \
 	     linux/hppa/signalent.h linux/hppa/syscallent.h \
-	     linux/ia64/syscallent.h linux/ia64/errnoent.h \
+	     linux/ia64/syscallent.h \
 	     linux/ia64/ioctlent.h linux/ia64/signalent.h \
 	     linux/m68k/syscallent.h \
      	     linux/mips/ioctlent.sh linux/mips/errnoent.h \
@@ -46,11 +46,11 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/powerpc/syscallent.h \
 	     linux/powerpc/errnoent.h linux/powerpc/ioctlent.h \
 	     linux/powerpc/signalent.h \
-	     linux/s390/errnoent.h linux/s390/ioctlent.h \
+	     linux/s390/ioctlent.h \
 	     linux/s390/signalent.h linux/s390/syscallent.h \
-	     linux/s390x/errnoent.h linux/s390x/ioctlent.h \
+	     linux/s390x/ioctlent.h \
 	     linux/s390x/signalent.h linux/s390x/syscallent.h \
-	     linux/sh/syscallent.h linux/sh/errnoent.h \
+	     linux/sh/syscallent.h \
 	     linux/sh/ioctlent.h linux/sh/signalent.h \
 	     linux/sh64/syscallent.h \
 	     linux/sparc/dummy2.h \

@@ -1,3 +1,14 @@
+2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Patch by Mike Frysinger (vapier AT gentoo.org).
+	Removing redundant errnoent.h files.
+	* Makefile.am: Remove references to linux/ia64/errnoent.h,
+	linux/s390/errnoent.h, linux/s390x/errnoent.h and linux/sh/errnoent.h.
+	* linux/ia64/errnoent.h: Remove, this arch uses common errnoent.h
+	* linux/s390/errnoent.h: Ditto.
+	* linux/s390x/errnoent.h: Ditto.
+	* linux/sh/errnoent.h: Ditto.
+
 2009-02-10  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: Check for struct sigcontext.
