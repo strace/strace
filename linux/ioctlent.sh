@@ -84,7 +84,7 @@ s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_
 bases=$(sed -n \
        -e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Z0-9_]\+\)[[:space:]]*,[[:space:]]*\([A-Z][A-Z0-9_]\+\)[[:space:]+,].*/\1\n\2/p' \
        -e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Z0-9_]\+\)[[:space:]+,].*/\1/p' \
-       ioctls.h | sort | uniq)
+       ioctls.h | sort -u)
 for base in $bases ; do
 	echo "Looking for $base"
 	regexp="^[[:space:]]*#[[:space:]]*define[[:space:]]\+$base"
