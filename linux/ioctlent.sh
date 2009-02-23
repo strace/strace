@@ -51,13 +51,15 @@ lookup_ioctls()
 
 	# Build the list of all ioctls
 	regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+0x'"$type"'..\>'
-	(cd "$dir" ; grep "$regexp" "$@" /dev/null 2>/dev/null ) |
+	(cd "$dir" && grep "$regexp" "$@" /dev/null 2>/dev/null) |
 		sed -ne "s,$asm/,asm/,g"'
 s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x'"$type"'..\).*/	{ "\1",	"\2",	\3	},/p' \
 		>> ioctls.h
 }
 
-: > ioctls.h
+
+> ioctls.h
+
 lookup_ioctls 22 scsi/sg.h
 lookup_ioctls 46 linux/fb.h
 lookup_ioctls 4B linux/kd.h
@@ -68,26 +70,86 @@ lookup_ioctls '7[12]' linux/videotext.h
 lookup_ioctls 89 $asm/sockios.h linux/sockios.h
 lookup_ioctls 8B linux/wireless.h
 
-files="linux/* $asm/* scsi/* sound/*"
+if [ -e $dir/Kbuild ]; then
+	# kernel has exported user space headers, so query only them
+	files=$(
+		cd $dir || exit
+		find . -mindepth 2 -name Kbuild | \
+			sed -e 's:^\./::' -e 's:/Kbuild:/*:' | \
+			grep -v '^asm-'
+		echo "$asm/* asm-generic/*"
+	)
+else
+	# older kernel so just assume some headers
+	files="linux/* $asm/* scsi/* sound/*"
+fi
 
 # Build the list of all ioctls
+# Example output:
+# { "asm/ioctls.h",	"TIOCSWINSZ",	0x5414  },
+# { "asm/mce.h",	"MCE_GETCLEAR_FLAGS",	_IOC(_IOC_NONE,'M',3,0) },
 regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+_S\?\(IO\|IOW\|IOR\|IOWR\)\>'
-(cd $dir ; grep $regexp $files 2>/dev/null ) | \
-	sed -ne "s,$asm/,asm/,g"'
-s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_S\?I.*(\([^[,]*\)[[:space:]]*,[[:space:]]*\([^,)]*\).*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\3,\4,0)	},/p' \
+(cd $dir && grep $regexp $files 2>/dev/null) | \
+	sed -n \
+	-e "s,$asm/,asm/,g" \
+	-e 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_S\?I.*(\([^[,]*\)[[:space:]]*,[[:space:]]*\([^,)]*\).*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\3,\4,0)	},/p' \
 	>> ioctls.h
 
+# Sort and drop dups?
+# sort -u <ioctls.h >ioctls1.h && mv ioctls1.h ioctls.h
+
+
+> ioctldefs.h
+
+# Collect potential ioctl names. ('bases' is a bad name. Sigh)
 # Some use a special base to offset their ioctls on. Extract that as well.
 # Some use 2 defines: _IOC(_IOC_NONE,DM_IOCTL,DM_LIST_DEVICES_CMD,....)
-: > ioctldefs.h
-
 bases=$(sed -n \
        -e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Z0-9_]\+\)[[:space:]]*,[[:space:]]*\([A-Z][A-Z0-9_]\+\)[[:space:]+,].*/\1\n\2/p' \
        -e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Z0-9_]\+\)[[:space:]+,].*/\1/p' \
        ioctls.h | sort -u)
-for base in $bases ; do
+
+for base in $bases; do
 	echo "Looking for $base"
 	regexp="^[[:space:]]*#[[:space:]]*define[[:space:]]\+$base"
-	(cd $dir ; grep -h $regexp 2>/dev/null $files ) | \
-		grep -v '\<_IO' >> ioctldefs.h
+	line=$( (cd $dir && grep -h $regexp 2>/dev/null $files) | grep -v '\<_IO')
+	if [ x"$line" != x ]; then
+		echo "$base is a #define" # "($line)"
+		echo "$line" >> ioctldefs.h
+	fi
+
+	if ! grep "\<$base\>" ioctldefs.h >/dev/null 2>/dev/null; then
+		# Not all ioctl's are defines ... some (like the DM_* stuff)
+		# are enums, so we have to extract that crap ourself
+		(
+		cd $dir || exit
+		# -P: inhibit generation of linemarkers
+		${CPP:-cpp} -P $(grep -l $base $files 2>/dev/null) | sed '/^$/d' | \
+		awk -v base="$base" '{
+			if ($1 == "enum") {
+				val = 0
+				while ($NF != "};") {
+					if (!getline)
+						exit
+					gsub(/,/, "")
+					if ($0 ~ /=/)
+						val = $NF
+					if ($1 == base) {
+						print "#define " base " (" val ")"
+						exit
+					}
+					val++
+				}
+			}
+		}'
+		) >> ioctldefs.h
+		if ! grep "\<$base\>" ioctldefs.h >/dev/null 2>/dev/null; then
+			echo "Can't find the definition for $base"
+		else
+			echo "$base is an enum"
+		fi
+	fi
 done
+
+# Sort and drop dups?
+# sort -u <ioctldefs.h >ioctldefs1.h && mv ioctldefs1.h ioctldefs.h
