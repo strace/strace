@@ -1,3 +1,10 @@
+2009-02-24  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* process.c: Indent preprocessor directives so that nesting
+	can be figured out. Add PTRACE_SET_SYSCALL to ptrace_cmds[].
+	* ioctlent.sh: Improved by Mike Frysinger.
+	* HACKING-scripts: New file by Mike Frysinger.
+
 2009-02-20  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Further signalent.h cleanup.

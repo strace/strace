@@ -2263,8 +2263,8 @@ struct tcb *tcp;
 #ifdef LINUX
 #ifndef __GLIBC__
 			tprintf(", domainname=\"%s\"", uname.domainname);
-#endif /* __GLIBC__ */
-#endif /* LINUX */
+#endif
+#endif
 			tprintf("}");
 		}
 		else
@@ -2277,7 +2277,7 @@ struct tcb *tcp;
 #ifndef SVR4
 
 static const struct xlat ptrace_cmds[] = {
-#ifndef FREEBSD
+# ifndef FREEBSD
 	{ PTRACE_TRACEME,	"PTRACE_TRACEME"	},
 	{ PTRACE_PEEKTEXT,	"PTRACE_PEEKTEXT",	},
 	{ PTRACE_PEEKDATA,	"PTRACE_PEEKDATA",	},
@@ -2290,82 +2290,85 @@ static const struct xlat ptrace_cmds[] = {
 	{ PTRACE_SINGLESTEP,	"PTRACE_SINGLESTEP"	},
 	{ PTRACE_ATTACH,	"PTRACE_ATTACH"		},
 	{ PTRACE_DETACH,	"PTRACE_DETACH"		},
-#ifdef PTRACE_GETREGS
+#  ifdef PTRACE_GETREGS
 	{ PTRACE_GETREGS,	"PTRACE_GETREGS"	},
-#endif
-#ifdef PTRACE_SETREGS
+#  endif
+#  ifdef PTRACE_SETREGS
 	{ PTRACE_SETREGS,	"PTRACE_SETREGS"	},
-#endif
-#ifdef PTRACE_GETFPREGS
+#  endif
+#  ifdef PTRACE_GETFPREGS
 	{ PTRACE_GETFPREGS,	"PTRACE_GETFPREGS",	},
-#endif
-#ifdef PTRACE_SETFPREGS
+#  endif
+#  ifdef PTRACE_SETFPREGS
 	{ PTRACE_SETFPREGS,	"PTRACE_SETFPREGS",	},
-#endif
-#ifdef PTRACE_GETFPXREGS
+#  endif
+#  ifdef PTRACE_GETFPXREGS
 	{ PTRACE_GETFPXREGS,	"PTRACE_GETFPXREGS",	},
-#endif
-#ifdef PTRACE_SETFPXREGS
+#  endif
+#  ifdef PTRACE_SETFPXREGS
 	{ PTRACE_SETFPXREGS,	"PTRACE_SETFPXREGS",	},
-#endif
-#ifdef PTRACE_GETVRREGS
+#  endif
+#  ifdef PTRACE_GETVRREGS
 	{ PTRACE_GETVRREGS,	"PTRACE_GETVRREGS",	},
-#endif
-#ifdef PTRACE_SETVRREGS
+#  endif
+#  ifdef PTRACE_SETVRREGS
 	{ PTRACE_SETVRREGS,	"PTRACE_SETVRREGS",	},
-#endif
-#ifdef PTRACE_SETOPTIONS
+#  endif
+#  ifdef PTRACE_SETOPTIONS
 	{ PTRACE_SETOPTIONS,	"PTRACE_SETOPTIONS",	},
-#endif
-#ifdef PTRACE_GETEVENTMSG
+#  endif
+#  ifdef PTRACE_GETEVENTMSG
 	{ PTRACE_GETEVENTMSG,	"PTRACE_GETEVENTMSG",	},
-#endif
-#ifdef PTRACE_GETSIGINFO
+#  endif
+#  ifdef PTRACE_GETSIGINFO
 	{ PTRACE_GETSIGINFO,	"PTRACE_GETSIGINFO",	},
-#endif
-#ifdef PTRACE_SETSIGINFO
+#  endif
+#  ifdef PTRACE_SETSIGINFO
 	{ PTRACE_SETSIGINFO,	"PTRACE_SETSIGINFO",	},
-#endif
-#ifdef SUNOS4
+#  endif
+#  ifdef PTRACE_SET_SYSCALL
+	{ PTRACE_SET_SYSCALL,	"PTRACE_SET_SYSCALL",	},
+#  endif
+#  ifdef SUNOS4
 	{ PTRACE_READDATA,	"PTRACE_READDATA"	},
 	{ PTRACE_WRITEDATA,	"PTRACE_WRITEDATA"	},
 	{ PTRACE_READTEXT,	"PTRACE_READTEXT"	},
 	{ PTRACE_WRITETEXT,	"PTRACE_WRITETEXT"	},
 	{ PTRACE_GETFPAREGS,	"PTRACE_GETFPAREGS"	},
 	{ PTRACE_SETFPAREGS,	"PTRACE_SETFPAREGS"	},
-#ifdef SPARC
+#   ifdef SPARC
 	{ PTRACE_GETWINDOW,	"PTRACE_GETWINDOW"	},
 	{ PTRACE_SETWINDOW,	"PTRACE_SETWINDOW"	},
-#else /* !SPARC */
-	{ PTRACE_22,		"PTRACE_PTRACE_22"	},
-	{ PTRACE_23,		"PTRACE_PTRACE_23"	},
-#endif /* !SPARC */
-#endif /* SUNOS4 */
+#   else /* !SPARC */
+	{ PTRACE_22,		"PTRACE_22"		},
+	{ PTRACE_23,		"PTRACE_3"		},
+#   endif /* !SPARC */
+#  endif /* SUNOS4 */
 	{ PTRACE_SYSCALL,	"PTRACE_SYSCALL"	},
-#ifdef SUNOS4
+#  ifdef SUNOS4
 	{ PTRACE_DUMPCORE,	"PTRACE_DUMPCORE"	},
-#ifdef I386
+#   ifdef I386
 	{ PTRACE_SETWRBKPT,	"PTRACE_SETWRBKPT"	},
 	{ PTRACE_SETACBKPT,	"PTRACE_SETACBKPT"	},
 	{ PTRACE_CLRDR7,	"PTRACE_CLRDR7"		},
-#else /* !I386 */
+#   else /* !I386 */
 	{ PTRACE_26,		"PTRACE_26"		},
 	{ PTRACE_27,		"PTRACE_27"		},
 	{ PTRACE_28,		"PTRACE_28"		},
-#endif /* !I386 */
+#   endif /* !I386 */
 	{ PTRACE_GETUCODE,	"PTRACE_GETUCODE"	},
-#endif /* SUNOS4 */
+#  endif /* SUNOS4 */
 
-#else /* FREEBSD */
+# else /* FREEBSD */
 
 	{ PT_TRACE_ME,		"PT_TRACE_ME"		},
 	{ PT_READ_I,		"PT_READ_I"		},
 	{ PT_READ_D,		"PT_READ_D"		},
 	{ PT_WRITE_I,		"PT_WRITE_I"		},
 	{ PT_WRITE_D,		"PT_WRITE_D"		},
-#ifdef PT_READ_U
+#  ifdef PT_READ_U
 	{ PT_READ_U,		"PT_READ_U"		},
-#endif
+#  endif
 	{ PT_CONTINUE,		"PT_CONTINUE"		},
 	{ PT_KILL,		"PT_KILL"		},
 	{ PT_STEP,		"PT_STEP"		},
@@ -2377,43 +2380,43 @@ static const struct xlat ptrace_cmds[] = {
 	{ PT_SETFPREGS,		"PT_SETFPREGS"		},
 	{ PT_GETDBREGS,		"PT_GETDBREGS"		},
 	{ PT_SETDBREGS,		"PT_SETDBREGS"		},
-#endif /* FREEBSD */
+# endif /* FREEBSD */
 	{ 0,			NULL			},
 };
 
-#ifndef FREEBSD
-#ifdef PTRACE_SETOPTIONS
+# ifndef FREEBSD
+#  ifdef PTRACE_SETOPTIONS
 static const struct xlat ptrace_setoptions_flags[] = {
-#ifdef PTRACE_O_TRACESYSGOOD
+#   ifdef PTRACE_O_TRACESYSGOOD
 	{ PTRACE_O_TRACESYSGOOD,"PTRACE_O_TRACESYSGOOD"	},
-#endif
-#ifdef PTRACE_O_TRACEFORK
+#   endif
+#   ifdef PTRACE_O_TRACEFORK
 	{ PTRACE_O_TRACEFORK,	"PTRACE_O_TRACEFORK"	},
-#endif
-#ifdef PTRACE_O_TRACEVFORK
+#   endif
+#   ifdef PTRACE_O_TRACEVFORK
 	{ PTRACE_O_TRACEVFORK,	"PTRACE_O_TRACEVFORK"	},
-#endif
-#ifdef PTRACE_O_TRACECLONE
+#   endif
+#   ifdef PTRACE_O_TRACECLONE
 	{ PTRACE_O_TRACECLONE,	"PTRACE_O_TRACECLONE"	},
-#endif
-#ifdef PTRACE_O_TRACEEXEC
+#   endif
+#   ifdef PTRACE_O_TRACEEXEC
 	{ PTRACE_O_TRACEEXEC,	"PTRACE_O_TRACEEXEC"	},
-#endif
-#ifdef PTRACE_O_TRACEVFORKDONE
+#   endif
+#   ifdef PTRACE_O_TRACEVFORKDONE
 	{ PTRACE_O_TRACEVFORKDONE,"PTRACE_O_TRACEVFORKDONE"},
-#endif
-#ifdef PTRACE_O_TRACEEXIT
+#   endif
+#   ifdef PTRACE_O_TRACEEXIT
 	{ PTRACE_O_TRACEEXIT,	"PTRACE_O_TRACEEXIT"	},
-#endif
+#   endif
 	{ 0,			NULL			},
 };
-#endif
-#endif
+#  endif /* PTRACE_SETOPTIONS */
+# endif /* !FREEBSD */
 
-#ifndef FREEBSD
+# ifndef FREEBSD
 const struct xlat struct_user_offsets[] = {
-#ifdef LINUX
-#if defined(S390) || defined(S390X)
+#  ifdef LINUX
+#   if defined(S390) || defined(S390X)
 	{ PT_PSWMASK,		"psw_mask"				},
 	{ PT_PSWADDR,		"psw_addr"				},
 	{ PT_GPR0,		"gpr0"					},
@@ -2450,7 +2453,7 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_ACR15,		"acr15"					},
 	{ PT_ORIGGPR2,		"orig_gpr2"				},
 	{ PT_FPC,		"fpc"					},
-#if defined(S390)
+#    if defined(S390)
 	{ PT_FPR0_HI,		"fpr0.hi"				},
 	{ PT_FPR0_LO,		"fpr0.lo"				},
 	{ PT_FPR1_HI,		"fpr1.hi"				},
@@ -2483,8 +2486,8 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_FPR14_LO,		"fpr14.lo"				},
 	{ PT_FPR15_HI,		"fpr15.hi"				},
 	{ PT_FPR15_LO,		"fpr15.lo"				},
-#endif
-#if defined(S390X)
+#    endif
+#    if defined(S390X)
 	{ PT_FPR0,		"fpr0"					},
 	{ PT_FPR1,		"fpr1"					},
 	{ PT_FPR2,		"fpr2"					},
@@ -2501,21 +2504,20 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_FPR13,		"fpr13"					},
 	{ PT_FPR14,		"fpr14"					},
 	{ PT_FPR15,		"fpr15"					},
-#endif
+#    endif
 	{ PT_CR_9,		"cr9"					},
 	{ PT_CR_10,		"cr10"					},
 	{ PT_CR_11,		"cr11"					},
 	{ PT_IEEE_IP,           "ieee_exception_ip"                     },
-#endif
-#if defined(SPARC)
+#   elif defined(SPARC)
 	/* XXX No support for these offsets yet. */
-#elif defined(HPPA)
+#   elif defined(HPPA)
 	/* XXX No support for these offsets yet. */
-#elif defined(POWERPC)
-#ifndef PT_ORIG_R3
-#define PT_ORIG_R3 34
-#endif
-#define REGSIZE (sizeof(unsigned long))
+#   elif defined(POWERPC)
+#    ifndef PT_ORIG_R3
+#     define PT_ORIG_R3 34
+#    endif
+#    define REGSIZE (sizeof(unsigned long))
 	{ REGSIZE*PT_R0,		"r0"				},
 	{ REGSIZE*PT_R1,		"r1"				},
 	{ REGSIZE*PT_R2,		"r2"				},
@@ -2556,9 +2558,8 @@ const struct xlat struct_user_offsets[] = {
 	{ REGSIZE*PT_XER,		"XER"				},
 	{ REGSIZE*PT_CCR,		"CCR"				},
 	{ REGSIZE*PT_FPR0,		"FPR0"				},
-#undef REGSIZE
-#else
-#ifdef ALPHA
+#    undef REGSIZE
+#   elif defined(ALPHA)
 	{ 0,			"r0"					},
 	{ 1,			"r1"					},
 	{ 2,			"r2"					},
@@ -2624,8 +2625,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 62,			"fp30"					},
 	{ 63,			"fp31"					},
 	{ 64,			"pc"					},
-#else /* !ALPHA */
-#ifdef IA64
+#   elif defined(IA64)
 	{ PT_F32, "f32" }, { PT_F33, "f33" }, { PT_F34, "f34" },
 	{ PT_F35, "f35" }, { PT_F36, "f36" }, { PT_F37, "f37" },
 	{ PT_F38, "f38" }, { PT_F39, "f39" }, { PT_F40, "f40" },
@@ -2690,15 +2690,14 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_AR_CCV, "ar.ccv" }, { PT_AR_FPSR, "ar.fpsr" },
 	{ PT_B0, "b0" }, { PT_B7, "b7" }, { PT_F6, "f6" },
 	{ PT_F7, "f7" }, { PT_F8, "f8" }, { PT_F9, "f9" },
-# ifdef PT_AR_CSD
+#    ifdef PT_AR_CSD
 	{ PT_AR_CSD, "ar.csd" },
-# endif
-# ifdef PT_AR_SSD
+#    endif
+#    ifdef PT_AR_SSD
 	{ PT_AR_SSD, "ar.ssd" },
-# endif
+#    endif
 	{ PT_DBR, "dbr" }, { PT_IBR, "ibr" }, { PT_PMD, "pmd" },
-#else /* !IA64 */
-#ifdef I386
+#   elif defined(I386)
 	{ 4*EBX,		"4*EBX"					},
 	{ 4*ECX,		"4*ECX"					},
 	{ 4*EDX,		"4*EDX"					},
@@ -2716,8 +2715,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*EFL,		"4*EFL"					},
 	{ 4*UESP,		"4*UESP"				},
 	{ 4*SS,			"4*SS"					},
-#else /* !I386 */
-#ifdef X86_64
+#   elif defined(X86_64)
 	{ 8*R15, 		"8*R15"					},
 	{ 8*R14, 		"8*R14"					},
 	{ 8*R13, 		"8*R13"					},
@@ -2733,20 +2731,19 @@ const struct xlat struct_user_offsets[] = {
 	{ 8*RDX,		"8*RDX"					},
 	{ 8*RSI,		"8*RSI"					},
 	{ 8*RDI,		"8*RDI"					},
-#if 0
+#    if 0
 	{ DS,			"DS"					},
 	{ ES,			"ES"					},
 	{ FS,			"FS"					},
 	{ GS,			"GS"					},
-#endif
+#    endif
 	{ 8*ORIG_RAX,		"8*ORIG_RAX"				},
 	{ 8*RIP,		"8*RIP"					},
 	{ 8*CS,			"8*CS"					},
 	{ 8*EFLAGS,		"8*EFL"					},
 	{ 8*RSP,		"8*RSP"					},
 	{ 8*SS,			"8*SS"					},
-#endif
-#ifdef M68K
+#   elif defined(M68K)
 	{ 4*PT_D1,		"4*PT_D1"				},
 	{ 4*PT_D2,		"4*PT_D2"				},
 	{ 4*PT_D3,		"4*PT_D3"				},
@@ -2766,9 +2763,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*PT_ORIG_D0,		"4*PT_ORIG_D0"				},
 	{ 4*PT_SR,		"4*PT_SR"				},
 	{ 4*PT_PC,		"4*PT_PC"				},
-#endif /* M68K */
-#endif /* !I386 */
-#ifdef SH
+#   elif defined(SH)
 	{ 4*REG_REG0,           "4*REG_REG0"                            },
 	{ 4*(REG_REG0+1),       "4*REG_REG1"                            },
 	{ 4*(REG_REG0+2),       "4*REG_REG2"                            },
@@ -2809,7 +2804,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*(REG_FPREG0+13),    "4*REG_FPREG13"                         },
 	{ 4*(REG_FPREG0+14),    "4*REG_FPREG14"                         },
 	{ 4*REG_FPREG15,        "4*REG_FPREG15"                         },
-#ifdef REG_XDREG0
+#    ifdef REG_XDREG0
 	{ 4*REG_XDREG0,         "4*REG_XDREG0"                          },
 	{ 4*(REG_XDREG0+2),     "4*REG_XDREG2"                          },
 	{ 4*(REG_XDREG0+4),     "4*REG_XDREG4"                          },
@@ -2818,10 +2813,9 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*(REG_XDREG0+10),    "4*REG_XDREG10"                         },
 	{ 4*(REG_XDREG0+12),    "4*REG_XDREG12"                         },
 	{ 4*REG_XDREG14,        "4*REG_XDREG14"                         },
-#endif
+#    endif
 	{ 4*REG_FPSCR,          "4*REG_FPSCR"                           },
-#endif /* SH */
-#ifdef SH64
+#   elif defined(SH64)
 	{ 0,		        "PC(L)"				        },
 	{ 4,	                "PC(U)"				        },
 	{ 8, 	                "SR(L)"	  	         		},
@@ -2974,8 +2968,7 @@ const struct xlat struct_user_offsets[] = {
 	   the kernel build options). */
 	{ uoff(regs),	        "offsetof(struct user, regs)"	        },
 	{ uoff(fpu),	        "offsetof(struct user, fpu)"	        },
-#endif
-#ifdef ARM
+#   elif defined(ARM)
 	{ uoff(regs.ARM_r0),	"r0"					},
 	{ uoff(regs.ARM_r1),	"r1"					},
 	{ uoff(regs.ARM_r2),	"r2"					},
@@ -2993,9 +2986,7 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(regs.ARM_lr),	"lr"					},
 	{ uoff(regs.ARM_pc),	"pc"					},
 	{ uoff(regs.ARM_cpsr),	"cpsr"					},
-#endif
-
-#ifdef MIPS
+#   elif defined(MIPS)
 	{ 0,			"r0"					},
 	{ 1,			"r1"					},
 	{ 2,			"r2"					},
@@ -3067,50 +3058,50 @@ const struct xlat struct_user_offsets[] = {
 	{ 68,			"mmlo"					},
 	{ 69,			"fpcsr"					},
 	{ 70,			"fpeir"					},
-#endif
+#   endif
 
-#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(BFIN)
+#   if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) && !defined(ALPHA) && !defined(IA64)
+#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(BFIN)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
-#endif
-#if  defined(I386) || defined(X86_64)
+#    endif
+#    if defined(I386) || defined(X86_64)
 	{ uoff(i387),		"offsetof(struct user, i387)"		},
-#else /* !I386 */
-#ifdef M68K
+#    endif
+#    if defined(M68K)
 	{ uoff(m68kfp),		"offsetof(struct user, m68kfp)"		},
-#endif /* M68K */
-#endif /* !I386 */
+#    endif
 	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
 	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
 	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
-#if !defined(SPARC64)
+#    if !defined(SPARC64)
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
-#endif
-#ifdef SH64
+#    endif
+#    ifdef SH64
 	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
-#endif
-#if !defined(SPARC64)
+#    endif
+#    if !defined(SPARC64)
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
-#endif
+#    endif
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
+#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
-#endif
-#if !defined(SPARC64)
+#    endif
+#    if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-#endif
-#if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
+#    endif
+#    if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
-#endif
+#    endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
 	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
-#if defined(I386) || defined(X86_64)
+#    if defined(I386) || defined(X86_64)
 	{ uoff(u_debugreg),	"offsetof(struct user, u_debugreg)"	},
-#endif /* I386 */
-#endif /* !IA64 */
-#endif /* !ALPHA */
-#endif /* !POWERPC/!SPARC */
-#endif /* LINUX */
-#ifdef SUNOS4
+#    endif
+#   endif /* !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) && !defined(ALPHA) && !defined(IA64) */
+
+#  endif /* LINUX */
+
+#  ifdef SUNOS4
 	{ uoff(u_pcb),		"offsetof(struct user, u_pcb)"		},
 	{ uoff(u_procp),	"offsetof(struct user, u_procp)"	},
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
@@ -3156,32 +3147,31 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(u_exdata.Ux_A),	"offsetof(struct user, u_exdata.Ux_A)"	},
 	{ uoff(u_exdata.ux_shell[0]),"offsetof(struct user, u_exdata.ux_shell[0])"},
 	{ uoff(u_lofault),	"offsetof(struct user, u_lofault)"	},
-#endif /* SUNOS4 */
-#ifndef HPPA
+#  endif /* SUNOS4 */
+#  ifndef HPPA
 	{ sizeof(struct user),	"sizeof(struct user)"			},
-#endif
+#  endif
 	{ 0,			NULL					},
 };
-#endif
+# endif /* !FREEBSD */
 
 int
-sys_ptrace(tcp)
-struct tcb *tcp;
+sys_ptrace(struct tcb *tcp)
 {
 	const struct xlat *x;
 	long addr;
 
 	if (entering(tcp)) {
 		printxval(ptrace_cmds, tcp->u_arg[0],
-#ifndef FREEBSD
+# ifndef FREEBSD
 			  "PTRACE_???"
-#else
+# else
 			  "PT_???"
-#endif
+# endif
 			);
 		tprintf(", %lu, ", tcp->u_arg[1]);
 		addr = tcp->u_arg[2];
-#ifndef FREEBSD
+# ifndef FREEBSD
 		if (tcp->u_arg[0] == PTRACE_PEEKUSER
 			|| tcp->u_arg[0] == PTRACE_POKEUSER) {
 			for (x = struct_user_offsets; x->str; x++) {
@@ -3198,28 +3188,28 @@ struct tcb *tcp;
 				tprintf("%s, ", x->str);
 		}
 		else
-#endif
+# endif
 			tprintf("%#lx, ", tcp->u_arg[2]);
-#ifdef LINUX
+# ifdef LINUX
 		switch (tcp->u_arg[0]) {
-#ifndef IA64
+#  ifndef IA64
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
 			break;
-#endif
+#  endif
 		case PTRACE_CONT:
 		case PTRACE_SINGLESTEP:
 		case PTRACE_SYSCALL:
 		case PTRACE_DETACH:
 			printsignal(tcp->u_arg[3]);
 			break;
-#ifdef PTRACE_SETOPTIONS
+#  ifdef PTRACE_SETOPTIONS
 		case PTRACE_SETOPTIONS:
 			printflags(ptrace_setoptions_flags, tcp->u_arg[3], "PTRACE_O_???");
 			break;
-#endif
-#ifdef PTRACE_SETSIGINFO
+#  endif
+#  ifdef PTRACE_SETSIGINFO
 		case PTRACE_SETSIGINFO: {
 			siginfo_t si;
 			if (!tcp->u_arg[3])
@@ -3232,12 +3222,12 @@ struct tcb *tcp;
 				printsiginfo(&si, verbose(tcp));
 			break;
 		}
-#endif
-#ifdef PTRACE_GETSIGINFO
+#  endif
+#  ifdef PTRACE_GETSIGINFO
 		case PTRACE_GETSIGINFO:
 			/* Don't print anything, do it at syscall return. */
 			break;
-#endif
+#  endif
 		default:
 			tprintf("%#lx", tcp->u_arg[3]);
 			break;
@@ -3247,13 +3237,13 @@ struct tcb *tcp;
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
-#ifdef IA64
+#  ifdef IA64
 			return RVAL_HEX;
-#else
+#  else
 			printnum(tcp, tcp->u_arg[3], "%#lx");
 			break;
-#endif
-#ifdef PTRACE_GETSIGINFO
+#  endif
+#  ifdef PTRACE_GETSIGINFO
 		case PTRACE_GETSIGINFO: {
 			siginfo_t si;
 			if (!tcp->u_arg[3])
@@ -3266,11 +3256,11 @@ struct tcb *tcp;
 				printsiginfo(&si, verbose(tcp));
 			break;
 		}
-#endif
+#  endif
 		}
 	}
-#endif /* LINUX */
-#ifdef SUNOS4
+# endif /* LINUX */
+# ifdef SUNOS4
 		if (tcp->u_arg[0] == PTRACE_WRITEDATA ||
 			tcp->u_arg[0] == PTRACE_WRITETEXT) {
 			tprintf("%lu, ", tcp->u_arg[3]);
@@ -3286,11 +3276,11 @@ struct tcb *tcp;
 			printstr(tcp, tcp->u_arg[4], tcp->u_arg[3]);
 		}
 	}
-#endif /* SUNOS4 */
-#ifdef FREEBSD
+# endif /* SUNOS4 */
+# ifdef FREEBSD
 		tprintf("%lu", tcp->u_arg[3]);
 	}
-#endif /* FREEBSD */
+# endif /* FREEBSD */
 	return 0;
 }
 
@@ -3342,19 +3332,19 @@ static const struct xlat futexops[] = {
 	{ FUTEX_WAKE_BITSET|FUTEX_PRIVATE_FLAG,		"FUTEX_WAKE_BITSET_PRIVATE" },
 	{ 0,						NULL }
 };
-#ifndef FUTEX_OP_SET
-# define FUTEX_OP_SET		0
-# define FUTEX_OP_ADD		1
-# define FUTEX_OP_OR		2
-# define FUTEX_OP_ANDN		3
-# define FUTEX_OP_XOR		4
-# define FUTEX_OP_CMP_EQ	0
-# define FUTEX_OP_CMP_NE	1
-# define FUTEX_OP_CMP_LT	2
-# define FUTEX_OP_CMP_LE	3
-# define FUTEX_OP_CMP_GT	4
-# define FUTEX_OP_CMP_GE	5
-#endif
+# ifndef FUTEX_OP_SET
+#  define FUTEX_OP_SET		0
+#  define FUTEX_OP_ADD		1
+#  define FUTEX_OP_OR		2
+#  define FUTEX_OP_ANDN		3
+#  define FUTEX_OP_XOR		4
+#  define FUTEX_OP_CMP_EQ	0
+#  define FUTEX_OP_CMP_NE	1
+#  define FUTEX_OP_CMP_LT	2
+#  define FUTEX_OP_CMP_LE	3
+#  define FUTEX_OP_CMP_GT	4
+#  define FUTEX_OP_CMP_GE	5
+# endif
 static const struct xlat futexwakeops[] = {
 	{ FUTEX_OP_SET,		"FUTEX_OP_SET" },
 	{ FUTEX_OP_ADD,		"FUTEX_OP_ADD" },
@@ -3532,8 +3522,8 @@ struct tcb *tcp;
     return 0;
 }
 
-#ifdef X86_64
-#include <asm/prctl.h>
+# ifdef X86_64
+# include <asm/prctl.h>
 
 static const struct xlat archvals[] = {
 	{ ARCH_SET_GS,		"ARCH_SET_GS"		},
@@ -3564,7 +3554,7 @@ struct tcb *tcp;
     }
     return 0;
 }
-#endif
+# endif /* X86_64 */
 
 
 int
@@ -3590,4 +3580,4 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif
+#endif /* LINUX */
