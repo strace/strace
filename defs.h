@@ -424,6 +424,7 @@ extern const struct xlat open_mode_flags[];
 extern const struct xlat addrfams[];
 extern const struct xlat struct_user_offsets[];
 extern const struct xlat open_access_modes[];
+extern const struct xlat ptrace_cmds[];
 
 /* Format of syscall return values */
 #define RVAL_DECIMAL	000	/* decimal format */
@@ -485,7 +486,7 @@ extern void set_overhead P((int));
 extern void qualify P((char *));
 extern int get_scno P((struct tcb *));
 extern long known_scno P((struct tcb *));
-extern long do_ptrace P((int request, struct tcb *tcp, void *addr, void *data));
+extern long do_ptrace P((int request, struct tcb *tcp, void *addr, long data));
 extern int ptrace_restart P((int request, struct tcb *tcp, int sig));
 extern int trace_syscall P((struct tcb *));
 extern int count_syscall P((struct tcb *, struct timeval *));

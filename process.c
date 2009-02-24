@@ -771,7 +771,7 @@ change_syscall(struct tcb *tcp, int new)
 #  define PTRACE_SET_SYSCALL 23
 # endif
 
-	if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new) != 0)
+	if (do_ptrace(PTRACE_SET_SYSCALL, tcp, NULL, new) != 0)
 		return -1;
 
 	return 0;
@@ -2276,7 +2276,7 @@ struct tcb *tcp;
 
 #ifndef SVR4
 
-static const struct xlat ptrace_cmds[] = {
+const struct xlat ptrace_cmds[] = {
 # ifndef FREEBSD
 	{ PTRACE_TRACEME,	"PTRACE_TRACEME"	},
 	{ PTRACE_PEEKTEXT,	"PTRACE_PEEKTEXT",	},

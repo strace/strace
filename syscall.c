@@ -1103,7 +1103,7 @@ get_scno(struct tcb *tcp)
 #elif defined (LINUX_MIPSN32)
 	unsigned long long regs[38];
 
-	if (ptrace (PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
+	if (do_ptrace(PTRACE_GETREGS, tcp, NULL, (long) &regs) < 0)
 		return -1;
 	a3 = regs[REG_A3];
 	r2 = regs[REG_V0];
@@ -1351,11 +1351,11 @@ struct tcb *tcp;
 	return scno;
 }
 
-/* Called in trace_syscall() at each syscall entry and exit.
+/* Called in trace_syscall at each syscall entry and exit.
  * Returns:
- * 0: "ignore this syscall", bail out of trace_syscall() silently.
- * 1: ok, continue in trace_syscall().
- * other: error, trace_syscall() should print error indicator
+ * 0: "ignore this syscall", bail out of trace_syscall silently.
+ * 1: ok, continue in trace_syscall.
+ * other: error, trace_syscall should print error indicator
  *    ("????" etc) and bail out.
  */
 static int
@@ -1937,10 +1937,11 @@ force_result(tcp, error, rval)
 #endif /* S390 || S390X */
 #endif /* LINUX */
 #ifdef SUNOS4
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_error),
-		   error << 24) < 0 ||
-	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_rval1), rval) < 0)
+	if (do_ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_error), error << 24) < 0
+	 || do_ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_rval1), rval) < 0
+	) {
 		return -1;
+	}
 #endif /* SUNOS4 */
 #ifdef SVR4
 	/* XXX no clue */
@@ -2071,10 +2072,10 @@ struct tcb *tcp;
 		else
      	        	nargs = tcp->u_nargs = MAX_ARGS;
 
-		if (ptrace (PTRACE_GETREGS, pid, NULL, (long) &regs) < 0)
+		if (do_ptrace(PTRACE_GETREGS, tcp, NULL, (long) &regs) < 0)
 			return -1;
 
-		for(i = 0; i < nargs; i++) {
+		for (i = 0; i < nargs; i++) {
 			tcp->u_arg[i] = regs[REG_A0 + i];
 # if defined (LINUX_MIPSN32)
 			tcp->ext_arg[i] = regs[REG_A0 + i];
@@ -2090,17 +2091,17 @@ struct tcb *tcp;
 			nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 		else
      	        	nargs = tcp->u_nargs = MAX_ARGS;
-		if(nargs > 4) {
-		  	if(upeek(tcp, REG_SP, &sp) < 0)
+		if (nargs > 4) {
+		  	if (upeek(tcp, REG_SP, &sp) < 0)
 			  	return -1;
-			for(i = 0; i < 4; i++) {
+			for (i = 0; i < 4; i++) {
 			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i])<0)
 				  	return -1;
 			}
 			umoven(tcp, sp+16, (nargs-4) * sizeof(tcp->u_arg[0]),
 			       (char *)(tcp->u_arg + 4));
 		} else {
-		  	for(i = 0; i < nargs; i++) {
+		  	for (i = 0; i < nargs; i++) {
 			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i]) < 0)
 				  	return -1;
 			}
@@ -2349,7 +2350,12 @@ trace_syscall(struct tcb *tcp)
 		if (dtime)
 			gettimeofday(&tv, NULL);
 
-		/* BTW, why we don't just memorize syscall no. on entry
+		/* In code below,
+		 * res = 1: no error, continue
+		 * res = 0: return 0 at once (not an error)
+		 * any other value: error, complain and return the value
+		 *
+		 * BTW, why we don't just memorize syscall no. on entry
 		 * in tcp->something?
 		 */
 		scno_good = res = get_scno(tcp);
@@ -2374,14 +2380,15 @@ trace_syscall(struct tcb *tcp)
 
 		if (tcp->flags & TCB_REPRINT) {
 			printleader(tcp);
-			tprintf("<... ");
-			if (scno_good != 1)
-				tprintf("????");
-			else if (tcp->scno >= nsyscalls || tcp->scno < 0)
-				tprintf("syscall_%lu", tcp->scno);
-			else
-				tprintf("%s", sysent[tcp->scno].sys_name);
-			tprintf(" resumed> ");
+			if (scno_good != 1) {
+				tprintf("<... syscall_?? resumed> ");
+			} else {
+				if (tcp->scno >= nsyscalls || tcp->scno < 0)
+					tprintf("<... syscall_%lu resumed> ", tcp->scno);
+				else
+					tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
+			}
+			/* [do we need to clear TCB_REPRINT?...] */
 		}
 
 		if (cflag)
@@ -2390,8 +2397,8 @@ trace_syscall(struct tcb *tcp)
 		if (res != 1) {
 			tprintf(") ");
 			tabto(acolumn);
-			tprintf("= ? <unavailable>");
-			printtrailer();
+			tprintf("= ?");
+			/* line will be finished by error handling code */
 			tcp->flags &= ~TCB_INSYSCALL;
 			return res;
 		}
@@ -2514,18 +2521,15 @@ trace_syscall(struct tcb *tcp)
 
 	if (res != 1) {
 		printleader(tcp);
-		tcp->flags &= ~TCB_REPRINT;
+		tcp->flags &= ~TCB_REPRINT; /* why? */
 		tcp_last = tcp;
 		if (scno_good != 1)
-			tprintf("????" /* anti-trigraph gap */ "(");
+			tprintf("syscall_??" /* anti-trigraph gap */ "(");
 		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
 			tprintf("syscall_%lu(", tcp->scno);
 		else
 			tprintf("%s(", sysent[tcp->scno].sys_name);
-		/*
-		 * " <unavailable>" will be added later by the code which
-		 * detects ptrace errors.
-		 */
+		/* Line will be finished by error handling code. */
 		tcp->flags |= TCB_INSYSCALL;
 		return res;
 	}
@@ -2679,7 +2683,7 @@ struct tcb *tcp;
 #ifdef LINUX
 #if defined (SPARC) || defined (SPARC64)
 	struct regs regs;
-	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
+	if (do_ptrace(PTRACE_GETREGS, tcp, (char *)&regs, 0) < 0)
 		return -1;
 	val = regs.r_o1;
 #elif defined(SH)

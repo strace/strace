@@ -1,5 +1,27 @@
 2009-02-24  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	Replace many more bare ptrace calls with calls to wrappers
+	which do proper error-checking and set tcp->ptrace_errno.
+	In some cases, missing error checking is added.
+	Error handling for trace_syscall() failures and other cases
+	where tcp->ptrace_errno is nonzero is cleaned up a bit
+	and made more verbose if we see error other than ESRC.
+	Some comments are added or expanded.
+	* defs.h: Declare ptrace_cmds[]. Modify do_ptrace
+	declaration (last parameter is long, not void *).
+	* process.c: Make ptrace_cmds[] non-static.
+	(change_syscall): Use do_ptrace() instead of bare ptrace().
+	* signal.c: Use do_ptrace() instead of bare ptrace().
+	* strace.c: Update trace_syscall() failure handling.
+	* syscall.c: Use do_ptrace() instead of bare ptrace().
+	* util.c: Use do_ptrace() instead of bare ptrace().
+	Update do_ptrace() wrapper.
+	(str_PTRACE_xxx): New function - helper returning "PTRACE_xxx".
+	(do_ptrace_peekdata): New function - wrapper for PTRACE_PEEKDATA
+	(do_ptrace5): New function - wrapper for 5-argument ptrace calls.
+
+2009-02-24  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	* process.c: Indent preprocessor directives so that nesting
 	can be figured out. Add PTRACE_SET_SYSCALL to ptrace_cmds[].
 	* ioctlent.sh: Improved by Mike Frysinger.

@@ -2712,27 +2712,28 @@ handle_stopped_tcbs(struct tcb *tcp)
 		/* we handled the STATUS, we are permitted to interrupt now. */
 		if (interrupted)
 			return 0;
-		if (trace_syscall(tcp) < 0 && !tcp->ptrace_errno) {
-			/* ptrace() failed in trace_syscall() with ESRCH.
-			 * Likely a result of process disappearing mid-flight.
-			 * Observed case: exit_group() terminating
-			 * all processes in thread group. In this case, threads
-			 * "disappear" in an unpredictable moment without any
-			 * notification to strace via wait().
+		if (trace_syscall(tcp) < 0) {
+			/* trace_syscall printed incompletely decoded syscall,
+			 * add error indicator.
+			 * NB: modulo bugs, errno must be nonzero, do not add
+			 * "if (err != 0)", this will hide bugs.
 			 */
+			int err = tcp->ptrace_errno;
+			tcp->ptrace_errno = 0;
+			if (err == ESRCH)
+				tprintf(" <unavailable>");
+			else
+				tprintf(" <ptrace error %d (%s)>", err, strerror(err));
+			printtrailer();
+			if (err == ESRCH)
+				/* Want to get death report anyway. */
+				goto tracing;
+			/* Strange error, we dare not continue. */
 			if (tcp->flags & TCB_ATTACHED) {
-				if (tcp_last) {
-					/* Do we have dangling line "syscall(param, param"?
-					 * Finish the line then. We cannot
-					 */
-					tcp_last->flags |= TCB_REPRINT;
-					tprintf(" <unfinished ...>");
-					printtrailer();
-				}
 				detach(tcp, 0);
 			} else {
-				ptrace(PTRACE_KILL,
-					tcp->pid, (char *) 1, SIGTERM);
+				ptrace(PTRACE_KILL, tcp->pid, (char *) 1, SIGTERM);
+				/* [why SIGTERM? why not also kill(SIGKILL)?] */
 				droptcb(tcp);
 			}
 			continue;
@@ -2838,13 +2839,25 @@ void
 printleader(struct tcb *tcp)
 {
 	if (tcp_last) {
-		if (tcp_last->ptrace_errno) {
+		int err = tcp_last->ptrace_errno;
+		if (err) {
 			tcp_last->ptrace_errno = 0;
 			if (tcp_last->flags & TCB_INSYSCALL) {
-				tprintf(" <unavailable ...>\n");
+				if (err == ESRCH)
+					tprintf(" <unavailable ...>\n");
+				else
+					tprintf(" <ptrace error %d (%s) ...>\n", err, strerror(err));
 				tcp_last->flags |= TCB_REPRINT;
 			} else {
-				tprintf("= ? <unavailable>\n");
+				/* Not sure this branch can ever be reached.
+				 * Oh well. Using subtly different format
+				 * (without "?" after "=") to make it
+				 * noticeable (grep for '= <' in straces).
+				 */
+				if (err == ESRCH)
+					tprintf("= <unavailable>\n");
+				else
+					tprintf("= <ptrace error %d (%s)>\n", err, strerror(err));
 			}
 		} else if (!outfname || followfork < 2 || tcp_last == tcp) {
 			tprintf(" <unfinished ...>\n");
