@@ -604,7 +604,7 @@ extern void print_ldt_entry();
 #  define ARG_PTID	(known_scno(tcp) == SYS_clone2 ? 3 : 2)
 #  define ARG_CTID	(known_scno(tcp) == SYS_clone2 ? 4 : 3)
 #  define ARG_TLS	(known_scno(tcp) == SYS_clone2 ? 5 : 4)
-# elif defined S390 || defined S390X
+# elif defined S390 || defined S390X || defined CRISV10 || defined CRISV32
 #  define ARG_STACK	0
 #  define ARG_FLAGS	1
 #  define ARG_PTID	2
@@ -763,6 +763,10 @@ change_syscall(struct tcb *tcp, int new)
 	   Assume 0 args as kernel never actually checks... */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_SYSCALL),
 				0x100000 | new) < 0)
+		return -1;
+	return 0;
+#elif defined(CRISV10) || defined(CRISV32)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R9), new) < 0)
 		return -1;
 	return 0;
 #elif defined(ARM)
@@ -3059,8 +3063,79 @@ const struct xlat struct_user_offsets[] = {
 	{ 69,			"fpcsr"					},
 	{ 70,			"fpeir"					},
 #   endif
+#   ifdef CRISV10
+	{ 4*PT_FRAMETYPE, "4*PT_FRAMETYPE" },
+	{ 4*PT_ORIG_R10, "4*PT_ORIG_R10" },
+	{ 4*PT_R13, "4*PT_R13" },
+	{ 4*PT_R12, "4*PT_R12" },
+	{ 4*PT_R11, "4*PT_R11" },
+	{ 4*PT_R10, "4*PT_R10" },
+	{ 4*PT_R9, "4*PT_R9" },
+	{ 4*PT_R8, "4*PT_R8" },
+	{ 4*PT_R7, "4*PT_R7" },
+	{ 4*PT_R6, "4*PT_R6" },
+	{ 4*PT_R5, "4*PT_R5" },
+	{ 4*PT_R4, "4*PT_R4" },
+	{ 4*PT_R3, "4*PT_R3" },
+	{ 4*PT_R2, "4*PT_R2" },
+	{ 4*PT_R1, "4*PT_R1" },
+	{ 4*PT_R0, "4*PT_R0" },
+	{ 4*PT_MOF, "4*PT_MOF" },
+	{ 4*PT_DCCR, "4*PT_DCCR" },
+	{ 4*PT_SRP, "4*PT_SRP" },
+	{ 4*PT_IRP, "4*PT_IRP" },
+	{ 4*PT_CSRINSTR, "4*PT_CSRINSTR" },
+	{ 4*PT_CSRADDR, "4*PT_CSRADDR" },
+	{ 4*PT_CSRDATA, "4*PT_CSRDATA" },
+	{ 4*PT_USP, "4*PT_USP" },
+#   endif
+#   ifdef CRISV32
+	{ 4*PT_ORIG_R10, "4*PT_ORIG_R10" },
+	{ 4*PT_R0, "4*PT_R0" },
+	{ 4*PT_R1, "4*PT_R1" },
+	{ 4*PT_R2, "4*PT_R2" },
+	{ 4*PT_R3, "4*PT_R3" },
+	{ 4*PT_R4, "4*PT_R4" },
+	{ 4*PT_R5, "4*PT_R5" },
+	{ 4*PT_R6, "4*PT_R6" },
+	{ 4*PT_R7, "4*PT_R7" },
+	{ 4*PT_R8, "4*PT_R8" },
+	{ 4*PT_R9, "4*PT_R9" },
+	{ 4*PT_R10, "4*PT_R10" },
+	{ 4*PT_R11, "4*PT_R11" },
+	{ 4*PT_R12, "4*PT_R12" },
+	{ 4*PT_R13, "4*PT_R13" },
+	{ 4*PT_ACR, "4*PT_ACR" },
+	{ 4*PT_SRS, "4*PT_SRS" },
+	{ 4*PT_MOF, "4*PT_MOF" },
+	{ 4*PT_SPC, "4*PT_SPC" },
+	{ 4*PT_CCS, "4*PT_CCS" },
+	{ 4*PT_SRP, "4*PT_SRP" },
+	{ 4*PT_ERP, "4*PT_ERP" },
+	{ 4*PT_EXS, "4*PT_EXS" },
+	{ 4*PT_EDA, "4*PT_EDA" },
+	{ 4*PT_USP, "4*PT_USP" },
+	{ 4*PT_PPC, "4*PT_PPC" },
+	{ 4*PT_BP_CTRL, "4*PT_BP_CTRL" },
+	{ 4*PT_BP+4, "4*PT_BP+4" },
+	{ 4*PT_BP+8, "4*PT_BP+8" },
+	{ 4*PT_BP+12, "4*PT_BP+12" },
+	{ 4*PT_BP+16, "4*PT_BP+16" },
+	{ 4*PT_BP+20, "4*PT_BP+20" },
+	{ 4*PT_BP+24, "4*PT_BP+24" },
+	{ 4*PT_BP+28, "4*PT_BP+28" },
+	{ 4*PT_BP+32, "4*PT_BP+32" },
+	{ 4*PT_BP+36, "4*PT_BP+36" },
+	{ 4*PT_BP+40, "4*PT_BP+40" },
+	{ 4*PT_BP+44, "4*PT_BP+44" },
+	{ 4*PT_BP+48, "4*PT_BP+48" },
+	{ 4*PT_BP+52, "4*PT_BP+52" },
+	{ 4*PT_BP+56, "4*PT_BP+56" },
+#   endif
 
-#   if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) && !defined(ALPHA) && !defined(IA64)
+#   if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
+		&& !defined(ALPHA) && !defined(IA64) \
+		&& !defined(CRISV10) && !defined(CRISV32)
 #    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(BFIN)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #    endif
@@ -3097,7 +3172,7 @@ const struct xlat struct_user_offsets[] = {
 #    if defined(I386) || defined(X86_64)
 	{ uoff(u_debugreg),	"offsetof(struct user, u_debugreg)"	},
 #    endif
-#   endif /* !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) && !defined(ALPHA) && !defined(IA64) */
+#   endif /* !defined(many arches) */
 
 #  endif /* LINUX */
 

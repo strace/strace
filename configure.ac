@@ -107,6 +107,14 @@ x86?64*)
 	arch=x86_64
 	AC_DEFINE([X86_64], 1, [Define for the AMD x86-64 architecture.])
 	;;
+cris|crisv10)
+	arch=crisv10
+	AC_DEFINE([CRISV10], 1, [Define for the CRISv10 architecture.])
+	;;
+crisv32)
+	arch=crisv32
+	AC_DEFINE([CRISV32], 1, [Define for the CRISv32 architecture.])
+	;;
 *)
 	AC_MSG_RESULT([NO!])
 	AC_MSG_ERROR([architecture $host_cpu is not supported by strace])

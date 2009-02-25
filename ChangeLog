@@ -1,3 +1,18 @@
+2009-02-25  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	CRIS support by Hinko Kocevar (hinko.kocevar AT cetrtapot.si)
+	* configure.ac: Make it recognize cris.
+	* process.c: Define ARG_xxx constants for cris.
+	(change_syscall): Add support for cris.
+	(struct_user_offsets): Add cris-specific data.
+	* signal.c (sys_sigreturn): Add support for cris.
+	* syscall.c (get_scno): Add support for cris.
+	(syscall_fixup): Add support for cris.
+	(get_error): Add support for cris.
+	(syscall_enter): Add support for cris.
+	(force_result): While at it, fix cpp directives indentation.
+	* util.c (printcall): Add support for cris.
+
 2009-02-24  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	Replace many more bare ptrace calls with calls to wrappers

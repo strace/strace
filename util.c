@@ -1218,8 +1218,7 @@ struct tcb *tcp;
 #endif /* 0 */
 
 void
-printcall(tcp)
-struct tcb *tcp;
+printcall(struct tcb *tcp)
 {
 #define PRINTBADPC tprintf(sizeof(long) == 4 ? "[????????] " : \
 			   sizeof(long) == 8 ? "[????????????????] " : \
@@ -1338,6 +1337,22 @@ struct tcb *tcp;
 	long pc;
 
 	if (upeek(tcp, PT_PC, &pc) < 0) {
+		PRINTBADPC;
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(CRISV10)
+	long pc;
+
+	if (upeek(tcp->pid, 4*PT_IRP, &pc) < 0) {
+		PRINTBADPC;
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(CRISV32)
+	long pc;
+
+	if (upeek(tcp->pid, 4*PT_ERP, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1545,6 +1560,13 @@ typedef struct regs arg_setup_state;
 #    define arg0_offset   (REG_OFFSET+16)
 #    define arg1_offset   (REG_OFFSET+24)
 #    define restore_arg0(tcp, state, val) 0
+#   elif defined CRISV10 || defined CRISV32
+#    define arg0_offset   (4*PT_R11)
+#    define arg1_offset   (4*PT_ORIG_R10)
+#    define restore_arg0(tcp, state, val) 0
+#    define restore_arg1(tcp, state, val) 0
+#    define arg0_index   1
+#    define arg1_index   0
 #   else
 #    define arg0_offset	0
 #    define arg1_offset	4

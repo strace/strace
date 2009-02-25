@@ -1232,10 +1232,9 @@ struct tcb *tcp;
 #ifdef LINUX
 
 int
-sys_sigreturn(tcp)
-struct tcb *tcp;
+sys_sigreturn(struct tcb *tcp)
 {
-#ifdef ARM
+#if defined(ARM)
 	struct pt_regs regs;
 	struct sigcontext_struct sc;
 
@@ -1280,8 +1279,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else
-#ifdef I386
+#elif defined(I386)
 	long esp;
 	struct sigcontext_struct sc;
 
@@ -1304,8 +1302,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else /* !I386 */
-#ifdef IA64
+#elif defined(IA64)
 	struct sigcontext sc;
 	long sp;
 
@@ -1331,8 +1328,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else /* !IA64 */
-#ifdef POWERPC
+#elif defined(POWERPC)
 	long esp;
 	struct sigcontext_struct sc;
 
@@ -1355,8 +1351,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else /* !POWERPC */
-#ifdef M68K
+#elif defined(M68K)
 	long usp;
 	struct sigcontext sc;
 
@@ -1379,8 +1374,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else /* !M68K */
-#ifdef ALPHA
+#elif defined(ALPHA)
 	long fp;
 	struct sigcontext_struct sc;
 
@@ -1403,8 +1397,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else
-#if defined (SPARC) || defined (SPARC64)
+#elif defined (SPARC) || defined (SPARC64)
 	long i1;
 	struct regs regs;
 	m_siginfo_t si;
@@ -1431,8 +1424,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else
-#if defined (LINUX_MIPSN32) || defined (LINUX_MIPSN64)
+#elif defined (LINUX_MIPSN32) || defined (LINUX_MIPSN64)
 	/* This decodes rt_sigreturn.  The 64-bit ABIs do not have
 	   sigreturn.  */
 	long sp;
@@ -1458,8 +1450,7 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
-#else
-#ifdef MIPS
+#elif defined(MIPS)
 	long sp;
 	struct pt_regs regs;
 	m_siginfo_t si;
@@ -1484,19 +1475,38 @@ struct tcb *tcp;
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
+#elif defined(CRISV10) || defined(CRISV32)
+	struct sigcontext sc;
+
+	if (entering(tcp)) {
+		long regs[PT_MAX+1];
+
+		tcp->u_arg[0] = 0;
+
+		if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long)regs) < 0) {
+			perror("sigreturn: PTRACE_GETREGS");
+			return 0;
+		}
+		if (umove(tcp, regs[PT_USP], &sc) < 0)
+			return 0;
+		tcp->u_arg[0] = 1;
+		tcp->u_arg[1] = sc.oldmask;
+	} else {
+		sigset_t sigm;
+		long_to_sigset(tcp->u_arg[1], &sigm);
+		tcp->u_rval = tcp->u_error = 0;
+
+		if (tcp->u_arg[0] == 0)
+			return 0;
+		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
+		return RVAL_NONE | RVAL_STR;
+	}
+	return 0;
 #else
 #warning No sys_sigreturn() for this architecture
 #warning         (no problem, just a reminder :-)
 	return 0;
-#endif /* MIPS */
-#endif /* LINUX_MIPSN32 || LINUX_MIPSN64 */
-#endif /* SPARC || SPARC64 */
-#endif /* ALPHA */
-#endif /* !M68K */
-#endif /* !POWERPC */
-#endif /* !IA64 */
-#endif /* !I386 */
-#endif /* S390 */
+#endif
 }
 
 int
