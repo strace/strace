@@ -13,47 +13,48 @@
 #include <stdio.h>
 #include <sys/wait.h>
 
-static void *start0 (void *arg)
+static void *start0(void *arg)
 {
-  pause ();
-  /* NOTREACHED */
-  assert (0);
+	pause();
+	/* NOTREACHED */
+	assert(0);
 }
 
-int main (void)
+int main(int argc, char *argv[])
 {
-  pthread_t thread0;
-  int i;
-  pid_t child, got_pid;
-  int status;
+	pthread_t thread0;
+	pid_t child, got_pid;
+	int status;
+	int i;
 
-  child = fork ();
-  switch (child)
-    {
-    case -1:
-      assert (0);
-    case 0:
-      i = pthread_create (&thread0, NULL, start0, NULL);
-      assert (i == 0);
-      /* The thread must be initialized, it becomes thread-child of this
-	 process-child (child of a child of the toplevel process).  */
-      sleep (1);
-      /* Here the child TCB cannot be deallocated as there still exist
-       * children (the thread child in START0).  */
-      exit (42);
-      /* NOTREACHED */
-      assert (0);
-    default:
-      /* We must not be waiting in WAITPID when the child double-exits.  */
-      sleep (2);
-      /* PID must be -1.  */
-      got_pid = waitpid (-1, &status, 0);
-      assert (got_pid == child);
-      assert (WIFEXITED (status));
-      assert (WEXITSTATUS (status) == 42);
-      puts ("OK");
-      exit (0);
-    }
-  /* NOTREACHED */
-  assert (0);
+	child = fork();
+
+	switch(child) {
+	case -1:
+		assert(0);
+	case 0:
+		i = pthread_create(&thread0, NULL, start0, NULL);
+		assert(i == 0);
+		/* The thread must be initialized, it becomes thread-child of this
+		   process-child (child of a child of the toplevel process).  */
+		sleep(1);
+		/* Here the child TCB cannot be deallocated as there still exist
+		 * children (the thread child in START0).  */
+		exit(42);
+		/* NOTREACHED */
+		assert(0);
+	default:
+		/* We must not be waiting in WAITPID when the child double-exits.  */
+		sleep(2);
+		/* PID must be -1.  */
+		got_pid = waitpid(-1, &status, 0);
+		assert(got_pid == child);
+		assert(WIFEXITED(status));
+		assert(WEXITSTATUS(status) == 42);
+		puts("OK");
+		exit(0);
+	}
+
+	/* NOTREACHED */
+	assert(0);
 }

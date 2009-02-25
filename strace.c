@@ -108,8 +108,9 @@ int not_failing_only = 0;
 static int exit_code = 0;
 static int strace_child = 0;
 static int ptrace_stop_sig = SIGTRAP;
+#if defined LINUX && (defined PTRACE_SETOPTIONS || defined PT_SETOPTIONS)
 static bool ptrace_opts_set;
-
+#endif
 static char *username = NULL;
 uid_t run_uid;
 gid_t run_gid;

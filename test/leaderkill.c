@@ -13,52 +13,52 @@
 #include <stdio.h>
 #include <sys/wait.h>
 
-static void *start0 (void *arg)
+static void *start0(void *arg)
 {
-  sleep (1);
-
-  exit (42);
+	sleep(1);
+	exit(42);
 }
 
-static void *start1 (void *arg)
+static void *start1(void *arg)
 {
-  pause ();
-  /* NOTREACHED */
-  assert (0);
-}
-
-int main (void)
-{
-  pthread_t thread0;
-  pthread_t thread1;
-  int i;
-  pid_t child, got_pid;
-  int status;
-
-  sleep (2);
-
-  child = fork ();
-  switch (child)
-    {
-      case -1:
-	abort ();
-      case 0:
-	i = pthread_create (&thread0, NULL, start0, NULL);
-	assert (i == 0);
-	i = pthread_create (&thread1, NULL, start1, NULL);
-	assert (i == 0);
-	pause ();
+	pause();
 	/* NOTREACHED */
-	assert (0);
-	break;
-      default:
-	got_pid = waitpid (child, &status, 0);
-	assert (got_pid == child);
-	assert (WIFEXITED (status));
-	assert (WEXITSTATUS (status) == 42);
-	puts ("OK");
-	exit (0);
-    }
-  /* NOTREACHED */
-  abort ();
+	assert(0);
+}
+
+int main(int argc, char *argv[])
+{
+	pthread_t thread0;
+	pthread_t thread1;
+	pid_t child, got_pid;
+	int status;
+	int i;
+
+	sleep(2);
+
+	child = fork();
+
+	switch(child) {
+	case -1:
+		abort();
+	case 0:
+		i = pthread_create(&thread0, NULL, start0, NULL);
+		assert(i == 0);
+		i = pthread_create(&thread1, NULL, start1, NULL);
+		assert(i == 0);
+		pause();
+		/* NOTREACHED */
+		assert(0);
+		break;
+	default:
+		got_pid = waitpid(child, &status, 0);
+		assert(got_pid == child);
+		assert(WIFEXITED(status));
+		assert(WEXITSTATUS(status) == 42);
+		puts("OK");
+		exit(0);
+	}
+
+	/* NOTREACHED */
+	abort();
 }

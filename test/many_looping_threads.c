@@ -17,7 +17,7 @@ static void *sub_thd(void *c)
 	return NULL;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	int i;
 	pthread_t *thd;
@@ -28,10 +28,12 @@ int main(int argc, char **argv)
 
 	thd = malloc(num_threads * sizeof(thd[0]));
 	fprintf(stderr, "test start, num_threads:%d...\n", num_threads);
+
 	for (i = 0; i < num_threads; i++) {
 		pthread_create(&thd[i], NULL, sub_thd, NULL);
 		fprintf(stderr, "after pthread_create\n");
 	}
+
 	/* Exit. This kills all threads */
 	return 0;
 }

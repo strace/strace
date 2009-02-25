@@ -6,28 +6,33 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-int
-main(void)
+int main(int argc, char *argv[])
 {
-  char *c = (char*)0x94000000;
-  int fd;
-  open( "/tmp/delme", O_RDWR );
-  mmap( c, 4096, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, 3, 0 );
-  *c = 0;
-  if (fork()) {
-    while(1) {
-      strcpy( c, "/etc/passwd" );
-      strcpy( c, "/etc/shadow" );
-    }
-  } else
-    while (1)
-      if ((fd=open( c, 0 ))!=-1)
-	  close(fd);
-  return 0;
+	/* XXX: x86 specific stuff? */
+	char *c = (char*) 0x94000000;
+	int fd;
+
+	open("/tmp/delme", O_RDWR);
+	mmap(c, 4096, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, 3, 0);
+	*c = 0;
+
+	if (fork()) {
+		while(1) {
+			strcpy(c, "/etc/passwd");
+			strcpy(c, "/etc/shadow");
+		}
+	} else {
+		while (1)
+			if ((fd = open(c, 0)) != -1)
+				close(fd);
+	}
+
+	return 0;
 }
