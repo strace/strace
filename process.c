@@ -537,7 +537,7 @@ struct tcb *tcp;
 			return 0;
 		tcpchild = alloctcb(tcp->u_rval);
 		if (proc_open(tcpchild, 2) < 0)
-		  	droptcb(tcpchild);
+			droptcb(tcpchild);
 	}
 	return 0;
 }
@@ -706,11 +706,11 @@ change_syscall(struct tcb *tcp, int new)
 #elif defined(S390) || defined(S390X)
 	/* s390 linux after 2.4.7 has a hook in entry.S to allow this */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new)<0)
-	        return -1;
+		return -1;
 	return 0;
 #elif defined(M68K)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new)<0)
-	    	return -1;
+		return -1;
 	return 0;
 #elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
@@ -718,15 +718,19 @@ change_syscall(struct tcb *tcp, int new)
 		return -1;
 	regs.r_g1=new;
 	if (ptrace(PTRACE_SETREGS, tcp->pid, (char*)&regs, 0)<0)
-	    	return -1;
+		return -1;
 	return 0;
 #elif defined(MIPS)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), new)<0)
-	    	return -1;
+		return -1;
 	return 0;
 #elif defined(ALPHA)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new)<0)
-	    	return -1;
+		return -1;
+	return 0;
+#elif defined(AVR32)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_R8), new) < 0)
+		return -1;
 	return 0;
 #elif defined(BFIN)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_P0), new)<0)
@@ -752,7 +756,7 @@ change_syscall(struct tcb *tcp, int new)
 	return 0;
 #elif defined(HPPA)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR20), new)<0)
-	    	return -1;
+		return -1;
 	return 0;
 #elif defined(SH)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new)<0)
@@ -792,7 +796,34 @@ setarg(tcp, argnum)
 	struct tcb *tcp;
 	int argnum;
 {
-#if defined (IA64)
+#if defined(AVR32)
+	{
+		errno = 0;
+		if (argnum == 0)
+			ptrace(PTRACE_POKEUSER, tcp->pid,
+			       (char *)(REG_R12_ORIG),
+			       tcp->u_arg[argnum]);
+		else if (argnum < 4)
+			/* r11 .. r9 */
+			ptrace(PTRACE_POKEUSER, tcp->pid,
+			       (char *)(REG_R12 - 4 * argnum),
+			       tcp->u_arg[argnum]);
+		else if (argnum < 5)
+			/* r5 */
+			ptrace(PTRACE_POKEUSER, tcp->pid,
+			       (char *)(REG_R5),
+			       tcp->u_arg[argnum]);
+		else if (argnum < 6)
+			/* r3 */
+			ptrace(PTRACE_POKEUSER, tcp->pid,
+			       (char *)(REG_R3),
+			       tcp->u_arg[argnum]);
+		else
+			return -E2BIG;
+		if (errno)
+			return -1;
+	}
+#elif defined(IA64)
 	{
 		unsigned long *bsp, *ap;
 
@@ -940,7 +971,7 @@ internal_clone(struct tcb *tcp)
 				sizeof tcpchild->inst);
 		}
 		tcpchild->parent = tcp;
- 		tcp->nchildren++;
+		tcp->nchildren++;
 		if (tcpchild->flags & TCB_SUSPENDED) {
 			/* The child was born suspended, due to our having
 			   forced CLONE_PTRACE.  */
@@ -998,7 +1029,7 @@ Process %u resumed (parent %d ready)\n",
 			}
 		}
 #endif
- 	}
+	}
 	return 0;
 }
 #endif
@@ -1029,7 +1060,7 @@ struct tcb *tcp;
 	if (entering(tcp)) {
 		if (setbpt(tcp) < 0)
 			return 0;
-  	}
+	}
 	else {
 		int bpt = tcp->flags & TCB_BPTSET;
 
@@ -2990,6 +3021,25 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(regs.ARM_lr),	"lr"					},
 	{ uoff(regs.ARM_pc),	"pc"					},
 	{ uoff(regs.ARM_cpsr),	"cpsr"					},
+#   elif defined(AVR32)
+	{ uoff(regs.sr),	"sr"					},
+	{ uoff(regs.pc),	"pc"					},
+	{ uoff(regs.lr),	"lr"					},
+	{ uoff(regs.sp),	"sp"					},
+	{ uoff(regs.r12),	"r12"					},
+	{ uoff(regs.r11),	"r11"					},
+	{ uoff(regs.r10),	"r10"					},
+	{ uoff(regs.r9),	"r9"					},
+	{ uoff(regs.r8),	"r8"					},
+	{ uoff(regs.r7),	"r7"					},
+	{ uoff(regs.r6),	"r6"					},
+	{ uoff(regs.r5),	"r5"					},
+	{ uoff(regs.r4),	"r4"					},
+	{ uoff(regs.r3),	"r3"					},
+	{ uoff(regs.r2),	"r2"					},
+	{ uoff(regs.r1),	"r1"					},
+	{ uoff(regs.r0),	"r0"					},
+	{ uoff(regs.r12_orig),	"orig_r12"				},
 #   elif defined(MIPS)
 	{ 0,			"r0"					},
 	{ 1,			"r1"					},
@@ -3136,7 +3186,7 @@ const struct xlat struct_user_offsets[] = {
 #   if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
 		&& !defined(ALPHA) && !defined(IA64) \
 		&& !defined(CRISV10) && !defined(CRISV32)
-#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(BFIN)
+#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #    endif
 #    if defined(I386) || defined(X86_64)
@@ -3151,20 +3201,20 @@ const struct xlat struct_user_offsets[] = {
 #    if !defined(SPARC64)
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
 #    endif
-#    ifdef SH64
+#    if defined(AVR32) || defined(SH64)
 	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
 #    endif
 #    if !defined(SPARC64)
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
 #    endif
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
+#    if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
 #    endif
 #    if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
 #    endif
-#    if !defined(ARM) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
+#    if !defined(ARM) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
 #    endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},

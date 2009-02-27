@@ -167,7 +167,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
 	{ -1,	0,	printargs,		"SYS_138"	}, /* 138 */
 	{ -1,	0,	printargs,		"SYS_139"	}, /* 139 */
- 	{ 5,	0,	sys_llseek,		"_llseek"	}, /* 140 */
+	{ 5,	0,	sys_llseek,		"_llseek"	}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
 	{ 2,	TD,	sys_flock,		"flock"		}, /* 143 */
@@ -219,12 +219,12 @@
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
- 	{ -1,	0,	printargs,		"SYS_192"	}, /* 192 */
- 	{ -1,	0,	printargs,		"SYS_193"	}, /* 193 */
- 	{ -1,	0,	printargs,		"SYS_194"	}, /* 194 */
- 	{ -1,	0,	printargs,		"SYS_195"	}, /* 195 */
- 	{ -1,	0,	printargs,		"SYS_196"	}, /* 196 */
- 	{ -1,	0,	printargs,		"SYS_197"	}, /* 197 */
+	{ -1,	0,	printargs,		"SYS_192"	}, /* 192 */
+	{ -1,	0,	printargs,		"SYS_193"	}, /* 193 */
+	{ -1,	0,	printargs,		"SYS_194"	}, /* 194 */
+	{ -1,	0,	printargs,		"SYS_195"	}, /* 195 */
+	{ -1,	0,	printargs,		"SYS_196"	}, /* 196 */
+	{ -1,	0,	printargs,		"SYS_197"	}, /* 197 */
 	{ 3,	TF,	sys_chown,		"lchown"	}, /* 198 */
 	{ 0,	0,	sys_getuid,		"getuid"	}, /* 199 */
 	{ 0,	0,	sys_getgid,		"getgid"	}, /* 200 */

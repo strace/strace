@@ -1270,7 +1270,7 @@ sys_so_socketpair(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-	  	/* not sure what this arg is */
+		/* not sure what this arg is */
 		tprintf("0x%lx", tcp->u_arg[0]);
 	}
 	return 0;
@@ -1644,7 +1644,7 @@ struct tcb *tcp;
 			switch (tcp->u_arg[2]) {
 #ifdef SO_LINGER
 			case SO_LINGER:
-			        if (len == sizeof (struct linger)) {
+				if (len == sizeof (struct linger)) {
 					struct linger linger;
 					if (umove (tcp,
 						   tcp->u_arg[3],

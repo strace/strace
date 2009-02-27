@@ -982,10 +982,10 @@ long addr;
 	struct stat statbuf;
 
 #ifdef LINUXSPARC
- 	if (current_personality == 1) {
- 		printstatsol(tcp, addr);
- 		return;
- 	}
+	if (current_personality == 1) {
+		printstatsol(tcp, addr);
+		return;
+	}
 #ifdef SPARC64
 	else if (current_personality == 2) {
 		printstat_sparc64(tcp, addr);
@@ -1056,10 +1056,10 @@ long addr;
 #endif
 
 #ifdef LINUXSPARC
- 	if (current_personality == 1) {
- 		printstatsol(tcp, addr);
- 		return;
- 	}
+	if (current_personality == 1) {
+		printstatsol(tcp, addr);
+		return;
+	}
 #ifdef SPARC64
 	else if (current_personality == 2) {
 		printstat_sparc64(tcp, addr);
@@ -1188,10 +1188,10 @@ long addr;
 	struct stat newstatbuf;
 
 #ifdef LINUXSPARC
- 	if (current_personality == 1) {
- 		printstatsol(tcp, addr);
- 		return;
- 	}
+	if (current_personality == 1) {
+		printstatsol(tcp, addr);
+		return;
+	}
 #endif /* LINUXSPARC */
 
 	if (!addr) {

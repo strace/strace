@@ -1431,21 +1431,21 @@ sys_sigreturn(struct tcb *tcp)
 	struct ucontext uc;
 
 	if(entering(tcp)) {
-	  	tcp->u_arg[0] = 0;
+		tcp->u_arg[0] = 0;
 		if (upeek(tcp, REG_SP, &sp) < 0)
-		  	return 0;
+			return 0;
 		/* There are six words followed by a 128-byte siginfo.  */
 		sp = sp + 6 * 4 + 128;
 		if (umove(tcp, sp, &uc) < 0)
-		  	return 0;
+			return 0;
 		tcp->u_arg[0] = 1;
 		tcp->u_arg[1] = *(long *) &uc.uc_sigmask;
 	} else {
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[1], &sigm);
-	  	tcp->u_rval = tcp->u_error = 0;
+		tcp->u_rval = tcp->u_error = 0;
 		if(tcp->u_arg[0] == 0)
-		  	return 0;
+			return 0;
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
 	}
@@ -1460,7 +1460,7 @@ sys_sigreturn(struct tcb *tcp)
 		return 0;
 	}
 	if(entering(tcp)) {
-	  	tcp->u_arg[0] = 0;
+		tcp->u_arg[0] = 0;
 		sp = regs.regs[29];
 		if (umove(tcp, sp, &si) < 0)
 		tcp->u_arg[0] = 1;
@@ -1468,7 +1468,7 @@ sys_sigreturn(struct tcb *tcp)
 	} else {
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[1], &sigm);
-	  	tcp->u_rval = tcp->u_error = 0;
+		tcp->u_rval = tcp->u_error = 0;
 		if(tcp->u_arg[0] == 0)
 			return 0;
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);

@@ -1,3 +1,17 @@
+2009-02-27  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	AVR32 support by Hans-Christian Egtvedt
+	(hans-christian.egtvedt AT atmel.com).
+	* configure.ac: Make it recognize avr32.
+	* defs.h: Define LINUX_AVR32.
+	* linux/avr32/syscallent.h: New file.
+	* Makefile.am: Reference linux/avr32/syscallent.h.
+	* proc.c (change_syscall, setarg): Add support for avr32.
+	(struct xlat struct_user_offsets[]): Ditto.
+	* syscall.c (get_scno): Ditto.
+	(get_error, force_result, syscall_enter): Ditto.
+	* util.c (getpc, printcall): Ditto.
+
 2009-02-25  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	CRIS support by Hinko Kocevar (hinko.kocevar AT cetrtapot.si)

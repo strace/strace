@@ -242,7 +242,7 @@ int code, arg;
 		printflags(proc_status_flags, arg, "PF_???");
 		return 1;
 	case PIOCGFL:
-	        if (syserror(tcp))
+		if (syserror(tcp))
 			tprintf(", %#x", arg);
 		else if (umove(tcp, arg, &val) < 0)
 			tprintf(", {...}");

@@ -468,7 +468,7 @@ int
 sys_poll(tcp)
 struct tcb *tcp;
 {
-    	return 0;
+	return 0;
 }
 #endif
 

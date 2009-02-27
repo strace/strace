@@ -336,7 +336,7 @@ sys_fcntl(struct tcb *tcp)
 			printflock64(tcp, tcp->u_arg[2], 0);
 			break;
 #endif
- 		}
+		}
 	}
 	else {
 		switch (tcp->u_arg[1]) {
@@ -368,7 +368,7 @@ sys_fcntl(struct tcb *tcp)
 			printflock64(tcp, tcp->u_arg[2], 1);
 			break;
 #endif
- 		default:
+		default:
 			tprintf(", %#lx", tcp->u_arg[2]);
 			break;
 		}

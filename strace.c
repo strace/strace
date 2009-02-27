@@ -1140,12 +1140,12 @@ proc_open(struct tcb *tcp, int attaching)
 	/* just unset the PF_LINGER flag for the Run-on-Last-Close. */
 	if (ioctl(tcp->pfd, PIOCGFL, &arg) < 0) {
 	        perror("PIOCGFL");
-	        return -1;
+		return -1;
 	}
 	arg &= ~PF_LINGER;
 	if (ioctl(tcp->pfd, PIOCSFL, arg) < 0) {
-	        perror("PIOCSFL");
-	        return -1;
+		perror("PIOCSFL");
+		return -1;
 	}
 #endif /* FREEBSD */
 #endif /* !PIOCSET */
@@ -1464,7 +1464,7 @@ resume_from_tcp (struct tcb *tcp)
 	if (tcp->parent &&
 	    (tcp->parent->flags & TCB_SUSPENDED) &&
 	    (tcp->parent->waitpid <= 0 || tcp->parent->waitpid == tcp->pid)) {
- 		error = resume(tcp->parent);
+		error = resume(tcp->parent);
 		++resumed;
 	}
 #ifdef TCB_CLONE_THREAD
@@ -1883,10 +1883,10 @@ int pfd;
 	pollinfo.pid = getpid();
 	for (;;) {
 #ifndef FREEBSD
-	        if (ioctl(pfd, PIOCWSTOP, NULL) < 0)
-#else /* FREEBSD */
-	        if (ioctl(pfd, PIOCWSTOP, &pfs) < 0)
-#endif /* FREEBSD */
+		if (ioctl(pfd, PIOCWSTOP, NULL) < 0)
+#else
+		if (ioctl(pfd, PIOCWSTOP, &pfs) < 0)
+#endif
 		{
 			switch (errno) {
 			case EINTR:
@@ -2048,7 +2048,7 @@ trace()
 			if (proc_poll_pipe[0] != -1)
 				ioctl_result = IOCTL_STATUS (tcp);
 			else
-			  	ioctl_result = IOCTL_WSTOP (tcp);
+				ioctl_result = IOCTL_WSTOP (tcp);
 #endif /* FREEBSD */
 			ioctl_errno = errno;
 #ifndef HAVE_POLLABLE_PROCFS
@@ -2166,7 +2166,7 @@ trace()
 			break;
 #ifdef FREEBSD
 		case 0: /* handle case we polled for nothing */
-		  	continue;
+			continue;
 #endif
 		default:
 			fprintf(stderr, "odd stop %d\n", tcp->status.PR_WHY);
@@ -2227,7 +2227,7 @@ handle_group_exit(struct tcb *tcp, int sig)
 		tcp->flags |= TCB_EXITING | TCB_GROUP_EXITING;
 		if (tcp->flags & TCB_ATTACHED) {
 			detach(tcp, sig);
-		  	if (leader != NULL && leader != tcp)
+			if (leader != NULL && leader != tcp)
 				leader->flags |= TCB_GROUP_EXITING;
 		} else {
 			if (ptrace_restart(PTRACE_CONT, tcp, sig) < 0) {

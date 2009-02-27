@@ -83,6 +83,10 @@ arm*)
 	arch=arm
 	AC_DEFINE([ARM], 1, [Define for the ARM architecture.])
 	;;
+avr32*)
+	arch=avr32
+	AC_DEFINE([AVR32], 1, [Define for the AVR32 architecture.])
+	;;
 s390)
 	arch=s390
 	AC_DEFINE([S390], 1, [Define for the S390 architecture.])
