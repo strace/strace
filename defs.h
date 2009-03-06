@@ -373,7 +373,10 @@ struct tcb {
  * without using TCB_WAITEXECVE flag.
  * I guess we can remove it from the source somewhere around year 2010 :)
  */
-# if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) || defined(POWERPC) || defined(IA64) || defined(HPPA) || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) || defined(ARM) || defined(MIPS) || defined(BFIN)
+# if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
+  || defined(POWERPC) || defined(IA64) || defined(HPPA) \
+  || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) \
+  || defined(ARM) || defined(MIPS) || defined(BFIN)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
 # endif
 # define TCB_CLONE_DETACHED 04000 /* CLONE_DETACHED set in creating syscall */
