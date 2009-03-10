@@ -420,7 +420,7 @@ sys_mq_open(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
 		/* flags */
-		tprint_open_modes(tcp, tcp->u_arg[1]);
+		tprint_open_modes(tcp->u_arg[1]);
 		if (tcp->u_arg[1] & O_CREAT) {
 # ifndef HAVE_MQUEUE_H
 			tprintf(", %lx", tcp->u_arg[2]);
@@ -489,7 +489,7 @@ printmqattr(struct tcb *tcp, long addr)
 			return;
 		}
 		tprintf("{mq_flags=");
-		tprint_open_modes(tcp, attr.mq_flags);
+		tprint_open_modes(attr.mq_flags);
 		tprintf(", mq_maxmsg=%ld, mq_msgsize=%ld, mq_curmsg=%ld}",
 			attr.mq_maxmsg, attr.mq_msgsize, attr.mq_curmsgs);
 # endif

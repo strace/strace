@@ -239,7 +239,7 @@ const struct xlat open_mode_flags[] = {
 #ifdef O_RSYNC
 	{ O_RSYNC,	"O_RSYNC"	},
 #endif
-#ifdef O_NDELAY
+#if defined(O_NDELAY) && (O_NDELAY != O_NONBLOCK)
 	{ O_NDELAY,	"O_NDELAY"	},
 #endif
 #ifdef O_PRIV
@@ -339,23 +339,61 @@ print_dirfd(long fd)
 #endif
 
 /*
+ * Pity stpcpy() is not standardized...
+ */
+static char *
+str_append(char *dst, const char *src)
+{
+	while ((*dst = *src++) != '\0')
+		dst++;
+	return dst;
+}
+
+/*
  * low bits of the open(2) flags define access mode,
  * other bits are real flags.
  */
-void
-tprint_open_modes(struct tcb *tcp, mode_t flags)
+const char *
+sprint_open_modes(mode_t flags)
 {
-	const char *str = xlookup(open_access_modes, flags & 3);
+	static char outstr[1024];
+	char *p;
+	char sep = 0;
+	const char *str;
+	const struct xlat *x;
 
-	if (str)
-	{
-		tprintf("%s", str);
+	p = str_append(outstr, "flags ");
+	str = xlookup(open_access_modes, flags & 3);
+	if (str) {
+		p = str_append(p, str);
 		flags &= ~3;
 		if (!flags)
-			return;
-		tprintf("|");
+			return outstr;
+		sep = '|';
 	}
-	printflags(open_mode_flags, flags, "O_???");
+
+	for (x = open_mode_flags; x->str; x++) {
+		if ((flags & x->val) == x->val) {
+			if (sep)
+				*p++ = sep;
+			p = str_append(p, x->str);
+			flags &= ~x->val;
+			if (!flags)
+				return outstr;
+			sep = '|';
+		}
+	}
+	/* flags is still nonzero */
+	if (sep)
+		*p++ = sep;
+	sprintf(p, "%#x", flags);
+	return outstr;
+}
+
+void
+tprint_open_modes(mode_t flags)
+{
+	tprintf(sprint_open_modes(flags) + sizeof("flags"));
 }
 
 static int
@@ -365,7 +403,7 @@ decode_open(struct tcb *tcp, int offset)
 		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", ");
 		/* flags */
-		tprint_open_modes(tcp, tcp->u_arg[offset + 1]);
+		tprint_open_modes(tcp->u_arg[offset + 1]);
 		if (tcp->u_arg[offset + 1] & O_CREAT) {
 			/* mode */
 			tprintf(", %#lo", tcp->u_arg[offset + 2]);

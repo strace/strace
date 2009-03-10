@@ -148,6 +148,18 @@ static const struct xlat fcntlcmds[] = {
 #ifdef F_UNSHARE
 	{ F_UNSHARE,	"F_UNSHARE"	},
 #endif
+#ifdef F_SETLEASE
+	{ F_SETLEASE,	"F_SETLEASE"	},
+#endif
+#ifdef F_GETLEASE
+	{ F_GETLEASE,	"F_GETLEASE"	},
+#endif
+#ifdef F_NOTIFY
+	{ F_NOTIFY,	"F_NOTIFY"	},
+#endif
+#ifdef F_DUPFD_CLOEXEC
+	{ F_DUPFD_CLOEXEC,"F_DUPFD_CLOEXEC"},
+#endif
 	{ 0,		NULL		},
 };
 
@@ -182,6 +194,33 @@ static const struct xlat lockfcmds[] = {
 #endif
 	{ 0,		NULL		},
 };
+
+#ifdef F_NOTIFY
+static const struct xlat notifyflags[] = {
+#ifdef DN_ACCESS
+	{ DN_ACCESS,	"DN_ACCESS"	},
+#endif
+#ifdef DN_MODIFY
+	{ DN_MODIFY,	"DN_MODIFY"	},
+#endif
+#ifdef DN_CREATE
+	{ DN_CREATE,	"DN_CREATE"	},
+#endif
+#ifdef DN_DELETE
+	{ DN_DELETE,	"DN_DELETE"	},
+#endif
+#ifdef DN_RENAME
+	{ DN_RENAME,	"DN_RENAME"	},
+#endif
+#ifdef DN_ATTRIB
+	{ DN_ATTRIB,	"DN_ATTRIB"	},
+#endif
+#ifdef DN_MULTISHOT
+	{ DN_MULTISHOT,	"DN_MULTISHOT"	},
+#endif
+	{ 0,		NULL		},
+};
+#endif
 
 static const struct xlat whence[] = {
 	{ SEEK_SET,	"SEEK_SET"	},
@@ -261,40 +300,6 @@ printflock64(struct tcb *tcp, long addr, int getlk)
 }
 #endif
 
-/*
- * low bits of the open(2) flags define access mode,
- * other bits are real flags.
- */
-static const char *
-sprint_open_modes(mode_t flags)
-{
-	static char outstr[1024];
-	const char *str = xlookup(open_access_modes, flags & 3);
-	const char *sep = "";
-	const struct xlat *x;
-
-	strcpy(outstr, "flags ");
-	if (str) {
-		strcat(outstr, str);
-		flags &= ~3;
-		if (!flags)
-			return outstr;
-		strcat(outstr, "|");
-	}
-
-	for (x = open_mode_flags; x->str; x++) {
-		if ((flags & x->val) == x->val) {
-			sprintf(outstr + strlen(outstr),
-				"%s%s", sep, x->str);
-			sep = "|";
-			flags &= ~x->val;
-		}
-	}
-	if (flags)
-		sprintf(outstr + strlen(outstr), "%s%#x", sep, flags);
-	return outstr;
-}
-
 int
 sys_fcntl(struct tcb *tcp)
 {
@@ -307,11 +312,14 @@ sys_fcntl(struct tcb *tcp)
 			printflags(fdflags, tcp->u_arg[2], "FD_???");
 			break;
 		case F_SETOWN: case F_DUPFD:
+#ifdef F_DUPFD_CLOEXEC
+		case F_DUPFD_CLOEXEC:
+#endif
 			tprintf(", %ld", tcp->u_arg[2]);
 			break;
 		case F_SETFL:
 			tprintf(", ");
-			tprint_open_modes(tcp, tcp->u_arg[2]);
+			tprint_open_modes(tcp->u_arg[2]);
 			break;
 		case F_SETLK: case F_SETLKW:
 #ifdef F_FREESP
@@ -326,14 +334,26 @@ sys_fcntl(struct tcb *tcp)
 #endif
 		/* Linux glibc defines SETLK64 as SETLK,
 		   even though the kernel has different values - as does Solaris. */
-#if defined(F_SETLK64) && F_SETLK64+0!=F_SETLK
+#if defined(F_SETLK64) && F_SETLK64 + 0 != F_SETLK
 		case F_SETLK64:
 #endif
-#if defined(F_SETLKW64) && F_SETLKW64+0!=F_SETLKW
+#if defined(F_SETLKW64) && F_SETLKW64 + 0 != F_SETLKW
 		case F_SETLKW64:
 #endif
 			tprintf(", ");
 			printflock64(tcp, tcp->u_arg[2], 0);
+			break;
+#endif
+#ifdef F_NOTIFY
+		case F_NOTIFY:
+			tprintf(", ");
+			printflags(notifyflags, tcp->u_arg[2], "DN_???");
+			break;
+#endif
+#ifdef F_SETLEASE
+		case F_SETLEASE:
+			tprintf(", ");
+			printxval(lockfcmds, tcp->u_arg[2], "F_???");
 			break;
 #endif
 		}
@@ -341,15 +361,23 @@ sys_fcntl(struct tcb *tcp)
 	else {
 		switch (tcp->u_arg[1]) {
 		case F_DUPFD:
+#ifdef F_DUPFD_CLOEXEC
+		case F_DUPFD_CLOEXEC:
+#endif
 		case F_SETFD: case F_SETFL:
 		case F_SETLK: case F_SETLKW:
 		case F_SETOWN: case F_GETOWN:
+#ifdef F_NOTIFY
+		case F_NOTIFY:
+#endif
+#ifdef F_SETLEASE
+		case F_SETLEASE:
+#endif
 			break;
 		case F_GETFD:
 			if (syserror(tcp) || tcp->u_rval == 0)
 				return 0;
-			tcp->auxstr =
-				sprintflags("flags ", fdflags, tcp->u_rval);
+			tcp->auxstr = sprintflags("flags ", fdflags, tcp->u_rval);
 			return RVAL_HEX|RVAL_STR;
 		case F_GETFL:
 			if (syserror(tcp))
@@ -367,6 +395,13 @@ sys_fcntl(struct tcb *tcp)
 			tprintf(", ");
 			printflock64(tcp, tcp->u_arg[2], 1);
 			break;
+#endif
+#ifdef F_GETLEASE
+		case F_GETLEASE:
+			if (syserror(tcp))
+				return 0;
+			tcp->auxstr = xlookup(lockfcmds, tcp->u_rval);
+			return RVAL_HEX|RVAL_STR;
 #endif
 		default:
 			tprintf(", %#lx", tcp->u_arg[2]);

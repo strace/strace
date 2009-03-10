@@ -1,3 +1,21 @@
+2009-03-10  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	Decode fcntl's F_{GET,SET}LEASE, F_NOTIFY, and F_DUPFD_CLOEXEC.
+	By Mike Frysinger (vapier AT gentoo.org)
+	* desc.c: Add F_SETLEASE, F_GETLEASE, F_NOTIFY,
+	F_DUPFD_CLOEXEC to fcntlcmds[]. Create notifyflags[] array.
+	(sys_fcntl): Handle new flags.
+
+	Optimize printing of open modes.
+	* defs.h: Declare sprint_open_modes(),
+	remove unused parameter in tprint_open_modes().
+	* desc.c (sprint_open_modes): Move fuction definition from here...
+	* file.c (sprint_open_modes): To here.
+	(tprint_open_modes): Use sprint_open_modes(), it already
+	generates needed string.
+	* ipc.c: Remove unused parameter from calls
+	to tprint_open_modes().
+
 2009-02-27  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	AVR32 support by Hans-Christian Egtvedt
