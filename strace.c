@@ -437,15 +437,9 @@ startup_attach(void)
 					if (tid <= 0)
 						continue;
 					++ntid;
-					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0) {
+					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0)
 						++nerr;
-						continue;
-					}
-#if defined LINUX && defined __NR_tkill
-					syscall(__NR_tkill, tid, SIGSTOP);
-					ptrace(PTRACE_CONT, tid, 0, 0);
-#endif
-					if (tid != tcbtab[tcbi]->pid) {
+					else if (tid != tcbtab[tcbi]->pid) {
 						tcp = alloctcb(tid);
 						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED;
 						tcbtab[tcbi]->nchildren++;
@@ -453,14 +447,14 @@ startup_attach(void)
 						tcbtab[tcbi]->nclone_detached++;
 						tcp->parent = tcbtab[tcbi];
 					}
+					if (interactive) {
+						sigprocmask(SIG_SETMASK, &empty_set, NULL);
+						if (interrupted)
+							return;
+						sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+					}
 				}
 				closedir(dir);
-				if (interactive) {
-					sigprocmask(SIG_SETMASK, &empty_set, NULL);
-					if (interrupted)
-						return;
-					sigprocmask(SIG_BLOCK, &blocked_set, NULL);
-				}
 				ntid -= nerr;
 				if (ntid == 0) {
 					perror("attach: ptrace(PTRACE_ATTACH, ...)");
@@ -482,14 +476,6 @@ startup_attach(void)
 			droptcb(tcp);
 			continue;
 		}
-#if defined LINUX && defined __NR_tkill
-		/* If process was SIGSTOPed, and waited for,
-		   even before attach, we will never get SIGSTOP
-		   notification. This works around it.
-		   Borrowed from GDB, thanks Jan! */
-		syscall(__NR_tkill, tcp->pid, SIGSTOP);
-		ptrace(PTRACE_CONT, tcp->pid, 0, 0);
-#endif
 		/* INTERRUPTED is going to be checked at the top of TRACE.  */
 
 		if (daemonized_tracer) {

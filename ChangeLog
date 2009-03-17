@@ -1,8 +1,6 @@
 2009-03-17  Denys Vlasenko  <dvlasenk@redhat.com>
 
-	* strace.c (startup_attach): Take care to correctly attach
-	to stopped processes by resending SIGSTOP.
-	(collect_stopped_tcbs): Check for ^C here, not in trace().
+	* strace.c (collect_stopped_tcbs): Check for ^C here, not in trace().
 	(trace): Remove check for ^C.
 
 2009-03-10  Denys Vlasenko  <dvlasenk@redhat.com>
