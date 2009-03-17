@@ -437,9 +437,15 @@ startup_attach(void)
 					if (tid <= 0)
 						continue;
 					++ntid;
-					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0)
+					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0) {
 						++nerr;
-					else if (tid != tcbtab[tcbi]->pid) {
+						continue;
+					}
+#if defined LINUX && defined __NR_tkill
+					syscall(__NR_tkill, tid, SIGSTOP);
+					ptrace(PTRACE_CONT, tid, 0, 0);
+#endif
+					if (tid != tcbtab[tcbi]->pid) {
 						tcp = alloctcb(tid);
 						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED;
 						tcbtab[tcbi]->nchildren++;
@@ -447,14 +453,14 @@ startup_attach(void)
 						tcbtab[tcbi]->nclone_detached++;
 						tcp->parent = tcbtab[tcbi];
 					}
-					if (interactive) {
-						sigprocmask(SIG_SETMASK, &empty_set, NULL);
-						if (interrupted)
-							return;
-						sigprocmask(SIG_BLOCK, &blocked_set, NULL);
-					}
 				}
 				closedir(dir);
+				if (interactive) {
+					sigprocmask(SIG_SETMASK, &empty_set, NULL);
+					if (interrupted)
+						return;
+					sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+				}
 				ntid -= nerr;
 				if (ntid == 0) {
 					perror("attach: ptrace(PTRACE_ATTACH, ...)");
@@ -476,6 +482,14 @@ startup_attach(void)
 			droptcb(tcp);
 			continue;
 		}
+#if defined LINUX && defined __NR_tkill
+		/* If process was SIGSTOPed, and waited for,
+		   even before attach, we will never get SIGSTOP
+		   notification. This works around it.
+		   Borrowed from GDB, thanks Jan! */
+		syscall(__NR_tkill, tcp->pid, SIGSTOP);
+		ptrace(PTRACE_CONT, tcp->pid, 0, 0);
+#endif
 		/* INTERRUPTED is going to be checked at the top of TRACE.  */
 
 		if (daemonized_tracer) {
@@ -2286,6 +2300,10 @@ collect_stopped_tcbs(void)
 
 	found_tcps = NULL;
 	while (1) {
+		if (interrupted)
+			break;
+		if (interactive)
+			sigprocmask(SIG_SETMASK, &empty_set, NULL);
 #ifdef LINUX
 #ifdef __WALL
 		pid = wait4(-1, &status, wait4_options | wnohang, ru_ptr);
@@ -2777,11 +2795,6 @@ trace()
 	struct tcb *tcbs;
 
 	while (nprocs != 0) {
-		if (interrupted)
-			return 0;
-		if (interactive)
-			sigprocmask(SIG_SETMASK, &empty_set, NULL);
-
 		/* The loop of "wait for one tracee, serve it, repeat"
 		 * may leave some tracees never served.
 		 * Kernel provides no guarantees of fairness when you have
