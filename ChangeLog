@@ -1,7 +1,8 @@
 2009-03-17  Denys Vlasenko  <dvlasenk@redhat.com>
 
-	* strace.c (collect_stopped_tcbs): Check for ^C here, not in trace().
-	(trace): Remove check for ^C.
+	* strace.c (collect_stopped_tcbs): Check for ^C here too,
+	not only in trace().
+	(trace): Tweak check for ^C to not set mask (not needed).
 
 2009-03-10  Denys Vlasenko  <dvlasenk@redhat.com>
 
