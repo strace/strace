@@ -2789,6 +2789,8 @@ trace()
 		 * To fix it, we collect *all* waitable tasks, then handle
 		 * them all, then repeat.
 		 */
+		if (interrupted)
+			return 0;
 		tcbs = collect_stopped_tcbs();
 		if (!tcbs)
 			break;
