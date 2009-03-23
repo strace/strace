@@ -1,3 +1,12 @@
+2009-03-23  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* system.c (sram_alloc_flag): Add L2_SRAM constant.
+	by Mike Frysinger (vapier AT gentoo.org).
+	(sys_sram_alloc): Fix improperly used %zu:
+	tcp->u_arg is not a size_t, it is a long.
+	* net.c (printcmsghdr): Fix improperly used %zu:
+	struct cmsghdr::cmsg_len is not a size_t.
+
 2009-03-17  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* strace.c (collect_stopped_tcbs): Check for ^C here too,

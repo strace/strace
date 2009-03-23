@@ -302,18 +302,18 @@ static const struct xlat sram_alloc_flags[] = {
 	{ L1_DATA_A_SRAM,	"L1_DATA_A_SRAM" },
 	{ L1_DATA_B_SRAM,	"L1_DATA_B_SRAM" },
 	{ L1_DATA_SRAM,		"L1_DATA_SRAM" },
+	{ L2_SRAM,		"L2_SRAM" },
 	{ 0,			NULL },
 };
 
 int
-sys_sram_alloc(tcp)
-struct tcb *tcp;
+sys_sram_alloc(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		/* size */
-		tprintf("%zu, ", tcp->u_arg[0]);
+		tprintf("%lu, ", tcp->u_arg[0]);
 		/* flags */
-		printxval(sram_alloc_flags, tcp->u_arg[1], "L1_???_SRAM");
+		printxval(sram_alloc_flags, tcp->u_arg[1], "???_SRAM");
 	}
 	return 1;
 }

@@ -1110,10 +1110,7 @@ static const struct xlat scmvals[] = {
 };
 
 static void
-printcmsghdr(tcp, addr, len)
-struct tcb *tcp;
-unsigned long addr;
-unsigned long len;
+printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 {
 	struct cmsghdr *cmsg = len < sizeof(struct cmsghdr) ?
 			       NULL : malloc(len);
@@ -1123,7 +1120,7 @@ unsigned long len;
 		return;
 	}
 
-	tprintf(", {cmsg_len=%zu, cmsg_level=", cmsg->cmsg_len);
+	tprintf(", {cmsg_len=%u, cmsg_level=", (unsigned) cmsg->cmsg_len);
 	printxval(socketlayers, cmsg->cmsg_level, "SOL_???");
 	tprintf(", cmsg_type=");
 
