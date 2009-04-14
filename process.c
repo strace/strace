@@ -1226,8 +1226,7 @@ struct tcb *tcp;
 }
 
 int
-sys_getresuid(tcp)
-    struct tcb *tcp;
+sys_getresuid(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		__kernel_uid_t uid;
@@ -3489,85 +3488,79 @@ static const struct xlat futexwakecmps[] = {
 };
 
 int
-sys_futex(tcp)
-struct tcb *tcp;
+sys_futex(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	long int cmd = tcp->u_arg[1] & 127;
-	tprintf("%p, ", (void *) tcp->u_arg[0]);
-	printxval(futexops, tcp->u_arg[1], "FUTEX_???");
-	tprintf(", %ld", tcp->u_arg[2]);
-	if (cmd == FUTEX_WAKE_BITSET)
-		tprintf(", %lx", tcp->u_arg[5]);
-	else if (cmd == FUTEX_WAIT) {
-		tprintf(", ");
-		printtv(tcp, tcp->u_arg[3]);
-	} else if (cmd == FUTEX_WAIT_BITSET) {
-		tprintf(", ");
-		printtv(tcp, tcp->u_arg[3]);
-		tprintf(", %lx", tcp->u_arg[5]);
-	} else if (cmd == FUTEX_REQUEUE)
-		tprintf(", %ld, %p", tcp->u_arg[3], (void *) tcp->u_arg[4]);
-	else if (cmd == FUTEX_CMP_REQUEUE)
-		tprintf(", %ld, %p, %ld", tcp->u_arg[3], (void *) tcp->u_arg[4], tcp->u_arg[5]);
-	else if (cmd == FUTEX_WAKE_OP) {
-		tprintf(", %ld, %p, {", tcp->u_arg[3], (void *) tcp->u_arg[4]);
-		if ((tcp->u_arg[5] >> 28) & 8)
-			tprintf("FUTEX_OP_OPARG_SHIFT|");
-		printxval(futexwakeops, (tcp->u_arg[5] >> 28) & 0x7, "FUTEX_OP_???");
-		tprintf(", %ld, ", (tcp->u_arg[5] >> 12) & 0xfff);
-		if ((tcp->u_arg[5] >> 24) & 8)
-			tprintf("FUTEX_OP_OPARG_SHIFT|");
-		printxval(futexwakecmps, (tcp->u_arg[5] >> 24) & 0x7, "FUTEX_OP_CMP_???");
-		tprintf(", %ld}", tcp->u_arg[5] & 0xfff);
+	if (entering(tcp)) {
+		long int cmd = tcp->u_arg[1] & 127;
+		tprintf("%p, ", (void *) tcp->u_arg[0]);
+		printxval(futexops, tcp->u_arg[1], "FUTEX_???");
+		tprintf(", %ld", tcp->u_arg[2]);
+		if (cmd == FUTEX_WAKE_BITSET)
+			tprintf(", %lx", tcp->u_arg[5]);
+		else if (cmd == FUTEX_WAIT) {
+			tprintf(", ");
+			printtv(tcp, tcp->u_arg[3]);
+		} else if (cmd == FUTEX_WAIT_BITSET) {
+			tprintf(", ");
+			printtv(tcp, tcp->u_arg[3]);
+			tprintf(", %lx", tcp->u_arg[5]);
+		} else if (cmd == FUTEX_REQUEUE)
+			tprintf(", %ld, %p", tcp->u_arg[3], (void *) tcp->u_arg[4]);
+		else if (cmd == FUTEX_CMP_REQUEUE)
+			tprintf(", %ld, %p, %ld", tcp->u_arg[3], (void *) tcp->u_arg[4], tcp->u_arg[5]);
+		else if (cmd == FUTEX_WAKE_OP) {
+			tprintf(", %ld, %p, {", tcp->u_arg[3], (void *) tcp->u_arg[4]);
+			if ((tcp->u_arg[5] >> 28) & 8)
+				tprintf("FUTEX_OP_OPARG_SHIFT|");
+			printxval(futexwakeops, (tcp->u_arg[5] >> 28) & 0x7, "FUTEX_OP_???");
+			tprintf(", %ld, ", (tcp->u_arg[5] >> 12) & 0xfff);
+			if ((tcp->u_arg[5] >> 24) & 8)
+				tprintf("FUTEX_OP_OPARG_SHIFT|");
+			printxval(futexwakecmps, (tcp->u_arg[5] >> 24) & 0x7, "FUTEX_OP_CMP_???");
+			tprintf(", %ld}", tcp->u_arg[5] & 0xfff);
+		}
 	}
-    }
-    return 0;
+	return 0;
 }
 
 static void
-print_affinitylist(tcp, list, len)
-struct tcb *tcp;
-long list;
-unsigned int len;
+print_affinitylist(struct tcb *tcp, long list, unsigned int len)
 {
-    int first = 1;
-    tprintf(" {");
-    while (len >= sizeof (unsigned long)) {
-	unsigned long w;
-	umove(tcp, list, &w);
-	tprintf("%s %lx", first ? "" : ",", w);
-	first = 0;
-	len -= sizeof (unsigned long);
-	list += sizeof(unsigned long);
-    }
-    tprintf(" }");
+	int first = 1;
+	tprintf(" {");
+	while (len >= sizeof (unsigned long)) {
+		unsigned long w;
+		umove(tcp, list, &w);
+		tprintf("%s %lx", first ? "" : ",", w);
+		first = 0;
+		len -= sizeof (unsigned long);
+		list += sizeof(unsigned long);
+	}
+	tprintf(" }");
 }
 
 int
-sys_sched_setaffinity(tcp)
-struct tcb *tcp;
+sys_sched_setaffinity(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-	print_affinitylist(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-    }
-    return 0;
+	if (entering(tcp)) {
+		tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+	}
+	return 0;
 }
 
 int
-sys_sched_getaffinity(tcp)
-struct tcb *tcp;
+sys_sched_getaffinity(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-    } else {
-	if (tcp->u_rval == -1)
-	    tprintf("%#lx", tcp->u_arg[2]);
-	else
-	    print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
-    }
-    return 0;
+	if (entering(tcp)) {
+		tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	} else {
+		if (tcp->u_rval == -1)
+			tprintf("%#lx", tcp->u_arg[2]);
+		else
+			print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
+	}
+	return 0;
 }
 
 static const struct xlat schedulers[] = {
@@ -3578,73 +3571,68 @@ static const struct xlat schedulers[] = {
 };
 
 int
-sys_sched_getscheduler(tcp)
-struct tcb *tcp;
+sys_sched_getscheduler(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	tprintf("%d", (int) tcp->u_arg[0]);
-    } else if (! syserror(tcp)) {
-	tcp->auxstr = xlookup (schedulers, tcp->u_rval);
-	if (tcp->auxstr != NULL)
-	    return RVAL_STR;
-    }
-    return 0;
+	if (entering(tcp)) {
+		tprintf("%d", (int) tcp->u_arg[0]);
+	} else if (! syserror(tcp)) {
+		tcp->auxstr = xlookup (schedulers, tcp->u_rval);
+		if (tcp->auxstr != NULL)
+			return RVAL_STR;
+	}
+	return 0;
 }
 
 int
-sys_sched_setscheduler(tcp)
-struct tcb *tcp;
+sys_sched_setscheduler(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	struct sched_param p;
-	tprintf("%d, ", (int) tcp->u_arg[0]);
-	printxval(schedulers, tcp->u_arg[1], "SCHED_???");
-	if (umove(tcp, tcp->u_arg[2], &p) < 0)
-	    tprintf(", %#lx", tcp->u_arg[2]);
-	else
-	    tprintf(", { %d }", p.__sched_priority);
-    }
-    return 0;
+	if (entering(tcp)) {
+		struct sched_param p;
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printxval(schedulers, tcp->u_arg[1], "SCHED_???");
+		if (umove(tcp, tcp->u_arg[2], &p) < 0)
+			tprintf(", %#lx", tcp->u_arg[2]);
+		else
+			tprintf(", { %d }", p.__sched_priority);
+	}
+	return 0;
 }
 
 int
-sys_sched_getparam(tcp)
-struct tcb *tcp;
+sys_sched_getparam(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	    tprintf("%d, ", (int) tcp->u_arg[0]);
-    } else {
-	struct sched_param p;
-	if (umove(tcp, tcp->u_arg[1], &p) < 0)
-	    tprintf("%#lx", tcp->u_arg[1]);
-	else
-	    tprintf("{ %d }", p.__sched_priority);
-    }
-    return 0;
+	if (entering(tcp)) {
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+	} else {
+		struct sched_param p;
+		if (umove(tcp, tcp->u_arg[1], &p) < 0)
+			tprintf("%#lx", tcp->u_arg[1]);
+		else
+			tprintf("{ %d }", p.__sched_priority);
+	}
+	return 0;
 }
 
 int
-sys_sched_setparam(tcp)
-struct tcb *tcp;
+sys_sched_setparam(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	struct sched_param p;
-	if (umove(tcp, tcp->u_arg[1], &p) < 0)
-	    tprintf("%d, %#lx", (int) tcp->u_arg[0], tcp->u_arg[1]);
-	else
-	    tprintf("%d, { %d }", (int) tcp->u_arg[0], p.__sched_priority);
-    }
-    return 0;
+	if (entering(tcp)) {
+		struct sched_param p;
+		if (umove(tcp, tcp->u_arg[1], &p) < 0)
+			tprintf("%d, %#lx", (int) tcp->u_arg[0], tcp->u_arg[1]);
+		else
+			tprintf("%d, { %d }", (int) tcp->u_arg[0], p.__sched_priority);
+	}
+	return 0;
 }
 
 int
-sys_sched_get_priority_min(tcp)
-struct tcb *tcp;
+sys_sched_get_priority_min(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	printxval(schedulers, tcp->u_arg[0], "SCHED_???");
-    }
-    return 0;
+	if (entering(tcp)) {
+		printxval(schedulers, tcp->u_arg[0], "SCHED_???");
+	}
+	return 0;
 }
 
 # ifdef X86_64
@@ -3659,32 +3647,33 @@ static const struct xlat archvals[] = {
 };
 
 int
-sys_arch_prctl(tcp)
-struct tcb *tcp;
+sys_arch_prctl(struct tcb *tcp)
 {
-    if (entering(tcp)) {
-	printxval(archvals, tcp->u_arg[0], "ARCH_???");
-	if (tcp->u_arg[0] == ARCH_SET_GS
-	    || tcp->u_arg[0] == ARCH_SET_FS)
-	    tprintf(", %#lx", tcp->u_arg[1]);
-    } else {
-	if (tcp->u_arg[0] == ARCH_GET_GS
-	    || tcp->u_arg[0] == ARCH_GET_FS) {
-	    long int v;
-	    if (!syserror(tcp) && umove(tcp, tcp->u_arg[1], &v) != -1)
-		tprintf(", [%#lx]", v);
-	    else
-		tprintf(", %#lx", tcp->u_arg[1]);
+	if (entering(tcp)) {
+		printxval(archvals, tcp->u_arg[0], "ARCH_???");
+		if (tcp->u_arg[0] == ARCH_SET_GS
+		 || tcp->u_arg[0] == ARCH_SET_FS
+		) {
+			tprintf(", %#lx", tcp->u_arg[1]);
+		}
+	} else {
+		if (tcp->u_arg[0] == ARCH_GET_GS
+		 || tcp->u_arg[0] == ARCH_GET_FS
+		) {
+			long int v;
+			if (!syserror(tcp) && umove(tcp, tcp->u_arg[1], &v) != -1)
+				tprintf(", [%#lx]", v);
+			else
+				tprintf(", %#lx", tcp->u_arg[1]);
+		}
 	}
-    }
-    return 0;
+	return 0;
 }
 # endif /* X86_64 */
 
 
 int
-sys_getcpu(tcp)
-struct tcb *tcp;
+sys_getcpu(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		unsigned u;

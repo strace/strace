@@ -109,8 +109,7 @@ static const struct xlat resources[] = {
 
 #if !HAVE_LONG_LONG_RLIM_T
 static char *
-sprintrlim(lim)
-long lim;
+sprintrlim(long lim)
 {
 	static char buf[32];
 
@@ -124,8 +123,7 @@ long lim;
 }
 
 int
-sys_getrlimit(tcp)
-struct tcb *tcp;
+sys_getrlimit(struct tcb *tcp)
 {
 	struct rlimit rlim;
 
@@ -147,8 +145,7 @@ struct tcb *tcp;
 }
 
 int
-sys_setrlimit(tcp)
-struct tcb *tcp;
+sys_setrlimit(struct tcb *tcp)
 {
 	struct rlimit rlim;
 
@@ -170,8 +167,7 @@ struct tcb *tcp;
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_RLIM_T
 static char *
-sprintrlim64(lim)
-rlim64_t lim;
+sprintrlim64(rlim64_t lim)
 {
 	static char buf[64];
 
@@ -185,8 +181,7 @@ rlim64_t lim;
 }
 
 int
-sys_getrlimit64(tcp)
-struct tcb *tcp;
+sys_getrlimit64(struct tcb *tcp)
 {
 	struct rlimit64 rlim;
 
@@ -208,8 +203,7 @@ struct tcb *tcp;
 }
 
 int
-sys_setrlimit64(tcp)
-struct tcb *tcp;
+sys_setrlimit64(struct tcb *tcp)
 {
 	struct rlimit64 rlim;
 
@@ -242,70 +236,64 @@ static const struct xlat usagewho[] = {
 
 #ifdef ALPHA
 void
-printrusage32(tcp, addr)
-struct tcb *tcp;
-long addr;
+printrusage32(struct tcb *tcp, long addr)
 {
-    struct timeval32
-    {
-	unsigned tv_sec;
-	unsigned tv_usec;
-    };
-    struct rusage32
-    {
-	struct timeval32 ru_utime;	/* user time used */
-	struct timeval32 ru_stime;	/* system time used */
-	long	ru_maxrss;		/* maximum resident set size */
-	long	ru_ixrss;		/* integral shared memory size */
-	long	ru_idrss;		/* integral unshared data size */
-	long	ru_isrss;		/* integral unshared stack size */
-	long	ru_minflt;		/* page reclaims */
-	long	ru_majflt;		/* page faults */
-	long	ru_nswap;		/* swaps */
-	long	ru_inblock;		/* block input operations */
-	long	ru_oublock;		/* block output operations */
-	long	ru_msgsnd;		/* messages sent */
-	long	ru_msgrcv;		/* messages received */
-	long	ru_nsignals;		/* signals received */
-	long	ru_nvcsw;		/* voluntary context switches */
-	long	ru_nivcsw;		/* involuntary " */
-    } ru;
+	struct timeval32 {
+		unsigned tv_sec;
+		unsigned tv_usec;
+	};
+	struct rusage32 {
+		struct timeval32 ru_utime;	/* user time used */
+		struct timeval32 ru_stime;	/* system time used */
+		long	ru_maxrss;		/* maximum resident set size */
+		long	ru_ixrss;		/* integral shared memory size */
+		long	ru_idrss;		/* integral unshared data size */
+		long	ru_isrss;		/* integral unshared stack size */
+		long	ru_minflt;		/* page reclaims */
+		long	ru_majflt;		/* page faults */
+		long	ru_nswap;		/* swaps */
+		long	ru_inblock;		/* block input operations */
+		long	ru_oublock;		/* block output operations */
+		long	ru_msgsnd;		/* messages sent */
+		long	ru_msgrcv;		/* messages received */
+		long	ru_nsignals;		/* signals received */
+		long	ru_nvcsw;		/* voluntary context switches */
+		long	ru_nivcsw;		/* involuntary " */
+	} ru;
 
-    if (!addr)
-	tprintf("NULL");
-    else if (syserror(tcp) || !verbose(tcp))
-	tprintf("%#lx", addr);
-    else if (umove(tcp, addr, &ru) < 0)
-	tprintf("{...}");
-    else if (!abbrev(tcp)) {
-	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
-		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
-		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
-	tprintf("ru_maxrss=%lu, ru_ixrss=%lu, ",
-		ru.ru_maxrss, ru.ru_ixrss);
-	tprintf("ru_idrss=%lu, ru_isrss=%lu, ",
-		ru.ru_idrss, ru.ru_isrss);
-	tprintf("ru_minflt=%lu, ru_majflt=%lu, ru_nswap=%lu, ",
-		ru.ru_minflt, ru.ru_majflt, ru.ru_nswap);
-	tprintf("ru_inblock=%lu, ru_oublock=%lu, ",
-		ru.ru_inblock, ru.ru_oublock);
-	tprintf("ru_msgsnd=%lu, ru_msgrcv=%lu, ",
-		ru.ru_msgsnd, ru.ru_msgrcv);
-	tprintf("ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}",
-		ru.ru_nsignals, ru.ru_nvcsw, ru.ru_nivcsw);
-    }
-    else {
-	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ...}",
-		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
-		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
-    }
+	if (!addr)
+		tprintf("NULL");
+	else if (syserror(tcp) || !verbose(tcp))
+		tprintf("%#lx", addr);
+	else if (umove(tcp, addr, &ru) < 0)
+		tprintf("{...}");
+	else if (!abbrev(tcp)) {
+		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
+			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
+			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+		tprintf("ru_maxrss=%lu, ru_ixrss=%lu, ",
+			ru.ru_maxrss, ru.ru_ixrss);
+		tprintf("ru_idrss=%lu, ru_isrss=%lu, ",
+			ru.ru_idrss, ru.ru_isrss);
+		tprintf("ru_minflt=%lu, ru_majflt=%lu, ru_nswap=%lu, ",
+			ru.ru_minflt, ru.ru_majflt, ru.ru_nswap);
+		tprintf("ru_inblock=%lu, ru_oublock=%lu, ",
+			ru.ru_inblock, ru.ru_oublock);
+		tprintf("ru_msgsnd=%lu, ru_msgrcv=%lu, ",
+			ru.ru_msgsnd, ru.ru_msgrcv);
+		tprintf("ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}",
+			ru.ru_nsignals, ru.ru_nvcsw, ru.ru_nivcsw);
+	}
+	else {
+		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ...}",
+			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
+			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+	}
 }
 #endif
 
 void
-printrusage(tcp, addr)
-struct tcb *tcp;
-long addr;
+printrusage(struct tcb *tcp, long addr)
 {
 	struct rusage ru;
 
@@ -340,8 +328,7 @@ long addr;
 }
 
 int
-sys_getrusage(tcp)
-struct tcb *tcp;
+sys_getrusage(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
@@ -354,8 +341,7 @@ struct tcb *tcp;
 
 #ifdef ALPHA
 int
-sys_osf_getrusage(tcp)
-struct tcb *tcp;
+sys_osf_getrusage(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
@@ -372,8 +358,7 @@ struct tcb *tcp;
 #ifdef LINUX
 
 int
-sys_sysinfo(tcp)
-struct tcb *tcp;
+sys_sysinfo(struct tcb *tcp)
 {
 	struct sysinfo si;
 
@@ -407,8 +392,7 @@ static const struct xlat priorities[] = {
 };
 
 int
-sys_getpriority(tcp)
-struct tcb *tcp;
+sys_getpriority(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(priorities, tcp->u_arg[0], "PRIO_???");
@@ -418,8 +402,7 @@ struct tcb *tcp;
 }
 
 int
-sys_setpriority(tcp)
-struct tcb *tcp;
+sys_setpriority(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(priorities, tcp->u_arg[0], "PRIO_???");
@@ -429,8 +412,7 @@ struct tcb *tcp;
 }
 
 int
-sys_nice(tcp)
-struct tcb *tcp;
+sys_nice(struct tcb *tcp)
 {
 	if (entering(tcp))
 		tprintf("%ld", tcp->u_arg[0]);
@@ -440,8 +422,7 @@ struct tcb *tcp;
 #ifndef SUNOS4
 
 int
-sys_times(tcp)
-struct tcb *tcp;
+sys_times(struct tcb *tcp)
 {
 	struct tms tbuf;
 

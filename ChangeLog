@@ -1,3 +1,11 @@
+2009-04-14  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* signal.c: Whitespace, comment, and style fixes, no code changes.
+	* file.c: Ditto.
+	* time.c: Ditto.
+	* process.c: Ditto.
+	* resource.c: Ditto.
+
 2009-03-23  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* system.c (sram_alloc_flag): Add L2_SRAM constant.
