@@ -35,6 +35,7 @@
 
 #include "defs.h"
 
+#include <stdint.h>
 #include <signal.h>
 #include <sys/user.h>
 #include <fcntl.h>
@@ -1860,15 +1861,19 @@ sys_rt_sigprocmask(tcp)
 /* Structure describing the action to be taken when a signal arrives.  */
 struct new_sigaction
 {
-	union
-	{
-		__sighandler_t __sa_handler;
-		void (*__sa_sigaction) (int, siginfo_t *, void *);
-	}
-	__sigaction_handler;
+	__sighandler_t __sa_handler;
 	unsigned long sa_flags;
 	void (*sa_restorer) (void);
-	unsigned long int sa_mask[2];
+	/* Kernel treats sa_mask as an array of longs. */
+	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
+};
+/* Same for i386-on-x86_64 and similar cases */
+struct new_sigaction32
+{
+	uint32_t __sa_handler;
+	uint32_t sa_flags;
+	uint32_t sa_restorer;
+	uint32_t sa_mask[2 * (NSIG / sizeof(long) ? NSIG / sizeof(long) : 1)];
 };
 
 
@@ -1878,6 +1883,7 @@ sys_rt_sigaction(struct tcb *tcp)
 	struct new_sigaction sa;
 	sigset_t sigset;
 	long addr;
+	int r;
 
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -1885,41 +1891,79 @@ sys_rt_sigaction(struct tcb *tcp)
 		addr = tcp->u_arg[1];
 	} else
 		addr = tcp->u_arg[2];
-	if (addr == 0)
+
+	if (addr == 0) {
 		tprintf("NULL");
-	else if (!verbose(tcp))
-		tprintf("%#lx", addr);
-	else if (umove(tcp, addr, &sa) < 0)
-		tprintf("{...}");
-	else {
-		if (sa.__sigaction_handler.__sa_handler == SIG_ERR)
-			tprintf("{SIG_ERR, ");
-		else if (sa.__sigaction_handler.__sa_handler == SIG_DFL)
-			tprintf("{SIG_DFL, ");
-		else if (sa.__sigaction_handler.__sa_handler == SIG_IGN)
-			tprintf("{SIG_IGN, ");
-		else
-			tprintf("{%#lx, ",
-				(long) sa.__sigaction_handler.__sa_handler);
-		sigemptyset(&sigset);
-#ifdef LINUXSPARC
-		if (tcp->u_arg[4] <= sizeof(sigset))
-			memcpy(&sigset, &sa.sa_mask, tcp->u_arg[4]);
-#else
-		if (tcp->u_arg[3] <= sizeof(sigset))
-			memcpy(&sigset, &sa.sa_mask, tcp->u_arg[3]);
-#endif
-		else
-			memcpy(&sigset, &sa.sa_mask, sizeof(sigset));
-		printsigmask(&sigset, 1);
-		tprintf(", ");
-		printflags(sigact_flags, sa.sa_flags, "SA_???");
-#ifdef SA_RESTORER
-		if (sa.sa_flags & SA_RESTORER)
-			tprintf(", %p", sa.sa_restorer);
-#endif
-		tprintf("}");
+		goto after_sa;
 	}
+	if (!verbose(tcp)) {
+		tprintf("%#lx", addr);
+		goto after_sa;
+	}
+#if SUPPORTED_PERSONALITIES > 1
+	if (personality_wordsize[current_personality] != sizeof(sa.sa_flags)
+	 && personality_wordsize[current_personality] == 4
+	) {
+		struct new_sigaction32 sa32;
+		r = umove(tcp, addr, &sa32);
+		if (r >= 0) {
+			memset(&sa, 0, sizeof(sa));
+			sa.__sa_handler = (void*)(unsigned long)sa32.__sa_handler;
+			sa.sa_flags     = sa32.sa_flags;
+			sa.sa_restorer  = (void*)(unsigned long)sa32.sa_restorer;
+			/* Kernel treats sa_mask as an array of longs.
+			 * For 32-bit process, "long" is uint32_t, thus, for example,
+			 * 32th bit in sa_mask will end up as bit 0 in sa_mask[1].
+			 * But for (64-bit) kernel, 32th bit in sa_mask is
+			 * 32th bit in 0th (64-bit) long!
+			 * For little-endian, it's the same.
+			 * For big-endian, we swap 32-bit words.
+			 */
+			sa.sa_mask[0] = sa32.sa_mask[0] + ((long)(sa32.sa_mask[1]) << 32);
+		}
+	} else
+#endif
+	{
+		r = umove(tcp, addr, &sa);
+	}
+	if (r < 0) {
+		tprintf("{...}");
+		goto after_sa;
+	}
+
+	if (sa.__sa_handler == SIG_ERR)
+		tprintf("{SIG_ERR, ");
+	else if (sa.__sa_handler == SIG_DFL)
+		tprintf("{SIG_DFL, ");
+	else if (sa.__sa_handler == SIG_IGN)
+		tprintf("{SIG_IGN, ");
+	else
+		tprintf("{%#lx, ", (long) sa.__sa_handler);
+	/* Questionable code below.
+	 * Kernel won't handle sys_rt_sigaction
+	 * with wrong sigset size (just returns EINVAL)
+	 * therefore tcp->u_arg[3(4)] _must_ be NSIG / 8 here,
+	 * and we always use smaller memcpy. */
+	sigemptyset(&sigset);
+#ifdef LINUXSPARC
+	if (tcp->u_arg[4] <= sizeof(sigset))
+		memcpy(&sigset, &sa.sa_mask, tcp->u_arg[4]);
+#else
+	if (tcp->u_arg[3] <= sizeof(sigset))
+		memcpy(&sigset, &sa.sa_mask, tcp->u_arg[3]);
+#endif
+	else
+		memcpy(&sigset, &sa.sa_mask, sizeof(sigset));
+	printsigmask(&sigset, 1);
+	tprintf(", ");
+	printflags(sigact_flags, sa.sa_flags, "SA_???");
+#ifdef SA_RESTORER
+	if (sa.sa_flags & SA_RESTORER)
+		tprintf(", %p", sa.sa_restorer);
+#endif
+	tprintf("}");
+
+ after_sa:
 	if (entering(tcp))
 		tprintf(", ");
 	else
@@ -1928,7 +1972,7 @@ sys_rt_sigaction(struct tcb *tcp)
 #elif defined(ALPHA)
 		tprintf(", %lu, %#lx", tcp->u_arg[3], tcp->u_arg[4]);
 #else
-		tprintf(", %lu", addr = tcp->u_arg[3]);
+		tprintf(", %lu", tcp->u_arg[3]);
 #endif
 	return 0;
 }

@@ -1,3 +1,10 @@
+2009-04-15  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* signal (sys_rt_sigaction): Print struct sigaction correctly
+	in 32/64 environment.
+	* desc.c (printflock): Add #ifdefs around earlier flock 32/64 fix
+	so that we don't waste time on arches with one personality.
+
 2009-04-14  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* signal.c: Whitespace, comment, and style fixes, no code changes.

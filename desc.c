@@ -236,34 +236,39 @@ printflock(struct tcb *tcp, long addr, int getlk)
 {
 	struct flock fl;
 
-	if (personality_wordsize[current_personality] == sizeof(fl.l_start)) {
+#if SUPPORTED_PERSONALITIES > 1
+	if (personality_wordsize[current_personality] != sizeof(fl.l_start)) {
+		if (personality_wordsize[current_personality] == 4) {
+			/* 32-bit x86 app on x86_64 and similar cases */
+			struct {
+				short int l_type;
+				short int l_whence;
+				int32_t l_start; /* off_t */
+				int32_t l_len; /* off_t */
+				int32_t l_pid; /* pid_t */
+			} fl32;
+			if (umove(tcp, addr, &fl32) < 0) {
+				tprintf("{...}");
+				return;
+			}
+			fl.l_type = fl32.l_type;
+			fl.l_whence = fl32.l_whence;
+			fl.l_start = fl32.l_start;
+			fl.l_len = fl32.l_len;
+			fl.l_pid = fl32.l_pid;
+		} else {
+			/* let people know we have a problem here */
+			tprintf("{ <decode error: unsupported wordsize %d> }",
+				personality_wordsize[current_personality]);
+			return;
+		}
+	} else
+#endif
+	{
 		if (umove(tcp, addr, &fl) < 0) {
 			tprintf("{...}");
 			return;
 		}
-	} else if (personality_wordsize[current_personality] == 4) {
-		/* 32-bit x86 app on x86_64 and similar cases */
-		struct {
-			short int l_type;
-			short int l_whence;
-			int32_t l_start; /* off_t */
-			int32_t l_len; /* off_t */
-			int32_t l_pid; /* pid_t */
-		} fl32;
-		if (umove(tcp, addr, &fl32) < 0) {
-			tprintf("{...}");
-			return;
-		}
-		fl.l_type = fl32.l_type;
-		fl.l_whence = fl32.l_whence;
-		fl.l_start = fl32.l_start;
-		fl.l_len = fl32.l_len;
-		fl.l_pid = fl32.l_pid;
-	} else {
-		/* let people know we have a problem here */
-		tprintf("{ <decode error: unsupported wordsize %d> }",
-				personality_wordsize[current_personality]);
-		return;
 	}
 	tprintf("{type=");
 	printxval(lockfcmds, fl.l_type, "F_???");
