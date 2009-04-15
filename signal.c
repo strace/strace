@@ -2034,21 +2034,32 @@ int sys_rt_sigtimedwait(struct tcb *tcp)
 		else
 			printsigmask(&sigset, 1);
 		tprintf(", ");
+		/* This is the only "return" parameter, */
+		if (tcp->u_arg[1] != 0)
+			return 0;
+		/* ... if it's NULL, can decode all on entry */
+		tprintf("NULL, ");
 	}
-	else {
+	else if (tcp->u_arg[1] != 0) {
+		/* syscall exit, and u_arg[1] wasn't NULL */
 		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[0]);
+			tprintf("%#lx, ", tcp->u_arg[1]);
 		else {
 			siginfo_t si;
 			if (umove(tcp, tcp->u_arg[1], &si) < 0)
-				tprintf("%#lx", tcp->u_arg[1]);
-			else
+				tprintf("%#lx, ", tcp->u_arg[1]);
+			else {
 				printsiginfo(&si, verbose(tcp));
-			/* XXX For now */
-			tprintf(", %#lx", tcp->u_arg[2]);
-			tprintf(", %d", (int) tcp->u_arg[3]);
+				tprintf(", ");
+			}
 		}
 	}
+	else {
+		/* syscall exit, and u_arg[1] was NULL */
+		return 0;
+	}
+	print_timespec(tcp, tcp->u_arg[2]);
+	tprintf(", %d", (int) tcp->u_arg[3]);
 	return 0;
 };
 

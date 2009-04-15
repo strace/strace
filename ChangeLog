@@ -1,5 +1,9 @@
 2009-04-15  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	* signal (sys_rt_sigtimedwait): Fix sigtimedwait syscall decoding.
+
+2009-04-15  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	* signal (sys_rt_sigaction): Print struct sigaction correctly
 	in 32/64 environment.
 	* desc.c (printflock): Add #ifdefs around earlier flock 32/64 fix
