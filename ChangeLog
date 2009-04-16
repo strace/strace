@@ -1,3 +1,8 @@
+2009-04-16  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* file.c (print_dirfd): Use int for file descriptor, not a long.
+	* process.c (printwaitn): Use int for PID, not a long.
+
 2009-04-15  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* signal (sys_rt_sigtimedwait): Fix sigtimedwait syscall decoding.
@@ -86,7 +91,7 @@
 	In some cases, missing error checking is added.
 	Error handling for trace_syscall() failures and other cases
 	where tcp->ptrace_errno is nonzero is cleaned up a bit
-	and made more verbose if we see error other than ESRC.
+	and made more verbose if we see error other than ESRCH.
 	Some comments are added or expanded.
 	* defs.h: Declare ptrace_cmds[]. Modify do_ptrace
 	declaration (last parameter is long, not void *).

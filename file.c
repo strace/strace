@@ -327,13 +327,16 @@ const struct xlat open_mode_flags[] = {
 # define AT_FDCWD                -100
 #endif
 
+/* The fd is an "int", so when decoding x86 on x86_64, we need to force sign
+ * extension to get the right value.  We do this by declaring fd as int here.
+ */
 static void
-print_dirfd(long fd)
+print_dirfd(int fd)
 {
 	if (fd == AT_FDCWD)
 		tprintf("AT_FDCWD, ");
 	else
-		tprintf("%ld, ", fd);
+		tprintf("%d, ", fd);
 }
 #endif
 

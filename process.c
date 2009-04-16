@@ -1998,21 +1998,24 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 	int exited = 0;
 
 	if (entering(tcp)) {
-		/*
-		 * Sign-extend a 32-bit value when that's what it is.
-		 *
-		 * NB: On Linux, kernel-side pid_t is typedef'ed to int
-		 * on all arches; also, glibc-2.8 truncates wait3 and wait4
+#ifdef LINUX
+		/* On Linux, kernel-side pid_t is typedef'ed to int
+		 * on all arches. Also, glibc-2.8 truncates wait3 and wait4
 		 * pid argument to int on 64bit arches, producing,
 		 * for example, wait4(4294967295, ...) instead of -1
-		 * in strace.
-		 * Therefore, maybe it makes sense to *unconditionally*
-		 * widen int to long here...
+		 * in strace. We have to use int here, not long.
+		 */
+		int pid = tcp->u_arg[0];
+		tprintf("%d, ", pid);
+#else
+		/*
+		 * Sign-extend a 32-bit value when that's what it is.
 		 */
 		long pid = tcp->u_arg[0];
 		if (personality_wordsize[current_personality] < sizeof pid)
 			pid = (long) (int) pid;
 		tprintf("%ld, ", pid);
+#endif
 	} else {
 		/* status */
 		if (!tcp->u_arg[1])
