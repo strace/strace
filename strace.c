@@ -2284,12 +2284,14 @@ collect_stopped_tcbs(void)
 	nextp = &found_tcps;
 #endif /* LINUX */
 
+	/* Make it possible to ^C strace while we wait */
+	if (interactive)
+		sigprocmask(SIG_SETMASK, &empty_set, NULL);
+
 	found_tcps = NULL;
 	while (1) {
 		if (interrupted)
 			break;
-		if (interactive)
-			sigprocmask(SIG_SETMASK, &empty_set, NULL);
 #ifdef LINUX
 #ifdef __WALL
 		pid = wait4(-1, &status, wait4_options | wnohang, ru_ptr);
@@ -2315,8 +2317,6 @@ collect_stopped_tcbs(void)
 		pid = wait(&status);
 #endif /* SUNOS4 */
 		wait_errno = errno;
-		if (interactive)
-			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 
 		if (pid == 0 && wnohang) {
 			/* We had at least one successful
@@ -2435,7 +2435,7 @@ Process %d attached (waiting for parent)\n",
 				if (f == tcp) {
 					remembered_pid = pid;
 					remembered_status = status;
-					return found_tcps;
+					goto ret;
 				}
 				f = f->next_need_service;
 			}
@@ -2462,6 +2462,10 @@ Process %d attached (waiting for parent)\n",
 		break;
 #endif
 	} /* while (1) - collecting all stopped/exited tracees */
+ ret:
+	/* Disable ^C etc */
+	if (interactive)
+		sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 
 	return found_tcps;
 }

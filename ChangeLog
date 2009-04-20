@@ -1,3 +1,8 @@
+2009-04-20  Denys Vlasenko  <dvlasenk@redhat.com>
+
+	* strace.c (collect_stopped_tcbs): Do not enable/disable signals
+	multiple times, do it just once per collecting pass.
+
 2009-04-16  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* file.c (print_dirfd): Use int for file descriptor, not a long.
