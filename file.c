@@ -779,14 +779,6 @@ printstatsol(struct tcb *tcp, long addr)
 {
 	struct solstat statbuf;
 
-	if (!addr) {
-		tprintf("NULL");
-		return;
-	}
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
-		return;
-	}
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
 		return;
@@ -831,14 +823,6 @@ printstat_sparc64(struct tcb *tcp, long addr)
 {
 	struct stat_sparc64 statbuf;
 
-	if (!addr) {
-		tprintf("NULL");
-		return;
-	}
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
-		return;
-	}
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
 		return;
@@ -1000,6 +984,15 @@ printstat(struct tcb *tcp, long addr)
 {
 	struct stat statbuf;
 
+	if (!addr) {
+		tprintf("NULL");
+		return;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
 #ifdef LINUXSPARC
 	if (current_personality == 1) {
 		printstatsol(tcp, addr);
@@ -1013,14 +1006,6 @@ printstat(struct tcb *tcp, long addr)
 #endif
 #endif /* LINUXSPARC */
 
-	if (!addr) {
-		tprintf("NULL");
-		return;
-	}
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
-		return;
-	}
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
 		return;
@@ -1068,22 +1053,9 @@ printstat64(struct tcb *tcp, long addr)
 {
 	struct stat64 statbuf;
 
-#ifdef	STAT64_SIZE
+#ifdef STAT64_SIZE
 	(void) sizeof(char[sizeof statbuf == STAT64_SIZE ? 1 : -1]);
 #endif
-
-#ifdef LINUXSPARC
-	if (current_personality == 1) {
-		printstatsol(tcp, addr);
-		return;
-	}
-#ifdef SPARC64
-	else if (current_personality == 2) {
-		printstat_sparc64(tcp, addr);
-		return;
-	}
-#endif
-#endif /* LINUXSPARC */
 
 	if (!addr) {
 		tprintf("NULL");
@@ -1093,6 +1065,20 @@ printstat64(struct tcb *tcp, long addr)
 		tprintf("%#lx", addr);
 		return;
 	}
+
+#ifdef LINUXSPARC
+	if (current_personality == 1) {
+		printstatsol(tcp, addr);
+		return;
+	}
+# ifdef SPARC64
+	else if (current_personality == 2) {
+		printstat_sparc64(tcp, addr);
+		return;
+	}
+# endif
+#endif /* LINUXSPARC */
+
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
 		return;
@@ -1200,13 +1186,6 @@ printoldstat(struct tcb *tcp, long addr)
 	struct __old_kernel_stat statbuf;
 	struct stat newstatbuf;
 
-#ifdef LINUXSPARC
-	if (current_personality == 1) {
-		printstatsol(tcp, addr);
-		return;
-	}
-#endif /* LINUXSPARC */
-
 	if (!addr) {
 		tprintf("NULL");
 		return;
@@ -1215,6 +1194,14 @@ printoldstat(struct tcb *tcp, long addr)
 		tprintf("%#lx", addr);
 		return;
 	}
+
+#ifdef LINUXSPARC
+	if (current_personality == 1) {
+		printstatsol(tcp, addr);
+		return;
+	}
+#endif /* LINUXSPARC */
+
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
 		return;

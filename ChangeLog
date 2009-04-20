@@ -1,5 +1,13 @@
 2009-04-20  Denys Vlasenko  <dvlasenk@redhat.com>
 
+	* strace.c (printstatsol, printstat_sparc64):
+	Remove NULL/error check for addr parameter.
+	(printoldstat, printstat, printoldstat64):
+	Move NULL/error check for addr parameter
+	so that it happens before printstatsol/printstat_sparc64 calls.
+
+2009-04-20  Denys Vlasenko  <dvlasenk@redhat.com>
+
 	* strace.c (collect_stopped_tcbs): Do not enable/disable signals
 	multiple times, do it just once per collecting pass.
 
