@@ -1,5 +1,8 @@
 2009-06-01  Dmitry V. Levin  <ldv@altlinux.org>
 
+	* strace.c (handle_stopped_tcbs): Fix cast for 4th argument
+	passed to ptrace().
+
 	* bjm.c (sys_query_module): Fix format warning reported by
 	gcc -Wformat-security.
 	* file.c (tprint_open_modes): Likewise.

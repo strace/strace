@@ -2602,7 +2602,7 @@ handle_stopped_tcbs(struct tcb *tcp)
 				 * Old kernels are known to lie here.
 				 */
 				if (ptrace(PTRACE_SETOPTIONS, pid, (char *) 0,
-					(void *) (PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC)) == 0)
+					(long) (PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC)) == 0)
 					ptrace_stop_sig = SIGTRAP | 0x80;
 			}
 #endif
@@ -2629,7 +2629,7 @@ handle_stopped_tcbs(struct tcb *tcp)
 				/* Take a better look...  */
 				siginfo_t si;
 				si.si_signo = 0;
-				ptrace(PTRACE_GETSIGINFO, pid, (void*) 0, (void*) &si);
+				ptrace(PTRACE_GETSIGINFO, pid, (void*) 0, (long) &si);
 				/*
 				 * Check some fields to make sure we see
 				 * real SIGTRAP.
