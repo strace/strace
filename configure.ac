@@ -209,7 +209,39 @@ AC_CHECK_LIB(nsl, main)
 fi
 
 AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl prctl sendmsg inet_ntop if_indextoname)
-AC_CHECK_HEADERS([sys/reg.h sys/filio.h sys/acl.h sys/asynch.h sys/door.h stropts.h sys/conf.h sys/stream.h sys/tihdr.h sys/tiuser.h sys/sysconfig.h ioctls.h sys/ioctl.h sys/ptrace.h termio.h linux/ptrace.h asm/reg.h sys/uio.h sys/aio.h poll.h sys/poll.h sys/vfs.h asm/sysmips.h linux/utsname.h sys/nscsys.h mqueue.h sys/epoll.h libaio.h inttypes.h], [], [])
+AC_CHECK_HEADERS([ \
+	inttypes.h \
+	ioctls.h \
+	libaio.h \
+	mqueue.h \
+	poll.h \
+	stropts.h \
+	termio.h \
+	sys/acl.h \
+	sys/aio.h \
+	sys/asynch.h \
+	sys/conf.h \
+	sys/door.h \
+	sys/epoll.h \
+	sys/filio.h \
+	sys/ioctl.h \
+	sys/nscsys.h \
+	sys/poll.h \
+	sys/ptrace.h \
+	sys/reg.h \
+	sys/stream.h \
+	sys/sysconfig.h \
+	sys/tihdr.h \
+	sys/tiuser.h \
+	sys/uio.h \
+	sys/vfs.h \
+	asm/cachectl.h \
+	asm/reg.h \
+	asm/sysmips.h \
+	linux/capability.h \
+	linux/ptrace.h \
+	linux/utsname.h \
+], [], [])
 AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
                  [], [], [#include <stddef.h>
 #include <linux/socket.h>])

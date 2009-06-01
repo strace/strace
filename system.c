@@ -66,11 +66,11 @@
 
 #include <sys/syscall.h>
 
-#ifdef SYS_capget
+#ifdef HAVE_LINUX_CAPABILITY_H
 #include <linux/capability.h>
 #endif
 
-#ifdef SYS_cacheflush
+#ifdef HAVE_ASM_CACHECTL_H
 #include <asm/cachectl.h>
 #endif
 
@@ -78,7 +78,7 @@
 #include <linux/utsname.h>
 #endif
 
-#ifdef MIPS
+#ifdef HAVE_ASM_SYSMIPS_H
 #include <asm/sysmips.h>
 #endif
 
