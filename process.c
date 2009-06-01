@@ -1785,7 +1785,7 @@ long addr;
 			cp.p64 = cp.p32;
 		if (cp.p64 == 0)
 			break;
-		tprintf(sep);
+		tprintf("%s", sep);
 		printstr(tcp, cp.p64, -1);
 		addr += personality_wordsize[current_personality];
 	}

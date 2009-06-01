@@ -395,7 +395,7 @@ sprint_open_modes(mode_t flags)
 void
 tprint_open_modes(mode_t flags)
 {
-	tprintf(sprint_open_modes(flags) + sizeof("flags"));
+	tprintf("%s", sprint_open_modes(flags) + sizeof("flags"));
 }
 
 static int

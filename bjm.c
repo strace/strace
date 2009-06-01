@@ -142,7 +142,7 @@ struct tcb *tcp;
 					for (idx=0; idx<ret; idx++) {
 						if (idx!=0)
 							tprintf(",");
-						tprintf(mod);
+						tprintf("%s", mod);
 						mod+=strlen(mod)+1;
 					}
 					free(data);

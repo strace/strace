@@ -1,5 +1,12 @@
 2009-06-01  Dmitry V. Levin  <ldv@altlinux.org>
 
+	* bjm.c (sys_query_module): Fix format warning reported by
+	gcc -Wformat-security.
+	* file.c (tprint_open_modes): Likewise.
+	* process.c (printargv): Likewise.
+	* signal.c (printsignal): Likewise.
+
+	Clean up header checks.
 	* configure.ac: Reformat AC_CHECK_HEADERS to keep it sorted and
 	easily updated, and reduce merging errors in the future.
 	* system.c: Convert all non-standard #ifdef checks for specific
