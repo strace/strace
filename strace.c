@@ -40,7 +40,6 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <sys/utsname.h>
 #include <pwd.h>
 #include <grp.h>
 #include <string.h>
@@ -100,17 +99,12 @@ static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
  */
 static bool daemonized_tracer = 0;
 
-static struct utsname utsname_buf;
-
 /* Sometimes we want to print only succeeding syscalls. */
 int not_failing_only = 0;
 
 static int exit_code = 0;
 static int strace_child = 0;
-static int ptrace_stop_sig = SIGTRAP;
-#if defined LINUX && (defined PTRACE_SETOPTIONS || defined PT_SETOPTIONS)
-static bool ptrace_opts_set;
-#endif
+
 static char *username = NULL;
 uid_t run_uid;
 gid_t run_gid;
@@ -122,6 +116,7 @@ FILE *outf;
 struct tcb **tcbtab;
 unsigned int nprocs, tcbtabsize;
 char *progname;
+extern char **environ;
 
 static int detach P((struct tcb *tcp, int sig));
 static int trace P((void));
@@ -441,7 +436,7 @@ startup_attach(void)
 						++nerr;
 					else if (tid != tcbtab[tcbi]->pid) {
 						tcp = alloctcb(tid);
-						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED;
+						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
 						tcbtab[tcbi]->nchildren++;
 						tcbtab[tcbi]->nclone_threads++;
 						tcbtab[tcbi]->nclone_detached++;
@@ -693,8 +688,6 @@ main(int argc, char *argv[])
 	static char buf[BUFSIZ];
 
 	progname = argv[0] ? argv[0] : "strace";
-
-	uname(&utsname_buf);
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
@@ -1002,10 +995,18 @@ alloc_tcb(int pid, int command_options_parsed)
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
 		if ((tcp->flags & TCB_INUSE) == 0) {
-			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
+			tcp->parent = NULL;
+			tcp->nchildren = 0;
+			tcp->nzombies = 0;
+#ifdef TCB_CLONE_THREAD
+			tcp->nclone_threads = tcp->nclone_detached = 0;
+			tcp->nclone_waiting = 0;
+#endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
 			tcp->outf = outf; /* Initialise to current out file */
+			tcp->stime.tv_sec = 0;
+			tcp->stime.tv_usec = 0;
 			tcp->pfd = -1;
 			nprocs++;
 			if (command_options_parsed)
@@ -1608,7 +1609,7 @@ int sig;
 				break;
 			}
 			error = ptrace_restart(PTRACE_CONT, tcp,
-					WSTOPSIG(status) == ptrace_stop_sig ? 0
+					WSTOPSIG(status) == SIGTRAP ? 0
 					: WSTOPSIG(status));
 			if (error < 0)
 				break;
@@ -2249,88 +2250,60 @@ handle_group_exit(struct tcb *tcp, int sig)
 }
 #endif
 
-static struct tcb *
-collect_stopped_tcbs(void)
+static int
+trace()
 {
-#ifdef LINUX
-	static int remembered_pid;
-	static int remembered_status;
-#endif
 	int pid;
 	int wait_errno;
 	int status;
 	struct tcb *tcp;
-	struct tcb *found_tcps;
 #ifdef LINUX
-	struct tcb **nextp;
 	struct rusage ru;
-	struct rusage* ru_ptr = cflag ? &ru : NULL;
-	int wnohang = 0;
 #ifdef __WALL
-	int wait4_options = __WALL;
+	static int wait4_options = __WALL;
 #endif
-
-	if (remembered_pid > 0) {
-		pid = remembered_pid;
-		remembered_pid = 0;
-		if (debug)
-			fprintf(stderr, " [remembered wait(%#x) = %u]\n",
-						remembered_status, pid);
-		tcp = pid2tcb(pid); /* can't be NULL */
-		tcp->wait_status = remembered_status;
-		tcp->next_need_service = NULL;
-		return tcp;
-	}
-	nextp = &found_tcps;
 #endif /* LINUX */
 
-	/* Make it possible to ^C strace while we wait */
-	if (interactive)
-		sigprocmask(SIG_SETMASK, &empty_set, NULL);
-
-	found_tcps = NULL;
-	while (1) {
+	while (nprocs != 0) {
 		if (interrupted)
-			break;
+			return 0;
+		if (interactive)
+			sigprocmask(SIG_SETMASK, &empty_set, NULL);
 #ifdef LINUX
 #ifdef __WALL
-		pid = wait4(-1, &status, wait4_options | wnohang, ru_ptr);
+		pid = wait4(-1, &status, wait4_options, cflag ? &ru : NULL);
 		if (pid < 0 && (wait4_options & __WALL) && errno == EINVAL) {
 			/* this kernel does not support __WALL */
 			wait4_options &= ~__WALL;
 			errno = 0;
-			pid = wait4(-1, &status, wait4_options | wnohang, ru_ptr);
+			pid = wait4(-1, &status, wait4_options,
+					cflag ? &ru : NULL);
 		}
 		if (pid < 0 && !(wait4_options & __WALL) && errno == ECHILD) {
 			/* most likely a "cloned" process */
-			pid = wait4(-1, &status, __WCLONE | wnohang, ru_ptr);
-			if (pid < 0 && errno != ECHILD) {
-				fprintf(stderr, "strace: wait4(WCLONE) "
+			pid = wait4(-1, &status, __WCLONE,
+					cflag ? &ru : NULL);
+			if (pid == -1) {
+				fprintf(stderr, "strace: clone wait4 "
 						"failed: %s\n", strerror(errno));
 			}
 		}
-#else /* !__WALL */
-		pid = wait4(-1, &status, wnohang, ru_ptr);
-#endif
+#else
+		pid = wait4(-1, &status, 0, cflag ? &ru : NULL);
+#endif /* __WALL */
 #endif /* LINUX */
 #ifdef SUNOS4
 		pid = wait(&status);
 #endif /* SUNOS4 */
 		wait_errno = errno;
+		if (interactive)
+			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 
-		if (pid == 0 && wnohang) {
-			/* We had at least one successful
-			 * wait() before. We waited
-			 * with WNOHANG second time.
-			 * Stop collecting more tracees,
-			 * process what we already have.
-			 */
-			break;
-		}
 		if (pid == -1) {
-			if (wait_errno == EINTR)
+			switch (wait_errno) {
+			case EINTR:
 				continue;
-			if (wait_errno == ECHILD) {
+			case ECHILD:
 				/*
 				 * We would like to verify this case
 				 * but sometimes a race in Solbourne's
@@ -2338,16 +2311,17 @@ collect_stopped_tcbs(void)
 				 * ECHILD before sending us SIGCHILD.
 				 */
 #if 0
-				if (nprocs != 0) {
-					fprintf(stderr, "strace: proc miscount\n");
-					exit(1);
-				}
+				if (nprocs == 0)
+					return 0;
+				fprintf(stderr, "strace: proc miscount\n");
+				exit(1);
 #endif
-				break;
+				return 0;
+			default:
+				errno = wait_errno;
+				perror("strace: wait");
+				return -1;
 			}
-			errno = wait_errno;
-			perror("strace: wait");
-			exit(1);
 		}
 		if (pid == popen_pid) {
 			if (WIFEXITED(status) || WIFSIGNALED(status))
@@ -2356,14 +2330,6 @@ collect_stopped_tcbs(void)
 		}
 		if (debug)
 			fprintf(stderr, " [wait(%#x) = %u]\n", status, pid);
-
-		/* RHEL5 bug workaround.
-		 * It can re-report stopped tasks. Happens on SIGSTOPs here.
-		 * Second (bogus) report has signal# set to 0.
-		 * Stop collecting and process what we have.
-		 */
-		if (WIFSTOPPED(status) && WSTOPSIG(status) == 0)
-			break;
 
 		/* Look up `pid' in our table. */
 		if ((tcp = pid2tcb(pid)) == NULL) {
@@ -2388,7 +2354,7 @@ Process %d attached (waiting for parent)\n",
 			else
 				/* This can happen if a clone call used
 				   CLONE_PTRACE itself.  */
-#endif /* LINUX */
+#endif
 			{
 				fprintf(stderr, "unknown pid: %u\n", pid);
 				if (WIFSTOPPED(status))
@@ -2396,13 +2362,15 @@ Process %d attached (waiting for parent)\n",
 				exit(1);
 			}
 		}
-
-#ifdef LINUX
+		/* set current output file */
+		outf = tcp->outf;
 		if (cflag) {
+#ifdef LINUX
 			tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
 			tcp->stime = ru.ru_stime;
+#endif /* !LINUX */
 		}
-#endif
+
 		if (tcp->flags & TCB_SUSPENDED) {
 			/*
 			 * Apparently, doing any ptrace() call on a stopped
@@ -2411,76 +2379,9 @@ Process %d attached (waiting for parent)\n",
 			 * process has not been actually restarted.
 			 * Since we have inspected the arguments of suspended
 			 * processes we end up here testing for this case.
-			 *
-			 * We also end up here when we catch new pid of
-			 * CLONE_PTRACEd process. Do not process/restart it
-			 * until we see corresponding clone() syscall exit
-			 * in its parent.
 			 */
 			continue;
 		}
-
-#ifdef LINUX
-		/* So far observed only on RHEL5 ia64, but I imagine this
-		 * can legitimately happen elsewhere.
-		 * If we waited and got a stopped task notification,
-		 * subsequent wait may return the same pid again, for example,
-		 * with SIGKILL notification. SIGKILL kills even stopped tasks.
-		 * We must not add it to the list
-		 * (one task can't be inserted twice in the list).
-		 */
-		{
-			struct tcb *f = found_tcps;
-			while (f) {
-				if (f == tcp) {
-					remembered_pid = pid;
-					remembered_status = status;
-					goto ret;
-				}
-				f = f->next_need_service;
-			}
-		}
-		/* It is important to not invert the order of tasks
-		 * to process. For one, alloc_tcb() above picks newly forked
-		 * threads in some order, processing of them and their parent
-		 * should be in the same order, otherwise bad things happen
-		 * (misinterpreted SIGSTOPs and such).
-		 */
-		tcp->wait_status = status;
-		*nextp = tcp;
-		nextp = &tcp->next_need_service;
-		*nextp = NULL;
-		wnohang = WNOHANG;
-#endif
-#ifdef SUNOS4
-		/* Probably need to replace wait with waitpid
-		 * and loop on Sun too, but I can't test it. Volunteers?
-		 */
-		tcp->wait_status = status;
-		tcp->next_need_service = NULL;
-		found_tcps = tcp;
-		break;
-#endif
-	} /* while (1) - collecting all stopped/exited tracees */
- ret:
-	/* Disable ^C etc */
-	if (interactive)
-		sigprocmask(SIG_BLOCK, &blocked_set, NULL);
-
-	return found_tcps;
-}
-
-static int
-handle_stopped_tcbs(struct tcb *tcp)
-{
-	for (; tcp; tcp = tcp->next_need_service) {
-		int pid;
-		int status;
-
-		outf = tcp->outf;
-		status = tcp->wait_status;
-		pid = tcp->pid;
-
 		if (WIFSIGNALED(status)) {
 			if (pid == strace_child)
 				exit_code = 0x100 | WTERMSIG(status);
@@ -2542,7 +2443,7 @@ handle_stopped_tcbs(struct tcb *tcp)
 		/*
 		 * Interestingly, the process may stop
 		 * with STOPSIG equal to some other signal
-		 * than SIGSTOP if we happen to attach
+		 * than SIGSTOP if we happend to attach
 		 * just before the process takes a signal.
 		 */
 		if ((tcp->flags & TCB_STARTUP) && WSTOPSIG(status) == SIGSTOP) {
@@ -2563,100 +2464,10 @@ handle_stopped_tcbs(struct tcb *tcp)
 					return -1;
 				}
 			}
-/* Add more OSes after you verified it works for them. */
-/* PTRACE_SETOPTIONS may be an enum, not a #define.
- * But sometimes we can test for it by checking PT_SETOPTIONS.
- */
-#if defined LINUX && (defined PTRACE_SETOPTIONS || defined PT_SETOPTIONS)
-# ifndef PTRACE_O_TRACESYSGOOD
-#  define PTRACE_O_TRACESYSGOOD 0x00000001
-# endif
-# ifndef PTRACE_O_TRACEEXEC
-#  define PTRACE_O_TRACEEXEC    0x00000010
-# endif
-# ifndef PTRACE_EVENT_EXEC
-#  define PTRACE_EVENT_EXEC     4
-# endif
-			/*
-			 * Ask kernel to set signo to SIGTRAP | 0x80
-			 * on ptrace-generated SIGTRAPs, and mark
-			 * execve's SIGTRAP with PTRACE_EVENT_EXEC.
-			 */
-			if (!ptrace_opts_set) {
-				char *p;
-				ptrace_opts_set = 1;
-
-				/* RHEL 2.6.18 definitely has crippling bugs */
-				/* Vanilla and Fedora 2.6.29 seems to work */
-				p = utsname_buf.release;
-				if (strtoul(p, &p, 10) < 2 || *p != '.')
-					goto tracing;
-				if (strtoul(++p, &p, 10) < 6 || *p != '.')
-					goto tracing;
-				if (strtoul(++p, &p, 10) < 29)
-					goto tracing;
-				/*
-				 * NB: even if this "succeeds", we can
-				 * revert back to SIGTRAP if we later see
-				 * that it didnt really work.
-				 * Old kernels are known to lie here.
-				 */
-				if (ptrace(PTRACE_SETOPTIONS, pid, (char *) 0,
-					(long) (PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC)) == 0)
-					ptrace_stop_sig = SIGTRAP | 0x80;
-			}
-#endif
 			goto tracing;
 		}
 
-#if defined LINUX && (defined PTRACE_SETOPTIONS || defined PT_SETOPTIONS)
-		if (ptrace_stop_sig != SIGTRAP && WSTOPSIG(status) == SIGTRAP) {
-			/*
-			 * We told ptrace to report SIGTRAP | 0x80 on this process
-			 * but got bare SIGTRAP. This can be a genuine SIGTRAP:
-			 * kill(pid, SIGTRAP), trap insn, etc;
-			 * but be paranoid about it.
-			 */
-			if (((unsigned)status >> 16) == PTRACE_EVENT_EXEC) {
-				/* It's post-exec ptrace stop. Ignore it,
-				 * we will get syscall exit ptrace stop later.
-				 */
-#ifdef TCB_WAITEXECVE
-				tcp->flags &= ~TCB_WAITEXECVE;
-#endif
-				goto tracing;
-			} else {
-				/* Take a better look...  */
-				siginfo_t si;
-				si.si_signo = 0;
-				ptrace(PTRACE_GETSIGINFO, pid, (void*) 0, (long) &si);
-				/*
-				 * Check some fields to make sure we see
-				 * real SIGTRAP.
-				 * Otherwise interpret it as ptrace stop.
-				 * Real SIGTRAPs (int3 insn on x86, kill() etc)
-				 * have these values:
-				 * int3:                   kill -TRAP $pid:
-				 * si_signo:5 (SIGTRAP)    si_signo:5 (SIGTRAP)
-				 * si_errno:0              si_errno:(?)
-				 * si_code:128 (SI_KERNEL) si_code:0 (SI_USER)
-				 * si_pid:0                si_pid:(>0?)
-				 * si_band:0               si_band:(?)
-				 * Ptrace stops have garbage there instead.
-				 */
-				if (si.si_signo != SIGTRAP
-				 || (si.si_code != SI_KERNEL && si.si_code != SI_USER)
-				) {
-					fprintf(stderr, "bogus SIGTRAP (si_code:%x), assuming old kernel\n", si.si_code);
-					ptrace_stop_sig = SIGTRAP;
-				}
-			}
-		}
-#endif
-
-		if (WSTOPSIG(status) != ptrace_stop_sig) {
-			/* This isn't a ptrace stop.  */
-
+		if (WSTOPSIG(status) != SIGTRAP) {
 			if (WSTOPSIG(status) == SIGSTOP &&
 					(tcp->flags & TCB_SIGTRAPPED)) {
 				/*
@@ -2721,28 +2532,27 @@ handle_stopped_tcbs(struct tcb *tcp)
 		/* we handled the STATUS, we are permitted to interrupt now. */
 		if (interrupted)
 			return 0;
-		if (trace_syscall(tcp) < 0) {
-			/* trace_syscall printed incompletely decoded syscall,
-			 * add error indicator.
-			 * NB: modulo bugs, errno must be nonzero, do not add
-			 * "if (err != 0)", this will hide bugs.
+		if (trace_syscall(tcp) < 0 && !tcp->ptrace_errno) {
+			/* ptrace() failed in trace_syscall() with ESRCH.
+			 * Likely a result of process disappearing mid-flight.
+			 * Observed case: exit_group() terminating
+			 * all processes in thread group. In this case, threads
+			 * "disappear" in an unpredictable moment without any
+			 * notification to strace via wait().
 			 */
-			int err = tcp->ptrace_errno;
-			tcp->ptrace_errno = 0;
-			if (err == ESRCH)
-				tprintf(" <unavailable>");
-			else
-				tprintf(" <ptrace error %d (%s)>", err, strerror(err));
-			printtrailer();
-			if (err == ESRCH)
-				/* Want to get death report anyway. */
-				goto tracing;
-			/* Strange error, we dare not continue. */
 			if (tcp->flags & TCB_ATTACHED) {
+				if (tcp_last) {
+					/* Do we have dangling line "syscall(param, param"?
+					 * Finish the line then. We cannot
+					 */
+					tcp_last->flags |= TCB_REPRINT;
+					tprintf(" <unfinished ...>");
+					printtrailer();
+				}
 				detach(tcp, 0);
 			} else {
-				ptrace(PTRACE_KILL, tcp->pid, (char *) 1, SIGTERM);
-				/* [why SIGTERM? why not also kill(SIGKILL)?] */
+				ptrace(PTRACE_KILL,
+					tcp->pid, (char *) 1, SIGTERM);
 				droptcb(tcp);
 			}
 			continue;
@@ -2773,34 +2583,6 @@ handle_stopped_tcbs(struct tcb *tcp)
 			cleanup();
 			return -1;
 		}
-	} /* for each tcp */
-
-	return 0;
-}
-
-static int
-trace()
-{
-	int rc;
-	struct tcb *tcbs;
-
-	while (nprocs != 0) {
-		/* The loop of "wait for one tracee, serve it, repeat"
-		 * may leave some tracees never served.
-		 * Kernel provides no guarantees of fairness when you have
-		 * many waitable tasks.
-		 * Try strace -f with test/many_looping_threads.c example.
-		 * To fix it, we collect *all* waitable tasks, then handle
-		 * them all, then repeat.
-		 */
-		if (interrupted)
-			return 0;
-		tcbs = collect_stopped_tcbs();
-		if (!tcbs)
-			break;
-		rc = handle_stopped_tcbs(tcbs);
-		if (rc)
-			return rc;
 	}
 	return 0;
 }
@@ -2842,32 +2624,20 @@ va_dcl
 }
 
 void
-printleader(struct tcb *tcp)
+printleader(tcp)
+struct tcb *tcp;
 {
 	if (tcp_last) {
-		int err = tcp_last->ptrace_errno;
-		if (err) {
-			tcp_last->ptrace_errno = 0;
+		if (tcp_last->ptrace_errno) {
 			if (tcp_last->flags & TCB_INSYSCALL) {
-				if (err == ESRCH)
-					tprintf(" <unavailable ...>\n");
-				else
-					tprintf(" <ptrace error %d (%s) ...>\n", err, strerror(err));
-				tcp_last->flags |= TCB_REPRINT;
-			} else {
-				/* Not sure this branch can ever be reached.
-				 * Oh well. Using subtly different format
-				 * (without "?" after "=") to make it
-				 * noticeable (grep for '= <' in straces).
-				 */
-				if (err == ESRCH)
-					tprintf("= <unavailable>\n");
-				else
-					tprintf("= <ptrace error %d (%s)>\n", err, strerror(err));
+				tprintf(" <unavailable>)");
+				tabto(acolumn);
 			}
+			tprintf("= ? <unavailable>\n");
+			tcp_last->ptrace_errno = 0;
 		} else if (!outfname || followfork < 2 || tcp_last == tcp) {
-			tprintf(" <unfinished ...>\n");
 			tcp_last->flags |= TCB_REPRINT;
+			tprintf(" <unfinished ...>\n");
 		}
 	}
 	curcol = 0;

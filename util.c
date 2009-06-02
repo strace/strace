@@ -241,102 +241,29 @@ xlookup(const struct xlat *xlat, int val)
 }
 
 /*
- * Generic ptrace wrapper which tracks ptrace errors
- * by setting tcp->ptrace_errno.
+ * Generic ptrace wrapper which tracks ESRCH errors
+ * by setting tcp->ptrace_errno to ESRCH.
  *
  * We assume that ESRCH indicates likely process death (SIGKILL?),
  * modulo bugs where process somehow ended up not stopped.
  * Unfortunately kernel uses ESRCH for that case too. Oh well.
+ *
+ * Currently used by upeek() only.
+ * TODO: use this in all other ptrace() calls while decoding.
  */
-static const char *
-str_PTRACE_xxx(int request)
-{
-	const char *s;
-	static char msg[sizeof(int) * 3 + sizeof("PTRACE_<%d>")];
-
-	s = xlookup(ptrace_cmds, request);
-	if (s)
-		return s;
-	sprintf(msg, "PTRACE_<%d>", request);
-	return msg;
-}
-
 long
-do_ptrace(int request, struct tcb *tcp, void *addr, long data)
+do_ptrace(int request, struct tcb *tcp, void *addr, void *data)
 {
-	int err;
 	long l;
 
 	errno = 0;
 	l = ptrace(request, tcp->pid, addr, data);
-	err = errno;
-	if (err) {
-		tcp->ptrace_errno = err;
-		if (err != ESRCH) {
-			fprintf(stderr, "strace: ptrace(%s,%u,%p,%lu): %s\n",
-				str_PTRACE_xxx(request),
-				(int) tcp->pid, addr, data, strerror(err));
-			errno = err; /* fprintf can clobber it, restore */
-		}
-		return -1;
-	}
+	/* Non-ESRCH errors might be our invalid reg/mem accesses,
+	 * we do not record them. */
+	if (errno == ESRCH)
+		tcp->ptrace_errno = ESRCH;
 	return l;
 }
-
-static long
-do_ptrace_peekdata(struct tcb *tcp, void *addr, int started)
-{
-	int err;
-	long l;
-
-	errno = 0;
-	l = ptrace(PTRACE_PEEKDATA, tcp->pid, addr, 0);
-	err = errno;
-	if (err) {
-		if (started && (err == EPERM || err == EIO)) {
-			/* Ran into 'end of memory' - not an error.
-			 * NB: errno is nonzero, caller uses this to detect
-			 * "end of string" condition.
-			 */
-			return 0;
-		}
-		/* If error happens at first call, we have a bogus address. */
-		if (addr != NULL && err != EIO) {
-			if (err != ESRCH) {
-				fprintf(stderr, "strace: ptrace(PTRACE_PEEKDATA,%u,%p,0): %s\n",
-					(int) tcp->pid, addr, strerror(err));
-				errno = err; /* fprintf can clobber it, restore */
-			}
-			tcp->ptrace_errno = err;
-			return -1;
-		}
-	}
-	return l;
-}
-
-#ifdef SUNOS4
-static long
-do_ptrace5(int request, struct tcb *tcp, void *addr, long data, char *data2)
-{
-	int err;
-	long l;
-
-	errno = 0;
-	l = ptrace(request, tcp->pid, addr, data, data2);
-	err = errno;
-	if (err) {
-		tcp->ptrace_errno = err;
-		if (err != ESRCH) {
-			fprintf(stderr, "strace: ptrace(%s,%u,%p,%lu,%p): %s\n",
-				str_PTRACE_xxx(request),
-				(int) tcp->pid, addr, data, data2, strerror(err));
-			errno = err; /* fprintf can clobber it, restore */
-		}
-		return -1;
-	}
-	return l;
-}
-#endif
 
 /*
  * Used when we want to unblock stopped traced process.
@@ -346,21 +273,25 @@ do_ptrace5(int request, struct tcb *tcp, void *addr, long data, char *data2)
  * Otherwise prints error message and returns -1.
  */
 int
-ptrace_restart(int request, struct tcb *tcp, int sig)
+ptrace_restart(int op, struct tcb *tcp, int sig)
 {
 	int err;
+	const char *msg;
 
 	errno = 0;
-	ptrace(request, tcp->pid, (void *) 1, (long) sig);
+	ptrace(op, tcp->pid, (void *) 1, (void *) (long) sig);
 	err = errno;
 	if (!err || err == ESRCH)
 		return 0;
 
 	tcp->ptrace_errno = err;
-	fprintf(stderr, "strace: ptrace(%s,%u,1,%d): %s\n",
-			str_PTRACE_xxx(request),
-			(int)tcp->pid, sig, strerror(err));
-	errno = err; /* fprintf can clobber it, restore */
+	msg = "SYSCALL";
+	if (op == PTRACE_CONT)
+		msg = "CONT";
+	if (op == PTRACE_DETACH)
+		msg = "DETACH";
+	fprintf(stderr, "strace: ptrace(PTRACE_%s,1,%d): %s\n",
+			msg, sig, strerror(err));
 	return -1;
 }
 
@@ -857,6 +788,7 @@ int
 umoven(struct tcb *tcp, long addr, int len, char *laddr)
 {
 #ifdef LINUX
+	int pid = tcp->pid;
 	int n, m;
 	int started = 0;
 	union {
@@ -868,17 +800,34 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
 		addr &= -sizeof(long); /* residue */
-		u.val = do_ptrace_peekdata(tcp, (char *) addr, started);
-		if (errno)
-			return u.val; /* 0 or -1 */
+		errno = 0;
+		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
+		if (errno) {
+			if (started && (errno==EPERM || errno==EIO)) {
+				/* Ran into 'end of memory' - stupid "printpath" */
+				return 0;
+			}
+			/* But if not started, we had a bogus address. */
+			if (addr != 0 && errno != EIO && errno != ESRCH)
+				perror("ptrace: umoven");
+			return -1;
+		}
 		started = 1;
 		memcpy(laddr, &u.x[n], m = MIN(sizeof(long) - n, len));
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 	while (len) {
-		u.val = do_ptrace_peekdata(tcp, (char *) addr, started);
-		if (errno)
-			return u.val; /* 0 or -1 */
+		errno = 0;
+		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
+		if (errno) {
+			if (started && (errno==EPERM || errno==EIO)) {
+				/* Ran into 'end of memory' - stupid "printpath" */
+				return 0;
+			}
+			if (addr != 0 && errno != EIO && errno != ESRCH)
+				perror("ptrace: umoven");
+			return -1;
+		}
 		started = 1;
 		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
 		addr += sizeof(long), laddr += m, len -= m;
@@ -898,16 +847,24 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
 		addr &= -sizeof(long); /* residue */
-		u.val = do_ptrace(PTRACE_PEEKDATA, tcp, (char *) addr, 0);
-		if (errno)
+		errno = 0;
+		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
+		if (errno) {
+			if (errno != ESRCH)
+				perror("umoven");
 			return -1;
+		}
 		memcpy(laddr, &u.x[n], m = MIN(sizeof(long) - n, len));
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 	while (len) {
-		u.val = do_ptrace(PTRACE_PEEKDATA, tcp, (char *) addr, 0);
-		if (errno)
+		errno = 0;
+		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
+		if (errno) {
+			if (errno != ESRCH)
+				perror("umoven");
 			return -1;
+		}
 		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
 		addr += sizeof(long), laddr += m, len -= m;
 	}
@@ -917,7 +874,12 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 	while (len) {
 		n = MIN(len, PAGSIZ);
 		n = MIN(n, ((addr + PAGSIZ) & PAGMASK) - addr);
-		if (do_ptrace5(PTRACE_READDATA, tcp, (char *) addr, len, laddr) < 0) {
+		if (ptrace(PTRACE_READDATA, pid,
+			   (char *) addr, len, laddr) < 0) {
+			if (errno != ESRCH) {
+				perror("umoven: ptrace(PTRACE_READDATA, ...)");
+				abort();
+			}
 			return -1;
 		}
 		len -= n;
@@ -979,6 +941,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 	}
 #else /* !USE_PROCFS */
 	int started = 0;
+	int pid = tcp->pid;
 	int i, n, m;
 	union {
 		long val;
@@ -989,9 +952,17 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
 		addr &= -sizeof(long); /* residue */
-		u.val = do_ptrace_peekdata(tcp, (char *)addr, started);
-		if (errno)
-			return u.val; /* 0 or -1 */
+		errno = 0;
+		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
+		if (errno) {
+			if (started && (errno==EPERM || errno==EIO)) {
+				/* Ran into 'end of memory' - stupid "printpath" */
+				return 0;
+			}
+			if (addr != 0 && errno != EIO && errno != ESRCH)
+				perror("umovestr");
+			return -1;
+		}
 		started = 1;
 		memcpy(laddr, &u.x[n], m = MIN(sizeof(long)-n,len));
 		while (n & (sizeof(long) - 1))
@@ -1000,9 +971,17 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 	while (len) {
-		u.val = do_ptrace_peekdata(tcp, (char *)addr, started);
-		if (errno)
-			return u.val; /* 0 or -1 */
+		errno = 0;
+		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
+		if (errno) {
+			if (started && (errno==EPERM || errno==EIO)) {
+				/* Ran into 'end of memory' - stupid "printpath" */
+				return 0;
+			}
+			if (addr != 0 && errno != EIO && errno != ESRCH)
+				perror("umovestr");
+			return -1;
+		}
 		started = 1;
 		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
 		for (i = 0; i < sizeof(long); i++)
@@ -1025,7 +1004,12 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 #ifdef SUNOS4
 
 static int
-uload(int cmd, struct tcb *tcp, long addr, int len, char *laddr)
+uload(cmd, pid, addr, len, laddr)
+int cmd;
+int pid;
+long addr;
+int len;
+char *laddr;
 {
 # if 0
 	int n;
@@ -1033,7 +1017,8 @@ uload(int cmd, struct tcb *tcp, long addr, int len, char *laddr)
 	while (len) {
 		n = MIN(len, PAGSIZ);
 		n = MIN(n, ((addr + PAGSIZ) & PAGMASK) - addr);
-		if (do_ptrace5(cmd, tcp, (char *)addr, n, laddr) < 0) {
+		if (ptrace(cmd, pid, (char *)addr, n, laddr) < 0) {
+			perror("uload: ptrace(PTRACE_WRITE, ...)");
 			return -1;
 		}
 		len -= n;
@@ -1060,39 +1045,50 @@ uload(int cmd, struct tcb *tcp, long addr, int len, char *laddr)
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
 		addr &= -sizeof(long);
-		u.val = do_ptrace(peek, tcp, (char *) addr, 0);
-		if (errno)
-			return -1;
-		m = MIN(sizeof(long) - n;
-		memcpy(&u.x[n], laddr, m, len));
-		if (do_ptrace(poke, tcp, (char *)addr, u.val) < 0) {
+		errno = 0;
+		u.val = ptrace(peek, pid, (char *) addr, 0);
+		if (errno) {
+			perror("uload: POKE");
 			return -1;
 		}
-		addr += sizeof(long);
-		laddr += m;
-		len -= m;
+		memcpy(&u.x[n], laddr, m = MIN(sizeof(long) - n, len));
+		if (ptrace(poke, pid, (char *)addr, u.val) < 0) {
+			perror("uload: POKE");
+			return -1;
+		}
+		addr += sizeof(long), laddr += m, len -= m;
 	}
-	errno = 0;
 	while (len) {
 		if (len < sizeof(long))
-			u.val = do_ptrace(peek, tcp, (char *) addr, 0);
-		m = MIN(sizeof(long), len);
-		memcpy(u.x, laddr, m);
-		if (errno || do_ptrace(poke, tcp, (char *) addr, u.val) < 0) {
+			u.val = ptrace(peek, pid, (char *) addr, 0);
+		memcpy(u.x, laddr, m = MIN(sizeof(long), len));
+		if (ptrace(poke, pid, (char *) addr, u.val) < 0) {
+			perror("uload: POKE");
 			return -1;
 		}
-		addr += sizeof(long);
-		laddr += m;
-		len -= m;
+		addr += sizeof(long), laddr += m, len -= m;
 	}
 # endif
 	return 0;
 }
 
-static int
-tload(struct tcb *tcp, int addr, int len, char *laddr)
+int
+tload(pid, addr, len, laddr)
+int pid;
+int addr, len;
+char *laddr;
 {
-	return uload(PTRACE_WRITETEXT, tcp, addr, len, laddr);
+	return uload(PTRACE_WRITETEXT, pid, addr, len, laddr);
+}
+
+int
+dload(pid, addr, len, laddr)
+int pid;
+int addr;
+int len;
+char *laddr;
+{
+	return uload(PTRACE_WRITEDATA, pid, addr, len, laddr);
 }
 
 #endif /* SUNOS4 */
@@ -1100,7 +1096,10 @@ tload(struct tcb *tcp, int addr, int len, char *laddr)
 #ifndef USE_PROCFS
 
 int
-upeek(struct tcb *tcp, long off, long *res)
+upeek(tcp, off, res)
+struct tcb *tcp;
+long off;
+long *res;
 {
 	long val;
 
@@ -1127,9 +1126,16 @@ upeek(struct tcb *tcp, long off, long *res)
 			off += 1024;
 	}
 # endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
+	errno = 0;
 	val = do_ptrace(PTRACE_PEEKUSER, tcp, (char *) off, 0);
-	if (errno)
+	if (val == -1 && errno) {
+		if (errno != ESRCH) {
+			char buf[60];
+			sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)", tcp->pid, off);
+			perror(buf);
+		}
 		return -1;
+	}
 	*res = val;
 	return 0;
 }
@@ -1175,17 +1181,17 @@ getpc(struct tcb *tcp)
 		return -1;
 # elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *) &regs, 0) < 0)
+	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
 	pc = regs.r_pc;
 # elif defined(S390) || defined(S390X)
-	if (upeek(tcp, PT_PSWADDR, &pc) < 0)
+	if(upeek(tcp,PT_PSWADDR,&pc) < 0)
 		return -1;
 # elif defined(HPPA)
-	if (upeek(tcp, PT_IAOQ0, &pc) < 0)
+	if(upeek(tcp,PT_IAOQ0,&pc) < 0)
 		return -1;
 # elif defined(SH)
-	if (upeek(tcp, 4*REG_PC, &pc) < 0)
+	if (upeek(tcp, 4*REG_PC ,&pc) < 0)
 		return -1;
 # elif defined(SH64)
 	if (upeek(tcp, REG_PC ,&pc) < 0)
@@ -1201,8 +1207,10 @@ getpc(struct tcb *tcp)
 	 */
 	struct regs regs;
 
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *) &regs, 0) < 0)
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *) &regs, 0) < 0) {
+		perror("getpc: ptrace(PTRACE_GETREGS, ...)");
 		return -1;
+	}
 	return regs.r_pc;
 #endif /* SUNOS4 */
 
@@ -1238,7 +1246,7 @@ printcall(struct tcb *tcp)
 
 # elif defined(S390) || defined(S390X)
 	long psw;
-	if (upeek(tcp, PT_PSWADDR, &psw) < 0) {
+	if(upeek(tcp,PT_PSWADDR,&psw) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1290,7 +1298,7 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 # elif defined(SPARC) || defined(SPARC64)
 	struct regs regs;
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *) &regs, 0) < 0) {
+	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1298,7 +1306,7 @@ printcall(struct tcb *tcp)
 # elif defined(HPPA)
 	long pc;
 
-	if (upeek(tcp, PT_IAOQ0, &pc) < 0) {
+	if(upeek(tcp,PT_IAOQ0,&pc) < 0) {
 		tprintf ("[????????] ");
 		return;
 	}
@@ -1373,7 +1381,8 @@ printcall(struct tcb *tcp)
 #ifdef SUNOS4
 	struct regs regs;
 
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *) &regs, 0) < 0) {
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *) &regs, 0) < 0) {
+		perror("printcall: ptrace(PTRACE_GETREGS, ...)");
 		PRINTBADPC;
 		return;
 	}
@@ -1494,9 +1503,9 @@ set_arg0 (struct tcb *tcp, arg_setup_state *state, long val)
 		req = PTRACE_POKEUSER;
 	} else
 		ap = ia64_rse_skip_regs(*state, 0);
-	if (do_ptrace(req, tcp, ap, val) < 0)
-		return -1;
-	return 0;
+	errno = 0;
+	ptrace(req, tcp->pid, ap, val);
+	return errno ? -1 : 0;
 }
 
 static int
@@ -1510,9 +1519,9 @@ set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
 		req = PTRACE_POKEUSER;
 	} else
 		ap = ia64_rse_skip_regs(*state, 1);
-	if (do_ptrace(req, tcp, ap, val) < 0)
-		return -1;
-	return 0;
+	errno = 0;
+	ptrace(req, tcp->pid, ap, val);
+	return errno ? -1 : 0;
 }
 
 /* ia64 does not return the input arguments from functions (and syscalls)
@@ -1526,9 +1535,9 @@ set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
 typedef struct regs arg_setup_state;
 
 #   define arg_setup(tcp, state) \
-    (do_ptrace(PTRACE_GETREGS, tcp, (char *) (state), 0))
+    (ptrace (PTRACE_GETREGS, tcp->pid, (char *) (state), 0))
 #   define arg_finish_change(tcp, state) \
-    (do_ptrace(PTRACE_SETREGS, tcp, (char *) (state), 0))
+    (ptrace (PTRACE_SETREGS, tcp->pid, (char *) (state), 0))
 
 #   define get_arg0(tcp, state, valp) (*(valp) = (state)->r_o0, 0)
 #   define get_arg1(tcp, state, valp) (*(valp) = (state)->r_o1, 0)
@@ -1598,15 +1607,15 @@ typedef int arg_setup_state;
     (upeek ((tcp), arg1_offset, (valp)))
 
 static int
-set_arg0(struct tcb *tcp, void *cookie, long val)
+set_arg0 (struct tcb *tcp, void *cookie, long val)
 {
-	return do_ptrace(PTRACE_POKEUSER, tcp, (char*)arg0_offset, val);
+	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val);
 }
 
 static int
-set_arg1(struct tcb *tcp, void *cookie, long val)
+set_arg1 (struct tcb *tcp, void *cookie, long val)
 {
-	return do_ptrace(PTRACE_POKEUSER, tcp, (char*)arg1_offset, val);
+	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg1_offset, val);
 }
 
 #  endif /* architectures */
@@ -1736,13 +1745,17 @@ struct tcb *tcp;
 		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
 		return -1;
 	}
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *)&regs, 0) < 0) {
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+		perror("setbpt: ptrace(PTRACE_GETREGS, ...)");
 		return -1;
 	}
 	tcp->baddr = regs.r_o7 + 8;
-	tcp->inst[0] = do_ptrace(PTRACE_PEEKTEXT, tcp, (char *)tcp->baddr, 0);
-	if (errno)
+	errno = 0;
+	tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)tcp->baddr, 0);
+	if(errno) {
+		perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
 		return -1;
+	}
 
 	/*
 	 * XXX - BRUTAL MODE ON
@@ -1760,8 +1773,11 @@ struct tcb *tcp;
 	inst <<= 32;
 	inst |= (tcp->inst[0] & 0xffffffffUL);
 #    endif
-	if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) tcp->baddr, inst) < 0)
+	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, inst);
+	if(errno) {
+		perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
 		return -1;
+	}
 	tcp->flags |= TCB_BPTSET;
 
 #   else /* !SPARC && !SPARC64 */
@@ -1778,11 +1794,17 @@ struct tcb *tcp;
 		if (debug)
 			fprintf(stderr, "[%d] setting bpt at %lx\n",
 				tcp->pid, tcp->baddr);
-		tcp->inst[0] = do_ptrace(PTRACE_PEEKTEXT, tcp, (char *) tcp->baddr, 0);
-		if (errno)
+		tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, tcp->pid,
+				      (char *) tcp->baddr, 0);
+		if (errno) {
+			perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
 			return -1;
-		if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) tcp->baddr, LOOP) < 0)
+		}
+		ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, LOOP);
+		if (errno) {
+			perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
 			return -1;
+		}
 		tcp->flags |= TCB_BPTSET;
 	} else {
 		/*
@@ -1808,15 +1830,21 @@ struct tcb *tcp;
 		/* store "ri" in low two bits */
 		tcp->baddr = addr | ((ipsr >> 41) & 0x3);
 
-		tcp->inst[0] = do_ptrace(PTRACE_PEEKTEXT, tcp, (char *) addr + 0, 0);
-		if (!errno)
-			tcp->inst[1] = do_ptrace(PTRACE_PEEKTEXT, tcp, (char *) addr + 8, 0);
-		if (errno)
+		errno = 0;
+		tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, pid, (char *) addr + 0,
+				      0);
+		tcp->inst[1] = ptrace(PTRACE_PEEKTEXT, pid, (char *) addr + 8,
+				      0);
+		if (errno) {
+			perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
 			return -1;
+		}
 
-		if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) addr + 0, LOOP0) < 0
-		 || do_ptrace(PTRACE_POKETEXT, tcp, (char *) addr + 8, LOOP1) < 0
-		) {
+		errno = 0;
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 0, LOOP0);
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 8, LOOP1);
+		if (errno) {
+			perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
 			return -1;
 		}
 		tcp->flags |= TCB_BPTSET;
@@ -1888,10 +1916,14 @@ struct tcb *tcp;
 #     endif
 	if (debug)
 		fprintf(stderr, "[%d] setting bpt at %lx\n", tcp->pid, tcp->baddr);
-	tcp->inst[0] = do_ptrace(PTRACE_PEEKTEXT, tcp, (char *) tcp->baddr, 0);
-	if (errno)
+	tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *) tcp->baddr, 0);
+	if (errno) {
+		perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
 		return -1;
-	if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) tcp->baddr, LOOP) < 0) {
+	}
+	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, LOOP);
+	if (errno) {
+		perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
 		return -1;
 	}
 	tcp->flags |= TCB_BPTSET;
@@ -1918,12 +1950,14 @@ struct tcb *tcp;
 		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
 		return -1;
 	}
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *)&regs, 0) < 0) {
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+		perror("setbpt: ptrace(PTRACE_GETREGS, ...)");
 		return -1;
 	}
 	tcp->baddr = regs.r_o7 + 8;
-	if (do_ptrace5(PTRACE_READTEXT, tcp, (char *)tcp->baddr,
-				sizeof tcp->inst, (char *)tcp->inst, "READTEXT") < 0) {
+	if (ptrace(PTRACE_READTEXT, tcp->pid, (char *)tcp->baddr,
+				sizeof tcp->inst, (char *)tcp->inst) < 0) {
+		perror("setbpt: ptrace(PTRACE_READTEXT, ...)");
 		return -1;
 	}
 
@@ -1937,8 +1971,9 @@ struct tcb *tcp;
 	 * generated by out PTRACE_ATTACH.
 	 * Of cause, if we evaporate ourselves in the middle of all this...
 	 */
-	if (do_ptrace5(PTRACE_WRITETEXT, tcp, (char *) tcp->baddr,
+	if (ptrace(PTRACE_WRITETEXT, tcp->pid, (char *) tcp->baddr,
 			sizeof loopdeloop, (char *) loopdeloop) < 0) {
+		perror("setbpt: ptrace(PTRACE_WRITETEXT, ...)");
 		return -1;
 	}
 	tcp->flags |= TCB_BPTSET;
@@ -1976,7 +2011,10 @@ struct tcb *tcp;
 		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
 		return -1;
 	}
-	if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) tcp->baddr, tcp->inst[0]) < 0) {
+	errno = 0;
+	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, tcp->inst[0]);
+	if(errno) {
+		perror("clearbtp: ptrace(PTRACE_POKETEXT, ...)");
 		return -1;
 	}
 	tcp->flags &= ~TCB_BPTSET;
@@ -1990,7 +2028,10 @@ struct tcb *tcp;
 			fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
 			return -1;
 		}
-		if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) tcp->baddr, tcp->inst[0]) < 0) {
+		errno = 0;
+		ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, tcp->inst[0]);
+		if (errno) {
+			perror("clearbtp: ptrace(PTRACE_POKETEXT, ...)");
 			return -1;
 		}
 		tcp->flags &= ~TCB_BPTSET;
@@ -2017,15 +2058,20 @@ struct tcb *tcp;
 			return -1;
 
 		/* restore original bundle: */
-		if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) addr + 0, tcp->inst[0]) < 0
-		 || do_ptrace(PTRACE_POKETEXT, tcp, (char *) addr + 8, tcp->inst[1]) < 0
-		) {
+		errno = 0;
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 0, tcp->inst[0]);
+		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 8, tcp->inst[1]);
+		if (errno) {
+			perror("clearbpt: ptrace(PTRACE_POKETEXT, ...)");
 			return -1;
 		}
 
 		/* restore original "ri" in ipsr: */
 		ipsr = (ipsr & ~(0x3ul << 41)) | ((tcp->baddr & 0x3) << 41);
-		if (do_ptrace(PTRACE_POKEUSER, tcp, (char *) PT_CR_IPSR, ipsr) < 0) {
+		errno = 0;
+		ptrace(PTRACE_POKEUSER, pid, (char *) PT_CR_IPSR, ipsr);
+		if (errno) {
+			perror("clrbpt: ptrace(PTRACE_POKEUSER, ...)");
 			return -1;
 		}
 
@@ -2047,7 +2093,10 @@ struct tcb *tcp;
 		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
 		return -1;
 	}
-	if (do_ptrace(PTRACE_POKETEXT, tcp, (char *) tcp->baddr, tcp->inst[0]) < 0) {
+	errno = 0;
+	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, tcp->inst[0]);
+	if (errno) {
+		perror("clearbtp: ptrace(PTRACE_POKETEXT, ...)");
 		return -1;
 	}
 	tcp->flags &= ~TCB_BPTSET;
@@ -2120,11 +2169,8 @@ struct tcb *tcp;
 	 * safe to set both IAOQ0 and IAOQ1 to that so the PSW N bit
 	 * has no significant effect.
 	 */
-	if (do_ptrace(PTRACE_POKEUSER, tcp, (void *)PT_IAOQ0, iaoq) < 0
-	 || do_ptrace(PTRACE_POKEUSER, tcp, (void *)PT_IAOQ1, iaoq) < 0
-	) {
-		return -1;
-	}
+	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ0, iaoq);
+	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ1, iaoq);
 #    elif defined(SH)
 	if (upeek(tcp, 4*REG_PC, &pc) < 0)
 		return -1;
@@ -2151,8 +2197,9 @@ struct tcb *tcp;
 		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
 		return -1;
 	}
-	if (do_ptrace5(PTRACE_WRITETEXT, tcp, (char *) tcp->baddr,
+	if (ptrace(PTRACE_WRITETEXT, tcp->pid, (char *) tcp->baddr,
 				sizeof tcp->inst, (char *) tcp->inst) < 0) {
+		perror("clearbtp: ptrace(PTRACE_WRITETEXT, ...)");
 		return -1;
 	}
 	tcp->flags &= ~TCB_BPTSET;
@@ -2162,10 +2209,12 @@ struct tcb *tcp;
 	 * Since we don't have a single instruction breakpoint, we may have
 	 * to adjust the program counter after removing our `breakpoint'.
 	 */
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *)&regs, 0) < 0) {
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+		perror("clearbpt: ptrace(PTRACE_GETREGS, ...)");
 		return -1;
 	}
-	if ((regs.r_pc < tcp->baddr) ||	(regs.r_pc > tcp->baddr + 4)) {
+	if ((regs.r_pc < tcp->baddr) ||
+				(regs.r_pc > tcp->baddr + 4)) {
 		/* The breakpoint has not been reached yet */
 		if (debug)
 			fprintf(stderr,
@@ -2179,7 +2228,8 @@ struct tcb *tcp;
 				regs.r_pc, tcp->baddr);
 
 	regs.r_pc = tcp->baddr;
-	if (do_ptrace(PTRACE_SETREGS, tcp, (char *)&regs, 0) < 0) {
+	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+		perror("clearbpt: ptrace(PTRACE_SETREGS, ...)");
 		return -1;
 	}
 #    endif /* LOOPA */
@@ -2250,7 +2300,7 @@ struct tcb *tcp;
 		fprintf(stderr, "out of memory\n");
 		return -1;
 	}
-	if (umoven(tcp, (int)ld.ld_symbols + (int)N_TXTADDR(hdr),
+	if (umoven(tcp, (int)ld.ld_symbols+(int)N_TXTADDR(hdr),
 					(int)ld.ld_symb_size, strtab) < 0)
 		goto err;
 
@@ -2275,7 +2325,7 @@ struct tcb *tcp;
 		 * Write entire symbol table back to avoid
 		 * memory alignment bugs in ptrace
 		 */
-		if (tload(tcp, (int)ld.ld_symbols + (int)N_TXTADDR(hdr),
+		if (tload(pid, (int)ld.ld_symbols+(int)N_TXTADDR(hdr),
 					(int)ld.ld_symb_size, strtab) < 0)
 			goto err;
 

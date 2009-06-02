@@ -298,11 +298,8 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 
 /* Trace Control Block */
 struct tcb {
-	int flags;		/* See below for TCB_ values */
+	short flags;		/* See below for TCB_ values */
 	int pid;		/* Process Id of this entry */
-	int wait_status;	/* Status from last wait() */
-	struct tcb *next_need_service;
-				/* Linked list of tracees found by wait()s */
 	long scno;		/* System call number */
 	int u_nargs;		/* System call arguments */
 	long u_arg[MAX_ARGS];	/* System call arguments */
@@ -328,8 +325,8 @@ struct tcb {
 	int nclone_threads;	/* # of nchildren with CLONE_THREAD */
 	int nclone_detached;	/* # of nchildren with CLONE_DETACHED */
 	int nclone_waiting;	/* clone threads in wait4 (TCB_SUSPENDED) */
-				/* (1st arg of wait4()) */
 #endif
+				/* (1st arg of wait4()) */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
 	int pfd;		/* proc file descriptor */
@@ -359,19 +356,12 @@ struct tcb {
 #define TCB_SUSPENDED	00040	/* Process can not be allowed to resume just now */
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
+#define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #ifdef LINUX
-/* TCB_WAITEXECVE bit means "ignore next SIGTRAP, it's execve exit stop".
- * it is not reliable if traced program masks SIGTRAP.
- *
- * x86 does not need TCB_WAITEXECVE.
+/* x86 does not need TCB_WAITEXECVE.
  * It can detect execve's SIGTRAP by looking at eax/rax.
  * See "stray syscall exit: eax = " message in syscall_fixup().
- *
- * Note that on newer kernels, we use ptrace options and therefore
- * can filter out execve stops reliably on any architecture,
- * without using TCB_WAITEXECVE flag.
- * I guess we can remove it from the source somewhere around year 2010 :)
  */
 # if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
   || defined(POWERPC) || defined(IA64) || defined(HPPA) \
@@ -430,7 +420,6 @@ extern const struct xlat open_mode_flags[];
 extern const struct xlat addrfams[];
 extern const struct xlat struct_user_offsets[];
 extern const struct xlat open_access_modes[];
-extern const struct xlat ptrace_cmds[];
 
 /* Format of syscall return values */
 #define RVAL_DECIMAL	000	/* decimal format */
@@ -492,7 +481,7 @@ extern void set_overhead P((int));
 extern void qualify P((char *));
 extern int get_scno P((struct tcb *));
 extern long known_scno P((struct tcb *));
-extern long do_ptrace P((int request, struct tcb *tcp, void *addr, long data));
+extern long do_ptrace P((int request, struct tcb *tcp, void *addr, void *data));
 extern int ptrace_restart P((int request, struct tcb *tcp, int sig));
 extern int trace_syscall P((struct tcb *));
 extern int count_syscall P((struct tcb *, struct timeval *));

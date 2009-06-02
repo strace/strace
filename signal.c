@@ -1403,13 +1403,14 @@ sys_sigreturn(struct tcb *tcp)
 	struct regs regs;
 	m_siginfo_t si;
 
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *)&regs, 0) < 0) {
+	if(ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+		perror("sigreturn: PTRACE_GETREGS ");
 		return 0;
 	}
-	if (entering(tcp)) {
+	if(entering(tcp)) {
 		tcp->u_arg[0] = 0;
 		i1 = regs.r_o1;
-		if (umove(tcp, i1, &si) < 0) {
+		if(umove(tcp, i1, &si) < 0) {
 			perror("sigreturn: umove ");
 			return 0;
 		}

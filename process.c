@@ -484,6 +484,18 @@ struct tcb *tcp;
 	return 0;
 }
 
+/* TCP is creating a child we want to follow.
+   If there will be space in tcbtab for it, set TCB_FOLLOWFORK and return 0.
+   If not, clear TCB_FOLLOWFORK, print an error, and return 1.  */
+static void
+fork_tcb(struct tcb *tcp)
+{
+	if (nprocs == tcbtabsize)
+		expand_tcbtab();
+
+	tcp->flags |= TCB_FOLLOWFORK;
+}
+
 #ifdef USE_PROCFS
 
 int
@@ -533,6 +545,7 @@ struct tcb *tcp;
 			return 0;
 		if (!followfork)
 			return 0;
+		fork_tcb(tcp);
 		if (syserror(tcp))
 			return 0;
 		tcpchild = alloctcb(tcp->u_rval);
@@ -779,7 +792,7 @@ change_syscall(struct tcb *tcp, int new)
 #  define PTRACE_SET_SYSCALL 23
 # endif
 
-	if (do_ptrace(PTRACE_SET_SYSCALL, tcp, NULL, new) != 0)
+	if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new) != 0)
 		return -1;
 
 	return 0;
@@ -899,18 +912,22 @@ setarg(tcp, argnum)
 
 #if defined SYS_clone || defined SYS_clone2
 int
-internal_clone(struct tcb *tcp)
+internal_clone(tcp)
+struct tcb *tcp;
 {
 	struct tcb *tcpchild;
-	int pid, bpt;
-
-	if (!followfork)
-		return 0;
+	int pid;
 	if (entering(tcp)) {
-		setbpt(tcp);
-		return 0;
+		if (!followfork)
+			return 0;
+		fork_tcb(tcp);
+		if (setbpt(tcp) < 0)
+			return 0;
 	} else {
-		bpt = tcp->flags & TCB_BPTSET;
+		int bpt = tcp->flags & TCB_BPTSET;
+
+		if (!(tcp->flags & TCB_FOLLOWFORK))
+			return 0;
 
 		if (syserror(tcp)) {
 			if (bpt)
@@ -919,15 +936,6 @@ internal_clone(struct tcb *tcp)
 		}
 
 		pid = tcp->u_rval;
-		/* Should not happen, but bugs often cause bogus value here. */
-		if (pid <= 1
-		 || (sizeof(pid) != sizeof(tcp->u_rval) && pid != tcp->u_rval)
-		) {
-			if (bpt)
-				clearbpt(tcp);
-			fprintf(stderr, "bogus clone() return value %lx!\n", tcp->u_rval);
-			return 0;
-		}
 
 #ifdef CLONE_PTRACE		/* See new setbpt code.  */
 		tcpchild = pid2tcb(pid);
@@ -944,6 +952,7 @@ internal_clone(struct tcb *tcp)
 		else
 #endif
 		{
+			fork_tcb(tcp);
 			tcpchild = alloctcb(pid);
 		}
 
@@ -979,9 +988,6 @@ internal_clone(struct tcb *tcp)
 				clearbpt(tcpchild);
 
 			tcpchild->flags &= ~(TCB_SUSPENDED|TCB_STARTUP);
-			/* TCB_SUSPENDED tasks are not collected by waitpid
-			 * loop, and left stopped. Restart it:
-			 */
 			if (ptrace_restart(PTRACE_SYSCALL, tcpchild, 0) < 0)
 				return -1;
 
@@ -1045,25 +1051,27 @@ struct tcb *tcp;
 
 	struct tcb *tcpchild;
 	int pid;
-	int follow = 1;
+	int dont_follow = 0;
 
 #ifdef SYS_vfork
 	if (known_scno(tcp) == SYS_vfork) {
 		/* Attempt to make vfork into fork, which we can follow. */
 		if (change_syscall(tcp, SYS_fork) < 0)
-			follow = 0;
+			dont_follow = 1;
 	}
 #endif
-	if (!followfork || !follow)
-		return 0;
-
 	if (entering(tcp)) {
+		if (!followfork || dont_follow)
+			return 0;
+		fork_tcb(tcp);
 		if (setbpt(tcp) < 0)
 			return 0;
 	}
 	else {
 		int bpt = tcp->flags & TCB_BPTSET;
 
+		if (!(tcp->flags & TCB_FOLLOWFORK))
+			return 0;
 		if (bpt)
 			clearbpt(tcp);
 
@@ -1071,6 +1079,7 @@ struct tcb *tcp;
 			return 0;
 
 		pid = tcp->u_rval;
+		fork_tcb(tcp);
 		tcpchild = alloctcb(pid);
 #ifdef LINUX
 #ifdef HPPA
@@ -2313,7 +2322,7 @@ struct tcb *tcp;
 
 #ifndef SVR4
 
-const struct xlat ptrace_cmds[] = {
+static const struct xlat ptrace_cmds[] = {
 # ifndef FREEBSD
 	{ PTRACE_TRACEME,	"PTRACE_TRACEME"	},
 	{ PTRACE_PEEKTEXT,	"PTRACE_PEEKTEXT",	},

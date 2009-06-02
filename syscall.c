@@ -38,39 +38,38 @@
 #include <signal.h>
 #include <time.h>
 #include <errno.h>
-#include <sched.h>
 #include <sys/user.h>
 #include <sys/syscall.h>
 #include <sys/param.h>
 
 #if HAVE_ASM_REG_H
-# if defined (SPARC) || defined (SPARC64)
+#if defined (SPARC) || defined (SPARC64)
 #  define fpq kernel_fpq
 #  define fq kernel_fq
 #  define fpu kernel_fpu
-# endif
-# include <asm/reg.h>
-# if defined (SPARC) || defined (SPARC64)
+#endif
+#include <asm/reg.h>
+#if defined (SPARC) || defined (SPARC64)
 #  undef fpq
 #  undef fq
 #  undef fpu
-# endif
+#endif
 #endif
 
 #ifdef HAVE_SYS_REG_H
-# include <sys/reg.h>
-# ifndef PTRACE_PEEKUSR
-#  define PTRACE_PEEKUSR PTRACE_PEEKUSER
-# endif
+#include <sys/reg.h>
+#ifndef PTRACE_PEEKUSR
+# define PTRACE_PEEKUSR PTRACE_PEEKUSER
+#endif
 #elif defined(HAVE_LINUX_PTRACE_H)
-# undef PTRACE_SYSCALL
+#undef PTRACE_SYSCALL
 # ifdef HAVE_STRUCT_IA64_FPREG
 #  define ia64_fpreg XXX_ia64_fpreg
 # endif
 # ifdef HAVE_STRUCT_PT_ALL_USER_REGS
 #  define pt_all_user_regs XXX_pt_all_user_regs
 # endif
-# include <linux/ptrace.h>
+#include <linux/ptrace.h>
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif
@@ -997,47 +996,26 @@ get_scno(struct tcb *tcp)
 	}
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
-	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
+	if (upeek (tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		if (ia32) {
 			if (upeek(tcp, PT_R1, &scno) < 0)	/* orig eax */
 				return -1;
 		} else {
-			if (upeek(tcp, PT_R15, &scno) < 0)
+			if (upeek (tcp, PT_R15, &scno) < 0)
 				return -1;
 		}
 		/* Check if we return from execve. */
 		if (tcp->flags & TCB_WAITEXECVE) {
-#  if defined PTRACE_GETSIGINFO
-			siginfo_t si;
-
-			tcp->flags &= ~TCB_WAITEXECVE;
-			/* If SIGTRAP is masked, execve's magic SIGTRAP
-			 * is not delivered. We end up here on a subsequent
-			 * ptrace stop instead. Luckily, we can check
-			 * for the type of this SIGTRAP. execve's magic one
-			 * has 0 (SI_USER) in si.si_code, ptrace stop has 5.
-			 * (I don't know why 5).
-			 */
-			si.si_code = SI_USER;
-			/* If PTRACE_GETSIGINFO fails, we assume it's
-			 * magic SIGTRAP. Moot anyway, PTRACE_GETSIGINFO
-			 * doesn't fail.
-			 */
-			ptrace(PTRACE_GETSIGINFO, tcp->pid, (void*) 0, (void*) &si);
-			if (si.si_code == SI_USER)
-				return 0;
-#  else
 			tcp->flags &= ~TCB_WAITEXECVE;
 			return 0;
-#  endif
 		}
 	} else {
 		/* syscall in progress */
-		if (upeek(tcp, PT_R8, &r8) < 0)
+		if (upeek (tcp, PT_R8, &r8) < 0)
 			return -1;
-		if (upeek(tcp, PT_R10, &r10) < 0)
+		if (upeek (tcp, PT_R10, &r10) < 0)
 			return -1;
 	}
 # elif defined (ARM)
@@ -1126,7 +1104,7 @@ get_scno(struct tcb *tcp)
 # elif defined (LINUX_MIPSN32)
 	unsigned long long regs[38];
 
-	if (do_ptrace(PTRACE_GETREGS, tcp, NULL, (long) &regs) < 0)
+	if (ptrace (PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
 		return -1;
 	a3 = regs[REG_A3];
 	r2 = regs[REG_V0];
@@ -1379,11 +1357,11 @@ struct tcb *tcp;
 	return scno;
 }
 
-/* Called in trace_syscall at each syscall entry and exit.
+/* Called in trace_syscall() at each syscall entry and exit.
  * Returns:
- * 0: "ignore this syscall", bail out of trace_syscall silently.
- * 1: ok, continue in trace_syscall.
- * other: error, trace_syscall should print error indicator
+ * 0: "ignore this syscall", bail out of trace_syscall() silently.
+ * 1: ok, continue in trace_syscall().
+ * other: error, trace_syscall() should print error indicator
  *    ("????" etc) and bail out.
  */
 static int
@@ -1938,11 +1916,10 @@ force_result(tcp, error, rval)
 #endif /* LINUX */
 
 #ifdef SUNOS4
-	if (do_ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_error), error << 24) < 0
-	 || do_ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_rval1), rval) < 0
-	) {
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_error),
+		   error << 24) < 0 ||
+	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_rval1), rval) < 0)
 		return -1;
-	}
 #endif /* SUNOS4 */
 
 #ifdef SVR4
@@ -2074,10 +2051,10 @@ syscall_enter(struct tcb *tcp)
 		else
 			nargs = tcp->u_nargs = MAX_ARGS;
 
-		if (do_ptrace(PTRACE_GETREGS, tcp, NULL, (long) &regs) < 0)
+		if (ptrace (PTRACE_GETREGS, pid, NULL, (long) &regs) < 0)
 			return -1;
 
-		for (i = 0; i < nargs; i++) {
+		for(i = 0; i < nargs; i++) {
 			tcp->u_arg[i] = regs[REG_A0 + i];
 # if defined (LINUX_MIPSN32)
 			tcp->ext_arg[i] = regs[REG_A0 + i];
@@ -2092,20 +2069,20 @@ syscall_enter(struct tcb *tcp)
 		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 			nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 		else
-			nargs = tcp->u_nargs = MAX_ARGS;
-		if (nargs > 4) {
-			if (upeek(tcp, REG_SP, &sp) < 0)
-				return -1;
-			for (i = 0; i < 4; i++) {
-				if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i])<0)
-					return -1;
+     	        	nargs = tcp->u_nargs = MAX_ARGS;
+		if(nargs > 4) {
+		  	if(upeek(tcp, REG_SP, &sp) < 0)
+			  	return -1;
+			for(i = 0; i < 4; i++) {
+			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i])<0)
+				  	return -1;
 			}
 			umoven(tcp, sp+16, (nargs-4) * sizeof(tcp->u_arg[0]),
 			       (char *)(tcp->u_arg + 4));
 		} else {
-			for (i = 0; i < nargs; i++) {
-				if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i]) < 0)
-					return -1;
+		  	for(i = 0; i < nargs; i++) {
+			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i]) < 0)
+				  	return -1;
 			}
 		}
 	}
@@ -2377,12 +2354,7 @@ trace_syscall(struct tcb *tcp)
 		if (dtime)
 			gettimeofday(&tv, NULL);
 
-		/* In code below,
-		 * res = 1: no error, continue
-		 * res = 0: return 0 at once (not an error)
-		 * any other value: error, complain and return the value
-		 *
-		 * BTW, why we don't just memorize syscall no. on entry
+		/* BTW, why we don't just memorize syscall no. on entry
 		 * in tcp->something?
 		 */
 		scno_good = res = get_scno(tcp);
@@ -2407,15 +2379,14 @@ trace_syscall(struct tcb *tcp)
 
 		if (tcp->flags & TCB_REPRINT) {
 			printleader(tcp);
-			if (scno_good != 1) {
-				tprintf("<... syscall_?? resumed> ");
-			} else {
-				if (tcp->scno >= nsyscalls || tcp->scno < 0)
-					tprintf("<... syscall_%lu resumed> ", tcp->scno);
-				else
-					tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
-			}
-			/* [do we need to clear TCB_REPRINT?...] */
+			tprintf("<... ");
+			if (scno_good != 1)
+				tprintf("????");
+			else if (tcp->scno >= nsyscalls || tcp->scno < 0)
+				tprintf("syscall_%lu", tcp->scno);
+			else
+				tprintf("%s", sysent[tcp->scno].sys_name);
+			tprintf(" resumed> ");
 		}
 
 		if (cflag)
@@ -2424,8 +2395,8 @@ trace_syscall(struct tcb *tcp)
 		if (res != 1) {
 			tprintf(") ");
 			tabto(acolumn);
-			tprintf("= ?");
-			/* line will be finished by error handling code */
+			tprintf("= ? <unavailable>");
+			printtrailer();
 			tcp->flags &= ~TCB_INSYSCALL;
 			return res;
 		}
@@ -2548,15 +2519,18 @@ trace_syscall(struct tcb *tcp)
 
 	if (res != 1) {
 		printleader(tcp);
-		tcp->flags &= ~TCB_REPRINT; /* why? */
+		tcp->flags &= ~TCB_REPRINT;
 		tcp_last = tcp;
 		if (scno_good != 1)
-			tprintf("syscall_??" /* anti-trigraph gap */ "(");
+			tprintf("????" /* anti-trigraph gap */ "(");
 		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
 			tprintf("syscall_%lu(", tcp->scno);
 		else
 			tprintf("%s(", sysent[tcp->scno].sys_name);
-		/* Line will be finished by error handling code. */
+		/*
+		 * " <unavailable>" will be added later by the code which
+		 * detects ptrace errors.
+		 */
 		tcp->flags |= TCB_INSYSCALL;
 		return res;
 	}
@@ -2710,7 +2684,7 @@ struct tcb *tcp;
 #ifdef LINUX
 #if defined (SPARC) || defined (SPARC64)
 	struct regs regs;
-	if (do_ptrace(PTRACE_GETREGS, tcp, (char *)&regs, 0) < 0)
+	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
 	val = regs.r_o1;
 #elif defined(SH)
