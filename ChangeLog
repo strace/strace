@@ -1,6 +1,8 @@
 2009-07-07  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* .cvsignore: Remove.
+	* README-CVS: Rename to README-hacking.
+	* Makefile.am (EXTRA_DIST): Remove README-CVS.
 
 2009-06-01  Dmitry V. Levin  <ldv@altlinux.org>
 

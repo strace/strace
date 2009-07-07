@@ -25,7 +25,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     debian/strace.manpages debian/strace-udeb.install \
 	     strace.spec \
 	     strace-graph COPYRIGHT CREDITS PORTING \
-	     README-CVS README-freebsd README-linux README-sunos4 README-svr4 \
+	     README-freebsd README-linux README-sunos4 README-svr4 \
 	     linux/ioctlsort.c linux/ioctlent.sh \
 	     linux/ioctlent.h linux/errnoent.h linux/signalent.h \
 	     linux/syscall.h linux/syscallent.h linux/dummy.h \
