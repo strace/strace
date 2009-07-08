@@ -35,4 +35,3 @@ for ($i = 0; $i < $index; $i++){
     $j++;
     print "\t{ $n\t$p\t$x\t$y },\t /* $j */\n";
 }
-

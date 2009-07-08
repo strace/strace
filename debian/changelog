@@ -569,7 +569,7 @@ strace (3.1-14) unstable; urgency=low
 strace (3.1-13) unstable; urgency=low
 
   * Corrected error on PowerPC patch that broke other archictectures
-  		(Bug# 13837)
+    (Bug# 13837)
 
  -- Wichert Akkerman <wakkerma@debian.org>  Tue, 14 Oct 1997 15:41:29 +0200
 

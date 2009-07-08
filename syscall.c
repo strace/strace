@@ -2069,20 +2069,20 @@ syscall_enter(struct tcb *tcp)
 		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 			nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 		else
-     	        	nargs = tcp->u_nargs = MAX_ARGS;
+			nargs = tcp->u_nargs = MAX_ARGS;
 		if(nargs > 4) {
-		  	if(upeek(tcp, REG_SP, &sp) < 0)
-			  	return -1;
+			if(upeek(tcp, REG_SP, &sp) < 0)
+				return -1;
 			for(i = 0; i < 4; i++) {
-			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i])<0)
-				  	return -1;
+				if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i])<0)
+					return -1;
 			}
 			umoven(tcp, sp+16, (nargs-4) * sizeof(tcp->u_arg[0]),
 			       (char *)(tcp->u_arg + 4));
 		} else {
-		  	for(i = 0; i < nargs; i++) {
-			  	if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i]) < 0)
-				  	return -1;
+			for(i = 0; i < nargs; i++) {
+				if (upeek(tcp, REG_A0 + i, &tcp->u_arg[i]) < 0)
+					return -1;
 			}
 		}
 	}
@@ -2186,8 +2186,8 @@ syscall_enter(struct tcb *tcp)
 		 *       in the trap number matches the number strace expects.
 		 */
 		/*
-		    assert(sysent[tcp->scno].nargs <
-		    	sizeof(syscall_regs)/sizeof(syscall_regs[0]));
+		assert(sysent[tcp->scno].nargs <
+		       sizeof(syscall_regs)/sizeof(syscall_regs[0]));
 		 */
 
 		tcp->u_nargs = sysent[tcp->scno].nargs;

@@ -10,4 +10,3 @@ childthread: LDFLAGS += -pthread
 
 clean distclean:
 	rm -f clone vfork fork sig leaderkill *.o core
-

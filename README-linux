@@ -29,4 +29,3 @@ There are three ways to compile strace with other kernel headers:
 
 * you can link /usr/include/linux and /usr/include/asm to the
   corresponding directories in your kernel source-tree.
-

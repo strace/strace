@@ -123,8 +123,8 @@ struct tcb *tcp;
 			umove(tcp, tcp->u_arg[4], &ret);
 			tprintf(", %Zu", ret);
 		} else if ((tcp->u_arg[1]==QM_MODULES) ||
-			       	(tcp->u_arg[1]==QM_DEPS) ||
-			       	(tcp->u_arg[1]==QM_REFS)) {
+			   (tcp->u_arg[1]==QM_DEPS) ||
+			   (tcp->u_arg[1]==QM_REFS)) {
 			size_t	ret;
 
 			umove(tcp, tcp->u_arg[4], &ret);

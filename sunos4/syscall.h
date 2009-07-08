@@ -172,4 +172,3 @@ int	sys_putmsg();
 int	sys_poll();
 
 int	sys_vpixsys();		/* VP/ix system calls */
-

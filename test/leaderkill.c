@@ -1,7 +1,7 @@
 /* Test handle_group_exit () handling of a thread leader still alive with its
  * thread child calling exit_group () and proper passing of the process exit
  * code to the process parent of this whole thread group.
- * 
+ *
  * gcc -o test/leaderkill test/leaderkill.c -Wall -ggdb2 -pthread;./test/leaderkill & pid=$!;sleep 1;strace -o x -q ./strace -f -p $pid
  * It must print: write(1, "OK\n", ...
  */

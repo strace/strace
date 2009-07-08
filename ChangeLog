@@ -1,3 +1,26 @@
+2009-07-08  Dmitry V. Levin  <ldv@altlinux.org>
+
+	Clean up spacing to fix warnings reported by git diff --check.
+	* ChangeLog: Fix spaces before tab in indent.
+	* bjm.c: Likewise.
+	* debian/changelog: Likewise.
+	* strace-graph: Likewise.
+	* syscall.c: Likewise.
+	* INSTALL: Fix trailing blank lines.
+	* README-linux: Likewise.
+	* README-svr4: Likewise.
+	* linux/sparc/gen.pl: Likewise.
+	* linux/sparc/syscall1.h: Likewise.
+	* linux/sparc64/syscall1.h: Likewise.
+	* linux/x86_64/gentab.pl: Likewise.
+	* sunos4/syscall.h: Likewise.
+	* test/Makefile: Likewise.
+	* debian/rules: Fix trailing whitespaces.
+	* desc.c: Likewise.
+	* svr4/syscallent.h: Likewise.
+	* test/childthread.c: Likewise.
+	* test/leaderkill.c: Likewise.
+
 2009-07-07  Dmitry V. Levin  <ldv@altlinux.org>
 
 	* .cvsignore: Remove.
@@ -220,7 +243,7 @@
 	(fork_tcb): Change return type to void - it can't fail now.
 	* strace.c: Move extern declarations out of function bodies.
 	Change all callsites of alloctcb(), alloc_tcb() and
-        fork_tcb(), removing now-redundant error checks.
+	fork_tcb(), removing now-redundant error checks.
 	(expand_tcbtab): Change return type to void - it can't fail now.
 	On failure to expand, print a message, clean up, and exit.
 	(alloc_tcb): On failure to expand, print a message, clean up, and exit.
@@ -4707,7 +4730,7 @@
 1999-12-27  Morten Welinder  <terra@diku.dk>
 
 	* syscall.c (lookup_signal, lookup_desc): isdigit requires an
- 	_unsigned_ char parameter.
+	_unsigned_ char parameter.
 
 2000-02-14 Wichert Akkerman <wakkerma@debian.org>
 
@@ -5020,13 +5043,13 @@ Mon May 20 23:17:14 1996  J. Richard Sladkey  <jrs@world.std.com>
 	* aclocal.m4 (AC_STRUCT_MSG_CONTROL): New macro.
 	* configure.in: Add call to AC_STRUCT_MSG_CONTROL.
 	* net.c (printmsghdr): Handle BSD 4.3 and 4.4 msghdr members
- 	differently.
+	differently.
 	Reported by Henrik Storner <storner@osiris.ping.dk>.
 
 	* configure.in: (AC_CHECK_{HEADERS,FUNCS}): Add checks for
- 	sys/filio.h and sys/stream.h and remove check for poll.
+	sys/filio.h and sys/stream.h and remove check for poll.
 	* desc.c (decode_select, sys_select, sys_oldselect) [LINUX]:
- 	Handle old and new styles of argument passing for select on Linux.
+	Handle old and new styles of argument passing for select on Linux.
 	* ioctl.c, stream.c: Conditionalize stream code on presence of
 	sys/stream.h instead of poll because glibc implements poll but
 	not the rest of the stream interface.
@@ -5050,17 +5073,17 @@ Mon May 20 01:19:36 1996  J. Richard Sladkey  <jrs@world.std.com>
 	* syscall.c (nerrnos{0,2}): Correct size computation.
 
 	* Makefile.in: Remove dependencies and rules relating to files
- 	normally found in the os directory.  Because of the new scheme we
- 	don't know precisely where they come from.  Sigh.
+	normally found in the os directory.  Because of the new scheme we
+	don't know precisely where they come from.  Sigh.
 	* signalent.sh: Make it work for sunos4, linux, and svr4.
 	* {sunos4,linux{,/alpha},svr4}/Makefile.in: Make rules correspond
- 	to traditional make syntax.  Add signalent.h to files which can
- 	unconditionally be rebuilt.  Prevent signalent.h from being
- 	unconditionally being rebuilt since it's customized.
+	to traditional make syntax.  Add signalent.h to files which can
+	unconditionally be rebuilt.  Prevent signalent.h from being
+	unconditionally being rebuilt since it's customized.
 	* {sunos4,linux{,/alpha},svr4}/{ioctlent,errnoent,signalent}.h:
- 	Use versions built by {ioctlent,errnoent,signaltent}.sh.
-  	* sunos4/ioctlent.sh: Work around sprintf troubles with SunOS
- 	4.1.4 and gcc 2.7.2.
+	Use versions built by {ioctlent,errnoent,signaltent}.sh.
+	* sunos4/ioctlent.sh: Work around sprintf troubles with SunOS
+	4.1.4 and gcc 2.7.2.
 
 Sun May 19 17:14:09 1996  J. Richard Sladkey  <jrs@world.std.com>
 
@@ -5085,8 +5108,8 @@ Sun May 19 01:12:28 1996  J. Richard Sladkey  <jrs@world.std.com>
 	* defs.h (SUPPORTED_PERSONALITES, DEFAULT_PERSONALITY): New.
 	* syscall.c (set_personality): New.
 	* strace.c (main): Call set_personality.
- 	* defs.h, syscall.c, ioctl.c, signal.c: Make sysent, errnoent,
- 	ioctlent, and signalent indirect pointers and redirect them
+	* defs.h, syscall.c, ioctl.c, signal.c: Make sysent, errnoent,
+	ioctlent, and signalent indirect pointers and redirect them
 	based on personality.
 	* {sunos4,svr4,linux{,/alpha}}/signalent.h: New files.
 	Suggested by Tom Dyas <tdyas@eden.rutgers.edu>.
@@ -5283,20 +5306,20 @@ Tue Jul  4 00:30:34 1995  Rick Sladkey  <jrs@world.std.com>
 	* version.c: Version 3.0.5 is released.
 
 	* desc.c, resource.c, strace.c, syscall.c, time.c: Cast tv_sec and
- 	tv_usec members to long when using printf.
+	tv_usec members to long when using printf.
 
 	* ipc.c: Omit define of __KERNEL__.
 	({MSG,SEM,SHM}_{STAT,INFO}): Explicitly define those things we
- 	want which __KERNEL__ used to provide.
+	want which __KERNEL__ used to provide.
 	(sys_msgrcv): Change reference to ipc_kludge structure to
 	look-alike ipc_wrapper to avoid dependence on __KERNEL__.
 
 	mem.c (mmap_flags) [MAP_{GROWSDOWN,DENYWRITE,EXECUTABLE}]: Add
- 	Linux specific options.
+	Linux specific options.
 
 	syscall.c: Use SYS_ERRLIST_DECLARED instead of guessing.
-  	[E{RESTART{SYS,NO{INTR,HAND}},NOIOCTLCMD}]: Explicitly define
- 	instead of depending of __KERNEL__.
+	[E{RESTART{SYS,NO{INTR,HAND}},NOIOCTLCMD}]: Explicitly define
+	instead of depending of __KERNEL__.
 
 	term.c: Cast c_{i,o,c,l}flag to long when using printf.
 

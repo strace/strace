@@ -73,5 +73,3 @@ while (<S>) {
 	}
 	print SL "#define SYS_$name $num\n"
 }
-
-

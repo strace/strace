@@ -498,4 +498,3 @@ extern int solaris_getcontext(), solaris_setcontext();
 #define SOLARIS_setcontext		(SOLARIS_context_subcall + 1)
 
 #define SOLARIS_context_nsubcalls	2
-

@@ -19,4 +19,3 @@ to the config.h file.  This forces strace to check whether the last process
 has finished a system call before polling other processes for events.
 
 Wichert Akkerman <wakkerma@debian.org>
-

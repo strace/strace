@@ -308,9 +308,9 @@ sub display_pid_trace {
 	} elsif ($$elem[0] eq 'FORK') {
 	    if ($i == 1) {
                 if ($lead =~ /-$/) {
- 		    display_pid_trace($$elem[1], "$lead--+--");
+		    display_pid_trace($$elem[1], "$lead--+--");
                 } else {
- 		    display_pid_trace($$elem[1], "$lead  +--");
+		    display_pid_trace($$elem[1], "$lead  +--");
                 }
 	    } elsif ($i == @seq) {
 		display_pid_trace($$elem[1], "$lead  `--");
@@ -336,4 +336,3 @@ sub display_trace {
 
     display_pid_trace($startpid, "");
 }
-

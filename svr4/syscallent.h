@@ -823,5 +823,5 @@
 	{ -1,	TF,	sys_aioaread64,		"aioaread64"	}, /* 417 */
 	{ -1,	TF,	sys_aioawrite64,	"aioawrite64"	}, /* 418 */
 	{ -1,	TF,	sys_aiocancel64,	"aiocancel64"	}, /* 419 */
-	{ -1,	TF,	sys_aiofsync,		"aiofsync"	}, /* 420 */ 
+	{ -1,	TF,	sys_aiofsync,		"aiofsync"	}, /* 420 */
 #endif

@@ -46,11 +46,11 @@ binary-indep:
 
 binary-arch: build checkroot
 	test -f stamp-build || make $(MFLAGS) -f debian/rules build
-	
+
 	# prepare 64bit executable and manpage, if it has been built
 	test -f stamp-build64 && ( mv build64/strace build64/strace64 ; \
 		cp strace.1 strace64.1 ) || true
-	
+
 	dh_testdir -s
 	dh_testroot -s
 	dh_installdirs -s
