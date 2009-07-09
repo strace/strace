@@ -4,6 +4,8 @@
 .libs
 .*.swp
 
+ChangeLog
+
 Makefile
 Makefile.in
 

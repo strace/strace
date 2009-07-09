@@ -24,7 +24,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     debian/strace.docs debian/strace.examples debian/strace.install \
 	     debian/strace.manpages debian/strace-udeb.install \
 	     strace.spec \
-	     strace-graph COPYRIGHT CREDITS PORTING \
+	     strace-graph ChangeLog-CVS COPYRIGHT CREDITS PORTING \
 	     README-freebsd README-linux README-sunos4 README-svr4 \
 	     linux/ioctlsort.c linux/ioctlent.sh \
 	     linux/ioctlent.h linux/errnoent.h linux/signalent.h \
@@ -82,6 +82,16 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     svr4/dummy.h svr4/errnoent.h svr4/ioctlent.h svr4/ioctlent.sh \
 	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
 	     xlate.el
+
+gen_changelog_start_date = 2009-07-09
+gen-changelog:
+	if test -d .git; then \
+		$(top_srcdir)/gitlog-to-changelog \
+		  --since=$(gen_changelog_start_date) \
+		  > $(distdir)/ChangeLog; \
+	fi
+dist-hook: gen-changelog
+.PHONY: gen-changelog
 
 if MAINTAINER_MODE
 if LINUX
