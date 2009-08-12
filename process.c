@@ -3440,8 +3440,17 @@ sys_ptrace(struct tcb *tcp)
 # ifndef FUTEX_WAKE_BITSET
 #  define FUTEX_WAKE_BITSET 10
 # endif
+# ifndef FUTEX_WAIT_REQUEUE_PI
+#  define FUTEX_WAIT_REQUEUE_PI 11
+# endif
+# ifndef FUTEX_CMP_REQUEUE_PI
+#  define FUTEX_CMP_REQUEUE_PI 12
+# endif
 # ifndef FUTEX_PRIVATE_FLAG
 #  define FUTEX_PRIVATE_FLAG 128
+# endif
+# ifndef FUTEX_CLOCK_REALTIME
+#  define FUTEX_CLOCK_REALTIME 256
 # endif
 static const struct xlat futexops[] = {
 	{ FUTEX_WAIT,					"FUTEX_WAIT" },
@@ -3455,6 +3464,8 @@ static const struct xlat futexops[] = {
 	{ FUTEX_TRYLOCK_PI,				"FUTEX_TRYLOCK_PI" },
 	{ FUTEX_WAIT_BITSET,				"FUTEX_WAIT_BITSET" },
 	{ FUTEX_WAKE_BITSET,				"FUTEX_WAKE_BITSET" },
+	{ FUTEX_WAIT_REQUEUE_PI,			"FUTEX_WAIT_REQUEUE_PI" },
+	{ FUTEX_CMP_REQUEUE_PI,				"FUTEX_CMP_REQUEUE_PI" },
 	{ FUTEX_WAIT|FUTEX_PRIVATE_FLAG,		"FUTEX_WAIT_PRIVATE" },
 	{ FUTEX_WAKE|FUTEX_PRIVATE_FLAG,		"FUTEX_WAKE_PRIVATE" },
 	{ FUTEX_FD|FUTEX_PRIVATE_FLAG,			"FUTEX_FD_PRIVATE" },
@@ -3466,6 +3477,12 @@ static const struct xlat futexops[] = {
 	{ FUTEX_TRYLOCK_PI|FUTEX_PRIVATE_FLAG,		"FUTEX_TRYLOCK_PI_PRIVATE" },
 	{ FUTEX_WAIT_BITSET|FUTEX_PRIVATE_FLAG,		"FUTEX_WAIT_BITSET_PRIVATE" },
 	{ FUTEX_WAKE_BITSET|FUTEX_PRIVATE_FLAG,		"FUTEX_WAKE_BITSET_PRIVATE" },
+	{ FUTEX_WAIT_REQUEUE_PI|FUTEX_PRIVATE_FLAG,	"FUTEX_WAIT_REQUEUE_PI_PRIVATE" },
+	{ FUTEX_CMP_REQUEUE_PI|FUTEX_PRIVATE_FLAG,	"FUTEX_CMP_REQUEUE_PI_PRIVATE" },
+	{ FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME,	"FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME" },
+	{ FUTEX_WAIT_BITSET|FUTEX_PRIVATE_FLAG|FUTEX_CLOCK_REALTIME,	"FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME" },
+	{ FUTEX_WAIT_REQUEUE_PI|FUTEX_CLOCK_REALTIME,	"FUTEX_WAIT_REQUEUE_PI|FUTEX_CLOCK_REALTIME" },
+	{ FUTEX_WAIT_REQUEUE_PI|FUTEX_PRIVATE_FLAG|FUTEX_CLOCK_REALTIME,	"FUTEX_WAIT_REQUEUE_PI_PRIVATE|FUTEX_CLOCK_REALTIME" },
 	{ 0,						NULL }
 };
 # ifndef FUTEX_OP_SET
@@ -3518,7 +3535,7 @@ sys_futex(struct tcb *tcp)
 			tprintf(", %lx", tcp->u_arg[5]);
 		} else if (cmd == FUTEX_REQUEUE)
 			tprintf(", %ld, %p", tcp->u_arg[3], (void *) tcp->u_arg[4]);
-		else if (cmd == FUTEX_CMP_REQUEUE)
+		else if (cmd == FUTEX_CMP_REQUEUE || cmd == FUTEX_CMP_REQUEUE_PI)
 			tprintf(", %ld, %p, %ld", tcp->u_arg[3], (void *) tcp->u_arg[4], tcp->u_arg[5]);
 		else if (cmd == FUTEX_WAKE_OP) {
 			tprintf(", %ld, %p, {", tcp->u_arg[3], (void *) tcp->u_arg[4]);
@@ -3530,6 +3547,10 @@ sys_futex(struct tcb *tcp)
 				tprintf("FUTEX_OP_OPARG_SHIFT|");
 			printxval(futexwakecmps, (tcp->u_arg[5] >> 24) & 0x7, "FUTEX_OP_CMP_???");
 			tprintf(", %ld}", tcp->u_arg[5] & 0xfff);
+		} else if (cmd == FUTEX_WAIT_REQUEUE_PI) {
+			tprintf(", ");
+			printtv(tcp, tcp->u_arg[3]);
+			tprintf(", %p", (void *) tcp->u_arg[4]);
 		}
 	}
 	return 0;
