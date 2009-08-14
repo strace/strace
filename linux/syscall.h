@@ -109,7 +109,7 @@ int sys_signalfd4(), sys_eventfd2(), sys_epoll_create1(), sys_dup3(), sys_pipe2(
 
 /* sys_socketcall subcalls */
 
-int sys_socket(), sys_bind(), sys_connect(), sys_listen();
+int sys_socket(), sys_bind(), sys_connect(), sys_listen(), sys_accept4();
 int sys_accept(), sys_getsockname(), sys_getpeername(), sys_socketpair();
 int sys_send(), sys_recv(), sys_sendto(), sys_recvfrom();
 int sys_shutdown(), sys_setsockopt(), sys_getsockopt();

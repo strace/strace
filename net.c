@@ -1303,13 +1303,14 @@ struct tcb *tcp;
 	return 0;
 }
 
-int
-sys_accept(tcp)
-struct tcb *tcp;
+static int
+do_accept(struct tcb *tcp, int flags_arg)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-	} else if (!tcp->u_arg[2])
+		return 0;
+	}
+	if (!tcp->u_arg[2])
 		tprintf("%#lx, NULL", tcp->u_arg[1]);
 	else {
 		int len;
@@ -1322,8 +1323,27 @@ struct tcb *tcp;
 		tprintf(", ");
 		printnum_int(tcp, tcp->u_arg[2], "%u");
 	}
+	if (flags_arg >= 0) {
+		tprintf(", ");
+		printflags(sock_type_flags, tcp->u_arg[flags_arg],
+			   "SOCK_???");
+	}
 	return 0;
 }
+
+int
+sys_accept(struct tcb *tcp)
+{
+	return do_accept(tcp, -1);
+}
+
+#ifdef LINUX
+int
+sys_accept4(struct tcb *tcp)
+{
+	return do_accept(tcp, 3);
+}
+#endif
 
 int
 sys_send(tcp)
