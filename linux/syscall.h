@@ -226,8 +226,9 @@ int sys_osf_utimes();
 #define SYS_sub_getsockopt	(SYS_socket_subcall + 15)
 #define SYS_sub_sendmsg		(SYS_socket_subcall + 16)
 #define SYS_sub_recvmsg		(SYS_socket_subcall + 17)
+#define SYS_sub_accept4		(SYS_socket_subcall + 18)
 
-#define SYS_socket_nsubcalls	18
+#define SYS_socket_nsubcalls	19
 #endif /* !(ALPHA || MIPS || HPPA) */
 
 /* sys_ipc subcalls */

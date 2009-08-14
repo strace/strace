@@ -372,36 +372,36 @@
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 368 */
 	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 369 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 370 */
-#if SYS_ipc_subcall != 371
+	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 371 */
+#if SYS_ipc_subcall != 372
  #error fix me
 #endif
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 371 */
-	{ 4,	TI,	printargs,		"semop"		}, /* 372 */
-	{ 4,	TI,	sys_semget,		"semget"	}, /* 373 */
-	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 374 */
-	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 375 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 376 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 372 */
+	{ 4,	TI,	printargs,		"semop"		}, /* 373 */
+	{ 4,	TI,	sys_semget,		"semget"	}, /* 374 */
+	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 375 */
+	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 376 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 377 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 378 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 379 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 380 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 381 */
-	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 382 */
-	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 383 */
-	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 384 */
-	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 385 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 386 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 382 */
+	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 383 */
+	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 384 */
+	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 385 */
+	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 386 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 387 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 388 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 389 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 390 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 391 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 392 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 393 */
-	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 394 */
-	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 395 */
-	{ 5,	0,	printargs,		"SYS_343"	}, /* 396 */
-	{ 5,	0,	printargs,		"SYS_344"	}, /* 397 */
-	{ 5,	0,	printargs,		"SYS_345"	}, /* 398 */
-	{ 5,	0,	printargs,		"SYS_346"	}, /* 399 */
-	{ 5,	0,	printargs,		"SYS_347"	}, /* 400 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 392 */
+	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 393 */
+	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 394 */
+	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 395 */
+	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 396 */
+	{ 5,	0,	printargs,		"SYS_397"	}, /* 397 */
+	{ 5,	0,	printargs,		"SYS_398"	}, /* 398 */
+	{ 5,	0,	printargs,		"SYS_399"	}, /* 399 */
+	{ 5,	0,	printargs,		"SYS_400"	}, /* 400 */

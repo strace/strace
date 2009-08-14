@@ -98,7 +98,7 @@ int sys_semtimedop();
 int	sys_socket(),sys_bind(),sys_listen(),sys_accept(),sys_connect();
 int	sys_socketpair(),sys_sendto(),sys_send(),sys_recvfrom(),sys_recv();
 int	sys_sendmsg(),sys_recvmsg(),sys_shutdown(),sys_setsockopt(),sys_getsockopt();
-int	sys_getsockname(),sys_getpeername(),sys_pipe();
+int	sys_getsockname(),sys_getpeername(),sys_pipe(),sys_accept4();
 
 int sys_setresuid(), sys_setresgid(), sys_getresuid(), sys_getresgid(), sys_pread();
 int sys_pwrite(), sys_getcwd();
@@ -232,8 +232,9 @@ int	sys_signalfd(), sys_timerfd(), sys_eventfd();
 #define SYS_sub_getsockopt	(SYS_socket_subcall + 15)
 #define SYS_sub_sendmsg		(SYS_socket_subcall + 16)
 #define SYS_sub_recvmsg		(SYS_socket_subcall + 17)
+#define SYS_sub_accept4		(SYS_socket_subcall + 18)
 
-#define SYS_socket_nsubcalls	18
+#define SYS_socket_nsubcalls	19
 
 #define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
 #define SYS_sub_semop		(SYS_ipc_subcall + 1)

@@ -450,8 +450,9 @@
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
 	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
+	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
 
-#if SYS_ipc_subcall != 418
+#if SYS_ipc_subcall != 419
  #error fix me
 #endif
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 418 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 419 */
