@@ -1776,8 +1776,8 @@ struct tcb *tcp;
 long addr;
 {
 	union {
-		int p32;
-		long p64;
+		unsigned int p32;
+		unsigned long p64;
 		char data[sizeof(long)];
 	} cp;
 	char *sep;
