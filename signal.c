@@ -1121,11 +1121,19 @@ struct tcb *tcp;
 	else if (umove(tcp, addr, &sa) < 0)
 		tprintf("{...}");
 	else {
-		if (sa.SA_HANDLER == SIG_ERR)
+		/* Architectures using function pointers, like
+		 * hppa, may need to manipulate the function pointer
+		 * to compute the result of a comparison. However,
+		 * the SA_HANDLER function pointer exists only in
+		 * the address space of the traced process, and can't
+		 * be manipulated by strace. In order to prevent the
+		 * compiler from generating code to manipulate
+		 * SA_HANDLER we cast the function pointers to long. */
+		if ((long)sa.SA_HANDLER == (long)SIG_ERR)
 			tprintf("{SIG_ERR, ");
-		else if (sa.SA_HANDLER == SIG_DFL)
+		else if ((long)sa.SA_HANDLER == (long)SIG_DFL)
 			tprintf("{SIG_DFL, ");
-		else if (sa.SA_HANDLER == SIG_IGN) {
+		else if ((long)sa.SA_HANDLER == (long)SIG_IGN) {
 #ifndef USE_PROCFS
 			if (tcp->u_arg[0] == SIGTRAP) {
 				tcp->flags |= TCB_SIGTRAPPED;
@@ -1931,12 +1939,19 @@ sys_rt_sigaction(struct tcb *tcp)
 		tprintf("{...}");
 		goto after_sa;
 	}
-
-	if (sa.__sa_handler == SIG_ERR)
+	/* Architectures using function pointers, like
+	 * hppa, may need to manipulate the function pointer
+	 * to compute the result of a comparison. However,
+	 * the SA_HANDLER function pointer exists only in
+	 * the address space of the traced process, and can't
+	 * be manipulated by strace. In order to prevent the
+	 * compiler from generating code to manipulate
+	 * SA_HANDLER we cast the function pointers to long. */
+	if ((long)sa.__sa_handler == (long)SIG_ERR)
 		tprintf("{SIG_ERR, ");
-	else if (sa.__sa_handler == SIG_DFL)
+	else if ((long)sa.__sa_handler == (long)SIG_DFL)
 		tprintf("{SIG_DFL, ");
-	else if (sa.__sa_handler == SIG_IGN)
+	else if ((long)sa.__sa_handler == (long)SIG_IGN)
 		tprintf("{SIG_IGN, ");
 	else
 		tprintf("{%#lx, ", (long) sa.__sa_handler);
