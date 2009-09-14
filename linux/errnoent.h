@@ -134,7 +134,7 @@
 	"EKEYREJECTED", /* 129 */
 	"EOWNERDEAD", /* 130 */
 	"ENOTRECOVERABLE", /* 131 */
-	"ERRNO_132", /* 132 */
+	"ERFKILL", /* 132 */
 	"ERRNO_133", /* 133 */
 	"ERRNO_134", /* 134 */
 	"ERRNO_135", /* 135 */
