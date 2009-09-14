@@ -197,10 +197,10 @@
 	{ 4,	TI,	sys_msgrcv,		"msgrcv"		}, /* 189 */
 	{ 4,	TI,	sys_msgget,		"msgget"		}, /* 190 */
 	{ 4,	TI,	sys_msgctl,		"msgctl"		}, /* 191 */
-	{ 4,	TI,	sys_shmat,		"shmat"			}, /* 192 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"			}, /* 193 */
-	{ 4,	TI,	sys_shmget,		"shmget"		}, /* 194 */
-	{ 4,	TI,	sys_shmctl,		"shmctl"		}, /* 195 */
+	{ 3,	TI,	sys_shmat,		"shmat"			}, /* 192 */
+	{ 1,	TI,	sys_shmdt,		"shmdt"			}, /* 193 */
+	{ 3,	TI,	sys_shmget,		"shmget"		}, /* 194 */
+	{ 3,	TI,	sys_shmctl,		"shmctl"		}, /* 195 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"		}, /* 196 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"		}, /* 197 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 198 */
@@ -302,4 +302,25 @@
 	{ 4,	TD,	printargs,		"vmsplice"		}, /* 294 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 295 */
 	{ 3,	0,	sys_getcpu,		"getcpu"		}, /* 296 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 297 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 297 */
+	{ 3,	TF,	sys_statfs64,		"statfs64"		}, /* 298 */
+	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"		}, /* 299 */
+	{ 4,	0,	printargs,		"kexec_load"		}, /* 300 */
+	{ 4,	TD|TF,	sys_utimensat,		"utimensat"		}, /* 301 */
+	{ 3,	TD,	printargs,		"signalfd"		}, /* 302 */
+	{ 4,	TD,	printargs,		"timerfd"		}, /* 303 */
+	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 304 */
+	{ 6,	TF,	sys_fallocate,		"fallocate"		}, /* 305 */
+	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 306 */
+	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"	}, /* 307 */
+	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"	}, /* 308 */
+	{ 4,	TD|TS,	printargs,		"signalfd4"		}, /* 309 */
+	{ 2,	TD,	printargs,		"eventfd2"		}, /* 310 */
+	{ 1,	0,	printargs,		"epoll_create1"		}, /* 311 */
+	{ 3,	TD,	printargs,		"dup3"			}, /* 312 */
+	{ 2,	TD,	printargs,		"pipe2"			}, /* 313 */
+	{ 1,	TD,	printargs,		"inotify_init1"		}, /* 314 */
+	{ 5,	TD,	printargs,		"preadv"		}, /* 315 */
+	{ 5,	TD,	printargs,		"pwritev"		}, /* 316 */
+	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 317 */
+	{ 5,	0,	printargs,		"perf_counter_open"	}, /* 318 */
