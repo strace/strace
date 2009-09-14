@@ -23,4 +23,5 @@ Makefile.in
 /missing
 /stamp-h1
 
+/ioctlsort
 /strace
