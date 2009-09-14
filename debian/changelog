@@ -1,3 +1,27 @@
+strace (4.5.18-1) unstable; urgency=low
+
+  * New upstream release, closes: #515655
+    + Fix FTBFS, closes: #518852
+  * Backported patch from CVS: Fix support for NUL-terminated
+    string, closes: #508484
+  * Build-depend on debhelper (>= 7.0.0).
+
+ -- Frederik Schüler <fs@debian.org>  Mon, 09 Mar 2009 14:39:42 +0100
+
+strace (4.5.17+cvs080723-2) unstable; urgency=low
+
+  * Pull Fix for sparc FTBFS from CVS, closes: #492774
+  * Make strace64 priority extra.
+
+ -- Frederik Schüler <fs@debian.org>  Sat, 02 Aug 2008 10:36:59 +0200
+
+strace (4.5.17+cvs080723-1) unstable; urgency=low
+
+  * New upstream cvs snapshot.
+    - fixes arm and armel FTBFS.
+
+ -- Frederik Schüler <fs@debian.org>  Wed, 23 Jul 2008 15:23:22 +0200
+
 strace (4.5.17-1) unstable; urgency=low
 
   * New upstream release.
