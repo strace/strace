@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.5.18
+Version: 4.5.19
 Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
@@ -81,8 +81,16 @@ rm -rf %{buildroot}
 %{_bindir}/strace64
 %endif
 
-
 %changelog
+* Mon Sep 14 2009 Dmitry V. Levin <ldv@altlinux.org> 4.5.19-1
+- New upstream release.
+  + exit/kill strace with traced process exitcode/signal (#105371);
+  + fixed build on ARM EABI (#507576);
+  + fixed display of 32-bit argv array on 64-bit architectures (#519480);
+  + fixed display of 32-bit fcntl(F_SETLK) on 64-bit architectures (#471169);
+  + fixed several bugs in strings decoder, including potential heap
+    memory corruption (#470529, #478324, #511035).
+
 * Thu Aug 28 2008 Roland McGrath <roland@redhat.com> - 4.5.18-1
 - build fix for newer kernel headers (#457291)
 - fix CLONE_VFORK handling (#455078)
