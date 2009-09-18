@@ -792,7 +792,7 @@ change_syscall(struct tcb *tcp, int new)
 #  define PTRACE_SET_SYSCALL 23
 # endif
 
-	if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new) != 0)
+	if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new & 0xffff) != 0)
 		return -1;
 
 	return 0;
