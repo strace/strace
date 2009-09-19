@@ -2833,6 +2833,10 @@ sys_fadvise64_64(struct tcb *tcp)
 #elif defined IA64 || defined X86_64 || defined ALPHA || defined LINUX_MIPSN64
 			(long long int) tcp->u_arg[1], (long long int) tcp->u_arg[2]);
 		printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
+#elif defined ARM
+			LONG_LONG(tcp->u_arg[2], tcp->u_arg[3]),
+			LONG_LONG(tcp->u_arg[4], tcp->u_arg[5]));
+		printxval(advise, tcp->u_arg[1], "POSIX_FADV_???");
 #else
 			LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]),
 			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
