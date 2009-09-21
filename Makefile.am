@@ -83,7 +83,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
 	     xlate.el
 
-gen_changelog_start_date = 2009-07-09
+gen_changelog_start_date = '2009-07-08 20:00'
 gen-changelog:
 	if test -d .git; then \
 		$(top_srcdir)/gitlog-to-changelog \
