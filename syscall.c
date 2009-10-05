@@ -1504,7 +1504,7 @@ syscall_fixup(struct tcb *tcp)
 		return 0;
 	}
 #elif defined(CRISV10) || defined(CRISV32)
-	if (upeek(tcp->pid, 4*PT_R10, &r10) < 0)
+	if (upeek(tcp, 4*PT_R10, &r10) < 0)
 		return -1;
 	if (r10 != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
 		if (debug)
@@ -2227,7 +2227,7 @@ syscall_enter(struct tcb *tcp)
 		else
 			tcp->u_nargs = 0;
 		for (i = 0; i < tcp->u_nargs; i++) {
-			if (upeek(tcp->pid, crisregs[i], &tcp->u_arg[i]) < 0)
+			if (upeek(tcp, crisregs[i], &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}

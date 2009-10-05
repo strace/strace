@@ -1362,7 +1362,7 @@ printcall(struct tcb *tcp)
 #elif defined(CRISV10)
 	long pc;
 
-	if (upeek(tcp->pid, 4*PT_IRP, &pc) < 0) {
+	if (upeek(tcp, 4*PT_IRP, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1370,7 +1370,7 @@ printcall(struct tcb *tcp)
 #elif defined(CRISV32)
 	long pc;
 
-	if (upeek(tcp->pid, 4*PT_ERP, &pc) < 0) {
+	if (upeek(tcp, 4*PT_ERP, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
