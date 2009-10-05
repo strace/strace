@@ -64,7 +64,11 @@
 #define DEFAULT_ACOLUMN	40	/* default alignment column for results */
 #endif
 #ifndef MAX_ARGS
-#define MAX_ARGS	32	/* maximum number of args to a syscall */
+# ifdef HPPA
+#  define MAX_ARGS	6	/* maximum number of args to a syscall */
+# else
+#  define MAX_ARGS	32	/* maximum number of args to a syscall */
+# endif
 #endif
 #ifndef DEFAULT_SORTBY
 #define DEFAULT_SORTBY "time"	/* default sorting method for call profiling */
