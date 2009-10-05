@@ -57,7 +57,7 @@ binary-arch: build checkroot
 	dh_installdocs -s
 	dh_installman -s
 	dh_installexamples -s
-	dh_installchangelogs -s ChangeLog
+	dh_installchangelogs -s
 	dh_install -s
 	dh_link -s
 	dh_strip -s

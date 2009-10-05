@@ -1,5 +1,6 @@
 strace (4.5.19-1) unstable; urgency=low
 
+  [ Dmitry V. Levin ]
   * New upstream release.
     + Fixed FTBFS on armel, closes: #520084, #535564
     + Marked sendfile(2) as a network syscall, closes: #509499
@@ -7,7 +8,14 @@ strace (4.5.19-1) unstable; urgency=low
     + Changed strace to exit/kill with traced process
       exitcode/signal, closes: #37665
 
- -- Dmitry V. Levin <ldv@altlinux.org>  Mon, 14 Sep 2009 12:34:56 +0000
+  [ Frederik Schüler ]
+  * Move myself from uploaders to maintainers, and drop Roland from the list,
+    closes: #521458
+  * Apply hppa fixes, thanks to Carlos O'Donell <carlos@systemhalted.org>
+    and Helge Deller <deller@gmx.de> for the fixes, closes: #546619, #437928
+  * Update standards-version to 3.8.1.
+
+ -- Frederik Schüler <fs@debian.org>  Mon, 05 Oct 2009 22:39:54 +0200
 
 strace (4.5.18-1) unstable; urgency=low
 
