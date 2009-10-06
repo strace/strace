@@ -45,6 +45,8 @@ Noteworthy changes in release 4.5.19
   * Fixed display of 32-bit argv array on 64-bit architectures.
     (Addresses Fedora bug #519480)
   * Fixed display of 32-bit struct sigaction on 64-bit architectures.
+  * Fixed HPPA architecture support.
+    (Addresses Debian bugs #437928 and #546619)
 
 Changes in 4.5.18
 ==============
