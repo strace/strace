@@ -35,7 +35,7 @@ int compare(const void* a, const void* b) {
 int main(int argc, char** argv) {
 	int i;
 
-#ifdef POWERPC			/* unspeakable kludge */
+#if defined(POWERPC) || defined(__powerpc__)			/* unspeakable kludge */
 	for (i = 0; i < nioctls; i++)
 		ioctls[i].code &= ~_IOC_DIRMASK;
 #endif
