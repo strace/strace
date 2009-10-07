@@ -152,6 +152,12 @@ static const struct xlat msg_flags[] = {
 	{ 0,		NULL		},
 };
 
+static const struct xlat semop_flags[] = {
+	{ SEM_UNDO,	"SEM_UNDO"	},
+	{ IPC_NOWAIT,	"IPC_NOWAIT"	},
+	{ 0,		NULL		},
+};
+
 int sys_msgget(tcp)
 struct tcb *tcp;
 {
@@ -273,14 +279,40 @@ struct tcb *tcp;
 int sys_semop(tcp)
 struct tcb *tcp;
 {
+	int i;
+
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
-			tprintf(", %#lx", tcp->u_arg[3]);
-			tprintf(", %lu", tcp->u_arg[1]);
+			tprintf(", %#lx {", tcp->u_arg[3]);
+			for(i = 0; i < tcp->u_arg[1]; i++) {
+				struct sembuf sb;
+				if(i != 0)
+					tprintf(", ");
+				if (umove(tcp, tcp->u_arg[3]+i*sizeof(struct sembuf), &sb) < 0)
+					tprintf("{???}");
+				else {
+					tprintf("{%u, %d, ", sb.sem_num, sb.sem_op);
+					printflags(semop_flags, sb.sem_flg, "SEM_???");
+					tprintf("}");
+				}
+			}
+			tprintf("}, %lu", tcp->u_arg[1]);
 		} else {
-			tprintf(", %#lx", tcp->u_arg[1]);
-			tprintf(", %lu", tcp->u_arg[2]);
+			tprintf(", %#lx {", tcp->u_arg[1]);
+			for(i = 0; i < tcp->u_arg[2]; i++) {
+				struct sembuf sb;
+				if(i != 0)
+					tprintf(", ");
+				if(umove(tcp, tcp->u_arg[1]+i*sizeof(struct sembuf), &sb) < 0)
+					tprintf("{???}");
+				else {
+					tprintf("{%u, %d, ", sb.sem_num, sb.sem_op);
+					printflags(semop_flags, sb.sem_flg, "SEM_???");
+					tprintf("}");
+				}
+			}
+			tprintf("}, %lu", tcp->u_arg[2]);
 		}
 	}
 	return 0;
@@ -290,15 +322,41 @@ struct tcb *tcp;
 int sys_semtimedop(tcp)
 struct tcb *tcp;
 {
+	int i;
+
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
-			tprintf(", %#lx", tcp->u_arg[3]);
-			tprintf(", %lu, ", tcp->u_arg[1]);
+			tprintf(", %#lx {", tcp->u_arg[3]);
+			for(i = 0; i < tcp->u_arg[1]; i++) {
+				struct sembuf sb;
+				if(i != 0)
+					tprintf(", ");
+				if(umove(tcp, tcp->u_arg[3]+i*sizeof(struct sembuf), &sb) < 0)
+					tprintf("{???}");
+				else {
+					tprintf("{%u, %d, ", sb.sem_num, sb.sem_op);
+					printflags(semop_flags, sb.sem_flg, "SEM_???");
+					tprintf("}");
+				}
+			}
+			tprintf("}, %lu, ", tcp->u_arg[1]);
 			printtv(tcp, tcp->u_arg[5]);
 		} else {
-			tprintf(", %#lx", tcp->u_arg[1]);
-			tprintf(", %lu, ", tcp->u_arg[2]);
+			tprintf(", %#lx {", tcp->u_arg[1]);
+			for(i = 0; i < tcp->u_arg[2]; i++) {
+				struct sembuf sb;
+				if(i != 0)
+					tprintf(", ");
+				if(umove(tcp, tcp->u_arg[1]+i*sizeof(struct sembuf), &sb) < 0)
+					tprintf("{???}");
+				else {
+					tprintf("{%u, %d, ", sb.sem_num, sb.sem_op);
+					printflags(semop_flags, sb.sem_flg, "SEM_???");
+					tprintf("}");
+				}
+			}
+			tprintf("}, %lu, ", tcp->u_arg[2]);
 			printtv(tcp, tcp->u_arg[3]);
 		}
 	}
