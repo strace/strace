@@ -201,7 +201,7 @@ int	sys_listxattr(), sys_llistxattr(), sys_flistxattr();
 int	sys_removexattr(), sys_lremovexattr(), sys_fremovexattr();
 int	sys_remap_file_pages(), sys_readahead(), sys_tgkill(), sys_statfs64();
 int	sys_fstatfs64(), sys_clock_settime(), sys_clock_gettime();
-int	sys_clock_getres(), sys_clock_nanosleep();
+int	sys_clock_getres(), sys_clock_nanosleep(), sys_nanosleep();
 int	sys_timer_create(), sys_timer_settime(), sys_timer_gettime();
 
 int	sys_io_setup(), sys_io_destroy(), sys_io_submit(), sys_io_cancel(), sys_io_getevents();
