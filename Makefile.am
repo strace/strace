@@ -83,6 +83,10 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
 	     xlate.el
 
+.PHONY: srpm
+srpm: dist-bzip2
+	rpmbuild --define '%_srcrpmdir .' -ts $(distdir).tar.bz2
+
 if MAINTAINER_MODE
 
 gen_changelog_start_date = 2009-07-08 20:00
