@@ -208,7 +208,20 @@ if test x$opsys != xlinux; then
 AC_CHECK_LIB(nsl, main)
 fi
 
-AC_CHECK_FUNCS(sigaction strerror strsignal pread sys_siglist _sys_siglist getdents mctl prctl sendmsg inet_ntop if_indextoname)
+AC_CHECK_FUNCS([ \
+	getdents \
+	if_indextoname \
+	inet_ntop \
+	mctl \
+	prctl \
+	pread \
+	sendmsg \
+	sigaction \
+	strerror \
+	strsignal \
+	sys_siglist \
+	_sys_siglist \
+])
 AC_CHECK_HEADERS([ \
 	inttypes.h \
 	ioctls.h \
