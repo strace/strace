@@ -24,7 +24,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     debian/strace.docs debian/strace.examples debian/strace.install \
 	     debian/strace.manpages debian/strace-udeb.install \
 	     strace.spec \
-	     strace-graph ChangeLog-CVS COPYRIGHT CREDITS PORTING \
+	     strace-graph ChangeLog ChangeLog-CVS COPYRIGHT CREDITS PORTING \
 	     README-freebsd README-linux README-sunos4 README-svr4 \
 	     linux/ioctlsort.c linux/ioctlent.sh \
 	     linux/ioctlent.h linux/errnoent.h linux/signalent.h \
@@ -83,17 +83,19 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
 	     xlate.el
 
-gen_changelog_start_date = '2009-07-08 20:00'
-gen-changelog:
-	if test -d .git; then \
-		$(top_srcdir)/gitlog-to-changelog \
-		  --since=$(gen_changelog_start_date) \
-		  > $(distdir)/ChangeLog; \
-	fi
-dist-hook: gen-changelog
-.PHONY: gen-changelog
-
 if MAINTAINER_MODE
+
+gen_changelog_start_date = 2009-07-08 20:00
+$(srcdir)/ChangeLog: $(top_srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
+		     $(top_srcdir)/.git/refs/heads/*
+	@rm -f $@.new
+	(cd $(top_srcdir); \
+	 ./gitlog-to-changelog --since='$(gen_changelog_start_date)'; \
+	 echo; echo; echo 'See ChangeLog-CVS for older changes.' \
+	) > $@.new
+	chmod 444 $@.new
+	mv -f $@.new $@
+
 if LINUX
 
 IOCTLDIR = /usr/include
