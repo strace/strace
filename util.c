@@ -257,7 +257,7 @@ do_ptrace(int request, struct tcb *tcp, void *addr, void *data)
 	long l;
 
 	errno = 0;
-	l = ptrace(request, tcp->pid, addr, data);
+	l = ptrace(request, tcp->pid, addr, (long) data);
 	/* Non-ESRCH errors might be our invalid reg/mem accesses,
 	 * we do not record them. */
 	if (errno == ESRCH)
@@ -279,7 +279,7 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	const char *msg;
 
 	errno = 0;
-	ptrace(op, tcp->pid, (void *) 1, (void *) (long) sig);
+	ptrace(op, tcp->pid, (void *) 1, (long) sig);
 	err = errno;
 	if (!err || err == ESRCH)
 		return 0;
