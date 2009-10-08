@@ -211,29 +211,30 @@ struct tcb *tcp;
 	return 0;
 }
 
-int sys_msgsnd(tcp)
-struct tcb *tcp;
+static void
+tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count)
 {
 	long mtype;
 
+	if (umove(tcp, addr, &mtype) < 0) {
+		tprintf("%#lx", addr);
+	} else {
+		tprintf("{%lu, ", mtype);
+		printstr(tcp, addr + sizeof(mtype), count);
+		tprintf("}");
+	}
+	tprintf(", %lu, ", count);
+	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+}
+
+int sys_msgsnd(struct tcb *tcp)
+{
 	if (entering(tcp)) {
-		tprintf("%lu", tcp->u_arg[0]);
+		tprintf("%lu, ", tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
-			umove(tcp, tcp->u_arg[3], &mtype);
-			tprintf(", {%lu, ", mtype);
-			printstr(tcp, tcp->u_arg[3] + sizeof(long),
-				 tcp->u_arg[1]);
-			tprintf("}, %lu", tcp->u_arg[1]);
-			tprintf(", ");
-			printflags(msg_flags, tcp->u_arg[2], "MSG_???");
+			tprint_msgsnd(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 		} else {
-			umove(tcp, tcp->u_arg[1], &mtype);
-			tprintf(", {%lu, ", mtype);
-			printstr(tcp, tcp->u_arg[1] + sizeof(long),
-				 tcp->u_arg[2]);
-			tprintf("}, %lu", tcp->u_arg[2]);
-			tprintf(", ");
-			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+			tprint_msgsnd(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		}
 	}
 	return 0;
