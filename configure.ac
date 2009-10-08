@@ -209,6 +209,7 @@ AC_CHECK_LIB(nsl, main)
 fi
 
 AC_CHECK_FUNCS([ \
+	fork \
 	getdents \
 	if_indextoname \
 	inet_ntop \

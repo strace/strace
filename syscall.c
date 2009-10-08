@@ -922,9 +922,6 @@ get_scno(struct tcb *tcp)
 # elif defined(BFIN)
 	if (upeek(tcp, PT_ORIG_P0, &scno))
 		return -1;
-	/* Check if we return from execve. */
-	if (tcp->flags & TCB_WAITEXECVE && tcp->flags & TCB_INSYSCALL)
-		tcp->flags &= ~(TCB_INSYSCALL | TCB_WAITEXECVE);
 # elif defined (I386)
 	if (upeek(tcp, 4*ORIG_EAX, &scno) < 0)
 		return -1;

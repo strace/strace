@@ -212,6 +212,14 @@ foobar()
 #endif /* MIPS */
 #endif /* SVR4 */
 
+/* Glue for systems without a MMU that cannot provide fork() */
+#ifdef HAVE_FORK
+# define strace_vforked 0
+#else
+# define strace_vforked 1
+# define fork()         vfork()
+#endif
+
 static int
 set_cloexec_flag(int fd)
 {
@@ -636,8 +644,11 @@ startup_child (char **argv)
 			 * Induce an immediate stop so that the parent
 			 * will resume us with PTRACE_SYSCALL and display
 			 * this execve call normally.
+			 * Unless of course we're on a no-MMU system where
+			 * we vfork()-ed, so we cannot stop the child.
 			 */
-			kill(getpid(), SIGSTOP);
+			if (!strace_vforked)
+				kill(getpid(), SIGSTOP);
 		} else {
 			struct sigaction sv_sigchld;
 			sigaction(SIGCHLD, NULL, &sv_sigchld);
@@ -2445,8 +2456,11 @@ Process %d attached (waiting for parent)\n",
 		 * with STOPSIG equal to some other signal
 		 * than SIGSTOP if we happend to attach
 		 * just before the process takes a signal.
+		 * A no-MMU vforked child won't send up a signal,
+		 * so skip the first (lost) execve notification.
 		 */
-		if ((tcp->flags & TCB_STARTUP) && WSTOPSIG(status) == SIGSTOP) {
+		if ((tcp->flags & TCB_STARTUP) &&
+		    (WSTOPSIG(status) == SIGSTOP || strace_vforked)) {
 			/*
 			 * This flag is there to keep us in sync.
 			 * Next time this process stops it should
