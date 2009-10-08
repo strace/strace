@@ -2337,7 +2337,8 @@ sys_getdents(struct tcb *tcp)
 		return 0;
 	}
 	len = tcp->u_rval;
-	if ((buf = malloc(len)) == NULL) {
+	buf = len ? malloc(len) : NULL;
+	if (len && !buf) {
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		fprintf(stderr, "out of memory\n");
 		return 0;
@@ -2420,7 +2421,8 @@ sys_getdents64(struct tcb *tcp)
 		return 0;
 	}
 	len = tcp->u_rval;
-	if ((buf = malloc(len)) == NULL) {
+	buf = len ? malloc(len) : NULL;
+	if (len && !buf) {
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		fprintf(stderr, "out of memory\n");
 		return 0;
