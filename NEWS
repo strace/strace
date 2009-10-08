@@ -22,6 +22,7 @@ Noteworthy changes in release 4.5.19
   * Enhanced CAP_* decoding.
   * Enhanced SIOCS* ioctls decoding.
   * Enhanced fcntl F_* flags decoding.
+  * Enhanced semop/semtimedop decoding.
   * Updated ARM architecture support.
   * Added Blackfin architecture support.
   * Added AVR32 architecture support.
