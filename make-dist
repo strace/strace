@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+git clone -s .git tmpdir
+cd tmpdir
+./git-set-file-times
+autoreconf -i
+./configure --enable-maintainer-mode
+make distcheck
