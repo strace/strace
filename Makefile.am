@@ -100,6 +100,8 @@ $(srcdir)/ChangeLog: $(top_srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
 	chmod 444 $@.new
 	mv -f $@.new $@
 
+export TAR_OPTIONS = --owner=0 --group=0 --numeric-owner --mode=go-w,go+rX
+
 if LINUX
 
 IOCTLDIR = /usr/include
