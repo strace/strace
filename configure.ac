@@ -251,7 +251,6 @@ AC_CHECK_HEADERS([ \
 	sys/uio.h \
 	sys/vfs.h \
 	asm/cachectl.h \
-	asm/reg.h \
 	asm/sysmips.h \
 	linux/capability.h \
 	linux/ptrace.h \
