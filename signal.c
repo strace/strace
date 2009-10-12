@@ -72,33 +72,14 @@
 # include <asm/ptrace_offsets.h>
 #endif /* !IA64 */
 
-#if HAVE_ASM_REG_H
-# if defined (SPARC) || defined (SPARC64)
-#  define fpq kernel_fpq
-#  define fq kernel_fq
-#  define fpu kernel_fpu
-# endif
-# include <asm/reg.h>
-# if defined (SPARC) || defined (SPARC64)
-#  undef fpq
-#  undef fq
-#  undef fpu
-# endif
 #if defined (LINUX) && defined (SPARC64)
-# define r_pc r_tpc
 # undef PTRACE_GETREGS
 # define PTRACE_GETREGS PTRACE_GETREGS64
 # undef PTRACE_SETREGS
 # define PTRACE_SETREGS PTRACE_SETREGS64
 #endif /* LINUX && SPARC64 */
-#endif /* HAVE_ASM_REG_H */
 
-#if defined (SPARC) || defined (SPARC64)
-typedef struct {
-	struct regs		si_regs;
-	int			si_mask;
-} m_siginfo_t;
-#elif defined (MIPS)
+#if defined (SPARC) || defined (SPARC64) || defined (MIPS)
 typedef struct {
 	struct pt_regs		si_regs;
 	int			si_mask;
@@ -1408,7 +1389,7 @@ sys_sigreturn(struct tcb *tcp)
 	return 0;
 #elif defined (SPARC) || defined (SPARC64)
 	long i1;
-	struct regs regs;
+	struct pt_regs regs;
 	m_siginfo_t si;
 
 	if(ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
@@ -1417,7 +1398,7 @@ sys_sigreturn(struct tcb *tcp)
 	}
 	if(entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		i1 = regs.r_o1;
+		i1 = regs.u_regs[U_REG_O1];
 		if(umove(tcp, i1, &si) < 0) {
 			perror("sigreturn: umove ");
 			return 0;

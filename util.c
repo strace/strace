@@ -78,66 +78,11 @@
 #include <sys/utsname.h>
 #endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
 
-#if defined(LINUXSPARC)
-
-# define fpq kernel_fpq
-# define fq kernel_fq
-# define fpu kernel_fpu
-# include <asm/reg.h>
-# undef fpq
-# undef fq
-# undef fpu
-
-#if defined (SPARC64)
-# define r_pc r_tpc
+#if defined(LINUXSPARC) && defined (SPARC64)
 # undef PTRACE_GETREGS
 # define PTRACE_GETREGS PTRACE_GETREGS64
 # undef PTRACE_SETREGS
 # define PTRACE_SETREGS PTRACE_SETREGS64
-#endif /* SPARC64 */
-
-#if !defined(__GLIBC__)
-
-#include <linux/unistd.h>
-
-#define _hack_syscall5(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,\
-          type5,arg5,syscall) \
-type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5) \
-{ \
-      long __res; \
-\
-__asm__ volatile ("or %%g0, %1, %%o0\n\t" \
-                  "or %%g0, %2, %%o1\n\t" \
-                  "or %%g0, %3, %%o2\n\t" \
-                  "or %%g0, %4, %%o3\n\t" \
-                  "or %%g0, %5, %%o4\n\t" \
-                  "or %%g0, %6, %%g1\n\t" \
-#if defined (SPARC64)
-                  "t 0x6d\n\t" \
-#else
-                  "t 0x10\n\t" \
-#endif
-                  "bcc 1f\n\t" \
-                  "or %%g0, %%o0, %0\n\t" \
-                  "sub %%g0, %%o0, %0\n\t" \
-                  "1:\n\t" \
-                  : "=r" (__res) \
-                  : "0" ((long)(arg1)),"1" ((long)(arg2)), \
-                    "2" ((long)(arg3)),"3" ((long)(arg4)),"4" ((long)(arg5)), \
-                    "i" (__NR_##syscall)  \
-                  : "g1", "o0", "o1", "o2", "o3", "o4"); \
-if (__res>=0) \
-	return (type) __res; \
-errno = -__res; \
-return -1; \
-}
-
-static _hack_syscall5(int,_ptrace,int,__request,int,__pid,int,__addr,int,__data,int,__addr2,ptrace)
-
-#define _ptrace
-
-#endif
-
 #endif
 
 /* macros */
@@ -1180,10 +1125,14 @@ getpc(struct tcb *tcp)
 	if (upeek(tcp, REG_EPC, &pc) < 0)
 		return -1;
 # elif defined(SPARC) || defined(SPARC64)
-	struct regs regs;
+	struct pt_regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
-	pc = regs.r_pc;
+#  if defined(SPARC64)
+	pc = regs.tpc;
+#  else
+	pc = regs.pc;
+#  endif
 # elif defined(S390) || defined(S390X)
 	if(upeek(tcp,PT_PSWADDR,&pc) < 0)
 		return -1;
@@ -1297,12 +1246,16 @@ printcall(struct tcb *tcp)
 	}
 	tprintf("[%08lx] ", pc);
 # elif defined(SPARC) || defined(SPARC64)
-	struct regs regs;
+	struct pt_regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0) {
 		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", regs.r_pc);
+#  if defined(SPARC64)
+	tprintf("[%08lx] ", regs.tpc);
+#  else
+	tprintf("[%08lx] ", regs.pc);
+#  endif
 # elif defined(HPPA)
 	long pc;
 
@@ -1532,17 +1485,17 @@ set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
 
 #  elif defined (SPARC) || defined (SPARC64)
 
-typedef struct regs arg_setup_state;
+typedef struct pt_regs arg_setup_state;
 
 #   define arg_setup(tcp, state) \
     (ptrace (PTRACE_GETREGS, tcp->pid, (char *) (state), 0))
 #   define arg_finish_change(tcp, state) \
     (ptrace (PTRACE_SETREGS, tcp->pid, (char *) (state), 0))
 
-#   define get_arg0(tcp, state, valp) (*(valp) = (state)->r_o0, 0)
-#   define get_arg1(tcp, state, valp) (*(valp) = (state)->r_o1, 0)
-#   define set_arg0(tcp, state, val) ((state)->r_o0 = (val), 0)
-#   define set_arg1(tcp, state, val) ((state)->r_o1 = (val), 0)
+#   define get_arg0(tcp, state, valp) (*(valp) = (state)->u_regs[U_REG_O0], 0)
+#   define get_arg1(tcp, state, valp) (*(valp) = (state)->u_regs[U_REG_O1], 0)
+#   define set_arg0(tcp, state, val) ((state)->u_regs[U_REG_O0] = (val), 0)
+#   define set_arg1(tcp, state, val) ((state)->u_regs[U_REG_O1] = (val), 0)
 #   define restore_arg0(tcp, state, val) 0
 
 #  else /* other architectures */

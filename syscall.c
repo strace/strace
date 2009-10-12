@@ -42,20 +42,6 @@
 #include <sys/syscall.h>
 #include <sys/param.h>
 
-#if HAVE_ASM_REG_H
-#if defined (SPARC) || defined (SPARC64)
-#  define fpq kernel_fpq
-#  define fq kernel_fq
-#  define fpu kernel_fpu
-#endif
-#include <asm/reg.h>
-#if defined (SPARC) || defined (SPARC64)
-#  undef fpq
-#  undef fq
-#  undef fpu
-#endif
-#endif
-
 #ifdef HAVE_SYS_REG_H
 #include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
@@ -75,7 +61,6 @@
 #endif
 
 #if defined (LINUX) && defined (SPARC64)
-# define r_pc r_tpc
 # undef PTRACE_GETREGS
 # define PTRACE_GETREGS PTRACE_GETREGS64
 # undef PTRACE_SETREGS
@@ -755,7 +740,7 @@ internal_syscall(struct tcb *tcp)
 #elif defined(AVR32)
 	static struct pt_regs regs;
 #elif defined (SPARC) || defined (SPARC64)
-	static struct regs regs;
+	static struct pt_regs regs;
 	static unsigned long trap;
 #elif defined(LINUX_MIPSN32)
 	static long long a3;
@@ -1186,9 +1171,11 @@ get_scno(struct tcb *tcp)
 	if (!(tcp->flags & TCB_INSYSCALL)) {
 		/* Retrieve the syscall trap instruction. */
 		errno = 0;
-		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.r_pc, 0);
 #  if defined(SPARC64)
+		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.tpc, 0);
 		trap >>= 32;
+#  else
+		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.pc, 0);
 #  endif
 		if (errno)
 			return -1;
@@ -1226,9 +1213,9 @@ get_scno(struct tcb *tcp)
 				return 0;
 			}
 #  if defined (SPARC64)
-			fprintf(stderr,"syscall: unknown syscall trap %08lx %016lx\n", trap, regs.r_tpc);
+			fprintf(stderr,"syscall: unknown syscall trap %08lx %016lx\n", trap, regs.tpc);
 #  else
-			fprintf(stderr,"syscall: unknown syscall trap %08x %08x\n", trap, regs.r_pc);
+			fprintf(stderr,"syscall: unknown syscall trap %08lx %08lx\n", trap, regs.pc);
 #  endif
 			return -1;
 		}
@@ -1237,10 +1224,10 @@ get_scno(struct tcb *tcp)
 		if (trap == 0x91d02027)
 			scno = 156;
 		else
-			scno = regs.r_g1;
+			scno = regs.u_regs[U_REG_G1];
 		if (scno == 0) {
-			scno = regs.r_o0;
-			memmove (&regs.r_o0, &regs.r_o1, 7*sizeof(regs.r_o0));
+			scno = regs.u_regs[U_REG_O0];
+			memmove (&regs.u_regs[U_REG_O0], &regs.u_regs[U_REG_O1], 7*sizeof(regs.u_regs[0]));
 		}
 	}
 # elif defined(HPPA)
@@ -1646,21 +1633,21 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(SPARC)
-		if (regs.r_psr & PSR_C) {
+		if (regs.psr & PSR_C) {
 			tcp->u_rval = -1;
-			u_error = regs.r_o0;
+			u_error = regs.u_regs[U_REG_O0];
 		}
 		else {
-			tcp->u_rval = regs.r_o0;
+			tcp->u_rval = regs.u_regs[U_REG_O0];
 			u_error = 0;
 		}
 # elif defined(SPARC64)
-		if (regs.r_tstate & 0x1100000000UL) {
+		if (regs.tstate & 0x1100000000UL) {
 			tcp->u_rval = -1;
-			u_error = regs.r_o0;
+			u_error = regs.u_regs[U_REG_O0];
 		}
 		else {
-			tcp->u_rval = regs.r_o0;
+			tcp->u_rval = regs.u_regs[U_REG_O0];
 			u_error = 0;
 		}
 # elif defined(HPPA)
@@ -1875,12 +1862,12 @@ force_result(tcp, error, rval)
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
 	if (error) {
-		regs.r_psr |= PSR_C;
-		regs.r_o0 = error;
+		regs.psr |= PSR_C;
+		regs.u_regs[U_REG_O0] = error;
 	}
 	else {
-		regs.r_psr &= ~PSR_C;
-		regs.r_o0 = rval;
+		regs.psr &= ~PSR_C;
+		regs.u_regs[U_REG_O0] = rval;
 	}
 	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
@@ -1888,12 +1875,12 @@ force_result(tcp, error, rval)
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
 	if (error) {
-		regs.r_tstate |= 0x1100000000UL;
-		regs.r_o0 = error;
+		regs.tstate |= 0x1100000000UL;
+		regs.u_regs[U_REG_O0] = error;
 	}
 	else {
-		regs.r_tstate &= ~0x1100000000UL;
-		regs.r_o0 = rval;
+		regs.tstate &= ~0x1100000000UL;
+		regs.u_regs[U_REG_O0] = rval;
 	}
 	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
@@ -2110,7 +2097,7 @@ syscall_enter(struct tcb *tcp)
 		else
 			tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++)
-			tcp->u_arg[i] = *((&regs.r_o0) + i);
+			tcp->u_arg[i] = regs.u_regs[U_REG_O0 + i];
 	}
 #elif defined (HPPA)
 	{
@@ -2680,10 +2667,10 @@ struct tcb *tcp;
 
 #ifdef LINUX
 #if defined (SPARC) || defined (SPARC64)
-	struct regs regs;
+	struct pt_regs regs;
 	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
 		return -1;
-	val = regs.r_o1;
+	val = regs.u_regs[U_REG_O1];
 #elif defined(SH)
 	if (upeek(tcp, 4*(REG_REG0+1), &val) < 0)
 		return -1;

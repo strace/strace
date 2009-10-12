@@ -56,20 +56,6 @@
 #include <sys/ptrace.h>
 #endif
 
-#if HAVE_ASM_REG_H
-#if defined (SPARC) || defined (SPARC64)
-#  define fpq kernel_fpq
-#  define fq kernel_fq
-#  define fpu kernel_fpu
-#endif /* SPARC || SPARC64 */
-#include <asm/reg.h>
-#if defined (SPARC) || defined (SPARC64)
-#  undef fpq
-#  undef fq
-#  undef fpu
-#endif /* SPARC || SPARC64 */
-#endif /* HAVE_ASM_REG_H */
-
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 #ifndef PTRACE_PEEKUSR
@@ -726,10 +712,10 @@ change_syscall(struct tcb *tcp, int new)
 		return -1;
 	return 0;
 #elif defined(SPARC) || defined(SPARC64)
-	struct regs regs;
+	struct pt_regs regs;
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char*)&regs, 0)<0)
 		return -1;
-	regs.r_g1=new;
+	regs.u_regs[U_REG_G1] = new;
 	if (ptrace(PTRACE_SETREGS, tcp->pid, (char*)&regs, 0)<0)
 		return -1;
 	return 0;
