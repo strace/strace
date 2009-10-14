@@ -1680,7 +1680,7 @@ sys_fstatfs(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef LINUX
+#if defined LINUX && defined HAVE_STATFS64
 static void
 printstatfs64(struct tcb *tcp, long addr)
 {

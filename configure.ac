@@ -187,6 +187,7 @@ AC_CHECK_MEMBERS([struct stat.st_blksize,
 		  struct stat.st_level,
 		  struct stat.st_rdev])
 AC_STAT64
+AC_STATFS64
 
 AC_TYPE_SIGNAL
 AC_TYPE_UID_T
