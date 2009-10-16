@@ -1079,6 +1079,13 @@ printstat64(struct tcb *tcp, long addr)
 # endif
 #endif /* LINUXSPARC */
 
+#if defined LINUX && defined X86_64
+	if (current_personality == 0) {
+		printstat(tcp, addr);
+		return;
+	}
+#endif
+ 
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
 		return;
