@@ -82,8 +82,8 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
-* Mon Sep 14 2009 Dmitry V. Levin <ldv@altlinux.org> 4.5.19-1
-- New upstream release.
+* Wed Oct 21 2009 Roland McGrath <roland@redhat.com> - 4.5.19-1
+- New upstream release, work mostly by Dmitry V. Levin <ldv@altlinux.org>
   + exit/kill strace with traced process exitcode/signal (#105371);
   + fixed build on ARM EABI (#507576);
   + fixed display of 32-bit argv array on 64-bit architectures (#519480);
