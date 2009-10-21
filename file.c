@@ -1085,7 +1085,7 @@ printstat64(struct tcb *tcp, long addr)
 		return;
 	}
 #endif
- 
+
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
 		return;
