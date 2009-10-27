@@ -119,33 +119,29 @@ unsigned int nprocs, tcbtabsize;
 char *progname;
 extern char **environ;
 
-static int detach P((struct tcb *tcp, int sig));
-static int trace P((void));
-static void cleanup P((void));
-static void interrupt P((int sig));
+static int detach(struct tcb *tcp, int sig);
+static int trace(void);
+static void cleanup(void);
+static void interrupt(int sig);
 static sigset_t empty_set, blocked_set;
 
 #ifdef HAVE_SIG_ATOMIC_T
 static volatile sig_atomic_t interrupted;
 #else /* !HAVE_SIG_ATOMIC_T */
-#ifdef __STDC__
 static volatile int interrupted;
-#else /* !__STDC__ */
-static int interrupted;
-#endif /* !__STDC__ */
 #endif /* !HAVE_SIG_ATOMIC_T */
 
 #ifdef USE_PROCFS
 
-static struct tcb *pfd2tcb P((int pfd));
-static void reaper P((int sig));
-static void rebuild_pollv P((void));
+static struct tcb *pfd2tcb(int pfd);
+static void reaper(int sig);
+static void rebuild_pollv(void);
 static struct pollfd *pollv;
 
 #ifndef HAVE_POLLABLE_PROCFS
 
-static void proc_poll_open P((void));
-static void proc_poller P((int pfd));
+static void proc_poll_open(void);
+static void proc_poller(int pfd);
 
 struct proc_pollfd {
 	int fd;
@@ -2611,26 +2607,14 @@ Process %d attached (waiting for parent)\n",
 
 #endif /* !USE_PROCFS */
 
-#ifdef __STDC__
 #include <stdarg.h>
-#define VA_START(a, b) va_start(a, b)
-#else
-#include <varargs.h>
-#define VA_START(a, b) va_start(a)
-#endif
 
 void
-#ifdef __STDC__
 tprintf(const char *fmt, ...)
-#else
-tprintf(fmt, va_alist)
-char *fmt;
-va_dcl
-#endif
 {
 	va_list args;
 
-	VA_START(args, fmt);
+	va_start(args, fmt);
 	if (outf) {
 		int n = vfprintf(outf, fmt, args);
 		if (n < 0) {

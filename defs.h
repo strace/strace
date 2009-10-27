@@ -158,15 +158,11 @@
 #include <asm/ptrace.h>
 #undef __KERNEL__
 #endif
-#ifdef __STDC__
 #ifdef LINUX
 extern long ptrace(int, int, char *, long);
 #else /* !LINUX */
 extern int ptrace(int, int, char *, int, ...);
 #endif /* !LINUX */
-#else /* !__STDC__ */
-extern int ptrace();
-#endif /* !__STDC__ */
 #endif /* !LINUXSPARC */
 #endif /* !SVR4 */
 
@@ -469,112 +465,106 @@ extern unsigned int nprocs, tcbtabsize;
 extern int max_strlen;
 extern struct tcb *tcp_last;
 
-#ifdef __STDC__
-#define P(args) args
-#else
-#define P(args) ()
-#endif
-
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
-extern int set_personality P((int personality));
-extern const char *xlookup P((const struct xlat *, int));
-extern struct tcb *alloc_tcb P((int, int));
-extern struct tcb *pid2tcb P((int));
-extern void droptcb P((struct tcb *));
-extern void expand_tcbtab P((void));
+extern int set_personality(int personality);
+extern const char *xlookup(const struct xlat *, int);
+extern struct tcb *alloc_tcb(int, int);
+extern struct tcb *pid2tcb(int);
+extern void droptcb(struct tcb *);
+extern void expand_tcbtab(void);
 
 #define alloctcb(pid)	alloc_tcb((pid), 1)
 
-extern void set_sortby P((char *));
-extern void set_overhead P((int));
-extern void qualify P((char *));
-extern int get_scno P((struct tcb *));
-extern long known_scno P((struct tcb *));
-extern long do_ptrace P((int request, struct tcb *tcp, void *addr, void *data));
-extern int ptrace_restart P((int request, struct tcb *tcp, int sig));
-extern int trace_syscall P((struct tcb *));
-extern int count_syscall P((struct tcb *, struct timeval *));
-extern void printxval P((const struct xlat *, int, const char *));
-extern int printargs P((struct tcb *));
-extern int addflags P((const struct xlat *, int));
-extern int printflags P((const struct xlat *, int, const char *));
-extern const char *sprintflags P((const char *, const struct xlat *, int));
-extern int umoven P((struct tcb *, long, int, char *));
-extern int umovestr P((struct tcb *, long, int, char *));
-extern int upeek P((struct tcb *, long, long *));
-extern void dumpiov P((struct tcb *, int, long));
-extern void dumpstr P((struct tcb *, long, int));
-extern void printstr P((struct tcb *, long, int));
-extern void printnum P((struct tcb *, long, char *));
-extern void printnum_int P((struct tcb *, long, char *));
-extern void printpath P((struct tcb *, long));
-extern void printpathn P((struct tcb *, long, int));
-extern void printtv_bitness P((struct tcb *, long, enum bitness_t, int));
-extern void sprinttv P((struct tcb *, long, enum bitness_t, char *));
-extern void print_timespec P((struct tcb *, long));
-extern void sprint_timespec P((char *, struct tcb *, long));
+extern void set_sortby(char *);
+extern void set_overhead(int);
+extern void qualify(char *);
+extern int get_scno(struct tcb *);
+extern long known_scno(struct tcb *);
+extern long do_ptrace(int request, struct tcb *tcp, void *addr, void *data);
+extern int ptrace_restart(int request, struct tcb *tcp, int sig);
+extern int trace_syscall(struct tcb *);
+extern int count_syscall(struct tcb *, struct timeval *);
+extern void printxval(const struct xlat *, int, const char *);
+extern int printargs(struct tcb *);
+extern int addflags(const struct xlat *, int);
+extern int printflags(const struct xlat *, int, const char *);
+extern const char *sprintflags(const char *, const struct xlat *, int);
+extern int umoven(struct tcb *, long, int, char *);
+extern int umovestr(struct tcb *, long, int, char *);
+extern int upeek(struct tcb *, long, long *);
+extern void dumpiov(struct tcb *, int, long);
+extern void dumpstr(struct tcb *, long, int);
+extern void printstr(struct tcb *, long, int);
+extern void printnum(struct tcb *, long, char *);
+extern void printnum_int(struct tcb *, long, char *);
+extern void printpath(struct tcb *, long);
+extern void printpathn(struct tcb *, long, int);
+extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
+extern void sprinttv(struct tcb *, long, enum bitness_t, char *);
+extern void print_timespec(struct tcb *, long);
+extern void sprint_timespec(char *, struct tcb *, long);
 #ifdef HAVE_SIGINFO_T
-extern void printsiginfo P((siginfo_t *, int));
+extern void printsiginfo(siginfo_t *, int);
 #endif
-extern void printsock P((struct tcb *, long, int));
-extern void print_sock_optmgmt P((struct tcb *, long, int));
-extern void printrusage P((struct tcb *, long));
-extern void printuid P((const char *, unsigned long));
-extern int clearbpt P((struct tcb *));
-extern int setbpt P((struct tcb *));
-extern int sigishandled P((struct tcb *, int));
-extern void printcall P((struct tcb *));
-extern const char *signame P((int));
-extern void print_sigset P((struct tcb *, long, int));
-extern void printsignal P((int));
-extern void printleader P((struct tcb *));
-extern void printtrailer P((void));
-extern void tabto P((int));
-extern void call_summary P((FILE *));
-extern void tprint_iov P((struct tcb *, unsigned long, unsigned long));
-extern void tprint_open_modes P((mode_t));
-extern const char *sprint_open_modes P((mode_t));
-extern int is_restart_error P((struct tcb *));
+extern void printsock(struct tcb *, long, int);
+extern void print_sock_optmgmt(struct tcb *, long, int);
+extern void printrusage(struct tcb *, long);
+extern void printuid(const char *, unsigned long);
+extern int clearbpt(struct tcb *);
+extern int setbpt(struct tcb *);
+extern int sigishandled(struct tcb *, int);
+extern void printcall(struct tcb *);
+extern const char *signame(int);
+extern void print_sigset(struct tcb *, long, int);
+extern void printsignal(int);
+extern void printleader(struct tcb *);
+extern void printtrailer(void);
+extern void tabto(int);
+extern void call_summary(FILE *);
+extern void tprint_iov(struct tcb *, unsigned long, unsigned long);
+extern void tprint_open_modes(mode_t);
+extern const char *sprint_open_modes(mode_t);
+extern int is_restart_error(struct tcb *);
 
-extern int change_syscall P((struct tcb *, int));
+extern int change_syscall(struct tcb *, int);
 #ifdef LINUX
-extern int internal_clone P((struct tcb *));
+extern int internal_clone(struct tcb *);
 #endif
-extern int internal_fork P((struct tcb *));
-extern int internal_exec P((struct tcb *));
-extern int internal_wait P((struct tcb *, int));
-extern int internal_exit P((struct tcb *));
+extern int internal_fork(struct tcb *);
+extern int internal_exec(struct tcb *);
+extern int internal_wait(struct tcb *, int);
+extern int internal_exit(struct tcb *);
 
-extern const struct ioctlent *ioctl_lookup P((long));
-extern const struct ioctlent *ioctl_next_match P((const struct ioctlent *));
-extern int ioctl_decode P((struct tcb *, long, long));
-extern int term_ioctl P((struct tcb *, long, long));
-extern int sock_ioctl P((struct tcb *, long, long));
-extern int proc_ioctl P((struct tcb *, int, int));
-extern int stream_ioctl P((struct tcb *, int, int));
+extern const struct ioctlent *ioctl_lookup(long);
+extern const struct ioctlent *ioctl_next_match(const struct ioctlent *);
+extern int ioctl_decode(struct tcb *, long, long);
+extern int term_ioctl(struct tcb *, long, long);
+extern int sock_ioctl(struct tcb *, long, long);
+extern int proc_ioctl(struct tcb *, int, int);
+extern int stream_ioctl(struct tcb *, int, int);
 #ifdef LINUX
-extern int rtc_ioctl P((struct tcb *, long, long));
-extern int scsi_ioctl P((struct tcb *, long, long));
+extern int rtc_ioctl(struct tcb *, long, long);
+extern int scsi_ioctl(struct tcb *, long, long);
 #endif
 
-extern void tv_tv P((struct timeval *, int, int));
-extern int tv_nz P((struct timeval *));
-extern int tv_cmp P((struct timeval *, struct timeval *));
-extern double tv_float P((struct timeval *));
-extern void tv_add P((struct timeval *, struct timeval *, struct timeval *));
-extern void tv_sub P((struct timeval *, struct timeval *, struct timeval *));
-extern void tv_mul P((struct timeval *, struct timeval *, int));
-extern void tv_div P((struct timeval *, struct timeval *, int));
+extern void tv_tv(struct timeval *, int, int);
+extern int tv_nz(struct timeval *);
+extern int tv_cmp(struct timeval *, struct timeval *);
+extern double tv_float(struct timeval *);
+extern void tv_add(struct timeval *, struct timeval *, struct timeval *);
+extern void tv_sub(struct timeval *, struct timeval *, struct timeval *);
+extern void tv_mul(struct timeval *, struct timeval *, int);
+extern void tv_div(struct timeval *, struct timeval *, int);
 
 #ifdef SUNOS4
-extern int fixvfork P((struct tcb *));
+extern int fixvfork(struct tcb *);
 #endif
 #if !(defined(LINUX) && !defined(SPARC) && !defined(SPARC64) && !defined(IA64))
-extern long getrval2 P((struct tcb *));
+extern long getrval2(struct tcb *);
 #endif
 #ifdef USE_PROCFS
-extern int proc_open P((struct tcb *tcp, int attaching));
+extern int proc_open(struct tcb *tcp, int attaching);
 #endif
 
 #define umove(pid, addr, objp)	\
@@ -585,22 +575,18 @@ extern int proc_open P((struct tcb *tcp, int attaching));
 #define printtv_special(tcp, addr)	\
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 
-#ifdef __STDC__
 #ifdef __GNUC__
 extern void tprintf(const char *fmt, ...)
 	__attribute__ ((format (printf, 1, 2)));
 #else
 extern void tprintf(const char *fmt, ...);
 #endif
-#else
-extern void tprintf();
-#endif
 
 #ifndef HAVE_STRERROR
-const char *strerror P((int));
+const char *strerror(int);
 #endif
 #ifndef HAVE_STRSIGNAL
-const char *strsignal P((int));
+const char *strsignal(int);
 #endif
 
 extern int current_personality;
