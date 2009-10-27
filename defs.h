@@ -321,6 +321,7 @@ struct tcb {
 	long long u_lrval;	/* long long return value */
 #endif
 	FILE *outf;		/* Output file for this process */
+	int curcol;		/* Output column for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */

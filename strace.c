@@ -113,6 +113,7 @@ int acolumn = DEFAULT_ACOLUMN;
 int max_strlen = DEFAULT_STRLEN;
 static char *outfname = NULL;
 FILE *outf;
+static int curcol;
 struct tcb **tcbtab;
 unsigned int nprocs, tcbtabsize;
 char *progname;
@@ -1016,6 +1017,7 @@ alloc_tcb(int pid, int command_options_parsed)
 #endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
 			tcp->outf = outf; /* Initialise to current out file */
+			tcp->curcol = 0;
 			tcp->stime.tv_sec = 0;
 			tcp->stime.tv_usec = 0;
 			tcp->pfd = -1;
@@ -2109,6 +2111,7 @@ trace()
 
 		/* set current output file */
 		outf = tcp->outf;
+		curcol = tcp->curcol;
 
 		if (cflag) {
 			struct timeval stime;
@@ -2185,6 +2188,8 @@ trace()
 			exit(1);
 			break;
 		}
+		/* Remember current print column before continuing. */
+		tcp->curcol = curcol;
 		arg = 0;
 #ifndef FREEBSD
 		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
@@ -2375,6 +2380,7 @@ Process %d attached (waiting for parent)\n",
 		}
 		/* set current output file */
 		outf = tcp->outf;
+		curcol = tcp->curcol;
 		if (cflag) {
 #ifdef LINUX
 			tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
@@ -2593,6 +2599,8 @@ Process %d attached (waiting for parent)\n",
 			continue;
 		}
 	tracing:
+		/* Remember current print column before continuing. */
+		tcp->curcol = curcol;
 		if (ptrace_restart(PTRACE_SYSCALL, tcp, 0) < 0) {
 			cleanup();
 			return -1;
@@ -2602,8 +2610,6 @@ Process %d attached (waiting for parent)\n",
 }
 
 #endif /* !USE_PROCFS */
-
-static int curcol;
 
 #ifdef __STDC__
 #include <stdarg.h>
@@ -2627,10 +2633,11 @@ va_dcl
 	VA_START(args, fmt);
 	if (outf) {
 		int n = vfprintf(outf, fmt, args);
-		if (n < 0 && outf != stderr)
-			perror(outfname == NULL
-			       ? "<writing to pipe>" : outfname);
-		else
+		if (n < 0) {
+			if (outf != stderr)
+				perror(outfname == NULL
+				       ? "<writing to pipe>" : outfname);
+		} else
 			curcol += n;
 	}
 	va_end(args);
