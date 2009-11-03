@@ -230,7 +230,7 @@ tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count)
 int sys_msgsnd(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
 			tprint_msgsnd(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 		} else {
@@ -240,37 +240,43 @@ int sys_msgsnd(struct tcb *tcp)
 	return 0;
 }
 
-int sys_msgrcv(tcp)
-struct tcb *tcp;
+static void
+tprint_msgrcv(struct tcb *tcp, long addr, unsigned long count, long msgtyp)
 {
 	long mtype;
 
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+	if (syserror(tcp) || umove(tcp, addr, &mtype) < 0) {
+		tprintf("%#lx", addr);
 	} else {
-		tprintf("%lu", tcp->u_arg[0]);
+		tprintf("{%lu, ", mtype);
+		printstr(tcp, addr + sizeof(mtype), count);
+		tprintf("}");
+	}
+	tprintf(", %lu, %ld, ", count, msgtyp);
+}
+
+int sys_msgrcv(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+	} else {
 		if (indirect_ipccall(tcp)) {
 			struct ipc_wrapper {
 				struct msgbuf *msgp;
 				long msgtyp;
 			} tmp;
-			umove(tcp, tcp->u_arg[3], &tmp);
-			umove(tcp, (long) tmp.msgp, &mtype);
-			tprintf(", {%lu, ", mtype);
-			printstr(tcp, (long) (tmp.msgp) + sizeof(long),
-				 tcp->u_arg[1]);
-			tprintf("}, %lu", tcp->u_arg[1]);
-			tprintf(", %ld", tmp.msgtyp);
-			tprintf(", ");
+
+			if (umove(tcp, tcp->u_arg[3], &tmp) < 0) {
+				tprintf("%#lx, %lu, ",
+					tcp->u_arg[3], tcp->u_arg[1]);
+			} else {
+				tprint_msgrcv(tcp, (long) tmp.msgp,
+					tcp->u_arg[1], tmp.msgtyp);
+			}
 			printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 		} else {
-			umove(tcp, tcp->u_arg[1], &mtype);
-			tprintf("{%lu, ", mtype);
-			printstr(tcp, tcp->u_arg[1] + sizeof(long),
-				 tcp->u_arg[2]);
-			tprintf("}, %lu", tcp->u_arg[2]);
-			tprintf(", %ld", tcp->u_arg[3]);
-			tprintf(", ");
+			tprint_msgrcv(tcp, tcp->u_arg[1],
+				tcp->u_arg[2], tcp->u_arg[3]);
 			printflags(msg_flags, tcp->u_arg[4], "MSG_???");
 		}
 	}

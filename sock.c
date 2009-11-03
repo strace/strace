@@ -258,8 +258,12 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 			int i;
 			unsigned nifra = ifc.ifc_len / sizeof(struct ifreq);
 			struct ifreq ifra[nifra];
-			umoven(tcp, (unsigned long) ifc.ifc_buf, sizeof(ifra),
-			       (char *) ifra);
+
+			if (umoven(tcp, (unsigned long) ifc.ifc_buf,
+				sizeof(ifra), (char *) ifra) < 0) {
+				tprintf("%lx}", (unsigned long) ifc.ifc_buf);
+				return 1;
+			}
 			tprintf("{");
 			for (i = 0; i < nifra; ++i ) {
 				if (i > 0)

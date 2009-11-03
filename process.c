@@ -3546,16 +3546,32 @@ static void
 print_affinitylist(struct tcb *tcp, long list, unsigned int len)
 {
 	int first = 1;
-	tprintf(" {");
-	while (len >= sizeof (unsigned long)) {
-		unsigned long w;
-		umove(tcp, list, &w);
-		tprintf("%s %lx", first ? "" : ",", w);
+	unsigned long w, min_len;
+
+	if (abbrev(tcp) && len / sizeof(w) > max_strlen)
+		min_len = len - max_strlen * sizeof(w);
+	else
+		min_len = 0;
+	for (; len >= sizeof(w) && len > min_len;
+	     len -= sizeof(w), list += sizeof(w)) {
+		if (umove(tcp, list, &w) < 0)
+			break;
+		if (first)
+			tprintf("{");
+		else
+			tprintf(", ");
 		first = 0;
-		len -= sizeof (unsigned long);
-		list += sizeof(unsigned long);
+		tprintf("%lx", w);
 	}
-	tprintf(" }");
+	if (len) {
+		if (first)
+			tprintf("%#lx", list);
+		else
+			tprintf(", %s}", (len >= sizeof(w) && len > min_len ?
+				"???" : "..."));
+	} else {
+		tprintf(first ? "{}" : "}");
+	}
 }
 
 int

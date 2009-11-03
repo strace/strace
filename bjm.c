@@ -98,52 +98,54 @@ static const struct xlat modflags[] = {
 };
 
 int
-sys_query_module(tcp)
-struct tcb *tcp;
+sys_query_module(struct tcb *tcp)
 {
-
-	if (exiting(tcp)) {
+	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
 		tprintf(", ");
 		printxval(which, tcp->u_arg[1], "QM_???");
 		tprintf(", ");
-		if (!verbose(tcp)) {
-			tprintf("%#lx, %lu, %#lx", tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[4]);
-		} else if (tcp->u_rval!=0) {
-			size_t	ret;
-			umove(tcp, tcp->u_arg[4], &ret);
-			tprintf("%#lx, %lu, %Zu", tcp->u_arg[2], tcp->u_arg[3], ret);
+	} else {
+		size_t ret;
+
+		if (!verbose(tcp) || syserror(tcp) ||
+		    umove(tcp, tcp->u_arg[4], &ret) < 0) {
+			tprintf("%#lx, %lu, %#lx", tcp->u_arg[2],
+				tcp->u_arg[3], tcp->u_arg[4]);
 		} else if (tcp->u_arg[1]==QM_INFO) {
 			struct module_info	mi;
-			size_t			ret;
-			umove(tcp, tcp->u_arg[2], &mi);
-			tprintf("{address=%#lx, size=%lu, flags=", mi.addr, mi.size);
-			printflags(modflags, mi.flags, "MOD_???");
-			tprintf(", usecount=%lu}", mi.usecount);
-			umove(tcp, tcp->u_arg[4], &ret);
-			tprintf(", %Zu", ret);
+			if (umove(tcp, tcp->u_arg[2], &mi) < 0) {
+				tprintf("%#lx, ", tcp->u_arg[2]);
+			} else {
+				tprintf("{address=%#lx, size=%lu, flags=",
+					mi.addr, mi.size);
+				printflags(modflags, mi.flags, "MOD_???");
+				tprintf(", usecount=%lu}, ", mi.usecount);
+			}
+			tprintf("%Zu", ret);
 		} else if ((tcp->u_arg[1]==QM_MODULES) ||
 			   (tcp->u_arg[1]==QM_DEPS) ||
 			   (tcp->u_arg[1]==QM_REFS)) {
-			size_t	ret;
-
-			umove(tcp, tcp->u_arg[4], &ret);
 			tprintf("{");
 			if (!abbrev(tcp)) {
-				char*	data	= (char*)malloc(tcp->u_arg[3]);
+				char*	data	= malloc(tcp->u_arg[3]);
 				char*	mod	= data;
 				size_t	idx;
 
-				if (data==NULL) {
+				if (!data) {
 					fprintf(stderr, "out of memory\n");
 					tprintf(" /* %Zu entries */ ", ret);
 				} else {
-					umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
-					for (idx=0; idx<ret; idx++) {
-						if (idx!=0)
-							tprintf(",");
-						tprintf("%s", mod);
-						mod+=strlen(mod)+1;
+					if (umoven(tcp, tcp->u_arg[2],
+						tcp->u_arg[3], data) < 0) {
+						tprintf(" /* %Zu entries */ ", ret);
+					} else {
+						for (idx=0; idx<ret; idx++) {
+							tprintf("%s%s",
+								(idx ? ", " : ""),
+								mod);
+							mod += strlen(mod)+1;
+						}
 					}
 					free(data);
 				}
@@ -151,22 +153,27 @@ struct tcb *tcp;
 				tprintf(" /* %Zu entries */ ", ret);
 			tprintf("}, %Zu", ret);
 		} else if (tcp->u_arg[1]==QM_SYMBOLS) {
-			size_t	ret;
-			umove(tcp, tcp->u_arg[4], &ret);
 			tprintf("{");
 			if (!abbrev(tcp)) {
-				char*			data	= (char *)malloc(tcp->u_arg[3]);
+				char*			data	= malloc(tcp->u_arg[3]);
 				struct module_symbol*	sym	= (struct module_symbol*)data;
 				size_t			idx;
 
-				if (data==NULL) {
+				if (!data) {
 					fprintf(stderr, "out of memory\n");
 					tprintf(" /* %Zu entries */ ", ret);
 				} else {
-					umoven(tcp, tcp->u_arg[2], tcp->u_arg[3], data);
-					for (idx=0; idx<ret; idx++) {
-						tprintf("{name=%s, value=%lu} ", data+(long)sym->name, sym->value);
-						sym++;
+					if (umoven(tcp, tcp->u_arg[2],
+						tcp->u_arg[3], data) < 0) {
+						tprintf(" /* %Zu entries */ ", ret);
+					} else {
+						for (idx=0; idx<ret; idx++) {
+							tprintf("%s{name=%s, value=%lu}",
+								(idx ? " " : ""),
+								data+(long)sym->name,
+								sym->value);
+							sym++;
+						}
 					}
 					free(data);
 				}
