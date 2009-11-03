@@ -610,10 +610,11 @@ int
 sys_readahead(struct tcb *tcp)
 {
 	if (entering(tcp)) {
+		ALIGN64 (tcp, 1);
 		tprintf("%ld, %lld, %ld", tcp->u_arg[0],
 # if defined LINUX_MIPSN32
 			tcp->ext_arg[1], tcp->u_arg[2]
-# elif defined IA64 || defined X86_64 || defined ALPHA || defined LINUX_MIPSN64
+# elif defined IA64 || defined X86_64 || defined ALPHA || defined LINUX_MIPSN64 || (defined POWERPC && defined __powerpc64__)
 			(long long int) tcp->u_arg[1], tcp->u_arg[2]
 # else
 			LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]), tcp->u_arg[3]
@@ -2815,9 +2816,10 @@ int
 sys_fadvise64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
+		ALIGN64(tcp, 1);
 		tprintf("%ld, %lld, %ld, ",
 			tcp->u_arg[0],
-# if defined IA64 || defined X86_64 || defined ALPHA
+# if defined IA64 || defined X86_64 || defined ALPHA || (defined POWERPC && defined __powerpc64__)
 			(long long int) tcp->u_arg[1], tcp->u_arg[2]);
 		printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
 #else
@@ -2842,7 +2844,7 @@ sys_fadvise64_64(struct tcb *tcp)
 #elif defined IA64 || defined X86_64 || defined ALPHA || defined LINUX_MIPSN64
 			(long long int) tcp->u_arg[1], (long long int) tcp->u_arg[2]);
 		printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
-#elif defined ARM
+#elif defined ARM || defined POWERPC
 			LONG_LONG(tcp->u_arg[2], tcp->u_arg[3]),
 			LONG_LONG(tcp->u_arg[4], tcp->u_arg[5]));
 		printxval(advise, tcp->u_arg[1], "POSIX_FADV_???");

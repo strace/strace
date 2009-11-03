@@ -219,7 +219,7 @@
 	{ 5,	0,	sys_putpmsg,		"putpmsg"		}, /* 188 */
 	{ 0,	TP,	sys_vfork,		"vfork"			}, /* 189 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"		}, /* 190 */
-	{ 4,	TD,	sys_readahead,		"readahead"		}, /* 190 */
+	{ 5,	TD,	sys_readahead,		"readahead"		}, /* 190 */
 	{ 6,	0,	sys_mmap,		"mmap2"			}, /* 192 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"		}, /* 193 */
 	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"		}, /* 194 */
