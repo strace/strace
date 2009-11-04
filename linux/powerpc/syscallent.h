@@ -338,7 +338,7 @@
 	{ 4,	TD,	sys_timerfd,		"timerfd"		}, /* 306 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 307 */
 	{ 5,	0,	printargs,		"SYS_308"		}, /* 308 */
-	{ 5,	0,	printargs,		"SYS_309"		}, /* 309 */
+	{ 6,	TF,	sys_fallocate,		"fallocate"		}, /* 309 */
 	{ 3,    0,      sys_subpage_prot,       "subpage_prot"          }, /* 310 */
 	{ 5,	0,	printargs,		"SYS_311"		}, /* 311 */
 	{ 5,	0,	printargs,		"SYS_312"		}, /* 312 */
