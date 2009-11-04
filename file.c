@@ -610,16 +610,10 @@ int
 sys_readahead(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		ALIGN64 (tcp, 1);
-		tprintf("%ld, %lld, %ld", tcp->u_arg[0],
-# if defined LINUX_MIPSN32
-			tcp->ext_arg[1], tcp->u_arg[2]
-# elif defined IA64 || defined X86_64 || defined ALPHA || defined LINUX_MIPSN64 || (defined POWERPC && defined __powerpc64__)
-			(long long int) tcp->u_arg[1], tcp->u_arg[2]
-# else
-			LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]), tcp->u_arg[3]
-# endif
-		);
+		int argn;
+		tprintf("%ld, ", tcp->u_arg[0]);
+		argn = printllval(tcp, "%lld", 1);
+		tprintf(", %ld", tcp->u_arg[argn]);
 	}
 	return 0;
 }
@@ -630,14 +624,13 @@ int
 sys_lseek64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		long long offset;
-		ALIGN64 (tcp, 1);	/* FreeBSD aligns off_t args */
-		offset = LONG_LONG(tcp->u_arg [1], tcp->u_arg[2]);
+		int argn;
+		tprintf("%ld, ", tcp->u_arg[0]);
 		if (tcp->u_arg[3] == SEEK_SET)
-			tprintf("%ld, %llu, ", tcp->u_arg[0], offset);
+			argn = printllval(tcp, "%llu, ", 1);
 		else
-			tprintf("%ld, %lld, ", tcp->u_arg[0], offset);
-		printxval(whence, tcp->u_arg[3], "SEEK_???");
+			argn = printllval(tcp, "%lld, ", 1);
+		printxval(whence, tcp->u_arg[argn], "SEEK_???");
 	}
 	return RVAL_LUDECIMAL;
 }
@@ -660,9 +653,8 @@ int
 sys_truncate64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		ALIGN64 (tcp, 1);
 		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", %llu", LONG_LONG(tcp->u_arg[1],tcp->u_arg[2]));
+		printllval(tcp, ", %llu", 1);
 	}
 	return 0;
 }
@@ -684,9 +676,8 @@ int
 sys_ftruncate64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		ALIGN64 (tcp, 1);
-		tprintf("%ld, %llu", tcp->u_arg[0],
-			LONG_LONG(tcp->u_arg[1] ,tcp->u_arg[2]));
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printllval(tcp, "%llu", 1);
 	}
 	return 0;
 }
@@ -2816,16 +2807,11 @@ int
 sys_fadvise64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		ALIGN64(tcp, 1);
-		tprintf("%ld, %lld, %ld, ",
-			tcp->u_arg[0],
-# if defined IA64 || defined X86_64 || defined ALPHA || (defined POWERPC && defined __powerpc64__)
-			(long long int) tcp->u_arg[1], tcp->u_arg[2]);
-		printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
-#else
-			LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]), tcp->u_arg[3]);
-		printxval(advise, tcp->u_arg[4], "POSIX_FADV_???");
-#endif
+		int argn;
+		tprintf("%ld, ", tcp->u_arg[0]);
+		argn = printllval(tcp, "%lld", 1);
+		tprintf(", %ld, ", tcp->u_arg[argn++]);
+		printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
 	}
 	return 0;
 }
@@ -2836,22 +2822,18 @@ int
 sys_fadvise64_64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %lld, %lld, ",
-			tcp->u_arg[0],
-#if defined LINUX_MIPSN32
-			tcp->ext_arg[1], tcp->ext_arg[2]);
-		printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
-#elif defined IA64 || defined X86_64 || defined ALPHA || defined LINUX_MIPSN64
-			(long long int) tcp->u_arg[1], (long long int) tcp->u_arg[2]);
-		printxval(advise, tcp->u_arg[3], "POSIX_FADV_???");
-#elif defined ARM || defined POWERPC
-			LONG_LONG(tcp->u_arg[2], tcp->u_arg[3]),
-			LONG_LONG(tcp->u_arg[4], tcp->u_arg[5]));
+		int argn;
+		tprintf("%ld, ", tcp->u_arg[0]);
+#if defined ARM || defined POWERPC
+		argn = printllval(tcp, "%lld, ", 2);
+#else
+		argn = printllval(tcp, "%lld, ", 1);
+#endif
+		argn = printllval(tcp, "%lld, ", argn);
+#if defined ARM || defined POWERPC
 		printxval(advise, tcp->u_arg[1], "POSIX_FADV_???");
 #else
-			LONG_LONG(tcp->u_arg[1], tcp->u_arg[2]),
-			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
-		printxval(advise, tcp->u_arg[5], "POSIX_FADV_???");
+		printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
 #endif
 	}
 	return 0;
@@ -2906,12 +2888,11 @@ int
 sys_fallocate(struct tcb *tcp)
 {
 	if (entering(tcp)) {
+		int argn;
 		tprintf("%ld, ", tcp->u_arg[0]);	/* fd */
 		tprintf("%#lo, ", tcp->u_arg[1]);	/* mode */
-		tprintf("%llu, ", LONG_LONG(tcp->u_arg[2],
-			tcp->u_arg[3]));		/* offset */
-		tprintf("%llu", LONG_LONG(tcp->u_arg[4],
-			tcp->u_arg[5]));		/* len */
+		argn = printllval(tcp, "%llu, ", 2);	/* offset */
+		printllval(tcp, "%llu", argn);		/* len */
 	}
 	return 0;
 }

@@ -651,20 +651,6 @@ extern const char *const signalent2[];
 extern const int nsignals2;
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
-#if defined(FREEBSD) || (defined(LINUX) \
-			 && defined(POWERPC) && !defined(__powerpc64__)) \
-  || defined (LINUX_MIPSO32)
-/* ARRGH!  off_t args are aligned on 64 bit boundaries! */
-#define ALIGN64(tcp,arg)						\
-do {									\
-	if (arg % 2)							\
-	    memmove (&tcp->u_arg[arg], &tcp->u_arg[arg + 1],		\
-		     (tcp->u_nargs - arg - 1) * sizeof tcp->u_arg[0]);	\
-} while (0)
-#else
-#define ALIGN64(tcp,arg) do { } while (0)
-#endif
-
 #if HAVE_LONG_LONG
 
 /* _l refers to the lower numbered u_arg,
@@ -678,6 +664,8 @@ do {									\
 #define LONG_LONG(_l,_h) \
     ((long long)((unsigned long long)(unsigned)(_h) | ((unsigned long long)(_l)<<32)))
 #endif
+
+extern int printllval(struct tcb *, const char *, int);
 #endif
 
 #ifdef IA64

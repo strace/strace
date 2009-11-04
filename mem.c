@@ -318,7 +318,6 @@ struct tcb *tcp;
 			return 0;
 #endif /* ALPHA */
 #endif /* linux */
-		ALIGN64 (tcp, 5);	/* FreeBSD wierdies */
 
 		/* addr */
 		tprintf("%#lx, ", u_arg[0]);
@@ -337,7 +336,7 @@ struct tcb *tcp;
 		/* fd */
 		tprintf(", %ld, ", u_arg[4]);
 		/* offset */
-		tprintf("%#llx", LONG_LONG(u_arg[5], u_arg[6]));
+		printllval(tcp, "%#llx", 5);
 	}
 	return RVAL_HEX;
 }

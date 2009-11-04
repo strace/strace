@@ -254,6 +254,42 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 		tprintf("%#x /* %s */", val, dflt);
 }
 
+#if HAVE_LONG_LONG
+/*
+ * Print 64bit argument at position llarg and return the index of the next
+ * argument.
+ */
+int
+printllval(struct tcb *tcp, const char *format, int llarg)
+{
+# if defined(FREEBSD) \
+     || (defined(LINUX) && defined(POWERPC) && !defined(__powerpc64__)) \
+     || defined (LINUX_MIPSO32)
+	/* Align 64bit argument to 64bit boundary.  */
+	if (llarg % 2) llarg++;
+# endif
+# if defined LINUX && defined X86_64
+	if (current_personality == 0) {
+		tprintf(format, tcp->u_arg[llarg]);
+		llarg++;
+	} else {
+		tprintf(format, LONG_LONG(tcp->u_arg[llarg], tcp->u_arg[llarg + 1]));
+		llarg += 2;
+	}
+# elif defined IA64 || defined ALPHA || (defined POWERPC && defined __powerpc64__)
+	tprintf(format, tcp->u_arg[llarg]);
+	llarg++;
+# elif defined LINUX_MIPSN32
+	tprintf(format, tcp->ext_arg[llarg]);
+	llarg++;
+# else
+	tprintf(format, LONG_LONG(tcp->u_arg[llarg], tcp->u_arg[llarg + 1]));
+	llarg += 2;
+# endif
+	return llarg;
+}
+#endif
+
 /*
  * Interpret `xlat' as an array of flags
  * print the entries whose bits are on in `flags'
