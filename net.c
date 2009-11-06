@@ -1605,8 +1605,7 @@ sys_socketpair(struct tcb *tcp)
 }
 
 int
-sys_getsockopt(tcp)
-struct tcb *tcp;
+sys_getsockopt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1648,10 +1647,11 @@ struct tcb *tcp;
 			tprintf("%lu", tcp->u_arg[2]);
 			break;
 		}
+		tprintf (", ");
 	} else {
 		int len;
 		if (syserror(tcp) || umove (tcp, tcp->u_arg[4], &len) < 0) {
-			tprintf(", %#lx, %#lx",
+			tprintf("%#lx, %#lx",
 				tcp->u_arg[3], tcp->u_arg[4]);
 			return 0;
 		}
@@ -1667,7 +1667,7 @@ struct tcb *tcp;
 						   tcp->u_arg[3],
 						   &linger) < 0)
 						break;
-					tprintf(", {onoff=%d, linger=%d}, "
+					tprintf("{onoff=%d, linger=%d}, "
 						"[%d]",
 						linger.l_onoff,
 						linger.l_linger,
@@ -1680,9 +1680,8 @@ struct tcb *tcp;
 			break;
 		}
 
-		tprintf (", ");
 		if (len == sizeof (int)) {
-			printnum(tcp, tcp->u_arg[3], "%ld");
+			printnum_int(tcp, tcp->u_arg[3], "%d");
 		}
 		else {
 			printstr (tcp, tcp->u_arg[3], len);
