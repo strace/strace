@@ -1710,7 +1710,7 @@ struct tcb *tcp;
 	    || restore_arg0 (tcp, &state, tcp->inst[0]) < 0
 	    || restore_arg1 (tcp, &state, tcp->inst[1]) < 0
 	    || arg_finish_change (tcp, &state))
-		return -1;
+		if (errno != ESRCH) return -1;
 	tcp->flags &= ~TCB_BPTSET;
 	return 0;
 }
