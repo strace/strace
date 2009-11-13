@@ -833,6 +833,30 @@ static const struct xlat sockpacketoptions[] = {
 #if defined(PACKET_STATISTICS)
 	{ PACKET_STATISTICS,		"PACKET_STATISTICS"	},
 #endif
+#if defined(PACKET_COPY_THRESH)
+	{ PACKET_COPY_THRESH,		"PACKET_COPY_THRESH"	},
+#endif
+#if defined(PACKET_AUXDATA)
+	{ PACKET_AUXDATA,		"PACKET_AUXDATA"	},
+#endif
+#if defined(PACKET_ORIGDEV)
+	{ PACKET_ORIGDEV,		"PACKET_ORIGDEV"	},
+#endif
+#if defined(PACKET_VERSION)
+	{ PACKET_VERSION,		"PACKET_VERSION"	},
+#endif
+#if defined(PACKET_HDRLEN)
+	{ PACKET_HDRLEN,		"PACKET_HDRLEN"	},
+#endif
+#if defined(PACKET_RESERVE)
+	{ PACKET_RESERVE,		"PACKET_RESERVE"	},
+#endif
+#if defined(PACKET_TX_RING)
+	{ PACKET_TX_RING,		"PACKET_TX_RING"	},
+#endif
+#if defined(PACKET_LOSS)
+	{ PACKET_LOSS,			"PACKET_LOSS"	},
+#endif
 	{ 0,				NULL			},
 };
 #endif /* SOL_PACKET */
@@ -1678,6 +1702,27 @@ sys_getsockopt(struct tcb *tcp)
 #endif
 			}
 			break;
+		case SOL_PACKET:
+			switch (tcp->u_arg[2]) {
+#ifdef PACKET_STATISTICS
+			case PACKET_STATISTICS:
+				if (len == sizeof(struct tpacket_stats)) {
+					struct tpacket_stats stats;
+					if (umove (tcp,
+						   tcp->u_arg[3],
+						   &stats) < 0)
+						break;
+					tprintf("{packets=%u, drops=%u}, "
+						"[%d]",
+						stats.tp_packets,
+						stats.tp_drops,
+						len);
+					return 0;
+				}
+				break;
+#endif
+			}
+			break;
 		}
 
 		if (len == sizeof (int)) {
@@ -1765,6 +1810,28 @@ int len;
 	    case SOL_PACKET:
 		printxval(sockpacketoptions, name, "PACKET_???");
 		/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
+		switch (name) {
+#ifdef PACKET_RX_RING
+		    case PACKET_RX_RING:
+#endif
+#ifdef PACKET_TX_RING
+		    case PACKET_TX_RING:
+#endif
+#if defined(PACKET_RX_RING) || defined(PACKET_TX_RING)
+			if (len == sizeof(struct tpacket_req)) {
+				struct tpacket_req req;
+				if (umove(tcp, addr, &req) < 0)
+					break;
+				tprintf(", {block_size=%u, block_nr=%u, frame_size=%u, frame_nr=%u}",
+					req.tp_block_size,
+					req.tp_block_nr,
+					req.tp_frame_size,
+					req.tp_frame_nr);
+				return 0;
+			}
+			break;
+#endif /* PACKET_RX_RING || PACKET_TX_RING */
+		}
 		break;
 #endif
 #ifdef SOL_TCP
