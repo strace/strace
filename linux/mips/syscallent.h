@@ -4169,7 +4169,7 @@
 	{ 1,	0,	sys_sched_get_priority_min,"sched_get_priority_min"}, /* 4164 */
 	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 4165 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 4166 */
-	{ 4,	0,	sys_mremap,		"mremap"	}, /* 4167 */
+	{ 5,	0,	sys_mremap,		"mremap"	}, /* 4167 */
 	{ 3,	TN,	sys_accept,		"accept"	}, /* 4168 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 4169 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 4170 */
@@ -5350,7 +5350,7 @@
 	{ 1,	0,	sys_pipe,		"pipe"		}, /* 5021 */
 	{ 5,	0,	sys_select,		"_newselect"	}, /* 5022 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	}, /* 5023 */
-	{ 4,	0,	sys_mremap,		"mremap"	}, /* 5024 */
+	{ 5,	0,	sys_mremap,		"mremap"	}, /* 5024 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 5025 */
 	{ 3,	0,	printargs,		"mincore"	}, /* 5026 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 5027 */
@@ -6576,7 +6576,7 @@
 	{ 1,	0,	sys_pipe,		"pipe"		}, /* 6021 */
 	{ 5,	0,	sys_select,		"_newselect"	}, /* 6022 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	}, /* 6023 */
-	{ 4,	0,	sys_mremap,		"mremap"	}, /* 6024 */
+	{ 5,	0,	sys_mremap,		"mremap"	}, /* 6024 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 6025 */
 	{ 3,	0,	printargs,		"mincore"	}, /* 6026 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 6027 */

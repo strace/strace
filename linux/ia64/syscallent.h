@@ -961,7 +961,7 @@
 	{ 2,	0,	sys_mlock,		"mlock"		}, /* 1153 */
 	{ 1,	0,	sys_mlockall,		"mlockall"	}, /* 1154 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 1155 */
-	{ 4,	0,	sys_mremap,		"mremap"	}, /* 1156 */
+	{ 5,	0,	sys_mremap,		"mremap"	}, /* 1156 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 1157 */
 	{ 2,	0,	sys_munlock,		"munlock"	}, /* 1158 */
 	{ 0,	0,	sys_munlockall,		"munlockall"	}, /* 1159 */

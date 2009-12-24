@@ -168,7 +168,7 @@
 	{ 1,	0,	sys_sched_get_priority_min,"sched_get_priority_min"}, /* 160 */
 	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 161 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"		}, /* 162 */
-	{ 4,	0,	sys_mremap,		"mremap"		}, /* 163 */
+	{ 5,	0,	sys_mremap,		"mremap"		}, /* 163 */
 	{ 3,	0,	sys_setresuid,		"setresuid"		}, /* 164 */
 	{ 3,	0,	sys_setresuid,		"getresuid"		}, /* 165 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"		}, /* 166 */

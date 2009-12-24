@@ -248,7 +248,7 @@
 	{ 1,0,sys_sched_get_priority_min,"sched_get_priority_min"},/* 247 */
 	{ 2,	0,sys_sched_rr_get_interval,"sched_rr_get_interval"},/* 248 */
 	{ 2,	0,	sys_nanosleep,	"nanosleep" },		/* 249 */
-	{ 4,	0,	sys_mremap,	"mremap" },		/* 250 */
+	{ 5,	0,	sys_mremap,	"mremap" },		/* 250 */
 	{ 1,	0,	sys_sysctl,	"_sysctl" },		/* 251 */
 	{ 1,	0,	sys_getsid,	"getsid" },		/* 252 */
 	{ 1,	TD,	sys_fdatasync,	"fdatasync" },		/* 253 */

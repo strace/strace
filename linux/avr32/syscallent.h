@@ -84,7 +84,7 @@
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 54 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"		}, /* 55 */
 	{ 2,	0,	sys_setpgid,		"setpgid"	}, /* 56 */
-	{ 4,	0,	sys_mremap,		"mremap"	}, /* 57 */
+	{ 5,	0,	sys_mremap,		"mremap"	}, /* 57 */
 	{ 3,	0,	sys_setresuid,		"setresuid"	}, /* 58 */
 	{ 3,	0,	sys_getresuid,		"getresuid"	}, /* 59 */
 	{ 2,	0,	sys_setreuid,		"setreuid"	}, /* 60 */

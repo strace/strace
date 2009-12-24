@@ -23,7 +23,7 @@
 	{ 1,	TD,	sys_pipe,		"pipe"		},  /* 22 */
 	{ 5,	TD,	sys_select,		"select"	},  /* 23 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"},  /* 24 */
-	{ 4,	0,	sys_mremap,		"mremap"	},  /* 25 */
+	{ 5,	0,	sys_mremap,		"mremap"	},  /* 25 */
 	{ 3,	0,	sys_msync,		"msync"		},  /* 26 */
 	{ 3,	0,	sys_mincore,		"mincore"	},  /* 27 */
 	{ 3,	0,	sys_madvise,		"madvise"	},  /* 28 */
