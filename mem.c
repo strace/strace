@@ -775,7 +775,7 @@ sys_mbind(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
 		printxval(policies, tcp->u_arg[2], "MPOL_???");
 		get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[4], 0);
 		tprintf(", ");
