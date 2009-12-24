@@ -370,6 +370,9 @@ struct tcb *tcp;
 
 static const struct xlat mremap_flags[] = {
 	{ MREMAP_MAYMOVE,	"MREMAP_MAYMOVE"	},
+#ifdef MREMAP_FIXED
+	{ MREMAP_FIXED,		"MREMAP_FIXED"		},
+#endif
 	{ 0,			NULL			}
 };
 
