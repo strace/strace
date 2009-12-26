@@ -679,16 +679,14 @@ internal_syscall(struct tcb *tcp)
 #if defined(FREEBSD) || defined(LINUX) || defined(SUNOS4)
 	    || sys_vfork == func
 #endif
+#ifdef LINUX
+	    || sys_clone == func
+#endif
 #if UNIXWARE > 2
 	    || sys_rfork == func
 #endif
 	   )
 		return internal_fork(tcp);
-
-#if defined(LINUX) && (defined SYS_clone || defined SYS_clone2)
-	if (sys_clone == func)
-		return internal_clone(tcp);
-#endif
 
 	if (   sys_execve == func
 #if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)

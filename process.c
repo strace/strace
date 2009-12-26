@@ -896,13 +896,10 @@ setarg(tcp, argnum)
 }
 #endif
 
-#if defined SYS_clone || defined SYS_clone2
+#ifdef LINUX
 int
-internal_clone(tcp)
-struct tcb *tcp;
+internal_fork(struct tcb *tcp)
 {
-	struct tcb *tcpchild;
-	int pid;
 	if (entering(tcp)) {
 		if (!followfork)
 			return 0;
@@ -910,10 +907,14 @@ struct tcb *tcp;
 		if (setbpt(tcp) < 0)
 			return 0;
 	} else {
-		int bpt = tcp->flags & TCB_BPTSET;
+		struct tcb *tcpchild;
+		int pid;
+		int bpt;
 
 		if (!(tcp->flags & TCB_FOLLOWFORK))
 			return 0;
+
+		bpt = tcp->flags & TCB_BPTSET;
 
 		if (syserror(tcp)) {
 			if (bpt)
@@ -936,7 +937,7 @@ struct tcb *tcp;
 					pid, tcp->pid);
 		}
 		else
-#endif
+#endif /* CLONE_PTRACE */
 		{
 			fork_tcb(tcp);
 			tcpchild = alloctcb(pid);
@@ -952,7 +953,7 @@ struct tcb *tcp;
 			droptcb(tcpchild);
 			return 0;
 		}
-#endif
+#endif /* !CLONE_PTRACE */
 
 		if (bpt)
 			clearbpt(tcp);
@@ -1020,21 +1021,17 @@ Process %u resumed (parent %d ready)\n",
 				++tcp->nclone_detached;
 			}
 		}
-#endif
+#endif /* TCB_CLONE_THREAD */
 	}
 	return 0;
 }
-#endif
+
+#else /* !LINUX */
 
 int
 internal_fork(tcp)
 struct tcb *tcp;
 {
-#ifdef LINUX
-	/* We do special magic with clone for any clone or fork.  */
-	return internal_clone(tcp);
-#else
-
 	struct tcb *tcpchild;
 	int pid;
 	int dont_follow = 0;
@@ -1067,32 +1064,6 @@ struct tcb *tcp;
 		pid = tcp->u_rval;
 		fork_tcb(tcp);
 		tcpchild = alloctcb(pid);
-#ifdef LINUX
-#ifdef HPPA
-		/* The child must have run before it can be attached. */
-		/* This must be a bug in the parisc kernel, but I havn't
-		 * identified it yet.  Seems to be an issue associated
-		 * with attaching to a process (which sends it a signal)
-		 * before that process has ever been scheduled.  When
-		 * debugging, I started seeing crashes in
-		 * arch/parisc/kernel/signal.c:do_signal(), apparently
-		 * caused by r8 getting corrupt over the dequeue_signal()
-		 * call.  Didn't make much sense though...
-		 */
-		{
-			struct timeval tv;
-			tv.tv_sec = 0;
-			tv.tv_usec = 10000;
-			select(0, NULL, NULL, NULL, &tv);
-		}
-#endif
-		if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
-			perror("PTRACE_ATTACH");
-			fprintf(stderr, "Too late?\n");
-			droptcb(tcpchild);
-			return 0;
-		}
-#endif /* LINUX */
 #ifdef SUNOS4
 #ifdef oldway
 		/* The child must have run before it can be attached. */
@@ -1138,8 +1109,9 @@ struct tcb *tcp;
 			fprintf(stderr, "Process %d attached\n", pid);
 	}
 	return 0;
-#endif
 }
+
+#endif /* !LINUX */
 
 #endif /* !USE_PROCFS */
 

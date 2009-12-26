@@ -528,9 +528,6 @@ extern const char *sprint_open_modes(mode_t);
 extern int is_restart_error(struct tcb *);
 
 extern int change_syscall(struct tcb *, int);
-#ifdef LINUX
-extern int internal_clone(struct tcb *);
-#endif
 extern int internal_fork(struct tcb *);
 extern int internal_exec(struct tcb *);
 extern int internal_wait(struct tcb *, int);
