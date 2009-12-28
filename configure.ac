@@ -120,6 +120,10 @@ crisv32)
 	arch=crisv32
 	AC_DEFINE([CRISV32], 1, [Define for the CRISv32 architecture.])
 	;;
+tile*)
+	arch=tile
+	AC_DEFINE([TILE], 1, [Define for the Tile architecture])
+	;;
 *)
 	AC_MSG_RESULT([NO!])
 	AC_MSG_ERROR([architecture $host_cpu is not supported by strace])

@@ -774,6 +774,12 @@ change_syscall(struct tcb *tcp, int new)
 		return -1;
 
 	return 0;
+#elif defined(TILE)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid,
+		   (char*)PTREGS_OFFSET_REG(0),
+		   new) != 0)
+		return -1;
+	return 0;
 #else
 #warning Do not know how to handle change_syscall for this architecture
 #endif /* architecture */
@@ -2954,6 +2960,68 @@ const struct xlat struct_user_offsets[] = {
 	{ 68,			"mmlo"					},
 	{ 69,			"fpcsr"					},
 	{ 70,			"fpeir"					},
+#   elif defined(TILE)
+	{ PTREGS_OFFSET_REG(0),  "r0"  },
+	{ PTREGS_OFFSET_REG(1),  "r1"  },
+	{ PTREGS_OFFSET_REG(2),  "r2"  },
+	{ PTREGS_OFFSET_REG(3),  "r3"  },
+	{ PTREGS_OFFSET_REG(4),  "r4"  },
+	{ PTREGS_OFFSET_REG(5),  "r5"  },
+	{ PTREGS_OFFSET_REG(6),  "r6"  },
+	{ PTREGS_OFFSET_REG(7),  "r7"  },
+	{ PTREGS_OFFSET_REG(8),  "r8"  },
+	{ PTREGS_OFFSET_REG(9),  "r9"  },
+	{ PTREGS_OFFSET_REG(10), "r10" },
+	{ PTREGS_OFFSET_REG(11), "r11" },
+	{ PTREGS_OFFSET_REG(12), "r12" },
+	{ PTREGS_OFFSET_REG(13), "r13" },
+	{ PTREGS_OFFSET_REG(14), "r14" },
+	{ PTREGS_OFFSET_REG(15), "r15" },
+	{ PTREGS_OFFSET_REG(16), "r16" },
+	{ PTREGS_OFFSET_REG(17), "r17" },
+	{ PTREGS_OFFSET_REG(18), "r18" },
+	{ PTREGS_OFFSET_REG(19), "r19" },
+	{ PTREGS_OFFSET_REG(20), "r20" },
+	{ PTREGS_OFFSET_REG(21), "r21" },
+	{ PTREGS_OFFSET_REG(22), "r22" },
+	{ PTREGS_OFFSET_REG(23), "r23" },
+	{ PTREGS_OFFSET_REG(24), "r24" },
+	{ PTREGS_OFFSET_REG(25), "r25" },
+	{ PTREGS_OFFSET_REG(26), "r26" },
+	{ PTREGS_OFFSET_REG(27), "r27" },
+	{ PTREGS_OFFSET_REG(28), "r28" },
+	{ PTREGS_OFFSET_REG(29), "r29" },
+	{ PTREGS_OFFSET_REG(30), "r30" },
+	{ PTREGS_OFFSET_REG(31), "r31" },
+	{ PTREGS_OFFSET_REG(32), "r32" },
+	{ PTREGS_OFFSET_REG(33), "r33" },
+	{ PTREGS_OFFSET_REG(34), "r34" },
+	{ PTREGS_OFFSET_REG(35), "r35" },
+	{ PTREGS_OFFSET_REG(36), "r36" },
+	{ PTREGS_OFFSET_REG(37), "r37" },
+	{ PTREGS_OFFSET_REG(38), "r38" },
+	{ PTREGS_OFFSET_REG(39), "r39" },
+	{ PTREGS_OFFSET_REG(40), "r40" },
+	{ PTREGS_OFFSET_REG(41), "r41" },
+	{ PTREGS_OFFSET_REG(42), "r42" },
+	{ PTREGS_OFFSET_REG(43), "r43" },
+	{ PTREGS_OFFSET_REG(44), "r44" },
+	{ PTREGS_OFFSET_REG(45), "r45" },
+	{ PTREGS_OFFSET_REG(46), "r46" },
+	{ PTREGS_OFFSET_REG(47), "r47" },
+	{ PTREGS_OFFSET_REG(48), "r48" },
+	{ PTREGS_OFFSET_REG(49), "r49" },
+	{ PTREGS_OFFSET_REG(50), "r50" },
+	{ PTREGS_OFFSET_REG(51), "r51" },
+	{ PTREGS_OFFSET_REG(52), "r52" },
+	{ PTREGS_OFFSET_TP, "tp" },
+	{ PTREGS_OFFSET_SP, "sp" },
+	{ PTREGS_OFFSET_LR, "lr" },
+	{ PTREGS_OFFSET_PC, "pc" },
+	{ PTREGS_OFFSET_EX1, "ex1" },
+	{ PTREGS_OFFSET_FAULTNUM, "faultnum" },
+	{ PTREGS_OFFSET_ORIG_R0, "orig_r0" },
+	{ PTREGS_OFFSET_FLAGS, "flags" },
 #   endif
 #   ifdef CRISV10
 	{ 4*PT_FRAMETYPE, "4*PT_FRAMETYPE" },
@@ -3028,7 +3096,7 @@ const struct xlat struct_user_offsets[] = {
 #   if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
 		&& !defined(ALPHA) && !defined(IA64) \
 		&& !defined(CRISV10) && !defined(CRISV32)
-#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN)
+#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN) && !defined(TILE)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 #    endif
 #    if defined(I386) || defined(X86_64)
@@ -3050,13 +3118,13 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
 #    endif
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#    if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
+#    if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64) && !defined(TILE)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
 #    endif
 #    if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
 #    endif
-#    if !defined(ARM) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
+#    if !defined(ARM) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN) && !defined(TILE)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
 #    endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},

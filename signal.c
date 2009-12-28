@@ -230,6 +230,9 @@ static const struct xlat sigact_flags[] = {
 #ifdef _SA_BSDCALL
 	{ _SA_BSDCALL,	"_SA_BSDCALL"	},
 #endif
+#ifdef SA_NOPTRACE
+	{ SA_NOPTRACE,	"SA_NOPTRACE"	},
+#endif
 	{ 0,		NULL		},
 };
 
@@ -1487,6 +1490,33 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(tcp->u_arg[1], &sigm);
 		tcp->u_rval = tcp->u_error = 0;
 
+		if (tcp->u_arg[0] == 0)
+			return 0;
+		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
+		return RVAL_NONE | RVAL_STR;
+	}
+	return 0;
+#elif defined(TILE)
+	struct ucontext uc;
+	long sp;
+
+	/* offset of ucontext in the kernel's sigframe structure */
+#	define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(struct siginfo)
+
+	if (entering(tcp)) {
+		tcp->u_arg[0] = 0;
+		if (upeek(tcp, PTREGS_OFFSET_SP, &sp) < 0)
+			return 0;
+		if (umove(tcp, sp + SIGFRAME_UC_OFFSET, &uc) < 0)
+			return 0;
+		tcp->u_arg[0] = 1;
+		memcpy(tcp->u_arg + 1, &uc.uc_sigmask, sizeof(uc.uc_sigmask));
+	}
+	else {
+		sigset_t sigm;
+
+		memcpy(&sigm, tcp->u_arg + 1, sizeof (sigm));
+		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);

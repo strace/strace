@@ -1281,6 +1281,17 @@ get_scno(struct tcb *tcp)
 # elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp, 4*PT_R9, &scno) < 0)
 		return -1;
+# elif defined(TILE)
+	if (upeek(tcp, PTREGS_OFFSET_REG(10), &scno) < 0)
+		return -1;
+
+	if (!(tcp->flags & TCB_INSYSCALL)) {
+		/* Check if we return from execve. */
+		if (tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
+		}
+	}
 # endif
 #endif /* LINUX */
 
@@ -1684,6 +1695,19 @@ get_error(struct tcb *tcp)
 		}
 		else {
 			tcp->u_rval = r10;
+			u_error = 0;
+		}
+# elif defined(TILE)
+		long rval;
+		/* interpret result as return value or error number */
+		if (upeek(tcp, PTREGS_OFFSET_REG(0), &rval) < 0)
+			return -1;
+		if (rval < 0 && rval > -nerrnos) {
+			tcp->u_rval = -1;
+			u_error = -rval;
+		}
+		else {
+			tcp->u_rval = rval;
 			u_error = 0;
 		}
 # endif
@@ -2210,6 +2234,18 @@ syscall_enter(struct tcb *tcp)
 			tcp->u_nargs = 0;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			if (upeek(tcp, crisregs[i], &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
+#elif defined(TILE)
+	{
+		int i;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else
+			tcp->u_nargs = MAX_ARGS;
+		for (i = 0; i < tcp->u_nargs; ++i) {
+			if (upeek(tcp, PTREGS_OFFSET_REG(i), &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}
