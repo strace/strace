@@ -2555,12 +2555,6 @@ trace_syscall(struct tcb *tcp)
 		decode_subcall(tcp, SYS_semsys_subcall,
 			SYS_semsys_nsubcalls, shift_style);
 		break;
-#if 0 /* broken */
-	case SYS_utssys:
-		decode_subcall(tcp, SYS_utssys_subcall,
-			SYS_utssys_nsubcalls, shift_style);
-		break;
-#endif
 	case SYS_sysfs:
 		decode_subcall(tcp, SYS_sysfs_subcall,
 			SYS_sysfs_nsubcalls, shift_style);

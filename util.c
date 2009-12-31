@@ -93,18 +93,6 @@
 #define MIN(a,b)		(((a) < (b)) ? (a) : (b))
 #endif
 
-#if 0
-void
-tv_tv(tv, a, b)
-struct timeval *tv;
-int a;
-int b;
-{
-	tv->tv_sec = a;
-	tv->tv_usec = b;
-}
-#endif
-
 int
 tv_nz(a)
 struct timeval *a;
@@ -817,39 +805,6 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 
 #ifdef SUNOS4
 	int pid = tcp->pid;
-#if 0
-	int n, m;
-	union {
-		long val;
-		char x[sizeof(long)];
-	} u;
-
-	if (addr & (sizeof(long) - 1)) {
-		/* addr not a multiple of sizeof(long) */
-		n = addr - (addr & -sizeof(long)); /* residue */
-		addr &= -sizeof(long); /* residue */
-		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
-		if (errno) {
-			if (errno != ESRCH)
-				perror("umoven");
-			return -1;
-		}
-		memcpy(laddr, &u.x[n], m = MIN(sizeof(long) - n, len));
-		addr += sizeof(long), laddr += m, len -= m;
-	}
-	while (len) {
-		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
-		if (errno) {
-			if (errno != ESRCH)
-				perror("umoven");
-			return -1;
-		}
-		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
-		addr += sizeof(long), laddr += m, len -= m;
-	}
-#else /* !oldway */
 	int n;
 
 	while (len) {
@@ -867,7 +822,6 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		addr += n;
 		laddr += n;
 	}
-#endif /* !oldway */
 #endif /* SUNOS4 */
 
 #ifdef USE_PROCFS
@@ -992,21 +946,6 @@ long addr;
 int len;
 char *laddr;
 {
-# if 0
-	int n;
-
-	while (len) {
-		n = MIN(len, PAGSIZ);
-		n = MIN(n, ((addr + PAGSIZ) & PAGMASK) - addr);
-		if (ptrace(cmd, pid, (char *)addr, n, laddr) < 0) {
-			perror("uload: ptrace(PTRACE_WRITE, ...)");
-			return -1;
-		}
-		len -= n;
-		addr += n;
-		laddr += n;
-	}
-# else
 	int peek, poke;
 	int n, m;
 	union {
@@ -1049,7 +988,6 @@ char *laddr;
 		}
 		addr += sizeof(long), laddr += m, len -= m;
 	}
-# endif
 	return 0;
 }
 
@@ -1122,95 +1060,6 @@ long *res;
 }
 
 #endif /* !USE_PROCFS */
-
-#if 0
-long
-getpc(struct tcb *tcp)
-{
-
-#ifdef LINUX
-	long pc;
-# if defined(I386)
-	if (upeek(tcp, 4*EIP, &pc) < 0)
-		return -1;
-# elif defined(X86_64)
-	if (upeek(tcp, 8*RIP, &pc) < 0)
-		return -1;
-# elif defined(IA64)
-	if (upeek(tcp, PT_B0, &pc) < 0)
-		return -1;
-# elif defined(ARM)
-	if (upeek(tcp, 4*15, &pc) < 0)
-		return -1;
-# elif defined(AVR32)
-	if (upeek(tcp, REG_PC, &pc) < 0)
-		return -1;
-# elif defined(BFIN)
-	if (upeek(tcp, REG_PC, &pc) < 0)
-		return -1;
-# elif defined(POWERPC)
-	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0)
-		return -1;
-# elif defined(M68K)
-	if (upeek(tcp, 4*PT_PC, &pc) < 0)
-		return -1;
-# elif defined(ALPHA)
-	if (upeek(tcp, REG_PC, &pc) < 0)
-		return -1;
-# elif defined(MIPS)
-	if (upeek(tcp, REG_EPC, &pc) < 0)
-		return -1;
-# elif defined(SPARC) || defined(SPARC64)
-	struct pt_regs regs;
-	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0)
-		return -1;
-#  if defined(SPARC64)
-	pc = regs.tpc;
-#  else
-	pc = regs.pc;
-#  endif
-# elif defined(S390) || defined(S390X)
-	if(upeek(tcp,PT_PSWADDR,&pc) < 0)
-		return -1;
-# elif defined(HPPA)
-	if(upeek(tcp,PT_IAOQ0,&pc) < 0)
-		return -1;
-# elif defined(SH)
-	if (upeek(tcp, 4*REG_PC ,&pc) < 0)
-		return -1;
-# elif defined(SH64)
-	if (upeek(tcp, REG_PC ,&pc) < 0)
-		return -1;
-# endif
-	return pc;
-#endif /* LINUX */
-
-#ifdef SUNOS4
-	/*
-	 * Return current program counter for `pid'
-	 * Assumes PC is never 0xffffffff
-	 */
-	struct regs regs;
-
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *) &regs, 0) < 0) {
-		perror("getpc: ptrace(PTRACE_GETREGS, ...)");
-		return -1;
-	}
-	return regs.r_pc;
-#endif /* SUNOS4 */
-
-#ifdef SVR4
-	/* XXX */
-	return 0;
-#endif /* SVR4 */
-
-#ifdef FREEBSD
-	struct reg regs;
-	pread(tcp->pfd_reg, &regs, sizeof(regs), 0);
-	return regs.r_eip;
-#endif /* FREEBSD */
-}
-#endif /* 0 */
 
 void
 printcall(struct tcb *tcp)
@@ -1397,7 +1246,7 @@ printcall(struct tcb *tcp)
  */
 #ifndef USE_PROCFS
 
-# if defined LINUX
+#ifdef LINUX
 
 #  include "syscall.h"
 
@@ -1721,206 +1570,6 @@ int
 setbpt(tcp)
 struct tcb *tcp;
 {
-#  ifdef LINUX
-	DEAD CODE HERE? WE ARE IN 'else !defined LINUX'
-#   if defined (SPARC) || defined (SPARC64)
-	/* We simply use the SunOS breakpoint code. */
-
-	struct regs regs;
-	unsigned long inst;
-#    define LOOPA	0x30800000	/* ba,a	0 */
-
-	if (tcp->flags & TCB_BPTSET) {
-		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
-		return -1;
-	}
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-		perror("setbpt: ptrace(PTRACE_GETREGS, ...)");
-		return -1;
-	}
-	tcp->baddr = regs.r_o7 + 8;
-	errno = 0;
-	tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)tcp->baddr, 0);
-	if(errno) {
-		perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
-		return -1;
-	}
-
-	/*
-	 * XXX - BRUTAL MODE ON
-	 * We cannot set a real BPT in the child, since it will not be
-	 * traced at the moment it will reach the trap and would probably
-	 * die with a core dump.
-	 * Thus, we are force our way in by taking out two instructions
-	 * and insert an eternal loop instead, in expectance of the SIGSTOP
-	 * generated by our PTRACE_ATTACH.
-	 * Of cause, if we evaporate ourselves in the middle of all this...
-	 */
-	errno = 0;
-	inst = LOOPA;
-#    if defined (SPARC64)
-	inst <<= 32;
-	inst |= (tcp->inst[0] & 0xffffffffUL);
-#    endif
-	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, inst);
-	if(errno) {
-		perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
-		return -1;
-	}
-	tcp->flags |= TCB_BPTSET;
-
-#   else /* !SPARC && !SPARC64 */
-#    ifdef IA64
-	if (ia32) {
-#		define LOOP	0x0000feeb
-		if (tcp->flags & TCB_BPTSET) {
-			fprintf(stderr, "PANIC: bpt already set in pid %u\n",
-				tcp->pid);
-			return -1;
-		}
-		if (upeek(tcp, PT_CR_IIP, &tcp->baddr) < 0)
-			return -1;
-		if (debug)
-			fprintf(stderr, "[%d] setting bpt at %lx\n",
-				tcp->pid, tcp->baddr);
-		tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, tcp->pid,
-				      (char *) tcp->baddr, 0);
-		if (errno) {
-			perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
-			return -1;
-		}
-		ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, LOOP);
-		if (errno) {
-			perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
-			return -1;
-		}
-		tcp->flags |= TCB_BPTSET;
-	} else {
-		/*
-		 * Our strategy here is to replace the bundle that
-		 * contained the clone() syscall with a bundle of the
-		 * form:
-		 *
-		 *	{ 1: br 1b; br 1b; br 1b }
-		 *
-		 * This ensures that the newly forked child will loop
-		 * endlessly until we've got a chance to attach to it.
-		 */
-# 			define LOOP0	0x0000100000000017
-# 			define LOOP1	0x4000000000200000
-		unsigned long addr, ipsr;
-		pid_t pid;
-
-		pid = tcp->pid;
-		if (upeek(tcp, PT_CR_IPSR, &ipsr) < 0)
-			return -1;
-		if (upeek(tcp, PT_CR_IIP, &addr) < 0)
-			return -1;
-		/* store "ri" in low two bits */
-		tcp->baddr = addr | ((ipsr >> 41) & 0x3);
-
-		errno = 0;
-		tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, pid, (char *) addr + 0,
-				      0);
-		tcp->inst[1] = ptrace(PTRACE_PEEKTEXT, pid, (char *) addr + 8,
-				      0);
-		if (errno) {
-			perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
-			return -1;
-		}
-
-		errno = 0;
-		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 0, LOOP0);
-		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 8, LOOP1);
-		if (errno) {
-			perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
-			return -1;
-		}
-		tcp->flags |= TCB_BPTSET;
-	}
-#    else /* !IA64 */
-
-#     if defined (I386) || defined(X86_64)
-#      define LOOP	0x0000feeb
-#     elif defined (M68K)
-#      define LOOP	0x60fe0000
-#     elif defined (ALPHA)
-#      define LOOP	0xc3ffffff
-#     elif defined (POWERPC)
-#      define LOOP	0x48000000
-#     elif defined(ARM)
-#      define LOOP	0xEAFFFFFE
-#     elif defined(MIPS)
-#      define LOOP	0x1000ffff
-#     elif defined(S390)
-#      define LOOP	0xa7f40000	/* BRC 15,0 */
-#     elif defined(S390X)
-#      define LOOP   0xa7f4000000000000UL /* BRC 15,0 */
-#     elif defined(HPPA)
-#      define LOOP	0xe81f1ff7	/* b,l,n <loc>,r0 */
-#     elif defined(SH)
-#      ifdef __LITTLE_ENDIAN__
-#       define LOOP   0x0000affe
-#      else
-#       define LOOP   0xfeaf0000
-#      endif
-#     else
-#      error unknown architecture
-#     endif
-
-	if (tcp->flags & TCB_BPTSET) {
-		fprintf(stderr, "PANIC: bpt already set in pid %u\n", tcp->pid);
-		return -1;
-	}
-#     if defined (I386)
-	if (upeek(tcp, 4*EIP, &tcp->baddr) < 0)
-		return -1;
-#     elif defined (X86_64)
-	if (upeek(tcp, 8*RIP, &tcp->baddr) < 0)
-		return -1;
-#     elif defined (M68K)
-	if (upeek(tcp, 4*PT_PC, &tcp->baddr) < 0)
-		return -1;
-#     elif defined (ALPHA)
-	return -1;
-#     elif defined (ARM)
-	return -1;
-#     elif defined (MIPS)
-	return -1;		/* FIXME: I do not know what i do - Flo */
-#     elif defined (POWERPC)
-	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &tcp->baddr) < 0)
-		return -1;
-#     elif defined(S390) || defined(S390X)
-	if (upeek(tcp,PT_PSWADDR, &tcp->baddr) < 0)
-		return -1;
-#     elif defined(HPPA)
-	if (upeek(tcp, PT_IAOQ0, &tcp->baddr) < 0)
-		return -1;
-	tcp->baddr &= ~0x03;
-#     elif defined(SH)
-	if (upeek(tcp, 4*REG_PC, &tcp->baddr) < 0)
-		return -1;
-#     else
-#      error unknown architecture
-#     endif
-	if (debug)
-		fprintf(stderr, "[%d] setting bpt at %lx\n", tcp->pid, tcp->baddr);
-	tcp->inst[0] = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *) tcp->baddr, 0);
-	if (errno) {
-		perror("setbpt: ptrace(PTRACE_PEEKTEXT, ...)");
-		return -1;
-	}
-	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, LOOP);
-	if (errno) {
-		perror("setbpt: ptrace(PTRACE_POKETEXT, ...)");
-		return -1;
-	}
-	tcp->flags |= TCB_BPTSET;
-
-#    endif /* !IA64 */
-#   endif /* !SPARC && !SPARC64 */
-#  endif /* LINUX */
-
 #  ifdef SUNOS4
 #   ifdef SPARC	/* This code is slightly sparc specific */
 
@@ -1977,204 +1626,6 @@ int
 clearbpt(tcp)
 struct tcb *tcp;
 {
-
-#  ifdef LINUX
-	DEAD CODE HERE? WE ARE IN 'else !defined LINUX'
-#   if defined(I386) || defined(X86_64)
-	long eip;
-#   elif defined(POWERPC)
-	long pc;
-#   elif defined(M68K)
-	long pc;
-#   elif defined(ALPHA)
-	long pc;
-#   elif defined(HPPA)
-	long iaoq;
-#   elif defined(SH)
-	long pc;
-#   endif /* architecture */
-
-#   if defined (SPARC) || defined (SPARC64)
-	/* Again, we borrow the SunOS breakpoint code. */
-	if (!(tcp->flags & TCB_BPTSET)) {
-		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
-		return -1;
-	}
-	errno = 0;
-	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, tcp->inst[0]);
-	if(errno) {
-		perror("clearbtp: ptrace(PTRACE_POKETEXT, ...)");
-		return -1;
-	}
-	tcp->flags &= ~TCB_BPTSET;
-#   elif defined(IA64)
-	if (ia32) {
-		unsigned long addr;
-
-		if (debug)
-			fprintf(stderr, "[%d] clearing bpt\n", tcp->pid);
-		if (!(tcp->flags & TCB_BPTSET)) {
-			fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
-			return -1;
-		}
-		errno = 0;
-		ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, tcp->inst[0]);
-		if (errno) {
-			perror("clearbtp: ptrace(PTRACE_POKETEXT, ...)");
-			return -1;
-		}
-		tcp->flags &= ~TCB_BPTSET;
-
-		if (upeek(tcp, PT_CR_IIP, &addr) < 0)
-			return -1;
-		if (addr != tcp->baddr) {
-			/* The breakpoint has not been reached yet.  */
-			if (debug)
-				fprintf(stderr,
-					"NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-						addr, tcp->baddr);
-			return 0;
-		}
-	} else {
-		unsigned long addr, ipsr;
-		pid_t pid;
-
-		pid = tcp->pid;
-
-		if (upeek(tcp, PT_CR_IPSR, &ipsr) < 0)
-			return -1;
-		if (upeek(tcp, PT_CR_IIP, &addr) < 0)
-			return -1;
-
-		/* restore original bundle: */
-		errno = 0;
-		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 0, tcp->inst[0]);
-		ptrace(PTRACE_POKETEXT, pid, (char *) addr + 8, tcp->inst[1]);
-		if (errno) {
-			perror("clearbpt: ptrace(PTRACE_POKETEXT, ...)");
-			return -1;
-		}
-
-		/* restore original "ri" in ipsr: */
-		ipsr = (ipsr & ~(0x3ul << 41)) | ((tcp->baddr & 0x3) << 41);
-		errno = 0;
-		ptrace(PTRACE_POKEUSER, pid, (char *) PT_CR_IPSR, ipsr);
-		if (errno) {
-			perror("clrbpt: ptrace(PTRACE_POKEUSER, ...)");
-			return -1;
-		}
-
-		tcp->flags &= ~TCB_BPTSET;
-
-		if (addr != (tcp->baddr & ~0x3)) {
-			/* the breakpoint has not been reached yet.  */
-			if (debug)
-				fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-					addr, tcp->baddr);
-			return 0;
-		}
-	}
-#   else /* !IA64 && !SPARC && !SPARC64 */
-
-	if (debug)
-		fprintf(stderr, "[%d] clearing bpt\n", tcp->pid);
-	if (!(tcp->flags & TCB_BPTSET)) {
-		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
-		return -1;
-	}
-	errno = 0;
-	ptrace(PTRACE_POKETEXT, tcp->pid, (char *) tcp->baddr, tcp->inst[0]);
-	if (errno) {
-		perror("clearbtp: ptrace(PTRACE_POKETEXT, ...)");
-		return -1;
-	}
-	tcp->flags &= ~TCB_BPTSET;
-
-#    ifdef I386
-	if (upeek(tcp, 4*EIP, &eip) < 0)
-		return -1;
-	if (eip != tcp->baddr) {
-		/* The breakpoint has not been reached yet.  */
-		if (debug)
-			fprintf(stderr,
-				"NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-					eip, tcp->baddr);
-		return 0;
-	}
-#    elif defined(X86_64)
-	if (upeek(tcp, 8*RIP, &eip) < 0)
-		return -1;
-	if (eip != tcp->baddr) {
-		/* The breakpoint has not been reached yet.  */
-		if (debug)
-			fprintf(stderr,
-				"NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-					eip, tcp->baddr);
-		return 0;
-	}
-#    elif defined(POWERPC)
-	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0)
-		return -1;
-	if (pc != tcp->baddr) {
-		/* The breakpoint has not been reached yet.  */
-		if (debug)
-			fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-				pc, tcp->baddr);
-		return 0;
-	}
-#    elif defined(M68K)
-	if (upeek(tcp, 4*PT_PC, &pc) < 0)
-		return -1;
-	if (pc != tcp->baddr) {
-		/* The breakpoint has not been reached yet.  */
-		if (debug)
-			fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-				pc, tcp->baddr);
-		return 0;
-	}
-#    elif defined(ALPHA)
-	if (upeek(tcp, REG_PC, &pc) < 0)
-		return -1;
-	if (pc != tcp->baddr) {
-		/* The breakpoint has not been reached yet.  */
-		if (debug)
-			fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-				pc, tcp->baddr);
-		return 0;
-	}
-#    elif defined(HPPA)
-	if (upeek(tcp, PT_IAOQ0, &iaoq) < 0)
-		return -1;
-	iaoq &= ~0x03;
-	if (iaoq != tcp->baddr && iaoq != tcp->baddr + 4) {
-		/* The breakpoint has not been reached yet.  */
-		if (debug)
-			fprintf(stderr, "NOTE: PC not at bpt (iaoq %#lx baddr %#lx)\n",
-				iaoq, tcp->baddr);
-		return 0;
-	}
-	iaoq = tcp->baddr | 3;
-	/* We should be pointing at a 'ldi -1000,r1' in glibc, so it is
-	 * safe to set both IAOQ0 and IAOQ1 to that so the PSW N bit
-	 * has no significant effect.
-	 */
-	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ0, iaoq);
-	ptrace(PTRACE_POKEUSER, tcp->pid, (void *)PT_IAOQ1, iaoq);
-#    elif defined(SH)
-	if (upeek(tcp, 4*REG_PC, &pc) < 0)
-		return -1;
-	if (pc != tcp->baddr) {
-		/* The breakpoint has not been reached yet.  */
-		if (debug)
-			fprintf(stderr, "NOTE: PC not at bpt (pc %#lx baddr %#lx)\n",
-				pc, tcp->baddr);
-		return 0;
-	}
-
-#    endif /* arch */
-#   endif /* !SPARC && !SPARC64 && !IA64 */
-#  endif /* LINUX */
-
 #  ifdef SUNOS4
 #   ifdef SPARC
 
@@ -2293,13 +1744,6 @@ struct tcb *tcp;
 					(int)ld.ld_symb_size, strtab) < 0)
 		goto err;
 
-# if 0
-	for (cp = strtab; cp < strtab + ld.ld_symb_size; ) {
-		fprintf(stderr, "[symbol: %s]\n", cp);
-		cp += strlen(cp)+1;
-	}
-	return 0;
-# endif
 	for (cp = strtab; cp < strtab + ld.ld_symb_size; ) {
 		if (strcmp(cp, "_vfork") == 0) {
 			if (debug)

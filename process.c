@@ -88,9 +88,9 @@
 #endif /* LINUX && SPARC64 */
 
 #ifdef HAVE_LINUX_FUTEX_H
-#include <linux/futex.h>
+# include <linux/futex.h>
 #endif
-#if defined LINUX
+#ifdef LINUX
 # ifndef FUTEX_WAIT
 #  define FUTEX_WAIT 0
 # endif
@@ -103,7 +103,7 @@
 # ifndef FUTEX_REQUEUE
 #  define FUTEX_REQUEUE 3
 # endif
-#endif
+#endif /* LINUX */
 
 #ifdef LINUX
 #include <sched.h>
@@ -120,15 +120,8 @@
 #endif
 
 #ifdef HAVE_PRCTL
-#include <sys/prctl.h>
-#endif
+# include <sys/prctl.h>
 
-#ifndef WCOREDUMP
-#define WCOREDUMP(status) ((status) & 0200)
-#endif
-
-/* WTA: this was `&& !defined(LINUXSPARC)', this seems unneeded though? */
-#if defined(HAVE_PRCTL)
 static const struct xlat prctl_options[] = {
 #ifdef PR_MAXPROCS
 	{ PR_MAXPROCS,		"PR_MAXPROCS"		},
@@ -365,7 +358,6 @@ struct tcb *tcp;
 	}
 	return 0;
 }
-
 #endif /* HAVE_PRCTL */
 
 #if defined(FREEBSD) || defined(SUNOS4) || defined(SVR4)
@@ -672,7 +664,7 @@ sys_unshare(struct tcb *tcp)
 		printflags(clone_flags, tcp->u_arg[0], "CLONE_???");
 	return 0;
 }
-#endif
+#endif /* LINUX */
 
 int
 sys_fork(tcp)
@@ -686,7 +678,7 @@ struct tcb *tcp;
 int
 change_syscall(struct tcb *tcp, int new)
 {
-#if defined(LINUX)
+#ifdef LINUX
 #if defined(I386)
 	/* Attempt to make vfork into fork, which we can follow. */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0)
@@ -788,113 +780,6 @@ change_syscall(struct tcb *tcp, int new)
 #endif /* LINUX */
 	return -1;
 }
-
-#if 0
-int
-setarg(tcp, argnum)
-	struct tcb *tcp;
-	int argnum;
-{
-#if defined(AVR32)
-	{
-		errno = 0;
-		if (argnum == 0)
-			ptrace(PTRACE_POKEUSER, tcp->pid,
-			       (char *)(REG_R12_ORIG),
-			       tcp->u_arg[argnum]);
-		else if (argnum < 4)
-			/* r11 .. r9 */
-			ptrace(PTRACE_POKEUSER, tcp->pid,
-			       (char *)(REG_R12 - 4 * argnum),
-			       tcp->u_arg[argnum]);
-		else if (argnum < 5)
-			/* r5 */
-			ptrace(PTRACE_POKEUSER, tcp->pid,
-			       (char *)(REG_R5),
-			       tcp->u_arg[argnum]);
-		else if (argnum < 6)
-			/* r3 */
-			ptrace(PTRACE_POKEUSER, tcp->pid,
-			       (char *)(REG_R3),
-			       tcp->u_arg[argnum]);
-		else
-			return -E2BIG;
-		if (errno)
-			return -1;
-	}
-#elif defined(IA64)
-	{
-		unsigned long *bsp, *ap;
-
-		if (upeek(tcp, PT_AR_BSP, (long *) &bsp) , 0)
-			return -1;
-
-		ap = ia64_rse_skip_regs(bsp, argnum);
-		errno = 0;
-		ptrace(PTRACE_POKEDATA, tcp->pid, (char *) ap, tcp->u_arg[argnum]);
-		if (errno)
-			return -1;
-
-	}
-#elif defined(I386)
-	{
-		ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*argnum), tcp->u_arg[argnum]);
-		if (errno)
-			return -1;
-	}
-#elif defined(X86_64)
-	{
-		ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(8*(long)argnum), tcp->u_arg[argnum]);
-		if (errno)
-			return -1;
-	}
-#elif defined(POWERPC)
-#ifndef PT_ORIG_R3
-#define PT_ORIG_R3 34
-#endif
-	{
-		ptrace(PTRACE_POKEUSER, tcp->pid,
-		       (char*)((argnum==0 ? PT_ORIG_R3 : argnum+PT_R3)*sizeof(unsigned long)),
-		       tcp->u_arg[argnum]);
-		if (errno)
-			return -1;
-	}
-#elif defined(MIPS)
-	{
-		errno = 0;
-		if (argnum < 4)
-			ptrace(PTRACE_POKEUSER, tcp->pid,
-			       (char*)(REG_A0 + argnum), tcp->u_arg[argnum]);
-		else {
-			unsigned long *sp;
-
-			if (upeek(tcp, REG_SP, (long *) &sp) , 0)
-				return -1;
-
-			ptrace(PTRACE_POKEDATA, tcp->pid,
-			       (char*)(sp + argnum - 4), tcp->u_arg[argnum]);
-		}
-		if (errno)
-			return -1;
-	}
-#elif defined(S390) || defined(S390X)
-	{
-		if(argnum <= 5)
-			ptrace(PTRACE_POKEUSER, tcp->pid,
-			       (char *) (argnum==0 ? PT_ORIGGPR2 :
-			       PT_GPR2 + argnum*sizeof(long)),
-			       tcp->u_arg[argnum]);
-		else
-			return -E2BIG;
-		if (errno)
-			return -1;
-	}
-#else
-# warning Sorry, setargs not implemented for this architecture.
-#endif
-	return 0;
-}
-#endif
 
 #ifdef LINUX
 int
@@ -1725,7 +1610,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-#endif
+#endif /* UNIXWARE */
 
 
 static void
@@ -1777,17 +1662,12 @@ long addr;
 
 #if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)
 int
-sys_execv(tcp)
-struct tcb *tcp;
+sys_execv(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		if (!verbose(tcp))
 			tprintf(", %#lx", tcp->u_arg[1]);
-#if 0
-		else if (abbrev(tcp))
-			printargc(", [/* %d arg%s */]", tcp, tcp->u_arg[1]);
-#endif
 		else {
 			tprintf(", [");
 			printargv(tcp, tcp->u_arg[1]);
@@ -1799,17 +1679,12 @@ struct tcb *tcp;
 #endif /* SPARC || SPARC64 || SUNOS4 */
 
 int
-sys_execve(tcp)
-struct tcb *tcp;
+sys_execve(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		if (!verbose(tcp))
 			tprintf(", %#lx", tcp->u_arg[1]);
-#if 0
-		else if (abbrev(tcp))
-			printargc(", [/* %d arg%s */]", tcp, tcp->u_arg[1]);
-#endif
 		else {
 			tprintf(", [");
 			printargv(tcp, tcp->u_arg[1]);
@@ -1907,8 +1782,12 @@ static const struct xlat wait4_options[] = {
 # define WCOREFLAG WCOREFLG
 #endif
 #ifndef WCOREFLAG
-#define WCOREFLAG 0x80
+# define WCOREFLAG 0x80
 #endif
+#ifndef WCOREDUMP
+# define WCOREDUMP(status) ((status) & 0200)
+#endif
+
 
 #ifndef W_STOPCODE
 #define W_STOPCODE(sig)		((sig) << 8 | 0x7f)
@@ -2735,12 +2614,6 @@ const struct xlat struct_user_offsets[] = {
 	{ 8*RDX,		"8*RDX"					},
 	{ 8*RSI,		"8*RSI"					},
 	{ 8*RDI,		"8*RDI"					},
-#    if 0
-	{ DS,			"DS"					},
-	{ ES,			"ES"					},
-	{ FS,			"FS"					},
-	{ GS,			"GS"					},
-#    endif
 	{ 8*ORIG_RAX,		"8*ORIG_RAX"				},
 	{ 8*RIP,		"8*RIP"					},
 	{ 8*CS,			"8*CS"					},

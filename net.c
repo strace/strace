@@ -2045,17 +2045,6 @@ struct tcb *tcp;
 
 }
 
-#if 0
-
-int
-sys_xsetsockaddr(tcp)
-struct tcb *tcp;
-{
-	return netlib_call (tcp, sys_setsockaddr);
-}
-
-#endif
-
 int
 sys_xgetsockopt(tcp)
 struct tcb *tcp;
@@ -2077,4 +2066,4 @@ struct tcb *tcp;
 	return netlib_call (tcp, sys_shutdown);
 }
 
-#endif
+#endif /* UNIXWARE */

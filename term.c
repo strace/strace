@@ -178,10 +178,7 @@ static const struct xlat modem_flags[] = {
 };
 
 
-int
-term_ioctl(tcp, code, arg)
-struct tcb *tcp;
-long code, arg;
+int term_ioctl(struct tcb *tcp, long code, long arg)
 {
 	struct termios tios;
 #ifndef FREEBSD
@@ -416,14 +413,6 @@ long code, arg;
 		tprintf(", ");
 		printnum_int(tcp, arg, "%d");
 		return 1;
-
-#if 0
-	/* ioctls with an indirect parameter displayed in hex */
-
-		tprintf(", ");
-		printnum(tcp, arg, "%#x");
-		return 1;
-#endif
 
 	/* ioctls with an indirect parameter displayed as a char */
 

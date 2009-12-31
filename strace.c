@@ -1655,21 +1655,12 @@ int sig;
 
 #ifdef USE_PROCFS
 
-static void
-reaper(sig)
-int sig;
+static void reaper(int sig)
 {
 	int pid;
 	int status;
 
 	while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-#if 0
-		struct tcb *tcp;
-
-		tcp = pid2tcb(pid);
-		if (tcp)
-			droptcb(tcp);
-#endif
 	}
 }
 
@@ -2322,12 +2313,6 @@ trace()
 				 * version of SunOS sometimes reports
 				 * ECHILD before sending us SIGCHILD.
 				 */
-#if 0
-				if (nprocs == 0)
-					return 0;
-				fprintf(stderr, "strace: proc miscount\n");
-				exit(1);
-#endif
 				return 0;
 			default:
 				errno = wait_errno;

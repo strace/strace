@@ -545,7 +545,6 @@ extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
 #endif
 
-extern void tv_tv(struct timeval *, int, int);
 extern int tv_nz(struct timeval *);
 extern int tv_cmp(struct timeval *, struct timeval *);
 extern double tv_float(struct timeval *);

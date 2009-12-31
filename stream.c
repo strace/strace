@@ -1033,10 +1033,7 @@ int len;
 #endif /* TI_BIND */
 
 
-static int
-internal_stream_ioctl(tcp, arg)
-struct tcb *tcp;
-int arg;
+static int internal_stream_ioctl(struct tcb *tcp, int arg)
 {
 	struct strioctl si;
 	struct ioctlent *iop;
@@ -1151,9 +1148,6 @@ int arg;
 	case SI_GETUDATA:
 		if (entering(tcp))
 			break;
-#if 0
-		tprintf("struct si_udata ");
-#endif
 		if (umove(tcp, (int) si.ic_dp, &udata) < 0)
 			tprintf("{...}");
 		else {
@@ -1164,9 +1158,6 @@ int arg;
 			tprintf("servtype=%d, so_state=%d, ",
 				udata.servtype, udata.so_state);
 			tprintf("so_options=%d", udata.so_options);
-#if 0
-			tprintf(", tsdusize=%d", udata.tsdusize);
-#endif
 			tprintf("}");
 		}
 		break;

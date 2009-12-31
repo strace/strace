@@ -1513,17 +1513,11 @@ struct tcb *tcp;
 }
 
 int
-sys_sigsuspend(tcp)
-struct tcb *tcp;
+sys_sigsuspend(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[2], &sigm);
-#if 0
-		/* first two are not really arguments, but print them anyway */
-		/* nevermind, they are an anachronism now, too bad... */
-		tprintf("%d, %#x, ", tcp->u_arg[0], tcp->u_arg[1]);
-#endif
 		printsigmask(&sigm, 0);
 	}
 	return 0;
