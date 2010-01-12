@@ -1540,7 +1540,7 @@ int sig;
 #endif
 
 	if (tcp->flags & TCB_BPTSET)
-		sig = SIGKILL;
+		clearbpt(tcp);
 
 #ifdef LINUX
 	/*
