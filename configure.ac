@@ -4,7 +4,7 @@ AC_INIT([strace],[4.5.20])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([foreign check-news dist-bzip2 no-dist-gzip])
+AM_INIT_AUTOMAKE([foreign check-news dist-bzip2 no-dist-gzip silent-rules])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
