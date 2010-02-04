@@ -1,6 +1,14 @@
 #! /usr/bin/make -f
 
-#export DH_VERBOSE=1
+export DH_VERBOSE=1
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+  CFLAGS += -O0
+else
+  CFLAGS += -O2
+endif
 
 DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_HOST_GNU_TYPE := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
@@ -35,6 +43,9 @@ build64/Makefile:
 	cd $(@D); CC="$(CC64)" sh ../configure --prefix=/usr --build=$(DEB_BUILD_GNU_TYPE) --host=$(HOST64)
 
 clean:
+	dh_testdir
+	dh_testroot
+	dh_prep
 	dh_clean
 	rm -rf debian/strace debian/strace-udeb debian/substvars debian/files debian/files~
 	rm -rf build64 stamp-build64 strace64.1
@@ -44,7 +55,7 @@ binary: binary-indep binary-arch
 
 binary-indep:
 
-binary-arch: build checkroot
+binary-arch: build
 	test -f stamp-build || make $(MFLAGS) -f debian/rules build
 
 	# prepare 64bit executable and manpage, if it has been built
@@ -68,6 +79,3 @@ binary-arch: build checkroot
 	dh_gencontrol -s
 	dh_md5sums -s
 	dh_builddeb -s
-
-checkroot:
-	test root = "`whoami`"

@@ -1,16 +1,14 @@
 Source: strace
 Maintainer: Frederik Schüler <fs@debian.org>
 Section: utils
-Priority: standard
+Priority: optional
 Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [i386 powerpc s390 sparc], debhelper (>= 7.0.0)
-Standards-Version: 3.8.1.0
+Standards-Version: 3.8.3
 Homepage: http://sourceforge.net/projects/strace/
 
 Package: strace
-Architecture: alpha amd64 arm armeb armel hppa i386 ia64 m68k mips mipsel powerpc ppc64 s390 s390x sh sparc
-Section: utils
-Priority: standard
-Depends: ${shlibs:Depends}
+Architecture: alpha amd64 arm armeb armel hppa i386 ia64 m68k mips mipsel powerpc ppc64 s390 s390x sh sparc sparc64
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: A system call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
  a trace of all the system calls made by a another process/program.
@@ -23,9 +21,8 @@ Description: A system call tracer
 
 Package: strace64
 Architecture: i386 powerpc s390 sparc
-Section: utils
 Priority: extra
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: A system call tracer for 64bit binaries
  strace is a system call tracer, i.e. a debugging tool which prints out
  a trace of all the system calls made by a another process/program.
@@ -43,8 +40,8 @@ Package: strace-udeb
 Section: debian-installer
 XC-Package-Type: udeb
 Priority: extra
-Architecture: alpha amd64 arm armeb armel hppa i386 ia64 m68k mips mipsel powerpc ppc64 s390 sh sparc
-Depends: ${shlibs:Depends}
+Architecture: alpha amd64 arm armeb armel hppa i386 ia64 m68k mips mipsel powerpc ppc64 s390 sh sparc sparc64
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: A system call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
  a trace of all the system calls made by a another process/program.

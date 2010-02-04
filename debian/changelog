@@ -1,3 +1,15 @@
+strace (4.5.19-2) unstable; urgency=low
+
+  * Add sparc64 to the architectures list, closes: #560062
+  * Fix FTBFS, thanks to Aurelien Jarno <aurelien@aurel32.net> for pointing
+    out the solution. Closes: #560516
+  * Rebuild as normal package, closes: #566968
+  * Update standards-version to 3.8.3.
+  * Lower package priority to optional, matching the archive override.
+  * Add watch file.
+
+ -- Frederik Schüler <fs@debian.org>  Tue, 26 Jan 2010 12:20:51 +0100
+
 strace (4.5.19-1) unstable; urgency=low
 
   [ Dmitry V. Levin ]
