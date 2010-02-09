@@ -2057,7 +2057,7 @@ syscall_enter(struct tcb *tcp)
 		else
 			nargs = tcp->u_nargs = MAX_ARGS;
 
-		if (ptrace (PTRACE_GETREGS, pid, NULL, (long) &regs) < 0)
+		if (ptrace (PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
 			return -1;
 
 		for(i = 0; i < nargs; i++) {
