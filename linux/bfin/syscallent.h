@@ -398,3 +398,4 @@
 	{ 5,	TD,	printargs,		"pwritev"	}, /* 367 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 368 */
 	{ 5,	0,	printargs,		"perf_counter_open"	}, /* 369 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 370 */

@@ -242,14 +242,13 @@
 
 #include "../dummy.h"
 
-/* You must be careful to check ../syscallent.h so that this table
+/* You must be careful to check ../i386/syscallent.h so that this table
    starts where that one leaves off.
 */
-#if SYS_ipc_subcall + SYS_ipc_nsubcalls != 444
+#if SYS_ipc_subcall + SYS_ipc_nsubcalls != 445
 # error fix me
 #endif
 
-	{ 8,	0,	printargs,		"SYS_444"	}, /* 444 */
 	{ 8,	0,	printargs,		"SYS_445"	}, /* 445 */
 	{ 8,	0,	printargs,		"SYS_446"	}, /* 446 */
 	{ 8,	0,	printargs,		"SYS_447"	}, /* 447 */

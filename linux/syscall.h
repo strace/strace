@@ -113,6 +113,7 @@ int sys_socket(), sys_bind(), sys_connect(), sys_listen(), sys_accept4();
 int sys_accept(), sys_getsockname(), sys_getpeername(), sys_socketpair();
 int sys_send(), sys_recv(), sys_sendto(), sys_recvfrom();
 int sys_shutdown(), sys_setsockopt(), sys_getsockopt();
+int sys_recvmmsg();
 
 /* *at syscalls */
 int sys_fchmodat();
@@ -228,8 +229,9 @@ int sys_osf_utimes();
 #define SYS_sub_sendmsg		(SYS_socket_subcall + 16)
 #define SYS_sub_recvmsg		(SYS_socket_subcall + 17)
 #define SYS_sub_accept4		(SYS_socket_subcall + 18)
+#define SYS_sub_recvmmsg	(SYS_socket_subcall + 19)
 
-#define SYS_socket_nsubcalls	19
+#define SYS_socket_nsubcalls	20
 #endif /* !(ALPHA || MIPS || HPPA) */
 
 /* sys_ipc subcalls */

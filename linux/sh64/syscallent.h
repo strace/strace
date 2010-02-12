@@ -451,8 +451,9 @@
 	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
 
-#if SYS_ipc_subcall != 419
+#if SYS_ipc_subcall != 420
  #error fix me
 #endif
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 419 */
+	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 420 */

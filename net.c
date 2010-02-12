@@ -1185,6 +1185,30 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 }
 
 static void
+do_msghdr(struct tcb *tcp, struct msghdr *msg)
+{
+	tprintf("{msg_name(%d)=", msg->msg_namelen);
+	printsock(tcp, (long)msg->msg_name, msg->msg_namelen);
+
+	tprintf(", msg_iov(%lu)=", (unsigned long)msg->msg_iovlen);
+	tprint_iov(tcp, (unsigned long)msg->msg_iovlen,
+		   (unsigned long)msg->msg_iov);
+
+#ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
+	tprintf(", msg_controllen=%lu", (unsigned long)msg->msg_controllen);
+	if (msg->msg_controllen)
+		printcmsghdr(tcp, (unsigned long) msg->msg_control,
+			     msg->msg_controllen);
+	tprintf(", msg_flags=");
+	printflags(msg_flags, msg->msg_flags, "MSG_???");
+#else /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
+	tprintf("msg_accrights=%#lx, msg_accrightslen=%u",
+		(unsigned long) msg->msg_accrights, msg->msg_accrightslen);
+#endif /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
+	tprintf("}");
+}
+
+static void
 printmsghdr(tcp, addr)
 struct tcb *tcp;
 long addr;
@@ -1195,26 +1219,27 @@ long addr;
 		tprintf("%#lx", addr);
 		return;
 	}
-	tprintf("{msg_name(%d)=", msg.msg_namelen);
-	printsock(tcp, (long)msg.msg_name, msg.msg_namelen);
-
-	tprintf(", msg_iov(%lu)=", (unsigned long)msg.msg_iovlen);
-	tprint_iov(tcp, (unsigned long)msg.msg_iovlen,
-		   (unsigned long)msg.msg_iov);
-
-#ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
-	tprintf(", msg_controllen=%lu", (unsigned long)msg.msg_controllen);
-	if (msg.msg_controllen)
-		printcmsghdr(tcp, (unsigned long) msg.msg_control,
-			     msg.msg_controllen);
-	tprintf(", msg_flags=");
-	printflags(msg_flags, msg.msg_flags, "MSG_???");
-#else /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
-	tprintf("msg_accrights=%#lx, msg_accrightslen=%u",
-		(unsigned long) msg.msg_accrights, msg.msg_accrightslen);
-#endif /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
-	tprintf("}");
+	do_msghdr(tcp, &msg);
 }
+
+#ifdef LINUX
+static void
+printmmsghdr(struct tcb *tcp, long addr)
+{
+	struct mmsghdr {
+		struct msghdr msg_hdr;
+		unsigned msg_len;
+	} mmsg;
+
+	if (umove(tcp, addr, &mmsg) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	tprintf("{");
+	do_msghdr(tcp, &mmsg.msg_hdr);
+	tprintf(", %u}", mmsg.msg_len);
+}
+#endif
 
 #endif /* HAVE_SENDMSG */
 
@@ -1502,6 +1527,24 @@ struct tcb *tcp;
 	}
 	return 0;
 }
+
+#ifdef LINUX
+int
+sys_recvmmsg(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printmmsghdr(tcp, tcp->u_arg[1]);
+		tprintf(", %ld, ", tcp->u_arg[2]);
+		/* flags */
+		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+		/* timeout */
+		tprintf(", ");
+		print_timespec(tcp, tcp->u_arg[4]);
+	}
+	return 0;
+}
+#endif
 
 #endif /* HAVE_SENDMSG */
 
