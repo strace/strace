@@ -1329,6 +1329,12 @@ sys_sigreturn(struct tcb *tcp)
 		tcp->u_arg[0] = 0;
 		if (upeek(tcp, sizeof(unsigned long)*PT_R1, &esp) < 0)
 			return 0;
+		/* Skip dummy stack frame. */
+#ifdef __powerpc64__
+		esp += 128;
+#else
+		esp += 64;
+#endif
 		if (umove(tcp, esp, &sc) < 0)
 			return 0;
 		tcp->u_arg[0] = 1;
