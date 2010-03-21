@@ -2885,6 +2885,14 @@ sys_inotify_rm_watch(struct tcb *tcp)
 }
 
 int
+sys_inotify_init1(struct tcb *tcp)
+{
+	if (entering(tcp))
+		printflags(open_mode_flags, tcp->u_arg[0], "O_???");
+	return 0;
+}
+
+int
 sys_fallocate(struct tcb *tcp)
 {
 	if (entering(tcp)) {

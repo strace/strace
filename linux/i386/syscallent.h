@@ -362,7 +362,7 @@
 	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 329 */
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 330 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 331 */
-	{ 1,	TD,	printargs,		"inotify_init1"	}, /* 332 */
+	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 332 */
 	{ 5,	0,	printargs,		"SYS_333"	}, /* 333 */
 	{ 5,	0,	printargs,		"SYS_334"	}, /* 334 */
 	{ 5,	0,	printargs,		"SYS_335"	}, /* 335 */

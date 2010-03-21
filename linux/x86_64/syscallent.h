@@ -292,4 +292,4 @@
 	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 291 */
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 292 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 293 */
-	{ 1,	TD,	printargs,		"inotify_init1"	}, /* 294 */
+	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 294 */

@@ -393,7 +393,7 @@
 	{ 1,	0,	printargs,		"epoll_create1"	}, /* 362 */
 	{ 3,	TD,	printargs,		"dup3"		}, /* 363 */
 	{ 2,	TD,	printargs,		"pipe2"		}, /* 364 */
-	{ 1,	TD,	printargs,		"inotify_init1"	}, /* 365 */
+	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 365 */
 	{ 5,	TD,	printargs,		"preadv"	}, /* 366 */
 	{ 5,	TD,	printargs,		"pwritev"	}, /* 367 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 368 */

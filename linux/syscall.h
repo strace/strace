@@ -135,6 +135,7 @@ int sys_poll();
 int sys_mincore();
 int sys_inotify_add_watch();
 int sys_inotify_rm_watch();
+int sys_inotify_init1();
 int sys_pselect6();
 int sys_ppoll();
 int sys_unshare();
