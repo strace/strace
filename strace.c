@@ -83,7 +83,8 @@ extern char *optarg;
 
 
 int debug = 0, followfork = 0;
-int dtime = 0, cflag = 0, xflag = 0, qflag = 0;
+int dtime = 0, xflag = 0, qflag = 0;
+cflag_t cflag = CFLAG_NONE;
 static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
 /*
  * daemonized_tracer supports -D option.
@@ -719,15 +720,27 @@ main(int argc, char *argv[])
 	qualify("verbose=all");
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
-		"+cdfFhiqrtTvVxz"
+		"+cCdfFhiqrtTvVxz"
 #ifndef USE_PROCFS
 		"D"
 #endif
 		"a:e:o:O:p:s:S:u:E:")) != EOF) {
 		switch (c) {
 		case 'c':
-			cflag++;
-			dtime++;
+			if (cflag == CFLAG_BOTH) {
+				fprintf(stderr, "%s: -c and -C are mutually exclusive options\n",
+					progname);
+				exit(1);
+			}
+			cflag = CFLAG_ONLY_STATS;
+			break;
+		case 'C':
+			if (cflag == CFLAG_ONLY_STATS) {
+				fprintf(stderr, "%s: -c and -C are mutually exclusive options\n",
+					progname);
+				exit(1);
+			}
+			cflag = CFLAG_BOTH;
 			break;
 		case 'd':
 			debug++;
@@ -838,7 +851,7 @@ main(int argc, char *argv[])
 
 	if (followfork > 1 && cflag) {
 		fprintf(stderr,
-			"%s: -c and -ff are mutually exclusive options\n",
+			"%s: (-c or -C) and -ff are mutually exclusive options\n",
 			progname);
 		exit(1);
 	}
@@ -2144,7 +2157,8 @@ trace()
 			}
 			break;
 		case PR_SIGNALLED:
-			if (!cflag && (qual_flags[what] & QUAL_SIGNAL)) {
+			if (cflag != CFLAG_ONLY_STATS
+			    && (qual_flags[what] & QUAL_SIGNAL)) {
 				printleader(tcp);
 				tprintf("--- %s (%s) ---",
 					signame(what), strsignal(what));
@@ -2160,7 +2174,8 @@ trace()
 			}
 			break;
 		case PR_FAULTED:
-			if (!cflag && (qual_flags[what] & QUAL_FAULT)) {
+			if (cflag != CFLAGS_ONLY_STATS
+			    && (qual_flags[what] & QUAL_FAULT)) {
 				printleader(tcp);
 				tprintf("=== FAULT %d ===", what);
 				printtrailer();
@@ -2383,7 +2398,7 @@ Process %d attached (waiting for parent)\n",
 		if (WIFSIGNALED(status)) {
 			if (pid == strace_child)
 				exit_code = 0x100 | WTERMSIG(status);
-			if (!cflag
+			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)) {
 				printleader(tcp);
 				tprintf("+++ killed by %s %s+++",
@@ -2482,7 +2497,7 @@ Process %d attached (waiting for parent)\n",
 				}
 				continue;
 			}
-			if (!cflag
+			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[WSTOPSIG(status)] & QUAL_SIGNAL)) {
 				unsigned long addr = 0;
 				long pc = 0;

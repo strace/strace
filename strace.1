@@ -43,7 +43,7 @@ strace \- trace system calls and signals
 .SH SYNOPSIS
 .B strace
 [
-.B \-dffhiqrtttTvxx
+.B \-CdffhiqrtttTvxx
 ]
 [
 .BI \-a column
@@ -242,6 +242,11 @@ Count time, calls, and errors for each system call and report a summary on
 program exit.  On Linux, this attempts to show system time (CPU time spent
 running in the kernel) independent of wall clock time.  If -c is used with
 -f or -F (below), only aggregate totals for all traced processes are kept.
+.TP
+.B \-C
+Like
+.B \-c
+but also print regular output while processes are running.
 .TP
 .B \-d
 Show some debugging output of

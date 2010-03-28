@@ -456,10 +456,17 @@ extern const struct xlat open_access_modes[];
 #define TRACE_SIGNAL	020	/* Trace signal-related syscalls. */
 #define TRACE_DESC	040	/* Trace file descriptor-related syscalls. */
 
+typedef enum {
+	CFLAG_NONE = 0,
+	CFLAG_ONLY_STATS,
+	CFLAG_BOTH
+} cflag_t;
+
 extern struct tcb **tcbtab;
 extern int *qual_flags;
 extern int debug, followfork;
-extern int dtime, cflag, xflag, qflag;
+extern int dtime, xflag, qflag;
+extern cflag_t cflag;
 extern int acolumn;
 extern unsigned int nprocs, tcbtabsize;
 extern int max_strlen;

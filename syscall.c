@@ -2369,7 +2369,7 @@ trace_syscall(struct tcb *tcp)
 		long u_error;
 
 		/* Measure the exit time as early as possible to avoid errors. */
-		if (dtime)
+		if (dtime || cflag)
 			gettimeofday(&tv, NULL);
 
 		/* BTW, why we don't just memorize syscall no. on entry
@@ -2407,8 +2407,15 @@ trace_syscall(struct tcb *tcp)
 			tprintf(" resumed> ");
 		}
 
-		if (cflag)
-			return count_syscall(tcp, &tv);
+		if (cflag) {
+			struct timeval t = tv;
+			int rc = count_syscall(tcp, &t);
+			if (cflag == CFLAG_ONLY_STATS)
+			{
+				tcp->flags &= ~TCB_INSYSCALL;
+				return rc;
+			}
+		}
 
 		if (res != 1) {
 			tprintf(") ");
@@ -2647,9 +2654,9 @@ trace_syscall(struct tcb *tcp)
 		return 0;
 	}
 
-	if (cflag) {
-		gettimeofday(&tcp->etime, NULL);
+	if (cflag == CFLAG_ONLY_STATS) {
 		tcp->flags |= TCB_INSYSCALL;
+		gettimeofday(&tcp->etime, NULL);
 		return 0;
 	}
 
@@ -2669,7 +2676,7 @@ trace_syscall(struct tcb *tcp)
 		return -1;
 	tcp->flags |= TCB_INSYSCALL;
 	/* Measure the entrance time as late as possible to avoid errors. */
-	if (dtime)
+	if (dtime || cflag)
 		gettimeofday(&tcp->etime, NULL);
 	return sys_res;
 }
