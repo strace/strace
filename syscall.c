@@ -2358,178 +2358,182 @@ syscall_enter(struct tcb *tcp)
 	return 1;
 }
 
-int
-trace_syscall(struct tcb *tcp)
+static int
+trace_syscall_exiting(struct tcb *tcp)
 {
 	int sys_res;
 	struct timeval tv;
 	int res, scno_good;
+	long u_error;
 
-	if (tcp->flags & TCB_INSYSCALL) {
-		long u_error;
+	/* Measure the exit time as early as possible to avoid errors. */
+	if (dtime || cflag)
+		gettimeofday(&tv, NULL);
 
-		/* Measure the exit time as early as possible to avoid errors. */
-		if (dtime || cflag)
-			gettimeofday(&tv, NULL);
+	/* BTW, why we don't just memorize syscall no. on entry
+	 * in tcp->something?
+	 */
+	scno_good = res = get_scno(tcp);
+	if (res == 0)
+		return res;
+	if (res == 1)
+		res = syscall_fixup(tcp);
+	if (res == 0)
+		return res;
+	if (res == 1)
+		res = get_error(tcp);
+	if (res == 0)
+		return res;
+	if (res == 1)
+		internal_syscall(tcp);
 
-		/* BTW, why we don't just memorize syscall no. on entry
-		 * in tcp->something?
-		 */
-		scno_good = res = get_scno(tcp);
-		if (res == 0)
-			return res;
-		if (res == 1)
-			res = syscall_fixup(tcp);
-		if (res == 0)
-			return res;
-		if (res == 1)
-			res = get_error(tcp);
-		if (res == 0)
-			return res;
-		if (res == 1)
-			internal_syscall(tcp);
-
-		if (res == 1 && tcp->scno >= 0 && tcp->scno < nsyscalls &&
-		    !(qual_flags[tcp->scno] & QUAL_TRACE)) {
-			tcp->flags &= ~TCB_INSYSCALL;
-			return 0;
-		}
-
-		if (tcp->flags & TCB_REPRINT) {
-			printleader(tcp);
-			tprintf("<... ");
-			if (scno_good != 1)
-				tprintf("????");
-			else if (tcp->scno >= nsyscalls || tcp->scno < 0)
-				tprintf("syscall_%lu", tcp->scno);
-			else
-				tprintf("%s", sysent[tcp->scno].sys_name);
-			tprintf(" resumed> ");
-		}
-
-		if (cflag) {
-			struct timeval t = tv;
-			int rc = count_syscall(tcp, &t);
-			if (cflag == CFLAG_ONLY_STATS)
-			{
-				tcp->flags &= ~TCB_INSYSCALL;
-				return rc;
-			}
-		}
-
-		if (res != 1) {
-			tprintf(") ");
-			tabto(acolumn);
-			tprintf("= ? <unavailable>");
-			printtrailer();
-			tcp->flags &= ~TCB_INSYSCALL;
-			return res;
-		}
-
-		if (tcp->scno >= nsyscalls || tcp->scno < 0
-		    || (qual_flags[tcp->scno] & QUAL_RAW))
-			sys_res = printargs(tcp);
-		else {
-			if (not_failing_only && tcp->u_error)
-				return 0;	/* ignore failed syscalls */
-			sys_res = (*sysent[tcp->scno].sys_func)(tcp);
-		}
-		u_error = tcp->u_error;
-		tprintf(") ");
-		tabto(acolumn);
-		if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
-		    qual_flags[tcp->scno] & QUAL_RAW) {
-			if (u_error)
-				tprintf("= -1 (errno %ld)", u_error);
-			else
-				tprintf("= %#lx", tcp->u_rval);
-		}
-		else if (!(sys_res & RVAL_NONE) && u_error) {
-			switch (u_error) {
-#ifdef LINUX
-			case ERESTARTSYS:
-				tprintf("= ? ERESTARTSYS (To be restarted)");
-				break;
-			case ERESTARTNOINTR:
-				tprintf("= ? ERESTARTNOINTR (To be restarted)");
-				break;
-			case ERESTARTNOHAND:
-				tprintf("= ? ERESTARTNOHAND (To be restarted)");
-				break;
-			case ERESTART_RESTARTBLOCK:
-				tprintf("= ? ERESTART_RESTARTBLOCK (To be restarted)");
-				break;
-#endif /* LINUX */
-			default:
-				tprintf("= -1 ");
-				if (u_error < 0)
-					tprintf("E??? (errno %ld)", u_error);
-				else if (u_error < nerrnos)
-					tprintf("%s (%s)", errnoent[u_error],
-						strerror(u_error));
-				else
-					tprintf("ERRNO_%ld (%s)", u_error,
-						strerror(u_error));
-				break;
-			}
-			if ((sys_res & RVAL_STR) && tcp->auxstr)
-				tprintf(" (%s)", tcp->auxstr);
-		}
-		else {
-			if (sys_res & RVAL_NONE)
-				tprintf("= ?");
-			else {
-				switch (sys_res & RVAL_MASK) {
-				case RVAL_HEX:
-					tprintf("= %#lx", tcp->u_rval);
-					break;
-				case RVAL_OCTAL:
-					tprintf("= %#lo", tcp->u_rval);
-					break;
-				case RVAL_UDECIMAL:
-					tprintf("= %lu", tcp->u_rval);
-					break;
-				case RVAL_DECIMAL:
-					tprintf("= %ld", tcp->u_rval);
-					break;
-#ifdef HAVE_LONG_LONG
-				case RVAL_LHEX:
-					tprintf("= %#llx", tcp->u_lrval);
-					break;
-				case RVAL_LOCTAL:
-					tprintf("= %#llo", tcp->u_lrval);
-					break;
-				case RVAL_LUDECIMAL:
-					tprintf("= %llu", tcp->u_lrval);
-					break;
-				case RVAL_LDECIMAL:
-					tprintf("= %lld", tcp->u_lrval);
-					break;
-#endif
-				default:
-					fprintf(stderr,
-						"invalid rval format\n");
-					break;
-				}
-			}
-			if ((sys_res & RVAL_STR) && tcp->auxstr)
-				tprintf(" (%s)", tcp->auxstr);
-		}
-		if (dtime) {
-			tv_sub(&tv, &tv, &tcp->etime);
-			tprintf(" <%ld.%06ld>",
-				(long) tv.tv_sec, (long) tv.tv_usec);
-		}
-		printtrailer();
-
-		dumpio(tcp);
-		if (fflush(tcp->outf) == EOF)
-			return -1;
+	if (res == 1 && tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	    !(qual_flags[tcp->scno] & QUAL_TRACE)) {
 		tcp->flags &= ~TCB_INSYSCALL;
 		return 0;
 	}
 
-	/* Entering system call */
+	if (tcp->flags & TCB_REPRINT) {
+		printleader(tcp);
+		tprintf("<... ");
+		if (scno_good != 1)
+			tprintf("????");
+		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
+			tprintf("syscall_%lu", tcp->scno);
+		else
+			tprintf("%s", sysent[tcp->scno].sys_name);
+		tprintf(" resumed> ");
+	}
+
+	if (cflag) {
+		struct timeval t = tv;
+		int rc = count_syscall(tcp, &t);
+		if (cflag == CFLAG_ONLY_STATS)
+		{
+			tcp->flags &= ~TCB_INSYSCALL;
+			return rc;
+		}
+	}
+
+	if (res != 1) {
+		tprintf(") ");
+		tabto(acolumn);
+		tprintf("= ? <unavailable>");
+		printtrailer();
+		tcp->flags &= ~TCB_INSYSCALL;
+		return res;
+	}
+
+	if (tcp->scno >= nsyscalls || tcp->scno < 0
+	    || (qual_flags[tcp->scno] & QUAL_RAW))
+		sys_res = printargs(tcp);
+	else {
+		if (not_failing_only && tcp->u_error)
+			return 0;	/* ignore failed syscalls */
+		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
+	}
+
+	u_error = tcp->u_error;
+	tprintf(") ");
+	tabto(acolumn);
+	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
+	    qual_flags[tcp->scno] & QUAL_RAW) {
+		if (u_error)
+			tprintf("= -1 (errno %ld)", u_error);
+		else
+			tprintf("= %#lx", tcp->u_rval);
+	}
+	else if (!(sys_res & RVAL_NONE) && u_error) {
+		switch (u_error) {
+#ifdef LINUX
+		case ERESTARTSYS:
+			tprintf("= ? ERESTARTSYS (To be restarted)");
+			break;
+		case ERESTARTNOINTR:
+			tprintf("= ? ERESTARTNOINTR (To be restarted)");
+			break;
+		case ERESTARTNOHAND:
+			tprintf("= ? ERESTARTNOHAND (To be restarted)");
+			break;
+		case ERESTART_RESTARTBLOCK:
+			tprintf("= ? ERESTART_RESTARTBLOCK (To be restarted)");
+			break;
+#endif /* LINUX */
+		default:
+			tprintf("= -1 ");
+			if (u_error < 0)
+				tprintf("E??? (errno %ld)", u_error);
+			else if (u_error < nerrnos)
+				tprintf("%s (%s)", errnoent[u_error],
+					strerror(u_error));
+			else
+				tprintf("ERRNO_%ld (%s)", u_error,
+					strerror(u_error));
+			break;
+		}
+		if ((sys_res & RVAL_STR) && tcp->auxstr)
+			tprintf(" (%s)", tcp->auxstr);
+	}
+	else {
+		if (sys_res & RVAL_NONE)
+			tprintf("= ?");
+		else {
+			switch (sys_res & RVAL_MASK) {
+			case RVAL_HEX:
+				tprintf("= %#lx", tcp->u_rval);
+				break;
+			case RVAL_OCTAL:
+				tprintf("= %#lo", tcp->u_rval);
+				break;
+			case RVAL_UDECIMAL:
+				tprintf("= %lu", tcp->u_rval);
+				break;
+			case RVAL_DECIMAL:
+				tprintf("= %ld", tcp->u_rval);
+				break;
+#ifdef HAVE_LONG_LONG
+			case RVAL_LHEX:
+				tprintf("= %#llx", tcp->u_lrval);
+				break;
+			case RVAL_LOCTAL:
+				tprintf("= %#llo", tcp->u_lrval);
+				break;
+			case RVAL_LUDECIMAL:
+				tprintf("= %llu", tcp->u_lrval);
+				break;
+			case RVAL_LDECIMAL:
+				tprintf("= %lld", tcp->u_lrval);
+				break;
+#endif
+			default:
+				fprintf(stderr,
+					"invalid rval format\n");
+				break;
+			}
+		}
+		if ((sys_res & RVAL_STR) && tcp->auxstr)
+			tprintf(" (%s)", tcp->auxstr);
+	}
+	if (dtime) {
+		tv_sub(&tv, &tv, &tcp->etime);
+		tprintf(" <%ld.%06ld>",
+			(long) tv.tv_sec, (long) tv.tv_usec);
+	}
+	printtrailer();
+
+	dumpio(tcp);
+	if (fflush(tcp->outf) == EOF)
+		return -1;
+	tcp->flags &= ~TCB_INSYSCALL;
+	return 0;
+}
+
+static int
+trace_syscall_entering(struct tcb *tcp)
+{
+	int sys_res;
+	int res, scno_good;
+
 	scno_good = res = get_scno(tcp);
 	if (res == 0)
 		return res;
@@ -2679,6 +2683,13 @@ trace_syscall(struct tcb *tcp)
 	if (dtime || cflag)
 		gettimeofday(&tcp->etime, NULL);
 	return sys_res;
+}
+
+int
+trace_syscall(struct tcb *tcp)
+{
+	return exiting(tcp) ?
+		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp);
 }
 
 int
