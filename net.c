@@ -1532,17 +1532,48 @@ struct tcb *tcp;
 int
 sys_recvmmsg(struct tcb *tcp)
 {
+	static char str[128];
 	if (entering(tcp)) {
+
 		tprintf("%ld, ", tcp->u_arg[0]);
-		printmmsghdr(tcp, tcp->u_arg[1]);
-		tprintf(", %ld, ", tcp->u_arg[2]);
-		/* flags */
-		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-		/* timeout */
-		tprintf(", ");
-		print_timespec(tcp, tcp->u_arg[4]);
+		if (verbose(tcp)) {
+			sprint_timespec(str, tcp, tcp->u_arg[4]);
+			tcp->auxstr = strdup(str);
+		} else {
+			tprintf("%#lx, %ld, ", tcp->u_arg[1], tcp->u_arg[2]);
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+			tprintf(", ");
+			print_timespec(tcp, tcp->u_arg[4]);
+		}
+		return 0;
+	} else {
+		if (verbose(tcp)) {
+			if (syserror(tcp))
+				tprintf("%#lx", tcp->u_arg[1]);
+			else
+				printmmsghdr(tcp, tcp->u_arg[1]);
+			tprintf(", %ld, ", tcp->u_arg[2]);
+			/* flags */
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+			/* timeout on entrance */
+			tprintf(", %s", tcp->auxstr ? tcp->auxstr : "{...}");
+			free((void *) tcp->auxstr);
+			tcp->auxstr = NULL;
+		}
+		if (syserror(tcp))
+			return 0;
+		if (tcp->u_rval == 0) {
+			tcp->auxstr = "Timeout";
+			return RVAL_STR;
+		}
+		if (!verbose(tcp))
+			return 0;
+		/* timeout on exit */
+		strcpy(str, "left ");
+		sprint_timespec(str + strlen(str), tcp, tcp->u_arg[4]);
+		tcp->auxstr = str;
+		return RVAL_STR;
 	}
-	return 0;
 }
 #endif
 
