@@ -37,7 +37,7 @@
 .fi
 .sp
 ..
-.TH STRACE 1 "2003-01-21"
+.TH STRACE 1 "2010-03-30"
 .SH NAME
 strace \- trace system calls and signals
 .SH SYNOPSIS
@@ -151,8 +151,10 @@ If a system call is being executed and meanwhile another one is being called
 from a different thread/process then
 .B strace
 will try to preserve the order of those events and mark the ongoing call as
-being \fIunfinished\fP.  When the call returns it will be marked as
-\fIresumed\fP.
+being
+.IR unfinished .
+When the call returns it will be marked as
+.IR resumed .
 .CW
 [pid 28772] select(4, [3], NULL, NULL, NULL <unfinished ...>
 [pid 28779] clock_gettime(CLOCK_REALTIME, {1130322148, 939977000}) = 0
@@ -240,8 +242,13 @@ Here the second argument represents the full set of all signals.
 .B \-c
 Count time, calls, and errors for each system call and report a summary on
 program exit.  On Linux, this attempts to show system time (CPU time spent
-running in the kernel) independent of wall clock time.  If -c is used with
--f or -F (below), only aggregate totals for all traced processes are kept.
+running in the kernel) independent of wall clock time.  If
+.B \-c
+is used with
+.B \-f
+or
+.B \-F
+(below), only aggregate totals for all traced processes are kept.
 .TP
 .B \-C
 Like
@@ -286,11 +293,13 @@ If the
 option is in effect, each processes trace is written to
 .I filename.pid
 where pid is the numeric process id of each process.
-This is incompatible with -c, since no per-process counts are kept.
+This is incompatible with
+.BR \-c ,
+since no per-process counts are kept.
 .TP
 .B \-F
 This option is now obsolete and it has the same functionality as
-.BR -f .
+.BR \-f .
 .TP
 .B \-h
 Print the help summary.
@@ -367,13 +376,13 @@ is a qualifier-dependent symbol or number.  The default
 qualifier is
 .BR trace .
 Using an exclamation mark negates the set of values.  For example,
-.B \-eopen
+.BR \-e "\ " open
 means literally
-.B "\-e trace=open"
+.BR \-e "\ " trace = open
 which in turn means trace only the
 .B open
 system call.  By contrast,
-.B "\-etrace=!open"
+.BR \-e "\ " trace "=!" open
 means to trace every system call except
 .BR open .
 In addition, the special values
@@ -386,93 +395,101 @@ Note that some shells use the exclamation point for history
 expansion even inside quoted arguments.  If so, you must escape
 the exclamation point with a backslash.
 .TP
-.BI "\-e trace=" set
+\fB\-e\ trace\fR=\fIset\fR
 Trace only the specified set of system calls.  The
 .B \-c
 option is useful for determining which system calls might be useful
 to trace.  For example,
-.B trace=open,close,read,write
+.BR trace = open,close,read,write
 means to only
 trace those four system calls.  Be careful when making inferences
 about the user/kernel boundary if only a subset of system calls
 are being monitored.  The default is
-.BR trace=all .
+.BR trace = all .
 .TP
-.B "\-e trace=file"
+\fB\-e\ trace\fR=\fIfile\fR
 Trace all system calls which take a file name as an argument.  You
 can think of this as an abbreviation for
-.BR "\-e\ trace=open,stat,chmod,unlink," ...
+.BR "\-e\ trace" = open , stat , chmod , unlink ,...
 which is useful to seeing what files the process is referencing.
 Furthermore, using the abbreviation will ensure that you don't
 accidentally forget to include a call like
 .B lstat
 in the list.  Betchya woulda forgot that one.
 .TP
-.B "\-e trace=process"
+\fB\-e\ trace\fR=\fIprocess\fR
 Trace all system calls which involve process management.  This
 is useful for watching the fork, wait, and exec steps of a process.
 .TP
-.B "\-e trace=network"
+\fB\-e\ trace\fR=\fInetwork\fR
 Trace all the network related system calls.
 .TP
-.B "\-e trace=signal"
+\fB\-e\ trace\fR=\fIsignal\fR
 Trace all signal related system calls.
 .TP
-.B "\-e trace=ipc"
+\fB\-e\ trace\fR=\fIipc\fR
 Trace all IPC related system calls.
 .TP
-.B "\-e trace=desc"
+\fB\-e\ trace\fR=\fIdesc\fR
 Trace all file descriptor related system calls.
 .TP
-.BI "\-e abbrev=" set
+\fB\-e\ abbrev\fR=\fIset\fR
 Abbreviate the output from printing each member of large structures.
 The default is
-.BR abbrev=all .
+.BR abbrev = all .
 The
 .B \-v
 option has the effect of
-.BR abbrev=none .
+.BR abbrev = none .
 .TP
-.BI "\-e verbose=" set
+\fB\-e\ verbose\fR=\fIset\fR
 Dereference structures for the specified set of system calls.  The
 default is
-.BR verbose=all .
+.BR verbose = all .
 .TP
-.BI "\-e raw=" set
+\fB\-e\ raw\fR=\fIset\fR
 Print raw, undecoded arguments for the specified set of system calls.
 This option has the effect of causing all arguments to be printed
 in hexadecimal.  This is mostly useful if you don't trust the
 decoding or you need to know the actual numeric value of an
 argument.
 .TP
-.BI "\-e signal=" set
+\fB\-e\ signal\fR=\fIset\fR
 Trace only the specified subset of signals.  The default is
-.BR signal=all .
+.BR signal = all .
 For example,
-.B signal=!SIGIO
+.B signal "=!" SIGIO
 (or
-.BR signal=!io )
+.BR signal "=!" io )
 causes SIGIO signals not to be traced.
 .TP
-.BI "\-e read=" set
+\fB\-e\ read\fR=\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data read from
 file descriptors listed in the specified set.  For example, to see
-all input activity on file descriptors 3 and 5 use
-.BR "\-e read=3,5" .
+all input activity on file descriptors
+.I 3
+and
+.I 5
+use
+\fB\-e\ read\fR=\fI3\fR,\fI5\fR.
 Note that this is independent from the normal tracing of the
 .BR read (2)
 system call which is controlled by the option
-.BR "\-e trace=read" .
+.BR -e "\ " trace = read .
 .TP
-.BI "\-e write=" set
+\fB\-e\ write\fR=\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data written to
 file descriptors listed in the specified set.  For example, to see
-all output activity on file descriptors 3 and 5 use
-.BR "\-e write=3,5" .
+all output activity on file descriptors
+.I 3
+and
+.I 5
+use
+\fB\-e\ write\fR=\fI3\fR,\fI5\fR.
 Note that this is independent from the normal tracing of the
 .BR write (2)
 system call which is controlled by the option
-.BR "\-e trace=write" .
+.BR -e "\ " trace = write .
 .TP
 .BI "\-o " filename
 Write the trace output to the file
@@ -536,7 +553,7 @@ option by the specified criterion.  Legal values are
 .BR name ,
 and
 .B nothing
-(default
+(default is
 .BR time ).
 .TP
 .BI "\-u " username
@@ -548,9 +565,9 @@ correct execution of setuid and/or setgid binaries.
 Unless this option is used setuid and setgid programs are executed
 without effective privileges.
 .TP
-.BI "\-E " var=val
+\fB\-E\ \fIvar\fR=\fIval\fR
 Run command with
-.IR var=val
+.IR var = val
 in its list of environment variables.
 .TP
 .BI "\-E " var
@@ -573,7 +590,7 @@ terminates itself with the same signal, so that
 can be used as a wrapper process transparent to the invoking parent process.
 .LP
 When using
-.BR -p ,
+.BR \-p ,
 the exit status of
 .B strace
 is zero unless there was an unexpected error in doing the tracing.
@@ -702,11 +719,12 @@ The SIGTRAP signal is used internally by the kernel implementation of
 system call tracing.  When a traced process receives a SIGTRAP signal not
 associated with tracing, strace will not report that signal correctly.
 This signal is not normally used by programs, but could be via a hard-coded
-break instruction or via kill(2).
+break instruction or via
+.BR kill (2).
 .SH PROBLEMS
 Problems with
 .B strace
 should be reported via the Debian Bug Tracking System,
 or to the
 .B strace
-mailing list at <strace-devel@lists.sourceforge.net>.
+mailing list at <strace\-devel@lists.sourceforge.net>.
