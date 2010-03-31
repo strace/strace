@@ -212,7 +212,8 @@ struct tcb *tcp;
 }
 
 static void
-tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count)
+tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count,
+	      unsigned long flags)
 {
 	long mtype;
 
@@ -224,7 +225,7 @@ tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count)
 		tprintf("}");
 	}
 	tprintf(", %lu, ", count);
-	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+	printflags(msg_flags, flags, "MSG_???");
 }
 
 int sys_msgsnd(struct tcb *tcp)
@@ -232,9 +233,11 @@ int sys_msgsnd(struct tcb *tcp)
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
-			tprint_msgsnd(tcp, tcp->u_arg[3], tcp->u_arg[1]);
+			tprint_msgsnd(tcp, tcp->u_arg[3], tcp->u_arg[1],
+				      tcp->u_arg[2]);
 		} else {
-			tprint_msgsnd(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+			tprint_msgsnd(tcp, tcp->u_arg[1], tcp->u_arg[2],
+				      tcp->u_arg[3]);
 		}
 	}
 	return 0;
