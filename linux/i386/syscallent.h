@@ -313,7 +313,7 @@
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 280 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 281 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 282 */
-	{ 5,	0,	printargs,		"sys_kexec_load" }, /* 283 */
+	{ 5,	0,	printargs,		"kexec_load"	}, /* 283 */
 	{ 5,	TP,	sys_waitid,		"waitid", SYS_waitid }, /* 284 */
 	{ 5,	0,	printargs,		"SYS_285"	}, /* 285 */
 	{ 5,	0,	printargs,		"add_key"	}, /* 286 */
@@ -363,11 +363,11 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 330 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 331 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 332 */
-	{ 5,	0,	printargs,		"SYS_333"	}, /* 333 */
-	{ 5,	0,	printargs,		"SYS_334"	}, /* 334 */
-	{ 5,	0,	printargs,		"SYS_335"	}, /* 335 */
-	{ 5,	0,	printargs,		"SYS_336"	}, /* 336 */
-	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */
+	{ 5,	TD,	printargs,		"preadv"	}, /* 333 */
+	{ 5,	TD,	printargs,		"pwritev"	}, /* 334 */
+	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 335 */
+	{ 5,	TD,	printargs,		"perf_event_open"}, /* 336 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 337 */
 	{ 5,	0,	printargs,		"SYS_338"	}, /* 338 */
 	{ 5,	0,	printargs,		"SYS_339"	}, /* 339 */
 	{ 5,	0,	printargs,		"SYS_340"	}, /* 340 */

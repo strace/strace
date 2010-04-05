@@ -151,7 +151,7 @@
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
-	{ 3,	0,	printargs,		"SYS_123"	}, /* 123 */
+	{ 3,	0,	printargs,		"cacheflush"	}, /* 123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
@@ -380,21 +380,21 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 349 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 350 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 351 */
-	{ 6,	0,	printargs,		"fallocate"	}, /* 352 */
-	{ 5,	0,	printargs,		"SYS_353"	}, /* 353 */
-	{ 5,	0,	printargs,		"SYS_354"	}, /* 354 */
-	{ 5,	0,	printargs,		"SYS_355"	}, /* 355 */
-	{ 5,	0,	printargs,		"SYS_356"	}, /* 356 */
-	{ 5,	0,	printargs,		"SYS_357"	}, /* 357 */
-	{ 5,	0,	printargs,		"SYS_358"	}, /* 358 */
-	{ 5,	0,	printargs,		"SYS_359"	}, /* 359 */
-	{ 5,	0,	printargs,		"SYS_360"	}, /* 360 */
-	{ 5,	0,	printargs,		"SYS_361"	}, /* 361 */
-	{ 5,	0,	printargs,		"SYS_362"	}, /* 362 */
-	{ 5,	0,	printargs,		"SYS_363"	}, /* 363 */
-	{ 5,	0,	printargs,		"SYS_364"	}, /* 364 */
-	{ 5,	0,	printargs,		"SYS_365"	}, /* 365 */
-	{ 5,	0,	printargs,		"SYS_366"	}, /* 366 */
+	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 352 */
+	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 353 */
+	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 354 */
+	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 355 */
+	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 356 */
+	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 357 */
+	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 358 */
+	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 359 */
+	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 360 */
+	{ 5,	TD,	printargs,		"preadv"	}, /* 361 */
+	{ 5,	TD,	printargs,		"pwritev"	}, /* 362 */
+	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 363 */
+	{ 5,	TD,	printargs,		"perf_event_open"}, /* 364 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 365 */
+	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 366 */
 	{ 5,	0,	printargs,		"SYS_367"	}, /* 367 */
 	{ 5,	0,	printargs,		"SYS_368"	}, /* 368 */
 	{ 5,	0,	printargs,		"SYS_369"	}, /* 369 */

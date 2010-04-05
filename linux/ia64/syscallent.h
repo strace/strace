@@ -1072,7 +1072,7 @@
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 1265 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 1266 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 1267 */
-	{ 5,	0,	printargs,		"sys_kexec_load" }, /* 1268 */
+	{ 5,	0,	printargs,		"kexec_load"	}, /* 1268 */
 	{ 5,	0,	printargs,		"vserver"	}, /* 1269 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 1270 */
 	{ 5,	0,	printargs,		"add_key"	}, /* 1271 */
@@ -1114,3 +1114,7 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 1307 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 1308 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 1309 */
+	{ 5,	TD,	printargs,		"preadv"	}, /* 1319 */
+	{ 5,	TD,	printargs,		"pwritev"	}, /* 1320 */
+	{ 4,	TS,	printargs,		"rt_tgsigqueueinfo"}, /* 1321 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 1322 */

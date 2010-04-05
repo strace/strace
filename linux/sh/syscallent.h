@@ -153,7 +153,7 @@
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
-	{ 3,	0,	sys_modify_ldt,		"modify_ldt"	}, /* 123 */
+	{ 3,	0,	printargs,		"cacheflush"	}, /* 123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
@@ -356,19 +356,19 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 321 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 322 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 323 */
-	{ 6,	0,	printargs,		"fallocate"	}, /* 324 */
-	{ 5,	0,	printargs,		"SYS_325"	}, /* 325 */
-	{ 5,	0,	printargs,		"SYS_326"	}, /* 326 */
-	{ 5,	0,	printargs,		"SYS_327"	}, /* 327 */
-	{ 5,	0,	printargs,		"SYS_328"	}, /* 328 */
-	{ 5,	0,	printargs,		"SYS_329"	}, /* 329 */
-	{ 5,	0,	printargs,		"SYS_330"	}, /* 330 */
-	{ 5,	0,	printargs,		"SYS_331"	}, /* 331 */
-	{ 5,	0,	printargs,		"SYS_332"	}, /* 332 */
-	{ 5,	0,	printargs,		"SYS_333"	}, /* 333 */
-	{ 5,	0,	printargs,		"SYS_334"	}, /* 334 */
-	{ 5,	0,	printargs,		"SYS_335"	}, /* 335 */
-	{ 5,	0,	printargs,		"SYS_336"	}, /* 336 */
+	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 324 */
+	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 325 */
+	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 326 */
+	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 327 */
+	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 328 */
+	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 329 */
+	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 330 */
+	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 331 */
+	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 332 */
+	{ 5,	TD,	printargs,		"preadv"	}, /* 333 */
+	{ 5,	TD,	printargs,		"pwritev"	}, /* 334 */
+	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 335 */
+	{ 5,	TD,	printargs,		"perf_event_open"}, /* 336 */
 	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */
 	{ 5,	0,	printargs,		"SYS_338"	}, /* 338 */
 	{ 5,	0,	printargs,		"SYS_339"	}, /* 339 */

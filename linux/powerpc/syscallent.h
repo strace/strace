@@ -84,7 +84,7 @@
 	{ 0,	0,	sys_lock,		"lock"			}, /* 53 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"			}, /* 54 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"			}, /* 55 */
-	{ 0,	0,	sys_mpx,		"sys_mpx"		}, /* 56 */
+	{ 0,	0,	sys_mpx,		"mpx"			}, /* 56 */
 	{ 2,	0,	sys_setpgid,		"setpgid"		}, /* 57 */
 	{ 2,	0,	sys_ulimit,		"ulimit"		}, /* 58 */
 	{ 1,	0,	sys_oldolduname,	"oldolduname"		}, /* 59 */
@@ -138,10 +138,10 @@
 	{ 2,	TF,	sys_lstat,		"lstat"			}, /* 107 */
 	{ 2,	TD,	sys_fstat,		"fstat"			}, /* 108 */
 	{ 1,	0,	sys_olduname,		"olduname"		}, /* 109 */
-	{ 5,	0,	printargs,		"SYS_110"		}, /* 110 */
+	{ 5,	0,	printargs,		"iopl"			}, /* 110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"		}, /* 111 */
 	{ 0,	0,	sys_idle,		"idle"			}, /* 112 */
-	{ 5,	0,	printargs,		"SYS_113"		}, /* 113 */
+	{ 5,	0,	printargs,		"vm86"			}, /* 113 */
 	{ 4,	TP,	sys_wait4,		"wait4"			}, /* 114 */
 	{ 1,	0,	sys_swapoff,		"swapoff"		}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"		}, /* 116 */
@@ -151,7 +151,7 @@
 	{ 5,	TP,	sys_clone,		"clone"			}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"		}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"			}, /* 122 */
-	{ 5,	0,	printargs,		"SYS_123"		}, /* 123 */
+	{ 5,	0,	printargs,		"modify_ldt"		}, /* 123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"		}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"		}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"		}, /* 126 */
@@ -223,7 +223,6 @@
 	{ 6,	0,	sys_mmap,		"mmap2"			}, /* 192 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"		}, /* 193 */
 	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"		}, /* 194 */
-
 	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 196 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"		}, /* 197 */
@@ -258,7 +257,7 @@
 	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"		}, /* 226 */
 	{ 2,	0,	sys_io_setup,		"io_setup"		}, /* 227 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"		}, /* 228 */
-	{ 5,	0,	sys_io_getevents,		"io_getevents"		}, /* 229 */
+	{ 5,	0,	sys_io_getevents,	"io_getevents"		}, /* 229 */
 	{ 3,	0,	sys_io_submit,		"io_submit"		}, /* 230 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"		}, /* 231 */
 	{ 1,	0,	printargs,		"set_tid_address"	}, /* 232 */
@@ -287,7 +286,7 @@
 	{ 1,	0,	printargs,		"rtas"			}, /* 255 */
 	{ 5,	0,	printargs,		"debug_setcontext"	}, /* 256 */
 	{ 5,	0,	printargs,		"vserver"		}, /* 257 */
-	{ 5,	0,	printargs,		"SYS_258"		}, /* 258 */
+	{ 5,	0,	printargs,		"migrate_pages"		}, /* 258 */
 	{ 6,	0,	sys_mbind,		"mbind"			}, /* 259 */
 	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"		}, /* 260 */
 	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"		}, /* 261 */
@@ -297,7 +296,7 @@
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive"	}, /* 265 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"		}, /* 266 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"		}, /* 267 */
-	{ 5,	0,	printargs,		"sys_kexec_load"	}, /* 268 */
+	{ 5,	0,	printargs,		"kexec_load"		}, /* 268 */
 	{ 5,	0,	printargs,		"add_key"		}, /* 269 */
 	{ 4,	0,	printargs,		"request_key"		}, /* 270 */
 	{ 5,	0,	printargs,		"keyctl"		}, /* 271 */
@@ -333,25 +332,25 @@
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 301 */
 	{ 3,	0,	sys_getcpu,		"getcpu"		}, /* 302 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 303 */
-	{ 5,	0,	printargs,		"SYS_304"		}, /* 304 */
+	{ 4,	TD|TF,	sys_utimensat,		"utimensat"		}, /* 304 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"		}, /* 305 */
-	{ 4,	TD,	sys_timerfd,		"timerfd"		}, /* 306 */
+	{ 4,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 306 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 307 */
-	{ 5,	0,	printargs,		"SYS_308"		}, /* 308 */
+	{ 4,	TD,	printargs,		"sync_file_range"	}, /* 308 */
 	{ 6,	TF,	sys_fallocate,		"fallocate"		}, /* 309 */
 	{ 3,    0,      sys_subpage_prot,       "subpage_prot"          }, /* 310 */
-	{ 5,	0,	printargs,		"SYS_311"		}, /* 311 */
-	{ 5,	0,	printargs,		"SYS_312"		}, /* 312 */
-	{ 5,	0,	printargs,		"SYS_313"		}, /* 313 */
-	{ 5,	0,	printargs,		"SYS_314"		}, /* 314 */
-	{ 5,	0,	printargs,		"SYS_315"		}, /* 315 */
-	{ 5,	0,	printargs,		"SYS_316"		}, /* 316 */
-	{ 5,	0,	printargs,		"SYS_317"		}, /* 317 */
-	{ 5,	0,	printargs,		"SYS_318"		}, /* 318 */
-	{ 5,	0,	printargs,		"SYS_319"		}, /* 319 */
-	{ 5,	0,	printargs,		"SYS_320"		}, /* 320 */
-	{ 5,	0,	printargs,		"SYS_321"		}, /* 321 */
-	{ 5,	0,	printargs,		"SYS_322"		}, /* 322 */
+	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"	}, /* 311 */
+	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"	}, /* 312 */
+	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"		}, /* 313 */
+	{ 2,	TD,	sys_eventfd2,		"eventfd2"		}, /* 314 */
+	{ 1,	0,	sys_epoll_create1,	"epoll_create1"		}, /* 315 */
+	{ 3,	TD,	sys_dup3,		"dup3"			}, /* 316 */
+	{ 2,	TD,	sys_pipe2,		"pipe2"			}, /* 317 */
+	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"		}, /* 318 */
+	{ 5,	TD,	printargs,		"perf_event_open"	}, /* 319 */
+	{ 5,	TD,	printargs,		"preadv"		}, /* 320 */
+	{ 5,	TD,	printargs,		"pwritev"		}, /* 321 */
+	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 322 */
 	{ 5,	0,	printargs,		"SYS_323"		}, /* 323 */
 	{ 5,	0,	printargs,		"SYS_324"		}, /* 324 */
 	{ 5,	0,	printargs,		"SYS_325"		}, /* 325 */
@@ -458,7 +457,7 @@
  #error fix me
 #endif
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 420 */
-	{ 4,	TI,	printargs,		"semop"		}, /* 421 */
+	{ 4,	TI,	sys_semop,		"semop"		}, /* 421 */
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 422 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 423 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 424 */

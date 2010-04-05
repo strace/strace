@@ -305,7 +305,7 @@
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 274 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 275 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 276 */
-	{ 5,	0,	printargs,		"sys_kexec_load" }, /* 277 */
+	{ 5,	0,	printargs,		"kexec_load"	}, /* 277 */
 	{ 5,	0,	printargs,		"add_key"	}, /* 278 */
 	{ 4,	0,	printargs,		"request_key"	}, /* 279 */
 	{ 5,	0,	printargs,		"keyctl"	}, /* 280 */
@@ -338,29 +338,26 @@
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 307 */
 	{ 4,	TD,	printargs,		"tee"		}, /* 308 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 309 */
-
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 310 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 311 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 312 */
-	{ 5,	0,	printargs,		"SYS_313"	}, /* 313 */
-	{ 5,	0,	printargs,		"SYS_314"	}, /* 314 */
-	{ 5,	0,	printargs,		"SYS_315"	}, /* 315 */
+	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 313 */
+	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 314 */
+	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 315 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 316 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 317 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 318 */
-	{ 5,	0,	printargs,		"SYS_319"	}, /* 319 */
-	{ 5,	0,	printargs,		"SYS_320"	}, /* 320 */
-	{ 5,	0,	printargs,		"SYS_321"	}, /* 321 */
-	{ 5,	0,	printargs,		"SYS_322"	}, /* 322 */
-	{ 5,	0,	printargs,		"SYS_323"	}, /* 323 */
-	{ 5,	0,	printargs,		"SYS_324"	}, /* 324 */
-	{ 5,	0,	printargs,		"SYS_325"	}, /* 325 */
-	{ 5,	0,	printargs,		"SYS_326"	}, /* 326 */
-	{ 5,	0,	printargs,		"SYS_327"	}, /* 327 */
-	{ 5,	0,	printargs,		"SYS_328"	}, /* 328 */
-	{ 5,	0,	printargs,		"SYS_329"	}, /* 329 */
-	{ 5,	0,	printargs,		"SYS_330"	}, /* 330 */
-	{ 5,	0,	printargs,		"SYS_331"	}, /* 331 */
+	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"}, /* 319 */
+	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 320 */
+	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 321 */
+	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 322 */
+	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 323 */
+	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 324 */
+	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 325 */
+	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 326 */
+	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 327 */
+	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 330 */
+	{ 5,	TD,	printargs,		"perf_event_open"}, /* 331 */
 	{ 5,	0,	printargs,		"SYS_332"	}, /* 332 */
 	{ 5,	0,	printargs,		"SYS_333"	}, /* 333 */
 	{ 5,	0,	printargs,		"SYS_334"	}, /* 334 */

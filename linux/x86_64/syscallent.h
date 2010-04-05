@@ -293,3 +293,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 292 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 293 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 294 */
+	{ 5,	TD,	printargs,		"preadv"	}, /* 295 */
+	{ 5,	TD,	printargs,		"pwritev"	}, /* 296 */
+	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 297 */
+	{ 5,	TD,	printargs,		"perf_event_open"}, /* 298 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 299 */
