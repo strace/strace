@@ -1,7 +1,14 @@
 strace (4.5.20-1) unstable; urgency=low
 
-  [ Frederik Schüler ]
+  [ Dmitry V. Levin ]
   * New upstream version.
+    + Corrected decoding of 64bit syscalls, closes: #570603
+    + Corrected getsockopt decoding on architectures where
+      sizeof(long) > sizeof(int), closes: #494844
+    + Corrected decoding of epoll_pwait, closes: #513014
+    + Implemented -C option to combine regular and -c output, closes: #466196
+
+  [ Frederik Schüler ]
   * Update standards-version to 3.8.4.
   * debian/rules: allow parallel building.
   * debian/rules: comment out verbose build, only needed for debugging.
@@ -31,6 +38,7 @@ strace (4.5.19-1) unstable; urgency=low
     + Fixed FTBFS on armel, closes: #520084, #535564
     + Marked sendfile(2) as a network syscall, closes: #509499
     + Fixed syscall numbers for tee and sync_file_range, closes: #503124
+    + Corrected accept(2) decoding, closes: #507573
     + Changed strace to exit/kill with traced process
       exitcode/signal, closes: #37665
 

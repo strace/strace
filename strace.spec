@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.5.19
+Version: 4.5.20
 Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
@@ -82,6 +82,11 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Tue Apr 13 2010 Roland McGrath <roland@redhat.com> - 4.5.20-1
+- New upstream release, work mostly by Andreas Schwab and Dmitry V. Levin.
+  + fixed potential stack buffer overflow in select decoder (#556678);
+  + fixed FTBFS (#539044).
+
 * Wed Oct 21 2009 Roland McGrath <roland@redhat.com> - 4.5.19-1
 - New upstream release, work mostly by Dmitry V. Levin <ldv@altlinux.org>
   + exit/kill strace with traced process exitcode/signal (#105371);

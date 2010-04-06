@@ -1,3 +1,38 @@
+Noteworthy changes in release 4.5.20
+====================================
+
+* Improvements
+  * Implemented decoding of new linux syscalls: inotify_init1, recvmmsg.
+  * Implemented basic decoding of new linux syscalls: preadv, pwritev,
+    rt_tgsigqueueinfo, perf_event_open.
+  * Enhanced decoding of recently added syscalls on non-x86 architectures
+    by replacing a bare decoder with elaborate parsers enabled earlier
+    for x86/x86-64.
+  * Implemented -C option to combine regular and -c output.
+    (Addresses Debian bug #466196)
+  * Enhanced decoding of mbind and mremap syscalls.
+  * Enhanced SOL_PACKET socket options decoding.
+  * Regenerated list of ioctl names from linux 2.6.33.
+  * Added TILE architecture support.
+
+* Bug fixes
+  * Fixed build with Linux kernel headers 2.6.32-rc5+.
+    (Addresses Debian bug #560516 and Fedora bug #539044)
+  * Fixed build on mips.
+  * Fixed handling of Linux systems without struct statfs64.
+  * Fixed reporting signal mask by sigreturn on powerpc.
+  * Fixed potential stack buffer overflow in select decoder.
+    (Addresses Fedora bug #556678)
+  * Corrected msgsnd indirect ipccall decoding.
+  * Corrected decoding of 64bit syscalls.
+    (Addresses Debian bug #570603)
+  * Corrected getsockopt decoding on architectures where
+    sizeof(long) > sizeof(int).
+    (Addresses Debian bug #494844)
+  * Corrected decoding of epoll_pwait.
+    (Addresses Debian bug #513014)
+  * Corrected handling of killed threads.
+
 Noteworthy changes in release 4.5.19
 ====================================
 
@@ -38,6 +73,7 @@ Noteworthy changes in release 4.5.19
   * Marked sendfile(2) as a network syscall.
     (Addresses Debian bug #509499)
   * Fixed accept(2) decoding.
+    (Addresses Debian bug #507573)
   * Fixed sigtimedwait(2) decoding.
   * Fixed build on ARM EABI.
     (Addresses Debian bugs #520084 and #535564, and Fedora bug #507576)
