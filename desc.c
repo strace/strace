@@ -546,7 +546,6 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		outstr[0] = '\0';
 		for (i = 0; i < 3; i++) {
 			int first = 1;
-			char str[20];
 
 			tcp->auxstr = outstr;
 			arg = args[i+1];
@@ -555,6 +554,8 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 				continue;
 			for (j = 0; j < args[0]; j++) {
 				if (FD_ISSET(j, fds)) {
+					char str[11 + 3 * sizeof(int)];
+
 					if (first) {
 						sprintf(str, "%s%s [%u", sep,
 							i == 0 ? "in" :
