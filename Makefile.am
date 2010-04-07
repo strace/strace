@@ -28,7 +28,8 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     README-freebsd README-linux README-sunos4 README-svr4 \
 	     linux/ioctlsort.c linux/ioctlent.sh \
 	     linux/ioctlent.h linux/errnoent.h linux/signalent.h \
-	     linux/syscall.h linux/syscallent.h linux/dummy.h \
+	     linux/syscall.h linux/dummy.h \
+	     linux/i386/syscallent.h \
 	     linux/alpha/errnoent.h linux/alpha/ioctlent.h \
 	     linux/alpha/signalent.h linux/alpha/syscallent.h \
 	     linux/arm/syscallent.h linux/arm/syscallent1.h \
