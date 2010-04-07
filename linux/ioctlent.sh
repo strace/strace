@@ -64,10 +64,10 @@ lookup_ioctls 22 scsi/sg.h
 lookup_ioctls 46 linux/fb.h
 lookup_ioctls 4B linux/kd.h
 lookup_ioctls 53 linux/cdrom.h scsi/scsi.h scsi/scsi_ioctl.h
-lookup_ioctls 54 $asm/ioctls.h
+lookup_ioctls 54 $asm/ioctls.h asm-generic/ioctls.h
 lookup_ioctls 56 linux/vt.h
 lookup_ioctls '7[12]' linux/videotext.h
-lookup_ioctls 89 $asm/sockios.h linux/sockios.h
+lookup_ioctls 89 $asm/sockios.h asm-generic/sockios.h linux/sockios.h
 lookup_ioctls 8B linux/wireless.h
 
 if [ -e $dir/Kbuild ]; then
@@ -81,7 +81,7 @@ if [ -e $dir/Kbuild ]; then
 	)
 else
 	# older kernel so just assume some headers
-	files="linux/* $asm/* scsi/* sound/*"
+	files="linux/* $asm/* asm-generic/* scsi/* sound/*"
 fi
 
 # Build the list of all ioctls
