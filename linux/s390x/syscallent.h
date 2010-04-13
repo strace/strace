@@ -355,6 +355,8 @@
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 325 */
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 326 */
 	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 327 */
+	{ 5,	TD,	printargs,		"preadv"	}, /* 328 */
+	{ 5,	TD,	printargs,		"pwritev"	}, /* 329 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 330 */
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 331 */
 	{ 5,	0,	printargs,		"SYS_332"	}, /* 332 */
