@@ -1,3 +1,17 @@
+strace (4.5.20-1) unstable; urgency=low
+
+  [ Frederik Schüler ]
+  * New upstream version.
+  * Update standards-version to 3.8.4.
+  * debian/rules: allow parallel building.
+  * debian/rules: comment out verbose build, only needed for debugging.
+  * debian/rules: clean up clean: target, dh_clean does most of the work
+    already.
+  * debian/rules: use *-stamp instead of stamp-*, so dh_clean can tidy
+    up for us.
+
+ -- Frederik Schüler <fs@debian.org>  Tue, 13 Apr 2010 13:02:57 +0200
+
 strace (4.5.19-2) unstable; urgency=low
 
   * Add sparc64 to the architectures list, closes: #560062
