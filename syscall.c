@@ -727,7 +727,7 @@ internal_syscall(struct tcb *tcp)
 #elif defined (POWERPC)
 	static long result,flags;
 #elif defined (M68K)
-	static int d0;
+	static long d0;
 #elif defined(BFIN)
 	static long r0;
 #elif defined (ARM)
