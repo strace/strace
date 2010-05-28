@@ -710,6 +710,26 @@ struct tcb *tcp;
 }
 #endif /* LINUX && __i386__ */
 
+#if defined(LINUX) && defined(M68K)
+
+int
+sys_set_thread_area(tcp)
+struct tcb *tcp;
+{
+	if (entering(tcp))
+		tprintf("%#lx", tcp->u_arg[0]);
+	return 0;
+
+}
+
+int
+sys_get_thread_area(tcp)
+struct tcb *tcp;
+{
+	return RVAL_HEX;
+}
+#endif
+
 #if defined(LINUX)
 int
 sys_remap_file_pages(tcp)

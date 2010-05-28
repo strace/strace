@@ -41,8 +41,10 @@
 /* machine-specific */
 #ifndef I386
 #define	sys_modify_ldt		printargs
+#ifndef M68K
 #define sys_get_thread_area	printargs
 #define sys_set_thread_area	printargs
+#endif
 #endif
 
 #define sys_sched_yield		printargs

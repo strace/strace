@@ -361,10 +361,10 @@
 	{ 5,	TD,	printargs,		"pwritev"	}, /* 330 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 331 */
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 332 */
-	{ 5,	0,	printargs,		"SYS_333"	}, /* 333 */
-	{ 5,	0,	printargs,		"SYS_334"	}, /* 334 */
-	{ 5,	0,	printargs,		"SYS_335"	}, /* 335 */
-	{ 5,	0,	printargs,		"SYS_336"	}, /* 336 */
+	{ 0,	0,	sys_get_thread_area,	"get_thread_area"}, /* 333 */
+	{ 1,	0,	sys_set_thread_area,	"set_thread_area"}, /* 334 */
+	{ 6,	0,	printargs,		"atomic_comxchg_32"}, /* 335 */
+	{ 0,	0,	printargs,		"atomic_barrier"}, /* 336 */
 	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */
 	{ 5,	0,	printargs,		"SYS_338"	}, /* 338 */
 	{ 5,	0,	printargs,		"SYS_339"	}, /* 339 */
