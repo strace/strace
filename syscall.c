@@ -2249,6 +2249,18 @@ syscall_enter(struct tcb *tcp)
 				return -1;
 		}
 	}
+#elif defined (M68K)
+	{
+		int i;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else
+			tcp->u_nargs = MAX_ARGS;
+		for (i = 0; i < tcp->u_nargs; i++) {
+			if (upeek(tcp, (i < 5 ? i : i + 2)*4, &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
 #else /* Other architecture (like i386) (32bits specific) */
 	{
 		int i;
