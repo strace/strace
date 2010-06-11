@@ -43,7 +43,7 @@ strace \- trace system calls and signals
 .SH SYNOPSIS
 .B strace
 [
-.B \-CdffhiqrtttTvxx
+.B \-CdDffhiqrtttTvxx
 ]
 [
 .BI \-a column
@@ -83,6 +83,9 @@ strace \- trace system calls and signals
 .sp
 .B strace
 .B \-c
+[
+.B \-D
+]
 [
 .BI \-e expr
 ]
@@ -254,6 +257,13 @@ or
 Like
 .B \-c
 but also print regular output while processes are running.
+.TP
+.B \-D
+(Not available on SVR4 and FreeBSD.)
+Run tracer process as a detached grandchild, not as parent of the
+tracee.  This reduces the visible effect of
+.B strace
+by keeping the tracee a direct child of the calling process.
 .TP
 .B \-d
 Show some debugging output of

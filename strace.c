@@ -168,12 +168,13 @@ FILE *ofp;
 int exitval;
 {
 	fprintf(ofp, "\
-usage: strace [-dffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
+usage: strace [-CdDffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
               [-p pid] ... [-s strsize] [-u username] [-E var=val] ...\n\
               [command [arg ...]]\n\
-   or: strace -c -D [-e expr] ... [-O overhead] [-S sortby] [-E var=val] ...\n\
+   or: strace -c [-D] [-e expr] ... [-O overhead] [-S sortby] [-E var=val] ...\n\
               [command [arg ...]]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
+-C -- like -c but also print regular output while processes are running\n\
 -f -- follow forks, -ff -- with output into separate files\n\
 -F -- attempt to follow vforks, -h -- print help message\n\
 -i -- print instruction pointer at time of syscall\n\
@@ -746,7 +747,6 @@ main(int argc, char *argv[])
 			debug++;
 			break;
 #ifndef USE_PROCFS
-		/* Experimental, not documented in manpage yet. */
 		case 'D':
 			daemonized_tracer = 1;
 			break;
