@@ -122,6 +122,28 @@ sprintrlim(long lim)
 	return buf;
 }
 
+# if defined LINUX && (defined POWERPC64 || defined X86_64)
+static void
+print_rlimit32(struct tcb *tcp)
+{
+	struct rlimit32 {
+		unsigned int rlim_cur;
+		unsigned int rlim_max;
+	} rlim;
+
+	if (umove(tcp, tcp->u_arg[1], &rlim) < 0)
+		tprintf("{...}");
+	else {
+		tprintf("{rlim_cur=%s,",
+			sprintrlim(rlim.rlim_cur == -1 ? RLIM_INFINITY
+				   : rlim.rlim_cur));
+		tprintf(" rlim_max=%s}",
+			sprintrlim(rlim.rlim_max == -1 ? RLIM_INFINITY
+				   : rlim.rlim_max));
+	}
+}
+# endif
+
 int
 sys_getrlimit(struct tcb *tcp)
 {
@@ -134,6 +156,10 @@ sys_getrlimit(struct tcb *tcp)
 	else {
 		if (syserror(tcp) || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
+# if defined LINUX && (defined POWERPC64 || defined X86_64)
+		else if (current_personality == 1)
+			print_rlimit32(tcp);
+# endif
 		else if (umove(tcp, tcp->u_arg[1], &rlim) < 0)
 			tprintf("{...}");
 		else {
@@ -154,6 +180,10 @@ sys_setrlimit(struct tcb *tcp)
 		tprintf(", ");
 		if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
+# if defined LINUX && (defined POWERPC64 || defined X86_64)
+		else if (current_personality == 1)
+			print_rlimit32(tcp);
+# endif
 		else if (umove(tcp, tcp->u_arg[1], &rlim) < 0)
 			tprintf("{...}");
 		else {
