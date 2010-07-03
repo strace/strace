@@ -490,6 +490,7 @@ extern int get_scno(struct tcb *);
 extern long known_scno(struct tcb *);
 extern long do_ptrace(int request, struct tcb *tcp, void *addr, void *data);
 extern int ptrace_restart(int request, struct tcb *tcp, int sig);
+extern int force_result(struct tcb *, int, long);
 extern int trace_syscall(struct tcb *);
 extern int count_syscall(struct tcb *, struct timeval *);
 extern void printxval(const struct xlat *, int, const char *);

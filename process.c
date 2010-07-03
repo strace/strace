@@ -1981,7 +1981,6 @@ int flagarg;
 		if (tcp->u_arg[flagarg] & WNOHANG) {
 			/* We must force a fake result of 0 instead of
 			   the ECHILD error.  */
-			extern int force_result();
 			return force_result(tcp, 0, 0);
 		}
 	}
