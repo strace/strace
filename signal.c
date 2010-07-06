@@ -1532,6 +1532,32 @@ sys_sigreturn(struct tcb *tcp)
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
+#elif defined(MICROBLAZE)
+	struct sigcontext sc;
+
+	/* TODO: Verify that this is correct...  */
+	if (entering(tcp)) {
+		long sp;
+
+		tcp->u_arg[0] = 0;
+
+		/* Read r1, the stack pointer.  */
+		if (upeek(tcp, 1 * 4, &sp) < 0)
+			return 0;
+		if (umove(tcp, sp, &sc) < 0)
+			return 0;
+		tcp->u_arg[0] = 1;
+		tcp->u_arg[1] = sc.oldmask;
+	} else {
+		sigset_t sigm;
+		long_to_sigset(tcp->u_arg[1], &sigm);
+		tcp->u_rval = tcp->u_error = 0;
+		if (tcp->u_arg[0] == 0)
+			return 0;
+		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
+		return RVAL_NONE | RVAL_STR;
+	}
+	return 0;
 #else
 #warning No sys_sigreturn() for this architecture
 #warning         (no problem, just a reminder :-)

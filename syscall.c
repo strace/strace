@@ -760,6 +760,8 @@ internal_syscall(struct tcb *tcp)
 	static long rax;
 #elif defined(CRISV10) || defined(CRISV32)
 	static long r10;
+#elif defined(MICROBLAZE)
+	static long r3;
 #endif
 #endif /* LINUX */
 #ifdef FREEBSD
@@ -1315,6 +1317,9 @@ get_scno(struct tcb *tcp)
 			return 0;
 		}
 	}
+# elif defined(MICROBLAZE)
+	if (upeek(tcp, 0, &scno) < 0)
+		return -1;
 # endif
 #endif /* LINUX */
 
@@ -1527,6 +1532,14 @@ syscall_fixup(struct tcb *tcp)
 			fprintf(stderr, "stray syscall exit: r10 = %ld\n", r10);
 		return 0;
 	}
+#elif defined(MICROBLAZE)
+	if (upeek(tcp, 3 * 4, &r3) < 0)
+		return -1;
+	if (r3 != -ENOSYS && !(tcp->flags & TCB_INSYSCALL)) {
+		if (debug)
+			fprintf(stderr, "stray syscall exit: r3 = %ld\n", r3);
+		return 0;
+	}
 #endif
 #endif /* LINUX */
 	return 1;
@@ -1731,6 +1744,16 @@ get_error(struct tcb *tcp)
 		}
 		else {
 			tcp->u_rval = rval;
+			u_error = 0;
+		}
+# elif defined(MICROBLAZE)
+		/* interpret result as return value or error number */
+		if (is_negated_errno(r3)) {
+			tcp->u_rval = -1;
+			u_error = -r3;
+		}
+		else {
+			tcp->u_rval = r3;
 			u_error = 0;
 		}
 # endif
@@ -2240,6 +2263,18 @@ syscall_enter(struct tcb *tcp)
 			tcp->u_nargs = MAX_ARGS;
 		for (i = 0; i < tcp->u_nargs; i++) {
 			if (upeek(tcp, argreg[current_personality][i]*8, &tcp->u_arg[i]) < 0)
+				return -1;
+		}
+	}
+#elif defined(MICROBLAZE)
+	{
+		int i;
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls)
+			tcp->u_nargs = sysent[tcp->scno].nargs;
+		else
+			tcp->u_nargs = 0;
+		for (i = 0; i < tcp->u_nargs; i++) {
+			if (upeek(tcp, (5 + i) * 4, &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	}

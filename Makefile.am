@@ -42,6 +42,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/ia64/syscallent.h \
 	     linux/ia64/ioctlent.h \
 	     linux/m68k/syscallent.h \
+	     linux/microblaze/syscallent.h \
 	     linux/mips/ioctlent.sh linux/mips/errnoent.h \
 	     linux/mips/ioctlent.h linux/mips/signalent.h \
 	     linux/mips/syscallent.h \

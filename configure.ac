@@ -127,6 +127,10 @@ tile*)
 	arch=tile
 	AC_DEFINE([TILE], 1, [Define for the Tile architecture])
 	;;
+microblaze*)
+	arch=microblaze
+	AC_DEFINE([MICROBLAZE], 1, [Define for the MicroBlaze architecture.])
+	;;
 *)
 	AC_MSG_RESULT([NO!])
 	AC_MSG_ERROR([architecture $host_cpu is not supported by strace])
