@@ -1087,11 +1087,12 @@ proc_open(struct tcb *tcp, int attaching)
 	/* Open the process pseudo-file in /proc. */
 #ifndef FREEBSD
 	sprintf(proc, "/proc/%d", tcp->pid);
-	if ((tcp->pfd = open(proc, O_RDWR|O_EXCL)) < 0) {
+	tcp->pfd = open(proc, O_RDWR|O_EXCL);
 #else /* FREEBSD */
 	sprintf(proc, "/proc/%d/mem", tcp->pid);
-	if ((tcp->pfd = open(proc, O_RDWR)) < 0) {
+	tcp->pfd = open(proc, O_RDWR);
 #endif /* FREEBSD */
+	if (tcp->pfd < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
@@ -2194,10 +2195,11 @@ trace()
 		tcp->curcol = curcol;
 		arg = 0;
 #ifndef FREEBSD
-		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
+		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0)
 #else
-		if (IOCTL (tcp->pfd, PIOCRUN, 0) < 0) {
+		if (IOCTL (tcp->pfd, PIOCRUN, 0) < 0)
 #endif
+		{
 			perror("PIOCRUN");
 			exit(1);
 		}
