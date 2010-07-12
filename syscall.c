@@ -883,6 +883,29 @@ get_scno(struct tcb *tcp)
 			return 0;
 		}
 	}
+
+#  ifdef POWERPC64
+	if (!(tcp->flags & TCB_INSYSCALL)) {
+		static int currpers = -1;
+		long val;
+		int pid = tcp->pid;
+
+		/* Check for 64/32 bit mode. */
+		if (upeek(tcp, sizeof (unsigned long)*PT_MSR, &val) < 0)
+			return -1;
+		/* SF is bit 0 of MSR */
+		if (val < 0)
+			currpers = 0;
+		else
+			currpers = 1;
+		if (currpers != current_personality) {
+			static const char *const names[] = {"64 bit", "32 bit"};
+			set_personality(currpers);
+			printf("[ Process PID=%d runs in %s mode. ]\n",
+					pid, names[current_personality]);
+		}
+	}
+#  endif
 # elif defined(AVR32)
 	/*
 	 * Read complete register set in one go.

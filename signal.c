@@ -1330,8 +1330,11 @@ sys_sigreturn(struct tcb *tcp)
 		if (upeek(tcp, sizeof(unsigned long)*PT_R1, &esp) < 0)
 			return 0;
 		/* Skip dummy stack frame. */
-#ifdef __powerpc64__
-		esp += 128;
+#ifdef POWERPC64
+		if (current_personality == 0)
+			esp += 128;
+		else
+			esp += 64;
 #else
 		esp += 64;
 #endif

@@ -280,7 +280,7 @@ AC_CACHE_VAL(ac_cv_have_little_endian_long_long,
 int main () {
 	union {
 		long long ll;
-		long l [2];
+		int l [2];
 	} u;
 	u.ll = 0x12345678;
 	if (u.l[0] == 0x12345678)

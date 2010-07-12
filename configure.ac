@@ -79,6 +79,9 @@ alpha*)
 powerpc*)
 	arch=powerpc
 	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
+	if test $host_cpu = powerpc64; then
+		AC_DEFINE([POWERPC64], 1, [Define for the PowerPC64 architecture.])
+	fi
 	;;
 arm*)
 	arch=arm

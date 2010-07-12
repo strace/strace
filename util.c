@@ -251,20 +251,24 @@ int
 printllval(struct tcb *tcp, const char *format, int llarg)
 {
 # if defined(FREEBSD) \
-     || (defined(LINUX) && defined(POWERPC) && !defined(__powerpc64__)) \
+     || (defined(LINUX) && defined(POWERPC) && !defined(POWERPC64)) \
      || defined (LINUX_MIPSO32)
 	/* Align 64bit argument to 64bit boundary.  */
 	if (llarg % 2) llarg++;
 # endif
-# if defined LINUX && defined X86_64
+# if defined LINUX && (defined X86_64 || defined POWERPC64)
 	if (current_personality == 0) {
 		tprintf(format, tcp->u_arg[llarg]);
 		llarg++;
 	} else {
+#  ifdef POWERPC64
+		/* Align 64bit argument to 64bit boundary.  */
+		if (llarg % 2) llarg++;
+#  endif
 		tprintf(format, LONG_LONG(tcp->u_arg[llarg], tcp->u_arg[llarg + 1]));
 		llarg += 2;
 	}
-# elif defined IA64 || defined ALPHA || (defined POWERPC && defined __powerpc64__)
+# elif defined IA64 || defined ALPHA
 	tprintf(format, tcp->u_arg[llarg]);
 	llarg++;
 # elif defined LINUX_MIPSN32
@@ -1110,10 +1114,14 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
-		tprintf ("[????????] ");
+		PRINTBADPC;
 		return;
 	}
+#  ifdef POWERPC64
+	tprintf("[%016lx] ", pc);
+#  else
 	tprintf("[%08lx] ", pc);
+#  endif
 # elif defined(M68K)
 	long pc;
 

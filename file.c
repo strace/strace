@@ -859,6 +859,71 @@ printstat_sparc64(struct tcb *tcp, long addr)
 #endif /* SPARC64 */
 #endif /* LINUXSPARC */
 
+#if defined LINUX && defined POWERPC64
+struct stat_powerpc32 {
+	unsigned int	st_dev;
+	unsigned int	st_ino;
+	unsigned int	st_mode;
+	unsigned short	st_nlink;
+	unsigned int	st_uid;
+	unsigned int	st_gid;
+	unsigned int	st_rdev;
+	unsigned int	st_size;
+	unsigned int	st_blksize;
+	unsigned int	st_blocks;
+	unsigned int	st_atime;
+	unsigned int	st_atime_nsec;
+	unsigned int	st_mtime;
+	unsigned int	st_mtime_nsec;
+	unsigned int	st_ctime;
+	unsigned int	st_ctime_nsec;
+	unsigned int	__unused4;
+	unsigned int	__unused5;
+};
+
+static void
+printstat_powerpc32(struct tcb *tcp, long addr)
+{
+	struct stat_powerpc32 statbuf;
+
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprintf("{...}");
+		return;
+	}
+
+	if (!abbrev(tcp)) {
+		tprintf("{st_dev=makedev(%u, %u), st_ino=%u, st_mode=%s, ",
+			major(statbuf.st_dev), minor(statbuf.st_dev),
+			statbuf.st_ino,
+			sprintmode(statbuf.st_mode));
+		tprintf("st_nlink=%u, st_uid=%u, st_gid=%u, ",
+			statbuf.st_nlink, statbuf.st_uid, statbuf.st_gid);
+		tprintf("st_blksize=%u, ", statbuf.st_blksize);
+		tprintf("st_blocks=%u, ", statbuf.st_blocks);
+	}
+	else
+		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
+	switch (statbuf.st_mode & S_IFMT) {
+	case S_IFCHR: case S_IFBLK:
+		tprintf("st_rdev=makedev(%lu, %lu), ",
+			(unsigned long) major(statbuf.st_rdev),
+			(unsigned long) minor(statbuf.st_rdev));
+		break;
+	default:
+		tprintf("st_size=%u, ", statbuf.st_size);
+		break;
+	}
+	if (!abbrev(tcp)) {
+		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
+		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
+		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
+		tprintf("}");
+	}
+	else
+		tprintf("...}");
+}
+#endif /* LINUX && POWERPC64 */
+
 static const struct xlat fileflags[] = {
 #ifdef FREEBSD
 	{ UF_NODUMP,	"UF_NODUMP"	},
@@ -997,6 +1062,13 @@ printstat(struct tcb *tcp, long addr)
 	}
 #endif
 #endif /* LINUXSPARC */
+
+#if defined LINUX && defined POWERPC64
+	if (current_personality == 1) {
+		printstat_powerpc32(tcp, addr);
+		return;
+	}
+#endif
 
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprintf("{...}");
@@ -1259,7 +1331,12 @@ sys_newfstatat(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
-#if defined HAVE_STAT64 && !(defined POWERPC && defined __powerpc64__)
+#ifdef POWERPC64
+		if (current_personality == 0)
+			printstat(tcp, tcp->u_arg[2]);
+		else
+			printstat64(tcp, tcp->u_arg[2]);
+#elif defined HAVE_STAT64
 		printstat64(tcp, tcp->u_arg[2]);
 #else
 		printstat(tcp, tcp->u_arg[2]);

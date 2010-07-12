@@ -246,6 +246,13 @@ extern int ptrace(int, int, char *, int, ...);
 #define PERSONALITY1_WORDSIZE 4
 #endif
 
+#ifdef POWERPC64
+#undef SUPPORTED_PERSONALITIES
+#define SUPPORTED_PERSONALITIES 2
+#define PERSONALITY0_WORDSIZE 8
+#define PERSONALITY1_WORDSIZE 4
+#endif
+
 #ifdef SVR4
 #ifdef HAVE_MP_PROCFS
 extern int mp_ioctl (int f, int c, void *a, int s);
