@@ -327,8 +327,8 @@
 	{ 4,	TD|TF,	sys_readlinkat,		"readlinkat"		}, /* 296 */
 	{ 3,	TD|TF,	sys_fchmodat,		"fchmodat"		}, /* 297 */
 	{ 3,	TD|TF,	sys_faccessat,		"faccessat"		}, /* 298 */
-	{ 2,	0,	printargs,		"set_robust_list"	}, /* 299 */
-	{ 3,	0,	printargs,		"get_robust_list"	}, /* 300 */
+	{ 3,	0,	printargs,		"get_robust_list"	}, /* 299 */
+	{ 2,	0,	printargs,		"set_robust_list"	}, /* 300 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 301 */
 	{ 3,	0,	sys_getcpu,		"getcpu"		}, /* 302 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 303 */
