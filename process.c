@@ -915,6 +915,16 @@ Process %u resumed (parent %d ready)\n",
 				tcpchild->flags |= TCB_CLONE_DETACHED;
 				++tcp->nclone_detached;
 			}
+			if ((call_flags & CLONE_PARENT) &&
+			    !(call_flags & CLONE_THREAD)) {
+				--tcp->nchildren;
+				tcpchild->parent = NULL;
+				if (tcp->parent != NULL) {
+					tcp = tcp->parent;
+					tcpchild->parent = tcp;
+					++tcp->nchildren;
+				}
+			}
 		}
 #endif /* TCB_CLONE_THREAD */
 	}
