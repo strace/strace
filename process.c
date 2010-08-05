@@ -1922,9 +1922,9 @@ int flagarg;
 	if (tcp->flags & TCB_CLONE_THREAD)
 		/* The children we wait for are our parent's children.  */
 		got_kids = (tcp->parent->nchildren
-			    > tcp->parent->nclone_detached);
+			    > (tcp->parent->nclone_detached + tcp->parent->nclone_threads));
 	else
-		got_kids = (tcp->nchildren > tcp->nclone_detached);
+		got_kids = (tcp->nchildren > (tcp->nclone_detached + tcp->nclone_threads));
 #else
 	got_kids = tcp->nchildren > 0;
 #endif
