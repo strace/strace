@@ -846,6 +846,13 @@ main(int argc, char *argv[])
 	if ((optind == argc) == !pflag_seen)
 		usage(stderr, 1);
 
+	if (pflag_seen && daemonized_tracer) {
+		fprintf(stderr,
+			"%s: -D and -p are mutually exclusive options\n",
+			progname);
+		exit(1);
+	}
+
 	if (!followfork)
 		followfork = optF;
 
