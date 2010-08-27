@@ -336,7 +336,6 @@ struct tcb {
 	int nzombies;		/* # of formerly traced children now dead */
 #ifdef LINUX
 	int nclone_threads;	/* # of nchildren with CLONE_THREAD */
-	int nclone_detached;	/* # of nchildren with CLONE_DETACHED */
 	int nclone_waiting;	/* clone threads in wait4 (TCB_SUSPENDED) */
 #endif
 				/* (1st arg of wait4()) */
@@ -382,7 +381,6 @@ struct tcb {
   || defined(ARM) || defined(MIPS) || defined(BFIN) || defined(TILE)
 #  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
 # endif
-# define TCB_CLONE_DETACHED 04000 /* CLONE_DETACHED set in creating syscall */
 # define TCB_CLONE_THREAD  010000 /* CLONE_THREAD set in creating syscall */
 # define TCB_GROUP_EXITING 020000 /* TCB_EXITING was exit_group, not _exit */
 # include <sys/syscall.h>

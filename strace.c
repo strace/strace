@@ -443,10 +443,9 @@ startup_attach(void)
 						++nerr;
 					else if (tid != tcbtab[tcbi]->pid) {
 						tcp = alloctcb(tid);
-						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_CLONE_DETACHED|TCB_FOLLOWFORK;
+						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_FOLLOWFORK;
 						tcbtab[tcbi]->nchildren++;
 						tcbtab[tcbi]->nclone_threads++;
-						tcbtab[tcbi]->nclone_detached++;
 						tcp->parent = tcbtab[tcbi];
 					}
 					if (interactive) {
@@ -1028,7 +1027,7 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->nchildren = 0;
 			tcp->nzombies = 0;
 #ifdef TCB_CLONE_THREAD
-			tcp->nclone_threads = tcp->nclone_detached = 0;
+			tcp->nclone_threads = 0;
 			tcp->nclone_waiting = 0;
 #endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
@@ -1396,15 +1395,10 @@ struct tcb *tcp;
 	if (tcp->parent != NULL) {
 		tcp->parent->nchildren--;
 #ifdef TCB_CLONE_THREAD
-		if (tcp->flags & TCB_CLONE_DETACHED)
-			tcp->parent->nclone_detached--;
 		if (tcp->flags & TCB_CLONE_THREAD)
 			tcp->parent->nclone_threads--;
 #endif
-#ifdef TCB_CLONE_DETACHED
-		if (!(tcp->flags & TCB_CLONE_DETACHED))
-#endif
-			tcp->parent->nzombies++;
+		tcp->parent->nzombies++;
 #ifdef LINUX
 		/* Update `tcp->parent->parent->nchildren' and the other fields
 		   like NCLONE_DETACHED, only for zombie group leader that has
@@ -2232,8 +2226,6 @@ handle_group_exit(struct tcb *tcp, int sig)
 
 	if (tcp->flags & TCB_CLONE_THREAD)
 		leader = tcp->parent;
-	else if (tcp->nclone_detached > 0)
-		leader = tcp;
 
 	if (sig < 0) {
 		if (leader != NULL && leader != tcp

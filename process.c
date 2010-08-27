@@ -555,7 +555,6 @@ struct tcb *tcp;
 #define CLONE_SETTLS	0x00080000	/* create a new TLS for the child */
 #define CLONE_PARENT_SETTID	0x00100000	/* set the TID in the parent */
 #define CLONE_CHILD_CLEARTID	0x00200000	/* clear the TID in the child */
-#define CLONE_DETACHED		0x00400000	/* parent wants no child-exit signal */
 #define CLONE_UNTRACED		0x00800000	/* set if the tracing process can't force CLONE_PTRACE on this clone */
 #define CLONE_CHILD_SETTID	0x01000000	/* set the TID in the child */
 
@@ -574,7 +573,6 @@ static const struct xlat clone_flags[] = {
     { CLONE_SETTLS,	"CLONE_SETTLS" },
     { CLONE_PARENT_SETTID,"CLONE_PARENT_SETTID" },
     { CLONE_CHILD_CLEARTID,"CLONE_CHILD_CLEARTID" },
-    { CLONE_DETACHED,	"CLONE_DETACHED" },
     { CLONE_UNTRACED,	"CLONE_UNTRACED" },
     { CLONE_CHILD_SETTID,"CLONE_CHILD_SETTID" },
     { 0,		NULL		},
@@ -910,10 +908,6 @@ Process %u resumed (parent %d ready)\n",
 			if (call_flags & CLONE_THREAD) {
 				tcpchild->flags |= TCB_CLONE_THREAD;
 				++tcp->nclone_threads;
-			}
-			if (call_flags & CLONE_DETACHED) {
-				tcpchild->flags |= TCB_CLONE_DETACHED;
-				++tcp->nclone_detached;
 			}
 			if ((call_flags & CLONE_PARENT) &&
 			    !(call_flags & CLONE_THREAD)) {
@@ -1932,9 +1926,9 @@ int flagarg;
 	if (tcp->flags & TCB_CLONE_THREAD)
 		/* The children we wait for are our parent's children.  */
 		got_kids = (tcp->parent->nchildren
-			    > (tcp->parent->nclone_detached + tcp->parent->nclone_threads));
+			    > tcp->parent->nclone_threads);
 	else
-		got_kids = (tcp->nchildren > (tcp->nclone_detached + tcp->nclone_threads));
+		got_kids = (tcp->nchildren > tcp->nclone_threads);
 #else
 	got_kids = tcp->nchildren > 0;
 #endif
