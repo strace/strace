@@ -131,7 +131,7 @@ static int (*sortfun)();
 static struct timeval overhead = { -1, -1 };
 
 void
-set_sortby(char *sortby)
+set_sortby(const char *sortby)
 {
 	if (strcmp(sortby, "time") == 0)
 		sortfun = time_cmp;
@@ -161,7 +161,7 @@ call_summary_pers(FILE *outf)
 	int     call_cum, error_cum;
 	struct timeval tv_cum, dtv;
 	double  percent;
-	char   *dashes = "-------------------------";
+	const char *dashes = "-------------------------";
 	char    error_str[16];
 	int    *sorted_count = calloc(sizeof(int), nsyscalls);
 

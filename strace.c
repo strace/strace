@@ -117,7 +117,7 @@ FILE *outf;
 static int curcol;
 struct tcb **tcbtab;
 unsigned int nprocs, tcbtabsize;
-char *progname;
+const char *progname;
 extern char **environ;
 
 static int detach(struct tcb *tcp, int sig);
@@ -531,7 +531,7 @@ startup_child (char **argv)
 		strcpy(pathname, filename);
 #endif /* USE_DEBUGGING_EXEC */
 	else {
-		char *path;
+		const char *path;
 		int m, n, len;
 
 		for (path = getenv("PATH"); path && *path; path += m) {

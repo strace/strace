@@ -36,8 +36,8 @@
 #endif
 
 struct ioctlent {
-	char *doth;
-	char *symbol;
+	const char *doth;
+	const char *symbol;
 	unsigned long code;
 };
 
@@ -56,9 +56,7 @@ const void *b;
 }
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, const char *argv[])
 {
 	int i;
 

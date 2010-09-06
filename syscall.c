@@ -238,9 +238,9 @@ static int qual_syscall(), qual_signal(), qual_fault(), qual_desc();
 
 static const struct qual_options {
 	int bitflag;
-	char *option_name;
-	int (*qualify)();
-	char *argument_name;
+	const char *option_name;
+	int (*qualify)(const char *, const struct qual_options *, int);
+	const char *argument_name;
 } qual_options[] = {
 	{ QUAL_TRACE,	"trace",	qual_syscall,	"system call"	},
 	{ QUAL_TRACE,	"t",		qual_syscall,	"system call"	},
@@ -299,10 +299,7 @@ qualify_one(n, opt, not, pers)
 }
 
 static int
-qual_syscall(s, opt, not)
-	char *s;
-	const struct qual_options *opt;
-	int not;
+qual_syscall(const char *s, const struct qual_options *opt, int not)
 {
 	int i;
 	int rc = -1;
@@ -340,10 +337,7 @@ qual_syscall(s, opt, not)
 }
 
 static int
-qual_signal(s, opt, not)
-	char *s;
-	const struct qual_options *opt;
-	int not;
+qual_signal(const char *s, const struct qual_options *opt, int not)
 {
 	int i;
 	char buf[32];
@@ -359,12 +353,10 @@ qual_signal(s, opt, not)
 		return -1;
 	strcpy(buf, s);
 	s = buf;
-	for (i = 0; s[i]; i++)
-		s[i] = toupper((unsigned char)(s[i]));
-	if (strncmp(s, "SIG", 3) == 0)
+	if (strncasecmp(s, "SIG", 3) == 0)
 		s += 3;
 	for (i = 0; i <= NSIG; i++)
-		if (strcmp(s, signame(i) + 3) == 0) {
+		if (strcasecmp(s, signame(i) + 3) == 0) {
 			qualify_one(i, opt, not, -1);
 			return 0;
 		}
@@ -372,19 +364,13 @@ qual_signal(s, opt, not)
 }
 
 static int
-qual_fault(s, opt, not)
-	char *s;
-	const struct qual_options *opt;
-	int not;
+qual_fault(const char *s, const struct qual_options *opt, int not)
 {
 	return -1;
 }
 
 static int
-qual_desc(s, opt, not)
-	char *s;
-	const struct qual_options *opt;
-	int not;
+qual_desc(const char *s, const struct qual_options *opt, int not)
 {
 	if (isdigit((unsigned char)*s)) {
 		int desc = atoi(s);
@@ -397,8 +383,7 @@ qual_desc(s, opt, not)
 }
 
 static int
-lookup_class(s)
-	char *s;
+lookup_class(const char *s)
 {
 	if (strcmp(s, "file") == 0)
 		return TRACE_FILE;
@@ -416,12 +401,12 @@ lookup_class(s)
 }
 
 void
-qualify(s)
-char *s;
+qualify(const char *s)
 {
 	const struct qual_options *opt;
 	int not;
-	char *p;
+	char *copy;
+	const char *p;
 	int i, n;
 
 	opt = &qual_options[0];
@@ -451,7 +436,13 @@ char *s;
 	for (i = 0; i < MAX_QUALS; i++) {
 		qualify_one(i, opt, !not, -1);
 	}
-	for (p = strtok(s, ","); p; p = strtok(NULL, ",")) {
+	if (!strchr(s, ','))
+		return;
+	if (!(copy = strdup(s))) {
+		fprintf(stderr, "out of memory\n");
+		exit(1);
+	}
+	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
 		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {
 			for (i = 0; i < nsyscalls0; i++)
 				if (sysent0[i].sys_flags & n)
@@ -477,6 +468,7 @@ char *s;
 			exit(1);
 		}
 	}
+	free(copy);
 	return;
 }
 

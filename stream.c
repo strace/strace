@@ -57,7 +57,7 @@
 struct strbuf {
 	int     maxlen;                 /* no. of bytes in buffer */
 	int     len;                    /* no. of bytes returned */
-	char    *buf;                   /* pointer to data */
+	const char *buf;                /* pointer to data */
 };
 #define MORECTL 1
 #define MOREDATA 2

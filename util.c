@@ -340,13 +340,10 @@ sprintflags(const char *prefix, const struct xlat *xlat, int flags)
 }
 
 int
-printflags(xlat, flags, dflt)
-const struct xlat *xlat;
-int flags;
-const char *dflt;
+printflags(const struct xlat *xlat, int flags, const char *dflt)
 {
 	int n;
-	char *sep;
+	const char *sep;
 
 	if (flags == 0 && xlat->val == 0) {
 		tprintf("%s", xlat->str);
@@ -383,10 +380,7 @@ const char *dflt;
 }
 
 void
-printnum(tcp, addr, fmt)
-struct tcb *tcp;
-long addr;
-char *fmt;
+printnum(struct tcb *tcp, long addr, const char *fmt)
 {
 	long num;
 
@@ -404,10 +398,7 @@ char *fmt;
 }
 
 void
-printnum_int(tcp, addr, fmt)
-struct tcb *tcp;
-long addr;
-char *fmt;
+printnum_int(struct tcb *tcp, long addr, const char *fmt)
 {
 	int num;
 

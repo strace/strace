@@ -315,7 +315,8 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 {
 	int i, nsigs;
 	int maxsigs;
-	char *format, *s;
+	const char *format;
+	char *s;
 	static char outstr[8 * sizeof(sigset_t) * 8];
 
 	strcpy(outstr, str);
@@ -785,7 +786,7 @@ int verbose;
 #ifdef LINUX
 
 static void
-parse_sigset_t (const char *str, sigset_t *set)
+parse_sigset_t(const char *str, sigset_t *set)
 {
 	const char *p;
 	unsigned int digit;
@@ -832,7 +833,7 @@ int sig;
 	int sfd;
 	char sname[32];
 	char buf[2048];
-	char *s;
+	const char *s;
 	int i;
 	sigset_t ignored, caught;
 #endif

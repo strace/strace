@@ -424,7 +424,7 @@ struct tcb {
 
 struct xlat {
 	int val;
-	char *str;
+	const char *str;
 };
 
 extern const struct xlat open_mode_flags[];
@@ -488,9 +488,9 @@ extern void expand_tcbtab(void);
 
 #define alloctcb(pid)	alloc_tcb((pid), 1)
 
-extern void set_sortby(char *);
+extern void set_sortby(const char *);
 extern void set_overhead(int);
-extern void qualify(char *);
+extern void qualify(const char *);
 extern int get_scno(struct tcb *);
 extern long known_scno(struct tcb *);
 extern long do_ptrace(int request, struct tcb *tcp, void *addr, void *data);
@@ -509,8 +509,8 @@ extern int upeek(struct tcb *, long, long *);
 extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr(struct tcb *, long, int);
-extern void printnum(struct tcb *, long, char *);
-extern void printnum_int(struct tcb *, long, char *);
+extern void printnum(struct tcb *, long, const char *);
+extern void printnum_int(struct tcb *, long, const char *);
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, int);
 extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);

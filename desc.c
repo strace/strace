@@ -490,7 +490,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			       & -sizeof(long));
 	fd_set *fds;
 	static char outstr[1024];
-	char *sep;
+	const char *sep;
 	long arg;
 
 	if (entering(tcp)) {
@@ -529,7 +529,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	else
 	{
 		unsigned int cumlen = 0;
-		char *sep = "";
+		const char *sep = "";
 
 		if (syserror(tcp))
 			return 0;

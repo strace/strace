@@ -1630,16 +1630,14 @@ struct tcb *tcp;
 
 
 static void
-printargv(tcp, addr)
-struct tcb *tcp;
-long addr;
+printargv(struct tcb *tcp, long addr)
 {
 	union {
 		unsigned int p32;
 		unsigned long p64;
 		char data[sizeof(long)];
 	} cp;
-	char *sep;
+	const char *sep;
 	int n = 0;
 
 	cp.p64 = 1;
@@ -1662,10 +1660,7 @@ long addr;
 }
 
 static void
-printargc(fmt, tcp, addr)
-char *fmt;
-struct tcb *tcp;
-long addr;
+printargc(const char *fmt, struct tcb *tcp, long addr)
 {
 	int count;
 	char *cp;
