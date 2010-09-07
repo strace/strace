@@ -619,12 +619,11 @@ extern int proc_open(struct tcb *tcp, int attaching);
 #define printtv_special(tcp, addr)	\
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 
-#ifdef __GNUC__
 extern void tprintf(const char *fmt, ...)
-	__attribute__ ((format (printf, 1, 2)));
-#else
-extern void tprintf(const char *fmt, ...);
+#ifdef __GNUC__
+	__attribute__ ((format (printf, 1, 2)))
 #endif
+	;
 
 #ifndef HAVE_STRERROR
 const char *strerror(int);
