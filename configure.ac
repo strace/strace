@@ -171,15 +171,13 @@ in the compilation directory.])
 	fi
 fi
 
-AC_WARNFLAGS
+gl_WARN_ADD([-Wall])
 if test "x$opsys" = "xsunos4"
 then
-	if test -n "$GCC"
-	then
-		# SunOS 4.x header files don't declare int functions.
-		WARNFLAGS="$WARNFLAGS -Wno-implicit"
-	fi
+	# SunOS 4.x header files don't declare int functions.
+	gl_WARN_ADD([-Wno-implicit])
 fi
+AC_SUBST([WARN_CFLAGS])
 
 AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL

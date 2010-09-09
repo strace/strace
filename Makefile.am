@@ -10,8 +10,8 @@ OS		= @opsys@
 ARCH		= @arch@
 
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(WARNFLAGS)
-INCLUDES = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS)
+AM_CFLAGS = $(WARN_CFLAGS)
+AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS)
 
 strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
 		 io.c ioctl.c mem.c net.c process.c bjm.c quota.c \
