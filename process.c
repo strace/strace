@@ -2086,11 +2086,9 @@ static const struct xlat waitid_types[] = {
 };
 
 int
-sys_waitid(tcp)
-struct tcb *tcp;
+sys_waitid(struct tcb *tcp)
 {
 	siginfo_t si;
-	int exited;
 
 	if (entering(tcp)) {
 		printxval(waitid_types, tcp->u_arg[0], "P_???");
@@ -2098,7 +2096,6 @@ struct tcb *tcp;
 	}
 	else {
 		/* siginfo */
-		exited = 0;
 		if (!tcp->u_arg[2])
 			tprintf("NULL");
 		else if (syserror(tcp))
