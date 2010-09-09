@@ -172,6 +172,7 @@ in the compilation directory.])
 fi
 
 gl_WARN_ADD([-Wall])
+gl_WARN_ADD([-Wwrite-strings])
 if test "x$opsys" = "xsunos4"
 then
 	# SunOS 4.x header files don't declare int functions.
