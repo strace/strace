@@ -9,6 +9,7 @@ OS		= @opsys@
 # ARCH is `i386', `m68k', `sparc', etc.
 ARCH		= @arch@
 
+ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WARNFLAGS)
 INCLUDES = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS)
 
