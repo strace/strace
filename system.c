@@ -318,6 +318,29 @@ sys_sram_alloc(struct tcb *tcp)
 	return 1;
 }
 
+#include <asm/cachectl.h>
+
+static const struct xlat cacheflush_flags[] = {
+	{ ICACHE,	"ICACHE" },
+	{ DCACHE,	"DCACHE" },
+	{ BCACHE,	"BCACHE" },
+	{ 0,		NULL },
+};
+
+int
+sys_cacheflush(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		/* start addr */
+		tprintf("%#lx, ", tcp->u_arg[0]);
+		/* length */
+		tprintf("%ld, ", tcp->u_arg[1]);
+		/* flags */
+		printxval(cacheflush_flags, tcp->u_arg[1], "?CACHE");
+	}
+	return 0;
+}
+
 #endif
 
 #endif /* LINUX */

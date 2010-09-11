@@ -334,4 +334,5 @@ int sys_subpage_prot();
 
 #ifdef BFIN
 int sys_sram_alloc();
+int sys_cacheflush();
 #endif

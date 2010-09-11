@@ -399,3 +399,7 @@
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 368 */
 	{ 5,	TD,	printargs,		"perf_event_open"	}, /* 369 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 370 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 371 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 372 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 373 */
+	{ 3,	0,	sys_cacheflush,		"cacheflush"	}, /* 374 */
