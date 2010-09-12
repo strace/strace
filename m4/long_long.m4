@@ -2,16 +2,10 @@ dnl ### A macro to determine if off_t is a long long
 AC_DEFUN([AC_OFF_T_IS_LONG_LONG],
 [AC_MSG_CHECKING(for long long off_t)
 AC_CACHE_VAL(ac_cv_have_long_long_off_t,
-[AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
-main () {
-	if (sizeof (off_t) == sizeof (long long) &&
-	    sizeof (off_t) > sizeof (long))
-	    return 0;
-	return 1;
-}
-]])],[ac_cv_have_long_long_off_t=yes],[ac_cv_have_long_long_off_t=no],[# Should try to guess here
-ac_cv_have_long_long_off_t=no
-])])
+[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
+char a[(sizeof (off_t) == sizeof (long long) &&
+        sizeof (off_t) > sizeof (long)) - 1];
+]])],[ac_cv_have_long_long_off_t=yes],[ac_cv_have_long_long_off_t=no])])
 AC_MSG_RESULT($ac_cv_have_long_long_off_t)
 if test "$ac_cv_have_long_long_off_t" = yes
 then
@@ -23,18 +17,12 @@ dnl ### A macro to determine if rlim_t is a long long
 AC_DEFUN([AC_RLIM_T_IS_LONG_LONG],
 [AC_MSG_CHECKING(for long long rlim_t)
 AC_CACHE_VAL(ac_cv_have_long_long_rlim_t,
-[AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
+[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-main () {
-	if (sizeof (rlim_t) == sizeof (long long) &&
-	    sizeof (rlim_t) > sizeof (long))
-	    return 0;
-	return 1;
-}
-]])],[ac_cv_have_long_long_rlim_t=yes],[ac_cv_have_long_long_rlim_t=no],[# Should try to guess here
-ac_cv_have_long_long_rlim_t=no
-])])
+char a[(sizeof (rlim_t) == sizeof (long long) &&
+        sizeof (rlim_t) > sizeof (long)) - 1];
+]])],[ac_cv_have_long_long_rlim_t=yes],[ac_cv_have_long_long_rlim_t=no])])
 AC_MSG_RESULT($ac_cv_have_long_long_rlim_t)
 if test "$ac_cv_have_long_long_rlim_t" = yes
 then
