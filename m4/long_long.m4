@@ -57,8 +57,12 @@ int main () {
 		return 0;
 	return 1;
 }
-]])],[ac_cv_have_little_endian_long_long=yes],[ac_cv_have_little_endian_long_long=no],[# Should try to guess here
-ac_cv_have_little_endian_long_long=no
+]])],[ac_cv_have_little_endian_long_long=yes],[ac_cv_have_little_endian_long_long=no],[
+if test "x$ac_cv_c_bigendian" = "xyes"; then
+	ac_cv_have_little_endian_long_long=no
+else
+	ac_cv_have_little_endian_long_long=yes
+fi
 ])])
 AC_MSG_RESULT($ac_cv_have_little_endian_long_long)
 if test "$ac_cv_have_little_endian_long_long" = yes
