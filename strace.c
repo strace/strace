@@ -1337,23 +1337,36 @@ proc_open(struct tcb *tcp, int attaching)
 #endif /* USE_PROCFS */
 
 struct tcb *
-pid2tcb(pid)
-int pid;
+pid2tcb(int pid)
+{
+	int i;
+
+	if (pid <= 0)
+		return NULL;
+
+	for (i = 0; i < tcbtabsize; i++) {
+		struct tcb *tcp = tcbtab[i];
+		if (tcp->pid == pid && (tcp->flags & TCB_INUSE))
+			return tcp;
+	}
+
+	return NULL;
+}
+
+#ifdef USE_PROCFS
+
+static struct tcb *
+first_used_tcb(void)
 {
 	int i;
 	struct tcb *tcp;
-
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
-		if (pid && tcp->pid != pid)
-			continue;
 		if (tcp->flags & TCB_INUSE)
 			return tcp;
 	}
 	return NULL;
 }
-
-#ifdef USE_PROCFS
 
 static struct tcb *
 pfd2tcb(pfd)
@@ -1992,7 +2005,7 @@ trace()
 #ifndef HAVE_POLLABLE_PROCFS
 			if (proc_poll_pipe[0] == -1) {
 #endif
-				tcp = pid2tcb(0);
+				tcp = first_used_tcb();
 				if (!tcp)
 					continue;
 				pfd = tcp->pfd;
