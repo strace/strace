@@ -436,8 +436,6 @@ qualify(const char *s)
 	for (i = 0; i < MAX_QUALS; i++) {
 		qualify_one(i, opt, !not, -1);
 	}
-	if (!strchr(s, ','))
-		return;
 	if (!(copy = strdup(s))) {
 		fprintf(stderr, "out of memory\n");
 		exit(1);
