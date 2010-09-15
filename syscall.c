@@ -239,7 +239,7 @@ static int qual_syscall(), qual_signal(), qual_fault(), qual_desc();
 static const struct qual_options {
 	int bitflag;
 	const char *option_name;
-	int (*qualify)(const char *, const struct qual_options *, int);
+	int (*qualify)(const char *, int, int);
 	const char *argument_name;
 } qual_options[] = {
 	{ QUAL_TRACE,	"trace",	qual_syscall,	"system call"	},
@@ -266,40 +266,36 @@ static const struct qual_options {
 };
 
 static void
-qualify_one(n, opt, not, pers)
-	int n;
-	const struct qual_options *opt;
-	int not;
-	int pers;
+qualify_one(int n, int bitflag, int not, int pers)
 {
 	if (pers == 0 || pers < 0) {
 		if (not)
-			qual_flags0[n] &= ~opt->bitflag;
+			qual_flags0[n] &= ~bitflag;
 		else
-			qual_flags0[n] |= opt->bitflag;
+			qual_flags0[n] |= bitflag;
 	}
 
 #if SUPPORTED_PERSONALITIES >= 2
 	if (pers == 1 || pers < 0) {
 		if (not)
-			qual_flags1[n] &= ~opt->bitflag;
+			qual_flags1[n] &= ~bitflag;
 		else
-			qual_flags1[n] |= opt->bitflag;
+			qual_flags1[n] |= bitflag;
 	}
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
 	if (pers == 2 || pers < 0) {
 		if (not)
-			qual_flags2[n] &= ~opt->bitflag;
+			qual_flags2[n] &= ~bitflag;
 		else
-			qual_flags2[n] |= opt->bitflag;
+			qual_flags2[n] |= bitflag;
 	}
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 }
 
 static int
-qual_syscall(const char *s, const struct qual_options *opt, int not)
+qual_syscall(const char *s, int bitflag, int not)
 {
 	int i;
 	int rc = -1;
@@ -308,19 +304,19 @@ qual_syscall(const char *s, const struct qual_options *opt, int not)
 		int i = atoi(s);
 		if (i < 0 || i >= MAX_QUALS)
 			return -1;
-		qualify_one(i, opt, not, -1);
+		qualify_one(i, bitflag, not, -1);
 		return 0;
 	}
 	for (i = 0; i < nsyscalls0; i++)
 		if (strcmp(s, sysent0[i].sys_name) == 0) {
-			qualify_one(i, opt, not, 0);
+			qualify_one(i, bitflag, not, 0);
 			rc = 0;
 		}
 
 #if SUPPORTED_PERSONALITIES >= 2
 	for (i = 0; i < nsyscalls1; i++)
 		if (strcmp(s, sysent1[i].sys_name) == 0) {
-			qualify_one(i, opt, not, 1);
+			qualify_one(i, bitflag, not, 1);
 			rc = 0;
 		}
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
@@ -328,7 +324,7 @@ qual_syscall(const char *s, const struct qual_options *opt, int not)
 #if SUPPORTED_PERSONALITIES >= 3
 	for (i = 0; i < nsyscalls2; i++)
 		if (strcmp(s, sysent2[i].sys_name) == 0) {
-			qualify_one(i, opt, not, 2);
+			qualify_one(i, bitflag, not, 2);
 			rc = 0;
 		}
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
@@ -337,7 +333,7 @@ qual_syscall(const char *s, const struct qual_options *opt, int not)
 }
 
 static int
-qual_signal(const char *s, const struct qual_options *opt, int not)
+qual_signal(const char *s, int bitflag, int not)
 {
 	int i;
 	char buf[32];
@@ -346,7 +342,7 @@ qual_signal(const char *s, const struct qual_options *opt, int not)
 		int signo = atoi(s);
 		if (signo < 0 || signo >= MAX_QUALS)
 			return -1;
-		qualify_one(signo, opt, not, -1);
+		qualify_one(signo, bitflag, not, -1);
 		return 0;
 	}
 	if (strlen(s) >= sizeof buf)
@@ -357,26 +353,26 @@ qual_signal(const char *s, const struct qual_options *opt, int not)
 		s += 3;
 	for (i = 0; i <= NSIG; i++)
 		if (strcasecmp(s, signame(i) + 3) == 0) {
-			qualify_one(i, opt, not, -1);
+			qualify_one(i, bitflag, not, -1);
 			return 0;
 		}
 	return -1;
 }
 
 static int
-qual_fault(const char *s, const struct qual_options *opt, int not)
+qual_fault(const char *s, int bitflag, int not)
 {
 	return -1;
 }
 
 static int
-qual_desc(const char *s, const struct qual_options *opt, int not)
+qual_desc(const char *s, int bitflag, int not)
 {
 	if (isdigit((unsigned char)*s)) {
 		int desc = atoi(s);
 		if (desc < 0 || desc >= MAX_QUALS)
 			return -1;
-		qualify_one(desc, opt, not, -1);
+		qualify_one(desc, bitflag, not, -1);
 		return 0;
 	}
 	return -1;
@@ -429,12 +425,12 @@ qualify(const char *s)
 	}
 	if (strcmp(s, "all") == 0) {
 		for (i = 0; i < MAX_QUALS; i++) {
-			qualify_one(i, opt, not, -1);
+			qualify_one(i, opt->bitflag, not, -1);
 		}
 		return;
 	}
 	for (i = 0; i < MAX_QUALS; i++) {
-		qualify_one(i, opt, !not, -1);
+		qualify_one(i, opt->bitflag, !not, -1);
 	}
 	if (!(copy = strdup(s))) {
 		fprintf(stderr, "out of memory\n");
@@ -444,23 +440,23 @@ qualify(const char *s)
 		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {
 			for (i = 0; i < nsyscalls0; i++)
 				if (sysent0[i].sys_flags & n)
-					qualify_one(i, opt, not, 0);
+					qualify_one(i, opt->bitflag, not, 0);
 
 #if SUPPORTED_PERSONALITIES >= 2
 			for (i = 0; i < nsyscalls1; i++)
 				if (sysent1[i].sys_flags & n)
-					qualify_one(i, opt, not, 1);
+					qualify_one(i, opt->bitflag, not, 1);
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
 			for (i = 0; i < nsyscalls2; i++)
 				if (sysent2[i].sys_flags & n)
-					qualify_one(i, opt, not, 2);
+					qualify_one(i, opt->bitflag, not, 2);
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 			continue;
 		}
-		if (opt->qualify(p, opt, not)) {
+		if (opt->qualify(p, opt->bitflag, not)) {
 			fprintf(stderr, "strace: invalid %s `%s'\n",
 				opt->argument_name, p);
 			exit(1);
