@@ -796,7 +796,16 @@ int
 internal_fork(struct tcb *tcp)
 {
 	if (entering(tcp)) {
+		tcp->flags &= ~TCB_FOLLOWFORK;
 		if (!followfork)
+			return 0;
+		/*
+		 * In occasion of using PTRACE_O_TRACECLONE, we won't see the
+		 * new child if clone is called with flag CLONE_UNTRACED, so
+		 * we keep the same logic with that option and don't trace it.
+		 */
+		if ((sysent[tcp->scno].sys_func == sys_clone) &&
+		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
 			return 0;
 		fork_tcb(tcp);
 		if (setbpt(tcp) < 0)
