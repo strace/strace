@@ -324,3 +324,5 @@
 	{ 5,	TD,	printargs,		"pwritev"		}, /* 316 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 317 */
 	{ 5,	TD,	printargs,		"perf_event_open"	}, /* 318 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"		}, /* 319 */
+	{ 4,	TN,	sys_accept4,		"accept4"		}, /* 320 */
