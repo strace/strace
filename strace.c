@@ -83,6 +83,7 @@ extern char *optarg;
 
 
 int debug = 0, followfork = 0;
+unsigned int ptrace_setoptions = 0;
 int dtime = 0, xflag = 0, qflag = 0;
 cflag_t cflag = CFLAG_NONE;
 static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
@@ -686,6 +687,77 @@ startup_child (char **argv)
 #endif /* USE_PROCFS */
 }
 
+#ifdef LINUX
+/*
+ * Test whether kernel support PTRACE_O_TRACECLONE et al options.
+ * First fork a new child, call ptrace with PTRACE_SETOPTIONS on it,
+ * and then see which options are supported on this kernel.
+ */
+static int
+test_ptrace_setoptions(void)
+{
+	int pid;
+
+	if ((pid = fork()) < 0)
+		return -1;
+	else if (pid == 0) {
+		if (ptrace(PTRACE_TRACEME, 0, (char *)1, 0) < 0) {
+			_exit(1);
+		}
+		kill(getpid(), SIGSTOP);
+		if ((pid = fork()) < 0) {
+			_exit(1);
+		}
+		_exit(0);
+	}
+	else {
+		int status, tracee_pid, error;
+		int no_child = 0;
+		while (1) {
+			tracee_pid = wait4(-1, &status, 0, NULL);
+			error = errno;
+			if (tracee_pid == -1) {
+				switch (error) {
+				case EINTR:
+					continue;
+				case ECHILD:
+					no_child = 1;
+					break;
+				default:
+					errno = error;
+					perror("test_ptrace_setoptions");
+					return -1;
+				}
+			}
+			if (no_child)
+				break;
+			if (tracee_pid != pid) {
+				if (ptrace(PTRACE_CONT, tracee_pid, 0, 0) < 0 &&
+				    errno != ESRCH)
+					kill(tracee_pid, SIGKILL);
+			}
+			else if (WIFSTOPPED(status)) {
+				if (status >> 16 == PTRACE_EVENT_FORK)
+					ptrace_setoptions |= (PTRACE_O_TRACEVFORK |
+							      PTRACE_O_TRACECLONE |
+							      PTRACE_O_TRACEFORK);
+				if (WSTOPSIG(status) == SIGSTOP) {
+					if (ptrace(PTRACE_SETOPTIONS, pid, NULL,
+						   PTRACE_O_TRACEFORK) < 0) {
+						kill(pid, SIGKILL);
+						return -1;
+					}
+				}
+				if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0 &&
+				    errno != ESRCH)
+					kill(pid, SIGKILL);
+			}
+		}
+	}
+	return 0;
+}
+#endif
+
 int
 main(int argc, char *argv[])
 {
@@ -914,6 +986,15 @@ main(int argc, char *argv[])
 		interactive = 0;
 		qflag = 1;
 	}
+
+#ifdef LINUX
+	if (followfork && test_ptrace_setoptions() < 0) {
+		fprintf(stderr, "Test for options supported by PTRACE_SETOPTIONS\
+			failed, give up using this feature\n");
+		ptrace_setoptions = 0;
+	}
+#endif
+
 	/* Valid states here:
 	   optind < argc	pflag_seen	outfname	interactive
 	   1			0		0		1

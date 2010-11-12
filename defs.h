@@ -308,6 +308,31 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PR_FAULTED      S_CORE
 #endif
 
+#ifdef LINUX
+# ifndef PTRACE_SETOPTIONS
+#  define PTRACE_SETOPTIONS	0x4200
+# endif
+# ifndef PTRACE_O_TRACEFORK
+#  define PTRACE_O_TRACEFORK	0x00000002
+# endif
+# ifndef PTRACE_O_TRACEVFORK
+#  define PTRACE_O_TRACEVFORK	0x00000004
+# endif
+# ifndef PTRACE_O_TRACECLONE
+#  define PTRACE_O_TRACECLONE	0x00000008
+# endif
+
+# ifndef PTRACE_EVENT_FORK
+#  define PTRACE_EVENT_FORK	1
+# endif
+# ifndef PTRACE_EVENT_VFORK
+#  define PTRACE_EVENT_VFORK	2
+# endif
+# ifndef PTRACE_EVENT_CLONE
+#  define PTRACE_EVENT_CLONE	3
+# endif
+#endif /* LINUX */
+
 /* Trace Control Block */
 struct tcb {
 	short flags;		/* See below for TCB_ values */
@@ -470,6 +495,7 @@ typedef enum {
 extern struct tcb **tcbtab;
 extern int *qual_flags;
 extern int debug, followfork;
+extern unsigned int ptrace_setoptions;
 extern int dtime, xflag, qflag;
 extern cflag_t cflag;
 extern int acolumn;
