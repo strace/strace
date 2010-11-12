@@ -793,8 +793,126 @@ change_syscall(struct tcb *tcp, int new)
 
 #ifdef LINUX
 int
+handle_new_child(struct tcb *tcp, int pid, int bpt)
+{
+	struct tcb *tcpchild;
+
+#ifdef CLONE_PTRACE		/* See new setbpt code.  */
+	tcpchild = pid2tcb(pid);
+	if (tcpchild != NULL) {
+		/* The child already reported its startup trap
+		   before the parent reported its syscall return.  */
+		if ((tcpchild->flags
+		     & (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
+		    != (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
+			fprintf(stderr, "\
+[preattached child %d of %d in weird state!]\n",
+				pid, tcp->pid);
+	}
+	else
+#endif /* CLONE_PTRACE */
+	{
+		fork_tcb(tcp);
+		tcpchild = alloctcb(pid);
+	}
+
+#ifndef CLONE_PTRACE
+	/* Attach to the new child */
+	if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
+		if (bpt)
+			clearbpt(tcp);
+		perror("PTRACE_ATTACH");
+		fprintf(stderr, "Too late?\n");
+		droptcb(tcpchild);
+		return 0;
+	}
+#endif /* !CLONE_PTRACE */
+
+	if (bpt)
+		clearbpt(tcp);
+
+	tcpchild->flags |= TCB_ATTACHED;
+	/* Child has BPT too, must be removed on first occasion.  */
+	if (bpt) {
+		tcpchild->flags |= TCB_BPTSET;
+		tcpchild->baddr = tcp->baddr;
+		memcpy(tcpchild->inst, tcp->inst,
+			sizeof tcpchild->inst);
+	}
+	tcpchild->parent = tcp;
+	tcp->nchildren++;
+	if (tcpchild->flags & TCB_SUSPENDED) {
+		/* The child was born suspended, due to our having
+		   forced CLONE_PTRACE.  */
+		if (bpt)
+			clearbpt(tcpchild);
+
+		tcpchild->flags &= ~(TCB_SUSPENDED|TCB_STARTUP);
+		if (ptrace_restart(PTRACE_SYSCALL, tcpchild, 0) < 0)
+			return -1;
+
+		if (!qflag)
+			fprintf(stderr, "\
+Process %u resumed (parent %d ready)\n",
+				pid, tcp->pid);
+	}
+	else {
+		if (!qflag)
+			fprintf(stderr, "Process %d attached\n", pid);
+	}
+
+#ifdef TCB_CLONE_THREAD
+	if (sysent[tcp->scno].sys_func == sys_clone)
+	{
+		/*
+		 * Save the flags used in this call,
+		 * in case we point TCP to our parent below.
+		 */
+		int call_flags = tcp->u_arg[ARG_FLAGS];
+		if ((tcp->flags & TCB_CLONE_THREAD) &&
+		    tcp->parent != NULL) {
+			/* The parent in this clone is itself a
+			   thread belonging to another process.
+			   There is no meaning to the parentage
+			   relationship of the new child with the
+			   thread, only with the process.  We
+			   associate the new thread with our
+			   parent.  Since this is done for every
+			   new thread, there will never be a
+			   TCB_CLONE_THREAD process that has
+			   children.  */
+			--tcp->nchildren;
+			tcp = tcp->parent;
+			tcpchild->parent = tcp;
+			++tcp->nchildren;
+		}
+		if (call_flags & CLONE_THREAD) {
+			tcpchild->flags |= TCB_CLONE_THREAD;
+			++tcp->nclone_threads;
+		}
+		if ((call_flags & CLONE_PARENT) &&
+		    !(call_flags & CLONE_THREAD)) {
+			--tcp->nchildren;
+			tcpchild->parent = NULL;
+			if (tcp->parent != NULL) {
+				tcp = tcp->parent;
+				tcpchild->parent = tcp;
+				++tcp->nchildren;
+			}
+		}
+	}
+#endif /* TCB_CLONE_THREAD */
+	return 0;
+}
+
+int
 internal_fork(struct tcb *tcp)
 {
+	if ((ptrace_setoptions
+	    & (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
+	   == (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
+		return 0;
+
 	if (entering(tcp)) {
 		tcp->flags &= ~TCB_FOLLOWFORK;
 		if (!followfork)
@@ -811,7 +929,6 @@ internal_fork(struct tcb *tcp)
 		if (setbpt(tcp) < 0)
 			return 0;
 	} else {
-		struct tcb *tcpchild;
 		int pid;
 		int bpt;
 
@@ -828,110 +945,7 @@ internal_fork(struct tcb *tcp)
 
 		pid = tcp->u_rval;
 
-#ifdef CLONE_PTRACE		/* See new setbpt code.  */
-		tcpchild = pid2tcb(pid);
-		if (tcpchild != NULL) {
-			/* The child already reported its startup trap
-			   before the parent reported its syscall return.  */
-			if ((tcpchild->flags
-			     & (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
-			    != (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
-				fprintf(stderr, "\
-[preattached child %d of %d in weird state!]\n",
-					pid, tcp->pid);
-		}
-		else
-#endif /* CLONE_PTRACE */
-		{
-			fork_tcb(tcp);
-			tcpchild = alloctcb(pid);
-		}
-
-#ifndef CLONE_PTRACE
-		/* Attach to the new child */
-		if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
-			if (bpt)
-				clearbpt(tcp);
-			perror("PTRACE_ATTACH");
-			fprintf(stderr, "Too late?\n");
-			droptcb(tcpchild);
-			return 0;
-		}
-#endif /* !CLONE_PTRACE */
-
-		if (bpt)
-			clearbpt(tcp);
-
-		tcpchild->flags |= TCB_ATTACHED;
-		/* Child has BPT too, must be removed on first occasion.  */
-		if (bpt) {
-			tcpchild->flags |= TCB_BPTSET;
-			tcpchild->baddr = tcp->baddr;
-			memcpy(tcpchild->inst, tcp->inst,
-				sizeof tcpchild->inst);
-		}
-		tcpchild->parent = tcp;
-		tcp->nchildren++;
-		if (tcpchild->flags & TCB_SUSPENDED) {
-			/* The child was born suspended, due to our having
-			   forced CLONE_PTRACE.  */
-			if (bpt)
-				clearbpt(tcpchild);
-
-			tcpchild->flags &= ~(TCB_SUSPENDED|TCB_STARTUP);
-			if (ptrace_restart(PTRACE_SYSCALL, tcpchild, 0) < 0)
-				return -1;
-
-			if (!qflag)
-				fprintf(stderr, "\
-Process %u resumed (parent %d ready)\n",
-					pid, tcp->pid);
-		}
-		else {
-			if (!qflag)
-				fprintf(stderr, "Process %d attached\n", pid);
-		}
-
-#ifdef TCB_CLONE_THREAD
-		{
-			/*
-			 * Save the flags used in this call,
-			 * in case we point TCP to our parent below.
-			 */
-			int call_flags = tcp->u_arg[ARG_FLAGS];
-			if ((tcp->flags & TCB_CLONE_THREAD) &&
-			    tcp->parent != NULL) {
-				/* The parent in this clone is itself a
-				   thread belonging to another process.
-				   There is no meaning to the parentage
-				   relationship of the new child with the
-				   thread, only with the process.  We
-				   associate the new thread with our
-				   parent.  Since this is done for every
-				   new thread, there will never be a
-				   TCB_CLONE_THREAD process that has
-				   children.  */
-				--tcp->nchildren;
-				tcp = tcp->parent;
-				tcpchild->parent = tcp;
-				++tcp->nchildren;
-			}
-			if (call_flags & CLONE_THREAD) {
-				tcpchild->flags |= TCB_CLONE_THREAD;
-				++tcp->nclone_threads;
-			}
-			if ((call_flags & CLONE_PARENT) &&
-			    !(call_flags & CLONE_THREAD)) {
-				--tcp->nchildren;
-				tcpchild->parent = NULL;
-				if (tcp->parent != NULL) {
-					tcp = tcp->parent;
-					tcpchild->parent = tcp;
-					++tcp->nchildren;
-				}
-			}
-		}
-#endif /* TCB_CLONE_THREAD */
+		return handle_new_child(tcp, pid, bpt);
 	}
 	return 0;
 }

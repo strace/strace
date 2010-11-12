@@ -2363,6 +2363,31 @@ handle_group_exit(struct tcb *tcp, int sig)
 }
 #endif
 
+#ifdef LINUX
+static int
+handle_ptrace_event(int status, struct tcb *tcp)
+{
+	if (status >> 16 == PTRACE_EVENT_VFORK ||
+	    status >> 16 == PTRACE_EVENT_CLONE ||
+	    status >> 16 == PTRACE_EVENT_FORK) {
+		int childpid;
+
+		if (do_ptrace(PTRACE_GETEVENTMSG, tcp, NULL, &childpid) < 0) {
+			if (errno != ESRCH) {
+				fprintf(stderr, "\
+%s: handle_ptrace_event: ptrace cannot get new child's pid\n",
+					progname);
+				cleanup();
+				exit(1);
+			}
+			return -1;
+		}
+		return handle_new_child(tcp, childpid, 0);
+	}
+	return 1;
+}
+#endif
+
 static int
 trace()
 {
@@ -2548,6 +2573,11 @@ Process %d attached (waiting for parent)\n",
 			fprintf(stderr, "pid %u stopped, [%s]\n",
 				pid, signame(WSTOPSIG(status)));
 
+		if (ptrace_setoptions && (status >> 16)) {
+			if (handle_ptrace_event(status, tcp) != 1)
+				goto tracing;
+		}
+
 		/*
 		 * Interestingly, the process may stop
 		 * with STOPSIG equal to some other signal
@@ -2575,6 +2605,13 @@ Process %d attached (waiting for parent)\n",
 					return -1;
 				}
 			}
+#ifdef LINUX
+			if (followfork && (tcp->parent == NULL) && ptrace_setoptions)
+				if (ptrace(PTRACE_SETOPTIONS, tcp->pid,
+					   NULL, ptrace_setoptions) < 0 &&
+				    errno != ESRCH)
+					ptrace_setoptions = 0;
+#endif
 			goto tracing;
 		}
 

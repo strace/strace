@@ -571,6 +571,9 @@ extern int internal_fork(struct tcb *);
 extern int internal_exec(struct tcb *);
 extern int internal_wait(struct tcb *, int);
 extern int internal_exit(struct tcb *);
+#ifdef LINUX
+extern int handle_new_child(struct tcb *, int, int);
+#endif
 
 extern const struct ioctlent *ioctl_lookup(long);
 extern const struct ioctlent *ioctl_next_match(const struct ioctlent *);
