@@ -343,6 +343,38 @@ sys_cacheflush(struct tcb *tcp)
 
 #endif
 
+#ifdef SH
+static const struct xlat cacheflush_flags[] = {
+#ifdef CACHEFLUSH_D_INVAL
+	{ CACHEFLUSH_D_INVAL,	"CACHEFLUSH_D_INVAL" },
+#endif
+#ifdef CACHEFLUSH_D_WB
+	{ CACHEFLUSH_D_WB,	"CACHEFLUSH_D_WB" },
+#endif
+#ifdef CACHEFLUSH_D_PURGE
+	{ CACHEFLUSH_D_PURGE,	"CACHEFLUSH_D_PURGE" },
+#endif
+#ifdef CACHEFLUSH_I
+	{ CACHEFLUSH_I,		"CACHEFLUSH_I" },
+#endif
+	{ 0,			NULL },
+};
+
+int
+sys_cacheflush(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		/* addr */
+		tprintf("%#lx, ", tcp->u_arg[0]);
+		/* len */
+		tprintf("%lu, ", tcp->u_arg[1]);
+		/* flags */
+		printflags(cacheflush_flags, tcp->u_arg[2], "CACHEFLUSH_???");
+	}
+	return 0;
+}
+#endif /* SH */
+
 #endif /* LINUX */
 
 #ifdef SUNOS4

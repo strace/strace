@@ -322,7 +322,7 @@ int sys_sysmips();
 int sys_setpgrp(), sys_gethostname(), sys_getdtablesize(), sys_utimes();
 int sys_capget(), sys_capset();
 
-#ifdef M68K
+#if defined M68K || defined SH
 int sys_cacheflush();
 #endif
 

@@ -153,7 +153,7 @@
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
-	{ 3,	0,	printargs,		"cacheflush"	}, /* 123 */
+	{ 3,	0,	sys_cacheflush,		"cacheflush"	}, /* 123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
