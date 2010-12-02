@@ -889,7 +889,7 @@ get_scno(struct tcb *tcp)
 		if (currpers != current_personality) {
 			static const char *const names[] = {"64 bit", "32 bit"};
 			set_personality(currpers);
-			printf("[ Process PID=%d runs in %s mode. ]\n",
+			fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
 					pid, names[current_personality]);
 		}
 	}
@@ -962,7 +962,7 @@ get_scno(struct tcb *tcp)
 
 		call = ptrace(PTRACE_PEEKTEXT, pid, (char *)rip, (char *)0);
 		if (errno)
-			printf("ptrace_peektext failed: %s\n",
+			fprintf(stderr, "ptrace_peektext failed: %s\n",
 					strerror(errno));
 		switch (call & 0xffff) {
 			/* x86-64: syscall = 0x0f 0x05 */
@@ -981,7 +981,7 @@ get_scno(struct tcb *tcp)
 		if (currpers != current_personality) {
 			static const char *const names[] = {"64 bit", "32 bit"};
 			set_personality(currpers);
-			printf("[ Process PID=%d runs in %s mode. ]\n",
+			fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
 					pid, names[current_personality]);
 		}
 	}
