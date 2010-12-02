@@ -689,9 +689,9 @@ startup_child (char **argv)
 
 #ifdef LINUX
 /*
- * Test whether kernel support PTRACE_O_TRACECLONE et al options.
+ * Test whether the kernel support PTRACE_O_TRACECLONE et al options.
  * First fork a new child, call ptrace with PTRACE_SETOPTIONS on it,
- * and then see which options are supported on this kernel.
+ * and then see which options are supported by the kernel.
  */
 static int
 test_ptrace_setoptions(void)
@@ -701,57 +701,45 @@ test_ptrace_setoptions(void)
 	if ((pid = fork()) < 0)
 		return -1;
 	else if (pid == 0) {
-		if (ptrace(PTRACE_TRACEME, 0, (char *)1, 0) < 0) {
+		if (ptrace(PTRACE_TRACEME, 0, (char *)1, 0) < 0)
 			_exit(1);
-		}
 		kill(getpid(), SIGSTOP);
-		if ((pid = fork()) < 0) {
-			_exit(1);
-		}
-		_exit(0);
+		_exit(fork() < 0);
 	}
-	else {
-		int status, tracee_pid, error;
-		int no_child = 0;
-		while (1) {
-			tracee_pid = wait4(-1, &status, 0, NULL);
-			error = errno;
-			if (tracee_pid == -1) {
-				switch (error) {
-				case EINTR:
-					continue;
-				case ECHILD:
-					no_child = 1;
-					break;
-				default:
-					errno = error;
-					perror("test_ptrace_setoptions");
+
+	while (1) {
+		int status, tracee_pid;
+
+		tracee_pid = wait(&status);
+		if (tracee_pid == -1) {
+			if (errno == EINTR)
+				continue;
+			else if (errno == ECHILD)
+				break;
+			perror("test_ptrace_setoptions");
+			return -1;
+		}
+		if (tracee_pid != pid) {
+			/* the grandchild */
+			if (ptrace(PTRACE_CONT, tracee_pid, 0, 0) < 0 &&
+			    errno != ESRCH)
+				kill(tracee_pid, SIGKILL);
+		}
+		else if (WIFSTOPPED(status)) {
+			if (status >> 16 == PTRACE_EVENT_FORK)
+				ptrace_setoptions |= (PTRACE_O_TRACEVFORK |
+						      PTRACE_O_TRACECLONE |
+						      PTRACE_O_TRACEFORK);
+			if (WSTOPSIG(status) == SIGSTOP) {
+				if (ptrace(PTRACE_SETOPTIONS, pid, NULL,
+					   PTRACE_O_TRACEFORK) < 0) {
+					kill(pid, SIGKILL);
 					return -1;
 				}
 			}
-			if (no_child)
-				break;
-			if (tracee_pid != pid) {
-				if (ptrace(PTRACE_CONT, tracee_pid, 0, 0) < 0 &&
-				    errno != ESRCH)
-					kill(tracee_pid, SIGKILL);
-			}
-			else if (WIFSTOPPED(status)) {
-				if (status >> 16 == PTRACE_EVENT_FORK)
-					ptrace_setoptions |= (PTRACE_O_TRACEVFORK |
-							      PTRACE_O_TRACECLONE |
-							      PTRACE_O_TRACEFORK);
-				if (WSTOPSIG(status) == SIGSTOP) {
-					if (ptrace(PTRACE_SETOPTIONS, pid, NULL,
-						   PTRACE_O_TRACEFORK) < 0) {
-						kill(pid, SIGKILL);
-						return -1;
-					}
-				}
-				if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0 &&
-				    errno != ESRCH)
-					kill(pid, SIGKILL);
-			}
+			if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0 &&
+			    errno != ESRCH)
+				kill(pid, SIGKILL);
 		}
 	}
 	return 0;
@@ -988,10 +976,16 @@ main(int argc, char *argv[])
 	}
 
 #ifdef LINUX
-	if (followfork && test_ptrace_setoptions() < 0) {
-		fprintf(stderr, "Test for options supported by PTRACE_SETOPTIONS\
-			failed, give up using this feature\n");
-		ptrace_setoptions = 0;
+	if (followfork) {
+		if (test_ptrace_setoptions() < 0) {
+			fprintf(stderr,
+				"Test for options supported by PTRACE_SETOPTIONS "
+				"failed, giving up using this feature.\n");
+			ptrace_setoptions = 0;
+		}
+		if (debug)
+			fprintf(stderr, "ptrace_setoptions = %#x\n",
+				ptrace_setoptions);
 	}
 #endif
 
