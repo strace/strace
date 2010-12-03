@@ -1774,6 +1774,24 @@ sys_getsockopt(struct tcb *tcp)
 				}
 				break;
 #endif
+#ifdef SO_PEERCRED
+			case SO_PEERCRED:
+				if (len == sizeof (struct ucred)) {
+					struct ucred uc;
+					if (umove (tcp,
+						   tcp->u_arg[3],
+						   &uc) < 0)
+						break;
+					tprintf("{pid=%ld, uid=%ld, gid=%ld}, "
+						"[%d]",
+						(long)uc.pid,
+						(long)uc.uid,
+						(long)uc.gid,
+						len);
+					return 0;
+				}
+				break;
+#endif
 			}
 			break;
 		case SOL_PACKET:
