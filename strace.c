@@ -945,6 +945,20 @@ main(int argc, char *argv[])
 		run_gid = getgid();
 	}
 
+#ifdef LINUX
+	if (followfork) {
+		if (test_ptrace_setoptions() < 0) {
+			fprintf(stderr,
+				"Test for options supported by PTRACE_SETOPTIONS "
+				"failed, giving up using this feature.\n");
+			ptrace_setoptions = 0;
+		}
+		if (debug)
+			fprintf(stderr, "ptrace_setoptions = %#x\n",
+				ptrace_setoptions);
+	}
+#endif
+
 	/* Check if they want to redirect the output. */
 	if (outfname) {
 		/* See if they want to pipe the output. */
@@ -974,20 +988,6 @@ main(int argc, char *argv[])
 		interactive = 0;
 		qflag = 1;
 	}
-
-#ifdef LINUX
-	if (followfork) {
-		if (test_ptrace_setoptions() < 0) {
-			fprintf(stderr,
-				"Test for options supported by PTRACE_SETOPTIONS "
-				"failed, giving up using this feature.\n");
-			ptrace_setoptions = 0;
-		}
-		if (debug)
-			fprintf(stderr, "ptrace_setoptions = %#x\n",
-				ptrace_setoptions);
-	}
-#endif
 
 	/* Valid states here:
 	   optind < argc	pflag_seen	outfname	interactive
