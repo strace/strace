@@ -372,24 +372,24 @@
 	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */
 	{ 5,	0,	printargs,		"SYS_338"	}, /* 338 */
 	{ 5,	0,	printargs,		"SYS_339"	}, /* 339 */
-	{ 5,	0,	printargs,		"SYS_340"	}, /* 340 */
-	{ 5,	0,	printargs,		"SYS_341"	}, /* 341 */
-	{ 5,	0,	printargs,		"SYS_342"	}, /* 342 */
-	{ 5,	0,	printargs,		"SYS_343"	}, /* 343 */
-	{ 5,	0,	printargs,		"SYS_344"	}, /* 344 */
-	{ 5,	0,	printargs,		"SYS_345"	}, /* 345 */
-	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
-	{ 5,	0,	printargs,		"SYS_347"	}, /* 347 */
-	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
-	{ 5,	0,	printargs,		"SYS_349"	}, /* 349 */
-	{ 5,	0,	printargs,		"SYS_350"	}, /* 350 */
-	{ 5,	0,	printargs,		"SYS_351"	}, /* 351 */
-	{ 5,	0,	printargs,		"SYS_352"	}, /* 352 */
-	{ 5,	0,	printargs,		"SYS_353"	}, /* 353 */
-	{ 5,	0,	printargs,		"SYS_354"	}, /* 354 */
-	{ 5,	0,	printargs,		"SYS_355"	}, /* 355 */
-	{ 5,	0,	printargs,		"SYS_356"	}, /* 356 */
-	{ 5,	0,	printargs,		"SYS_357"	}, /* 357 */
+	{ 3,	TN,	sys_socket,		"socket"	}, /* 340 */
+	{ 3,	TN,	sys_bind,		"bind"		}, /* 341 */
+	{ 3,	TN,	sys_connect,		"connect"	}, /* 342 */
+	{ 2,	TN,	sys_listen,		"listen"	}, /* 343 */
+	{ 3,	TN,	sys_accept,		"accept"	}, /* 344 */
+	{ 3,	TN,	sys_getsockname,	"getsockname"	}, /* 345 */
+	{ 3,	TN,	sys_getpeername,	"getpeername"	}, /* 346 */
+	{ 4,	TN,	sys_socketpair,		"socketpair"	}, /* 347 */
+	{ 4,	TN,	sys_send,		"send"		}, /* 348 */
+	{ 4,	TN,	sys_recv,		"recv"		}, /* 349 */
+	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 350 */
+	{ 6,	TN,	sys_recvfrom,		"recvfrom"	}, /* 351 */
+	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 352 */
+	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 353 */
+	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 354 */
+	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 355 */
+	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 356 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 357 */
 	{ 5,	0,	printargs,		"SYS_358"	}, /* 358 */
 	{ 5,	0,	printargs,		"SYS_359"	}, /* 359 */
 	{ 5,	0,	printargs,		"SYS_360"	}, /* 360 */
