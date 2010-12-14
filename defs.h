@@ -312,6 +312,9 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 # ifndef PTRACE_SETOPTIONS
 #  define PTRACE_SETOPTIONS	0x4200
 # endif
+# ifndef PTRACE_GETEVENTMSG
+#  define PTRACE_GETEVENTMSG	0x4201
+# endif
 # ifndef PTRACE_O_TRACEFORK
 #  define PTRACE_O_TRACEFORK	0x00000002
 # endif
