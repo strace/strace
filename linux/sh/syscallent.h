@@ -390,7 +390,7 @@
 	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 355 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 356 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 357 */
-	{ 5,	0,	printargs,		"SYS_358"	}, /* 358 */
+	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 358 */
 	{ 5,	0,	printargs,		"SYS_359"	}, /* 359 */
 	{ 5,	0,	printargs,		"SYS_360"	}, /* 360 */
 	{ 5,	0,	printargs,		"SYS_361"	}, /* 361 */
