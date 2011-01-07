@@ -449,6 +449,15 @@ static const struct xlat protocols[] = {
 #ifdef IPPROTO_IPIP
 	{ IPPROTO_IPIP,	"IPPROTO_IPIP"	},
 #endif
+#ifdef IPPROTO_UDPLITE
+	{ IPPROTO_UDPLITE, "IPPROTO_UDPLITE" },
+#endif
+#ifdef IPPROTO_SCTP
+	{ IPPROTO_SCTP, "IPPROTO_SCTP"  },
+#endif
+#ifdef IPPROTO_GRE
+	{ IPPROTO_GRE, "IPPROTO_GRE"    },
+#endif
 	{ 0,		NULL		},
 };
 static const struct xlat msg_flags[] = {
