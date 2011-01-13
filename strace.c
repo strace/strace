@@ -726,13 +726,14 @@ test_ptrace_setoptions(void)
 				kill(tracee_pid, SIGKILL);
 		}
 		else if (WIFSTOPPED(status)) {
+			const unsigned int test_options = PTRACE_O_TRACECLONE |
+							  PTRACE_O_TRACEFORK |
+							  PTRACE_O_TRACEVFORK;
 			if (status >> 16 == PTRACE_EVENT_FORK)
-				ptrace_setoptions |= (PTRACE_O_TRACEVFORK |
-						      PTRACE_O_TRACECLONE |
-						      PTRACE_O_TRACEFORK);
+				ptrace_setoptions |= test_options;
 			if (WSTOPSIG(status) == SIGSTOP) {
 				if (ptrace(PTRACE_SETOPTIONS, pid, NULL,
-					   PTRACE_O_TRACEFORK) < 0) {
+					   test_options) < 0) {
 					kill(pid, SIGKILL);
 					return -1;
 				}
