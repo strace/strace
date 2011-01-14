@@ -49,6 +49,9 @@
 #ifdef HAVE_NETINET_UDP_H
 #include <netinet/udp.h>
 #endif
+#ifdef HAVE_NETINET_SCTP_H
+#include <netinet/sctp.h>
+#endif
 #include <arpa/inet.h>
 #include <net/if.h>
 #if defined(LINUX)
@@ -948,6 +951,132 @@ static const struct xlat sockpacketoptions[] = {
 };
 #endif /* SOL_PACKET */
 
+#ifdef SOL_SCTP
+static const struct xlat socksctpoptions[] = {
+#if defined(SCTP_RTOINFO)
+	{ SCTP_RTOINFO,			"SCTP_RTOINFO"	},
+#endif
+#if defined(SCTP_ASSOCINFO)
+	{ SCTP_ASSOCINFO,		"SCTP_ASSOCINFO"},
+#endif
+#if defined(SCTP_INITMSG)
+	{ SCTP_INITMSG,			"SCTP_INITMSG"	},
+#endif
+#if defined(SCTP_NODELAY)
+	{ SCTP_NODELAY,			"SCTP_NODELAY"	},
+#endif
+#if defined(SCTP_AUTOCLOSE)
+	{ SCTP_AUTOCLOSE,		"SCTP_AUTOCLOSE"},
+#endif
+#if defined(SCTP_SET_PEER_PRIMARY_ADDR)
+	{ SCTP_SET_PEER_PRIMARY_ADDR,	"SCTP_SET_PEER_PRIMARY_ADDR"},
+#endif
+#if defined(SCTP_PRIMARY_ADDR)
+	{ SCTP_PRIMARY_ADDR,		"SCTP_PRIMARY_ADDR"	},
+#endif
+#if defined(SCTP_ADAPTATION_LAYER)
+	{ SCTP_ADAPTATION_LAYER,	"SCTP_ADAPTATION_LAYER"	},
+#endif
+#if defined(SCTP_DISABLE_FRAGMENTS)
+	{ SCTP_DISABLE_FRAGMENTS,	"SCTP_DISABLE_FRAGMENTS"},
+#endif
+#if defined(SCTP_PEER_ADDR_PARAMS)
+	{ SCTP_PEER_ADDR_PARAMS,	"SCTP_PEER_ADDR_PARAMS"	},
+#endif
+#if defined(SCTP_DEFAULT_SEND_PARAM)
+	{ SCTP_DEFAULT_SEND_PARAM,	"SCTP_DEFAULT_SEND_PARAM"},
+#endif
+#if defined(SCTP_EVENTS)
+	{ SCTP_EVENTS,			"SCTP_EVENTS"		},
+#endif
+#if defined(SCTP_I_WANT_MAPPED_V4_ADDR)
+	{ SCTP_I_WANT_MAPPED_V4_ADDR,	"SCTP_I_WANT_MAPPED_V4_ADDR"},
+#endif
+#if defined(SCTP_MAXSEG)
+	{ SCTP_MAXSEG,			"SCTP_MAXSEG"		},
+#endif
+#if defined(SCTP_STATUS)
+	{ SCTP_STATUS,			"SCTP_STATUS"		},
+#endif
+#if defined(SCTP_GET_PEER_ADDR_INFO)
+	{ SCTP_GET_PEER_ADDR_INFO,	"SCTP_GET_PEER_ADDR_INFO"},
+#endif
+#if defined(SCTP_DELAYED_ACK)
+	{ SCTP_DELAYED_ACK,		"SCTP_DELAYED_ACK"	},
+#endif
+#if defined(SCTP_CONTEXT)
+	{ SCTP_CONTEXT,			"SCTP_CONTEXT"		},
+#endif
+#if defined(SCTP_FRAGMENT_INTERLEAVE)
+	{ SCTP_FRAGMENT_INTERLEAVE,	"SCTP_FRAGMENT_INTERLEAVE"},
+#endif
+#if defined(SCTP_PARTIAL_DELIVERY_POINT)
+	{ SCTP_PARTIAL_DELIVERY_POINT,	"SCTP_PARTIAL_DELIVERY_POINT"},
+#endif
+#if defined(SCTP_MAX_BURST)
+	{ SCTP_MAX_BURST,		"SCTP_MAX_BURST"	},
+#endif
+#if defined(SCTP_AUTH_CHUNK)
+	{ SCTP_AUTH_CHUNK,		"SCTP_AUTH_CHUNK"	},
+#endif
+#if defined(SCTP_HMAC_IDENT)
+	{ SCTP_HMAC_IDENT,		"SCTP_HMAC_IDENT"	},
+#endif
+#if defined(SCTP_AUTH_KEY)
+	{ SCTP_AUTH_KEY,		"SCTP_AUTH_KEY"		},
+#endif
+#if defined(SCTP_AUTH_ACTIVE_KEY)
+	{ SCTP_AUTH_ACTIVE_KEY,		"SCTP_AUTH_ACTIVE_KEY"	},
+#endif
+#if defined(SCTP_AUTH_DELETE_KEY)
+	{ SCTP_AUTH_DELETE_KEY,		"SCTP_AUTH_DELETE_KEY"	},
+#endif
+#if defined(SCTP_PEER_AUTH_CHUNKS)
+	{ SCTP_PEER_AUTH_CHUNKS,	"SCTP_PEER_AUTH_CHUNKS"	},
+#endif
+#if defined(SCTP_LOCAL_AUTH_CHUNKS)
+	{ SCTP_LOCAL_AUTH_CHUNKS,	"SCTP_LOCAL_AUTH_CHUNKS"},
+#endif
+#if defined(SCTP_GET_ASSOC_NUMBER)
+	{ SCTP_GET_ASSOC_NUMBER,	"SCTP_GET_ASSOC_NUMBER"	},
+#endif
+
+	/* linux specific things */
+#if defined(SCTP_SOCKOPT_BINDX_ADD)
+	{ SCTP_SOCKOPT_BINDX_ADD,	"SCTP_SOCKOPT_BINDX_ADD"	},
+#endif
+#if defined(SCTP_SOCKOPT_BINDX_REM)
+	{ SCTP_SOCKOPT_BINDX_REM,	"SCTP_SOCKOPT_BINDX_REM"	},
+#endif
+#if defined(SCTP_SOCKOPT_PEELOFF)
+	{ SCTP_SOCKOPT_PEELOFF,		"SCTP_SOCKOPT_PEELOFF"		},
+#endif
+#if defined(SCTP_GET_PEER_ADDRS_NUM_OLD)
+	{ SCTP_GET_PEER_ADDRS_NUM_OLD,	"SCTP_GET_PEER_ADDRS_NUM_OLD"	},
+#endif
+#if defined(SCTP_GET_PEER_ADDRS_OLD)
+	{ SCTP_GET_PEER_ADDRS_OLD,	"SCTP_GET_PEER_ADDRS_OLD"	},
+#endif
+#if defined(SCTP_GET_LOCAL_ADDRS_NUM_OLD)
+	{ SCTP_GET_LOCAL_ADDRS_NUM_OLD,	"SCTP_GET_LOCAL_ADDRS_NUM_OLD"	},
+#endif
+#if defined(SCTP_GET_LOCAL_ADDRS_OLD)
+	{ SCTP_GET_LOCAL_ADDRS_OLD,	"SCTP_GET_LOCAL_ADDRS_OLD"	},
+#endif
+#if defined(SCTP_SOCKOPT_CONNECTX_OLD)
+	{ SCTP_SOCKOPT_CONNECTX_OLD,	"SCTP_SOCKOPT_CONNECTX_OLD"	},
+#endif
+#if defined(SCTP_GET_PEER_ADDRS)
+	{ SCTP_GET_PEER_ADDRS,		"SCTP_GET_PEER_ADDRS"		},
+#endif
+#if defined(SCTP_GET_LOCAL_ADDRS)
+	{ SCTP_GET_LOCAL_ADDRS,		"SCTP_GET_LOCAL_ADDRS"		},
+#endif
+
+	{ 0,	NULL	},
+};
+#endif
+
 #if  !defined (SOL_TCP) && defined (IPPROTO_TCP)
 #define SOL_TCP IPPROTO_TCP
 #endif
@@ -1825,6 +1954,11 @@ sys_getsockopt(struct tcb *tcp)
 			printxval(socktcpoptions, tcp->u_arg[2], "TCP_???");
 			break;
 #endif
+#ifdef SOL_SCTP
+		case SOL_SCTP:
+			printxval(socksctpoptions, tcp->u_arg[2], "SCTP_???");
+			break;
+#endif
 
 		/* SOL_AX25 SOL_ROSE SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25
 		 * etc. still need work */
@@ -2016,6 +2150,11 @@ int len;
 #ifdef SOL_TCP
 	    case SOL_TCP:
 		printxval(socktcpoptions, name, "TCP_???");
+		break;
+#endif
+#ifdef SOL_SCTP
+	   case SOL_SCTP:
+		printxval(socksctpoptions, name, "SCTP_???");
 		break;
 #endif
 #ifdef SOL_RAW

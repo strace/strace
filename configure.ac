@@ -267,6 +267,7 @@ AC_CHECK_HEADERS([ \
 	linux/capability.h \
 	linux/ptrace.h \
 	linux/utsname.h \
+	netinet/sctp.h \
 ], [], [])
 AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
                  [], [], [#include <stddef.h>
