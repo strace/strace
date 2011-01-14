@@ -60,6 +60,7 @@ s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\
 
 > ioctls.h
 
+lookup_ioctls 03 linux/hdreg.h
 lookup_ioctls 22 scsi/sg.h
 lookup_ioctls 46 linux/fb.h
 lookup_ioctls 4B linux/kd.h
