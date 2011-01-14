@@ -417,7 +417,7 @@ about the user/kernel boundary if only a subset of system calls
 are being monitored.  The default is
 .BR trace = all .
 .TP
-\fB\-e\ trace\fR=\fIfile\fR
+.BR "\-e\ trace" = file
 Trace all system calls which take a file name as an argument.  You
 can think of this as an abbreviation for
 .BR "\-e\ trace" = open , stat , chmod , unlink ,...
@@ -427,20 +427,20 @@ accidentally forget to include a call like
 .B lstat
 in the list.  Betchya woulda forgot that one.
 .TP
-\fB\-e\ trace\fR=\fIprocess\fR
+.BR "\-e\ trace" = process
 Trace all system calls which involve process management.  This
 is useful for watching the fork, wait, and exec steps of a process.
 .TP
-\fB\-e\ trace\fR=\fInetwork\fR
+.BR "\-e\ trace" = network
 Trace all the network related system calls.
 .TP
-\fB\-e\ trace\fR=\fIsignal\fR
+.BR "\-e\ trace" = signal
 Trace all signal related system calls.
 .TP
-\fB\-e\ trace\fR=\fIipc\fR
+.BR "\-e\ trace" = ipc
 Trace all IPC related system calls.
 .TP
-\fB\-e\ trace\fR=\fIdesc\fR
+.BR "\-e\ trace" = desc
 Trace all file descriptor related system calls.
 .TP
 \fB\-e\ abbrev\fR=\fIset\fR
