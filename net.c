@@ -365,11 +365,14 @@ static const struct xlat socketlayers[] = {
 #if defined(SOL_ICMPV6)
 	{ SOL_ICMPV6,	"SOL_ICMPV6"	},
 #endif
+#if defined(SOL_SCTP)
+	{ SOL_SCTP,	"SOL_SCTP"	},
+#endif
+#if defined(SOL_UDPLITE)
+	{ SOL_UDPLITE,	"SOL_UDPLITE"	},
+#endif
 #if defined(SOL_RAW)
 	{ SOL_RAW,	"SOL_RAW"	},
-#endif
-#if defined(SOL_IPX)
-	{ SOL_IPX,	"SOL_IPX"	},
 #endif
 #if defined(SOL_IPX)
 	{ SOL_IPX,	"SOL_IPX"	},
@@ -403,6 +406,42 @@ static const struct xlat socketlayers[] = {
 #endif
 #if defined(SOL_IRDA)
 	{ SOL_IRDA,	"SOL_IRDA"	},
+#endif
+#if defined(SOL_NETBEUI)
+	{ SOL_NETBEUI,	"SOL_NETBEUI"	},
+#endif
+#if defined(SOL_LLC)
+	{ SOL_LLC,	"SOL_LLC"	},
+#endif
+#if defined(SOL_DCCP)
+	{ SOL_DCCP,	"SOL_DCCP"	},
+#endif
+#if defined(SOL_NETLINK)
+	{ SOL_NETLINK,	"SOL_NETLINK"	},
+#endif
+#if defined(SOL_TIPC)
+	{ SOL_TIPC,	"SOL_TIPC"	},
+#endif
+#if defined(SOL_RXRPC)
+	{ SOL_RXRPC,	"SOL_RXRPC"	},
+#endif
+#if defined(SOL_PPPOL2TP)
+	{ SOL_PPPOL2TP,	"SOL_PPPOL2TP"	},
+#endif
+#if defined(SOL_BLUETOOTH)
+	{ SOL_BLUETOOTH,"SOL_BLUETOOTH" },
+#endif
+#if defined(SOL_PNPIPE)
+	{ SOL_PNPIPE,	"SOL_PNPIPE"	},
+#endif
+#if defined(SOL_RDS)
+	{ SOL_RDS,	"SOL_RDS"	},
+#endif
+#if defined(SOL_IUVC)
+	{ SOL_IUCV,	"SOL_IUCV"	},
+#endif
+#if defined(SOL_CAIF)
+	{ SOL_CAIF,	"SOL_CAIF"	},
 #endif
 	{ SOL_SOCKET,	"SOL_SOCKET"	},	/* Never used! */
 };
