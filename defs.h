@@ -588,6 +588,7 @@ extern int stream_ioctl(struct tcb *, int, int);
 #ifdef LINUX
 extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
+extern int block_ioctl(struct tcb *, long, long);
 #endif
 
 extern int tv_nz(struct timeval *);

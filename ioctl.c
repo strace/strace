@@ -152,6 +152,9 @@ long code, arg;
 #ifdef LINUX
 	case 'p':
 		return rtc_ioctl(tcp, code, arg);
+	case 0x03:
+	case 0x12:
+		return block_ioctl(tcp, code, arg);
 	case 0x22:
 		return scsi_ioctl(tcp, code, arg);
 #endif
