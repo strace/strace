@@ -28,6 +28,7 @@
 #include "defs.h"
 #ifdef LINUX
 #include <stdint.h>
+#include <inttypes.h>
 #include <linux/blkpg.h>
 #include <linux/fs.h>
 #include <linux/hdreg.h>
@@ -91,124 +92,116 @@ static void
 print_blkpg_req(struct tcb *tcp, struct blkpg_ioctl_arg *blkpg)
 {
 	struct blkpg_partition p;
-	const char *ioctl_name;
 
-	ioctl_name = xlookup(blkpg_ops, blkpg->op);
-	if (!ioctl_name) {
-		tprintf("{%#x, /* BLKPG_??? */", blkpg->op);
-		return;
-	}
+	tprintf("{");
+	printxval(blkpg_ops, blkpg->op, "BLKPG_???");
 
-	tprintf("{%s, flags=%d, datalen=%d, ",
-		ioctl_name, blkpg->flags, blkpg->datalen);
+	tprintf(", flags=%d, datalen=%d, ",
+		blkpg->flags, blkpg->datalen);
 
-	if (umove(tcp, (unsigned long)blkpg->data, &p) < 0) {
-		tprintf("%#lx", (unsigned long)blkpg->data);
-		return;
-	}
-
-	tprintf("{start=%lld, length=%lld, pno=%d, ",
-		p.start, p.length, p.pno);
-
-	tprintf("devname=\"%s\", volname=\"%s\"}",
-		p.devname, p.volname);
+	if (umove(tcp, (long) blkpg->data, &p) < 0)
+		tprintf("%#lx}", (long) blkpg->data);
+	else
+		tprintf("{start=%lld, length=%lld, pno=%d, "
+			"devname=\"%.*s\", volname=\"%.*s\"}}",
+			p.start, p.length, p.pno,
+			(int) sizeof(p.devname), p.devname,
+			(int) sizeof(p.volname), p.volname);
 }
 
 int
 block_ioctl(struct tcb *tcp, long code, long arg)
 {
 	switch (code) {
-
-	/* These pass arg as a value, not a pointer */
+	/* take arg as a value, not as a pointer */
 	case BLKRASET:
 	case BLKFRASET:
 		if (entering(tcp))
 			tprintf(", %ld", arg);
 		break;
 
-	/* Just pass in a signed int */
+	/* take a signed int */
 	case BLKROSET:
 	case BLKBSZSET:
 		if (entering(tcp)) {
-			int int_val;
-			if (umove(tcp, arg, &int_val) < 0)
+			int val;
+			if (umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %d", int_val);
+				tprintf(", %d", val);
 		}
 		break;
 
-	/* Just return an unsigned short */
+	/* returns an unsigned short */
 	case BLKSECTGET:
 		if (exiting(tcp)) {
-			unsigned short ushort_val;
-			if (umove(tcp, arg, &ushort_val) < 0)
+			unsigned short val;
+			if (syserror(tcp) || umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %hu", ushort_val);
+				tprintf(", %hu", val);
 		}
 		break;
 
-	/* Just return a signed int */
+	/* return a signed int */
 	case BLKROGET:
 	case BLKBSZGET:
 	case BLKSSZGET:
 	case BLKALIGNOFF:
 		if (exiting(tcp)) {
-			int int_val;
-			if (umove(tcp, arg, &int_val) < 0)
+			int val;
+			if (syserror(tcp) || umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %d", int_val);
+				tprintf(", %d", val);
 		}
 		break;
 
-	/* Just return an unsigned int */
+	/* return an unsigned int */
 	case BLKPBSZGET:
 	case BLKIOMIN:
 	case BLKIOOPT:
 	case BLKDISCARDZEROES:
 		if (exiting(tcp)) {
-			unsigned int uint_val;
-			if (umove(tcp, arg, &uint_val) < 0)
+			unsigned int val;
+			if (syserror(tcp) || umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %u", uint_val);
+				tprintf(", %u", val);
 		}
 		break;
 
-	/* Just return a signed long */
+	/* return a signed long */
 	case BLKRAGET:
 	case BLKFRAGET:
 		if (exiting(tcp)) {
-			long size;
-			if (umove(tcp, arg, &size) < 0)
+			long val;
+			if (syserror(tcp) || umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %ld", size);
+				tprintf(", %ld", val);
 		}
 		break;
 
-	/* Just return an unsigned long */
+	/* returns an unsigned long */
 	case BLKGETSIZE:
 		if (exiting(tcp)) {
-			unsigned long ulong_val;
-			if (umove(tcp, arg, &ulong_val) < 0)
+			unsigned long val;
+			if (syserror(tcp) || umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %lu", ulong_val);
+				tprintf(", %lu", val);
 			}
 		break;
 
-	/* Just return a quad */
+	/* return an uint64_t */
 	case BLKGETSIZE64:
 		if (exiting(tcp)) {
-			uint64_t uint64_val;
-			if (umove(tcp, arg, &uint64_val) < 0)
+			uint64_t val;
+			if (syserror(tcp) || umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %llu",
-					(unsigned long long)uint64_val);
+				tprintf(", %" PRIu64, val);
 		}
 		break;
 
@@ -220,16 +213,15 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 			if (umove(tcp, arg, range) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", {%llx, %llx}",
-					(unsigned long long)range[0],
-					(unsigned long long)range[1]);
+				tprintf(", {%" PRIx64 ", %" PRIx64 "}",
+					range[0], range[1]);
 		}
 		break;
 
 	case HDIO_GETGEO:
 		if (exiting(tcp)) {
 			struct hd_geometry geo;
-			if (umove(tcp, arg, &geo) < 0)
+			if (syserror(tcp) || umove(tcp, arg, &geo) < 0)
 				tprintf(", %#lx", arg);
 			else
 				tprintf(", {heads=%hhu, sectors=%hhu, "
@@ -238,6 +230,7 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 					geo.cylinders, geo.start);
 		}
 		break;
+
 	case BLKPG:
 		if (entering(tcp)) {
 			struct blkpg_ioctl_arg blkpg;
@@ -248,34 +241,31 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 				print_blkpg_req(tcp, &blkpg);
 			}
 		}
-		if (exiting(tcp)) {
-			tprintf("}");
-		}
 		break;
+
 	case BLKTRACESETUP:
 		if (entering(tcp)) {
 			struct blk_user_trace_setup buts;
 			if (umove(tcp, arg, &buts) < 0)
 				tprintf(", %#lx", arg);
-			else {
-				tprintf(", {act_mask=%hu, buf_size=%u, ",
-					buts.act_mask, buts.buf_size);
-				tprintf("buf_nr=%u, start_lba=%llu, ",
-					buts.buf_nr,
-					(unsigned long long)buts.start_lba);
-				tprintf("end_lba=%llu, pid=%u}",
-					(unsigned long long)buts.end_lba,
-					buts.pid);
-			}
+			else
+				tprintf(", {act_mask=%hu, buf_size=%u, "
+					"buf_nr=%u, start_lba=%" PRIu64 ", "
+					"end_lba=%" PRIu64 ", pid=%u}",
+					buts.act_mask, buts.buf_size,
+					buts.buf_nr, buts.start_lba,
+					buts.end_lba, buts.pid);
 		}
 		if (exiting(tcp)) {
 			struct blk_user_trace_setup buts;
-			if (umove(tcp, arg, &buts) < 0)
+			if (syserror(tcp) || umove(tcp, arg, &buts) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", {name=\"%s\"}", buts.name);
+				tprintf(", {name=\"%.*s\"}",
+					(int) sizeof(buts.name), buts.name);
 		}
 		break;
+
 	/* No arguments or unhandled */
 	case BLKTRACESTART:
 	case BLKTRACESTOP:
