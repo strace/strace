@@ -522,3 +522,6 @@
 	{ 5,	TD,	printargs,		"pwritev"		}, /* 491 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 492 */
 	{ 5,	TD,	printargs,		"perf_event_open"	}, /* 493 */
+	{ 2,	0,	printargs,		"fanotify_init"		}, /* 494 */
+	{ 5,	0,	printargs,		"fanotify_mark"		}, /* 495 */
+	{ 4,	0,	printargs,		"prlimit64"		}, /* 496 */

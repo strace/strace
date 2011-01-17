@@ -360,9 +360,9 @@
 	{ 5,	TD,	printargs,		"pwritev"	}, /* 329 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 330 */
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 331 */
-	{ 5,	0,	printargs,		"SYS_332"	}, /* 332 */
-	{ 5,	0,	printargs,		"SYS_333"	}, /* 333 */
-	{ 5,	0,	printargs,		"SYS_334"	}, /* 334 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 332 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 333 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 334 */
 	{ 5,	0,	printargs,		"SYS_335"	}, /* 335 */
 	{ 5,	0,	printargs,		"SYS_336"	}, /* 336 */
 	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */

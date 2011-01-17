@@ -4338,6 +4338,9 @@
 	{ 5,	TD,	printargs,		"perf_event_open" }, /* 4333 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 4334 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 4335 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 4336 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 4337 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 4338 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
 	{ 0,	0,	printargs,		"o32_exit"		}, /* 4001 */
@@ -4675,6 +4678,9 @@
 	{ 5,	TD,	printargs,		"o32_perf_event_open" }, /* 4333 */
 	{ 4,	TN,	printargs,		"o32_accept4"	}, /* 4334 */
 	{ 5,	TN,	printargs,		"o32_recvmmsg"	}, /* 4335 */
+	{ 2,	0,	printargs,		"o32_fanotify_init"	}, /* 4336 */
+	{ 5,	0,	printargs,		"o32_fanotify_mark"	}, /* 4337 */
+	{ 4,	0,	printargs,		"o32_prlimit64"	}, /* 4338 */
 #endif
 	{ 0,	0,	printargs,		"SYS_4336"	}, /* 4336 */
 	{ 0,	0,	printargs,		"SYS_4337"	}, /* 4337 */
@@ -5637,6 +5643,9 @@
 	{ 5,	TD,	printargs,		"perf_event_open" }, /* 5292 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 5293 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 5294 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 5295 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 5296 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 5297 */
 #else
 	{ 0,	0,	printargs,		"n64_read"		}, /* 5000 */
 	{ 0,	0,	printargs,		"n64_write"		}, /* 5001 */
@@ -5933,6 +5942,9 @@
 	{ 0,	0,	printargs,		"n64_perf_event_open"	}, /* 5292 */
 	{ 0,	0,	printargs,		"n64_accept4"		}, /* 5293 */
 	{ 0,	0,	printargs,		"n64_recvmmsg"		}, /* 5294 */
+	{ 2,	0,	printargs,		"n64_fanotify_init"	}, /* 5295 */
+	{ 5,	0,	printargs,		"n64_fanotify_mark"	}, /* 5296 */
+	{ 4,	0,	printargs,		"n64_prlimit64"		}, /* 5297 */
 #endif
 	{ 0,	0,	printargs,		"SYS_5295"	}, /* 5295 */
 	{ 0,	0,	printargs,		"SYS_5296"	}, /* 5296 */
@@ -6942,6 +6954,9 @@
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 6297 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 6298 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 6299 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 6300 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 6301 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 6302 */
 
 #else
 	{ 0,	0,	printargs,		"n32_read"		}, /* 6000 */
@@ -7244,6 +7259,9 @@
 	{ 4,	TN,	printargs,		"n32_accept4"		}, /* 6297 */
 	{ 5,	TN,	printargs,		"n32_recvmmsg"		}, /* 6298 */
 	{ 3,	TD,	printargs,		"n32_getdents"		}, /* 6299 */
+	{ 2,	0,	printargs,		"n32_fanotify_init"	}, /* 6300 */
+	{ 5,	0,	printargs,		"n32_fanotify_mark"	}, /* 6301 */
+	{ 4,	0,	printargs,		"n32_prlimit64"		}, /* 6302 */
 #endif
 	{ 0,	0,	printargs,		"SYS_6300"	}, /* 6300 */
 	{ 0,	0,	printargs,		"SYS_6301"	}, /* 6301 */

@@ -369,9 +369,9 @@
 	{ 5,	TD,	printargs,		"pwritev"	}, /* 334 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 335 */
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 336 */
-	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */
-	{ 5,	0,	printargs,		"SYS_338"	}, /* 338 */
-	{ 5,	0,	printargs,		"SYS_339"	}, /* 339 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 337 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 338 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 339 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 340 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 341 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 342 */

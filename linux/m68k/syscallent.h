@@ -365,9 +365,9 @@
 	{ 1,	0,	sys_set_thread_area,	"set_thread_area"}, /* 334 */
 	{ 6,	0,	printargs,		"atomic_comxchg_32"}, /* 335 */
 	{ 0,	0,	printargs,		"atomic_barrier"}, /* 336 */
-	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */
-	{ 5,	0,	printargs,		"SYS_338"	}, /* 338 */
-	{ 5,	0,	printargs,		"SYS_339"	}, /* 339 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 337 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 338 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 339 */
 	{ 5,	0,	printargs,		"SYS_340"	}, /* 340 */
 	{ 5,	0,	printargs,		"SYS_341"	}, /* 341 */
 	{ 5,	0,	printargs,		"SYS_342"	}, /* 342 */

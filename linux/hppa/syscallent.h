@@ -326,3 +326,4 @@
 	{ 5,	TD,	printargs,		"perf_event_open"	}, /* 318 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"		}, /* 319 */
 	{ 4,	TN,	sys_accept4,		"accept4"		}, /* 320 */
+	{ 4,	0,	printargs,		"prlimit64"		}, /* 321 */

@@ -327,9 +327,9 @@
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 326 */
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 327 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 328 */
-	{ 5,	0,	printargs,	"SYS_329" },		/* 329 */
-	{ 5,	0,	printargs,	"SYS_330" },		/* 330 */
-	{ 5,	0,	printargs,	"SYS_331" },		/* 331 */
+	{ 2,	0,	printargs,		"fanotify_init"	}, /* 329 */
+	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 330 */
+	{ 4,	0,	printargs,		"prlimit64"	}, /* 331 */
 	{ 5,	0,	printargs,	"SYS_332" },		/* 332 */
 	{ 5,	0,	printargs,	"SYS_333" },		/* 333 */
 	{ 5,	0,	printargs,	"SYS_334" },		/* 334 */
