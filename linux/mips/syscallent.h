@@ -4215,7 +4215,7 @@
 	{ 6,	0,	sys_mmap,		"mmap"		}, /* 4210 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
 	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
-	{ 2,	TF,	printargs,		"stat64"	}, /* 4213 */
+	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 4213 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 4214 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"	}, /* 4215 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 4216 */
