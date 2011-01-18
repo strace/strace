@@ -52,7 +52,7 @@
 	{ 4,	0,	printargs,		"osf_mount"		}, /* 21 */
 	{ 2,	0,	sys_umount2,		"umount"		}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"		}, /* 23 */
-	{ 0,	0,	sys_getuid,		"getxuid"		}, /* 24 */
+	{ 0,	NF,	sys_getuid,		"getxuid"		}, /* 24 */
 	{ 5,	0,	printargs,		"exec_with_loader"	}, /* 25, not implemented */
 	{ 4,	0,	sys_ptrace,		"ptrace"		}, /* 26 */
 	{ 5,	0,	printargs,		"osf_nrecvmsg"		}, /* 27, not implemented */
@@ -75,7 +75,7 @@
 	{ 5,	0,	printargs,		"osf_profil"		}, /* 44, not implemented */
 	{ 3,	TD|TF,	sys_open,		"open"			}, /* 45 */
 	{ 5,	0,	printargs,		"osf_old_sigaction"	}, /* 46, not implemented */
-	{ 1,	0,	sys_getgid,		"getxgid"		}, /* 47 */
+	{ 1,	NF,	sys_getgid,		"getxgid"		}, /* 47 */
 	{ 3,	TS,	printargs,		"osf_sigprocmask"	}, /* 48 */
 	{ 5,	0,	printargs,		"osf_getlogin"		}, /* 49, not implemented */
 	{ 5,	0,	printargs,		"osf_setlogin"		}, /* 50, not implemented */
@@ -353,8 +353,8 @@
 	{ 1,	0,	sys_swapon,		"swapon"		}, /* 322 */
 	{ 1,	0,	sys_times,		"times"			}, /* 323 */
 	{ 1,	0,	sys_personality,	"personality"		}, /* 324 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"		}, /* 325 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"		}, /* 326 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"		}, /* 325 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"		}, /* 326 */
 	{ 2,	0,	sys_ustat,		"ustat"			}, /* 327 */
 	{ 2,	TF,	sys_statfs,		"statfs"		}, /* 328 */
 	{ 2,	TD,	sys_fstatfs,		"fstatfs"		}, /* 329 */

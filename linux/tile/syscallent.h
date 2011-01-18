@@ -21,7 +21,7 @@
 	{ 5,	TF,	sys_mount,		"mount" }, /* 20 */
 	{ 2,	TF,	sys_umount2,		"umount" }, /* 21 */
 	{ 1,	0,	sys_setuid,		"setuid" }, /* 22 */
-	{ 0,	0,	sys_getuid,		"getuid" }, /* 23 */
+	{ 0,	NF,	sys_getuid,		"getuid" }, /* 23 */
 	{ 1,	0,	sys_stime,		"stime" }, /* 24 */
 	{ 4,	0,	sys_ptrace,		"ptrace" }, /* 25 */
 	{ 1,	0,	sys_alarm,		"alarm" }, /* 26 */
@@ -40,10 +40,10 @@
 	{ 1,	0,	sys_times,		"times" }, /* 39 */
 	{ 1,	0,	sys_brk,		"brk" }, /* 40 */
 	{ 1,	0,	sys_setgid,		"setgid" }, /* 41 */
-	{ 0,	0,	sys_getgid,		"getgid" }, /* 42 */
+	{ 0,	NF,	sys_getgid,		"getgid" }, /* 42 */
 	{ 3,	TS,	sys_signal,		"signal" }, /* 43 */
-	{ 0,	0,	sys_geteuid,		"geteuid" }, /* 44 */
-	{ 0,	0,	sys_getegid,		"getegid" }, /* 45 */
+	{ 0,	NF,	sys_geteuid,		"geteuid" }, /* 44 */
+	{ 0,	NF,	sys_getegid,		"getegid" }, /* 45 */
 	{ 1,	TF,	sys_acct,		"acct" }, /* 46 */
 	{ 3,	TD,	sys_ioctl,		"ioctl" }, /* 47 */
 	{ 3,	TD,	sys_fcntl,		"fcntl" }, /* 48 */
@@ -138,8 +138,8 @@
 	{ 3,	0,	sys_sysfs,		"sysfs" }, /* 137 */
 	{ 1,	0,	sys_personality,	"personality" }, /* 138 */
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall" }, /* 139 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid" }, /* 140 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid" }, /* 141 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid" }, /* 140 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid" }, /* 141 */
 	{ 5,	TD,	sys_llseek,		"_llseek" }, /* 142 */
 	{ 3,	TD,	sys_getdents,		"getdents" }, /* 143 */
 	{ 2,	TD,	sys_flock,		"flock" }, /* 144 */

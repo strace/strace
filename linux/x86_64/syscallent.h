@@ -100,13 +100,13 @@
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	},  /* 99 */
 	{ 1,	0,	sys_times,		"times"		},  /* 100 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	},  /* 101 */
-	{ 0,	0,	sys_getuid,		"getuid"	},  /* 102 */
+	{ 0,	NF,	sys_getuid,		"getuid"	},  /* 102 */
 	{ 3,	0,	sys_syslog,		"syslog"	},  /* 103 */
-	{ 0,	0,	sys_getgid,		"getgid"	},  /* 104 */
+	{ 0,	NF,	sys_getgid,		"getgid"	},  /* 104 */
 	{ 1,	0,	sys_setuid,		"setuid"	},  /* 105 */
 	{ 1,	0,	sys_setgid,		"setgid"	},  /* 106 */
-	{ 0,	0,	sys_geteuid,		"geteuid"	},  /* 107 */
-	{ 0,	0,	sys_getegid,		"getegid"	},  /* 108 */
+	{ 0,	NF,	sys_geteuid,		"geteuid"	},  /* 107 */
+	{ 0,	NF,	sys_getegid,		"getegid"	},  /* 108 */
 	{ 2,	0,	sys_setpgid,		"setpgid"	},  /* 109 */
 	{ 0,	0,	sys_getppid,		"getppid"	},  /* 110 */
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	},  /* 111 */
@@ -120,8 +120,8 @@
 	{ 3,	0,	sys_setresgid,		"setresgid"	},  /* 119 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	},  /* 120 */
 	{ 1,	0,	sys_getpgid,		"getpgid"	},  /* 121 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"	},  /* 122 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"	},  /* 123 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"	},  /* 122 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"	},  /* 123 */
 	{ 1,	0,	sys_getsid,		"getsid"	},  /* 124 */
 	{ 2,	0,	sys_capget,		"capget"	},  /* 125 */
 	{ 2,	0,	sys_capset,		"capset"	},  /* 126 */

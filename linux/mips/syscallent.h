@@ -4026,7 +4026,7 @@
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 4021 */
 	{ 1,	TF,	sys_umount,		"oldumount"	}, /* 4022 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 4023 */
-	{ 0,	0,	sys_getuid,		"getuid"	}, /* 4024 */
+	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 4024 */
 	{ 1,	0,	sys_stime,		"stime"		}, /* 4025 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 4026 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 4027 */
@@ -4049,10 +4049,10 @@
 	{ 0,	0,	sys_prof,		"prof"		}, /* 4044 */
 	{ 1,	0,	sys_brk,		"brk"		}, /* 4045 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 4046 */
-	{ 0,	0,	sys_getgid,		"getgid"	}, /* 4047 */
+	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 4047 */
 	{ 1,	TS,	sys_signal,		"signal"	}, /* 4048 */
-	{ 0,	0,	sys_geteuid,		"geteuid"	}, /* 4049 */
-	{ 0,	0,	sys_getegid,		"getegid"	}, /* 4050 */
+	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 4049 */
+	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 4050 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 4051 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 4052 */
 	{ 0,	0,	sys_lock,		"lock"		}, /* 4053 */
@@ -4140,8 +4140,8 @@
 	{ 3,	0,	sys_sysfs,		"sysfs"		}, /* 4135 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 4136 */
 	{ 0,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 4137 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"	}, /* 4138 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"	}, /* 4139 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 4138 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 4139 */
 	{ 5,	TF,	sys_llseek,		"_llseek"	}, /* 4140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 4141 */
 	{ 5,	TD,	sys_select,		"_newselect"	}, /* 4142 */
@@ -5448,13 +5448,13 @@
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 5097 */
 	{ 1,	0,	sys_times,		"times"		}, /* 5098 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 5099 */
-	{ 0,	0,	sys_getuid,		"getuid"	}, /* 5100 */
+	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 5100 */
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 5101 */
-	{ 0,	0,	sys_getgid,		"getgid"	}, /* 5102 */
+	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 5102 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 5103 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 5104 */
-	{ 0,	0,	sys_geteuid,		"geteuid"	}, /* 5105 */
-	{ 0,	0,	sys_getegid,		"getegid"	}, /* 5106 */
+	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 5105 */
+	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 5106 */
 	{ 2,	0,	sys_setpgid,		"setpgid"	}, /* 5107 */
 	{ 0,	0,	sys_getppid,		"getppid"	}, /* 5108 */
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 5109 */
@@ -5468,8 +5468,8 @@
 	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 5117 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 5118 */
 	{ 0,	0,	sys_getpgid,		"getpgid"	}, /* 5119 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"	}, /* 5120 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"	}, /* 5121 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 5120 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 5121 */
 	{ 1,	0,	sys_getsid,		"getsid"	}, /* 5122 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 5123 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 5124 */
@@ -6754,13 +6754,13 @@
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 6097 */
 	{ 1,	0,	sys_times,		"times"		}, /* 6098 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 6099 */
-	{ 0,	0,	sys_getuid,		"getuid"	}, /* 6100 */
+	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 6100 */
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 6101 */
-	{ 0,	0,	sys_getgid,		"getgid"	}, /* 6102 */
+	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 6102 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 6103 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 6104 */
-	{ 0,	0,	sys_geteuid,		"geteuid"	}, /* 6105 */
-	{ 0,	0,	sys_getegid,		"getegid"	}, /* 6106 */
+	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 6105 */
+	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 6106 */
 	{ 2,	0,	sys_setpgid,		"setpgid"	}, /* 6107 */
 	{ 0,	0,	sys_getppid,		"getppid"	}, /* 6108 */
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 6109 */
@@ -6774,8 +6774,8 @@
 	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 6117 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 6118 */
 	{ 0,	0,	sys_getpgid,		"getpgid"	}, /* 6119 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"	}, /* 6120 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"	}, /* 6121 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 6120 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 6121 */
 	{ 1,	0,	sys_getsid,		"getsid"	}, /* 6122 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 6123 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 6124 */

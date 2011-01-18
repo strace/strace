@@ -51,7 +51,7 @@
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
 	{ 2,	TF,	sys_umount,		"umount"	}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 23 */
-	{ 0,	0,	sys_getuid,		"getuid"	}, /* 24 */
+	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 24 */
 	{ 1,	0,	sys_stime,		"stime"		}, /* 25 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 26 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 27 */
@@ -74,13 +74,13 @@
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 44 */
 	{ 1,	0,	sys_brk,		"brk"		}, /* 45 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 46 */
-	{ 0,	0,	sys_getgid,		"getgid"	}, /* 47 */
+	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 47 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 48 */
-	{ 0,	0,	sys_geteuid,		"geteuid"	}, /* 49 */
-	{ 0,	0,	sys_getegid,		"getegid"	}, /* 50 */
+	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 49 */
+	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"	}, /* 52 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"	}, /* 53 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 52 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 53 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 54 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"		}, /* 55 */
 	{ 2,	0,	sys_setpgid,		"setpgid"	}, /* 56 */

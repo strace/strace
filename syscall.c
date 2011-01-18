@@ -109,6 +109,7 @@
 #define TN TRACE_NETWORK
 #define TP TRACE_PROCESS
 #define TS TRACE_SIGNAL
+#define NF SYSCALL_NEVER_FAILS
 
 static const struct sysent sysent0[] = {
 #include "syscallent.h"
@@ -143,6 +144,7 @@ int nsyscalls;
 #undef TN
 #undef TP
 #undef TS
+#undef NF
 
 static const char *const errnoent0[] = {
 #include "errnoent.h"
@@ -1553,8 +1555,13 @@ get_error(struct tcb *tcp)
 {
 	int u_error = 0;
 #ifdef LINUX
+	int check_errno = 1;
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	    sysent[tcp->scno].sys_flags & SYSCALL_NEVER_FAILS) {
+		check_errno = 0;
+	}
 # if defined(S390) || defined(S390X)
-	if (is_negated_errno(gpr2)) {
+	if (check_errno && is_negated_errno(gpr2)) {
 		tcp->u_rval = -1;
 		u_error = -gpr2;
 	}
@@ -1563,7 +1570,7 @@ get_error(struct tcb *tcp)
 		u_error = 0;
 	}
 # elif defined(I386)
-	if (is_negated_errno(eax)) {
+	if (check_errno && is_negated_errno(eax)) {
 		tcp->u_rval = -1;
 		u_error = -eax;
 	}
@@ -1572,7 +1579,7 @@ get_error(struct tcb *tcp)
 		u_error = 0;
 	}
 # elif defined(X86_64)
-	if (is_negated_errno(rax)) {
+	if (check_errno && is_negated_errno(rax)) {
 		tcp->u_rval = -1;
 		u_error = -rax;
 	}
@@ -1585,7 +1592,7 @@ get_error(struct tcb *tcp)
 		int err;
 
 		err = (int)r8;
-		if (is_negated_errno(err)) {
+		if (check_errno && is_negated_errno(err)) {
 			tcp->u_rval = -1;
 			u_error = -err;
 		}
@@ -1594,7 +1601,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 	} else {
-		if (r10) {
+		if (check_errno && r10) {
 			tcp->u_rval = -1;
 			u_error = r8;
 		} else {
@@ -1603,7 +1610,7 @@ get_error(struct tcb *tcp)
 		}
 	}
 # elif defined(MIPS)
-		if (a3) {
+		if (check_errno && a3) {
 			tcp->u_rval = -1;
 			u_error = r2;
 		} else {
@@ -1611,7 +1618,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(POWERPC)
-		if (is_negated_errno(result)) {
+		if (check_errno && is_negated_errno(result)) {
 			tcp->u_rval = -1;
 			u_error = -result;
 		}
@@ -1620,7 +1627,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(M68K)
-		if (is_negated_errno(d0)) {
+		if (check_errno && is_negated_errno(d0)) {
 			tcp->u_rval = -1;
 			u_error = -d0;
 		}
@@ -1629,7 +1636,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(ARM)
-		if (is_negated_errno(regs.ARM_r0)) {
+		if (check_errno && is_negated_errno(regs.ARM_r0)) {
 			tcp->u_rval = -1;
 			u_error = -regs.ARM_r0;
 		}
@@ -1638,7 +1645,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(AVR32)
-		if (regs.r12 && (unsigned) -regs.r12 < nerrnos) {
+		if (check_errno && regs.r12 && (unsigned) -regs.r12 < nerrnos) {
 			tcp->u_rval = -1;
 			u_error = -regs.r12;
 		}
@@ -1647,7 +1654,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(BFIN)
-		if (is_negated_errno(r0)) {
+		if (check_errno && is_negated_errno(r0)) {
 			tcp->u_rval = -1;
 			u_error = -r0;
 		} else {
@@ -1655,7 +1662,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(ALPHA)
-		if (a3) {
+		if (check_errno && a3) {
 			tcp->u_rval = -1;
 			u_error = r0;
 		}
@@ -1664,7 +1671,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(SPARC)
-		if (regs.psr & PSR_C) {
+		if (check_errno && regs.psr & PSR_C) {
 			tcp->u_rval = -1;
 			u_error = regs.u_regs[U_REG_O0];
 		}
@@ -1673,7 +1680,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(SPARC64)
-		if (regs.tstate & 0x1100000000UL) {
+		if (check_errno && regs.tstate & 0x1100000000UL) {
 			tcp->u_rval = -1;
 			u_error = regs.u_regs[U_REG_O0];
 		}
@@ -1682,7 +1689,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(HPPA)
-		if (is_negated_errno(r28)) {
+		if (check_errno && is_negated_errno(r28)) {
 			tcp->u_rval = -1;
 			u_error = -r28;
 		}
@@ -1692,7 +1699,7 @@ get_error(struct tcb *tcp)
 		}
 # elif defined(SH)
 		/* interpret R0 as return value or error number */
-		if (is_negated_errno(r0)) {
+		if (check_errno && is_negated_errno(r0)) {
 			tcp->u_rval = -1;
 			u_error = -r0;
 		}
@@ -1702,7 +1709,7 @@ get_error(struct tcb *tcp)
 		}
 # elif defined(SH64)
 		/* interpret result as return value or error number */
-		if (is_negated_errno(r9)) {
+		if (check_errno && is_negated_errno(r9)) {
 			tcp->u_rval = -1;
 			u_error = -r9;
 		}
@@ -1711,7 +1718,7 @@ get_error(struct tcb *tcp)
 			u_error = 0;
 		}
 # elif defined(CRISV10) || defined(CRISV32)
-		if (r10 && (unsigned) -r10 < nerrnos) {
+		if (check_errno && r10 && (unsigned) -r10 < nerrnos) {
 			tcp->u_rval = -1;
 			u_error = -r10;
 		}
@@ -1724,7 +1731,7 @@ get_error(struct tcb *tcp)
 		/* interpret result as return value or error number */
 		if (upeek(tcp, PTREGS_OFFSET_REG(0), &rval) < 0)
 			return -1;
-		if (rval < 0 && rval > -nerrnos) {
+		if (check_errno && rval < 0 && rval > -nerrnos) {
 			tcp->u_rval = -1;
 			u_error = -rval;
 		}
@@ -1734,7 +1741,7 @@ get_error(struct tcb *tcp)
 		}
 # elif defined(MICROBLAZE)
 		/* interpret result as return value or error number */
-		if (is_negated_errno(r3)) {
+		if (check_errno && is_negated_errno(r3)) {
 			tcp->u_rval = -1;
 			u_error = -r3;
 		}

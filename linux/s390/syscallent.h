@@ -52,7 +52,7 @@
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
 	{ 1,	TF,	sys_umount,		"oldumount"	}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 23 */
-	{ 0,	0,	sys_getuid,		"getuid"	}, /* 24 */
+	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 24 */
 	{ 1,	0,	sys_stime,		"stime"		}, /* 25 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 26 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 27 */
@@ -77,8 +77,8 @@
 	{ -1,	0,	printargs,		"SYS_46"	}, /* 46 */
 	{ -1,	0,	printargs,		"SYS_47"	}, /* 47 */
 	{ 3,	TS,	sys_signal,		"signal"	}, /* 48 */
-	{ 0,	0,	sys_geteuid,		"geteuid"	}, /* 49 */
-	{ 0,	0,	sys_getegid,		"getegid"	}, /* 50 */
+	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 49 */
+	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 52 */
 	{ -1,	0,	printargs,		"SYS_53"	}, /* 53 */
@@ -166,8 +166,8 @@
 	{ 3,	0,	sys_sysfs,		"sysfs"		}, /* 135 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 136 */
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"	}, /* 138 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"	}, /* 139 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 138 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 139 */
 	{ 5,	TD,	sys_llseek,		"_llseek"	}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
@@ -227,10 +227,10 @@
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"	}, /* 197 */
 	{ 3,	TF,	sys_chown,		"lchown"	}, /* 198 */
-	{ 0,	0,	sys_getuid,		"getuid"	}, /* 199 */
-	{ 0,	0,	sys_getgid,		"getgid"	}, /* 200 */
-	{ 0,	0,	sys_geteuid,		"geteuid"	}, /* 201 */
-	{ 0,	0,	sys_getegid,		"getegid"	}, /* 202 */
+	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 199 */
+	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 200 */
+	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 201 */
+	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 202 */
 	{ 2,	0,	sys_setreuid,		"setreuid"	}, /* 203 */
 	{ 2,	0,	sys_setregid,		"setregid"	}, /* 204 */
 	{ 2,	0,	sys_getgroups,		"getgroups"	}, /* 205 */
@@ -243,8 +243,8 @@
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 212 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 213 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 214 */
-	{ 1,	0,	sys_setfsuid,		"setfsuid"	}, /* 215 */
-	{ 1,	0,	sys_setfsgid,		"setfsgid"	}, /* 216 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 215 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 216 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
 	{ 3,	0,	sys_mincore,	         "mincore"      }, /* 218 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */

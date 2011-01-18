@@ -58,8 +58,10 @@
 #define	sys_swapoff		sys_chdir
 #define	sys_delete_module	sys_open
 #define	sys_fchdir		sys_close
-#define	sys_setfsuid		sys_setuid
-#define	sys_setfsgid		sys_setgid
+#define	sys_getgid		sys_getuid
+#define	sys_getegid		sys_getuid
+#define	sys_geteuid		sys_getuid
+#define	sys_setfsgid		sys_setfsuid
 #define	sys_acct		sys_chdir
 #define sys_fdatasync		sys_close
 #define sys_mlock		sys_munmap
@@ -70,12 +72,8 @@
 /* printargs does the right thing */
 #define	sys_setup		printargs
 #define	sys_getpid		printargs
-#define	sys_getuid		printargs
 #define	sys_pause		printargs
 #define	sys_sync		printargs
-#define	sys_getgid		printargs
-#define	sys_geteuid		printargs
-#define	sys_getegid		printargs
 #define	sys_getppid		printargs
 #define	sys_getpgrp		printargs
 #define	sys_setsid		printargs

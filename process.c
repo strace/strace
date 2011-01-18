@@ -1110,6 +1110,22 @@ struct tcb *tcp;
 
 #ifdef LINUX
 
+int sys_getuid(struct tcb *tcp)
+{
+	if (exiting(tcp))
+		tcp->u_rval = (uid_t) tcp->u_rval;
+	return RVAL_UDECIMAL;
+}
+
+int sys_setfsuid(struct tcb *tcp)
+{
+	if (entering(tcp))
+		tprintf("%u", (uid_t) tcp->u_arg[0]);
+	else
+		tcp->u_rval = (uid_t) tcp->u_rval;
+	return RVAL_UDECIMAL;
+}
+
 int
 sys_setuid(tcp)
 struct tcb *tcp;
