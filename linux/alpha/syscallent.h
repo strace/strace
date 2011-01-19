@@ -483,7 +483,7 @@
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat"		}, /* 452 */
 	{ 5,	TD|TF,	sys_fchownat,		"fchownat"		}, /* 453 */
 	{ 3,	TD|TF,	sys_futimesat,		"futimesat"		}, /* 454 */
-	{ 4,	TD|TD,	sys_newfstatat,		"newfstatat"		}, /* 455 */
+	{ 4,	TD|TF,	sys_newfstatat,		"newfstatat"		}, /* 455 */
 	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"		}, /* 456 */
 	{ 4,	TD|TF,	sys_renameat,		"renameat"		}, /* 457 */
 	{ 5,	TD|TF,	sys_linkat,		"linkat"		}, /* 458 */

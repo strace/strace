@@ -260,7 +260,7 @@
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 259 */
 	{ 5,	TD|TF,	sys_fchownat,		"fchownat"	}, /* 260 */
 	{ 3,	TD|TF,	sys_futimesat,		"futimesat"	}, /* 261 */
-	{ 4,	TD|TD,	sys_newfstatat,		"newfstatat"	}, /* 262 */
+	{ 4,	TD|TF,	sys_newfstatat,		"newfstatat"	}, /* 262 */
 	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"	}, /* 263 */
 	{ 4,	TD|TF,	sys_renameat,		"renameat"	}, /* 264 */
 	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 265 */

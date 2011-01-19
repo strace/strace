@@ -270,7 +270,7 @@
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat" }, /* 269 */
 	{ 5,	TD|TF,	sys_fchownat,		"fchownat" }, /* 270 */
 	{ 3,	TD|TF,	sys_futimesat,		"futimesat" }, /* 271 */
-	{ 4,	TD|TD,	sys_newfstatat,		"fstatat64" }, /* 272 */
+	{ 4,	TD|TF,	sys_newfstatat,		"fstatat64" }, /* 272 */
 	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat" }, /* 273 */
 	{ 4,	TD|TF,	sys_renameat,		"renameat" }, /* 274 */
 	{ 5,	TD|TF,	sys_linkat,		"linkat" }, /* 275 */

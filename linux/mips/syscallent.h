@@ -4295,7 +4295,7 @@
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 4290 */
 	{ 5,	TD|TF,	sys_fchownat,		"fchownat"	}, /* 4291 */
 	{ 3,	TD|TF,	sys_futimesat,		"futimesat"	}, /* 4292 */
-	{ 4,	TD|TD,	sys_newfstatat,		"newfstatat"	}, /* 4293 */
+	{ 4,	TD|TF,	sys_newfstatat,		"newfstatat"	}, /* 4293 */
 	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"	}, /* 4294 */
 	{ 4,	TD|TF,	sys_renameat,		"renameat"	}, /* 4295 */
 	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 4296 */
@@ -4635,7 +4635,7 @@
 	{ 4,	TD|TF,	printargs,		"o32_mknodat"	}, /* 4290 */
 	{ 5,	TD|TF,	printargs,		"o32_fchownat"	}, /* 4291 */
 	{ 3,	TD|TF,	printargs,		"o32_futimesat"	}, /* 4292 */
-	{ 4,	TD|TD,	printargs,		"o32_newfstatat"	}, /* 4293 */
+	{ 4,	TD|TF,	printargs,		"o32_newfstatat"	}, /* 4293 */
 	{ 3,	TD|TF,	printargs,		"o32_unlinkat"	}, /* 4294 */
 	{ 4,	TD|TF,	printargs,		"o32_renameat"	}, /* 4295 */
 	{ 5,	TD|TF,	printargs,		"o32_linkat"	}, /* 4296 */
