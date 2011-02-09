@@ -469,66 +469,37 @@ qualify(const char *s)
 }
 
 static void
-dumpio(tcp)
-struct tcb *tcp;
+dumpio(struct tcb *tcp)
 {
 	if (syserror(tcp))
 		return;
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= MAX_QUALS)
 		return;
-	switch (known_scno(tcp)) {
-	case SYS_read:
-#ifdef SYS_pread64
-	case SYS_pread64:
-#endif
-#if defined SYS_pread && SYS_pread64 != SYS_pread
-	case SYS_pread:
-#endif
-#ifdef SYS_recv
-	case SYS_recv:
-#elif defined SYS_sub_recv
-	case SYS_sub_recv:
-#endif
-#ifdef SYS_recvfrom
-	case SYS_recvfrom:
-#elif defined SYS_sub_recvfrom
-	case SYS_sub_recvfrom:
-#endif
-		if (qual_flags[tcp->u_arg[0]] & QUAL_READ)
+	if (tcp->scno < 0 || tcp->scno >= nsyscalls)
+		return;
+	if (sysent[tcp->scno].sys_func == printargs)
+		return;
+	if (qual_flags[tcp->u_arg[0]] & QUAL_READ) {
+		if (sysent[tcp->scno].sys_func == sys_read ||
+		    sysent[tcp->scno].sys_func == sys_pread ||
+		    sysent[tcp->scno].sys_func == sys_pread64 ||
+		    sysent[tcp->scno].sys_func == sys_recv ||
+		    sysent[tcp->scno].sys_func == sys_recvfrom)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		break;
-	case SYS_write:
-#ifdef SYS_pwrite64
-	case SYS_pwrite64:
-#endif
-#if defined SYS_pwrite && SYS_pwrite64 != SYS_pwrite
-	case SYS_pwrite:
-#endif
-#ifdef SYS_send
-	case SYS_send:
-#elif defined SYS_sub_send
-	case SYS_sub_send:
-#endif
-#ifdef SYS_sendto
-	case SYS_sendto:
-#elif defined SYS_sub_sendto
-	case SYS_sub_sendto:
-#endif
-		if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE)
+		else if (sysent[tcp->scno].sys_func == sys_readv)
+			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		return;
+	}
+	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
+		if (sysent[tcp->scno].sys_func == sys_write ||
+		    sysent[tcp->scno].sys_func == sys_pwrite ||
+		    sysent[tcp->scno].sys_func == sys_pwrite64 ||
+		    sysent[tcp->scno].sys_func == sys_send ||
+		    sysent[tcp->scno].sys_func == sys_sendto)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		break;
-#ifdef SYS_readv
-	case SYS_readv:
-		if (qual_flags[tcp->u_arg[0]] & QUAL_READ)
+		else if (sysent[tcp->scno].sys_func == sys_writev)
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-		break;
-#endif
-#ifdef SYS_writev
-	case SYS_writev:
-		if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE)
-			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-		break;
-#endif
+		return;
 	}
 }
 
