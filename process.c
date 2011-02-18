@@ -443,18 +443,11 @@ struct tcb *tcp;
 }
 
 int
-internal_exit(tcp)
-struct tcb *tcp;
+internal_exit(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tcp->flags |= TCB_EXITING;
 #ifdef __NR_exit_group
-# ifdef IA64
-		if (ia32) {
-			if (tcp->scno == 252)
-				tcp->flags |= TCB_GROUP_EXITING;
-		} else
-# endif
 		if (known_scno(tcp) == __NR_exit_group)
 			tcp->flags |= TCB_GROUP_EXITING;
 #endif
