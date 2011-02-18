@@ -1326,13 +1326,14 @@ get_scno(struct tcb *tcp)
 
 
 long
-known_scno(tcp)
-struct tcb *tcp;
+known_scno(struct tcb *tcp)
 {
 	long scno = tcp->scno;
+#if SUPPORTED_PERSONALITIES > 1
 	if (scno >= 0 && scno < nsyscalls && sysent[scno].native_scno != 0)
 		scno = sysent[scno].native_scno;
 	else
+#endif
 		scno += NR_SYSCALL_BASE;
 	return scno;
 }
