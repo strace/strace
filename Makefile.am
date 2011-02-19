@@ -62,7 +62,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/sparc/signalent.h linux/sparc/signalent1.h \
 	     linux/sparc/syscall.h linux/sparc/syscall1.h \
 	     linux/sparc/syscallent.h linux/sparc/syscallent1.h \
-	     linux/sparc/gen.pl linux/sparc/syscall.h.2 \
+	     linux/sparc/gen.pl \
 	     linux/sparc64/dummy2.h linux/sparc64/errnoent.h \
 	     linux/sparc64/errnoent1.h linux/sparc64/errnoent2.h \
 	     linux/sparc64/ioctlent.h linux/sparc64/ioctlent1.h \
