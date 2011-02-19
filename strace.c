@@ -696,7 +696,10 @@ startup_child (char **argv)
 static int
 test_ptrace_setoptions(void)
 {
-	int pid;
+	int pid, expected_grandchild = 0, found_grandchild = 0;
+	const unsigned int test_options = PTRACE_O_TRACECLONE |
+					  PTRACE_O_TRACEFORK |
+					  PTRACE_O_TRACEVFORK;
 
 	if ((pid = fork()) < 0)
 		return -1;
@@ -720,29 +723,37 @@ test_ptrace_setoptions(void)
 			return -1;
 		}
 		if (tracee_pid != pid) {
-			/* the grandchild */
+			found_grandchild = tracee_pid;
 			if (ptrace(PTRACE_CONT, tracee_pid, 0, 0) < 0 &&
 			    errno != ESRCH)
 				kill(tracee_pid, SIGKILL);
 		}
 		else if (WIFSTOPPED(status)) {
-			const unsigned int test_options = PTRACE_O_TRACECLONE |
-							  PTRACE_O_TRACEFORK |
-							  PTRACE_O_TRACEVFORK;
-			if (status >> 16 == PTRACE_EVENT_FORK)
-				ptrace_setoptions |= test_options;
-			if (WSTOPSIG(status) == SIGSTOP) {
-				if (ptrace(PTRACE_SETOPTIONS, pid, NULL,
-					   test_options) < 0) {
+			switch (WSTOPSIG(status)) {
+			case SIGSTOP:
+				if (ptrace(PTRACE_SETOPTIONS, pid,
+					   NULL, test_options) < 0) {
 					kill(pid, SIGKILL);
 					return -1;
 				}
+				break;
+			case SIGTRAP:
+				if (status >> 16 == PTRACE_EVENT_FORK) {
+					long msg = 0;
+
+					if (ptrace(PTRACE_GETEVENTMSG, pid,
+						   NULL, (long) &msg) == 0)
+						expected_grandchild = msg;
+				}
+				break;
 			}
 			if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0 &&
 			    errno != ESRCH)
 				kill(pid, SIGKILL);
 		}
 	}
+	if (expected_grandchild && expected_grandchild == found_grandchild)
+		ptrace_setoptions |= test_options;
 	return 0;
 }
 #endif
@@ -2365,7 +2376,7 @@ handle_ptrace_event(int status, struct tcb *tcp)
 	if (status >> 16 == PTRACE_EVENT_VFORK ||
 	    status >> 16 == PTRACE_EVENT_CLONE ||
 	    status >> 16 == PTRACE_EVENT_FORK) {
-		int childpid;
+		long childpid;
 
 		if (do_ptrace(PTRACE_GETEVENTMSG, tcp, NULL, &childpid) < 0) {
 			if (errno != ESRCH) {
