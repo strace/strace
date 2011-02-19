@@ -219,6 +219,8 @@ int	sys_epoll_pwait();
 int	sys_signalfd(), sys_timerfd(), sys_eventfd();
 int	sys_signalfd4(), sys_eventfd2(), sys_epoll_create1(), sys_dup3(), sys_pipe2();
 int	sys_inotify_init1();
+int	sys_setfsuid();
+int	sys_pread64(), sys_pwrite64();
 
 #  define SYS_socket_subcall	353
 #define SYS_sub_socket		(SYS_socket_subcall + 1)
