@@ -1,1 +1,0 @@
-#include "../sparc/syscall.h"

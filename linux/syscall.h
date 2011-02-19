@@ -210,7 +210,11 @@ int sys_osf_utimes();
 #  undef SYS_sendmsg
 #  undef SYS_recvmsg
 # endif /* IA64 */
+# if defined(SPARC) || defined(SPARC64)
+#  define SYS_socket_subcall	353
+# else
 #  define SYS_socket_subcall	400
+# endif
 #define SYS_sub_socket		(SYS_socket_subcall + 1)
 #define SYS_sub_bind		(SYS_socket_subcall + 2)
 #define SYS_sub_connect		(SYS_socket_subcall + 3)
@@ -240,7 +244,7 @@ int sys_semget(), sys_semctl(), sys_semop();
 int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
 int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 
-#if !defined(ALPHA) && !defined(MIPS) && !defined(SPARC) && !defined(HPPA) && \
+#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && \
 	!defined(__ARM_EABI__)
 # ifdef	IA64
    /*
@@ -280,7 +284,7 @@ int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
 #define SYS_sub_shmctl		(SYS_ipc_subcall + 24)
 
 #define SYS_ipc_nsubcalls	25
-#endif /* !(ALPHA || MIPS || SPARC || HPPA) */
+#endif /* !(ALPHA || MIPS || HPPA) */
 
 #if defined SYS_ipc_subcall && !defined SYS_ipc
 # define SYS_ipc SYS_ipc_subcall
@@ -335,4 +339,32 @@ int sys_subpage_prot();
 #ifdef BFIN
 int sys_sram_alloc();
 int sys_cacheflush();
+#endif
+
+#if defined SPARC || defined SPARC64
+#include "sparc/syscall1.h"
+int sys_execv();
+int sys_getpagesize();
+int sys_getmsg(), sys_putmsg();
+
+int	sys_semsys(), sys_semctl(), sys_semget();
+#define SYS_semsys_subcall	200
+#define SYS_semsys_nsubcalls	3
+#define SYS_semctl		(SYS_semsys_subcall + 0)
+#define SYS_semget		(SYS_semsys_subcall + 1)
+#define SYS_semop		(SYS_semsys_subcall + 2)
+int	sys_msgsys(), sys_msgget(), sys_msgctl(), sys_msgrcv(), sys_msgsnd();
+#define SYS_msgsys_subcall	203
+#define SYS_msgsys_nsubcalls	4
+#define SYS_msgget		(SYS_msgsys_subcall + 0)
+#define SYS_msgctl		(SYS_msgsys_subcall + 1)
+#define SYS_msgrcv		(SYS_msgsys_subcall + 2)
+#define SYS_msgsnd		(SYS_msgsys_subcall + 3)
+int	sys_shmsys(), sys_shmat(), sys_shmctl(), sys_shmdt(), sys_shmget();
+#define SYS_shmsys_subcall	207
+#define SYS_shmsys_nsubcalls	4
+#define SYS_shmat		(SYS_shmsys_subcall + 0)
+#define SYS_shmctl		(SYS_shmsys_subcall + 1)
+#define SYS_shmdt		(SYS_shmsys_subcall + 2)
+#define SYS_shmget		(SYS_shmsys_subcall + 3)
 #endif
