@@ -2707,7 +2707,8 @@ trace_syscall_entering(struct tcb *tcp)
 	else
 		tprintf("%s(", sysent[tcp->scno].sys_name);
 	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
-	    ((qual_flags[tcp->scno] & QUAL_RAW) && tcp->scno != SYS_exit))
+	    ((qual_flags[tcp->scno] & QUAL_RAW) &&
+	     sysent[tcp->scno].sys_func != sys_exit))
 		sys_res = printargs(tcp);
 	else
 		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
