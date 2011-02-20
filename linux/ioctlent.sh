@@ -64,6 +64,7 @@ lookup_ioctls 03 linux/hdreg.h
 lookup_ioctls 22 scsi/sg.h
 lookup_ioctls 46 linux/fb.h
 lookup_ioctls 4B linux/kd.h
+lookup_ioctls 4C linux/loop.h
 lookup_ioctls 53 linux/cdrom.h scsi/scsi.h scsi/scsi_ioctl.h
 lookup_ioctls 54 $asm/ioctls.h asm-generic/ioctls.h
 lookup_ioctls 56 linux/vt.h
