@@ -4250,7 +4250,7 @@
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 4245 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 4246 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 4247 */
-	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 4248 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 4248 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 4249 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 4250 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 4251 */
@@ -4328,7 +4328,7 @@
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime" }, /* 4323 */
 	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 4324 */
 	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 4325 */
-	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 4326 */
+	{ 1,	TD,	sys_epoll_create1,	"epoll_create1"	}, /* 4326 */
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 4327 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 4328 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 4329 */
@@ -4590,7 +4590,7 @@
 	{ 3,	0,	printargs,		"o32_io_cancel"	}, /* 4245 */
 	{ 1,	TP,	printargs,		"o32_exit_group"	}, /* 4246 */
 	{ 3,	0,	printargs,		"o32_lookup_dcookie"}, /* 4247 */
-	{ 1,	0,	printargs,		"o32_epoll_create"	}, /* 4248 */
+	{ 1,	TD,	printargs,		"o32_epoll_create"	}, /* 4248 */
 	{ 4,	TD,	printargs,		"o32_epoll_ctl"	}, /* 4249 */
 	{ 4,	TD,	printargs,		"o32_epoll_wait"	}, /* 4250 */
 	{ 5,	0,	printargs,		"o32_remap_file_pages"}, /* 4251 */
@@ -4668,7 +4668,7 @@
 	{ 4,	TD,	printargs,		"o32_timerfd_settime" }, /* 4323 */
 	{ 4,	TD|TS,	printargs,		"o32_signalfd4"	}, /* 4324 */
 	{ 2,	TD,	printargs,		"o32_eventfd2"	}, /* 4325 */
-	{ 1,	0,	printargs,		"o32_epoll_create1" }, /* 4326 */
+	{ 1,	TD,	printargs,		"o32_epoll_create1" }, /* 4326 */
 	{ 3,	TD,	printargs,		"o32_dup3"	}, /* 4327 */
 	{ 2,	TD,	printargs,		"o32_pipe2"	}, /* 4328 */
 	{ 1,	TD,	printargs,		"o32_inotify_init1" }, /* 4329 */
@@ -5555,7 +5555,7 @@
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 5204 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 5205 */
 	{ 3,	0,	printargs,		"lookup_dcookie" }, /* 5206 */
-	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 5207 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 5207 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 5208 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 5209 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages" }, /* 5210 */
@@ -5633,7 +5633,7 @@
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime" }, /* 5282 */
 	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 5283 */
 	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 5284 */
-	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 5285 */
+	{ 1,	TD,	sys_epoll_create1,	"epoll_create1"	}, /* 5285 */
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 5286 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 5287 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 5288 */
@@ -6861,7 +6861,7 @@
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 6204 */
 	{ 1,	TP,	sys_exit,		"exit_group"}, /* 6205 */
 	{ 3,	0,	printargs,		"lookup_dcookie"	}, /* 6206 */
-	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 6207 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 6207 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 6208 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 6209 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"	}, /* 6210 */
@@ -6943,7 +6943,7 @@
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime" }, /* 6286 */
 	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 6287 */
 	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 6288 */
-	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 6289 */
+	{ 1,	TD,	sys_epoll_create1,	"epoll_create1"	}, /* 6289 */
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 6290 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 6291 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 6292 */
@@ -7248,7 +7248,7 @@
 	{ 4,	TD,	printargs,		"n32_timerfd_settime"	}, /* 6286 */
 	{ 4,	TD|TS,	printargs,		"n32_signalfd4"		}, /* 6287 */
 	{ 2,	TD,	printargs,		"n32_eventfd2"		}, /* 6288 */
-	{ 1,	0,	printargs,		"n32_epoll_create1"	}, /* 6289 */
+	{ 1,	TD,	printargs,		"n32_epoll_create1"	}, /* 6289 */
 	{ 3,	TD,	printargs,		"n32_dup3"		}, /* 6290 */
 	{ 2,	TD,	printargs,		"n32_pipe2"		}, /* 6291 */
 	{ 1,	TD,	printargs,		"n32_inotify_init1"	}, /* 6292 */

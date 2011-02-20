@@ -229,7 +229,7 @@
 	{ 1,	0,	printargs,		"free_hugepages"	}, /* 221 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 222 */
 	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 223 */
-	{ 1,	0,	sys_epoll_create,	"epoll_create"		}, /* 224 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create"		}, /* 224 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"		}, /* 225 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"		}, /* 226 */
 	{ 5,	0,	printargs,		"remap_file_pages"	}, /* 227 */
@@ -316,7 +316,7 @@
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"	}, /* 308 */
 	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"		}, /* 309 */
 	{ 2,	TD,	sys_eventfd2,		"eventfd2"		}, /* 310 */
-	{ 1,	0,	sys_epoll_create1,	"epoll_create1"		}, /* 311 */
+	{ 1,	TD,	sys_epoll_create1,	"epoll_create1"		}, /* 311 */
 	{ 3,	TD,	sys_dup3,		"dup3"			}, /* 312 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"			}, /* 313 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"		}, /* 314 */

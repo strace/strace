@@ -226,7 +226,7 @@
 	{ 4,	0,	printargs,		"migrate_pages" }, /* 225 */
 	{ 1,	TP,	sys_exit,		"exit_group" }, /* 226 */
 	{ 4,	0,	printargs,		"lookup_dcookie" }, /* 227 */
-	{ 1,	0,	sys_epoll_create,	"epoll_create" }, /* 228 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create" }, /* 228 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl" }, /* 229 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait" }, /* 230 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages" }, /* 231 */

@@ -276,7 +276,7 @@
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 246 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 247 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 248 */
-	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 249 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 249 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 251 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 252 */
@@ -354,7 +354,7 @@
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 324 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 325 */
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 326 */
-	{ 1,	0,	sys_epoll_create1,	"epoll_create1"	}, /* 327 */
+	{ 1,	TD,	sys_epoll_create1,	"epoll_create1"	}, /* 327 */
 	{ 5,	TD,	printargs,		"preadv"	}, /* 328 */
 	{ 5,	TD,	printargs,		"pwritev"	}, /* 329 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 330 */

@@ -232,7 +232,7 @@
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 202 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 203 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 204 */
-	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 205 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 205 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 206 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 207 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 208 */
