@@ -332,7 +332,7 @@
 	{ 3,	0,	printargs,		"sethae"		}, /* 301 */
 	{ 5,	TF,	sys_mount,		"mount"			}, /* 302 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex32"		}, /* 303 */
-	{ 1,	0,	sys_swapoff,		"swapoff"		}, /* 304 */
+	{ 1,	TF,	sys_swapoff,		"swapoff"		}, /* 304 */
 	{ 3,	TD,	sys_getdents,		"getdents"		}, /* 305 */
 	{ 2,	0,	sys_create_module,	"create_module"		}, /* 306 */
 	{ 4,	0,	sys_init_module,	"init_module"		}, /* 307 */

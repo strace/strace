@@ -107,7 +107,7 @@
 	{ 2,	0,	sys_getitimer,		"getitimer" }, /* 106 */
 	{ 0,	0,	sys_vhangup,		"vhangup" }, /* 107 */
 	{ 4,	TP,	sys_wait4,		"wait4" }, /* 108 */
-	{ 1,	0,	sys_swapoff,		"swapoff" }, /* 109 */
+	{ 1,	TF,	sys_swapoff,		"swapoff" }, /* 109 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo" }, /* 110 */
 	{ 4,	TI,	sys_shmget,		"shmget" }, /* 111 */
 	{ 4,	TI,	sys_shmat,		"shmat" }, /* 112 */

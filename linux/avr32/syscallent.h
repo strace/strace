@@ -133,7 +133,7 @@
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 103 */
 	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 104 */
 	{ 2,	0,	sys_getitimer,		"getitimer"	}, /* 105 */
-	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 106 */
+	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 106 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 107 */
 	{ 6,	0,	sys_ipc,		"ipc"		}, /* 108 */
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 109 */

@@ -143,7 +143,7 @@
 	{ 0,	0,	sys_idle,		"idle"		}, /* 112 */
 	{ 1,	0,	sys_vm86old,		"vm86old"	}, /* 113 */
 	{ 4,	TP,	sys_wait4,		"wait4", SYS_wait4 }, /* 114 */
-	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 115 */
+	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
 	{ 6,	0,	sys_ipc,		"ipc", SYS_ipc }, /* 117 */
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 118 */

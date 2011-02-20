@@ -120,7 +120,7 @@
 	{ 2,	TD,	sys_fstat64,		"fstat64"		}, /* 112 */
 	{ 0,	0,	sys_vfork,		"vfork"			}, /* 113 */
 	{ 4,	TP,	sys_wait4,		"wait4"			}, /* 114 */
-	{ 1,	0,	sys_swapoff,		"swapoff"		}, /* 115 */
+	{ 1,	TF,	sys_swapoff,		"swapoff"		}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"		}, /* 116 */
 	{ 2,	TN,	sys_shutdown,		"shutdown"		}, /* 117 */
 	{ 1,	TD,	sys_fsync,		"fsync"			}, /* 118 */

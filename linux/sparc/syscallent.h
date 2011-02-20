@@ -211,7 +211,7 @@
 	{ 6,	TD,	printargs,	"fadvise64_64" },	/* 210 */
 	{ 3,	TS,	sys_tgkill,	"tgkill" },		/* 211 */
 	{ 3,	TP,	sys_waitpid,	"waitpid" },		/* 212 */
-	{ 1,	0,	sys_swapoff,	"swapoff" },		/* 213 */
+	{ 1,	TF,	sys_swapoff,	"swapoff" },		/* 213 */
 	{ 1,	0,	sys_sysinfo,	"sysinfo" },		/* 214 */
 	{ 5,	0,	sys_ipc,	"ipc" },		/* 215 */
 	{ 1,	TS,	sys_sigreturn,	"sigreturn" },		/* 216 */

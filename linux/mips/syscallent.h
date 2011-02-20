@@ -4117,7 +4117,7 @@
 	{ 0,	0,	sys_idle,		"idle"		}, /* 4112 */
 	{ 5,	0,	sys_vm86old,		"vm86"		}, /* 4113 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 4114 */
-	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 4115 */
+	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 4115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 4116 */
 	{ 6,	0,	sys_ipc,		"ipc"		}, /* 4117 */
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 4118 */
@@ -5511,7 +5511,7 @@
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 5160 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 5161 */
 	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 5162 */
-	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 5163 */
+	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 5163 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 5164 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 5165 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 5166 */
@@ -6817,7 +6817,7 @@
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 6160 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 6161 */
 	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 6162 */
-	{ 1,	0,	sys_swapoff,		"swapoff"	}, /* 6163 */
+	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 6163 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 6164 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 6165 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 6166 */
