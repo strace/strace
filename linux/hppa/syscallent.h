@@ -248,7 +248,7 @@
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"		}, /* 240 */
 	{ 4,	TF,	sys_getxattr,		"getxattr"		}, /* 241 */
 	{ 4,	TF,	sys_getxattr,		"lgetxattr"		}, /* 242 */
-	{ 4,	0,	sys_fgetxattr,		"fgetxattr"		}, /* 243 */
+	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"		}, /* 243 */
 	{ 5,	TF,	sys_listxattr,		"listxattr"		}, /* 244 */
 	{ 5,	TF,	sys_listxattr,		"llistxattr"		}, /* 245 */
 	{ 5,	0,	sys_flistxattr,		"flistxattr"		}, /* 246 */

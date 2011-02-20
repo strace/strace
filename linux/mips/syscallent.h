@@ -4231,10 +4231,10 @@
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 4226 */
 	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 4227 */
 	{ 4,	TF,	sys_getxattr,		"lgetxattr"	}, /* 4228 */
-	{ 4,	0,	sys_fgetxattr,		"fgetxattr"	}, /* 4229 */
+	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"	}, /* 4229 */
 	{ 3,	TF,	sys_listxattr,		"listxattr"	}, /* 4230 */
 	{ 3,	TF,	sys_listxattr,		"llistxattr"	}, /* 4231 */
-	{ 3,	0,	sys_flistxattr,		"flistxattr"	}, /* 4232 */
+	{ 3,	TD,	sys_flistxattr,		"flistxattr"	}, /* 4232 */
 	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 4233 */
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 4234 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 4235 */
@@ -4571,10 +4571,10 @@
 	{ 5,	TD,	printargs,		"o32_fsetxattr"	}, /* 4226 */
 	{ 4,	TF,	printargs,		"o32_getxattr"	}, /* 4227 */
 	{ 4,	TF,	printargs,		"o32_lgetxattr"	}, /* 4228 */
-	{ 4,	0,	printargs,		"o32_fgetxattr"	}, /* 4229 */
+	{ 4,	TD,	printargs,		"o32_fgetxattr"	}, /* 4229 */
 	{ 3,	TF,	printargs,		"o32_listxattr"	}, /* 4230 */
 	{ 3,	TF,	printargs,		"o32_llistxattr"	}, /* 4231 */
-	{ 3,	0,	printargs,		"o32_flistxattr"	}, /* 4232 */
+	{ 3,	TD,	printargs,		"o32_flistxattr"	}, /* 4232 */
 	{ 2,	TF,	printargs,		"o32_removexattr"	}, /* 4233 */
 	{ 2,	TF,	printargs,		"o32_lremovexattr"	}, /* 4234 */
 	{ 2,	TD,	printargs,		"o32_fremovexattr"	}, /* 4235 */
@@ -5533,13 +5533,13 @@
 	{ 5,	0,	sys_fsetxattr,		"fsetxattr"	}, /* 5182 */
 	{ 4,	0,	sys_getxattr,		"getxattr"	}, /* 5183 */
 	{ 4,	0,	sys_getxattr,		"lgetxattr"	}, /* 5184 */
-	{ 4,	0,	sys_fgetxattr,		"fgetxattr"	}, /* 5185 */
+	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"	}, /* 5185 */
 	{ 3,	0,	sys_listxattr,		"listxattr"	}, /* 5186 */
 	{ 3,	0,	sys_listxattr,		"llistxattr"	}, /* 5187 */
-	{ 3,	0,	sys_flistxattr,		"flistxattr"	}, /* 5188 */
+	{ 3,	TD,	sys_flistxattr,		"flistxattr"	}, /* 5188 */
 	{ 2,	0,	sys_removexattr,	"removexattr"	}, /* 5189 */
 	{ 2,	0,	sys_removexattr,	"lremovexattr"	}, /* 5190 */
-	{ 2,	0,	sys_fremovexattr,	"fremovexattr"	}, /* 5191 */
+	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 5191 */
 	{ 2,	0,	sys_kill,		"tkill"		}, /* 5192 */
 	{ 1,	0,	sys_time,		"time"		}, /* 5193 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 5194 */
@@ -6839,13 +6839,13 @@
 	{ 5,	0,	sys_fsetxattr,		"fsetxattr"	}, /* 6182 */
 	{ 4,	0,	sys_getxattr,		"getxattr"	}, /* 6183 */
 	{ 4,	0,	sys_getxattr,		"lgetxattr"	}, /* 6184 */
-	{ 4,	0,	sys_fgetxattr,		"fgetxattr"	}, /* 6185 */
+	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"	}, /* 6185 */
 	{ 3,	0,	sys_listxattr,		"listxattr"	}, /* 6186 */
 	{ 3,	0,	sys_listxattr,		"llistxattr"	}, /* 6187 */
-	{ 3,	0,	sys_flistxattr,		"flistxattr"	}, /* 6188 */
+	{ 3,	TD,	sys_flistxattr,		"flistxattr"	}, /* 6188 */
 	{ 2,	0,	sys_removexattr,	"removexattr"	}, /* 6189 */
 	{ 2,	0,	sys_removexattr,	"lremovexattr"	}, /* 6190 */
-	{ 2,	0,	sys_fremovexattr,	"fremovexattr"	}, /* 6191 */
+	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 6191 */
 	{ 2,	0,	sys_kill,		"tkill"		}, /* 6192 */
 	{ 1,	0,	sys_time,		"time"		}, /* 6193 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 6194 */

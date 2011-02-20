@@ -175,10 +175,10 @@
 	{ 3,	TD,	sys_getdents,	"getdents" },		/* 174 */
 	{ 0,	0,	sys_setsid,	"setsid" },		/* 175 */
 	{ 1,	TD,	sys_fchdir,	"fchdir" },		/* 176 */
-	{ 4,    0,	sys_fgetxattr,	"fgetxattr" },		/* 177 */
+	{ 4,    TD,	sys_fgetxattr,	"fgetxattr" },		/* 177 */
 	{ 3,	TF,	sys_listxattr,	"listxattr" },		/* 178 */
 	{ 3,	TF,	sys_listxattr,	"llistxattr" },		/* 179 */
-	{ 3,	0,	sys_flistxattr,	"flistxattr" },		/* 180 */
+	{ 3,	TD,	sys_flistxattr,	"flistxattr" },		/* 180 */
 	{ 2,	TF,	sys_removexattr,"removexattr" },	/* 181 */
 	{ 2,	TF,	sys_removexattr,"lremovexattr" },	/* 182 */
 	{ 1,	TS,	sys_sigpending,	"sigpending" },		/* 183 */

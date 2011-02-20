@@ -191,10 +191,10 @@
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 190 */
 	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 191 */
 	{ 4,	TF,	sys_getxattr,		"lgetxattr"	}, /* 192 */
-	{ 4,	0,	sys_fgetxattr,		"fgetxattr"	}, /* 193 */
+	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"	}, /* 193 */
 	{ 3,	TF,	sys_listxattr,		"listxattr"	}, /* 194 */
 	{ 3,	TF,	sys_listxattr,		"llistxattr"	}, /* 195 */
-	{ 3,	0,	sys_flistxattr,		"flistxattr"	}, /* 196 */
+	{ 3,	TD,	sys_flistxattr,		"flistxattr"	}, /* 196 */
 	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 197 */
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 198 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 199 */
