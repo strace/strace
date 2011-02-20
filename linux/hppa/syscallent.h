@@ -310,7 +310,7 @@
 	{ 3,	TD,	printargs,		"signalfd"		}, /* 302 */
 	{ 4,	TD,	printargs,		"timerfd"		}, /* 303 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 304 */
-	{ 6,	TF,	sys_fallocate,		"fallocate"		}, /* 305 */
+	{ 6,	TD,	sys_fallocate,		"fallocate"		}, /* 305 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 306 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"	}, /* 307 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"	}, /* 308 */

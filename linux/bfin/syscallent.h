@@ -384,7 +384,7 @@
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 353 */
 	{ 2,	0,	printargs,		"set_robust_list"	}, /* 354 */
 	{ 3,	0,	printargs,		"get_robust_list"	}, /* 355 */
-	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 356 */
+	{ 6,	TD,	sys_fallocate,		"fallocate"	}, /* 356 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 357 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"	}, /* 358 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"	}, /* 359 */

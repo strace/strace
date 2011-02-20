@@ -4322,7 +4322,7 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 4317 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 4318 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 4319 */
-	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 4320 */
+	{ 6,	TD,	sys_fallocate,		"fallocate"	}, /* 4320 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create" }, /* 4321 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime" }, /* 4322 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime" }, /* 4323 */
@@ -4662,7 +4662,7 @@
 	{ 3,	TD|TS,	printargs,		"o32_signalfd"	}, /* 4317 */
 	{ 4,	TD,	printargs,		"o32_timerfd"	}, /* 4318 */
 	{ 1,	TD,	printargs,		"o32_eventfd"	}, /* 4319 */
-	{ 6,	TF,	printargs,		"o32_fallocate"	}, /* 4320 */
+	{ 6,	TD,	printargs,		"o32_fallocate"	}, /* 4320 */
 	{ 2,	TD,	printargs,		"o32_timerfd_create" }, /* 4321 */
 	{ 2,	TD,	printargs,		"o32_timerfd_gettime" }, /* 4322 */
 	{ 4,	TD,	printargs,		"o32_timerfd_settime" }, /* 4323 */
@@ -5627,7 +5627,7 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 5276 */
 	{ 0,	0,	printargs,		"SYS_5277"	}, /* 5277 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 5278 */
-	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 5279 */
+	{ 6,	TD,	sys_fallocate,		"fallocate"	}, /* 5279 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create" }, /* 5280 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime" }, /* 5281 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime" }, /* 5282 */
@@ -6937,7 +6937,7 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 6280 */
 	{ 0,	0,	printargs,		"SYS_6281"	}, /* 6281 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 6282 */
-	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 6283 */
+	{ 6,	TD,	sys_fallocate,		"fallocate"	}, /* 6283 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create" }, /* 6284 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime" }, /* 6285 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime" }, /* 6286 */
@@ -7242,7 +7242,7 @@
 	{ 3,	TD|TS,	printargs,		"n32_signalfd"		}, /* 6280 */
 	{ 0,	0,	printargs,		"n32_SYS_6281"		}, /* 6281 */
 	{ 1,	TD,	printargs,		"n32_eventfd"		}, /* 6282 */
-	{ 6,	TF,	printargs,		"n32_fallocate"		}, /* 6283 */
+	{ 6,	TD,	printargs,		"n32_fallocate"		}, /* 6283 */
 	{ 2,	TD,	printargs,		"n32_timerfd_create"	}, /* 6284 */
 	{ 2,	TD,	printargs,		"n32_timerfd_gettime"	}, /* 6285 */
 	{ 4,	TD,	printargs,		"n32_timerfd_settime"	}, /* 6286 */
