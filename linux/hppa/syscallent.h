@@ -241,7 +241,7 @@
 	{ 5,	0,	printargs,		"mq_notify"		}, /* 233 */
 	{ 5,	0,	printargs,		"mq_getsetattr"		}, /* 234 */
 	{ 4,	0,	printargs,		"waitid"		}, /* 235 */
-	{ 5,	0,	printargs,		"fadvise64_64"		}, /* 236 */
+	{ 5,	TD,	printargs,		"fadvise64_64"		}, /* 236 */
 	{ 5,	0,	printargs,		"set_tid_address"	}, /* 237 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"		}, /* 238 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"		}, /* 239 */

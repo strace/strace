@@ -207,8 +207,8 @@
 	{ 2,	TD,	sys_socketcall,	"socketcall" },		/* 206 */
 	{ 3,	0,	sys_syslog,	"syslog" },		/* 207 */
 	{ 4,	0,	printargs,	"lookup_dcookie" },	/* 208 */
-	{ 6,	0,	printargs,	"fadvise64" },		/* 209 */
-	{ 6,	0,	printargs,	"fadvise64_64" },	/* 210 */
+	{ 6,	TD,	printargs,	"fadvise64" },		/* 209 */
+	{ 6,	TD,	printargs,	"fadvise64_64" },	/* 210 */
 	{ 3,	TS,	sys_tgkill,	"tgkill" },		/* 211 */
 	{ 3,	TP,	sys_waitpid,	"waitpid" },		/* 212 */
 	{ 1,	0,	sys_swapoff,	"swapoff" },		/* 213 */

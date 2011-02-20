@@ -261,7 +261,7 @@
 	{ 3,	0,	sys_io_submit,		"io_submit"		}, /* 230 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"		}, /* 231 */
 	{ 1,	0,	printargs,		"set_tid_address"	}, /* 232 */
-	{ 6,	0,	sys_fadvise64,		"fadvise64"		}, /* 233 */
+	{ 6,	TD,	sys_fadvise64,		"fadvise64"		}, /* 233 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 234 */
 	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 235 */
 	{ 1,	0,	sys_epoll_create,	"epoll_create"		}, /* 236 */
@@ -282,7 +282,7 @@
 	{ 2,	TF,	sys_utimes,		"utimes"		}, /* 251 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"		}, /* 252 */
 	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"		}, /* 253 */
-	{ 6,	0,	sys_fadvise64_64,	"fadvise64_64"		}, /* 254 */
+	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"		}, /* 254 */
 	{ 1,	0,	printargs,		"rtas"			}, /* 255 */
 	{ 5,	0,	printargs,		"debug_setcontext"	}, /* 256 */
 	{ 5,	0,	printargs,		"vserver"		}, /* 257 */

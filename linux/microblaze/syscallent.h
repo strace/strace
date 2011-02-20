@@ -276,7 +276,7 @@
 	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 247 */
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 248 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 249 */
-	{ 5,	0,	sys_fadvise64,		"fadvise64"	}, /* 250 */
+	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 250 */
 	{ 0,	0,	printargs,		"SYS_251"	}, /* 251 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 252 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 253 */
@@ -298,7 +298,7 @@
 	{ 2,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 269 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 270 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 271 */
-	{ 6,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 272 */
+	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 272 */
 	{ 5,	0,	printargs,		"vserver"	}, /* 273 */
 	{ 4,	0,	sys_mbind,		"mbind"		}, /* 274 */
 	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 275 */

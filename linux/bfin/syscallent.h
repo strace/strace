@@ -301,7 +301,7 @@
 	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 270 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 271 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 272 */
-	{ 6,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 273 */
+	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 273 */
 	{ 5,	0,	printargs,		"vserver"	}, /* 274 */
 	{ 6,	0,	sys_mbind,		"mbind"		}, /* 275 */
 	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 276 */
@@ -381,7 +381,7 @@
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 350 */
 	{ 5,	0,	sys_pread,		"pread64"	}, /* 351 */
 	{ 5,	0,	sys_pwrite,		"pwrite64"	}, /* 352 */
-	{ 5,	0,	sys_fadvise64,		"fadvise64"	}, /* 353 */
+	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 353 */
 	{ 2,	0,	printargs,		"set_robust_list"	}, /* 354 */
 	{ 3,	0,	printargs,		"get_robust_list"	}, /* 355 */
 	{ 6,	TF,	sys_fallocate,		"fallocate"	}, /* 356 */

@@ -229,7 +229,7 @@
 	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 199 */
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 200 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 201 */
-	{ 5,	0,	sys_fadvise64,		"fadvise64"	}, /* 202 */
+	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 202 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 203 */
 	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 204 */
 	{ 1,	0,	sys_epoll_create,	"epoll_create"	}, /* 205 */
@@ -251,7 +251,7 @@
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 221 */
 	{ 5,	0,	printargs,		"SYS_222"	}, /* 222 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 223 */
-	{ 6,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 224 */
+	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 224 */
 	{ 3,	0,	printargs,		"cacheflush"	}, /* 225 */
 	{ 5,	0,	printargs,		"vserver"	}, /* 226 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 227 */

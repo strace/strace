@@ -219,7 +219,7 @@
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 218 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 219 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 220 */
-	{ 4,	0,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
+	{ 4,	TD,	sys_fadvise64_64,	"fadvise64"	}, /* 221 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 222 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 223 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 224 */

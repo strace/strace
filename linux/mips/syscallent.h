@@ -4256,7 +4256,7 @@
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 4251 */
 	{ 1,	0,	printargs,		"set_tid_address"}, /* 4252 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 4253 */
-	{ 6,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 4254 */
+	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 4254 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 4255 */
 	{ 2,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 4256 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 4257 */
@@ -5563,7 +5563,7 @@
 	{ 1,	0,	printargs,		"set_tid_address" }, /* 5212 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 5213 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 5214 */
-	{ 4,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 5215 */
+	{ 4,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 5215 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 5216 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 5217 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 5218 */
@@ -6870,7 +6870,7 @@
 	{ 1,	0,	printargs,		"set_tid_address" }, /* 6213 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 6214 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 6215 */
-	{ 5,	0,	sys_fadvise64,		"fadvise64"	}, /* 6216 */
+	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 6216 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 6217 */
 	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 6218 */
 	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 6219 */

@@ -300,7 +300,7 @@
 	{ 3,	0,	sys_fstatfs64,		"fstatfs64"	}, /* 267 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 268 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 269 */
-	{ 6,	0,	sys_fadvise64_64,	"fadvise64_64"	}, /* 270 */
+	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 270 */
 	{ 5,	0,	printargs,		"pciconfig_iobase"	}, /* 271 */
 	{ 5,	0,	printargs,		"pciconfig_read"	}, /* 272 */
 	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 273 */
