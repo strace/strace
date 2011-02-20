@@ -395,8 +395,8 @@
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 364 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 365 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 366 */
-	{ 2,	0,	printargs,		"fanotify_init"	}, /* 367 */
-	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 368 */
+	{ 2,	TD,	printargs,		"fanotify_init"	}, /* 367 */
+	{ 5,	TD|TF,	printargs,		"fanotify_mark"	}, /* 368 */
 	{ 4,	0,	printargs,		"prlimit64"	}, /* 369 */
 	{ 5,	0,	printargs,		"SYS_370"	}, /* 370 */
 	{ 5,	0,	printargs,		"SYS_371"	}, /* 371 */

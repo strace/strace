@@ -1118,6 +1118,6 @@
 	{ 5,	TD,	printargs,		"pwritev"	}, /* 1320 */
 	{ 4,	TS,	printargs,		"rt_tgsigqueueinfo"}, /* 1321 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 1322 */
-	{ 2,	0,	printargs,		"fanotify_init"	}, /* 1323 */
-	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 1324 */
+	{ 2,	TD,	printargs,		"fanotify_init"	}, /* 1323 */
+	{ 5,	TD|TF,	printargs,		"fanotify_mark"	}, /* 1324 */
 	{ 4,	0,	printargs,		"prlimit64"	}, /* 1325 */

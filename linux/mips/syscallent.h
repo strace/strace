@@ -4338,8 +4338,8 @@
 	{ 5,	TD,	printargs,		"perf_event_open" }, /* 4333 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 4334 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 4335 */
-	{ 2,	0,	printargs,		"fanotify_init"	}, /* 4336 */
-	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 4337 */
+	{ 2,	TD,	printargs,		"fanotify_init"	}, /* 4336 */
+	{ 5,	TD|TF,	printargs,		"fanotify_mark"	}, /* 4337 */
 	{ 4,	0,	printargs,		"prlimit64"	}, /* 4338 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
@@ -5643,8 +5643,8 @@
 	{ 5,	TD,	printargs,		"perf_event_open" }, /* 5292 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 5293 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 5294 */
-	{ 2,	0,	printargs,		"fanotify_init"	}, /* 5295 */
-	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 5296 */
+	{ 2,	TD,	printargs,		"fanotify_init"	}, /* 5295 */
+	{ 5,	TD|TF,	printargs,		"fanotify_mark"	}, /* 5296 */
 	{ 4,	0,	printargs,		"prlimit64"	}, /* 5297 */
 #else
 	{ 0,	0,	printargs,		"n64_read"		}, /* 5000 */
@@ -6954,8 +6954,8 @@
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 6297 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 6298 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 6299 */
-	{ 2,	0,	printargs,		"fanotify_init"	}, /* 6300 */
-	{ 5,	0,	printargs,		"fanotify_mark"	}, /* 6301 */
+	{ 2,	TD,	printargs,		"fanotify_init"	}, /* 6300 */
+	{ 5,	TD|TF,	printargs,		"fanotify_mark"	}, /* 6301 */
 	{ 4,	0,	printargs,		"prlimit64"	}, /* 6302 */
 
 #else
