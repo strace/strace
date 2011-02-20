@@ -99,7 +99,7 @@
 	{ 2,	TF,	sys_lstat,		"lstat"			}, /* 68 */
 	{ 5,	0,	printargs,		"osf_sbrk"		}, /* 69, not implemented */
 	{ 5,	0,	printargs,		"osf_sstk"		}, /* 70, not implemented */
-	{ 6,	0,	sys_mmap,		"mmap"			}, /* 71 */
+	{ 6,	TD,	sys_mmap,		"mmap"			}, /* 71 */
 	{ 5,	0,	printargs,		"osf_old_vadvise"	}, /* 72, not implemented */
 	{ 2,	0,	sys_munmap,		"munmap"		}, /* 73 */
 	{ 3,	0,	sys_mprotect,		"mprotect"		}, /* 74 */

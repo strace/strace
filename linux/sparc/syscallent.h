@@ -54,7 +54,7 @@
 	{ 0,	NF,	sys_getgid,	"getgid32" },		/* 53 */
 	{ 3,	TD,	sys_ioctl,	"ioctl" },		/* 54 */
 	{ 3,	0,	sys_reboot,	"reboot" },		/* 55 */
-	{ 6,	0,	sys_mmap,	"mmap2" },		/* 56 */
+	{ 6,	TD,	sys_mmap,	"mmap2" },		/* 56 */
 	{ 2,	TF,	sys_symlink,	"symlink" },		/* 57 */
 	{ 3,	TF,	sys_readlink,	"readlink" },		/* 58 */
 	{ 3,	TF|TP,	sys_execve,	"execve" },		/* 59 */
@@ -69,7 +69,7 @@
 	{ 5,	TD,	sys_pwrite,	"pwrite" },		/* 68 */
 	{ 0,    NF,	sys_geteuid,	"geteuid32" },		/* 69 */
 	{ 0,	NF,	sys_getegid,	"getegid32" },		/* 70 */
-	{ 6,	0,	sys_mmap,	"mmap" },		/* 71 */
+	{ 6,	TD,	sys_mmap,	"mmap" },		/* 71 */
 	{ 2,	0,	sys_setreuid,	"setreuid32" },		/* 72 */
 	{ 2,	0,	sys_munmap,	"munmap" },		/* 73 */
 	{ 3,	0,	sys_mprotect,	"mprotect" },		/* 74 */

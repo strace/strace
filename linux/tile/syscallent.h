@@ -75,7 +75,7 @@
 	{ 1,	TF,	sys_uselib,		"uselib" }, /* 74 */
 	{ 1,	TF,	sys_swapon,		"swapon" }, /* 75 */
 	{ 3,	0,	sys_reboot,		"reboot" }, /* 76 */
-	{ 6,	0,	sys_mmap,		"mmap2" }, /* 77 */
+	{ 6,	TD,	sys_mmap,		"mmap2" }, /* 77 */
 	{ 2,	0,	sys_munmap,		"munmap" }, /* 78 */
 	{ 2,	TF,	sys_truncate,		"truncate" }, /* 79 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate" }, /* 80 */

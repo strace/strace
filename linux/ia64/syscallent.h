@@ -955,7 +955,7 @@
 	{ 4,	TD,	sys_pread,		"pread"		}, /* 1148 */
 	{ 4,	TD,	sys_pwrite,		"pwrite"	}, /* 1149 */
 	{ 1,	0,	printargs,		"_sysctl"	}, /* 1150 */
-	{ 6,	0,	sys_mmap,		"mmap"		}, /* 1151 */
+	{ 6,	TD,	sys_mmap,		"mmap"		}, /* 1151 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 1152 */
 	{ 2,	0,	sys_mlock,		"mlock"		}, /* 1153 */
 	{ 1,	0,	sys_mlockall,		"mlockall"	}, /* 1154 */
@@ -976,7 +976,7 @@
 	{ 3,	0,	printargs,		"nfsservctl"	}, /* 1169 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 1170 */
 	{ 1,	0,	sys_getpagesize,	"getpagesize"	}, /* 1171 */
-	{ 6,	0,	sys_mmap,		"mmap2"		}, /* 1172 */
+	{ 6,	TD,	sys_mmap,		"mmap2"		}, /* 1172 */
 	{ 5,	0,	printargs,		"pciconfig_read"}, /* 1173 */
 	{ 5,	0,	printargs,		"pciconfig_write"}, /* 1174 */
 	{ 8,	0,	printargs,		"perfmonctl"	}, /* 1175 */

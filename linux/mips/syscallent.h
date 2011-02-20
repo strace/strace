@@ -4092,7 +4092,7 @@
 	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 4087 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 4088 */
 	{ 3,	TD,	sys_readdir,		"readdir"	}, /* 4089 */
-	{ 6,	0,	sys_mmap,		"old_mmap"	}, /* 4090 */
+	{ 6,	TD,	sys_mmap,		"old_mmap"	}, /* 4090 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 4091 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 4092 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 4093 */
@@ -4212,7 +4212,7 @@
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 4207 */
 	{ 0,	0,	printargs,		"SYS_4208"	}, /* 4208 */
 	{ 0,	0,	printargs,		"SYS_4209"	}, /* 4209 */
-	{ 6,	0,	sys_mmap,		"mmap"		}, /* 4210 */
+	{ 6,	TD,	sys_mmap,		"mmap"		}, /* 4210 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
 	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 4213 */
@@ -5357,7 +5357,7 @@
 	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 5006 */
 	{ 3,	0,	sys_poll,		"poll"		}, /* 5007 */
 	{ 3,	0,	sys_lseek,		"lseek"		}, /* 5008 */
-	{ 6,	0,	sys_mmap,		"mmap"		}, /* 5009 */
+	{ 6,	TD,	sys_mmap,		"mmap"		}, /* 5009 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 5010 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 5011 */
 	{ 1,	0,	sys_brk,		"brk"		}, /* 5012 */
@@ -6663,7 +6663,7 @@
 	{ 2,	TF,	sys_lstat64,		"lstat"		}, /* 6006 */
 	{ 3,	0,	sys_poll,		"poll"		}, /* 6007 */
 	{ 3,	0,	sys_lseek,		"lseek"		}, /* 6008 */
-	{ 6,	0,	sys_mmap,		"mmap"		}, /* 6009 */
+	{ 6,	TD,	sys_mmap,		"mmap"		}, /* 6009 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 6010 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 6011 */
 	{ 1,	0,	sys_brk,		"brk"		}, /* 6012 */

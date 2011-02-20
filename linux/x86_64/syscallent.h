@@ -7,7 +7,7 @@
 	{ 2,	TF,	sys_lstat,		"lstat"		},  /* 6 */
 	{ 3,	TD,	sys_poll,		"poll"		},  /* 7 */
 	{ 3,	TD,	sys_lseek,		"lseek"		},  /* 8 */
-	{ 6,	0,	sys_mmap,	"mmap" }, /* 9 */
+	{ 6,	TD,	sys_mmap,	"mmap" }, /* 9 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	},  /* 10 */
 	{ 2,	0,	sys_munmap,		"munmap"	},  /* 11 */
 	{ 1,	0,	sys_brk,		"brk"		},  /* 12 */
