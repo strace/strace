@@ -1,3 +1,13 @@
+strace (4.6-1) unstable; urgency=low
+
+  [ Dmitry V. Levin ]
+  * New upstream version.
+    + Added HDIO_* ioctl names, closes: #450953
+    + Fixed stat64 decoding on mips, closes: #599028
+    + Fixed misleading italics in the manual page, closes: #589323
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Mon, 14 Mar 2011 15:16:17 +0000
+
 strace (4.5.20-2) unstable; urgency=low
 
   * Add missing sparc syscall defines to fix FTBFS on sparc.

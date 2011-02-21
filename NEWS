@@ -1,3 +1,54 @@
+Noteworthy changes in release 4.6
+=================================
+
+* Changes in behavior
+  * Print diagnostic information about changes in personality mode to
+    standard error instead of standard output.
+
+* Improvements
+  * Implemented a new method of following clone, fork, and vfork
+    syscalls using the Linux kernel's explicit facilities for tracing
+    creation of threads and child processes.
+  * Implemented CLONE_PARENT and CLONE_UNTRACED flags handling.
+  * Implemented decoding of TLS syscalls on m68k.
+  * Implemented biarch support on powerpc64.
+  * Implemented biarch support for getrlimit() and setrlimit().
+  * Implemented decoding of struct ucred in getsockopt SO_PEERCRED.
+  * Implemented SOL_SCTP socket options decoding.
+  * Added HDIO_* ioctl names.
+    (Addresses Debian bug #450953).
+  * Added LOOP_* ioctl names.
+  * Updated lists of CLOCK_*, CLONE_*, MS_*, and SOL_* constants
+    to match Linux 2.6.37.
+  * Updated the list of IPPROTO_* constants to match netinet/in.h.
+  * Implemented decoding of HDIO_* and BLK* ioctls.
+  * Added MicroBlaze architecture support.
+  * Added new syscall entries to match Linux 2.6.37.
+  * Regenerated list of ioctl names from Linux 2.6.37.
+  * Enhanced signal notification decoding.
+  * Documented -C and -D options.
+
+* Bug fixes
+  * Fixed fetching syscall arguments on m68k.
+  * Fixed an error when judging whether a process has children.
+  * Fixed get/set_robust_list syscall numbers for powerpc.
+  * Fixed a corner case in printing clone flags.
+  * Fixed cross-compiling issues.
+  * Fixed build issues on powerpc64, SH and SPARC.
+  * Fixed syscall flags of fstatat*, mmap, mmap2, fadvise64*, swapoff,
+    fgetxattr, flistxattr, fremovexattr, epoll_create, fallocate,
+    fanotify_init, and fanotify_mark syscalls.
+  * Fixed decoding of get[ug]id, gete[ug]id and setfs[ug]id return values.
+  * Fixed biarch support in IO dumping.
+  * Fixed raw exit_group decoding.
+  * Fixed decoding of file descriptors on 64-bit architectures.
+  * Fixed a corner case in waitpid handling.
+    (Addresses Red Hat bug #663547).
+  * Fixed stat64 decoding on mips
+    (Addresses Debian bug #599028).
+  * Fixed misleading italics in the manual page.
+    (Addresses Debian bug #589323).
+
 Noteworthy changes in release 4.5.20
 ====================================
 
