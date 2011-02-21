@@ -1,3 +1,9 @@
+strace (4.5.20-2) unstable; urgency=low
+
+  * Add missing sparc syscall defines to fix FTBFS on sparc.
+
+ -- Frederik Schüler <fs@debian.org>  Tue, 04 May 2010 14:31:46 +0200
+
 strace (4.5.20-1) unstable; urgency=low
 
   [ Dmitry V. Levin ]
