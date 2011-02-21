@@ -30,4 +30,6 @@ Makefile.in
 /ioctlsort
 /strace
 
+/linux/ioctlent.h
+
 /strace-*.tar.xz

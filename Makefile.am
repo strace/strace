@@ -13,7 +13,7 @@ ARCH		= @arch@
 
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WARN_CFLAGS)
-AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS)
+AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS) -I$(builddir)/$(OS)
 
 strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
 		 io.c ioctl.c mem.c net.c process.c bjm.c quota.c \
@@ -31,53 +31,55 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     strace-graph ChangeLog ChangeLog-CVS COPYRIGHT CREDITS PORTING \
 	     README-freebsd README-linux README-sunos4 README-svr4 \
 	     linux/ioctlsort.c linux/ioctlent.sh \
-	     linux/ioctlent.h linux/errnoent.h linux/signalent.h \
+	     linux/ioctlent.h.in linux/errnoent.h linux/signalent.h \
 	     linux/syscall.h linux/dummy.h \
-	     linux/i386/syscallent.h \
-	     linux/alpha/errnoent.h linux/alpha/ioctlent.h \
+	     linux/i386/ioctlent.h.in linux/i386/syscallent.h \
+	     linux/alpha/errnoent.h linux/alpha/ioctlent.h.in \
 	     linux/alpha/signalent.h linux/alpha/syscallent.h \
-	     linux/arm/syscallent.h linux/arm/syscallent1.h \
+	     linux/arm/ioctlent.h.in linux/arm/syscallent.h \
+	     linux/arm/syscallent1.h \
 	     linux/arm/signalent1.h linux/arm/ioctlent1.h \
 	     linux/arm/errnoent1.h \
-	     linux/avr32/syscallent.h \
-	     linux/bfin/ioctlent.h linux/bfin/syscallent.h \
-	     linux/hppa/errnoent.h linux/hppa/ioctlent.h \
+	     linux/avr32/ioctlent.h.in linux/avr32/syscallent.h \
+	     linux/bfin/ioctlent.h.in linux/bfin/syscallent.h \
+	     linux/hppa/errnoent.h linux/hppa/ioctlent.h.in \
 	     linux/hppa/signalent.h linux/hppa/syscallent.h \
-	     linux/ia64/ioctlent.h \
+	     linux/ia64/ioctlent.h.in \
 	     linux/ia64/signalent.h \
 	     linux/ia64/syscallent.h \
-	     linux/m68k/syscallent.h \
-	     linux/microblaze/syscallent.h \
+	     linux/m68k/ioctlent.h.in linux/m68k/syscallent.h \
+	     linux/microblaze/ioctlent.h.in linux/microblaze/syscallent.h \
 	     linux/mips/ioctlent.sh linux/mips/errnoent.h \
-	     linux/mips/ioctlent.h linux/mips/signalent.h \
+	     linux/mips/ioctlent.h.in linux/mips/signalent.h \
 	     linux/mips/syscallent.h \
-	     linux/powerpc/ioctlent.h linux/powerpc/ioctlent1.h \
+	     linux/powerpc/ioctlent.h.in linux/powerpc/ioctlent1.h \
 	     linux/powerpc/syscallent.h linux/powerpc/syscallent1.h \
 	     linux/powerpc/errnoent1.h linux/powerpc/signalent1.h \
-	     linux/s390/ioctlent.h \
+	     linux/s390/ioctlent.h.in \
 	     linux/s390/syscallent.h \
-	     linux/s390x/ioctlent.h \
+	     linux/s390x/ioctlent.h.in \
 	     linux/s390x/syscallent.h \
 	     linux/sh/syscallent.h \
-	     linux/sh/ioctlent.h \
-	     linux/sh64/syscallent.h \
+	     linux/sh/ioctlent.h.in \
+	     linux/sh64/ioctlent.h.in linux/sh64/syscallent.h \
 	     linux/sparc/dummy2.h \
 	     linux/sparc/errnoent.h linux/sparc/errnoent1.h \
-	     linux/sparc/ioctlent.h linux/sparc/ioctlent1.h \
+	     linux/sparc/ioctlent.h.in linux/sparc/ioctlent1.h \
 	     linux/sparc/signalent.h linux/sparc/signalent1.h \
 	     linux/sparc/syscall1.h \
 	     linux/sparc/syscallent.h linux/sparc/syscallent1.h \
 	     linux/sparc/gen.pl \
 	     linux/sparc64/dummy2.h linux/sparc64/errnoent.h \
 	     linux/sparc64/errnoent1.h linux/sparc64/errnoent2.h \
-	     linux/sparc64/ioctlent.h linux/sparc64/ioctlent1.h \
+	     linux/sparc64/ioctlent.h.in linux/sparc64/ioctlent1.h \
 	     linux/sparc64/ioctlent2.h linux/sparc64/signalent.h \
 	     linux/sparc64/signalent1.h linux/sparc64/signalent2.h \
 	     linux/sparc64/syscall1.h \
 	     linux/sparc64/syscallent.h linux/sparc64/syscallent1.h \
 	     linux/sparc64/syscallent2.h \
-	     linux/tile/syscallent.h \
-	     linux/x86_64/syscallent.h linux/x86_64/gentab.pl \
+	     linux/tile/ioctlent.h.in linux/tile/syscallent.h \
+	     linux/x86_64/ioctlent.h.in linux/x86_64/syscallent.h \
+	     linux/x86_64/gentab.pl \
 	     linux/x86_64/errnoent1.h linux/x86_64/ioctlent1.h \
 	     linux/x86_64/signalent1.h linux/x86_64/syscallent1.h \
 	     freebsd/ioctlent.sh \
@@ -95,6 +97,8 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 .PHONY: srpm
 srpm: dist-xz
 	rpmbuild --define '%_srcrpmdir .' -ts $(distdir).tar.xz
+
+BUILT_SOURCES =
 
 if MAINTAINER_MODE
 
@@ -128,15 +132,11 @@ if LINUX
 IOCTLDIR = /usr/include
 IOCTLASM = asm
 
-if I386
-ioctlent_h = linux/ioctlent.h
-else
-ioctlent_h = linux/$(ARCH)/ioctlent.h
-endif
+ioctlent_h_in = linux/ioctlent.h.in
 
-BUILT_SOURCES = $(ioctlent_h)
+BUILT_SOURCES += $(ioctlent_h_in)
 
-$(srcdir)/$(ioctlent_h): ioctlsort
+$(srcdir)/$(ioctlent_h_in): ioctlsort
 	$(<D)/$(<F) > $@
 ioctlsort: $(srcdir)/linux/ioctlsort.c ioctls.h ioctldefs.h
 	$(filter-out -I%,$(LINK.c)) -I. -I$(IOCTLDIR) $(filter -I%,$(LINK.c)) \
@@ -146,4 +146,18 @@ ioctls.h: $(srcdir)/linux/ioctlent.sh
 ioctldefs.h: ioctls.h ;
 
 endif
+endif
+
+if LINUX
+
+ioctlent_h = $(builddir)/$(OS)/ioctlent.h
+BUILT_SOURCES += $(ioctlent_h)
+CLEANFILES = $(ioctlent_h)
+ioctlent_h_deps = $(srcdir)/$(OS)/ioctlent.h.in $(srcdir)/$(OS)/$(ARCH)/ioctlent.h.in
+$(ioctlent_h): $(top_builddir)/config.status $(ioctlent_h_deps)
+	$(MKDIR_P) $(builddir)/$(OS)
+	cat $(ioctlent_h_deps) | \
+		$(COMPILE) -E -P - | \
+		LC_ALL=C sort -u -k3,3 -k2,2 > $@
+
 endif
