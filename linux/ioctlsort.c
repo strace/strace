@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 	for (i = 0; i < nioctls; i++)
 		if (i == 0 || ioctls[i].code != ioctls[i-1].code ||
 		    strcmp (ioctls[i].name, ioctls[i-1].name))
-			printf("\t{\"%s\",\t\"%s\",\t%#lx},\n",
+			printf("\t{\"%s\",\t\"%s\",\t%#06lx},\n",
 				ioctls[i].header, ioctls[i].name, ioctls[i].code);
 
 	return 0;
