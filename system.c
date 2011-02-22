@@ -55,6 +55,11 @@
 #define MS_PRIVATE	(1<<18)	/* change to private */
 #define MS_SLAVE	(1<<19)	/* change to slave */
 #define MS_SHARED	(1<<20)	/* change to shared */
+#define MS_RELATIME	(1<<21)
+#define MS_KERNMOUNT	(1<<22)
+#define MS_I_VERSION	(1<<23)
+#define MS_STRICTATIME	(1<<24)
+#define MS_BORN		(1<<29)
 #define MS_ACTIVE	(1<<30)
 #define MS_NOUSER	(1<<31)
 #define MS_MGC_VAL	0xc0ed0000	/* Magic flag number */
@@ -92,6 +97,11 @@ static const struct xlat mount_flags[] = {
 	{ MS_NOEXEC,	"MS_NOEXEC"	},
 	{ MS_SYNCHRONOUS,"MS_SYNCHRONOUS"},
 	{ MS_REMOUNT,	"MS_REMOUNT"	},
+	{ MS_RELATIME,	"MS_RELATIME"	},
+	{ MS_KERNMOUNT,	"MS_KERNMOUNT"	},
+	{ MS_I_VERSION,	"MS_I_VERSION"	},
+	{ MS_STRICTATIME,"MS_STRICTATIME"},
+	{ MS_BORN,	"MS_BORN"	},
 	{ MS_MANDLOCK,	"MS_MANDLOCK"	},
 	{ MS_NOATIME,	"MS_NOATIME"	},
 	{ MS_NODIRATIME,"MS_NODIRATIME"	},
