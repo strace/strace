@@ -1005,7 +1005,7 @@ realprintstat(struct tcb *tcp, struct stat *statbuf)
 #endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 		break;
 	default:
-		tprintf("st_size=%lu, ", statbuf->st_size);
+		tprintf("st_size=%lu, ", (unsigned long) statbuf->st_size);
 		break;
 	}
 	if (!abbrev(tcp)) {
