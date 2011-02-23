@@ -20,8 +20,9 @@ strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
 noinst_HEADERS = defs.h
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
-	     debian/changelog debian/control debian/copyright debian/rules \
-	     debian/compat debian/strace64.install debian/strace64.manpages \
+	     debian/changelog debian/compat debian/control debian/copyright \
+	     debian/rules debian/source/format debian/watch \
+	     debian/strace64.install debian/strace64.manpages \
 	     debian/strace.docs debian/strace.examples debian/strace.install \
 	     debian/strace.manpages debian/strace-udeb.install \
 	     strace.spec \
@@ -40,15 +41,17 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/bfin/ioctlent.h linux/bfin/syscallent.h \
 	     linux/hppa/errnoent.h linux/hppa/ioctlent.h \
 	     linux/hppa/signalent.h linux/hppa/syscallent.h \
-	     linux/ia64/syscallent.h \
 	     linux/ia64/ioctlent.h \
+	     linux/ia64/signalent.h \
+	     linux/ia64/syscallent.h \
 	     linux/m68k/syscallent.h \
 	     linux/microblaze/syscallent.h \
 	     linux/mips/ioctlent.sh linux/mips/errnoent.h \
 	     linux/mips/ioctlent.h linux/mips/signalent.h \
 	     linux/mips/syscallent.h \
-	     linux/powerpc/syscallent.h \
-	     linux/powerpc/ioctlent.h \
+	     linux/powerpc/ioctlent.h linux/powerpc/ioctlent1.h \
+	     linux/powerpc/syscallent.h linux/powerpc/syscallent1.h \
+	     linux/powerpc/errnoent1.h linux/powerpc/signalent1.h \
 	     linux/s390/ioctlent.h \
 	     linux/s390/syscallent.h \
 	     linux/s390x/ioctlent.h \
