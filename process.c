@@ -1898,7 +1898,9 @@ static int
 printwaitn(struct tcb *tcp, int n, int bitness)
 {
 	int status;
+#ifdef SUNOS4
 	int exited = 0;
+#endif
 
 	if (entering(tcp)) {
 #ifdef LINUX
@@ -1928,7 +1930,10 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 		else if (umove(tcp, tcp->u_arg[1], &status) < 0)
 			tprintf("[?]");
 		else
-			exited = printstatus(status);
+#ifdef SUNOS4
+			exited =
+#endif
+			printstatus(status);
 		/* options */
 		tprintf(", ");
 		printflags(wait4_options, tcp->u_arg[2], "W???");
