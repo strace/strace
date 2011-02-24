@@ -107,6 +107,18 @@ $(srcdir)/ChangeLog: $(top_srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
 	chmod 444 $@.new
 	mv -f $@.new $@
 
+$(srcdir)/CREDITS: $(top_srcdir)/CREDITS.in $(top_srcdir)/.mailmap \
+		   $(srcdir)/Makefile.in
+	$(AM_V_GEN)							\
+	{								\
+	  cd $(top_srcdir);						\
+	  sed '/^##/,$$d' CREDITS.in;					\
+	  { sed -n '1,/^##>/d; s/  \+/\t/; s/^./&/p' CREDITS.in;	\
+	    git log --pretty=format:'%aN	%aE';			\
+	  } | LC_ALL=C sort -u						\
+	    | awk -F'\t' '{printf("\t%s <%s>\n",$$1,$$2)}';		\
+	} > $@-t && mv $@-t $@
+
 export TAR_OPTIONS = --owner=0 --group=0 --numeric-owner --mode=go-w,go+rX
 
 if LINUX
