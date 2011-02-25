@@ -4,8 +4,8 @@
 .libs
 .*.swp
 
-ChangeLog
-CREDITS
+/ChangeLog
+/CREDITS
 
 Makefile
 Makefile.in
@@ -25,5 +25,7 @@ Makefile.in
 /stamp-h1
 
 /*.gdb
+/ioctls.h
+/ioctldefs.h
 /ioctlsort
 /strace
