@@ -29,3 +29,5 @@ Makefile.in
 /ioctldefs.h
 /ioctlsort
 /strace
+
+/strace-*.tar.xz

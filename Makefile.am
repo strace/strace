@@ -93,8 +93,8 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     xlate.el
 
 .PHONY: srpm
-srpm: dist-bzip2
-	rpmbuild --define '%_srcrpmdir .' -ts $(distdir).tar.bz2
+srpm: dist-xz
+	rpmbuild --define '%_srcrpmdir .' -ts $(distdir).tar.xz
 
 if MAINTAINER_MODE
 

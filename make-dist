@@ -22,4 +22,4 @@ autoreconf -i -f
 
 make -s $j distcheck
 
-mv -f *.tar.bz2 ..
+mv -f strace-*.tar.xz ..

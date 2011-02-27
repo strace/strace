@@ -5,7 +5,7 @@ Release: 2%{?dist}
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
-Source0: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.bz2
+Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: libacl-devel, libaio-devel, time
