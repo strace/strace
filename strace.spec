@@ -8,7 +8,7 @@ URL: http://sourceforge.net/projects/strace/
 Source0: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: libaio-devel, libacl-devel
+BuildRequires: libacl-devel, libaio-devel, time
 
 %define strace64_arches ppc64 sparc64
 
@@ -65,6 +65,9 @@ rm -f %{buildroot}%{_bindir}/strace-graph
 %ifarch %{strace64_arches}
 %{copy64} %{buildroot}%{_bindir}/strace %{buildroot}%{_bindir}/strace64
 %endif
+
+%check
+make check
 
 %clean
 rm -rf %{buildroot}
