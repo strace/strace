@@ -309,5 +309,5 @@ AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
 
 AC_PATH_PROG([PERL], [perl])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_OUTPUT

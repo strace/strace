@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Ensure that strace tests kernel PTRACE_O_TRACECLONE support properly.
+
+. "${srcdir=.}/init.sh"
+
+case "$(uname -rs)" in
+	Linux\ 2.6.*) ;;
+	*) skip_ 'The kernel is not Linux 2.6.*' ;;
+esac
+
+check_strace
+check_prog timeout
+
+timeout -s 9 9 \
+$STRACE -df -enone /bin/true 2>&1 |
+	fgrep -qx 'ptrace_setoptions = 0xe' ||
+		fail_ 'strace failed to recognize proper kernel PTRACE_O_TRACECLONE support'

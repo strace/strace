@@ -1,5 +1,7 @@
 # Automake input for strace.
 
+SUBDIRS = tests
+
 bin_PROGRAMS = strace
 man_MANS = strace.1
 bin_SCRIPTS = strace-graph
