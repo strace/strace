@@ -2941,6 +2941,12 @@ static const struct xlat inotify_modes[] = {
 	{ 0,		NULL		}
 };
 
+static const struct xlat inotify_init_flags[] = {
+	{ 0x00000800,	"IN_NONBLOCK"	},
+	{ 0x00080000,	"IN_CLOEXEC" 	},
+	{ 0,		NULL 		}
+};
+
 int
 sys_inotify_add_watch(struct tcb *tcp)
 {
@@ -2966,7 +2972,7 @@ int
 sys_inotify_init1(struct tcb *tcp)
 {
 	if (entering(tcp))
-		printflags(open_mode_flags, tcp->u_arg[0], "O_???");
+		printflags(inotify_init_flags, tcp->u_arg[0], "IN_???");
 	return 0;
 }
 
