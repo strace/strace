@@ -337,7 +337,7 @@ static const struct xlat socktypes[] = {
 #endif
 	{ 0,		NULL		},
 };
-const struct xlat sock_type_flags[] = {
+static const struct xlat sock_type_flags[] = {
 #ifdef SOCK_CLOEXEC
 	{ SOCK_CLOEXEC,	"SOCK_CLOEXEC"	},
 #endif
@@ -447,6 +447,7 @@ static const struct xlat socketlayers[] = {
 	{ SOL_CAIF,	"SOL_CAIF"	},
 #endif
 	{ SOL_SOCKET,	"SOL_SOCKET"	},	/* Never used! */
+	/* The SOL_* array should remain not NULL-terminated. */
 };
 /*** WARNING: DANGER WILL ROBINSON: NOTE "socketlayers" array above
      falls into "protocols" array below!!!!   This is intended!!! ***/
