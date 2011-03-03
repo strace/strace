@@ -1796,23 +1796,20 @@ sys_recvmmsg(struct tcb *tcp)
 
 #endif /* HAVE_SENDMSG */
 
+static const struct xlat shutdown_modes[] = {
+       { 0,	"SHUT_RD"	},
+       { 1,	"SHUT_WR"	},
+       { 2,	"SHUT_RDWR"	},
+       { 0,	NULL		}
+};
+
 int
 sys_shutdown(tcp)
 struct tcb *tcp;
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %ld", tcp->u_arg[0], tcp->u_arg[1]);
-		switch (tcp->u_arg[1]) {
-		case 0:
-			tprintf("%s", " /* receive */");
-			break;
-		case 1:
-			tprintf("%s", " /* send */");
-			break;
-		case 2:
-			tprintf("%s", " /* send and receive */");
-			break;
-		}
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printxval(shutdown_modes, tcp->u_arg[1], "SHUT_???");
 	}
 	return 0;
 }
