@@ -110,7 +110,7 @@ $(srcdir)/ChangeLog: $(top_srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
 	mv -f $@.new $@
 
 $(srcdir)/CREDITS: $(top_srcdir)/CREDITS.in $(top_srcdir)/.mailmap \
-		   $(srcdir)/Makefile.in
+		   $(srcdir)/Makefile.in $(top_srcdir)/.git/refs/heads/*
 	$(AM_V_GEN)							\
 	{								\
 	  cd $(top_srcdir);						\
