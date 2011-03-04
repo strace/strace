@@ -331,12 +331,15 @@ const struct xlat open_mode_flags[] = {
  * extension to get the right value.  We do this by declaring fd as int here.
  */
 static void
-print_dirfd(int fd)
+print_dirfd(struct tcb *tcp, int fd)
 {
 	if (fd == AT_FDCWD)
 		tprintf("AT_FDCWD, ");
 	else
-		tprintf("%d, ", fd);
+	{
+		printfd(tcp, fd);
+		tprintf(", ");
+	}
 }
 #endif
 
@@ -425,7 +428,7 @@ int
 sys_openat(struct tcb *tcp)
 {
 	if (entering(tcp))
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_open(tcp, 1);
 }
 #endif
@@ -513,7 +516,7 @@ int
 sys_faccessat(struct tcb *tcp)
 {
 	if (entering(tcp))
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_access(tcp, 1);
 }
 #endif
@@ -543,7 +546,8 @@ sys_lseek(struct tcb *tcp)
 	int _whence;
 
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		offset = tcp->ext_arg[1];
 		_whence = tcp->u_arg[2];
 		if (_whence == SEEK_SET)
@@ -562,7 +566,8 @@ sys_lseek(struct tcb *tcp)
 	int _whence;
 
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		offset = tcp->u_arg[1];
 		_whence = tcp->u_arg[2];
 		if (_whence == SEEK_SET)
@@ -581,19 +586,20 @@ int
 sys_llseek(struct tcb *tcp)
 {
 	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
 		/*
 		 * This one call takes explicitly two 32-bit arguments hi, lo,
 		 * rather than one 64-bit argument for which LONG_LONG works
 		 * appropriate for the native byte order.
 		 */
 		if (tcp->u_arg[4] == SEEK_SET)
-			tprintf("%ld, %llu, ", tcp->u_arg[0],
-				(((long long int) tcp->u_arg[1]) << 32
-				 | (unsigned long long) (unsigned) tcp->u_arg[2]));
+			tprintf(", %llu, ",
+				((long long int) tcp->u_arg[1]) << 32 |
+				(unsigned long long) (unsigned) tcp->u_arg[2]);
 		else
-			tprintf("%ld, %lld, ", tcp->u_arg[0],
-				(((long long int) tcp->u_arg[1]) << 32
-				 | (unsigned long long) (unsigned) tcp->u_arg[2]));
+			tprintf(", %lld, ",
+				((long long int) tcp->u_arg[1]) << 32 |
+				(unsigned long long) (unsigned) tcp->u_arg[2]);
 	}
 	else {
 		long long int off;
@@ -611,7 +617,8 @@ sys_readahead(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int argn;
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		argn = printllval(tcp, "%lld", 1);
 		tprintf(", %ld", tcp->u_arg[argn]);
 	}
@@ -625,7 +632,8 @@ sys_lseek64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int argn;
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		if (tcp->u_arg[3] == SEEK_SET)
 			argn = printllval(tcp, "%llu, ", 1);
 		else
@@ -665,7 +673,8 @@ int
 sys_ftruncate(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %lu", tcp->u_arg[0], tcp->u_arg[1]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", %lu", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -676,7 +685,8 @@ int
 sys_ftruncate64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printllval(tcp, "%llu", 1);
 	}
 	return 0;
@@ -1327,7 +1337,7 @@ int
 sys_newfstatat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
@@ -1366,9 +1376,10 @@ sys_oldstat(struct tcb *tcp)
 int
 sys_fstat(struct tcb *tcp)
 {
-	if (entering(tcp))
-		tprintf("%ld, ", tcp->u_arg[0]);
-	else {
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
 		printstat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -1379,9 +1390,10 @@ int
 sys_fstat64(struct tcb *tcp)
 {
 #ifdef HAVE_STAT64
-	if (entering(tcp))
-		tprintf("%ld, ", tcp->u_arg[0]);
-	else {
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
 		printstat64(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -1394,9 +1406,10 @@ sys_fstat64(struct tcb *tcp)
 int
 sys_oldfstat(struct tcb *tcp)
 {
-	if (entering(tcp))
-		tprintf("%ld, ", tcp->u_arg[0]);
-	else {
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
 		printoldstat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -1750,7 +1763,8 @@ int
 sys_fstatfs(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 	} else {
 		printstatfs(tcp, tcp->u_arg[1]);
 	}
@@ -1807,7 +1821,8 @@ int
 sys_fstatfs64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 	} else {
 		if (tcp->u_arg[1] == sizeof (struct statfs64))
 			printstatfs64(tcp, tcp->u_arg[2]);
@@ -1922,7 +1937,7 @@ int
 sys_mkdirat(struct tcb *tcp)
 {
 	if (entering(tcp))
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_mkdir(tcp, 1);
 }
 #endif
@@ -1940,7 +1955,7 @@ int
 sys_fchdir(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
 	}
 	return 0;
 }
@@ -1959,7 +1974,7 @@ int
 sys_fchroot(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
 	}
 	return 0;
 }
@@ -1981,12 +1996,13 @@ int
 sys_linkat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
-		print_dirfd(tcp->u_arg[2]);
+		print_dirfd(tcp, tcp->u_arg[2]);
 		printpath(tcp, tcp->u_arg[3]);
-		tprintf(", %ld", tcp->u_arg[4]);
+		tprintf(", ");
+		printfd(tcp, tcp->u_arg[4]);
 	}
 	return 0;
 }
@@ -2014,7 +2030,7 @@ int
 sys_unlinkat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 		printflags(unlinkatflags, tcp->u_arg[2], "AT_???");
@@ -2041,7 +2057,7 @@ sys_symlinkat(struct tcb *tcp)
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
-		print_dirfd(tcp->u_arg[1]);
+		print_dirfd(tcp, tcp->u_arg[1]);
 		printpath(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -2075,7 +2091,7 @@ int
 sys_readlinkat(struct tcb *tcp)
 {
 	if (entering(tcp))
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_readlink(tcp, 1);
 }
 #endif
@@ -2096,10 +2112,10 @@ int
 sys_renameat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
-		print_dirfd(tcp->u_arg[2]);
+		print_dirfd(tcp, tcp->u_arg[2]);
 		printpath(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -2122,7 +2138,7 @@ int
 sys_fchownat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 		printpath(tcp, tcp->u_arg[1]);
 		printuid(", ", tcp->u_arg[2]);
 		printuid(", ", tcp->u_arg[3]);
@@ -2137,7 +2153,7 @@ int
 sys_fchown(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
 		printuid(", ", tcp->u_arg[1]);
 		printuid(", ", tcp->u_arg[2]);
 	}
@@ -2165,7 +2181,7 @@ int
 sys_fchmodat(struct tcb *tcp)
 {
 	if (entering(tcp))
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_chmod(tcp, 1);
 }
 #endif
@@ -2174,7 +2190,8 @@ int
 sys_fchmod(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %#lo", tcp->u_arg[0], tcp->u_arg[1]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", %#lo", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -2225,7 +2242,7 @@ int
 sys_futimesat(struct tcb *tcp)
 {
 	if (entering(tcp))
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_utimes(tcp, 1, 0);
 }
 
@@ -2233,7 +2250,7 @@ int
 sys_utimensat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 		decode_utimes(tcp, 1, 1);
 		tprintf(", ");
 		printflags(utimensatflags, tcp->u_arg[3], "AT_???");
@@ -2316,7 +2333,7 @@ int
 sys_mknodat(struct tcb *tcp)
 {
 	if (entering(tcp))
-		print_dirfd(tcp->u_arg[0]);
+		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_mknod(tcp, 1);
 }
 #endif
@@ -2337,7 +2354,7 @@ int
 sys_fsync(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
 	}
 	return 0;
 }
@@ -2367,7 +2384,8 @@ int
 sys_readdir(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 	} else {
 		if (syserror(tcp) || tcp->u_rval == 0 || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
@@ -2405,7 +2423,8 @@ sys_getdents(struct tcb *tcp)
 	char *buf;
 
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		return 0;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
@@ -2489,7 +2508,8 @@ sys_getdents64(struct tcb *tcp)
 	char *buf;
 
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		return 0;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
@@ -2562,7 +2582,8 @@ sys_getdirentries(struct tcb *tcp)
 	char *buf;
 
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		return 0;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
@@ -2786,7 +2807,8 @@ int
 sys_fsetxattr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
 		print_xattr_val(tcp, 0, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
 		tprintf(", ");
@@ -2813,7 +2835,8 @@ int
 sys_fgetxattr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
 	} else {
 		print_xattr_val(tcp, syserror(tcp), tcp->u_arg[2], tcp->u_arg[3],
@@ -2838,7 +2861,7 @@ int
 sys_flistxattr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
 	} else {
 		/* XXX Print value in format */
 		tprintf(", %p, %lu", (void *) tcp->u_arg[1], tcp->u_arg[2]);
@@ -2861,7 +2884,8 @@ int
 sys_fremovexattr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
 	}
 	return 0;
@@ -2885,7 +2909,8 @@ sys_fadvise64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int argn;
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		argn = printllval(tcp, "%lld", 1);
 		tprintf(", %ld, ", tcp->u_arg[argn++]);
 		printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
@@ -2900,7 +2925,8 @@ sys_fadvise64_64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int argn;
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 #if defined ARM || defined POWERPC
 		argn = printllval(tcp, "%lld, ", 2);
 #else
@@ -2951,7 +2977,8 @@ int
 sys_inotify_add_watch(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printpath(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 		printflags(inotify_modes, tcp->u_arg[2], "IN_???");
@@ -2963,7 +2990,8 @@ int
 sys_inotify_rm_watch(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %ld", tcp->u_arg[0], tcp->u_arg[1]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", %ld", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -2981,7 +3009,8 @@ sys_fallocate(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int argn;
-		tprintf("%ld, ", tcp->u_arg[0]);	/* fd */
+		printfd(tcp, tcp->u_arg[0]);		/* fd */
+		tprintf(", ");
 		tprintf("%#lo, ", tcp->u_arg[1]);	/* mode */
 		argn = printllval(tcp, "%llu, ", 2);	/* offset */
 		printllval(tcp, "%llu", argn);		/* len */

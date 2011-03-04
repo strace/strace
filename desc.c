@@ -309,7 +309,8 @@ int
 sys_fcntl(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printxval(fcntlcmds, tcp->u_arg[1], "F_???");
 		switch (tcp->u_arg[1]) {
 		case F_SETFD:
@@ -422,7 +423,8 @@ int
 sys_flock(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printflags(flockcmds, tcp->u_arg[1], "LOCK_???");
 	}
 	return 0;
@@ -433,7 +435,7 @@ int
 sys_close(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
 	}
 	return 0;
 }
@@ -442,7 +444,7 @@ int
 sys_dup(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
 	}
 	return 0;
 }
@@ -451,7 +453,9 @@ static int
 do_dup2(struct tcb *tcp, int flags_arg)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %ld", tcp->u_arg[0], tcp->u_arg[1]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		printfd(tcp, tcp->u_arg[1]);
 		if (flags_arg >= 0) {
 			tprintf(", ");
 			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
@@ -516,7 +520,8 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			tprintf(", [");
 			for (j = 0, sep = ""; j < nfds; j++) {
 				if (FD_ISSET(j, fds)) {
-					tprintf("%s%u", sep, j);
+					tprintf("%s", sep);
+					printfd(tcp, j);
 					sep = " ";
 				}
 			}
@@ -703,9 +708,12 @@ int
 sys_epoll_ctl(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
-		tprintf(", %ld, ", tcp->u_arg[2]);
+		tprintf(", ");
+		printfd(tcp, tcp->u_arg[2]);
+		tprintf(", ");
 		if (tcp->u_arg[3] == 0)
 			tprintf("NULL");
 		else {
@@ -724,9 +732,10 @@ sys_epoll_ctl(struct tcb *tcp)
 static void
 epoll_wait_common(struct tcb *tcp)
 {
-	if (entering(tcp))
-		tprintf("%ld, ", tcp->u_arg[0]);
-	else {
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
 		if (syserror(tcp))
 			tprintf("%lx", tcp->u_arg[1]);
 		else if (tcp->u_rval == 0)

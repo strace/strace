@@ -338,7 +338,9 @@ decode_poll(struct tcb *tcp, long pts)
 				tprintf("{fd=%d}", fds.fd);
 				continue;
 			}
-			tprintf("{fd=%d, events=", fds.fd);
+			tprintf("{fd=");
+			printfd(tcp, fds.fd);
+			tprintf(", events=");
 			printflags(pollflags, fds.events, "POLL???");
 			tprintf("}");
 		}

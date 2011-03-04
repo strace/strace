@@ -416,6 +416,12 @@ printnum_int(struct tcb *tcp, long addr, const char *fmt)
 }
 
 void
+printfd(struct tcb *tcp, int fd)
+{
+	tprintf("%d", fd);
+}
+
+void
 printuid(text, uid)
 const char *text;
 unsigned long uid;

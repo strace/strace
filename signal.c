@@ -2132,7 +2132,8 @@ static int
 do_signalfd(struct tcb *tcp, int flags_arg)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 		print_sigset(tcp, tcp->u_arg[1], 1);
 		tprintf(", %lu", tcp->u_arg[2]);
 		if (flags_arg >= 0) {

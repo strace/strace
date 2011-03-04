@@ -232,12 +232,8 @@ long flags;
 #endif
 
 #if !HAVE_LONG_LONG_OFF_T
-static
-int
-print_mmap(tcp,u_arg, offset)
-struct tcb *tcp;
-long *u_arg;
-long long offset;
+static int
+print_mmap(struct tcb *tcp, long *u_arg, long long offset)
 {
 	if (entering(tcp)) {
 		/* addr */
@@ -261,10 +257,11 @@ long long offset;
 #else
 		printflags(mmap_flags, u_arg[3], "MAP_???");
 #endif
-		/* fd (is always int, not long) */
-		tprintf(", %d, ", (int)u_arg[4]);
+		/* fd */
+		tprintf(", ");
+		printfd(tcp, u_arg[4]);
 		/* offset */
-		tprintf("%#llx", offset);
+		tprintf(", %#llx", offset);
 	}
 	return RVAL_HEX;
 }
@@ -341,8 +338,7 @@ struct tcb *tcp;
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 int
-sys_mmap64(tcp)
-struct tcb *tcp;
+sys_mmap64(struct tcb *tcp)
 {
 #ifdef linux
 #ifdef ALPHA
@@ -378,9 +374,10 @@ struct tcb *tcp;
 		printflags(mmap_flags, u_arg[3], "MAP_???");
 #endif
 		/* fd */
-		tprintf(", %ld, ", u_arg[4]);
+		tprintf(", ");
+		printfd(tcp, tcp->u_arg[4]);
 		/* offset */
-		printllval(tcp, "%#llx", 5);
+		printllval(tcp, ", %#llx", 5);
 	}
 	return RVAL_HEX;
 }
