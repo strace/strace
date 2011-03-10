@@ -451,6 +451,8 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 #define SI_TKILL	-6	/* sent by tkill */
 #define SI_ASYNCNL	-60     /* sent by asynch name lookup completion */
 
+#define SI_FROMUSER(sip)	((sip)->si_code <= 0)
+
 #endif /* LINUX */
 
 #if __GLIBC_MINOR__ < 1
@@ -656,9 +658,7 @@ static const struct xlat sigbus_codes[] = {
 };
 
 void
-printsiginfo(sip, verbose)
-siginfo_t *sip;
-int verbose;
+printsiginfo(siginfo_t *sip, int verbose)
 {
 	const char *code;
 
@@ -719,23 +719,34 @@ int verbose;
 		}
 #ifdef SI_FROMUSER
 		if (SI_FROMUSER(sip)) {
-			tprintf(", si_pid=%ld, si_uid=%ld",
-				sip->si_pid, sip->si_uid);
-#ifdef SI_QUEUE
+			tprintf(", si_pid=%lu, si_uid=%lu",
+				(unsigned long) sip->si_pid,
+				(unsigned long) sip->si_uid);
 			switch (sip->si_code) {
-			case SI_QUEUE:
+#ifdef SI_USER
+			case SI_USER:
+				break;
+#endif
+#ifdef SI_TKILL
+			case SI_TKILL:
+				break;
+#endif
 #ifdef SI_TIMER
 			case SI_TIMER:
-#endif /* SI_QUEUE */
-			case SI_ASYNCIO:
-#ifdef SI_MESGQ
-			case SI_MESGQ:
-#endif /* SI_MESGQ */
-				tprintf(", si_value=%d",
-					sip->si_value.sival_int);
+				tprintf(", si_value=%d", sip->si_int);
 				break;
+#endif
+#ifdef LINUX
+			default:
+				if (!verbose)
+					tprintf(", ...");
+				else
+					tprintf(", si_value={int=%u, ptr=%#lx}",
+						sip->si_int,
+						(unsigned long) sip->si_ptr);
+				break;
+#endif
 			}
-#endif /* SI_QUEUE */
 		}
 		else
 #endif /* SI_FROMUSER */
