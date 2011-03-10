@@ -738,6 +738,8 @@ printsiginfo(siginfo_t *sip, int verbose)
 #endif
 #ifdef LINUX
 			default:
+				if (!sip->si_ptr)
+					break;
 				if (!verbose)
 					tprintf(", ...");
 				else
@@ -783,13 +785,16 @@ printsiginfo(siginfo_t *sip, int verbose)
 				break;
 #ifdef LINUX
 			default:
-			        tprintf(", si_pid=%lu, si_uid=%lu, ",
-					(unsigned long) sip->si_pid,
-					(unsigned long) sip->si_uid);
+				if (sip->si_pid || sip->si_uid)
+				        tprintf(", si_pid=%lu, si_uid=%lu",
+						(unsigned long) sip->si_pid,
+						(unsigned long) sip->si_uid);
+				if (!sip->si_ptr)
+					break;
 				if (!verbose)
-					tprintf("...");
+					tprintf(", ...");
 				else {
-					tprintf("si_value={int=%u, ptr=%#lx}",
+					tprintf(", si_value={int=%u, ptr=%#lx}",
 						sip->si_int,
 						(unsigned long) sip->si_ptr);
 				}
