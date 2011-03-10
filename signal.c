@@ -441,14 +441,17 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 #define POLL_ERR        4       /* i/o error */
 #define POLL_PRI        5       /* high priority input available */
 #define POLL_HUP        6       /* device disconnected */
+#define SI_KERNEL	0x80	/* sent by kernel */
 #define SI_USER         0       /* sent by kill, sigsend, raise */
 #define SI_QUEUE        -1      /* sent by sigqueue */
 #define SI_TIMER        -2      /* sent by timer expiration */
 #define SI_MESGQ        -3      /* sent by real time mesq state change */
 #define SI_ASYNCIO      -4      /* sent by AIO completion */
-#define SI_SIGIO	-5	/* Sent by SIGIO */
-#define SI_TKILL	-6	/* Sent by tkill */
-#endif
+#define SI_SIGIO	-5	/* sent by SIGIO */
+#define SI_TKILL	-6	/* sent by tkill */
+#define SI_ASYNCNL	-60     /* sent by asynch name lookup completion */
+
+#endif /* LINUX */
 
 #if __GLIBC_MINOR__ < 1
 /* Type for data associated with a signal.  */
@@ -537,14 +540,11 @@ typedef struct siginfo
 #if defined (SVR4) || defined (LINUX)
 
 static const struct xlat siginfo_codes[] = {
-#ifdef SI_NOINFO
-	{ SI_NOINFO,	"SI_NOINFO"	},
+#ifdef SI_KERNEL
+	{ SI_KERNEL,	"SI_KERNEL"	},
 #endif
 #ifdef SI_USER
 	{ SI_USER,	"SI_USER"	},
-#endif
-#ifdef SI_LWP
-	{ SI_LWP,	"SI_LWP"	},
 #endif
 #ifdef SI_QUEUE
 	{ SI_QUEUE,	"SI_QUEUE"	},
@@ -552,17 +552,26 @@ static const struct xlat siginfo_codes[] = {
 #ifdef SI_TIMER
 	{ SI_TIMER,	"SI_TIMER"	},
 #endif
-#ifdef SI_ASYNCIO
-	{ SI_ASYNCIO,	"SI_ASYNCIO"	},
-#endif
 #ifdef SI_MESGQ
 	{ SI_MESGQ,	"SI_MESGQ"	},
+#endif
+#ifdef SI_ASYNCIO
+	{ SI_ASYNCIO,	"SI_ASYNCIO"	},
 #endif
 #ifdef SI_SIGIO
 	{ SI_SIGIO,	"SI_SIGIO"	},
 #endif
 #ifdef SI_TKILL
 	{ SI_TKILL,	"SI_TKILL"	},
+#endif
+#ifdef SI_ASYNCNL
+	{ SI_ASYNCNL,	"SI_ASYNCNL"	},
+#endif
+#ifdef SI_NOINFO
+	{ SI_NOINFO,	"SI_NOINFO"	},
+#endif
+#ifdef SI_LWP
+	{ SI_LWP,	"SI_LWP"	},
 #endif
 	{ 0,		NULL		},
 };
