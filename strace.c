@@ -2637,25 +2637,34 @@ Process %d attached (waiting for parent)\n",
 			}
 			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[WSTOPSIG(status)] & QUAL_SIGNAL)) {
-				unsigned long addr = 0;
-				long pc = 0;
 				siginfo_t si;
 #if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
-#				define PSR_RI	41
-				long psr;
+				long pc = 0;
+				long psr = 0;
 
 				upeek(tcp, PT_CR_IPSR, &psr);
 				upeek(tcp, PT_CR_IIP, &pc);
 
+# define PSR_RI	41
 				pc += (psr >> PSR_RI) & 0x3;
+# define PC_FORMAT_STR	" @ %lx"
+# define PC_FORMAT_ARG	pc
+#else
+# define PC_FORMAT_STR	"%s"
+# define PC_FORMAT_ARG	""
 #endif
-				si.si_addr = NULL;
-				if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == 0)
-					addr = (unsigned long) si.si_addr;
 				printleader(tcp);
-				tprintf("--- %s (%s) @ %lx (%lx) ---",
-					signame(WSTOPSIG(status)),
-					strsignal(WSTOPSIG(status)), pc, addr);
+				if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == 0) {
+					tprintf("--- ");
+					printsiginfo(&si, verbose(tcp));
+					tprintf(" (%s)" PC_FORMAT_STR " ---",
+						strsignal(WSTOPSIG(status)),
+						PC_FORMAT_ARG);
+				} else
+					tprintf("--- %s by %s" PC_FORMAT_STR " ---",
+						strsignal(WSTOPSIG(status)),
+						signame(WSTOPSIG(status)),
+						PC_FORMAT_ARG);
 				printtrailer();
 			}
 			if (((tcp->flags & TCB_ATTACHED) ||
