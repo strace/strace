@@ -2639,27 +2639,19 @@ Process %d attached (waiting for parent)\n",
 			    && (qual_flags[WSTOPSIG(status)] & QUAL_SIGNAL)) {
 				unsigned long addr = 0;
 				long pc = 0;
-#if defined(PT_CR_IPSR) && defined(PT_CR_IIP) && defined(PT_GETSIGINFO)
+				siginfo_t si;
+#if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
 #				define PSR_RI	41
-				struct siginfo si;
 				long psr;
 
 				upeek(tcp, PT_CR_IPSR, &psr);
 				upeek(tcp, PT_CR_IIP, &pc);
 
 				pc += (psr >> PSR_RI) & 0x3;
-				ptrace(PT_GETSIGINFO, pid, 0, (long) &si);
-				addr = (unsigned long) si.si_addr;
-#elif defined PTRACE_GETSIGINFO
-				if (WSTOPSIG(status) == SIGSEGV ||
-				    WSTOPSIG(status) == SIGBUS) {
-					siginfo_t si;
-					if (ptrace(PTRACE_GETSIGINFO, pid,
-						   0, &si) == 0)
-						addr = (unsigned long)
-							si.si_addr;
-				}
 #endif
+				si.si_addr = NULL;
+				if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == 0)
+					addr = (unsigned long) si.si_addr;
 				printleader(tcp);
 				tprintf("--- %s (%s) @ %lx (%lx) ---",
 					signame(WSTOPSIG(status)),
