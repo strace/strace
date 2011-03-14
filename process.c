@@ -2267,6 +2267,12 @@ static const struct xlat ptrace_cmds[] = {
 #  ifdef PTRACE_SETSIGINFO
 	{ PTRACE_SETSIGINFO,	"PTRACE_SETSIGINFO",	},
 #  endif
+#  ifdef PTRACE_GETREGSET
+	{ PTRACE_GETREGSET,	"PTRACE_GETREGSET",	},
+#  endif
+#  ifdef PTRACE_SETREGSET
+	{ PTRACE_SETREGSET,	"PTRACE_SETREGSET",	},
+#  endif
 #  ifdef PTRACE_SET_SYSCALL
 	{ PTRACE_SET_SYSCALL,	"PTRACE_SET_SYSCALL",	},
 #  endif
