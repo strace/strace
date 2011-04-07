@@ -54,7 +54,7 @@ struct blk_user_trace_setup {
 #ifndef BLKTRACESTART
 #define BLKTRACESTART _IO(0x12,116)
 #endif
-#ifndef BLKTRACESTART
+#ifndef BLKTRACESTOP
 #define BLKTRACESTOP _IO(0x12,117)
 #endif
 #ifndef BLKTRACETEARDOWN
