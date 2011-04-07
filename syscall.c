@@ -2422,8 +2422,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (res == 1)
 		internal_syscall(tcp);
 
-	if (res == 1 && tcp->scno >= 0 && tcp->scno < nsyscalls &&
-	    !(qual_flags[tcp->scno] & QUAL_TRACE)) {
+	if (res == 1 && filtered(tcp)) {
 		tcp->flags &= ~TCB_INSYSCALL;
 		return 0;
 	}
@@ -2688,10 +2687,15 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 
 	internal_syscall(tcp);
-	if (tcp->scno >=0 && tcp->scno < nsyscalls && !(qual_flags[tcp->scno] & QUAL_TRACE)) {
-		tcp->flags |= TCB_INSYSCALL;
+
+	if ((tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	     !(qual_flags[tcp->scno] & QUAL_TRACE)) ||
+	    (tracing_paths && !pathtrace_match(tcp))) {
+		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
 		return 0;
 	}
+
+	tcp->flags &= ~TCB_FILTERED;
 
 	if (cflag == CFLAG_ONLY_STATS) {
 		tcp->flags |= TCB_INSYSCALL;

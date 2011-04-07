@@ -401,6 +401,7 @@ struct tcb {
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
 #define TCB_FOLLOWFORK	00400	/* Process should have forks followed */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
+#define TCB_FILTERED	02000	/* This system call has been filtered out */
 #ifdef LINUX
 /* x86 does not need TCB_WAITEXECVE.
  * It can detect execve's SIGTRAP by looking at eax/rax.
@@ -410,7 +411,7 @@ struct tcb {
   || defined(POWERPC) || defined(IA64) || defined(HPPA) \
   || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) \
   || defined(ARM) || defined(MIPS) || defined(BFIN) || defined(TILE)
-#  define TCB_WAITEXECVE 02000	/* ignore SIGTRAP after exceve */
+#  define TCB_WAITEXECVE 04000	/* ignore SIGTRAP after exceve */
 # endif
 # define TCB_CLONE_THREAD  010000 /* CLONE_THREAD set in creating syscall */
 # define TCB_GROUP_EXITING 020000 /* TCB_EXITING was exit_group, not _exit */
@@ -452,6 +453,7 @@ struct tcb {
 #define syserror(tcp)	((tcp)->u_error != 0)
 #define verbose(tcp)	(qual_flags[(tcp)->scno] & QUAL_VERBOSE)
 #define abbrev(tcp)	(qual_flags[(tcp)->scno] & QUAL_ABBREV)
+#define filtered(tcp)	((tcp)->flags & TCB_FILTERED)
 
 struct xlat {
 	int val;
@@ -553,6 +555,7 @@ extern void sprint_timespec(char *, struct tcb *, long);
 #ifdef HAVE_SIGINFO_T
 extern void printsiginfo(siginfo_t *, int);
 #endif
+extern const char *getfdpath(struct tcb *, int);
 extern void printfd(struct tcb *, int);
 extern void printsock(struct tcb *, long, int);
 extern void print_sock_optmgmt(struct tcb *, long, int);
@@ -573,6 +576,9 @@ extern void tprint_iov(struct tcb *, unsigned long, unsigned long);
 extern void tprint_open_modes(mode_t);
 extern const char *sprint_open_modes(mode_t);
 extern int is_restart_error(struct tcb *);
+
+extern int pathtrace_select(const char *);
+extern int pathtrace_match(struct tcb *);
 
 extern int change_syscall(struct tcb *, int);
 extern int internal_fork(struct tcb *);
@@ -706,3 +712,5 @@ extern long ia32;
 #endif
 
 extern int not_failing_only;
+extern int show_fd_path;
+extern int tracing_paths;

@@ -43,7 +43,7 @@ strace \- trace system calls and signals
 .SH SYNOPSIS
 .B strace
 [
-.B \-CdDffhiqrtttTvxx
+.B \-CdDffhiqrtttTvxxy
 ]
 [
 .BI \-a column
@@ -57,6 +57,10 @@ strace \- trace system calls and signals
 ]
 [
 .BI \-p pid
+]
+\&...
+[
+.BI \-P path
 ]
 \&...
 [
@@ -358,6 +362,9 @@ Print all non-ASCII strings in hexadecimal string format.
 .B \-xx
 Print all strings in hexadecimal string format.
 .TP
+.B \-y
+Print paths associated with file descriptor arguments.
+.TP
 .BI "\-a " column
 Align return values in a specific column (default column 40).
 .TP
@@ -548,6 +555,13 @@ options can be used to attach to up to 32 processes in addition to
 (which is optional if at least one
 .B \-p
 option is given).
+.TP
+.BI "\-P " path
+Trace only system calls accessing
+.I path.
+Multiple
+.B \-P
+options can be used to specify up to 256 paths.
 .TP
 .BI "\-s " strsize
 Specify the maximum string size to print (the default is 32).  Note

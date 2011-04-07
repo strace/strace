@@ -418,7 +418,12 @@ printnum_int(struct tcb *tcp, long addr, const char *fmt)
 void
 printfd(struct tcb *tcp, int fd)
 {
-	tprintf("%d", fd);
+	const char *p;
+
+	if (show_fd_path && (p = getfdpath(tcp, fd)))
+		tprintf("%d<%s>", fd, p);
+	else
+		tprintf("%d", fd);
 }
 
 void

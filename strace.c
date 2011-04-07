@@ -104,6 +104,12 @@ static bool daemonized_tracer = 0;
 /* Sometimes we want to print only succeeding syscalls. */
 int not_failing_only = 0;
 
+/* Show path associated with fd arguments */
+int show_fd_path = 0;
+
+/* are we filtering traces based on paths? */
+int tracing_paths = 0;
+
 static int exit_code = 0;
 static int strace_child = 0;
 
@@ -169,9 +175,9 @@ FILE *ofp;
 int exitval;
 {
 	fprintf(ofp, "\
-usage: strace [-CdDffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
+usage: strace [-CdDffhiqrtttTvVxxy] [-a column] [-e expr] ... [-o file]\n\
               [-p pid] ... [-s strsize] [-u username] [-E var=val] ...\n\
-              [command [arg ...]]\n\
+              [-P path] [command [arg ...]]\n\
    or: strace -c [-D] [-e expr] ... [-O overhead] [-S sortby] [-E var=val] ...\n\
               [command [arg ...]]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
@@ -184,6 +190,7 @@ usage: strace [-CdDffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
 -T -- print time spent in each syscall, -V -- print version\n\
 -v -- verbose mode: print unabbreviated argv, stat, termio[s], etc. args\n\
 -x -- print non-ascii strings in hex, -xx -- print all strings in hex\n\
+-y -- print paths associated with file descriptor arguments\n\
 -a column -- alignment COLUMN for printing syscall results (default %d)\n\
 -e expr -- a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
    options: trace, abbrev, verbose, raw, signal, read, or write\n\
@@ -196,6 +203,7 @@ usage: strace [-CdDffhiqrtttTvVxx] [-a column] [-e expr] ... [-o file]\n\
 -u username -- run command as username handling setuid and/or setgid\n\
 -E var=val -- put var=val in the environment for command\n\
 -E var -- remove var from the environment for command\n\
+-P path -- trace accesses to path\n\
 " /* this is broken, so don't document it
 -z -- print only succeeding syscalls\n\
   */
@@ -792,11 +800,11 @@ main(int argc, char *argv[])
 	qualify("verbose=all");
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
-		"+cCdfFhiqrtTvVxz"
+		"+cCdfFhiqrtTvVxyz"
 #ifndef USE_PROCFS
 		"D"
 #endif
-		"a:e:o:O:p:s:S:u:E:")) != EOF) {
+		"a:e:o:O:p:s:S:u:E:P:")) != EOF) {
 		switch (c) {
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
@@ -850,6 +858,9 @@ main(int argc, char *argv[])
 		case 'x':
 			xflag++;
 			break;
+		case 'y':
+			show_fd_path = 1;
+			break;
 		case 'v':
 			qualify("abbrev=none");
 			break;
@@ -885,6 +896,13 @@ main(int argc, char *argv[])
 			tcp = alloc_tcb(pid, 0);
 			tcp->flags |= TCB_ATTACHED;
 			pflag_seen++;
+			break;
+		case 'P':
+			tracing_paths = 1;
+			if (pathtrace_select(optarg)) {
+				fprintf(stderr,"%s : failed to select path '%s'\n", progname, optarg);
+				exit(1);
+			}
 			break;
 		case 's':
 			max_strlen = atoi(optarg);
