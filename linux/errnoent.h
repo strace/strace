@@ -135,7 +135,7 @@
 	"EOWNERDEAD", /* 130 */
 	"ENOTRECOVERABLE", /* 131 */
 	"ERFKILL", /* 132 */
-	"ERRNO_133", /* 133 */
+	"EHWPOISON", /* 133 */
 	"ERRNO_134", /* 134 */
 	"ERRNO_135", /* 135 */
 	"ERRNO_136", /* 136 */
