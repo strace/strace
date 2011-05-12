@@ -4332,8 +4332,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 4327 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 4328 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 4329 */
-	{ 6,	TD,	printargs,		"preadv"	}, /* 4330 */
-	{ 6,	TD,	printargs,		"pwritev"	}, /* 4331 */
+	{ 6,	TD,	sys_preadv,		"preadv"	}, /* 4330 */
+	{ 6,	TD,	sys_pwritev,		"pwritev"	}, /* 4331 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo" }, /* 4332 */
 	{ 5,	TD,	printargs,		"perf_event_open" }, /* 4333 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 4334 */
@@ -5637,8 +5637,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 5286 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 5287 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 5288 */
-	{ 5,	TD,	printargs,		"preadv"	}, /* 5289 */
-	{ 5,	TD,	printargs,		"pwritev"	}, /* 5290 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 5289 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 5290 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo" }, /* 5291 */
 	{ 5,	TD,	printargs,		"perf_event_open" }, /* 5292 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 5293 */
@@ -6947,8 +6947,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 6290 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 6291 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 6292 */
-	{ 5,	TD,	printargs,		"preadv"	}, /* 6293 */
-	{ 5,	TD,	printargs,		"pwritev"	}, /* 6294 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 6293 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 6294 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo" }, /* 6295 */
 	{ 5,	TD,	printargs,		"perf_event_open" }, /* 6296 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 6297 */

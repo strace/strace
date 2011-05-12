@@ -1114,8 +1114,8 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 1307 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 1308 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 1309 */
-	{ 5,	TD,	printargs,		"preadv"	}, /* 1319 */
-	{ 5,	TD,	printargs,		"pwritev"	}, /* 1320 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 1319 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 1320 */
 	{ 4,	TS,	printargs,		"rt_tgsigqueueinfo"}, /* 1321 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 1322 */
 	{ 2,	TD,	printargs,		"fanotify_init"	}, /* 1323 */

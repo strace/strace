@@ -304,6 +304,39 @@ sys_pwrite(struct tcb *tcp)
 	return 0;
 }
 
+#if HAVE_SYS_UIO_H
+int
+sys_preadv(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+	} else {
+		if (syserror(tcp)) {
+			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+			return 0;
+		}
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		tprintf(", %lu, ", tcp->u_arg[2]);
+		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+	}
+	return 0;
+}
+
+int
+sys_pwritev(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprintf(", ");
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		tprintf(", %lu, ", tcp->u_arg[2]);
+		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+	}
+	return 0;
+}
+#endif /* HAVE_SYS_UIO_H */
+
 int
 sys_sendfile(struct tcb *tcp)
 {

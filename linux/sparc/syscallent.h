@@ -322,8 +322,8 @@
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 321 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 322 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 323 */
-	{ 5,	TD,	printargs,		"preadv"	}, /* 324 */
-	{ 5,	TD,	printargs,		"pwritev"	}, /* 325 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 324 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 325 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 326 */
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 327 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 328 */

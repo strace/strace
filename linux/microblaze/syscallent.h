@@ -392,8 +392,8 @@
 	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 360 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 361 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 362 */
-	{ 5,	TD,	printargs,		"preadv"	}, /* 363 */
-	{ 5,	TD,	printargs,		"pwritev"	}, /* 364 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 363 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 364 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 365 */
 	{ 5,	TN,	printargs,		"perf_event_open"	}, /* 366 */
 	{ 5,	TN,	printargs,		"recvmmsg"	}, /* 367 */

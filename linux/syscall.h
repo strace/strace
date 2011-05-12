@@ -80,6 +80,7 @@ int sys_sched_get_priority_max(), sys_sched_get_priority_min();
 int sys_sched_rr_get_interval(), sys_nanosleep(), sys_mremap();
 int sys_sendmsg(), sys_recvmsg(), sys_setresuid(), sys_setresgid();
 int sys_getresuid(), sys_getresgid(), sys_pread(), sys_pwrite(), sys_getcwd();
+int sys_preadv(), sys_pwritev();
 int sys_sigaltstack(), sys_rt_sigprocmask(), sys_rt_sigaction();
 int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
 int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
