@@ -504,7 +504,7 @@ typedef enum {
 extern struct tcb **tcbtab;
 extern int *qual_flags;
 extern int debug, followfork;
-extern unsigned int ptrace_setoptions;
+extern unsigned int ptrace_setoptions_followfork;
 extern int dtime, xflag, qflag;
 extern cflag_t cflag;
 extern int acolumn;
