@@ -85,7 +85,7 @@ extern char *optarg;
 
 int debug = 0, followfork = 0;
 unsigned int ptrace_setoptions_followfork = 0;
-static unsigned int ptrace_setoptions_for_all = 0;
+unsigned int ptrace_setoptions_for_all = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
 static unsigned int SYSCALLTRAP = SIGTRAP;
 int dtime = 0, xflag = 0, qflag = 0;

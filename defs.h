@@ -505,6 +505,7 @@ extern struct tcb **tcbtab;
 extern int *qual_flags;
 extern int debug, followfork;
 extern unsigned int ptrace_setoptions_followfork;
+extern unsigned int ptrace_setoptions_for_all;
 extern int dtime, xflag, qflag;
 extern cflag_t cflag;
 extern int acolumn;

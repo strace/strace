@@ -1775,8 +1775,7 @@ struct tcb *tcp;
 #endif
 
 int
-internal_exec(tcp)
-struct tcb *tcp;
+internal_exec(struct tcb *tcp)
 {
 #ifdef SUNOS4
 	if (exiting(tcp) && !syserror(tcp) && followfork)
@@ -1785,8 +1784,11 @@ struct tcb *tcp;
 #if defined LINUX && defined TCB_WAITEXECVE
 	if (exiting(tcp) && syserror(tcp))
 		tcp->flags &= ~TCB_WAITEXECVE;
-	else
-		tcp->flags |= TCB_WAITEXECVE;
+	else {
+		/* Maybe we have post-execve SIGTRAP suppressed? */
+		if (!(ptrace_setoptions_for_all & PTRACE_O_TRACEEXEC))
+			tcp->flags |= TCB_WAITEXECVE; /* no */
+	}
 #endif /* LINUX && TCB_WAITEXECVE */
 	return 0;
 }
