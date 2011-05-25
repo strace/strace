@@ -1955,16 +1955,16 @@ extern char *sys_errlist[];
 #endif /* HAVE_DECL_SYS_ERRLIST */
 
 const char *
-strerror(errno)
-int errno;
+strerror(err_no)
+int err_no;
 {
 	static char buf[64];
 
-	if (errno < 1 || errno >= sys_nerr) {
-		sprintf(buf, "Unknown error %d", errno);
+	if (err_no < 1 || err_no >= sys_nerr) {
+		sprintf(buf, "Unknown error %d", err_no);
 		return buf;
 	}
-	return sys_errlist[errno];
+	return sys_errlist[err_no];
 }
 
 #endif /* HAVE_STERRROR */
