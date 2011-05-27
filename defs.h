@@ -339,6 +339,10 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 # endif
 #endif /* LINUX */
 
+#if !defined __GNUC__
+# define __attribute__(x) /*nothing*/
+#endif
+
 /* Trace Control Block */
 struct tcb {
 	short flags;		/* See below for TCB_ values */
@@ -515,6 +519,11 @@ extern struct tcb *tcp_last;
 
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
+void error_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+void perror_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+void error_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
+void perror_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
+
 extern int set_personality(int personality);
 extern const char *xlookup(const struct xlat *, int);
 extern struct tcb *alloc_tcb(int, int);
@@ -630,11 +639,7 @@ extern int proc_open(struct tcb *tcp, int attaching);
 #define printtv_special(tcp, addr)	\
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 
-extern void tprintf(const char *fmt, ...)
-#ifdef __GNUC__
-	__attribute__ ((format (printf, 1, 2)))
-#endif
-	;
+extern void tprintf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 #ifndef HAVE_STRERROR
 const char *strerror(int);

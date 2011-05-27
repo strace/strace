@@ -87,7 +87,7 @@ int debug = 0, followfork = 0;
 unsigned int ptrace_setoptions_followfork = 0;
 unsigned int ptrace_setoptions_for_all = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
-static unsigned int SYSCALLTRAP = SIGTRAP;
+static unsigned int syscall_trap_sig = SIGTRAP;
 int dtime = 0, xflag = 0, qflag = 0;
 cflag_t cflag = CFLAG_NONE;
 static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
@@ -116,6 +116,7 @@ int tracing_paths = 0;
 
 static int exit_code = 0;
 static int strace_child = 0;
+static int strace_tracer_pid = 0;
 
 static char *username = NULL;
 uid_t run_uid;
@@ -215,29 +216,62 @@ usage: strace [-CdDffhiqrtttTvVxxy] [-a column] [-e expr] ... [-o file]\n\
 	exit(exitval);
 }
 
-static void error_msg_and_die(const char *fmt, ...)
-#if defined __GNUC__
-	__attribute__ ((noreturn, format(printf, 1, 2)))
-#endif
-;
-static void error_msg_and_die(const char *fmt, ...)
+static void die(void) __attribute__ ((noreturn));
+static void die(void)
+{
+	if (strace_tracer_pid == getpid()) {
+		cflag = 0;
+		cleanup();
+	}
+	exit(1);
+}
+
+static void verror_msg(int err_no, const char *fmt, va_list p)
 {
 	char *msg;
-	va_list p;
 
-	va_start(p, fmt);
 	msg = NULL;
 	vasprintf(&msg, fmt, p);
 	if (msg) {
-		fprintf(stderr, "%s: %s\n", progname, msg);
+		fflush(NULL);
+		if (err_no)
+			fprintf(stderr, "%s: %s: %s\n", progname, msg, strerror(err_no));
+		else
+			fprintf(stderr, "%s: %s\n", progname, msg);
 		free(msg);
 	}
-	va_end(p);
+}
 
-	/* TODO? cflag = 0; -- or else cleanup() may print summary */
-	cleanup();
-	fflush(NULL);
-	_exit(1);
+void error_msg(const char *fmt, ...)
+{
+	va_list p;
+	va_start(p, fmt);
+	verror_msg(0, fmt, p);
+	va_end(p);
+}
+
+void error_msg_and_die(const char *fmt, ...)
+{
+	va_list p;
+	va_start(p, fmt);
+	verror_msg(0, fmt, p);
+	die();
+}
+
+void perror_msg(const char *fmt, ...)
+{
+	va_list p;
+	va_start(p, fmt);
+	verror_msg(errno, fmt, p);
+	va_end(p);
+}
+
+void perror_msg_and_die(const char *fmt, ...)
+{
+	va_list p;
+	va_start(p, fmt);
+	verror_msg(errno, fmt, p);
+	die();
 }
 
 #ifdef SVR4
@@ -429,14 +463,17 @@ startup_attach(void)
 		}
 		if (pid) { /* parent */
 			/*
-			 * Wait for child to attach to straced process
-			 * (our parent). Child SIGKILLs us after it attached.
-			 * Parent's wait() is unblocked by our death,
+			 * Wait for grandchild to attach to straced process
+			 * (grandparent). Grandchild SIGKILLs us after it attached.
+			 * Grandparent's wait() is unblocked by our death,
 			 * it proceeds to exec the straced program.
 			 */
 			pause();
 			_exit(0); /* paranoia */
 		}
+		/* grandchild */
+		/* We will be the tracer process. Remember our new pid: */
+		strace_tracer_pid = getpid();
 	}
 
 	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
@@ -613,8 +650,8 @@ startup_child (char **argv)
 		cleanup();
 		exit(1);
 	}
-	if ((pid != 0 && daemonized_tracer) /* parent: to become a traced process */
-	 || (pid == 0 && !daemonized_tracer) /* child: to become a traced process */
+	if ((pid != 0 && daemonized_tracer) /* -D: parent to become a traced process */
+	 || (pid == 0 && !daemonized_tracer) /* not -D: child to become a traced process */
 	) {
 		pid = getpid();
 #ifdef USE_PROCFS
@@ -710,6 +747,9 @@ startup_child (char **argv)
 	}
 
 	/* We are the tracer.  */
+	/* With -D, we are *child* here, IOW: different pid. Fetch it. */
+	strace_tracer_pid = getpid();
+
 	tcp = alloctcb(daemonized_tracer ? getppid() : pid);
 	if (daemonized_tracer) {
 		/* We want subsequent startup_attach() to attach to it.  */
@@ -817,13 +857,13 @@ test_ptrace_setoptions_for_all(void)
 
 	pid = fork();
 	if (pid < 0)
-		error_msg_and_die("fork failed");
+		perror_msg_and_die("fork");
 
 	if (pid == 0) {
 		pid = getpid();
 		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
-			/* "parent, something is deeply wrong!" */
-			kill(pid, SIGKILL);
+			/* Note: exits with exitcode 1 */
+			perror_msg_and_die("%s: PTRACE_TRACEME doesn't work", __func__);
 		kill(pid, SIGSTOP);
 		_exit(0); /* parent should see entry into this syscall */
 	}
@@ -837,10 +877,14 @@ test_ptrace_setoptions_for_all(void)
 			if (errno == EINTR)
 				continue;
 			kill(pid, SIGKILL);
-			error_msg_and_die("%s: unexpected wait result %d", __func__, tracee_pid);
+			perror_msg_and_die("%s: unexpected wait result %d", __func__, tracee_pid);
 		}
-		if (WIFEXITED(status))
-			break;
+		if (WIFEXITED(status)) {
+			if (WEXITSTATUS(status) == 0)
+				break;
+			/* PTRACE_TRACEME failed in child. This is fatal. */
+			exit(1);
+		}
 		if (!WIFSTOPPED(status)) {
 			kill(pid, SIGKILL);
 			error_msg_and_die("%s: unexpected wait status %x", __func__, status);
@@ -852,19 +896,21 @@ test_ptrace_setoptions_for_all(void)
 			 * and thus will decide to not use the option.
 			 * IOW: the outcome of the test will be correct.
 			 */
-			ptrace(PTRACE_SETOPTIONS, pid, 0L, test_options);
+			if (ptrace(PTRACE_SETOPTIONS, pid, 0L, test_options) < 0)
+				if (errno != EINVAL)
+					perror_msg("PTRACE_SETOPTIONS");
 		}
 		if (WSTOPSIG(status) == (SIGTRAP | 0x80)) {
 			it_worked = 1;
 		}
 		if (ptrace(PTRACE_SYSCALL, pid, 0L, 0L) < 0) {
 			kill(pid, SIGKILL);
-			error_msg_and_die("PTRACE_SYSCALL doesn't work");
+			perror_msg_and_die("PTRACE_SYSCALL doesn't work");
 		}
 	}
 
 	if (it_worked) {
-		SYSCALLTRAP = (SIGTRAP | 0x80);
+		syscall_trap_sig = (SIGTRAP | 0x80);
 		ptrace_setoptions_for_all = test_options;
 		if (debug)
 			fprintf(stderr, "ptrace_setoptions_for_all = %#x\n",
@@ -888,6 +934,8 @@ main(int argc, char *argv[])
 	static char buf[BUFSIZ];
 
 	progname = argv[0] ? argv[0] : "strace";
+
+	strace_tracer_pid = getpid();
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
@@ -1000,7 +1048,7 @@ main(int argc, char *argv[])
 					progname, optarg);
 				break;
 			}
-			if (pid == getpid()) {
+			if (pid == strace_tracer_pid) {
 				fprintf(stderr, "%s: I'm sorry, I can't let you do that, Dave.\n", progname);
 				break;
 			}
@@ -1863,7 +1911,7 @@ int sig;
 				break;
 			}
 			error = ptrace_restart(PTRACE_CONT, tcp,
-					WSTOPSIG(status) == SYSCALLTRAP ? 0
+					WSTOPSIG(status) == syscall_trap_sig ? 0
 					: WSTOPSIG(status));
 			if (error < 0)
 				break;
@@ -2525,6 +2573,8 @@ handle_ptrace_event(int status, struct tcb *tcp)
 			fprintf(stderr, "PTRACE_EVENT_EXEC on pid %d (ignored)\n", tcp->pid);
 		return 0;
 	}
+	/* Some PTRACE_EVENT_foo we didn't ask for?! */
+	error_msg("Unexpected status %x on pid %d", status, tcp->pid);
 	return 1;
 }
 #endif
@@ -2756,7 +2806,7 @@ Process %d attached (waiting for parent)\n",
 				if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, options) < 0) {
 					if (errno != ESRCH) {
 						/* Should never happen, really */
-						error_msg_and_die("PTRACE_SETOPTIONS");
+						perror_msg_and_die("PTRACE_SETOPTIONS");
 					}
 				}
 			}
@@ -2764,7 +2814,7 @@ Process %d attached (waiting for parent)\n",
 			goto tracing;
 		}
 
-		if (WSTOPSIG(status) != SYSCALLTRAP) {
+		if (WSTOPSIG(status) != syscall_trap_sig) {
 			if (WSTOPSIG(status) == SIGSTOP &&
 					(tcp->flags & TCB_SIGTRAPPED)) {
 				/*
