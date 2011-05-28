@@ -209,8 +209,8 @@
 	{ 3,	TS,	sys_rt_sigqueueinfo,    "rt_sigqueueinfo"}, /* 178 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 179 */
 
-	{ 5,	TF,	sys_pread,		"pread"		}, /* 180 */
-	{ 5,	TF,	sys_pwrite,		"pwrite"	}, /* 181 */
+	{ 6,	TF,	sys_pread,		"pread"		}, /* 180 */
+	{ 6,	TF,	sys_pwrite,		"pwrite"	}, /* 181 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 182 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
@@ -222,8 +222,8 @@
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
 	{ 6,	TD,	sys_mmap,		"mmap2"		}, /* 192 */
-	{ 3,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
-	{ 3,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
+	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
+	{ 4,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
 	{ 2,	TF,	sys_fstat64,		"fstat64"	}, /* 197 */
@@ -255,7 +255,7 @@
 	{ 5,	0,	printargs,		"SYS_222"	}, /* 222 */
 	{ 5,	0,	printargs,		"SYS_223"	}, /* 223 */
 	{ 0,	0,	printargs,		"gettid"	}, /* 224 */
-	{ 4,	0,	sys_readahead,		"readahead"	}, /* 225 */
+	{ 5,	0,	sys_readahead,		"readahead"	}, /* 225 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 226 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 227 */
 	{ 5,	0,	sys_fsetxattr,		"fsetxattr"	}, /* 228 */
@@ -391,8 +391,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 358 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 359 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 360 */
-	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 361 */
-	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 362 */
+	{ 6,	TD,	sys_preadv,		"preadv"	}, /* 361 */
+	{ 6,	TD,	sys_pwritev,		"pwritev"	}, /* 362 */
 	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 363 */
 	{ 5,	TD,	printargs,		"perf_event_open"}, /* 364 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 365 */

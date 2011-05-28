@@ -243,7 +243,8 @@ printllval(struct tcb *tcp, const char *format, int llarg)
 {
 # if defined(FREEBSD) \
      || (defined(LINUX) && defined(POWERPC) && !defined(POWERPC64)) \
-     || defined (LINUX_MIPSO32)
+     || defined(LINUX_MIPSO32) \
+     || defined(__ARM_EABI__)
 	/* Align 64bit argument to 64bit boundary.  */
 	if (llarg % 2) llarg++;
 # endif
