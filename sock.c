@@ -68,10 +68,7 @@ static const struct xlat iffflags[] = {
 
 
 static void
-print_addr(tcp, addr, ifr)
-struct tcb *tcp;
-long addr;
-struct ifreq *ifr;
+print_addr(struct tcb *tcp, long addr, struct ifreq *ifr)
 {
 	if (ifr->ifr_addr.sa_family == AF_INET) {
 		struct sockaddr_in *sinp;

@@ -288,11 +288,7 @@ sigset_t *s;
 #endif
 
 static int
-copy_sigset_len(tcp, addr, s, len)
-struct tcb *tcp;
-long addr;
-sigset_t *s;
-int len;
+copy_sigset_len(struct tcb *tcp, long addr, sigset_t *s, int len)
 {
 	if (len > sizeof(*s))
 		len = sizeof(*s);
@@ -850,9 +846,7 @@ parse_sigset_t(const char *str, sigset_t *set)
  * else return 0.  This routine will never be called with SIGKILL.
  */
 int
-sigishandled(tcp, sig)
-struct tcb *tcp;
-int sig;
+sigishandled(struct tcb *tcp, int sig)
 {
 #ifdef LINUX
 	int sfd;
@@ -946,8 +940,7 @@ int sig;
 #if defined(SUNOS4) || defined(FREEBSD)
 
 int
-sys_sigvec(tcp)
-struct tcb *tcp;
+sys_sigvec(struct tcb *tcp)
 {
 	struct sigvec sv;
 	long addr;
@@ -1005,8 +998,7 @@ struct tcb *tcp;
 }
 
 int
-sys_sigpause(tcp)
-struct tcb *tcp;
+sys_sigpause(struct tcb *tcp)
 {
 	if (entering(tcp)) {	/* WTA: UD had a bug here: he forgot the braces */
 		sigset_t sigm;
@@ -1017,8 +1009,7 @@ struct tcb *tcp;
 }
 
 int
-sys_sigstack(tcp)
-struct tcb *tcp;
+sys_sigstack(struct tcb *tcp)
 {
 	struct sigstack ss;
 	long addr;
@@ -1041,8 +1032,7 @@ struct tcb *tcp;
 }
 
 int
-sys_sigcleanup(tcp)
-struct tcb *tcp;
+sys_sigcleanup(struct tcb *tcp)
 {
 	return 0;
 }
@@ -1052,8 +1042,7 @@ struct tcb *tcp;
 #ifndef SVR4
 
 int
-sys_sigsetmask(tcp)
-struct tcb *tcp;
+sys_sigsetmask(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		sigset_t sigm;
@@ -1080,8 +1069,7 @@ struct tcb *tcp;
 
 #if defined(SUNOS4) || defined(FREEBSD)
 int
-sys_sigblock(tcp)
-struct tcb *tcp;
+sys_sigblock(struct tcb *tcp)
 {
 	return sys_sigsetmask(tcp);
 }
@@ -1106,8 +1094,7 @@ struct old_sigaction {
 #endif
 
 int
-sys_sigaction(tcp)
-struct tcb *tcp;
+sys_sigaction(struct tcb *tcp)
 {
 	long addr;
 #ifdef LINUX
@@ -1185,8 +1172,7 @@ struct tcb *tcp;
 }
 
 int
-sys_signal(tcp)
-struct tcb *tcp;
+sys_signal(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -1236,8 +1222,7 @@ struct tcb *tcp;
 
 #ifdef SVR4
 int
-sys_sighold(tcp)
-struct tcb *tcp;
+sys_sighold(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -1592,8 +1577,7 @@ sys_sigreturn(struct tcb *tcp)
 }
 
 int
-sys_siggetmask(tcp)
-struct tcb *tcp;
+sys_siggetmask(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		sigset_t sigm;
@@ -1619,8 +1603,7 @@ sys_sigsuspend(struct tcb *tcp)
 #if defined(SVR4) || defined(FREEBSD)
 
 int
-sys_sigsuspend(tcp)
-struct tcb *tcp;
+sys_sigsuspend(struct tcb *tcp)
 {
 	sigset_t sigset;
 
@@ -1674,9 +1657,7 @@ static const struct xlat sigaltstack_flags[] = {
 
 #ifdef SVR4
 static void
-printcontext(tcp, ucp)
-struct tcb *tcp;
-ucontext_t *ucp;
+printcontext(struct tcb *tcp, ucontext_t *ucp)
 {
 	tprintf("{");
 	if (!abbrev(tcp)) {
@@ -1697,8 +1678,7 @@ ucontext_t *ucp;
 }
 
 int
-sys_getcontext(tcp)
-struct tcb *tcp;
+sys_getcontext(struct tcb *tcp)
 {
 	ucontext_t uc;
 
@@ -1716,8 +1696,7 @@ struct tcb *tcp;
 }
 
 int
-sys_setcontext(tcp)
-struct tcb *tcp;
+sys_setcontext(struct tcb *tcp)
 {
 	ucontext_t uc;
 
@@ -1743,9 +1722,7 @@ struct tcb *tcp;
 #if defined(LINUX) || defined(FREEBSD)
 
 static int
-print_stack_t(tcp, addr)
-struct tcb *tcp;
-unsigned long addr;
+print_stack_t(struct tcb *tcp, unsigned long addr)
 {
 	stack_t ss;
 	if (umove(tcp, addr, &ss) < 0)
@@ -1757,8 +1734,7 @@ unsigned long addr;
 }
 
 int
-sys_sigaltstack(tcp)
-	struct tcb *tcp;
+sys_sigaltstack(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		if (tcp->u_arg[0] == 0)
@@ -1780,8 +1756,7 @@ sys_sigaltstack(tcp)
 #ifdef HAVE_SIGACTION
 
 int
-sys_sigprocmask(tcp)
-struct tcb *tcp;
+sys_sigprocmask(struct tcb *tcp)
 {
 #ifdef ALPHA
 	if (entering(tcp)) {
@@ -1820,8 +1795,7 @@ struct tcb *tcp;
 #endif /* HAVE_SIGACTION */
 
 int
-sys_kill(tcp)
-struct tcb *tcp;
+sys_kill(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		/*
@@ -1837,8 +1811,7 @@ struct tcb *tcp;
 
 #if defined(FREEBSD) || defined(SUNOS4)
 int
-sys_killpg(tcp)
-struct tcb *tcp;
+sys_killpg(struct tcb *tcp)
 {
 	return sys_kill(tcp);
 }
@@ -1846,8 +1819,7 @@ struct tcb *tcp;
 
 #ifdef LINUX
 int
-sys_tgkill(tcp)
-	struct tcb *tcp;
+sys_tgkill(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld, %s",
@@ -1858,8 +1830,7 @@ sys_tgkill(tcp)
 #endif
 
 int
-sys_sigpending(tcp)
-struct tcb *tcp;
+sys_sigpending(struct tcb *tcp)
 {
 	sigset_t sigset;
 
@@ -1875,8 +1846,7 @@ struct tcb *tcp;
 }
 
 #ifdef SVR4
-int sys_sigwait(tcp)
-struct tcb *tcp;
+int sys_sigwait(struct tcb *tcp)
 {
 	sigset_t sigset;
 
@@ -1898,9 +1868,8 @@ struct tcb *tcp;
 
 #ifdef LINUX
 
-	int
-sys_rt_sigprocmask(tcp)
-	struct tcb *tcp;
+int
+sys_rt_sigprocmask(struct tcb *tcp)
 {
 	sigset_t sigset;
 

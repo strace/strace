@@ -251,7 +251,7 @@ static const struct xlat prctl_options[] = {
 
 
 static const char *
-unalignctl_string (unsigned int ctl)
+unalignctl_string(unsigned int ctl)
 {
 	static char buf[16];
 
@@ -273,8 +273,7 @@ unalignctl_string (unsigned int ctl)
 
 
 int
-sys_prctl(tcp)
-struct tcb *tcp;
+sys_prctl(struct tcb *tcp)
 {
 	int i;
 
@@ -362,8 +361,7 @@ struct tcb *tcp;
 
 #if defined(FREEBSD) || defined(SUNOS4) || defined(SVR4)
 int
-sys_gethostid(tcp)
-struct tcb *tcp;
+sys_gethostid(struct tcb *tcp)
 {
 	if (exiting(tcp))
 		return RVAL_HEX;
@@ -372,8 +370,7 @@ struct tcb *tcp;
 #endif /* FREEBSD || SUNOS4 || SVR4 */
 
 int
-sys_sethostname(tcp)
-struct tcb *tcp;
+sys_sethostname(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpathn(tcp, tcp->u_arg[0], tcp->u_arg[1]);
@@ -384,8 +381,7 @@ struct tcb *tcp;
 
 #if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4) || defined(SVR4)
 int
-sys_gethostname(tcp)
-struct tcb *tcp;
+sys_gethostname(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp))
@@ -399,8 +395,7 @@ struct tcb *tcp;
 #endif /* ALPHA || FREEBSD || SUNOS4 || SVR4 */
 
 int
-sys_setdomainname(tcp)
-struct tcb *tcp;
+sys_setdomainname(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpathn(tcp, tcp->u_arg[0], tcp->u_arg[1]);
@@ -412,8 +407,7 @@ struct tcb *tcp;
 #if !defined(LINUX)
 
 int
-sys_getdomainname(tcp)
-struct tcb *tcp;
+sys_getdomainname(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp))
@@ -427,8 +421,7 @@ struct tcb *tcp;
 #endif /* !LINUX */
 
 int
-sys_exit(tcp)
-struct tcb *tcp;
+sys_exit(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		fprintf(stderr, "_exit returned!\n");
@@ -484,8 +477,7 @@ sys_fork(struct tcb *tcp)
 #if UNIXWARE > 2
 
 int
-sys_rfork(tcp)
-struct tcb *tcp;
+sys_rfork(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf ("%ld", tcp->u_arg[0]);
@@ -502,8 +494,7 @@ struct tcb *tcp;
 #endif
 
 int
-internal_fork(tcp)
-struct tcb *tcp;
+internal_fork(struct tcb *tcp)
 {
 	struct tcb *tcpchild;
 
@@ -621,8 +612,7 @@ extern void print_ldt_entry();
 # endif
 
 int
-sys_clone(tcp)
-struct tcb *tcp;
+sys_clone(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		const char *sep = "|";
@@ -674,8 +664,7 @@ sys_unshare(struct tcb *tcp)
 #endif /* LINUX */
 
 int
-sys_fork(tcp)
-struct tcb *tcp;
+sys_fork(struct tcb *tcp)
 {
 	if (exiting(tcp))
 		return RVAL_UDECIMAL;
@@ -960,8 +949,7 @@ internal_fork(struct tcb *tcp)
 #else /* !LINUX */
 
 int
-internal_fork(tcp)
-struct tcb *tcp;
+internal_fork(struct tcb *tcp)
 {
 	struct tcb *tcpchild;
 	int pid;
@@ -1049,8 +1037,7 @@ struct tcb *tcp;
 #if defined(SUNOS4) || defined(LINUX) || defined(FREEBSD)
 
 int
-sys_vfork(tcp)
-struct tcb *tcp;
+sys_vfork(struct tcb *tcp)
 {
 	if (exiting(tcp))
 		return RVAL_UDECIMAL;
@@ -1064,8 +1051,7 @@ struct tcb *tcp;
 static char idstr[16];
 
 int
-sys_getpid(tcp)
-struct tcb *tcp;
+sys_getpid(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		sprintf(idstr, "ppid %lu", getrval2(tcp));
@@ -1076,8 +1062,7 @@ struct tcb *tcp;
 }
 
 int
-sys_getuid(tcp)
-struct tcb *tcp;
+sys_getuid(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		sprintf(idstr, "euid %lu", getrval2(tcp));
@@ -1088,8 +1073,7 @@ struct tcb *tcp;
 }
 
 int
-sys_getgid(tcp)
-struct tcb *tcp;
+sys_getgid(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		sprintf(idstr, "egid %lu", getrval2(tcp));
@@ -1120,8 +1104,7 @@ int sys_setfsuid(struct tcb *tcp)
 }
 
 int
-sys_setuid(tcp)
-struct tcb *tcp;
+sys_setuid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%u", (uid_t) tcp->u_arg[0]);
@@ -1130,8 +1113,7 @@ struct tcb *tcp;
 }
 
 int
-sys_setgid(tcp)
-struct tcb *tcp;
+sys_setgid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%u", (gid_t) tcp->u_arg[0]);
@@ -1166,8 +1148,7 @@ sys_getresuid(struct tcb *tcp)
 }
 
 int
-sys_getresgid(tcp)
-struct tcb *tcp;
+sys_getresgid(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		__kernel_gid_t gid;
@@ -1195,8 +1176,7 @@ struct tcb *tcp;
 #endif /* LINUX */
 
 int
-sys_setreuid(tcp)
-struct tcb *tcp;
+sys_setreuid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printuid("", tcp->u_arg[0]);
@@ -1206,8 +1186,7 @@ struct tcb *tcp;
 }
 
 int
-sys_setregid(tcp)
-struct tcb *tcp;
+sys_setregid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printuid("", tcp->u_arg[0]);
@@ -1218,8 +1197,7 @@ struct tcb *tcp;
 
 #if defined(LINUX) || defined(FREEBSD)
 int
-sys_setresuid(tcp)
-     struct tcb *tcp;
+sys_setresuid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printuid("", tcp->u_arg[0]);
@@ -1229,8 +1207,7 @@ sys_setresuid(tcp)
 	return 0;
 }
 int
-sys_setresgid(tcp)
-     struct tcb *tcp;
+sys_setresgid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printuid("", tcp->u_arg[0]);
@@ -1243,8 +1220,7 @@ sys_setresgid(tcp)
 #endif /* LINUX || FREEBSD */
 
 int
-sys_setgroups(tcp)
-struct tcb *tcp;
+sys_setgroups(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		unsigned long len, size, start, cur, end, abbrev_end;
@@ -1298,8 +1274,7 @@ struct tcb *tcp;
 }
 
 int
-sys_getgroups(tcp)
-struct tcb *tcp;
+sys_getgroups(struct tcb *tcp)
 {
 	unsigned long len;
 
@@ -1363,8 +1338,7 @@ struct tcb *tcp;
 
 #ifdef LINUX
 int
-sys_setgroups32(tcp)
-struct tcb *tcp;
+sys_setgroups32(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		unsigned long len, size, start, cur, end, abbrev_end;
@@ -1418,8 +1392,7 @@ struct tcb *tcp;
 }
 
 int
-sys_getgroups32(tcp)
-struct tcb *tcp;
+sys_getgroups32(struct tcb *tcp)
 {
 	unsigned long len;
 
@@ -1480,8 +1453,7 @@ struct tcb *tcp;
 
 #if defined(ALPHA) || defined(SUNOS4) || defined(SVR4)
 int
-sys_setpgrp(tcp)
-struct tcb *tcp;
+sys_setpgrp(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 #ifndef SVR4
@@ -1493,8 +1465,7 @@ struct tcb *tcp;
 #endif /* ALPHA || SUNOS4 || SVR4 */
 
 int
-sys_getpgrp(tcp)
-struct tcb *tcp;
+sys_getpgrp(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 #ifndef SVR4
@@ -1505,8 +1476,7 @@ struct tcb *tcp;
 }
 
 int
-sys_getsid(tcp)
-struct tcb *tcp;
+sys_getsid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
@@ -1515,15 +1485,13 @@ struct tcb *tcp;
 }
 
 int
-sys_setsid(tcp)
-struct tcb *tcp;
+sys_setsid(struct tcb *tcp)
 {
 	return 0;
 }
 
 int
-sys_getpgid(tcp)
-struct tcb *tcp;
+sys_getpgid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
@@ -1532,8 +1500,7 @@ struct tcb *tcp;
 }
 
 int
-sys_setpgid(tcp)
-struct tcb *tcp;
+sys_setpgid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, %lu", tcp->u_arg[0], tcp->u_arg[1]);
@@ -1639,8 +1606,7 @@ printpriv(struct tcb *tcp, long addr, int len, const struct xlat *opt)
 
 
 int
-sys_procpriv(tcp)
-struct tcb *tcp;
+sys_procpriv(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(procpriv_cmds, tcp->u_arg[0], "???PRV");
@@ -1762,8 +1728,7 @@ sys_execve(struct tcb *tcp)
 
 #if UNIXWARE > 2
 
-int sys_rexecve(tcp)
-struct tcb *tcp;
+int sys_rexecve(struct tcb *tcp)
 {
 	if (entering (tcp)) {
 		sys_execve (tcp);
@@ -1856,8 +1821,7 @@ static const struct xlat wait4_options[] = {
 #endif
 
 static int
-printstatus(status)
-int status;
+printstatus(int status)
 {
 	int exited = 0;
 
@@ -1966,9 +1930,7 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 }
 
 int
-internal_wait(tcp, flagarg)
-struct tcb *tcp;
-int flagarg;
+internal_wait(struct tcb *tcp, int flagarg)
 {
 	int got_kids;
 
@@ -2056,8 +2018,7 @@ int flagarg;
 #ifdef SVR4
 
 int
-sys_wait(tcp)
-struct tcb *tcp;
+sys_wait(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		/* The library wrapper stuffs this into the user variable. */
@@ -2071,8 +2032,7 @@ struct tcb *tcp;
 
 #ifdef FREEBSD
 int
-sys_wait(tcp)
-struct tcb *tcp;
+sys_wait(struct tcb *tcp)
 {
 	int status;
 
@@ -2089,23 +2049,20 @@ struct tcb *tcp;
 #endif
 
 int
-sys_waitpid(tcp)
-struct tcb *tcp;
+sys_waitpid(struct tcb *tcp)
 {
 	return printwaitn(tcp, 3, 0);
 }
 
 int
-sys_wait4(tcp)
-struct tcb *tcp;
+sys_wait4(struct tcb *tcp)
 {
 	return printwaitn(tcp, 4, 0);
 }
 
 #ifdef ALPHA
 int
-sys_osf_wait4(tcp)
-struct tcb *tcp;
+sys_osf_wait4(struct tcb *tcp)
 {
 	return printwaitn(tcp, 4, 1);
 }
@@ -2177,8 +2134,7 @@ sys_waitid(struct tcb *tcp)
 #endif /* SVR4 or LINUX */
 
 int
-sys_alarm(tcp)
-struct tcb *tcp;
+sys_alarm(struct tcb *tcp)
 {
 	if (entering(tcp))
 		tprintf("%lu", tcp->u_arg[0]);
@@ -2186,8 +2142,7 @@ struct tcb *tcp;
 }
 
 int
-sys_uname(tcp)
-struct tcb *tcp;
+sys_uname(struct tcb *tcp)
 {
 	struct utsname uname;
 

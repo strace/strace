@@ -579,7 +579,7 @@ startup_attach(void)
 }
 
 static void
-startup_child (char **argv)
+startup_child(char **argv)
 {
 	struct stat statbuf;
 	const char *filename;
@@ -1634,8 +1634,7 @@ first_used_tcb(void)
 }
 
 static struct tcb *
-pfd2tcb(pfd)
-int pfd;
+pfd2tcb(int pfd)
 {
 	int i;
 
@@ -1652,8 +1651,7 @@ int pfd;
 #endif /* USE_PROCFS */
 
 void
-droptcb(tcp)
-struct tcb *tcp;
+droptcb(struct tcb *tcp)
 {
 	if (tcp->pid == 0)
 		return;
@@ -1718,8 +1716,7 @@ struct tcb *tcp;
 #ifndef USE_PROCFS
 
 static int
-resume(tcp)
-struct tcb *tcp;
+resume(struct tcb *tcp)
 {
 	if (tcp == NULL)
 		return -1;
@@ -1743,7 +1740,7 @@ struct tcb *tcp;
 }
 
 static int
-resume_from_tcp (struct tcb *tcp)
+resume_from_tcp(struct tcb *tcp)
 {
 	int error = 0;
 	int resumed = 0;
@@ -1815,9 +1812,7 @@ resume_from_tcp (struct tcb *tcp)
    would SIGSTOP it and wait for its SIGSTOP notification forever.  */
 
 static int
-detach(tcp, sig)
-struct tcb *tcp;
-int sig;
+detach(struct tcb *tcp, int sig)
 {
 	int error = 0;
 #ifdef LINUX
@@ -1960,7 +1955,7 @@ static void reaper(int sig)
 #endif /* USE_PROCFS */
 
 static void
-cleanup()
+cleanup(void)
 {
 	int i;
 	struct tcb *tcp;
@@ -1989,8 +1984,7 @@ cleanup()
 }
 
 static void
-interrupt(sig)
-int sig;
+interrupt(int sig)
 {
 	interrupted = 1;
 }
@@ -2003,8 +1997,7 @@ extern char *sys_errlist[];
 #endif /* HAVE_DECL_SYS_ERRLIST */
 
 const char *
-strerror(err_no)
-int err_no;
+strerror(int err_no)
 {
 	static char buf[64];
 
@@ -2027,8 +2020,7 @@ extern char *_sys_siglist[];
 #endif
 
 const char *
-strsignal(sig)
-int sig;
+strsignal(int sig)
 {
 	static char buf[64];
 
@@ -2048,7 +2040,7 @@ int sig;
 #ifdef USE_PROCFS
 
 static void
-rebuild_pollv()
+rebuild_pollv(void)
 {
 	int i, j;
 
@@ -2077,7 +2069,7 @@ rebuild_pollv()
 #ifndef HAVE_POLLABLE_PROCFS
 
 static void
-proc_poll_open()
+proc_poll_open(void)
 {
 	int i;
 
@@ -2093,10 +2085,7 @@ proc_poll_open()
 }
 
 static int
-proc_poll(pollv, nfds, timeout)
-struct pollfd *pollv;
-int nfds;
-int timeout;
+proc_poll(struct pollfd *pollv, int nfds, int timeout)
 {
 	int i;
 	int n;
@@ -2119,14 +2108,12 @@ int timeout;
 }
 
 static void
-wakeup_handler(sig)
-int sig;
+wakeup_handler(int sig)
 {
 }
 
 static void
-proc_poller(pfd)
-int pfd;
+proc_poller(int pfd)
 {
 	struct proc_pollfd pollinfo;
 	struct sigaction sa;
@@ -2247,7 +2234,7 @@ choose_pfd()
 }
 
 static int
-trace()
+trace(void)
 {
 #ifdef POLL_HACK
 	struct tcb *in_syscall = NULL;
@@ -2961,8 +2948,7 @@ tprintf(const char *fmt, ...)
 }
 
 void
-printleader(tcp)
-struct tcb *tcp;
+printleader(struct tcb *tcp)
 {
 	if (tcp_last) {
 		if (tcp_last->ptrace_errno) {
@@ -3014,8 +3000,7 @@ struct tcb *tcp;
 }
 
 void
-tabto(col)
-int col;
+tabto(int col)
 {
 	if (curcol < col)
 		tprintf("%*s", col - curcol, "");

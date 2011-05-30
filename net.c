@@ -1426,9 +1426,7 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg)
 }
 
 static void
-printmsghdr(tcp, addr)
-struct tcb *tcp;
-long addr;
+printmsghdr(struct tcb *tcp, long addr)
 {
 	struct msghdr msg;
 
@@ -1513,8 +1511,7 @@ sys_socket(struct tcb *tcp)
 
 #ifdef SVR4
 int
-sys_so_socket(tcp)
-struct tcb *tcp;
+sys_so_socket(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		/* not sure really what these args are... but this
@@ -1529,8 +1526,7 @@ struct tcb *tcp;
 }
 
 int
-sys_so_socketpair(tcp)
-struct tcb *tcp;
+sys_so_socketpair(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		/* not sure what this arg is */
@@ -1541,8 +1537,7 @@ struct tcb *tcp;
 #endif /* SVR4 */
 
 int
-sys_bind(tcp)
-struct tcb *tcp;
+sys_bind(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1553,15 +1548,13 @@ struct tcb *tcp;
 }
 
 int
-sys_connect(tcp)
-struct tcb *tcp;
+sys_connect(struct tcb *tcp)
 {
 	return sys_bind(tcp);
 }
 
 int
-sys_listen(tcp)
-struct tcb *tcp;
+sys_listen(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %lu", tcp->u_arg[0], tcp->u_arg[1]);
@@ -1612,8 +1605,7 @@ sys_accept4(struct tcb *tcp)
 #endif
 
 int
-sys_send(tcp)
-struct tcb *tcp;
+sys_send(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1626,8 +1618,7 @@ struct tcb *tcp;
 }
 
 int
-sys_sendto(tcp)
-struct tcb *tcp;
+sys_sendto(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1647,8 +1638,7 @@ struct tcb *tcp;
 #ifdef HAVE_SENDMSG
 
 int
-sys_sendmsg(tcp)
-struct tcb *tcp;
+sys_sendmsg(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1663,8 +1653,7 @@ struct tcb *tcp;
 #endif /* HAVE_SENDMSG */
 
 int
-sys_recv(tcp)
-struct tcb *tcp;
+sys_recv(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1681,8 +1670,7 @@ struct tcb *tcp;
 }
 
 int
-sys_recvfrom(tcp)
-struct tcb *tcp;
+sys_recvfrom(struct tcb *tcp)
 {
 	int fromlen;
 
@@ -1728,8 +1716,7 @@ struct tcb *tcp;
 #ifdef HAVE_SENDMSG
 
 int
-sys_recvmsg(tcp)
-struct tcb *tcp;
+sys_recvmsg(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1804,8 +1791,7 @@ static const struct xlat shutdown_modes[] = {
 };
 
 int
-sys_shutdown(tcp)
-struct tcb *tcp;
+sys_shutdown(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -1815,15 +1801,13 @@ struct tcb *tcp;
 }
 
 int
-sys_getsockname(tcp)
-struct tcb *tcp;
+sys_getsockname(struct tcb *tcp)
 {
 	return sys_accept(tcp);
 }
 
 int
-sys_getpeername(tcp)
-struct tcb *tcp;
+sys_getpeername(struct tcb *tcp)
 {
 	return sys_accept(tcp);
 }
@@ -2048,9 +2032,7 @@ sys_getsockopt(struct tcb *tcp)
 }
 
 #if defined(ICMP_FILTER)
-static void printicmpfilter(tcp, addr)
-struct tcb *tcp;
-long addr;
+static void printicmpfilter(struct tcb *tcp, long addr)
 {
 	struct icmp_filter	filter;
 
@@ -2074,12 +2056,7 @@ long addr;
 #endif /* ICMP_FILTER */
 
 static int
-printsockopt (tcp, level, name, addr, len)
-struct tcb *tcp;
-int level;
-int name;
-long addr;
-int len;
+printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 {
 	printxval(socketlayers, level, "SOL_??");
 	tprintf (", ");
@@ -2193,10 +2170,7 @@ int len;
 #ifdef HAVE_STRUCT_OPTHDR
 
 void
-print_sock_optmgmt (tcp, addr, len)
-struct tcb *tcp;
-long addr;
-int len;
+print_sock_optmgmt(struct tcb *tcp, long addr, int len)
 {
 	int c = 0;
 	struct opthdr hdr;
@@ -2229,8 +2203,7 @@ int len;
 #endif
 
 int
-sys_setsockopt(tcp)
-struct tcb *tcp;
+sys_setsockopt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -2255,9 +2228,7 @@ static const struct xlat sock_version[] = {
 
 
 int
-netlib_call(tcp, func)
-struct tcb *tcp;
-int (*func) ();
+netlib_call(struct tcb *tcp, int (*func)())
 {
 	if (entering(tcp)) {
 		int i;
@@ -2274,64 +2245,55 @@ int (*func) ();
 }
 
 int
-sys_xsocket(tcp)
-struct tcb *tcp;
+sys_xsocket(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_socket);
 }
 
 int
-sys_xsocketpair(tcp)
-struct tcb *tcp;
+sys_xsocketpair(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_socketpair);
 }
 
 int
-sys_xbind(tcp)
-struct tcb *tcp;
+sys_xbind(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_bind);
 }
 
 int
-sys_xconnect(tcp)
-struct tcb *tcp;
+sys_xconnect(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_connect);
 }
 
 int
-sys_xlisten(tcp)
-struct tcb *tcp;
+sys_xlisten(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_listen);
 }
 
 int
-sys_xaccept(tcp)
-struct tcb *tcp;
+sys_xaccept(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_accept);
 }
 
 int
-sys_xsendmsg(tcp)
-struct tcb *tcp;
+sys_xsendmsg(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_sendmsg);
 }
 
 int
-sys_xrecvmsg(tcp)
-struct tcb *tcp;
+sys_xrecvmsg(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_recvmsg);
 }
 
 int
-sys_xgetsockaddr(tcp)
-struct tcb *tcp;
+sys_xgetsockaddr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval (sock_version, tcp->u_arg[0], "__NETLIB_???");
@@ -2362,22 +2324,19 @@ struct tcb *tcp;
 }
 
 int
-sys_xgetsockopt(tcp)
-struct tcb *tcp;
+sys_xgetsockopt(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_getsockopt);
 }
 
 int
-sys_xsetsockopt(tcp)
-struct tcb *tcp;
+sys_xsetsockopt(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_setsockopt);
 }
 
 int
-sys_xshutdown(tcp)
-struct tcb *tcp;
+sys_xshutdown(struct tcb *tcp)
 {
 	return netlib_call (tcp, sys_shutdown);
 }

@@ -528,11 +528,7 @@ static const struct subcall subcalls_table[] = {
 #if !(defined(LINUX) && ( defined(ALPHA) || defined(MIPS) || defined(__ARM_EABI__) ))
 
 static void
-decode_subcall(tcp, subcall, nsubcalls, style)
-struct tcb *tcp;
-int subcall;
-int nsubcalls;
-enum subcall_style style;
+decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style style)
 {
 	unsigned long addr, mask;
 	int i;
@@ -1799,10 +1795,7 @@ get_error(struct tcb *tcp)
 }
 
 int
-force_result(tcp, error, rval)
-	struct tcb *tcp;
-	int error;
-	long rval;
+force_result(struct tcb *tcp, int error, long rval)
 {
 #ifdef LINUX
 # if defined(S390) || defined(S390X)
@@ -2733,8 +2726,7 @@ trace_syscall(struct tcb *tcp)
 }
 
 int
-printargs(tcp)
-struct tcb *tcp;
+printargs(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int i;
@@ -2746,8 +2738,7 @@ struct tcb *tcp;
 }
 
 long
-getrval2(tcp)
-struct tcb *tcp;
+getrval2(struct tcb *tcp)
 {
 	long val = -1;
 
@@ -2800,8 +2791,7 @@ struct tcb *tcp;
  * so if you see "indir" this program has gone astray.
  */
 int
-sys_indir(tcp)
-struct tcb *tcp;
+sys_indir(struct tcb *tcp)
 {
 	int i, scno, nargs;
 

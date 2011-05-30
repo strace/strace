@@ -189,8 +189,7 @@ sys_query_module(struct tcb *tcp)
 }
 
 int
-sys_create_module(tcp)
-struct tcb *tcp;
+sys_create_module(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -200,8 +199,7 @@ struct tcb *tcp;
 }
 
 int
-sys_init_module(tcp)
-struct tcb *tcp;
+sys_init_module(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, ", tcp->u_arg[0]);

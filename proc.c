@@ -87,9 +87,7 @@ static const struct xlat proc_run_flags[] = {
 };
 
 int
-proc_ioctl(tcp, code, arg)
-struct tcb *tcp;
-int code, arg;
+proc_ioctl(struct tcb *tcp, int code, int arg)
 {
 	int val;
 	prstatus_t status;
@@ -203,9 +201,7 @@ static const struct xlat proc_status_flags[] = {
 };
 
 int
-proc_ioctl(tcp, code, arg)
-struct tcb *tcp;
-int code, arg;
+proc_ioctl(struct tcb *tcp, int code, int arg)
 {
 	int val;
 	struct procfs_status status;

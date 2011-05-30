@@ -57,8 +57,7 @@
 #endif
 
 int
-sys_brk(tcp)
-struct tcb *tcp;
+sys_brk(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx", tcp->u_arg[0]);
@@ -72,8 +71,7 @@ struct tcb *tcp;
 
 #if defined(FREEBSD) || defined(SUNOS4)
 int
-sys_sbrk(tcp)
-struct tcb *tcp;
+sys_sbrk(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
@@ -267,8 +265,7 @@ print_mmap(struct tcb *tcp, long *u_arg, long long offset)
 }
 
 #ifdef LINUX
-int sys_old_mmap(tcp)
-struct tcb *tcp;
+int sys_old_mmap(struct tcb *tcp)
 {
 	long u_arg[6];
 
@@ -315,8 +312,7 @@ struct tcb *tcp;
 #endif
 
 int
-sys_mmap(tcp)
-struct tcb *tcp;
+sys_mmap(struct tcb *tcp)
 {
 	long long offset = tcp->u_arg[5];
 
@@ -385,8 +381,7 @@ sys_mmap64(struct tcb *tcp)
 
 
 int
-sys_munmap(tcp)
-struct tcb *tcp;
+sys_munmap(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu",
@@ -396,8 +391,7 @@ struct tcb *tcp;
 }
 
 int
-sys_mprotect(tcp)
-struct tcb *tcp;
+sys_mprotect(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ",
@@ -454,8 +448,7 @@ static const struct xlat madvise_cmds[] = {
 
 
 int
-sys_madvise(tcp)
-struct tcb *tcp;
+sys_madvise(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -476,8 +469,7 @@ static const struct xlat mlockall_flags[] = {
 };
 
 int
-sys_mlockall(tcp)
-struct tcb *tcp;
+sys_mlockall(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printflags(mlockall_flags, tcp->u_arg[0], "MCL_???");
@@ -500,8 +492,7 @@ static const struct xlat mctl_sync[] = {
 };
 
 int
-sys_msync(tcp)
-struct tcb *tcp;
+sys_msync(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		/* addr */
@@ -534,8 +525,7 @@ static const struct xlat mctl_lockas[] = {
 };
 
 int
-sys_mctl(tcp)
-struct tcb *tcp;
+sys_mctl(struct tcb *tcp)
 {
 	int arg, function;
 
@@ -568,8 +558,7 @@ struct tcb *tcp;
 #endif /* MC_SYNC */
 
 int
-sys_mincore(tcp)
-struct tcb *tcp;
+sys_mincore(struct tcb *tcp)
 {
 	unsigned long i, len;
 	char *vec = NULL;
@@ -601,8 +590,7 @@ struct tcb *tcp;
 
 #if defined(ALPHA) || defined(FREEBSD) || defined(IA64) || defined(SUNOS4) || defined(SVR4) || defined(SPARC) || defined(SPARC64)
 int
-sys_getpagesize(tcp)
-struct tcb *tcp;
+sys_getpagesize(struct tcb *tcp)
 {
 	if (exiting(tcp))
 		return RVAL_HEX;
@@ -633,8 +621,7 @@ print_ldt_entry(struct modify_ldt_ldt_s *ldt_entry)
 }
 
 int
-sys_modify_ldt(tcp)
-struct tcb *tcp;
+sys_modify_ldt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		struct modify_ldt_ldt_s copy;
@@ -657,8 +644,7 @@ struct tcb *tcp;
 }
 
 int
-sys_set_thread_area(tcp)
-struct tcb *tcp;
+sys_set_thread_area(struct tcb *tcp)
 {
 	struct modify_ldt_ldt_s copy;
 	if (entering(tcp)) {
@@ -686,8 +672,7 @@ struct tcb *tcp;
 }
 
 int
-sys_get_thread_area(tcp)
-struct tcb *tcp;
+sys_get_thread_area(struct tcb *tcp)
 {
 	struct modify_ldt_ldt_s copy;
 	if (exiting(tcp)) {
@@ -710,8 +695,7 @@ struct tcb *tcp;
 #if defined(LINUX) && defined(M68K)
 
 int
-sys_set_thread_area(tcp)
-struct tcb *tcp;
+sys_set_thread_area(struct tcb *tcp)
 {
 	if (entering(tcp))
 		tprintf("%#lx", tcp->u_arg[0]);
@@ -720,8 +704,7 @@ struct tcb *tcp;
 }
 
 int
-sys_get_thread_area(tcp)
-struct tcb *tcp;
+sys_get_thread_area(struct tcb *tcp)
 {
 	return RVAL_HEX;
 }
@@ -729,8 +712,7 @@ struct tcb *tcp;
 
 #if defined(LINUX)
 int
-sys_remap_file_pages(tcp)
-struct tcb *tcp;
+sys_remap_file_pages(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -789,11 +771,7 @@ static const struct xlat move_pages_flags[] = {
 
 
 static void
-get_nodes(tcp, ptr, maxnodes, err)
-struct tcb *tcp;
-unsigned long ptr;
-unsigned long maxnodes;
-int err;
+get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)
 {
 	unsigned long nlongs, size, end;
 
@@ -836,8 +814,7 @@ int err;
 }
 
 int
-sys_mbind(tcp)
-struct tcb *tcp;
+sys_mbind(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -850,8 +827,7 @@ struct tcb *tcp;
 }
 
 int
-sys_set_mempolicy(tcp)
-struct tcb *tcp;
+sys_set_mempolicy(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(policies, tcp->u_arg[0], "MPOL_???");
@@ -861,8 +837,7 @@ struct tcb *tcp;
 }
 
 int
-sys_get_mempolicy(tcp)
-struct tcb *tcp;
+sys_get_mempolicy(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		int pol;
@@ -880,8 +855,7 @@ struct tcb *tcp;
 }
 
 int
-sys_move_pages(tcp)
-struct tcb *tcp;
+sys_move_pages(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		unsigned long npages = tcp->u_arg[1];
@@ -954,8 +928,7 @@ struct tcb *tcp;
 
 #if defined(LINUX) && defined(POWERPC)
 int
-sys_subpage_prot(tcp)
-struct tcb *tcp;
+sys_subpage_prot(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		unsigned long cur, end, abbrev_end, entries;

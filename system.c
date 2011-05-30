@@ -208,8 +208,7 @@ static const struct xlat personality_options[] = {
 };
 
 int
-sys_personality(tcp)
-struct tcb *tcp;
+sys_personality(struct tcb *tcp)
 {
 	if (entering(tcp))
 		printxval(personality_options, tcp->u_arg[0], "PER_???");
@@ -240,8 +239,7 @@ static const struct xlat bootflags3[] = {
 };
 
 int
-sys_reboot(tcp)
-struct tcb *tcp;
+sys_reboot(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printflags(bootflags1, tcp->u_arg[0], "LINUX_REBOOT_MAGIC_???");
@@ -285,8 +283,7 @@ static const struct xlat cacheflush_flags[] = {
 };
 
 int
-sys_cacheflush(tcp)
-struct tcb *tcp;
+sys_cacheflush(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		/* addr */
@@ -402,8 +399,7 @@ sys_cacheflush(struct tcb *tcp)
 
 /*ARGSUSED*/
 int
-sys_sync(tcp)
-struct tcb *tcp;
+sys_sync(struct tcb *tcp)
 {
 	return 0;
 }
@@ -424,8 +420,7 @@ static const struct xlat bootflags[] = {
 };
 
 int
-sys_reboot(tcp)
-struct tcb *tcp;
+sys_reboot(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printflags(bootflags, tcp->u_arg[0], "RB_???");
@@ -437,8 +432,7 @@ struct tcb *tcp;
 }
 
 int
-sys_sysacct(tcp)
-struct tcb *tcp;
+sys_sysacct(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
@@ -447,8 +441,7 @@ struct tcb *tcp;
 }
 
 int
-sys_swapon(tcp)
-struct tcb *tcp;
+sys_swapon(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
@@ -457,8 +450,7 @@ struct tcb *tcp;
 }
 
 int
-sys_nfs_svc(tcp)
-struct tcb *tcp;
+sys_nfs_svc(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printsock(tcp, tcp->u_arg[0]);
@@ -512,8 +504,7 @@ static const struct xlat nfsflags[] = {
 };
 
 int
-sys_mount(tcp)
-struct tcb *tcp;
+sys_mount(struct tcb *tcp)
 {
 	char type[4];
 
@@ -581,8 +572,7 @@ struct tcb *tcp;
 }
 
 int
-sys_unmount(tcp)
-struct tcb *tcp;
+sys_unmount(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
@@ -591,15 +581,13 @@ struct tcb *tcp;
 }
 
 int
-sys_umount(tcp)
-struct tcb *tcp;
+sys_umount(struct tcb *tcp)
 {
 	return sys_unmount(tcp);
 }
 
 int
-sys_auditsys(tcp)
-struct tcb *tcp;
+sys_auditsys(struct tcb *tcp)
 {
 	/* XXX - no information available */
 	return printargs(tcp);
@@ -612,8 +600,7 @@ static const struct xlat ex_auth_flags[] = {
 };
 
 int
-sys_exportfs(tcp)
-struct tcb *tcp;
+sys_exportfs(struct tcb *tcp)
 {
 	struct export e;
 	int i;
@@ -680,8 +667,7 @@ static const struct xlat sysconflimits[] = {
 };
 
 int
-sys_sysconf(tcp)
-struct tcb *tcp;
+sys_sysconf(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(sysconflimits, tcp->u_arg[0], "_SC_???");
@@ -725,8 +711,7 @@ static const struct xlat pathconflimits[] = {
 
 
 int
-sys_pathconf(tcp)
-struct tcb *tcp;
+sys_pathconf(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
@@ -737,8 +722,7 @@ struct tcb *tcp;
 }
 
 int
-sys_fpathconf(tcp)
-struct tcb *tcp;
+sys_fpathconf(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -839,8 +823,7 @@ static const struct xlat sysconfig_options[] = {
 };
 
 int
-sys_sysconfig(tcp)
-struct tcb *tcp;
+sys_sysconfig(struct tcb *tcp)
 {
 	if (entering(tcp))
 		printxval(sysconfig_options, tcp->u_arg[0], "_CONFIG_???");
@@ -873,8 +856,7 @@ static const struct xlat sysinfo_options[] = {
 };
 
 int
-sys_sysinfo(tcp)
-struct tcb *tcp;
+sys_sysinfo(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(sysinfo_options, tcp->u_arg[0], "SI_???");
@@ -1258,8 +1240,7 @@ static const struct xlat syssgi_options[] = {
 };
 
 int
-sys_syssgi(tcp)
-struct tcb *tcp;
+sys_syssgi(struct tcb *tcp)
 {
 	int i;
 
@@ -1331,8 +1312,7 @@ static const struct xlat nfs_flags[] = {
 };
 
 int
-sys_mount(tcp)
-struct tcb *tcp;
+sys_mount(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -1442,8 +1422,7 @@ static const struct xlat nfs_flags[] = {
 };
 
 int
-sys_mount(tcp)
-struct tcb *tcp;
+sys_mount(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		char fstyp [FSTYPSZ];
@@ -1525,8 +1504,7 @@ struct tcb *tcp;
 #else /* !UNIXWARE */
 
 int
-sys_mount(tcp)
-struct tcb *tcp;
+sys_mount(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -1592,8 +1570,7 @@ static const struct xlat capabilities[] = {
 
 
 int
-sys_capget(tcp)
-struct tcb *tcp;
+sys_capget(struct tcb *tcp)
 {
 	static cap_user_header_t       arg0 = NULL;
 	static cap_user_data_t         arg1 = NULL;
@@ -1644,8 +1621,7 @@ struct tcb *tcp;
 }
 
 int
-sys_capset(tcp)
-struct tcb *tcp;
+sys_capset(struct tcb *tcp)
 {
 	static cap_user_header_t       arg0 = NULL;
 	static cap_user_data_t         arg1 = NULL;
@@ -1697,14 +1673,12 @@ struct tcb *tcp;
 
 #else
 
-int sys_capget(tcp)
-struct tcb *tcp;
+int sys_capget(struct tcb *tcp)
 {
 	return printargs(tcp);
 }
 
-int sys_capset(tcp)
-struct tcb *tcp;
+int sys_capset(struct tcb *tcp)
 {
 	return printargs(tcp);
 }
@@ -1958,8 +1932,7 @@ static const struct xlat sysctl_net_ipv6_route[] = {
 };
 
 int
-sys_sysctl(tcp)
-struct tcb *tcp;
+sys_sysctl(struct tcb *tcp)
 {
 	struct __sysctl_args info;
 	int *name;
@@ -2113,8 +2086,7 @@ struct tcb *tcp;
 	return 0;
 }
 #else
-int sys_sysctl(tcp)
-struct tcb *tcp;
+int sys_sysctl(struct tcb *tcp)
 {
 	return printargs(tcp);
 }
@@ -2123,8 +2095,7 @@ struct tcb *tcp;
 #ifdef FREEBSD
 #include <sys/sysctl.h>
 
-int sys___sysctl(tcp)
-struct tcb *tcp;
+int sys___sysctl(struct tcb *tcp)
 {
 	int qoid[CTL_MAXNAME+2];
 	char ctl[1024];
@@ -2183,8 +2154,7 @@ static const struct xlat ksym_flags[] = {
 };
 
 int
-sys_getksym(tcp)
-struct tcb *tcp;
+sys_getksym(struct tcb *tcp)
 {
 	if (entering (tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
@@ -2265,8 +2235,7 @@ static const struct xlat ssi_cmd [] = {
 	{ 0,		NULL		},
 };
 
-int sys_ssisys (tcp)
-struct tcb *tcp;
+int sys_ssisys(struct tcb *tcp)
 {
 	struct ssisys_iovec iov;
 	cls_nodeinfo_args_t cni;
@@ -2356,8 +2325,7 @@ static const struct xlat sysmips_operations[] = {
 	{ 0, NULL }
 };
 
-int sys_sysmips(tcp)
-struct tcb *tcp;
+int sys_sysmips(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(sysmips_operations, tcp->u_arg[0], "???");

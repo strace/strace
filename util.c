@@ -94,15 +94,13 @@
 #endif
 
 int
-tv_nz(a)
-struct timeval *a;
+tv_nz(struct timeval *a)
 {
 	return a->tv_sec || a->tv_usec;
 }
 
 int
-tv_cmp(a, b)
-struct timeval *a, *b;
+tv_cmp(struct timeval *a, struct timeval *b)
 {
 	if (a->tv_sec < b->tv_sec
 	    || (a->tv_sec == b->tv_sec && a->tv_usec < b->tv_usec))
@@ -114,15 +112,13 @@ struct timeval *a, *b;
 }
 
 double
-tv_float(tv)
-struct timeval *tv;
+tv_float(struct timeval *tv)
 {
 	return tv->tv_sec + tv->tv_usec/1000000.0;
 }
 
 void
-tv_add(tv, a, b)
-struct timeval *tv, *a, *b;
+tv_add(struct timeval *tv, struct timeval *a, struct timeval *b)
 {
 	tv->tv_sec = a->tv_sec + b->tv_sec;
 	tv->tv_usec = a->tv_usec + b->tv_usec;
@@ -133,8 +129,7 @@ struct timeval *tv, *a, *b;
 }
 
 void
-tv_sub(tv, a, b)
-struct timeval *tv, *a, *b;
+tv_sub(struct timeval *tv, struct timeval *a, struct timeval *b)
 {
 	tv->tv_sec = a->tv_sec - b->tv_sec;
 	tv->tv_usec = a->tv_usec - b->tv_usec;
@@ -145,9 +140,7 @@ struct timeval *tv, *a, *b;
 }
 
 void
-tv_div(tv, a, n)
-struct timeval *tv, *a;
-int n;
+tv_div(struct timeval *tv, struct timeval *a, int n)
 {
 	tv->tv_usec = (a->tv_sec % n * 1000000 + a->tv_usec + n / 2) / n;
 	tv->tv_sec = a->tv_sec / n + tv->tv_usec / 1000000;
@@ -155,9 +148,7 @@ int n;
 }
 
 void
-tv_mul(tv, a, n)
-struct timeval *tv, *a;
-int n;
+tv_mul(struct timeval *tv, struct timeval *a, int n)
 {
 	tv->tv_usec = a->tv_usec * n;
 	tv->tv_sec = a->tv_sec * n + tv->tv_usec / 1000000;
@@ -288,9 +279,7 @@ printllval(struct tcb *tcp, const char *format, int llarg)
  * return # of flags printed.
  */
 int
-addflags(xlat, flags)
-const struct xlat *xlat;
-int flags;
+addflags(const struct xlat *xlat, int flags)
 {
 	int n;
 
@@ -427,9 +416,7 @@ printfd(struct tcb *tcp, int fd)
 }
 
 void
-printuid(text, uid)
-const char *text;
-unsigned long uid;
+printuid(const char *text, unsigned long uid)
 {
 	tprintf("%s", text);
 	tprintf((uid == -1) ? "%ld" : "%lu", uid);
@@ -644,10 +631,7 @@ printstr(struct tcb *tcp, long addr, int len)
 
 #if HAVE_SYS_UIO_H
 void
-dumpiov(tcp, len, addr)
-struct tcb * tcp;
-int len;
-long addr;
+dumpiov(struct tcb *tcp, int len, long addr)
 {
 #if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
 	union {
@@ -698,10 +682,7 @@ long addr;
 #endif
 
 void
-dumpstr(tcp, addr, len)
-struct tcb *tcp;
-long addr;
-int len;
+dumpstr(struct tcb *tcp, long addr, int len)
 {
 	static int strsize = -1;
 	static unsigned char *str;
@@ -945,12 +926,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 #ifdef SUNOS4
 
 static int
-uload(cmd, pid, addr, len, laddr)
-int cmd;
-int pid;
-long addr;
-int len;
-char *laddr;
+uload(int cmd, int pid, long addr, int len, char *laddr)
 {
 	int peek, poke;
 	int n, m;
@@ -998,20 +974,13 @@ char *laddr;
 }
 
 int
-tload(pid, addr, len, laddr)
-int pid;
-int addr, len;
-char *laddr;
+tload(int pid, int addr, int len, char *laddr)
 {
 	return uload(PTRACE_WRITETEXT, pid, addr, len, laddr);
 }
 
 int
-dload(pid, addr, len, laddr)
-int pid;
-int addr;
-int len;
-char *laddr;
+dload(int pid, int addr, int len, char *laddr)
 {
 	return uload(PTRACE_WRITEDATA, pid, addr, len, laddr);
 }
@@ -1021,10 +990,7 @@ char *laddr;
 #ifndef USE_PROCFS
 
 int
-upeek(tcp, off, res)
-struct tcb *tcp;
-long off;
-long *res;
+upeek(struct tcb *tcp, long off, long *res)
 {
 	long val;
 
@@ -1312,7 +1278,7 @@ arg_setup(struct tcb *tcp, arg_setup_state *state)
 
 #   ifdef SYS_fork
 static int
-get_arg0 (struct tcb *tcp, arg_setup_state *state, long *valp)
+get_arg0(struct tcb *tcp, arg_setup_state *state, long *valp)
 {
 	int ret;
 
@@ -1326,7 +1292,7 @@ get_arg0 (struct tcb *tcp, arg_setup_state *state, long *valp)
 }
 
 static int
-get_arg1 (struct tcb *tcp, arg_setup_state *state, long *valp)
+get_arg1(struct tcb *tcp, arg_setup_state *state, long *valp)
 {
 	int ret;
 
@@ -1341,7 +1307,7 @@ get_arg1 (struct tcb *tcp, arg_setup_state *state, long *valp)
 #   endif
 
 static int
-set_arg0 (struct tcb *tcp, arg_setup_state *state, long val)
+set_arg0(struct tcb *tcp, arg_setup_state *state, long val)
 {
 	int req = PTRACE_POKEDATA;
 	void *ap;
@@ -1357,7 +1323,7 @@ set_arg0 (struct tcb *tcp, arg_setup_state *state, long val)
 }
 
 static int
-set_arg1 (struct tcb *tcp, arg_setup_state *state, long val)
+set_arg1(struct tcb *tcp, arg_setup_state *state, long val)
 {
 	int req = PTRACE_POKEDATA;
 	void *ap;
@@ -1455,13 +1421,13 @@ typedef int arg_setup_state;
     (upeek ((tcp), arg1_offset, (valp)))
 
 static int
-set_arg0 (struct tcb *tcp, void *cookie, long val)
+set_arg0(struct tcb *tcp, void *cookie, long val)
 {
 	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val);
 }
 
 static int
-set_arg1 (struct tcb *tcp, void *cookie, long val)
+set_arg1(struct tcb *tcp, void *cookie, long val)
 {
 	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg1_offset, val);
 }
@@ -1561,8 +1527,7 @@ setbpt(struct tcb *tcp)
 }
 
 int
-clearbpt(tcp)
-struct tcb *tcp;
+clearbpt(struct tcb *tcp)
 {
 	arg_setup_state state;
 	if (arg_setup (tcp, &state) < 0
@@ -1577,8 +1542,7 @@ struct tcb *tcp;
 # else /* !defined LINUX */
 
 int
-setbpt(tcp)
-struct tcb *tcp;
+setbpt(struct tcb *tcp)
 {
 #  ifdef SUNOS4
 #   ifdef SPARC	/* This code is slightly sparc specific */
@@ -1633,8 +1597,7 @@ struct tcb *tcp;
 }
 
 int
-clearbpt(tcp)
-struct tcb *tcp;
+clearbpt(struct tcb *tcp)
 {
 #  ifdef SUNOS4
 #   ifdef SPARC
@@ -1697,9 +1660,7 @@ struct tcb *tcp;
 #ifdef SUNOS4
 
 static int
-getex(tcp, hdr)
-struct tcb *tcp;
-struct exec *hdr;
+getex(struct tcb *tcp, struct exec *hdr)
 {
 	int n;
 
@@ -1719,8 +1680,7 @@ struct exec *hdr;
 }
 
 int
-fixvfork(tcp)
-struct tcb *tcp;
+fixvfork(struct tcb *tcp)
 {
 	int pid = tcp->pid;
 	/*

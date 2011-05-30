@@ -158,8 +158,7 @@ static const struct xlat semop_flags[] = {
 	{ 0,		NULL		},
 };
 
-int sys_msgget(tcp)
-struct tcb *tcp;
+int sys_msgget(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		if (tcp->u_arg[0])
@@ -183,8 +182,7 @@ struct tcb *tcp;
 #endif
 
 static int
-indirect_ipccall(tcp)
-struct tcb *tcp;
+indirect_ipccall(struct tcb *tcp)
 {
 #ifdef LINUX
 #ifdef X86_64
@@ -200,8 +198,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-int sys_msgctl(tcp)
-struct tcb *tcp;
+int sys_msgctl(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -360,8 +357,7 @@ int sys_semtimedop(struct tcb *tcp)
 }
 #endif
 
-int sys_semget(tcp)
-struct tcb *tcp;
+int sys_semget(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		if (tcp->u_arg[0])
@@ -377,8 +373,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-int sys_semctl(tcp)
-struct tcb *tcp;
+int sys_semctl(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
@@ -389,8 +384,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-int sys_shmget(tcp)
-struct tcb *tcp;
+int sys_shmget(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		if (tcp->u_arg[0])
@@ -406,8 +400,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-int sys_shmctl(tcp)
-struct tcb *tcp;
+int sys_shmctl(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -421,8 +414,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-int sys_shmat(tcp)
-struct tcb *tcp;
+int sys_shmat(struct tcb *tcp)
 {
 #ifdef LINUX
 	unsigned long raddr;
@@ -452,8 +444,7 @@ struct tcb *tcp;
 	return 0;
 }
 
-int sys_shmdt(tcp)
-struct tcb *tcp;
+int sys_shmdt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		if (indirect_ipccall(tcp)) {

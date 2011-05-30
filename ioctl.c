@@ -69,9 +69,7 @@ const struct ioctlent *ioctlent;
 int nioctlents;
 
 static int
-compare(a, b)
-const void *a;
-const void *b;
+compare(const void *a, const void *b)
 {
 	unsigned long code1 = ((struct ioctlent *) a)->code;
 	unsigned long code2 = ((struct ioctlent *) b)->code;
@@ -79,8 +77,7 @@ const void *b;
 }
 
 const struct ioctlent *
-ioctl_lookup(code)
-long code;
+ioctl_lookup(long code)
 {
 	struct ioctlent *iop, ioent;
 
@@ -111,9 +108,7 @@ const struct ioctlent *iop;
 }
 
 int
-ioctl_decode(tcp, code, arg)
-struct tcb *tcp;
-long code, arg;
+ioctl_decode(struct tcb *tcp, long code, long arg)
 {
 	switch ((code >> 8) & 0xff) {
 #ifdef LINUX

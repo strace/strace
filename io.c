@@ -76,10 +76,7 @@ sys_write(struct tcb *tcp)
 
 #if HAVE_SYS_UIO_H
 void
-tprint_iov(tcp, len, addr)
-struct tcb * tcp;
-unsigned long len;
-unsigned long addr;
+tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr)
 {
 #if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
 	union {

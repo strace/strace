@@ -77,10 +77,7 @@ static const struct xlat msgflags[] = {
 
 
 static void
-printstrbuf(tcp, sbp, getting)
-struct tcb *tcp;
-struct strbuf *sbp;
-int getting;
+printstrbuf(struct tcb *tcp, struct strbuf *sbp, int getting)
 {
 	if (sbp->maxlen == -1 && getting)
 		tprintf("{maxlen=-1}");
@@ -95,10 +92,7 @@ int getting;
 }
 
 static void
-printstrbufarg(tcp, arg, getting)
-struct tcb *tcp;
-int arg;
-int getting;
+printstrbufarg(struct tcb *tcp, int arg, int getting)
 {
 	struct strbuf buf;
 
@@ -112,8 +106,7 @@ int getting;
 }
 
 int
-sys_putmsg(tcp)
-struct tcb *tcp;
+sys_putmsg(struct tcb *tcp)
 {
 	int i;
 
@@ -131,8 +124,7 @@ struct tcb *tcp;
 
 #if defined(SPARC) || defined(SPARC64) || defined(SUNOS4) || defined(SVR4)
 int
-sys_getmsg(tcp)
-struct tcb *tcp;
+sys_getmsg(struct tcb *tcp)
 {
 	int i, flags;
 
@@ -195,8 +187,7 @@ static const struct xlat pmsgflags[] = {
 
 #ifdef SYS_putpmsg
 int
-sys_putpmsg(tcp)
-struct tcb *tcp;
+sys_putpmsg(struct tcb *tcp)
 {
 	int i;
 
@@ -217,8 +208,7 @@ struct tcb *tcp;
 
 #ifdef SYS_getpmsg
 int
-sys_getpmsg(tcp)
-struct tcb *tcp;
+sys_getpmsg(struct tcb *tcp)
 {
 	int i, flags;
 
@@ -467,8 +457,7 @@ sys_ppoll(struct tcb *tcp)
 
 #else /* !HAVE_SYS_POLL_H */
 int
-sys_poll(tcp)
-struct tcb *tcp;
+sys_poll(struct tcb *tcp)
 {
 	return 0;
 }
@@ -608,10 +597,7 @@ static const struct xlat xti_generic [] = {
 
 
 void
-print_xti_optmgmt (tcp, addr, len)
-struct tcb *tcp;
-long addr;
-int len;
+print_xti_optmgmt(struct tcb *tcp, long addr, int len)
 {
 	int c = 0;
 	struct t_opthdr hdr;
@@ -662,10 +648,7 @@ int len;
 
 
 static void
-print_optmgmt (tcp, addr, len)
-struct tcb *tcp;
-long addr;
-int len;
+print_optmgmt(struct tcb *tcp, long addr, int len)
 {
 	/* We don't know how to tell if TLI (socket) or XTI
 	   optmgmt is being used yet, assume TLI. */
@@ -753,11 +736,7 @@ static const struct xlat tli_errors [] = {
 
 
 static int
-print_transport_message (tcp, expect, addr, len)
-struct tcb *tcp;
-int expect;
-long addr;
-int len;
+print_transport_message(struct tcb *tcp, int expect, long addr, int len)
 {
 	union T_primitives m;
 	int c = 0;
@@ -1180,9 +1159,7 @@ static int internal_stream_ioctl(struct tcb *tcp, int arg)
 }
 
 int
-stream_ioctl(tcp, code, arg)
-struct tcb *tcp;
-int code, arg;
+stream_ioctl(struct tcb *tcp, int code, int arg)
 {
 #ifdef I_LIST
 	int i;
