@@ -308,29 +308,29 @@ extern int sys_door();
 extern int sys_sigwait();
 extern int sys_truncate();
 extern int sys_ftruncate();
-extern int sys_getksym ();
+extern int sys_getksym();
 extern int sys_procpriv();
 #endif
 #if UNIXWARE >= 7
-extern int sys_lseek64 ();
-extern int sys_truncate64 ();
-extern int sys_ftruncate64 ();
-extern int sys_xsocket ();
-extern int sys_xsocketpair ();
-extern int sys_xbind ();
-extern int sys_xconnect ();
-extern int sys_xlisten ();
-extern int sys_xaccept ();
-extern int sys_xrecvmsg ();
-extern int sys_xsendmsg ();
-extern int sys_xgetsockaddr ();
-extern int sys_xsetsockaddr ();
-extern int sys_xgetsockopt ();
-extern int sys_xsetsockopt ();
-extern int sys_xshutdown ();
-extern int sys_rfork ();
-extern int sys_ssisys ();
-extern int sys_rexecve ();
+extern int sys_lseek64();
+extern int sys_truncate64();
+extern int sys_ftruncate64();
+extern int sys_xsocket();
+extern int sys_xsocketpair();
+extern int sys_xbind();
+extern int sys_xconnect();
+extern int sys_xlisten();
+extern int sys_xaccept();
+extern int sys_xrecvmsg();
+extern int sys_xsendmsg();
+extern int sys_xgetsockaddr();
+extern int sys_xsetsockaddr();
+extern int sys_xgetsockopt();
+extern int sys_xsetsockopt();
+extern int sys_xshutdown();
+extern int sys_rfork();
+extern int sys_ssisys();
+extern int sys_rexecve();
 #endif
 #endif /* !MIPS */
 

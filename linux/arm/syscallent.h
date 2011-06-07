@@ -202,7 +202,7 @@
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 173 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"  }, /* 174 */
+	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 175 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 176 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 177 */
@@ -247,7 +247,7 @@
 	{ 1,	0,	sys_setgid,		"setgid32"	}, /* 214 */
 	{ 1,	NF,	sys_setfsuid,		"setfsuid32"	}, /* 215 */
 	{ 1,	NF,	sys_setfsgid,		"setfsgid32"	}, /* 216 */
-	{ 3,    0,      sys_getdents64,         "getdents64"    }, /* 217 */
+	{ 3,	0,	sys_getdents64,		"getdents64"	}, /* 217 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 218 */
 	{ 3,	0,	printargs,		"mincore"	}, /* 219 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 220 */

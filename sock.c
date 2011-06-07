@@ -190,7 +190,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 					  "AF_???");
 				tprintf(", ");
 				print_addr(tcp, ((long) tcp->u_arg[2]
-						 + offsetof (struct ifreq,
+						 + offsetof(struct ifreq,
 							     ifr_addr.sa_data)),
 					   &ifr);
 				tprintf("}");
@@ -273,7 +273,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 						  "AF_???");
 					tprintf(", ");
 					print_addr(tcp, ((long) tcp->u_arg[2]
-							 + offsetof (struct ifreq,
+							 + offsetof(struct ifreq,
 								     ifr_addr.sa_data)
 							 + ((char *) &ifra[i]
 							    - (char *) &ifra[0])),

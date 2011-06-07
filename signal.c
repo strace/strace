@@ -460,7 +460,7 @@ typedef union sigval
 } sigval_t;
 
 # define __SI_MAX_SIZE     128
-# define __SI_PAD_SIZE     ((__SI_MAX_SIZE / sizeof (int)) - 3)
+# define __SI_PAD_SIZE     ((__SI_MAX_SIZE / sizeof(int)) - 3)
 
 typedef struct siginfo
 {
@@ -659,7 +659,7 @@ printsiginfo(siginfo_t *sip, int verbose)
 	const char *code;
 
 	if (sip->si_signo == 0) {
-		tprintf ("{}");
+		tprintf("{}");
 		return;
 	}
 	tprintf("{si_signo=");
@@ -1148,7 +1148,7 @@ sys_sigaction(struct tcb *tcp)
 #endif /* !USE_PROCFS */
 			tprintf("{%#lx, ", (long) sa.SA_HANDLER);
 #ifndef LINUX
-			printsigmask (&sa.sa_mask, 0);
+			printsigmask(&sa.sa_mask, 0);
 #else
 			long_to_sigset(sa.sa_mask, &sigset);
 			printsigmask(&sigset, 0);
@@ -1269,17 +1269,17 @@ sys_sigreturn(struct tcb *tcp)
 
 	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
-		if (upeek(tcp,PT_GPR15,&usp)<0)
+		if (upeek(tcp, PT_GPR15, &usp) < 0)
 			return 0;
 		if (umove(tcp, usp+__SIGNAL_FRAMESIZE, &sc) < 0)
 			return 0;
 		tcp->u_arg[0] = 1;
-		memcpy(&tcp->u_arg[1],&sc.oldmask[0],sizeof(sigset_t));
+		memcpy(&tcp->u_arg[1], &sc.oldmask[0], sizeof(sigset_t));
 	} else {
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;
-		tcp->auxstr = sprintsigmask("mask now ",(sigset_t *)&tcp->u_arg[1],0);
+		tcp->auxstr = sprintsigmask("mask now ", (sigset_t *)&tcp->u_arg[1], 0);
 		return RVAL_NONE | RVAL_STR;
 	}
 	return 0;
@@ -1324,7 +1324,7 @@ sys_sigreturn(struct tcb *tcp)
 	else {
 		sigset_t sigm;
 
-		memcpy(&sigm, tcp->u_arg + 1, sizeof (sigm));
+		memcpy(&sigm, tcp->u_arg + 1, sizeof(sigm));
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;
@@ -1415,14 +1415,14 @@ sys_sigreturn(struct tcb *tcp)
 	struct pt_regs regs;
 	m_siginfo_t si;
 
-	if(ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
 		perror("sigreturn: PTRACE_GETREGS ");
 		return 0;
 	}
-	if(entering(tcp)) {
+	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
 		i1 = regs.u_regs[U_REG_O1];
-		if(umove(tcp, i1, &si) < 0) {
+		if (umove(tcp, i1, &si) < 0) {
 			perror("sigreturn: umove ");
 			return 0;
 		}
@@ -1432,7 +1432,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[1], &sigm);
 		tcp->u_rval = tcp->u_error = 0;
-		if(tcp->u_arg[0] == 0)
+		if (tcp->u_arg[0] == 0)
 			return 0;
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
@@ -1444,7 +1444,7 @@ sys_sigreturn(struct tcb *tcp)
 	long sp;
 	struct ucontext uc;
 
-	if(entering(tcp)) {
+	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
 		if (upeek(tcp, REG_SP, &sp) < 0)
 			return 0;
@@ -1458,7 +1458,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[1], &sigm);
 		tcp->u_rval = tcp->u_error = 0;
-		if(tcp->u_arg[0] == 0)
+		if (tcp->u_arg[0] == 0)
 			return 0;
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
@@ -1469,11 +1469,11 @@ sys_sigreturn(struct tcb *tcp)
 	struct pt_regs regs;
 	m_siginfo_t si;
 
-	if(ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
 		perror("sigreturn: PTRACE_GETREGS ");
 		return 0;
 	}
-	if(entering(tcp)) {
+	if (entering(tcp)) {
 		tcp->u_arg[0] = 0;
 		sp = regs.regs[29];
 		if (umove(tcp, sp, &si) < 0)
@@ -1483,7 +1483,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[1], &sigm);
 		tcp->u_rval = tcp->u_error = 0;
-		if(tcp->u_arg[0] == 0)
+		if (tcp->u_arg[0] == 0)
 			return 0;
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
@@ -1535,7 +1535,7 @@ sys_sigreturn(struct tcb *tcp)
 	else {
 		sigset_t sigm;
 
-		memcpy(&sigm, tcp->u_arg + 1, sizeof (sigm));
+		memcpy(&sigm, tcp->u_arg + 1, sizeof(sigm));
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;

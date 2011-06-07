@@ -395,7 +395,7 @@ sys_fcntl(struct tcb *tcp)
 			printflock(tcp, tcp->u_arg[2], 1);
 			break;
 #if _LFS64_LARGEFILE
-#if defined(F_GETLK64) && F_GETLK64+0!=F_GETLK
+#if defined(F_GETLK64) && F_GETLK64+0 != F_GETLK
 		case F_GETLK64:
 #endif
 			tprintf(", ");

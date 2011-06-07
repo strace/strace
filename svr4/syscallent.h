@@ -367,7 +367,7 @@
 	{ -1,	0,	printargs,		"SYS_140"	}, /* 140 */
 #if UNIXWARE >= 2
 	{ -1,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
-	{ -1,	0, 	printargs,		"SYS_142"	}, /* 142 */
+	{ -1,	0,	printargs,		"SYS_142"	}, /* 142 */
 	{ -1,	0,	sys_keyctl,		"keyctl"	}, /* 143 */
 	{ -1,	0,	sys_secsys,		"secsys"	}, /* 144 */
 	{ -1,	0,	sys_filepriv,		"filepriv"	}, /* 145 */
@@ -377,10 +377,10 @@
 	{ -1,	0,	sys_fdevstat,		"fdevstat"	}, /* 149 */
 	{ -1,	0,	sys_flvlfile,		"flvlfile"	}, /* 150 */
 	{ -1,	0,	sys_lvlfile,		"lvlfile"	}, /* 151 */
-	{ -1,	0, 	printargs,		"SYS_152"	}, /* 152 */
+	{ -1,	0,	printargs,		"SYS_152"	}, /* 152 */
 	{ -1,	0,	sys_lvlequal,		"lvlequal"	}, /* 153 */
 	{ -1,	0,	sys_lvlproc,		"lvlproc"	}, /* 154 */
-	{ -1,	0, 	printargs,		"SYS_155"	}, /* 155 */
+	{ -1,	0,	printargs,		"SYS_155"	}, /* 155 */
 	{ -1,	0,	sys_lvlipc,		"lvlipc"	}, /* 156 */
 	{ -1,	0,	sys_acl,		"acl"		}, /* 157 */
 	{ -1,	0,	sys_auditevt,		"auditevt"	}, /* 158 */
@@ -406,14 +406,14 @@
 	{ -1,	0,	sys_lwpprivate,		"lwpprivate"	}, /* 178 */
 	{ -1,	0,	sys_processor_bind,	"processor_bind"}, /* 179 */
 	{ -1,	0,	sys_processor_exbind,	"processor_exbind"}, /* 180 */
-	{ -1,	0, 	printargs,		"SYS_181"	}, /* 181 */
-	{ -1,	0, 	printargs,		"SYS_182"	}, /* 182 */
+	{ -1,	0,	printargs,		"SYS_181"	}, /* 181 */
+	{ -1,	0,	printargs,		"SYS_182"	}, /* 182 */
 	{ -1,	0,	sys_prepblock,		"prepblock"	}, /* 183 */
 	{ -1,	0,	sys_block,		"block"		}, /* 184 */
 	{ -1,	0,	sys_rdblock,		"rdblock"	}, /* 185 */
 	{ -1,	0,	sys_unblock,		"unblock"	}, /* 186 */
 	{ -1,	0,	sys_cancelblock,	"cancelblock"	}, /* 187 */
-	{ -1,	0, 	printargs,		"SYS_188"	}, /* 188 */
+	{ -1,	0,	printargs,		"SYS_188"	}, /* 188 */
 	{ -1,	TD,	sys_pread,		"pread"		}, /* 189 */
 	{ -1,	TD,	sys_pwrite,		"pwrite"	}, /* 190 */
 	{ -1,	TF,	sys_truncate,		"truncate"	}, /* 191 */

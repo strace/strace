@@ -120,7 +120,7 @@
 	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 87 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 88 */
 	{ 3,	TD,	sys_readdir,		"readdir"	}, /* 89 */
-	{ 6,	TD,	sys_old_mmap,		"old_mmap"   	}, /* 90 */
+	{ 6,	TD,	sys_old_mmap,		"old_mmap"	}, /* 90 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 91 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 92 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 93 */
@@ -204,7 +204,7 @@
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 173 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"  }, /* 174 */
+	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 175 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 176 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 177 */

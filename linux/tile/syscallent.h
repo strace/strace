@@ -55,7 +55,7 @@
 	{ 0,	0,	sys_getppid,		"getppid" }, /* 54 */
 	{ 0,	0,	sys_getpgrp,		"getpgrp" }, /* 55 */
 	{ 0,	0,	sys_setsid,		"setsid" }, /* 56 */
-	{ 0,	TS, 	printargs,		"sgetmask" }, /* 57 */
+	{ 0,	TS,	printargs,		"sgetmask" }, /* 57 */
 	{ 1,	TS,	printargs,		"ssetmask" }, /* 58 */
 	{ 2,	0,	sys_setreuid,		"setreuid" }, /* 59 */
 	{ 2,	0,	sys_setregid,		"setregid" }, /* 60 */
@@ -287,7 +287,7 @@
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 286 */
 	{ 4,	TD,	printargs,		"tee" }, /* 287 */
 	{ 4,	TD,	printargs,		"vmsplice" }, /* 288 */
-	{ 6,	TP, 	sys_move_pages,		"move_pages" }, /* 289 */
+	{ 6,	TP,	sys_move_pages,		"move_pages" }, /* 289 */
 	{ 1,	TP,	printargs,		"unused" }, /* 290 */
 	{ 1,	0,	printargs,		"cmpxchg_badaddr" }, /* 291 */
 	{ 3,	0,	sys_getcpu,		"getcpu" }, /* 292 */

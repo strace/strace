@@ -40,7 +40,7 @@
 
 #include "syscall.h"
 
-#define NumElem(a)  ((int)((sizeof (a))/((sizeof (a)[0]))))
+#define NumElem(a)  (int)(sizeof(a) / sizeof((a)[0]))
 
 #define MAXSELECTED  256	/* max number of "selected" paths */
 static const char *selected[MAXSELECTED];	/* paths selected for tracing */
@@ -202,7 +202,7 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_dup3 ||
 	    s->sys_func == sys_sendfile ||
 	    s->sys_func == sys_sendfile64 ||
-            !strcmp(s->sys_name, "tee"))
+	    !strcmp(s->sys_name, "tee"))
 	{
 		/* fd, fd */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
@@ -221,7 +221,7 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_readlinkat ||
 	    s->sys_func == sys_utimensat ||
 	    s->sys_func == sys_fchownat ||
-            s->sys_func == sys_pipe2)
+	    s->sys_func == sys_pipe2)
 	{
 		/* fd, path */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
@@ -232,7 +232,7 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_pivotroot ||
 	    s->sys_func == sys_rename ||
 	    s->sys_func == sys_symlink ||
-            s->sys_func == sys_mount)
+	    s->sys_func == sys_mount)
 	{
 		/* path, path */
 		return upathmatch(tcp, tcp->u_arg[0]) ||
@@ -240,7 +240,7 @@ pathtrace_match(struct tcb *tcp)
 	}
 
 	if (s->sys_func == sys_renameat ||
-            s->sys_func == sys_linkat)
+	    s->sys_func == sys_linkat)
 	{
 		/* fd, path, fd, path */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
@@ -260,7 +260,7 @@ pathtrace_match(struct tcb *tcp)
 		/* path, fd, path */
 		return fdmatch(tcp, tcp->u_arg[1]) ||
 			upathmatch(tcp, tcp->u_arg[0]) ||
-                        upathmatch(tcp, tcp->u_arg[2]);
+			upathmatch(tcp, tcp->u_arg[2]);
 	}
 
 	if (!strcmp(s->sys_name, "splice"))
@@ -278,7 +278,7 @@ pathtrace_match(struct tcb *tcp)
 
 	if (s->sys_func == sys_select ||
 	    s->sys_func == sys_oldselect ||
-            s->sys_func == sys_pselect6)
+	    s->sys_func == sys_pselect6)
 	{
 		int     i, j, nfds;
 		long   *args, oldargs[5];
@@ -331,7 +331,7 @@ pathtrace_match(struct tcb *tcp)
 	}
 
 	if (s->sys_func == sys_poll ||
-            s->sys_func == sys_ppoll)
+	    s->sys_func == sys_ppoll)
 	{
 		struct pollfd fds;
 		unsigned nfds;

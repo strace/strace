@@ -94,7 +94,7 @@
 	{ 0,	0,	sys_getppid,		"getppid"	}, /* 64 */
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 65 */
 	{ 0,	0,	sys_setsid,		"setsid"	}, /* 66 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"  }, /* 67 */
+	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 67 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 68 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 69 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 70 */
@@ -292,7 +292,7 @@
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 262 */
 	{ 4,	TD,	printargs,		"tee"		}, /* 263 */
 	{ 4,	TD,	printargs,		"vmsplice"	}, /* 264 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"   }, /* 265 */
+	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 265 */
 	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 266 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 267 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 268 */

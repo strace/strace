@@ -846,7 +846,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 	   hardware page size).  Assume all pages >= 1024 (a-historical
 	   I know) */
 
-	int page = 1024; 	/* How to find this? */
+	int page = 1024;	/* How to find this? */
 	int move = page - (addr & (page - 1));
 	int left = len;
 
@@ -856,7 +856,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		if (move > left) move = left;
 		if ((move = read(fd, laddr, move)) <= 0)
 			return left != len ? 0 : -1;
-		if (memchr (laddr, 0, move)) break;
+		if (memchr(laddr, 0, move)) break;
 		left -= move;
 		laddr += move;
 		addr += move;
@@ -887,7 +887,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 			return -1;
 		}
 		started = 1;
-		memcpy(laddr, &u.x[n], m = MIN(sizeof(long)-n,len));
+		memcpy(laddr, &u.x[n], m = MIN(sizeof(long)-n, len));
 		while (n & (sizeof(long) - 1))
 			if (u.x[n++] == '\0')
 				return 0;
@@ -1023,7 +1023,7 @@ upeek(struct tcb *tcp, long off, long *res)
 	if (val == -1 && errno) {
 		if (errno != ESRCH) {
 			char buf[60];
-			sprintf(buf,"upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)", tcp->pid, off);
+			sprintf(buf, "upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)", tcp->pid, off);
 			perror(buf);
 		}
 		return -1;
@@ -1053,7 +1053,7 @@ printcall(struct tcb *tcp)
 
 # elif defined(S390) || defined(S390X)
 	long psw;
-	if(upeek(tcp,PT_PSWADDR,&psw) < 0) {
+	if (upeek(tcp, PT_PSWADDR, &psw) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1095,7 +1095,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, 4*PT_PC, &pc) < 0) {
-		tprintf ("[????????] ");
+		tprintf("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1103,13 +1103,13 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprintf ("[????????????????] ");
+		tprintf("[????????????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
 # elif defined(SPARC) || defined(SPARC64)
 	struct pt_regs regs;
-	if (ptrace(PTRACE_GETREGS,tcp->pid,(char *)&regs,0) < 0) {
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
 		PRINTBADPC;
 		return;
 	}
@@ -1121,8 +1121,8 @@ printcall(struct tcb *tcp)
 # elif defined(HPPA)
 	long pc;
 
-	if(upeek(tcp,PT_IAOQ0,&pc) < 0) {
-		tprintf ("[????????] ");
+	if (upeek(tcp, PT_IAOQ0, &pc) < 0) {
+		tprintf("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1130,7 +1130,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, REG_EPC, &pc) < 0) {
-		tprintf ("[????????] ");
+		tprintf("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1138,7 +1138,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, 4*REG_PC, &pc) < 0) {
-		tprintf ("[????????] ");
+		tprintf("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1146,7 +1146,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprintf ("[????????????????] ");
+		tprintf("[????????????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1284,9 +1284,9 @@ get_arg0(struct tcb *tcp, arg_setup_state *state, long *valp)
 	int ret;
 
 	if (ia32)
-		ret = upeek (tcp, PT_R11, valp);
+		ret = upeek(tcp, PT_R11, valp);
 	else
-		ret = umoven (tcp,
+		ret = umoven(tcp,
 			      (unsigned long) ia64_rse_skip_regs(*state, 0),
 			      sizeof(long), (void *) valp);
 	return ret;
@@ -1298,9 +1298,9 @@ get_arg1(struct tcb *tcp, arg_setup_state *state, long *valp)
 	int ret;
 
 	if (ia32)
-		ret = upeek (tcp, PT_R9, valp);
+		ret = upeek(tcp, PT_R9, valp);
 	else
-		ret = umoven (tcp,
+		ret = umoven(tcp,
 			      (unsigned long) ia64_rse_skip_regs(*state, 1),
 			      sizeof(long), (void *) valp);
 	return ret;
@@ -1350,9 +1350,9 @@ set_arg1(struct tcb *tcp, arg_setup_state *state, long val)
 typedef struct pt_regs arg_setup_state;
 
 #   define arg_setup(tcp, state) \
-    (ptrace (PTRACE_GETREGS, tcp->pid, (char *) (state), 0))
+    (ptrace(PTRACE_GETREGS, tcp->pid, (char *) (state), 0))
 #   define arg_finish_change(tcp, state) \
-    (ptrace (PTRACE_SETREGS, tcp->pid, (char *) (state), 0))
+    (ptrace(PTRACE_SETREGS, tcp->pid, (char *) (state), 0))
 
 #   define get_arg0(tcp, state, valp) (*(valp) = (state)->u_regs[U_REG_O0], 0)
 #   define get_arg1(tcp, state, valp) (*(valp) = (state)->u_regs[U_REG_O1], 0)
@@ -1417,20 +1417,20 @@ typedef int arg_setup_state;
 #   define arg_setup(tcp, state) (0)
 #   define arg_finish_change(tcp, state)	0
 #   define get_arg0(tcp, cookie, valp) \
-    (upeek ((tcp), arg0_offset, (valp)))
+    (upeek((tcp), arg0_offset, (valp)))
 #   define get_arg1(tcp, cookie, valp) \
-    (upeek ((tcp), arg1_offset, (valp)))
+    (upeek((tcp), arg1_offset, (valp)))
 
 static int
 set_arg0(struct tcb *tcp, void *cookie, long val)
 {
-	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val);
+	return ptrace(PTRACE_POKEUSER, tcp->pid, (char*)arg0_offset, val);
 }
 
 static int
 set_arg1(struct tcb *tcp, void *cookie, long val)
 {
-	return ptrace (PTRACE_POKEUSER, tcp->pid, (char*)arg1_offset, val);
+	return ptrace(PTRACE_POKEUSER, tcp->pid, (char*)arg1_offset, val);
 }
 
 #  endif /* architectures */
@@ -1480,13 +1480,13 @@ setbpt(struct tcb *tcp)
 	case SYS_fork:
 #  endif
 #  if defined SYS_fork || defined SYS_vfork
-		if (arg_setup (tcp, &state) < 0
-		    || get_arg0 (tcp, &state, &tcp->inst[0]) < 0
-		    || get_arg1 (tcp, &state, &tcp->inst[1]) < 0
+		if (arg_setup(tcp, &state) < 0
+		    || get_arg0(tcp, &state, &tcp->inst[0]) < 0
+		    || get_arg1(tcp, &state, &tcp->inst[1]) < 0
 		    || change_syscall(tcp, clone_scno[current_personality]) < 0
-		    || set_arg0 (tcp, &state, CLONE_PTRACE|SIGCHLD) < 0
-		    || set_arg1 (tcp, &state, 0) < 0
-		    || arg_finish_change (tcp, &state) < 0)
+		    || set_arg0(tcp, &state, CLONE_PTRACE|SIGCHLD) < 0
+		    || set_arg1(tcp, &state, 0) < 0
+		    || arg_finish_change(tcp, &state) < 0)
 			return -1;
 		tcp->u_arg[arg0_index] = CLONE_PTRACE|SIGCHLD;
 		tcp->u_arg[arg1_index] = 0;
@@ -1506,12 +1506,12 @@ setbpt(struct tcb *tcp)
 		   clear also CLONE_VM but only in the CLONE_VFORK case as
 		   otherwise we would break pthread_create.  */
 
-		if ((arg_setup (tcp, &state) < 0
-		    || set_arg0 (tcp, &state,
+		if ((arg_setup(tcp, &state) < 0
+		    || set_arg0(tcp, &state,
 				 (tcp->u_arg[arg0_index] | CLONE_PTRACE)
 				 & ~(tcp->u_arg[arg0_index] & CLONE_VFORK
 				     ? CLONE_VFORK | CLONE_VM : 0)) < 0
-		    || arg_finish_change (tcp, &state) < 0))
+		    || arg_finish_change(tcp, &state) < 0))
 			return -1;
 		tcp->flags |= TCB_BPTSET;
 		tcp->inst[0] = tcp->u_arg[arg0_index];
@@ -1531,10 +1531,10 @@ int
 clearbpt(struct tcb *tcp)
 {
 	arg_setup_state state;
-	if (arg_setup (tcp, &state) < 0
-	    || restore_arg0 (tcp, &state, tcp->inst[0]) < 0
-	    || restore_arg1 (tcp, &state, tcp->inst[1]) < 0
-	    || arg_finish_change (tcp, &state))
+	if (arg_setup(tcp, &state) < 0
+	    || restore_arg0(tcp, &state, tcp->inst[0]) < 0
+	    || restore_arg1(tcp, &state, tcp->inst[1]) < 0
+	    || arg_finish_change(tcp, &state))
 		if (errno != ESRCH) return -1;
 	tcp->flags &= ~TCB_BPTSET;
 	return 0;

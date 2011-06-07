@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	*c = 0;
 
 	if (fork()) {
-		while(1) {
+		while (1) {
 			strcpy(c, "/etc/passwd");
 			strcpy(c, "/etc/shadow");
 		}

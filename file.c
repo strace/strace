@@ -257,17 +257,17 @@ const struct xlat open_mode_flags[] = {
 #  endif
 # endif
 # ifdef O_LARGEFILE
-	{ O_LARGEFILE,	"O_LARGEFILE"   },
+	{ O_LARGEFILE,	"O_LARGEFILE"	},
 # endif
 #endif
 #ifdef O_DIRECTORY
-	{ O_DIRECTORY,	"O_DIRECTORY"   },
+	{ O_DIRECTORY,	"O_DIRECTORY"	},
 #endif
 #ifdef O_NOFOLLOW
-	{ O_NOFOLLOW, 	"O_NOFOLLOW"	},
+	{ O_NOFOLLOW,	"O_NOFOLLOW"	},
 #endif
 #ifdef O_NOATIME
-	{ O_NOATIME, 	"O_NOATIME"	},
+	{ O_NOATIME,	"O_NOATIME"	},
 #endif
 #ifdef O_CLOEXEC
 	{ O_CLOEXEC,	"O_CLOEXEC"	},
@@ -946,11 +946,11 @@ static const struct xlat fileflags[] = {
 	{ SF_APPEND,	"SF_APPEND"	},
 	{ SF_NOUNLINK,	"SF_NOUNLINK"	},
 #elif UNIXWARE >= 2
-#ifdef 	_S_ISMLD
-	{ _S_ISMLD, 	"_S_ISMLD"	},
+#ifdef _S_ISMLD
+	{ _S_ISMLD,	"_S_ISMLD"	},
 #endif
-#ifdef 	_S_ISMOUNTED
-	{ _S_ISMOUNTED, "_S_ISMOUNTED"	},
+#ifdef _S_ISMOUNTED
+	{ _S_ISMOUNTED,	"_S_ISMOUNTED"	},
 #endif
 #endif
 	{ 0,		NULL		},
@@ -1723,7 +1723,7 @@ printstatfs(struct tcb *tcp, long addr)
 		sprintfstype(statbuf.f_type),
 		statbuf.f_bsize, statbuf.f_blocks, statbuf.f_bfree);
 	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_fsid={%d, %d}, f_namelen=%u",
-		statbuf.f_bavail,statbuf.f_files, statbuf.f_ffree,
+		statbuf.f_bavail, statbuf.f_files, statbuf.f_ffree,
 		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1],
 		statbuf.f_namelen);
 #else /* !ALPHA */
@@ -1809,7 +1809,7 @@ sys_statfs64(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", %lu, ", tcp->u_arg[1]);
 	} else {
-		if (tcp->u_arg[1] == sizeof (struct statfs64))
+		if (tcp->u_arg[1] == sizeof(struct statfs64))
 			printstatfs64(tcp, tcp->u_arg[2]);
 		else
 			tprintf("{???}");
@@ -1824,7 +1824,7 @@ sys_fstatfs64(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprintf(", %lu, ", tcp->u_arg[1]);
 	} else {
-		if (tcp->u_arg[1] == sizeof (struct statfs64))
+		if (tcp->u_arg[1] == sizeof(struct statfs64))
 			printstatfs64(tcp, tcp->u_arg[2]);
 		else
 			tprintf("{???}");
@@ -2223,7 +2223,7 @@ decode_utimes(struct tcb *tcp, int offset, int special)
 					BITNESS_CURRENT, special);
 			tprintf(", ");
 			printtv_bitness(tcp, tcp->u_arg[offset + 1]
-					+ sizeof (struct timeval),
+					+ sizeof(struct timeval),
 					BITNESS_CURRENT, special);
 			tprintf("}");
 		}
@@ -2402,15 +2402,15 @@ sys_readdir(struct tcb *tcp)
 
 #if defined FREEBSD || defined LINUX
 static const struct xlat direnttypes[] = {
-	{ DT_UNKNOWN,	"DT_UNKNOWN" 	},
-	{ DT_FIFO,	"DT_FIFO" 	},
-	{ DT_CHR,	"DT_CHR" 	},
-	{ DT_DIR,	"DT_DIR" 	},
-	{ DT_BLK,	"DT_BLK" 	},
-	{ DT_REG,	"DT_REG" 	},
-	{ DT_LNK,	"DT_LNK" 	},
-	{ DT_SOCK,	"DT_SOCK" 	},
-	{ DT_WHT,	"DT_WHT" 	},
+	{ DT_UNKNOWN,	"DT_UNKNOWN"	},
+	{ DT_FIFO,	"DT_FIFO"	},
+	{ DT_CHR,	"DT_CHR"	},
+	{ DT_DIR,	"DT_DIR"	},
+	{ DT_BLK,	"DT_BLK"	},
+	{ DT_REG,	"DT_REG"	},
+	{ DT_LNK,	"DT_LNK"	},
+	{ DT_SOCK,	"DT_SOCK"	},
+	{ DT_WHT,	"DT_WHT"	},
 	{ 0,		NULL		},
 };
 
@@ -2969,8 +2969,8 @@ static const struct xlat inotify_modes[] = {
 
 static const struct xlat inotify_init_flags[] = {
 	{ 0x00000800,	"IN_NONBLOCK"	},
-	{ 0x00080000,	"IN_CLOEXEC" 	},
-	{ 0,		NULL 		}
+	{ 0x00080000,	"IN_CLOEXEC"	},
+	{ 0,		NULL		}
 };
 
 int

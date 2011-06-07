@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
 	child = fork();
 
-	switch(child) {
+	switch (child) {
 	case -1:
 		assert(0);
 	case 0:

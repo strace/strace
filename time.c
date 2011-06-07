@@ -790,7 +790,7 @@ printsigevent(struct tcb *tcp, long arg)
 		return;
 	}
 #endif
-	if (umove (tcp, arg, &sev) < 0)
+	if (umove(tcp, arg, &sev) < 0)
 		tprintf("{...}");
 	else {
 		tprintf("{%p, ", sev.sigev_value.sival_ptr);

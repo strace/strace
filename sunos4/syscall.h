@@ -165,7 +165,7 @@ int	sys_nfs_svc();		/* run nfs server */
 int	sys_nfs_getfh();		/* get file handle */
 int	sys_exportfs();		/* export file systems */
 
-int  	sys_rfssys();		/* RFS-related calls */
+int	sys_rfssys();		/* RFS-related calls */
 
 int	sys_getmsg();
 int	sys_putmsg();

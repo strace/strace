@@ -298,7 +298,7 @@ tprint_sembuf(struct tcb *tcp, long addr, unsigned long count)
 		return;
 	}
 
-	for(i = 0; i < max_count; ++i) {
+	for (i = 0; i < max_count; ++i) {
 		struct sembuf sb;
 		if (i)
 			tprintf(", ");

@@ -245,7 +245,7 @@
 	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 215 */
 	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 216 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
-	{ 3,	0,	sys_mincore,	         "mincore"      }, /* 218 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 218 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ -1,	0,	printargs,		"SYS_221"	}, /* 221 */

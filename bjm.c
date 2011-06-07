@@ -49,7 +49,7 @@
 #define MOD_RUNNING		1
 #define MOD_DELETED		2
 #define MOD_AUTOCLEAN		4
-#define MOD_VISITED  		8
+#define MOD_VISITED		8
 #define MOD_USED_ONCE		16
 #define MOD_JUST_FREED		32
 #define MOD_INITIALIZING	64
@@ -140,7 +140,7 @@ sys_query_module(struct tcb *tcp)
 						tcp->u_arg[3], data) < 0) {
 						tprintf(" /* %Zu entries */ ", ret);
 					} else {
-						for (idx=0; idx<ret; idx++) {
+						for (idx = 0; idx < ret; idx++) {
 							tprintf("%s%s",
 								(idx ? ", " : ""),
 								mod);
@@ -167,7 +167,7 @@ sys_query_module(struct tcb *tcp)
 						tcp->u_arg[3], data) < 0) {
 						tprintf(" /* %Zu entries */ ", ret);
 					} else {
-						for (idx=0; idx<ret; idx++) {
+						for (idx = 0; idx < ret; idx++) {
 							tprintf("%s{name=%s, value=%lu}",
 								(idx ? " " : ""),
 								data+(long)sym->name,

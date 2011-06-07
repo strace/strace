@@ -202,7 +202,7 @@
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 173 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"  }, /* 174 */
+	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 175 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 176 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 177 */

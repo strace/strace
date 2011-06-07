@@ -149,7 +149,7 @@
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
-	{ 3,    0,      sys_modify_ldt,         "modify_ldt"    }, /* 123 */
+	{ 3,	0,	sys_modify_ldt,		"modify_ldt"	}, /* 123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
@@ -200,7 +200,7 @@
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 173 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"  }, /* 174 */
+	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 175 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 176 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 177 */

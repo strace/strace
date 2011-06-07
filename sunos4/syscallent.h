@@ -230,12 +230,12 @@
 	{ 0,	0,	sys_nosys,		"nosys"		}, /* 199 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 200 */
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 201 */
-	{ 4,	TI,	sys_semop,		"semop" 	}, /* 202 */
+	{ 4,	TI,	sys_semop,		"semop"		}, /* 202 */
 	{ 5,	TI,	sys_msgget,		"msgget"	}, /* 203 */
 	{ 5,	TI,	sys_msgctl,		"msgctl"	}, /* 204 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 205 */
 	{ 5,	TI,	sys_msgsnd,		"msgsnd"	}, /* 206 */
-	{ 3,	TI,	sys_shmat,		"shmat" 	}, /* 207 */
+	{ 3,	TI,	sys_shmat,		"shmat"		}, /* 207 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"	}, /* 208 */
-	{ 3,	TI,	sys_shmdt,		"shmdt" 	}, /* 209 */
+	{ 3,	TI,	sys_shmdt,		"shmdt"		}, /* 209 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 210 */

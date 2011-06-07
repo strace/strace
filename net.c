@@ -893,8 +893,8 @@ static const struct xlat sockipv6options[] = {
 
 #ifdef SOL_IPX
 static const struct xlat sockipxoptions[] = {
-	{ IPX_TYPE,     "IPX_TYPE"      },
-	{ 0,            NULL            },
+	{ IPX_TYPE,	"IPX_TYPE"	},
+	{ 0,		NULL		},
 };
 #endif /* SOL_IPX */
 
@@ -1267,24 +1267,24 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 #ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
 		{
 #if defined(HAVE_IF_INDEXTONAME) && defined(IN6_IS_ADDR_LINKLOCAL) && defined(IN6_IS_ADDR_MC_LINKLOCAL)
-		    int numericscope = 0;
-		    if (IN6_IS_ADDR_LINKLOCAL (&addrbuf.sa6.sin6_addr)
-			    || IN6_IS_ADDR_MC_LINKLOCAL (&addrbuf.sa6.sin6_addr)) {
-			char scopebuf[IFNAMSIZ + 1];
+			int numericscope = 0;
+			if (IN6_IS_ADDR_LINKLOCAL(&addrbuf.sa6.sin6_addr)
+			    || IN6_IS_ADDR_MC_LINKLOCAL(&addrbuf.sa6.sin6_addr)) {
+				char scopebuf[IFNAMSIZ + 1];
 
-			if (if_indextoname (addrbuf.sa6.sin6_scope_id, scopebuf) == NULL)
-			    numericscope++;
-			else
-			    tprintf(", sin6_scope_id=if_nametoindex(\"%s\")", scopebuf);
-		    } else
-			numericscope++;
+				if (if_indextoname(addrbuf.sa6.sin6_scope_id, scopebuf) == NULL)
+					numericscope++;
+				else
+					tprintf(", sin6_scope_id=if_nametoindex(\"%s\")", scopebuf);
+			} else
+				numericscope++;
 
-		    if (numericscope)
+			if (numericscope)
 #endif
-			tprintf(", sin6_scope_id=%u", addrbuf.sa6.sin6_scope_id);
+				tprintf(", sin6_scope_id=%u", addrbuf.sa6.sin6_scope_id);
 		}
 #endif
-		    break;
+		break;
 #endif
 #if defined(AF_IPX) && defined(linux)
 	case AF_IPX:
@@ -1299,7 +1299,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 			 * this way.. :)
 			 */
 			tprintf("%08lx:", (unsigned long)ntohl(addrbuf.sipx.sipx_network));
-			for (i = 0; i<IPX_NODE_LEN; i++)
+			for (i = 0; i < IPX_NODE_LEN; i++)
 				tprintf("%02x", addrbuf.sipx.sipx_node[i]);
 			tprintf("/[%02x]", addrbuf.sipx.sipx_type);
 		}
@@ -1316,7 +1316,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 			tprintf(", addr(%d)={%d, ",
 					addrbuf.ll.sll_halen,
 					addrbuf.ll.sll_hatype);
-			for (i=0; i<addrbuf.ll.sll_halen; i++)
+			for (i = 0; i < addrbuf.ll.sll_halen; i++)
 				tprintf("%02x", addrbuf.ll.sll_addr[i]);
 		}
 		break;
@@ -1373,7 +1373,7 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 
 		if (cmsg->cmsg_type == SCM_RIGHTS
 		    && CMSG_LEN(sizeof(int)) <= cmsg_len) {
-			int *fds = (int *) CMSG_DATA (cmsg);
+			int *fds = (int *) CMSG_DATA(cmsg);
 			int first = 1;
 
 			tprintf(", {");
@@ -1389,7 +1389,7 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 		}
 		if (cmsg->cmsg_type == SCM_CREDENTIALS
 		    && CMSG_LEN(sizeof(struct ucred)) <= cmsg_len) {
-			struct ucred *uc = (struct ucred *) CMSG_DATA (cmsg);
+			struct ucred *uc = (struct ucred *) CMSG_DATA(cmsg);
 
 			tprintf("{pid=%ld, uid=%ld, gid=%ld}}",
 				(long)uc->pid, (long)uc->uid, (long)uc->gid);
@@ -1574,7 +1574,7 @@ do_accept(struct tcb *tcp, int flags_arg)
 	else {
 		int len;
 		if (tcp->u_arg[1] == 0 || syserror(tcp)
-		    || umove (tcp, tcp->u_arg[2], &len) < 0) {
+		    || umove(tcp, tcp->u_arg[2], &len) < 0) {
 			tprintf("%#lx", tcp->u_arg[1]);
 		} else {
 			printsock(tcp, tcp->u_arg[1], len);
@@ -1784,10 +1784,10 @@ sys_recvmmsg(struct tcb *tcp)
 #endif /* HAVE_SENDMSG */
 
 static const struct xlat shutdown_modes[] = {
-       { 0,	"SHUT_RD"	},
-       { 1,	"SHUT_WR"	},
-       { 2,	"SHUT_RDWR"	},
-       { 0,	NULL		}
+	{ 0,	"SHUT_RD"	},
+	{ 1,	"SHUT_WR"	},
+	{ 2,	"SHUT_RDWR"	},
+	{ 0,	NULL		}
 };
 
 int
@@ -1906,7 +1906,7 @@ sys_getsockopt(struct tcb *tcp)
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printxval(socketlayers, tcp->u_arg[1], "SOL_???");
-		tprintf (", ");
+		tprintf(", ");
 		switch (tcp->u_arg[1]) {
 		case SOL_SOCKET:
 			printxval(sockoptions, tcp->u_arg[2], "SO_???");
@@ -1948,10 +1948,10 @@ sys_getsockopt(struct tcb *tcp)
 			tprintf("%lu", tcp->u_arg[2]);
 			break;
 		}
-		tprintf (", ");
+		tprintf(", ");
 	} else {
 		int len;
-		if (syserror(tcp) || umove (tcp, tcp->u_arg[4], &len) < 0) {
+		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &len) < 0) {
 			tprintf("%#lx, %#lx",
 				tcp->u_arg[3], tcp->u_arg[4]);
 			return 0;
@@ -1962,9 +1962,9 @@ sys_getsockopt(struct tcb *tcp)
 			switch (tcp->u_arg[2]) {
 #ifdef SO_LINGER
 			case SO_LINGER:
-				if (len == sizeof (struct linger)) {
+				if (len == sizeof(struct linger)) {
 					struct linger linger;
-					if (umove (tcp,
+					if (umove(tcp,
 						   tcp->u_arg[3],
 						   &linger) < 0)
 						break;
@@ -1979,9 +1979,9 @@ sys_getsockopt(struct tcb *tcp)
 #endif
 #ifdef SO_PEERCRED
 			case SO_PEERCRED:
-				if (len == sizeof (struct ucred)) {
+				if (len == sizeof(struct ucred)) {
 					struct ucred uc;
-					if (umove (tcp,
+					if (umove(tcp,
 						   tcp->u_arg[3],
 						   &uc) < 0)
 						break;
@@ -2003,7 +2003,7 @@ sys_getsockopt(struct tcb *tcp)
 			case PACKET_STATISTICS:
 				if (len == sizeof(struct tpacket_stats)) {
 					struct tpacket_stats stats;
-					if (umove (tcp,
+					if (umove(tcp,
 						   tcp->u_arg[3],
 						   &stats) < 0)
 						break;
@@ -2020,11 +2020,11 @@ sys_getsockopt(struct tcb *tcp)
 			break;
 		}
 
-		if (len == sizeof (int)) {
+		if (len == sizeof(int)) {
 			printnum_int(tcp, tcp->u_arg[3], "%d");
 		}
 		else {
-			printstr (tcp, tcp->u_arg[3], len);
+			printstr(tcp, tcp->u_arg[3], len);
 		}
 		tprintf(", [%d]", len);
 	}
@@ -2059,16 +2059,16 @@ static int
 printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 {
 	printxval(socketlayers, level, "SOL_??");
-	tprintf (", ");
+	tprintf(", ");
 	switch (level) {
 	    case SOL_SOCKET:
 		printxval(sockoptions, name, "SO_???");
 		switch (name) {
 #if defined(SO_LINGER)
 		    case SO_LINGER:
-			if (len == sizeof (struct linger)) {
+			if (len == sizeof(struct linger)) {
 				struct linger linger;
-				if (umove (tcp, addr, &linger) < 0)
+				if (umove(tcp, addr, &linger) < 0)
 					break;
 				tprintf(", {onoff=%d, linger=%d}",
 					linger.l_onoff,
@@ -2155,13 +2155,13 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 
 	/* default arg printing */
 
-	tprintf (", ");
+	tprintf(", ");
 
-	if (len == sizeof (int)) {
-		printnum_int (tcp, addr, "%d");
+	if (len == sizeof(int)) {
+		printnum_int(tcp, addr, "%d");
 	}
 	else {
-		printstr (tcp, addr, len);
+		printstr(tcp, addr, len);
 	}
 	return 0;
 }
@@ -2178,26 +2178,26 @@ print_sock_optmgmt(struct tcb *tcp, long addr, int len)
 	while (len >= (int) sizeof hdr) {
 		if (umove(tcp, addr, &hdr) < 0) break;
 		if (c++) {
-			tprintf (", ");
+			tprintf(", ");
 		}
 		else if (len > hdr.len + sizeof hdr) {
-			tprintf ("[");
+			tprintf("[");
 		}
-		tprintf ("{");
+		tprintf("{");
 		addr += sizeof hdr;
 		len -= sizeof hdr;
-		printsockopt (tcp, hdr.level, hdr.name, addr, hdr.len);
+		printsockopt(tcp, hdr.level, hdr.name, addr, hdr.len);
 		if (hdr.len > 0) {
 			addr += hdr.len;
 			len -= hdr.len;
 		}
-		tprintf ("}");
+		tprintf("}");
 	}
 	if (len > 0) {
-		if (c++) tprintf (", ");
-		printstr (tcp, addr, len);
+		if (c++) tprintf(", ");
+		printstr(tcp, addr, len);
 	}
-	if (c > 1) tprintf ("]");
+	if (c > 1) tprintf("]");
 }
 
 #endif
@@ -2207,7 +2207,7 @@ sys_setsockopt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		printsockopt (tcp, tcp->u_arg[1], tcp->u_arg[2],
+		printsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			      tcp->u_arg[3], tcp->u_arg[4]);
 		tprintf(", %lu", tcp->u_arg[4]);
 	}
@@ -2223,7 +2223,7 @@ static const struct xlat sock_version[] = {
 	{ __NETLIB_GEMINI_XPG4,	"GEMINI_XPG4" },
 	{ __NETLIB_FP1_SVR4,	"FP1_SVR4" },
 	{ __NETLIB_FP1_XPG4,	"FP1_XPG4" },
-	{ 0,            NULL            },
+	{ 0,			NULL },
 };
 
 
@@ -2232,82 +2232,81 @@ netlib_call(struct tcb *tcp, int (*func)())
 {
 	if (entering(tcp)) {
 		int i;
-		printxval (sock_version, tcp->u_arg[0], "__NETLIB_???");
+		printxval(sock_version, tcp->u_arg[0], "__NETLIB_???");
 		tprintf(", ");
 		--tcp->u_nargs;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = tcp->u_arg[i + 1];
-		return func (tcp);
-
+		return func(tcp);
 	}
 
-	return func (tcp);
+	return func(tcp);
 }
 
 int
 sys_xsocket(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_socket);
+	return netlib_call(tcp, sys_socket);
 }
 
 int
 sys_xsocketpair(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_socketpair);
+	return netlib_call(tcp, sys_socketpair);
 }
 
 int
 sys_xbind(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_bind);
+	return netlib_call(tcp, sys_bind);
 }
 
 int
 sys_xconnect(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_connect);
+	return netlib_call(tcp, sys_connect);
 }
 
 int
 sys_xlisten(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_listen);
+	return netlib_call(tcp, sys_listen);
 }
 
 int
 sys_xaccept(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_accept);
+	return netlib_call(tcp, sys_accept);
 }
 
 int
 sys_xsendmsg(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_sendmsg);
+	return netlib_call(tcp, sys_sendmsg);
 }
 
 int
 sys_xrecvmsg(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_recvmsg);
+	return netlib_call(tcp, sys_recvmsg);
 }
 
 int
 sys_xgetsockaddr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval (sock_version, tcp->u_arg[0], "__NETLIB_???");
+		printxval(sock_version, tcp->u_arg[0], "__NETLIB_???");
 		tprintf(", ");
 		if (tcp->u_arg[1] == 0) {
-			tprintf ("LOCALNAME, ");
+			tprintf("LOCALNAME, ");
 		}
 		else if (tcp->u_arg[1] == 1) {
-			tprintf ("REMOTENAME, ");
+			tprintf("REMOTENAME, ");
 		}
 		else {
-			tprintf ("%ld, ", tcp->u_arg [1]);
+			tprintf("%ld, ", tcp->u_arg[1]);
 		}
-		tprintf ("%ld, ", tcp->u_arg [2]);
+		tprintf("%ld, ", tcp->u_arg[2]);
 	}
 	else {
 		if (tcp->u_arg[3] == 0 || syserror(tcp)) {
@@ -2326,19 +2325,19 @@ sys_xgetsockaddr(struct tcb *tcp)
 int
 sys_xgetsockopt(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_getsockopt);
+	return netlib_call(tcp, sys_getsockopt);
 }
 
 int
 sys_xsetsockopt(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_setsockopt);
+	return netlib_call(tcp, sys_setsockopt);
 }
 
 int
 sys_xshutdown(struct tcb *tcp)
 {
-	return netlib_call (tcp, sys_shutdown);
+	return netlib_call(tcp, sys_shutdown);
 }
 
 #endif /* UNIXWARE */

@@ -255,13 +255,13 @@ extern int ptrace(int, int, char *, int, ...);
 
 #ifdef SVR4
 #ifdef HAVE_MP_PROCFS
-extern int mp_ioctl (int f, int c, void *a, int s);
-#define IOCTL(f,c,a)	mp_ioctl (f, c, a, sizeof *a)
+extern int mp_ioctl(int f, int c, void *a, int s);
+#define IOCTL(f,c,a)	mp_ioctl(f, c, a, sizeof *a)
 #define IOCTL_STATUS(t) \
-	 pread (t->pfd_stat, &t->status, sizeof t->status, 0)
+	 pread(t->pfd_stat, &t->status, sizeof t->status, 0)
 #define IOCTL_WSTOP(t)						\
-	(IOCTL (t->pfd, PCWSTOP, (char *)NULL) < 0 ? -1 :		\
-	 IOCTL_STATUS (t))
+	(IOCTL(t->pfd, PCWSTOP, (char *)NULL) < 0 ? -1 :		\
+	 IOCTL_STATUS(t))
 #define PR_WHY		pr_lwp.pr_why
 #define PR_WHAT		pr_lwp.pr_what
 #define PR_REG		pr_lwp.pr_context.uc_mcontext.gregs
@@ -280,8 +280,8 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #define PIOCRUN		PCRUN
 #else
 #define IOCTL		ioctl
-#define IOCTL_STATUS(t)	ioctl (t->pfd, PIOCSTATUS, &t->status)
-#define IOCTL_WSTOP(t)	ioctl (t->pfd, PIOCWSTOP, &t->status)
+#define IOCTL_STATUS(t)	ioctl(t->pfd, PIOCSTATUS, &t->status)
+#define IOCTL_WSTOP(t)	ioctl(t->pfd, PIOCWSTOP, &t->status)
 #define PR_WHY		pr_why
 #define PR_WHAT		pr_what
 #define PR_REG		pr_reg
@@ -292,8 +292,8 @@ extern int mp_ioctl (int f, int c, void *a, int s);
 #endif
 #ifdef FREEBSD
 #define IOCTL		ioctl
-#define IOCTL_STATUS(t)	ioctl (t->pfd, PIOCSTATUS, &t->status)
-#define IOCTL_WSTOP(t)	ioctl (t->pfd, PIOCWAIT, &t->status)
+#define IOCTL_STATUS(t)	ioctl(t->pfd, PIOCSTATUS, &t->status)
+#define IOCTL_WSTOP(t)	ioctl(t->pfd, PIOCWAIT, &t->status)
 #define PIOCRUN         PIOCCONT
 #define PIOCWSTOP       PIOCWAIT
 #define PR_WHY		why

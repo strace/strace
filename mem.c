@@ -289,7 +289,7 @@ int sys_old_mmap(struct tcb *tcp)
 #elif defined(SH) || defined(SH64)
 	/* SH has always passed the args in registers */
 	int i;
-	for (i=0; i<6; i++)
+	for (i = 0; i < 6; i++)
 		u_arg[i] = tcp->u_arg[i];
 #else
 # if defined(X86_64)
@@ -627,7 +627,7 @@ sys_modify_ldt(struct tcb *tcp)
 		struct modify_ldt_ldt_s copy;
 		tprintf("%ld", tcp->u_arg[0]);
 		if (tcp->u_arg[1] == 0
-				|| tcp->u_arg[2] != sizeof (struct modify_ldt_ldt_s)
+				|| tcp->u_arg[2] != sizeof(struct modify_ldt_ldt_s)
 				|| umove(tcp, tcp->u_arg[1], &copy) == -1)
 			tprintf(", %lx", tcp->u_arg[1]);
 		else {
@@ -875,7 +875,7 @@ sys_move_pages(struct tcb *tcp)
 					break;
 				}
 				tprintf("%p", p);
-				puser += sizeof (void *);
+				puser += sizeof(void *);
 			}
 			tprintf("}, ");
 		}
@@ -894,7 +894,7 @@ sys_move_pages(struct tcb *tcp)
 					break;
 				}
 				tprintf("%#x", node);
-				nodeuser += sizeof (int);
+				nodeuser += sizeof(int);
 			}
 			tprintf("}, ");
 		}
@@ -916,7 +916,7 @@ sys_move_pages(struct tcb *tcp)
 					break;
 				}
 				tprintf("%#x", status);
-				statususer += sizeof (int);
+				statususer += sizeof(int);
 			}
 			tprintf("}, ");
 		}

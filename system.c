@@ -615,18 +615,18 @@ sys_exportfs(struct tcb *tcp)
 		printxval(ex_auth_flags, e.ex_auth, "AUTH_???");
 		tprintf(", roots:[");
 		if (e.ex_auth == AUTH_UNIX) {
-			for (i=0; i<e.ex_u.exunix.rootaddrs.naddrs; i++) {
+			for (i = 0; i < e.ex_u.exunix.rootaddrs.naddrs; i++) {
 				printsock(tcp,
 					(int)&e.ex_u.exunix.rootaddrs.addrvec[i]);
 			}
 			tprintf("], writers:[");
-			for (i=0; i<e.ex_writeaddrs.naddrs; i++) {
+			for (i = 0; i < e.ex_writeaddrs.naddrs; i++) {
 				printsock(tcp,
 					(int)&e.ex_writeaddrs.addrvec[i]);
 			}
 			tprintf("]");
 		} else {
-			for (i=0; i<e.ex_u.exdes.nnames; i++) {
+			for (i = 0; i < e.ex_u.exdes.nnames; i++) {
 				printsock(tcp,
 					(int)&e.ex_u.exdes.rootnames[i]);
 				tprintf(", ");
@@ -849,7 +849,7 @@ static const struct xlat sysinfo_options[] = {
 #ifdef SI_SET_KERB_REALM
 	{ SI_SET_KERB_REALM,	"SI_SET_KERB_REALM"	},
 #endif
-#ifdef 	SI_KERB_REALM
+#ifdef SI_KERB_REALM
 	{ SI_KERB_REALM,	"SI_KERB_REALM"		},
 #endif
 	{ 0,			NULL			},
@@ -1425,7 +1425,7 @@ int
 sys_mount(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		char fstyp [FSTYPSZ];
+		char fstyp[FSTYPSZ];
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", ");
 		printpath(tcp, tcp->u_arg[1]);
@@ -1448,7 +1448,7 @@ sys_mount(struct tcb *tcp)
 #ifdef VX_MS_MASK
 			/* On UW7 they don't give us the defines and structs
 			   we need to see what is going on.  Bummer. */
-			if (strcmp (fstyp, "vxfs") == 0) {
+			if (strcmp(fstyp, "vxfs") == 0) {
 				struct vx_mountargs5 args;
 				if (umove(tcp, tcp->u_arg[4], &args) < 0)
 					tprintf("%#lx", tcp->u_arg[4]);
@@ -1456,32 +1456,32 @@ sys_mount(struct tcb *tcp)
 					tprintf("{ flags=");
 					printflags(vxfs_flags, args.mflags, "VX_MS_???");
 					if (args.mflags & VX_MS_SNAPSHOT) {
-						tprintf (", snapof=");
-						printstr (tcp,
+						tprintf(", snapof=");
+						printstr(tcp,
 							  (long) args.primaryspec,
 							  -1);
 						if (args.snapsize > 0)
-							tprintf (", snapsize=%ld", args.snapsize);
+							tprintf(", snapsize=%ld", args.snapsize);
 					}
 					tprintf(" }");
 				}
 			}
 			else
 #endif
-			if (strcmp (fstyp, "specfs") == 0) {
-				tprintf ("dev=");
-				printstr (tcp, tcp->u_arg[4], -1);
+			if (strcmp(fstyp, "specfs") == 0) {
+				tprintf("dev=");
+				printstr(tcp, tcp->u_arg[4], -1);
 			}
 			else
-			if (strcmp (fstyp, "nfs") == 0) {
+			if (strcmp(fstyp, "nfs") == 0) {
 				struct nfs_args args;
 				if (umove(tcp, tcp->u_arg[4], &args) < 0)
 					tprintf("%#lx", tcp->u_arg[4]);
 				else {
 					struct netbuf addr;
 					tprintf("{ addr=");
-					if (umove (tcp, (int) args.addr, &addr) < 0) {
-						tprintf ("%#lx", (long) args.addr);
+					if (umove(tcp, (int) args.addr, &addr) < 0) {
+						tprintf("%#lx", (long) args.addr);
 					}
 					else {
 						printsock(tcp, (int) addr.buf, addr.len);
@@ -1565,7 +1565,7 @@ static const struct xlat capabilities[] = {
 #ifdef CAP_SETFCAP
 	{ 1<<CAP_SETFCAP,	"CAP_SETFCAP"	},
 #endif
-	{ 0,                    NULL            },
+	{ 0,		NULL		},
 };
 
 
@@ -1575,7 +1575,7 @@ sys_capget(struct tcb *tcp)
 	static cap_user_header_t       arg0 = NULL;
 	static cap_user_data_t         arg1 = NULL;
 
-	if(!entering(tcp)) {
+	if (!entering(tcp)) {
 		if (!arg0) {
 			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
 				fprintf(stderr, "out of memory\n");
@@ -1626,7 +1626,7 @@ sys_capset(struct tcb *tcp)
 	static cap_user_header_t       arg0 = NULL;
 	static cap_user_data_t         arg1 = NULL;
 
-	if(entering(tcp)) {
+	if (entering(tcp)) {
 		if (!arg0) {
 			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
 				fprintf(stderr, "out of memory\n");
@@ -1938,11 +1938,11 @@ sys_sysctl(struct tcb *tcp)
 	int *name;
 	unsigned long size;
 
-	if (umove (tcp, tcp->u_arg[0], &info) < 0)
+	if (umove(tcp, tcp->u_arg[0], &info) < 0)
 		return printargs(tcp);
 
-	size = sizeof (int) * (unsigned long) info.nlen;
-	name = (size / sizeof (int) != info.nlen) ? NULL : malloc (size);
+	size = sizeof(int) * (unsigned long) info.nlen;
+	name = (size / sizeof(int) != info.nlen) ? NULL : malloc(size);
 	if (name == NULL ||
 	    umoven(tcp, (unsigned long) info.name, size, (char *) name) < 0) {
 		free(name);
@@ -2156,7 +2156,7 @@ static const struct xlat ksym_flags[] = {
 int
 sys_getksym(struct tcb *tcp)
 {
-	if (entering (tcp)) {
+	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
 		tprintf(", ");
 	}
@@ -2167,14 +2167,14 @@ sys_getksym(struct tcb *tcp)
 		}
 		else {
 			int val;
-			printnum (tcp, tcp->u_arg[1], "%#lx");
+			printnum(tcp, tcp->u_arg[1], "%#lx");
 			tprintf(", ");
 			if (umove(tcp, tcp->u_arg[2], &val) < 0) {
 				tprintf("%#lx", tcp->u_arg[2]);
 			}
 			else {
 				tprintf("[");
-				printxval (ksym_flags, val, "STT_???");
+				printxval(ksym_flags, val, "STT_???");
 				tprintf("]");
 			}
 		}
@@ -2188,7 +2188,7 @@ sys_getksym(struct tcb *tcp)
 struct cred;
 #include <sys/nscsys.h>
 
-static const struct xlat ssi_cmd [] = {
+static const struct xlat ssi_cmd[] = {
 	{ SSISYS_BADOP,	"SSISYS_BADOP"	},
 	{ SSISYS_LDLVL_INIT,"SSISYS_LDLVL_INIT"},
 	{ SSISYS_LDLVL_GETVEC,"SSISYS_LDLVL_GETVEC"},
@@ -2241,54 +2241,54 @@ int sys_ssisys(struct tcb *tcp)
 	cls_nodeinfo_args_t cni;
 	clusternode_info_t info;
 
-	if (entering (tcp)) {
+	if (entering(tcp)) {
 		ts_reclaim_child_inargs_t trc;
 		if (tcp->u_arg[1] != sizeof iov ||
-		    umove (tcp, tcp->u_arg[0], &iov) < 0)
+		    umove(tcp, tcp->u_arg[0], &iov) < 0)
 		{
-			tprintf ("%#lx, %ld", tcp->u_arg[0], tcp->u_arg[1]);
+			tprintf("%#lx, %ld", tcp->u_arg[0], tcp->u_arg[1]);
 			return 0;
 		}
-		tprintf ("{id=");
+		tprintf("{id=");
 		printxval(ssi_cmd, iov.tio_id.id_cmd, "SSISYS_???");
-		tprintf (":%d", iov.tio_id.id_ver);
+		tprintf(":%d", iov.tio_id.id_ver);
 		switch (iov.tio_id.id_cmd) {
 		    case SSISYS_RECLAIM_CHILD:
 			if (iov.tio_udatainlen != sizeof trc ||
-			    umove (tcp, (long) iov.tio_udatain, &trc) < 0)
+			    umove(tcp, (long) iov.tio_udatain, &trc) < 0)
 				goto bad;
-			tprintf (", in={pid=%ld, start=%ld}",
+			tprintf(", in={pid=%ld, start=%ld}",
 				 trc.trc_pid, trc.trc_start);
 			break;
 		    case SSISYS_CLUSTERNODE_INFO:
 			if (iov.tio_udatainlen != sizeof cni ||
-			    umove (tcp, (long) iov.tio_udatain, &cni) < 0)
+			    umove(tcp, (long) iov.tio_udatain, &cni) < 0)
 				goto bad;
-			tprintf (", in={node=%ld, len=%d}",
+			tprintf(", in={node=%ld, len=%d}",
 				 cni.nodenum, cni.info_len);
 			break;
 		    default:
 		    bad:
 			if (iov.tio_udatainlen) {
-				tprintf (", in=[/* %d bytes */]",
+				tprintf(", in=[/* %d bytes */]",
 					 iov.tio_udatainlen);
 			}
 		}
 	}
 	else {
 		if (tcp->u_arg[1] != sizeof iov ||
-		    umove (tcp, tcp->u_arg[0], &iov) < 0)
+		    umove(tcp, tcp->u_arg[0], &iov) < 0)
 		    goto done;
 		switch (iov.tio_id.id_cmd) {
 		    case SSISYS_CLUSTERNODE_INFO:
 			if (iov.tio_udatainlen != sizeof cni ||
-			    umove (tcp, (long) iov.tio_udatain, &cni) < 0)
+			    umove(tcp, (long) iov.tio_udatain, &cni) < 0)
 				goto bad_out;
 			if (cni.info_len != sizeof info ||
 			    iov.tio_udataoutlen != sizeof &info ||
-			    umove (tcp, (long) iov.tio_udataout, &info) < 0)
+			    umove(tcp, (long) iov.tio_udataout, &info) < 0)
 				goto bad_out;
-			tprintf (", out={node=%ld, cpus=%d, online=%d}",
+			tprintf(", out={node=%ld, cpus=%d, online=%d}",
 				 info.node_num, info.node_totalcpus,
 				 info.node_onlinecpus);
 			break;
@@ -2296,12 +2296,12 @@ int sys_ssisys(struct tcb *tcp)
 		    default:
 		    bad_out:
 			if (iov.tio_udataoutlen) {
-				tprintf (", out=[/* %d bytes */]",
+				tprintf(", out=[/* %d bytes */]",
 					 iov.tio_udataoutlen);
 			}
 		}
 	    done:
-		tprintf ("}, %ld", tcp->u_arg[1]);
+		tprintf("}, %ld", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -2331,7 +2331,7 @@ int sys_sysmips(struct tcb *tcp)
 		printxval(sysmips_operations, tcp->u_arg[0], "???");
 		if (!verbose(tcp)) {
 			tprintf("%ld, %ld, %ld", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
-		} else if (tcp->u_arg[0]==SETNAME) {
+		} else if (tcp->u_arg[0] == SETNAME) {
 			char nodename[__NEW_UTS_LEN + 1];
 			if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN + 1), nodename) < 0)
 				tprintf(", %#lx", tcp->u_arg[1]);

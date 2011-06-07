@@ -11,7 +11,7 @@
 	{ 3,	0,	sys_mprotect,		"mprotect"	},  /* 10 */
 	{ 2,	0,	sys_munmap,		"munmap"	},  /* 11 */
 	{ 1,	0,	sys_brk,		"brk"		},  /* 12 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"  },  /* 13 */
+	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	},  /* 13 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"},  /* 14 */
 	{ 1,	TS,	printargs,		"rt_sigreturn"	},  /* 15 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		},  /* 16 */

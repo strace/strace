@@ -50,15 +50,15 @@
 #ifdef LINUX
 # include <asm/unistd.h>
 # if defined __NR_tgkill
-#  define my_tgkill(pid, tid, sig) syscall (__NR_tgkill, (pid), (tid), (sig))
+#  define my_tgkill(pid, tid, sig) syscall(__NR_tgkill, (pid), (tid), (sig))
 # elif defined __NR_tkill
-#  define my_tgkill(pid, tid, sig) syscall (__NR_tkill, (tid), (sig))
+#  define my_tgkill(pid, tid, sig) syscall(__NR_tkill, (tid), (sig))
 # else
    /* kill() may choose arbitrarily the target task of the process group
       while we later wait on a that specific TID.  PID process waits become
       TID task specific waits for a process under ptrace(2).  */
 #  warning "Neither tkill(2) nor tgkill(2) available, risk of strace hangs!"
-#  define my_tgkill(pid, tid, sig) kill ((tid), (sig))
+#  define my_tgkill(pid, tid, sig) kill((tid), (sig))
 # endif
 #endif
 
@@ -451,7 +451,7 @@ startup_attach(void)
 	 * Block user interruptions as we would leave the traced
 	 * process stopped (process state T) if we would terminate in
 	 * between PTRACE_ATTACH and wait4 () on SIGSTOP.
-	 * We rely on cleanup () from this point on.
+	 * We rely on cleanup() from this point on.
 	 */
 	if (interactive)
 		sigprocmask(SIG_BLOCK, &blocked_set, NULL);
@@ -655,7 +655,7 @@ startup_child(char **argv)
 	) {
 		pid = getpid();
 #ifdef USE_PROCFS
-		if (outf != stderr) close (fileno (outf));
+		if (outf != stderr) close(fileno(outf));
 #ifdef MIPS
 		/* Kludge for SGI, see proc_open for details. */
 		sa.sa_handler = foobar;
@@ -669,8 +669,8 @@ startup_child(char **argv)
 		kill(pid, SIGSTOP); /* stop HERE */
 #endif /* FREEBSD */
 #else /* !USE_PROCFS */
-		if (outf!=stderr)
-			close(fileno (outf));
+		if (outf != stderr)
+			close(fileno(outf));
 
 		if (!daemonized_tracer) {
 			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
@@ -1059,7 +1059,7 @@ main(int argc, char *argv[])
 		case 'P':
 			tracing_paths = 1;
 			if (pathtrace_select(optarg)) {
-				fprintf(stderr,"%s : failed to select path '%s'\n", progname, optarg);
+				fprintf(stderr, "%s : failed to select path '%s'\n", progname, optarg);
 				exit(1);
 			}
 			break;
@@ -1393,7 +1393,7 @@ proc_open(struct tcb *tcp, int attaching)
 		 * condition we have to poll for the event.
 		 */
 		for (;;) {
-			if (IOCTL_STATUS (tcp) < 0) {
+			if (IOCTL_STATUS(tcp) < 0) {
 				perror("strace: PIOCSTATUS");
 				return -1;
 			}
@@ -1449,22 +1449,22 @@ proc_open(struct tcb *tcp, int attaching)
 	premptyset(&syscalls);
 	for (i = 1; i < MAX_QUALS; ++i) {
 		if (i > (sizeof syscalls) * CHAR_BIT) break;
-		if (qual_flags [i] & QUAL_TRACE) praddset (&syscalls, i);
+		if (qual_flags[i] & QUAL_TRACE) praddset(&syscalls, i);
 	}
-	praddset (&syscalls, SYS_execve);
+	praddset(&syscalls, SYS_execve);
 	if (followfork) {
-		praddset (&syscalls, SYS_fork);
+		praddset(&syscalls, SYS_fork);
 #ifdef SYS_forkall
-		praddset (&syscalls, SYS_forkall);
+		praddset(&syscalls, SYS_forkall);
 #endif
 #ifdef SYS_fork1
-		praddset (&syscalls, SYS_fork1);
+		praddset(&syscalls, SYS_fork1);
 #endif
 #ifdef SYS_rfork1
-		praddset (&syscalls, SYS_rfork1);
+		praddset(&syscalls, SYS_rfork1);
 #endif
 #ifdef SYS_rforkall
-		praddset (&syscalls, SYS_rforkall);
+		praddset(&syscalls, SYS_rforkall);
 #endif
 	}
 	if (IOCTL(tcp->pfd, PIOCSENTRY, &syscalls) < 0) {
@@ -1480,7 +1480,7 @@ proc_open(struct tcb *tcp, int attaching)
 	premptyset(&signals);
 	for (i = 1; i < MAX_QUALS; ++i) {
 		if (i > (sizeof signals) * CHAR_BIT) break;
-		if (qual_flags [i] & QUAL_SIGNAL) praddset (&signals, i);
+		if (qual_flags[i] & QUAL_SIGNAL) praddset(&signals, i);
 	}
 	if (IOCTL(tcp->pfd, PIOCSTRACE, &signals) < 0) {
 		perror("PIOCSTRACE");
@@ -1490,7 +1490,7 @@ proc_open(struct tcb *tcp, int attaching)
 	premptyset(&faults);
 	for (i = 1; i < MAX_QUALS; ++i) {
 		if (i > (sizeof faults) * CHAR_BIT) break;
-		if (qual_flags [i] & QUAL_FAULT) praddset (&faults, i);
+		if (qual_flags[i] & QUAL_FAULT) praddset(&faults, i);
 	}
 	if (IOCTL(tcp->pfd, PIOCSFAULT, &faults) < 0) {
 		perror("PIOCSFAULT");
@@ -1498,8 +1498,8 @@ proc_open(struct tcb *tcp, int attaching)
 	}
 #else /* FREEBSD */
 	/* set events flags. */
-	arg = S_SIG | S_SCE | S_SCX ;
-	if(ioctl(tcp->pfd, PIOCBIS, arg) < 0) {
+	arg = S_SIG | S_SCE | S_SCX;
+	if (ioctl(tcp->pfd, PIOCBIS, arg) < 0) {
 		perror("PIOCBIS");
 		return -1;
 	}
@@ -1515,7 +1515,7 @@ proc_open(struct tcb *tcp, int attaching)
 #ifdef PRSABORT
 		/* The child is in a pause(), abort it. */
 		arg = PRSABORT;
-		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0) {
+		if (IOCTL(tcp->pfd, PIOCRUN, &arg) < 0) {
 			perror("PIOCRUN");
 			return -1;
 		}
@@ -1527,7 +1527,7 @@ proc_open(struct tcb *tcp, int attaching)
 #endif
 		for (;;) {
 			/* Wait for the child to do something. */
-			if (IOCTL_WSTOP (tcp) < 0) {
+			if (IOCTL_WSTOP(tcp) < 0) {
 				perror("PIOCWSTOP");
 				return -1;
 			}
@@ -1779,7 +1779,7 @@ resume_from_tcp(struct tcb *tcp)
 			    && ((t->flags & (TCB_CLONE_THREAD|TCB_SUSPENDED))
 				== (TCB_CLONE_THREAD|TCB_SUSPENDED))
 			    && t->waitpid == tcp->pid) {
-				error |= resume (t);
+				error |= resume(t);
 				++resumed;
 			}
 		}
@@ -1794,7 +1794,7 @@ resume_from_tcp(struct tcb *tcp)
 					== (TCB_CLONE_THREAD|TCB_SUSPENDED))
 				    && t->waitpid <= 0
 					) {
-					error |= resume (t);
+					error |= resume(t);
 					break;
 				}
 			}
@@ -1923,7 +1923,7 @@ detach(struct tcb *tcp, int sig)
 #endif /* SUNOS4 */
 
 #ifndef USE_PROCFS
-	error |= resume_from_tcp (tcp);
+	error |= resume_from_tcp(tcp);
 #endif
 
 	if (!qflag)
@@ -1933,7 +1933,7 @@ detach(struct tcb *tcp, int sig)
 
 #ifdef LINUX
 	if (zombie != NULL) {
-		/* TCP no longer exists therefore you must not detach () it.  */
+		/* TCP no longer exists therefore you must not detach() it.  */
 		droptcb(zombie);
 	}
 #endif
@@ -2045,7 +2045,7 @@ rebuild_pollv(void)
 	int i, j;
 
 	if (pollv != NULL)
-		free (pollv);
+		free(pollv);
 	pollv = (struct pollfd *) malloc(nprocs * sizeof pollv[0]);
 	if (pollv == NULL) {
 		fprintf(stderr, "%s: out of memory\n", progname);
@@ -2281,7 +2281,7 @@ trace(void)
 				in_syscall = NULL;
 				pv.fd = tcp->pfd;
 				pv.events = POLLWANT;
-				if ((what = poll (&pv, 1, 1)) < 0) {
+				if ((what = poll(&pv, 1, 1)) < 0) {
 					if (interrupted)
 						return 0;
 					continue;
@@ -2321,15 +2321,15 @@ trace(void)
 		/* Get the status of the process. */
 		if (!interrupted) {
 #ifndef FREEBSD
-			ioctl_result = IOCTL_WSTOP (tcp);
+			ioctl_result = IOCTL_WSTOP(tcp);
 #else /* FREEBSD */
 			/* Thanks to some scheduling mystery, the first poller
 			   sometimes waits for the already processed end of fork
 			   event. Doing a non blocking poll here solves the problem. */
 			if (proc_poll_pipe[0] != -1)
-				ioctl_result = IOCTL_STATUS (tcp);
+				ioctl_result = IOCTL_STATUS(tcp);
 			else
-				ioctl_result = IOCTL_WSTOP (tcp);
+				ioctl_result = IOCTL_WSTOP(tcp);
 #endif /* FREEBSD */
 			ioctl_errno = errno;
 #ifndef HAVE_POLLABLE_PROCFS
@@ -2368,7 +2368,7 @@ trace(void)
 #ifdef FREEBSD
 		if ((tcp->flags & TCB_STARTUP) && (tcp->status.PR_WHY == PR_SYSEXIT)) {
 			/* discard first event for a syscall we never entered */
-			IOCTL (tcp->pfd, PIOCRUN, 0);
+			IOCTL(tcp->pfd, PIOCRUN, 0);
 			continue;
 		}
 #endif
@@ -2461,9 +2461,9 @@ trace(void)
 		tcp->curcol = curcol;
 		arg = 0;
 #ifndef FREEBSD
-		if (IOCTL (tcp->pfd, PIOCRUN, &arg) < 0)
+		if (IOCTL(tcp->pfd, PIOCRUN, &arg) < 0)
 #else
-		if (IOCTL (tcp->pfd, PIOCRUN, 0) < 0)
+		if (IOCTL(tcp->pfd, PIOCRUN, 0) < 0)
 #endif
 		{
 			perror("PIOCRUN");

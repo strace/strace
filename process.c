@@ -480,7 +480,7 @@ int
 sys_rfork(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf ("%ld", tcp->u_arg[0]);
+		tprintf("%ld", tcp->u_arg[0]);
 	}
 	else if (!syserror(tcp)) {
 		if (getrval2(tcp)) {
@@ -692,27 +692,27 @@ change_syscall(struct tcb *tcp, int new)
 	return 0;
 #elif defined(S390) || defined(S390X)
 	/* s390 linux after 2.4.7 has a hook in entry.S to allow this */
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new) < 0)
 		return -1;
 	return 0;
 #elif defined(M68K)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new) < 0)
 		return -1;
 	return 0;
 #elif defined(SPARC) || defined(SPARC64)
 	struct pt_regs regs;
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char*)&regs, 0)<0)
+	if (ptrace(PTRACE_GETREGS, tcp->pid, (char*)&regs, 0) < 0)
 		return -1;
 	regs.u_regs[U_REG_G1] = new;
-	if (ptrace(PTRACE_SETREGS, tcp->pid, (char*)&regs, 0)<0)
+	if (ptrace(PTRACE_SETREGS, tcp->pid, (char*)&regs, 0) < 0)
 		return -1;
 	return 0;
 #elif defined(MIPS)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), new) < 0)
 		return -1;
 	return 0;
 #elif defined(ALPHA)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new) < 0)
 		return -1;
 	return 0;
 #elif defined(AVR32)
@@ -720,7 +720,7 @@ change_syscall(struct tcb *tcp, int new)
 		return -1;
 	return 0;
 #elif defined(BFIN)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_P0), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_P0), new) < 0)
 		return -1;
 	return 0;
 #elif defined(IA64)
@@ -736,17 +736,17 @@ change_syscall(struct tcb *tcp, int new)
 				__FUNCTION__, new);
 			return -1;
 		}
-		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R1), new)<0)
+		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R1), new) < 0)
 			return -1;
-	} else if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R15), new)<0)
+	} else if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R15), new) < 0)
 		return -1;
 	return 0;
 #elif defined(HPPA)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR20), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR20), new) < 0)
 		return -1;
 	return 0;
 #elif defined(SH)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new) < 0)
 		return -1;
 	return 0;
 #elif defined(SH64)
@@ -766,7 +766,7 @@ change_syscall(struct tcb *tcp, int new)
 #  define PTRACE_SET_SYSCALL 23
 # endif
 
-	if (ptrace (PTRACE_SET_SYSCALL, tcp->pid, 0, new & 0xffff) != 0)
+	if (ptrace(PTRACE_SET_SYSCALL, tcp->pid, 0, new & 0xffff) != 0)
 		return -1;
 
 	return 0;
@@ -777,7 +777,7 @@ change_syscall(struct tcb *tcp, int new)
 		return -1;
 	return 0;
 #elif defined(MICROBLAZE)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR(0)), new)<0)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR(0)), new) < 0)
 		return -1;
 	return 0;
 #else
@@ -1513,7 +1513,7 @@ sys_setpgid(struct tcb *tcp)
 #include <sys/privilege.h>
 
 
-static const struct xlat procpriv_cmds [] = {
+static const struct xlat procpriv_cmds[] = {
 	{ SETPRV,	"SETPRV"	},
 	{ CLRPRV,	"CLRPRV"	},
 	{ PUTPRV,	"PUTPRV"	},
@@ -1523,7 +1523,7 @@ static const struct xlat procpriv_cmds [] = {
 };
 
 
-static const struct xlat procpriv_priv [] = {
+static const struct xlat procpriv_priv[] = {
 	{ P_OWNER,	"P_OWNER"	},
 	{ P_AUDIT,	"P_AUDIT"	},
 	{ P_COMPAT,	"P_COMPAT"	},
@@ -1556,7 +1556,7 @@ static const struct xlat procpriv_priv [] = {
 };
 
 
-static const struct xlat procpriv_type [] = {
+static const struct xlat procpriv_type[] = {
 	{ PS_FIX,	"PS_FIX"	},
 	{ PS_INH,	"PS_INH"	},
 	{ PS_MAX,	"PS_MAX"	},
@@ -1568,40 +1568,40 @@ static const struct xlat procpriv_type [] = {
 static void
 printpriv(struct tcb *tcp, long addr, int len, const struct xlat *opt)
 {
-	priv_t buf [128];
-	int max = verbose (tcp) ? sizeof buf / sizeof buf [0] : 10;
+	priv_t buf[128];
+	int max = verbose(tcp) ? sizeof buf / sizeof buf[0] : 10;
 	int dots = len > max;
 	int i;
 
 	if (len > max) len = max;
 
 	if (len <= 0 ||
-	    umoven (tcp, addr, len * sizeof buf[0], (char *) buf) < 0)
+	    umoven(tcp, addr, len * sizeof buf[0], (char *) buf) < 0)
 	{
-		tprintf ("%#lx", addr);
+		tprintf("%#lx", addr);
 		return;
 	}
 
-	tprintf ("[");
+	tprintf("[");
 
 	for (i = 0; i < len; ++i) {
 		const char *t, *p;
 
-		if (i) tprintf (", ");
+		if (i) tprintf(", ");
 
-		if ((t = xlookup (procpriv_type, buf [i] & PS_TYPE)) &&
-		    (p = xlookup (procpriv_priv, buf [i] & ~PS_TYPE)))
+		if ((t = xlookup(procpriv_type, buf[i] & PS_TYPE)) &&
+		    (p = xlookup(procpriv_priv, buf[i] & ~PS_TYPE)))
 		{
-			tprintf ("%s|%s", t, p);
+			tprintf("%s|%s", t, p);
 		}
 		else {
-			tprintf ("%#lx", buf [i]);
+			tprintf("%#lx", buf[i]);
 		}
 	}
 
-	if (dots) tprintf (" ...");
+	if (dots) tprintf(" ...");
 
-	tprintf ("]");
+	tprintf("]");
 }
 
 
@@ -1619,19 +1619,19 @@ sys_procpriv(struct tcb *tcp)
 			break;
 
 		    default:
-			tprintf (", ");
-			printpriv (tcp, tcp->u_arg[1], tcp->u_arg[2]);
-			tprintf (", %ld", tcp->u_arg[2]);
+			tprintf(", ");
+			printpriv(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+			tprintf(", %ld", tcp->u_arg[2]);
 		}
 	}
 	else if (tcp->u_arg[0] == GETPRV) {
-		if (syserror (tcp)) {
+		if (syserror(tcp)) {
 			tprintf(", %#lx, %ld", tcp->u_arg[1], tcp->u_arg[2]);
 		}
 		else {
-			tprintf (", ");
-			printpriv (tcp, tcp->u_arg[1], tcp->u_rval);
-			tprintf (", %ld", tcp->u_arg[2]);
+			tprintf(", ");
+			printpriv(tcp, tcp->u_arg[1], tcp->u_rval);
+			tprintf(", %ld", tcp->u_arg[2]);
 		}
 	}
 
@@ -1730,9 +1730,9 @@ sys_execve(struct tcb *tcp)
 
 int sys_rexecve(struct tcb *tcp)
 {
-	if (entering (tcp)) {
-		sys_execve (tcp);
-		tprintf (", %ld", tcp->u_arg[3]);
+	if (entering(tcp)) {
+		sys_execve(tcp);
+		tprintf(", %ld", tcp->u_arg[3]);
 	}
 	return 0;
 }
@@ -2412,7 +2412,7 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_CR_9,		"cr9"					},
 	{ PT_CR_10,		"cr10"					},
 	{ PT_CR_11,		"cr11"					},
-	{ PT_IEEE_IP,           "ieee_exception_ip"                     },
+	{ PT_IEEE_IP,		"ieee_exception_ip"			},
 #   elif defined(SPARC)
 	/* XXX No support for these offsets yet. */
 #   elif defined(HPPA)
@@ -2620,10 +2620,10 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*UESP,		"4*UESP"				},
 	{ 4*SS,			"4*SS"					},
 #   elif defined(X86_64)
-	{ 8*R15, 		"8*R15"					},
-	{ 8*R14, 		"8*R14"					},
-	{ 8*R13, 		"8*R13"					},
-	{ 8*R12, 		"8*R12"					},
+	{ 8*R15,		"8*R15"					},
+	{ 8*R14,		"8*R14"					},
+	{ 8*R13,		"8*R13"					},
+	{ 8*R12,		"8*R12"					},
 	{ 8*RBP,		"8*RBP"					},
 	{ 8*RBX,		"8*RBX"					},
 	{ 8*R11,		"8*R11"					},
@@ -2662,210 +2662,210 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*PT_SR,		"4*PT_SR"				},
 	{ 4*PT_PC,		"4*PT_PC"				},
 #   elif defined(SH)
-	{ 4*REG_REG0,           "4*REG_REG0"                            },
-	{ 4*(REG_REG0+1),       "4*REG_REG1"                            },
-	{ 4*(REG_REG0+2),       "4*REG_REG2"                            },
-	{ 4*(REG_REG0+3),       "4*REG_REG3"                            },
-	{ 4*(REG_REG0+4),       "4*REG_REG4"                            },
-	{ 4*(REG_REG0+5),       "4*REG_REG5"                            },
-	{ 4*(REG_REG0+6),       "4*REG_REG6"                            },
-	{ 4*(REG_REG0+7),       "4*REG_REG7"                            },
-	{ 4*(REG_REG0+8),       "4*REG_REG8"                            },
-	{ 4*(REG_REG0+9),       "4*REG_REG9"                            },
-	{ 4*(REG_REG0+10),      "4*REG_REG10"                           },
-	{ 4*(REG_REG0+11),      "4*REG_REG11"                           },
-	{ 4*(REG_REG0+12),      "4*REG_REG12"                           },
-	{ 4*(REG_REG0+13),      "4*REG_REG13"                           },
-	{ 4*(REG_REG0+14),      "4*REG_REG14"                           },
-	{ 4*REG_REG15,          "4*REG_REG15"                           },
-	{ 4*REG_PC,             "4*REG_PC"                              },
-	{ 4*REG_PR,             "4*REG_PR"                              },
-	{ 4*REG_SR,             "4*REG_SR"                              },
-	{ 4*REG_GBR,            "4*REG_GBR"                             },
-	{ 4*REG_MACH,           "4*REG_MACH"                            },
-	{ 4*REG_MACL,           "4*REG_MACL"                            },
-	{ 4*REG_SYSCALL,        "4*REG_SYSCALL"                         },
-	{ 4*REG_FPUL,           "4*REG_FPUL"                            },
-	{ 4*REG_FPREG0,         "4*REG_FPREG0"                          },
-	{ 4*(REG_FPREG0+1),     "4*REG_FPREG1"                          },
-	{ 4*(REG_FPREG0+2),     "4*REG_FPREG2"                          },
-	{ 4*(REG_FPREG0+3),     "4*REG_FPREG3"                          },
-	{ 4*(REG_FPREG0+4),     "4*REG_FPREG4"                          },
-	{ 4*(REG_FPREG0+5),     "4*REG_FPREG5"                          },
-	{ 4*(REG_FPREG0+6),     "4*REG_FPREG6"                          },
-	{ 4*(REG_FPREG0+7),     "4*REG_FPREG7"                          },
-	{ 4*(REG_FPREG0+8),     "4*REG_FPREG8"                          },
-	{ 4*(REG_FPREG0+9),     "4*REG_FPREG9"                          },
-	{ 4*(REG_FPREG0+10),    "4*REG_FPREG10"                         },
-	{ 4*(REG_FPREG0+11),    "4*REG_FPREG11"                         },
-	{ 4*(REG_FPREG0+12),    "4*REG_FPREG12"                         },
-	{ 4*(REG_FPREG0+13),    "4*REG_FPREG13"                         },
-	{ 4*(REG_FPREG0+14),    "4*REG_FPREG14"                         },
-	{ 4*REG_FPREG15,        "4*REG_FPREG15"                         },
+	{ 4*REG_REG0,		"4*REG_REG0"				},
+	{ 4*(REG_REG0+1),	"4*REG_REG1"				},
+	{ 4*(REG_REG0+2),	"4*REG_REG2"				},
+	{ 4*(REG_REG0+3),	"4*REG_REG3"				},
+	{ 4*(REG_REG0+4),	"4*REG_REG4"				},
+	{ 4*(REG_REG0+5),	"4*REG_REG5"				},
+	{ 4*(REG_REG0+6),	"4*REG_REG6"				},
+	{ 4*(REG_REG0+7),	"4*REG_REG7"				},
+	{ 4*(REG_REG0+8),	"4*REG_REG8"				},
+	{ 4*(REG_REG0+9),	"4*REG_REG9"				},
+	{ 4*(REG_REG0+10),	"4*REG_REG10"				},
+	{ 4*(REG_REG0+11),	"4*REG_REG11"				},
+	{ 4*(REG_REG0+12),	"4*REG_REG12"				},
+	{ 4*(REG_REG0+13),	"4*REG_REG13"				},
+	{ 4*(REG_REG0+14),	"4*REG_REG14"				},
+	{ 4*REG_REG15,		"4*REG_REG15"				},
+	{ 4*REG_PC,		"4*REG_PC"				},
+	{ 4*REG_PR,		"4*REG_PR"				},
+	{ 4*REG_SR,		"4*REG_SR"				},
+	{ 4*REG_GBR,		"4*REG_GBR"				},
+	{ 4*REG_MACH,		"4*REG_MACH"				},
+	{ 4*REG_MACL,		"4*REG_MACL"				},
+	{ 4*REG_SYSCALL,	"4*REG_SYSCALL"				},
+	{ 4*REG_FPUL,		"4*REG_FPUL"				},
+	{ 4*REG_FPREG0,		"4*REG_FPREG0"				},
+	{ 4*(REG_FPREG0+1),	"4*REG_FPREG1"				},
+	{ 4*(REG_FPREG0+2),	"4*REG_FPREG2"				},
+	{ 4*(REG_FPREG0+3),	"4*REG_FPREG3"				},
+	{ 4*(REG_FPREG0+4),	"4*REG_FPREG4"				},
+	{ 4*(REG_FPREG0+5),	"4*REG_FPREG5"				},
+	{ 4*(REG_FPREG0+6),	"4*REG_FPREG6"				},
+	{ 4*(REG_FPREG0+7),	"4*REG_FPREG7"				},
+	{ 4*(REG_FPREG0+8),	"4*REG_FPREG8"				},
+	{ 4*(REG_FPREG0+9),	"4*REG_FPREG9"				},
+	{ 4*(REG_FPREG0+10),	"4*REG_FPREG10"				},
+	{ 4*(REG_FPREG0+11),	"4*REG_FPREG11"				},
+	{ 4*(REG_FPREG0+12),	"4*REG_FPREG12"				},
+	{ 4*(REG_FPREG0+13),	"4*REG_FPREG13"				},
+	{ 4*(REG_FPREG0+14),	"4*REG_FPREG14"				},
+	{ 4*REG_FPREG15,	"4*REG_FPREG15"				},
 #    ifdef REG_XDREG0
-	{ 4*REG_XDREG0,         "4*REG_XDREG0"                          },
-	{ 4*(REG_XDREG0+2),     "4*REG_XDREG2"                          },
-	{ 4*(REG_XDREG0+4),     "4*REG_XDREG4"                          },
-	{ 4*(REG_XDREG0+6),     "4*REG_XDREG6"                          },
-	{ 4*(REG_XDREG0+8),     "4*REG_XDREG8"                          },
-	{ 4*(REG_XDREG0+10),    "4*REG_XDREG10"                         },
-	{ 4*(REG_XDREG0+12),    "4*REG_XDREG12"                         },
-	{ 4*REG_XDREG14,        "4*REG_XDREG14"                         },
+	{ 4*REG_XDREG0,		"4*REG_XDREG0"				},
+	{ 4*(REG_XDREG0+2),	"4*REG_XDREG2"				},
+	{ 4*(REG_XDREG0+4),	"4*REG_XDREG4"				},
+	{ 4*(REG_XDREG0+6),	"4*REG_XDREG6"				},
+	{ 4*(REG_XDREG0+8),	"4*REG_XDREG8"				},
+	{ 4*(REG_XDREG0+10),	"4*REG_XDREG10"				},
+	{ 4*(REG_XDREG0+12),	"4*REG_XDREG12"				},
+	{ 4*REG_XDREG14,	"4*REG_XDREG14"				},
 #    endif
-	{ 4*REG_FPSCR,          "4*REG_FPSCR"                           },
+	{ 4*REG_FPSCR,		"4*REG_FPSCR"				},
 #   elif defined(SH64)
-	{ 0,		        "PC(L)"				        },
-	{ 4,	                "PC(U)"				        },
-	{ 8, 	                "SR(L)"	  	         		},
-	{ 12,               	"SR(U)"     				},
-	{ 16,            	"syscall no.(L)" 			},
-	{ 20,            	"syscall_no.(U)"			},
-	{ 24,            	"R0(L)"     				},
-	{ 28,            	"R0(U)"     				},
-	{ 32,            	"R1(L)"     				},
-	{ 36,            	"R1(U)"     				},
-	{ 40,            	"R2(L)"     				},
-	{ 44,            	"R2(U)"     				},
-	{ 48,            	"R3(L)"     				},
-	{ 52,            	"R3(U)"     				},
-	{ 56,            	"R4(L)"     				},
-	{ 60,            	"R4(U)"     				},
-	{ 64,            	"R5(L)"     				},
-	{ 68,            	"R5(U)"     				},
-	{ 72,            	"R6(L)"     				},
-	{ 76,            	"R6(U)"     				},
-	{ 80,            	"R7(L)"     				},
-	{ 84,            	"R7(U)"     				},
-	{ 88,            	"R8(L)"     				},
-	{ 92,            	"R8(U)"     				},
-	{ 96,            	"R9(L)"     				},
-	{ 100,           	"R9(U)"     				},
-	{ 104,           	"R10(L)"     				},
-	{ 108,           	"R10(U)"     				},
-	{ 112,           	"R11(L)"     				},
-	{ 116,           	"R11(U)"     				},
-	{ 120,           	"R12(L)"     				},
-	{ 124,           	"R12(U)"     				},
-	{ 128,           	"R13(L)"     				},
-	{ 132,           	"R13(U)"     				},
-	{ 136,           	"R14(L)"     				},
-	{ 140,           	"R14(U)"     				},
-	{ 144,           	"R15(L)"     				},
-	{ 148,           	"R15(U)"     				},
-	{ 152,           	"R16(L)"     				},
-	{ 156,           	"R16(U)"     				},
-	{ 160,           	"R17(L)"     				},
-	{ 164,           	"R17(U)"     				},
-	{ 168,           	"R18(L)"     				},
-	{ 172,           	"R18(U)"     				},
-	{ 176,           	"R19(L)"     				},
-	{ 180,           	"R19(U)"     				},
-	{ 184,           	"R20(L)"     				},
-	{ 188,           	"R20(U)"     				},
-	{ 192,           	"R21(L)"     				},
-	{ 196,           	"R21(U)"     				},
-	{ 200,           	"R22(L)"     				},
-	{ 204,           	"R22(U)"     				},
-	{ 208,           	"R23(L)"     				},
-	{ 212,           	"R23(U)"     				},
-	{ 216,           	"R24(L)"     				},
-	{ 220,           	"R24(U)"     				},
-	{ 224,           	"R25(L)"     				},
-	{ 228,           	"R25(U)"     				},
-	{ 232,           	"R26(L)"     				},
-	{ 236,           	"R26(U)"     				},
-	{ 240,           	"R27(L)"     				},
-	{ 244,           	"R27(U)"     				},
-	{ 248,           	"R28(L)"     				},
-	{ 252,           	"R28(U)"     				},
-	{ 256,           	"R29(L)"     				},
-	{ 260,           	"R29(U)"     				},
-	{ 264,           	"R30(L)"     				},
-	{ 268,           	"R30(U)"     				},
-	{ 272,           	"R31(L)"     				},
-	{ 276,           	"R31(U)"     				},
-	{ 280,           	"R32(L)"     				},
-	{ 284,           	"R32(U)"     				},
-	{ 288,           	"R33(L)"     				},
-	{ 292,           	"R33(U)"     				},
-	{ 296,           	"R34(L)"     				},
-	{ 300,           	"R34(U)"     				},
-	{ 304,           	"R35(L)"     				},
-	{ 308,           	"R35(U)"     				},
-	{ 312,           	"R36(L)"     				},
-	{ 316,           	"R36(U)"     				},
-	{ 320,           	"R37(L)"     				},
-	{ 324,           	"R37(U)"     				},
-	{ 328,           	"R38(L)"     				},
-	{ 332,           	"R38(U)"     				},
-	{ 336,           	"R39(L)"     				},
-	{ 340,           	"R39(U)"     				},
-	{ 344,           	"R40(L)"     				},
-	{ 348,           	"R40(U)"     				},
-	{ 352,           	"R41(L)"     				},
-	{ 356,           	"R41(U)"     				},
-	{ 360,           	"R42(L)"     				},
-	{ 364,           	"R42(U)"     				},
-	{ 368,           	"R43(L)"     				},
-	{ 372,           	"R43(U)"     				},
-	{ 376,           	"R44(L)"     				},
-	{ 380,           	"R44(U)"     				},
-	{ 384,           	"R45(L)"     				},
-	{ 388,           	"R45(U)"     				},
-	{ 392,           	"R46(L)"     				},
-	{ 396,           	"R46(U)"     				},
-	{ 400,           	"R47(L)"     				},
-	{ 404,           	"R47(U)"     				},
-	{ 408,           	"R48(L)"     				},
-	{ 412,           	"R48(U)"     				},
-	{ 416,           	"R49(L)"     				},
-	{ 420,           	"R49(U)"     				},
-	{ 424,           	"R50(L)"     				},
-	{ 428,           	"R50(U)"     				},
-	{ 432,           	"R51(L)"     				},
-	{ 436,           	"R51(U)"     				},
-	{ 440,           	"R52(L)"     				},
-	{ 444,           	"R52(U)"     				},
-	{ 448,           	"R53(L)"     				},
-	{ 452,           	"R53(U)"     				},
-	{ 456,           	"R54(L)"     				},
-	{ 460,           	"R54(U)"     				},
-	{ 464,           	"R55(L)"     				},
-	{ 468,           	"R55(U)"     				},
-	{ 472,           	"R56(L)"     				},
-	{ 476,           	"R56(U)"     				},
-	{ 480,           	"R57(L)"     				},
-	{ 484,           	"R57(U)"     				},
-	{ 488,           	"R58(L)"     				},
-	{ 492,           	"R58(U)"     				},
-	{ 496,           	"R59(L)"     				},
-	{ 500,           	"R59(U)"     				},
-	{ 504,           	"R60(L)"     				},
-	{ 508,           	"R60(U)"     				},
-	{ 512,           	"R61(L)"     				},
-	{ 516,           	"R61(U)"     				},
-	{ 520,           	"R62(L)"     				},
-	{ 524,           	"R62(U)"     				},
-	{ 528,                  "TR0(L)"                                },
-	{ 532,                  "TR0(U)"                                },
-	{ 536,                  "TR1(L)"                                },
-	{ 540,                  "TR1(U)"                                },
-	{ 544,                  "TR2(L)"                                },
-	{ 548,                  "TR2(U)"                                },
-	{ 552,                  "TR3(L)"                                },
-	{ 556,                  "TR3(U)"                                },
-	{ 560,                  "TR4(L)"                                },
-	{ 564,                  "TR4(U)"                                },
-	{ 568,                  "TR5(L)"                                },
-	{ 572,                  "TR5(U)"                                },
-	{ 576,                  "TR6(L)"                                },
-	{ 580,                  "TR6(U)"                                },
-	{ 584,                  "TR7(L)"                                },
-	{ 588,                  "TR7(U)"                                },
+	{ 0,			"PC(L)"					},
+	{ 4,			"PC(U)"					},
+	{ 8,			"SR(L)"					},
+	{ 12,			"SR(U)"					},
+	{ 16,			"syscall no.(L)"			},
+	{ 20,			"syscall_no.(U)"			},
+	{ 24,			"R0(L)"					},
+	{ 28,			"R0(U)"					},
+	{ 32,			"R1(L)"					},
+	{ 36,			"R1(U)"					},
+	{ 40,			"R2(L)"					},
+	{ 44,			"R2(U)"					},
+	{ 48,			"R3(L)"					},
+	{ 52,			"R3(U)"					},
+	{ 56,			"R4(L)"					},
+	{ 60,			"R4(U)"					},
+	{ 64,			"R5(L)"					},
+	{ 68,			"R5(U)"					},
+	{ 72,			"R6(L)"					},
+	{ 76,			"R6(U)"					},
+	{ 80,			"R7(L)"					},
+	{ 84,			"R7(U)"					},
+	{ 88,			"R8(L)"					},
+	{ 92,			"R8(U)"					},
+	{ 96,			"R9(L)"					},
+	{ 100,			"R9(U)"					},
+	{ 104,			"R10(L)"				},
+	{ 108,			"R10(U)"				},
+	{ 112,			"R11(L)"				},
+	{ 116,			"R11(U)"				},
+	{ 120,			"R12(L)"				},
+	{ 124,			"R12(U)"				},
+	{ 128,			"R13(L)"				},
+	{ 132,			"R13(U)"				},
+	{ 136,			"R14(L)"				},
+	{ 140,			"R14(U)"				},
+	{ 144,			"R15(L)"				},
+	{ 148,			"R15(U)"				},
+	{ 152,			"R16(L)"				},
+	{ 156,			"R16(U)"				},
+	{ 160,			"R17(L)"				},
+	{ 164,			"R17(U)"				},
+	{ 168,			"R18(L)"				},
+	{ 172,			"R18(U)"				},
+	{ 176,			"R19(L)"				},
+	{ 180,			"R19(U)"				},
+	{ 184,			"R20(L)"				},
+	{ 188,			"R20(U)"				},
+	{ 192,			"R21(L)"				},
+	{ 196,			"R21(U)"				},
+	{ 200,			"R22(L)"				},
+	{ 204,			"R22(U)"				},
+	{ 208,			"R23(L)"				},
+	{ 212,			"R23(U)"				},
+	{ 216,			"R24(L)"				},
+	{ 220,			"R24(U)"				},
+	{ 224,			"R25(L)"				},
+	{ 228,			"R25(U)"				},
+	{ 232,			"R26(L)"				},
+	{ 236,			"R26(U)"				},
+	{ 240,			"R27(L)"				},
+	{ 244,			"R27(U)"				},
+	{ 248,			"R28(L)"				},
+	{ 252,			"R28(U)"				},
+	{ 256,			"R29(L)"				},
+	{ 260,			"R29(U)"				},
+	{ 264,			"R30(L)"				},
+	{ 268,			"R30(U)"				},
+	{ 272,			"R31(L)"				},
+	{ 276,			"R31(U)"				},
+	{ 280,			"R32(L)"				},
+	{ 284,			"R32(U)"				},
+	{ 288,			"R33(L)"				},
+	{ 292,			"R33(U)"				},
+	{ 296,			"R34(L)"				},
+	{ 300,			"R34(U)"				},
+	{ 304,			"R35(L)"				},
+	{ 308,			"R35(U)"				},
+	{ 312,			"R36(L)"				},
+	{ 316,			"R36(U)"				},
+	{ 320,			"R37(L)"				},
+	{ 324,			"R37(U)"				},
+	{ 328,			"R38(L)"				},
+	{ 332,			"R38(U)"				},
+	{ 336,			"R39(L)"				},
+	{ 340,			"R39(U)"				},
+	{ 344,			"R40(L)"				},
+	{ 348,			"R40(U)"				},
+	{ 352,			"R41(L)"				},
+	{ 356,			"R41(U)"				},
+	{ 360,			"R42(L)"				},
+	{ 364,			"R42(U)"				},
+	{ 368,			"R43(L)"				},
+	{ 372,			"R43(U)"				},
+	{ 376,			"R44(L)"				},
+	{ 380,			"R44(U)"				},
+	{ 384,			"R45(L)"				},
+	{ 388,			"R45(U)"				},
+	{ 392,			"R46(L)"				},
+	{ 396,			"R46(U)"				},
+	{ 400,			"R47(L)"				},
+	{ 404,			"R47(U)"				},
+	{ 408,			"R48(L)"				},
+	{ 412,			"R48(U)"				},
+	{ 416,			"R49(L)"				},
+	{ 420,			"R49(U)"				},
+	{ 424,			"R50(L)"				},
+	{ 428,			"R50(U)"				},
+	{ 432,			"R51(L)"				},
+	{ 436,			"R51(U)"				},
+	{ 440,			"R52(L)"				},
+	{ 444,			"R52(U)"				},
+	{ 448,			"R53(L)"				},
+	{ 452,			"R53(U)"				},
+	{ 456,			"R54(L)"				},
+	{ 460,			"R54(U)"				},
+	{ 464,			"R55(L)"				},
+	{ 468,			"R55(U)"				},
+	{ 472,			"R56(L)"				},
+	{ 476,			"R56(U)"				},
+	{ 480,			"R57(L)"				},
+	{ 484,			"R57(U)"				},
+	{ 488,			"R58(L)"				},
+	{ 492,			"R58(U)"				},
+	{ 496,			"R59(L)"				},
+	{ 500,			"R59(U)"				},
+	{ 504,			"R60(L)"				},
+	{ 508,			"R60(U)"				},
+	{ 512,			"R61(L)"				},
+	{ 516,			"R61(U)"				},
+	{ 520,			"R62(L)"				},
+	{ 524,			"R62(U)"				},
+	{ 528,			"TR0(L)"				},
+	{ 532,			"TR0(U)"				},
+	{ 536,			"TR1(L)"				},
+	{ 540,			"TR1(U)"				},
+	{ 544,			"TR2(L)"				},
+	{ 548,			"TR2(U)"				},
+	{ 552,			"TR3(L)"				},
+	{ 556,			"TR3(U)"				},
+	{ 560,			"TR4(L)"				},
+	{ 564,			"TR4(U)"				},
+	{ 568,			"TR5(L)"				},
+	{ 572,			"TR5(U)"				},
+	{ 576,			"TR6(L)"				},
+	{ 580,			"TR6(U)"				},
+	{ 584,			"TR7(L)"				},
+	{ 588,			"TR7(U)"				},
 	/* This entry is in case pt_regs contains dregs (depends on
 	   the kernel build options). */
-	{ uoff(regs),	        "offsetof(struct user, regs)"	        },
-	{ uoff(fpu),	        "offsetof(struct user, fpu)"	        },
+	{ uoff(regs),		"offsetof(struct user, regs)"		},
+	{ uoff(fpu),		"offsetof(struct user, fpu)"		},
 #   elif defined(ARM)
 	{ uoff(regs.ARM_r0),	"r0"					},
 	{ uoff(regs.ARM_r1),	"r1"					},
@@ -3140,12 +3140,12 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_GPR(29),		"r29"					},
 	{ PT_GPR(30),		"r30"					},
 	{ PT_GPR(31),		"r31"					},
-	{ PT_PC, 		"rpc",					},
-	{ PT_MSR, 		"rmsr",					},
+	{ PT_PC,		"rpc",					},
+	{ PT_MSR,		"rmsr",					},
 	{ PT_EAR,		"rear",					},
 	{ PT_ESR,		"resr",					},
 	{ PT_FSR,		"rfsr",					},
-	{ PT_KERNEL_MODE, 	"kernel_mode",				},
+	{ PT_KERNEL_MODE,	"kernel_mode",				},
 #   endif
 
 #   if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
@@ -3579,7 +3579,7 @@ sys_sched_getscheduler(struct tcb *tcp)
 	if (entering(tcp)) {
 		tprintf("%d", (int) tcp->u_arg[0]);
 	} else if (! syserror(tcp)) {
-		tcp->auxstr = xlookup (schedulers, tcp->u_rval);
+		tcp->auxstr = xlookup(schedulers, tcp->u_rval);
 		if (tcp->auxstr != NULL)
 			return RVAL_STR;
 	}
