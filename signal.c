@@ -259,8 +259,7 @@ static const struct xlat sigprocmaskcmds[] = {
 #endif
 
 const char *
-signame(sig)
-int sig;
+signame(int sig)
 {
 	static char buf[30];
 	if (sig >= 0 && sig < nsignals) {
@@ -278,9 +277,7 @@ int sig;
 
 #ifndef UNIXWARE
 static void
-long_to_sigset(l, s)
-long l;
-sigset_t *s;
+long_to_sigset(long l, sigset_t *s)
 {
 	sigemptyset(s);
 	*(long *)s = l;
@@ -372,16 +369,13 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 }
 
 static void
-printsigmask(mask, rt)
-sigset_t *mask;
-int rt;
+printsigmask(sigset_t *mask, int rt)
 {
 	tprintf("%s", sprintsigmask("", mask, rt));
 }
 
 void
-printsignal(nr)
-int nr;
+printsignal(int nr)
 {
 	tprintf("%s", signame(nr));
 }
