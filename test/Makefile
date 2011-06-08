@@ -2,11 +2,15 @@
 # $Id$
 #
 
-all: vfork fork sig skodic clone leaderkill childthread
+all: \
+    vfork fork sig skodic clone leaderkill childthread \
+    sigkill_rain wait_must_be_interruptible
 
 leaderkill: LDFLAGS += -pthread
 
 childthread: LDFLAGS += -pthread
 
 clean distclean:
-	rm -f clone vfork fork sig leaderkill *.o core
+	rm -f *.o core \
+    vfork fork sig skodic clone leaderkill childthread \
+    sigkill_rain wait_must_be_interruptible

@@ -1,12 +1,10 @@
-/* This test is not yet added to Makefile */
-
 #include <stdlib.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <signal.h>
-
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <stdio.h>
 
 static const struct sockaddr sa;
 
@@ -15,6 +13,12 @@ int main(int argc, char *argv[])
 	int loops;
 	int pid;
 	sigset_t set;
+
+	printf(
+"Please run me under 'strace -f -oLOG', and examine LOG file for incorrect\n"
+"decoding of interrupted syscalls: grep for 'sendto', '??" /* anti-trigraph gap */ "?', 'unavailable'.\n"
+"Pass number of iterations in argv[1] (default: 999).\n"
+	);
 
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
@@ -57,7 +61,7 @@ int main(int argc, char *argv[])
 				 */
 				switch (loops & 1) {
 				case 0:
-					break; /* intentional empty */
+					break; /* intentionally empty */
 				case 1:
 					sendto(-1, "Hello cruel world", 17, 0, &sa, sizeof(sa));
 					break;

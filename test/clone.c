@@ -1,3 +1,6 @@
+/* for CLONE_foo: */
+#define _GNU_SOURCE 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sched.h>

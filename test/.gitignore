@@ -1,7 +1,9 @@
+vfork
 fork
 sig
 skodic
-vfork
 clone
 leaderkill
 childthread
+sigkill_rain
+wait_must_be_interruptible
