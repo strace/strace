@@ -2352,8 +2352,9 @@ syscall_enter(struct tcb *tcp)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = 5;
-	umoven(tcp, tcp->status.PR_REG[UESP] + 4,
-		tcp->u_nargs*sizeof(tcp->u_arg[0]), (char *) tcp->u_arg);
+	if (tcp->u_nargs > 0)
+		umoven(tcp, tcp->status.PR_REG[UESP] + 4,
+			tcp->u_nargs*sizeof(tcp->u_arg[0]), (char *) tcp->u_arg);
 #else
 	I DONT KNOW WHAT TO DO
 #endif /* !HAVE_PR_SYSCALL */
