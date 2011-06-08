@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 "decoding of interrupted syscalls: grep for 'sendto', '??" /* anti-trigraph gap */ "?', 'unavailable'.\n"
 "Pass number of iterations in argv[1] (default: 999).\n"
 	);
+	fflush(NULL);
 
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
