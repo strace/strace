@@ -4121,7 +4121,7 @@
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 4116 */
 	{ 6,	0,	sys_ipc,		"ipc"		}, /* 4117 */
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 4118 */
-	{ 1,	TS,	sys_sigreturn,		"sigreturn"	}, /* 4119 */
+	{ 0,	TS,	sys_sigreturn,		"sigreturn"	}, /* 4119 */
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 4120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 4121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 4122 */

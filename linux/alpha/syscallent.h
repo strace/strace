@@ -131,7 +131,7 @@
 	{ 2,	0,	sys_getpriority,	"osf_getpriority"	}, /* 100 */
 	{ 4,	TN,	sys_send,		"send"			}, /* 101 */
 	{ 4,	TN,	sys_recv,		"recv"			}, /* 102 */
-	{ 1,	TS,	sys_sigreturn,		"sigreturn"		}, /* 103 */
+	{ 0,	TS,	sys_sigreturn,		"sigreturn"		}, /* 103 */
 	{ 3,	TN,	sys_bind,		"bind"			}, /* 104 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"		}, /* 105 */
 	{ 2,	TN,	sys_listen,		"listen"		}, /* 106 */
