@@ -1477,6 +1477,7 @@ sys_sigreturn(struct tcb *tcp)
 		tcp->u_arg[0] = 0;
 		sp = regs.regs[29];
 		if (umove(tcp, sp, &si) < 0)
+			return 0;
 		tcp->u_arg[0] = 1;
 		tcp->u_arg[1] = si.si_mask;
 	} else {
