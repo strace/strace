@@ -2953,7 +2953,7 @@ printleader(struct tcb *tcp)
 	if (tcp_last) {
 		if (tcp_last->ptrace_errno) {
 			if (tcp_last->flags & TCB_INSYSCALL) {
-				tprintf(" <unavailable>)");
+				tprintf(" <unavailable>) ");
 				tabto(acolumn);
 			}
 			tprintf("= ? <unavailable>\n");
