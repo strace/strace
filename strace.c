@@ -228,18 +228,14 @@ static void die(void)
 
 static void verror_msg(int err_no, const char *fmt, va_list p)
 {
-	char *msg;
-
-	msg = NULL;
-	vasprintf(&msg, fmt, p);
-	if (msg) {
-		fflush(NULL);
-		if (err_no)
-			fprintf(stderr, "%s: %s: %s\n", progname, msg, strerror(err_no));
-		else
-			fprintf(stderr, "%s: %s\n", progname, msg);
-		free(msg);
-	}
+	fflush(NULL);
+	fprintf(stderr, "%s: ", progname);
+	vfprintf(stderr, fmt, p);
+	if (err_no)
+		fprintf(stderr, ": %s\n", strerror(err_no));
+	else
+		putc('\n', stderr);
+	fflush(stderr);
 }
 
 void error_msg(const char *fmt, ...)
