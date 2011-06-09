@@ -4682,9 +4682,6 @@
 	{ 5,	0,	printargs,		"o32_fanotify_mark"	}, /* 4337 */
 	{ 4,	0,	printargs,		"o32_prlimit64"	}, /* 4338 */
 #endif
-	{ 0,	0,	printargs,		"SYS_4336"	}, /* 4336 */
-	{ 0,	0,	printargs,		"SYS_4337"	}, /* 4337 */
-	{ 0,	0,	printargs,		"SYS_4338"	}, /* 4338 */
 	{ 0,	0,	printargs,		"SYS_4339"	}, /* 4339 */
 	{ 0,	0,	printargs,		"SYS_4340"	}, /* 4340 */
 	{ 0,	0,	printargs,		"SYS_4341"	}, /* 4341 */
