@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Ensure that strace tests kernel PTRACE_O_TRACESYSGOOD support properly.
+
+. "${srcdir=.}/init.sh"
+
+[ "$(uname -s)" = Linux ] ||
+	skip_ 'The kernel is not a Linux kernel'
+case "$(uname -r)" in
+	2.[6-9]*|2.[1-5][0-9]*|[3-9].*|[12][0-9]*) ;;
+	*) skip_ 'The kernel is not Linux 2.6.* or newer' ;;
+esac
+
+check_strace
+check_prog timeout
+
+timeout -s 9 9 \
+$STRACE -d -enone / 2>&1 |
+	grep -F -x 'ptrace_setoptions_for_all = 0x11' > /dev/null ||
+		fail_ 'strace failed to recognize proper kernel PTRACE_O_TRACESYSGOOD support'
