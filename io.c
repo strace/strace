@@ -76,7 +76,7 @@ sys_write(struct tcb *tcp)
 
 #if HAVE_SYS_UIO_H
 void
-tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr)
+tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_iov)
 {
 #if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
 	union {
@@ -132,7 +132,10 @@ tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr)
 			break;
 		}
 		tprintf("{");
-		printstr(tcp, (long) iov_iov_base, iov_iov_len);
+		if (decode_iov)
+			printstr(tcp, (long) iov_iov_base, iov_iov_len);
+		else
+			tprintf("%#lx", (long) iov_iov_base);
 		tprintf(", %lu}", (unsigned long)iov_iov_len);
 	}
 	tprintf("]");
@@ -155,7 +158,7 @@ sys_readv(struct tcb *tcp)
 					tcp->u_arg[1], tcp->u_arg[2]);
 			return 0;
 		}
-		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
@@ -167,7 +170,7 @@ sys_writev(struct tcb *tcp)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprintf(", ");
-		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
@@ -243,9 +246,9 @@ sys_sendfile(struct tcb *tcp)
 				tprintf(", %#lx", tcp->u_arg[5]);
 			else {
 				tprintf(", { ");
-				tprint_iov(tcp, hdtr.hdr_cnt, hdtr.headers);
+				tprint_iov(tcp, hdtr.hdr_cnt, hdtr.headers, 1);
 				tprintf(", %u, ", hdtr.hdr_cnt);
-				tprint_iov(tcp, hdtr.trl_cnt, hdtr.trailers);
+				tprint_iov(tcp, hdtr.trl_cnt, hdtr.trailers, 1);
 				tprintf(", %u }", hdtr.hdr_cnt);
 			}
 		}
@@ -316,7 +319,7 @@ sys_preadv(struct tcb *tcp)
 			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 			return 0;
 		}
-		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
 	}
@@ -329,7 +332,7 @@ sys_pwritev(struct tcb *tcp)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprintf(", ");
-		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
 	}

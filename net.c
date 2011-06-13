@@ -1409,7 +1409,7 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg)
 
 	tprintf(", msg_iov(%lu)=", (unsigned long)msg->msg_iovlen);
 	tprint_iov(tcp, (unsigned long)msg->msg_iovlen,
-		   (unsigned long)msg->msg_iov);
+		   (unsigned long)msg->msg_iov, 1);
 
 #ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
 	tprintf(", msg_controllen=%lu", (unsigned long)msg->msg_controllen);

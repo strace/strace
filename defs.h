@@ -584,7 +584,7 @@ extern void printleader(struct tcb *);
 extern void printtrailer(void);
 extern void tabto(int);
 extern void call_summary(FILE *);
-extern void tprint_iov(struct tcb *, unsigned long, unsigned long);
+extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_open_modes(mode_t);
 extern const char *sprint_open_modes(mode_t);
 extern int is_restart_error(struct tcb *);
