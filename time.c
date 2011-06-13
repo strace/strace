@@ -823,12 +823,12 @@ sys_timer_create(struct tcb *tcp)
 		printsigevent(tcp, tcp->u_arg[1]);
 		tprintf(", ");
 	} else {
-		void *p;
+		int timer_id;
 
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[2], &p) < 0)
+		if (syserror(tcp) || umove(tcp, tcp->u_arg[2], &timer_id) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
 		else
-			tprintf("{%p}", p);
+			tprintf("{%d}", timer_id);
 	}
 	return 0;
 }
