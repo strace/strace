@@ -114,14 +114,14 @@
 static const struct sysent sysent0[] = {
 #include "syscallent.h"
 };
-static const int nsyscalls0 = sizeof sysent0 / sizeof sysent0[0];
+static const int nsyscalls0 = ARRAY_SIZE(sysent0);
 int qual_flags0[MAX_QUALS];
 
 #if SUPPORTED_PERSONALITIES >= 2
 static const struct sysent sysent1[] = {
 #include "syscallent1.h"
 };
-static const int nsyscalls1 = sizeof sysent1 / sizeof sysent1[0];
+static const int nsyscalls1 = ARRAY_SIZE(sysent1);
 int qual_flags1[MAX_QUALS];
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
@@ -129,7 +129,7 @@ int qual_flags1[MAX_QUALS];
 static const struct sysent sysent2[] = {
 #include "syscallent2.h"
 };
-static const int nsyscalls2 = sizeof sysent2 / sizeof sysent2[0];
+static const int nsyscalls2 = ARRAY_SIZE(sysent2);
 int qual_flags2[MAX_QUALS];
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
@@ -149,20 +149,20 @@ int nsyscalls;
 static const char *const errnoent0[] = {
 #include "errnoent.h"
 };
-static const int nerrnos0 = sizeof errnoent0 / sizeof errnoent0[0];
+static const int nerrnos0 = ARRAY_SIZE(errnoent0);
 
 #if SUPPORTED_PERSONALITIES >= 2
 static const char *const errnoent1[] = {
 #include "errnoent1.h"
 };
-static const int nerrnos1 = sizeof errnoent1 / sizeof errnoent1[0];
+static const int nerrnos1 = ARRAY_SIZE(errnoent1);
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
 static const char *const errnoent2[] = {
 #include "errnoent2.h"
 };
-static const int nerrnos2 = sizeof errnoent2 / sizeof errnoent2[0];
+static const int nerrnos2 = ARRAY_SIZE(errnoent2);
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 const char *const *errnoent;
@@ -596,9 +596,9 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 		break;
 #ifdef FREEBSD
 	case table_style:
-		for (i = 0; i < sizeof(subcalls_table) / sizeof(struct subcall); i++)
+		for (i = 0; i < ARRAY_SIZE(subcalls_table); i++)
 			if (subcalls_table[i].call == tcp->scno) break;
-		if (i < sizeof(subcalls_table) / sizeof(struct subcall) &&
+		if (i < ARRAY_SIZE(subcalls_table) &&
 		    tcp->u_arg[0] >= 0 && tcp->u_arg[0] < subcalls_table[i].nsubcalls) {
 			tcp->scno = subcalls_table[i].subcalls[tcp->u_arg[0]];
 			for (i = 0; i < tcp->u_nargs; i++)
@@ -2165,7 +2165,7 @@ syscall_enter(struct tcb *tcp)
 		if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 			tcp->u_nargs = sysent[tcp->scno].nargs;
 		else
-			tcp->u_nargs = sizeof(argreg) / sizeof(argreg[0]);
+			tcp->u_nargs = ARRAY_SIZE(argreg);
 
 		for (i = 0; i < tcp->u_nargs; ++i)
 			if (upeek(tcp, argreg[i], &tcp->u_arg[i]) < 0)
@@ -2196,8 +2196,7 @@ syscall_enter(struct tcb *tcp)
 		 *       in the trap number matches the number strace expects.
 		 */
 		/*
-		assert(sysent[tcp->scno].nargs <
-		       sizeof(syscall_regs)/sizeof(syscall_regs[0]));
+		assert(sysent[tcp->scno].nargs < ARRAY_SIZE(syscall_regs));
 		 */
 
 		tcp->u_nargs = sysent[tcp->scno].nargs;

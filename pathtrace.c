@@ -40,8 +40,6 @@
 
 #include "syscall.h"
 
-#define NumElem(a)  (int)(sizeof(a) / sizeof((a)[0]))
-
 #define MAXSELECTED  256	/* max number of "selected" paths */
 static const char *selected[MAXSELECTED];	/* paths selected for tracing */
 
@@ -51,9 +49,9 @@ static const char *selected[MAXSELECTED];	/* paths selected for tracing */
 static int
 pathmatch(const char *path)
 {
-	int     i;
+	unsigned int i;
 
-	for (i = 0; i < NumElem(selected); ++i)
+	for (i = 0; i < ARRAY_SIZE(selected); ++i)
 	{
 		if (selected[i] == NULL)
 			return 0;
@@ -93,11 +91,11 @@ fdmatch(struct tcb *tcp, int fd)
 static int
 storepath(const char *path)
 {
-	int     i;
+	unsigned int i;
 
 	if (path == NULL)
 	{
-		for (i = 0; i < NumElem(selected); ++i)
+		for (i = 0; i < ARRAY_SIZE(selected); ++i)
 			if (selected[i])
 			{
 				free((char *) selected[i]);
@@ -106,15 +104,15 @@ storepath(const char *path)
 		return 0;
 	}
 
-	for (i = 0; i < NumElem(selected); ++i)
+	for (i = 0; i < ARRAY_SIZE(selected); ++i)
 		if (!selected[i])
 		{
 			selected[i] = path;
 			return 0;
 		}
 
-	fprintf(stderr, "Max trace paths exceeded, only using first %d\n",
-		NumElem(selected));
+	fprintf(stderr, "Max trace paths exceeded, only using first %u\n",
+		(unsigned int) ARRAY_SIZE(selected));
 	return -1;
 }
 

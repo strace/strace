@@ -47,14 +47,14 @@ const struct ioctlent ioctlent0[] = {
 #include <asm/ioctl.h>
 #endif
 
-const int nioctlents0 = sizeof ioctlent0 / sizeof ioctlent0[0];
+const int nioctlents0 = ARRAY_SIZE(ioctlent0);
 
 #if SUPPORTED_PERSONALITIES >= 2
 const struct ioctlent ioctlent1[] = {
 #include "ioctlent1.h"
 };
 
-const int nioctlents1 = sizeof ioctlent1 / sizeof ioctlent1[0];
+const int nioctlents1 = ARRAY_SIZE(ioctlent1);
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
@@ -62,7 +62,7 @@ const struct ioctlent ioctlent2[] = {
 #include "ioctlent2.h"
 };
 
-const int nioctlents2 = sizeof ioctlent2 / sizeof ioctlent2[0];
+const int nioctlents2 = ARRAY_SIZE(ioctlent2);
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 const struct ioctlent *ioctlent;

@@ -343,6 +343,8 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 # define __attribute__(x) /*nothing*/
 #endif
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+
 /* Trace Control Block */
 struct tcb {
 	short flags;		/* See below for TCB_ values */

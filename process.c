@@ -1569,7 +1569,7 @@ static void
 printpriv(struct tcb *tcp, long addr, int len, const struct xlat *opt)
 {
 	priv_t buf[128];
-	int max = verbose(tcp) ? sizeof buf / sizeof buf[0] : 10;
+	int max = verbose(tcp) ? ARRAY_SIZE(buf) : 10;
 	int dots = len > max;
 	int i;
 

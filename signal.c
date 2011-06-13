@@ -143,20 +143,20 @@ struct sigcontext
 const char *const signalent0[] = {
 #include "signalent.h"
 };
-const int nsignals0 = sizeof signalent0 / sizeof signalent0[0];
+const int nsignals0 = ARRAY_SIZE(signalent0);
 
 #if SUPPORTED_PERSONALITIES >= 2
 const char *const signalent1[] = {
 #include "signalent1.h"
 };
-const int nsignals1 = sizeof signalent1 / sizeof signalent1[0];
+const int nsignals1 = ARRAY_SIZE(signalent1);
 #endif /* SUPPORTED_PERSONALITIES >= 2 */
 
 #if SUPPORTED_PERSONALITIES >= 3
 const char *const signalent2[] = {
 #include "signalent2.h"
 };
-const int nsignals2 = sizeof signalent2 / sizeof signalent2[0];
+const int nsignals2 = ARRAY_SIZE(signalent2);
 #endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 const char *const *signalent;
