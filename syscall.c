@@ -653,22 +653,6 @@ internal_syscall(struct tcb *tcp)
 	   )
 		return internal_exec(tcp);
 
-	if (   sys_waitpid == func
-	    || sys_wait4 == func
-#if defined(SVR4) || defined(FREEBSD) || defined(SUNOS4)
-	    || sys_wait == func
-#endif
-#ifdef ALPHA
-	    || sys_osf_wait4 == func
-#endif
-	   )
-		return internal_wait(tcp, 2);
-
-#if defined(LINUX) || defined(SVR4)
-	if (sys_waitid == func)
-		return internal_wait(tcp, 3);
-#endif
-
 	return 0;
 }
 

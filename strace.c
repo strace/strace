@@ -1289,7 +1289,6 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->nzombies = 0;
 #ifdef TCB_CLONE_THREAD
 			tcp->nclone_threads = 0;
-			tcp->nclone_waiting = 0;
 #endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
 			tcp->outf = outf; /* Initialise to current out file */
@@ -1709,99 +1708,6 @@ droptcb(struct tcb *tcp)
 	tcp->outf = 0;
 }
 
-#ifndef USE_PROCFS
-
-static int
-resume(struct tcb *tcp)
-{
-	if (tcp == NULL)
-		return -1;
-
-	if (!(tcp->flags & TCB_SUSPENDED)) {
-		fprintf(stderr, "PANIC: pid %u not suspended\n", tcp->pid);
-		return -1;
-	}
-	tcp->flags &= ~TCB_SUSPENDED;
-#ifdef TCB_CLONE_THREAD
-	if (tcp->flags & TCB_CLONE_THREAD)
-		tcp->parent->nclone_waiting--;
-#endif
-
-	if (ptrace_restart(PTRACE_SYSCALL, tcp, 0) < 0)
-		return -1;
-
-	if (!qflag)
-		fprintf(stderr, "Process %u resumed\n", tcp->pid);
-	return 0;
-}
-
-static int
-resume_from_tcp(struct tcb *tcp)
-{
-	int error = 0;
-	int resumed = 0;
-
-	/* XXX This won't always be quite right (but it never was).
-	   A waiter with argument 0 or < -1 is waiting for any pid in
-	   a particular pgrp, which this child might or might not be
-	   in.  The waiter will only wake up if it's argument is -1
-	   or if it's waiting for tcp->pid's pgrp.  It makes a
-	   difference to wake up a waiter when there might be more
-	   traced children, because it could get a false ECHILD
-	   error.  OTOH, if this was the last child in the pgrp, then
-	   it ought to wake up and get ECHILD.  We would have to
-	   search the system for all pid's in the pgrp to be sure.
-
-	     && (t->waitpid == -1 ||
-		 (t->waitpid == 0 && getpgid (tcp->pid) == getpgid (t->pid))
-		 || (t->waitpid < 0 && t->waitpid == -getpid (t->pid)))
-	*/
-
-	if (tcp->parent &&
-	    (tcp->parent->flags & TCB_SUSPENDED) &&
-	    (tcp->parent->waitpid <= 0 || tcp->parent->waitpid == tcp->pid)) {
-		error = resume(tcp->parent);
-		++resumed;
-	}
-#ifdef TCB_CLONE_THREAD
-	if (tcp->parent && tcp->parent->nclone_waiting > 0) {
-		/* Some other threads of our parent are waiting too.  */
-		unsigned int i;
-
-		/* Resume all the threads that were waiting for this PID.  */
-		for (i = 0; i < tcbtabsize; i++) {
-			struct tcb *t = tcbtab[i];
-			if (t->parent == tcp->parent && t != tcp
-			    && ((t->flags & (TCB_CLONE_THREAD|TCB_SUSPENDED))
-				== (TCB_CLONE_THREAD|TCB_SUSPENDED))
-			    && t->waitpid == tcp->pid) {
-				error |= resume(t);
-				++resumed;
-			}
-		}
-		if (resumed == 0)
-			/* Noone was waiting for this PID in particular,
-			   so now we might need to resume some wildcarders.  */
-			for (i = 0; i < tcbtabsize; i++) {
-				struct tcb *t = tcbtab[i];
-				if (t->parent == tcp->parent && t != tcp
-				    && ((t->flags
-					 & (TCB_CLONE_THREAD|TCB_SUSPENDED))
-					== (TCB_CLONE_THREAD|TCB_SUSPENDED))
-				    && t->waitpid <= 0
-					) {
-					error |= resume(t);
-					break;
-				}
-			}
-	}
-#endif
-
-	return error;
-}
-
-#endif /* !USE_PROCFS */
-
 /* detach traced process; continue with sig
    Never call DETACH twice on the same process as both unattached and
    attached-unstopped processes give the same ESRCH.  For unattached process we
@@ -1917,10 +1823,6 @@ detach(struct tcb *tcp, int sig)
 	sig = 0;
 	error = ptrace_restart(PTRACE_DETACH, tcp, sig);
 #endif /* SUNOS4 */
-
-#ifndef USE_PROCFS
-	error |= resume_from_tcp(tcp);
-#endif
 
 	if (!qflag)
 		fprintf(stderr, "Process %u detached\n", tcp->pid);
@@ -2498,9 +2400,6 @@ handle_group_exit(struct tcb *tcp, int sig)
 				tcp->pid, leader ? leader->pid : -1);
 		}
 		/* TCP no longer exists therefore you must not detach() it.  */
-#ifndef USE_PROCFS
-		resume_from_tcp(tcp);
-#endif
 		droptcb(tcp);	/* Already died.  */
 	}
 	else {

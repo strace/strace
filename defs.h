@@ -369,11 +369,9 @@ struct tcb {
 				/* Support for tracing forked processes */
 	struct tcb *parent;	/* Parent of this process */
 	int nchildren;		/* # of traced children */
-	int waitpid;		/* pid(s) this process is waiting for */
 	int nzombies;		/* # of formerly traced children now dead */
 #ifdef LINUX
 	int nclone_threads;	/* # of nchildren with CLONE_THREAD */
-	int nclone_waiting;	/* clone threads in wait4 (TCB_SUSPENDED) */
 #endif
 				/* (1st arg of wait4()) */
 	long baddr;		/* `Breakpoint' address */
@@ -595,7 +593,6 @@ extern int pathtrace_match(struct tcb *);
 extern int change_syscall(struct tcb *, int);
 extern int internal_fork(struct tcb *);
 extern int internal_exec(struct tcb *);
-extern int internal_wait(struct tcb *, int);
 extern int internal_exit(struct tcb *);
 #ifdef LINUX
 extern int handle_new_child(struct tcb *, int, int);
