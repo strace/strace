@@ -84,8 +84,7 @@ extern char *optarg;
 
 
 int debug = 0, followfork = 0;
-unsigned int ptrace_setoptions_followfork = 0;
-unsigned int ptrace_setoptions_for_all = 0;
+unsigned int ptrace_setoptions = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
 static unsigned int syscall_trap_sig = SIGTRAP;
 int dtime = 0, xflag = 0, qflag = 0;
@@ -826,7 +825,7 @@ test_ptrace_setoptions_followfork(void)
 		}
 	}
 	if (expected_grandchild && expected_grandchild == found_grandchild)
-		ptrace_setoptions_followfork |= test_options;
+		ptrace_setoptions |= test_options;
 	return 0;
 }
 
@@ -907,10 +906,10 @@ test_ptrace_setoptions_for_all(void)
 
 	if (it_worked) {
 		syscall_trap_sig = (SIGTRAP | 0x80);
-		ptrace_setoptions_for_all = test_options;
+		ptrace_setoptions |= test_options;
 		if (debug)
-			fprintf(stderr, "ptrace_setoptions_for_all = %#x\n",
-				ptrace_setoptions_for_all);
+			fprintf(stderr, "ptrace_setoptions = %#x\n",
+				ptrace_setoptions);
 		return;
 	}
 
@@ -1136,11 +1135,11 @@ main(int argc, char *argv[])
 			fprintf(stderr,
 				"Test for options supported by PTRACE_SETOPTIONS "
 				"failed, giving up using this feature.\n");
-			ptrace_setoptions_followfork = 0;
+			ptrace_setoptions = 0;
 		}
 		if (debug)
-			fprintf(stderr, "ptrace_setoptions_followfork = %#x\n",
-				ptrace_setoptions_followfork);
+			fprintf(stderr, "ptrace_setoptions = %#x\n",
+				ptrace_setoptions);
 	}
 	test_ptrace_setoptions_for_all();
 #endif
@@ -2679,16 +2678,16 @@ Process %d attached (waiting for parent)\n",
 				}
 			}
 #ifdef LINUX
-			int options = ptrace_setoptions_for_all;
-			if (followfork && (tcp->parent == NULL))
-				options |= ptrace_setoptions_followfork;
-			if (options) {
-				if (debug)
-					fprintf(stderr, "setting opts %x on pid %d\n", options, tcp->pid);
-				if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, options) < 0) {
-					if (errno != ESRCH) {
-						/* Should never happen, really */
-						perror_msg_and_die("PTRACE_SETOPTIONS");
+			/* If options were not set for this tracee yet */
+			if (tcp->parent == NULL) {
+				if (ptrace_setoptions) {
+					if (debug)
+						fprintf(stderr, "setting opts %x on pid %d\n", ptrace_setoptions, tcp->pid);
+					if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, ptrace_setoptions) < 0) {
+						if (errno != ESRCH) {
+							/* Should never happen, really */
+							perror_msg_and_die("PTRACE_SETOPTIONS");
+						}
 					}
 				}
 			}

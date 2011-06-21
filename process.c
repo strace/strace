@@ -904,7 +904,7 @@ Process %u resumed (parent %d ready)\n",
 int
 internal_fork(struct tcb *tcp)
 {
-	if ((ptrace_setoptions_followfork
+	if ((ptrace_setoptions
 	    & (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
 	   == (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
 		return 0;
@@ -1751,7 +1751,7 @@ internal_exec(struct tcb *tcp)
 		tcp->flags &= ~TCB_WAITEXECVE;
 	else {
 		/* Maybe we have post-execve SIGTRAP suppressed? */
-		if (!(ptrace_setoptions_for_all & PTRACE_O_TRACEEXEC))
+		if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC))
 			tcp->flags |= TCB_WAITEXECVE; /* no */
 	}
 #endif /* LINUX && TCB_WAITEXECVE */
