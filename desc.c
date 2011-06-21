@@ -815,6 +815,8 @@ sys_io_destroy(struct tcb *tcp)
 	return 0;
 }
 
+#ifdef HAVE_LIBAIO_H
+
 enum iocb_sub {
 	SUB_NONE, SUB_COMMON, SUB_POLL, SUB_VECTOR
 };
@@ -860,6 +862,9 @@ print_common_flags(struct iocb *iocb)
 	if (iocb->u.c.flags & ~IOCB_RESFD)
 		tprintf("flags=%x, ", iocb->u.c.flags);
 }
+
+#endif /* HAVE_LIBAIO_H */
+
 int
 sys_io_submit(struct tcb *tcp)
 {
