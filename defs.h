@@ -368,9 +368,8 @@ struct tcb {
 	struct timeval etime;	/* Syscall entry time */
 				/* Support for tracing forked processes */
 	struct tcb *parent;	/* Parent of this process */
-	int nchildren;		/* # of traced children */
 #ifdef LINUX
-	int nclone_threads;	/* # of nchildren with CLONE_THREAD */
+	int nclone_threads;	/* # of children with CLONE_THREAD */
 #endif
 				/* (1st arg of wait4()) */
 	long baddr;		/* `Breakpoint' address */

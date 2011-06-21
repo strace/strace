@@ -836,7 +836,6 @@ handle_new_child(struct tcb *tcp, int pid, int bpt)
 			sizeof tcpchild->inst);
 	}
 	tcpchild->parent = tcp;
-	tcp->nchildren++;
 	if (tcpchild->flags & TCB_SUSPENDED) {
 		/* The child was born suspended, due to our having
 		   forced CLONE_PTRACE.  */
@@ -877,10 +876,8 @@ Process %u resumed (parent %d ready)\n",
 			   new thread, there will never be a
 			   TCB_CLONE_THREAD process that has
 			   children.  */
-			--tcp->nchildren;
 			tcp = tcp->parent;
 			tcpchild->parent = tcp;
-			++tcp->nchildren;
 		}
 		if (call_flags & CLONE_THREAD) {
 			tcpchild->flags |= TCB_CLONE_THREAD;
@@ -888,12 +885,10 @@ Process %u resumed (parent %d ready)\n",
 		}
 		if ((call_flags & CLONE_PARENT) &&
 		    !(call_flags & CLONE_THREAD)) {
-			--tcp->nchildren;
 			tcpchild->parent = NULL;
 			if (tcp->parent != NULL) {
 				tcp = tcp->parent;
 				tcpchild->parent = tcp;
-				++tcp->nchildren;
 			}
 		}
 	}
@@ -1023,7 +1018,6 @@ internal_fork(struct tcb *tcp)
 				sizeof tcpchild->inst);
 		}
 		tcpchild->parent = tcp;
-		tcp->nchildren++;
 		if (!qflag)
 			fprintf(stderr, "Process %d attached\n", pid);
 	}
