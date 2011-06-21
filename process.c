@@ -917,8 +917,7 @@ internal_fork(struct tcb *tcp)
 		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
 			return 0;
 		fork_tcb(tcp);
-		if (setbpt(tcp) < 0)
-			return 0;
+		setbpt(tcp);
 	} else {
 		int pid;
 		int bpt;
@@ -961,8 +960,7 @@ internal_fork(struct tcb *tcp)
 		if (!followfork || dont_follow)
 			return 0;
 		fork_tcb(tcp);
-		if (setbpt(tcp) < 0)
-			return 0;
+		setbpt(tcp);
 	}
 	else {
 		int bpt = tcp->flags & TCB_BPTSET;

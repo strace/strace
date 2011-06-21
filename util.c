@@ -1223,7 +1223,7 @@ printcall(struct tcb *tcp)
  */
 #ifndef USE_PROCFS
 
-#ifdef LINUX
+# ifdef LINUX
 
 #  include "syscall.h"
 
