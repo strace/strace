@@ -1285,7 +1285,6 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->pid = pid;
 			tcp->parent = NULL;
 			tcp->nchildren = 0;
-			tcp->nzombies = 0;
 #ifdef TCB_CLONE_THREAD
 			tcp->nclone_threads = 0;
 #endif
@@ -1668,7 +1667,6 @@ droptcb(struct tcb *tcp)
 		if (tcp->flags & TCB_CLONE_THREAD)
 			tcp->parent->nclone_threads--;
 #endif
-		tcp->parent->nzombies++;
 #ifdef LINUX
 		/* Update `tcp->parent->parent->nchildren' and the other fields
 		   like NCLONE_DETACHED, only for zombie group leader that has

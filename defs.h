@@ -369,7 +369,6 @@ struct tcb {
 				/* Support for tracing forked processes */
 	struct tcb *parent;	/* Parent of this process */
 	int nchildren;		/* # of traced children */
-	int nzombies;		/* # of formerly traced children now dead */
 #ifdef LINUX
 	int nclone_threads;	/* # of nchildren with CLONE_THREAD */
 #endif
