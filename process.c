@@ -845,8 +845,7 @@ Process %u resumed (parent %d ready)\n",
 	}
 
 #ifdef TCB_CLONE_THREAD
-	if (sysent[tcp->scno].sys_func == sys_clone)
-	{
+	if (sysent[tcp->scno].sys_func == sys_clone) {
 		/*
 		 * Save the flags used in this call,
 		 * in case we point TCP to our parent below.

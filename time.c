@@ -359,7 +359,7 @@ printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 		} else {
 			struct itimerval itv;
 
-			if ((rc = umove(tcp, addr, &itv)) >= 0)	{
+			if ((rc = umove(tcp, addr, &itv)) >= 0) {
 				tprintf("{it_interval=");
 				tprint_timeval(tcp, &itv.it_interval);
 				tprintf(", it_value=");
@@ -784,8 +784,7 @@ printsigevent(struct tcb *tcp, long arg)
 	struct sigevent sev;
 
 #if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] == 4)
-	{
+	if (personality_wordsize[current_personality] == 4) {
 		printsigevent32(tcp, arg);
 		return;
 	}

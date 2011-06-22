@@ -531,8 +531,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		tprintf(", ");
 		printtv_bitness(tcp, args[4], bitness, 0);
 	}
-	else
-	{
+	else {
 		unsigned int cumlen = 0;
 		const char *sep = "";
 

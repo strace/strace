@@ -2419,8 +2419,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (cflag) {
 		struct timeval t = tv;
 		int rc = count_syscall(tcp, &t);
-		if (cflag == CFLAG_ONLY_STATS)
-		{
+		if (cflag == CFLAG_ONLY_STATS) {
 			tcp->flags &= ~TCB_INSYSCALL;
 			return rc;
 		}

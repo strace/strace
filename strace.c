@@ -317,8 +317,7 @@ swap_uid(void)
 #ifndef SVR4
 	int euid = geteuid(), uid = getuid();
 
-	if (euid != uid && setreuid(euid, uid) < 0)
-	{
+	if (euid != uid && setreuid(euid, uid) < 0) {
 		fprintf(stderr, "%s: setreuid: %s\n",
 			progname, strerror(errno));
 		exit(1);

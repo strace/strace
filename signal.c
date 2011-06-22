@@ -894,16 +894,14 @@ sigishandled(struct tcb *tcp, int sig)
 	 * command name has any spaces in it.  So be it.
 	 */
 	s = strstr(buf, "SigIgn:\t");
-	if (!s)
-	{
+	if (!s) {
 		fprintf(stderr, "/proc/pid/status format error\n");
 		return 1;
 	}
 	parse_sigset_t(s + 8, &ignored);
 
 	s = strstr(buf, "SigCgt:\t");
-	if (!s)
-	{
+	if (!s) {
 		fprintf(stderr, "/proc/pid/status format error\n");
 		return 1;
 	}

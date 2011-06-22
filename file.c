@@ -335,8 +335,7 @@ print_dirfd(struct tcb *tcp, int fd)
 {
 	if (fd == AT_FDCWD)
 		tprintf("AT_FDCWD, ");
-	else
-	{
+	else {
 		printfd(tcp, fd);
 		tprintf(", ");
 	}

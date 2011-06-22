@@ -51,8 +51,7 @@ pathmatch(const char *path)
 {
 	unsigned int i;
 
-	for (i = 0; i < ARRAY_SIZE(selected); ++i)
-	{
+	for (i = 0; i < ARRAY_SIZE(selected); ++i) {
 		if (selected[i] == NULL)
 			return 0;
 		if (!strcmp(path, selected[i]))
@@ -67,7 +66,7 @@ pathmatch(const char *path)
 static int
 upathmatch(struct tcb *tcp, unsigned long upath)
 {
-	char    path[PATH_MAX + 1];
+	char path[PATH_MAX + 1];
 
 	return umovestr(tcp, upath, sizeof path, path) == 0 &&
 		pathmatch(path);
@@ -93,11 +92,9 @@ storepath(const char *path)
 {
 	unsigned int i;
 
-	if (path == NULL)
-	{
+	if (path == NULL) {
 		for (i = 0; i < ARRAY_SIZE(selected); ++i)
-			if (selected[i])
-			{
+			if (selected[i]) {
 				free((char *) selected[i]);
 				selected[i] = NULL;
 			}
@@ -105,8 +102,7 @@ storepath(const char *path)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(selected); ++i)
-		if (!selected[i])
-		{
+		if (!selected[i]) {
 			selected[i] = path;
 			return 0;
 		}
@@ -161,8 +157,7 @@ pathtrace_select(const char *path)
 		return 0;
 
 	/* if realpath and specified path are same, we're done */
-	if (!strcmp(path, rpath))
-	{
+	if (!strcmp(path, rpath)) {
 		free(rpath);
 		return 0;
 	}
@@ -247,29 +242,25 @@ pathtrace_match(struct tcb *tcp)
 			upathmatch(tcp, tcp->u_arg[3]);
 	}
 
-	if (s->sys_func == sys_old_mmap || s->sys_func == sys_mmap)
-	{
+	if (s->sys_func == sys_old_mmap || s->sys_func == sys_mmap) {
 		/* x, x, x, x, fd */
 		return fdmatch(tcp, tcp->u_arg[4]);
 	}
 
-	if (s->sys_func == sys_symlinkat)
-	{
+	if (s->sys_func == sys_symlinkat) {
 		/* path, fd, path */
 		return fdmatch(tcp, tcp->u_arg[1]) ||
 			upathmatch(tcp, tcp->u_arg[0]) ||
 			upathmatch(tcp, tcp->u_arg[2]);
 	}
 
-	if (!strcmp(s->sys_name, "splice"))
-	{
+	if (!strcmp(s->sys_name, "splice")) {
 		/* fd, x, fd, x, x */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
 			fdmatch(tcp, tcp->u_arg[2]);
 	}
 
-	if (s->sys_func == sys_epoll_ctl)
-	{
+	if (s->sys_func == sys_epoll_ctl) {
 		/* x, x, fd, x */
 		return fdmatch(tcp, tcp->u_arg[2]);
 	}
@@ -283,8 +274,7 @@ pathtrace_match(struct tcb *tcp)
 		unsigned fdsize;
 		fd_set *fds;
 
-		if (s->sys_func == sys_oldselect)
-		{
+		if (s->sys_func == sys_oldselect) {
 			if (umoven(tcp, tcp->u_arg[0], sizeof oldargs,
 				   (char*) oldargs) < 0)
 			{
@@ -300,26 +290,22 @@ pathtrace_match(struct tcb *tcp)
 			  & -sizeof(long));
 		fds = malloc(fdsize);
 
-		if (fds == NULL)
-		{
+		if (fds == NULL) {
 			fprintf(stderr, "out of memory\n");
 			return 0;
 		}
 
-		for (i = 1; i <= 3; ++i)
-		{
+		for (i = 1; i <= 3; ++i) {
 			if (args[i] == 0)
 				continue;
 
-			if (umoven(tcp, args[i], fdsize, (char *) fds) < 0)
-			{
+			if (umoven(tcp, args[i], fdsize, (char *) fds) < 0) {
 				fprintf(stderr, "umoven() failed\n");
 				continue;
 			}
 
 			for (j = 0; j < nfds; ++j)
-				if (FD_ISSET(j, fds) && fdmatch(tcp, j))
-				{
+				if (FD_ISSET(j, fds) && fdmatch(tcp, j)) {
 					free(fds);
 					return 1;
 				}
