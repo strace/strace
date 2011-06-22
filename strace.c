@@ -333,17 +333,16 @@ swap_uid(void)
 #endif
 
 static FILE *
-strace_fopen(const char *path, const char *mode)
+strace_fopen(const char *path)
 {
 	FILE *fp;
 
 	swap_uid();
-	if ((fp = fopen_for_output(path, mode)) == NULL)
-		fprintf(stderr, "%s: can't fopen '%s': %s\n",
-			progname, path, strerror(errno));
+	fp = fopen_for_output(path, "w");
+	if (!fp)
+		perror_msg_and_die("Can't fopen '%s'", path);
 	swap_uid();
-	if (fp)
-		set_cloexec_flag(fileno(fp));
+	set_cloexec_flag(fileno(fp));
 	return fp;
 }
 
@@ -395,19 +394,14 @@ strace_popen(const char *command)
 	return fp;
 }
 
-static int
+static void
 newoutf(struct tcb *tcp)
 {
 	if (outfname && followfork > 1) {
 		char name[520 + sizeof(int) * 3];
-		FILE *fp;
-
 		sprintf(name, "%.512s.%u", outfname, tcp->pid);
-		if ((fp = strace_fopen(name, "w")) == NULL)
-			return -1;
-		tcp->outf = fp;
+		tcp->outf = strace_fopen(name);
 	}
-	return 0;
 }
 
 static void
@@ -455,8 +449,7 @@ startup_attach(void)
 #endif
 		/* Reinitialize the output since it may have changed. */
 		tcp->outf = outf;
-		if (newoutf(tcp) < 0)
-			exit(1);
+		newoutf(tcp);
 
 #ifdef USE_PROCFS
 		if (proc_open(tcp, 1) < 0) {
@@ -1129,9 +1122,8 @@ main(int argc, char *argv[])
 				error_msg_and_die("Piping the output and -ff are mutually exclusive");
 			outf = strace_popen(outfname + 1);
 		}
-		else if (followfork <= 1 &&
-			 (outf = strace_fopen(outfname, "w")) == NULL)
-			exit(1);
+		else if (followfork <= 1)
+			outf = strace_fopen(outfname);
 	}
 
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!')
