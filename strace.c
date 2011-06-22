@@ -1252,21 +1252,15 @@ expand_tcbtab(void)
 	   callers have pointers and it would be a pain.
 	   So tcbtab is a table of pointers.  Since we never
 	   free the TCBs, we allocate a single chunk of many.  */
-	struct tcb **newtab = (struct tcb **)
-		realloc(tcbtab, 2 * tcbtabsize * sizeof tcbtab[0]);
-	struct tcb *newtcbs = (struct tcb *) calloc(tcbtabsize,
-						    sizeof *newtcbs);
-	int i;
-	if (newtab == NULL || newtcbs == NULL) {
-		fprintf(stderr, "%s: expand_tcbtab: out of memory\n",
-			progname);
-		cleanup();
-		exit(1);
-	}
-	for (i = tcbtabsize; i < 2 * tcbtabsize; ++i)
-		newtab[i] = &newtcbs[i - tcbtabsize];
+	int i = tcbtabsize;
+	struct tcb *newtcbs = calloc(tcbtabsize, sizeof(newtcbs[0]));
+	struct tcb **newtab = realloc(tcbtab, tcbtabsize * 2 * sizeof(tcbtab[0]));
+	if (newtab == NULL || newtcbs == NULL)
+		error_msg_and_die("expand_tcbtab: out of memory");
 	tcbtabsize *= 2;
 	tcbtab = newtab;
+	while (i < tcbtabsize)
+		tcbtab[i++] = newtcbs++;
 }
 
 struct tcb *
@@ -1281,16 +1275,10 @@ alloc_tcb(int pid, int command_options_parsed)
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
 		if ((tcp->flags & TCB_INUSE) == 0) {
+			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
-			tcp->parent = NULL;
-#ifdef TCB_CLONE_THREAD
-			tcp->nclone_threads = 0;
-#endif
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
 			tcp->outf = outf; /* Initialise to current out file */
-			tcp->curcol = 0;
-			tcp->stime.tv_sec = 0;
-			tcp->stime.tv_usec = 0;
 			tcp->pfd = -1;
 			nprocs++;
 			if (command_options_parsed)
@@ -1298,9 +1286,7 @@ alloc_tcb(int pid, int command_options_parsed)
 			return tcp;
 		}
 	}
-	fprintf(stderr, "%s: bug in alloc_tcb\n", progname);
-	cleanup();
-	exit(1);
+	error_msg_and_die("bug in alloc_tcb");
 }
 
 #ifdef USE_PROCFS
