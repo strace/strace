@@ -285,30 +285,26 @@ foobar()
 # define fork()         vfork()
 #endif
 
-static int
+static void
 set_cloexec_flag(int fd)
 {
-	int     flags, newflags;
+	int flags, newflags;
 
-	if ((flags = fcntl(fd, F_GETFD, 0)) < 0)
-	{
-		fprintf(stderr, "%s: fcntl F_GETFD: %s\n",
-			progname, strerror(errno));
-		return -1;
+	flags = fcntl(fd, F_GETFD);
+	if (flags < 0) {
+		/* Can happen only if fd is bad.
+		 * Should never happen: if it does, we have a bug
+		 * in the caller. Therefore we just abort
+		 * instead of propagating the error.
+		 */
+		perror_msg_and_die("fcntl(%d, F_GETFD)", fd);
 	}
 
 	newflags = flags | FD_CLOEXEC;
 	if (flags == newflags)
-		return 0;
+		return;
 
-	if (fcntl(fd, F_SETFD, newflags) < 0)
-	{
-		fprintf(stderr, "%s: fcntl F_SETFD: %s\n",
-			progname, strerror(errno));
-		return -1;
-	}
-
-	return 0;
+	fcntl(fd, F_SETFD, newflags); /* never fails */
 }
 
 /*
@@ -346,11 +342,8 @@ strace_fopen(const char *path, const char *mode)
 		fprintf(stderr, "%s: can't fopen '%s': %s\n",
 			progname, path, strerror(errno));
 	swap_uid();
-	if (fp && set_cloexec_flag(fileno(fp)) < 0)
-	{
-		fclose(fp);
-		fp = NULL;
-	}
+	if (fp)
+		set_cloexec_flag(fileno(fp));
 	return fp;
 }
 
@@ -1287,25 +1280,19 @@ proc_open(struct tcb *tcp, int attaching)
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if (set_cloexec_flag(tcp->pfd) < 0) {
-		return -1;
-	}
+	set_cloexec_flag(tcp->pfd);
 	sprintf(proc, "/proc/%d/status", tcp->pid);
 	if ((tcp->pfd_stat = open(proc, O_RDONLY|O_EXCL)) < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if (set_cloexec_flag(tcp->pfd_stat) < 0) {
-		return -1;
-	}
+	set_cloexec_flag(tcp->pfd_stat);
 	sprintf(proc, "/proc/%d/as", tcp->pid);
 	if ((tcp->pfd_as = open(proc, O_RDONLY|O_EXCL)) < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if (set_cloexec_flag(tcp->pfd_as) < 0) {
-		return -1;
-	}
+	set_cloexec_flag(tcp->pfd_as);
 #else
 	/* Open the process pseudo-file in /proc. */
 #ifndef FREEBSD
@@ -1319,9 +1306,7 @@ proc_open(struct tcb *tcp, int attaching)
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
-	if (set_cloexec_flag(tcp->pfd) < 0) {
-		return -1;
-	}
+	set_cloexec_flag(tcp->pfd);
 #endif
 #ifdef FREEBSD
 	sprintf(proc, "/proc/%d/regs", tcp->pid);
@@ -1931,9 +1916,7 @@ proc_poll_open(void)
 		exit(1);
 	}
 	for (i = 0; i < 2; i++) {
-		if (set_cloexec_flag(proc_poll_pipe[i]) < 0) {
-			exit(1);
-		}
+		set_cloexec_flag(proc_poll_pipe[i]);
 	}
 }
 
