@@ -127,9 +127,8 @@ static char *outfname = NULL;
 FILE *outf;
 static int curcol;
 struct tcb **tcbtab;
-unsigned int nprocs, tcbtabsize;
+static unsigned int nprocs, tcbtabsize;
 const char *progname;
-extern char **environ;
 
 static int detach(struct tcb *tcp, int sig);
 static int trace(void);
@@ -1244,7 +1243,7 @@ main(int argc, char *argv[])
 	exit(exit_code);
 }
 
-void
+static void
 expand_tcbtab(void)
 {
 	/* Allocate some more TCBs and expand the table.

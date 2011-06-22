@@ -448,18 +448,6 @@ internal_exit(struct tcb *tcp)
 	return 0;
 }
 
-/* TCP is creating a child we want to follow.
-   If there will be space in tcbtab for it, set TCB_FOLLOWFORK and return 0.
-   If not, clear TCB_FOLLOWFORK, print an error, and return 1.  */
-static void
-fork_tcb(struct tcb *tcp)
-{
-	if (nprocs == tcbtabsize)
-		expand_tcbtab();
-
-	tcp->flags |= TCB_FOLLOWFORK;
-}
-
 #ifdef USE_PROCFS
 
 int
@@ -507,7 +495,7 @@ internal_fork(struct tcb *tcp)
 			return 0;
 		if (!followfork)
 			return 0;
-		fork_tcb(tcp);
+		tcp->flags |= TCB_FOLLOWFORK;
 		if (syserror(tcp))
 			return 0;
 		tcpchild = alloctcb(tcp->u_rval);
@@ -808,7 +796,7 @@ handle_new_child(struct tcb *tcp, int pid, int bpt)
 	else
 #endif /* CLONE_PTRACE */
 	{
-		fork_tcb(tcp);
+		tcp->flags |= TCB_FOLLOWFORK;
 		tcpchild = alloctcb(pid);
 	}
 
@@ -916,7 +904,7 @@ internal_fork(struct tcb *tcp)
 		if ((sysent[tcp->scno].sys_func == sys_clone) &&
 		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
 			return 0;
-		fork_tcb(tcp);
+		tcp->flags |= TCB_FOLLOWFORK;
 		setbpt(tcp);
 	} else {
 		int pid;
@@ -959,7 +947,7 @@ internal_fork(struct tcb *tcp)
 	if (entering(tcp)) {
 		if (!followfork || dont_follow)
 			return 0;
-		fork_tcb(tcp);
+		tcp->flags |= TCB_FOLLOWFORK;
 		setbpt(tcp);
 	}
 	else {
@@ -974,7 +962,7 @@ internal_fork(struct tcb *tcp)
 			return 0;
 
 		pid = tcp->u_rval;
-		fork_tcb(tcp);
+		tcp->flags |= TCB_FOLLOWFORK;
 		tcpchild = alloctcb(pid);
 #ifdef SUNOS4
 #ifdef oldway

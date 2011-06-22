@@ -510,7 +510,6 @@ extern unsigned int ptrace_setoptions;
 extern int dtime, xflag, qflag;
 extern cflag_t cflag;
 extern int acolumn;
-extern unsigned int nprocs, tcbtabsize;
 extern int max_strlen;
 extern struct tcb *tcp_last;
 
@@ -526,7 +525,6 @@ extern const char *xlookup(const struct xlat *, int);
 extern struct tcb *alloc_tcb(int, int);
 extern struct tcb *pid2tcb(int);
 extern void droptcb(struct tcb *);
-extern void expand_tcbtab(void);
 
 #define alloctcb(pid)	alloc_tcb((pid), 1)
 
