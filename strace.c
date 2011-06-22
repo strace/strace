@@ -354,7 +354,7 @@ strace_fopen(const char *path, const char *mode)
 	return fp;
 }
 
-static int popen_pid = -1;
+static int popen_pid = 0;
 
 #ifndef _PATH_BSHELL
 # define _PATH_BSHELL "/bin/sh"
@@ -368,56 +368,38 @@ static int popen_pid = -1;
 static FILE *
 strace_popen(const char *command)
 {
-	int     fds[2];
+	FILE *fp;
+	int fds[2];
 
 	swap_uid();
 	if (pipe(fds) < 0)
-	{
-		fprintf(stderr, "%s: pipe: %s\n",
-			progname, strerror(errno));
-		swap_uid();
-		return NULL;
-	}
+		perror_msg_and_die("pipe");
 
-	if (set_cloexec_flag(fds[1]) < 0)
-	{
-		close(fds[0]);
-		close(fds[1]);
-		swap_uid();
-		return NULL;
-	}
+	set_cloexec_flag(fds[1]); /* never fails */
 
-	if ((popen_pid = fork()) == -1)
-	{
-		fprintf(stderr, "%s: fork: %s\n",
-			progname, strerror(errno));
-		close(fds[0]);
-		close(fds[1]);
-		swap_uid();
-		return NULL;
-	}
+	popen_pid = vfork();
+	if (popen_pid == -1)
+		perror_msg_and_die("vfork");
 
-	if (popen_pid)
-	{
-		/* parent */
-		close(fds[0]);
-		swap_uid();
-		return fdopen(fds[1], "w");
-	} else
-	{
+	if (popen_pid == 0) {
 		/* child */
 		close(fds[1]);
-		if (fds[0] && (dup2(fds[0], 0) || close(fds[0])))
-		{
-			fprintf(stderr, "%s: dup2: %s\n",
-				progname, strerror(errno));
-			_exit(1);
+		if (fds[0] != 0) {
+			if (dup2(fds[0], 0))
+				perror_msg_and_die("dup2");
+			close(fds[0]);
 		}
 		execl(_PATH_BSHELL, "sh", "-c", command, NULL);
-		fprintf(stderr, "%s: execl: %s: %s\n",
-			progname, _PATH_BSHELL, strerror(errno));
-		_exit(1);
+		perror_msg_and_die("Can't execute '%s'", _PATH_BSHELL);
 	}
+
+	/* parent */
+	close(fds[0]);
+	swap_uid();
+	fp = fdopen(fds[1], "w");
+	if (!fp)
+		error_msg_and_die("Out of memory");
+	return fp;
 }
 
 static int
@@ -1150,15 +1132,9 @@ main(int argc, char *argv[])
 			 * We can't do the <outfname>.PID funny business
 			 * when using popen, so prohibit it.
 			 */
-			if (followfork > 1) {
-				fprintf(stderr, "\
-%s: piping the output and -ff are mutually exclusive options\n",
-					progname);
-				exit(1);
-			}
-
-			if ((outf = strace_popen(outfname + 1)) == NULL)
-				exit(1);
+			if (followfork > 1)
+				error_msg_and_die("Piping the output and -ff are mutually exclusive");
+			outf = strace_popen(outfname + 1);
 		}
 		else if (followfork <= 1 &&
 			 (outf = strace_fopen(outfname, "w")) == NULL)
@@ -2509,7 +2485,7 @@ trace()
 		}
 		if (pid == popen_pid) {
 			if (WIFEXITED(status) || WIFSIGNALED(status))
-				popen_pid = -1;
+				popen_pid = 0;
 			continue;
 		}
 		if (debug)
