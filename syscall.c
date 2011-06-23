@@ -2121,7 +2121,7 @@ syscall_enter(struct tcb *tcp)
 	tcp->u_arg[5] = regs.r3;
 # elif defined(BFIN)
 	int i;
-	int argreg[] = {PT_R0, PT_R1, PT_R2, PT_R3, PT_R4, PT_R5};
+	static const int argreg[] = { PT_R0, PT_R1, PT_R2, PT_R3, PT_R4, PT_R5 };
 
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
@@ -2133,20 +2133,20 @@ syscall_enter(struct tcb *tcp)
 			return -1;
 # elif defined(SH)
 	int i;
-	static int syscall_regs[] = {
-		REG_REG0+4, REG_REG0+5, REG_REG0+6, REG_REG0+7,
-		REG_REG0, REG_REG0+1, REG_REG0+2
+	static const int syscall_regs[] = {
+		4 * (REG_REG0+4), 4 * (REG_REG0+5), 4 * (REG_REG0+6), 4 * (REG_REG0+7),
+		4 * (REG_REG0  ), 4 * (REG_REG0+1), 4 * (REG_REG0+2)
 	};
 
 	tcp->u_nargs = sysent[tcp->scno].nargs;
 	for (i = 0; i < tcp->u_nargs; i++) {
-		if (upeek(tcp, 4 * syscall_regs[i], &tcp->u_arg[i]) < 0)
+		if (upeek(tcp, syscall_regs[i], &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # elif defined(SH64)
 	int i;
 	/* Registers used by SH5 Linux system calls for parameters */
-	static int syscall_regs[] = { 2, 3, 4, 5, 6, 7 };
+	static const int syscall_regs[] = { 2, 3, 4, 5, 6, 7 };
 
 	/*
 	 * TODO: should also check that the number of arguments encoded
@@ -2163,9 +2163,9 @@ syscall_enter(struct tcb *tcp)
 	}
 # elif defined(X86_64)
 	int i;
-	static int argreg[SUPPORTED_PERSONALITIES][MAX_ARGS] = {
-		{RDI,RSI,RDX,R10,R8,R9},	/* x86-64 ABI */
-		{RBX,RCX,RDX,RSI,RDI,RBP}	/* i386 ABI */
+	static const int argreg[SUPPORTED_PERSONALITIES][MAX_ARGS] = {
+		{ 8 * RDI, 8 * RSI, 8 * RDX, 8 * R10, 8 * R8 , 8 * R9  }, /* x86-64 ABI */
+		{ 8 * RBX, 8 * RCX, 8 * RDX, 8 * RSI, 8 * RDI, 8 * RBP }  /* i386 ABI */
 	};
 
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
@@ -2173,7 +2173,7 @@ syscall_enter(struct tcb *tcp)
 	else
 		tcp->u_nargs = MAX_ARGS;
 	for (i = 0; i < tcp->u_nargs; i++) {
-		if (upeek(tcp, argreg[current_personality][i]*8, &tcp->u_arg[i]) < 0)
+		if (upeek(tcp, argreg[current_personality][i], &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # elif defined(MICROBLAZE)
@@ -2190,7 +2190,7 @@ syscall_enter(struct tcb *tcp)
 	int i;
 	static const int crisregs[] = {
 		4*PT_ORIG_R10, 4*PT_R11, 4*PT_R12,
-		4*PT_R13, 4*PT_MOF, 4*PT_SRP
+		4*PT_R13     , 4*PT_MOF, 4*PT_SRP
 	};
 
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
