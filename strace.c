@@ -173,9 +173,7 @@ static int proc_poll_pipe[2] = { -1, -1 };
 #endif /* USE_PROCFS */
 
 static void
-usage(ofp, exitval)
-FILE *ofp;
-int exitval;
+usage(FILE *ofp, int exitval)
 {
 	fprintf(ofp, "\
 usage: strace [-CdDffhiqrtttTvVxxy] [-a column] [-e expr] ... [-o file]\n\
@@ -318,9 +316,7 @@ swap_uid(void)
 	int euid = geteuid(), uid = getuid();
 
 	if (euid != uid && setreuid(euid, uid) < 0) {
-		fprintf(stderr, "%s: setreuid: %s\n",
-			progname, strerror(errno));
-		exit(1);
+		perror_msg_and_die("setreuid");
 	}
 #endif
 }
@@ -551,8 +547,7 @@ startup_child(char **argv)
 	if (strchr(filename, '/')) {
 		if (strlen(filename) > sizeof pathname - 1) {
 			errno = ENAMETOOLONG;
-			perror("strace: exec");
-			exit(1);
+			perror_msg_and_die("exec");
 		}
 		strcpy(pathname, filename);
 	}
@@ -600,15 +595,11 @@ startup_child(char **argv)
 		}
 	}
 	if (stat(pathname, &statbuf) < 0) {
-		fprintf(stderr, "%s: %s: command not found\n",
-			progname, filename);
-		exit(1);
+		perror_msg_and_die("Can't stat '%s'", filename);
 	}
 	strace_child = pid = fork();
 	if (pid < 0) {
-		perror("strace: fork");
-		cleanup();
-		exit(1);
+		perror_msg_and_die("fork");
 	}
 	if ((pid != 0 && daemonized_tracer) /* -D: parent to become a traced process */
 	 || (pid == 0 && !daemonized_tracer) /* not -D: child to become a traced process */
@@ -634,8 +625,7 @@ startup_child(char **argv)
 
 		if (!daemonized_tracer) {
 			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
-				perror("strace: ptrace(PTRACE_TRACEME, ...)");
-				exit(1);
+				perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
 			}
 			if (debug)
 				kill(pid, SIGSTOP);
@@ -656,16 +646,13 @@ startup_child(char **argv)
 			 */
 			if (username != NULL) {
 				if (initgroups(username, run_gid) < 0) {
-					perror("initgroups");
-					exit(1);
+					perror_msg_and_die("initgroups");
 				}
 				if (setregid(run_gid, run_egid) < 0) {
-					perror("setregid");
-					exit(1);
+					perror_msg_and_die("setregid");
 				}
 				if (setreuid(run_uid, run_euid) < 0) {
-					perror("setreuid");
-					exit(1);
+					perror_msg_and_die("setreuid");
 				}
 			}
 		}
@@ -702,8 +689,7 @@ startup_child(char **argv)
 #endif /* !USE_PROCFS */
 
 		execv(pathname, argv);
-		perror("strace: exec");
-		_exit(1);
+		perror_msg_and_die("exec");
 	}
 
 	/* We are the tracer.  */
@@ -717,9 +703,7 @@ startup_child(char **argv)
 	}
 #ifdef USE_PROCFS
 	if (proc_open(tcp, 0) < 0) {
-		fprintf(stderr, "trouble opening proc file\n");
-		cleanup();
-		exit(1);
+		perror_msg_and_die("trouble opening proc file");
 	}
 #endif /* USE_PROCFS */
 }
@@ -891,22 +875,18 @@ main(int argc, char *argv[])
 	int optF = 0;
 	struct sigaction sa;
 
-	static char buf[BUFSIZ];
-
 	progname = argv[0] ? argv[0] : "strace";
 
 	strace_tracer_pid = getpid();
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
-	if ((tcbtab = calloc(tcbtabsize, sizeof tcbtab[0])) == NULL) {
-		fprintf(stderr, "%s: out of memory\n", progname);
-		exit(1);
-	}
-	if ((tcbtab[0] = calloc(tcbtabsize, sizeof tcbtab[0][0])) == NULL) {
-		fprintf(stderr, "%s: out of memory\n", progname);
-		exit(1);
-	}
+	tcbtab = calloc(tcbtabsize, sizeof tcbtab[0]);
+	if (tcbtab == NULL)
+		error_msg_and_die("Out of memory");
+	tcbtab[0] = calloc(tcbtabsize, sizeof tcbtab[0][0]);
+	if (tcbtab[0] == NULL)
+		error_msg_and_die("Out of memory");
 	for (tcp = tcbtab[0]; tcp < &tcbtab[0][tcbtabsize]; ++tcp)
 		tcbtab[tcp - tcbtab[0]] = &tcbtab[0][tcp - tcbtab[0]];
 
@@ -927,17 +907,13 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
-				fprintf(stderr, "%s: -c and -C are mutually exclusive options\n",
-					progname);
-				exit(1);
+				error_msg_and_die("-c and -C are mutually exclusive options");
 			}
 			cflag = CFLAG_ONLY_STATS;
 			break;
 		case 'C':
 			if (cflag == CFLAG_ONLY_STATS) {
-				fprintf(stderr, "%s: -c and -C are mutually exclusive options\n",
-					progname);
-				exit(1);
+				error_msg_and_die("-c and -C are mutually exclusive options");
 			}
 			cflag = CFLAG_BOTH;
 			break;
@@ -1004,12 +980,11 @@ main(int argc, char *argv[])
 			break;
 		case 'p':
 			if ((pid = atoi(optarg)) <= 0) {
-				fprintf(stderr, "%s: Invalid process id: %s\n",
-					progname, optarg);
+				error_msg("Invalid process id: '%s'", optarg);
 				break;
 			}
 			if (pid == strace_tracer_pid) {
-				fprintf(stderr, "%s: I'm sorry, I can't let you do that, Dave.\n", progname);
+				error_msg("I'm sorry, I can't let you do that, Dave.");
 				break;
 			}
 			tcp = alloc_tcb(pid, 0);
@@ -1019,17 +994,13 @@ main(int argc, char *argv[])
 		case 'P':
 			tracing_paths = 1;
 			if (pathtrace_select(optarg)) {
-				fprintf(stderr, "%s : failed to select path '%s'\n", progname, optarg);
-				exit(1);
+				error_msg_and_die("Failed to select path '%s'", optarg);
 			}
 			break;
 		case 's':
 			max_strlen = atoi(optarg);
 			if (max_strlen < 0) {
-				fprintf(stderr,
-					"%s: invalid -s argument: %s\n",
-					progname, optarg);
-				exit(1);
+				error_msg_and_die("Invalid -s argument: '%s'", optarg);
 			}
 			break;
 		case 'S':
@@ -1040,9 +1011,7 @@ main(int argc, char *argv[])
 			break;
 		case 'E':
 			if (putenv(optarg) < 0) {
-				fprintf(stderr, "%s: out of memory\n",
-					progname);
-				exit(1);
+				error_msg_and_die("Out of memory");
 			}
 			break;
 		default:
@@ -1055,20 +1024,14 @@ main(int argc, char *argv[])
 		usage(stderr, 1);
 
 	if (pflag_seen && daemonized_tracer) {
-		fprintf(stderr,
-			"%s: -D and -p are mutually exclusive options\n",
-			progname);
-		exit(1);
+		error_msg_and_die("-D and -p are mutually exclusive options");
 	}
 
 	if (!followfork)
 		followfork = optF;
 
 	if (followfork > 1 && cflag) {
-		fprintf(stderr,
-			"%s: (-c or -C) and -ff are mutually exclusive options\n",
-			progname);
-		exit(1);
+		error_msg_and_die("(-c or -C) and -ff are mutually exclusive options");
 	}
 
 	/* See if they want to run as another user. */
@@ -1076,15 +1039,10 @@ main(int argc, char *argv[])
 		struct passwd *pent;
 
 		if (getuid() != 0 || geteuid() != 0) {
-			fprintf(stderr,
-				"%s: you must be root to use the -u option\n",
-				progname);
-			exit(1);
+			error_msg_and_die("You must be root to use the -u option");
 		}
 		if ((pent = getpwnam(username)) == NULL) {
-			fprintf(stderr, "%s: cannot find user `%s'\n",
-				progname, username);
-			exit(1);
+			error_msg_and_die("Cannot find user '%s'", username);
 		}
 		run_uid = pent->pw_uid;
 		run_gid = pent->pw_gid;
@@ -1125,8 +1083,10 @@ main(int argc, char *argv[])
 			outf = strace_fopen(outfname);
 	}
 
-	if (!outfname || outfname[0] == '|' || outfname[0] == '!')
+	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
+		static char buf[BUFSIZ];
 		setvbuf(outf, buf, _IOLBF, BUFSIZ);
+	}
 	if (outfname && optind < argc) {
 		interactive = 0;
 		qflag = 1;
@@ -1326,7 +1286,7 @@ proc_open(struct tcb *tcp, int attaching)
 				return -1;
 			}
 			if (tcp->status.PR_FLAGS & PR_ASLEEP)
-			    break;
+				break;
 		}
 	}
 #ifndef FREEBSD
@@ -1877,8 +1837,7 @@ rebuild_pollv(void)
 		free(pollv);
 	pollv = (struct pollfd *) malloc(nprocs * sizeof pollv[0]);
 	if (pollv == NULL) {
-		fprintf(stderr, "%s: out of memory\n", progname);
-		exit(1);
+		error_msg_and_die("Out of memory");
 	}
 
 	for (i = j = 0; i < tcbtabsize; i++) {
@@ -1890,8 +1849,7 @@ rebuild_pollv(void)
 		j++;
 	}
 	if (j != nprocs) {
-		fprintf(stderr, "strace: proc miscount\n");
-		exit(1);
+		error_msg_and_die("proc miscount");
 	}
 }
 
@@ -1903,8 +1861,7 @@ proc_poll_open(void)
 	int i;
 
 	if (pipe(proc_poll_pipe) < 0) {
-		perror("pipe");
-		exit(1);
+		perror_msg_and_die("pipe");
 	}
 	for (i = 0; i < 2; i++) {
 		set_cloexec_flag(proc_poll_pipe[i]);
@@ -1921,8 +1878,7 @@ proc_poll(struct pollfd *pollv, int nfds, int timeout)
 	if ((n = read(proc_poll_pipe[0], &pollinfo, sizeof(pollinfo))) < 0)
 		return n;
 	if (n != sizeof(struct proc_pollfd)) {
-		fprintf(stderr, "panic: short read: %d\n", n);
-		exit(1);
+		error_msg_and_die("panic: short read: %d", n);
 	}
 	for (i = 0; i < nprocs; i++) {
 		if (pollv[i].fd == pollinfo.fd)
@@ -1954,8 +1910,7 @@ proc_poller(int pfd)
 
 	switch (fork()) {
 	case -1:
-		perror("fork");
-		_exit(1);
+		perror_msg_and_die("fork");
 	case 0:
 		break;
 	default:
@@ -1978,8 +1933,7 @@ proc_poller(int pfd)
 	sigemptyset(&empty_set);
 
 	if (getrlimit(RLIMIT_NOFILE, &rl) < 0) {
-		perror("getrlimit(RLIMIT_NOFILE, ...)");
-		_exit(1);
+		perror_msg_and_die("getrlimit(RLIMIT_NOFILE, ...)");
 	}
 	n = rl.rlim_cur;
 	for (i = 0; i < n; i++) {
@@ -2045,8 +1999,7 @@ choose_pfd()
 		if (pollv[j].revents & (POLLHUP | POLLERR)) {
 			tcp = pfd2tcb(pollv[j].fd);
 			if (!tcp) {
-				fprintf(stderr, "strace: lost proc\n");
-				exit(1);
+				error_msg_and_die("lost proc");
 			}
 			droptcb(tcp);
 			return -1;
@@ -2056,8 +2009,7 @@ choose_pfd()
 			return pollv[j].fd;
 		}
 	}
-	fprintf(stderr, "strace: nothing ready\n");
-	exit(1);
+	error_msg_and_die("nothing ready");
 }
 
 static int
@@ -2139,8 +2091,7 @@ trace(void)
 
 		/* Look up `pfd' in our table. */
 		if ((tcp = pfd2tcb(pfd)) == NULL) {
-			fprintf(stderr, "unknown pfd: %u\n", pfd);
-			exit(1);
+			error_msg_and_die("unknown pfd: %u", pfd);
 		}
 #ifdef POLL_HACK
 	FOUND:
@@ -2187,8 +2138,7 @@ trace(void)
 				droptcb(tcp);
 				continue;
 			default:
-				perror("PIOCWSTOP");
-				exit(1);
+				perror_msg_and_die("PIOCWSTOP");
 			}
 		}
 
@@ -2234,8 +2184,7 @@ trace(void)
 			if (tcp->status.PR_FLAGS & PR_ASLEEP) {
 				tcp->status.PR_WHY = PR_SYSENTRY;
 				if (trace_syscall(tcp) < 0) {
-					fprintf(stderr, "syscall trouble\n");
-					exit(1);
+					error_msg_and_die("syscall trouble");
 				}
 			}
 			break;
@@ -2246,8 +2195,7 @@ trace(void)
 #endif
 		case PR_SYSEXIT:
 			if (trace_syscall(tcp) < 0) {
-				fprintf(stderr, "syscall trouble\n");
-				exit(1);
+				error_msg_and_die("syscall trouble");
 			}
 			break;
 		case PR_SIGNALLED:
@@ -2280,8 +2228,7 @@ trace(void)
 			continue;
 #endif
 		default:
-			fprintf(stderr, "odd stop %d\n", tcp->status.PR_WHY);
-			exit(1);
+			error_msg_and_die("odd stop %d", tcp->status.PR_WHY);
 			break;
 		}
 		/* Remember current print column before continuing. */
@@ -2293,8 +2240,7 @@ trace(void)
 		if (IOCTL(tcp->pfd, PIOCRUN, 0) < 0)
 #endif
 		{
-			perror("PIOCRUN");
-			exit(1);
+			perror_msg_and_die("PIOCRUN");
 		}
 	}
 	return 0;
@@ -2369,11 +2315,7 @@ handle_ptrace_event(int status, struct tcb *tcp)
 
 		if (do_ptrace(PTRACE_GETEVENTMSG, tcp, NULL, &childpid) < 0) {
 			if (errno != ESRCH) {
-				fprintf(stderr, "\
-%s: handle_ptrace_event: ptrace cannot get new child's pid\n",
-					progname);
-				cleanup();
-				exit(1);
+				error_msg_and_die("Cannot get new child's pid");
 			}
 			return -1;
 		}
@@ -2424,8 +2366,7 @@ trace()
 			pid = wait4(-1, &status, __WCLONE,
 					cflag ? &ru : NULL);
 			if (pid == -1) {
-				fprintf(stderr, "strace: clone wait4 "
-						"failed: %s\n", strerror(errno));
+				perror_msg("wait4(__WCLONE) failed");
 			}
 		}
 #else
@@ -2490,10 +2431,9 @@ Process %d attached (waiting for parent)\n",
 				   CLONE_PTRACE itself.  */
 #endif
 			{
-				fprintf(stderr, "unknown pid: %u\n", pid);
 				if (WIFSTOPPED(status))
 					ptrace(PTRACE_CONT, pid, (char *) 1, 0);
-				exit(1);
+				error_msg_and_die("Unknown pid: %u", pid);
 			}
 		}
 		/* set current output file */
