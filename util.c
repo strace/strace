@@ -1494,9 +1494,9 @@ setbpt(struct tcb *tcp)
 		return 0;
 #  endif
 
-	case SYS_clone:
+	case SYS_clone: ;
 #  ifdef SYS_clone2
-	case SYS_clone2:
+	case SYS_clone2: ;
 #  endif
 		/* ia64 calls directly `clone (CLONE_VFORK | CLONE_VM)'
 		   contrary to x86 SYS_vfork above.  Even on x86 we turn the
@@ -1506,12 +1506,12 @@ setbpt(struct tcb *tcp)
 		   clear also CLONE_VM but only in the CLONE_VFORK case as
 		   otherwise we would break pthread_create.  */
 
-		if ((arg_setup(tcp, &state) < 0
-		    || set_arg0(tcp, &state,
-				 (tcp->u_arg[arg0_index] | CLONE_PTRACE)
-				 & ~(tcp->u_arg[arg0_index] & CLONE_VFORK
-				     ? CLONE_VFORK | CLONE_VM : 0)) < 0
-		    || arg_finish_change(tcp, &state) < 0))
+		long new_arg0 = (tcp->u_arg[arg0_index] | CLONE_PTRACE);
+		if (new_arg0 & CLONE_VFORK)
+			new_arg0 &= ~(unsigned long)(CLONE_VFORK | CLONE_VM);
+		if (arg_setup(tcp, &state) < 0
+		 || set_arg0(tcp, &state, new_arg0) < 0
+		 || arg_finish_change(tcp, &state) < 0)
 			return -1;
 		tcp->flags |= TCB_BPTSET;
 		tcp->inst[0] = tcp->u_arg[arg0_index];
@@ -1535,7 +1535,8 @@ clearbpt(struct tcb *tcp)
 	    || restore_arg0(tcp, &state, tcp->inst[0]) < 0
 	    || restore_arg1(tcp, &state, tcp->inst[1]) < 0
 	    || arg_finish_change(tcp, &state))
-		if (errno != ESRCH) return -1;
+		if (errno != ESRCH)
+			return -1;
 	tcp->flags &= ~TCB_BPTSET;
 	return 0;
 }
