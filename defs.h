@@ -566,6 +566,12 @@ extern void print_sock_optmgmt(struct tcb *, long, int);
 extern void printrusage(struct tcb *, long);
 extern void printuid(const char *, unsigned long);
 extern int clearbpt(struct tcb *);
+/*
+ * On Linux, "setbpt" is a misnomer: we don't set a breakpoint
+ * (IOW: no poking in user's text segment),
+ * instead we change fork/vfork/clone into clone(CLONE_PTRACE).
+ * On newer kernels, we use PTRACE_O_TRACECLONE/TRACE[V]FORK instead.
+ */
 extern int setbpt(struct tcb *);
 extern int sigishandled(struct tcb *, int);
 extern void printcall(struct tcb *);
