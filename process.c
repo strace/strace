@@ -780,7 +780,6 @@ handle_new_child(struct tcb *tcp, int pid, int bpt)
 {
 	struct tcb *tcpchild;
 
-#ifdef CLONE_PTRACE		/* See new setbpt code.  */
 	tcpchild = pid2tcb(pid);
 	if (tcpchild != NULL) {
 		/* The child already reported its startup trap
@@ -792,30 +791,15 @@ handle_new_child(struct tcb *tcp, int pid, int bpt)
 [preattached child %d of %d in weird state!]\n",
 				pid, tcp->pid);
 	}
-	else
-#endif /* CLONE_PTRACE */
-	{
+	else {
 		tcpchild = alloctcb(pid);
 	}
 
-#ifndef CLONE_PTRACE
-	/* Attach to the new child */
-	if (ptrace(PTRACE_ATTACH, pid, (char *) 1, 0) < 0) {
-		if (bpt)
-			clearbpt(tcp);
-		perror("PTRACE_ATTACH");
-		fprintf(stderr, "Too late?\n");
-		droptcb(tcpchild);
-		return 0;
-	}
-#endif /* !CLONE_PTRACE */
-
-	if (bpt)
-		clearbpt(tcp);
-
 	tcpchild->flags |= TCB_ATTACHED;
-	/* Child has BPT too, must be removed on first occasion.  */
+
 	if (bpt) {
+		clearbpt(tcp);
+		/* Child has BPT too, must be removed on first occasion.  */
 		tcpchild->flags |= TCB_BPTSET;
 		tcpchild->baddr = tcp->baddr;
 		memcpy(tcpchild->inst, tcp->inst,
