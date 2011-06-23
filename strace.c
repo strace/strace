@@ -475,7 +475,7 @@ startup_attach(void)
 						++nerr;
 					else if (tid != tcbtab[tcbi]->pid) {
 						tcp = alloctcb(tid);
-						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD|TCB_FOLLOWFORK;
+						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD;
 						tcbtab[tcbi]->nclone_threads++;
 						tcp->parent = tcbtab[tcbi];
 					}

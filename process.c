@@ -495,7 +495,6 @@ internal_fork(struct tcb *tcp)
 			return 0;
 		if (!followfork)
 			return 0;
-		tcp->flags |= TCB_FOLLOWFORK;
 		if (syserror(tcp))
 			return 0;
 		tcpchild = alloctcb(tcp->u_rval);
@@ -796,7 +795,6 @@ handle_new_child(struct tcb *tcp, int pid, int bpt)
 	else
 #endif /* CLONE_PTRACE */
 	{
-		tcp->flags |= TCB_FOLLOWFORK;
 		tcpchild = alloctcb(pid);
 	}
 
@@ -891,10 +889,10 @@ internal_fork(struct tcb *tcp)
 	   == (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
 		return 0;
 
+	if (!followfork)
+		return 0;
+
 	if (entering(tcp)) {
-		tcp->flags &= ~TCB_FOLLOWFORK;
-		if (!followfork)
-			return 0;
 		/*
 		 * In occasion of using PTRACE_O_TRACECLONE, we won't see the
 		 * new child if clone is called with flag CLONE_UNTRACED, so
@@ -903,14 +901,10 @@ internal_fork(struct tcb *tcp)
 		if ((sysent[tcp->scno].sys_func == sys_clone) &&
 		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
 			return 0;
-		tcp->flags |= TCB_FOLLOWFORK;
 		setbpt(tcp);
 	} else {
 		int pid;
 		int bpt;
-
-		if (!(tcp->flags & TCB_FOLLOWFORK))
-			return 0;
 
 		bpt = tcp->flags & TCB_BPTSET;
 
@@ -943,17 +937,18 @@ internal_fork(struct tcb *tcp)
 			dont_follow = 1;
 	}
 #endif
+
+	if (!followfork)
+		return 0;
+
 	if (entering(tcp)) {
-		if (!followfork || dont_follow)
+		if (dont_follow)
 			return 0;
-		tcp->flags |= TCB_FOLLOWFORK;
 		setbpt(tcp);
 	}
 	else {
 		int bpt = tcp->flags & TCB_BPTSET;
 
-		if (!(tcp->flags & TCB_FOLLOWFORK))
-			return 0;
 		if (bpt)
 			clearbpt(tcp);
 
@@ -961,7 +956,6 @@ internal_fork(struct tcb *tcp)
 			return 0;
 
 		pid = tcp->u_rval;
-		tcp->flags |= TCB_FOLLOWFORK;
 		tcpchild = alloctcb(pid);
 #ifdef SUNOS4
 #ifdef oldway
