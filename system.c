@@ -1572,25 +1572,17 @@ static const struct xlat capabilities[] = {
 int
 sys_capget(struct tcb *tcp)
 {
-	static cap_user_header_t       arg0 = NULL;
-	static cap_user_data_t         arg1 = NULL;
+	/* cap_user_ types are _pointers_ to (small) structs. */
+	/* Structs themselves have no names defined. */
+	/* Have to use ugly hack to place them on stack. */
+	cap_user_header_t arg0;
+	cap_user_data_t   arg1;
+	long a0[sizeof(*arg0) / sizeof(long) + 1];
+	long a1[sizeof(*arg1) / sizeof(long) + 1];
+	arg0 = (cap_user_header_t*) &a0;
+	arg1 = (cap_user_data_t  *) &a1;
 
 	if (!entering(tcp)) {
-		if (!arg0) {
-			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
-				fprintf(stderr, "out of memory\n");
-				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return -1;
-			}
-		}
-		if (!arg1) {
-			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
-				fprintf(stderr, "out of memory\n");
-				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return -1;
-			}
-		}
-
 		if (!tcp->u_arg[0])
 			tprintf("NULL");
 		else if (!verbose(tcp))
@@ -1623,25 +1615,14 @@ sys_capget(struct tcb *tcp)
 int
 sys_capset(struct tcb *tcp)
 {
-	static cap_user_header_t       arg0 = NULL;
-	static cap_user_data_t         arg1 = NULL;
+	cap_user_header_t arg0;
+	cap_user_data_t   arg1;
+	long a0[sizeof(*arg0) / sizeof(long) + 1];
+	long a1[sizeof(*arg1) / sizeof(long) + 1];
+	arg0 = (cap_user_header_t*) &a0;
+	arg1 = (cap_user_data_t  *) &a1;
 
 	if (entering(tcp)) {
-		if (!arg0) {
-			if ((arg0 = malloc(sizeof(*arg0))) == NULL) {
-				fprintf(stderr, "out of memory\n");
-				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return -1;
-			}
-		}
-		if (!arg1) {
-			if ((arg1 = malloc(sizeof(*arg1))) == NULL) {
-				fprintf(stderr, "out of memory\n");
-				tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-				return -1;
-			}
-		}
-
 		if (!tcp->u_arg[0])
 			tprintf("NULL");
 		else if (!verbose(tcp))
