@@ -881,14 +881,14 @@ main(int argc, char *argv[])
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
-	tcbtab = calloc(tcbtabsize, sizeof tcbtab[0]);
+	tcbtab = calloc(tcbtabsize, sizeof(tcbtab[0]));
 	if (tcbtab == NULL)
 		error_msg_and_die("Out of memory");
-	tcbtab[0] = calloc(tcbtabsize, sizeof tcbtab[0][0]);
-	if (tcbtab[0] == NULL)
+	tcp = calloc(tcbtabsize, sizeof(*tcp));
+	if (tcp == NULL)
 		error_msg_and_die("Out of memory");
-	for (tcp = tcbtab[0]; tcp < &tcbtab[0][tcbtabsize]; ++tcp)
-		tcbtab[tcp - tcbtab[0]] = &tcbtab[0][tcp - tcbtab[0]];
+	for (c = 0; c < tcbtabsize; c++)
+		tcbtab[c] = tcp++;
 
 	outf = stderr;
 	interactive = 1;
