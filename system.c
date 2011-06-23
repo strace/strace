@@ -1579,8 +1579,8 @@ sys_capget(struct tcb *tcp)
 	cap_user_data_t   arg1;
 	long a0[sizeof(*arg0) / sizeof(long) + 1];
 	long a1[sizeof(*arg1) / sizeof(long) + 1];
-	arg0 = (cap_user_header_t*) &a0;
-	arg1 = (cap_user_data_t  *) &a1;
+	arg0 = (cap_user_header_t) a0;
+	arg1 = (cap_user_data_t  ) a1;
 
 	if (!entering(tcp)) {
 		if (!tcp->u_arg[0])
@@ -1619,8 +1619,8 @@ sys_capset(struct tcb *tcp)
 	cap_user_data_t   arg1;
 	long a0[sizeof(*arg0) / sizeof(long) + 1];
 	long a1[sizeof(*arg1) / sizeof(long) + 1];
-	arg0 = (cap_user_header_t*) &a0;
-	arg1 = (cap_user_data_t  *) &a1;
+	arg0 = (cap_user_header_t) a0;
+	arg1 = (cap_user_data_t  ) a1;
 
 	if (entering(tcp)) {
 		if (!tcp->u_arg[0])
