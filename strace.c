@@ -471,13 +471,20 @@ startup_attach(void)
 					if (tid <= 0)
 						continue;
 					++ntid;
-					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0)
+					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0) {
 						++nerr;
-					else if (tid != tcbtab[tcbi]->pid) {
-						tcp = alloctcb(tid);
-						tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD;
-						tcbtab[tcbi]->nclone_threads++;
-						tcp->parent = tcbtab[tcbi];
+						if (debug)
+							fprintf(stderr, "attach to pid %d failed\n", tid);
+					}
+					else {
+						if (debug)
+							fprintf(stderr, "attach to pid %d succeeded\n", tid);
+						if (tid != tcbtab[tcbi]->pid) {
+							tcp = alloctcb(tid);
+							tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD;
+							tcbtab[tcbi]->nclone_threads++;
+							tcp->parent = tcbtab[tcbi];
+						}
 					}
 					if (interactive) {
 						sigprocmask(SIG_SETMASK, &empty_set, NULL);
@@ -508,6 +515,8 @@ startup_attach(void)
 			droptcb(tcp);
 			continue;
 		}
+		if (debug)
+			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
 		/* INTERRUPTED is going to be checked at the top of TRACE.  */
 
 		if (daemonized_tracer) {
@@ -528,7 +537,7 @@ startup_attach(void)
 			fprintf(stderr,
 				"Process %u attached - interrupt to quit\n",
 				tcp->pid);
-	}
+	} /* for each tcbtab[] */
 
 	if (interactive)
 		sigprocmask(SIG_SETMASK, &empty_set, NULL);
