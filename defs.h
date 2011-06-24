@@ -259,9 +259,8 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 #define IOCTL(f,c,a)	mp_ioctl(f, c, a, sizeof *a)
 #define IOCTL_STATUS(t) \
 	 pread(t->pfd_stat, &t->status, sizeof t->status, 0)
-#define IOCTL_WSTOP(t)						\
-	(IOCTL(t->pfd, PCWSTOP, (char *)NULL) < 0 ? -1 :		\
-	 IOCTL_STATUS(t))
+#define IOCTL_WSTOP(t) \
+	(IOCTL(t->pfd, PCWSTOP, (char *)NULL) < 0 ? -1 : IOCTL_STATUS(t))
 #define PR_WHY		pr_lwp.pr_why
 #define PR_WHAT		pr_lwp.pr_what
 #define PR_REG		pr_lwp.pr_context.uc_mcontext.gregs
