@@ -2488,12 +2488,12 @@ Process %d attached (waiting for parent)\n",
 		/* set current output file */
 		outf = tcp->outf;
 		curcol = tcp->curcol;
-		if (cflag) {
 #ifdef LINUX
+		if (cflag) {
 			tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
 			tcp->stime = ru.ru_stime;
-#endif /* !LINUX */
 		}
+#endif
 
 		if (tcp->flags & TCB_SUSPENDED) {
 			/*
@@ -2512,12 +2512,14 @@ Process %d attached (waiting for parent)\n",
 			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)) {
 				printleader(tcp);
+#ifdef WCOREDUMP
 				tprintf("+++ killed by %s %s+++",
 					signame(WTERMSIG(status)),
-#ifdef WCOREDUMP
-					WCOREDUMP(status) ? "(core dumped) " :
+					WCOREDUMP(status) ? "(core dumped) " : "");
+#else
+				tprintf("+++ killed by %s +++",
+					signame(WTERMSIG(status)));
 #endif
-					"");
 				printtrailer();
 			}
 #ifdef TCB_GROUP_EXITING
