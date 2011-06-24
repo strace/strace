@@ -1200,6 +1200,8 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->outf = outf; /* Initialise to current out file */
 			tcp->pfd = -1;
 			nprocs++;
+			if (debug)
+				fprintf(stderr, "new tcb for pid %d, active tcbs:%d\n", tcp->pid, nprocs);
 			if (command_options_parsed)
 				newoutf(tcp);
 			return tcp;
@@ -1554,6 +1556,8 @@ droptcb(struct tcb *tcp)
 	}
 #endif
 	nprocs--;
+	if (debug)
+		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
 	tcp->pid = 0;
 
 	if (tcp->parent != NULL) {
@@ -2322,8 +2326,6 @@ handle_ptrace_event(int status, struct tcb *tcp)
 		return handle_new_child(tcp, childpid, 0);
 	}
 	if (status >> 16 == PTRACE_EVENT_EXEC) {
-		if (debug)
-			fprintf(stderr, "PTRACE_EVENT_EXEC on pid %d (ignored)\n", tcp->pid);
 		return 0;
 	}
 	/* Some PTRACE_EVENT_foo we didn't ask for?! */
@@ -2403,8 +2405,47 @@ trace()
 				popen_pid = 0;
 			continue;
 		}
-		if (debug)
-			fprintf(stderr, " [wait(%#x) = %u]\n", status, pid);
+		if (debug) {
+			char buf[sizeof("WIFEXITED,exitcode=%u") + sizeof(int)*3 /*paranoia:*/ + 16];
+#ifdef LINUX
+			unsigned ev = (unsigned)status >> 16;
+			if (ev) {
+				static const char *const event_names[] = {
+					[PTRACE_EVENT_CLONE] = "CLONE",
+					[PTRACE_EVENT_FORK]  = "FORK",
+					[PTRACE_EVENT_VFORK] = "VFORK",
+					[PTRACE_EVENT_VFORK_DONE] = "VFORK_DONE",
+					[PTRACE_EVENT_EXEC]  = "EXEC",
+					[PTRACE_EVENT_EXIT]  = "EXIT",
+				};
+				const char *e;
+				if (ev < ARRAY_SIZE(event_names))
+					e = event_names[ev];
+				else {
+					sprintf(buf, "?? (%u)", ev);
+					e = buf;
+				}
+				fprintf(stderr, " PTRACE_EVENT_%s", e);
+			}
+#endif
+			strcpy(buf, "???");
+			if (WIFSIGNALED(status))
+#ifdef WCOREDUMP
+				sprintf(buf, "WIFSIGNALED,%ssig=%s",
+						WCOREDUMP(status) ? "core," : "",
+						signame(WTERMSIG(status)));
+#else
+				sprintf(buf, "WIFSIGNALED,sig=%s",
+						signame(WTERMSIG(status)));
+#endif
+			if (WIFEXITED(status))
+				sprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
+			if (WIFSTOPPED(status))
+				sprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
+			if (WIFCONTINUED(status))
+				strcpy(buf, "WIFCONTINUED");
+			fprintf(stderr, " [wait(0x%04x) = %u] %s\n", status, pid, buf);
+		}
 
 		/* Look up `pid' in our table. */
 		if ((tcp = pid2tcb(pid)) == NULL) {
@@ -2481,8 +2522,6 @@ Process %d attached (waiting for parent)\n",
 		if (WIFEXITED(status)) {
 			if (pid == strace_child)
 				exit_code = WEXITSTATUS(status);
-			if (debug)
-				fprintf(stderr, "pid %u exited with %d\n", pid, WEXITSTATUS(status));
 			if ((tcp->flags & (TCB_ATTACHED|TCB_STARTUP)) == TCB_ATTACHED
 #ifdef TCB_GROUP_EXITING
 			    && !(tcp->parent && (tcp->parent->flags & TCB_GROUP_EXITING))
@@ -2511,9 +2550,6 @@ Process %d attached (waiting for parent)\n",
 			droptcb(tcp);
 			continue;
 		}
-		if (debug)
-			fprintf(stderr, "pid %u stopped, [%s]\n",
-				pid, signame(WSTOPSIG(status)));
 
 		if (status >> 16) {
 			if (handle_ptrace_event(status, tcp) != 1)
