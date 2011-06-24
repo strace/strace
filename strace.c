@@ -517,7 +517,6 @@ startup_attach(void)
 		}
 		if (debug)
 			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
-		/* INTERRUPTED is going to be checked at the top of TRACE.  */
 
 		if (daemonized_tracer) {
 			/*
@@ -2687,7 +2686,7 @@ Process %d attached (waiting for parent)\n",
 			if (tcp->flags & TCB_ATTACHED) {
 				if (tcp_last) {
 					/* Do we have dangling line "syscall(param, param"?
-					 * Finish the line then. We cannot
+					 * Finish the line then.
 					 */
 					tcp_last->flags |= TCB_REPRINT;
 					tprintf(" <unfinished ...>");
