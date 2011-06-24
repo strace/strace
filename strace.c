@@ -2734,8 +2734,6 @@ Process %d attached (waiting for parent)\n",
 
 #endif /* !USE_PROCFS */
 
-#include <stdarg.h>
-
 void
 tprintf(const char *fmt, ...)
 {
