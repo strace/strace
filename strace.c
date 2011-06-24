@@ -118,17 +118,17 @@ static int strace_child = 0;
 static int strace_tracer_pid = 0;
 
 static char *username = NULL;
-uid_t run_uid;
-gid_t run_gid;
+static uid_t run_uid;
+static gid_t run_gid;
 
 int acolumn = DEFAULT_ACOLUMN;
 int max_strlen = DEFAULT_STRLEN;
 static char *outfname = NULL;
-FILE *outf;
+static FILE *outf;
 static int curcol;
-struct tcb **tcbtab;
+static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
-const char *progname;
+static const char *progname;
 
 static int detach(struct tcb *tcp, int sig);
 static int trace(void);
