@@ -317,6 +317,10 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 # if !HAVE_DECL_PTRACE_GETSIGINFO
 #  define PTRACE_GETSIGINFO	0x4202
 # endif
+
+# if !HAVE_DECL_PTRACE_O_TRACESYSGOOD
+#  define PTRACE_O_TRACESYSGOOD	0x00000001
+# endif
 # if !HAVE_DECL_PTRACE_O_TRACEFORK
 #  define PTRACE_O_TRACEFORK	0x00000002
 # endif
@@ -325,6 +329,12 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 # endif
 # if !HAVE_DECL_PTRACE_O_TRACECLONE
 #  define PTRACE_O_TRACECLONE	0x00000008
+# endif
+# if !HAVE_DECL_PTRACE_O_TRACEEXEC
+#  define PTRACE_O_TRACEEXEC	0x00000010
+# endif
+# if !HAVE_DECL_PTRACE_O_TRACEEXIT
+#  define PTRACE_O_TRACEEXIT	0x00000040
 # endif
 
 # if !HAVE_DECL_PTRACE_EVENT_FORK
@@ -335,6 +345,15 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 # endif
 # if !HAVE_DECL_PTRACE_EVENT_CLONE
 #  define PTRACE_EVENT_CLONE	3
+# endif
+# if !HAVE_DECL_PTRACE_EVENT_EXEC
+#  define PTRACE_EVENT_EXEC	4
+# endif
+# if !HAVE_DECL_PTRACE_EVENT_VFORK_DONE
+#  define PTRACE_EVENT_VFORK_DONE	5
+# endif
+# if !HAVE_DECL_PTRACE_EVENT_EXIT
+#  define PTRACE_EVENT_EXIT	6
 # endif
 #endif /* LINUX */
 
