@@ -581,6 +581,9 @@ extern void printfd(struct tcb *, int);
 extern void printsock(struct tcb *, long, int);
 extern void print_sock_optmgmt(struct tcb *, long, int);
 extern void printrusage(struct tcb *, long);
+#ifdef ALPHA
+extern void printrusage32(struct tcb *, long);
+#endif
 extern void printuid(const char *, unsigned long);
 extern int clearbpt(struct tcb *);
 /*
