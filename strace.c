@@ -2450,8 +2450,10 @@ trace()
 				sprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
 			if (WIFSTOPPED(status))
 				sprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
+#ifdef WIFCONTINUED
 			if (WIFCONTINUED(status))
 				strcpy(buf, "WIFCONTINUED");
+#endif
 			fprintf(stderr, " [wait(0x%04x) = %u] %s\n", status, pid, buf);
 		}
 

@@ -194,6 +194,7 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 			}
 		break;
 
+#ifdef BLKGETSIZE64
 	/* return an uint64_t */
 	case BLKGETSIZE64:
 		if (exiting(tcp)) {
@@ -204,6 +205,7 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 				tprintf(", %" PRIu64, val);
 		}
 		break;
+#endif
 
 	/* More complex types */
 	case BLKDISCARD:
