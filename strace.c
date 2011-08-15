@@ -2351,9 +2351,10 @@ trace()
 	struct tcb *tcp;
 #ifdef LINUX
 	struct rusage ru;
-#ifdef __WALL
+	struct rusage *rup = cflag ? &ru : NULL;
+# ifdef __WALL
 	static int wait4_options = __WALL;
-#endif
+# endif
 #endif /* LINUX */
 
 	while (nprocs != 0) {
@@ -2362,35 +2363,32 @@ trace()
 		if (interactive)
 			sigprocmask(SIG_SETMASK, &empty_set, NULL);
 #ifdef LINUX
-#ifdef __WALL
-		pid = wait4(-1, &status, wait4_options, cflag ? &ru : NULL);
+# ifdef __WALL
+		pid = wait4(-1, &status, wait4_options, rup);
 		if (pid < 0 && (wait4_options & __WALL) && errno == EINVAL) {
 			/* this kernel does not support __WALL */
 			wait4_options &= ~__WALL;
-			errno = 0;
-			pid = wait4(-1, &status, wait4_options,
-					cflag ? &ru : NULL);
+			pid = wait4(-1, &status, wait4_options, rup);
 		}
 		if (pid < 0 && !(wait4_options & __WALL) && errno == ECHILD) {
 			/* most likely a "cloned" process */
-			pid = wait4(-1, &status, __WCLONE,
-					cflag ? &ru : NULL);
-			if (pid == -1) {
+			pid = wait4(-1, &status, __WCLONE, rup);
+			if (pid < 0) {
 				perror_msg("wait4(__WCLONE) failed");
 			}
 		}
-#else
-		pid = wait4(-1, &status, 0, cflag ? &ru : NULL);
-#endif /* __WALL */
+# else
+		pid = wait4(-1, &status, 0, rup);
+# endif /* __WALL */
 #endif /* LINUX */
 #ifdef SUNOS4
 		pid = wait(&status);
-#endif /* SUNOS4 */
+#endif
 		wait_errno = errno;
 		if (interactive)
 			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 
-		if (pid == -1) {
+		if (pid < 0) {
 			switch (wait_errno) {
 			case EINTR:
 				continue;
