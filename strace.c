@@ -723,12 +723,20 @@ startup_child(char **argv)
 }
 
 #ifdef LINUX
+static void kill_save_errno(pid_t pid, int sig)
+{
+	int saved_errno = errno;
+
+	(void) kill(pid, sig);
+	errno = saved_errno;
+}
+
 /*
  * Test whether the kernel support PTRACE_O_TRACECLONE et al options.
  * First fork a new child, call ptrace with PTRACE_SETOPTIONS on it,
  * and then see which options are supported by the kernel.
  */
-static int
+static void
 test_ptrace_setoptions_followfork(void)
 {
 	int pid, expected_grandchild = 0, found_grandchild = 0;
@@ -737,59 +745,93 @@ test_ptrace_setoptions_followfork(void)
 					  PTRACE_O_TRACEVFORK;
 
 	if ((pid = fork()) < 0)
-		return -1;
+		perror_msg_and_die("fork");
 	else if (pid == 0) {
-		if (ptrace(PTRACE_TRACEME, 0, (char *)1, 0) < 0)
-			_exit(1);
-		kill(getpid(), SIGSTOP);
-		_exit(fork() < 0);
+		pid = getpid();
+		if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0)
+			perror_msg_and_die("%s: PTRACE_TRACEME doesn't work",
+					   __func__);
+		kill(pid, SIGSTOP);
+		if (fork() < 0)
+			perror_msg_and_die("fork");
+		_exit(0);
 	}
 
 	while (1) {
 		int status, tracee_pid;
 
+		errno = 0;
 		tracee_pid = wait(&status);
-		if (tracee_pid == -1) {
+		if (tracee_pid <= 0) {
 			if (errno == EINTR)
 				continue;
 			else if (errno == ECHILD)
 				break;
-			perror("test_ptrace_setoptions_followfork");
-			return -1;
+			kill_save_errno(pid, SIGKILL);
+			perror_msg_and_die("%s: unexpected wait result %d",
+					   __func__, tracee_pid);
+		}
+		if (WIFEXITED(status)) {
+			if (WEXITSTATUS(status)) {
+				if (tracee_pid != pid)
+					kill_save_errno(pid, SIGKILL);
+				error_msg_and_die("%s: unexpected exit status %u",
+						  __func__, WEXITSTATUS(status));
+			}
+			continue;
+		}
+		if (WIFSIGNALED(status)) {
+			if (tracee_pid != pid)
+				kill_save_errno(pid, SIGKILL);
+			error_msg_and_die("%s: unexpected signal %u",
+					  __func__, WTERMSIG(status));
+		}
+		if (!WIFSTOPPED(status)) {
+			if (tracee_pid != pid)
+				kill_save_errno(tracee_pid, SIGKILL);
+			kill(pid, SIGKILL);
+			error_msg_and_die("%s: unexpected wait status %x",
+					  __func__, status);
 		}
 		if (tracee_pid != pid) {
 			found_grandchild = tracee_pid;
-			if (ptrace(PTRACE_CONT, tracee_pid, 0, 0) < 0 &&
-			    errno != ESRCH)
-				kill(tracee_pid, SIGKILL);
-		}
-		else if (WIFSTOPPED(status)) {
-			switch (WSTOPSIG(status)) {
-			case SIGSTOP:
-				if (ptrace(PTRACE_SETOPTIONS, pid,
-					   NULL, test_options) < 0) {
-					kill(pid, SIGKILL);
-					return -1;
-				}
-				break;
-			case SIGTRAP:
-				if (status >> 16 == PTRACE_EVENT_FORK) {
-					long msg = 0;
-
-					if (ptrace(PTRACE_GETEVENTMSG, pid,
-						   NULL, (long) &msg) == 0)
-						expected_grandchild = msg;
-				}
-				break;
+			if (ptrace(PTRACE_CONT, tracee_pid, 0, 0) < 0) {
+				kill_save_errno(tracee_pid, SIGKILL);
+				kill_save_errno(pid, SIGKILL);
+				perror_msg_and_die("PTRACE_CONT doesn't work");
 			}
-			if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0 &&
-			    errno != ESRCH)
-				kill(pid, SIGKILL);
+			continue;
+		}
+		switch (WSTOPSIG(status)) {
+		case SIGSTOP:
+			if (ptrace(PTRACE_SETOPTIONS, pid, 0, test_options) < 0
+			    && errno != EINVAL && errno != EIO)
+				perror_msg("PTRACE_SETOPTIONS");
+			break;
+		case SIGTRAP:
+			if (status >> 16 == PTRACE_EVENT_FORK) {
+				long msg = 0;
+
+				if (ptrace(PTRACE_GETEVENTMSG, pid,
+					   NULL, (long) &msg) == 0)
+					expected_grandchild = msg;
+			}
+			break;
+		}
+		if (ptrace(PTRACE_SYSCALL, pid, 0, 0) < 0) {
+			kill_save_errno(pid, SIGKILL);
+			perror_msg_and_die("PTRACE_SYSCALL doesn't work");
 		}
 	}
-	if (expected_grandchild && expected_grandchild == found_grandchild)
+	if (expected_grandchild && expected_grandchild == found_grandchild) {
 		ptrace_setoptions |= test_options;
-	return 0;
+		if (debug)
+			fprintf(stderr, "ptrace_setoptions = %#x\n",
+				ptrace_setoptions);
+		return;
+	}
+	error_msg("Test for PTRACE_O_TRACECLONE failed, "
+		  "giving up using this feature.");
 }
 
 /*
@@ -809,7 +851,8 @@ test_ptrace_setoptions_followfork(void)
 static void
 test_ptrace_setoptions_for_all(void)
 {
-	const unsigned int test_options = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC;
+	const unsigned int test_options = PTRACE_O_TRACESYSGOOD |
+					  PTRACE_O_TRACEEXEC;
 	int pid;
 	int it_worked = 0;
 
@@ -821,7 +864,8 @@ test_ptrace_setoptions_for_all(void)
 		pid = getpid();
 		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
 			/* Note: exits with exitcode 1 */
-			perror_msg_and_die("%s: PTRACE_TRACEME doesn't work", __func__);
+			perror_msg_and_die("%s: PTRACE_TRACEME doesn't work",
+					   __func__);
 		kill(pid, SIGSTOP);
 		_exit(0); /* parent should see entry into this syscall */
 	}
@@ -834,18 +878,24 @@ test_ptrace_setoptions_for_all(void)
 		if (tracee_pid <= 0) {
 			if (errno == EINTR)
 				continue;
-			kill(pid, SIGKILL);
-			perror_msg_and_die("%s: unexpected wait result %d", __func__, tracee_pid);
+			kill_save_errno(pid, SIGKILL);
+			perror_msg_and_die("%s: unexpected wait result %d",
+					   __func__, tracee_pid);
 		}
 		if (WIFEXITED(status)) {
 			if (WEXITSTATUS(status) == 0)
 				break;
-			/* PTRACE_TRACEME failed in child. This is fatal. */
-			exit(1);
+			error_msg_and_die("%s: unexpected exit status %u",
+					  __func__, WEXITSTATUS(status));
+		}
+		if (WIFSIGNALED(status)) {
+			error_msg_and_die("%s: unexpected signal %u",
+					  __func__, WTERMSIG(status));
 		}
 		if (!WIFSTOPPED(status)) {
 			kill(pid, SIGKILL);
-			error_msg_and_die("%s: unexpected wait status %x", __func__, status);
+			error_msg_and_die("%s: unexpected wait status %x",
+					  __func__, status);
 		}
 		if (WSTOPSIG(status) == SIGSTOP) {
 			/*
@@ -854,15 +904,15 @@ test_ptrace_setoptions_for_all(void)
 			 * and thus will decide to not use the option.
 			 * IOW: the outcome of the test will be correct.
 			 */
-			if (ptrace(PTRACE_SETOPTIONS, pid, 0L, test_options) < 0)
-				if (errno != EINVAL)
-					perror_msg("PTRACE_SETOPTIONS");
+			if (ptrace(PTRACE_SETOPTIONS, pid, 0L, test_options) < 0
+			    && errno != EINVAL && errno != EIO)
+				perror_msg("PTRACE_SETOPTIONS");
 		}
 		if (WSTOPSIG(status) == (SIGTRAP | 0x80)) {
 			it_worked = 1;
 		}
 		if (ptrace(PTRACE_SYSCALL, pid, 0L, 0L) < 0) {
-			kill(pid, SIGKILL);
+			kill_save_errno(pid, SIGKILL);
 			perror_msg_and_die("PTRACE_SYSCALL doesn't work");
 		}
 	}
@@ -876,8 +926,8 @@ test_ptrace_setoptions_for_all(void)
 		return;
 	}
 
-	fprintf(stderr,
-		"Test for PTRACE_O_TRACESYSGOOD failed, giving up using this feature.\n");
+	error_msg("Test for PTRACE_O_TRACESYSGOOD failed, "
+		  "giving up using this feature.");
 }
 #endif
 
@@ -1067,17 +1117,8 @@ main(int argc, char *argv[])
 	}
 
 #ifdef LINUX
-	if (followfork) {
-		if (test_ptrace_setoptions_followfork() < 0) {
-			fprintf(stderr,
-				"Test for options supported by PTRACE_SETOPTIONS "
-				"failed, giving up using this feature.\n");
-			ptrace_setoptions = 0;
-		}
-		if (debug)
-			fprintf(stderr, "ptrace_setoptions = %#x\n",
-				ptrace_setoptions);
-	}
+	if (followfork)
+		test_ptrace_setoptions_followfork();
 	test_ptrace_setoptions_for_all();
 #endif
 
