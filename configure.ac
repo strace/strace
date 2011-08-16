@@ -323,6 +323,15 @@ AC_CHECK_DECLS([
 		PTRACE_EVENT_VFORK_DONE,
 		PTRACE_EVENT_EXIT],,, [#include <sys/ptrace.h>])
 
+AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
+	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#include <stdlib.h>
+#include <linux/fs.h>], [return !BLKGETSIZE64;])],
+			   [ac_cv_have_blkgetsize64=yes], [ac_cv_have_blkgetsize64=no])]
+	if test $ac_cv_have_blkgetsize64 = yes; then
+		AC_DEFINE([HAVE_BLKGETSIZE64], [1], [Define to 1 if you have BLKGETSIZE64.])
+	fi)
+
 AC_PATH_PROG([PERL], [perl])
 
 AC_CONFIG_FILES([Makefile tests/Makefile])

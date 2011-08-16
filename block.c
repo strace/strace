@@ -194,7 +194,7 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 			}
 		break;
 
-#ifdef BLKGETSIZE64
+#ifdef HAVE_BLKGETSIZE64
 	/* return an uint64_t */
 	case BLKGETSIZE64:
 		if (exiting(tcp)) {
