@@ -385,7 +385,6 @@ struct tcb {
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
 				/* Support for tracing forked processes */
-	struct tcb *parent;	/* Parent of this process */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
 	int pfd;		/* proc file descriptor */
@@ -411,6 +410,9 @@ struct tcb {
 #define TCB_INUSE	00002	/* This table entry is in use */
 #define TCB_INSYSCALL	00004	/* A system call is in progress */
 #define TCB_ATTACHED	00010	/* Process is not our own child */
+#ifdef LINUX
+#define TCB_ATTACH_DONE	00020	/* PTRACE_ATTACH was done on this tcb->pid */
+#endif
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
@@ -424,9 +426,8 @@ struct tcb {
   || defined(POWERPC) || defined(IA64) || defined(HPPA) \
   || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) \
   || defined(ARM) || defined(MIPS) || defined(BFIN) || defined(TILE)
-#  define TCB_WAITEXECVE 04000	/* ignore SIGTRAP after exceve */
+#  define TCB_WAITEXECVE 04000	/* ignore SIGTRAP after execve */
 # endif
-# define TCB_CLONE_THREAD  010000 /* CLONE_THREAD set in creating syscall */
 # include <sys/syscall.h>
 # ifndef __NR_exit_group
 # /* Hack: Most headers around are too old to have __NR_exit_group.  */

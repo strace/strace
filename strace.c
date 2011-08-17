@@ -49,16 +49,14 @@
 
 #ifdef LINUX
 # include <asm/unistd.h>
-# if defined __NR_tgkill
-#  define my_tgkill(pid, tid, sig) syscall(__NR_tgkill, (pid), (tid), (sig))
-# elif defined __NR_tkill
-#  define my_tgkill(pid, tid, sig) syscall(__NR_tkill, (tid), (sig))
+# if defined __NR_tkill
+#  define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
 # else
    /* kill() may choose arbitrarily the target task of the process group
       while we later wait on a that specific TID.  PID process waits become
       TID task specific waits for a process under ptrace(2).  */
 #  warning "Neither tkill(2) nor tgkill(2) available, risk of strace hangs!"
-#  define my_tgkill(pid, tid, sig) kill((tid), (sig))
+#  define my_tkill(tid, sig) kill((tid), (sig))
 # endif
 #endif
 
@@ -436,10 +434,11 @@ startup_attach(void)
 
 	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
 		tcp = tcbtab[tcbi];
+
 		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
 			continue;
 #ifdef LINUX
-		if (tcp->flags & TCB_CLONE_THREAD)
+		if (tcp->flags & TCB_ATTACH_DONE)
 			continue;
 #endif
 		/* Reinitialize the output since it may have changed. */
@@ -479,16 +478,15 @@ startup_attach(void)
 					else {
 						if (debug)
 							fprintf(stderr, "attach to pid %d succeeded\n", tid);
-						if (tid != tcbtab[tcbi]->pid) {
-							tcp = alloctcb(tid);
-							tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD;
-							tcp->parent = tcbtab[tcbi];
+						if (tid != tcp->pid) {
+							struct tcb *new_tcp = alloctcb(tid);
+							new_tcp->flags |= TCB_ATTACHED|TCB_ATTACH_DONE;
 						}
 					}
 					if (interactive) {
 						sigprocmask(SIG_SETMASK, &empty_set, NULL);
 						if (interrupted)
-							return;
+							goto ret;
 						sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 					}
 				}
@@ -503,12 +501,12 @@ startup_attach(void)
 					fprintf(stderr, ntid > 1
 ? "Process %u attached with %u threads - interrupt to quit\n"
 : "Process %u attached - interrupt to quit\n",
-						tcbtab[tcbi]->pid, ntid);
+						tcp->pid, ntid);
 				}
 				continue;
 			} /* if (opendir worked) */
 		} /* if (-f) */
-# endif
+# endif /* LINUX */
 		if (ptrace(PTRACE_ATTACH, tcp->pid, (char *) 1, 0) < 0) {
 			perror("attach: ptrace(PTRACE_ATTACH, ...)");
 			droptcb(tcp);
@@ -536,6 +534,15 @@ startup_attach(void)
 				"Process %u attached - interrupt to quit\n",
 				tcp->pid);
 	} /* for each tcbtab[] */
+
+ ret:
+#ifdef LINUX
+	/* TCB_ATTACH_DONE flag is used only in this function */
+	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
+		tcp = tcbtab[tcbi];
+		tcp->flags &= ~TCB_ATTACH_DONE;
+	}
+#endif
 
 	if (interactive)
 		sigprocmask(SIG_SETMASK, &empty_set, NULL);
@@ -1621,15 +1628,11 @@ detach(struct tcb *tcp, int sig)
 		/* Shouldn't happen. */
 		perror("detach: ptrace(PTRACE_DETACH, ...)");
 	}
-	else if (my_tgkill((tcp->flags & TCB_CLONE_THREAD ? tcp->parent->pid
-							  : tcp->pid),
-			   tcp->pid, 0) < 0) {
+	else if (my_tkill(tcp->pid, 0) < 0) {
 		if (errno != ESRCH)
 			perror("detach: checking sanity");
 	}
-	else if (!catch_sigstop && my_tgkill((tcp->flags & TCB_CLONE_THREAD
-					      ? tcp->parent->pid : tcp->pid),
-					     tcp->pid, SIGSTOP) < 0) {
+	else if (!catch_sigstop && my_tkill(tcp->pid, SIGSTOP) < 0) {
 		if (errno != ESRCH)
 			perror("detach: stopping child");
 	}
@@ -2443,16 +2446,13 @@ trace()
 				}
 			}
 #ifdef LINUX
-			/* If options were not set for this tracee yet */
-			if (tcp->parent == NULL) {
-				if (ptrace_setoptions) {
-					if (debug)
-						fprintf(stderr, "setting opts %x on pid %d\n", ptrace_setoptions, tcp->pid);
-					if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, ptrace_setoptions) < 0) {
-						if (errno != ESRCH) {
-							/* Should never happen, really */
-							perror_msg_and_die("PTRACE_SETOPTIONS");
-						}
+			if (ptrace_setoptions) {
+				if (debug)
+					fprintf(stderr, "setting opts %x on pid %d\n", ptrace_setoptions, tcp->pid);
+				if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, ptrace_setoptions) < 0) {
+					if (errno != ESRCH) {
+						/* Should never happen, really */
+						perror_msg_and_die("PTRACE_SETOPTIONS");
 					}
 				}
 			}

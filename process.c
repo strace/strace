@@ -866,7 +866,6 @@ internal_fork(struct tcb *tcp)
 			memcpy(tcpchild->inst, tcp->inst,
 				sizeof tcpchild->inst);
 		}
-		tcpchild->parent = tcp;
 		if (!qflag)
 			fprintf(stderr, "Process %d attached\n", pid);
 	}
