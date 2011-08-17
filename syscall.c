@@ -627,9 +627,6 @@ internal_syscall(struct tcb *tcp)
 
 	func = sysent[tcp->scno].sys_func;
 
-	if (sys_exit == func)
-		return internal_exit(tcp);
-
 	if (   sys_fork == func
 #if defined(FREEBSD) || defined(LINUX) || defined(SUNOS4)
 	    || sys_vfork == func

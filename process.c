@@ -435,19 +435,6 @@ sys_exit(struct tcb *tcp)
 	return 0;
 }
 
-int
-internal_exit(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tcp->flags |= TCB_EXITING;
-#ifdef __NR_exit_group
-		if (known_scno(tcp) == __NR_exit_group)
-			tcp->flags |= TCB_GROUP_EXITING;
-#endif
-	}
-	return 0;
-}
-
 #ifdef USE_PROCFS
 
 int
@@ -850,7 +837,6 @@ Process %u resumed (parent %d ready)\n",
 		}
 		if (call_flags & CLONE_THREAD) {
 			tcpchild->flags |= TCB_CLONE_THREAD;
-			++tcp->nclone_threads;
 		}
 		if ((call_flags & CLONE_PARENT) &&
 		    !(call_flags & CLONE_THREAD)) {

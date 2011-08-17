@@ -482,7 +482,6 @@ startup_attach(void)
 						if (tid != tcbtab[tcbi]->pid) {
 							tcp = alloctcb(tid);
 							tcp->flags |= TCB_ATTACHED|TCB_CLONE_THREAD;
-							tcbtab[tcbi]->nclone_threads++;
 							tcp->parent = tcbtab[tcbi];
 						}
 					}
@@ -1553,40 +1552,11 @@ droptcb(struct tcb *tcp)
 {
 	if (tcp->pid == 0)
 		return;
-#ifdef TCB_CLONE_THREAD
-	if (tcp->nclone_threads > 0) {
-		/* There are other threads left in this process, but this
-		   is the one whose PID represents the whole process.
-		   We need to keep this record around as a zombie until
-		   all the threads die.  */
-		tcp->flags |= TCB_EXITING;
-		return;
-	}
-#endif
+
 	nprocs--;
 	if (debug)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
-	tcp->pid = 0;
 
-	if (tcp->parent != NULL) {
-#ifdef TCB_CLONE_THREAD
-		if (tcp->flags & TCB_CLONE_THREAD)
-			tcp->parent->nclone_threads--;
-#endif
-#ifdef LINUX
-		/* Update fields like NCLONE_DETACHED, only
-		   for zombie group leader that has already reported
-		   and been short-circuited at the top of this
-		   function.  The same condition as at the top of DETACH.  */
-		if ((tcp->flags & TCB_CLONE_THREAD) &&
-		    tcp->parent->nclone_threads == 0 &&
-		    (tcp->parent->flags & TCB_EXITING))
-			droptcb(tcp->parent);
-#endif
-		tcp->parent = NULL;
-	}
-
-	tcp->flags = 0;
 	if (tcp->pfd != -1) {
 		close(tcp->pfd);
 		tcp->pfd = -1;
@@ -1601,14 +1571,15 @@ droptcb(struct tcb *tcp)
 		}
 #endif /* !FREEBSD */
 #ifdef USE_PROCFS
-		rebuild_pollv(); /* Note, flags needs to be cleared by now.  */
+		tcp->flags = 0; /* rebuild_pollv needs it */
+		rebuild_pollv();
 #endif
 	}
 
 	if (outfname && followfork > 1 && tcp->outf)
 		fclose(tcp->outf);
 
-	tcp->outf = 0;
+	memset(tcp, 0, sizeof(*tcp));
 }
 
 /* detach traced process; continue with sig
@@ -1622,14 +1593,6 @@ detach(struct tcb *tcp, int sig)
 	int error = 0;
 #ifdef LINUX
 	int status, catch_sigstop;
-	struct tcb *zombie = NULL;
-
-	/* If the group leader is lingering only because of this other
-	   thread now dying, then detach the leader as well.  */
-	if ((tcp->flags & TCB_CLONE_THREAD) &&
-	    tcp->parent->nclone_threads == 1 &&
-	    (tcp->parent->flags & TCB_EXITING))
-		zombie = tcp->parent;
 #endif
 
 	if (tcp->flags & TCB_BPTSET)
@@ -1731,13 +1694,6 @@ detach(struct tcb *tcp, int sig)
 		fprintf(stderr, "Process %u detached\n", tcp->pid);
 
 	droptcb(tcp);
-
-#ifdef LINUX
-	if (zombie != NULL) {
-		/* TCP no longer exists therefore you must not detach() it.  */
-		droptcb(zombie);
-	}
-#endif
 
 	return error;
 }
@@ -2260,62 +2216,6 @@ trace(void)
 
 #else /* !USE_PROCFS */
 
-#ifdef TCB_GROUP_EXITING
-/* Handle an exit detach or death signal that is taking all the
-   related clone threads with it.  This is called in three circumstances:
-   SIG == -1	TCP has already died (TCB_ATTACHED is clear, strace is parent).
-   SIG == 0	Continuing TCP will perform an exit_group syscall.
-   SIG == other	Continuing TCP with SIG will kill the process.
-*/
-static int
-handle_group_exit(struct tcb *tcp, int sig)
-{
-	/* We need to locate our records of all the clone threads
-	   related to TCP, either its children or siblings.  */
-	struct tcb *leader = NULL;
-
-	if (tcp->flags & TCB_CLONE_THREAD)
-		leader = tcp->parent;
-
-	if (sig < 0) {
-		if (leader != NULL && leader != tcp
-		 && !(leader->flags & TCB_GROUP_EXITING)
-		 && !(tcp->flags & TCB_STARTUP)
-		) {
-			fprintf(stderr,
-				"PANIC: handle_group_exit: %d leader %d\n",
-				tcp->pid, leader ? leader->pid : -1);
-		}
-		/* TCP no longer exists therefore you must not detach() it.  */
-		droptcb(tcp);	/* Already died.  */
-	}
-	else {
-		/* Mark that we are taking the process down.  */
-		tcp->flags |= TCB_EXITING | TCB_GROUP_EXITING;
-		if (tcp->flags & TCB_ATTACHED) {
-			detach(tcp, sig);
-			if (leader != NULL && leader != tcp)
-				leader->flags |= TCB_GROUP_EXITING;
-		} else {
-			if (ptrace_restart(PTRACE_CONT, tcp, sig) < 0) {
-				cleanup();
-				return -1;
-			}
-			if (leader != NULL) {
-				leader->flags |= TCB_GROUP_EXITING;
-				if (leader != tcp)
-					droptcb(tcp);
-			}
-			/* The leader will report to us as parent now,
-			   and then we'll get to the SIG==-1 case.  */
-			return 0;
-		}
-	}
-
-	return 0;
-}
-#endif
-
 #ifdef LINUX
 static int
 handle_ptrace_event(int status, struct tcb *tcp)
@@ -2522,37 +2422,24 @@ Process %d attached (waiting for parent)\n",
 #endif
 				printtrailer();
 			}
-#ifdef TCB_GROUP_EXITING
-			handle_group_exit(tcp, -1);
-#else
 			droptcb(tcp);
-#endif
 			continue;
 		}
 		if (WIFEXITED(status)) {
 			if (pid == strace_child)
 				exit_code = WEXITSTATUS(status);
-			if ((tcp->flags & (TCB_ATTACHED|TCB_STARTUP)) == TCB_ATTACHED
-#ifdef TCB_GROUP_EXITING
-			    && !(tcp->parent && (tcp->parent->flags & TCB_GROUP_EXITING))
-			    && !(tcp->flags & TCB_GROUP_EXITING)
-#endif
-			) {
-				fprintf(stderr,
-					"PANIC: attached pid %u exited with %d\n",
-					pid, WEXITSTATUS(status));
-			}
 			if (tcp == tcp_last) {
 				if ((tcp->flags & (TCB_INSYSCALL|TCB_REPRINT)) == TCB_INSYSCALL)
 					tprintf(" <unfinished ... exit status %d>\n",
 						WEXITSTATUS(status));
 				tcp_last = NULL;
 			}
-#ifdef TCB_GROUP_EXITING
-			handle_group_exit(tcp, -1);
-#else
+			if (!cflag /* && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL) */ ) {
+				printleader(tcp);
+				tprintf("+++ exited with %d +++", WEXITSTATUS(status));
+				printtrailer();
+			}
 			droptcb(tcp);
-#endif
 			continue;
 		}
 		if (!WIFSTOPPED(status)) {
@@ -2657,16 +2544,6 @@ Process %d attached (waiting for parent)\n",
 						PC_FORMAT_ARG);
 				printtrailer();
 			}
-			if (((tcp->flags & TCB_ATTACHED) ||
-			     tcp->nclone_threads > 0) &&
-				!sigishandled(tcp, WSTOPSIG(status))) {
-#ifdef TCB_GROUP_EXITING
-				handle_group_exit(tcp, WSTOPSIG(status));
-#else
-				detach(tcp, WSTOPSIG(status));
-#endif
-				continue;
-			}
 			if (ptrace_restart(PTRACE_SYSCALL, tcp, WSTOPSIG(status)) < 0) {
 				cleanup();
 				return -1;
@@ -2699,22 +2576,6 @@ Process %d attached (waiting for parent)\n",
 				ptrace(PTRACE_KILL,
 					tcp->pid, (char *) 1, SIGTERM);
 				droptcb(tcp);
-			}
-			continue;
-		}
-		if (tcp->flags & TCB_EXITING) {
-#ifdef TCB_GROUP_EXITING
-			if (tcp->flags & TCB_GROUP_EXITING) {
-				if (handle_group_exit(tcp, 0) < 0)
-					return -1;
-				continue;
-			}
-#endif
-			if (tcp->flags & TCB_ATTACHED)
-				detach(tcp, 0);
-			else if (ptrace_restart(PTRACE_CONT, tcp, 0) < 0) {
-				cleanup();
-				return -1;
 			}
 			continue;
 		}

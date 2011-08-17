@@ -386,10 +386,6 @@ struct tcb {
 	struct timeval etime;	/* Syscall entry time */
 				/* Support for tracing forked processes */
 	struct tcb *parent;	/* Parent of this process */
-#ifdef LINUX
-	int nclone_threads;	/* # of children with CLONE_THREAD */
-#endif
-				/* (1st arg of wait4()) */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
 	int pfd;		/* proc file descriptor */
@@ -415,7 +411,6 @@ struct tcb {
 #define TCB_INUSE	00002	/* This table entry is in use */
 #define TCB_INSYSCALL	00004	/* A system call is in progress */
 #define TCB_ATTACHED	00010	/* Process is not our own child */
-#define TCB_EXITING	00020	/* As far as we know, this process is exiting */
 #define TCB_SUSPENDED	00040	/* Process can not be allowed to resume just now */
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
@@ -433,7 +428,6 @@ struct tcb {
 #  define TCB_WAITEXECVE 04000	/* ignore SIGTRAP after exceve */
 # endif
 # define TCB_CLONE_THREAD  010000 /* CLONE_THREAD set in creating syscall */
-# define TCB_GROUP_EXITING 020000 /* TCB_EXITING was exit_group, not _exit */
 # include <sys/syscall.h>
 # ifndef __NR_exit_group
 # /* Hack: Most headers around are too old to have __NR_exit_group.  */
@@ -593,7 +587,6 @@ extern int clearbpt(struct tcb *);
  * On newer kernels, we use PTRACE_O_TRACECLONE/TRACE[V]FORK instead.
  */
 extern int setbpt(struct tcb *);
-extern int sigishandled(struct tcb *, int);
 extern void printcall(struct tcb *);
 extern const char *signame(int);
 extern void print_sigset(struct tcb *, long, int);
@@ -613,7 +606,6 @@ extern int pathtrace_match(struct tcb *);
 extern int change_syscall(struct tcb *, int);
 extern int internal_fork(struct tcb *);
 extern int internal_exec(struct tcb *);
-extern int internal_exit(struct tcb *);
 #ifdef LINUX
 extern int handle_new_child(struct tcb *, int, int);
 #endif
