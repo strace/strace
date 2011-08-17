@@ -762,94 +762,6 @@ change_syscall(struct tcb *tcp, int new)
 }
 
 #ifdef LINUX
-int
-handle_new_child(struct tcb *tcp, int pid, int bpt)
-{
-	struct tcb *tcpchild;
-
-	tcpchild = pid2tcb(pid);
-	if (tcpchild != NULL) {
-		/* The child already reported its startup trap
-		   before the parent reported its syscall return.  */
-		if ((tcpchild->flags
-		     & (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
-		    != (TCB_STARTUP|TCB_ATTACHED|TCB_SUSPENDED))
-			fprintf(stderr, "\
-[preattached child %d of %d in weird state!]\n",
-				pid, tcp->pid);
-	}
-	else {
-		tcpchild = alloctcb(pid);
-	}
-
-	tcpchild->flags |= TCB_ATTACHED;
-
-	if (bpt) {
-		clearbpt(tcp);
-		/* Child has BPT too, must be removed on first occasion.  */
-		tcpchild->flags |= TCB_BPTSET;
-		tcpchild->baddr = tcp->baddr;
-		memcpy(tcpchild->inst, tcp->inst,
-			sizeof tcpchild->inst);
-	}
-	tcpchild->parent = tcp;
-	if (tcpchild->flags & TCB_SUSPENDED) {
-		/* The child was born suspended, due to our having
-		   forced CLONE_PTRACE.  */
-		if (bpt)
-			clearbpt(tcpchild);
-
-		tcpchild->flags &= ~(TCB_SUSPENDED|TCB_STARTUP);
-		if (ptrace_restart(PTRACE_SYSCALL, tcpchild, 0) < 0)
-			return -1;
-
-		if (!qflag)
-			fprintf(stderr, "\
-Process %u resumed (parent %d ready)\n",
-				pid, tcp->pid);
-	}
-	else {
-		if (!qflag)
-			fprintf(stderr, "Process %d attached\n", pid);
-	}
-
-#ifdef TCB_CLONE_THREAD
-	if (sysent[tcp->scno].sys_func == sys_clone) {
-		/*
-		 * Save the flags used in this call,
-		 * in case we point TCP to our parent below.
-		 */
-		int call_flags = tcp->u_arg[ARG_FLAGS];
-		if ((tcp->flags & TCB_CLONE_THREAD) &&
-		    tcp->parent != NULL) {
-			/* The parent in this clone is itself a
-			   thread belonging to another process.
-			   There is no meaning to the parentage
-			   relationship of the new child with the
-			   thread, only with the process.  We
-			   associate the new thread with our
-			   parent.  Since this is done for every
-			   new thread, there will never be a
-			   TCB_CLONE_THREAD process that has
-			   children.  */
-			tcp = tcp->parent;
-			tcpchild->parent = tcp;
-		}
-		if (call_flags & CLONE_THREAD) {
-			tcpchild->flags |= TCB_CLONE_THREAD;
-		}
-		if ((call_flags & CLONE_PARENT) &&
-		    !(call_flags & CLONE_THREAD)) {
-			tcpchild->parent = NULL;
-			if (tcp->parent != NULL) {
-				tcp = tcp->parent;
-				tcpchild->parent = tcp;
-			}
-		}
-	}
-#endif /* TCB_CLONE_THREAD */
-	return 0;
-}
 
 int
 internal_fork(struct tcb *tcp)
@@ -864,29 +776,17 @@ internal_fork(struct tcb *tcp)
 
 	if (entering(tcp)) {
 		/*
-		 * In occasion of using PTRACE_O_TRACECLONE, we won't see the
-		 * new child if clone is called with flag CLONE_UNTRACED, so
-		 * we keep the same logic with that option and don't trace it.
+		 * We won't see the new child if clone is called with
+		 * CLONE_UNTRACED, so we keep the same logic with that option
+		 * and don't trace it.
 		 */
 		if ((sysent[tcp->scno].sys_func == sys_clone) &&
 		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
 			return 0;
 		setbpt(tcp);
 	} else {
-		int pid;
-		int bpt;
-
-		bpt = tcp->flags & TCB_BPTSET;
-
-		if (syserror(tcp)) {
-			if (bpt)
-				clearbpt(tcp);
-			return 0;
-		}
-
-		pid = tcp->u_rval;
-
-		return handle_new_child(tcp, pid, bpt);
+		if (tcp->flags & TCB_BPTSET)
+			clearbpt(tcp);
 	}
 	return 0;
 }

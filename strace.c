@@ -2216,32 +2216,6 @@ trace(void)
 
 #else /* !USE_PROCFS */
 
-#ifdef LINUX
-static int
-handle_ptrace_event(int status, struct tcb *tcp)
-{
-	if (status >> 16 == PTRACE_EVENT_VFORK ||
-	    status >> 16 == PTRACE_EVENT_CLONE ||
-	    status >> 16 == PTRACE_EVENT_FORK) {
-		long childpid;
-
-		if (do_ptrace(PTRACE_GETEVENTMSG, tcp, NULL, &childpid) < 0) {
-			if (errno != ESRCH) {
-				error_msg_and_die("Cannot get new child's pid");
-			}
-			return -1;
-		}
-		return handle_new_child(tcp, childpid, 0);
-	}
-	if (status >> 16 == PTRACE_EVENT_EXEC) {
-		return 0;
-	}
-	/* Some PTRACE_EVENT_foo we didn't ask for?! */
-	error_msg("Unexpected status %x on pid %d", status, tcp->pid);
-	return 1;
-}
-#endif
-
 static int
 trace()
 {
@@ -2369,10 +2343,9 @@ trace()
 				   child so that we know how to do clearbpt
 				   in the child.  */
 				tcp = alloctcb(pid);
-				tcp->flags |= TCB_ATTACHED | TCB_SUSPENDED;
+				tcp->flags |= TCB_ATTACHED;
 				if (!qflag)
-					fprintf(stderr, "\
-Process %d attached (waiting for parent)\n",
+					fprintf(stderr, "Process %d attached\n",
 						pid);
 			}
 			else
@@ -2395,17 +2368,6 @@ Process %d attached (waiting for parent)\n",
 		}
 #endif
 
-		if (tcp->flags & TCB_SUSPENDED) {
-			/*
-			 * Apparently, doing any ptrace() call on a stopped
-			 * process, provokes the kernel to report the process
-			 * status again on a subsequent wait(), even if the
-			 * process has not been actually restarted.
-			 * Since we have inspected the arguments of suspended
-			 * processes we end up here testing for this case.
-			 */
-			continue;
-		}
 		if (WIFSIGNALED(status)) {
 			if (pid == strace_child)
 				exit_code = 0x100 | WTERMSIG(status);
@@ -2449,8 +2411,8 @@ Process %d attached (waiting for parent)\n",
 		}
 
 		if (status >> 16) {
-			if (handle_ptrace_event(status, tcp) != 1)
-				goto tracing;
+			/* Ptrace event (we ignore all of them for now) */
+			goto tracing;
 		}
 
 		/*
@@ -2548,7 +2510,6 @@ Process %d attached (waiting for parent)\n",
 				cleanup();
 				return -1;
 			}
-			tcp->flags &= ~TCB_SUSPENDED;
 			continue;
 		}
 		/* we handled the STATUS, we are permitted to interrupt now. */
@@ -2577,11 +2538,6 @@ Process %d attached (waiting for parent)\n",
 					tcp->pid, (char *) 1, SIGTERM);
 				droptcb(tcp);
 			}
-			continue;
-		}
-		if (tcp->flags & TCB_SUSPENDED) {
-			if (!qflag)
-				fprintf(stderr, "Process %u suspended\n", pid);
 			continue;
 		}
 	tracing:

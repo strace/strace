@@ -411,7 +411,6 @@ struct tcb {
 #define TCB_INUSE	00002	/* This table entry is in use */
 #define TCB_INSYSCALL	00004	/* A system call is in progress */
 #define TCB_ATTACHED	00010	/* Process is not our own child */
-#define TCB_SUSPENDED	00040	/* Process can not be allowed to resume just now */
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
