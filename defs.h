@@ -57,8 +57,8 @@
 #endif
 #endif
 #ifndef DEFAULT_STRLEN
-#define DEFAULT_STRLEN	32	/* default maximum # of bytes printed in
-				  `printstr', change with `-s' switch */
+/* default maximum # of bytes printed in `printstr', change with -s switch */
+#define DEFAULT_STRLEN	32
 #endif
 #ifndef DEFAULT_ACOLUMN
 #define DEFAULT_ACOLUMN	40	/* default alignment column for results */
@@ -67,6 +67,7 @@
 # ifdef HPPA
 #  define MAX_ARGS	6	/* maximum number of args to a syscall */
 # else
+/* Way too big. Switch your arch to saner size after you tested that it works */
 #  define MAX_ARGS	32	/* maximum number of args to a syscall */
 # endif
 #endif

@@ -70,7 +70,7 @@
 
 #ifdef IA64
 # include <asm/ptrace_offsets.h>
-#endif /* !IA64 */
+#endif
 
 #if defined (LINUX) && defined (SPARC64)
 # undef PTRACE_GETREGS
@@ -131,13 +131,17 @@ struct sigcontext
 #endif /* M68K */
 #endif /* !I386 */
 #endif /* !HAVE_ASM_SIGCONTEXT_H */
+
 #ifndef NSIG
+#warning: NSIG is not defined, using 32
 #define NSIG 32
 #endif
 #ifdef ARM
+/* Ugh. Is this really correct? ARM has no RT signals?! */
 #undef NSIG
 #define NSIG 32
 #endif
+
 #endif /* LINUX */
 
 const char *const signalent0[] = {
@@ -178,7 +182,7 @@ static const struct xlat sigvec_flags[] = {
 
 #if defined LINUX && (defined I386 || defined X86_64)
 /* The libc headers do not define this constant since it should only be
-   used by the implementation.  So wwe define it here.  */
+   used by the implementation.  So we define it here.  */
 # ifndef SA_RESTORER
 #  define SA_RESTORER 0x04000000
 # endif
@@ -261,18 +265,18 @@ static const struct xlat sigprocmaskcmds[] = {
 const char *
 signame(int sig)
 {
-	static char buf[30];
-	if (sig >= 0 && sig < nsignals) {
+	static char buf[sizeof("SIGRT_%d") + sizeof(int)*3];
+
+	if (sig >= 0 && sig < nsignals)
 		return signalent[sig];
 #ifdef SIGRTMIN
-	} else if (sig >= __SIGRTMIN && sig <= __SIGRTMAX) {
-		sprintf(buf, "SIGRT_%ld", (long)(sig - __SIGRTMIN));
-		return buf;
-#endif /* SIGRTMIN */
-	} else {
-		sprintf(buf, "%d", sig);
+	if (sig >= __SIGRTMIN && sig <= __SIGRTMAX) {
+		sprintf(buf, "SIGRT_%d", (int)(sig - __SIGRTMIN));
 		return buf;
 	}
+#endif
+	sprintf(buf, "%d", sig);
+	return buf;
 }
 
 #ifndef UNIXWARE
@@ -1727,7 +1731,6 @@ sys_rt_sigprocmask(struct tcb *tcp)
 	}
 	else {
 		if (!tcp->u_arg[2])
-
 			tprintf("NULL");
 		else if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[2]);

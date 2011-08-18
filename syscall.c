@@ -90,9 +90,11 @@
 #define ERESTART_RESTARTBLOCK 516	/* restart by calling sys_restart_syscall */
 #endif
 #ifndef NSIG
+#warning: NSIG is not defined, using 32
 #define NSIG 32
 #endif
 #ifdef ARM
+/* Ugh. Is this really correct? ARM has no RT signals?! */
 #undef NSIG
 #define NSIG 32
 #undef NR_SYSCALL_BASE
