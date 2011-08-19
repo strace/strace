@@ -828,7 +828,10 @@ get_scno(struct tcb *tcp)
 
 #  ifdef POWERPC64
 	if (!(tcp->flags & TCB_INSYSCALL)) {
-		static int currpers = -1;
+		/* TODO: speed up strace by not doing this at every syscall.
+		 * We only need to do it after execve.
+		 */
+		int currpers;
 		long val;
 		int pid = tcp->pid;
 
@@ -878,7 +881,10 @@ get_scno(struct tcb *tcp)
 		return -1;
 
 	if (!(tcp->flags & TCB_INSYSCALL)) {
-		static int currpers = -1;
+		/* TODO: speed up strace by not doing this at every syscall.
+		 * We only need to do it after execve.
+		 */
+		int currpers;
 		long val;
 		int pid = tcp->pid;
 
