@@ -265,46 +265,44 @@ print_mmap(struct tcb *tcp, long *u_arg, long long offset)
 #ifdef LINUX
 int sys_old_mmap(struct tcb *tcp)
 {
-	long u_arg[6];
-
 #if defined(IA64)
-	int i, v;
 	/*
-	 *  IA64 processes never call this routine, they only use the
-	 *  new `sys_mmap' interface.  This code converts the integer
-	 *  arguments that the IA32 process pushed onto the stack into
-	 *  longs.
+	 * IA64 processes never call this routine, they only use the
+	 * new `sys_mmap' interface.
+	 * For IA32 processes, this code converts the integer arguments
+	 * that they pushed onto the stack, into longs.
 	 *
-	 *  Note that addresses with bit 31 set will be sign extended.
-	 *  Fortunately, those addresses are not currently being generated
-	 *  for IA32 processes so it's not a problem.
+	 * Note that addresses with bit 31 set will be sign extended.
+	 * Fortunately, those addresses are not currently being generated
+	 * for IA32 processes so it's not a problem.
 	 */
+	int i;
+	long u_arg[6];
+	int narrow_arg[6];
+	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), (char *) narrow_arg) == -1)
+		return 0;
 	for (i = 0; i < 6; i++)
-		if (umove(tcp, tcp->u_arg[0] + (i * sizeof(int)), &v) == -1)
-			return 0;
-		else
-			u_arg[i] = v;
+		u_arg[i] = narrow_arg[i];
 #elif defined(SH) || defined(SH64)
 	/* SH has always passed the args in registers */
-	int i;
-	for (i = 0; i < 6; i++)
-		u_arg[i] = tcp->u_arg[i];
+	long *u_arg = tcp->u_arg;
 #else
+	long u_arg[6];
 # if defined(X86_64)
 	if (current_personality == 1) {
 		int i;
-		for (i = 0; i < 6; ++i) {
-			unsigned int val;
-			if (umove(tcp, tcp->u_arg[0] + i * 4, &val) == -1)
-				return 0;
-			u_arg[i] = val;
-		}
+		unsigned narrow_arg[6];
+		if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), (char *) narrow_arg) == -1)
+			return 0;
+		for (i = 0; i < 6; ++i)
+			u_arg[i] = narrow_arg[i];
 	}
 	else
 # endif
-	if (umoven(tcp, tcp->u_arg[0], sizeof u_arg, (char *) u_arg) == -1)
+	if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), (char *) u_arg) == -1)
 		return 0;
-#endif /* !IA64 && !SH[64] */
+#endif /* other architectures */
+
 	return print_mmap(tcp, u_arg, u_arg[5]);
 }
 #endif /* LINUX */
@@ -314,6 +312,11 @@ sys_mmap(struct tcb *tcp)
 {
 	long long offset = tcp->u_arg[5];
 
+	/* FIXME: why only SH64? i386 mmap2 syscall ends up
+	 * in this function, but does not convert offset
+	 * from pages to bytes. See test/mmap_offset_decode.c
+	 * Why SH64 and i386 are handled differently?
+	 */
 #if defined(LINUX) && defined(SH64)
 	/*
 	 * Old mmap differs from new mmap in specifying the
