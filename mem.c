@@ -334,25 +334,15 @@ sys_mmap(struct tcb *tcp)
 int
 sys_mmap64(struct tcb *tcp)
 {
-#ifdef linux
-#ifdef ALPHA
-	long *u_arg = tcp->u_arg;
-#else /* !ALPHA */
-	long u_arg[7];
-#endif /* !ALPHA */
-#else /* !linux */
-	long *u_arg = tcp->u_arg;
-#endif /* !linux */
-
 	if (entering(tcp)) {
-#ifdef linux
-#ifndef ALPHA
+#if !defined(LINUX) || defined(ALPHA)
+		long *u_arg = tcp->u_arg;
+#else
+		long u_arg[7];
 		if (umoven(tcp, tcp->u_arg[0], sizeof u_arg,
 				(char *) u_arg) == -1)
 			return 0;
-#endif /* ALPHA */
-#endif /* linux */
-
+#endif
 		/* addr */
 		tprintf("%#lx, ", u_arg[0]);
 		/* len */
@@ -369,13 +359,16 @@ sys_mmap64(struct tcb *tcp)
 #endif
 		/* fd */
 		tprintf(", ");
+	/* BUG?! should be u_arg[4] (without tcp->)? */
 		printfd(tcp, tcp->u_arg[4]);
 		/* offset */
+	/* BUG?! on non-ALPHA linux, offset will be not in tcp->u_arg,
+	 * but in local u_arg, but printllval prints tcp->u_arg! */
 		printllval(tcp, ", %#llx", 5);
 	}
 	return RVAL_HEX;
 }
-#endif
+#endif /* _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T */
 
 
 int
