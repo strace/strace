@@ -748,10 +748,12 @@ get_scno(struct tcb *tcp)
 
 		long opcode, offset_reg, tmp;
 		void * svc_addr;
-		int gpr_offset[16] = {PT_GPR0,  PT_GPR1,  PT_ORIGGPR2, PT_GPR3,
-				      PT_GPR4,  PT_GPR5,  PT_GPR6,     PT_GPR7,
-				      PT_GPR8,  PT_GPR9,  PT_GPR10,    PT_GPR11,
-				      PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15};
+		static const int gpr_offset[16] = {
+				PT_GPR0,  PT_GPR1,  PT_ORIGGPR2, PT_GPR3,
+				PT_GPR4,  PT_GPR5,  PT_GPR6,     PT_GPR7,
+				PT_GPR8,  PT_GPR9,  PT_GPR10,    PT_GPR11,
+				PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15
+		};
 
 		if (upeek(tcp, PT_PSWADDR, &pc) < 0)
 			return -1;
