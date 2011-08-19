@@ -229,7 +229,7 @@
 	{ 5,	0,	printargs,		"pciconfig_read"	}, /* 198 */
 	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 199 */
 	{ 3,	0,	printargs,		"pciconfig_iobase"	}, /* 200 */
-	{ 8,	0,	printargs,		"MOL"			}, /* 201 */
+	{ 6,	0,	printargs,		"MOL"			}, /* 201 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"		}, /* 202 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"		}, /* 203 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"		}, /* 204 */
@@ -432,7 +432,7 @@
 #if SYS_socket_subcall != 400
  #error fix me
 #endif
-	{ 8,	0,	printargs,		"socket_subcall"}, /* 400 */
+	{ 6,	0,	printargs,		"socket_subcall"}, /* 400 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 401 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 402 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 403 */

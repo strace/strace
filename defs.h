@@ -48,7 +48,7 @@
 # endif
 #endif
 
-/* configuration section */
+/* Configuration section */
 #ifndef MAX_QUALS
 #if defined(LINUX) && defined(MIPS)
 #define MAX_QUALS	7000	/* maximum number of syscalls, signals, etc. */
@@ -63,14 +63,35 @@
 #ifndef DEFAULT_ACOLUMN
 #define DEFAULT_ACOLUMN	40	/* default alignment column for results */
 #endif
+
+/* Maximum number of args to a syscall.
+ *
+ * Make sure that all entries in all syscallent.h files
+ * have nargs <= MAX_ARGS!
+ * linux/<ARCH>/syscallent.h: ia64 has many syscalls with
+ * nargs = 8, mips has two with nargs = 7 (both are printargs),
+ * all others are <= 6.
+ * freebsd/i386/syscallent.h: one syscall with nargs = 8
+ * (sys_sendfile, looks legitimate)
+ * and one with nargs = 7 (sys_mmap, maybe it should have 6?).
+ * sunos4/syscallent.h: all are <= 6.
+ * svr4/syscallent.h: all are -1.
+ */
 #ifndef MAX_ARGS
 # ifdef HPPA
-#  define MAX_ARGS	6	/* maximum number of args to a syscall */
+#  define MAX_ARGS	6
+# elif defined X86_64 || defined I386
+#  ifdef FREEBSD
+#   define MAX_ARGS	8
+#  else
+#   define MAX_ARGS	6
+#  endif
 # else
 /* Way too big. Switch your arch to saner size after you tested that it works */
-#  define MAX_ARGS	32	/* maximum number of args to a syscall */
+#  define MAX_ARGS	32
 # endif
 #endif
+
 #ifndef DEFAULT_SORTBY
 #define DEFAULT_SORTBY "time"	/* default sorting method for call profiling */
 #endif

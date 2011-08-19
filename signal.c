@@ -262,6 +262,28 @@ static const struct xlat sigprocmaskcmds[] = {
 #endif
 #endif
 
+/* Note on the size of sigset_t:
+ *
+ * In glibc, sigset_t is an array with space for 1024 bits (!),
+ * even though all arches supported by Linux have only 64 signals
+ * except MIPS, which has 128. IOW, it is 128 bytes long.
+ *
+ * In-kernel sigset_t is sized correctly (it is either 64 or 128 bit long).
+ * However, some old syscall return only 32 lower bits (one word).
+ * Example: sys_sigpending vs sys_rt_sigpending.
+ *
+ * Be aware of this fact when you try to
+ *     memcpy(&tcp->u_arg[1], &something, sizeof(sigset_t))
+ * - sizeof(sigset_t) is much bigger than you think,
+ * it may overflow tcp->u_arg[] array, and it may try to copy more data
+ * than is really available in <something>.
+ * Similarly,
+ *     umoven(tcp, addr, sizeof(sigset_t), &sigset)
+ * may be a bad idea: it'll try to read much more data than needed
+ * to fetch a sigset_t.
+ * Use (NSIG / 8) as a size instead.
+ */
+
 const char *
 signame(int sig)
 {
@@ -310,11 +332,21 @@ static const char *
 sprintsigmask(const char *str, sigset_t *mask, int rt)
 /* set might include realtime sigs */
 {
+	/* Was [8 * sizeof(sigset_t) * 8], but
+	 * glibc sigset_t is huge (1024 bits = 128 *bytes*),
+	 * and we were ending up with 8k (!) buffer here.
+	 *
+	 * No Unix system can have sig > 255
+	 * (waitpid API won't be able to indicate death from one)
+	 * and sig 0 doesn't exist either.
+	 * Therefore max possible no of sigs is 255: 1..255
+	 */
+	static char outstr[8 * 255];
+
 	int i, nsigs;
 	int maxsigs;
 	const char *format;
 	char *s;
-	static char outstr[8 * sizeof(sigset_t) * 8];
 
 	strcpy(outstr, str);
 	s = outstr + strlen(outstr);
@@ -1134,7 +1166,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, usp+__SIGNAL_FRAMESIZE, &sc) < 0)
 			return 0;
 		tcp->u_arg[0] = 1;
-		memcpy(&tcp->u_arg[1], &sc.oldmask[0], sizeof(sigset_t));
+		memcpy(&tcp->u_arg[1], &sc.oldmask[0], NSIG / 8);
 	} else {
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
@@ -1177,14 +1209,15 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, sp + 16 + SIGFRAME_SC_OFFSET, &sc) < 0)
 			return 0;
 		tcp->u_arg[0] = 1;
-		memcpy(tcp->u_arg + 1, &sc.sc_mask, sizeof(sc.sc_mask));
+		memcpy(tcp->u_arg + 1, &sc.sc_mask, NSIG / 8);
 	}
 	else {
 		sigset_t sigm;
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;
-		memcpy(&sigm, tcp->u_arg + 1, sizeof(sigm));
+		sigemptyset(&sigm);
+		memcpy(&sigm, tcp->u_arg + 1, NSIG / 8);
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
 	}
@@ -1377,14 +1410,15 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, sp + SIGFRAME_UC_OFFSET, &uc) < 0)
 			return 0;
 		tcp->u_arg[0] = 1;
-		memcpy(tcp->u_arg + 1, &uc.uc_sigmask, sizeof(uc.uc_sigmask));
+		memcpy(tcp->u_arg + 1, &uc.uc_sigmask, NSIG / 8);
 	}
 	else {
 		sigset_t sigm;
 		tcp->u_rval = tcp->u_error = 0;
 		if (tcp->u_arg[0] == 0)
 			return 0;
-		memcpy(&sigm, tcp->u_arg + 1, sizeof(sigm));
+		sigemptyset(&sigm);
+		memcpy(&sigm, tcp->u_arg + 1, NSIG / 8);
 		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
 		return RVAL_NONE | RVAL_STR;
 	}

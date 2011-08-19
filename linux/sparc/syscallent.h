@@ -354,7 +354,7 @@
 #if SYS_socket_subcall != 353
  #error fix me
 #endif
-	{ 8,	0,	printargs,		"socket_subcall"}, /* 353 */
+	{ 6,	0,	printargs,		"socket_subcall"}, /* 353 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 354 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 355 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 356 */

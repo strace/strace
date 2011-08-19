@@ -434,7 +434,7 @@
 #if SYS_socket_subcall != 400
  #error fix me
 #endif
-	{ 8,	0,	printargs,		"socket_subcall"}, /* 400 */
+	{ 6,	0,	printargs,		"socket_subcall"}, /* 400 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 401 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 402 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 403 */

@@ -4002,7 +4002,7 @@
 	{ 0,	0,	printargs,		"SYS_3999"	}, /* 3999 */ /* end of POSIX */
 #if !defined (LINUX_MIPSN32) && !defined (LINUX_MIPSN64)
 	/* For an O32 strace, decode the o32 syscalls.  */
-	{ 8,	0,	printargs,		"syscall"	}, /* 4000 */ /* start of Linux o32 */
+	{ 7,	0,	printargs,		"syscall"	}, /* 4000 */ /* start of Linux o32 */
 	{ 1,	TP,	sys_exit,		"exit"		}, /* 4001 */
 	{ 0,	TP,	sys_fork,		"fork"		}, /* 4002 */
 	{ 3,	TD,	sys_read,		"read"		}, /* 4003 */
