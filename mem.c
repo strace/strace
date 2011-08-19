@@ -40,13 +40,13 @@
 #include <sys/mman.h>
 
 #if defined(LINUX) && defined(I386)
-#include <asm/ldt.h>
+# include <asm/ldt.h>
 # ifdef HAVE_STRUCT_USER_DESC
 #  define modify_ldt_ldt_s user_desc
 # endif
 #endif
 #if defined(LINUX) && defined(SH64)
-#include <asm/page.h>	    /* for PAGE_SHIFT */
+# include <asm/page.h>	    /* for PAGE_SHIFT */
 #endif
 
 #ifdef HAVE_LONG_LONG_OFF_T
@@ -195,10 +195,8 @@ static const struct xlat mmap_flags[] = {
 };
 
 #ifdef TILE
-static
-int
-addtileflags(flags)
-long flags;
+static int
+addtileflags(long flags)
 {
 	long home = flags & _MAP_CACHE_MKHOME(_MAP_CACHE_HOME_MASK);
 	flags &= ~_MAP_CACHE_MKHOME(_MAP_CACHE_HOME_MASK);
@@ -269,7 +267,7 @@ int sys_old_mmap(struct tcb *tcp)
 {
 	long u_arg[6];
 
-#if	defined(IA64)
+#if defined(IA64)
 	int i, v;
 	/*
 	 *  IA64 processes never call this routine, they only use the
@@ -306,10 +304,10 @@ int sys_old_mmap(struct tcb *tcp)
 # endif
 	if (umoven(tcp, tcp->u_arg[0], sizeof u_arg, (char *) u_arg) == -1)
 		return 0;
-#endif	// defined(IA64)
+#endif /* !IA64 && !SH[64] */
 	return print_mmap(tcp, u_arg, u_arg[5]);
 }
-#endif
+#endif /* LINUX */
 
 int
 sys_mmap(struct tcb *tcp)
