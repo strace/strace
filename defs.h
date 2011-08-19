@@ -628,9 +628,6 @@ extern int pathtrace_match(struct tcb *);
 extern int change_syscall(struct tcb *, int);
 extern int internal_fork(struct tcb *);
 extern int internal_exec(struct tcb *);
-#ifdef LINUX
-extern int handle_new_child(struct tcb *, int, int);
-#endif
 
 extern const struct ioctlent *ioctl_lookup(long);
 extern const struct ioctlent *ioctl_next_match(const struct ioctlent *);
