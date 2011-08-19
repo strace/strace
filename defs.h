@@ -572,7 +572,7 @@ extern int trace_syscall(struct tcb *);
 extern int count_syscall(struct tcb *, struct timeval *);
 extern void printxval(const struct xlat *, int, const char *);
 extern int printargs(struct tcb *);
-extern int addflags(const struct xlat *, int);
+extern void addflags(const struct xlat *, int);
 extern int printflags(const struct xlat *, int, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, int);
 extern int umoven(struct tcb *, long, int, char *);

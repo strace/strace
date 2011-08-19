@@ -279,27 +279,22 @@ printllval(struct tcb *tcp, const char *format, int llarg)
  * print the entries whose bits are on in `flags'
  * return # of flags printed.
  */
-int
+void
 addflags(const struct xlat *xlat, int flags)
 {
-	int n;
-
-	for (n = 0; xlat->str; xlat++) {
+	for (; xlat->str; xlat++) {
 		if (xlat->val && (flags & xlat->val) == xlat->val) {
 			tprintf("|%s", xlat->str);
 			flags &= ~xlat->val;
-			n++;
 		}
 	}
 	if (flags) {
 		tprintf("|%#x", flags);
-		n++;
 	}
-	return n;
 }
 
 /*
- * Interpret `xlat' as an array of flags/
+ * Interpret `xlat' as an array of flags.
  * Print to static string the entries whose bits are on in `flags'
  * Return static string.
  */
