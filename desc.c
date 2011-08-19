@@ -823,8 +823,8 @@ enum iocb_sub {
 static const char *
 iocb_cmd_lookup(unsigned cmd, enum iocb_sub *sub)
 {
-	static char buf[64];
-	static struct {
+	static char buf[sizeof("%u /* SUB_??? */") + sizeof(int)*3];
+	static const struct {
 		const char *name;
 		enum iocb_sub sub;
 	} cmds[] = {
@@ -844,7 +844,7 @@ iocb_cmd_lookup(unsigned cmd, enum iocb_sub *sub)
 		return cmds[cmd].name;
 	}
 	*sub = SUB_NONE;
-	snprintf(buf, sizeof(buf), "%u /* SUB_??? */", cmd);
+	sprintf(buf, "%u /* SUB_??? */", cmd);
 	return buf;
 }
 
