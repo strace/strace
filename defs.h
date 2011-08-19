@@ -387,7 +387,7 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 
 /* Trace Control Block */
 struct tcb {
-	short flags;		/* See below for TCB_ values */
+	int flags;		/* See below for TCB_ values */
 	int pid;		/* Process Id of this entry */
 	long scno;		/* System call number */
 	int u_nargs;		/* System call arguments */
