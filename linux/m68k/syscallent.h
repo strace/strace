@@ -264,7 +264,7 @@
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 233 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 234 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 235 */
-	{ 4,	TF,	sys_sendfile64,		"sendfile64"	}, /* 236 */
+	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 236 */
 	{ 3,	0,	sys_mincore,		"mincore"	}, /* 237 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 238 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"	}, /* 239 */

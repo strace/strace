@@ -184,7 +184,7 @@
 	{ 2,	0,	sys_capget,		"capget" }, /* 183 */
 	{ 2,	0,	sys_capset,		"capset" }, /* 184 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack" }, /* 185 */
-	{ 4,	TD,	sys_sendfile,		"sendfile" }, /* 186 */
+	{ 4,	TD|TN,	sys_sendfile,		"sendfile" }, /* 186 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg" }, /* 187 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg" }, /* 188 */
 	{ 0,	TP,	sys_vfork,		"vfork" }, /* 189 */
@@ -213,7 +213,7 @@
 	{ 2,	TF,	sys_removexattr,	"lremovexattr" }, /* 212 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr" }, /* 213 */
 	{ 2,	TS,	sys_kill,		"tkill" }, /* 214 */
-	{ 4,	TD,	sys_sendfile64,		"sendfile64" }, /* 215 */
+	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64" }, /* 215 */
 	{ 5,	0,	sys_futex,		"futex" }, /* 216 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" }, /* 217 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" }, /* 218 */

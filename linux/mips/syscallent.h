@@ -4239,7 +4239,7 @@
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 4234 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 4235 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 4236 */
-	{ 5,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 4237 */
+	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 4237 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 4238 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"}, /* 4239 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"}, /* 4240 */
