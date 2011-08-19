@@ -246,7 +246,7 @@ printllval(struct tcb *tcp, const char *format, int llarg)
      || defined(LINUX_MIPSO32) \
      || defined(__ARM_EABI__)
 	/* Align 64bit argument to 64bit boundary.  */
-	if (llarg % 2) llarg++;
+	llarg = (llarg + 1) & 0x1e;
 # endif
 # if defined LINUX && (defined X86_64 || defined POWERPC64)
 	if (current_personality == 0) {
@@ -255,7 +255,7 @@ printllval(struct tcb *tcp, const char *format, int llarg)
 	} else {
 #  ifdef POWERPC64
 		/* Align 64bit argument to 64bit boundary.  */
-		if (llarg % 2) llarg++;
+		llarg = (llarg + 1) & 0x1e;
 #  endif
 		tprintf(format, LONG_LONG(tcp->u_arg[llarg], tcp->u_arg[llarg + 1]));
 		llarg += 2;
