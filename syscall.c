@@ -183,9 +183,9 @@ const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 #if SUPPORTED_PERSONALITIES > 2
 	PERSONALITY2_WORDSIZE,
 #endif
-};;
+};
 
-int
+void
 set_personality(int personality)
 {
 	switch (personality) {
@@ -213,7 +213,7 @@ set_personality(int personality)
 		nsignals = nsignals1;
 		qual_flags = qual_flags1;
 		break;
-#endif /* SUPPORTED_PERSONALITIES >= 2 */
+#endif
 
 #if SUPPORTED_PERSONALITIES >= 3
 	case 2:
@@ -227,14 +227,10 @@ set_personality(int personality)
 		nsignals = nsignals2;
 		qual_flags = qual_flags2;
 		break;
-#endif /* SUPPORTED_PERSONALITIES >= 3 */
-
-	default:
-		return -1;
+#endif
 	}
 
 	current_personality = personality;
-	return 0;
 }
 
 

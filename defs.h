@@ -552,7 +552,7 @@ void perror_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 void error_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
 void perror_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
 
-extern int set_personality(int personality);
+extern void set_personality(int personality);
 extern const char *xlookup(const struct xlat *, int);
 extern struct tcb *alloc_tcb(int, int);
 extern struct tcb *pid2tcb(int);
