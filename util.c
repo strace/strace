@@ -691,6 +691,7 @@ dumpstr(struct tcb *tcp, long addr, int len)
 		str = malloc(len);
 		if (str == NULL) {
 			fprintf(stderr, "out of memory\n");
+	/* BUG! On next call we may use NULL str! */
 			return;
 		}
 		strsize = len;

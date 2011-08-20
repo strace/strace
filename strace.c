@@ -1233,7 +1233,7 @@ expand_tcbtab(void)
 	struct tcb *newtcbs = calloc(tcbtabsize, sizeof(newtcbs[0]));
 	struct tcb **newtab = realloc(tcbtab, tcbtabsize * 2 * sizeof(tcbtab[0]));
 	if (newtab == NULL || newtcbs == NULL)
-		error_msg_and_die("expand_tcbtab: out of memory");
+		error_msg_and_die("Out of memory");
 	tcbtabsize *= 2;
 	tcbtab = newtab;
 	while (i < tcbtabsize)
@@ -1854,9 +1854,8 @@ rebuild_pollv(void)
 {
 	int i, j;
 
-	if (pollv != NULL)
-		free(pollv);
-	pollv = (struct pollfd *) malloc(nprocs * sizeof pollv[0]);
+	free(pollv);
+	pollv = malloc(nprocs * sizeof(pollv[0]));
 	if (pollv == NULL) {
 		error_msg_and_die("Out of memory");
 	}
