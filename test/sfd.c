@@ -13,7 +13,8 @@ int main(int argc, char *argv[])
 
 	sprintf(sname, "/proc/%d/stat", pid);
 
-	if ((sfd = open(sname, O_RDONLY)) == -1) {
+	sfd = open(sname, O_RDONLY);
+	if (sfd == -1) {
 		perror(sname);
 		return 1;
 	}

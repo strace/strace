@@ -738,7 +738,8 @@ sprinttime(time_t t)
 		strcpy(buf, "0");
 		return buf;
 	}
-	if ((tmp = localtime(&t)))
+	tmp = localtime(&t);
+	if (tmp)
 		snprintf(buf, sizeof buf, "%02d/%02d/%02d-%02d:%02d:%02d",
 			tmp->tm_year + 1900, tmp->tm_mon + 1, tmp->tm_mday,
 			tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
@@ -2590,7 +2591,8 @@ sys_getdirentries(struct tcb *tcp)
 		return 0;
 	}
 	len = tcp->u_rval;
-	if ((buf = malloc(len)) == NULL) {
+	buf = malloc(len);
+	if (buf == NULL) {
 		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		fprintf(stderr, "out of memory\n");
 		return 0;

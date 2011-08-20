@@ -687,9 +687,9 @@ dumpstr(struct tcb *tcp, long addr, int len)
 	int i, j;
 
 	if (strsize < len) {
-		if (str)
-			free(str);
-		if ((str = malloc(len)) == NULL) {
+		free(str);
+		str = malloc(len);
+		if (str == NULL) {
 			fprintf(stderr, "out of memory\n");
 			return;
 		}
@@ -848,10 +848,13 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 	lseek(fd, addr, SEEK_SET);
 
 	while (left) {
-		if (move > left) move = left;
-		if ((move = read(fd, laddr, move)) <= 0)
+		if (move > left)
+			move = left;
+		move = read(fd, laddr, move);
+		if (move <= 0)
 			return left != len ? 0 : -1;
-		if (memchr(laddr, 0, move)) break;
+		if (memchr(laddr, 0, move))
+			break;
 		left -= move;
 		laddr += move;
 		addr += move;
@@ -1703,7 +1706,8 @@ fixvfork(struct tcb *tcp)
 		fprintf(stderr, "Cannot read link_dynamic_2\n");
 		return -1;
 	}
-	if ((strtab = malloc((unsigned)ld.ld_symb_size)) == NULL) {
+	strtab = malloc((unsigned)ld.ld_symb_size);
+	if (strtab == NULL) {
 		fprintf(stderr, "out of memory\n");
 		return -1;
 	}

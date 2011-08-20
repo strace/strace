@@ -538,7 +538,8 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		if (syserror(tcp))
 			return 0;
 
-		if ((nfds = tcp->u_rval) == 0) {
+		nfds = tcp->u_rval;
+		if (nfds == 0) {
 			tcp->auxstr = "Timeout";
 			return RVAL_STR;
 		}

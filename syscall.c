@@ -470,7 +470,8 @@ qualify(const char *s)
 	for (i = 0; i < MAX_QUALS; i++) {
 		qualify_one(i, opt->bitflag, !not, -1);
 	}
-	if (!(copy = strdup(s))) {
+	copy = strdup(s);
+	if (!copy) {
 		fprintf(stderr, "out of memory\n");
 		exit(1);
 	}
@@ -2775,7 +2776,8 @@ sys_indir(struct tcb *tcp)
 	int i, scno, nargs;
 
 	if (entering(tcp)) {
-		if ((scno = tcp->u_arg[0]) > nsyscalls) {
+		scno = tcp->u_arg[0];
+		if (scno > nsyscalls) {
 			fprintf(stderr, "Bogus syscall: %u\n", scno);
 			return 0;
 		}

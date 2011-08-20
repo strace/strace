@@ -81,7 +81,8 @@ printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 		{
 			struct timeval32 tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0) {
+			rc = umove(tcp, addr, &tv);
+			if (rc >= 0) {
 				if (special && tv.tv_sec == 0 &&
 				    tv.tv_usec == UTIME_NOW)
 					tprintf("UTIME_NOW");
@@ -94,7 +95,8 @@ printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 		} else {
 			struct timeval tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0) {
+			rc = umove(tcp, addr, &tv);
+			if (rc >= 0) {
 				if (special && tv.tv_sec == 0 &&
 				    tv.tv_usec == UTIME_NOW)
 					tprintf("UTIME_NOW");
@@ -128,13 +130,15 @@ sprinttv(struct tcb *tcp, long addr, enum bitness_t bitness, char *buf)
 		{
 			struct timeval32 tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0)
+			rc = umove(tcp, addr, &tv);
+			if (rc >= 0)
 				sprintf(buf, "{%u, %u}",
 					tv.tv_sec, tv.tv_usec);
 		} else {
 			struct timeval tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0)
+			rc = umove(tcp, addr, &tv);
+			if (rc >= 0)
 				sprintf(buf, "{%lu, %lu}",
 					(unsigned long) tv.tv_sec,
 					(unsigned long) tv.tv_usec);
@@ -157,7 +161,8 @@ void print_timespec(struct tcb *tcp, long addr)
 		if (personality_wordsize[current_personality] == 4) {
 			struct timeval32 tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0)
+			rc = umove(tcp, addr, &tv);
+			if (rc >= 0)
 				tprintf("{%u, %u}",
 					tv.tv_sec, tv.tv_usec);
 		} else
@@ -165,7 +170,8 @@ void print_timespec(struct tcb *tcp, long addr)
 		{
 			struct timespec ts;
 
-			if ((rc = umove(tcp, addr, &ts)) >= 0)
+			rc = umove(tcp, addr, &ts);
+			if (rc >= 0)
 				tprintf("{%lu, %lu}",
 					(unsigned long) ts.tv_sec,
 					(unsigned long) ts.tv_nsec);
@@ -188,7 +194,8 @@ void sprint_timespec(char *buf, struct tcb *tcp, long addr)
 		if (personality_wordsize[current_personality] == 4) {
 			struct timeval32 tv;
 
-			if ((rc = umove(tcp, addr, &tv)) >= 0)
+			rc = umove(tcp, addr, &tv);
+			if (rc >= 0)
 				sprintf(buf, "{%u, %u}",
 					tv.tv_sec, tv.tv_usec);
 		} else
@@ -196,7 +203,8 @@ void sprint_timespec(char *buf, struct tcb *tcp, long addr)
 		{
 			struct timespec ts;
 
-			if ((rc = umove(tcp, addr, &ts)) >= 0)
+			rc = umove(tcp, addr, &ts);
+			if (rc >= 0)
 				sprintf(buf, "{%lu, %lu}",
 					(unsigned long) ts.tv_sec,
 					(unsigned long) ts.tv_nsec);
@@ -349,7 +357,8 @@ printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 				struct timeval32 it_interval, it_value;
 			} itv;
 
-			if ((rc = umove(tcp, addr, &itv)) >= 0) {
+			rc = umove(tcp, addr, &itv);
+			if (rc >= 0) {
 				tprintf("{it_interval=");
 				tprint_timeval32(tcp, &itv.it_interval);
 				tprintf(", it_value=");
@@ -359,7 +368,8 @@ printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 		} else {
 			struct itimerval itv;
 
-			if ((rc = umove(tcp, addr, &itv)) >= 0) {
+			rc = umove(tcp, addr, &itv);
+			if (rc >= 0) {
 				tprintf("{it_interval=");
 				tprint_timeval(tcp, &itv.it_interval);
 				tprintf(", it_value=");

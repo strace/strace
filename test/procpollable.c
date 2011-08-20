@@ -12,14 +12,16 @@ int main(int argc, char *argv[])
 	FILE *pfp;
 	struct pollfd pfd;
 
-	if ((pid = fork()) == 0) {
+	pid = fork();
+	if (pid == 0) {
 		pause();
 		exit(0);
 	}
 
 	sprintf(proc, "/proc/%d", pid);
 
-	if ((pfp = fopen(proc, "r+")) == NULL)
+	pfp = fopen(proc, "r+");
+	if (pfp == NULL)
 		goto fail;
 
 	if (ioctl(fileno(pfp), PIOCSTOP, NULL) < 0)

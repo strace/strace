@@ -434,8 +434,8 @@ sys_ioctl(struct tcb *tcp)
 		ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
 	else {
-		int ret;
-		if (!(ret = ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2])))
+		int ret = ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		if (!ret)
 			tprintf(", %#lx", tcp->u_arg[2]);
 		else
 			return ret - 1;

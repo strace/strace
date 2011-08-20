@@ -744,9 +744,10 @@ test_ptrace_setoptions_followfork(void)
 					  PTRACE_O_TRACEFORK |
 					  PTRACE_O_TRACEVFORK;
 
-	if ((pid = fork()) < 0)
+	pid = fork();
+	if (pid < 0)
 		perror_msg_and_die("fork");
-	else if (pid == 0) {
+	if (pid == 0) {
 		pid = getpid();
 		if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0)
 			perror_msg_and_die("%s: PTRACE_TRACEME doesn't work",
@@ -1043,7 +1044,8 @@ main(int argc, char *argv[])
 			set_overhead(atoi(optarg));
 			break;
 		case 'p':
-			if ((pid = atoi(optarg)) <= 0) {
+			pid = atoi(optarg);
+			if (pid <= 0) {
 				error_msg("Invalid process id: '%s'", optarg);
 				break;
 			}
@@ -1105,7 +1107,8 @@ main(int argc, char *argv[])
 		if (getuid() != 0 || geteuid() != 0) {
 			error_msg_and_die("You must be root to use the -u option");
 		}
-		if ((pent = getpwnam(username)) == NULL) {
+		pent = getpwnam(username);
+		if (pent == NULL) {
 			error_msg_and_die("Cannot find user '%s'", username);
 		}
 		run_uid = pent->pw_uid;
@@ -1284,19 +1287,22 @@ proc_open(struct tcb *tcp, int attaching)
 #ifdef HAVE_MP_PROCFS
 	/* Open the process pseudo-files in /proc. */
 	sprintf(proc, "/proc/%d/ctl", tcp->pid);
-	if ((tcp->pfd = open(proc, O_WRONLY|O_EXCL)) < 0) {
+	tcp->pfd = open(proc, O_WRONLY|O_EXCL);
+	if (tcp->pfd < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
 	set_cloexec_flag(tcp->pfd);
 	sprintf(proc, "/proc/%d/status", tcp->pid);
-	if ((tcp->pfd_stat = open(proc, O_RDONLY|O_EXCL)) < 0) {
+	tcp->pfd_stat = open(proc, O_RDONLY|O_EXCL);
+	if (tcp->pfd_stat < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
 	set_cloexec_flag(tcp->pfd_stat);
 	sprintf(proc, "/proc/%d/as", tcp->pid);
-	if ((tcp->pfd_as = open(proc, O_RDONLY|O_EXCL)) < 0) {
+	tcp->pfd_as = open(proc, O_RDONLY|O_EXCL);
+	if (tcp->pfd_as < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
 	}
@@ -1318,13 +1324,15 @@ proc_open(struct tcb *tcp, int attaching)
 #endif
 #ifdef FREEBSD
 	sprintf(proc, "/proc/%d/regs", tcp->pid);
-	if ((tcp->pfd_reg = open(proc, O_RDONLY)) < 0) {
+	tcp->pfd_reg = open(proc, O_RDONLY);
+	if (tcp->pfd_reg < 0) {
 		perror("strace: open(\"/proc/.../regs\", ...)");
 		return -1;
 	}
 	if (cflag) {
 		sprintf(proc, "/proc/%d/status", tcp->pid);
-		if ((tcp->pfd_status = open(proc, O_RDONLY)) < 0) {
+		tcp->pfd_status = open(proc, O_RDONLY);
+		if (tcp->pfd_status < 0) {
 			perror("strace: open(\"/proc/.../status\", ...)");
 			return -1;
 		}
@@ -1662,7 +1670,8 @@ detach(struct tcb *tcp, int sig)
 	 * detached process would be left stopped (process state T).
 	 */
 	catch_sigstop = (tcp->flags & TCB_STARTUP);
-	if ((error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig)) == 0) {
+	error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig);
+	if (error == 0) {
 		/* On a clear day, you can see forever. */
 	}
 	else if (errno != ESRCH) {
@@ -1887,7 +1896,8 @@ proc_poll(struct pollfd *pollv, int nfds, int timeout)
 	int n;
 	struct proc_pollfd pollinfo;
 
-	if ((n = read(proc_poll_pipe[0], &pollinfo, sizeof(pollinfo))) < 0)
+	n = read(proc_poll_pipe[0], &pollinfo, sizeof(pollinfo));
+	if (n < 0)
 		return n;
 	if (n != sizeof(struct proc_pollfd)) {
 		error_msg_and_die("panic: short read: %d", n);
@@ -2072,7 +2082,8 @@ trace(void)
 				in_syscall = NULL;
 				pv.fd = tcp->pfd;
 				pv.events = POLLWANT;
-				if ((what = poll(&pv, 1, 1)) < 0) {
+				what = poll(&pv, 1, 1);
+				if (what < 0) {
 					if (interrupted)
 						return 0;
 					continue;
@@ -2102,7 +2113,8 @@ trace(void)
 		}
 
 		/* Look up `pfd' in our table. */
-		if ((tcp = pfd2tcb(pfd)) == NULL) {
+		tcp = pfd2tcb(pfd);
+		if (tcp == NULL) {
 			error_msg_and_die("unknown pfd: %u", pfd);
 		}
 #ifdef POLL_HACK
@@ -2175,7 +2187,8 @@ trace(void)
 			char buf[1024];
 			int len;
 
-			if ((len = pread(tcp->pfd_status, buf, sizeof(buf) - 1, 0)) > 0) {
+			len = pread(tcp->pfd_status, buf, sizeof(buf) - 1, 0);
+			if (len > 0) {
 				buf[len] = '\0';
 				sscanf(buf,
 				       "%*s %*d %*d %*d %*d %*d,%*d %*s %*d,%*d %*d,%*d %ld,%ld",
@@ -2374,7 +2387,8 @@ trace()
 		}
 
 		/* Look up `pid' in our table. */
-		if ((tcp = pid2tcb(pid)) == NULL) {
+		tcp = pid2tcb(pid);
+		if (tcp == NULL) {
 #ifdef LINUX
 			if (followfork) {
 				/* This is needed to go with the CLONE_PTRACE
