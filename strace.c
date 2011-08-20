@@ -1311,13 +1311,13 @@ proc_open(struct tcb *tcp, int attaching)
 	set_cloexec_flag(tcp->pfd_as);
 #else
 	/* Open the process pseudo-file in /proc. */
-#ifndef FREEBSD
+# ifndef FREEBSD
 	sprintf(proc, "/proc/%d", tcp->pid);
 	tcp->pfd = open(proc, O_RDWR|O_EXCL);
-#else /* FREEBSD */
+# else
 	sprintf(proc, "/proc/%d/mem", tcp->pid);
 	tcp->pfd = open(proc, O_RDWR);
-#endif /* FREEBSD */
+# endif
 	if (tcp->pfd < 0) {
 		perror("strace: open(\"/proc/...\", ...)");
 		return -1;
@@ -1495,10 +1495,11 @@ proc_open(struct tcb *tcp, int attaching)
 			/* Set it running: maybe execve will be next. */
 #ifndef FREEBSD
 			arg = 0;
-			if (IOCTL(tcp->pfd, PIOCRUN, &arg) < 0) {
-#else /* FREEBSD */
-			if (IOCTL(tcp->pfd, PIOCRUN, 0) < 0) {
-#endif /* FREEBSD */
+			if (IOCTL(tcp->pfd, PIOCRUN, &arg) < 0)
+#else
+			if (IOCTL(tcp->pfd, PIOCRUN, 0) < 0)
+#endif
+			{
 				perror("PIOCRUN");
 				return -1;
 			}
@@ -1510,10 +1511,9 @@ proc_open(struct tcb *tcp, int attaching)
 			        kill(tcp->pid, SIGCONT);
 #endif
 		}
-#ifndef FREEBSD
 	}
-#else /* FREEBSD */
-	} else {
+#ifdef FREEBSD
+	else {
 		if (attaching < 2) {
 			/* We are attaching to an already running process.
 			 * Try to figure out the state of the process in syscalls,
