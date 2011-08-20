@@ -144,28 +144,6 @@ struct sigcontext
 
 #endif /* LINUX */
 
-const char *const signalent0[] = {
-#include "signalent.h"
-};
-const int nsignals0 = ARRAY_SIZE(signalent0);
-
-#if SUPPORTED_PERSONALITIES >= 2
-const char *const signalent1[] = {
-#include "signalent1.h"
-};
-const int nsignals1 = ARRAY_SIZE(signalent1);
-#endif /* SUPPORTED_PERSONALITIES >= 2 */
-
-#if SUPPORTED_PERSONALITIES >= 3
-const char *const signalent2[] = {
-#include "signalent2.h"
-};
-const int nsignals2 = ARRAY_SIZE(signalent2);
-#endif /* SUPPORTED_PERSONALITIES >= 3 */
-
-const char *const *signalent;
-int nsignals;
-
 #if defined(SUNOS4) || defined(FREEBSD)
 
 static const struct xlat sigvec_flags[] = {

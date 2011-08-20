@@ -116,28 +116,18 @@
 static const struct sysent sysent0[] = {
 #include "syscallent.h"
 };
-static const int nsyscalls0 = ARRAY_SIZE(sysent0);
-int qual_flags0[MAX_QUALS];
 
 #if SUPPORTED_PERSONALITIES >= 2
 static const struct sysent sysent1[] = {
 #include "syscallent1.h"
 };
-static const int nsyscalls1 = ARRAY_SIZE(sysent1);
-int qual_flags1[MAX_QUALS];
-#endif /* SUPPORTED_PERSONALITIES >= 2 */
+#endif
 
 #if SUPPORTED_PERSONALITIES >= 3
 static const struct sysent sysent2[] = {
 #include "syscallent2.h"
 };
-static const int nsyscalls2 = ARRAY_SIZE(sysent2);
-int qual_flags2[MAX_QUALS];
-#endif /* SUPPORTED_PERSONALITIES >= 3 */
-
-const struct sysent *sysent;
-int *qual_flags;
-int nsyscalls;
+#endif
 
 /* Now undef them since short defines cause wicked namespace pollution. */
 #undef TD
@@ -148,27 +138,75 @@ int nsyscalls;
 #undef TS
 #undef NF
 
+
+/*
+ * `ioctlent.h' may be generated from `ioctlent.raw' by the auxiliary
+ * program `ioctlsort', such that the list is sorted by the `code' field.
+ * This has the side-effect of resolving the _IO.. macros into
+ * plain integers, eliminating the need to include here everything
+ * in "/usr/include".
+ */
+
+
 static const char *const errnoent0[] = {
 #include "errnoent.h"
 };
-static const int nerrnos0 = ARRAY_SIZE(errnoent0);
+static const char *const signalent0[] = {
+#include "signalent.h"
+};
+static const struct ioctlent ioctlent0[] = {
+#include "ioctlent.h"
+};
+enum { nsyscalls0 = ARRAY_SIZE(sysent0) };
+enum { nerrnos0 = ARRAY_SIZE(errnoent0) };
+enum { nsignals0 = ARRAY_SIZE(signalent0) };
+enum { nioctlents0 = ARRAY_SIZE(ioctlent0) };
+int qual_flags0[MAX_QUALS];
 
 #if SUPPORTED_PERSONALITIES >= 2
 static const char *const errnoent1[] = {
 #include "errnoent1.h"
 };
-static const int nerrnos1 = ARRAY_SIZE(errnoent1);
-#endif /* SUPPORTED_PERSONALITIES >= 2 */
+static const char *const signalent1[] = {
+#include "signalent1.h"
+};
+static const struct ioctlent ioctlent1[] = {
+#include "ioctlent1.h"
+};
+enum { nsyscalls1 = ARRAY_SIZE(sysent1) };
+enum { nerrnos1 = ARRAY_SIZE(errnoent1) };
+enum { nsignals1 = ARRAY_SIZE(signalent1) };
+enum { nioctlents1 = ARRAY_SIZE(ioctlent1) };
+int qual_flags1[MAX_QUALS];
+#endif
 
 #if SUPPORTED_PERSONALITIES >= 3
 static const char *const errnoent2[] = {
 #include "errnoent2.h"
 };
-static const int nerrnos2 = ARRAY_SIZE(errnoent2);
-#endif /* SUPPORTED_PERSONALITIES >= 3 */
+static const char *const signalent2[] = {
+#include "signalent2.h"
+};
+static const struct ioctlent ioctlent2[] = {
+#include "ioctlent2.h"
+};
+enum { nsyscalls2 = ARRAY_SIZE(sysent2) };
+enum { nerrnos2 = ARRAY_SIZE(errnoent2) };
+enum { nsignals2 = ARRAY_SIZE(signalent2) };
+enum { nioctlents2 = ARRAY_SIZE(ioctlent2) };
+int qual_flags2[MAX_QUALS];
+#endif
 
+
+const struct sysent *sysent;
 const char *const *errnoent;
+const char *const *signalent;
+const struct ioctlent *ioctlent;
+int nsyscalls;
 int nerrnos;
+int nsignals;
+int nioctlents;
+int *qual_flags;
 
 int current_personality;
 

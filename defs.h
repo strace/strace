@@ -689,42 +689,20 @@ struct sysent {
 	long	native_scno;	/* Match against SYS_* constants.  */
 };
 
-extern const struct sysent *sysent;
-extern int nsyscalls;
-
-extern const char *const *errnoent;
-extern int nerrnos;
-
 struct ioctlent {
 	const char *doth;
 	const char *symbol;
 	unsigned long code;
 };
 
+extern const struct sysent *sysent;
+extern int nsyscalls;
+extern const char *const *errnoent;
+extern int nerrnos;
 extern const struct ioctlent *ioctlent;
 extern int nioctlents;
-
 extern const char *const *signalent;
 extern int nsignals;
-
-extern const struct ioctlent ioctlent0[];
-extern const int nioctlents0;
-extern const char *const signalent0[];
-extern const int nsignals0;
-
-#if SUPPORTED_PERSONALITIES >= 2
-extern const struct ioctlent ioctlent1[];
-extern const int nioctlents1;
-extern const char *const signalent1[];
-extern const int nsignals1;
-#endif /* SUPPORTED_PERSONALITIES >= 2 */
-
-#if SUPPORTED_PERSONALITIES >= 3
-extern const struct ioctlent ioctlent2[];
-extern const int nioctlents2;
-extern const char *const signalent2[];
-extern const int nsignals2;
-#endif /* SUPPORTED_PERSONALITIES >= 3 */
 
 #if HAVE_LONG_LONG
 
