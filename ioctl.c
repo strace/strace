@@ -64,8 +64,7 @@ ioctl_lookup(long code)
 }
 
 const struct ioctlent *
-ioctl_next_match(iop)
-const struct ioctlent *iop;
+ioctl_next_match(const struct ioctlent *iop)
 {
 	long code;
 
