@@ -1256,7 +1256,9 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->pid = pid;
 			tcp->flags = TCB_INUSE | TCB_STARTUP;
 			tcp->outf = outf; /* Initialise to current out file */
+#ifdef USE_PROCFS
 			tcp->pfd = -1;
+#endif
 			nprocs++;
 			if (debug)
 				fprintf(stderr, "new tcb for pid %d, active tcbs:%d\n", tcp->pid, nprocs);
@@ -1613,10 +1615,11 @@ droptcb(struct tcb *tcp)
 	if (debug)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
 
+#ifdef USE_PROCFS
 	if (tcp->pfd != -1) {
 		close(tcp->pfd);
 		tcp->pfd = -1;
-#ifdef FREEBSD
+# ifdef FREEBSD
 		if (tcp->pfd_reg != -1) {
 		        close(tcp->pfd_reg);
 		        tcp->pfd_reg = -1;
@@ -1625,12 +1628,11 @@ droptcb(struct tcb *tcp)
 			close(tcp->pfd_status);
 			tcp->pfd_status = -1;
 		}
-#endif /* !FREEBSD */
-#ifdef USE_PROCFS
+# endif
 		tcp->flags = 0; /* rebuild_pollv needs it */
 		rebuild_pollv();
-#endif
 	}
+#endif
 
 	if (outfname && followfork > 1 && tcp->outf)
 		fclose(tcp->outf);

@@ -390,7 +390,7 @@ struct tcb {
 	int flags;		/* See below for TCB_ values */
 	int pid;		/* Process Id of this entry */
 	long scno;		/* System call number */
-	int u_nargs;		/* System call arguments */
+	int u_nargs;		/* System call argument count */
 	long u_arg[MAX_ARGS];	/* System call arguments */
 #if defined (LINUX_MIPSN32)
 	long long ext_arg[MAX_ARGS];	/* System call arguments */
@@ -409,17 +409,19 @@ struct tcb {
 				/* Support for tracing forked processes */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
+	int ptrace_errno;
+#ifdef USE_PROCFS
 	int pfd;		/* proc file descriptor */
+#endif
 #ifdef SVR4
-#ifdef HAVE_MP_PROCFS
+# ifdef HAVE_MP_PROCFS
 	int pfd_stat;
 	int pfd_as;
 	pstatus_t status;
-#else
+# else
 	prstatus_t status;	/* procfs status structure */
+# endif
 #endif
-#endif
-	int ptrace_errno;
 #ifdef FREEBSD
 	struct procfs_status status;
 	int pfd_reg;
