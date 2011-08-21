@@ -432,7 +432,25 @@ struct tcb {
 /* TCB flags */
 #define TCB_STARTUP	00001	/* We have just begun ptracing this process */
 #define TCB_INUSE	00002	/* This table entry is in use */
-#define TCB_INSYSCALL	00004	/* A system call is in progress */
+/*
+ * Are we in system call entry or in syscall exit?
+ *
+ * This bit is set after all syscall entry processing is done.
+ * Therefore, this bit will be set when next ptrace stop occurs,
+ * which should be syscall exit stop. Other stops which are possible
+ * directly after syscall entry (death, ptrace event stop)
+ * are simpler and handled without calling trace_syscall(), therefore
+ * the places where TCB_INSYSCALL can be set but we aren't in syscall stop
+ * are limited to trace(), this condition is never observed in trace_syscall()
+ * and below.
+ * The bit is cleared after all syscall exit processing is done.
+ * User-generated SIGTRAPs and post-execve SIGTRAP make it necessary
+ * to be very careful and NOT set TCB_INSYSCALL bit when they are encountered.
+ * TCB_WAITEXECVE bit is used for this purpose (see below).
+ *
+ * Use entering(tcp) / exiting(tcp) to check this bit to make code more readable.
+ */
+#define TCB_INSYSCALL	00004
 #define TCB_ATTACHED	00010	/* Process is not our own child */
 #ifdef LINUX
 #define TCB_ATTACH_DONE	00020	/* PTRACE_ATTACH was done on this tcb->pid */
@@ -443,14 +461,17 @@ struct tcb {
 #define TCB_FILTERED	02000	/* This system call has been filtered out */
 #ifdef LINUX
 /* x86 does not need TCB_WAITEXECVE.
- * It can detect execve's SIGTRAP by looking at eax/rax.
- * See "stray syscall exit: eax = " message in syscall_fixup().
+ * It can detect SIGTRAP by looking at eax/rax.
+ * See "not a syscall entry (eax = %ld)\n" message in syscall_fixup().
  */
 # if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
   || defined(POWERPC) || defined(IA64) || defined(HPPA) \
   || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) \
   || defined(ARM) || defined(MIPS) || defined(BFIN) || defined(TILE)
-#  define TCB_WAITEXECVE 04000	/* ignore SIGTRAP after execve */
+/* This tracee has entered into execve syscall. Expect post-execve SIGTRAP
+ * to happen. (When it is detected, tracee is continued and this bit is cleared.)
+ */
+#  define TCB_WAITEXECVE 04000
 # endif
 # include <sys/syscall.h>
 # ifndef __NR_exit_group

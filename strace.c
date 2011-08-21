@@ -2012,7 +2012,7 @@ choose_pfd()
 		 * heuristic improves the readability of the trace.
 		 */
 		tcp = pfd2tcb(pollv[last].fd);
-		if (tcp && (tcp->flags & TCB_INSYSCALL))
+		if (tcp && exiting(tcp))
 			return pollv[last].fd;
 	}
 
