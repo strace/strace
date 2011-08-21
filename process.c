@@ -1581,14 +1581,15 @@ int sys_rexecve(struct tcb *tcp)
 
 #endif
 
+#if defined SUNOS4 || (defined LINUX && defined TCB_WAITEXECVE)
 int
 internal_exec(struct tcb *tcp)
 {
-#ifdef SUNOS4
+# if defined SUNOS4
 	if (exiting(tcp) && !syserror(tcp) && followfork)
 		fixvfork(tcp);
-#endif /* SUNOS4 */
-#if defined LINUX && defined TCB_WAITEXECVE
+# endif
+# if defined LINUX && defined TCB_WAITEXECVE
 	if (exiting(tcp) && syserror(tcp))
 		tcp->flags &= ~TCB_WAITEXECVE;
 	else {
@@ -1596,9 +1597,10 @@ internal_exec(struct tcb *tcp)
 		if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC))
 			tcp->flags |= TCB_WAITEXECVE; /* no */
 	}
-#endif /* LINUX && TCB_WAITEXECVE */
+# endif
 	return 0;
 }
+#endif
 
 #ifdef LINUX
 #ifndef __WNOTHREAD
@@ -1721,12 +1723,12 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 		int pid = tcp->u_arg[0];
 		tprintf("%d, ", pid);
 #else
-		/*
-		 * Sign-extend a 32-bit value when that's what it is.
-		 */
 		long pid = tcp->u_arg[0];
+# if SUPPORTED_PERSONALITIES > 1
+		/* Sign-extend a 32-bit value when that's what it is. */
 		if (personality_wordsize[current_personality] < sizeof pid)
 			pid = (long) (int) pid;
+# endif
 		tprintf("%ld, ", pid);
 #endif
 	} else {

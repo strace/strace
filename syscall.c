@@ -657,7 +657,7 @@ internal_syscall(struct tcb *tcp)
 	 * correctly support following forks in the presence of tracing
 	 * qualifiers.
 	 */
-	int	(*func)();
+	int (*func)();
 
 	if (tcp->scno < 0 || tcp->scno >= nsyscalls)
 		return 0;
@@ -677,15 +677,17 @@ internal_syscall(struct tcb *tcp)
 	   )
 		return internal_fork(tcp);
 
+#if defined SUNOS4 || (defined LINUX && defined TCB_WAITEXECVE)
 	if (   sys_execve == func
-#if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)
+# if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)
 	    || sys_execv == func
-#endif
-#if UNIXWARE > 2
+# endif
+# if UNIXWARE > 2
 	    || sys_rexecve == func
-#endif
+# endif
 	   )
 		return internal_exec(tcp);
+#endif
 
 	return 0;
 }
@@ -1536,10 +1538,12 @@ static inline int
 is_negated_errno(unsigned long int val)
 {
 	unsigned long int max = -(long int) nerrnos;
+# if SUPPORTED_PERSONALITIES > 1
 	if (personality_wordsize[current_personality] < sizeof(val)) {
 		val = (unsigned int) val;
 		max = (unsigned int) max;
 	}
+# endif
 	return val > max;
 }
 #endif
@@ -2467,14 +2471,13 @@ trace_syscall_exiting(struct tcb *tcp)
 			break;
 #endif /* LINUX */
 		default:
-			tprintf("= -1 ");
 			if (u_error < 0)
-				tprintf("E??? (errno %ld)", u_error);
+				tprintf("= -1 E??? (errno %ld)", u_error);
 			else if (u_error < nerrnos)
-				tprintf("%s (%s)", errnoent[u_error],
+				tprintf("= -1 %s (%s)", errnoent[u_error],
 					strerror(u_error));
 			else
-				tprintf("ERRNO_%ld (%s)", u_error,
+				tprintf("= -1 ERRNO_%ld (%s)", u_error,
 					strerror(u_error));
 			break;
 		}
