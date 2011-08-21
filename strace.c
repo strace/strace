@@ -2493,7 +2493,7 @@ trace()
 			if (tcp->flags & TCB_BPTSET) {
 				/*
 				 * One example is a breakpoint inherited from
-				 * parent through fork ().
+				 * parent through fork().
 				 */
 				if (clearbpt(tcp) < 0) /* Pretty fatal */ {
 					droptcb(tcp);
@@ -2543,22 +2543,22 @@ trace()
 # define PSR_RI	41
 				pc += (psr >> PSR_RI) & 0x3;
 # define PC_FORMAT_STR	" @ %lx"
-# define PC_FORMAT_ARG	pc
+# define PC_FORMAT_ARG	, pc
 #else
-# define PC_FORMAT_STR	"%s"
-# define PC_FORMAT_ARG	""
+# define PC_FORMAT_STR	""
+# define PC_FORMAT_ARG	/* nothing */
 #endif
 				printleader(tcp);
 				if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == 0) {
 					tprintf("--- ");
 					printsiginfo(&si, verbose(tcp));
 					tprintf(" (%s)" PC_FORMAT_STR " ---",
-						strsignal(WSTOPSIG(status)),
+						strsignal(WSTOPSIG(status))
 						PC_FORMAT_ARG);
 				} else
 					tprintf("--- %s by %s" PC_FORMAT_STR " ---",
 						strsignal(WSTOPSIG(status)),
-						signame(WSTOPSIG(status)),
+						signame(WSTOPSIG(status))
 						PC_FORMAT_ARG);
 				printtrailer();
 			}
@@ -2568,9 +2568,15 @@ trace()
 			}
 			continue;
 		}
-		/* we handled the STATUS, we are permitted to interrupt now. */
+
+		/* We handled quick cases, we are permitted to interrupt now. */
 		if (interrupted)
 			return 0;
+
+		/* This should be syscall entry or exit.
+		 * (Or it still can be that pesky post-execve SIGTRAP!)
+		 * Handle it.
+		 */
 		if (trace_syscall(tcp) < 0 && !tcp->ptrace_errno) {
 			/* ptrace() failed in trace_syscall() with ESRCH.
 			 * Likely a result of process disappearing mid-flight.
