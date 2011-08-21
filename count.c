@@ -47,11 +47,11 @@ static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 
 static struct timeval shortest = { 1000000, 0 };
 
-int
+void
 count_syscall(struct tcb *tcp, struct timeval *tv)
 {
 	if (tcp->scno < 0 || tcp->scno >= nsyscalls)
-		return 0;
+		return;
 
 	if (!counts) {
 		counts = calloc(nsyscalls, sizeof(*counts));
@@ -95,8 +95,6 @@ count_syscall(struct tcb *tcp, struct timeval *tv)
 	if (tv_cmp(tv, &shortest) < 0)
 		shortest = *tv;
 	tv_add(&counts[tcp->scno].time, &counts[tcp->scno].time, tv);
-
-	return 0;
 }
 
 static int
