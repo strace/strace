@@ -2384,6 +2384,168 @@ syscall_enter(struct tcb *tcp)
 }
 
 static int
+trace_syscall_entering(struct tcb *tcp)
+{
+	int res, scno_good;
+
+	scno_good = res = get_scno(tcp);
+	if (res == 0)
+		return res;
+	if (res == 1)
+		res = syscall_fixup(tcp);
+	if (res == 0)
+		return res;
+	if (res == 1)
+		res = syscall_enter(tcp);
+	if (res == 0)
+		return res;
+
+	if (res != 1) {
+		printleader(tcp);
+		tcp->flags &= ~TCB_REPRINT;
+		tcp_last = tcp;
+		if (scno_good != 1)
+			tprintf("????" /* anti-trigraph gap */ "(");
+		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
+			tprintf("syscall_%lu(", tcp->scno);
+		else
+			tprintf("%s(", sysent[tcp->scno].sys_name);
+		/*
+		 * " <unavailable>" will be added later by the code which
+		 * detects ptrace errors.
+		 */
+		goto ret;
+	}
+
+	switch (known_scno(tcp)) {
+#ifdef SYS_socket_subcall
+	case SYS_socketcall:
+		decode_subcall(tcp, SYS_socket_subcall,
+			SYS_socket_nsubcalls, deref_style);
+		break;
+#endif
+#ifdef SYS_ipc_subcall
+	case SYS_ipc:
+		decode_subcall(tcp, SYS_ipc_subcall,
+			SYS_ipc_nsubcalls, shift_style);
+		break;
+#endif
+#ifdef SVR4
+#ifdef SYS_pgrpsys_subcall
+	case SYS_pgrpsys:
+		decode_subcall(tcp, SYS_pgrpsys_subcall,
+			SYS_pgrpsys_nsubcalls, shift_style);
+		break;
+#endif /* SYS_pgrpsys_subcall */
+#ifdef SYS_sigcall_subcall
+	case SYS_sigcall:
+		decode_subcall(tcp, SYS_sigcall_subcall,
+			SYS_sigcall_nsubcalls, mask_style);
+		break;
+#endif /* SYS_sigcall_subcall */
+	case SYS_msgsys:
+		decode_subcall(tcp, SYS_msgsys_subcall,
+			SYS_msgsys_nsubcalls, shift_style);
+		break;
+	case SYS_shmsys:
+		decode_subcall(tcp, SYS_shmsys_subcall,
+			SYS_shmsys_nsubcalls, shift_style);
+		break;
+	case SYS_semsys:
+		decode_subcall(tcp, SYS_semsys_subcall,
+			SYS_semsys_nsubcalls, shift_style);
+		break;
+	case SYS_sysfs:
+		decode_subcall(tcp, SYS_sysfs_subcall,
+			SYS_sysfs_nsubcalls, shift_style);
+		break;
+	case SYS_spcall:
+		decode_subcall(tcp, SYS_spcall_subcall,
+			SYS_spcall_nsubcalls, shift_style);
+		break;
+#ifdef SYS_context_subcall
+	case SYS_context:
+		decode_subcall(tcp, SYS_context_subcall,
+			SYS_context_nsubcalls, shift_style);
+		break;
+#endif /* SYS_context_subcall */
+#ifdef SYS_door_subcall
+	case SYS_door:
+		decode_subcall(tcp, SYS_door_subcall,
+			SYS_door_nsubcalls, door_style);
+		break;
+#endif /* SYS_door_subcall */
+#ifdef SYS_kaio_subcall
+	case SYS_kaio:
+		decode_subcall(tcp, SYS_kaio_subcall,
+			SYS_kaio_nsubcalls, shift_style);
+		break;
+#endif
+#endif /* SVR4 */
+#ifdef FREEBSD
+	case SYS_msgsys:
+	case SYS_shmsys:
+	case SYS_semsys:
+		decode_subcall(tcp, 0, 0, table_style);
+		break;
+#endif
+#ifdef SUNOS4
+	case SYS_semsys:
+		decode_subcall(tcp, SYS_semsys_subcall,
+			SYS_semsys_nsubcalls, shift_style);
+		break;
+	case SYS_msgsys:
+		decode_subcall(tcp, SYS_msgsys_subcall,
+			SYS_msgsys_nsubcalls, shift_style);
+		break;
+	case SYS_shmsys:
+		decode_subcall(tcp, SYS_shmsys_subcall,
+			SYS_shmsys_nsubcalls, shift_style);
+		break;
+#endif
+	}
+
+	internal_syscall(tcp);
+
+	if ((tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	     !(qual_flags[tcp->scno] & QUAL_TRACE)) ||
+	    (tracing_paths && !pathtrace_match(tcp))) {
+		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
+		return 0;
+	}
+
+	tcp->flags &= ~TCB_FILTERED;
+
+	if (cflag == CFLAG_ONLY_STATS) {
+		res = 0;
+		goto ret;
+	}
+
+	printleader(tcp);
+	tcp->flags &= ~TCB_REPRINT;
+	tcp_last = tcp;
+	if (tcp->scno >= nsyscalls || tcp->scno < 0)
+		tprintf("syscall_%lu(", tcp->scno);
+	else
+		tprintf("%s(", sysent[tcp->scno].sys_name);
+	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
+	    ((qual_flags[tcp->scno] & QUAL_RAW) &&
+	     sysent[tcp->scno].sys_func != sys_exit))
+		res = printargs(tcp);
+	else
+		res = (*sysent[tcp->scno].sys_func)(tcp);
+
+	if (fflush(tcp->outf) == EOF)
+		return -1;
+ ret:
+	tcp->flags |= TCB_INSYSCALL;
+	/* Measure the entrance time as late as possible to avoid errors. */
+	if (dtime || cflag)
+		gettimeofday(&tcp->etime, NULL);
+	return res;
+}
+
+static int
 trace_syscall_exiting(struct tcb *tcp)
 {
 	int sys_res;
@@ -2555,168 +2717,6 @@ trace_syscall_exiting(struct tcb *tcp)
  ret:
 	tcp->flags &= ~TCB_INSYSCALL;
 	return 0;
-}
-
-static int
-trace_syscall_entering(struct tcb *tcp)
-{
-	int res, scno_good;
-
-	scno_good = res = get_scno(tcp);
-	if (res == 0)
-		return res;
-	if (res == 1)
-		res = syscall_fixup(tcp);
-	if (res == 0)
-		return res;
-	if (res == 1)
-		res = syscall_enter(tcp);
-	if (res == 0)
-		return res;
-
-	if (res != 1) {
-		printleader(tcp);
-		tcp->flags &= ~TCB_REPRINT;
-		tcp_last = tcp;
-		if (scno_good != 1)
-			tprintf("????" /* anti-trigraph gap */ "(");
-		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
-			tprintf("syscall_%lu(", tcp->scno);
-		else
-			tprintf("%s(", sysent[tcp->scno].sys_name);
-		/*
-		 * " <unavailable>" will be added later by the code which
-		 * detects ptrace errors.
-		 */
-		goto ret;
-	}
-
-	switch (known_scno(tcp)) {
-#ifdef SYS_socket_subcall
-	case SYS_socketcall:
-		decode_subcall(tcp, SYS_socket_subcall,
-			SYS_socket_nsubcalls, deref_style);
-		break;
-#endif
-#ifdef SYS_ipc_subcall
-	case SYS_ipc:
-		decode_subcall(tcp, SYS_ipc_subcall,
-			SYS_ipc_nsubcalls, shift_style);
-		break;
-#endif
-#ifdef SVR4
-#ifdef SYS_pgrpsys_subcall
-	case SYS_pgrpsys:
-		decode_subcall(tcp, SYS_pgrpsys_subcall,
-			SYS_pgrpsys_nsubcalls, shift_style);
-		break;
-#endif /* SYS_pgrpsys_subcall */
-#ifdef SYS_sigcall_subcall
-	case SYS_sigcall:
-		decode_subcall(tcp, SYS_sigcall_subcall,
-			SYS_sigcall_nsubcalls, mask_style);
-		break;
-#endif /* SYS_sigcall_subcall */
-	case SYS_msgsys:
-		decode_subcall(tcp, SYS_msgsys_subcall,
-			SYS_msgsys_nsubcalls, shift_style);
-		break;
-	case SYS_shmsys:
-		decode_subcall(tcp, SYS_shmsys_subcall,
-			SYS_shmsys_nsubcalls, shift_style);
-		break;
-	case SYS_semsys:
-		decode_subcall(tcp, SYS_semsys_subcall,
-			SYS_semsys_nsubcalls, shift_style);
-		break;
-	case SYS_sysfs:
-		decode_subcall(tcp, SYS_sysfs_subcall,
-			SYS_sysfs_nsubcalls, shift_style);
-		break;
-	case SYS_spcall:
-		decode_subcall(tcp, SYS_spcall_subcall,
-			SYS_spcall_nsubcalls, shift_style);
-		break;
-#ifdef SYS_context_subcall
-	case SYS_context:
-		decode_subcall(tcp, SYS_context_subcall,
-			SYS_context_nsubcalls, shift_style);
-		break;
-#endif /* SYS_context_subcall */
-#ifdef SYS_door_subcall
-	case SYS_door:
-		decode_subcall(tcp, SYS_door_subcall,
-			SYS_door_nsubcalls, door_style);
-		break;
-#endif /* SYS_door_subcall */
-#ifdef SYS_kaio_subcall
-	case SYS_kaio:
-		decode_subcall(tcp, SYS_kaio_subcall,
-			SYS_kaio_nsubcalls, shift_style);
-		break;
-#endif
-#endif /* SVR4 */
-#ifdef FREEBSD
-	case SYS_msgsys:
-	case SYS_shmsys:
-	case SYS_semsys:
-		decode_subcall(tcp, 0, 0, table_style);
-		break;
-#endif
-#ifdef SUNOS4
-	case SYS_semsys:
-		decode_subcall(tcp, SYS_semsys_subcall,
-			SYS_semsys_nsubcalls, shift_style);
-		break;
-	case SYS_msgsys:
-		decode_subcall(tcp, SYS_msgsys_subcall,
-			SYS_msgsys_nsubcalls, shift_style);
-		break;
-	case SYS_shmsys:
-		decode_subcall(tcp, SYS_shmsys_subcall,
-			SYS_shmsys_nsubcalls, shift_style);
-		break;
-#endif
-	}
-
-	internal_syscall(tcp);
-
-	if ((tcp->scno >= 0 && tcp->scno < nsyscalls &&
-	     !(qual_flags[tcp->scno] & QUAL_TRACE)) ||
-	    (tracing_paths && !pathtrace_match(tcp))) {
-		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
-		return 0;
-	}
-
-	tcp->flags &= ~TCB_FILTERED;
-
-	if (cflag == CFLAG_ONLY_STATS) {
-		res = 0;
-		goto ret;
-	}
-
-	printleader(tcp);
-	tcp->flags &= ~TCB_REPRINT;
-	tcp_last = tcp;
-	if (tcp->scno >= nsyscalls || tcp->scno < 0)
-		tprintf("syscall_%lu(", tcp->scno);
-	else
-		tprintf("%s(", sysent[tcp->scno].sys_name);
-	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
-	    ((qual_flags[tcp->scno] & QUAL_RAW) &&
-	     sysent[tcp->scno].sys_func != sys_exit))
-		res = printargs(tcp);
-	else
-		res = (*sysent[tcp->scno].sys_func)(tcp);
-
-	if (fflush(tcp->outf) == EOF)
-		return -1;
- ret:
-	tcp->flags |= TCB_INSYSCALL;
-	/* Measure the entrance time as late as possible to avoid errors. */
-	if (dtime || cflag)
-		gettimeofday(&tcp->etime, NULL);
-	return res;
 }
 
 int
