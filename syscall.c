@@ -2413,8 +2413,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		internal_syscall(tcp);
 
 	if (res == 1 && filtered(tcp)) {
-		tcp->flags &= ~TCB_INSYSCALL;
-		return 0;
+		goto ret;
 	}
 
 	if (tcp->flags & TCB_REPRINT) {
@@ -2433,8 +2432,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		struct timeval t = tv;
 		count_syscall(tcp, &t);
 		if (cflag == CFLAG_ONLY_STATS) {
-			tcp->flags &= ~TCB_INSYSCALL;
-			return 0;
+			goto ret;
 		}
 	}
 
@@ -2451,14 +2449,22 @@ trace_syscall_exiting(struct tcb *tcp)
 	    || (qual_flags[tcp->scno] & QUAL_RAW))
 		sys_res = printargs(tcp);
 	else {
+	/* FIXME: not_failing_only (IOW, option -z) is broken:
+	 * failure of syscall is known only after syscall return.
+	 * Thus we end up with something like this on, say, ENOENT:
+	 *     open("doesnt_exist", O_RDONLY <unfinished ...>
+	 *     {next syscall decode}
+	 * whereas the intended result is that open(...) line
+	 * is not shown at all.
+	 */
 		if (not_failing_only && tcp->u_error)
-			return 0;	/* ignore failed syscalls */
+			goto ret;	/* ignore failed syscalls */
 		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
 	}
 
-	u_error = tcp->u_error;
 	tprintf(") ");
 	tabto(acolumn);
+	u_error = tcp->u_error;
 	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
 	    qual_flags[tcp->scno] & QUAL_RAW) {
 		if (u_error)
@@ -2546,6 +2552,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	dumpio(tcp);
 	if (fflush(tcp->outf) == EOF)
 		return -1;
+ ret:
 	tcp->flags &= ~TCB_INSYSCALL;
 	return 0;
 }
@@ -2553,7 +2560,6 @@ trace_syscall_exiting(struct tcb *tcp)
 static int
 trace_syscall_entering(struct tcb *tcp)
 {
-	int sys_res;
 	int res, scno_good;
 
 	scno_good = res = get_scno(tcp);
@@ -2582,8 +2588,7 @@ trace_syscall_entering(struct tcb *tcp)
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
 		 */
-		tcp->flags |= TCB_INSYSCALL;
-		return res;
+		goto ret;
 	}
 
 	switch (known_scno(tcp)) {
@@ -2686,9 +2691,8 @@ trace_syscall_entering(struct tcb *tcp)
 	tcp->flags &= ~TCB_FILTERED;
 
 	if (cflag == CFLAG_ONLY_STATS) {
-		tcp->flags |= TCB_INSYSCALL;
-		gettimeofday(&tcp->etime, NULL);
-		return 0;
+		res = 0;
+		goto ret;
 	}
 
 	printleader(tcp);
@@ -2701,16 +2705,18 @@ trace_syscall_entering(struct tcb *tcp)
 	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
 	    ((qual_flags[tcp->scno] & QUAL_RAW) &&
 	     sysent[tcp->scno].sys_func != sys_exit))
-		sys_res = printargs(tcp);
+		res = printargs(tcp);
 	else
-		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
+		res = (*sysent[tcp->scno].sys_func)(tcp);
+
 	if (fflush(tcp->outf) == EOF)
 		return -1;
+ ret:
 	tcp->flags |= TCB_INSYSCALL;
 	/* Measure the entrance time as late as possible to avoid errors. */
 	if (dtime || cflag)
 		gettimeofday(&tcp->etime, NULL);
-	return sys_res;
+	return res;
 }
 
 int
