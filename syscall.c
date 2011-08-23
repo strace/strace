@@ -570,7 +570,7 @@ static void
 decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style style)
 {
 	unsigned long addr, mask;
-	int i;
+	int i, n;
 	int size = personality_wordsize[current_personality];
 
 	switch (style) {
@@ -578,8 +578,8 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
 			return;
 		tcp->scno = subcall + tcp->u_arg[0];
-		tcp->u_nargs = sysent[tcp->scno].nargs;
-		for (i = 0; i < tcp->u_nargs; i++)
+		tcp->u_nargs = n = sysent[tcp->scno].nargs;
+		for (i = 0; i < n; i++)
 			tcp->u_arg[i] = tcp->u_arg[i + 1];
 		break;
 	case deref_style:
@@ -587,7 +587,8 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 			return;
 		tcp->scno = subcall + tcp->u_arg[0];
 		addr = tcp->u_arg[1];
-		for (i = 0; i < sysent[tcp->scno].nargs; i++) {
+		tcp->u_nargs = n = sysent[tcp->scno].nargs;
+		for (i = 0; i < n; i++) {
 			if (size == sizeof(int)) {
 				unsigned int arg;
 				if (umove(tcp, addr, &arg) < 0)
@@ -604,7 +605,6 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 				abort();
 			addr += size;
 		}
-		tcp->u_nargs = sysent[tcp->scno].nargs;
 		break;
 	case mask_style:
 		mask = (tcp->u_arg[0] >> 8) & 0xff;
@@ -2124,12 +2124,12 @@ syscall_enter(struct tcb *tcp)
 #  ifndef PT_ORIG_R3
 #   define PT_ORIG_R3 34
 #  endif
-	int i;
+	int i, nargs;
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = MAX_ARGS;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = MAX_ARGS;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, (i==0) ?
 			(sizeof(unsigned long) * PT_ORIG_R3) :
 			((i+PT_R3) * sizeof(unsigned long)),
@@ -2145,12 +2145,12 @@ syscall_enter(struct tcb *tcp)
 	for (i = 0; i < tcp->u_nargs; i++)
 		tcp->u_arg[i] = regs.u_regs[U_REG_O0 + i];
 # elif defined(HPPA)
-	int i;
+	int i, nargs;
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = MAX_ARGS;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = MAX_ARGS;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, PT_GR26-4*i, &tcp->u_arg[i]) < 0)
 			return -1;
 	}
@@ -2171,26 +2171,26 @@ syscall_enter(struct tcb *tcp)
 	tcp->u_arg[4] = regs.r5;
 	tcp->u_arg[5] = regs.r3;
 # elif defined(BFIN)
-	int i;
+	int i, nargs;
 	static const int argreg[] = { PT_R0, PT_R1, PT_R2, PT_R3, PT_R4, PT_R5 };
 
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = ARRAY_SIZE(argreg);
+		nargs = tcp->u_nargs = ARRAY_SIZE(argreg);
 
-	for (i = 0; i < tcp->u_nargs; ++i)
+	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, argreg[i], &tcp->u_arg[i]) < 0)
 			return -1;
 # elif defined(SH)
-	int i;
+	int i, nargs;
 	static const int syscall_regs[] = {
 		4 * (REG_REG0+4), 4 * (REG_REG0+5), 4 * (REG_REG0+6), 4 * (REG_REG0+7),
 		4 * (REG_REG0  ), 4 * (REG_REG0+1), 4 * (REG_REG0+2)
 	};
 
-	tcp->u_nargs = sysent[tcp->scno].nargs;
-	for (i = 0; i < tcp->u_nargs; i++) {
+	nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, syscall_regs[i], &tcp->u_arg[i]) < 0)
 			return -1;
 	}
@@ -2207,90 +2207,90 @@ syscall_enter(struct tcb *tcp)
 	assert(sysent[tcp->scno].nargs < ARRAY_SIZE(syscall_regs));
 	 */
 
-	tcp->u_nargs = sysent[tcp->scno].nargs;
-	for (i = 0; i < tcp->u_nargs; i++) {
+	nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, REG_GENERAL(syscall_regs[i]), &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # elif defined(X86_64)
-	int i;
+	int i, nargs;
 	static const int argreg[SUPPORTED_PERSONALITIES][MAX_ARGS] = {
 		{ 8 * RDI, 8 * RSI, 8 * RDX, 8 * R10, 8 * R8 , 8 * R9  }, /* x86-64 ABI */
 		{ 8 * RBX, 8 * RCX, 8 * RDX, 8 * RSI, 8 * RDI, 8 * RBP }  /* i386 ABI */
 	};
 
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = MAX_ARGS;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = MAX_ARGS;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, argreg[current_personality][i], &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # elif defined(MICROBLAZE)
-	int i;
+	int i, nargs;
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = 0;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = 0;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, (5 + i) * 4, &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # elif defined(CRISV10) || defined(CRISV32)
-	int i;
+	int i, nargs;
 	static const int crisregs[] = {
 		4*PT_ORIG_R10, 4*PT_R11, 4*PT_R12,
 		4*PT_R13     , 4*PT_MOF, 4*PT_SRP
 	};
 
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = 0;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = 0;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, crisregs[i], &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # elif defined(TILE)
-	int i;
+	int i, nargs;
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = MAX_ARGS;
-	for (i = 0; i < tcp->u_nargs; ++i) {
+		nargs = tcp->u_nargs = MAX_ARGS;
+	for (i = 0; i < nargs; ++i) {
 		if (upeek(tcp, PTREGS_OFFSET_REG(i), &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # elif defined(M68K)
-	int i;
+	int i, nargs;
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = MAX_ARGS;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = MAX_ARGS;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, (i < 5 ? i : i + 2)*4, &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # else /* Other architecture (like i386) (32bits specific) */
-	int i;
+	int i, nargs;
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = MAX_ARGS;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = MAX_ARGS;
+	for (i = 0; i < nargs; i++) {
 		if (upeek(tcp, i*4, &tcp->u_arg[i]) < 0)
 			return -1;
 	}
 # endif
 #endif /* LINUX */
 #ifdef SUNOS4
-	int i;
+	int i, nargs;
 	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
-		tcp->u_nargs = sysent[tcp->scno].nargs;
+		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
-		tcp->u_nargs = MAX_ARGS;
-	for (i = 0; i < tcp->u_nargs; i++) {
+		nargs = tcp->u_nargs = MAX_ARGS;
+	for (i = 0; i < nargs; i++) {
 		struct user *u;
 
 		if (upeek(tcp, uoff(u_arg[0]) +
