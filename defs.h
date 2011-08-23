@@ -719,13 +719,13 @@ struct ioctlent {
 };
 
 extern const struct sysent *sysent;
-extern int nsyscalls;
+extern unsigned nsyscalls;
 extern const char *const *errnoent;
-extern int nerrnos;
+extern unsigned nerrnos;
 extern const struct ioctlent *ioctlent;
-extern int nioctlents;
+extern unsigned nioctlents;
 extern const char *const *signalent;
-extern int nsignals;
+extern unsigned nsignals;
 
 #if HAVE_LONG_LONG
 

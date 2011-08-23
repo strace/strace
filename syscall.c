@@ -204,10 +204,10 @@ const struct sysent *sysent;
 const char *const *errnoent;
 const char *const *signalent;
 const struct ioctlent *ioctlent;
-int nsyscalls;
-int nerrnos;
-int nsignals;
-int nioctlents;
+unsigned nsyscalls;
+unsigned nerrnos;
+unsigned nsignals;
+unsigned nioctlents;
 int *qual_flags;
 
 int current_personality;
@@ -578,10 +578,7 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
 			return;
 		tcp->scno = subcall + tcp->u_arg[0];
-		if (sysent[tcp->scno].nargs != -1)
-			tcp->u_nargs = sysent[tcp->scno].nargs;
-		else
-			tcp->u_nargs--;
+		tcp->u_nargs = sysent[tcp->scno].nargs;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = tcp->u_arg[i + 1];
 		break;
@@ -617,8 +614,7 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 			return;
 		tcp->u_arg[0] &= 0xff;
 		tcp->scno = subcall + i;
-		if (sysent[tcp->scno].nargs != -1)
-			tcp->u_nargs = sysent[tcp->scno].nargs;
+		tcp->u_nargs = sysent[tcp->scno].nargs;
 		break;
 	case door_style:
 		/*
@@ -628,10 +624,7 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 		if (tcp->u_arg[5] < 0 || tcp->u_arg[5] >= nsubcalls)
 			return;
 		tcp->scno = subcall + tcp->u_arg[5];
-		if (sysent[tcp->scno].nargs != -1)
-			tcp->u_nargs = sysent[tcp->scno].nargs;
-		else
-			tcp->u_nargs--;
+		tcp->u_nargs = sysent[tcp->scno].nargs;
 		break;
 #ifdef FREEBSD
 	case table_style:
@@ -2012,7 +2005,7 @@ syscall_enter(struct tcb *tcp)
 #ifdef LINUX
 # if defined(S390) || defined(S390X)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2022,7 +2015,7 @@ syscall_enter(struct tcb *tcp)
 	}
 # elif defined(ALPHA)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2051,8 +2044,7 @@ syscall_enter(struct tcb *tcp)
 		sol = (cfm >> 7) & 0x7f;
 		out0 = ia64_rse_skip_regs((unsigned long *) rbs_end, -sof + sol);
 
-		if (tcp->scno >= 0 && tcp->scno < nsyscalls
-		    && sysent[tcp->scno].nargs != -1)
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 			tcp->u_nargs = sysent[tcp->scno].nargs;
 		else
 			tcp->u_nargs = MAX_ARGS;
@@ -2082,8 +2074,7 @@ syscall_enter(struct tcb *tcp)
 			/* truncate away IVE sign-extension */
 			tcp->u_arg[i] &= 0xffffffff;
 
-		if (tcp->scno >= 0 && tcp->scno < nsyscalls
-		    && sysent[tcp->scno].nargs != -1)
+		if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 			tcp->u_nargs = sysent[tcp->scno].nargs;
 		else
 			tcp->u_nargs = 5;
@@ -2092,7 +2083,7 @@ syscall_enter(struct tcb *tcp)
 	/* N32 and N64 both use up to six registers.  */
 	unsigned long long regs[38];
 	int i, nargs;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		nargs = tcp->u_nargs = MAX_ARGS;
@@ -2110,7 +2101,7 @@ syscall_enter(struct tcb *tcp)
 	long sp;
 	int i, nargs;
 
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		nargs = tcp->u_nargs = MAX_ARGS;
@@ -2134,7 +2125,7 @@ syscall_enter(struct tcb *tcp)
 #   define PT_ORIG_R3 34
 #  endif
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2147,7 +2138,7 @@ syscall_enter(struct tcb *tcp)
 	}
 # elif defined(SPARC) || defined(SPARC64)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2155,7 +2146,7 @@ syscall_enter(struct tcb *tcp)
 		tcp->u_arg[i] = regs.u_regs[U_REG_O0 + i];
 # elif defined(HPPA)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2165,7 +2156,7 @@ syscall_enter(struct tcb *tcp)
 	}
 # elif defined(ARM)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2183,7 +2174,7 @@ syscall_enter(struct tcb *tcp)
 	int i;
 	static const int argreg[] = { PT_R0, PT_R1, PT_R2, PT_R3, PT_R4, PT_R5 };
 
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = ARRAY_SIZE(argreg);
@@ -2228,7 +2219,7 @@ syscall_enter(struct tcb *tcp)
 		{ 8 * RBX, 8 * RCX, 8 * RDX, 8 * RSI, 8 * RDI, 8 * RBP }  /* i386 ABI */
 	};
 
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2263,7 +2254,7 @@ syscall_enter(struct tcb *tcp)
 	}
 # elif defined(TILE)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2273,7 +2264,7 @@ syscall_enter(struct tcb *tcp)
 	}
 # elif defined(M68K)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2283,7 +2274,7 @@ syscall_enter(struct tcb *tcp)
 	}
 # else /* Other architecture (like i386) (32bits specific) */
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2295,7 +2286,7 @@ syscall_enter(struct tcb *tcp)
 #endif /* LINUX */
 #ifdef SUNOS4
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = MAX_ARGS;
@@ -2313,7 +2304,7 @@ syscall_enter(struct tcb *tcp)
 	 * SGI is broken: even though it has pr_sysarg, it doesn't
 	 * set them on system call entry.  Get a clue.
 	 */
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_nsysarg;
@@ -2331,7 +2322,7 @@ syscall_enter(struct tcb *tcp)
 	/*
 	 * Like SGI, UnixWare doesn't set pr_sysarg until system call exit
 	 */
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_lwp.pr_nsysarg;
@@ -2339,14 +2330,14 @@ syscall_enter(struct tcb *tcp)
 		tcp->u_nargs * sizeof(tcp->u_arg[0]), (char *) tcp->u_arg);
 # elif defined(HAVE_PR_SYSCALL)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_nsysarg;
 	for (i = 0; i < tcp->u_nargs; i++)
 		tcp->u_arg[i] = tcp->status.pr_sysarg[i];
 # elif defined(I386)
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls && sysent[tcp->scno].nargs != -1)
+	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = 5;
