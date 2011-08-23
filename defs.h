@@ -68,17 +68,17 @@
  *
  * Make sure that all entries in all syscallent.h files
  * have nargs <= MAX_ARGS!
- * linux/<ARCH>/syscallent.h: ia64 has many syscalls with
- * nargs = 8, mips has two with nargs = 7 (both are printargs),
- * all others are <= 6.
+ * linux/<ARCH>/syscallent.h: all have nargs <= 6.
  * freebsd/i386/syscallent.h: one syscall with nargs = 8
  * (sys_sendfile, looks legitimate)
  * and one with nargs = 7 (sys_mmap, maybe it should have 6?).
  * sunos4/syscallent.h: all are <= 6.
- * svr4/syscallent.h: all are -1.
+ * svr4/syscallent.h: all are MA (MAX_ARGS), it's unclear what the real max is.
  */
 #ifndef MAX_ARGS
-# ifdef HPPA
+# if defined LINUX
+#   define MAX_ARGS	6
+# elif defined HPPA
 #  define MAX_ARGS	6
 # elif defined X86_64 || defined I386
 #  ifdef FREEBSD

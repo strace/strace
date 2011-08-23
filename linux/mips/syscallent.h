@@ -4002,7 +4002,7 @@
 	{ 0,	0,	printargs,		"SYS_3999"	}, /* 3999 */ /* end of POSIX */
 #if !defined (LINUX_MIPSN32) && !defined (LINUX_MIPSN64)
 	/* For an O32 strace, decode the o32 syscalls.  */
-	{ 7,	0,	printargs,		"syscall"	}, /* 4000 */ /* start of Linux o32 */
+	{ MA,	0,	printargs,		"syscall"	}, /* 4000 */ /* start of Linux o32 */
 	{ 1,	TP,	sys_exit,		"exit"		}, /* 4001 */
 	{ 0,	TP,	sys_fork,		"fork"		}, /* 4002 */
 	{ 3,	TD,	sys_read,		"read"		}, /* 4003 */
@@ -4596,7 +4596,7 @@
 	{ 5,	0,	printargs,		"o32_remap_file_pages"}, /* 4251 */
 	{ 1,	0,	printargs,		"o32_set_tid_address"}, /* 4252 */
 	{ 0,	0,	printargs,		"o32_restart_syscall"}, /* 4253 */
-	{ 7,	0,	printargs,		"o32_fadvise64_64"	}, /* 4254 */
+	{ MA,	0,	printargs,		"o32_fadvise64_64"	}, /* 4254 */
 	{ 3,	TF,	printargs,		"o32_statfs64"	}, /* 4255 */
 	{ 2,	TD,	printargs,		"o32_fstatfs64"	}, /* 4256 */
 	{ 3,	0,	printargs,		"o32_timer_create"	}, /* 4257 */
