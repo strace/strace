@@ -334,6 +334,11 @@ sys_mmap(struct tcb *tcp)
 #endif /* !HAVE_LONG_LONG_OFF_T */
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
+/* TODO: comment which arches use this routine.
+ * For one, does ALPHA on Linux use this??
+ * From code it seems that it might use 7 or 8 registers,
+ * which is strange - Linux syscalls can pass maximum of 6 parameters!
+ */
 int
 sys_mmap64(struct tcb *tcp)
 {
@@ -362,12 +367,17 @@ sys_mmap64(struct tcb *tcp)
 #endif
 		/* fd */
 		tprintf(", ");
-	/* BUG?! should be u_arg[4] (without tcp->)? */
-		printfd(tcp, tcp->u_arg[4]);
+		printfd(tcp, u_arg[4]);
 		/* offset */
-	/* BUG?! on non-ALPHA linux, offset will be not in tcp->u_arg,
-	 * but in local u_arg, but printllval prints tcp->u_arg! */
+#if !defined(LINUX) || defined(ALPHA)
 		printllval(tcp, ", %#llx", 5);
+#else
+		/* NOTE: not verified that [5] and [6] should be used.
+		 * It's possible that long long is 64-bit aligned in memory
+		 * and we need to use [6] and [7] here instead:
+		 */
+		tprintf(", %#llx", LONG_LONG(u_arg[5], u_arg[6]));
+#endif
 	}
 	return RVAL_HEX;
 }
