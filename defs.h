@@ -705,7 +705,7 @@ extern int current_personality;
 extern const int personality_wordsize[];
 
 struct sysent {
-	int	nargs;
+	unsigned nargs;
 	int	sys_flags;
 	int	(*sys_func)();
 	const char *sys_name;

@@ -122,7 +122,7 @@ while (<MASTER>) {
 
 	if ($1 > $sysnum) { # syscall gap
 	    while($sysnum < $1) {
-		print "  { -1,\t0,\tprintargs,\t\"SYS_$sysnum\"\t}, /* $sysnum */\n";
+		print "  { MA,\t0,\tprintargs,\t\"SYS_$sysnum\"\t}, /* $sysnum */\n";
 		$sysnum++;
 	    }
 	} elsif ($1 < $sysnum) {

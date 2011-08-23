@@ -45,8 +45,8 @@
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 14 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 15 */
 	{ 3,	TF,	sys_chown,		"lchown"	}, /* 16 */
-	{ -1,	0,	printargs,		"SYS_17"	}, /* 17 */
-	{ -1,	0,	printargs,		"SYS_18"	}, /* 18 */
+	{ MA,	0,	printargs,		"SYS_17"	}, /* 17 */
+	{ MA,	0,	printargs,		"SYS_18"	}, /* 18 */
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
@@ -56,14 +56,14 @@
 	{ 1,	0,	sys_stime,		"stime"		}, /* 25 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 26 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 27 */
-	{ -1,	0,	printargs,		"SYS_28"	}, /* 28 */
+	{ MA,	0,	printargs,		"SYS_28"	}, /* 28 */
 	{ 0,	TS,	sys_pause,		"pause"		}, /* 29 */
 	{ 2,	TF,	sys_utime,		"utime"		}, /* 30 */
-	{ -1,	0,	printargs,		"SYS_31"	}, /* 31 */
-	{ -1,	0,	printargs,		"SYS_32"	}, /* 32 */
+	{ MA,	0,	printargs,		"SYS_31"	}, /* 31 */
+	{ MA,	0,	printargs,		"SYS_32"	}, /* 32 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 33 */
 	{ 1,	0,	sys_nice,		"nice"		}, /* 34 */
-	{ -1,	0,	printargs,		"SYS_35"	}, /* 35 */
+	{ MA,	0,	printargs,		"SYS_35"	}, /* 35 */
 	{ 0,	0,	sys_sync,		"sync"		}, /* 36 */
 	{ 2,	TS,	sys_kill,		"kill"		}, /* 37 */
 	{ 2,	TF,	sys_rename,		"rename"	}, /* 38 */
@@ -72,22 +72,22 @@
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 41 */
 	{ 1,	TD,	sys_pipe,		"pipe"		}, /* 42 */
 	{ 1,	0,	sys_times,		"times"		}, /* 43 */
-	{ -1,	0,	printargs,		"SYS_44"	}, /* 44 */
+	{ MA,	0,	printargs,		"SYS_44"	}, /* 44 */
 	{ 1,	0,	sys_brk,		"brk"		}, /* 45 */
-	{ -1,	0,	printargs,		"SYS_46"	}, /* 46 */
-	{ -1,	0,	printargs,		"SYS_47"	}, /* 47 */
+	{ MA,	0,	printargs,		"SYS_46"	}, /* 46 */
+	{ MA,	0,	printargs,		"SYS_47"	}, /* 47 */
 	{ 3,	TS,	sys_signal,		"signal"	}, /* 48 */
 	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 49 */
 	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 52 */
-	{ -1,	0,	printargs,		"SYS_53"	}, /* 53 */
+	{ MA,	0,	printargs,		"SYS_53"	}, /* 53 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 54 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"		}, /* 55 */
-	{ -1,	0,	printargs,		"SYS_56"	}, /* 56 */
+	{ MA,	0,	printargs,		"SYS_56"	}, /* 56 */
 	{ 2,	0,	sys_setpgid,		"setpgid"	}, /* 57 */
-	{ -1,	0,	printargs,		"SYS_58"	}, /* 58 */
-	{ -1,	0,	printargs,		"SYS_59"	}, /* 59 */
+	{ MA,	0,	printargs,		"SYS_58"	}, /* 58 */
+	{ MA,	0,	printargs,		"SYS_59"	}, /* 59 */
 	{ 1,	0,	sys_umask,		"umask"		}, /* 60 */
 	{ 1,	TF,	sys_chroot,		"chroot"	}, /* 61 */
 	{ 2,	0,	sys_ustat,		"ustat"		}, /* 62 */
@@ -96,8 +96,8 @@
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 65 */
 	{ 0,	0,	sys_setsid,		"setsid"	}, /* 66 */
 	{ 3,	TS,	sys_sigaction,		"sigaction"	}, /* 67 */
-	{ -1,	0,	printargs,		"SYS_68"	}, /* 68 */
-	{ -1,	0,	printargs,		"SYS_69"	}, /* 69 */
+	{ MA,	0,	printargs,		"SYS_68"	}, /* 68 */
+	{ MA,	0,	printargs,		"SYS_69"	}, /* 69 */
 	{ 2,	0,	sys_setreuid,		"setreuid"	}, /* 70 */
 	{ 2,	0,	sys_setregid,		"setregid"	}, /* 71 */
 	{ 3,	TS,	sys_sigsuspend,		"sigsuspend"	}, /* 72 */
@@ -110,9 +110,9 @@
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */
 	{ 2,	0,	sys_getgroups,		"getgroups"	}, /* 80 */
 	{ 2,	0,	sys_setgroups,		"setgroups"	}, /* 81 */
-	{ -1,	0,	printargs,		"SYS_82"	}, /* 82 */
+	{ MA,	0,	printargs,		"SYS_82"	}, /* 82 */
 	{ 2,	TF,	sys_symlink,		"symlink"	}, /* 83 */
-	{ -1,	0,	printargs,		"SYS_84"	}, /* 84 */
+	{ MA,	0,	printargs,		"SYS_84"	}, /* 84 */
 	{ 3,	TF,	sys_readlink,		"readlink"	}, /* 85 */
 	{ 1,	TF,	sys_uselib,		"uselib"	}, /* 86 */
 	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 87 */
@@ -126,7 +126,7 @@
 	{ 3,	TD,	sys_fchown,		"fchown"	}, /* 95 */
 	{ 2,	0,	sys_getpriority,	"getpriority"	}, /* 96 */
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 97 */
-	{ -1,	0,	printargs,		"SYS_98"	}, /* 98 */
+	{ MA,	0,	printargs,		"SYS_98"	}, /* 98 */
 	{ 2,	TF,	sys_statfs,		"statfs"	}, /* 99 */
 	{ 2,	TD,	sys_fstatfs,		"fstatfs"	}, /* 100 */
 	{ 3,	0,	sys_ioperm,		"ioperm"	}, /* 101 */
@@ -137,11 +137,11 @@
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 106 */
 	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 107 */
 	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 108 */
-	{ -1,	0,	printargs,		"SYS_109"	}, /* 109 */
-	{ -1,	0,	printargs,		"SYS_110"	}, /* 110 */
+	{ MA,	0,	printargs,		"SYS_109"	}, /* 109 */
+	{ MA,	0,	printargs,		"SYS_110"	}, /* 110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 111 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 112 */
-	{ -1,	0,	printargs,		"SYS_113"	}, /* 113 */
+	{ MA,	0,	printargs,		"SYS_113"	}, /* 113 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 114 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
@@ -151,7 +151,7 @@
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
-	{ -1,	0,	printargs,		"SYS_123"	}, /* 123 */
+	{ MA,	0,	printargs,		"SYS_123"	}, /* 123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
@@ -194,7 +194,7 @@
 	{ 5,	0,	sys_mremap,		"mremap"	}, /* 163 */
 	{ 3,	0,	sys_setresuid,		"setresuid"	}, /* 164 */
 	{ 3,	0,	sys_getresuid,		"getresuid"	}, /* 165 */
-	{ -1,	0,	printargs,		"SYS_166"	}, /* 166 */
+	{ MA,	0,	printargs,		"SYS_166"	}, /* 166 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 167 */
 	{ 3,	TD,	sys_poll,		"poll"		}, /* 168 */
 	{ 3,	0,	printargs,		"nfsservctl"	}, /* 169 */
@@ -270,7 +270,7 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 239 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 240 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 241 */
-	{ -1,	0,	printargs,		"SYS_242"	}, /* 242 */
+	{ MA,	0,	printargs,		"SYS_242"	}, /* 242 */
 	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 243 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 244 */
 	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 245 */

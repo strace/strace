@@ -112,6 +112,7 @@
 #define TP TRACE_PROCESS
 #define TS TRACE_SIGNAL
 #define NF SYSCALL_NEVER_FAILS
+#define MA MAX_ARGS
 
 static const struct sysent sysent0[] = {
 #include "syscallent.h"
@@ -137,6 +138,7 @@ static const struct sysent sysent2[] = {
 #undef TP
 #undef TS
 #undef NF
+#undef MA
 
 
 /*
