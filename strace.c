@@ -119,8 +119,9 @@ static char *username = NULL;
 static uid_t run_uid;
 static gid_t run_gid;
 
-int acolumn = DEFAULT_ACOLUMN;
 int max_strlen = DEFAULT_STRLEN;
+static int acolumn = DEFAULT_ACOLUMN;
+static char *acolumn_spaces;
 static char *outfname = NULL;
 static FILE *outf;
 static int curcol;
@@ -1033,6 +1034,8 @@ main(int argc, char *argv[])
 			break;
 		case 'a':
 			acolumn = atoi(optarg);
+			if (acolumn < 0)
+				error_msg_and_die("Bad column width '%s'", optarg);
 			break;
 		case 'e':
 			qualify(optarg);
@@ -1085,6 +1088,12 @@ main(int argc, char *argv[])
 			break;
 		}
 	}
+
+	acolumn_spaces = malloc(acolumn + 1);
+	if (!acolumn_spaces)
+		error_msg_and_die("Out of memory");
+	memset(acolumn_spaces, ' ', acolumn);
+	acolumn_spaces[acolumn] = '\0';
 
 	if ((optind == argc) == !pflag_seen)
 		usage(stderr, 1);
@@ -2641,7 +2650,7 @@ printleader(struct tcb *tcp)
 		if (tcp_last->ptrace_errno) {
 			if (tcp_last->flags & TCB_INSYSCALL) {
 				tprintf(" <unavailable>) ");
-				tabto(acolumn);
+				tabto();
 			}
 			tprintf("= ? <unavailable>\n");
 			tcp_last->ptrace_errno = 0;
@@ -2687,10 +2696,10 @@ printleader(struct tcb *tcp)
 }
 
 void
-tabto(int col)
+tabto(void)
 {
-	if (curcol < col)
-		tprintf("%*s", col - curcol, "");
+	if (curcol < acolumn)
+		tprintf(acolumn_spaces + curcol);
 }
 
 void

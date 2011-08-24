@@ -2334,7 +2334,7 @@ trace_syscall_exiting(struct tcb *tcp)
 
 	if (res != 1) {
 		tprintf(") ");
-		tabto(acolumn);
+		tabto();
 		tprintf("= ? <unavailable>");
 		printtrailer();
 		tcp->flags &= ~TCB_INSYSCALL;
@@ -2359,7 +2359,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 
 	tprintf(") ");
-	tabto(acolumn);
+	tabto();
 	u_error = tcp->u_error;
 	if (!SCNO_IN_RANGE(tcp->scno) ||
 	    qual_flags[tcp->scno] & QUAL_RAW) {
