@@ -2290,14 +2290,14 @@ trace_syscall_exiting(struct tcb *tcp)
 {
 	int sys_res;
 	struct timeval tv;
-	int res, scno_good;
+	int res;
 	long u_error;
 
 	/* Measure the exit time as early as possible to avoid errors. */
 	if (dtime || cflag)
 		gettimeofday(&tv, NULL);
 
-	scno_good = res = get_syscall_result(tcp);
+	res = get_syscall_result(tcp);
 	if (res == 0)
 		return res;
 	if (res == 1)
@@ -2317,14 +2317,10 @@ trace_syscall_exiting(struct tcb *tcp)
 
 	if (tcp->flags & TCB_REPRINT) {
 		printleader(tcp);
-		tprintf("<... ");
-		if (scno_good != 1)
-			tprintf("????");
-		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
-			tprintf("syscall_%lu", tcp->scno);
+		if (tcp->scno >= nsyscalls || tcp->scno < 0)
+			tprintf("<... syscall_%lu resumed> ", tcp->scno);
 		else
-			tprintf("%s", sysent[tcp->scno].sys_name);
-		tprintf(" resumed> ");
+			tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
 	}
 
 	if (cflag) {
