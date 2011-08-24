@@ -1296,124 +1296,18 @@ get_scno_on_sysenter(struct tcb *tcp)
 static int
 get_scno_on_sysexit(struct tcb *tcp)
 {
-	long scno = 0;
-
 #ifdef LINUX
 # if defined(S390) || defined(S390X)
-	if (tcp->flags & TCB_WAITEXECVE) {
-		/*
-		 * When the execve system call completes successfully, the
-		 * new process still has -ENOSYS (old style) or __NR_execve
-		 * (new style) in gpr2.  We cannot recover the scno again
-		 * by disassembly, because the image that executed the
-		 * syscall is gone now.  Fortunately, we don't want it.  We
-		 * leave the flag set so that syscall_fixup can fake the
-		 * result.
-		 */
-		return 1;
-	}
-
-	if (upeek(tcp, PT_GPR2, &syscall_mode) < 0)
-		return -1;
-
-	if (syscall_mode != -ENOSYS) {
-		/*
-		 * Since kernel version 2.5.44 the scno gets passed in gpr2.
-		 */
-		scno = syscall_mode;
-	} else {
-		/*
-		 * Old style of "passing" the scno via the SVC instruction.
-		 */
-
-		long opcode, offset_reg, tmp;
-		void * svc_addr;
-		static const int gpr_offset[16] = {
-				PT_GPR0,  PT_GPR1,  PT_ORIGGPR2, PT_GPR3,
-				PT_GPR4,  PT_GPR5,  PT_GPR6,     PT_GPR7,
-				PT_GPR8,  PT_GPR9,  PT_GPR10,    PT_GPR11,
-				PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15
-		};
-
-		if (upeek(tcp, PT_PSWADDR, &pc) < 0)
-			return -1;
-		errno = 0;
-		opcode = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(pc-sizeof(long)), 0);
-		if (errno) {
-			perror("peektext(pc-oneword)");
-			return -1;
-		}
-
-		/*
-		 *  We have to check if the SVC got executed directly or via an
-		 *  EXECUTE instruction. In case of EXECUTE it is necessary to do
-		 *  instruction decoding to derive the system call number.
-		 *  Unfortunately the opcode sizes of EXECUTE and SVC are differently,
-		 *  so that this doesn't work if a SVC opcode is part of an EXECUTE
-		 *  opcode. Since there is no way to find out the opcode size this
-		 *  is the best we can do...
-		 */
-
-		if ((opcode & 0xff00) == 0x0a00) {
-			/* SVC opcode */
-			scno = opcode & 0xff;
-		}
-		else {
-			/* SVC got executed by EXECUTE instruction */
-
-			/*
-			 *  Do instruction decoding of EXECUTE. If you really want to
-			 *  understand this, read the Principles of Operations.
-			 */
-			svc_addr = (void *) (opcode & 0xfff);
-
-			tmp = 0;
-			offset_reg = (opcode & 0x000f0000) >> 16;
-			if (offset_reg && (upeek(tcp, gpr_offset[offset_reg], &tmp) < 0))
-				return -1;
-			svc_addr += tmp;
-
-			tmp = 0;
-			offset_reg = (opcode & 0x0000f000) >> 12;
-			if (offset_reg && (upeek(tcp, gpr_offset[offset_reg], &tmp) < 0))
-				return -1;
-			svc_addr += tmp;
-
-			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, svc_addr, 0);
-			if (errno)
-				return -1;
-#  if defined(S390X)
-			scno >>= 48;
-#  else
-			scno >>= 16;
-#  endif
-			tmp = 0;
-			offset_reg = (opcode & 0x00f00000) >> 20;
-			if (offset_reg && (upeek(tcp, gpr_offset[offset_reg], &tmp) < 0))
-				return -1;
-
-			scno = (scno | tmp) & 0xff;
-		}
-	}
 # elif defined (POWERPC)
-	if (upeek(tcp, sizeof(unsigned long)*PT_R0, &scno) < 0)
-		return -1;
 # elif defined(AVR32)
 	/*
 	 * Read complete register set in one go.
 	 */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
 		return -1;
-
 # elif defined(BFIN)
-	if (upeek(tcp, PT_ORIG_P0, &scno))
-		return -1;
 # elif defined (I386)
-	if (upeek(tcp, 4*ORIG_EAX, &scno) < 0)
-		return -1;
 # elif defined (X86_64)
-	if (upeek(tcp, 8*ORIG_RAX, &scno) < 0)
-		return -1;
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
@@ -1428,71 +1322,7 @@ get_scno_on_sysexit(struct tcb *tcp)
 	 */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 		return -1;
-
-	/*
-	 * We only need to grab the syscall number on syscall entry.
-	 */
-	if (regs.ARM_ip == 0) {
-		/*
-		 * Note: we only deal with only 32-bit CPUs here.
-		 */
-		if (regs.ARM_cpsr & 0x20) {
-			/*
-			 * Get the Thumb-mode system call number
-			 */
-			scno = regs.ARM_r7;
-		} else {
-			/*
-			 * Get the ARM-mode system call number
-			 */
-			errno = 0;
-			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(regs.ARM_pc - 4), NULL);
-			if (errno)
-				return -1;
-
-		/* FIXME: bogus check? it is already done on entering before,
-		 * so we never can see it here?
-		 */
-			if (scno == 0 && (tcp->flags & TCB_WAITEXECVE)) {
-				tcp->flags &= ~TCB_WAITEXECVE;
-				return 0;
-			}
-
-			/* Handle the EABI syscall convention.  We do not
-			   bother converting structures between the two
-			   ABIs, but basic functionality should work even
-			   if strace and the traced program have different
-			   ABIs.  */
-			if (scno == 0xef000000) {
-				scno = regs.ARM_r7;
-			} else {
-				if ((scno & 0x0ff00000) != 0x0f900000) {
-					fprintf(stderr, "syscall: unknown syscall trap 0x%08lx\n",
-						scno);
-					return -1;
-				}
-
-				/*
-				 * Fixup the syscall number
-				 */
-				scno &= 0x000fffff;
-			}
-		}
-		if (scno & 0x0f0000) {
-			/*
-			 * Handle ARM specific syscall
-			 */
-			set_personality(1);
-			scno &= 0x0000ffff;
-		} else
-			set_personality(0);
-
-		fprintf(stderr, "pid %d stray syscall exit\n", tcp->pid);
-		tcp->flags &= ~TCB_INSYSCALL;
-	}
 # elif defined (M68K)
-	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
-		return -1;
 # elif defined (LINUX_MIPSN32)
 	unsigned long long regs[38];
 
@@ -1515,47 +1345,15 @@ get_scno_on_sysexit(struct tcb *tcp)
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
 # elif defined(HPPA)
-	if (upeek(tcp, PT_GR20, &scno) < 0)
-		return -1;
 # elif defined(SH)
-	/*
-	 * In the new syscall ABI, the system call number is in R3.
-	 */
-	if (upeek(tcp, 4*(REG_REG0+3), &scno) < 0)
-		return -1;
-
-	if (scno < 0) {
-		/* Odd as it may seem, a glibc bug has been known to cause
-		   glibc to issue bogus negative syscall numbers.  So for
-		   our purposes, make strace print what it *should* have been */
-		long correct_scno = (scno & 0xff);
-		if (debug)
-			fprintf(stderr,
-				"Detected glibc bug: bogus system call"
-				" number = %ld, correcting to %ld\n",
-				scno,
-				correct_scno);
-		scno = correct_scno;
-	}
 # elif defined(SH64)
-	if (upeek(tcp, REG_SYSCALL, &scno) < 0)
-		return -1;
-	scno &= 0xFFFF;
 # elif defined(CRISV10) || defined(CRISV32)
-	if (upeek(tcp, 4*PT_R9, &scno) < 0)
-		return -1;
 # elif defined(TILE)
-	if (upeek(tcp, PTREGS_OFFSET_REG(10), &scno) < 0)
-		return -1;
 # elif defined(MICROBLAZE)
-	if (upeek(tcp, 0, &scno) < 0)
-		return -1;
 # endif
 #endif /* LINUX */
 
 #ifdef SUNOS4
-	if (upeek(tcp, uoff(u_arg[7]), &scno) < 0)
-		return -1;
 #elif defined(SH)
 	/* new syscall ABI returns result in R0 */
 	if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
@@ -1567,24 +1365,11 @@ get_scno_on_sysexit(struct tcb *tcp)
 #endif
 
 #ifdef USE_PROCFS
-# ifdef HAVE_PR_SYSCALL
-	scno = tcp->status.PR_SYSCALL;
-# else
-#  ifndef FREEBSD
-	scno = tcp->status.PR_WHAT;
-#  else
+# ifndef HAVE_PR_SYSCALL
+#  ifdef FREEBSD
 	if (pread(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
 		perror("pread");
 		return -1;
-	}
-	switch (regs.r_eax) {
-	case SYS_syscall:
-	case SYS___syscall:
-		pread(tcp->pfd, &scno, sizeof(scno), regs.r_esp + sizeof(int));
-		break;
-	default:
-		scno = regs.r_eax;
-		break;
 	}
 #  endif /* FREEBSD */
 # endif /* !HAVE_PR_SYSCALL */
