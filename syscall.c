@@ -681,7 +681,7 @@ sys_indir(struct tcb *tcp)
 	if (entering(tcp)) {
 		scno = tcp->u_arg[0];
 		if (!SCNO_IN_RANGE(scno)) {
-			fprintf(stderr, "Bogus syscall: %u\n", scno);
+			fprintf(stderr, "Bogus syscall: %ld\n", scno);
 			return 0;
 		}
 		nargs = sysent[scno].nargs;
