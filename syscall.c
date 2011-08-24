@@ -754,12 +754,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 
 #ifdef LINUX
 # if defined(S390) || defined(S390X)
-	if (tcp->flags & TCB_WAITEXECVE) {
-		/* This is the post-execve SIGTRAP. */
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
-
 	if (upeek(tcp, PT_GPR2, &syscall_mode) < 0)
 		return -1;
 
@@ -843,11 +837,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 # elif defined (POWERPC)
 	if (upeek(tcp, sizeof(unsigned long)*PT_R0, &scno) < 0)
 		return -1;
-	/* Check if this is the post-execve SIGTRAP. */
-	if (scno == 0 && (tcp->flags & TCB_WAITEXECVE)) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 #  ifdef POWERPC64
 	/* TODO: speed up strace by not doing this at every syscall.
 	 * We only need to do it after execve.
@@ -872,19 +861,10 @@ get_scno_on_sysenter(struct tcb *tcp)
 	}
 #  endif
 # elif defined(AVR32)
-	/*
-	 * Read complete register set in one go.
-	 */
+	/* Read complete register set in one go. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
 		return -1;
-
 	scno = regs.r8;
-
-	/* Check if this is the post-execve SIGTRAP. */
-	if (tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 # elif defined(BFIN)
 	if (upeek(tcp, PT_ORIG_P0, &scno))
 		return -1;
@@ -969,15 +949,8 @@ get_scno_on_sysenter(struct tcb *tcp)
 		if (upeek(tcp, PT_R15, &scno) < 0)
 			return -1;
 	}
-	/* Check if this is the post-execve SIGTRAP. */
-	if (tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 # elif defined (ARM)
-	/*
-	 * Read complete register set in one go.
-	 */
+	/* Read complete register set in one go. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 		return -1;
 
@@ -985,12 +958,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 	 * We only need to grab the syscall number on syscall entry.
 	 */
 	if (regs.ARM_ip == 0) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-
 		/*
 		 * Note: we only deal with only 32-bit CPUs here.
 		 */
@@ -1007,14 +974,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(regs.ARM_pc - 4), NULL);
 			if (errno)
 				return -1;
-
-		/* FIXME: bogus check? it is already done before,
-		 * so we never can see it here?
-		 */
-			if (scno == 0 && (tcp->flags & TCB_WAITEXECVE)) {
-				tcp->flags &= ~TCB_WAITEXECVE;
-				return 0;
-			}
 
 			/* Handle the EABI syscall convention.  We do not
 			   bother converting structures between the two
@@ -1061,13 +1020,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 	r2 = regs[REG_V0];
 
 	scno = r2;
-
-	/* Check if this is the post-execve SIGTRAP. */
-	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
-
 	if (scno < 0 || scno > nsyscalls) {
 		if (a3 == 0 || a3 == -1) {
 			if (debug)
@@ -1081,12 +1033,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 	if (upeek(tcp, REG_V0, &scno) < 0)
 		return -1;
 
-	/* Check if this is the post-execve SIGTRAP. */
-	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
-
 	if (scno < 0 || scno > nsyscalls) {
 		if (a3 == 0 || a3 == -1) {
 			if (debug)
@@ -1097,15 +1043,8 @@ get_scno_on_sysenter(struct tcb *tcp)
 # elif defined (ALPHA)
 	if (upeek(tcp, REG_A3, &a3) < 0)
 		return -1;
-
 	if (upeek(tcp, REG_R0, &scno) < 0)
 		return -1;
-
-	/* Check if this is the post-execve SIGTRAP. */
-	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 
 	/*
 	 * Do some sanity checks to figure out if it's
@@ -1162,11 +1101,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 		set_personality(1);
 		break;
 	default:
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
 #  if defined (SPARC64)
 		fprintf(stderr, "syscall: unknown syscall trap %08lx %016lx\n", trap, regs.tpc);
 #  else
@@ -1187,11 +1121,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 # elif defined(HPPA)
 	if (upeek(tcp, PT_GR20, &scno) < 0)
 		return -1;
-	/* Check if this is the post-execve SIGTRAP. */
-	if (tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 # elif defined(SH)
 	/*
 	 * In the new syscall ABI, the system call number is in R3.
@@ -1212,34 +1141,16 @@ get_scno_on_sysenter(struct tcb *tcp)
 				correct_scno);
 		scno = correct_scno;
 	}
-
-	/* Check if this is the post-execve SIGTRAP. */
-	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 # elif defined(SH64)
 	if (upeek(tcp, REG_SYSCALL, &scno) < 0)
 		return -1;
 	scno &= 0xFFFF;
-
-	/* Check if this is the post-execve SIGTRAP. */
-	if (tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 # elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp, 4*PT_R9, &scno) < 0)
 		return -1;
 # elif defined(TILE)
 	if (upeek(tcp, PTREGS_OFFSET_REG(10), &scno) < 0)
 		return -1;
-
-	/* Check if this is the post-execve SIGTRAP. */
-	if (tcp->flags & TCB_WAITEXECVE) {
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
 # elif defined(MICROBLAZE)
 	if (upeek(tcp, 0, &scno) < 0)
 		return -1;
@@ -1300,9 +1211,7 @@ get_scno_on_sysexit(struct tcb *tcp)
 # if defined(S390) || defined(S390X)
 # elif defined (POWERPC)
 # elif defined(AVR32)
-	/*
-	 * Read complete register set in one go.
-	 */
+	/* Read complete register set in one go. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
 		return -1;
 # elif defined(BFIN)
@@ -1321,9 +1230,7 @@ get_scno_on_sysexit(struct tcb *tcp)
 	if (upeek(tcp, PT_R10, &r10) < 0)
 		return -1;
 # elif defined (ARM)
-	/*
-	 * Read complete register set in one go.
-	 */
+	/* Read complete register set in one go. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 		return -1;
 # elif defined (M68K)
@@ -1511,6 +1418,7 @@ syscall_fixup(struct tcb *tcp)
 		  == (TCB_INSYSCALL|TCB_WAITEXECVE))
 		 && (gpr2 == -ENOSYS || gpr2 == tcp->scno)) {
 		/*
+		 * Return from execve.
 		 * Fake a return value of zero.  We leave the TCB_WAITEXECVE
 		 * flag set for the post-execve SIGTRAP to see and reset.
 		 */
@@ -2308,6 +2216,14 @@ trace_syscall_entering(struct tcb *tcp)
 {
 	int res, scno_good;
 
+#if defined TCB_WAITEXECVE
+	if (tcp->flags & TCB_WAITEXECVE) {
+		/* This is the post-execve SIGTRAP. */
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
+	}
+#endif
+
 	scno_good = res = get_scno_on_sysenter(tcp);
 	if (res == 0)
 		return res;
@@ -2477,9 +2393,6 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (dtime || cflag)
 		gettimeofday(&tv, NULL);
 
-	/* BTW, why we don't just memorize syscall no. on entry
-	 * in tcp->something?
-	 */
 	scno_good = res = get_scno_on_sysexit(tcp);
 	if (res == 0)
 		return res;
