@@ -1488,7 +1488,7 @@ proc_open(struct tcb *tcp, int attaching)
 			}
 			if (tcp->status.PR_WHY == PR_SYSENTRY) {
 				tcp->flags &= ~TCB_INSYSCALL;
-				get_scno_on_sysenter(tcp);
+				get_scno(tcp);
 				if (known_scno(tcp) == SYS_execve)
 					break;
 			}

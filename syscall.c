@@ -748,7 +748,7 @@ struct reg regs; /* TODO: make static? */
 static
 #endif
 int
-get_scno_on_sysenter(struct tcb *tcp)
+get_scno(struct tcb *tcp)
 {
 	long scno = 0;
 
@@ -1205,7 +1205,7 @@ get_scno_on_sysenter(struct tcb *tcp)
  *    ("????" etc) and bail out.
  */
 static int
-get_scno_on_sysexit(struct tcb *tcp)
+get_syscall_result(struct tcb *tcp)
 {
 #ifdef LINUX
 # if defined(S390) || defined(S390X)
@@ -1776,174 +1776,6 @@ get_error(struct tcb *tcp)
 	return 1;
 }
 
-int
-force_result(struct tcb *tcp, int error, long rval)
-{
-#ifdef LINUX
-# if defined(S390) || defined(S390X)
-	gpr2 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)PT_GPR2, gpr2) < 0)
-		return -1;
-# elif defined(I386)
-	eax = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(EAX * 4), eax) < 0)
-		return -1;
-# elif defined(X86_64)
-	rax = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(RAX * 8), rax) < 0)
-		return -1;
-# elif defined(IA64)
-	if (ia32) {
-		r8 = error ? -error : rval;
-		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R8), r8) < 0)
-			return -1;
-	}
-	else {
-		if (error) {
-			r8 = error;
-			r10 = -1;
-		}
-		else {
-			r8 = rval;
-			r10 = 0;
-		}
-		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R8), r8) < 0 ||
-		    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R10), r10) < 0)
-			return -1;
-	}
-# elif defined(BFIN)
-	r0 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)PT_R0, r0) < 0)
-		return -1;
-# elif defined(MIPS)
-	if (error) {
-		r2 = error;
-		a3 = -1;
-	}
-	else {
-		r2 = rval;
-		a3 = 0;
-	}
-	/* PTRACE_POKEUSER is OK even for n32 since rval is only a long.  */
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), a3) < 0 ||
-	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), r2) < 0)
-		return -1;
-# elif defined(POWERPC)
-	if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
-		return -1;
-	if (error) {
-		flags |= SO_MASK;
-		result = error;
-	}
-	else {
-		flags &= ~SO_MASK;
-		result = rval;
-	}
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(sizeof(unsigned long)*PT_CCR), flags) < 0 ||
-	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(sizeof(unsigned long)*PT_R3), result) < 0)
-		return -1;
-# elif defined(M68K)
-	d0 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_D0), d0) < 0)
-		return -1;
-# elif defined(ARM)
-	regs.ARM_r0 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*0), regs.ARM_r0) < 0)
-		return -1;
-# elif defined(AVR32)
-	regs.r12 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)REG_R12, regs.r12) < 0)
-		return -1;
-# elif defined(ALPHA)
-	if (error) {
-		a3 = -1;
-		r0 = error;
-	}
-	else {
-		a3 = 0;
-		r0 = rval;
-	}
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), a3) < 0 ||
-	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_R0), r0) < 0)
-		return -1;
-# elif defined(SPARC)
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
-		return -1;
-	if (error) {
-		regs.psr |= PSR_C;
-		regs.u_regs[U_REG_O0] = error;
-	}
-	else {
-		regs.psr &= ~PSR_C;
-		regs.u_regs[U_REG_O0] = rval;
-	}
-	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0)
-		return -1;
-# elif defined(SPARC64)
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
-		return -1;
-	if (error) {
-		regs.tstate |= 0x1100000000UL;
-		regs.u_regs[U_REG_O0] = error;
-	}
-	else {
-		regs.tstate &= ~0x1100000000UL;
-		regs.u_regs[U_REG_O0] = rval;
-	}
-	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0)
-		return -1;
-# elif defined(HPPA)
-	r28 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR28), r28) < 0)
-		return -1;
-# elif defined(SH)
-	r0 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*REG_REG0), r0) < 0)
-		return -1;
-# elif defined(SH64)
-	r9 = error ? -error : rval;
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)REG_GENERAL(9), r9) < 0)
-		return -1;
-# endif
-#endif /* LINUX */
-
-#ifdef SUNOS4
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_error),
-		   error << 24) < 0 ||
-	    ptrace(PTRACE_POKEUSER, tcp->pid, (char*)uoff(u_rval1), rval) < 0)
-		return -1;
-#endif /* SUNOS4 */
-
-#ifdef SVR4
-	/* XXX no clue */
-	return -1;
-#endif /* SVR4 */
-
-#ifdef FREEBSD
-	if (pread(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
-		perror("pread");
-		return -1;
-	}
-	if (error) {
-		regs.r_eflags |= PSL_C;
-		regs.r_eax = error;
-	}
-	else {
-		regs.r_eflags &= ~PSL_C;
-		regs.r_eax = rval;
-	}
-	if (pwrite(tcp->pfd_reg, &regs, sizeof(regs), 0) < 0) {
-		perror("pwrite");
-		return -1;
-	}
-#endif /* FREEBSD */
-
-	/* All branches reach here on success (only).  */
-	tcp->u_error = error;
-	tcp->u_rval = rval;
-	return 0;
-}
-
 static int
 syscall_enter(struct tcb *tcp)
 {
@@ -2224,7 +2056,7 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 #endif
 
-	scno_good = res = get_scno_on_sysenter(tcp);
+	scno_good = res = get_scno(tcp);
 	if (res == 0)
 		return res;
 	if (res == 1)
@@ -2393,7 +2225,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (dtime || cflag)
 		gettimeofday(&tv, NULL);
 
-	scno_good = res = get_scno_on_sysexit(tcp);
+	scno_good = res = get_syscall_result(tcp);
 	if (res == 0)
 		return res;
 	if (res == 1)
