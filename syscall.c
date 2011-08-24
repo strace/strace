@@ -2022,7 +2022,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = gpr2;
-		u_error = 0;
 	}
 # elif defined(I386)
 	if (check_errno && is_negated_errno(eax)) {
@@ -2031,7 +2030,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = eax;
-		u_error = 0;
 	}
 # elif defined(X86_64)
 	if (check_errno && is_negated_errno(rax)) {
@@ -2040,7 +2038,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = rax;
-		u_error = 0;
 	}
 # elif defined(IA64)
 	if (ia32) {
@@ -2053,7 +2050,6 @@ get_error(struct tcb *tcp)
 		}
 		else {
 			tcp->u_rval = err;
-			u_error = 0;
 		}
 	} else {
 		if (check_errno && r10) {
@@ -2061,7 +2057,6 @@ get_error(struct tcb *tcp)
 			u_error = r8;
 		} else {
 			tcp->u_rval = r8;
-			u_error = 0;
 		}
 	}
 # elif defined(MIPS)
@@ -2070,7 +2065,6 @@ get_error(struct tcb *tcp)
 		u_error = r2;
 	} else {
 		tcp->u_rval = r2;
-		u_error = 0;
 	}
 # elif defined(POWERPC)
 	if (check_errno && is_negated_errno(result)) {
@@ -2079,7 +2073,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = result;
-		u_error = 0;
 	}
 # elif defined(M68K)
 	if (check_errno && is_negated_errno(d0)) {
@@ -2088,7 +2081,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = d0;
-		u_error = 0;
 	}
 # elif defined(ARM)
 	if (check_errno && is_negated_errno(regs.ARM_r0)) {
@@ -2097,7 +2089,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = regs.ARM_r0;
-		u_error = 0;
 	}
 # elif defined(AVR32)
 	if (check_errno && regs.r12 && (unsigned) -regs.r12 < nerrnos) {
@@ -2106,7 +2097,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = regs.r12;
-		u_error = 0;
 	}
 # elif defined(BFIN)
 	if (check_errno && is_negated_errno(r0)) {
@@ -2114,7 +2104,6 @@ get_error(struct tcb *tcp)
 		u_error = -r0;
 	} else {
 		tcp->u_rval = r0;
-		u_error = 0;
 	}
 # elif defined(ALPHA)
 	if (check_errno && a3) {
@@ -2123,7 +2112,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = r0;
-		u_error = 0;
 	}
 # elif defined(SPARC)
 	if (check_errno && regs.psr & PSR_C) {
@@ -2132,7 +2120,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = regs.u_regs[U_REG_O0];
-		u_error = 0;
 	}
 # elif defined(SPARC64)
 	if (check_errno && regs.tstate & 0x1100000000UL) {
@@ -2141,7 +2128,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = regs.u_regs[U_REG_O0];
-		u_error = 0;
 	}
 # elif defined(HPPA)
 	if (check_errno && is_negated_errno(r28)) {
@@ -2150,27 +2136,22 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = r28;
-		u_error = 0;
 	}
 # elif defined(SH)
-	/* interpret R0 as return value or error number */
 	if (check_errno && is_negated_errno(r0)) {
 		tcp->u_rval = -1;
 		u_error = -r0;
 	}
 	else {
 		tcp->u_rval = r0;
-		u_error = 0;
 	}
 # elif defined(SH64)
-	/* interpret result as return value or error number */
 	if (check_errno && is_negated_errno(r9)) {
 		tcp->u_rval = -1;
 		u_error = -r9;
 	}
 	else {
 		tcp->u_rval = r9;
-		u_error = 0;
 	}
 # elif defined(CRISV10) || defined(CRISV32)
 	if (check_errno && r10 && (unsigned) -r10 < nerrnos) {
@@ -2179,11 +2160,9 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = r10;
-		u_error = 0;
 	}
 # elif defined(TILE)
 	long rval;
-	/* interpret result as return value or error number */
 	if (upeek(tcp, PTREGS_OFFSET_REG(0), &rval) < 0)
 		return -1;
 	if (check_errno && rval < 0 && rval > -nerrnos) {
@@ -2192,17 +2171,14 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = rval;
-		u_error = 0;
 	}
 # elif defined(MICROBLAZE)
-	/* interpret result as return value or error number */
 	if (check_errno && is_negated_errno(r3)) {
 		tcp->u_rval = -1;
 		u_error = -r3;
 	}
 	else {
 		tcp->u_rval = r3;
-		u_error = 0;
 	}
 # endif
 #endif /* LINUX */
@@ -2225,11 +2201,9 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = tcp->status.pr_reg[R_O0];
-		u_error = 0;
 	}
 # endif /* SPARC */
 # ifdef I386
-	/* Wanna know how to kill an hour single-stepping? */
 	if (tcp->status.PR_REG[EFL] & 0x1) {
 		tcp->u_rval = -1;
 		u_error = tcp->status.PR_REG[EAX];
@@ -2241,18 +2215,15 @@ get_error(struct tcb *tcp)
 			((unsigned long long) tcp->status.PR_REG[EDX] << 32) +
 			tcp->status.PR_REG[EAX];
 #  endif
-		u_error = 0;
 	}
 # endif /* I386 */
 # ifdef X86_64
-	/* Wanna know how to kill an hour single-stepping? */
 	if (tcp->status.PR_REG[EFLAGS] & 0x1) {
 		tcp->u_rval = -1;
 		u_error = tcp->status.PR_REG[RAX];
 	}
 	else {
 		tcp->u_rval = tcp->status.PR_REG[RAX];
-		u_error = 0;
 	}
 # endif /* X86_64 */
 # ifdef MIPS
@@ -2262,7 +2233,6 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = tcp->status.pr_reg[CTX_V0];
-		u_error = 0;
 	}
 # endif /* MIPS */
 #endif /* SVR4 */
@@ -2273,8 +2243,7 @@ get_error(struct tcb *tcp)
 	} else {
 		tcp->u_rval = regs.r_eax;
 		tcp->u_lrval =
-		  ((unsigned long long) regs.r_edx << 32) +  regs.r_eax;
-	        u_error = 0;
+		  ((unsigned long long) regs.r_edx << 32) + regs.r_eax;
 	}
 #endif /* FREEBSD */
 	tcp->u_error = u_error;
