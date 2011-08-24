@@ -1307,7 +1307,11 @@ get_scno_on_sysexit(struct tcb *tcp)
 		return -1;
 # elif defined(BFIN)
 # elif defined (I386)
+	if (upeek(tcp, 4*EAX, &eax) < 0)
+		return -1;
 # elif defined (X86_64)
+	if (upeek(tcp, 8*RAX, &rax) < 0)
+		return -1;
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
@@ -1468,22 +1472,30 @@ syscall_fixup(struct tcb *tcp)
 #ifdef LINUX
 	/* A common case of "not a syscall entry" is post-execve SIGTRAP */
 #if defined (I386)
-	if (upeek(tcp, 4*EAX, &eax) < 0)
-		return -1;
-	if (eax != -ENOSYS && entering(tcp)) {
-		if (debug)
-			fprintf(stderr, "not a syscall entry (eax = %ld)\n", eax);
-		return 0;
+	/* With PTRACE_O_TRACEEXEC, post-execve SIGTRAP is disabled.
+	 * Every extra ptrace call is expensive, so check EAX
+	 * on syscall entry only if PTRACE_O_TRACEEXEC is not enabled:
+	 */
+	if (entering(tcp) && !(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
+		if (upeek(tcp, 4*EAX, &eax) < 0)
+			return -1;
+		if (eax != -ENOSYS) {
+			if (debug)
+				fprintf(stderr, "not a syscall entry (eax = %ld)\n", eax);
+			return 0;
+		}
 	}
 #elif defined (X86_64)
-	if (upeek(tcp, 8*RAX, &rax) < 0)
-		return -1;
-	if (current_personality == 1)
-		rax = (long int)(int)rax; /* sign extend from 32 bits */
-	if (rax != -ENOSYS && entering(tcp)) {
-		if (debug)
-			fprintf(stderr, "not a syscall entry (rax = %ld)\n", rax);
-		return 0;
+	if (entering(tcp) && !(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
+		if (upeek(tcp, 8*RAX, &rax) < 0)
+			return -1;
+		if (current_personality == 1)
+			rax = (long int)(int)rax; /* sign extend from 32 bits */
+		if (rax != -ENOSYS && entering(tcp)) {
+			if (debug)
+				fprintf(stderr, "not a syscall entry (rax = %ld)\n", rax);
+			return 0;
+		}
 	}
 #elif defined (S390) || defined (S390X)
 	if (upeek(tcp, PT_GPR2, &gpr2) < 0)
