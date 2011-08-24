@@ -675,11 +675,12 @@ getrval2(struct tcb *tcp)
 int
 sys_indir(struct tcb *tcp)
 {
-	int i, scno, nargs;
+	int i, nargs;
+	long scno;
 
 	if (entering(tcp)) {
 		scno = tcp->u_arg[0];
-		if (scno > nsyscalls) {
+		if (!SCNO_IN_RANGE(scno)) {
 			fprintf(stderr, "Bogus syscall: %u\n", scno);
 			return 0;
 		}
@@ -1045,7 +1046,7 @@ get_scno(struct tcb *tcp)
 	r2 = regs[REG_V0];
 
 	scno = r2;
-	if (scno < 0 || scno > nsyscalls) {
+	if (!SCNO_IN_RANGE(scno)) {
 		if (a3 == 0 || a3 == -1) {
 			if (debug)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
@@ -1058,7 +1059,7 @@ get_scno(struct tcb *tcp)
 	if (upeek(tcp, REG_V0, &scno) < 0)
 		return -1;
 
-	if (scno < 0 || scno > nsyscalls) {
+	if (!SCNO_IN_RANGE(scno)) {
 		if (a3 == 0 || a3 == -1) {
 			if (debug)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
@@ -1075,7 +1076,7 @@ get_scno(struct tcb *tcp)
 	 * Do some sanity checks to figure out if it's
 	 * really a syscall entry
 	 */
-	if (scno < 0 || scno > nsyscalls) {
+	if (!SCNO_IN_RANGE(scno)) {
 		if (a3 == 0 || a3 == -1) {
 			if (debug)
 				fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
@@ -1228,7 +1229,7 @@ known_scno(struct tcb *tcp)
 {
 	long scno = tcp->scno;
 #if SUPPORTED_PERSONALITIES > 1
-	if (scno >= 0 && scno < nsyscalls && sysent[scno].native_scno != 0)
+	if (SCNO_IN_RANGE(scno) && sysent[scno].native_scno != 0)
 		scno = sysent[scno].native_scno;
 	else
 #endif
@@ -1425,7 +1426,7 @@ internal_syscall(struct tcb *tcp)
 	 */
 	int (*func)();
 
-	if (tcp->scno < 0 || tcp->scno >= nsyscalls)
+	if (!SCNO_IN_RANGE(tcp->scno))
 		return 0;
 
 	func = sysent[tcp->scno].sys_func;
@@ -1464,7 +1465,7 @@ syscall_enter(struct tcb *tcp)
 #ifdef LINUX
 	int i, nargs;
 
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
+	if (SCNO_IN_RANGE(tcp->scno))
 		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		nargs = tcp->u_nargs = MAX_ARGS;
@@ -1635,7 +1636,7 @@ syscall_enter(struct tcb *tcp)
 #endif /* LINUX */
 #ifdef SUNOS4
 	int i, nargs;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
+	if (SCNO_IN_RANGE(tcp->scno))
 		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		nargs = tcp->u_nargs = MAX_ARGS;
@@ -1653,7 +1654,7 @@ syscall_enter(struct tcb *tcp)
 	 * SGI is broken: even though it has pr_sysarg, it doesn't
 	 * set them on system call entry.  Get a clue.
 	 */
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
+	if (SCNO_IN_RANGE(tcp->scno))
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_nsysarg;
@@ -1671,7 +1672,7 @@ syscall_enter(struct tcb *tcp)
 	/*
 	 * Like SGI, UnixWare doesn't set pr_sysarg until system call exit
 	 */
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
+	if (SCNO_IN_RANGE(tcp->scno))
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_lwp.pr_nsysarg;
@@ -1679,14 +1680,14 @@ syscall_enter(struct tcb *tcp)
 		tcp->u_nargs * sizeof(tcp->u_arg[0]), (char *) tcp->u_arg);
 # elif defined(HAVE_PR_SYSCALL)
 	int i;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
+	if (SCNO_IN_RANGE(tcp->scno))
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = tcp->status.pr_nsysarg;
 	for (i = 0; i < tcp->u_nargs; i++)
 		tcp->u_arg[i] = tcp->status.pr_sysarg[i];
 # elif defined(I386)
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls)
+	if (SCNO_IN_RANGE(tcp->scno))
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		tcp->u_nargs = 5;
@@ -1698,7 +1699,7 @@ syscall_enter(struct tcb *tcp)
 # endif
 #endif /* SVR4 */
 #ifdef FREEBSD
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	if (SCNO_IN_RANGE(tcp->scno) &&
 	    sysent[tcp->scno].nargs > tcp->status.val)
 		tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
@@ -1756,7 +1757,7 @@ trace_syscall_entering(struct tcb *tcp)
 		tcp_last = tcp;
 		if (scno_good != 1)
 			tprintf("????" /* anti-trigraph gap */ "(");
-		else if (tcp->scno >= nsyscalls || tcp->scno < 0)
+		else if (!SCNO_IN_RANGE(tcp->scno))
 			tprintf("syscall_%lu(", tcp->scno);
 		else
 			tprintf("%s(", sysent[tcp->scno].sys_name);
@@ -1857,7 +1858,7 @@ trace_syscall_entering(struct tcb *tcp)
 
 	internal_syscall(tcp);
 
-	if ((tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	if ((SCNO_IN_RANGE(tcp->scno) &&
 	     !(qual_flags[tcp->scno] & QUAL_TRACE)) ||
 	    (tracing_paths && !pathtrace_match(tcp))) {
 		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
@@ -1874,11 +1875,11 @@ trace_syscall_entering(struct tcb *tcp)
 	printleader(tcp);
 	tcp->flags &= ~TCB_REPRINT;
 	tcp_last = tcp;
-	if (tcp->scno >= nsyscalls || tcp->scno < 0)
+	if (!SCNO_IN_RANGE(tcp->scno))
 		tprintf("syscall_%lu(", tcp->scno);
 	else
 		tprintf("%s(", sysent[tcp->scno].sys_name);
-	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
+	if (!SCNO_IN_RANGE(tcp->scno) ||
 	    ((qual_flags[tcp->scno] & QUAL_RAW) &&
 	     sysent[tcp->scno].sys_func != sys_exit))
 		res = printargs(tcp);
@@ -2011,7 +2012,7 @@ get_error(struct tcb *tcp)
 	int u_error = 0;
 #ifdef LINUX
 	int check_errno = 1;
-	if (tcp->scno >= 0 && tcp->scno < nsyscalls &&
+	if (SCNO_IN_RANGE(tcp->scno) &&
 	    sysent[tcp->scno].sys_flags & SYSCALL_NEVER_FAILS) {
 		check_errno = 0;
 	}
@@ -2257,7 +2258,7 @@ dumpio(struct tcb *tcp)
 		return;
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= MAX_QUALS)
 		return;
-	if (tcp->scno < 0 || tcp->scno >= nsyscalls)
+	if (!SCNO_IN_RANGE(tcp->scno))
 		return;
 	if (sysent[tcp->scno].sys_func == printargs)
 		return;
@@ -2317,7 +2318,7 @@ trace_syscall_exiting(struct tcb *tcp)
 
 	if (tcp->flags & TCB_REPRINT) {
 		printleader(tcp);
-		if (tcp->scno >= nsyscalls || tcp->scno < 0)
+		if (!SCNO_IN_RANGE(tcp->scno))
 			tprintf("<... syscall_%lu resumed> ", tcp->scno);
 		else
 			tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
@@ -2340,7 +2341,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		return res;
 	}
 
-	if (tcp->scno >= nsyscalls || tcp->scno < 0
+	if (!SCNO_IN_RANGE(tcp->scno)
 	    || (qual_flags[tcp->scno] & QUAL_RAW))
 		sys_res = printargs(tcp);
 	else {
@@ -2360,7 +2361,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	tprintf(") ");
 	tabto(acolumn);
 	u_error = tcp->u_error;
-	if (tcp->scno >= nsyscalls || tcp->scno < 0 ||
+	if (!SCNO_IN_RANGE(tcp->scno) ||
 	    qual_flags[tcp->scno] & QUAL_RAW) {
 		if (u_error)
 			tprintf("= -1 (errno %ld)", u_error);

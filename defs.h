@@ -728,6 +728,8 @@ extern unsigned nioctlents;
 extern const char *const *signalent;
 extern unsigned nsignals;
 
+#define SCNO_IN_RANGE(scno) ((unsigned long)(scno) < nsyscalls)
+
 #if HAVE_LONG_LONG
 
 /* _l refers to the lower numbered u_arg,
