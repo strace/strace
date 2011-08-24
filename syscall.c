@@ -755,21 +755,7 @@ get_scno_on_sysenter(struct tcb *tcp)
 #ifdef LINUX
 # if defined(S390) || defined(S390X)
 	if (tcp->flags & TCB_WAITEXECVE) {
-		/*
-		 * When the execve system call completes successfully, the
-		 * new process still has -ENOSYS (old style) or __NR_execve
-		 * (new style) in gpr2.  We cannot recover the scno again
-		 * by disassembly, because the image that executed the
-		 * syscall is gone now.  Fortunately, we don't want it.  We
-		 * leave the flag set so that syscall_fixup can fake the
-		 * result.
-		 */
-		if (exiting(tcp))
-			return 1;
-		/*
-		 * This is the post-execve SIGTRAP.  We cannot try to read
-		 * the system call here either.
-		 */
+		/* This is the post-execve SIGTRAP. */
 		tcp->flags &= ~TCB_WAITEXECVE;
 		return 0;
 	}
@@ -786,9 +772,8 @@ get_scno_on_sysenter(struct tcb *tcp)
 		/*
 		 * Old style of "passing" the scno via the SVC instruction.
 		 */
-
 		long opcode, offset_reg, tmp;
-		void * svc_addr;
+		void *svc_addr;
 		static const int gpr_offset[16] = {
 				PT_GPR0,  PT_GPR1,  PT_ORIGGPR2, PT_GPR3,
 				PT_GPR4,  PT_GPR5,  PT_GPR6,     PT_GPR7,
@@ -814,7 +799,6 @@ get_scno_on_sysenter(struct tcb *tcp)
 		 *  opcode. Since there is no way to find out the opcode size this
 		 *  is the best we can do...
 		 */
-
 		if ((opcode & 0xff00) == 0x0a00) {
 			/* SVC opcode */
 			scno = opcode & 0xff;
@@ -859,37 +843,32 @@ get_scno_on_sysenter(struct tcb *tcp)
 # elif defined (POWERPC)
 	if (upeek(tcp, sizeof(unsigned long)*PT_R0, &scno) < 0)
 		return -1;
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && (tcp->flags & TCB_WAITEXECVE)) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
+	/* Check if this is the post-execve SIGTRAP. */
+	if (scno == 0 && (tcp->flags & TCB_WAITEXECVE)) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
-
 #  ifdef POWERPC64
-	if (entering(tcp)) {
-		/* TODO: speed up strace by not doing this at every syscall.
-		 * We only need to do it after execve.
-		 */
-		int currpers;
-		long val;
-		int pid = tcp->pid;
+	/* TODO: speed up strace by not doing this at every syscall.
+	 * We only need to do it after execve.
+	 */
+	int currpers;
+	long val;
+	int pid = tcp->pid;
 
-		/* Check for 64/32 bit mode. */
-		if (upeek(tcp, sizeof(unsigned long)*PT_MSR, &val) < 0)
-			return -1;
-		/* SF is bit 0 of MSR */
-		if (val < 0)
-			currpers = 0;
-		else
-			currpers = 1;
-		if (currpers != current_personality) {
-			static const char *const names[] = {"64 bit", "32 bit"};
-			set_personality(currpers);
-			fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-					pid, names[current_personality]);
-		}
+	/* Check for 64/32 bit mode. */
+	if (upeek(tcp, sizeof(unsigned long)*PT_MSR, &val) < 0)
+		return -1;
+	/* SF is bit 0 of MSR */
+	if (val < 0)
+		currpers = 0;
+	else
+		currpers = 1;
+	if (currpers != current_personality) {
+		static const char *const names[] = {"64 bit", "32 bit"};
+		set_personality(currpers);
+		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
+				pid, names[current_personality]);
 	}
 #  endif
 # elif defined(AVR32)
@@ -899,17 +878,12 @@ get_scno_on_sysenter(struct tcb *tcp)
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
 		return -1;
 
-	/*
-	 * We only need to grab the syscall number on syscall entry.
-	 */
-	if (entering(tcp)) {
-		scno = regs.r8;
+	scno = regs.r8;
 
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
+	/* Check if this is the post-execve SIGTRAP. */
+	if (tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
 # elif defined(BFIN)
 	if (upeek(tcp, PT_ORIG_P0, &scno))
@@ -921,94 +895,84 @@ get_scno_on_sysenter(struct tcb *tcp)
 	if (upeek(tcp, 8*ORIG_RAX, &scno) < 0)
 		return -1;
 
-	if (entering(tcp)) {
-		/* TODO: speed up strace by not doing this at every syscall.
-		 * We only need to do it after execve.
-		 */
-		int currpers;
-		long val;
-		int pid = tcp->pid;
+	/* TODO: speed up strace by not doing this at every syscall.
+	 * We only need to do it after execve.
+	 */
+	int currpers;
+	long val;
+	int pid = tcp->pid;
 
-		/* Check CS register value. On x86-64 linux it is:
-		 *	0x33	for long mode (64 bit)
-		 *	0x23	for compatibility mode (32 bit)
-		 * It takes only one ptrace and thus doesn't need
-		 * to be cached.
-		 */
-		if (upeek(tcp, 8*CS, &val) < 0)
-			return -1;
-		switch (val) {
-			case 0x23: currpers = 1; break;
-			case 0x33: currpers = 0; break;
-			default:
-				fprintf(stderr, "Unknown value CS=0x%02X while "
-					 "detecting personality of process "
-					 "PID=%d\n", (int)val, pid);
-				currpers = current_personality;
-				break;
-		}
+	/* Check CS register value. On x86-64 linux it is:
+	 *	0x33	for long mode (64 bit)
+	 *	0x23	for compatibility mode (32 bit)
+	 * It takes only one ptrace and thus doesn't need
+	 * to be cached.
+	 */
+	if (upeek(tcp, 8*CS, &val) < 0)
+		return -1;
+	switch (val) {
+		case 0x23: currpers = 1; break;
+		case 0x33: currpers = 0; break;
+		default:
+			fprintf(stderr, "Unknown value CS=0x%02X while "
+				 "detecting personality of process "
+				 "PID=%d\n", (int)val, pid);
+			currpers = current_personality;
+			break;
+	}
 #  if 0
-		/* This version analyzes the opcode of a syscall instruction.
-		 * (int 0x80 on i386 vs. syscall on x86-64)
-		 * It works, but is too complicated.
-		 */
-		unsigned long val, rip, i;
+	/* This version analyzes the opcode of a syscall instruction.
+	 * (int 0x80 on i386 vs. syscall on x86-64)
+	 * It works, but is too complicated.
+	 */
+	unsigned long val, rip, i;
 
-		if (upeek(tcp, 8*RIP, &rip) < 0)
-			perror("upeek(RIP)");
+	if (upeek(tcp, 8*RIP, &rip) < 0)
+		perror("upeek(RIP)");
 
-		/* sizeof(syscall) == sizeof(int 0x80) == 2 */
-		rip -= 2;
-		errno = 0;
+	/* sizeof(syscall) == sizeof(int 0x80) == 2 */
+	rip -= 2;
+	errno = 0;
 
-		call = ptrace(PTRACE_PEEKTEXT, pid, (char *)rip, (char *)0);
-		if (errno)
-			fprintf(stderr, "ptrace_peektext failed: %s\n",
-					strerror(errno));
-		switch (call & 0xffff) {
-			/* x86-64: syscall = 0x0f 0x05 */
-			case 0x050f: currpers = 0; break;
-			/* i386: int 0x80 = 0xcd 0x80 */
-			case 0x80cd: currpers = 1; break;
-			default:
-				currpers = current_personality;
-				fprintf(stderr,
-					"Unknown syscall opcode (0x%04X) while "
-					"detecting personality of process "
-					"PID=%d\n", (int)call, pid);
-				break;
-		}
+	call = ptrace(PTRACE_PEEKTEXT, pid, (char *)rip, (char *)0);
+	if (errno)
+		fprintf(stderr, "ptrace_peektext failed: %s\n",
+				strerror(errno));
+	switch (call & 0xffff) {
+		/* x86-64: syscall = 0x0f 0x05 */
+		case 0x050f: currpers = 0; break;
+		/* i386: int 0x80 = 0xcd 0x80 */
+		case 0x80cd: currpers = 1; break;
+		default:
+			currpers = current_personality;
+			fprintf(stderr,
+				"Unknown syscall opcode (0x%04X) while "
+				"detecting personality of process "
+				"PID=%d\n", (int)call, pid);
+			break;
+	}
 #  endif
-		if (currpers != current_personality) {
-			static const char *const names[] = {"64 bit", "32 bit"};
-			set_personality(currpers);
-			fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-					pid, names[current_personality]);
-		}
+	if (currpers != current_personality) {
+		static const char *const names[] = {"64 bit", "32 bit"};
+		set_personality(currpers);
+		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
+				pid, names[current_personality]);
 	}
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
-	if (entering(tcp)) {
-		if (ia32) {
-			if (upeek(tcp, PT_R1, &scno) < 0)	/* orig eax */
-				return -1;
-		} else {
-			if (upeek(tcp, PT_R15, &scno) < 0)
-				return -1;
-		}
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
+	if (ia32) {
+		if (upeek(tcp, PT_R1, &scno) < 0)	/* orig eax */
+			return -1;
 	} else {
-		/* Syscall exit */
-		if (upeek(tcp, PT_R8, &r8) < 0)
+		if (upeek(tcp, PT_R15, &scno) < 0)
 			return -1;
-		if (upeek(tcp, PT_R10, &r10) < 0)
-			return -1;
+	}
+	/* Check if this is the post-execve SIGTRAP. */
+	if (tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
 # elif defined (ARM)
 	/*
@@ -1021,12 +985,10 @@ get_scno_on_sysenter(struct tcb *tcp)
 	 * We only need to grab the syscall number on syscall entry.
 	 */
 	if (regs.ARM_ip == 0) {
-		if (entering(tcp)) {
-			/* Check if this is the post-execve SIGTRAP. */
-			if (tcp->flags & TCB_WAITEXECVE) {
-				tcp->flags &= ~TCB_WAITEXECVE;
-				return 0;
-			}
+		/* Check if this is the post-execve SIGTRAP. */
+		if (tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
 		}
 
 		/*
@@ -1046,7 +1008,7 @@ get_scno_on_sysenter(struct tcb *tcp)
 			if (errno)
 				return -1;
 
-		/* FIXME: bogus check? it is already done on entering before,
+		/* FIXME: bogus check? it is already done before,
 		 * so we never can see it here?
 		 */
 			if (scno == 0 && (tcp->flags & TCB_WAITEXECVE)) {
@@ -1083,15 +1045,9 @@ get_scno_on_sysenter(struct tcb *tcp)
 		} else
 			set_personality(0);
 
-		if (exiting(tcp)) {
-			fprintf(stderr, "pid %d stray syscall exit\n", tcp->pid);
-			tcp->flags &= ~TCB_INSYSCALL;
-		}
 	} else {
-		if (entering(tcp)) {
-			fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);
-			tcp->flags |= TCB_INSYSCALL;
-		}
+		fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);
+		tcp->flags |= TCB_INSYSCALL;
 	}
 # elif defined (M68K)
 	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
@@ -1104,154 +1060,137 @@ get_scno_on_sysenter(struct tcb *tcp)
 	a3 = regs[REG_A3];
 	r2 = regs[REG_V0];
 
-	if (entering(tcp)) {
-		scno = r2;
+	scno = r2;
 
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
+	/* Check if this is the post-execve SIGTRAP. */
+	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
+	}
+
+	if (scno < 0 || scno > nsyscalls) {
+		if (a3 == 0 || a3 == -1) {
+			if (debug)
+				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
 			return 0;
-		}
-
-		if (scno < 0 || scno > nsyscalls) {
-			if (a3 == 0 || a3 == -1) {
-				if (debug)
-					fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
-				return 0;
-			}
 		}
 	}
 # elif defined (MIPS)
 	if (upeek(tcp, REG_A3, &a3) < 0)
 		return -1;
-	if (entering(tcp)) {
-		if (upeek(tcp, REG_V0, &scno) < 0)
-			return -1;
+	if (upeek(tcp, REG_V0, &scno) < 0)
+		return -1;
 
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
+	/* Check if this is the post-execve SIGTRAP. */
+	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
+	}
+
+	if (scno < 0 || scno > nsyscalls) {
+		if (a3 == 0 || a3 == -1) {
+			if (debug)
+				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
 			return 0;
 		}
-
-		if (scno < 0 || scno > nsyscalls) {
-			if (a3 == 0 || a3 == -1) {
-				if (debug)
-					fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
-				return 0;
-			}
-		}
-	} else {
-		if (upeek(tcp, REG_V0, &r2) < 0)
-			return -1;
 	}
 # elif defined (ALPHA)
 	if (upeek(tcp, REG_A3, &a3) < 0)
 		return -1;
 
-	if (entering(tcp)) {
-		if (upeek(tcp, REG_R0, &scno) < 0)
-			return -1;
+	if (upeek(tcp, REG_R0, &scno) < 0)
+		return -1;
 
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
+	/* Check if this is the post-execve SIGTRAP. */
+	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
+	}
+
+	/*
+	 * Do some sanity checks to figure out if it's
+	 * really a syscall entry
+	 */
+	if (scno < 0 || scno > nsyscalls) {
+		if (a3 == 0 || a3 == -1) {
+			if (debug)
+				fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
 			return 0;
 		}
-
-		/*
-		 * Do some sanity checks to figure out if it's
-		 * really a syscall entry
-		 */
-		if (scno < 0 || scno > nsyscalls) {
-			if (a3 == 0 || a3 == -1) {
-				if (debug)
-					fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
-				return 0;
-			}
-		}
-	}
-	else {
-		if (upeek(tcp, REG_R0, &r0) < 0)
-			return -1;
 	}
 # elif defined (SPARC) || defined (SPARC64)
 	/* Everything we need is in the current register set. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
 
-	/* If we are entering, then disassemble the syscall trap. */
-	if (entering(tcp)) {
-		/* Retrieve the syscall trap instruction. */
-		errno = 0;
+	/* Disassemble the syscall trap. */
+	/* Retrieve the syscall trap instruction. */
+	errno = 0;
 #  if defined(SPARC64)
-		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.tpc, 0);
-		trap >>= 32;
+	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.tpc, 0);
+	trap >>= 32;
 #  else
-		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.pc, 0);
+	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.pc, 0);
 #  endif
-		if (errno)
-			return -1;
-
-		/* Disassemble the trap to see what personality to use. */
-		switch (trap) {
-		case 0x91d02010:
-			/* Linux/SPARC syscall trap. */
-			set_personality(0);
-			break;
-		case 0x91d0206d:
-			/* Linux/SPARC64 syscall trap. */
-			set_personality(2);
-			break;
-		case 0x91d02000:
-			/* SunOS syscall trap. (pers 1) */
-			fprintf(stderr, "syscall: SunOS no support\n");
-			return -1;
-		case 0x91d02008:
-			/* Solaris 2.x syscall trap. (per 2) */
-			set_personality(1);
-			break;
-		case 0x91d02009:
-			/* NetBSD/FreeBSD syscall trap. */
-			fprintf(stderr, "syscall: NetBSD/FreeBSD not supported\n");
-			return -1;
-		case 0x91d02027:
-			/* Solaris 2.x gettimeofday */
-			set_personality(1);
-			break;
-		default:
-			/* Check if this is the post-execve SIGTRAP. */
-			if (tcp->flags & TCB_WAITEXECVE) {
-				tcp->flags &= ~TCB_WAITEXECVE;
-				return 0;
-			}
-#  if defined (SPARC64)
-			fprintf(stderr, "syscall: unknown syscall trap %08lx %016lx\n", trap, regs.tpc);
-#  else
-			fprintf(stderr, "syscall: unknown syscall trap %08lx %08lx\n", trap, regs.pc);
-#  endif
-			return -1;
-		}
-
-		/* Extract the system call number from the registers. */
-		if (trap == 0x91d02027)
-			scno = 156;
-		else
-			scno = regs.u_regs[U_REG_G1];
-		if (scno == 0) {
-			scno = regs.u_regs[U_REG_O0];
-			memmove(&regs.u_regs[U_REG_O0], &regs.u_regs[U_REG_O1], 7*sizeof(regs.u_regs[0]));
-		}
-	}
-# elif defined(HPPA)
-	if (upeek(tcp, PT_GR20, &scno) < 0)
+	if (errno)
 		return -1;
-	if (entering(tcp)) {
+
+	/* Disassemble the trap to see what personality to use. */
+	switch (trap) {
+	case 0x91d02010:
+		/* Linux/SPARC syscall trap. */
+		set_personality(0);
+		break;
+	case 0x91d0206d:
+		/* Linux/SPARC64 syscall trap. */
+		set_personality(2);
+		break;
+	case 0x91d02000:
+		/* SunOS syscall trap. (pers 1) */
+		fprintf(stderr, "syscall: SunOS no support\n");
+		return -1;
+	case 0x91d02008:
+		/* Solaris 2.x syscall trap. (per 2) */
+		set_personality(1);
+		break;
+	case 0x91d02009:
+		/* NetBSD/FreeBSD syscall trap. */
+		fprintf(stderr, "syscall: NetBSD/FreeBSD not supported\n");
+		return -1;
+	case 0x91d02027:
+		/* Solaris 2.x gettimeofday */
+		set_personality(1);
+		break;
+	default:
 		/* Check if this is the post-execve SIGTRAP. */
 		if (tcp->flags & TCB_WAITEXECVE) {
 			tcp->flags &= ~TCB_WAITEXECVE;
 			return 0;
 		}
+#  if defined (SPARC64)
+		fprintf(stderr, "syscall: unknown syscall trap %08lx %016lx\n", trap, regs.tpc);
+#  else
+		fprintf(stderr, "syscall: unknown syscall trap %08lx %08lx\n", trap, regs.pc);
+#  endif
+		return -1;
+	}
+
+	/* Extract the system call number from the registers. */
+	if (trap == 0x91d02027)
+		scno = 156;
+	else
+		scno = regs.u_regs[U_REG_G1];
+	if (scno == 0) {
+		scno = regs.u_regs[U_REG_O0];
+		memmove(&regs.u_regs[U_REG_O0], &regs.u_regs[U_REG_O1], 7*sizeof(regs.u_regs[0]));
+	}
+# elif defined(HPPA)
+	if (upeek(tcp, PT_GR20, &scno) < 0)
+		return -1;
+	/* Check if this is the post-execve SIGTRAP. */
+	if (tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
 # elif defined(SH)
 	/*
@@ -1274,24 +1213,20 @@ get_scno_on_sysenter(struct tcb *tcp)
 		scno = correct_scno;
 	}
 
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
+	/* Check if this is the post-execve SIGTRAP. */
+	if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
 # elif defined(SH64)
 	if (upeek(tcp, REG_SYSCALL, &scno) < 0)
 		return -1;
 	scno &= 0xFFFF;
 
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
+	/* Check if this is the post-execve SIGTRAP. */
+	if (tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
 # elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp, 4*PT_R9, &scno) < 0)
@@ -1300,12 +1235,10 @@ get_scno_on_sysenter(struct tcb *tcp)
 	if (upeek(tcp, PTREGS_OFFSET_REG(10), &scno) < 0)
 		return -1;
 
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
+	/* Check if this is the post-execve SIGTRAP. */
+	if (tcp->flags & TCB_WAITEXECVE) {
+		tcp->flags &= ~TCB_WAITEXECVE;
+		return 0;
 	}
 # elif defined(MICROBLAZE)
 	if (upeek(tcp, 0, &scno) < 0)
@@ -1350,8 +1283,7 @@ get_scno_on_sysenter(struct tcb *tcp)
 # endif /* !HAVE_PR_SYSCALL */
 #endif /* USE_PROCFS */
 
-	if (entering(tcp))
-		tcp->scno = scno;
+	tcp->scno = scno;
 	return 1;
 }
 
@@ -1378,14 +1310,7 @@ get_scno_on_sysexit(struct tcb *tcp)
 		 * leave the flag set so that syscall_fixup can fake the
 		 * result.
 		 */
-		if (exiting(tcp))
-			return 1;
-		/*
-		 * This is the post-execve SIGTRAP.  We cannot try to read
-		 * the system call here either.
-		 */
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
+		return 1;
 	}
 
 	if (upeek(tcp, PT_GPR2, &syscall_mode) < 0)
@@ -1473,39 +1398,6 @@ get_scno_on_sysexit(struct tcb *tcp)
 # elif defined (POWERPC)
 	if (upeek(tcp, sizeof(unsigned long)*PT_R0, &scno) < 0)
 		return -1;
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && (tcp->flags & TCB_WAITEXECVE)) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	}
-
-#  ifdef POWERPC64
-	if (entering(tcp)) {
-		/* TODO: speed up strace by not doing this at every syscall.
-		 * We only need to do it after execve.
-		 */
-		int currpers;
-		long val;
-		int pid = tcp->pid;
-
-		/* Check for 64/32 bit mode. */
-		if (upeek(tcp, sizeof(unsigned long)*PT_MSR, &val) < 0)
-			return -1;
-		/* SF is bit 0 of MSR */
-		if (val < 0)
-			currpers = 0;
-		else
-			currpers = 1;
-		if (currpers != current_personality) {
-			static const char *const names[] = {"64 bit", "32 bit"};
-			set_personality(currpers);
-			fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-					pid, names[current_personality]);
-		}
-	}
-#  endif
 # elif defined(AVR32)
 	/*
 	 * Read complete register set in one go.
@@ -1513,18 +1405,6 @@ get_scno_on_sysexit(struct tcb *tcp)
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
 		return -1;
 
-	/*
-	 * We only need to grab the syscall number on syscall entry.
-	 */
-	if (entering(tcp)) {
-		scno = regs.r8;
-
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	}
 # elif defined(BFIN)
 	if (upeek(tcp, PT_ORIG_P0, &scno))
 		return -1;
@@ -1534,96 +1414,14 @@ get_scno_on_sysexit(struct tcb *tcp)
 # elif defined (X86_64)
 	if (upeek(tcp, 8*ORIG_RAX, &scno) < 0)
 		return -1;
-
-	if (entering(tcp)) {
-		/* TODO: speed up strace by not doing this at every syscall.
-		 * We only need to do it after execve.
-		 */
-		int currpers;
-		long val;
-		int pid = tcp->pid;
-
-		/* Check CS register value. On x86-64 linux it is:
-		 *	0x33	for long mode (64 bit)
-		 *	0x23	for compatibility mode (32 bit)
-		 * It takes only one ptrace and thus doesn't need
-		 * to be cached.
-		 */
-		if (upeek(tcp, 8*CS, &val) < 0)
-			return -1;
-		switch (val) {
-			case 0x23: currpers = 1; break;
-			case 0x33: currpers = 0; break;
-			default:
-				fprintf(stderr, "Unknown value CS=0x%02X while "
-					 "detecting personality of process "
-					 "PID=%d\n", (int)val, pid);
-				currpers = current_personality;
-				break;
-		}
-#  if 0
-		/* This version analyzes the opcode of a syscall instruction.
-		 * (int 0x80 on i386 vs. syscall on x86-64)
-		 * It works, but is too complicated.
-		 */
-		unsigned long val, rip, i;
-
-		if (upeek(tcp, 8*RIP, &rip) < 0)
-			perror("upeek(RIP)");
-
-		/* sizeof(syscall) == sizeof(int 0x80) == 2 */
-		rip -= 2;
-		errno = 0;
-
-		call = ptrace(PTRACE_PEEKTEXT, pid, (char *)rip, (char *)0);
-		if (errno)
-			fprintf(stderr, "ptrace_peektext failed: %s\n",
-					strerror(errno));
-		switch (call & 0xffff) {
-			/* x86-64: syscall = 0x0f 0x05 */
-			case 0x050f: currpers = 0; break;
-			/* i386: int 0x80 = 0xcd 0x80 */
-			case 0x80cd: currpers = 1; break;
-			default:
-				currpers = current_personality;
-				fprintf(stderr,
-					"Unknown syscall opcode (0x%04X) while "
-					"detecting personality of process "
-					"PID=%d\n", (int)call, pid);
-				break;
-		}
-#  endif
-		if (currpers != current_personality) {
-			static const char *const names[] = {"64 bit", "32 bit"};
-			set_personality(currpers);
-			fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-					pid, names[current_personality]);
-		}
-	}
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
-	if (entering(tcp)) {
-		if (ia32) {
-			if (upeek(tcp, PT_R1, &scno) < 0)	/* orig eax */
-				return -1;
-		} else {
-			if (upeek(tcp, PT_R15, &scno) < 0)
-				return -1;
-		}
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	} else {
-		/* Syscall exit */
-		if (upeek(tcp, PT_R8, &r8) < 0)
-			return -1;
-		if (upeek(tcp, PT_R10, &r10) < 0)
-			return -1;
-	}
+	if (upeek(tcp, PT_R8, &r8) < 0)
+		return -1;
+	if (upeek(tcp, PT_R10, &r10) < 0)
+		return -1;
 # elif defined (ARM)
 	/*
 	 * Read complete register set in one go.
@@ -1635,14 +1433,6 @@ get_scno_on_sysexit(struct tcb *tcp)
 	 * We only need to grab the syscall number on syscall entry.
 	 */
 	if (regs.ARM_ip == 0) {
-		if (entering(tcp)) {
-			/* Check if this is the post-execve SIGTRAP. */
-			if (tcp->flags & TCB_WAITEXECVE) {
-				tcp->flags &= ~TCB_WAITEXECVE;
-				return 0;
-			}
-		}
-
 		/*
 		 * Note: we only deal with only 32-bit CPUs here.
 		 */
@@ -1697,15 +1487,8 @@ get_scno_on_sysexit(struct tcb *tcp)
 		} else
 			set_personality(0);
 
-		if (exiting(tcp)) {
-			fprintf(stderr, "pid %d stray syscall exit\n", tcp->pid);
-			tcp->flags &= ~TCB_INSYSCALL;
-		}
-	} else {
-		if (entering(tcp)) {
-			fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);
-			tcp->flags |= TCB_INSYSCALL;
-		}
+		fprintf(stderr, "pid %d stray syscall exit\n", tcp->pid);
+		tcp->flags &= ~TCB_INSYSCALL;
 	}
 # elif defined (M68K)
 	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
@@ -1717,156 +1500,23 @@ get_scno_on_sysexit(struct tcb *tcp)
 		return -1;
 	a3 = regs[REG_A3];
 	r2 = regs[REG_V0];
-
-	if (entering(tcp)) {
-		scno = r2;
-
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-
-		if (scno < 0 || scno > nsyscalls) {
-			if (a3 == 0 || a3 == -1) {
-				if (debug)
-					fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
-				return 0;
-			}
-		}
-	}
 # elif defined (MIPS)
 	if (upeek(tcp, REG_A3, &a3) < 0)
 		return -1;
-	if (entering(tcp)) {
-		if (upeek(tcp, REG_V0, &scno) < 0)
-			return -1;
-
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-
-		if (scno < 0 || scno > nsyscalls) {
-			if (a3 == 0 || a3 == -1) {
-				if (debug)
-					fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
-				return 0;
-			}
-		}
-	} else {
-		if (upeek(tcp, REG_V0, &r2) < 0)
-			return -1;
-	}
+	if (upeek(tcp, REG_V0, &r2) < 0)
+		return -1;
 # elif defined (ALPHA)
 	if (upeek(tcp, REG_A3, &a3) < 0)
 		return -1;
-
-	if (entering(tcp)) {
-		if (upeek(tcp, REG_R0, &scno) < 0)
-			return -1;
-
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-
-		/*
-		 * Do some sanity checks to figure out if it's
-		 * really a syscall entry
-		 */
-		if (scno < 0 || scno > nsyscalls) {
-			if (a3 == 0 || a3 == -1) {
-				if (debug)
-					fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
-				return 0;
-			}
-		}
-	}
-	else {
-		if (upeek(tcp, REG_R0, &r0) < 0)
-			return -1;
-	}
+	if (upeek(tcp, REG_R0, &r0) < 0)
+		return -1;
 # elif defined (SPARC) || defined (SPARC64)
 	/* Everything we need is in the current register set. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
-
-	/* If we are entering, then disassemble the syscall trap. */
-	if (entering(tcp)) {
-		/* Retrieve the syscall trap instruction. */
-		errno = 0;
-#  if defined(SPARC64)
-		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.tpc, 0);
-		trap >>= 32;
-#  else
-		trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.pc, 0);
-#  endif
-		if (errno)
-			return -1;
-
-		/* Disassemble the trap to see what personality to use. */
-		switch (trap) {
-		case 0x91d02010:
-			/* Linux/SPARC syscall trap. */
-			set_personality(0);
-			break;
-		case 0x91d0206d:
-			/* Linux/SPARC64 syscall trap. */
-			set_personality(2);
-			break;
-		case 0x91d02000:
-			/* SunOS syscall trap. (pers 1) */
-			fprintf(stderr, "syscall: SunOS no support\n");
-			return -1;
-		case 0x91d02008:
-			/* Solaris 2.x syscall trap. (per 2) */
-			set_personality(1);
-			break;
-		case 0x91d02009:
-			/* NetBSD/FreeBSD syscall trap. */
-			fprintf(stderr, "syscall: NetBSD/FreeBSD not supported\n");
-			return -1;
-		case 0x91d02027:
-			/* Solaris 2.x gettimeofday */
-			set_personality(1);
-			break;
-		default:
-			/* Check if this is the post-execve SIGTRAP. */
-			if (tcp->flags & TCB_WAITEXECVE) {
-				tcp->flags &= ~TCB_WAITEXECVE;
-				return 0;
-			}
-#  if defined (SPARC64)
-			fprintf(stderr, "syscall: unknown syscall trap %08lx %016lx\n", trap, regs.tpc);
-#  else
-			fprintf(stderr, "syscall: unknown syscall trap %08lx %08lx\n", trap, regs.pc);
-#  endif
-			return -1;
-		}
-
-		/* Extract the system call number from the registers. */
-		if (trap == 0x91d02027)
-			scno = 156;
-		else
-			scno = regs.u_regs[U_REG_G1];
-		if (scno == 0) {
-			scno = regs.u_regs[U_REG_O0];
-			memmove(&regs.u_regs[U_REG_O0], &regs.u_regs[U_REG_O1], 7*sizeof(regs.u_regs[0]));
-		}
-	}
 # elif defined(HPPA)
 	if (upeek(tcp, PT_GR20, &scno) < 0)
 		return -1;
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	}
 # elif defined(SH)
 	/*
 	 * In the new syscall ABI, the system call number is in R3.
@@ -1887,40 +1537,16 @@ get_scno_on_sysexit(struct tcb *tcp)
 				correct_scno);
 		scno = correct_scno;
 	}
-
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (scno == 0 && tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	}
 # elif defined(SH64)
 	if (upeek(tcp, REG_SYSCALL, &scno) < 0)
 		return -1;
 	scno &= 0xFFFF;
-
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	}
 # elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp, 4*PT_R9, &scno) < 0)
 		return -1;
 # elif defined(TILE)
 	if (upeek(tcp, PTREGS_OFFSET_REG(10), &scno) < 0)
 		return -1;
-
-	if (entering(tcp)) {
-		/* Check if this is the post-execve SIGTRAP. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	}
 # elif defined(MICROBLAZE)
 	if (upeek(tcp, 0, &scno) < 0)
 		return -1;
@@ -1964,8 +1590,6 @@ get_scno_on_sysexit(struct tcb *tcp)
 # endif /* !HAVE_PR_SYSCALL */
 #endif /* USE_PROCFS */
 
-	if (entering(tcp))
-		tcp->scno = scno;
 	return 1;
 }
 
