@@ -389,19 +389,20 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 struct tcb {
 	int flags;		/* See below for TCB_ values */
 	int pid;		/* Process Id of this entry */
-	long scno;		/* System call number */
 	int u_nargs;		/* System call argument count */
+	int u_error;		/* Error code */
+	long scno;		/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
 #if defined (LINUX_MIPSN32)
 	long long ext_arg[MAX_ARGS];	/* System call arguments */
 #endif
-	int u_error;		/* Error code */
 	long u_rval;		/* (first) return value */
 #ifdef HAVE_LONG_LONG
 	long long u_lrval;	/* long long return value */
 #endif
-	FILE *outf;		/* Output file for this process */
+	int ptrace_errno;
 	int curcol;		/* Output column for this process */
+	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
@@ -409,7 +410,6 @@ struct tcb {
 				/* Support for tracing forked processes */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
-	int ptrace_errno;
 #ifdef USE_PROCFS
 	int pfd;		/* proc file descriptor */
 #endif
