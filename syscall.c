@@ -1250,66 +1250,43 @@ syscall_fixup(struct tcb *tcp)
 #ifdef USE_PROCFS
 	int scno = known_scno(tcp);
 
-	if (entering(tcp)) {
-		if (tcp->status.PR_WHY != PR_SYSENTRY) {
-			if (
-			    scno == SYS_fork
+	if (tcp->status.PR_WHY != PR_SYSENTRY) {
+		if (
+		    scno == SYS_fork
 #ifdef SYS_vfork
-			    || scno == SYS_vfork
-#endif /* SYS_vfork */
+		    || scno == SYS_vfork
+#endif
 #ifdef SYS_fork1
-			    || scno == SYS_fork1
-#endif /* SYS_fork1 */
+		    || scno == SYS_fork1
+#endif
 #ifdef SYS_forkall
-			    || scno == SYS_forkall
-#endif /* SYS_forkall */
+		    || scno == SYS_forkall
+#endif
 #ifdef SYS_rfork1
-			    || scno == SYS_rfork1
-#endif /* SYS_fork1 */
+		    || scno == SYS_rfork1
+#endif
 #ifdef SYS_rforkall
-			    || scno == SYS_rforkall
-#endif /* SYS_rforkall */
-			    ) {
-				/* We are returning in the child, fake it. */
-				tcp->status.PR_WHY = PR_SYSENTRY;
-				trace_syscall(tcp);
-				tcp->status.PR_WHY = PR_SYSEXIT;
-			}
-			else {
-				fprintf(stderr, "syscall: missing entry\n");
-				tcp->flags |= TCB_INSYSCALL;
-			}
+		    || scno == SYS_rforkall
+#endif
+		    ) {
+			/* We are returning in the child, fake it. */
+			tcp->status.PR_WHY = PR_SYSENTRY;
+			trace_syscall(tcp);
+			tcp->status.PR_WHY = PR_SYSEXIT;
 		}
-	}
-	else {
-		if (tcp->status.PR_WHY != PR_SYSEXIT) {
-			fprintf(stderr, "syscall: missing exit\n");
-			tcp->flags &= ~TCB_INSYSCALL;
+		else {
+			fprintf(stderr, "syscall: missing entry\n");
+			tcp->flags |= TCB_INSYSCALL;
 		}
 	}
 #endif /* USE_PROCFS */
 
 #ifdef SUNOS4
-	if (entering(tcp)) {
-		if (scno == 0) {
-			fprintf(stderr, "syscall: missing entry\n");
-			tcp->flags |= TCB_INSYSCALL;
-		}
+	if (scno == 0) {
+		fprintf(stderr, "syscall: missing entry\n");
+		tcp->flags |= TCB_INSYSCALL;
 	}
-	else {
-		if (scno != 0) {
-			if (debug) {
-				/*
-				 * This happens when a signal handler
-				 * for a signal which interrupted a
-				 * a system call makes another system call.
-				 */
-				fprintf(stderr, "syscall: missing exit\n");
-			}
-			tcp->flags &= ~TCB_INSYSCALL;
-		}
-	}
-#endif /* SUNOS4 */
+#endif
 
 #ifdef LINUX
 	/* A common case of "not a syscall entry" is post-execve SIGTRAP */
@@ -1318,7 +1295,7 @@ syscall_fixup(struct tcb *tcp)
 	 * Every extra ptrace call is expensive, so check EAX
 	 * on syscall entry only if PTRACE_O_TRACEEXEC is not enabled:
 	 */
-	if (entering(tcp) && !(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
+	if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
 		if (upeek(tcp, 4*EAX, &eax) < 0)
 			return -1;
 		if (eax != -ENOSYS) {
@@ -1328,7 +1305,7 @@ syscall_fixup(struct tcb *tcp)
 		}
 	}
 #elif defined (X86_64)
-	if (entering(tcp) && !(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
+	if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
 		if (upeek(tcp, 8*RAX, &rax) < 0)
 			return -1;
 		if (current_personality == 1)
@@ -1344,20 +1321,10 @@ syscall_fixup(struct tcb *tcp)
 		return -1;
 	if (syscall_mode != -ENOSYS)
 		syscall_mode = tcp->scno;
-	if (gpr2 != syscall_mode && entering(tcp)) {
+	if (gpr2 != syscall_mode) {
 		if (debug)
 			fprintf(stderr, "not a syscall entry (gpr2 = %ld)\n", gpr2);
 		return 0;
-	}
-	else if (((tcp->flags & (TCB_INSYSCALL|TCB_WAITEXECVE))
-		  == (TCB_INSYSCALL|TCB_WAITEXECVE))
-		 && (gpr2 == -ENOSYS || gpr2 == tcp->scno)) {
-		/*
-		 * Return from execve.
-		 * Fake a return value of zero.  We leave the TCB_WAITEXECVE
-		 * flag set for the post-execve SIGTRAP to see and reset.
-		 */
-		gpr2 = 0;
 	}
 #elif defined (POWERPC)
 # define SO_MASK 0x10000000
@@ -1370,15 +1337,13 @@ syscall_fixup(struct tcb *tcp)
 #elif defined (M68K)
 	if (upeek(tcp, 4*PT_D0, &d0) < 0)
 		return -1;
-	if (d0 != -ENOSYS && entering(tcp)) {
+	if (d0 != -ENOSYS) {
 		if (debug)
 			fprintf(stderr, "not a syscall entry (d0 = %ld)\n", d0);
 		return 0;
 	}
 #elif defined (ARM)
-	/*
-	 * Nothing required
-	 */
+	/* Nothing required */
 #elif defined(BFIN)
 	if (upeek(tcp, PT_R0, &r0) < 0)
 		return -1;
@@ -1390,7 +1355,7 @@ syscall_fixup(struct tcb *tcp)
 		return -1;
 	if (upeek(tcp, PT_R8, &r8) < 0)
 		return -1;
-	if (ia32 && r8 != -ENOSYS && entering(tcp)) {
+	if (ia32 && r8 != -ENOSYS) {
 		if (debug)
 			fprintf(stderr, "not a syscall entry (r8 = %ld)\n", r8);
 		return 0;
@@ -1398,7 +1363,7 @@ syscall_fixup(struct tcb *tcp)
 #elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp, 4*PT_R10, &r10) < 0)
 		return -1;
-	if (r10 != -ENOSYS && entering(tcp)) {
+	if (r10 != -ENOSYS) {
 		if (debug)
 			fprintf(stderr, "not a syscall entry (r10 = %ld)\n", r10);
 		return 0;
@@ -1406,7 +1371,7 @@ syscall_fixup(struct tcb *tcp)
 #elif defined(MICROBLAZE)
 	if (upeek(tcp, 3 * 4, &r3) < 0)
 		return -1;
-	if (r3 != -ENOSYS && entering(tcp)) {
+	if (r3 != -ENOSYS) {
 		if (debug)
 			fprintf(stderr, "not a syscall entry (r3 = %ld)\n", r3);
 		return 0;
@@ -1998,55 +1963,15 @@ static int
 syscall_fixup_on_sysexit(struct tcb *tcp)
 {
 #ifdef USE_PROCFS
-	int scno = known_scno(tcp);
-
-	if (entering(tcp)) {
-		if (tcp->status.PR_WHY != PR_SYSENTRY) {
-			if (
-			    scno == SYS_fork
-#ifdef SYS_vfork
-			    || scno == SYS_vfork
-#endif /* SYS_vfork */
-#ifdef SYS_fork1
-			    || scno == SYS_fork1
-#endif /* SYS_fork1 */
-#ifdef SYS_forkall
-			    || scno == SYS_forkall
-#endif /* SYS_forkall */
-#ifdef SYS_rfork1
-			    || scno == SYS_rfork1
-#endif /* SYS_fork1 */
-#ifdef SYS_rforkall
-			    || scno == SYS_rforkall
-#endif /* SYS_rforkall */
-			    ) {
-				/* We are returning in the child, fake it. */
-				tcp->status.PR_WHY = PR_SYSENTRY;
-				trace_syscall(tcp);
-				tcp->status.PR_WHY = PR_SYSEXIT;
-			}
-			else {
-				fprintf(stderr, "syscall: missing entry\n");
-				tcp->flags |= TCB_INSYSCALL;
-			}
-		}
-	}
-	else {
-		if (tcp->status.PR_WHY != PR_SYSEXIT) {
-			fprintf(stderr, "syscall: missing exit\n");
-			tcp->flags &= ~TCB_INSYSCALL;
-		}
+	if (tcp->status.PR_WHY != PR_SYSEXIT) {
+		fprintf(stderr, "syscall: missing exit\n");
+		tcp->flags &= ~TCB_INSYSCALL;
 	}
 #endif /* USE_PROCFS */
 
 #ifdef SUNOS4
-	if (entering(tcp)) {
-		if (scno == 0) {
-			fprintf(stderr, "syscall: missing entry\n");
-			tcp->flags |= TCB_INSYSCALL;
-		}
-	}
-	else {
+	{
+		int scno = known_scno(tcp);
 		if (scno != 0) {
 			if (debug) {
 				/*
@@ -2062,45 +1987,12 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 #endif /* SUNOS4 */
 
 #ifdef LINUX
-	/* A common case of "not a syscall entry" is post-execve SIGTRAP */
-#if defined (I386)
-	/* With PTRACE_O_TRACEEXEC, post-execve SIGTRAP is disabled.
-	 * Every extra ptrace call is expensive, so check EAX
-	 * on syscall entry only if PTRACE_O_TRACEEXEC is not enabled:
-	 */
-	if (entering(tcp) && !(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
-		if (upeek(tcp, 4*EAX, &eax) < 0)
-			return -1;
-		if (eax != -ENOSYS) {
-			if (debug)
-				fprintf(stderr, "not a syscall entry (eax = %ld)\n", eax);
-			return 0;
-		}
-	}
-#elif defined (X86_64)
-	if (entering(tcp) && !(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
-		if (upeek(tcp, 8*RAX, &rax) < 0)
-			return -1;
-		if (current_personality == 1)
-			rax = (long int)(int)rax; /* sign extend from 32 bits */
-		if (rax != -ENOSYS && entering(tcp)) {
-			if (debug)
-				fprintf(stderr, "not a syscall entry (rax = %ld)\n", rax);
-			return 0;
-		}
-	}
-#elif defined (S390) || defined (S390X)
+#if defined (S390) || defined (S390X)
 	if (upeek(tcp, PT_GPR2, &gpr2) < 0)
 		return -1;
 	if (syscall_mode != -ENOSYS)
 		syscall_mode = tcp->scno;
-	if (gpr2 != syscall_mode && entering(tcp)) {
-		if (debug)
-			fprintf(stderr, "not a syscall entry (gpr2 = %ld)\n", gpr2);
-		return 0;
-	}
-	else if (((tcp->flags & (TCB_INSYSCALL|TCB_WAITEXECVE))
-		  == (TCB_INSYSCALL|TCB_WAITEXECVE))
+	if ((tcp->flags & TCB_WAITEXECVE)
 		 && (gpr2 == -ENOSYS || gpr2 == tcp->scno)) {
 		/*
 		 * Return from execve.
@@ -2120,15 +2012,8 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 #elif defined (M68K)
 	if (upeek(tcp, 4*PT_D0, &d0) < 0)
 		return -1;
-	if (d0 != -ENOSYS && entering(tcp)) {
-		if (debug)
-			fprintf(stderr, "not a syscall entry (d0 = %ld)\n", d0);
-		return 0;
-	}
 #elif defined (ARM)
-	/*
-	 * Nothing required
-	 */
+	/* Nothing required */
 #elif defined(BFIN)
 	if (upeek(tcp, PT_R0, &r0) < 0)
 		return -1;
@@ -2140,27 +2025,12 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 		return -1;
 	if (upeek(tcp, PT_R8, &r8) < 0)
 		return -1;
-	if (ia32 && r8 != -ENOSYS && entering(tcp)) {
-		if (debug)
-			fprintf(stderr, "not a syscall entry (r8 = %ld)\n", r8);
-		return 0;
-	}
 #elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp, 4*PT_R10, &r10) < 0)
 		return -1;
-	if (r10 != -ENOSYS && entering(tcp)) {
-		if (debug)
-			fprintf(stderr, "not a syscall entry (r10 = %ld)\n", r10);
-		return 0;
-	}
 #elif defined(MICROBLAZE)
 	if (upeek(tcp, 3 * 4, &r3) < 0)
 		return -1;
-	if (r3 != -ENOSYS && entering(tcp)) {
-		if (debug)
-			fprintf(stderr, "not a syscall entry (r3 = %ld)\n", r3);
-		return 0;
-	}
 #endif
 #endif /* LINUX */
 	return 1;
