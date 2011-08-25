@@ -1245,7 +1245,7 @@ known_scno(struct tcb *tcp)
  *    ("????" etc) and bail out.
  */
 static int
-syscall_fixup(struct tcb *tcp)
+syscall_fixup_on_sysenter(struct tcb *tcp)
 {
 #ifdef USE_PROCFS
 	int scno = known_scno(tcp);
@@ -1697,7 +1697,7 @@ trace_syscall_entering(struct tcb *tcp)
 	if (res == 0)
 		return res;
 	if (res == 1)
-		res = syscall_fixup(tcp);
+		res = syscall_fixup_on_sysenter(tcp);
 	if (res == 0)
 		return res;
 	if (res == 1)

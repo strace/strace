@@ -462,7 +462,8 @@ struct tcb {
 #ifdef LINUX
 /* x86 does not need TCB_WAITEXECVE.
  * It can detect SIGTRAP by looking at eax/rax.
- * See "not a syscall entry (eax = %ld)\n" message in syscall_fixup().
+ * See "not a syscall entry (eax = %ld)\n" message
+ * in syscall_fixup_on_sysenter().
  */
 # if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
   || defined(POWERPC) || defined(IA64) || defined(HPPA) \
