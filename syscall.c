@@ -721,7 +721,7 @@ static long eax;
 long r8, r10, psr; /* TODO: make static? */
 long ia32 = 0; /* not static */
 # elif defined (POWERPC)
-static long result, flags;
+static long result;
 # elif defined (M68K)
 static long d0;
 # elif defined(BFIN)
@@ -1317,6 +1317,10 @@ syscall_fixup(struct tcb *tcp)
 		}
 	}
 #elif defined (S390) || defined (S390X)
+	/* TODO: we already fetched PT_GPR2 in get_scno
+	 * and stored it in syscall_mode, reuse it here
+	 * instead of re-fetching?
+	 */
 	if (upeek(tcp, PT_GPR2, &gpr2) < 0)
 		return -1;
 	if (syscall_mode != -ENOSYS)
@@ -1326,15 +1330,8 @@ syscall_fixup(struct tcb *tcp)
 			fprintf(stderr, "not a syscall entry (gpr2 = %ld)\n", gpr2);
 		return 0;
 	}
-#elif defined (POWERPC)
-# define SO_MASK 0x10000000
-	if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
-		return -1;
-	if (upeek(tcp, sizeof(unsigned long)*PT_R3, &result) < 0)
-		return -1;
-	if (flags & SO_MASK)
-		result = -result;
 #elif defined (M68K)
+	/* TODO? Eliminate upeek's in arches below like we did in x86 */
 	if (upeek(tcp, 4*PT_D0, &d0) < 0)
 		return -1;
 	if (d0 != -ENOSYS) {
@@ -1342,14 +1339,6 @@ syscall_fixup(struct tcb *tcp)
 			fprintf(stderr, "not a syscall entry (d0 = %ld)\n", d0);
 		return 0;
 	}
-#elif defined (ARM)
-	/* Nothing required */
-#elif defined(BFIN)
-	if (upeek(tcp, PT_R0, &r0) < 0)
-		return -1;
-#elif defined (HPPA)
-	if (upeek(tcp, PT_GR28, &r28) < 0)
-		return -1;
 #elif defined(IA64)
 	if (upeek(tcp, PT_R10, &r10) < 0)
 		return -1;
@@ -1872,12 +1861,26 @@ get_syscall_result(struct tcb *tcp)
 {
 #ifdef LINUX
 # if defined(S390) || defined(S390X)
+	if (upeek(tcp, PT_GPR2, &gpr2) < 0)
+		return -1;
 # elif defined (POWERPC)
+# define SO_MASK 0x10000000
+	{
+		long flags;
+		if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
+			return -1;
+		if (upeek(tcp, sizeof(unsigned long)*PT_R3, &result) < 0)
+			return -1;
+		if (flags & SO_MASK)
+			result = -result;
+	}
 # elif defined(AVR32)
 	/* Read complete register set in one go. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
 		return -1;
 # elif defined(BFIN)
+	if (upeek(tcp, PT_R0, &r0) < 0)
+		return -1;
 # elif defined (I386)
 	if (upeek(tcp, 4*EAX, &eax) < 0)
 		return -1;
@@ -1897,6 +1900,8 @@ get_syscall_result(struct tcb *tcp)
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 		return -1;
 # elif defined (M68K)
+	if (upeek(tcp, 4*PT_D0, &d0) < 0)
+		return -1;
 # elif defined (LINUX_MIPSN32)
 	unsigned long long regs[38];
 
@@ -1919,11 +1924,17 @@ get_syscall_result(struct tcb *tcp)
 	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
 		return -1;
 # elif defined(HPPA)
+	if (upeek(tcp, PT_GR28, &r28) < 0)
+		return -1;
 # elif defined(SH)
 # elif defined(SH64)
 # elif defined(CRISV10) || defined(CRISV32)
+	if (upeek(tcp, 4*PT_R10, &r10) < 0)
+		return -1;
 # elif defined(TILE)
 # elif defined(MICROBLAZE)
+	if (upeek(tcp, 3 * 4, &r3) < 0)
+		return -1;
 # endif
 #endif /* LINUX */
 
@@ -1987,9 +1998,7 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 #endif /* SUNOS4 */
 
 #ifdef LINUX
-#if defined (S390) || defined (S390X)
-	if (upeek(tcp, PT_GPR2, &gpr2) < 0)
-		return -1;
+# if defined (S390) || defined (S390X)
 	if (syscall_mode != -ENOSYS)
 		syscall_mode = tcp->scno;
 	if ((tcp->flags & TCB_WAITEXECVE)
@@ -2001,37 +2010,7 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 		 */
 		gpr2 = 0;
 	}
-#elif defined (POWERPC)
-# define SO_MASK 0x10000000
-	if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
-		return -1;
-	if (upeek(tcp, sizeof(unsigned long)*PT_R3, &result) < 0)
-		return -1;
-	if (flags & SO_MASK)
-		result = -result;
-#elif defined (M68K)
-	if (upeek(tcp, 4*PT_D0, &d0) < 0)
-		return -1;
-#elif defined (ARM)
-	/* Nothing required */
-#elif defined(BFIN)
-	if (upeek(tcp, PT_R0, &r0) < 0)
-		return -1;
-#elif defined (HPPA)
-	if (upeek(tcp, PT_GR28, &r28) < 0)
-		return -1;
-#elif defined(IA64)
-	if (upeek(tcp, PT_R10, &r10) < 0)
-		return -1;
-	if (upeek(tcp, PT_R8, &r8) < 0)
-		return -1;
-#elif defined(CRISV10) || defined(CRISV32)
-	if (upeek(tcp, 4*PT_R10, &r10) < 0)
-		return -1;
-#elif defined(MICROBLAZE)
-	if (upeek(tcp, 3 * 4, &r3) < 0)
-		return -1;
-#endif
+# endif
 #endif /* LINUX */
 	return 1;
 }
