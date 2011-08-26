@@ -160,33 +160,33 @@
 #endif
 
 #ifdef USE_PROCFS
-#include <sys/procfs.h>
-#ifdef HAVE_MP_PROCFS
-#include <sys/uio.h>
-#endif
-#ifdef FREEBSD
-#include <sys/pioctl.h>
-#endif /* FREEBSD */
+# include <sys/procfs.h>
+# ifdef HAVE_MP_PROCFS
+#  include <sys/uio.h>
+# endif
+# ifdef FREEBSD
+#  include <sys/pioctl.h>
+# endif
 #else /* !USE_PROCFS */
-#if (defined(LINUXSPARC) || defined(LINUX_X86_64) || defined(LINUX_ARM) || defined(LINUX_AVR32)) && defined(__GLIBC__)
-#include <sys/ptrace.h>
-#else
+# if (defined(LINUXSPARC) || defined(LINUX_X86_64) || defined(LINUX_ARM) || defined(LINUX_AVR32)) && defined(__GLIBC__)
+#  include <sys/ptrace.h>
+# else
 /* Work around awkward prototype in ptrace.h. */
-#define ptrace xptrace
-#include <sys/ptrace.h>
-#undef ptrace
-#ifdef POWERPC
-#define __KERNEL__
-#include <asm/ptrace.h>
-#undef __KERNEL__
-#endif
-#ifdef LINUX
+#  define ptrace xptrace
+#  include <sys/ptrace.h>
+#  undef ptrace
+#  ifdef POWERPC
+#   define __KERNEL__
+#   include <asm/ptrace.h>
+#   undef __KERNEL__
+#  endif
+#  ifdef LINUX
 extern long ptrace(int, int, char *, long);
-#else /* !LINUX */
+#  else
 extern int ptrace(int, int, char *, int, ...);
-#endif /* !LINUX */
-#endif /* !LINUXSPARC */
-#endif /* !SVR4 */
+#  endif
+# endif
+#endif /* !USE_PROCFS */
 
 #ifdef LINUX
 #if !defined(__GLIBC__)
