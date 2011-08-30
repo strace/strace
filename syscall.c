@@ -716,7 +716,9 @@ struct tcb *tcp_last = NULL;
 
 #ifdef LINUX
 # if defined (I386)
-static long eax;
+static struct pt_regs i386_regs;
+# elif defined(X86_64)
+static struct pt_regs x86_64_regs;
 # elif defined (IA64)
 long r8, r10, psr; /* TODO: make static? */
 long ia32 = 0; /* not static */
@@ -752,8 +754,6 @@ static long r28;
 static long r0;
 # elif defined(SH64)
 static long r9;
-# elif defined(X86_64)
-static long rax;
 # elif defined(CRISV10) || defined(CRISV32)
 static long r10;
 # elif defined(MICROBLAZE)
@@ -895,34 +895,26 @@ get_scno(struct tcb *tcp)
 	if (upeek(tcp, PT_ORIG_P0, &scno))
 		return -1;
 # elif defined (I386)
-	if (upeek(tcp, 4*ORIG_EAX, &scno) < 0)
+	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &i386_regs) < 0)
 		return -1;
+	scno = i386_regs.orig_eax;
 # elif defined (X86_64)
-	if (upeek(tcp, 8*ORIG_RAX, &scno) < 0)
-		return -1;
-
-	/* TODO: speed up strace by not doing this at every syscall.
-	 * We only need to do it after execve.
-	 */
 	int currpers;
-	long val;
-	int pid = tcp->pid;
+	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &x86_64_regs) < 0)
+		return -1;
+	scno = x86_64_regs.orig_rax;
 
 	/* Check CS register value. On x86-64 linux it is:
 	 *	0x33	for long mode (64 bit)
 	 *	0x23	for compatibility mode (32 bit)
-	 * It takes only one ptrace and thus doesn't need
-	 * to be cached.
 	 */
-	if (upeek(tcp, 8*CS, &val) < 0)
-		return -1;
-	switch (val) {
+	switch (x86_64_regs.cs) {
 		case 0x23: currpers = 1; break;
 		case 0x33: currpers = 0; break;
 		default:
-			fprintf(stderr, "Unknown value CS=0x%02X while "
+			fprintf(stderr, "Unknown value CS=0x%08X while "
 				 "detecting personality of process "
-				 "PID=%d\n", (int)val, pid);
+				 "PID=%d\n", (int)x86_64_regs.cs, tcp->pid);
 			currpers = current_personality;
 			break;
 	}
@@ -933,14 +925,13 @@ get_scno(struct tcb *tcp)
 	 */
 	unsigned long val, rip, i;
 
-	if (upeek(tcp, 8*RIP, &rip) < 0)
-		perror("upeek(RIP)");
+	rip = x86_64_regs.rip;
 
 	/* sizeof(syscall) == sizeof(int 0x80) == 2 */
 	rip -= 2;
 	errno = 0;
 
-	call = ptrace(PTRACE_PEEKTEXT, pid, (char *)rip, (char *)0);
+	call = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)rip, (char *)0);
 	if (errno)
 		fprintf(stderr, "ptrace_peektext failed: %s\n",
 				strerror(errno));
@@ -954,7 +945,7 @@ get_scno(struct tcb *tcp)
 			fprintf(stderr,
 				"Unknown syscall opcode (0x%04X) while "
 				"detecting personality of process "
-				"PID=%d\n", (int)call, pid);
+				"PID=%d\n", (int)call, tcp->pid);
 			break;
 	}
 #  endif
@@ -962,14 +953,14 @@ get_scno(struct tcb *tcp)
 		static const char *const names[] = {"64 bit", "32 bit"};
 		set_personality(currpers);
 		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-				pid, names[current_personality]);
+				tcp->pid, names[current_personality]);
 	}
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
 	if (ia32) {
-		if (upeek(tcp, PT_R1, &scno) < 0)	/* orig eax */
+		if (upeek(tcp, PT_R1, &scno) < 0)
 			return -1;
 	} else {
 		if (upeek(tcp, PT_R15, &scno) < 0)
@@ -1291,26 +1282,17 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 #ifdef LINUX
 	/* A common case of "not a syscall entry" is post-execve SIGTRAP */
 #if defined (I386)
-	/* With PTRACE_O_TRACEEXEC, post-execve SIGTRAP is disabled.
-	 * Every extra ptrace call is expensive, so check EAX
-	 * on syscall entry only if PTRACE_O_TRACEEXEC is not enabled:
-	 */
-	if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
-		if (upeek(tcp, 4*EAX, &eax) < 0)
-			return -1;
-		if (eax != -ENOSYS) {
-			if (debug)
-				fprintf(stderr, "not a syscall entry (eax = %ld)\n", eax);
-			return 0;
-		}
+	if (i386_regs.eax != -ENOSYS) {
+		if (debug)
+			fprintf(stderr, "not a syscall entry (eax = %ld)\n", i386_regs.eax);
+		return 0;
 	}
 #elif defined (X86_64)
-	if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC)) {
-		if (upeek(tcp, 8*RAX, &rax) < 0)
-			return -1;
+	{
+		long rax = x86_64_regs.rax;
 		if (current_personality == 1)
-			rax = (long int)(int)rax; /* sign extend from 32 bits */
-		if (rax != -ENOSYS && entering(tcp)) {
+			rax = (int)rax; /* sign extend from 32 bits */
+		if (rax != -ENOSYS) {
 			if (debug)
 				fprintf(stderr, "not a syscall entry (rax = %ld)\n", rax);
 			return 0;
@@ -1521,6 +1503,7 @@ syscall_enter(struct tcb *tcp)
 	for (i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = regs.uregs[i];
 # elif defined(AVR32)
+	/* TODO: make it faster by unrolling into 6 direct assignments */
 	static const unsigned long *argregp[MAX_ARGS] = { &regs.r12,
 							  &regs.r11,
 							  &regs.r10,
@@ -1553,14 +1536,24 @@ syscall_enter(struct tcb *tcp)
 		if (upeek(tcp, REG_GENERAL(syscall_regs[i]), &tcp->u_arg[i]) < 0)
 			return -1;
 # elif defined(X86_64)
-	static const int argreg[SUPPORTED_PERSONALITIES][MAX_ARGS] = {
-		{ 8 * RDI, 8 * RSI, 8 * RDX, 8 * R10, 8 * R8 , 8 * R9  }, /* x86-64 ABI */
-		{ 8 * RBX, 8 * RCX, 8 * RDX, 8 * RSI, 8 * RDI, 8 * RBP }  /* i386 ABI */
-	};
-
-	for (i = 0; i < nargs; ++i)
-		if (upeek(tcp, argreg[current_personality][i], &tcp->u_arg[i]) < 0)
-			return -1;
+	(void)i;
+	(void)nargs;
+	if (current_personality == 0) { /* x86-64 ABI */
+		tcp->u_arg[0] = x86_64_regs.rdi;
+		tcp->u_arg[1] = x86_64_regs.rsi;
+		tcp->u_arg[2] = x86_64_regs.rdx;
+		tcp->u_arg[3] = x86_64_regs.r10;
+		tcp->u_arg[4] = x86_64_regs.r8;
+		tcp->u_arg[5] = x86_64_regs.r9;
+	} else { /* i386 ABI */
+		/* Sign-extend lower 32 bits */
+		tcp->u_arg[0] = (long)(int)x86_64_regs.rbx;
+		tcp->u_arg[1] = (long)(int)x86_64_regs.rcx;
+		tcp->u_arg[2] = (long)(int)x86_64_regs.rdx;
+		tcp->u_arg[3] = (long)(int)x86_64_regs.rsi;
+		tcp->u_arg[4] = (long)(int)x86_64_regs.rdi;
+		tcp->u_arg[5] = (long)(int)x86_64_regs.rbp;
+	}
 # elif defined(MICROBLAZE)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, (5 + i) * 4, &tcp->u_arg[i]) < 0)
@@ -1582,7 +1575,16 @@ syscall_enter(struct tcb *tcp)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, (i < 5 ? i : i + 2)*4, &tcp->u_arg[i]) < 0)
 			return -1;
-# else /* Other architecture (like i386) (32bits specific) */
+# elif defined(I386)
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = i386_regs.ebx;
+	tcp->u_arg[1] = i386_regs.ecx;
+	tcp->u_arg[2] = i386_regs.edx;
+	tcp->u_arg[3] = i386_regs.esi;
+	tcp->u_arg[4] = i386_regs.edi;
+	tcp->u_arg[5] = i386_regs.ebp;
+# else /* Other architecture (32bits specific) */
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, i*4, &tcp->u_arg[i]) < 0)
 			return -1;
@@ -1882,10 +1884,10 @@ get_syscall_result(struct tcb *tcp)
 	if (upeek(tcp, PT_R0, &r0) < 0)
 		return -1;
 # elif defined (I386)
-	if (upeek(tcp, 4*EAX, &eax) < 0)
+	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &i386_regs) < 0)
 		return -1;
 # elif defined (X86_64)
-	if (upeek(tcp, 8*RAX, &rax) < 0)
+	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &x86_64_regs) < 0)
 		return -1;
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
@@ -2053,20 +2055,20 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = gpr2;
 	}
 # elif defined(I386)
-	if (check_errno && is_negated_errno(eax)) {
+	if (check_errno && is_negated_errno(i386_regs.eax)) {
 		tcp->u_rval = -1;
-		u_error = -eax;
+		u_error = -i386_regs.eax;
 	}
 	else {
-		tcp->u_rval = eax;
+		tcp->u_rval = i386_regs.eax;
 	}
 # elif defined(X86_64)
-	if (check_errno && is_negated_errno(rax)) {
+	if (check_errno && is_negated_errno(x86_64_regs.rax)) {
 		tcp->u_rval = -1;
-		u_error = -rax;
+		u_error = -x86_64_regs.rax;
 	}
 	else {
-		tcp->u_rval = rax;
+		tcp->u_rval = x86_64_regs.rax;
 	}
 # elif defined(IA64)
 	if (ia32) {

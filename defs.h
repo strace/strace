@@ -193,6 +193,12 @@ extern int ptrace(int, int, char *, int, ...);
 #define	PTRACE_PEEKUSER	PTRACE_PEEKUSR
 #define	PTRACE_POKEUSER	PTRACE_POKEUSR
 #endif
+#if defined(X86_64) || defined(I386)
+/* For struct pt_regs. x86 strace uses PTRACE_GETREGS.
+ * PTRACE_GETREGS returns registers in the layout of this struct.
+ */
+#  include <asm/ptrace.h>
+#endif
 #ifdef ALPHA
 #  define REG_R0 0
 #  define REG_A0 16
