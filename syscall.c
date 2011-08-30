@@ -1503,15 +1503,14 @@ syscall_enter(struct tcb *tcp)
 	for (i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = regs.uregs[i];
 # elif defined(AVR32)
-	/* TODO: make it faster by unrolling into 6 direct assignments */
-	static const unsigned long *argregp[MAX_ARGS] = { &regs.r12,
-							  &regs.r11,
-							  &regs.r10,
-							  &regs.r9,
-							  &regs.r5,
-							  &regs.r3 };
-	for (i = 0; i < nargs; ++i)
-		tcp->u_arg[i] = *argregp[i];
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = regs.r12;
+	tcp->u_arg[1] = regs.r11;
+	tcp->u_arg[2] = regs.r10;
+	tcp->u_arg[3] = regs.r9;
+	tcp->u_arg[4] = regs.r5;
+	tcp->u_arg[5] = regs.r3;
 # elif defined(BFIN)
 	static const int argreg[MAX_ARGS] = { PT_R0, PT_R1, PT_R2, PT_R3, PT_R4, PT_R5 };
 
