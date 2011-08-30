@@ -29,7 +29,7 @@
 #include "defs.h"
 
 #include <ctype.h>
-#include <limits.h>
+#include <sys/param.h>
 
 #ifdef HAVE_POLL_H
 #include <poll.h>
