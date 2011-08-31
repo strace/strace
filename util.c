@@ -619,14 +619,15 @@ printstr(struct tcb *tcp, long addr, int len)
 		return;
 	}
 	/* Allocate static buffers if they are not allocated yet. */
-	if (!str)
+	if (!str) {
 		str = malloc(max_strlen + 1);
-	if (!outstr)
+		if (!str)
+			die_out_of_memory();
+	}
+	if (!outstr) {
 		outstr = malloc(4 * max_strlen + sizeof "\"...\"");
-	if (!str || !outstr) {
-		fprintf(stderr, "out of memory\n");
-		tprintf("%#lx", addr);
-		return;
+		if (!outstr)
+			die_out_of_memory();
 	}
 
 	if (len < 0) {
@@ -687,10 +688,9 @@ dumpiov(struct tcb *tcp, int len, long addr)
 	unsigned long size;
 
 	size = sizeof_iov * (unsigned long) len;
-	if (size / sizeof_iov != len
+	if (size / sizeof_iov != len /* overflow? */
 	    || (iov = malloc(size)) == NULL) {
-		fprintf(stderr, "out of memory\n");
-		return;
+		die_out_of_memory();
 	}
 	if (umoven(tcp, addr, size, (char *) iov) >= 0) {
 		for (i = 0; i < len; i++) {
@@ -715,18 +715,14 @@ dumpstr(struct tcb *tcp, long addr, int len)
 {
 	static int strsize = -1;
 	static unsigned char *str;
-	static char outstr[80];
 	char *s;
 	int i, j;
 
 	if (strsize < len) {
 		free(str);
 		str = malloc(len);
-		if (str == NULL) {
-			fprintf(stderr, "out of memory\n");
-	/* BUG! On next call we may use NULL str! */
-			return;
-		}
+		if (!str)
+			die_out_of_memory();
 		strsize = len;
 	}
 
@@ -734,6 +730,8 @@ dumpstr(struct tcb *tcp, long addr, int len)
 		return;
 
 	for (i = 0; i < len; i += 16) {
+		char outstr[80];
+
 		s = outstr;
 		sprintf(s, " | %05x ", i);
 		s += 9;
@@ -1741,10 +1739,8 @@ fixvfork(struct tcb *tcp)
 		return -1;
 	}
 	strtab = malloc((unsigned)ld.ld_symb_size);
-	if (strtab == NULL) {
-		fprintf(stderr, "out of memory\n");
-		return -1;
-	}
+	if (!strtab)
+		die_out_of_memory();
 	if (umoven(tcp, (int)ld.ld_symbols+(int)N_TXTADDR(hdr),
 					(int)ld.ld_symb_size, strtab) < 0)
 		goto err;

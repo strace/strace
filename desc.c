@@ -497,9 +497,9 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	long arg;
 
 	if (entering(tcp)) {
-		fds = (fd_set *) malloc(fdsize);
-		if (fds == NULL)
-			fprintf(stderr, "out of memory\n");
+		fds = malloc(fdsize);
+		if (!fds)
+			die_out_of_memory();
 		nfds = args[0];
 		tprintf("%d", nfds);
 		for (i = 0; i < 3; i++) {
@@ -508,7 +508,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 				tprintf(", NULL");
 				continue;
 			}
-			if (fds == NULL || !verbose(tcp)) {
+			if (!verbose(tcp)) {
 				tprintf(", %#lx", arg);
 				continue;
 			}
@@ -546,8 +546,8 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		}
 
 		fds = malloc(fdsize);
-		if (fds == NULL)
-			fprintf(stderr, "out of memory\n");
+		if (!fds)
+			die_out_of_memory();
 
 		tcp->auxstr = outstr;
 		outptr = outstr;
@@ -556,8 +556,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			int first = 1;
 
 			arg = args[i+1];
-			if (fds == NULL || !arg ||
-			    umoven(tcp, arg, fdsize, (char *) fds) < 0)
+			if (!arg || umoven(tcp, arg, fdsize, (char *) fds) < 0)
 				continue;
 			for (j = 0; j < args[0]; j++) {
 				if (FD_ISSET(j, fds)) {

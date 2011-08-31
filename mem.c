@@ -564,12 +564,12 @@ sys_mctl(struct tcb *tcp)
 int
 sys_mincore(struct tcb *tcp)
 {
-	unsigned long i, len;
-	char *vec = NULL;
-
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
 	} else {
+		unsigned long i, len;
+		char *vec = NULL;
+
 		len = tcp->u_arg[1];
 		if (syserror(tcp) || tcp->u_arg[2] == 0 ||
 			(vec = malloc(len)) == NULL ||
@@ -586,8 +586,7 @@ sys_mincore(struct tcb *tcp)
 			}
 			tprintf("]");
 		}
-		if (vec)
-			free(vec);
+		free(vec);
 	}
 	return 0;
 }

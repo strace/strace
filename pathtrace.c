@@ -290,10 +290,8 @@ pathtrace_match(struct tcb *tcp)
 			  & -sizeof(long));
 		fds = malloc(fdsize);
 
-		if (fds == NULL) {
-			fprintf(stderr, "out of memory\n");
-			return 0;
-		}
+		if (!fds)
+			die_out_of_memory();
 
 		for (i = 1; i <= 3; ++i) {
 			if (args[i] == 0)

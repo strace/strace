@@ -55,11 +55,8 @@ count_syscall(struct tcb *tcp, struct timeval *tv)
 
 	if (!counts) {
 		counts = calloc(nsyscalls, sizeof(*counts));
-		if (!counts) {
-			fprintf(stderr,
-				"strace: out of memory for call counts\n");
-			exit(1);
-		}
+		if (!counts)
+			die_out_of_memory();
 	}
 
 	counts[tcp->scno].calls++;
@@ -157,10 +154,8 @@ call_summary_pers(FILE *outf)
 	char    error_str[16];
 	int    *sorted_count = calloc(sizeof(int), nsyscalls);
 
-	if (!sorted_count) {
-		fprintf(stderr, "strace: out of memory for call summary\n");
-		return;
-	}
+	if (!sorted_count)
+		die_out_of_memory();
 
 	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
 	if (overhead.tv_sec == -1) {

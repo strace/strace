@@ -2422,11 +2422,8 @@ sys_getdents(struct tcb *tcp)
 	}
 	len = tcp->u_rval;
 	buf = len ? malloc(len) : NULL;
-	if (len && !buf) {
-		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
-		fprintf(stderr, "out of memory\n");
-		return 0;
-	}
+	if (len && !buf)
+		die_out_of_memory();
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		free(buf);
@@ -2507,11 +2504,8 @@ sys_getdents64(struct tcb *tcp)
 	}
 	len = tcp->u_rval;
 	buf = len ? malloc(len) : NULL;
-	if (len && !buf) {
-		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
-		fprintf(stderr, "out of memory\n");
-		return 0;
-	}
+	if (len && !buf)
+		die_out_of_memory();
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		free(buf);
@@ -2581,11 +2575,8 @@ sys_getdirentries(struct tcb *tcp)
 	}
 	len = tcp->u_rval;
 	buf = malloc(len);
-	if (buf == NULL) {
-		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
-		fprintf(stderr, "out of memory\n");
-		return 0;
-	}
+	if (!buf)
+		die_out_of_memory();
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		free(buf);

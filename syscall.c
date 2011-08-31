@@ -473,10 +473,8 @@ qualify(const char *s)
 		qualify_one(i, opt->bitflag, !not, -1);
 	}
 	copy = strdup(s);
-	if (!copy) {
-		fprintf(stderr, "out of memory\n");
-		exit(1);
-	}
+	if (!copy)
+		die_out_of_memory();
 	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
 		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {
 			for (i = 0; i < nsyscalls0; i++)

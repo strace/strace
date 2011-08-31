@@ -580,6 +580,7 @@ void error_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 void perror_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
 void error_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
 void perror_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
+void die_out_of_memory(void) __attribute__ ((noreturn));
 
 extern void set_personality(int personality);
 extern const char *xlookup(const struct xlat *, int);

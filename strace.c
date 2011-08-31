@@ -264,6 +264,15 @@ void perror_msg_and_die(const char *fmt, ...)
 	die();
 }
 
+void die_out_of_memory(void)
+{
+	static bool recursed = 0;
+	if (recursed)
+		exit(1);
+	recursed = 1;
+	error_msg_and_die("Out of memory");
+}
+
 #ifdef SVR4
 #ifdef MIPS
 void
@@ -383,7 +392,7 @@ strace_popen(const char *command)
 	swap_uid();
 	fp = fdopen(fds[1], "w");
 	if (!fp)
-		error_msg_and_die("Out of memory");
+		die_out_of_memory();
 	return fp;
 }
 
@@ -947,11 +956,11 @@ main(int argc, char *argv[])
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
 	tcbtab = calloc(tcbtabsize, sizeof(tcbtab[0]));
-	if (tcbtab == NULL)
-		error_msg_and_die("Out of memory");
+	if (!tcbtab)
+		die_out_of_memory();
 	tcp = calloc(tcbtabsize, sizeof(*tcp));
-	if (tcp == NULL)
-		error_msg_and_die("Out of memory");
+	if (!tcp)
+		die_out_of_memory();
 	for (c = 0; c < tcbtabsize; c++)
 		tcbtab[c] = tcp++;
 
@@ -1078,9 +1087,8 @@ main(int argc, char *argv[])
 			username = strdup(optarg);
 			break;
 		case 'E':
-			if (putenv(optarg) < 0) {
-				error_msg_and_die("Out of memory");
-			}
+			if (putenv(optarg) < 0)
+				die_out_of_memory();
 			break;
 		default:
 			usage(stderr, 1);
@@ -1090,7 +1098,7 @@ main(int argc, char *argv[])
 
 	acolumn_spaces = malloc(acolumn + 1);
 	if (!acolumn_spaces)
-		error_msg_and_die("Out of memory");
+		die_out_of_memory();
 	memset(acolumn_spaces, ' ', acolumn);
 	acolumn_spaces[acolumn] = '\0';
 
@@ -1240,8 +1248,8 @@ expand_tcbtab(void)
 	int i = tcbtabsize;
 	struct tcb *newtcbs = calloc(tcbtabsize, sizeof(newtcbs[0]));
 	struct tcb **newtab = realloc(tcbtab, tcbtabsize * 2 * sizeof(tcbtab[0]));
-	if (newtab == NULL || newtcbs == NULL)
-		error_msg_and_die("Out of memory");
+	if (!newtab || !newtcbs)
+		die_out_of_memory();
 	tcbtabsize *= 2;
 	tcbtab = newtab;
 	while (i < tcbtabsize)
@@ -1866,9 +1874,8 @@ rebuild_pollv(void)
 
 	free(pollv);
 	pollv = malloc(nprocs * sizeof(pollv[0]));
-	if (pollv == NULL) {
-		error_msg_and_die("Out of memory");
-	}
+	if (!pollv)
+		die_out_of_memory();
 
 	for (i = j = 0; i < tcbtabsize; i++) {
 		struct tcb *tcp = tcbtab[i];
