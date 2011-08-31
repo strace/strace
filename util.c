@@ -440,8 +440,15 @@ string_quote(const char *instr, char *outstr, int len, int size)
 {
 	const unsigned char *ustr = (const unsigned char *) instr;
 	char *s = outstr;
-	int usehex = 0, c, i;
+	int usehex, c, i, eol;
 
+	eol = 0x100; /* this can never match a char */
+	if (len < 0) {
+		size--;
+		eol = '\0';
+	}
+
+	usehex = 0;
 	if (xflag > 1)
 		usehex = 1;
 	else if (xflag) {
@@ -450,13 +457,8 @@ string_quote(const char *instr, char *outstr, int len, int size)
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
 			/* Check for NUL-terminated string. */
-			if (len < 0) {
-				if (c == '\0')
-					break;
-				/* Quote at most size - 1 bytes. */
-				if (i == size - 1)
-					continue;
-			}
+			if (c == eol)
+				break;
 			if (!isprint(c) && !isspace(c)) {
 				usehex = 1;
 				break;
@@ -471,27 +473,19 @@ string_quote(const char *instr, char *outstr, int len, int size)
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
 			/* Check for NUL-terminated string. */
-			if (len < 0) {
-				if (c == '\0')
-					break;
-				/* Quote at most size - 1 bytes. */
-				if (i == size - 1)
-					continue;
-			}
-			sprintf(s, "\\x%02x", c);
-			s += 4;
+			if (c == eol)
+				goto asciz_ended;
+			*s++ = '\\';
+			*s++ = 'x';
+			*s++ = "0123456789abcdef"[c >> 4];
+			*s++ = "0123456789abcdef"[c & 0xf];
 		}
 	} else {
 		for (i = 0; i < size; ++i) {
 			c = ustr[i];
 			/* Check for NUL-terminated string. */
-			if (len < 0) {
-				if (c == '\0')
-					break;
-				/* Quote at most size - 1 bytes. */
-				if (i == size - 1)
-					continue;
-			}
+			if (c == eol)
+				goto asciz_ended;
 			switch (c) {
 				case '\"': case '\\':
 					*s++ = '\\';
@@ -520,13 +514,25 @@ string_quote(const char *instr, char *outstr, int len, int size)
 				default:
 					if (isprint(c))
 						*s++ = c;
-					else if (i + 1 < size
-						 && isdigit(ustr[i + 1])) {
-						sprintf(s, "\\%03o", c);
-						s += 4;
-					} else {
-						sprintf(s, "\\%o", c);
-						s += strlen(s);
+					else {
+						/* Print \octal */
+						*s++ = '\\';
+						if (i + 1 < size
+						    && ustr[i + 1] >= '0'
+						    && ustr[i + 1] <= '9'
+						) {
+							/* Print \ooo */
+							*s++ = '0' + (c >> 6);
+							*s++ = '0' + ((c >> 3) & 0x7);
+						} else {
+							/* Print \[[o]o]o */
+							if ((c >> 3) != 0) {
+								if ((c >> 6) != 0)
+									*s++ = '0' + (c >> 6);
+								*s++ = '0' + ((c >> 3) & 0x7);
+							}
+						}
+						*s++ = '0' + (c & 0x7);
 					}
 					break;
 			}
@@ -536,8 +542,21 @@ string_quote(const char *instr, char *outstr, int len, int size)
 	*s++ = '\"';
 	*s = '\0';
 
-	/* Return nonzero if the string was unterminated.  */
-	return i == size;
+	/* Return zero if we printed entire ASCIZ string (didn't truncate it) */
+	if (len < 0 && ustr[i] == '\0') {
+		/* We didn't see NUL yet (otherwise we'd jump to 'asciz_ended')
+		 * but next char is NUL.
+		 */
+		return 0;
+	}
+
+	return 1;
+
+ asciz_ended:
+	*s++ = '\"';
+	*s = '\0';
+	/* Return zero: we printed entire ASCIZ string (didn't truncate it) */
+	return 0;
 }
 
 /*
