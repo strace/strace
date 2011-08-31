@@ -164,6 +164,14 @@ xlookup(const struct xlat *xlat, int val)
 	return NULL;
 }
 
+char *
+stpcpy(char *dst, const char *src)
+{
+	while ((*dst = *src++) != '\0')
+		dst++;
+	return dst;
+}
+
 /*
  * Generic ptrace wrapper which tracks ESRCH errors
  * by setting tcp->ptrace_errno to ESRCH.
@@ -302,23 +310,24 @@ const char *
 sprintflags(const char *prefix, const struct xlat *xlat, int flags)
 {
 	static char outstr[1024];
+	char *outptr;
 	int found = 0;
 
-	strcpy(outstr, prefix);
+	outptr = stpcpy(outstr, prefix);
 
 	for (; xlat->str; xlat++) {
 		if ((flags & xlat->val) == xlat->val) {
 			if (found)
-				strcat(outstr, "|");
-			strcat(outstr, xlat->str);
+				*outptr++ = '|';
+			outptr = stpcpy(outptr, xlat->str);
 			flags &= ~xlat->val;
 			found = 1;
 		}
 	}
 	if (flags) {
 		if (found)
-			strcat(outstr, "|");
-		sprintf(outstr + strlen(outstr), "%#x", flags);
+			*outptr++ = '|';
+		outptr += sprintf(outptr, "%#x", flags);
 	}
 
 	return outstr;
@@ -554,14 +563,16 @@ printpathn(struct tcb *tcp, long addr, int n)
 		tprintf("%#lx", addr);
 	else {
 		static char outstr[4*(sizeof path - 1) + sizeof "\"...\""];
+		const char *fmt;
 		int trunc = (path[n] != '\0');
 
 		if (trunc)
 			path[n] = '\0';
-		(void) string_quote(path, outstr, -1, n + 1);
+		string_quote(path, outstr, -1, n + 1);
+		fmt = "%s";
 		if (trunc)
-			strcat(outstr, "...");
-		tprintf("%s", outstr);
+			fmt = "%s...";
+		tprintf(fmt, outstr);
 	}
 }
 
@@ -582,6 +593,7 @@ printstr(struct tcb *tcp, long addr, int len)
 	static char *str = NULL;
 	static char *outstr;
 	int size;
+	const char *fmt;
 
 	if (!addr) {
 		tprintf("NULL");
@@ -605,6 +617,7 @@ printstr(struct tcb *tcp, long addr, int len)
 		 */
 		size = max_strlen + 1;
 		str[max_strlen] = '\0';
+	/* FIXME! umovestr can overwrite the '\0' stored above??? */
 		if (umovestr(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
@@ -618,11 +631,12 @@ printstr(struct tcb *tcp, long addr, int len)
 		}
 	}
 
+	fmt = "%s";
 	if (string_quote(str, outstr, len, size) &&
 	    (len < 0 || len > max_strlen))
-		strcat(outstr, "...");
+		fmt = "%s...";
 
-	tprintf("%s", outstr);
+	tprintf(fmt, outstr);
 }
 
 #if HAVE_SYS_UIO_H

@@ -680,6 +680,13 @@ extern void tv_sub(struct timeval *, struct timeval *, struct timeval *);
 extern void tv_mul(struct timeval *, struct timeval *, int);
 extern void tv_div(struct timeval *, struct timeval *, int);
 
+/* Some libc have stpcpy, some don't. Sigh...
+ * Roll our private implementation...
+ */
+#undef stpcpy
+#define stpcpy strace_stpcpy
+extern char *stpcpy(char *dst, const char *src);
+
 #ifdef SUNOS4
 extern int fixvfork(struct tcb *);
 #endif

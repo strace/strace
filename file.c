@@ -343,17 +343,6 @@ print_dirfd(struct tcb *tcp, int fd)
 #endif
 
 /*
- * Pity stpcpy() is not standardized...
- */
-static char *
-str_append(char *dst, const char *src)
-{
-	while ((*dst = *src++) != '\0')
-		dst++;
-	return dst;
-}
-
-/*
  * low bits of the open(2) flags define access mode,
  * other bits are real flags.
  */
@@ -366,10 +355,10 @@ sprint_open_modes(mode_t flags)
 	const char *str;
 	const struct xlat *x;
 
-	p = str_append(outstr, "flags ");
+	p = stpcpy(outstr, "flags ");
 	str = xlookup(open_access_modes, flags & 3);
 	if (str) {
-		p = str_append(p, str);
+		p = stpcpy(p, str);
 		flags &= ~3;
 		if (!flags)
 			return outstr;
@@ -380,7 +369,7 @@ sprint_open_modes(mode_t flags)
 		if ((flags & x->val) == x->val) {
 			if (sep)
 				*p++ = sep;
-			p = str_append(p, x->str);
+			p = stpcpy(p, x->str);
 			flags &= ~x->val;
 			if (!flags)
 				return outstr;
