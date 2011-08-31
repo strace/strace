@@ -341,9 +341,9 @@ decode_poll(struct tcb *tcp, long pts)
 		return 0;
 	} else {
 		static char outstr[1024];
-		char str[64];
+		char *outptr;
+#define end_outstr (outstr + sizeof(outstr))
 		const char *flagstr;
-		unsigned int cumlen;
 
 		if (syserror(tcp))
 			return 0;
@@ -366,62 +366,56 @@ decode_poll(struct tcb *tcp, long pts)
 			abbrev_end = end;
 		}
 
-		outstr[0] = '\0';
-		cumlen = 0;
+		outptr = outstr;
 
 		for (cur = start; cur < end; cur += sizeof(fds)) {
 			if (umoven(tcp, cur, sizeof fds, (char *) &fds) < 0) {
-				++cumlen;
-				if (cumlen < sizeof(outstr))
-					strcat(outstr, "?");
+				if (outptr < end_outstr - 2)
+					*outptr++ = '?';
 				failed = 1;
 				break;
 			}
 			if (!fds.revents)
 				continue;
-			if (!cumlen) {
-				++cumlen;
-				strcat(outstr, "[");
+			if (outptr == outstr) {
+				*outptr++ = '[';
 			} else {
-				cumlen += 2;
-				if (cumlen < sizeof(outstr))
-					strcat(outstr, ", ");
+				if (outptr < end_outstr - 3)
+					outptr = stpcpy(outptr, ", ");
 			}
 			if (cur >= abbrev_end) {
-				cumlen += 3;
-				if (cumlen < sizeof(outstr))
-					strcat(outstr, "...");
+				if (outptr < end_outstr - 4)
+					outptr = stpcpy(outptr, "...");
 				break;
 			}
-			sprintf(str, "{fd=%d, revents=", fds.fd);
+			if (outptr < end_outstr - (sizeof("{fd=%d, revents=") + sizeof(int)*3) + 1)
+				outptr += sprintf(outptr, "{fd=%d, revents=", fds.fd);
 			flagstr = sprintflags("", pollflags, fds.revents);
-			cumlen += strlen(str) + strlen(flagstr) + 1;
-			if (cumlen < sizeof(outstr)) {
-				strcat(outstr, str);
-				strcat(outstr, flagstr);
-				strcat(outstr, "}");
+			if (outptr < end_outstr - (strlen(flagstr) + 2)) {
+				outptr = stpcpy(outptr, flagstr);
+				*outptr++ = '}';
 			}
 		}
 		if (failed)
 			return 0;
 
-		if (cumlen && ++cumlen < sizeof(outstr))
-			strcat(outstr, "]");
+		if (outptr != outstr /* && outptr < end_outstr - 1 (always true)*/)
+			*outptr++ = ']';
 
+		*outptr = '\0';
 		if (pts) {
-			char str[128];
-
-			sprintf(str, "%sleft ", cumlen ? ", " : "");
-			sprint_timespec(str + strlen(str), tcp, pts);
-			if ((cumlen += strlen(str)) < sizeof(outstr))
-				strcat(outstr, str);
+			if (outptr < end_outstr - 128) {
+				outptr = stpcpy(outptr, outptr == outstr ? "left " : ", left ");
+				sprint_timespec(outptr, tcp, pts);
+			}
 		}
 
-		if (!outstr[0])
+		if (outptr == outstr)
 			return 0;
 
 		tcp->auxstr = outstr;
 		return RVAL_STR;
+#undef end_outstr
 	}
 }
 

@@ -493,7 +493,6 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	unsigned int fdsize = ((((args[0] + 7) / 8) + sizeof(long) - 1)
 			       & -sizeof(long));
 	fd_set *fds;
-	static char outstr[1024];
 	const char *sep;
 	long arg;
 
@@ -532,8 +531,10 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		printtv_bitness(tcp, args[4], bitness, 0);
 	}
 	else {
-		unsigned int cumlen = 0;
-		const char *sep = "";
+		static char outstr[1024];
+		char *outptr;
+#define end_outstr (outstr + sizeof(outstr))
+		const char *sep;
 
 		if (syserror(tcp))
 			return 0;
@@ -544,41 +545,42 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			return RVAL_STR;
 		}
 
-		fds = (fd_set *) malloc(fdsize);
+		fds = malloc(fdsize);
 		if (fds == NULL)
 			fprintf(stderr, "out of memory\n");
 
-		outstr[0] = '\0';
+		tcp->auxstr = outstr;
+		outptr = outstr;
+		sep = "";
 		for (i = 0; i < 3; i++) {
 			int first = 1;
 
-			tcp->auxstr = outstr;
 			arg = args[i+1];
 			if (fds == NULL || !arg ||
 			    umoven(tcp, arg, fdsize, (char *) fds) < 0)
 				continue;
 			for (j = 0; j < args[0]; j++) {
 				if (FD_ISSET(j, fds)) {
-					char str[11 + 3 * sizeof(int)];
-
-					if (first) {
-						sprintf(str, "%s%s [%u", sep,
-							i == 0 ? "in" :
-							i == 1 ? "out" :
-							"except", j);
-						first = 0;
-						sep = ", ";
+					/* +2 chars needed at the end: ']',NUL */
+					if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
+						if (first) {
+							outptr += sprintf(outptr, "%s%s [%u",
+								sep,
+								i == 0 ? "in" : i == 1 ? "out" : "except",
+								j
+							);
+							first = 0;
+							sep = ", ";
+						}
+						else {
+							outptr += sprintf(outptr, " %u", j);
+						}
 					}
-					else
-						sprintf(str, " %u", j);
-					cumlen += strlen(str);
-					if (cumlen < sizeof(outstr))
-						strcat(outstr, str);
 					nfds--;
 				}
 			}
-			if (cumlen)
-				strcat(outstr, "]");
+			if (outptr != outstr)
+				*outptr++ = ']';
 			if (nfds == 0)
 				break;
 		}
@@ -586,15 +588,15 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 #ifdef LINUX
 		/* This contains no useful information on SunOS.  */
 		if (args[4]) {
-			char str[128];
-
-			sprintf(str, "%sleft ", sep);
-			sprinttv(tcp, args[4], bitness, str + strlen(str));
-			if ((cumlen += strlen(str)) < sizeof(outstr))
-				strcat(outstr, str);
+			if (outptr < end_outstr - 128) {
+				outptr += sprintf(outptr, "%sleft ", sep);
+				outptr = sprinttv(tcp, args[4], bitness, outptr);
+			}
 		}
 #endif /* LINUX */
+		*outptr = '\0';
 		return RVAL_STR;
+#undef end_outstr
 	}
 	return 0;
 }
