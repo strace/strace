@@ -549,7 +549,6 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		if (!fds)
 			die_out_of_memory();
 
-		tcp->auxstr = outstr;
 		outptr = outstr;
 		sep = "";
 		for (i = 0; i < 3; i++) {
@@ -594,6 +593,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		}
 #endif /* LINUX */
 		*outptr = '\0';
+		tcp->auxstr = outstr;
 		return RVAL_STR;
 #undef end_outstr
 	}
