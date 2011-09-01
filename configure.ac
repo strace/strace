@@ -235,6 +235,7 @@ AC_CHECK_FUNCS([ \
 	strsignal \
 	sys_siglist \
 	_sys_siglist \
+	stpcpy \
 ])
 AC_CHECK_HEADERS([ \
 	inttypes.h \

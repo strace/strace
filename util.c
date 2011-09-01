@@ -164,6 +164,7 @@ xlookup(const struct xlat *xlat, int val)
 	return NULL;
 }
 
+#if !defined HAVE_STPCPY
 char *
 stpcpy(char *dst, const char *src)
 {
@@ -171,6 +172,7 @@ stpcpy(char *dst, const char *src)
 		dst++;
 	return dst;
 }
+#endif
 
 /*
  * Generic ptrace wrapper which tracks ESRCH errors
