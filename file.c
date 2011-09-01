@@ -2421,6 +2421,11 @@ sys_getdents(struct tcb *tcp)
 		return 0;
 	}
 	len = tcp->u_rval;
+	/* Beware of insanely large or negative values in tcp->u_rval */
+	if (tcp->u_rval > 1024*1024)
+		len = 1024*1024;
+	if (tcp->u_rval < 0)
+		len = 0;
 	buf = len ? malloc(len) : NULL;
 	if (len && !buf)
 		die_out_of_memory();
@@ -2502,10 +2507,17 @@ sys_getdents64(struct tcb *tcp)
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		return 0;
 	}
+
 	len = tcp->u_rval;
+	/* Beware of insanely large or negative tcp->u_rval */
+	if (tcp->u_rval > 1024*1024)
+		len = 1024*1024;
+	if (tcp->u_rval < 0)
+		len = 0;
 	buf = len ? malloc(len) : NULL;
 	if (len && !buf)
 		die_out_of_memory();
+
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		free(buf);
@@ -2573,10 +2585,17 @@ sys_getdirentries(struct tcb *tcp)
 		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		return 0;
 	}
+
 	len = tcp->u_rval;
+	/* Beware of insanely large or negative tcp->u_rval */
+	if (tcp->u_rval > 1024*1024)
+		len = 1024*1024;
+	if (tcp->u_rval < 0)
+		len = 0;
 	buf = malloc(len);
 	if (!buf)
 		die_out_of_memory();
+
 	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 		free(buf);

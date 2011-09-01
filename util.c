@@ -686,12 +686,14 @@ dumpiov(struct tcb *tcp, int len, long addr)
 #define iov_iov_len(i) iov[i].iov_len
 #endif
 	int i;
-	unsigned long size;
+	unsigned size;
 
-	size = sizeof_iov * (unsigned long) len;
-	if (size / sizeof_iov != len /* overflow? */
+	size = sizeof_iov * len;
+	/* Assuming no sane program has millions of iovs */
+	if ((unsigned)len > 1024*1024 /* insane or negative size? */
 	    || (iov = malloc(size)) == NULL) {
-		die_out_of_memory();
+		fprintf(stderr, "Out of memory\n");
+		return;
 	}
 	if (umoven(tcp, addr, size, (char *) iov) >= 0) {
 		for (i = 0; i < len; i++) {
@@ -703,7 +705,7 @@ dumpiov(struct tcb *tcp, int len, long addr)
 				iov_iov_len(i));
 		}
 	}
-	free((char *) iov);
+	free(iov);
 #undef sizeof_iov
 #undef iov_iov_base
 #undef iov_iov_len
@@ -722,8 +724,11 @@ dumpstr(struct tcb *tcp, long addr, int len)
 	if (strsize < len) {
 		free(str);
 		str = malloc(len);
-		if (!str)
-			die_out_of_memory();
+		if (!str) {
+			strsize = -1;
+			fprintf(stderr, "Out of memory\n");
+			return;
+		}
 		strsize = len;
 	}
 

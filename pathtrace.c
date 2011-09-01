@@ -269,7 +269,8 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_oldselect ||
 	    s->sys_func == sys_pselect6)
 	{
-		int     i, j, nfds;
+		int     i, j;
+		unsigned nfds;
 		long   *args, oldargs[5];
 		unsigned fdsize;
 		fd_set *fds;
@@ -286,10 +287,14 @@ pathtrace_match(struct tcb *tcp)
 			args = tcp->u_arg;
 
 		nfds = args[0];
+		/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
+		if (args[0] > 1024*1024)
+			nfds = 1024*1024;
+		if (args[0] < 0)
+			nfds = 0;
 		fdsize = ((((nfds + 7) / 8) + sizeof(long) - 1)
 			  & -sizeof(long));
 		fds = malloc(fdsize);
-
 		if (!fds)
 			die_out_of_memory();
 
