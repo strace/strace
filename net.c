@@ -1468,7 +1468,7 @@ tprint_sock_type(struct tcb *tcp, int flags)
 	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
 
 	if (str) {
-		tprintf("%s", str);
+		tprints(str);
 		flags &= ~SOCK_TYPE_MASK;
 		if (!flags)
 			return;

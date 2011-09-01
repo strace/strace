@@ -2646,7 +2646,21 @@ tprintf(const char *fmt, ...)
 			curcol += n;
 	}
 	va_end(args);
-	return;
+}
+
+void
+tprints(const char *str)
+{
+	if (outf) {
+		int n = fputs(str, outf);
+		if (n >= 0) {
+			curcol += strlen(str);
+			return;
+		}
+		if (outf != stderr)
+			perror(outfname == NULL
+			       ? "<writing to pipe>" : outfname);
+	}
 }
 
 void
@@ -2705,7 +2719,7 @@ void
 tabto(void)
 {
 	if (curcol < acolumn)
-		tprintf(acolumn_spaces + curcol);
+		tprints(acolumn_spaces + curcol);
 }
 
 void

@@ -519,7 +519,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			tprintf(", [");
 			for (j = 0, sep = ""; j < nfds; j++) {
 				if (FD_ISSET(j, fds)) {
-					tprintf("%s", sep);
+					tprints(sep);
 					printfd(tcp, j);
 					sep = " ";
 				}

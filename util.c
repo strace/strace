@@ -236,7 +236,7 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 	const char *str = xlookup(xlat, val);
 
 	if (str)
-		tprintf("%s", str);
+		tprints(str);
 	else
 		tprintf("%#x /* %s */", val, dflt);
 }
@@ -340,7 +340,7 @@ printflags(const struct xlat *xlat, int flags, const char *dflt)
 	const char *sep;
 
 	if (flags == 0 && xlat->val == 0) {
-		tprintf("%s", xlat->str);
+		tprints(xlat->str);
 		return 1;
 	}
 
@@ -423,8 +423,7 @@ printfd(struct tcb *tcp, int fd)
 void
 printuid(const char *text, unsigned long uid)
 {
-	tprintf("%s", text);
-	tprintf((uid == -1) ? "%ld" : "%lu", uid);
+	tprintf((uid == -1) ? "%s%ld" : "%s%lu", text, uid);
 }
 
 static char path[MAXPATHLEN + 1];

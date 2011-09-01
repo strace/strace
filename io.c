@@ -426,7 +426,7 @@ sys_ioctl(struct tcb *tcp)
 		tprintf(", ");
 		iop = ioctl_lookup(tcp->u_arg[1]);
 		if (iop) {
-			tprintf("%s", iop->symbol);
+			tprints(iop->symbol);
 			while ((iop = ioctl_next_match(iop)))
 				tprintf(" or %s", iop->symbol);
 		} else

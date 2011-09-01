@@ -708,6 +708,7 @@ extern int proc_open(struct tcb *tcp, int attaching);
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 
 extern void tprintf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
+extern void tprints(const char *str);
 
 #ifndef HAVE_STRERROR
 const char *strerror(int);

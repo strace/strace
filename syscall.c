@@ -683,7 +683,7 @@ sys_indir(struct tcb *tcp)
 			return 0;
 		}
 		nargs = sysent[scno].nargs;
-		tprintf("%s", sysent[scno].sys_name);
+		tprints(sysent[scno].sys_name);
 		for (i = 0; i < nargs; i++)
 			tprintf(", %#lx", tcp->u_arg[i+1]);
 	}

@@ -385,13 +385,13 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 static void
 printsigmask(sigset_t *mask, int rt)
 {
-	tprintf("%s", sprintsigmask("", mask, rt));
+	tprints(sprintsigmask("", mask, rt));
 }
 
 void
 printsignal(int nr)
 {
-	tprintf("%s", signame(nr));
+	tprints(signame(nr));
 }
 
 void
