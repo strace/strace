@@ -120,10 +120,8 @@ sprinttv(struct tcb *tcp, long addr, enum bitness_t bitness, char *buf)
 	if (addr == 0)
 		return stpcpy(buf, "NULL");
 
-	if (!verbose(tcp)) {
-		buf += sprintf(buf, "%#lx", addr);
-		return buf;
-	}
+	if (!verbose(tcp))
+		return buf + sprintf(buf, "%#lx", addr);
 
 	if (bitness == BITNESS_32
 #if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
@@ -135,21 +133,19 @@ sprinttv(struct tcb *tcp, long addr, enum bitness_t bitness, char *buf)
 
 		rc = umove(tcp, addr, &tv);
 		if (rc >= 0)
-			buf += sprintf(buf, "{%u, %u}",
+			return buf + sprintf(buf, "{%u, %u}",
 				tv.tv_sec, tv.tv_usec);
 	} else {
 		struct timeval tv;
 
 		rc = umove(tcp, addr, &tv);
 		if (rc >= 0)
-			buf += sprintf(buf, "{%lu, %lu}",
+			return buf + sprintf(buf, "{%lu, %lu}",
 				(unsigned long) tv.tv_sec,
 				(unsigned long) tv.tv_usec);
 	}
-	if (rc < 0)
-		buf = stpcpy(buf, "{...}");
 
-	return buf;
+	return stpcpy(buf, "{...}");
 }
 
 void print_timespec(struct tcb *tcp, long addr)
