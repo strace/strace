@@ -489,7 +489,7 @@ sys_getdtablesize(struct tcb *tcp)
 static int
 decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 {
-	int i, j, nfds;
+	int i, j;
 	unsigned nfds, fdsize;
 	fd_set *fds;
 	const char *sep;
