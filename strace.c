@@ -652,7 +652,7 @@ startup_child(char **argv)
 				kill(pid, SIGSTOP);
 		}
 
-		if (username != NULL || geteuid() == 0) {
+		if (username != NULL) {
 			uid_t run_euid = run_uid;
 			gid_t run_egid = run_gid;
 
@@ -660,24 +660,21 @@ startup_child(char **argv)
 				run_euid = statbuf.st_uid;
 			if (statbuf.st_mode & S_ISGID)
 				run_egid = statbuf.st_gid;
-
 			/*
 			 * It is important to set groups before we
 			 * lose privileges on setuid.
 			 */
-			if (username != NULL) {
-				if (initgroups(username, run_gid) < 0) {
-					perror_msg_and_die("initgroups");
-				}
-				if (setregid(run_gid, run_egid) < 0) {
-					perror_msg_and_die("setregid");
-				}
-				if (setreuid(run_uid, run_euid) < 0) {
-					perror_msg_and_die("setreuid");
-				}
+			if (initgroups(username, run_gid) < 0) {
+				perror_msg_and_die("initgroups");
+			}
+			if (setregid(run_gid, run_egid) < 0) {
+				perror_msg_and_die("setregid");
+			}
+			if (setreuid(run_uid, run_euid) < 0) {
+				perror_msg_and_die("setreuid");
 			}
 		}
-		else
+		else if (geteuid() != 0)
 			setreuid(run_uid, run_uid);
 
 		if (!daemonized_tracer) {
