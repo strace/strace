@@ -415,7 +415,7 @@ startup_attach(void)
 	/*
 	 * Block user interruptions as we would leave the traced
 	 * process stopped (process state T) if we would terminate in
-	 * between PTRACE_ATTACH and wait4 () on SIGSTOP.
+	 * between PTRACE_ATTACH and wait4() on SIGSTOP.
 	 * We rely on cleanup() from this point on.
 	 */
 	if (interactive)
@@ -628,24 +628,22 @@ startup_child(char **argv)
 	 || (pid == 0 && !daemonized_tracer) /* not -D: child to become a traced process */
 	) {
 		pid = getpid();
+		if (outf != stderr)
+			close(fileno(outf));
 #ifdef USE_PROCFS
-		if (outf != stderr) close(fileno(outf));
-#ifdef MIPS
+# ifdef MIPS
 		/* Kludge for SGI, see proc_open for details. */
 		sa.sa_handler = foobar;
 		sa.sa_flags = 0;
 		sigemptyset(&sa.sa_mask);
 		sigaction(SIGINT, &sa, NULL);
-#endif /* MIPS */
-#ifndef FREEBSD
+# endif
+# ifndef FREEBSD
 		pause();
-#else /* FREEBSD */
+# else
 		kill(pid, SIGSTOP); /* stop HERE */
-#endif /* FREEBSD */
+# endif
 #else /* !USE_PROCFS */
-		if (outf != stderr)
-			close(fileno(outf));
-
 		if (!daemonized_tracer) {
 			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
 				perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
@@ -684,14 +682,14 @@ startup_child(char **argv)
 
 		if (!daemonized_tracer) {
 			/*
-			 * Induce an immediate stop so that the parent
+			 * Induce a ptrace stop. Tracer (our parent)
 			 * will resume us with PTRACE_SYSCALL and display
-			 * this execve call normally.
-			 * Unless of course we're on a no-MMU system where
-			 * we vfork()-ed, so we cannot stop the child.
+			 * the immediately following execve syscall.
+			 * Can't do this on NOMMU systems, we are after
+			 * vfork: parent is blocked, stopping would deadlock.
 			 */
 			if (!strace_vforked)
-				kill(getpid(), SIGSTOP);
+				kill(pid, SIGSTOP);
 		} else {
 			struct sigaction sv_sigchld;
 			sigaction(SIGCHLD, NULL, &sv_sigchld);
@@ -715,20 +713,25 @@ startup_child(char **argv)
 		perror_msg_and_die("exec");
 	}
 
-	/* We are the tracer.  */
-	/* With -D, we are *child* here, IOW: different pid. Fetch it. */
-	strace_tracer_pid = getpid();
+	/* We are the tracer */
 
-	tcp = alloctcb(daemonized_tracer ? getppid() : pid);
-	if (daemonized_tracer) {
-		/* We want subsequent startup_attach() to attach to it.  */
+	if (!daemonized_tracer) {
+		tcp = alloctcb(pid);
+	}
+	else {
+		/* With -D, *we* are child here, IOW: different pid. Fetch it: */
+		strace_tracer_pid = getpid();
+		/* The tracee is our parent: */
+		pid = getppid();
+		tcp = alloctcb(pid);
+		/* We want subsequent startup_attach() to attach to it: */
 		tcp->flags |= TCB_ATTACHED;
 	}
 #ifdef USE_PROCFS
 	if (proc_open(tcp, 0) < 0) {
 		perror_msg_and_die("trouble opening proc file");
 	}
-#endif /* USE_PROCFS */
+#endif
 }
 
 #ifdef LINUX
