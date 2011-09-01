@@ -430,7 +430,7 @@ sys_exit(struct tcb *tcp)
 	/* special case: we stop tracing this process, finish line now */
 	tprintf("%ld) ", tcp->u_arg[0]);
 	tabto();
-	tprintf("= ?");
+	tprints("= ?");
 	printtrailer();
 	return 0;
 }
@@ -597,7 +597,7 @@ sys_clone(struct tcb *tcp)
 			tprintf("stack_size=%#lx, ",
 				tcp->u_arg[ARG_STACKSIZE]);
 # endif
-		tprintf("flags=");
+		tprints("flags=");
 		if (!printflags(clone_flags, flags &~ CSIGNAL, NULL))
 			sep = "";
 		if ((flags & CSIGNAL) != 0)
@@ -614,7 +614,7 @@ sys_clone(struct tcb *tcp)
 				tprintf(", {entry_number:%d, ",
 					copy.entry_number);
 				if (!verbose(tcp))
-					tprintf("...}");
+					tprints("...}");
 				else
 					print_ldt_entry(&copy);
 			}
@@ -1072,12 +1072,12 @@ sys_setgroups(struct tcb *tcp)
 		len = tcp->u_arg[0];
 		tprintf("%lu, ", len);
 		if (len == 0) {
-			tprintf("[]");
+			tprints("[]");
 			return 0;
 		}
 		start = tcp->u_arg[1];
 		if (start == 0) {
-			tprintf("NULL");
+			tprints("NULL");
 			return 0;
 		}
 		size = len * sizeof(gid);
@@ -1093,22 +1093,22 @@ sys_setgroups(struct tcb *tcp)
 		} else {
 			abbrev_end = end;
 		}
-		tprintf("[");
+		tprints("[");
 		for (cur = start; cur < end; cur += sizeof(gid)) {
 			if (cur > start)
-				tprintf(", ");
+				tprints(", ");
 			if (cur >= abbrev_end) {
-				tprintf("...");
+				tprints("...");
 				break;
 			}
 			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
-				tprintf("?");
+				tprints("?");
 				failed = 1;
 				break;
 			}
 			tprintf("%lu", (unsigned long) gid);
 		}
-		tprintf("]");
+		tprints("]");
 		if (failed)
 			tprintf(" %#lx", tcp->u_arg[1]);
 	}
@@ -1130,12 +1130,12 @@ sys_getgroups(struct tcb *tcp)
 
 		len = tcp->u_rval;
 		if (len == 0) {
-			tprintf("[]");
+			tprints("[]");
 			return 0;
 		}
 		start = tcp->u_arg[1];
 		if (start == 0) {
-			tprintf("NULL");
+			tprints("NULL");
 			return 0;
 		}
 		if (tcp->u_arg[0] == 0) {
@@ -1156,22 +1156,22 @@ sys_getgroups(struct tcb *tcp)
 		} else {
 			abbrev_end = end;
 		}
-		tprintf("[");
+		tprints("[");
 		for (cur = start; cur < end; cur += sizeof(gid)) {
 			if (cur > start)
-				tprintf(", ");
+				tprints(", ");
 			if (cur >= abbrev_end) {
-				tprintf("...");
+				tprints("...");
 				break;
 			}
 			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
-				tprintf("?");
+				tprints("?");
 				failed = 1;
 				break;
 			}
 			tprintf("%lu", (unsigned long) gid);
 		}
-		tprintf("]");
+		tprints("]");
 		if (failed)
 			tprintf(" %#lx", tcp->u_arg[1]);
 	}
@@ -1190,12 +1190,12 @@ sys_setgroups32(struct tcb *tcp)
 		len = tcp->u_arg[0];
 		tprintf("%lu, ", len);
 		if (len == 0) {
-			tprintf("[]");
+			tprints("[]");
 			return 0;
 		}
 		start = tcp->u_arg[1];
 		if (start == 0) {
-			tprintf("NULL");
+			tprints("NULL");
 			return 0;
 		}
 		size = len * sizeof(gid);
@@ -1211,22 +1211,22 @@ sys_setgroups32(struct tcb *tcp)
 		} else {
 			abbrev_end = end;
 		}
-		tprintf("[");
+		tprints("[");
 		for (cur = start; cur < end; cur += sizeof(gid)) {
 			if (cur > start)
-				tprintf(", ");
+				tprints(", ");
 			if (cur >= abbrev_end) {
-				tprintf("...");
+				tprints("...");
 				break;
 			}
 			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
-				tprintf("?");
+				tprints("?");
 				failed = 1;
 				break;
 			}
 			tprintf("%lu", (unsigned long) gid);
 		}
-		tprintf("]");
+		tprints("]");
 		if (failed)
 			tprintf(" %#lx", tcp->u_arg[1]);
 	}
@@ -1248,12 +1248,12 @@ sys_getgroups32(struct tcb *tcp)
 
 		len = tcp->u_rval;
 		if (len == 0) {
-			tprintf("[]");
+			tprints("[]");
 			return 0;
 		}
 		start = tcp->u_arg[1];
 		if (start == 0) {
-			tprintf("NULL");
+			tprints("NULL");
 			return 0;
 		}
 		size = len * sizeof(gid);
@@ -1270,22 +1270,22 @@ sys_getgroups32(struct tcb *tcp)
 		} else {
 			abbrev_end = end;
 		}
-		tprintf("[");
+		tprints("[");
 		for (cur = start; cur < end; cur += sizeof(gid)) {
 			if (cur > start)
-				tprintf(", ");
+				tprints(", ");
 			if (cur >= abbrev_end) {
-				tprintf("...");
+				tprints("...");
 				break;
 			}
 			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
-				tprintf("?");
+				tprints("?");
 				failed = 1;
 				break;
 			}
 			tprintf("%lu", (unsigned long) gid);
 		}
-		tprintf("]");
+		tprints("]");
 		if (failed)
 			tprintf(" %#lx", tcp->u_arg[1]);
 	}
@@ -1424,12 +1424,12 @@ printpriv(struct tcb *tcp, long addr, int len, const struct xlat *opt)
 		return;
 	}
 
-	tprintf("[");
+	tprints("[");
 
 	for (i = 0; i < len; ++i) {
 		const char *t, *p;
 
-		if (i) tprintf(", ");
+		if (i) tprints(", ");
 
 		if ((t = xlookup(procpriv_type, buf[i] & PS_TYPE)) &&
 		    (p = xlookup(procpriv_priv, buf[i] & ~PS_TYPE)))
@@ -1441,9 +1441,9 @@ printpriv(struct tcb *tcp, long addr, int len, const struct xlat *opt)
 		}
 	}
 
-	if (dots) tprintf(" ...");
+	if (dots) tprints(" ...");
 
-	tprintf("]");
+	tprints("]");
 }
 
 
@@ -1461,7 +1461,7 @@ sys_procpriv(struct tcb *tcp)
 			break;
 
 		    default:
-			tprintf(", ");
+			tprints(", ");
 			printpriv(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 			tprintf(", %ld", tcp->u_arg[2]);
 		}
@@ -1471,7 +1471,7 @@ sys_procpriv(struct tcb *tcp)
 			tprintf(", %#lx, %ld", tcp->u_arg[1], tcp->u_arg[2]);
 		}
 		else {
-			tprintf(", ");
+			tprints(", ");
 			printpriv(tcp, tcp->u_arg[1], tcp->u_rval);
 			tprintf(", %ld", tcp->u_arg[2]);
 		}
@@ -1534,9 +1534,9 @@ sys_execv(struct tcb *tcp)
 		if (!verbose(tcp))
 			tprintf(", %#lx", tcp->u_arg[1]);
 		else {
-			tprintf(", [");
+			tprints(", [");
 			printargv(tcp, tcp->u_arg[1]);
-			tprintf("]");
+			tprints("]");
 		}
 	}
 	return 0;
@@ -1551,18 +1551,18 @@ sys_execve(struct tcb *tcp)
 		if (!verbose(tcp))
 			tprintf(", %#lx", tcp->u_arg[1]);
 		else {
-			tprintf(", [");
+			tprints(", [");
 			printargv(tcp, tcp->u_arg[1]);
-			tprintf("]");
+			tprints("]");
 		}
 		if (!verbose(tcp))
 			tprintf(", %#lx", tcp->u_arg[2]);
 		else if (abbrev(tcp))
 			printargc(", [/* %d var%s */]", tcp, tcp->u_arg[2]);
 		else {
-			tprintf(", [");
+			tprints(", [");
 			printargv(tcp, tcp->u_arg[2]);
-			tprintf("]");
+			tprints("]");
 		}
 	}
 	return 0;
@@ -1697,7 +1697,7 @@ printstatus(int status)
 	}
 
 	if (status == 0)
-		tprintf("]");
+		tprints("]");
 	else
 		tprintf(" | %#x]", status);
 
@@ -1734,24 +1734,24 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 	} else {
 		/* status */
 		if (!tcp->u_arg[1])
-			tprintf("NULL");
+			tprints("NULL");
 		else if (syserror(tcp) || tcp->u_rval == 0)
 			tprintf("%#lx", tcp->u_arg[1]);
 		else if (umove(tcp, tcp->u_arg[1], &status) < 0)
-			tprintf("[?]");
+			tprints("[?]");
 		else
 #ifdef SUNOS4
 			exited =
 #endif
 			printstatus(status);
 		/* options */
-		tprintf(", ");
+		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[2], "W???");
 		if (n == 4) {
-			tprintf(", ");
+			tprints(", ");
 			/* usage */
 			if (!tcp->u_arg[3])
-				tprintf("NULL");
+				tprints("NULL");
 #ifdef LINUX
 			else if (tcp->u_rval > 0) {
 #ifdef ALPHA
@@ -1865,21 +1865,21 @@ sys_waitid(struct tcb *tcp)
 	else {
 		/* siginfo */
 		if (!tcp->u_arg[2])
-			tprintf("NULL");
+			tprints("NULL");
 		else if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[2]);
 		else if (umove(tcp, tcp->u_arg[2], &si) < 0)
-			tprintf("{???}");
+			tprints("{???}");
 		else
 			printsiginfo(&si, verbose(tcp));
 		/* options */
-		tprintf(", ");
+		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
 		if (tcp->u_nargs > 4) {
 			/* usage */
-			tprintf(", ");
+			tprints(", ");
 			if (!tcp->u_arg[4])
-				tprintf("NULL");
+				tprints("NULL");
 			else if (tcp->u_error)
 				tprintf("%#lx", tcp->u_arg[4]);
 			else
@@ -1908,7 +1908,7 @@ sys_uname(struct tcb *tcp)
 		if (syserror(tcp) || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
 		else if (umove(tcp, tcp->u_arg[0], &uname) < 0)
-			tprintf("{...}");
+			tprints("{...}");
 		else if (!abbrev(tcp)) {
 
 			tprintf("{sysname=\"%s\", nodename=\"%s\", ",
@@ -1921,7 +1921,7 @@ sys_uname(struct tcb *tcp)
 			tprintf(", domainname=\"%s\"", uname.domainname);
 #endif
 #endif
-			tprintf("}");
+			tprints("}");
 		}
 		else
 			tprintf("{sys=\"%s\", node=\"%s\", ...}",
@@ -3061,11 +3061,11 @@ sys_ptrace(struct tcb *tcp)
 		case PTRACE_SETSIGINFO: {
 			siginfo_t si;
 			if (!tcp->u_arg[3])
-				tprintf("NULL");
+				tprints("NULL");
 			else if (syserror(tcp))
 				tprintf("%#lx", tcp->u_arg[3]);
 			else if (umove(tcp, tcp->u_arg[3], &si) < 0)
-				tprintf("{???}");
+				tprints("{???}");
 			else
 				printsiginfo(&si, verbose(tcp));
 			break;
@@ -3095,11 +3095,11 @@ sys_ptrace(struct tcb *tcp)
 		case PTRACE_GETSIGINFO: {
 			siginfo_t si;
 			if (!tcp->u_arg[3])
-				tprintf("NULL");
+				tprints("NULL");
 			else if (syserror(tcp))
 				tprintf("%#lx", tcp->u_arg[3]);
 			else if (umove(tcp, tcp->u_arg[3], &si) < 0)
-				tprintf("{???}");
+				tprints("{???}");
 			else
 				printsiginfo(&si, verbose(tcp));
 			break;
@@ -3239,10 +3239,10 @@ sys_futex(struct tcb *tcp)
 		if (cmd == FUTEX_WAKE_BITSET)
 			tprintf(", %lx", tcp->u_arg[5]);
 		else if (cmd == FUTEX_WAIT) {
-			tprintf(", ");
+			tprints(", ");
 			printtv(tcp, tcp->u_arg[3]);
 		} else if (cmd == FUTEX_WAIT_BITSET) {
-			tprintf(", ");
+			tprints(", ");
 			printtv(tcp, tcp->u_arg[3]);
 			tprintf(", %lx", tcp->u_arg[5]);
 		} else if (cmd == FUTEX_REQUEUE)
@@ -3252,15 +3252,15 @@ sys_futex(struct tcb *tcp)
 		else if (cmd == FUTEX_WAKE_OP) {
 			tprintf(", %ld, %p, {", tcp->u_arg[3], (void *) tcp->u_arg[4]);
 			if ((tcp->u_arg[5] >> 28) & 8)
-				tprintf("FUTEX_OP_OPARG_SHIFT|");
+				tprints("FUTEX_OP_OPARG_SHIFT|");
 			printxval(futexwakeops, (tcp->u_arg[5] >> 28) & 0x7, "FUTEX_OP_???");
 			tprintf(", %ld, ", (tcp->u_arg[5] >> 12) & 0xfff);
 			if ((tcp->u_arg[5] >> 24) & 8)
-				tprintf("FUTEX_OP_OPARG_SHIFT|");
+				tprints("FUTEX_OP_OPARG_SHIFT|");
 			printxval(futexwakecmps, (tcp->u_arg[5] >> 24) & 0x7, "FUTEX_OP_CMP_???");
 			tprintf(", %ld}", tcp->u_arg[5] & 0xfff);
 		} else if (cmd == FUTEX_WAIT_REQUEUE_PI) {
-			tprintf(", ");
+			tprints(", ");
 			printtv(tcp, tcp->u_arg[3]);
 			tprintf(", %p", (void *) tcp->u_arg[4]);
 		}
@@ -3283,9 +3283,9 @@ print_affinitylist(struct tcb *tcp, long list, unsigned int len)
 		if (umove(tcp, list, &w) < 0)
 			break;
 		if (first)
-			tprintf("{");
+			tprints("{");
 		else
-			tprintf(", ");
+			tprints(", ");
 		first = 0;
 		tprintf("%lx", w);
 	}
@@ -3296,7 +3296,7 @@ print_affinitylist(struct tcb *tcp, long list, unsigned int len)
 			tprintf(", %s}", (len >= sizeof(w) && len > min_len ?
 				"???" : "..."));
 	} else {
-		tprintf(first ? "{}" : "}");
+		tprints(first ? "{}" : "}");
 	}
 }
 
@@ -3439,13 +3439,13 @@ sys_getcpu(struct tcb *tcp)
 	if (exiting(tcp)) {
 		unsigned u;
 		if (tcp->u_arg[0] == 0)
-			tprintf("NULL, ");
+			tprints("NULL, ");
 		else if (umove(tcp, tcp->u_arg[0], &u) < 0)
 			tprintf("%#lx, ", tcp->u_arg[0]);
 		else
 			tprintf("[%u], ", u);
 		if (tcp->u_arg[1] == 0)
-			tprintf("NULL, ");
+			tprints("NULL, ");
 		else if (umove(tcp, tcp->u_arg[1], &u) < 0)
 			tprintf("%#lx, ", tcp->u_arg[1]);
 		else

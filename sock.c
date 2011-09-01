@@ -92,7 +92,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 			    && ifc.ifc_buf == NULL)
 				tprintf(", {%d -> ", ifc.ifc_len);
 			else
-				tprintf(", {");
+				tprints(", {");
 		}
 		return 0;
 	}
@@ -188,12 +188,12 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 				printxval(addrfams,
 					  ifr.ifr_addr.sa_family,
 					  "AF_???");
-				tprintf(", ");
+				tprints(", ");
 				print_addr(tcp, ((long) tcp->u_arg[2]
 						 + offsetof(struct ifreq,
 							     ifr_addr.sa_data)),
 					   &ifr);
-				tprintf("}");
+				tprints("}");
 				break;
 			case SIOCGIFHWADDR:
 			case SIOCSIFHWADDR:
@@ -206,7 +206,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 				break;
 			case SIOCGIFFLAGS:
 			case SIOCSIFFLAGS:
-				tprintf("ifr_flags=");
+				tprints("ifr_flags=");
 				printflags(iffflags, ifr.ifr_flags, "IFF_???");
 				break;
 			case SIOCGIFMETRIC:
@@ -238,19 +238,19 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 					(unsigned) ifr.ifr_map.port);
 				break;
 			}
-			tprintf("}");
+			tprints("}");
 		}
 		return 1;
 	case SIOCGIFCONF:
 		if (umove(tcp, tcp->u_arg[2], &ifc) < 0) {
-			tprintf("???}");
+			tprints("???}");
 			return 1;
 		}
 		tprintf("%d, ", ifc.ifc_len);
 		if (syserror(tcp)) {
 			tprintf("%lx", (unsigned long) ifc.ifc_buf);
 		} else if (ifc.ifc_buf == NULL) {
-			tprintf("NULL");
+			tprints("NULL");
 		} else {
 			int i;
 			unsigned nifra = ifc.ifc_len / sizeof(struct ifreq);
@@ -261,17 +261,17 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 				tprintf("%lx}", (unsigned long) ifc.ifc_buf);
 				return 1;
 			}
-			tprintf("{");
+			tprints("{");
 			for (i = 0; i < nifra; ++i ) {
 				if (i > 0)
-					tprintf(", ");
+					tprints(", ");
 				tprintf("{\"%s\", {",
 					ifra[i].ifr_name);
 				if (verbose(tcp)) {
 					printxval(addrfams,
 						  ifra[i].ifr_addr.sa_family,
 						  "AF_???");
-					tprintf(", ");
+					tprints(", ");
 					print_addr(tcp, ((long) tcp->u_arg[2]
 							 + offsetof(struct ifreq,
 								     ifr_addr.sa_data)
@@ -279,12 +279,12 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 							    - (char *) &ifra[0])),
 						   &ifra[i]);
 				} else
-					tprintf("...");
-				tprintf("}}");
+					tprints("...");
+				tprints("}}");
 			}
-			tprintf("}");
+			tprints("}");
 		}
-		tprintf("}");
+		tprints("}");
 		return 1;
 #endif
 	default:

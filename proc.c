@@ -101,23 +101,23 @@ proc_ioctl(struct tcb *tcp, int code, int arg)
 	case PIOCSTOP:
 	case PIOCWSTOP:
 		if (arg == 0)
-			tprintf(", NULL");
+			tprints(", NULL");
 		else if (syserror(tcp))
 			tprintf(", %#x", arg);
 		else if (umove(tcp, arg, &status) < 0)
-			tprintf(", {...}");
+			tprints(", {...}");
 		else {
-			tprintf(", {pr_flags=");
+			tprints(", {pr_flags=");
 			printflags(proc_status_flags, status.pr_flags, "PR_???");
 			if (status.pr_why) {
-				tprintf(", pr_why=");
+				tprints(", pr_why=");
 				printxval(proc_status_why, status.pr_why,
 					  "PR_???");
 			}
 			switch (status.pr_why) {
 			case PR_SIGNALLED:
 			case PR_JOBCONTROL:
-				tprintf(", pr_what=");
+				tprints(", pr_what=");
 				printsignal(status.pr_what);
 				break;
 			case PR_FAULTED:
@@ -129,29 +129,29 @@ proc_ioctl(struct tcb *tcp, int code, int arg)
 					sysent[status.pr_what].sys_name);
 				break;
 			}
-			tprintf(", ...}");
+			tprints(", ...}");
 		}
 		return 1;
 	case PIOCRUN:
 		if (arg == 0)
-			tprintf(", NULL");
+			tprints(", NULL");
 		else if (umove(tcp, arg, &run) < 0)
-			tprintf(", {...}");
+			tprints(", {...}");
 		else {
-			tprintf(", {pr_flags=");
+			tprints(", {pr_flags=");
 			printflags(proc_run_flags, run.pr_flags, "PR???");
-			tprintf(", ...}");
+			tprints(", ...}");
 		}
 		return 1;
 #ifdef PIOCSET
 	case PIOCSET:
 	case PIOCRESET:
 		if (umove(tcp, arg, &val) < 0)
-			tprintf(", [?]");
+			tprints(", [?]");
 		else {
-			tprintf(", [");
+			tprints(", [");
 			printflags(proc_status_flags, val, "PR_???");
-			tprintf("]");
+			tprints("]");
 		}
 		return 1;
 #endif /* PIOCSET */
@@ -159,11 +159,11 @@ proc_ioctl(struct tcb *tcp, int code, int arg)
 	case PIOCUNKILL:
 		/* takes a pointer to a signal */
 		if (umove(tcp, arg, &val) < 0)
-			tprintf(", [?]");
+			tprints(", [?]");
 		else {
-			tprintf(", [");
+			tprints(", [");
 			printsignal(val);
-			tprintf("]");
+			tprints("]");
 		}
 		return 1;
 	case PIOCSFORK:
@@ -213,39 +213,39 @@ proc_ioctl(struct tcb *tcp, int code, int arg)
 	case PIOCSTATUS:
 	case PIOCWAIT:
 		if (arg == 0)
-			tprintf(", NULL");
+			tprints(", NULL");
 		else if (syserror(tcp))
 			tprintf(", %x", arg);
 		else if (umove(tcp, arg, &status) < 0)
-			tprintf(", {...}");
+			tprints(", {...}");
 		else {
 			tprintf(", {state=%d, flags=", status.state);
 			printflags(proc_status_flags, status.flags, "PF_???");
-			tprintf(", events=");
+			tprints(", events=");
 			printflags(proc_status_why, status.events, "S_???");
-			tprintf(", why=");
+			tprints(", why=");
 			printxval(proc_status_why, status.why, "S_???");
 			tprintf(", val=%lu}", status.val);
 		}
 		return 1;
 	case PIOCBIS:
-		tprintf(", ");
+		tprints(", ");
 		printflags(proc_status_why, arg, "S_???");
 		return 1;
 		return 1;
 	case PIOCSFL:
-		tprintf(", ");
+		tprints(", ");
 		printflags(proc_status_flags, arg, "PF_???");
 		return 1;
 	case PIOCGFL:
 		if (syserror(tcp))
 			tprintf(", %#x", arg);
 		else if (umove(tcp, arg, &val) < 0)
-			tprintf(", {...}");
+			tprints(", {...}");
 		else {
-			tprintf(", [");
+			tprints(", [");
 			printflags(proc_status_flags, val, "PF_???");
-			tprintf("]");
+			tprints("]");
 		}
 		return 1;
 	default:

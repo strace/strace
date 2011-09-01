@@ -93,7 +93,7 @@ print_blkpg_req(struct tcb *tcp, struct blkpg_ioctl_arg *blkpg)
 {
 	struct blkpg_partition p;
 
-	tprintf("{");
+	tprints("{");
 	printxval(blkpg_ops, blkpg->op, "BLKPG_???");
 
 	tprintf(", flags=%d, datalen=%d, ",
@@ -239,7 +239,7 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 			if (umove(tcp, arg, &blkpg) < 0)
 				tprintf(", %#lx", arg);
 			else {
-				tprintf(", ");
+				tprints(", ");
 				print_blkpg_req(tcp, &blkpg);
 			}
 		}

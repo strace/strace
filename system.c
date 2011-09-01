@@ -136,19 +136,19 @@ sys_mount(struct tcb *tcp)
 			ignore_type = ignore_data = 1;
 
 		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", ");
+		tprints(", ");
 
 		printpath(tcp, tcp->u_arg[1]);
-		tprintf(", ");
+		tprints(", ");
 
 		if (ignore_type && tcp->u_arg[2])
 			tprintf("%#lx", tcp->u_arg[2]);
 		else
 			printstr(tcp, tcp->u_arg[2], -1);
-		tprintf(", ");
+		tprints(", ");
 
 		printflags(mount_flags, tcp->u_arg[3], "MS_???");
-		tprintf(", ");
+		tprints(", ");
 
 		if (ignore_data && tcp->u_arg[4])
 			tprintf("%#lx", tcp->u_arg[4]);
@@ -174,7 +174,7 @@ sys_umount2(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
-		tprintf(", ");
+		tprints(", ");
 		printflags(umount_flags, tcp->u_arg[1], "MNT_???");
 	}
 	return 0;
@@ -243,12 +243,12 @@ sys_reboot(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printflags(bootflags1, tcp->u_arg[0], "LINUX_REBOOT_MAGIC_???");
-		tprintf(", ");
+		tprints(", ");
 		printflags(bootflags2, tcp->u_arg[1], "LINUX_REBOOT_MAGIC_???");
-		tprintf(", ");
+		tprints(", ");
 		printflags(bootflags3, tcp->u_arg[2], "LINUX_REBOOT_CMD_???");
 		if (tcp->u_arg[2] == LINUX_REBOOT_CMD_RESTART2) {
-			tprintf(", ");
+			tprints(", ");
 			printstr(tcp, tcp->u_arg[3], -1);
 		}
 	}
@@ -290,7 +290,7 @@ sys_cacheflush(struct tcb *tcp)
 		tprintf("%#lx, ", tcp->u_arg[0]);
 		/* scope */
 		printxval(cacheflush_scope, tcp->u_arg[1], "FLUSH_SCOPE_???");
-		tprintf(", ");
+		tprints(", ");
 		/* flags */
 		printflags(cacheflush_flags, tcp->u_arg[2], "FLUSH_CACHE_???");
 		/* len */
@@ -516,9 +516,9 @@ sys_mount(struct tcb *tcp)
 			tprintf("\"%s\", ", type);
 		}
 		printstr(tcp, tcp->u_arg[1], -1);
-		tprintf(", ");
+		tprints(", ");
 		printflags(mountflags, tcp->u_arg[2] & ~M_NEWTYPE, "M_???");
-		tprintf(", ");
+		tprints(", ");
 
 		if (strcmp(type, "4.2") == 0) {
 			struct ufs_args a;
@@ -534,9 +534,9 @@ sys_mount(struct tcb *tcp)
 			struct nfs_args a;
 			if (umove(tcp, tcp->u_arg[3], &a) < 0)
 				return 0;
-			tprintf("[");
+			tprints("[");
 			printsock(tcp, (int) a.addr);
-			tprintf(", ");
+			tprints(", ");
 			printflags(nfsflags, a.flags, "NFSMNT_???");
 			tprintf(", ws:%u,rs:%u,to:%u,re:%u,",
 				a.wsize, a.rsize, a.timeo, a.retrans);
@@ -550,13 +550,13 @@ sys_mount(struct tcb *tcp)
 				printstr(tcp, (int) a.netname, -1);
 			else
 				tprintf("%#lx", (unsigned long) a.netname);
-			tprintf("]");
+			tprints("]");
 		} else if (strcmp(type, "rfs") == 0) {
 			struct rfs_args a;
 			struct token t;
 			if (umove(tcp, tcp->u_arg[3], &a) < 0)
 				return 0;
-			tprintf("[");
+			tprints("[");
 			printstr(tcp, (int)a.rmtfs, -1);
 			if (umove(tcp, (int)a.token, &t) < 0)
 				return 0;
@@ -613,27 +613,27 @@ sys_exportfs(struct tcb *tcp)
 		}
 		tprintf("{fl:%u, anon:%u, ", e.ex_flags, e.ex_anon);
 		printxval(ex_auth_flags, e.ex_auth, "AUTH_???");
-		tprintf(", roots:[");
+		tprints(", roots:[");
 		if (e.ex_auth == AUTH_UNIX) {
 			for (i = 0; i < e.ex_u.exunix.rootaddrs.naddrs; i++) {
 				printsock(tcp,
 					(int)&e.ex_u.exunix.rootaddrs.addrvec[i]);
 			}
-			tprintf("], writers:[");
+			tprints("], writers:[");
 			for (i = 0; i < e.ex_writeaddrs.naddrs; i++) {
 				printsock(tcp,
 					(int)&e.ex_writeaddrs.addrvec[i]);
 			}
-			tprintf("]");
+			tprints("]");
 		} else {
 			for (i = 0; i < e.ex_u.exdes.nnames; i++) {
 				printsock(tcp,
 					(int)&e.ex_u.exdes.rootnames[i]);
-				tprintf(", ");
+				tprints(", ");
 			}
 			tprintf("], window:%u", e.ex_u.exdes.window);
 		}
-		tprintf("}");
+		tprints("}");
 	}
 	return 0;
 }
@@ -715,7 +715,7 @@ sys_pathconf(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
-		tprintf(", ");
+		tprints(", ");
 		printxval(pathconflimits, tcp->u_arg[1], "_PC_???");
 	}
 	return 0;
@@ -860,7 +860,7 @@ sys_sysinfo(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(sysinfo_options, tcp->u_arg[0], "SI_???");
-		tprintf(", ");
+		tprints(", ");
 	}
 	else {
 		/* Technically some calls write values.  So what. */
@@ -1316,30 +1316,30 @@ sys_mount(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", ");
+		tprints(", ");
 		printpath(tcp, tcp->u_arg[1]);
-		tprintf(", ");
+		tprints(", ");
 		printflags(mount_flags, tcp->u_arg[2], "MS_???");
 		if (tcp->u_arg[2] & (MS_FSS | MS_DATA)) {
-			tprintf(", ");
+			tprints(", ");
 			tprintf("%ld", tcp->u_arg[3]);
 		}
 		if (tcp->u_arg[2] & MS_DATA) {
 			int nfs_type = sysfs(GETFSIND, FSID_NFS);
 
-			tprintf(", ");
+			tprints(", ");
 			if (tcp->u_arg[3] == nfs_type) {
 				struct nfs_args args;
 				if (umove(tcp, tcp->u_arg[4], &args) < 0)
 					tprintf("%#lx", tcp->u_arg[4]);
 				else {
-					tprintf("addr=");
+					tprints("addr=");
 					printsock(tcp, (int) args.addr);
-					tprintf(", flags=");
+					tprints(", flags=");
 					printflags(nfs_flags, args.flags, "NFSMNT_???");
-					tprintf(", hostname=");
+					tprints(", hostname=");
 					printstr(tcp, (int) args.hostname, -1);
-					tprintf(", ...}");
+					tprints(", ...}");
 				}
 			}
 			else
@@ -1427,9 +1427,9 @@ sys_mount(struct tcb *tcp)
 	if (entering(tcp)) {
 		char fstyp[FSTYPSZ];
 		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", ");
+		tprints(", ");
 		printpath(tcp, tcp->u_arg[1]);
-		tprintf(", ");
+		tprints(", ");
 		printflags(mount_flags, tcp->u_arg[2], "MS_???");
 		/* The doc sez that the file system type is given as a
 		   fsindex, and we should use sysfs to work out the name.
@@ -1444,7 +1444,7 @@ sys_mount(struct tcb *tcp)
 				tprintf(", \"%s\"", fstyp);
 		}
 		if (tcp->u_arg[2] & MS_DATA) {
-			tprintf(", ");
+			tprints(", ");
 #ifdef VX_MS_MASK
 			/* On UW7 they don't give us the defines and structs
 			   we need to see what is going on.  Bummer. */
@@ -1453,23 +1453,23 @@ sys_mount(struct tcb *tcp)
 				if (umove(tcp, tcp->u_arg[4], &args) < 0)
 					tprintf("%#lx", tcp->u_arg[4]);
 				else {
-					tprintf("{ flags=");
+					tprints("{ flags=");
 					printflags(vxfs_flags, args.mflags, "VX_MS_???");
 					if (args.mflags & VX_MS_SNAPSHOT) {
-						tprintf(", snapof=");
+						tprints(", snapof=");
 						printstr(tcp,
 							  (long) args.primaryspec,
 							  -1);
 						if (args.snapsize > 0)
 							tprintf(", snapsize=%ld", args.snapsize);
 					}
-					tprintf(" }");
+					tprints(" }");
 				}
 			}
 			else
 #endif
 			if (strcmp(fstyp, "specfs") == 0) {
-				tprintf("dev=");
+				tprints("dev=");
 				printstr(tcp, tcp->u_arg[4], -1);
 			}
 			else
@@ -1479,18 +1479,18 @@ sys_mount(struct tcb *tcp)
 					tprintf("%#lx", tcp->u_arg[4]);
 				else {
 					struct netbuf addr;
-					tprintf("{ addr=");
+					tprints("{ addr=");
 					if (umove(tcp, (int) args.addr, &addr) < 0) {
 						tprintf("%#lx", (long) args.addr);
 					}
 					else {
 						printsock(tcp, (int) addr.buf, addr.len);
 					}
-					tprintf(", flags=");
+					tprints(", flags=");
 					printflags(nfs_flags, args.flags, "NFSMNT_???");
-					tprintf(", hostname=");
+					tprints(", hostname=");
 					printstr(tcp, (int) args.hostname, -1);
-					tprintf(", ...}");
+					tprints(", ...}");
 				}
 			}
 			else
@@ -1508,9 +1508,9 @@ sys_mount(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", ");
+		tprints(", ");
 		printpath(tcp, tcp->u_arg[1]);
-		tprintf(", ...");
+		tprints(", ...");
 	}
 	return 0;
 }
@@ -1584,29 +1584,29 @@ sys_capget(struct tcb *tcp)
 
 	if (!entering(tcp)) {
 		if (!tcp->u_arg[0])
-			tprintf("NULL");
+			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
 		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0), (char *) arg0) < 0)
-			tprintf("???");
+			tprints("???");
 		else {
 			tprintf("%#x, %d", arg0->version, arg0->pid);
 		}
-		tprintf(", ");
+		tprints(", ");
 		if (!tcp->u_arg[1])
-			tprintf("NULL");
+			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
 		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1), (char *) arg1) < 0)
-			tprintf("???");
+			tprints("???");
 		else {
-			tprintf("{");
+			tprints("{");
 			printflags(capabilities, arg1->effective, "CAP_???");
-			tprintf(", ");
+			tprints(", ");
 			printflags(capabilities, arg1->permitted, "CAP_???");
-			tprintf(", ");
+			tprints(", ");
 			printflags(capabilities, arg1->inheritable, "CAP_???");
-			tprintf("}");
+			tprints("}");
 		}
 	}
 	return 0;
@@ -1624,29 +1624,29 @@ sys_capset(struct tcb *tcp)
 
 	if (entering(tcp)) {
 		if (!tcp->u_arg[0])
-			tprintf("NULL");
+			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
 		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0), (char *) arg0) < 0)
-			tprintf("???");
+			tprints("???");
 		else {
 			tprintf("%#x, %d", arg0->version, arg0->pid);
 		}
-		tprintf(", ");
+		tprints(", ");
 		if (!tcp->u_arg[1])
-			tprintf("NULL");
+			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
 		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1), (char *) arg1) < 0)
-			tprintf("???");
+			tprints("???");
 		else {
-			tprintf("{");
+			tprints("{");
 			printflags(capabilities, arg1->effective, "CAP_???");
-			tprintf(", ");
+			tprints(", ");
 			printflags(capabilities, arg1->permitted, "CAP_???");
-			tprintf(", ");
+			tprints(", ");
 			printflags(capabilities, arg1->inheritable, "CAP_???");
-			tprintf("}");
+			tprints("}");
 		}
 	}
 	return 0;
@@ -1937,7 +1937,7 @@ sys_sysctl(struct tcb *tcp)
 	if (entering(tcp)) {
 		int cnt = 0, max_cnt;
 
-		tprintf("{{");
+		tprints("{{");
 
 		if (info.nlen == 0)
 			goto out;
@@ -1948,17 +1948,17 @@ sys_sysctl(struct tcb *tcp)
 			goto out;
 		switch (name[0]) {
 		case CTL_KERN:
-			tprintf(", ");
+			tprints(", ");
 			printxval(sysctl_kern, name[1], "KERN_???");
 			++cnt;
 			break;
 		case CTL_VM:
-			tprintf(", ");
+			tprints(", ");
 			printxval(sysctl_vm, name[1], "VM_???");
 			++cnt;
 			break;
 		case CTL_NET:
-			tprintf(", ");
+			tprints(", ");
 			printxval(sysctl_net, name[1], "NET_???");
 			++cnt;
 
@@ -1966,17 +1966,17 @@ sys_sysctl(struct tcb *tcp)
 				goto out;
 			switch (name[1]) {
 			case NET_CORE:
-				tprintf(", ");
+				tprints(", ");
 				printxval(sysctl_net_core, name[2],
 					  "NET_CORE_???");
 				break;
 			case NET_UNIX:
-				tprintf(", ");
+				tprints(", ");
 				printxval(sysctl_net_unix, name[2],
 					  "NET_UNIX_???");
 				break;
 			case NET_IPV4:
-				tprintf(", ");
+				tprints(", ");
 				printxval(sysctl_net_ipv4, name[2],
 					  "NET_IPV4_???");
 
@@ -1984,13 +1984,13 @@ sys_sysctl(struct tcb *tcp)
 					goto out;
 				switch (name[2]) {
 				case NET_IPV4_ROUTE:
-					tprintf(", ");
+					tprints(", ");
 					printxval(sysctl_net_ipv4_route,
 						  name[3],
 						  "NET_IPV4_ROUTE_???");
 					break;
 				case NET_IPV4_CONF:
-					tprintf(", ");
+					tprints(", ");
 					printxval(sysctl_net_ipv4_conf,
 						  name[3],
 						  "NET_IPV4_CONF_???");
@@ -2000,7 +2000,7 @@ sys_sysctl(struct tcb *tcp)
 				}
 				break;
 			case NET_IPV6:
-				tprintf(", ");
+				tprints(", ");
 				printxval(sysctl_net_ipv6, name[2],
 					  "NET_IPV6_???");
 
@@ -2008,7 +2008,7 @@ sys_sysctl(struct tcb *tcp)
 					goto out;
 				switch (name[2]) {
 				case NET_IPV6_ROUTE:
-					tprintf(", ");
+					tprints(", ");
 					printxval(sysctl_net_ipv6_route,
 						  name[3],
 						  "NET_IPV6_ROUTE_???");
@@ -2031,7 +2031,7 @@ sys_sysctl(struct tcb *tcp)
 		while (cnt < max_cnt)
 			tprintf(", %x", name[cnt++]);
 		if (cnt < info.nlen)
-			tprintf(", ...");
+			tprints(", ...");
 		tprintf("}, %d, ", info.nlen);
 	} else {
 		size_t oldlen;
@@ -2050,7 +2050,7 @@ sys_sysctl(struct tcb *tcp)
 			printpath(tcp, (size_t)info.oldval);
 			tprintf(", %Zu, ", oldlen);
 			if (info.newval == 0)
-				tprintf("NULL");
+				tprints("NULL");
 			else if (syserror(tcp))
 				tprintf("%p", info.newval);
 			else
@@ -2060,7 +2060,7 @@ sys_sysctl(struct tcb *tcp)
 			tprintf("%p, %Zd, %p, %Zd", info.oldval, oldlen,
 				info.newval, info.newlen);
 		}
-		tprintf("}");
+		tprints("}");
 	}
 
 	free(name);
@@ -2087,7 +2087,7 @@ int sys___sysctl(struct tcb *tcp)
 		if (tcp->u_arg[1] < 0 || tcp->u_arg[1] > CTL_MAXNAME ||
 		    (umoven(tcp, tcp->u_arg[0], tcp->u_arg[1] * sizeof(int),
 			    (char *) (qoid + 2)) < 0))
-			tprintf("[...], ");
+			tprints("[...], ");
 		else {
 			/* Use sysctl to ask the name of the current MIB
 			   This uses the undocumented "Staff-functions" used
@@ -2096,7 +2096,7 @@ int sys___sysctl(struct tcb *tcp)
 			qoid[0] = 0; /* sysctl */
 			qoid[1] = 1; /* name */
 			i = sizeof(ctl);
-			tprintf("[");
+			tprints("[");
 			if (sysctl(qoid, tcp->u_arg[1] + 2, ctl, &i, 0, 0) >= 0) {
 				numeric = !abbrev(tcp);
 				tprintf("%s%s", ctl, numeric ? ", " : "");
@@ -2106,7 +2106,7 @@ int sys___sysctl(struct tcb *tcp)
 				for (i = 0; i < tcp->u_arg[1]; i++)
 					tprintf("%s%d", i ? "." : "", qoid[i + 2]);
 			}
-			tprintf("], ");
+			tprints("], ");
 			tprintf("%lu, ", tcp->u_arg[1]);
 		}
 	} else {
@@ -2139,7 +2139,7 @@ sys_getksym(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
-		tprintf(", ");
+		tprints(", ");
 	}
 	else {
 		if (syserror(tcp)) {
@@ -2149,14 +2149,14 @@ sys_getksym(struct tcb *tcp)
 		else {
 			int val;
 			printnum(tcp, tcp->u_arg[1], "%#lx");
-			tprintf(", ");
+			tprints(", ");
 			if (umove(tcp, tcp->u_arg[2], &val) < 0) {
 				tprintf("%#lx", tcp->u_arg[2]);
 			}
 			else {
-				tprintf("[");
+				tprints("[");
 				printxval(ksym_flags, val, "STT_???");
-				tprintf("]");
+				tprints("]");
 			}
 		}
 	}
@@ -2230,7 +2230,7 @@ int sys_ssisys(struct tcb *tcp)
 			tprintf("%#lx, %ld", tcp->u_arg[0], tcp->u_arg[1]);
 			return 0;
 		}
-		tprintf("{id=");
+		tprints("{id=");
 		printxval(ssi_cmd, iov.tio_id.id_cmd, "SSISYS_???");
 		tprintf(":%d", iov.tio_id.id_ver);
 		switch (iov.tio_id.id_cmd) {

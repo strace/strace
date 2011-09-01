@@ -102,9 +102,9 @@ sys_query_module(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
-		tprintf(", ");
+		tprints(", ");
 		printxval(which, tcp->u_arg[1], "QM_???");
-		tprintf(", ");
+		tprints(", ");
 	} else {
 		size_t ret;
 
@@ -126,7 +126,7 @@ sys_query_module(struct tcb *tcp)
 		} else if ((tcp->u_arg[1]==QM_MODULES) ||
 			   (tcp->u_arg[1]==QM_DEPS) ||
 			   (tcp->u_arg[1]==QM_REFS)) {
-			tprintf("{");
+			tprints("{");
 			if (!abbrev(tcp)) {
 				char*	data	= malloc(tcp->u_arg[3]);
 				char*	mod	= data;
@@ -153,7 +153,7 @@ sys_query_module(struct tcb *tcp)
 				tprintf(" /* %Zu entries */ ", ret);
 			tprintf("}, %Zu", ret);
 		} else if (tcp->u_arg[1]==QM_SYMBOLS) {
-			tprintf("{");
+			tprints("{");
 			if (!abbrev(tcp)) {
 				char*			data	= malloc(tcp->u_arg[3]);
 				struct module_symbol*	sym	= (struct module_symbol*)data;

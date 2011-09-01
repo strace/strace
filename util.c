@@ -366,7 +366,7 @@ printflags(const struct xlat *xlat, int flags, const char *dflt)
 				tprintf(" /* %s */", dflt);
 		} else {
 			if (dflt)
-				tprintf("0");
+				tprints("0");
 		}
 	}
 
@@ -379,16 +379,16 @@ printnum(struct tcb *tcp, long addr, const char *fmt)
 	long num;
 
 	if (!addr) {
-		tprintf("NULL");
+		tprints("NULL");
 		return;
 	}
 	if (umove(tcp, addr, &num) < 0) {
 		tprintf("%#lx", addr);
 		return;
 	}
-	tprintf("[");
+	tprints("[");
 	tprintf(fmt, num);
-	tprintf("]");
+	tprints("]");
 }
 
 void
@@ -397,16 +397,16 @@ printnum_int(struct tcb *tcp, long addr, const char *fmt)
 	int num;
 
 	if (!addr) {
-		tprintf("NULL");
+		tprints("NULL");
 		return;
 	}
 	if (umove(tcp, addr, &num) < 0) {
 		tprintf("%#lx", addr);
 		return;
 	}
-	tprintf("[");
+	tprints("[");
 	tprintf(fmt, num);
-	tprintf("]");
+	tprints("]");
 }
 
 void
@@ -566,7 +566,7 @@ void
 printpathn(struct tcb *tcp, long addr, int n)
 {
 	if (!addr) {
-		tprintf("NULL");
+		tprints("NULL");
 		return;
 	}
 
@@ -614,7 +614,7 @@ printstr(struct tcb *tcp, long addr, int len)
 	const char *fmt;
 
 	if (!addr) {
-		tprintf("NULL");
+		tprints("NULL");
 		return;
 	}
 	/* Allocate static buffers if they are not allocated yet. */
@@ -1124,7 +1124,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, 4*PT_PC, &pc) < 0) {
-		tprintf("[????????] ");
+		tprints("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1132,7 +1132,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprintf("[????????????????] ");
+		tprints("[????????????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1151,7 +1151,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, PT_IAOQ0, &pc) < 0) {
-		tprintf("[????????] ");
+		tprints("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1159,7 +1159,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, REG_EPC, &pc) < 0) {
-		tprintf("[????????] ");
+		tprints("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1167,7 +1167,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, 4*REG_PC, &pc) < 0) {
-		tprintf("[????????] ");
+		tprints("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1175,7 +1175,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprintf("[????????????????] ");
+		tprints("[????????????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
@@ -1191,7 +1191,7 @@ printcall(struct tcb *tcp)
 	long pc;
 
 	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprintf("[????????] ");
+		tprints("[????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);

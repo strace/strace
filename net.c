@@ -1220,7 +1220,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 	char string_addr[100];
 
 	if (addr == 0) {
-		tprintf("NULL");
+		tprints("NULL");
 		return;
 	}
 	if (!verbose(tcp)) {
@@ -1233,24 +1233,24 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 
 	memset(&addrbuf, 0, sizeof(addrbuf));
 	if (umoven(tcp, addr, addrlen, addrbuf.pad) < 0) {
-		tprintf("{...}");
+		tprints("{...}");
 		return;
 	}
 	addrbuf.pad[sizeof(addrbuf.pad) - 1] = '\0';
 
-	tprintf("{sa_family=");
+	tprints("{sa_family=");
 	printxval(addrfams, addrbuf.sa.sa_family, "AF_???");
-	tprintf(", ");
+	tprints(", ");
 
 	switch (addrbuf.sa.sa_family) {
 	case AF_UNIX:
 		if (addrlen == 2) {
-			tprintf("NULL");
+			tprints("NULL");
 		} else if (addrbuf.sau.sun_path[0]) {
-			tprintf("path=");
+			tprints("path=");
 			printpathn(tcp, addr + 2, strlen(addrbuf.sau.sun_path));
 		} else {
-			tprintf("path=@");
+			tprints("path=@");
 			printpathn(tcp, addr + 3, strlen(addrbuf.sau.sun_path + 1));
 		}
 		break;
@@ -1331,12 +1331,12 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 	AF_X25 AF_ROSE etc. still need to be done */
 
 	default:
-		tprintf("sa_data=");
+		tprints("sa_data=");
 		printstr(tcp, (long) &((struct sockaddr *) addr)->sa_data,
 			sizeof addrbuf.sa.sa_data);
 		break;
 	}
-	tprintf("}");
+	tprints("}");
 }
 
 #if HAVE_SENDMSG
@@ -1363,7 +1363,7 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 
 	tprintf(", {cmsg_len=%u, cmsg_level=", (unsigned) cmsg->cmsg_len);
 	printxval(socketlayers, cmsg->cmsg_level, "SOL_???");
-	tprintf(", cmsg_type=");
+	tprints(", cmsg_type=");
 
 	if (cmsg->cmsg_level == SOL_SOCKET) {
 		unsigned long cmsg_len;
@@ -1376,14 +1376,14 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 			int *fds = (int *) CMSG_DATA(cmsg);
 			int first = 1;
 
-			tprintf(", {");
+			tprints(", {");
 			while ((char *) fds < ((char *) cmsg + cmsg_len)) {
 				if (!first)
-					tprintf(", ");
+					tprints(", ");
 				tprintf("%d", *fds++);
 				first = 0;
 			}
-			tprintf("}}");
+			tprints("}}");
 			free(cmsg);
 			return;
 		}
@@ -1398,7 +1398,7 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 		}
 	}
 	free(cmsg);
-	tprintf(", ...}");
+	tprints(", ...}");
 }
 
 static void
@@ -1416,13 +1416,13 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg)
 	if (msg->msg_controllen)
 		printcmsghdr(tcp, (unsigned long) msg->msg_control,
 			     msg->msg_controllen);
-	tprintf(", msg_flags=");
+	tprints(", msg_flags=");
 	printflags(msg_flags, msg->msg_flags, "MSG_???");
 #else /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
 	tprintf("msg_accrights=%#lx, msg_accrightslen=%u",
 		(unsigned long) msg->msg_accrights, msg->msg_accrightslen);
 #endif /* !HAVE_STRUCT_MSGHDR_MSG_CONTROL */
-	tprintf("}");
+	tprints("}");
 }
 
 static void
@@ -1450,7 +1450,7 @@ printmmsghdr(struct tcb *tcp, long addr)
 		tprintf("%#lx", addr);
 		return;
 	}
-	tprintf("{");
+	tprints("{");
 	do_msghdr(tcp, &mmsg.msg_hdr);
 	tprintf(", %u}", mmsg.msg_len);
 }
@@ -1472,7 +1472,7 @@ tprint_sock_type(struct tcb *tcp, int flags)
 		flags &= ~SOCK_TYPE_MASK;
 		if (!flags)
 			return;
-		tprintf("|");
+		tprints("|");
 	}
 	printflags(sock_type_flags, flags, "SOCK_???");
 }
@@ -1482,9 +1482,9 @@ sys_socket(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
-		tprintf(", ");
+		tprints(", ");
 		tprint_sock_type(tcp, tcp->u_arg[1]);
-		tprintf(", ");
+		tprints(", ");
 		switch (tcp->u_arg[0]) {
 		case PF_INET:
 #ifdef PF_INET6
@@ -1495,9 +1495,9 @@ sys_socket(struct tcb *tcp)
 #ifdef PF_IPX
 		case PF_IPX:
 			/* BTW: I don't believe this.. */
-			tprintf("[");
+			tprints("[");
 			printxval(domains, tcp->u_arg[2], "PF_???");
-			tprintf("]");
+			tprints("]");
 			break;
 #endif /* PF_IPX */
 		default:
@@ -1578,11 +1578,11 @@ do_accept(struct tcb *tcp, int flags_arg)
 		} else {
 			printsock(tcp, tcp->u_arg[1], len);
 		}
-		tprintf(", ");
+		tprints(", ");
 		printnum_int(tcp, tcp->u_arg[2], "%u");
 	}
 	if (flags_arg >= 0) {
-		tprintf(", ");
+		tprints(", ");
 		printflags(sock_type_flags, tcp->u_arg[flags_arg],
 			   "SOCK_???");
 	}
@@ -1626,7 +1626,7 @@ sys_sendto(struct tcb *tcp)
 		/* flags */
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		/* to address */
-		tprintf(", ");
+		tprints(", ");
 		printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 		/* to length */
 		tprintf(", %lu", tcp->u_arg[5]);
@@ -1643,7 +1643,7 @@ sys_sendmsg(struct tcb *tcp)
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printmsghdr(tcp, tcp->u_arg[1]);
 		/* flags */
-		tprintf(", ");
+		tprints(", ");
 		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 	}
 	return 0;
@@ -1691,20 +1691,20 @@ sys_recvfrom(struct tcb *tcp)
 		/* from address, len */
 		if (!tcp->u_arg[4] || !tcp->u_arg[5]) {
 			if (tcp->u_arg[4] == 0)
-				tprintf(", NULL");
+				tprints(", NULL");
 			else
 				tprintf(", %#lx", tcp->u_arg[4]);
 			if (tcp->u_arg[5] == 0)
-				tprintf(", NULL");
+				tprints(", NULL");
 			else
 				tprintf(", %#lx", tcp->u_arg[5]);
 			return 0;
 		}
 		if (umove(tcp, tcp->u_arg[5], &fromlen) < 0) {
-			tprintf(", {...}, [?]");
+			tprints(", {...}, [?]");
 			return 0;
 		}
-		tprintf(", ");
+		tprints(", ");
 		printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 		/* from length */
 		tprintf(", [%u]", fromlen);
@@ -1725,7 +1725,7 @@ sys_recvmsg(struct tcb *tcp)
 		else
 			printmsghdr(tcp, tcp->u_arg[1]);
 		/* flags */
-		tprintf(", ");
+		tprints(", ");
 		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 	}
 	return 0;
@@ -1745,7 +1745,7 @@ sys_recvmmsg(struct tcb *tcp)
 		} else {
 			tprintf("%#lx, %ld, ", tcp->u_arg[1], tcp->u_arg[2]);
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-			tprintf(", ");
+			tprints(", ");
 			print_timespec(tcp, tcp->u_arg[4]);
 		}
 		return 0;
@@ -1822,7 +1822,7 @@ do_pipe(struct tcb *tcp, int flags_arg)
 			int fds[2];
 
 			if (umoven(tcp, tcp->u_arg[0], sizeof fds, (char *) fds) < 0)
-				tprintf("[...]");
+				tprints("[...]");
 			else
 				tprintf("[%u, %u]", fds[0], fds[1]);
 #elif defined(SPARC) || defined(SPARC64) || defined(SH) || defined(SVR4) || defined(FREEBSD) || defined(IA64)
@@ -1832,7 +1832,7 @@ do_pipe(struct tcb *tcp, int flags_arg)
 #endif
 		}
 		if (flags_arg >= 0) {
-			tprintf(", ");
+			tprints(", ");
 			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 		}
 	}
@@ -1862,9 +1862,9 @@ sys_socketpair(struct tcb *tcp)
 
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
-		tprintf(", ");
+		tprints(", ");
 		tprint_sock_type(tcp, tcp->u_arg[1]);
-		tprintf(", ");
+		tprints(", ");
 		switch (tcp->u_arg[0]) {
 		case PF_INET:
 			printxval(protocols, tcp->u_arg[2], "IPPROTO_???");
@@ -1872,9 +1872,9 @@ sys_socketpair(struct tcb *tcp)
 #ifdef PF_IPX
 		case PF_IPX:
 			/* BTW: I don't believe this.. */
-			tprintf("[");
+			tprints("[");
 			printxval(domains, tcp->u_arg[2], "PF_???");
-			tprintf("]");
+			tprints("]");
 			break;
 #endif /* PF_IPX */
 		default:
@@ -1888,7 +1888,7 @@ sys_socketpair(struct tcb *tcp)
 		}
 #ifdef LINUX
 		if (umoven(tcp, tcp->u_arg[3], sizeof fds, (char *) fds) < 0)
-			tprintf(", [...]");
+			tprints(", [...]");
 		else
 			tprintf(", [%u, %u]", fds[0], fds[1]);
 #endif /* LINUX */
@@ -1905,7 +1905,7 @@ sys_getsockopt(struct tcb *tcp)
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printxval(socketlayers, tcp->u_arg[1], "SOL_???");
-		tprintf(", ");
+		tprints(", ");
 		switch (tcp->u_arg[1]) {
 		case SOL_SOCKET:
 			printxval(sockoptions, tcp->u_arg[2], "SO_???");
@@ -1947,7 +1947,7 @@ sys_getsockopt(struct tcb *tcp)
 			tprintf("%lu", tcp->u_arg[2]);
 			break;
 		}
-		tprintf(", ");
+		tprints(", ");
 	} else {
 		int len;
 		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &len) < 0) {
@@ -2036,7 +2036,7 @@ static void printicmpfilter(struct tcb *tcp, long addr)
 	struct icmp_filter	filter;
 
 	if (!addr) {
-		tprintf("NULL");
+		tprints("NULL");
 		return;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
@@ -2044,13 +2044,13 @@ static void printicmpfilter(struct tcb *tcp, long addr)
 		return;
 	}
 	if (umove(tcp, addr, &filter) < 0) {
-		tprintf("{...}");
+		tprints("{...}");
 		return;
 	}
 
-	tprintf("~(");
+	tprints("~(");
 	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
-	tprintf(")");
+	tprints(")");
 }
 #endif /* ICMP_FILTER */
 
@@ -2058,7 +2058,7 @@ static int
 printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 {
 	printxval(socketlayers, level, "SOL_??");
-	tprintf(", ");
+	tprints(", ");
 	switch (level) {
 	    case SOL_SOCKET:
 		printxval(sockoptions, name, "SO_???");
@@ -2137,7 +2137,7 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 		switch (name) {
 #if defined(ICMP_FILTER)
 		    case ICMP_FILTER:
-			tprintf(", ");
+			tprints(", ");
 			printicmpfilter(tcp, addr);
 			return 0;
 #endif
@@ -2154,7 +2154,7 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 
 	/* default arg printing */
 
-	tprintf(", ");
+	tprints(", ");
 
 	if (len == sizeof(int)) {
 		printnum_int(tcp, addr, "%d");
@@ -2177,12 +2177,12 @@ print_sock_optmgmt(struct tcb *tcp, long addr, int len)
 	while (len >= (int) sizeof hdr) {
 		if (umove(tcp, addr, &hdr) < 0) break;
 		if (c++) {
-			tprintf(", ");
+			tprints(", ");
 		}
 		else if (len > hdr.len + sizeof hdr) {
-			tprintf("[");
+			tprints("[");
 		}
-		tprintf("{");
+		tprints("{");
 		addr += sizeof hdr;
 		len -= sizeof hdr;
 		printsockopt(tcp, hdr.level, hdr.name, addr, hdr.len);
@@ -2190,13 +2190,13 @@ print_sock_optmgmt(struct tcb *tcp, long addr, int len)
 			addr += hdr.len;
 			len -= hdr.len;
 		}
-		tprintf("}");
+		tprints("}");
 	}
 	if (len > 0) {
-		if (c++) tprintf(", ");
+		if (c++) tprints(", ");
 		printstr(tcp, addr, len);
 	}
-	if (c > 1) tprintf("]");
+	if (c > 1) tprints("]");
 }
 
 #endif
@@ -2232,7 +2232,7 @@ netlib_call(struct tcb *tcp, int (*func)())
 	if (entering(tcp)) {
 		int i;
 		printxval(sock_version, tcp->u_arg[0], "__NETLIB_???");
-		tprintf(", ");
+		tprints(", ");
 		--tcp->u_nargs;
 		for (i = 0; i < tcp->u_nargs; i++)
 			tcp->u_arg[i] = tcp->u_arg[i + 1];
@@ -2295,12 +2295,12 @@ sys_xgetsockaddr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printxval(sock_version, tcp->u_arg[0], "__NETLIB_???");
-		tprintf(", ");
+		tprints(", ");
 		if (tcp->u_arg[1] == 0) {
-			tprintf("LOCALNAME, ");
+			tprints("LOCALNAME, ");
 		}
 		else if (tcp->u_arg[1] == 1) {
-			tprintf("REMOTENAME, ");
+			tprints("REMOTENAME, ");
 		}
 		else {
 			tprintf("%ld, ", tcp->u_arg[1]);
@@ -2313,7 +2313,7 @@ sys_xgetsockaddr(struct tcb *tcp)
 		} else {
 			printsock(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 		}
-		tprintf(", ");
+		tprints(", ");
 		printnum(tcp, tcp->u_arg[4], "%lu");
 	}
 

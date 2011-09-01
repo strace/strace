@@ -212,15 +212,15 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 		if (!verbose(tcp) || umove(tcp, arg, &tios) < 0)
 			return 0;
 		if (abbrev(tcp)) {
-			tprintf(", {");
+			tprints(", {");
 #ifndef FREEBSD
 			printxval(baud_options, tios.c_cflag & CBAUD, "B???");
 #else
 			printxval(baud_options, tios.c_ispeed, "B???");
 			if (tios.c_ispeed != tios.c_ospeed) {
-				tprintf(" (in)");
+				tprints(" (in)");
 				printxval(baud_options, tios.c_ospeed, "B???");
-				tprintf(" (out)");
+				tprints(" (out)");
 			}
 #endif
 			tprintf(" %sopost %sisig %sicanon %secho ...}",
@@ -257,7 +257,7 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 		if (!verbose(tcp) || umove(tcp, arg, &tio) < 0)
 			return 0;
 		if (abbrev(tcp)) {
-			tprintf(", {");
+			tprints(", {");
 			printxval(baud_options, tio.c_cflag & CBAUD, "B???");
 			tprintf(" %sopost %sisig %sicanon %secho ...}",
 				(tio.c_oflag & OPOST) ? "" : "-",
@@ -316,13 +316,13 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 	/* ioctls with a direct decodable arg */
 #ifdef TCXONC
 	case TCXONC:
-		tprintf(", ");
+		tprints(", ");
 		printxval(tcxonc_options, arg, "TC???");
 		return 1;
 #endif
 #ifdef TCLFLSH
 	case TCFLSH:
-		tprintf(", ");
+		tprints(", ");
 		printxval(tcflsh_options, arg, "TC???");
 		return 1;
 #endif
@@ -336,9 +336,9 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 	case TIOCMSET:
 		if (umove(tcp, arg, &i) < 0)
 			return 0;
-		tprintf(", [");
+		tprints(", [");
 		printflags(modem_flags, i, "TIOCM_???");
-		tprintf("]");
+		tprints("]");
 		return 1;
 #endif /* TIOCMGET */
 
@@ -410,7 +410,7 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 #ifdef TIOCGPTN
 	case TIOCGPTN:
 #endif
-		tprintf(", ");
+		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		return 1;
 
@@ -419,7 +419,7 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 #ifdef TIOCSTI
 	case TIOCSTI:
 #endif
-		tprintf(", ");
+		tprints(", ");
 		printstr(tcp, arg, 1);
 		return 1;
 

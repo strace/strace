@@ -204,19 +204,19 @@ addtileflags(long flags)
 	if (flags & _MAP_CACHE_INCOHERENT) {
 		flags &= ~_MAP_CACHE_INCOHERENT;
 		if (home == MAP_CACHE_HOME_NONE) {
-			tprintf("|MAP_CACHE_INCOHERENT");
+			tprints("|MAP_CACHE_INCOHERENT");
 			return flags;
 		}
-		tprintf("|_MAP_CACHE_INCOHERENT");
+		tprints("|_MAP_CACHE_INCOHERENT");
 	}
 
 	switch (home) {
 	case 0:	break;
-	case MAP_CACHE_HOME_HERE: tprintf("|MAP_CACHE_HOME_HERE"); break;
-	case MAP_CACHE_HOME_NONE: tprintf("|MAP_CACHE_HOME_NONE"); break;
-	case MAP_CACHE_HOME_SINGLE: tprintf("|MAP_CACHE_HOME_SINGLE"); break;
-	case MAP_CACHE_HOME_TASK: tprintf("|MAP_CACHE_HOME_TASK"); break;
-	case MAP_CACHE_HOME_HASH: tprintf("|MAP_CACHE_HOME_HASH"); break;
+	case MAP_CACHE_HOME_HERE: tprints("|MAP_CACHE_HOME_HERE"); break;
+	case MAP_CACHE_HOME_NONE: tprints("|MAP_CACHE_HOME_NONE"); break;
+	case MAP_CACHE_HOME_SINGLE: tprints("|MAP_CACHE_HOME_SINGLE"); break;
+	case MAP_CACHE_HOME_TASK: tprints("|MAP_CACHE_HOME_TASK"); break;
+	case MAP_CACHE_HOME_HASH: tprints("|MAP_CACHE_HOME_HASH"); break;
 	default:
 		tprintf("|MAP_CACHE_HOME(%d)",
 			(home >> _MAP_CACHE_HOME_SHIFT) );
@@ -234,14 +234,14 @@ print_mmap(struct tcb *tcp, long *u_arg, long long offset)
 	if (entering(tcp)) {
 		/* addr */
 		if (!u_arg[0])
-			tprintf("NULL, ");
+			tprints("NULL, ");
 		else
 			tprintf("%#lx, ", u_arg[0]);
 		/* len */
 		tprintf("%lu, ", u_arg[1]);
 		/* prot */
 		printflags(mmap_prot, u_arg[2], "PROT_???");
-		tprintf(", ");
+		tprints(", ");
 		/* flags */
 #ifdef MAP_TYPE
 		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
@@ -254,7 +254,7 @@ print_mmap(struct tcb *tcp, long *u_arg, long long offset)
 		printflags(mmap_flags, u_arg[3], "MAP_???");
 #endif
 		/* fd */
-		tprintf(", ");
+		tprints(", ");
 		printfd(tcp, u_arg[4]);
 		/* offset */
 		tprintf(", %#llx", offset);
@@ -357,7 +357,7 @@ sys_mmap64(struct tcb *tcp)
 		tprintf("%lu, ", u_arg[1]);
 		/* prot */
 		printflags(mmap_prot, u_arg[2], "PROT_???");
-		tprintf(", ");
+		tprints(", ");
 		/* flags */
 #ifdef MAP_TYPE
 		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
@@ -366,7 +366,7 @@ sys_mmap64(struct tcb *tcp)
 		printflags(mmap_flags, u_arg[3], "MAP_???");
 #endif
 		/* fd */
-		tprintf(", ");
+		tprints(", ");
 		printfd(tcp, u_arg[4]);
 		/* offset */
 #if !defined(LINUX) || defined(ALPHA)
@@ -543,7 +543,7 @@ sys_mctl(struct tcb *tcp)
 		printflags(mctl_funcs, function, "MC_???");
 		/* arg */
 		arg = tcp->u_arg[3];
-		tprintf(", ");
+		tprints(", ");
 		switch (function) {
 		case MC_SYNC:
 			printflags(mctl_sync, arg, "MS_???");
@@ -576,15 +576,15 @@ sys_mincore(struct tcb *tcp)
 			umoven(tcp, tcp->u_arg[2], len, vec) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
 		else {
-			tprintf("[");
+			tprints("[");
 			for (i = 0; i < len; i++) {
 				if (abbrev(tcp) && i >= max_strlen) {
-					tprintf("...");
+					tprints("...");
 					break;
 				}
-				tprintf((vec[i] & 1) ? "1" : "0");
+				tprints((vec[i] & 1) ? "1" : "0");
 			}
-			tprintf("]");
+			tprints("]");
 		}
 		free(vec);
 	}
@@ -636,7 +636,7 @@ sys_modify_ldt(struct tcb *tcp)
 		else {
 			tprintf(", {entry_number:%d, ", copy.entry_number);
 			if (!verbose(tcp))
-				tprintf("...}");
+				tprints("...}");
 			else {
 				print_ldt_entry(&copy);
 			}
@@ -656,13 +656,13 @@ sys_set_thread_area(struct tcb *tcp)
 				tprintf("{entry_number:%d -> ",
 					copy.entry_number);
 			else
-				tprintf("{entry_number:");
+				tprints("{entry_number:");
 		}
 	} else {
 		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
 			tprintf("%d, ", copy.entry_number);
 			if (!verbose(tcp))
-				tprintf("...}");
+				tprints("...}");
 			else {
 				print_ldt_entry(&copy);
 			}
@@ -682,7 +682,7 @@ sys_get_thread_area(struct tcb *tcp)
 		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
 			tprintf("{entry_number:%d, ", copy.entry_number);
 			if (!verbose(tcp))
-				tprintf("...}");
+				tprints("...}");
 			else {
 				print_ldt_entry(&copy);
 			}
@@ -793,22 +793,22 @@ get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)
 		} else {
 			abbrev_end = end;
 		}
-		tprintf(", {");
+		tprints(", {");
 		for (cur = ptr; cur < end; cur += sizeof(long)) {
 			if (cur > ptr)
-				tprintf(", ");
+				tprints(", ");
 			if (cur >= abbrev_end) {
-				tprintf("...");
+				tprints("...");
 				break;
 			}
 			if (umoven(tcp, cur, sizeof(n), (char *) &n) < 0) {
-				tprintf("?");
+				tprints("?");
 				failed = 1;
 				break;
 			}
 			tprintf("%#0*lx", (int) sizeof(long) * 2 + 2, n);
 		}
-		tprintf("}");
+		tprints("}");
 		if (failed)
 			tprintf(" %#lx", ptr);
 	} else
@@ -823,7 +823,7 @@ sys_mbind(struct tcb *tcp)
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
 		printxval(policies, tcp->u_arg[2], "MPOL_???");
 		get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[4], 0);
-		tprintf(", ");
+		tprints(", ");
 		printflags(mbindflags, tcp->u_arg[5], "MPOL_???");
 	}
 	return 0;
@@ -845,7 +845,7 @@ sys_get_mempolicy(struct tcb *tcp)
 	if (exiting(tcp)) {
 		int pol;
 		if (tcp->u_arg[0] == 0)
-			tprintf("NULL");
+			tprints("NULL");
 		else if (syserror(tcp) || umove(tcp, tcp->u_arg[0], &pol) < 0)
 			tprintf("%#lx", tcp->u_arg[0]);
 		else
@@ -864,64 +864,64 @@ sys_move_pages(struct tcb *tcp)
 		unsigned long npages = tcp->u_arg[1];
 		tprintf("%ld, %lu, ", tcp->u_arg[0], npages);
 		if (tcp->u_arg[2] == 0)
-			tprintf("NULL, ");
+			tprints("NULL, ");
 		else {
 			int i;
 			long puser = tcp->u_arg[2];
-			tprintf("{");
+			tprints("{");
 			for (i = 0; i < npages; ++i) {
 				void *p;
 				if (i > 0)
-					tprintf(", ");
+					tprints(", ");
 				if (umove(tcp, puser, &p) < 0) {
-					tprintf("???");
+					tprints("???");
 					break;
 				}
 				tprintf("%p", p);
 				puser += sizeof(void *);
 			}
-			tprintf("}, ");
+			tprints("}, ");
 		}
 		if (tcp->u_arg[3] == 0)
-			tprintf("NULL, ");
+			tprints("NULL, ");
 		else {
 			int i;
 			long nodeuser = tcp->u_arg[3];
-			tprintf("{");
+			tprints("{");
 			for (i = 0; i < npages; ++i) {
 				int node;
 				if (i > 0)
-					tprintf(", ");
+					tprints(", ");
 				if (umove(tcp, nodeuser, &node) < 0) {
-					tprintf("???");
+					tprints("???");
 					break;
 				}
 				tprintf("%#x", node);
 				nodeuser += sizeof(int);
 			}
-			tprintf("}, ");
+			tprints("}, ");
 		}
 	}
 	if (exiting(tcp)) {
 		unsigned long npages = tcp->u_arg[1];
 		if (tcp->u_arg[4] == 0)
-			tprintf("NULL, ");
+			tprints("NULL, ");
 		else {
 			int i;
 			long statususer = tcp->u_arg[4];
-			tprintf("{");
+			tprints("{");
 			for (i = 0; i < npages; ++i) {
 				int status;
 				if (i > 0)
-					tprintf(", ");
+					tprints(", ");
 				if (umove(tcp, statususer, &status) < 0) {
-					tprintf("???");
+					tprints("???");
 					break;
 				}
 				tprintf("%#x", status);
 				statususer += sizeof(int);
 			}
-			tprintf("}, ");
+			tprints("}, ");
 		}
 		printflags(move_pages_flags, tcp->u_arg[5], "MPOL_???");
 	}
@@ -940,7 +940,7 @@ sys_subpage_prot(struct tcb *tcp)
 		tprintf("%#lx, %#lx, ", tcp->u_arg[0], tcp->u_arg[1]);
 		entries = tcp->u_arg[1] >> 16;
 		if (!entries || !tcp->u_arg[2]) {
-			tprintf("{}");
+			tprints("{}");
 			return 0;
 		}
 		cur = tcp->u_arg[2];
@@ -956,12 +956,12 @@ sys_subpage_prot(struct tcb *tcp)
 		}
 		else
 			abbrev_end = end;
-		tprintf("{");
+		tprints("{");
 		for (; cur < end; cur += sizeof(int)) {
 			if (cur > tcp->u_arg[2])
-				tprintf(", ");
+				tprints(", ");
 			if (cur >= abbrev_end) {
-				tprintf("...");
+				tprints("...");
 				break;
 			}
 			if (umove(tcp, cur, &entry) < 0) {
@@ -971,7 +971,7 @@ sys_subpage_prot(struct tcb *tcp)
 			else
 				tprintf("%#08x", entry);
 		}
-		tprintf("}");
+		tprints("}");
 	}
 
 	return 0;

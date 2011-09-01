@@ -2360,9 +2360,9 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 
 	if (res != 1) {
-		tprintf(") ");
+		tprints(") ");
 		tabto();
-		tprintf("= ? <unavailable>");
+		tprints("= ? <unavailable>");
 		printtrailer();
 		tcp->flags &= ~TCB_INSYSCALL;
 		return res;
@@ -2385,7 +2385,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
 	}
 
-	tprintf(") ");
+	tprints(") ");
 	tabto();
 	u_error = tcp->u_error;
 	if (!SCNO_IN_RANGE(tcp->scno) ||
@@ -2399,16 +2399,16 @@ trace_syscall_exiting(struct tcb *tcp)
 		switch (u_error) {
 #ifdef LINUX
 		case ERESTARTSYS:
-			tprintf("= ? ERESTARTSYS (To be restarted)");
+			tprints("= ? ERESTARTSYS (To be restarted)");
 			break;
 		case ERESTARTNOINTR:
-			tprintf("= ? ERESTARTNOINTR (To be restarted)");
+			tprints("= ? ERESTARTNOINTR (To be restarted)");
 			break;
 		case ERESTARTNOHAND:
-			tprintf("= ? ERESTARTNOHAND (To be restarted)");
+			tprints("= ? ERESTARTNOHAND (To be restarted)");
 			break;
 		case ERESTART_RESTARTBLOCK:
-			tprintf("= ? ERESTART_RESTARTBLOCK (To be restarted)");
+			tprints("= ? ERESTART_RESTARTBLOCK (To be restarted)");
 			break;
 #endif /* LINUX */
 		default:
@@ -2427,7 +2427,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 	else {
 		if (sys_res & RVAL_NONE)
-			tprintf("= ?");
+			tprints("= ?");
 		else {
 			switch (sys_res & RVAL_MASK) {
 			case RVAL_HEX:

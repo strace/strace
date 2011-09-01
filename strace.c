@@ -1797,7 +1797,7 @@ cleanup(void)
 				"cleanup: looking at pid %u\n", tcp->pid);
 		if (tcp_last &&
 		    (!outfname || followfork < 2 || tcp_last == tcp)) {
-			tprintf(" <unfinished ...>");
+			tprints(" <unfinished ...>");
 			printtrailer();
 		}
 		if (tcp->flags & TCB_ATTACHED)
@@ -2249,7 +2249,7 @@ trace(void)
 #ifdef PR_INFO
 				if (tcp->status.PR_INFO.si_signo == what) {
 					printleader(tcp);
-					tprintf("    siginfo=");
+					tprints("    siginfo=");
 					printsiginfo(&tcp->status.PR_INFO, 1);
 					printtrailer();
 				}
@@ -2565,7 +2565,7 @@ trace()
 #endif
 				printleader(tcp);
 				if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == 0) {
-					tprintf("--- ");
+					tprints("--- ");
 					printsiginfo(&si, verbose(tcp));
 					tprintf(" (%s)" PC_FORMAT_STR " ---",
 						strsignal(WSTOPSIG(status))
@@ -2606,7 +2606,7 @@ trace()
 					 * Finish the line then.
 					 */
 					tcp_last->flags |= TCB_REPRINT;
-					tprintf(" <unfinished ...>");
+					tprints(" <unfinished ...>");
 					printtrailer();
 				}
 				detach(tcp, 0);
@@ -2669,14 +2669,14 @@ printleader(struct tcb *tcp)
 	if (tcp_last) {
 		if (tcp_last->ptrace_errno) {
 			if (tcp_last->flags & TCB_INSYSCALL) {
-				tprintf(" <unavailable>) ");
+				tprints(" <unavailable>) ");
 				tabto();
 			}
-			tprintf("= ? <unavailable>\n");
+			tprints("= ? <unavailable>\n");
 			tcp_last->ptrace_errno = 0;
 		} else if (!outfname || followfork < 2 || tcp_last == tcp) {
 			tcp_last->flags |= TCB_REPRINT;
-			tprintf(" <unfinished ...>\n");
+			tprints(" <unfinished ...>\n");
 		}
 	}
 	curcol = 0;
@@ -2725,7 +2725,7 @@ tabto(void)
 void
 printtrailer(void)
 {
-	tprintf("\n");
+	tprints("\n");
 	tcp_last = NULL;
 }
 

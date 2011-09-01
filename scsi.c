@@ -33,7 +33,7 @@ print_sg_io_buffer(struct tcb *tcp, unsigned char *addr, int len)
 		tprintf(", %02x", buf[i]);
 	free(buf);
 	if (allocated != len)
-		tprintf(", ...");
+		tprints(", ...");
 }
 
 static void
@@ -55,7 +55,7 @@ print_sg_io_req(struct tcb *tcp, struct sg_io_hdr *sg_io)
 		tprintf(", data[%u]=[", sg_io->dxfer_len);
 		printstr(tcp, (unsigned long) sg_io->dxferp,
 			 sg_io->dxfer_len);
-		tprintf("]");
+		tprints("]");
 	}
 }
 
@@ -67,7 +67,7 @@ print_sg_io_res(struct tcb *tcp, struct sg_io_hdr *sg_io)
 		tprintf(", data[%u]=[", sg_io->dxfer_len);
 		printstr(tcp, (unsigned long) sg_io->dxferp,
 			 sg_io->dxfer_len);
-		tprintf("]");
+		tprints("]");
 	}
 	tprintf(", status=%02x, ", sg_io->status);
 	tprintf("masked_status=%02x, ", sg_io->masked_status);
@@ -91,7 +91,7 @@ scsi_ioctl(struct tcb *tcp, long code, long arg)
 			if (umove(tcp, arg, &sg_io) < 0)
 				tprintf(", %#lx", arg);
 			else {
-				tprintf(", ");
+				tprints(", ");
 				print_sg_io_req(tcp, &sg_io);
 			}
 		}
@@ -101,7 +101,7 @@ scsi_ioctl(struct tcb *tcp, long code, long arg)
 			if (!syserror(tcp) && umove(tcp, arg, &sg_io) >= 0)
 				print_sg_io_res(tcp, &sg_io);
 			else
-				tprintf("}");
+				tprints("}");
 		}
 		break;
 	default:
