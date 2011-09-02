@@ -424,7 +424,7 @@ startup_attach(void)
 	if (daemonized_tracer) {
 		pid_t pid = fork();
 		if (pid < 0) {
-			_exit(1);
+			perror_msg_and_die("fork");
 		}
 		if (pid) { /* parent */
 			/*
@@ -641,7 +641,7 @@ startup_child(char **argv)
 # ifndef FREEBSD
 		pause();
 # else
-		kill(pid, SIGSTOP); /* stop HERE */
+		kill(pid, SIGSTOP);
 # endif
 #else /* !USE_PROCFS */
 		if (!daemonized_tracer) {

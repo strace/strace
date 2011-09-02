@@ -224,8 +224,7 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 		msg = "CONT";
 	if (op == PTRACE_DETACH)
 		msg = "DETACH";
-	fprintf(stderr, "strace: ptrace(PTRACE_%s,1,%d): %s\n",
-			msg, sig, strerror(err));
+	perror_msg("ptrace(PTRACE_%s,1,%d)", msg, sig);
 	return -1;
 }
 
