@@ -2294,7 +2294,7 @@ trace()
 {
 	int pid;
 	int wait_errno;
-	int status;
+	int status, sig;
 	struct tcb *tcp;
 #ifdef LINUX
 	struct rusage ru;
@@ -2486,8 +2486,10 @@ trace()
 
 		if (status >> 16) {
 			/* Ptrace event (we ignore all of them for now) */
-			goto tracing;
+			goto restart_tracee_with_sig_0;
 		}
+
+		sig = WSTOPSIG(status);
 
 		/*
 		 * Interestingly, the process may stop
@@ -2498,7 +2500,7 @@ trace()
 		 * so skip the first (lost) execve notification.
 		 */
 		if ((tcp->flags & TCB_STARTUP) &&
-		    (WSTOPSIG(status) == SIGSTOP || strace_vforked)) {
+		    (sig == SIGSTOP || strace_vforked)) {
 			/*
 			 * This flag is there to keep us in sync.
 			 * Next time this process stops it should
@@ -2510,7 +2512,8 @@ trace()
 				 * One example is a breakpoint inherited from
 				 * parent through fork().
 				 */
-				if (clearbpt(tcp) < 0) /* Pretty fatal */ {
+				if (clearbpt(tcp) < 0) {
+					/* Pretty fatal */
 					droptcb(tcp);
 					cleanup();
 					return -1;
@@ -2528,25 +2531,21 @@ trace()
 				}
 			}
 #endif
-			goto tracing;
+			goto restart_tracee_with_sig_0;
 		}
 
-		if (WSTOPSIG(status) != syscall_trap_sig) {
-			if (WSTOPSIG(status) == SIGSTOP &&
+		if (sig != syscall_trap_sig) {
+			if (sig == SIGSTOP &&
 					(tcp->flags & TCB_SIGTRAPPED)) {
 				/*
 				 * Trapped attempt to block SIGTRAP
 				 * Hope we are back in control now.
 				 */
 				tcp->flags &= ~(TCB_INSYSCALL | TCB_SIGTRAPPED);
-				if (ptrace_restart(PTRACE_SYSCALL, tcp, 0) < 0) {
-					cleanup();
-					return -1;
-				}
-				continue;
+				goto restart_tracee_with_sig_0;
 			}
 			if (cflag != CFLAG_ONLY_STATS
-			    && (qual_flags[WSTOPSIG(status)] & QUAL_SIGNAL)) {
+			    && (qual_flags[sig] & QUAL_SIGNAL)) {
 				siginfo_t si;
 #if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
 				long pc = 0;
@@ -2568,20 +2567,16 @@ trace()
 					tprints("--- ");
 					printsiginfo(&si, verbose(tcp));
 					tprintf(" (%s)" PC_FORMAT_STR " ---",
-						strsignal(WSTOPSIG(status))
+						strsignal(sig)
 						PC_FORMAT_ARG);
 				} else
 					tprintf("--- %s by %s" PC_FORMAT_STR " ---",
-						strsignal(WSTOPSIG(status)),
-						signame(WSTOPSIG(status))
+						strsignal(sig),
+						signame(sig)
 						PC_FORMAT_ARG);
 				printtrailer();
 			}
-			if (ptrace_restart(PTRACE_SYSCALL, tcp, WSTOPSIG(status)) < 0) {
-				cleanup();
-				return -1;
-			}
-			continue;
+			goto restart_tracee;
 		}
 
 		/* We handled quick cases, we are permitted to interrupt now. */
@@ -2617,10 +2612,12 @@ trace()
 			}
 			continue;
 		}
-	tracing:
+ restart_tracee_with_sig_0:
+		sig = 0;
+ restart_tracee:
 		/* Remember current print column before continuing. */
 		tcp->curcol = curcol;
-		if (ptrace_restart(PTRACE_SYSCALL, tcp, 0) < 0) {
+		if (ptrace_restart(PTRACE_SYSCALL, tcp, sig) < 0) {
 			cleanup();
 			return -1;
 		}
