@@ -436,8 +436,15 @@ struct tcb {
 };
 
 /* TCB flags */
-#define TCB_STARTUP	00001	/* We have just begun ptracing this process */
-#define TCB_INUSE	00002	/* This table entry is in use */
+#define TCB_INUSE		00001	/* This table entry is in use */
+/* We have attached to this process, but did not see it stopping yet.
+ * (If this bit is not set, we either didn't attach yet,
+ * or we did attach to it, already saw it stopping at least once,
+ * did some init work on it and cleared this bit. TODO: maybe it makes sense
+ * to split these two states?)
+ */
+#define TCB_STARTUP		00002
+#define TCB_IGNORE_ONE_SIGSTOP	00004	/* Next SIGSTOP is to be ignored */
 /*
  * Are we in system call entry or in syscall exit?
  *
@@ -456,8 +463,8 @@ struct tcb {
  *
  * Use entering(tcp) / exiting(tcp) to check this bit to make code more readable.
  */
-#define TCB_INSYSCALL	00004
-#define TCB_ATTACHED	00010	/* Process is not our own child */
+#define TCB_INSYSCALL	00010
+#define TCB_ATTACHED	00020	/* Process is not our own child */
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */

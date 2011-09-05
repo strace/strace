@@ -491,7 +491,7 @@ startup_attach(void)
 					cur_tcp = tcp;
 					if (tid != tcp->pid)
 						cur_tcp = alloctcb(tid);
-					cur_tcp->flags |= TCB_ATTACHED | TCB_STARTUP;
+					cur_tcp->flags |= TCB_ATTACHED | TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
 				}
 				closedir(dir);
 				if (interactive) {
@@ -512,6 +512,13 @@ startup_attach(void)
 : "Process %u attached - interrupt to quit\n",
 						tcp->pid, ntid);
 				}
+				if (!(tcp->flags & TCB_STARTUP)) {
+					/* -p PID, we failed to attach to PID itself
+					 * but did attach to some of its sibling threads.
+					 * Drop PID's tcp.
+					 */
+					droptcb(tcp);
+				}
 				continue;
 			} /* if (opendir worked) */
 		} /* if (-f) */
@@ -521,7 +528,7 @@ startup_attach(void)
 			droptcb(tcp);
 			continue;
 		}
-		tcp->flags |= TCB_STARTUP;
+		tcp->flags |= TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
 		if (debug)
 			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
 
@@ -707,7 +714,10 @@ startup_child(char **argv)
 
 	if (!daemonized_tracer) {
 		tcp = alloctcb(pid);
-		tcp->flags |= TCB_STARTUP;
+		if (!strace_vforked)
+			tcp->flags |= TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
+		else
+			tcp->flags |= TCB_STARTUP;
 	}
 	else {
 		/* With -D, *we* are child here, IOW: different pid. Fetch it: */
@@ -1677,11 +1687,11 @@ detach(struct tcb *tcp, int sig)
 #define PTRACE_DETACH PTRACE_SUNDETACH
 #endif
 	/*
-	 * On TCB_STARTUP we did PTRACE_ATTACH but still did not get the
-	 * expected SIGSTOP.  We must catch exactly one as otherwise the
-	 * detached process would be left stopped (process state T).
+	 * We did PTRACE_ATTACH but possibly didn't see the expected SIGSTOP.
+	 * We must catch exactly one as otherwise the detached process
+	 * would be left stopped (process state T).
 	 */
-	catch_sigstop = (tcp->flags & TCB_STARTUP);
+	catch_sigstop = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
 	error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig);
 	if (error == 0) {
 		/* On a clear day, you can see forever. */
@@ -2411,7 +2421,7 @@ trace()
 				   child so that we know how to do clearbpt
 				   in the child.  */
 				tcp = alloctcb(pid);
-				tcp->flags |= TCB_ATTACHED | TCB_STARTUP;
+				tcp->flags |= TCB_ATTACHED | TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
 				if (!qflag)
 					fprintf(stderr, "Process %d attached\n",
 						pid);
@@ -2478,28 +2488,10 @@ trace()
 			continue;
 		}
 
-		if (status >> 16) {
-			/* Ptrace event (we ignore all of them for now) */
-			goto restart_tracee_with_sig_0;
-		}
-
-		sig = WSTOPSIG(status);
-
-		/*
-		 * Interestingly, the process may stop
-		 * with STOPSIG equal to some other signal
-		 * than SIGSTOP if we happend to attach
-		 * just before the process takes a signal.
-		 * A no-MMU vforked child won't send up a signal,
-		 * so skip the first (lost) execve notification.
-		 */
-		if ((tcp->flags & TCB_STARTUP) &&
-		    (sig == SIGSTOP || strace_vforked)) {
-			/*
-			 * This flag is there to keep us in sync.
-			 * Next time this process stops it should
-			 * really be entering a system call.
-			 */
+		/* Is this the very first time we see this tracee stopped? */
+		if (tcp->flags & TCB_STARTUP) {
+			if (debug)
+				fprintf(stderr, "pid %d has TCB_STARTUP, initializing it\n", tcp->pid);
 			tcp->flags &= ~TCB_STARTUP;
 			if (tcp->flags & TCB_BPTSET) {
 				/*
@@ -2525,6 +2517,25 @@ trace()
 				}
 			}
 #endif
+		}
+
+		if (((unsigned)status >> 16) != 0) {
+			/* Ptrace event (we ignore all of them for now) */
+			goto restart_tracee_with_sig_0;
+		}
+
+		sig = WSTOPSIG(status);
+
+		/* Is this post-attach SIGSTOP?
+		 * Interestingly, the process may stop
+		 * with STOPSIG equal to some other signal
+		 * than SIGSTOP if we happend to attach
+		 * just before the process takes a signal.
+		 */
+		if (sig == SIGSTOP && (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)) {
+			if (debug)
+				fprintf(stderr, "ignored SIGSTOP on pid %d\n", tcp->pid);
+			tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
 			goto restart_tracee_with_sig_0;
 		}
 

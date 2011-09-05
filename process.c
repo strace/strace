@@ -859,7 +859,7 @@ internal_fork(struct tcb *tcp)
 		}
 #endif /* !oldway */
 #endif /* SUNOS4 */
-		tcpchild->flags |= TCB_ATTACHED | TCB_STARTUP;
+		tcpchild->flags |= TCB_ATTACHED | TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
 		/* Child has BPT too, must be removed on first occasion */
 		if (bpt) {
 			tcpchild->flags |= TCB_BPTSET;
