@@ -458,9 +458,6 @@ struct tcb {
  */
 #define TCB_INSYSCALL	00004
 #define TCB_ATTACHED	00010	/* Process is not our own child */
-#ifdef LINUX
-#define TCB_ATTACH_DONE	00020	/* PTRACE_ATTACH was done on this tcb->pid */
-#endif
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */

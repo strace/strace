@@ -444,13 +444,11 @@ startup_attach(void)
 	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
 		tcp = tcbtab[tcbi];
 
-		if (!(tcp->flags & TCB_INUSE) || !(tcp->flags & TCB_ATTACHED))
-			continue;
-#ifdef LINUX
-		if (tcp->flags & TCB_ATTACH_DONE)
-			continue;
-#endif
-		/* Reinitialize the output since it may have changed. */
+		/* Is this a process we should attach to, but not yet attached? */
+		if ((tcp->flags & (TCB_ATTACHED | TCB_STARTUP)) != TCB_ATTACHED)
+			continue; /* no */
+
+		/* Reinitialize the output since it may have changed */
 		tcp->outf = outf;
 		newoutf(tcp);
 
@@ -493,7 +491,7 @@ startup_attach(void)
 					cur_tcp = tcp;
 					if (tid != tcp->pid)
 						cur_tcp = alloctcb(tid);
-					cur_tcp->flags |= TCB_ATTACHED|TCB_ATTACH_DONE|TCB_STARTUP;
+					cur_tcp->flags |= TCB_ATTACHED | TCB_STARTUP;
 				}
 				closedir(dir);
 				if (interactive) {
@@ -548,14 +546,6 @@ startup_attach(void)
 	} /* for each tcbtab[] */
 
  ret:
-#ifdef LINUX
-	/* TCB_ATTACH_DONE flag is used only in this function */
-	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
-		tcp = tcbtab[tcbi];
-		tcp->flags &= ~TCB_ATTACH_DONE;
-	}
-#endif
-
 	if (interactive)
 		sigprocmask(SIG_SETMASK, &empty_set, NULL);
 }
