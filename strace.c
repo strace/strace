@@ -471,8 +471,11 @@ startup_attach(void)
 			if (dir != NULL) {
 				unsigned int ntid = 0, nerr = 0;
 				struct dirent *de;
-				int tid;
+
 				while ((de = readdir(dir)) != NULL) {
+					struct tcb *cur_tcp;
+					int tid;
+
 					if (de->d_fileno == 0)
 						continue;
 					tid = atoi(de->d_name);
@@ -483,23 +486,22 @@ startup_attach(void)
 						++nerr;
 						if (debug)
 							fprintf(stderr, "attach to pid %d failed\n", tid);
+						continue;
 					}
-					else {
-						if (debug)
-							fprintf(stderr, "attach to pid %d succeeded\n", tid);
-						if (tid != tcp->pid) {
-							struct tcb *new_tcp = alloctcb(tid);
-							new_tcp->flags |= TCB_ATTACHED|TCB_ATTACH_DONE;
-						}
-					}
-					if (interactive) {
-						sigprocmask(SIG_SETMASK, &empty_set, NULL);
-						if (interrupted)
-							goto ret;
-						sigprocmask(SIG_BLOCK, &blocked_set, NULL);
-					}
+					if (debug)
+						fprintf(stderr, "attach to pid %d succeeded\n", tid);
+					cur_tcp = tcp;
+					if (tid != tcp->pid)
+						cur_tcp = alloctcb(tid);
+					cur_tcp->flags |= TCB_ATTACHED|TCB_ATTACH_DONE|TCB_STARTUP;
 				}
 				closedir(dir);
+				if (interactive) {
+					sigprocmask(SIG_SETMASK, &empty_set, NULL);
+					if (interrupted)
+						goto ret;
+					sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+				}
 				ntid -= nerr;
 				if (ntid == 0) {
 					perror("attach: ptrace(PTRACE_ATTACH, ...)");
@@ -521,6 +523,7 @@ startup_attach(void)
 			droptcb(tcp);
 			continue;
 		}
+		tcp->flags |= TCB_STARTUP;
 		if (debug)
 			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
 
@@ -714,6 +717,7 @@ startup_child(char **argv)
 
 	if (!daemonized_tracer) {
 		tcp = alloctcb(pid);
+		tcp->flags |= TCB_STARTUP;
 	}
 	else {
 		/* With -D, *we* are child here, IOW: different pid. Fetch it: */
@@ -1270,7 +1274,7 @@ alloc_tcb(int pid, int command_options_parsed)
 		if ((tcp->flags & TCB_INUSE) == 0) {
 			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
-			tcp->flags = TCB_INUSE | TCB_STARTUP;
+			tcp->flags = TCB_INUSE;
 			tcp->outf = outf; /* Initialise to current out file */
 #ifdef USE_PROCFS
 			tcp->pfd = -1;
@@ -2417,7 +2421,7 @@ trace()
 				   child so that we know how to do clearbpt
 				   in the child.  */
 				tcp = alloctcb(pid);
-				tcp->flags |= TCB_ATTACHED;
+				tcp->flags |= TCB_ATTACHED | TCB_STARTUP;
 				if (!qflag)
 					fprintf(stderr, "Process %d attached\n",
 						pid);

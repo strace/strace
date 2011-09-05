@@ -487,6 +487,7 @@ internal_fork(struct tcb *tcp)
 		tcpchild = alloctcb(tcp->u_rval);
 		if (proc_open(tcpchild, 2) < 0)
 			droptcb(tcpchild);
+		tcpchild->flags |= TCB_STARTUP;
 	}
 	return 0;
 }
@@ -858,7 +859,7 @@ internal_fork(struct tcb *tcp)
 		}
 #endif /* !oldway */
 #endif /* SUNOS4 */
-		tcpchild->flags |= TCB_ATTACHED;
+		tcpchild->flags |= TCB_ATTACHED | TCB_STARTUP;
 		/* Child has BPT too, must be removed on first occasion */
 		if (bpt) {
 			tcpchild->flags |= TCB_BPTSET;
