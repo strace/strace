@@ -496,10 +496,10 @@
 	{ 1,	TP,	sys_unshare,		"unshare"		}, /* 465 */
 	{ 2,	0,	printargs,		"set_robust_list"	}, /* 466 */
 	{ 3,	0,	printargs,		"get_robust_list"	}, /* 467 */
-	{ 6,	TD,	printargs,		"splice"		}, /* 468 */
+	{ 6,	TD,	sys_splice,		"splice"		}, /* 468 */
 	{ 4,	TD,	printargs,		"sync_file_range"	}, /* 469 */
-	{ 4,	TD,	printargs,		"tee"			}, /* 470 */
-	{ 4,	TD,	printargs,		"vmsplice"		}, /* 471 */
+	{ 4,	TD,	sys_tee,		"tee"			}, /* 470 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice"		}, /* 471 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 472 */
 	{ 3,	0,	sys_getcpu,		"getcpu"		}, /* 473 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 474 */

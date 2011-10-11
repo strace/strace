@@ -4306,10 +4306,10 @@
 	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 4301 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 4302 */
 	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 4303 */
-	{ 6,	TD,	printargs,		"splice"	}, /* 4304 */
+	{ 6,	TD,	sys_splice,		"splice"	}, /* 4304 */
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 4305 */
-	{ 4,	TD,	printargs,		"tee"		}, /* 4306 */
-	{ 4,	TD,	printargs,		"vmsplice"	}, /* 4307 */
+	{ 4,	TD,	sys_tee,		"tee"		}, /* 4306 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 4307 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 4308 */
 	{ 2,	0,	printargs,		"set_robust_list" }, /* 4309 */
 	{ 3,	0,	printargs,		"get_robust_list" }, /* 4310 */
@@ -5608,10 +5608,10 @@
 	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 5260 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 5261 */
 	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 5262 */
-	{ 6,	TD,	printargs,		"splice"	}, /* 5263 */
+	{ 6,	TD,	sys_splice,		"splice"	}, /* 5263 */
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 5264 */
-	{ 4,	TD,	printargs,		"tee"		}, /* 5265 */
-	{ 4,	TD,	printargs,		"vmsplice"	}, /* 5266 */
+	{ 4,	TD,	sys_tee,		"tee"		}, /* 5265 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 5266 */
 	{ 6,	0,	printargs,		"move_pages"	}, /* 5267 */
 	{ 2,	0,	printargs,		"set_robust_list" }, /* 5268 */
 	{ 3,	0,	printargs,		"get_robust_list" }, /* 5269 */
@@ -6918,10 +6918,10 @@
 	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 6264 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 6265 */
 	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 6266 */
-	{ 6,	TD,	printargs,		"splice"	}, /* 6267 */
+	{ 6,	TD,	sys_splice,		"splice"	}, /* 6267 */
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 6268 */
-	{ 4,	TD,	printargs,		"tee"		}, /* 6269 */
-	{ 4,	TD,	printargs,		"vmsplice"	}, /* 6270 */
+	{ 4,	TD,	sys_tee,		"tee"		}, /* 6269 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 6270 */
 	{ 6,	0,	printargs,		"move_pages"	}, /* 6271 */
 	{ 2,	0,	printargs,		"set_robust_list" }, /* 6272 */
 	{ 3,	0,	printargs,		"get_robust_list" }, /* 6273 */

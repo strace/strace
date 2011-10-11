@@ -283,10 +283,10 @@
 	{ 1,	TP,	sys_unshare,		"unshare" }, /* 282 */
 	{ 2,	0,	printargs,		"set_robust_list" }, /* 283 */
 	{ 3,	0,	printargs,		"get_robust_list" }, /* 284 */
-	{ 6,	TD,	printargs,		"splice" }, /* 285 */
+	{ 6,	TD,	sys_splice,		"splice" }, /* 285 */
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 286 */
-	{ 4,	TD,	printargs,		"tee" }, /* 287 */
-	{ 4,	TD,	printargs,		"vmsplice" }, /* 288 */
+	{ 4,	TD,	sys_tee,		"tee" }, /* 287 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice" }, /* 288 */
 	{ 6,	TP,	sys_move_pages,		"move_pages" }, /* 289 */
 	{ 1,	TP,	printargs,		"unused" }, /* 290 */
 	{ 1,	0,	printargs,		"cmpxchg_badaddr" }, /* 291 */

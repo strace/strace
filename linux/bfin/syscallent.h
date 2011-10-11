@@ -370,10 +370,10 @@
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 339 */
 	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 340 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 341 */
-	{ 6,	TD,	printargs,		"splice"	}, /* 342 */
+	{ 6,	TD,	sys_splice,		"splice"	}, /* 342 */
 	{ 4,	TD,	printargs,		"sync_file_range"	}, /* 343 */
-	{ 4,	TD,	printargs,		"tee"		}, /* 344 */
-	{ 4,	TD,	printargs,		"vmsplice"	}, /* 345 */
+	{ 4,	TD,	sys_tee,		"tee"		}, /* 344 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 345 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 346 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 347 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 348 */

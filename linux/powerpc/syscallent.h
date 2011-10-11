@@ -311,9 +311,9 @@
 	{ 6,	TD,	sys_pselect6,		"pselect6"		}, /* 280 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"			}, /* 281 */
 	{ 1,	TP,	sys_unshare,		"unshare"		}, /* 282 */
-	{ 6,	TD,	printargs,		"splice"		}, /* 283 */
-	{ 4,	TD,	printargs,		"tee"			}, /* 284 */
-	{ 4,	TD,	printargs,		"vmsplice"		}, /* 285 */
+	{ 6,	TD,	sys_splice,		"splice"		}, /* 283 */
+	{ 4,	TD,	sys_tee,		"tee"			}, /* 284 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice"		}, /* 285 */
 	{ 4,	TD|TF,	sys_openat,		"openat"		}, /* 286 */
 	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"		}, /* 287 */
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat"		}, /* 288 */

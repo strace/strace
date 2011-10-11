@@ -1103,10 +1103,10 @@
 	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 1296 */
 	{ 2,	0,	printargs,		"set_robust_list" }, /* 1297 */
 	{ 3,	0,	printargs,		"get_robust_list" }, /* 1298 */
-	{ 6,	TD,	printargs,		"splice"	}, /* 1299 */
+	{ 6,	TD,	sys_splice,		"splice"	}, /* 1299 */
 	{ 4,	TD,	printargs,		"sync_file_range" }, /* 1300 */
-	{ 4,	TD,	printargs,		"tee"		}, /* 1301 */
-	{ 4,	TD,	printargs,		"vmsplice"	}, /* 1302 */
+	{ 4,	TD,	sys_tee,		"tee"		}, /* 1301 */
+	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 1302 */
 	{ MA,	0,	printargs,		"SYS_1303"	}, /* 1303 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 1304 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 1305 */

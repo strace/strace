@@ -141,6 +141,9 @@ int sys_inotify_init1();
 int sys_pselect6();
 int sys_ppoll();
 int sys_unshare();
+int sys_tee();
+int sys_splice();
+int sys_vmsplice();
 
 /* architecture-specific calls */
 #ifdef ALPHA

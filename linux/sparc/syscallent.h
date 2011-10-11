@@ -278,7 +278,7 @@
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 277 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 278 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 279 */
-	{ 4,	TD,	printargs,		"tee"		}, /* 280 */
+	{ 4,	TD,	sys_tee,		"tee"		}, /* 280 */
 	{ 5,	0,	printargs,		"add_key"	}, /* 281 */
 	{ 4,	0,	printargs,		"request_key"	}, /* 282 */
 	{ 5,	0,	printargs,		"keyctl"	}, /* 283 */

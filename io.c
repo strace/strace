@@ -361,27 +361,106 @@ sys_sendfile(struct tcb *tcp)
 	return 0;
 }
 
+static void
+print_loff_t(struct tcb *tcp, long addr)
+{
+	loff_t offset;
+
+	if (!addr)
+		tprints("NULL");
+	else if (umove(tcp, addr, &offset) < 0)
+		tprintf("%#lx", addr);
+	else
+		tprintf("[%llu]", (unsigned long long int) offset);
+}
+
 int
 sys_sendfile64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		loff_t offset;
-
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		printfd(tcp, tcp->u_arg[1]);
 		tprints(", ");
-		if (!tcp->u_arg[2])
-			tprints("NULL");
-		else if (umove(tcp, tcp->u_arg[2], &offset) < 0)
-			tprintf("%#lx", tcp->u_arg[2]);
-		else
-			tprintf("[%llu]", (unsigned long long int) offset);
+		print_loff_t(tcp, tcp->u_arg[2]);
 		tprintf(", %lu", tcp->u_arg[3]);
 	}
 	return 0;
 }
 
+static const struct xlat splice_flags[] = {
+#ifdef SPLICE_F_MOVE
+	{ SPLICE_F_MOVE,     "SPLICE_F_MOVE"     },
+#endif
+#ifdef SPLICE_F_NONBLOCK
+	{ SPLICE_F_NONBLOCK, "SPLICE_F_NONBLOCK" },
+#endif
+#ifdef SPLICE_F_MORE
+	{ SPLICE_F_MORE,     "SPLICE_F_MORE"     },
+#endif
+#ifdef SPLICE_F_GIFT
+	{ SPLICE_F_GIFT,     "SPLICE_F_GIFT"     },
+#endif
+	{ 0,                 NULL                },
+};
+
+int
+sys_tee(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		/* int fd_in */
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		/* int fd_out */
+		printfd(tcp, tcp->u_arg[1]);
+		tprints(", ");
+		/* size_t len */
+		tprintf("%lu, ", tcp->u_arg[2]);
+		/* unsigned int flags */
+		printflags(splice_flags, tcp->u_arg[3], "SPLICE_F_???");
+	}
+	return 0;
+}
+
+int
+sys_splice(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		/* int fd_in */
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		/* loff_t *off_in */
+		print_loff_t(tcp, tcp->u_arg[1]);
+		tprints(", ");
+		/* int fd_out */
+		printfd(tcp, tcp->u_arg[2]);
+		tprints(", ");
+		/* loff_t *off_out */
+		print_loff_t(tcp, tcp->u_arg[3]);
+		tprints(", ");
+		/* size_t len */
+		tprintf("%lu, ", tcp->u_arg[4]);
+		/* unsigned int flags */
+		printflags(splice_flags, tcp->u_arg[5], "SPLICE_F_???");
+	}
+	return 0;
+}
+
+int
+sys_vmsplice(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		/* int fd */
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		/* const struct iovec *iov, unsigned long nr_segs */
+		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
+		tprints(", ");
+		/* unsigned int flags */
+		printflags(splice_flags, tcp->u_arg[3], "SPLICE_F_???");
+	}
+	return 0;
+}
 #endif /* LINUX */
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
