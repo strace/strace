@@ -674,6 +674,9 @@ static const struct xlat epollevents[] = {
 #ifdef EPOLLHUP
 	{ EPOLLHUP,	"EPOLLHUP"	},
 #endif
+#ifdef EPOLLRDHUP
+	{ EPOLLRDHUP,	"EPOLLRDHUP"	},
+#endif
 #ifdef EPOLLONESHOT
 	{ EPOLLONESHOT,	"EPOLLONESHOT"	},
 #endif
