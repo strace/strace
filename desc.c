@@ -777,7 +777,7 @@ epoll_wait_common(struct tcb *tcp)
 			tprints("{...}");
 #endif
 		}
-		tprintf(", %ld, %ld", tcp->u_arg[2], tcp->u_arg[3]);
+		tprintf(", %d, %d", (int) tcp->u_arg[2], (int) tcp->u_arg[3]);
 	}
 }
 
