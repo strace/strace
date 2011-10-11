@@ -792,10 +792,6 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
 		if (errno) {
-			if (started && (errno==EPERM || errno==EIO)) {
-				/* Ran into 'end of memory' - stupid "printpath" */
-				return 0;
-			}
 			/* But if not started, we had a bogus address. */
 			if (addr != 0 && errno != EIO && errno != ESRCH)
 				perror("ptrace: umoven");
@@ -913,10 +909,6 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
 		if (errno) {
-			if (started && (errno==EPERM || errno==EIO)) {
-				/* Ran into 'end of memory' - stupid "printpath" */
-				return 0;
-			}
 			if (addr != 0 && errno != EIO && errno != ESRCH)
 				perror("umovestr");
 			return -1;
