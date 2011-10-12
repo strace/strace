@@ -276,7 +276,3 @@
 #define solaris_adjtime printargs
 #define solaris_fchroot printargs
 #define solaris_utimes printargs
-
-#if DONE
-#define solaris_open printargs
-#endif
