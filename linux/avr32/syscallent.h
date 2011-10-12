@@ -95,7 +95,7 @@
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 65 */
 	{ 0,	0,	sys_setsid,		"setsid"	}, /* 66 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 67 */
-	{ 1,	TS,	printargs,		"rt_sigreturn"	}, /* 68 */
+	{ 1,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 68 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 69 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 70 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 71 */
@@ -172,7 +172,7 @@
 	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 142 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 143 */
 	{ 3,	TD,	sys_poll,		"poll"		}, /* 144 */
-	{ 3,	0,	printargs,		"nfsservctl"	}, /* 145 */
+	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 145 */
 	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 146 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 147 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 148 */
@@ -203,7 +203,7 @@
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 173 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 174 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 175 */
-	{ 0,	0,	printargs,		"gettid"	}, /* 176 */
+	{ 0,	0,	sys_gettid,		"gettid"	}, /* 176 */
 	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 177 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 178 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 179 */
@@ -231,12 +231,12 @@
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 201 */
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 202 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 203 */
-	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 204 */
+	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 204 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 205 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 206 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 207 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 208 */
-	{ 1,	0,	printargs,		"set_tid_address"}, /* 209 */
+	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 209 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 210 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 211 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 212 */
@@ -253,21 +253,21 @@
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 223 */
 	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 224 */
 	{ 3,	0,	printargs,		"cacheflush"	}, /* 225 */
-	{ 5,	0,	printargs,		"vserver"	}, /* 226 */
+	{ 5,	0,	sys_vserver,		"vserver"	}, /* 226 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 227 */
 	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 228 */
 	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 229 */
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 230 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 231 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr" }, /* 232 */
-	{ 5,	0,	printargs,		"kexec_load"	}, /* 233 */
+	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 233 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 234 */
-	{ 5,	0,	printargs,		"add_key"	}, /* 235 */
-	{ 4,	0,	printargs,		"request_key"	}, /* 236 */
-	{ 5,	0,	printargs,		"keyctl"	}, /* 237 */
-	{ 3,	0,	printargs,		"ioprio_set"	}, /* 238 */
-	{ 2,	0,	printargs,		"ioprio_get"	}, /* 239 */
-	{ 0,	0,	printargs,		"inotify_init"	}, /* 240 */
+	{ 5,	0,	sys_add_key,		"add_key"	}, /* 235 */
+	{ 4,	0,	sys_request_key,	"request_key"	}, /* 236 */
+	{ 5,	0,	sys_keyctl,		"keyctl"	}, /* 237 */
+	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 238 */
+	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 239 */
+	{ 0,	0,	sys_inotify_init,	"inotify_init"	}, /* 240 */
 	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 241 */
 	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 242 */
 	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 243 */
@@ -286,10 +286,10 @@
 	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 256 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 257 */
 	{ 1,	TD,	sys_unshare,		"unshare"	}, /* 258 */
-	{ 2,	0,	printargs,		"set_robust_list" }, /* 259 */
-	{ 3,	0,	printargs,		"get_robust_list" }, /* 260 */
+	{ 2,	0,	sys_set_robust_list,	"set_robust_list" }, /* 259 */
+	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 260 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 261 */
-	{ 4,	TD,	printargs,		"sync_file_range" }, /* 262 */
+	{ 4,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 262 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 263 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 264 */
 	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 265 */

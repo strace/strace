@@ -174,7 +174,7 @@
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"		}, /* 166 */
 	{ 5,	0,	sys_query_module,	"query_module"		}, /* 167 */
 	{ 3,	TD,	sys_poll,		"poll"			}, /* 168 */
-	{ 3,	0,	printargs,		"nfsservctl"		}, /* 169 */
+	{ 3,	0,	sys_nfsservctl,		"nfsservctl"		}, /* 169 */
 	{ 3,	0,	sys_setresgid,		"setresgid"		}, /* 170 */
 	{ 3,	0,	sys_setresgid,		"getresgid"		}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"			}, /* 172 */
@@ -211,7 +211,7 @@
 	{ 5,	0,	printargs,		"attrctl"		}, /* 203 */
 	{ 5,	0,	printargs,		"acl_get"		}, /* 204 */
 	{ 5,	0,	printargs,		"acl_set"		}, /* 205 */
-	{ 0,	0,	printargs,		"gettid"		}, /* 206 */
+	{ 0,	0,	sys_gettid,		"gettid"		}, /* 206 */
 	{ 4,	TD,	sys_readahead,		"readahead"		}, /* 207 */
 	{ 2,	TS,	sys_kill,		"tkill"			}, /* 208 */
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile64"		}, /* 209 */
@@ -228,7 +228,7 @@
 	{ 5,	0,	printargs,		"alloc_hugepages"	}, /* 220 */
 	{ 1,	0,	printargs,		"free_hugepages"	}, /* 221 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 222 */
-	{ 4,	0,	printargs,		"lookup_dcookie"	}, /* 223 */
+	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"	}, /* 223 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"		}, /* 224 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"		}, /* 225 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"		}, /* 226 */
@@ -242,7 +242,7 @@
 	{ 5,	0,	printargs,		"mq_getsetattr"		}, /* 234 */
 	{ 4,	0,	printargs,		"waitid"		}, /* 235 */
 	{ 5,	TD,	printargs,		"fadvise64_64"		}, /* 236 */
-	{ 5,	0,	printargs,		"set_tid_address"	}, /* 237 */
+	{ 5,	0,	sys_set_tid_address,	"set_tid_address"	}, /* 237 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"		}, /* 238 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"		}, /* 239 */
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"		}, /* 240 */
@@ -268,16 +268,16 @@
 	{ 5,	0,	printargs,		"mbind"			}, /* 260 */
 	{ 5,	0,	printargs,		"get_mempolicy"		}, /* 261 */
 	{ 5,	0,	printargs,		"set_mempolicy"		}, /* 262 */
-	{ 5,	0,	printargs,		"vserver"		}, /* 263 */
-	{ 5,	0,	printargs,		"add_key"		}, /* 264 */
-	{ 4,	0,	printargs,		"request_key"		}, /* 265 */
-	{ 5,	0,	printargs,		"keyctl"		}, /* 266 */
-	{ 3,	0,	printargs,		"ioprio_set"		}, /* 267 */
-	{ 2,	0,	printargs,		"ioprio_get"		}, /* 268 */
-	{ 0,	TD,	printargs,		"inotify_init"		}, /* 269 */
+	{ 5,	0,	sys_vserver,		"vserver"		}, /* 263 */
+	{ 5,	0,	sys_add_key,		"add_key"		}, /* 264 */
+	{ 4,	0,	sys_request_key,	"request_key"		}, /* 265 */
+	{ 5,	0,	sys_keyctl,		"keyctl"		}, /* 266 */
+	{ 3,	0,	sys_ioprio_set,		"ioprio_set"		}, /* 267 */
+	{ 2,	0,	sys_ioprio_get,		"ioprio_get"		}, /* 268 */
+	{ 0,	TD,	sys_inotify_init,	"inotify_init"		}, /* 269 */
 	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch"	}, /* 270 */
 	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch"	}, /* 271 */
-	{ 4,	0,	printargs,		"migrate_pages"		}, /* 272 */
+	{ 4,	0,	sys_migrate_pages,	"migrate_pages"		}, /* 272 */
 	{ 6,	TD,	sys_pselect6,		"pselect6"		}, /* 273 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"			}, /* 274 */
 	{ 4,	TD|TF,	sys_openat,		"openat"		}, /* 275 */
@@ -294,10 +294,10 @@
 	{ 3,	TD|TF,	sys_fchmodat,		"fchmodat"		}, /* 286 */
 	{ 3,	TD|TF,	sys_faccessat,		"faccessat"		}, /* 287 */
 	{ 1,	TP,	sys_unshare,		"unshare"		}, /* 288 */
-	{ 2,	0,	printargs,		"set_robust_list"	}, /* 289 */
-	{ 3,	0,	printargs,		"get_robust_list"	}, /* 290 */
+	{ 2,	0,	sys_set_robust_list,	"set_robust_list"	}, /* 289 */
+	{ 3,	0,	sys_get_robust_list,	"get_robust_list"	}, /* 290 */
 	{ 6,	TD,	sys_splice,		"splice"		}, /* 291 */
-	{ 4,	TD,	printargs,		"sync_file_range"	}, /* 292 */
+	{ 4,	TD,	sys_sync_file_range,	"sync_file_range"	}, /* 292 */
 	{ 4,	TD,	sys_tee,		"tee"			}, /* 293 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"		}, /* 294 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 295 */
@@ -305,7 +305,7 @@
 	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 297 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"		}, /* 298 */
 	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"		}, /* 299 */
-	{ 4,	0,	printargs,		"kexec_load"		}, /* 300 */
+	{ 4,	0,	sys_kexec_load,		"kexec_load"		}, /* 300 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"		}, /* 301 */
 	{ 3,	TD,	printargs,		"signalfd"		}, /* 302 */
 	{ 4,	TD,	printargs,		"timerfd"		}, /* 303 */
@@ -322,8 +322,8 @@
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"		}, /* 314 */
 	{ 5,	TD,	sys_preadv,		"preadv"		}, /* 315 */
 	{ 5,	TD,	sys_pwritev,		"pwritev"		}, /* 316 */
-	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"	}, /* 317 */
-	{ 5,	TD,	printargs,		"perf_event_open"	}, /* 318 */
+	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"	}, /* 317 */
+	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"	}, /* 318 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"		}, /* 319 */
 	{ 4,	TN,	sys_accept4,		"accept4"		}, /* 320 */
-	{ 4,	0,	printargs,		"prlimit64"		}, /* 321 */
+	{ 4,	0,	sys_prlimit64,		"prlimit64"		}, /* 321 */

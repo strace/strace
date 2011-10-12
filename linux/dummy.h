@@ -29,11 +29,29 @@
  */
 
 /* still unfinished */
+#define	sys_add_key		printargs
+#define	sys_get_robust_list	printargs
+#define	sys_fanotify_init	printargs
+#define	sys_fanotify_mark	printargs
 #define	sys_ioperm		printargs
 #define	sys_iopl		printargs
+#define	sys_ioprio_get		printargs
+#define	sys_ioprio_set		printargs
+#define	sys_keyctl		printargs
+#define	sys_kexec_load		printargs
+#define	sys_lookup_dcookie	printargs
+#define	sys_migrate_pages	printargs
+#define	sys_nfsservctl		printargs
+#define	sys_perf_event_open	printargs
+#define	sys_prlimit64		printargs
+#define	sys_request_key		printargs
+#define	sys_rt_tgsigqueueinfo	printargs
 #define	sys_sched_rr_get_interval printargs
+#define	sys_set_robust_list	printargs
+#define	sys_sync_file_range	printargs
 #define	sys_sysfs		printargs
 #define	sys_syslog		printargs
+#define	sys_vm86		printargs
 #define	sys_vm86old		printargs
 
 /* machine-specific */
@@ -69,12 +87,16 @@
 #define	sys_getpgrp		printargs
 #define	sys_getpid		printargs
 #define	sys_getppid		printargs
+#define	sys_gettid		printargs
 #define	sys_idle		printargs
+#define	sys_inotify_init	printargs
 #define	sys_munlockall		printargs
 #define	sys_pause		printargs
+#define	sys_rt_sigreturn	printargs
 #define	sys_sched_yield		printargs
 #define	sys_setsid		printargs
 #define	sys_setup		printargs
+#define	sys_set_tid_address	printargs
 #define	sys_sync		printargs
 #define	sys_timer_delete	printargs
 #define	sys_timer_getoverrun	printargs
@@ -95,9 +117,12 @@
 #define	sys_phys		printargs
 #define	sys_profil		printargs
 #define	sys_prof		printargs
+#define	sys_security		printargs
 #define	sys_stty		printargs
+#define	sys_tuxcall		printargs
 #define	sys_ulimit		printargs
 #define	sys_ustat		printargs
+#define	sys_vserver		printargs
 
 /* deprecated */
 #define	sys_bdflush		printargs

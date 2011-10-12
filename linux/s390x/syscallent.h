@@ -196,7 +196,7 @@
 	{ MA,	0,	printargs,		"SYS_166"	}, /* 166 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 167 */
 	{ 3,	TD,	sys_poll,		"poll"		}, /* 168 */
-	{ 3,	0,	printargs,		"nfsservctl"	}, /* 169 */
+	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 169 */
 	{ MA,	0,	printargs,		"SYS_170"	}, /* 170 */
 	{ MA,	0,	printargs,		"SYS_171"	}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
@@ -263,7 +263,7 @@
 	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 233 */
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 234 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 235 */
-	{ 0,	0,	printargs,		"gettid"	}, /* 236 */
+	{ 0,	0,	sys_gettid,		"gettid"	}, /* 236 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 237 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 238 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 239 */
@@ -279,7 +279,7 @@
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 249 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 251 */
-	{ 1,	0,	printargs,		"set_tid_address"}, /* 252 */
+	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 252 */
 	{ 5,	TD,	printargs,		"fadvise64"	}, /* 253 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 254 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 255 */
@@ -290,7 +290,7 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 260 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 261 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 262 */
-	{ 5,	0,	printargs,		"vserver"	}, /* 263 */
+	{ 5,	0,	sys_vserver,		"vserver"	}, /* 263 */
 	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 264 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 265 */
 	{ 3,	TF,	sys_fstatfs64,		"fstatfs64"	}, /* 266 */
@@ -304,17 +304,17 @@
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 274 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 275 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 276 */
-	{ 5,	0,	printargs,		"kexec_load"	}, /* 277 */
-	{ 5,	0,	printargs,		"add_key"	}, /* 278 */
-	{ 4,	0,	printargs,		"request_key"	}, /* 279 */
-	{ 5,	0,	printargs,		"keyctl"	}, /* 280 */
+	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 277 */
+	{ 5,	0,	sys_add_key,		"add_key"	}, /* 278 */
+	{ 4,	0,	sys_request_key,	"request_key"	}, /* 279 */
+	{ 5,	0,	sys_keyctl,		"keyctl"	}, /* 280 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 281 */
-	{ 3,	0,	printargs,		"ioprio_set"	}, /* 282 */
-	{ 2,	0,	printargs,		"ioprio_get"	}, /* 283 */
-	{ 0,	TD,	printargs,		"inotify_init"	}, /* 284 */
+	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 282 */
+	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 283 */
+	{ 0,	TD,	sys_inotify_init,	"inotify_init"	}, /* 284 */
 	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 285 */
 	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 286 */
-	{ 4,	0,	printargs,		"migrate_pages"	}, /* 287 */
+	{ 4,	0,	sys_migrate_pages,	"migrate_pages"	}, /* 287 */
 	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 288 */
 	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"	}, /* 289 */
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 290 */
@@ -331,10 +331,10 @@
 	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 301 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 302 */
 	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 303 */
-	{ 2,	0,	printargs,		"set_robust_list" }, /* 304 */
-	{ 3,	0,	printargs,		"get_robust_list" }, /* 305 */
+	{ 2,	0,	sys_set_robust_list,	"set_robust_list" }, /* 304 */
+	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 305 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 306 */
-	{ 4,	TD,	printargs,		"sync_file_range" }, /* 307 */
+	{ 4,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 307 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 308 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 309 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 310 */
@@ -357,11 +357,11 @@
 	{ 1,	TD,	sys_epoll_create1,	"epoll_create1"	}, /* 327 */
 	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 328 */
 	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 329 */
-	{ 4,	TP|TS,	printargs,		"rt_tgsigqueueinfo"}, /* 330 */
-	{ 5,	TD,	printargs,		"perf_event_open"}, /* 331 */
-	{ 2,	TD,	printargs,		"fanotify_init"	}, /* 332 */
-	{ 5,	TD|TF,	printargs,		"fanotify_mark"	}, /* 333 */
-	{ 4,	0,	printargs,		"prlimit64"	}, /* 334 */
+	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"}, /* 330 */
+	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"}, /* 331 */
+	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 332 */
+	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 333 */
+	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 334 */
 	{ 5,	0,	printargs,		"SYS_335"	}, /* 335 */
 	{ 5,	0,	printargs,		"SYS_336"	}, /* 336 */
 	{ 5,	0,	printargs,		"SYS_337"	}, /* 337 */
