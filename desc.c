@@ -694,11 +694,21 @@ sys_epoll_create(struct tcb *tcp)
 	return 0;
 }
 
+static const struct xlat epollflags[] = {
+#ifdef EPOLL_CLOEXEC
+	{ EPOLL_CLOEXEC,	"EPOLL_CLOEXEC"	},
+#endif
+#ifdef EPOLL_NONBLOCK
+	{ EPOLL_NONBLOCK,	"EPOLL_NONBLOCK"	},
+#endif
+	{ 0,		NULL		}
+};
+
 int
 sys_epoll_create1(struct tcb *tcp)
 {
 	if (entering(tcp))
-		printflags(open_mode_flags, tcp->u_arg[0], "O_???");
+		printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
 	return 0;
 }
 
