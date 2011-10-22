@@ -326,6 +326,11 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 		printxval(tcflsh_options, arg, "TC???");
 		return 1;
 #endif
+#ifdef TIOCSCTTY
+	case TIOCSCTTY:
+		tprintf(", %ld", arg);
+		return 1;
+#endif
 
 	/* ioctls with an indirect parameter displayed as modem flags */
 
@@ -425,9 +430,6 @@ int term_ioctl(struct tcb *tcp, long code, long arg)
 
 	/* ioctls with no parameters */
 
-#ifdef TIOCSCTTY
-	case TIOCSCTTY:
-#endif
 #ifdef TIOCNOTTY
 	case TIOCNOTTY:
 #endif
