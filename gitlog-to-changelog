@@ -1,13 +1,15 @@
-#!/usr/bin/perl
+eval '(exit $?0)' && eval 'exec perl -wS "$0" ${1+"$@"}'
+  & eval 'exec perl -wS "$0" $argv:q'
+    if 0;
 # Convert git log output to ChangeLog format.
 
-my $VERSION = '2009-06-04 08:53'; # UTC
+my $VERSION = '2011-10-31 16:06'; # UTC
 # The definition above must lie within the first 8 lines in order
 # for the Emacs time-stamp write hook (at end) to update it.
 # If you change this file with Emacs, please let the write hook
 # do its job.  Otherwise, update this string manually.
 
-# Copyright (C) 2008, 2009 Free Software Foundation, Inc.
+# Copyright (C) 2008-2011 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -60,6 +62,11 @@ OPTIONS:
 
    --since=DATE convert only the logs since DATE;
                   the default is to convert all log entries.
+   --format=FMT set format string for commit subject and body;
+                  see 'man git-log' for the list of format metacharacters;
+                  the default is '%s%n%b%n'
+   --append-dot append a dot to the first line of each commit message if
+                  there is no other punctuation or blank at the end.
 
    --help       display this help and exit
    --version    output version information and exit
@@ -95,16 +102,23 @@ sub quoted_cmd(@)
 }
 
 {
-  my $since_date = '1970-01-01 UTC';
+  my $since_date;
+  my $format_string = '%s%n%b%n';
+  my $append_dot = 0;
   GetOptions
     (
      help => sub { usage 0 },
      version => sub { print "$ME version $VERSION\n"; exit },
      'since=s' => \$since_date,
+     'format=s' => \$format_string,
+     'append-dot' => \$append_dot,
     ) or usage 1;
 
-  my @cmd = (qw (git log --log-size), "--since=$since_date",
-             '--pretty=format:%ct  %an  <%ae>%n%n%s%n%b%n', @ARGV);
+  defined $since_date
+    and unshift @ARGV, "--since=$since_date";
+
+  my @cmd = (qw (git log --log-size),
+             '--pretty=format:%ct  %an  <%ae>%n%n'.$format_string, @ARGV);
   open PIPE, '-|', @cmd
     or die ("$ME: failed to run `". quoted_cmd (@cmd) ."': $!\n"
             . "(Is your Git too old?  Version 1.5.1 or later is required.)\n");
@@ -145,6 +159,13 @@ sub quoted_cmd(@)
       # Omit "Signed-off-by..." lines.
       @line = grep !/^Signed-off-by: .*>$/, @line;
 
+      # Remove leading and trailing blank lines.
+      if (@line)
+        {
+          while ($line[0] =~ /^\s*$/) { shift @line; }
+          while ($line[$#line] =~ /^\s*$/) { pop @line; }
+        }
+
       # If there were any lines
       if (@line == 0)
         {
@@ -152,9 +173,17 @@ sub quoted_cmd(@)
         }
       else
         {
-          # Remove leading and trailing blank lines.
-          while ($line[0] =~ /^\s*$/) { shift @line; }
-          while ($line[$#line] =~ /^\s*$/) { pop @line; }
+          if ($append_dot)
+            {
+              # If the first line of the message has enough room, then
+              if (length $line[0] < 72)
+                {
+                  # append a dot if there is no other punctuation or blank
+                  # at the end.
+                  $line[0] =~ /[[:punct:]\s]$/
+                    or $line[0] .= '.';
+                }
+            }
 
           # Prefix each non-empty line with a TAB.
           @line = map { length $_ ? "\t$_" : '' } @line;
@@ -174,6 +203,7 @@ sub quoted_cmd(@)
 }
 
 # Local Variables:
+# mode: perl
 # indent-tabs-mode: nil
 # eval: (add-hook 'write-file-hooks 'time-stamp)
 # time-stamp-start: "my $VERSION = '"

@@ -107,7 +107,8 @@ $(srcdir)/ChangeLog: $(top_srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
 		     $(top_srcdir)/.git/refs/heads/*
 	@rm -f $@.new
 	(cd $(top_srcdir); \
-	 ./gitlog-to-changelog --since='$(gen_changelog_start_date)'; \
+	 ./gitlog-to-changelog --append-dot \
+	   --since='$(gen_changelog_start_date)'; \
 	 echo; echo; echo 'See ChangeLog-CVS for older changes.' \
 	) > $@.new
 	chmod 444 $@.new
