@@ -502,7 +502,7 @@
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"		}, /* 471 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 472 */
 	{ 3,	0,	sys_getcpu,		"getcpu"		}, /* 473 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 474 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 474 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"		}, /* 475 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"		}, /* 476 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"		}, /* 477 */

@@ -4315,7 +4315,7 @@
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 4310 */
 	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 4311 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 4312 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 4313 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 4313 */
 	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 4314 */
 	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 4315 */
 	{ 4,	0,	printargs,		"utimensat"	}, /* 4316 */
@@ -5617,7 +5617,7 @@
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 5269 */
 	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 5270 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 5271 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 5272 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 5272 */
 	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 5273 */
 	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 5274 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 5275 */
@@ -6927,7 +6927,7 @@
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 6273 */
 	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 6274 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 6275 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 6276 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 6276 */
 	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 6277 */
 	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 6278 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 6279 */

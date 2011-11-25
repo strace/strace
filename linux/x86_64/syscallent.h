@@ -279,7 +279,7 @@
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 278 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 279 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 280 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 281 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 281 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 282 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"}, /* 283 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 284 */

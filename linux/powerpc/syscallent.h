@@ -331,7 +331,7 @@
 	{ 2,	0,	sys_set_robust_list,	"set_robust_list"	}, /* 300 */
 	{ 6,	0,	sys_move_pages,		"move_pages"		}, /* 301 */
 	{ 3,	0,	sys_getcpu,		"getcpu"		}, /* 302 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 303 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 303 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"		}, /* 304 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"		}, /* 305 */
 	{ 4,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 306 */

@@ -343,7 +343,7 @@
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 312 */
 	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 313 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 314 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 315 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 315 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 316 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 317 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"}, /* 318 */

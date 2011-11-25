@@ -292,7 +292,7 @@
 	{ 4,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 262 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 263 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 264 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 265 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 265 */
 	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 266 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 267 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 268 */

@@ -291,7 +291,7 @@
 	{ 1,	TP,	printargs,		"unused" }, /* 290 */
 	{ 1,	0,	printargs,		"cmpxchg_badaddr" }, /* 291 */
 	{ 3,	0,	sys_getcpu,		"getcpu" }, /* 292 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 293 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 293 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat" }, /* 294 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd" }, /* 295 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create" }, /* 296 */

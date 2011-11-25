@@ -1109,7 +1109,7 @@
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 1302 */
 	{ MA,	0,	printargs,		"SYS_1303"	}, /* 1303 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 1304 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 1305 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 1305 */
 	{ MA,	0,	printargs,		"SYS_1306"	}, /* 1306 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 1307 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 1308 */

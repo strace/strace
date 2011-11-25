@@ -374,7 +374,7 @@
 	{ 4,	TD,	sys_sync_file_range,	"sync_file_range"	}, /* 343 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 344 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 345 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 346 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 346 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 347 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 348 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 349 */

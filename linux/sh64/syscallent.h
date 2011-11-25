@@ -375,7 +375,7 @@
 	{ 5,	TD,	sys_vmsplice,		"vmsplice"	}, /* 344 */
 	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 345 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 346 */
-	{ 5,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 347 */
+	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 347 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 348 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 349 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 350 */
