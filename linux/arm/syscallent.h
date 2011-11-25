@@ -280,7 +280,7 @@
 	{ 3,	0,	printargs,		"io_cancel"	}, /* 247 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 248 */
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 249 */
-	{ 1,	TD,	printargs,		"epoll_create"	}, /* 250 */
+	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 250 */
 	{ 4,	0,	printargs,		"epoll_ctl"	}, /* 251 */
 	{ 4,	0,	printargs,		"epoll_wait"	}, /* 252 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 253 */
