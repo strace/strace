@@ -350,7 +350,7 @@
 	{ 1,	0,	sys_sysctl,		"sysctl"		}, /* 319 */
 	{ 0,	0,	sys_idle,		"idle"			}, /* 320 */
 	{ 1,	0,	sys_umount,		"oldumount"		}, /* 321 */
-	{ 1,	0,	sys_swapon,		"swapon"		}, /* 322 */
+	{ 2,	TF,	sys_swapon,		"swapon"		}, /* 322 */
 	{ 1,	0,	sys_times,		"times"			}, /* 323 */
 	{ 1,	0,	sys_personality,	"personality"		}, /* 324 */
 	{ 1,	NF,	sys_setfsuid,		"setfsuid"		}, /* 325 */

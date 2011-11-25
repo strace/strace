@@ -115,7 +115,7 @@
 	{ 2,	TF,	sys_oldlstat,		"oldlstat"	}, /* 84 */
 	{ 3,	TF,	sys_readlink,		"readlink"	}, /* 85 */
 	{ 1,	TF,	sys_uselib,		"uselib"	}, /* 86 */
-	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 87 */
+	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 87 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 88 */
 	{ 3,	TD,	sys_readdir,		"readdir"	}, /* 89 */
 	{ 6,	TD,	sys_old_mmap,		"old_mmap"	}, /* 90 */

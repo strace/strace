@@ -92,7 +92,7 @@
 	{ 2,	TF,	sys_lstat,		"newlstat"		}, /* 84 */
 	{ 3,	TF,	sys_readlink,		"readlink"		}, /* 85 */
 	{ 1,	0,	sys_uselib,		"uselib"		}, /* 86 */
-	{ 1,	0,	sys_swapon,		"swapon"		}, /* 87 */
+	{ 2,	TF,	sys_swapon,		"swapon"		}, /* 87 */
 	{ 3,	0,	sys_reboot,		"reboot"		}, /* 88 */
 	{ 6,	TD,	sys_mmap,		"mmap2"			}, /* 89 */
 	{ 6,	TD,	sys_mmap,		"mmap"			}, /* 90 */

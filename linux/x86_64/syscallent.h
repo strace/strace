@@ -165,7 +165,7 @@
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	},  /* 164 */
 	{ 5,	TF,	sys_mount,		"mount"		},  /* 165 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 166 */
-	{ 1,	TF,	sys_swapon,		"swapon"	},  /* 167 */
+	{ 2,	TF,	sys_swapon,		"swapon"	},  /* 167 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	},  /* 168 */
 	{ 3,	0,	sys_reboot,		"reboot"	},  /* 169 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	},  /* 170 */

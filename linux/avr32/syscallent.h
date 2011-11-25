@@ -115,7 +115,7 @@
 	{ 3,	TF,	sys_readlink,		"readlink"	}, /* 85 */
 	{ 5,	TD,	sys_pread,		"pread"		}, /* 86 */
 	{ 5,	TD,	sys_pwrite,		"pwrite"	}, /* 87 */
-	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 88 */
+	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 88 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 89 */
 	{ 6,	TD,	sys_mmap,		"mmap"		}, /* 90 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 91 */

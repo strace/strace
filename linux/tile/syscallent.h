@@ -73,7 +73,7 @@
 	{ 2,	TF,	sys_lstat,		"lstat" }, /* 72 */
 	{ 3,	TF,	sys_readlink,		"readlink" }, /* 73 */
 	{ 1,	TF,	sys_uselib,		"uselib" }, /* 74 */
-	{ 1,	TF,	sys_swapon,		"swapon" }, /* 75 */
+	{ 2,	TF,	sys_swapon,		"swapon" }, /* 75 */
 	{ 3,	0,	sys_reboot,		"reboot" }, /* 76 */
 	{ 6,	TD,	sys_mmap,		"mmap2" }, /* 77 */
 	{ 2,	0,	sys_munmap,		"munmap" }, /* 78 */

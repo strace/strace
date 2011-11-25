@@ -83,7 +83,7 @@
 	{ 2,	0,	sys_setgroups32,"setgroups32" },	/* 82 */
 	{ 3,	0,	sys_setitimer,	"setitimer" },		/* 83 */
 	{ 2,	TD,	sys_ftruncate,	"ftruncate64" },	/* 84 */
-	{ 1,	TF,	sys_swapon,	"swapon" },		/* 85 */
+	{ 2,	TF,	sys_swapon,	"swapon" },		/* 85 */
 	{ 2,	0,	sys_getitimer,	"getitimer" },		/* 86 */
 	{ 1,	0,	sys_setuid,	"setuid32" },		/* 87 */
 	{ 2,	0,	sys_sethostname,"sethostname" },	/* 88 */

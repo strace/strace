@@ -4089,7 +4089,7 @@
 	{ 2,	TF,	sys_oldlstat,		"oldlstat"	}, /* 4084 */
 	{ 3,	TF,	sys_readlink,		"readlink"	}, /* 4085 */
 	{ 1,	TF,	sys_uselib,		"uselib"	}, /* 4086 */
-	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 4087 */
+	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 4087 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 4088 */
 	{ 3,	TD,	sys_readdir,		"readdir"	}, /* 4089 */
 	{ 6,	TD,	sys_mmap,		"old_mmap"	}, /* 4090 */
@@ -5507,7 +5507,7 @@
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 5159 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 5160 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 5161 */
-	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 5162 */
+	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 5162 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 5163 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 5164 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 5165 */
@@ -6813,7 +6813,7 @@
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 6159 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 6160 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 6161 */
-	{ 1,	TF,	sys_swapon,		"swapon"	}, /* 6162 */
+	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 6162 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 6163 */
 	{ 3,	0,	sys_reboot,		"reboot"	}, /* 6164 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 6165 */
