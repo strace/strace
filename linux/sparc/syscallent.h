@@ -237,7 +237,7 @@
 	{ 5,	TD,	sys_llseek,	"_llseek" },		/* 236 */
 	{ 2,	0,	sys_mlock,	"mlock" },		/* 237 */
 	{ 2,	0,	sys_munlock,	"munlock" },		/* 238 */
-	{ 2,	0,	sys_mlockall,	"mlockall" },		/* 239 */
+	{ 1,	0,	sys_mlockall,	"mlockall" },		/* 239 */
 	{ 0,	0,	sys_munlockall,	"munlockall" },		/* 240 */
 	{ 2,	0,	sys_sched_setparam,"sched_setparam"},	/* 241 */
 	{ 2,	0,	sys_sched_getparam,"sched_getparam"},	/* 242 */

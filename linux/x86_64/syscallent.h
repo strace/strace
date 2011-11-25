@@ -149,7 +149,7 @@
 	{ 2,	0,	sys_sched_rr_get_interval,	"sched_rr_get_interval"	},  /* 148 */
 	{ 2,	0,	sys_mlock,		"mlock"		},  /* 149 */
 	{ 2,	0,	sys_munlock,		"munlock"	},  /* 150 */
-	{ 2,	0,	sys_mlockall,		"mlockall"	},  /* 151 */
+	{ 1,	0,	sys_mlockall,		"mlockall"	},  /* 151 */
 	{ 0,	0,	sys_munlockall,		"munlockall"	},  /* 152 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	},  /* 153 */
 	{ 3,	0,	sys_modify_ldt,		"modify_ldt"	},  /* 154 */
