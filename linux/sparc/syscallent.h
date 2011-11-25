@@ -112,7 +112,7 @@
 	{ 3,	TS,	sys_getresgid,	"getresgid" },		/* 111 */
 	{ 2,	TS,	sys_setresgid,	"setresgid32" },	/* 112 */
 	{ 5,	TN,	sys_recvmsg,	"recvmsg" },		/* 113 */
-	{ 5,	TN,	sys_sendmsg,	"sendmsg" },		/* 114 */
+	{ 3,	TN,	sys_sendmsg,	"sendmsg" },		/* 114 */
 	{ 2,	0,	sys_getgroups32,"getgroups32" },	/* 115 */
 	{ 2,	0,	sys_gettimeofday,"gettimeofday" },	/* 116 */
 	{ 2,	0,	sys_getrusage,	"getrusage" },		/* 117 */
@@ -370,7 +370,7 @@
 	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 366 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 367 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 368 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 369 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 369 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 370 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 371 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 372 */

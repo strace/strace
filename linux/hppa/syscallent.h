@@ -188,7 +188,7 @@
 	{ 3,	TF,	sys_chown,		"chown"			}, /* 180 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"		}, /* 181 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"		}, /* 182 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg"		}, /* 183 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"		}, /* 183 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"		}, /* 184 */
 	{ 4,	TI,	sys_semop,		"semop"			}, /* 185 */
 	{ 4,	TI,	sys_semget,		"semget"		}, /* 186 */

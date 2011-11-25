@@ -389,7 +389,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 357 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 358 */
 	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 359 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 360 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 360 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 361 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 362 */
 	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 363 */

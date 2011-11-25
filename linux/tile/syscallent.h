@@ -100,7 +100,7 @@
 	{ 2,	TN,	sys_shutdown,		"shutdown" }, /* 99 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt" }, /* 100 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt" }, /* 101 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg" }, /* 102 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg" }, /* 102 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg" }, /* 103 */
 	{ 3,	0,	sys_syslog,		"syslog" }, /* 104 */
 	{ 3,	0,	sys_setitimer,		"setitimer" }, /* 105 */

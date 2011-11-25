@@ -263,7 +263,7 @@
 	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 232 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 233 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 234 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 235 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 235 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 236 */
 	{ 4,	TI,	sys_semop,		"semop"		}, /* 237 */
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 238 */
@@ -448,7 +448,7 @@
 	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 413 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 414 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */

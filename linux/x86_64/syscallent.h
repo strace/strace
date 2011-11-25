@@ -44,7 +44,7 @@
 	{ 3,	TN,	sys_accept,		"accept"	},  /* 43 */
 	{ 6,	TN,	sys_sendto,		"sendto"	},  /* 44 */
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"	},  /* 45 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg"	},  /* 46 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"	},  /* 46 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	},  /* 47 */
 	{ 2,	TN,	sys_shutdown,		"shutdown"	},  /* 48 */
 	{ 3,	TN,	sys_bind,		"bind"		},  /* 49 */

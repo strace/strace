@@ -353,7 +353,7 @@
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"	}, /* 322 */
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 323 */
 	{ 4,	TN,	sys_send,		"send"		}, /* 324 */
-	{ 5,	TN,	sys_sendmsg,		"sendmsg"	}, /* 325 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 325 */
 	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 326 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 327 */
 	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 328 */
