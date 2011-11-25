@@ -231,7 +231,7 @@
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 230 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 231 */
 	{ 5,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 232 */
-	{ 5,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 233 */
+	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 233 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 234 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 235 */
 	{ 5,	0,	sys_vserver,		"vserver"	}, /* 236 */

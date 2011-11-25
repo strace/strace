@@ -278,7 +278,7 @@
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 247 */
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 248 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 249 */
-	{ 4,	0,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
+	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
 	{ 4,	0,	sys_epoll_wait,		"epoll_wait"	}, /* 251 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 252 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 253 */
