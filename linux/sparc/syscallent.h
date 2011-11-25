@@ -197,8 +197,8 @@
 	{ 2,	0,	sys_ulimit,	"ulimit" },		/* 196 */
 	{ 0,	0,	sys_getppid,	"getppid" },		/* 197 */
 	{ 3,	TS,	sys_sigaction,	"sigaction" },		/* 198 */
-	{ 5,	0,	printargs,	"sgetmask" },		/* 199 */
-	{ 5,	0,	printargs,	"ssetmask" },		/* 200 */
+	{ 0,	TS,	sys_siggetmask,	"sgetmask" },		/* 199 */
+	{ 1,	TS,	sys_sigsetmask,	"ssetmask" },		/* 200 */
 	{ 3,	TS,	sys_sigsuspend,	"sigsuspend" },		/* 201 */
 	{ 2,	TF,	sys_lstat,	"lstat" },		/* 202 */
 	{ 1,	TF,	sys_uselib,	"uselib" },		/* 203 */
