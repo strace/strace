@@ -63,8 +63,8 @@
 #define sys_ulimit		printargs
 #define sys_oldolduname		printargs
 #define sys_sigaction		printargs
-#define sys_sgetmask		printargs
-#define sys_ssetmask		printargs
+#define sys_siggetmask		printargs
+#define sys_sigsetmask		printargs
 #define sys_sigsuspend		printargs
 #define sys_sigpending		printargs
 #define sys_setrlimit		printargs
@@ -167,8 +167,8 @@
 #undef sys_ulimit
 #undef sys_oldolduname
 #undef sys_sigaction
-#undef sys_sgetmask
-#undef sys_ssetmask
+#undef sys_siggetmask
+#undef sys_sigsetmask
 #undef sys_sigsuspend
 #undef sys_sigpending
 #undef sys_setrlimit
