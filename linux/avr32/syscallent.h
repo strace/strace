@@ -135,7 +135,7 @@
 	{ 2,	0,	sys_getitimer,		"getitimer"	}, /* 105 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 106 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 107 */
-	{ 6,	0,	sys_ipc,		"ipc"		}, /* 108 */
+	{ 6,	TI,	sys_ipc,		"ipc"		}, /* 108 */
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 109 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 110 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 111 */

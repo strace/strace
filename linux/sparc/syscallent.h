@@ -213,7 +213,7 @@
 	{ 3,	TP,	sys_waitpid,	"waitpid" },		/* 212 */
 	{ 1,	TF,	sys_swapoff,	"swapoff" },		/* 213 */
 	{ 1,	0,	sys_sysinfo,	"sysinfo" },		/* 214 */
-	{ 5,	0,	sys_ipc,	"ipc" },		/* 215 */
+	{ 5,	TI,	sys_ipc,	"ipc" },		/* 215 */
 	{ 0,	TS,	sys_sigreturn,	"sigreturn" },		/* 216 */
 	{ 5,	TP,	sys_clone,	"clone" },		/* 217 */
 	{ 3,	0,	sys_modify_ldt,	"modify_ldt" },		/* 218 */
