@@ -900,7 +900,7 @@
 	{ 1,	0,	sys_uselib,		"uselib"	}, /* 1093 */
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 1094 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 1095 */
-	{ 3,	0,	sys_reboot,		"reboot"	}, /* 1096 */
+	{ 4,	0,	sys_reboot,		"reboot"	}, /* 1096 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 1097 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 1098 */
 	{ 2,	TD,	sys_fchmod,		"fchmod"	}, /* 1099 */

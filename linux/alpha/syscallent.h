@@ -339,7 +339,7 @@
 	{ 2,	0,	sys_delete_module,	"delete_module"		}, /* 308 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"	}, /* 309 */
 	{ 3,	0,	sys_syslog,		"syslog"		}, /* 310 */
-	{ 3,	0,	sys_reboot,		"reboot"		}, /* 311 */
+	{ 4,	0,	sys_reboot,		"reboot"		}, /* 311 */
 	{ 5,	TP,	sys_clone,		"clone"			}, /* 312 */
 	{ 1,	0,	sys_uselib,		"uselib"		}, /* 313 */
 	{ 2,	0,	sys_mlock,		"mlock"			}, /* 314 */

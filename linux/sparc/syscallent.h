@@ -53,7 +53,7 @@
 	{ 2,	0,	printargs,	"memory_ordering" },	/* 52 */
 	{ 0,	NF,	sys_getgid,	"getgid32" },		/* 53 */
 	{ 3,	TD,	sys_ioctl,	"ioctl" },		/* 54 */
-	{ 3,	0,	sys_reboot,	"reboot" },		/* 55 */
+	{ 4,	0,	sys_reboot,	"reboot" },		/* 55 */
 	{ 6,	TD,	sys_mmap,	"mmap2" },		/* 56 */
 	{ 2,	TF,	sys_symlink,	"symlink" },		/* 57 */
 	{ 3,	TF,	sys_readlink,	"readlink" },		/* 58 */

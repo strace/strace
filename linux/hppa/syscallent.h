@@ -93,7 +93,7 @@
 	{ 3,	TF,	sys_readlink,		"readlink"		}, /* 85 */
 	{ 1,	0,	sys_uselib,		"uselib"		}, /* 86 */
 	{ 2,	TF,	sys_swapon,		"swapon"		}, /* 87 */
-	{ 3,	0,	sys_reboot,		"reboot"		}, /* 88 */
+	{ 4,	0,	sys_reboot,		"reboot"		}, /* 88 */
 	{ 6,	TD,	sys_mmap,		"mmap2"			}, /* 89 */
 	{ 6,	TD,	sys_mmap,		"mmap"			}, /* 90 */
 	{ 2,	0,	sys_munmap,		"munmap"		}, /* 91 */

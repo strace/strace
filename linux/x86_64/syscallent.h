@@ -167,7 +167,7 @@
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 166 */
 	{ 2,	TF,	sys_swapon,		"swapon"	},  /* 167 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	},  /* 168 */
-	{ 3,	0,	sys_reboot,		"reboot"	},  /* 169 */
+	{ 4,	0,	sys_reboot,		"reboot"	},  /* 169 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	},  /* 170 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	},  /* 171 */
 	{ 1,	0,	sys_iopl,		"iopl"		},  /* 172 */
