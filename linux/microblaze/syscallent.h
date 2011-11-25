@@ -282,7 +282,7 @@
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 253 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 254 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 255 */
-	{ 3,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 256 */
+	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 256 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"}, /* 257 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 258 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 259 */
