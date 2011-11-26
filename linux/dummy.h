@@ -30,6 +30,7 @@
 
 /* still unfinished */
 #define	sys_add_key		printargs
+#define	sys_clock_adjtime	printargs
 #define	sys_get_robust_list	printargs
 #define	sys_fanotify_init	printargs
 #define	sys_fanotify_mark	printargs
@@ -41,12 +42,16 @@
 #define	sys_kexec_load		printargs
 #define	sys_lookup_dcookie	printargs
 #define	sys_migrate_pages	printargs
+#define	sys_name_to_handle_at	printargs
 #define	sys_nfsservctl		printargs
+#define	sys_open_by_handle_at	printargs
 #define	sys_perf_event_open	printargs
 #define	sys_prlimit64		printargs
 #define	sys_request_key		printargs
 #define	sys_rt_tgsigqueueinfo	printargs
 #define	sys_sched_rr_get_interval printargs
+#define	sys_sendmmsg		printargs
+#define	sys_setns		printargs
 #define	sys_set_robust_list	printargs
 #define	sys_sync_file_range	printargs
 #define	sys_sysfs		printargs
@@ -79,6 +84,7 @@
 #define	sys_setfsgid		sys_setfsuid
 #define	sys_swapoff		sys_chdir
 #define	sys_swapon		sys_chdir
+#define	sys_syncfs		sys_close
 #define	sys_umount		sys_chdir
 #define	sys_uselib		sys_chdir
 

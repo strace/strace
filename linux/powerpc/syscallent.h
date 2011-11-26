@@ -373,12 +373,12 @@
 	{ 5,	0,	printargs,		"SYS_342"		}, /* 342 */
 	{ 5,	0,	printargs,		"SYS_343"		}, /* 343 */
 	{ 5,	0,	printargs,		"SYS_344"		}, /* 344 */
-	{ 5,	0,	printargs,		"SYS_345"		}, /* 345 */
-	{ 5,	0,	printargs,		"SYS_346"		}, /* 346 */
-	{ 5,	0,	printargs,		"SYS_347"		}, /* 347 */
-	{ 5,	0,	printargs,		"SYS_348"		}, /* 348 */
-	{ 5,	0,	printargs,		"SYS_349"		}, /* 349 */
-	{ 5,	0,	printargs,		"SYS_350"		}, /* 350 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"	}, /* 345 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"	}, /* 346 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"		}, /* 347 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"		}, /* 348 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"		}, /* 349 */
+	{ 2,	TD,	sys_setns,		"setns"			}, /* 350 */
 	{ 5,	0,	printargs,		"SYS_351"		}, /* 351 */
 	{ 5,	0,	printargs,		"SYS_352"		}, /* 352 */
 	{ 5,	0,	printargs,		"SYS_353"		}, /* 353 */

@@ -330,12 +330,12 @@
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 329 */
 	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 330 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 331 */
-	{ 5,	0,	printargs,	"SYS_332" },		/* 332 */
-	{ 5,	0,	printargs,	"SYS_333" },		/* 333 */
-	{ 5,	0,	printargs,	"SYS_334" },		/* 334 */
-	{ 5,	0,	printargs,	"SYS_335" },		/* 335 */
-	{ 5,	0,	printargs,	"SYS_336" },		/* 336 */
-	{ 5,	0,	printargs,	"SYS_337" },		/* 337 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 332 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 333 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 334 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 335 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 336 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 337 */
 	{ 5,	0,	printargs,	"SYS_338" },		/* 338 */
 	{ 5,	0,	printargs,	"SYS_339" },		/* 339 */
 	{ 5,	0,	printargs,	"SYS_340" },		/* 340 */

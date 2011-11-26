@@ -391,12 +391,12 @@
 	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 356 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 357 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 358 */
-	{ 5,	0,	printargs,		"SYS_359"	}, /* 359 */
-	{ 5,	0,	printargs,		"SYS_360"	}, /* 360 */
-	{ 5,	0,	printargs,		"SYS_361"	}, /* 361 */
-	{ 5,	0,	printargs,		"SYS_362"	}, /* 362 */
-	{ 5,	0,	printargs,		"SYS_363"	}, /* 363 */
-	{ 5,	0,	printargs,		"SYS_364"	}, /* 364 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 359 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 360 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 361 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 362 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 363 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 364 */
 	{ 5,	0,	printargs,		"SYS_365"	}, /* 365 */
 	{ 5,	0,	printargs,		"SYS_366"	}, /* 366 */
 	{ 5,	0,	printargs,		"SYS_367"	}, /* 367 */

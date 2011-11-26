@@ -309,3 +309,5 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 279 */
 	{ 2,	TD,	sys_timerfd,		"timerfd_create" }, /* 280 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 281 */
+	{ 5,	0,	printargs,		"SYS_282"	}, /* 282 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 283 */

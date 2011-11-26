@@ -525,3 +525,8 @@
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"		}, /* 494 */
 	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"		}, /* 495 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"		}, /* 496 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"	}, /* 497 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"	}, /* 498 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"		}, /* 499 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"		}, /* 500 */
+	{ 2,	TD,	sys_setns,		"setns"			}, /* 501 */

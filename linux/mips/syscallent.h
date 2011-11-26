@@ -4341,6 +4341,12 @@
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 4336 */
 	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 4337 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 4338 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 4339 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 4340 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 4341 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 4342 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 4343 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 4344 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
 	{ 0,	0,	printargs,		"o32_exit"		}, /* 4001 */
@@ -4678,16 +4684,16 @@
 	{ 5,	TD,	printargs,		"o32_perf_event_open" }, /* 4333 */
 	{ 4,	TN,	printargs,		"o32_accept4"	}, /* 4334 */
 	{ 5,	TN,	printargs,		"o32_recvmmsg"	}, /* 4335 */
-	{ 2,	0,	printargs,		"o32_fanotify_init"	}, /* 4336 */
-	{ 5,	0,	printargs,		"o32_fanotify_mark"	}, /* 4337 */
+	{ 2,	TD,	printargs,		"o32_fanotify_init" }, /* 4336 */
+	{ 5,	TD|TF,	printargs,		"o32_fanotify_mark" }, /* 4337 */
 	{ 4,	0,	printargs,		"o32_prlimit64"	}, /* 4338 */
+	{ 5,	TD|TF,	printargs,		"o32_name_to_handle_at"}, /* 4339 */
+	{ 3,	TD,	printargs,		"o32_open_by_handle_at"}, /* 4340 */
+	{ 2,	0,	printargs,		"o32_clock_adjtime" }, /* 4341 */
+	{ 1,	TD,	printargs,		"o32_syncfs"	}, /* 4342 */
+	{ 4,	TN,	printargs,		"o32_sendmmsg"	}, /* 4343 */
+	{ 2,	TD,	printargs,		"o32_setns"	}, /* 4344 */
 #endif
-	{ 0,	0,	printargs,		"SYS_4339"	}, /* 4339 */
-	{ 0,	0,	printargs,		"SYS_4340"	}, /* 4340 */
-	{ 0,	0,	printargs,		"SYS_4341"	}, /* 4341 */
-	{ 0,	0,	printargs,		"SYS_4342"	}, /* 4342 */
-	{ 0,	0,	printargs,		"SYS_4343"	}, /* 4343 */
-	{ 0,	0,	printargs,		"SYS_4344"	}, /* 4344 */
 	{ 0,	0,	printargs,		"SYS_4345"	}, /* 4345 */
 	{ 0,	0,	printargs,		"SYS_4346"	}, /* 4346 */
 	{ 0,	0,	printargs,		"SYS_4347"	}, /* 4347 */
@@ -5643,6 +5649,12 @@
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 5295 */
 	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 5296 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 5297 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 5298 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 5299 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 5300 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 5301 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 5302 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 5303 */
 #else
 	{ 0,	0,	printargs,		"n64_read"		}, /* 5000 */
 	{ 0,	0,	printargs,		"n64_write"		}, /* 5001 */
@@ -5942,16 +5954,13 @@
 	{ 2,	0,	printargs,		"n64_fanotify_init"	}, /* 5295 */
 	{ 5,	0,	printargs,		"n64_fanotify_mark"	}, /* 5296 */
 	{ 4,	0,	printargs,		"n64_prlimit64"		}, /* 5297 */
+	{ 5,	TD|TF,	printargs,		"n64_name_to_handle_at"	}, /* 5298 */
+	{ 3,	TD,	printargs,		"n64_open_by_handle_at"	}, /* 5299 */
+	{ 2,	0,	printargs,		"n64_clock_adjtime"	}, /* 5300 */
+	{ 1,	TD,	printargs,		"n64_syncfs"		}, /* 5301 */
+	{ 4,	TN,	printargs,		"n64_sendmmsg"		}, /* 5302 */
+	{ 2,	TD,	printargs,		"n64_setns"		}, /* 5303 */
 #endif
-	{ 0,	0,	printargs,		"SYS_5295"	}, /* 5295 */
-	{ 0,	0,	printargs,		"SYS_5296"	}, /* 5296 */
-	{ 0,	0,	printargs,		"SYS_5297"	}, /* 5297 */
-	{ 0,	0,	printargs,		"SYS_5298"	}, /* 5298 */
-	{ 0,	0,	printargs,		"SYS_5299"	}, /* 5299 */
-	{ 0,	0,	printargs,		"SYS_5300"	}, /* 5300 */
-	{ 0,	0,	printargs,		"SYS_5301"	}, /* 5301 */
-	{ 0,	0,	printargs,		"SYS_5302"	}, /* 5302 */
-	{ 0,	0,	printargs,		"SYS_5303"	}, /* 5303 */
 	{ 0,	0,	printargs,		"SYS_5304"	}, /* 5304 */
 	{ 0,	0,	printargs,		"SYS_5305"	}, /* 5305 */
 	{ 0,	0,	printargs,		"SYS_5306"	}, /* 5306 */
@@ -6954,6 +6963,12 @@
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 6300 */
 	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 6301 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 6302 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 6303 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 6304 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 6305 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 6306 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 6307 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 6308 */
 
 #else
 	{ 0,	0,	printargs,		"n32_read"		}, /* 6000 */
@@ -7259,16 +7274,13 @@
 	{ 2,	0,	printargs,		"n32_fanotify_init"	}, /* 6300 */
 	{ 5,	0,	printargs,		"n32_fanotify_mark"	}, /* 6301 */
 	{ 4,	0,	printargs,		"n32_prlimit64"		}, /* 6302 */
+	{ 5,	TD|TF,	printargs,		"n32_name_to_handle_at"	}, /* 6303 */
+	{ 3,	TD,	printargs,		"n32_open_by_handle_at"	}, /* 6304 */
+	{ 2,	0,	printargs,		"n32_clock_adjtime"	}, /* 6305 */
+	{ 1,	TD,	printargs,		"n32_syncfs"		}, /* 6306 */
+	{ 4,	TN,	printargs,		"n32_sendmmsg"		}, /* 6307 */
+	{ 2,	TD,	printargs,		"n32_setns"		}, /* 6308 */
 #endif
-	{ 0,	0,	printargs,		"SYS_6300"	}, /* 6300 */
-	{ 0,	0,	printargs,		"SYS_6301"	}, /* 6301 */
-	{ 0,	0,	printargs,		"SYS_6302"	}, /* 6302 */
-	{ 0,	0,	printargs,		"SYS_6303"	}, /* 6303 */
-	{ 0,	0,	printargs,		"SYS_6304"	}, /* 6304 */
-	{ 0,	0,	printargs,		"SYS_6305"	}, /* 6305 */
-	{ 0,	0,	printargs,		"SYS_6306"	}, /* 6306 */
-	{ 0,	0,	printargs,		"SYS_6307"	}, /* 6307 */
-	{ 0,	0,	printargs,		"SYS_6308"	}, /* 6308 */
 	{ 0,	0,	printargs,		"SYS_6309"	}, /* 6309 */
 	{ 0,	0,	printargs,		"SYS_6310"	}, /* 6310 */
 	{ 0,	0,	printargs,		"SYS_6311"	}, /* 6311 */

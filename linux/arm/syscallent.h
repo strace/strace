@@ -400,12 +400,12 @@
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 367 */
 	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 368 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 369 */
-	{ 5,	0,	printargs,		"SYS_370"	}, /* 370 */
-	{ 5,	0,	printargs,		"SYS_371"	}, /* 371 */
-	{ 5,	0,	printargs,		"SYS_372"	}, /* 372 */
-	{ 5,	0,	printargs,		"SYS_373"	}, /* 373 */
-	{ 5,	0,	printargs,		"SYS_374"	}, /* 374 */
-	{ 5,	0,	printargs,		"SYS_375"	}, /* 375 */
+	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 370 */
+	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 371 */
+	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 372 */
+	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 373 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 374 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 375 */
 	{ 5,	0,	printargs,		"SYS_376"	}, /* 376 */
 	{ 5,	0,	printargs,		"SYS_377"	}, /* 377 */
 	{ 5,	0,	printargs,		"SYS_378"	}, /* 378 */
