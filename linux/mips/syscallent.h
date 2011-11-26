@@ -4219,7 +4219,7 @@
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 4214 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"	}, /* 4215 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 4216 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 4217 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 4217 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 4218 */
 	{ 3,	TF,	sys_getdents64,		"getdents64"	}, /* 4219 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 4220 */
@@ -5371,7 +5371,7 @@
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	}, /* 5023 */
 	{ 5,	0,	sys_mremap,		"mremap"	}, /* 5024 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 5025 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 5026 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 5026 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 5027 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 5028 */
 	{ 3,	TI,	sys_shmat,		"shmgat"	}, /* 5029 */
@@ -6677,7 +6677,7 @@
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	}, /* 6023 */
 	{ 5,	0,	sys_mremap,		"mremap"	}, /* 6024 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 6025 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 6026 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 6026 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 6027 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 6028 */
 	{ 3,	TI,	sys_shmat,		"shmgat"	}, /* 6029 */

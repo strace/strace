@@ -199,7 +199,7 @@
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 169 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"	}, /* 170 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 171 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 172 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 172 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 173 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 174 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 175 */

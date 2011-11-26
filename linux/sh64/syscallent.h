@@ -246,7 +246,7 @@
 	{ 1,	0,	printargs,		"setfsuid32"	}, /* 215 */
 	{ 1,	0,	printargs,		"setfsgid32"	}, /* 216 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 218 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 218 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 220 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 221 */

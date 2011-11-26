@@ -249,7 +249,7 @@
 	{ 1,	NF,	sys_setfsgid,		"setfsgid32"	}, /* 216 */
 	{ 3,	0,	sys_getdents64,		"getdents64"	}, /* 217 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 218 */
-	{ 3,	0,	printargs,		"mincore"	}, /* 219 */
+	{ 3,	0,	sys_mincore,		"mincore"	}, /* 219 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 220 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"	}, /* 221 */
 	{ 5,	0,	printargs,		"SYS_222"	}, /* 222 */
