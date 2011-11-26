@@ -4194,7 +4194,7 @@
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 4189 */
 	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 4190 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 4191 */
-	{ 5,	0,	printargs,		"prctl"		}, /* 4192 */
+	{ 5,	0,	sys_prctl,		"prctl"		}, /* 4192 */
 	{ 1,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 4193 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 4194 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 4195 */
@@ -5498,7 +5498,7 @@
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 5150 */
 	{ 2,	0,	sys_pivotroot,		"pivot_root"	}, /* 5151 */
 	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 5152 */
-	{ 5,	0,	printargs,		"prctl"		}, /* 5153 */
+	{ 5,	0,	sys_prctl,		"prctl"		}, /* 5153 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 5154 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 5155 */
 	{ 1,	TF,	sys_chroot,		"chroot"	}, /* 5156 */
@@ -6804,7 +6804,7 @@
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 6150 */
 	{ 2,	0,	sys_pivotroot,		"pivot_root"	}, /* 6151 */
 	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 6152 */
-	{ 5,	0,	printargs,		"prctl"		}, /* 6153 */
+	{ 5,	0,	sys_prctl,		"prctl"		}, /* 6153 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 6154 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 6155 */
 	{ 1,	TF,	sys_chroot,		"chroot"	}, /* 6156 */
