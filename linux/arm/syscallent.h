@@ -273,11 +273,11 @@
 	{ 6,	0,	sys_futex,		"futex"		}, /* 240 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 241 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 242 */
-	{ 2,	0,	printargs,		"io_setup"	}, /* 243 */
-	{ 1,	0,	printargs,		"io_destroy"	}, /* 244 */
-	{ 5,	0,	printargs,		"io_getevents"	}, /* 245 */
-	{ 3,	0,	printargs,		"io_submit"	}, /* 246 */
-	{ 3,	0,	printargs,		"io_cancel"	}, /* 247 */
+	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 243 */
+	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 244 */
+	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 245 */
+	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 246 */
+	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 247 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 248 */
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 249 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 250 */
