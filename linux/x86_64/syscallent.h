@@ -307,3 +307,4 @@
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 306 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 307 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 308 */
+	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 309 */
