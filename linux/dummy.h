@@ -43,7 +43,6 @@
 #define	sys_lookup_dcookie	printargs
 #define	sys_migrate_pages	printargs
 #define	sys_name_to_handle_at	printargs
-#define	sys_nfsservctl		printargs
 #define	sys_open_by_handle_at	printargs
 #define	sys_perf_event_open	printargs
 #define	sys_prlimit64		printargs
@@ -120,6 +119,7 @@
 #define	sys_gtty		printargs
 #define	sys_lock		printargs
 #define	sys_mpx			printargs
+#define	sys_nfsservctl		printargs
 #define	sys_phys		printargs
 #define	sys_profil		printargs
 #define	sys_prof		printargs
