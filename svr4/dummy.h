@@ -206,6 +206,14 @@
 #define sys_ntp_adjtime printargs
 
 /* like another call */
+#define sys_chroot sys_chdir
+#define sys_rmdir sys_chdir
+#define sys_unlink sys_chdir
+#define sys_dup sys_close
+#define sys_fchdir sys_close
+#define sys_fchroot sys_close
+#define sys_rename sys_link
+#define sys_symlink sys_link
 #define sys_lchown sys_chown
 #define sys_setuid sys_close
 #define sys_seteuid sys_close

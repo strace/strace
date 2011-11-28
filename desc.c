@@ -440,15 +440,6 @@ sys_close(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_dup(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
-
 static int
 do_dup2(struct tcb *tcp, int flags_arg)
 {

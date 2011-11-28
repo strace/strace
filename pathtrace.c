@@ -195,7 +195,7 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_dup3 ||
 	    s->sys_func == sys_sendfile ||
 	    s->sys_func == sys_sendfile64 ||
-	    !strcmp(s->sys_name, "tee"))
+	    s->sys_func == sys_tee)
 	{
 		/* fd, fd */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
@@ -222,9 +222,6 @@ pathtrace_match(struct tcb *tcp)
 	}
 
 	if (s->sys_func == sys_link ||
-	    s->sys_func == sys_pivotroot ||
-	    s->sys_func == sys_rename ||
-	    s->sys_func == sys_symlink ||
 	    s->sys_func == sys_mount)
 	{
 		/* path, path */
@@ -254,7 +251,7 @@ pathtrace_match(struct tcb *tcp)
 			upathmatch(tcp, tcp->u_arg[2]);
 	}
 
-	if (!strcmp(s->sys_name, "splice")) {
+	if (s->sys_func == sys_splice) {
 		/* fd, x, fd, x, x */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
 			fdmatch(tcp, tcp->u_arg[2]);

@@ -52,6 +52,16 @@
 #define sys_oldquota	printargs
 #define sys_getdirentries	printargs
 
+/* like another call */
+#define sys_chroot sys_chdir
+#define sys_rmdir sys_chdir
+#define sys_unlink sys_chdir
+#define sys_dup sys_close
+#define sys_fchdir sys_close
+#define sys_fchroot sys_close
+#define sys_rename sys_link
+#define sys_symlink sys_link
+
 /* No interesting parameters or return values */
 #define sys_vhangup	printargs
 #define sys_sys_setsid	printargs

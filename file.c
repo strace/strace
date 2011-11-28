@@ -1883,18 +1883,6 @@ sys_ustat(struct tcb *tcp)
 }
 #endif /* SUNOS4 */
 
-int
-sys_pivotroot(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printpath(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-
 /* directory */
 int
 sys_chdir(struct tcb *tcp)
@@ -1932,44 +1920,6 @@ sys_mkdirat(struct tcb *tcp)
 #endif
 
 int
-sys_rmdir(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
-
-int
-sys_fchdir(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
-
-int
-sys_chroot(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
-
-#if defined(SUNOS4) || defined(SVR4)
-int
-sys_fchroot(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
-#endif /* SUNOS4 || SVR4 */
-
-int
 sys_link(struct tcb *tcp)
 {
 	if (entering(tcp)) {
@@ -1997,15 +1947,6 @@ sys_linkat(struct tcb *tcp)
 }
 #endif
 
-int
-sys_unlink(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
-
 #ifdef LINUX
 static const struct xlat unlinkatflags[] = {
 #ifndef AT_REMOVEDIR
@@ -2027,17 +1968,6 @@ sys_unlinkat(struct tcb *tcp)
 	return 0;
 }
 #endif
-
-int
-sys_symlink(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printpath(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
 
 #ifdef LINUX
 int
@@ -2084,17 +2014,6 @@ sys_readlinkat(struct tcb *tcp)
 	return decode_readlink(tcp, 1);
 }
 #endif
-
-int
-sys_rename(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printpath(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
 
 #ifdef LINUX
 int

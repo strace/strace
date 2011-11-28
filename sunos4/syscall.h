@@ -57,7 +57,7 @@ int	sys_adjtime();
 int	sys_getitimer(),sys_setitimer();
 
 /* 1.5 descriptors */
-int	sys_getdtablesize(),sys_dup(),sys_dup2(),sys_close();
+int	sys_getdtablesize(),sys_dup2(),sys_close();
 int	sys_select(),sys_getdopt(),sys_setdopt(),sys_fcntl(),sys_flock();
 
 /* 1.6 resource controls */
@@ -78,12 +78,11 @@ int	sys_read(),sys_write(),sys_readv(),sys_writev(),sys_ioctl();
 int	sys_aioread(), sys_aiowrite(), sys_aiowait(), sys_aiocancel();
 
 /* 2.2 file system */
-int	sys_chdir(),sys_chroot();
-int	sys_fchdir(),sys_fchroot();
-int	sys_mkdir(),sys_rmdir(),sys_getdirentries(), sys_getdents();
-int	sys_creat(),sys_open(),sys_mknod(),sys_unlink(),sys_stat(),sys_fstat(),sys_lstat();
+int	sys_chdir();
+int	sys_mkdir(),sys_getdirentries(), sys_getdents();
+int	sys_creat(),sys_open(),sys_mknod(),sys_stat(),sys_fstat(),sys_lstat();
 int	sys_chown(),sys_fchown(),sys_chmod(),sys_fchmod(),sys_utimes();
-int	sys_link(),sys_symlink(),sys_readlink(),sys_rename();
+int	sys_link(),sys_readlink();
 int	sys_lseek(),sys_truncate(),sys_ftruncate(),sys_access(),sys_fsync();
 int	sys_statfs(),sys_fstatfs();
 
