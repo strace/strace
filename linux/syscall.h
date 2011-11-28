@@ -33,86 +33,281 @@
 /* primary syscalls */
 
 int sys_restart_syscall();
-int sys_setup(), sys_exit(), sys_fork(), sys_read(), sys_write();
-int sys_open(), sys_close(), sys_waitpid(), sys_creat(), sys_link();
-int sys_execve(), sys_chdir(), sys_time(), sys_mknod();
-int sys_chmod(), sys_chown(), sys_break(), sys_oldstat();
-int sys_lseek(), sys_getpid(), sys_mount(), sys_umount(), sys_umount2();
-int sys_setuid(), sys_getuid(), sys_stime(), sys_ptrace();
-int sys_alarm(), sys_oldfstat(), sys_pause(), sys_utime();
-int sys_stty(), sys_gtty(), sys_access(), sys_nice(), sys_ftime();
-int sys_sync(), sys_kill(), sys_mkdir();
-int sys_pipe(), sys_times(), sys_prof(), sys_brk();
-int sys_setgid(), sys_getgid(), sys_signal(), sys_geteuid();
-int sys_getegid(), sys_acct(), sys_phys(), sys_lock(), sys_ioctl();
-int sys_fcntl(), sys_mpx(), sys_setpgid(), sys_ulimit();
-int sys_olduname(), sys_umask(), sys_ustat();
-int sys_dup2(), sys_getppid(), sys_getpgrp(), sys_setsid();
-int sys_sigaction(), sys_siggetmask(), sys_sigsetmask();
-int sys_setreuid(), sys_setregid(), sys_sigsuspend();
-int sys_sigpending(), sys_sethostname(), sys_setrlimit();
-int sys_getrlimit(), sys_getrusage(), sys_gettimeofday();
-int sys_settimeofday(), sys_getgroups(), sys_setgroups();
-int sys_setgroups32(), sys_getgroups32();
-int sys_oldselect(), sys_oldlstat(), sys_readlink();
-int sys_uselib(), sys_swapon(), sys_reboot(), sys_readdir();
-int sys_mmap(), sys_munmap(), sys_truncate(), sys_ftruncate();
-int sys_fchmod(), sys_fchown(), sys_getpriority();
-int sys_setpriority(), sys_profil(), sys_statfs(), sys_fstatfs();
-int sys_ioperm(), sys_socketcall(), sys_syslog(), sys_setitimer();
-int sys_getitimer(), sys_stat(), sys_lstat(), sys_fstat();
-int sys_uname(), sys_iopl(), sys_vhangup(), sys_idle(), sys_vm86();
-int sys_wait4(), sys_swapoff(), sys_ipc(), sys_sigreturn();
-int sys_fsync(), sys_clone(), sys_setdomainname(), sys_sysinfo();
-int sys_modify_ldt(), sys_adjtimex(), sys_mprotect();
-int sys_sigprocmask(), sys_create_module(), sys_init_module();
-int sys_delete_module(), sys_get_kernel_syms(), sys_quotactl();
-int sys_getpgid(), sys_bdflush();
-int sys_sysfs(), sys_personality(), sys_afs_syscall();
-int sys_setfsuid(), sys_setfsgid(), sys_llseek();
-int sys_getdents(), sys_flock(), sys_msync();
-int sys_readv(), sys_writev(), sys_select();
-int sys_getsid(), sys_fdatasync(), sys_sysctl();
-int sys_mlock(), sys_munlock(), sys_mlockall(), sys_munlockall(), sys_madvise();
-int sys_sched_setparam(), sys_sched_getparam();
-int sys_sched_setscheduler(), sys_sched_getscheduler(), sys_sched_yield();
-int sys_sched_get_priority_max(), sys_sched_get_priority_min();
-int sys_sched_rr_get_interval(), sys_nanosleep(), sys_mremap();
-int sys_sendmsg(), sys_recvmsg(), sys_setresuid(), sys_setresgid();
-int sys_getresuid(), sys_getresgid(), sys_pread(), sys_pwrite(), sys_getcwd();
-int sys_preadv(), sys_pwritev();
-int sys_sigaltstack(), sys_rt_sigprocmask(), sys_rt_sigaction();
-int sys_rt_sigpending(), sys_rt_sigsuspend(), sys_rt_sigqueueinfo();
-int sys_rt_sigtimedwait(), sys_prctl(), sys_poll(), sys_vfork();
-int sys_sendfile(), sys_old_mmap(), sys_stat64(), sys_lstat64(), sys_fstat64();
-int sys_truncate64(), sys_ftruncate64(), sys_getdents64();
-int sys_getpmsg(), sys_putpmsg(), sys_readahead(), sys_sendfile64();
-int sys_setxattr(), sys_fsetxattr(), sys_getxattr(), sys_fgetxattr();
-int sys_listxattr(), sys_flistxattr(), sys_removexattr(), sys_fremovexattr();
-int sys_sched_setaffinity(), sys_sched_getaffinity(), sys_futex();
-int sys_set_thread_area(), sys_get_thread_area(), sys_remap_file_pages();
-int sys_timer_create(), sys_timer_delete(), sys_timer_getoverrun();
-int sys_timer_gettime(), sys_timer_settime(), sys_clock_settime();
-int sys_clock_gettime(), sys_clock_getres(), sys_clock_nanosleep();
-int sys_semtimedop(), sys_statfs64(), sys_fstatfs64(), sys_tgkill();
-int sys_mq_open(), sys_mq_timedsend(), sys_mq_timedreceive();
-int sys_mq_notify(), sys_mq_getsetattr();
-int sys_epoll_create(), sys_epoll_ctl(), sys_epoll_wait();
-int sys_waitid(), sys_fadvise64(), sys_fadvise64_64();
-int sys_mbind(), sys_get_mempolicy(), sys_set_mempolicy(), sys_move_pages();
+int sys_setup();
+int sys_exit();
+int sys_fork();
+int sys_read();
+int sys_write();
+int sys_open();
+int sys_close();
+int sys_waitpid();
+int sys_creat();
+int sys_link();
+int sys_execve();
+int sys_chdir();
+int sys_time();
+int sys_mknod();
+int sys_chmod();
+int sys_chown();
+int sys_break();
+int sys_oldstat();
+int sys_lseek();
+int sys_getpid();
+int sys_mount();
+int sys_umount();
+int sys_umount2();
+int sys_setuid();
+int sys_getuid();
+int sys_stime();
+int sys_ptrace();
+int sys_alarm();
+int sys_oldfstat();
+int sys_pause();
+int sys_utime();
+int sys_stty();
+int sys_gtty();
+int sys_access();
+int sys_nice();
+int sys_ftime();
+int sys_sync();
+int sys_kill();
+int sys_mkdir();
+int sys_pipe();
+int sys_times();
+int sys_prof();
+int sys_brk();
+int sys_setgid();
+int sys_getgid();
+int sys_signal();
+int sys_geteuid();
+int sys_getegid();
+int sys_acct();
+int sys_phys();
+int sys_lock();
+int sys_ioctl();
+int sys_fcntl();
+int sys_mpx();
+int sys_setpgid();
+int sys_ulimit();
+int sys_olduname();
+int sys_umask();
+int sys_ustat();
+int sys_dup2();
+int sys_getppid();
+int sys_getpgrp();
+int sys_setsid();
+int sys_sigaction();
+int sys_siggetmask();
+int sys_sigsetmask();
+int sys_setreuid();
+int sys_setregid();
+int sys_sigsuspend();
+int sys_sigpending();
+int sys_sethostname();
+int sys_setrlimit();
+int sys_getrlimit();
+int sys_getrusage();
+int sys_gettimeofday();
+int sys_settimeofday();
+int sys_getgroups();
+int sys_setgroups();
+int sys_setgroups32();
+int sys_getgroups32();
+int sys_oldselect();
+int sys_oldlstat();
+int sys_readlink();
+int sys_uselib();
+int sys_swapon();
+int sys_reboot();
+int sys_readdir();
+int sys_mmap();
+int sys_munmap();
+int sys_truncate();
+int sys_ftruncate();
+int sys_fchmod();
+int sys_fchown();
+int sys_getpriority();
+int sys_setpriority();
+int sys_profil();
+int sys_statfs();
+int sys_fstatfs();
+int sys_ioperm();
+int sys_socketcall();
+int sys_syslog();
+int sys_setitimer();
+int sys_getitimer();
+int sys_stat();
+int sys_lstat();
+int sys_fstat();
+int sys_uname();
+int sys_iopl();
+int sys_vhangup();
+int sys_idle();
+int sys_vm86();
+int sys_wait4();
+int sys_swapoff();
+int sys_ipc();
+int sys_sigreturn();
+int sys_fsync();
+int sys_clone();
+int sys_setdomainname();
+int sys_sysinfo();
+int sys_modify_ldt();
+int sys_adjtimex();
+int sys_mprotect();
+int sys_sigprocmask();
+int sys_create_module();
+int sys_init_module();
+int sys_delete_module();
+int sys_get_kernel_syms();
+int sys_quotactl();
+int sys_getpgid();
+int sys_bdflush();
+int sys_sysfs();
+int sys_personality();
+int sys_afs_syscall();
+int sys_setfsuid();
+int sys_setfsgid();
+int sys_llseek();
+int sys_getdents();
+int sys_flock();
+int sys_msync();
+int sys_readv();
+int sys_writev();
+int sys_select();
+int sys_getsid();
+int sys_fdatasync();
+int sys_sysctl();
+int sys_mlock();
+int sys_munlock();
+int sys_mlockall();
+int sys_munlockall();
+int sys_madvise();
+int sys_sched_setparam();
+int sys_sched_getparam();
+int sys_sched_setscheduler();
+int sys_sched_getscheduler();
+int sys_sched_yield();
+int sys_sched_get_priority_max();
+int sys_sched_get_priority_min();
+int sys_sched_rr_get_interval();
+int sys_nanosleep();
+int sys_mremap();
+int sys_sendmsg();
+int sys_recvmsg();
+int sys_setresuid();
+int sys_setresgid();
+int sys_getresuid();
+int sys_getresgid();
+int sys_pread();
+int sys_pwrite();
+int sys_getcwd();
+int sys_preadv();
+int sys_pwritev();
+int sys_sigaltstack();
+int sys_rt_sigprocmask();
+int sys_rt_sigaction();
+int sys_rt_sigpending();
+int sys_rt_sigsuspend();
+int sys_rt_sigqueueinfo();
+int sys_rt_sigtimedwait();
+int sys_prctl();
+int sys_poll();
+int sys_vfork();
+int sys_sendfile();
+int sys_old_mmap();
+int sys_stat64();
+int sys_lstat64();
+int sys_fstat64();
+int sys_truncate64();
+int sys_ftruncate64();
+int sys_getdents64();
+int sys_getpmsg();
+int sys_putpmsg();
+int sys_readahead();
+int sys_sendfile64();
+int sys_setxattr();
+int sys_fsetxattr();
+int sys_getxattr();
+int sys_fgetxattr();
+int sys_listxattr();
+int sys_flistxattr();
+int sys_removexattr();
+int sys_fremovexattr();
+int sys_sched_setaffinity();
+int sys_sched_getaffinity();
+int sys_futex();
+int sys_set_thread_area();
+int sys_get_thread_area();
+int sys_remap_file_pages();
+int sys_timer_create();
+int sys_timer_delete();
+int sys_timer_getoverrun();
+int sys_timer_gettime();
+int sys_timer_settime();
+int sys_clock_settime();
+int sys_clock_gettime();
+int sys_clock_getres();
+int sys_clock_nanosleep();
+int sys_semtimedop();
+int sys_statfs64();
+int sys_fstatfs64();
+int sys_tgkill();
+int sys_mq_open();
+int sys_mq_timedsend();
+int sys_mq_timedreceive();
+int sys_mq_notify();
+int sys_mq_getsetattr();
+int sys_epoll_create();
+int sys_epoll_ctl();
+int sys_epoll_wait();
+int sys_waitid();
+int sys_fadvise64();
+int sys_fadvise64_64();
+int sys_mbind();
+int sys_get_mempolicy();
+int sys_set_mempolicy();
+int sys_move_pages();
 int sys_arch_prctl();
-int sys_io_setup(), sys_io_submit(), sys_io_cancel(), sys_io_getevents(), sys_io_destroy();
-int sys_utimensat(), sys_epoll_pwait(), sys_signalfd(), sys_timerfd(), sys_eventfd();
+int sys_io_setup();
+int sys_io_submit();
+int sys_io_cancel();
+int sys_io_getevents();
+int sys_io_destroy();
+int sys_utimensat();
+int sys_epoll_pwait();
+int sys_signalfd();
+int sys_timerfd();
+int sys_eventfd();
 int sys_getcpu();
-int sys_fallocate(), sys_timerfd_create(), sys_timerfd_settime(), sys_timerfd_gettime();
-int sys_signalfd4(), sys_eventfd2(), sys_epoll_create1(), sys_dup3(), sys_pipe2();
+int sys_fallocate();
+int sys_timerfd_create();
+int sys_timerfd_settime();
+int sys_timerfd_gettime();
+int sys_signalfd4();
+int sys_eventfd2();
+int sys_epoll_create1();
+int sys_dup3();
+int sys_pipe2();
 
 /* sys_socketcall subcalls */
 
-int sys_socket(), sys_bind(), sys_connect(), sys_listen(), sys_accept4();
-int sys_accept(), sys_getsockname(), sys_getpeername(), sys_socketpair();
-int sys_send(), sys_recv(), sys_sendto(), sys_recvfrom();
-int sys_shutdown(), sys_setsockopt(), sys_getsockopt();
+int sys_socket();
+int sys_bind();
+int sys_connect();
+int sys_listen();
+int sys_accept4();
+int sys_accept();
+int sys_getsockname();
+int sys_getpeername();
+int sys_socketpair();
+int sys_send();
+int sys_recv();
+int sys_sendto();
+int sys_recvfrom();
+int sys_shutdown();
+int sys_setsockopt();
+int sys_getsockopt();
 int sys_recvmmsg();
 
 /* *at syscalls */
@@ -243,9 +438,17 @@ int sys_osf_utimes();
 
 /* sys_ipc subcalls */
 
-int sys_semget(), sys_semctl(), sys_semop();
-int sys_msgsnd(), sys_msgrcv(), sys_msgget(), sys_msgctl();
-int sys_shmat(), sys_shmdt(), sys_shmget(), sys_shmctl();
+int sys_semget();
+int sys_semctl();
+int sys_semop();
+int sys_msgsnd();
+int sys_msgrcv();
+int sys_msgget();
+int sys_msgctl();
+int sys_shmat();
+int sys_shmdt();
+int sys_shmget();
+int sys_shmctl();
 
 #if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && \
 	!defined(__ARM_EABI__)
@@ -315,25 +518,33 @@ int sys_getpagesize();
 #endif
 
 #ifdef ALPHA
-int osf_statfs(), osf_fstatfs();
+int osf_statfs();
+int osf_fstatfs();
 #endif
 
 #ifdef IA64
-int sys_getpmsg(), sys_putpmsg();	/* STREAMS stuff */
+/* STREAMS stuff */
+int sys_getpmsg();
+int sys_putpmsg();
 #endif
 
 #ifdef MIPS
 int sys_sysmips();
 #endif
 
-int sys_setpgrp(), sys_gethostname(), sys_getdtablesize(), sys_utimes();
-int sys_capget(), sys_capset();
+int sys_setpgrp();
+int sys_gethostname();
+int sys_getdtablesize();
+int sys_utimes();
+int sys_capget();
+int sys_capset();
 
 #if defined M68K || defined SH
 int sys_cacheflush();
 #endif
 
-int sys_pread64(), sys_pwrite64();
+int sys_pread64();
+int sys_pwrite64();
 
 #ifdef POWERPC
 int sys_subpage_prot();
@@ -348,22 +559,33 @@ int sys_cacheflush();
 #include "sparc/syscall1.h"
 int sys_execv();
 int sys_getpagesize();
-int sys_getmsg(), sys_putmsg();
+int sys_getmsg();
+int sys_putmsg();
 
-int	sys_semsys(), sys_semctl(), sys_semget();
+int sys_semsys();
+int sys_semctl();
+int sys_semget();
 #define SYS_semsys_subcall	200
 #define SYS_semsys_nsubcalls	3
 #define SYS_semctl		(SYS_semsys_subcall + 0)
 #define SYS_semget		(SYS_semsys_subcall + 1)
 #define SYS_semop		(SYS_semsys_subcall + 2)
-int	sys_msgsys(), sys_msgget(), sys_msgctl(), sys_msgrcv(), sys_msgsnd();
+int sys_msgsys();
+int sys_msgget();
+int sys_msgctl();
+int sys_msgrcv();
+int sys_msgsnd();
 #define SYS_msgsys_subcall	203
 #define SYS_msgsys_nsubcalls	4
 #define SYS_msgget		(SYS_msgsys_subcall + 0)
 #define SYS_msgctl		(SYS_msgsys_subcall + 1)
 #define SYS_msgrcv		(SYS_msgsys_subcall + 2)
 #define SYS_msgsnd		(SYS_msgsys_subcall + 3)
-int	sys_shmsys(), sys_shmat(), sys_shmctl(), sys_shmdt(), sys_shmget();
+int sys_shmsys();
+int sys_shmat();
+int sys_shmctl();
+int sys_shmdt();
+int sys_shmget();
 #define SYS_shmsys_subcall	207
 #define SYS_shmsys_nsubcalls	4
 #define SYS_shmat		(SYS_shmsys_subcall + 0)
