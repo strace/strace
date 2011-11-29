@@ -2568,7 +2568,7 @@ trace()
 # define PC_FORMAT_ARG	/* nothing */
 #endif
 				printleader(tcp);
-				if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == 0) {
+				if (ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) == 0) {
 					tprints("--- ");
 					printsiginfo(&si, verbose(tcp));
 					tprintf(" (%s)" PC_FORMAT_STR " ---",
