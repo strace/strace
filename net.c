@@ -1119,6 +1119,24 @@ static const struct xlat socktcpoptions[] = {
 #if defined(TCP_QUICKACK)
 	{ TCP_QUICKACK,		"TCP_QUICKACK" },
 #endif
+#if defined(TCP_CONGESTION)
+	{ TCP_CONGESTION,	"TCP_CONGESTION" },
+#endif
+#if defined(TCP_MD5SIG)
+	{ TCP_MD5SIG,		"TCP_MD5SIG" },
+#endif
+#if defined(TCP_COOKIE_TRANSACTIONS)
+	{ TCP_COOKIE_TRANSACTIONS,	"TCP_COOKIE_TRANSACTIONS" },
+#endif
+#if defined(TCP_THIN_LINEAR_TIMEOUTS)
+	{ TCP_THIN_LINEAR_TIMEOUTS,	"TCP_THIN_LINEAR_TIMEOUTS" },
+#endif
+#if defined(TCP_THIN_DUPACK)
+	{ TCP_THIN_DUPACK,	"TCP_THIN_DUPACK" },
+#endif
+#if defined(TCP_USER_TIMEOUT)
+	{ TCP_USER_TIMEOUT,	"TCP_USER_TIMEOUT" },
+#endif
 	{ 0,			NULL		},
 };
 #endif /* SOL_TCP */
