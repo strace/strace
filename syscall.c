@@ -273,6 +273,27 @@ set_personality(int personality)
 	current_personality = personality;
 }
 
+#if SUPPORTED_PERSONALITIES > 1
+static void
+update_personality(struct tcb *tcp, int personality)
+{
+	if (personality == current_personality)
+		return;
+	set_personality(personality);
+
+	if (personality == tcp->currpers)
+		return;
+	tcp->currpers = personality;
+
+#if defined(POWERPC64) || defined(X86_64)
+	if (!qflag) {
+		static const char *const names[] = {"64 bit", "32 bit"};
+		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
+			tcp->pid, names[personality]);
+	}
+#endif
+}
+#endif
 
 static int qual_syscall(), qual_signal(), qual_fault(), qual_desc();
 
@@ -877,12 +898,7 @@ get_scno(struct tcb *tcp)
 		currpers = 0;
 	else
 		currpers = 1;
-	if (currpers != current_personality) {
-		static const char *const names[] = {"64 bit", "32 bit"};
-		set_personality(currpers);
-		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-				pid, names[current_personality]);
-	}
+	update_personality(tcp, currpers);
 #  endif
 # elif defined(AVR32)
 	/* Read complete register set in one go. */
@@ -947,12 +963,7 @@ get_scno(struct tcb *tcp)
 			break;
 	}
 #  endif
-	if (currpers != current_personality) {
-		static const char *const names[] = {"64 bit", "32 bit"};
-		set_personality(currpers);
-		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-				tcp->pid, names[current_personality]);
-	}
+	update_personality(tcp, currpers);
 # elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
@@ -1014,10 +1025,10 @@ get_scno(struct tcb *tcp)
 			/*
 			 * Handle ARM specific syscall
 			 */
-			set_personality(1);
+			update_personality(tcp, 1);
 			scno &= 0x0000ffff;
 		} else
-			set_personality(0);
+			update_personality(tcp, 0);
 
 	} else {
 		fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);
@@ -1093,11 +1104,11 @@ get_scno(struct tcb *tcp)
 	switch (trap) {
 	case 0x91d02010:
 		/* Linux/SPARC syscall trap. */
-		set_personality(0);
+		update_personality(tcp, 0);
 		break;
 	case 0x91d0206d:
 		/* Linux/SPARC64 syscall trap. */
-		set_personality(2);
+		update_personality(tcp, 2);
 		break;
 	case 0x91d02000:
 		/* SunOS syscall trap. (pers 1) */
@@ -1105,7 +1116,7 @@ get_scno(struct tcb *tcp)
 		return -1;
 	case 0x91d02008:
 		/* Solaris 2.x syscall trap. (per 2) */
-		set_personality(1);
+		update_personality(tcp, 1);
 		break;
 	case 0x91d02009:
 		/* NetBSD/FreeBSD syscall trap. */
@@ -1113,7 +1124,7 @@ get_scno(struct tcb *tcp)
 		return -1;
 	case 0x91d02027:
 		/* Solaris 2.x gettimeofday */
-		set_personality(1);
+		update_personality(tcp, 1);
 		break;
 	default:
 #  if defined (SPARC64)
@@ -2325,6 +2336,9 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (dtime || cflag)
 		gettimeofday(&tv, NULL);
 
+#if SUPPORTED_PERSONALITIES > 1
+	update_personality(tcp, tcp->currpers);
+#endif
 	res = get_syscall_result(tcp);
 	if (res == 0)
 		return res;

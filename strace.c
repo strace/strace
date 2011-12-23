@@ -1276,6 +1276,9 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->pid = pid;
 			tcp->flags = TCB_INUSE;
 			tcp->outf = outf; /* Initialise to current out file */
+#if SUPPORTED_PERSONALITIES > 1
+			tcp->currpers = current_personality;
+#endif
 #ifdef USE_PROCFS
 			tcp->pfd = -1;
 #endif

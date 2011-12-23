@@ -407,6 +407,9 @@ struct tcb {
 	long long u_lrval;	/* long long return value */
 #endif
 	int ptrace_errno;
+#if SUPPORTED_PERSONALITIES > 1
+	int currpers;		/* Personality at the time of scno update */
+#endif
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
