@@ -785,6 +785,11 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		char x[sizeof(long)];
 	} u;
 
+#if SUPPORTED_PERSONALITIES > 1
+	if (personality_wordsize[current_personality] < sizeof(addr))
+		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
+#endif
+
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
@@ -901,6 +906,11 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		long val;
 		char x[sizeof(long)];
 	} u;
+
+#if SUPPORTED_PERSONALITIES > 1
+	if (personality_wordsize[current_personality] < sizeof(addr))
+		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
+#endif
 
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
