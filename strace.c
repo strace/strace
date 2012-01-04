@@ -128,7 +128,7 @@ static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
 static const char *progname;
 
-static int detach(struct tcb *tcp, int sig);
+static int detach(struct tcb *tcp);
 static int trace(void);
 static void cleanup(void);
 static void interrupt(int sig);
@@ -1669,7 +1669,7 @@ droptcb(struct tcb *tcp)
    would SIGSTOP it and wait for its SIGSTOP notification forever.  */
 
 static int
-detach(struct tcb *tcp, int sig)
+detach(struct tcb *tcp)
 {
 	int error = 0;
 #ifdef LINUX
@@ -1695,7 +1695,7 @@ detach(struct tcb *tcp, int sig)
 	 * would be left stopped (process state T).
 	 */
 	catch_sigstop = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
-	error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, sig);
+	error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, 0);
 	if (error == 0) {
 		/* On a clear day, you can see forever. */
 	}
@@ -1748,7 +1748,7 @@ detach(struct tcb *tcp, int sig)
 				break;
 			}
 			if (WSTOPSIG(status) == SIGSTOP) {
-				ptrace_restart(PTRACE_DETACH, tcp, sig);
+				ptrace_restart(PTRACE_DETACH, tcp, 0);
 				break;
 			}
 			error = ptrace_restart(PTRACE_CONT, tcp,
@@ -1762,10 +1762,7 @@ detach(struct tcb *tcp, int sig)
 
 #if defined(SUNOS4)
 	/* PTRACE_DETACH won't respect `sig' argument, so we post it here. */
-	if (sig && kill(tcp->pid, sig) < 0)
-		perror("detach: kill");
-	sig = 0;
-	error = ptrace_restart(PTRACE_DETACH, tcp, sig);
+	error = ptrace_restart(PTRACE_DETACH, tcp, 0);
 #endif /* SUNOS4 */
 
 	if (!qflag)
@@ -1808,7 +1805,7 @@ cleanup(void)
 			printtrailer();
 		}
 		if (tcp->flags & TCB_ATTACHED)
-			detach(tcp, 0);
+			detach(tcp);
 		else {
 			kill(tcp->pid, SIGCONT);
 			kill(tcp->pid, SIGTERM);
@@ -2612,7 +2609,7 @@ trace()
 					tprints(" <unfinished ...>");
 					printtrailer();
 				}
-				detach(tcp, 0);
+				detach(tcp);
 			} else {
 				ptrace(PTRACE_KILL,
 					tcp->pid, (char *) 1, SIGTERM);
