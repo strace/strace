@@ -2596,9 +2596,7 @@ trace()
 			/* ptrace() failed in trace_syscall() with ESRCH.
 			 * Likely a result of process disappearing mid-flight.
 			 * Observed case: exit_group() terminating
-			 * all processes in thread group. In this case, threads
-			 * "disappear" in an unpredictable moment without any
-			 * notification to strace via wait().
+			 * all processes in thread group.
 			 */
 			if (tcp->flags & TCB_ATTACHED) {
 				if (tcp_last) {
@@ -2609,11 +2607,16 @@ trace()
 					tprints(" <unfinished ...>");
 					printtrailer();
 				}
-				detach(tcp);
+				/* We assume that ptrace error was caused by process death.
+				 * We used to detach(tcp) here, but since we no longer
+				 * implement "detach before death" policy/hack,
+				 * we can let this process to report its death to us
+				 * normally, via WIFEXITED or WIFSIGNALED wait status.
+				 */
 			} else {
-				ptrace(PTRACE_KILL,
-					tcp->pid, (char *) 1, SIGTERM);
-				droptcb(tcp);
+				/* It's our real child (and we also trace it) */
+				/* my_tkill(pid, SIGKILL); - why? */
+				/* droptcb(tcp); - why? */
 			}
 			continue;
 		}
