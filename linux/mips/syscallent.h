@@ -4195,7 +4195,7 @@
 	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 4190 */
 	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 4191 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 4192 */
-	{ 1,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 4193 */
+	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 4193 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 4194 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 4195 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 4196 */
@@ -5562,7 +5562,7 @@
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 5208 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 5209 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages" }, /* 5210 */
-	{ 1,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 5211 */
+	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 5211 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address" }, /* 5212 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 5213 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 5214 */
@@ -6871,7 +6871,7 @@
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 6208 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 6209 */
 	{ 5,	0,	sys_remap_file_pages,	"remap_file_pages"	}, /* 6210 */
-	{ 1,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 6211 */
+	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 6211 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"	}, /* 6212 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address" }, /* 6213 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 6214 */

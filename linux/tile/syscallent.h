@@ -122,7 +122,7 @@
 	{ 4,	TI,	sys_msgrcv,		"msgrcv" }, /* 121 */
 	{ 4,	TI,	sys_msgctl,		"msgctl" }, /* 122 */
 	{ 1,	TD,	sys_fsync,		"fsync" }, /* 123 */
-	{ 1,	TS,	printargs,		"sigreturn" }, /* 124 */
+	{ 0,	TS,	printargs,		"sigreturn" }, /* 124 */
 	{ 5,	TP,	sys_clone,		"clone" }, /* 125 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname" }, /* 126 */
 	{ 1,	0,	sys_uname,		"uname" }, /* 127 */
@@ -170,7 +170,7 @@
 	{ 3,	0,	sys_setresgid,		"setresgid" }, /* 169 */
 	{ 3,	0,	sys_getresgid,		"getresgid" }, /* 170 */
 	{ 5,	0,	sys_prctl,		"prctl" }, /* 171 */
-	{ 1,	TS,	sys_rt_sigreturn,	"rt_sigreturn" }, /* 172 */
+	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn" }, /* 172 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction" }, /* 173 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask" }, /* 174 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending" }, /* 175 */

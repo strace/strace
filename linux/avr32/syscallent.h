@@ -95,7 +95,7 @@
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 65 */
 	{ 0,	0,	sys_setsid,		"setsid"	}, /* 66 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 67 */
-	{ 1,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 68 */
+	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 68 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 69 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 70 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 71 */
