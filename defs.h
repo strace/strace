@@ -391,6 +391,14 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
+#ifdef LINUX
+# if defined(I386)
+struct pt_regs i386_regs;
+# elif defined(X86_64)
+struct pt_regs x86_64_regs;
+# endif
+#endif /* LINUX */
+
 /* Trace Control Block */
 struct tcb {
 	int flags;		/* See below for TCB_ values */

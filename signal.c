@@ -1117,95 +1117,63 @@ sys_sigreturn(struct tcb *tcp)
 	if (entering(tcp)) {
 		struct pt_regs regs;
 		struct sigcontext_struct sc;
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 			return 0;
 		if (umove(tcp, regs.ARM_sp, &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = sc.oldmask;
-	} else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(sc.oldmask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
 		long usp;
 		struct sigcontext_struct sc;
-		tcp->u_arg[0] = 0;
 		if (upeek(tcp, PT_GPR15, &usp) < 0)
 			return 0;
-		if (umove(tcp, usp+__SIGNAL_FRAMESIZE, &sc) < 0)
+		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		memcpy(&tcp->u_arg[1], &sc.oldmask[0], NSIG / 8);
-	} else {
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		tcp->auxstr = sprintsigmask("mask now ", (sigset_t *)&tcp->u_arg[1], 0);
-		return RVAL_NONE | RVAL_STR;
+		tprints(sprintsigmask(") (mask ", (sigset_t *)&sc.oldmask[0], 0);
 	}
 	return 0;
 #elif defined(I386)
 	if (entering(tcp)) {
-		long esp;
 		struct sigcontext_struct sc;
-		tcp->u_arg[0] = 0;
-		if (upeek(tcp, 4*UESP, &esp) < 0)
-			return 0;
-		if (umove(tcp, esp, &sc) < 0)
-			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = sc.oldmask;
-	}
-	else {
+		/* Note: on i386, sc is followed on stack by struct fpstate
+		 * and after it an additional u32 extramask[1] which holds
+		 * upper half of the mask. We can fetch it there
+		 * if/when we'd want to display the full mask...
+		 */
 		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
+		if (umove(tcp, i386_regs.esp, &sc) < 0)
 			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(sc.oldmask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(IA64)
 	if (entering(tcp)) {
 		struct sigcontext sc;
 		long sp;
+		sigset_t sigm;
 		/* offset of sigcontext in the kernel's sigframe structure: */
 #		define SIGFRAME_SC_OFFSET	0x90
-		tcp->u_arg[0] = 0;
 		if (upeek(tcp, PT_R12, &sp) < 0)
 			return 0;
 		if (umove(tcp, sp + 16 + SIGFRAME_SC_OFFSET, &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		memcpy(tcp->u_arg + 1, &sc.sc_mask, NSIG / 8);
-	}
-	else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
 		sigemptyset(&sigm);
-		memcpy(&sigm, tcp->u_arg + 1, NSIG / 8);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		memcpy(&sigm, &sc.sc_mask, NSIG / 8);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(POWERPC)
 	if (entering(tcp)) {
 		long esp;
 		struct sigcontext_struct sc;
-		tcp->u_arg[0] = 0;
-		if (upeek(tcp, sizeof(unsigned long)*PT_R1, &esp) < 0)
+		sigset_t sigm;
+		if (upeek(tcp, sizeof(unsigned long) * PT_R1, &esp) < 0)
 			return 0;
 		/* Skip dummy stack frame. */
 #ifdef POWERPC64
@@ -1218,61 +1186,34 @@ sys_sigreturn(struct tcb *tcp)
 #endif
 		if (umove(tcp, esp, &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = sc.oldmask;
-	}
-	else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(sc.oldmask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(M68K)
 	if (entering(tcp)) {
 		long usp;
 		struct sigcontext sc;
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		if (upeek(tcp, 4*PT_USP, &usp) < 0)
 			return 0;
 		if (umove(tcp, usp, &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = sc.sc_mask;
-	}
-	else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(sc.sc_mask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(ALPHA)
 	if (entering(tcp)) {
 		long fp;
 		struct sigcontext_struct sc;
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		if (upeek(tcp, REG_FP, &fp) < 0)
 			return 0;
 		if (umove(tcp, fp, &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = sc.sc_mask;
-	}
-	else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(sc.sc_mask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined (SPARC) || defined (SPARC64)
@@ -1280,7 +1221,7 @@ sys_sigreturn(struct tcb *tcp)
 		long i1;
 		struct pt_regs regs;
 		m_siginfo_t si;
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
 			perror("sigreturn: PTRACE_GETREGS");
 			return 0;
@@ -1290,16 +1231,8 @@ sys_sigreturn(struct tcb *tcp)
 			perror("sigreturn: umove");
 			return 0;
 		}
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = si.si_mask;
-	} else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(si.si_mask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined (LINUX_MIPSN32) || defined (LINUX_MIPSN64)
@@ -1308,23 +1241,15 @@ sys_sigreturn(struct tcb *tcp)
 	if (entering(tcp)) {
 		long sp;
 		struct ucontext uc;
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		if (upeek(tcp, REG_SP, &sp) < 0)
 			return 0;
 		/* There are six words followed by a 128-byte siginfo.  */
 		sp = sp + 6 * 4 + 128;
 		if (umove(tcp, sp, &uc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = *(long *) &uc.uc_sigmask;
-	} else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(*(long *) &uc.uc_sigmask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(MIPS)
@@ -1332,7 +1257,7 @@ sys_sigreturn(struct tcb *tcp)
 		long sp;
 		struct pt_regs regs;
 		m_siginfo_t si;
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
 			perror("sigreturn: PTRACE_GETREGS");
 			return 0;
@@ -1340,65 +1265,40 @@ sys_sigreturn(struct tcb *tcp)
 		sp = regs.regs[29];
 		if (umove(tcp, sp, &si) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = si.si_mask;
-	} else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(si.si_mask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(CRISV10) || defined(CRISV32)
 	if (entering(tcp)) {
 		struct sigcontext sc;
 		long regs[PT_MAX+1];
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long)regs) < 0) {
 			perror("sigreturn: PTRACE_GETREGS");
 			return 0;
 		}
 		if (umove(tcp, regs[PT_USP], &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = sc.oldmask;
-	} else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(sc.oldmask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(TILE)
 	if (entering(tcp)) {
 		struct ucontext uc;
 		long sp;
+		sigset_t sigm;
 
 		/* offset of ucontext in the kernel's sigframe structure */
 #		define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(struct siginfo)
-		tcp->u_arg[0] = 0;
 		if (upeek(tcp, PTREGS_OFFSET_SP, &sp) < 0)
 			return 0;
 		if (umove(tcp, sp + SIGFRAME_UC_OFFSET, &uc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		memcpy(tcp->u_arg + 1, &uc.uc_sigmask, NSIG / 8);
-	}
-	else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
 		sigemptyset(&sigm);
-		memcpy(&sigm, tcp->u_arg + 1, NSIG / 8);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		memcpy(&sigm, &uc.uc_sigmask, NSIG / 8);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #elif defined(MICROBLAZE)
@@ -1406,22 +1306,14 @@ sys_sigreturn(struct tcb *tcp)
 	if (entering(tcp)) {
 		struct sigcontext sc;
 		long sp;
-		tcp->u_arg[0] = 0;
+		sigset_t sigm;
 		/* Read r1, the stack pointer.  */
 		if (upeek(tcp, 1 * 4, &sp) < 0)
 			return 0;
 		if (umove(tcp, sp, &sc) < 0)
 			return 0;
-		tcp->u_arg[0] = 1;
-		tcp->u_arg[1] = sc.oldmask;
-	} else {
-		sigset_t sigm;
-		tcp->u_rval = tcp->u_error = 0;
-		if (tcp->u_arg[0] == 0)
-			return 0;
-		long_to_sigset(tcp->u_arg[1], &sigm);
-		tcp->auxstr = sprintsigmask("mask now ", &sigm, 0);
-		return RVAL_NONE | RVAL_STR;
+		long_to_sigset(sc.oldmask, &sigm);
+		tprints(sprintsigmask(") (mask ", &sigm, 0);
 	}
 	return 0;
 #else

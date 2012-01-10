@@ -734,10 +734,10 @@ is_restart_error(struct tcb *tcp)
 struct tcb *tcp_last = NULL;
 
 #ifdef LINUX
-# if defined (I386)
-static struct pt_regs i386_regs;
+# if defined(I386)
+struct pt_regs i386_regs;
 # elif defined(X86_64)
-static struct pt_regs x86_64_regs;
+struct pt_regs x86_64_regs;
 # elif defined (IA64)
 long r8, r10, psr; /* TODO: make static? */
 long ia32 = 0; /* not static */
