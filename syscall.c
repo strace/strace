@@ -2412,17 +2412,57 @@ trace_syscall_exiting(struct tcb *tcp)
 	else if (!(sys_res & RVAL_NONE) && u_error) {
 		switch (u_error) {
 #ifdef LINUX
+		/* Blocked signals do not interrupt any syscalls.
+		 * In this case syscalls don't return ERESTARTfoo codes.
+		 *
+		 * Deadly signals set to SIG_DFL interrupt syscalls
+		 * and kill the process regardless of which of the codes below
+		 * is returned by the interrupted syscall.
+		 * In some cases, kernel forces a kernel-generated deadly
+		 * signal to be unblocked and set to SIG_DFL (and thus cause
+		 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
+		 * or SIGILL. (The alternative is to leave process spinning
+		 * forever on the faulty instruction - not useful).
+		 *
+		 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
+		 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
+		 * but kernel will always restart them.
+		 */
 		case ERESTARTSYS:
-			tprints("= ? ERESTARTSYS (To be restarted)");
+			/* Most common type of signal-interrupted syscall exit code.
+			 * The system call will be restarted with the same arguments
+			 * if SA_RESTART is set; otherwise, it will fail with EINTR.
+			 */
+			tprints("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
 			break;
 		case ERESTARTNOINTR:
+			/* Rare. For example, fork() returns this if interrupted.
+			 * SA_RESTART is ignored (assumed set): the restart is unconditional.
+			 */
 			tprints("= ? ERESTARTNOINTR (To be restarted)");
 			break;
 		case ERESTARTNOHAND:
-			tprints("= ? ERESTARTNOHAND (To be restarted)");
+			/* pause(), rt_sigsuspend() etc use this code.
+			 * SA_RESTART is ignored (assumed not set):
+			 * syscall won't restart (will return EINTR instead)
+			 * even after signal with SA_RESTART set.
+			 * However, after SIG_IGN or SIG_DFL signal it will.
+			 */
+			tprints("= ? ERESTARTNOHAND (Interrupted by signal)");
 			break;
 		case ERESTART_RESTARTBLOCK:
-			tprints("= ? ERESTART_RESTARTBLOCK (To be restarted)");
+			/* Syscalls like nanosleep(), poll() which can't be
+			 * restarted with their original arguments use this
+			 * code. Kernel will execute restart_syscall() instead,
+			 * which changes arguments before restarting syscall.
+			 * SA_RESTART is ignored (assumed not set) similarly
+			 * to ERESTARTNOHAND. (Kernel can't honor SA_RESTART
+			 * since restart data is saved in "restart block"
+			 * in task struct, and if signal handler uses a syscall
+			 * which in turn saves another such restart block,
+			 * old data is lost and restart becomes impossible)
+			 */
+			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
 			break;
 #endif /* LINUX */
 		default:
