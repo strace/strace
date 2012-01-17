@@ -1077,7 +1077,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, regs.ARM_sp, &sc) < 0)
 			return 0;
 		long_to_sigset(sc.oldmask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(S390) || defined(S390X)
@@ -1088,7 +1088,7 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &sc) < 0)
 			return 0;
-		tprints(sprintsigmask(") (mask ", (sigset_t *)&sc.oldmask[0], 0);
+		tprints(sprintsigmask(") (mask ", (sigset_t *)&sc.oldmask[0], 0));
 	}
 	return 0;
 #elif defined(I386)
@@ -1119,7 +1119,7 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		sigemptyset(&sigm);
 		memcpy(&sigm, &sc.sc_mask, NSIG / 8);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(POWERPC)
@@ -1141,7 +1141,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, esp, &sc) < 0)
 			return 0;
 		long_to_sigset(sc.oldmask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(M68K)
@@ -1154,7 +1154,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, usp, &sc) < 0)
 			return 0;
 		long_to_sigset(sc.sc_mask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(ALPHA)
@@ -1167,7 +1167,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, fp, &sc) < 0)
 			return 0;
 		long_to_sigset(sc.sc_mask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined (SPARC) || defined (SPARC64)
@@ -1186,7 +1186,7 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		}
 		long_to_sigset(si.si_mask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined (LINUX_MIPSN32) || defined (LINUX_MIPSN64)
@@ -1203,7 +1203,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, sp, &uc) < 0)
 			return 0;
 		long_to_sigset(*(long *) &uc.uc_sigmask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(MIPS)
@@ -1220,7 +1220,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, sp, &si) < 0)
 			return 0;
 		long_to_sigset(si.si_mask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(CRISV10) || defined(CRISV32)
@@ -1235,7 +1235,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, regs[PT_USP], &sc) < 0)
 			return 0;
 		long_to_sigset(sc.oldmask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(TILE)
@@ -1252,7 +1252,7 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		sigemptyset(&sigm);
 		memcpy(&sigm, &uc.uc_sigmask, NSIG / 8);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #elif defined(MICROBLAZE)
@@ -1267,7 +1267,7 @@ sys_sigreturn(struct tcb *tcp)
 		if (umove(tcp, sp, &sc) < 0)
 			return 0;
 		long_to_sigset(sc.oldmask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0);
+		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
 #else
