@@ -1794,6 +1794,54 @@ printstatfs64(struct tcb *tcp, long addr)
 	tprints("}");
 }
 
+struct compat_statfs64 {
+	uint32_t f_type;
+	uint32_t f_bsize;
+	uint64_t f_blocks;
+	uint64_t f_bfree;
+	uint64_t f_bavail;
+	uint64_t f_files;
+	uint64_t f_ffree;
+	fsid_t f_fsid;
+	uint32_t f_namelen;
+	uint32_t f_frsize;
+	uint32_t f_flags;
+	uint32_t f_spare[4];
+}
+#if defined(X86_64) || defined(IA64)
+  __attribute__ ((packed, aligned(4)))
+#endif
+;
+
+static void
+printcompat_statfs64(struct tcb *tcp, long addr)
+{
+	struct compat_statfs64 statbuf;
+
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprints("{...}");
+		return;
+	}
+	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%llu, f_bfree=%llu, ",
+		sprintfstype(statbuf.f_type),
+		(unsigned long)statbuf.f_bsize,
+		(unsigned long long)statbuf.f_blocks,
+		(unsigned long long)statbuf.f_bfree);
+	tprintf("f_bavail=%llu, f_files=%llu, f_ffree=%llu, f_fsid={%d, %d}",
+		(unsigned long long)statbuf.f_bavail,
+		(unsigned long long)statbuf.f_files,
+		(unsigned long long)statbuf.f_ffree,
+		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
+	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
+	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
+	tprintf(", f_flags=%lu", (unsigned long)statbuf.f_frsize);
+	tprints("}");
+}
+
 int
 sys_statfs64(struct tcb *tcp)
 {
@@ -1803,6 +1851,8 @@ sys_statfs64(struct tcb *tcp)
 	} else {
 		if (tcp->u_arg[1] == sizeof(struct statfs64))
 			printstatfs64(tcp, tcp->u_arg[2]);
+		else if (tcp->u_arg[1] == sizeof(struct compat_statfs64))
+			printcompat_statfs64(tcp, tcp->u_arg[2]);
 		else
 			tprints("{???}");
 	}
@@ -1818,6 +1868,8 @@ sys_fstatfs64(struct tcb *tcp)
 	} else {
 		if (tcp->u_arg[1] == sizeof(struct statfs64))
 			printstatfs64(tcp, tcp->u_arg[2]);
+		else if (tcp->u_arg[1] == sizeof(struct compat_statfs64))
+			printcompat_statfs64(tcp, tcp->u_arg[2]);
 		else
 			tprints("{???}");
 	}
