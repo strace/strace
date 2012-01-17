@@ -393,9 +393,7 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 
 #ifdef LINUX
 # if defined(I386)
-struct pt_regs i386_regs;
-# elif defined(X86_64)
-struct pt_regs x86_64_regs;
+extern struct pt_regs i386_regs;
 # endif
 #endif /* LINUX */
 

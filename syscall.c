@@ -737,7 +737,7 @@ struct tcb *tcp_last = NULL;
 # if defined(I386)
 struct pt_regs i386_regs;
 # elif defined(X86_64)
-struct pt_regs x86_64_regs;
+static struct pt_regs x86_64_regs;
 # elif defined (IA64)
 long r8, r10, psr; /* TODO: make static? */
 long ia32 = 0; /* not static */
