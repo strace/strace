@@ -737,7 +737,13 @@ struct tcb *tcp_last = NULL;
 # if defined(I386)
 struct pt_regs i386_regs;
 # elif defined(X86_64)
-static struct pt_regs x86_64_regs;
+/*
+ * On 32 bits, pt_regs and user_regs_struct are the same,
+ * but on 64 bits, user_regs_struct has six more fields:
+ * fs_base, gs_base, ds, es, fs, gs.
+ * PTRACE_GETREGS fills them too, so struct pt_regs would overflow.
+ */
+static struct user_regs_struct x86_64_regs;
 # elif defined (IA64)
 long r8, r10, psr; /* TODO: make static? */
 long ia32 = 0; /* not static */
