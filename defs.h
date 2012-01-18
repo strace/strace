@@ -475,7 +475,6 @@ struct tcb {
 #define TCB_INSYSCALL	00010
 #define TCB_ATTACHED	00020	/* Process is not our own child */
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
-#define TCB_SIGTRAPPED	00200	/* Process wanted to block SIGTRAP */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #define TCB_FILTERED	02000	/* This system call has been filtered out */
 #ifdef LINUX

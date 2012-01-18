@@ -2542,15 +2542,6 @@ trace()
 		}
 
 		if (sig != syscall_trap_sig) {
-			if (sig == SIGSTOP &&
-					(tcp->flags & TCB_SIGTRAPPED)) {
-				/*
-				 * Trapped attempt to block SIGTRAP
-				 * Hope we are back in control now.
-				 */
-				tcp->flags &= ~(TCB_INSYSCALL | TCB_SIGTRAPPED);
-				goto restart_tracee_with_sig_0;
-			}
 			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[sig] & QUAL_SIGNAL)) {
 				siginfo_t si;

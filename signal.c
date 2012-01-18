@@ -842,24 +842,12 @@ sys_sigvec(struct tcb *tcp)
 			tprints("{SIG_DFL}");
 			break;
 		case (int) SIG_IGN:
-			if (tcp->u_arg[0] == SIGTRAP) {
-				tcp->flags |= TCB_SIGTRAPPED;
-				kill(tcp->pid, SIGSTOP);
-			}
 			tprints("{SIG_IGN}");
 			break;
 		case (int) SIG_HOLD:
-			if (tcp->u_arg[0] == SIGTRAP) {
-				tcp->flags |= TCB_SIGTRAPPED;
-				kill(tcp->pid, SIGSTOP);
-			}
-			tprints("SIG_HOLD");
+			tprints("{SIG_HOLD}");
 			break;
 		default:
-			if (tcp->u_arg[0] == SIGTRAP) {
-				tcp->flags |= TCB_SIGTRAPPED;
-				kill(tcp->pid, SIGSTOP);
-			}
 			tprintf("{%#lx, ", (unsigned long) sv.sv_handler);
 			printsigmask(&sv.sv_mask, 0);
 			tprints(", ");
@@ -923,14 +911,6 @@ sys_sigsetmask(struct tcb *tcp)
 		sigset_t sigm;
 		long_to_sigset(tcp->u_arg[0], &sigm);
 		printsigmask(&sigm, 0);
-#ifndef USE_PROCFS
-		if ((tcp->u_arg[0] & sigmask(SIGTRAP))) {
-			/* Mark attempt to block SIGTRAP */
-			tcp->flags |= TCB_SIGTRAPPED;
-			/* Send unblockable signal */
-			kill(tcp->pid, SIGSTOP);
-		}
-#endif /* !USE_PROCFS */
 	}
 	else if (!syserror(tcp)) {
 		sigset_t sigm;
@@ -1005,24 +985,10 @@ sys_sigaction(struct tcb *tcp)
 			tprints("{SIG_ERR, ");
 		else if ((long)sa.SA_HANDLER == (long)SIG_DFL)
 			tprints("{SIG_DFL, ");
-		else if ((long)sa.SA_HANDLER == (long)SIG_IGN) {
-#ifndef USE_PROCFS
-			if (tcp->u_arg[0] == SIGTRAP) {
-				tcp->flags |= TCB_SIGTRAPPED;
-				kill(tcp->pid, SIGSTOP);
-			}
-#endif /* !USE_PROCFS */
+		else if ((long)sa.SA_HANDLER == (long)SIG_IGN)
 			tprints("{SIG_IGN, ");
-		}
-		else {
-#ifndef USE_PROCFS
-			if (tcp->u_arg[0] == SIGTRAP) {
-				tcp->flags |= TCB_SIGTRAPPED;
-				kill(tcp->pid, SIGSTOP);
-			}
-#endif /* !USE_PROCFS */
+		else
 			tprintf("{%#lx, ", (long) sa.SA_HANDLER);
-		}
 #ifndef LINUX
 		printsigmask(&sa.sa_mask, 0);
 #else
@@ -1060,21 +1026,9 @@ sys_signal(struct tcb *tcp)
 			tprints("SIG_DFL");
 			break;
 		case (long) SIG_IGN:
-#ifndef USE_PROCFS
-			if (tcp->u_arg[0] == SIGTRAP) {
-				tcp->flags |= TCB_SIGTRAPPED;
-				kill(tcp->pid, SIGSTOP);
-			}
-#endif /* !USE_PROCFS */
 			tprints("SIG_IGN");
 			break;
 		default:
-#ifndef USE_PROCFS
-			if (tcp->u_arg[0] == SIGTRAP) {
-				tcp->flags |= TCB_SIGTRAPPED;
-				kill(tcp->pid, SIGSTOP);
-			}
-#endif /* !USE_PROCFS */
 			tprintf("%#lx", tcp->u_arg[1]);
 		}
 		return 0;
