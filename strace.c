@@ -2462,6 +2462,7 @@ trace()
 #endif
 				printtrailer();
 			}
+			fflush(tcp->outf);
 			droptcb(tcp);
 			continue;
 		}
@@ -2479,6 +2480,7 @@ trace()
 				tprintf("+++ exited with %d +++", WEXITSTATUS(status));
 				printtrailer();
 			}
+			fflush(tcp->outf);
 			droptcb(tcp);
 			continue;
 		}
@@ -2580,6 +2582,7 @@ trace()
 						signame(sig)
 						PC_FORMAT_ARG);
 				printtrailer();
+				fflush(tcp->outf);
 			}
 			goto restart_tracee;
 		}
@@ -2606,6 +2609,7 @@ trace()
 					tcp_last->flags |= TCB_REPRINT;
 					tprints(" <unfinished ...>");
 					printtrailer();
+					fflush(tcp->outf);
 				}
 				/* We assume that ptrace error was caused by process death.
 				 * We used to detach(tcp) here, but since we no longer
