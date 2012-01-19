@@ -427,8 +427,6 @@ printuid(const char *text, unsigned long uid)
 	tprintf((uid == -1) ? "%s%ld" : "%s%lu", text, uid);
 }
 
-static char path[MAXPATHLEN + 1];
-
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
@@ -566,6 +564,8 @@ string_quote(const char *instr, char *outstr, int len, int size)
 void
 printpathn(struct tcb *tcp, long addr, int n)
 {
+	char path[MAXPATHLEN + 1];
+
 	if (!addr) {
 		tprints("NULL");
 		return;
@@ -581,24 +581,25 @@ printpathn(struct tcb *tcp, long addr, int n)
 	if (umovestr(tcp, addr, n + 1, path) < 0)
 		tprintf("%#lx", addr);
 	else {
-		static char outstr[4*(sizeof path - 1) + sizeof "\"...\""];
-		const char *fmt;
+		char *outstr;
 		int trunc = (path[n] != '\0');
 
 		if (trunc)
 			path[n] = '\0';
-		string_quote(path, outstr, -1, n + 1);
-		fmt = "%s";
+		n++;
+		outstr = alloca(4 * n); /* 4*(n-1) + 2 for quotes */
+		string_quote(path, outstr, -1, n);
+		tprints(outstr);
 		if (trunc)
-			fmt = "%s...";
-		tprintf(fmt, outstr);
+			tprints("...");
 	}
 }
 
 void
 printpath(struct tcb *tcp, long addr)
 {
-	printpathn(tcp, addr, sizeof path - 1);
+	/* Size must correspond to char path[] size in printpathn */
+	printpathn(tcp, addr, MAXPATHLEN);
 }
 
 /*
@@ -612,7 +613,7 @@ printstr(struct tcb *tcp, long addr, int len)
 	static char *str = NULL;
 	static char *outstr;
 	int size;
-	const char *fmt;
+	int ellipsis;
 
 	if (!addr) {
 		tprints("NULL");
@@ -623,9 +624,7 @@ printstr(struct tcb *tcp, long addr, int len)
 		str = malloc(max_strlen + 1);
 		if (!str)
 			die_out_of_memory();
-	}
-	if (!outstr) {
-		outstr = malloc(4 * max_strlen + sizeof "\"...\"");
+		outstr = malloc(4 * max_strlen + /*for quotes:*/ 2);
 		if (!outstr)
 			die_out_of_memory();
 	}
@@ -651,12 +650,12 @@ printstr(struct tcb *tcp, long addr, int len)
 		}
 	}
 
-	fmt = "%s";
-	if (string_quote(str, outstr, len, size) &&
-	    (len < 0 || len > max_strlen))
-		fmt = "%s...";
+	ellipsis = (string_quote(str, outstr, len, size) &&
+			(len < 0 || len > max_strlen));
 
-	tprintf(fmt, outstr);
+	tprints(outstr);
+	if (ellipsis)
+		tprints("...");
 }
 
 #if HAVE_SYS_UIO_H
