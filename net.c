@@ -1753,12 +1753,16 @@ sys_recvmsg(struct tcb *tcp)
 int
 sys_recvmmsg(struct tcb *tcp)
 {
-	static char str[128];
-	if (entering(tcp)) {
+	/* +5 chars are for "left " prefix */
+	static char str[5 + TIMESPEC_TEXT_BUFSIZE];
 
+	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
 		if (verbose(tcp)) {
 			sprint_timespec(str, tcp, tcp->u_arg[4]);
+			/* Abusing tcp->auxstr as temp storage.
+			 * Will be used and freed on syscall exit.
+			 */
 			tcp->auxstr = strdup(str);
 		} else {
 			tprintf("%#lx, %ld, ", tcp->u_arg[1], tcp->u_arg[2]);
@@ -1790,8 +1794,7 @@ sys_recvmmsg(struct tcb *tcp)
 		if (!verbose(tcp))
 			return 0;
 		/* timeout on exit */
-		strcpy(str, "left ");
-		sprint_timespec(str + strlen(str), tcp, tcp->u_arg[4]);
+		sprint_timespec(stpcpy(str, "left "), tcp, tcp->u_arg[4]);
 		tcp->auxstr = str;
 		return RVAL_STR;
 	}

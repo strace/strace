@@ -404,7 +404,7 @@ decode_poll(struct tcb *tcp, long pts)
 
 		*outptr = '\0';
 		if (pts) {
-			if (outptr < end_outstr - 128) {
+			if (outptr < end_outstr - (10 + TIMESPEC_TEXT_BUFSIZE)) {
 				outptr = stpcpy(outptr, outptr == outstr ? "left " : ", left ");
 				sprint_timespec(outptr, tcp, pts);
 			}

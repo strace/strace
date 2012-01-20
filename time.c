@@ -66,54 +66,13 @@ tprint_timeval(struct tcb *tcp, const struct timeval *tv)
 void
 printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 {
-	if (addr == 0)
-		tprints("NULL");
-	else if (!verbose(tcp))
-		tprintf("%#lx", addr);
-	else {
-		int rc;
-
-		if (bitness == BITNESS_32
-#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
-		    || personality_wordsize[current_personality] == 4
-#endif
-			)
-		{
-			struct timeval32 tv;
-
-			rc = umove(tcp, addr, &tv);
-			if (rc >= 0) {
-				if (special && tv.tv_sec == 0 &&
-				    tv.tv_usec == UTIME_NOW)
-					tprints("UTIME_NOW");
-				else if (special && tv.tv_sec == 0 &&
-					 tv.tv_usec == UTIME_OMIT)
-					tprints("UTIME_OMIT");
-				else
-					tprint_timeval32(tcp, &tv);
-			}
-		} else {
-			struct timeval tv;
-
-			rc = umove(tcp, addr, &tv);
-			if (rc >= 0) {
-				if (special && tv.tv_sec == 0 &&
-				    tv.tv_usec == UTIME_NOW)
-					tprints("UTIME_NOW");
-				else if (special && tv.tv_sec == 0 &&
-					 tv.tv_usec == UTIME_OMIT)
-					tprints("UTIME_OMIT");
-				else
-					tprint_timeval(tcp, &tv);
-			}
-		}
-		if (rc < 0)
-			tprints("{...}");
-	}
+	char buf[TIMEVAL_TEXT_BUFSIZE];
+	sprinttv(buf, tcp, addr, bitness, special);
+	tprints(buf);
 }
 
 char *
-sprinttv(struct tcb *tcp, long addr, enum bitness_t bitness, char *buf)
+sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 {
 	int rc;
 
@@ -132,56 +91,46 @@ sprinttv(struct tcb *tcp, long addr, enum bitness_t bitness, char *buf)
 		struct timeval32 tv;
 
 		rc = umove(tcp, addr, &tv);
-		if (rc >= 0)
+		if (rc >= 0) {
+			if (special && tv.tv_sec == 0) {
+				if (tv.tv_usec == UTIME_NOW)
+					return stpcpy(buf, "UTIME_NOW");
+				if (tv.tv_usec == UTIME_OMIT)
+					return stpcpy(buf, "UTIME_OMIT");
+			}
 			return buf + sprintf(buf, "{%u, %u}",
 				tv.tv_sec, tv.tv_usec);
+		}
 	} else {
 		struct timeval tv;
 
 		rc = umove(tcp, addr, &tv);
-		if (rc >= 0)
+		if (rc >= 0) {
+			if (special && tv.tv_sec == 0) {
+				if (tv.tv_usec == UTIME_NOW)
+					return stpcpy(buf, "UTIME_NOW");
+				if (tv.tv_usec == UTIME_OMIT)
+					return stpcpy(buf, "UTIME_OMIT");
+			}
 			return buf + sprintf(buf, "{%lu, %lu}",
 				(unsigned long) tv.tv_sec,
 				(unsigned long) tv.tv_usec);
+		}
 	}
 
 	return stpcpy(buf, "{...}");
 }
 
-void print_timespec(struct tcb *tcp, long addr)
+void
+print_timespec(struct tcb *tcp, long addr)
 {
-	if (addr == 0)
-		tprints("NULL");
-	else if (!verbose(tcp))
-		tprintf("%#lx", addr);
-	else {
-		int rc;
-
-#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
-		if (personality_wordsize[current_personality] == 4) {
-			struct timeval32 tv;
-
-			rc = umove(tcp, addr, &tv);
-			if (rc >= 0)
-				tprintf("{%u, %u}",
-					tv.tv_sec, tv.tv_usec);
-		} else
-#endif
-		{
-			struct timespec ts;
-
-			rc = umove(tcp, addr, &ts);
-			if (rc >= 0)
-				tprintf("{%lu, %lu}",
-					(unsigned long) ts.tv_sec,
-					(unsigned long) ts.tv_nsec);
-		}
-		if (rc < 0)
-			tprints("{...}");
-	}
+	char buf[TIMESPEC_TEXT_BUFSIZE];
+	sprint_timespec(buf, tcp, addr);
+	tprints(buf);
 }
 
-void sprint_timespec(char *buf, struct tcb *tcp, long addr)
+void
+sprint_timespec(char *buf, struct tcb *tcp, long addr)
 {
 	if (addr == 0)
 		strcpy(buf, "NULL");

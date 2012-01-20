@@ -584,9 +584,9 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 #ifdef LINUX
 		/* This contains no useful information on SunOS.  */
 		if (args[4]) {
-			if (outptr < end_outstr - 128) {
+			if (outptr < end_outstr - (10 + TIMEVAL_TEXT_BUFSIZE)) {
 				outptr += sprintf(outptr, "%sleft ", sep);
-				outptr = sprinttv(tcp, args[4], bitness, outptr);
+				outptr = sprinttv(outptr, tcp, args[4], bitness, /*special:*/ 0);
 			}
 		}
 #endif /* LINUX */

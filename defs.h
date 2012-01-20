@@ -628,8 +628,10 @@ extern void printnum(struct tcb *, long, const char *);
 extern void printnum_int(struct tcb *, long, const char *);
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, int);
+#define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))
+#define TIMEVAL_TEXT_BUFSIZE  TIMESPEC_TEXT_BUFSIZE
 extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
-extern char *sprinttv(struct tcb *, long, enum bitness_t, char *);
+extern char *sprinttv(char *, struct tcb *, long, enum bitness_t, int special);
 extern void print_timespec(struct tcb *, long);
 extern void sprint_timespec(char *, struct tcb *, long);
 #ifdef HAVE_SIGINFO_T
