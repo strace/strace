@@ -513,7 +513,7 @@ sys_mount(struct tcb *tcp)
 				tcp->u_arg[0],  sizeof type, type) < 0) {
 			tprintf("OLDTYPE:#%lx", tcp->u_arg[0]);
 		} else {
-			tprintf("\"%s\", ", type);
+			tprintf("\"%.4s\", ", type);
 		}
 		printstr(tcp, tcp->u_arg[1], -1);
 		tprints(", ");
@@ -1437,11 +1437,11 @@ sys_mount(struct tcb *tcp)
 		   for all SVR4's? */
 		if (tcp->u_arg[2] & (MS_FSS | MS_DATA)) {
 			if (umovestr(tcp, tcp->u_arg[3], FSTYPSZ, fstyp) < 0) {
-				*fstyp = 0;
+				fstyp[0] = '\0';
 				tprintf(", %ld", tcp->u_arg[3]);
 			}
 			else
-				tprintf(", \"%s\"", fstyp);
+				tprintf(", \"%.*s\"", (int)FSTYPSZ, fstyp);
 		}
 		if (tcp->u_arg[2] & MS_DATA) {
 			tprints(", ");
@@ -2317,7 +2317,7 @@ int sys_sysmips(struct tcb *tcp)
 			if (umovestr(tcp, tcp->u_arg[1], (__NEW_UTS_LEN + 1), nodename) < 0)
 				tprintf(", %#lx", tcp->u_arg[1]);
 			else
-				tprintf(", \"%s\"", nodename);
+				tprintf(", \"%.*s\"", (int)(__NEW_UTS_LEN + 1), nodename);
 		} else if (tcp->u_arg[0] == MIPS_ATOMIC_SET) {
 			tprintf(", %#lx, 0x%lx", tcp->u_arg[1], tcp->u_arg[2]);
 		} else if (tcp->u_arg[0] == MIPS_FIXADE) {
