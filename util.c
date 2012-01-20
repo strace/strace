@@ -432,6 +432,9 @@ printuid(const char *text, unsigned long uid)
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
  * If `len' < 0, treat `instr' as a NUL-terminated string
  * and quote at most (`size' - 1) bytes.
+ *
+ * Returns 0 if len < 0 and NUL was seen, 1 otherwise.
+ * Note that if len >= 0, always returns 1.
  */
 static int
 string_quote(const char *instr, char *outstr, int len, int size)
@@ -565,32 +568,30 @@ void
 printpathn(struct tcb *tcp, long addr, int n)
 {
 	char path[MAXPATHLEN + 1];
+	int nul_seen;
 
 	if (!addr) {
 		tprints("NULL");
 		return;
 	}
 
-	/* Cap path length to the path buffer size,
-	   and NUL-terminate the buffer. */
+	/* Cap path length to the path buffer size */
 	if (n > sizeof path - 1)
 		n = sizeof path - 1;
-	path[n] = '\0';
 
 	/* Fetch one byte more to find out whether path length > n. */
-	if (umovestr(tcp, addr, n + 1, path) < 0)
+	nul_seen = umovestr(tcp, addr, n + 1, path);
+	if (nul_seen < 0)
 		tprintf("%#lx", addr);
 	else {
 		char *outstr;
-		int trunc = (path[n] != '\0');
 
-		if (trunc)
-			path[n] = '\0';
+		path[n] = '\0';
 		n++;
-		outstr = alloca(4 * n); /* 4*(n-1) + 2 for quotes */
+		outstr = alloca(4 * n); /* 4*(n-1) + 3 for quotes and NUL */
 		string_quote(path, outstr, -1, n);
 		tprints(outstr);
-		if (trunc)
+		if (!nul_seen)
 			tprints("...");
 	}
 }
@@ -624,7 +625,7 @@ printstr(struct tcb *tcp, long addr, int len)
 		str = malloc(max_strlen + 1);
 		if (!str)
 			die_out_of_memory();
-		outstr = malloc(4 * max_strlen + /*for quotes:*/ 2);
+		outstr = malloc(4 * max_strlen + /*for quotes and NUL:*/ 3);
 		if (!outstr)
 			die_out_of_memory();
 	}
@@ -635,8 +636,6 @@ printstr(struct tcb *tcp, long addr, int len)
 		 * because string_quote() quotes one byte less.
 		 */
 		size = max_strlen + 1;
-		str[max_strlen] = '\0';
-	/* FIXME! umovestr can overwrite the '\0' stored above??? */
 		if (umovestr(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
@@ -650,6 +649,9 @@ printstr(struct tcb *tcp, long addr, int len)
 		}
 	}
 
+	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
+	 * or we were requested to print more than -s NUM chars)...
+	 */
 	ellipsis = (string_quote(str, outstr, len, size) &&
 			(len < 0 || len > max_strlen));
 
@@ -859,8 +861,16 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 }
 
 /*
- * like `umove' but make the additional effort of looking
+ * Like `umove' but make the additional effort of looking
  * for a terminating zero byte.
+ *
+ * Returns < 0 on error, > 0 if NUL was seen,
+ * (TODO if useful: return count of bytes including NUL),
+ * else 0 if len bytes were read but no NUL byte seen.
+ *
+ * Note: there is no guarantee we won't overwrite some bytes
+ * in laddr[] _after_ terminating NUL (but, of course,
+ * we never write past laddr[len-1]).
  */
 int
 umovestr(struct tcb *tcp, long addr, int len, char *laddr)
@@ -891,7 +901,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		if (move <= 0)
 			return left != len ? 0 : -1;
 		if (memchr(laddr, 0, move))
-			break;
+			return 1;
 		left -= move;
 		laddr += move;
 		addr += move;
@@ -926,7 +936,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		memcpy(laddr, &u.x[n], m = MIN(sizeof(long)-n, len));
 		while (n & (sizeof(long) - 1))
 			if (u.x[n++] == '\0')
-				return 0;
+				return 1;
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 	while (len) {
@@ -945,7 +955,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
 		for (i = 0; i < sizeof(long); i++)
 			if (u.x[i] == '\0')
-				return 0;
+				return 1;
 
 		addr += sizeof(long), laddr += m, len -= m;
 	}
