@@ -780,7 +780,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 #ifdef LINUX
 	int pid = tcp->pid;
 	int n, m;
-	int started = 0;
+	int started;
 	union {
 		long val;
 		char x[sizeof(long)];
@@ -791,6 +791,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
 #endif
 
+	started = 0;
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
@@ -804,7 +805,8 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 			return -1;
 		}
 		started = 1;
-		memcpy(laddr, &u.x[n], m = MIN(sizeof(long) - n, len));
+		m = MIN(sizeof(long) - n, len);
+		memcpy(laddr, &u.x[n], m);
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 	while (len) {
@@ -820,7 +822,8 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 			return -1;
 		}
 		started = 1;
-		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
+		m = MIN(sizeof(long), len);
+		memcpy(laddr, u.x, m);
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 #endif /* LINUX */
@@ -876,11 +879,11 @@ int
 umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 {
 #ifdef USE_PROCFS
-#ifdef HAVE_MP_PROCFS
+# ifdef HAVE_MP_PROCFS
 	int fd = tcp->pfd_as;
-#else
+# else
 	int fd = tcp->pfd;
-#endif
+# endif
 	/* Some systems (e.g. FreeBSD) can be upset if we read off the
 	   end of valid memory,  avoid this by trying to read up
 	   to page boundaries.  But we don't know what a page is (and
@@ -907,8 +910,9 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		addr += move;
 		move = page;
 	}
+	return 0;
 #else /* !USE_PROCFS */
-	int started = 0;
+	int started;
 	int pid = tcp->pid;
 	int i, n, m;
 	union {
@@ -921,6 +925,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
 #endif
 
+	started = 0;
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
@@ -933,7 +938,8 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 			return -1;
 		}
 		started = 1;
-		memcpy(laddr, &u.x[n], m = MIN(sizeof(long)-n, len));
+		m = MIN(sizeof(long) - n, len);
+		memcpy(laddr, &u.x[n], m);
 		while (n & (sizeof(long) - 1))
 			if (u.x[n++] == '\0')
 				return 1;
@@ -952,11 +958,11 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 			return -1;
 		}
 		started = 1;
-		memcpy(laddr, u.x, m = MIN(sizeof(long), len));
+		m = MIN(sizeof(long), len);
+		memcpy(laddr, u.x, m);
 		for (i = 0; i < sizeof(long); i++)
 			if (u.x[i] == '\0')
 				return 1;
-
 		addr += sizeof(long), laddr += m, len -= m;
 	}
 #endif /* !USE_PROCFS */
@@ -1000,7 +1006,8 @@ uload(int cmd, int pid, long addr, int len, char *laddr)
 			perror("uload: POKE");
 			return -1;
 		}
-		memcpy(&u.x[n], laddr, m = MIN(sizeof(long) - n, len));
+		m = MIN(sizeof(long) - n, len);
+		memcpy(&u.x[n], laddr, m);
 		if (ptrace(poke, pid, (char *)addr, u.val) < 0) {
 			perror("uload: POKE");
 			return -1;
@@ -1010,7 +1017,8 @@ uload(int cmd, int pid, long addr, int len, char *laddr)
 	while (len) {
 		if (len < sizeof(long))
 			u.val = ptrace(peek, pid, (char *) addr, 0);
-		memcpy(u.x, laddr, m = MIN(sizeof(long), len));
+		m = MIN(sizeof(long), len);
+		memcpy(u.x, laddr, m);
 		if (ptrace(poke, pid, (char *) addr, u.val) < 0) {
 			perror("uload: POKE");
 			return -1;
