@@ -86,7 +86,8 @@ unsigned int ptrace_setoptions = 0;
 static unsigned int syscall_trap_sig = SIGTRAP;
 int dtime = 0, xflag = 0, qflag = 0;
 cflag_t cflag = CFLAG_NONE;
-static int iflag = 0, interactive = 0, pflag_seen = 0, rflag = 0, tflag = 0;
+static int iflag = 0, pflag_seen = 0, rflag = 0, tflag = 0;
+static int interactive = 1;
 /*
  * daemonized_tracer supports -D option.
  * With this option, strace forks twice.
@@ -989,7 +990,6 @@ main(int argc, char *argv[])
 		tcbtab[c] = tcp++;
 
 	outf = stderr;
-	interactive = 1;
 	set_sortby(DEFAULT_SORTBY);
 	set_personality(DEFAULT_PERSONALITY);
 	qualify("trace=all");
