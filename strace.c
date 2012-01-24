@@ -1119,6 +1119,8 @@ main(int argc, char *argv[])
 			break;
 		}
 	}
+	argv += optind;
+	/* argc -= optind; - no need, argc is not used below */
 
 	acolumn_spaces = malloc(acolumn + 1);
 	if (!acolumn_spaces)
@@ -1126,7 +1128,8 @@ main(int argc, char *argv[])
 	memset(acolumn_spaces, ' ', acolumn);
 	acolumn_spaces[acolumn] = '\0';
 
-	if ((optind == argc) == !pflag_seen)
+	/* Must have PROG [ARGS], or -p PID. Not both. */
+	if (!argv[0] == !pflag_seen)
 		usage(stderr, 1);
 
 	if (pflag_seen && daemonized_tracer) {
@@ -1187,25 +1190,25 @@ main(int argc, char *argv[])
 			die_out_of_memory();
 		setvbuf(outf, buf, _IOLBF, BUFSIZ);
 	}
-	if (outfname && optind < argc) {
+	if (outfname && argv[0]) {
 		interactive = 0;
 		qflag = 1;
 	}
 
 	/* Valid states here:
-	   optind < argc	pflag_seen	outfname	interactive
-	   1			0		0		1
-	   0			1		0		1
-	   1			0		1		0
-	   0			1		1		1
+	   argv[0]	pflag_seen	outfname	interactive
+	   yes		0		0		1
+	   no		1		0		1
+	   yes		0		1		0
+	   no		1		1		1
 	 */
 
 	/* STARTUP_CHILD must be called before the signal handlers get
 	   installed below as they are inherited into the spawned process.
 	   Also we do not need to be protected by them as during interruption
 	   in the STARTUP_CHILD mode we kill the spawned process anyway.  */
-	if (!pflag_seen)
-		startup_child(&argv[optind]);
+	if (argv[0])
+		startup_child(argv);
 
 	sigemptyset(&empty_set);
 	sigemptyset(&blocked_set);
@@ -1214,6 +1217,10 @@ main(int argc, char *argv[])
 	sa.sa_flags = 0;
 	sigaction(SIGTTOU, &sa, NULL);
 	sigaction(SIGTTIN, &sa, NULL);
+	/* In interactive mode (if no -o OUTFILE, or -p PID is used),
+	 * fatal signals are blocked across syscall waits, and acted on
+	 * in between. In non-interactive mode, signals are ignored.
+	 */
 	if (interactive) {
 		sigaddset(&blocked_set, SIGHUP);
 		sigaddset(&blocked_set, SIGINT);
