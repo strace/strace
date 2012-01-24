@@ -1182,7 +1182,9 @@ main(int argc, char *argv[])
 	}
 
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
-		static char buf[BUFSIZ];
+		char *buf = malloc(BUFSIZ);
+		if (!buf)
+			die_out_of_memory();
 		setvbuf(outf, buf, _IOLBF, BUFSIZ);
 	}
 	if (outfname && optind < argc) {
