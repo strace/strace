@@ -232,7 +232,7 @@ static void verror_msg(int err_no, const char *fmt, va_list p)
 	 * Thus we use vasprintf + single fprintf.
 	 */
 	msg = NULL;
-	if (vasprintf(&msg, fmt, p) >= 0 && msg) {
+	if (vasprintf(&msg, fmt, p) >= 0) {
 		if (err_no)
 			fprintf(stderr, "%s: %s: %s\n", progname, msg, strerror(err_no));
 		else
