@@ -1607,7 +1607,7 @@ proc_open(struct tcb *tcp, int attaching)
 
 #endif /* USE_PROCFS */
 
-struct tcb *
+static struct tcb *
 pid2tcb(int pid)
 {
 	int i;
