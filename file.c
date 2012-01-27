@@ -2048,7 +2048,14 @@ decode_readlink(struct tcb *tcp, int offset)
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[offset + 1]);
 		else
-			printpathn(tcp, tcp->u_arg[offset + 1], tcp->u_rval);
+			/* Used to use printpathn(), but readlink
+			 * neither includes NUL in the returned count,
+			 * nor actually writes it into memory.
+			 * printpathn() would decide on printing
+			 * "..." continuation based on garbage
+			 * past return buffer's end.
+			 */
+			printstr(tcp, tcp->u_arg[offset + 1], tcp->u_rval);
 		tprintf(", %lu", tcp->u_arg[offset + 2]);
 	}
 	return 0;
