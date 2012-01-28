@@ -716,8 +716,6 @@ int
 is_restart_error(struct tcb *tcp)
 {
 #ifdef LINUX
-	if (!syserror(tcp))
-		return 0;
 	switch (tcp->u_error) {
 		case ERESTARTSYS:
 		case ERESTARTNOINTR:

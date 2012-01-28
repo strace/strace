@@ -271,7 +271,7 @@ sys_nanosleep(struct tcb *tcp)
 		print_timespec(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (!tcp->u_arg[1] || is_restart_error(tcp))
+		if (!tcp->u_arg[1] || !is_restart_error(tcp))
 			print_timespec(tcp, tcp->u_arg[1]);
 		else
 			tprintf("%#lx", tcp->u_arg[1]);
