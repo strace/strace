@@ -769,6 +769,39 @@ dumpstr(struct tcb *tcp, long addr, int len)
 	}
 }
 
+
+/* Need to do this since process_vm_readv() is not yet available in libc.
+ * When libc is be updated, only "static bool process_vm_readv_not_supported"
+ * line should remain.
+ */
+#if !defined(__NR_process_vm_readv)
+# if defined(I386)
+#  define __NR_process_vm_readv  347
+# elif defined(X86_64)
+#  define __NR_process_vm_readv  310
+# elif defined(POWERPC)
+#  define __NR_process_vm_readv  351
+# endif
+#endif
+
+#if defined(__NR_process_vm_readv)
+static bool process_vm_readv_not_supported = 0;
+static ssize_t process_vm_readv(pid_t pid,
+		 const struct iovec *lvec,
+		 unsigned long liovcnt,
+		 const struct iovec *rvec,
+		 unsigned long riovcnt,
+		 unsigned long flags)
+{
+	return syscall(__NR_process_vm_readv, (long)pid, lvec, liovcnt, rvec, riovcnt, flags);
+}
+#else
+static bool process_vm_readv_not_supported = 1;
+# define process_vm_readv(...) (errno = ENOSYS, -1)
+#endif
+/* end of hack */
+
+
 #define PAGMASK	(~(PAGSIZ - 1))
 /*
  * move `len' bytes of data from process `pid'
@@ -785,6 +818,29 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		long val;
 		char x[sizeof(long)];
 	} u;
+
+	if (!process_vm_readv_not_supported) {
+		struct iovec local[1], remote[1];
+		int r;
+
+		local[0].iov_base = laddr;
+		remote[0].iov_base = (void*)addr;
+		local[0].iov_len = remote[0].iov_len = len;
+		r = process_vm_readv(pid,
+				local, 1,
+				remote, 1,
+				/*flags:*/ 0
+		);
+		if (r < 0) {
+			if (errno == ENOSYS)
+				process_vm_readv_not_supported = 1;
+			else /* strange... */
+				perror("process_vm_readv");
+			goto vm_readv_didnt_work;
+		}
+		return r;
+	}
+ vm_readv_didnt_work:
 
 #if SUPPORTED_PERSONALITIES > 1
 	if (personality_wordsize[current_personality] < sizeof(addr))
@@ -924,6 +980,54 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 	if (personality_wordsize[current_personality] < sizeof(addr))
 		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
 #endif
+
+	if (!process_vm_readv_not_supported) {
+		struct iovec local[1], remote[1];
+
+		local[0].iov_base = laddr;
+		remote[0].iov_base = (void*)addr;
+
+		while (len > 0) {
+			int end_in_page;
+			int r;
+			int chunk_len;
+
+			/* Don't read kilobytes: most strings are short */
+			chunk_len = len;
+			if (chunk_len > 256)
+				chunk_len = 256;
+			/* Don't cross pages. I guess otherwise we can get EFAULT
+			 * and fail to notice that terminating NUL lies
+			 * in the existing (first) page.
+			 * (I hope there aren't arches with pages < 4K)
+			 */
+			end_in_page = ((addr + chunk_len) & 4095);
+			r = chunk_len - end_in_page;
+			if (r > 0) /* if chunk_len > end_in_page */
+				chunk_len = r; /* chunk_len -= end_in_page */
+
+			local[0].iov_len = remote[0].iov_len = chunk_len;
+			r = process_vm_readv(pid,
+					local, 1,
+					remote, 1,
+					/*flags:*/ 0
+			);
+			if (r < 0) {
+				if (errno == ENOSYS)
+					process_vm_readv_not_supported = 1;
+				else /* strange... */
+					perror("process_vm_readv");
+				goto vm_readv_didnt_work;
+			}
+			if (memchr(local[0].iov_base, '\0', r))
+				return 1;
+			local[0].iov_base += r;
+			remote[0].iov_base += r;
+			len -= r;
+		}
+		return 0;
+	}
+ vm_readv_didnt_work:
 
 	started = 0;
 	if (addr & (sizeof(long) - 1)) {

@@ -308,3 +308,5 @@
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 307 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 308 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 309 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 310 */
+	{ 6,	0,	printargs,		"process_vm_writev"	}, /* 311 */

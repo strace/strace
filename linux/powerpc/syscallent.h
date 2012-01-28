@@ -379,8 +379,8 @@
 	{ 1,	TD,	sys_syncfs,		"syncfs"		}, /* 348 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"		}, /* 349 */
 	{ 2,	TD,	sys_setns,		"setns"			}, /* 350 */
-	{ 5,	0,	printargs,		"SYS_351"		}, /* 351 */
-	{ 5,	0,	printargs,		"SYS_352"		}, /* 352 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 351 */
+	{ 6,	0,	printargs,		"process_vm_writev"	}, /* 352 */
 	{ 5,	0,	printargs,		"SYS_353"		}, /* 353 */
 	{ 5,	0,	printargs,		"SYS_354"		}, /* 354 */
 	{ 5,	0,	printargs,		"SYS_355"		}, /* 355 */

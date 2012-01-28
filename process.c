@@ -3456,4 +3456,30 @@ sys_getcpu(struct tcb *tcp)
 	return 0;
 }
 
+int
+sys_process_vm_readv(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		/* arg 1: pid */
+		tprintf("%ld, ", tcp->u_arg[0]);
+	} else {
+		/* args 2,3: local iov,cnt */
+		if (syserror(tcp)) {
+			tprintf("%#lx, %lu",
+					tcp->u_arg[1], tcp->u_arg[2]);
+		} else {
+			tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
+		}
+		tprints(", ");
+		/* args 4,5: remote iov,cnt */
+		if (syserror(tcp)) {
+			tprintf("%#lx, %lu", tcp->u_arg[3], tcp->u_arg[4]);
+		} else {
+			tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3], 0);
+		}
+		/* arg 6: flags */
+		tprintf(", %lu", tcp->u_arg[5]);
+	}
+	return 0;
+}
 #endif /* LINUX */
