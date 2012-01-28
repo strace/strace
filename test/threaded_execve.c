@@ -11,7 +11,6 @@
  * # Should not be confused by traced execve-ing thread
  * # replacing traced leader:
  * [LEADER_EXIT=1] strace -oLOG -f ./threaded_execve
- * ^^^ so far slightly bad output with LEADER_EXIT=1
  *
  * # Same, but different output mode. Output after execve
  * # should go into leader's LOG.<pid> file, not into execve'ed
@@ -24,7 +23,7 @@
  * ^^^^^^^^^^^^^^^^^^^^^
  * In Linux 3.2, non-traced execve-ing thread does not
  * become traced after execve, even though it has pid == leader's pid
- * after execve.
+ * after execve. And yet, strace's waitpid doesn't return ECHILD.
  *
  * # Run for NUM seconds, not just one second.
  * # Watch top to check for memory leaks in strace:

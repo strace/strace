@@ -125,6 +125,7 @@ static int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
 static char *outfname = NULL;
 static FILE *outf;
+struct tcb *printing_tcp = NULL;
 static int curcol;
 static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
@@ -1844,10 +1845,10 @@ cleanup(void)
 		if (debug)
 			fprintf(stderr,
 				"cleanup: looking at pid %u\n", tcp->pid);
-		if (tcp_last &&
-		    (!outfname || followfork < 2 || tcp_last == tcp)) {
-			tprints(" <unfinished ...>");
-			printtrailer();
+		if (printing_tcp &&
+		    (!outfname || followfork < 2 || printing_tcp == tcp)) {
+			tprints(" <unfinished ...>\n");
+			printing_tcp = NULL;
 		}
 		if (tcp->flags & TCB_ATTACHED)
 			detach(tcp);
@@ -2292,15 +2293,16 @@ trace(void)
 			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[what] & QUAL_SIGNAL)) {
 				printleader(tcp);
-				tprintf("--- %s (%s) ---",
+				tprintf("--- %s (%s) ---\n",
 					signame(what), strsignal(what));
-				printtrailer();
+				printing_tcp = NULL;
 #ifdef PR_INFO
 				if (tcp->status.PR_INFO.si_signo == what) {
 					printleader(tcp);
 					tprints("    siginfo=");
 					printsiginfo(&tcp->status.PR_INFO, 1);
-					printtrailer();
+					tprints("\n");
+					printing_tcp = NULL;
 				}
 #endif
 			}
@@ -2309,8 +2311,8 @@ trace(void)
 			if (cflag != CFLAGS_ONLY_STATS
 			    && (qual_flags[what] & QUAL_FAULT)) {
 				printleader(tcp);
-				tprintf("=== FAULT %d ===", what);
-				printtrailer();
+				tprintf("=== FAULT %d ===\n", what);
+				printing_tcp = NULL;
 			}
 			break;
 #ifdef FREEBSD
@@ -2483,15 +2485,11 @@ trace()
 					outf = tcp->outf;
 					curcol = tcp->curcol;
 					if (!cflag) {
-						if ((tcp->flags & (TCB_INSYSCALL|TCB_REPRINT)) == TCB_INSYSCALL) {
-							/* We printed "syscall(some params"
-							 * but didn't print "\n" yet.
-							 */
+						if (printing_tcp)
 							tprints(" <unfinished ...>\n");
-						}
 						printleader(tcp);
-						tprintf("+++ superseded by execve in pid %lu +++", old_pid);
-						printtrailer();
+						tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
+						printing_tcp = NULL;
 						fflush(outf);
 					}
 					if (execve_thread) {
@@ -2555,14 +2553,14 @@ trace()
 			    && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)) {
 				printleader(tcp);
 #ifdef WCOREDUMP
-				tprintf("+++ killed by %s %s+++",
+				tprintf("+++ killed by %s %s+++\n",
 					signame(WTERMSIG(status)),
 					WCOREDUMP(status) ? "(core dumped) " : "");
 #else
-				tprintf("+++ killed by %s +++",
+				tprintf("+++ killed by %s +++\n",
 					signame(WTERMSIG(status)));
 #endif
-				printtrailer();
+				printing_tcp = NULL;
 			}
 			fflush(tcp->outf);
 			droptcb(tcp);
@@ -2571,16 +2569,14 @@ trace()
 		if (WIFEXITED(status)) {
 			if (pid == strace_child)
 				exit_code = WEXITSTATUS(status);
-			if (tcp == tcp_last) {
-				if ((tcp->flags & (TCB_INSYSCALL|TCB_REPRINT)) == TCB_INSYSCALL)
-					tprintf(" <unfinished ... exit status %d>\n",
-						WEXITSTATUS(status));
-				tcp_last = NULL;
+			if (tcp == printing_tcp) {
+				tprints(" <unfinished ...>\n");
+				printing_tcp = NULL;
 			}
 			if (!cflag /* && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL) */ ) {
 				printleader(tcp);
-				tprintf("+++ exited with %d +++", WEXITSTATUS(status));
-				printtrailer();
+				tprintf("+++ exited with %d +++\n", WEXITSTATUS(status));
+				printing_tcp = NULL;
 			}
 			fflush(tcp->outf);
 			droptcb(tcp);
@@ -2666,15 +2662,15 @@ trace()
 				if (ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) == 0) {
 					tprints("--- ");
 					printsiginfo(&si, verbose(tcp));
-					tprintf(" (%s)" PC_FORMAT_STR " ---",
+					tprintf(" (%s)" PC_FORMAT_STR " ---\n",
 						strsignal(sig)
 						PC_FORMAT_ARG);
 				} else
-					tprintf("--- %s by %s" PC_FORMAT_STR " ---",
+					tprintf("--- %s by %s" PC_FORMAT_STR " ---\n",
 						strsignal(sig),
 						signame(sig)
 						PC_FORMAT_ARG);
-				printtrailer();
+				printing_tcp = NULL;
 				fflush(tcp->outf);
 			}
 			goto restart_tracee;
@@ -2695,13 +2691,13 @@ trace()
 			 * all processes in thread group.
 			 */
 			if (tcp->flags & TCB_ATTACHED) {
-				if (tcp_last) {
+				if (printing_tcp) {
 					/* Do we have dangling line "syscall(param, param"?
 					 * Finish the line then.
 					 */
-					tcp_last->flags |= TCB_REPRINT;
-					tprints(" <unfinished ...>");
-					printtrailer();
+					printing_tcp->flags |= TCB_REPRINT;
+					tprints(" <unfinished ...>\n");
+					printing_tcp = NULL;
 					fflush(tcp->outf);
 				}
 				/* We assume that ptrace error was caused by process death.
@@ -2768,19 +2764,21 @@ tprints(const char *str)
 void
 printleader(struct tcb *tcp)
 {
-	if (tcp_last) {
-		if (tcp_last->ptrace_errno) {
-			if (tcp_last->flags & TCB_INSYSCALL) {
+	if (printing_tcp) {
+		if (printing_tcp->ptrace_errno) {
+			if (printing_tcp->flags & TCB_INSYSCALL) {
 				tprints(" <unavailable>) ");
 				tabto();
 			}
 			tprints("= ? <unavailable>\n");
-			tcp_last->ptrace_errno = 0;
-		} else if (!outfname || followfork < 2 || tcp_last == tcp) {
-			tcp_last->flags |= TCB_REPRINT;
+			printing_tcp->ptrace_errno = 0;
+		} else if (!outfname || followfork < 2 || printing_tcp == tcp) {
+			printing_tcp->flags |= TCB_REPRINT;
 			tprints(" <unfinished ...>\n");
 		}
 	}
+
+	printing_tcp = tcp;
 	curcol = 0;
 	if ((followfork == 1 || pflag_seen > 1) && outfname)
 		tprintf("%-5d ", tcp->pid);
@@ -2822,13 +2820,6 @@ tabto(void)
 {
 	if (curcol < acolumn)
 		tprints(acolumn_spaces + curcol);
-}
-
-void
-printtrailer(void)
-{
-	tprints("\n");
-	tcp_last = NULL;
 }
 
 #ifdef HAVE_MP_PROCFS

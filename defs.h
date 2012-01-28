@@ -584,7 +584,12 @@ extern unsigned int ptrace_setoptions;
 extern int dtime, xflag, qflag;
 extern cflag_t cflag;
 extern int max_strlen;
-extern struct tcb *tcp_last;
+/*
+ * Which tcb has incomplete line being printed right now?
+ * NULL if last line has been completed ('\n'-terminated).
+ * printleader(tcp) sets it. Clearing is open-coded.
+ */
+extern struct tcb *printing_tcp;
 
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
@@ -658,7 +663,6 @@ extern const char *signame(int);
 extern void print_sigset(struct tcb *, long, int);
 extern void printsignal(int);
 extern void printleader(struct tcb *);
-extern void printtrailer(void);
 extern void tabto(void);
 extern void call_summary(FILE *);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);

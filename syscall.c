@@ -731,8 +731,6 @@ is_restart_error(struct tcb *tcp)
 	return 0;
 }
 
-struct tcb *tcp_last = NULL;
-
 #ifdef LINUX
 # if defined(I386)
 struct pt_regs i386_regs;
@@ -1724,7 +1722,6 @@ trace_syscall_entering(struct tcb *tcp)
 	if (res != 1) {
 		printleader(tcp);
 		tcp->flags &= ~TCB_REPRINT;
-		tcp_last = tcp;
 		if (scno_good != 1)
 			tprintf("????" /* anti-trigraph gap */ "(");
 		else if (!SCNO_IN_RANGE(tcp->scno))
@@ -1844,7 +1841,6 @@ trace_syscall_entering(struct tcb *tcp)
 
 	printleader(tcp);
 	tcp->flags &= ~TCB_REPRINT;
-	tcp_last = tcp;
 	if (!SCNO_IN_RANGE(tcp->scno))
 		tprintf("syscall_%lu(", tcp->scno);
 	else
@@ -2382,8 +2378,8 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (res != 1) {
 		tprints(") ");
 		tabto();
-		tprints("= ? <unavailable>");
-		printtrailer();
+		tprints("= ? <unavailable>\n");
+		printing_tcp = NULL;
 		tcp->flags &= ~TCB_INSYSCALL;
 		return res;
 	}
@@ -2530,7 +2526,8 @@ trace_syscall_exiting(struct tcb *tcp)
 		tprintf(" <%ld.%06ld>",
 			(long) tv.tv_sec, (long) tv.tv_usec);
 	}
-	printtrailer();
+	tprints("\n");
+	printing_tcp = NULL;
 
 	dumpio(tcp);
 	if (fflush(tcp->outf) == EOF)
