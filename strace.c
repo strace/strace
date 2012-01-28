@@ -45,6 +45,7 @@
 #include <grp.h>
 #include <string.h>
 #include <dirent.h>
+#include <sys/utsname.h>
 
 #ifdef LINUX
 # include <asm/unistd.h>
@@ -128,6 +129,8 @@ static int curcol;
 static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
 static const char *progname;
+
+static char *os_release; /* from uname() */
 
 static int detach(struct tcb *tcp);
 static int trace(void);
@@ -965,6 +968,18 @@ test_ptrace_setoptions_for_all(void)
 }
 #endif
 
+/* Noinline: don't want main to have struct utsname permanently on stack */
+static void __attribute__ ((noinline))
+get_os_release(void)
+{
+	struct utsname u;
+	if (uname(&u) < 0)
+		perror_msg_and_die("uname");
+	os_release = strdup(u.release);
+	if (!os_release)
+		die_out_of_memory();
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -976,6 +991,8 @@ main(int argc, char *argv[])
 	progname = argv[0] ? argv[0] : "strace";
 
 	strace_tracer_pid = getpid();
+
+	get_os_release();
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
@@ -2324,10 +2341,6 @@ trace(void)
 static int
 trace()
 {
-	int pid;
-	int wait_errno;
-	int status, sig;
-	struct tcb *tcp;
 #ifdef LINUX
 	struct rusage ru;
 	struct rusage *rup = cflag ? &ru : NULL;
@@ -2337,6 +2350,12 @@ trace()
 #endif /* LINUX */
 
 	while (nprocs != 0) {
+		int pid;
+		int wait_errno;
+		int status, sig;
+		struct tcb *tcp;
+		unsigned event;
+
 		if (interrupted)
 			return 0;
 		if (interactive)
@@ -2390,11 +2409,12 @@ trace()
 				popen_pid = 0;
 			continue;
 		}
+
+		event = ((unsigned)status >> 16);
 		if (debug) {
 			char buf[sizeof("WIFEXITED,exitcode=%u") + sizeof(int)*3 /*paranoia:*/ + 16];
 #ifdef LINUX
-			unsigned ev = (unsigned)status >> 16;
-			if (ev) {
+			if (event != 0) {
 				static const char *const event_names[] = {
 					[PTRACE_EVENT_CLONE] = "CLONE",
 					[PTRACE_EVENT_FORK]  = "FORK",
@@ -2404,10 +2424,10 @@ trace()
 					[PTRACE_EVENT_EXIT]  = "EXIT",
 				};
 				const char *e;
-				if (ev < ARRAY_SIZE(event_names))
-					e = event_names[ev];
+				if (event < ARRAY_SIZE(event_names))
+					e = event_names[event];
 				else {
-					sprintf(buf, "?? (%u)", ev);
+					sprintf(buf, "?? (%u)", event);
 					e = buf;
 				}
 				fprintf(stderr, " PTRACE_EVENT_%s", e);
@@ -2434,8 +2454,62 @@ trace()
 			fprintf(stderr, " [wait(0x%04x) = %u] %s\n", status, pid, buf);
 		}
 
-		/* Look up `pid' in our table. */
+		/* Look up 'pid' in our table. */
 		tcp = pid2tcb(pid);
+
+#ifdef LINUX
+		/* Under Linux, execve changes pid to thread leader's pid,
+		 * and we see this changed pid on EVENT_EXEC and later,
+		 * execve sysexit. Leader "disappears" without exit
+		 * notification. Let user know that, drop leader's tcb,
+		 * and fix up pid in execve thread's tcb.
+		 * Effectively, execve thread's tcb replaces leader's tcb.
+		 *
+		 * BTW, leader is 'stuck undead' (doesn't report WIFEXITED
+		 * on exit syscall) in multithreaded programs exactly
+		 * in order to handle this case.
+		 *
+		 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
+		 * On 2.6 and earlier, it can return garbage.
+		 */
+		if (event == PTRACE_EVENT_EXEC && os_release[0] >= '3') {
+			long old_pid = 0;
+			if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, (long) &old_pid) >= 0
+			 && old_pid > 0
+			 && old_pid != pid
+			) {
+				struct tcb *execve_thread = pid2tcb(old_pid);
+				if (tcp) {
+					outf = tcp->outf;
+					curcol = tcp->curcol;
+					if (!cflag) {
+						if ((tcp->flags & (TCB_INSYSCALL|TCB_REPRINT)) == TCB_INSYSCALL) {
+							/* We printed "syscall(some params"
+							 * but didn't print "\n" yet.
+							 */
+							tprints(" <unfinished ...>\n");
+						}
+						printleader(tcp);
+						tprintf("+++ superseded by execve in pid %lu +++", old_pid);
+						printtrailer();
+						fflush(outf);
+					}
+					if (execve_thread) {
+						/* swap output FILEs (needed for -ff) */
+						tcp->outf = execve_thread->outf;
+						execve_thread->outf = outf;
+					}
+					droptcb(tcp);
+				}
+				tcp = execve_thread;
+				if (tcp) {
+					tcp->pid = pid;
+					tcp->flags |= TCB_REPRINT;
+				}
+			}
+		}
+#endif
+
 		if (tcp == NULL) {
 #ifdef LINUX
 			if (followfork) {
@@ -2549,7 +2623,7 @@ trace()
 #endif
 		}
 
-		if (((unsigned)status >> 16) != 0) {
+		if (event != 0) {
 			/* Ptrace event (we ignore all of them for now) */
 			goto restart_tracee_with_sig_0;
 		}
