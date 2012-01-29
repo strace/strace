@@ -319,64 +319,57 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 	 * and sig 0 doesn't exist either.
 	 * Therefore max possible no of sigs is 255: 1..255
 	 */
-	static char outstr[8 * 255];
+	static char outstr[8 * (255 * 2 / 3)];
 
 	int i, nsigs;
 	int maxsigs;
-	const char *format;
+	int show_members;
+	char sep;
 	char *s;
 
-	strcpy(outstr, str);
-	s = outstr + strlen(outstr);
-	nsigs = 0;
 	maxsigs = nsignals;
 #ifdef __SIGRTMAX
 	if (rt)
 		maxsigs = __SIGRTMAX; /* instead */
 #endif
+	s = stpcpy(outstr, str);
+	nsigs = 0;
 	for (i = 1; i < maxsigs; i++) {
 		if (sigismember(mask, i) == 1)
 			nsigs++;
 	}
-	if (nsigs >= nsignals * 2 / 3) {
+
+	/* 1: show mask members, 0: show those which are NOT in mask */
+	show_members = (nsigs < nsignals * 2 / 3);
+	if (!show_members)
 		*s++ = '~';
-		for (i = 1; i < maxsigs; i++) {
-			switch (sigismember(mask, i)) {
-			case 1:
-				sigdelset(mask, i);
-				break;
-			case 0:
-				sigaddset(mask, i);
-				break;
-			}
-		}
-	}
-	format = "%s";
-	*s++ = '[';
+
+	sep = '[';
 	for (i = 1; i < maxsigs; i++) {
-		if (sigismember(mask, i) == 1) {
+		if (sigismember(mask, i) == show_members) {
 			/* real-time signals on solaris don't have
 			 * signalent entries
 			 */
+			char tsig[40];
+			*s++ = sep;
 			if (i < nsignals) {
-				sprintf(s, format, signalent[i] + 3);
+				s = stpcpy(s, signalent[i] + 3);
 			}
 #ifdef SIGRTMIN
 			else if (i >= __SIGRTMIN && i <= __SIGRTMAX) {
-				char tsig[40];
 				sprintf(tsig, "RT_%u", i - __SIGRTMIN);
-				sprintf(s, format, tsig);
+				s = stpcpy(s, tsig);
 			}
 #endif /* SIGRTMIN */
 			else {
-				char tsig[32];
 				sprintf(tsig, "%u", i);
-				sprintf(s, format, tsig);
+				s = stpcpy(s, tsig);
 			}
-			s += strlen(s);
-			format = " %s";
+			sep = ' ';
 		}
 	}
+	if (sep == '[')
+		*s++ = sep;
 	*s++ = ']';
 	*s = '\0';
 	return outstr;

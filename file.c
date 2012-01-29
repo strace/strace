@@ -272,7 +272,6 @@ const struct xlat open_mode_flags[] = {
 #ifdef O_CLOEXEC
 	{ O_CLOEXEC,	"O_CLOEXEC"	},
 #endif
-
 #ifdef FNDELAY
 	{ FNDELAY,	"FNDELAY"	},
 #endif
@@ -349,15 +348,17 @@ print_dirfd(struct tcb *tcp, int fd)
 const char *
 sprint_open_modes(mode_t flags)
 {
-	static char outstr[1024];
+	static char outstr[(1 + ARRAY_SIZE(open_mode_flags)) * sizeof("O_LARGEFILE")];
 	char *p;
-	char sep = 0;
+	char sep;
 	const char *str;
 	const struct xlat *x;
 
-	p = stpcpy(outstr, "flags ");
+	sep = ' ';
+	p = stpcpy(outstr, "flags");
 	str = xlookup(open_access_modes, flags & 3);
 	if (str) {
+		*p++ = sep;
 		p = stpcpy(p, str);
 		flags &= ~3;
 		if (!flags)
@@ -367,8 +368,7 @@ sprint_open_modes(mode_t flags)
 
 	for (x = open_mode_flags; x->str; x++) {
 		if ((flags & x->val) == x->val) {
-			if (sep)
-				*p++ = sep;
+			*p++ = sep;
 			p = stpcpy(p, x->str);
 			flags &= ~x->val;
 			if (!flags)
@@ -377,8 +377,7 @@ sprint_open_modes(mode_t flags)
 		}
 	}
 	/* flags is still nonzero */
-	if (sep)
-		*p++ = sep;
+	*p++ = sep;
 	sprintf(p, "%#x", flags);
 	return outstr;
 }

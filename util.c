@@ -325,8 +325,10 @@ sprintflags(const char *prefix, const struct xlat *xlat, int flags)
 			if (found)
 				*outptr++ = '|';
 			outptr = stpcpy(outptr, xlat->str);
-			flags &= ~xlat->val;
 			found = 1;
+			flags &= ~xlat->val;
+			if (!flags)
+				break;
 		}
 	}
 	if (flags) {

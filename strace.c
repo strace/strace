@@ -656,8 +656,9 @@ startup_child(char **argv)
 		int m, n, len;
 
 		for (path = getenv("PATH"); path && *path; path += m) {
-			if (strchr(path, ':')) {
-				n = strchr(path, ':') - path;
+			const char *colon = strchr(path, ':');
+			if (colon) {
+				n = colon - path;
 				m = n + 1;
 			}
 			else
