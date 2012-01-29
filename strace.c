@@ -88,7 +88,20 @@ static unsigned int syscall_trap_sig = SIGTRAP;
 int dtime = 0, xflag = 0, qflag = 0;
 cflag_t cflag = CFLAG_NONE;
 static int iflag = 0, pflag_seen = 0, rflag = 0, tflag = 0;
-static int interactive = 1;
+
+/* -I n */
+enum {
+    INTR_NOT_SET        = 0,
+    INTR_ANYWHERE       = 1, /* don't block/ignore any signals */
+    INTR_WHILE_WAIT     = 2, /* block fatal signals while decoding syscall. default */
+    INTR_NEVER          = 3, /* block fatal signals. default if '-o FILE PROG' */
+    INTR_BLOCK_TSTP_TOO = 4, /* block fatal signals and SIGTSTP (^Z) */
+    NUM_INTR_OPTS
+};
+static int opt_intr;
+/* We play with signal mask only if this mode is active: */
+#define interactive (opt_intr == INTR_WHILE_WAIT)
+
 /*
  * daemonized_tracer supports -D option.
  * With this option, strace forks twice.
@@ -187,16 +200,23 @@ static void
 usage(FILE *ofp, int exitval)
 {
 	fprintf(ofp, "\
-usage: strace [-CdDffhiqrtttTvVxxy] [-a column] [-e expr] ... [-o file]\n\
-              [-p pid] ... [-s strsize] [-u username] [-E var=val] ...\n\
-              [-P path] [command [arg ...]]\n\
-   or: strace -c [-D] [-e expr] ... [-O overhead] [-S sortby] [-E var=val] ...\n\
-              [command [arg ...]]\n\
+usage: strace [-CdDffhiqrtttTvVxxy] [-I n] [-a column] [-e expr]... [-o file]\n\
+              [-p pid]... [-s strsize] [-u username] [-E var=val]...\n\
+              [-P path] [PROG [ARGS]]]\n\
+   or: strace -c [-D] [-I n] [-e expr]... [-O overhead] [-S sortby] [-E var=val]...\n\
+              [PROG [ARGS]]]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
 -C -- like -c but also print regular output while processes are running\n\
+-D -- run tracer process as a detached grandchild, not as parent\n\
 -f -- follow forks, -ff -- with output into separate files\n\
 -F -- attempt to follow vforks, -h -- print help message\n\
 -i -- print instruction pointer at time of syscall\n\
+-I interruptible\n\
+   1: no signals are blocked\n\
+   2: fatal signals are blocked while decoding syscall (default)\n\
+   3: fatal signals are always blocked (default if '-o FILE PROG')\n\
+   4: fatal signals and SIGTSTP (^Z) are always blocked\n\
+      (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 -q -- suppress messages about attaching, detaching, etc.\n\
 -r -- print relative timestamp, -t -- absolute timestamp, -tt -- with usecs\n\
 -T -- print time spent in each syscall, -V -- print version\n\
@@ -209,7 +229,6 @@ usage: strace [-CdDffhiqrtttTvVxxy] [-a column] [-e expr] ... [-o file]\n\
 -o file -- send trace output to FILE instead of stderr\n\
 -O overhead -- set overhead for tracing syscalls to OVERHEAD usecs\n\
 -p pid -- trace process with process id PID, may be repeated\n\
--D -- run tracer process as a detached grandchild, not as parent\n\
 -s strsize -- limit length of print strings to STRSIZE chars (default %d)\n\
 -S sortby -- sort syscall counts by: time, calls, name, nothing (default %s)\n\
 -u username -- run command as username handling setuid and/or setgid\n\
@@ -1119,7 +1138,7 @@ main(int argc, char *argv[])
 #ifndef USE_PROCFS
 		"D"
 #endif
-		"a:e:o:O:p:s:S:u:E:P:")) != EOF) {
+		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
 		switch (c) {
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
@@ -1219,7 +1238,7 @@ main(int argc, char *argv[])
 		case 's':
 			max_strlen = atoi(optarg);
 			if (max_strlen < 0) {
-				error_msg_and_die("Invalid -s argument: '%s'", optarg);
+				error_msg_and_die("Invalid -%c argument: '%s'", c, optarg);
 			}
 			break;
 		case 'S':
@@ -1231,6 +1250,12 @@ main(int argc, char *argv[])
 		case 'E':
 			if (putenv(optarg) < 0)
 				die_out_of_memory();
+			break;
+		case 'I':
+			opt_intr = atoi(optarg);
+			if (opt_intr <= 0 || opt_intr >= NUM_INTR_OPTS) {
+				error_msg_and_die("Invalid -%c argument: '%s'", c, optarg);
+			}
 			break;
 		default:
 			usage(stderr, 1);
@@ -1310,16 +1335,18 @@ main(int argc, char *argv[])
 		setvbuf(outf, buf, _IOLBF, BUFSIZ);
 	}
 	if (outfname && argv[0]) {
-		interactive = 0;
+		if (!opt_intr)
+			opt_intr = INTR_NEVER;
 		qflag = 1;
 	}
+	if (!opt_intr)
+		opt_intr = INTR_WHILE_WAIT;
 
-	/* Valid states here:
-	   argv[0]	pflag_seen	outfname	interactive
-	   yes		0		0		1
-	   no		1		0		1
-	   yes		0		1		0
-	   no		1		1		1
+	/* argv[0]	-pPID	-oFILE	Default interactive setting
+	 * yes		0	0	INTR_WHILE_WAIT
+	 * no		1	0	INTR_WHILE_WAIT
+	 * yes		0	1	INTR_NEVER
+	 * no		1	1	INTR_WHILE_WAIT
 	 */
 
 	/* STARTUP_CHILD must be called before the signal handlers get
@@ -1334,29 +1361,36 @@ main(int argc, char *argv[])
 	sa.sa_handler = SIG_IGN;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	sigaction(SIGTTOU, &sa, NULL);
-	sigaction(SIGTTIN, &sa, NULL);
-	/* In interactive mode (if no -o OUTFILE, or -p PID is used),
-	 * fatal signals are blocked across syscall waits, and acted on
-	 * in between. In non-interactive mode, signals are ignored.
-	 */
-	if (interactive) {
-		sigaddset(&blocked_set, SIGHUP);
-		sigaddset(&blocked_set, SIGINT);
-		sigaddset(&blocked_set, SIGQUIT);
-		sigaddset(&blocked_set, SIGPIPE);
-		sigaddset(&blocked_set, SIGTERM);
-		sa.sa_handler = interrupt;
+	sigaction(SIGTTOU, &sa, NULL); /* SIG_IGN */
+	sigaction(SIGTTIN, &sa, NULL); /* SIG_IGN */
+	if (opt_intr != INTR_ANYWHERE) {
+		if (opt_intr == INTR_BLOCK_TSTP_TOO)
+			sigaction(SIGTSTP, &sa, NULL); /* SIG_IGN */
+		/*
+		 * In interactive mode (if no -o OUTFILE, or -p PID is used),
+		 * fatal signals are blocked while syscall stop is processed,
+		 * and acted on in between, when waiting for new syscall stops.
+		 * In non-interactive mode, signals are ignored.
+		 */
+		if (opt_intr == INTR_WHILE_WAIT) {
+			sigaddset(&blocked_set, SIGHUP);
+			sigaddset(&blocked_set, SIGINT);
+			sigaddset(&blocked_set, SIGQUIT);
+			sigaddset(&blocked_set, SIGPIPE);
+			sigaddset(&blocked_set, SIGTERM);
+			sa.sa_handler = interrupt;
 #ifdef SUNOS4
-		/* POSIX signals on sunos4.1 are a little broken. */
-		sa.sa_flags = SA_INTERRUPT;
-#endif /* SUNOS4 */
+			/* POSIX signals on sunos4.1 are a little broken. */
+			sa.sa_flags = SA_INTERRUPT;
+#endif
+		}
+		/* SIG_IGN, or set handler for these */
+		sigaction(SIGHUP, &sa, NULL);
+		sigaction(SIGINT, &sa, NULL);
+		sigaction(SIGQUIT, &sa, NULL);
+		sigaction(SIGPIPE, &sa, NULL);
+		sigaction(SIGTERM, &sa, NULL);
 	}
-	sigaction(SIGHUP, &sa, NULL);
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
-	sigaction(SIGPIPE, &sa, NULL);
-	sigaction(SIGTERM, &sa, NULL);
 #ifdef USE_PROCFS
 	sa.sa_handler = reaper;
 	sigaction(SIGCHLD, &sa, NULL);
@@ -1375,6 +1409,7 @@ main(int argc, char *argv[])
 
 	if (trace() < 0)
 		exit(1);
+
 	cleanup();
 	fflush(NULL);
 	if (exit_code > 0xff) {
