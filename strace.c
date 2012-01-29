@@ -2729,6 +2729,10 @@ trace(void)
 			/* Ptrace event */
 #ifdef USE_SEIZE
 			if (event == PTRACE_EVENT_STOP || event == PTRACE_EVENT_STOP1) {
+				/*
+				 * PTRACE_INTERRUPT-stop or group-stop.
+				 * PTRACE_INTERRUPT-stop has sig == SIGTRAP here.
+				 */
 				if (sig == SIGSTOP
 				 || sig == SIGTSTP
 				 || sig == SIGTTIN
@@ -2762,7 +2766,9 @@ trace(void)
 			 * (as opposed to "tracee received signal").
 			 */
 			stopped = (ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) < 0);
+#ifdef USE_SEIZE
  show_stopsig:
+#endif
 			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[sig] & QUAL_SIGNAL)) {
 #if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
