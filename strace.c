@@ -103,6 +103,14 @@ static int interactive = 1;
  */
 static bool daemonized_tracer = 0;
 
+#ifdef USE_SEIZE
+static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
+# define use_seize (post_attach_sigstop == 0)
+#else
+# define post_attach_sigstop TCB_IGNORE_ONE_SIGSTOP
+# define use_seize 0
+#endif
+
 /* Sometimes we want to print only succeeding syscalls. */
 int not_failing_only = 0;
 
@@ -314,6 +322,23 @@ foobar()
 # define fork()         vfork()
 #endif
 
+#ifdef USE_SEIZE
+static int
+ptrace_attach_or_seize(int pid)
+{
+	int r;
+	if (!use_seize)
+		return ptrace(PTRACE_ATTACH, pid, 0, 0);
+	r = ptrace(PTRACE_SEIZE, pid, 0, PTRACE_SEIZE_DEVEL);
+	if (r)
+		return r;
+	r = ptrace(PTRACE_INTERRUPT, pid, 0, 0);
+	return r;
+}
+#else
+# define ptrace_attach_or_seize(pid) ptrace(PTRACE_ATTACH, (pid), 0, 0)
+#endif
+
 static void
 set_cloexec_flag(int fd)
 {
@@ -504,7 +529,7 @@ startup_attach(void)
 					if (tid <= 0)
 						continue;
 					++ntid;
-					if (ptrace(PTRACE_ATTACH, tid, (char *) 1, 0) < 0) {
+					if (ptrace_attach_or_seize(tid) < 0) {
 						++nerr;
 						if (debug)
 							fprintf(stderr, "attach to pid %d failed\n", tid);
@@ -515,7 +540,7 @@ startup_attach(void)
 					cur_tcp = tcp;
 					if (tid != tcp->pid)
 						cur_tcp = alloctcb(tid);
-					cur_tcp->flags |= TCB_ATTACHED | TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
+					cur_tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
 				}
 				closedir(dir);
 				if (interactive) {
@@ -547,12 +572,12 @@ startup_attach(void)
 			} /* if (opendir worked) */
 		} /* if (-f) */
 # endif /* LINUX */
-		if (ptrace(PTRACE_ATTACH, tcp->pid, (char *) 1, 0) < 0) {
+		if (ptrace_attach_or_seize(tcp->pid) < 0) {
 			perror("attach: ptrace(PTRACE_ATTACH, ...)");
 			droptcb(tcp);
 			continue;
 		}
-		tcp->flags |= TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
+		tcp->flags |= TCB_STARTUP | post_attach_sigstop;
 		if (debug)
 			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
 
@@ -668,12 +693,10 @@ startup_child(char **argv)
 		kill(pid, SIGSTOP);
 # endif
 #else /* !USE_PROCFS */
-		if (!daemonized_tracer) {
-			if (ptrace(PTRACE_TRACEME, 0, (char *) 1, 0) < 0) {
+		if (!daemonized_tracer && !use_seize) {
+			if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
 				perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
 			}
-			if (debug)
-				kill(pid, SIGSTOP);
 		}
 
 		if (username != NULL) {
@@ -737,9 +760,37 @@ startup_child(char **argv)
 	/* We are the tracer */
 
 	if (!daemonized_tracer) {
+		if (!use_seize) {
+			/* child did PTRACE_TRACEME, nothing to do in parent */
+		} else {
+			if (!strace_vforked) {
+				/* Wait until child stopped itself */
+				int status;
+				while (waitpid(pid, &status, WSTOPPED) < 0) {
+					if (errno == EINTR)
+						continue;
+					perror_msg_and_die("waitpid");
+				}
+				if (!WIFSTOPPED(status) || WSTOPSIG(status) != SIGSTOP) {
+					kill(pid, SIGKILL);
+					perror_msg_and_die("Unexpected wait status %x", status);
+				}
+			}
+			/* Else: vforked case, we have no way to sync.
+			 * Just attach to it as soon as possible.
+			 * This means that we may miss a few first syscalls...
+			 */
+
+			if (ptrace_attach_or_seize(pid)) {
+				kill(pid, SIGKILL);
+				perror_msg_and_die("Can't attach to %d", pid);
+			}
+			if (!strace_vforked)
+				kill(pid, SIGCONT);
+		}
 		tcp = alloctcb(pid);
 		if (!strace_vforked)
-			tcp->flags |= TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
+			tcp->flags |= TCB_STARTUP | post_attach_sigstop;
 		else
 			tcp->flags |= TCB_STARTUP;
 	}
@@ -786,7 +837,7 @@ test_ptrace_setoptions_followfork(void)
 		perror_msg_and_die("fork");
 	if (pid == 0) {
 		pid = getpid();
-		if (ptrace(PTRACE_TRACEME, 0, 0, 0) < 0)
+		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
 			perror_msg_and_die("%s: PTRACE_TRACEME doesn't work",
 					   __func__);
 		kill(pid, SIGSTOP);
@@ -967,6 +1018,56 @@ test_ptrace_setoptions_for_all(void)
 	error_msg("Test for PTRACE_O_TRACESYSGOOD failed, "
 		  "giving up using this feature.");
 }
+
+# ifdef USE_SEIZE
+static void
+test_ptrace_seize(void)
+{
+	int pid;
+
+	pid = fork();
+	if (pid < 0)
+		perror_msg_and_die("fork");
+
+	if (pid == 0) {
+		pause();
+		_exit(0);
+	}
+
+	/* PTRACE_SEIZE, unlike ATTACH, doesn't force tracee to trap.  After
+	 * attaching tracee continues to run unless a trap condition occurs.
+	 * PTRACE_SEIZE doesn't affect signal or group stop state.
+	 */
+	if (ptrace(PTRACE_SEIZE, pid, 0, PTRACE_SEIZE_DEVEL) == 0) {
+		post_attach_sigstop = 0; /* this sets use_seize to 1 */
+	} else if (debug) {
+		fprintf(stderr, "PTRACE_SEIZE doesn't work\n");
+	}
+
+	kill(pid, SIGKILL);
+
+	while (1) {
+		int status, tracee_pid;
+
+		errno = 0;
+		tracee_pid = waitpid(pid, &status, 0);
+		if (tracee_pid <= 0) {
+			if (errno == EINTR)
+				continue;
+			perror_msg_and_die("%s: unexpected wait result %d",
+					 __func__, tracee_pid);
+		}
+		if (WIFSIGNALED(status)) {
+			return;
+		}
+		error_msg_and_die("%s: unexpected wait status %x",
+				__func__, status);
+	}
+}
+# else /* !USE_SEIZE */
+#  define test_ptrace_seize() ((void)0)
+# endif
+
 #endif
 
 /* Noinline: don't want main to have struct utsname permanently on stack */
@@ -1183,6 +1284,7 @@ main(int argc, char *argv[])
 	if (followfork)
 		test_ptrace_setoptions_followfork();
 	test_ptrace_setoptions_for_all();
+	test_ptrace_seize();
 #endif
 
 	/* Check if they want to redirect the output. */
@@ -1736,7 +1838,7 @@ detach(struct tcb *tcp)
 #define PTRACE_DETACH PTRACE_SUNDETACH
 #endif
 	/*
-	 * We did PTRACE_ATTACH but possibly didn't see the expected SIGSTOP.
+	 * We attached but possibly didn't see the expected SIGSTOP.
 	 * We must catch exactly one as otherwise the detached process
 	 * would be left stopped (process state T).
 	 */
@@ -2341,7 +2443,7 @@ trace(void)
 #else /* !USE_PROCFS */
 
 static int
-trace()
+trace(void)
 {
 #ifdef LINUX
 	struct rusage ru;
@@ -2355,6 +2457,7 @@ trace()
 		int pid;
 		int wait_errno;
 		int status, sig;
+		int stopped;
 		struct tcb *tcp;
 		unsigned event;
 
@@ -2521,7 +2624,7 @@ trace()
 				   child so that we know how to do clearbpt
 				   in the child.  */
 				tcp = alloctcb(pid);
-				tcp->flags |= TCB_ATTACHED | TCB_STARTUP | TCB_IGNORE_ONE_SIGSTOP;
+				tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
 				if (!qflag)
 					fprintf(stderr, "Process %d attached\n",
 						pid);
@@ -2619,12 +2722,24 @@ trace()
 #endif
 		}
 
+		sig = WSTOPSIG(status);
+
 		if (event != 0) {
-			/* Ptrace event (we ignore all of them for now) */
+			/* Ptrace event */
+#ifdef USE_SEIZE
+			if (event == PTRACE_EVENT_STOP || event == PTRACE_EVENT_STOP1) {
+				if (sig == SIGSTOP
+				 || sig == SIGTSTP
+				 || sig == SIGTTIN
+				 || sig == SIGTTOU
+				) {
+					stopped = 1;
+					goto show_stopsig;
+				}
+			}
+#endif
 			goto restart_tracee_with_sig_0;
 		}
-
-		sig = WSTOPSIG(status);
 
 		/* Is this post-attach SIGSTOP?
 		 * Interestingly, the process may stop
@@ -2640,9 +2755,15 @@ trace()
 		}
 
 		if (sig != syscall_trap_sig) {
+			siginfo_t si;
+
+			/* Nonzero (true) if tracee is stopped by signal
+			 * (as opposed to "tracee received signal").
+			 */
+			stopped = (ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) < 0);
+ show_stopsig:
 			if (cflag != CFLAG_ONLY_STATS
 			    && (qual_flags[sig] & QUAL_SIGNAL)) {
-				siginfo_t si;
 #if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
 				long pc = 0;
 				long psr = 0;
@@ -2659,7 +2780,7 @@ trace()
 # define PC_FORMAT_ARG	/* nothing */
 #endif
 				printleader(tcp);
-				if (ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) == 0) {
+				if (!stopped) {
 					tprints("--- ");
 					printsiginfo(&si, verbose(tcp));
 					tprintf(" (%s)" PC_FORMAT_STR " ---\n",
@@ -2673,6 +2794,27 @@ trace()
 				printing_tcp = NULL;
 				fflush(tcp->outf);
 			}
+
+			if (!stopped)
+				/* It's signal-delivery-stop. Inject the signal */
+				goto restart_tracee;
+
+			/* It's group-stop */
+#ifdef USE_SEIZE
+			if (use_seize) {
+				/*
+				 * This ends ptrace-stop, but does *not* end group-stop.
+				 * This makes stopping signals work properly on straced process
+				 * (that is, process really stops. It used to continue to run).
+				 */
+				if (ptrace_restart(PTRACE_LISTEN, tcp, 0) < 0) {
+					cleanup();
+					return -1;
+				}
+				continue;
+			}
+			/* We don't have PTRACE_LISTEN support... */
+#endif
 			goto restart_tracee;
 		}
 

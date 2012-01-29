@@ -383,6 +383,24 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 # if !HAVE_DECL_PTRACE_EVENT_EXIT
 #  define PTRACE_EVENT_EXIT	6
 # endif
+
+/* Experimental code using PTRACE_SEIZE can be enabled here: */
+//# define USE_SEIZE 1
+
+# ifdef USE_SEIZE
+#  undef PTRACE_SEIZE
+#  define PTRACE_SEIZE		0x4206
+#  undef PTRACE_INTERRUPT
+#  define PTRACE_INTERRUPT	0x4207
+#  undef PTRACE_LISTEN
+#  define PTRACE_LISTEN		0x4208
+#  undef PTRACE_SEIZE_DEVEL
+#  define PTRACE_SEIZE_DEVEL	0x80000000
+#  undef PTRACE_EVENT_STOP
+#  define PTRACE_EVENT_STOP	7
+#  define PTRACE_EVENT_STOP1	128
+# endif
+
 #endif /* LINUX */
 
 #if !defined __GNUC__

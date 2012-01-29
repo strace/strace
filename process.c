@@ -1992,6 +1992,15 @@ static const struct xlat ptrace_cmds[] = {
 #  ifdef PTRACE_SET_SYSCALL
 	{ PTRACE_SET_SYSCALL,	"PTRACE_SET_SYSCALL"	},
 #  endif
+#  ifdef PTRACE_SEIZE
+	{ PTRACE_SEIZE,		"PTRACE_SEIZE"		},
+#  endif
+#  ifdef PTRACE_INTERRUPT
+	{ PTRACE_INTERRUPT,	"PTRACE_INTERRUPT"	},
+#  endif
+#  ifdef PTRACE_LISTEN
+	{ PTRACE_LISTEN,	"PTRACE_LISTEN"		},
+#  endif
 #  ifdef SUNOS4
 	{ PTRACE_READDATA,	"PTRACE_READDATA"	},
 	{ PTRACE_WRITEDATA,	"PTRACE_WRITEDATA"	},
