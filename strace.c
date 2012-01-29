@@ -1974,7 +1974,12 @@ cleanup(void)
 {
 	int i;
 	struct tcb *tcp;
-	int fatal_sig = interrupted ? interrupted : SIGTERM;
+	int fatal_sig;
+
+	/* 'interrupted' is a volatile object, fetch it only once */
+	fatal_sig = interrupted;
+	if (!fatal_sig)
+		fatal_sig = SIGTERM;
 
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
