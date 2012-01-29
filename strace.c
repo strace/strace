@@ -149,9 +149,9 @@ static sigset_t empty_set, blocked_set;
 
 #ifdef HAVE_SIG_ATOMIC_T
 static volatile sig_atomic_t interrupted;
-#else /* !HAVE_SIG_ATOMIC_T */
+#else
 static volatile int interrupted;
-#endif /* !HAVE_SIG_ATOMIC_T */
+#endif
 
 #ifdef USE_PROCFS
 
@@ -1939,6 +1939,7 @@ cleanup(void)
 {
 	int i;
 	struct tcb *tcp;
+	int fatal_sig = interrupted ? interrupted : SIGTERM;
 
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
@@ -1956,7 +1957,7 @@ cleanup(void)
 			detach(tcp);
 		else {
 			kill(tcp->pid, SIGCONT);
-			kill(tcp->pid, SIGTERM);
+			kill(tcp->pid, fatal_sig);
 		}
 	}
 	if (cflag)
@@ -1966,7 +1967,7 @@ cleanup(void)
 static void
 interrupt(int sig)
 {
-	interrupted = 1;
+	interrupted = sig;
 }
 
 #ifndef HAVE_STRERROR
