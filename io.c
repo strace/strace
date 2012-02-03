@@ -379,7 +379,11 @@ sys_sendfile(struct tcb *tcp)
 		else if (umove(tcp, tcp->u_arg[2], &offset) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
 		else
+#ifdef HAVE_LONG_LONG_OFF_T
+			tprintf("[%llu]", offset);
+#else
 			tprintf("[%lu]", offset);
+#endif
 		tprintf(", %lu", tcp->u_arg[3]);
 	}
 	return 0;
