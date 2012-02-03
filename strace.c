@@ -202,14 +202,14 @@ usage(FILE *ofp, int exitval)
 	fprintf(ofp, "\
 usage: strace [-CdDffhiqrtttTvVxxy] [-I n] [-a column] [-e expr]... [-o file]\n\
               [-p pid]... [-s strsize] [-u username] [-E var=val]...\n\
-              [-P path] [PROG [ARGS]]]\n\
+              [-P path] [PROG [ARGS]]\n\
    or: strace -c [-D] [-I n] [-e expr]... [-O overhead] [-S sortby] [-E var=val]...\n\
-              [PROG [ARGS]]]\n\
+              [PROG [ARGS]]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
 -C -- like -c but also print regular output while processes are running\n\
 -D -- run tracer process as a detached grandchild, not as parent\n\
 -f -- follow forks, -ff -- with output into separate files\n\
--F -- attempt to follow vforks, -h -- print help message\n\
+-F -- attempt to follow vforks\n\
 -i -- print instruction pointer at time of syscall\n\
 -I interruptible\n\
    1: no signals are blocked\n\
@@ -219,10 +219,12 @@ usage: strace [-CdDffhiqrtttTvVxxy] [-I n] [-a column] [-e expr]... [-o file]\n\
       (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 -q -- suppress messages about attaching, detaching, etc.\n\
 -r -- print relative timestamp, -t -- absolute timestamp, -tt -- with usecs\n\
--T -- print time spent in each syscall, -V -- print version\n\
--v -- verbose mode: print unabbreviated argv, stat, termio[s], etc. args\n\
+-T -- print time spent in each syscall\n\
+-v -- verbose mode: print unabbreviated argv, stat, termios, etc. args\n\
 -x -- print non-ascii strings in hex, -xx -- print all strings in hex\n\
 -y -- print paths associated with file descriptor arguments\n\
+-h -- print help message\n\
+-V -- print version\n\
 -a column -- alignment COLUMN for printing syscall results (default %d)\n\
 -e expr -- a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
    options: trace, abbrev, verbose, raw, signal, read, or write\n\
