@@ -49,7 +49,9 @@
 
 #define rlimit64 rlimit			/* Ugly hack */
 #define rlim64_t rlim_t			/* Ugly hack */
+#ifndef RLIM64_INFINITY
 #define RLIM64_INFINITY RLIM_INFINITY	/* You guessed it */
+#endif
 
 #define sys_getrlimit64	sys_getrlimit
 #define sys_setrlimit64	sys_setrlimit
