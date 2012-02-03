@@ -780,7 +780,8 @@ extern unsigned nioctlents;
 extern const char *const *signalent;
 extern unsigned nsignals;
 
-#define SCNO_IN_RANGE(scno) ((unsigned long)(scno) < nsyscalls)
+#define SCNO_IN_RANGE(scno) \
+  ((unsigned long)(scno) < nsyscalls && sysent[scno].sys_func)
 
 #if HAVE_LONG_LONG
 
