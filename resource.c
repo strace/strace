@@ -399,14 +399,15 @@ sys_sysinfo(struct tcb *tcp)
 			tprints("{...}");
 		else {
 			tprintf("{uptime=%lu, loads=[%lu, %lu, %lu] ",
-				si.uptime, si.loads[0], si.loads[1],
-				si.loads[2]);
+				(long) si.uptime, (long) si.loads[0],
+				(long) si.loads[1], (long) si.loads[2]);
 			tprintf("totalram=%lu, freeram=%lu, ",
-				si.totalram, si.freeram);
+				(long) si.totalram, (long) si.freeram);
 			tprintf("sharedram=%lu, bufferram=%lu} ",
-				si.sharedram, si.bufferram);
+				(long) si.sharedram, (long) si.bufferram);
 			tprintf("totalswap=%lu, freeswap=%lu, procs=%hu}",
-				si.totalswap, si.freeswap, si.procs);
+				(long) si.totalswap, (long) si.freeswap,
+				si.procs);
 		}
 	}
 	return 0;

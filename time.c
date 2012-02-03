@@ -580,19 +580,19 @@ tprint_timex(struct tcb *tcp, long addr)
 	tprints("{modes=");
 	printflags(adjtimex_modes, tx.modes, "ADJ_???");
 	tprintf(", offset=%ld, freq=%ld, maxerror=%ld, ",
-		tx.offset, tx.freq, tx.maxerror);
-	tprintf("esterror=%lu, status=", tx.esterror);
+		(long) tx.offset, (long) tx.freq, (long) tx.maxerror);
+	tprintf("esterror=%lu, status=", (long) tx.esterror);
 	printflags(adjtimex_status, tx.status, "STA_???");
 	tprintf(", constant=%ld, precision=%lu, ",
-		tx.constant, tx.precision);
-	tprintf("tolerance=%ld, time=", tx.tolerance);
+		(long) tx.constant, (long) tx.precision);
+	tprintf("tolerance=%ld, time=", (long) tx.tolerance);
 	tprint_timeval(tcp, &tx.time);
 	tprintf(", tick=%ld, ppsfreq=%ld, jitter=%ld",
-		tx.tick, tx.ppsfreq, tx.jitter);
+		(long) tx.tick, (long) tx.ppsfreq, (long) tx.jitter);
 	tprintf(", shift=%d, stabil=%ld, jitcnt=%ld",
-		tx.shift, tx.stabil, tx.jitcnt);
+		tx.shift, (long) tx.stabil, (long) tx.jitcnt);
 	tprintf(", calcnt=%ld, errcnt=%ld, stbcnt=%ld",
-		tx.calcnt, tx.errcnt, tx.stbcnt);
+		(long) tx.calcnt, (long) tx.errcnt, (long) tx.stbcnt);
 #endif
 	tprints("}");
 	return 0;

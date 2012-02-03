@@ -380,8 +380,8 @@ decode_cmd_data(struct tcb *tcp, u_int32_t cmd, unsigned long data)
 			tprintf("ihardlimit=%u, ", dq.dqb_ihardlimit);
 			tprintf("isoftlimit=%u, ", dq.dqb_isoftlimit);
 			tprintf("curinodes=%u, ", dq.dqb_curinodes);
-			tprintf("btime=%lu, ", dq.dqb_btime);
-			tprintf("itime=%lu}", dq.dqb_itime);
+			tprintf("btime=%lu, ", (long) dq.dqb_btime);
+			tprintf("itime=%lu}", (long) dq.dqb_itime);
 			break;
 		}
 		case Q_V2_GETQUOTA:
@@ -403,8 +403,8 @@ decode_cmd_data(struct tcb *tcp, u_int32_t cmd, unsigned long data)
 			tprintf("bhardlimit=%u, ", dq.dqb_bhardlimit);
 			tprintf("bsoftlimit=%u, ", dq.dqb_bsoftlimit);
 			tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
-			tprintf("btime=%lu, ", dq.dqb_btime);
-			tprintf("itime=%lu}", dq.dqb_itime);
+			tprintf("btime=%lu, ", (long) dq.dqb_btime);
+			tprintf("itime=%lu}", (long) dq.dqb_itime);
 			break;
 		}
 		case Q_XGETQUOTA:

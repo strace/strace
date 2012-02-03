@@ -193,7 +193,7 @@ call_summary_pers(FILE *outf)
 				   / tv_float(&tv_cum));
 			fprintf(outf, "%6.2f %11.6f %11ld %9d %9.9s %s\n",
 				percent, tv_float(&counts[j].time),
-				(long) 1000000 * dtv.tv_sec + dtv.tv_usec,
+				(long) (1000000 * dtv.tv_sec + dtv.tv_usec),
 				counts[j].calls,
 				error_str, sysent[j].sys_name);
 		}
