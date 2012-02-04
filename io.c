@@ -37,15 +37,6 @@
 #include <sys/uio.h>
 #endif
 
-#ifdef HAVE_LONG_LONG_OFF_T
-/*
- * Hacks for systems that have a long long off_t
- */
-
-#define sys_pread64	sys_pread
-#define sys_pwrite64	sys_pwrite
-#endif
-
 int
 sys_read(struct tcb *tcp)
 {
@@ -218,6 +209,39 @@ sys_pwrite(struct tcb *tcp)
 	}
 	return 0;
 }
+
+#if _LFS64_LARGEFILE
+int
+sys_pread64(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else
+			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+		tprintf(", %lu, ", tcp->u_arg[2]);
+		printllval(tcp, "%#llx", 3);
+	}
+	return 0;
+}
+
+int
+sys_pwrite64(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		tprintf(", %lu, ", tcp->u_arg[2]);
+		printllval(tcp, "%#llx", 3);
+	}
+	return 0;
+}
+#endif /* _LFS64_LARGEFILE */
+
 #endif /* SVR4 */
 
 #ifdef FREEBSD
@@ -462,38 +486,6 @@ sys_vmsplice(struct tcb *tcp)
 	return 0;
 }
 #endif /* LINUX */
-
-#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
-int
-sys_pread64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%#llx", 3);
-	}
-	return 0;
-}
-
-int
-sys_pwrite64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%#llx", 3);
-	}
-	return 0;
-}
-#endif
 
 int
 sys_ioctl(struct tcb *tcp)

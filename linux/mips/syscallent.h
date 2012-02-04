@@ -5367,7 +5367,7 @@
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 5013 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 5014 */
 	{ 3,	0,	sys_ioctl,		"ioctl"		}, /* 5015 */
-	{ 6,	TF,	sys_pread64,		"pread"		}, /* 5016 */
+	{ 6,	TF,	sys_pread,		"pread"		}, /* 5016 */
 	{ 6,	TF,	sys_pwrite64,		"pwrite"	}, /* 5017 */
 	{ 3,	0,	sys_readv,		"readv"		}, /* 5018 */
 	{ 3,	0,	sys_writev,		"writev"	}, /* 5019 */
@@ -6676,8 +6676,8 @@
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 6013 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 6014 */
 	{ 3,	0,	sys_ioctl,		"ioctl"		}, /* 6015 */
-	{ 6,	TF,	sys_pread64,		"pread"		}, /* 6016 */
-	{ 6,	TF,	sys_pwrite64,		"pwrite"	}, /* 6017 */
+	{ 6,	TD,	sys_pread,		"pread"		}, /* 6016 */
+	{ 6,	TD,	sys_pwrite,		"pwrite"	}, /* 6017 */
 	{ 3,	0,	sys_readv,		"readv"		}, /* 6018 */
 	{ 3,	0,	sys_writev,		"writev"	}, /* 6019 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 6020 */
