@@ -179,6 +179,9 @@ pathtrace_match(struct tcb *tcp)
 	if (selected[0] == NULL)
 		return 1;
 
+	if (!SCNO_IN_RANGE(tcp->scno))
+		return 0;
+
 	s = &sysent[tcp->scno];
 
 	if (!(s->sys_flags & (TRACE_FILE | TRACE_DESC)))
