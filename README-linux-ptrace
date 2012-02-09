@@ -53,7 +53,7 @@ process (all its threads), even if some threads of the process are
 ptraced.
 
 Tracer can kill a tracee with ptrace(PTRACE_KILL, pid, 0, 0). This
-opeartion is deprecated, use kill/tgkill(SIGKILL) instead.
+operation is deprecated, use kill/tgkill(SIGKILL) instead.
 
 ^^^ Oleg prefers to deprecate it instead of describing (and needing to
 support) PTRACE_KILL's quirks.
@@ -165,17 +165,13 @@ Note that sig value may be different from WSTOPSIG(status) value -
 tracer can cause a different signal to be injected.
 
 Note that suppressed signal still causes syscalls to return
-prematurely. Restartable syscalls will be restarted (tracer will
-observe tracee to execute restart_syscall(2) syscall if tracer uses
-PTRACE_SYSCALL), non-restartable syscalls (for example, nanosleep) may
-return with -EINTR even though no observable signal is injected to the
-tracee.
-
-Note that restarting ptrace commands issued in ptrace-stops other than
-signal-delivery-stop are not guaranteed to inject a signal, even if sig
-is nonzero. No error is reported, nonzero sig may simply be ignored.
-Ptrace users should not try to "create new signal" this way: use
-tgkill(2) instead.
+prematurely. Kernel should always restart the syscall in this case:
+tracer would observe a new syscall-enter-stop for the same syscall,
+or, in case of syscalls returning ERESTART_RESTARTBLOCK,
+tracer would observe a syscall-enter-stop for restart_syscall(2)
+syscall. There may still be bugs in this area which cause some syscalls
+to instead return with -EINTR even though no observable signal
+was injected to the tracee.
 
 This is a cause of confusion among ptrace users. One typical scenario
 is that tracer observes group-stop, mistakes it for
