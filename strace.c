@@ -1698,7 +1698,8 @@ proc_open(struct tcb *tcp, int attaching)
 			if (tcp->status.PR_WHY == PR_SYSENTRY) {
 				tcp->flags &= ~TCB_INSYSCALL;
 				get_scno(tcp);
-				if (known_scno(tcp) == SYS_execve)
+				if (SCNO_IN_RANGE(tcp->scno) &&
+				    sysent[tcp->scno].sys_func == sys_execve)
 					break;
 			}
 			/* Set it running: maybe execve will be next. */

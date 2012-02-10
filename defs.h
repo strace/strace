@@ -511,26 +511,6 @@ struct tcb {
 #  define TCB_WAITEXECVE 04000
 # endif
 # include <sys/syscall.h>
-# ifndef __NR_exit_group
-# /* Hack: Most headers around are too old to have __NR_exit_group.  */
-#  ifdef ALPHA
-#   define __NR_exit_group 405
-#  elif defined I386
-#   define __NR_exit_group 252
-#  elif defined X86_64
-#   define __NR_exit_group 231
-#  elif defined IA64
-#   define __NR_exit_group 1236
-#  elif defined POWERPC
-#   define __NR_exit_group 234
-#  elif defined S390 || defined S390X
-#   define __NR_exit_group 248
-#  elif defined SPARC || defined SPARC64
-#   define __NR_exit_group 188
-#  elif defined M68K
-#   define __NR_exit_group 247
-#  endif /* ALPHA et al */
-# endif	/* !__NR_exit_group */
 #endif /* LINUX */
 
 /* qualifier flags */
