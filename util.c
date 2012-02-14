@@ -776,6 +776,11 @@ dumpstr(struct tcb *tcp, long addr, int len)
 }
 
 
+#ifdef HAVE_PROCESS_VM_READV
+/* C library supports this, but the kernel might not. */
+static bool process_vm_readv_not_supported = 0;
+#else
+
 /* Need to do this since process_vm_readv() is not yet available in libc.
  * When libc is be updated, only "static bool process_vm_readv_not_supported"
  * line should remain.
@@ -805,7 +810,8 @@ static ssize_t process_vm_readv(pid_t pid,
 static bool process_vm_readv_not_supported = 1;
 # define process_vm_readv(...) (errno = ENOSYS, -1)
 #endif
-/* end of hack */
+
+#endif /* end of hack */
 
 
 #define PAGMASK	(~(PAGSIZ - 1))

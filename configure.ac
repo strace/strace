@@ -236,6 +236,7 @@ AC_CHECK_FUNCS([ \
 	sys_siglist \
 	_sys_siglist \
 	stpcpy \
+	process_vm_readv \
 ])
 AC_CHECK_HEADERS([ \
 	inttypes.h \
