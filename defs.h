@@ -610,7 +610,6 @@ extern void qualify(const char *);
 #ifdef USE_PROCFS
 extern int get_scno(struct tcb *);
 #endif
-extern long known_scno(struct tcb *);
 extern long do_ptrace(int request, struct tcb *tcp, void *addr, void *data);
 extern int ptrace_restart(int request, struct tcb *tcp, int sig);
 extern int trace_syscall(struct tcb *);
@@ -742,7 +741,6 @@ struct sysent {
 	int	sys_flags;
 	int	(*sys_func)();
 	const char *sys_name;
-	long	native_scno;	/* Match against SYS_* constants.  */
 };
 
 struct ioctlent {

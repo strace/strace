@@ -72,7 +72,6 @@
 # include <asm/rse.h>
 #endif
 
-#define NR_SYSCALL_BASE 0
 #ifdef LINUX
 #ifndef ERESTARTSYS
 #define ERESTARTSYS	512
@@ -97,8 +96,6 @@
 /* Ugh. Is this really correct? ARM has no RT signals?! */
 #undef NSIG
 #define NSIG 32
-#undef NR_SYSCALL_BASE
-#define NR_SYSCALL_BASE __NR_SYSCALL_BASE
 #endif
 #endif /* LINUX */
 
@@ -1226,19 +1223,6 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
-long
-known_scno(struct tcb *tcp)
-{
-	long scno = tcp->scno;
-#if SUPPORTED_PERSONALITIES > 1
-	if (SCNO_IN_RANGE(scno) && sysent[scno].native_scno != 0)
-		scno = sysent[scno].native_scno;
-	else
-#endif
-		scno += NR_SYSCALL_BASE;
-	return scno;
-}
-
 /* Called at each syscall entry.
  * Returns:
  * 0: "ignore this ptrace stop", bail out of trace_syscall() silently.
@@ -1250,7 +1234,7 @@ static int
 syscall_fixup_on_sysenter(struct tcb *tcp)
 {
 #ifdef USE_PROCFS
-	int scno = known_scno(tcp);
+	int scno = tcp->scno;
 
 	if (tcp->status.PR_WHY != PR_SYSENTRY) {
 		if (
@@ -1754,7 +1738,7 @@ trace_syscall_entering(struct tcb *tcp)
 #endif /* SYS_socket_subcall || SYS_ipc_subcall */
 
 #if defined(SVR4) || defined(FREEBSD) || defined(SUNOS4)
-	switch (known_scno(tcp)) {
+	switch (tcp->scno) {
 #ifdef SVR4
 #ifdef SYS_pgrpsys_subcall
 	case SYS_pgrpsys:
@@ -2002,7 +1986,7 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 
 #ifdef SUNOS4
 	{
-		int scno = known_scno(tcp);
+		int scno = tcp->scno;
 		if (scno != 0) {
 			if (debug) {
 				/*

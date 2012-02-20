@@ -475,7 +475,7 @@ internal_fork(struct tcb *tcp)
 
 	if (exiting(tcp)) {
 #ifdef SYS_rfork
-		if (known_scno(tcp) == SYS_rfork && !(tcp->u_arg[0]&RFPROC))
+		if (tcp->scno == SYS_rfork && !(tcp->u_arg[0]&RFPROC))
 			return 0;
 #endif
 		if (getrval2(tcp))
@@ -562,10 +562,10 @@ extern void print_ldt_entry();
 # if defined IA64
 #  define ARG_FLAGS	0
 #  define ARG_STACK	1
-#  define ARG_STACKSIZE	(known_scno(tcp) == SYS_clone2 ? 2 : -1)
-#  define ARG_PTID	(known_scno(tcp) == SYS_clone2 ? 3 : 2)
-#  define ARG_CTID	(known_scno(tcp) == SYS_clone2 ? 4 : 3)
-#  define ARG_TLS	(known_scno(tcp) == SYS_clone2 ? 5 : 4)
+#  define ARG_STACKSIZE	(tcp->scno == SYS_clone2 ? 2 : -1)
+#  define ARG_PTID	(tcp->scno == SYS_clone2 ? 3 : 2)
+#  define ARG_CTID	(tcp->scno == SYS_clone2 ? 4 : 3)
+#  define ARG_TLS	(tcp->scno == SYS_clone2 ? 5 : 4)
 # elif defined S390 || defined S390X || defined CRISV10 || defined CRISV32
 #  define ARG_STACK	0
 #  define ARG_FLAGS	1
@@ -802,7 +802,7 @@ internal_fork(struct tcb *tcp)
 	int dont_follow = 0;
 
 #ifdef SYS_vfork
-	if (known_scno(tcp) == SYS_vfork) {
+	if (tcp->scno == SYS_vfork) {
 		/* Attempt to make vfork into fork, which we can follow. */
 		if (change_syscall(tcp, SYS_fork) < 0)
 			dont_follow = 1;
