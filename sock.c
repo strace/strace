@@ -291,3 +291,9 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 		return 0;
 	}
 }
+
+int
+sys_socketcall(struct tcb *tcp)
+{
+	return printargs(tcp);
+}

@@ -130,7 +130,7 @@
 	{ 2,	TF,	sys_statfs,		"statfs"	}, /* 99 */
 	{ 2,	TD,	sys_fstatfs,		"fstatfs"	}, /* 100 */
 	{ 3,	0,	sys_ioperm,		"ioperm"	}, /* 101 */
-	{ 2,	TD,	sys_socketcall,		"socketcall", SYS_socketcall }, /* 102 */
+	{ 2,	TD,	sys_socketcall,		"socketcall"	}, /* 102 */
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 103 */
 	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 104 */
 	{ 2,	0,	sys_getitimer,		"getitimer"	}, /* 105 */
@@ -145,7 +145,7 @@
 	{ 4,	TP,	sys_wait4,		"wait4",	}, /* 114 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
-	{ 6,	TI,	sys_ipc,		"ipc", SYS_ipc }, /* 117 */
+	{ 6,	TI,	sys_ipc,		"ipc",		}, /* 117 */
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 118 */
 	{ 0,	TS,	sys_sigreturn,		"sigreturn"	}, /* 119 */
 	{ 5,	TP,	sys_clone,		"clone", SYS_clone }, /* 120 */

@@ -80,7 +80,6 @@
 #define sys_statfs		printargs
 #define sys_fstatfs		printargs
 #define sys_ioperm		printargs
-#define sys_socketcall		printargs
 #define sys_setitimer		printargs
 #define sys_getitimer		printargs
 #define sys_stat		printargs
@@ -92,7 +91,6 @@
 #define sys_vm86old		printargs
 #define sys_wait4		printargs
 #define sys_sysinfo		printargs
-#define sys_ipc			printargs
 #define sys_sigreturn		printargs
 #define sys_uname		printargs
 #define sys_modify_ldt		printargs
@@ -184,7 +182,6 @@
 #undef sys_statfs
 #undef sys_fstatfs
 #undef sys_ioperm
-#undef sys_socketcall
 #undef sys_setitimer
 #undef sys_getitimer
 #undef sys_stat
@@ -196,7 +193,6 @@
 #undef sys_vm86old
 #undef sys_wait4
 #undef sys_sysinfo
-#undef sys_ipc
 #undef sys_sigreturn
 #undef sys_uname
 #undef sys_modify_ldt

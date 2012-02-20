@@ -114,10 +114,6 @@
 #define	sys_timer_getoverrun	printargs
 #define	sys_vhangup		printargs
 
-/* subcall entry points */
-#define	sys_socketcall		printargs
-#define	sys_ipc			printargs
-
 /* unimplemented */
 #define	sys_afs_syscall		printargs
 #define	sys_break		printargs

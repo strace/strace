@@ -122,6 +122,7 @@ int sys_io_getevents();
 int sys_io_setup();
 int sys_io_submit();
 int sys_ioctl();
+int sys_ipc();
 int sys_kill();
 int sys_link();
 int sys_linkat();
@@ -259,6 +260,7 @@ int sys_sigreturn();
 int sys_sigsetmask();
 int sys_sigsuspend();
 int sys_socket();
+int sys_socketcall();
 int sys_socketpair();
 int sys_splice();
 int sys_stat();
@@ -315,32 +317,6 @@ int sys_osf_wait4();
 
 #if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && \
 	!defined(__ARM_EABI__)
-# ifdef	IA64
-/*
- *  IA64 syscall numbers (the only ones available from standard header
- *  files) are disjoint from IA32 syscall numbers.  We need to define
- *  the IA32 socket call number here.
- */
-#  define SYS_socketcall	102
-
-#  undef SYS_socket
-#  undef SYS_bind
-#  undef SYS_connect
-#  undef SYS_listen
-#  undef SYS_accept
-#  undef SYS_getsockname
-#  undef SYS_getpeername
-#  undef SYS_socketpair
-#  undef SYS_send
-#  undef SYS_recv
-#  undef SYS_sendto
-#  undef SYS_recvfrom
-#  undef SYS_shutdown
-#  undef SYS_setsockopt
-#  undef SYS_getsockopt
-#  undef SYS_sendmsg
-#  undef SYS_recvmsg
-# endif /* IA64 */
 # if defined(SPARC) || defined(SPARC64)
 #  define SYS_socket_subcall	353
 # else
@@ -352,40 +328,9 @@ int sys_osf_wait4();
 
 #if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && \
 	!defined(__ARM_EABI__)
-# ifdef	IA64
-   /*
-    * IA64 syscall numbers (the only ones available from standard
-    * header files) are disjoint from IA32 syscall numbers.  We need
-    * to define the IA32 socket call number here.  Fortunately, this
-    * symbol, `SYS_ipc', is not used by any of the IA64 code so
-    * re-defining this symbol will not cause a problem.
-   */
-#  undef SYS_ipc
-#  define SYS_ipc		117
-#  undef SYS_semop
-#  undef SYS_semget
-#  undef SYS_semctl
-#  undef SYS_semtimedop
-#  undef SYS_msgsnd
-#  undef SYS_msgrcv
-#  undef SYS_msgget
-#  undef SYS_msgctl
-#  undef SYS_shmat
-#  undef SYS_shmdt
-#  undef SYS_shmget
-#  undef SYS_shmctl
-# endif /* IA64 */
 #define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
-
 #define SYS_ipc_nsubcalls	25
 #endif /* !(ALPHA || MIPS || HPPA) */
-
-#if defined SYS_ipc_subcall && !defined SYS_ipc
-# define SYS_ipc SYS_ipc_subcall
-#endif
-#if defined SYS_socket_subcall && !defined SYS_socketcall
-# define SYS_socketcall SYS_socket_subcall
-#endif
 
 #ifdef IA64
   /*
@@ -434,19 +379,8 @@ int sys_semsys();
 int sys_shmsys();
 #define SYS_semsys_subcall	200
 #define SYS_semsys_nsubcalls	3
-#define SYS_semctl		(SYS_semsys_subcall + 0)
-#define SYS_semget		(SYS_semsys_subcall + 1)
-#define SYS_semop		(SYS_semsys_subcall + 2)
 #define SYS_msgsys_subcall	203
 #define SYS_msgsys_nsubcalls	4
-#define SYS_msgget		(SYS_msgsys_subcall + 0)
-#define SYS_msgctl		(SYS_msgsys_subcall + 1)
-#define SYS_msgrcv		(SYS_msgsys_subcall + 2)
-#define SYS_msgsnd		(SYS_msgsys_subcall + 3)
 #define SYS_shmsys_subcall	207
 #define SYS_shmsys_nsubcalls	4
-#define SYS_shmat		(SYS_shmsys_subcall + 0)
-#define SYS_shmctl		(SYS_shmsys_subcall + 1)
-#define SYS_shmdt		(SYS_shmsys_subcall + 2)
-#define SYS_shmget		(SYS_shmsys_subcall + 3)
 #endif

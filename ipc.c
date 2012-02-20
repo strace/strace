@@ -560,3 +560,9 @@ sys_mq_getsetattr(struct tcb *tcp)
 	return 0;
 }
 #endif
+
+int
+sys_ipc(struct tcb *tcp)
+{
+	return printargs(tcp);
+}

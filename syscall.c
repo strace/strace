@@ -1733,19 +1733,28 @@ trace_syscall_entering(struct tcb *tcp)
 		goto ret;
 	}
 
-	switch (known_scno(tcp)) {
+#if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
+	while (SCNO_IN_RANGE(tcp->scno)) {
 #ifdef SYS_socket_subcall
-	case SYS_socketcall:
-		decode_subcall(tcp, SYS_socket_subcall,
-			SYS_socket_nsubcalls, deref_style);
-		break;
+		if (sysent[tcp->scno].sys_func == sys_socketcall) {
+			decode_subcall(tcp, SYS_socket_subcall,
+				SYS_socket_nsubcalls, deref_style);
+			break;
+		}
 #endif
 #ifdef SYS_ipc_subcall
-	case SYS_ipc:
-		decode_subcall(tcp, SYS_ipc_subcall,
-			SYS_ipc_nsubcalls, shift_style);
-		break;
+		if (sysent[tcp->scno].sys_func == sys_ipc) {
+			decode_subcall(tcp, SYS_ipc_subcall,
+				SYS_ipc_nsubcalls, shift_style);
+			break;
+		}
 #endif
+		break;
+	}
+#endif /* SYS_socket_subcall || SYS_ipc_subcall */
+
+#if defined(SVR4) || defined(FREEBSD) || defined(SUNOS4)
+	switch (known_scno(tcp)) {
 #ifdef SVR4
 #ifdef SYS_pgrpsys_subcall
 	case SYS_pgrpsys:
@@ -1820,6 +1829,7 @@ trace_syscall_entering(struct tcb *tcp)
 		break;
 #endif
 	}
+#endif /* SVR4 || FREEBSD || SUNOS4 */
 
 	internal_syscall(tcp);
 
