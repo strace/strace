@@ -1415,11 +1415,6 @@ printcall(struct tcb *tcp)
 
 #  ifdef IA64
 
-/* We don't have fork()/vfork() syscalls on ia64 itself, but the ia32
-   subsystem has them for x86... */
-#   define SYS_fork	2
-#   define SYS_vfork	190
-
 typedef unsigned long *arg_setup_state;
 
 static int
@@ -1449,7 +1444,6 @@ arg_setup(struct tcb *tcp, arg_setup_state *state)
 
 #   define arg_finish_change(tcp, state)	0
 
-#   ifdef SYS_fork
 static int
 get_arg0(struct tcb *tcp, arg_setup_state *state, long *valp)
 {
@@ -1477,7 +1471,6 @@ get_arg1(struct tcb *tcp, arg_setup_state *state, long *valp)
 			      sizeof(long), (void *) valp);
 	return ret;
 }
-#   endif
 
 static int
 set_arg0(struct tcb *tcp, arg_setup_state *state, long val)
@@ -1644,14 +1637,8 @@ setbpt(struct tcb *tcp)
 			}
 	}
 
-	switch (known_scno(tcp)) {
-#  ifdef SYS_vfork
-	case SYS_vfork:
-#  endif
-#  ifdef SYS_fork
-	case SYS_fork:
-#  endif
-#  if defined SYS_fork || defined SYS_vfork
+	if (sysent[tcp->scno].sys_func == sys_fork ||
+	    sysent[tcp->scno].sys_func == sys_vfork) {
 		if (arg_setup(tcp, &state) < 0
 		    || get_arg0(tcp, &state, &tcp->inst[0]) < 0
 		    || get_arg1(tcp, &state, &tcp->inst[1]) < 0
@@ -1664,14 +1651,11 @@ setbpt(struct tcb *tcp)
 		tcp->u_arg[arg1_index] = 0;
 		tcp->flags |= TCB_BPTSET;
 		return 0;
-#  endif
+	}
 
-	case SYS_clone: ;
-#  ifdef SYS_clone2
-	case SYS_clone2: ;
-#  endif
+	if (sysent[tcp->scno].sys_func == sys_clone) {
 		/* ia64 calls directly `clone (CLONE_VFORK | CLONE_VM)'
-		   contrary to x86 SYS_vfork above.  Even on x86 we turn the
+		   contrary to x86 vfork above.  Even on x86 we turn the
 		   vfork semantics into plain fork - each application must not
 		   depend on the vfork specifics according to POSIX.  We would
 		   hang waiting for the parent resume otherwise.  We need to
@@ -1689,13 +1673,10 @@ setbpt(struct tcb *tcp)
 		tcp->inst[0] = tcp->u_arg[arg0_index];
 		tcp->inst[1] = tcp->u_arg[arg1_index];
 		return 0;
-
-	default:
-		fprintf(stderr, "PANIC: setbpt for syscall %ld on %u???\n",
-			tcp->scno, tcp->pid);
-		break;
 	}
 
+	fprintf(stderr, "PANIC: setbpt for syscall %ld on %u???\n",
+		tcp->scno, tcp->pid);
 	return -1;
 }
 

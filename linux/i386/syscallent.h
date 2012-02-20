@@ -30,7 +30,7 @@
 
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 0 */
 	{ 1,	TP,	sys_exit,		"_exit",	}, /* 1 */
-	{ 0,	TP,	sys_fork,		"fork", SYS_fork }, /* 2 */
+	{ 0,	TP,	sys_fork,		"fork",		}, /* 2 */
 	{ 3,	TD,	sys_read,		"read",		}, /* 3 */
 	{ 3,	TD,	sys_write,		"write",	}, /* 4 */
 	{ 3,	TD|TF,	sys_open,		"open"		}, /* 5 */
@@ -148,7 +148,7 @@
 	{ 6,	TI,	sys_ipc,		"ipc",		}, /* 117 */
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 118 */
 	{ 0,	TS,	sys_sigreturn,		"sigreturn"	}, /* 119 */
-	{ 5,	TP,	sys_clone,		"clone", SYS_clone }, /* 120 */
+	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
 	{ 3,	0,	sys_modify_ldt,		"modify_ldt"	}, /* 123 */
@@ -219,7 +219,7 @@
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 187 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 188 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
-	{ 0,	TP,	sys_vfork,		"vfork", SYS_vfork }, /* 190 */
+	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
 	{ 6,	TD,	sys_mmap,		"mmap2"		}, /* 192 */
 	{ 3,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */

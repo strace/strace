@@ -37,7 +37,6 @@
 #define sys_getpmsg		printargs
 #define sys_putpmsg		printargs
 #define sys_ugetrlimit		printargs
-#define sys_fork		printargs
 #define sys_waitpid		printargs
 #define sys_time		printargs
 #define sys_break		printargs
@@ -124,7 +123,6 @@
 #define sys_pwrite		printargs
 #define sys_sigaltstack		printargs
 #define sys_sendfile		printargs
-#define sys_vfork		printargs
 #define sys_truncate64		printargs
 #define sys_ftruncate64		printargs
 #define sys_stat64		printargs
@@ -139,7 +137,6 @@
 #undef sys_getpmsg
 #undef sys_putpmsg
 #undef sys_ugetrlimit
-#undef sys_fork
 #undef sys_waitpid
 #undef sys_time
 #undef sys_break
@@ -228,7 +225,6 @@
 #undef sys_pwrite
 #undef sys_sigaltstack
 #undef sys_sendfile
-#undef sys_vfork
 #undef sys_truncate64
 #undef sys_ftruncate64
 #undef sys_stat64

@@ -332,16 +332,6 @@ int sys_osf_wait4();
 #define SYS_ipc_nsubcalls	25
 #endif /* !(ALPHA || MIPS || HPPA) */
 
-#ifdef IA64
-  /*
-   * IA64 syscall numbers (the only ones available from standard header
-   * files) are disjoint from IA32 syscall numbers.  We need to define
-   * some IA32 specific syscalls here.
-   */
-# define SYS_fork	2
-# define SYS_vfork	190
-#endif /* IA64 */
-
 #if defined(ALPHA) || defined(IA64) || defined(SPARC) || defined(SPARC64)
 int sys_getpagesize();
 #endif
