@@ -1265,10 +1265,10 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 		if (addrlen == 2) {
 			tprints("NULL");
 		} else if (addrbuf.sau.sun_path[0]) {
-			tprints("path=");
+			tprints("sun_path=");
 			printpathn(tcp, addr + 2, strlen(addrbuf.sau.sun_path));
 		} else {
-			tprints("path=@");
+			tprints("sun_path=@");
 			printpathn(tcp, addr + 3, strlen(addrbuf.sau.sun_path + 1));
 		}
 		break;
