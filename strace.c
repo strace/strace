@@ -1416,6 +1416,10 @@ main(int argc, char *argv[])
 	cleanup();
 	fflush(NULL);
 	if (exit_code > 0xff) {
+		/* Avoid potential core file clobbering.  */
+		struct rlimit rlim = {0, 0};
+		setrlimit(RLIMIT_CORE, &rlim);
+
 		/* Child was killed by a signal, mimic that.  */
 		exit_code &= 0xff;
 		signal(exit_code, SIG_DFL);
