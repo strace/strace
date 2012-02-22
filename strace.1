@@ -181,7 +181,7 @@ This example shows the shell performing ``>>xyzzy'' output redirection:
 .CW
 open("xyzzy", O_WRONLY|O_APPEND|O_CREAT, 0666) = 3
 .CE
-Here the three argument form of open is decoded by breaking down the
+Here the third argument of open is decoded by breaking down the
 flag argument into its three bitwise-OR constituents and printing the
 mode value in octal by tradition.  Where traditional or native
 usage differs from ANSI or POSIX, the latter forms are preferred.
