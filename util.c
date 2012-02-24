@@ -831,6 +831,11 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		char x[sizeof(long)];
 	} u;
 
+#if SUPPORTED_PERSONALITIES > 1
+	if (personality_wordsize[current_personality] < sizeof(addr))
+		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
+#endif
+
 	if (!process_vm_readv_not_supported) {
 		struct iovec local[1], remote[1];
 		int r;
@@ -854,11 +859,6 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		return r;
 	}
  vm_readv_didnt_work:
-
-#if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] < sizeof(addr))
-		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
-#endif
 
 	started = 0;
 	if (addr & (sizeof(long) - 1)) {
