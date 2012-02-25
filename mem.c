@@ -584,7 +584,7 @@ sys_getpagesize(struct tcb *tcp)
 }
 #endif
 
-#if defined(__i386__)
+#if defined(I386)
 void
 print_ldt_entry(struct modify_ldt_ldt_s *ldt_entry)
 {
@@ -676,7 +676,7 @@ sys_get_thread_area(struct tcb *tcp)
 	return 0;
 
 }
-#endif /* __i386__ */
+#endif /* I386 */
 
 #if defined(M68K)
 int

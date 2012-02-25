@@ -4000,7 +4000,7 @@
 	{ 0,	0,	printargs,		"SYS_3997"	}, /* 3997 */
 	{ 0,	0,	printargs,		"SYS_3998"	}, /* 3998 */
 	{ 0,	0,	printargs,		"SYS_3999"	}, /* 3999 */ /* end of POSIX */
-#if !defined (LINUX_MIPSN32) && !defined (LINUX_MIPSN64)
+#if !defined(LINUX_MIPSN32) && !defined(LINUX_MIPSN64)
 	/* For an O32 strace, decode the o32 syscalls.  */
 	{ MA,	0,	printargs,		"syscall"	}, /* 4000 */ /* start of Linux o32 */
 	{ 1,	TP,	sys_exit,		"exit"		}, /* 4001 */
@@ -5349,7 +5349,7 @@
 	{ 0,	0,	printargs,		"SYS_4997"	}, /* 4997 */
 	{ 0,	0,	printargs,		"SYS_4998"	}, /* 4998 */
 	{ 0,	0,	printargs,		"SYS_4999"	}, /* 4999 */ /* end of Linux o32 */
-#if defined (LINUX_MIPSN64)
+#if defined(LINUX_MIPSN64)
 	/* For an N64 strace decode the N64 64-bit syscalls.  */
 	{ 3,	TF,	sys_read,		"read"		}, /* 5000 */ /* start of Linux N64 */
 	{ 3,	TF,	sys_write,		"write"		}, /* 5001 */
@@ -6658,7 +6658,7 @@
 	{ 0,	0,	printargs,		"SYS_5998"	}, /* 5998 */
 	{ 0,	0,	printargs,		"SYS_5999"	}, /* 5999 */ /* end of Linux N64 */
 
-#if defined (LINUX_MIPSN32)
+#if defined(LINUX_MIPSN32)
 	/* For an N32 strace decode the N32 64-bit syscalls.  */
 	{ 3,	TF,	sys_read,		"read"		}, /* 6000 */ /* start of Linux N32 */
 	{ 3,	TF,	sys_write,		"write"		}, /* 6001 */

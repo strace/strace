@@ -1010,7 +1010,7 @@ sys_sigreturn(struct tcb *tcp)
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
-#elif defined (SPARC) || defined (SPARC64)
+#elif defined(SPARC) || defined(SPARC64)
 	if (entering(tcp)) {
 		long i1;
 		struct pt_regs regs;
@@ -1029,7 +1029,7 @@ sys_sigreturn(struct tcb *tcp)
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
 	return 0;
-#elif defined (LINUX_MIPSN32) || defined (LINUX_MIPSN64)
+#elif defined(LINUX_MIPSN32) || defined(LINUX_MIPSN64)
 	/* This decodes rt_sigreturn.  The 64-bit ABIs do not have
 	   sigreturn.  */
 	if (entering(tcp)) {

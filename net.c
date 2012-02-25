@@ -61,7 +61,7 @@
 #  include <linux/ipx.h>
 #endif
 
-#if defined (__GLIBC__) && (((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)) || defined(HAVE_SIN6_SCOPE_ID_LINUX))
+#if defined(__GLIBC__) && (((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)) || defined(HAVE_SIN6_SCOPE_ID_LINUX))
 #if defined(HAVE_LINUX_IN6_H)
 #if defined(HAVE_SIN6_SCOPE_ID_LINUX)
 #undef in6_addr
@@ -724,7 +724,7 @@ static const struct xlat sockoptions[] = {
 	{ 0,		NULL		},
 };
 
-#if !defined (SOL_IP) && defined (IPPROTO_IP)
+#if !defined(SOL_IP) && defined(IPPROTO_IP)
 #define SOL_IP IPPROTO_IP
 #endif
 
@@ -1071,7 +1071,7 @@ static const struct xlat socksctpoptions[] = {
 };
 #endif
 
-#if  !defined (SOL_TCP) && defined (IPPROTO_TCP)
+#if !defined(SOL_TCP) && defined(IPPROTO_TCP)
 #define SOL_TCP IPPROTO_TCP
 #endif
 

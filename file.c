@@ -501,7 +501,7 @@ static const struct xlat whence[] = {
 };
 
 #ifndef HAVE_LONG_LONG_OFF_T
-#if defined (LINUX_MIPSN32)
+#if defined(LINUX_MIPSN32)
 int
 sys_lseek(struct tcb *tcp)
 {
@@ -781,7 +781,7 @@ printstatsol(struct tcb *tcp, long addr)
 		tprints("...}");
 }
 
-#if defined (SPARC64)
+#if defined(SPARC64)
 static void
 printstat_sparc64(struct tcb *tcp, long addr)
 {
@@ -1795,7 +1795,7 @@ sys_fstatfs64(struct tcb *tcp)
 }
 #endif
 
-#if defined(__alpha)
+#if defined(ALPHA)
 int
 osf_statfs(struct tcb *tcp)
 {
