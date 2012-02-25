@@ -41,7 +41,7 @@ struct kernel_dirent {
 	char            d_name[1];
 };
 
-#  ifdef LINUXSPARC
+#ifdef LINUXSPARC
 struct stat {
 	unsigned short	st_dev;
 	unsigned int	st_ino;
@@ -61,7 +61,7 @@ struct stat {
 	int		st_blocks;
 	unsigned int	__unused4[2];
 };
-#if defined(SPARC64)
+# if defined(SPARC64)
 struct stat_sparc64 {
 	unsigned int	st_dev;
 	unsigned long	st_ino;
@@ -78,81 +78,82 @@ struct stat_sparc64 {
 	long		st_blocks;
 	unsigned long	__unused4[2];
 };
-#endif /* SPARC64 */
-#    define stat kernel_stat
-#    include <asm/stat.h>
-#    undef stat
-#  else
-#    undef dev_t
-#    undef ino_t
-#    undef mode_t
-#    undef nlink_t
-#    undef uid_t
-#    undef gid_t
-#    undef off_t
-#    undef loff_t
+# endif /* SPARC64 */
+# define stat kernel_stat
+# include <asm/stat.h>
+# undef stat
+#else
+# undef dev_t
+# undef ino_t
+# undef mode_t
+# undef nlink_t
+# undef uid_t
+# undef gid_t
+# undef off_t
+# undef loff_t
 
-#    define dev_t __kernel_dev_t
-#    define ino_t __kernel_ino_t
-#    define mode_t __kernel_mode_t
-#    define nlink_t __kernel_nlink_t
-#    define uid_t __kernel_uid_t
-#    define gid_t __kernel_gid_t
-#    define off_t __kernel_off_t
-#    define loff_t __kernel_loff_t
+# define dev_t __kernel_dev_t
+# define ino_t __kernel_ino_t
+# define mode_t __kernel_mode_t
+# define nlink_t __kernel_nlink_t
+# define uid_t __kernel_uid_t
+# define gid_t __kernel_gid_t
+# define off_t __kernel_off_t
+# define loff_t __kernel_loff_t
 
-#    include <asm/stat.h>
+# include <asm/stat.h>
 
-#    undef dev_t
-#    undef ino_t
-#    undef mode_t
-#    undef nlink_t
-#    undef uid_t
-#    undef gid_t
-#    undef off_t
-#    undef loff_t
+# undef dev_t
+# undef ino_t
+# undef mode_t
+# undef nlink_t
+# undef uid_t
+# undef gid_t
+# undef off_t
+# undef loff_t
 
-#    define dev_t dev_t
-#    define ino_t ino_t
-#    define mode_t mode_t
-#    define nlink_t nlink_t
-#    define uid_t uid_t
-#    define gid_t gid_t
-#    define off_t off_t
-#    define loff_t loff_t
-#  endif
-#  ifdef HPPA	/* asm-parisc/stat.h defines stat64 */
-#    undef stat64
-#  endif
-#  define stat libc_stat
-#  define stat64 libc_stat64
-#  include <sys/stat.h>
-#  undef stat
-#  undef stat64
-   /* These might be macros. */
-#  undef st_atime
-#  undef st_mtime
-#  undef st_ctime
-#  ifdef HPPA
-#    define stat64 hpux_stat64
-#  endif
+# define dev_t dev_t
+# define ino_t ino_t
+# define mode_t mode_t
+# define nlink_t nlink_t
+# define uid_t uid_t
+# define gid_t gid_t
+# define off_t off_t
+# define loff_t loff_t
+#endif
+
+#ifdef HPPA	/* asm-parisc/stat.h defines stat64 */
+# undef stat64
+#endif
+#define stat libc_stat
+#define stat64 libc_stat64
+#include <sys/stat.h>
+#undef stat
+#undef stat64
+ /* These might be macros. */
+#undef st_atime
+#undef st_mtime
+#undef st_ctime
+#ifdef HPPA
+# define stat64 hpux_stat64
+#endif
 
 #include <fcntl.h>
 
 
 #ifdef HAVE_SYS_VFS_H
-#include <sys/vfs.h>
+# include <sys/vfs.h>
 #endif
 
 #ifdef HAVE_LINUX_XATTR_H
-#include <linux/xattr.h>
+# include <linux/xattr.h>
 #else
-#define XATTR_CREATE 1
-#define XATTR_REPLACE 2
+# define XATTR_CREATE 1
+# define XATTR_REPLACE 2
 #endif
 
 
-#if _LFS64_LARGEFILE && (defined(LINUX) || defined(SVR4))
+#if _LFS64_LARGEFILE
 # ifdef HAVE_INTTYPES_H
 #  include <inttypes.h>
 # else
@@ -166,27 +167,27 @@ struct stat_sparc64 {
  * Ugly hacks for systems that have typedef long long off_t
  */
 
-#define stat64 stat
-#define HAVE_STAT64 1	/* Ugly hack */
+# define stat64 stat
+# define HAVE_STAT64 1	/* Ugly hack */
 
-#define	sys_stat64	sys_stat
-#define sys_fstat64	sys_fstat
-#define sys_lstat64	sys_lstat
-#define sys_lseek64	sys_lseek
-#define sys_truncate64	sys_truncate
-#define sys_ftruncate64	sys_ftruncate
+# define sys_stat64	sys_stat
+# define sys_fstat64	sys_fstat
+# define sys_lstat64	sys_lstat
+# define sys_lseek64	sys_lseek
+# define sys_truncate64	sys_truncate
+# define sys_ftruncate64	sys_ftruncate
 #endif
 
 #ifdef MAJOR_IN_SYSMACROS
-#include <sys/sysmacros.h>
+# include <sys/sysmacros.h>
 #endif
 
 #ifdef MAJOR_IN_MKDEV
-#include <sys/mkdev.h>
+# include <sys/mkdev.h>
 #endif
 
 #ifdef HAVE_SYS_ASYNCH_H
-#include <sys/asynch.h>
+# include <sys/asynch.h>
 #endif
 
 
@@ -830,7 +831,7 @@ printstat_sparc64(struct tcb *tcp, long addr)
 #endif /* SPARC64 */
 #endif /* LINUXSPARC */
 
-#if defined LINUX && defined POWERPC64
+#if defined POWERPC64
 struct stat_powerpc32 {
 	unsigned int	st_dev;
 	unsigned int	st_ino;
@@ -893,7 +894,7 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 	else
 		tprints("...}");
 }
-#endif /* LINUX && POWERPC64 */
+#endif /* POWERPC64 */
 
 static const struct xlat fileflags[] = {
 	{ 0,		NULL		},
@@ -994,7 +995,7 @@ printstat(struct tcb *tcp, long addr)
 #endif
 #endif /* LINUXSPARC */
 
-#if defined LINUX && defined POWERPC64
+#if defined POWERPC64
 	if (current_personality == 1) {
 		printstat_powerpc32(tcp, addr);
 		return;
@@ -1010,7 +1011,7 @@ printstat(struct tcb *tcp, long addr)
 }
 #endif	/* !HAVE_LONG_LONG_OFF_T */
 
-#if !defined HAVE_STAT64 && defined LINUX && defined X86_64
+#if !defined HAVE_STAT64 && defined X86_64
 /*
  * Linux x86_64 has unified `struct stat' but its i386 biarch needs
  * `struct stat64'.  Its <asm-i386/stat.h> definition expects 32-bit `long'.
@@ -1074,7 +1075,7 @@ printstat64(struct tcb *tcp, long addr)
 # endif
 #endif /* LINUXSPARC */
 
-#if defined LINUX && defined X86_64
+#if defined X86_64
 	if (current_personality == 0) {
 		printstat(tcp, addr);
 		return;
@@ -1162,8 +1163,7 @@ printstat64(struct tcb *tcp, long addr)
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT) \
-    && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
 static void
 convertoldstat(const struct __old_kernel_stat *oldbuf, struct stat *newbuf)
 {
@@ -1198,12 +1198,12 @@ printoldstat(struct tcb *tcp, long addr)
 		return;
 	}
 
-#ifdef LINUXSPARC
+# ifdef LINUXSPARC
 	if (current_personality == 1) {
 		printstatsol(tcp, addr);
 		return;
 	}
-#endif /* LINUXSPARC */
+# endif
 
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprints("{...}");
@@ -1213,7 +1213,7 @@ printoldstat(struct tcb *tcp, long addr)
 	convertoldstat(&statbuf, &newstatbuf);
 	realprintstat(tcp, &newstatbuf);
 }
-#endif /* LINUX && !IA64 && !HPPA && !X86_64 && !S390 && !S390X */
+#endif
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -1278,8 +1278,7 @@ sys_newfstatat(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT) \
-    && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
 int
 sys_oldstat(struct tcb *tcp)
 {
@@ -1291,7 +1290,7 @@ sys_oldstat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* LINUX && HAVE_STRUCT___OLD_KERNEL_STAT */
+#endif
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -1323,8 +1322,7 @@ sys_fstat64(struct tcb *tcp)
 #endif
 }
 
-#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT) \
-    && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
 int
 sys_oldfstat(struct tcb *tcp)
 {
@@ -1336,7 +1334,7 @@ sys_oldfstat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* LINUX && HAVE_STRUCT___OLD_KERNEL_STAT */
+#endif
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
@@ -1368,8 +1366,7 @@ sys_lstat64(struct tcb *tcp)
 #endif
 }
 
-#if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT) \
-    && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
 int
 sys_oldlstat(struct tcb *tcp)
 {
@@ -1381,10 +1378,10 @@ sys_oldlstat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* LINUX && HAVE_STRUCT___OLD_KERNEL_STAT */
+#endif
 
 
-#if defined(SVR4) || defined(LINUXSPARC)
+#if defined(LINUXSPARC)
 
 int
 sys_xstat(struct tcb *tcp)
@@ -1394,11 +1391,11 @@ sys_xstat(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else {
-#ifdef _STAT64_VER
+# ifdef _STAT64_VER
 		if (tcp->u_arg[0] == _STAT64_VER)
 			printstat64 (tcp, tcp->u_arg[2]);
 		else
-#endif
+# endif
 		printstat(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -1410,11 +1407,11 @@ sys_fxstat(struct tcb *tcp)
 	if (entering(tcp))
 		tprintf("%ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1]);
 	else {
-#ifdef _STAT64_VER
+# ifdef _STAT64_VER
 		if (tcp->u_arg[0] == _STAT64_VER)
 			printstat64 (tcp, tcp->u_arg[2]);
 		else
-#endif
+# endif
 		printstat(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -1428,11 +1425,11 @@ sys_lxstat(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else {
-#ifdef _STAT64_VER
+# ifdef _STAT64_VER
 		if (tcp->u_arg[0] == _STAT64_VER)
 			printstat64 (tcp, tcp->u_arg[2]);
 		else
-#endif
+# endif
 		printstat(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -1449,15 +1446,9 @@ sys_xmknod(struct tcb *tcp)
 		tprintf(", %s", sprintmode(mode));
 		switch (mode & S_IFMT) {
 		case S_IFCHR: case S_IFBLK:
-#ifdef LINUXSPARC
 			tprintf(", makedev(%lu, %lu)",
 				(unsigned long) ((tcp->u_arg[3] >> 18) & 0x3fff),
 				(unsigned long) (tcp->u_arg[3] & 0x3ffff));
-#else
-			tprintf(", makedev(%lu, %lu)",
-				(unsigned long) major(tcp->u_arg[3]),
-				(unsigned long) minor(tcp->u_arg[3]));
-#endif
 			break;
 		default:
 			break;
@@ -1466,29 +1457,29 @@ sys_xmknod(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef HAVE_SYS_ACL_H
+# ifdef HAVE_SYS_ACL_H
 
-#include <sys/acl.h>
+#  include <sys/acl.h>
 
 static const struct xlat aclcmds[] = {
-#ifdef SETACL
+#  ifdef SETACL
 	{ SETACL,	"SETACL"	},
-#endif
-#ifdef GETACL
+#  endif
+#  ifdef GETACL
 	{ GETACL,	"GETACL"	},
-#endif
-#ifdef GETACLCNT
+#  endif
+#  ifdef GETACLCNT
 	{ GETACLCNT,	"GETACLCNT"	},
-#endif
-#ifdef ACL_GET
+#  endif
+#  ifdef ACL_GET
 	{ ACL_GET,	"ACL_GET"	},
-#endif
-#ifdef ACL_SET
+#  endif
+#  ifdef ACL_SET
 	{ ACL_SET,	"ACL_SET"	},
-#endif
-#ifdef ACL_CNT
+#  endif
+#  ifdef ACL_CNT
 	{ ACL_CNT,	"ACL_CNT"	},
-#endif
+#  endif
 	{ 0,		NULL		},
 };
 
@@ -1534,15 +1525,15 @@ sys_facl(struct tcb *tcp)
 
 
 static const struct xlat aclipc[] = {
-#ifdef IPC_SHM
+#  ifdef IPC_SHM
 	{ IPC_SHM,	"IPC_SHM"	},
-#endif
-#ifdef IPC_SEM
+#  endif
+#  ifdef IPC_SEM
 	{ IPC_SEM,	"IPC_SEM"	},
-#endif
-#ifdef IPC_MSG
+#  endif
+#  ifdef IPC_MSG
 	{ IPC_MSG,	"IPC_MSG"	},
-#endif
+#  endif
 	{ 0,		NULL		},
 };
 
@@ -1567,9 +1558,9 @@ sys_aclipc(struct tcb *tcp)
 	return 0;
 }
 
-#endif /* HAVE_SYS_ACL_H */
+# endif /* HAVE_SYS_ACL_H */
 
-#endif /* SVR4 || LINUXSPARC */
+#endif /* LINUXSPARC */
 
 
 static const struct xlat fsmagic[] = {
@@ -1687,7 +1678,7 @@ sys_fstatfs(struct tcb *tcp)
 	return 0;
 }
 
-#if defined LINUX && defined HAVE_STATFS64
+#if defined HAVE_STATFS64
 static void
 printstatfs64(struct tcb *tcp, long addr)
 {
@@ -1804,8 +1795,7 @@ sys_fstatfs64(struct tcb *tcp)
 }
 #endif
 
-#if defined(LINUX) && defined(__alpha)
-
+#if defined(__alpha)
 int
 osf_statfs(struct tcb *tcp)
 {
@@ -1830,8 +1820,7 @@ osf_fstatfs(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* LINUX && __alpha */
-
+#endif
 
 
 /* directory */

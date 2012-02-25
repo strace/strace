@@ -58,7 +58,7 @@
 #  define my_tkill(tid, sig) kill((tid), (sig))
 # endif
 
-#if defined(IA64) && defined(LINUX)
+#if defined(IA64)
 # include <asm/ptrace_offsets.h>
 #endif
 

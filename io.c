@@ -69,7 +69,7 @@ sys_write(struct tcb *tcp)
 void
 tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_iov)
 {
-#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1
 	union {
 		struct { u_int32_t base; u_int32_t len; } iov32;
 		struct { u_int64_t base; u_int64_t len; } iov64;

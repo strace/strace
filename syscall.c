@@ -60,14 +60,14 @@
 # undef pt_all_user_regs
 #endif
 
-#if defined (LINUX) && defined (SPARC64)
+#if defined(SPARC64)
 # undef PTRACE_GETREGS
 # define PTRACE_GETREGS PTRACE_GETREGS64
 # undef PTRACE_SETREGS
 # define PTRACE_SETREGS PTRACE_SETREGS64
-#endif /* LINUX && SPARC64 */
+#endif
 
-#if defined(LINUX) && defined(IA64)
+#if defined(IA64)
 # include <asm/ptrace_offsets.h>
 # include <asm/rse.h>
 #endif
@@ -523,7 +523,7 @@ qualify(const char *s)
 
 enum subcall_style { shift_style, deref_style, mask_style, door_style };
 
-#if !(defined(LINUX) && ( defined(ALPHA) || defined(MIPS) || defined(__ARM_EABI__) ))
+#if !(defined(ALPHA) || defined(MIPS) || defined(__ARM_EABI__))
 
 static void
 decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style style)
@@ -1206,9 +1206,9 @@ internal_syscall(struct tcb *tcp)
 	   )
 		return internal_fork(tcp);
 
-#if defined SUNOS4 || (defined LINUX && defined TCB_WAITEXECVE)
+#if defined(TCB_WAITEXECVE)
 	if (   sys_execve == func
-# if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)
+# if defined(SPARC) || defined(SPARC64)
 	    || sys_execv == func
 # endif
 	   )

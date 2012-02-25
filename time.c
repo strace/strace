@@ -81,7 +81,7 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 		return buf + sprintf(buf, "%#lx", addr);
 
 	if (bitness == BITNESS_32
-#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1
 	    || personality_wordsize[current_personality] == 4
 #endif
 		)
@@ -137,7 +137,7 @@ sprint_timespec(char *buf, struct tcb *tcp, long addr)
 	else {
 		int rc;
 
-#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1
 		if (personality_wordsize[current_personality] == 4) {
 			struct timeval32 tv;
 
@@ -291,7 +291,7 @@ printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 		int rc;
 
 		if (bitness == BITNESS_32
-#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1
 		    || personality_wordsize[current_personality] == 4
 #endif
 			)

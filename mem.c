@@ -37,13 +37,13 @@
 #include <asm/mman.h>
 #include <sys/mman.h>
 
-#if defined(LINUX) && defined(I386)
+#if defined(I386)
 # include <asm/ldt.h>
 # ifdef HAVE_STRUCT_USER_DESC
 #  define modify_ldt_ldt_s user_desc
 # endif
 #endif
-#if defined(LINUX) && defined(SH64)
+#if defined(SH64)
 # include <asm/page.h>	    /* for PAGE_SHIFT */
 #endif
 
@@ -299,7 +299,7 @@ sys_mmap(struct tcb *tcp)
 	 * from pages to bytes. See test/mmap_offset_decode.c
 	 * Why SH64 and i386 are handled differently?
 	 */
-#if defined(LINUX) && defined(SH64)
+#if defined(SH64)
 	/*
 	 * Old mmap differs from new mmap in specifying the
 	 * offset in units of bytes rather than pages.  We
@@ -325,7 +325,7 @@ int
 sys_mmap64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-#if !defined(LINUX) || defined(ALPHA)
+#if defined(ALPHA)
 		long *u_arg = tcp->u_arg;
 #else
 		long u_arg[7];
@@ -354,7 +354,7 @@ sys_mmap64(struct tcb *tcp)
 		tprints(", ");
 		printfd(tcp, u_arg[4]);
 		/* offset */
-#if !defined(LINUX) || defined(ALPHA)
+#if defined(ALPHA)
 		printllval(tcp, ", %#llx", 5);
 #else
 		/* NOTE: not verified that [5] and [6] should be used.
@@ -574,7 +574,7 @@ sys_mincore(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(ALPHA) || defined(FREEBSD) || defined(IA64) || defined(SUNOS4) || defined(SVR4) || defined(SPARC) || defined(SPARC64)
+#if defined(ALPHA) || defined(IA64) || defined(SPARC) || defined(SPARC64)
 int
 sys_getpagesize(struct tcb *tcp)
 {
@@ -582,9 +582,9 @@ sys_getpagesize(struct tcb *tcp)
 		return RVAL_HEX;
 	return 0;
 }
-#endif /* ALPHA || FREEBSD || IA64 || SUNOS4 || SVR4 */
+#endif
 
-#if defined(LINUX) && defined(__i386__)
+#if defined(__i386__)
 void
 print_ldt_entry(struct modify_ldt_ldt_s *ldt_entry)
 {
@@ -676,10 +676,9 @@ sys_get_thread_area(struct tcb *tcp)
 	return 0;
 
 }
-#endif /* LINUX && __i386__ */
+#endif /* __i386__ */
 
-#if defined(LINUX) && defined(M68K)
-
+#if defined(M68K)
 int
 sys_set_thread_area(struct tcb *tcp)
 {
@@ -910,7 +909,7 @@ sys_move_pages(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(LINUX) && defined(POWERPC)
+#if defined(POWERPC)
 int
 sys_subpage_prot(struct tcb *tcp)
 {

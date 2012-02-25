@@ -62,7 +62,7 @@
 #define SEM_INFO 19
 #endif
 
-#if defined LINUX && !defined IPC_64
+#if !defined IPC_64
 # define IPC_64 0x100
 #endif
 
@@ -421,11 +421,11 @@ int sys_shmat(struct tcb *tcp)
 		if (syserror(tcp))
 			return 0;
 /* HPPA does not use an IPC multiplexer on Linux.  */
-#if defined(LINUX) && !defined(HPPA)
+#if !defined(HPPA)
 		if (umove(tcp, tcp->u_arg[2], &raddr) < 0)
 			return RVAL_NONE;
 		tcp->u_rval = raddr;
-#endif /* LINUX */
+#endif
 		return RVAL_HEX;
 	}
 	return 0;

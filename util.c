@@ -44,27 +44,27 @@
 #include <sys/uio.h>
 #endif
 
-#if defined(linux) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
+#if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)
 #include <linux/ptrace.h>
 #endif
 
-#if defined(LINUX) && defined(IA64)
+#if defined(IA64)
 # include <asm/ptrace_offsets.h>
 # include <asm/rse.h>
 #endif
 
 #ifdef HAVE_SYS_REG_H
-#include <sys/reg.h>
+# include <sys/reg.h>
 # define PTRACE_PEEKUSR PTRACE_PEEKUSER
 #elif defined(HAVE_LINUX_PTRACE_H)
-#undef PTRACE_SYSCALL
+# undef PTRACE_SYSCALL
 # ifdef HAVE_STRUCT_IA64_FPREG
 #  define ia64_fpreg XXX_ia64_fpreg
 # endif
 # ifdef HAVE_STRUCT_PT_ALL_USER_REGS
 #  define pt_all_user_regs XXX_pt_all_user_regs
 # endif
-#include <linux/ptrace.h>
+# include <linux/ptrace.h>
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif
@@ -246,7 +246,7 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 int
 printllval(struct tcb *tcp, const char *format, int llarg)
 {
-# if defined LINUX && (defined X86_64 || defined POWERPC64)
+# if defined X86_64 || defined POWERPC64
 	if (current_personality == 0) {
 		tprintf(format, tcp->u_arg[llarg]);
 		llarg++;
@@ -655,7 +655,7 @@ printstr(struct tcb *tcp, long addr, int len)
 void
 dumpiov(struct tcb *tcp, int len, long addr)
 {
-#if defined(LINUX) && SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1
 	union {
 		struct { u_int32_t base; u_int32_t len; } *iov32;
 		struct { u_int64_t base; u_int64_t len; } *iov64;

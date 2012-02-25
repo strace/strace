@@ -465,13 +465,13 @@ sys_dup3(struct tcb *tcp)
 	return do_dup2(tcp, 2);
 }
 
-#if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4)
+#if defined(ALPHA)
 int
 sys_getdtablesize(struct tcb *tcp)
 {
 	return 0;
 }
-#endif /* ALPHA || FREEBSD || SUNOS4 */
+#endif
 
 static int
 decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)

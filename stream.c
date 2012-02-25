@@ -120,7 +120,7 @@ sys_putmsg(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(SPARC) || defined(SPARC64) || defined(SUNOS4) || defined(SVR4)
+#if defined(SPARC) || defined(SPARC64)
 int
 sys_getmsg(struct tcb *tcp)
 {
@@ -166,7 +166,7 @@ sys_getmsg(struct tcb *tcp)
 	}
 	return RVAL_HEX | RVAL_STR;
 }
-#endif /* SPARC || SPARC64 || SUNOS4 || SVR4 */
+#endif
 
 #if defined SYS_putpmsg || defined SYS_getpmsg
 static const struct xlat pmsgflags[] = {

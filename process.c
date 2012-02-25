@@ -52,50 +52,50 @@
 
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
-#ifndef PTRACE_PEEKUSR
-# define PTRACE_PEEKUSR PTRACE_PEEKUSER
-#endif
-#ifndef PTRACE_POKEUSR
-# define PTRACE_POKEUSR PTRACE_POKEUSER
-#endif
+# ifndef PTRACE_PEEKUSR
+#  define PTRACE_PEEKUSR PTRACE_PEEKUSER
+# endif
+# ifndef PTRACE_POKEUSR
+#  define PTRACE_POKEUSR PTRACE_POKEUSER
+# endif
 #endif
 
 #ifdef HAVE_LINUX_PTRACE_H
-#undef PTRACE_SYSCALL
+# undef PTRACE_SYSCALL
 # ifdef HAVE_STRUCT_IA64_FPREG
 #  define ia64_fpreg XXX_ia64_fpreg
 # endif
 # ifdef HAVE_STRUCT_PT_ALL_USER_REGS
 #  define pt_all_user_regs XXX_pt_all_user_regs
 # endif
-#include <linux/ptrace.h>
+# include <linux/ptrace.h>
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif
 
-#if defined (LINUX) && defined (SPARC64)
+#if defined(SPARC64)
 # define r_pc r_tpc
 # undef PTRACE_GETREGS
 # define PTRACE_GETREGS PTRACE_GETREGS64
 # undef PTRACE_SETREGS
 # define PTRACE_SETREGS PTRACE_SETREGS64
-#endif /* LINUX && SPARC64 */
+#endif
 
 #ifdef HAVE_LINUX_FUTEX_H
 # include <linux/futex.h>
 #endif
-# ifndef FUTEX_WAIT
-#  define FUTEX_WAIT 0
-# endif
-# ifndef FUTEX_WAKE
-#  define FUTEX_WAKE 1
-# endif
-# ifndef FUTEX_FD
-#  define FUTEX_FD 2
-# endif
-# ifndef FUTEX_REQUEUE
-#  define FUTEX_REQUEUE 3
-# endif
+#ifndef FUTEX_WAIT
+# define FUTEX_WAIT 0
+#endif
+#ifndef FUTEX_WAKE
+# define FUTEX_WAKE 1
+#endif
+#ifndef FUTEX_FD
+# define FUTEX_FD 2
+#endif
+#ifndef FUTEX_REQUEUE
+# define FUTEX_REQUEUE 3
+#endif
 
 #include <sched.h>
 #include <asm/posix_types.h>
@@ -104,7 +104,7 @@
 #undef GETGROUPS32_T
 #define GETGROUPS32_T __kernel_gid32_t
 
-#if defined(LINUX) && defined(IA64)
+#if defined(IA64)
 # include <asm/ptrace_offsets.h>
 # include <asm/rse.h>
 #endif
@@ -360,7 +360,7 @@ sys_sethostname(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4) || defined(SVR4)
+#if defined(ALPHA)
 int
 sys_gethostname(struct tcb *tcp)
 {
@@ -373,7 +373,7 @@ sys_gethostname(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* ALPHA || FREEBSD || SUNOS4 || SVR4 */
+#endif
 
 int
 sys_setdomainname(struct tcb *tcp)
@@ -1068,7 +1068,7 @@ sys_getgroups32(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(ALPHA) || defined(SUNOS4) || defined(SVR4)
+#if defined(ALPHA)
 int
 sys_setpgrp(struct tcb *tcp)
 {
@@ -1077,7 +1077,7 @@ sys_setpgrp(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* ALPHA || SUNOS4 || SVR4 */
+#endif
 
 int
 sys_getpgrp(struct tcb *tcp)
@@ -1165,7 +1165,7 @@ printargc(const char *fmt, struct tcb *tcp, long addr)
 	tprintf(fmt, count, count == 1 ? "" : "s");
 }
 
-#if defined(SPARC) || defined(SPARC64) || defined(SUNOS4)
+#if defined(SPARC) || defined(SPARC64)
 int
 sys_execv(struct tcb *tcp)
 {
@@ -1181,7 +1181,7 @@ sys_execv(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* SPARC || SPARC64 || SUNOS4 */
+#endif
 
 int
 sys_execve(struct tcb *tcp)
@@ -1209,11 +1209,10 @@ sys_execve(struct tcb *tcp)
 }
 
 
-#if defined SUNOS4 || (defined LINUX && defined TCB_WAITEXECVE)
+#if defined(TCB_WAITEXECVE)
 int
 internal_exec(struct tcb *tcp)
 {
-# if defined LINUX && defined TCB_WAITEXECVE
 	if (exiting(tcp) && syserror(tcp))
 		tcp->flags &= ~TCB_WAITEXECVE;
 	else {
@@ -1221,7 +1220,6 @@ internal_exec(struct tcb *tcp)
 		if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC))
 			tcp->flags |= TCB_WAITEXECVE; /* no */
 	}
-# endif
 	return 0;
 }
 #endif

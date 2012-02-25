@@ -48,7 +48,7 @@
 
 /* Configuration section */
 #ifndef MAX_QUALS
-#if defined(LINUX) && defined(MIPS)
+#if defined(MIPS)
 #define MAX_QUALS	7000	/* maximum number of syscalls, signals, etc. */
 #else
 #define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
@@ -67,11 +67,6 @@
  * Make sure that all entries in all syscallent.h files
  * have nargs <= MAX_ARGS!
  * linux/<ARCH>/syscallent.h: all have nargs <= 6.
- * freebsd/i386/syscallent.h: one syscall with nargs = 8
- * (sys_sendfile, looks legitimate)
- * and one with nargs = 7 (sys_mmap, maybe it should have 6?).
- * sunos4/syscallent.h: all are <= 6.
- * svr4/syscallent.h: all are MA (MAX_ARGS), it's unclear what the real max is.
  */
 #ifndef MAX_ARGS
 #   define MAX_ARGS	6
@@ -578,8 +573,7 @@ extern void tv_div(struct timeval *, struct timeval *, int);
 extern char *stpcpy(char *dst, const char *src);
 #endif
 
-#if !(defined(LINUX) && !defined(SPARC) && !defined(SPARC64) && !defined(IA64) \
-	&& !defined(SH))
+#if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
 extern long getrval2(struct tcb *);
 #endif
 

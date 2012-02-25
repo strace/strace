@@ -43,21 +43,21 @@
 
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
-#ifndef PTRACE_PEEKUSR
-# define PTRACE_PEEKUSR PTRACE_PEEKUSER
-#endif
-#ifndef PTRACE_POKEUSR
-# define PTRACE_POKEUSR PTRACE_POKEUSER
-#endif
+# ifndef PTRACE_PEEKUSR
+#  define PTRACE_PEEKUSR PTRACE_PEEKUSER
+# endif
+# ifndef PTRACE_POKEUSR
+#  define PTRACE_POKEUSR PTRACE_POKEUSER
+# endif
 #elif defined(HAVE_LINUX_PTRACE_H)
-#undef PTRACE_SYSCALL
+# undef PTRACE_SYSCALL
 # ifdef HAVE_STRUCT_IA64_FPREG
 #  define ia64_fpreg XXX_ia64_fpreg
 # endif
 # ifdef HAVE_STRUCT_PT_ALL_USER_REGS
 #  define pt_all_user_regs XXX_pt_all_user_regs
 # endif
-#include <linux/ptrace.h>
+# include <linux/ptrace.h>
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif
@@ -68,24 +68,24 @@
 # include <asm/ptrace_offsets.h>
 #endif
 
-#if defined (LINUX) && defined (SPARC64)
+#if defined(SPARC64)
 # undef PTRACE_GETREGS
 # define PTRACE_GETREGS PTRACE_GETREGS64
 # undef PTRACE_SETREGS
 # define PTRACE_SETREGS PTRACE_SETREGS64
-#endif /* LINUX && SPARC64 */
+#endif
 
-#if defined (SPARC) || defined (SPARC64) || defined (MIPS)
+#if defined(SPARC) || defined(SPARC64) || defined(MIPS)
 typedef struct {
 	struct pt_regs		si_regs;
 	int			si_mask;
 } m_siginfo_t;
 #elif defined HAVE_ASM_SIGCONTEXT_H
-#if !defined(IA64) && !defined(X86_64)
-#include <asm/sigcontext.h>
-#endif /* !IA64 && !X86_64 */
+# if !defined(IA64) && !defined(X86_64)
+#  include <asm/sigcontext.h>
+# endif /* !IA64 && !X86_64 */
 #else /* !HAVE_ASM_SIGCONTEXT_H */
-#if defined I386 && !defined HAVE_STRUCT_SIGCONTEXT_STRUCT
+# if defined I386 && !defined HAVE_STRUCT_SIGCONTEXT_STRUCT
 struct sigcontext_struct {
 	unsigned short gs, __gsh;
 	unsigned short fs, __fsh;
@@ -110,8 +110,8 @@ struct sigcontext_struct {
 	unsigned long oldmask;
 	unsigned long cr2;
 };
-#else /* !I386 */
-#if defined M68K && !defined HAVE_STRUCT_SIGCONTEXT
+# else /* !I386 */
+#  if defined M68K && !defined HAVE_STRUCT_SIGCONTEXT
 struct sigcontext
 {
 	unsigned long sc_mask;
@@ -124,25 +124,25 @@ struct sigcontext
 	unsigned long sc_pc;
 	unsigned short sc_formatvec;
 };
-#endif /* M68K */
-#endif /* !I386 */
+#  endif /* M68K */
+# endif /* !I386 */
 #endif /* !HAVE_ASM_SIGCONTEXT_H */
 
 #ifndef NSIG
-#warning: NSIG is not defined, using 32
-#define NSIG 32
+# warning: NSIG is not defined, using 32
+# define NSIG 32
 #endif
 #ifdef ARM
 /* Ugh. Is this really correct? ARM has no RT signals?! */
-#undef NSIG
-#define NSIG 32
+# undef NSIG
+# define NSIG 32
 #endif
 
 
 
 #ifdef HAVE_SIGACTION
 
-#if defined LINUX && (defined I386 || defined X86_64)
+#if defined I386 || defined X86_64
 /* The libc headers do not define this constant since it should only be
    used by the implementation.  So we define it here.  */
 # ifndef SA_RESTORER
@@ -427,7 +427,7 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 
 #define SI_FROMUSER(sip)	((sip)->si_code <= 0)
 
-#endif /* LINUX */
+#endif
 
 #if __GLIBC_MINOR__ < 1
 /* Type for data associated with a signal.  */
@@ -1141,7 +1141,7 @@ sys_sigsuspend(struct tcb *tcp)
 
 
 
-#if defined LINUX && !defined SS_ONSTACK
+#if !defined SS_ONSTACK
 #define SS_ONSTACK      1
 #define SS_DISABLE      2
 #if __GLIBC_MINOR__ == 0
