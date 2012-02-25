@@ -2185,4 +2185,3 @@ sys_setsockopt(struct tcb *tcp)
 	}
 	return 0;
 }
-

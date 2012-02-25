@@ -2119,4 +2119,3 @@ tabto(void)
 	if (curcol < acolumn)
 		tprints(acolumn_spaces + curcol);
 }
-

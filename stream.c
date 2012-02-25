@@ -451,5 +451,3 @@ sys_poll(struct tcb *tcp)
 	return 0;
 }
 #endif
-
-

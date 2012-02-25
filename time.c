@@ -962,4 +962,3 @@ sys_timerfd_gettime(struct tcb *tcp)
 	}
 	return 0;
 }
-

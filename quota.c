@@ -655,5 +655,3 @@ sys_quotactl(struct tcb *tcp)
 	}
 	return 0;
 }
-
-

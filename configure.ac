@@ -259,11 +259,7 @@ AC_CHECK_TYPES([struct sigcontext_struct,
 		struct sigcontext],,, [#include <signal.h>])
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
-AC_MP_PROCFS
-AC_POLLABLE_PROCFS
-
 AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
-AC_STRUCT_PR_SYSCALL
 
 AC_CHECK_MEMBERS([struct T_conn_res.QUEUE_ptr,
                   struct T_conn_res.ACCEPTOR_id],,,
