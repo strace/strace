@@ -32,9 +32,7 @@
 
 #include "defs.h"
 
-#ifdef LINUX
 #include <asm/ioctl.h>
-#endif
 
 static int
 compare(const void *a, const void *b)
@@ -50,9 +48,7 @@ ioctl_lookup(long code)
 	struct ioctlent *iop, ioent;
 
 	ioent.code = code;
-#ifdef LINUX
 	ioent.code &= (_IOC_NRMASK<<_IOC_NRSHIFT) | (_IOC_TYPEMASK<<_IOC_TYPESHIFT);
-#endif
 	iop = (struct ioctlent *) bsearch((char *) &ioent, (char *) ioctlent,
 			nioctlents, sizeof(struct ioctlent), compare);
 	while (iop > ioctlent)
@@ -78,40 +74,18 @@ int
 ioctl_decode(struct tcb *tcp, long code, long arg)
 {
 	switch ((code >> 8) & 0xff) {
-#ifdef LINUX
 #if defined(ALPHA) || defined(POWERPC)
 	case 'f': case 't': case 'T':
 #else /* !ALPHA */
 	case 0x54:
 #endif /* !ALPHA */
-#else /* !LINUX */
-	case 'f': case 't': case 'T':
-#endif /* !LINUX */
 		return term_ioctl(tcp, code, arg);
-#ifdef LINUX
 	case 0x89:
-#else /* !LINUX */
-	case 'r': case 's': case 'i':
-#ifndef FREEBSD
-	case 'p':
-#endif
-#endif /* !LINUX */
 		return sock_ioctl(tcp, code, arg);
-#ifdef USE_PROCFS
-#ifndef HAVE_MP_PROCFS
-#ifndef FREEBSD
-	case 'q':
-#else
-	case 'p':
-#endif
-		return proc_ioctl(tcp, code, arg);
-#endif
-#endif /* USE_PROCFS */
 #ifdef HAVE_SYS_STREAM_H
 	case 'S':
 		return stream_ioctl(tcp, code, arg);
 #endif /* HAVE_SYS_STREAM_H */
-#ifdef LINUX
 	case 'p':
 		return rtc_ioctl(tcp, code, arg);
 	case 0x03:
@@ -119,7 +93,6 @@ ioctl_decode(struct tcb *tcp, long code, long arg)
 		return block_ioctl(tcp, code, arg);
 	case 0x22:
 		return scsi_ioctl(tcp, code, arg);
-#endif
 	default:
 		break;
 	}

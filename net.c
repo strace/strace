@@ -54,14 +54,12 @@
 #endif
 #include <arpa/inet.h>
 #include <net/if.h>
-#if defined(LINUX)
 #include <asm/types.h>
 #if defined(__GLIBC__) && (__GLIBC__ >= 2) && (__GLIBC__ + __GLIBC_MINOR__ >= 3)
 #  include <netipx/ipx.h>
 #else
 #  include <linux/ipx.h>
 #endif
-#endif /* LINUX */
 
 #if defined (__GLIBC__) && (((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)) || defined(HAVE_SIN6_SCOPE_ID_LINUX))
 #if defined(HAVE_LINUX_IN6_H)
@@ -105,11 +103,7 @@
 #define PF_UNSPEC AF_UNSPEC
 #endif
 
-#if UNIXWARE >= 7
-#define HAVE_SENDMSG		1		/* HACK - *FIXME* */
-#endif
 
-#ifdef LINUX
 /* Under Linux these are enums so we can't test for them with ifdef. */
 #define IPPROTO_EGP IPPROTO_EGP
 #define IPPROTO_PUP IPPROTO_PUP
@@ -117,7 +111,6 @@
 #define IPPROTO_IGMP IPPROTO_IGMP
 #define IPPROTO_RAW IPPROTO_RAW
 #define IPPROTO_MAX IPPROTO_MAX
-#endif
 
 static const struct xlat domains[] = {
 #ifdef PF_AAL5
@@ -1455,7 +1448,6 @@ printmsghdr(struct tcb *tcp, long addr)
 	do_msghdr(tcp, &msg);
 }
 
-#ifdef LINUX
 static void
 printmmsghdr(struct tcb *tcp, long addr)
 {
@@ -1472,7 +1464,6 @@ printmmsghdr(struct tcb *tcp, long addr)
 	do_msghdr(tcp, &mmsg.msg_hdr);
 	tprintf(", %u}", mmsg.msg_len);
 }
-#endif
 
 #endif /* HAVE_SENDMSG */
 
@@ -1526,32 +1517,6 @@ sys_socket(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef SVR4
-int
-sys_so_socket(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		/* not sure really what these args are... but this
-		 * is how truss prints it
-		 */
-		tprintf("%ld, %ld, %ld, ",
-		  tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
-		printpath(tcp, tcp->u_arg[3]);
-		tprintf(", %ld", tcp->u_arg[4]);
-	}
-	return 0;
-}
-
-int
-sys_so_socketpair(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		/* not sure what this arg is */
-		tprintf("0x%lx", tcp->u_arg[0]);
-	}
-	return 0;
-}
-#endif /* SVR4 */
 
 int
 sys_bind(struct tcb *tcp)
@@ -1613,13 +1578,11 @@ sys_accept(struct tcb *tcp)
 	return do_accept(tcp, -1);
 }
 
-#ifdef LINUX
 int
 sys_accept4(struct tcb *tcp)
 {
 	return do_accept(tcp, 3);
 }
-#endif
 
 int
 sys_send(struct tcb *tcp)
@@ -1749,7 +1712,6 @@ sys_recvmsg(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef LINUX
 int
 sys_recvmmsg(struct tcb *tcp)
 {
@@ -1799,7 +1761,6 @@ sys_recvmmsg(struct tcb *tcp)
 		return RVAL_STR;
 	}
 }
-#endif
 
 #endif /* HAVE_SENDMSG */
 
@@ -1866,20 +1827,16 @@ sys_pipe(struct tcb *tcp)
 	return do_pipe(tcp, -1);
 }
 
-#ifdef LINUX
 int
 sys_pipe2(struct tcb *tcp)
 {
 	return do_pipe(tcp, 1);
 }
-#endif
 
 int
 sys_socketpair(struct tcb *tcp)
 {
-#ifdef LINUX
 	int fds[2];
-#endif
 
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
@@ -1907,15 +1864,10 @@ sys_socketpair(struct tcb *tcp)
 			tprintf(", %#lx", tcp->u_arg[3]);
 			return 0;
 		}
-#ifdef LINUX
 		if (umoven(tcp, tcp->u_arg[3], sizeof fds, (char *) fds) < 0)
 			tprints(", [...]");
 		else
 			tprintf(", [%u, %u]", fds[0], fds[1]);
-#endif /* LINUX */
-#if defined(SUNOS4) || defined(SVR4) || defined(FREEBSD)
-		tprintf(", [%lu, %lu]", tcp->u_rval, getrval2(tcp));
-#endif /* SUNOS4 || SVR4 || FREEBSD */
 	}
 	return 0;
 }
@@ -2234,130 +2186,3 @@ sys_setsockopt(struct tcb *tcp)
 	return 0;
 }
 
-#if UNIXWARE >= 7
-
-static const struct xlat sock_version[] = {
-	{ __NETLIB_UW211_SVR4,	"UW211_SVR4" },
-	{ __NETLIB_UW211_XPG4,	"UW211_XPG4" },
-	{ __NETLIB_GEMINI_SVR4,	"GEMINI_SVR4" },
-	{ __NETLIB_GEMINI_XPG4,	"GEMINI_XPG4" },
-	{ __NETLIB_FP1_SVR4,	"FP1_SVR4" },
-	{ __NETLIB_FP1_XPG4,	"FP1_XPG4" },
-	{ 0,			NULL },
-};
-
-
-int
-netlib_call(struct tcb *tcp, int (*func)())
-{
-	if (entering(tcp)) {
-		int i;
-		printxval(sock_version, tcp->u_arg[0], "__NETLIB_???");
-		tprints(", ");
-		--tcp->u_nargs;
-		for (i = 0; i < tcp->u_nargs; i++)
-			tcp->u_arg[i] = tcp->u_arg[i + 1];
-		return func(tcp);
-	}
-
-	return func(tcp);
-}
-
-int
-sys_xsocket(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_socket);
-}
-
-int
-sys_xsocketpair(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_socketpair);
-}
-
-int
-sys_xbind(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_bind);
-}
-
-int
-sys_xconnect(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_connect);
-}
-
-int
-sys_xlisten(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_listen);
-}
-
-int
-sys_xaccept(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_accept);
-}
-
-int
-sys_xsendmsg(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_sendmsg);
-}
-
-int
-sys_xrecvmsg(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_recvmsg);
-}
-
-int
-sys_xgetsockaddr(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printxval(sock_version, tcp->u_arg[0], "__NETLIB_???");
-		tprints(", ");
-		if (tcp->u_arg[1] == 0) {
-			tprints("LOCALNAME, ");
-		}
-		else if (tcp->u_arg[1] == 1) {
-			tprints("REMOTENAME, ");
-		}
-		else {
-			tprintf("%ld, ", tcp->u_arg[1]);
-		}
-		tprintf("%ld, ", tcp->u_arg[2]);
-	}
-	else {
-		if (tcp->u_arg[3] == 0 || syserror(tcp)) {
-			tprintf("%#lx", tcp->u_arg[3]);
-		} else {
-			printsock(tcp, tcp->u_arg[3], tcp->u_arg[4]);
-		}
-		tprints(", ");
-		printnum(tcp, tcp->u_arg[4], "%lu");
-	}
-
-	return 0;
-
-}
-
-int
-sys_xgetsockopt(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_getsockopt);
-}
-
-int
-sys_xsetsockopt(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_setsockopt);
-}
-
-int
-sys_xshutdown(struct tcb *tcp)
-{
-	return netlib_call(tcp, sys_shutdown);
-}
-
-#endif /* UNIXWARE */

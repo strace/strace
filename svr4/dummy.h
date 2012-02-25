@@ -237,13 +237,6 @@
 #define sys_fork1 sys_fork
 #define sys_forkall sys_fork
 #define sys_memcntl sys_mctl
-#if UNIXWARE > 2
-#define sys_rfork1 sys_rfork
-#define sys_rforkall sys_rfork
-#ifndef HAVE_SYS_NSCSYS_H
-#define sys_ssisys printargs
-#endif
-#endif
 
 /* aio */
 #define sys_aionotify printargs

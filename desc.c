@@ -34,9 +34,7 @@
 
 #include <fcntl.h>
 #include <sys/file.h>
-#ifdef LINUX
 #include <inttypes.h>
-#endif
 #ifdef HAVE_SYS_EPOLL_H
 #include <sys/epoll.h>
 #endif
@@ -461,13 +459,11 @@ sys_dup2(struct tcb *tcp)
 	return do_dup2(tcp, -1);
 }
 
-#ifdef LINUX
 int
 sys_dup3(struct tcb *tcp)
 {
 	return do_dup2(tcp, 2);
 }
-#endif
 
 #if defined(ALPHA) || defined(FREEBSD) || defined(SUNOS4)
 int
@@ -581,7 +577,6 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 				break;
 		}
 		free(fds);
-#ifdef LINUX
 		/* This contains no useful information on SunOS.  */
 		if (args[4]) {
 			if (outptr < end_outstr - (10 + TIMEVAL_TEXT_BUFSIZE)) {
@@ -589,7 +584,6 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 				outptr = sprinttv(outptr, tcp, args[4], bitness, /*special:*/ 0);
 			}
 		}
-#endif /* LINUX */
 		*outptr = '\0';
 		tcp->auxstr = outstr;
 		return RVAL_STR;
@@ -598,7 +592,6 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	return 0;
 }
 
-#ifdef LINUX
 
 int
 sys_oldselect(struct tcb *tcp)
@@ -1028,7 +1021,6 @@ sys_io_getevents(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* LINUX */
 
 int
 sys_select(struct tcb *tcp)
@@ -1036,7 +1028,6 @@ sys_select(struct tcb *tcp)
 	return decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
 }
 
-#ifdef LINUX
 int
 sys_pselect6(struct tcb *tcp)
 {
@@ -1084,4 +1075,3 @@ sys_eventfd2(struct tcb *tcp)
 {
 	return do_eventfd(tcp, 1);
 }
-#endif

@@ -64,7 +64,6 @@ count_syscall(struct tcb *tcp, struct timeval *tv)
 		counts[tcp->scno].errors++;
 
 	tv_sub(tv, tv, &tcp->etime);
-#ifdef LINUX
 	if (tv_cmp(tv, &tcp->dtime) > 0) {
 		static struct timeval one_tick;
 
@@ -88,7 +87,6 @@ count_syscall(struct tcb *tcp, struct timeval *tv)
 				*tv = one_tick;
 		}
 	}
-#endif /* LINUX */
 	if (tv_cmp(tv, &shortest) < 0)
 		shortest = *tv;
 	tv_add(&counts[tcp->scno].time, &counts[tcp->scno].time, tv);

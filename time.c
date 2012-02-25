@@ -31,7 +31,6 @@
 
 #include "defs.h"
 
-#ifdef LINUX
 #include <linux/version.h>
 #include <sys/timex.h>
 #include <linux/ioctl.h>
@@ -43,7 +42,6 @@
 #ifndef UTIME_OMIT
 #define UTIME_OMIT ((1l << 30) - 2l)
 #endif
-#endif /* LINUX */
 
 struct timeval32
 {
@@ -167,9 +165,7 @@ int
 sys_time(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
-#ifndef SVR4
 		printnum(tcp, tcp->u_arg[0], "%ld");
-#endif /* SVR4 */
 	}
 	return 0;
 }
@@ -193,10 +189,8 @@ sys_gettimeofday(struct tcb *tcp)
 			return 0;
 		}
 		printtv(tcp, tcp->u_arg[0]);
-#ifndef SVR4
 		tprints(", ");
 		printtv(tcp, tcp->u_arg[1]);
-#endif /* !SVR4 */
 	}
 	return 0;
 }
@@ -212,10 +206,8 @@ sys_osf_gettimeofday(struct tcb *tcp)
 			return 0;
 		}
 		printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
-#ifndef SVR4
 		tprints(", ");
 		printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
-#endif /* !SVR4 */
 	}
 	return 0;
 }
@@ -226,10 +218,8 @@ sys_settimeofday(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printtv(tcp, tcp->u_arg[0]);
-#ifndef SVR4
 		tprints(", ");
 		printtv(tcp, tcp->u_arg[1]);
-#endif /* !SVR4 */
 	}
 	return 0;
 }
@@ -240,10 +230,8 @@ sys_osf_settimeofday(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
-#ifndef SVR4
 		tprints(", ");
 		printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
-#endif /* !SVR4 */
 	}
 	return 0;
 }
@@ -409,7 +397,6 @@ sys_osf_setitimer(struct tcb *tcp)
 }
 #endif
 
-#ifdef LINUX
 
 static const struct xlat adjtimex_modes[] = {
   { 0, "0" },
@@ -976,4 +963,3 @@ sys_timerfd_gettime(struct tcb *tcp)
 	return 0;
 }
 
-#endif /* LINUX */

@@ -29,13 +29,8 @@
 
 #include "defs.h"
 
-#ifdef LINUX
 #include <sys/socket.h>
 #include <linux/sockios.h>
-#else
-#include <sys/socket.h>
-#include <sys/sockio.h>
-#endif
 #include <arpa/inet.h>
 
 #if defined (ALPHA) || defined(SH) || defined(SH64)
@@ -127,7 +122,6 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 #endif
 		printnum(tcp, arg, ", %#d");
 		return 1;
-#ifdef LINUX
 	case SIOCGIFNAME:
 	case SIOCSIFNAME:
 	case SIOCGIFINDEX:
@@ -286,7 +280,6 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 		}
 		tprints("}");
 		return 1;
-#endif
 	default:
 		return 0;
 	}

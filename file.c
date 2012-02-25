@@ -34,18 +34,13 @@
 
 #include <dirent.h>
 
-#ifdef LINUX
 struct kernel_dirent {
 	unsigned long   d_ino;
 	unsigned long   d_off;
 	unsigned short  d_reclen;
 	char            d_name[1];
 };
-#else
-# define kernel_dirent dirent
-#endif
 
-#ifdef LINUX
 #  ifdef LINUXSPARC
 struct stat {
 	unsigned short	st_dev;
@@ -141,15 +136,9 @@ struct stat_sparc64 {
 #  ifdef HPPA
 #    define stat64 hpux_stat64
 #  endif
-#else
-#  include <sys/stat.h>
-#endif
 
 #include <fcntl.h>
 
-#ifdef SVR4
-#  include <sys/cred.h>
-#endif /* SVR4 */
 
 #ifdef HAVE_SYS_VFS_H
 #include <sys/vfs.h>
@@ -157,16 +146,11 @@ struct stat_sparc64 {
 
 #ifdef HAVE_LINUX_XATTR_H
 #include <linux/xattr.h>
-#elif defined linux
+#else
 #define XATTR_CREATE 1
 #define XATTR_REPLACE 2
 #endif
 
-#ifdef FREEBSD
-#include <sys/param.h>
-#include <sys/mount.h>
-#include <sys/stat.h>
-#endif
 
 #if _LFS64_LARGEFILE && (defined(LINUX) || defined(SVR4))
 # ifdef HAVE_INTTYPES_H
@@ -205,9 +189,6 @@ struct stat_sparc64 {
 #include <sys/asynch.h>
 #endif
 
-#ifdef SUNOS4
-#include <ustat.h>
-#endif
 
 const struct xlat open_access_modes[] = {
 	{ O_RDONLY,	"O_RDONLY"	},
@@ -320,7 +301,6 @@ const struct xlat open_mode_flags[] = {
 	{ 0,		NULL		},
 };
 
-#ifdef LINUX
 
 #ifndef AT_FDCWD
 # define AT_FDCWD                -100
@@ -339,7 +319,6 @@ print_dirfd(struct tcb *tcp, int fd)
 		tprints(", ");
 	}
 }
-#endif
 
 /*
  * low bits of the open(2) flags define access mode,
@@ -410,7 +389,6 @@ sys_open(struct tcb *tcp)
 	return decode_open(tcp, 0);
 }
 
-#ifdef LINUX
 int
 sys_openat(struct tcb *tcp)
 {
@@ -418,7 +396,6 @@ sys_openat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_open(tcp, 1);
 }
-#endif
 
 #ifdef LINUXSPARC
 static const struct xlat openmodessol[] = {
@@ -498,7 +475,6 @@ sys_access(struct tcb *tcp)
 	return decode_access(tcp, 0);
 }
 
-#ifdef LINUX
 int
 sys_faccessat(struct tcb *tcp)
 {
@@ -506,7 +482,6 @@ sys_faccessat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_access(tcp, 1);
 }
-#endif
 
 int
 sys_umask(struct tcb *tcp)
@@ -568,7 +543,6 @@ sys_lseek(struct tcb *tcp)
 #endif /* LINUX_MIPSN32 */
 #endif
 
-#ifdef LINUX
 int
 sys_llseek(struct tcb *tcp)
 {
@@ -611,7 +585,6 @@ sys_readahead(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
 int
@@ -923,49 +896,9 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 #endif /* LINUX && POWERPC64 */
 
 static const struct xlat fileflags[] = {
-#ifdef FREEBSD
-	{ UF_NODUMP,	"UF_NODUMP"	},
-	{ UF_IMMUTABLE,	"UF_IMMUTABLE"	},
-	{ UF_APPEND,	"UF_APPEND"	},
-	{ UF_OPAQUE,	"UF_OPAQUE"	},
-	{ UF_NOUNLINK,	"UF_NOUNLINK"	},
-	{ SF_ARCHIVED,	"SF_ARCHIVED"	},
-	{ SF_IMMUTABLE,	"SF_IMMUTABLE"	},
-	{ SF_APPEND,	"SF_APPEND"	},
-	{ SF_NOUNLINK,	"SF_NOUNLINK"	},
-#elif UNIXWARE >= 2
-#ifdef _S_ISMLD
-	{ _S_ISMLD,	"_S_ISMLD"	},
-#endif
-#ifdef _S_ISMOUNTED
-	{ _S_ISMOUNTED,	"_S_ISMOUNTED"	},
-#endif
-#endif
 	{ 0,		NULL		},
 };
 
-#ifdef FREEBSD
-int
-sys_chflags(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printflags(fileflags, tcp->u_arg[1], "UF_???");
-	}
-	return 0;
-}
-
-int
-sys_fchflags(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
-		printflags(fileflags, tcp->u_arg[1], "UF_???");
-	}
-	return 0;
-}
-#endif
 
 #ifndef HAVE_LONG_LONG_OFF_T
 static void
@@ -1312,7 +1245,6 @@ sys_stat64(struct tcb *tcp)
 #endif
 }
 
-#ifdef LINUX
 static const struct xlat fstatatflags[] = {
 #ifndef AT_SYMLINK_NOFOLLOW
 # define AT_SYMLINK_NOFOLLOW     0x100
@@ -1345,7 +1277,6 @@ sys_newfstatat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 #if defined(LINUX) && defined(HAVE_STRUCT___OLD_KERNEL_STAT) \
     && !defined(HAVE_LONG_LONG_OFF_T)
@@ -1640,7 +1571,6 @@ sys_aclipc(struct tcb *tcp)
 
 #endif /* SVR4 || LINUXSPARC */
 
-#ifdef LINUX
 
 static const struct xlat fsmagic[] = {
 	{ 0x73757245,	"CODA_SUPER_MAGIC"	},
@@ -1675,15 +1605,12 @@ static const struct xlat fsmagic[] = {
 	{ 0,		NULL			},
 };
 
-#endif /* LINUX */
 
-#ifndef SVR4
 
 static const char *
 sprintfstype(int magic)
 {
 	static char buf[32];
-#ifdef LINUX
 	const char *s;
 
 	s = xlookup(fsmagic, magic);
@@ -1691,7 +1618,6 @@ sprintfstype(int magic)
 		sprintf(buf, "\"%s\"", s);
 		return buf;
 	}
-#endif /* LINUX */
 	sprintf(buf, "%#x", magic);
 	return buf;
 }
@@ -1729,9 +1655,7 @@ printstatfs(struct tcb *tcp, long addr)
 		(unsigned long)statbuf.f_files,
 		(unsigned long)statbuf.f_ffree,
 		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
-#ifdef LINUX
 	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
-#endif /* LINUX */
 #endif /* !ALPHA */
 #ifdef _STATFS_F_FRSIZE
 	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
@@ -1908,38 +1832,7 @@ osf_fstatfs(struct tcb *tcp)
 }
 #endif /* LINUX && __alpha */
 
-#endif /* !SVR4 */
 
-#ifdef SUNOS4
-int
-sys_ustat(struct tcb *tcp)
-{
-	struct ustat statbuf;
-
-	if (entering(tcp)) {
-		tprintf("makedev(%lu, %lu), ",
-				(long) major(tcp->u_arg[0]),
-				(long) minor(tcp->u_arg[0]));
-	}
-	else {
-		if (syserror(tcp) || !verbose(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umove(tcp, tcp->u_arg[1], &statbuf) < 0)
-			tprints("{...}");
-		else {
-			tprintf("{f_tfree=%lu, f_tinode=%lu, ",
-				statbuf.f_tfree, statbuf.f_tinode);
-			tprintf("f_fname=\"%.*s\", ",
-				(int) sizeof(statbuf.f_fname),
-				statbuf.f_fname);
-			tprintf("f_fpack=\"%.*s\"}",
-				(int) sizeof(statbuf.f_fpack),
-				statbuf.f_fpack);
-		}
-	}
-	return 0;
-}
-#endif /* SUNOS4 */
 
 /* directory */
 int
@@ -1967,7 +1860,6 @@ sys_mkdir(struct tcb *tcp)
 	return decode_mkdir(tcp, 0);
 }
 
-#ifdef LINUX
 int
 sys_mkdirat(struct tcb *tcp)
 {
@@ -1975,7 +1867,6 @@ sys_mkdirat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_mkdir(tcp, 1);
 }
-#endif
 
 int
 sys_link(struct tcb *tcp)
@@ -1988,7 +1879,6 @@ sys_link(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef LINUX
 int
 sys_linkat(struct tcb *tcp)
 {
@@ -2003,9 +1893,7 @@ sys_linkat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
-#ifdef LINUX
 static const struct xlat unlinkatflags[] = {
 #ifndef AT_REMOVEDIR
 # define AT_REMOVEDIR            0x200
@@ -2025,9 +1913,7 @@ sys_unlinkat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
-#ifdef LINUX
 int
 sys_symlinkat(struct tcb *tcp)
 {
@@ -2039,7 +1925,6 @@ sys_symlinkat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 static int
 decode_readlink(struct tcb *tcp, int offset)
@@ -2070,7 +1955,6 @@ sys_readlink(struct tcb *tcp)
 	return decode_readlink(tcp, 0);
 }
 
-#ifdef LINUX
 int
 sys_readlinkat(struct tcb *tcp)
 {
@@ -2078,9 +1962,7 @@ sys_readlinkat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_readlink(tcp, 1);
 }
-#endif
 
-#ifdef LINUX
 int
 sys_renameat(struct tcb *tcp)
 {
@@ -2093,7 +1975,6 @@ sys_renameat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 int
 sys_chown(struct tcb *tcp)
@@ -2106,7 +1987,6 @@ sys_chown(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef LINUX
 int
 sys_fchownat(struct tcb *tcp)
 {
@@ -2120,7 +2000,6 @@ sys_fchownat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 int
 sys_fchown(struct tcb *tcp)
@@ -2149,7 +2028,6 @@ sys_chmod(struct tcb *tcp)
 	return decode_chmod(tcp, 0);
 }
 
-#ifdef LINUX
 int
 sys_fchmodat(struct tcb *tcp)
 {
@@ -2157,7 +2035,6 @@ sys_fchmodat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_chmod(tcp, 1);
 }
-#endif
 
 int
 sys_fchmod(struct tcb *tcp)
@@ -2210,7 +2087,6 @@ sys_utimes(struct tcb *tcp)
 	return decode_utimes(tcp, 0, 0);
 }
 
-#ifdef LINUX
 int
 sys_futimesat(struct tcb *tcp)
 {
@@ -2230,7 +2106,6 @@ sys_utimensat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 int
 sys_utime(struct tcb *tcp)
@@ -2301,7 +2176,6 @@ sys_mknod(struct tcb *tcp)
 	return decode_mknod(tcp, 0);
 }
 
-#ifdef LINUX
 int
 sys_mknodat(struct tcb *tcp)
 {
@@ -2309,19 +2183,7 @@ sys_mknodat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_mknod(tcp, 1);
 }
-#endif
 
-#ifdef FREEBSD
-int
-sys_mkfifo(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", %#lo", tcp->u_arg[1]);
-	}
-	return 0;
-}
-#endif /* FREEBSD */
 
 int
 sys_fsync(struct tcb *tcp)
@@ -2332,7 +2194,6 @@ sys_fsync(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef LINUX
 
 static void
 printdir(struct tcb *tcp, long addr)
@@ -2371,9 +2232,7 @@ sys_readdir(struct tcb *tcp)
 	return 0;
 }
 
-#endif /* LINUX */
 
-#if defined FREEBSD || defined LINUX
 static const struct xlat direnttypes[] = {
 	{ DT_UNKNOWN,	"DT_UNKNOWN"	},
 	{ DT_FIFO,	"DT_FIFO"	},
@@ -2387,7 +2246,6 @@ static const struct xlat direnttypes[] = {
 	{ 0,		NULL		},
 };
 
-#endif
 
 int
 sys_getdents(struct tcb *tcp)
@@ -2422,42 +2280,12 @@ sys_getdents(struct tcb *tcp)
 		tprints("{");
 	for (i = 0; i < len;) {
 		struct kernel_dirent *d = (struct kernel_dirent *) &buf[i];
-#ifdef LINUX
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
 				i ? " " : "", d->d_ino, d->d_off);
 			tprintf("d_reclen=%u, d_name=\"%s\"}",
 				d->d_reclen, d->d_name);
 		}
-#endif /* LINUX */
-#ifdef SVR4
-		if (!abbrev(tcp)) {
-			tprintf("%s{d_ino=%lu, d_off=%lu, ",
-				i ? " " : "",
-				(unsigned long) d->d_ino,
-				(unsigned long) d->d_off);
-			tprintf("d_reclen=%u, d_name=\"%s\"}",
-				d->d_reclen, d->d_name);
-		}
-#endif /* SVR4 */
-#ifdef SUNOS4
-		if (!abbrev(tcp)) {
-			tprintf("%s{d_off=%lu, d_fileno=%lu, d_reclen=%u, ",
-				i ? " " : "", d->d_off, d->d_fileno,
-				d->d_reclen);
-			tprintf("d_namlen=%u, d_name=\"%.*s\"}",
-				d->d_namlen, d->d_namlen, d->d_name);
-		}
-#endif /* SUNOS4 */
-#ifdef FREEBSD
-		if (!abbrev(tcp)) {
-			tprintf("%s{d_fileno=%u, d_reclen=%u, d_type=",
-				i ? " " : "", d->d_fileno, d->d_reclen);
-			printxval(direnttypes, d->d_type, "DT_???");
-			tprintf(", d_namlen=%u, d_name=\"%.*s\"}",
-				d->d_namlen, d->d_namlen, d->d_name);
-		}
-#endif /* FREEBSD */
 		if (!d->d_reclen) {
 			tprints("/* d_reclen == 0, problem here */");
 			break;
@@ -2511,30 +2339,17 @@ sys_getdents64(struct tcb *tcp)
 		tprints("{");
 	for (i = 0; i < len;) {
 		struct dirent64 *d = (struct dirent64 *) &buf[i];
-#if defined(LINUX) || defined(SVR4)
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%" PRIu64 ", d_off=%" PRId64 ", ",
 				i ? " " : "",
 				d->d_ino,
 				d->d_off);
-#ifdef LINUX
 			tprints("d_type=");
 			printxval(direnttypes, d->d_type, "DT_???");
 			tprints(", ");
-#endif
 			tprintf("d_reclen=%u, d_name=\"%s\"}",
 				d->d_reclen, d->d_name);
 		}
-#endif /* LINUX || SVR4 */
-#ifdef SUNOS4
-		if (!abbrev(tcp)) {
-			tprintf("%s{d_off=%lu, d_fileno=%lu, d_reclen=%u, ",
-				i ? " " : "", d->d_off, d->d_fileno,
-				d->d_reclen);
-			tprintf("d_namlen=%u, d_name=\"%.*s\"}",
-				d->d_namlen, d->d_namlen, d->d_name);
-		}
-#endif /* SUNOS4 */
 		if (!d->d_reclen) {
 			tprints("/* d_reclen == 0, problem here */");
 			break;
@@ -2552,72 +2367,7 @@ sys_getdents64(struct tcb *tcp)
 }
 #endif
 
-#ifdef FREEBSD
-int
-sys_getdirentries(struct tcb *tcp)
-{
-	int i, len, dents = 0;
-	long basep;
-	char *buf;
 
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		return 0;
-	}
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
-		return 0;
-	}
-
-	len = tcp->u_rval;
-	/* Beware of insanely large or negative tcp->u_rval */
-	if (tcp->u_rval > 1024*1024)
-		len = 1024*1024;
-	if (tcp->u_rval < 0)
-		len = 0;
-	buf = malloc(len);
-	if (!buf)
-		die_out_of_memory();
-
-	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-		tprintf("%#lx, %lu, %#lx", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
-		free(buf);
-		return 0;
-	}
-	if (!abbrev(tcp))
-		tprints("{");
-	for (i = 0; i < len;) {
-		struct kernel_dirent *d = (struct kernel_dirent *) &buf[i];
-		if (!abbrev(tcp)) {
-			tprintf("%s{d_fileno=%u, d_reclen=%u, d_type=",
-				i ? " " : "", d->d_fileno, d->d_reclen);
-			printxval(direnttypes, d->d_type, "DT_???");
-			tprintf(", d_namlen=%u, d_name=\"%.*s\"}",
-				d->d_namlen, d->d_namlen, d->d_name);
-		}
-		if (!d->d_reclen) {
-			tprints("/* d_reclen == 0, problem here */");
-			break;
-		}
-		i += d->d_reclen;
-		dents++;
-	}
-	if (!abbrev(tcp))
-		tprints("}");
-	else
-		tprintf("/* %u entries */", dents);
-	free(buf);
-	tprintf(", %lu", tcp->u_arg[2]);
-	if (umove(tcp, tcp->u_arg[3], &basep) < 0)
-		tprintf(", %#lx", tcp->u_arg[3]);
-	else
-		tprintf(", [%lu]", basep);
-	return 0;
-}
-#endif
-
-#ifdef LINUX
 int
 sys_getcwd(struct tcb *tcp)
 {
@@ -2630,22 +2380,7 @@ sys_getcwd(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* LINUX */
 
-#ifdef FREEBSD
-int
-sys___getcwd(struct tcb *tcp)
-{
-	if (exiting(tcp)) {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[0]);
-		else
-			printpathn(tcp, tcp->u_arg[0], tcp->u_arg[1]);
-		tprintf(", %lu", tcp->u_arg[1]);
-	}
-	return 0;
-}
-#endif
 
 #ifdef HAVE_SYS_ASYNCH_H
 
@@ -2887,7 +2622,6 @@ static const struct xlat advise[] = {
 };
 
 
-#ifdef LINUX
 int
 sys_fadvise64(struct tcb *tcp)
 {
@@ -2901,7 +2635,6 @@ sys_fadvise64(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 
 int
@@ -2926,7 +2659,6 @@ sys_fadvise64_64(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef LINUX
 static const struct xlat inotify_modes[] = {
 	{ 0x00000001,	"IN_ACCESS"	},
 	{ 0x00000002,	"IN_MODIFY"	},
@@ -3001,4 +2733,3 @@ sys_fallocate(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif

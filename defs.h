@@ -37,9 +37,7 @@
 #include <sgidefs.h>
 #endif
 
-#ifdef linux
 #include <features.h>
-#endif
 
 #ifdef _LARGEFILE64_SOURCE
 /* This is the macro everything checks before using foo64 names.  */
@@ -76,20 +74,7 @@
  * svr4/syscallent.h: all are MA (MAX_ARGS), it's unclear what the real max is.
  */
 #ifndef MAX_ARGS
-# if defined LINUX
 #   define MAX_ARGS	6
-# elif defined HPPA
-#  define MAX_ARGS	6
-# elif defined X86_64 || defined I386
-#  ifdef FREEBSD
-#   define MAX_ARGS	8
-#  else
-#   define MAX_ARGS	6
-#  endif
-# else
-/* Way too big. Switch your arch to saner size after you tested that it works */
-#  define MAX_ARGS	32
-# endif
 #endif
 
 #ifndef DEFAULT_SORTBY
@@ -118,7 +103,6 @@
 #include <signal.h>
 #endif
 
-#if defined(LINUX)
 #  if defined(SPARC) || defined(SPARC64)
 #     define LINUXSPARC
 #  endif
@@ -142,32 +126,10 @@
 #  if defined(AVR32)
 #     define LINUX_AVR32
 #  endif
-#endif
 
-#if defined(SVR4) || defined(FREEBSD)
-#define USE_PROCFS
-#else
 #undef USE_PROCFS
-#endif
 
-#ifdef FREEBSD
-#ifndef I386
-#error "FreeBSD support is only for i386 arch right now."
-#endif
-#include <machine/psl.h>
-#include <machine/reg.h>
-#include <sys/syscall.h>
-#endif
 
-#ifdef USE_PROCFS
-# include <sys/procfs.h>
-# ifdef HAVE_MP_PROCFS
-#  include <sys/uio.h>
-# endif
-# ifdef FREEBSD
-#  include <sys/pioctl.h>
-# endif
-#else /* !USE_PROCFS */
 # if (defined(LINUXSPARC) || defined(LINUX_X86_64) || defined(LINUX_ARM) || defined(LINUX_AVR32)) && defined(__GLIBC__)
 #  include <sys/ptrace.h>
 # else
@@ -180,15 +142,9 @@
 #   include <asm/ptrace.h>
 #   undef __KERNEL__
 #  endif
-#  ifdef LINUX
 extern long ptrace(int, int, char *, long);
-#  else
-extern int ptrace(int, int, char *, int, ...);
-#  endif
 # endif
-#endif /* !USE_PROCFS */
 
-#ifdef LINUX
 #if !defined(__GLIBC__)
 #define	PTRACE_PEEKUSER	PTRACE_PEEKUSR
 #define	PTRACE_POKEUSER	PTRACE_POKEUSR
@@ -236,7 +192,6 @@ extern int ptrace(int, int, char *, int, ...);
 #  define REG_PC             (0*8)
 #  define REG_SYSCALL        (2*8)
 #endif /* SH64 */
-#endif /* LINUX */
 
 #define SUPPORTED_PERSONALITIES 1
 #define DEFAULT_PERSONALITY 0
@@ -281,61 +236,7 @@ extern int ptrace(int, int, char *, int, ...);
 #define PERSONALITY1_WORDSIZE 4
 #endif
 
-#ifdef SVR4
-#ifdef HAVE_MP_PROCFS
-extern int mp_ioctl(int f, int c, void *a, int s);
-#define IOCTL(f,c,a)	mp_ioctl(f, c, a, sizeof *a)
-#define IOCTL_STATUS(t) \
-	 pread(t->pfd_stat, &t->status, sizeof t->status, 0)
-#define IOCTL_WSTOP(t) \
-	(IOCTL(t->pfd, PCWSTOP, (char *)NULL) < 0 ? -1 : IOCTL_STATUS(t))
-#define PR_WHY		pr_lwp.pr_why
-#define PR_WHAT		pr_lwp.pr_what
-#define PR_REG		pr_lwp.pr_context.uc_mcontext.gregs
-#define PR_FLAGS	pr_lwp.pr_flags
-#define PR_SYSCALL	pr_lwp.pr_syscall
-#define PR_INFO		pr_lwp.pr_info
-#define PIOCSTIP	PCSTOP
-#define PIOCSET		PCSET
-#define PIOCRESET	PCRESET
-#define PIOCSTRACE	PCSTRACE
-#define PIOCSFAULT	PCSFAULT
-#define PIOCWSTOP	PCWSTOP
-#define PIOCSTOP	PCSTOP
-#define PIOCSENTRY	PCSENTRY
-#define PIOCSEXIT	PCSEXIT
-#define PIOCRUN		PCRUN
-#else
-#define IOCTL		ioctl
-#define IOCTL_STATUS(t)	ioctl(t->pfd, PIOCSTATUS, &t->status)
-#define IOCTL_WSTOP(t)	ioctl(t->pfd, PIOCWSTOP, &t->status)
-#define PR_WHY		pr_why
-#define PR_WHAT		pr_what
-#define PR_REG		pr_reg
-#define PR_FLAGS	pr_flags
-#define PR_SYSCALL	pr_syscall
-#define PR_INFO		pr_info
-#endif
-#endif
-#ifdef FREEBSD
-#define IOCTL		ioctl
-#define IOCTL_STATUS(t)	ioctl(t->pfd, PIOCSTATUS, &t->status)
-#define IOCTL_WSTOP(t)	ioctl(t->pfd, PIOCWAIT, &t->status)
-#define PIOCRUN         PIOCCONT
-#define PIOCWSTOP       PIOCWAIT
-#define PR_WHY		why
-#define PR_WHAT		val
-#define PR_FLAGS	state
-/* from /usr/src/sys/miscfs/procfs/procfs_vnops.c,
-   status.state = 0 for running, 1 for stopped */
-#define PR_ASLEEP	1
-#define PR_SYSENTRY     S_SCE
-#define PR_SYSEXIT      S_SCX
-#define PR_SIGNALLED    S_SIG
-#define PR_FAULTED      S_CORE
-#endif
 
-#ifdef LINUX
 # if !HAVE_DECL_PTRACE_SETOPTIONS
 #  define PTRACE_SETOPTIONS	0x4200
 # endif
@@ -401,7 +302,6 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 #  define PTRACE_EVENT_STOP1	128
 # endif
 
-#endif /* LINUX */
 
 #if !defined __GNUC__
 # define __attribute__(x) /*nothing*/
@@ -409,11 +309,9 @@ extern int mp_ioctl(int f, int c, void *a, int s);
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
-#ifdef LINUX
 # if defined(I386)
 extern struct pt_regs i386_regs;
 # endif
-#endif /* LINUX */
 
 /* Trace Control Block */
 struct tcb {
@@ -443,23 +341,6 @@ struct tcb {
 				/* Support for tracing forked processes */
 	long baddr;		/* `Breakpoint' address */
 	long inst[2];		/* Instructions on above */
-#ifdef USE_PROCFS
-	int pfd;		/* proc file descriptor */
-#endif
-#ifdef SVR4
-# ifdef HAVE_MP_PROCFS
-	int pfd_stat;
-	int pfd_as;
-	pstatus_t status;
-# else
-	prstatus_t status;	/* procfs status structure */
-# endif
-#endif
-#ifdef FREEBSD
-	struct procfs_status status;
-	int pfd_reg;
-	int pfd_status;
-#endif
 };
 
 /* TCB flags */
@@ -495,7 +376,6 @@ struct tcb {
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #define TCB_FILTERED	02000	/* This system call has been filtered out */
-#ifdef LINUX
 /* x86 does not need TCB_WAITEXECVE.
  * It can detect SIGTRAP by looking at eax/rax.
  * See "not a syscall entry (eax = %ld)\n" message
@@ -511,7 +391,6 @@ struct tcb {
 #  define TCB_WAITEXECVE 04000
 # endif
 # include <sys/syscall.h>
-#endif /* LINUX */
 
 /* qualifier flags */
 #define QUAL_TRACE	0001	/* this system call should be traced */
@@ -607,9 +486,6 @@ extern void droptcb(struct tcb *);
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void qualify(const char *);
-#ifdef USE_PROCFS
-extern int get_scno(struct tcb *);
-#endif
 extern long do_ptrace(int request, struct tcb *tcp, void *addr, void *data);
 extern int ptrace_restart(int request, struct tcb *tcp, int sig);
 extern int trace_syscall(struct tcb *);
@@ -681,11 +557,9 @@ extern int term_ioctl(struct tcb *, long, long);
 extern int sock_ioctl(struct tcb *, long, long);
 extern int proc_ioctl(struct tcb *, int, int);
 extern int stream_ioctl(struct tcb *, int, int);
-#ifdef LINUX
 extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
 extern int block_ioctl(struct tcb *, long, long);
-#endif
 
 extern int tv_nz(struct timeval *);
 extern int tv_cmp(struct timeval *, struct timeval *);
@@ -704,15 +578,9 @@ extern void tv_div(struct timeval *, struct timeval *, int);
 extern char *stpcpy(char *dst, const char *src);
 #endif
 
-#ifdef SUNOS4
-extern int fixvfork(struct tcb *);
-#endif
 #if !(defined(LINUX) && !defined(SPARC) && !defined(SPARC64) && !defined(IA64) \
 	&& !defined(SH))
 extern long getrval2(struct tcb *);
-#endif
-#ifdef USE_PROCFS
-extern int proc_open(struct tcb *tcp, int attaching);
 #endif
 
 #define umove(pid, addr, objp)	\

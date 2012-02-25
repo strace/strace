@@ -117,7 +117,6 @@ storepath(const char *path)
  */
 const char *getfdpath(struct tcb *tcp, int fd)
 {
-#ifdef LINUX
 	static char path[PATH_MAX+1];
 	char linkpath[64];
 	ssize_t n;
@@ -131,9 +130,6 @@ const char *getfdpath(struct tcb *tcp, int fd)
 		return NULL;
 	path[n] = '\0';
 	return path;
-#else
-	return NULL;
-#endif
 }
 
 /*
@@ -192,7 +188,6 @@ pathtrace_match(struct tcb *tcp)
 	 * other than test arg[0].
 	 */
 
-#ifdef LINUX
 
 	if (s->sys_func == sys_dup2 ||
 	    s->sys_func == sys_dup3 ||
@@ -358,9 +353,6 @@ pathtrace_match(struct tcb *tcp)
 		 */
 		return 0;
 	}
-#else
-#warning "path tracing only using arg[0]"
-#endif
 
 	/*
 	 * Our fallback position for calls that haven't already

@@ -33,14 +33,8 @@
 #include "defs.h"
 
 #include <sys/resource.h>
-#ifdef LINUX
 #include <sys/times.h>
 #include <linux/kernel.h>
-#endif /* LINUX */
-#if defined(SVR4) || defined(FREEBSD)
-#include <sys/times.h>
-#include <sys/time.h>
-#endif
 
 #if HAVE_LONG_LONG_RLIM_T
 /*
@@ -255,7 +249,6 @@ sys_setrlimit64(struct tcb *tcp)
 }
 #endif /* _LFS64_LARGEFILES || HAVE_LONG_LONG_RLIM_T */
 
-#ifndef SVR4
 
 static const struct xlat usagewho[] = {
 	{ RUSAGE_SELF,		"RUSAGE_SELF"		},
@@ -385,9 +378,7 @@ sys_osf_getrusage(struct tcb *tcp)
 }
 #endif /* ALPHA */
 
-#endif /* !SVR4 */
 
-#ifdef LINUX
 
 int
 sys_sysinfo(struct tcb *tcp)
@@ -415,7 +406,6 @@ sys_sysinfo(struct tcb *tcp)
 	return 0;
 }
 
-#endif /* LINUX */
 
 static const struct xlat priorities[] = {
 	{ PRIO_PROCESS,	"PRIO_PROCESS"	},
@@ -452,7 +442,6 @@ sys_nice(struct tcb *tcp)
 	return 0;
 }
 
-#ifndef SUNOS4
 
 int
 sys_times(struct tcb *tcp)
@@ -476,4 +465,3 @@ sys_times(struct tcb *tcp)
 	return 0;
 }
 
-#endif /* !SUNOS4 */

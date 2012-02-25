@@ -43,11 +43,6 @@
 #if HAVE_SYS_UIO_H
 #include <sys/uio.h>
 #endif
-#ifdef SUNOS4
-#include <machine/reg.h>
-#include <a.out.h>
-#include <link.h>
-#endif /* SUNOS4 */
 
 #if defined(linux) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
 #include <linux/ptrace.h>
@@ -74,9 +69,6 @@
 # undef pt_all_user_regs
 #endif
 
-#ifdef SUNOS4_KERNEL_ARCH_KLUDGE
-#include <sys/utsname.h>
-#endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
 
 #if defined(LINUXSPARC) && defined (SPARC64)
 # undef PTRACE_GETREGS
@@ -254,13 +246,6 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 int
 printllval(struct tcb *tcp, const char *format, int llarg)
 {
-# if defined(FREEBSD) \
-     || (defined(LINUX) && defined(POWERPC) && !defined(POWERPC64)) \
-     || defined(LINUX_MIPSO32) \
-     || defined(__ARM_EABI__)
-	/* Align 64bit argument to 64bit boundary.  */
-	llarg = (llarg + 1) & 0x1e;
-# endif
 # if defined LINUX && (defined X86_64 || defined POWERPC64)
 	if (current_personality == 0) {
 		tprintf(format, tcp->u_arg[llarg]);
@@ -822,7 +807,6 @@ static bool process_vm_readv_not_supported = 1;
 int
 umoven(struct tcb *tcp, long addr, int len, char *laddr)
 {
-#ifdef LINUX
 	int pid = tcp->pid;
 	int n, m;
 	int started;
@@ -895,39 +879,8 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		memcpy(laddr, u.x, m);
 		addr += sizeof(long), laddr += m, len -= m;
 	}
-#endif /* LINUX */
 
-#ifdef SUNOS4
-	int pid = tcp->pid;
-	int n;
 
-	while (len) {
-		n = MIN(len, PAGSIZ);
-		n = MIN(n, ((addr + PAGSIZ) & PAGMASK) - addr);
-		if (ptrace(PTRACE_READDATA, pid,
-			   (char *) addr, len, laddr) < 0) {
-			if (errno != ESRCH) {
-				perror("umoven: ptrace(PTRACE_READDATA, ...)");
-				abort();
-			}
-			return -1;
-		}
-		len -= n;
-		addr += n;
-		laddr += n;
-	}
-#endif /* SUNOS4 */
-
-#ifdef USE_PROCFS
-#ifdef HAVE_MP_PROCFS
-	int fd = tcp->pfd_as;
-#else
-	int fd = tcp->pfd;
-#endif
-	lseek(fd, addr, SEEK_SET);
-	if (read(fd, laddr, len) == -1)
-		return -1;
-#endif /* USE_PROCFS */
 
 	return 0;
 }
@@ -947,40 +900,6 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 int
 umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 {
-#ifdef USE_PROCFS
-# ifdef HAVE_MP_PROCFS
-	int fd = tcp->pfd_as;
-# else
-	int fd = tcp->pfd;
-# endif
-	/* Some systems (e.g. FreeBSD) can be upset if we read off the
-	   end of valid memory,  avoid this by trying to read up
-	   to page boundaries.  But we don't know what a page is (and
-	   getpagesize(2) (if it exists) doesn't necessarily return
-	   hardware page size).  Assume all pages >= 1024 (a-historical
-	   I know) */
-
-	int page = 1024;	/* How to find this? */
-	int move = page - (addr & (page - 1));
-	int left = len;
-
-	lseek(fd, addr, SEEK_SET);
-
-	while (left) {
-		if (move > left)
-			move = left;
-		move = read(fd, laddr, move);
-		if (move <= 0)
-			return left != len ? 0 : -1;
-		if (memchr(laddr, 0, move))
-			return 1;
-		left -= move;
-		laddr += move;
-		addr += move;
-		move = page;
-	}
-	return 0;
-#else /* !USE_PROCFS */
 	int started;
 	int pid = tcp->pid;
 	int i, n, m;
@@ -1083,113 +1002,21 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 				return 1;
 		addr += sizeof(long), laddr += m, len -= m;
 	}
-#endif /* !USE_PROCFS */
 	return 0;
 }
 
-#ifdef LINUX
 # if !defined (SPARC) && !defined(SPARC64)
 #  define PTRACE_WRITETEXT	101
 #  define PTRACE_WRITEDATA	102
 # endif /* !SPARC && !SPARC64 */
-#endif /* LINUX */
 
-#ifdef SUNOS4
 
-static int
-uload(int cmd, int pid, long addr, int len, char *laddr)
-{
-	int peek, poke;
-	int n, m;
-	union {
-		long val;
-		char x[sizeof(long)];
-	} u;
-
-	if (cmd == PTRACE_WRITETEXT) {
-		peek = PTRACE_PEEKTEXT;
-		poke = PTRACE_POKETEXT;
-	}
-	else {
-		peek = PTRACE_PEEKDATA;
-		poke = PTRACE_POKEDATA;
-	}
-	if (addr & (sizeof(long) - 1)) {
-		/* addr not a multiple of sizeof(long) */
-		n = addr - (addr & -sizeof(long)); /* residue */
-		addr &= -sizeof(long);
-		errno = 0;
-		u.val = ptrace(peek, pid, (char *) addr, 0);
-		if (errno) {
-			perror("uload: POKE");
-			return -1;
-		}
-		m = MIN(sizeof(long) - n, len);
-		memcpy(&u.x[n], laddr, m);
-		if (ptrace(poke, pid, (char *)addr, u.val) < 0) {
-			perror("uload: POKE");
-			return -1;
-		}
-		addr += sizeof(long), laddr += m, len -= m;
-	}
-	while (len) {
-		if (len < sizeof(long))
-			u.val = ptrace(peek, pid, (char *) addr, 0);
-		m = MIN(sizeof(long), len);
-		memcpy(u.x, laddr, m);
-		if (ptrace(poke, pid, (char *) addr, u.val) < 0) {
-			perror("uload: POKE");
-			return -1;
-		}
-		addr += sizeof(long), laddr += m, len -= m;
-	}
-	return 0;
-}
-
-int
-tload(int pid, int addr, int len, char *laddr)
-{
-	return uload(PTRACE_WRITETEXT, pid, addr, len, laddr);
-}
-
-int
-dload(int pid, int addr, int len, char *laddr)
-{
-	return uload(PTRACE_WRITEDATA, pid, addr, len, laddr);
-}
-
-#endif /* SUNOS4 */
-
-#ifndef USE_PROCFS
 
 int
 upeek(struct tcb *tcp, long off, long *res)
 {
 	long val;
 
-# ifdef SUNOS4_KERNEL_ARCH_KLUDGE
-	{
-		static int is_sun4m = -1;
-		struct utsname name;
-
-		/* Round up the usual suspects. */
-		if (is_sun4m == -1) {
-			if (uname(&name) < 0) {
-				perror("upeek: uname?");
-				exit(1);
-			}
-			is_sun4m = strcmp(name.machine, "sun4m") == 0;
-			if (is_sun4m) {
-				const struct xlat *x;
-
-				for (x = struct_user_offsets; x->str; x++)
-					x->val += 1024;
-			}
-		}
-		if (is_sun4m)
-			off += 1024;
-	}
-# endif /* SUNOS4_KERNEL_ARCH_KLUDGE */
 	errno = 0;
 	val = do_ptrace(PTRACE_PEEKUSER, tcp, (char *) off, 0);
 	if (val == -1 && errno) {
@@ -1204,7 +1031,6 @@ upeek(struct tcb *tcp, long off, long *res)
 	return 0;
 }
 
-#endif /* !USE_PROCFS */
 
 void
 printcall(struct tcb *tcp)
@@ -1213,7 +1039,6 @@ printcall(struct tcb *tcp)
 			   sizeof(long) == 8 ? "[????????????????] " : \
 			   NULL /* crash */)
 
-#ifdef LINUX
 # ifdef I386
 	long eip;
 
@@ -1363,29 +1188,9 @@ printcall(struct tcb *tcp)
 	}
 	tprintf("[%08lx] ", pc);
 # endif /* architecture */
-#endif /* LINUX */
 
-#ifdef SUNOS4
-	struct regs regs;
 
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *) &regs, 0) < 0) {
-		perror("printcall: ptrace(PTRACE_GETREGS, ...)");
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%08x] ", regs.r_o7);
-#endif /* SUNOS4 */
 
-#ifdef SVR4
-	/* XXX */
-	PRINTBADPC;
-#endif
-
-#ifdef FREEBSD
-	struct reg regs;
-	pread(tcp->pfd_reg, &regs, sizeof(regs), 0);
-	tprintf("[%08x] ", regs.r_eip);
-#endif /* FREEBSD */
 }
 
 
@@ -1393,9 +1198,7 @@ printcall(struct tcb *tcp)
  * These #if's are huge, please indent them correctly.
  * It's easy to get confused otherwise.
  */
-#ifndef USE_PROCFS
 
-# ifdef LINUX
 
 #  include "syscall.h"
 
@@ -1694,204 +1497,6 @@ clearbpt(struct tcb *tcp)
 	return 0;
 }
 
-# else /* !defined LINUX */
-
-int
-setbpt(struct tcb *tcp)
-{
-#  ifdef SUNOS4
-#   ifdef SPARC	/* This code is slightly sparc specific */
-
-	struct regs regs;
-#    define BPT	0x91d02001	/* ta	1 */
-#    define LOOP	0x10800000	/* ba	0 */
-#    define LOOPA	0x30800000	/* ba,a	0 */
-#    define NOP	0x01000000
-#    if LOOPA
-	static int loopdeloop[1] = {LOOPA};
-#    else
-	static int loopdeloop[2] = {LOOP, NOP};
-#    endif
-
-	if (tcp->flags & TCB_BPTSET) {
-		fprintf(stderr, "PANIC: TCB already set in pid %u\n", tcp->pid);
-		return -1;
-	}
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-		perror("setbpt: ptrace(PTRACE_GETREGS, ...)");
-		return -1;
-	}
-	tcp->baddr = regs.r_o7 + 8;
-	if (ptrace(PTRACE_READTEXT, tcp->pid, (char *)tcp->baddr,
-				sizeof tcp->inst, (char *)tcp->inst) < 0) {
-		perror("setbpt: ptrace(PTRACE_READTEXT, ...)");
-		return -1;
-	}
-
-	/*
-	 * XXX - BRUTAL MODE ON
-	 * We cannot set a real BPT in the child, since it will not be
-	 * traced at the moment it will reach the trap and would probably
-	 * die with a core dump.
-	 * Thus, we are force our way in by taking out two instructions
-	 * and insert an eternal loop in stead, in expectance of the SIGSTOP
-	 * generated by out PTRACE_ATTACH.
-	 * Of cause, if we evaporate ourselves in the middle of all this...
-	 */
-	if (ptrace(PTRACE_WRITETEXT, tcp->pid, (char *) tcp->baddr,
-			sizeof loopdeloop, (char *) loopdeloop) < 0) {
-		perror("setbpt: ptrace(PTRACE_WRITETEXT, ...)");
-		return -1;
-	}
-	tcp->flags |= TCB_BPTSET;
-
-#   endif /* SPARC */
-#  endif /* SUNOS4 */
-
-	return 0;
-}
-
-int
-clearbpt(struct tcb *tcp)
-{
-#  ifdef SUNOS4
-#   ifdef SPARC
-
-#    if !LOOPA
-	struct regs regs;
-#    endif
-
-	if (!(tcp->flags & TCB_BPTSET)) {
-		fprintf(stderr, "PANIC: TCB not set in pid %u\n", tcp->pid);
-		return -1;
-	}
-	if (ptrace(PTRACE_WRITETEXT, tcp->pid, (char *) tcp->baddr,
-				sizeof tcp->inst, (char *) tcp->inst) < 0) {
-		perror("clearbtp: ptrace(PTRACE_WRITETEXT, ...)");
-		return -1;
-	}
-	tcp->flags &= ~TCB_BPTSET;
-
-#    if !LOOPA
-	/*
-	 * Since we don't have a single instruction breakpoint, we may have
-	 * to adjust the program counter after removing our `breakpoint'.
-	 */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-		perror("clearbpt: ptrace(PTRACE_GETREGS, ...)");
-		return -1;
-	}
-	if ((regs.r_pc < tcp->baddr) ||
-				(regs.r_pc > tcp->baddr + 4)) {
-		/* The breakpoint has not been reached yet */
-		if (debug)
-			fprintf(stderr,
-				"NOTE: PC not at bpt (pc %#x baddr %#x)\n",
-					regs.r_pc, tcp->baddr);
-		return 0;
-	}
-	if (regs.r_pc != tcp->baddr)
-		if (debug)
-			fprintf(stderr, "NOTE: PC adjusted (%#x -> %#x\n",
-				regs.r_pc, tcp->baddr);
-
-	regs.r_pc = tcp->baddr;
-	if (ptrace(PTRACE_SETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-		perror("clearbpt: ptrace(PTRACE_SETREGS, ...)");
-		return -1;
-	}
-#    endif /* LOOPA */
-#   endif /* SPARC */
-#  endif /* SUNOS4 */
-
-	return 0;
-}
-
-# endif /* !defined LINUX */
-
-#endif /* !USE_PROCFS */
 
 
-#ifdef SUNOS4
 
-static int
-getex(struct tcb *tcp, struct exec *hdr)
-{
-	int n;
-
-	for (n = 0; n < sizeof *hdr; n += 4) {
-		long res;
-		if (upeek(tcp, uoff(u_exdata) + n, &res) < 0)
-			return -1;
-		memcpy(((char *) hdr) + n, &res, 4);
-	}
-	if (debug) {
-		fprintf(stderr, "[struct exec: magic: %o version %u Mach %o\n",
-			hdr->a_magic, hdr->a_toolversion, hdr->a_machtype);
-		fprintf(stderr, "Text %lu Data %lu Bss %lu Syms %lu Entry %#lx]\n",
-			hdr->a_text, hdr->a_data, hdr->a_bss, hdr->a_syms, hdr->a_entry);
-	}
-	return 0;
-}
-
-int
-fixvfork(struct tcb *tcp)
-{
-	int pid = tcp->pid;
-	/*
-	 * Change `vfork' in a freshly exec'ed dynamically linked
-	 * executable's (internal) symbol table to plain old `fork'
-	 */
-
-	struct exec hdr;
-	struct link_dynamic dyn;
-	struct link_dynamic_2 ld;
-	char *strtab, *cp;
-
-	if (getex(tcp, &hdr) < 0)
-		return -1;
-	if (!hdr.a_dynamic)
-		return -1;
-
-	if (umove(tcp, (int) N_DATADDR(hdr), &dyn) < 0) {
-		fprintf(stderr, "Cannot read DYNAMIC\n");
-		return -1;
-	}
-	if (umove(tcp, (int) dyn.ld_un.ld_2, &ld) < 0) {
-		fprintf(stderr, "Cannot read link_dynamic_2\n");
-		return -1;
-	}
-	strtab = malloc((unsigned)ld.ld_symb_size);
-	if (!strtab)
-		die_out_of_memory();
-	if (umoven(tcp, (int)ld.ld_symbols+(int)N_TXTADDR(hdr),
-					(int)ld.ld_symb_size, strtab) < 0)
-		goto err;
-
-	for (cp = strtab; cp < strtab + ld.ld_symb_size; ) {
-		if (strcmp(cp, "_vfork") == 0) {
-			if (debug)
-				fprintf(stderr, "fixvfork: FOUND _vfork\n");
-			strcpy(cp, "_fork");
-			break;
-		}
-		cp += strlen(cp)+1;
-	}
-	if (cp < strtab + ld.ld_symb_size)
-		/*
-		 * Write entire symbol table back to avoid
-		 * memory alignment bugs in ptrace
-		 */
-		if (tload(pid, (int)ld.ld_symbols+(int)N_TXTADDR(hdr),
-					(int)ld.ld_symb_size, strtab) < 0)
-			goto err;
-
-	free(strtab);
-	return 0;
-
-err:
-	free(strtab);
-	return -1;
-}
-
-#endif /* SUNOS4 */

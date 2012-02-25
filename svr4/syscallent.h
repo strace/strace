@@ -328,11 +328,7 @@
 	{ MA,	0,	sys_fstatvfs,		"fstatvfs"	}, /* 104 */
 	{ MA,	0,	printargs,		"SYS_105"	}, /* 105 */
 	{ MA,	0,	sys_nfssys,		"nfssys"	}, /* 106 */
-#if UNIXWARE
-	{ MA,	TP,	sys_waitsys,		"waitsys"	}, /* 107 */
-#else
 	{ MA,	TP,	sys_waitid,		"waitid"	}, /* 107 */
-#endif
 	{ MA,	0,	sys_sigsendsys,		"sigsendsys"	}, /* 108 */
 	{ MA,	0,	sys_hrtsys,		"hrtsys"	}, /* 109 */
 	{ MA,	0,	sys_acancel,		"acancel"	}, /* 110 */
@@ -366,159 +362,6 @@
 	{ MA,	0,	sys_adjtime,		"adjtime"	}, /* 138 */
 	{ MA,	0,	sys_sysinfo,		"sysinfo"	}, /* 139 */
 	{ MA,	0,	printargs,		"SYS_140"	}, /* 140 */
-#if UNIXWARE >= 2
-	{ MA,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
-	{ MA,	0,	printargs,		"SYS_142"	}, /* 142 */
-	{ MA,	0,	sys_keyctl,		"keyctl"	}, /* 143 */
-	{ MA,	0,	sys_secsys,		"secsys"	}, /* 144 */
-	{ MA,	0,	sys_filepriv,		"filepriv"	}, /* 145 */
-	{ MA,	0,	sys_procpriv,		"procpriv"	}, /* 146 */
-	{ MA,	0,	sys_devstat,		"devstat"	}, /* 147 */
-	{ MA,	0,	sys_aclipc,		"aclipc"	}, /* 148 */
-	{ MA,	0,	sys_fdevstat,		"fdevstat"	}, /* 149 */
-	{ MA,	0,	sys_flvlfile,		"flvlfile"	}, /* 150 */
-	{ MA,	0,	sys_lvlfile,		"lvlfile"	}, /* 151 */
-	{ MA,	0,	printargs,		"SYS_152"	}, /* 152 */
-	{ MA,	0,	sys_lvlequal,		"lvlequal"	}, /* 153 */
-	{ MA,	0,	sys_lvlproc,		"lvlproc"	}, /* 154 */
-	{ MA,	0,	printargs,		"SYS_155"	}, /* 155 */
-	{ MA,	0,	sys_lvlipc,		"lvlipc"	}, /* 156 */
-	{ MA,	0,	sys_acl,		"acl"		}, /* 157 */
-	{ MA,	0,	sys_auditevt,		"auditevt"	}, /* 158 */
-	{ MA,	0,	sys_auditctl,		"auditctl"	}, /* 159 */
-	{ MA,	0,	sys_auditdmp,		"auditdmp"	}, /* 160 */
-	{ MA,	0,	sys_auditlog,		"auditlog"	}, /* 161 */
-	{ MA,	0,	sys_auditbuf,		"auditbuf"	}, /* 162 */
-	{ MA,	0,	sys_lvldom,		"lvldom"	}, /* 163 */
-	{ MA,	0,	sys_lvlvfs,		"lvlvfs"	}, /* 164 */
-	{ MA,	0,	sys_mkmld,		"mkmld"		}, /* 165 */
-	{ MA,	0,	sys_mldmode,		"mldmode"	}, /* 166 */
-	{ MA,	0,	sys_secadvise,		"secadvise"	}, /* 167 */
-	{ MA,	0,	sys_online,		"online"	}, /* 168 */
-	{ MA,	0,	sys_setitimer,		"setitimer"	}, /* 169 */
-	{ MA,	0,	sys_getitimer,		"getitimer"	}, /* 170 */
-	{ MA,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 171 */
-	{ MA,	0,	sys_settimeofday,	"settimeofday"	}, /* 172 */
-	{ MA,	0,	sys_lwp_create,		"lwpcreate"	}, /* 173 */
-	{ MA,	0,	sys_lwp_exit,		"lwpexit"	}, /* 174 */
-	{ MA,	0,	sys_lwp_wait,		"lwpwait"	}, /* 175 */
-	{ MA,	0,	sys_lwp_self,		"lwpself"	}, /* 176 */
-	{ MA,	0,	sys_lwpinfo,		"lwpinfo"	}, /* 177 */
-	{ MA,	0,	sys_lwpprivate,		"lwpprivate"	}, /* 178 */
-	{ MA,	0,	sys_processor_bind,	"processor_bind"}, /* 179 */
-	{ MA,	0,	sys_processor_exbind,	"processor_exbind"}, /* 180 */
-	{ MA,	0,	printargs,		"SYS_181"	}, /* 181 */
-	{ MA,	0,	printargs,		"SYS_182"	}, /* 182 */
-	{ MA,	0,	sys_prepblock,		"prepblock"	}, /* 183 */
-	{ MA,	0,	sys_block,		"block"		}, /* 184 */
-	{ MA,	0,	sys_rdblock,		"rdblock"	}, /* 185 */
-	{ MA,	0,	sys_unblock,		"unblock"	}, /* 186 */
-	{ MA,	0,	sys_cancelblock,	"cancelblock"	}, /* 187 */
-	{ MA,	0,	printargs,		"SYS_188"	}, /* 188 */
-	{ MA,	TD,	sys_pread,		"pread"		}, /* 189 */
-	{ MA,	TD,	sys_pwrite,		"pwrite"	}, /* 190 */
-	{ MA,	TF,	sys_truncate,		"truncate"	}, /* 191 */
-	{ MA,	TD,	sys_ftruncate,		"ftruncate"	}, /* 192 */
-	{ MA,	0,	sys_lwpkill,		"lwpkill"	}, /* 193 */
-	{ MA,	0,	sys_sigwait,		"sigwait"	}, /* 194 */
-	{ MA,	0,	sys_fork1,		"fork1"		}, /* 195 */
-	{ MA,	0,	sys_forkall,		"forkall"	}, /* 196 */
-	{ MA,	0,	sys_modload,		"modload"	}, /* 197 */
-	{ MA,	0,	sys_moduload,		"moduload"	}, /* 198 */
-	{ MA,	0,	sys_modpath,		"modpath"	}, /* 199 */
-	{ MA,	0,	sys_modstat,		"modstat"	}, /* 200 */
-	{ MA,	0,	sys_modadm,		"modadm"	}, /* 201 */
-	{ MA,	0,	sys_getksym,		"getksym"	}, /* 202 */
-	{ MA,	0,	sys_lwpsuspend,		"lwpsuspend"	}, /* 203 */
-	{ MA,	0,	sys_lwpcontinue,	"lwpcontinue"	}, /* 204 */
-	{ MA,	0,	sys_priocntllst,	"priocntllst"	}, /* 205 */
-	{ MA,	0,	sys_sleep,		"sleep"		}, /* 206 */
-	{ MA,	0,	sys_lwp_sema_wait,	"lwp_sema_wait"	}, /* 207 */
-	{ MA,	0,	sys_lwp_sema_post,	"lwp_sema_post"	}, /* 208 */
-	{ MA,	0,	sys_lwp_sema_trywait,	"lwp_sema_trywait"}, /* 209 */
-	{ MA,	0,	printargs,		"SYS_210"	}, /* 210 */
-	{ MA,	0,	printargs,		"SYS_211"	}, /* 211 */
-	{ MA,	0,	printargs,		"SYS_212"	}, /* 212 */
-	{ MA,	0,	printargs,		"SYS_213"	}, /* 213 */
-	{ MA,	0,	printargs,		"SYS_214"	}, /* 214 */
-	{ MA,	0,	printargs,		"SYS_215"	}, /* 215 */
-#if UNIXWARE >= 7
-	{ MA,	0,	sys_fstatvfs64,		"fstatvfs64"	}, /* 216 */
-	{ MA,	TF,	sys_statvfs64,		"statvfs64"	}, /* 217 */
-	{ MA,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 218 */
-	{ MA,	TF,	sys_truncate64,		"truncate64"	}, /* 219 */
-	{ MA,	0,	sys_getrlimit64,	"getrlimit64"	}, /* 220 */
-	{ MA,	0,	sys_setrlimit64,	"setrlimit64"	}, /* 221 */
-	{ MA,	TF,	sys_lseek64,		"lseek64"	}, /* 222 */
-	{ MA,	TF,	sys_mmap64,		"mmap64"	}, /* 223 */
-	{ MA,	TF,	sys_pread64,		"pread64"	}, /* 224 */
-	{ MA,	TF,	sys_pwrite64,		"pwrite64"	}, /* 225 */
-	{ MA,	TD|TF,	sys_creat64,		"creat64"	}, /* 226 */
-	{ MA,	0,	sys_dshmsys,		"dshmsys"	}, /* 227 */
-	{ MA,	0,	sys_invlpg,		"invlpg"	}, /* 228 */
-	{ MA,	0,	sys_rfork1,		"rfork1"	}, /* 229 */
-	{ MA,	0,	sys_rforkall,		"rforkall"	}, /* 230 */
-	{ MA,	0,	sys_rexecve,		"rexecve"	}, /* 231 */
-	{ MA,	0,	sys_migrate,		"migrate"	}, /* 232 */
-	{ MA,	0,	sys_kill3,		"kill3"		}, /* 233 */
-	{ MA,	0,	sys_ssisys,		"ssisys"	}, /* 234 */
-	{ MA,	TN,	sys_xaccept,		"xaccept"	}, /* 235 */
-	{ MA,	TN,	sys_xbind,		"xbind"		}, /* 236 */
-	{ MA,	TN,	sys_xbindresvport,	"xbindresvport"	}, /* 237 */
-	{ MA,	TN,	sys_xconnect,		"xconnect"	}, /* 238 */
-	{ MA,	TN,	sys_xgetsockaddr,	"xgetsockaddr"	}, /* 239 */
-	{ MA,	TN,	sys_xgetsockopt,	"xgetsockopt"	}, /* 240 */
-	{ MA,	TN,	sys_xlisten,		"xlisten"	}, /* 241 */
-	{ MA,	TN,	sys_xrecvmsg,		"xrecvmsg"	}, /* 242 */
-	{ MA,	TN,	sys_xsendmsg,		"xsendmsg"	}, /* 243 */
-	{ MA,	TN,	sys_xsetsockaddr,	"xsetsockaddr"	}, /* 244 */
-	{ MA,	TN,	sys_xsetsockopt,	"xsetsockopt"	}, /* 245 */
-	{ MA,	TN,	sys_xshutdown,		"xshutdown"	}, /* 246 */
-	{ MA,	TN,	sys_xsocket,		"xsocket"	}, /* 247 */
-	{ MA,	TN,	sys_xsocketpair,	"xsocketpair"	}, /* 248 */
-#else	/* UNIXWARE 2 */
-	{ MA,	0,	printargs,		"SYS_216"	}, /* 216 */
-	{ MA,	0,	printargs,		"SYS_217"	}, /* 217 */
-	{ MA,	0,	printargs,		"SYS_218"	}, /* 218 */
-	{ MA,	0,	printargs,		"SYS_219"	}, /* 219 */
-	{ MA,	0,	printargs,		"SYS_220"	}, /* 220 */
-	{ MA,	0,	printargs,		"SYS_221"	}, /* 221 */
-	{ MA,	0,	printargs,		"SYS_222"	}, /* 222 */
-	{ MA,	0,	printargs,		"SYS_223"	}, /* 223 */
-	{ MA,	0,	printargs,		"SYS_224"	}, /* 224 */
-	{ MA,	0,	printargs,		"SYS_225"	}, /* 225 */
-	{ MA,	0,	printargs,		"SYS_226"	}, /* 226 */
-	{ MA,	0,	printargs,		"SYS_227"	}, /* 227 */
-	{ MA,	0,	printargs,		"SYS_228"	}, /* 228 */
-	{ MA,	0,	printargs,		"SYS_229"	}, /* 229 */
-	{ MA,	0,	printargs,		"SYS_230"	}, /* 230 */
-	{ MA,	0,	printargs,		"SYS_231"	}, /* 231 */
-	{ MA,	0,	printargs,		"SYS_232"	}, /* 232 */
-	{ MA,	0,	printargs,		"SYS_233"	}, /* 233 */
-	{ MA,	0,	printargs,		"SYS_234"	}, /* 234 */
-	{ MA,	0,	printargs,		"SYS_235"	}, /* 235 */
-	{ MA,	0,	printargs,		"SYS_236"	}, /* 236 */
-	{ MA,	0,	printargs,		"SYS_237"	}, /* 237 */
-	{ MA,	0,	printargs,		"SYS_238"	}, /* 238 */
-	{ MA,	0,	printargs,		"SYS_239"	}, /* 239 */
-	{ MA,	0,	printargs,		"SYS_240"	}, /* 240 */
-	{ MA,	0,	printargs,		"SYS_241"	}, /* 241 */
-	{ MA,	0,	printargs,		"SYS_242"	}, /* 242 */
-	{ MA,	0,	printargs,		"SYS_243"	}, /* 243 */
-	{ MA,	0,	printargs,		"SYS_244"	}, /* 244 */
-	{ MA,	0,	printargs,		"SYS_245"	}, /* 245 */
-	{ MA,	0,	printargs,		"SYS_246"	}, /* 246 */
-	{ MA,	0,	printargs,		"SYS_247"	}, /* 247 */
-	{ MA,	0,	printargs,		"SYS_248"	}, /* 248 */
-#endif	/* UNIXWARE 2 */
-	{ MA,	0,	printargs,		"SYS_249"	}, /* 249 */
-	{ MA,	0,	printargs,		"SYS_250"	}, /* 250 */
-	{ MA,	0,	printargs,		"SYS_251"	}, /* 251 */
-	{ MA,	0,	printargs,		"SYS_252"	}, /* 252 */
-	{ MA,	0,	printargs,		"SYS_253"	}, /* 253 */
-	{ MA,	0,	printargs,		"SYS_254"	}, /* 254 */
-	{ MA,	0,	printargs,		"SYS_255"	}, /* 255 */
-#else   /* !UNIXWARE */
 	{ MA,	0,	sys_seteuid,		"seteuid"	}, /* 141 */
 	{ MA,	0,	sys_vtrace,		"vtrace"	}, /* 142 */
 	{ MA,	TP,	sys_fork1,		"fork1"		}, /* 143 */
@@ -646,7 +489,6 @@
 	{ MA,	0,	printargs,		"cladm"		}, /* 253 */
 	{ MA,	0,	printargs,		"lwp_sig_timedwait"	}, /* 254 */
 	{ MA,	0,	printargs,		"umount2"	}, /* 255 */
-#endif /* !UNIXWARE */
 #endif /* !MIPS */
 	{ MA,	0,	printargs,		"SYS_256"	}, /* 256 */
 	{ MA,	0,	printargs,		"SYS_257"	}, /* 257 */

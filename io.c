@@ -168,127 +168,8 @@ sys_writev(struct tcb *tcp)
 }
 #endif
 
-#if defined(SVR4)
 
-int
-sys_pread(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-#if UNIXWARE
-		/* off_t is signed int */
-		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
-#else
-		tprintf(", %lu, %llu", tcp->u_arg[2],
-			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
-#endif
-	}
-	return 0;
-}
 
-int
-sys_pwrite(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-#if UNIXWARE
-		/* off_t is signed int */
-		tprintf(", %lu, %ld", tcp->u_arg[2], tcp->u_arg[3]);
-#else
-		tprintf(", %lu, %llu", tcp->u_arg[2],
-			LONG_LONG(tcp->u_arg[3], tcp->u_arg[4]));
-#endif
-	}
-	return 0;
-}
-
-#if _LFS64_LARGEFILE
-int
-sys_pread64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%#llx", 3);
-	}
-	return 0;
-}
-
-int
-sys_pwrite64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%#llx", 3);
-	}
-	return 0;
-}
-#endif /* _LFS64_LARGEFILE */
-
-#endif /* SVR4 */
-
-#ifdef FREEBSD
-#include <sys/types.h>
-#include <sys/socket.h>
-
-int
-sys_sendfile(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printfd(tcp, tcp->u_arg[1]);
-		tprintf(", %llu, %lu",
-			LONG_LONG(tcp->u_arg[2], tcp->u_arg[3]),
-			tcp->u_arg[4]);
-	} else {
-		off_t offset;
-
-		if (!tcp->u_arg[5])
-			tprints(", NULL");
-		else {
-			struct sf_hdtr hdtr;
-
-			if (umove(tcp, tcp->u_arg[5], &hdtr) < 0)
-				tprintf(", %#lx", tcp->u_arg[5]);
-			else {
-				tprints(", { ");
-				tprint_iov(tcp, hdtr.hdr_cnt, hdtr.headers, 1);
-				tprintf(", %u, ", hdtr.hdr_cnt);
-				tprint_iov(tcp, hdtr.trl_cnt, hdtr.trailers, 1);
-				tprintf(", %u }", hdtr.hdr_cnt);
-			}
-		}
-		if (!tcp->u_arg[6])
-			tprints(", NULL");
-		else if (umove(tcp, tcp->u_arg[6], &offset) < 0)
-			tprintf(", %#lx", tcp->u_arg[6]);
-		else
-			tprintf(", [%llu]", offset);
-		tprintf(", %lu", tcp->u_arg[7]);
-	}
-	return 0;
-}
-#endif /* FREEBSD */
-
-#ifdef LINUX
 
 /* The SH4 ABI does allow long longs in odd-numbered registers, but
    does not allow them to be split between registers and memory - and
@@ -489,7 +370,6 @@ sys_vmsplice(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* LINUX */
 
 int
 sys_ioctl(struct tcb *tcp)
