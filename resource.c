@@ -118,7 +118,7 @@ sprintrlim(long lim)
 	return buf;
 }
 
-# if defined POWERPC64 || defined X86_64
+# if defined(POWERPC64) || defined(X86_64)
 static void
 print_rlimit32(struct tcb *tcp)
 {
@@ -152,7 +152,7 @@ sys_getrlimit(struct tcb *tcp)
 	else {
 		if (syserror(tcp) || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
-# if defined POWERPC64 || defined X86_64
+# if defined(POWERPC64) || defined(X86_64)
 		else if (current_personality == 1)
 			print_rlimit32(tcp);
 # endif
@@ -176,7 +176,7 @@ sys_setrlimit(struct tcb *tcp)
 		tprints(", ");
 		if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
-# if defined POWERPC64 || defined X86_64
+# if defined(POWERPC64) || defined(X86_64)
 		else if (current_personality == 1)
 			print_rlimit32(tcp);
 # endif

@@ -1822,7 +1822,6 @@ osf_fstatfs(struct tcb *tcp)
 }
 #endif
 
-
 /* directory */
 int
 sys_chdir(struct tcb *tcp)

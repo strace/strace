@@ -82,10 +82,6 @@ ioctl_decode(struct tcb *tcp, long code, long arg)
 		return term_ioctl(tcp, code, arg);
 	case 0x89:
 		return sock_ioctl(tcp, code, arg);
-#ifdef HAVE_SYS_STREAM_H
-	case 'S':
-		return stream_ioctl(tcp, code, arg);
-#endif /* HAVE_SYS_STREAM_H */
 	case 'p':
 		return rtc_ioctl(tcp, code, arg);
 	case 0x03:

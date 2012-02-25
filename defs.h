@@ -64,8 +64,7 @@
 
 /* Maximum number of args to a syscall.
  *
- * Make sure that all entries in all syscallent.h files
- * have nargs <= MAX_ARGS!
+ * Make sure that all entries in all syscallent.h files have nargs <= MAX_ARGS!
  * linux/<ARCH>/syscallent.h: all have nargs <= 6.
  */
 #ifndef MAX_ARGS
@@ -539,7 +538,6 @@ extern int ioctl_decode(struct tcb *, long, long);
 extern int term_ioctl(struct tcb *, long, long);
 extern int sock_ioctl(struct tcb *, long, long);
 extern int proc_ioctl(struct tcb *, int, int);
-extern int stream_ioctl(struct tcb *, int, int);
 extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
 extern int block_ioctl(struct tcb *, long, long);

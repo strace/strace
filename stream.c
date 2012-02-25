@@ -43,13 +43,6 @@
 #ifdef HAVE_SYS_CONF_H
 #include <sys/conf.h>
 #endif
-#ifdef HAVE_SYS_STREAM_H
-#include <sys/stream.h>
-#endif
-#ifdef HAVE_SYS_TIHDR_H
-#include <sys/tihdr.h>
-#endif
-
 
 #ifndef HAVE_STROPTS_H
 #define RS_HIPRI 1
@@ -61,12 +54,6 @@ struct strbuf {
 #define MORECTL 1
 #define MOREDATA 2
 #endif /* !HAVE_STROPTS_H */
-
-#ifdef HAVE_SYS_TIUSER_H
-#include <sys/tiuser.h>
-#include <sys/sockmod.h>
-#include <sys/timod.h>
-#endif /* HAVE_SYS_TIUSER_H */
 
 static const struct xlat msgflags[] = {
 	{ RS_HIPRI,	"RS_HIPRI"	},

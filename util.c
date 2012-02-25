@@ -246,7 +246,7 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 int
 printllval(struct tcb *tcp, const char *format, int llarg)
 {
-# if defined X86_64 || defined POWERPC64
+# if defined(X86_64) || defined(POWERPC64)
 	if (current_personality == 0) {
 		tprintf(format, tcp->u_arg[llarg]);
 		llarg++;

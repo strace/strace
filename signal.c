@@ -138,11 +138,9 @@ struct sigcontext
 # define NSIG 32
 #endif
 
-
-
 #ifdef HAVE_SIGACTION
 
-#if defined I386 || defined X86_64
+#if defined(I386) || defined(X86_64)
 /* The libc headers do not define this constant since it should only be
    used by the implementation.  So we define it here.  */
 # ifndef SA_RESTORER
@@ -1138,8 +1136,6 @@ sys_sigsuspend(struct tcb *tcp)
 	}
 	return 0;
 }
-
-
 
 #if !defined SS_ONSTACK
 #define SS_ONSTACK      1
