@@ -74,7 +74,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc CREDITS ChangeLog ChangeLog-CVS COPYRIGHT NEWS PORTING README
+%doc CREDITS ChangeLog ChangeLog-CVS COPYRIGHT NEWS README
 %{_bindir}/strace
 %{_mandir}/man1/*
 
