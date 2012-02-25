@@ -144,32 +144,11 @@ AC_SUBST(arch)
 AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
 AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
-AM_CONDITIONAL([SUNOS4], [test x$opsys = xsunos4])
-AM_CONDITIONAL([SVR4], [test x$opsys = xsvr4])
-AM_CONDITIONAL([FREEBSD], [test x$opsys = xfreebsd])
 
 AC_PROG_CC
 AC_GNU_SOURCE
 
 AC_INCLUDEDIR
-
-if test "x$opsys" = "xsunos4" && test "x$arch" = "xsparc"
-then
-	AC_MSG_CHECKING(for valid machine include directory)
-	if test -d "$includedir/sun4"
-	then
-		rm -f machine
-		ln -s $includedir/sun4 machine
-		AC_MSG_RESULT(yes)
-		AC_DEFINE(SUNOS4_KERNEL_ARCH_KLUDGE, 1, [
-Define if you are have a SPARC with SUNOS4 and your want a version
-of strace that will work on sun4, sun4c and sun4m kernel architectures.
-Only useful if you have a symbolic link from machine to /usr/include/sun4
-in the compilation directory.])
-	else
-		AC_MSG_RESULT(no)
-	fi
-fi
 
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wwrite-strings])

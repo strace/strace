@@ -6,7 +6,7 @@ bin_PROGRAMS = strace
 man_MANS = strace.1
 bin_SCRIPTS = strace-graph
 
-# OS is one of `linux', `sunos4', `svr4', or `freebsd'.
+# OS is `linux'
 OS		= @opsys@
 # ARCH is `i386', `m68k', `sparc', etc.
 ARCH		= @arch@
@@ -29,7 +29,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     debian/strace.manpages debian/strace-udeb.install \
 	     strace.spec \
 	     strace-graph ChangeLog ChangeLog-CVS COPYRIGHT CREDITS PORTING \
-	     README-freebsd README-linux README-sunos4 README-svr4 \
+	     README-linux \
 	     linux/ioctlsort.c linux/ioctlent.sh \
 	     linux/ioctlent.h.in linux/errnoent.h linux/signalent.h \
 	     linux/syscall.h linux/dummy.h \
@@ -82,16 +82,6 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/x86_64/gentab.pl \
 	     linux/x86_64/errnoent1.h linux/x86_64/ioctlent1.h \
 	     linux/x86_64/signalent1.h linux/x86_64/syscallent1.h \
-	     freebsd/ioctlent.sh \
-	     freebsd/syscalls.cat freebsd/syscalls.pl freebsd/syscalls.print \
-	     freebsd/i386/errnoent.h freebsd/i386/ioctlent.h \
-	     freebsd/i386/signalent.h \
-	     freebsd/i386/syscall.h freebsd/i386/syscallent.h \
-	     sunos4/dummy.h sunos4/errnoent.h \
-	     sunos4/ioctlent.h sunos4/ioctlent.sh sunos4/signalent.h \
-	     sunos4/syscall.h sunos4/syscallent.h \
-	     svr4/dummy.h svr4/errnoent.h svr4/ioctlent.h svr4/ioctlent.sh \
-	     svr4/signalent.h svr4/syscall.h svr4/syscallent.h \
 	     xlate.el
 
 .PHONY: srpm

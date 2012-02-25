@@ -263,7 +263,6 @@ Like
 but also print regular output while processes are running.
 .TP
 .B \-D
-(Not available on SVR4 and FreeBSD.)
 Run tracer process as a detached grandchild, not as parent of the
 tracee.  This reduces the visible effect of
 .B strace
@@ -295,10 +294,6 @@ for a child that is currently
 being traced, it is suspended until an appropriate child process either
 terminates or incurs a signal that would cause it to terminate (as
 determined from the child's current signal disposition).
-.IP
-On SunOS 4.x the tracing of
-.BR vfork s
-is accomplished with some dynamic linking trickery.
 .TP
 .B \-ff
 If the

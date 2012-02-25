@@ -1,1 +1,1 @@
-#include "svr4/ioctlent.h"
+#include "../sparc/ioctlent1.h"

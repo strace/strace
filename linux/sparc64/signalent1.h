@@ -1,1 +1,1 @@
-#include "../svr4/signalent.h"
+#include "../sparc/signalent1.h"
