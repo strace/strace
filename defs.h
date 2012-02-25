@@ -30,11 +30,11 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #ifdef MIPS
-#include <sgidefs.h>
+# include <sgidefs.h>
 #endif
 
 #include <features.h>
@@ -48,18 +48,18 @@
 
 /* Configuration section */
 #ifndef MAX_QUALS
-#if defined(MIPS)
-#define MAX_QUALS	7000	/* maximum number of syscalls, signals, etc. */
-#else
-#define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
-#endif
+# if defined(MIPS)
+#  define MAX_QUALS	7000	/* maximum number of syscalls, signals, etc. */
+# else
+#  define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
+# endif
 #endif
 #ifndef DEFAULT_STRLEN
 /* default maximum # of bytes printed in `printstr', change with -s switch */
-#define DEFAULT_STRLEN	32
+# define DEFAULT_STRLEN	32
 #endif
 #ifndef DEFAULT_ACOLUMN
-#define DEFAULT_ACOLUMN	40	/* default alignment column for results */
+# define DEFAULT_ACOLUMN	40	/* default alignment column for results */
 #endif
 
 /* Maximum number of args to a syscall.
@@ -69,11 +69,11 @@
  * linux/<ARCH>/syscallent.h: all have nargs <= 6.
  */
 #ifndef MAX_ARGS
-#   define MAX_ARGS	6
+# define MAX_ARGS	6
 #endif
 
 #ifndef DEFAULT_SORTBY
-#define DEFAULT_SORTBY "time"	/* default sorting method for call profiling */
+# define DEFAULT_SORTBY "time"	/* default sorting method for call profiling */
 #endif
 
 #include <sys/types.h>
@@ -87,89 +87,77 @@
 #include <errno.h>
 
 #ifdef HAVE_STDBOOL_H
-#include <stdbool.h>
+# include <stdbool.h>
 #endif
 
 #ifdef STDC_HEADERS
-#include <stddef.h>
+# include <stddef.h>
 #endif /* STDC_HEADERS */
 
 #ifdef HAVE_SIGINFO_T
-#include <signal.h>
+# include <signal.h>
 #endif
 
-#  if defined(SPARC) || defined(SPARC64)
-#     define LINUXSPARC
-#  endif
-#  if defined(X86_64)
-#     define LINUX_X86_64
-#  endif
-#  if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI32
-#     define LINUX_MIPSO32
-#  endif
-#  if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_NABI32
-#     define LINUX_MIPSN32
-#     define LINUX_MIPS64
-#  endif
-#  if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI64
-#     define LINUX_MIPSN64
-#     define LINUX_MIPS64
-#  endif
-#  if defined(ARM)
-#     define LINUX_ARM
-#  endif
-#  if defined(AVR32)
-#     define LINUX_AVR32
-#  endif
+#if defined(SPARC) || defined(SPARC64)
+# define LINUXSPARC
+#endif
+#if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI32
+# define LINUX_MIPSO32
+#endif
+#if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_NABI32
+# define LINUX_MIPSN32
+# define LINUX_MIPS64
+#endif
+#if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI64
+# define LINUX_MIPSN64
+# define LINUX_MIPS64
+#endif
 
-#undef USE_PROCFS
-
-
-# if (defined(LINUXSPARC) || defined(LINUX_X86_64) || defined(LINUX_ARM) || defined(LINUX_AVR32)) && defined(__GLIBC__)
-#  include <sys/ptrace.h>
-# else
+#if (defined(LINUXSPARC) || defined(X86_64) || defined(ARM) || defined(AVR32)) && defined(__GLIBC__)
+# include <sys/ptrace.h>
+#else
 /* Work around awkward prototype in ptrace.h. */
-#  define ptrace xptrace
-#  include <sys/ptrace.h>
-#  undef ptrace
-#  ifdef POWERPC
-#   define __KERNEL__
-#   include <asm/ptrace.h>
-#   undef __KERNEL__
-#  endif
-extern long ptrace(int, int, char *, long);
+# define ptrace xptrace
+# include <sys/ptrace.h>
+# undef ptrace
+# ifdef POWERPC
+#  define __KERNEL__
+#  include <asm/ptrace.h>
+#  undef __KERNEL__
 # endif
+extern long ptrace(int, int, char *, long);
+#endif
 
 #if !defined(__GLIBC__)
-#define	PTRACE_PEEKUSER	PTRACE_PEEKUSR
-#define	PTRACE_POKEUSER	PTRACE_POKEUSR
+# define PTRACE_PEEKUSER PTRACE_PEEKUSR
+# define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
 #if defined(X86_64) || defined(I386)
 /* For struct pt_regs. x86 strace uses PTRACE_GETREGS.
  * PTRACE_GETREGS returns registers in the layout of this struct.
  */
-#  include <asm/ptrace.h>
+# include <asm/ptrace.h>
 #endif
 #ifdef ALPHA
-#  define REG_R0 0
-#  define REG_A0 16
-#  define REG_A3 19
-#  define REG_FP 30
-#  define REG_PC 64
+# define REG_R0 0
+# define REG_A0 16
+# define REG_A3 19
+# define REG_FP 30
+# define REG_PC 64
 #endif /* ALPHA */
 #ifdef MIPS
-#  define REG_V0 2
-#  define REG_A0 4
-#  define REG_A3 7
-#  define REG_SP 29
-#  define REG_EPC 64
+# define REG_V0 2
+# define REG_A0 4
+# define REG_A3 7
+# define REG_SP 29
+# define REG_EPC 64
 #endif /* MIPS */
 #ifdef HPPA
-#  define PT_GR20 (20*4)
-#  define PT_GR26 (26*4)
-#  define PT_GR28 (28*4)
-#  define PT_IAOQ0 (106*4)
-#  define PT_IAOQ1 (107*4)
+# define PT_GR20 (20*4)
+# define PT_GR26 (26*4)
+# define PT_GR28 (28*4)
+# define PT_IAOQ0 (106*4)
+# define PT_IAOQ1 (107*4)
 #endif /* HPPA */
 #ifdef SH64
    /* SH64 Linux - this code assumes the following kernel API for system calls:
@@ -182,10 +170,10 @@ extern long ptrace(int, int, char *, long);
           On return:   R9   = result. */
 
    /* Offset for peeks of registers */
-#  define REG_OFFSET         (24)
-#  define REG_GENERAL(x)     (8*(x)+REG_OFFSET)
-#  define REG_PC             (0*8)
-#  define REG_SYSCALL        (2*8)
+# define REG_OFFSET         (24)
+# define REG_GENERAL(x)     (8*(x)+REG_OFFSET)
+# define REG_PC             (0*8)
+# define REG_SYSCALL        (2*8)
 #endif /* SH64 */
 
 #define SUPPORTED_PERSONALITIES 1
@@ -194,108 +182,108 @@ extern long ptrace(int, int, char *, long);
 #ifdef LINUXSPARC
 /* Indexes into the pt_regs.u_reg[] array -- UREG_XX from kernel are all off
  * by 1 and use Ix instead of Ox.  These work for both 32 and 64 bit Linux. */
-#define U_REG_G1 0
-#define U_REG_O0 7
-#define U_REG_O1 8
-#define PERSONALITY0_WORDSIZE 4
-#define PERSONALITY1_WORDSIZE 4
-#undef  SUPPORTED_PERSONALITIES
-#if defined(SPARC64)
-#include <asm/psrcompat.h>
-#define SUPPORTED_PERSONALITIES 3
-#define PERSONALITY2_WORDSIZE 8
-#else
-#include <asm/psr.h>
-#define SUPPORTED_PERSONALITIES 2
-#endif /* SPARC64 */
+# define U_REG_G1 0
+# define U_REG_O0 7
+# define U_REG_O1 8
+# define PERSONALITY0_WORDSIZE 4
+# define PERSONALITY1_WORDSIZE 4
+# undef  SUPPORTED_PERSONALITIES
+# if defined(SPARC64)
+#  include <asm/psrcompat.h>
+#  define SUPPORTED_PERSONALITIES 3
+#  define PERSONALITY2_WORDSIZE 8
+# else
+#  include <asm/psr.h>
+#  define SUPPORTED_PERSONALITIES 2
+# endif /* SPARC64 */
 #endif /* LINUXSPARC */
 
 #ifdef X86_64
-#undef SUPPORTED_PERSONALITIES
-#define SUPPORTED_PERSONALITIES 2
-#define PERSONALITY0_WORDSIZE 8
-#define PERSONALITY1_WORDSIZE 4
+# undef SUPPORTED_PERSONALITIES
+# define SUPPORTED_PERSONALITIES 2
+# define PERSONALITY0_WORDSIZE 8
+# define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef ARM
-#undef SUPPORTED_PERSONALITIES
-#define SUPPORTED_PERSONALITIES 2
-#define PERSONALITY0_WORDSIZE 4
-#define PERSONALITY1_WORDSIZE 4
+# undef SUPPORTED_PERSONALITIES
+# define SUPPORTED_PERSONALITIES 2
+# define PERSONALITY0_WORDSIZE 4
+# define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef POWERPC64
-#undef SUPPORTED_PERSONALITIES
-#define SUPPORTED_PERSONALITIES 2
-#define PERSONALITY0_WORDSIZE 8
-#define PERSONALITY1_WORDSIZE 4
+# undef SUPPORTED_PERSONALITIES
+# define SUPPORTED_PERSONALITIES 2
+# define PERSONALITY0_WORDSIZE 8
+# define PERSONALITY1_WORDSIZE 4
 #endif
 
 
-# if !HAVE_DECL_PTRACE_SETOPTIONS
-#  define PTRACE_SETOPTIONS	0x4200
-# endif
-# if !HAVE_DECL_PTRACE_GETEVENTMSG
-#  define PTRACE_GETEVENTMSG	0x4201
-# endif
-# if !HAVE_DECL_PTRACE_GETSIGINFO
-#  define PTRACE_GETSIGINFO	0x4202
-# endif
+#if !HAVE_DECL_PTRACE_SETOPTIONS
+# define PTRACE_SETOPTIONS	0x4200
+#endif
+#if !HAVE_DECL_PTRACE_GETEVENTMSG
+# define PTRACE_GETEVENTMSG	0x4201
+#endif
+#if !HAVE_DECL_PTRACE_GETSIGINFO
+# define PTRACE_GETSIGINFO	0x4202
+#endif
 
-# if !HAVE_DECL_PTRACE_O_TRACESYSGOOD
-#  define PTRACE_O_TRACESYSGOOD	0x00000001
-# endif
-# if !HAVE_DECL_PTRACE_O_TRACEFORK
-#  define PTRACE_O_TRACEFORK	0x00000002
-# endif
-# if !HAVE_DECL_PTRACE_O_TRACEVFORK
-#  define PTRACE_O_TRACEVFORK	0x00000004
-# endif
-# if !HAVE_DECL_PTRACE_O_TRACECLONE
-#  define PTRACE_O_TRACECLONE	0x00000008
-# endif
-# if !HAVE_DECL_PTRACE_O_TRACEEXEC
-#  define PTRACE_O_TRACEEXEC	0x00000010
-# endif
-# if !HAVE_DECL_PTRACE_O_TRACEEXIT
-#  define PTRACE_O_TRACEEXIT	0x00000040
-# endif
+#if !HAVE_DECL_PTRACE_O_TRACESYSGOOD
+# define PTRACE_O_TRACESYSGOOD	0x00000001
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEFORK
+# define PTRACE_O_TRACEFORK	0x00000002
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEVFORK
+# define PTRACE_O_TRACEVFORK	0x00000004
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACECLONE
+# define PTRACE_O_TRACECLONE	0x00000008
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEEXEC
+# define PTRACE_O_TRACEEXEC	0x00000010
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEEXIT
+# define PTRACE_O_TRACEEXIT	0x00000040
+#endif
 
-# if !HAVE_DECL_PTRACE_EVENT_FORK
-#  define PTRACE_EVENT_FORK	1
-# endif
-# if !HAVE_DECL_PTRACE_EVENT_VFORK
-#  define PTRACE_EVENT_VFORK	2
-# endif
-# if !HAVE_DECL_PTRACE_EVENT_CLONE
-#  define PTRACE_EVENT_CLONE	3
-# endif
-# if !HAVE_DECL_PTRACE_EVENT_EXEC
-#  define PTRACE_EVENT_EXEC	4
-# endif
-# if !HAVE_DECL_PTRACE_EVENT_VFORK_DONE
-#  define PTRACE_EVENT_VFORK_DONE	5
-# endif
-# if !HAVE_DECL_PTRACE_EVENT_EXIT
-#  define PTRACE_EVENT_EXIT	6
-# endif
+#if !HAVE_DECL_PTRACE_EVENT_FORK
+# define PTRACE_EVENT_FORK	1
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_VFORK
+# define PTRACE_EVENT_VFORK	2
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_CLONE
+# define PTRACE_EVENT_CLONE	3
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_EXEC
+# define PTRACE_EVENT_EXEC	4
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_VFORK_DONE
+# define PTRACE_EVENT_VFORK_DONE	5
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_EXIT
+# define PTRACE_EVENT_EXIT	6
+#endif
 
 /* Experimental code using PTRACE_SEIZE can be enabled here: */
 //# define USE_SEIZE 1
 
-# ifdef USE_SEIZE
-#  undef PTRACE_SEIZE
-#  define PTRACE_SEIZE		0x4206
-#  undef PTRACE_INTERRUPT
-#  define PTRACE_INTERRUPT	0x4207
-#  undef PTRACE_LISTEN
-#  define PTRACE_LISTEN		0x4208
-#  undef PTRACE_SEIZE_DEVEL
-#  define PTRACE_SEIZE_DEVEL	0x80000000
-#  undef PTRACE_EVENT_STOP
-#  define PTRACE_EVENT_STOP	7
-#  define PTRACE_EVENT_STOP1	128
-# endif
+#ifdef USE_SEIZE
+# undef PTRACE_SEIZE
+# define PTRACE_SEIZE		0x4206
+# undef PTRACE_INTERRUPT
+# define PTRACE_INTERRUPT	0x4207
+# undef PTRACE_LISTEN
+# define PTRACE_LISTEN		0x4208
+# undef PTRACE_SEIZE_DEVEL
+# define PTRACE_SEIZE_DEVEL	0x80000000
+# undef PTRACE_EVENT_STOP
+# define PTRACE_EVENT_STOP	7
+# define PTRACE_EVENT_STOP1	128
+#endif
 
 
 #if !defined __GNUC__
@@ -304,9 +292,9 @@ extern long ptrace(int, int, char *, long);
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
-# if defined(I386)
+#if defined(I386)
 extern struct pt_regs i386_regs;
-# endif
+#endif
 
 /* Trace Control Block */
 struct tcb {
@@ -316,7 +304,7 @@ struct tcb {
 	int u_error;		/* Error code */
 	long scno;		/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
-#if defined (LINUX_MIPSN32)
+#if defined(LINUX_MIPSN32)
 	long long ext_arg[MAX_ARGS];	/* System call arguments */
 #endif
 	long u_rval;		/* (first) return value */
@@ -376,16 +364,16 @@ struct tcb {
  * See "not a syscall entry (eax = %ld)\n" message
  * in syscall_fixup_on_sysenter().
  */
-# if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
+#if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
   || defined(POWERPC) || defined(IA64) || defined(HPPA) \
   || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) \
   || defined(ARM) || defined(MIPS) || defined(BFIN) || defined(TILE)
 /* This tracee has entered into execve syscall. Expect post-execve SIGTRAP
  * to happen. (When it is detected, tracee is continued and this bit is cleared.)
  */
-#  define TCB_WAITEXECVE 04000
-# endif
-# include <sys/syscall.h>
+# define TCB_WAITEXECVE 04000
+#endif
+#include <sys/syscall.h>
 
 /* qualifier flags */
 #define QUAL_TRACE	0001	/* this system call should be traced */
@@ -429,9 +417,9 @@ extern const struct xlat open_access_modes[];
 #define RVAL_NONE	020	/* Print nothing */
 
 #ifndef offsetof
-#define offsetof(type, member)	(((char *) &(((type *) NULL)->member)) - \
+# define offsetof(type, member)	(((char *) &(((type *) NULL)->member)) - \
 				 ((char *) (type *) NULL))
-#endif /* !offsetof */
+#endif
 
 /* get offset of member within a user struct */
 #define uoff(member)	offsetof(struct user, member)
