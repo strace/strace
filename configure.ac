@@ -8,40 +8,6 @@ AM_INIT_AUTOMAKE([foreign check-news dist-xz no-dist-gzip silent-rules])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
-AC_MSG_CHECKING([for supported operating system])
-case "$host_os" in
-*linux*)
-	opsys=linux
-	AC_DEFINE([LINUX], 1, [Define for the Linux operating system.])
-	;;
-sunos4*)
-	opsys=sunos4
-	AC_DEFINE([SUNOS4], 1, [Define for the SunOS 4.x operating system.])
-	;;
-solaris2* | sysv[[45]]* | irix[[56]]*)
-	opsys=svr4
-	AC_DEFINE([SVR4], 1, [Define for the System V release 4 operating
-system or a derivative like Solaris 2.x or Irix 5.x.])
-	case "$host_os" in
-	sysv4.2uw*)
-		AC_DEFINE(UNIXWARE, 2, [Define for UnixWare systems.])
-		;;
-	sysv5*)
-		AC_DEFINE(UNIXWARE, 7, [Define for UnixWare systems.])
-		;;
-	esac
-	;;
-freebsd*)
-	opsys=freebsd
-	AC_DEFINE([FREEBSD], 1, [Define for the FreeBSD operating system.])
-	;;
-*)
-	AC_MSG_RESULT([NO!])
-	AC_MSG_ERROR([operating system $host_os is not supported by strace])
-	;;
-esac
-AC_MSG_RESULT($opsys)
-
 AC_MSG_CHECKING([for supported architecture])
 case "$host_cpu" in
 bfin)
@@ -138,10 +104,8 @@ microblaze*)
 esac
 AC_MSG_RESULT($arch)
 
-AC_SUBST(opsys)
 AC_SUBST(arch)
 
-AM_CONDITIONAL([LINUX], [test x$opsys = xlinux])
 AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
 
@@ -152,15 +116,9 @@ AC_INCLUDEDIR
 
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wwrite-strings])
-if test "x$opsys" = "xsunos4"
-then
-	# SunOS 4.x header files don't declare int functions.
-	gl_WARN_ADD([-Wno-implicit])
-fi
 AC_SUBST([WARN_CFLAGS])
 
 AC_PROG_CPP
-AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
 AC_C_CONST
 AC_C_BIGENDIAN
@@ -196,18 +154,11 @@ AC_RLIM_T_IS_LONG_LONG
 AC_CHECK_TYPES([struct opthdr],,, [#include <sys/socket.h>])
 AC_CHECK_TYPES([struct t_opthdr],,, [#include <sys/tiuser.h>])
 
-if test x$opsys != xlinux; then
-AC_CHECK_LIB(nsl, main)
-fi
-
 AC_CHECK_FUNCS([ \
 	fork \
-	getdents \
 	if_indextoname \
 	inet_ntop \
-	mctl \
 	prctl \
-	pread \
 	sendmsg \
 	sigaction \
 	strerror \
@@ -224,23 +175,15 @@ AC_CHECK_HEADERS([ \
 	mqueue.h \
 	poll.h \
 	stropts.h \
-	termio.h \
 	sys/acl.h \
-	sys/aio.h \
 	sys/asynch.h \
 	sys/conf.h \
-	sys/door.h \
 	sys/epoll.h \
 	sys/filio.h \
 	sys/ioctl.h \
-	sys/nscsys.h \
 	sys/poll.h \
 	sys/ptrace.h \
 	sys/reg.h \
-	sys/stream.h \
-	sys/sysconfig.h \
-	sys/tihdr.h \
-	sys/tiuser.h \
 	sys/uio.h \
 	sys/vfs.h \
 	asm/cachectl.h \

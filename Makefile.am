@@ -6,8 +6,7 @@ bin_PROGRAMS = strace
 man_MANS = strace.1
 bin_SCRIPTS = strace-graph
 
-# OS is `linux'
-OS		= @opsys@
+OS		= linux
 # ARCH is `i386', `m68k', `sparc', etc.
 ARCH		= @arch@
 
@@ -28,8 +27,8 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     debian/strace.docs debian/strace.examples debian/strace.install \
 	     debian/strace.manpages debian/strace-udeb.install \
 	     strace.spec \
-	     strace-graph ChangeLog ChangeLog-CVS COPYRIGHT CREDITS PORTING \
-	     README-linux \
+	     strace-graph ChangeLog ChangeLog-CVS COPYRIGHT CREDITS \
+	     README-linux README-linux-ptrace \
 	     linux/ioctlsort.c linux/ioctlent.sh \
 	     linux/ioctlent.h.in linux/errnoent.h linux/signalent.h \
 	     linux/syscall.h linux/dummy.h \
