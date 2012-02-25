@@ -136,7 +136,6 @@ static const struct sysent sysent2[] = {
 #undef NF
 #undef MA
 
-
 /*
  * `ioctlent.h' may be generated from `ioctlent.raw' by the auxiliary
  * program `ioctlsort', such that the list is sorted by the `code' field.
@@ -144,7 +143,6 @@ static const struct sysent sysent2[] = {
  * plain integers, eliminating the need to include here everything
  * in "/usr/include".
  */
-
 
 static const char *const errnoent0[] = {
 #include "errnoent.h"
@@ -194,7 +192,6 @@ enum { nsignals2 = ARRAY_SIZE(signalent2) };
 enum { nioctlents2 = ARRAY_SIZE(ioctlent2) };
 int qual_flags2[MAX_QUALS];
 #endif
-
 
 const struct sysent *sysent;
 const char *const *errnoent;

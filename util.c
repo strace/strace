@@ -69,7 +69,6 @@
 # undef pt_all_user_regs
 #endif
 
-
 #if defined(SPARC64)
 # undef PTRACE_GETREGS
 # define PTRACE_GETREGS PTRACE_GETREGS64
@@ -760,7 +759,6 @@ dumpstr(struct tcb *tcp, long addr, int len)
 	}
 }
 
-
 #ifdef HAVE_PROCESS_VM_READV
 /* C library supports this, but the kernel might not. */
 static bool process_vm_readv_not_supported = 0;
@@ -797,7 +795,6 @@ static bool process_vm_readv_not_supported = 1;
 #endif
 
 #endif /* end of hack */
-
 
 #define PAGMASK	(~(PAGSIZ - 1))
 /*
@@ -1027,7 +1024,6 @@ upeek(struct tcb *tcp, long off, long *res)
 	return 0;
 }
 
-
 void
 printcall(struct tcb *tcp)
 {
@@ -1186,12 +1182,10 @@ printcall(struct tcb *tcp)
 #endif /* architecture */
 }
 
-
 /*
  * These #if's are huge, please indent them correctly.
  * It's easy to get confused otherwise.
  */
-
 
 #include "syscall.h"
 

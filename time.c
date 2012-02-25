@@ -195,7 +195,6 @@ sys_gettimeofday(struct tcb *tcp)
 	return 0;
 }
 
-
 #ifdef ALPHA
 int
 sys_osf_gettimeofday(struct tcb *tcp)
@@ -343,7 +342,6 @@ sys_getitimer(struct tcb *tcp)
 	return 0;
 }
 
-
 #ifdef ALPHA
 int
 sys_osf_getitimer(struct tcb *tcp)
@@ -396,7 +394,6 @@ sys_osf_setitimer(struct tcb *tcp)
 	return 0;
 }
 #endif
-
 
 static const struct xlat adjtimex_modes[] = {
   { 0, "0" },

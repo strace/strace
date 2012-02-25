@@ -57,7 +57,6 @@ s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\
 		>> ioctls.h
 }
 
-
 > ioctls.h
 
 lookup_ioctls 03 linux/hdreg.h
@@ -101,7 +100,6 @@ regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\
 
 # Sort and drop dups?
 # sort -u <ioctls.h >ioctls1.h && mv ioctls1.h ioctls.h
-
 
 > ioctldefs.h
 

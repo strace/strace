@@ -103,7 +103,6 @@
 #define PF_UNSPEC AF_UNSPEC
 #endif
 
-
 /* Under Linux these are enums so we can't test for them with ifdef. */
 #define IPPROTO_EGP IPPROTO_EGP
 #define IPPROTO_PUP IPPROTO_PUP
@@ -1206,7 +1205,6 @@ static const struct xlat af_packet_types[] = {
 };
 #endif /* defined(AF_PACKET) */
 
-
 void
 printsock(struct tcb *tcp, long addr, int addrlen)
 {
@@ -1516,7 +1514,6 @@ sys_socket(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 int
 sys_bind(struct tcb *tcp)
@@ -2137,7 +2134,6 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 	}
 	return 0;
 }
-
 
 #ifdef HAVE_STRUCT_OPTHDR
 

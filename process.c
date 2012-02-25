@@ -49,7 +49,6 @@
 #include <sys/syscall.h>
 #include <signal.h>
 
-
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 # ifndef PTRACE_PEEKUSR
@@ -239,7 +238,6 @@ static const struct xlat prctl_options[] = {
 	{ 0,			NULL			},
 };
 
-
 static const char *
 unalignctl_string(unsigned int ctl)
 {
@@ -260,7 +258,6 @@ unalignctl_string(unsigned int ctl)
 	sprintf(buf, "%x", ctl);
 	return buf;
 }
-
 
 int
 sys_prctl(struct tcb *tcp)
@@ -349,7 +346,6 @@ sys_prctl(struct tcb *tcp)
 }
 #endif /* HAVE_PRCTL */
 
-
 int
 sys_sethostname(struct tcb *tcp)
 {
@@ -385,7 +381,6 @@ sys_setdomainname(struct tcb *tcp)
 	return 0;
 }
 
-
 int
 sys_exit(struct tcb *tcp)
 {
@@ -400,8 +395,6 @@ sys_exit(struct tcb *tcp)
 	printing_tcp = NULL;
 	return 0;
 }
-
-
 
 /* defines copied from linux/sched.h since we can't include that
  * ourselves (it conflicts with *lots* of libc includes)
@@ -666,7 +659,6 @@ change_syscall(struct tcb *tcp, int new)
 	return -1;
 }
 
-
 int
 internal_fork(struct tcb *tcp)
 {
@@ -695,9 +687,6 @@ internal_fork(struct tcb *tcp)
 	return 0;
 }
 
-
-
-
 int
 sys_vfork(struct tcb *tcp)
 {
@@ -705,9 +694,6 @@ sys_vfork(struct tcb *tcp)
 		return RVAL_UDECIMAL;
 	return 0;
 }
-
-
-
 
 int sys_getuid(struct tcb *tcp)
 {
@@ -795,7 +781,6 @@ sys_getresgid(struct tcb *tcp)
 	return 0;
 }
 
-
 int
 sys_setreuid(struct tcb *tcp)
 {
@@ -836,7 +821,6 @@ sys_setresgid(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 int
 sys_setgroups(struct tcb *tcp)
@@ -1121,8 +1105,6 @@ sys_setpgid(struct tcb *tcp)
 	return 0;
 }
 
-
-
 static void
 printargv(struct tcb *tcp, long addr)
 {
@@ -1208,7 +1190,6 @@ sys_execve(struct tcb *tcp)
 	return 0;
 }
 
-
 #if defined(TCB_WAITEXECVE)
 int
 internal_exec(struct tcb *tcp)
@@ -1275,7 +1256,6 @@ static const struct xlat wait4_options[] = {
 #ifndef WCOREDUMP
 # define WCOREDUMP(status) ((status) & 0200)
 #endif
-
 
 #ifndef W_STOPCODE
 #define W_STOPCODE(sig)		((sig) << 8 | 0x7f)
@@ -1371,8 +1351,6 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 	return 0;
 }
 
-
-
 int
 sys_waitpid(struct tcb *tcp)
 {
@@ -1392,7 +1370,6 @@ sys_osf_wait4(struct tcb *tcp)
 	return printwaitn(tcp, 4, 1);
 }
 #endif
-
 
 static const struct xlat waitid_types[] = {
 	{ P_PID,	"P_PID"		},
@@ -1455,7 +1432,6 @@ sys_waitid(struct tcb *tcp)
 	return 0;
 }
 
-
 int
 sys_alarm(struct tcb *tcp)
 {
@@ -1492,7 +1468,6 @@ sys_uname(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 static const struct xlat ptrace_cmds[] = {
 	{ PTRACE_TRACEME,	"PTRACE_TRACEME"	},
@@ -2463,7 +2438,6 @@ const struct xlat struct_user_offsets[] = {
 #    endif
 #   endif /* !defined(many arches) */
 
-
 #  ifndef HPPA
 	{ sizeof(struct user),	"sizeof(struct user)"			},
 #  endif
@@ -2569,7 +2543,6 @@ sys_ptrace(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 # ifndef FUTEX_CMP_REQUEUE
 #  define FUTEX_CMP_REQUEUE 4
@@ -2867,7 +2840,6 @@ sys_arch_prctl(struct tcb *tcp)
 	return 0;
 }
 # endif /* X86_64 */
-
 
 int
 sys_getcpu(struct tcb *tcp)

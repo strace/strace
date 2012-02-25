@@ -45,8 +45,6 @@ while (<F>) {
 
 open(SL, ">syscallnum.h") || die "cannot create syscallnum.h\n";
 
-
-
 open(S,$ARGV[1]) || die "cannot open syscall file $ARGV[1]\n";
 while (<S>) {
 	$name = "";

@@ -50,7 +50,6 @@
 #define printflock printflock64	/* Horrider hack */
 #endif
 
-
 static const struct xlat fcntlcmds[] = {
 	{ F_DUPFD,	"F_DUPFD"	},
 	{ F_GETFD,	"F_GETFD"	},
@@ -591,7 +590,6 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	}
 	return 0;
 }
-
 
 int
 sys_oldselect(struct tcb *tcp)

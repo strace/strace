@@ -218,7 +218,6 @@ extern long ptrace(int, int, char *, long);
 # define PERSONALITY1_WORDSIZE 4
 #endif
 
-
 #if !HAVE_DECL_PTRACE_SETOPTIONS
 # define PTRACE_SETOPTIONS	0x4200
 #endif
@@ -283,7 +282,6 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_EVENT_STOP	7
 # define PTRACE_EVENT_STOP1	128
 #endif
-
 
 #if !defined __GNUC__
 # define __attribute__(x) /*nothing*/

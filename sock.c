@@ -61,7 +61,6 @@ static const struct xlat iffflags[] = {
 	{ 0,			NULL			}
 };
 
-
 static void
 print_addr(struct tcb *tcp, long addr, struct ifreq *ifr)
 {

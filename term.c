@@ -168,7 +168,6 @@ static const struct xlat modem_flags[] = {
 	{ 0,		NULL,		},
 };
 
-
 int term_ioctl(struct tcb *tcp, long code, long arg)
 {
 	struct termios tios;

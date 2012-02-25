@@ -63,7 +63,6 @@ sys_brk(struct tcb *tcp)
 	return RVAL_HEX;
 }
 
-
 static const struct xlat mmap_prot[] = {
 	{ PROT_NONE,	"PROT_NONE",	},
 	{ PROT_READ,	"PROT_READ"	},
@@ -368,7 +367,6 @@ sys_mmap64(struct tcb *tcp)
 }
 #endif /* _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T */
 
-
 int
 sys_munmap(struct tcb *tcp)
 {
@@ -389,7 +387,6 @@ sys_mprotect(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 static const struct xlat mremap_flags[] = {
 	{ MREMAP_MAYMOVE,	"MREMAP_MAYMOVE"	},
@@ -434,7 +431,6 @@ static const struct xlat madvise_cmds[] = {
 	{ 0,			NULL },
 };
 
-
 int
 sys_madvise(struct tcb *tcp)
 {
@@ -444,7 +440,6 @@ sys_madvise(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 static const struct xlat mlockall_flags[] = {
 #ifdef MCL_CURRENT
@@ -464,8 +459,6 @@ sys_mlockall(struct tcb *tcp)
 	}
 	return 0;
 }
-
-
 
 #ifdef MS_ASYNC
 
@@ -712,7 +705,6 @@ sys_remap_file_pages(struct tcb *tcp)
 	return 0;
 }
 
-
 #define MPOL_DEFAULT    0
 #define MPOL_PREFERRED  1
 #define MPOL_BIND       2
@@ -724,7 +716,6 @@ sys_remap_file_pages(struct tcb *tcp)
 #define MPOL_MF_STRICT  (1<<0)
 #define MPOL_MF_MOVE	(1<<1)
 #define MPOL_MF_MOVE_ALL (1<<2)
-
 
 static const struct xlat policies[] = {
 	{ MPOL_DEFAULT,		"MPOL_DEFAULT"		},
@@ -752,7 +743,6 @@ static const struct xlat move_pages_flags[] = {
 	{ MPOL_MF_MOVE_ALL,	"MPOL_MF_MOVE_ALL"	},
 	{ 0,			NULL			}
 };
-
 
 static void
 get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)

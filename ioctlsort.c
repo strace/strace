@@ -28,7 +28,6 @@
  *	$Id$
  */
 
-
 #include <stdio.h>
 
 #ifdef STDC_HEADERS

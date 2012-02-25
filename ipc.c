@@ -32,7 +32,6 @@
 
 #include "defs.h"
 
-
 # ifdef HAVE_MQUEUE_H
 #  include <mqueue.h>
 # endif
@@ -442,7 +441,6 @@ int sys_shmdt(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 int
 sys_mq_open(struct tcb *tcp)

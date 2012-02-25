@@ -62,11 +62,9 @@
 # include <asm/ptrace_offsets.h>
 #endif
 
-
 extern char **environ;
 extern int optind;
 extern char *optarg;
-
 
 int debug = 0, followfork = 0;
 unsigned int ptrace_setoptions = 0;
@@ -152,7 +150,6 @@ static volatile sig_atomic_t interrupted;
 #else
 static volatile int interrupted;
 #endif
-
 
 static void
 usage(FILE *ofp, int exitval)
@@ -283,7 +280,6 @@ void die_out_of_memory(void)
 	recursed = 1;
 	error_msg_and_die("Out of memory");
 }
-
 
 /* Glue for systems without a MMU that cannot provide fork() */
 #ifdef HAVE_FORK
@@ -1007,7 +1003,6 @@ test_ptrace_seize(void)
 #  define test_ptrace_seize() ((void)0)
 # endif
 
-
 /* Noinline: don't want main to have struct utsname permanently on stack */
 static void __attribute__ ((noinline))
 get_os_release(void)
@@ -1381,7 +1376,6 @@ alloc_tcb(int pid, int command_options_parsed)
 	error_msg_and_die("bug in alloc_tcb");
 }
 
-
 static struct tcb *
 pid2tcb(int pid)
 {
@@ -1399,7 +1393,6 @@ pid2tcb(int pid)
 	return NULL;
 }
 
-
 void
 droptcb(struct tcb *tcp)
 {
@@ -1409,7 +1402,6 @@ droptcb(struct tcb *tcp)
 	nprocs--;
 	if (debug)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
-
 
 	if (outfname && followfork > 1 && tcp->outf)
 		fclose(tcp->outf);
@@ -1510,7 +1502,6 @@ detach(struct tcb *tcp)
 		}
 	}
 
-
 	if (!qflag)
 		fprintf(stderr, "Process %u detached\n", tcp->pid);
 
@@ -1518,7 +1509,6 @@ detach(struct tcb *tcp)
 
 	return error;
 }
-
 
 static void
 cleanup(void)
@@ -1608,7 +1598,6 @@ strsignal(int sig)
 }
 
 #endif /* HAVE_STRSIGNAL */
-
 
 static int
 trace(void)
@@ -2024,7 +2013,6 @@ trace(void)
 	}
 	return 0;
 }
-
 
 void
 tprintf(const char *fmt, ...)

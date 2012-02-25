@@ -60,7 +60,6 @@ static const struct xlat msgflags[] = {
 	{ 0,		NULL		},
 };
 
-
 static void
 printstrbuf(struct tcb *tcp, struct strbuf *sbp, int getting)
 {
@@ -241,8 +240,6 @@ sys_getpmsg(struct tcb *tcp)
 	return RVAL_HEX | RVAL_STR;
 }
 #endif /* SYS_getpmsg */
-
-
 
 #ifdef HAVE_SYS_POLL_H
 

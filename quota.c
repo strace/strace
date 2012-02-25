@@ -33,7 +33,6 @@
 
 #include "defs.h"
 
-
 #include <inttypes.h>
 
 #define SUBCMDMASK  0x00ff

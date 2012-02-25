@@ -40,7 +40,6 @@
 #include <sys/user.h>
 #include <fcntl.h>
 
-
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 # ifndef PTRACE_PEEKUSR
@@ -61,8 +60,6 @@
 # undef ia64_fpreg
 # undef pt_all_user_regs
 #endif
-
-
 
 #ifdef IA64
 # include <asm/ptrace_offsets.h>
@@ -376,7 +373,6 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 		printsigmask(&ss, rt);
 }
 
-
 #ifndef ILL_ILLOPC
 #define ILL_ILLOPC      1       /* illegal opcode */
 #define ILL_ILLOPN      2       /* illegal operand */
@@ -508,8 +504,6 @@ typedef struct siginfo
 #define si_fd		_sifields._sigpoll.si_fd
 
 #endif
-
-
 
 static const struct xlat siginfo_codes[] = {
 #ifdef SI_KERNEL
@@ -770,9 +764,6 @@ printsiginfo(siginfo_t *sip, int verbose)
 	tprints("}");
 }
 
-
-
-
 int
 sys_sigsetmask(struct tcb *tcp)
 {
@@ -790,8 +781,6 @@ sys_sigsetmask(struct tcb *tcp)
 	}
 	return 0;
 }
-
-
 
 #ifdef HAVE_SIGACTION
 
@@ -813,7 +802,6 @@ sys_sigaction(struct tcb *tcp)
 	long addr;
 	sigset_t sigset;
 	struct old_sigaction sa;
-
 
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -898,9 +886,7 @@ sys_signal(struct tcb *tcp)
 	return 0;
 }
 
-
 #endif /* HAVE_SIGACTION */
-
 
 int
 sys_sigreturn(struct tcb *tcp)
@@ -1156,8 +1142,6 @@ static const struct xlat sigaltstack_flags[] = {
 	{ 0,		NULL		},
 };
 
-
-
 static int
 print_stack_t(struct tcb *tcp, unsigned long addr)
 {
@@ -1240,7 +1224,6 @@ sys_kill(struct tcb *tcp)
 	return 0;
 }
 
-
 int
 sys_tgkill(struct tcb *tcp)
 {
@@ -1266,8 +1249,6 @@ sys_sigpending(struct tcb *tcp)
 	}
 	return 0;
 }
-
-
 
 int
 sys_rt_sigprocmask(struct tcb *tcp)
@@ -1301,7 +1282,6 @@ sys_rt_sigprocmask(struct tcb *tcp)
 	return 0;
 }
 
-
 /* Structure describing the action to be taken when a signal arrives.  */
 struct new_sigaction
 {
@@ -1319,7 +1299,6 @@ struct new_sigaction32
 	uint32_t sa_restorer;
 	uint32_t sa_mask[2 * (NSIG / sizeof(long) ? NSIG / sizeof(long) : 1)];
 };
-
 
 int
 sys_rt_sigaction(struct tcb *tcp)

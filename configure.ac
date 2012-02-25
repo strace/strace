@@ -223,7 +223,6 @@ AC_CHECK_MEMBERS([struct sigcontext.sc_hi2],,, [#include <signal.h>
 # include <asm/sigcontext.h>
 #endif])
 
-
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
 AC_CHECK_DECLS([

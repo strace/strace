@@ -332,9 +332,6 @@
 	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 303 */
 	{ 3,	TD|TF,	sys_symlinkat,		"symlinkat"	}, /* 304 */
 	{ 4,	TD|TF,	sys_readlinkat,		"readlinkat"	}, /* 305 */
-
-
-
 	{ 3,	TD|TF,	sys_fchmodat,		"fchmodat"	}, /* 306 */
 	{ 3,	TD|TF,	sys_faccessat,		"faccessat"	}, /* 307 */
 	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 308 */

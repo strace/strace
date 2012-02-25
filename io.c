@@ -168,9 +168,6 @@ sys_writev(struct tcb *tcp)
 }
 #endif
 
-
-
-
 /* The SH4 ABI does allow long longs in odd-numbered registers, but
    does not allow them to be split between registers and memory - and
    there are only four argument registers for normal functions.  As a

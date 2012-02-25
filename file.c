@@ -140,7 +140,6 @@ struct stat_sparc64 {
 
 #include <fcntl.h>
 
-
 #ifdef HAVE_SYS_VFS_H
 # include <sys/vfs.h>
 #endif
@@ -151,7 +150,6 @@ struct stat_sparc64 {
 # define XATTR_CREATE 1
 # define XATTR_REPLACE 2
 #endif
-
 
 #if _LFS64_LARGEFILE
 # ifdef HAVE_INTTYPES_H
@@ -189,7 +187,6 @@ struct stat_sparc64 {
 #ifdef HAVE_SYS_ASYNCH_H
 # include <sys/asynch.h>
 #endif
-
 
 const struct xlat open_access_modes[] = {
 	{ O_RDONLY,	"O_RDONLY"	},
@@ -301,7 +298,6 @@ const struct xlat open_mode_flags[] = {
 #endif
 	{ 0,		NULL		},
 };
-
 
 #ifndef AT_FDCWD
 # define AT_FDCWD                -100
@@ -900,7 +896,6 @@ static const struct xlat fileflags[] = {
 	{ 0,		NULL		},
 };
 
-
 #ifndef HAVE_LONG_LONG_OFF_T
 static void
 realprintstat(struct tcb *tcp, struct stat *statbuf)
@@ -966,7 +961,6 @@ realprintstat(struct tcb *tcp, struct stat *statbuf)
 	else
 		tprints("...}");
 }
-
 
 static void
 printstat(struct tcb *tcp, long addr)
@@ -1182,7 +1176,6 @@ convertoldstat(const struct __old_kernel_stat *oldbuf, struct stat *newbuf)
 	newbuf->st_blocks = 0; /* not supported in old_stat */
 }
 
-
 static void
 printoldstat(struct tcb *tcp, long addr)
 {
@@ -1380,7 +1373,6 @@ sys_oldlstat(struct tcb *tcp)
 }
 #endif
 
-
 #if defined(LINUXSPARC)
 
 int
@@ -1503,7 +1495,6 @@ sys_acl(struct tcb *tcp)
 	return 0;
 }
 
-
 int
 sys_facl(struct tcb *tcp)
 {
@@ -1523,7 +1514,6 @@ sys_facl(struct tcb *tcp)
 	return 0;
 }
 
-
 static const struct xlat aclipc[] = {
 #  ifdef IPC_SHM
 	{ IPC_SHM,	"IPC_SHM"	},
@@ -1536,7 +1526,6 @@ static const struct xlat aclipc[] = {
 #  endif
 	{ 0,		NULL		},
 };
-
 
 int
 sys_aclipc(struct tcb *tcp)
@@ -1561,7 +1550,6 @@ sys_aclipc(struct tcb *tcp)
 # endif /* HAVE_SYS_ACL_H */
 
 #endif /* LINUXSPARC */
-
 
 static const struct xlat fsmagic[] = {
 	{ 0x73757245,	"CODA_SUPER_MAGIC"	},
@@ -1595,8 +1583,6 @@ static const struct xlat fsmagic[] = {
 	{ 0x62656572,	"SYSFS_MAGIC"		},
 	{ 0,		NULL			},
 };
-
-
 
 static const char *
 sprintfstype(int magic)
@@ -2172,7 +2158,6 @@ sys_mknodat(struct tcb *tcp)
 	return decode_mknod(tcp, 1);
 }
 
-
 int
 sys_fsync(struct tcb *tcp)
 {
@@ -2181,7 +2166,6 @@ sys_fsync(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 static void
 printdir(struct tcb *tcp, long addr)
@@ -2220,7 +2204,6 @@ sys_readdir(struct tcb *tcp)
 	return 0;
 }
 
-
 static const struct xlat direnttypes[] = {
 	{ DT_UNKNOWN,	"DT_UNKNOWN"	},
 	{ DT_FIFO,	"DT_FIFO"	},
@@ -2233,7 +2216,6 @@ static const struct xlat direnttypes[] = {
 	{ DT_WHT,	"DT_WHT"	},
 	{ 0,		NULL		},
 };
-
 
 int
 sys_getdents(struct tcb *tcp)
@@ -2289,7 +2271,6 @@ sys_getdents(struct tcb *tcp)
 	free(buf);
 	return 0;
 }
-
 
 #if _LFS64_LARGEFILE
 int
@@ -2355,7 +2336,6 @@ sys_getdents64(struct tcb *tcp)
 }
 #endif
 
-
 int
 sys_getcwd(struct tcb *tcp)
 {
@@ -2368,7 +2348,6 @@ sys_getcwd(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 #ifdef HAVE_SYS_ASYNCH_H
 
@@ -2598,7 +2577,6 @@ sys_fremovexattr(struct tcb *tcp)
 	return 0;
 }
 
-
 static const struct xlat advise[] = {
   { POSIX_FADV_NORMAL,		"POSIX_FADV_NORMAL"	},
   { POSIX_FADV_RANDOM,		"POSIX_FADV_RANDOM"	},
@@ -2608,7 +2586,6 @@ static const struct xlat advise[] = {
   { POSIX_FADV_NOREUSE,		"POSIX_FADV_NOREUSE"	},
   { 0,				NULL			}
 };
-
 
 int
 sys_fadvise64(struct tcb *tcp)
@@ -2623,7 +2600,6 @@ sys_fadvise64(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 int
 sys_fadvise64_64(struct tcb *tcp)

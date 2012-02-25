@@ -249,7 +249,6 @@ sys_setrlimit64(struct tcb *tcp)
 }
 #endif /* _LFS64_LARGEFILES || HAVE_LONG_LONG_RLIM_T */
 
-
 static const struct xlat usagewho[] = {
 	{ RUSAGE_SELF,		"RUSAGE_SELF"		},
 	{ RUSAGE_CHILDREN,	"RUSAGE_CHILDREN"	},
@@ -378,8 +377,6 @@ sys_osf_getrusage(struct tcb *tcp)
 }
 #endif /* ALPHA */
 
-
-
 int
 sys_sysinfo(struct tcb *tcp)
 {
@@ -405,7 +402,6 @@ sys_sysinfo(struct tcb *tcp)
 	}
 	return 0;
 }
-
 
 static const struct xlat priorities[] = {
 	{ PRIO_PROCESS,	"PRIO_PROCESS"	},
@@ -441,7 +437,6 @@ sys_nice(struct tcb *tcp)
 		tprintf("%ld", tcp->u_arg[0]);
 	return 0;
 }
-
 
 int
 sys_times(struct tcb *tcp)

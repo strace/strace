@@ -381,10 +381,6 @@ sys_cacheflush(struct tcb *tcp)
 }
 #endif /* SH */
 
-
-
-
-
 #ifdef SYS_capget
 
 static const struct xlat capabilities[] = {
@@ -432,7 +428,6 @@ static const struct xlat capabilities[] = {
 #endif
 	{ 0,		NULL		},
 };
-
 
 int
 sys_capget(struct tcb *tcp)
@@ -930,8 +925,6 @@ sys_sysctl(struct tcb *tcp)
 	free(name);
 	return 0;
 }
-
-
 
 #ifdef MIPS
 

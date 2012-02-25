@@ -188,7 +188,6 @@ pathtrace_match(struct tcb *tcp)
 	 * other than test arg[0].
 	 */
 
-
 	if (s->sys_func == sys_dup2 ||
 	    s->sys_func == sys_dup3 ||
 	    s->sys_func == sys_sendfile ||
