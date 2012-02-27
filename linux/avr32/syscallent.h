@@ -217,7 +217,7 @@
 	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 187 */
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 188 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 189 */
-	{ 2,	0,	sys_kill,		"tkill"		}, /* 190 */
+	{ 2,	TS,	sys_kill,		"tkill"		}, /* 190 */
 	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 191 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 192 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 193 */

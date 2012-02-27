@@ -5543,7 +5543,7 @@
 	{ 2,	0,	sys_removexattr,	"removexattr"	}, /* 5189 */
 	{ 2,	0,	sys_removexattr,	"lremovexattr"	}, /* 5190 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 5191 */
-	{ 2,	0,	sys_kill,		"tkill"		}, /* 5192 */
+	{ 2,	TS,	sys_kill,		"tkill"		}, /* 5192 */
 	{ 1,	0,	sys_time,		"time"		}, /* 5193 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 5194 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"}, /* 5195 */
@@ -6852,7 +6852,7 @@
 	{ 2,	0,	sys_removexattr,	"removexattr"	}, /* 6189 */
 	{ 2,	0,	sys_removexattr,	"lremovexattr"	}, /* 6190 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 6191 */
-	{ 2,	0,	sys_kill,		"tkill"		}, /* 6192 */
+	{ 2,	TS,	sys_kill,		"tkill"		}, /* 6192 */
 	{ 1,	0,	sys_time,		"time"		}, /* 6193 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 6194 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"}, /* 6195 */

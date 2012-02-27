@@ -264,7 +264,7 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"		}, /* 256 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"		}, /* 257 */
 	{ 5,	0,	printargs,		"clock_nanosleep"	}, /* 258 */
-	{ 5,	0,	printargs,		"tgkill"		}, /* 259 */
+	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 259 */
 	{ 5,	0,	printargs,		"mbind"			}, /* 260 */
 	{ 5,	0,	printargs,		"get_mempolicy"		}, /* 261 */
 	{ 5,	0,	printargs,		"set_mempolicy"		}, /* 262 */
