@@ -2106,10 +2106,10 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 		printxval(sockrawoptions, name, "RAW_???");
 		switch (name) {
 #if defined(ICMP_FILTER)
-		    case ICMP_FILTER:
-			tprints(", ");
-			printicmpfilter(tcp, addr);
-			return 0;
+			case ICMP_FILTER:
+				tprints(", ");
+				printicmpfilter(tcp, addr);
+				return 0;
 #endif
 		}
 		break;

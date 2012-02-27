@@ -1385,7 +1385,7 @@ sys_xstat(struct tcb *tcp)
 	} else {
 # ifdef _STAT64_VER
 		if (tcp->u_arg[0] == _STAT64_VER)
-			printstat64 (tcp, tcp->u_arg[2]);
+			printstat64(tcp, tcp->u_arg[2]);
 		else
 # endif
 		printstat(tcp, tcp->u_arg[2]);
@@ -1401,7 +1401,7 @@ sys_fxstat(struct tcb *tcp)
 	else {
 # ifdef _STAT64_VER
 		if (tcp->u_arg[0] == _STAT64_VER)
-			printstat64 (tcp, tcp->u_arg[2]);
+			printstat64(tcp, tcp->u_arg[2]);
 		else
 # endif
 		printstat(tcp, tcp->u_arg[2]);
@@ -1419,7 +1419,7 @@ sys_lxstat(struct tcb *tcp)
 	} else {
 # ifdef _STAT64_VER
 		if (tcp->u_arg[0] == _STAT64_VER)
-			printstat64 (tcp, tcp->u_arg[2]);
+			printstat64(tcp, tcp->u_arg[2]);
 		else
 # endif
 		printstat(tcp, tcp->u_arg[2]);
@@ -2125,15 +2125,16 @@ decode_mknod(struct tcb *tcp, int offset)
 		printpath(tcp, tcp->u_arg[offset]);
 		tprintf(", %s", sprintmode(mode));
 		switch (mode & S_IFMT) {
-		case S_IFCHR: case S_IFBLK:
+		case S_IFCHR:
+		case S_IFBLK:
 #ifdef LINUXSPARC
 			if (current_personality == 1)
-			tprintf(", makedev(%lu, %lu)",
+				tprintf(", makedev(%lu, %lu)",
 				(unsigned long) ((tcp->u_arg[offset + 2] >> 18) & 0x3fff),
 				(unsigned long) (tcp->u_arg[offset + 2] & 0x3ffff));
 			else
 #endif
-			tprintf(", makedev(%lu, %lu)",
+				tprintf(", makedev(%lu, %lu)",
 				(unsigned long) major(tcp->u_arg[offset + 2]),
 				(unsigned long) minor(tcp->u_arg[offset + 2]));
 			break;

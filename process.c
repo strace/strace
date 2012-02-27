@@ -241,19 +241,19 @@ static const struct xlat prctl_options[] = {
 static const char *
 unalignctl_string(unsigned int ctl)
 {
-	static char buf[16];
+	static char buf[sizeof(int)*2 + 2];
 
 	switch (ctl) {
 #ifdef PR_UNALIGN_NOPRINT
-	      case PR_UNALIGN_NOPRINT:
-		return "NOPRINT";
+		case PR_UNALIGN_NOPRINT:
+			return "NOPRINT";
 #endif
 #ifdef PR_UNALIGN_SIGBUS
-	      case PR_UNALIGN_SIGBUS:
-		return "SIGBUS";
+		case PR_UNALIGN_SIGBUS:
+			return "SIGBUS";
 #endif
-	      default:
-		break;
+		default:
+			break;
 	}
 	sprintf(buf, "%x", ctl);
 	return buf;
@@ -2745,7 +2745,7 @@ sys_sched_getscheduler(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%d", (int) tcp->u_arg[0]);
-	} else if (! syserror(tcp)) {
+	} else if (!syserror(tcp)) {
 		tcp->auxstr = xlookup(schedulers, tcp->u_rval);
 		if (tcp->auxstr != NULL)
 			return RVAL_STR;

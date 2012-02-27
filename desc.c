@@ -1011,7 +1011,7 @@ sys_io_getevents(struct tcb *tcp)
 			}
 			tprints("}, ");
 #else
-				tprints("{...}");
+			tprints("{...}");
 #endif
 		}
 
