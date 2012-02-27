@@ -104,14 +104,15 @@ static const struct xlat resources[] = {
 };
 
 #if !HAVE_LONG_LONG_RLIM_T
-static char *
+static const char *
 sprintrlim(long lim)
 {
-	static char buf[32];
+	static char buf[sizeof(long)*3 + sizeof("%ld*1024")];
 
 	if (lim == RLIM_INFINITY)
-		sprintf(buf, "RLIM_INFINITY");
-	else if (lim > 1024 && lim%1024 == 0)
+		return "RLIM_INFINITY";
+
+	if (lim > 1024 && lim%1024 == 0)
 		sprintf(buf, "%ld*1024", lim/1024);
 	else
 		sprintf(buf, "%ld", lim);
@@ -192,14 +193,15 @@ sys_setrlimit(struct tcb *tcp)
 #endif /* !HAVE_LONG_LONG_RLIM_T */
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_RLIM_T
-static char *
+static const char *
 sprintrlim64(rlim64_t lim)
 {
-	static char buf[64];
+	static char buf[sizeof(long long)*3 + sizeof("%lld*1024")];
 
 	if (lim == RLIM64_INFINITY)
-		sprintf(buf, "RLIM64_INFINITY");
-	else if (lim > 1024 && lim%1024 == 0)
+		return "RLIM64_INFINITY";
+
+	if (lim > 1024 && lim%1024 == 0)
 		sprintf(buf, "%lld*1024", (long long) lim/1024);
 	else
 		sprintf(buf, "%lld", (long long) lim);

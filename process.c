@@ -1007,21 +1007,21 @@ printargv(struct tcb *tcp, long addr)
 	} cp;
 	const char *sep;
 	int n = 0;
+	unsigned wordsize = personality_wordsize[current_personality];
 
 	cp.p64 = 1;
 	for (sep = ""; !abbrev(tcp) || n < max_strlen / 2; sep = ", ", ++n) {
-		if (umoven(tcp, addr, personality_wordsize[current_personality],
-			   cp.data) < 0) {
+		if (umoven(tcp, addr, wordsize, cp.data) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
-		if (personality_wordsize[current_personality] == 4)
+		if (wordsize == 4)
 			cp.p64 = cp.p32;
 		if (cp.p64 == 0)
 			break;
 		tprints(sep);
 		printstr(tcp, cp.p64, -1);
-		addr += personality_wordsize[current_personality];
+		addr += wordsize;
 	}
 	if (cp.p64)
 		tprintf("%s...", sep);

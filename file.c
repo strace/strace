@@ -666,7 +666,9 @@ static const struct xlat modetypes[] = {
 static const char *
 sprintmode(int mode)
 {
-	static char buf[64];
+	static char buf[sizeof("S_IFSOCK|S_ISUID|S_ISGID|S_ISVTX|%o")
+			+ sizeof(int)*3
+			+ /*paranoia:*/ 8];
 	const char *s;
 
 	if ((mode & S_IFMT) == 0)
@@ -675,13 +677,13 @@ sprintmode(int mode)
 		sprintf(buf, "%#o", mode);
 		return buf;
 	}
-	sprintf(buf, "%s%s%s%s", s,
+	s = buf + sprintf(buf, "%s%s%s%s", s,
 		(mode & S_ISUID) ? "|S_ISUID" : "",
 		(mode & S_ISGID) ? "|S_ISGID" : "",
 		(mode & S_ISVTX) ? "|S_ISVTX" : "");
 	mode &= ~(S_IFMT|S_ISUID|S_ISGID|S_ISVTX);
 	if (mode)
-		sprintf(buf + strlen(buf), "|%#o", mode);
+		sprintf((char*)s, "|%#o", mode);
 	s = (*buf == '|') ? buf + 1 : buf;
 	return *s ? s : "0";
 }
@@ -690,7 +692,7 @@ static char *
 sprinttime(time_t t)
 {
 	struct tm *tmp;
-	static char buf[32];
+	static char buf[sizeof("yyyy/mm/dd-hh:mm:ss")];
 
 	if (t == 0) {
 		strcpy(buf, "0");
@@ -818,8 +820,7 @@ printstat_sparc64(struct tcb *tcp, long addr)
 	if (!abbrev(tcp)) {
 		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
 		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
-		tprints("}");
+		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
 	}
 	else
 		tprints("...}");
@@ -884,8 +885,7 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 	if (!abbrev(tcp)) {
 		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
 		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
-		tprints("}");
+		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
 	}
 	else
 		tprints("...}");
@@ -1742,8 +1742,7 @@ printcompat_statfs64(struct tcb *tcp, long addr)
 		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
 	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
 	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
-	tprintf(", f_flags=%lu", (unsigned long)statbuf.f_frsize);
-	tprints("}");
+	tprintf(", f_flags=%lu}", (unsigned long)statbuf.f_frsize);
 }
 
 int
@@ -2088,6 +2087,7 @@ sys_utime(struct tcb *tcp)
 		long utl[2];
 		int uti[2];
 	} u;
+	unsigned wordsize = personality_wordsize[current_personality];
 
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -2096,17 +2096,13 @@ sys_utime(struct tcb *tcp)
 			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1],
-				2 * personality_wordsize[current_personality],
-				(char *) &u) < 0)
+		else if (umoven(tcp, tcp->u_arg[1], 2 * wordsize, (char *) &u) < 0)
 			tprints("[?, ?]");
-		else if (personality_wordsize[current_personality]
-			 == sizeof u.utl[0]) {
+		else if (wordsize == sizeof u.utl[0]) {
 			tprintf("[%s,", sprinttime(u.utl[0]));
 			tprintf(" %s]", sprinttime(u.utl[1]));
 		}
-		else if (personality_wordsize[current_personality]
-			 == sizeof u.uti[0]) {
+		else if (wordsize == sizeof u.uti[0]) {
 			tprintf("[%s,", sprinttime(u.uti[0]));
 			tprintf(" %s]", sprinttime(u.uti[1]));
 		}

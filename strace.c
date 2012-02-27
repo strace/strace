@@ -1561,7 +1561,7 @@ extern char *sys_errlist[];
 const char *
 strerror(int err_no)
 {
-	static char buf[64];
+	static char buf[sizeof("Unknown error %d") + sizeof(int)*3];
 
 	if (err_no < 1 || err_no >= sys_nerr) {
 		sprintf(buf, "Unknown error %d", err_no);
@@ -1584,7 +1584,7 @@ extern char *_sys_siglist[];
 const char *
 strsignal(int sig)
 {
-	static char buf[64];
+	static char buf[sizeof("Unknown signal %d") + sizeof(int)*3];
 
 	if (sig < 1 || sig >= NSIG) {
 		sprintf(buf, "Unknown signal %d", sig);
