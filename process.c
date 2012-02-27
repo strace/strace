@@ -721,15 +721,6 @@ sys_setuid(struct tcb *tcp)
 }
 
 int
-sys_setgid(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%u", (gid_t) tcp->u_arg[0]);
-	}
-	return 0;
-}
-
-int
 sys_getresuid(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
@@ -756,32 +747,6 @@ sys_getresuid(struct tcb *tcp)
 }
 
 int
-sys_getresgid(struct tcb *tcp)
-{
-	if (exiting(tcp)) {
-		__kernel_gid_t gid;
-		if (syserror(tcp))
-			tprintf("%#lx, %#lx, %#lx", tcp->u_arg[0],
-				tcp->u_arg[1], tcp->u_arg[2]);
-		else {
-			if (umove(tcp, tcp->u_arg[0], &gid) < 0)
-				tprintf("%#lx, ", tcp->u_arg[0]);
-			else
-				tprintf("[%lu], ", (unsigned long) gid);
-			if (umove(tcp, tcp->u_arg[1], &gid) < 0)
-				tprintf("%#lx, ", tcp->u_arg[1]);
-			else
-				tprintf("[%lu], ", (unsigned long) gid);
-			if (umove(tcp, tcp->u_arg[2], &gid) < 0)
-				tprintf("%#lx", tcp->u_arg[2]);
-			else
-				tprintf("[%lu]", (unsigned long) gid);
-		}
-	}
-	return 0;
-}
-
-int
 sys_setreuid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
@@ -792,27 +757,7 @@ sys_setreuid(struct tcb *tcp)
 }
 
 int
-sys_setregid(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printuid("", tcp->u_arg[0]);
-		printuid(", ", tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-int
 sys_setresuid(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printuid("", tcp->u_arg[0]);
-		printuid(", ", tcp->u_arg[1]);
-		printuid(", ", tcp->u_arg[2]);
-	}
-	return 0;
-}
-int
-sys_setresgid(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printuid("", tcp->u_arg[0]);
@@ -1048,59 +993,6 @@ sys_getgroups32(struct tcb *tcp)
 		tprints("]");
 		if (failed)
 			tprintf(" %#lx", tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-#if defined(ALPHA)
-int
-sys_setpgrp(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%lu, %lu", tcp->u_arg[0], tcp->u_arg[1]);
-	}
-	return 0;
-}
-#endif
-
-int
-sys_getpgrp(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%lu", tcp->u_arg[0]);
-	}
-	return 0;
-}
-
-int
-sys_getsid(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%lu", tcp->u_arg[0]);
-	}
-	return 0;
-}
-
-int
-sys_setsid(struct tcb *tcp)
-{
-	return 0;
-}
-
-int
-sys_getpgid(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%lu", tcp->u_arg[0]);
-	}
-	return 0;
-}
-
-int
-sys_setpgid(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%lu, %lu", tcp->u_arg[0], tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -1429,14 +1321,6 @@ sys_waitid(struct tcb *tcp)
 				printrusage(tcp, tcp->u_arg[4]);
 		}
 	}
-	return 0;
-}
-
-int
-sys_alarm(struct tcb *tcp)
-{
-	if (entering(tcp))
-		tprintf("%lu", tcp->u_arg[0]);
 	return 0;
 }
 

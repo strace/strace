@@ -431,14 +431,6 @@ sys_setpriority(struct tcb *tcp)
 }
 
 int
-sys_nice(struct tcb *tcp)
-{
-	if (entering(tcp))
-		tprintf("%ld", tcp->u_arg[0]);
-	return 0;
-}
-
-int
 sys_times(struct tcb *tcp)
 {
 	struct tms tbuf;

@@ -75,9 +75,14 @@
 #define	sys_dup			sys_close
 #define	sys_fchdir		sys_close
 #define	sys_fdatasync		sys_close
-#define	sys_getegid		sys_getuid
 #define	sys_geteuid		sys_getuid
+#define	sys_getegid		sys_getuid
 #define	sys_getgid		sys_getuid
+#define	sys_getresgid		sys_getresuid
+#define	sys_setgid		sys_setuid
+#define	sys_setregid		sys_setreuid
+#define	sys_setresgid		sys_setresuid
+#define	sys_setfsgid		sys_setfsuid
 #define	sys_mlock		sys_munmap
 #define	sys_mq_unlink		sys_chdir
 #define	sys_munlock		sys_munmap
@@ -85,7 +90,6 @@
 #define	sys_rename		sys_link
 #define	sys_rmdir		sys_chdir
 #define	sys_sched_get_priority_max sys_sched_get_priority_min
-#define	sys_setfsgid		sys_setfsuid
 #define	sys_swapoff		sys_chdir
 #define	sys_swapon		sys_chdir
 #define	sys_symlink		sys_link
@@ -96,23 +100,30 @@
 
 /* printargs does the right thing */
 #define	sys_getpgid		printargs
-#define	sys_getpgrp		printargs
 #define	sys_getpid		printargs
 #define	sys_getppid		printargs
 #define	sys_gettid		printargs
+#define	sys_setsid		printargs
 #define	sys_idle		printargs
 #define	sys_inotify_init	printargs
 #define	sys_munlockall		printargs
 #define	sys_pause		printargs
 #define	sys_rt_sigreturn	printargs
 #define	sys_sched_yield		printargs
-#define	sys_setsid		printargs
 #define	sys_setup		printargs
 #define	sys_set_tid_address	printargs
 #define	sys_sync		printargs
 #define	sys_timer_delete	printargs
 #define	sys_timer_getoverrun	printargs
 #define	sys_vhangup		printargs
+
+/* printargs_lu/ld does the right thing */
+#define	sys_getsid		printargs_lu
+#define	sys_getpgrp		printargs_lu
+#define	sys_setpgid		printargs_lu
+#define	sys_setpgrp		printargs_lu
+#define	sys_alarm		printargs_lu
+#define	sys_nice		printargs_ld
 
 /* unimplemented */
 #define	sys_afs_syscall		printargs

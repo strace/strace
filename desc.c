@@ -668,12 +668,11 @@ static const struct xlat epollevents[] = {
 	{ 0,		NULL		}
 };
 
+/* Not aliased to printargs_ld: we want it to have a distinct address */
 int
 sys_epoll_create(struct tcb *tcp)
 {
-	if (entering(tcp))
-		tprintf("%ld", tcp->u_arg[0]);
-	return 0;
+	return printargs_ld(tcp);
 }
 
 static const struct xlat epollflags[] = {

@@ -599,6 +599,30 @@ printargs(struct tcb *tcp)
 	return 0;
 }
 
+int
+printargs_lu(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		int i;
+
+		for (i = 0; i < tcp->u_nargs; i++)
+			tprintf("%s%lu", i ? ", " : "", tcp->u_arg[i]);
+	}
+	return 0;
+}
+
+int
+printargs_ld(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		int i;
+
+		for (i = 0; i < tcp->u_nargs; i++)
+			tprintf("%s%ld", i ? ", " : "", tcp->u_arg[i]);
+	}
+	return 0;
+}
+
 long
 getrval2(struct tcb *tcp)
 {

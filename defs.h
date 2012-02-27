@@ -472,6 +472,8 @@ extern int trace_syscall(struct tcb *);
 extern void count_syscall(struct tcb *, struct timeval *);
 extern void printxval(const struct xlat *, int, const char *);
 extern int printargs(struct tcb *);
+extern int printargs_lu(struct tcb *);
+extern int printargs_ld(struct tcb *);
 extern void addflags(const struct xlat *, int);
 extern int printflags(const struct xlat *, int, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, int);
