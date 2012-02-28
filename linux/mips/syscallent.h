@@ -1,4 +1,4 @@
-#include "dummy.h"
+#include "../dummy.h"
 
 	{ 0,	0,	printargs,		"svr4_syscall"	}, /*  000 */
 	{ 0,	0,	printargs,		"svr4_exit"	}, /*  001 */

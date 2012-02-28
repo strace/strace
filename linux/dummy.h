@@ -89,7 +89,7 @@
 #define	sys_pivotroot		sys_link
 #define	sys_rename		sys_link
 #define	sys_rmdir		sys_chdir
-#define	sys_sched_get_priority_max sys_sched_get_priority_min
+#define	sys_sched_get_priority_max	sys_sched_get_priority_min
 #define	sys_swapoff		sys_chdir
 #define	sys_swapon		sys_chdir
 #define	sys_symlink		sys_link
