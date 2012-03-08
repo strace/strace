@@ -219,7 +219,7 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	if (op == PTRACE_LISTEN)
 		msg = "LISTEN";
 #endif
-	perror_msg("ptrace(PTRACE_%s,1,%d)", msg, sig);
+	perror_msg("ptrace(PTRACE_%s,pid:%d,1,sig:%d)", msg, tcp->pid, sig);
 	return -1;
 }
 
@@ -851,7 +851,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		if (errno) {
 			/* But if not started, we had a bogus address. */
 			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror("ptrace: umoven");
+				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
 			return -1;
 		}
 		started = 1;
@@ -868,7 +868,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 				return 0;
 			}
 			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror("ptrace: umoven");
+				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
 			return -1;
 		}
 		started = 1;
@@ -966,7 +966,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
 		if (errno) {
 			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror("umovestr");
+				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
 			return -1;
 		}
 		started = 1;
@@ -986,7 +986,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 				return 0;
 			}
 			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror("umovestr");
+				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
 			return -1;
 		}
 		started = 1;
@@ -1014,9 +1014,7 @@ upeek(struct tcb *tcp, long off, long *res)
 	val = do_ptrace(PTRACE_PEEKUSER, tcp, (char *) off, 0);
 	if (val == -1 && errno) {
 		if (errno != ESRCH) {
-			char buf[60];
-			sprintf(buf, "upeek: ptrace(PTRACE_PEEKUSER,%d,%lu,0)", tcp->pid, off);
-			perror(buf);
+			perror_msg("upeek: PTRACE_PEEKUSER pid:%d @0x%lx)", tcp->pid, off);
 		}
 		return -1;
 	}

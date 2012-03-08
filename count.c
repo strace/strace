@@ -130,8 +130,7 @@ set_sortby(const char *sortby)
 	else if (strcmp(sortby, "nothing") == 0)
 		sortfun = NULL;
 	else {
-		fprintf(stderr, "invalid sortby: `%s'\n", sortby);
-		exit(1);
+		error_msg_and_die("invalid sortby: '%s'", sortby);
 	}
 }
 

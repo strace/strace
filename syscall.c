@@ -510,9 +510,8 @@ qualify(const char *s)
 			continue;
 		}
 		if (opt->qualify(p, opt->bitflag, not)) {
-			fprintf(stderr, "strace: invalid %s `%s'\n",
+			error_msg_and_die("invalid %s '%s'",
 				opt->argument_name, p);
-			exit(1);
 		}
 	}
 	free(copy);

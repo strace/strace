@@ -775,7 +775,7 @@ test_ptrace_setoptions_followfork(void)
 		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
 			perror_msg_and_die("%s: PTRACE_TRACEME doesn't work",
 					   __func__);
-		kill(pid, SIGSTOP);
+		kill_save_errno(pid, SIGSTOP);
 		if (fork() < 0)
 			perror_msg_and_die("fork");
 		_exit(0);
@@ -789,7 +789,7 @@ test_ptrace_setoptions_followfork(void)
 		if (tracee_pid <= 0) {
 			if (errno == EINTR)
 				continue;
-			else if (errno == ECHILD)
+			if (errno == ECHILD)
 				break;
 			kill_save_errno(pid, SIGKILL);
 			perror_msg_and_die("%s: unexpected wait result %d",
@@ -813,7 +813,7 @@ test_ptrace_setoptions_followfork(void)
 		if (!WIFSTOPPED(status)) {
 			if (tracee_pid != pid)
 				kill_save_errno(tracee_pid, SIGKILL);
-			kill(pid, SIGKILL);
+			kill_save_errno(pid, SIGKILL);
 			error_msg_and_die("%s: unexpected wait status %x",
 					  __func__, status);
 		}
@@ -1655,7 +1655,7 @@ trace(void)
 				return 0;
 			default:
 				errno = wait_errno;
-				perror("strace: wait");
+				perror_msg("wait");
 				return -1;
 			}
 		}
