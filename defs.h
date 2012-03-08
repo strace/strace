@@ -466,7 +466,6 @@ extern void droptcb(struct tcb *);
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void qualify(const char *);
-extern long do_ptrace(int request, struct tcb *tcp, void *addr, void *data);
 extern int ptrace_restart(int request, struct tcb *tcp, int sig);
 extern int trace_syscall(struct tcb *);
 extern void count_syscall(struct tcb *, struct timeval *);

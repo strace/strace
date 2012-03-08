@@ -166,31 +166,6 @@ stpcpy(char *dst, const char *src)
 #endif
 
 /*
- * Generic ptrace wrapper which tracks ESRCH errors
- * by setting tcp->ptrace_errno to ESRCH.
- *
- * We assume that ESRCH indicates likely process death (SIGKILL?),
- * modulo bugs where process somehow ended up not stopped.
- * Unfortunately kernel uses ESRCH for that case too. Oh well.
- *
- * Currently used by upeek() only.
- * TODO: use this in all other ptrace() calls while decoding.
- */
-long
-do_ptrace(int request, struct tcb *tcp, void *addr, void *data)
-{
-	long l;
-
-	errno = 0;
-	l = ptrace(request, tcp->pid, addr, (long) data);
-	/* Non-ESRCH errors might be our invalid reg/mem accesses,
-	 * we do not record them. */
-	if (errno == ESRCH)
-		tcp->ptrace_errno = ESRCH;
-	return l;
-}
-
-/*
  * Used when we want to unblock stopped traced process.
  * Should be only used with PTRACE_CONT, PTRACE_DETACH and PTRACE_SYSCALL.
  * Returns 0 on success or if error was ESRCH
@@ -204,7 +179,7 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	const char *msg;
 
 	errno = 0;
-	ptrace(op, tcp->pid, (void *) 1, (long) sig);
+	ptrace(op, tcp->pid, (void *) 0, (long) sig);
 	err = errno;
 	if (!err || err == ESRCH)
 		return 0;
@@ -219,7 +194,7 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	if (op == PTRACE_LISTEN)
 		msg = "LISTEN";
 #endif
-	perror_msg("ptrace(PTRACE_%s,pid:%d,1,sig:%d)", msg, tcp->pid, sig);
+	perror_msg("ptrace(PTRACE_%s,pid:%d,sig:%d)", msg, tcp->pid, sig);
 	return -1;
 }
 
@@ -1011,7 +986,7 @@ upeek(struct tcb *tcp, long off, long *res)
 	long val;
 
 	errno = 0;
-	val = do_ptrace(PTRACE_PEEKUSER, tcp, (char *) off, 0);
+	val = ptrace(PTRACE_PEEKUSER, tcp->pid, (char *) off, 0);
 	if (val == -1 && errno) {
 		if (errno != ESRCH) {
 			perror_msg("upeek: PTRACE_PEEKUSER pid:%d @0x%lx)", tcp->pid, off);
