@@ -420,6 +420,45 @@ newoutf(struct tcb *tcp)
 	}
 }
 
+static void process_opt_p_list(char *opt)
+{
+	while (*opt) {
+		/*
+		 * We accept -p PID,PID; -p "`pidof PROG`"; -p "`pgrep PROG`".
+		 * pidof uses space as delim, pgrep uses newline. :(
+		 */
+		int pid;
+		struct tcb *tcp;
+		char *delim = opt + strcspn(opt, ", \n\t");
+		char c = *delim;
+
+		*delim = '\0';
+		pid = atoi(opt); /* TODO: stricter parsing of the number? */
+		if (pid <= 0) {
+			error_msg("Invalid process id: '%s'", opt);
+			*delim = c;
+			return;
+		}
+		if (pid == strace_tracer_pid) {
+			error_msg("I'm sorry, I can't let you do that, Dave.");
+			*delim = c;
+			return;
+		}
+		*delim = c;
+		tcp = alloc_tcb(pid, 0);
+		tcp->flags |= TCB_ATTACHED;
+		/*
+		 * pflag_seen says how many PIDs we handled,
+		 * not how many -p opts there were.
+		 * Used to decide whether to print pid prefix in logs.
+		 */
+		pflag_seen++;
+		if (c == '\0')
+			break;
+		opt = delim + 1;
+	}
+}
+
 static void
 startup_attach(void)
 {
@@ -1019,7 +1058,7 @@ int
 main(int argc, char *argv[])
 {
 	struct tcb *tcp;
-	int c, pid = 0;
+	int c;
 	int optF = 0;
 	struct sigaction sa;
 
@@ -1126,18 +1165,7 @@ main(int argc, char *argv[])
 			set_overhead(atoi(optarg));
 			break;
 		case 'p':
-			pid = atoi(optarg);
-			if (pid <= 0) {
-				error_msg("Invalid process id: '%s'", optarg);
-				break;
-			}
-			if (pid == strace_tracer_pid) {
-				error_msg("I'm sorry, I can't let you do that, Dave.");
-				break;
-			}
-			tcp = alloc_tcb(pid, 0);
-			tcp->flags |= TCB_ATTACHED;
-			pflag_seen++;
+			process_opt_p_list(optarg);
 			break;
 		case 'P':
 			tracing_paths = 1;
