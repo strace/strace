@@ -352,14 +352,9 @@ struct tcb {
  * Use entering(tcp) / exiting(tcp) to check this bit to make code more readable.
  */
 #define TCB_INSYSCALL	00010
-/*
- * Process is not our own child.
- * In "strace [-f] PROG" case, traced child (PROG) will have this bit not set,
- * but any its children (including threads) will.
- * Note: if bit is set, it does *not* mean that attaching was already done.
- * There is a small window at the init time when it's not true.
- */
-#define TCB_ATTACHED	00020
+#define TCB_ATTACHED	00020   /* It is attached already */
+/* Are we PROG from "strace PROG [ARGS]" invocation? */
+#define TCB_STRACE_CHILD 00040
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
 #define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
 #define TCB_FILTERED	02000	/* This system call has been filtered out */

@@ -329,6 +329,14 @@ set_cloexec_flag(int fd)
 	fcntl(fd, F_SETFD, newflags); /* never fails */
 }
 
+static void kill_save_errno(pid_t pid, int sig)
+{
+	int saved_errno = errno;
+
+	(void) kill(pid, sig);
+	errno = saved_errno;
+}
+
 /*
  * When strace is setuid executable, we have to swap uids
  * before and after filesystem and process management operations.
@@ -429,7 +437,6 @@ static void process_opt_p_list(char *opt)
 		 * pidof uses space as delim, pgrep uses newline. :(
 		 */
 		int pid;
-		struct tcb *tcp;
 		char *delim = opt + strcspn(opt, ", \n\t");
 		char c = *delim;
 
@@ -446,8 +453,7 @@ static void process_opt_p_list(char *opt)
 			return;
 		}
 		*delim = c;
-		tcp = alloc_tcb(pid, 0);
-		tcp->flags |= TCB_ATTACHED;
+		alloc_tcb(pid, 0);
 		if (c == '\0')
 			break;
 		opt = delim + 1;
@@ -492,9 +498,12 @@ startup_attach(void)
 	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
 		tcp = tcbtab[tcbi];
 
+		if (!(tcp->flags & TCB_INUSE))
+			continue;
+
 		/* Is this a process we should attach to, but not yet attached? */
-		if ((tcp->flags & (TCB_ATTACHED | TCB_STARTUP)) != TCB_ATTACHED)
-			continue; /* no */
+		if (tcp->flags & TCB_ATTACHED)
+			continue; /* no, we already attached it */
 
 		/* Reinitialize the output since it may have changed */
 		tcp->outf = outf;
@@ -552,7 +561,7 @@ startup_attach(void)
 : "Process %u attached - interrupt to quit\n",
 						tcp->pid, ntid);
 				}
-				if (!(tcp->flags & TCB_STARTUP)) {
+				if (!(tcp->flags & TCB_ATTACHED)) {
 					/* -p PID, we failed to attach to PID itself
 					 * but did attach to some of its sibling threads.
 					 * Drop PID's tcp.
@@ -567,7 +576,7 @@ startup_attach(void)
 			droptcb(tcp);
 			continue;
 		}
-		tcp->flags |= TCB_STARTUP | post_attach_sigstop;
+		tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
 		if (debug)
 			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
 
@@ -576,7 +585,7 @@ startup_attach(void)
 			 * It is our grandparent we trace, not a -p PID.
 			 * Don't want to just detach on exit, so...
 			 */
-			tcp->flags &= ~TCB_ATTACHED;
+			tcp->flags |= TCB_STRACE_CHILD;
 			/*
 			 * Make parent go away.
 			 * Also makes grandparent's wait() unblock.
@@ -747,7 +756,7 @@ startup_child(char **argv)
 					perror_msg_and_die("waitpid");
 				}
 				if (!WIFSTOPPED(status) || WSTOPSIG(status) != SIGSTOP) {
-					kill(pid, SIGKILL);
+					kill_save_errno(pid, SIGKILL);
 					perror_msg_and_die("Unexpected wait status %x", status);
 				}
 			}
@@ -757,7 +766,7 @@ startup_child(char **argv)
 			 */
 
 			if (ptrace_attach_or_seize(pid)) {
-				kill(pid, SIGKILL);
+				kill_save_errno(pid, SIGKILL);
 				perror_msg_and_die("Can't attach to %d", pid);
 			}
 			if (!strace_vforked)
@@ -765,9 +774,9 @@ startup_child(char **argv)
 		}
 		tcp = alloctcb(pid);
 		if (!strace_vforked)
-			tcp->flags |= TCB_STARTUP | post_attach_sigstop;
+			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP | post_attach_sigstop;
 		else
-			tcp->flags |= TCB_STARTUP;
+			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP;
 	}
 	else {
 		/* With -D, *we* are child here, IOW: different pid. Fetch it: */
@@ -775,17 +784,7 @@ startup_child(char **argv)
 		/* The tracee is our parent: */
 		pid = getppid();
 		tcp = alloctcb(pid);
-		/* We want subsequent startup_attach() to attach to it: */
-		tcp->flags |= TCB_ATTACHED;
 	}
-}
-
-static void kill_save_errno(pid_t pid, int sig)
-{
-	int saved_errno = errno;
-
-	(void) kill(pid, sig);
-	errno = saved_errno;
 }
 
 /*
@@ -1440,15 +1439,15 @@ droptcb(struct tcb *tcp)
 }
 
 /* detach traced process; continue with sig
-   Never call DETACH twice on the same process as both unattached and
-   attached-unstopped processes give the same ESRCH.  For unattached process we
-   would SIGSTOP it and wait for its SIGSTOP notification forever.  */
-
+ * Never call DETACH twice on the same process as both unattached and
+ * attached-unstopped processes give the same ESRCH.  For unattached process we
+ * would SIGSTOP it and wait for its SIGSTOP notification forever.
+ */
 static int
 detach(struct tcb *tcp)
 {
-	int error = 0;
-	int status, catch_sigstop;
+	int error;
+	int status, sigstop_expected;
 
 	if (tcp->flags & TCB_BPTSET)
 		clearbpt(tcp);
@@ -1462,31 +1461,36 @@ detach(struct tcb *tcp)
 #undef PTRACE_DETACH
 #define PTRACE_DETACH PTRACE_SUNDETACH
 #endif
-	/*
-	 * We attached but possibly didn't see the expected SIGSTOP.
-	 * We must catch exactly one as otherwise the detached process
-	 * would be left stopped (process state T).
-	 */
-	catch_sigstop = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
-	error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, 0);
-	if (error == 0) {
-		/* On a clear day, you can see forever. */
+
+	sigstop_expected = 0;
+	if (tcp->flags & TCB_ATTACHED) {
+		/*
+		 * We attached but possibly didn't see the expected SIGSTOP.
+		 * We must catch exactly one as otherwise the detached process
+		 * would be left stopped (process state T).
+		 */
+		sigstop_expected = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
+		error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, 0);
+		if (error == 0) {
+			/* On a clear day, you can see forever. */
+		}
+		else if (errno != ESRCH) {
+			/* Shouldn't happen. */
+			perror("detach: ptrace(PTRACE_DETACH, ...)");
+		}
+		else if (my_tkill(tcp->pid, 0) < 0) {
+			if (errno != ESRCH)
+				perror("detach: checking sanity");
+		}
+		else if (!sigstop_expected && my_tkill(tcp->pid, SIGSTOP) < 0) {
+			if (errno != ESRCH)
+				perror("detach: stopping child");
+		}
+		else
+			sigstop_expected = 1;
 	}
-	else if (errno != ESRCH) {
-		/* Shouldn't happen. */
-		perror("detach: ptrace(PTRACE_DETACH, ...)");
-	}
-	else if (my_tkill(tcp->pid, 0) < 0) {
-		if (errno != ESRCH)
-			perror("detach: checking sanity");
-	}
-	else if (!catch_sigstop && my_tkill(tcp->pid, SIGSTOP) < 0) {
-		if (errno != ESRCH)
-			perror("detach: stopping child");
-	}
-	else
-		catch_sigstop = 1;
-	if (catch_sigstop) {
+
+	if (sigstop_expected) {
 		for (;;) {
 #ifdef __WALL
 			if (wait4(tcp->pid, &status, __WALL, NULL) < 0) {
@@ -1532,7 +1536,7 @@ detach(struct tcb *tcp)
 		}
 	}
 
-	if (!qflag)
+	if (!qflag && (tcp->flags & TCB_ATTACHED))
 		fprintf(stderr, "Process %u detached\n", tcp->pid);
 
 	droptcb(tcp);
@@ -1564,7 +1568,7 @@ cleanup(void)
 			tprints(" <unfinished ...>\n");
 			printing_tcp = NULL;
 		}
-		if (tcp->flags & TCB_ATTACHED)
+		if (!(tcp->flags & TCB_STRACE_CHILD))
 			detach(tcp);
 		else {
 			kill(tcp->pid, SIGCONT);
@@ -2008,7 +2012,8 @@ trace(void)
 			 * Observed case: exit_group() terminating
 			 * all processes in thread group.
 			 */
-			if (tcp->flags & TCB_ATTACHED) {
+			if (!(tcp->flags & TCB_STRACE_CHILD)) {
+//TODO: why do we handle our child differently??
 				if (printing_tcp) {
 					/* Do we have dangling line "syscall(param, param"?
 					 * Finish the line then.
