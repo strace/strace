@@ -1,6 +1,4 @@
 #!/bin/sh
-#
-# TODO: install alongside strace on "make install" time?
 
 if test $# = 0; then
 	echo "Usage: ${0##*/} STRACE_LOG"
