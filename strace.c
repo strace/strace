@@ -582,11 +582,6 @@ startup_attach(void)
 
 		if (daemonized_tracer) {
 			/*
-			 * It is our grandparent we trace, not a -p PID.
-			 * Don't want to just detach on exit, so...
-			 */
-			tcp->flags |= TCB_STRACE_CHILD;
-			/*
 			 * Make parent go away.
 			 * Also makes grandparent's wait() unblock.
 			 */
@@ -783,7 +778,8 @@ startup_child(char **argv)
 		strace_tracer_pid = getpid();
 		/* The tracee is our parent: */
 		pid = getppid();
-		tcp = alloctcb(pid);
+		alloctcb(pid);
+		/* attaching will be done later, by startup_attach */
 	}
 }
 
@@ -2012,28 +2008,21 @@ trace(void)
 			 * Observed case: exit_group() terminating
 			 * all processes in thread group.
 			 */
-			if (!(tcp->flags & TCB_STRACE_CHILD)) {
-//TODO: why do we handle our child differently??
-				if (printing_tcp) {
-					/* Do we have dangling line "syscall(param, param"?
-					 * Finish the line then.
-					 */
-					printing_tcp->flags |= TCB_REPRINT;
-					tprints(" <unfinished ...>\n");
-					printing_tcp = NULL;
-					fflush(tcp->outf);
-				}
-				/* We assume that ptrace error was caused by process death.
-				 * We used to detach(tcp) here, but since we no longer
-				 * implement "detach before death" policy/hack,
-				 * we can let this process to report its death to us
-				 * normally, via WIFEXITED or WIFSIGNALED wait status.
+			if (printing_tcp) {
+				/* Do we have dangling line "syscall(param, param"?
+				 * Finish the line then.
 				 */
-			} else {
-				/* It's our real child (and we also trace it) */
-				/* my_tkill(pid, SIGKILL); - why? */
-				/* droptcb(tcp); - why? */
+				printing_tcp->flags |= TCB_REPRINT;
+				tprints(" <unfinished ...>\n");
+				printing_tcp = NULL;
+				fflush(tcp->outf);
 			}
+			/* We assume that ptrace error was caused by process death.
+			 * We used to detach(tcp) here, but since we no longer
+			 * implement "detach before death" policy/hack,
+			 * we can let this process to report its death to us
+			 * normally, via WIFEXITED or WIFSIGNALED wait status.
+			 */
 			continue;
 		}
  restart_tracee_with_sig_0:
