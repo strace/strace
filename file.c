@@ -33,6 +33,7 @@
 #include "defs.h"
 
 #include <dirent.h>
+#include <sys/swap.h>
 
 struct kernel_dirent {
 	unsigned long   d_ino;
@@ -2691,6 +2692,27 @@ sys_fallocate(struct tcb *tcp)
 		tprintf("%#lo, ", tcp->u_arg[1]);	/* mode */
 		argn = printllval(tcp, "%llu, ", 2);	/* offset */
 		printllval(tcp, "%llu", argn);		/* len */
+	}
+	return 0;
+}
+
+static const struct xlat swap_flags[] = {
+	{ SWAP_FLAG_PREFER,	"SWAP_FLAG_PREFER"	},
+	{ SWAP_FLAG_DISCARD,	"SWAP_FLAG_DISCARD"	},
+	{ 0,			NULL			}
+};
+
+int
+sys_swapon(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		int flags = tcp->u_arg[1];
+		printpath(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		printflags(swap_flags, flags & ~SWAP_FLAG_PRIO_MASK,
+			"SWAP_FLAG_???");
+		if (flags & SWAP_FLAG_PREFER)
+			tprintf("|%d", flags & SWAP_FLAG_PRIO_MASK);
 	}
 	return 0;
 }
