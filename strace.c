@@ -1489,7 +1489,7 @@ detach(struct tcb *tcp)
 	if (sigstop_expected) {
 		for (;;) {
 #ifdef __WALL
-			if (wait4(tcp->pid, &status, __WALL, NULL) < 0) {
+			if (waitpid(tcp->pid, &status, __WALL) < 0) {
 				if (errno == ECHILD) /* Already gone.  */
 					break;
 				if (errno != EINVAL) {
@@ -1505,8 +1505,7 @@ detach(struct tcb *tcp)
 					}
 #ifdef __WCLONE
 					/* If no processes, try clones.  */
-					if (wait4(tcp->pid, &status, __WCLONE,
-						  NULL) < 0) {
+					if (waitpid(tcp->pid, &status, __WCLONE) < 0) {
 						if (errno != ECHILD)
 							perror("detach: waiting");
 						break;
