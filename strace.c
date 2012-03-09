@@ -1809,7 +1809,7 @@ trace(void)
 				   CLONE_PTRACE itself.  */
 			{
 				if (WIFSTOPPED(status))
-					ptrace(PTRACE_CONT, pid, (char *) 1, 0);
+					ptrace(PTRACE_CONT, pid, (char *) 0, 0);
 				error_msg_and_die("Unknown pid: %u", pid);
 			}
 		}
