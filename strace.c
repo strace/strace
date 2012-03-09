@@ -72,7 +72,8 @@ unsigned int ptrace_setoptions = 0;
 static unsigned int syscall_trap_sig = SIGTRAP;
 int dtime = 0, xflag = 0, qflag = 0;
 cflag_t cflag = CFLAG_NONE;
-static int iflag = 0, pflag_seen = 0, rflag = 0, tflag = 0;
+static int iflag = 0, rflag = 0, tflag = 0;
+static int print_pid_pfx = 0;
 
 /* -I n */
 enum {
@@ -447,12 +448,6 @@ static void process_opt_p_list(char *opt)
 		*delim = c;
 		tcp = alloc_tcb(pid, 0);
 		tcp->flags |= TCB_ATTACHED;
-		/*
-		 * pflag_seen says how many PIDs we handled,
-		 * not how many -p opts there were.
-		 * Used to decide whether to print pid prefix in logs.
-		 */
-		pflag_seen++;
 		if (c == '\0')
 			break;
 		opt = delim + 1;
@@ -1210,10 +1205,10 @@ main(int argc, char *argv[])
 	acolumn_spaces[acolumn] = '\0';
 
 	/* Must have PROG [ARGS], or -p PID. Not both. */
-	if (!argv[0] == !pflag_seen)
+	if (!argv[0] == !nprocs)
 		usage(stderr, 1);
 
-	if (pflag_seen && daemonized_tracer) {
+	if (nprocs != 0 && daemonized_tracer) {
 		error_msg_and_die("-D and -p are mutually exclusive options");
 	}
 
@@ -1331,8 +1326,15 @@ main(int argc, char *argv[])
 	sa.sa_handler = SIG_DFL;
 	sigaction(SIGCHLD, &sa, NULL);
 
-	if (pflag_seen || daemonized_tracer)
+	if (nprocs != 0 || daemonized_tracer)
 		startup_attach();
+
+	/* Do we want pids printed in our -o OUTFILE?
+	 * -ff: no (every pid has its own file); or
+	 * -f: yes (there can be more pids in the future); or
+	 * -p PID1,PID2: yes (there are already more than one pid)
+	 */
+	print_pid_pfx = (outfname && followfork < 2 && (followfork == 1 || nprocs > 1));
 
 	if (trace() < 0)
 		exit(1);
@@ -2094,10 +2096,12 @@ printleader(struct tcb *tcp)
 
 	printing_tcp = tcp;
 	curcol = 0;
-	if ((followfork == 1 || pflag_seen > 1) && outfname)
+
+	if (print_pid_pfx)
 		tprintf("%-5d ", tcp->pid);
 	else if (nprocs > 1 && !outfname)
 		tprintf("[pid %5u] ", tcp->pid);
+
 	if (tflag) {
 		char str[sizeof("HH:MM:SS")];
 		struct timeval tv, dtv;
