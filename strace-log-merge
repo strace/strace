@@ -1,46 +1,33 @@
 #!/bin/sh
 
 if test $# = 0; then
-	echo "Usage: ${0##*/} STRACE_LOG"
-	echo
-	echo "\
+	cat >&2 <<__EOF__
+Usage: ${0##*/} STRACE_LOG
+
 Finds all STRACE_LOG.PID files, adds PID prefix to every line,
 then combines and sorts them, and prints result to standard output.
 
 It is assumed that STRACE_LOGs were produced by strace with -tt[t]
-option which prints timestamps (otherwise sorting won't do any good).\
-"
-	exit
+option which prints timestamps (otherwise sorting won't do any good).
+__EOF__
+	exit 1
 fi
-
-is_numeric() {
-	# Remove digits. If something remains,
-	# then $1 is not a number
-
-	u=$1
-	test "$u" || return 1 # "" is not a number
-
-	while true; do
-		v=${u#[0123456789]} # remove one digit
-		test "$v" || return 0 # we removed all chars. ok
-		test "$v" = "$u" && return 1 # we have non-digit. bad
-		u=$v
-	done
-}
 
 logfile=$1
 pfxlen=${#1}
 
 for file in "$logfile".*; do
+	[ -f "$file" ] || continue
 	suffix=${file:1+$pfxlen}
-	is_numeric "$suffix" || {
+	[ "$suffix" -gt 0 ] 2> /dev/null || {
 		echo "Skipped file '$file' (bad suffix)" >&2
 		continue
 	}
 	pid=$(printf "%-5s" $suffix)
-	# Some strace logs have last line which is not '\n' terminated.
-	# 's/$/\n/' adds extra newlines to every line.
+	# Some strace logs have last line which is not '\n' terminated,
+	# so add extra newline to every file.
 	# grep -v '^$' removes empty lines which may result.
-	sed -e "s/^/$pid /" -e 's/$/\n/' <"$file"
+	sed "s/^/$pid /" < "$file"
+	echo
 done \
 | grep -v '^$' | sort -k2
