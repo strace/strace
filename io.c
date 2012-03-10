@@ -361,7 +361,7 @@ sys_vmsplice(struct tcb *tcp)
 		tprints(", ");
 		/* const struct iovec *iov, unsigned long nr_segs */
 		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
-		tprints(", ");
+		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* unsigned int flags */
 		printflags(splice_flags, tcp->u_arg[3], "SPLICE_F_???");
 	}
