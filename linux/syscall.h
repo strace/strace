@@ -175,6 +175,7 @@ int sys_preadv();
 int sys_pselect6();
 int sys_ptrace();
 int sys_process_vm_readv();
+int sys_process_vm_writev();
 int sys_putpmsg();
 int sys_pwrite();
 int sys_pwritev();
