@@ -530,3 +530,5 @@
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"		}, /* 499 */
 	{ 1,	TD,	sys_syncfs,		"syncfs"		}, /* 500 */
 	{ 2,	TD,	sys_setns,		"setns"			}, /* 501 */
+	{ 4,	TN,	sys_accept4,		"accept4"		}, /* 502 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"		}, /* 503 */

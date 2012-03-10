@@ -1117,5 +1117,8 @@
 	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 1327 */
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 1328 */
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 1329 */
-	{ 2,	TD,	sys_setns,		"setns"		}, /* 1331 */
-	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 1332 */
+	{ 2,	TD,	sys_setns,		"setns"		}, /* 1330 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 1331 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 1332 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 1333 */
+	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 1334 */

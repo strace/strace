@@ -4347,6 +4347,8 @@
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 4342 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 4343 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 4344 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 4345 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 4346 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
 	{ 0,	0,	printargs,		"o32_exit"		}, /* 4001 */
@@ -4693,9 +4695,9 @@
 	{ 1,	TD,	printargs,		"o32_syncfs"	}, /* 4342 */
 	{ 4,	TN,	printargs,		"o32_sendmmsg"	}, /* 4343 */
 	{ 2,	TD,	printargs,		"o32_setns"	}, /* 4344 */
+	{ 6,	0,	printargs,		"o32_process_vm_readv"	}, /* 4345 */
+	{ 6,	0,	printargs,		"o32_process_vm_writev"	}, /* 4346 */
 #endif
-	{ 0,	0,	printargs,		"SYS_4345"	}, /* 4345 */
-	{ 0,	0,	printargs,		"SYS_4346"	}, /* 4346 */
 	{ 0,	0,	printargs,		"SYS_4347"	}, /* 4347 */
 	{ 0,	0,	printargs,		"SYS_4348"	}, /* 4348 */
 	{ 0,	0,	printargs,		"SYS_4349"	}, /* 4349 */
@@ -5655,6 +5657,8 @@
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 5301 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 5302 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 5303 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 5304 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 5305 */
 #else
 	{ 0,	0,	printargs,		"n64_read"		}, /* 5000 */
 	{ 0,	0,	printargs,		"n64_write"		}, /* 5001 */
@@ -5960,9 +5964,9 @@
 	{ 1,	TD,	printargs,		"n64_syncfs"		}, /* 5301 */
 	{ 4,	TN,	printargs,		"n64_sendmmsg"		}, /* 5302 */
 	{ 2,	TD,	printargs,		"n64_setns"		}, /* 5303 */
+	{ 6,	0,	printargs,		"n64_process_vm_readv"	}, /* 5304 */
+	{ 6,	0,	printargs,		"n64_process_vm_writev"	}, /* 5305 */
 #endif
-	{ 0,	0,	printargs,		"SYS_5304"	}, /* 5304 */
-	{ 0,	0,	printargs,		"SYS_5305"	}, /* 5305 */
 	{ 0,	0,	printargs,		"SYS_5306"	}, /* 5306 */
 	{ 0,	0,	printargs,		"SYS_5307"	}, /* 5307 */
 	{ 0,	0,	printargs,		"SYS_5308"	}, /* 5308 */
@@ -6969,6 +6973,8 @@
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 6306 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 6307 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 6308 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 6309 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 6310 */
 
 #else
 	{ 0,	0,	printargs,		"n32_read"		}, /* 6000 */
@@ -7280,9 +7286,9 @@
 	{ 1,	TD,	printargs,		"n32_syncfs"		}, /* 6306 */
 	{ 4,	TN,	printargs,		"n32_sendmmsg"		}, /* 6307 */
 	{ 2,	TD,	printargs,		"n32_setns"		}, /* 6308 */
+	{ 6,	0,	printargs,		"n32_process_vm_readv"	}, /* 6309 */
+	{ 6,	0,	printargs,		"n32_process_vm_writev"	}, /* 6310 */
 #endif
-	{ 0,	0,	printargs,		"SYS_6309"	}, /* 6309 */
-	{ 0,	0,	printargs,		"SYS_6310"	}, /* 6310 */
 	{ 0,	0,	printargs,		"SYS_6311"	}, /* 6311 */
 	{ 0,	0,	printargs,		"SYS_6312"	}, /* 6312 */
 	{ 0,	0,	printargs,		"SYS_6313"	}, /* 6313 */

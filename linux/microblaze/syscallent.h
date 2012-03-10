@@ -402,3 +402,6 @@
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 373 */
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 374 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 375 */
+	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 376 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 377 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 378 */

@@ -373,8 +373,8 @@
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 342 */
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 343 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 344 */
-	{ 5,	0,	printargs,		"SYS_345"	}, /* 345 */
-	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 345 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 346 */
 	{ 5,	0,	printargs,		"SYS_347"	}, /* 347 */
 	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
 	{ 5,	0,	printargs,		"SYS_349"	}, /* 349 */
