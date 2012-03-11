@@ -50,7 +50,6 @@
 #define	sys_rt_tgsigqueueinfo	printargs
 #define	sys_sched_rr_get_interval printargs
 #define	sys_sendmmsg		printargs
-#define	sys_setns		printargs
 #define	sys_set_robust_list	printargs
 #define	sys_sync_file_range	printargs
 #define	sys_sysfs		printargs
@@ -89,6 +88,7 @@
 #define	sys_sched_get_priority_max	sys_sched_get_priority_min
 #define	sys_setfsgid		sys_setfsuid
 #define	sys_setgid		sys_setuid
+#define	sys_setns		sys_inotify_rm_watch
 #define	sys_setregid		sys_setreuid
 #define	sys_setresgid		sys_setresuid
 #define	sys_swapoff		sys_chdir
