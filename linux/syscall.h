@@ -220,6 +220,7 @@ int sys_semtimedop();
 int sys_send();
 int sys_sendfile();
 int sys_sendfile64();
+int sys_sendmmsg();
 int sys_sendmsg();
 int sys_sendto();
 int sys_set_mempolicy();

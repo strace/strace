@@ -1447,13 +1447,14 @@ printmsghdr(struct tcb *tcp, long addr)
 }
 
 static void
-printmmsghdr(struct tcb *tcp, long addr)
+printmmsghdr(struct tcb *tcp, long addr, unsigned int idx)
 {
 	struct mmsghdr {
 		struct msghdr msg_hdr;
 		unsigned msg_len;
 	} mmsg;
 
+	addr += sizeof(mmsg) * idx;
 	if (umove(tcp, addr, &mmsg) < 0) {
 		tprintf("%#lx", addr);
 		return;
@@ -1461,6 +1462,30 @@ printmmsghdr(struct tcb *tcp, long addr)
 	tprints("{");
 	do_msghdr(tcp, &mmsg.msg_hdr);
 	tprintf(", %u}", mmsg.msg_len);
+}
+
+static void
+decode_mmsg(struct tcb *tcp)
+{
+	/* mmsgvec */
+	if (syserror(tcp)) {
+		tprintf("%#lx", tcp->u_arg[1]);
+	} else {
+		unsigned int len = tcp->u_rval;
+		unsigned int i;
+
+		tprints("{");
+		for (i = 0; i < len; ++i) {
+			if (i)
+				tprints(", ");
+			printmmsghdr(tcp, tcp->u_arg[1], i);
+		}
+		tprints("}");
+	}
+	/* vlen */
+	tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
+	/* flags */
+	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 }
 
 #endif /* HAVE_SENDMSG */
@@ -1627,6 +1652,24 @@ sys_sendmsg(struct tcb *tcp)
 	return 0;
 }
 
+int
+sys_sendmmsg(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		/* sockfd */
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+		if (!verbose(tcp)) {
+			tprintf("%#lx, %u, ",
+				tcp->u_arg[1], (unsigned int) tcp->u_arg[2]);
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+		}
+	} else {
+		if (verbose(tcp))
+			decode_mmsg(tcp);
+	}
+	return 0;
+}
+
 #endif /* HAVE_SENDMSG */
 
 int
@@ -1732,13 +1775,7 @@ sys_recvmmsg(struct tcb *tcp)
 		return 0;
 	} else {
 		if (verbose(tcp)) {
-			if (syserror(tcp))
-				tprintf("%#lx", tcp->u_arg[1]);
-			else
-				printmmsghdr(tcp, tcp->u_arg[1]);
-			tprintf(", %ld, ", tcp->u_arg[2]);
-			/* flags */
-			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+			decode_mmsg(tcp);
 			/* timeout on entrance */
 			tprintf(", %s", tcp->auxstr ? tcp->auxstr : "{...}");
 			free((void *) tcp->auxstr);
