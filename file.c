@@ -2660,7 +2660,7 @@ sys_inotify_rm_watch(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
-		tprintf(", %ld", tcp->u_arg[1]);
+		tprintf(", %d", (int) tcp->u_arg[1]);
 	}
 	return 0;
 }
