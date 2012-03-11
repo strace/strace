@@ -88,6 +88,7 @@ int sys_ftruncate64();
 int sys_futex();
 int sys_futimesat();
 int sys_get_mempolicy();
+int sys_get_robust_list();
 int sys_get_thread_area();
 int sys_getcpu();
 int sys_getcwd();
