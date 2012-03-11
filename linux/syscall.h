@@ -208,6 +208,7 @@ int sys_sched_get_priority_min();
 int sys_sched_getaffinity();
 int sys_sched_getparam();
 int sys_sched_getscheduler();
+int sys_sched_rr_get_interval();
 int sys_sched_setaffinity();
 int sys_sched_setparam();
 int sys_sched_setscheduler();

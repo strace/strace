@@ -45,7 +45,6 @@
 #define	sys_prlimit64		printargs
 #define	sys_request_key		printargs
 #define	sys_rt_tgsigqueueinfo	printargs
-#define	sys_sched_rr_get_interval printargs
 #define	sys_sendmmsg		printargs
 #define	sys_sync_file_range	printargs
 #define	sys_sysfs		printargs

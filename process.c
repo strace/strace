@@ -2717,6 +2717,20 @@ sys_sched_get_priority_min(struct tcb *tcp)
 	return 0;
 }
 
+int
+sys_sched_rr_get_interval(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", (long) (pid_t) tcp->u_arg[0]);
+	} else {
+		if (syserror(tcp))
+			tprintf("%#lx", tcp->u_arg[1]);
+		else
+			print_timespec(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
 # ifdef X86_64
 # include <asm/prctl.h>
 
