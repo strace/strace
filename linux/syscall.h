@@ -132,6 +132,7 @@ int sys_lstat();
 int sys_lstat64();
 int sys_madvise();
 int sys_mbind();
+int sys_migrate_pages();
 int sys_mincore();
 int sys_mkdir();
 int sys_mkdirat();

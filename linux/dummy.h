@@ -39,7 +39,6 @@
 #define	sys_kexec_load		printargs
 #define	sys_keyctl		printargs
 #define	sys_lookup_dcookie	printargs
-#define	sys_migrate_pages	printargs
 #define	sys_name_to_handle_at	printargs
 #define	sys_open_by_handle_at	printargs
 #define	sys_perf_event_open	printargs

@@ -829,6 +829,18 @@ sys_get_mempolicy(struct tcb *tcp)
 }
 
 int
+sys_migrate_pages(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%ld, ", (long) (pid_t) tcp->u_arg[0]);
+		get_nodes(tcp, tcp->u_arg[2], tcp->u_arg[1], 0);
+		tprints(", ");
+		get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[1], 0);
+	}
+	return 0;
+}
+
+int
 sys_move_pages(struct tcb *tcp)
 {
 	if (entering(tcp)) {
