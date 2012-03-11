@@ -582,22 +582,28 @@ tprint_timex(struct tcb *tcp, long addr)
 	return 0;
 }
 
+static int
+do_adjtimex(struct tcb *tcp, long addr)
+{
+	if (addr == 0)
+		tprints("NULL");
+	else if (syserror(tcp) || !verbose(tcp))
+		tprintf("%#lx", addr);
+	else if (tprint_timex(tcp, addr) < 0)
+		tprints("{...}");
+	if (syserror(tcp))
+		return 0;
+	tcp->auxstr = xlookup(adjtimex_state, tcp->u_rval);
+	if (tcp->auxstr)
+		return RVAL_STR;
+	return 0;
+}
+
 int
 sys_adjtimex(struct tcb *tcp)
 {
-	if (exiting(tcp)) {
-		if (tcp->u_arg[0] == 0)
-			tprints("NULL");
-		else if (syserror(tcp) || !verbose(tcp))
-			tprintf("%#lx", tcp->u_arg[0]);
-		else if (tprint_timex(tcp, tcp->u_arg[0]) < 0)
-			tprints("{...}");
-		if (syserror(tcp))
-			return 0;
-		tcp->auxstr = xlookup(adjtimex_state, tcp->u_rval);
-		if (tcp->auxstr)
-			return RVAL_STR;
-	}
+	if (exiting(tcp))
+		return do_adjtimex(tcp, tcp->u_arg[0]);
 	return 0;
 }
 
@@ -673,6 +679,16 @@ sys_clock_nanosleep(struct tcb *tcp)
 		else
 			printtv(tcp, tcp->u_arg[3]);
 	}
+	return 0;
+}
+
+int
+sys_clock_adjtime(struct tcb *tcp)
+{
+	if (exiting(tcp))
+		return do_adjtimex(tcp, tcp->u_arg[1]);
+	printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+	tprints(", ");
 	return 0;
 }
 

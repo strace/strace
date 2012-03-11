@@ -44,6 +44,7 @@ int sys_capset();
 int sys_chdir();
 int sys_chmod();
 int sys_chown();
+int sys_clock_adjtime();
 int sys_clock_gettime();
 int sys_clock_nanosleep();
 int sys_clock_settime();

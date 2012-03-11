@@ -30,7 +30,6 @@
 
 /* still unfinished */
 #define	sys_add_key		printargs
-#define	sys_clock_adjtime	printargs
 #define	sys_fanotify_init	printargs
 #define	sys_fanotify_mark	printargs
 #define	sys_get_robust_list	printargs
