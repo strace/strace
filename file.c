@@ -2156,15 +2156,6 @@ sys_mknodat(struct tcb *tcp)
 	return decode_mknod(tcp, 1);
 }
 
-int
-sys_fsync(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
-
 static void
 printdir(struct tcb *tcp, long addr)
 {

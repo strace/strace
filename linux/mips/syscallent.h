@@ -5425,7 +5425,7 @@
 	{ 3,	TI,	sys_msgctl,		"msgctl"	}, /* 5069 */
 	{ 3,	0,	sys_fcntl,		"fcntl"		}, /* 5070 */
 	{ 2,	0,	sys_flock,		"flock"		}, /* 5071 */
-	{ 1,	0,	sys_fsync,		"fsync"		}, /* 5072 */
+	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 5072 */
 	{ 1,	0,	sys_fdatasync,		"fdatasync"	}, /* 5073 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 5074 */
 	{ 2,	0,	sys_ftruncate,		"ftruncate"	}, /* 5075 */
@@ -6736,7 +6736,7 @@
 	{ 3,	TI,	sys_msgctl,		"msgctl"	}, /* 6069 */
 	{ 3,	0,	sys_fcntl,		"fcntl"		}, /* 6070 */
 	{ 2,	0,	sys_flock,		"flock"		}, /* 6071 */
-	{ 1,	0,	sys_fsync,		"fsync"		}, /* 6072 */
+	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 6072 */
 	{ 1,	0,	sys_fdatasync,		"fdatasync"	}, /* 6073 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 6074 */
 	{ 2,	0,	sys_ftruncate,		"ftruncate"	}, /* 6075 */

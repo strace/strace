@@ -75,6 +75,7 @@
 #define	sys_dup			sys_close
 #define	sys_fchdir		sys_close
 #define	sys_fdatasync		sys_close
+#define	sys_fsync		sys_close
 #define	sys_geteuid		sys_getuid
 #define	sys_getegid		sys_getuid
 #define	sys_getgid		sys_getuid

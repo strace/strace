@@ -146,7 +146,7 @@
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
 	{ 6,	TI,	sys_ipc,		"ipc"		}, /* 117 */
-	{ 1,	0,	sys_fsync,		"fsync"		}, /* 118 */
+	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 118 */
 	{ 0,	TS,	sys_sigreturn,		"sigreturn"	}, /* 119 */
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */

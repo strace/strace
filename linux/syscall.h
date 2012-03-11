@@ -82,7 +82,6 @@ int sys_fstat();
 int sys_fstat64();
 int sys_fstatfs();
 int sys_fstatfs64();
-int sys_fsync();
 int sys_ftruncate();
 int sys_ftruncate64();
 int sys_futex();
