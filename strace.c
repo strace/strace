@@ -1128,8 +1128,7 @@ test_ptrace_seize(void)
 #  define test_ptrace_seize() ((void)0)
 # endif
 
-/* Noinline: don't want main to have struct utsname permanently on stack */
-static void __attribute__ ((noinline))
+static void
 get_os_release(void)
 {
 	struct utsname u;
@@ -1140,8 +1139,16 @@ get_os_release(void)
 		die_out_of_memory();
 }
 
-int
-main(int argc, char *argv[])
+/*
+ * Initialization part of main() was eating much stack (~0.5k),
+ * which was unused after init.
+ * We can reuse it if we move init code into a separate function.
+ *
+ * Don't want main() to inline us and defeat the reason
+ * we have a separate function.
+ */
+static void __attribute__ ((noinline))
+init(int argc, char *argv[])
 {
 	struct tcb *tcp;
 	int c;
@@ -1426,26 +1433,6 @@ main(int argc, char *argv[])
 	 * -p PID1,PID2: yes (there are already more than one pid)
 	 */
 	print_pid_pfx = (outfname && followfork < 2 && (followfork == 1 || nprocs > 1));
-
-	if (trace() < 0)
-		exit(1);
-
-	cleanup();
-	fflush(NULL);
-	if (exit_code > 0xff) {
-		/* Avoid potential core file clobbering.  */
-		struct rlimit rlim = {0, 0};
-		setrlimit(RLIMIT_CORE, &rlim);
-
-		/* Child was killed by a signal, mimic that.  */
-		exit_code &= 0xff;
-		signal(exit_code, SIG_DFL);
-		raise(exit_code);
-		/* Paranoia - what if this signal is not fatal?
-		   Exit with 128 + signo then.  */
-		exit_code += 128;
-	}
-	exit(exit_code);
 }
 
 static void
@@ -2131,4 +2118,32 @@ trace(void)
 		}
 	}
 	return 0;
+}
+
+int
+main(int argc, char *argv[])
+{
+	init(argc, argv);
+
+	/* Run main tracing loop */
+	if (trace() < 0)
+		return 1;
+
+	cleanup();
+	fflush(NULL);
+	if (exit_code > 0xff) {
+		/* Avoid potential core file clobbering.  */
+		struct rlimit rlim = {0, 0};
+		setrlimit(RLIMIT_CORE, &rlim);
+
+		/* Child was killed by a signal, mimic that.  */
+		exit_code &= 0xff;
+		signal(exit_code, SIG_DFL);
+		raise(exit_code);
+		/* Paranoia - what if this signal is not fatal?
+		   Exit with 128 + signo then.  */
+		exit_code += 128;
+	}
+
+	return exit_code;
 }
