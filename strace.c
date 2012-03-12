@@ -337,6 +337,102 @@ static void kill_save_errno(pid_t pid, int sig)
 	errno = saved_errno;
 }
 
+void
+tprintf(const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	if (outf) {
+		int n = vfprintf(outf, fmt, args);
+		if (n < 0) {
+			if (outf != stderr)
+				perror(outfname == NULL
+				       ? "<writing to pipe>" : outfname);
+		} else
+			curcol += n;
+	}
+	va_end(args);
+}
+
+void
+tprints(const char *str)
+{
+	if (outf) {
+		int n = fputs(str, outf);
+		if (n >= 0) {
+			curcol += strlen(str);
+			return;
+		}
+		if (outf != stderr)
+			perror(outfname == NULL
+			       ? "<writing to pipe>" : outfname);
+	}
+}
+
+void
+printleader(struct tcb *tcp)
+{
+	if (printing_tcp) {
+		if (printing_tcp->ptrace_errno) {
+			if (printing_tcp->flags & TCB_INSYSCALL) {
+				tprints(" <unavailable>) ");
+				tabto();
+			}
+			tprints("= ? <unavailable>\n");
+			printing_tcp->ptrace_errno = 0;
+		} else if (!outfname || followfork < 2 || printing_tcp == tcp) {
+			printing_tcp->flags |= TCB_REPRINT;
+			tprints(" <unfinished ...>\n");
+		}
+	}
+
+	printing_tcp = tcp;
+	curcol = 0;
+
+	if (print_pid_pfx)
+		tprintf("%-5d ", tcp->pid);
+	else if (nprocs > 1 && !outfname)
+		tprintf("[pid %5u] ", tcp->pid);
+
+	if (tflag) {
+		char str[sizeof("HH:MM:SS")];
+		struct timeval tv, dtv;
+		static struct timeval otv;
+
+		gettimeofday(&tv, NULL);
+		if (rflag) {
+			if (otv.tv_sec == 0)
+				otv = tv;
+			tv_sub(&dtv, &tv, &otv);
+			tprintf("%6ld.%06ld ",
+				(long) dtv.tv_sec, (long) dtv.tv_usec);
+			otv = tv;
+		}
+		else if (tflag > 2) {
+			tprintf("%ld.%06ld ",
+				(long) tv.tv_sec, (long) tv.tv_usec);
+		}
+		else {
+			time_t local = tv.tv_sec;
+			strftime(str, sizeof(str), "%T", localtime(&local));
+			if (tflag > 1)
+				tprintf("%s.%06ld ", str, (long) tv.tv_usec);
+			else
+				tprintf("%s ", str);
+		}
+	}
+	if (iflag)
+		printcall(tcp);
+}
+
+void
+tabto(void)
+{
+	if (curcol < acolumn)
+		tprints(acolumn_spaces + curcol);
+}
+
 /*
  * When strace is setuid executable, we have to swap uids
  * before and after filesystem and process management operations.
@@ -2035,100 +2131,4 @@ trace(void)
 		}
 	}
 	return 0;
-}
-
-void
-tprintf(const char *fmt, ...)
-{
-	va_list args;
-
-	va_start(args, fmt);
-	if (outf) {
-		int n = vfprintf(outf, fmt, args);
-		if (n < 0) {
-			if (outf != stderr)
-				perror(outfname == NULL
-				       ? "<writing to pipe>" : outfname);
-		} else
-			curcol += n;
-	}
-	va_end(args);
-}
-
-void
-tprints(const char *str)
-{
-	if (outf) {
-		int n = fputs(str, outf);
-		if (n >= 0) {
-			curcol += strlen(str);
-			return;
-		}
-		if (outf != stderr)
-			perror(outfname == NULL
-			       ? "<writing to pipe>" : outfname);
-	}
-}
-
-void
-printleader(struct tcb *tcp)
-{
-	if (printing_tcp) {
-		if (printing_tcp->ptrace_errno) {
-			if (printing_tcp->flags & TCB_INSYSCALL) {
-				tprints(" <unavailable>) ");
-				tabto();
-			}
-			tprints("= ? <unavailable>\n");
-			printing_tcp->ptrace_errno = 0;
-		} else if (!outfname || followfork < 2 || printing_tcp == tcp) {
-			printing_tcp->flags |= TCB_REPRINT;
-			tprints(" <unfinished ...>\n");
-		}
-	}
-
-	printing_tcp = tcp;
-	curcol = 0;
-
-	if (print_pid_pfx)
-		tprintf("%-5d ", tcp->pid);
-	else if (nprocs > 1 && !outfname)
-		tprintf("[pid %5u] ", tcp->pid);
-
-	if (tflag) {
-		char str[sizeof("HH:MM:SS")];
-		struct timeval tv, dtv;
-		static struct timeval otv;
-
-		gettimeofday(&tv, NULL);
-		if (rflag) {
-			if (otv.tv_sec == 0)
-				otv = tv;
-			tv_sub(&dtv, &tv, &otv);
-			tprintf("%6ld.%06ld ",
-				(long) dtv.tv_sec, (long) dtv.tv_usec);
-			otv = tv;
-		}
-		else if (tflag > 2) {
-			tprintf("%ld.%06ld ",
-				(long) tv.tv_sec, (long) tv.tv_usec);
-		}
-		else {
-			time_t local = tv.tv_sec;
-			strftime(str, sizeof(str), "%T", localtime(&local));
-			if (tflag > 1)
-				tprintf("%s.%06ld ", str, (long) tv.tv_usec);
-			else
-				tprintf("%s ", str);
-		}
-	}
-	if (iflag)
-		printcall(tcp);
-}
-
-void
-tabto(void)
-{
-	if (curcol < acolumn)
-		tprints(acolumn_spaces + curcol);
 }
