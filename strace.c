@@ -1356,6 +1356,10 @@ init(int argc, char *argv[])
 		}
 		else if (followfork <= 1)
 			outf = strace_fopen(outfname);
+	} else {
+		/* -ff without -o FILE is the same as single -f */
+		if (followfork > 1)
+			followfork = 1;
 	}
 
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
