@@ -525,7 +525,8 @@ newoutf(struct tcb *tcp)
 	}
 }
 
-static void process_opt_p_list(char *opt)
+static void
+process_opt_p_list(char *opt)
 {
 	while (*opt) {
 		/*
