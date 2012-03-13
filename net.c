@@ -587,6 +587,9 @@ static const struct xlat msg_flags[] = {
 #ifdef MSG_MORE
 	{ MSG_MORE,		"MSG_MORE"		},
 #endif
+#ifdef MSG_WAITFORONE
+	{ MSG_WAITFORONE,	"MSG_WAITFORONE"	},
+#endif
 #ifdef MSG_CMSG_CLOEXEC
 	{ MSG_CMSG_CLOEXEC,	"MSG_CMSG_CLOEXEC"	},
 #endif
