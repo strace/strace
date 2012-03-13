@@ -1239,14 +1239,30 @@ sys_stat64(struct tcb *tcp)
 #endif
 }
 
-static const struct xlat fstatatflags[] = {
 #ifndef AT_SYMLINK_NOFOLLOW
-# define AT_SYMLINK_NOFOLLOW     0x100
+# define AT_SYMLINK_NOFOLLOW	0x100
 #endif
+#ifndef AT_REMOVEDIR
+# define AT_REMOVEDIR		0x200
+#endif
+#ifndef AT_SYMLINK_FOLLOW
+# define AT_SYMLINK_FOLLOW	0x400
+#endif
+#ifndef AT_NO_AUTOMOUNT
+# define AT_NO_AUTOMOUNT	0x800
+#endif
+#ifndef AT_EMPTY_PATH
+# define AT_EMPTY_PATH		0x1000
+#endif
+
+static const struct xlat at_flags[] = {
 	{ AT_SYMLINK_NOFOLLOW,	"AT_SYMLINK_NOFOLLOW"	},
-	{ 0,			NULL			},
+	{ AT_REMOVEDIR,		"AT_REMOVEDIR"		},
+	{ AT_SYMLINK_FOLLOW,	"AT_SYMLINK_FOLLOW"	},
+	{ AT_NO_AUTOMOUNT,	"AT_NO_AUTOMOUNT"	},
+	{ AT_EMPTY_PATH,	"AT_EMPTY_PATH"		},
+	{ 0,			NULL			}
 };
-#define utimensatflags fstatatflags
 
 int
 sys_newfstatat(struct tcb *tcp)
@@ -1267,7 +1283,7 @@ sys_newfstatat(struct tcb *tcp)
 		printstat(tcp, tcp->u_arg[2]);
 #endif
 		tprints(", ");
-		printflags(fstatatflags, tcp->u_arg[3], "AT_???");
+		printflags(at_flags, tcp->u_arg[3], "AT_???");
 	}
 	return 0;
 }
@@ -1853,19 +1869,6 @@ sys_link(struct tcb *tcp)
 	return 0;
 }
 
-#ifndef AT_SYMLINK_FOLLOW
-# define AT_SYMLINK_FOLLOW	0x400
-#endif
-#ifndef AT_EMPTY_PATH
-# define AT_EMPTY_PATH		0x1000
-#endif
-
-static const struct xlat linkat_flags[] = {
-	{ AT_SYMLINK_FOLLOW,	"AT_SYMLINK_FOLLOW"	},
-	{ AT_EMPTY_PATH,	"AT_EMPTY_PATH"		},
-	{ 0,			NULL			}
-};
-
 int
 sys_linkat(struct tcb *tcp)
 {
@@ -1876,18 +1879,10 @@ sys_linkat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[2]);
 		printpath(tcp, tcp->u_arg[3]);
 		tprints(", ");
-		printflags(linkat_flags, tcp->u_arg[4], "AT_???");
+		printflags(at_flags, tcp->u_arg[4], "AT_???");
 	}
 	return 0;
 }
-
-static const struct xlat unlinkatflags[] = {
-#ifndef AT_REMOVEDIR
-# define AT_REMOVEDIR            0x200
-#endif
-	{ AT_REMOVEDIR,	"AT_REMOVEDIR"	},
-	{ 0,		NULL		},
-};
 
 int
 sys_unlinkat(struct tcb *tcp)
@@ -1896,7 +1891,7 @@ sys_unlinkat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
-		printflags(unlinkatflags, tcp->u_arg[2], "AT_???");
+		printflags(at_flags, tcp->u_arg[2], "AT_???");
 	}
 	return 0;
 }
@@ -1983,7 +1978,7 @@ sys_fchownat(struct tcb *tcp)
 		printuid(", ", tcp->u_arg[2]);
 		printuid(", ", tcp->u_arg[3]);
 		tprints(", ");
-		printflags(fstatatflags, tcp->u_arg[4], "AT_???");
+		printflags(at_flags, tcp->u_arg[4], "AT_???");
 	}
 	return 0;
 }
@@ -2089,7 +2084,7 @@ sys_utimensat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 		decode_utimes(tcp, 1, 1);
 		tprints(", ");
-		printflags(utimensatflags, tcp->u_arg[3], "AT_???");
+		printflags(at_flags, tcp->u_arg[3], "AT_???");
 	}
 	return 0;
 }
