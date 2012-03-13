@@ -1816,24 +1816,7 @@ trace(void)
 		event = ((unsigned)status >> 16);
 		if (debug) {
 			char buf[sizeof("WIFEXITED,exitcode=%u") + sizeof(int)*3 /*paranoia:*/ + 16];
-			if (event != 0) {
-				static const char *const event_names[] = {
-					[PTRACE_EVENT_CLONE] = "CLONE",
-					[PTRACE_EVENT_FORK]  = "FORK",
-					[PTRACE_EVENT_VFORK] = "VFORK",
-					[PTRACE_EVENT_VFORK_DONE] = "VFORK_DONE",
-					[PTRACE_EVENT_EXEC]  = "EXEC",
-					[PTRACE_EVENT_EXIT]  = "EXIT",
-				};
-				const char *e;
-				if (event < ARRAY_SIZE(event_names))
-					e = event_names[event];
-				else {
-					sprintf(buf, "?? (%u)", event);
-					e = buf;
-				}
-				fprintf(stderr, " PTRACE_EVENT_%s", e);
-			}
+			char evbuf[sizeof(",PTRACE_EVENT_?? (%u)") + sizeof(int)*3 /*paranoia:*/ + 16];
 			strcpy(buf, "???");
 			if (WIFSIGNALED(status))
 #ifdef WCOREDUMP
@@ -1852,7 +1835,26 @@ trace(void)
 			if (WIFCONTINUED(status))
 				strcpy(buf, "WIFCONTINUED");
 #endif
-			fprintf(stderr, " [wait(0x%04x) = %u] %s\n", status, pid, buf);
+			evbuf[0] = '\0';
+			if (event != 0) {
+				static const char *const event_names[] = {
+					[PTRACE_EVENT_CLONE] = "CLONE",
+					[PTRACE_EVENT_FORK]  = "FORK",
+					[PTRACE_EVENT_VFORK] = "VFORK",
+					[PTRACE_EVENT_VFORK_DONE] = "VFORK_DONE",
+					[PTRACE_EVENT_EXEC]  = "EXEC",
+					[PTRACE_EVENT_EXIT]  = "EXIT",
+				};
+				const char *e;
+				if (event < ARRAY_SIZE(event_names))
+					e = event_names[event];
+				else {
+					sprintf(buf, "?? (%u)", event);
+					e = buf;
+				}
+				sprintf(evbuf, ",PTRACE_EVENT_%s", e);
+			}
+			fprintf(stderr, " [wait(0x%04x) = %u] %s%s\n", status, pid, buf, evbuf);
 		}
 
 		/* Look up 'pid' in our table. */
