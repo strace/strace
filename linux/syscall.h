@@ -268,6 +268,7 @@ int sys_swapon();
 int sys_symlinkat();
 int sys_sysctl();
 int sys_sysinfo();
+int sys_syslog();
 int sys_tee();
 int sys_tgkill();
 int sys_time();
