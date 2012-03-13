@@ -44,7 +44,6 @@
 #define	sys_perf_event_open	printargs
 #define	sys_prlimit64		printargs
 #define	sys_request_key		printargs
-#define	sys_rt_tgsigqueueinfo	printargs
 #define	sys_sync_file_range	printargs
 #define	sys_sysfs		printargs
 #define	sys_vm86old		printargs

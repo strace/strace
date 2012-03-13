@@ -204,6 +204,7 @@ int sys_rt_sigprocmask();
 int sys_rt_sigqueueinfo();
 int sys_rt_sigsuspend();
 int sys_rt_sigtimedwait();
+int sys_rt_tgsigqueueinfo();
 int sys_sched_get_priority_min();
 int sys_sched_getaffinity();
 int sys_sched_getparam();

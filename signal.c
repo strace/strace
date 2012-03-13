@@ -1437,18 +1437,35 @@ sys_rt_sigsuspend(struct tcb *tcp)
 	return 0;
 }
 
+static void
+print_sigqueueinfo(struct tcb *tcp, int sig, unsigned long uinfo)
+{
+	siginfo_t si;
+
+	printsignal(sig);
+	tprints(", ");
+	if (umove(tcp, uinfo, &si) < 0)
+		tprintf("%#lx", uinfo);
+	else
+		printsiginfo(&si, verbose(tcp));
+}
+
 int
 sys_rt_sigqueueinfo(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		siginfo_t si;
 		tprintf("%lu, ", tcp->u_arg[0]);
-		printsignal(tcp->u_arg[1]);
-		tprints(", ");
-		if (umove(tcp, tcp->u_arg[2], &si) < 0)
-			tprintf("%#lx", tcp->u_arg[2]);
-		else
-			printsiginfo(&si, verbose(tcp));
+		print_sigqueueinfo(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	}
+	return 0;
+}
+
+int
+sys_rt_tgsigqueueinfo(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		print_sigqueueinfo(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 	}
 	return 0;
 }
