@@ -1853,6 +1853,19 @@ sys_link(struct tcb *tcp)
 	return 0;
 }
 
+#ifndef AT_SYMLINK_FOLLOW
+# define AT_SYMLINK_FOLLOW	0x400
+#endif
+#ifndef AT_EMPTY_PATH
+# define AT_EMPTY_PATH		0x1000
+#endif
+
+static const struct xlat linkat_flags[] = {
+	{ AT_SYMLINK_FOLLOW,	"AT_SYMLINK_FOLLOW"	},
+	{ AT_EMPTY_PATH,	"AT_EMPTY_PATH"		},
+	{ 0,			NULL			}
+};
+
 int
 sys_linkat(struct tcb *tcp)
 {
@@ -1863,7 +1876,7 @@ sys_linkat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[2]);
 		printpath(tcp, tcp->u_arg[3]);
 		tprints(", ");
-		printfd(tcp, tcp->u_arg[4]);
+		printflags(linkat_flags, tcp->u_arg[4], "AT_???");
 	}
 	return 0;
 }
