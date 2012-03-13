@@ -392,7 +392,7 @@ sys_exit(struct tcb *tcp)
 	tprintf("%ld) ", tcp->u_arg[0]);
 	tabto();
 	tprints("= ?\n");
-	printing_tcp = NULL;
+	line_ended();
 	return 0;
 }
 

@@ -371,9 +371,28 @@ tprints(const char *str)
 }
 
 void
+line_ended(void)
+{
+	curcol = 0;
+	fflush(outf);
+	if (!printing_tcp)
+		return;
+	printing_tcp->curcol = 0;
+	printing_tcp = NULL;
+}
+
+void
 printleader(struct tcb *tcp)
 {
+	/* If -ff, "previous tcb we printed" is always the same as current,
+	 * because we have per-tcb output files.
+	 */
+	if (followfork >= 2)
+		printing_tcp = tcp;
+
 	if (printing_tcp) {
+		outf = printing_tcp->outf;
+		curcol = printing_tcp->curcol;
 		if (printing_tcp->ptrace_errno) {
 			if (printing_tcp->flags & TCB_INSYSCALL) {
 				tprints(" <unavailable>) ");
@@ -381,13 +400,23 @@ printleader(struct tcb *tcp)
 			}
 			tprints("= ? <unavailable>\n");
 			printing_tcp->ptrace_errno = 0;
-		} else if (!outfname || followfork < 2 || printing_tcp == tcp) {
-			printing_tcp->flags |= TCB_REPRINT;
+			printing_tcp->curcol = 0;
+		}
+		if (printing_tcp->curcol != 0 && (followfork < 2 || printing_tcp == tcp)) {
+			/*
+			 * case 1: we have a shared log (i.e. not -ff), and last line
+			 * wasn't finished (same or different tcb, doesn't matter).
+			 * case 2: split log, we are the same tcb, but our last line
+			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
+			 */
 			tprints(" <unfinished ...>\n");
+			printing_tcp->flags |= TCB_REPRINT;
+			printing_tcp->curcol = 0;
 		}
 	}
 
 	printing_tcp = tcp;
+	outf = tcp->outf;
 	curcol = 0;
 
 	if (print_pid_pfx)
@@ -518,7 +547,7 @@ strace_popen(const char *command)
 static void
 newoutf(struct tcb *tcp)
 {
-	if (outfname && followfork > 1) {
+	if (outfname && followfork >= 2) {
 		char name[520 + sizeof(int) * 3];
 		sprintf(name, "%.512s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
@@ -1516,8 +1545,16 @@ droptcb(struct tcb *tcp)
 	if (debug)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
 
-	if (outfname && followfork > 1 && tcp->outf)
+	if (printing_tcp == tcp)
+		printing_tcp = NULL;
+
+	if (outfname && followfork >= 2 && tcp->outf) {
+		if (tcp->curcol != 0)
+			fprintf(tcp->outf, " <detached>\n");
 		fclose(tcp->outf);
+	} else if (tcp->outf) {
+		fflush(tcp->outf);
+	}
 
 	memset(tcp, 0, sizeof(*tcp));
 }
@@ -1646,17 +1683,11 @@ cleanup(void)
 		if (debug)
 			fprintf(stderr,
 				"cleanup: looking at pid %u\n", tcp->pid);
-		if (printing_tcp &&
-		    (!outfname || followfork < 2 || printing_tcp == tcp)) {
-			tprints(" <unfinished ...>\n");
-			printing_tcp = NULL;
-		}
-		if (!(tcp->flags & TCB_STRACE_CHILD))
-			detach(tcp);
-		else {
+		if (tcp->flags & TCB_STRACE_CHILD) {
 			kill(tcp->pid, SIGCONT);
 			kill(tcp->pid, fatal_sig);
 		}
+		detach(tcp);
 	}
 	if (cflag)
 		call_summary(outf);
@@ -1851,18 +1882,20 @@ trace(void)
 				if (tcp) {
 					outf = tcp->outf;
 					curcol = tcp->curcol;
-					if (!cflag) {
-						if (printing_tcp)
-							tprints(" <unfinished ...>\n");
-						printleader(tcp);
-						tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
-						printing_tcp = NULL;
-						fflush(outf);
-					}
 					if (execve_thread) {
+						if (execve_thread->curcol != 0) {
+							/*
+							 * One case we are here is -ff:
+							 * try "strace -oLOG -ff test/threaded_execve"
+							 */
+							fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
+							execve_thread->curcol = 0;
+						}
 						/* swap output FILEs (needed for -ff) */
 						tcp->outf = execve_thread->outf;
+						tcp->curcol = execve_thread->curcol;
 						execve_thread->outf = outf;
+						execve_thread->curcol = curcol;
 					}
 					droptcb(tcp);
 				}
@@ -1870,6 +1903,11 @@ trace(void)
 				if (tcp) {
 					tcp->pid = pid;
 					tcp->flags |= TCB_REPRINT;
+					if (!cflag) {
+						printleader(tcp);
+						tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
+						line_ended();
+					}
 				}
 			}
 		}
@@ -1900,9 +1938,11 @@ trace(void)
 				error_msg_and_die("Unknown pid: %u", pid);
 			}
 		}
-		/* set current output file */
+
+		/* Set current output file */
 		outf = tcp->outf;
 		curcol = tcp->curcol;
+
 		if (cflag) {
 			tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
 			tcp->stime = ru.ru_stime;
@@ -1922,25 +1962,19 @@ trace(void)
 				tprintf("+++ killed by %s +++\n",
 					signame(WTERMSIG(status)));
 #endif
-				printing_tcp = NULL;
+				line_ended();
 			}
-			fflush(tcp->outf);
 			droptcb(tcp);
 			continue;
 		}
 		if (WIFEXITED(status)) {
 			if (pid == strace_child)
 				exit_code = WEXITSTATUS(status);
-			if (tcp == printing_tcp) {
-				tprints(" <unfinished ...>\n");
-				printing_tcp = NULL;
-			}
 			if (!cflag /* && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL) */ ) {
 				printleader(tcp);
 				tprintf("+++ exited with %d +++\n", WEXITSTATUS(status));
-				printing_tcp = NULL;
+				line_ended();
 			}
-			fflush(tcp->outf);
 			droptcb(tcp);
 			continue;
 		}
@@ -2054,8 +2088,7 @@ trace(void)
 						strsignal(sig),
 						signame(sig)
 						PC_FORMAT_ARG);
-				printing_tcp = NULL;
-				fflush(tcp->outf);
+				line_ended();
 			}
 
 			if (!stopped)
@@ -2074,6 +2107,7 @@ trace(void)
 					cleanup();
 					return -1;
 				}
+				tcp->curcol = curcol;
 				continue;
 			}
 			/* We don't have PTRACE_LISTEN support... */
@@ -2094,22 +2128,13 @@ trace(void)
 			 * Likely a result of process disappearing mid-flight.
 			 * Observed case: exit_group() terminating
 			 * all processes in thread group.
-			 */
-			if (printing_tcp) {
-				/* Do we have dangling line "syscall(param, param"?
-				 * Finish the line then.
-				 */
-				printing_tcp->flags |= TCB_REPRINT;
-				tprints(" <unfinished ...>\n");
-				printing_tcp = NULL;
-				fflush(tcp->outf);
-			}
-			/* We assume that ptrace error was caused by process death.
+			 * We assume that ptrace error was caused by process death.
 			 * We used to detach(tcp) here, but since we no longer
 			 * implement "detach before death" policy/hack,
 			 * we can let this process to report its death to us
 			 * normally, via WIFEXITED or WIFSIGNALED wait status.
 			 */
+			tcp->curcol = curcol;
 			continue;
 		}
  restart_tracee_with_sig_0:

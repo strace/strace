@@ -443,13 +443,6 @@ extern unsigned int ptrace_setoptions;
 extern int dtime, xflag, qflag;
 extern cflag_t cflag;
 extern int max_strlen;
-/*
- * Which tcb has incomplete line being printed right now?
- * NULL if last line has been completed ('\n'-terminated).
- * printleader(tcp) sets it. Clearing is open-coded.
- */
-extern struct tcb *printing_tcp;
-
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
 void error_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
@@ -518,8 +511,8 @@ extern void printcall(struct tcb *);
 extern const char *signame(int);
 extern void print_sigset(struct tcb *, long, int);
 extern void printsignal(int);
-extern void printleader(struct tcb *);
-extern void tabto(void);
+
+
 extern void call_summary(FILE *);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_open_modes(mode_t);
@@ -564,6 +557,30 @@ extern char *stpcpy(char *dst, const char *src);
 extern long getrval2(struct tcb *);
 #endif
 
+/* Strace log generation machinery.
+ *
+ * printing_tcp: tcb which has incomplete line being printed right now.
+ * NULL if last line has been completed ('\n'-terminated).
+ * printleader(tcp) examines it, finishes incomplete line if needed,
+ * the sets it to tcp.
+ * line_ended() clears printing_tcp and resets ->curcol = 0.
+ * tcp->curcol == 0 check is also used to detect completeness
+ * of last line, since in -ff mode just checking printing_tcp for NULL
+ * is not enough.
+ *
+ * If you change this code, test log generation in both -f and -ff modes
+ * using:
+ * strace -oLOG -f[f] test/threaded_execve
+ * strace -oLOG -f[f] test/sigkill_rain
+ * strace -oLOG -f[f] -p "`pidof web_browser`"
+ */
+extern struct tcb *printing_tcp;
+extern void printleader(struct tcb *);
+extern void line_ended(void);
+extern void tabto(void);
+extern void tprintf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
+extern void tprints(const char *str);
+
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof *(objp), (char *) (objp))
 
@@ -571,9 +588,6 @@ extern long getrval2(struct tcb *);
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 0)
 #define printtv_special(tcp, addr)	\
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
-
-extern void tprintf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
-extern void tprints(const char *str);
 
 #ifndef HAVE_STRERROR
 const char *strerror(int);

@@ -1915,6 +1915,17 @@ trace_syscall_exiting(struct tcb *tcp)
 		goto ret;
 	}
 
+	/* TODO: TCB_REPRINT is probably not necessary:
+	 * we can determine whether reprinting is needed
+	 * by examining printing_tcp. Something like:
+	 * if not in -ff mode, and printing_tcp != tcp,
+	 * then the log is not currenlty ends with *our*
+	 * syscall entry output, but with something else,
+	 * and we need to reprint.
+	 * If we'd implement this, printing_tcp = tcp
+	 * assignments in code below can be made more logical.
+	 */
+
 	if (tcp->flags & TCB_REPRINT) {
 		printleader(tcp);
 		if (!SCNO_IN_RANGE(tcp->scno))
@@ -1932,18 +1943,20 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 
 	if (res != 1) {
+		printing_tcp = tcp;
 		tprints(") ");
 		tabto();
 		tprints("= ? <unavailable>\n");
-		printing_tcp = NULL;
+		line_ended();
 		tcp->flags &= ~TCB_INSYSCALL;
 		return res;
 	}
 
 	if (!SCNO_IN_RANGE(tcp->scno)
-	    || (qual_flags[tcp->scno] & QUAL_RAW))
+	    || (qual_flags[tcp->scno] & QUAL_RAW)) {
+		printing_tcp = tcp;
 		sys_res = printargs(tcp);
-	else {
+	} else {
 	/* FIXME: not_failing_only (IOW, option -z) is broken:
 	 * failure of syscall is known only after syscall return.
 	 * Thus we end up with something like this on, say, ENOENT:
@@ -1954,6 +1967,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	 */
 		if (not_failing_only && tcp->u_error)
 			goto ret;	/* ignore failed syscalls */
+		printing_tcp = tcp;
 		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
 	}
 
@@ -2081,11 +2095,9 @@ trace_syscall_exiting(struct tcb *tcp)
 			(long) tv.tv_sec, (long) tv.tv_usec);
 	}
 	tprints("\n");
-	printing_tcp = NULL;
-
 	dumpio(tcp);
-	if (fflush(tcp->outf) == EOF)
-		return -1;
+	line_ended();
+
  ret:
 	tcp->flags &= ~TCB_INSYSCALL;
 	return 0;
