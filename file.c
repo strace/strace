@@ -2528,14 +2528,31 @@ sys_fgetxattr(struct tcb *tcp)
 	return 0;
 }
 
+static void
+print_xattr_list(struct tcb *tcp, unsigned long addr, unsigned long size)
+{
+	if (syserror(tcp)) {
+		tprintf("%#lx", addr);
+	} else {
+		if (!addr) {
+			tprints("NULL");
+		} else {
+			unsigned long len =
+				(size < tcp->u_rval) ? size : tcp->u_rval;
+			printstr(tcp, addr, len);
+		}
+	}
+	tprintf(", %lu", size);
+}
+
 int
 sys_listxattr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
+		tprints(", ");
 	} else {
-		/* XXX Print value in format */
-		tprintf(", %p, %lu", (void *) tcp->u_arg[1], tcp->u_arg[2]);
+		print_xattr_list(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
 	return 0;
 }
@@ -2545,9 +2562,9 @@ sys_flistxattr(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 	} else {
-		/* XXX Print value in format */
-		tprintf(", %p, %lu", (void *) tcp->u_arg[1], tcp->u_arg[2]);
+		print_xattr_list(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
 	return 0;
 }
