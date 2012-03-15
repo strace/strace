@@ -1180,13 +1180,27 @@ int
 sys_sigprocmask(struct tcb *tcp)
 {
 #ifdef ALPHA
+	sigset_t ss;
 	if (entering(tcp)) {
+		/*
+		 * Alpha/OSF is different: it doesn't pass in two pointers,
+		 * but rather passes in the new bitmask as an argument and
+		 * then returns the old bitmask.  This "works" because we
+		 * only have 64 signals to worry about.  If you want more,
+		 * use of the rt_sigprocmask syscall is required.
+		 * Alpha:
+		 *	old = osf_sigprocmask(how, new);
+		 * Everyone else:
+		 *	ret = sigprocmask(how, &new, &old, ...);
+		 */
+		memcpy(&ss, &tcp->u_arg[1], sizeof(long));
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprints(", ");
-		printsigmask(tcp->u_arg[1], 0);
+		printsigmask(&ss, 0);
 	}
 	else if (!syserror(tcp)) {
-		tcp->auxstr = sprintsigmask("old mask ", tcp->u_rval, 0);
+		memcpy(&ss, &tcp->u_rval, sizeof(long));
+		tcp->auxstr = sprintsigmask("old mask ", &ss, 0);
 		return RVAL_HEX | RVAL_STR;
 	}
 #else /* !ALPHA */

@@ -76,7 +76,7 @@
 	{ 3,	TD|TF,	sys_open,		"open"			}, /* 45 */
 	{ 5,	0,	printargs,		"osf_old_sigaction"	}, /* 46, not implemented */
 	{ 1,	NF,	sys_getgid,		"getxgid"		}, /* 47 */
-	{ 3,	TS,	printargs,		"osf_sigprocmask"	}, /* 48 */
+	{ 2,	TS,	sys_sigprocmask,	"osf_sigprocmask"	}, /* 48 */
 	{ 5,	0,	printargs,		"osf_getlogin"		}, /* 49, not implemented */
 	{ 5,	0,	printargs,		"osf_setlogin"		}, /* 50, not implemented */
 	{ 1,	TF,	sys_acct,		"acct"			}, /* 51 */
