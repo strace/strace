@@ -873,21 +873,11 @@ startup_child(char **argv)
 			if (!strace_vforked)
 				kill(pid, SIGSTOP);
 		} else {
-			struct sigaction sv_sigchld;
-			sigaction(SIGCHLD, NULL, &sv_sigchld);
-			/*
-			 * Make sure it is not SIG_IGN, otherwise wait
-			 * will not block.
-			 */
-			signal(SIGCHLD, SIG_DFL);
-			/*
-			 * Wait for grandchild to attach to us.
-			 * It kills child after that, and wait() unblocks.
-			 */
 			alarm(3);
+			/* we depend on SIGCHLD set to SIG_DFL by init code */
+			/* if it happens to be SIG_IGN'ed, wait won't block */
 			wait(NULL);
 			alarm(0);
-			sigaction(SIGCHLD, &sv_sigchld, NULL);
 		}
 
 		execv(pathname, argv);
@@ -1235,6 +1225,13 @@ init(int argc, char *argv[])
 
 	progname = argv[0] ? argv[0] : "strace";
 
+	/* Make sure SIGCHLD has the default action so that waitpid
+	   definitely works without losing track of children.  The user
+	   should not have given us a bogus state to inherit, but he might
+	   have.  Arguably we should detect SIG_IGN here and pass it on
+	   to children, but probably noone really needs that.  */
+	signal(SIGCHLD, SIG_DFL);
+
 	strace_tracer_pid = getpid();
 
 	os_release = get_os_release();
@@ -1502,14 +1499,6 @@ init(int argc, char *argv[])
 		sigaction(SIGPIPE, &sa, NULL);
 		sigaction(SIGTERM, &sa, NULL);
 	}
-	/* Make sure SIGCHLD has the default action so that waitpid
-	   definitely works without losing track of children.  The user
-	   should not have given us a bogus state to inherit, but he might
-	   have.  Arguably we should detect SIG_IGN here and pass it on
-	   to children, but probably noone really needs that.  */
-	sa.sa_handler = SIG_DFL;
-	sigaction(SIGCHLD, &sa, NULL);
-
 	if (nprocs != 0 || daemonized_tracer)
 		startup_attach();
 
