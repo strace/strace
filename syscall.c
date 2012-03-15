@@ -970,7 +970,7 @@ get_scno(struct tcb *tcp)
 	scno = r2;
 	if (!SCNO_IN_RANGE(scno)) {
 		if (a3 == 0 || a3 == -1) {
-			if (debug)
+			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
 			return 0;
 		}
@@ -983,7 +983,7 @@ get_scno(struct tcb *tcp)
 
 	if (!SCNO_IN_RANGE(scno)) {
 		if (a3 == 0 || a3 == -1) {
-			if (debug)
+			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
 			return 0;
 		}
@@ -1000,7 +1000,7 @@ get_scno(struct tcb *tcp)
 	 */
 	if (!SCNO_IN_RANGE(scno)) {
 		if (a3 == 0 || a3 == -1) {
-			if (debug)
+			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
 			return 0;
 		}
@@ -1081,7 +1081,7 @@ get_scno(struct tcb *tcp)
 		   glibc to issue bogus negative syscall numbers.  So for
 		   our purposes, make strace print what it *should* have been */
 		long correct_scno = (scno & 0xff);
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr,
 				"Detected glibc bug: bogus system call"
 				" number = %ld, correcting to %ld\n",
@@ -1131,7 +1131,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	/* A common case of "not a syscall entry" is post-execve SIGTRAP */
 #if defined(I386)
 	if (i386_regs.eax != -ENOSYS) {
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "not a syscall entry (eax = %ld)\n", i386_regs.eax);
 		return 0;
 	}
@@ -1141,7 +1141,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 		if (current_personality == 1)
 			rax = (int)rax; /* sign extend from 32 bits */
 		if (rax != -ENOSYS) {
-			if (debug)
+			if (debug_flag)
 				fprintf(stderr, "not a syscall entry (rax = %ld)\n", rax);
 			return 0;
 		}
@@ -1156,7 +1156,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	if (syscall_mode != -ENOSYS)
 		syscall_mode = tcp->scno;
 	if (gpr2 != syscall_mode) {
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "not a syscall entry (gpr2 = %ld)\n", gpr2);
 		return 0;
 	}
@@ -1165,7 +1165,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	if (upeek(tcp, 4*PT_D0, &d0) < 0)
 		return -1;
 	if (d0 != -ENOSYS) {
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "not a syscall entry (d0 = %ld)\n", d0);
 		return 0;
 	}
@@ -1175,7 +1175,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	if (upeek(tcp, PT_R8, &r8) < 0)
 		return -1;
 	if (ia32 && r8 != -ENOSYS) {
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "not a syscall entry (r8 = %ld)\n", r8);
 		return 0;
 	}
@@ -1183,7 +1183,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	if (upeek(tcp, 4*PT_R10, &r10) < 0)
 		return -1;
 	if (r10 != -ENOSYS) {
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "not a syscall entry (r10 = %ld)\n", r10);
 		return 0;
 	}
@@ -1191,7 +1191,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	if (upeek(tcp, 3 * 4, &r3) < 0)
 		return -1;
 	if (r3 != -ENOSYS) {
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "not a syscall entry (r3 = %ld)\n", r3);
 		return 0;
 	}
@@ -1522,7 +1522,7 @@ trace_syscall_entering(struct tcb *tcp)
  ret:
 	tcp->flags |= TCB_INSYSCALL;
 	/* Measure the entrance time as late as possible to avoid errors. */
-	if (dtime || cflag)
+	if (Tflag || cflag)
 		gettimeofday(&tcp->etime, NULL);
 	return res;
 }
@@ -1890,7 +1890,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	long u_error;
 
 	/* Measure the exit time as early as possible to avoid errors. */
-	if (dtime || cflag)
+	if (Tflag || cflag)
 		gettimeofday(&tv, NULL);
 
 #if SUPPORTED_PERSONALITIES > 1
@@ -2088,7 +2088,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
 	}
-	if (dtime) {
+	if (Tflag) {
 		tv_sub(&tv, &tv, &tcp->etime);
 		tprintf(" <%ld.%06ld>",
 			(long) tv.tv_sec, (long) tv.tv_usec);

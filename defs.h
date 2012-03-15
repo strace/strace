@@ -32,18 +32,34 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#ifdef MIPS
-# include <sgidefs.h>
-#endif
-
-#include <features.h>
-
 #ifdef _LARGEFILE64_SOURCE
 /* This is the macro everything checks before using foo64 names.  */
 # ifndef _LFS64_LARGEFILE
 #  define _LFS64_LARGEFILE 1
 # endif
+#endif
+#ifdef MIPS
+# include <sgidefs.h>
+#endif
+#include <features.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <time.h>
+#include <sys/time.h>
+#include <errno.h>
+#include <sys/syscall.h>
+#ifdef HAVE_STDBOOL_H
+# include <stdbool.h>
+#endif
+#ifdef STDC_HEADERS
+# include <stddef.h>
+#endif
+#ifdef HAVE_SIGINFO_T
+# include <signal.h>
 #endif
 
 /* Configuration section */
@@ -61,8 +77,8 @@
 #ifndef DEFAULT_ACOLUMN
 # define DEFAULT_ACOLUMN	40	/* default alignment column for results */
 #endif
-
-/* Maximum number of args to a syscall.
+/*
+ * Maximum number of args to a syscall.
  *
  * Make sure that all entries in all syscallent.h files have nargs <= MAX_ARGS!
  * linux/<ARCH>/syscallent.h: all have nargs <= 6.
@@ -70,31 +86,9 @@
 #ifndef MAX_ARGS
 # define MAX_ARGS	6
 #endif
-
+/* default sorting method for call profiling */
 #ifndef DEFAULT_SORTBY
-# define DEFAULT_SORTBY "time"	/* default sorting method for call profiling */
-#endif
-
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-#include <sys/time.h>
-#include <errno.h>
-
-#ifdef HAVE_STDBOOL_H
-# include <stdbool.h>
-#endif
-
-#ifdef STDC_HEADERS
-# include <stddef.h>
-#endif /* STDC_HEADERS */
-
-#ifdef HAVE_SIGINFO_T
-# include <signal.h>
+# define DEFAULT_SORTBY "time"
 #endif
 
 #if defined(SPARC) || defined(SPARC64)
@@ -372,7 +366,6 @@ struct tcb {
  */
 # define TCB_WAITEXECVE 04000
 #endif
-#include <sys/syscall.h>
 
 /* qualifier flags */
 #define QUAL_TRACE	0001	/* this system call should be traced */
@@ -436,13 +429,19 @@ typedef enum {
 	CFLAG_ONLY_STATS,
 	CFLAG_BOTH
 } cflag_t;
-
-extern int *qual_flags;
-extern int debug, followfork;
-extern unsigned int ptrace_setoptions;
-extern int dtime, xflag, qflag;
 extern cflag_t cflag;
-extern int max_strlen;
+extern int *qual_flags;
+extern bool debug_flag;
+extern bool Tflag;
+extern bool qflag;
+extern bool not_failing_only;
+extern bool show_fd_path;
+extern bool tracing_paths;
+extern unsigned int xflag;
+extern unsigned int followfork;
+extern unsigned int ptrace_setoptions;
+extern unsigned int max_strlen;
+
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
 void error_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
@@ -644,7 +643,3 @@ extern int printllval(struct tcb *, const char *, int);
 #ifdef IA64
 extern long ia32;
 #endif
-
-extern int not_failing_only;
-extern int show_fd_path;
-extern int tracing_paths;

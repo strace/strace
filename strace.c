@@ -46,34 +46,42 @@
 #include <string.h>
 #include <dirent.h>
 #include <sys/utsname.h>
-
-# include <asm/unistd.h>
-# if defined __NR_tkill
-#  define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
-# else
-   /* kill() may choose arbitrarily the target task of the process group
-      while we later wait on a that specific TID.  PID process waits become
-      TID task specific waits for a process under ptrace(2).  */
-#  warning "Neither tkill(2) nor tgkill(2) available, risk of strace hangs!"
-#  define my_tkill(tid, sig) kill((tid), (sig))
-# endif
-
+#include <asm/unistd.h>
 #if defined(IA64)
 # include <asm/ptrace_offsets.h>
 #endif
-
+/* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
 extern int optind;
 extern char *optarg;
 
-int debug = 0, followfork = 0;
+
+#if defined __NR_tkill
+# define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
+#else
+   /* kill() may choose arbitrarily the target task of the process group
+      while we later wait on a that specific TID.  PID process waits become
+      TID task specific waits for a process under ptrace(2).  */
+# warning "Neither tkill(2) nor tgkill(2) available, risk of strace hangs!"
+# define my_tkill(tid, sig) kill((tid), (sig))
+#endif
+
+#undef KERNEL_VERSION
+#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+
+cflag_t cflag = CFLAG_NONE;
+unsigned int followfork = 0;
 unsigned int ptrace_setoptions = 0;
+unsigned int xflag = 0;
+bool debug_flag = 0;
+bool Tflag = 0;
+bool qflag = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
 static unsigned int syscall_trap_sig = SIGTRAP;
-int dtime = 0, xflag = 0, qflag = 0;
-cflag_t cflag = CFLAG_NONE;
-static int iflag = 0, rflag = 0, tflag = 0;
-static int print_pid_pfx = 0;
+static unsigned int tflag = 0;
+static bool iflag = 0;
+static bool rflag = 0;
+static bool print_pid_pfx = 0;
 
 /* -I n */
 enum {
@@ -111,13 +119,13 @@ static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #endif
 
 /* Sometimes we want to print only succeeding syscalls. */
-int not_failing_only = 0;
+bool not_failing_only = 0;
 
 /* Show path associated with fd arguments */
-int show_fd_path = 0;
+bool show_fd_path = 0;
 
 /* are we filtering traces based on paths? */
-int tracing_paths = 0;
+bool tracing_paths = 0;
 
 static int exit_code = 0;
 static int strace_child = 0;
@@ -127,13 +135,13 @@ static char *username = NULL;
 static uid_t run_uid;
 static gid_t run_gid;
 
-int max_strlen = DEFAULT_STRLEN;
-static int acolumn = DEFAULT_ACOLUMN;
+unsigned int max_strlen = DEFAULT_STRLEN;
+static unsigned int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
 static char *outfname = NULL;
 static FILE *outf;
 struct tcb *printing_tcp = NULL;
-static int curcol;
+static unsigned int curcol;
 static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
 static const char *progname;
@@ -657,11 +665,11 @@ startup_attach(void)
 					++ntid;
 					if (ptrace_attach_or_seize(tid) < 0) {
 						++nerr;
-						if (debug)
+						if (debug_flag)
 							fprintf(stderr, "attach to pid %d failed\n", tid);
 						continue;
 					}
-					if (debug)
+					if (debug_flag)
 						fprintf(stderr, "attach to pid %d succeeded\n", tid);
 					cur_tcp = tcp;
 					if (tid != tcp->pid)
@@ -703,7 +711,7 @@ startup_attach(void)
 			continue;
 		}
 		tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
 
 		if (daemonized_tracer) {
@@ -1004,7 +1012,7 @@ test_ptrace_setoptions_followfork(void)
 	}
 	if (expected_grandchild && expected_grandchild == found_grandchild) {
 		ptrace_setoptions |= test_options;
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "ptrace_setoptions = %#x\n",
 				ptrace_setoptions);
 		return;
@@ -1099,7 +1107,7 @@ test_ptrace_setoptions_for_all(void)
 	if (it_worked) {
 		syscall_trap_sig = (SIGTRAP | 0x80);
 		ptrace_setoptions |= test_options;
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr, "ptrace_setoptions = %#x\n",
 				ptrace_setoptions);
 		return;
@@ -1130,7 +1138,7 @@ test_ptrace_seize(void)
 	 */
 	if (ptrace(PTRACE_SEIZE, pid, 0, PTRACE_SEIZE_DEVEL) == 0) {
 		post_attach_sigstop = 0; /* this sets use_seize to 1 */
-	} else if (debug) {
+	} else if (debug_flag) {
 		fprintf(stderr, "PTRACE_SEIZE doesn't work\n");
 	}
 
@@ -1227,7 +1235,7 @@ init(int argc, char *argv[])
 			cflag = CFLAG_BOTH;
 			break;
 		case 'd':
-			debug++;
+			debug_flag = 1;
 			break;
 		case 'D':
 			daemonized_tracer = 1;
@@ -1242,20 +1250,19 @@ init(int argc, char *argv[])
 			usage(stdout, 0);
 			break;
 		case 'i':
-			iflag++;
+			iflag = 1;
 			break;
 		case 'q':
-			qflag++;
+			qflag = 1;
 			break;
 		case 'r':
-			rflag++;
-			tflag++;
-			break;
+			rflag = 1;
+			/* fall through to tflag++ */
 		case 't':
 			tflag++;
 			break;
 		case 'T':
-			dtime++;
+			Tflag = 1;
 			break;
 		case 'x':
 			xflag++;
@@ -1508,7 +1515,7 @@ alloc_tcb(int pid, int command_options_parsed)
 			tcp->currpers = current_personality;
 #endif
 			nprocs++;
-			if (debug)
+			if (debug_flag)
 				fprintf(stderr, "new tcb for pid %d, active tcbs:%d\n", tcp->pid, nprocs);
 			if (command_options_parsed)
 				newoutf(tcp);
@@ -1542,7 +1549,7 @@ droptcb(struct tcb *tcp)
 		return;
 
 	nprocs--;
-	if (debug)
+	if (debug_flag)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
 
 	if (printing_tcp == tcp)
@@ -1680,7 +1687,7 @@ cleanup(void)
 		tcp = tcbtab[i];
 		if (!(tcp->flags & TCB_INUSE))
 			continue;
-		if (debug)
+		if (debug_flag)
 			fprintf(stderr,
 				"cleanup: looking at pid %u\n", tcp->pid);
 		if (tcp->flags & TCB_STRACE_CHILD) {
@@ -1814,7 +1821,7 @@ trace(void)
 		}
 
 		event = ((unsigned)status >> 16);
-		if (debug) {
+		if (debug_flag) {
 			char buf[sizeof("WIFEXITED,exitcode=%u") + sizeof(int)*3 /*paranoia:*/ + 16];
 			char evbuf[sizeof(",PTRACE_EVENT_?? (%u)") + sizeof(int)*3 /*paranoia:*/ + 16];
 			strcpy(buf, "???");
@@ -1988,7 +1995,7 @@ trace(void)
 
 		/* Is this the very first time we see this tracee stopped? */
 		if (tcp->flags & TCB_STARTUP) {
-			if (debug)
+			if (debug_flag)
 				fprintf(stderr, "pid %d has TCB_STARTUP, initializing it\n", tcp->pid);
 			tcp->flags &= ~TCB_STARTUP;
 			if (tcp->flags & TCB_BPTSET) {
@@ -2004,7 +2011,7 @@ trace(void)
 				}
 			}
 			if (ptrace_setoptions) {
-				if (debug)
+				if (debug_flag)
 					fprintf(stderr, "setting opts %x on pid %d\n", ptrace_setoptions, tcp->pid);
 				if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, ptrace_setoptions) < 0) {
 					if (errno != ESRCH) {
@@ -2045,7 +2052,7 @@ trace(void)
 		 * just before the process takes a signal.
 		 */
 		if (sig == SIGSTOP && (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)) {
-			if (debug)
+			if (debug_flag)
 				fprintf(stderr, "ignored SIGSTOP on pid %d\n", tcp->pid);
 			tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
 			goto restart_tracee_with_sig_0;
