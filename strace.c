@@ -122,6 +122,9 @@ bool show_fd_path = 0;
 /* are we filtering traces based on paths? */
 bool tracing_paths = 0;
 
+static bool detach_on_execve = 0;
+static bool skip_startup_execve = 0;
+
 static int exit_code = 0;
 static int strace_child = 0;
 static int strace_tracer_pid = 0;
@@ -197,9 +200,13 @@ usage: strace [-CdDffhiqrtttTvVxxy] [-I n] [-a column] [-e expr]... [-o file]\n\
 -E var=val -- put var=val in the environment for command\n\
 -E var -- remove var from the environment for command\n\
 -P path -- trace accesses to path\n\
-" /* this is broken, so don't document it
+"
+/* this is broken, so don't document it
 -z -- print only succeeding syscalls\n\
-  */
+ */
+/* experimental, don't document it yet (option letter may change in the future!)
+-b -- detach on successful execve\n\
+ */
 , DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(exitval);
 }
@@ -1214,10 +1221,13 @@ init(int argc, char *argv[])
 	qualify("verbose=all");
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
-		"+cCdfFhiqrtTvVxyz"
+		"+bcCdfFhiqrtTvVxyz"
 		"D"
 		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
 		switch (c) {
+		case 'b':
+			detach_on_execve = 1;
+			break;
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
 				error_msg_and_die("-c and -C are mutually exclusive options");
@@ -1419,8 +1429,10 @@ init(int argc, char *argv[])
 	   installed below as they are inherited into the spawned process.
 	   Also we do not need to be protected by them as during interruption
 	   in the STARTUP_CHILD mode we kill the spawned process anyway.  */
-	if (argv[0])
+	if (argv[0]) {
+		skip_startup_execve = 1;
 		startup_child(argv);
+	}
 
 	sigemptyset(&empty_set);
 	sigemptyset(&blocked_set);
@@ -1922,6 +1934,13 @@ trace(void)
 					}
 				}
 			}
+		}
+
+		if (event == PTRACE_EVENT_EXEC && detach_on_execve) {
+			if (!skip_startup_execve)
+				detach(tcp);
+			/* This was initial execve for "strace PROG". Skip. */
+			skip_startup_execve = 0;
 		}
 
 		if (tcp == NULL) {
