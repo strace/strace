@@ -811,7 +811,6 @@ get_scno(struct tcb *tcp)
 	 */
 	int currpers;
 	long val;
-	int pid = tcp->pid;
 
 	/* Check for 64/32 bit mode. */
 	if (upeek(tcp, sizeof(unsigned long)*PT_MSR, &val) < 0)
