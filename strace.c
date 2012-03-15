@@ -144,7 +144,7 @@ static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
 static const char *progname;
 
-static char *os_release; /* from uname() */
+static unsigned os_release; /* generated from uname()'s u.release */
 
 static int detach(struct tcb *tcp);
 static int trace(void);
@@ -1169,15 +1169,31 @@ test_ptrace_seize(void)
 #  define test_ptrace_seize() ((void)0)
 # endif
 
-static void
+static unsigned
 get_os_release(void)
 {
+	unsigned rel;
+	const char *p;
 	struct utsname u;
 	if (uname(&u) < 0)
 		perror_msg_and_die("uname");
-	os_release = strdup(u.release);
-	if (!os_release)
-		die_out_of_memory();
+	/* u.release has this form: "3.2.9[-some-garbage]" */
+	rel = 0;
+	p = u.release;
+	for (;;) {
+		if (!(*p >= '0' && *p <= '9'))
+			error_msg_and_die("Bad OS release string: '%s'", u.release);
+		/* Note: this open-codes KERNEL_VERSION(): */
+		rel = (rel << 8) | atoi(p);
+		if (rel >= KERNEL_VERSION(1,0,0))
+			break;
+		while (*p >= '0' && *p <= '9')
+			p++;
+		if (*p != '.')
+			error_msg_and_die("Bad OS release string: '%s'", u.release);
+		p++;
+	}
+	return rel;
 }
 
 /*
@@ -1200,7 +1216,7 @@ init(int argc, char *argv[])
 
 	strace_tracer_pid = getpid();
 
-	get_os_release();
+	os_release = get_os_release();
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
@@ -1896,7 +1912,7 @@ trace(void)
 		 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
 		 * On 2.6 and earlier, it can return garbage.
 		 */
-		if (event == PTRACE_EVENT_EXEC && os_release[0] >= '3') {
+		if (event == PTRACE_EVENT_EXEC && os_release >= KERNEL_VERSION(3,0,0)) {
 			long old_pid = 0;
 			if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, (long) &old_pid) >= 0
 			 && old_pid > 0
