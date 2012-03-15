@@ -317,12 +317,7 @@ struct tcb {
 
 /* TCB flags */
 #define TCB_INUSE		00001	/* This table entry is in use */
-/* We have attached to this process, but did not see it stopping yet.
- * (If this bit is not set, we either didn't attach yet,
- * or we did attach to it, already saw it stopping at least once,
- * did some init work on it and cleared this bit. TODO: maybe it makes sense
- * to split these two states?)
- */
+/* We have attached to this process, but did not see it stopping yet */
 #define TCB_STARTUP		00002
 #define TCB_IGNORE_ONE_SIGSTOP	00004	/* Next SIGSTOP is to be ignored */
 /*
