@@ -680,21 +680,12 @@ effective user
 .SM ID
 privileges while being traced.
 .LP
-A traced process ignores
-.SM SIGSTOP
-except on SVR4 platforms.
-.LP
-A traced process which tries to block SIGTRAP will be sent a SIGSTOP
-in an attempt to force continuation of tracing.
-.LP
 A traced process runs slowly.
 .LP
 Traced processes which are descended from
 .I command
 may be left running after an interrupt signal (\c
 .SM CTRL\s0-C).
-.LP
-On Linux, exciting as it would be, tracing the init process is forbidden.
 .LP
 The
 .B \-i
@@ -730,13 +721,6 @@ automatic configuration support.  In 1995 he ported
 .B strace
 to Irix
 and tired of writing about himself in the third person.
-.SH BUGS
-The SIGTRAP signal is used internally by the kernel implementation of
-system call tracing.  When a traced process receives a SIGTRAP signal not
-associated with tracing, strace will not report that signal correctly.
-This signal is not normally used by programs, but could be via a hard-coded
-break instruction or via
-.BR kill (2).
 .SH PROBLEMS
 Problems with
 .B strace
