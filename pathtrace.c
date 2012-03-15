@@ -110,7 +110,7 @@ const char *
 getfdpath(struct tcb *tcp, int fd)
 {
 	static char path[PATH_MAX+1];
-	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)];
+	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 	ssize_t n;
 
 	if (fd < 0)
