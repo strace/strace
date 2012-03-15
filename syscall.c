@@ -516,7 +516,7 @@ qualify(const char *s)
 
 enum subcall_style { shift_style, deref_style, mask_style, door_style };
 
-#if !(defined(ALPHA) || defined(MIPS) || defined(__ARM_EABI__))
+#if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
 
 static void
 decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style style)
@@ -580,7 +580,8 @@ decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style s
 		break;
 	}
 }
-#endif
+
+#endif /* SYS_socket_subcall || SYS_ipc_subcall */
 
 int
 printargs(struct tcb *tcp)
