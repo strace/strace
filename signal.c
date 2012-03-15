@@ -1339,9 +1339,9 @@ sys_rt_sigaction(struct tcb *tcp)
 		goto after_sa;
 	}
 #if SUPPORTED_PERSONALITIES > 1
+#if SIZEOF_LONG > 4
 	if (personality_wordsize[current_personality] != sizeof(sa.sa_flags)
-	 && personality_wordsize[current_personality] == 4
-	) {
+	    && personality_wordsize[current_personality] == 4) {
 		struct new_sigaction32 sa32;
 		r = umove(tcp, addr, &sa32);
 		if (r >= 0) {
@@ -1360,6 +1360,7 @@ sys_rt_sigaction(struct tcb *tcp)
 			sa.sa_mask[0] = sa32.sa_mask[0] + ((long)(sa32.sa_mask[1]) << 32);
 		}
 	} else
+#endif
 #endif
 	{
 		r = umove(tcp, addr, &sa);

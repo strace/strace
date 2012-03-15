@@ -251,6 +251,8 @@ AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 		AC_DEFINE([HAVE_BLKGETSIZE64], [1], [Define to 1 if you have BLKGETSIZE64.])
 	fi)
 
+AC_CHECK_SIZEOF([long])
+
 AC_PATH_PROG([PERL], [perl])
 
 AC_CONFIG_FILES([Makefile tests/Makefile])
