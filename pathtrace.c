@@ -53,7 +53,7 @@ pathmatch(const char *path)
 	for (i = 0; i < ARRAY_SIZE(selected); ++i) {
 		if (selected[i] == NULL)
 			return 0;
-		if (!strcmp(path, selected[i]))
+		if (strcmp(path, selected[i]) == 0)
 			return 1;
 	}
 	return 0;
@@ -91,20 +91,12 @@ storepath(const char *path)
 {
 	unsigned int i;
 
-	if (path == NULL) {
-		for (i = 0; i < ARRAY_SIZE(selected); ++i)
-			if (selected[i]) {
-				free((char *) selected[i]);
-				selected[i] = NULL;
-			}
-		return 0;
-	}
-
-	for (i = 0; i < ARRAY_SIZE(selected); ++i)
+	for (i = 0; i < ARRAY_SIZE(selected); ++i) {
 		if (!selected[i]) {
 			selected[i] = path;
 			return 0;
 		}
+	}
 
 	fprintf(stderr, "Max trace paths exceeded, only using first %u\n",
 		(unsigned int) ARRAY_SIZE(selected));
@@ -114,16 +106,17 @@ storepath(const char *path)
 /*
  * Get path associated with fd.
  */
-const char *getfdpath(struct tcb *tcp, int fd)
+const char *
+getfdpath(struct tcb *tcp, int fd)
 {
 	static char path[PATH_MAX+1];
-	char linkpath[64];
+	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)];
 	ssize_t n;
 
 	if (fd < 0)
 		return NULL;
 
-	snprintf(linkpath, sizeof linkpath, "/proc/%d/fd/%d", tcp->pid, fd);
+	sprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
 	n = readlink(linkpath, path, (sizeof path) - 1);
 	if (n <= 0)
 		return NULL;
@@ -138,10 +131,7 @@ const char *getfdpath(struct tcb *tcp, int fd)
 int
 pathtrace_select(const char *path)
 {
-	char   *rpath;
-
-	if (path == NULL)
-		return storepath(path);
+	char *rpath;
 
 	if (storepath(path))
 		return -1;
@@ -152,7 +142,7 @@ pathtrace_select(const char *path)
 		return 0;
 
 	/* if realpath and specified path are same, we're done */
-	if (!strcmp(path, rpath)) {
+	if (strcmp(path, rpath) == 0) {
 		free(rpath);
 		return 0;
 	}
@@ -343,7 +333,7 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_timerfd_settime ||
 	    s->sys_func == sys_timerfd_gettime ||
 	    s->sys_func == sys_epoll_create ||
-	    !strcmp(s->sys_name, "fanotify_init"))
+	    strcmp(s->sys_name, "fanotify_init") == 0)
 	{
 		/*
 		 * These have TRACE_FILE or TRACE_DESCRIPTOR set, but they
