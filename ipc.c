@@ -178,10 +178,10 @@ indirect_ipccall(struct tcb *tcp)
 #if defined IA64
 	return tcp->scno < 1024; /* ia32 emulation syscalls are low */
 #endif
-#if !defined MIPS && !defined HPPA
-	return 1;
-#endif
+#if defined(ALPHA) || defined(MIPS) || defined(HPPA) || defined(__ARM_EABI__)
 	return 0;
+#endif
+	return 1;
 }
 
 int sys_msgctl(struct tcb *tcp)
@@ -404,8 +404,6 @@ int sys_shmctl(struct tcb *tcp)
 
 int sys_shmat(struct tcb *tcp)
 {
-	unsigned long raddr;
-
 	if (exiting(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
@@ -419,12 +417,12 @@ int sys_shmat(struct tcb *tcp)
 		}
 		if (syserror(tcp))
 			return 0;
-/* HPPA does not use an IPC multiplexer on Linux.  */
-#if !defined(HPPA)
-		if (umove(tcp, tcp->u_arg[2], &raddr) < 0)
-			return RVAL_NONE;
-		tcp->u_rval = raddr;
-#endif
+		if (indirect_ipccall(tcp)) {
+			unsigned long raddr;
+			if (umove(tcp, tcp->u_arg[2], &raddr) < 0)
+				return RVAL_NONE;
+			tcp->u_rval = raddr;
+		}
 		return RVAL_HEX;
 	}
 	return 0;
