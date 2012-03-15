@@ -166,9 +166,10 @@ usage: strace [-CdDffhiqrtttTvVxxy] [-I n] [-a column] [-e expr]... [-o file]\n\
               [PROG [ARGS]]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
 -C -- like -c but also print regular output while processes are running\n\
+-d -- enable debug output to stderr\n\
 -D -- run tracer process as a detached grandchild, not as parent\n\
 -f -- follow forks, -ff -- with output into separate files\n\
--F -- attempt to follow vforks\n\
+-F -- attempt to follow vforks (deprecated, use -f)\n\
 -i -- print instruction pointer at time of syscall\n\
 -I interruptible\n\
    1: no signals are blocked\n\
@@ -1547,16 +1548,22 @@ droptcb(struct tcb *tcp)
 	if (debug_flag)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
 
+	if (tcp->outf) {
+		if (outfname && followfork >= 2) {
+			if (tcp->curcol != 0)
+				fprintf(tcp->outf, " <detached ...>\n");
+			fclose(tcp->outf);
+			if (outf == tcp->outf)
+				outf = NULL;
+		} else {
+			if (printing_tcp == tcp && tcp->curcol != 0)
+				fprintf(tcp->outf, " <detached ...>\n");
+			fflush(tcp->outf);
+		}
+	}
+
 	if (printing_tcp == tcp)
 		printing_tcp = NULL;
-
-	if (outfname && followfork >= 2 && tcp->outf) {
-		if (tcp->curcol != 0)
-			fprintf(tcp->outf, " <detached>\n");
-		fclose(tcp->outf);
-	} else if (tcp->outf) {
-		fflush(tcp->outf);
-	}
 
 	memset(tcp, 0, sizeof(*tcp));
 }
@@ -1585,6 +1592,7 @@ detach(struct tcb *tcp)
 #define PTRACE_DETACH PTRACE_SUNDETACH
 #endif
 
+	error = 0;
 	sigstop_expected = 0;
 	if (tcp->flags & TCB_ATTACHED) {
 		/*
