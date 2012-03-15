@@ -44,7 +44,6 @@
 #define sys_lseek		printargs
 #define sys_stime		printargs
 #define sys_ptrace		printargs
-#define sys_alarm		printargs
 #define sys_oldfstat		printargs
 #define sys_pause		printargs
 #define sys_utime		printargs
@@ -112,7 +111,6 @@
 #define sys_vm86		printargs
 #define sys_query_module	printargs
 #define sys_nfsservctl		printargs
-#define sys_getresgid		printargs
 #define sys_rt_sigreturn	printargs
 #define sys_rt_sigaction	printargs
 #define sys_rt_sigprocmask	printargs
@@ -144,7 +142,6 @@
 #undef sys_lseek
 #undef sys_stime
 #undef sys_ptrace
-#undef sys_alarm
 #undef sys_oldfstat
 #undef sys_pause
 #undef sys_utime
@@ -197,7 +194,6 @@
 #undef sys_sigprocmask
 #undef sys_create_module
 #undef sys_init_module
-#undef sys_delete_module
 #undef sys_get_kernel_syms
 #undef sys_quotactl
 #undef sys_bdflush
@@ -209,12 +205,10 @@
 #undef sys_writev
 #undef sys__sysctl
 #undef sys_sched_rr_get_interval
-#undef sys_nanosleep
 #undef sys_getresuid
 #undef sys_vm86
 #undef sys_query_module
 #undef sys_nfsservctl
-#undef sys_getresgid
 #undef sys_rt_sigreturn
 #undef sys_rt_sigaction
 #undef sys_rt_sigprocmask
