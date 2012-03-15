@@ -2712,6 +2712,12 @@ sys_fallocate(struct tcb *tcp)
 	return 0;
 }
 
+#ifndef SWAP_FLAG_PREFER
+# define SWAP_FLAG_PREFER 0x8000
+#endif
+#ifndef SWAP_FLAG_DISCARD
+# define SWAP_FLAG_DISCARD 0x10000
+#endif
 static const struct xlat swap_flags[] = {
 	{ SWAP_FLAG_PREFER,	"SWAP_FLAG_PREFER"	},
 	{ SWAP_FLAG_DISCARD,	"SWAP_FLAG_DISCARD"	},
