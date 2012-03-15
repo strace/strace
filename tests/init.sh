@@ -16,7 +16,7 @@ check_prog()
 
 check_strace()
 {
-	STRACE=${*-../strace}
+	STRACE=${*:-../strace}
 	$STRACE -V > /dev/null ||
 		framework_failure_ "$STRACE is not available"
 }
