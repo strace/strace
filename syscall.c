@@ -514,74 +514,53 @@ qualify(const char *s)
 	return;
 }
 
-enum subcall_style { shift_style, deref_style, mask_style, door_style };
-
-#if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
-
+#ifdef SYS_socket_subcall
 static void
-decode_subcall(struct tcb *tcp, int subcall, int nsubcalls, enum subcall_style style)
+decode_socket_subcall(struct tcb *tcp)
 {
-	unsigned long addr, mask;
-	int i, n;
-	int size = personality_wordsize[current_personality];
+	unsigned long addr;
+	unsigned int i, size;
 
-	switch (style) {
-	case shift_style:
-		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
-			return;
-		tcp->scno = subcall + tcp->u_arg[0];
-		tcp->u_nargs = n = sysent[tcp->scno].nargs;
-		for (i = 0; i < n; i++)
-			tcp->u_arg[i] = tcp->u_arg[i + 1];
-		break;
-	case deref_style:
-		if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= nsubcalls)
-			return;
-		tcp->scno = subcall + tcp->u_arg[0];
-		addr = tcp->u_arg[1];
-		tcp->u_nargs = n = sysent[tcp->scno].nargs;
-		for (i = 0; i < n; i++) {
-			if (size == sizeof(int)) {
-				unsigned int arg;
-				if (umove(tcp, addr, &arg) < 0)
-					arg = 0;
-				tcp->u_arg[i] = arg;
-			}
-			else if (size == sizeof(long)) {
-				unsigned long arg;
-				if (umove(tcp, addr, &arg) < 0)
-					arg = 0;
-				tcp->u_arg[i] = arg;
-			}
-			else
-				abort();
-			addr += size;
+	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= SYS_socket_nsubcalls)
+		return;
+
+	tcp->scno = SYS_socket_subcall + tcp->u_arg[0];
+	addr = tcp->u_arg[1];
+	tcp->u_nargs = sysent[tcp->scno].nargs;
+	size = personality_wordsize[current_personality];
+	for (i = 0; i < tcp->u_nargs; ++i) {
+		if (size == sizeof(int)) {
+			unsigned int arg;
+			if (umove(tcp, addr, &arg) < 0)
+				arg = 0;
+			tcp->u_arg[i] = arg;
 		}
-		break;
-	case mask_style:
-		mask = (tcp->u_arg[0] >> 8) & 0xff;
-		for (i = 0; mask; i++)
-			mask >>= 1;
-		if (i >= nsubcalls)
-			return;
-		tcp->u_arg[0] &= 0xff;
-		tcp->scno = subcall + i;
-		tcp->u_nargs = sysent[tcp->scno].nargs;
-		break;
-	case door_style:
-		/*
-		 * Oh, yuck.  The call code is the *sixth* argument.
-		 * (don't you mean the *last* argument? - JH)
-		 */
-		if (tcp->u_arg[5] < 0 || tcp->u_arg[5] >= nsubcalls)
-			return;
-		tcp->scno = subcall + tcp->u_arg[5];
-		tcp->u_nargs = sysent[tcp->scno].nargs;
-		break;
+		else {
+			unsigned long arg;
+			if (umove(tcp, addr, &arg) < 0)
+				arg = 0;
+			tcp->u_arg[i] = arg;
+		}
+		addr += size;
 	}
 }
+#endif
 
-#endif /* SYS_socket_subcall || SYS_ipc_subcall */
+#ifdef SYS_ipc_subcall
+static void
+decode_ipc_subcall(struct tcb *tcp)
+{
+	unsigned int i;
+
+	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= SYS_ipc_nsubcalls)
+		return;
+
+	tcp->scno = SYS_ipc_subcall + tcp->u_arg[0];
+	tcp->u_nargs = sysent[tcp->scno].nargs;
+	for (i = 0; i < tcp->u_nargs; i++)
+		tcp->u_arg[i] = tcp->u_arg[i + 1];
+}
+#endif
 
 int
 printargs(struct tcb *tcp)
@@ -1469,15 +1448,13 @@ trace_syscall_entering(struct tcb *tcp)
 	while (SCNO_IN_RANGE(tcp->scno)) {
 # ifdef SYS_socket_subcall
 		if (sysent[tcp->scno].sys_func == sys_socketcall) {
-			decode_subcall(tcp, SYS_socket_subcall,
-				SYS_socket_nsubcalls, deref_style);
+			decode_socket_subcall(tcp);
 			break;
 		}
 # endif
 # ifdef SYS_ipc_subcall
 		if (sysent[tcp->scno].sys_func == sys_ipc) {
-			decode_subcall(tcp, SYS_ipc_subcall,
-				SYS_ipc_nsubcalls, shift_style);
+			decode_ipc_subcall(tcp);
 			break;
 		}
 # endif
