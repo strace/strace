@@ -158,6 +158,27 @@ static volatile sig_atomic_t interrupted;
 static volatile int interrupted;
 #endif
 
+#ifndef HAVE_STRERROR
+
+#if !HAVE_DECL_SYS_ERRLIST
+extern int sys_nerr;
+extern char *sys_errlist[];
+#endif /* HAVE_DECL_SYS_ERRLIST */
+
+const char *
+strerror(int err_no)
+{
+	static char buf[sizeof("Unknown error %d") + sizeof(int)*3];
+
+	if (err_no < 1 || err_no >= sys_nerr) {
+		sprintf(buf, "Unknown error %d", err_no);
+		return buf;
+	}
+	return sys_errlist[err_no];
+}
+
+#endif /* HAVE_STERRROR */
+
 static void
 usage(FILE *ofp, int exitval)
 {
@@ -1737,54 +1758,6 @@ interrupt(int sig)
 	interrupted = sig;
 }
 
-#ifndef HAVE_STRERROR
-
-#if !HAVE_DECL_SYS_ERRLIST
-extern int sys_nerr;
-extern char *sys_errlist[];
-#endif /* HAVE_DECL_SYS_ERRLIST */
-
-const char *
-strerror(int err_no)
-{
-	static char buf[sizeof("Unknown error %d") + sizeof(int)*3];
-
-	if (err_no < 1 || err_no >= sys_nerr) {
-		sprintf(buf, "Unknown error %d", err_no);
-		return buf;
-	}
-	return sys_errlist[err_no];
-}
-
-#endif /* HAVE_STERRROR */
-
-#ifndef HAVE_STRSIGNAL
-
-#if defined HAVE_SYS_SIGLIST && !defined HAVE_DECL_SYS_SIGLIST
-extern char *sys_siglist[];
-#endif
-#if defined HAVE_SYS__SIGLIST && !defined HAVE_DECL__SYS_SIGLIST
-extern char *_sys_siglist[];
-#endif
-
-const char *
-strsignal(int sig)
-{
-	static char buf[sizeof("Unknown signal %d") + sizeof(int)*3];
-
-	if (sig < 1 || sig >= NSIG) {
-		sprintf(buf, "Unknown signal %d", sig);
-		return buf;
-	}
-#ifdef HAVE__SYS_SIGLIST
-	return _sys_siglist[sig];
-#else
-	return sys_siglist[sig];
-#endif
-}
-
-#endif /* HAVE_STRSIGNAL */
-
 static int
 trace(void)
 {
@@ -2125,14 +2098,12 @@ trace(void)
 #endif
 				printleader(tcp);
 				if (!stopped) {
-					tprints("--- ");
+					tprintf("--- %s ", signame(sig));
 					printsiginfo(&si, verbose(tcp));
-					tprintf(" (%s)" PC_FORMAT_STR " ---\n",
-						strsignal(sig)
+					tprintf(PC_FORMAT_STR " ---\n"
 						PC_FORMAT_ARG);
 				} else
-					tprintf("--- %s by %s" PC_FORMAT_STR " ---\n",
-						strsignal(sig),
+					tprintf("--- stopped by %s" PC_FORMAT_STR " ---\n",
 						signame(sig)
 						PC_FORMAT_ARG);
 				line_ended();

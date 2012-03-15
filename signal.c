@@ -418,8 +418,10 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 #define SI_TKILL	-6	/* sent by tkill */
 #define SI_ASYNCNL	-60     /* sent by asynch name lookup completion */
 
-#define SI_FROMUSER(sip)	((sip)->si_code <= 0)
+#endif
 
+#ifndef SI_FROMUSER
+# define SI_FROMUSER(sip)	((sip)->si_code <= 0)
 #endif
 
 #if __GLIBC_MINOR__ < 1

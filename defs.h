@@ -63,9 +63,6 @@
 #ifndef HAVE_STRERROR
 const char *strerror(int);
 #endif
-#ifndef HAVE_STRSIGNAL
-const char *strsignal(int);
-#endif
 #ifndef HAVE_STPCPY
 /* Some libc have stpcpy, some don't. Sigh...
  * Roll our private implementation...
