@@ -501,37 +501,37 @@ sys_capget(struct tcb *tcp)
 	/* cap_user_ types are _pointers_ to (small) structs. */
 	/* Structs themselves have no names defined. */
 	/* Have to use ugly hack to place them on stack. */
-	cap_user_header_t arg0;
-	cap_user_data_t   arg1;
-	long a0[sizeof(*arg0) / sizeof(long) + 1];
-	long a1[sizeof(*arg1) / sizeof(long) + 1];
-	arg0 = (cap_user_header_t) a0;
-	arg1 = (cap_user_data_t  ) a1;
+	union { cap_user_header_t p; long *a; char *c; } arg0;
+	union { cap_user_data_t p; long *a; char *c; } arg1;
+	long a0[sizeof(*arg0.p) / sizeof(long) + 1];
+	long a1[sizeof(*arg1.p) / sizeof(long) + 1];
+	arg0.a = a0;
+	arg1.a = a1;
 
 	if (!entering(tcp)) {
 		if (!tcp->u_arg[0])
 			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
-		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0), (char *) arg0) < 0)
+		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0.p), arg0.c) < 0)
 			tprints("???");
 		else {
-			tprintf("%#x, %d", arg0->version, arg0->pid);
+			tprintf("%#x, %d", arg0.p->version, arg0.p->pid);
 		}
 		tprints(", ");
 		if (!tcp->u_arg[1])
 			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1), (char *) arg1) < 0)
+		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1.p), arg1.c) < 0)
 			tprints("???");
 		else {
 			tprints("{");
-			printflags(capabilities, arg1->effective, "CAP_???");
+			printflags(capabilities, arg1.p->effective, "CAP_???");
 			tprints(", ");
-			printflags(capabilities, arg1->permitted, "CAP_???");
+			printflags(capabilities, arg1.p->permitted, "CAP_???");
 			tprints(", ");
-			printflags(capabilities, arg1->inheritable, "CAP_???");
+			printflags(capabilities, arg1.p->inheritable, "CAP_???");
 			tprints("}");
 		}
 	}
@@ -541,37 +541,37 @@ sys_capget(struct tcb *tcp)
 int
 sys_capset(struct tcb *tcp)
 {
-	cap_user_header_t arg0;
-	cap_user_data_t   arg1;
-	long a0[sizeof(*arg0) / sizeof(long) + 1];
-	long a1[sizeof(*arg1) / sizeof(long) + 1];
-	arg0 = (cap_user_header_t) a0;
-	arg1 = (cap_user_data_t  ) a1;
+	union { cap_user_header_t p; long *a; char *c; } arg0;
+	union { cap_user_data_t p; long *a; char *c; } arg1;
+	long a0[sizeof(*arg0.p) / sizeof(long) + 1];
+	long a1[sizeof(*arg1.p) / sizeof(long) + 1];
+	arg0.a = a0;
+	arg1.a = a1;
 
 	if (entering(tcp)) {
 		if (!tcp->u_arg[0])
 			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
-		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0), (char *) arg0) < 0)
+		else if (umoven(tcp, tcp->u_arg[0], sizeof(*arg0.p), arg0.c) < 0)
 			tprints("???");
 		else {
-			tprintf("%#x, %d", arg0->version, arg0->pid);
+			tprintf("%#x, %d", arg0.p->version, arg0.p->pid);
 		}
 		tprints(", ");
 		if (!tcp->u_arg[1])
 			tprints("NULL");
 		else if (!verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1), (char *) arg1) < 0)
+		else if (umoven(tcp, tcp->u_arg[1], sizeof(*arg1.p), arg1.c) < 0)
 			tprints("???");
 		else {
 			tprints("{");
-			printflags(capabilities, arg1->effective, "CAP_???");
+			printflags(capabilities, arg1.p->effective, "CAP_???");
 			tprints(", ");
-			printflags(capabilities, arg1->permitted, "CAP_???");
+			printflags(capabilities, arg1.p->permitted, "CAP_???");
 			tprints(", ");
-			printflags(capabilities, arg1->inheritable, "CAP_???");
+			printflags(capabilities, arg1.p->inheritable, "CAP_???");
 			tprints("}");
 		}
 	}
