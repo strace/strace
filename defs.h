@@ -60,6 +60,27 @@
 #endif
 #include <signal.h>
 
+#ifndef HAVE_STRERROR
+const char *strerror(int);
+#endif
+#ifndef HAVE_STRSIGNAL
+const char *strsignal(int);
+#endif
+#ifndef HAVE_STPCPY
+/* Some libc have stpcpy, some don't. Sigh...
+ * Roll our private implementation...
+ */
+#undef stpcpy
+#define stpcpy strace_stpcpy
+extern char *stpcpy(char *dst, const char *src);
+#endif
+
+#if !defined __GNUC__
+# define __attribute__(x) /*nothing*/
+#endif
+
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+
 /* Configuration section */
 #ifndef MAX_QUALS
 # if defined(MIPS)
@@ -275,14 +296,11 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_EVENT_STOP1	128
 #endif
 
-#if !defined __GNUC__
-# define __attribute__(x) /*nothing*/
-#endif
-
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
-
 #if defined(I386)
 extern struct pt_regs i386_regs;
+#endif
+#if defined(IA64)
+extern long ia32;
 #endif
 
 /* Trace Control Block */
@@ -491,7 +509,6 @@ extern void printrusage(struct tcb *, long);
 extern void printrusage32(struct tcb *, long);
 #endif
 extern void printuid(const char *, unsigned long);
-extern int clearbpt(struct tcb *);
 /*
  * On Linux, "setbpt" is a misnomer: we don't set a breakpoint
  * (IOW: no poking in user's text segment),
@@ -499,11 +516,11 @@ extern int clearbpt(struct tcb *);
  * On newer kernels, we use PTRACE_O_TRACECLONE/TRACE[V]FORK instead.
  */
 extern int setbpt(struct tcb *);
+extern int clearbpt(struct tcb *);
 extern void printcall(struct tcb *);
 extern const char *signame(int);
 extern void print_sigset(struct tcb *, long, int);
 extern void printsignal(int);
-
 
 extern void call_summary(FILE *);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
@@ -535,15 +552,6 @@ extern void tv_add(struct timeval *, struct timeval *, struct timeval *);
 extern void tv_sub(struct timeval *, struct timeval *, struct timeval *);
 extern void tv_mul(struct timeval *, struct timeval *, int);
 extern void tv_div(struct timeval *, struct timeval *, int);
-
-#if !defined HAVE_STPCPY
-/* Some libc have stpcpy, some don't. Sigh...
- * Roll our private implementation...
- */
-#undef stpcpy
-#define stpcpy strace_stpcpy
-extern char *stpcpy(char *dst, const char *src);
-#endif
 
 #if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
 extern long getrval2(struct tcb *);
@@ -580,13 +588,6 @@ extern void tprints(const char *str);
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 0)
 #define printtv_special(tcp, addr)	\
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
-
-#ifndef HAVE_STRERROR
-const char *strerror(int);
-#endif
-#ifndef HAVE_STRSIGNAL
-const char *strsignal(int);
-#endif
 
 extern int current_personality;
 extern const int personality_wordsize[];
@@ -631,8 +632,4 @@ extern unsigned nsignals;
 #endif
 
 extern int printllval(struct tcb *, const char *, int);
-#endif
-
-#ifdef IA64
-extern long ia32;
 #endif
