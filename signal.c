@@ -36,7 +36,6 @@
 #include "defs.h"
 
 #include <stdint.h>
-#include <signal.h>
 #include <sys/user.h>
 #include <fcntl.h>
 

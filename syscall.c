@@ -35,11 +35,7 @@
 
 #include "defs.h"
 
-#include <signal.h>
-#include <time.h>
-#include <errno.h>
 #include <sys/user.h>
-#include <sys/syscall.h>
 #include <sys/param.h>
 
 #ifdef HAVE_SYS_REG_H

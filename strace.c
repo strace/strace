@@ -32,10 +32,7 @@
 
 #include "defs.h"
 
-#include <sys/types.h>
 #include <stdarg.h>
-#include <signal.h>
-#include <errno.h>
 #include <sys/param.h>
 #include <fcntl.h>
 #include <sys/resource.h>
@@ -43,10 +40,8 @@
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
-#include <string.h>
 #include <dirent.h>
 #include <sys/utsname.h>
-#include <asm/unistd.h>
 #if defined(IA64)
 # include <asm/ptrace_offsets.h>
 #endif

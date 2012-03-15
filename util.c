@@ -35,8 +35,6 @@
 
 #include "defs.h"
 
-#include <signal.h>
-#include <sys/syscall.h>
 #include <sys/user.h>
 #include <sys/param.h>
 #include <fcntl.h>
@@ -1162,7 +1160,6 @@ printcall(struct tcb *tcp)
 
 #include "syscall.h"
 
-#include <sys/syscall.h>
 #ifndef CLONE_PTRACE
 # define CLONE_PTRACE    0x00002000
 #endif

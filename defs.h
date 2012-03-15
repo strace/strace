@@ -58,9 +58,7 @@
 #ifdef STDC_HEADERS
 # include <stddef.h>
 #endif
-#ifdef HAVE_SIGINFO_T
-# include <signal.h>
-#endif
+#include <signal.h>
 
 /* Configuration section */
 #ifndef MAX_QUALS

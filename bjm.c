@@ -33,13 +33,10 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <sys/utsname.h>
 #include <sys/user.h>
-#include <sys/syscall.h>
-#include <signal.h>
 
 /* Bits of module.flags.  */
 

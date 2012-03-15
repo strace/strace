@@ -28,7 +28,6 @@
 
 #include "defs.h"
 
-#include <ctype.h>
 #include <sys/param.h>
 
 #ifdef HAVE_POLL_H

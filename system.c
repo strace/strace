@@ -68,7 +68,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include <sys/syscall.h>
 
 #ifdef HAVE_LINUX_CAPABILITY_H
 #include <linux/capability.h>

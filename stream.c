@@ -29,7 +29,6 @@
  */
 
 #include "defs.h"
-#include <sys/syscall.h>
 
 #ifdef HAVE_POLL_H
 #include <poll.h>
