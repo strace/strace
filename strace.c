@@ -366,6 +366,88 @@ static void kill_save_errno(pid_t pid, int sig)
 	errno = saved_errno;
 }
 
+/*
+ * When strace is setuid executable, we have to swap uids
+ * before and after filesystem and process management operations.
+ */
+static void
+swap_uid(void)
+{
+	int euid = geteuid(), uid = getuid();
+
+	if (euid != uid && setreuid(euid, uid) < 0) {
+		perror_msg_and_die("setreuid");
+	}
+}
+
+#if _LFS64_LARGEFILE
+# define fopen_for_output fopen64
+#else
+# define fopen_for_output fopen
+#endif
+
+static FILE *
+strace_fopen(const char *path)
+{
+	FILE *fp;
+
+	swap_uid();
+	fp = fopen_for_output(path, "w");
+	if (!fp)
+		perror_msg_and_die("Can't fopen '%s'", path);
+	swap_uid();
+	set_cloexec_flag(fileno(fp));
+	return fp;
+}
+
+static int popen_pid = 0;
+
+#ifndef _PATH_BSHELL
+# define _PATH_BSHELL "/bin/sh"
+#endif
+
+/*
+ * We cannot use standard popen(3) here because we have to distinguish
+ * popen child process from other processes we trace, and standard popen(3)
+ * does not export its child's pid.
+ */
+static FILE *
+strace_popen(const char *command)
+{
+	FILE *fp;
+	int fds[2];
+
+	swap_uid();
+	if (pipe(fds) < 0)
+		perror_msg_and_die("pipe");
+
+	set_cloexec_flag(fds[1]); /* never fails */
+
+	popen_pid = vfork();
+	if (popen_pid == -1)
+		perror_msg_and_die("vfork");
+
+	if (popen_pid == 0) {
+		/* child */
+		close(fds[1]);
+		if (fds[0] != 0) {
+			if (dup2(fds[0], 0))
+				perror_msg_and_die("dup2");
+			close(fds[0]);
+		}
+		execl(_PATH_BSHELL, "sh", "-c", command, NULL);
+		perror_msg_and_die("Can't execute '%s'", _PATH_BSHELL);
+	}
+
+	/* parent */
+	close(fds[0]);
+	swap_uid();
+	fp = fdopen(fds[1], "w");
+	if (!fp)
+		die_out_of_memory();
+	return fp;
+}
+
 void
 tprintf(const char *fmt, ...)
 {
@@ -491,88 +573,6 @@ tabto(void)
 		tprints(acolumn_spaces + curcol);
 }
 
-/*
- * When strace is setuid executable, we have to swap uids
- * before and after filesystem and process management operations.
- */
-static void
-swap_uid(void)
-{
-	int euid = geteuid(), uid = getuid();
-
-	if (euid != uid && setreuid(euid, uid) < 0) {
-		perror_msg_and_die("setreuid");
-	}
-}
-
-#if _LFS64_LARGEFILE
-# define fopen_for_output fopen64
-#else
-# define fopen_for_output fopen
-#endif
-
-static FILE *
-strace_fopen(const char *path)
-{
-	FILE *fp;
-
-	swap_uid();
-	fp = fopen_for_output(path, "w");
-	if (!fp)
-		perror_msg_and_die("Can't fopen '%s'", path);
-	swap_uid();
-	set_cloexec_flag(fileno(fp));
-	return fp;
-}
-
-static int popen_pid = 0;
-
-#ifndef _PATH_BSHELL
-# define _PATH_BSHELL "/bin/sh"
-#endif
-
-/*
- * We cannot use standard popen(3) here because we have to distinguish
- * popen child process from other processes we trace, and standard popen(3)
- * does not export its child's pid.
- */
-static FILE *
-strace_popen(const char *command)
-{
-	FILE *fp;
-	int fds[2];
-
-	swap_uid();
-	if (pipe(fds) < 0)
-		perror_msg_and_die("pipe");
-
-	set_cloexec_flag(fds[1]); /* never fails */
-
-	popen_pid = vfork();
-	if (popen_pid == -1)
-		perror_msg_and_die("vfork");
-
-	if (popen_pid == 0) {
-		/* child */
-		close(fds[1]);
-		if (fds[0] != 0) {
-			if (dup2(fds[0], 0))
-				perror_msg_and_die("dup2");
-			close(fds[0]);
-		}
-		execl(_PATH_BSHELL, "sh", "-c", command, NULL);
-		perror_msg_and_die("Can't execute '%s'", _PATH_BSHELL);
-	}
-
-	/* parent */
-	close(fds[0]);
-	swap_uid();
-	fp = fdopen(fds[1], "w");
-	if (!fp)
-		die_out_of_memory();
-	return fp;
-}
-
 static void
 newoutf(struct tcb *tcp)
 {
@@ -581,6 +581,192 @@ newoutf(struct tcb *tcp)
 		sprintf(name, "%.512s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
 	}
+}
+
+static void
+expand_tcbtab(void)
+{
+	/* Allocate some more TCBs and expand the table.
+	   We don't want to relocate the TCBs because our
+	   callers have pointers and it would be a pain.
+	   So tcbtab is a table of pointers.  Since we never
+	   free the TCBs, we allocate a single chunk of many.  */
+	int i = tcbtabsize;
+	struct tcb *newtcbs = calloc(tcbtabsize, sizeof(newtcbs[0]));
+	struct tcb **newtab = realloc(tcbtab, tcbtabsize * 2 * sizeof(tcbtab[0]));
+	if (!newtab || !newtcbs)
+		die_out_of_memory();
+	tcbtabsize *= 2;
+	tcbtab = newtab;
+	while (i < tcbtabsize)
+		tcbtab[i++] = newtcbs++;
+}
+
+static struct tcb *
+alloc_tcb(int pid, int command_options_parsed)
+{
+	int i;
+	struct tcb *tcp;
+
+	if (nprocs == tcbtabsize)
+		expand_tcbtab();
+
+	for (i = 0; i < tcbtabsize; i++) {
+		tcp = tcbtab[i];
+		if ((tcp->flags & TCB_INUSE) == 0) {
+			memset(tcp, 0, sizeof(*tcp));
+			tcp->pid = pid;
+			tcp->flags = TCB_INUSE;
+			tcp->outf = outf; /* Initialise to current out file */
+#if SUPPORTED_PERSONALITIES > 1
+			tcp->currpers = current_personality;
+#endif
+			nprocs++;
+			if (debug_flag)
+				fprintf(stderr, "new tcb for pid %d, active tcbs:%d\n", tcp->pid, nprocs);
+			if (command_options_parsed)
+				newoutf(tcp);
+			return tcp;
+		}
+	}
+	error_msg_and_die("bug in alloc_tcb");
+}
+#define alloctcb(pid) alloc_tcb((pid), 1)
+
+static void
+droptcb(struct tcb *tcp)
+{
+	if (tcp->pid == 0)
+		return;
+
+	nprocs--;
+	if (debug_flag)
+		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
+
+	if (tcp->outf) {
+		if (outfname && followfork >= 2) {
+			if (tcp->curcol != 0)
+				fprintf(tcp->outf, " <detached ...>\n");
+			fclose(tcp->outf);
+			if (outf == tcp->outf)
+				outf = NULL;
+		} else {
+			if (printing_tcp == tcp && tcp->curcol != 0)
+				fprintf(tcp->outf, " <detached ...>\n");
+			fflush(tcp->outf);
+		}
+	}
+
+	if (printing_tcp == tcp)
+		printing_tcp = NULL;
+
+	memset(tcp, 0, sizeof(*tcp));
+}
+
+/* detach traced process; continue with sig
+ * Never call DETACH twice on the same process as both unattached and
+ * attached-unstopped processes give the same ESRCH.  For unattached process we
+ * would SIGSTOP it and wait for its SIGSTOP notification forever.
+ */
+static int
+detach(struct tcb *tcp)
+{
+	int error;
+	int status, sigstop_expected;
+
+	if (tcp->flags & TCB_BPTSET)
+		clearbpt(tcp);
+
+	/*
+	 * Linux wrongly insists the child be stopped
+	 * before detaching.  Arghh.  We go through hoops
+	 * to make a clean break of things.
+	 */
+#if defined(SPARC)
+#undef PTRACE_DETACH
+#define PTRACE_DETACH PTRACE_SUNDETACH
+#endif
+
+	error = 0;
+	sigstop_expected = 0;
+	if (tcp->flags & TCB_ATTACHED) {
+		/*
+		 * We attached but possibly didn't see the expected SIGSTOP.
+		 * We must catch exactly one as otherwise the detached process
+		 * would be left stopped (process state T).
+		 */
+		sigstop_expected = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
+		error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, 0);
+		if (error == 0) {
+			/* On a clear day, you can see forever. */
+		}
+		else if (errno != ESRCH) {
+			/* Shouldn't happen. */
+			perror("detach: ptrace(PTRACE_DETACH, ...)");
+		}
+		else if (my_tkill(tcp->pid, 0) < 0) {
+			if (errno != ESRCH)
+				perror("detach: checking sanity");
+		}
+		else if (!sigstop_expected && my_tkill(tcp->pid, SIGSTOP) < 0) {
+			if (errno != ESRCH)
+				perror("detach: stopping child");
+		}
+		else
+			sigstop_expected = 1;
+	}
+
+	if (sigstop_expected) {
+		for (;;) {
+#ifdef __WALL
+			if (waitpid(tcp->pid, &status, __WALL) < 0) {
+				if (errno == ECHILD) /* Already gone.  */
+					break;
+				if (errno != EINVAL) {
+					perror("detach: waiting");
+					break;
+				}
+#endif /* __WALL */
+				/* No __WALL here.  */
+				if (waitpid(tcp->pid, &status, 0) < 0) {
+					if (errno != ECHILD) {
+						perror("detach: waiting");
+						break;
+					}
+#ifdef __WCLONE
+					/* If no processes, try clones.  */
+					if (waitpid(tcp->pid, &status, __WCLONE) < 0) {
+						if (errno != ECHILD)
+							perror("detach: waiting");
+						break;
+					}
+#endif /* __WCLONE */
+				}
+#ifdef __WALL
+			}
+#endif
+			if (!WIFSTOPPED(status)) {
+				/* Au revoir, mon ami. */
+				break;
+			}
+			if (WSTOPSIG(status) == SIGSTOP) {
+				ptrace_restart(PTRACE_DETACH, tcp, 0);
+				break;
+			}
+			error = ptrace_restart(PTRACE_CONT, tcp,
+					WSTOPSIG(status) == syscall_trap_sig ? 0
+					: WSTOPSIG(status));
+			if (error < 0)
+				break;
+		}
+	}
+
+	if (!qflag && (tcp->flags & TCB_ATTACHED))
+		fprintf(stderr, "Process %u detached\n", tcp->pid);
+
+	droptcb(tcp);
+
+	return error;
 }
 
 static void
@@ -1507,55 +1693,6 @@ init(int argc, char *argv[])
 	print_pid_pfx = (outfname && followfork < 2 && (followfork == 1 || nprocs > 1));
 }
 
-static void
-expand_tcbtab(void)
-{
-	/* Allocate some more TCBs and expand the table.
-	   We don't want to relocate the TCBs because our
-	   callers have pointers and it would be a pain.
-	   So tcbtab is a table of pointers.  Since we never
-	   free the TCBs, we allocate a single chunk of many.  */
-	int i = tcbtabsize;
-	struct tcb *newtcbs = calloc(tcbtabsize, sizeof(newtcbs[0]));
-	struct tcb **newtab = realloc(tcbtab, tcbtabsize * 2 * sizeof(tcbtab[0]));
-	if (!newtab || !newtcbs)
-		die_out_of_memory();
-	tcbtabsize *= 2;
-	tcbtab = newtab;
-	while (i < tcbtabsize)
-		tcbtab[i++] = newtcbs++;
-}
-
-struct tcb *
-alloc_tcb(int pid, int command_options_parsed)
-{
-	int i;
-	struct tcb *tcp;
-
-	if (nprocs == tcbtabsize)
-		expand_tcbtab();
-
-	for (i = 0; i < tcbtabsize; i++) {
-		tcp = tcbtab[i];
-		if ((tcp->flags & TCB_INUSE) == 0) {
-			memset(tcp, 0, sizeof(*tcp));
-			tcp->pid = pid;
-			tcp->flags = TCB_INUSE;
-			tcp->outf = outf; /* Initialise to current out file */
-#if SUPPORTED_PERSONALITIES > 1
-			tcp->currpers = current_personality;
-#endif
-			nprocs++;
-			if (debug_flag)
-				fprintf(stderr, "new tcb for pid %d, active tcbs:%d\n", tcp->pid, nprocs);
-			if (command_options_parsed)
-				newoutf(tcp);
-			return tcp;
-		}
-	}
-	error_msg_and_die("bug in alloc_tcb");
-}
-
 static struct tcb *
 pid2tcb(int pid)
 {
@@ -1571,142 +1708,6 @@ pid2tcb(int pid)
 	}
 
 	return NULL;
-}
-
-void
-droptcb(struct tcb *tcp)
-{
-	if (tcp->pid == 0)
-		return;
-
-	nprocs--;
-	if (debug_flag)
-		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
-
-	if (tcp->outf) {
-		if (outfname && followfork >= 2) {
-			if (tcp->curcol != 0)
-				fprintf(tcp->outf, " <detached ...>\n");
-			fclose(tcp->outf);
-			if (outf == tcp->outf)
-				outf = NULL;
-		} else {
-			if (printing_tcp == tcp && tcp->curcol != 0)
-				fprintf(tcp->outf, " <detached ...>\n");
-			fflush(tcp->outf);
-		}
-	}
-
-	if (printing_tcp == tcp)
-		printing_tcp = NULL;
-
-	memset(tcp, 0, sizeof(*tcp));
-}
-
-/* detach traced process; continue with sig
- * Never call DETACH twice on the same process as both unattached and
- * attached-unstopped processes give the same ESRCH.  For unattached process we
- * would SIGSTOP it and wait for its SIGSTOP notification forever.
- */
-static int
-detach(struct tcb *tcp)
-{
-	int error;
-	int status, sigstop_expected;
-
-	if (tcp->flags & TCB_BPTSET)
-		clearbpt(tcp);
-
-	/*
-	 * Linux wrongly insists the child be stopped
-	 * before detaching.  Arghh.  We go through hoops
-	 * to make a clean break of things.
-	 */
-#if defined(SPARC)
-#undef PTRACE_DETACH
-#define PTRACE_DETACH PTRACE_SUNDETACH
-#endif
-
-	error = 0;
-	sigstop_expected = 0;
-	if (tcp->flags & TCB_ATTACHED) {
-		/*
-		 * We attached but possibly didn't see the expected SIGSTOP.
-		 * We must catch exactly one as otherwise the detached process
-		 * would be left stopped (process state T).
-		 */
-		sigstop_expected = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
-		error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, 0);
-		if (error == 0) {
-			/* On a clear day, you can see forever. */
-		}
-		else if (errno != ESRCH) {
-			/* Shouldn't happen. */
-			perror("detach: ptrace(PTRACE_DETACH, ...)");
-		}
-		else if (my_tkill(tcp->pid, 0) < 0) {
-			if (errno != ESRCH)
-				perror("detach: checking sanity");
-		}
-		else if (!sigstop_expected && my_tkill(tcp->pid, SIGSTOP) < 0) {
-			if (errno != ESRCH)
-				perror("detach: stopping child");
-		}
-		else
-			sigstop_expected = 1;
-	}
-
-	if (sigstop_expected) {
-		for (;;) {
-#ifdef __WALL
-			if (waitpid(tcp->pid, &status, __WALL) < 0) {
-				if (errno == ECHILD) /* Already gone.  */
-					break;
-				if (errno != EINVAL) {
-					perror("detach: waiting");
-					break;
-				}
-#endif /* __WALL */
-				/* No __WALL here.  */
-				if (waitpid(tcp->pid, &status, 0) < 0) {
-					if (errno != ECHILD) {
-						perror("detach: waiting");
-						break;
-					}
-#ifdef __WCLONE
-					/* If no processes, try clones.  */
-					if (waitpid(tcp->pid, &status, __WCLONE) < 0) {
-						if (errno != ECHILD)
-							perror("detach: waiting");
-						break;
-					}
-#endif /* __WCLONE */
-				}
-#ifdef __WALL
-			}
-#endif
-			if (!WIFSTOPPED(status)) {
-				/* Au revoir, mon ami. */
-				break;
-			}
-			if (WSTOPSIG(status) == SIGSTOP) {
-				ptrace_restart(PTRACE_DETACH, tcp, 0);
-				break;
-			}
-			error = ptrace_restart(PTRACE_CONT, tcp,
-					WSTOPSIG(status) == syscall_trap_sig ? 0
-					: WSTOPSIG(status));
-			if (error < 0)
-				break;
-		}
-	}
-
-	if (!qflag && (tcp->flags & TCB_ATTACHED))
-		fprintf(stderr, "Process %u detached\n", tcp->pid);
-
-	droptcb(tcp);
-
-	return error;
 }
 
 static void

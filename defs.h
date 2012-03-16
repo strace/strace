@@ -460,10 +460,6 @@ void die_out_of_memory(void) __attribute__ ((noreturn));
 
 extern void set_personality(int personality);
 extern const char *xlookup(const struct xlat *, int);
-extern struct tcb *alloc_tcb(int, int);
-extern void droptcb(struct tcb *);
-
-#define alloctcb(pid)	alloc_tcb((pid), 1)
 
 extern void set_sortby(const char *);
 extern void set_overhead(int);
