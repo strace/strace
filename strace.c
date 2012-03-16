@@ -932,7 +932,7 @@ startup_attach(void)
 
 		if (!qflag)
 			fprintf(stderr,
-				"Process %u attached - interrupt to quit\n",
+				"Process %u attached\n",
 				tcp->pid);
 	} /* for each tcbtab[] */
 
