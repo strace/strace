@@ -150,7 +150,6 @@ AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
 AC_CHECK_TYPES([long long])
 AC_LITTLE_ENDIAN_LONG_LONG
 AC_OFF_T_IS_LONG_LONG
-AC_RLIM_T_IS_LONG_LONG
 AC_CHECK_TYPES([struct opthdr],,, [#include <sys/socket.h>])
 AC_CHECK_TYPES([struct t_opthdr],,, [#include <sys/tiuser.h>])
 
@@ -252,6 +251,7 @@ AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 	fi)
 
 AC_CHECK_SIZEOF([long])
+AC_CHECK_SIZEOF([rlim_t],,[#include <sys/resource.h>])
 
 AC_PATH_PROG([PERL], [perl])
 

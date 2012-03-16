@@ -13,23 +13,6 @@ then
 fi
 ])
 
-dnl ### A macro to determine if rlim_t is a long long
-AC_DEFUN([AC_RLIM_T_IS_LONG_LONG],
-[AC_MSG_CHECKING(for long long rlim_t)
-AC_CACHE_VAL(ac_cv_have_long_long_rlim_t,
-[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-char a[(sizeof (rlim_t) == sizeof (long long) &&
-        sizeof (rlim_t) > sizeof (long)) - 1];
-]])],[ac_cv_have_long_long_rlim_t=yes],[ac_cv_have_long_long_rlim_t=no])])
-AC_MSG_RESULT($ac_cv_have_long_long_rlim_t)
-if test "$ac_cv_have_long_long_rlim_t" = yes
-then
-	AC_DEFINE([HAVE_LONG_LONG_RLIM_T], 1, [Define if rlim_t is a long long.])
-fi
-])
-
 dnl ### A macro to determine endianness of long long
 AC_DEFUN([AC_LITTLE_ENDIAN_LONG_LONG],
 [AC_MSG_CHECKING(for little endian long long)
