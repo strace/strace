@@ -26,12 +26,9 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <stdarg.h>
 #include <sys/param.h>
 #include <fcntl.h>
@@ -163,7 +160,7 @@ static volatile int interrupted;
 #if !HAVE_DECL_SYS_ERRLIST
 extern int sys_nerr;
 extern char *sys_errlist[];
-#endif /* HAVE_DECL_SYS_ERRLIST */
+#endif
 
 const char *
 strerror(int err_no)

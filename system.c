@@ -26,8 +26,6 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
@@ -67,24 +65,18 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-
 #ifdef HAVE_LINUX_CAPABILITY_H
-#include <linux/capability.h>
+# include <linux/capability.h>
 #endif
-
 #ifdef HAVE_ASM_CACHECTL_H
-#include <asm/cachectl.h>
+# include <asm/cachectl.h>
 #endif
-
 #ifdef HAVE_LINUX_USTNAME_H
-#include <linux/utsname.h>
+# include <linux/utsname.h>
 #endif
-
 #ifdef HAVE_ASM_SYSMIPS_H
-#include <asm/sysmips.h>
+# include <asm/sysmips.h>
 #endif
-
 #include <linux/sysctl.h>
 
 static const struct xlat mount_flags[] = {

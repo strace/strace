@@ -25,8 +25,6 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #ifdef HAVE_CONFIG_H
@@ -42,23 +40,25 @@
 # include <sgidefs.h>
 #endif
 #include <features.h>
+#ifdef HAVE_STDBOOL_H
+# include <stdbool.h>
+#endif
+#include <stdint.h>
+#include <inttypes.h>
 #include <sys/types.h>
+#ifdef STDC_HEADERS
+# include <stddef.h>
+#endif
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
+#include <signal.h>
 #include <time.h>
 #include <sys/time.h>
-#include <errno.h>
 #include <sys/syscall.h>
-#ifdef HAVE_STDBOOL_H
-# include <stdbool.h>
-#endif
-#ifdef STDC_HEADERS
-# include <stddef.h>
-#endif
-#include <signal.h>
 
 #ifndef HAVE_STRERROR
 const char *strerror(int);

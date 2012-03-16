@@ -24,14 +24,11 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include <stdio.h>
-
 #ifdef STDC_HEADERS
-#include <stdlib.h>
+# include <stdlib.h>
 #endif
 
 struct ioctlent {
@@ -45,9 +42,7 @@ struct ioctlent {
 int nioctlents = sizeof ioctlent / sizeof ioctlent[0];
 
 int
-compare(a, b)
-const void *a;
-const void *b;
+compare(const void *a, const void *b)
 {
 	unsigned long code1 = ((struct ioctlent *) a)->code;
 	unsigned long code2 = ((struct ioctlent *) b)->code;

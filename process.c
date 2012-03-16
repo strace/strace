@@ -8,7 +8,6 @@
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
  *                    port by Greg Banks <gbanks@pocketpenguins.com>
-
  *
  * All rights reserved.
  *
@@ -33,12 +32,9 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -448,40 +444,40 @@ static const struct xlat clone_flags[] = {
     { 0,		NULL		},
 };
 
-# ifdef I386
-#  include <asm/ldt.h>
-#   ifdef HAVE_STRUCT_USER_DESC
-#    define modify_ldt_ldt_s user_desc
-#   endif
+#ifdef I386
+# include <asm/ldt.h>
+#  ifdef HAVE_STRUCT_USER_DESC
+#   define modify_ldt_ldt_s user_desc
+#  endif
 extern void print_ldt_entry();
-# endif
+#endif
 
-# if defined IA64
-#  define ARG_FLAGS	0
-#  define ARG_STACK	1
-#  define ARG_STACKSIZE	(tcp->scno == SYS_clone2 ? 2 : -1)
-#  define ARG_PTID	(tcp->scno == SYS_clone2 ? 3 : 2)
-#  define ARG_CTID	(tcp->scno == SYS_clone2 ? 4 : 3)
-#  define ARG_TLS	(tcp->scno == SYS_clone2 ? 5 : 4)
-# elif defined S390 || defined S390X || defined CRISV10 || defined CRISV32
-#  define ARG_STACK	0
-#  define ARG_FLAGS	1
-#  define ARG_PTID	2
-#  define ARG_CTID	3
-#  define ARG_TLS	4
-# elif defined X86_64 || defined ALPHA
-#  define ARG_FLAGS	0
-#  define ARG_STACK	1
-#  define ARG_PTID	2
-#  define ARG_CTID	3
-#  define ARG_TLS	4
-# else
-#  define ARG_FLAGS	0
-#  define ARG_STACK	1
-#  define ARG_PTID	2
-#  define ARG_TLS	3
-#  define ARG_CTID	4
-# endif
+#if defined IA64
+# define ARG_FLAGS	0
+# define ARG_STACK	1
+# define ARG_STACKSIZE	(tcp->scno == SYS_clone2 ? 2 : -1)
+# define ARG_PTID	(tcp->scno == SYS_clone2 ? 3 : 2)
+# define ARG_CTID	(tcp->scno == SYS_clone2 ? 4 : 3)
+# define ARG_TLS	(tcp->scno == SYS_clone2 ? 5 : 4)
+#elif defined S390 || defined S390X || defined CRISV10 || defined CRISV32
+# define ARG_STACK	0
+# define ARG_FLAGS	1
+# define ARG_PTID	2
+# define ARG_CTID	3
+# define ARG_TLS	4
+#elif defined X86_64 || defined ALPHA
+# define ARG_FLAGS	0
+# define ARG_STACK	1
+# define ARG_PTID	2
+# define ARG_CTID	3
+# define ARG_TLS	4
+#else
+# define ARG_FLAGS	0
+# define ARG_STACK	1
+# define ARG_PTID	2
+# define ARG_TLS	3
+# define ARG_CTID	4
+#endif
 
 int
 sys_clone(struct tcb *tcp)
@@ -490,11 +486,11 @@ sys_clone(struct tcb *tcp)
 		const char *sep = "|";
 		unsigned long flags = tcp->u_arg[ARG_FLAGS];
 		tprintf("child_stack=%#lx, ", tcp->u_arg[ARG_STACK]);
-# ifdef ARG_STACKSIZE
+#ifdef ARG_STACKSIZE
 		if (ARG_STACKSIZE != -1)
 			tprintf("stack_size=%#lx, ",
 				tcp->u_arg[ARG_STACKSIZE]);
-# endif
+#endif
 		tprints("flags=");
 		if (!printflags(clone_flags, flags &~ CSIGNAL, NULL))
 			sep = "";
@@ -506,7 +502,7 @@ sys_clone(struct tcb *tcp)
 		if (flags & CLONE_PARENT_SETTID)
 			tprintf(", parent_tidptr=%#lx", tcp->u_arg[ARG_PTID]);
 		if (flags & CLONE_SETTLS) {
-# ifdef I386
+#ifdef I386
 			struct modify_ldt_ldt_s copy;
 			if (umove(tcp, tcp->u_arg[ARG_TLS], &copy) != -1) {
 				tprintf(", {entry_number:%d, ",
@@ -517,7 +513,7 @@ sys_clone(struct tcb *tcp)
 					print_ldt_entry(&copy);
 			}
 			else
-# endif
+#endif
 				tprintf(", tls=%#lx", tcp->u_arg[ARG_TLS]);
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID))
@@ -2729,7 +2725,7 @@ sys_sched_rr_get_interval(struct tcb *tcp)
 }
 
 # ifdef X86_64
-# include <asm/prctl.h>
+#  include <asm/prctl.h>
 
 static const struct xlat archvals[] = {
 	{ ARCH_SET_GS,		"ARCH_SET_GS"		},

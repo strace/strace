@@ -27,14 +27,12 @@
  */
 
 #include "defs.h"
-
 #include <sys/param.h>
-
 #ifdef HAVE_POLL_H
-#include <poll.h>
+# include <poll.h>
 #endif
 #ifdef HAVE_SYS_POLL_H
-#include <sys/poll.h>
+# include <sys/poll.h>
 #endif
 
 #include "syscall.h"

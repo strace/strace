@@ -26,8 +26,6 @@
  */
 
 #include "defs.h"
-#include <stdint.h>
-#include <inttypes.h>
 #include <linux/blkpg.h>
 #include <linux/fs.h>
 #include <linux/hdreg.h>

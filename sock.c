@@ -23,18 +23,14 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <sys/socket.h>
 #include <linux/sockios.h>
 #include <arpa/inet.h>
-
 #if defined(ALPHA) || defined(SH) || defined(SH64)
-# ifdef HAVE_SYS_IOCTL_H
+# if defined(HAVE_SYS_IOCTL_H)
 #  include <sys/ioctl.h>
 # elif defined(HAVE_IOCTLS_H)
 #  include <ioctls.h>

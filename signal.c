@@ -29,13 +29,9 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
-#include <stdint.h>
 #include <sys/user.h>
 #include <fcntl.h>
 
@@ -79,7 +75,7 @@ typedef struct {
 #elif defined HAVE_ASM_SIGCONTEXT_H
 # if !defined(IA64) && !defined(X86_64)
 #  include <asm/sigcontext.h>
-# endif /* !IA64 && !X86_64 */
+# endif
 #else /* !HAVE_ASM_SIGCONTEXT_H */
 # if defined I386 && !defined HAVE_STRUCT_SIGCONTEXT_STRUCT
 struct sigcontext_struct {
@@ -417,7 +413,6 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 #define SI_SIGIO	-5	/* sent by SIGIO */
 #define SI_TKILL	-6	/* sent by tkill */
 #define SI_ASYNCNL	-60     /* sent by asynch name lookup completion */
-
 #endif
 
 #ifndef SI_FROMUSER

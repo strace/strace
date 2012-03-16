@@ -28,15 +28,11 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <asm/mman.h>
 #include <sys/mman.h>
-
 #if defined(I386)
 # include <asm/ldt.h>
 # ifdef HAVE_STRUCT_USER_DESC
@@ -51,7 +47,7 @@
 /*
  * Ugly hacks for systems that have a long long off_t
  */
-#define sys_mmap64	sys_mmap
+# define sys_mmap64	sys_mmap
 #endif
 
 int

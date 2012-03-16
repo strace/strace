@@ -26,81 +26,72 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-
 #if defined(HAVE_SIN6_SCOPE_ID_LINUX)
-#define in6_addr in6_addr_libc
-#define ipv6_mreq ipv6_mreq_libc
-#define sockaddr_in6 sockaddr_in6_libc
+# define in6_addr in6_addr_libc
+# define ipv6_mreq ipv6_mreq_libc
+# define sockaddr_in6 sockaddr_in6_libc
 #endif
-
 #include <netinet/in.h>
 #ifdef HAVE_NETINET_TCP_H
-#include <netinet/tcp.h>
+# include <netinet/tcp.h>
 #endif
 #ifdef HAVE_NETINET_UDP_H
-#include <netinet/udp.h>
+# include <netinet/udp.h>
 #endif
 #ifdef HAVE_NETINET_SCTP_H
-#include <netinet/sctp.h>
+# include <netinet/sctp.h>
 #endif
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <asm/types.h>
 #if defined(__GLIBC__) && (__GLIBC__ >= 2) && (__GLIBC__ + __GLIBC_MINOR__ >= 3)
-#  include <netipx/ipx.h>
+# include <netipx/ipx.h>
 #else
-#  include <linux/ipx.h>
+# include <linux/ipx.h>
 #endif
 
 #if defined(__GLIBC__) && (((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)) || defined(HAVE_SIN6_SCOPE_ID_LINUX))
-#if defined(HAVE_LINUX_IN6_H)
-#if defined(HAVE_SIN6_SCOPE_ID_LINUX)
-#undef in6_addr
-#undef ipv6_mreq
-#undef sockaddr_in6
-#define in6_addr in6_addr_kernel
-#define ipv6_mreq ipv6_mreq_kernel
-#define sockaddr_in6 sockaddr_in6_kernel
-#endif
-#include <linux/in6.h>
-#if defined(HAVE_SIN6_SCOPE_ID_LINUX)
-#undef in6_addr
-#undef ipv6_mreq
-#undef sockaddr_in6
-#define in6_addr in6_addr_libc
-#define ipv6_mreq ipv6_mreq_libc
-#define sockaddr_in6 sockaddr_in6_kernel
-#endif
-#endif
+# if defined(HAVE_LINUX_IN6_H)
+#  if defined(HAVE_SIN6_SCOPE_ID_LINUX)
+#   undef in6_addr
+#   undef ipv6_mreq
+#   undef sockaddr_in6
+#   define in6_addr in6_addr_kernel
+#   define ipv6_mreq ipv6_mreq_kernel
+#   define sockaddr_in6 sockaddr_in6_kernel
+#  endif
+#  include <linux/in6.h>
+#  if defined(HAVE_SIN6_SCOPE_ID_LINUX)
+#   undef in6_addr
+#   undef ipv6_mreq
+#   undef sockaddr_in6
+#   define in6_addr in6_addr_libc
+#   define ipv6_mreq ipv6_mreq_libc
+#   define sockaddr_in6 sockaddr_in6_kernel
+#  endif
+# endif
 #endif
 
 #if defined(HAVE_SYS_UIO_H)
-#include <sys/uio.h>
+# include <sys/uio.h>
 #endif
-
 #if defined(HAVE_LINUX_NETLINK_H)
-#include <linux/netlink.h>
+# include <linux/netlink.h>
 #endif
-
 #if defined(HAVE_LINUX_IF_PACKET_H)
-#include <linux/if_packet.h>
+# include <linux/if_packet.h>
 #endif
-
 #if defined(HAVE_LINUX_ICMP_H)
-#include <linux/icmp.h>
+# include <linux/icmp.h>
 #endif
-
 #ifndef PF_UNSPEC
-#define PF_UNSPEC AF_UNSPEC
+# define PF_UNSPEC AF_UNSPEC
 #endif
 
 /* Under Linux these are enums so we can't test for them with ifdef. */

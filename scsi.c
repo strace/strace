@@ -27,7 +27,6 @@
  */
 
 #include "defs.h"
-
 #include <sys/ioctl.h>
 #include <scsi/sg.h>
 

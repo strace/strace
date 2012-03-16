@@ -24,23 +24,20 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #ifdef HAVE_POLL_H
-#include <poll.h>
+# include <poll.h>
 #endif
 #ifdef HAVE_SYS_POLL_H
-#include <sys/poll.h>
+# include <sys/poll.h>
 #endif
 #ifdef HAVE_STROPTS_H
-#include <stropts.h>
+# include <stropts.h>
 #endif
 #ifdef HAVE_SYS_CONF_H
-#include <sys/conf.h>
+# include <sys/conf.h>
 #endif
 
 #ifndef HAVE_STROPTS_H

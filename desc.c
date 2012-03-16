@@ -26,28 +26,24 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <fcntl.h>
 #include <sys/file.h>
-#include <inttypes.h>
 #ifdef HAVE_SYS_EPOLL_H
-#include <sys/epoll.h>
+# include <sys/epoll.h>
 #endif
 #ifdef HAVE_LIBAIO_H
-#include <libaio.h>
+# include <libaio.h>
 #endif
 
 #if HAVE_LONG_LONG_OFF_T
 /*
  * Hacks for systems that have a long long off_t
  */
-#define flock64	flock		/* Horrid hack */
-#define printflock printflock64	/* Horrider hack */
+# define flock64	flock		/* Horrid hack */
+# define printflock printflock64	/* Horrider hack */
 #endif
 
 static const struct xlat fcntlcmds[] = {

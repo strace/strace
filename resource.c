@@ -26,12 +26,9 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <sys/resource.h>
 #include <sys/times.h>
 #include <linux/kernel.h>
@@ -40,15 +37,13 @@
 /*
  * Hacks for systems that have a long long rlim_t
  */
-
-#define rlimit64 rlimit			/* Ugly hack */
-#define rlim64_t rlim_t			/* Ugly hack */
-#ifndef RLIM64_INFINITY
-#define RLIM64_INFINITY RLIM_INFINITY	/* You guessed it */
-#endif
-
-#define sys_getrlimit64	sys_getrlimit
-#define sys_setrlimit64	sys_setrlimit
+# define rlimit64 rlimit			/* Ugly hack */
+# define rlim64_t rlim_t			/* Ugly hack */
+# ifndef RLIM64_INFINITY
+#  define RLIM64_INFINITY RLIM_INFINITY	/* You guessed it */
+# endif
+# define sys_getrlimit64	sys_getrlimit
+# define sys_setrlimit64	sys_setrlimit
 #endif
 
 static const struct xlat resources[] = {

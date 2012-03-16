@@ -29,12 +29,9 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <sys/user.h>
 #include <sys/param.h>
 #include <fcntl.h>
@@ -43,7 +40,7 @@
 #endif
 
 #if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)
-#include <linux/ptrace.h>
+# include <linux/ptrace.h>
 #endif
 
 #if defined(IA64)

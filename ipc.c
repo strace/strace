@@ -26,16 +26,12 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
-# ifdef HAVE_MQUEUE_H
-#  include <mqueue.h>
-# endif
-
+#ifdef HAVE_MQUEUE_H
+# include <mqueue.h>
+#endif
 #include <fcntl.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>

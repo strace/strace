@@ -1,8 +1,5 @@
 /*
  * Copyright (c) 2001 Hewlett-Packard, Matthew Wilcox
- *
- * $Id$
- *
  */
 
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"	}, /* 0 */

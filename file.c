@@ -26,21 +26,11 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *	$Id$
  */
 
 #include "defs.h"
-
 #include <dirent.h>
 #include <sys/swap.h>
-
-struct kernel_dirent {
-	unsigned long   d_ino;
-	unsigned long   d_off;
-	unsigned short  d_reclen;
-	char            d_name[1];
-};
 
 #ifdef LINUXSPARC
 struct stat {
@@ -92,7 +82,6 @@ struct stat_sparc64 {
 # undef gid_t
 # undef off_t
 # undef loff_t
-
 # define dev_t __kernel_dev_t
 # define ino_t __kernel_ino_t
 # define mode_t __kernel_mode_t
@@ -112,7 +101,6 @@ struct stat_sparc64 {
 # undef gid_t
 # undef off_t
 # undef loff_t
-
 # define dev_t dev_t
 # define ino_t ino_t
 # define mode_t mode_t
@@ -131,7 +119,7 @@ struct stat_sparc64 {
 #include <sys/stat.h>
 #undef stat
 #undef stat64
- /* These might be macros. */
+/* These might be macros. */
 #undef st_atime
 #undef st_mtime
 #undef st_ctime
@@ -140,11 +128,9 @@ struct stat_sparc64 {
 #endif
 
 #include <fcntl.h>
-
 #ifdef HAVE_SYS_VFS_H
 # include <sys/vfs.h>
 #endif
-
 #ifdef HAVE_LINUX_XATTR_H
 # include <linux/xattr.h>
 #else
@@ -152,23 +138,12 @@ struct stat_sparc64 {
 # define XATTR_REPLACE 2
 #endif
 
-#if _LFS64_LARGEFILE
-# ifdef HAVE_INTTYPES_H
-#  include <inttypes.h>
-# else
-#  define PRId64 "lld"
-#  define PRIu64 "llu"
-# endif
-#endif
-
 #if HAVE_LONG_LONG_OFF_T
 /*
  * Ugly hacks for systems that have typedef long long off_t
  */
-
 # define stat64 stat
 # define HAVE_STAT64 1	/* Ugly hack */
-
 # define sys_stat64	sys_stat
 # define sys_fstat64	sys_fstat
 # define sys_lstat64	sys_lstat
@@ -188,6 +163,13 @@ struct stat_sparc64 {
 #ifdef HAVE_SYS_ASYNCH_H
 # include <sys/asynch.h>
 #endif
+
+struct kernel_dirent {
+	unsigned long   d_ino;
+	unsigned long   d_off;
+	unsigned short  d_reclen;
+	char            d_name[1];
+};
 
 const struct xlat open_access_modes[] = {
 	{ O_RDONLY,	"O_RDONLY"	},
