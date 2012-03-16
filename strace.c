@@ -573,10 +573,15 @@ tabto(void)
 		tprints(acolumn_spaces + curcol);
 }
 
+/* Should be only called directly *after successful attach* to a tracee.
+ * Otherwise, "strace -oFILE -ff -p<nonexistant_pid>"
+ * may create bogus empty FILE.<nonexistant_pid>, and then die.
+ */
 static void
 newoutf(struct tcb *tcp)
 {
-	if (outfname && followfork >= 2) {
+	tcp->outf = outf; /* if not -ff mode, the same file is for all */
+	if (followfork >= 2) {
 		char name[520 + sizeof(int) * 3];
 		sprintf(name, "%.512s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
@@ -603,7 +608,7 @@ expand_tcbtab(void)
 }
 
 static struct tcb *
-alloc_tcb(int pid, int command_options_parsed)
+alloctcb(int pid)
 {
 	int i;
 	struct tcb *tcp;
@@ -617,21 +622,18 @@ alloc_tcb(int pid, int command_options_parsed)
 			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
 			tcp->flags = TCB_INUSE;
-			tcp->outf = outf; /* Initialise to current out file */
+			/* tcp->outf = outf; - not needed? */
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
 			nprocs++;
 			if (debug_flag)
 				fprintf(stderr, "new tcb for pid %d, active tcbs:%d\n", tcp->pid, nprocs);
-			if (command_options_parsed)
-				newoutf(tcp);
 			return tcp;
 		}
 	}
-	error_msg_and_die("bug in alloc_tcb");
+	error_msg_and_die("bug in alloctcb");
 }
-#define alloctcb(pid) alloc_tcb((pid), 1)
 
 static void
 droptcb(struct tcb *tcp)
@@ -794,7 +796,7 @@ process_opt_p_list(char *opt)
 			return;
 		}
 		*delim = c;
-		alloc_tcb(pid, 0);
+		alloctcb(pid);
 		if (c == '\0')
 			break;
 		opt = delim + 1;
@@ -846,9 +848,6 @@ startup_attach(void)
 		if (tcp->flags & TCB_ATTACHED)
 			continue; /* no, we already attached it */
 
-		/* Reinitialize the output since it may have changed */
-		tcp->outf = outf;
-		newoutf(tcp);
 
 		if (followfork && !daemonized_tracer) {
 			char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
@@ -882,6 +881,7 @@ startup_attach(void)
 					if (tid != tcp->pid)
 						cur_tcp = alloctcb(tid);
 					cur_tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
+					newoutf(cur_tcp);
 				}
 				closedir(dir);
 				if (interactive) {
@@ -898,8 +898,8 @@ startup_attach(void)
 				}
 				if (!qflag) {
 					fprintf(stderr, ntid > 1
-? "Process %u attached with %u threads - interrupt to quit\n"
-: "Process %u attached - interrupt to quit\n",
+? "Process %u attached with %u threads\n"
+: "Process %u attached\n",
 						tcp->pid, ntid);
 				}
 				if (!(tcp->flags & TCB_ATTACHED)) {
@@ -918,6 +918,7 @@ startup_attach(void)
 			continue;
 		}
 		tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
+		newoutf(tcp);
 		if (debug_flag)
 			fprintf(stderr, "attach to pid %d (main) succeeded\n", tcp->pid);
 
@@ -1103,6 +1104,7 @@ startup_child(char **argv)
 			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP | post_attach_sigstop;
 		else
 			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP;
+		newoutf(tcp);
 	}
 	else {
 		/* With -D, *we* are child here, IOW: different pid. Fetch it: */
@@ -1111,6 +1113,7 @@ startup_child(char **argv)
 		pid = getppid();
 		alloctcb(pid);
 		/* attaching will be done later, by startup_attach */
+		/* note: we don't do newoutf(tcp) here either! */
 	}
 }
 
@@ -1573,7 +1576,7 @@ init(int argc, char *argv[])
 	if (!followfork)
 		followfork = optF;
 
-	if (followfork > 1 && cflag) {
+	if (followfork >= 2 && cflag) {
 		error_msg_and_die("(-c or -C) and -ff are mutually exclusive options");
 	}
 
@@ -1609,15 +1612,15 @@ init(int argc, char *argv[])
 			 * We can't do the <outfname>.PID funny business
 			 * when using popen, so prohibit it.
 			 */
-			if (followfork > 1)
+			if (followfork >= 2)
 				error_msg_and_die("Piping the output and -ff are mutually exclusive");
 			outf = strace_popen(outfname + 1);
 		}
-		else if (followfork <= 1)
+		else if (followfork < 2)
 			outf = strace_fopen(outfname);
 	} else {
 		/* -ff without -o FILE is the same as single -f */
-		if (followfork > 1)
+		if (followfork >= 2)
 			followfork = 1;
 	}
 
@@ -1932,6 +1935,7 @@ trace(void)
 				   in the child.  */
 				tcp = alloctcb(pid);
 				tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
+				newoutf(tcp);
 				if (!qflag)
 					fprintf(stderr, "Process %d attached\n",
 						pid);
