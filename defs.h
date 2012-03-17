@@ -524,7 +524,6 @@ extern int is_restart_error(struct tcb *);
 extern int pathtrace_select(const char *);
 extern int pathtrace_match(struct tcb *);
 
-extern int change_syscall(struct tcb *, int);
 extern int internal_fork(struct tcb *);
 extern int internal_exec(struct tcb *);
 
