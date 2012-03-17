@@ -848,7 +848,6 @@ startup_attach(void)
 		if (tcp->flags & TCB_ATTACHED)
 			continue; /* no, we already attached it */
 
-
 		if (followfork && !daemonized_tracer) {
 			char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
 			DIR *dir;

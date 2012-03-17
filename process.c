@@ -418,30 +418,30 @@ sys_exit(struct tcb *tcp)
 #define CLONE_IO		0x80000000	/* Clone io context */
 
 static const struct xlat clone_flags[] = {
-    { CLONE_VM,		"CLONE_VM"	},
-    { CLONE_FS,		"CLONE_FS"	},
-    { CLONE_FILES,	"CLONE_FILES"	},
-    { CLONE_SIGHAND,	"CLONE_SIGHAND"	},
-    { CLONE_IDLETASK,	"CLONE_IDLETASK"},
-    { CLONE_PTRACE,	"CLONE_PTRACE"	},
-    { CLONE_VFORK,	"CLONE_VFORK"	},
-    { CLONE_PARENT,	"CLONE_PARENT"	},
-    { CLONE_THREAD,	"CLONE_THREAD" },
-    { CLONE_NEWNS,	"CLONE_NEWNS" },
-    { CLONE_SYSVSEM,	"CLONE_SYSVSEM" },
-    { CLONE_SETTLS,	"CLONE_SETTLS" },
-    { CLONE_PARENT_SETTID,"CLONE_PARENT_SETTID" },
-    { CLONE_CHILD_CLEARTID,"CLONE_CHILD_CLEARTID" },
-    { CLONE_UNTRACED,	"CLONE_UNTRACED" },
-    { CLONE_CHILD_SETTID,"CLONE_CHILD_SETTID" },
-    { CLONE_STOPPED,	"CLONE_STOPPED" },
-    { CLONE_NEWUTS,	"CLONE_NEWUTS" },
-    { CLONE_NEWIPC,	"CLONE_NEWIPC" },
-    { CLONE_NEWUSER,	"CLONE_NEWUSER" },
-    { CLONE_NEWPID,	"CLONE_NEWPID" },
-    { CLONE_NEWNET,	"CLONE_NEWNET" },
-    { CLONE_IO,		"CLONE_IO" },
-    { 0,		NULL		},
+	{ CLONE_VM,		"CLONE_VM"	},
+	{ CLONE_FS,		"CLONE_FS"	},
+	{ CLONE_FILES,		"CLONE_FILES"	},
+	{ CLONE_SIGHAND,	"CLONE_SIGHAND"	},
+	{ CLONE_IDLETASK,	"CLONE_IDLETASK" },
+	{ CLONE_PTRACE,		"CLONE_PTRACE"	},
+	{ CLONE_VFORK,		"CLONE_VFORK"	},
+	{ CLONE_PARENT,		"CLONE_PARENT"	},
+	{ CLONE_THREAD,		"CLONE_THREAD"	},
+	{ CLONE_NEWNS,		"CLONE_NEWNS"	},
+	{ CLONE_SYSVSEM,	"CLONE_SYSVSEM"	},
+	{ CLONE_SETTLS,		"CLONE_SETTLS"	},
+	{ CLONE_PARENT_SETTID,	"CLONE_PARENT_SETTID" },
+	{ CLONE_CHILD_CLEARTID,	"CLONE_CHILD_CLEARTID" },
+	{ CLONE_UNTRACED,	"CLONE_UNTRACED" },
+	{ CLONE_CHILD_SETTID,	"CLONE_CHILD_SETTID" },
+	{ CLONE_STOPPED,	"CLONE_STOPPED"	},
+	{ CLONE_NEWUTS,		"CLONE_NEWUTS"	},
+	{ CLONE_NEWIPC,		"CLONE_NEWIPC"	},
+	{ CLONE_NEWUSER,	"CLONE_NEWUSER"	},
+	{ CLONE_NEWPID,		"CLONE_NEWPID"	},
+	{ CLONE_NEWNET,		"CLONE_NEWNET"	},
+	{ CLONE_IO,		"CLONE_IO"	},
+	{ 0,			NULL		},
 };
 
 #ifdef I386
@@ -542,12 +542,10 @@ int
 change_syscall(struct tcb *tcp, int new)
 {
 #if defined(I386)
-	/* Attempt to make vfork into fork, which we can follow. */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0)
 		return -1;
 	return 0;
 #elif defined(X86_64)
-	/* Attempt to make vfork into fork, which we can follow. */
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0)
 		return -1;
 	return 0;
@@ -631,10 +629,8 @@ change_syscall(struct tcb *tcp, int new)
 # ifndef PTRACE_SET_SYSCALL
 #  define PTRACE_SET_SYSCALL 23
 # endif
-
 	if (ptrace(PTRACE_SET_SYSCALL, tcp->pid, 0, new & 0xffff) != 0)
 		return -1;
-
 	return 0;
 #elif defined(TILE)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid,
@@ -1139,14 +1135,13 @@ static const struct xlat wait4_options[] = {
 # define WCOREFLAG 0x80
 #endif
 #ifndef WCOREDUMP
-# define WCOREDUMP(status) ((status) & 0200)
+# define WCOREDUMP(status)  ((status) & 0200)
 #endif
-
 #ifndef W_STOPCODE
-#define W_STOPCODE(sig)		((sig) << 8 | 0x7f)
+# define W_STOPCODE(sig)  ((sig) << 8 | 0x7f)
 #endif
 #ifndef W_EXITCODE
-#define W_EXITCODE(ret, sig)	((ret) << 8 | (sig))
+# define W_EXITCODE(ret, sig)  ((ret) << 8 | (sig))
 #endif
 
 static int
@@ -1359,94 +1354,94 @@ static const struct xlat ptrace_cmds[] = {
 	{ PTRACE_SINGLESTEP,	"PTRACE_SINGLESTEP"	},
 	{ PTRACE_ATTACH,	"PTRACE_ATTACH"		},
 	{ PTRACE_DETACH,	"PTRACE_DETACH"		},
-#  ifdef PTRACE_GETREGS
+#ifdef PTRACE_GETREGS
 	{ PTRACE_GETREGS,	"PTRACE_GETREGS"	},
-#  endif
-#  ifdef PTRACE_SETREGS
+#endif
+#ifdef PTRACE_SETREGS
 	{ PTRACE_SETREGS,	"PTRACE_SETREGS"	},
-#  endif
-#  ifdef PTRACE_GETFPREGS
+#endif
+#ifdef PTRACE_GETFPREGS
 	{ PTRACE_GETFPREGS,	"PTRACE_GETFPREGS"	},
-#  endif
-#  ifdef PTRACE_SETFPREGS
+#endif
+#ifdef PTRACE_SETFPREGS
 	{ PTRACE_SETFPREGS,	"PTRACE_SETFPREGS"	},
-#  endif
-#  ifdef PTRACE_GETFPXREGS
+#endif
+#ifdef PTRACE_GETFPXREGS
 	{ PTRACE_GETFPXREGS,	"PTRACE_GETFPXREGS"	},
-#  endif
-#  ifdef PTRACE_SETFPXREGS
+#endif
+#ifdef PTRACE_SETFPXREGS
 	{ PTRACE_SETFPXREGS,	"PTRACE_SETFPXREGS"	},
-#  endif
-#  ifdef PTRACE_GETVRREGS
+#endif
+#ifdef PTRACE_GETVRREGS
 	{ PTRACE_GETVRREGS,	"PTRACE_GETVRREGS"	},
-#  endif
-#  ifdef PTRACE_SETVRREGS
+#endif
+#ifdef PTRACE_SETVRREGS
 	{ PTRACE_SETVRREGS,	"PTRACE_SETVRREGS"	},
-#  endif
-#  ifdef PTRACE_SETOPTIONS
+#endif
+#ifdef PTRACE_SETOPTIONS
 	{ PTRACE_SETOPTIONS,	"PTRACE_SETOPTIONS"	},
-#  endif
-#  ifdef PTRACE_GETEVENTMSG
+#endif
+#ifdef PTRACE_GETEVENTMSG
 	{ PTRACE_GETEVENTMSG,	"PTRACE_GETEVENTMSG"	},
-#  endif
-#  ifdef PTRACE_GETSIGINFO
+#endif
+#ifdef PTRACE_GETSIGINFO
 	{ PTRACE_GETSIGINFO,	"PTRACE_GETSIGINFO"	},
-#  endif
-#  ifdef PTRACE_SETSIGINFO
+#endif
+#ifdef PTRACE_SETSIGINFO
 	{ PTRACE_SETSIGINFO,	"PTRACE_SETSIGINFO"	},
-#  endif
-#  ifdef PTRACE_GETREGSET
+#endif
+#ifdef PTRACE_GETREGSET
 	{ PTRACE_GETREGSET,	"PTRACE_GETREGSET"	},
-#  endif
-#  ifdef PTRACE_SETREGSET
+#endif
+#ifdef PTRACE_SETREGSET
 	{ PTRACE_SETREGSET,	"PTRACE_SETREGSET"	},
-#  endif
-#  ifdef PTRACE_SET_SYSCALL
+#endif
+#ifdef PTRACE_SET_SYSCALL
 	{ PTRACE_SET_SYSCALL,	"PTRACE_SET_SYSCALL"	},
-#  endif
-#  ifdef PTRACE_SEIZE
+#endif
+#ifdef PTRACE_SEIZE
 	{ PTRACE_SEIZE,		"PTRACE_SEIZE"		},
-#  endif
-#  ifdef PTRACE_INTERRUPT
+#endif
+#ifdef PTRACE_INTERRUPT
 	{ PTRACE_INTERRUPT,	"PTRACE_INTERRUPT"	},
-#  endif
-#  ifdef PTRACE_LISTEN
+#endif
+#ifdef PTRACE_LISTEN
 	{ PTRACE_LISTEN,	"PTRACE_LISTEN"		},
-#  endif
+#endif
 	{ PTRACE_SYSCALL,	"PTRACE_SYSCALL"	},
 
 	{ 0,			NULL			},
 };
 
-#  ifdef PTRACE_SETOPTIONS
+#ifdef PTRACE_SETOPTIONS
 static const struct xlat ptrace_setoptions_flags[] = {
-#   ifdef PTRACE_O_TRACESYSGOOD
+# ifdef PTRACE_O_TRACESYSGOOD
 	{ PTRACE_O_TRACESYSGOOD,"PTRACE_O_TRACESYSGOOD"	},
-#   endif
-#   ifdef PTRACE_O_TRACEFORK
+# endif
+# ifdef PTRACE_O_TRACEFORK
 	{ PTRACE_O_TRACEFORK,	"PTRACE_O_TRACEFORK"	},
-#   endif
-#   ifdef PTRACE_O_TRACEVFORK
+# endif
+# ifdef PTRACE_O_TRACEVFORK
 	{ PTRACE_O_TRACEVFORK,	"PTRACE_O_TRACEVFORK"	},
-#   endif
-#   ifdef PTRACE_O_TRACECLONE
+# endif
+# ifdef PTRACE_O_TRACECLONE
 	{ PTRACE_O_TRACECLONE,	"PTRACE_O_TRACECLONE"	},
-#   endif
-#   ifdef PTRACE_O_TRACEEXEC
+# endif
+# ifdef PTRACE_O_TRACEEXEC
 	{ PTRACE_O_TRACEEXEC,	"PTRACE_O_TRACEEXEC"	},
-#   endif
-#   ifdef PTRACE_O_TRACEVFORKDONE
+# endif
+# ifdef PTRACE_O_TRACEVFORKDONE
 	{ PTRACE_O_TRACEVFORKDONE,"PTRACE_O_TRACEVFORKDONE"},
-#   endif
-#   ifdef PTRACE_O_TRACEEXIT
+# endif
+# ifdef PTRACE_O_TRACEEXIT
 	{ PTRACE_O_TRACEEXIT,	"PTRACE_O_TRACEEXIT"	},
-#   endif
+# endif
 	{ 0,			NULL			},
 };
-#  endif /* PTRACE_SETOPTIONS */
+#endif /* PTRACE_SETOPTIONS */
 
 const struct xlat struct_user_offsets[] = {
-#   if defined(S390) || defined(S390X)
+#if defined(S390) || defined(S390X)
 	{ PT_PSWMASK,		"psw_mask"				},
 	{ PT_PSWADDR,		"psw_addr"				},
 	{ PT_GPR0,		"gpr0"					},
@@ -1483,7 +1478,7 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_ACR15,		"acr15"					},
 	{ PT_ORIGGPR2,		"orig_gpr2"				},
 	{ PT_FPC,		"fpc"					},
-#    if defined(S390)
+#if defined(S390)
 	{ PT_FPR0_HI,		"fpr0.hi"				},
 	{ PT_FPR0_LO,		"fpr0.lo"				},
 	{ PT_FPR1_HI,		"fpr1.hi"				},
@@ -1516,8 +1511,8 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_FPR14_LO,		"fpr14.lo"				},
 	{ PT_FPR15_HI,		"fpr15.hi"				},
 	{ PT_FPR15_LO,		"fpr15.lo"				},
-#    endif
-#    if defined(S390X)
+#endif
+#if defined(S390X)
 	{ PT_FPR0,		"fpr0"					},
 	{ PT_FPR1,		"fpr1"					},
 	{ PT_FPR2,		"fpr2"					},
@@ -1534,20 +1529,20 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_FPR13,		"fpr13"					},
 	{ PT_FPR14,		"fpr14"					},
 	{ PT_FPR15,		"fpr15"					},
-#    endif
+#endif
 	{ PT_CR_9,		"cr9"					},
 	{ PT_CR_10,		"cr10"					},
 	{ PT_CR_11,		"cr11"					},
 	{ PT_IEEE_IP,		"ieee_exception_ip"			},
-#   elif defined(SPARC)
+#elif defined(SPARC)
 	/* XXX No support for these offsets yet. */
-#   elif defined(HPPA)
+#elif defined(HPPA)
 	/* XXX No support for these offsets yet. */
-#   elif defined(POWERPC)
-#    ifndef PT_ORIG_R3
-#     define PT_ORIG_R3 34
-#    endif
-#    define REGSIZE (sizeof(unsigned long))
+#elif defined(POWERPC)
+# ifndef PT_ORIG_R3
+#  define PT_ORIG_R3 34
+# endif
+# define REGSIZE (sizeof(unsigned long))
 	{ REGSIZE*PT_R0,		"r0"				},
 	{ REGSIZE*PT_R1,		"r1"				},
 	{ REGSIZE*PT_R2,		"r2"				},
@@ -1588,8 +1583,8 @@ const struct xlat struct_user_offsets[] = {
 	{ REGSIZE*PT_XER,		"XER"				},
 	{ REGSIZE*PT_CCR,		"CCR"				},
 	{ REGSIZE*PT_FPR0,		"FPR0"				},
-#    undef REGSIZE
-#   elif defined(ALPHA)
+# undef REGSIZE
+#elif defined(ALPHA)
 	{ 0,			"r0"					},
 	{ 1,			"r1"					},
 	{ 2,			"r2"					},
@@ -1655,7 +1650,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 62,			"fp30"					},
 	{ 63,			"fp31"					},
 	{ 64,			"pc"					},
-#   elif defined(IA64)
+#elif defined(IA64)
 	{ PT_F32, "f32" }, { PT_F33, "f33" }, { PT_F34, "f34" },
 	{ PT_F35, "f35" }, { PT_F36, "f36" }, { PT_F37, "f37" },
 	{ PT_F38, "f38" }, { PT_F39, "f39" }, { PT_F40, "f40" },
@@ -1720,14 +1715,14 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_AR_CCV, "ar.ccv" }, { PT_AR_FPSR, "ar.fpsr" },
 	{ PT_B0, "b0" }, { PT_B7, "b7" }, { PT_F6, "f6" },
 	{ PT_F7, "f7" }, { PT_F8, "f8" }, { PT_F9, "f9" },
-#    ifdef PT_AR_CSD
+# ifdef PT_AR_CSD
 	{ PT_AR_CSD, "ar.csd" },
-#    endif
-#    ifdef PT_AR_SSD
+# endif
+# ifdef PT_AR_SSD
 	{ PT_AR_SSD, "ar.ssd" },
-#    endif
+# endif
 	{ PT_DBR, "dbr" }, { PT_IBR, "ibr" }, { PT_PMD, "pmd" },
-#   elif defined(I386)
+#elif defined(I386)
 	{ 4*EBX,		"4*EBX"					},
 	{ 4*ECX,		"4*ECX"					},
 	{ 4*EDX,		"4*EDX"					},
@@ -1745,7 +1740,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*EFL,		"4*EFL"					},
 	{ 4*UESP,		"4*UESP"				},
 	{ 4*SS,			"4*SS"					},
-#   elif defined(X86_64)
+#elif defined(X86_64)
 	{ 8*R15,		"8*R15"					},
 	{ 8*R14,		"8*R14"					},
 	{ 8*R13,		"8*R13"					},
@@ -1767,7 +1762,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 8*EFLAGS,		"8*EFL"					},
 	{ 8*RSP,		"8*RSP"					},
 	{ 8*SS,			"8*SS"					},
-#   elif defined(M68K)
+#elif defined(M68K)
 	{ 4*PT_D1,		"4*PT_D1"				},
 	{ 4*PT_D2,		"4*PT_D2"				},
 	{ 4*PT_D3,		"4*PT_D3"				},
@@ -1787,7 +1782,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*PT_ORIG_D0,		"4*PT_ORIG_D0"				},
 	{ 4*PT_SR,		"4*PT_SR"				},
 	{ 4*PT_PC,		"4*PT_PC"				},
-#   elif defined(SH)
+#elif defined(SH)
 	{ 4*REG_REG0,		"4*REG_REG0"				},
 	{ 4*(REG_REG0+1),	"4*REG_REG1"				},
 	{ 4*(REG_REG0+2),	"4*REG_REG2"				},
@@ -1828,7 +1823,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*(REG_FPREG0+13),	"4*REG_FPREG13"				},
 	{ 4*(REG_FPREG0+14),	"4*REG_FPREG14"				},
 	{ 4*REG_FPREG15,	"4*REG_FPREG15"				},
-#    ifdef REG_XDREG0
+# ifdef REG_XDREG0
 	{ 4*REG_XDREG0,		"4*REG_XDREG0"				},
 	{ 4*(REG_XDREG0+2),	"4*REG_XDREG2"				},
 	{ 4*(REG_XDREG0+4),	"4*REG_XDREG4"				},
@@ -1837,9 +1832,9 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*(REG_XDREG0+10),	"4*REG_XDREG10"				},
 	{ 4*(REG_XDREG0+12),	"4*REG_XDREG12"				},
 	{ 4*REG_XDREG14,	"4*REG_XDREG14"				},
-#    endif
+# endif
 	{ 4*REG_FPSCR,		"4*REG_FPSCR"				},
-#   elif defined(SH64)
+#elif defined(SH64)
 	{ 0,			"PC(L)"					},
 	{ 4,			"PC(U)"					},
 	{ 8,			"SR(L)"					},
@@ -1992,7 +1987,7 @@ const struct xlat struct_user_offsets[] = {
 	   the kernel build options). */
 	{ uoff(regs),		"offsetof(struct user, regs)"		},
 	{ uoff(fpu),		"offsetof(struct user, fpu)"		},
-#   elif defined(ARM)
+#elif defined(ARM)
 	{ uoff(regs.ARM_r0),	"r0"					},
 	{ uoff(regs.ARM_r1),	"r1"					},
 	{ uoff(regs.ARM_r2),	"r2"					},
@@ -2010,7 +2005,7 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(regs.ARM_lr),	"lr"					},
 	{ uoff(regs.ARM_pc),	"pc"					},
 	{ uoff(regs.ARM_cpsr),	"cpsr"					},
-#   elif defined(AVR32)
+#elif defined(AVR32)
 	{ uoff(regs.sr),	"sr"					},
 	{ uoff(regs.pc),	"pc"					},
 	{ uoff(regs.lr),	"lr"					},
@@ -2029,7 +2024,7 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(regs.r1),	"r1"					},
 	{ uoff(regs.r0),	"r0"					},
 	{ uoff(regs.r12_orig),	"orig_r12"				},
-#   elif defined(MIPS)
+#elif defined(MIPS)
 	{ 0,			"r0"					},
 	{ 1,			"r1"					},
 	{ 2,			"r2"					},
@@ -2101,7 +2096,7 @@ const struct xlat struct_user_offsets[] = {
 	{ 68,			"mmlo"					},
 	{ 69,			"fpcsr"					},
 	{ 70,			"fpeir"					},
-#   elif defined(TILE)
+#elif defined(TILE)
 	{ PTREGS_OFFSET_REG(0),  "r0"  },
 	{ PTREGS_OFFSET_REG(1),  "r1"  },
 	{ PTREGS_OFFSET_REG(2),  "r2"  },
@@ -2163,8 +2158,8 @@ const struct xlat struct_user_offsets[] = {
 	{ PTREGS_OFFSET_FAULTNUM, "faultnum" },
 	{ PTREGS_OFFSET_ORIG_R0, "orig_r0" },
 	{ PTREGS_OFFSET_FLAGS, "flags" },
-#   endif
-#   ifdef CRISV10
+#endif
+#ifdef CRISV10
 	{ 4*PT_FRAMETYPE, "4*PT_FRAMETYPE" },
 	{ 4*PT_ORIG_R10, "4*PT_ORIG_R10" },
 	{ 4*PT_R13, "4*PT_R13" },
@@ -2189,8 +2184,8 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*PT_CSRADDR, "4*PT_CSRADDR" },
 	{ 4*PT_CSRDATA, "4*PT_CSRDATA" },
 	{ 4*PT_USP, "4*PT_USP" },
-#   endif
-#   ifdef CRISV32
+#endif
+#ifdef CRISV32
 	{ 4*PT_ORIG_R10, "4*PT_ORIG_R10" },
 	{ 4*PT_R0, "4*PT_R0" },
 	{ 4*PT_R1, "4*PT_R1" },
@@ -2232,8 +2227,8 @@ const struct xlat struct_user_offsets[] = {
 	{ 4*PT_BP+48, "4*PT_BP+48" },
 	{ 4*PT_BP+52, "4*PT_BP+52" },
 	{ 4*PT_BP+56, "4*PT_BP+56" },
-#   endif
-#   ifdef MICROBLAZE
+#endif
+#ifdef MICROBLAZE
 	{ PT_GPR(0),		"r0"					},
 	{ PT_GPR(1),		"r1"					},
 	{ PT_GPR(2),		"r2"					},
@@ -2272,52 +2267,52 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_ESR,		"resr",					},
 	{ PT_FSR,		"rfsr",					},
 	{ PT_KERNEL_MODE,	"kernel_mode",				},
-#   endif
+#endif
 
-#   if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
+#if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
 		&& !defined(ALPHA) && !defined(IA64) \
 		&& !defined(CRISV10) && !defined(CRISV32) && !defined(MICROBLAZE)
-#    if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN) && !defined(TILE)
+# if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN) && !defined(TILE)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
-#    endif
-#    if defined(I386) || defined(X86_64)
+# endif
+# if defined(I386) || defined(X86_64)
 	{ uoff(i387),		"offsetof(struct user, i387)"		},
-#    endif
-#    if defined(M68K)
+# endif
+# if defined(M68K)
 	{ uoff(m68kfp),		"offsetof(struct user, m68kfp)"		},
-#    endif
+# endif
 	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
 	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
 	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
-#    if !defined(SPARC64)
+# if !defined(SPARC64)
 	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
-#    endif
-#    if defined(AVR32) || defined(SH64)
+# endif
+# if defined(AVR32) || defined(SH64)
 	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
-#    endif
-#    if !defined(SPARC64)
+# endif
+# if !defined(SPARC64)
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
-#    endif
+# endif
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-#    if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64) && !defined(TILE)
+# if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64) && !defined(TILE)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
-#    endif
-#    if !defined(SPARC64)
+# endif
+# if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-#    endif
-#    if !defined(ARM) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN) && !defined(TILE)
+# endif
+# if !defined(ARM) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN) && !defined(TILE)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
-#    endif
+# endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
 	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
-#    if defined(I386) || defined(X86_64)
+# if defined(I386) || defined(X86_64)
 	{ uoff(u_debugreg),	"offsetof(struct user, u_debugreg)"	},
-#    endif
-#   endif /* !defined(many arches) */
+# endif
+#endif /* !defined(many arches) */
 
-#  ifndef HPPA
+#ifndef HPPA
 	{ sizeof(struct user),	"sizeof(struct user)"			},
-#  endif
+#endif
 	{ 0,			NULL					},
 };
 
@@ -2351,24 +2346,24 @@ sys_ptrace(struct tcb *tcp)
 		else
 			tprintf("%#lx, ", tcp->u_arg[2]);
 		switch (tcp->u_arg[0]) {
-#  ifndef IA64
+#ifndef IA64
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
 			break;
-#  endif
+#endif
 		case PTRACE_CONT:
 		case PTRACE_SINGLESTEP:
 		case PTRACE_SYSCALL:
 		case PTRACE_DETACH:
 			printsignal(tcp->u_arg[3]);
 			break;
-#  ifdef PTRACE_SETOPTIONS
+#ifdef PTRACE_SETOPTIONS
 		case PTRACE_SETOPTIONS:
 			printflags(ptrace_setoptions_flags, tcp->u_arg[3], "PTRACE_O_???");
 			break;
-#  endif
-#  ifdef PTRACE_SETSIGINFO
+#endif
+#ifdef PTRACE_SETSIGINFO
 		case PTRACE_SETSIGINFO: {
 			siginfo_t si;
 			if (!tcp->u_arg[3])
@@ -2381,12 +2376,12 @@ sys_ptrace(struct tcb *tcp)
 				printsiginfo(&si, verbose(tcp));
 			break;
 		}
-#  endif
-#  ifdef PTRACE_GETSIGINFO
+#endif
+#ifdef PTRACE_GETSIGINFO
 		case PTRACE_GETSIGINFO:
 			/* Don't print anything, do it at syscall return. */
 			break;
-#  endif
+#endif
 		default:
 			tprintf("%#lx", tcp->u_arg[3]);
 			break;
@@ -2396,13 +2391,13 @@ sys_ptrace(struct tcb *tcp)
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
-#  ifdef IA64
+#ifdef IA64
 			return RVAL_HEX;
-#  else
+#else
 			printnum(tcp, tcp->u_arg[3], "%#lx");
 			break;
-#  endif
-#  ifdef PTRACE_GETSIGINFO
+#endif
+#ifdef PTRACE_GETSIGINFO
 		case PTRACE_GETSIGINFO: {
 			siginfo_t si;
 			if (!tcp->u_arg[3])
@@ -2415,41 +2410,41 @@ sys_ptrace(struct tcb *tcp)
 				printsiginfo(&si, verbose(tcp));
 			break;
 		}
-#  endif
+#endif
 		}
 	}
 	return 0;
 }
 
-# ifndef FUTEX_CMP_REQUEUE
-#  define FUTEX_CMP_REQUEUE 4
-# endif
-# ifndef FUTEX_WAKE_OP
-#  define FUTEX_WAKE_OP 5
-# endif
-# ifndef FUTEX_LOCK_PI
-#  define FUTEX_LOCK_PI 6
-#  define FUTEX_UNLOCK_PI 7
-#  define FUTEX_TRYLOCK_PI 8
-# endif
-# ifndef FUTEX_WAIT_BITSET
-#  define FUTEX_WAIT_BITSET 9
-# endif
-# ifndef FUTEX_WAKE_BITSET
-#  define FUTEX_WAKE_BITSET 10
-# endif
-# ifndef FUTEX_WAIT_REQUEUE_PI
-#  define FUTEX_WAIT_REQUEUE_PI 11
-# endif
-# ifndef FUTEX_CMP_REQUEUE_PI
-#  define FUTEX_CMP_REQUEUE_PI 12
-# endif
-# ifndef FUTEX_PRIVATE_FLAG
-#  define FUTEX_PRIVATE_FLAG 128
-# endif
-# ifndef FUTEX_CLOCK_REALTIME
-#  define FUTEX_CLOCK_REALTIME 256
-# endif
+#ifndef FUTEX_CMP_REQUEUE
+# define FUTEX_CMP_REQUEUE 4
+#endif
+#ifndef FUTEX_WAKE_OP
+# define FUTEX_WAKE_OP 5
+#endif
+#ifndef FUTEX_LOCK_PI
+# define FUTEX_LOCK_PI 6
+# define FUTEX_UNLOCK_PI 7
+# define FUTEX_TRYLOCK_PI 8
+#endif
+#ifndef FUTEX_WAIT_BITSET
+# define FUTEX_WAIT_BITSET 9
+#endif
+#ifndef FUTEX_WAKE_BITSET
+# define FUTEX_WAKE_BITSET 10
+#endif
+#ifndef FUTEX_WAIT_REQUEUE_PI
+# define FUTEX_WAIT_REQUEUE_PI 11
+#endif
+#ifndef FUTEX_CMP_REQUEUE_PI
+# define FUTEX_CMP_REQUEUE_PI 12
+#endif
+#ifndef FUTEX_PRIVATE_FLAG
+# define FUTEX_PRIVATE_FLAG 128
+#endif
+#ifndef FUTEX_CLOCK_REALTIME
+# define FUTEX_CLOCK_REALTIME 256
+#endif
 static const struct xlat futexops[] = {
 	{ FUTEX_WAIT,					"FUTEX_WAIT" },
 	{ FUTEX_WAKE,					"FUTEX_WAKE" },
@@ -2483,19 +2478,19 @@ static const struct xlat futexops[] = {
 	{ FUTEX_WAIT_REQUEUE_PI|FUTEX_PRIVATE_FLAG|FUTEX_CLOCK_REALTIME,	"FUTEX_WAIT_REQUEUE_PI_PRIVATE|FUTEX_CLOCK_REALTIME" },
 	{ 0,						NULL }
 };
-# ifndef FUTEX_OP_SET
-#  define FUTEX_OP_SET		0
-#  define FUTEX_OP_ADD		1
-#  define FUTEX_OP_OR		2
-#  define FUTEX_OP_ANDN		3
-#  define FUTEX_OP_XOR		4
-#  define FUTEX_OP_CMP_EQ	0
-#  define FUTEX_OP_CMP_NE	1
-#  define FUTEX_OP_CMP_LT	2
-#  define FUTEX_OP_CMP_LE	3
-#  define FUTEX_OP_CMP_GT	4
-#  define FUTEX_OP_CMP_GE	5
-# endif
+#ifndef FUTEX_OP_SET
+# define FUTEX_OP_SET		0
+# define FUTEX_OP_ADD		1
+# define FUTEX_OP_OR		2
+# define FUTEX_OP_ANDN		3
+# define FUTEX_OP_XOR		4
+# define FUTEX_OP_CMP_EQ	0
+# define FUTEX_OP_CMP_NE	1
+# define FUTEX_OP_CMP_LT	2
+# define FUTEX_OP_CMP_LE	3
+# define FUTEX_OP_CMP_GT	4
+# define FUTEX_OP_CMP_GE	5
+#endif
 static const struct xlat futexwakeops[] = {
 	{ FUTEX_OP_SET,		"FUTEX_OP_SET" },
 	{ FUTEX_OP_ADD,		"FUTEX_OP_ADD" },
@@ -2724,8 +2719,8 @@ sys_sched_rr_get_interval(struct tcb *tcp)
 	return 0;
 }
 
-# ifdef X86_64
-#  include <asm/prctl.h>
+#ifdef X86_64
+# include <asm/prctl.h>
 
 static const struct xlat archvals[] = {
 	{ ARCH_SET_GS,		"ARCH_SET_GS"		},
@@ -2758,7 +2753,7 @@ sys_arch_prctl(struct tcb *tcp)
 	}
 	return 0;
 }
-# endif /* X86_64 */
+#endif /* X86_64 */
 
 int
 sys_getcpu(struct tcb *tcp)

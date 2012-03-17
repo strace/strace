@@ -1007,7 +1007,6 @@ printcall(struct tcb *tcp)
 		return;
 	}
 	tprintf("[%08lx] ", eip);
-
 #elif defined(S390) || defined(S390X)
 	long psw;
 	if (upeek(tcp, PT_PSWADDR, &psw) < 0) {

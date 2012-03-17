@@ -141,29 +141,29 @@ static const struct xlat mmap_flags[] = {
 	{ MAP_EXECUTABLE,"MAP_EXECUTABLE"},
 #endif
 #ifdef MAP_INHERIT
-	{ MAP_INHERIT,"MAP_INHERIT"	},
+	{ MAP_INHERIT,	"MAP_INHERIT"	},
 #endif
 #ifdef MAP_FILE
-	{ MAP_FILE,"MAP_FILE"},
+	{ MAP_FILE,	"MAP_FILE"	},
 #endif
 #ifdef MAP_LOCKED
-	{ MAP_LOCKED,"MAP_LOCKED"},
+	{ MAP_LOCKED,	"MAP_LOCKED"	},
 #endif
 	/* FreeBSD ones */
 #ifdef MAP_ANON
-	{ MAP_ANON,		"MAP_ANON"	},
+	{ MAP_ANON,	"MAP_ANON"	},
 #endif
 #ifdef MAP_HASSEMAPHORE
-	{ MAP_HASSEMAPHORE,	"MAP_HASSEMAPHORE"	},
+	{ MAP_HASSEMAPHORE,"MAP_HASSEMAPHORE"},
 #endif
 #ifdef MAP_STACK
-	{ MAP_STACK,		"MAP_STACK"	},
+	{ MAP_STACK,	"MAP_STACK"	},
 #endif
 #ifdef MAP_NOSYNC
-	{ MAP_NOSYNC,		"MAP_NOSYNC"	},
+	{ MAP_NOSYNC,	"MAP_NOSYNC"	},
 #endif
 #ifdef MAP_NOCORE
-	{ MAP_NOCORE,		"MAP_NOCORE"	},
+	{ MAP_NOCORE,	"MAP_NOCORE"	},
 #endif
 #ifdef TILE
 	{ MAP_CACHE_NO_LOCAL, "MAP_CACHE_NO_LOCAL" },

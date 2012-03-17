@@ -984,7 +984,7 @@ sys_io_getevents(struct tcb *tcp)
 	} else {
 		if (tcp->u_rval == 0) {
 			tprints("{}");
-		} else  {
+		} else {
 #ifdef HAVE_LIBAIO_H
 			struct io_event *events = (void *)tcp->u_arg[3];
 			long i, nr = tcp->u_rval;

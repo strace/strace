@@ -393,97 +393,97 @@ sys_osf_setitimer(struct tcb *tcp)
 #endif
 
 static const struct xlat adjtimex_modes[] = {
-  { 0, "0" },
+	{ 0,		"0"			},
 #ifdef ADJ_OFFSET
-  { ADJ_OFFSET, "ADJ_OFFSET" },
+	{ ADJ_OFFSET,	"ADJ_OFFSET"		},
 #endif
 #ifdef ADJ_FREQUENCY
-  { ADJ_FREQUENCY, "ADJ_FREQUENCY" },
+	{ ADJ_FREQUENCY, "ADJ_FREQUENCY"	},
 #endif
 #ifdef ADJ_MAXERROR
-  { ADJ_MAXERROR, "ADJ_MAXERROR" },
+	{ ADJ_MAXERROR,	"ADJ_MAXERROR"		},
 #endif
 #ifdef ADJ_ESTERROR
-  { ADJ_ESTERROR, "ADJ_ESTERROR" },
+	{ ADJ_ESTERROR,	"ADJ_ESTERROR"		},
 #endif
 #ifdef ADJ_STATUS
-  { ADJ_STATUS, "ADJ_STATUS" },
+	{ ADJ_STATUS,	"ADJ_STATUS"		},
 #endif
 #ifdef ADJ_TIMECONST
-  { ADJ_TIMECONST, "ADJ_TIMECONST" },
+	{ ADJ_TIMECONST, "ADJ_TIMECONST"	},
 #endif
 #ifdef ADJ_TICK
-  { ADJ_TICK, "ADJ_TICK" },
+	{ ADJ_TICK,	"ADJ_TICK"		},
 #endif
 #ifdef ADJ_OFFSET_SINGLESHOT
-  { ADJ_OFFSET_SINGLESHOT, "ADJ_OFFSET_SINGLESHOT" },
+	{ ADJ_OFFSET_SINGLESHOT, "ADJ_OFFSET_SINGLESHOT" },
 #endif
-  { 0,             NULL }
+	{ 0,		NULL			}
 };
 
 static const struct xlat adjtimex_status[] = {
 #ifdef STA_PLL
-  { STA_PLL, "STA_PLL" },
+	{ STA_PLL,	"STA_PLL"	},
 #endif
 #ifdef STA_PPSFREQ
-  { STA_PPSFREQ, "STA_PPSFREQ" },
+	{ STA_PPSFREQ,	"STA_PPSFREQ"	},
 #endif
 #ifdef STA_PPSTIME
-  { STA_PPSTIME, "STA_PPSTIME" },
+	{ STA_PPSTIME,	"STA_PPSTIME"	},
 #endif
 #ifdef STA_FLL
-  { STA_FLL, "STA_FLL" },
+	{ STA_FLL,	"STA_FLL"	},
 #endif
 #ifdef STA_INS
-  { STA_INS, "STA_INS" },
+	{ STA_INS,	"STA_INS"	},
 #endif
 #ifdef STA_DEL
-  { STA_DEL, "STA_DEL" },
+	{ STA_DEL,	"STA_DEL"	},
 #endif
 #ifdef STA_UNSYNC
-  { STA_UNSYNC, "STA_UNSYNC" },
+	{ STA_UNSYNC,	"STA_UNSYNC"	},
 #endif
 #ifdef STA_FREQHOLD
-  { STA_FREQHOLD, "STA_FREQHOLD" },
+	{ STA_FREQHOLD,	"STA_FREQHOLD"	},
 #endif
 #ifdef STA_PPSSIGNAL
-  { STA_PPSSIGNAL, "STA_PPSSIGNAL" },
+	{ STA_PPSSIGNAL, "STA_PPSSIGNAL" },
 #endif
 #ifdef STA_PPSJITTER
-  { STA_PPSJITTER, "STA_PPSJITTER" },
+	{ STA_PPSJITTER, "STA_PPSJITTER" },
 #endif
 #ifdef STA_PPSWANDER
-  { STA_PPSWANDER, "STA_PPSWANDER" },
+	{ STA_PPSWANDER, "STA_PPSWANDER" },
 #endif
 #ifdef STA_PPSERROR
-  { STA_PPSERROR, "STA_PPSERROR" },
+	{ STA_PPSERROR,	"STA_PPSERROR"	},
 #endif
 #ifdef STA_CLOCKERR
-  { STA_CLOCKERR, "STA_CLOCKERR" },
+	{ STA_CLOCKERR,	"STA_CLOCKERR"	},
 #endif
-  { 0,             NULL }
+	{ 0,		NULL		}
 };
 
 static const struct xlat adjtimex_state[] = {
 #ifdef TIME_OK
-  { TIME_OK, "TIME_OK" },
+	{ TIME_OK,	"TIME_OK"	},
 #endif
 #ifdef TIME_INS
-  { TIME_INS, "TIME_INS" },
+	{ TIME_INS,	"TIME_INS"	},
 #endif
 #ifdef TIME_DEL
-  { TIME_DEL, "TIME_DEL" },
+	{ TIME_DEL,	"TIME_DEL"	},
 #endif
 #ifdef TIME_OOP
-  { TIME_OOP, "TIME_OOP" },
+	{ TIME_OOP,	"TIME_OOP"	},
 #endif
 #ifdef TIME_WAIT
-  { TIME_WAIT, "TIME_WAIT" },
+	{ TIME_WAIT,	"TIME_WAIT"	},
 #endif
 #ifdef TIME_ERROR
-  { TIME_ERROR, "TIME_ERROR" },
+	{ TIME_ERROR,	"TIME_ERROR"	},
 #endif
-  { 0,             NULL }
+	{ 0,		NULL		}
 };
 
 #if SUPPORTED_PERSONALITIES > 1
@@ -605,33 +605,33 @@ sys_adjtimex(struct tcb *tcp)
 }
 
 static const struct xlat clockflags[] = {
-  { TIMER_ABSTIME, "TIMER_ABSTIME" },
-  { 0,             NULL }
+	{ TIMER_ABSTIME,	"TIMER_ABSTIME"	},
+	{ 0,			NULL		}
 };
 
 static const struct xlat clocknames[] = {
 #ifdef CLOCK_REALTIME
-  { CLOCK_REALTIME, "CLOCK_REALTIME" },
+	{ CLOCK_REALTIME,		"CLOCK_REALTIME" },
 #endif
 #ifdef CLOCK_MONOTONIC
-  { CLOCK_MONOTONIC, "CLOCK_MONOTONIC" },
+	{ CLOCK_MONOTONIC,		"CLOCK_MONOTONIC" },
 #endif
 #ifdef CLOCK_PROCESS_CPUTIME_ID
-  { CLOCK_PROCESS_CPUTIME_ID, "CLOCK_PROCESS_CPUTIME_ID" },
+	{ CLOCK_PROCESS_CPUTIME_ID,	"CLOCK_PROCESS_CPUTIME_ID" },
 #endif
 #ifdef CLOCK_THREAD_CPUTIME_ID
-  { CLOCK_THREAD_CPUTIME_ID, "CLOCK_THREAD_CPUTIME_ID" },
+	{ CLOCK_THREAD_CPUTIME_ID,	"CLOCK_THREAD_CPUTIME_ID" },
 #endif
 #ifdef CLOCK_MONOTONIC_RAW
-  { CLOCK_MONOTONIC_RAW, "CLOCK_MONOTONIC_RAW" },
+	{ CLOCK_MONOTONIC_RAW,		"CLOCK_MONOTONIC_RAW" },
 #endif
 #ifdef CLOCK_REALTIME_COARSE
-  { CLOCK_REALTIME_COARSE, "CLOCK_REALTIME_COARSE" },
+	{ CLOCK_REALTIME_COARSE,	"CLOCK_REALTIME_COARSE" },
 #endif
 #ifdef CLOCK_MONOTONIC_COARSE
-  { CLOCK_MONOTONIC_COARSE, "CLOCK_MONOTONIC_COARSE" },
+	{ CLOCK_MONOTONIC_COARSE,	"CLOCK_MONOTONIC_COARSE" },
 #endif
-  { 0, NULL }
+	{ 0,				NULL }
 };
 
 int
