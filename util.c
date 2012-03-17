@@ -970,11 +970,6 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 	return 0;
 }
 
-#if !defined(SPARC) && !defined(SPARC64)
-# define PTRACE_WRITETEXT	101
-# define PTRACE_WRITEDATA	102
-#endif /* !SPARC && !SPARC64 */
-
 int
 upeek(struct tcb *tcp, long off, long *res)
 {
