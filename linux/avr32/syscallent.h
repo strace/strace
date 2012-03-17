@@ -44,7 +44,7 @@
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 16 */
 	{ 3,	TF,	sys_chown,		"lchown"	}, /* 17 */
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 18 */
-	{ 5,	TD,	sys_llseek,		"llseek"	}, /* 19 */
+	{ 5,	TD,	sys_llseek,		"_llseek"	}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
 	{ 2,	TF,	sys_umount,		"umount"	}, /* 22 */
@@ -155,7 +155,7 @@
 	{ 3,	TD,	sys_writev,		"writev"	}, /* 127 */
 	{ 1,	0,	sys_getsid,		"getsid"	}, /* 128 */
 	{ 1,	TD,	sys_fdatasync,		"fdatasync"	}, /* 129 */
-	{ 1,	0,	sys_sysctl,		"sysctl"	}, /* 130 */
+	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 130 */
 	{ 2,	0,	sys_mlock,		"mlock"		}, /* 131 */
 	{ 2,	0,	sys_munlock,		"munlock"	}, /* 132 */
 	{ 1,	0,	sys_mlockall,		"mlockall"	}, /* 133 */

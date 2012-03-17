@@ -938,7 +938,7 @@
 	{ 5,	TD,	sys_writev,		"writev"	}, /* 1147 */
 	{ 4,	TD,	sys_pread,		"pread"		}, /* 1148 */
 	{ 4,	TD,	sys_pwrite,		"pwrite"	}, /* 1149 */
-	{ 1,	0,	printargs,		"sysctl"	}, /* 1150 */
+	{ 1,	0,	printargs,		"_sysctl"	}, /* 1150 */
 	{ 6,	TD,	sys_mmap,		"mmap"		}, /* 1151 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 1152 */
 	{ 2,	0,	sys_mlock,		"mlock"		}, /* 1153 */

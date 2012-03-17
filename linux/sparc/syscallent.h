@@ -234,7 +234,7 @@
 	{ 1,	0,	sys_stime,	"stime" },		/* 233 */
 	{ 3,	TF,	sys_statfs64,	"statfs64" },		/* 234 */
 	{ 3,	TD,	sys_fstatfs64,	"fstatfs64" },		/* 235 */
-	{ 5,	TD,	sys_llseek,	"llseek" },		/* 236 */
+	{ 5,	TD,	sys_llseek,	"_llseek" },		/* 236 */
 	{ 2,	0,	sys_mlock,	"mlock" },		/* 237 */
 	{ 2,	0,	sys_munlock,	"munlock" },		/* 238 */
 	{ 1,	0,	sys_mlockall,	"mlockall" },		/* 239 */
@@ -249,7 +249,7 @@
 	{ 2,	0,sys_sched_rr_get_interval,"sched_rr_get_interval"},/* 248 */
 	{ 2,	0,	sys_nanosleep,	"nanosleep" },		/* 249 */
 	{ 5,	0,	sys_mremap,	"mremap" },		/* 250 */
-	{ 1,	0,	sys_sysctl,	"sysctl" },		/* 251 */
+	{ 1,	0,	sys_sysctl,	"_sysctl" },		/* 251 */
 	{ 1,	0,	sys_getsid,	"getsid" },		/* 252 */
 	{ 1,	TD,	sys_fdatasync,	"fdatasync" },		/* 253 */
 	{ 3,	0,	sys_nfsservctl,	"nfsservctl" },		/* 254 */

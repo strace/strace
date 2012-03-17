@@ -4142,9 +4142,9 @@
 	{ 0,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 4137 */
 	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 4138 */
 	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 4139 */
-	{ 5,	TF,	sys_llseek,		"llseek"	}, /* 4140 */
+	{ 5,	TF,	sys_llseek,		"_llseek"	}, /* 4140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 4141 */
-	{ 5,	TD,	sys_select,		"newselect"	}, /* 4142 */
+	{ 5,	TD,	sys_select,		"_newselect"	}, /* 4142 */
 	{ 2,	TD,	sys_flock,		"flock"		}, /* 4143 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 4144 */
 	{ 3,	TD,	sys_readv,		"readv"		}, /* 4145 */
@@ -4155,7 +4155,7 @@
 	{ 0,	0,	sys_setup,		"setup"		}, /* 4150 */
 	{ 1,	0,	sys_getsid,		"getsid"	}, /* 4151 */
 	{ 1,	TD,	sys_fdatasync,		"fdatasync"	}, /* 4152 */
-	{ 1,	0,	sys_sysctl,		"sysctl"	}, /* 4153 */
+	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 4153 */
 	{ 2,	0,	sys_mlock,		"mlock"		}, /* 4154 */
 	{ 2,	0,	sys_munlock,		"munlock"	}, /* 4155 */
 	{ 1,	0,	sys_mlockall,		"mlockall"	}, /* 4156 */
@@ -5375,7 +5375,7 @@
 	{ 3,	0,	sys_writev,		"writev"	}, /* 5019 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 5020 */
 	{ 1,	0,	sys_pipe,		"pipe"		}, /* 5021 */
-	{ 5,	0,	sys_select,		"newselect"	}, /* 5022 */
+	{ 5,	0,	sys_select,		"_newselect"	}, /* 5022 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	}, /* 5023 */
 	{ 5,	0,	sys_mremap,		"mremap"	}, /* 5024 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 5025 */
@@ -5505,7 +5505,7 @@
 	{ 0,	0,	sys_munlockall,		"munlockall"	}, /* 5149 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 5150 */
 	{ 2,	0,	sys_pivotroot,		"pivot_root"	}, /* 5151 */
-	{ 1,	0,	sys_sysctl,		"sysctl"	}, /* 5152 */
+	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 5152 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 5153 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 5154 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 5155 */
@@ -6686,7 +6686,7 @@
 	{ 3,	0,	sys_writev,		"writev"	}, /* 6019 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 6020 */
 	{ 1,	0,	sys_pipe,		"pipe"		}, /* 6021 */
-	{ 5,	0,	sys_select,		"newselect"	}, /* 6022 */
+	{ 5,	0,	sys_select,		"_newselect"	}, /* 6022 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	}, /* 6023 */
 	{ 5,	0,	sys_mremap,		"mremap"	}, /* 6024 */
 	{ 3,	0,	sys_msync,		"msync"		}, /* 6025 */
@@ -6816,7 +6816,7 @@
 	{ 0,	0,	sys_munlockall,		"munlockall"	}, /* 6149 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 6150 */
 	{ 2,	0,	sys_pivotroot,		"pivot_root"	}, /* 6151 */
-	{ 1,	0,	sys_sysctl,		"sysctl"	}, /* 6152 */
+	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 6152 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 6153 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 6154 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 6155 */
