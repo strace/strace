@@ -68,16 +68,13 @@
 #ifndef ERESTARTSYS
 # define ERESTARTSYS	512
 #endif
-# ifndef ERESTARTNOINTR
+#ifndef ERESTARTNOINTR
 # define ERESTARTNOINTR	513
 #endif
-# ifndef ERESTARTNOHAND
-# define ERESTARTNOHAND	514	/* restart if no handler.. */
+#ifndef ERESTARTNOHAND
+# define ERESTARTNOHAND	514	/* restart if no handler */
 #endif
-# ifndef ENOIOCTLCMD
-# define ENOIOCTLCMD	515	/* No ioctl command */
-#endif
-# ifndef ERESTART_RESTARTBLOCK
+#ifndef ERESTART_RESTARTBLOCK
 # define ERESTART_RESTARTBLOCK 516	/* restart by calling sys_restart_syscall */
 #endif
 

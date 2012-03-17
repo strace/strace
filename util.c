@@ -1165,9 +1165,6 @@ printcall(struct tcb *tcp)
 #ifndef CLONE_VM
 # define CLONE_VM        0x00000100
 #endif
-#ifndef CLONE_STOPPED
-# define CLONE_STOPPED   0x02000000
-#endif
 
 static int
 change_syscall(struct tcb *tcp, int new)
