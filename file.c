@@ -147,7 +147,6 @@ struct stat_sparc64 {
 # define sys_stat64	sys_stat
 # define sys_fstat64	sys_fstat
 # define sys_lstat64	sys_lstat
-# define sys_lseek64	sys_lseek
 # define sys_truncate64	sys_truncate
 # define sys_ftruncate64	sys_ftruncate
 #endif
@@ -479,8 +478,8 @@ static const struct xlat whence[] = {
 	{ 0,		NULL		},
 };
 
-#ifndef HAVE_LONG_LONG_OFF_T
-#if defined(LINUX_MIPSN32)
+#if !defined(HAVE_LONG_LONG_OFF_T)
+# if defined(LINUX_MIPSN32)
 int
 sys_lseek(struct tcb *tcp)
 {
@@ -500,7 +499,7 @@ sys_lseek(struct tcb *tcp)
 	}
 	return RVAL_UDECIMAL;
 }
-#else /* !LINUX_MIPSN32 */
+# else /* !LINUX_MIPSN32 */
 int
 sys_lseek(struct tcb *tcp)
 {
@@ -520,7 +519,26 @@ sys_lseek(struct tcb *tcp)
 	}
 	return RVAL_UDECIMAL;
 }
-#endif /* LINUX_MIPSN32 */
+# endif
+#else /* HAVE_LONG_LONG_OFF_T */
+/*
+ * ??? Any arch using it? I386 doesn't...
+ */
+int
+sys_lseek(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		int argn;
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		if (tcp->u_arg[3] == SEEK_SET)
+			argn = printllval(tcp, "%llu, ", 1);
+		else
+			argn = printllval(tcp, "%lld, ", 1);
+		printxval(whence, tcp->u_arg[argn], "SEEK_???");
+	}
+	return RVAL_LUDECIMAL;
+}
 #endif
 
 int
@@ -565,24 +583,6 @@ sys_readahead(struct tcb *tcp)
 	}
 	return 0;
 }
-
-#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
-int
-sys_lseek64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		int argn;
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		if (tcp->u_arg[3] == SEEK_SET)
-			argn = printllval(tcp, "%llu, ", 1);
-		else
-			argn = printllval(tcp, "%lld, ", 1);
-		printxval(whence, tcp->u_arg[argn], "SEEK_???");
-	}
-	return RVAL_LUDECIMAL;
-}
-#endif
 
 #ifndef HAVE_LONG_LONG_OFF_T
 int
