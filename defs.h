@@ -325,9 +325,8 @@ struct tcb {
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
-				/* Support for tracing forked processes */
-	long baddr;		/* `Breakpoint' address */
-	long inst[2];		/* Instructions on above */
+				/* Support for tracing forked processes: */
+	long inst[2];		/* Saved clone args (badly named) */
 };
 
 /* TCB flags */
