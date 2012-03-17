@@ -2061,11 +2061,11 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 	printxval(socketlayers, level, "SOL_??");
 	tprints(", ");
 	switch (level) {
-	    case SOL_SOCKET:
+	case SOL_SOCKET:
 		printxval(sockoptions, name, "SO_???");
 		switch (name) {
 #if defined(SO_LINGER)
-		    case SO_LINGER:
+		case SO_LINGER:
 			if (len == sizeof(struct linger)) {
 				struct linger linger;
 				if (umove(tcp, addr, &linger) < 0)
@@ -2080,30 +2080,30 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 		}
 		break;
 #ifdef SOL_IP
-	    case SOL_IP:
+	case SOL_IP:
 		printxval(sockipoptions, name, "IP_???");
 		break;
 #endif
 #ifdef SOL_IPV6
-	    case SOL_IPV6:
+	case SOL_IPV6:
 		printxval(sockipv6options, name, "IPV6_???");
 		break;
 #endif
 #ifdef SOL_IPX
-	    case SOL_IPX:
+	case SOL_IPX:
 		printxval(sockipxoptions, name, "IPX_???");
 		break;
 #endif
 #ifdef SOL_PACKET
-	    case SOL_PACKET:
+	case SOL_PACKET:
 		printxval(sockpacketoptions, name, "PACKET_???");
 		/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
 		switch (name) {
 #ifdef PACKET_RX_RING
-		    case PACKET_RX_RING:
+		case PACKET_RX_RING:
 #endif
 #ifdef PACKET_TX_RING
-		    case PACKET_TX_RING:
+		case PACKET_TX_RING:
 #endif
 #if defined(PACKET_RX_RING) || defined(PACKET_TX_RING)
 			if (len == sizeof(struct tpacket_req)) {
@@ -2123,17 +2123,17 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 		break;
 #endif
 #ifdef SOL_TCP
-	    case SOL_TCP:
+	case SOL_TCP:
 		printxval(socktcpoptions, name, "TCP_???");
 		break;
 #endif
 #ifdef SOL_SCTP
-	   case SOL_SCTP:
+	case SOL_SCTP:
 		printxval(socksctpoptions, name, "SCTP_???");
 		break;
 #endif
 #ifdef SOL_RAW
-	    case SOL_RAW:
+	case SOL_RAW:
 		printxval(sockrawoptions, name, "RAW_???");
 		switch (name) {
 #if defined(ICMP_FILTER)
@@ -2149,7 +2149,7 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 		/* SOL_AX25 SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25
 		 * etc. still need work  */
 
-	    default:
+	default:
 		tprintf("%u", name);
 	}
 

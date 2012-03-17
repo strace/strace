@@ -868,13 +868,13 @@ sys_signal(struct tcb *tcp)
 	}
 	else if (!syserror(tcp)) {
 		switch (tcp->u_rval) {
-		    case (long) SIG_ERR:
+		case (long) SIG_ERR:
 			tcp->auxstr = "SIG_ERR"; break;
-		    case (long) SIG_DFL:
+		case (long) SIG_DFL:
 			tcp->auxstr = "SIG_DFL"; break;
-		    case (long) SIG_IGN:
+		case (long) SIG_IGN:
 			tcp->auxstr = "SIG_IGN"; break;
-		    default:
+		default:
 			tcp->auxstr = NULL;
 		}
 		return RVAL_HEX | RVAL_STR;
