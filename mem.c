@@ -150,7 +150,7 @@ static const struct xlat mmap_flags[] = {
 	{ MAP_LOCKED,	"MAP_LOCKED"	},
 #endif
 	/* FreeBSD ones */
-#ifdef MAP_ANON
+#if defined(MAP_ANON) && (!defined(MAP_ANONYMOUS) || MAP_ANON != MAP_ANONYMOUS)
 	{ MAP_ANON,	"MAP_ANON"	},
 #endif
 #ifdef MAP_HASSEMAPHORE
