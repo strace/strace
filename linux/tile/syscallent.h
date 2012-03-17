@@ -140,7 +140,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall" }, /* 139 */
 	{ 1,	NF,	sys_setfsuid,		"setfsuid" }, /* 140 */
 	{ 1,	NF,	sys_setfsgid,		"setfsgid" }, /* 141 */
-	{ 5,	TD,	sys_llseek,		"_llseek" }, /* 142 */
+	{ 5,	TD,	sys_llseek,		"llseek" }, /* 142 */
 	{ 3,	TD,	sys_getdents,		"getdents" }, /* 143 */
 	{ 2,	TD,	sys_flock,		"flock" }, /* 144 */
 	{ 3,	0,	sys_msync,		"msync" }, /* 145 */
@@ -148,7 +148,7 @@
 	{ 3,	TD,	sys_writev,		"writev" }, /* 147 */
 	{ 1,	0,	sys_getsid,		"getsid" }, /* 148 */
 	{ 1,	TD,	sys_fdatasync,		"fdatasync" }, /* 149 */
-	{ 1,	0,	sys_sysctl,		"_sysctl" }, /* 150 */
+	{ 1,	0,	sys_sysctl,		"sysctl" }, /* 150 */
 	{ 2,	0,	sys_mlock,		"mlock" }, /* 151 */
 	{ 2,	0,	sys_munlock,		"munlock" }, /* 152 */
 	{ 1,	0,	sys_mlockall,		"mlockall" }, /* 153 */

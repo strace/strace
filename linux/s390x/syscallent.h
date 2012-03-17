@@ -167,7 +167,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
 	{ MA,	0,	printargs,		"SYS_138"	}, /* 138 */
 	{ MA,	0,	printargs,		"SYS_139"	}, /* 139 */
-	{ 5,	0,	sys_llseek,		"_llseek"	}, /* 140 */
+	{ 5,	0,	sys_llseek,		"llseek"	}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
 	{ 2,	TD,	sys_flock,		"flock"		}, /* 143 */
@@ -176,7 +176,7 @@
 	{ 3,	TD,	sys_writev,		"writev"	}, /* 146 */
 	{ 1,	0,	sys_getsid,		"getsid"	}, /* 147 */
 	{ 1,	TD,	sys_fdatasync,		"fdatasync"	}, /* 148 */
-	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 149 */
+	{ 1,	0,	sys_sysctl,		"sysctl"	}, /* 149 */
 	{ 2,	0,	sys_mlock,		"mlock"		}, /* 150 */
 	{ 2,	0,	sys_munlock,		"munlock"	}, /* 151 */
 	{ 1,	0,	sys_mlockall,		"mlockall"	}, /* 152 */
