@@ -10,24 +10,24 @@
  *
  * # Should not be confused by traced execve-ing thread
  * # replacing traced leader:
- * [LEADER_EXIT=1] strace -oLOG -f ./threaded_execve
+ * strace -oLOG -f ./threaded_execve
  *
  * # Same, but different output mode. Output after execve
  * # should go into leader's LOG.<pid> file, not into execve'ed
  * # thread's log file:
- * [LEADER_EXIT=1] strace -oLOG -ff ./threaded_execve
+ * strace -oLOG -ff ./threaded_execve
  *
  * # Should not be confused by non-traced execve-ing thread
  * # replacing traced leader:
- * [LEADER_EXIT=1] strace -oLOG ./threaded_execve
- * ^^^^^^^^^^^^^^^^^^^^^
+ * strace -oLOG ./threaded_execve
+ * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  * In Linux 3.2, non-traced execve-ing thread does not
  * become traced after execve, even though it has pid == leader's pid
  * after execve. And yet, strace's waitpid doesn't return ECHILD.
  *
  * # Run for NUM seconds, not just one second.
  * # Watch top to check for memory leaks in strace:
- * [LEADER_EXIT=1] strace -oLOG -f ./threaded_execve <NUM>
+ * strace -oLOG -f ./threaded_execve <NUM>
  *
  */
 #define NUM_THREADS 1
@@ -65,6 +65,7 @@ extern int __clone2(int (*fn) (void *), void *child_stack_base,
 #define syscall_exit(v) syscall(__NR_exit, (v));
 
 static char my_name[PATH_MAX];
+static int leader_final_action;
 
 static int
 thread1(void *unused)
@@ -77,18 +78,20 @@ thread1(void *unused)
 static int
 thread2(void *unused)
 {
+	char buf[64];
+	sprintf(buf, "%d", leader_final_action);
 	write(1, "2", 1);
 	usleep(20*1000);
 	/* This fails with ENOENT if leader has exited by now! :) */
-	execl("/proc/self/exe", "exe", "exe", NULL);
+	execl("/proc/self/exe", "exe", "exe", buf, NULL);
 	/* So fall back to resolved name */
-	execl(my_name, "exe", "exe", NULL);
+	execl(my_name, "exe", "exe", buf, NULL);
 	for(;;) pause();
 	return 0;
 }
 
 static void
-thread_leader(int die)
+thread_leader(void)
 {
 	/* malloc gives sufficiently aligned buffer.
 	 * long buf[] does not! (on ia64).
@@ -111,27 +114,31 @@ thread_leader(int die)
 		| 0        /* no signal to send on death */
 		, NULL);
 
-	if (die) syscall_exit(42);
-	for(;;) pause();
+	/* Various states leader can be while other thread execve's: */
+	switch (leader_final_action % 3) {
+		case 0: syscall_exit(42); /* leader is dead */
+		case 1: for(;;) pause(); /* leader is in syscall */
+		default: for(;;) continue; /* leader is in userspace */
+	}
 }
 
 int
 main(int argc, char **argv)
 {
-	int die = getenv("LEADER_EXIT") != NULL;
-
 	if (readlink("/proc/self/exe", my_name, sizeof(my_name)-1) <= 0)
 		return 1;
 
 	setbuf(stdout, NULL);
 
-	if (argv[1] && strcmp(argv[1], "exe") == 0)
-		thread_leader(die);
+	if (argv[1] && strcmp(argv[1], "exe") == 0) {
+		leader_final_action = atoi(argv[2]) + 1;
+		thread_leader();
+	}
 
 	printf("%d: thread leader\n", getpid());
 
 	alarm(argv[1] ? atoi(argv[1]) : 1);
-	thread_leader(die);
+	thread_leader();
 
         return 0;
 }
