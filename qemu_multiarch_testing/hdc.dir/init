@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Emit a msg to let user know this place was reached
+echo "Copying to /home"
+# Had a case where cp SEGVs, let's have diagnostics for it
+cp -a /mnt /home || { echo "cp: $?"; exit 1; }
+cd /home/mnt || exit $?
+exec ./init2
+echo "Failed to exec ./init2"

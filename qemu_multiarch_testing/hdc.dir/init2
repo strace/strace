@@ -1,0 +1,16 @@
+#!/bin/sh
+
+umount /mnt # optional
+echo "Building"
+(
+	cd strace &&
+	./configure &&
+	make &&
+	echo "Build: SUCCESS" &&
+	./strace
+	# strace may segfault, let's see exit code
+	echo "Exit code: $?"
+) 2>&1 | tee strace_build.log
+mount -o remount,ro /home
+sync
+sleep 1

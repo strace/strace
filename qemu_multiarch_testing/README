@@ -1,0 +1,42 @@
+How to test strace build using Aboriginal Linux's system images.
+
+* Put a autoconf'ed strace source tree into hdc.dir/strace dir.
+For example, this should work:
+git clone git://strace.git.sourceforge.net/gitroot/strace/strace &&
+cd strace && autoreconf -i -f
+
+* Run ./make-hdc-img.sh: it will generate ext2 image file,
+hdc.img, from hdc.dir/* data. This requires root for loop mount.
+
+* Download and unpack, or build from source and unpack
+one or more system-image-ARCH directories into this directory
+(the one which contains this README).
+
+* Run: ./parallel-build-hdc-img.sh system-image-DIR1 system-image-DIR2...
+(background it if you don't want to see "Waiting to finish" thing).
+This runs a strace build in several qemu virtual machines in parallel.
+
+* Observe system-image-*.log file(s) with growing log of strace build.
+
+There is no automated detection of errors for now: you need to examine
+logs yourself.
+
+For me, the following system images worked:
+system-image-armv4l
+system-image-armv4tl
+system-image-armv5l
+system-image-armv6l
+system-image-i686 (had to s/qemu-system-i386/qemu/ in run-emulator.sh)
+system-image-mipsel
+system-image-mips
+system-image-x86_64
+
+And these did not:
+system-image-armv4eb - VFS: Cannot open root device "sda" or unknown-block(0,0)
+system-image-m68k    - run-emulator.sh has no call of qemu-system-* (not supported yet??)
+system-image-mips64  -
+	need to run ./native-build.sh ../hdc.img by hand;
+	copying in /mnt/init fails (segv?)
+system-image-powerpc - qemu-system-ppc: command not found
+system-image-sh4     - hdc does not mount (no support for 2 disks)
+system-image-sparc   - qemu-system-sparc: command not found
