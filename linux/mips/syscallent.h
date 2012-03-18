@@ -5370,7 +5370,7 @@
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 5014 */
 	{ 3,	0,	sys_ioctl,		"ioctl"		}, /* 5015 */
 	{ 6,	TF,	sys_pread,		"pread"		}, /* 5016 */
-	{ 6,	TF,	sys_pwrite64,		"pwrite"	}, /* 5017 */
+	{ 6,	TF,	sys_pwrite,		"pwrite"	}, /* 5017 */
 	{ 3,	0,	sys_readv,		"readv"		}, /* 5018 */
 	{ 3,	0,	sys_writev,		"writev"	}, /* 5019 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 5020 */
