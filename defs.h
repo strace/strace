@@ -516,9 +516,6 @@ extern int is_restart_error(struct tcb *);
 extern int pathtrace_select(const char *);
 extern int pathtrace_match(struct tcb *);
 
-extern int internal_fork(struct tcb *);
-extern int internal_exec(struct tcb *);
-
 extern const struct ioctlent *ioctl_lookup(long);
 extern const struct ioctlent *ioctl_next_match(const struct ioctlent *);
 extern int ioctl_decode(struct tcb *, long, long);

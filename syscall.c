@@ -1169,7 +1169,58 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	return 1;
 }
 
-static int
+static void
+internal_fork(struct tcb *tcp)
+{
+#if defined S390 || defined S390X || defined CRISV10 || defined CRISV32
+# define ARG_FLAGS	1
+#else
+# define ARG_FLAGS	0
+#endif
+#ifndef CLONE_UNTRACED
+# define CLONE_UNTRACED	0x00800000
+#endif
+	if ((ptrace_setoptions
+	    & (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
+	   == (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
+		return;
+
+	if (!followfork)
+		return;
+
+	if (entering(tcp)) {
+		/*
+		 * We won't see the new child if clone is called with
+		 * CLONE_UNTRACED, so we keep the same logic with that option
+		 * and don't trace it.
+		 */
+		if ((sysent[tcp->scno].sys_func == sys_clone) &&
+		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
+			return;
+		setbpt(tcp);
+	} else {
+		if (tcp->flags & TCB_BPTSET)
+			clearbpt(tcp);
+	}
+}
+
+#if defined(TCB_WAITEXECVE)
+static void
+internal_exec(struct tcb *tcp)
+{
+	/* Maybe we have post-execve SIGTRAP suppressed? */
+	if (ptrace_setoptions & PTRACE_O_TRACEEXEC)
+		return; /* yes, no need to do anything */
+
+	if (exiting(tcp) && syserror(tcp))
+		/* Error in execve, no post-execve SIGTRAP expected */
+		tcp->flags &= ~TCB_WAITEXECVE;
+	else
+		tcp->flags |= TCB_WAITEXECVE;
+}
+#endif
+
+static void
 internal_syscall(struct tcb *tcp)
 {
 	/*
@@ -1180,26 +1231,28 @@ internal_syscall(struct tcb *tcp)
 	int (*func)();
 
 	if (!SCNO_IN_RANGE(tcp->scno))
-		return 0;
+		return;
 
 	func = sysent[tcp->scno].sys_func;
 
 	if (   sys_fork == func
 	    || sys_vfork == func
 	    || sys_clone == func
-	   )
-		return internal_fork(tcp);
+	   ) {
+		internal_fork(tcp);
+		return;
+	}
 
 #if defined(TCB_WAITEXECVE)
 	if (   sys_execve == func
 # if defined(SPARC) || defined(SPARC64)
 	    || sys_execv == func
 # endif
-	   )
-		return internal_exec(tcp);
+	   ) {
+		internal_exec(tcp);
+		return;
+	}
 #endif
-
-	return 0;
 }
 
 static int

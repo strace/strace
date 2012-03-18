@@ -531,34 +531,6 @@ sys_unshare(struct tcb *tcp)
 }
 
 int
-internal_fork(struct tcb *tcp)
-{
-	if ((ptrace_setoptions
-	    & (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
-	   == (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
-		return 0;
-
-	if (!followfork)
-		return 0;
-
-	if (entering(tcp)) {
-		/*
-		 * We won't see the new child if clone is called with
-		 * CLONE_UNTRACED, so we keep the same logic with that option
-		 * and don't trace it.
-		 */
-		if ((sysent[tcp->scno].sys_func == sys_clone) &&
-		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
-			return 0;
-		setbpt(tcp);
-	} else {
-		if (tcp->flags & TCB_BPTSET)
-			clearbpt(tcp);
-	}
-	return 0;
-}
-
-int
 sys_fork(struct tcb *tcp)
 {
 	if (exiting(tcp))
@@ -960,21 +932,6 @@ sys_execve(struct tcb *tcp)
 	}
 	return 0;
 }
-
-#if defined(TCB_WAITEXECVE)
-int
-internal_exec(struct tcb *tcp)
-{
-	if (exiting(tcp) && syserror(tcp))
-		tcp->flags &= ~TCB_WAITEXECVE;
-	else {
-		/* Maybe we have post-execve SIGTRAP suppressed? */
-		if (!(ptrace_setoptions & PTRACE_O_TRACEEXEC))
-			tcp->flags |= TCB_WAITEXECVE; /* no */
-	}
-	return 0;
-}
-#endif
 
 #ifndef __WNOTHREAD
 #define __WNOTHREAD	0x20000000
