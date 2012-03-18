@@ -2033,20 +2033,6 @@ trace_syscall_exiting(struct tcb *tcp)
 			case RVAL_DECIMAL:
 				tprintf("= %ld", tcp->u_rval);
 				break;
-#ifdef HAVE_LONG_LONG
-			case RVAL_LHEX:
-				tprintf("= %#llx", tcp->u_lrval);
-				break;
-			case RVAL_LOCTAL:
-				tprintf("= %#llo", tcp->u_lrval);
-				break;
-			case RVAL_LUDECIMAL:
-				tprintf("= %llu", tcp->u_lrval);
-				break;
-			case RVAL_LDECIMAL:
-				tprintf("= %lld", tcp->u_lrval);
-				break;
-#endif
 			default:
 				fprintf(stderr,
 					"invalid rval format\n");
