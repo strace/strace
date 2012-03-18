@@ -520,25 +520,6 @@ sys_lseek(struct tcb *tcp)
 	return RVAL_UDECIMAL;
 }
 # endif
-#else /* HAVE_LONG_LONG_OFF_T */
-/*
- * ??? Any arch using it? I386 doesn't...
- */
-int
-sys_lseek(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		int argn;
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		if (tcp->u_arg[3] == SEEK_SET)
-			argn = printllval(tcp, "%llu, ", 1);
-		else
-			argn = printllval(tcp, "%lld, ", 1);
-		printxval(whence, tcp->u_arg[argn], "SEEK_???");
-	}
-	return RVAL_LUDECIMAL;
-}
 #endif
 
 int
