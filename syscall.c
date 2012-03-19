@@ -183,29 +183,25 @@ enum { nioctlents2 = ARRAY_SIZE(ioctlent2) };
 int qual_flags2[MAX_QUALS];
 #endif
 
-const struct sysent *sysent;
-const char *const *errnoent;
-const char *const *signalent;
-const struct ioctlent *ioctlent;
-unsigned nsyscalls;
-unsigned nerrnos;
-unsigned nsignals;
-unsigned nioctlents;
-int *qual_flags;
+const struct sysent *sysent = sysent0;
+const char *const *errnoent = errnoent0;
+const char *const *signalent = signalent0;
+const struct ioctlent *ioctlent = ioctlent0;
+unsigned nsyscalls = nsyscalls0;
+unsigned nerrnos = nerrnos0;
+unsigned nsignals = nsignals0;
+unsigned nioctlents = nioctlents0;
+int *qual_flags = qual_flags0;
 
+#if SUPPORTED_PERSONALITIES > 1
 int current_personality;
 
-#ifndef PERSONALITY0_WORDSIZE
-# define PERSONALITY0_WORDSIZE sizeof(long)
-#endif
 const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 	PERSONALITY0_WORDSIZE,
-#if SUPPORTED_PERSONALITIES > 1
 	PERSONALITY1_WORDSIZE,
-#endif
-#if SUPPORTED_PERSONALITIES > 2
+# if SUPPORTED_PERSONALITIES > 2
 	PERSONALITY2_WORDSIZE,
-#endif
+# endif
 };
 
 void
@@ -224,7 +220,6 @@ set_personality(int personality)
 		qual_flags = qual_flags0;
 		break;
 
-#if SUPPORTED_PERSONALITIES >= 2
 	case 1:
 		errnoent = errnoent1;
 		nerrnos = nerrnos1;
@@ -236,9 +231,8 @@ set_personality(int personality)
 		nsignals = nsignals1;
 		qual_flags = qual_flags1;
 		break;
-#endif
 
-#if SUPPORTED_PERSONALITIES >= 3
+# if SUPPORTED_PERSONALITIES >= 3
 	case 2:
 		errnoent = errnoent2;
 		nerrnos = nerrnos2;
@@ -250,13 +244,12 @@ set_personality(int personality)
 		nsignals = nsignals2;
 		qual_flags = qual_flags2;
 		break;
-#endif
+# endif
 	}
 
 	current_personality = personality;
 }
 
-#if SUPPORTED_PERSONALITIES > 1
 static void
 update_personality(struct tcb *tcp, int personality)
 {
@@ -521,7 +514,7 @@ decode_socket_subcall(struct tcb *tcp)
 	tcp->scno = SYS_socket_subcall + tcp->u_arg[0];
 	addr = tcp->u_arg[1];
 	tcp->u_nargs = sysent[tcp->scno].nargs;
-	size = personality_wordsize[current_personality];
+	size = current_wordsize;
 	for (i = 0; i < tcp->u_nargs; ++i) {
 		if (size == sizeof(int)) {
 			unsigned int arg;
@@ -685,8 +678,7 @@ static long r3;
  * other: error, trace_syscall() should print error indicator
  *    ("????" etc) and bail out.
  */
-static
-int
+static int
 get_scno(struct tcb *tcp)
 {
 	long scno = 0;
@@ -1682,7 +1674,7 @@ is_negated_errno(unsigned long int val)
 {
 	unsigned long int max = -(long int) nerrnos;
 #if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] < sizeof(val)) {
+	if (current_wordsize < sizeof(val)) {
 		val = (unsigned int) val;
 		max = (unsigned int) max;
 	}

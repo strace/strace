@@ -230,8 +230,8 @@ printflock(struct tcb *tcp, long addr, int getlk)
 	struct flock fl;
 
 #if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] != sizeof(fl.l_start)) {
-		if (personality_wordsize[current_personality] == 4) {
+	if (current_wordsize != sizeof(fl.l_start)) {
+		if (current_wordsize == 4) {
 			/* 32-bit x86 app on x86_64 and similar cases */
 			struct {
 				short int l_type;
@@ -252,7 +252,7 @@ printflock(struct tcb *tcp, long addr, int getlk)
 		} else {
 			/* let people know we have a problem here */
 			tprintf("{ <decode error: unsupported wordsize %d> }",
-				personality_wordsize[current_personality]);
+				current_wordsize);
 			return;
 		}
 	} else

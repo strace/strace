@@ -1226,7 +1226,7 @@ sys_kill(struct tcb *tcp)
 		long pid = tcp->u_arg[0];
 #if SUPPORTED_PERSONALITIES > 1
 		/* Sign-extend a 32-bit value when that's what it is. */
-		if (personality_wordsize[current_personality] < sizeof pid)
+		if (current_wordsize < sizeof pid)
 			pid = (long) (int) pid;
 #endif
 		tprintf("%ld, %s", pid, signame(tcp->u_arg[1]));
@@ -1335,8 +1335,7 @@ sys_rt_sigaction(struct tcb *tcp)
 	}
 #if SUPPORTED_PERSONALITIES > 1
 #if SIZEOF_LONG > 4
-	if (personality_wordsize[current_personality] != sizeof(sa.sa_flags)
-	    && personality_wordsize[current_personality] == 4) {
+	if (current_wordsize != sizeof(sa.sa_flags) && current_wordsize == 4) {
 		struct new_sigaction32 sa32;
 		r = umove(tcp, addr, &sa32);
 		if (r >= 0) {

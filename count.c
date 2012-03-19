@@ -220,7 +220,7 @@ call_summary(FILE *outf)
 		if (i)
 			fprintf(outf,
 				"System call usage summary for %u bit mode:\n",
-				personality_wordsize[current_personality] * 8);
+				current_wordsize * 8);
 		call_summary_pers(outf);
 	}
 

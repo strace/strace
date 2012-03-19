@@ -858,7 +858,7 @@ printargv(struct tcb *tcp, long addr)
 	} cp;
 	const char *sep;
 	int n = 0;
-	unsigned wordsize = personality_wordsize[current_personality];
+	unsigned wordsize = current_wordsize;
 
 	cp.p64 = 1;
 	for (sep = ""; !abbrev(tcp) || n < max_strlen / 2; sep = ", ", ++n) {

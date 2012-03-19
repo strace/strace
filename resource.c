@@ -180,7 +180,7 @@ decode_rlimit(struct tcb *tcp, unsigned long addr)
 # if SIZEOF_RLIM_T == 4
 		print_rlimit32(tcp, addr);
 # else
-		if (personality_wordsize[current_personality] == 4)
+		if (current_wordsize == 4)
 			print_rlimit32(tcp, addr);
 		else
 			print_rlimit64(tcp, addr);

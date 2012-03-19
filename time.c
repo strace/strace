@@ -79,7 +79,7 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 
 	if (bitness == BITNESS_32
 #if SUPPORTED_PERSONALITIES > 1
-	    || personality_wordsize[current_personality] == 4
+	    || current_wordsize == 4
 #endif
 		)
 	{
@@ -135,7 +135,7 @@ sprint_timespec(char *buf, struct tcb *tcp, long addr)
 		int rc;
 
 #if SUPPORTED_PERSONALITIES > 1
-		if (personality_wordsize[current_personality] == 4) {
+		if (current_wordsize == 4) {
 			struct timeval32 tv;
 
 			rc = umove(tcp, addr, &tv);
@@ -288,7 +288,7 @@ printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 
 		if (bitness == BITNESS_32
 #if SUPPORTED_PERSONALITIES > 1
-		    || personality_wordsize[current_personality] == 4
+		    || current_wordsize == 4
 #endif
 			)
 		{
@@ -542,7 +542,7 @@ tprint_timex(struct tcb *tcp, long addr)
 	struct timex tx;
 
 #if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] == 4)
+	if (current_wordsize == 4)
 		return tprint_timex32(tcp, addr);
 #endif
 	if (umove(tcp, addr, &tx) < 0)
@@ -746,7 +746,7 @@ printsigevent(struct tcb *tcp, long arg)
 	struct sigevent sev;
 
 #if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] == 4) {
+	if (current_wordsize == 4) {
 		printsigevent32(tcp, arg);
 		return;
 	}

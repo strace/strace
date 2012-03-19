@@ -228,6 +228,10 @@ extern long ptrace(int, int, char *, long);
 # define PERSONALITY1_WORDSIZE 4
 #endif
 
+#ifndef PERSONALITY0_WORDSIZE
+# define PERSONALITY0_WORDSIZE sizeof(long)
+#endif
+
 #if !HAVE_DECL_PTRACE_SETOPTIONS
 # define PTRACE_SETOPTIONS	0x4200
 #endif
@@ -450,7 +454,6 @@ void error_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(pr
 void perror_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
 void die_out_of_memory(void) __attribute__ ((noreturn));
 
-extern void set_personality(int personality);
 extern const char *xlookup(const struct xlat *, int);
 
 extern void set_sortby(const char *);
@@ -570,8 +573,16 @@ extern void tprints(const char *str);
 #define printtv_special(tcp, addr)	\
 	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 
+#if SUPPORTED_PERSONALITIES > 1
+extern void set_personality(int personality);
 extern int current_personality;
 extern const int personality_wordsize[];
+# define current_wordsize (personality_wordsize[current_personality])
+#else
+# define set_personality(personality) ((void)0)
+# define current_personality 0
+# define current_wordsize    PERSONALITY0_WORDSIZE
+#endif
 
 struct sysent {
 	unsigned nargs;

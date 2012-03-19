@@ -631,14 +631,11 @@ dumpiov(struct tcb *tcp, int len, long addr)
 	} iovu;
 #define iov iovu.iov64
 #define sizeof_iov \
-  (personality_wordsize[current_personality] == 4 \
-   ? sizeof(*iovu.iov32) : sizeof(*iovu.iov64))
+	(current_wordsize == 4 ? sizeof(*iovu.iov32) : sizeof(*iovu.iov64))
 #define iov_iov_base(i) \
-  (personality_wordsize[current_personality] == 4 \
-   ? (u_int64_t) iovu.iov32[i].base : iovu.iov64[i].base)
+	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].base : iovu.iov64[i].base)
 #define iov_iov_len(i) \
-  (personality_wordsize[current_personality] == 4 \
-   ? (u_int64_t) iovu.iov32[i].len : iovu.iov64[i].len)
+	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].len : iovu.iov64[i].len)
 #else
 	struct iovec *iov;
 #define sizeof_iov sizeof(*iov)
@@ -783,8 +780,8 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 	} u;
 
 #if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] < sizeof(addr))
-		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
+	if (current_wordsize < sizeof(addr))
+		addr &= (1ul << 8 * current_wordsize) - 1;
 #endif
 
 	if (!process_vm_readv_not_supported) {
@@ -874,8 +871,8 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 	} u;
 
 #if SUPPORTED_PERSONALITIES > 1
-	if (personality_wordsize[current_personality] < sizeof(addr))
-		addr &= (1ul << 8 * personality_wordsize[current_personality]) - 1;
+	if (current_wordsize < sizeof(addr))
+		addr &= (1ul << 8 * current_wordsize) - 1;
 #endif
 
 	if (!process_vm_readv_not_supported) {

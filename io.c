@@ -72,14 +72,11 @@ tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_io
 		struct { u_int64_t base; u_int64_t len; } iov64;
 	} iov;
 #define sizeof_iov \
-  (personality_wordsize[current_personality] == 4 \
-   ? sizeof(iov.iov32) : sizeof(iov.iov64))
+	(current_wordsize == 4 ? sizeof(iov.iov32) : sizeof(iov.iov64))
 #define iov_iov_base \
-  (personality_wordsize[current_personality] == 4 \
-   ? (u_int64_t) iov.iov32.base : iov.iov64.base)
+	(current_wordsize == 4 ? (uint64_t) iov.iov32.base : iov.iov64.base)
 #define iov_iov_len \
-  (personality_wordsize[current_personality] == 4 \
-   ? (u_int64_t) iov.iov32.len : iov.iov64.len)
+	(current_wordsize == 4 ? (uint64_t) iov.iov32.len : iov.iov64.len)
 #else
 	struct iovec iov;
 #define sizeof_iov sizeof(iov)

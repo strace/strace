@@ -2059,7 +2059,7 @@ sys_utime(struct tcb *tcp)
 		long utl[2];
 		int uti[2];
 	} u;
-	unsigned wordsize = personality_wordsize[current_personality];
+	unsigned wordsize = current_wordsize;
 
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
