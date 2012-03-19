@@ -248,8 +248,8 @@
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ 3,	0,	sys_fcntl,		"fcntl64"	}, /* 221 */
-	{ 4,	0,	printargs,		"SYS_222"	}, /* 222 */
-	{ 4,	0,	printargs,		"SYS_223"	}, /* 223 */
+	{ 4,	0,	NULL,			NULL		}, /* 222 */
+	{ 4,	0,	NULL,			NULL		}, /* 223 */
 	{ 0,	0,	sys_gettid,		"gettid"	}, /* 224 */
 	{ 4,	0,	sys_readahead,		"readahead"	}, /* 225 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 226 */
@@ -277,7 +277,7 @@
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 248 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 249 */
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 250 */
-	{ 0,	0,	printargs,		"SYS_251"	}, /* 251 */
+	{ 0,	0,	NULL,			NULL		}, /* 251 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 252 */
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 253 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 254 */
@@ -311,7 +311,7 @@
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 282 */
 	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 283 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 284 */
-	{ 5,	0,	printargs,		"SYS_285"	}, /* 285 */
+	{ 5,	0,	NULL,			NULL		}, /* 285 */
 	{ 5,	0,	sys_add_key,		"add_key"	}, /* 286 */
 	{ 4,	0,	sys_request_key,	"request_key"	}, /* 287 */
 	{ 5,	0,	sys_keyctl,		"keyctl"	}, /* 288 */

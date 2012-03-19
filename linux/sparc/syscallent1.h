@@ -89,21 +89,21 @@
 	{ 6,	TF,	solaris_chroot,		"chroot"	}, /* 61 */
 	{ 6,	0,	solaris_fcntl,		"fcntl"		}, /* 62 */
 	{ 6,	0,	solaris_ulimit,		"ulimit"	}, /* 63 */
-	{ 6,	0,	printargs,		"SYS_64"	}, /* 64 */
-	{ 6,	0,	printargs,		"SYS_65"	}, /* 65 */
-	{ 6,	0,	printargs,		"SYS_66"	}, /* 66 */
-	{ 6,	0,	printargs,		"SYS_67"	}, /* 67 */
-	{ 6,	0,	printargs,		"SYS_68"	}, /* 68 */
-	{ 6,	0,	printargs,		"SYS_69"	}, /* 69 */
-	{ 6,	0,	printargs,		"SYS_70"	}, /* 70 */
-	{ 6,	0,	printargs,		"SYS_71"	}, /* 71 */
-	{ 6,	0,	printargs,		"SYS_72"	}, /* 72 */
-	{ 6,	0,	printargs,		"SYS_73"	}, /* 73 */
-	{ 6,	0,	printargs,		"SYS_74"	}, /* 74 */
-	{ 6,	0,	printargs,		"SYS_75"	}, /* 75 */
-	{ 6,	0,	printargs,		"SYS_76"	}, /* 76 */
-	{ 6,	0,	printargs,		"SYS_77"	}, /* 77 */
-	{ 6,	0,	printargs,		"SYS_78"	}, /* 78 */
+	{ 6,	0,	NULL,			NULL		}, /* 64 */
+	{ 6,	0,	NULL,			NULL		}, /* 65 */
+	{ 6,	0,	NULL,			NULL		}, /* 66 */
+	{ 6,	0,	NULL,			NULL		}, /* 67 */
+	{ 6,	0,	NULL,			NULL		}, /* 68 */
+	{ 6,	0,	NULL,			NULL		}, /* 69 */
+	{ 6,	0,	NULL,			NULL		}, /* 70 */
+	{ 6,	0,	NULL,			NULL		}, /* 71 */
+	{ 6,	0,	NULL,			NULL		}, /* 72 */
+	{ 6,	0,	NULL,			NULL		}, /* 73 */
+	{ 6,	0,	NULL,			NULL		}, /* 74 */
+	{ 6,	0,	NULL,			NULL		}, /* 75 */
+	{ 6,	0,	NULL,			NULL		}, /* 76 */
+	{ 6,	0,	NULL,			NULL		}, /* 77 */
+	{ 6,	0,	NULL,			NULL		}, /* 78 */
 	{ 6,	TF,	solaris_rmdir,		"rmdir"		}, /* 79 */
 	{ 6,	TF,	solaris_mkdir,		"mkdir"		}, /* 80 */
 	{ 6,	0,	solaris_getdents,	"getdents"	}, /* 81 */
@@ -130,7 +130,7 @@
 	{ 6,	0,	solaris_evtrapret,	"evtrapret"	}, /* 102 */
 	{ 6,	TF,	solaris_statvfs,	"statvfs"	}, /* 103 */
 	{ 6,	0,	solaris_fstatvfs,	"fstatvfs"	}, /* 104 */
-	{ 6,	0,	printargs,		"SYS_105"	}, /* 105 */
+	{ 6,	0,	NULL,			NULL		}, /* 105 */
 	{ 6,	0,	solaris_nfssys,		"nfssys"	}, /* 106 */
 	{ 6,	TP,	solaris_waitid,		"waitid"	}, /* 107 */
 	{ 6,	0,	solaris_sigsendsys,	"sigsendsys"	}, /* 108 */
@@ -165,7 +165,7 @@
 	{ 6,	0,	solaris_sysconfig,	"sysconfig"	}, /* 137 */
 	{ 6,	0,	solaris_adjtime,	"adjtime"	}, /* 138 */
 	{ 6,	0,	solaris_sysinfo,	"sysinfo"	}, /* 139 */
-	{ 6,	0,	printargs,		"SYS_140"	}, /* 140 */
+	{ 6,	0,	NULL,			NULL		}, /* 140 */
 	{ 6,	0,	solaris_seteuid,	"seteuid"	}, /* 141 */
 	{ 6,	0,	solaris_vtrace,		"vtrace"	}, /* 142 */
 	{ 6,	TP,	solaris_fork1,		"fork1"		}, /* 143 */
@@ -174,9 +174,9 @@
 	{ 6,	0,	solaris_yield,		"yield"		}, /* 146 */
 	{ 6,	0,	solaris_lwp_sema_wait,	"lwp_sema_wait"	}, /* 147 */
 	{ 6,	0,	solaris_lwp_sema_post,	"lwp_sema_post"	}, /* 148 */
-	{ 6,	0,	printargs,		"SYS_149"	}, /* 149 */
-	{ 6,	0,	printargs,		"SYS_150"	}, /* 150 */
-	{ 6,	0,	printargs,		"SYS_151"	}, /* 151 */
+	{ 6,	0,	NULL,			NULL		}, /* 149 */
+	{ 6,	0,	NULL,			NULL		}, /* 150 */
+	{ 6,	0,	NULL,			NULL		}, /* 151 */
 	{ 6,	0,	solaris_modctl,		"modctl"	}, /* 152 */
 	{ 6,	0,	solaris_fchroot,	"fchroot"	}, /* 153 */
 	{ 6,	TF,	solaris_utimes,		"utimes"	}, /* 154 */
@@ -202,15 +202,15 @@
 	{ 6,	0,	solaris_pwrite,		"pwrite"	}, /* 174 */
 	{ 6,	0,	solaris_llseek,		"llseek"	}, /* 175 */
 	{ 6,	0,	solaris_inst_sync,	"inst_sync"	}, /* 176 */
-	{ 6,	0,	printargs,		"SYS_177"	}, /* 177 */
-	{ 6,	0,	printargs,		"SYS_178"	}, /* 178 */
-	{ 6,	0,	printargs,		"SYS_179"	}, /* 179 */
-	{ 6,	0,	printargs,		"SYS_180"	}, /* 180 */
-	{ 6,	0,	printargs,		"SYS_181"	}, /* 181 */
-	{ 6,	0,	printargs,		"SYS_182"	}, /* 182 */
-	{ 6,	0,	printargs,		"SYS_183"	}, /* 183 */
-	{ 6,	0,	printargs,		"SYS_184"	}, /* 184 */
-	{ 6,	0,	printargs,		"SYS_185"	}, /* 185 */
+	{ 6,	0,	NULL,			NULL		}, /* 177 */
+	{ 6,	0,	NULL,			NULL		}, /* 178 */
+	{ 6,	0,	NULL,			NULL		}, /* 179 */
+	{ 6,	0,	NULL,			NULL		}, /* 180 */
+	{ 6,	0,	NULL,			NULL		}, /* 181 */
+	{ 6,	0,	NULL,			NULL		}, /* 182 */
+	{ 6,	0,	NULL,			NULL		}, /* 183 */
+	{ 6,	0,	NULL,			NULL		}, /* 184 */
+	{ 6,	0,	NULL,			NULL		}, /* 185 */
 	{ 6,	0,	solaris_auditsys,	"auditsys"	}, /* 186 */
 	{ 6,	0,	solaris_processor_bind,	"processor_bind"}, /* 187 */
 	{ 6,	0,	solaris_processor_info,	"processor_info"}, /* 188 */
@@ -225,106 +225,106 @@
 	{ 6,	0,	solaris_timer_gettime,	"timer_gettime"	}, /* 197 */
 	{ 6,	0,	solaris_timer_getoverrun,"timer_getoverrun"}, /* 198 */
 	{ 6,	0,	solaris_nanosleep,	"nanosleep"	}, /* 199 */
-	{ 6,	0,	printargs,		"SYS_200"	}, /* 200 */
-	{ 6,	0,	printargs,		"SYS_201"	}, /* 201 */
-	{ 6,	0,	printargs,		"SYS_202"	}, /* 202 */
-	{ 6,	0,	printargs,		"SYS_203"	}, /* 203 */
-	{ 6,	0,	printargs,		"SYS_204"	}, /* 204 */
-	{ 6,	0,	printargs,		"SYS_205"	}, /* 205 */
-	{ 6,	0,	printargs,		"SYS_206"	}, /* 206 */
-	{ 6,	0,	printargs,		"SYS_207"	}, /* 207 */
-	{ 6,	0,	printargs,		"SYS_208"	}, /* 208 */
-	{ 6,	0,	printargs,		"SYS_209"	}, /* 209 */
-	{ 6,	0,	printargs,		"SYS_210"	}, /* 210 */
-	{ 6,	0,	printargs,		"SYS_211"	}, /* 211 */
-	{ 6,	0,	printargs,		"SYS_212"	}, /* 212 */
-	{ 6,	0,	printargs,		"SYS_213"	}, /* 213 */
-	{ 6,	0,	printargs,		"SYS_214"	}, /* 214 */
-	{ 6,	0,	printargs,		"SYS_215"	}, /* 215 */
-	{ 6,	0,	printargs,		"SYS_216"	}, /* 216 */
-	{ 6,	0,	printargs,		"SYS_217"	}, /* 217 */
-	{ 6,	0,	printargs,		"SYS_218"	}, /* 218 */
-	{ 6,	0,	printargs,		"SYS_219"	}, /* 219 */
-	{ 6,	0,	printargs,		"SYS_220"	}, /* 220 */
-	{ 6,	0,	printargs,		"SYS_221"	}, /* 221 */
-	{ 6,	0,	printargs,		"SYS_222"	}, /* 222 */
-	{ 6,	0,	printargs,		"SYS_223"	}, /* 223 */
-	{ 6,	0,	printargs,		"SYS_224"	}, /* 224 */
-	{ 6,	0,	printargs,		"SYS_225"	}, /* 225 */
-	{ 6,	0,	printargs,		"SYS_226"	}, /* 226 */
-	{ 6,	0,	printargs,		"SYS_227"	}, /* 227 */
-	{ 6,	0,	printargs,		"SYS_228"	}, /* 228 */
-	{ 6,	0,	printargs,		"SYS_229"	}, /* 229 */
-	{ 6,	0,	printargs,		"SYS_230"	}, /* 230 */
-	{ 6,	0,	printargs,		"SYS_231"	}, /* 231 */
-	{ 6,	0,	printargs,		"SYS_232"	}, /* 232 */
-	{ 6,	0,	printargs,		"SYS_233"	}, /* 233 */
-	{ 6,	0,	printargs,		"SYS_234"	}, /* 234 */
-	{ 6,	0,	printargs,		"SYS_235"	}, /* 235 */
-	{ 6,	0,	printargs,		"SYS_236"	}, /* 236 */
-	{ 6,	0,	printargs,		"SYS_237"	}, /* 237 */
-	{ 6,	0,	printargs,		"SYS_238"	}, /* 238 */
-	{ 6,	0,	printargs,		"SYS_239"	}, /* 239 */
-	{ 6,	0,	printargs,		"SYS_240"	}, /* 240 */
-	{ 6,	0,	printargs,		"SYS_241"	}, /* 241 */
-	{ 6,	0,	printargs,		"SYS_242"	}, /* 242 */
-	{ 6,	0,	printargs,		"SYS_243"	}, /* 243 */
-	{ 6,	0,	printargs,		"SYS_244"	}, /* 244 */
-	{ 6,	0,	printargs,		"SYS_245"	}, /* 245 */
-	{ 6,	0,	printargs,		"SYS_246"	}, /* 246 */
-	{ 6,	0,	printargs,		"SYS_247"	}, /* 247 */
-	{ 6,	0,	printargs,		"SYS_248"	}, /* 248 */
-	{ 6,	0,	printargs,		"SYS_249"	}, /* 249 */
-	{ 6,	0,	printargs,		"SYS_250"	}, /* 250 */
-	{ 6,	0,	printargs,		"SYS_251"	}, /* 251 */
-	{ 6,	0,	printargs,		"SYS_252"	}, /* 252 */
-	{ 6,	0,	printargs,		"SYS_253"	}, /* 253 */
-	{ 6,	0,	printargs,		"SYS_254"	}, /* 254 */
-	{ 6,	0,	printargs,		"SYS_255"	}, /* 255 */
-	{ 6,	0,	printargs,		"SYS_256"	}, /* 256 */
-	{ 6,	0,	printargs,		"SYS_257"	}, /* 257 */
-	{ 6,	0,	printargs,		"SYS_258"	}, /* 258 */
-	{ 6,	0,	printargs,		"SYS_259"	}, /* 259 */
-	{ 6,	0,	printargs,		"SYS_260"	}, /* 260 */
-	{ 6,	0,	printargs,		"SYS_261"	}, /* 261 */
-	{ 6,	0,	printargs,		"SYS_262"	}, /* 262 */
-	{ 6,	0,	printargs,		"SYS_263"	}, /* 263 */
-	{ 6,	0,	printargs,		"SYS_264"	}, /* 264 */
-	{ 6,	0,	printargs,		"SYS_265"	}, /* 265 */
-	{ 6,	0,	printargs,		"SYS_266"	}, /* 266 */
-	{ 6,	0,	printargs,		"SYS_267"	}, /* 267 */
-	{ 6,	0,	printargs,		"SYS_268"	}, /* 268 */
-	{ 6,	0,	printargs,		"SYS_269"	}, /* 269 */
-	{ 6,	0,	printargs,		"SYS_270"	}, /* 270 */
-	{ 6,	0,	printargs,		"SYS_271"	}, /* 271 */
-	{ 6,	0,	printargs,		"SYS_272"	}, /* 272 */
-	{ 6,	0,	printargs,		"SYS_273"	}, /* 273 */
-	{ 6,	0,	printargs,		"SYS_274"	}, /* 274 */
-	{ 6,	0,	printargs,		"SYS_275"	}, /* 275 */
-	{ 6,	0,	printargs,		"SYS_276"	}, /* 276 */
-	{ 6,	0,	printargs,		"SYS_277"	}, /* 277 */
-	{ 6,	0,	printargs,		"SYS_278"	}, /* 278 */
-	{ 6,	0,	printargs,		"SYS_279"	}, /* 279 */
-	{ 6,	0,	printargs,		"SYS_280"	}, /* 280 */
-	{ 6,	0,	printargs,		"SYS_281"	}, /* 281 */
-	{ 6,	0,	printargs,		"SYS_282"	}, /* 282 */
-	{ 6,	0,	printargs,		"SYS_283"	}, /* 283 */
-	{ 6,	0,	printargs,		"SYS_284"	}, /* 284 */
-	{ 6,	0,	printargs,		"SYS_285"	}, /* 285 */
-	{ 6,	0,	printargs,		"SYS_286"	}, /* 286 */
-	{ 6,	0,	printargs,		"SYS_287"	}, /* 287 */
-	{ 6,	0,	printargs,		"SYS_288"	}, /* 288 */
-	{ 6,	0,	printargs,		"SYS_289"	}, /* 289 */
-	{ 6,	0,	printargs,		"SYS_290"	}, /* 290 */
-	{ 6,	0,	printargs,		"SYS_291"	}, /* 291 */
-	{ 6,	0,	printargs,		"SYS_292"	}, /* 292 */
-	{ 6,	0,	printargs,		"SYS_293"	}, /* 293 */
-	{ 6,	0,	printargs,		"SYS_294"	}, /* 294 */
-	{ 6,	0,	printargs,		"SYS_295"	}, /* 295 */
-	{ 6,	0,	printargs,		"SYS_296"	}, /* 296 */
-	{ 6,	0,	printargs,		"SYS_297"	}, /* 297 */
-	{ 6,	0,	printargs,		"SYS_298"	}, /* 298 */
-	{ 6,	0,	printargs,		"SYS_299"	}, /* 299 */
+	{ 6,	0,	NULL,			NULL		}, /* 200 */
+	{ 6,	0,	NULL,			NULL		}, /* 201 */
+	{ 6,	0,	NULL,			NULL		}, /* 202 */
+	{ 6,	0,	NULL,			NULL		}, /* 203 */
+	{ 6,	0,	NULL,			NULL		}, /* 204 */
+	{ 6,	0,	NULL,			NULL		}, /* 205 */
+	{ 6,	0,	NULL,			NULL		}, /* 206 */
+	{ 6,	0,	NULL,			NULL		}, /* 207 */
+	{ 6,	0,	NULL,			NULL		}, /* 208 */
+	{ 6,	0,	NULL,			NULL		}, /* 209 */
+	{ 6,	0,	NULL,			NULL		}, /* 210 */
+	{ 6,	0,	NULL,			NULL		}, /* 211 */
+	{ 6,	0,	NULL,			NULL		}, /* 212 */
+	{ 6,	0,	NULL,			NULL		}, /* 213 */
+	{ 6,	0,	NULL,			NULL		}, /* 214 */
+	{ 6,	0,	NULL,			NULL		}, /* 215 */
+	{ 6,	0,	NULL,			NULL		}, /* 216 */
+	{ 6,	0,	NULL,			NULL		}, /* 217 */
+	{ 6,	0,	NULL,			NULL		}, /* 218 */
+	{ 6,	0,	NULL,			NULL		}, /* 219 */
+	{ 6,	0,	NULL,			NULL		}, /* 220 */
+	{ 6,	0,	NULL,			NULL		}, /* 221 */
+	{ 6,	0,	NULL,			NULL		}, /* 222 */
+	{ 6,	0,	NULL,			NULL		}, /* 223 */
+	{ 6,	0,	NULL,			NULL		}, /* 224 */
+	{ 6,	0,	NULL,			NULL		}, /* 225 */
+	{ 6,	0,	NULL,			NULL		}, /* 226 */
+	{ 6,	0,	NULL,			NULL		}, /* 227 */
+	{ 6,	0,	NULL,			NULL		}, /* 228 */
+	{ 6,	0,	NULL,			NULL		}, /* 229 */
+	{ 6,	0,	NULL,			NULL		}, /* 230 */
+	{ 6,	0,	NULL,			NULL		}, /* 231 */
+	{ 6,	0,	NULL,			NULL		}, /* 232 */
+	{ 6,	0,	NULL,			NULL		}, /* 233 */
+	{ 6,	0,	NULL,			NULL		}, /* 234 */
+	{ 6,	0,	NULL,			NULL		}, /* 235 */
+	{ 6,	0,	NULL,			NULL		}, /* 236 */
+	{ 6,	0,	NULL,			NULL		}, /* 237 */
+	{ 6,	0,	NULL,			NULL		}, /* 238 */
+	{ 6,	0,	NULL,			NULL		}, /* 239 */
+	{ 6,	0,	NULL,			NULL		}, /* 240 */
+	{ 6,	0,	NULL,			NULL		}, /* 241 */
+	{ 6,	0,	NULL,			NULL		}, /* 242 */
+	{ 6,	0,	NULL,			NULL		}, /* 243 */
+	{ 6,	0,	NULL,			NULL		}, /* 244 */
+	{ 6,	0,	NULL,			NULL		}, /* 245 */
+	{ 6,	0,	NULL,			NULL		}, /* 246 */
+	{ 6,	0,	NULL,			NULL		}, /* 247 */
+	{ 6,	0,	NULL,			NULL		}, /* 248 */
+	{ 6,	0,	NULL,			NULL		}, /* 249 */
+	{ 6,	0,	NULL,			NULL		}, /* 250 */
+	{ 6,	0,	NULL,			NULL		}, /* 251 */
+	{ 6,	0,	NULL,			NULL		}, /* 252 */
+	{ 6,	0,	NULL,			NULL		}, /* 253 */
+	{ 6,	0,	NULL,			NULL		}, /* 254 */
+	{ 6,	0,	NULL,			NULL		}, /* 255 */
+	{ 6,	0,	NULL,			NULL		}, /* 256 */
+	{ 6,	0,	NULL,			NULL		}, /* 257 */
+	{ 6,	0,	NULL,			NULL		}, /* 258 */
+	{ 6,	0,	NULL,			NULL		}, /* 259 */
+	{ 6,	0,	NULL,			NULL		}, /* 260 */
+	{ 6,	0,	NULL,			NULL		}, /* 261 */
+	{ 6,	0,	NULL,			NULL		}, /* 262 */
+	{ 6,	0,	NULL,			NULL		}, /* 263 */
+	{ 6,	0,	NULL,			NULL		}, /* 264 */
+	{ 6,	0,	NULL,			NULL		}, /* 265 */
+	{ 6,	0,	NULL,			NULL		}, /* 266 */
+	{ 6,	0,	NULL,			NULL		}, /* 267 */
+	{ 6,	0,	NULL,			NULL		}, /* 268 */
+	{ 6,	0,	NULL,			NULL		}, /* 269 */
+	{ 6,	0,	NULL,			NULL		}, /* 270 */
+	{ 6,	0,	NULL,			NULL		}, /* 271 */
+	{ 6,	0,	NULL,			NULL		}, /* 272 */
+	{ 6,	0,	NULL,			NULL		}, /* 273 */
+	{ 6,	0,	NULL,			NULL		}, /* 274 */
+	{ 6,	0,	NULL,			NULL		}, /* 275 */
+	{ 6,	0,	NULL,			NULL		}, /* 276 */
+	{ 6,	0,	NULL,			NULL		}, /* 277 */
+	{ 6,	0,	NULL,			NULL		}, /* 278 */
+	{ 6,	0,	NULL,			NULL		}, /* 279 */
+	{ 6,	0,	NULL,			NULL		}, /* 280 */
+	{ 6,	0,	NULL,			NULL		}, /* 281 */
+	{ 6,	0,	NULL,			NULL		}, /* 282 */
+	{ 6,	0,	NULL,			NULL		}, /* 283 */
+	{ 6,	0,	NULL,			NULL		}, /* 284 */
+	{ 6,	0,	NULL,			NULL		}, /* 285 */
+	{ 6,	0,	NULL,			NULL		}, /* 286 */
+	{ 6,	0,	NULL,			NULL		}, /* 287 */
+	{ 6,	0,	NULL,			NULL		}, /* 288 */
+	{ 6,	0,	NULL,			NULL		}, /* 289 */
+	{ 6,	0,	NULL,			NULL		}, /* 290 */
+	{ 6,	0,	NULL,			NULL		}, /* 291 */
+	{ 6,	0,	NULL,			NULL		}, /* 292 */
+	{ 6,	0,	NULL,			NULL		}, /* 293 */
+	{ 6,	0,	NULL,			NULL		}, /* 294 */
+	{ 6,	0,	NULL,			NULL		}, /* 295 */
+	{ 6,	0,	NULL,			NULL		}, /* 296 */
+	{ 6,	0,	NULL,			NULL		}, /* 297 */
+	{ 6,	0,	NULL,			NULL		}, /* 298 */
+	{ 6,	0,	NULL,			NULL		}, /* 299 */
 
 	{ 6,	0,	solaris_getpgrp,	"getpgrp"	}, /* 300 */
 	{ 6,	0,	solaris_setpgrp,	"setpgrp"	}, /* 301 */
@@ -332,10 +332,10 @@
 	{ 6,	0,	solaris_setsid,		"setsid"	}, /* 303 */
 	{ 6,	0,	solaris_getpgid,	"getpgid"	}, /* 304 */
 	{ 6,	0,	solaris_setpgid,	"setpgid"	}, /* 305 */
-	{ 6,	0,	printargs,		"SYS_306"	}, /* 306 */
-	{ 6,	0,	printargs,		"SYS_307"	}, /* 307 */
-	{ 6,	0,	printargs,		"SYS_308"	}, /* 308 */
-	{ 6,	0,	printargs,		"SYS_309"	}, /* 309 */
+	{ 6,	0,	NULL,			NULL		}, /* 306 */
+	{ 6,	0,	NULL,			NULL		}, /* 307 */
+	{ 6,	0,	NULL,			NULL		}, /* 308 */
+	{ 6,	0,	NULL,			NULL		}, /* 309 */
 
 	{ 6,	TS,	solaris_signal,		"signal"	}, /* 310 */
 	{ 6,	TS,	solaris_sigset,		"sigset"	}, /* 311 */
@@ -343,95 +343,95 @@
 	{ 6,	TS,	solaris_sigrelse,	"sigrelse"	}, /* 313 */
 	{ 6,	TS,	solaris_sigignore,	"sigignore"	}, /* 314 */
 	{ 6,	TS,	solaris_sigpause,	"sigpause"	}, /* 315 */
-	{ 6,	0,	printargs,		"SYS_316"	}, /* 316 */
-	{ 6,	0,	printargs,		"SYS_317"	}, /* 317 */
-	{ 6,	0,	printargs,		"SYS_318"	}, /* 318 */
-	{ 6,	0,	printargs,		"SYS_319"	}, /* 319 */
+	{ 6,	0,	NULL,			NULL		}, /* 316 */
+	{ 6,	0,	NULL,			NULL		}, /* 317 */
+	{ 6,	0,	NULL,			NULL		}, /* 318 */
+	{ 6,	0,	NULL,			NULL		}, /* 319 */
 
 	{ 6,	TI,	solaris_msgget,		"msgget"	}, /* 320 */
 	{ 6,	TI,	solaris_msgctl,		"msgctl"	}, /* 321 */
 	{ 6,	TI,	solaris_msgrcv,		"msgrcv"	}, /* 322 */
 	{ 6,	TI,	solaris_msgsnd,		"msgsnd"	}, /* 323 */
-	{ 6,	0,	printargs,		"SYS_324"	}, /* 324 */
-	{ 6,	0,	printargs,		"SYS_325"	}, /* 325 */
-	{ 6,	0,	printargs,		"SYS_326"	}, /* 326 */
-	{ 6,	0,	printargs,		"SYS_327"	}, /* 327 */
-	{ 6,	0,	printargs,		"SYS_328"	}, /* 328 */
-	{ 6,	0,	printargs,		"SYS_329"	}, /* 329 */
+	{ 6,	0,	NULL,			NULL		}, /* 324 */
+	{ 6,	0,	NULL,			NULL		}, /* 325 */
+	{ 6,	0,	NULL,			NULL		}, /* 326 */
+	{ 6,	0,	NULL,			NULL		}, /* 327 */
+	{ 6,	0,	NULL,			NULL		}, /* 328 */
+	{ 6,	0,	NULL,			NULL		}, /* 329 */
 
 	{ 6,	TI,	solaris_shmat,		"shmat"		}, /* 330 */
 	{ 6,	TI,	solaris_shmctl,		"shmctl"	}, /* 331 */
 	{ 6,	TI,	solaris_shmdt,		"shmdt"		}, /* 332 */
 	{ 6,	TI,	solaris_shmget,		"shmget"	}, /* 333 */
-	{ 6,	0,	printargs,		"SYS_334"	}, /* 334 */
-	{ 6,	0,	printargs,		"SYS_335"	}, /* 335 */
-	{ 6,	0,	printargs,		"SYS_336"	}, /* 336 */
-	{ 6,	0,	printargs,		"SYS_337"	}, /* 337 */
-	{ 6,	0,	printargs,		"SYS_338"	}, /* 338 */
-	{ 6,	0,	printargs,		"SYS_339"	}, /* 339 */
+	{ 6,	0,	NULL,			NULL		}, /* 334 */
+	{ 6,	0,	NULL,			NULL		}, /* 335 */
+	{ 6,	0,	NULL,			NULL		}, /* 336 */
+	{ 6,	0,	NULL,			NULL		}, /* 337 */
+	{ 6,	0,	NULL,			NULL		}, /* 338 */
+	{ 6,	0,	NULL,			NULL		}, /* 339 */
 
 	{ 6,	TI,	solaris_semctl,		"semctl"	}, /* 340 */
 	{ 6,	TI,	solaris_semget,		"semget"	}, /* 341 */
 	{ 6,	TI,	solaris_semop,		"semop"		}, /* 342 */
-	{ 6,	0,	printargs,		"SYS_343"	}, /* 343 */
-	{ 6,	0,	printargs,		"SYS_344"	}, /* 344 */
-	{ 6,	0,	printargs,		"SYS_345"	}, /* 345 */
-	{ 6,	0,	printargs,		"SYS_346"	}, /* 346 */
-	{ 6,	0,	printargs,		"SYS_347"	}, /* 347 */
-	{ 6,	0,	printargs,		"SYS_348"	}, /* 348 */
-	{ 6,	0,	printargs,		"SYS_349"	}, /* 349 */
+	{ 6,	0,	NULL,			NULL		}, /* 343 */
+	{ 6,	0,	NULL,			NULL		}, /* 344 */
+	{ 6,	0,	NULL,			NULL		}, /* 345 */
+	{ 6,	0,	NULL,			NULL		}, /* 346 */
+	{ 6,	0,	NULL,			NULL		}, /* 347 */
+	{ 6,	0,	NULL,			NULL		}, /* 348 */
+	{ 6,	0,	NULL,			NULL		}, /* 349 */
 
 	{ 6,	0,	solaris_olduname,	"olduname"	}, /* 350 */
 	{ 6,	0,	printargs,		"utssys1"	}, /* 351 */
 	{ 6,	0,	solaris_ustat,		"ustat"		}, /* 352 */
 	{ 6,	0,	solaris_fusers,		"fusers"	}, /* 353 */
-	{ 6,	0,	printargs,		"SYS_354"	}, /* 354 */
-	{ 6,	0,	printargs,		"SYS_355"	}, /* 355 */
-	{ 6,	0,	printargs,		"SYS_356"	}, /* 356 */
-	{ 6,	0,	printargs,		"SYS_357"	}, /* 357 */
-	{ 6,	0,	printargs,		"SYS_358"	}, /* 358 */
-	{ 6,	0,	printargs,		"SYS_359"	}, /* 359 */
+	{ 6,	0,	NULL,			NULL		}, /* 354 */
+	{ 6,	0,	NULL,			NULL		}, /* 355 */
+	{ 6,	0,	NULL,			NULL		}, /* 356 */
+	{ 6,	0,	NULL,			NULL		}, /* 357 */
+	{ 6,	0,	NULL,			NULL		}, /* 358 */
+	{ 6,	0,	NULL,			NULL		}, /* 359 */
 
 	{ 6,	0,	printargs,		"sysfs0"	}, /* 360 */
 	{ 6,	0,	solaris_sysfs1,		"sysfs1"	}, /* 361 */
 	{ 6,	0,	solaris_sysfs2,		"sysfs2"	}, /* 362 */
 	{ 6,	0,	solaris_sysfs3,		"sysfs3"	}, /* 363 */
-	{ 6,	0,	printargs,		"SYS_364"	}, /* 364 */
-	{ 6,	0,	printargs,		"SYS_365"	}, /* 365 */
-	{ 6,	0,	printargs,		"SYS_366"	}, /* 366 */
-	{ 6,	0,	printargs,		"SYS_367"	}, /* 367 */
-	{ 6,	0,	printargs,		"SYS_368"	}, /* 368 */
-	{ 6,	0,	printargs,		"SYS_369"	}, /* 369 */
+	{ 6,	0,	NULL,			NULL		}, /* 364 */
+	{ 6,	0,	NULL,			NULL		}, /* 365 */
+	{ 6,	0,	NULL,			NULL		}, /* 366 */
+	{ 6,	0,	NULL,			NULL		}, /* 367 */
+	{ 6,	0,	NULL,			NULL		}, /* 368 */
+	{ 6,	0,	NULL,			NULL		}, /* 369 */
 
 	{ 6,	0,	printargs,		"spcall0"	}, /* 370 */
 	{ 6,	TS,	solaris_sigpending,	"sigpending"	}, /* 371 */
 	{ 6,	TS,	solaris_sigfillset,	"sigfillset"	}, /* 372 */
-	{ 6,	0,	printargs,		"SYS_373"	}, /* 373 */
-	{ 6,	0,	printargs,		"SYS_374"	}, /* 374 */
-	{ 6,	0,	printargs,		"SYS_375"	}, /* 375 */
-	{ 6,	0,	printargs,		"SYS_376"	}, /* 376 */
-	{ 6,	0,	printargs,		"SYS_377"	}, /* 377 */
-	{ 6,	0,	printargs,		"SYS_378"	}, /* 378 */
-	{ 6,	0,	printargs,		"SYS_379"	}, /* 379 */
+	{ 6,	0,	NULL,			NULL		}, /* 373 */
+	{ 6,	0,	NULL,			NULL		}, /* 374 */
+	{ 6,	0,	NULL,			NULL		}, /* 375 */
+	{ 6,	0,	NULL,			NULL		}, /* 376 */
+	{ 6,	0,	NULL,			NULL		}, /* 377 */
+	{ 6,	0,	NULL,			NULL		}, /* 378 */
+	{ 6,	0,	NULL,			NULL		}, /* 379 */
 
 	{ 6,	0,	solaris_getcontext,	"getcontext"	}, /* 380 */
 	{ 6,	0,	solaris_setcontext,	"setcontext"	}, /* 381 */
-	{ 6,	0,	printargs,		"SYS_382"	}, /* 382 */
-	{ 6,	0,	printargs,		"SYS_383"	}, /* 383 */
-	{ 6,	0,	printargs,		"SYS_384"	}, /* 384 */
-	{ 6,	0,	printargs,		"SYS_385"	}, /* 385 */
-	{ 6,	0,	printargs,		"SYS_386"	}, /* 386 */
-	{ 6,	0,	printargs,		"SYS_387"	}, /* 387 */
-	{ 6,	0,	printargs,		"SYS_388"	}, /* 388 */
-	{ 6,	0,	printargs,		"SYS_389"	}, /* 389 */
+	{ 6,	0,	NULL,			NULL		}, /* 382 */
+	{ 6,	0,	NULL,			NULL		}, /* 383 */
+	{ 6,	0,	NULL,			NULL		}, /* 384 */
+	{ 6,	0,	NULL,			NULL		}, /* 385 */
+	{ 6,	0,	NULL,			NULL		}, /* 386 */
+	{ 6,	0,	NULL,			NULL		}, /* 387 */
+	{ 6,	0,	NULL,			NULL		}, /* 388 */
+	{ 6,	0,	NULL,			NULL		}, /* 389 */
 
-	{ 6,	0,	printargs,		"SYS_390"	}, /* 390 */
-	{ 6,	0,	printargs,		"SYS_391"	}, /* 391 */
-	{ 6,	0,	printargs,		"SYS_392"	}, /* 392 */
-	{ 6,	0,	printargs,		"SYS_393"	}, /* 393 */
-	{ 6,	0,	printargs,		"SYS_394"	}, /* 394 */
-	{ 6,	0,	printargs,		"SYS_395"	}, /* 395 */
-	{ 6,	0,	printargs,		"SYS_396"	}, /* 396 */
-	{ 6,	0,	printargs,		"SYS_397"	}, /* 397 */
-	{ 6,	0,	printargs,		"SYS_398"	}, /* 398 */
-	{ 6,	0,	printargs,		"SYS_399"	}, /* 399 */
+	{ 6,	0,	NULL,			NULL		}, /* 390 */
+	{ 6,	0,	NULL,			NULL		}, /* 391 */
+	{ 6,	0,	NULL,			NULL		}, /* 392 */
+	{ 6,	0,	NULL,			NULL		}, /* 393 */
+	{ 6,	0,	NULL,			NULL		}, /* 394 */
+	{ 6,	0,	NULL,			NULL		}, /* 395 */
+	{ 6,	0,	NULL,			NULL		}, /* 396 */
+	{ 6,	0,	NULL,			NULL		}, /* 397 */
+	{ 6,	0,	NULL,			NULL		}, /* 398 */
+	{ 6,	0,	NULL,			NULL		}, /* 399 */

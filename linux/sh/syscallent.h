@@ -44,7 +44,7 @@
 	{ 1,	0,	sys_time,		"time"		}, /* 13 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 14 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 15 */
-	{ 3,	TF,	sys_chown,		"lchown"		}, /* 16 */
+	{ 3,	TF,	sys_chown,		"lchown"	}, /* 16 */
 	{ 0,	0,	sys_break,		"break"		}, /* 17 */
 	{ 2,	TF,	sys_oldstat,		"oldstat"	}, /* 18 */
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 19 */
@@ -217,8 +217,8 @@
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 187 */
-	{ 5,	0,	printargs,		"SYS_188"	}, /* 188 */
-	{ 5,	0,	printargs,		"SYS_189"	}, /* 189 */
+	{ 5,	0,	NULL,			NULL		}, /* 188 */
+	{ 5,	0,	NULL,			NULL		}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 5,	0,	printargs,		"getrlimit"	}, /* 191 */
 	{ 6,	TD,	sys_mmap,		"mmap2"		}, /* 192 */
@@ -252,8 +252,8 @@
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 221 */
-	{ 4,	0,	printargs,		"SYS_222"	}, /* 222 */
-	{ 4,	0,	printargs,		"SYS_223"	}, /* 223 */
+	{ 4,	0,	NULL,			NULL		}, /* 222 */
+	{ 4,	0,	NULL,			NULL		}, /* 223 */
 	{ 4,	0,	sys_gettid,		"gettid"	}, /* 224 */
 	{ 5,	TD,	sys_readahead,		"readahead"	}, /* 225 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 226 */
@@ -273,15 +273,15 @@
 	{ 6,	0,	sys_futex,		"futex"		}, /* 240 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"}, /* 241 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"}, /* 242 */
-	{ 0,	0,	printargs,		"SYS_243"	}, /* 243 */
-	{ 0,	0,	printargs,		"SYS_244"	}, /* 244 */
+	{ 0,	0,	NULL,			NULL		}, /* 243 */
+	{ 0,	0,	NULL,			NULL		}, /* 244 */
 	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 245 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 246 */
 	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 247 */
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 248 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 249 */
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 250 */
-	{ 0,	0,	printargs,		"SYS_251"	}, /* 251 */
+	{ 0,	0,	NULL,			NULL		}, /* 251 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 252 */
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 253 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 254 */
@@ -303,7 +303,7 @@
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 270 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 271 */
 	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 272 */
-	{ 0,	0,	printargs,		"SYS_273"	}, /* 273 */
+	{ 0,	0,	NULL,			NULL		}, /* 273 */
 	{ 4,	0,	sys_mbind,		"mbind"		}, /* 274 */
 	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 275 */
 	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"	}, /* 276 */
@@ -323,7 +323,7 @@
 	{ 0,	TD,	sys_inotify_init,	"inotify_init"	}, /* 290 */
 	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch"}, /* 291 */
 	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch"}, /* 292 */
-	{ 5,	0,	printargs,		"SYS_293"	}, /* 293 */
+	{ 5,	0,	NULL,			NULL		}, /* 293 */
 	{ 4,	0,	sys_migrate_pages,	"migrate_pages"	}, /* 294 */
 	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 295 */
 	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"	}, /* 296 */
@@ -397,39 +397,39 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 364 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 365 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 366 */
-	{ 5,	0,	printargs,		"SYS_367"	}, /* 367 */
-	{ 5,	0,	printargs,		"SYS_368"	}, /* 368 */
-	{ 5,	0,	printargs,		"SYS_369"	}, /* 369 */
-	{ 5,	0,	printargs,		"SYS_370"	}, /* 370 */
-	{ 5,	0,	printargs,		"SYS_371"	}, /* 371 */
-	{ 5,	0,	printargs,		"SYS_372"	}, /* 372 */
-	{ 5,	0,	printargs,		"SYS_373"	}, /* 373 */
-	{ 5,	0,	printargs,		"SYS_374"	}, /* 374 */
-	{ 5,	0,	printargs,		"SYS_375"	}, /* 375 */
-	{ 5,	0,	printargs,		"SYS_376"	}, /* 376 */
-	{ 5,	0,	printargs,		"SYS_377"	}, /* 377 */
-	{ 5,	0,	printargs,		"SYS_378"	}, /* 378 */
-	{ 5,	0,	printargs,		"SYS_379"	}, /* 379 */
-	{ 5,	0,	printargs,		"SYS_380"	}, /* 380 */
-	{ 5,	0,	printargs,		"SYS_381"	}, /* 381 */
-	{ 5,	0,	printargs,		"SYS_382"	}, /* 382 */
-	{ 5,	0,	printargs,		"SYS_383"	}, /* 383 */
-	{ 5,	0,	printargs,		"SYS_384"	}, /* 384 */
-	{ 5,	0,	printargs,		"SYS_385"	}, /* 385 */
-	{ 5,	0,	printargs,		"SYS_386"	}, /* 386 */
-	{ 5,	0,	printargs,		"SYS_387"	}, /* 387 */
-	{ 5,	0,	printargs,		"SYS_388"	}, /* 388 */
-	{ 5,	0,	printargs,		"SYS_389"	}, /* 389 */
-	{ 5,	0,	printargs,		"SYS_390"	}, /* 390 */
-	{ 5,	0,	printargs,		"SYS_391"	}, /* 391 */
-	{ 5,	0,	printargs,		"SYS_392"	}, /* 392 */
-	{ 5,	0,	printargs,		"SYS_393"	}, /* 393 */
-	{ 5,	0,	printargs,		"SYS_394"	}, /* 394 */
-	{ 5,	0,	printargs,		"SYS_395"	}, /* 395 */
-	{ 5,	0,	printargs,		"SYS_396"	}, /* 396 */
-	{ 5,	0,	printargs,		"SYS_397"	}, /* 397 */
-	{ 5,	0,	printargs,		"SYS_398"	}, /* 398 */
-	{ 5,	0,	printargs,		"SYS_399"	}, /* 399 */
+	{ 5,	0,	NULL,			NULL		}, /* 367 */
+	{ 5,	0,	NULL,			NULL		}, /* 368 */
+	{ 5,	0,	NULL,			NULL		}, /* 369 */
+	{ 5,	0,	NULL,			NULL		}, /* 370 */
+	{ 5,	0,	NULL,			NULL		}, /* 371 */
+	{ 5,	0,	NULL,			NULL		}, /* 372 */
+	{ 5,	0,	NULL,			NULL		}, /* 373 */
+	{ 5,	0,	NULL,			NULL		}, /* 374 */
+	{ 5,	0,	NULL,			NULL		}, /* 375 */
+	{ 5,	0,	NULL,			NULL		}, /* 376 */
+	{ 5,	0,	NULL,			NULL		}, /* 377 */
+	{ 5,	0,	NULL,			NULL		}, /* 378 */
+	{ 5,	0,	NULL,			NULL		}, /* 379 */
+	{ 5,	0,	NULL,			NULL		}, /* 380 */
+	{ 5,	0,	NULL,			NULL		}, /* 381 */
+	{ 5,	0,	NULL,			NULL		}, /* 382 */
+	{ 5,	0,	NULL,			NULL		}, /* 383 */
+	{ 5,	0,	NULL,			NULL		}, /* 384 */
+	{ 5,	0,	NULL,			NULL		}, /* 385 */
+	{ 5,	0,	NULL,			NULL		}, /* 386 */
+	{ 5,	0,	NULL,			NULL		}, /* 387 */
+	{ 5,	0,	NULL,			NULL		}, /* 388 */
+	{ 5,	0,	NULL,			NULL		}, /* 389 */
+	{ 5,	0,	NULL,			NULL		}, /* 390 */
+	{ 5,	0,	NULL,			NULL		}, /* 391 */
+	{ 5,	0,	NULL,			NULL		}, /* 392 */
+	{ 5,	0,	NULL,			NULL		}, /* 393 */
+	{ 5,	0,	NULL,			NULL		}, /* 394 */
+	{ 5,	0,	NULL,			NULL		}, /* 395 */
+	{ 5,	0,	NULL,			NULL		}, /* 396 */
+	{ 5,	0,	NULL,			NULL		}, /* 397 */
+	{ 5,	0,	NULL,			NULL		}, /* 398 */
+	{ 5,	0,	NULL,			NULL		}, /* 399 */
 
 #if SYS_socket_subcall != 400
  #error fix me

@@ -40,29 +40,29 @@
 	{ 1,	TF,	sys_unlink,		"unlink"	}, /* 10 */
 	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 11 */
 	{ 1,	TF,	sys_chdir,		"chdir"		}, /* 12 */
-	{ MA,	0,	printargs,		"SYS_13"	}, /* 13 */
+	{ MA,	0,	NULL,			NULL		}, /* 13 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 14 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 15 */
-	{ MA,	0,	printargs,		"SYS_16"	}, /* 16 */
-	{ MA,	0,	printargs,		"SYS_17"	}, /* 17 */
-	{ MA,	0,	printargs,		"SYS_18"	}, /* 18 */
+	{ MA,	0,	NULL,			NULL		}, /* 16 */
+	{ MA,	0,	NULL,			NULL		}, /* 17 */
+	{ MA,	0,	NULL,			NULL		}, /* 18 */
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
 	{ 1,	TF,	sys_umount,		"oldumount"	}, /* 22 */
-	{ MA,	0,	printargs,		"SYS_23"	}, /* 23 */
-	{ MA,	0,	printargs,		"SYS_24"	}, /* 24 */
-	{ MA,	0,	printargs,		"SYS_25"	}, /* 25 */
+	{ MA,	0,	NULL,			NULL		}, /* 23 */
+	{ MA,	0,	NULL,			NULL		}, /* 24 */
+	{ MA,	0,	NULL,			NULL		}, /* 25 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 26 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 27 */
-	{ MA,	0,	printargs,		"SYS_28"	}, /* 28 */
+	{ MA,	0,	NULL,			NULL		}, /* 28 */
 	{ 0,	TS,	sys_pause,		"pause"		}, /* 29 */
 	{ 2,	TF,	sys_utime,		"utime"		}, /* 30 */
-	{ MA,	0,	printargs,		"SYS_31"	}, /* 31 */
-	{ MA,	0,	printargs,		"SYS_32"	}, /* 32 */
+	{ MA,	0,	NULL,			NULL		}, /* 31 */
+	{ MA,	0,	NULL,			NULL		}, /* 32 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 33 */
 	{ 1,	0,	sys_nice,		"nice"		}, /* 34 */
-	{ MA,	0,	printargs,		"SYS_35"	}, /* 35 */
+	{ MA,	0,	NULL,			NULL		}, /* 35 */
 	{ 0,	0,	sys_sync,		"sync"		}, /* 36 */
 	{ 2,	TS,	sys_kill,		"kill"		}, /* 37 */
 	{ 2,	TF,	sys_rename,		"rename"	}, /* 38 */
@@ -71,22 +71,22 @@
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 41 */
 	{ 1,	TD,	sys_pipe,		"pipe"		}, /* 42 */
 	{ 1,	0,	sys_times,		"times"		}, /* 43 */
-	{ MA,	0,	printargs,		"SYS_44"	}, /* 44 */
+	{ MA,	0,	NULL,			NULL		}, /* 44 */
 	{ 1,	0,	sys_brk,		"brk"		}, /* 45 */
-	{ MA,	0,	printargs,		"SYS_46"	}, /* 46 */
-	{ MA,	0,	printargs,		"SYS_47"	}, /* 47 */
+	{ MA,	0,	NULL,			NULL		}, /* 46 */
+	{ MA,	0,	NULL,			NULL		}, /* 47 */
 	{ 3,	TS,	sys_signal,		"signal"	}, /* 48 */
-	{ MA,	0,	printargs,		"SYS_49"	}, /* 49 */
-	{ MA,	0,	printargs,		"SYS_50"	}, /* 50 */
+	{ MA,	0,	NULL,			NULL		}, /* 49 */
+	{ MA,	0,	NULL,			NULL		}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 52 */
-	{ MA,	0,	printargs,		"SYS_53"	}, /* 53 */
+	{ MA,	0,	NULL,			NULL		}, /* 53 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 54 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"		}, /* 55 */
-	{ MA,	0,	printargs,		"SYS_56"	}, /* 56 */
+	{ MA,	0,	NULL,			NULL		}, /* 56 */
 	{ 2,	0,	sys_setpgid,		"setpgid"	}, /* 57 */
-	{ MA,	0,	printargs,		"SYS_58"	}, /* 58 */
-	{ MA,	0,	printargs,		"SYS_59"	}, /* 59 */
+	{ MA,	0,	NULL,			NULL		}, /* 58 */
+	{ MA,	0,	NULL,			NULL		}, /* 59 */
 	{ 1,	0,	sys_umask,		"umask"		}, /* 60 */
 	{ 1,	TF,	sys_chroot,		"chroot"	}, /* 61 */
 	{ 2,	0,	sys_ustat,		"ustat"		}, /* 62 */
@@ -95,10 +95,10 @@
 	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 65 */
 	{ 0,	0,	sys_setsid,		"setsid"	}, /* 66 */
 	{ 3,	TS,	sys_sigaction,		"sigaction"	}, /* 67 */
-	{ MA,	0,	printargs,		"SYS_68"	}, /* 68 */
-	{ MA,	0,	printargs,		"SYS_69"	}, /* 69 */
-	{ MA,	0,	printargs,		"SYS_70"	}, /* 70 */
-	{ MA,	0,	printargs,		"SYS_71"	}, /* 71 */
+	{ MA,	0,	NULL,			NULL		}, /* 68 */
+	{ MA,	0,	NULL,			NULL		}, /* 69 */
+	{ MA,	0,	NULL,			NULL		}, /* 70 */
+	{ MA,	0,	NULL,			NULL		}, /* 71 */
 	{ 3,	TS,	sys_sigsuspend,		"sigsuspend"	}, /* 72 */
 	{ 1,	TS,	sys_sigpending,		"sigpending"	}, /* 73 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 74 */
@@ -107,28 +107,28 @@
 	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 77 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 78 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */
-	{ MA,	0,	printargs,		"SYS_80"	}, /* 80 */
-	{ MA,	0,	printargs,		"SYS_81"	}, /* 81 */
-	{ MA,	0,	printargs,		"SYS_82"	}, /* 82 */
+	{ MA,	0,	NULL,			NULL		}, /* 80 */
+	{ MA,	0,	NULL,			NULL		}, /* 81 */
+	{ MA,	0,	NULL,			NULL		}, /* 82 */
 	{ 2,	TF,	sys_symlink,		"symlink"	}, /* 83 */
-	{ MA,	0,	printargs,		"SYS_84"	}, /* 84 */
+	{ MA,	0,	NULL,			NULL		}, /* 84 */
 	{ 3,	TF,	sys_readlink,		"readlink"	}, /* 85 */
 	{ 1,	TF,	sys_uselib,		"uselib"	}, /* 86 */
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 87 */
 	{ 4,	0,	sys_reboot,		"reboot"	}, /* 88 */
-	{ MA,	0,	printargs,		"SYS_89"	}, /* 89 */
+	{ MA,	0,	NULL,			NULL		}, /* 89 */
 	{ 6,	TD,	sys_old_mmap,		"mmap"		}, /* 90 */
 	{ 2,	0,	sys_munmap,		"munmap"	}, /* 91 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 92 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 93 */
 	{ 2,	TD,	sys_fchmod,		"fchmod"	}, /* 94 */
-	{ MA,	0,	printargs,		"SYS_95"	}, /* 95 */
+	{ MA,	0,	NULL,			NULL		}, /* 95 */
 	{ 2,	0,	sys_getpriority,	"getpriority"	}, /* 96 */
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 97 */
-	{ MA,	0,	printargs,		"SYS_98"	}, /* 98 */
+	{ MA,	0,	NULL,			NULL		}, /* 98 */
 	{ 2,	TF,	sys_statfs,		"statfs"	}, /* 99 */
 	{ 2,	TD,	sys_fstatfs,		"fstatfs"	}, /* 100 */
-	{ MA,	0,	printargs,		"SYS_101"	}, /* 101 */
+	{ MA,	0,	NULL,			NULL		}, /* 101 */
 	{ 2,	TD,	sys_socketcall,		"socketcall"	}, /* 102 */
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 103 */
 	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 104 */
@@ -136,11 +136,11 @@
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 106 */
 	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 107 */
 	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 108 */
-	{ MA,	0,	printargs,		"SYS_109"	}, /* 109 */
-	{ MA,	0,	printargs,		"SYS_110"	}, /* 110 */
+	{ MA,	0,	NULL,			NULL		}, /* 109 */
+	{ MA,	0,	NULL,			NULL		}, /* 110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 111 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 112 */
-	{ MA,	0,	printargs,		"SYS_113"	}, /* 113 */
+	{ MA,	0,	NULL,			NULL		}, /* 113 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 114 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 115 */
 	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
@@ -150,7 +150,7 @@
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
 	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
-	{ MA,	0,	printargs,		"SYS_123"	}, /* 123 */
+	{ MA,	0,	NULL,			NULL		}, /* 123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
 	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
@@ -165,8 +165,8 @@
 	{ 3,	0,	sys_sysfs,		"sysfs"		}, /* 135 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 136 */
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
-	{ MA,	0,	printargs,		"SYS_138"	}, /* 138 */
-	{ MA,	0,	printargs,		"SYS_139"	}, /* 139 */
+	{ MA,	0,	NULL,			NULL		}, /* 138 */
+	{ MA,	0,	NULL,			NULL		}, /* 139 */
 	{ 5,	0,	sys_llseek,		"_llseek"	}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
@@ -191,14 +191,14 @@
 	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 161 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 162 */
 	{ 5,	0,	sys_mremap,		"mremap"	}, /* 163 */
-	{ MA,	0,	printargs,		"SYS_164"	}, /* 164 */
-	{ MA,	0,	printargs,		"SYS_165"	}, /* 165 */
-	{ MA,	0,	printargs,		"SYS_166"	}, /* 166 */
+	{ MA,	0,	NULL,			NULL		}, /* 164 */
+	{ MA,	0,	NULL,			NULL		}, /* 165 */
+	{ MA,	0,	NULL,			NULL		}, /* 166 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 167 */
 	{ 3,	TD,	sys_poll,		"poll"		}, /* 168 */
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 169 */
-	{ MA,	0,	printargs,		"SYS_170"	}, /* 170 */
-	{ MA,	0,	printargs,		"SYS_171"	}, /* 171 */
+	{ MA,	0,	NULL,			NULL		}, /* 170 */
+	{ MA,	0,	NULL,			NULL		}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 0,	TS,	sys_sigreturn,		"rt_sigreturn"	}, /* 173 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
@@ -209,7 +209,7 @@
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 179 */
 	{ 5,	TD,	sys_pread,		"pread"		}, /* 180 */
 	{ 5,	TD,	sys_pwrite,		"pwrite"	}, /* 181 */
-	{ MA,	0,	printargs,		"SYS_182"	}, /* 182 */
+	{ MA,	0,	NULL,			NULL		}, /* 182 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
@@ -219,12 +219,12 @@
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
-	{ MA,	0,	printargs,		"SYS_192"	}, /* 192 */
-	{ MA,	0,	printargs,		"SYS_193"	}, /* 193 */
-	{ MA,	0,	printargs,		"SYS_194"	}, /* 194 */
-	{ MA,	0,	printargs,		"SYS_195"	}, /* 195 */
-	{ MA,	0,	printargs,		"SYS_196"	}, /* 196 */
-	{ MA,	0,	printargs,		"SYS_197"	}, /* 197 */
+	{ MA,	0,	NULL,			NULL		}, /* 192 */
+	{ MA,	0,	NULL,			NULL		}, /* 193 */
+	{ MA,	0,	NULL,			NULL		}, /* 194 */
+	{ MA,	0,	NULL,			NULL		}, /* 195 */
+	{ MA,	0,	NULL,			NULL		}, /* 196 */
+	{ MA,	0,	NULL,			NULL		}, /* 197 */
 	{ 3,	TF,	sys_chown,		"lchown"	}, /* 198 */
 	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 199 */
 	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 200 */
@@ -248,7 +248,7 @@
 	{ 3,	0,	sys_mincore,		"mincore"	}, /* 218 */
 	{ 3,	0,	sys_madvise,		"madvise"	}, /* 219 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
-	{ MA,	0,	printargs,		"SYS_221"	}, /* 221 */
+	{ MA,	0,	NULL,			NULL		}, /* 221 */
 	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 222 */
 	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 223 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 224 */
@@ -269,7 +269,7 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 239 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 240 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 241 */
-	{ MA,	0,	printargs,		"SYS_242"	}, /* 242 */
+	{ MA,	0,	NULL,			NULL		}, /* 242 */
 	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 243 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 244 */
 	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 245 */
@@ -369,64 +369,64 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 339 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 340 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 341 */
-	{ 5,	0,	printargs,		"SYS_342"	}, /* 342 */
-	{ 5,	0,	printargs,		"SYS_343"	}, /* 343 */
-	{ 5,	0,	printargs,		"SYS_344"	}, /* 344 */
-	{ 5,	0,	printargs,		"SYS_345"	}, /* 345 */
-	{ 5,	0,	printargs,		"SYS_346"	}, /* 346 */
-	{ 5,	0,	printargs,		"SYS_347"	}, /* 347 */
-	{ 5,	0,	printargs,		"SYS_348"	}, /* 348 */
-	{ 5,	0,	printargs,		"SYS_349"	}, /* 349 */
-	{ 5,	0,	printargs,		"SYS_350"	}, /* 350 */
-	{ 5,	0,	printargs,		"SYS_351"	}, /* 351 */
-	{ 5,	0,	printargs,		"SYS_352"	}, /* 352 */
-	{ 5,	0,	printargs,		"SYS_353"	}, /* 353 */
-	{ 5,	0,	printargs,		"SYS_354"	}, /* 354 */
-	{ 5,	0,	printargs,		"SYS_355"	}, /* 355 */
-	{ 5,	0,	printargs,		"SYS_356"	}, /* 356 */
-	{ 5,	0,	printargs,		"SYS_357"	}, /* 357 */
-	{ 5,	0,	printargs,		"SYS_358"	}, /* 358 */
-	{ 5,	0,	printargs,		"SYS_359"	}, /* 359 */
-	{ 5,	0,	printargs,		"SYS_360"	}, /* 360 */
-	{ 5,	0,	printargs,		"SYS_361"	}, /* 361 */
-	{ 5,	0,	printargs,		"SYS_362"	}, /* 362 */
-	{ 5,	0,	printargs,		"SYS_363"	}, /* 363 */
-	{ 5,	0,	printargs,		"SYS_364"	}, /* 364 */
-	{ 5,	0,	printargs,		"SYS_365"	}, /* 365 */
-	{ 5,	0,	printargs,		"SYS_366"	}, /* 366 */
-	{ 5,	0,	printargs,		"SYS_367"	}, /* 367 */
-	{ 5,	0,	printargs,		"SYS_368"	}, /* 368 */
-	{ 5,	0,	printargs,		"SYS_369"	}, /* 369 */
-	{ 5,	0,	printargs,		"SYS_370"	}, /* 370 */
-	{ 5,	0,	printargs,		"SYS_371"	}, /* 371 */
-	{ 5,	0,	printargs,		"SYS_372"	}, /* 372 */
-	{ 5,	0,	printargs,		"SYS_373"	}, /* 373 */
-	{ 5,	0,	printargs,		"SYS_374"	}, /* 374 */
-	{ 5,	0,	printargs,		"SYS_375"	}, /* 375 */
-	{ 5,	0,	printargs,		"SYS_376"	}, /* 376 */
-	{ 5,	0,	printargs,		"SYS_377"	}, /* 377 */
-	{ 5,	0,	printargs,		"SYS_378"	}, /* 378 */
-	{ 5,	0,	printargs,		"SYS_379"	}, /* 379 */
-	{ 5,	0,	printargs,		"SYS_380"	}, /* 380 */
-	{ 5,	0,	printargs,		"SYS_381"	}, /* 381 */
-	{ 5,	0,	printargs,		"SYS_382"	}, /* 382 */
-	{ 5,	0,	printargs,		"SYS_383"	}, /* 383 */
-	{ 5,	0,	printargs,		"SYS_384"	}, /* 384 */
-	{ 5,	0,	printargs,		"SYS_385"	}, /* 385 */
-	{ 5,	0,	printargs,		"SYS_386"	}, /* 386 */
-	{ 5,	0,	printargs,		"SYS_387"	}, /* 387 */
-	{ 5,	0,	printargs,		"SYS_388"	}, /* 388 */
-	{ 5,	0,	printargs,		"SYS_389"	}, /* 389 */
-	{ 5,	0,	printargs,		"SYS_390"	}, /* 390 */
-	{ 5,	0,	printargs,		"SYS_391"	}, /* 391 */
-	{ 5,	0,	printargs,		"SYS_392"	}, /* 392 */
-	{ 5,	0,	printargs,		"SYS_393"	}, /* 393 */
-	{ 5,	0,	printargs,		"SYS_394"	}, /* 394 */
-	{ 5,	0,	printargs,		"SYS_395"	}, /* 395 */
-	{ 5,	0,	printargs,		"SYS_396"	}, /* 396 */
-	{ 5,	0,	printargs,		"SYS_397"	}, /* 397 */
-	{ 5,	0,	printargs,		"SYS_398"	}, /* 398 */
-	{ 5,	0,	printargs,		"SYS_399"	}, /* 399 */
+	{ 5,	0,	NULL,			NULL		}, /* 342 */
+	{ 5,	0,	NULL,			NULL		}, /* 343 */
+	{ 5,	0,	NULL,			NULL		}, /* 344 */
+	{ 5,	0,	NULL,			NULL		}, /* 345 */
+	{ 5,	0,	NULL,			NULL		}, /* 346 */
+	{ 5,	0,	NULL,			NULL		}, /* 347 */
+	{ 5,	0,	NULL,			NULL		}, /* 348 */
+	{ 5,	0,	NULL,			NULL		}, /* 349 */
+	{ 5,	0,	NULL,			NULL		}, /* 350 */
+	{ 5,	0,	NULL,			NULL		}, /* 351 */
+	{ 5,	0,	NULL,			NULL		}, /* 352 */
+	{ 5,	0,	NULL,			NULL		}, /* 353 */
+	{ 5,	0,	NULL,			NULL		}, /* 354 */
+	{ 5,	0,	NULL,			NULL		}, /* 355 */
+	{ 5,	0,	NULL,			NULL		}, /* 356 */
+	{ 5,	0,	NULL,			NULL		}, /* 357 */
+	{ 5,	0,	NULL,			NULL		}, /* 358 */
+	{ 5,	0,	NULL,			NULL		}, /* 359 */
+	{ 5,	0,	NULL,			NULL		}, /* 360 */
+	{ 5,	0,	NULL,			NULL		}, /* 361 */
+	{ 5,	0,	NULL,			NULL		}, /* 362 */
+	{ 5,	0,	NULL,			NULL		}, /* 363 */
+	{ 5,	0,	NULL,			NULL		}, /* 364 */
+	{ 5,	0,	NULL,			NULL		}, /* 365 */
+	{ 5,	0,	NULL,			NULL		}, /* 366 */
+	{ 5,	0,	NULL,			NULL		}, /* 367 */
+	{ 5,	0,	NULL,			NULL		}, /* 368 */
+	{ 5,	0,	NULL,			NULL		}, /* 369 */
+	{ 5,	0,	NULL,			NULL		}, /* 370 */
+	{ 5,	0,	NULL,			NULL		}, /* 371 */
+	{ 5,	0,	NULL,			NULL		}, /* 372 */
+	{ 5,	0,	NULL,			NULL		}, /* 373 */
+	{ 5,	0,	NULL,			NULL		}, /* 374 */
+	{ 5,	0,	NULL,			NULL		}, /* 375 */
+	{ 5,	0,	NULL,			NULL		}, /* 376 */
+	{ 5,	0,	NULL,			NULL		}, /* 377 */
+	{ 5,	0,	NULL,			NULL		}, /* 378 */
+	{ 5,	0,	NULL,			NULL		}, /* 379 */
+	{ 5,	0,	NULL,			NULL		}, /* 380 */
+	{ 5,	0,	NULL,			NULL		}, /* 381 */
+	{ 5,	0,	NULL,			NULL		}, /* 382 */
+	{ 5,	0,	NULL,			NULL		}, /* 383 */
+	{ 5,	0,	NULL,			NULL		}, /* 384 */
+	{ 5,	0,	NULL,			NULL		}, /* 385 */
+	{ 5,	0,	NULL,			NULL		}, /* 386 */
+	{ 5,	0,	NULL,			NULL		}, /* 387 */
+	{ 5,	0,	NULL,			NULL		}, /* 388 */
+	{ 5,	0,	NULL,			NULL		}, /* 389 */
+	{ 5,	0,	NULL,			NULL		}, /* 390 */
+	{ 5,	0,	NULL,			NULL		}, /* 391 */
+	{ 5,	0,	NULL,			NULL		}, /* 392 */
+	{ 5,	0,	NULL,			NULL		}, /* 393 */
+	{ 5,	0,	NULL,			NULL		}, /* 394 */
+	{ 5,	0,	NULL,			NULL		}, /* 395 */
+	{ 5,	0,	NULL,			NULL		}, /* 396 */
+	{ 5,	0,	NULL,			NULL		}, /* 397 */
+	{ 5,	0,	NULL,			NULL		}, /* 398 */
+	{ 5,	0,	NULL,			NULL		}, /* 399 */
 
 #if SYS_socket_subcall != 400
  #error fix me

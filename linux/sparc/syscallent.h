@@ -265,7 +265,7 @@
 	{ 1,	0,	sys_timer_getoverrun,"timer_getoverrun" },/* 264 */
 	{ 1,	0,	sys_timer_delete,"timer_delete" },	/* 265 */
 	{ 3,	0,	sys_timer_create,"timer_create" },	/* 266 */
-	{ 5,	0,	printargs,	"SYS_267" },		/* 267 */
+	{ 5,	0,	NULL,			NULL		}, /* 267 */
 	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 268 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 269 */
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 270 */
@@ -338,19 +338,19 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 337 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 338 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 339 */
-	{ 5,	0,	printargs,	"SYS_340" },		/* 340 */
-	{ 5,	0,	printargs,	"SYS_341" },		/* 341 */
-	{ 5,	0,	printargs,	"SYS_342" },		/* 342 */
-	{ 5,	0,	printargs,	"SYS_343" },		/* 343 */
-	{ 5,	0,	printargs,	"SYS_344" },		/* 344 */
-	{ 5,	0,	printargs,	"SYS_345" },		/* 345 */
-	{ 5,	0,	printargs,	"SYS_346" },		/* 346 */
-	{ 5,	0,	printargs,	"SYS_347" },		/* 347 */
-	{ 5,	0,	printargs,	"SYS_348" },		/* 348 */
-	{ 5,	0,	printargs,	"SYS_349" },		/* 349 */
-	{ 5,	0,	printargs,	"SYS_350" },		/* 350 */
-	{ 5,	0,	printargs,	"SYS_351" },		/* 351 */
-	{ 5,	0,	printargs,	"SYS_352" },		/* 352 */
+	{ 5,	0,	NULL,			NULL		}, /* 340 */
+	{ 5,	0,	NULL,			NULL		}, /* 341 */
+	{ 5,	0,	NULL,			NULL		}, /* 342 */
+	{ 5,	0,	NULL,			NULL		}, /* 343 */
+	{ 5,	0,	NULL,			NULL		}, /* 344 */
+	{ 5,	0,	NULL,			NULL		}, /* 345 */
+	{ 5,	0,	NULL,			NULL		}, /* 346 */
+	{ 5,	0,	NULL,			NULL		}, /* 347 */
+	{ 5,	0,	NULL,			NULL		}, /* 348 */
+	{ 5,	0,	NULL,			NULL		}, /* 349 */
+	{ 5,	0,	NULL,			NULL		}, /* 350 */
+	{ 5,	0,	NULL,			NULL		}, /* 351 */
+	{ 5,	0,	NULL,			NULL		}, /* 352 */
 #if SYS_socket_subcall != 353
  #error fix me
 #endif
@@ -402,7 +402,7 @@
 	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 395 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 396 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 397 */
-	{ 5,	0,	printargs,		"SYS_397"	}, /* 398 */
-	{ 5,	0,	printargs,		"SYS_398"	}, /* 399 */
-	{ 5,	0,	printargs,		"SYS_399"	}, /* 400 */
-	{ 5,	0,	printargs,		"SYS_400"	}, /* 401 */
+	{ 5,	0,	NULL,			NULL		}, /* 398 */
+	{ 5,	0,	NULL,			NULL		}, /* 399 */
+	{ 5,	0,	NULL,			NULL		}, /* 400 */
+	{ 5,	0,	NULL,			NULL		}, /* 401 */

@@ -104,7 +104,7 @@
 	{ 2,	TF,	sys_statfs,		"statfs"		}, /* 99 */
 	{ 2,	TD,	sys_fstatfs,		"fstatfs"		}, /* 100 */
 	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 101 */
-	{ 5,	0,	printargs,		"SYS_102"		}, /* 102 */
+	{ 5,	0,	NULL,			NULL			}, /* 102 */
 	{ 3,	0,	sys_syslog,		"syslog"		}, /* 103 */
 	{ 3,	0,	sys_setitimer,		"setitimer"		}, /* 104 */
 	{ 2,	0,	sys_getitimer,		"getitimer"		}, /* 105 */

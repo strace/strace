@@ -247,7 +247,7 @@
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 219 */
 	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 220 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 221 */
-	{ 5,	0,	printargs,		"SYS_222"	}, /* 222 */
+	{ 5,	0,	NULL,			NULL		}, /* 222 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 223 */
 	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 224 */
 	{ 3,	0,	printargs,		"cacheflush"	}, /* 225 */
@@ -307,5 +307,5 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 279 */
 	{ 2,	TD,	sys_timerfd,		"timerfd_create" }, /* 280 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 281 */
-	{ 5,	0,	printargs,		"SYS_282"	}, /* 282 */
+	{ 5,	0,	NULL,			NULL		}, /* 282 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 283 */
