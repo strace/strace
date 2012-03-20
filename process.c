@@ -2170,9 +2170,7 @@ sys_ptrace(struct tcb *tcp)
 	long addr;
 
 	if (entering(tcp)) {
-		printxval(ptrace_cmds, tcp->u_arg[0],
-			  "PTRACE_???"
-			);
+		printxval(ptrace_cmds, tcp->u_arg[0], "PTRACE_???");
 		tprintf(", %lu, ", tcp->u_arg[1]);
 		addr = tcp->u_arg[2];
 		if (tcp->u_arg[0] == PTRACE_PEEKUSER

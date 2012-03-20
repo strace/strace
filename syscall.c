@@ -1471,7 +1471,7 @@ trace_syscall_entering(struct tcb *tcp)
 		printleader(tcp);
 		tcp->flags &= ~TCB_REPRINT;
 		if (scno_good != 1)
-			tprintf("????" /* anti-trigraph gap */ "(");
+			tprints("????" /* anti-trigraph gap */ "(");
 		else if (!SCNO_IN_RANGE(tcp->scno))
 			tprintf("syscall_%lu(", tcp->scno);
 		else
