@@ -673,9 +673,9 @@ static long r3;
 #endif
 
 /* Returns:
- * 0: "ignore this ptrace stop", bail out of trace_syscall() silently.
- * 1: ok, continue in trace_syscall().
- * other: error, trace_syscall() should print error indicator
+ * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
+ * 1: ok, continue in trace_syscall_entering().
+ * other: error, trace_syscall_entering() should print error indicator
  *    ("????" etc) and bail out.
  */
 static int
@@ -1082,9 +1082,9 @@ get_scno(struct tcb *tcp)
 
 /* Called at each syscall entry.
  * Returns:
- * 0: "ignore this ptrace stop", bail out of trace_syscall() silently.
- * 1: ok, continue in trace_syscall().
- * other: error, trace_syscall() should print error indicator
+ * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
+ * 1: ok, continue in trace_syscall_entering().
+ * other: error, trace_syscall_entering() should print error indicator
  *    ("????" etc) and bail out.
  */
 static int
@@ -1459,12 +1459,13 @@ trace_syscall_entering(struct tcb *tcp)
 	scno_good = res = get_scno(tcp);
 	if (res == 0)
 		return res;
-	if (res == 1)
+	if (res == 1) {
 		res = syscall_fixup_on_sysenter(tcp);
-	if (res == 0)
-		return res;
-	if (res == 1)
-		res = get_syscall_args(tcp);
+		if (res == 0)
+			return res;
+		if (res == 1)
+			res = get_syscall_args(tcp);
+	}
 
 	if (res != 1) {
 		printleader(tcp);
@@ -1540,9 +1541,8 @@ trace_syscall_entering(struct tcb *tcp)
 }
 
 /* Returns:
- * 0: "ignore this ptrace stop", bail out of trace_syscall() silently.
- * 1: ok, continue in trace_syscall().
- * other: error, trace_syscall() should print error indicator
+ * 1: ok, continue in trace_syscall_exiting().
+ * -1: error, trace_syscall_exiting() should print error indicator
  *    ("????" etc) and bail out.
  */
 static int
@@ -1674,6 +1674,11 @@ is_negated_errno(unsigned long int val)
 	return val > max;
 }
 
+/* Returns:
+ * 1: ok, continue in trace_syscall_exiting().
+ * -1: error, trace_syscall_exiting() should print error indicator
+ *    ("????" etc) and bail out.
+ */
 static int
 get_error(struct tcb *tcp)
 {
@@ -1902,26 +1907,22 @@ trace_syscall_exiting(struct tcb *tcp)
 	update_personality(tcp, tcp->currpers);
 #endif
 	res = get_syscall_result(tcp);
-	if (res == 0)
-		return res;
 	if (res == 1) {
 		syscall_fixup_on_sysexit(tcp); /* never fails */
-		res = get_error(tcp);
-	}
-	if (res == 0)
-		return res;
-	if (res == 1)
-		internal_syscall(tcp);
-
-	if (res == 1 && filtered(tcp)) {
-		goto ret;
+		res = get_error(tcp); /* returns 1 or -1 */
+		if (res == 1) {
+			internal_syscall(tcp);
+			if (filtered(tcp)) {
+				goto ret;
+			}
+		}
 	}
 
 	/* TODO: TCB_REPRINT is probably not necessary:
 	 * we can determine whether reprinting is needed
 	 * by examining printing_tcp. Something like:
 	 * if not in -ff mode, and printing_tcp != tcp,
-	 * then the log is not currenlty ends with *our*
+	 * then the log is not currently ends with *our*
 	 * syscall entry output, but with something else,
 	 * and we need to reprint.
 	 * If we'd implement this, printing_tcp = tcp
