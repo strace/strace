@@ -29,30 +29,50 @@
  */
 
 #include "defs.h"
+#include <limits.h>
 #include <asm/ioctl.h>
 
 static int
 compare(const void *a, const void *b)
 {
-	unsigned long code1 = ((struct ioctlent *) a)->code;
+	unsigned long code1 = (long) a;
 	unsigned long code2 = ((struct ioctlent *) b)->code;
-	return (code1 > code2) ? 1 : (code1 < code2) ? -1 : 0;
+
+	/* Simply returning (code1 - code2) may be wrong.
+	 * Exmaple: 0xffffffff - 0 = 0xffffffff = -1.
+	 * Need to shift both values down until they both fit
+	 * in positive int.
+	 */
+	while ((code1|code2) > INT_MAX) {
+#if INT_MAX == LONG_MAX
+		/* this case is easy */
+		code1 >>= 1;
+		code2 >>= 1;
+		break;
+#else
+		/* Remove INT_MAX worth of bits, then check again */
+		code1 >>= sizeof(int) * 8 - 1;
+		code2 >>= sizeof(int) * 8 - 1;
+#endif
+	}
+	return (int)code1 - (int)code2;
 }
 
 const struct ioctlent *
 ioctl_lookup(long code)
 {
-	struct ioctlent *iop, ioent;
+	struct ioctlent *iop;
 
-	ioent.code = code;
-	ioent.code &= (_IOC_NRMASK<<_IOC_NRSHIFT) | (_IOC_TYPEMASK<<_IOC_TYPESHIFT);
-	iop = (struct ioctlent *) bsearch((char *) &ioent, (char *) ioctlent,
-			nioctlents, sizeof(struct ioctlent), compare);
-	while (iop > ioctlent)
-		if ((--iop)->code != ioent.code) {
+	code &= (_IOC_NRMASK<<_IOC_NRSHIFT) | (_IOC_TYPEMASK<<_IOC_TYPESHIFT);
+	iop = bsearch((void*)code, ioctlent,
+			nioctlents, sizeof(ioctlent[0]), compare);
+	while (iop > ioctlent) {
+		iop--;
+		if (iop->code != code) {
 			iop++;
 			break;
 		}
+	}
 	return iop;
 }
 
@@ -61,7 +81,8 @@ ioctl_next_match(const struct ioctlent *iop)
 {
 	long code;
 
-	code = (iop++)->code;
+	code = iop->code;
+	iop++;
 	if (iop < ioctlent + nioctlents && iop->code == code)
 		return iop;
 	return NULL;
