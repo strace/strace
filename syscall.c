@@ -635,7 +635,7 @@ static struct user_regs_struct x86_64_regs;
 long r8, r10, psr; /* TODO: make static? */
 long ia32 = 0; /* not static */
 #elif defined(POWERPC)
-static long result;
+static long ppc_result;
 #elif defined(M68K)
 static long d0;
 #elif defined(BFIN)
@@ -1557,10 +1557,10 @@ get_syscall_result(struct tcb *tcp)
 		long flags;
 		if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
 			return -1;
-		if (upeek(tcp, sizeof(unsigned long)*PT_R3, &result) < 0)
+		if (upeek(tcp, sizeof(unsigned long)*PT_R3, &ppc_result) < 0)
 			return -1;
 		if (flags & SO_MASK)
-			result = -result;
+			ppc_result = -ppc_result;
 	}
 #elif defined(AVR32)
 	/* Read complete register set in one go. */
@@ -1735,12 +1735,12 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = r2;
 	}
 #elif defined(POWERPC)
-	if (check_errno && is_negated_errno(result)) {
+	if (check_errno && is_negated_errno(ppc_result)) {
 		tcp->u_rval = -1;
-		u_error = -result;
+		u_error = -ppc_result;
 	}
 	else {
-		tcp->u_rval = result;
+		tcp->u_rval = ppc_result;
 	}
 #elif defined(M68K)
 	if (check_errno && is_negated_errno(d0)) {
