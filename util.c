@@ -161,39 +161,6 @@ stpcpy(char *dst, const char *src)
 #endif
 
 /*
- * Used when we want to unblock stopped traced process.
- * Should be only used with PTRACE_CONT, PTRACE_DETACH and PTRACE_SYSCALL.
- * Returns 0 on success or if error was ESRCH
- * (presumably process was killed while we talk to it).
- * Otherwise prints error message and returns -1.
- */
-int
-ptrace_restart(int op, struct tcb *tcp, int sig)
-{
-	int err;
-	const char *msg;
-
-	errno = 0;
-	ptrace(op, tcp->pid, (void *) 0, (long) sig);
-	err = errno;
-	if (!err || err == ESRCH)
-		return 0;
-
-	tcp->ptrace_errno = err;
-	msg = "SYSCALL";
-	if (op == PTRACE_CONT)
-		msg = "CONT";
-	if (op == PTRACE_DETACH)
-		msg = "DETACH";
-#ifdef PTRACE_LISTEN
-	if (op == PTRACE_LISTEN)
-		msg = "LISTEN";
-#endif
-	perror_msg("ptrace(PTRACE_%s,pid:%d,sig:%d)", msg, tcp->pid, sig);
-	return -1;
-}
-
-/*
  * Print entry in struct xlat table, if there.
  */
 void
