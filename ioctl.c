@@ -29,7 +29,6 @@
  */
 
 #include "defs.h"
-#include <limits.h>
 #include <asm/ioctl.h>
 
 static int
