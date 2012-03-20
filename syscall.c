@@ -1247,8 +1247,9 @@ internal_syscall(struct tcb *tcp)
 #endif
 }
 
+/* Return -1 on error or 1 on success (never 0!) */
 static int
-syscall_enter(struct tcb *tcp)
+get_syscall_args(struct tcb *tcp)
 {
 	int i, nargs;
 
@@ -1463,9 +1464,7 @@ trace_syscall_entering(struct tcb *tcp)
 	if (res == 0)
 		return res;
 	if (res == 1)
-		res = syscall_enter(tcp);
-	if (res == 0)
-		return res;
+		res = get_syscall_args(tcp);
 
 	if (res != 1) {
 		printleader(tcp);
@@ -1639,14 +1638,8 @@ get_syscall_result(struct tcb *tcp)
 	return 1;
 }
 
-/* Called at each syscall exit.
- * Returns:
- * 0: "ignore this ptrace stop", bail out of trace_syscall() silently.
- * 1: ok, continue in trace_syscall().
- * other: error, trace_syscall() should print error indicator
- *    ("????" etc) and bail out.
- */
-static int
+/* Called at each syscall exit */
+static void
 syscall_fixup_on_sysexit(struct tcb *tcp)
 {
 #if defined(S390) || defined(S390X)
@@ -1662,7 +1655,6 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 		gpr2 = 0;
 	}
 #endif
-	return 1;
 }
 
 /*
@@ -1912,12 +1904,10 @@ trace_syscall_exiting(struct tcb *tcp)
 	res = get_syscall_result(tcp);
 	if (res == 0)
 		return res;
-	if (res == 1)
-		res = syscall_fixup_on_sysexit(tcp);
-	if (res == 0)
-		return res;
-	if (res == 1)
+	if (res == 1) {
+		syscall_fixup_on_sysexit(tcp); /* never fails */
 		res = get_error(tcp);
+	}
 	if (res == 0)
 		return res;
 	if (res == 1)
