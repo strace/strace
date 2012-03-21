@@ -1,10 +1,12 @@
 #!/bin/sh
 
+export HDBMEGS=128
+
 build_in_dir()
 {
 	cd "$1" || exit 1
 	rm -f hdb.img 2>/dev/null
-	./native-build.sh ../hdc.img
+	nice -n10 ./native-build.sh ../hdc.img
 	rm -f hdb.img 2>/dev/null
 }
 

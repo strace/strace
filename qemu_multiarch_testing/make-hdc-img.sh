@@ -1,6 +1,6 @@
 #!/bin/sh
 
-HDCMEGS=128
+export HDCMEGS=128
 
 rm hdc.img 2>/dev/null
 umount -d hdc.img.dir 2>/dev/null
