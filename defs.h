@@ -316,7 +316,6 @@ struct tcb {
 	long long ext_arg[MAX_ARGS];	/* System call arguments */
 #endif
 	long u_rval;		/* (first) return value */
-	int ptrace_errno;
 #if SUPPORTED_PERSONALITIES > 1
 	int currpers;		/* Personality at the time of scno update */
 #endif

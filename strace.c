@@ -352,10 +352,9 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	errno = 0;
 	ptrace(op, tcp->pid, (void *) 0, (long) sig);
 	err = errno;
-	if (!err || err == ESRCH)
+	if (!err)
 		return 0;
 
-	tcp->ptrace_errno = err;
 	msg = "SYSCALL";
 	if (op == PTRACE_CONT)
 		msg = "CONT";
@@ -365,6 +364,22 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	if (op == PTRACE_LISTEN)
 		msg = "LISTEN";
 #endif
+	/*
+	 * Why curcol != 0? Otherwise sometimes we get this:
+	 *
+	 * 10252 kill(10253, SIGKILL)              = 0
+	 *  <ptrace(SYSCALL,10252):No such process>10253 ...next decode...
+	 *
+	 * 10252 died after we retrieved syscall exit data,
+	 * but before we tried to restart it. Log looks ugly.
+	 */
+	if (curcol != 0) {
+		tprintf(" <ptrace(%s):%s>\n", msg, strerror(err));
+		line_ended();
+	}
+	if (err == ESRCH)
+		return 0;
+	errno = err;
 	perror_msg("ptrace(PTRACE_%s,pid:%d,sig:%d)", msg, tcp->pid, sig);
 	return -1;
 }
@@ -537,15 +552,6 @@ printleader(struct tcb *tcp)
 	if (printing_tcp) {
 		outf = printing_tcp->outf;
 		curcol = printing_tcp->curcol;
-		if (printing_tcp->ptrace_errno) {
-			if (printing_tcp->flags & TCB_INSYSCALL) {
-				tprints(" <unavailable>) ");
-				tabto();
-			}
-			tprints("= ? <unavailable>\n");
-			printing_tcp->ptrace_errno = 0;
-			printing_tcp->curcol = 0;
-		}
 		if (printing_tcp->curcol != 0 && (followfork < 2 || printing_tcp == tcp)) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
@@ -2164,10 +2170,10 @@ trace(void)
 		 * (Or it still can be that pesky post-execve SIGTRAP!)
 		 * Handle it.
 		 */
-		if (trace_syscall(tcp) < 0 && !tcp->ptrace_errno) {
-			/* ptrace() failed in trace_syscall() with ESRCH.
+		if (trace_syscall(tcp) < 0) {
+			/* ptrace() failed in trace_syscall().
 			 * Likely a result of process disappearing mid-flight.
-			 * Observed case: exit_group() terminating
+			 * Observed case: exit_group() or SIGKILL terminating
 			 * all processes in thread group.
 			 * We assume that ptrace error was caused by process death.
 			 * We used to detach(tcp) here, but since we no longer
@@ -2182,11 +2188,12 @@ trace(void)
 		sig = 0;
  restart_tracee:
 		/* Remember current print column before continuing. */
-		tcp->curcol = curcol;
 		if (ptrace_restart(PTRACE_SYSCALL, tcp, sig) < 0) {
+			tcp->curcol = curcol;
 			cleanup();
 			return -1;
 		}
+		tcp->curcol = curcol;
 	}
 	return 0;
 }
