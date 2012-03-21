@@ -2018,7 +2018,7 @@ trace(void)
 		if (WIFEXITED(status)) {
 			if (pid == strace_child)
 				exit_code = WEXITSTATUS(status);
-			if (!cflag /* && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL) */ ) {
+			if (cflag != CFLAG_ONLY_STATS) {
 				printleader(tcp);
 				tprintf("+++ exited with %d +++\n", WEXITSTATUS(status));
 				line_ended();
@@ -2152,6 +2152,7 @@ trace(void)
 				 * (that is, process really stops. It used to continue to run).
 				 */
 				if (ptrace_restart(PTRACE_LISTEN, tcp, 0) < 0) {
+					tcp->curcol = curcol;
 					cleanup();
 					return -1;
 				}
