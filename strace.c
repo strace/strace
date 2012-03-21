@@ -560,7 +560,6 @@ printleader(struct tcb *tcp)
 			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
 			 */
 			tprints(" <unfinished ...>\n");
-			printing_tcp->flags |= TCB_REPRINT;
 			printing_tcp->curcol = 0;
 		}
 	}
@@ -1943,11 +1942,11 @@ trace(void)
 				tcp = execve_thread;
 				if (tcp) {
 					tcp->pid = pid;
-					tcp->flags |= TCB_REPRINT;
-					if (!cflag) {
+					if (cflag != CFLAG_ONLY_STATS) {
 						printleader(tcp);
 						tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
 						line_ended();
+						tcp->flags |= TCB_REPRINT;
 					}
 				}
 			}
@@ -2103,6 +2102,8 @@ trace(void)
 
 			/* Nonzero (true) if tracee is stopped by signal
 			 * (as opposed to "tracee received signal").
+			 * TODO: shouldn't we check for errno == EINVAL too?
+			 * We can get ESRCH instead, you know...
 			 */
 			stopped = (ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) < 0);
 #ifdef USE_SEIZE

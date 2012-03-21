@@ -1469,7 +1469,6 @@ trace_syscall_entering(struct tcb *tcp)
 
 	if (res != 1) {
 		printleader(tcp);
-		tcp->flags &= ~TCB_REPRINT;
 		if (scno_good != 1)
 			tprints("????" /* anti-trigraph gap */ "(");
 		else if (!SCNO_IN_RANGE(tcp->scno))
@@ -1518,7 +1517,6 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 
 	printleader(tcp);
-	tcp->flags &= ~TCB_REPRINT;
 	if (!SCNO_IN_RANGE(tcp->scno))
 		tprintf("syscall_%lu(", tcp->scno);
 	else
@@ -1918,25 +1916,6 @@ trace_syscall_exiting(struct tcb *tcp)
 		}
 	}
 
-	/* TODO: TCB_REPRINT is probably not necessary:
-	 * we can determine whether reprinting is needed
-	 * by examining printing_tcp. Something like:
-	 * if not in -ff mode, and printing_tcp != tcp,
-	 * then the log is not currently ends with *our*
-	 * syscall entry output, but with something else,
-	 * and we need to reprint.
-	 * If we'd implement this, printing_tcp = tcp
-	 * assignments in code below can be made more logical.
-	 */
-
-	if (tcp->flags & TCB_REPRINT) {
-		printleader(tcp);
-		if (!SCNO_IN_RANGE(tcp->scno))
-			tprintf("<... syscall_%lu resumed> ", tcp->scno);
-		else
-			tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
-	}
-
 	if (cflag) {
 		struct timeval t = tv;
 		count_syscall(tcp, &t);
@@ -1945,8 +1924,27 @@ trace_syscall_exiting(struct tcb *tcp)
 		}
 	}
 
+	/* If not in -ff mode, and printing_tcp != tcp,
+	 * then the log currently does not end with output
+	 * of _our syscall entry_, but with something else.
+	 * We need to say which syscall's return is this.
+	 *
+	 * Forced reprinting via TCB_REPRINT is used only by
+	 * "strace -ff -oLOG test/threaded_execve" corner case.
+	 * It's the only case when -ff mode needs reprinting.
+	 */
+	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
+		tcp->flags &= ~TCB_REPRINT;
+		printleader(tcp);
+		if (!SCNO_IN_RANGE(tcp->scno))
+			tprintf("<... syscall_%lu resumed> ", tcp->scno);
+		else
+			tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
+	}
+	printing_tcp = tcp;
+
 	if (res != 1) {
-		printing_tcp = tcp;
+		/* There was error in one of prior ptrace ops */
 		tprints(") ");
 		tabto();
 		tprints("= ? <unavailable>\n");
@@ -1955,10 +1953,10 @@ trace_syscall_exiting(struct tcb *tcp)
 		return res;
 	}
 
+	sys_res = 0;
 	if (!SCNO_IN_RANGE(tcp->scno)
 	    || (qual_flags[tcp->scno] & QUAL_RAW)) {
-		printing_tcp = tcp;
-		sys_res = printargs(tcp);
+		/* sys_res = printargs(tcp); - but it's nop on sysexit */
 	} else {
 	/* FIXME: not_failing_only (IOW, option -z) is broken:
 	 * failure of syscall is known only after syscall return.
@@ -1970,7 +1968,6 @@ trace_syscall_exiting(struct tcb *tcp)
 	 */
 		if (not_failing_only && tcp->u_error)
 			goto ret;	/* ignore failed syscalls */
-		printing_tcp = tcp;
 		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
 	}
 
