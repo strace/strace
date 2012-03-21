@@ -76,6 +76,11 @@ extern char *stpcpy(char *dst, const char *src);
 # define __attribute__(x) /*nothing*/
 #endif
 
+#ifndef offsetof
+# define offsetof(type, member)	\
+	(((char *) &(((type *) NULL)->member)) - ((char *) (type *) NULL))
+#endif
+
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 /* Configuration section */
@@ -355,10 +360,10 @@ struct tcb {
 #define TCB_INSYSCALL	00010
 #define TCB_ATTACHED	00020   /* It is attached already */
 /* Are we PROG from "strace PROG [ARGS]" invocation? */
-#define TCB_STRACE_CHILD 00040
+#define TCB_STRACE_CHILD 0040
 #define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
-#define TCB_REPRINT	01000	/* We should reprint this syscall on exit */
-#define TCB_FILTERED	02000	/* This system call has been filtered out */
+#define TCB_REPRINT	00200	/* We should reprint this syscall on exit */
+#define TCB_FILTERED	00400	/* This system call has been filtered out */
 /* x86 does not need TCB_WAITEXECVE.
  * It can detect SIGTRAP by looking at eax/rax.
  * See "not a syscall entry (eax = %ld)\n" message
@@ -371,7 +376,7 @@ struct tcb {
 /* This tracee has entered into execve syscall. Expect post-execve SIGTRAP
  * to happen. (When it is detected, tracee is continued and this bit is cleared.)
  */
-# define TCB_WAITEXECVE 04000
+# define TCB_WAITEXECVE	01000
 #endif
 
 /* qualifier flags */
@@ -410,14 +415,6 @@ extern const struct xlat open_access_modes[];
 
 #define RVAL_STR	010	/* Print `auxstr' field after return val */
 #define RVAL_NONE	020	/* Print nothing */
-
-#ifndef offsetof
-# define offsetof(type, member)	(((char *) &(((type *) NULL)->member)) - \
-				 ((char *) (type *) NULL))
-#endif
-
-/* get offset of member within a user struct */
-#define uoff(member)	offsetof(struct user, member)
 
 #define TRACE_FILE	001	/* Trace file-related syscalls. */
 #define TRACE_IPC	002	/* Trace IPC-related syscalls. */

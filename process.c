@@ -1287,6 +1287,8 @@ static const struct xlat ptrace_setoptions_flags[] = {
 };
 #endif /* PTRACE_SETOPTIONS */
 
+#define uoff(member)	offsetof(struct user, member)
+
 const struct xlat struct_user_offsets[] = {
 #if defined(S390) || defined(S390X)
 	{ PT_PSWMASK,		"psw_mask"				},
