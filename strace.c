@@ -684,7 +684,7 @@ droptcb(struct tcb *tcp)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
 
 	if (tcp->outf) {
-		if (outfname && followfork >= 2) {
+		if (followfork >= 2) {
 			if (tcp->curcol != 0)
 				fprintf(tcp->outf, " <detached ...>\n");
 			fclose(tcp->outf);
@@ -1898,68 +1898,7 @@ trace(void)
 		/* Look up 'pid' in our table. */
 		tcp = pid2tcb(pid);
 
-		/* Under Linux, execve changes pid to thread leader's pid,
-		 * and we see this changed pid on EVENT_EXEC and later,
-		 * execve sysexit. Leader "disappears" without exit
-		 * notification. Let user know that, drop leader's tcb,
-		 * and fix up pid in execve thread's tcb.
-		 * Effectively, execve thread's tcb replaces leader's tcb.
-		 *
-		 * BTW, leader is 'stuck undead' (doesn't report WIFEXITED
-		 * on exit syscall) in multithreaded programs exactly
-		 * in order to handle this case.
-		 *
-		 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
-		 * On 2.6 and earlier, it can return garbage.
-		 */
-		if (event == PTRACE_EVENT_EXEC && os_release >= KERNEL_VERSION(3,0,0)) {
-			long old_pid = 0;
-			if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, (long) &old_pid) >= 0
-			 && old_pid > 0
-			 && old_pid != pid
-			) {
-				struct tcb *execve_thread = pid2tcb(old_pid);
-				if (tcp) {
-					outf = tcp->outf;
-					curcol = tcp->curcol;
-					if (execve_thread) {
-						if (execve_thread->curcol != 0) {
-							/*
-							 * One case we are here is -ff:
-							 * try "strace -oLOG -ff test/threaded_execve"
-							 */
-							fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
-							execve_thread->curcol = 0;
-						}
-						/* swap output FILEs (needed for -ff) */
-						tcp->outf = execve_thread->outf;
-						tcp->curcol = execve_thread->curcol;
-						execve_thread->outf = outf;
-						execve_thread->curcol = curcol;
-					}
-					droptcb(tcp);
-				}
-				tcp = execve_thread;
-				if (tcp) {
-					tcp->pid = pid;
-					if (cflag != CFLAG_ONLY_STATS) {
-						printleader(tcp);
-						tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
-						line_ended();
-						tcp->flags |= TCB_REPRINT;
-					}
-				}
-			}
-		}
-
-		if (event == PTRACE_EVENT_EXEC && detach_on_execve) {
-			if (!skip_startup_execve)
-				detach(tcp);
-			/* This was initial execve for "strace PROG". Skip. */
-			skip_startup_execve = 0;
-		}
-
-		if (tcp == NULL) {
+		if (!tcp) {
 			if (followfork) {
 				/* This is needed to go with the CLONE_PTRACE
 				   changes in process.c/util.c: we might see
@@ -1976,15 +1915,77 @@ trace(void)
 				if (!qflag)
 					fprintf(stderr, "Process %d attached\n",
 						pid);
-			}
-			else
+			} else {
 				/* This can happen if a clone call used
 				   CLONE_PTRACE itself.  */
-			{
 				if (WIFSTOPPED(status))
 					ptrace(PTRACE_CONT, pid, (char *) 0, 0);
 				error_msg_and_die("Unknown pid: %u", pid);
 			}
+		}
+
+		/* Under Linux, execve changes pid to thread leader's pid,
+		 * and we see this changed pid on EVENT_EXEC and later,
+		 * execve sysexit. Leader "disappears" without exit
+		 * notification. Let user know that, drop leader's tcb,
+		 * and fix up pid in execve thread's tcb.
+		 * Effectively, execve thread's tcb replaces leader's tcb.
+		 *
+		 * BTW, leader is 'stuck undead' (doesn't report WIFEXITED
+		 * on exit syscall) in multithreaded programs exactly
+		 * in order to handle this case.
+		 *
+		 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
+		 * On 2.6 and earlier, it can return garbage.
+		 */
+		if (event == PTRACE_EVENT_EXEC && os_release >= KERNEL_VERSION(3,0,0)) {
+			struct tcb *execve_thread;
+			long old_pid = 0;
+
+			if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, (long) &old_pid) < 0)
+				goto dont_switch_tcbs;
+			if (old_pid <= 0 || old_pid == pid)
+				goto dont_switch_tcbs;
+			execve_thread = pid2tcb(old_pid);
+			/* It should be !NULL, but I feel paranoid */
+			if (!execve_thread)
+				goto dont_switch_tcbs;
+
+			outf = tcp->outf;
+			curcol = tcp->curcol;
+			if (execve_thread->curcol != 0) {
+				/*
+				 * One case we are here is -ff:
+				 * try "strace -oLOG -ff test/threaded_execve"
+				 */
+				fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
+				execve_thread->curcol = 0;
+			}
+			/* Swap output FILEs (needed for -ff) */
+			tcp->outf = execve_thread->outf;
+			tcp->curcol = execve_thread->curcol;
+			/* And their column positions */
+			execve_thread->outf = outf;
+			execve_thread->curcol = curcol;
+			/* Drop leader, but close execve'd thread outfile (if -ff) */
+			droptcb(tcp);
+			/* Switch to the thread, reusing leader's outfile and pid */
+			tcp = execve_thread;
+			tcp->pid = pid;
+			if (cflag != CFLAG_ONLY_STATS) {
+				printleader(tcp);
+				tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
+				line_ended();
+				tcp->flags |= TCB_REPRINT;
+			}
+		}
+ dont_switch_tcbs:
+
+		if (event == PTRACE_EVENT_EXEC && detach_on_execve) {
+			if (!skip_startup_execve)
+				detach(tcp);
+			/* This was initial execve for "strace PROG". Skip. */
+			skip_startup_execve = 0;
 		}
 
 		/* Set current output file */
