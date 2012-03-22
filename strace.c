@@ -133,10 +133,14 @@ static gid_t run_gid;
 unsigned int max_strlen = DEFAULT_STRLEN;
 static unsigned int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
+
 static char *outfname = NULL;
-static FILE *outf;
+/* If -ff, points to stderr. Else, it's our common output log */
+static FILE *shared_log;
+
 struct tcb *printing_tcp = NULL;
-static unsigned int curcol;
+static struct tcb *current_tcp;
+
 static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
 static const char *progname;
@@ -373,7 +377,7 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	 * 10252 died after we retrieved syscall exit data,
 	 * but before we tried to restart it. Log looks ugly.
 	 */
-	if (curcol != 0) {
+	if (current_tcp && current_tcp->curcol != 0) {
 		tprintf(" <ptrace(%s):%s>\n", msg, strerror(err));
 		line_ended();
 	}
@@ -502,14 +506,14 @@ tprintf(const char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	if (outf) {
-		int n = vfprintf(outf, fmt, args);
+	if (current_tcp) {
+		int n = vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
-			if (outf != stderr)
+			if (current_tcp->outf != stderr)
 				perror(outfname == NULL
 				       ? "<writing to pipe>" : outfname);
 		} else
-			curcol += n;
+			current_tcp->curcol += n;
 	}
 	va_end(args);
 }
@@ -517,27 +521,28 @@ tprintf(const char *fmt, ...)
 void
 tprints(const char *str)
 {
-	if (outf) {
-		int n = fputs(str, outf);
+	if (current_tcp) {
+		int n = fputs(str, current_tcp->outf);
 		if (n >= 0) {
-			curcol += strlen(str);
+			current_tcp->curcol += strlen(str);
 			return;
 		}
-		if (outf != stderr)
-			perror(outfname == NULL
-			       ? "<writing to pipe>" : outfname);
+		if (current_tcp->outf != stderr)
+			perror(!outfname ? "<writing to pipe>" : outfname);
 	}
 }
 
 void
 line_ended(void)
 {
-	curcol = 0;
-	fflush(outf);
-	if (!printing_tcp)
-		return;
-	printing_tcp->curcol = 0;
-	printing_tcp = NULL;
+	if (current_tcp) {
+		current_tcp->curcol = 0;
+		fflush(current_tcp->outf);
+	}
+	if (printing_tcp) {
+		printing_tcp->curcol = 0;
+		printing_tcp = NULL;
+	}
 }
 
 void
@@ -550,8 +555,7 @@ printleader(struct tcb *tcp)
 		printing_tcp = tcp;
 
 	if (printing_tcp) {
-		outf = printing_tcp->outf;
-		curcol = printing_tcp->curcol;
+		current_tcp = printing_tcp;
 		if (printing_tcp->curcol != 0 && (followfork < 2 || printing_tcp == tcp)) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
@@ -565,8 +569,8 @@ printleader(struct tcb *tcp)
 	}
 
 	printing_tcp = tcp;
-	outf = tcp->outf;
-	curcol = 0;
+	current_tcp = tcp;
+	current_tcp->curcol = 0;
 
 	if (print_pid_pfx)
 		tprintf("%-5d ", tcp->pid);
@@ -607,8 +611,8 @@ printleader(struct tcb *tcp)
 void
 tabto(void)
 {
-	if (curcol < acolumn)
-		tprints(acolumn_spaces + curcol);
+	if (current_tcp->curcol < acolumn)
+		tprints(acolumn_spaces + current_tcp->curcol);
 }
 
 /* Should be only called directly *after successful attach* to a tracee.
@@ -618,7 +622,7 @@ tabto(void)
 static void
 newoutf(struct tcb *tcp)
 {
-	tcp->outf = outf; /* if not -ff mode, the same file is for all */
+	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
 	if (followfork >= 2) {
 		char name[520 + sizeof(int) * 3];
 		sprintf(name, "%.512s.%u", outfname, tcp->pid);
@@ -660,7 +664,6 @@ alloctcb(int pid)
 			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
 			tcp->flags = TCB_INUSE;
-			/* tcp->outf = outf; - not needed? */
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
@@ -688,8 +691,6 @@ droptcb(struct tcb *tcp)
 			if (tcp->curcol != 0)
 				fprintf(tcp->outf, " <detached ...>\n");
 			fclose(tcp->outf);
-			if (outf == tcp->outf)
-				outf = NULL;
 		} else {
 			if (printing_tcp == tcp && tcp->curcol != 0)
 				fprintf(tcp->outf, " <detached ...>\n");
@@ -697,6 +698,8 @@ droptcb(struct tcb *tcp)
 		}
 	}
 
+	if (current_tcp == tcp)
+		current_tcp = NULL;
 	if (printing_tcp == tcp)
 		printing_tcp = NULL;
 
@@ -1050,8 +1053,8 @@ startup_child(char **argv)
 	 || (pid == 0 && !daemonized_tracer) /* not -D: child to become a traced process */
 	) {
 		pid = getpid();
-		if (outf != stderr)
-			close(fileno(outf));
+		if (shared_log != stderr)
+			close(fileno(shared_log));
 		if (!daemonized_tracer && !use_seize) {
 			if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
 				perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
@@ -1470,7 +1473,7 @@ init(int argc, char *argv[])
 	for (c = 0; c < tcbtabsize; c++)
 		tcbtab[c] = tcp++;
 
-	outf = stderr;
+	shared_log = stderr;
 	set_sortby(DEFAULT_SORTBY);
 	set_personality(DEFAULT_PERSONALITY);
 	qualify("trace=all");
@@ -1651,10 +1654,10 @@ init(int argc, char *argv[])
 			 */
 			if (followfork >= 2)
 				error_msg_and_die("Piping the output and -ff are mutually exclusive");
-			outf = strace_popen(outfname + 1);
+			shared_log = strace_popen(outfname + 1);
 		}
 		else if (followfork < 2)
-			outf = strace_fopen(outfname);
+			shared_log = strace_fopen(outfname);
 	} else {
 		/* -ff without -o FILE is the same as single -f */
 		if (followfork >= 2)
@@ -1665,7 +1668,7 @@ init(int argc, char *argv[])
 		char *buf = malloc(BUFSIZ);
 		if (!buf)
 			die_out_of_memory();
-		setvbuf(outf, buf, _IOLBF, BUFSIZ);
+		setvbuf(shared_log, buf, _IOLBF, BUFSIZ);
 	}
 	if (outfname && argv[0]) {
 		if (!opt_intr)
@@ -1776,7 +1779,7 @@ cleanup(void)
 		detach(tcp);
 	}
 	if (cflag)
-		call_summary(outf);
+		call_summary(shared_log);
 }
 
 static void
@@ -1939,6 +1942,7 @@ trace(void)
 		 * On 2.6 and earlier, it can return garbage.
 		 */
 		if (event == PTRACE_EVENT_EXEC && os_release >= KERNEL_VERSION(3,0,0)) {
+			FILE *fp;
 			struct tcb *execve_thread;
 			long old_pid = 0;
 
@@ -1951,22 +1955,21 @@ trace(void)
 			if (!execve_thread)
 				goto dont_switch_tcbs;
 
-			outf = tcp->outf;
-			curcol = tcp->curcol;
 			if (execve_thread->curcol != 0) {
 				/*
 				 * One case we are here is -ff:
 				 * try "strace -oLOG -ff test/threaded_execve"
 				 */
 				fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
-				execve_thread->curcol = 0;
+				/*execve_thread->curcol = 0; - no need, see code below */
 			}
 			/* Swap output FILEs (needed for -ff) */
-			tcp->outf = execve_thread->outf;
-			tcp->curcol = execve_thread->curcol;
+			fp = execve_thread->outf;
+			execve_thread->outf = tcp->outf;
+			tcp->outf = fp;
 			/* And their column positions */
-			execve_thread->outf = outf;
-			execve_thread->curcol = curcol;
+			execve_thread->curcol = tcp->curcol;
+			tcp->curcol = 0;
 			/* Drop leader, but close execve'd thread outfile (if -ff) */
 			droptcb(tcp);
 			/* Switch to the thread, reusing leader's outfile and pid */
@@ -1989,8 +1992,7 @@ trace(void)
 		}
 
 		/* Set current output file */
-		outf = tcp->outf;
-		curcol = tcp->curcol;
+		current_tcp = tcp;
 
 		if (cflag) {
 			tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
@@ -2153,11 +2155,9 @@ trace(void)
 				 * (that is, process really stops. It used to continue to run).
 				 */
 				if (ptrace_restart(PTRACE_LISTEN, tcp, 0) < 0) {
-					tcp->curcol = curcol;
 					cleanup();
 					return -1;
 				}
-				tcp->curcol = curcol;
 				continue;
 			}
 			/* We don't have PTRACE_LISTEN support... */
@@ -2184,7 +2184,6 @@ trace(void)
 			 * we can let this process to report its death to us
 			 * normally, via WIFEXITED or WIFSIGNALED wait status.
 			 */
-			tcp->curcol = curcol;
 			continue;
 		}
  restart_tracee_with_sig_0:
@@ -2192,11 +2191,9 @@ trace(void)
  restart_tracee:
 		/* Remember current print column before continuing. */
 		if (ptrace_restart(PTRACE_SYSCALL, tcp, sig) < 0) {
-			tcp->curcol = curcol;
 			cleanup();
 			return -1;
 		}
-		tcp->curcol = curcol;
 	}
 	return 0;
 }
