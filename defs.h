@@ -450,13 +450,51 @@ void error_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(pr
 void perror_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
 void die_out_of_memory(void) __attribute__ ((noreturn));
 
-extern const char *xlookup(const struct xlat *, int);
-
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void qualify(const char *);
 extern int trace_syscall(struct tcb *);
 extern void count_syscall(struct tcb *, struct timeval *);
+extern void call_summary(FILE *);
+
+extern int umoven(struct tcb *, long, int, char *);
+#define umove(pid, addr, objp)	\
+	umoven((pid), (addr), sizeof(*(objp)), (char *) (objp))
+extern int umovestr(struct tcb *, long, int, char *);
+extern int upeek(struct tcb *, long, long *);
+#if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
+extern long getrval2(struct tcb *);
+#endif
+/*
+ * On Linux, "setbpt" is a misnomer: we don't set a breakpoint
+ * (IOW: no poking in user's text segment),
+ * instead we change fork/vfork/clone into clone(CLONE_PTRACE).
+ * On newer kernels, we use PTRACE_O_TRACECLONE/TRACE[V]FORK instead.
+ */
+extern int setbpt(struct tcb *);
+extern int clearbpt(struct tcb *);
+
+extern const char *signame(int);
+extern int is_restart_error(struct tcb *);
+extern int pathtrace_select(const char *);
+extern int pathtrace_match(struct tcb *);
+extern const char *getfdpath(struct tcb *, int);
+
+extern const char *xlookup(const struct xlat *, int);
+
+#if HAVE_LONG_LONG
+/* _l refers to the lower numbered u_arg,
+ * _h refers to the higher numbered u_arg
+ */
+# if HAVE_LITTLE_ENDIAN_LONG_LONG
+#  define LONG_LONG(_l,_h) \
+	((long long)((unsigned long long)(unsigned)(_l) | ((unsigned long long)(_h)<<32)))
+# else
+#  define LONG_LONG(_l,_h) \
+	((long long)((unsigned long long)(unsigned)(_h) | ((unsigned long long)(_l)<<32)))
+# endif
+extern int printllval(struct tcb *, const char *, int);
+#endif
 extern void printxval(const struct xlat *, int, const char *);
 extern int printargs(struct tcb *);
 extern int printargs_lu(struct tcb *);
@@ -464,9 +502,6 @@ extern int printargs_ld(struct tcb *);
 extern void addflags(const struct xlat *, int);
 extern int printflags(const struct xlat *, int, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, int);
-extern int umoven(struct tcb *, long, int, char *);
-extern int umovestr(struct tcb *, long, int, char *);
-extern int upeek(struct tcb *, long, long *);
 extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr(struct tcb *, long, int);
@@ -477,13 +512,16 @@ extern void printpathn(struct tcb *, long, int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))
 #define TIMEVAL_TEXT_BUFSIZE  TIMESPEC_TEXT_BUFSIZE
 extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
+#define printtv(tcp, addr)	\
+	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 0)
+#define printtv_special(tcp, addr)	\
+	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 extern char *sprinttv(char *, struct tcb *, long, enum bitness_t, int special);
 extern void print_timespec(struct tcb *, long);
 extern void sprint_timespec(char *, struct tcb *, long);
 #ifdef HAVE_SIGINFO_T
 extern void printsiginfo(siginfo_t *, int);
 #endif
-extern const char *getfdpath(struct tcb *, int);
 extern void printfd(struct tcb *, int);
 extern void printsock(struct tcb *, long, int);
 extern void print_sock_optmgmt(struct tcb *, long, int);
@@ -492,27 +530,12 @@ extern void printrusage(struct tcb *, long);
 extern void printrusage32(struct tcb *, long);
 #endif
 extern void printuid(const char *, unsigned long);
-/*
- * On Linux, "setbpt" is a misnomer: we don't set a breakpoint
- * (IOW: no poking in user's text segment),
- * instead we change fork/vfork/clone into clone(CLONE_PTRACE).
- * On newer kernels, we use PTRACE_O_TRACECLONE/TRACE[V]FORK instead.
- */
-extern int setbpt(struct tcb *);
-extern int clearbpt(struct tcb *);
 extern void printcall(struct tcb *);
-extern const char *signame(int);
 extern void print_sigset(struct tcb *, long, int);
 extern void printsignal(int);
-
-extern void call_summary(FILE *);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_open_modes(mode_t);
 extern const char *sprint_open_modes(mode_t);
-extern int is_restart_error(struct tcb *);
-
-extern int pathtrace_select(const char *);
-extern int pathtrace_match(struct tcb *);
 
 extern const struct ioctlent *ioctl_lookup(long);
 extern const struct ioctlent *ioctl_next_match(const struct ioctlent *);
@@ -531,10 +554,6 @@ extern void tv_add(struct timeval *, struct timeval *, struct timeval *);
 extern void tv_sub(struct timeval *, struct timeval *, struct timeval *);
 extern void tv_mul(struct timeval *, struct timeval *, int);
 extern void tv_div(struct timeval *, struct timeval *, int);
-
-#if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
-extern long getrval2(struct tcb *);
-#endif
 
 /* Strace log generation machinery.
  *
@@ -559,14 +578,6 @@ extern void line_ended(void);
 extern void tabto(void);
 extern void tprintf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 extern void tprints(const char *str);
-
-#define umove(pid, addr, objp)	\
-	umoven((pid), (addr), sizeof *(objp), (char *) (objp))
-
-#define printtv(tcp, addr)	\
-	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 0)
-#define printtv_special(tcp, addr)	\
-	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 
 #if SUPPORTED_PERSONALITIES > 1
 extern void set_personality(int personality);
@@ -603,20 +614,3 @@ extern unsigned nsignals;
 
 #define SCNO_IN_RANGE(scno) \
   ((unsigned long)(scno) < nsyscalls && sysent[scno].sys_func)
-
-#if HAVE_LONG_LONG
-
-/* _l refers to the lower numbered u_arg,
- * _h refers to the higher numbered u_arg
- */
-
-#if HAVE_LITTLE_ENDIAN_LONG_LONG
-#define LONG_LONG(_l,_h) \
-    ((long long)((unsigned long long)(unsigned)(_l) | ((unsigned long long)(_h)<<32)))
-#else
-#define LONG_LONG(_l,_h) \
-    ((long long)((unsigned long long)(unsigned)(_h) | ((unsigned long long)(_l)<<32)))
-#endif
-
-extern int printllval(struct tcb *, const char *, int);
-#endif
