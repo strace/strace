@@ -83,6 +83,13 @@ extern char *stpcpy(char *dst, const char *src);
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
+/* Glibc has an efficient macro for sigemptyset
+ * (it just does one or two assignments of 0 to internal vector of longs).
+ */
+#if defined(__GLIBC__) && defined(__sigemptyset) && !defined(sigemptyset)
+# define sigemptyset __sigemptyset
+#endif
+
 /* Configuration section */
 #ifndef MAX_QUALS
 # if defined(MIPS)

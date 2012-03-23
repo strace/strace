@@ -337,7 +337,7 @@ qual_syscall(const char *s, int bitflag, int not)
 	int i;
 	int rc = -1;
 
-	if (isdigit((unsigned char)*s)) {
+	if (*s >= '0' && *s <= '9') {
 		int i = atoi(s);
 		if (i < 0 || i >= MAX_QUALS)
 			return -1;
@@ -373,26 +373,22 @@ static int
 qual_signal(const char *s, int bitflag, int not)
 {
 	int i;
-	char buf[32];
 
-	if (isdigit((unsigned char)*s)) {
+	if (*s >= '0' && *s <= '9') {
 		int signo = atoi(s);
 		if (signo < 0 || signo >= MAX_QUALS)
 			return -1;
 		qualify_one(signo, bitflag, not, -1);
 		return 0;
 	}
-	if (strlen(s) >= sizeof buf)
-		return -1;
-	strcpy(buf, s);
-	s = buf;
 	if (strncasecmp(s, "SIG", 3) == 0)
 		s += 3;
-	for (i = 0; i <= NSIG; i++)
+	for (i = 0; i <= NSIG; i++) {
 		if (strcasecmp(s, signame(i) + 3) == 0) {
 			qualify_one(i, bitflag, not, -1);
 			return 0;
 		}
+	}
 	return -1;
 }
 
@@ -405,7 +401,7 @@ qual_fault(const char *s, int bitflag, int not)
 static int
 qual_desc(const char *s, int bitflag, int not)
 {
-	if (isdigit((unsigned char)*s)) {
+	if (*s >= '0' && *s <= '9') {
 		int desc = atoi(s);
 		if (desc < 0 || desc >= MAX_QUALS)
 			return -1;
