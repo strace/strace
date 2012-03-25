@@ -564,10 +564,14 @@ printstr(struct tcb *tcp, long addr, int len)
 	}
 	/* Allocate static buffers if they are not allocated yet. */
 	if (!str) {
+		unsigned int outstr_size = 4 * max_strlen + /*for quotes and NUL:*/ 3;
+
+		if (outstr_size / 4 != max_strlen)
+			die_out_of_memory();
 		str = malloc(max_strlen + 1);
 		if (!str)
 			die_out_of_memory();
-		outstr = malloc(4 * max_strlen + /*for quotes and NUL:*/ 3);
+		outstr = malloc(outstr_size);
 		if (!outstr)
 			die_out_of_memory();
 	}
