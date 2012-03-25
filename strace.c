@@ -131,7 +131,7 @@ static uid_t run_uid;
 static gid_t run_gid;
 
 unsigned int max_strlen = DEFAULT_STRLEN;
-static unsigned int acolumn = DEFAULT_ACOLUMN;
+static int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
 
 static char *outfname = NULL;
@@ -313,6 +313,12 @@ void die_out_of_memory(void)
 		exit(1);
 	recursed = 1;
 	error_msg_and_die("Out of memory");
+}
+
+static void
+error_opt_arg(int opt, const char *arg)
+{
+	error_msg_and_die("Invalid -%c argument: '%s'", opt, arg);
 }
 
 /* Glue for systems without a MMU that cannot provide fork() */
@@ -825,14 +831,14 @@ process_opt_p_list(char *opt)
 		char c = *delim;
 
 		*delim = '\0';
-		pid = atoi(opt); /* TODO: stricter parsing of the number? */
+		pid = string_to_uint(opt);
 		if (pid <= 0) {
-			error_msg("Invalid process id: '%s'", opt);
+			error_msg_and_die("Invalid process id: '%s'", opt);
 			*delim = c;
 			return;
 		}
 		if (pid == strace_tracer_pid) {
-			error_msg("I'm sorry, I can't let you do that, Dave.");
+			error_msg_and_die("I'm sorry, I can't let you do that, Dave.");
 			*delim = c;
 			return;
 		}
@@ -905,6 +911,7 @@ startup_attach(void)
 
 					if (de->d_fileno == 0)
 						continue;
+					/* we trust /proc filesystem */
 					tid = atoi(de->d_name);
 					if (tid <= 0)
 						continue;
@@ -1445,7 +1452,7 @@ static void __attribute__ ((noinline))
 init(int argc, char *argv[])
 {
 	struct tcb *tcp;
-	int c;
+	int c, i;
 	int optF = 0;
 	struct sigaction sa;
 
@@ -1547,9 +1554,9 @@ init(int argc, char *argv[])
 			not_failing_only = 1;
 			break;
 		case 'a':
-			acolumn = atoi(optarg);
+			acolumn = string_to_uint(optarg);
 			if (acolumn < 0)
-				error_msg_and_die("Bad column width '%s'", optarg);
+				error_opt_arg(c, optarg);
 			break;
 		case 'e':
 			qualify(optarg);
@@ -1558,7 +1565,10 @@ init(int argc, char *argv[])
 			outfname = strdup(optarg);
 			break;
 		case 'O':
-			set_overhead(atoi(optarg));
+			i = string_to_uint(optarg);
+			if (i < 0)
+				error_opt_arg(c, optarg);
+			set_overhead(i);
 			break;
 		case 'p':
 			process_opt_p_list(optarg);
@@ -1570,10 +1580,10 @@ init(int argc, char *argv[])
 			}
 			break;
 		case 's':
-			max_strlen = atoi(optarg);
-			if (max_strlen < 0) {
-				error_msg_and_die("Invalid -%c argument: '%s'", c, optarg);
-			}
+			i = string_to_uint(optarg);
+			if (i < 0)
+				error_opt_arg(c, optarg);
+			max_strlen = i;
 			break;
 		case 'S':
 			set_sortby(optarg);
@@ -1586,10 +1596,9 @@ init(int argc, char *argv[])
 				die_out_of_memory();
 			break;
 		case 'I':
-			opt_intr = atoi(optarg);
-			if (opt_intr <= 0 || opt_intr >= NUM_INTR_OPTS) {
-				error_msg_and_die("Invalid -%c argument: '%s'", c, optarg);
-			}
+			opt_intr = string_to_uint(optarg);
+			if (opt_intr <= 0 || opt_intr >= NUM_INTR_OPTS)
+				error_opt_arg(c, optarg);
 			break;
 		default:
 			usage(stderr, 1);

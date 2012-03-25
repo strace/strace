@@ -338,7 +338,7 @@ qual_syscall(const char *s, int bitflag, int not)
 	int rc = -1;
 
 	if (*s >= '0' && *s <= '9') {
-		int i = atoi(s);
+		int i = string_to_uint(s);
 		if (i < 0 || i >= MAX_QUALS)
 			return -1;
 		qualify_one(i, bitflag, not, -1);
@@ -375,7 +375,7 @@ qual_signal(const char *s, int bitflag, int not)
 	int i;
 
 	if (*s >= '0' && *s <= '9') {
-		int signo = atoi(s);
+		int signo = string_to_uint(s);
 		if (signo < 0 || signo >= MAX_QUALS)
 			return -1;
 		qualify_one(signo, bitflag, not, -1);
@@ -402,7 +402,7 @@ static int
 qual_desc(const char *s, int bitflag, int not)
 {
 	if (*s >= '0' && *s <= '9') {
-		int desc = atoi(s);
+		int desc = string_to_uint(s);
 		if (desc < 0 || desc >= MAX_QUALS)
 			return -1;
 		qualify_one(desc, bitflag, not, -1);

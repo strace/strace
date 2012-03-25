@@ -489,6 +489,8 @@ extern const char *getfdpath(struct tcb *, int);
 
 extern const char *xlookup(const struct xlat *, int);
 
+extern int string_to_uint(const char *str);
+
 #if HAVE_LONG_LONG
 /* _l refers to the lower numbered u_arg,
  * _h refers to the higher numbered u_arg

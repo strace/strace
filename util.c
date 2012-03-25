@@ -80,6 +80,21 @@
 #endif
 
 int
+string_to_uint(const char *str)
+{
+	char *error;
+	long value;
+
+	if (!*str)
+		return -1;
+	errno = 0;
+	value = strtol(str, &error, 10);
+	if (errno || *error || value < 0 || (long)(int)value != value)
+		return -1;
+	return (int)value;
+}
+
+int
 tv_nz(struct timeval *a)
 {
 	return a->tv_sec || a->tv_usec;
