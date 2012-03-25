@@ -126,14 +126,16 @@ AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
 AC_HEADER_STAT
-AC_CHECK_MEMBERS([struct stat.st_blksize,
-		  struct stat.st_blocks,
-		  struct stat.st_aclcnt,
-		  struct stat.st_flags,
-		  struct stat.st_fstype,
-		  struct stat.st_gen,
-		  struct stat.st_level,
-		  struct stat.st_rdev])
+AC_CHECK_MEMBERS(m4_normalize([
+	struct stat.st_aclcnt,
+	struct stat.st_blksize,
+	struct stat.st_blocks,
+	struct stat.st_flags,
+	struct stat.st_fstype,
+	struct stat.st_gen,
+	struct stat.st_level,
+	struct stat.st_rdev
+]))
 AC_STAT64
 AC_STATFS64
 
@@ -153,45 +155,45 @@ AC_OFF_T_IS_LONG_LONG
 AC_CHECK_TYPES([struct opthdr],,, [#include <sys/socket.h>])
 AC_CHECK_TYPES([struct t_opthdr],,, [#include <sys/tiuser.h>])
 
-AC_CHECK_FUNCS([ \
-	fork \
-	if_indextoname \
-	inet_ntop \
-	prctl \
-	sendmsg \
-	sigaction \
-	strerror \
-	strsignal \
-	sys_siglist \
-	_sys_siglist \
-	stpcpy \
-	process_vm_readv \
-])
-AC_CHECK_HEADERS([ \
-	inttypes.h \
-	ioctls.h \
-	libaio.h \
-	mqueue.h \
-	poll.h \
-	stropts.h \
-	sys/acl.h \
-	sys/asynch.h \
-	sys/conf.h \
-	sys/epoll.h \
-	sys/filio.h \
-	sys/ioctl.h \
-	sys/poll.h \
-	sys/ptrace.h \
-	sys/reg.h \
-	sys/uio.h \
-	sys/vfs.h \
-	asm/cachectl.h \
-	asm/sysmips.h \
-	linux/capability.h \
-	linux/ptrace.h \
-	linux/utsname.h \
-	netinet/sctp.h \
-], [], [])
+AC_CHECK_FUNCS(m4_normalize([
+	fork
+	if_indextoname
+	inet_ntop
+	prctl
+	process_vm_readv
+	sendmsg
+	sigaction
+	stpcpy
+	strerror
+	strsignal
+	_sys_siglist
+	sys_siglist
+]))
+AC_CHECK_HEADERS(m4_normalize([
+	asm/cachectl.h
+	asm/sysmips.h
+	inttypes.h
+	ioctls.h
+	libaio.h
+	linux/capability.h
+	linux/ptrace.h
+	linux/utsname.h
+	mqueue.h
+	netinet/sctp.h
+	poll.h
+	stropts.h
+	sys/acl.h
+	sys/asynch.h
+	sys/conf.h
+	sys/epoll.h
+	sys/filio.h
+	sys/ioctl.h
+	sys/poll.h
+	sys/ptrace.h
+	sys/reg.h
+	sys/uio.h
+	sys/vfs.h
+]))
 AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
                  [], [], [#include <stddef.h>
 #include <sys/socket.h>
@@ -224,22 +226,23 @@ AC_CHECK_MEMBERS([struct sigcontext.sc_hi2],,, [#include <signal.h>
 
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
-AC_CHECK_DECLS([
-		PTRACE_SETOPTIONS,
-		PTRACE_GETEVENTMSG,
-		PTRACE_GETSIGINFO,
-		PTRACE_O_TRACESYSGOOD,
-		PTRACE_O_TRACEFORK,
-		PTRACE_O_TRACEVFORK,
-		PTRACE_O_TRACECLONE,
-		PTRACE_O_TRACEEXEC,
-		PTRACE_O_TRACEEXIT,
-		PTRACE_EVENT_FORK,
-		PTRACE_EVENT_VFORK,
-		PTRACE_EVENT_CLONE,
-		PTRACE_EVENT_EXEC,
-		PTRACE_EVENT_VFORK_DONE,
-		PTRACE_EVENT_EXIT],,, [#include <sys/ptrace.h>])
+AC_CHECK_DECLS(m4_normalize([
+	PTRACE_EVENT_CLONE,
+	PTRACE_EVENT_EXEC,
+	PTRACE_EVENT_EXIT,
+	PTRACE_EVENT_FORK,
+	PTRACE_EVENT_VFORK,
+	PTRACE_EVENT_VFORK_DONE,
+	PTRACE_GETEVENTMSG,
+	PTRACE_GETSIGINFO,
+	PTRACE_O_TRACECLONE,
+	PTRACE_O_TRACEEXEC,
+	PTRACE_O_TRACEEXIT,
+	PTRACE_O_TRACEFORK,
+	PTRACE_O_TRACESYSGOOD,
+	PTRACE_O_TRACEVFORK,
+	PTRACE_SETOPTIONS
+]),,, [#include <sys/ptrace.h>])
 
 AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
