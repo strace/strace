@@ -39,71 +39,24 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .B strace
-[
-.B \-CdDffhiqrtttTvxxy
-]
-[
-.BI \-a column
-]
-[
-.BI \-e expr
-]
-\&...
-[
-.BI \-o file
-]
-[
-.BI \-p pid
-]
-\&...
-[
-.BI \-P path
-]
-\&...
-[
-.BI \-s strsize
-]
-[
-.BI \-u username
-]
-[
-.BI \-E var=val
-]
-\&...
-[
-.BI \-E var
-]
-\&...
-[
-.I command
-[
-.I arg
-\&...
-]
-]
+[\fB-CdffhiqrtttTvVxxy\fR]
+[\fB-I\fIn\fR]
+[\fB-e\fIexpr\fR]... [\fB-a\fIcolumn\fR]
+[\fB-o\fIfile\fR]
+[\fB-s\fIstrsize\fR]
+[\fB-P\fIpath\fR]... \fB-p\fIpid\fR... /
+[\fB-D\fR]
+[\fB-E\fIvar\fR[=\fIval\fR]]... [\fB-u\fIusername\fR]
+\fIcommand\fR [\fIargs\fR]
 .sp
 .B strace
-.B \-c
-[
-.B \-D
-]
-[
-.BI \-e expr
-]
-\&...
-[
-.BI \-O overhead
-]
-[
-.BI \-S sortby
-]
-[
-.I command
-[
-.I arg
-\&...
-]
-]
+\fB-c\fR[\fBdf\fR]
+[\fB-I\fIn\fR]
+[\fB-e\fIexpr\fR]... [\fB-O\fIoverhead\fR]
+[\fB-S\fIsortby\fR] \fB-p\fIpid\fR... /
+[\fB-D\fR]
+[\fB-E\fIvar\fR[=\fIval\fR]]... [\fB-u\fIusername\fR]
+\fIcommand\fR [\fIargs\fR]
 .SH DESCRIPTION
 .IX "strace command" "" "\fLstrace\fR command"
 .LP
@@ -499,6 +452,13 @@ Note that this is independent from the normal tracing of the
 .BR write (2)
 system call which is controlled by the option
 .BR -e "\ " trace = write .
+.TP
+.BI "\-I " interruptible
+When strace can be interrupted by signals (such as pressing ^C).
+1: no signals are blocked; 2: fatal signals are blocked while decoding syscall
+(default); 3: fatal signals are always blocked (default if '-o FILE PROG');
+4: fatal signals and SIGTSTP (^Z) are always blocked (useful to make
+strace -o FILE PROG not stop on ^Z).
 .TP
 .BI "\-o " filename
 Write the trace output to the file
