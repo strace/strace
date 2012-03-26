@@ -25,7 +25,7 @@ logfile=$1
 
 for file in "$logfile".*; do
 	[ -f "$file" ] || continue
-	suffix=${file#$logfile.}
+	suffix=${file#"$logfile".}
 	[ "$suffix" -gt 0 ] 2> /dev/null ||
 		continue
 	pid=$(printf "%-5s" $suffix)
