@@ -352,25 +352,25 @@
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"		}, /* 323 */
 	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"		}, /* 324 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"		}, /* 325 */
-	{ 5,	0,	NULL,			NULL			}, /* 326 */
-	{ 5,	0,	NULL,			NULL			}, /* 327 */
-	{ 5,	0,	NULL,			NULL			}, /* 328 */
-	{ 5,	0,	NULL,			NULL			}, /* 329 */
-	{ 5,	0,	NULL,			NULL			}, /* 330 */
-	{ 5,	0,	NULL,			NULL			}, /* 331 */
-	{ 5,	0,	NULL,			NULL			}, /* 332 */
-	{ 5,	0,	NULL,			NULL			}, /* 333 */
-	{ 5,	0,	NULL,			NULL			}, /* 334 */
-	{ 5,	0,	NULL,			NULL			}, /* 335 */
-	{ 5,	0,	NULL,			NULL			}, /* 336 */
-	{ 5,	0,	NULL,			NULL			}, /* 337 */
-	{ 5,	0,	NULL,			NULL			}, /* 338 */
-	{ 5,	0,	NULL,			NULL			}, /* 339 */
-	{ 5,	0,	NULL,			NULL			}, /* 340 */
-	{ 5,	0,	NULL,			NULL			}, /* 341 */
-	{ 5,	0,	NULL,			NULL			}, /* 342 */
-	{ 5,	0,	NULL,			NULL			}, /* 343 */
-	{ 5,	0,	NULL,			NULL			}, /* 344 */
+	{ 3,	TN,	sys_socket,		"socket"		}, /* 326 */
+	{ 3,	TN,	sys_bind,		"bind"			}, /* 327 */
+	{ 3,	TN,	sys_connect,		"connect"		}, /* 328 */
+	{ 2,	TN,	sys_listen,		"listen"		}, /* 329 */
+	{ 3,	TN,	sys_accept,		"accept"		}, /* 330 */
+	{ 3,	TN,	sys_getsockname,	"getsockname"		}, /* 331 */
+	{ 3,	TN,	sys_getpeername,	"getpeername"		}, /* 332 */
+	{ 4,	TN,	sys_socketpair,		"socketpair"		}, /* 333 */
+	{ 4,	TN,	sys_send,		"send"			}, /* 334 */
+	{ 6,	TN,	sys_sendto,		"sendto"		}, /* 335 */
+	{ 4,	TN,	sys_recv,		"recv"			}, /* 336 */
+	{ 6,	TN,	sys_recvfrom,		"recvfrom"		}, /* 337 */
+	{ 2,	TN,	sys_shutdown,		"shutdown"		}, /* 338 */
+	{ 5,	TN,	sys_setsockopt,		"setsockopt"		}, /* 339 */
+	{ 5,	TN,	sys_getsockopt,		"getsockopt"		}, /* 340 */
+	{ 3,	TN,	sys_sendmsg,		"sendmsg"		}, /* 341 */
+	{ 5,	TN,	sys_recvmsg,		"recvmsg"		}, /* 342 */
+	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"		}, /* 343 */
+	{ 4,	TN,	sys_accept4,		"accept4"		}, /* 344 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"	}, /* 345 */
 	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"	}, /* 346 */
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"		}, /* 347 */
