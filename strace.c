@@ -833,13 +833,9 @@ process_opt_p_list(char *opt)
 		pid = string_to_uint(opt);
 		if (pid <= 0) {
 			error_msg_and_die("Invalid process id: '%s'", opt);
-			*delim = c;
-			return;
 		}
 		if (pid == strace_tracer_pid) {
 			error_msg_and_die("I'm sorry, I can't let you do that, Dave.");
-			*delim = c;
-			return;
 		}
 		*delim = c;
 		alloctcb(pid);
