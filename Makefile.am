@@ -17,7 +17,7 @@ AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS) -I$(builddir)/$(OS)
 strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
 		 io.c ioctl.c mem.c net.c process.c bjm.c quota.c \
 		 resource.c signal.c sock.c system.c term.c time.c \
-		 scsi.c stream.c block.c pathtrace.c
+		 scsi.c stream.c block.c pathtrace.c mtd.c
 noinst_HEADERS = defs.h
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
@@ -32,7 +32,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     README-linux README-linux-ptrace \
 	     linux/ioctlsort.c linux/ioctlent.sh \
 	     linux/ioctlent.h.in linux/errnoent.h linux/signalent.h \
-	     linux/syscall.h linux/dummy.h \
+	     linux/syscall.h linux/dummy.h linux/mtd-abi.h \
 	     linux/i386/ioctlent.h.in linux/i386/syscallent.h \
 	     linux/alpha/errnoent.h linux/alpha/ioctlent.h.in \
 	     linux/alpha/signalent.h linux/alpha/syscallent.h \

@@ -545,6 +545,7 @@ extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_open_modes(mode_t);
 extern const char *sprint_open_modes(mode_t);
+extern void print_loff_t(struct tcb *, long);
 
 extern const struct ioctlent *ioctl_lookup(long);
 extern const struct ioctlent *ioctl_next_match(const struct ioctlent *);
@@ -555,6 +556,7 @@ extern int proc_ioctl(struct tcb *, int, int);
 extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
 extern int block_ioctl(struct tcb *, long, long);
+extern int mtd_ioctl(struct tcb *, long, long);
 
 extern int tv_nz(struct timeval *);
 extern int tv_cmp(struct timeval *, struct timeval *);

@@ -261,7 +261,7 @@ sys_sendfile(struct tcb *tcp)
 	return 0;
 }
 
-static void
+void
 print_loff_t(struct tcb *tcp, long addr)
 {
 	loff_t offset;
