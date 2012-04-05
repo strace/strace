@@ -1285,6 +1285,10 @@ test_ptrace_setoptions_for_all(void)
 	int pid;
 	int it_worked = 0;
 
+	/* this fork test doesn't work on no-mmu systems */
+	if (strace_vforked)
+		return;
+
 	pid = fork();
 	if (pid < 0)
 		perror_msg_and_die("fork");
