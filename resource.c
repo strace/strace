@@ -427,10 +427,12 @@ sys_times(struct tcb *tcp)
 		else if (umove(tcp, tcp->u_arg[0], &tbuf) < 0)
 			tprints("{...}");
 		else {
-			tprintf("{tms_utime=%lu, tms_stime=%lu, ",
-				tbuf.tms_utime, tbuf.tms_stime);
-			tprintf("tms_cutime=%lu, tms_cstime=%lu}",
-				tbuf.tms_cutime, tbuf.tms_cstime);
+			tprintf("{tms_utime=%llu, tms_stime=%llu, ",
+				(unsigned long long) tbuf.tms_utime,
+				(unsigned long long) tbuf.tms_stime);
+			tprintf("tms_cutime=%llu, tms_cstime=%llu}",
+				(unsigned long long) tbuf.tms_cutime,
+				(unsigned long long) tbuf.tms_cstime);
 		}
 	}
 	return 0;
