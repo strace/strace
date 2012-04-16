@@ -379,9 +379,9 @@ sys_sysinfo(struct tcb *tcp)
 				(long) si.totalram, (long) si.freeram);
 			tprintf("sharedram=%lu, bufferram=%lu} ",
 				(long) si.sharedram, (long) si.bufferram);
-			tprintf("totalswap=%lu, freeswap=%lu, procs=%hu}",
+			tprintf("totalswap=%lu, freeswap=%lu, procs=%u}",
 				(long) si.totalswap, (long) si.freeswap,
-				si.procs);
+				(unsigned)si.procs);
 		}
 	}
 	return 0;

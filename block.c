@@ -136,7 +136,7 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 			if (syserror(tcp) || umove(tcp, arg, &val) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", %hu", val);
+				tprintf(", %u", (unsigned)val);
 		}
 		break;
 
@@ -223,10 +223,12 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 			if (syserror(tcp) || umove(tcp, arg, &geo) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", {heads=%hhu, sectors=%hhu, "
-					"cylinders=%hu, start=%lu}",
-					geo.heads, geo.sectors,
-					geo.cylinders, geo.start);
+				tprintf(", {heads=%u, sectors=%u, "
+					"cylinders=%u, start=%lu}",
+					(unsigned)geo.heads,
+					(unsigned)geo.sectors,
+					(unsigned)geo.cylinders,
+					geo.start);
 		}
 		break;
 
@@ -248,10 +250,10 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 			if (umove(tcp, arg, &buts) < 0)
 				tprintf(", %#lx", arg);
 			else
-				tprintf(", {act_mask=%hu, buf_size=%u, "
+				tprintf(", {act_mask=%u, buf_size=%u, "
 					"buf_nr=%u, start_lba=%" PRIu64 ", "
 					"end_lba=%" PRIu64 ", pid=%u}",
-					buts.act_mask, buts.buf_size,
+					(unsigned)buts.act_mask, buts.buf_size,
 					buts.buf_nr, buts.start_lba,
 					buts.end_lba, buts.pid);
 		}

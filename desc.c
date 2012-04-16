@@ -950,10 +950,10 @@ sys_io_cancel(struct tcb *tcp)
 		tprintf("%lu, ", tcp->u_arg[0]);
 #ifdef HAVE_LIBAIO_H
 		if (umove(tcp, tcp->u_arg[1], &iocb) == 0) {
-			tprintf("{%p, %u, %hu, %hu, %d}, ",
+			tprintf("{%p, %u, %u, %u, %d}, ",
 				iocb.data, iocb.key,
-				iocb.aio_lio_opcode,
-				iocb.aio_reqprio, iocb.aio_fildes);
+				(unsigned)iocb.aio_lio_opcode,
+				(unsigned)iocb.aio_reqprio, iocb.aio_fildes);
 		} else
 #endif
 			tprints("{...}, ");
