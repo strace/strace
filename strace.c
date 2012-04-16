@@ -527,7 +527,7 @@ void
 tprints(const char *str)
 {
 	if (current_tcp) {
-		int n = fputs(str, current_tcp->outf);
+		int n = fputs_unlocked(str, current_tcp->outf);
 		if (n >= 0) {
 			current_tcp->curcol += strlen(str);
 			return;
