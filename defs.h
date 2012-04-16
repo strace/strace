@@ -469,6 +469,23 @@ void error_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(pr
 void perror_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
 void die_out_of_memory(void) __attribute__ ((noreturn));
 
+#ifdef USE_CUSTOM_PRINTF
+/*
+ * Speed-optimized vfprintf implementation.
+ * See comment in vsprintf.c for allowed formats.
+ * Short version: %h[h]u, %zu, %tu are not allowed, use %[l[l]]u.
+ *
+ * It results in strace using about 5% less CPU in user space
+ * (compared to glibc version).
+ * But strace spends a lot of time in kernel space,
+ * so overall it does not appear to be a significant win.
+ * Thus disabled by default.
+ */
+int strace_vfprintf(FILE *fp, const char *fmt, va_list args);
+#else
+# define strace_vfprintf vfprintf
+#endif
+
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void qualify(const char *);
