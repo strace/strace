@@ -73,6 +73,29 @@ struct stat_sparc64 {
 # define stat kernel_stat
 # include <asm/stat.h>
 # undef stat
+#elif defined(X32)
+struct stat {
+	unsigned long long	st_dev;
+	unsigned long long	st_ino;
+	unsigned long long	st_nlink;
+
+	unsigned int		st_mode;
+	unsigned int		st_uid;
+	unsigned int		st_gid;
+	unsigned int		__pad0;
+	unsigned long long	st_rdev;
+	long long		st_size;
+	long long		st_blksize;
+	long long		st_blocks;
+
+	unsigned long long	st_atime;
+	unsigned long long	st_atime_nsec;
+	unsigned long long	st_mtime;
+	unsigned long long	st_mtime_nsec;
+	unsigned long long	st_ctime;
+	unsigned long long	st_ctime_nsec;
+	long long		__unused[3];
+};
 #else
 # undef dev_t
 # undef ino_t
@@ -1032,7 +1055,7 @@ printstat64(struct tcb *tcp, long addr)
 #endif /* LINUXSPARC */
 
 #if defined X86_64
-	if (current_personality == 0) {
+	if (current_personality != 1) {
 		printstat(tcp, addr);
 		return;
 	}

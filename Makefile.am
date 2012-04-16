@@ -78,10 +78,14 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/sparc64/syscallent.h linux/sparc64/syscallent1.h \
 	     linux/sparc64/syscallent2.h \
 	     linux/tile/ioctlent.h.in linux/tile/syscallent.h \
+	     linux/x32/errnoent.h linux/x32/ioctlent.h.in \
+	     linux/x32/signalent.h linux/x32/syscallent.h \
 	     linux/x86_64/ioctlent.h.in linux/x86_64/syscallent.h \
 	     linux/x86_64/gentab.pl \
 	     linux/x86_64/errnoent1.h linux/x86_64/ioctlent1.h \
 	     linux/x86_64/signalent1.h linux/x86_64/syscallent1.h \
+	     linux/x86_64/errnoent2.h linux/x86_64/ioctlent2.h \
+	     linux/x86_64/signalent2.h linux/x86_64/syscallent2.h \
 	     xlate.el
 
 .PHONY: srpm

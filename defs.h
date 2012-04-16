@@ -153,7 +153,7 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_PEEKUSER PTRACE_PEEKUSR
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
-#if defined(X86_64) || defined(I386)
+#if defined(X86_64) || defined(X32) || defined(I386)
 /* For struct pt_regs. x86 strace uses PTRACE_GETREGS.
  * PTRACE_GETREGS returns registers in the layout of this struct.
  */
@@ -221,9 +221,10 @@ extern long ptrace(int, int, char *, long);
 
 #ifdef X86_64
 # undef SUPPORTED_PERSONALITIES
-# define SUPPORTED_PERSONALITIES 2
+# define SUPPORTED_PERSONALITIES 3
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
+# define PERSONALITY2_WORDSIZE 4
 #endif
 
 #ifdef ARM
@@ -324,7 +325,7 @@ struct tcb {
 	int u_error;		/* Error code */
 	long scno;		/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
-#if defined(LINUX_MIPSN32)
+#if defined(LINUX_MIPSN32) || defined(X32)
 	long long ext_arg[MAX_ARGS];	/* System call arguments */
 #endif
 	long u_rval;		/* return value */

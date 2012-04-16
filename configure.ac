@@ -8,6 +8,11 @@ AM_INIT_AUTOMAKE([foreign check-news dist-xz no-dist-gzip silent-rules])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
+AC_PROG_CC
+AC_GNU_SOURCE
+
+AC_USE_SYSTEM_EXTENSIONS
+
 AC_MSG_CHECKING([for supported architecture])
 case "$host_cpu" in
 bfin)
@@ -78,8 +83,15 @@ sh*)
 	AC_DEFINE([SH], 1, [Define for the SH architecture.])
 	;;
 x86?64*)
-	arch=x86_64
-	AC_DEFINE([X86_64], 1, [Define for the AMD x86-64 architecture.])
+	AC_TRY_COMPILE(
+[#ifndef __ILP32__
+# error not x32
+#endif], [], arch=x32, arch=x86_64)
+	if test "$arch" = "x86_64"; then
+		AC_DEFINE([X86_64], 1, [Define for the 64bit AMD x86-64 architecture.])
+	else
+		AC_DEFINE([X32], 1, [Define for the 32bit AMD x86-64 architecture.])
+	fi
 	;;
 cris|crisv10)
 	arch=crisv10
@@ -108,9 +120,7 @@ AC_SUBST(arch)
 
 AM_CONDITIONAL([I386], [test x$arch = xi386])
 AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
-
-AC_PROG_CC
-AC_GNU_SOURCE
+AM_CONDITIONAL([X32], [test x$arch = xx32])
 
 AC_INCLUDEDIR
 

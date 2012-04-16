@@ -169,7 +169,7 @@ static int
 indirect_ipccall(struct tcb *tcp)
 {
 #ifdef X86_64
-	return current_personality > 0;
+	return current_personality == 1;
 #endif
 #if defined IA64
 	return tcp->scno < 1024; /* ia32 emulation syscalls are low */

@@ -212,7 +212,7 @@ printllval(struct tcb *tcp, const char *format, int llarg)
 # elif defined IA64 || defined ALPHA
 	tprintf(format, tcp->u_arg[llarg]);
 	llarg++;
-# elif defined LINUX_MIPSN32
+# elif defined LINUX_MIPSN32 || defined X32
 	tprintf(format, tcp->ext_arg[llarg]);
 	llarg++;
 # else
@@ -997,7 +997,7 @@ printcall(struct tcb *tcp)
 	tprintf("[%16lx] ", psw);
 # endif
 
-#elif defined(X86_64)
+#elif defined(X86_64) || defined(X32)
 	long rip;
 
 	if (upeek(tcp, 8*RIP, &rip) < 0) {
@@ -1151,7 +1151,7 @@ change_syscall(struct tcb *tcp, int new)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0)
 		return -1;
 	return 0;
-#elif defined(X86_64)
+#elif defined(X86_64) || defined(X32)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0)
 		return -1;
 	return 0;
@@ -1392,7 +1392,7 @@ typedef struct pt_regs arg_setup_state;
 # elif defined(HPPA)
 #  define arg0_offset	PT_GR26
 #  define arg1_offset	(PT_GR26-4)
-# elif defined(X86_64)
+# elif defined(X86_64) || defined(X32)
 #  define arg0_offset	((long)(8*(current_personality ? RBX : RDI)))
 #  define arg1_offset	((long)(8*(current_personality ? RCX : RSI)))
 # elif defined(SH)
