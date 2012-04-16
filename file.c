@@ -501,7 +501,7 @@ static const struct xlat whence[] = {
 	{ 0,		NULL		},
 };
 
-#if defined(LINUX_MIPSN32)
+#if defined(LINUX_MIPSN32) || defined(X32)
 int
 sys_lseek(struct tcb *tcp)
 {
