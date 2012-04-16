@@ -327,7 +327,10 @@ struct tcb {
 #if defined(LINUX_MIPSN32)
 	long long ext_arg[MAX_ARGS];	/* System call arguments */
 #endif
-	long u_rval;		/* (first) return value */
+	long u_rval;		/* return value */
+#if defined(LINUX_MIPSN32) || defined(X32)
+	long long u_lrval;	/* long long return value */
+#endif
 #if SUPPORTED_PERSONALITIES > 1
 	int currpers;		/* Personality at the time of scno update */
 #endif
@@ -418,7 +421,15 @@ extern const struct xlat open_access_modes[];
 #define RVAL_HEX	001	/* hex format */
 #define RVAL_OCTAL	002	/* octal format */
 #define RVAL_UDECIMAL	003	/* unsigned decimal format */
-#define RVAL_MASK	003	/* mask for these values */
+#if defined(LINUX_MIPSN32) || defined(X32)
+# if 0 /* unused so far */
+#  define RVAL_LDECIMAL	004	/* long decimal format */
+#  define RVAL_LHEX	005	/* long hex format */
+#  define RVAL_LOCTAL	006	/* long octal format */
+# endif
+# define RVAL_LUDECIMAL	007	/* long unsigned decimal format */
+#endif
+#define RVAL_MASK	007	/* mask for these values */
 
 #define RVAL_STR	010	/* Print `auxstr' field after return val */
 #define RVAL_NONE	020	/* Print nothing */

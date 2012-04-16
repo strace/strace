@@ -478,8 +478,7 @@ static const struct xlat whence[] = {
 	{ 0,		NULL		},
 };
 
-#if !defined(HAVE_LONG_LONG_OFF_T)
-# if defined(LINUX_MIPSN32)
+#if defined(LINUX_MIPSN32)
 int
 sys_lseek(struct tcb *tcp)
 {
@@ -497,9 +496,9 @@ sys_lseek(struct tcb *tcp)
 			tprintf("%lld, ", offset);
 		printxval(whence, _whence, "SEEK_???");
 	}
-	return RVAL_UDECIMAL;
+	return RVAL_LUDECIMAL;
 }
-# else /* !LINUX_MIPSN32 */
+#else
 int
 sys_lseek(struct tcb *tcp)
 {
@@ -519,7 +518,6 @@ sys_lseek(struct tcb *tcp)
 	}
 	return RVAL_UDECIMAL;
 }
-# endif
 #endif
 
 int

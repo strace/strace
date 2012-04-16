@@ -1735,6 +1735,9 @@ get_error(struct tcb *tcp)
 		u_error = r2;
 	} else {
 		tcp->u_rval = r2;
+# if defined(LINUX_MIPSN32)
+		tcp->u_lrval = r2;
+# endif
 	}
 #elif defined(POWERPC)
 	if (check_errno && is_negated_errno(ppc_result)) {
@@ -2065,6 +2068,24 @@ trace_syscall_exiting(struct tcb *tcp)
 			case RVAL_DECIMAL:
 				tprintf("= %ld", tcp->u_rval);
 				break;
+#if defined(LINUX_MIPSN32) || defined(X32)
+			/*
+			case RVAL_LHEX:
+				tprintf("= %#llx", tcp->u_lrval);
+				break;
+			case RVAL_LOCTAL:
+				tprintf("= %#llo", tcp->u_lrval);
+				break;
+			*/
+			case RVAL_LUDECIMAL:
+				tprintf("= %llu", tcp->u_lrval);
+				break;
+			/*
+			case RVAL_LDECIMAL:
+				tprintf("= %lld", tcp->u_lrval);
+				break;
+			*/
+#endif
 			default:
 				fprintf(stderr,
 					"invalid rval format\n");
