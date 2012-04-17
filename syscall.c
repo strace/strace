@@ -273,6 +273,12 @@ update_personality(struct tcb *tcp, int personality)
 		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
 			tcp->pid, names[personality]);
 	}
+# elif defined(X32)
+	if (!qflag) {
+		static const char *const names[] = {"x32", "32 bit"};
+		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
+			tcp->pid, names[personality]);
+	}
 # endif
 }
 #endif
@@ -868,15 +874,25 @@ get_scno(struct tcb *tcp)
 	}
 # endif
 # ifdef X32
-	if (currpers == 0 || currpers == 1) {
-		fprintf(stderr, "syscall_%lu (...) in unsupported %s "
-			"mode of process PID=%d\n", scno,
-			currpers == 0 ? "64-bit" : "32-bit", tcp->pid);
-		return 0;
+	/* Value of currpers:
+	 *   0: 64 bit
+	 *   1: 32 bit
+	 *   2: X32
+	 * Value of current_personality:
+	 *   0: X32
+	 *   1: 32 bit
+	 */
+	switch (currpers) {
+		case 0:
+			fprintf(stderr, "syscall_%lu (...) in unsupported "
+					"64-bit mode of process PID=%d\n",
+				scno, tcp->pid);
+			return 0;
+		case 2:
+			currpers = 0;
 	}
-# else
-	update_personality(tcp, currpers);
 # endif
+	update_personality(tcp, currpers);
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)

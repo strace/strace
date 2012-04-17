@@ -227,6 +227,13 @@ extern long ptrace(int, int, char *, long);
 # define PERSONALITY2_WORDSIZE 4
 #endif
 
+#ifdef X32
+# undef SUPPORTED_PERSONALITIES
+# define SUPPORTED_PERSONALITIES 2
+# define PERSONALITY0_WORDSIZE 4
+# define PERSONALITY1_WORDSIZE 4
+#endif
+
 #ifdef ARM
 # undef SUPPORTED_PERSONALITIES
 # define SUPPORTED_PERSONALITIES 2

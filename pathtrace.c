@@ -224,9 +224,7 @@ pathtrace_match(struct tcb *tcp)
 	}
 
 	if (
-#if !defined X32
 	    s->sys_func == sys_old_mmap ||
-#endif
 	    s->sys_func == sys_mmap) {
 		/* x, x, x, x, fd */
 		return fdmatch(tcp, tcp->u_arg[4]);

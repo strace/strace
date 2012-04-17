@@ -80,6 +80,8 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     linux/tile/ioctlent.h.in linux/tile/syscallent.h \
 	     linux/x32/errnoent.h linux/x32/ioctlent.h.in \
 	     linux/x32/signalent.h linux/x32/syscallent.h \
+	     linux/x32/errnoent1.h linux/x32/ioctlent1.h \
+	     linux/x32/signalent1.h linux/x32/syscallent1.h \
 	     linux/x86_64/ioctlent.h.in linux/x86_64/syscallent.h \
 	     linux/x86_64/gentab.pl \
 	     linux/x86_64/errnoent1.h linux/x86_64/ioctlent1.h \
