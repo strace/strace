@@ -378,7 +378,7 @@ printuid(const char *text, unsigned long uid)
  * Returns 0 if len < 0 and NUL was seen, 1 otherwise.
  * Note that if len >= 0, always returns 1.
  */
-static int
+int
 string_quote(const char *instr, char *outstr, int len, int size)
 {
 	const unsigned char *ustr = (const unsigned char *) instr;

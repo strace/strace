@@ -526,6 +526,7 @@ extern const char *getfdpath(struct tcb *, int);
 extern const char *xlookup(const struct xlat *, int);
 
 extern int string_to_uint(const char *str);
+extern int string_quote(const char *, char *, int, int);
 
 #if HAVE_LONG_LONG
 /* _l refers to the lower numbered u_arg,
@@ -593,6 +594,7 @@ extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
 extern int block_ioctl(struct tcb *, long, long);
 extern int mtd_ioctl(struct tcb *, long, long);
+extern int loop_ioctl(struct tcb *, long, long);
 
 extern int tv_nz(struct timeval *);
 extern int tv_cmp(struct timeval *, struct timeval *);
