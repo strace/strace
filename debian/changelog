@@ -8,6 +8,27 @@ strace (4.6-1) unstable; urgency=low
 
  -- Dmitry V. Levin <ldv@altlinux.org>  Mon, 14 Mar 2011 15:16:17 +0000
 
+strace (4.5.20-2.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Add sh4 to arch list.
+  * Add powerpcspe to arch list (Closes: #579842).
+
+ -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Tue, 22 Mar 2011 09:03:49 +0900
+
+strace (4.5.20-2.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Add sh4 to arch list (Closes: #537105).
+
+ -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Wed, 09 Mar 2011 09:22:01 +0900
+
+strace (4.5.20-2.1) unstable; urgency=low
+
+  * NMU, added armhf support. (Closes: #596960)
+
+ -- Konstantinos Margaritis <markos@debian.org>  Thu, 24 Feb 2011 14:47:54 +0000
+
 strace (4.5.20-2) unstable; urgency=low
 
   * Add missing sparc syscall defines to fix FTBFS on sparc.

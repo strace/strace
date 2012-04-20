@@ -1,7 +1,7 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
 Version: 4.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
@@ -85,6 +85,9 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Mon Mar 14 2011 Dmitry V. Levin <ldv@altlinux.org> - 4.6-1
 - New upstream release.
   + fixed a corner case in waitpid handling (#663547).
