@@ -1,3 +1,77 @@
+Noteworthy changes in release 4.7
+=================================
+
+* Changes in behavior
+  * strace no longer suspends waitpid until there is a child
+    for waitpid'ing process to collect status from.
+  * strace no longer detaches from a tracee which is supposed
+    to be going to die.
+  * strace now issues a new message: "+++ exited with EXITCODE +++"
+    which shows exact moment strace got exit notification,
+    analogous to existing "+++ killed by SIG +++" message.
+
+* Improvements
+  * Added x32 architecture support.
+  * Added -y and -P options to print file descriptor paths and
+    filter by those paths.
+  * Added -I option to control strace interactivity.
+  * Allowed -p option to take comma or whitespace-separated list of PIDs.
+  * Added strace_log_merge script helper to merge timestamped "strace -ff"
+    log files.
+  * Implemented decoding of clock_adjtime, get_robust_list, migrate_pages,
+    preadv, prlimit64, process_vm_readv, process_vm_writev, pwritev,
+    rt_tgsigqueueinfo, sendmmsg, setns, set_robust_list,
+    sched_rr_get_interval, splice, syslog, tee and vmsplice syscalls.
+  * Enhanced decoding of capget, capset, getrlimit, flistxattr, io_submit,
+    listxattr, setrlimit and swapon syscalls.
+  * Implemented decoding of loop and mtd ioctls.
+  * Added syscall entries for new linux syscalls.
+  * Added syscall entries for direct socket system calls on powerpc.
+  * Updated the list of errno constants.
+  * Updated lists of MSG_* and TCP_* constants.
+  * Regenerated the list of ioctl names from Linux 3.3.
+  * Enhanced switching between processes with different personalities.
+  * Enhanced signals reporting by using short signal names.
+  * Made ERESTART* messages more descriptive.
+  * Made parsing of numbers from strings more robust.
+  * Added support for compat_statfs64 and statfs64.f_flags.
+  * Changed read of data blocks to use single process_vm_readv syscall
+    (when available) instead of several PTRACE_PEEKDATA operations.
+  * Changed read of registers on x86 and x86-64 to use single PTRACE_GETREGS
+    operation instead of several PTRACE_PEEKUSER operations.
+  * Applied various optimizations to make strace work faster.
+
+* Bug fixes
+  * Implemented proper handling of real SIGTRAPs on kernels supporting
+    PTRACE_O_TRACESYSGOOD.
+    (Addresses Fedora bug #162774).
+  * Fixed sockaddr_un.sun_path name in decoded output.
+    (Addresses Debian bug #554946).
+  * Fixed to avoid potential core file clobbering on exit.
+    (Addresses Debian bug #656398).
+  * Fixed a typo in documentation.
+    (Addresses Debian bug #653309).
+  * Fixed decoding of timer id returned by timer_create.
+  * Fixed epoll_create1, epoll_wait and epoll_pwait decoding.
+  * Fixed *at syscalls flags decoding.
+  * Fixed ARM EABI 64-bit syscall's arguments decoding.
+  * Fixed semtimedop decoding on s390.
+  * Fixed osf_sigprocmask decoding on alpha.
+  * Fixed ipc and socket subcall decoding on several architectures.
+  * Corrected syscall entries for epoll_pwait, epoll_create, epoll_ctl,
+    epoll_wait, mincore, mlockall, prctl, reboot, sendfile, sendfile64,
+    sendmsg, sgetmask, ssetmask, swapon, tgkill and tkill syscalls.
+  * Corrcted io_* syscall entries on ARM.
+  * Fixed PID prefix printing in "strace -oLOG -ff -p1 -p2 -p3" case.
+  * Fixed logging of unfinished lines in "strace -oLOG -ff" case.
+  * Fixed build when libaio-devel is not available.
+  * Fixed configure checks for PTRACE_* constants.
+  * Fixed compilation warnings remained on several architectures.
+
+* Portability
+  * Removed all non-Linux code.  After years of neglect, that dead code
+    just hampered further strace development.
+
 Noteworthy changes in release 4.6
 =================================
 
