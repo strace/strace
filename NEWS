@@ -11,7 +11,7 @@ Noteworthy changes in release 4.7
     analogous to existing "+++ killed by SIG +++" message.
 
 * Improvements
-  * Added x32 architecture support.
+  * Added x32 personality support (x86_64 architecture).
   * Added -y and -P options to print file descriptor paths and
     filter by those paths.
   * Added -I option to control strace interactivity.
@@ -61,7 +61,7 @@ Noteworthy changes in release 4.7
   * Corrected syscall entries for epoll_pwait, epoll_create, epoll_ctl,
     epoll_wait, mincore, mlockall, prctl, reboot, sendfile, sendfile64,
     sendmsg, sgetmask, ssetmask, swapon, tgkill and tkill syscalls.
-  * Corrcted io_* syscall entries on ARM.
+  * Corrected io_* syscall entries on ARM.
   * Fixed PID prefix printing in "strace -oLOG -ff -p1 -p2 -p3" case.
   * Fixed logging of unfinished lines in "strace -oLOG -ff" case.
   * Fixed build when libaio-devel is not available.
