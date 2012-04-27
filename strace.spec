@@ -76,6 +76,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc CREDITS ChangeLog ChangeLog-CVS COPYRIGHT NEWS README
 %{_bindir}/strace
+%{_bindir}/strace-log-merge
 %{_mandir}/man1/*
 
 %ifarch %{strace64_arches}
