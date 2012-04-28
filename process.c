@@ -1170,13 +1170,12 @@ sys_uname(struct tcb *tcp)
 		else if (umove(tcp, tcp->u_arg[0], &uname) < 0)
 			tprints("{...}");
 		else if (!abbrev(tcp)) {
-
 			tprintf("{sysname=\"%s\", nodename=\"%s\", ",
 				uname.sysname, uname.nodename);
 			tprintf("release=\"%s\", version=\"%s\", ",
 				uname.release, uname.version);
 			tprintf("machine=\"%s\"", uname.machine);
-#ifndef __GLIBC__
+#if defined(_GNU_SOURCE) && defined(__GLIBC__)
 			tprintf(", domainname=\"%s\"", uname.domainname);
 #endif
 			tprints("}");
