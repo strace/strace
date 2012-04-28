@@ -372,21 +372,21 @@ printuid(const char *text, unsigned long uid)
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
- * If `len' < 0, treat `instr' as a NUL-terminated string
+ * If `len' is -1, treat `instr' as a NUL-terminated string
  * and quote at most (`size' - 1) bytes.
  *
- * Returns 0 if len < 0 and NUL was seen, 1 otherwise.
+ * Returns 0 if len == -1 and NUL was seen, 1 otherwise.
  * Note that if len >= 0, always returns 1.
  */
 int
-string_quote(const char *instr, char *outstr, int len, int size)
+string_quote(const char *instr, char *outstr, long len, int size)
 {
 	const unsigned char *ustr = (const unsigned char *) instr;
 	char *s = outstr;
 	int usehex, c, i, eol;
 
 	eol = 0x100; /* this can never match a char */
-	if (len < 0) {
+	if (len == -1) {
 		size--;
 		eol = '\0';
 	}
@@ -486,7 +486,7 @@ string_quote(const char *instr, char *outstr, int len, int size)
 	*s = '\0';
 
 	/* Return zero if we printed entire ASCIZ string (didn't truncate it) */
-	if (len < 0 && ustr[i] == '\0') {
+	if (len == -1 && ustr[i] == '\0') {
 		/* We didn't see NUL yet (otherwise we'd jump to 'asciz_ended')
 		 * but next char is NUL.
 		 */
@@ -551,7 +551,7 @@ printpath(struct tcb *tcp, long addr)
  * If string length exceeds `max_strlen', append `...' to the output.
  */
 void
-printstr(struct tcb *tcp, long addr, int len)
+printstr(struct tcb *tcp, long addr, long len)
 {
 	static char *str = NULL;
 	static char *outstr;
@@ -576,7 +576,7 @@ printstr(struct tcb *tcp, long addr, int len)
 			die_out_of_memory();
 	}
 
-	if (len < 0) {
+	if (len == -1) {
 		/*
 		 * Treat as a NUL-terminated string: fetch one byte more
 		 * because string_quote() quotes one byte less.
@@ -588,7 +588,9 @@ printstr(struct tcb *tcp, long addr, int len)
 		}
 	}
 	else {
-		size = MIN(len, max_strlen);
+		size = max_strlen;
+		if (size > (unsigned long)len)
+			size = (unsigned long)len;
 		if (umoven(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;

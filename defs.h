@@ -526,7 +526,7 @@ extern const char *getfdpath(struct tcb *, int);
 extern const char *xlookup(const struct xlat *, int);
 
 extern int string_to_uint(const char *str);
-extern int string_quote(const char *, char *, int, int);
+extern int string_quote(const char *, char *, long, int);
 
 #if HAVE_LONG_LONG
 /* _l refers to the lower numbered u_arg,
@@ -550,7 +550,7 @@ extern int printflags(const struct xlat *, int, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, int);
 extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
-extern void printstr(struct tcb *, long, int);
+extern void printstr(struct tcb *, long, long);
 extern void printnum(struct tcb *, long, const char *);
 extern void printnum_int(struct tcb *, long, const char *);
 extern void printpath(struct tcb *, long);
