@@ -29,6 +29,7 @@
  */
 
 #include "defs.h"
+#include <limits.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -1405,14 +1406,14 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 }
 
 static void
-do_msghdr(struct tcb *tcp, struct msghdr *msg)
+do_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 {
 	tprintf("{msg_name(%d)=", msg->msg_namelen);
 	printsock(tcp, (long)msg->msg_name, msg->msg_namelen);
 
 	tprintf(", msg_iov(%lu)=", (unsigned long)msg->msg_iovlen);
-	tprint_iov(tcp, (unsigned long)msg->msg_iovlen,
-		   (unsigned long)msg->msg_iov, 1);
+	tprint_iov_upto(tcp, (unsigned long)msg->msg_iovlen,
+		   (unsigned long)msg->msg_iov, 1, data_size);
 
 #ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
 	tprintf(", msg_controllen=%lu", (unsigned long)msg->msg_controllen);
@@ -1429,7 +1430,7 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg)
 }
 
 static void
-printmsghdr(struct tcb *tcp, long addr)
+printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
@@ -1437,7 +1438,7 @@ printmsghdr(struct tcb *tcp, long addr)
 		tprintf("%#lx", addr);
 		return;
 	}
-	do_msghdr(tcp, &msg);
+	do_msghdr(tcp, &msg, data_size);
 }
 
 static void
@@ -1454,7 +1455,7 @@ printmmsghdr(struct tcb *tcp, long addr, unsigned int idx)
 		return;
 	}
 	tprints("{");
-	do_msghdr(tcp, &mmsg.msg_hdr);
+	do_msghdr(tcp, &mmsg.msg_hdr, ULONG_MAX);
 	tprintf(", %u}", mmsg.msg_len);
 }
 
@@ -1638,7 +1639,7 @@ sys_sendmsg(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		printmsghdr(tcp, tcp->u_arg[1]);
+		printmsghdr(tcp, tcp->u_arg[1], ULONG_MAX);
 		/* flags */
 		tprints(", ");
 		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
@@ -1738,7 +1739,7 @@ sys_recvmsg(struct tcb *tcp)
 		if (syserror(tcp) || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
-			printmsghdr(tcp, tcp->u_arg[1]);
+			printmsghdr(tcp, tcp->u_arg[1], tcp->u_rval);
 		/* flags */
 		tprints(", ");
 		printflags(msg_flags, tcp->u_arg[2], "MSG_???");

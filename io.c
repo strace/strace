@@ -30,6 +30,7 @@
 
 #include "defs.h"
 #include <fcntl.h>
+#include <limits.h>
 #if HAVE_SYS_UIO_H
 # include <sys/uio.h>
 #endif
@@ -63,8 +64,12 @@ sys_write(struct tcb *tcp)
 }
 
 #if HAVE_SYS_UIO_H
+/*
+ * data_size limits the cumulative size of printed data.
+ * Example: recvmsg returing a short read.
+ */
 void
-tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_iov)
+tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_iov, unsigned long data_size)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	union {
@@ -117,9 +122,13 @@ tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_io
 			break;
 		}
 		tprints("{");
-		if (decode_iov)
-			printstr(tcp, (long) iov_iov_base, iov_iov_len);
-		else
+		if (decode_iov) {
+			unsigned long len = iov_iov_len;
+			if (len > data_size)
+				len = data_size;
+			data_size -= len;
+			printstr(tcp, (long) iov_iov_base, len);
+		} else
 			tprintf("%#lx", (long) iov_iov_base);
 		tprintf(", %lu}", (unsigned long)iov_iov_len);
 	}
@@ -129,6 +138,12 @@ tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_io
 #undef sizeof_iov
 #undef iov_iov_base
 #undef iov_iov_len
+}
+
+void
+tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_iov)
+{
+	tprint_iov_upto(tcp, len, addr, decode_iov, ULONG_MAX);
 }
 
 int

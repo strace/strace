@@ -580,6 +580,7 @@ extern void printcall(struct tcb *);
 extern void print_sigset(struct tcb *, long, int);
 extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
+extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int decode_iov, unsigned long);
 extern void tprint_open_modes(mode_t);
 extern const char *sprint_open_modes(mode_t);
 extern void print_loff_t(struct tcb *, long);
