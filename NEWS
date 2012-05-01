@@ -20,7 +20,7 @@ Noteworthy changes in release 4.7
     log files.
   * Implemented decoding of clock_adjtime, get_robust_list, migrate_pages,
     preadv, prlimit64, process_vm_readv, process_vm_writev, pwritev,
-    rt_tgsigqueueinfo, sendmmsg, setns, set_robust_list,
+    recvmmsg, recvmsg, rt_tgsigqueueinfo, sendmmsg, setns, set_robust_list,
     sched_rr_get_interval, splice, syslog, tee and vmsplice syscalls.
   * Enhanced decoding of capget, capset, getrlimit, flistxattr, io_submit,
     listxattr, setrlimit and swapon syscalls.
@@ -71,6 +71,8 @@ Noteworthy changes in release 4.7
 * Portability
   * Removed all non-Linux code.  After years of neglect, that dead code
     just hampered further strace development.
+  * Linux kernel >= 2.6.18 is recommended.  Older versions might still
+    work but they haven't been thoroughly tested with this release.
 
 Noteworthy changes in release 4.6
 =================================
