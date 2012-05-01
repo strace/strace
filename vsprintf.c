@@ -10,10 +10,11 @@
  */
 
 #include "defs.h"
-#include <stdarg.h>
-#include <limits.h>
 
 #ifdef USE_CUSTOM_PRINTF
+
+#include <stdarg.h>
+#include <limits.h>
 
 #define noinline_for_stack /*nothing*/
 #define likely(expr)       (expr)
