@@ -28,7 +28,7 @@ Noteworthy changes in release 4.7
   * Added syscall entries for new linux syscalls.
   * Added syscall entries for direct socket system calls on powerpc.
   * Updated the list of errno constants.
-  * Updated lists of MSG_* and TCP_* constants.
+  * Updated lists of MSG_*, STA_*, and TCP_* constants.
   * Regenerated the list of ioctl names from Linux 3.3.
   * Enhanced switching between processes with different personalities.
   * Enhanced signals reporting by using short signal names.

@@ -461,6 +461,15 @@ static const struct xlat adjtimex_status[] = {
 #ifdef STA_CLOCKERR
 	{ STA_CLOCKERR,	"STA_CLOCKERR"	},
 #endif
+#ifdef STA_NANO
+	{ STA_NANO,	"STA_NANO"	},
+#endif
+#ifdef STA_MODE
+	{ STA_MODE,	"STA_MODE"	},
+#endif
+#ifdef STA_CLK
+	{ STA_CLK,	"STA_CLK"	},
+#endif
 	{ 0,		NULL		}
 };
 
