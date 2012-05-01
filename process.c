@@ -1175,7 +1175,7 @@ sys_uname(struct tcb *tcp)
 			tprintf("release=\"%s\", version=\"%s\", ",
 				uname.release, uname.version);
 			tprintf("machine=\"%s\"", uname.machine);
-#if defined(_GNU_SOURCE) && defined(__GLIBC__)
+#ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
 			tprintf(", domainname=\"%s\"", uname.domainname);
 #endif
 			tprints("}");
