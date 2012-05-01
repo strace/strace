@@ -1441,7 +1441,7 @@ printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
 }
 
 static void
-printmmsghdr(struct tcb *tcp, long addr, unsigned int idx)
+printmmsghdr(struct tcb *tcp, long addr, unsigned int idx, unsigned long msg_len)
 {
 	struct mmsghdr {
 		struct msghdr msg_hdr;
@@ -1454,12 +1454,12 @@ printmmsghdr(struct tcb *tcp, long addr, unsigned int idx)
 		return;
 	}
 	tprints("{");
-	do_msghdr(tcp, &mmsg.msg_hdr, (unsigned long) -1L);
+	do_msghdr(tcp, &mmsg.msg_hdr, msg_len ? msg_len : mmsg.msg_len);
 	tprintf(", %u}", mmsg.msg_len);
 }
 
 static void
-decode_mmsg(struct tcb *tcp)
+decode_mmsg(struct tcb *tcp, unsigned long msg_len)
 {
 	/* mmsgvec */
 	if (syserror(tcp)) {
@@ -1472,7 +1472,7 @@ decode_mmsg(struct tcb *tcp)
 		for (i = 0; i < len; ++i) {
 			if (i)
 				tprints(", ");
-			printmmsghdr(tcp, tcp->u_arg[1], i);
+			printmmsghdr(tcp, tcp->u_arg[1], i, msg_len);
 		}
 		tprints("}");
 	}
@@ -1659,7 +1659,7 @@ sys_sendmmsg(struct tcb *tcp)
 		}
 	} else {
 		if (verbose(tcp))
-			decode_mmsg(tcp);
+			decode_mmsg(tcp, (unsigned long) -1L);
 	}
 	return 0;
 }
@@ -1769,7 +1769,7 @@ sys_recvmmsg(struct tcb *tcp)
 		return 0;
 	} else {
 		if (verbose(tcp)) {
-			decode_mmsg(tcp);
+			decode_mmsg(tcp, 0);
 			/* timeout on entrance */
 			tprintf(", %s", tcp->auxstr ? tcp->auxstr : "{...}");
 			free((void *) tcp->auxstr);
