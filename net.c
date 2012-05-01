@@ -29,7 +29,6 @@
  */
 
 #include "defs.h"
-#include <limits.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -1455,7 +1454,7 @@ printmmsghdr(struct tcb *tcp, long addr, unsigned int idx)
 		return;
 	}
 	tprints("{");
-	do_msghdr(tcp, &mmsg.msg_hdr, ULONG_MAX);
+	do_msghdr(tcp, &mmsg.msg_hdr, (unsigned long) -1L);
 	tprintf(", %u}", mmsg.msg_len);
 }
 
@@ -1639,7 +1638,7 @@ sys_sendmsg(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		printmsghdr(tcp, tcp->u_arg[1], ULONG_MAX);
+		printmsghdr(tcp, tcp->u_arg[1], (unsigned long) -1L);
 		/* flags */
 		tprints(", ");
 		printflags(msg_flags, tcp->u_arg[2], "MSG_???");

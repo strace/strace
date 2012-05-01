@@ -30,7 +30,6 @@
 
 #include "defs.h"
 #include <fcntl.h>
-#include <limits.h>
 #if HAVE_SYS_UIO_H
 # include <sys/uio.h>
 #endif
@@ -143,7 +142,7 @@ tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr, int deco
 void
 tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_iov)
 {
-	tprint_iov_upto(tcp, len, addr, decode_iov, ULONG_MAX);
+	tprint_iov_upto(tcp, len, addr, decode_iov, (unsigned long) -1L);
 }
 
 int
