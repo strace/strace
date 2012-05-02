@@ -33,8 +33,10 @@
 
 static const struct xlat loop_flags_options[] = {
 	{ LO_FLAGS_READ_ONLY,	"LO_FLAGS_READ_ONLY"	},
+#if HAVE_DECL_LO_FLAGS_AUTOCLEAR
 	{ LO_FLAGS_AUTOCLEAR,	"LO_FLAGS_AUTOCLEAR"	},
-#ifdef LO_FLAGS_PARTSCAN
+#endif
+#if HAVE_DECL_LO_FLAGS_PARTSCAN
 	{ LO_FLAGS_PARTSCAN,	"LO_FLAGS_PARTSCAN"	},
 #endif
 	{ 0,			NULL			},
@@ -164,7 +166,9 @@ int loop_ioctl(struct tcb *tcp, long code, long arg)
 		return 1;
 
 	case LOOP_CLR_FD:
+#ifdef LOOP_SET_CAPACITY
 	case LOOP_SET_CAPACITY:
+#endif
 #ifdef LOOP_CTL_GET_FREE
 	/* newer loop-control stuff */
 	case LOOP_CTL_GET_FREE:

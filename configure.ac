@@ -254,6 +254,11 @@ AC_CHECK_DECLS(m4_normalize([
 	PTRACE_SETOPTIONS
 ]),,, [#include <sys/ptrace.h>])
 
+AC_CHECK_DECLS(m4_normalize([
+	LO_FLAGS_AUTOCLEAR,
+	LO_FLAGS_PARTSCAN
+]),,, [#include <linux/loop.h>])
+
 AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
 #include <stdlib.h>
