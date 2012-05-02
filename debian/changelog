@@ -1,6 +1,14 @@
+strace (4.7-1) unstable; urgency=low
+
+  * New upstream version.
+    + Fixed sockaddr_un.sun_path name in decoded output, closes: #554946
+    + Avoid potential core file clobbering on exit, closes: #656398
+    + Fixed a typo in documentation, closes: #653309
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Wed, 02 May 2012 12:34:56 +0000
+
 strace (4.6-1) unstable; urgency=low
 
-  [ Dmitry V. Levin ]
   * New upstream version.
     + Added HDIO_* ioctl names, closes: #450953
     + Fixed stat64 decoding on mips, closes: #599028

@@ -1,7 +1,7 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.6
-Release: 2%{?dist}
+Version: 4.7
+Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
@@ -86,6 +86,10 @@ rm -rf %{buildroot}
 %endif
 
 %changelog
+* Wed May 02 2012 Dmitry V. Levin <ldv@altlinux.org> 4.7-1
+- New upstream release.
+  + implemented proper handling of real SIGTRAPs (#162774).
+
 * Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
