@@ -22,3 +22,10 @@ Each commit log should always start with a one-line summary, the second
 line should be blank, and the remaining lines are usually ChangeLog-style
 entries for all affected files, except the leading TABs which should
 be omitted.
+
+
+Documentation
+=============
+All noteworthy changes should be mentioned in NEWS.  All changes in strace
+command interface should be reflected in the man page.  New options should
+be documented both in -h output and in the man page.
