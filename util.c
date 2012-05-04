@@ -735,7 +735,8 @@ static bool process_vm_readv_not_supported = 0;
 
 #if defined(__NR_process_vm_readv)
 static bool process_vm_readv_not_supported = 0;
-static ssize_t process_vm_readv(pid_t pid,
+/* Have to avoid duplicating with the C library headers. */
+static ssize_t strace_process_vm_readv(pid_t pid,
 		 const struct iovec *lvec,
 		 unsigned long liovcnt,
 		 const struct iovec *rvec,
@@ -744,6 +745,7 @@ static ssize_t process_vm_readv(pid_t pid,
 {
 	return syscall(__NR_process_vm_readv, (long)pid, lvec, liovcnt, rvec, riovcnt, flags);
 }
+#define process_vm_readv strace_process_vm_readv
 #else
 static bool process_vm_readv_not_supported = 1;
 # define process_vm_readv(...) (errno = ENOSYS, -1)
