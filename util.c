@@ -1512,9 +1512,9 @@ setbpt(struct tcb *tcp)
 		 || set_arg0(tcp, &state, new_arg0) < 0
 		 || arg_finish_change(tcp, &state) < 0)
 			return -1;
-		tcp->flags |= TCB_BPTSET;
 		tcp->inst[0] = tcp->u_arg[arg0_index];
 		tcp->inst[1] = tcp->u_arg[arg1_index];
+		tcp->flags |= TCB_BPTSET;
 		return 0;
 	}
 
@@ -1528,6 +1528,7 @@ clearbpt(struct tcb *tcp)
 {
 	arg_setup_state state;
 	if (arg_setup(tcp, &state) < 0
+	    || change_syscall(tcp, tcp->scno) < 0
 	    || restore_arg0(tcp, &state, tcp->inst[0]) < 0
 	    || restore_arg1(tcp, &state, tcp->inst[1]) < 0
 	    || arg_finish_change(tcp, &state))
