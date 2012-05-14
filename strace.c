@@ -1432,8 +1432,14 @@ get_os_release(void)
 			break;
 		while (*p >= '0' && *p <= '9')
 			p++;
-		if (*p != '.')
+		if (*p != '.') {
+			if (rel >= KERNEL_VERSION(0,1,0)) {
+				/* "X.Y-something" means "X.Y.0" */
+				rel <<= 8;
+				break;
+			}
 			error_msg_and_die("Bad OS release string: '%s'", u.release);
+		}
 		p++;
 	}
 	return rel;
