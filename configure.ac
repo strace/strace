@@ -124,6 +124,14 @@ AC_INCLUDEDIR
 
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wwrite-strings])
+AC_ARG_ENABLE([gcc-Werror],
+  [AS_HELP_STRING([--enable-gcc-Werror], [turn on gcc's -Werror option])],
+  [case $enableval in
+     yes) gl_WARN_ADD([-Werror]) ;;
+     no)  ;;
+     *)   AC_MSG_ERROR([bad value $enableval for gcc-Werror option]) ;;
+   esac]
+)
 AC_SUBST([WARN_CFLAGS])
 
 AC_PROG_CPP
