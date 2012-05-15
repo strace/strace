@@ -899,7 +899,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.oldmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
 		long usp;
@@ -910,7 +909,6 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		tprints(sprintsigmask(") (mask ", (sigset_t *)&sc.oldmask[0], 0));
 	}
-	return 0;
 #elif defined(I386)
 	if (entering(tcp)) {
 		struct sigcontext_struct sc;
@@ -925,7 +923,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.oldmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(IA64)
 	if (entering(tcp)) {
 		struct sigcontext sc;
@@ -941,7 +938,6 @@ sys_sigreturn(struct tcb *tcp)
 		memcpy(&sigm, &sc.sc_mask, NSIG / 8);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(POWERPC)
 	if (entering(tcp)) {
 		long esp;
@@ -963,7 +959,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.oldmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(M68K)
 	if (entering(tcp)) {
 		long usp;
@@ -976,7 +971,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.sc_mask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(ALPHA)
 	if (entering(tcp)) {
 		long fp;
@@ -989,7 +983,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.sc_mask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(SPARC) || defined(SPARC64)
 	if (entering(tcp)) {
 		long i1;
@@ -1008,7 +1001,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(si.si_mask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(LINUX_MIPSN32) || defined(LINUX_MIPSN64)
 	/* This decodes rt_sigreturn.  The 64-bit ABIs do not have
 	   sigreturn.  */
@@ -1025,7 +1017,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(*(long *) &uc.uc_sigmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(MIPS)
 	if (entering(tcp)) {
 		long sp;
@@ -1042,7 +1033,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(si.si_mask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(CRISV10) || defined(CRISV32)
 	if (entering(tcp)) {
 		struct sigcontext sc;
@@ -1057,7 +1047,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.oldmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(TILE)
 	if (entering(tcp)) {
 		struct ucontext uc;
@@ -1074,7 +1063,6 @@ sys_sigreturn(struct tcb *tcp)
 		memcpy(&sigm, &uc.uc_sigmask, NSIG / 8);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
 #elif defined(MICROBLAZE)
 	/* TODO: Verify that this is correct...  */
 	if (entering(tcp)) {
@@ -1089,12 +1077,13 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.oldmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-	return 0;
+#elif defined(X86_64)
+	/* no need to remind */
 #else
-#warning No sys_sigreturn() for this architecture
-#warning         (no problem, just a reminder :-)
-	return 0;
+# warning No sys_sigreturn() for this architecture
+# warning         (no problem, just a reminder :-)
 #endif
+	return 0;
 }
 
 int
