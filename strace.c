@@ -1917,15 +1917,6 @@ trace(void)
 
 		if (!tcp) {
 			if (followfork) {
-				/* This is needed to go with the CLONE_PTRACE
-				   changes in process.c/util.c: we might see
-				   the child's initial trap before we see the
-				   parent return from the clone syscall.
-				   Leave the child suspended until the parent
-				   returns from its system call.  Only then
-				   will we have the association of parent and
-				   child so that we know how to do clearbpt
-				   in the child.  */
 				tcp = alloctcb(pid);
 				tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
 				newoutf(tcp);
