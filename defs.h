@@ -249,7 +249,7 @@ extern long ptrace(int, int, char *, long);
 #endif
 
 #ifndef PERSONALITY0_WORDSIZE
-# define PERSONALITY0_WORDSIZE sizeof(long)
+# define PERSONALITY0_WORDSIZE (int)(sizeof(long))
 #endif
 
 #if !HAVE_DECL_PTRACE_SETOPTIONS
