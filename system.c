@@ -845,9 +845,9 @@ sys_sysctl(struct tcb *tcp)
 	    umoven(tcp, (unsigned long) info.name, size, (char *) name) < 0) {
 		free(name);
 		if (entering(tcp))
-			tprintf("{%p, %d, %p, %p, %p, %Zu}",
+			tprintf("{%p, %d, %p, %p, %p, %lu}",
 				info.name, info.nlen, info.oldval,
-				info.oldlenp, info.newval, info.newlen);
+				info.oldlenp, info.newval, (unsigned long)info.newlen);
 		return 0;
 	}
 
@@ -965,17 +965,18 @@ sys_sysctl(struct tcb *tcp)
 #endif
 				 )))) {
 			printpath(tcp, (size_t)info.oldval);
-			tprintf(", %Zu, ", oldlen);
+			tprintf(", %lu, ", (unsigned long)oldlen);
 			if (info.newval == 0)
 				tprints("NULL");
 			else if (syserror(tcp))
 				tprintf("%p", info.newval);
 			else
 				printpath(tcp, (size_t)info.newval);
-			tprintf(", %Zd", info.newlen);
+			tprintf(", %ld}", (unsigned long)info.newlen);
 		} else {
-			tprintf("%p, %Zd, %p, %Zd", info.oldval, oldlen,
-				info.newval, info.newlen);
+			tprintf("%p, %ld, %p, %ld}",
+				info.oldval, (unsigned long)oldlen,
+				info.newval, (unsigned long)info.newlen);
 		}
 		tprints("}");
 	}

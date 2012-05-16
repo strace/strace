@@ -115,7 +115,7 @@ sys_query_module(struct tcb *tcp)
 				printflags(modflags, mi.flags, "MOD_???");
 				tprintf(", usecount=%lu}, ", mi.usecount);
 			}
-			tprintf("%Zu", ret);
+			tprintf("%lu", (unsigned long)ret);
 		} else if ((tcp->u_arg[1]==QM_MODULES) ||
 			   (tcp->u_arg[1]==QM_DEPS) ||
 			   (tcp->u_arg[1]==QM_REFS)) {
@@ -127,11 +127,11 @@ sys_query_module(struct tcb *tcp)
 
 				if (!data) {
 					fprintf(stderr, "out of memory\n");
-					tprintf(" /* %Zu entries */ ", ret);
+					tprintf(" /* %lu entries */ ", (unsigned long)ret);
 				} else {
 					if (umoven(tcp, tcp->u_arg[2],
 						tcp->u_arg[3], data) < 0) {
-						tprintf(" /* %Zu entries */ ", ret);
+						tprintf(" /* %lu entries */ ", (unsigned long)ret);
 					} else {
 						for (idx = 0; idx < ret; idx++) {
 							tprintf("%s%s",
@@ -143,8 +143,8 @@ sys_query_module(struct tcb *tcp)
 					free(data);
 				}
 			} else
-				tprintf(" /* %Zu entries */ ", ret);
-			tprintf("}, %Zu", ret);
+				tprintf(" /* %lu entries */ ", (unsigned long)ret);
+			tprintf("}, %lu", (unsigned long)ret);
 		} else if (tcp->u_arg[1]==QM_SYMBOLS) {
 			tprints("{");
 			if (!abbrev(tcp)) {
@@ -154,11 +154,11 @@ sys_query_module(struct tcb *tcp)
 
 				if (!data) {
 					fprintf(stderr, "out of memory\n");
-					tprintf(" /* %Zu entries */ ", ret);
+					tprintf(" /* %lu entries */ ", (unsigned long)ret);
 				} else {
 					if (umoven(tcp, tcp->u_arg[2],
 						tcp->u_arg[3], data) < 0) {
-						tprintf(" /* %Zu entries */ ", ret);
+						tprintf(" /* %lu entries */ ", (unsigned long)ret);
 					} else {
 						for (idx = 0; idx < ret; idx++) {
 							tprintf("%s{name=%s, value=%lu}",
@@ -171,8 +171,8 @@ sys_query_module(struct tcb *tcp)
 					free(data);
 				}
 			} else
-				tprintf(" /* %Zu entries */ ", ret);
-			tprintf("}, %Zd", ret);
+				tprintf(" /* %lu entries */ ", (unsigned long)ret);
+			tprintf("}, %ld", (unsigned long)ret);
 		} else {
 			printstr(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 			tprintf(", %#lx", tcp->u_arg[4]);
