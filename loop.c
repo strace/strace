@@ -72,7 +72,7 @@ int loop_ioctl(struct tcb *tcp, long code, long arg)
 		if (!verbose(tcp) || umove(tcp, arg, &info) < 0)
 			return 0;
 
-		tprintf(", {number=%i", info.lo_number);
+		tprintf(", {number=%d", info.lo_number);
 
 		if (!abbrev(tcp)) {
 			tprintf(", device=%#lx, inode=%lu, rdevice=%#lx",
@@ -87,7 +87,7 @@ int loop_ioctl(struct tcb *tcp, long code, long arg)
 			tprints(", encrypt_type=");
 			printxval(loop_crypt_type_options, info.lo_encrypt_type,
 				"LO_CRYPT_???");
-			tprintf(", encrypt_key_size=%i", info.lo_encrypt_key_size);
+			tprintf(", encrypt_key_size=%d", info.lo_encrypt_key_size);
 		}
 
 		tprints(", flags=");

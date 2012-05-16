@@ -267,7 +267,7 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 		if (!verbose(tcp) || umove(tcp, arg, &i) < 0)
 			return 0;
 
-		tprintf(", [%i]", i);
+		tprintf(", [%d]", i);
 		return 1;
 
 	case MTDFILEMODE:
