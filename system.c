@@ -951,8 +951,8 @@ sys_sysctl(struct tcb *tcp)
 			tprints(", ...");
 		tprintf("}, %d, ", info.nlen);
 	} else {
-		size_t oldlen;
-		if (umove(tcp, (size_t)info.oldlenp, &oldlen) >= 0
+		size_t oldlen = 0;
+		if (umove(tcp, (long)info.oldlenp, &oldlen) >= 0
 		    && info.nlen >= 2
 		    && ((name[0] == CTL_KERN
 			 && (name[1] == KERN_OSRELEASE
@@ -978,7 +978,6 @@ sys_sysctl(struct tcb *tcp)
 				info.oldval, (unsigned long)oldlen,
 				info.newval, (unsigned long)info.newlen);
 		}
-		tprints("}");
 	}
 
 	free(name);
