@@ -623,8 +623,7 @@ sys_readahead(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		argn = printllval(tcp, "%lld", 1);
+		argn = printllval(tcp, ", %lld", 1);
 		tprintf(", %ld", tcp->u_arg[argn]);
 	}
 	return 0;
@@ -672,8 +671,7 @@ sys_ftruncate64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printllval(tcp, "%llu", 1);
+		printllval(tcp, ", %llu", 1);
 	}
 	return 0;
 }
@@ -2635,8 +2633,7 @@ sys_fadvise64(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		argn = printllval(tcp, "%lld", 1);
+		argn = printllval(tcp, ", %lld", 1);
 		tprintf(", %ld, ", tcp->u_arg[argn++]);
 		printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
 	}
@@ -2649,11 +2646,10 @@ sys_fadvise64_64(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
 #if defined ARM || defined POWERPC
-		argn = printllval(tcp, "%lld, ", 2);
+		argn = printllval(tcp, ", %lld, ", 2);
 #else
-		argn = printllval(tcp, "%lld, ", 1);
+		argn = printllval(tcp, ", %lld, ", 1);
 #endif
 		argn = printllval(tcp, "%lld, ", argn);
 #if defined ARM || defined POWERPC
@@ -2732,8 +2728,7 @@ sys_fallocate(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);		/* fd */
-		tprints(", ");
-		tprintf("%#lo, ", tcp->u_arg[1]);	/* mode */
+		tprintf(", %#lo, ", tcp->u_arg[1]);	/* mode */
 		argn = printllval(tcp, "%llu, ", 2);	/* offset */
 		printllval(tcp, "%llu", argn);		/* len */
 	}
