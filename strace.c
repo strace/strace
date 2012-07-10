@@ -335,7 +335,7 @@ ptrace_attach_or_seize(int pid)
 	int r;
 	if (!use_seize)
 		return ptrace(PTRACE_ATTACH, pid, 0, 0);
-	r = ptrace(PTRACE_SEIZE, pid, 0, PTRACE_SEIZE_DEVEL);
+	r = ptrace(PTRACE_SEIZE, pid, 0, 0);
 	if (r)
 		return r;
 	r = ptrace(PTRACE_INTERRUPT, pid, 0, 0);
@@ -1382,7 +1382,7 @@ test_ptrace_seize(void)
 	 * attaching tracee continues to run unless a trap condition occurs.
 	 * PTRACE_SEIZE doesn't affect signal or group stop state.
 	 */
-	if (ptrace(PTRACE_SEIZE, pid, 0, PTRACE_SEIZE_DEVEL) == 0) {
+	if (ptrace(PTRACE_SEIZE, pid, 0, 0) == 0) {
 		post_attach_sigstop = 0; /* this sets use_seize to 1 */
 	} else if (debug_flag) {
 		fprintf(stderr, "PTRACE_SEIZE doesn't work\n");
@@ -2074,7 +2074,7 @@ trace(void)
 		if (event != 0) {
 			/* Ptrace event */
 #ifdef USE_SEIZE
-			if (event == PTRACE_EVENT_STOP || event == PTRACE_EVENT_STOP1) {
+			if (event == PTRACE_EVENT_STOP) {
 				/*
 				 * PTRACE_INTERRUPT-stop or group-stop.
 				 * PTRACE_INTERRUPT-stop has sig == SIGTRAP here.

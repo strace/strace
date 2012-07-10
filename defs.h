@@ -300,8 +300,10 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_EVENT_EXIT	6
 #endif
 
-/* Experimental code using PTRACE_SEIZE can be enabled here: */
-//# define USE_SEIZE 1
+/* Experimental code using PTRACE_SEIZE can be enabled here.
+ * This needs Linux kernel 3.4.x or later to work.
+ */
+#define USE_SEIZE 1
 
 #ifdef USE_SEIZE
 # undef PTRACE_SEIZE
@@ -310,11 +312,8 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_INTERRUPT	0x4207
 # undef PTRACE_LISTEN
 # define PTRACE_LISTEN		0x4208
-# undef PTRACE_SEIZE_DEVEL
-# define PTRACE_SEIZE_DEVEL	0x80000000
 # undef PTRACE_EVENT_STOP
-# define PTRACE_EVENT_STOP	7
-# define PTRACE_EVENT_STOP1	128
+# define PTRACE_EVENT_STOP	128
 #endif
 
 #if defined(I386)
