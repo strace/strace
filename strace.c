@@ -2214,6 +2214,12 @@ main(int argc, char *argv[])
 
 	cleanup();
 	fflush(NULL);
+	if (shared_log != stderr)
+		fclose(shared_log);
+	if (popen_pid) {
+		while (waitpid(popen_pid, NULL, 0) < 0 && errno == EINTR)
+			;
+	}
 	if (exit_code > 0xff) {
 		/* Avoid potential core file clobbering.  */
 		struct rlimit rlim = {0, 0};
