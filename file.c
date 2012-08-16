@@ -2276,8 +2276,10 @@ sys_getdents(struct tcb *tcp)
 		if (!abbrev(tcp)) {
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
 				i ? " " : "", d->d_ino, d->d_off);
-			tprintf("d_reclen=%u, d_name=\"%s\"}",
+			tprintf("d_reclen=%u, d_name=\"%s\", d_type=",
 				d->d_reclen, d->d_name);
+			printxval(direnttypes, buf[i + d->d_reclen - 1], "DT_???");
+			tprints("}");
 		}
 		if (!d->d_reclen) {
 			tprints("/* d_reclen == 0, problem here */");
