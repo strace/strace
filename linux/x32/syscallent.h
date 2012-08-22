@@ -52,8 +52,8 @@
 	{ 3,	TN,	sys_getsockname,	"getsockname"	},  /* 51 */
 	{ 3,	TN,	sys_getpeername,	"getpeername"	},  /* 52 */
 	{ 4,	TN,	sys_socketpair,		"socketpair"	},  /* 53 */
-	{ 5,	TN,	sys_setsockopt,		"setsockopt"	},  /* 54 */
-	{ 5,	TN,	sys_getsockopt,		"getsockopt"	},  /* 55 */
+	{ },							    /* 54 */
+	{ },							    /* 55 */
 	{ 5,	TP,	sys_clone,		"clone"		},  /* 56 */
 	{ 0,	TP,	sys_fork,		"fork"		},  /* 57 */
 	{ 0,	TP,	sys_vfork,		"vfork"		},  /* 58 */
@@ -342,3 +342,5 @@
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 538 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv" }, /* 539 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev" }, /* 540 */
+	{ 5,	TN,	sys_setsockopt,		"setsockopt"	},  /* 541 */
+	{ 5,	TN,	sys_getsockopt,		"getsockopt"	},  /* 542 */
