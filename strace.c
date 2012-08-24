@@ -1086,7 +1086,9 @@ startup_child(char **argv)
 			}
 		}
 		else if (geteuid() != 0)
-			setreuid(run_uid, run_uid);
+			if (setreuid(run_uid, run_uid) < 0) {
+				perror_msg_and_die("setreuid");
+			}
 
 		if (!daemonized_tracer) {
 			/*
