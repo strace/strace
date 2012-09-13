@@ -54,7 +54,7 @@ extern char *optarg;
    /* kill() may choose arbitrarily the target task of the process group
       while we later wait on a that specific TID.  PID process waits become
       TID task specific waits for a process under ptrace(2).  */
-# warning "Neither tkill(2) nor tgkill(2) available, risk of strace hangs!"
+# warning "tkill(2) not available, risk of strace hangs!"
 # define my_tkill(tid, sig) kill((tid), (sig))
 #endif
 
@@ -731,8 +731,8 @@ detach(struct tcb *tcp)
 	 * to make a clean break of things.
 	 */
 #if defined(SPARC)
-#undef PTRACE_DETACH
-#define PTRACE_DETACH PTRACE_SUNDETACH
+# undef PTRACE_DETACH
+# define PTRACE_DETACH PTRACE_SUNDETACH
 #endif
 
 	error = 0;
@@ -1365,7 +1365,7 @@ test_ptrace_setoptions_for_all(void)
 		  "giving up using this feature.");
 }
 
-# ifdef USE_SEIZE
+#ifdef USE_SEIZE
 static void
 test_ptrace_seize(void)
 {
@@ -1410,9 +1410,9 @@ test_ptrace_seize(void)
 				__func__, status);
 	}
 }
-# else /* !USE_SEIZE */
-#  define test_ptrace_seize() ((void)0)
-# endif
+#else /* !USE_SEIZE */
+# define test_ptrace_seize() ((void)0)
+#endif
 
 static unsigned
 get_os_release(void)
@@ -1809,9 +1809,9 @@ trace(void)
 {
 	struct rusage ru;
 	struct rusage *rup = cflag ? &ru : NULL;
-# ifdef __WALL
+#ifdef __WALL
 	static int wait4_options = __WALL;
-# endif
+#endif
 
 	while (nprocs != 0) {
 		int pid;
@@ -1825,7 +1825,7 @@ trace(void)
 			return 0;
 		if (interactive)
 			sigprocmask(SIG_SETMASK, &empty_set, NULL);
-# ifdef __WALL
+#ifdef __WALL
 		pid = wait4(-1, &status, wait4_options, rup);
 		if (pid < 0 && (wait4_options & __WALL) && errno == EINVAL) {
 			/* this kernel does not support __WALL */
@@ -1839,9 +1839,9 @@ trace(void)
 				perror_msg("wait4(__WCLONE) failed");
 			}
 		}
-# else
+#else
 		pid = wait4(-1, &status, 0, rup);
-# endif /* __WALL */
+#endif /* __WALL */
 		wait_errno = errno;
 		if (interactive)
 			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
@@ -2196,7 +2196,6 @@ trace(void)
  restart_tracee_with_sig_0:
 		sig = 0;
  restart_tracee:
-		/* Remember current print column before continuing. */
 		if (ptrace_restart(PTRACE_SYSCALL, tcp, sig) < 0) {
 			cleanup();
 			return -1;
