@@ -1581,8 +1581,7 @@ trace_syscall_entering(struct tcb *tcp)
 	else
 		res = (*sysent[tcp->scno].sys_func)(tcp);
 
-	if (fflush(tcp->outf) == EOF)
-		return -1;
+	fflush(tcp->outf);
  ret:
 	tcp->flags |= TCB_INSYSCALL;
 	/* Measure the entrance time as late as possible to avoid errors. */
