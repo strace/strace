@@ -721,7 +721,7 @@ get_scno(struct tcb *tcp)
 		errno = 0;
 		opcode = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(pc-sizeof(long)), 0);
 		if (errno) {
-			perror("peektext(pc-oneword)");
+			perror_msg("%s", "peektext(pc-oneword)");
 			return -1;
 		}
 

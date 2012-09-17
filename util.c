@@ -789,9 +789,10 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		if (r < 0) {
 			if (errno == ENOSYS)
 				process_vm_readv_not_supported = 1;
-			else if (errno != EINVAL && errno != ESRCH) /* EINVAL is seen if process is gone */
-				/* strange... */
-				perror("process_vm_readv");
+			else if (errno != EINVAL && errno != ESRCH)
+				/* EINVAL or ESRCH could be seen if process is gone,
+				 * all the rest is strange and should be reported. */
+				perror_msg("%s", "process_vm_readv");
 			goto vm_readv_didnt_work;
 		}
 		return r;
@@ -899,9 +900,11 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 			if (r < 0) {
 				if (errno == ENOSYS)
 					process_vm_readv_not_supported = 1;
-				else if (errno != EINVAL && errno != ESRCH) /* EINVAL is seen if process is gone */
-					/* strange... */
-					perror("process_vm_readv");
+				else if (errno != EINVAL && errno != ESRCH)
+					/* EINVAL or ESRCH could be seen
+					 * if process is gone, all the rest
+					 * is strange and should be reported. */
+					perror_msg("%s", "process_vm_readv");
 				goto vm_readv_didnt_work;
 			}
 			if (memchr(local[0].iov_base, '\0', r))

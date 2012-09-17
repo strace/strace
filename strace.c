@@ -515,8 +515,7 @@ tprintf(const char *fmt, ...)
 		int n = strace_vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
 			if (current_tcp->outf != stderr)
-				perror(outfname == NULL
-				       ? "<writing to pipe>" : outfname);
+				perror_msg("%s", outfname);
 		} else
 			current_tcp->curcol += n;
 	}
@@ -533,7 +532,7 @@ tprints(const char *str)
 			return;
 		}
 		if (current_tcp->outf != stderr)
-			perror(!outfname ? "<writing to pipe>" : outfname);
+			perror_msg("%s", outfname);
 	}
 }
 
@@ -750,15 +749,15 @@ detach(struct tcb *tcp)
 		}
 		else if (errno != ESRCH) {
 			/* Shouldn't happen. */
-			perror("detach: ptrace(PTRACE_DETACH, ...)");
+			perror_msg("%s", "detach: ptrace(PTRACE_DETACH, ...)");
 		}
 		else if (my_tkill(tcp->pid, 0) < 0) {
 			if (errno != ESRCH)
-				perror("detach: checking sanity");
+				perror_msg("%s", "detach: checking sanity");
 		}
 		else if (!sigstop_expected && my_tkill(tcp->pid, SIGSTOP) < 0) {
 			if (errno != ESRCH)
-				perror("detach: stopping child");
+				perror_msg("%s", "detach: stopping child");
 		}
 		else
 			sigstop_expected = 1;
@@ -771,21 +770,21 @@ detach(struct tcb *tcp)
 				if (errno == ECHILD) /* Already gone.  */
 					break;
 				if (errno != EINVAL) {
-					perror("detach: waiting");
+					perror_msg("%s", "detach: waiting");
 					break;
 				}
 #endif /* __WALL */
 				/* No __WALL here.  */
 				if (waitpid(tcp->pid, &status, 0) < 0) {
 					if (errno != ECHILD) {
-						perror("detach: waiting");
+						perror_msg("%s", "detach: waiting");
 						break;
 					}
 #ifdef __WCLONE
 					/* If no processes, try clones.  */
 					if (waitpid(tcp->pid, &status, __WCLONE) < 0) {
 						if (errno != ECHILD)
-							perror("detach: waiting");
+							perror_msg("%s", "detach: waiting");
 						break;
 					}
 #endif /* __WCLONE */
@@ -934,7 +933,7 @@ startup_attach(void)
 				}
 				ntid -= nerr;
 				if (ntid == 0) {
-					perror("attach: ptrace(PTRACE_ATTACH, ...)");
+					perror_msg("%s", "attach: ptrace(PTRACE_ATTACH, ...)");
 					droptcb(tcp);
 					continue;
 				}
@@ -955,7 +954,7 @@ startup_attach(void)
 			} /* if (opendir worked) */
 		} /* if (-f) */
 		if (ptrace_attach_or_seize(tcp->pid) < 0) {
-			perror("attach: ptrace(PTRACE_ATTACH, ...)");
+			perror_msg("%s", "attach: ptrace(PTRACE_ATTACH, ...)");
 			droptcb(tcp);
 			continue;
 		}
