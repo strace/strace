@@ -97,6 +97,7 @@
 #define TN TRACE_NETWORK
 #define TP TRACE_PROCESS
 #define TS TRACE_SIGNAL
+#define TM TRACE_MEMORY
 #define NF SYSCALL_NEVER_FAILS
 #define MA MAX_ARGS
 
@@ -123,6 +124,7 @@ static const struct sysent sysent2[] = {
 #undef TN
 #undef TP
 #undef TS
+#undef TM
 #undef NF
 #undef MA
 
@@ -441,6 +443,8 @@ lookup_class(const char *s)
 		return TRACE_SIGNAL;
 	if (strcmp(s, "desc") == 0)
 		return TRACE_DESC;
+	if (strcmp(s, "memory") == 0)
+		return TRACE_MEMORY;
 	return -1;
 }
 

@@ -447,7 +447,8 @@ extern const struct xlat open_access_modes[];
 #define TRACE_PROCESS	010	/* Trace process-related syscalls. */
 #define TRACE_SIGNAL	020	/* Trace signal-related syscalls. */
 #define TRACE_DESC	040	/* Trace file descriptor-related syscalls. */
-#define SYSCALL_NEVER_FAILS	0100	/* Syscall is always successful. */
+#define TRACE_MEMORY	0100	/* Trace memory mapping-related syscalls. */
+#define SYSCALL_NEVER_FAILS	0200	/* Syscall is always successful. */
 
 typedef enum {
 	CFLAG_NONE = 0,

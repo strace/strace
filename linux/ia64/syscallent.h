@@ -848,7 +848,7 @@
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 1057 */
 	{ 1,	TD,	sys_pipe,		"pipe"		}, /* 1058 */
 	{ 1,	0,	sys_times,		"times"		}, /* 1059 */
-	{ 1,	0,	sys_brk,		"brk"		}, /* 1060 */
+	{ 1,	TM,	sys_brk,		"brk"		}, /* 1060 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 1061 */
 	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 1062 */
 	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 1063 */
@@ -939,15 +939,15 @@
 	{ 4,	TD,	sys_pread,		"pread"		}, /* 1148 */
 	{ 4,	TD,	sys_pwrite,		"pwrite"	}, /* 1149 */
 	{ 1,	0,	printargs,		"_sysctl"	}, /* 1150 */
-	{ 6,	TD,	sys_mmap,		"mmap"		}, /* 1151 */
-	{ 2,	0,	sys_munmap,		"munmap"	}, /* 1152 */
-	{ 2,	0,	sys_mlock,		"mlock"		}, /* 1153 */
-	{ 1,	0,	sys_mlockall,		"mlockall"	}, /* 1154 */
-	{ 3,	0,	sys_mprotect,		"mprotect"	}, /* 1155 */
-	{ 5,	0,	sys_mremap,		"mremap"	}, /* 1156 */
-	{ 3,	0,	sys_msync,		"msync"		}, /* 1157 */
-	{ 2,	0,	sys_munlock,		"munlock"	}, /* 1158 */
-	{ 0,	0,	sys_munlockall,		"munlockall"	}, /* 1159 */
+	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 1151 */
+	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 1152 */
+	{ 2,	TM,	sys_mlock,		"mlock"		}, /* 1153 */
+	{ 1,	TM,	sys_mlockall,		"mlockall"	}, /* 1154 */
+	{ 3,	TM,	sys_mprotect,		"mprotect"	}, /* 1155 */
+	{ 5,	TM,	sys_mremap,		"mremap"	}, /* 1156 */
+	{ 3,	TM,	sys_msync,		"msync"		}, /* 1157 */
+	{ 2,	TM,	sys_munlock,		"munlock"	}, /* 1158 */
+	{ 0,	TM,	sys_munlockall,		"munlockall"	}, /* 1159 */
 	{ 2,	0,	sys_sched_getparam,	"sched_getparam"}, /* 1160 */
 	{ 2,	0,	sys_sched_setparam,	"sched_setparam"}, /* 1161 */
 	{ 2,	0,	sys_sched_getscheduler,	"sched_getscheduler"}, /* 1162 */
@@ -960,7 +960,7 @@
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 1169 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 1170 */
 	{ 1,	0,	sys_getpagesize,	"getpagesize"	}, /* 1171 */
-	{ 6,	TD,	sys_mmap,		"mmap2"		}, /* 1172 */
+	{ 6,	TD|TM,	sys_mmap,		"mmap2"		}, /* 1172 */
 	{ 5,	0,	printargs,		"pciconfig_read"}, /* 1173 */
 	{ 5,	0,	printargs,		"pciconfig_write"}, /* 1174 */
 	{ MA,	0,	printargs,		"perfmonctl"	}, /* 1175 */
@@ -996,8 +996,8 @@
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 1205 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 1206 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 1207 */
-	{ 3,	0,	sys_mincore,		"mincore"	}, /* 1208 */
-	{ 3,	0,	sys_madvise,		"madvise"	}, /* 1209 */
+	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 1208 */
+	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 1209 */
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 1210 */
 	{ 2,	0,	sys_lstat,		"lstat"		}, /* 1211 */
 	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 1212 */
@@ -1047,9 +1047,9 @@
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 1256 */
 	{ MA,	0,	printargs,		"fstatfs64"	}, /* 1257 */
 	{ MA,	0,	printargs,		"statfs64"	}, /* 1258 */
-	{ 6,	0,	sys_mbind,		"mbind"		}, /* 1259 */
-	{ 5,	0,	sys_get_mempolicy,	"get_mempolicy"	}, /* 1260 */
-	{ 3,	0,	sys_set_mempolicy,	"set_mempolicy"	}, /* 1261 */
+	{ 6,	TM,	sys_mbind,		"mbind"		}, /* 1259 */
+	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 1260 */
+	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"	}, /* 1261 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 1262 */
 	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 1263 */
 	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 1264 */
@@ -1064,11 +1064,11 @@
 	{ 5,	0,	sys_keyctl,		"keyctl"	}, /* 1273 */
 	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 1274 */
 	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 1275 */
-	{ 6,	0,	sys_move_pages,		"move_pages"	}, /* 1276 */
+	{ 6,	TM,	sys_move_pages,		"move_pages"	}, /* 1276 */
 	{ 0,	TD,	sys_inotify_init,	"inotify_init"	}, /* 1277 */
 	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 1278 */
 	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 1279 */
-	{ 4,	0,	sys_migrate_pages,	"migrate_pages"	}, /* 1280 */
+	{ 4,	TM,	sys_migrate_pages,	"migrate_pages"	}, /* 1280 */
 	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 1281 */
 	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"	}, /* 1282 */
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 1283 */
