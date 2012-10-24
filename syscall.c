@@ -65,6 +65,12 @@
 # include <asm/rse.h>
 #endif
 
+#if defined(AARCH64)
+# include <asm/ptrace.h>
+# include <sys/uio.h>
+# include <elf.h>
+#endif
+
 #ifndef ERESTARTSYS
 # define ERESTARTSYS	512
 #endif
@@ -657,6 +663,8 @@ static long d0;
 static long r0;
 #elif defined(ARM)
 static struct pt_regs regs;
+#elif defined(AARCH64)
+static struct user_pt_regs regs;
 #elif defined(ALPHA)
 static long r0;
 static long a3;
@@ -967,6 +975,13 @@ get_scno(struct tcb *tcp)
 		fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);
 		tcp->flags |= TCB_INSYSCALL;
 	}
+#elif defined(AARCH64)
+	struct iovec io;
+	io.iov_base = &regs;
+	io.iov_len = sizeof(regs);
+	if (ptrace(PTRACE_GETREGSET, tcp->pid, NT_PRSTATUS, (void *)&io) == -1)
+		return -1;
+	scno = regs.regs[8];
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
 		return -1;
@@ -1403,6 +1418,9 @@ get_syscall_args(struct tcb *tcp)
 #elif defined(ARM)
 	for (i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = regs.uregs[i];
+#elif defined(AARCH64)
+	for (i = 0; i < nargs; ++i)
+		tcp->u_arg[i] = regs.regs[i];
 #elif defined(AVR32)
 	(void)i;
 	(void)nargs;
@@ -1641,6 +1659,12 @@ get_syscall_result(struct tcb *tcp)
 	/* Read complete register set in one go. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 		return -1;
+#elif defined(AARCH64)
+	struct iovec io;
+	io.iov_base = &regs;
+	io.iov_len = sizeof(regs);
+	if (ptrace(PTRACE_GETREGSET, tcp->pid, NT_PRSTATUS, (void *)&io) == -1)
+		return -1;
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_D0, &d0) < 0)
 		return -1;
@@ -1822,6 +1846,14 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = regs.ARM_r0;
+	}
+#elif defined(AARCH64)
+	if (check_errno && is_negated_errno(regs.regs[0])) {
+		tcp->u_rval = -1;
+		u_error = -regs.regs[0];
+	}
+	else {
+		tcp->u_rval = regs.regs[0];
 	}
 #elif defined(AVR32)
 	if (check_errno && regs.r12 && (unsigned) -regs.r12 < nerrnos) {

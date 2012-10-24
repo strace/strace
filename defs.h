@@ -134,7 +134,7 @@ extern char *stpcpy(char *dst, const char *src);
 # define LINUX_MIPS64
 #endif
 
-#if (defined(LINUXSPARC) || defined(X86_64) || defined(ARM) || defined(AVR32)) && defined(__GLIBC__)
+#if (defined(LINUXSPARC) || defined(X86_64) || defined(ARM) || defined(AARCH64) || defined(AVR32)) && defined(__GLIBC__)
 # include <sys/ptrace.h>
 #else
 /* Work around awkward prototype in ptrace.h. */
@@ -389,7 +389,8 @@ struct tcb {
 #if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
   || defined(POWERPC) || defined(IA64) || defined(HPPA) \
   || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) \
-  || defined(ARM) || defined(MIPS) || defined(BFIN) || defined(TILE)
+  || defined(ARM) || defined(AARCH64) || defined(MIPS) || defined(BFIN) \
+  || defined(TILE)
 /* This tracee has entered into execve syscall. Expect post-execve SIGTRAP
  * to happen. (When it is detected, tracee is continued and this bit is cleared.)
  */

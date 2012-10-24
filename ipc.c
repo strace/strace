@@ -174,7 +174,7 @@ indirect_ipccall(struct tcb *tcp)
 #if defined IA64
 	return tcp->scno < 1024; /* ia32 emulation syscalls are low */
 #endif
-#if defined(ALPHA) || defined(MIPS) || defined(HPPA) || defined(__ARM_EABI__)
+#if defined(ALPHA) || defined(MIPS) || defined(HPPA) || defined(__ARM_EABI__) || defined(AARCH64)
 	return 0;
 #endif
 	return 1;

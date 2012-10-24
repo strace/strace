@@ -56,6 +56,10 @@ arm*)
 	arch=arm
 	AC_DEFINE([ARM], 1, [Define for the ARM architecture.])
 	;;
+aarch64*)
+	arch=aarch64
+	AC_DEFINE([AARCH64], 1, [Define for the AArch64 architecture.])
+	;;
 avr32*)
 	arch=avr32
 	AC_DEFINE([AVR32], 1, [Define for the AVR32 architecture.])
