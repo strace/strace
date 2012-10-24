@@ -519,8 +519,8 @@
 	"ERESTARTNOHAND", /* 514 */
 	"ENOIOCTLCMD", /* 515 */
 	"ERESTART_RESTARTBLOCK", /* 516 */
-	"ERRNO_517", /* 517 */
-	"ERRNO_518", /* 518 */
+	"EPROBE_DEFER", /* 517 */
+	"EOPENSTALE", /* 518 */
 	"ERRNO_519", /* 519 */
 	"ERRNO_520", /* 520 */
 	"EBADHANDLE", /* 521 */
