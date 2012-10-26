@@ -177,7 +177,7 @@
 	{ 2,	0,	sys_delete_module,	"delete_module"	},  /* 176 */
 	{ 1,	0,	printargs,		"64:get_kernel_syms"	},  /* 177 */
 	{ 5,	0,	printargs,		"64:query_module"	},  /* 178 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	},  /* 179 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	},  /* 179 */
 	{ 3,	0,	printargs,		"64:nfsservctl"	},  /* 180 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 181 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 182 */

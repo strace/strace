@@ -157,7 +157,7 @@
 	{ 3,	0,	sys_init_module,	"init_module"	}, /* 128 */
 	{ 2,	0,	sys_delete_module,	"delete_module"	}, /* 129 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 130 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 131 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	}, /* 131 */
 	{ 1,	0,	sys_getpgid,		"getpgid"	}, /* 132 */
 	{ 1,	0,	sys_fchdir,		"fchdir"	}, /* 133 */
 	{ 0,	0,	sys_bdflush,		"bdflush"	}, /* 134 */

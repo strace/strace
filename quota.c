@@ -617,7 +617,7 @@ sys_quotactl(struct tcb *tcp)
 		tprints("|");
 		printxval(quotatypes, type, "???QUOTA");
 		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], -1);
+		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 		switch (cmd) {
 			case Q_V1_QUOTAON:

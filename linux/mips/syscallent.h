@@ -1141,7 +1141,7 @@
 	{ 0,	TM,	printargs,		"sysv_madvise"	}, /* 1138 */
 	{ 0,	0,	printargs,		"sysv_pagelock"	}, /* 1139 */
 	{ 0,	0,	printargs,		"sysv_getpagesize"	}, /* 1140 */
-	{ 0,	0,	printargs,		"sysv_quotactl"	}, /* 1141 */
+	{ 0,	TF,	printargs,		"sysv_quotactl"	}, /* 1141 */
 	{ 0,	0,	printargs,		"sysv_libdetach"	}, /* 1142 */
 	{ 0,	0,	printargs,		"sysv_BSDgetpgrp"	}, /* 1143 */
 	{ 0,	0,	printargs,		"sysv_BSDsetpgrp"	}, /* 1144 */
@@ -2168,7 +2168,7 @@
 	{ 0,	0,	printargs,		"bsd43_getdomainname"	}, /* 2165 */
 	{ 0,	0,	printargs,		"bsd43_setdomainname"	}, /* 2166 */
 	{ 0,	0,	printargs,		"bsd43_pcfs_mount"	}, /* 2167 */
-	{ 0,	0,	printargs,		"bsd43_quotactl"	}, /* 2168 */
+	{ 0,	TF,	printargs,		"bsd43_quotactl"	}, /* 2168 */
 	{ 0,	0,	printargs,		"bsd43_oldexportfs"	}, /* 2169 */
 	{ 0,	0,	printargs,		"bsd43_smount"	}, /* 2170 */
 	{ 0,	0,	printargs,		"bsd43_mipshwconf"	}, /* 2171 */
@@ -4133,7 +4133,7 @@
 	{ 3,	0,	sys_init_module,	"init_module"	}, /* 4128 */
 	{ 2,	0,	sys_delete_module,	"delete_module"	}, /* 4129 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 4130 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 4131 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	}, /* 4131 */
 	{ 1,	0,	sys_getpgid,		"getpgid"	}, /* 4132 */
 	{ 1,	TF,	sys_fchdir,		"fchdir"	}, /* 4133 */
 	{ 2,	0,	sys_bdflush,		"bdflush"	}, /* 4134 */
@@ -4481,7 +4481,7 @@
 	{ 0,	0,	printargs,		"o32_init_module"	}, /* 4128 */
 	{ 0,	0,	printargs,		"o32_delete_module"	}, /* 4129 */
 	{ 0,	0,	printargs,		"o32_get_kernel_syms"}, /* 4130 */
-	{ 0,	0,	printargs,		"o32_quotactl"	}, /* 4131 */
+	{ 0,	TF,	printargs,		"o32_quotactl"	}, /* 4131 */
 	{ 0,	0,	printargs,		"o32_getpgid"	}, /* 4132 */
 	{ 0,	0,	printargs,		"o32_fchdir"	}, /* 4133 */
 	{ 0,	0,	printargs,		"o32_bdflush"	}, /* 4134 */
@@ -5525,7 +5525,7 @@
 	{ 1,	0,	sys_delete_module,	"delete_module"	}, /* 5169 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 5170 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 5171 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 5172 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	}, /* 5172 */
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 5173 */
 	{ 5,	TN,	printargs,		"getpmsg"	}, /* 5174 */
 	{ 5,	TN,	printargs,		"putpmsg"	}, /* 5175 */
@@ -5832,7 +5832,7 @@
 	{ 0,	0,	printargs,		"n64_delete_module"	}, /* 5169 */
 	{ 0,	0,	printargs,		"n64_get_kernel_syms"	}, /* 5170 */
 	{ 0,	0,	printargs,		"n64_query_module"	}, /* 5171 */
-	{ 0,	0,	printargs,		"n64_quotactl"		}, /* 5172 */
+	{ 0,	TF,	printargs,		"n64_quotactl"		}, /* 5172 */
 	{ 0,	0,	printargs,		"n64_nfsservctl"	}, /* 5173 */
 	{ 0,	0,	printargs,		"n64_getpmsg"		}, /* 5174 */
 	{ 0,	0,	printargs,		"n64_putpmsg"		}, /* 5175 */
@@ -6836,7 +6836,7 @@
 	{ 1,	0,	sys_delete_module,	"delete_module"	}, /* 6169 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 6170 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 6171 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 6172 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	}, /* 6172 */
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 6173 */
 	{ 5,	TN,	printargs,		"getpmsg"	}, /* 6174 */
 	{ 5,	TN,	printargs,		"putpmsg"	}, /* 6175 */
@@ -7149,7 +7149,7 @@
 	{ 0,	0,	printargs,		"n32_delete_module"	}, /* 6169 */
 	{ 0,	0,	printargs,		"n32_get_kernel_syms"	}, /* 6170 */
 	{ 0,	0,	printargs,		"n32_query_module"	}, /* 6171 */
-	{ 0,	0,	printargs,		"n32_quotactl"		}, /* 6172 */
+	{ 0,	TF,	printargs,		"n32_quotactl"		}, /* 6172 */
 	{ 0,	0,	printargs,		"n32_nfsservctl"	}, /* 6173 */
 	{ 0,	0,	printargs,		"n32_getpmsg"		}, /* 6174 */
 	{ 0,	0,	printargs,		"n32_putpmsg"		}, /* 6175 */

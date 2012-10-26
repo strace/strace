@@ -213,6 +213,12 @@ pathtrace_match(struct tcb *tcp)
 			upathmatch(tcp, tcp->u_arg[1]);
 	}
 
+	if (s->sys_func == sys_quotactl)
+	{
+		/* x, path */
+		return upathmatch(tcp, tcp->u_arg[1]);
+	}
+
 	if (s->sys_func == sys_renameat ||
 	    s->sys_func == sys_linkat)
 	{

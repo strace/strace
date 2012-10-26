@@ -163,7 +163,7 @@
 	{ 2,	0,	printargs,	"getdomainname" },	/* 162 */
 	{ 2,	0,	sys_setdomainname,"setdomainname" },	/* 163 */
 	{ 5,	0,	printargs,	"utrap_install" },	/* 164 */
-	{ 4,	0,	sys_quotactl,	"quotactl" },		/* 165 */
+	{ 4,	TF,	sys_quotactl,	"quotactl" },		/* 165 */
 	{ 1,	0,	sys_set_tid_address,"set_tid_address" },	/* 166 */
 	{ 5,	TF,	sys_mount,	"mount" },		/* 167 */
 	{ 2,	0,	sys_ustat,	"ustat" },		/* 168 */

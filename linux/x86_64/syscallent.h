@@ -177,7 +177,7 @@
 	{ 2,	0,	sys_delete_module,	"delete_module"	},  /* 176 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"},  /* 177 */
 	{ 5,	0,	sys_query_module,	"query_module"	},  /* 178 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	},  /* 179 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	},  /* 179 */
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	},  /* 180 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 181 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 182 */

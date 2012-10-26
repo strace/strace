@@ -58,7 +58,7 @@
 	{ 1,	TD,	sys_close,			"close"				}, /*   57 */
 	{ 0,	0,	sys_vhangup,			"vhangup"			}, /*   58 */
 	{ 2,	TD,	sys_pipe2,			"pipe2"				}, /*   59 */
-	{ 4,	0,	sys_quotactl,			"quotactl"			}, /*   60 */
+	{ 4,	TF,	sys_quotactl,			"quotactl"			}, /*   60 */
 	{ 3,	TD,	sys_getdents64,			"getdents64"			}, /*   61 */
 	{ 3,	TD,	sys_lseek,			"lseek"				}, /*   62 */
 	{ 3,	TD,	sys_read,			"read"				}, /*   63 */

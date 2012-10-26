@@ -131,7 +131,7 @@
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask" }, /* 130 */
 	{ 3,	0,	sys_init_module,	"init_module" }, /* 131 */
 	{ 1,	0,	sys_delete_module,	"delete_module" }, /* 132 */
-	{ 4,	0,	sys_quotactl,		"quotactl" }, /* 133 */
+	{ 4,	TF,	sys_quotactl,		"quotactl" }, /* 133 */
 	{ 1,	0,	sys_getpgid,		"getpgid" }, /* 134 */
 	{ 1,	TD,	sys_fchdir,		"fchdir" }, /* 135 */
 	{ 0,	0,	sys_bdflush,		"bdflush" }, /* 136 */

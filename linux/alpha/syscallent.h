@@ -174,7 +174,7 @@
 	{ 2,	0,	sys_setrlimit,		"setrlimit"		}, /* 145 */
 	{ 5,	0,	printargs,		"osf_old_killpg"	}, /* 146, not implemented */
 	{ 0,	0,	sys_setsid,		"setsid"		}, /* 147 */
-	{ 4,	0,	sys_quotactl,		"quotactl"		}, /* 148 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"		}, /* 148 */
 	{ 5,	0,	printargs,		"osf_oldquota"		}, /* 149, not implemented */
 	{ 3,	TN,	sys_getsockname,	"getsockname"		}, /* 150 */
 	{ 5,	0,	NULL,			NULL			}, /* 151 */

@@ -925,7 +925,7 @@
 	{ 2,	0,	sys_delete_module,	"delete_module"	}, /* 1134 */
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 1135 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 1136 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 1137 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	}, /* 1137 */
 	{ 0,	0,	sys_bdflush,		"bdflush"	}, /* 1138 */
 	{ 3,	0,	sys_sysfs,		"sysfs"		}, /* 1139 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 1140 */

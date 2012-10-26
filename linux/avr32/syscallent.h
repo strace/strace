@@ -142,7 +142,7 @@
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 114 */
 	{ 3,	0,	sys_init_module,	"init_module"	}, /* 115 */
 	{ 2,	0,	sys_delete_module,	"delete_module"	}, /* 116 */
-	{ 4,	0,	sys_quotactl,		"quotactl"	}, /* 117 */
+	{ 4,	TF,	sys_quotactl,		"quotactl"	}, /* 117 */
 	{ 1,	0,	sys_getpgid,		"getpgid"	}, /* 118 */
 	{ 0,	0,	sys_bdflush,		"bdflush"	}, /* 119 */
 	{ 3,	0,	sys_sysfs,		"sysfs"		}, /* 120 */
