@@ -287,6 +287,12 @@ update_personality(struct tcb *tcp, int personality)
 		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
 			tcp->pid, names[personality]);
 	}
+# elif defined(AARCH64)
+	if (!qflag) {
+		static const char *const names[] = {"32-bit ARM", "AArch64"};
+		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
+			tcp->pid, names[personality]);
+	}
 # endif
 }
 #endif
@@ -664,7 +670,8 @@ static long r0;
 #elif defined(ARM)
 static struct pt_regs regs;
 #elif defined(AARCH64)
-static struct user_pt_regs regs;
+static struct user_pt_regs aarch64_regs;
+static struct arm_pt_regs regs;
 #elif defined(ALPHA)
 static long r0;
 static long a3;
@@ -916,6 +923,29 @@ get_scno(struct tcb *tcp)
 		if (upeek(tcp, PT_R15, &scno) < 0)
 			return -1;
 	}
+#elif defined(AARCH64)
+	struct iovec io;
+	char buf[sizeof(aarch64_regs)];
+	io.iov_base = &buf;
+	io.iov_len = sizeof(aarch64_regs);
+	if (ptrace(PTRACE_GETREGSET, tcp->pid, NT_PRSTATUS, (void *)&io) == -1)
+		return -1;
+	switch (io.iov_len) {
+		case sizeof(aarch64_regs):
+			/* We are in 64-bit mode */
+			memcpy(&aarch64_regs, buf, sizeof(aarch64_regs));
+			scno = aarch64_regs.regs[8];
+			update_personality(tcp, 1);
+			break;
+		case sizeof(regs):
+			/* We are in 32-bit mode */
+			memcpy(&regs, buf, sizeof(regs));
+			scno = regs.uregs[7];
+			update_personality(tcp, 0);
+			break;
+		default:
+			return -1;
+	}
 #elif defined(ARM)
 	/* Read complete register set in one go. */
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
@@ -975,13 +1005,6 @@ get_scno(struct tcb *tcp)
 		fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);
 		tcp->flags |= TCB_INSYSCALL;
 	}
-#elif defined(AARCH64)
-	struct iovec io;
-	io.iov_base = &regs;
-	io.iov_len = sizeof(regs);
-	if (ptrace(PTRACE_GETREGSET, tcp->pid, NT_PRSTATUS, (void *)&io) == -1)
-		return -1;
-	scno = regs.regs[8];
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
 		return -1;
@@ -1415,12 +1438,15 @@ get_syscall_args(struct tcb *tcp)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, PT_GR26-4*i, &tcp->u_arg[i]) < 0)
 			return -1;
-#elif defined(ARM)
+#elif defined(ARM) || defined(AARCH64)
+# if defined(AARCH64)
+	if (tcp->currpers == 1)
+		for (i = 0; i < nargs; ++i)
+			tcp->u_arg[i] = aarch64_regs.regs[i];
+	else
+# endif /* AARCH64 */
 	for (i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = regs.uregs[i];
-#elif defined(AARCH64)
-	for (i = 0; i < nargs; ++i)
-		tcp->u_arg[i] = regs.regs[i];
 #elif defined(AVR32)
 	(void)i;
 	(void)nargs;
@@ -1655,15 +1681,30 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 	if (upeek(tcp, PT_R10, &r10) < 0)
 		return -1;
-#elif defined(ARM)
-	/* Read complete register set in one go. */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
-		return -1;
 #elif defined(AARCH64)
 	struct iovec io;
-	io.iov_base = &regs;
-	io.iov_len = sizeof(regs);
+	char buf[sizeof(aarch64_regs)];
+	io.iov_base = &buf;
+	io.iov_len = sizeof(aarch64_regs);
 	if (ptrace(PTRACE_GETREGSET, tcp->pid, NT_PRSTATUS, (void *)&io) == -1)
+		return -1;
+	switch (io.iov_len) {
+		case sizeof(aarch64_regs):
+			/* We are in 64-bit mode */
+			memcpy(&aarch64_regs, buf, sizeof(aarch64_regs));
+			update_personality(tcp, 1);
+			break;
+		case sizeof(regs):
+			/* We are in 32-bit mode */
+			memcpy(&regs, buf, sizeof(regs));
+			update_personality(tcp, 0);
+			break;
+		default:
+			return -1;
+	}
+#elif defined(ARM)
+	/* Read complete ARM register set in one go. */
+	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
 		return -1;
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_D0, &d0) < 0)
@@ -1839,21 +1880,27 @@ get_error(struct tcb *tcp)
 	else {
 		tcp->u_rval = d0;
 	}
-#elif defined(ARM)
-	if (check_errno && is_negated_errno(regs.ARM_r0)) {
-		tcp->u_rval = -1;
-		u_error = -regs.ARM_r0;
+#elif defined(ARM) || defined(AARCH64)
+# if defined(AARCH64)
+	if (tcp->currpers == 1) {
+		if (check_errno && is_negated_errno(aarch64_regs.regs[0])) {
+			tcp->u_rval = -1;
+			u_error = -aarch64_regs.regs[0];
+		}
+		else {
+			tcp->u_rval = aarch64_regs.regs[0];
+		}
 	}
-	else {
-		tcp->u_rval = regs.ARM_r0;
-	}
-#elif defined(AARCH64)
-	if (check_errno && is_negated_errno(regs.regs[0])) {
-		tcp->u_rval = -1;
-		u_error = -regs.regs[0];
-	}
-	else {
-		tcp->u_rval = regs.regs[0];
+	else
+# endif /* AARCH64 */
+	{
+		if (check_errno && is_negated_errno(regs.ARM_r0)) {
+			tcp->u_rval = -1;
+			u_error = -regs.ARM_r0;
+		}
+		else {
+			tcp->u_rval = regs.ARM_r0;
+		}
 	}
 #elif defined(AVR32)
 	if (check_errno && regs.r12 && (unsigned) -regs.r12 < nerrnos) {
