@@ -1151,116 +1151,6 @@ printcall(struct tcb *tcp)
 # define CLONE_VM        0x00000100
 #endif
 
-static int
-change_syscall(struct tcb *tcp, int new)
-{
-#if defined(I386)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0)
-		return -1;
-	return 0;
-#elif defined(X86_64) || defined(X32)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0)
-		return -1;
-	return 0;
-#elif defined(POWERPC)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid,
-		   (char*)(sizeof(unsigned long)*PT_R0), new) < 0)
-		return -1;
-	return 0;
-#elif defined(S390) || defined(S390X)
-	/* s390 linux after 2.4.7 has a hook in entry.S to allow this */
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new) < 0)
-		return -1;
-	return 0;
-#elif defined(M68K)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new) < 0)
-		return -1;
-	return 0;
-#elif defined(SPARC) || defined(SPARC64)
-	struct pt_regs regs;
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char*)&regs, 0) < 0)
-		return -1;
-	regs.u_regs[U_REG_G1] = new;
-	if (ptrace(PTRACE_SETREGS, tcp->pid, (char*)&regs, 0) < 0)
-		return -1;
-	return 0;
-#elif defined(MIPS)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), new) < 0)
-		return -1;
-	return 0;
-#elif defined(ALPHA)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new) < 0)
-		return -1;
-	return 0;
-#elif defined(AVR32)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_R8), new) < 0)
-		return -1;
-	return 0;
-#elif defined(BFIN)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_P0), new) < 0)
-		return -1;
-	return 0;
-#elif defined(IA64)
-	if (ia32) {
-		switch (new) {
-		case 2:
-			break;	/* x86 SYS_fork */
-		case SYS_clone:
-			new = 120;
-			break;
-		default:
-			fprintf(stderr, "%s: unexpected syscall %d\n",
-				__FUNCTION__, new);
-			return -1;
-		}
-		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R1), new) < 0)
-			return -1;
-	} else if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R15), new) < 0)
-		return -1;
-	return 0;
-#elif defined(HPPA)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR20), new) < 0)
-		return -1;
-	return 0;
-#elif defined(SH)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new) < 0)
-		return -1;
-	return 0;
-#elif defined(SH64)
-	/* Top half of reg encodes the no. of args n as 0x1n.
-	   Assume 0 args as kernel never actually checks... */
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_SYSCALL),
-				0x100000 | new) < 0)
-		return -1;
-	return 0;
-#elif defined(CRISV10) || defined(CRISV32)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R9), new) < 0)
-		return -1;
-	return 0;
-#elif defined(ARM)
-	/* Some kernels support this, some (pre-2.6.16 or so) don't.  */
-# ifndef PTRACE_SET_SYSCALL
-#  define PTRACE_SET_SYSCALL 23
-# endif
-	if (ptrace(PTRACE_SET_SYSCALL, tcp->pid, 0, new & 0xffff) != 0)
-		return -1;
-	return 0;
-#elif defined(TILE)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid,
-		   (char*)PTREGS_OFFSET_REG(0),
-		   new) != 0)
-		return -1;
-	return 0;
-#elif defined(MICROBLAZE)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR(0)), new) < 0)
-		return -1;
-	return 0;
-#else
-#warning Do not know how to handle change_syscall for this architecture
-#endif /* architecture */
-	return -1;
-}
-
 #ifdef IA64
 
 typedef unsigned long *arg_setup_state;
@@ -1458,6 +1348,111 @@ set_arg1(struct tcb *tcp, void *cookie, long val)
 # define arg1_index 1
 #endif
 
+static int
+change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
+{
+#if defined(I386)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0)
+		return -1;
+	return 0;
+#elif defined(X86_64) || defined(X32)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0)
+		return -1;
+	return 0;
+#elif defined(POWERPC)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid,
+		   (char*)(sizeof(unsigned long)*PT_R0), new) < 0)
+		return -1;
+	return 0;
+#elif defined(S390) || defined(S390X)
+	/* s390 linux after 2.4.7 has a hook in entry.S to allow this */
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR2), new) < 0)
+		return -1;
+	return 0;
+#elif defined(M68K)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_ORIG_D0), new) < 0)
+		return -1;
+	return 0;
+#elif defined(SPARC) || defined(SPARC64)
+	state->u_regs[U_REG_G1] = new;
+	return 0;
+#elif defined(MIPS)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_V0), new) < 0)
+		return -1;
+	return 0;
+#elif defined(ALPHA)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_A3), new) < 0)
+		return -1;
+	return 0;
+#elif defined(AVR32)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_R8), new) < 0)
+		return -1;
+	return 0;
+#elif defined(BFIN)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_P0), new) < 0)
+		return -1;
+	return 0;
+#elif defined(IA64)
+	if (ia32) {
+		switch (new) {
+		case 2:
+			break;	/* x86 SYS_fork */
+		case SYS_clone:
+			new = 120;
+			break;
+		default:
+			fprintf(stderr, "%s: unexpected syscall %d\n",
+				__FUNCTION__, new);
+			return -1;
+		}
+		if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R1), new) < 0)
+			return -1;
+	} else if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_R15), new) < 0)
+		return -1;
+	return 0;
+#elif defined(HPPA)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GR20), new) < 0)
+		return -1;
+	return 0;
+#elif defined(SH)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*(REG_REG0+3)), new) < 0)
+		return -1;
+	return 0;
+#elif defined(SH64)
+	/* Top half of reg encodes the no. of args n as 0x1n.
+	   Assume 0 args as kernel never actually checks... */
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_SYSCALL),
+				0x100000 | new) < 0)
+		return -1;
+	return 0;
+#elif defined(CRISV10) || defined(CRISV32)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(4*PT_R9), new) < 0)
+		return -1;
+	return 0;
+#elif defined(ARM)
+	/* Some kernels support this, some (pre-2.6.16 or so) don't.  */
+# ifndef PTRACE_SET_SYSCALL
+#  define PTRACE_SET_SYSCALL 23
+# endif
+	if (ptrace(PTRACE_SET_SYSCALL, tcp->pid, 0, new & 0xffff) != 0)
+		return -1;
+	return 0;
+#elif defined(TILE)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid,
+		   (char*)PTREGS_OFFSET_REG(0),
+		   new) != 0)
+		return -1;
+	return 0;
+#elif defined(MICROBLAZE)
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR(0)), new) < 0)
+		return -1;
+	return 0;
+#else
+#warning Do not know how to handle change_syscall for this architecture
+#endif /* architecture */
+	return -1;
+}
+
 int
 setbpt(struct tcb *tcp)
 {
@@ -1488,7 +1483,8 @@ setbpt(struct tcb *tcp)
 		if (arg_setup(tcp, &state) < 0
 		    || get_arg0(tcp, &state, &tcp->inst[0]) < 0
 		    || get_arg1(tcp, &state, &tcp->inst[1]) < 0
-		    || change_syscall(tcp, clone_scno[current_personality]) < 0
+		    || change_syscall(tcp, &state,
+				      clone_scno[current_personality]) < 0
 		    || set_arg0(tcp, &state, CLONE_PTRACE|SIGCHLD) < 0
 		    || set_arg1(tcp, &state, 0) < 0
 		    || arg_finish_change(tcp, &state) < 0)
@@ -1531,7 +1527,7 @@ clearbpt(struct tcb *tcp)
 {
 	arg_setup_state state;
 	if (arg_setup(tcp, &state) < 0
-	    || change_syscall(tcp, tcp->scno) < 0
+	    || change_syscall(tcp, &state, tcp->scno) < 0
 	    || restore_arg0(tcp, &state, tcp->inst[0]) < 0
 	    || restore_arg1(tcp, &state, tcp->inst[1]) < 0
 	    || arg_finish_change(tcp, &state))
