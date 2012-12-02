@@ -39,7 +39,7 @@
 # include <sys/uio.h>
 #endif
 
-#if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)
+#if defined(__GLIBC__) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
 # include <linux/ptrace.h>
 #endif
 

@@ -419,7 +419,7 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 # define SI_FROMUSER(sip)	((sip)->si_code <= 0)
 #endif
 
-#if __GLIBC_MINOR__ < 1
+#if defined(__GLIBC__) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
 /* Type for data associated with a signal.  */
 typedef union sigval
 {
@@ -1111,7 +1111,7 @@ sys_sigsuspend(struct tcb *tcp)
 #if !defined SS_ONSTACK
 #define SS_ONSTACK      1
 #define SS_DISABLE      2
-#if __GLIBC_MINOR__ == 0
+#if defined(__GLIBC__) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
 typedef struct
 {
 	__ptr_t ss_sp;
