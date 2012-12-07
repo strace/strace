@@ -330,7 +330,7 @@ int sys_semtimedop(struct tcb *tcp)
 #if defined(S390)
 			printtv(tcp, tcp->u_arg[2]);
 #else
-			printtv(tcp, tcp->u_arg[5]);
+			printtv(tcp, tcp->u_arg[4]);
 #endif
 		} else {
 			tprint_sembuf(tcp, tcp->u_arg[1], tcp->u_arg[2]);
