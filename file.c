@@ -2466,6 +2466,8 @@ print_xattr_val(struct tcb *tcp, int failed,
 		unsigned long insize,
 		unsigned long size)
 {
+	if (insize == 0)
+		failed = 1;
 	if (!failed) {
 		unsigned long capacity = 4 * size + 1;
 		unsigned char *buf = (capacity < size) ? NULL : malloc(capacity);
