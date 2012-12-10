@@ -327,7 +327,7 @@ int sys_semtimedop(struct tcb *tcp)
 		if (indirect_ipccall(tcp)) {
 			tprint_sembuf(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 			tprints(", ");
-#if defined(S390)
+#if defined(S390) || defined(S390X)
 			printtv(tcp, tcp->u_arg[2]);
 #else
 			printtv(tcp, tcp->u_arg[4]);
