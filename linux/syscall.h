@@ -163,6 +163,7 @@ int sys_oldselect();
 int sys_oldstat();
 int sys_open();
 int sys_openat();
+int sys_perf_event_open();
 int sys_personality();
 int sys_pipe();
 int sys_pipe2();

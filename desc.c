@@ -37,6 +37,9 @@
 #ifdef HAVE_LIBAIO_H
 # include <libaio.h>
 #endif
+#ifdef HAVE_LINUX_PERF_EVENT_H
+# include  <linux/perf_event.h>
+#endif
 
 #if HAVE_LONG_LONG_OFF_T
 /*
@@ -220,6 +223,19 @@ static const struct xlat whence[] = {
 	{ SEEK_CUR,	"SEEK_CUR"	},
 	{ SEEK_END,	"SEEK_END"	},
 	{ 0,		NULL		},
+};
+
+static const struct xlat perf_event_open_flags[] = {
+#ifdef PERF_FLAG_FD_NO_GROUP
+	{ PERF_FLAG_FD_NO_GROUP,	"PERF_FLAG_FD_NO_GROUP"	},
+#endif
+#ifdef PERF_FLAG_FD_OUTPUT
+	{ PERF_FLAG_FD_OUTPUT,		"PERF_FLAG_FD_OUTPUT"	},
+#endif
+#ifdef PERF_FLAG_PID_CGROUP
+	{ PERF_FLAG_PID_CGROUP,		"PERF_FLAG_PID_CGROUP"	},
+#endif
+	{ 0,				NULL			},
 };
 
 #ifndef HAVE_LONG_LONG_OFF_T
@@ -1067,4 +1083,19 @@ int
 sys_eventfd2(struct tcb *tcp)
 {
 	return do_eventfd(tcp, 1);
+}
+
+int
+sys_perf_event_open(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		tprintf("%#lx, %d, %d, %d, ",
+			tcp->u_arg[0],
+			(int) tcp->u_arg[1],
+			(int) tcp->u_arg[2],
+			(int) tcp->u_arg[3]);
+		printflags(perf_event_open_flags, tcp->u_arg[4],
+			   "PERF_FLAG_???");
+	}
+	return 0;
 }

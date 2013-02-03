@@ -196,6 +196,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	ioctls.h
 	libaio.h
 	linux/capability.h
+	linux/perf_event.h
 	linux/ptrace.h
 	linux/utsname.h
 	mqueue.h
