@@ -356,6 +356,12 @@ extern struct pt_regs i386_regs;
 #if defined(IA64)
 extern long ia32;
 #endif
+#if defined(SPARC) || defined(SPARC64)
+extern struct pt_regs regs;
+#endif
+#if defined(ARM)
+extern struct pt_regs regs;
+#endif
 
 /* Trace Control Block */
 struct tcb {
@@ -535,6 +541,20 @@ extern int trace_syscall(struct tcb *);
 extern void count_syscall(struct tcb *, struct timeval *);
 extern void call_summary(FILE *);
 
+#if defined(AVR32) \
+ || defined(I386) \
+ || defined(X86_64) || defined(X32) \
+ || defined(AARCH64) \
+ || defined(ARM) \
+ || defined(SPARC) || defined(SPARC64)
+extern long get_regs_error;
+# define clear_regs()  (get_regs_error = -1)
+extern void get_regs(pid_t pid);
+#else
+# define get_regs_error 0
+# define clear_regs()  ((void)0)
+# define get_regs(pid) ((void)0)
+#endif
 extern int umoven(struct tcb *, long, int, char *);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (char *) (objp))

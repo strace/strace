@@ -1933,6 +1933,10 @@ trace(void)
 			}
 		}
 
+		clear_regs();
+		if (WIFSTOPPED(status))
+			get_regs(pid);
+
 		/* Under Linux, execve changes pid to thread leader's pid,
 		 * and we see this changed pid on EVENT_EXEC and later,
 		 * execve sysexit. Leader "disappears" without exit

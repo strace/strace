@@ -618,9 +618,6 @@ getrval2(struct tcb *tcp)
 	long val = -1;
 
 #if defined(SPARC) || defined(SPARC64)
-	struct pt_regs regs;
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
-		return -1;
 	val = regs.u_regs[U_REG_O1];
 #elif defined(SH)
 	if (upeek(tcp, 4*(REG_REG0+1), &val) < 0)
@@ -668,17 +665,20 @@ static long d0;
 #elif defined(BFIN)
 static long r0;
 #elif defined(ARM)
-static struct pt_regs regs;
+struct pt_regs regs; /* not static */
 #elif defined(AARCH64)
 static struct user_pt_regs aarch64_regs;
 static struct arm_pt_regs regs;
+static struct iovec aarch64_io = {
+	.iov_base = &aarch64_regs
+};
 #elif defined(ALPHA)
 static long r0;
 static long a3;
 #elif defined(AVR32)
 static struct pt_regs regs;
 #elif defined(SPARC) || defined(SPARC64)
-static struct pt_regs regs;
+struct pt_regs regs; /* not static */
 static unsigned long trap;
 #elif defined(LINUX_MIPSN32)
 static long long a3;
@@ -700,6 +700,172 @@ static long r9;
 static long r10;
 #elif defined(MICROBLAZE)
 static long r3;
+#endif
+
+void
+printcall(struct tcb *tcp)
+{
+#define PRINTBADPC tprintf(sizeof(long) == 4 ? "[????????] " : \
+			   sizeof(long) == 8 ? "[????????????????] " : \
+			   NULL /* crash */)
+	if (get_regs_error) {
+		PRINTBADPC;
+		return;
+	}
+#if defined(I386)
+	tprintf("[%08lx] ", i386_regs.eip);
+#elif defined(S390) || defined(S390X)
+	long psw;
+	if (upeek(tcp, PT_PSWADDR, &psw) < 0) {
+		PRINTBADPC;
+		return;
+	}
+# ifdef S390
+	tprintf("[%08lx] ", psw);
+# elif S390X
+	tprintf("[%16lx] ", psw);
+# endif
+#elif defined(X86_64) || defined(X32)
+	tprintf("[%16lx] ", x86_64_regs.ip);
+#elif defined(IA64)
+	long ip;
+
+	if (upeek(tcp, PT_B0, &ip) < 0) {
+		PRINTBADPC;
+		return;
+	}
+	tprintf("[%08lx] ", ip);
+#elif defined(POWERPC)
+	long pc;
+
+	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
+		PRINTBADPC;
+		return;
+	}
+# ifdef POWERPC64
+	tprintf("[%016lx] ", pc);
+# else
+	tprintf("[%08lx] ", pc);
+# endif
+#elif defined(M68K)
+	long pc;
+
+	if (upeek(tcp, 4*PT_PC, &pc) < 0) {
+		tprints("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(ALPHA)
+	long pc;
+
+	if (upeek(tcp, REG_PC, &pc) < 0) {
+		tprints("[????????????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(SPARC)
+	tprintf("[%08lx] ", regs.pc);
+#elif defined(SPARC64)
+	tprintf("[%08lx] ", regs.tpc);
+#elif defined(HPPA)
+	long pc;
+
+	if (upeek(tcp, PT_IAOQ0, &pc) < 0) {
+		tprints("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(MIPS)
+	long pc;
+
+	if (upeek(tcp, REG_EPC, &pc) < 0) {
+		tprints("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(SH)
+	long pc;
+
+	if (upeek(tcp, 4*REG_PC, &pc) < 0) {
+		tprints("[????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(SH64)
+	long pc;
+
+	if (upeek(tcp, REG_PC, &pc) < 0) {
+		tprints("[????????????????] ");
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(ARM)
+	tprintf("[%08lx] ", regs.ARM_pc);
+/*#elif defined(AARCH64) ??? */
+#elif defined(AVR32)
+	tprintf("[%08lx] ", regs.pc);
+#elif defined(BFIN)
+	long pc;
+
+	if (upeek(tcp, PT_PC, &pc) < 0) {
+		PRINTBADPC;
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(CRISV10)
+	long pc;
+
+	if (upeek(tcp, 4*PT_IRP, &pc) < 0) {
+		PRINTBADPC;
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#elif defined(CRISV32)
+	long pc;
+
+	if (upeek(tcp, 4*PT_ERP, &pc) < 0) {
+		PRINTBADPC;
+		return;
+	}
+	tprintf("[%08lx] ", pc);
+#endif /* architecture */
+}
+
+#ifndef get_regs
+long get_regs_error;
+void get_regs(pid_t pid)
+{
+# if defined(AVR32)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &regs);
+# elif defined(I386)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
+# elif defined(X86_64) || defined(X32)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
+# elif defined(AARCH64)
+	/*aarch64_io.iov_base = &aarch64_regs; - already is */
+	aarch64_io.iov_len = sizeof(aarch64_regs);
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, (void *)&aarch64_io);
+	if (get_regs_error)
+		return;
+	switch (aarch64_io.iov_len) {
+		case sizeof(regs):
+			/* We are in 32-bit mode */
+			memcpy(&regs, &aarch64_regs, sizeof(regs));
+			break;
+		case sizeof(aarch64_regs):
+			/* We are in 64-bit mode */
+			/* Data is already in aarch64_regs */
+			break;
+		default:
+			get_regs_error = -1;
+			break;
+	}
+# elif defined(ARM)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&regs);
+# elif defined(SPARC) || defined(SPARC64)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&regs, 0);
+# endif
+}
 #endif
 
 /* Returns:
@@ -815,16 +981,11 @@ get_scno(struct tcb *tcp)
 	update_personality(tcp, currpers);
 # endif
 #elif defined(AVR32)
-	/* Read complete register set in one go. */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
-		return -1;
 	scno = regs.r8;
 #elif defined(BFIN)
 	if (upeek(tcp, PT_ORIG_P0, &scno))
 		return -1;
 #elif defined(I386)
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &i386_regs) < 0)
-		return -1;
 	scno = i386_regs.orig_eax;
 #elif defined(X86_64) || defined(X32)
 # ifndef __X32_SYSCALL_BIT
@@ -835,8 +996,6 @@ get_scno(struct tcb *tcp)
 # endif
 
 	int currpers;
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &x86_64_regs) < 0)
-		return -1;
 	scno = x86_64_regs.orig_rax;
 
 	/* Check CS register value. On x86-64 linux it is:
@@ -924,33 +1083,19 @@ get_scno(struct tcb *tcp)
 			return -1;
 	}
 #elif defined(AARCH64)
-	struct iovec io;
-	char buf[sizeof(aarch64_regs)];
-	io.iov_base = &buf;
-	io.iov_len = sizeof(aarch64_regs);
-	if (ptrace(PTRACE_GETREGSET, tcp->pid, NT_PRSTATUS, (void *)&io) == -1)
-		return -1;
-	switch (io.iov_len) {
+	switch (aarch64_io.iov_len) {
 		case sizeof(aarch64_regs):
 			/* We are in 64-bit mode */
-			memcpy(&aarch64_regs, buf, sizeof(aarch64_regs));
 			scno = aarch64_regs.regs[8];
 			update_personality(tcp, 1);
 			break;
 		case sizeof(regs):
 			/* We are in 32-bit mode */
-			memcpy(&regs, buf, sizeof(regs));
 			scno = regs.uregs[7];
 			update_personality(tcp, 0);
 			break;
-		default:
-			return -1;
 	}
 #elif defined(ARM)
-	/* Read complete register set in one go. */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
-		return -1;
-
 	/*
 	 * We only need to grab the syscall number on syscall entry.
 	 */
@@ -1055,10 +1200,6 @@ get_scno(struct tcb *tcp)
 		}
 	}
 #elif defined(SPARC) || defined(SPARC64)
-	/* Everything we need is in the current register set. */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
-		return -1;
-
 	/* Disassemble the syscall trap. */
 	/* Retrieve the syscall trap instruction. */
 	errno = 0;
@@ -1557,7 +1698,7 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 #endif
 
-	scno_good = res = get_scno(tcp);
+	scno_good = res = (get_regs_error ? -1 : get_scno(tcp));
 	if (res == 0)
 		return res;
 	if (res == 1) {
@@ -1661,18 +1802,14 @@ get_syscall_result(struct tcb *tcp)
 			ppc_result = -ppc_result;
 	}
 #elif defined(AVR32)
-	/* Read complete register set in one go. */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, &regs) < 0)
-		return -1;
+	/* already done by get_regs */
 #elif defined(BFIN)
 	if (upeek(tcp, PT_R0, &r0) < 0)
 		return -1;
 #elif defined(I386)
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &i386_regs) < 0)
-		return -1;
+	/* already done by get_regs */
 #elif defined(X86_64) || defined(X32)
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &x86_64_regs) < 0)
-		return -1;
+	/* already done by get_regs */
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
@@ -1682,30 +1819,13 @@ get_syscall_result(struct tcb *tcp)
 	if (upeek(tcp, PT_R10, &r10) < 0)
 		return -1;
 #elif defined(AARCH64)
-	struct iovec io;
-	char buf[sizeof(aarch64_regs)];
-	io.iov_base = &buf;
-	io.iov_len = sizeof(aarch64_regs);
-	if (ptrace(PTRACE_GETREGSET, tcp->pid, NT_PRSTATUS, (void *)&io) == -1)
-		return -1;
-	switch (io.iov_len) {
-		case sizeof(aarch64_regs):
-			/* We are in 64-bit mode */
-			memcpy(&aarch64_regs, buf, sizeof(aarch64_regs));
-			update_personality(tcp, 1);
-			break;
-		case sizeof(regs):
-			/* We are in 32-bit mode */
-			memcpy(&regs, buf, sizeof(regs));
-			update_personality(tcp, 0);
-			break;
-		default:
-			return -1;
-	}
+/* FIXME: uh, why do we do it on syscall *exit*? We did it on entry already... */
+	/* We are in 64-bit mode (personality 1) if register struct is aarch64_regs,
+	 * else it's personality 0.
+	 */
+	update_personality(tcp, aarch64_io.iov_len == sizeof(aarch64_regs));
 #elif defined(ARM)
-	/* Read complete ARM register set in one go. */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
-		return -1;
+	/* already done by get_regs */
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_D0, &d0) < 0)
 		return -1;
@@ -1727,14 +1847,18 @@ get_syscall_result(struct tcb *tcp)
 	if (upeek(tcp, REG_R0, &r0) < 0)
 		return -1;
 #elif defined(SPARC) || defined(SPARC64)
-	/* Everything we need is in the current register set. */
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0)
-		return -1;
+	/* already done by get_regs */
 #elif defined(HPPA)
 	if (upeek(tcp, PT_GR28, &r28) < 0)
 		return -1;
 #elif defined(SH)
+	/* new syscall ABI returns result in R0 */
+	if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
+		return -1;
 #elif defined(SH64)
+	/* ABI defines result returned in r9 */
+	if (upeek(tcp, REG_GENERAL(9), (long *)&r9) < 0)
+		return -1;
 #elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp, 4*PT_R10, &r10) < 0)
 		return -1;
@@ -1743,17 +1867,6 @@ get_syscall_result(struct tcb *tcp)
 	if (upeek(tcp, 3 * 4, &r3) < 0)
 		return -1;
 #endif
-
-#if defined(SH)
-	/* new syscall ABI returns result in R0 */
-	if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
-		return -1;
-#elif defined(SH64)
-	/* ABI defines result returned in r9 */
-	if (upeek(tcp, REG_GENERAL(9), (long *)&r9) < 0)
-		return -1;
-#endif
-
 	return 1;
 }
 
@@ -2045,7 +2158,7 @@ trace_syscall_exiting(struct tcb *tcp)
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
-	res = get_syscall_result(tcp);
+	res = (get_regs_error ? -1 : get_syscall_result(tcp));
 	if (res == 1) {
 		syscall_fixup_on_sysexit(tcp); /* never fails */
 		res = get_error(tcp); /* returns 1 or -1 */

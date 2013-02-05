@@ -60,13 +60,6 @@
 # include <asm/ptrace_offsets.h>
 #endif
 
-#if defined(SPARC64)
-# undef PTRACE_GETREGS
-# define PTRACE_GETREGS PTRACE_GETREGS64
-# undef PTRACE_SETREGS
-# define PTRACE_SETREGS PTRACE_SETREGS64
-#endif
-
 #if defined(SPARC) || defined(SPARC64) || defined(MIPS)
 typedef struct {
 	struct pt_regs		si_regs;
@@ -889,11 +882,8 @@ sys_sigreturn(struct tcb *tcp)
 {
 #if defined(ARM)
 	if (entering(tcp)) {
-		struct pt_regs regs;
 		struct sigcontext_struct sc;
 		sigset_t sigm;
-		if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (void *)&regs) == -1)
-			return 0;
 		if (umove(tcp, regs.ARM_sp, &sc) < 0)
 			return 0;
 		long_to_sigset(sc.oldmask, &sigm);
@@ -986,13 +976,8 @@ sys_sigreturn(struct tcb *tcp)
 #elif defined(SPARC) || defined(SPARC64)
 	if (entering(tcp)) {
 		long i1;
-		struct pt_regs regs;
 		m_siginfo_t si;
 		sigset_t sigm;
-		if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-			perror_msg("%s", "sigreturn: PTRACE_GETREGS");
-			return 0;
-		}
 		i1 = regs.u_regs[U_REG_O1];
 		if (umove(tcp, i1, &si) < 0) {
 			perror_msg("%s", "sigreturn: umove");

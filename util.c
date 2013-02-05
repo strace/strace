@@ -64,13 +64,6 @@
 # undef pt_all_user_regs
 #endif
 
-#if defined(SPARC64)
-# undef PTRACE_GETREGS
-# define PTRACE_GETREGS PTRACE_GETREGS64
-# undef PTRACE_SETREGS
-# define PTRACE_SETREGS PTRACE_SETREGS64
-#endif
-
 /* macros */
 #ifndef MAX
 # define MAX(a,b)		(((a) > (b)) ? (a) : (b))
@@ -977,163 +970,6 @@ upeek(struct tcb *tcp, long off, long *res)
 	return 0;
 }
 
-void
-printcall(struct tcb *tcp)
-{
-#define PRINTBADPC tprintf(sizeof(long) == 4 ? "[????????] " : \
-			   sizeof(long) == 8 ? "[????????????????] " : \
-			   NULL /* crash */)
-
-#if defined(I386)
-	long eip;
-
-	if (upeek(tcp, 4*EIP, &eip) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%08lx] ", eip);
-#elif defined(S390) || defined(S390X)
-	long psw;
-	if (upeek(tcp, PT_PSWADDR, &psw) < 0) {
-		PRINTBADPC;
-		return;
-	}
-# ifdef S390
-	tprintf("[%08lx] ", psw);
-# elif S390X
-	tprintf("[%16lx] ", psw);
-# endif
-
-#elif defined(X86_64) || defined(X32)
-	long rip;
-
-	if (upeek(tcp, 8*RIP, &rip) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%16lx] ", rip);
-#elif defined(IA64)
-	long ip;
-
-	if (upeek(tcp, PT_B0, &ip) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%08lx] ", ip);
-#elif defined(POWERPC)
-	long pc;
-
-	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
-		PRINTBADPC;
-		return;
-	}
-# ifdef POWERPC64
-	tprintf("[%016lx] ", pc);
-# else
-	tprintf("[%08lx] ", pc);
-# endif
-#elif defined(M68K)
-	long pc;
-
-	if (upeek(tcp, 4*PT_PC, &pc) < 0) {
-		tprints("[????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(ALPHA)
-	long pc;
-
-	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprints("[????????????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(SPARC) || defined(SPARC64)
-	struct pt_regs regs;
-	if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-		PRINTBADPC;
-		return;
-	}
-# if defined(SPARC64)
-	tprintf("[%08lx] ", regs.tpc);
-# else
-	tprintf("[%08lx] ", regs.pc);
-# endif
-#elif defined(HPPA)
-	long pc;
-
-	if (upeek(tcp, PT_IAOQ0, &pc) < 0) {
-		tprints("[????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(MIPS)
-	long pc;
-
-	if (upeek(tcp, REG_EPC, &pc) < 0) {
-		tprints("[????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(SH)
-	long pc;
-
-	if (upeek(tcp, 4*REG_PC, &pc) < 0) {
-		tprints("[????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(SH64)
-	long pc;
-
-	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprints("[????????????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(ARM)
-	long pc;
-
-	if (upeek(tcp, 4*15, &pc) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(AVR32)
-	long pc;
-
-	if (upeek(tcp, REG_PC, &pc) < 0) {
-		tprints("[????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(BFIN)
-	long pc;
-
-	if (upeek(tcp, PT_PC, &pc) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(CRISV10)
-	long pc;
-
-	if (upeek(tcp, 4*PT_IRP, &pc) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#elif defined(CRISV32)
-	long pc;
-
-	if (upeek(tcp, 4*PT_ERP, &pc) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf("[%08lx] ", pc);
-#endif /* architecture */
-}
-
 /*
  * These #if's are huge, please indent them correctly.
  * It's easy to get confused otherwise.
@@ -1249,6 +1085,13 @@ set_arg1(struct tcb *tcp, arg_setup_state *state, long val)
 # define restore_arg1(tcp, state, val) ((void) (state), 0)
 
 #elif defined(SPARC) || defined(SPARC64)
+
+# if defined(SPARC64)
+#  undef PTRACE_GETREGS
+#  define PTRACE_GETREGS PTRACE_GETREGS64
+#  undef PTRACE_SETREGS
+#  define PTRACE_SETREGS PTRACE_SETREGS64
+# endif
 
 typedef struct pt_regs arg_setup_state;
 
