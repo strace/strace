@@ -612,23 +612,25 @@ printargs_ld(struct tcb *tcp)
 	return 0;
 }
 
+#if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
 long
 getrval2(struct tcb *tcp)
 {
-	long val = -1;
+	long val;
 
-#if defined(SPARC) || defined(SPARC64)
+# if defined(SPARC) || defined(SPARC64)
 	val = regs.u_regs[U_REG_O1];
-#elif defined(SH)
+# elif defined(SH)
 	if (upeek(tcp, 4*(REG_REG0+1), &val) < 0)
 		return -1;
-#elif defined(IA64)
+# elif defined(IA64)
 	if (upeek(tcp, PT_R9, &val) < 0)
 		return -1;
-#endif
+# endif
 
 	return val;
 }
+#endif
 
 int
 is_restart_error(struct tcb *tcp)
