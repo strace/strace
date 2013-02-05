@@ -465,7 +465,7 @@ extern void print_ldt_entry();
 # define ARG_PTID	2
 # define ARG_CTID	3
 # define ARG_TLS	4
-#elif defined X86_64 || defined X32 || defined ALPHA
+#elif defined X86_64 || defined X32 || defined ALPHA || defined TILE
 # define ARG_FLAGS	0
 # define ARG_STACK	1
 # define ARG_PTID	2
@@ -2119,9 +2119,9 @@ const struct xlat struct_user_offsets[] = {
 
 #if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
 		&& !defined(ALPHA) && !defined(IA64) \
-		&& !defined(CRISV10) && !defined(CRISV32) && !defined(MICROBLAZE) \
-		&& !defined(AARCH64)
-# if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN) && !defined(TILE)
+		&& !defined(CRISV10) && !defined(CRISV32) \
+		&& !defined(MICROBLAZE) && !defined(AARCH64) && !defined(TILE)
+# if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 # endif
 # if defined(I386) || defined(X86_64) || defined(X32)
@@ -2143,13 +2143,13 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
 # endif
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-# if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64) && !defined(TILE)
+# if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
 	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
 # endif
 # if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
 # endif
-# if !defined(ARM) && !defined(AARCH64) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN) && !defined(TILE)
+# if !defined(ARM) && !defined(AARCH64) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
 	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
 # endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
@@ -2159,7 +2159,7 @@ const struct xlat struct_user_offsets[] = {
 # endif
 #endif /* !defined(many arches) */
 
-#if !defined(HPPA) && !defined(AARCH64)
+#if !defined(HPPA) && !defined(AARCH64) && !defined(TILE)
 	{ sizeof(struct user),	"sizeof(struct user)"			},
 #endif
 	{ 0,			NULL					},

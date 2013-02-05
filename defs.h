@@ -153,7 +153,7 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_PEEKUSER PTRACE_PEEKUSR
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
-#if defined(X86_64) || defined(X32) || defined(I386)
+#if defined(X86_64) || defined(X32) || defined(I386) || defined(TILE)
 /* For struct pt_regs. x86 strace uses PTRACE_GETREGS.
  * PTRACE_GETREGS returns registers in the layout of this struct.
  */
@@ -282,6 +282,17 @@ struct arm_pt_regs {
 # define PERSONALITY1_WORDSIZE 4
 #endif
 
+#ifdef TILE
+# undef SUPPORTED_PERSONALITIES
+# define SUPPORTED_PERSONALITIES 2
+# define PERSONALITY0_WORDSIZE 8
+# define PERSONALITY1_WORDSIZE 4
+# ifdef __tilepro__
+#  undef DEFAULT_PERSONALITY
+#  define DEFAULT_PERSONALITY 1
+# endif
+#endif
+
 #ifndef PERSONALITY0_WORDSIZE
 # define PERSONALITY0_WORDSIZE (int)(sizeof(long))
 #endif
@@ -361,6 +372,9 @@ extern struct pt_regs regs;
 #endif
 #if defined(ARM)
 extern struct pt_regs regs;
+#endif
+#if defined(TILE)
+extern struct pt_regs tile_regs;
 #endif
 
 /* Trace Control Block */

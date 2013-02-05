@@ -1150,6 +1150,11 @@ typedef struct pt_regs arg_setup_state;
 #  define restore_arg1(tcp, state, val) 0
 #  define arg0_index	1
 #  define arg1_index	0
+# elif defined TILE
+#  define arg0_offset   PTREGS_OFFSET_REG(0)
+#  define arg1_offset   PTREGS_OFFSET_REG(1)
+#  define restore_arg0(tcp, state, val) 0
+#  define restore_arg1(tcp, state, val) 0
 # else
 #  define arg0_offset	0
 #  define arg1_offset	4

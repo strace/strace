@@ -1035,14 +1035,11 @@ sys_sigreturn(struct tcb *tcp)
 #elif defined(TILE)
 	if (entering(tcp)) {
 		struct ucontext uc;
-		long sp;
 		sigset_t sigm;
 
 		/* offset of ucontext in the kernel's sigframe structure */
 #		define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(struct siginfo)
-		if (upeek(tcp, PTREGS_OFFSET_SP, &sp) < 0)
-			return 0;
-		if (umove(tcp, sp + SIGFRAME_UC_OFFSET, &uc) < 0)
+		if (umove(tcp, tile_regs.sp + SIGFRAME_UC_OFFSET, &uc) < 0)
 			return 0;
 		sigemptyset(&sigm);
 		memcpy(&sigm, &uc.uc_sigmask, NSIG / 8);

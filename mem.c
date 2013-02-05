@@ -197,7 +197,7 @@ addtileflags(long flags)
 	case MAP_CACHE_HOME_TASK: tprints("|MAP_CACHE_HOME_TASK"); break;
 	case MAP_CACHE_HOME_HASH: tprints("|MAP_CACHE_HOME_HASH"); break;
 	default:
-		tprintf("|MAP_CACHE_HOME(%d)",
+		tprintf("|MAP_CACHE_HOME(%ld)",
 			(home >> _MAP_CACHE_HOME_SHIFT) );
 		break;
 	}

@@ -71,6 +71,12 @@
 # include <elf.h>
 #endif
 
+#if defined(TILE)
+# ifndef PT_FLAGS_COMPAT
+#  define PT_FLAGS_COMPAT 0x10000  /* from Linux 3.8 on */
+# endif
+#endif
+
 #ifndef ERESTARTSYS
 # define ERESTARTSYS	512
 #endif
@@ -290,6 +296,12 @@ update_personality(struct tcb *tcp, int personality)
 # elif defined(AARCH64)
 	if (!qflag) {
 		static const char *const names[] = {"32-bit ARM", "AArch64"};
+		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
+			tcp->pid, names[personality]);
+	}
+# elif defined(TILE)
+	if (!qflag) {
+		static const char *const names[] = {"64-bit", "32-bit"};
 		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
 			tcp->pid, names[personality]);
 	}
@@ -699,6 +711,8 @@ static long r0;
 static long r9;
 #elif defined(CRISV10) || defined(CRISV32)
 static long r10;
+#elif defined(TILE)
+struct pt_regs tile_regs;
 #elif defined(MICROBLAZE)
 static long r3;
 #endif
@@ -829,6 +843,12 @@ printcall(struct tcb *tcp)
 		return;
 	}
 	tprintf("[%08lx] ", pc);
+#elif defined(TILE)
+# ifdef _LP64
+	tprintf("[%16lx] ", tile_regs.pc);
+# else
+	tprintf("[%08lx] ", tile_regs.pc);
+# endif
 #endif /* architecture */
 }
 
@@ -865,6 +885,8 @@ void get_regs(pid_t pid)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&regs);
 # elif defined(SPARC) || defined(SPARC64)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&regs, 0);
+# elif defined(TILE)
+	get_regs_error = ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &tile_regs);
 # endif
 }
 #endif
@@ -1289,8 +1311,25 @@ get_scno(struct tcb *tcp)
 	if (upeek(tcp, 4*PT_R9, &scno) < 0)
 		return -1;
 #elif defined(TILE)
-	if (upeek(tcp, PTREGS_OFFSET_REG(10), &scno) < 0)
-		return -1;
+	int currpers;
+	scno = tile_regs.regs[10];
+# ifdef __tilepro__
+	currpers = 1;
+# else
+	if (tile_regs.flags & PT_FLAGS_COMPAT)
+		currpers = 1;
+	else
+		currpers = 0;
+# endif
+	update_personality(tcp, currpers);
+
+	if (!(tcp->flags & TCB_INSYSCALL)) {
+		/* Check if we return from execve. */
+		if (tcp->flags & TCB_WAITEXECVE) {
+			tcp->flags &= ~TCB_WAITEXECVE;
+			return 0;
+		}
+	}
 #elif defined(MICROBLAZE)
 	if (upeek(tcp, 0, &scno) < 0)
 		return -1;
@@ -1664,8 +1703,7 @@ get_syscall_args(struct tcb *tcp)
 			return -1;
 #elif defined(TILE)
 	for (i = 0; i < nargs; ++i)
-		if (upeek(tcp, PTREGS_OFFSET_REG(i), &tcp->u_arg[i]) < 0)
-			return -1;
+		tcp->u_arg[i] = tile_regs.regs[i];
 #elif defined(M68K)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, (i < 5 ? i : i + 2)*4, &tcp->u_arg[i]) < 0)
@@ -1865,6 +1903,7 @@ get_syscall_result(struct tcb *tcp)
 	if (upeek(tcp, 4*PT_R10, &r10) < 0)
 		return -1;
 #elif defined(TILE)
+	/* already done by get_regs */
 #elif defined(MICROBLAZE)
 	if (upeek(tcp, 3 * 4, &r3) < 0)
 		return -1;
@@ -2089,15 +2128,17 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = r10;
 	}
 #elif defined(TILE)
-	long rval;
-	if (upeek(tcp, PTREGS_OFFSET_REG(0), &rval) < 0)
-		return -1;
-	if (check_errno && rval < 0 && rval > -nerrnos) {
+	/*
+	 * The standard tile calling convention returns the value (or negative
+	 * errno) in r0, and zero (or positive errno) in r1.
+	 * Until at least kernel 3.8, however, the r1 value is not reflected
+	 * in ptregs at this point, so we use r0 here.
+	 */
+	if (check_errno && is_negated_errno(tile_regs.regs[0])) {
 		tcp->u_rval = -1;
-		u_error = -rval;
-	}
-	else {
-		tcp->u_rval = rval;
+		u_error = -tile_regs.regs[0];
+	} else {
+		tcp->u_rval = tile_regs.regs[0];
 	}
 #elif defined(MICROBLAZE)
 	if (check_errno && is_negated_errno(r3)) {
