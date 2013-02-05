@@ -159,6 +159,9 @@ static const struct xlat mmap_flags[] = {
 #ifdef MAP_STACK
 	{ MAP_STACK,	"MAP_STACK"	},
 #endif
+#if defined MAP_UNINITIALIZED && MAP_UNINITIALIZED > 0
+	{ MAP_UNINITIALIZED,"MAP_UNINITIALIZED"},
+#endif
 #ifdef MAP_NOSYNC
 	{ MAP_NOSYNC,	"MAP_NOSYNC"	},
 #endif
