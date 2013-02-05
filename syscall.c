@@ -681,7 +681,6 @@ static long a3;
 static struct pt_regs regs;
 #elif defined(SPARC) || defined(SPARC64)
 struct pt_regs regs; /* not static */
-static unsigned long trap;
 #elif defined(LINUX_MIPSN32)
 static long long a3;
 static long long r2;
@@ -1204,6 +1203,7 @@ get_scno(struct tcb *tcp)
 #elif defined(SPARC) || defined(SPARC64)
 	/* Disassemble the syscall trap. */
 	/* Retrieve the syscall trap instruction. */
+	unsigned long trap;
 	errno = 0;
 # if defined(SPARC64)
 	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.tpc, 0);
