@@ -56,6 +56,7 @@
 #define MS_KERNMOUNT	(1<<22)
 #define MS_I_VERSION	(1<<23)
 #define MS_STRICTATIME	(1<<24)
+#define MS_NOSEC	(1<<28)
 #define MS_BORN		(1<<29)
 #define MS_ACTIVE	(1<<30)
 #define MS_NOUSER	(1<<31)
@@ -91,6 +92,7 @@ static const struct xlat mount_flags[] = {
 	{ MS_KERNMOUNT,	"MS_KERNMOUNT"	},
 	{ MS_I_VERSION,	"MS_I_VERSION"	},
 	{ MS_STRICTATIME,"MS_STRICTATIME"},
+	{ MS_NOSEC,	"MS_NOSEC"	},
 	{ MS_BORN,	"MS_BORN"	},
 	{ MS_MANDLOCK,	"MS_MANDLOCK"	},
 	{ MS_NOATIME,	"MS_NOATIME"	},
