@@ -741,7 +741,7 @@ printcall(struct tcb *tcp)
 	tprintf("[%16lx] ", psw);
 # endif
 #elif defined(X86_64) || defined(X32)
-	tprintf("[%16lx] ", x86_64_regs.ip);
+	tprintf("[%16lx] ", x86_64_regs.rip);
 #elif defined(IA64)
 	long ip;
 
