@@ -560,7 +560,8 @@ extern void call_summary(FILE *);
  || defined(X86_64) || defined(X32) \
  || defined(AARCH64) \
  || defined(ARM) \
- || defined(SPARC) || defined(SPARC64)
+ || defined(SPARC) || defined(SPARC64) \
+ || defined(TILE)
 extern long get_regs_error;
 # define clear_regs()  (get_regs_error = -1)
 extern void get_regs(pid_t pid);

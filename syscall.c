@@ -845,9 +845,9 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(TILE)
 # ifdef _LP64
-	tprintf("[%016lx] ", tile_regs.pc);
+	tprintf("[%016lx] ", (unsigned long) tile_regs.pc);
 # else
-	tprintf("[%08lx] ", tile_regs.pc);
+	tprintf("[%08lx] ", (unsigned long) tile_regs.pc);
 # endif
 #endif /* architecture */
 }
@@ -886,7 +886,7 @@ void get_regs(pid_t pid)
 # elif defined(SPARC) || defined(SPARC64)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&regs, 0);
 # elif defined(TILE)
-	get_regs_error = ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &tile_regs);
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &tile_regs);
 # endif
 }
 #endif
