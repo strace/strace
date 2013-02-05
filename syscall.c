@@ -738,10 +738,10 @@ printcall(struct tcb *tcp)
 # ifdef S390
 	tprintf("[%08lx] ", psw);
 # elif S390X
-	tprintf("[%16lx] ", psw);
+	tprintf("[%016lx] ", psw);
 # endif
 #elif defined(X86_64) || defined(X32)
-	tprintf("[%16lx] ", (unsigned long) x86_64_regs.rip);
+	tprintf("[%016lx] ", (unsigned long) x86_64_regs.rip);
 #elif defined(IA64)
 	long ip;
 
@@ -845,7 +845,7 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(TILE)
 # ifdef _LP64
-	tprintf("[%16lx] ", tile_regs.pc);
+	tprintf("[%016lx] ", tile_regs.pc);
 # else
 	tprintf("[%08lx] ", tile_regs.pc);
 # endif
