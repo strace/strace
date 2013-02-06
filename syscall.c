@@ -670,7 +670,7 @@ struct pt_regs i386_regs;
  */
 static struct user_regs_struct x86_64_regs;
 #elif defined(IA64)
-long r8, r10, psr; /* TODO: make static? */
+long r8, r10; /* TODO: make static? */
 long ia32 = 0; /* not static */
 #elif defined(POWERPC)
 static long ppc_result;
@@ -1096,6 +1096,7 @@ get_scno(struct tcb *tcp)
 	update_personality(tcp, currpers);
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
+	long psr;
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
 	if (ia32) {
@@ -1853,6 +1854,7 @@ get_syscall_result(struct tcb *tcp)
 	/* already done by get_regs */
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
+	long psr;
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
 	if (upeek(tcp, PT_R8, &r8) < 0)
