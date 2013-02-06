@@ -518,6 +518,7 @@ extern bool qflag;
 extern bool not_failing_only;
 extern bool show_fd_path;
 extern bool tracing_paths;
+extern bool need_fork_exec_workarounds;
 extern unsigned int xflag;
 extern unsigned int followfork;
 extern unsigned int ptrace_setoptions;

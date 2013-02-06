@@ -1482,7 +1482,7 @@ internal_exec(struct tcb *tcp)
 #endif
 
 static void
-internal_syscall(struct tcb *tcp)
+syscall_fixup_for_fork_exec(struct tcb *tcp)
 {
 	/*
 	 * We must always trace a few critical system calls in order to
@@ -1782,7 +1782,8 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 #endif /* SYS_socket_subcall || SYS_ipc_subcall */
 
-	internal_syscall(tcp);
+	if (need_fork_exec_workarounds)
+		syscall_fixup_for_fork_exec(tcp);
 
 	if ((SCNO_IN_RANGE(tcp->scno) &&
 	     !(qual_flags[tcp->scno] & QUAL_TRACE)) ||
@@ -2206,7 +2207,8 @@ trace_syscall_exiting(struct tcb *tcp)
 		syscall_fixup_on_sysexit(tcp); /* never fails */
 		res = get_error(tcp); /* returns 1 or -1 */
 		if (res == 1) {
-			internal_syscall(tcp);
+			if (need_fork_exec_workarounds)
+				syscall_fixup_for_fork_exec(tcp);
 			if (filtered(tcp)) {
 				goto ret;
 			}

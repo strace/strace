@@ -65,6 +65,7 @@ cflag_t cflag = CFLAG_NONE;
 unsigned int followfork = 0;
 unsigned int ptrace_setoptions = 0;
 unsigned int xflag = 0;
+bool need_fork_exec_workarounds = 0;
 bool debug_flag = 0;
 bool Tflag = 0;
 bool qflag = 0;
@@ -1165,7 +1166,7 @@ startup_child(char **argv)
  * First fork a new child, call ptrace with PTRACE_SETOPTIONS on it,
  * and then see which options are supported by the kernel.
  */
-static void
+static int
 test_ptrace_setoptions_followfork(void)
 {
 	int pid, expected_grandchild = 0, found_grandchild = 0;
@@ -1258,10 +1259,11 @@ test_ptrace_setoptions_followfork(void)
 		if (debug_flag)
 			fprintf(stderr, "ptrace_setoptions = %#x\n",
 				ptrace_setoptions);
-		return;
+		return 0;
 	}
 	error_msg("Test for PTRACE_O_TRACECLONE failed, "
 		  "giving up using this feature.");
+	return 1;
 }
 
 /*
@@ -1278,7 +1280,7 @@ test_ptrace_setoptions_followfork(void)
  *		int	$0x80
  * (compile with: "gcc -nostartfiles -nostdlib -o int3 int3.S")
  */
-static void
+static int
 test_ptrace_setoptions_for_all(void)
 {
 	const unsigned int test_options = PTRACE_O_TRACESYSGOOD |
@@ -1287,8 +1289,9 @@ test_ptrace_setoptions_for_all(void)
 	int it_worked = 0;
 
 	/* this fork test doesn't work on no-mmu systems */
+	/* FIXME: isn't it better to assume we *succeed*? */
 	if (strace_vforked)
-		return;
+		return 1;
 
 	pid = fork();
 	if (pid < 0)
@@ -1357,11 +1360,12 @@ test_ptrace_setoptions_for_all(void)
 		if (debug_flag)
 			fprintf(stderr, "ptrace_setoptions = %#x\n",
 				ptrace_setoptions);
-		return;
+		return 0;
 	}
 
 	error_msg("Test for PTRACE_O_TRACESYSGOOD failed, "
 		  "giving up using this feature.");
+	return 1;
 }
 
 #ifdef USE_SEIZE
@@ -1654,9 +1658,14 @@ init(int argc, char *argv[])
 		run_gid = getgid();
 	}
 
+	/*
+	 * On any reasonably recent Linux kernel (circa about 2.5.46)
+	 * need_fork_exec_workarounds should stay 0 after these tests:
+	 */
+	/*need_fork_exec_workarounds = 0; - already is */
 	if (followfork)
-		test_ptrace_setoptions_followfork();
-	test_ptrace_setoptions_for_all();
+		need_fork_exec_workarounds = test_ptrace_setoptions_followfork();
+	need_fork_exec_workarounds |= test_ptrace_setoptions_for_all();
 	test_ptrace_seize();
 
 	/* Check if they want to redirect the output. */
