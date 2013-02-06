@@ -371,7 +371,7 @@ extern long ia32;
 extern struct pt_regs regs;
 #endif
 #if defined(ARM)
-extern struct pt_regs regs;
+extern struct pt_regs arm_regs;
 #endif
 #if defined(TILE)
 extern struct pt_regs tile_regs;

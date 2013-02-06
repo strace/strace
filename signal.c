@@ -884,7 +884,7 @@ sys_sigreturn(struct tcb *tcp)
 	if (entering(tcp)) {
 		struct sigcontext_struct sc;
 		sigset_t sigm;
-		if (umove(tcp, regs.ARM_sp, &sc) < 0)
+		if (umove(tcp, arm_regs.ARM_sp, &sc) < 0)
 			return 0;
 		long_to_sigset(sc.oldmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));

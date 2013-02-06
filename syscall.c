@@ -679,10 +679,10 @@ static long d0;
 #elif defined(BFIN)
 static long r0;
 #elif defined(ARM)
-struct pt_regs regs; /* not static */
+struct pt_regs arm_regs; /* not static */
 #elif defined(AARCH64)
 static struct user_pt_regs aarch64_regs;
-static struct arm_pt_regs regs;
+static struct arm_pt_regs arm_regs;
 static struct iovec aarch64_io = {
 	.iov_base = &aarch64_regs
 };
@@ -815,7 +815,7 @@ printcall(struct tcb *tcp)
 	}
 	tprintf("[%08lx] ", pc);
 #elif defined(ARM)
-	tprintf("[%08lx] ", regs.ARM_pc);
+	tprintf("[%08lx] ", arm_regs.ARM_pc);
 /*#elif defined(AARCH64) ??? */
 #elif defined(AVR32)
 	tprintf("[%08lx] ", regs.pc);
@@ -862,6 +862,8 @@ void get_regs(pid_t pid)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
 # elif defined(X86_64) || defined(X32)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
+# elif defined(ARM)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&arm_regs);
 # elif defined(AARCH64)
 	/*aarch64_io.iov_base = &aarch64_regs; - already is */
 	aarch64_io.iov_len = sizeof(aarch64_regs);
@@ -871,7 +873,7 @@ void get_regs(pid_t pid)
 	switch (aarch64_io.iov_len) {
 		case sizeof(regs):
 			/* We are in 32-bit mode */
-			memcpy(&regs, &aarch64_regs, sizeof(regs));
+			memcpy(&arm_regs, &aarch64_regs, sizeof(arm_regs));
 			break;
 		case sizeof(aarch64_regs):
 			/* We are in 64-bit mode */
@@ -881,8 +883,6 @@ void get_regs(pid_t pid)
 			get_regs_error = -1;
 			break;
 	}
-# elif defined(ARM)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&regs);
 # elif defined(SPARC) || defined(SPARC64)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&regs, 0);
 # elif defined(TILE)
@@ -1115,7 +1115,7 @@ get_scno(struct tcb *tcp)
 			break;
 		case sizeof(regs):
 			/* We are in 32-bit mode */
-			scno = regs.uregs[7];
+			scno = arm_regs.uregs[7];
 			update_personality(tcp, 0);
 			break;
 	}
@@ -1123,21 +1123,21 @@ get_scno(struct tcb *tcp)
 	/*
 	 * We only need to grab the syscall number on syscall entry.
 	 */
-	if (regs.ARM_ip == 0) {
+	if (arm_regs.ARM_ip == 0) {
 		/*
-		 * Note: we only deal with only 32-bit CPUs here.
+		 * Note: we only deal with 32-bit CPUs here
 		 */
-		if (regs.ARM_cpsr & 0x20) {
+		if (arm_regs.ARM_cpsr & 0x20) {
 			/*
 			 * Get the Thumb-mode system call number
 			 */
-			scno = regs.ARM_r7;
+			scno = arm_regs.ARM_r7;
 		} else {
 			/*
 			 * Get the ARM-mode system call number
 			 */
 			errno = 0;
-			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(regs.ARM_pc - 4), NULL);
+			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(arm_regs.ARM_pc - 4), NULL);
 			if (errno)
 				return -1;
 
@@ -1147,7 +1147,7 @@ get_scno(struct tcb *tcp)
 			   if strace and the traced program have different
 			   ABIs.  */
 			if (scno == 0xef000000) {
-				scno = regs.ARM_r7;
+				scno = arm_regs.ARM_r7;
 			} else {
 				if ((scno & 0x0ff00000) != 0x0f900000) {
 					fprintf(stderr, "syscall: unknown syscall trap 0x%08lx\n",
@@ -1629,7 +1629,7 @@ get_syscall_args(struct tcb *tcp)
 	else
 # endif /* AARCH64 */
 	for (i = 0; i < nargs; ++i)
-		tcp->u_arg[i] = regs.uregs[i];
+		tcp->u_arg[i] = arm_regs.uregs[i];
 #elif defined(AVR32)
 	(void)i;
 	(void)nargs;
@@ -2051,12 +2051,12 @@ get_error(struct tcb *tcp)
 	else
 # endif /* AARCH64 */
 	{
-		if (check_errno && is_negated_errno(regs.ARM_r0)) {
+		if (check_errno && is_negated_errno(arm_regs.ARM_r0)) {
 			tcp->u_rval = -1;
-			u_error = -regs.ARM_r0;
+			u_error = -arm_regs.ARM_r0;
 		}
 		else {
-			tcp->u_rval = regs.ARM_r0;
+			tcp->u_rval = arm_regs.ARM_r0;
 		}
 	}
 #elif defined(AVR32)
