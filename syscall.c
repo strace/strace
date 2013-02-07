@@ -670,12 +670,12 @@ struct pt_regs i386_regs;
  */
 static struct user_regs_struct x86_64_regs;
 #elif defined(IA64)
-long r8, r10; /* TODO: make static? */
 long ia32 = 0; /* not static */
+static long ia64_r8, ia64_r10;
 #elif defined(POWERPC)
 static long ppc_result;
 #elif defined(M68K)
-static long d0;
+static long m68k_d0;
 #elif defined(BFIN)
 static long r0;
 #elif defined(ARM)
@@ -688,7 +688,7 @@ static struct iovec aarch64_io = {
 };
 #elif defined(ALPHA)
 static long r0;
-static long a3;
+static long alpha_a3;
 #elif defined(AVR32)
 static struct pt_regs regs;
 #elif defined(SPARC) || defined(SPARC64)
@@ -704,17 +704,17 @@ static long gpr2;
 static long pc;
 static long syscall_mode;
 #elif defined(HPPA)
-static long r28;
+static long hppa_r28;
 #elif defined(SH)
 static long r0;
 #elif defined(SH64)
-static long r9;
+static long sh64_r9;
 #elif defined(CRISV10) || defined(CRISV32)
-static long r10;
+static long cris_r10;
 #elif defined(TILE)
 struct pt_regs tile_regs;
 #elif defined(MICROBLAZE)
-static long r3;
+static long microblaze_r3;
 #endif
 
 void
@@ -1207,7 +1207,7 @@ get_scno(struct tcb *tcp)
 		}
 	}
 #elif defined(ALPHA)
-	if (upeek(tcp, REG_A3, &a3) < 0)
+	if (upeek(tcp, REG_A3, &alpha_a3) < 0)
 		return -1;
 	if (upeek(tcp, REG_R0, &scno) < 0)
 		return -1;
@@ -1217,7 +1217,7 @@ get_scno(struct tcb *tcp)
 	 * really a syscall entry
 	 */
 	if (!SCNO_IN_RANGE(scno)) {
-		if (a3 == 0 || a3 == -1) {
+		if (alpha_a3 == 0 || alpha_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
 			return 0;
@@ -1342,7 +1342,7 @@ get_scno(struct tcb *tcp)
 		return -1;
 #elif defined(SH64)
 	/* ABI defines result returned in r9 */
-	if (upeek(tcp, REG_GENERAL(9), (long *)&r9) < 0)
+	if (upeek(tcp, REG_GENERAL(9), (long *)&sh64_r9) < 0)
 		return -1;
 #endif
 
@@ -1394,37 +1394,37 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	}
 #elif defined(M68K)
 	/* TODO? Eliminate upeek's in arches below like we did in x86 */
-	if (upeek(tcp, 4*PT_D0, &d0) < 0)
+	if (upeek(tcp, 4*PT_D0, &m68k_d0) < 0)
 		return -1;
-	if (d0 != -ENOSYS) {
+	if (m68k_d0 != -ENOSYS) {
 		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (d0 = %ld)\n", d0);
+			fprintf(stderr, "not a syscall entry (d0 = %ld)\n", m68k_d0);
 		return 0;
 	}
 #elif defined(IA64)
-	if (upeek(tcp, PT_R10, &r10) < 0)
+	if (upeek(tcp, PT_R10, &ia64_r10) < 0)
 		return -1;
-	if (upeek(tcp, PT_R8, &r8) < 0)
+	if (upeek(tcp, PT_R8, &ia64_r8) < 0)
 		return -1;
-	if (ia32 && r8 != -ENOSYS) {
+	if (ia32 && ia64_r8 != -ENOSYS) {
 		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (r8 = %ld)\n", r8);
+			fprintf(stderr, "not a syscall entry (r8 = %ld)\n", ia64_r8);
 		return 0;
 	}
 #elif defined(CRISV10) || defined(CRISV32)
-	if (upeek(tcp, 4*PT_R10, &r10) < 0)
+	if (upeek(tcp, 4*PT_R10, &cris_r10) < 0)
 		return -1;
-	if (r10 != -ENOSYS) {
+	if (cris_r10 != -ENOSYS) {
 		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (r10 = %ld)\n", r10);
+			fprintf(stderr, "not a syscall entry (r10 = %ld)\n", cris_r10);
 		return 0;
 	}
 #elif defined(MICROBLAZE)
-	if (upeek(tcp, 3 * 4, &r3) < 0)
+	if (upeek(tcp, 3 * 4, &microblaze_r3) < 0)
 		return -1;
-	if (r3 != -ENOSYS) {
+	if (microblaze_r3 != -ENOSYS) {
 		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (r3 = %ld)\n", r3);
+			fprintf(stderr, "not a syscall entry (r3 = %ld)\n", microblaze_r3);
 		return 0;
 	}
 #endif
@@ -1857,9 +1857,9 @@ get_syscall_result(struct tcb *tcp)
 	long psr;
 	if (upeek(tcp, PT_CR_IPSR, &psr) >= 0)
 		ia32 = (psr & IA64_PSR_IS) != 0;
-	if (upeek(tcp, PT_R8, &r8) < 0)
+	if (upeek(tcp, PT_R8, &ia64_r8) < 0)
 		return -1;
-	if (upeek(tcp, PT_R10, &r10) < 0)
+	if (upeek(tcp, PT_R10, &ia64_r10) < 0)
 		return -1;
 #elif defined(AARCH64)
 /* FIXME: uh, why do we do it on syscall *exit*? We did it on entry already... */
@@ -1870,7 +1870,7 @@ get_syscall_result(struct tcb *tcp)
 #elif defined(ARM)
 	/* already done by get_regs */
 #elif defined(M68K)
-	if (upeek(tcp, 4*PT_D0, &d0) < 0)
+	if (upeek(tcp, 4*PT_D0, &m68k_d0) < 0)
 		return -1;
 #elif defined(LINUX_MIPSN32)
 	unsigned long long regs[38];
@@ -1892,7 +1892,7 @@ get_syscall_result(struct tcb *tcp)
 #elif defined(SPARC) || defined(SPARC64)
 	/* already done by get_regs */
 #elif defined(HPPA)
-	if (upeek(tcp, PT_GR28, &r28) < 0)
+	if (upeek(tcp, PT_GR28, &hppa_r28) < 0)
 		return -1;
 #elif defined(SH)
 	/* new syscall ABI returns result in R0 */
@@ -1900,15 +1900,15 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 #elif defined(SH64)
 	/* ABI defines result returned in r9 */
-	if (upeek(tcp, REG_GENERAL(9), (long *)&r9) < 0)
+	if (upeek(tcp, REG_GENERAL(9), (long *)&sh64_r9) < 0)
 		return -1;
 #elif defined(CRISV10) || defined(CRISV32)
-	if (upeek(tcp, 4*PT_R10, &r10) < 0)
+	if (upeek(tcp, 4*PT_R10, &cris_r10) < 0)
 		return -1;
 #elif defined(TILE)
 	/* already done by get_regs */
 #elif defined(MICROBLAZE)
-	if (upeek(tcp, 3 * 4, &r3) < 0)
+	if (upeek(tcp, 3 * 4, &microblaze_r3) < 0)
 		return -1;
 #endif
 	return 1;
@@ -1995,7 +1995,7 @@ get_error(struct tcb *tcp)
 	if (ia32) {
 		int err;
 
-		err = (int)r8;
+		err = (int)ia64_r8;
 		if (check_errno && is_negated_errno(err)) {
 			tcp->u_rval = -1;
 			u_error = -err;
@@ -2004,11 +2004,11 @@ get_error(struct tcb *tcp)
 			tcp->u_rval = err;
 		}
 	} else {
-		if (check_errno && r10) {
+		if (check_errno && ia64_r10) {
 			tcp->u_rval = -1;
-			u_error = r8;
+			u_error = ia64_r8;
 		} else {
-			tcp->u_rval = r8;
+			tcp->u_rval = ia64_r8;
 		}
 	}
 #elif defined(MIPS)
@@ -2030,12 +2030,12 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = ppc_result;
 	}
 #elif defined(M68K)
-	if (check_errno && is_negated_errno(d0)) {
+	if (check_errno && is_negated_errno(m68k_d0)) {
 		tcp->u_rval = -1;
-		u_error = -d0;
+		u_error = -m68k_d0;
 	}
 	else {
-		tcp->u_rval = d0;
+		tcp->u_rval = m68k_d0;
 	}
 #elif defined(ARM) || defined(AARCH64)
 # if defined(AARCH64)
@@ -2075,7 +2075,7 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = r0;
 	}
 #elif defined(ALPHA)
-	if (check_errno && a3) {
+	if (check_errno && alpha_a3) {
 		tcp->u_rval = -1;
 		u_error = r0;
 	}
@@ -2099,12 +2099,12 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = regs.u_regs[U_REG_O0];
 	}
 #elif defined(HPPA)
-	if (check_errno && is_negated_errno(r28)) {
+	if (check_errno && is_negated_errno(hppa_r28)) {
 		tcp->u_rval = -1;
-		u_error = -r28;
+		u_error = -hppa_r28;
 	}
 	else {
-		tcp->u_rval = r28;
+		tcp->u_rval = hppa_r28;
 	}
 #elif defined(SH)
 	if (check_errno && is_negated_errno(r0)) {
@@ -2115,20 +2115,20 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = r0;
 	}
 #elif defined(SH64)
-	if (check_errno && is_negated_errno(r9)) {
+	if (check_errno && is_negated_errno(sh64_r9)) {
 		tcp->u_rval = -1;
-		u_error = -r9;
+		u_error = -sh64_r9;
 	}
 	else {
-		tcp->u_rval = r9;
+		tcp->u_rval = sh64_r9;
 	}
 #elif defined(CRISV10) || defined(CRISV32)
-	if (check_errno && r10 && (unsigned) -r10 < nerrnos) {
+	if (check_errno && cris_r10 && (unsigned) -cris_r10 < nerrnos) {
 		tcp->u_rval = -1;
-		u_error = -r10;
+		u_error = -cris_r10;
 	}
 	else {
-		tcp->u_rval = r10;
+		tcp->u_rval = cris_r10;
 	}
 #elif defined(TILE)
 	/*
@@ -2144,12 +2144,12 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = tile_regs.regs[0];
 	}
 #elif defined(MICROBLAZE)
-	if (check_errno && is_negated_errno(r3)) {
+	if (check_errno && is_negated_errno(microblaze_r3)) {
 		tcp->u_rval = -1;
-		u_error = -r3;
+		u_error = -microblaze_r3;
 	}
 	else {
-		tcp->u_rval = r3;
+		tcp->u_rval = microblaze_r3;
 	}
 #endif
 	tcp->u_error = u_error;
