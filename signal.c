@@ -774,16 +774,12 @@ sys_sigsetmask(struct tcb *tcp)
 #ifdef HAVE_SIGACTION
 
 struct old_sigaction {
-	__sighandler_t __sa_handler;
+	/* sa_handler may be a libc #define, need to use other name: */
+	void (*__sa_handler)(int);
 	unsigned long sa_mask;
 	unsigned long sa_flags;
 	void (*sa_restorer)(void);
 };
-#define SA_HANDLER __sa_handler
-
-#ifndef SA_HANDLER
-#define SA_HANDLER sa_handler
-#endif
 
 int
 sys_sigaction(struct tcb *tcp)
@@ -808,19 +804,19 @@ sys_sigaction(struct tcb *tcp)
 		/* Architectures using function pointers, like
 		 * hppa, may need to manipulate the function pointer
 		 * to compute the result of a comparison. However,
-		 * the SA_HANDLER function pointer exists only in
+		 * the __sa_handler function pointer exists only in
 		 * the address space of the traced process, and can't
 		 * be manipulated by strace. In order to prevent the
 		 * compiler from generating code to manipulate
-		 * SA_HANDLER we cast the function pointers to long. */
-		if ((long)sa.SA_HANDLER == (long)SIG_ERR)
+		 * __sa_handler we cast the function pointers to long. */
+		if ((long)sa.__sa_handler == (long)SIG_ERR)
 			tprints("{SIG_ERR, ");
-		else if ((long)sa.SA_HANDLER == (long)SIG_DFL)
+		else if ((long)sa.__sa_handler == (long)SIG_DFL)
 			tprints("{SIG_DFL, ");
-		else if ((long)sa.SA_HANDLER == (long)SIG_IGN)
+		else if ((long)sa.__sa_handler == (long)SIG_IGN)
 			tprints("{SIG_IGN, ");
 		else
-			tprintf("{%#lx, ", (long) sa.SA_HANDLER);
+			tprintf("{%#lx, ", (long) sa.__sa_handler);
 		long_to_sigset(sa.sa_mask, &sigset);
 		printsigmask(&sigset, 0);
 		tprints(", ");
@@ -1266,9 +1262,10 @@ sys_rt_sigprocmask(struct tcb *tcp)
 /* Structure describing the action to be taken when a signal arrives.  */
 struct new_sigaction
 {
-	__sighandler_t __sa_handler;
+	/* sa_handler may be a libc #define, need to use other name: */
+	void (*__sa_handler)(int);
 	unsigned long sa_flags;
-	void (*sa_restorer) (void);
+	void (*sa_restorer)(void);
 	/* Kernel treats sa_mask as an array of longs. */
 	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
 };
@@ -1337,11 +1334,11 @@ sys_rt_sigaction(struct tcb *tcp)
 	/* Architectures using function pointers, like
 	 * hppa, may need to manipulate the function pointer
 	 * to compute the result of a comparison. However,
-	 * the SA_HANDLER function pointer exists only in
+	 * the __sa_handler function pointer exists only in
 	 * the address space of the traced process, and can't
 	 * be manipulated by strace. In order to prevent the
 	 * compiler from generating code to manipulate
-	 * SA_HANDLER we cast the function pointers to long. */
+	 * __sa_handler we cast the function pointers to long. */
 	if ((long)sa.__sa_handler == (long)SIG_ERR)
 		tprints("{SIG_ERR, ");
 	else if ((long)sa.__sa_handler == (long)SIG_DFL)
