@@ -295,7 +295,7 @@ update_personality(struct tcb *tcp, int personality)
 	}
 # elif defined(AARCH64)
 	if (!qflag) {
-		static const char *const names[] = {"32-bit ARM", "AArch64"};
+		static const char *const names[] = {"32-bit", "AArch64"};
 		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
 			tcp->pid, names[personality]);
 	}
@@ -681,8 +681,12 @@ static long r0;
 #elif defined(ARM)
 struct pt_regs arm_regs; /* not static */
 #elif defined(AARCH64)
-static struct user_pt_regs aarch64_regs;
-static struct arm_pt_regs arm_regs;
+static union {
+	struct user_pt_regs aarch64;
+	struct arm_pt_regs  arm;
+} arm_regs_union;
+# define aarch64_regs arm_regs_union.aarch64
+# define arm_regs     arm_regs_union.arm
 static struct iovec aarch64_io = {
 	.iov_base = &aarch64_regs
 };
@@ -816,7 +820,8 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(ARM)
 	tprintf("[%08lx] ", arm_regs.ARM_pc);
-/*#elif defined(AARCH64) ??? */
+#elif defined(AARCH64)
+	/* tprintf("[%016lx] ", aarch64_regs.regs[???]); */
 #elif defined(AVR32)
 	tprintf("[%08lx] ", regs.pc);
 #elif defined(BFIN)
@@ -868,21 +873,22 @@ void get_regs(pid_t pid)
 	/*aarch64_io.iov_base = &aarch64_regs; - already is */
 	aarch64_io.iov_len = sizeof(aarch64_regs);
 	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, (void *)&aarch64_io);
+#  if 0
+	/* Paranoia checks */
 	if (get_regs_error)
 		return;
 	switch (aarch64_io.iov_len) {
-		case sizeof(regs):
-			/* We are in 32-bit mode */
-			memcpy(&arm_regs, &aarch64_regs, sizeof(arm_regs));
-			break;
 		case sizeof(aarch64_regs):
 			/* We are in 64-bit mode */
-			/* Data is already in aarch64_regs */
+			break;
+		case sizeof(arm_regs):
+			/* We are in 32-bit mode */
 			break;
 		default:
 			get_regs_error = -1;
 			break;
 	}
+#  endif
 # elif defined(SPARC) || defined(SPARC64)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&regs, 0);
 # elif defined(TILE)
@@ -1113,9 +1119,9 @@ get_scno(struct tcb *tcp)
 			scno = aarch64_regs.regs[8];
 			update_personality(tcp, 1);
 			break;
-		case sizeof(regs):
+		case sizeof(arm_regs):
 			/* We are in 32-bit mode */
-			scno = arm_regs.uregs[7];
+			scno = arm_regs.ARM_r7;
 			update_personality(tcp, 0);
 			break;
 	}
@@ -1627,7 +1633,7 @@ get_syscall_args(struct tcb *tcp)
 		for (i = 0; i < nargs; ++i)
 			tcp->u_arg[i] = aarch64_regs.regs[i];
 	else
-# endif /* AARCH64 */
+# endif
 	for (i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = arm_regs.uregs[i];
 #elif defined(AVR32)
@@ -1861,14 +1867,16 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 	if (upeek(tcp, PT_R10, &ia64_r10) < 0)
 		return -1;
+#elif defined(ARM)
+	/* already done by get_regs */
 #elif defined(AARCH64)
-/* FIXME: uh, why do we do it on syscall *exit*? We did it on entry already... */
+	/* register reading already done by get_regs */
+
+	/* Used to do this, but we did it on syscall entry already: */
 	/* We are in 64-bit mode (personality 1) if register struct is aarch64_regs,
 	 * else it's personality 0.
 	 */
-	update_personality(tcp, aarch64_io.iov_len == sizeof(aarch64_regs));
-#elif defined(ARM)
-	/* already done by get_regs */
+	/*update_personality(tcp, aarch64_io.iov_len == sizeof(aarch64_regs));*/
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_D0, &m68k_d0) < 0)
 		return -1;
@@ -2049,7 +2057,7 @@ get_error(struct tcb *tcp)
 		}
 	}
 	else
-# endif /* AARCH64 */
+# endif
 	{
 		if (check_errno && is_negated_errno(arm_regs.ARM_r0)) {
 			tcp->u_rval = -1;
