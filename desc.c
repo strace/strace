@@ -267,7 +267,7 @@ printflock(struct tcb *tcp, long addr, int getlk)
 			fl.l_pid = fl32.l_pid;
 		} else {
 			/* let people know we have a problem here */
-			tprintf("{ <decode error: unsupported wordsize %d> }",
+			tprintf("<decode error: unsupported wordsize %d>",
 				current_wordsize);
 			return;
 		}

@@ -2121,12 +2121,15 @@ sys_utime(struct tcb *tcp)
 	union {
 		long utl[2];
 		int uti[2];
+		long paranoia_for_huge_wordsize[4];
 	} u;
-	unsigned wordsize = current_wordsize;
+	unsigned wordsize;
 
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		tprints(", ");
+
+		wordsize = current_wordsize;
 		if (!tcp->u_arg[1])
 			tprints("NULL");
 		else if (!verbose(tcp))
@@ -2142,7 +2145,8 @@ sys_utime(struct tcb *tcp)
 			tprintf(" %s]", sprinttime(u.uti[1]));
 		}
 		else
-			abort();
+			tprintf("<decode error: unsupported wordsize %d>",
+				wordsize);
 	}
 	return 0;
 }
