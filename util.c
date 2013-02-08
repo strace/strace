@@ -39,10 +39,6 @@
 # include <sys/uio.h>
 #endif
 
-#if defined(__GLIBC__) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
-# include <linux/ptrace.h>
-#endif
-
 #if defined(IA64)
 # include <asm/ptrace_offsets.h>
 # include <asm/rse.h>

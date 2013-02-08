@@ -50,13 +50,13 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <asm/types.h>
-#if defined(__GLIBC__) && (__GLIBC__ >= 2) && (__GLIBC__ + __GLIBC_MINOR__ >= 3)
+#if defined(__GLIBC__)
 # include <netipx/ipx.h>
 #else
 # include <linux/ipx.h>
 #endif
 
-#if defined(__GLIBC__) && (((__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1)) || defined(HAVE_SIN6_SCOPE_ID_LINUX))
+#if defined(__GLIBC__) && defined(HAVE_SIN6_SCOPE_ID_LINUX)
 # if defined(HAVE_LINUX_IN6_H)
 #  if defined(HAVE_SIN6_SCOPE_ID_LINUX)
 #   undef in6_addr

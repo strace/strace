@@ -412,88 +412,6 @@ print_sigset(struct tcb *tcp, long addr, int rt)
 # define SI_FROMUSER(sip)	((sip)->si_code <= 0)
 #endif
 
-#if defined(__GLIBC__) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
-/* Type for data associated with a signal.  */
-typedef union sigval
-{
-	int sival_int;
-	void *sival_ptr;
-} sigval_t;
-
-# define __SI_MAX_SIZE     128
-# define __SI_PAD_SIZE     ((__SI_MAX_SIZE / sizeof(int)) - 3)
-
-typedef struct siginfo
-{
-	int si_signo;               /* Signal number.  */
-	int si_errno;               /* If non-zero, an errno value associated with
-								   this signal, as defined in <errno.h>.  */
-	int si_code;                /* Signal code.  */
-
-	union
-	{
-		int _pad[__SI_PAD_SIZE];
-
-		/* kill().  */
-		struct
-		{
-			__pid_t si_pid;     /* Sending process ID.  */
-			__uid_t si_uid;     /* Real user ID of sending process.  */
-		} _kill;
-
-		/* POSIX.1b timers.  */
-		struct
-		{
-			unsigned int _timer1;
-			unsigned int _timer2;
-		} _timer;
-
-		/* POSIX.1b signals.  */
-		struct
-		{
-			__pid_t si_pid;     /* Sending process ID.  */
-			__uid_t si_uid;     /* Real user ID of sending process.  */
-			sigval_t si_sigval; /* Signal value.  */
-		} _rt;
-
-		/* SIGCHLD.  */
-		struct
-		{
-			__pid_t si_pid;     /* Which child.  */
-			int si_status;      /* Exit value or signal.  */
-			__clock_t si_utime;
-			__clock_t si_stime;
-		} _sigchld;
-
-		/* SIGILL, SIGFPE, SIGSEGV, SIGBUS.  */
-		struct
-		{
-			void *si_addr;      /* Faulting insn/memory ref.  */
-		} _sigfault;
-
-		/* SIGPOLL.  */
-		struct
-		{
-			int si_band;        /* Band event for SIGPOLL.  */
-			int si_fd;
-		} _sigpoll;
-	} _sifields;
-} siginfo_t;
-
-#define si_pid		_sifields._kill.si_pid
-#define si_uid		_sifields._kill.si_uid
-#define si_status	_sifields._sigchld.si_status
-#define si_utime	_sifields._sigchld.si_utime
-#define si_stime	_sifields._sigchld.si_stime
-#define si_value	_sifields._rt.si_sigval
-#define si_int		_sifields._rt.si_sigval.sival_int
-#define si_ptr		_sifields._rt.si_sigval.sival_ptr
-#define si_addr		_sifields._sigfault.si_addr
-#define si_band		_sifields._sigpoll.si_band
-#define si_fd		_sifields._sigpoll.si_fd
-
-#endif
-
 static const struct xlat siginfo_codes[] = {
 #ifdef SI_KERNEL
 	{ SI_KERNEL,	"SI_KERNEL"	},
@@ -1089,14 +1007,6 @@ sys_sigsuspend(struct tcb *tcp)
 #if !defined SS_ONSTACK
 #define SS_ONSTACK      1
 #define SS_DISABLE      2
-#if defined(__GLIBC__) && (__GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 1))
-typedef struct
-{
-	__ptr_t ss_sp;
-	int ss_flags;
-	size_t ss_size;
-} stack_t;
-#endif
 #endif
 
 static const struct xlat sigaltstack_flags[] = {
