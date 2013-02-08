@@ -705,7 +705,6 @@ static long a3;
 static long r2;
 #elif defined(S390) || defined(S390X)
 static long gpr2;
-static long pc;
 static long syscall_mode;
 #elif defined(HPPA)
 static long hppa_r28;
@@ -921,6 +920,7 @@ get_scno(struct tcb *tcp)
 		/*
 		 * Old style of "passing" the scno via the SVC instruction.
 		 */
+		long psw;
 		long opcode, offset_reg, tmp;
 		void *svc_addr;
 		static const int gpr_offset[16] = {
@@ -930,12 +930,12 @@ get_scno(struct tcb *tcp)
 				PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15
 		};
 
-		if (upeek(tcp, PT_PSWADDR, &pc) < 0)
+		if (upeek(tcp, PT_PSWADDR, &psw) < 0)
 			return -1;
 		errno = 0;
-		opcode = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(pc-sizeof(long)), 0);
+		opcode = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(psw - sizeof(long)), 0);
 		if (errno) {
-			perror_msg("%s", "peektext(pc-oneword)");
+			perror_msg("%s", "peektext(psw-oneword)");
 			return -1;
 		}
 
