@@ -954,32 +954,32 @@ sys_sysctl(struct tcb *tcp)
 		tprintf("}, %d, ", info.nlen);
 	} else {
 		size_t oldlen = 0;
-		if (umove(tcp, (long)info.oldlenp, &oldlen) >= 0
-		    && info.nlen >= 2
-		    && ((name[0] == CTL_KERN
-			 && (name[1] == KERN_OSRELEASE
-			     || name[1] == KERN_OSTYPE
+		if (info.oldval == NULL) {
+			tprints("NULL");
+		} else if (umove(tcp, (long)info.oldlenp, &oldlen) >= 0
+			   && info.nlen >= 2
+			   && ((name[0] == CTL_KERN
+				&& (name[1] == KERN_OSRELEASE
+				    || name[1] == KERN_OSTYPE
 #ifdef KERN_JAVA_INTERPRETER
-			     || name[1] == KERN_JAVA_INTERPRETER
+				    || name[1] == KERN_JAVA_INTERPRETER
 #endif
 #ifdef KERN_JAVA_APPLETVIEWER
-			     || name[1] == KERN_JAVA_APPLETVIEWER
+				    || name[1] == KERN_JAVA_APPLETVIEWER
 #endif
-				 )))) {
+					)))) {
 			printpath(tcp, (size_t)info.oldval);
-			tprintf(", %lu, ", (unsigned long)oldlen);
-			if (info.newval == 0)
-				tprints("NULL");
-			else if (syserror(tcp))
-				tprintf("%p", info.newval);
-			else
-				printpath(tcp, (size_t)info.newval);
-			tprintf(", %ld}", (unsigned long)info.newlen);
 		} else {
-			tprintf("%p, %ld, %p, %ld}",
-				info.oldval, (unsigned long)oldlen,
-				info.newval, (unsigned long)info.newlen);
+			tprintf("%p", info.oldval);
 		}
+		tprintf(", %lu, ", (unsigned long)oldlen);
+		if (info.newval == NULL)
+			tprints("NULL");
+		else if (syserror(tcp))
+			tprintf("%p", info.newval);
+		else
+			printpath(tcp, (size_t)info.newval);
+		tprintf(", %lu", (unsigned long)info.newlen);
 	}
 
 	free(name);
