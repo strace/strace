@@ -1015,33 +1015,31 @@ static const struct xlat sigaltstack_flags[] = {
 	{ 0,		NULL		},
 };
 
-static int
+static void
 print_stack_t(struct tcb *tcp, unsigned long addr)
 {
 	stack_t ss;
-	if (umove(tcp, addr, &ss) < 0)
-		return -1;
-	tprintf("{ss_sp=%#lx, ss_flags=", (unsigned long) ss.ss_sp);
-	printflags(sigaltstack_flags, ss.ss_flags, "SS_???");
-	tprintf(", ss_size=%lu}", (unsigned long) ss.ss_size);
-	return 0;
+
+	if (!addr) {
+		tprints("NULL");
+	} else if (umove(tcp, addr, &ss) < 0) {
+		tprintf("%#lx", addr);
+	} else {
+		tprintf("{ss_sp=%#lx, ss_flags=", (unsigned long) ss.ss_sp);
+		printflags(sigaltstack_flags, ss.ss_flags, "SS_???");
+		tprintf(", ss_size=%lu}", (unsigned long) ss.ss_size);
+	}
 }
 
 int
 sys_sigaltstack(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		if (tcp->u_arg[0] == 0)
-			tprints("NULL");
-		else if (print_stack_t(tcp, tcp->u_arg[0]) < 0)
-			return -1;
+		print_stack_t(tcp, tcp->u_arg[0]);
 	}
 	else {
 		tprints(", ");
-		if (tcp->u_arg[1] == 0)
-			tprints("NULL");
-		else if (print_stack_t(tcp, tcp->u_arg[1]) < 0)
-			return -1;
+		print_stack_t(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
