@@ -71,12 +71,6 @@
 # include <elf.h>
 #endif
 
-#if defined(TILE)
-# ifndef PT_FLAGS_COMPAT
-#  define PT_FLAGS_COMPAT 0x10000  /* from Linux 3.8 on */
-# endif
-#endif
-
 #ifndef ERESTARTSYS
 # define ERESTARTSYS	512
 #endif
@@ -682,13 +676,13 @@ static long r0;
 struct pt_regs arm_regs; /* not static */
 #elif defined(AARCH64)
 static union {
-	struct user_pt_regs aarch64;
-	struct arm_pt_regs  arm;
+	struct user_pt_regs aarch64_r;
+	struct arm_pt_regs  arm_r;
 } arm_regs_union;
-# define aarch64_regs arm_regs_union.aarch64
-# define arm_regs     arm_regs_union.arm
+# define aarch64_regs arm_regs_union.aarch64_r
+# define arm_regs     arm_regs_union.arm_r
 static struct iovec aarch64_io = {
-	.iov_base = &aarch64_regs
+	.iov_base = &arm_regs_union
 };
 #elif defined(ALPHA)
 static long r0;
@@ -869,8 +863,8 @@ void get_regs(pid_t pid)
 # elif defined(ARM)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&arm_regs);
 # elif defined(AARCH64)
-	/*aarch64_io.iov_base = &aarch64_regs; - already is */
-	aarch64_io.iov_len = sizeof(aarch64_regs);
+	/*aarch64_io.iov_base = &arm_regs_union; - already is */
+	aarch64_io.iov_len = sizeof(arm_regs_union);
 	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, (void *)&aarch64_io);
 #  if 0
 	/* Paranoia checks */
@@ -1020,10 +1014,6 @@ get_scno(struct tcb *tcp)
 # ifndef __X32_SYSCALL_BIT
 #  define __X32_SYSCALL_BIT	0x40000000
 # endif
-# ifndef __X32_SYSCALL_MASK
-#  define __X32_SYSCALL_MASK	__X32_SYSCALL_BIT
-# endif
-
 	int currpers;
 	scno = x86_64_regs.orig_rax;
 
@@ -1038,7 +1028,7 @@ get_scno(struct tcb *tcp)
 		case 0x33:
 			if (x86_64_regs.ds == 0x2b) {
 				currpers = 2;
-				scno &= ~__X32_SYSCALL_MASK;
+				scno &= ~__X32_SYSCALL_BIT;
 			} else
 				currpers = 0;
 			break;
@@ -1080,24 +1070,19 @@ get_scno(struct tcb *tcp)
 			break;
 	}
 # endif
+
 # ifdef X32
-	/* Value of currpers:
-	 *   0: 64 bit
-	 *   1: 32 bit
-	 *   2: X32
-	 * Value of current_personality:
-	 *   0: X32
-	 *   1: 32 bit
+	/* If we are built for a x32 system, then personality 0 is x32
+	 * (not x86_64), and stracing of x86_64 apps is not supported.
+	 * Stracing of i386 apps is still supported.
 	 */
-	switch (currpers) {
-		case 0:
-			fprintf(stderr, "syscall_%lu (...) in unsupported "
-					"64-bit mode of process PID=%d\n",
-				scno, tcp->pid);
-			return 0;
-		case 2:
-			currpers = 0;
+	if (currpers == 0) {
+		fprintf(stderr, "syscall_%lu(...) in unsupported "
+				"64-bit mode of process PID=%d\n",
+			scno, tcp->pid);
+		return 0;
 	}
+	currpers &= ~2; /* map 2,1 to 0,1 */
 # endif
 	update_personality(tcp, currpers);
 #elif defined(IA64)
@@ -1323,6 +1308,9 @@ get_scno(struct tcb *tcp)
 # ifdef __tilepro__
 	currpers = 1;
 # else
+#  ifndef PT_FLAGS_COMPAT
+#   define PT_FLAGS_COMPAT 0x10000  /* from Linux 3.8 on */
+#  endif
 	if (tile_regs.flags & PT_FLAGS_COMPAT)
 		currpers = 1;
 	else
