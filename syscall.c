@@ -1330,16 +1330,6 @@ get_scno(struct tcb *tcp)
 		return -1;
 #endif
 
-#if defined(SH)
-	/* new syscall ABI returns result in R0 */
-	if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
-		return -1;
-#elif defined(SH64)
-	/* ABI defines result returned in r9 */
-	if (upeek(tcp, REG_GENERAL(9), (long *)&sh64_r9) < 0)
-		return -1;
-#endif
-
 	tcp->scno = scno;
 	return 1;
 }
