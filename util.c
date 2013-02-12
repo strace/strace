@@ -1293,8 +1293,8 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 	/* Tilera CPUs are only supported since about linux-2.6.34 */
 	return 0;
 #elif defined(MICROBLAZE)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR(0)), new) < 0)
-		return -1;
+	/* setbpt/clearbpt never used: */
+	/* microblaze is only supported since about linux-2.6.30 */
 	return 0;
 #else
 #warning Do not know how to handle change_syscall for this architecture
