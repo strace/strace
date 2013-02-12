@@ -1261,7 +1261,7 @@ sys_rt_sigaction(struct tcb *tcp)
 	 * therefore tcp->u_arg[3(4)] _must_ be NSIG / 8 here,
 	 * and we always use smaller memcpy. */
 	sigemptyset(&sigset);
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 	if (tcp->u_arg[4] <= sizeof(sigset))
 		memcpy(&sigset, &sa.sa_mask, tcp->u_arg[4]);
 #else
@@ -1283,7 +1283,7 @@ sys_rt_sigaction(struct tcb *tcp)
 	if (entering(tcp))
 		tprints(", ");
 	else
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 		tprintf(", %#lx, %lu", tcp->u_arg[3], tcp->u_arg[4]);
 #elif defined(ALPHA)
 		tprintf(", %lu, %#lx", tcp->u_arg[3], tcp->u_arg[4]);

@@ -119,22 +119,26 @@ extern char *stpcpy(char *dst, const char *src);
 # define DEFAULT_SORTBY "time"
 #endif
 
-#if defined(SPARC) || defined(SPARC64)
-# define LINUXSPARC
-#endif
+/* Experimental code using PTRACE_SEIZE can be enabled here.
+ * This needs Linux kernel 3.4.x or later to work.
+ */
+#define USE_SEIZE 1
+
 #if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI32
 # define LINUX_MIPSO32
 #endif
 #if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_NABI32
 # define LINUX_MIPSN32
-# define LINUX_MIPS64
 #endif
 #if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI64
 # define LINUX_MIPSN64
-# define LINUX_MIPS64
 #endif
 
-#if (defined(LINUXSPARC) || defined(X86_64) || defined(ARM) || defined(AARCH64) || defined(AVR32)) && defined(__GLIBC__)
+#if (defined(SPARC) || defined(SPARC64) \
+    || defined(X86_64) \
+    || defined(ARM) || defined(AARCH64) \
+    || defined(AVR32) \
+    ) && defined(__GLIBC__)
 # include <sys/ptrace.h>
 #else
 /* Work around awkward prototype in ptrace.h. */
@@ -149,10 +153,70 @@ extern char *stpcpy(char *dst, const char *src);
 extern long ptrace(int, int, char *, long);
 #endif
 
+#if !HAVE_DECL_PTRACE_SETOPTIONS
+# define PTRACE_SETOPTIONS	0x4200
+#endif
+#if !HAVE_DECL_PTRACE_GETEVENTMSG
+# define PTRACE_GETEVENTMSG	0x4201
+#endif
+#if !HAVE_DECL_PTRACE_GETSIGINFO
+# define PTRACE_GETSIGINFO	0x4202
+#endif
+
+#if !HAVE_DECL_PTRACE_O_TRACESYSGOOD
+# define PTRACE_O_TRACESYSGOOD	0x00000001
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEFORK
+# define PTRACE_O_TRACEFORK	0x00000002
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEVFORK
+# define PTRACE_O_TRACEVFORK	0x00000004
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACECLONE
+# define PTRACE_O_TRACECLONE	0x00000008
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEEXEC
+# define PTRACE_O_TRACEEXEC	0x00000010
+#endif
+#if !HAVE_DECL_PTRACE_O_TRACEEXIT
+# define PTRACE_O_TRACEEXIT	0x00000040
+#endif
+
+#if !HAVE_DECL_PTRACE_EVENT_FORK
+# define PTRACE_EVENT_FORK	1
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_VFORK
+# define PTRACE_EVENT_VFORK	2
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_CLONE
+# define PTRACE_EVENT_CLONE	3
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_EXEC
+# define PTRACE_EVENT_EXEC	4
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_VFORK_DONE
+# define PTRACE_EVENT_VFORK_DONE	5
+#endif
+#if !HAVE_DECL_PTRACE_EVENT_EXIT
+# define PTRACE_EVENT_EXIT	6
+#endif
+
 #if !defined(__GLIBC__)
 # define PTRACE_PEEKUSER PTRACE_PEEKUSR
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
+
+#ifdef USE_SEIZE
+# undef PTRACE_SEIZE
+# define PTRACE_SEIZE		0x4206
+# undef PTRACE_INTERRUPT
+# define PTRACE_INTERRUPT	0x4207
+# undef PTRACE_LISTEN
+# define PTRACE_LISTEN		0x4208
+# undef PTRACE_EVENT_STOP
+# define PTRACE_EVENT_STOP	128
+#endif
+
 #if defined(X86_64) || defined(X32) || defined(I386) || defined(TILE)
 /* For struct pt_regs. x86 strace uses PTRACE_GETREGS.
  * PTRACE_GETREGS returns registers in the layout of this struct.
@@ -220,10 +284,7 @@ struct arm_pt_regs {
 # define ARM_ORIG_r0    uregs[17]
 #endif /* AARCH64 */
 
-#define SUPPORTED_PERSONALITIES 1
-#define DEFAULT_PERSONALITY 0
-
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 /* Indexes into the pt_regs.u_reg[] array -- UREG_XX from kernel are all off
  * by 1 and use Ix instead of Ox.  These work for both 32 and 64 bit Linux. */
 # define U_REG_G1 0
@@ -231,7 +292,6 @@ struct arm_pt_regs {
 # define U_REG_O1 8
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 4
-# undef  SUPPORTED_PERSONALITIES
 # if defined(SPARC64)
 #  include <asm/psrcompat.h>
 #  define SUPPORTED_PERSONALITIES 3
@@ -240,10 +300,9 @@ struct arm_pt_regs {
 #  include <asm/psr.h>
 #  define SUPPORTED_PERSONALITIES 2
 # endif /* SPARC64 */
-#endif /* LINUXSPARC */
+#endif /* SPARC[64] */
 
 #ifdef X86_64
-# undef SUPPORTED_PERSONALITIES
 # define SUPPORTED_PERSONALITIES 3
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
@@ -251,113 +310,48 @@ struct arm_pt_regs {
 #endif
 
 #ifdef X32
-# undef SUPPORTED_PERSONALITIES
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef ARM
-# undef SUPPORTED_PERSONALITIES
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef AARCH64
-# undef SUPPORTED_PERSONALITIES
 /* The existing ARM personality, then AArch64 */
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 8
-# undef DEFAULT_PERSONALITY
 # define DEFAULT_PERSONALITY 1
 #endif
 
 #ifdef POWERPC64
-# undef SUPPORTED_PERSONALITIES
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef TILE
-# undef SUPPORTED_PERSONALITIES
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
 # ifdef __tilepro__
-#  undef DEFAULT_PERSONALITY
 #  define DEFAULT_PERSONALITY 1
 # endif
 #endif
 
+#ifndef SUPPORTED_PERSONALITIES
+# define SUPPORTED_PERSONALITIES 1
+#endif
+#ifndef DEFAULT_PERSONALITY
+# define DEFAULT_PERSONALITY 0
+#endif
 #ifndef PERSONALITY0_WORDSIZE
 # define PERSONALITY0_WORDSIZE (int)(sizeof(long))
-#endif
-
-#if !HAVE_DECL_PTRACE_SETOPTIONS
-# define PTRACE_SETOPTIONS	0x4200
-#endif
-#if !HAVE_DECL_PTRACE_GETEVENTMSG
-# define PTRACE_GETEVENTMSG	0x4201
-#endif
-#if !HAVE_DECL_PTRACE_GETSIGINFO
-# define PTRACE_GETSIGINFO	0x4202
-#endif
-
-#if !HAVE_DECL_PTRACE_O_TRACESYSGOOD
-# define PTRACE_O_TRACESYSGOOD	0x00000001
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEFORK
-# define PTRACE_O_TRACEFORK	0x00000002
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEVFORK
-# define PTRACE_O_TRACEVFORK	0x00000004
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACECLONE
-# define PTRACE_O_TRACECLONE	0x00000008
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEEXEC
-# define PTRACE_O_TRACEEXEC	0x00000010
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEEXIT
-# define PTRACE_O_TRACEEXIT	0x00000040
-#endif
-
-#if !HAVE_DECL_PTRACE_EVENT_FORK
-# define PTRACE_EVENT_FORK	1
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_VFORK
-# define PTRACE_EVENT_VFORK	2
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_CLONE
-# define PTRACE_EVENT_CLONE	3
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_EXEC
-# define PTRACE_EVENT_EXEC	4
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_VFORK_DONE
-# define PTRACE_EVENT_VFORK_DONE	5
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_EXIT
-# define PTRACE_EVENT_EXIT	6
-#endif
-
-/* Experimental code using PTRACE_SEIZE can be enabled here.
- * This needs Linux kernel 3.4.x or later to work.
- */
-#define USE_SEIZE 1
-
-#ifdef USE_SEIZE
-# undef PTRACE_SEIZE
-# define PTRACE_SEIZE		0x4206
-# undef PTRACE_INTERRUPT
-# define PTRACE_INTERRUPT	0x4207
-# undef PTRACE_LISTEN
-# define PTRACE_LISTEN		0x4208
-# undef PTRACE_EVENT_STOP
-# define PTRACE_EVENT_STOP	128
 #endif
 
 #if defined(I386)
@@ -385,12 +379,10 @@ struct tcb {
 	long scno;		/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
 #if defined(LINUX_MIPSN32) || defined(X32)
-	long long ext_arg[MAX_ARGS];	/* System call arguments */
-#endif
-	long u_rval;		/* return value */
-#if defined(LINUX_MIPSN32) || defined(X32)
+	long long ext_arg[MAX_ARGS];
 	long long u_lrval;	/* long long return value */
 #endif
+	long u_rval;		/* Return value */
 #if SUPPORTED_PERSONALITIES > 1
 	int currpers;		/* Personality at the time of scno update */
 #endif

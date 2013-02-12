@@ -32,7 +32,7 @@
 #include <dirent.h>
 #include <sys/swap.h>
 
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 struct stat {
 	unsigned short	st_dev;
 	unsigned int	st_ino;
@@ -421,7 +421,7 @@ sys_openat(struct tcb *tcp)
 	return decode_open(tcp, 1);
 }
 
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 static const struct xlat openmodessol[] = {
 	{ 0,		"O_RDWR"	},
 	{ 1,		"O_RDONLY"	},
@@ -736,7 +736,7 @@ sprinttime(time_t t)
 	return buf;
 }
 
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 typedef struct {
 	int     tv_sec;
 	int     tv_nsec;
@@ -806,7 +806,7 @@ printstatsol(struct tcb *tcp, long addr)
 		tprints("...}");
 }
 
-#if defined(SPARC64)
+# if defined(SPARC64)
 static void
 printstat_sparc64(struct tcb *tcp, long addr)
 {
@@ -852,8 +852,8 @@ printstat_sparc64(struct tcb *tcp, long addr)
 	else
 		tprints("...}");
 }
-#endif /* SPARC64 */
-#endif /* LINUXSPARC */
+# endif /* SPARC64 */
+#endif /* SPARC[64] */
 
 #if defined POWERPC64
 struct stat_powerpc32 {
@@ -1003,7 +1003,7 @@ printstat(struct tcb *tcp, long addr)
 		return;
 	}
 
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 	if (current_personality == 1) {
 		printstatsol(tcp, addr);
 		return;
@@ -1014,7 +1014,7 @@ printstat(struct tcb *tcp, long addr)
 		return;
 	}
 #endif
-#endif /* LINUXSPARC */
+#endif /* SPARC[64] */
 
 #if defined POWERPC64
 	if (current_personality == 1) {
@@ -1083,7 +1083,7 @@ printstat64(struct tcb *tcp, long addr)
 		return;
 	}
 
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 	if (current_personality == 1) {
 		printstatsol(tcp, addr);
 		return;
@@ -1094,7 +1094,7 @@ printstat64(struct tcb *tcp, long addr)
 		return;
 	}
 # endif
-#endif /* LINUXSPARC */
+#endif /* SPARC[64] */
 
 #if defined X86_64
 	if (current_personality != 1) {
@@ -1218,7 +1218,7 @@ printoldstat(struct tcb *tcp, long addr)
 		return;
 	}
 
-# ifdef LINUXSPARC
+# if defined(SPARC) || defined(SPARC64)
 	if (current_personality == 1) {
 		printstatsol(tcp, addr);
 		return;
@@ -1416,7 +1416,7 @@ sys_oldlstat(struct tcb *tcp)
 }
 #endif
 
-#if defined(LINUXSPARC)
+#if defined(SPARC) || defined(SPARC64)
 
 int
 sys_xstat(struct tcb *tcp)
@@ -1592,7 +1592,7 @@ sys_aclipc(struct tcb *tcp)
 
 # endif /* HAVE_SYS_ACL_H */
 
-#endif /* LINUXSPARC */
+#endif /* SPARC[64] */
 
 static const struct xlat fsmagic[] = {
 	{ 0x73757245,	"CODA_SUPER_MAGIC"	},
@@ -2162,7 +2162,7 @@ decode_mknod(struct tcb *tcp, int offset)
 		switch (mode & S_IFMT) {
 		case S_IFCHR:
 		case S_IFBLK:
-#ifdef LINUXSPARC
+#if defined(SPARC) || defined(SPARC64)
 			if (current_personality == 1)
 				tprintf(", makedev(%lu, %lu)",
 				(unsigned long) ((tcp->u_arg[offset + 2] >> 18) & 0x3fff),
