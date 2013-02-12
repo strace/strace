@@ -1428,11 +1428,42 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 	tprints("}");
 }
 
+struct msghdr32 {
+	uint32_t /* void* */    msg_name;
+	uint32_t /* socklen_t */msg_namelen;
+	uint32_t /* iovec* */   msg_iov;
+	uint32_t /* size_t */   msg_iovlen;
+	uint32_t /* void* */    msg_control;
+	uint32_t /* size_t */   msg_controllen;
+	uint32_t /* int */      msg_flags;
+};
+struct mmsghdr32 {
+	struct msghdr32         msg_hdr;
+	uint32_t /* unsigned */ msg_len;
+};
+
 static void
 printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize == 4) {
+		struct msghdr32 msg32;
+
+		if (umove(tcp, addr, &msg32) < 0) {
+			tprintf("%#lx", addr);
+			return;
+		}
+		msg.msg_name       = (void*)(long)msg32.msg_name;
+		msg.msg_namelen    =              msg32.msg_namelen;
+		msg.msg_iov        = (void*)(long)msg32.msg_iov;
+		msg.msg_iovlen     =              msg32.msg_iovlen;
+		msg.msg_control    = (void*)(long)msg32.msg_control;
+		msg.msg_controllen =              msg32.msg_controllen;
+		msg.msg_flags      =              msg32.msg_flags;
+	} else
+#endif
 	if (umove(tcp, addr, &msg) < 0) {
 		tprintf("%#lx", addr);
 		return;
@@ -1448,10 +1479,31 @@ printmmsghdr(struct tcb *tcp, long addr, unsigned int idx, unsigned long msg_len
 		unsigned msg_len;
 	} mmsg;
 
-	addr += sizeof(mmsg) * idx;
-	if (umove(tcp, addr, &mmsg) < 0) {
-		tprintf("%#lx", addr);
-		return;
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize == 4) {
+		struct mmsghdr32 mmsg32;
+
+		addr += sizeof(mmsg32) * idx;
+		if (umove(tcp, addr, &mmsg32) < 0) {
+			tprintf("%#lx", addr);
+			return;
+		}
+		mmsg.msg_hdr.msg_name       = (void*)(long)mmsg32.msg_hdr.msg_name;
+		mmsg.msg_hdr.msg_namelen    =              mmsg32.msg_hdr.msg_namelen;
+		mmsg.msg_hdr.msg_iov        = (void*)(long)mmsg32.msg_hdr.msg_iov;
+		mmsg.msg_hdr.msg_iovlen     =              mmsg32.msg_hdr.msg_iovlen;
+		mmsg.msg_hdr.msg_control    = (void*)(long)mmsg32.msg_hdr.msg_control;
+		mmsg.msg_hdr.msg_controllen =              mmsg32.msg_hdr.msg_controllen;
+		mmsg.msg_hdr.msg_flags      =              mmsg32.msg_hdr.msg_flags;
+		mmsg.msg_len                =              mmsg32.msg_len;
+	} else
+#endif
+	{
+		addr += sizeof(mmsg) * idx;
+		if (umove(tcp, addr, &mmsg) < 0) {
+			tprintf("%#lx", addr);
+			return;
+		}
 	}
 	tprints("{");
 	do_msghdr(tcp, &mmsg.msg_hdr, msg_len ? msg_len : mmsg.msg_len);
