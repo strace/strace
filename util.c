@@ -966,6 +966,13 @@ upeek(struct tcb *tcp, long off, long *res)
 	return 0;
 }
 
+/* Note! On new kernels (about 2.5.46+), we use PTRACE_O_TRACECLONE
+ * and PTRACE_O_TRACE[V]FORK for tracing children.
+ * If you are adding a new arch which is only supported by newer kernels,
+ * you most likely don't need to add any code below
+ * beside a dummy "return 0" block in change_syscall().
+ */
+
 /*
  * These #if's are huge, please indent them correctly.
  * It's easy to get confused otherwise.
@@ -1118,9 +1125,6 @@ typedef struct pt_regs arg_setup_state;
 # elif defined(ALPHA) || defined(MIPS)
 #  define arg0_offset	REG_A0
 #  define arg1_offset	(REG_A0+1)
-# elif defined(AVR32)
-#  define arg0_offset	(REG_R12)
-#  define arg1_offset	(REG_R11)
 # elif defined(POWERPC)
 #  define arg0_offset	(sizeof(unsigned long)*PT_R3)
 #  define arg1_offset	(sizeof(unsigned long)*PT_R4)
@@ -1146,11 +1150,6 @@ typedef struct pt_regs arg_setup_state;
 #  define restore_arg1(tcp, state, val) 0
 #  define arg0_index	1
 #  define arg1_index	0
-# elif defined TILE
-#  define arg0_offset   PTREGS_OFFSET_REG(0)
-#  define arg1_offset   PTREGS_OFFSET_REG(1)
-#  define restore_arg0(tcp, state, val) 0
-#  define restore_arg1(tcp, state, val) 0
 # else
 #  define arg0_offset	0
 #  define arg1_offset	4
@@ -1229,12 +1228,12 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 		return -1;
 	return 0;
 #elif defined(AVR32)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_R8), new) < 0)
-		return -1;
+	/* setbpt/clearbpt never used: */
+	/* AVR32 is only supported since about linux-2.6.19 */
 	return 0;
 #elif defined(BFIN)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(REG_P0), new) < 0)
-		return -1;
+	/* setbpt/clearbpt never used: */
+	/* Blackfin is only supported since about linux-2.6.23 */
 	return 0;
 #elif defined(IA64)
 	if (ia32) {
@@ -1282,10 +1281,8 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 		return -1;
 	return 0;
 #elif defined(TILE)
-	if (ptrace(PTRACE_POKEUSER, tcp->pid,
-		   (char*)PTREGS_OFFSET_REG(0),
-		   new) != 0)
-		return -1;
+	/* setbpt/clearbpt never used: */
+	/* Tilera CPUs are only supported since about linux-2.6.34 */
 	return 0;
 #elif defined(MICROBLAZE)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(PT_GPR(0)), new) < 0)

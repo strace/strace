@@ -118,8 +118,8 @@ extern char *stpcpy(char *dst, const char *src);
 #ifndef DEFAULT_SORTBY
 # define DEFAULT_SORTBY "time"
 #endif
-
-/* Experimental code using PTRACE_SEIZE can be enabled here.
+/*
+ * Experimental code using PTRACE_SEIZE can be enabled here.
  * This needs Linux kernel 3.4.x or later to work.
  */
 #define USE_SEIZE 1
@@ -427,15 +427,23 @@ struct tcb {
 #define TCB_REPRINT	00200	/* We should reprint this syscall on exit */
 #define TCB_FILTERED	00400	/* This system call has been filtered out */
 /* x86 does not need TCB_WAITEXECVE.
- * It can detect SIGTRAP by looking at eax/rax.
- * See "not a syscall entry (eax = %ld)\n" message
- * in syscall_fixup_on_sysenter().
+ * It can detect post-execve SIGTRAP by looking at eax/rax.
+ * See "not a syscall entry (eax = %ld)\n" message.
+ *
+ * Note! On new kernels (about 2.5.46+), we use PTRACE_O_TRACEEXEC, which
+ * suppresses post-execve SIGTRAP. If you are adding a new arch which is
+ * only supported by newer kernels, you most likely don't need to define
+ * TCB_WAITEXECVE!
  */
-#if defined(ALPHA) || defined(AVR32) || defined(SPARC) || defined(SPARC64) \
-  || defined(POWERPC) || defined(IA64) || defined(HPPA) \
-  || defined(SH) || defined(SH64) || defined(S390) || defined(S390X) \
-  || defined(ARM) || defined(AARCH64) || defined(MIPS) || defined(BFIN) \
-  || defined(TILE)
+#if defined(ALPHA) \
+ || defined(SPARC) || defined(SPARC64) \
+ || defined(POWERPC) \
+ || defined(IA64) \
+ || defined(HPPA) \
+ || defined(SH) || defined(SH64) \
+ || defined(S390) || defined(S390X) \
+ || defined(ARM) || defined(AARCH64) \
+ || defined(MIPS)
 /* This tracee has entered into execve syscall. Expect post-execve SIGTRAP
  * to happen. (When it is detected, tracee is continued and this bit is cleared.)
  */
