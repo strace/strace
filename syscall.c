@@ -1946,6 +1946,24 @@ is_negated_errno(unsigned long int val)
 	return val > max;
 }
 
+#if defined(X32)
+static inline int
+is_negated_errno_x32(unsigned long long val)
+{
+	unsigned long long max = -(long long) nerrnos;
+	/*
+	 * current_wordsize is 4 even in personality 0 (native X32)
+	 * but truncation _must not_ be done in it.
+	 * can't check current_wordsize here!
+	 */
+	if (current_personality != 0) {
+		val = (uint32_t) val;
+		max = (uint32_t) max;
+	}
+	return val > max;
+}
+#endif
+
 /* Returns:
  * 1: ok, continue in trace_syscall_exiting().
  * -1: error, trace_syscall_exiting() should print error indicator
@@ -1976,16 +1994,23 @@ get_error(struct tcb *tcp)
 	else {
 		tcp->u_rval = i386_regs.eax;
 	}
-#elif defined(X86_64) || defined(X32)
+#elif defined(X86_64)
 	if (check_errno && is_negated_errno(x86_64_regs.rax)) {
 		tcp->u_rval = -1;
 		u_error = -x86_64_regs.rax;
 	}
 	else {
 		tcp->u_rval = x86_64_regs.rax;
-# if defined(X32)
+	}
+#elif defined(X32)
+	/* Careful: is_negated_errno() works only on longs */
+	if (check_errno && is_negated_errno_x32(x86_64_regs.rax)) {
+		tcp->u_rval = -1;
+		u_error = -x86_64_regs.rax;
+	}
+	else {
+		tcp->u_rval = x86_64_regs.rax; /* truncating */
 		tcp->u_lrval = x86_64_regs.rax;
-# endif
 	}
 #elif defined(IA64)
 	if (ia32) {
