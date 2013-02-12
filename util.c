@@ -1198,9 +1198,13 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_EAX * 4), new) < 0)
 		return -1;
 	return 0;
-#elif defined(X86_64) || defined(X32)
+#elif defined(X86_64)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid, (char*)(ORIG_RAX * 8), new) < 0)
 		return -1;
+	return 0;
+#elif defined(X32)
+	/* setbpt/clearbpt never used: */
+	/* X32 is only supported since about linux-3.0.30 */
 	return 0;
 #elif defined(POWERPC)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid,
@@ -1279,6 +1283,10 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 # endif
 	if (ptrace(PTRACE_SET_SYSCALL, tcp->pid, 0, new & 0xffff) != 0)
 		return -1;
+	return 0;
+#elif defined(AARCH64)
+	/* setbpt/clearbpt never used: */
+	/* AARCH64 is only supported since about linux-3.0.31 */
 	return 0;
 #elif defined(TILE)
 	/* setbpt/clearbpt never used: */
