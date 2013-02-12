@@ -2116,50 +2116,157 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_FSR,		"rfsr",					},
 	{ PT_KERNEL_MODE,	"kernel_mode",				},
 #endif
-
-#if !defined(SPARC) && !defined(HPPA) && !defined(POWERPC) \
-		&& !defined(ALPHA) && !defined(IA64) \
-		&& !defined(CRISV10) && !defined(CRISV32) \
-		&& !defined(MICROBLAZE) && !defined(AARCH64) && !defined(TILE)
-# if !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SPARC64) && !defined(AVR32) && !defined(BFIN)
-	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
-# endif
-# if defined(I386) || defined(X86_64) || defined(X32)
-	{ uoff(i387),		"offsetof(struct user, i387)"		},
-# endif
-# if defined(M68K)
-	{ uoff(m68kfp),		"offsetof(struct user, m68kfp)"		},
-# endif
+	/* Other fields in "struct user" */
+#if defined(S390) || defined(S390X)
 	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
 	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
 	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
-# if !defined(SPARC64)
-	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
-# endif
-# if defined(AVR32) || defined(SH64)
-	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
-# endif
-# if !defined(SPARC64)
 	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
-# endif
 	{ uoff(signal),		"offsetof(struct user, signal)"		},
-# if !defined(AVR32) && !defined(S390) && !defined(S390X) && !defined(MIPS) && !defined(SH) && !defined(SH64) && !defined(SPARC64)
-	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
-# endif
-# if !defined(SPARC64)
 	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-# endif
-# if !defined(ARM) && !defined(AARCH64) && !defined(AVR32) && !defined(MIPS) && !defined(S390) && !defined(S390X) && !defined(SPARC64) && !defined(BFIN)
-	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
-# endif
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
 	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
-# if defined(I386) || defined(X86_64) || defined(X32)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(POWERPC)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(I386) || defined(X86_64) || defined(X32)
+	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
+	{ uoff(i387),		"offsetof(struct user, i387)"		},
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
 	{ uoff(u_debugreg),	"offsetof(struct user, u_debugreg)"	},
-# endif
-#endif /* !defined(many arches) */
-
-#if !defined(HPPA) && !defined(AARCH64) && !defined(TILE)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(IA64)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(ARM)
+	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(AARCH64)
+	/* nothing */
+#elif defined(M68K)
+	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
+	{ uoff(m68kfp),		"offsetof(struct user, m68kfp)"		},
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(reserved),	"offsetof(struct user, reserved)"	},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(LINUX_MIPSN32)
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(MIPS)
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(ALPHA)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(SPARC)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(SPARC64)
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(HPPA)
+	/* nothing */
+#elif defined(SH)
+	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(SH64)
+	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(CRISV10) || defined(CRISV32)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(TILE)
+	/* nothing */
+#elif defined(MICROBLAZE)
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(AVR32)
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
+	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
+	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(BFIN)
+	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
+	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
+	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
+	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
+	{ uoff(signal),		"offsetof(struct user, signal)"		},
+	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
+	{ uoff(magic),		"offsetof(struct user, magic)"		},
+	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
 	{ sizeof(struct user),	"sizeof(struct user)"			},
 #endif
 	{ 0,			NULL					},
