@@ -2179,19 +2179,7 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
 	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
 	{ sizeof(struct user),	"sizeof(struct user)"			},
-#elif defined(LINUX_MIPSN32)
-	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
-	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
-	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
-	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
-	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
-	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
-	{ uoff(signal),		"offsetof(struct user, signal)"		},
-	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-	{ uoff(magic),		"offsetof(struct user, magic)"		},
-	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
-	{ sizeof(struct user),	"sizeof(struct user)"			},
-#elif defined(MIPS)
+#elif defined(MIPS) || defined(LINUX_MIPSN32)
 	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
 	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
 	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
@@ -2217,21 +2205,7 @@ const struct xlat struct_user_offsets[] = {
 	{ sizeof(struct user),	"sizeof(struct user)"			},
 #elif defined(HPPA)
 	/* nothing */
-#elif defined(SH)
-	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
-	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
-	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
-	{ uoff(u_ssize),	"offsetof(struct user, u_ssize)"	},
-	{ uoff(start_code),	"offsetof(struct user, start_code)"	},
-	{ uoff(start_data),	"offsetof(struct user, start_data)"	},
-	{ uoff(start_stack),	"offsetof(struct user, start_stack)"	},
-	{ uoff(signal),		"offsetof(struct user, signal)"		},
-	{ uoff(u_ar0),		"offsetof(struct user, u_ar0)"		},
-	{ uoff(u_fpstate),	"offsetof(struct user, u_fpstate)"	},
-	{ uoff(magic),		"offsetof(struct user, magic)"		},
-	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
-	{ sizeof(struct user),	"sizeof(struct user)"			},
-#elif defined(SH64)
+#elif defined(SH) || defined(SH64)
 	{ uoff(u_fpvalid),	"offsetof(struct user, u_fpvalid)"	},
 	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
 	{ uoff(u_dsize),	"offsetof(struct user, u_dsize)"	},
