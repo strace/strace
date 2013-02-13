@@ -1126,22 +1126,13 @@ static const struct xlat waitid_types[] = {
 int
 sys_waitid(struct tcb *tcp)
 {
-	siginfo_t si;
-
 	if (entering(tcp)) {
 		printxval(waitid_types, tcp->u_arg[0], "P_???");
 		tprintf(", %ld, ", tcp->u_arg[1]);
 	}
 	else {
 		/* siginfo */
-		if (!tcp->u_arg[2])
-			tprints("NULL");
-		else if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[2]);
-		else if (umove(tcp, tcp->u_arg[2], &si) < 0)
-			tprints("{???}");
-		else
-			printsiginfo(&si, verbose(tcp));
+		printsiginfo_at(tcp, tcp->u_arg[2]);
 		/* options */
 		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
@@ -2306,15 +2297,7 @@ sys_ptrace(struct tcb *tcp)
 #endif
 #ifdef PTRACE_SETSIGINFO
 		case PTRACE_SETSIGINFO: {
-			siginfo_t si;
-			if (!tcp->u_arg[3])
-				tprints("NULL");
-			else if (syserror(tcp))
-				tprintf("%#lx", tcp->u_arg[3]);
-			else if (umove(tcp, tcp->u_arg[3], &si) < 0)
-				tprints("{???}");
-			else
-				printsiginfo(&si, verbose(tcp));
+			printsiginfo_at(tcp, tcp->u_arg[3]);
 			break;
 		}
 #endif
@@ -2347,15 +2330,7 @@ sys_ptrace(struct tcb *tcp)
 #endif
 #ifdef PTRACE_GETSIGINFO
 		case PTRACE_GETSIGINFO: {
-			siginfo_t si;
-			if (!tcp->u_arg[3])
-				tprints("NULL");
-			else if (syserror(tcp))
-				tprintf("%#lx", tcp->u_arg[3]);
-			else if (umove(tcp, tcp->u_arg[3], &si) < 0)
-				tprints("{???}");
-			else
-				printsiginfo(&si, verbose(tcp));
+			printsiginfo_at(tcp, tcp->u_arg[3]);
 			break;
 		}
 #endif

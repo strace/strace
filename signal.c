@@ -671,6 +671,25 @@ printsiginfo(siginfo_t *sip, int verbose)
 	tprints("}");
 }
 
+void
+printsiginfo_at(struct tcb *tcp, long addr)
+{
+	siginfo_t si;
+	if (!addr) {
+		tprints("NULL");
+		return;
+	}
+	if (syserror(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	if (umove(tcp, addr, &si) < 0) {
+		tprints("{???}");
+		return;
+	}
+	printsiginfo(&si, verbose(tcp));
+}
+
 int
 sys_sigsetmask(struct tcb *tcp)
 {
@@ -1209,8 +1228,7 @@ sys_rt_sigaction(struct tcb *tcp)
 		tprintf("%#lx", addr);
 		goto after_sa;
 	}
-#if SUPPORTED_PERSONALITIES > 1
-#if SIZEOF_LONG > 4
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize != sizeof(sa.sa_flags) && current_wordsize == 4) {
 		struct new_sigaction32 sa32;
 		r = umove(tcp, addr, &sa32);
@@ -1230,7 +1248,6 @@ sys_rt_sigaction(struct tcb *tcp)
 			sa.sa_mask[0] = sa32.sa_mask[0] + ((long)(sa32.sa_mask[1]) << 32);
 		}
 	} else
-#endif
 #endif
 	{
 		r = umove(tcp, addr, &sa);
@@ -1326,14 +1343,9 @@ sys_rt_sigsuspend(struct tcb *tcp)
 static void
 print_sigqueueinfo(struct tcb *tcp, int sig, unsigned long uinfo)
 {
-	siginfo_t si;
-
 	printsignal(sig);
 	tprints(", ");
-	if (umove(tcp, uinfo, &si) < 0)
-		tprintf("%#lx", uinfo);
-	else
-		printsiginfo(&si, verbose(tcp));
+	printsiginfo_at(tcp, uinfo);
 }
 
 int
@@ -1375,17 +1387,8 @@ int sys_rt_sigtimedwait(struct tcb *tcp)
 	}
 	else if (tcp->u_arg[1] != 0) {
 		/* syscall exit, and u_arg[1] wasn't NULL */
-		if (syserror(tcp))
-			tprintf("%#lx, ", tcp->u_arg[1]);
-		else {
-			siginfo_t si;
-			if (umove(tcp, tcp->u_arg[1], &si) < 0)
-				tprintf("%#lx, ", tcp->u_arg[1]);
-			else {
-				printsiginfo(&si, verbose(tcp));
-				tprints(", ");
-			}
-		}
+		printsiginfo_at(tcp, tcp->u_arg[1]);
+		tprints(", ");
 	}
 	else {
 		/* syscall exit, and u_arg[1] was NULL */

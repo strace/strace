@@ -637,6 +637,7 @@ extern void print_timespec(struct tcb *, long);
 extern void sprint_timespec(char *, struct tcb *, long);
 #ifdef HAVE_SIGINFO_T
 extern void printsiginfo(siginfo_t *, int);
+extern void printsiginfo_at(struct tcb *tcp, long addr);
 #endif
 extern void printfd(struct tcb *, int);
 extern void printsock(struct tcb *, long, int);
