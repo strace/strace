@@ -2260,9 +2260,11 @@ sys_ptrace(struct tcb *tcp)
 	if (entering(tcp)) {
 		printxval(ptrace_cmds, tcp->u_arg[0], "PTRACE_???");
 		tprintf(", %lu, ", tcp->u_arg[1]);
+
 		addr = tcp->u_arg[2];
 		if (tcp->u_arg[0] == PTRACE_PEEKUSER
-			|| tcp->u_arg[0] == PTRACE_POKEUSER) {
+		 || tcp->u_arg[0] == PTRACE_POKEUSER
+		) {
 			for (x = struct_user_offsets; x->str; x++) {
 				if (x->val >= addr)
 					break;
@@ -2275,9 +2277,15 @@ sys_ptrace(struct tcb *tcp)
 			}
 			else
 				tprintf("%s, ", x->str);
-		}
-		else
-			tprintf("%#lx, ", tcp->u_arg[2]);
+		} else
+#ifdef PTRACE_GETREGSET
+		//if (tcp->u_arg[0] == PTRACE_GET/SETREGSET) {
+		//	TODO: show tcp->u_arg[2] as "NT_xxx, "
+		//} else
+#endif
+			tprintf("%#lx, ", addr);
+
+
 		switch (tcp->u_arg[0]) {
 #ifndef IA64
 		case PTRACE_PEEKDATA:
@@ -2315,6 +2323,13 @@ sys_ptrace(struct tcb *tcp)
 			/* Don't print anything, do it at syscall return. */
 			break;
 #endif
+#ifdef PTRACE_GETREGSET
+		case PTRACE_GETREGSET:
+			break;
+		case PTRACE_SETREGSET:
+			tprint_iov(tcp, /*len:*/ 1, tcp->u_arg[3], /*as string:*/ 0);
+			break;
+#endif
 		default:
 			tprintf("%#lx", tcp->u_arg[3]);
 			break;
@@ -2343,6 +2358,11 @@ sys_ptrace(struct tcb *tcp)
 				printsiginfo(&si, verbose(tcp));
 			break;
 		}
+#endif
+#ifdef PTRACE_GETREGSET
+		case PTRACE_GETREGSET:
+			tprint_iov(tcp, /*len:*/ 1, tcp->u_arg[3], /*as string:*/ 0);
+			break;
 #endif
 		}
 	}
