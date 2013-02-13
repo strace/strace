@@ -671,7 +671,7 @@ static long ppc_result;
 #elif defined(M68K)
 static long m68k_d0;
 #elif defined(BFIN)
-static long r0;
+static long bfin_r0;
 #elif defined(ARM)
 struct pt_regs arm_regs; /* not static */
 #elif defined(AARCH64)
@@ -685,25 +685,25 @@ static struct iovec aarch64_io = {
 	.iov_base = &arm_regs_union
 };
 #elif defined(ALPHA)
-static long r0;
+static long alpha_r0;
 static long alpha_a3;
 #elif defined(AVR32)
 static struct pt_regs regs;
 #elif defined(SPARC) || defined(SPARC64)
 struct pt_regs regs; /* not static */
 #elif defined(LINUX_MIPSN32)
-static long long a3;
-static long long r2;
+static long long mips_a3;
+static long long mips_r2;
 #elif defined(MIPS)
-static long a3;
-static long r2;
+static long mips_a3;
+static long mips_r2;
 #elif defined(S390) || defined(S390X)
 static long gpr2;
 static long syscall_mode;
 #elif defined(HPPA)
 static long hppa_r28;
 #elif defined(SH)
-static long r0;
+static long sh_r0;
 #elif defined(SH64)
 static long sh64_r9;
 #elif defined(CRISV10) || defined(CRISV32)
@@ -1173,25 +1173,25 @@ get_scno(struct tcb *tcp)
 
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
 		return -1;
-	a3 = regs[REG_A3];
-	r2 = regs[REG_V0];
+	mips_a3 = regs[REG_A3];
+	mips_r2 = regs[REG_V0];
 
-	scno = r2;
+	scno = mips_r2;
 	if (!SCNO_IN_RANGE(scno)) {
-		if (a3 == 0 || a3 == -1) {
+		if (mips_a3 == 0 || mips_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
 			return 0;
 		}
 	}
 #elif defined(MIPS)
-	if (upeek(tcp, REG_A3, &a3) < 0)
+	if (upeek(tcp, REG_A3, &mips_a3) < 0)
 		return -1;
 	if (upeek(tcp, REG_V0, &scno) < 0)
 		return -1;
 
 	if (!SCNO_IN_RANGE(scno)) {
-		if (a3 == 0 || a3 == -1) {
+		if (mips_a3 == 0 || mips_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
 			return 0;
@@ -1830,7 +1830,7 @@ get_syscall_result(struct tcb *tcp)
 #elif defined(AVR32)
 	/* already done by get_regs */
 #elif defined(BFIN)
-	if (upeek(tcp, PT_R0, &r0) < 0)
+	if (upeek(tcp, PT_R0, &bfin_r0) < 0)
 		return -1;
 #elif defined(I386)
 	/* already done by get_regs */
@@ -1863,17 +1863,17 @@ get_syscall_result(struct tcb *tcp)
 
 	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
 		return -1;
-	a3 = regs[REG_A3];
-	r2 = regs[REG_V0];
+	mips_a3 = regs[REG_A3];
+	mips_r2 = regs[REG_V0];
 #elif defined(MIPS)
-	if (upeek(tcp, REG_A3, &a3) < 0)
+	if (upeek(tcp, REG_A3, &mips_a3) < 0)
 		return -1;
-	if (upeek(tcp, REG_V0, &r2) < 0)
+	if (upeek(tcp, REG_V0, &mips_r2) < 0)
 		return -1;
 #elif defined(ALPHA)
-	if (upeek(tcp, REG_A3, &a3) < 0)
+	if (upeek(tcp, REG_A3, &alpha_a3) < 0)
 		return -1;
-	if (upeek(tcp, REG_R0, &r0) < 0)
+	if (upeek(tcp, REG_R0, &alpha_r0) < 0)
 		return -1;
 #elif defined(SPARC) || defined(SPARC64)
 	/* already done by get_regs */
@@ -1882,7 +1882,7 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 #elif defined(SH)
 	/* new syscall ABI returns result in R0 */
-	if (upeek(tcp, 4*REG_REG0, (long *)&r0) < 0)
+	if (upeek(tcp, 4*REG_REG0, (long *)&sh_r0) < 0)
 		return -1;
 #elif defined(SH64)
 	/* ABI defines result returned in r9 */
@@ -2023,13 +2023,13 @@ get_error(struct tcb *tcp)
 		}
 	}
 #elif defined(MIPS)
-	if (check_errno && a3) {
+	if (check_errno && mips_a3) {
 		tcp->u_rval = -1;
-		u_error = r2;
+		u_error = mips_r2;
 	} else {
-		tcp->u_rval = r2;
+		tcp->u_rval = mips_r2;
 # if defined(LINUX_MIPSN32)
-		tcp->u_lrval = r2;
+		tcp->u_lrval = mips_r2;
 # endif
 	}
 #elif defined(POWERPC)
@@ -2079,19 +2079,19 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = regs.r12;
 	}
 #elif defined(BFIN)
-	if (check_errno && is_negated_errno(r0)) {
+	if (check_errno && is_negated_errno(bfin_r0)) {
 		tcp->u_rval = -1;
-		u_error = -r0;
+		u_error = -bfin_r0;
 	} else {
-		tcp->u_rval = r0;
+		tcp->u_rval = bfin_r0;
 	}
 #elif defined(ALPHA)
 	if (check_errno && alpha_a3) {
 		tcp->u_rval = -1;
-		u_error = r0;
+		u_error = alpha_r0;
 	}
 	else {
-		tcp->u_rval = r0;
+		tcp->u_rval = alpha_r0;
 	}
 #elif defined(SPARC)
 	if (check_errno && regs.psr & PSR_C) {
@@ -2118,12 +2118,12 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = hppa_r28;
 	}
 #elif defined(SH)
-	if (check_errno && is_negated_errno(r0)) {
+	if (check_errno && is_negated_errno(sh_r0)) {
 		tcp->u_rval = -1;
-		u_error = -r0;
+		u_error = -sh_r0;
 	}
 	else {
-		tcp->u_rval = r0;
+		tcp->u_rval = sh_r0;
 	}
 #elif defined(SH64)
 	if (check_errno && is_negated_errno(sh64_r9)) {
