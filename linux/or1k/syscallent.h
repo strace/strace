@@ -242,7 +242,7 @@
 	{  5,	TD,	sys_perf_event_open,		"perf_event_open"	}, /* 241 */
 	{  4,	TN,	sys_accept4,			"accept4"		}, /* 242 */
 	{  5,	TN,	sys_recvmmsg,			"recvmmsg"		}, /* 243 */
-	{  6,	NF,	sys_or1k_atomic,		"or1k_atomic" 		}, /* 244 */
+	{  6,	NF,	sys_or1k_atomic,		"or1k_atomic"		}, /* 244 */
 
 	[245 ... 259] = { },
 
