@@ -58,9 +58,6 @@ extern char *optarg;
 # define my_tkill(tid, sig) kill((tid), (sig))
 #endif
 
-#undef KERNEL_VERSION
-#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-
 cflag_t cflag = CFLAG_NONE;
 unsigned int followfork = 0;
 unsigned int ptrace_setoptions = 0;
@@ -146,7 +143,7 @@ static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
 static const char *progname;
 
-static unsigned os_release; /* generated from uname()'s u.release */
+unsigned os_release; /* generated from uname()'s u.release */
 
 static int detach(struct tcb *tcp);
 static int trace(void);

@@ -518,10 +518,13 @@ extern bool not_failing_only;
 extern bool show_fd_path;
 extern bool tracing_paths;
 extern bool need_fork_exec_workarounds;
-extern unsigned int xflag;
-extern unsigned int followfork;
-extern unsigned int ptrace_setoptions;
-extern unsigned int max_strlen;
+extern unsigned xflag;
+extern unsigned followfork;
+extern unsigned ptrace_setoptions;
+extern unsigned max_strlen;
+extern unsigned os_release;
+#undef KERNEL_VERSION
+#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 

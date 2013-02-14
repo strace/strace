@@ -65,6 +65,13 @@
 # include <asm/rse.h>
 #endif
 
+#if defined(X86_64) || defined(X32)
+# include <linux/ptrace.h>
+# include <asm/ptrace.h>
+# include <sys/uio.h>
+# include <elf.h>
+#endif
+
 #if defined(AARCH64)
 # include <asm/ptrace.h>
 # include <sys/uio.h>
@@ -657,12 +664,39 @@ is_restart_error(struct tcb *tcp)
 struct pt_regs i386_regs;
 #elif defined(X86_64) || defined(X32)
 /*
- * On 32 bits, pt_regs and user_regs_struct are the same,
- * but on 64 bits, user_regs_struct has six more fields:
+ * On i386, pt_regs and user_regs_struct are the same,
+ * but on 64 bit x86, user_regs_struct has six more fields:
  * fs_base, gs_base, ds, es, fs, gs.
  * PTRACE_GETREGS fills them too, so struct pt_regs would overflow.
  */
-static struct user_regs_struct x86_64_regs;
+struct i386_user_regs_struct {
+	uint32_t ebx;
+	uint32_t ecx;
+	uint32_t edx;
+	uint32_t esi;
+	uint32_t edi;
+	uint32_t ebp;
+	uint32_t eax;
+	uint32_t xds;
+	uint32_t xes;
+	uint32_t xfs;
+	uint32_t xgs;
+	uint32_t orig_eax;
+	uint32_t eip;
+	uint32_t xcs;
+	uint32_t eflags;
+	uint32_t esp;
+	uint32_t xss;
+};
+static union {
+	struct user_regs_struct      x86_64_r;
+	struct i386_user_regs_struct i386_r;
+} x86_regs_union;
+# define x86_64_regs x86_regs_union.x86_64_r
+# define i386_regs   x86_regs_union.i386_r
+static struct iovec x86_io = {
+	.iov_base = &x86_regs_union
+};
 #elif defined(IA64)
 long ia32 = 0; /* not static */
 static long ia64_r8, ia64_r10;
@@ -738,7 +772,16 @@ printcall(struct tcb *tcp)
 	tprintf("[%016lx] ", psw);
 # endif
 #elif defined(X86_64) || defined(X32)
-	tprintf("[%016lx] ", (unsigned long) x86_64_regs.rip);
+	if (x86_io.iov_len == sizeof(i386_regs)) {
+		tprintf("[%08x] ", (unsigned) i386_regs.eip);
+	} else {
+# if defined(X86_64)
+		tprintf("[%016lx] ", (unsigned long) x86_64_regs.rip);
+# elif defined(X32)
+		/* Note: this truncates 64-bit rip to 32 bits */
+		tprintf("[%08lx] ", (unsigned long) x86_64_regs.rip);
+# endif
+	}
 #elif defined(IA64)
 	long ip;
 
@@ -859,7 +902,40 @@ void get_regs(pid_t pid)
 # elif defined(I386)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
 # elif defined(X86_64) || defined(X32)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
+	/* PTRACE_GETREGSET was introduced around 2.6.25 */
+	if (os_release >= KERNEL_VERSION(2,6,30)) {
+		/*x86_io.iov_base = &x86_regs_union; - already is */
+		x86_io.iov_len = sizeof(x86_regs_union);
+		get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, (long) &x86_io);
+	} else {
+		/* Use old method, with heuristical detection of 32-bitness */
+		x86_io.iov_len = sizeof(x86_64_regs);
+		get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
+		if (!get_regs_error && x86_64_regs.cs == 0x23) {
+			x86_io.iov_len = sizeof(i386_regs);
+			/*
+			 * The order is important: i386_regs and x86_64_regs
+			 * are overlaid in memory!
+			 */
+			i386_regs.ebx = x86_64_regs.rbx;
+			i386_regs.ecx = x86_64_regs.rcx;
+			i386_regs.edx = x86_64_regs.rdx;
+			i386_regs.esi = x86_64_regs.rsi;
+			i386_regs.edi = x86_64_regs.rdi;
+			i386_regs.ebp = x86_64_regs.rbp;
+			i386_regs.eax = x86_64_regs.rax;
+			/*i386_regs.xds = x86_64_regs.ds; unused by strace */
+			/*i386_regs.xes = x86_64_regs.es; ditto... */
+			/*i386_regs.xfs = x86_64_regs.fs;*/
+			/*i386_regs.xgs = x86_64_regs.gs;*/
+			i386_regs.orig_eax = x86_64_regs.orig_rax;
+			i386_regs.eip = x86_64_regs.rip;
+			/*i386_regs.xcs = x86_64_regs.cs;*/
+			/*i386_regs.eflags = x86_64_regs.eflags;*/
+			i386_regs.esp = x86_64_regs.rsp;
+			/*i386_regs.xss = x86_64_regs.ss;*/
+		}
+	}
 # elif defined(ARM)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&arm_regs);
 # elif defined(AARCH64)
@@ -1015,14 +1091,33 @@ get_scno(struct tcb *tcp)
 #  define __X32_SYSCALL_BIT	0x40000000
 # endif
 	int currpers;
-	scno = x86_64_regs.orig_rax;
-
-	/* Check CS register value. On x86-64 linux it is:
-	 *	0x33	for long mode (64 bit)
-	 *	0x23	for compatibility mode (32 bit)
-	 * Check DS register value. On x86-64 linux it is:
-	 *	0x2b	for x32 mode (x86-64 in 32 bit)
+# if 1
+	/* GETREGSET of NT_PRSTATUS tells us regset size,
+	 * which unambiguously detects i386.
+	 *
+	 * Linux kernel distinguishes x86-64 and x32 processes
+	 * solely by looking at __X32_SYSCALL_BIT:
+	 * arch/x86/include/asm/compat.h::is_x32_task():
+	 * if (task_pt_regs(current)->orig_ax & __X32_SYSCALL_BIT)
+	 *         return true;
 	 */
+	if (x86_io.iov_len == sizeof(i386_regs)) {
+		scno = i386_regs.orig_eax;
+		currpers = 1;
+	} else {
+		scno = x86_64_regs.orig_rax;
+		currpers = 0;
+		if (scno & __X32_SYSCALL_BIT) {
+			scno -= __X32_SYSCALL_BIT;
+			currpers = 2;
+		}
+	}
+# elif 0
+	/* cs = 0x33 for long mode (native 64 bit and x32)
+	 * cs = 0x23 for compatibility mode (32 bit)
+	 * ds = 0x2b for x32 mode (x86-64 in 32 bit)
+	 */
+	scno = x86_64_regs.orig_rax;
 	switch (x86_64_regs.cs) {
 		case 0x23: currpers = 1; break;
 		case 0x33:
@@ -1039,19 +1134,15 @@ get_scno(struct tcb *tcp)
 			currpers = current_personality;
 			break;
 	}
-# if 0
+# elif 0
 	/* This version analyzes the opcode of a syscall instruction.
 	 * (int 0x80 on i386 vs. syscall on x86-64)
-	 * It works, but is too complicated.
+	 * It works, but is too complicated, and strictly speaking, unreliable.
 	 */
-	unsigned long val, rip, i;
-
-	rip = x86_64_regs.rip;
-
+	unsigned long call, rip = x86_64_regs.rip;
 	/* sizeof(syscall) == sizeof(int 0x80) == 2 */
 	rip -= 2;
 	errno = 0;
-
 	call = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)rip, (char *)0);
 	if (errno)
 		fprintf(stderr, "ptrace_peektext failed: %s\n",
@@ -1353,9 +1444,14 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	}
 #elif defined(X86_64) || defined(X32)
 	{
-		long rax = x86_64_regs.rax;
-		if (current_personality == 1)
-			rax = (int)rax; /* sign extend from 32 bits */
+		long rax;
+		if (x86_io.iov_len == sizeof(i386_regs)) {
+			/* Sign extend from 32 bits */
+			rax = (int32_t)i386_regs.eax;
+		} else {
+			/* Note: in X32 build, this truncates 64 to 32 bits */
+			rax = x86_64_regs.rax;
+		}
 		if (rax != -ENOSYS) {
 			if (debug_flag)
 				fprintf(stderr, "not a syscall entry (rax = %ld)\n", rax);
@@ -1649,7 +1745,8 @@ get_syscall_args(struct tcb *tcp)
 #elif defined(X86_64) || defined(X32)
 	(void)i;
 	(void)nargs;
-	if (current_personality != 1) { /* x86-64 or x32 ABI */
+	if (x86_io.iov_len != sizeof(i386_regs)) {
+		/* x86-64 or x32 ABI */
 		tcp->u_arg[0] = x86_64_regs.rdi;
 		tcp->u_arg[1] = x86_64_regs.rsi;
 		tcp->u_arg[2] = x86_64_regs.rdx;
@@ -1664,14 +1761,15 @@ get_syscall_args(struct tcb *tcp)
 		tcp->ext_arg[4] = x86_64_regs.r8;
 		tcp->ext_arg[5] = x86_64_regs.r9;
 #  endif
-	} else { /* i386 ABI */
-		/* Sign-extend lower 32 bits */
-		tcp->u_arg[0] = (long)(int)x86_64_regs.rbx;
-		tcp->u_arg[1] = (long)(int)x86_64_regs.rcx;
-		tcp->u_arg[2] = (long)(int)x86_64_regs.rdx;
-		tcp->u_arg[3] = (long)(int)x86_64_regs.rsi;
-		tcp->u_arg[4] = (long)(int)x86_64_regs.rdi;
-		tcp->u_arg[5] = (long)(int)x86_64_regs.rbp;
+	} else {
+		/* i386 ABI */
+		/* Sign-extend from 32 bits */
+		tcp->u_arg[0] = (long)(int32_t)i386_regs.ebx;
+		tcp->u_arg[1] = (long)(int32_t)i386_regs.ecx;
+		tcp->u_arg[2] = (long)(int32_t)i386_regs.edx;
+		tcp->u_arg[3] = (long)(int32_t)i386_regs.esi;
+		tcp->u_arg[4] = (long)(int32_t)i386_regs.edi;
+		tcp->u_arg[5] = (long)(int32_t)i386_regs.ebp;
 	}
 #elif defined(MICROBLAZE)
 	for (i = 0; i < nargs; ++i)
@@ -1985,22 +2083,39 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = i386_regs.eax;
 	}
 #elif defined(X86_64)
-	if (check_errno && is_negated_errno(x86_64_regs.rax)) {
+	long rax;
+	if (x86_io.iov_len == sizeof(i386_regs)) {
+		/* Sign extend from 32 bits */
+		rax = (int32_t)i386_regs.eax;
+	} else {
+		rax = x86_64_regs.rax;
+	}
+	if (check_errno && is_negated_errno(rax)) {
 		tcp->u_rval = -1;
-		u_error = -x86_64_regs.rax;
+		u_error = -rax;
 	}
 	else {
-		tcp->u_rval = x86_64_regs.rax;
+		tcp->u_rval = rax;
 	}
 #elif defined(X32)
+	/* In X32, return value is 64-bit (llseek uses one).
+	 * Using merely "long rax" would not work.
+	 */
+	long long rax;
+	if (x86_io.iov_len == sizeof(i386_regs)) {
+		/* Sign extend from 32 bits */
+		rax = (int32_t)i386_regs.eax;
+	} else {
+		rax = x86_64_regs.rax;
+	}
 	/* Careful: is_negated_errno() works only on longs */
-	if (check_errno && is_negated_errno_x32(x86_64_regs.rax)) {
+	if (check_errno && is_negated_errno_x32(rax)) {
 		tcp->u_rval = -1;
-		u_error = -x86_64_regs.rax;
+		u_error = -rax;
 	}
 	else {
-		tcp->u_rval = x86_64_regs.rax; /* truncating */
-		tcp->u_lrval = x86_64_regs.rax;
+		tcp->u_rval = rax; /* truncating */
+		tcp->u_lrval = rax;
 	}
 #elif defined(IA64)
 	if (ia32) {
