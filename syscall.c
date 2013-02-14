@@ -78,6 +78,11 @@
 # include <elf.h>
 #endif
 
+#if defined(OR1K)
+# include <sys/uio.h>
+# include <elf.h>
+#endif
+
 #ifndef ERESTARTSYS
 # define ERESTARTSYS	512
 #endif
@@ -746,6 +751,11 @@ static long cris_r10;
 struct pt_regs tile_regs;
 #elif defined(MICROBLAZE)
 static long microblaze_r3;
+#elif defined(OR1K)
+static struct user_regs_struct or1k_regs;
+static struct iovec or1k_io = {
+	.iov_base = &or1k_regs
+};
 #endif
 
 void
@@ -890,6 +900,8 @@ printcall(struct tcb *tcp)
 # else
 	tprintf("[%08lx] ", (unsigned long) tile_regs.pc);
 # endif
+#elif defined(OR1K)
+	tprintf("[%08lx] ", or1k_regs.pc);
 #endif /* architecture */
 }
 
@@ -962,6 +974,9 @@ void get_regs(pid_t pid)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&regs, 0);
 # elif defined(TILE)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &tile_regs);
+# elif defined(OR1K)
+	or1k_io.iov_len = sizeof(or1k_regs);
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &or1k_io);
 # endif
 }
 #endif
@@ -1419,6 +1434,8 @@ get_scno(struct tcb *tcp)
 #elif defined(MICROBLAZE)
 	if (upeek(tcp, 0, &scno) < 0)
 		return -1;
+#elif defined(OR1K)
+	scno = or1k_regs.gpr[11];
 #endif
 
 	tcp->scno = scno;
@@ -1800,6 +1817,10 @@ get_syscall_args(struct tcb *tcp)
 	tcp->u_arg[3] = i386_regs.esi;
 	tcp->u_arg[4] = i386_regs.edi;
 	tcp->u_arg[5] = i386_regs.ebp;
+#elif defined(OR1K)
+	(void)nargs;
+	for (i = 0; i < 6; ++i)
+		tcp->u_arg[i] = or1k_regs.gpr[3 + i];
 #else /* Other architecture (32bits specific) */
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, i*4, &tcp->u_arg[i]) < 0)
@@ -1994,6 +2015,8 @@ get_syscall_result(struct tcb *tcp)
 #elif defined(MICROBLAZE)
 	if (upeek(tcp, 3 * 4, &microblaze_r3) < 0)
 		return -1;
+#elif defined(OR1K)
+	/* already done by get_regs */
 #endif
 	return 1;
 }
@@ -2276,6 +2299,14 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = microblaze_r3;
+	}
+#elif defined(OR1K)
+	if (check_errno && is_negated_errno(or1k_regs.gpr[11])) {
+		tcp->u_rval = -1;
+		u_error = -or1k_regs.gpr[11];
+	}
+	else {
+		tcp->u_rval = or1k_regs.gpr[11];
 	}
 #endif
 	tcp->u_error = u_error;

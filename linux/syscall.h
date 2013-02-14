@@ -348,6 +348,10 @@ int sys_sysmips();
 int sys_cacheflush();
 #endif
 
+#if defined OR1K
+int sys_or1k_atomic();
+#endif
+
 #ifdef POWERPC
 int sys_subpage_prot();
 #endif

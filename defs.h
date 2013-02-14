@@ -138,6 +138,7 @@ extern char *stpcpy(char *dst, const char *src);
     || defined(X86_64) \
     || defined(ARM) || defined(AARCH64) \
     || defined(AVR32) \
+    || defined(OR1K) \
     ) && defined(__GLIBC__)
 # include <sys/ptrace.h>
 #else
@@ -564,7 +565,8 @@ extern void call_summary(FILE *);
  || defined(AARCH64) \
  || defined(ARM) \
  || defined(SPARC) || defined(SPARC64) \
- || defined(TILE)
+ || defined(TILE) \
+ || defined(OR1K)
 extern long get_regs_error;
 # define clear_regs()  (get_regs_error = -1)
 extern void get_regs(pid_t pid);

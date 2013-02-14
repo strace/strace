@@ -465,7 +465,8 @@ extern void print_ldt_entry();
 # define ARG_PTID	2
 # define ARG_CTID	3
 # define ARG_TLS	4
-#elif defined X86_64 || defined X32 || defined ALPHA || defined TILE
+#elif defined X86_64 || defined X32 || defined ALPHA || defined TILE \
+   || defined OR1K
 # define ARG_FLAGS	0
 # define ARG_STACK	1
 # define ARG_PTID	2
@@ -2107,6 +2108,42 @@ const struct xlat struct_user_offsets[] = {
 	{ PT_FSR,		"rfsr",					},
 	{ PT_KERNEL_MODE,	"kernel_mode",				},
 #endif
+#ifdef OR1K
+	{ 4*0,  "r0" },
+	{ 4*1,  "r1" },
+	{ 4*2,  "r2" },
+	{ 4*3,  "r3" },
+	{ 4*4,  "r4" },
+	{ 4*5,  "r5" },
+	{ 4*6,  "r6" },
+	{ 4*7,  "r7" },
+	{ 4*8,  "r8" },
+	{ 4*9,  "r9" },
+	{ 4*10, "r10" },
+	{ 4*11, "r11" },
+	{ 4*12, "r12" },
+	{ 4*13, "r13" },
+	{ 4*14, "r14" },
+	{ 4*15, "r15" },
+	{ 4*16, "r16" },
+	{ 4*17, "r17" },
+	{ 4*18, "r18" },
+	{ 4*19, "r19" },
+	{ 4*20, "r20" },
+	{ 4*21, "r21" },
+	{ 4*22, "r22" },
+	{ 4*23, "r23" },
+	{ 4*24, "r24" },
+	{ 4*25, "r25" },
+	{ 4*26, "r26" },
+	{ 4*27, "r27" },
+	{ 4*28, "r28" },
+	{ 4*29, "r29" },
+	{ 4*30, "r30" },
+	{ 4*31, "r31" },
+	{ 4*32, "pc" },
+	{ 4*33, "sr" },
+#endif
 	/* Other fields in "struct user" */
 #if defined(S390) || defined(S390X)
 	{ uoff(u_tsize),	"offsetof(struct user, u_tsize)"	},
@@ -2238,6 +2275,8 @@ const struct xlat struct_user_offsets[] = {
 	{ uoff(magic),		"offsetof(struct user, magic)"		},
 	{ uoff(u_comm),		"offsetof(struct user, u_comm)"		},
 	{ sizeof(struct user),	"sizeof(struct user)"			},
+#elif defined(OR1K)
+	/* nothing */
 #endif
 	{ 0,			NULL					},
 };

@@ -111,6 +111,11 @@ microblaze*)
 	arch=microblaze
 	AC_DEFINE([MICROBLAZE], 1, [Define for the MicroBlaze architecture.])
 	;;
+or1k*)
+	arch=or1k
+	AC_DEFINE([OR1K], 1, [Define for the OpenRISC 1000 architecture.])
+	;;
+
 *)
 	AC_MSG_RESULT([NO!])
 	AC_MSG_ERROR([architecture $host_cpu is not supported by strace])
