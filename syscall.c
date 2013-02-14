@@ -914,8 +914,11 @@ void get_regs(pid_t pid)
 # elif defined(I386)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
 # elif defined(X86_64) || defined(X32)
-	/* PTRACE_GETREGSET was introduced around 2.6.25 */
-	if (os_release >= KERNEL_VERSION(2,6,30)) {
+	/*
+	 * PTRACE_GETREGSET was introduced in 2.6.33.
+	 * Let's be paranoid and require a bit later kernel.
+	 */
+	if (os_release >= KERNEL_VERSION(2,6,35)) {
 		/*x86_io.iov_base = &x86_regs_union; - already is */
 		x86_io.iov_len = sizeof(x86_regs_union);
 		get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, (long) &x86_io);
