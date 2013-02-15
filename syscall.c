@@ -67,7 +67,6 @@
 
 #if defined(X86_64) || defined(X32)
 # include <linux/ptrace.h>
-# include <asm/ptrace.h>
 # include <sys/uio.h>
 # include <elf.h>
 #endif
@@ -672,7 +671,7 @@ is_restart_error(struct tcb *tcp)
 }
 
 #if defined(I386)
-struct pt_regs i386_regs;
+struct user_regs_struct i386_regs;
 #elif defined(X86_64) || defined(X32)
 /*
  * On i386, pt_regs and user_regs_struct are the same,

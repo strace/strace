@@ -154,6 +154,10 @@ extern char *stpcpy(char *dst, const char *src);
 extern long ptrace(int, int, char *, long);
 #endif
 
+#if defined(TILE)
+# include <asm/ptrace.h>  /* struct pt_regs */
+#endif
+
 #if !HAVE_DECL_PTRACE_SETOPTIONS
 # define PTRACE_SETOPTIONS	0x4200
 #endif
@@ -218,12 +222,6 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_EVENT_STOP	128
 #endif
 
-#if defined(X86_64) || defined(X32) || defined(I386) || defined(TILE)
-/* For struct pt_regs. x86 strace uses PTRACE_GETREGS.
- * PTRACE_GETREGS returns registers in the layout of this struct.
- */
-# include <asm/ptrace.h>
-#endif
 #ifdef ALPHA
 # define REG_R0 0
 # define REG_A0 16
@@ -356,7 +354,7 @@ struct arm_pt_regs {
 #endif
 
 #if defined(I386)
-extern struct pt_regs i386_regs;
+extern struct user_regs_struct i386_regs;
 #endif
 #if defined(IA64)
 extern long ia32;
