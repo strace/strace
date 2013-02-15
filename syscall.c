@@ -1768,6 +1768,15 @@ get_syscall_args(struct tcb *tcp)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, REG_GENERAL(syscall_regs[i]), &tcp->u_arg[i]) < 0)
 			return -1;
+#elif defined(I386)
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = i386_regs.ebx;
+	tcp->u_arg[1] = i386_regs.ecx;
+	tcp->u_arg[2] = i386_regs.edx;
+	tcp->u_arg[3] = i386_regs.esi;
+	tcp->u_arg[4] = i386_regs.edi;
+	tcp->u_arg[5] = i386_regs.ebp;
 #elif defined(X86_64) || defined(X32)
 	(void)i;
 	(void)nargs;
@@ -1789,13 +1798,16 @@ get_syscall_args(struct tcb *tcp)
 #  endif
 	} else {
 		/* i386 ABI */
-		/* Sign-extend from 32 bits */
-		tcp->u_arg[0] = (long)(int32_t)i386_regs.ebx;
-		tcp->u_arg[1] = (long)(int32_t)i386_regs.ecx;
-		tcp->u_arg[2] = (long)(int32_t)i386_regs.edx;
-		tcp->u_arg[3] = (long)(int32_t)i386_regs.esi;
-		tcp->u_arg[4] = (long)(int32_t)i386_regs.edi;
-		tcp->u_arg[5] = (long)(int32_t)i386_regs.ebp;
+		/* Zero-extend from 32 bits */
+		/* Use widen_to_long(tcp->u_arg[N]) in syscall handlers
+		 * if you need to use *sign-extended* parameter.
+		 */
+		tcp->u_arg[0] = (long)(uint32_t)i386_regs.ebx;
+		tcp->u_arg[1] = (long)(uint32_t)i386_regs.ecx;
+		tcp->u_arg[2] = (long)(uint32_t)i386_regs.edx;
+		tcp->u_arg[3] = (long)(uint32_t)i386_regs.esi;
+		tcp->u_arg[4] = (long)(uint32_t)i386_regs.edi;
+		tcp->u_arg[5] = (long)(uint32_t)i386_regs.ebp;
 	}
 #elif defined(MICROBLAZE)
 	for (i = 0; i < nargs; ++i)
@@ -1817,15 +1829,6 @@ get_syscall_args(struct tcb *tcp)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, (i < 5 ? i : i + 2)*4, &tcp->u_arg[i]) < 0)
 			return -1;
-#elif defined(I386)
-	(void)i;
-	(void)nargs;
-	tcp->u_arg[0] = i386_regs.ebx;
-	tcp->u_arg[1] = i386_regs.ecx;
-	tcp->u_arg[2] = i386_regs.edx;
-	tcp->u_arg[3] = i386_regs.esi;
-	tcp->u_arg[4] = i386_regs.edi;
-	tcp->u_arg[5] = i386_regs.ebp;
 #elif defined(OR1K)
 	(void)nargs;
 	for (i = 0; i < 6; ++i)
