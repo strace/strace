@@ -1205,7 +1205,6 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 #elif defined(X32)
 	/* setbpt/clearbpt never used: */
 	/* X32 is only supported since about linux-3.0.30 */
-	return 0;
 #elif defined(POWERPC)
 	if (ptrace(PTRACE_POKEUSER, tcp->pid,
 		   (char*)(sizeof(unsigned long)*PT_R0), new) < 0)
@@ -1234,11 +1233,9 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 #elif defined(AVR32)
 	/* setbpt/clearbpt never used: */
 	/* AVR32 is only supported since about linux-2.6.19 */
-	return 0;
 #elif defined(BFIN)
 	/* setbpt/clearbpt never used: */
 	/* Blackfin is only supported since about linux-2.6.23 */
-	return 0;
 #elif defined(IA64)
 	if (ia32) {
 		switch (new) {
@@ -1287,15 +1284,12 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 #elif defined(AARCH64)
 	/* setbpt/clearbpt never used: */
 	/* AARCH64 is only supported since about linux-3.0.31 */
-	return 0;
 #elif defined(TILE)
 	/* setbpt/clearbpt never used: */
 	/* Tilera CPUs are only supported since about linux-2.6.34 */
-	return 0;
 #elif defined(MICROBLAZE)
 	/* setbpt/clearbpt never used: */
 	/* microblaze is only supported since about linux-2.6.30 */
-	return 0;
 #elif defined(OR1K)
 	/* never reached; OR1K is only supported by kernels since 3.1.0. */
 #else
