@@ -1432,14 +1432,6 @@ get_scno(struct tcb *tcp)
 		currpers = 0;
 # endif
 	update_personality(tcp, currpers);
-
-	if (!(tcp->flags & TCB_INSYSCALL)) {
-		/* Check if we return from execve. */
-		if (tcp->flags & TCB_WAITEXECVE) {
-			tcp->flags &= ~TCB_WAITEXECVE;
-			return 0;
-		}
-	}
 #elif defined(MICROBLAZE)
 	if (upeek(tcp, 0, &scno) < 0)
 		return -1;
