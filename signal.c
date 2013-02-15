@@ -1117,13 +1117,10 @@ int
 sys_kill(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		long pid = tcp->u_arg[0];
-#if SUPPORTED_PERSONALITIES > 1
-		/* Sign-extend a 32-bit value when that's what it is. */
-		if (current_wordsize < sizeof pid)
-			pid = (long) (int) pid;
-#endif
-		tprintf("%ld, %s", pid, signame(tcp->u_arg[1]));
+		tprintf("%ld, %s",
+			widen_to_long(tcp->u_arg[0]),
+			signame(tcp->u_arg[1])
+		);
 	}
 	return 0;
 }
@@ -1133,7 +1130,10 @@ sys_tgkill(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld, %s",
-			tcp->u_arg[0], tcp->u_arg[1], signame(tcp->u_arg[2]));
+			widen_to_long(tcp->u_arg[0]),
+			widen_to_long(tcp->u_arg[1]),
+			signame(tcp->u_arg[2])
+		);
 	}
 	return 0;
 }

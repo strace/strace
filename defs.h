@@ -723,6 +723,16 @@ extern unsigned current_wordsize;
 # endif
 #endif
 
+/* In many, many places we play fast and loose and use
+ * tprintf("%d", (int) tcp->u_arg[N]) to print fds, pids etc.
+ * We probably need to use widen_to_long() instead:
+ */
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+# define widen_to_long(v) (current_wordsize == 4 ? (long)(int32_t)(v) : (long)(v))
+#else
+# define widen_to_long(v) ((long)(v))
+#endif
+
 struct sysent {
 	unsigned nargs;
 	int	sys_flags;

@@ -173,8 +173,7 @@ decode_rlimit(struct tcb *tcp, unsigned long addr)
 {
 	if (!addr)
 		tprints("NULL");
-	else if (!verbose(tcp) ||
-		 (exiting(tcp) && syserror(tcp)))
+	else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)))
 		tprintf("%#lx", addr);
 	else {
 # if SIZEOF_RLIM_T == 4
