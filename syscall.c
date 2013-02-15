@@ -214,15 +214,18 @@ unsigned nioctlents = nioctlents0;
 int *qual_flags = qual_flags0;
 
 #if SUPPORTED_PERSONALITIES > 1
-int current_personality;
+unsigned current_personality;
 
-const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
+# ifndef current_wordsize
+unsigned current_wordsize;
+static const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 	PERSONALITY0_WORDSIZE,
 	PERSONALITY1_WORDSIZE,
 # if SUPPORTED_PERSONALITIES > 2
 	PERSONALITY2_WORDSIZE,
 # endif
 };
+# endif
 
 void
 set_personality(int personality)
@@ -268,6 +271,9 @@ set_personality(int personality)
 	}
 
 	current_personality = personality;
+# ifndef current_wordsize
+	current_wordsize = personality_wordsize[personality];
+# endif
 }
 
 static void

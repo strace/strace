@@ -707,13 +707,20 @@ extern void tprints(const char *str);
 
 #if SUPPORTED_PERSONALITIES > 1
 extern void set_personality(int personality);
-extern int current_personality;
-extern const int personality_wordsize[];
-# define current_wordsize (personality_wordsize[current_personality])
+extern unsigned current_personality;
 #else
 # define set_personality(personality) ((void)0)
 # define current_personality 0
-# define current_wordsize    PERSONALITY0_WORDSIZE
+#endif
+
+#if SUPPORTED_PERSONALITIES == 1
+# define current_wordsize PERSONALITY0_WORDSIZE
+#else
+# if SUPPORTED_PERSONALITIES == 2 && PERSONALITY0_WORDSIZE == PERSONALITY1_WORDSIZE
+#  define current_wordsize PERSONALITY0_WORDSIZE
+# else
+extern unsigned current_wordsize;
+# endif
 #endif
 
 struct sysent {
