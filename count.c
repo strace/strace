@@ -48,7 +48,7 @@ static struct timeval shortest = { 1000000, 0 };
 void
 count_syscall(struct tcb *tcp, struct timeval *tv)
 {
-	if (!SCNO_IN_RANGE(tcp->scno))
+	if (!SCNO_IS_VALID(tcp->scno))
 		return;
 
 	if (!counts) {

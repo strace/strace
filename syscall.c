@@ -1281,7 +1281,7 @@ get_scno(struct tcb *tcp)
 	mips_r2 = regs[REG_V0];
 
 	scno = mips_r2;
-	if (!SCNO_IN_RANGE(scno)) {
+	if (!SCNO_IS_VALID(scno)) {
 		if (mips_a3 == 0 || mips_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
@@ -1294,7 +1294,7 @@ get_scno(struct tcb *tcp)
 	if (upeek(tcp, REG_V0, &scno) < 0)
 		return -1;
 
-	if (!SCNO_IN_RANGE(scno)) {
+	if (!SCNO_IS_VALID(scno)) {
 		if (mips_a3 == 0 || mips_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
@@ -1311,7 +1311,7 @@ get_scno(struct tcb *tcp)
 	 * Do some sanity checks to figure out if it's
 	 * really a syscall entry
 	 */
-	if (!SCNO_IN_RANGE(scno)) {
+	if (!SCNO_IS_VALID(scno)) {
 		if (alpha_a3 == 0 || alpha_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
@@ -1579,7 +1579,7 @@ syscall_fixup_for_fork_exec(struct tcb *tcp)
 	 */
 	int (*func)();
 
-	if (!SCNO_IN_RANGE(tcp->scno))
+	if (!SCNO_IS_VALID(tcp->scno))
 		return;
 
 	func = sysent[tcp->scno].sys_func;
@@ -1610,7 +1610,7 @@ get_syscall_args(struct tcb *tcp)
 {
 	int i, nargs;
 
-	if (SCNO_IN_RANGE(tcp->scno))
+	if (SCNO_IS_VALID(tcp->scno))
 		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
 	else
 		nargs = tcp->u_nargs = MAX_ARGS;
@@ -1850,7 +1850,7 @@ trace_syscall_entering(struct tcb *tcp)
 		printleader(tcp);
 		if (scno_good != 1)
 			tprints("????" /* anti-trigraph gap */ "(");
-		else if (!SCNO_IN_RANGE(tcp->scno))
+		else if (!SCNO_IS_VALID(tcp->scno))
 			tprintf("syscall_%lu(", tcp->scno);
 		else
 			tprintf("%s(", sysent[tcp->scno].sys_name);
@@ -1862,7 +1862,7 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 
 #if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
-	while (SCNO_IN_RANGE(tcp->scno)) {
+	while (SCNO_IS_VALID(tcp->scno)) {
 # ifdef SYS_socket_subcall
 		if (sysent[tcp->scno].sys_func == sys_socketcall) {
 			decode_socket_subcall(tcp);
@@ -1882,7 +1882,7 @@ trace_syscall_entering(struct tcb *tcp)
 	if (need_fork_exec_workarounds)
 		syscall_fixup_for_fork_exec(tcp);
 
-	if ((SCNO_IN_RANGE(tcp->scno) &&
+	if ((SCNO_IS_VALID(tcp->scno) &&
 	     !(qual_flags[tcp->scno] & QUAL_TRACE)) ||
 	    (tracing_paths && !pathtrace_match(tcp))) {
 		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
@@ -1897,11 +1897,11 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 
 	printleader(tcp);
-	if (!SCNO_IN_RANGE(tcp->scno))
+	if (!SCNO_IS_VALID(tcp->scno))
 		tprintf("syscall_%lu(", tcp->scno);
 	else
 		tprintf("%s(", sysent[tcp->scno].sys_name);
-	if (!SCNO_IN_RANGE(tcp->scno) ||
+	if (!SCNO_IS_VALID(tcp->scno) ||
 	    ((qual_flags[tcp->scno] & QUAL_RAW) &&
 	     sysent[tcp->scno].sys_func != sys_exit))
 		res = printargs(tcp);
@@ -2078,8 +2078,9 @@ get_error(struct tcb *tcp)
 {
 	int u_error = 0;
 	int check_errno = 1;
-	if (SCNO_IN_RANGE(tcp->scno) &&
-	    sysent[tcp->scno].sys_flags & SYSCALL_NEVER_FAILS) {
+	if (SCNO_IS_VALID(tcp->scno)
+	 && (sysent[tcp->scno].sys_flags & SYSCALL_NEVER_FAILS)
+	) {
 		check_errno = 0;
 	}
 #if defined(S390) || defined(S390X)
@@ -2313,7 +2314,7 @@ dumpio(struct tcb *tcp)
 		return;
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= MAX_QUALS)
 		return;
-	if (!SCNO_IN_RANGE(tcp->scno))
+	if (!SCNO_IS_VALID(tcp->scno))
 		return;
 	if (sysent[tcp->scno].sys_func == printargs)
 		return;
@@ -2387,7 +2388,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		if (!SCNO_IN_RANGE(tcp->scno))
+		if (!SCNO_IS_VALID(tcp->scno))
 			tprintf("<... syscall_%lu resumed> ", tcp->scno);
 		else
 			tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
@@ -2405,7 +2406,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 
 	sys_res = 0;
-	if (!SCNO_IN_RANGE(tcp->scno)
+	if (!SCNO_IS_VALID(tcp->scno)
 	    || (qual_flags[tcp->scno] & QUAL_RAW)) {
 		/* sys_res = printargs(tcp); - but it's nop on sysexit */
 	} else {
@@ -2425,7 +2426,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	tprints(") ");
 	tabto();
 	u_error = tcp->u_error;
-	if (!SCNO_IN_RANGE(tcp->scno) ||
+	if (!SCNO_IS_VALID(tcp->scno) ||
 	    qual_flags[tcp->scno] & QUAL_RAW) {
 		if (u_error)
 			tprintf("= -1 (errno %ld)", u_error);

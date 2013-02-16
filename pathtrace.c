@@ -162,7 +162,7 @@ pathtrace_match(struct tcb *tcp)
 	if (selected[0] == NULL)
 		return 1;
 
-	if (!SCNO_IN_RANGE(tcp->scno))
+	if (!SCNO_IS_VALID(tcp->scno))
 		return 0;
 
 	s = &sysent[tcp->scno];

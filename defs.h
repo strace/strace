@@ -753,5 +753,5 @@ extern unsigned nioctlents;
 extern const char *const *signalent;
 extern unsigned nsignals;
 
-#define SCNO_IN_RANGE(scno) \
+#define SCNO_IS_VALID(scno) \
   ((unsigned long)(scno) < nsyscalls && sysent[scno].sys_func)
