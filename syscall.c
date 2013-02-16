@@ -2073,12 +2073,12 @@ is_negated_errno_x32(unsigned long long val)
  * -1: error, trace_syscall_exiting() should print error indicator
  *    ("????" etc) and bail out.
  */
-static int
+static void
 get_error(struct tcb *tcp)
 {
 	int u_error = 0;
 	int check_errno = 1;
-	if (SCNO_IS_VALID(tcp->scno)
+	if (SCNO_IN_RANGE(tcp->scno)
 	 && (sysent[tcp->scno].sys_flags & SYSCALL_NEVER_FAILS)
 	) {
 		check_errno = 0;
@@ -2304,7 +2304,6 @@ get_error(struct tcb *tcp)
 	}
 #endif
 	tcp->u_error = u_error;
-	return 1;
 }
 
 static void
@@ -2358,14 +2357,11 @@ trace_syscall_exiting(struct tcb *tcp)
 	res = (get_regs_error ? -1 : get_syscall_result(tcp));
 	if (res == 1) {
 		syscall_fixup_on_sysexit(tcp); /* never fails */
-		res = get_error(tcp); /* returns 1 or -1 */
-		if (res == 1) {
-			if (need_fork_exec_workarounds)
-				syscall_fixup_for_fork_exec(tcp);
-			if (filtered(tcp)) {
-				goto ret;
-			}
-		}
+		get_error(tcp); /* never fails */
+		if (need_fork_exec_workarounds)
+			syscall_fixup_for_fork_exec(tcp);
+		if (filtered(tcp))
+			goto ret;
 	}
 
 	if (cflag) {

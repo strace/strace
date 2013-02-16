@@ -753,5 +753,12 @@ extern unsigned nioctlents;
 extern const char *const *signalent;
 extern unsigned nsignals;
 
+/*
+ * If you need non-NULL sysent[scno].sys_func and sysent[scno].sys_name
+ */
 #define SCNO_IS_VALID(scno) \
-  ((unsigned long)(scno) < nsyscalls && sysent[scno].sys_func)
+	((unsigned long)(scno) < nsyscalls && sysent[scno].sys_func)
+
+/* Only ensures that sysent[scno] isn't out of range */
+#define SCNO_IN_RANGE(scno) \
+	((unsigned long)(scno) < nsyscalls)
