@@ -911,7 +911,7 @@ sys_sigreturn(struct tcb *tcp)
 		long i1;
 		m_siginfo_t si;
 		sigset_t sigm;
-		i1 = regs.u_regs[U_REG_O1];
+		i1 = sparc_regs.u_regs[U_REG_O1];
 		if (umove(tcp, i1, &si) < 0) {
 			perror_msg("%s", "sigreturn: umove");
 			return 0;

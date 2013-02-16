@@ -642,7 +642,7 @@ getrval2(struct tcb *tcp)
 	long val;
 
 # if defined(SPARC) || defined(SPARC64)
-	val = regs.u_regs[U_REG_O1];
+	val = sparc_regs.u_regs[U_REG_O1];
 # elif defined(SH)
 	if (upeek(tcp, 4*(REG_REG0+1), &val) < 0)
 		return -1;
@@ -732,9 +732,9 @@ static struct iovec aarch64_io = {
 static long alpha_r0;
 static long alpha_a3;
 #elif defined(AVR32)
-static struct pt_regs regs;
+static struct pt_regs avr32_regs;
 #elif defined(SPARC) || defined(SPARC64)
-struct pt_regs regs; /* not static */
+struct pt_regs sparc_regs; /* not static */
 #elif defined(LINUX_MIPSN32)
 static long long mips_a3;
 static long long mips_r2;
@@ -799,7 +799,6 @@ printcall(struct tcb *tcp)
 	}
 #elif defined(IA64)
 	long ip;
-
 	if (upeek(tcp, PT_B0, &ip) < 0) {
 		PRINTBADPC;
 		return;
@@ -807,7 +806,6 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", ip);
 #elif defined(POWERPC)
 	long pc;
-
 	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
 		PRINTBADPC;
 		return;
@@ -819,7 +817,6 @@ printcall(struct tcb *tcp)
 # endif
 #elif defined(M68K)
 	long pc;
-
 	if (upeek(tcp, 4*PT_PC, &pc) < 0) {
 		tprints("[????????] ");
 		return;
@@ -827,19 +824,17 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(ALPHA)
 	long pc;
-
 	if (upeek(tcp, REG_PC, &pc) < 0) {
 		tprints("[????????????????] ");
 		return;
 	}
 	tprintf("[%08lx] ", pc);
 #elif defined(SPARC)
-	tprintf("[%08lx] ", regs.pc);
+	tprintf("[%08lx] ", sparc_regs.pc);
 #elif defined(SPARC64)
-	tprintf("[%08lx] ", regs.tpc);
+	tprintf("[%08lx] ", sparc_regs.tpc);
 #elif defined(HPPA)
 	long pc;
-
 	if (upeek(tcp, PT_IAOQ0, &pc) < 0) {
 		tprints("[????????] ");
 		return;
@@ -847,7 +842,6 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(MIPS)
 	long pc;
-
 	if (upeek(tcp, REG_EPC, &pc) < 0) {
 		tprints("[????????] ");
 		return;
@@ -855,7 +849,6 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(SH)
 	long pc;
-
 	if (upeek(tcp, 4*REG_PC, &pc) < 0) {
 		tprints("[????????] ");
 		return;
@@ -863,7 +856,6 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(SH64)
 	long pc;
-
 	if (upeek(tcp, REG_PC, &pc) < 0) {
 		tprints("[????????????????] ");
 		return;
@@ -874,10 +866,9 @@ printcall(struct tcb *tcp)
 #elif defined(AARCH64)
 	/* tprintf("[%016lx] ", aarch64_regs.regs[???]); */
 #elif defined(AVR32)
-	tprintf("[%08lx] ", regs.pc);
+	tprintf("[%08lx] ", avr32_regs.pc);
 #elif defined(BFIN)
 	long pc;
-
 	if (upeek(tcp, PT_PC, &pc) < 0) {
 		PRINTBADPC;
 		return;
@@ -885,7 +876,6 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(CRISV10)
 	long pc;
-
 	if (upeek(tcp, 4*PT_IRP, &pc) < 0) {
 		PRINTBADPC;
 		return;
@@ -893,7 +883,6 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", pc);
 #elif defined(CRISV32)
 	long pc;
-
 	if (upeek(tcp, 4*PT_ERP, &pc) < 0) {
 		PRINTBADPC;
 		return;
@@ -912,10 +901,11 @@ printcall(struct tcb *tcp)
 
 #ifndef get_regs
 long get_regs_error;
-void get_regs(pid_t pid)
+void
+get_regs(pid_t pid)
 {
 # if defined(AVR32)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &regs);
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &avr32_regs);
 # elif defined(I386)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
 # elif defined(X86_64) || defined(X32)
@@ -979,7 +969,7 @@ void get_regs(pid_t pid)
 	}
 #  endif
 # elif defined(SPARC) || defined(SPARC64)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&regs, 0);
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&sparc_regs, 0);
 # elif defined(TILE)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &tile_regs);
 # elif defined(OR1K)
@@ -1103,7 +1093,7 @@ get_scno(struct tcb *tcp)
 	update_personality(tcp, currpers);
 # endif
 #elif defined(AVR32)
-	scno = regs.r8;
+	scno = avr32_regs.r8;
 #elif defined(BFIN)
 	if (upeek(tcp, PT_ORIG_P0, &scno))
 		return -1;
@@ -1334,10 +1324,10 @@ get_scno(struct tcb *tcp)
 	unsigned long trap;
 	errno = 0;
 # if defined(SPARC64)
-	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.tpc, 0);
+	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)sparc_regs.tpc, 0);
 	trap >>= 32;
 # else
-	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)regs.pc, 0);
+	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)sparc_regs.pc, 0);
 # endif
 	if (errno)
 		return -1;
@@ -1370,9 +1360,9 @@ get_scno(struct tcb *tcp)
 		break;
 	default:
 # if defined(SPARC64)
-		fprintf(stderr, "syscall: unknown syscall trap %08lx %016lx\n", trap, regs.tpc);
+		fprintf(stderr, "syscall: unknown syscall trap %08lx %016lx\n", trap, sparc_regs.tpc);
 # else
-		fprintf(stderr, "syscall: unknown syscall trap %08lx %08lx\n", trap, regs.pc);
+		fprintf(stderr, "syscall: unknown syscall trap %08lx %08lx\n", trap, sparc_regs.pc);
 # endif
 		return -1;
 	}
@@ -1381,10 +1371,10 @@ get_scno(struct tcb *tcp)
 	if (trap == 0x91d02027)
 		scno = 156;
 	else
-		scno = regs.u_regs[U_REG_G1];
+		scno = sparc_regs.u_regs[U_REG_G1];
 	if (scno == 0) {
-		scno = regs.u_regs[U_REG_O0];
-		memmove(&regs.u_regs[U_REG_O0], &regs.u_regs[U_REG_O1], 7*sizeof(regs.u_regs[0]));
+		scno = sparc_regs.u_regs[U_REG_O0];
+		memmove(&sparc_regs.u_regs[U_REG_O0], &sparc_regs.u_regs[U_REG_O1], 7*sizeof(sparc_regs.u_regs[0]));
 	}
 #elif defined(HPPA)
 	if (upeek(tcp, PT_GR20, &scno) < 0)
@@ -1713,7 +1703,7 @@ get_syscall_args(struct tcb *tcp)
 	}
 #elif defined(SPARC) || defined(SPARC64)
 	for (i = 0; i < nargs; ++i)
-		tcp->u_arg[i] = regs.u_regs[U_REG_O0 + i];
+		tcp->u_arg[i] = sparc_regs.u_regs[U_REG_O0 + i];
 #elif defined(HPPA)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, PT_GR26-4*i, &tcp->u_arg[i]) < 0)
@@ -1730,12 +1720,12 @@ get_syscall_args(struct tcb *tcp)
 #elif defined(AVR32)
 	(void)i;
 	(void)nargs;
-	tcp->u_arg[0] = regs.r12;
-	tcp->u_arg[1] = regs.r11;
-	tcp->u_arg[2] = regs.r10;
-	tcp->u_arg[3] = regs.r9;
-	tcp->u_arg[4] = regs.r5;
-	tcp->u_arg[5] = regs.r3;
+	tcp->u_arg[0] = avr32_regs.r12;
+	tcp->u_arg[1] = avr32_regs.r11;
+	tcp->u_arg[2] = avr32_regs.r10;
+	tcp->u_arg[3] = avr32_regs.r9;
+	tcp->u_arg[4] = avr32_regs.r5;
+	tcp->u_arg[5] = avr32_regs.r3;
 #elif defined(BFIN)
 	static const int argreg[MAX_ARGS] = { PT_R0, PT_R1, PT_R2, PT_R3, PT_R4, PT_R5 };
 
@@ -2212,12 +2202,12 @@ get_error(struct tcb *tcp)
 		}
 	}
 #elif defined(AVR32)
-	if (check_errno && regs.r12 && (unsigned) -regs.r12 < nerrnos) {
+	if (check_errno && avr32_regs.r12 && (unsigned) -avr32_regs.r12 < nerrnos) {
 		tcp->u_rval = -1;
-		u_error = -regs.r12;
+		u_error = -avr32_regs.r12;
 	}
 	else {
-		tcp->u_rval = regs.r12;
+		tcp->u_rval = avr32_regs.r12;
 	}
 #elif defined(BFIN)
 	if (check_errno && is_negated_errno(bfin_r0)) {
@@ -2235,20 +2225,20 @@ get_error(struct tcb *tcp)
 		tcp->u_rval = alpha_r0;
 	}
 #elif defined(SPARC)
-	if (check_errno && regs.psr & PSR_C) {
+	if (check_errno && sparc_regs.psr & PSR_C) {
 		tcp->u_rval = -1;
-		u_error = regs.u_regs[U_REG_O0];
+		u_error = sparc_regs.u_regs[U_REG_O0];
 	}
 	else {
-		tcp->u_rval = regs.u_regs[U_REG_O0];
+		tcp->u_rval = sparc_regs.u_regs[U_REG_O0];
 	}
 #elif defined(SPARC64)
-	if (check_errno && regs.tstate & 0x1100000000UL) {
+	if (check_errno && sparc_regs.tstate & 0x1100000000UL) {
 		tcp->u_rval = -1;
-		u_error = regs.u_regs[U_REG_O0];
+		u_error = sparc_regs.u_regs[U_REG_O0];
 	}
 	else {
-		tcp->u_rval = regs.u_regs[U_REG_O0];
+		tcp->u_rval = sparc_regs.u_regs[U_REG_O0];
 	}
 #elif defined(HPPA)
 	if (check_errno && is_negated_errno(hppa_r28)) {
