@@ -559,7 +559,7 @@ sys_lseek(struct tcb *tcp)
 int
 sys_lseek(struct tcb *tcp)
 {
-	off_t offset;
+	long offset;
 	int whence;
 
 	if (entering(tcp)) {
@@ -586,7 +586,8 @@ sys_lseek(struct tcb *tcp)
  * ((loff_t) hi << 32) | lo
  * Note that for architectures with kernel's long wider than userspace long
  * (such as x32), combining code will use *kernel's*, i.e. *wide* longs
- * for hi and lo. We may need to use tcp->ext_arg[N]!
+ * for hi and lo. We would need to use tcp->ext_arg[N] on x32...
+ * ...however, x32 (and x86_64) does not _have_ llseek syscall as such.
  */
 int
 sys_llseek(struct tcb *tcp)
