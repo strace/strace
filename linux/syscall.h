@@ -313,22 +313,19 @@ int sys_osf_utimes();
 int sys_osf_wait4();
 #endif
 
-#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && \
-	!defined(__ARM_EABI__)
+#if !defined(ALPHA) \
+ && !defined(MIPS) \
+ && !defined(HPPA) \
+ && !defined(__ARM_EABI__)
 # if defined(SPARC) || defined(SPARC64)
 #  define SYS_socket_subcall	353
 # else
 #  define SYS_socket_subcall	400
 # endif
-
-#define SYS_socket_nsubcalls	20
-#endif /* !(ALPHA || MIPS || HPPA) */
-
-#if !defined(ALPHA) && !defined(MIPS) && !defined(HPPA) && \
-	!defined(__ARM_EABI__)
-#define SYS_ipc_subcall		((SYS_socket_subcall)+(SYS_socket_nsubcalls))
-#define SYS_ipc_nsubcalls	25
-#endif /* !(ALPHA || MIPS || HPPA) */
+# define SYS_socket_nsubcalls	20
+# define SYS_ipc_subcall	((SYS_socket_subcall)+(SYS_socket_nsubcalls))
+# define SYS_ipc_nsubcalls	25
+#endif
 
 #if defined(ALPHA) || defined(IA64) || defined(SPARC) || defined(SPARC64)
 int sys_getpagesize();

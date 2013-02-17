@@ -426,7 +426,7 @@
 	{ 5,	0,	sys_tuxcall,		"tuxcall"		}, /* 397 */
 	{ 2,	0,	sys_io_setup,		"io_setup"		}, /* 398 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"		}, /* 399 */
-	{ 5,	0,	sys_io_getevents,		"io_getevents"		}, /* 400 */
+	{ 5,	0,	sys_io_getevents,	"io_getevents"		}, /* 400 */
 	{ 3,	0,	sys_io_submit,		"io_submit"		}, /* 401 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"		}, /* 402 */
 	{ 5,	0,	NULL,			NULL			}, /* 403 */
