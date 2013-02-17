@@ -516,7 +516,7 @@ sys_umask(struct tcb *tcp)
 	return RVAL_OCTAL;
 }
 
-static const struct xlat whence[] = {
+static const struct xlat whence_codes[] = {
 	{ SEEK_SET,	"SEEK_SET"	},
 	{ SEEK_CUR,	"SEEK_CUR"	},
 	{ SEEK_END,	"SEEK_END"	},
@@ -544,7 +544,7 @@ sys_lseek(struct tcb *tcp)
 			tprintf(", %llu, ", offset);
 		else
 			tprintf(", %lld, ", offset);
-		printxval(whence, whence, "SEEK_???");
+		printxval(whence_codes, whence, "SEEK_???");
 	}
 	return RVAL_LUDECIMAL;
 }
@@ -564,7 +564,7 @@ sys_lseek32(struct tcb *tcp)
 			tprintf(", %lu, ", offset);
 		else
 			tprintf(", %ld, ", offset);
-		printxval(whence, whence, "SEEK_???");
+		printxval(whence_codes, whence, "SEEK_???");
 	}
 	return RVAL_UDECIMAL;
 }
@@ -584,7 +584,7 @@ sys_lseek(struct tcb *tcp)
 			tprintf(", %lu, ", offset);
 		else
 			tprintf(", %ld, ", offset);
-		printxval(whence, whence, "SEEK_???");
+		printxval(whence_codes, whence, "SEEK_???");
 	}
 	return RVAL_UDECIMAL;
 }
@@ -622,7 +622,7 @@ sys_llseek(struct tcb *tcp)
 			tprintf("%#lx, ", tcp->u_arg[3]);
 		else
 			tprintf("[%llu], ", off);
-		printxval(whence, tcp->u_arg[4], "SEEK_???");
+		printxval(whence_codes, tcp->u_arg[4], "SEEK_???");
 	}
 	return 0;
 }
