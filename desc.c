@@ -218,13 +218,6 @@ static const struct xlat notifyflags[] = {
 };
 #endif
 
-static const struct xlat whence[] = {
-	{ SEEK_SET,	"SEEK_SET"	},
-	{ SEEK_CUR,	"SEEK_CUR"	},
-	{ SEEK_END,	"SEEK_END"	},
-	{ 0,		NULL		},
-};
-
 static const struct xlat perf_event_open_flags[] = {
 #ifdef PERF_FLAG_FD_NO_GROUP
 	{ PERF_FLAG_FD_NO_GROUP,	"PERF_FLAG_FD_NO_GROUP"	},
@@ -282,7 +275,7 @@ printflock(struct tcb *tcp, long addr, int getlk)
 	tprints("{type=");
 	printxval(lockfcmds, fl.l_type, "F_???");
 	tprints(", whence=");
-	printxval(whence, fl.l_whence, "SEEK_???");
+	printxval(whence_codes, fl.l_whence, "SEEK_???");
 	tprintf(", start=%ld, len=%ld", fl.l_start, fl.l_len);
 	if (getlk)
 		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);
@@ -305,7 +298,7 @@ printflock64(struct tcb *tcp, long addr, int getlk)
 	tprints("{type=");
 	printxval(lockfcmds, fl.l_type, "F_???");
 	tprints(", whence=");
-	printxval(whence, fl.l_whence, "SEEK_???");
+	printxval(whence_codes, fl.l_whence, "SEEK_???");
 	tprintf(", start=%lld, len=%lld", (long long) fl.l_start, (long long) fl.l_len);
 	if (getlk)
 		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);

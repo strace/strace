@@ -475,6 +475,7 @@ extern const struct xlat open_mode_flags[];
 extern const struct xlat addrfams[];
 extern const struct xlat struct_user_offsets[];
 extern const struct xlat open_access_modes[];
+extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */
 #define RVAL_DECIMAL	000	/* decimal format */

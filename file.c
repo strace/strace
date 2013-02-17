@@ -516,10 +516,16 @@ sys_umask(struct tcb *tcp)
 	return RVAL_OCTAL;
 }
 
-static const struct xlat whence_codes[] = {
+const struct xlat whence_codes[] = {
 	{ SEEK_SET,	"SEEK_SET"	},
 	{ SEEK_CUR,	"SEEK_CUR"	},
 	{ SEEK_END,	"SEEK_END"	},
+#ifdef SEEK_DATA
+	{ SEEK_DATA,	"SEEK_DATA"	},
+#endif
+#ifdef SEEK_HOLE
+	{ SEEK_HOLE,	"SEEK_HOLE"	},
+#endif
 	{ 0,		NULL		},
 };
 
