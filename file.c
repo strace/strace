@@ -528,6 +528,7 @@ static const struct xlat whence_codes[] = {
  * In kernel, off_t is always the same as (kernel's) long
  * (see include/uapi/asm-generic/posix_types.h),
  * which means that on x32 we need to use tcp->ext_arg[N] to get offset argument.
+ * Use test/x32_lseek.c to test lseek decoding.
  */
 #if defined(LINUX_MIPSN32) || defined(X32)
 int
@@ -548,27 +549,6 @@ sys_lseek(struct tcb *tcp)
 	}
 	return RVAL_LUDECIMAL;
 }
-
-# if defined(X32)
-int
-sys_lseek32(struct tcb *tcp)
-{
-	long offset;
-	int whence;
-
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		offset = tcp->u_arg[1];
-		whence = tcp->u_arg[2];
-		if (whence == SEEK_SET)
-			tprintf(", %lu, ", offset);
-		else
-			tprintf(", %ld, ", offset);
-		printxval(whence_codes, whence, "SEEK_???");
-	}
-	return RVAL_UDECIMAL;
-}
-# endif
 #else
 int
 sys_lseek(struct tcb *tcp)
@@ -598,9 +578,9 @@ sys_lseek(struct tcb *tcp)
  *
  * hi,lo are "unsigned longs" and combined exactly this way in kernel:
  * ((loff_t) hi << 32) | lo
- * Note that for architectures with kernel's long wider than userspace longs
+ * Note that for architectures with kernel's long wider than userspace long
  * (such as x32), combining code will use *kernel's*, i.e. *wide* longs
- * for hi and lo. You may need to use tcp->ext_arg[N]!
+ * for hi and lo. We may need to use tcp->ext_arg[N]!
  */
 int
 sys_llseek(struct tcb *tcp)

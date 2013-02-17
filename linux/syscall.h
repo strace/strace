@@ -373,7 +373,3 @@ int sys_shmsys();
 #define SYS_shmsys_subcall	207
 #define SYS_shmsys_nsubcalls	4
 #endif
-
-#ifdef X32
-int sys_lseek32();
-#endif
