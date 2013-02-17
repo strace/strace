@@ -178,7 +178,6 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 		tprintf("%#x /* %s */", val, dflt);
 }
 
-#if HAVE_LONG_LONG
 /*
  * Print 64bit argument at position llarg and return the index of the next
  * argument.
@@ -186,31 +185,41 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 int
 printllval(struct tcb *tcp, const char *format, int llarg)
 {
-# if defined(X86_64) || defined(POWERPC64)
+#if defined(X86_64) || defined(POWERPC64)
 	if (current_personality == 0) {
+		/* Technically, format expects "long long",
+		 * but we supply "long". We expect that
+		 * on this arch, they are the same.
+		 */
 		tprintf(format, tcp->u_arg[llarg]);
 		llarg++;
 	} else {
-#  ifdef POWERPC64
+# ifdef POWERPC64
 		/* Align 64bit argument to 64bit boundary.  */
 		llarg = (llarg + 1) & 0x1e;
-#  endif
+# endif
 		tprintf(format, LONG_LONG(tcp->u_arg[llarg], tcp->u_arg[llarg + 1]));
 		llarg += 2;
 	}
-# elif defined IA64 || defined ALPHA
+#elif defined IA64 || defined ALPHA
+	/* Technically, format expects "long long",
+	 * but we supply "long". We expect that
+	 * on this arch, they are the same.
+	 */
 	tprintf(format, tcp->u_arg[llarg]);
 	llarg++;
-# elif defined LINUX_MIPSN32 || defined X32
+#elif defined LINUX_MIPSN32 || defined X32
 	tprintf(format, tcp->ext_arg[llarg]);
 	llarg++;
-# else
+#else
+# if SIZEOF_LONG > 4
+#  error BUG: must not combine two args for long long on this arch
+# endif
 	tprintf(format, LONG_LONG(tcp->u_arg[llarg], tcp->u_arg[llarg + 1]));
 	llarg += 2;
-# endif
+#endif
 	return llarg;
 }
-#endif
 
 /*
  * Interpret `xlat' as an array of flags

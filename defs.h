@@ -602,19 +602,18 @@ extern const char *xlookup(const struct xlat *, int);
 extern int string_to_uint(const char *str);
 extern int string_quote(const char *, char *, long, int);
 
-#if HAVE_LONG_LONG
-/* _l refers to the lower numbered u_arg,
- * _h refers to the higher numbered u_arg
+/* a refers to the lower numbered u_arg,
+ * b refers to the higher numbered u_arg
  */
-# if HAVE_LITTLE_ENDIAN_LONG_LONG
-#  define LONG_LONG(_l,_h) \
-	((long long)((unsigned long long)(unsigned)(_l) | ((unsigned long long)(_h)<<32)))
-# else
-#  define LONG_LONG(_l,_h) \
-	((long long)((unsigned long long)(unsigned)(_h) | ((unsigned long long)(_l)<<32)))
-# endif
-extern int printllval(struct tcb *, const char *, int);
+#if HAVE_LITTLE_ENDIAN_LONG_LONG
+# define LONG_LONG(a,b) \
+	((long long)((unsigned long long)(unsigned)(a) | ((unsigned long long)(b)<<32)))
+#else
+# define LONG_LONG(a,b) \
+	((long long)((unsigned long long)(unsigned)(b) | ((unsigned long long)(a)<<32)))
 #endif
+extern int printllval(struct tcb *, const char *, int);
+
 extern void printxval(const struct xlat *, int, const char *);
 extern int printargs(struct tcb *);
 extern int printargs_lu(struct tcb *);
