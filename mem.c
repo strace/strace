@@ -202,7 +202,6 @@ addtileflags(long flags)
 }
 #endif
 
-#if !HAVE_LONG_LONG_OFF_T
 static int
 print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
 {
@@ -300,20 +299,13 @@ sys_mmap(struct tcb *tcp)
 #endif
 	return print_mmap(tcp, tcp->u_arg, offset);
 }
-#endif /* !HAVE_LONG_LONG_OFF_T */
 
-#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
+#if _LFS64_LARGEFILE
 /* TODO: comment which arches use this routine.
  * For one, does ALPHA on Linux use this??
  * From code it seems that it might use 7 or 8 registers,
  * which is strange - Linux syscalls can pass maximum of 6 parameters!
  */
-# ifdef HAVE_LONG_LONG_OFF_T
-/* For systems that have a long long off_t,
- * sys_mmap in syscall tables is handled by sys_mmap64:
- */
-#  define sys_mmap64 sys_mmap
-# endif
 int
 sys_mmap64(struct tcb *tcp)
 {
@@ -359,7 +351,7 @@ sys_mmap64(struct tcb *tcp)
 	}
 	return RVAL_HEX;
 }
-#endif /* _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T */
+#endif
 
 int
 sys_munmap(struct tcb *tcp)

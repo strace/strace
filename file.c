@@ -183,19 +183,6 @@ struct stat64 {
 # define XATTR_REPLACE 2
 #endif
 
-#if HAVE_LONG_LONG_OFF_T
-/*
- * Ugly hacks for systems that have typedef long long off_t
- */
-# define stat64 stat
-# define HAVE_STAT64 1	/* Ugly hack */
-# define sys_stat64	sys_stat
-# define sys_fstat64	sys_fstat
-# define sys_lstat64	sys_lstat
-# define sys_truncate64	sys_truncate
-# define sys_ftruncate64	sys_ftruncate
-#endif
-
 #ifdef MAJOR_IN_SYSMACROS
 # include <sys/sysmacros.h>
 #endif
@@ -626,7 +613,6 @@ sys_readahead(struct tcb *tcp)
 	return 0;
 }
 
-#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_truncate(struct tcb *tcp)
 {
@@ -636,9 +622,8 @@ sys_truncate(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
-#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
+#if _LFS64_LARGEFILE
 int
 sys_truncate64(struct tcb *tcp)
 {
@@ -650,7 +635,6 @@ sys_truncate64(struct tcb *tcp)
 }
 #endif
 
-#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_ftruncate(struct tcb *tcp)
 {
@@ -660,9 +644,8 @@ sys_ftruncate(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
-#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
+#if _LFS64_LARGEFILE
 int
 sys_ftruncate64(struct tcb *tcp)
 {
@@ -920,7 +903,6 @@ static const struct xlat fileflags[] = {
 	{ 0,		NULL		},
 };
 
-#ifndef HAVE_LONG_LONG_OFF_T
 static void
 realprintstat(struct tcb *tcp, struct stat *statbuf)
 {
@@ -1027,7 +1009,6 @@ printstat(struct tcb *tcp, long addr)
 
 	realprintstat(tcp, &statbuf);
 }
-#endif	/* !HAVE_LONG_LONG_OFF_T */
 
 #if !defined HAVE_STAT64 && defined X86_64
 /*
@@ -1181,7 +1162,7 @@ printstat64(struct tcb *tcp, long addr)
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 static void
 convertoldstat(const struct __old_kernel_stat *oldbuf, struct stat *newbuf)
 {
@@ -1232,7 +1213,6 @@ printoldstat(struct tcb *tcp, long addr)
 }
 #endif
 
-#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_stat(struct tcb *tcp)
 {
@@ -1244,7 +1224,6 @@ sys_stat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 int
 sys_stat64(struct tcb *tcp)
@@ -1311,7 +1290,7 @@ sys_newfstatat(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 int
 sys_oldstat(struct tcb *tcp)
 {
@@ -1325,7 +1304,6 @@ sys_oldstat(struct tcb *tcp)
 }
 #endif
 
-#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_fstat(struct tcb *tcp)
 {
@@ -1337,7 +1315,6 @@ sys_fstat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 int
 sys_fstat64(struct tcb *tcp)
@@ -1355,7 +1332,7 @@ sys_fstat64(struct tcb *tcp)
 #endif
 }
 
-#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 int
 sys_oldfstat(struct tcb *tcp)
 {
@@ -1369,7 +1346,6 @@ sys_oldfstat(struct tcb *tcp)
 }
 #endif
 
-#ifndef HAVE_LONG_LONG_OFF_T
 int
 sys_lstat(struct tcb *tcp)
 {
@@ -1381,7 +1357,6 @@ sys_lstat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 int
 sys_lstat64(struct tcb *tcp)
@@ -1399,7 +1374,7 @@ sys_lstat64(struct tcb *tcp)
 #endif
 }
 
-#if defined(HAVE_STRUCT___OLD_KERNEL_STAT) && !defined(HAVE_LONG_LONG_OFF_T)
+#if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
 int
 sys_oldlstat(struct tcb *tcp)
 {

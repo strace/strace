@@ -41,14 +41,6 @@
 # include  <linux/perf_event.h>
 #endif
 
-#if HAVE_LONG_LONG_OFF_T
-/*
- * Hacks for systems that have a long long off_t
- */
-# define flock64	flock		/* Horrid hack */
-# define printflock printflock64	/* Horrider hack */
-#endif
-
 static const struct xlat fcntlcmds[] = {
 	{ F_DUPFD,	"F_DUPFD"	},
 	{ F_GETFD,	"F_GETFD"	},
@@ -231,7 +223,6 @@ static const struct xlat perf_event_open_flags[] = {
 	{ 0,				NULL			},
 };
 
-#ifndef HAVE_LONG_LONG_OFF_T
 /* fcntl/lockf */
 static void
 printflock(struct tcb *tcp, long addr, int getlk)
@@ -282,9 +273,8 @@ printflock(struct tcb *tcp, long addr, int getlk)
 	else
 		tprints("}");
 }
-#endif
 
-#if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
+#if _LFS64_LARGEFILE
 /* fcntl/lockf */
 static void
 printflock64(struct tcb *tcp, long addr, int getlk)

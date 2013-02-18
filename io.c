@@ -262,6 +262,10 @@ sys_sendfile(struct tcb *tcp)
 		tprints(", ");
 		if (!tcp->u_arg[2])
 			tprints("NULL");
+//FIXME: obviously bogus.
+//Probably should use explicit long.
+//Arches with long long offset param should use
+//sys_sendfile64, not this fn.
 		else if (umove(tcp, tcp->u_arg[2], &offset) < 0)
 			tprintf("%#lx", tcp->u_arg[2]);
 		else
