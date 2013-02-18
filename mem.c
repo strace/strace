@@ -43,13 +43,6 @@
 # include <asm/page.h>	    /* for PAGE_SHIFT */
 #endif
 
-#ifdef HAVE_LONG_LONG_OFF_T
-/*
- * Ugly hacks for systems that have a long long off_t
- */
-# define sys_mmap64	sys_mmap
-#endif
-
 int
 sys_brk(struct tcb *tcp)
 {
@@ -211,7 +204,7 @@ addtileflags(long flags)
 
 #if !HAVE_LONG_LONG_OFF_T
 static int
-print_mmap(struct tcb *tcp, long *u_arg, long long offset)
+print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
 {
 	if (entering(tcp)) {
 		/* addr */
@@ -227,16 +220,16 @@ print_mmap(struct tcb *tcp, long *u_arg, long long offset)
 		/* flags */
 #ifdef MAP_TYPE
 		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
-#ifdef TILE
+# ifdef TILE
 		addflags(mmap_flags, addtileflags(u_arg[3] & ~MAP_TYPE));
-#else
+# else
 		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
-#endif
+# endif
 #else
 		printflags(mmap_flags, u_arg[3], "MAP_???");
 #endif
-		/* fd */
 		tprints(", ");
+		/* fd */
 		printfd(tcp, u_arg[4]);
 		/* offset */
 		tprintf(", %#llx", offset);
@@ -252,14 +245,10 @@ int sys_old_mmap(struct tcb *tcp)
 	 * new `sys_mmap' interface.
 	 * For IA32 processes, this code converts the integer arguments
 	 * that they pushed onto the stack, into longs.
-	 *
-	 * Note that addresses with bit 31 set will be sign extended.
-	 * Fortunately, those addresses are not currently being generated
-	 * for IA32 processes so it's not a problem.
 	 */
 	int i;
 	long u_arg[6];
-	int narrow_arg[6];
+	unsigned narrow_arg[6];
 	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), (char *) narrow_arg) == -1)
 		return 0;
 	for (i = 0; i < 6; i++)
@@ -267,9 +256,8 @@ int sys_old_mmap(struct tcb *tcp)
 #elif defined(SH) || defined(SH64)
 	/* SH has always passed the args in registers */
 	long *u_arg = tcp->u_arg;
-#else
+#elif defined(X86_64)
 	long u_arg[6];
-# if defined(X86_64)
 	if (current_personality == 1) {
 		int i;
 		unsigned narrow_arg[6];
@@ -277,14 +265,16 @@ int sys_old_mmap(struct tcb *tcp)
 			return 0;
 		for (i = 0; i < 6; ++i)
 			u_arg[i] = narrow_arg[i];
+	} else {
+		if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), (char *) u_arg) == -1)
+			return 0;
 	}
-	else
-# endif
+#else
+	long u_arg[6];
 	if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), (char *) u_arg) == -1)
 		return 0;
-#endif /* other architectures */
-
-	return print_mmap(tcp, u_arg, u_arg[5]);
+#endif
+	return print_mmap(tcp, u_arg, (unsigned long)u_arg[5]);
 }
 
 int
@@ -353,6 +343,12 @@ int sys_old_mmap(struct tcb *tcp)
  * From code it seems that it might use 7 or 8 registers,
  * which is strange - Linux syscalls can pass maximum of 6 parameters!
  */
+# ifdef HAVE_LONG_LONG_OFF_T
+/* For systems that have a long long off_t,
+ * sys_mmap in syscall tables is handled by sys_mmap64:
+ */
+#  define sys_mmap64 sys_mmap
+# endif
 int
 sys_mmap64(struct tcb *tcp)
 {
