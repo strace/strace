@@ -300,59 +300,6 @@ sys_mmap(struct tcb *tcp)
 	return print_mmap(tcp, tcp->u_arg, offset);
 }
 
-#if _LFS64_LARGEFILE
-/* TODO: comment which arches use this routine.
- * For one, does ALPHA on Linux use this??
- * From code it seems that it might use 7 or 8 registers,
- * which is strange - Linux syscalls can pass maximum of 6 parameters!
- */
-int
-sys_mmap64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-#if defined(ALPHA) || defined(X32)
-		long *u_arg = tcp->u_arg;
-#else
-		long u_arg[7];
-		if (umoven(tcp, tcp->u_arg[0], sizeof u_arg,
-				(char *) u_arg) == -1)
-			return 0;
-#endif
-		/* addr */
-		if (!u_arg[0])
-			tprints("NULL, ");
-		else
-			tprintf("%#lx, ", u_arg[0]);
-		/* len */
-		tprintf("%lu, ", u_arg[1]);
-		/* prot */
-		printflags(mmap_prot, u_arg[2], "PROT_???");
-		tprints(", ");
-		/* flags */
-#ifdef MAP_TYPE
-		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
-		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
-#else
-		printflags(mmap_flags, u_arg[3], "MAP_???");
-#endif
-		/* fd */
-		tprints(", ");
-		printfd(tcp, u_arg[4]);
-		/* offset */
-#if defined(ALPHA) || defined(X32)
-		printllval(tcp, ", %#llx", 5);
-#else
-		/* NOTE: not verified that [5] and [6] should be used.
-		 * It's possible that long long is 64-bit aligned in memory
-		 * and we need to use [6] and [7] here instead:
-		 */
-		tprintf(", %#llx", LONG_LONG(u_arg[5], u_arg[6]));
-#endif
-	}
-	return RVAL_HEX;
-}
-#endif
-
 int
 sys_munmap(struct tcb *tcp)
 {
