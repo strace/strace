@@ -280,13 +280,8 @@ int sys_old_mmap(struct tcb *tcp)
 int
 sys_mmap(struct tcb *tcp)
 {
-	long long offset = tcp->u_arg[5];
+	unsigned long long offset = (unsigned long) tcp->u_arg[5];
 
-	/* FIXME: why only SH64? i386 mmap2 syscall ends up
-	 * in this function, but does not convert offset
-	 * from pages to bytes. See test/mmap_offset_decode.c
-	 * Why SH64 and i386 are handled differently?
-	 */
 #if defined(SH64)
 	/*
 	 * Old mmap differs from new mmap in specifying the
@@ -295,8 +290,12 @@ sys_mmap(struct tcb *tcp)
 	 * sees bytes in the printout.
 	 */
 	offset <<= PAGE_SHIFT;
-#endif
-#if defined(LINUX_MIPSN32)
+#elif defined(I386)
+	/* Try test/mmap_offset_decode.c */
+	offset <<= 12; /* 4096 byte pages */
+#elif defined(LINUX_MIPSN32) || defined(X32)
+	/* Try test/x32_mmap.c */
+	/* At least for X32 it definitely should not be page-shifted! */
 	offset = tcp->ext_arg[5];
 #endif
 	return print_mmap(tcp, tcp->u_arg, offset);
@@ -304,40 +303,6 @@ sys_mmap(struct tcb *tcp)
 #endif /* !HAVE_LONG_LONG_OFF_T */
 
 #if _LFS64_LARGEFILE || HAVE_LONG_LONG_OFF_T
-# if defined(X32)
-int sys_old_mmap(struct tcb *tcp)
-{
-	long u_arg[6];
-	if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), (char *) u_arg) == -1)
-		return 0;
-	if (entering(tcp)) {
-		/* addr */
-		if (!u_arg[0])
-			tprints("NULL, ");
-		else
-			tprintf("%#lx, ", u_arg[0]);
-		/* len */
-		tprintf("%lu, ", u_arg[1]);
-		/* prot */
-		printflags(mmap_prot, u_arg[2], "PROT_???");
-		tprints(", ");
-		/* flags */
-#  ifdef MAP_TYPE
-		printxval(mmap_flags, u_arg[3] & MAP_TYPE, "MAP_???");
-		addflags(mmap_flags, u_arg[3] & ~MAP_TYPE);
-#  else
-		printflags(mmap_flags, u_arg[3], "MAP_???");
-#  endif
-		/* fd */
-		tprints(", ");
-		printfd(tcp, u_arg[4]);
-		/* offset */
-		tprintf(", %#lx", u_arg[5]);
-	}
-	return RVAL_HEX;
-}
-# endif
-
 /* TODO: comment which arches use this routine.
  * For one, does ALPHA on Linux use this??
  * From code it seems that it might use 7 or 8 registers,
