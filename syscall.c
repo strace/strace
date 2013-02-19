@@ -2464,8 +2464,9 @@ trace_syscall_exiting(struct tcb *tcp)
 			/* pause(), rt_sigsuspend() etc use this code.
 			 * SA_RESTART is ignored (assumed not set):
 			 * syscall won't restart (will return EINTR instead)
-			 * even after signal with SA_RESTART set.
-			 * However, after SIG_IGN or SIG_DFL signal it will.
+			 * even after signal with SA_RESTART set. However,
+			 * after SIG_IGN or SIG_DFL signal it will restart
+			 * (thus the name "restart only if has no handler").
 			 */
 			tprints("= ? ERESTARTNOHAND (Interrupted by signal)");
 			break;
