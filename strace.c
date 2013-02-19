@@ -981,13 +981,79 @@ startup_attach(void)
 		sigprocmask(SIG_SETMASK, &empty_set, NULL);
 }
 
+/* Stack-o-phobic exec helper, in the hope to work around
+ * NOMMU + "daemonized tracer" difficulty.
+ */
+struct exec_params {
+	int fd_to_close;
+	uid_t run_euid;
+	gid_t run_egid;
+	char **argv;
+	char *pathname;
+};
+static struct exec_params params_for_tracee;
+static void __attribute__ ((noinline, noreturn))
+exec_or_die(void)
+{
+	struct exec_params *params = &params_for_tracee;
+
+	if (params->fd_to_close >= 0)
+		close(params->fd_to_close);
+	if (!daemonized_tracer && !use_seize) {
+		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
+			perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
+		}
+	}
+
+	if (username != NULL) {
+		/*
+		 * It is important to set groups before we
+		 * lose privileges on setuid.
+		 */
+		if (initgroups(username, run_gid) < 0) {
+			perror_msg_and_die("initgroups");
+		}
+		if (setregid(run_gid, params->run_egid) < 0) {
+			perror_msg_and_die("setregid");
+		}
+		if (setreuid(run_uid, params->run_euid) < 0) {
+			perror_msg_and_die("setreuid");
+		}
+	}
+	else if (geteuid() != 0)
+		if (setreuid(run_uid, run_uid) < 0) {
+			perror_msg_and_die("setreuid");
+		}
+
+	if (!daemonized_tracer) {
+		/*
+		 * Induce a ptrace stop. Tracer (our parent)
+		 * will resume us with PTRACE_SYSCALL and display
+		 * the immediately following execve syscall.
+		 * Can't do this on NOMMU systems, we are after
+		 * vfork: parent is blocked, stopping would deadlock.
+		 */
+		if (!NOMMU_SYSTEM)
+			kill(getpid(), SIGSTOP);
+	} else {
+		alarm(3);
+		/* we depend on SIGCHLD set to SIG_DFL by init code */
+		/* if it happens to be SIG_IGN'ed, wait won't block */
+		wait(NULL);
+		alarm(0);
+	}
+
+	execv(params->pathname, params->argv);
+	perror_msg_and_die("exec");
+}
+
 static void
 startup_child(char **argv)
 {
 	struct stat statbuf;
 	const char *filename;
 	char pathname[MAXPATHLEN];
-	int pid = 0;
+	int pid;
 	struct tcb *tcp;
 
 	filename = argv[0];
@@ -1045,69 +1111,29 @@ startup_child(char **argv)
 	if (stat(pathname, &statbuf) < 0) {
 		perror_msg_and_die("Can't stat '%s'", filename);
 	}
+
+	params_for_tracee.fd_to_close = (shared_log != stderr) ? fileno(shared_log) : -1;
+	params_for_tracee.run_euid = (statbuf.st_mode & S_ISUID) ? statbuf.st_uid : run_uid;
+	params_for_tracee.run_egid = (statbuf.st_mode & S_ISGID) ? statbuf.st_gid : run_gid;
+	params_for_tracee.argv = argv;
+	/*
+	 * On NOMMU, can be safely freed only after execve in tracee.
+	 * It's hard to know when that happens, so we just leak it.
+	 */
+	params_for_tracee.pathname = strdup(pathname);
+
 	strace_child = pid = fork();
 	if (pid < 0) {
 		perror_msg_and_die("fork");
 	}
-	if ((pid != 0 && daemonized_tracer) /* -D: parent to become a traced process */
-	 || (pid == 0 && !daemonized_tracer) /* not -D: child to become a traced process */
+	if ((pid != 0 && daemonized_tracer)
+	 || (pid == 0 && !daemonized_tracer)
 	) {
-		pid = getpid();
-		if (shared_log != stderr)
-			close(fileno(shared_log));
-		if (!daemonized_tracer && !use_seize) {
-			if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
-				perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
-			}
-		}
-
-		if (username != NULL) {
-			uid_t run_euid = run_uid;
-			gid_t run_egid = run_gid;
-
-			if (statbuf.st_mode & S_ISUID)
-				run_euid = statbuf.st_uid;
-			if (statbuf.st_mode & S_ISGID)
-				run_egid = statbuf.st_gid;
-			/*
-			 * It is important to set groups before we
-			 * lose privileges on setuid.
-			 */
-			if (initgroups(username, run_gid) < 0) {
-				perror_msg_and_die("initgroups");
-			}
-			if (setregid(run_gid, run_egid) < 0) {
-				perror_msg_and_die("setregid");
-			}
-			if (setreuid(run_uid, run_euid) < 0) {
-				perror_msg_and_die("setreuid");
-			}
-		}
-		else if (geteuid() != 0)
-			if (setreuid(run_uid, run_uid) < 0) {
-				perror_msg_and_die("setreuid");
-			}
-
-		if (!daemonized_tracer) {
-			/*
-			 * Induce a ptrace stop. Tracer (our parent)
-			 * will resume us with PTRACE_SYSCALL and display
-			 * the immediately following execve syscall.
-			 * Can't do this on NOMMU systems, we are after
-			 * vfork: parent is blocked, stopping would deadlock.
-			 */
-			if (!NOMMU_SYSTEM)
-				kill(pid, SIGSTOP);
-		} else {
-			alarm(3);
-			/* we depend on SIGCHLD set to SIG_DFL by init code */
-			/* if it happens to be SIG_IGN'ed, wait won't block */
-			wait(NULL);
-			alarm(0);
-		}
-
-		execv(pathname, argv);
-		perror_msg_and_die("exec");
+		/* We are to become the tracee. Two cases:
+		 * -D: we are parent
+		 * not -D: we are child
+		 */
+		exec_or_die();
 	}
 
 	/* We are the tracer */
@@ -1157,8 +1183,23 @@ startup_child(char **argv)
 		/* attaching will be done later, by startup_attach */
 		/* note: we don't do newoutf(tcp) here either! */
 
-//NOMMU BUG! -D is active, we (child) return, and this smashes the stack!
-//When parent will be unpaused, it segfaults.
+		/* NOMMU BUG! -D mode is active, we (child) return,
+		 * and we will scribble over parent's stack!
+		 * When parent later unpauses, it segfaults.
+		 *
+		 * We work around it
+		 * (1) by declaring exec_or_die() NORETURN,
+		 * hopefully compiler will just jump to it
+		 * instead of call (won't push anything to stack),
+		 * (2) by trying very hard in exec_or_die()
+		 * to not use any stack,
+		 * (3) having a really big (MAXPATHLEN) stack object
+		 * in this function, which creates a "buffer" between
+		 * child's and parent's stack pointers.
+		 * This may save us if (1) and (2) failed
+		 * and compiler decided to use stack in exec_or_die() anyway
+		 * (happens on i386 because of stack parameter passing).
+		 */
 	}
 }
 
@@ -1718,10 +1759,11 @@ init(int argc, char *argv[])
 	sigemptyset(&empty_set);
 	sigemptyset(&blocked_set);
 
-	/* STARTUP_CHILD must be called before the signal handlers get
-	   installed below as they are inherited into the spawned process.
-	   Also we do not need to be protected by them as during interruption
-	   in the STARTUP_CHILD mode we kill the spawned process anyway.  */
+	/* startup_child() must be called before the signal handlers get
+	 * installed below as they are inherited into the spawned process.
+	 * Also we do not need to be protected by them as during interruption
+	 * in the startup_child() mode we kill the spawned process anyway.
+	 */
 	if (argv[0]) {
 		skip_startup_execve = 1;
 		startup_child(argv);
