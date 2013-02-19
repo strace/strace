@@ -123,6 +123,9 @@ extern char *stpcpy(char *dst, const char *src);
  * This needs Linux kernel 3.4.x or later to work.
  */
 #define USE_SEIZE 1
+/* For forcing NOMMU build, set to 1 */
+#define NOMMU_SYSTEM 0
+
 
 #if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI32
 # define LINUX_MIPSO32
@@ -211,7 +214,7 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
 
-#ifdef USE_SEIZE
+#if USE_SEIZE
 # undef PTRACE_SEIZE
 # define PTRACE_SEIZE		0x4206
 # undef PTRACE_INTERRUPT

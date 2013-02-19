@@ -58,6 +58,15 @@ extern char *optarg;
 # define my_tkill(tid, sig) kill((tid), (sig))
 #endif
 
+/* Glue for systems without a MMU that cannot provide fork() */
+#if !defined(HAVE_FORK)
+# undef NOMMU_SYSTEM
+# define NOMMU_SYSTEM 1
+#endif
+#if NOMMU_SYSTEM
+# define fork() vfork()
+#endif
+
 cflag_t cflag = CFLAG_NONE;
 unsigned int followfork = 0;
 unsigned int ptrace_setoptions = 0;
@@ -100,7 +109,7 @@ static int opt_intr;
  */
 static bool daemonized_tracer = 0;
 
-#ifdef USE_SEIZE
+#if USE_SEIZE
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 # define use_seize (post_attach_sigstop == 0)
 #else
@@ -318,15 +327,7 @@ error_opt_arg(int opt, const char *arg)
 	error_msg_and_die("Invalid -%c argument: '%s'", opt, arg);
 }
 
-/* Glue for systems without a MMU that cannot provide fork() */
-#ifdef HAVE_FORK
-# define strace_vforked 0
-#else
-# define strace_vforked 1
-# define fork()         vfork()
-#endif
-
-#ifdef USE_SEIZE
+#if USE_SEIZE
 static int
 ptrace_attach_or_seize(int pid)
 {
@@ -1095,7 +1096,7 @@ startup_child(char **argv)
 			 * Can't do this on NOMMU systems, we are after
 			 * vfork: parent is blocked, stopping would deadlock.
 			 */
-			if (!strace_vforked)
+			if (!NOMMU_SYSTEM)
 				kill(pid, SIGSTOP);
 		} else {
 			alarm(3);
@@ -1115,7 +1116,7 @@ startup_child(char **argv)
 		if (!use_seize) {
 			/* child did PTRACE_TRACEME, nothing to do in parent */
 		} else {
-			if (!strace_vforked) {
+			if (!NOMMU_SYSTEM) {
 				/* Wait until child stopped itself */
 				int status;
 				while (waitpid(pid, &status, WSTOPPED) < 0) {
@@ -1128,7 +1129,7 @@ startup_child(char **argv)
 					perror_msg_and_die("Unexpected wait status %x", status);
 				}
 			}
-			/* Else: vforked case, we have no way to sync.
+			/* Else: NOMMU case, we have no way to sync.
 			 * Just attach to it as soon as possible.
 			 * This means that we may miss a few first syscalls...
 			 */
@@ -1137,11 +1138,11 @@ startup_child(char **argv)
 				kill_save_errno(pid, SIGKILL);
 				perror_msg_and_die("Can't attach to %d", pid);
 			}
-			if (!strace_vforked)
+			if (!NOMMU_SYSTEM)
 				kill(pid, SIGCONT);
 		}
 		tcp = alloctcb(pid);
-		if (!strace_vforked)
+		if (!NOMMU_SYSTEM)
 			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP | post_attach_sigstop;
 		else
 			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP;
@@ -1155,6 +1156,9 @@ startup_child(char **argv)
 		alloctcb(pid);
 		/* attaching will be done later, by startup_attach */
 		/* note: we don't do newoutf(tcp) here either! */
+
+//NOMMU BUG! -D is active, we (child) return, and this smashes the stack!
+//When parent will be unpaused, it segfaults.
 	}
 }
 
@@ -1286,9 +1290,8 @@ test_ptrace_setoptions_for_all(void)
 	int it_worked = 0;
 
 	/* this fork test doesn't work on no-mmu systems */
-	/* FIXME: isn't it better to assume we *succeed*? */
-	if (strace_vforked)
-		return 1;
+	if (NOMMU_SYSTEM)
+		return 0; /* be bold, and pretend that test succeeded */
 
 	pid = fork();
 	if (pid < 0)
@@ -1365,11 +1368,17 @@ test_ptrace_setoptions_for_all(void)
 	return 1;
 }
 
-#ifdef USE_SEIZE
+#if USE_SEIZE
 static void
 test_ptrace_seize(void)
 {
 	int pid;
+
+	/* this fork test doesn't work on no-mmu systems */
+	if (NOMMU_SYSTEM) {
+		post_attach_sigstop = 0; /* this sets use_seize to 1 */
+		return;
+	}
 
 	pid = fork();
 	if (pid < 0)
@@ -1706,6 +1715,9 @@ init(int argc, char *argv[])
 	 * no		1	1	INTR_WHILE_WAIT
 	 */
 
+	sigemptyset(&empty_set);
+	sigemptyset(&blocked_set);
+
 	/* STARTUP_CHILD must be called before the signal handlers get
 	   installed below as they are inherited into the spawned process.
 	   Also we do not need to be protected by them as during interruption
@@ -1715,8 +1727,6 @@ init(int argc, char *argv[])
 		startup_child(argv);
 	}
 
-	sigemptyset(&empty_set);
-	sigemptyset(&blocked_set);
 	sa.sa_handler = SIG_IGN;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
@@ -2084,7 +2094,7 @@ trace(void)
 
 		if (event != 0) {
 			/* Ptrace event */
-#ifdef USE_SEIZE
+#if USE_SEIZE
 			if (event == PTRACE_EVENT_STOP) {
 				/*
 				 * PTRACE_INTERRUPT-stop or group-stop.
@@ -2125,7 +2135,7 @@ trace(void)
 			 * We can get ESRCH instead, you know...
 			 */
 			stopped = (ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) < 0);
-#ifdef USE_SEIZE
+#if USE_SEIZE
  show_stopsig:
 #endif
 			if (cflag != CFLAG_ONLY_STATS
@@ -2163,7 +2173,7 @@ trace(void)
 				goto restart_tracee;
 
 			/* It's group-stop */
-#ifdef USE_SEIZE
+#if USE_SEIZE
 			if (use_seize) {
 				/*
 				 * This ends ptrace-stop, but does *not* end group-stop.
