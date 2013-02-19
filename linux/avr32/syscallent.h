@@ -115,7 +115,7 @@
 	{ 5,	TD,	sys_pwrite,		"pwrite"	}, /* 87 */
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 88 */
 	{ 4,	0,	sys_reboot,		"reboot"	}, /* 89 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 90 */
+	{ 6,	TD|TM,	sys_mmap_pgoff,		"mmap"		}, /* 90 */
 	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 91 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 92 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 93 */

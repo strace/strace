@@ -140,7 +140,7 @@
 	{ 6,	0,	solaris_priocntlsys,	"priocntlsys"	}, /* 112 */
 	{ 6,	TF,	solaris_pathconf,	"pathconf"	}, /* 113 */
 	{ 6,	0,	solaris_mincore,	"mincore"	}, /* 114 */
-	{ 6,	TD,	solaris_mmap,		"mmap"		}, /* 115 */
+	{ 6,	TD|TM,	solaris_mmap,		"mmap"		}, /* 115 */
 	{ 6,	0,	solaris_mprotect,	"mprotect"	}, /* 116 */
 	{ 6,	0,	solaris_munmap,		"munmap"	}, /* 117 */
 	{ 6,	0,	solaris_fpathconf,	"fpathconf"	}, /* 118 */

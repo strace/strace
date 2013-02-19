@@ -220,7 +220,7 @@
 	{  5,	0,	sys_keyctl,			"keyctl"		}, /* 219 */
 	{  5,	TP,	sys_clone,			"clone"			}, /* 220 */
 	{  3,	TF|TP,	sys_execve,			"execve"		}, /* 221 */
-	{  6,	TD,	sys_mmap,			"mmap2"			}, /* 222 */
+	{  6,	TD|TM,	sys_mmap_pgoff,			"mmap2"			}, /* 222 */
 	{  6,	TD,	sys_fadvise64_64,		"fadvise64_64"		}, /* 223 */
 	{  2,	TF,	sys_swapon,			"swapon"		}, /* 224 */
 	{  1,	TF,	sys_swapoff,			"swapoff"		}, /* 225 */

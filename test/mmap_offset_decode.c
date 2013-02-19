@@ -15,8 +15,8 @@
  * $ strace ./mmap_offset_decode
  *
  * As of today (2011-08), on i386 strace prints page offset.
+ * Fixed 2013-02-19. Now all mmaps on all arches should show byte offsets.
  */
-
 #define _LARGEFILE_SOURCE
 #define _LARGEFILE64_SOURCE
 #define _FILE_OFFSET_BITS 64

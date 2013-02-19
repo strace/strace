@@ -116,7 +116,7 @@
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 87 */
 	{ 4,	0,	sys_reboot,		"reboot"	}, /* 88 */
 	{ 3,	0,	sys_readdir,		"readdir"	}, /* 89 */
-	{ 6,	TD|TM,	sys_old_mmap,		"old_mmap"	}, /* 90 */
+	{ 1,	TD|TM,	sys_old_mmap,		"old_mmap"	}, /* 90 */
 	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 91 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 92 */
 	{ 2,	0,	sys_ftruncate,		"ftruncate"	}, /* 93 */
@@ -219,7 +219,7 @@
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap2"		}, /* 192 */
+	{ 6,	TD|TM,	sys_mmap_pgoff,		"mmap2"		}, /* 192 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
 	{ 4,	TF,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */

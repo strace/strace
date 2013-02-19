@@ -231,7 +231,13 @@ pathtrace_match(struct tcb *tcp)
 
 	if (
 	    s->sys_func == sys_old_mmap ||
-	    s->sys_func == sys_mmap) {
+#if defined(S390)
+	    s->sys_func == sys_old_mmap_pgoff ||
+#endif
+	    s->sys_func == sys_mmap ||
+	    s->sys_func == sys_mmap_pgoff ||
+	    s->sys_func == sys_mmap_4koff
+	) {
 		/* x, x, x, x, fd */
 		return fdmatch(tcp, tcp->u_arg[4]);
 	}

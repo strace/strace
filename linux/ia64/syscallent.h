@@ -960,7 +960,7 @@
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 1169 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 1170 */
 	{ 1,	0,	sys_getpagesize,	"getpagesize"	}, /* 1171 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap2"		}, /* 1172 */
+	{ 6,	TD|TM,	sys_mmap_pgoff,		"mmap2"		}, /* 1172 */
 	{ 5,	0,	printargs,		"pciconfig_read"}, /* 1173 */
 	{ 5,	0,	printargs,		"pciconfig_write"}, /* 1174 */
 	{ MA,	0,	printargs,		"perfmonctl"	}, /* 1175 */

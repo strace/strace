@@ -115,7 +115,7 @@
 	{ 0,	0,	printargs,		"svr4_priocntlset"	}, /*  0112 */
 	{ 0,	0,	printargs,		"svr4_pathconf"	}, /*  0113 */
 	{ 0,	TM,	printargs,		"svr4_mincore"	}, /*  0114 */
-	{ 0,	TM,	printargs,		"svr4_mmap"	}, /*  0115 */
+	{ 0,	TD|TM,	printargs,		"svr4_mmap"	}, /*  0115 */
 	{ 0,	TM,	printargs,		"svr4_mprotect"	}, /*  0116 */
 	{ 0,	TM,	printargs,		"svr4_munmap"	}, /*  0117 */
 	{ 0,	0,	printargs,		"svr4_fpathconf"	}, /*  0118 */
@@ -346,7 +346,7 @@
 	{ 0,	0,	printargs,		"sysv_procblk"	}, /* 1131 */
 	{ 0,	0,	printargs,		"sysv_sprocsp"	}, /* 1132 */
 	{ 0,	0,	printargs,		"sysv_sgigsc"	}, /* 1133 */
-	{ 0,	TM,	printargs,		"sysv_mmap"	}, /* 1134 */
+	{ 0,	TD|TM,	printargs,		"sysv_mmap"	}, /* 1134 */
 	{ 0,	TM,	printargs,		"sysv_munmap"	}, /* 1135 */
 	{ 0,	TM,	printargs,		"sysv_mprotect"	}, /* 1136 */
 	{ 0,	TM,	printargs,		"sysv_msync"	}, /* 1137 */
@@ -397,7 +397,7 @@
 	{ 0,	0,	printargs,		"sysv_writev"	}, /* 1182 */
 	{ 0,	0,	printargs,		"sysv_truncate64"	}, /* 1183 */
 	{ 0,	0,	printargs,		"sysv_ftruncate64"	}, /* 1184 */
-	{ 0,	TM,	printargs,		"sysv_mmap64"	}, /* 1185 */
+	{ 0,	TD|TM,	printargs,		"sysv_mmap64"	}, /* 1185 */
 	{ 0,	0,	printargs,		"sysv_dmi"	}, /* 1186 */
 	{ 0,	0,	printargs,		"sysv_pread"	}, /* 1187 */
 	{ 0,	0,	printargs,		"sysv_pwrite"	}, /* 1188 */
@@ -475,7 +475,7 @@
 	{ 0,	0,	printargs,		"bsd43_vwrite"	}, /* 2068 */
 	{ 0,	TM,	printargs,		"bsd43_sbrk"	}, /* 2069 */
 	{ 0,	0,	printargs,		"bsd43_sstk"	}, /* 2070 */
-	{ 0,	TM,	printargs,		"bsd43_mmap"	}, /* 2071 */
+	{ 0,	TD|TM,	printargs,		"bsd43_mmap"	}, /* 2071 */
 	{ 0,	0,	printargs,		"bsd43_vadvise"	}, /* 2072 */
 	{ 0,	TM,	printargs,		"bsd43_munmap"	}, /* 2073 */
 	{ 0,	TM,	printargs,		"bsd43_mprotect"	}, /* 2074 */
@@ -733,7 +733,7 @@
 	{ 0,	0,	printargs,		"posix_SGI_blkproc"	}, /* 3131 */
 	{ 0,	0,	NULL,			NULL		}, /* 3132 */
 	{ 0,	0,	printargs,		"posix_SGI_sgigsc"	}, /* 3133 */
-	{ 0,	TM,	printargs,		"posix_SGI_mmap"	}, /* 3134 */
+	{ 0,	TD|TM,	printargs,		"posix_SGI_mmap"	}, /* 3134 */
 	{ 0,	TM,	printargs,		"posix_SGI_munmap"	}, /* 3135 */
 	{ 0,	TM,	printargs,		"posix_SGI_mprotect"	}, /* 3136 */
 	{ 0,	TM,	printargs,		"posix_SGI_msync"	}, /* 3137 */
@@ -754,7 +754,7 @@
 	{ 0,	0,	printargs,		"posix_fchown"	}, /* 3152 */
 	{ 0,	0,	printargs,		"posix_fchmod"	}, /* 3153 */
 	{ 0,	0,	printargs,		"posix_wait3"	}, /* 3154 */
-	{ 0,	TM,	printargs,		"posix_mmap"	}, /* 3155 */
+	{ 0,	TD|TM,	printargs,		"posix_mmap"	}, /* 3155 */
 	{ 0,	TM,	printargs,		"posix_munmap"	}, /* 3156 */
 	{ 0,	TM,	printargs,		"posix_madvise"	}, /* 3157 */
 	{ 0,	0,	printargs,		"posix_BSD_getpagesize"	}, /* 3158 */
@@ -1083,7 +1083,7 @@
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 4207 */
 	{ 0,	0,	NULL,			NULL		}, /* 4208 */
 	{ 0,	0,	NULL,			NULL		}, /* 4209 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 4210 */
+	{ 6,	TD|TM,	sys_mmap_4koff,		"mmap"		}, /* 4210 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
 	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 4213 */
@@ -1311,7 +1311,7 @@
 	{ 0,	0,	printargs,		"o32_swapon"	}, /* 4087 */
 	{ 0,	0,	printargs,		"o32_reboot"	}, /* 4088 */
 	{ 0,	0,	printargs,		"o32_readdir"	}, /* 4089 */
-	{ 0,	TM,	printargs,		"o32_old_mmap"	}, /* 4090 */
+	{ 0,	TD|TM,	printargs,		"o32_old_mmap"	}, /* 4090 */
 	{ 0,	TM,	printargs,		"o32_munmap"	}, /* 4091 */
 	{ 0,	0,	printargs,		"o32_truncate"	}, /* 4092 */
 	{ 0,	0,	printargs,		"o32_ftruncate"	}, /* 4093 */
@@ -1431,7 +1431,7 @@
 	{ 0,	0,	printargs,		"o32_sendfile"	}, /* 4207 */
 	{ 0,	0,	NULL,			NULL		}, /* 4208 */
 	{ 0,	0,	NULL,			NULL		}, /* 4209 */
-	{ 0,	TM,	printargs,		"o32_mmap"		}, /* 4210 */
+	{ 0,	TD|TM,	printargs,		"o32_mmap"		}, /* 4210 */
 	{ 0,	0,	printargs,		"o32_truncate64"	}, /* 4211 */
 	{ 0,	0,	printargs,		"o32_ftruncate64"	}, /* 4212 */
 	{ 0,	0,	printargs,		"o32_stat64"	}, /* 4213 */
@@ -1890,7 +1890,7 @@
 	{ 0,	0,	printargs,		"n64_lstat"		}, /* 5006 */
 	{ 0,	0,	printargs,		"n64_poll"		}, /* 5007 */
 	{ 0,	0,	printargs,		"n64_lseek"		}, /* 5008 */
-	{ 0,	TM,	printargs,		"n64_mmap"		}, /* 5009 */
+	{ 0,	TD|TM,	printargs,		"n64_mmap"		}, /* 5009 */
 	{ 0,	TM,	printargs,		"n64_mprotect"		}, /* 5010 */
 	{ 0,	TM,	printargs,		"n64_munmap"		}, /* 5011 */
 	{ 0,	TM,	printargs,		"n64_brk"		}, /* 5012 */
@@ -2514,7 +2514,7 @@
 	{ 0,	0,	printargs,		"n32_lstat"		}, /* 6006 */
 	{ 0,	0,	printargs,		"n32_poll"		}, /* 6007 */
 	{ 0,	0,	printargs,		"n32_lseek"		}, /* 6008 */
-	{ 0,	TM,	printargs,		"n32_mmap"		}, /* 6009 */
+	{ 0,	TD|TM,	printargs,		"n32_mmap"		}, /* 6009 */
 	{ 0,	TM,	printargs,		"n32_mprotect"		}, /* 6010 */
 	{ 0,	TM,	printargs,		"n32_munmap"		}, /* 6011 */
 	{ 0,	TM,	printargs,		"n32_brk"		}, /* 6012 */
