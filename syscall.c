@@ -2041,7 +2041,7 @@ static inline int
 is_negated_errno(unsigned long int val)
 {
 	unsigned long int max = -(long int) nerrnos;
-#if SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize < sizeof(val)) {
 		val = (unsigned int) val;
 		max = (unsigned int) max;

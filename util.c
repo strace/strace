@@ -767,7 +767,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		char x[sizeof(long)];
 	} u;
 
-#if SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize < sizeof(addr))
 		addr &= (1ul << 8 * current_wordsize) - 1;
 #endif
@@ -859,7 +859,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		char x[sizeof(long)];
 	} u;
 
-#if SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize < sizeof(addr))
 		addr &= (1ul << 8 * current_wordsize) - 1;
 #endif
