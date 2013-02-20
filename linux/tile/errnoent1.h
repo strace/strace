@@ -1,2 +1,2 @@
 /* tilegx32/tilepro */
-#include "linux/errnoent.h"
+#include "../errnoent.h"

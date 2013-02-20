@@ -1,2 +1,2 @@
-/* Our second set comes from the i386 files.  */
-#include "linux/ioctlent.h"
+/* "ARM specific syscall" personality */
+#include "../ioctlent.h"

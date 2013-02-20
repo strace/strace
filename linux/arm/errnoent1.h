@@ -1,2 +1,2 @@
-/* Our second set comes from the i386 files.  */
+/* "ARM specific syscall" personality */
 #include "../errnoent.h"

@@ -126,7 +126,7 @@
 #define sys_fstat64		printargs
 #define sys_fcntl64		printargs
 
-#include "i386/syscallent.h"
+#include "../i386/syscallent.h"
 
 #undef sys_getrlimit
 #undef sys_afs_syscall

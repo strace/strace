@@ -1,4 +1,4 @@
-/* ARM specific syscalls */
+/* "ARM specific syscall" personality */
 	{ 5,	0,	NULL,			NULL			}, /* 0 */
 	{ 5,	0,	printargs,		"breakpoint"		}, /* 1 */
 	{ 5,	0,	printargs,		"cacheflush"		}, /* 2 */

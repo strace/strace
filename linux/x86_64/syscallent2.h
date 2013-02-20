@@ -1,2 +1,2 @@
-/* Our third set is for x32.  */
-#include "x32/syscallent.h"
+/* x32 personality */
+#include "../x32/syscallent.h"

@@ -358,17 +358,13 @@ struct arm_pt_regs {
 
 #if defined(I386)
 extern struct user_regs_struct i386_regs;
-#endif
-#if defined(IA64)
+#elif defined(IA64)
 extern long ia32;
-#endif
-#if defined(SPARC) || defined(SPARC64)
+#elif defined(SPARC) || defined(SPARC64)
 extern struct pt_regs sparc_regs;
-#endif
-#if defined(ARM)
+#elif defined(ARM)
 extern struct pt_regs arm_regs;
-#endif
-#if defined(TILE)
+#elif defined(TILE)
 extern struct pt_regs tile_regs;
 #endif
 

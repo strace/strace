@@ -7,4 +7,4 @@
 #define sys_lstat64 sys_stat64
 #define sys_truncate64 sys_truncate
 #define sys_ftruncate64 sys_ftruncate
-#include "i386/syscallent.h"
+#include "../i386/syscallent.h"

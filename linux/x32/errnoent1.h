@@ -1,2 +1,2 @@
-/* Our second set comes from the i386 files.  */
+/* i386 personality */
 #include "../errnoent.h"

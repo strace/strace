@@ -1,2 +1,2 @@
-/* Our third set is for x32.  */
+/* x32 personality */
 #include "../signalent.h"
