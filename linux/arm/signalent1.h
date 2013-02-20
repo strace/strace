@@ -1,2 +1,2 @@
-/* i386 personality */
+/* "ARM specific syscall" personality */
 #include "../signalent.h"

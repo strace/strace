@@ -406,6 +406,8 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 375 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 376 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 377 */
+
+#ifndef __ARM_EABI__
 	{ 5,	0,	NULL,			NULL		}, /* 378 */
 	{ 5,	0,	NULL,			NULL		}, /* 379 */
 	{ 5,	0,	NULL,			NULL		}, /* 380 */
@@ -428,8 +430,6 @@
 	{ 5,	0,	NULL,			NULL		}, /* 397 */
 	{ 5,	0,	NULL,			NULL		}, /* 398 */
 	{ 5,	0,	NULL,			NULL		}, /* 399 */
-
-#ifndef __ARM_EABI__
 #if SYS_socket_subcall != 400
  #error fix me
 #endif

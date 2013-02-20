@@ -1215,59 +1215,43 @@ get_scno(struct tcb *tcp)
 			break;
 	}
 #elif defined(ARM)
-	/*
-	 * We only need to grab the syscall number on syscall entry.
-	 */
-	if (arm_regs.ARM_ip == 0) {
-		/*
-		 * Note: we only deal with 32-bit CPUs here
-		 */
-		if (arm_regs.ARM_cpsr & 0x20) {
-			/*
-			 * Get the Thumb-mode system call number
-			 */
-			scno = arm_regs.ARM_r7;
-		} else {
-			/*
-			 * Get the ARM-mode system call number
-			 */
-			errno = 0;
-			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(arm_regs.ARM_pc - 4), NULL);
-			if (errno)
-				return -1;
-
-			/* Handle the EABI syscall convention.  We do not
-			   bother converting structures between the two
-			   ABIs, but basic functionality should work even
-			   if strace and the traced program have different
-			   ABIs.  */
-			if (scno == 0xef000000) {
-				scno = arm_regs.ARM_r7;
-			} else {
-				if ((scno & 0x0ff00000) != 0x0f900000) {
-					fprintf(stderr, "syscall: unknown syscall trap 0x%08lx\n",
-						scno);
-					return -1;
-				}
-
-				/*
-				 * Fixup the syscall number
-				 */
-				scno &= 0x000fffff;
-			}
-		}
-		if (scno & 0x0f0000) {
-			/*
-			 * Handle ARM specific syscall
-			 */
-			update_personality(tcp, 1);
-			scno &= 0x0000ffff;
-		} else
-			update_personality(tcp, 0);
-
-	} else {
-		fprintf(stderr, "pid %d stray syscall entry\n", tcp->pid);
+	if (arm_regs.ARM_ip != 0) {
+		/* It is not a syscall entry */
+		fprintf(stderr, "pid %d stray syscall exit\n", tcp->pid);
 		tcp->flags |= TCB_INSYSCALL;
+		return 0;
+	}
+	/* Note: we support only 32-bit CPUs, not 26-bit */
+
+	if (arm_regs.ARM_cpsr & 0x20) {
+		/* Thumb mode */
+		scno = arm_regs.ARM_r7;
+	} else {
+		/* ARM mode */
+		errno = 0;
+		scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(arm_regs.ARM_pc - 4), NULL);
+		if (errno)
+			return -1;
+
+		/* EABI syscall convention? */
+		if (scno == 0xef000000) {
+			scno = arm_regs.ARM_r7; /* yes */
+		} else {
+			if ((scno & 0x0ff00000) != 0x0f900000) {
+				fprintf(stderr, "pid %d unknown syscall trap 0x%08lx\n",
+					tcp->pid, scno);
+				return -1;
+			}
+			/* Fixup the syscall number */
+			scno &= 0x000fffff;
+		}
+	}
+	if (scno & 0x000f0000) {
+		/* ARM specific syscall. We handle it as a separate "personality" */
+		update_personality(tcp, 1);
+		scno &= 0x0000ffff;
+	} else {
+		update_personality(tcp, 0);
 	}
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
