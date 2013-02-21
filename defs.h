@@ -318,9 +318,7 @@ struct arm_pt_regs {
 #endif
 
 #ifdef ARM
-# define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY0_WORDSIZE 4
-# define PERSONALITY1_WORDSIZE 4
+/* one personality */
 #endif
 
 #ifdef AARCH64

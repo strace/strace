@@ -406,8 +406,9 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 375 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 376 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 377 */
-
-#ifndef __ARM_EABI__
+#ifdef __ARM_EABI__
+# define ARM_LAST_ORDINARY_SYSCALL 377
+#else
 	{ 5,	0,	NULL,			NULL		}, /* 378 */
 	{ 5,	0,	NULL,			NULL		}, /* 379 */
 	{ 5,	0,	NULL,			NULL		}, /* 380 */
@@ -430,9 +431,9 @@
 	{ 5,	0,	NULL,			NULL		}, /* 397 */
 	{ 5,	0,	NULL,			NULL		}, /* 398 */
 	{ 5,	0,	NULL,			NULL		}, /* 399 */
-#if SYS_socket_subcall != 400
- #error fix me
-#endif
+# if SYS_socket_subcall != 400
+#  error fix me
+# endif
 	{ 6,	0,	printargs,		"socket_subcall"}, /* 400 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 401 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 402 */
@@ -454,9 +455,9 @@
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
 
-#if SYS_ipc_subcall != 420
- #error fix me
-#endif
+# if SYS_ipc_subcall != 420
+#  error fix me
+# endif
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 420 */
 	{ 4,	TI,	sys_semop,		"semop"		}, /* 421 */
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 422 */
@@ -482,4 +483,22 @@
 	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 442 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 443 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 444 */
-#endif
+# define ARM_LAST_ORDINARY_SYSCALL 444
+#endif /* !EABI */
+
+	/* __ARM_NR_cmpxchg (0x000ffff0).
+	 * Remapped by shuffle_scno() to be directly after ordinary syscalls
+	 * in this table.
+	 */
+	{ 5,	0,	printargs,		"cmpxchg"		},
+
+	/* ARM specific syscalls. Encoded with scno 0x000f00xx.
+	 * Remapped by shuffle_scno() to be directly after __ARM_NR_cmpxchg.
+	 */
+	{ 5,	0,	NULL,			NULL			}, /* 0 */
+	{ 5,	0,	printargs,		"breakpoint"		}, /* 1 */
+	{ 5,	0,	printargs,		"cacheflush"		}, /* 2 */
+	{ 5,	0,	printargs,		"usr26"			}, /* 3 */
+	{ 5,	0,	printargs,		"usr32"			}, /* 4 */
+	{ 5,	0,	printargs,		"set_tls"		}, /* 5 */
+#define ARM_LAST_SPECIAL_SYSCALL 5

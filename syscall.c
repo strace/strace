@@ -899,6 +899,51 @@ printcall(struct tcb *tcp)
 #endif /* architecture */
 }
 
+/* Shuffle syscall numbers so that we don't have huge gaps in syscall table.
+ * The shuffling should be reversible: shuffle_scno(shuffle_scno(n)) == n.
+ */
+#if defined(ARM) /* So far only ARM needs this */
+static long
+shuffle_scno(unsigned long scno)
+{
+	if (scno <= ARM_LAST_ORDINARY_SYSCALL)
+		return scno;
+
+	/* __ARM_NR_cmpxchg? Swap with LAST_ORDINARY+1 */
+	if (scno == 0x000ffff0)
+		return ARM_LAST_ORDINARY_SYSCALL+1;
+	if (scno == ARM_LAST_ORDINARY_SYSCALL+1)
+		return 0x000ffff0;
+
+	/* Is it ARM specific syscall?
+	 * Swap with [LAST_ORDINARY+2, LAST_ORDINARY+2 + LAST_SPECIAL] range.
+	 */
+	if (scno >= 0x000f0000
+	 && scno <= 0x000f0000 + ARM_LAST_SPECIAL_SYSCALL
+	) {
+		return scno - 0x000f0000 + (ARM_LAST_ORDINARY_SYSCALL+2);
+	}
+	if (/* scno >= ARM_LAST_ORDINARY_SYSCALL+2 - always true */ 1
+	 && scno <= (ARM_LAST_ORDINARY_SYSCALL+2) + ARM_LAST_SPECIAL_SYSCALL
+	) {
+		return scno + 0x000f0000 - (ARM_LAST_ORDINARY_SYSCALL+2);
+	}
+
+	return scno;
+}
+#else
+# define shuffle_scno(scno) ((long)(scno))
+#endif
+
+static char*
+undefined_scno_name(struct tcb *tcp)
+{
+	static char buf[sizeof("syscall_%lu") + sizeof(long)*3];
+
+	sprintf(buf, "syscall_%lu", shuffle_scno(tcp->scno));
+	return buf;
+}
+
 #ifndef get_regs
 long get_regs_error;
 void
@@ -1246,13 +1291,8 @@ get_scno(struct tcb *tcp)
 			scno &= 0x000fffff;
 		}
 	}
-	if (scno & 0x000f0000) {
-		/* ARM specific syscall. We handle it as a separate "personality" */
-		update_personality(tcp, 1);
-		scno &= 0x0000ffff;
-	} else {
-		update_personality(tcp, 0);
-	}
+
+	scno = shuffle_scno(scno);
 #elif defined(M68K)
 	if (upeek(tcp, 4*PT_ORIG_D0, &scno) < 0)
 		return -1;
@@ -1835,7 +1875,7 @@ trace_syscall_entering(struct tcb *tcp)
 		if (scno_good != 1)
 			tprints("????" /* anti-trigraph gap */ "(");
 		else if (!SCNO_IS_VALID(tcp->scno))
-			tprintf("syscall_%lu(", tcp->scno);
+			tprintf("%s(", undefined_scno_name(tcp));
 		else
 			tprintf("%s(", sysent[tcp->scno].sys_name);
 		/*
@@ -1882,7 +1922,7 @@ trace_syscall_entering(struct tcb *tcp)
 
 	printleader(tcp);
 	if (!SCNO_IS_VALID(tcp->scno))
-		tprintf("syscall_%lu(", tcp->scno);
+		tprintf("%s(", undefined_scno_name(tcp));
 	else
 		tprintf("%s(", sysent[tcp->scno].sys_name);
 	if (!SCNO_IS_VALID(tcp->scno) ||
@@ -2369,7 +2409,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
 		if (!SCNO_IS_VALID(tcp->scno))
-			tprintf("<... syscall_%lu resumed> ", tcp->scno);
+			tprintf("<... %s resumed> ", undefined_scno_name(tcp));
 		else
 			tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
 	}
