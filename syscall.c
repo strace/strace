@@ -556,16 +556,18 @@ static void
 decode_socket_subcall(struct tcb *tcp)
 {
 	unsigned long addr;
-	unsigned int i, size;
+	unsigned int i, n, size;
 
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= SYS_socket_nsubcalls)
 		return;
 
 	tcp->scno = SYS_socket_subcall + tcp->u_arg[0];
+	tcp->qual_flg = qual_flags[tcp->scno];
+	tcp->s_ent = &sysent[tcp->scno];
 	addr = tcp->u_arg[1];
-	tcp->u_nargs = sysent[tcp->scno].nargs;
 	size = current_wordsize;
-	for (i = 0; i < tcp->u_nargs; ++i) {
+	n = tcp->s_ent->nargs;
+	for (i = 0; i < n; ++i) {
 		if (size == sizeof(int)) {
 			unsigned int arg;
 			if (umove(tcp, addr, &arg) < 0)
@@ -587,14 +589,16 @@ decode_socket_subcall(struct tcb *tcp)
 static void
 decode_ipc_subcall(struct tcb *tcp)
 {
-	unsigned int i;
+	unsigned int i, n;
 
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= SYS_ipc_nsubcalls)
 		return;
 
 	tcp->scno = SYS_ipc_subcall + tcp->u_arg[0];
-	tcp->u_nargs = sysent[tcp->scno].nargs;
-	for (i = 0; i < tcp->u_nargs; i++)
+	tcp->qual_flg = qual_flags[tcp->scno];
+	tcp->s_ent = &sysent[tcp->scno];
+	n = tcp->s_ent->nargs;
+	for (i = 0; i < n; i++)
 		tcp->u_arg[i] = tcp->u_arg[i + 1];
 }
 #endif
@@ -604,8 +608,8 @@ printargs(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int i;
-
-		for (i = 0; i < tcp->u_nargs; i++)
+		int n = tcp->s_ent->nargs;
+		for (i = 0; i < n; i++)
 			tprintf("%s%#lx", i ? ", " : "", tcp->u_arg[i]);
 	}
 	return 0;
@@ -616,8 +620,8 @@ printargs_lu(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int i;
-
-		for (i = 0; i < tcp->u_nargs; i++)
+		int n = tcp->s_ent->nargs;
+		for (i = 0; i < n; i++)
 			tprintf("%s%lu", i ? ", " : "", tcp->u_arg[i]);
 	}
 	return 0;
@@ -628,8 +632,8 @@ printargs_ld(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int i;
-
-		for (i = 0; i < tcp->u_nargs; i++)
+		int n = tcp->s_ent->nargs;
+		for (i = 0; i < n; i++)
 			tprintf("%s%ld", i ? ", " : "", tcp->u_arg[i]);
 	}
 	return 0;
@@ -1305,7 +1309,7 @@ get_scno(struct tcb *tcp)
 	mips_r2 = regs[REG_V0];
 
 	scno = mips_r2;
-	if (!SCNO_IS_VALID(scno)) {
+	if (!SCNO_IN_RANGE(scno)) {
 		if (mips_a3 == 0 || mips_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
@@ -1318,7 +1322,7 @@ get_scno(struct tcb *tcp)
 	if (upeek(tcp, REG_V0, &scno) < 0)
 		return -1;
 
-	if (!SCNO_IS_VALID(scno)) {
+	if (!SCNO_IN_RANGE(scno)) {
 		if (mips_a3 == 0 || mips_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
@@ -1335,7 +1339,7 @@ get_scno(struct tcb *tcp)
 	 * Do some sanity checks to figure out if it's
 	 * really a syscall entry
 	 */
-	if (!SCNO_IS_VALID(scno)) {
+	if (!SCNO_IN_RANGE(scno)) {
 		if (alpha_a3 == 0 || alpha_a3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
@@ -1453,6 +1457,19 @@ get_scno(struct tcb *tcp)
 #endif
 
 	tcp->scno = scno;
+	if (SCNO_IS_VALID(tcp->scno)) {
+		tcp->s_ent = &sysent[scno];
+		tcp->qual_flg = qual_flags[scno];
+	} else {
+		static const struct sysent unknown = {
+			.nargs = MAX_ARGS,
+			.sys_flags = 0,
+			.sys_func = printargs,
+			.sys_name = "unknown", /* not used */
+		};
+		tcp->s_ent = &unknown;
+		tcp->qual_flg = UNDEFINED_SCNO | QUAL_RAW | DEFAULT_QUAL_FLAGS;
+	}
 	return 1;
 }
 
@@ -1567,8 +1584,9 @@ internal_fork(struct tcb *tcp)
 		 * CLONE_UNTRACED, so we keep the same logic with that option
 		 * and don't trace it.
 		 */
-		if ((sysent[tcp->scno].sys_func == sys_clone) &&
-		    (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED))
+		if ((tcp->s_ent->sys_func == sys_clone)
+		 && (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED)
+		)
 			return;
 		setbpt(tcp);
 	} else {
@@ -1603,10 +1621,7 @@ syscall_fixup_for_fork_exec(struct tcb *tcp)
 	 */
 	int (*func)();
 
-	if (!SCNO_IS_VALID(tcp->scno))
-		return;
-
-	func = sysent[tcp->scno].sys_func;
+	func = tcp->s_ent->sys_func;
 
 	if (   sys_fork == func
 	    || sys_vfork == func
@@ -1634,10 +1649,7 @@ get_syscall_args(struct tcb *tcp)
 {
 	int i, nargs;
 
-	if (SCNO_IS_VALID(tcp->scno))
-		nargs = tcp->u_nargs = sysent[tcp->scno].nargs;
-	else
-		nargs = tcp->u_nargs = MAX_ARGS;
+	nargs = tcp->s_ent->nargs;
 
 #if defined(S390) || defined(S390X)
 	for (i = 0; i < nargs; ++i)
@@ -1874,10 +1886,10 @@ trace_syscall_entering(struct tcb *tcp)
 		printleader(tcp);
 		if (scno_good != 1)
 			tprints("????" /* anti-trigraph gap */ "(");
-		else if (!SCNO_IS_VALID(tcp->scno))
+		else if (tcp->qual_flg & UNDEFINED_SCNO)
 			tprintf("%s(", undefined_scno_name(tcp));
 		else
-			tprintf("%s(", sysent[tcp->scno].sys_name);
+			tprintf("%s(", tcp->s_ent->sys_name);
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -1886,29 +1898,29 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 
 #if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
-	while (SCNO_IS_VALID(tcp->scno)) {
+	while (1) {
 # ifdef SYS_socket_subcall
-		if (sysent[tcp->scno].sys_func == sys_socketcall) {
+		if (tcp->s_ent->sys_func == sys_socketcall) {
 			decode_socket_subcall(tcp);
 			break;
 		}
 # endif
 # ifdef SYS_ipc_subcall
-		if (sysent[tcp->scno].sys_func == sys_ipc) {
+		if (tcp->s_ent->sys_func == sys_ipc) {
 			decode_ipc_subcall(tcp);
 			break;
 		}
 # endif
 		break;
 	}
-#endif /* SYS_socket_subcall || SYS_ipc_subcall */
+#endif
 
 	if (need_fork_exec_workarounds)
 		syscall_fixup_for_fork_exec(tcp);
 
-	if ((SCNO_IS_VALID(tcp->scno) &&
-	     !(qual_flags[tcp->scno] & QUAL_TRACE)) ||
-	    (tracing_paths && !pathtrace_match(tcp))) {
+	if (!(tcp->qual_flg & QUAL_TRACE)
+	 || (tracing_paths && !pathtrace_match(tcp))
+	) {
 		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
 		return 0;
 	}
@@ -1921,16 +1933,14 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 
 	printleader(tcp);
-	if (!SCNO_IS_VALID(tcp->scno))
+	if (tcp->qual_flg & UNDEFINED_SCNO)
 		tprintf("%s(", undefined_scno_name(tcp));
 	else
-		tprintf("%s(", sysent[tcp->scno].sys_name);
-	if (!SCNO_IS_VALID(tcp->scno) ||
-	    ((qual_flags[tcp->scno] & QUAL_RAW) &&
-	     sysent[tcp->scno].sys_func != sys_exit))
+		tprintf("%s(", tcp->s_ent->sys_name);
+	if ((tcp->qual_flg & QUAL_RAW) && tcp->s_ent->sys_func != sys_exit)
 		res = printargs(tcp);
 	else
-		res = (*sysent[tcp->scno].sys_func)(tcp);
+		res = tcp->s_ent->sys_func(tcp);
 
 	fflush(tcp->outf);
  ret:
@@ -2102,9 +2112,7 @@ get_error(struct tcb *tcp)
 {
 	int u_error = 0;
 	int check_errno = 1;
-	if (SCNO_IN_RANGE(tcp->scno)
-	 && (sysent[tcp->scno].sys_flags & SYSCALL_NEVER_FAILS)
-	) {
+	if (tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS) {
 		check_errno = 0;
 	}
 #if defined(S390) || defined(S390X)
@@ -2333,31 +2341,32 @@ get_error(struct tcb *tcp)
 static void
 dumpio(struct tcb *tcp)
 {
+	int (*func)();
+
 	if (syserror(tcp))
 		return;
-	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= MAX_QUALS)
+	if ((unsigned long) tcp->u_arg[0] >= MAX_QUALS)
 		return;
-	if (!SCNO_IS_VALID(tcp->scno))
-		return;
-	if (sysent[tcp->scno].sys_func == printargs)
+	func = tcp->s_ent->sys_func;
+	if (func == printargs)
 		return;
 	if (qual_flags[tcp->u_arg[0]] & QUAL_READ) {
-		if (sysent[tcp->scno].sys_func == sys_read ||
-		    sysent[tcp->scno].sys_func == sys_pread ||
-		    sysent[tcp->scno].sys_func == sys_recv ||
-		    sysent[tcp->scno].sys_func == sys_recvfrom)
+		if (func == sys_read ||
+		    func == sys_pread ||
+		    func == sys_recv ||
+		    func == sys_recvfrom)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		else if (sysent[tcp->scno].sys_func == sys_readv)
+		else if (func == sys_readv)
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 		return;
 	}
 	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
-		if (sysent[tcp->scno].sys_func == sys_write ||
-		    sysent[tcp->scno].sys_func == sys_pwrite ||
-		    sysent[tcp->scno].sys_func == sys_send ||
-		    sysent[tcp->scno].sys_func == sys_sendto)
+		if (func == sys_write ||
+		    func == sys_pwrite ||
+		    func == sys_send ||
+		    func == sys_sendto)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		else if (sysent[tcp->scno].sys_func == sys_writev)
+		else if (func == sys_writev)
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 		return;
 	}
@@ -2408,10 +2417,10 @@ trace_syscall_exiting(struct tcb *tcp)
 	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		if (!SCNO_IS_VALID(tcp->scno))
+		if (tcp->qual_flg & UNDEFINED_SCNO)
 			tprintf("<... %s resumed> ", undefined_scno_name(tcp));
 		else
-			tprintf("<... %s resumed> ", sysent[tcp->scno].sys_name);
+			tprintf("<... %s resumed> ", tcp->s_ent->sys_name);
 	}
 	printing_tcp = tcp;
 
@@ -2426,8 +2435,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 
 	sys_res = 0;
-	if (!SCNO_IS_VALID(tcp->scno)
-	    || (qual_flags[tcp->scno] & QUAL_RAW)) {
+	if (tcp->qual_flg & QUAL_RAW) {
 		/* sys_res = printargs(tcp); - but it's nop on sysexit */
 	} else {
 	/* FIXME: not_failing_only (IOW, option -z) is broken:
@@ -2440,14 +2448,13 @@ trace_syscall_exiting(struct tcb *tcp)
 	 */
 		if (not_failing_only && tcp->u_error)
 			goto ret;	/* ignore failed syscalls */
-		sys_res = (*sysent[tcp->scno].sys_func)(tcp);
+		sys_res = tcp->s_ent->sys_func(tcp);
 	}
 
 	tprints(") ");
 	tabto();
 	u_error = tcp->u_error;
-	if (!SCNO_IS_VALID(tcp->scno) ||
-	    qual_flags[tcp->scno] & QUAL_RAW) {
+	if (tcp->qual_flg & QUAL_RAW) {
 		if (u_error)
 			tprintf("= -1 (errno %ld)", u_error);
 		else

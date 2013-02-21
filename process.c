@@ -302,7 +302,7 @@ sys_prctl(struct tcb *tcp)
 			break;
 #endif
 		default:
-			for (i = 1; i < tcp->u_nargs; i++)
+			for (i = 1; i < tcp->s_ent->nargs; i++)
 				tprintf(", %#lx", tcp->u_arg[i]);
 			break;
 		}
@@ -1137,7 +1137,7 @@ sys_waitid(struct tcb *tcp)
 		/* options */
 		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
-		if (tcp->u_nargs > 4) {
+		if (tcp->s_ent->nargs > 4) {
 			/* usage */
 			tprints(", ");
 			if (!tcp->u_arg[4])

@@ -1543,6 +1543,9 @@ init(int argc, char *argv[])
 	qualify("trace=all");
 	qualify("abbrev=all");
 	qualify("verbose=all");
+#if DEFAULT_QUAL_FLAGS != (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
+# error Bug in DEFAULT_QUAL_FLAGS
+#endif
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
 		"+bcCdfFhiqrtTvVxyz"

@@ -366,11 +366,24 @@ extern struct pt_regs arm_regs;
 extern struct pt_regs tile_regs;
 #endif
 
+struct sysent {
+	unsigned nargs;
+	int	sys_flags;
+	int	(*sys_func)();
+	const char *sys_name;
+};
+
+struct ioctlent {
+	const char *doth;
+	const char *symbol;
+	unsigned long code;
+};
+
 /* Trace Control Block */
 struct tcb {
 	int flags;		/* See below for TCB_ values */
 	int pid;		/* Process Id of this entry */
-	int u_nargs;		/* System call argument count */
+	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
 	int u_error;		/* Error code */
 	long scno;		/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
@@ -385,6 +398,7 @@ struct tcb {
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
+	const struct sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
@@ -447,14 +461,17 @@ struct tcb {
 #endif
 
 /* qualifier flags */
-#define QUAL_TRACE	0001	/* this system call should be traced */
-#define QUAL_ABBREV	0002	/* abbreviate the structures of this syscall */
-#define QUAL_VERBOSE	0004	/* decode the structures of this syscall */
-#define QUAL_RAW	0010	/* print all args in hex for this syscall */
-#define QUAL_SIGNAL	0020	/* report events with this signal */
-#define QUAL_FAULT	0040	/* report events with this fault */
-#define QUAL_READ	0100	/* dump data read on this file descriptor */
-#define QUAL_WRITE	0200	/* dump data written to this file descriptor */
+#define QUAL_TRACE	0x001	/* this system call should be traced */
+#define QUAL_ABBREV	0x002	/* abbreviate the structures of this syscall */
+#define QUAL_VERBOSE	0x004	/* decode the structures of this syscall */
+#define QUAL_RAW	0x008	/* print all args in hex for this syscall */
+#define QUAL_SIGNAL	0x010	/* report events with this signal */
+#define QUAL_FAULT	0x020	/* report events with this fault */
+#define QUAL_READ	0x040	/* dump data read on this file descriptor */
+#define QUAL_WRITE	0x080	/* dump data written to this file descriptor */
+#define UNDEFINED_SCNO	0x100	/* Used only in tcp->qual_flg */
+
+#define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 
 #define entering(tcp)	(!((tcp)->flags & TCB_INSYSCALL))
 #define exiting(tcp)	((tcp)->flags & TCB_INSYSCALL)
@@ -727,19 +744,6 @@ extern unsigned current_wordsize;
 #else
 # define widen_to_long(v) ((long)(v))
 #endif
-
-struct sysent {
-	unsigned nargs;
-	int	sys_flags;
-	int	(*sys_func)();
-	const char *sys_name;
-};
-
-struct ioctlent {
-	const char *doth;
-	const char *symbol;
-	unsigned long code;
-};
 
 extern const struct sysent *sysent;
 extern unsigned nsyscalls;

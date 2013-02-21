@@ -1332,8 +1332,8 @@ setbpt(struct tcb *tcp)
 			}
 	}
 
-	if (sysent[tcp->scno].sys_func == sys_fork ||
-	    sysent[tcp->scno].sys_func == sys_vfork) {
+	if (tcp->s_ent->sys_func == sys_fork ||
+	    tcp->s_ent->sys_func == sys_vfork) {
 		if (arg_setup(tcp, &state) < 0
 		    || get_arg0(tcp, &state, &tcp->inst[0]) < 0
 		    || get_arg1(tcp, &state, &tcp->inst[1]) < 0
@@ -1349,7 +1349,7 @@ setbpt(struct tcb *tcp)
 		return 0;
 	}
 
-	if (sysent[tcp->scno].sys_func == sys_clone) {
+	if (tcp->s_ent->sys_func == sys_clone) {
 		/* ia64 calls directly `clone (CLONE_VFORK | CLONE_VM)'
 		   contrary to x86 vfork above.  Even on x86 we turn the
 		   vfork semantics into plain fork - each application must not

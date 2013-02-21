@@ -48,7 +48,9 @@ static struct timeval shortest = { 1000000, 0 };
 void
 count_syscall(struct tcb *tcp, struct timeval *tv)
 {
-	if (!SCNO_IS_VALID(tcp->scno))
+	unsigned long scno = tcp->scno;
+
+	if (!SCNO_IN_RANGE(scno))
 		return;
 
 	if (!counts) {
@@ -57,9 +59,9 @@ count_syscall(struct tcb *tcp, struct timeval *tv)
 			die_out_of_memory();
 	}
 
-	counts[tcp->scno].calls++;
+	counts[scno].calls++;
 	if (tcp->u_error)
-		counts[tcp->scno].errors++;
+		counts[scno].errors++;
 
 	tv_sub(tv, tv, &tcp->etime);
 	if (tv_cmp(tv, &tcp->dtime) > 0) {
@@ -87,7 +89,7 @@ count_syscall(struct tcb *tcp, struct timeval *tv)
 	}
 	if (tv_cmp(tv, &shortest) < 0)
 		shortest = *tv;
-	tv_add(&counts[tcp->scno].time, &counts[tcp->scno].time, tv);
+	tv_add(&counts[scno].time, &counts[scno].time, tv);
 }
 
 static int
