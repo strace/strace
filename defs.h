@@ -470,6 +470,7 @@ struct tcb {
 #define QUAL_READ	0x040	/* dump data read on this file descriptor */
 #define QUAL_WRITE	0x080	/* dump data written to this file descriptor */
 #define UNDEFINED_SCNO	0x100	/* Used only in tcp->qual_flg */
+typedef uint8_t qualbits_t;
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 
@@ -524,7 +525,7 @@ typedef enum {
 	CFLAG_BOTH
 } cflag_t;
 extern cflag_t cflag;
-extern int *qual_flags;
+extern qualbits_t *qual_flags;
 extern bool debug_flag;
 extern bool Tflag;
 extern bool qflag;

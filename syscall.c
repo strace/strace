@@ -166,7 +166,7 @@ enum { nsyscalls0 = ARRAY_SIZE(sysent0) };
 enum { nerrnos0 = ARRAY_SIZE(errnoent0) };
 enum { nsignals0 = ARRAY_SIZE(signalent0) };
 enum { nioctlents0 = ARRAY_SIZE(ioctlent0) };
-int qual_flags0[MAX_QUALS];
+qualbits_t qual_flags0[MAX_QUALS];
 
 #if SUPPORTED_PERSONALITIES >= 2
 static const char *const errnoent1[] = {
@@ -182,7 +182,7 @@ enum { nsyscalls1 = ARRAY_SIZE(sysent1) };
 enum { nerrnos1 = ARRAY_SIZE(errnoent1) };
 enum { nsignals1 = ARRAY_SIZE(signalent1) };
 enum { nioctlents1 = ARRAY_SIZE(ioctlent1) };
-int qual_flags1[MAX_QUALS];
+qualbits_t qual_flags1[MAX_QUALS];
 #endif
 
 #if SUPPORTED_PERSONALITIES >= 3
@@ -199,7 +199,7 @@ enum { nsyscalls2 = ARRAY_SIZE(sysent2) };
 enum { nerrnos2 = ARRAY_SIZE(errnoent2) };
 enum { nsignals2 = ARRAY_SIZE(signalent2) };
 enum { nioctlents2 = ARRAY_SIZE(ioctlent2) };
-int qual_flags2[MAX_QUALS];
+qualbits_t qual_flags2[MAX_QUALS];
 #endif
 
 const struct sysent *sysent = sysent0;
@@ -210,7 +210,7 @@ unsigned nsyscalls = nsyscalls0;
 unsigned nerrnos = nerrnos0;
 unsigned nsignals = nsignals0;
 unsigned nioctlents = nioctlents0;
-int *qual_flags = qual_flags0;
+qualbits_t *qual_flags = qual_flags0;
 
 #if SUPPORTED_PERSONALITIES > 1
 unsigned current_personality;
