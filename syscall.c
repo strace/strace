@@ -320,7 +320,7 @@ update_personality(struct tcb *tcp, int personality)
 }
 #endif
 
-static int qual_syscall(), qual_signal(), qual_fault(), qual_desc();
+static int qual_syscall(), qual_signal(), qual_desc();
 
 static const struct qual_options {
 	int bitflag;
@@ -339,9 +339,6 @@ static const struct qual_options {
 	{ QUAL_SIGNAL,	"signal",	qual_signal,	"signal"	},
 	{ QUAL_SIGNAL,	"signals",	qual_signal,	"signal"	},
 	{ QUAL_SIGNAL,	"s",		qual_signal,	"signal"	},
-	{ QUAL_FAULT,	"fault",	qual_fault,	"fault"		},
-	{ QUAL_FAULT,	"faults",	qual_fault,	"fault"		},
-	{ QUAL_FAULT,	"m",		qual_fault,	"fault"		},
 	{ QUAL_READ,	"read",		qual_desc,	"descriptor"	},
 	{ QUAL_READ,	"reads",	qual_desc,	"descriptor"	},
 	{ QUAL_READ,	"r",		qual_desc,	"descriptor"	},
@@ -441,12 +438,6 @@ qual_signal(const char *s, int bitflag, int not)
 			return 0;
 		}
 	}
-	return -1;
-}
-
-static int
-qual_fault(const char *s, int bitflag, int not)
-{
 	return -1;
 }
 

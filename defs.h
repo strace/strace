@@ -466,11 +466,10 @@ struct tcb {
 #define QUAL_VERBOSE	0x004	/* decode the structures of this syscall */
 #define QUAL_RAW	0x008	/* print all args in hex for this syscall */
 #define QUAL_SIGNAL	0x010	/* report events with this signal */
-#define QUAL_FAULT	0x020	/* report events with this fault */
-#define QUAL_READ	0x040	/* dump data read on this file descriptor */
-#define QUAL_WRITE	0x080	/* dump data written to this file descriptor */
-#define UNDEFINED_SCNO	0x100	/* Used only in tcp->qual_flg */
+#define QUAL_READ	0x020	/* dump data read on this file descriptor */
+#define QUAL_WRITE	0x040	/* dump data written to this file descriptor */
 typedef uint8_t qualbits_t;
+#define UNDEFINED_SCNO	0x100	/* Used only in tcp->qual_flg */
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 
