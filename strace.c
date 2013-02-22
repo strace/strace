@@ -2074,7 +2074,8 @@ trace(void)
 			if (pid == strace_child)
 				exit_code = 0x100 | WTERMSIG(status);
 			if (cflag != CFLAG_ONLY_STATS
-			    && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)) {
+			 && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)
+			) {
 				printleader(tcp);
 #ifdef WCOREDUMP
 				tprintf("+++ killed by %s %s+++\n",
@@ -2184,7 +2185,8 @@ trace(void)
  show_stopsig:
 #endif
 			if (cflag != CFLAG_ONLY_STATS
-			    && (qual_flags[sig] & QUAL_SIGNAL)) {
+			 && (qual_flags[sig] & QUAL_SIGNAL)
+			) {
 #if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
 				long pc = 0;
 				long psr = 0;

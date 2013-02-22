@@ -157,7 +157,7 @@ pathtrace_select(const char *path)
 int
 pathtrace_match(struct tcb *tcp)
 {
-	const struct sysent *s;
+	const struct_sysent *s;
 
 	if (selected[0] == NULL)
 		return 1;

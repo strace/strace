@@ -366,18 +366,18 @@ extern struct pt_regs arm_regs;
 extern struct pt_regs tile_regs;
 #endif
 
-struct sysent {
+typedef struct sysent {
 	unsigned nargs;
 	int	sys_flags;
 	int	(*sys_func)();
 	const char *sys_name;
-};
+} struct_sysent;
 
-struct ioctlent {
+typedef struct ioctlent {
 	const char *doth;
 	const char *symbol;
 	unsigned long code;
-};
+} struct_ioctlent;
 
 /* Trace Control Block */
 struct tcb {
@@ -398,7 +398,7 @@ struct tcb {
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
-	const struct sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
+	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
@@ -673,8 +673,8 @@ extern void tprint_open_modes(mode_t);
 extern const char *sprint_open_modes(mode_t);
 extern void print_loff_t(struct tcb *, long);
 
-extern const struct ioctlent *ioctl_lookup(long);
-extern const struct ioctlent *ioctl_next_match(const struct ioctlent *);
+extern const struct_ioctlent *ioctl_lookup(long);
+extern const struct_ioctlent *ioctl_next_match(const struct_ioctlent *);
 extern int ioctl_decode(struct tcb *, long, long);
 extern int term_ioctl(struct tcb *, long, long);
 extern int sock_ioctl(struct tcb *, long, long);
@@ -745,11 +745,11 @@ extern unsigned current_wordsize;
 # define widen_to_long(v) ((long)(v))
 #endif
 
-extern const struct sysent *sysent;
+extern const struct_sysent *sysent;
 extern unsigned nsyscalls;
 extern const char *const *errnoent;
 extern unsigned nerrnos;
-extern const struct ioctlent *ioctlent;
+extern const struct_ioctlent *ioctlent;
 extern unsigned nioctlents;
 extern const char *const *signalent;
 extern unsigned nsignals;

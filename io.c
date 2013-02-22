@@ -383,7 +383,7 @@ sys_vmsplice(struct tcb *tcp)
 int
 sys_ioctl(struct tcb *tcp)
 {
-	const struct ioctlent *iop;
+	const struct_ioctlent *iop;
 
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);

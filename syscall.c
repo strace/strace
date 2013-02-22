@@ -118,18 +118,18 @@
 #define NF SYSCALL_NEVER_FAILS
 #define MA MAX_ARGS
 
-static const struct sysent sysent0[] = {
+static const struct_sysent sysent0[] = {
 #include "syscallent.h"
 };
 
-#if SUPPORTED_PERSONALITIES >= 2
-static const struct sysent sysent1[] = {
+#if SUPPORTED_PERSONALITIES > 1
+static const struct_sysent sysent1[] = {
 # include "syscallent1.h"
 };
 #endif
 
-#if SUPPORTED_PERSONALITIES >= 3
-static const struct sysent sysent2[] = {
+#if SUPPORTED_PERSONALITIES > 2
+static const struct_sysent sysent2[] = {
 # include "syscallent2.h"
 };
 #endif
@@ -159,7 +159,7 @@ static const char *const errnoent0[] = {
 static const char *const signalent0[] = {
 #include "signalent.h"
 };
-static const struct ioctlent ioctlent0[] = {
+static const struct_ioctlent ioctlent0[] = {
 #include "ioctlent.h"
 };
 enum { nsyscalls0 = ARRAY_SIZE(sysent0) };
@@ -168,14 +168,14 @@ enum { nsignals0 = ARRAY_SIZE(signalent0) };
 enum { nioctlents0 = ARRAY_SIZE(ioctlent0) };
 qualbits_t qual_flags0[MAX_QUALS];
 
-#if SUPPORTED_PERSONALITIES >= 2
+#if SUPPORTED_PERSONALITIES > 1
 static const char *const errnoent1[] = {
 # include "errnoent1.h"
 };
 static const char *const signalent1[] = {
 # include "signalent1.h"
 };
-static const struct ioctlent ioctlent1[] = {
+static const struct_ioctlent ioctlent1[] = {
 # include "ioctlent1.h"
 };
 enum { nsyscalls1 = ARRAY_SIZE(sysent1) };
@@ -185,14 +185,14 @@ enum { nioctlents1 = ARRAY_SIZE(ioctlent1) };
 qualbits_t qual_flags1[MAX_QUALS];
 #endif
 
-#if SUPPORTED_PERSONALITIES >= 3
+#if SUPPORTED_PERSONALITIES > 2
 static const char *const errnoent2[] = {
 # include "errnoent2.h"
 };
 static const char *const signalent2[] = {
 # include "signalent2.h"
 };
-static const struct ioctlent ioctlent2[] = {
+static const struct_ioctlent ioctlent2[] = {
 # include "ioctlent2.h"
 };
 enum { nsyscalls2 = ARRAY_SIZE(sysent2) };
@@ -202,10 +202,10 @@ enum { nioctlents2 = ARRAY_SIZE(ioctlent2) };
 qualbits_t qual_flags2[MAX_QUALS];
 #endif
 
-const struct sysent *sysent = sysent0;
+const struct_sysent *sysent = sysent0;
 const char *const *errnoent = errnoent0;
 const char *const *signalent = signalent0;
-const struct ioctlent *ioctlent = ioctlent0;
+const struct_ioctlent *ioctlent = ioctlent0;
 unsigned nsyscalls = nsyscalls0;
 unsigned nerrnos = nerrnos0;
 unsigned nsignals = nsignals0;
@@ -254,7 +254,7 @@ set_personality(int personality)
 		qual_flags = qual_flags1;
 		break;
 
-# if SUPPORTED_PERSONALITIES >= 3
+# if SUPPORTED_PERSONALITIES > 2
 	case 2:
 		errnoent = errnoent2;
 		nerrnos = nerrnos2;
@@ -358,7 +358,7 @@ qualify_one(int n, int bitflag, int not, int pers)
 			qual_flags0[n] |= bitflag;
 	}
 
-#if SUPPORTED_PERSONALITIES >= 2
+#if SUPPORTED_PERSONALITIES > 1
 	if (pers == 1 || pers < 0) {
 		if (not)
 			qual_flags1[n] &= ~bitflag;
@@ -367,7 +367,7 @@ qualify_one(int n, int bitflag, int not, int pers)
 	}
 #endif
 
-#if SUPPORTED_PERSONALITIES >= 3
+#if SUPPORTED_PERSONALITIES > 2
 	if (pers == 2 || pers < 0) {
 		if (not)
 			qual_flags2[n] &= ~bitflag;
@@ -397,7 +397,7 @@ qual_syscall(const char *s, int bitflag, int not)
 			rc = 0;
 		}
 
-#if SUPPORTED_PERSONALITIES >= 2
+#if SUPPORTED_PERSONALITIES > 1
 	for (i = 0; i < nsyscalls1; i++)
 		if (sysent1[i].sys_name &&
 		    strcmp(s, sysent1[i].sys_name) == 0) {
@@ -406,7 +406,7 @@ qual_syscall(const char *s, int bitflag, int not)
 		}
 #endif
 
-#if SUPPORTED_PERSONALITIES >= 3
+#if SUPPORTED_PERSONALITIES > 2
 	for (i = 0; i < nsyscalls2; i++)
 		if (sysent2[i].sys_name &&
 		    strcmp(s, sysent2[i].sys_name) == 0) {
@@ -519,13 +519,13 @@ qualify(const char *s)
 				if (sysent0[i].sys_flags & n)
 					qualify_one(i, opt->bitflag, not, 0);
 
-#if SUPPORTED_PERSONALITIES >= 2
+#if SUPPORTED_PERSONALITIES > 1
 			for (i = 0; i < nsyscalls1; i++)
 				if (sysent1[i].sys_flags & n)
 					qualify_one(i, opt->bitflag, not, 1);
 #endif
 
-#if SUPPORTED_PERSONALITIES >= 3
+#if SUPPORTED_PERSONALITIES > 2
 			for (i = 0; i < nsyscalls2; i++)
 				if (sysent2[i].sys_flags & n)
 					qualify_one(i, opt->bitflag, not, 2);
@@ -1452,7 +1452,7 @@ get_scno(struct tcb *tcp)
 		tcp->s_ent = &sysent[scno];
 		tcp->qual_flg = qual_flags[scno];
 	} else {
-		static const struct sysent unknown = {
+		static const struct_sysent unknown = {
 			.nargs = MAX_ARGS,
 			.sys_flags = 0,
 			.sys_func = printargs,
