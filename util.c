@@ -1389,6 +1389,9 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 	/* microblaze is only supported since about linux-2.6.30 */
 #elif defined(OR1K)
 	/* never reached; OR1K is only supported by kernels since 3.1.0. */
+#elif defined(METAG)
+	/* setbpt/clearbpt never used: */
+	/* Meta is only supported since linux-3.7 */
 #else
 #warning Do not know how to handle change_syscall for this architecture
 #endif /* architecture */

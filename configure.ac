@@ -37,6 +37,10 @@ sparc*)
 	arch=sparc
 	AC_DEFINE([SPARC], 1, [Define for the SPARC architecture.])
 	;;
+metag*)
+	arch=metag
+	AC_DEFINE([METAG], 1, [Define for the Meta architecture.])
+	;;
 mips*)
 	arch=mips
 	AC_DEFINE([MIPS], 1, [Define for the MIPS architecture.])

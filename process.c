@@ -2277,6 +2277,8 @@ const struct xlat struct_user_offsets[] = {
 	{ sizeof(struct user),	"sizeof(struct user)"			},
 #elif defined(OR1K)
 	/* nothing */
+#elif defined(METAG)
+	/* nothing */
 #endif
 	{ 0,			NULL					},
 };

@@ -82,6 +82,11 @@
 # include <elf.h>
 #endif
 
+#if defined(METAG)
+# include <sys/uio.h>
+# include <elf.h>
+#endif
+
 #ifndef ERESTARTSYS
 # define ERESTARTSYS	512
 #endif
@@ -802,6 +807,11 @@ static struct user_regs_struct or1k_regs;
 static struct iovec or1k_io = {
 	.iov_base = &or1k_regs
 };
+#elif defined(METAG)
+static struct user_gp_regs metag_regs;
+static struct iovec metag_io = {
+	.iov_base = &metag_regs
+};
 #endif
 
 void
@@ -937,6 +947,8 @@ printcall(struct tcb *tcp)
 # endif
 #elif defined(OR1K)
 	tprintf("[%08lx] ", or1k_regs.pc);
+#elif defined(METAG)
+	tprintf("[%08lx] ", metag_regs.pc);
 #endif /* architecture */
 }
 
@@ -1061,6 +1073,9 @@ get_regs(pid_t pid)
 # elif defined(OR1K)
 	or1k_io.iov_len = sizeof(or1k_regs);
 	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &or1k_io);
+# elif defined(METAG)
+	metag_io.iov_len = sizeof(metag_regs);
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &metag_io);
 # endif
 }
 #endif
@@ -1491,6 +1506,8 @@ get_scno(struct tcb *tcp)
 		return -1;
 #elif defined(OR1K)
 	scno = or1k_regs.gpr[11];
+#elif defined(METAG)
+	scno = metag_regs.dx[0][1];	/* syscall number in D1Re0 (D1.0) */
 #endif
 
 	tcp->scno = scno;
@@ -1887,6 +1904,10 @@ get_syscall_args(struct tcb *tcp)
 	(void)nargs;
 	for (i = 0; i < 6; ++i)
 		tcp->u_arg[i] = or1k_regs.gpr[3 + i];
+#elif defined(METAG)
+	for (i = 0; i < nargs; i++)
+		/* arguments go backwards from D1Ar1 (D1.3) */
+		tcp->u_arg[i] = ((unsigned long *)&metag_regs.dx[3][1])[-i];
 #else /* Other architecture (32bits specific) */
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, i*4, &tcp->u_arg[i]) < 0)
@@ -2080,6 +2101,8 @@ get_syscall_result(struct tcb *tcp)
 	if (upeek(tcp, 3 * 4, &microblaze_r3) < 0)
 		return -1;
 #elif defined(OR1K)
+	/* already done by get_regs */
+#elif defined(METAG)
 	/* already done by get_regs */
 #endif
 	return 1;
@@ -2333,6 +2356,15 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = sh64_r9;
+	}
+#elif defined(METAG)
+	/* result pointer in D0Re0 (D0.0) */
+	if (check_errno && is_negated_errno(metag_regs.dx[0][0])) {
+		tcp->u_rval = -1;
+		u_error = -metag_regs.dx[0][0];
+	}
+	else {
+		tcp->u_rval = metag_regs.dx[0][0];
 	}
 #elif defined(CRISV10) || defined(CRISV32)
 	if (check_errno && cris_r10 && (unsigned) -cris_r10 < nerrnos) {
