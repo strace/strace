@@ -661,54 +661,70 @@ dumpstr(struct tcb *tcp, long addr, int len)
 {
 	static int strsize = -1;
 	static unsigned char *str;
-	char *s;
-	int i, j;
 
-	if (strsize < len) {
+	char outbuf[
+		(
+			(sizeof(
+			"xx xx xx xx xx xx xx xx  xx xx xx xx xx xx xx xx  "
+			"1234567890123456") + /*in case I'm off by few:*/ 4)
+		/*align to 8 to make memset easier:*/ + 7) & -8
+	];
+	const unsigned char *src;
+	int i;
+
+	memset(outbuf, ' ', sizeof(outbuf));
+
+	if (strsize < len + 16) {
 		free(str);
-		str = malloc(len);
+		str = malloc(len + 16);
 		if (!str) {
 			strsize = -1;
 			fprintf(stderr, "Out of memory\n");
 			return;
 		}
-		strsize = len;
+		strsize = len + 16;
 	}
 
 	if (umoven(tcp, addr, len, (char *) str) < 0)
 		return;
 
-	for (i = 0; i < len; i += 16) {
-		char outstr[80];
+	/* Space-pad to 16 bytes */
+	i = len;
+	while (i & 0xf)
+		str[i++] = ' ';
 
-		s = outstr;
-		sprintf(s, " | %05x ", i);
-		s += 9;
-		for (j = 0; j < 16; j++) {
-			if (j == 8)
-				*s++ = ' ';
-			if (i + j < len) {
-				sprintf(s, " %02x", str[i + j]);
-				s += 3;
+	i = 0;
+	src = str;
+	while (i < len) {
+		char *dst = outbuf;
+		/* Hex dump */
+		do {
+			if (i < len) {
+				*dst++ = "0123456789abcdef"[*src >> 4];
+				*dst++ = "0123456789abcdef"[*src & 0xf];
 			}
 			else {
-				*s++ = ' '; *s++ = ' '; *s++ = ' ';
+				*dst++ = ' ';
+				*dst++ = ' ';
 			}
-		}
-		*s++ = ' '; *s++ = ' ';
-		for (j = 0; j < 16; j++) {
-			if (j == 8)
-				*s++ = ' ';
-			if (i + j < len) {
-				if (isprint(str[i + j]))
-					*s++ = str[i + j];
-				else
-					*s++ = '.';
-			}
+			dst++; /* space is there by memset */
+			i++;
+			if ((i & 7) == 0)
+				dst++; /* space is there by memset */
+			src++;
+		} while (i & 0xf);
+		/* ASCII dump */
+		i -= 16;
+		src -= 16;
+		do {
+			if (*src >= ' ' && *src < 0x7f)
+				*dst++ = *src;
 			else
-				*s++ = ' ';
-		}
-		tprintf("%s |\n", outstr);
+				*dst++ = '.';
+			src++;
+		} while (++i & 0xf);
+		*dst = '\0';
+		tprintf(" | %05x  %s |\n", i, outbuf);
 	}
 }
 
