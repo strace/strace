@@ -724,7 +724,7 @@ dumpstr(struct tcb *tcp, long addr, int len)
 			src++;
 		} while (++i & 0xf);
 		*dst = '\0';
-		tprintf(" | %05x  %s |\n", i, outbuf);
+		tprintf(" | %05x  %s |\n", i - 16, outbuf);
 	}
 }
 
