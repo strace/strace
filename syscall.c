@@ -118,7 +118,7 @@
 #define NF SYSCALL_NEVER_FAILS
 #define MA MAX_ARGS
 
-static const struct_sysent sysent0[] = {
+const struct_sysent sysent0[] = {
 #include "syscallent.h"
 };
 
@@ -153,20 +153,19 @@ static const struct_sysent sysent2[] = {
  * in "/usr/include".
  */
 
-static const char *const errnoent0[] = {
+const char *const errnoent0[] = {
 #include "errnoent.h"
 };
-static const char *const signalent0[] = {
+const char *const signalent0[] = {
 #include "signalent.h"
 };
-static const struct_ioctlent ioctlent0[] = {
+const struct_ioctlent ioctlent0[] = {
 #include "ioctlent.h"
 };
 enum { nsyscalls0 = ARRAY_SIZE(sysent0) };
 enum { nerrnos0 = ARRAY_SIZE(errnoent0) };
 enum { nsignals0 = ARRAY_SIZE(signalent0) };
 enum { nioctlents0 = ARRAY_SIZE(ioctlent0) };
-qualbits_t qual_flags0[MAX_QUALS];
 
 #if SUPPORTED_PERSONALITIES > 1
 static const char *const errnoent1[] = {
@@ -182,7 +181,6 @@ enum { nsyscalls1 = ARRAY_SIZE(sysent1) };
 enum { nerrnos1 = ARRAY_SIZE(errnoent1) };
 enum { nsignals1 = ARRAY_SIZE(signalent1) };
 enum { nioctlents1 = ARRAY_SIZE(ioctlent1) };
-qualbits_t qual_flags1[MAX_QUALS];
 #endif
 
 #if SUPPORTED_PERSONALITIES > 2
@@ -199,18 +197,60 @@ enum { nsyscalls2 = ARRAY_SIZE(sysent2) };
 enum { nerrnos2 = ARRAY_SIZE(errnoent2) };
 enum { nsignals2 = ARRAY_SIZE(signalent2) };
 enum { nioctlents2 = ARRAY_SIZE(ioctlent2) };
-qualbits_t qual_flags2[MAX_QUALS];
 #endif
 
+#if SUPPORTED_PERSONALITIES > 1
 const struct_sysent *sysent = sysent0;
 const char *const *errnoent = errnoent0;
 const char *const *signalent = signalent0;
 const struct_ioctlent *ioctlent = ioctlent0;
+#endif
 unsigned nsyscalls = nsyscalls0;
 unsigned nerrnos = nerrnos0;
 unsigned nsignals = nsignals0;
 unsigned nioctlents = nioctlents0;
-qualbits_t *qual_flags = qual_flags0;
+
+unsigned num_quals;
+qualbits_t *qual_vec[SUPPORTED_PERSONALITIES];
+
+static const unsigned nsyscall_vec[SUPPORTED_PERSONALITIES] = {
+	nsyscalls0,
+#if SUPPORTED_PERSONALITIES > 1
+	nsyscalls1,
+#endif
+#if SUPPORTED_PERSONALITIES > 2
+	nsyscalls2,
+#endif
+};
+static const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
+	sysent0,
+#if SUPPORTED_PERSONALITIES > 1
+	sysent1,
+#endif
+#if SUPPORTED_PERSONALITIES > 2
+	sysent2,
+#endif
+};
+
+enum {
+	MAX_NSYSCALLS1 = (nsyscalls0
+#if SUPPORTED_PERSONALITIES > 1
+			> nsyscalls1 ? nsyscalls0 : nsyscalls1
+#endif
+			),
+	MAX_NSYSCALLS2 = (MAX_NSYSCALLS1
+#if SUPPORTED_PERSONALITIES > 2
+			> nsyscalls2 ? MAX_NSYSCALLS1 : nsyscalls2
+#endif
+			),
+	MAX_NSYSCALLS = MAX_NSYSCALLS2,
+	/* We are ready for arches with up to 255 signals,
+	 * even though the largest known signo is on MIPS and it is 128.
+	 * The number of existing syscalls on all arches is
+	 * larger that 255 anyway, so it is just a pedantic matter.
+	 */
+	MIN_QUALS = MAX_NSYSCALLS > 255 ? MAX_NSYSCALLS : 255
+};
 
 #if SUPPORTED_PERSONALITIES > 1
 unsigned current_personality;
@@ -229,42 +269,36 @@ static const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 void
 set_personality(int personality)
 {
+	nsyscalls = nsyscall_vec[personality];
+	sysent = sysent_vec[personality];
+
 	switch (personality) {
 	case 0:
 		errnoent = errnoent0;
 		nerrnos = nerrnos0;
-		sysent = sysent0;
-		nsyscalls = nsyscalls0;
 		ioctlent = ioctlent0;
 		nioctlents = nioctlents0;
 		signalent = signalent0;
 		nsignals = nsignals0;
-		qual_flags = qual_flags0;
 		break;
 
 	case 1:
 		errnoent = errnoent1;
 		nerrnos = nerrnos1;
-		sysent = sysent1;
-		nsyscalls = nsyscalls1;
 		ioctlent = ioctlent1;
 		nioctlents = nioctlents1;
 		signalent = signalent1;
 		nsignals = nsignals1;
-		qual_flags = qual_flags1;
 		break;
 
 # if SUPPORTED_PERSONALITIES > 2
 	case 2:
 		errnoent = errnoent2;
 		nerrnos = nerrnos2;
-		sysent = sysent2;
-		nsyscalls = nsyscalls2;
 		ioctlent = ioctlent2;
 		nioctlents = nioctlents2;
 		signalent = signalent2;
 		nsignals = nsignals2;
-		qual_flags = qual_flags2;
 		break;
 # endif
 	}
@@ -349,71 +383,62 @@ static const struct qual_options {
 };
 
 static void
+reallocate_qual(int n)
+{
+	unsigned p;
+	qualbits_t *qp;
+	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
+		qp = qual_vec[p] = realloc(qual_vec[p], n * sizeof(qualbits_t));
+		if (!qp)
+			die_out_of_memory();
+		memset(&qp[num_quals], 0, (n - num_quals) * sizeof(qualbits_t));
+	}
+	num_quals = n;
+}
+
+static void
 qualify_one(int n, int bitflag, int not, int pers)
 {
-	if (pers == 0 || pers < 0) {
-		if (not)
-			qual_flags0[n] &= ~bitflag;
-		else
-			qual_flags0[n] |= bitflag;
-	}
+	unsigned p;
 
-#if SUPPORTED_PERSONALITIES > 1
-	if (pers == 1 || pers < 0) {
-		if (not)
-			qual_flags1[n] &= ~bitflag;
-		else
-			qual_flags1[n] |= bitflag;
-	}
-#endif
+	if (num_quals <= n)
+		reallocate_qual(n + 1);
 
-#if SUPPORTED_PERSONALITIES > 2
-	if (pers == 2 || pers < 0) {
-		if (not)
-			qual_flags2[n] &= ~bitflag;
-		else
-			qual_flags2[n] |= bitflag;
+	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
+		if (pers == p || pers < 0) {
+			if (not)
+				qual_vec[p][n] &= ~bitflag;
+			else
+				qual_vec[p][n] |= bitflag;
+		}
 	}
-#endif
 }
 
 static int
 qual_syscall(const char *s, int bitflag, int not)
 {
-	int i;
+	unsigned p;
+	unsigned i;
 	int rc = -1;
 
 	if (*s >= '0' && *s <= '9') {
-		int i = string_to_uint(s);
-		if (i < 0 || i >= MAX_QUALS)
+		i = string_to_uint(s);
+		if (i > MAX_NSYSCALLS)
 			return -1;
 		qualify_one(i, bitflag, not, -1);
 		return 0;
 	}
-	for (i = 0; i < nsyscalls0; i++)
-		if (sysent0[i].sys_name &&
-		    strcmp(s, sysent0[i].sys_name) == 0) {
-			qualify_one(i, bitflag, not, 0);
-			rc = 0;
-		}
 
-#if SUPPORTED_PERSONALITIES > 1
-	for (i = 0; i < nsyscalls1; i++)
-		if (sysent1[i].sys_name &&
-		    strcmp(s, sysent1[i].sys_name) == 0) {
-			qualify_one(i, bitflag, not, 1);
-			rc = 0;
+	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
+		for (i = 0; i < nsyscall_vec[p]; i++) {
+			if (sysent_vec[p][i].sys_name
+			 && strcmp(s, sysent_vec[p][i].sys_name) == 0
+			) {
+				qualify_one(i, bitflag, not, 0);
+				rc = 0;
+			}
 		}
-#endif
-
-#if SUPPORTED_PERSONALITIES > 2
-	for (i = 0; i < nsyscalls2; i++)
-		if (sysent2[i].sys_name &&
-		    strcmp(s, sysent2[i].sys_name) == 0) {
-			qualify_one(i, bitflag, not, 2);
-			rc = 0;
-		}
-#endif
+	}
 
 	return rc;
 }
@@ -425,7 +450,7 @@ qual_signal(const char *s, int bitflag, int not)
 
 	if (*s >= '0' && *s <= '9') {
 		int signo = string_to_uint(s);
-		if (signo < 0 || signo >= MAX_QUALS)
+		if (signo < 0 || signo > 255)
 			return -1;
 		qualify_one(signo, bitflag, not, -1);
 		return 0;
@@ -446,7 +471,7 @@ qual_desc(const char *s, int bitflag, int not)
 {
 	if (*s >= '0' && *s <= '9') {
 		int desc = string_to_uint(s);
-		if (desc < 0 || desc >= MAX_QUALS)
+		if (desc < 0 || desc > 0x7fff) /* paranoia */
 			return -1;
 		qualify_one(desc, bitflag, not, -1);
 		return 0;
@@ -483,6 +508,9 @@ qualify(const char *s)
 	const char *p;
 	int i, n;
 
+	if (num_quals == 0)
+		reallocate_qual(MIN_QUALS);
+
 	opt = &qual_options[0];
 	for (i = 0; (p = qual_options[i].option_name); i++) {
 		n = strlen(p);
@@ -502,12 +530,12 @@ qualify(const char *s)
 		s = "all";
 	}
 	if (strcmp(s, "all") == 0) {
-		for (i = 0; i < MAX_QUALS; i++) {
+		for (i = 0; i < num_quals; i++) {
 			qualify_one(i, opt->bitflag, not, -1);
 		}
 		return;
 	}
-	for (i = 0; i < MAX_QUALS; i++) {
+	for (i = 0; i < num_quals; i++) {
 		qualify_one(i, opt->bitflag, !not, -1);
 	}
 	copy = strdup(s);
@@ -515,22 +543,12 @@ qualify(const char *s)
 		die_out_of_memory();
 	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
 		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {
-			for (i = 0; i < nsyscalls0; i++)
-				if (sysent0[i].sys_flags & n)
-					qualify_one(i, opt->bitflag, not, 0);
-
-#if SUPPORTED_PERSONALITIES > 1
-			for (i = 0; i < nsyscalls1; i++)
-				if (sysent1[i].sys_flags & n)
-					qualify_one(i, opt->bitflag, not, 1);
-#endif
-
-#if SUPPORTED_PERSONALITIES > 2
-			for (i = 0; i < nsyscalls2; i++)
-				if (sysent2[i].sys_flags & n)
-					qualify_one(i, opt->bitflag, not, 2);
-#endif
-
+			unsigned pers;
+			for (pers = 0; pers < SUPPORTED_PERSONALITIES; pers++) {
+				for (i = 0; i < nsyscall_vec[pers]; i++)
+					if (sysent_vec[pers][i].sys_flags & n)
+						qualify_one(i, opt->bitflag, not, 0);
+			}
 			continue;
 		}
 		if (opt->qualify(p, opt->bitflag, not)) {
@@ -2336,7 +2354,7 @@ dumpio(struct tcb *tcp)
 
 	if (syserror(tcp))
 		return;
-	if ((unsigned long) tcp->u_arg[0] >= MAX_QUALS)
+	if ((unsigned long) tcp->u_arg[0] >= num_quals)
 		return;
 	func = tcp->s_ent->sys_func;
 	if (func == printargs)

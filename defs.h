@@ -91,13 +91,6 @@ extern char *stpcpy(char *dst, const char *src);
 #endif
 
 /* Configuration section */
-#ifndef MAX_QUALS
-# if defined(MIPS)
-#  define MAX_QUALS	7000	/* maximum number of syscalls, signals, etc. */
-# else
-#  define MAX_QUALS	2048	/* maximum number of syscalls, signals, etc. */
-# endif
-#endif
 #ifndef DEFAULT_STRLEN
 /* default maximum # of bytes printed in `printstr', change with -s switch */
 # define DEFAULT_STRLEN	32
@@ -524,7 +517,6 @@ typedef enum {
 	CFLAG_BOTH
 } cflag_t;
 extern cflag_t cflag;
-extern qualbits_t *qual_flags;
 extern bool debug_flag;
 extern bool Tflag;
 extern bool qflag;
@@ -745,14 +737,28 @@ extern unsigned current_wordsize;
 # define widen_to_long(v) ((long)(v))
 #endif
 
+extern const struct_sysent sysent0[];
+extern const char *const errnoent0[];
+extern const char *const signalent0[];
+extern const struct_ioctlent ioctlent0[];
+extern qualbits_t *qual_vec[SUPPORTED_PERSONALITIES];
+#define qual_flags (qual_vec[current_personality])
+#if SUPPORTED_PERSONALITIES > 1
 extern const struct_sysent *sysent;
-extern unsigned nsyscalls;
 extern const char *const *errnoent;
-extern unsigned nerrnos;
-extern const struct_ioctlent *ioctlent;
-extern unsigned nioctlents;
 extern const char *const *signalent;
+extern const struct_ioctlent *ioctlent;
+#else
+# define sysent     sysent0
+# define errnoent   errnoent0
+# define signalent  signalent0
+# define ioctlent   ioctlent0
+#endif
+extern unsigned nsyscalls;
+extern unsigned nerrnos;
 extern unsigned nsignals;
+extern unsigned nioctlents;
+extern unsigned num_quals;
 
 /*
  * If you need non-NULL sysent[scno].sys_func and sysent[scno].sys_name
