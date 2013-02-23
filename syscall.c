@@ -423,7 +423,7 @@ qual_syscall(const char *s, int bitflag, int not)
 
 	if (*s >= '0' && *s <= '9') {
 		i = string_to_uint(s);
-		if (i > MAX_NSYSCALLS)
+		if (i >= MAX_NSYSCALLS)
 			return -1;
 		qualify_one(i, bitflag, not, -1);
 		return 0;
