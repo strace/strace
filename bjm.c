@@ -195,8 +195,7 @@ int
 sys_init_module(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, ", tcp->u_arg[0]);
-		tprintf("%lu, ", tcp->u_arg[1]);
+		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
 		printstr(tcp, tcp->u_arg[2], -1);
 	}
 	return 0;
