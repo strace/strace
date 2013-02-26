@@ -777,7 +777,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 {
 	int pid = tcp->pid;
 	int n, m;
-	int started;
+	//int started;
 	union {
 		long val;
 		char x[sizeof(long)];
@@ -800,6 +800,8 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 				remote, 1,
 				/*flags:*/ 0
 		);
+		if (r == len)
+			return 0;
 		if (r < 0) {
 			if (errno == ENOSYS)
 				process_vm_readv_not_supported = 1;
@@ -807,13 +809,12 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 				/* EINVAL or ESRCH could be seen if process is gone,
 				 * all the rest is strange and should be reported. */
 				perror_msg("%s", "process_vm_readv");
-			goto vm_readv_didnt_work;
+		} else {
+			perror_msg("process_vm_readv: short read (%d < %d)", r, len);
 		}
-		return r;
 	}
- vm_readv_didnt_work:
 
-	started = 0;
+	//started = 0;
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
@@ -826,7 +827,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
 			return -1;
 		}
-		started = 1;
+		//started = 1;
 		m = MIN(sizeof(long) - n, len);
 		memcpy(laddr, &u.x[n], m);
 		addr += sizeof(long), laddr += m, len -= m;
@@ -835,15 +836,19 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
 		if (errno) {
+#if 0
+//FIXME: wrong. printpath doesn't use this routine. Callers expect full copies.
+//Ok to remove?
 			if (started && (errno==EPERM || errno==EIO)) {
 				/* Ran into 'end of memory' - stupid "printpath" */
 				return 0;
 			}
+#endif
 			if (addr != 0 && errno != EIO && errno != ESRCH)
 				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
 			return -1;
 		}
-		started = 1;
+		//started = 1;
 		m = MIN(sizeof(long), len);
 		memcpy(laddr, u.x, m);
 		addr += sizeof(long), laddr += m, len -= m;
