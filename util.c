@@ -808,9 +808,9 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 			else if (errno != EINVAL && errno != ESRCH)
 				/* EINVAL or ESRCH could be seen if process is gone,
 				 * all the rest is strange and should be reported. */
-				perror_msg("%s", "process_vm_readv");
+				perror_msg("process_vm_readv");
 		} else {
-			perror_msg("process_vm_readv: short read (%d < %d)", r, len);
+			error_msg("process_vm_readv: short read (%d < %d)", r, len);
 		}
 	}
 
@@ -923,7 +923,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 					/* EINVAL or ESRCH could be seen
 					 * if process is gone, all the rest
 					 * is strange and should be reported. */
-					perror_msg("%s", "process_vm_readv");
+					perror_msg("process_vm_readv");
 				goto vm_readv_didnt_work;
 			}
 			if (memchr(local[0].iov_base, '\0', r))

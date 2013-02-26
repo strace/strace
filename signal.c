@@ -913,7 +913,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigset_t sigm;
 		i1 = sparc_regs.u_regs[U_REG_O1];
 		if (umove(tcp, i1, &si) < 0) {
-			perror_msg("%s", "sigreturn: umove");
+			perror_msg("sigreturn: umove");
 			return 0;
 		}
 		long_to_sigset(si.si_mask, &sigm);
@@ -942,7 +942,7 @@ sys_sigreturn(struct tcb *tcp)
 		m_siginfo_t si;
 		sigset_t sigm;
 		if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-			perror_msg("%s", "sigreturn: PTRACE_GETREGS");
+			perror_msg("sigreturn: PTRACE_GETREGS");
 			return 0;
 		}
 		sp = regs.regs[29];
@@ -957,7 +957,7 @@ sys_sigreturn(struct tcb *tcp)
 		long regs[PT_MAX+1];
 		sigset_t sigm;
 		if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long)regs) < 0) {
-			perror_msg("%s", "sigreturn: PTRACE_GETREGS");
+			perror_msg("sigreturn: PTRACE_GETREGS");
 			return 0;
 		}
 		if (umove(tcp, regs[PT_USP], &sc) < 0)

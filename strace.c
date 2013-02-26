@@ -750,15 +750,15 @@ detach(struct tcb *tcp)
 		}
 		else if (errno != ESRCH) {
 			/* Shouldn't happen. */
-			perror_msg("%s", "detach: ptrace(PTRACE_DETACH, ...)");
+			perror_msg("detach: ptrace(PTRACE_DETACH, ...)");
 		}
 		else if (my_tkill(tcp->pid, 0) < 0) {
 			if (errno != ESRCH)
-				perror_msg("%s", "detach: checking sanity");
+				perror_msg("detach: checking sanity");
 		}
 		else if (!sigstop_expected && my_tkill(tcp->pid, SIGSTOP) < 0) {
 			if (errno != ESRCH)
-				perror_msg("%s", "detach: stopping child");
+				perror_msg("detach: stopping child");
 		}
 		else
 			sigstop_expected = 1;
@@ -771,21 +771,21 @@ detach(struct tcb *tcp)
 				if (errno == ECHILD) /* Already gone.  */
 					break;
 				if (errno != EINVAL) {
-					perror_msg("%s", "detach: waiting");
+					perror_msg("detach: waiting");
 					break;
 				}
 #endif /* __WALL */
 				/* No __WALL here.  */
 				if (waitpid(tcp->pid, &status, 0) < 0) {
 					if (errno != ECHILD) {
-						perror_msg("%s", "detach: waiting");
+						perror_msg("detach: waiting");
 						break;
 					}
 #ifdef __WCLONE
 					/* If no processes, try clones.  */
 					if (waitpid(tcp->pid, &status, __WCLONE) < 0) {
 						if (errno != ECHILD)
-							perror_msg("%s", "detach: waiting");
+							perror_msg("detach: waiting");
 						break;
 					}
 #endif /* __WCLONE */
@@ -934,7 +934,7 @@ startup_attach(void)
 				}
 				ntid -= nerr;
 				if (ntid == 0) {
-					perror_msg("%s", "attach: ptrace(PTRACE_ATTACH, ...)");
+					perror_msg("attach: ptrace(PTRACE_ATTACH, ...)");
 					droptcb(tcp);
 					continue;
 				}
@@ -955,7 +955,7 @@ startup_attach(void)
 			} /* if (opendir worked) */
 		} /* if (-f) */
 		if (ptrace_attach_or_seize(tcp->pid) < 0) {
-			perror_msg("%s", "attach: ptrace(PTRACE_ATTACH, ...)");
+			perror_msg("attach: ptrace(PTRACE_ATTACH, ...)");
 			droptcb(tcp);
 			continue;
 		}
