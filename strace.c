@@ -1122,7 +1122,7 @@ startup_child(char **argv)
 	 * On NOMMU, can be safely freed only after execve in tracee.
 	 * It's hard to know when that happens, so we just leak it.
 	 */
-	params_for_tracee.pathname = strdup(pathname);
+	params_for_tracee.pathname = NOMMU_SYSTEM ? strdup(pathname) : pathname;
 
 	strace_child = pid = fork();
 	if (pid < 0) {
@@ -1156,6 +1156,7 @@ startup_child(char **argv)
 					kill_save_errno(pid, SIGKILL);
 					perror_msg_and_die("Unexpected wait status %x", status);
 				}
+				skip_startup_execve = 1;
 			}
 			/* Else: NOMMU case, we have no way to sync.
 			 * Just attach to it as soon as possible.
@@ -1177,13 +1178,14 @@ startup_child(char **argv)
 		newoutf(tcp);
 	}
 	else {
-		/* With -D, *we* are child here, IOW: different pid. Fetch it: */
+		/* With -D, we are *child* here, IOW: different pid. Fetch it: */
 		strace_tracer_pid = getpid();
 		/* The tracee is our parent: */
 		pid = getppid();
 		alloctcb(pid);
 		/* attaching will be done later, by startup_attach */
 		/* note: we don't do newoutf(tcp) here either! */
+		skip_startup_execve = 1;
 
 		/* NOMMU BUG! -D mode is active, we (child) return,
 		 * and we will scribble over parent's stack!
@@ -1201,6 +1203,9 @@ startup_child(char **argv)
 		 * This may save us if (1) and (2) failed
 		 * and compiler decided to use stack in exec_or_die() anyway
 		 * (happens on i386 because of stack parameter passing).
+		 *
+		 * A cleaner solution is to use makecontext + setcontext
+		 * to create a genuine separate stack and execute on it.
 		 */
 	}
 }
@@ -1217,6 +1222,10 @@ test_ptrace_setoptions_followfork(void)
 	const unsigned int test_options = PTRACE_O_TRACECLONE |
 					  PTRACE_O_TRACEFORK |
 					  PTRACE_O_TRACEVFORK;
+
+	/* Need fork for test. NOMMU has no forks */
+	if (NOMMU_SYSTEM)
+		goto worked; /* be bold, and pretend that test succeeded */
 
 	pid = fork();
 	if (pid < 0)
@@ -1299,6 +1308,7 @@ test_ptrace_setoptions_followfork(void)
 		}
 	}
 	if (expected_grandchild && expected_grandchild == found_grandchild) {
+ worked:
 		ptrace_setoptions |= test_options;
 		if (debug_flag)
 			fprintf(stderr, "ptrace_setoptions = %#x\n",
@@ -1332,9 +1342,9 @@ test_ptrace_setoptions_for_all(void)
 	int pid;
 	int it_worked = 0;
 
-	/* this fork test doesn't work on no-mmu systems */
+	/* Need fork for test. NOMMU has no forks */
 	if (NOMMU_SYSTEM)
-		return 0; /* be bold, and pretend that test succeeded */
+		goto worked; /* be bold, and pretend that test succeeded */
 
 	pid = fork();
 	if (pid < 0)
@@ -1398,6 +1408,7 @@ test_ptrace_setoptions_for_all(void)
 	}
 
 	if (it_worked) {
+ worked:
 		syscall_trap_sig = (SIGTRAP | 0x80);
 		ptrace_setoptions |= test_options;
 		if (debug_flag)
@@ -1417,7 +1428,7 @@ test_ptrace_seize(void)
 {
 	int pid;
 
-	/* this fork test doesn't work on no-mmu systems */
+	/* Need fork for test. NOMMU has no forks */
 	if (NOMMU_SYSTEM) {
 		post_attach_sigstop = 0; /* this sets use_seize to 1 */
 		return;
@@ -1770,7 +1781,6 @@ init(int argc, char *argv[])
 	 * in the startup_child() mode we kill the spawned process anyway.
 	 */
 	if (argv[0]) {
-		skip_startup_execve = 1;
 		startup_child(argv);
 	}
 

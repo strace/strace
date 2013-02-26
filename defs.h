@@ -116,7 +116,7 @@ extern char *stpcpy(char *dst, const char *src);
  * This needs Linux kernel 3.4.x or later to work.
  */
 #define USE_SEIZE 1
-/* For forcing NOMMU build, set to 1 */
+/* To force NOMMU build, set to 1 */
 #define NOMMU_SYSTEM 0
 
 
