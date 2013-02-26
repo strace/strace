@@ -65,7 +65,7 @@ upathmatch(struct tcb *tcp, unsigned long upath)
 {
 	char path[PATH_MAX + 1];
 
-	return umovestr(tcp, upath, sizeof path, path) >= 0 &&
+	return umovestr(tcp, upath, sizeof path, path) > 0 &&
 		pathmatch(path);
 }
 
