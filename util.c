@@ -776,8 +776,7 @@ int
 umoven(struct tcb *tcp, long addr, int len, char *laddr)
 {
 	int pid = tcp->pid;
-	int n, m;
-	//int started;
+	int n, m, nread;
 	union {
 		long val;
 		char x[sizeof(long)];
@@ -795,63 +794,82 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		local[0].iov_base = laddr;
 		remote[0].iov_base = (void*)addr;
 		local[0].iov_len = remote[0].iov_len = len;
-		r = process_vm_readv(pid,
-				local, 1,
-				remote, 1,
-				/*flags:*/ 0
-		);
+		r = process_vm_readv(pid, local, 1, remote, 1, 0);
 		if (r == len)
 			return 0;
-		if (r < 0) {
-			if (errno == ENOSYS)
+		if (r >= 0) {
+			error_msg("umoven: short read (%d < %d) @0x%lx",
+				  r, len, addr);
+			return -1;
+		}
+		switch (errno) {
+			case ENOSYS:
 				process_vm_readv_not_supported = 1;
-			else if (errno != EINVAL && errno != ESRCH)
-				/* EINVAL or ESRCH could be seen if process is gone,
-				 * all the rest is strange and should be reported. */
+				break;
+			case ESRCH:
+				/* the process is gone */
+				return -1;
+			case EFAULT: case EIO: case EPERM:
+				/* address space is inaccessible */
+				return -1;
+			default:
+				/* all the rest is strange and should be reported */
 				perror_msg("process_vm_readv");
-		} else {
-			error_msg("process_vm_readv: short read (%d < %d)", r, len);
+				return -1;
 		}
 	}
 
-	//started = 0;
+	nread = 0;
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
 		addr &= -sizeof(long); /* residue */
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
-		if (errno) {
-			/* But if not started, we had a bogus address. */
-			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
-			return -1;
+		switch (errno) {
+			case 0:
+				break;
+			case ESRCH: case EINVAL:
+				/* these could be seen if the process is gone */
+				return -1;
+			case EFAULT: case EIO: case EPERM:
+				/* address space is inaccessible */
+				return -1;
+			default:
+				/* all the rest is strange and should be reported */
+				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx",
+					    pid, addr);
+				return -1;
 		}
-		//started = 1;
 		m = MIN(sizeof(long) - n, len);
 		memcpy(laddr, &u.x[n], m);
-		addr += sizeof(long), laddr += m, len -= m;
+		addr += sizeof(long), laddr += m, len -= m, nread += m;
 	}
 	while (len) {
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
-		if (errno) {
-#if 0
-//FIXME: wrong. printpath doesn't use this routine. Callers expect full copies.
-//Ok to remove?
-			if (started && (errno==EPERM || errno==EIO)) {
-				/* Ran into 'end of memory' - stupid "printpath" */
-				return 0;
-			}
-#endif
-			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
-			return -1;
+		switch (errno) {
+			case 0:
+				break;
+			case ESRCH: case EINVAL:
+				/* these could be seen if the process is gone */
+				return -1;
+			case EFAULT: case EIO: case EPERM:
+				/* address space is inaccessible */
+				if (nread) {
+					perror_msg("umoven: short read (%d < %d) @0x%lx",
+						   nread, nread + len, addr - nread);
+				}
+				return -1;
+			default:
+				/* all the rest is strange and should be reported */
+				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx",
+					    pid, addr);
+				return -1;
 		}
-		//started = 1;
 		m = MIN(sizeof(long), len);
 		memcpy(laddr, u.x, m);
-		addr += sizeof(long), laddr += m, len -= m;
+		addr += sizeof(long), laddr += m, len -= m, nread += m;
 	}
 
 	return 0;
@@ -872,9 +890,8 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 int
 umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 {
-	int started;
 	int pid = tcp->pid;
-	int i, n, m;
+	int i, n, m, nread;
 	union {
 		long val;
 		char x[sizeof(long)];
@@ -885,6 +902,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		addr &= (1ul << 8 * current_wordsize) - 1;
 #endif
 
+	nread = 0;
 	if (!process_vm_readv_not_supported) {
 		struct iovec local[1], remote[1];
 
@@ -911,70 +929,96 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 				chunk_len = r; /* chunk_len -= end_in_page */
 
 			local[0].iov_len = remote[0].iov_len = chunk_len;
-			r = process_vm_readv(pid,
-					local, 1,
-					remote, 1,
-					/*flags:*/ 0
-			);
-			if (r < 0) {
-				if (errno == ENOSYS)
-					process_vm_readv_not_supported = 1;
-				else if (errno != EINVAL && errno != ESRCH)
-					/* EINVAL or ESRCH could be seen
-					 * if process is gone, all the rest
-					 * is strange and should be reported. */
-					perror_msg("process_vm_readv");
-				goto vm_readv_didnt_work;
+			r = process_vm_readv(pid, local, 1, remote, 1, 0);
+			if (r > 0) {
+				if (memchr(local[0].iov_base, '\0', r))
+					return 1;
+				local[0].iov_base += r;
+				remote[0].iov_base += r;
+				len -= r;
+				nread += r;
+				continue;
 			}
-			if (memchr(local[0].iov_base, '\0', r))
-				return 1;
-			local[0].iov_base += r;
-			remote[0].iov_base += r;
-			len -= r;
+			switch (errno) {
+				case ENOSYS:
+					process_vm_readv_not_supported = 1;
+					goto vm_readv_didnt_work;
+				case ESRCH:
+					/* the process is gone */
+					return -1;
+				case EFAULT: case EIO: case EPERM:
+					/* address space is inaccessible */
+					if (nread) {
+						perror_msg("umovestr: short read (%d < %d) @0x%lx",
+							   nread, nread + len, addr);
+					}
+					return -1;
+				default:
+					/* all the rest is strange and should be reported */
+					perror_msg("process_vm_readv");
+					return -1;
+			}
 		}
 		return 0;
 	}
  vm_readv_didnt_work:
 
-	started = 0;
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
 		n = addr - (addr & -sizeof(long)); /* residue */
 		addr &= -sizeof(long); /* residue */
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
-		if (errno) {
-			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
-			return -1;
+		switch (errno) {
+			case 0:
+				break;
+			case ESRCH: case EINVAL:
+				/* these could be seen if the process is gone */
+				return -1;
+			case EFAULT: case EIO: case EPERM:
+				/* address space is inaccessible */
+				return -1;
+			default:
+				/* all the rest is strange and should be reported */
+				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx",
+					    pid, addr);
+				return -1;
 		}
-		started = 1;
 		m = MIN(sizeof(long) - n, len);
 		memcpy(laddr, &u.x[n], m);
 		while (n & (sizeof(long) - 1))
 			if (u.x[n++] == '\0')
 				return 1;
-		addr += sizeof(long), laddr += m, len -= m;
+		addr += sizeof(long), laddr += m, len -= m, nread += m;
 	}
 	while (len) {
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
-		if (errno) {
-			if (started && (errno==EPERM || errno==EIO)) {
-				/* Ran into 'end of memory' - stupid "printpath" */
-				return 0;
-			}
-			if (addr != 0 && errno != EIO && errno != ESRCH)
-				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx", pid, addr);
-			return -1;
+		switch (errno) {
+			case 0:
+				break;
+			case ESRCH: case EINVAL:
+				/* these could be seen if the process is gone */
+				return -1;
+			case EFAULT: case EIO: case EPERM:
+				/* address space is inaccessible */
+				if (nread) {
+					perror_msg("umovestr: short read (%d < %d) @0x%lx",
+						   nread, nread + len, addr - nread);
+				}
+				return -1;
+			default:
+				/* all the rest is strange and should be reported */
+				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx",
+					   pid, addr);
+				return -1;
 		}
-		started = 1;
 		m = MIN(sizeof(long), len);
 		memcpy(laddr, u.x, m);
 		for (i = 0; i < sizeof(long); i++)
 			if (u.x[i] == '\0')
 				return 1;
-		addr += sizeof(long), laddr += m, len -= m;
+		addr += sizeof(long), laddr += m, len -= m, nread += m;
 	}
 	return 0;
 }
