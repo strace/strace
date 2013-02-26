@@ -201,7 +201,6 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -d -- enable debug output to stderr\n\
 -D -- run tracer process as a detached grandchild, not as parent\n\
 -f -- follow forks, -ff -- with output into separate files\n\
--F -- attempt to follow vforks (deprecated, use -f)\n\
 -i -- print instruction pointer at time of syscall\n\
 -q -- suppress messages about attaching, detaching, etc.\n\
 -r -- print relative timestamp, -t -- absolute timestamp, -tt -- with usecs\n\
@@ -212,7 +211,7 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -h -- print help message, -V -- print version\n\
 -a column -- alignment COLUMN for printing syscall results (default %d)\n\
 -e expr -- a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
-   options: trace, abbrev, verbose, raw, signal, read, or write\n\
+   options: trace, abbrev, verbose, raw, signal, read, write\n\
 -I interruptible --\n\
    1: no signals are blocked\n\
    2: fatal signals are blocked while decoding syscall (default)\n\
@@ -229,6 +228,9 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -E var -- remove var from the environment for command\n\
 -P path -- trace accesses to path\n\
 "
+/* ancient, no one should use it
+-F -- attempt to follow vforks (deprecated, use -f)\n\
+ */
 /* this is broken, so don't document it
 -z -- print only succeeding syscalls\n\
  */
