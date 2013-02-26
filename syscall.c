@@ -162,10 +162,6 @@ const char *const signalent0[] = {
 const struct_ioctlent ioctlent0[] = {
 #include "ioctlent.h"
 };
-enum { nsyscalls0 = ARRAY_SIZE(sysent0) };
-enum { nerrnos0 = ARRAY_SIZE(errnoent0) };
-enum { nsignals0 = ARRAY_SIZE(signalent0) };
-enum { nioctlents0 = ARRAY_SIZE(ioctlent0) };
 
 #if SUPPORTED_PERSONALITIES > 1
 static const char *const errnoent1[] = {
@@ -177,10 +173,6 @@ static const char *const signalent1[] = {
 static const struct_ioctlent ioctlent1[] = {
 # include "ioctlent1.h"
 };
-enum { nsyscalls1 = ARRAY_SIZE(sysent1) };
-enum { nerrnos1 = ARRAY_SIZE(errnoent1) };
-enum { nsignals1 = ARRAY_SIZE(signalent1) };
-enum { nioctlents1 = ARRAY_SIZE(ioctlent1) };
 #endif
 
 #if SUPPORTED_PERSONALITIES > 2
@@ -193,11 +185,47 @@ static const char *const signalent2[] = {
 static const struct_ioctlent ioctlent2[] = {
 # include "ioctlent2.h"
 };
-enum { nsyscalls2 = ARRAY_SIZE(sysent2) };
-enum { nerrnos2 = ARRAY_SIZE(errnoent2) };
-enum { nsignals2 = ARRAY_SIZE(signalent2) };
-enum { nioctlents2 = ARRAY_SIZE(ioctlent2) };
 #endif
+
+enum {
+	nsyscalls0 = ARRAY_SIZE(sysent0)
+#if SUPPORTED_PERSONALITIES > 1
+	, nsyscalls1 = ARRAY_SIZE(sysent1)
+# if SUPPORTED_PERSONALITIES > 2
+	, nsyscalls2 = ARRAY_SIZE(sysent2)
+# endif
+#endif
+};
+
+enum {
+	nerrnos0 = ARRAY_SIZE(errnoent0)
+#if SUPPORTED_PERSONALITIES > 1
+	, nerrnos1 = ARRAY_SIZE(errnoent1)
+# if SUPPORTED_PERSONALITIES > 2
+	, nerrnos2 = ARRAY_SIZE(errnoent2)
+# endif
+#endif
+};
+
+enum {
+	nsignals0 = ARRAY_SIZE(signalent0)
+#if SUPPORTED_PERSONALITIES > 1
+	, nsignals1 = ARRAY_SIZE(signalent1)
+# if SUPPORTED_PERSONALITIES > 2
+	, nsignals2 = ARRAY_SIZE(signalent2)
+# endif
+#endif
+};
+
+enum {
+	nioctlents0 = ARRAY_SIZE(ioctlent0)
+#if SUPPORTED_PERSONALITIES > 1
+	, nioctlents1 = ARRAY_SIZE(ioctlent1)
+# if SUPPORTED_PERSONALITIES > 2
+	, nioctlents2 = ARRAY_SIZE(ioctlent2)
+# endif
+#endif
+};
 
 #if SUPPORTED_PERSONALITIES > 1
 const struct_sysent *sysent = sysent0;
