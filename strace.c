@@ -210,6 +210,7 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -y -- print paths associated with file descriptor arguments\n\
 -h -- print help message, -V -- print version\n\
 -a column -- alignment COLUMN for printing syscall results (default %d)\n\
+-b execve -- detach on this syscall\n\
 -e expr -- a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
    options: trace, abbrev, verbose, raw, signal, read, write\n\
 -I interruptible --\n\
@@ -233,9 +234,6 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
  */
 /* this is broken, so don't document it
 -z -- print only succeeding syscalls\n\
- */
-/* experimental, don't document it yet (option letter may change in the future!)
--b -- detach on successful execve\n\
  */
 , DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(exitval);
@@ -1561,11 +1559,14 @@ init(int argc, char *argv[])
 #endif
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
-		"+bcCdfFhiqrtTvVxyz"
+		"+b:cCdfFhiqrtTvVxyz"
 		"D"
 		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
 		switch (c) {
 		case 'b':
+			if (strcmp(optarg, "execve") != 0)
+				error_msg_and_die("Syscall '%s' for -b isn't supported",
+					optarg);
 			detach_on_execve = 1;
 			break;
 		case 'c':

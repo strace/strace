@@ -41,7 +41,9 @@ strace \- trace system calls and signals
 .B strace
 [\fB-CdffhiqrtttTvVxxy\fR]
 [\fB-I\fIn\fR]
-[\fB-e\fIexpr\fR]... [\fB-a\fIcolumn\fR]
+[\fB-b\fIexecve\fR]
+[\fB-e\fIexpr\fR]...
+[\fB-a\fIcolumn\fR]
 [\fB-o\fIfile\fR]
 [\fB-s\fIstrsize\fR]
 [\fB-P\fIpath\fR]... \fB-p\fIpid\fR... /
@@ -52,7 +54,9 @@ strace \- trace system calls and signals
 .B strace
 \fB-c\fR[\fBdf\fR]
 [\fB-I\fIn\fR]
-[\fB-e\fIexpr\fR]... [\fB-O\fIoverhead\fR]
+[\fB-b\fIexecve\fR]
+[\fB-e\fIexpr\fR]...
+[\fB-O\fIoverhead\fR]
 [\fB-S\fIsortby\fR] \fB-p\fIpid\fR... /
 [\fB-D\fR]
 [\fB-E\fIvar\fR[=\fIval\fR]]... [\fB-u\fIusername\fR]
@@ -226,24 +230,16 @@ itself on the standard error.
 .B \-f
 Trace child processes as they are created by currently traced
 processes as a result of the
-.BR fork (2)
-system call.
-.IP
-On non-Linux platforms the new process is
-attached to as soon as its pid is known (through the return value of
-.BR fork (2)
-in the parent process). This means that such children may run
-uncontrolled for a while (especially in the case of a
-.BR vfork (2)),
-until the parent is scheduled again to complete its
-.RB ( v ) fork (2)
-call.  On Linux the child is traced from its first instruction with no delay.
-If the parent process decides to
-.BR wait (2)
-for a child that is currently
-being traced, it is suspended until an appropriate child process either
-terminates or incurs a signal that would cause it to terminate (as
-determined from the child's current signal disposition).
+.BR fork (2),
+.BR vfork (2)
+and
+.BR clone (2)
+system calls. Note that
+.B \-p
+.I PID
+.B \-f
+will attach all threads of process PID if it is multi-threaded,
+not only thread with thread_id = PID.
 .TP
 .B \-ff
 If the
@@ -312,6 +308,14 @@ Print paths associated with file descriptor arguments.
 .TP
 .BI "\-a " column
 Align return values in a specific column (default column 40).
+.TP
+.BI "\-b " syscall
+If specified syscall is reached, detach from traced process.
+Currently, only
+.I execve
+syscall is supported. This option is useful if you want to trace
+multi-threaded process and therefore require -f, but don't want
+to trace its (potentially very complex) children.
 .TP
 .BI "\-e " expr
 A qualifying expression which modifies which events to trace
