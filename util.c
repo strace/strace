@@ -843,7 +843,10 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		}
 		m = MIN(sizeof(long) - n, len);
 		memcpy(laddr, &u.x[n], m);
-		addr += sizeof(long), laddr += m, len -= m, nread += m;
+		addr += sizeof(long);
+		laddr += m;
+		nread += m;
+		len -= m;
 	}
 	while (len) {
 		errno = 0;
@@ -869,7 +872,10 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		}
 		m = MIN(sizeof(long), len);
 		memcpy(laddr, u.x, m);
-		addr += sizeof(long), laddr += m, len -= m, nread += m;
+		addr += sizeof(long);
+		laddr += m;
+		nread += m;
+		len -= m;
 	}
 
 	return 0;
@@ -890,10 +896,20 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 int
 umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 {
+#if SIZEOF_LONG == 4
+	const unsigned long x01010101 = 0x01010101ul;
+	const unsigned long x80808080 = 0x80808080ul;
+#elif SIZEOF_LONG == 8
+	const unsigned long x01010101 = 0x0101010101010101ul;
+	const unsigned long x80808080 = 0x8080808080808080ul;
+#else
+# error SIZEOF_LONG > 8
+#endif
+
 	int pid = tcp->pid;
-	int i, n, m, nread;
+	int n, m, nread;
 	union {
-		long val;
+		unsigned long val;
 		char x[sizeof(long)];
 	} u;
 
@@ -989,8 +1005,12 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		while (n & (sizeof(long) - 1))
 			if (u.x[n++] == '\0')
 				return 1;
-		addr += sizeof(long), laddr += m, len -= m, nread += m;
+		addr += sizeof(long);
+		laddr += m;
+		nread += m;
+		len -= m;
 	}
+
 	while (len) {
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
@@ -1015,10 +1035,13 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		}
 		m = MIN(sizeof(long), len);
 		memcpy(laddr, u.x, m);
-		for (i = 0; i < sizeof(long); i++)
-			if (u.x[i] == '\0')
-				return 1;
-		addr += sizeof(long), laddr += m, len -= m, nread += m;
+		/* "If a NUL char exists in this word" */
+		if ((u.val - x01010101) & ~u.val & x80808080)
+			return 1;
+		addr += sizeof(long);
+		laddr += m;
+		nread += m;
+		len -= m;
 	}
 	return 0;
 }
