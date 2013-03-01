@@ -462,7 +462,7 @@ qual_syscall(const char *s, int bitflag, int not)
 			if (sysent_vec[p][i].sys_name
 			 && strcmp(s, sysent_vec[p][i].sys_name) == 0
 			) {
-				qualify_one(i, bitflag, not, 0);
+				qualify_one(i, bitflag, not, p);
 				rc = 0;
 			}
 		}
@@ -575,7 +575,7 @@ qualify(const char *s)
 			for (pers = 0; pers < SUPPORTED_PERSONALITIES; pers++) {
 				for (i = 0; i < nsyscall_vec[pers]; i++)
 					if (sysent_vec[pers][i].sys_flags & n)
-						qualify_one(i, opt->bitflag, not, 0);
+						qualify_one(i, opt->bitflag, not, pers);
 			}
 			continue;
 		}
