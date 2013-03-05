@@ -2568,7 +2568,7 @@ trace_syscall_exiting(struct tcb *tcp)
 			 * after SIG_IGN or SIG_DFL signal it will restart
 			 * (thus the name "restart only if has no handler").
 			 */
-			tprints("= ? ERESTARTNOHAND (Interrupted by signal)");
+			tprints("= ? ERESTARTNOHAND (To be restarted if no handler)");
 			break;
 		case ERESTART_RESTARTBLOCK:
 			/* Syscalls like nanosleep(), poll() which can't be
