@@ -72,7 +72,7 @@ printstrbuf(struct tcb *tcp, struct strbuf *sbp, int getting)
 }
 
 static void
-printstrbufarg(struct tcb *tcp, int arg, int getting)
+printstrbufarg(struct tcb *tcp, long arg, int getting)
 {
 	struct strbuf buf;
 

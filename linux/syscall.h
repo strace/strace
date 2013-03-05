@@ -98,7 +98,7 @@ int sys_getgroups32();
 int sys_gethostname();
 int sys_getitimer();
 int sys_getpeername();
-int sys_getpmsg();
+int sys_getpmsg(); /* TODO: non-Linux, remove? */
 int sys_getpriority();
 int sys_getresuid();
 int sys_getrlimit();
@@ -181,7 +181,7 @@ int sys_process_vm_readv();
 int sys_process_vm_writev();
 int sys_pselect6();
 int sys_ptrace();
-int sys_putpmsg();
+int sys_putpmsg(); /* TODO: non-Linux, remove? */
 int sys_pwrite();
 int sys_pwritev();
 int sys_query_module();
@@ -332,12 +332,6 @@ int sys_osf_wait4();
 
 #if defined(ALPHA) || defined(IA64) || defined(SPARC) || defined(SPARC64)
 int sys_getpagesize();
-#endif
-
-#ifdef IA64
-/* STREAMS stuff */
-int sys_getpmsg();
-int sys_putpmsg();
 #endif
 
 #ifdef MIPS
