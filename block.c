@@ -188,7 +188,7 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 				tprintf(", %#lx", arg);
 			else
 				tprintf(", %lu", val);
-			}
+		}
 		break;
 
 #ifdef HAVE_BLKGETSIZE64
