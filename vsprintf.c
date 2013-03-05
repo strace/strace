@@ -759,8 +759,8 @@ int kernel_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 
 int strace_vfprintf(FILE *fp, const char *fmt, va_list args)
 {
-	static char *buf;
-	static unsigned buflen;
+	static char *buf = NULL;
+	static unsigned buflen = 0;
 
 	int r;
 	va_list a1;
@@ -773,6 +773,8 @@ int strace_vfprintf(FILE *fp, const char *fmt, va_list args)
 		buflen = len + 256;
 		free(buf);
 		buf = malloc(buflen);
+		if (!buf)
+			die_out_of_memory();
 		/*len =*/ kernel_vsnprintf(buf, buflen, fmt, args);
 	}
 
