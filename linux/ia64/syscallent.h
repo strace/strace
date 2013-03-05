@@ -828,7 +828,7 @@
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 1037 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 1038 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 1039 */
-	{ 3,	TF,	sys_lseek,		"lseek"		}, /* 1040 */
+	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 1040 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 1041 */
 	{ 0,	0,	sys_getppid,		"getppid"	}, /* 1042 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 1043 */
@@ -1025,7 +1025,7 @@
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 1234 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 1235 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
-	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 1237 */
+	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 1237 */
 	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 1238 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 1239 */
 	{ 5,	0,	sys_io_getevents,		"io_getevents"	}, /* 1240 */

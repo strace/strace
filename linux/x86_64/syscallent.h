@@ -45,7 +45,7 @@
 	{ 6,	TN,	sys_sendto,		"sendto"	},  /* 44 */
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"	},  /* 45 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	},  /* 46 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	},  /* 47 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	},  /* 47 */
 	{ 2,	TN,	sys_shutdown,		"shutdown"	},  /* 48 */
 	{ 3,	TN,	sys_bind,		"bind"		},  /* 49 */
 	{ 2,	TN,	sys_listen,		"listen"	},  /* 50 */
@@ -210,7 +210,7 @@
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 209 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 210 */
 	{ 1,	0,	sys_get_thread_area,	"get_thread_area" }, /* 211 */
-	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 212 */
+	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 212 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 213 */
 	{ 4,	0,	printargs,		"epoll_ctl_old"	}, /* 214 */
 	{ 4,	0,	printargs,		"epoll_wait_old"}, /* 215 */

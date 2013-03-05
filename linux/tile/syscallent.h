@@ -210,7 +210,7 @@
 	{ 5,	TN,	sys_getsockopt,			"getsockopt"			}, /*  209 */
 	{ 2,	TN,	sys_shutdown,			"shutdown"			}, /*  210 */
 	{ 3,	TN,	sys_sendmsg,			"sendmsg"			}, /*  211 */
-	{ 5,	TN,	sys_recvmsg,			"recvmsg"			}, /*  212 */
+	{ 3,	TN,	sys_recvmsg,			"recvmsg"			}, /*  212 */
 	{ 4,	TD,	sys_readahead,			"readahead"			}, /*  213 */
 	{ 1,	TM,	sys_brk,			"brk"				}, /*  214 */
 	{ 2,	TM,	sys_munmap,			"munmap"			}, /*  215 */

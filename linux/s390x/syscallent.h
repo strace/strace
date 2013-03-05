@@ -167,7 +167,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
 	{ MA,	0,	NULL,			NULL		}, /* 138 */
 	{ MA,	0,	NULL,			NULL		}, /* 139 */
-	{ 5,	0,	sys_llseek,		"_llseek"	}, /* 140 */
+	{ 5,	TD,	sys_llseek,		"_llseek"	}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
 	{ 2,	TD,	sys_flock,		"flock"		}, /* 143 */
@@ -293,7 +293,7 @@
 	{ 5,	0,	sys_vserver,		"vserver"	}, /* 263 */
 	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 264 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 265 */
-	{ 3,	TF,	sys_fstatfs64,		"fstatfs64"	}, /* 266 */
+	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 266 */
 	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages"}, /* 267 */
 	{ 6,	TM,	sys_mbind,		"mbind"		}, /* 268 */
 	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 269 */
@@ -448,7 +448,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 414 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
 

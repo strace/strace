@@ -320,7 +320,7 @@
 	{ 3,	TD,	sys_writev,		"writev"	},  /* 516 */
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"	},  /* 517 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	},  /* 518 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	},  /* 519 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	},  /* 519 */
 	{ 3,	TF|TP,	sys_execve,		"execve"	},  /* 520 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	},  /* 521 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	},  /* 522 */

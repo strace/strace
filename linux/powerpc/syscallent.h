@@ -45,7 +45,7 @@
 	{ 3,	TF,	sys_chown,		"lchown"		}, /* 16 */
 	{ 0,	TM,	sys_break,		"break"			}, /* 17 */
 	{ 2,	TF,	sys_oldstat,		"oldstat"		}, /* 18 */
-	{ 3,	TF,	sys_lseek,		"lseek"			}, /* 19 */
+	{ 3,	TD,	sys_lseek,		"lseek"			}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"		}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"			}, /* 21 */
 	{ 1,	TF,	sys_umount,		"oldumount"		}, /* 22 */
@@ -166,7 +166,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"		}, /* 137 */
 	{ 1,	NF,	sys_setfsuid,		"setfsuid"		}, /* 138 */
 	{ 1,	NF,	sys_setfsgid,		"setfsgid"		}, /* 139 */
-	{ 5,	TF,	sys_llseek,		"_llseek"		}, /* 140 */
+	{ 5,	TD,	sys_llseek,		"_llseek"		}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"		}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"		}, /* 142 */
 	{ 2,	TD,	sys_flock,		"flock"			}, /* 143 */
@@ -332,7 +332,7 @@
 	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"		}, /* 303 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"		}, /* 304 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"		}, /* 305 */
-	{ 4,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 306 */
+	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 306 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 307 */
 	{ 4,	TD,	sys_sync_file_range,	"sync_file_range"	}, /* 308 */
 	{ 6,	TD,	sys_fallocate,		"fallocate"		}, /* 309 */
@@ -368,7 +368,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"		}, /* 339 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"		}, /* 340 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"		}, /* 341 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"		}, /* 342 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"		}, /* 342 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"		}, /* 343 */
 	{ 4,	TN,	sys_accept4,		"accept4"		}, /* 344 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"	}, /* 345 */
@@ -447,7 +447,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 414 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
 

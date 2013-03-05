@@ -60,7 +60,7 @@
 	{  2,	TD,	sys_pipe2,			"pipe2"			}, /* 59 */
 	{  4,	0,	sys_quotactl,			"quotactl"		}, /* 60 */
 	{  3,	TD,	sys_getdents64,			"getdents64"		}, /* 61 */
-	{  5,	TF,	sys_llseek,			"_llseek"		}, /* 62 */
+	{  5,	TD,	sys_llseek,			"_llseek"		}, /* 62 */
 	{  3,	TD,	sys_read,			"read"			}, /* 63 */
 	{  3,	TD,	sys_write,			"write"			}, /* 64 */
 	{  3,	TD,	sys_readv,			"readv"			}, /* 65 */
@@ -83,7 +83,7 @@
 	{  1,	TD,	sys_fsync,			"fsync"			}, /* 82 */
 	{  1,	TD,	sys_fdatasync,			"fdatasync"		}, /* 83 */
 	{  4,	TD,	sys_sync_file_range,		"sync_file_range"	}, /* 84 */
-	{  4,	TD,	sys_timerfd_create,		"timerfd_create"	}, /* 85 */
+	{  2,	TD,	sys_timerfd_create,		"timerfd_create"	}, /* 85 */
 	{  4,	TD,	sys_timerfd_settime,		"timerfd_settime"	}, /* 86 */
 	{  2,	TD,	sys_timerfd_gettime,		"timerfd_gettime"	}, /* 87 */
 	{  4,	TD|TF,	sys_utimensat,			"utimensat"		}, /* 88 */
@@ -125,7 +125,7 @@
 	{  0,	0,	sys_sched_yield,		"sched_yield"		}, /* 124 */
 	{  1,	0,	sys_sched_get_priority_max,	"sched_get_priority_max"}, /* 125 */
 	{  1,	0,	sys_sched_get_priority_min,	"sched_get_priority_min"}, /* 126 */
-	{  2,	0,	sys_sched_rr_get_interval,	"sched_rr_get_interval" }, /* 127 */
+	{  2,	0,	sys_sched_rr_get_interval,	"sched_rr_get_interval"	}, /* 127 */
 	{  0,	0,	sys_restart_syscall,		"restart_syscall"	}, /* 128 */
 	{  2,	TS,	sys_kill,			"kill"			}, /* 129 */
 	{  2,	TS,	sys_kill,			"tkill"			}, /* 130 */
@@ -210,11 +210,11 @@
 	{  5,	TN,	sys_getsockopt,			"getsockopt"		}, /* 209 */
 	{  2,	TN,	sys_shutdown,			"shutdown"		}, /* 210 */
 	{  3,	TN,	sys_sendmsg,			"sendmsg"		}, /* 211 */
-	{  5,	TN,	sys_recvmsg,			"recvmsg"		}, /* 212 */
+	{  3,	TN,	sys_recvmsg,			"recvmsg"		}, /* 212 */
 	{  5,	TD,	sys_readahead,			"readahead"		}, /* 213 */
-	{  1,	0,	sys_brk,			"brk"			}, /* 214 */
-	{  2,	0,	sys_munmap,			"munmap"		}, /* 215 */
-	{  5,	0,	sys_mremap,			"mremap"		}, /* 216 */
+	{  1,	TM,	sys_brk,			"brk"			}, /* 214 */
+	{  2,	TM,	sys_munmap,			"munmap"		}, /* 215 */
+	{  5,	TM,	sys_mremap,			"mremap"		}, /* 216 */
 	{  5,	0,	sys_add_key,			"add_key"		}, /* 217 */
 	{  4,	0,	sys_request_key,		"request_key"		}, /* 218 */
 	{  5,	0,	sys_keyctl,			"keyctl"		}, /* 219 */
@@ -224,20 +224,20 @@
 	{  6,	TD,	sys_fadvise64_64,		"fadvise64_64"		}, /* 223 */
 	{  2,	TF,	sys_swapon,			"swapon"		}, /* 224 */
 	{  1,	TF,	sys_swapoff,			"swapoff"		}, /* 225 */
-	{  3,	0,	sys_mprotect,			"mprotect"		}, /* 226 */
-	{  3,	0,	sys_msync,			"msync"			}, /* 227 */
-	{  2,	0,	sys_mlock,			"mlock"			}, /* 228 */
-	{  2,	0,	sys_munlock,			"munlock"		}, /* 229 */
-	{  1,	0,	sys_mlockall,			"mlockall"		}, /* 230 */
-	{  0,	0,	sys_munlockall,			"munlockall"		}, /* 231 */
-	{  3,	0,	sys_mincore,			"mincore"		}, /* 232 */
-	{  3,	0,	sys_madvise,			"madvise"		}, /* 233 */
-	{  5,	0,	sys_remap_file_pages,		"remap_file_pages"	}, /* 234 */
-	{  6,	0,	sys_mbind,			"mbind"			}, /* 235 */
-	{  5,	0,	sys_get_mempolicy,		"get_mempolicy"		}, /* 236 */
-	{  3,	0,	sys_set_mempolicy,		"set_mempolicy"		}, /* 237 */
-	{  5,	0,	sys_migrate_pages,		"migrate_pages"		}, /* 238 */
-	{  6,	0,	sys_move_pages,			"move_pages"		}, /* 239 */
+	{  3,	TM,	sys_mprotect,			"mprotect"		}, /* 226 */
+	{  3,	TM,	sys_msync,			"msync"			}, /* 227 */
+	{  2,	TM,	sys_mlock,			"mlock"			}, /* 228 */
+	{  2,	TM,	sys_munlock,			"munlock"		}, /* 229 */
+	{  1,	TM,	sys_mlockall,			"mlockall"		}, /* 230 */
+	{  0,	TM,	sys_munlockall,			"munlockall"		}, /* 231 */
+	{  3,	TM,	sys_mincore,			"mincore"		}, /* 232 */
+	{  3,	TM,	sys_madvise,			"madvise"		}, /* 233 */
+	{  5,	TM,	sys_remap_file_pages,		"remap_file_pages"	}, /* 234 */
+	{  6,	TM,	sys_mbind,			"mbind"			}, /* 235 */
+	{  5,	TM,	sys_get_mempolicy,		"get_mempolicy"		}, /* 236 */
+	{  3,	TM,	sys_set_mempolicy,		"set_mempolicy"		}, /* 237 */
+	{  5,	TM,	sys_migrate_pages,		"migrate_pages"		}, /* 238 */
+	{  6,	TM,	sys_move_pages,			"move_pages"		}, /* 239 */
 	{  4,	TP|TS,	sys_rt_tgsigqueueinfo,		"rt_tgsigqueueinfo"	}, /* 240 */
 	{  5,	TD,	sys_perf_event_open,		"perf_event_open"	}, /* 241 */
 	{  4,	TN,	sys_accept4,			"accept4"		}, /* 242 */

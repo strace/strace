@@ -16,7 +16,7 @@
 	{  2,	TF,	sys_removexattr,		"lremovexattr"		}, /* 15 */
 	{  2,	TD,	sys_fremovexattr,		"fremovexattr"		}, /* 16 */
 	{  2,	TF,	sys_getcwd,			"getcwd"		}, /* 17 */
-	{  4,	TF,	sys_lookup_dcookie,		"lookup_dcookie"	}, /* 18 */
+	{  4,	0,	sys_lookup_dcookie,		"lookup_dcookie"	}, /* 18 */
 	{  2,	TD,	sys_eventfd2,			"eventfd2"		}, /* 19 */
 	{  1,	TD,	sys_epoll_create1,		"epoll_create1"		}, /* 20 */
 	{  4,	TD,	sys_epoll_ctl,			"epoll_ctl"		}, /* 21 */

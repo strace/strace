@@ -45,7 +45,7 @@
 	{ 3,	TF,	sys_chown,		"chown"			}, /* 16 */
 	{ 1,	TM,	sys_brk,		"brk"			}, /* 17 */
 	{ 5,	0,	printargs,		"osf_getfsstat"		}, /* 18, not implemented */
-	{ 3,	TF,	sys_lseek,		"lseek"			}, /* 19 */
+	{ 3,	TD,	sys_lseek,		"lseek"			}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getxpid"		}, /* 20 */
 	{ 4,	0,	printargs,		"osf_mount"		}, /* 21 */
 	{ 2,	0,	sys_umount2,		"umount"		}, /* 22 */
@@ -368,7 +368,7 @@
 	{ 1,	0,	sys_uname,		"uname"			}, /* 339 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"		}, /* 340 */
 	{ 5,	TM,	sys_mremap,		"mremap"		}, /* 341 */
-	{ 5,	0,	sys_nfsservctl,		"nfsservctl"		}, /* 342 */
+	{ 3,	0,	sys_nfsservctl,		"nfsservctl"		}, /* 342 */
 	{ 3,	0,	sys_setresuid,		"setresuid"		}, /* 343 */
 	{ 3,	0,	sys_getresuid,		"getresuid"		}, /* 344 */
 	{ 5,	0,	printargs,		"pciconfig_read"	}, /* 345 */
@@ -432,7 +432,7 @@
 	{ 5,	0,	NULL,			NULL			}, /* 403 */
 	{ 5,	0,	NULL,			NULL			}, /* 404 */
 	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 405 */
-	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"	}, /* 406 */
+	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"	}, /* 406 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"		}, /* 407 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"		}, /* 408 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"		}, /* 409 */

@@ -349,7 +349,7 @@
 	{ 2,	TN,	sys_listen,		"listen"	}, /* 320 */
 	{ 4,	TN,	sys_recv,		"recv"		}, /* 321 */
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"	}, /* 322 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 323 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 323 */
 	{ 4,	TN,	sys_send,		"send"		}, /* 324 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 325 */
 	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 326 */

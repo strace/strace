@@ -262,7 +262,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 233 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 234 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 235 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 236 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 236 */
 	{ 4,	TI,	sys_semop,		"semop"		}, /* 237 */
 	{ 4,	TI,	sys_semget,		"semget"	}, /* 238 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 239 */
@@ -307,7 +307,7 @@
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 278 */
 	{ 5,	0,	NULL,			NULL		}, /* 279 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 280 */
-	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 281 */
+	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 281 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 282 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 283 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 284 */
@@ -447,7 +447,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 414 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
 

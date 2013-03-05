@@ -1013,7 +1013,7 @@
 	{ 0,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 4137 */
 	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 4138 */
 	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 4139 */
-	{ 5,	TF,	sys_llseek,		"_llseek"	}, /* 4140 */
+	{ 5,	TD,	sys_llseek,		"_llseek"	}, /* 4140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 4141 */
 	{ 5,	TD,	sys_select,		"_newselect"	}, /* 4142 */
 	{ 2,	TD,	sys_flock,		"flock"		}, /* 4143 */
@@ -1579,10 +1579,10 @@
 	{ 3,	TF,	sys_open,		"open"		}, /* 5002 */
 	{ 1,	0,	sys_close,		"close"		}, /* 5003 */
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 5004 */
-	{ 2,	0,	sys_fstat,		"fstat"		}, /* 5005 */
+	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 5005 */
 	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 5006 */
 	{ 3,	0,	sys_poll,		"poll"		}, /* 5007 */
-	{ 3,	0,	sys_lseek,		"lseek"		}, /* 5008 */
+	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 5008 */
 	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 5009 */
 	{ 3,	TM,	sys_mprotect,		"mprotect"	}, /* 5010 */
 	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 5011 */
@@ -1649,7 +1649,7 @@
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 5072 */
 	{ 1,	0,	sys_fdatasync,		"fdatasync"	}, /* 5073 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 5074 */
-	{ 2,	0,	sys_ftruncate,		"ftruncate"	}, /* 5075 */
+	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 5075 */
 	{ 3,	0,	sys_getdents,		"getdents"	}, /* 5076 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 5077 */
 	{ 1,	TF,	sys_chdir,		"chdir"		}, /* 5078 */
@@ -1709,7 +1709,7 @@
 	{ 1,	0,	sys_personality,	"personality"	}, /* 5132 */
 	{ 2,	0,	sys_ustat,		"ustat"		}, /* 5133 */
 	{ 3,	0,	sys_statfs,		"statfs"	}, /* 5134 */
-	{ 3,	0,	sys_fstatfs,		"fstatfs"	}, /* 5135 */
+	{ 3,	TD,	sys_fstatfs,		"fstatfs"	}, /* 5135 */
 	{ 5,	0,	sys_sysfs,		"sysfs"		}, /* 5136 */
 	{ 2,	0,	sys_getpriority,	"getpriority"	}, /* 5137 */
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 5138 */
@@ -2198,10 +2198,10 @@
 	{ 3,	TF,	sys_open,		"open"		}, /* 6002 */
 	{ 1,	0,	sys_close,		"close"		}, /* 6003 */
 	{ 2,	TF,	sys_stat64,		"stat"		}, /* 6004 */
-	{ 2,	0,	sys_fstat64,		"fstat"		}, /* 6005 */
+	{ 2,	TD,	sys_fstat64,		"fstat"		}, /* 6005 */
 	{ 2,	TF,	sys_lstat64,		"lstat"		}, /* 6006 */
 	{ 3,	0,	sys_poll,		"poll"		}, /* 6007 */
-	{ 3,	0,	sys_lseek,		"lseek"		}, /* 6008 */
+	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 6008 */
 	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 6009 */
 	{ 3,	TM,	sys_mprotect,		"mprotect"	}, /* 6010 */
 	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 6011 */
@@ -2268,7 +2268,7 @@
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 6072 */
 	{ 1,	0,	sys_fdatasync,		"fdatasync"	}, /* 6073 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 6074 */
-	{ 2,	0,	sys_ftruncate,		"ftruncate"	}, /* 6075 */
+	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 6075 */
 	{ 3,	0,	sys_getdents,		"getdents"	}, /* 6076 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 6077 */
 	{ 1,	TF,	sys_chdir,		"chdir"		}, /* 6078 */
@@ -2328,7 +2328,7 @@
 	{ 1,	0,	sys_personality,	"personality"	}, /* 6132 */
 	{ 2,	0,	sys_ustat,		"ustat"		}, /* 6133 */
 	{ 3,	0,	sys_statfs,		"statfs"	}, /* 6134 */
-	{ 3,	0,	sys_fstatfs,		"fstatfs"	}, /* 6135 */
+	{ 3,	TD,	sys_fstatfs,		"fstatfs"	}, /* 6135 */
 	{ 5,	0,	sys_sysfs,		"sysfs"		}, /* 6136 */
 	{ 2,	0,	sys_getpriority,	"getpriority"	}, /* 6137 */
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 6138 */

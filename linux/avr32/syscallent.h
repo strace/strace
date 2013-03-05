@@ -190,7 +190,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 162 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 163 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 164 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 165 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 165 */
 	{ 3,	TF,	sys_truncate64,		"truncate64"	}, /* 166 */
 	{ 3,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 167 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 168 */

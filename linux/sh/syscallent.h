@@ -222,8 +222,8 @@
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
 	{ 5,	0,	printargs,		"getrlimit"	}, /* 191 */
 	{ 6,	TD|TM,	sys_mmap_4koff,		"mmap2"		}, /* 192 */
-	{ 5,	0,	sys_truncate64,		"truncate64"	}, /* 193 */
-	{ 5,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
+	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
+	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"	}, /* 197 */
@@ -386,7 +386,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 353 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 354 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 355 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 356 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 356 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 357 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 358 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 359 */
@@ -451,7 +451,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 414 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
 

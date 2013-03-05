@@ -21,7 +21,7 @@
 	{ 3,	TF,	sys_chown,		"lchown"		}, /* 16 */
 	{ 3,	TN,	sys_socket,		"socket"		}, /* 17 */
 	{ 2,	TF,	sys_stat,		"newstat"		}, /* 18 */
-	{ 3,	TF,	sys_lseek,		"lseek"			}, /* 19 */
+	{ 3,	TD,	sys_lseek,		"lseek"			}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"		}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"			}, /* 21 */
 	{ 3,	TN,	sys_bind,		"bind"			}, /* 22 */
@@ -142,7 +142,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"		}, /* 137 */
 	{ 1,	NF,	sys_setfsuid,		"setfsuid"		}, /* 138 */
 	{ 1,	NF,	sys_setfsgid,		"setfsgid"		}, /* 139 */
-	{ 5,	TF,	sys_llseek,		"_llseek"		}, /* 140 */
+	{ 5,	TD,	sys_llseek,		"_llseek"		}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"		}, /* 141 */
 	{ 5,	TD,	sys_select,		"_newselect"		}, /* 142 */
 	{ 2,	TD,	sys_flock,		"flock"			}, /* 143 */
@@ -186,7 +186,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"		}, /* 181 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"		}, /* 182 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"		}, /* 183 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"		}, /* 184 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"		}, /* 184 */
 	{ 4,	TI,	sys_semop,		"semop"			}, /* 185 */
 	{ 4,	TI,	sys_semget,		"semget"		}, /* 186 */
 	{ 4,	TI,	sys_semctl,		"semctl"		}, /* 187 */

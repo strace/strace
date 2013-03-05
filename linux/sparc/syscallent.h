@@ -111,7 +111,7 @@
 	{ 3,	TS,	sys_setresgid,	"setresgid" },		/* 110 */
 	{ 3,	TS,	sys_getresgid,	"getresgid" },		/* 111 */
 	{ 2,	TS,	sys_setresgid,	"setresgid32" },	/* 112 */
-	{ 5,	TN,	sys_recvmsg,	"recvmsg" },		/* 113 */
+	{ 3,	TN,	sys_recvmsg,	"recvmsg" },		/* 113 */
 	{ 3,	TN,	sys_sendmsg,	"sendmsg" },		/* 114 */
 	{ 2,	0,	sys_getgroups32,"getgroups32" },	/* 115 */
 	{ 2,	0,	sys_gettimeofday,"gettimeofday" },	/* 116 */
@@ -244,9 +244,9 @@
 	{ 3,	0,	sys_sched_setscheduler,"sched_setscheduler"},/* 243 */
 	{ 1,	0,	sys_sched_getscheduler,"sched_getscheduler"},/* 244 */
 	{ 0,	0,	sys_sched_yield,"sched_yield" },	/* 245 */
-	{ 1,0,sys_sched_get_priority_max,"sched_get_priority_max"},/* 246 */
-	{ 1,0,sys_sched_get_priority_min,"sched_get_priority_min"},/* 247 */
-	{ 2,	0,sys_sched_rr_get_interval,"sched_rr_get_interval"},/* 248 */
+	{ 1,	0,	sys_sched_get_priority_max,"sched_get_priority_max"},/* 246 */
+	{ 1,	0,	sys_sched_get_priority_min,"sched_get_priority_min"},/* 247 */
+	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"},/* 248 */
 	{ 2,	0,	sys_nanosleep,	"nanosleep" },		/* 249 */
 	{ 5,	TM,	sys_mremap,	"mremap" },		/* 250 */
 	{ 1,	0,	sys_sysctl,	"_sysctl" },		/* 251 */
@@ -371,7 +371,7 @@
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 367 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 368 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 369 */
-	{ 5,	TN,	sys_recvmsg,		"recvmsg"	}, /* 370 */
+	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 370 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 371 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 372 */
 #if SYS_ipc_subcall != 373
