@@ -37,7 +37,7 @@
 
 #include "syscall.h"
 
-static const char **selected = NULL; /* paths selected for tracing */
+const char **paths_selected = NULL;
 static unsigned num_selected = 0;
 
 /*
@@ -49,7 +49,7 @@ pathmatch(const char *path)
 	unsigned i;
 
 	for (i = 0; i < num_selected; ++i) {
-		if (strcmp(path, selected[i]) == 0)
+		if (strcmp(path, paths_selected[i]) == 0)
 			return 1;
 	}
 	return 0;
@@ -91,10 +91,10 @@ storepath(const char *path)
 		return; /* already in table */
 
 	i = num_selected++;
-	selected = realloc(selected, num_selected * sizeof(selected[0]));
-	if (!selected)
+	paths_selected = realloc(paths_selected, num_selected * sizeof(paths_selected[0]));
+	if (!paths_selected)
 		die_out_of_memory();
-	selected[i] = path;
+	paths_selected[i] = path;
 }
 
 /*
@@ -153,9 +153,6 @@ int
 pathtrace_match(struct tcb *tcp)
 {
 	const struct_sysent *s;
-
-	if (!selected)
-		return 1;
 
 	s = tcp->s_ent;
 

@@ -123,9 +123,6 @@ bool not_failing_only = 0;
 /* Show path associated with fd arguments */
 bool show_fd_path = 0;
 
-/* are we filtering traces based on paths? */
-bool tracing_paths = 0;
-
 static bool detach_on_execve = 0;
 static bool skip_startup_execve = 0;
 
@@ -1648,7 +1645,6 @@ init(int argc, char *argv[])
 			process_opt_p_list(optarg);
 			break;
 		case 'P':
-			tracing_paths = 1;
 			pathtrace_select(optarg);
 			break;
 		case 's':

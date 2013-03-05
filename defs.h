@@ -523,7 +523,9 @@ extern bool Tflag;
 extern bool qflag;
 extern bool not_failing_only;
 extern bool show_fd_path;
-extern bool tracing_paths;
+/* are we filtering traces based on paths? */
+extern const char **paths_selected;
+#define tracing_paths (paths_selected != NULL)
 extern bool need_fork_exec_workarounds;
 extern unsigned xflag;
 extern unsigned followfork;
