@@ -37,8 +37,8 @@
 
 #include "syscall.h"
 
-#define MAXSELECTED  256	/* max number of "selected" paths */
-static const char *selected[MAXSELECTED];	/* paths selected for tracing */
+static const char **selected = NULL; /* paths selected for tracing */
+static unsigned num_selected = 0;
 
 /*
  * Return true if specified path matches one that we're tracing.
@@ -46,11 +46,9 @@ static const char *selected[MAXSELECTED];	/* paths selected for tracing */
 static int
 pathmatch(const char *path)
 {
-	unsigned int i;
+	unsigned i;
 
-	for (i = 0; i < ARRAY_SIZE(selected); ++i) {
-		if (selected[i] == NULL)
-			return 0;
+	for (i = 0; i < num_selected; ++i) {
 		if (strcmp(path, selected[i]) == 0)
 			return 1;
 	}
@@ -84,21 +82,19 @@ fdmatch(struct tcb *tcp, int fd)
  * Add a path to the set we're tracing.
  * Secifying NULL will delete all paths.
  */
-static int
+static void
 storepath(const char *path)
 {
-	unsigned int i;
+	unsigned i;
 
-	for (i = 0; i < ARRAY_SIZE(selected); ++i) {
-		if (!selected[i]) {
-			selected[i] = path;
-			return 0;
-		}
-	}
+	if (pathmatch(path))
+		return; /* already in table */
 
-	fprintf(stderr, "Max trace paths exceeded, only using first %u\n",
-		(unsigned int) ARRAY_SIZE(selected));
-	return -1;
+	i = num_selected++;
+	selected = realloc(selected, num_selected * sizeof(selected[0]));
+	if (!selected)
+		die_out_of_memory();
+	selected[i] = path;
 }
 
 /*
@@ -126,28 +122,27 @@ getfdpath(struct tcb *tcp, int fd)
  * Add a path to the set we're tracing.  Also add the canonicalized
  * version of the path.  Secifying NULL will delete all paths.
  */
-int
+void
 pathtrace_select(const char *path)
 {
 	char *rpath;
 
-	if (storepath(path))
-		return -1;
+	storepath(path);
 
 	rpath = realpath(path, NULL);
 
 	if (rpath == NULL)
-		return 0;
+		return;
 
 	/* if realpath and specified path are same, we're done */
 	if (strcmp(path, rpath) == 0) {
 		free(rpath);
-		return 0;
+		return;
 	}
 
 	fprintf(stderr, "Requested path '%s' resolved into '%s'\n",
 		path, rpath);
-	return storepath(rpath);
+	storepath(rpath);
 }
 
 /*
@@ -159,7 +154,7 @@ pathtrace_match(struct tcb *tcp)
 {
 	const struct_sysent *s;
 
-	if (selected[0] == NULL)
+	if (!selected)
 		return 1;
 
 	s = tcp->s_ent;

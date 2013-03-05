@@ -601,7 +601,7 @@ extern int clearbpt(struct tcb *);
 
 extern const char *signame(int);
 extern int is_restart_error(struct tcb *);
-extern int pathtrace_select(const char *);
+extern void pathtrace_select(const char *);
 extern int pathtrace_match(struct tcb *);
 extern const char *getfdpath(struct tcb *, int);
 

@@ -1649,9 +1649,7 @@ init(int argc, char *argv[])
 			break;
 		case 'P':
 			tracing_paths = 1;
-			if (pathtrace_select(optarg)) {
-				error_msg_and_die("Failed to select path '%s'", optarg);
-			}
+			pathtrace_select(optarg);
 			break;
 		case 's':
 			i = string_to_uint(optarg);
