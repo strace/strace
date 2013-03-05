@@ -144,10 +144,16 @@
 #define	sys_sendmsg		printargs
 #endif
 
-#ifndef SYS_getpmsg
+/* Who has STREAMS syscalls?
+ * Linux hasn't. Solaris has (had?).
+ * Just in case I miss something, retain in for Sparc.
+ * Note: SYS_get/putpmsg may be defined even though syscalls
+ * return ENOSYS. Can't just check defined(SYS_getpmsg).
+ */
+#if (!defined(SPARC) && !defined(SPARC64)) || !defined(SYS_getpmsg)
 #define	sys_getpmsg		printargs
 #endif
-#ifndef SYS_putpmsg
+#if (!defined(SPARC) && !defined(SPARC64)) || !defined(SYS_putpmsg)
 #define	sys_putpmsg		printargs
 #endif
 

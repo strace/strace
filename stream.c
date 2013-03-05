@@ -33,23 +33,28 @@
 #ifdef HAVE_SYS_POLL_H
 # include <sys/poll.h>
 #endif
-#ifdef HAVE_STROPTS_H
-# include <stropts.h>
-#endif
 #ifdef HAVE_SYS_CONF_H
 # include <sys/conf.h>
 #endif
 
-#ifndef HAVE_STROPTS_H
-#define RS_HIPRI 1
+/* Who has STREAMS syscalls?
+ * Linux hasn't. Solaris has (had?).
+ * Just in case I miss something, retain in for Sparc...
+ */
+#if defined(SPARC) || defined(SPARC64)
+
+# ifdef HAVE_STROPTS_H
+#  include <stropts.h>
+# else
+#  define RS_HIPRI 1
 struct strbuf {
 	int     maxlen;                 /* no. of bytes in buffer */
 	int     len;                    /* no. of bytes returned */
 	const char *buf;                /* pointer to data */
 };
-#define MORECTL 1
-#define MOREDATA 2
-#endif /* !HAVE_STROPTS_H */
+#  define MORECTL 1
+#  define MOREDATA 2
+# endif
 
 static const struct xlat msgflags[] = {
 	{ RS_HIPRI,	"RS_HIPRI"	},
@@ -102,7 +107,6 @@ sys_putmsg(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(SPARC) || defined(SPARC64)
 int
 sys_getmsg(struct tcb *tcp)
 {
@@ -148,24 +152,21 @@ sys_getmsg(struct tcb *tcp)
 	}
 	return RVAL_HEX | RVAL_STR;
 }
-#endif
 
-#if defined SYS_putpmsg || defined SYS_getpmsg
+# if defined SYS_putpmsg || defined SYS_getpmsg
 static const struct xlat pmsgflags[] = {
-#ifdef MSG_HIPRI
+#  ifdef MSG_HIPRI
 	{ MSG_HIPRI,	"MSG_HIPRI"	},
-#endif
-#ifdef MSG_AND
+#  endif
+#  ifdef MSG_AND
 	{ MSG_ANY,	"MSG_ANY"	},
-#endif
-#ifdef MSG_BAND
+#  endif
+#  ifdef MSG_BAND
 	{ MSG_BAND,	"MSG_BAND"	},
-#endif
+#  endif
 	{ 0,		NULL		},
 };
-#endif
-
-#ifdef SYS_putpmsg
+#  ifdef SYS_putpmsg
 int
 sys_putpmsg(struct tcb *tcp)
 {
@@ -184,9 +185,8 @@ sys_putpmsg(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* SYS_putpmsg */
-
-#ifdef SYS_getpmsg
+#  endif
+#  ifdef SYS_getpmsg
 int
 sys_getpmsg(struct tcb *tcp)
 {
@@ -235,31 +235,35 @@ sys_getpmsg(struct tcb *tcp)
 	}
 	return RVAL_HEX | RVAL_STR;
 }
-#endif /* SYS_getpmsg */
+#  endif
+# endif /* getpmsg/putpmsg */
+
+#endif /* STREAMS syscalls support */
+
 
 #ifdef HAVE_SYS_POLL_H
 
 static const struct xlat pollflags[] = {
-#ifdef POLLIN
+# ifdef POLLIN
 	{ POLLIN,	"POLLIN"	},
 	{ POLLPRI,	"POLLPRI"	},
 	{ POLLOUT,	"POLLOUT"	},
-#ifdef POLLRDNORM
+#  ifdef POLLRDNORM
 	{ POLLRDNORM,	"POLLRDNORM"	},
-#endif
-#ifdef POLLWRNORM
+#  endif
+#  ifdef POLLWRNORM
 	{ POLLWRNORM,	"POLLWRNORM"	},
-#endif
-#ifdef POLLRDBAND
+#  endif
+#  ifdef POLLRDBAND
 	{ POLLRDBAND,	"POLLRDBAND"	},
-#endif
-#ifdef POLLWRBAND
+#  endif
+#  ifdef POLLWRBAND
 	{ POLLWRBAND,	"POLLWRBAND"	},
-#endif
+#  endif
 	{ POLLERR,	"POLLERR"	},
 	{ POLLHUP,	"POLLHUP"	},
 	{ POLLNVAL,	"POLLNVAL"	},
-#endif
+# endif
 	{ 0,		NULL		},
 };
 
@@ -401,11 +405,11 @@ sys_poll(struct tcb *tcp)
 {
 	int rc = decode_poll(tcp, 0);
 	if (entering(tcp)) {
-#ifdef INFTIM
+# ifdef INFTIM
 		if (tcp->u_arg[2] == INFTIM)
 			tprints("INFTIM");
 		else
-#endif
+# endif
 			tprintf("%ld", tcp->u_arg[2]);
 	}
 	return rc;
