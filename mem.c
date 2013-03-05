@@ -40,14 +40,15 @@
 # endif
 #endif
 
-#include <sys/user.h>	/* for PAGE_SHIFT */
-#if defined(SH64)
-# include <asm/page.h>	/* for PAGE_SHIFT */
-#endif
-#if !defined(PAGE_SHIFT)
-# warning Failed to get PAGE_SHIFT, assuming 12
-# define PAGE_SHIFT 12
-#endif
+static unsigned long
+get_pagesize()
+{
+	static unsigned long pagesize;
+
+	if (!pagesize)
+		pagesize = sysconf(_SC_PAGESIZE);
+	return pagesize;
+}
 
 int
 sys_brk(struct tcb *tcp)
@@ -295,7 +296,7 @@ sys_old_mmap_pgoff(struct tcb *tcp)
 	for (i = 0; i < 5; i++)
 		u_arg[i] = (unsigned long) narrow_arg[i];
 	offset = narrow_arg[5];
-	offset <<= PAGE_SHIFT;
+	offset *= get_pagesize();
 	return print_mmap(tcp, u_arg, offset);
 }
 #endif
@@ -324,7 +325,7 @@ sys_mmap_pgoff(struct tcb *tcp)
 	/* Try test/mmap_offset_decode.c */
 	unsigned long long offset;
 	offset = (unsigned long) tcp->u_arg[5];
-	offset <<= PAGE_SHIFT;
+	offset *= get_pagesize();
 	return print_mmap(tcp, tcp->u_arg, offset);
 }
 
