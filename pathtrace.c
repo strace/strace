@@ -73,9 +73,10 @@ upathmatch(struct tcb *tcp, unsigned long upath)
 static int
 fdmatch(struct tcb *tcp, int fd)
 {
-	const char *path = getfdpath(tcp, fd);
+	char path[PATH_MAX + 1];
+	int n = getfdpath(tcp, fd, path, sizeof(path));
 
-	return path && pathmatch(path);
+	return n >= 0 && pathmatch(path);
 }
 
 /*
@@ -100,22 +101,24 @@ storepath(const char *path)
 /*
  * Get path associated with fd.
  */
-const char *
-getfdpath(struct tcb *tcp, int fd)
+int
+getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 {
-	static char path[PATH_MAX+1];
 	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 	ssize_t n;
 
 	if (fd < 0)
-		return NULL;
+		return -1;
 
 	sprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
-	n = readlink(linkpath, path, (sizeof path) - 1);
-	if (n <= 0)
-		return NULL;
-	path[n] = '\0';
-	return path;
+	n = readlink(linkpath, buf, bufsize - 1);
+	/*
+	 * NB: if buf is too small, readlink doesn't fail,
+	 * it returns truncated result (IOW: n == bufsize - 1).
+	 */
+	if (n >= 0)
+		buf[n] = '\0';
+	return n;
 }
 
 /*

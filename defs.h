@@ -605,7 +605,7 @@ extern const char *signame(int);
 extern int is_restart_error(struct tcb *);
 extern void pathtrace_select(const char *);
 extern int pathtrace_match(struct tcb *);
-extern const char *getfdpath(struct tcb *, int);
+extern int getfdpath(struct tcb *, int, char *, unsigned);
 
 extern const char *xlookup(const struct xlat *, int);
 

@@ -353,10 +353,10 @@ printnum_int(struct tcb *tcp, long addr, const char *fmt)
 void
 printfd(struct tcb *tcp, int fd)
 {
-	const char *p;
+	char path[PATH_MAX + 1];
 
-	if (show_fd_path && (p = getfdpath(tcp, fd)))
-		tprintf("%d<%s>", fd, p);
+	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0)
+		tprintf("%d<%s>", fd, path);
 	else
 		tprintf("%d", fd);
 }
