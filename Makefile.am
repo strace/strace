@@ -20,6 +20,8 @@ strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
 		 scsi.c stream.c block.c pathtrace.c mtd.c vsprintf.c \
 		 loop.c
 noinst_HEADERS = defs.h
+# Enable this to get link map generated
+#strace_CFLAGS = $(AM_CFLAGS) -Wl,-Map=strace.mapfile
 
 EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     debian/changelog debian/compat debian/control debian/copyright \
