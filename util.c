@@ -400,7 +400,16 @@ string_quote(const char *instr, char *outstr, long len, int size)
 			/* Check for NUL-terminated string. */
 			if (c == eol)
 				break;
-			if (!isprint(c) && !isspace(c)) {
+
+			/* Force hex unless c is printable or whitespace */
+			if (c > 0x7e) {
+				usehex = 1;
+				break;
+			}
+			/* In ASCII isspace is only these chars: "\t\n\v\f\r".
+			 * They happen to have ASCII codes 9,10,11,12,13.
+			 */
+			if (c < ' ' && (unsigned)(c - 9) >= 5) {
 				usehex = 1;
 				break;
 			}
@@ -453,7 +462,7 @@ string_quote(const char *instr, char *outstr, long len, int size)
 					*s++ = 'v';
 					break;
 				default:
-					if (isprint(c))
+					if (c >= ' ' && c <= 0x7e)
 						*s++ = c;
 					else {
 						/* Print \octal */

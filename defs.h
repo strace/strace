@@ -52,7 +52,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
+/* Open-coding isprint(ch) et al proved more efficient than calling
+ * generalized libc interface. We don't *want* to do non-ASCII anyway.
+ */
+/* #include <ctype.h> */
 #include <string.h>
 #include <errno.h>
 #include <signal.h>

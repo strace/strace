@@ -2456,7 +2456,7 @@ print_xattr_val(struct tcb *tcp, int failed,
 			unsigned char *in = &buf[3 * size];
 			size_t i;
 			for (i = 0; i < size; ++i) {
-				if (isprint(in[i]))
+				if (in[i] >= ' ' && in[i] <= 0x7e)
 					*out++ = in[i];
 				else {
 #define tohex(n) "0123456789abcdef"[n]
