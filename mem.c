@@ -400,6 +400,39 @@ static const struct xlat madvise_cmds[] = {
 #ifdef MADV_DONTNEED
 	{ MADV_DONTNEED,	"MADV_DONTNEED" },
 #endif
+#ifdef MADV_REMOVE
+	{ MADV_REMOVE,		"MADV_REMOVE" },
+#endif
+#ifdef MADV_DONTFORK
+	{ MADV_DONTFORK,	"MADV_DONTFORK" },
+#endif
+#ifdef MADV_DOFORK
+	{ MADV_DOFORK,		"MADV_DOFORK" },
+#endif
+#ifdef MADV_HWPOISON
+	{ MADV_HWPOISON,	"MADV_HWPOISON" },
+#endif
+#ifdef MADV_SOFT_OFFLINE
+	{ MADV_SOFT_OFFLINE,	"MADV_SOFT_OFFLINE" },
+#endif
+#ifdef MADV_MERGEABLE
+	{ MADV_MERGEABLE,	"MADV_MERGEABLE" },
+#endif
+#ifdef MADV_UNMERGEABLE
+	{ MADV_UNMERGEABLE,	"MADV_UNMERGEABLE" },
+#endif
+#ifdef MADV_HUGEPAGE
+	{ MADV_HUGEPAGE,	"MADV_HUGEPAGE" },
+#endif
+#ifdef MADV_NOHUGEPAGE
+	{ MADV_NOHUGEPAGE,	"MADV_NOHUGEPAGE" },
+#endif
+#ifdef MADV_DONTDUMP
+	{ MADV_DONTDUMP,	"MADV_DONTDUMP" },
+#endif
+#ifdef MADV_DODUMP
+	{ MADV_DODUMP,		"MADV_DODUMP" },
+#endif
 	{ 0,			NULL },
 };
 
