@@ -988,27 +988,54 @@ undefined_scno_name(struct tcb *tcp)
 
 #ifndef get_regs
 long get_regs_error;
+
+#if defined(PTRACE_GETREGSET) && defined(NT_PRSTATUS)
+# if defined(ARM)
+static void get_regset(pid_t pid)
+{
+	static struct iovec arm_io = {
+		.iov_base = &arm_regs,
+		.iov_len = sizeof(arm_regs)
+	};
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
+				NT_PRSTATUS, (long) &arm_io);
+}
+# elif defined(I386)
+static void get_regset(pid_t pid)
+{
+	static struct iovec i386_io = {
+		.iov_base = &i386_regs,
+		.iov_len = sizeof(i386_regs)
+	};
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
+				NT_PRSTATUS, (long) &i386_io);
+}
+# elif defined(X86_64)
+static void get_regset(pid_t pid)
+{
+	/* x86_io.iov_base = &x86_regs_union; - already is */
+	x86_io.iov_len = sizeof(x86_regs_union);
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
+				NT_PRSTATUS, (long) &x86_io);
+}
+# endif
+#endif /* PTRACE_GETREGSET && NT_PRSTATUS */
 void
 get_regs(pid_t pid)
 {
 # if defined(AVR32)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &avr32_regs);
-# elif defined(I386)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
 # elif defined(X32)
 	/* x86_io.iov_base = &x86_regs_union; - already is */
 	x86_io.iov_len = sizeof(x86_regs_union);
 	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
 				NT_PRSTATUS, (long) &x86_io);
-# elif defined(X86_64)
+# elif defined(ARM) || defined(I386) || defined(X86_64)
 #  if defined(PTRACE_GETREGSET) && defined(NT_PRSTATUS)
 	static int getregset_support;
 
 	if (getregset_support >= 0) {
-		/* x86_io.iov_base = &x86_regs_union; - already is */
-		x86_io.iov_len = sizeof(x86_regs_union);
-		get_regs_error = ptrace(PTRACE_GETREGSET, pid,
-					NT_PRSTATUS, (long) &x86_io);
+		get_regset(pid);
 		if (getregset_support > 0)
 			return;
 		if (get_regs_error >= 0) {
@@ -1020,6 +1047,11 @@ get_regs(pid_t pid)
 		getregset_support = -1;
 	}
 #  endif /* PTRACE_GETREGSET && NT_PRSTATUS */
+#  if defined(ARM)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &arm_regs);
+#  elif defined(I386)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
+#  elif defined(X86_64)
 	/* Use old method, with unreliable heuristical detection of 32-bitness. */
 	x86_io.iov_len = sizeof(x86_64_regs);
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
@@ -1047,8 +1079,9 @@ get_regs(pid_t pid)
 		i386_regs.esp = x86_64_regs.rsp;
 		/* i386_regs.xss = x86_64_regs.ss; */
 	}
-# elif defined(ARM)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&arm_regs);
+#  else
+#   error fix me
+#  endif /* ARM || I386 || X86_64 */
 # elif defined(AARCH64)
 	/*aarch64_io.iov_base = &arm_regs_union; - already is */
 	aarch64_io.iov_len = sizeof(arm_regs_union);
