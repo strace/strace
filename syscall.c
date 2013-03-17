@@ -1011,42 +1011,51 @@ get_regs(pid_t pid)
 	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
 				NT_PRSTATUS, (long) &x86_io);
 # elif defined(X86_64)
-	/*
-	 * PTRACE_GETREGSET was introduced in 2.6.33.
-	 * Let's be paranoid and require a bit later kernel.
-	 */
-	if (os_release >= KERNEL_VERSION(2,6,35)) {
-		/*x86_io.iov_base = &x86_regs_union; - already is */
+#  if defined(PTRACE_GETREGSET) && defined(NT_PRSTATUS)
+	static int getregset_support;
+
+	if (getregset_support >= 0) {
+		/* x86_io.iov_base = &x86_regs_union; - already is */
 		x86_io.iov_len = sizeof(x86_regs_union);
-		get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, (long) &x86_io);
-	} else {
-		/* Use old method, with heuristical detection of 32-bitness */
-		x86_io.iov_len = sizeof(x86_64_regs);
-		get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
-		if (!get_regs_error && x86_64_regs.cs == 0x23) {
-			x86_io.iov_len = sizeof(i386_regs);
-			/*
-			 * The order is important: i386_regs and x86_64_regs
-			 * are overlaid in memory!
-			 */
-			i386_regs.ebx = x86_64_regs.rbx;
-			i386_regs.ecx = x86_64_regs.rcx;
-			i386_regs.edx = x86_64_regs.rdx;
-			i386_regs.esi = x86_64_regs.rsi;
-			i386_regs.edi = x86_64_regs.rdi;
-			i386_regs.ebp = x86_64_regs.rbp;
-			i386_regs.eax = x86_64_regs.rax;
-			/*i386_regs.xds = x86_64_regs.ds; unused by strace */
-			/*i386_regs.xes = x86_64_regs.es; ditto... */
-			/*i386_regs.xfs = x86_64_regs.fs;*/
-			/*i386_regs.xgs = x86_64_regs.gs;*/
-			i386_regs.orig_eax = x86_64_regs.orig_rax;
-			i386_regs.eip = x86_64_regs.rip;
-			/*i386_regs.xcs = x86_64_regs.cs;*/
-			/*i386_regs.eflags = x86_64_regs.eflags;*/
-			i386_regs.esp = x86_64_regs.rsp;
-			/*i386_regs.xss = x86_64_regs.ss;*/
+		get_regs_error = ptrace(PTRACE_GETREGSET, pid,
+					NT_PRSTATUS, (long) &x86_io);
+		if (getregset_support > 0)
+			return;
+		if (get_regs_error >= 0) {
+			getregset_support = 1;
+			return;
 		}
+		if (errno == EPERM || errno == ESRCH)
+			return;
+		getregset_support = -1;
+	}
+#  endif /* PTRACE_GETREGSET && NT_PRSTATUS */
+	/* Use old method, with unreliable heuristical detection of 32-bitness. */
+	x86_io.iov_len = sizeof(x86_64_regs);
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
+	if (!get_regs_error && x86_64_regs.cs == 0x23) {
+		x86_io.iov_len = sizeof(i386_regs);
+		/*
+		 * The order is important: i386_regs and x86_64_regs
+		 * are overlaid in memory!
+		 */
+		i386_regs.ebx = x86_64_regs.rbx;
+		i386_regs.ecx = x86_64_regs.rcx;
+		i386_regs.edx = x86_64_regs.rdx;
+		i386_regs.esi = x86_64_regs.rsi;
+		i386_regs.edi = x86_64_regs.rdi;
+		i386_regs.ebp = x86_64_regs.rbp;
+		i386_regs.eax = x86_64_regs.rax;
+		/* i386_regs.xds = x86_64_regs.ds; unused by strace */
+		/* i386_regs.xes = x86_64_regs.es; ditto... */
+		/* i386_regs.xfs = x86_64_regs.fs; */
+		/* i386_regs.xgs = x86_64_regs.gs; */
+		i386_regs.orig_eax = x86_64_regs.orig_rax;
+		i386_regs.eip = x86_64_regs.rip;
+		/* i386_regs.xcs = x86_64_regs.cs; */
+		/* i386_regs.eflags = x86_64_regs.eflags; */
+		i386_regs.esp = x86_64_regs.rsp;
+		/* i386_regs.xss = x86_64_regs.ss; */
 	}
 # elif defined(ARM)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (void *)&arm_regs);
