@@ -134,11 +134,12 @@ extern char *stpcpy(char *dst, const char *src);
 #endif
 
 #if (defined(SPARC) || defined(SPARC64) \
-    || defined(X86_64) \
+    || defined(I386) || defined(X32) || defined(X86_64) \
     || defined(ARM) || defined(AARCH64) \
     || defined(AVR32) \
     || defined(OR1K) \
     || defined(METAG) \
+    || defined(TILE) \
     ) && defined(__GLIBC__)
 # include <sys/ptrace.h>
 #else
