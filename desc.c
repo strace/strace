@@ -855,9 +855,9 @@ static void
 print_common_flags(struct iocb *iocb)
 {
 	if (iocb->u.c.flags & IOCB_RESFD)
-		tprintf("resfd=%d, ", iocb->u.c.resfd);
+		tprintf(", resfd=%d", iocb->u.c.resfd);
 	if (iocb->u.c.flags & ~IOCB_RESFD)
-		tprintf("flags=%x, ", iocb->u.c.flags);
+		tprintf(", flags=%x", iocb->u.c.flags);
 }
 
 #endif /* HAVE_LIBAIO_H */
@@ -914,8 +914,9 @@ sys_io_submit(struct tcb *tcp)
 					print_common_flags(&iocb);
 					break;
 				case SUB_VECTOR:
-					tprintf(", %llx, ", iocb.u.v.offset);
+					tprintf(", %llx", iocb.u.v.offset);
 					print_common_flags(&iocb);
+					tprints(", ");
 					tprint_iov(tcp, iocb.u.v.nr,
 						   (unsigned long)iocb.u.v.vec,
 						   iocb.aio_lio_opcode == IO_CMD_PWRITEV);
