@@ -12,7 +12,7 @@ framework_skip_() { warn_ "$ME_: framework skip: $*"; exit 77; }
 
 check_prog()
 {
-	"$@" --version > /dev/null 2>&1 ||
+	type "$@" > /dev/null 2>&1 ||
 		framework_skip_ "$* is not available"
 }
 
