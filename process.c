@@ -41,6 +41,9 @@
 #include <sys/resource.h>
 #include <sys/utsname.h>
 #include <sys/user.h>
+#ifdef HAVE_ELF_H
+# include <elf.h>
+#endif
 
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
@@ -1278,6 +1281,79 @@ static const struct xlat ptrace_setoptions_flags[] = {
 };
 #endif /* PTRACE_SETOPTIONS */
 
+static const struct xlat nt_descriptor_types[] = {
+#ifdef NT_PRSTATUS
+	{ NT_PRSTATUS,		"NT_PRSTATUS" },
+#endif
+#ifdef NT_FPREGSET
+	{ NT_FPREGSET,		"NT_FPREGSET" },
+#endif
+#ifdef NT_PRPSINFO
+	{ NT_PRPSINFO,		"NT_PRPSINFO" },
+#endif
+#ifdef NT_PRXREG
+	{ NT_PRXREG,		"NT_PRXREG" },
+#endif
+#ifdef NT_TASKSTRUCT
+	{ NT_TASKSTRUCT,	"NT_TASKSTRUCT" },
+#endif
+#ifdef NT_PLATFORM
+	{ NT_PLATFORM,		"NT_PLATFORM" },
+#endif
+#ifdef NT_AUXV
+	{ NT_AUXV,		"NT_AUXV" },
+#endif
+#ifdef NT_GWINDOWS
+	{ NT_GWINDOWS,		"NT_GWINDOWS" },
+#endif
+#ifdef NT_ASRS
+	{ NT_ASRS,		"NT_ASRS" },
+#endif
+#ifdef NT_PSTATUS
+	{ NT_PSTATUS,		"NT_PSTATUS" },
+#endif
+#ifdef NT_PSINFO
+	{ NT_PSINFO,		"NT_PSINFO" },
+#endif
+#ifdef NT_PRCRED
+	{ NT_PRCRED,		"NT_PRCRED" },
+#endif
+#ifdef NT_UTSNAME
+	{ NT_UTSNAME,		"NT_UTSNAME" },
+#endif
+#ifdef NT_LWPSTATUS
+	{ NT_LWPSTATUS,		"NT_LWPSTATUS" },
+#endif
+#ifdef NT_LWPSINFO
+	{ NT_LWPSINFO,		"NT_LWPSINFO" },
+#endif
+#ifdef NT_PRFPXREG
+	{ NT_PRFPXREG,		"NT_PRFPXREG" },
+#endif
+#ifdef NT_PRXFPREG
+	{ NT_PRXFPREG,		"NT_PRXFPREG" },
+#endif
+#ifdef NT_PPC_VMX
+	{ NT_PPC_VMX,		"NT_PPC_VMX" },
+#endif
+#ifdef NT_PPC_SPE
+	{ NT_PPC_SPE,		"NT_PPC_SPE" },
+#endif
+#ifdef NT_PPC_VSX
+	{ NT_PPC_VSX,		"NT_PPC_VSX" },
+#endif
+#ifdef NT_386_TLS
+	{ NT_386_TLS,		"NT_386_TLS" },
+#endif
+#ifdef NT_386_IOPERM
+	{ NT_386_IOPERM,	"NT_386_IOPERM" },
+#endif
+#ifdef NT_X86_XSTATE
+	{ NT_X86_XSTATE,	"NT_X86_XSTATE" },
+#endif
+	{ 0,			NULL },
+};
+
 #define uoff(member)	offsetof(struct user, member)
 
 const struct xlat struct_user_offsets[] = {
@@ -2311,9 +2387,12 @@ sys_ptrace(struct tcb *tcp)
 				tprintf("%s, ", x->str);
 		} else
 #ifdef PTRACE_GETREGSET
-		//if (tcp->u_arg[0] == PTRACE_GET/SETREGSET) {
-		//	TODO: show tcp->u_arg[2] as "NT_xxx, "
-		//} else
+		if (tcp->u_arg[0] == PTRACE_GETREGSET
+		 || tcp->u_arg[0] == PTRACE_SETREGSET
+		) {
+			printxval(nt_descriptor_types, tcp->u_arg[2], "NT_???");
+			tprints(", ");
+		} else
 #endif
 			tprintf("%#lx, ", addr);
 
