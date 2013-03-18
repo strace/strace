@@ -707,6 +707,7 @@ is_restart_error(struct tcb *tcp)
 
 #if defined(I386)
 struct user_regs_struct i386_regs;
+# define ARCH_REGS_FOR_GETREGSET i386_regs
 #elif defined(X86_64) || defined(X32)
 /*
  * On i386, pt_regs and user_regs_struct are the same,
@@ -753,6 +754,7 @@ static long m68k_d0;
 static long bfin_r0;
 #elif defined(ARM)
 struct pt_regs arm_regs; /* not static */
+# define ARCH_REGS_FOR_GETREGSET arm_regs
 #elif defined(AARCH64)
 static union {
 	struct user_pt_regs aarch64_r;
@@ -793,14 +795,10 @@ struct pt_regs tile_regs;
 static long microblaze_r3;
 #elif defined(OR1K)
 static struct user_regs_struct or1k_regs;
-static struct iovec or1k_io = {
-	.iov_base = &or1k_regs
-};
+# define ARCH_REGS_FOR_GETREGSET or1k_regs
 #elif defined(METAG)
 static struct user_gp_regs metag_regs;
-static struct iovec metag_io = {
-	.iov_base = &metag_regs
-};
+# define ARCH_REGS_FOR_GETREGSET metag_regs
 #endif
 
 void
@@ -990,47 +988,51 @@ undefined_scno_name(struct tcb *tcp)
 long get_regs_error;
 
 #if defined(PTRACE_GETREGSET) && defined(NT_PRSTATUS)
-# if defined(ARM)
 static void get_regset(pid_t pid)
 {
-	static struct iovec arm_io = {
-		.iov_base = &arm_regs,
-		.iov_len = sizeof(arm_regs)
+/* constant iovec */
+# if defined(ARM) \
+  || defined(I386) \
+  || defined(METAG) \
+  || defined(OR1K)
+	static struct iovec io = {
+		.iov_base = &ARCH_REGS_FOR_GETREGSET,
+		.iov_len = sizeof(ARCH_REGS_FOR_GETREGSET)
 	};
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
-				NT_PRSTATUS, (long) &arm_io);
-}
-# elif defined(I386)
-static void get_regset(pid_t pid)
-{
-	static struct iovec i386_io = {
-		.iov_base = &i386_regs,
-		.iov_len = sizeof(i386_regs)
-	};
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
-				NT_PRSTATUS, (long) &i386_io);
-}
-# elif defined(X86_64)
-static void get_regset(pid_t pid)
-{
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &io);
+
+/* variable iovec */
+# elif defined(X86_64) || defined(X32)
 	/* x86_io.iov_base = &x86_regs_union; - already is */
 	x86_io.iov_len = sizeof(x86_regs_union);
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
-				NT_PRSTATUS, (long) &x86_io);
-}
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &x86_io);
+# elif defined(AARCH64)
+	/* aarch64_io.iov_base = &arm_regs_union; - already is */
+	aarch64_io.iov_len = sizeof(arm_regs_union);
+	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &aarch64_io);
+# else
+#  warning both PTRACE_GETREGSET and NT_PRSTATUS are available but not yet used
 # endif
+}
 #endif /* PTRACE_GETREGSET && NT_PRSTATUS */
+
 void
 get_regs(pid_t pid)
 {
-# if defined(AVR32)
+/* PTRACE_GETREGSET only */
+# if defined(METAG) || defined(OR1K) || defined(X32) || defined(AARCH64)
+	get_regset(pid);
+
+/* PTRACE_GETREGS only */
+# elif defined(AVR32)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &avr32_regs);
-# elif defined(X32)
-	/* x86_io.iov_base = &x86_regs_union; - already is */
-	x86_io.iov_len = sizeof(x86_regs_union);
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid,
-				NT_PRSTATUS, (long) &x86_io);
-# elif defined(ARM) || defined(I386) || defined(X86_64)
+# elif defined(TILE)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &tile_regs);
+# elif defined(SPARC) || defined(SPARC64)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&sparc_regs, 0);
+
+/* try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS */
+# else
 #  if defined(PTRACE_GETREGSET) && defined(NT_PRSTATUS)
 	static int getregset_support;
 
@@ -1048,13 +1050,13 @@ get_regs(pid_t pid)
 	}
 #  endif /* PTRACE_GETREGSET && NT_PRSTATUS */
 #  if defined(ARM)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &arm_regs);
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &arm_regs);
 #  elif defined(I386)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &i386_regs);
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &i386_regs);
 #  elif defined(X86_64)
 	/* Use old method, with unreliable heuristical detection of 32-bitness. */
 	x86_io.iov_len = sizeof(x86_64_regs);
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &x86_64_regs);
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
 	if (!get_regs_error && x86_64_regs.cs == 0x23) {
 		x86_io.iov_len = sizeof(i386_regs);
 		/*
@@ -1080,41 +1082,11 @@ get_regs(pid_t pid)
 		/* i386_regs.xss = x86_64_regs.ss; */
 	}
 #  else
-#   error fix me
+#   error unhandled architecture
 #  endif /* ARM || I386 || X86_64 */
-# elif defined(AARCH64)
-	/*aarch64_io.iov_base = &arm_regs_union; - already is */
-	aarch64_io.iov_len = sizeof(arm_regs_union);
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, (void *)&aarch64_io);
-#  if 0
-	/* Paranoia checks */
-	if (get_regs_error)
-		return;
-	switch (aarch64_io.iov_len) {
-		case sizeof(aarch64_regs):
-			/* We are in 64-bit mode */
-			break;
-		case sizeof(arm_regs):
-			/* We are in 32-bit mode */
-			break;
-		default:
-			get_regs_error = -1;
-			break;
-	}
-#  endif
-# elif defined(SPARC) || defined(SPARC64)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&sparc_regs, 0);
-# elif defined(TILE)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &tile_regs);
-# elif defined(OR1K)
-	or1k_io.iov_len = sizeof(or1k_regs);
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &or1k_io);
-# elif defined(METAG)
-	metag_io.iov_len = sizeof(metag_regs);
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &metag_io);
 # endif
 }
-#endif
+#endif /* !get_regs */
 
 /* Returns:
  * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
