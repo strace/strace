@@ -66,7 +66,6 @@
 #endif
 
 #if defined(X86_64) || defined(X32)
-# include <linux/ptrace.h>
 # include <sys/uio.h>
 # include <elf.h>
 #endif
