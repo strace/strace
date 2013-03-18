@@ -65,25 +65,15 @@
 # include <asm/rse.h>
 #endif
 
-#if defined(X86_64) || defined(X32)
-# include <sys/uio.h>
+/* for struct iovec */
+#include <sys/uio.h>
+/* for NT_PRSTATUS */
+#ifdef HAVE_ELF_H
 # include <elf.h>
 #endif
 
 #if defined(AARCH64)
 # include <asm/ptrace.h>
-# include <sys/uio.h>
-# include <elf.h>
-#endif
-
-#if defined(OR1K)
-# include <sys/uio.h>
-# include <elf.h>
-#endif
-
-#if defined(METAG)
-# include <sys/uio.h>
-# include <elf.h>
 #endif
 
 #ifndef ERESTARTSYS
