@@ -204,7 +204,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	inttypes.h
 	ioctls.h
-	libaio.h
 	linux/capability.h
 	linux/perf_event.h
 	linux/ptrace.h
@@ -293,6 +292,11 @@ AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 
 AC_CHECK_SIZEOF([long])
 AC_CHECK_SIZEOF([rlim_t],,[#include <sys/resource.h>])
+
+AC_CHECK_HEADERS([libaio.h], [
+	AC_CHECK_MEMBERS([struct iocb.u.c.flags],,, [#include <libaio.h>])
+	AC_CHECK_DECLS([IO_CMD_PWRITE, IO_CMD_PWRITEV],,, [#include <libaio.h>])
+])
 
 AC_PATH_PROG([PERL], [perl])
 

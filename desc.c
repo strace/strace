@@ -854,10 +854,14 @@ iocb_cmd_lookup(unsigned cmd, enum iocb_sub *sub)
 static void
 print_common_flags(struct iocb *iocb)
 {
+#if HAVE_STRUCT_IOCB_U_C_FLAGS
 	if (iocb->u.c.flags & IOCB_RESFD)
 		tprintf(", resfd=%d", iocb->u.c.resfd);
 	if (iocb->u.c.flags & ~IOCB_RESFD)
 		tprintf(", flags=%x", iocb->u.c.flags);
+#else
+# warning "libaio.h is too old => limited io_submit decoding"
+#endif
 }
 
 #endif /* HAVE_LIBAIO_H */
@@ -901,13 +905,14 @@ sys_io_submit(struct tcb *tcp)
 				tprintf("filedes:%d", iocb.aio_fildes);
 				switch (sub) {
 				case SUB_COMMON:
+#if HAVE_DECL_IO_CMD_PWRITE
 					if (iocb.aio_lio_opcode == IO_CMD_PWRITE) {
 						tprints(", str:");
 						printstr(tcp, (unsigned long)iocb.u.c.buf,
 							 iocb.u.c.nbytes);
-					} else {
+					} else
+#endif
 						tprintf(", buf:%p", iocb.u.c.buf);
-					}
 					tprintf(", nbytes:%lu, offset:%llx",
 						iocb.u.c.nbytes,
 						iocb.u.c.offset);
@@ -919,7 +924,12 @@ sys_io_submit(struct tcb *tcp)
 					tprints(", ");
 					tprint_iov(tcp, iocb.u.v.nr,
 						   (unsigned long)iocb.u.v.vec,
-						   iocb.aio_lio_opcode == IO_CMD_PWRITEV);
+#if HAVE_DECL_IO_CMD_PWRITEV
+						   iocb.aio_lio_opcode == IO_CMD_PWRITEV
+#else
+						   0
+#endif
+						  );
 					break;
 				case SUB_POLL:
 					tprintf(", %x", iocb.u.poll.events);
@@ -932,7 +942,7 @@ sys_io_submit(struct tcb *tcp)
 			if (i)
 				tprints("}");
 #else
-#warning "libaio-devel is not available => no io_submit decoding"
+#warning "libaio.h is not available => no io_submit decoding"
 			tprintf("%#lx", tcp->u_arg[2]);
 #endif
 		}
