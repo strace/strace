@@ -435,8 +435,20 @@ swap_uid(void)
 
 #if _LFS64_LARGEFILE
 # define fopen_for_output fopen64
+# define struct_stat struct stat64
+# define stat_file stat64
+# define struct_dirent struct dirent64
+# define read_dir readdir64
+# define struct_rlimit struct rlimit64
+# define set_rlimit setrlimit64
 #else
 # define fopen_for_output fopen
+# define struct_stat struct stat
+# define stat_file stat
+# define struct_dirent struct dirent
+# define read_dir readdir
+# define struct_rlimit struct rlimit
+# define set_rlimit setrlimit
 #endif
 
 static FILE *
@@ -893,9 +905,9 @@ startup_attach(void)
 			dir = opendir(procdir);
 			if (dir != NULL) {
 				unsigned int ntid = 0, nerr = 0;
-				struct dirent *de;
+				struct_dirent *de;
 
-				while ((de = readdir(dir)) != NULL) {
+				while ((de = read_dir(dir)) != NULL) {
 					struct tcb *cur_tcp;
 					int tid;
 
@@ -1047,7 +1059,7 @@ exec_or_die(void)
 static void
 startup_child(char **argv)
 {
-	struct stat statbuf;
+	struct_stat statbuf;
 	const char *filename;
 	char pathname[MAXPATHLEN];
 	int pid;
@@ -1067,7 +1079,7 @@ startup_child(char **argv)
 	 * first regardless of the path but doing that gives
 	 * security geeks a panic attack.
 	 */
-	else if (stat(filename, &statbuf) == 0)
+	else if (stat_file(filename, &statbuf) == 0)
 		strcpy(pathname, filename);
 #endif /* USE_DEBUGGING_EXEC */
 	else {
@@ -1096,7 +1108,7 @@ startup_child(char **argv)
 			if (len && pathname[len - 1] != '/')
 				pathname[len++] = '/';
 			strcpy(pathname + len, filename);
-			if (stat(pathname, &statbuf) == 0 &&
+			if (stat_file(pathname, &statbuf) == 0 &&
 			    /* Accept only regular files
 			       with some execute bits set.
 			       XXX not perfect, might still fail */
@@ -1105,7 +1117,7 @@ startup_child(char **argv)
 				break;
 		}
 	}
-	if (stat(pathname, &statbuf) < 0) {
+	if (stat_file(pathname, &statbuf) < 0) {
 		perror_msg_and_die("Can't stat '%s'", filename);
 	}
 
@@ -2296,8 +2308,8 @@ main(int argc, char *argv[])
 	}
 	if (exit_code > 0xff) {
 		/* Avoid potential core file clobbering.  */
-		struct rlimit rlim = {0, 0};
-		setrlimit(RLIMIT_CORE, &rlim);
+		struct_rlimit rlim = {0, 0};
+		set_rlimit(RLIMIT_CORE, &rlim);
 
 		/* Child was killed by a signal, mimic that.  */
 		exit_code &= 0xff;
