@@ -2167,22 +2167,31 @@ sys_mknodat(struct tcb *tcp)
 }
 
 static void
-printdir(struct tcb *tcp, long addr)
+print_old_dirent(struct tcb *tcp, long addr)
 {
-	struct dirent d;
+#ifdef SH64
+	typedef struct kernel_dirent old_dirent_t;
+#else
+	typedef struct {
+		uint32_t	d_ino;
+		uint32_t	d_off;
+		unsigned short  d_reclen;
+		char            d_name[1];
+	} old_dirent_t;
+#endif
+	old_dirent_t d;
 
-	if (!verbose(tcp)) {
+	if (!verbose(tcp) || umove(tcp, addr, &d) < 0) {
 		tprintf("%#lx", addr);
 		return;
 	}
-	if (umove(tcp, addr, &d) < 0) {
-		tprints("{...}");
-		return;
-	}
-	tprintf("{d_ino=%ld, ", (unsigned long) d.d_ino);
-	tprints("d_name=");
-	printpathn(tcp, (long) ((struct dirent *) addr)->d_name, d.d_reclen);
-	tprints("}");
+
+	tprintf("{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=\"",
+		(unsigned long) d.d_ino, (unsigned long) d.d_off, d.d_reclen);
+	if (d.d_reclen > 256)
+		d.d_reclen = 256;
+	printpathn(tcp, addr + offsetof(old_dirent_t, d_name), d.d_reclen);
+	tprints("\"}");
 }
 
 int
@@ -2195,7 +2204,7 @@ sys_readdir(struct tcb *tcp)
 		if (syserror(tcp) || tcp->u_rval == 0 || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
-			printdir(tcp, tcp->u_arg[1]);
+			print_old_dirent(tcp, tcp->u_arg[1]);
 		/* Not much point in printing this out, it is always 1. */
 		if (tcp->u_arg[2] != 1)
 			tprintf(", %lu", tcp->u_arg[2]);
