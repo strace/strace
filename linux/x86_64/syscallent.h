@@ -38,7 +38,7 @@
 	{ 1,	0,	sys_alarm,		"alarm"		},  /* 37 */
 	{ 3,	0,	sys_setitimer,		"setitimer"	},  /* 38 */
 	{ 0,	0,	sys_getpid,		"getpid"	},  /* 39 */
-	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	},  /* 40 */
+	{ 4,	TD|TN,	sys_sendfile64,		"sendfile"	},  /* 40 */
 	{ 3,	TN,	sys_socket,		"socket"	},  /* 41 */
 	{ 3,	TN,	sys_connect,		"connect"	},  /* 42 */
 	{ 3,	TN,	sys_accept,		"accept"	},  /* 43 */

@@ -69,7 +69,7 @@
 	{ 6,	TD,	sys_pwrite,			"pwrite64"		}, /* 68 */
 	{ 5,	TD,	sys_preadv,			"preadv"		}, /* 69 */
 	{ 5,	TD,	sys_pwritev,			"pwritev"		}, /* 70 */
-	{ 4,	TD|TN,	sys_sendfile64,			"sendfile64"		}, /* 71 */
+	{ 4,	TD|TN,	sys_sendfile64,			"sendfile"		}, /* 71 */
 	{ 6,	TD,	sys_pselect6,			"pselect6"		}, /* 72 */
 	{ 5,	TD,	sys_ppoll,			"ppoll"			}, /* 73 */
 	{ 4,	TD|TS,	sys_signalfd4,			"signalfd4"		}, /* 74 */

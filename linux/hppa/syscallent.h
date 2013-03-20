@@ -211,7 +211,7 @@
 	{ 0,	0,	sys_gettid,		"gettid"		}, /* 206 */
 	{ 4,	TD,	sys_readahead,		"readahead"		}, /* 207 */
 	{ 2,	TS,	sys_kill,		"tkill"			}, /* 208 */
-	{ 4,	TD|TN,	sys_sendfile,		"sendfile64"		}, /* 209 */
+	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"		}, /* 209 */
 	{ 6,	0,	sys_futex,		"futex"			}, /* 210 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"	}, /* 211 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"	}, /* 212 */

@@ -250,30 +250,41 @@ sys_pwritev(struct tcb *tcp)
 }
 #endif /* HAVE_SYS_UIO_H */
 
+static void
+print_off_t(struct tcb *tcp, long addr)
+{
+	unsigned long offset;
+
+	if (!addr) {
+		tprints("NULL");
+		return;
+	}
+
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize == 4) {
+		uint32_t off;
+
+		if (umove(tcp, addr, &off) < 0)
+			tprintf("%#lx", addr);
+		else
+			tprintf("[%u]", off);
+	} else
+#endif
+	if (umove(tcp, addr, &offset) < 0)
+		tprintf("%#lx", addr);
+	else
+		tprintf("[%lu]", offset);
+}
+
 int
 sys_sendfile(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		off_t offset;
-
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		printfd(tcp, tcp->u_arg[1]);
 		tprints(", ");
-		if (!tcp->u_arg[2])
-			tprints("NULL");
-//FIXME: obviously bogus.
-//Probably should use explicit long.
-//Arches with long long offset param should use
-//sys_sendfile64, not this fn.
-		else if (umove(tcp, tcp->u_arg[2], &offset) < 0)
-			tprintf("%#lx", tcp->u_arg[2]);
-		else
-#ifdef HAVE_LONG_LONG_OFF_T
-			tprintf("[%llu]", offset);
-#else
-			tprintf("[%lu]", offset);
-#endif
+		print_off_t(tcp, tcp->u_arg[2]);
 		tprintf(", %lu", tcp->u_arg[3]);
 	}
 	return 0;
