@@ -120,6 +120,11 @@ or1k*)
 	AC_DEFINE([OR1K], 1, [Define for the OpenRISC 1000 architecture.])
 	;;
 
+xtensa*)
+	arch=xtensa
+	AC_DEFINE([XTENSA], 1, [Define for the Xtensa architecture])
+	;;
+
 *)
 	AC_MSG_RESULT([NO!])
 	AC_MSG_ERROR([architecture $host_cpu is not supported by strace])

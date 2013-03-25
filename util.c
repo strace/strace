@@ -1401,6 +1401,9 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 #elif defined(METAG)
 	/* setbpt/clearbpt never used: */
 	/* Meta is only supported since linux-3.7 */
+#elif defined(XTENSA)
+	/* setbpt/clearbpt never used: */
+	/* Xtensa is only supported since linux 2.6.13 */
 #else
 #warning Do not know how to handle change_syscall for this architecture
 #endif /* architecture */

@@ -76,6 +76,10 @@
 # include <asm/ptrace.h>
 #endif
 
+#if defined(XTENSA)
+# include <asm/ptrace.h>
+#endif
+
 #ifndef ERESTARTSYS
 # define ERESTARTSYS	512
 #endif
@@ -799,6 +803,8 @@ static struct user_regs_struct or1k_regs;
 #elif defined(METAG)
 static struct user_gp_regs metag_regs;
 # define ARCH_REGS_FOR_GETREGSET metag_regs
+#elif defined(XTENSA)
+static long xtensa_a2;
 #endif
 
 void
@@ -936,6 +942,13 @@ printcall(struct tcb *tcp)
 	tprintf("[%08lx] ", or1k_regs.pc);
 #elif defined(METAG)
 	tprintf("[%08lx] ", metag_regs.pc);
+#elif defined(XTENSA)
+	long pc;
+	if (upeek(tcp, REG_PC, &pc) < 0) {
+		PRINTBADPC;
+		return;
+	}
+	tprintf("[%08lx] ", pc);
 #endif /* architecture */
 }
 
@@ -1516,6 +1529,9 @@ get_scno(struct tcb *tcp)
 	scno = or1k_regs.gpr[11];
 #elif defined(METAG)
 	scno = metag_regs.dx[0][1];	/* syscall number in D1Re0 (D1.0) */
+#elif defined(XTENSA)
+	if (upeek(tcp, SYSCALL_NR, &scno) < 0)
+		return -1;
 #endif
 
 	tcp->scno = scno;
@@ -1916,6 +1932,12 @@ get_syscall_args(struct tcb *tcp)
 	for (i = 0; i < nargs; i++)
 		/* arguments go backwards from D1Ar1 (D1.3) */
 		tcp->u_arg[i] = ((unsigned long *)&metag_regs.dx[3][1])[-i];
+#elif defined(XTENSA)
+	/* arg0: a6, arg1: a3, arg2: a4, arg3: a5, arg4: a8, arg5: a9 */
+	static const int xtensaregs[MAX_ARGS] = { 6, 3, 4, 5, 8, 9 };
+	for (i = 0; i < nargs; ++i)
+		if (upeek(tcp, REG_A_BASE + xtensaregs[i], &tcp->u_arg[i]) < 0)
+			return -1;
 #else /* Other architecture (32bits specific) */
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp, i*4, &tcp->u_arg[i]) < 0)
@@ -2112,6 +2134,9 @@ get_syscall_result(struct tcb *tcp)
 	/* already done by get_regs */
 #elif defined(METAG)
 	/* already done by get_regs */
+#elif defined(XTENSA)
+	if (upeek(tcp, REG_A_BASE + 2, &xtensa_a2) < 0)
+		return -1;
 #endif
 	return 1;
 }
@@ -2410,6 +2435,14 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = or1k_regs.gpr[11];
+	}
+#elif defined(XTENSA)
+	if (check_errno && is_negated_errno(xtensa_a2)) {
+		tcp->u_rval = -1;
+		u_error = -xtensa_a2;
+	}
+	else {
+		tcp->u_rval = xtensa_a2;
 	}
 #endif
 	tcp->u_error = u_error;

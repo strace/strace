@@ -140,6 +140,7 @@ extern char *stpcpy(char *dst, const char *src);
     || defined(OR1K) \
     || defined(METAG) \
     || defined(TILE) \
+    || defined(XTENSA) \
     ) && defined(__GLIBC__)
 # include <sys/ptrace.h>
 #else

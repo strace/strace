@@ -994,6 +994,8 @@ sys_sigreturn(struct tcb *tcp)
 	}
 #elif defined(X86_64)
 	/* no need to remind */
+#elif defined(XTENSA)
+	/* Xtensa only has rt_sys_sigreturn */
 #else
 # warning No sys_sigreturn() for this architecture
 # warning         (no problem, just a reminder :-)
