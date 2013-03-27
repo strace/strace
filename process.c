@@ -159,6 +159,7 @@ static const struct xlat prctl_options[] = {
 #ifdef PR_PTHREADEXIT
 	{ PR_PTHREADEXIT,	"PR_PTHREADEXIT"	},
 #endif
+
 #ifdef PR_SET_PDEATHSIG
 	{ PR_SET_PDEATHSIG,	"PR_SET_PDEATHSIG"	},
 #endif
@@ -219,6 +220,12 @@ static const struct xlat prctl_options[] = {
 #ifdef PR_SET_SECCOMP
 	{ PR_SET_SECCOMP,	"PR_SET_SECCOMP"	},
 #endif
+#ifdef PR_CAPBSET_READ
+	{ PR_CAPBSET_READ,	"PR_CAPBSET_READ"	},
+#endif
+#ifdef PR_CAPBSET_DROP
+	{ PR_CAPBSET_DROP,	"PR_CAPBSET_DROP"	},
+#endif
 #ifdef PR_GET_TSC
 	{ PR_GET_TSC,		"PR_GET_TSC"		},
 #endif
@@ -230,6 +237,42 @@ static const struct xlat prctl_options[] = {
 #endif
 #ifdef PR_SET_SECUREBITS
 	{ PR_SET_SECUREBITS,	"PR_SET_SECUREBITS"	},
+#endif
+#ifdef PR_SET_TIMERSLACK
+	{ PR_SET_TIMERSLACK,	"PR_SET_TIMERSLACK"	},
+#endif
+#ifdef PR_GET_TIMERSLACK
+	{ PR_GET_TIMERSLACK,	"PR_GET_TIMERSLACK"	},
+#endif
+#ifdef PR_TASK_PERF_EVENTS_DISABLE
+	{ PR_TASK_PERF_EVENTS_DISABLE,	"PR_TASK_PERF_EVENTS_DISABLE"	},
+#endif
+#ifdef PR_TASK_PERF_EVENTS_ENABLE
+	{ PR_TASK_PERF_EVENTS_ENABLE,	"PR_TASK_PERF_EVENTS_ENABLE"	},
+#endif
+#ifdef PR_MCE_KILL
+	{ PR_MCE_KILL,		"PR_MCE_KILL"		},
+#endif
+#ifdef PR_MCE_KILL_GET
+	{ PR_MCE_KILL_GET,	"PR_MCE_KILL_GET"	},
+#endif
+#ifdef PR_SET_MM
+	{ PR_SET_MM,		"PR_SET_MM"		},
+#endif
+#ifdef PR_SET_CHILD_SUBREAPER
+	{ PR_SET_CHILD_SUBREAPER,	"PR_SET_CHILD_SUBREAPER"	},
+#endif
+#ifdef PR_GET_CHILD_SUBREAPER
+	{ PR_GET_CHILD_SUBREAPER,	"PR_GET_CHILD_SUBREAPER"	},
+#endif
+#ifdef PR_SET_NO_NEW_PRIVS
+	{ PR_SET_NO_NEW_PRIVS,	"PR_SET_NO_NEW_PRIVS"	},
+#endif
+#ifdef PR_GET_NO_NEW_PRIVS
+	{ PR_GET_NO_NEW_PRIVS,	"PR_GET_NO_NEW_PRIVS"	},
+#endif
+#ifdef PR_GET_TID_ADDRESS
+	{ PR_GET_TID_ADDRESS,	"PR_GET_TID_ADDRESS"	},
 #endif
 	{ 0,			NULL			},
 };
