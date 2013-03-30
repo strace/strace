@@ -1,2 +1,2 @@
 /* tilegx32/tilepro */
-#include "../ioctlent.h"
+#include "ioctlent.h"
