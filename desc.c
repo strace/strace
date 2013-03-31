@@ -913,13 +913,13 @@ sys_io_submit(struct tcb *tcp)
 					} else
 #endif
 						tprintf(", buf:%p", iocb.u.c.buf);
-					tprintf(", nbytes:%lu, offset:%llx",
+					tprintf(", nbytes:%lu, offset:%lld",
 						iocb.u.c.nbytes,
 						iocb.u.c.offset);
 					print_common_flags(&iocb);
 					break;
 				case SUB_VECTOR:
-					tprintf(", %llx", iocb.u.v.offset);
+					tprintf(", %lld", iocb.u.v.offset);
 					print_common_flags(&iocb);
 					tprints(", ");
 					tprint_iov(tcp, iocb.u.v.nr,
