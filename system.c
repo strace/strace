@@ -378,7 +378,7 @@ sys_sram_alloc(struct tcb *tcp)
 		/* size */
 		tprintf("%lu, ", tcp->u_arg[0]);
 		/* flags */
-		printxval(sram_alloc_flags, tcp->u_arg[1], "???_SRAM");
+		printflags(sram_alloc_flags, tcp->u_arg[1], "???_SRAM");
 	}
 	return 1;
 }
