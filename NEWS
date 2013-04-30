@@ -1,8 +1,8 @@
-Noteworthy changes in release ?.?
-=================================
+Noteworthy changes in release ?.? (????-??-??)
+==============================================
 
-Noteworthy changes in release 4.7
-=================================
+Noteworthy changes in release 4.7 (2012-05-02)
+==============================================
 
 * Changes in behavior
   * strace no longer suspends waitpid until there is a child
@@ -77,8 +77,8 @@ Noteworthy changes in release 4.7
   * Linux kernel >= 2.6.18 is recommended.  Older versions might still
     work but they haven't been thoroughly tested with this release.
 
-Noteworthy changes in release 4.6
-=================================
+Noteworthy changes in release 4.6 (2011-03-15)
+==============================================
 
 * Changes in behavior
   * Print diagnostic information about changes in personality mode to
@@ -128,8 +128,8 @@ Noteworthy changes in release 4.6
   * Fixed misleading italics in the manual page.
     (Addresses Debian bug #589323).
 
-Noteworthy changes in release 4.5.20
-====================================
+Noteworthy changes in release 4.5.20 (2010-04-13)
+=================================================
 
 * Improvements
   * Implemented decoding of new linux syscalls: inotify_init1, recvmmsg.
@@ -163,8 +163,8 @@ Noteworthy changes in release 4.5.20
     (Addresses Debian bug #513014)
   * Corrected handling of killed threads.
 
-Noteworthy changes in release 4.5.19
-====================================
+Noteworthy changes in release 4.5.19 (2009-10-21)
+=================================================
 
 * Changes in behavior
   * When command exits, strace now exits with the same exit status.

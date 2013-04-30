@@ -2,6 +2,7 @@
 *.o
 .deps
 .libs
+.version
 .*.swp
 
 /ChangeLog

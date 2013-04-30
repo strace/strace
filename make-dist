@@ -21,5 +21,6 @@ autoreconf -i -f
 ./configure --enable-maintainer-mode
 
 make -s $j distcheck
+make -s $j news-check
 
 mv -f strace-*.tar.xz ..

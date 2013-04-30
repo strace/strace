@@ -49,6 +49,7 @@ noinst_HEADERS = defs.h
 
 EXTRA_DIST =				\
 	$(man_MANS)			\
+	.version			\
 	COPYRIGHT			\
 	CREDITS				\
 	ChangeLog			\
@@ -179,15 +180,34 @@ EXTRA_DIST =				\
 srpm: dist-xz
 	rpmbuild --define '%_srcrpmdir .' -ts $(distdir).tar.xz
 
-BUILT_SOURCES =
+BUILT_SOURCES = .version
+
+$(srcdir)/.version:
+	$(AM_V_GEN)echo $(VERSION) > $@-t && mv $@-t $@
+
+dist-hook:
+	$(AM_V_GEN)echo $(VERSION) > $(distdir)/.tarball-version
+
+today = $(shell date +%Y-%m-%d)
+version_regexp = $(subst .,\.,$(VERSION))
+news_check_regexp = 'Noteworthy changes in release $(version_regexp) ($(today))'
+
+news-check: NEWS
+	$(AM_V_GEN)if head -1 $< |				\
+	  grep -x $(news_check_regexp) >/dev/null; then		\
+		:;						\
+	else							\
+		echo >&2 '$<: check failed';			\
+		exit 1;						\
+	fi
 
 if MAINTAINER_MODE
 
 gen_changelog_start_date = 2009-07-08 20:00
-$(srcdir)/ChangeLog: $(top_srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
-		     $(top_srcdir)/.git/refs/heads/*
+$(srcdir)/ChangeLog: $(srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
+		     $(srcdir)/.version
 	@rm -f $@.new
-	(cd $(top_srcdir); \
+	(cd $(srcdir); \
 	 ./gitlog-to-changelog --append-dot \
 	   --since='$(gen_changelog_start_date)'; \
 	 echo; echo; echo 'See ChangeLog-CVS for older changes.' \
@@ -195,11 +215,11 @@ $(srcdir)/ChangeLog: $(top_srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
 	chmod 444 $@.new
 	mv -f $@.new $@
 
-$(srcdir)/CREDITS: $(top_srcdir)/CREDITS.in $(top_srcdir)/.mailmap \
-		   $(srcdir)/Makefile.in $(top_srcdir)/.git/refs/heads/*
+$(srcdir)/CREDITS: $(srcdir)/CREDITS.in $(srcdir)/.mailmap \
+		   $(srcdir)/Makefile.in $(srcdir)/.version
 	$(AM_V_GEN)							\
 	{								\
-	  cd $(top_srcdir);						\
+	  cd $(srcdir);							\
 	  sed '/^##/,$$d' CREDITS.in;					\
 	  { sed -n '1,/^##>/d; s/  \+/\t/; s/^./&/p' CREDITS.in;	\
 	    git log --pretty=format:'%aN	%aE';			\

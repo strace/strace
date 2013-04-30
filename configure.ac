@@ -1,10 +1,12 @@
 dnl Process this file with autoconf to create configure.  Use autoreconf.
 AC_PREREQ(2.57)
-AC_INIT([strace],[4.7])
+AC_INIT([strace],
+	m4_esyscmd([./git-version-gen .tarball-version]),
+	[strace-devel@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([foreign check-news dist-xz no-dist-gzip silent-rules])
+AM_INIT_AUTOMAKE([foreign dist-xz no-dist-gzip silent-rules])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
