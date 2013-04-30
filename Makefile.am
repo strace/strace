@@ -33,7 +33,7 @@ EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
 	     strace-graph strace-log-merge \
 	     ChangeLog ChangeLog-CVS COPYRIGHT CREDITS \
 	     README-linux README-linux-ptrace \
-	     linux/ioctlsort.c linux/ioctlent.sh \
+	     linux/ioctlsort.c linux/ioctlent.sh linux/ioctlent-filter.awk \
 	     linux/ioctlent.h.in linux/errnoent.h linux/signalent.h \
 	     linux/syscall.h linux/dummy.h linux/mtd-abi.h \
 	     linux/i386/ioctlent.h.in linux/i386/syscallent.h \
