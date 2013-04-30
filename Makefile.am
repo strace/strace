@@ -14,81 +14,166 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS) -I$(builddir)/$(OS)
 
-strace_SOURCES = strace.c syscall.c count.c util.c desc.c file.c ipc.c \
-		 io.c ioctl.c mem.c net.c process.c bjm.c quota.c \
-		 resource.c signal.c sock.c system.c term.c time.c \
-		 scsi.c stream.c block.c pathtrace.c mtd.c vsprintf.c \
-		 loop.c
+strace_SOURCES =	\
+	bjm.c		\
+	block.c		\
+	count.c		\
+	desc.c		\
+	file.c		\
+	io.c		\
+	ioctl.c		\
+	ipc.c		\
+	loop.c		\
+	mem.c		\
+	mtd.c		\
+	net.c		\
+	pathtrace.c	\
+	process.c	\
+	quota.c		\
+	resource.c	\
+	scsi.c		\
+	signal.c	\
+	sock.c		\
+	strace.c	\
+	stream.c	\
+	syscall.c	\
+	system.c	\
+	term.c		\
+	time.c		\
+	util.c		\
+	vsprintf.c
+
 noinst_HEADERS = defs.h
 # Enable this to get link map generated
 #strace_CFLAGS = $(AM_CFLAGS) -Wl,-Map=strace.mapfile
 
-EXTRA_DIST = $(man_MANS) errnoent.sh signalent.sh syscallent.sh ioctlsort.c \
-	     debian/changelog debian/compat debian/control debian/copyright \
-	     debian/rules debian/source/format debian/watch \
-	     debian/strace64.install debian/strace64.manpages \
-	     debian/strace.docs debian/strace.examples debian/strace.install \
-	     debian/strace.manpages debian/strace-udeb.install \
-	     strace.spec \
-	     strace-graph strace-log-merge \
-	     ChangeLog ChangeLog-CVS COPYRIGHT CREDITS \
-	     README-linux README-linux-ptrace \
-	     linux/ioctlsort.c linux/ioctlent.sh linux/ioctlent-filter.awk \
-	     linux/ioctlent.h.in linux/errnoent.h linux/signalent.h \
-	     linux/syscall.h linux/dummy.h linux/mtd-abi.h \
-	     linux/i386/ioctlent.h.in linux/i386/syscallent.h \
-	     linux/alpha/errnoent.h linux/alpha/ioctlent.h.in \
-	     linux/alpha/signalent.h linux/alpha/syscallent.h \
-	     linux/arm/ioctlent.h.in linux/arm/syscallent.h \
-	     linux/avr32/ioctlent.h.in linux/avr32/syscallent.h \
-	     linux/bfin/ioctlent.h.in linux/bfin/syscallent.h \
-	     linux/hppa/errnoent.h linux/hppa/ioctlent.h.in \
-	     linux/hppa/signalent.h linux/hppa/syscallent.h \
-	     linux/ia64/ioctlent.h.in \
-	     linux/ia64/signalent.h \
-	     linux/ia64/syscallent.h \
-	     linux/m68k/ioctlent.h.in linux/m68k/syscallent.h \
-	     linux/microblaze/ioctlent.h.in linux/microblaze/syscallent.h \
-	     linux/mips/ioctlent.sh linux/mips/errnoent.h \
-	     linux/mips/ioctlent.h.in linux/mips/signalent.h \
-	     linux/mips/syscallent.h \
-	     linux/powerpc/ioctlent.h.in linux/powerpc/ioctlent1.h \
-	     linux/powerpc/syscallent.h linux/powerpc/syscallent1.h \
-	     linux/powerpc/errnoent1.h linux/powerpc/signalent1.h \
-	     linux/s390/ioctlent.h.in \
-	     linux/s390/syscallent.h \
-	     linux/s390x/ioctlent.h.in \
-	     linux/s390x/syscallent.h \
-	     linux/sh/syscallent.h \
-	     linux/sh/ioctlent.h.in \
-	     linux/sh64/ioctlent.h.in linux/sh64/syscallent.h \
-	     linux/sparc/dummy2.h \
-	     linux/sparc/errnoent.h linux/sparc/errnoent1.h \
-	     linux/sparc/ioctlent.h.in linux/sparc/ioctlent1.h \
-	     linux/sparc/signalent.h linux/sparc/signalent1.h \
-	     linux/sparc/syscall1.h \
-	     linux/sparc/syscallent.h linux/sparc/syscallent1.h \
-	     linux/sparc/gen.pl \
-	     linux/sparc64/dummy2.h linux/sparc64/errnoent.h \
-	     linux/sparc64/errnoent1.h linux/sparc64/errnoent2.h \
-	     linux/sparc64/ioctlent.h.in linux/sparc64/ioctlent1.h \
-	     linux/sparc64/ioctlent2.h linux/sparc64/signalent.h \
-	     linux/sparc64/signalent1.h linux/sparc64/signalent2.h \
-	     linux/sparc64/syscall1.h \
-	     linux/sparc64/syscallent.h linux/sparc64/syscallent1.h \
-	     linux/sparc64/syscallent2.h \
-	     linux/tile/ioctlent.h.in linux/tile/syscallent.h \
-	     linux/x32/errnoent.h linux/x32/ioctlent.h.in \
-	     linux/x32/signalent.h linux/x32/syscallent.h \
-	     linux/x32/errnoent1.h linux/x32/ioctlent1.h \
-	     linux/x32/signalent1.h linux/x32/syscallent1.h \
-	     linux/x86_64/ioctlent.h.in linux/x86_64/syscallent.h \
-	     linux/x86_64/gentab.pl \
-	     linux/x86_64/errnoent1.h linux/x86_64/ioctlent1.h \
-	     linux/x86_64/signalent1.h linux/x86_64/syscallent1.h \
-	     linux/x86_64/errnoent2.h linux/x86_64/ioctlent2.h \
-	     linux/x86_64/signalent2.h linux/x86_64/syscallent2.h \
-	     xlate.el
+EXTRA_DIST =				\
+	$(man_MANS)			\
+	COPYRIGHT			\
+	CREDITS				\
+	ChangeLog			\
+	ChangeLog-CVS			\
+	README-linux			\
+	README-linux-ptrace		\
+	debian/changelog		\
+	debian/compat			\
+	debian/control			\
+	debian/copyright		\
+	debian/rules			\
+	debian/source/format		\
+	debian/strace-udeb.install	\
+	debian/strace.docs		\
+	debian/strace.examples		\
+	debian/strace.install		\
+	debian/strace.manpages		\
+	debian/strace64.install		\
+	debian/strace64.manpages	\
+	debian/watch			\
+	errnoent.sh			\
+	ioctlsort.c			\
+	linux/alpha/errnoent.h		\
+	linux/alpha/ioctlent.h.in	\
+	linux/alpha/signalent.h		\
+	linux/alpha/syscallent.h	\
+	linux/arm/ioctlent.h.in		\
+	linux/arm/syscallent.h		\
+	linux/avr32/ioctlent.h.in	\
+	linux/avr32/syscallent.h	\
+	linux/bfin/ioctlent.h.in	\
+	linux/bfin/syscallent.h		\
+	linux/dummy.h			\
+	linux/errnoent.h		\
+	linux/hppa/errnoent.h		\
+	linux/hppa/ioctlent.h.in	\
+	linux/hppa/signalent.h		\
+	linux/hppa/syscallent.h		\
+	linux/i386/ioctlent.h.in	\
+	linux/i386/syscallent.h		\
+	linux/ia64/ioctlent.h.in	\
+	linux/ia64/signalent.h		\
+	linux/ia64/syscallent.h		\
+	linux/ioctlent-filter.awk	\
+	linux/ioctlent.h.in		\
+	linux/ioctlent.sh		\
+	linux/ioctlsort.c		\
+	linux/m68k/ioctlent.h.in	\
+	linux/m68k/syscallent.h		\
+	linux/microblaze/ioctlent.h.in	\
+	linux/microblaze/syscallent.h	\
+	linux/mips/errnoent.h		\
+	linux/mips/ioctlent.h.in	\
+	linux/mips/ioctlent.sh		\
+	linux/mips/signalent.h		\
+	linux/mips/syscallent.h		\
+	linux/mtd-abi.h			\
+	linux/powerpc/errnoent1.h	\
+	linux/powerpc/ioctlent.h.in	\
+	linux/powerpc/ioctlent1.h	\
+	linux/powerpc/signalent1.h	\
+	linux/powerpc/syscallent.h	\
+	linux/powerpc/syscallent1.h	\
+	linux/s390/ioctlent.h.in	\
+	linux/s390/syscallent.h		\
+	linux/s390x/ioctlent.h.in	\
+	linux/s390x/syscallent.h	\
+	linux/sh/ioctlent.h.in		\
+	linux/sh/syscallent.h		\
+	linux/sh64/ioctlent.h.in	\
+	linux/sh64/syscallent.h		\
+	linux/signalent.h		\
+	linux/sparc/dummy2.h		\
+	linux/sparc/errnoent.h		\
+	linux/sparc/errnoent1.h		\
+	linux/sparc/gen.pl		\
+	linux/sparc/ioctlent.h.in	\
+	linux/sparc/ioctlent1.h		\
+	linux/sparc/signalent.h		\
+	linux/sparc/signalent1.h	\
+	linux/sparc/syscall1.h		\
+	linux/sparc/syscallent.h	\
+	linux/sparc/syscallent1.h	\
+	linux/sparc64/dummy2.h		\
+	linux/sparc64/errnoent.h	\
+	linux/sparc64/errnoent1.h	\
+	linux/sparc64/errnoent2.h	\
+	linux/sparc64/ioctlent.h.in	\
+	linux/sparc64/ioctlent1.h	\
+	linux/sparc64/ioctlent2.h	\
+	linux/sparc64/signalent.h	\
+	linux/sparc64/signalent1.h	\
+	linux/sparc64/signalent2.h	\
+	linux/sparc64/syscall1.h	\
+	linux/sparc64/syscallent.h	\
+	linux/sparc64/syscallent1.h	\
+	linux/sparc64/syscallent2.h	\
+	linux/syscall.h			\
+	linux/tile/ioctlent.h.in	\
+	linux/tile/syscallent.h		\
+	linux/x32/errnoent.h		\
+	linux/x32/errnoent1.h		\
+	linux/x32/ioctlent.h.in		\
+	linux/x32/ioctlent1.h		\
+	linux/x32/signalent.h		\
+	linux/x32/signalent1.h		\
+	linux/x32/syscallent.h		\
+	linux/x32/syscallent1.h		\
+	linux/x86_64/errnoent1.h	\
+	linux/x86_64/errnoent2.h	\
+	linux/x86_64/gentab.pl		\
+	linux/x86_64/ioctlent.h.in	\
+	linux/x86_64/ioctlent1.h	\
+	linux/x86_64/ioctlent2.h	\
+	linux/x86_64/signalent1.h	\
+	linux/x86_64/signalent2.h	\
+	linux/x86_64/syscallent.h	\
+	linux/x86_64/syscallent1.h	\
+	linux/x86_64/syscallent2.h	\
+	signalent.sh			\
+	strace-graph			\
+	strace-log-merge		\
+	strace.spec			\
+	syscallent.sh			\
+	xlate.el
 
 .PHONY: srpm
 srpm: dist-xz
