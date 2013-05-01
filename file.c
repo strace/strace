@@ -118,6 +118,20 @@ struct stat64 {
 	unsigned long		st_ctime_nsec;
 	unsigned long long	st_ino;
 };
+
+struct __old_kernel_stat {
+	unsigned short st_dev;
+	unsigned short st_ino;
+	unsigned short st_mode;
+	unsigned short st_nlink;
+	unsigned short st_uid;
+	unsigned short st_gid;
+	unsigned short st_rdev;
+	unsigned int   st_size;
+	unsigned int   st_atime;
+	unsigned int   st_mtime;
+	unsigned int   st_ctime;
+};
 #else
 # undef dev_t
 # undef ino_t
