@@ -5,7 +5,7 @@ AC_INIT([strace],
 	[strace-devel@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign dist-xz no-dist-gzip silent-rules])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
