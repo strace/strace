@@ -1360,48 +1360,6 @@ sys_oldfstat(struct tcb *tcp)
 }
 #endif
 
-int
-sys_lstat(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printstat(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-int
-sys_lstat64(struct tcb *tcp)
-{
-#ifdef HAVE_STAT64
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printstat64(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-#else
-	return printargs(tcp);
-#endif
-}
-
-#if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
-int
-sys_oldlstat(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printoldstat(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-#endif
-
 #if defined(SPARC) || defined(SPARC64)
 
 int

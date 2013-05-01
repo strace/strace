@@ -26,6 +26,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef HAVE_STRUCT___OLD_KERNEL_STAT
+#define	sys_oldfstat		printargs
+#define	sys_oldstat		printargs
+#endif
+
 /* still unfinished */
 #define	sys_add_key		printargs
 #define	sys_fanotify_init	printargs
@@ -67,9 +72,12 @@
 #define	sys_geteuid		sys_getuid
 #define	sys_getgid		sys_getuid
 #define	sys_getresgid		sys_getresuid
+#define	sys_lstat		sys_stat
+#define	sys_lstat64		sys_stat64
 #define	sys_mlock		sys_munmap
 #define	sys_mq_unlink		sys_chdir
 #define	sys_munlock		sys_munmap
+#define	sys_oldlstat		sys_oldstat
 #define	sys_pivotroot		sys_link
 #define	sys_rename		sys_link
 #define	sys_rmdir		sys_chdir
@@ -155,10 +163,4 @@
 #endif
 #if (!defined(SPARC) && !defined(SPARC64)) || !defined(SYS_putpmsg)
 #define	sys_putpmsg		printargs
-#endif
-
-#ifndef HAVE_STRUCT___OLD_KERNEL_STAT
-#define	sys_oldfstat		printargs
-#define	sys_oldlstat		printargs
-#define	sys_oldstat		printargs
 #endif
