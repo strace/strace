@@ -201,7 +201,7 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
 		arg_no += 2;
 	}
-#elif defined IA64 || defined ALPHA
+#elif defined IA64 || defined ALPHA || defined S390X
 	/* Technically, format expects "long long",
 	 * but we supply "long". We expect that
 	 * on this arch, they are the same.
