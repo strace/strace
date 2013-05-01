@@ -223,6 +223,29 @@ static const struct xlat perf_event_open_flags[] = {
 	{ 0,				NULL			},
 };
 
+#if _LFS64_LARGEFILE
+/* fcntl/lockf */
+static void
+printflock64(struct tcb *tcp, long addr, int getlk)
+{
+	struct flock64 fl;
+
+	if (umove(tcp, addr, &fl) < 0) {
+		tprints("{...}");
+		return;
+	}
+	tprints("{type=");
+	printxval(lockfcmds, fl.l_type, "F_???");
+	tprints(", whence=");
+	printxval(whence_codes, fl.l_whence, "SEEK_???");
+	tprintf(", start=%lld, len=%lld", (long long) fl.l_start, (long long) fl.l_len);
+	if (getlk)
+		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);
+	else
+		tprints("}");
+}
+#endif
+
 /* fcntl/lockf */
 static void
 printflock(struct tcb *tcp, long addr, int getlk)
@@ -230,6 +253,12 @@ printflock(struct tcb *tcp, long addr, int getlk)
 	struct flock fl;
 
 #if SUPPORTED_PERSONALITIES > 1
+# ifdef X32
+	if (current_personality == 0) {
+		printflock64(tcp, addr, getlk);
+		return;
+	}
+# endif
 	if (current_wordsize != sizeof(fl.l_start)) {
 		if (current_wordsize == 4) {
 			/* 32-bit x86 app on x86_64 and similar cases */
@@ -267,35 +296,16 @@ printflock(struct tcb *tcp, long addr, int getlk)
 	printxval(lockfcmds, fl.l_type, "F_???");
 	tprints(", whence=");
 	printxval(whence_codes, fl.l_whence, "SEEK_???");
+#ifdef X32
+	tprintf(", start=%lld, len=%lld", fl.l_start, fl.l_len);
+#else
 	tprintf(", start=%ld, len=%ld", fl.l_start, fl.l_len);
-	if (getlk)
-		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);
-	else
-		tprints("}");
-}
-
-#if _LFS64_LARGEFILE
-/* fcntl/lockf */
-static void
-printflock64(struct tcb *tcp, long addr, int getlk)
-{
-	struct flock64 fl;
-
-	if (umove(tcp, addr, &fl) < 0) {
-		tprints("{...}");
-		return;
-	}
-	tprints("{type=");
-	printxval(lockfcmds, fl.l_type, "F_???");
-	tprints(", whence=");
-	printxval(whence_codes, fl.l_whence, "SEEK_???");
-	tprintf(", start=%lld, len=%lld", (long long) fl.l_start, (long long) fl.l_len);
-	if (getlk)
-		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);
-	else
-		tprints("}");
-}
 #endif
+	if (getlk)
+		tprintf(", pid=%lu}", (unsigned long) fl.l_pid);
+	else
+		tprints("}");
+}
 
 int
 sys_fcntl(struct tcb *tcp)

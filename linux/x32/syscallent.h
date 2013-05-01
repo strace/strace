@@ -74,8 +74,8 @@
 	{ 2,	TD,	sys_flock,		"flock"		},  /* 73 */
 	{ 1,	TD,	sys_fsync,		"fsync"		},  /* 74 */
 	{ 1,	TD,	sys_fdatasync,		"fdatasync"	},  /* 75 */
-	{ 2,	TF,	sys_truncate,		"truncate"	},  /* 76 */
-	{ 2,	TD,	sys_ftruncate,		"ftruncate"	},  /* 77 */
+	{ 2,	TF,	sys_truncate64,		"truncate"	},  /* 76 */
+	{ 2,	TD,	sys_ftruncate64,	"ftruncate"	},  /* 77 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 78 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	},  /* 79 */
 	{ 1,	TF,	sys_chdir,		"chdir"		},  /* 80 */

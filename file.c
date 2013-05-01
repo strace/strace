@@ -117,7 +117,8 @@ struct stat64 {
 	unsigned long		st_ctime;
 	unsigned long		st_ctime_nsec;
 	unsigned long long	st_ino;
-};
+} __attribute__((packed));
+# define HAVE_STAT64	1
 
 struct __old_kernel_stat {
 	unsigned short st_dev;
@@ -982,6 +983,7 @@ realprintstat(struct tcb *tcp, struct stat *statbuf)
 		tprints("...}");
 }
 
+#ifndef X32
 static void
 printstat(struct tcb *tcp, long addr)
 {
@@ -1023,6 +1025,9 @@ printstat(struct tcb *tcp, long addr)
 
 	realprintstat(tcp, &statbuf);
 }
+#else /* X32 */
+# define printstat printstat64
+#endif
 
 #if !defined HAVE_STAT64 && defined X86_64
 /*
@@ -1060,7 +1065,11 @@ struct stat64 {
 static void
 printstat64(struct tcb *tcp, long addr)
 {
+#ifdef X32
+	struct stat statbuf;
+#else
 	struct stat64 statbuf;
+#endif
 
 #ifdef STAT64_SIZE
 	(void) sizeof(char[sizeof statbuf == STAT64_SIZE ? 1 : -1]);
@@ -1239,6 +1248,63 @@ sys_stat(struct tcb *tcp)
 	return 0;
 }
 
+#ifdef X32
+static void
+printstat64_x32(struct tcb *tcp, long addr)
+{
+	struct stat64 statbuf;
+
+	if (!addr) {
+		tprints("NULL");
+		return;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprints("{...}");
+		return;
+	}
+
+	if (!abbrev(tcp)) {
+		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%llu, st_mode=%s, ",
+			(unsigned long) major(statbuf.st_dev),
+			(unsigned long) minor(statbuf.st_dev),
+			(unsigned long long) statbuf.st_ino,
+			sprintmode(statbuf.st_mode));
+		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
+			(unsigned long) statbuf.st_nlink,
+			(unsigned long) statbuf.st_uid,
+			(unsigned long) statbuf.st_gid);
+		tprintf("st_blksize=%lu, ",
+			(unsigned long) statbuf.st_blksize);
+		tprintf("st_blocks=%lu, ", (unsigned long) statbuf.st_blocks);
+	}
+	else
+		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
+	switch (statbuf.st_mode & S_IFMT) {
+	case S_IFCHR: case S_IFBLK:
+		tprintf("st_rdev=makedev(%lu, %lu), ",
+			(unsigned long) major(statbuf.st_rdev),
+			(unsigned long) minor(statbuf.st_rdev));
+		break;
+	default:
+		tprintf("st_size=%llu, ", (unsigned long long) statbuf.st_size);
+		break;
+	}
+	if (!abbrev(tcp)) {
+		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
+		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
+		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
+		tprints("}");
+	}
+	else
+		tprints("...}");
+}
+#endif /* X32 */
+
 int
 sys_stat64(struct tcb *tcp)
 {
@@ -1247,7 +1313,11 @@ sys_stat64(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
+# ifdef X32
+		printstat64_x32(tcp, tcp->u_arg[1]);
+# else
 		printstat64(tcp, tcp->u_arg[1]);
+# endif
 	}
 	return 0;
 #else
@@ -1338,7 +1408,11 @@ sys_fstat64(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
+# ifdef X32
+		printstat64_x32(tcp, tcp->u_arg[1]);
+# else
 		printstat64(tcp, tcp->u_arg[1]);
+# endif
 	}
 	return 0;
 #else
@@ -2722,88 +2796,3 @@ sys_swapon(struct tcb *tcp)
 	}
 	return 0;
 }
-
-#ifdef X32
-# undef stat64
-# undef sys_fstat64
-# undef sys_stat64
-
-static void
-realprintstat64(struct tcb *tcp, long addr)
-{
-	struct stat64 statbuf;
-
-	if (!addr) {
-		tprints("NULL");
-		return;
-	}
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
-		return;
-	}
-
-	if (umove(tcp, addr, &statbuf) < 0) {
-		tprints("{...}");
-		return;
-	}
-
-	if (!abbrev(tcp)) {
-		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%llu, st_mode=%s, ",
-			(unsigned long) major(statbuf.st_dev),
-			(unsigned long) minor(statbuf.st_dev),
-			(unsigned long long) statbuf.st_ino,
-			sprintmode(statbuf.st_mode));
-		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
-			(unsigned long) statbuf.st_nlink,
-			(unsigned long) statbuf.st_uid,
-			(unsigned long) statbuf.st_gid);
-		tprintf("st_blksize=%lu, ",
-			(unsigned long) statbuf.st_blksize);
-		tprintf("st_blocks=%lu, ", (unsigned long) statbuf.st_blocks);
-	}
-	else
-		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
-	switch (statbuf.st_mode & S_IFMT) {
-	case S_IFCHR: case S_IFBLK:
-		tprintf("st_rdev=makedev(%lu, %lu), ",
-			(unsigned long) major(statbuf.st_rdev),
-			(unsigned long) minor(statbuf.st_rdev));
-		break;
-	default:
-		tprintf("st_size=%llu, ", (unsigned long long) statbuf.st_size);
-		break;
-	}
-	if (!abbrev(tcp)) {
-		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
-		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
-		tprints("}");
-	}
-	else
-		tprints("...}");
-}
-
-int
-sys_fstat64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		realprintstat64(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-int
-sys_stat64(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		realprintstat64(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-#endif
