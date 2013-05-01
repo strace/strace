@@ -15,12 +15,11 @@
 
 int main(int argc, char *argv[])
 {
-	/* XXX: x86 specific stuff? */
-	char *c = (char*) 0x94000000;
+	char *c;
 	int fd;
 
-	open("/tmp/delme", O_RDWR);
-	mmap(c, 4096, PROT_READ | PROT_WRITE, MAP_FIXED | MAP_SHARED, 3, 0);
+	fd = open("/tmp/delme", O_RDWR);
+	c = mmap(0, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	*c = 0;
 
 	if (fork()) {
