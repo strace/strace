@@ -3,6 +3,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <string.h>
 
 /* Expected order is:
  * Child signals parent

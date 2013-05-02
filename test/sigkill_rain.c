@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
+#include <sys/wait.h>
 
 static const struct sockaddr sa;
 
