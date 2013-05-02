@@ -35,4 +35,6 @@ $STRACE -efile find sample > /dev/null 2> check.log &&
 LC_ALL=C grep '^[[:alnum:]_]*stat[[:alnum:]_]*([^()"]*"sample", {st_mode=S_IFREG|0644, st_size=46118400000, \.\.\.}' check.log > /dev/null ||
 	{ cat check.log; fail_ 'strace -efile failed to trace newfstatat/fstatat64 properly'; }
 
+rm -f sample
+
 exit 0
