@@ -70,6 +70,7 @@
 #define sys_getgroups		printargs
 #define sys_setgroups		printargs
 #define sys_select		printargs
+#undef sys_oldlstat
 #define sys_oldlstat		printargs
 #define sys_readdir		printargs
 #define sys_profil		printargs
@@ -79,6 +80,7 @@
 #define sys_setitimer		printargs
 #define sys_getitimer		printargs
 #define sys_stat		printargs
+#undef sys_lstat
 #define sys_lstat		printargs
 #define sys_fstat		printargs
 #define sys_olduname		printargs
@@ -122,6 +124,7 @@
 #define sys_truncate64		printargs
 #define sys_ftruncate64		printargs
 #define sys_stat64		printargs
+#undef sys_lstat64
 #define sys_lstat64		printargs
 #define sys_fstat64		printargs
 #define sys_fcntl64		printargs
