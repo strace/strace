@@ -4,6 +4,9 @@
 .libs
 .version
 .*.swp
+*.gdb
+.gdbinit
+.gdb_history
 
 /ChangeLog
 /CREDITS
@@ -30,6 +33,7 @@ Makefile.in
 /ioctldefs.h
 /ioctlsort
 /strace
+/test-driver
 
 /linux/ioctlent.h
 

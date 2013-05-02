@@ -1,1 +1,2 @@
-check.log
+*.log
+*.trs
