@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Check how ftruncate, lseek and stat family syscalls are traced.
+
+. "${srcdir=.}/init.sh"
+
+check_strace
+check_prog dd
+check_prog find
+check_prog grep
+check_prog rm
+check_prog timeout
+
+umask 022
+truncate_cmd='dd seek=46118400000 obs=1 count=0 if=/dev/null of=sample'
+$truncate_cmd > check.log 2>&1 ||
+	{ cat check.log; framework_skip_ 'failed to create a large sparse file'; }
+rm -f sample
+
+timeout -s 9 $check_timeout \
+$STRACE -edesc $truncate_cmd 2>&1 > /dev/null 2> check.log &&
+LC_ALL=C grep -x 'ftruncate\(64\)\?(1, 46118400000) \+= 0' check.log > /dev/null ||
+	{ cat check.log; fail_ 'strace -edesc failed to trace ftruncate/ftruncate64 properly'; }
+
+LC_ALL=C grep -x 'lseek(1, 46118400000, SEEK_CUR) \+= 46118400000\|_llseek(1, 46118400000, \[46118400000\], SEEK_CUR) \+= 0' check.log > /dev/null ||
+	{ cat check.log; fail_ 'strace -edesc failed to trace lseek/_llseek properly'; }
+
+timeout -s 9 $check_timeout \
+$STRACE -efile find -L sample > /dev/null 2> check.log &&
+LC_ALL=C grep -x 'stat\(64\)\?("sample", {st_mode=S_IFREG|0644, st_size=46118400000, \.\.\.}) \+= 0' check.log > /dev/null ||
+	{ cat check.log; fail_ 'strace -efile failed to trace stat/stat64 properly'; }
+
+timeout -s 9 $check_timeout \
+$STRACE -efile find sample > /dev/null 2> check.log &&
+LC_ALL=C grep '^[[:alnum:]_]*stat[[:alnum:]_]*([^()"]*"sample", {st_mode=S_IFREG|0644, st_size=46118400000, \.\.\.}' check.log > /dev/null ||
+	{ cat check.log; fail_ 'strace -efile failed to trace newfstatat/fstatat64 properly'; }
+
+exit 0
