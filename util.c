@@ -208,7 +208,15 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 	 */
 	tprintf(format, tcp->u_arg[arg_no]);
 	arg_no++;
-#elif defined LINUX_MIPSN32 || defined X32
+#elif defined X32
+	if (current_personality == 0) {
+		tprintf(format, tcp->ext_arg[arg_no]);
+		arg_no++;
+	} else {
+		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
+		arg_no += 2;
+	}
+#elif defined LINUX_MIPSN32
 	tprintf(format, tcp->ext_arg[arg_no]);
 	arg_no++;
 #else
