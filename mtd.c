@@ -35,6 +35,11 @@
 #else
 # include <mtd/mtd-abi.h>
 #endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0)
+# include "ubi-user.h"
+#else
+# include <mtd/ubi-user.h>
+#endif
 
 static const struct xlat mtd_mode_options[] = {
 	{ MTD_OPS_PLACE_OOB,	"MTD_OPS_PLACE_OOB"	},
@@ -274,6 +279,125 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 		/* XXX: process return value as enum mtd_file_modes */
 
 	case MEMGETREGIONCOUNT:
+		/* These ones take simple args, so let default printer handle it */
+
+	default:
+		return 0;
+	}
+}
+
+static const struct xlat ubi_volume_types[] = {
+	{ UBI_DYNAMIC_VOLUME,	"UBI_DYNAMIC_VOLUME"	},
+	{ UBI_STATIC_VOLUME,	"UBI_STATIC_VOLUME"	},
+	{ 0,			NULL			},
+};
+
+static const struct xlat ubi_volume_props[] = {
+	{ UBI_VOL_PROP_DIRECT_WRITE,	"UBI_VOL_PROP_DIRECT_WRITE"	},
+	{ 0,			NULL			},
+};
+
+int ubi_ioctl(struct tcb *tcp, long code, long arg)
+{
+	struct ubi_mkvol_req mkvol;
+	struct ubi_rsvol_req rsvol;
+	struct ubi_rnvol_req rnvol;
+	struct ubi_attach_req attach;
+	struct ubi_map_req map;
+	struct ubi_set_vol_prop_req prop;
+	/* 4*(n-1) + 3 for quotes and NUL */
+	char vol_name[(UBI_MAX_VOLUME_NAME + 1) * 4];
+
+	if (entering(tcp))
+		return 0;
+
+	switch (code) {
+	case UBI_IOCMKVOL:
+		if (!verbose(tcp) || umove(tcp, arg, &mkvol) < 0)
+			return 0;
+
+		tprintf(", {vol_id=%" PRIi32 ", alignment=%" PRIi32
+			", bytes=%" PRIi64 ", vol_type=", mkvol.vol_id,
+			mkvol.alignment, (int64_t)mkvol.bytes);
+		printxval(ubi_volume_types, mkvol.vol_type, "UBI_???_VOLUME");
+		string_quote(mkvol.name, vol_name, -1, mkvol.name_len);
+		tprintf(", name_len=%" PRIi16 ", name=%s",
+			mkvol.name_len, vol_name);
+		tprints("}");
+		return 1;
+
+	case UBI_IOCRSVOL:
+		if (!verbose(tcp) || umove(tcp, arg, &rsvol) < 0)
+			return 0;
+
+		tprintf(", {vol_id=%" PRIi32 ", bytes=%" PRIi64 "}",
+			rsvol.vol_id, (int64_t)rsvol.bytes);
+		return 1;
+
+	case UBI_IOCRNVOL: {
+		__s32 c;
+
+		if (!verbose(tcp) || umove(tcp, arg, &rnvol) < 0)
+			return 0;
+
+		tprintf(", {count=%" PRIi32 ", ents=[", rnvol.count);
+		for (c = 0; c < CLAMP(rnvol.count, 0, UBI_MAX_RNVOL); ++c) {
+			if (c)
+				tprints(", ");
+			string_quote(rnvol.ents[c].name, vol_name, -1,
+				rnvol.ents[c].name_len);
+			tprintf("{vol_id=%" PRIi32 ", name_len=%" PRIi16
+				", name=%s}", rnvol.ents[c].vol_id,
+				rnvol.ents[c].name_len, vol_name);
+		}
+		tprints("]}");
+		return 1;
+	}
+
+	case UBI_IOCVOLUP: {
+		__s64 bytes;
+
+		if (!verbose(tcp) || umove(tcp, arg, &bytes) < 0)
+			return 0;
+
+		tprintf(", %" PRIi64, (int64_t)bytes);
+		return 1;
+	}
+
+	case UBI_IOCATT:
+		if (!verbose(tcp) || umove(tcp, arg, &attach) < 0)
+			return 0;
+
+		tprintf(", {ubi_num=%" PRIi32 ", mtd_num=%" PRIi32
+			", vid_hdr_offset=%" PRIi32
+			", max_beb_per1024=%" PRIi16 "}",
+			attach.ubi_num, attach.mtd_num,
+			attach.vid_hdr_offset, attach.max_beb_per1024);
+		return 1;
+
+	case UBI_IOCEBMAP:
+		if (!verbose(tcp) || umove(tcp, arg, &map) < 0)
+			return 0;
+
+		tprintf(", {lnum=%" PRIi32 ", dtype=%" PRIi8 "}",
+			map.lnum, map.dtype);
+		return 1;
+
+	case UBI_IOCSETVOLPROP:
+		if (!verbose(tcp) || umove(tcp, arg, &prop) < 0)
+			return 0;
+
+		tprints(", {property=");
+		printxval(ubi_volume_props, prop.property, "UBI_VOL_PROP_???");
+		tprintf(", value=%#" PRIx64 "}", (uint64_t)prop.value);
+		return 1;
+
+	case UBI_IOCRMVOL:
+	case UBI_IOCDET:
+	case UBI_IOCEBER:
+	case UBI_IOCEBCH:
+	case UBI_IOCEBUNMAP:
+	case UBI_IOCEBISMAP:
 		/* These ones take simple args, so let default printer handle it */
 
 	default:

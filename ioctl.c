@@ -92,6 +92,9 @@ ioctl_decode(struct tcb *tcp, long code, long arg)
 		return loop_ioctl(tcp, code, arg);
 	case 'M':
 		return mtd_ioctl(tcp, code, arg);
+	case 'o':
+	case 'O':
+		return ubi_ioctl(tcp, code, arg);
 	default:
 		break;
 	}

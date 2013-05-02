@@ -86,6 +86,15 @@ extern char *stpcpy(char *dst, const char *src);
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
+/* macros */
+#ifndef MAX
+# define MAX(a, b)		(((a) > (b)) ? (a) : (b))
+#endif
+#ifndef MIN
+# define MIN(a, b)		(((a) < (b)) ? (a) : (b))
+#endif
+#define CLAMP(val, min, max) MIN(MAX(min, val), max)
+
 /* Glibc has an efficient macro for sigemptyset
  * (it just does one or two assignments of 0 to internal vector of longs).
  */
@@ -684,6 +693,7 @@ extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
 extern int block_ioctl(struct tcb *, long, long);
 extern int mtd_ioctl(struct tcb *, long, long);
+extern int ubi_ioctl(struct tcb *, long, long);
 extern int loop_ioctl(struct tcb *, long, long);
 
 extern int tv_nz(struct timeval *);
