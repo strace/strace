@@ -171,9 +171,6 @@ struct __old_kernel_stat {
 # define loff_t loff_t
 #endif
 
-#ifdef HPPA	/* asm-parisc/stat.h defines stat64 */
-# undef stat64
-#endif
 #define stat libc_stat
 #define stat64 libc_stat64
 #include <sys/stat.h>
@@ -183,9 +180,6 @@ struct __old_kernel_stat {
 #undef st_atime
 #undef st_mtime
 #undef st_ctime
-#ifdef HPPA
-# define stat64 hpux_stat64
-#endif
 
 #include <fcntl.h>
 #ifdef HAVE_SYS_VFS_H
