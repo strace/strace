@@ -186,8 +186,8 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 		tprintf(format, tcp->u_arg[arg_no]);
 		arg_no++;
 	} else {
-# if defined(POWERPC64)
-		/* Align arg_no to next even number */
+# if defined(AARCH64) || defined(POWERPC64)
+		/* Align arg_no to the next even number. */
 		arg_no = (arg_no + 1) & 0xe;
 # endif
 		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
@@ -215,6 +215,10 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 # if SIZEOF_LONG > 4
 #  error BUG: must not combine two args for long long on this arch
 # endif
+#if defined(ARM) || defined(POWERPC)
+	/* Align arg_no to the next even number. */
+	arg_no = (arg_no + 1) & 0xe;
+#endif
 	tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
 	arg_no += 2;
 #endif
