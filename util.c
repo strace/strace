@@ -178,7 +178,7 @@ int
 printllval(struct tcb *tcp, const char *format, int arg_no)
 {
 #if defined(X86_64) || defined(POWERPC64) || defined(TILE) || defined(AARCH64) || \
-    defined(LINUX_MIPSN64)
+    defined(LINUX_MIPSN64) || defined(SPARC64)
 	if (current_personality == 0) {
 		/* Technically, format expects "long long",
 		 * but we supply "long". We expect that
