@@ -177,29 +177,26 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
 int
 printllval(struct tcb *tcp, const char *format, int arg_no)
 {
-#if defined(X86_64) || defined(POWERPC64) || defined(TILE) || defined(AARCH64) || \
-    defined(LINUX_MIPSN64) || defined(SPARC64)
-	if (current_personality == 0) {
-		/* Technically, format expects "long long",
-		 * but we supply "long". We expect that
-		 * on this arch, they are the same.
-		 */
+#if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
+# if SUPPORTED_PERSONALITIES > 1
+	if (current_wordsize > 4) {
+# endif
 		tprintf(format, tcp->u_arg[arg_no]);
 		arg_no++;
+# if SUPPORTED_PERSONALITIES > 1
 	} else {
-# if defined(AARCH64) || defined(POWERPC64)
+#  if defined(AARCH64) || defined(POWERPC64)
 		/* Align arg_no to the next even number. */
 		arg_no = (arg_no + 1) & 0xe;
-# endif
+#  endif
 		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
 		arg_no += 2;
 	}
-#elif defined IA64 || defined ALPHA || defined S390X
-	/* Technically, format expects "long long",
-	 * but we supply "long". We expect that
-	 * on this arch, they are the same.
-	 */
-	tprintf(format, tcp->u_arg[arg_no]);
+# endif /* SUPPORTED_PERSONALITIES */
+#elif SIZEOF_LONG > 4
+#  error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
+#elif defined LINUX_MIPSN32
+	tprintf(format, tcp->ext_arg[arg_no]);
 	arg_no++;
 #elif defined X32
 	if (current_personality == 0) {
@@ -209,20 +206,15 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
 		arg_no += 2;
 	}
-#elif defined LINUX_MIPSN32
-	tprintf(format, tcp->ext_arg[arg_no]);
-	arg_no++;
 #else
-# if SIZEOF_LONG > 4
-#  error BUG: must not combine two args for long long on this arch
-# endif
-#if defined(ARM) || defined(POWERPC)
+# if defined(ARM) || defined(POWERPC)
 	/* Align arg_no to the next even number. */
 	arg_no = (arg_no + 1) & 0xe;
-#endif
+# endif
 	tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
 	arg_no += 2;
 #endif
+
 	return arg_no;
 }
 

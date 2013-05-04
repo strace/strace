@@ -298,6 +298,7 @@ AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 	fi)
 
 AC_CHECK_SIZEOF([long])
+AC_CHECK_SIZEOF([long long])
 AC_CHECK_SIZEOF([rlim_t],,[#include <sys/resource.h>])
 
 AC_CHECK_HEADERS([libaio.h], [
