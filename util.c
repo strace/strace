@@ -207,7 +207,7 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 		arg_no += 2;
 	}
 #else
-# if defined(ARM) || defined(POWERPC)
+# if defined(ARM) || defined(POWERPC) || defined(LINUX_MIPSO32) || defined(XTENSA)
 	/* Align arg_no to the next even number. */
 	arg_no = (arg_no + 1) & 0xe;
 # endif
