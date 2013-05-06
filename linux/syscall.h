@@ -316,7 +316,8 @@ int sys_osf_wait4();
 #if !defined(ALPHA) \
  && !defined(MIPS) \
  && !defined(HPPA) \
- && !defined(__ARM_EABI__)
+ && !defined(__ARM_EABI__) \
+ && !defined(BFIN)
 # if defined(SPARC) || defined(SPARC64)
 #  define SYS_socket_subcall	353
 # else
