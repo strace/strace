@@ -313,14 +313,20 @@ int sys_osf_utimes();
 int sys_osf_wait4();
 #endif
 
-#if !defined(ALPHA) \
- && !defined(MIPS) \
- && !defined(HPPA) \
- && !defined(__ARM_EABI__) \
- && !defined(BFIN) \
- && !defined(TILE) \
- && !defined(XTENSA)
-# if defined(SPARC) || defined(SPARC64)
+#if defined ALPHA \
+ || defined __ARM_EABI__ \
+ || defined BFIN \
+ || defined HPPA \
+ || defined MIPS \
+ || defined TILE \
+ || defined XTENSA
+/*
+ * This architecture does not have a socketcall or ipc subcall,
+ * it has dedicated syscalls instead, so there is no need
+ * to implement socket or ipc subcall decoding.
+ */
+#else
+# if defined SPARC || defined SPARC64
 #  define SYS_socket_subcall	353
 # else
 #  define SYS_socket_subcall	400
