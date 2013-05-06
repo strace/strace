@@ -2677,7 +2677,7 @@ sys_fadvise64_64(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		argn = printllval(tcp, ", %lld, ", 1);
 		argn = printllval(tcp, "%lld, ", argn);
-#if defined ARM || defined AARCH64 || defined POWERPC || defined XTENSA
+#if defined __ARM_EABI__ || defined AARCH64 || defined POWERPC || defined XTENSA
 		printxval(advise, tcp->u_arg[1], "POSIX_FADV_???");
 #else
 		printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
