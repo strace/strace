@@ -318,7 +318,8 @@ int sys_osf_wait4();
  && !defined(HPPA) \
  && !defined(__ARM_EABI__) \
  && !defined(BFIN) \
- && !defined(TILE)
+ && !defined(TILE) \
+ && !defined(XTENSA)
 # if defined(SPARC) || defined(SPARC64)
 #  define SYS_socket_subcall	353
 # else
