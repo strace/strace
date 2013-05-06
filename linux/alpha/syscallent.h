@@ -39,7 +39,7 @@
 	{ 1,	TF,	sys_unlink,		"unlink"		}, /* 10 */
 	{ 5,	0,	printargs,		"osf_execve"		}, /* 11, not implemented */
 	{ 1,	TF,	sys_chdir,		"chdir"			}, /* 12 */
-	{ 1,	TF,	sys_fchdir,		"fchdir"		}, /* 13 */
+	{ 1,	TD,	sys_fchdir,		"fchdir"		}, /* 13 */
 	{ 3,	TF,	sys_mknod,		"mknod"			}, /* 14 */
 	{ 2,	TF,	sys_chmod,		"chmod"			}, /* 15 */
 	{ 3,	TF,	sys_chown,		"chown"			}, /* 16 */
@@ -48,7 +48,7 @@
 	{ 3,	TD,	sys_lseek,		"lseek"			}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getxpid"		}, /* 20 */
 	{ 4,	0,	printargs,		"osf_mount"		}, /* 21 */
-	{ 2,	0,	sys_umount2,		"umount"		}, /* 22 */
+	{ 2,	TF,	sys_umount2,		"umount"		}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"		}, /* 23 */
 	{ 0,	NF,	sys_getuid,		"getxuid"		}, /* 24 */
 	{ 5,	0,	printargs,		"exec_with_loader"	}, /* 25, not implemented */
@@ -261,7 +261,7 @@
 	{ 5,	0,	NULL,			NULL			}, /* 232 */
 	{ 1,	0,	sys_getpgid,		"getpgid"		}, /* 233 */
 	{ 1,	0,	sys_getsid,		"getsid"		}, /* 234 */
-	{ 5,	0,	sys_sigaltstack,	"sigaltstack"		}, /* 235 */
+	{ 5,	TS,	sys_sigaltstack,	"sigaltstack"		}, /* 235 */
 	{ 5,	0,	printargs,		"osf_waitid"		}, /* 236, not implemented */
 	{ 5,	0,	printargs,		"osf_priocntlset"	}, /* 237, not implemented */
 	{ 5,	0,	printargs,		"osf_sigsendset"	}, /* 238, not implemented */
@@ -339,7 +339,7 @@
 	{ 3,	0,	sys_syslog,		"syslog"		}, /* 310 */
 	{ 4,	0,	sys_reboot,		"reboot"		}, /* 311 */
 	{ 5,	TP,	sys_clone,		"clone"			}, /* 312 */
-	{ 1,	0,	sys_uselib,		"uselib"		}, /* 313 */
+	{ 1,	TF,	sys_uselib,		"uselib"		}, /* 313 */
 	{ 2,	TM,	sys_mlock,		"mlock"			}, /* 314 */
 	{ 2,	TM,	sys_munlock,		"munlock"		}, /* 315 */
 	{ 1,	TM,	sys_mlockall,		"mlockall"		}, /* 316 */
@@ -347,7 +347,7 @@
 	{ 1,	0,	sys_sysinfo,		"sysinfo"		}, /* 318 */
 	{ 1,	0,	sys_sysctl,		"sysctl"		}, /* 319 */
 	{ 0,	0,	sys_idle,		"idle"			}, /* 320 */
-	{ 1,	0,	sys_umount,		"oldumount"		}, /* 321 */
+	{ 1,	TF,	sys_umount,		"oldumount"		}, /* 321 */
 	{ 2,	TF,	sys_swapon,		"swapon"		}, /* 322 */
 	{ 1,	0,	sys_times,		"times"			}, /* 323 */
 	{ 1,	0,	sys_personality,	"personality"		}, /* 324 */
@@ -389,11 +389,11 @@
 	{ 3,	0,	sys_settimeofday,	"settimeofday"		}, /* 360 */
 	{ 2,	0,	sys_getitimer,		"getitimer"		}, /* 361 */
 	{ 3,	0,	sys_setitimer,		"setitimer"		}, /* 362 */
-	{ 2,	0,	sys_utimes,		"utimes"		}, /* 363 */
+	{ 2,	TF,	sys_utimes,		"utimes"		}, /* 363 */
 	{ 2,	0,	sys_getrusage,		"getrusage"		}, /* 364 */
 	{ 4,	TP,	sys_wait4,		"wait4"			}, /* 365 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"		}, /* 366 */
-	{ 2,	0,	sys_getcwd,		"getcwd"		}, /* 367 */
+	{ 2,	TF,	sys_getcwd,		"getcwd"		}, /* 367 */
 	{ 2,	0,	sys_capget,		"capget"		}, /* 368 */
 	{ 2,	0,	sys_capset,		"capset"		}, /* 369 */
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"		}, /* 370 */

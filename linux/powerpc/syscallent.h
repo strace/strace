@@ -159,7 +159,7 @@
 	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"	}, /* 130 */
 	{ 4,	TF,	sys_quotactl,		"quotactl"		}, /* 131 */
 	{ 1,	0,	sys_getpgid,		"getpgid"		}, /* 132 */
-	{ 1,	TF,	sys_fchdir,		"fchdir"		}, /* 133 */
+	{ 1,	TD,	sys_fchdir,		"fchdir"		}, /* 133 */
 	{ 0,	0,	sys_bdflush,		"bdflush"		}, /* 134 */
 	{ 3,	0,	sys_sysfs,		"sysfs"			}, /* 135 */
 	{ 1,	0,	sys_personality,	"personality"		}, /* 136 */

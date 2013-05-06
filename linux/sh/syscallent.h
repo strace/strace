@@ -212,7 +212,7 @@
 	{ 6,	TD,	sys_pread,		"pread"		}, /* 180 */
 	{ 6,	TD,	sys_pwrite,		"pwrite"	}, /* 181 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 182 */
-	{ 2,	0,	sys_getcwd,		"getcwd"	}, /* 183 */
+	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
 	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */

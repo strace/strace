@@ -58,7 +58,7 @@
 	{ 1,	TD,	sys_close,			"close"			}, /* 57 */
 	{ 0,	0,	sys_vhangup,			"vhangup"		}, /* 58 */
 	{ 2,	TD,	sys_pipe2,			"pipe2"			}, /* 59 */
-	{ 4,	0,	sys_quotactl,			"quotactl"		}, /* 60 */
+	{ 4,	TF,	sys_quotactl,			"quotactl"		}, /* 60 */
 	{ 3,	TD,	sys_getdents64,			"getdents64"		}, /* 61 */
 	{ 5,	TD,	sys_llseek,			"llseek"		}, /* 62 */
 	{ 3,	TD,	sys_read,			"read"			}, /* 63 */
@@ -251,8 +251,8 @@
 	[249 ... 259] = { },
 
 	{ 4,	TP,	sys_wait4,			"wait4"			}, /* 260 */
-	{ 4,	TP,	sys_prlimit64,			"prlimit64"		}, /* 261 */
-	{ 2,	0,	sys_fanotify_init,		"fanotify_init"		}, /* 262 */
+	{ 4,	0,	sys_prlimit64,			"prlimit64"		}, /* 261 */
+	{ 2,	TD,	sys_fanotify_init,		"fanotify_init"		}, /* 262 */
 	{ 5,	TD|TF,	sys_fanotify_mark,		"fanotify_mark"		}, /* 263 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,		"name_to_handle_at"	}, /* 264 */
 	{ 3,	TD,	sys_open_by_handle_at,		"open_by_handle_at"	}, /* 265 */
@@ -260,6 +260,6 @@
 	{ 1,	TD,	sys_syncfs,			"syncfs"		}, /* 267 */
 	{ 2,	TD,	sys_setns,			"setns"			}, /* 268 */
 	{ 4,	TN,	sys_sendmmsg,			"sendmmsg"		}, /* 269 */
-	{ 6,	TP,	sys_process_vm_readv,		"process_vm_readv"	}, /* 270 */
-	{ 6,	TP,	sys_process_vm_writev,		"process_vm_writev"	}, /* 271 */
+	{ 6,	0,	sys_process_vm_readv,		"process_vm_readv"	}, /* 270 */
+	{ 6,	0,	sys_process_vm_writev,		"process_vm_writev"	}, /* 271 */
 	{ 5,	TP,	printargs,			"kcmp"			}, /* 272 */

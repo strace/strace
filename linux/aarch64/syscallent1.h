@@ -322,7 +322,7 @@
 	{ 0,	TP,	sys_vfork,			"vfork"				}, /* 1071 */
 	{ 4,	TP,	sys_wait4,			"wait4"				}, /* 1072 */
 	{ 6,	TN,	sys_recv,			"recv"				}, /* 1073 */
-	{ 4,	TD|TN,	sys_send,			"send"				}, /* 1074 */
+	{ 4,	TN,	sys_send,			"send"				}, /* 1074 */
 	{ 2,	0,	sys_bdflush,			"bdflush"			}, /* 1075 */
 	{ 2,	TF,	sys_umount,			"umount"			}, /* 1076 */
 	{ 1,	TF,	sys_uselib,			"uselib"			}, /* 1077 */

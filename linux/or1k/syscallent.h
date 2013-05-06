@@ -48,7 +48,7 @@
 	{ 6,	TD,	sys_fallocate,			"fallocate"		}, /* 47 */
 	{ 3,	TD|TF,	sys_faccessat,			"faccessat"		}, /* 48 */
 	{ 1,	TF,	sys_chdir,			"chdir"			}, /* 49 */
-	{ 1,	TF,	sys_fchdir,			"fchdir"		}, /* 50 */
+	{ 1,	TD,	sys_fchdir,			"fchdir"		}, /* 50 */
 	{ 1,	TF,	sys_chroot,			"chroot"		}, /* 51 */
 	{ 2,	TD,	sys_fchmod,			"fchmod"		}, /* 52 */
 	{ 3,	TD|TF,	sys_fchmodat,			"fchmodat"		}, /* 53 */
@@ -58,7 +58,7 @@
 	{ 1,	TD,	sys_close,			"close"			}, /* 57 */
 	{ 0,	0,	sys_vhangup,			"vhangup"		}, /* 58 */
 	{ 2,	TD,	sys_pipe2,			"pipe2"			}, /* 59 */
-	{ 4,	0,	sys_quotactl,			"quotactl"		}, /* 60 */
+	{ 4,	TF,	sys_quotactl,			"quotactl"		}, /* 60 */
 	{ 3,	TD,	sys_getdents64,			"getdents64"		}, /* 61 */
 	{ 5,	TD,	sys_llseek,			"_llseek"		}, /* 62 */
 	{ 3,	TD,	sys_read,			"read"			}, /* 63 */

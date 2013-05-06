@@ -265,7 +265,7 @@
 	{ 5,	0,	sys_keyctl,		"keyctl"	}, /* 237 */
 	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 238 */
 	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 239 */
-	{ 0,	0,	sys_inotify_init,	"inotify_init"	}, /* 240 */
+	{ 0,	TD,	sys_inotify_init,	"inotify_init"	}, /* 240 */
 	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 241 */
 	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 242 */
 	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 243 */
@@ -283,7 +283,7 @@
 	{ 3,	TD|TF,	sys_faccessat,		"faccessat"	}, /* 255 */
 	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 256 */
 	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 257 */
-	{ 1,	TD,	sys_unshare,		"unshare"	}, /* 258 */
+	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 258 */
 	{ 2,	0,	sys_set_robust_list,	"set_robust_list" }, /* 259 */
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 260 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 261 */

@@ -821,13 +821,13 @@
 	{ 3,	TD,	sys_write,		"write"		}, /* 1027 */
 	{ 3,	TD|TF,	sys_open,		"open"		}, /* 1028 */
 	{ 1,	TD,	sys_close,		"close"		}, /* 1029 */
-	{ 2,	0,	sys_creat,		"creat"		}, /* 1030 */
+	{ 2,	TD|TF,	sys_creat,		"creat"		}, /* 1030 */
 	{ 2,	TF,	sys_link,		"link"		}, /* 1031 */
 	{ 1,	TF,	sys_unlink,		"unlink"	}, /* 1032 */
 	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 1033 */
 	{ 1,	TF,	sys_chdir,		"chdir"		}, /* 1034 */
-	{ 1,	TF,	sys_fchdir,		"fchdir"	}, /* 1035 */
-	{ 2,	0,	sys_utimes,		"utimes"	}, /* 1036 */
+	{ 1,	TD,	sys_fchdir,		"fchdir"	}, /* 1035 */
+	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 1036 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 1037 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 1038 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 1039 */
@@ -835,7 +835,7 @@
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 1041 */
 	{ 0,	0,	sys_getppid,		"getppid"	}, /* 1042 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 1043 */
-	{ 1,	0,	sys_umount2,		"umount"	}, /* 1044 */
+	{ 1,	TF,	sys_umount2,		"umount"	}, /* 1044 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 1045 */
 	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 1046 */
 	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 1047 */
@@ -884,7 +884,7 @@
 	{ 3,	TD,	sys_poll,		"poll"		}, /* 1090 */
 	{ 2,	TF,	sys_symlink,		"symlink"	}, /* 1091 */
 	{ 3,	TF,	sys_readlink,		"readlink"	}, /* 1092 */
-	{ 1,	0,	sys_uselib,		"uselib"	}, /* 1093 */
+	{ 1,	TF,	sys_uselib,		"uselib"	}, /* 1093 */
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 1094 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 1095 */
 	{ 4,	0,	sys_reboot,		"reboot"	}, /* 1096 */
@@ -1002,7 +1002,7 @@
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 1208 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 1209 */
 	{ 2,	TF,	sys_stat,		"stat"		}, /* 1210 */
-	{ 2,	0,	sys_lstat,		"lstat"		}, /* 1211 */
+	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 1211 */
 	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 1212 */
 	{ 6,	TP,	sys_clone,		"clone2"	}, /* 1213 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 1214 */
@@ -1010,16 +1010,16 @@
 	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 1216 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 1217 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 1218 */
-	{ 5,	TD,	sys_setxattr,		"fsetxattr"	}, /* 1219 */
+	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 1219 */
 	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 1220 */
 	{ 4,	TF,	sys_getxattr,		"lgetxattr"	}, /* 1221 */
-	{ 4,	TD,	sys_getxattr,		"fgetxattr"	}, /* 1222 */
+	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"	}, /* 1222 */
 	{ 3,	TF,	sys_listxattr,		"listxattr"	}, /* 1223 */
 	{ 3,	TF,	sys_listxattr,		"llistxattr"	}, /* 1224 */
-	{ 3,	TD,	sys_listxattr,		"flistxattr"	}, /* 1225 */
+	{ 3,	TD,	sys_flistxattr,		"flistxattr"	}, /* 1225 */
 	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 1226 */
 	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 1227 */
-	{ 2,	TD,	sys_removexattr,	"fremovexattr"	}, /* 1228 */
+	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 1228 */
 	{ 2,	TS,	sys_kill,		"tkill"		}, /* 1229 */
 	{ 6,	0,	sys_futex,		"futex"		}, /* 1230 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */

@@ -377,8 +377,8 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 348 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 349 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 350 */
-	{ 5,	0,	sys_pread,		"pread64"	}, /* 351 */
-	{ 5,	0,	sys_pwrite,		"pwrite64"	}, /* 352 */
+	{ 5,	TD,	sys_pread,		"pread64"	}, /* 351 */
+	{ 5,	TD,	sys_pwrite,		"pwrite64"	}, /* 352 */
 	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 353 */
 	{ 2,	0,	sys_set_robust_list,	"set_robust_list"	}, /* 354 */
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list"	}, /* 355 */
