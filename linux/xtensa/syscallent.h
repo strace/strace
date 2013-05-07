@@ -21,8 +21,8 @@
 	{ 3,	TD,	sys_writev,		"writev"	}, /* 25 */
 	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 26 */
 	{ 1,	TD,	sys_fdatasync,		"fdatasync"	}, /* 27 */
-	{ 2,	TF,	sys_truncate64,		"truncate64"	}, /* 28 */
-	{ 2,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 29 */
+	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 28 */
+	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 29 */
 	{ 6,	TD,	sys_pread,		"pread64"	}, /* 30 */
 	{ 6,	TD,	sys_pwrite,		"pwrite64"	}, /* 31 */
 	{ 2,	TF,	sys_link,		"link"		}, /* 32 */

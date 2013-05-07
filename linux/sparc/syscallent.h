@@ -82,7 +82,7 @@
 	{ 0,	0,	sys_getpgrp,	"getpgrp" },		/* 81 */
 	{ 2,	0,	sys_setgroups32,"setgroups32" },	/* 82 */
 	{ 3,	0,	sys_setitimer,	"setitimer" },		/* 83 */
-	{ 2,	TD,	sys_ftruncate,	"ftruncate64" },	/* 84 */
+	{ 3,	TD,	sys_ftruncate64,"ftruncate64" },	/* 84 */
 	{ 2,	TF,	sys_swapon,	"swapon" },		/* 85 */
 	{ 2,	0,	sys_getitimer,	"getitimer" },		/* 86 */
 	{ 1,	0,	sys_setuid,	"setuid32" },		/* 87 */

@@ -43,8 +43,8 @@
 	{ 3,	0,	sys_nfsservctl,			"nfsservctl"		}, /* 42 */
 	{ 3,	TF,	sys_statfs64,			"statfs64"		}, /* 43 */
 	{ 3,	TD,	sys_fstatfs64,			"fstatfs64"		}, /* 44 */
-	{ 4,	TF,	sys_truncate64,			"truncate64"		}, /* 45 */
-	{ 4,	TD,	sys_ftruncate64,		"ftruncate64"		}, /* 46 */
+	{ 3,	TF,	sys_truncate64,			"truncate64"		}, /* 45 */
+	{ 3,	TD,	sys_ftruncate64,		"ftruncate64"		}, /* 46 */
 	{ 6,	TD,	sys_fallocate,			"fallocate"		}, /* 47 */
 	{ 3,	TD|TF,	sys_faccessat,			"faccessat"		}, /* 48 */
 	{ 1,	TF,	sys_chdir,			"chdir"			}, /* 49 */
