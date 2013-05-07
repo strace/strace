@@ -317,6 +317,7 @@ int sys_osf_wait4();
  || defined __ARM_EABI__ \
  || defined BFIN \
  || defined HPPA \
+ || defined METAG \
  || defined MIPS \
  || defined TILE \
  || defined XTENSA
