@@ -366,14 +366,5 @@ int sys_sram_alloc();
 #include "sparc/syscall1.h"
 int sys_execv();
 int sys_getmsg();
-int sys_msgsys();
 int sys_putmsg();
-int sys_semsys();
-int sys_shmsys();
-#define SYS_semsys_subcall	200
-#define SYS_semsys_nsubcalls	3
-#define SYS_msgsys_subcall	203
-#define SYS_msgsys_nsubcalls	4
-#define SYS_shmsys_subcall	207
-#define SYS_shmsys_nsubcalls	4
 #endif
