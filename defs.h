@@ -38,6 +38,7 @@
 #endif
 
 #ifdef MIPS
+# include <sgidefs.h>
 # if _MIPS_SIM == _MIPS_SIM_ABI64
 #  define LINUX_MIPSN64
 # elif _MIPS_SIM == _MIPS_SIM_NABI32
@@ -47,7 +48,6 @@
 # else
 #  error Unsupported _MIPS_SIM
 # endif
-# include <sgidefs.h>
 #endif
 
 #include <features.h>
