@@ -36,9 +36,20 @@
 #  define _LFS64_LARGEFILE 1
 # endif
 #endif
+
 #ifdef MIPS
+# if _MIPS_SIM == _MIPS_SIM_ABI64
+#  define LINUX_MIPSN64
+# elif _MIPS_SIM == _MIPS_SIM_NABI32
+#  define LINUX_MIPSN32
+# elif _MIPS_SIM == _MIPS_SIM_ABI32
+#  define LINUX_MIPSO32
+# else
+#  error Unsupported _MIPS_SIM
+# endif
 # include <sgidefs.h>
 #endif
+
 #include <features.h>
 #ifdef HAVE_STDBOOL_H
 # include <stdbool.h>
@@ -114,10 +125,15 @@ extern char *stpcpy(char *dst, const char *src);
  * Maximum number of args to a syscall.
  *
  * Make sure that all entries in all syscallent.h files have nargs <= MAX_ARGS!
- * linux/<ARCH>/syscallent.h: all have nargs <= 6.
+ * linux/<ARCH>/syscallent*.h:
+ * 	all have nargs <= 6 except mips o32 which has nargs <= 7.
  */
 #ifndef MAX_ARGS
-# define MAX_ARGS	6
+# ifdef LINUX_MIPSO32
+#  define MAX_ARGS	7
+# else
+#  define MAX_ARGS	6
+# endif
 #endif
 /* default sorting method for call profiling */
 #ifndef DEFAULT_SORTBY
@@ -130,17 +146,6 @@ extern char *stpcpy(char *dst, const char *src);
 #define USE_SEIZE 1
 /* To force NOMMU build, set to 1 */
 #define NOMMU_SYSTEM 0
-
-
-#if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI32
-# define LINUX_MIPSO32
-#endif
-#if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_NABI32
-# define LINUX_MIPSN32
-#endif
-#if defined(MIPS) && _MIPS_SIM == _MIPS_SIM_ABI64
-# define LINUX_MIPSN64
-#endif
 
 #if (defined(SPARC) || defined(SPARC64) \
     || defined(I386) || defined(X32) || defined(X86_64) \
