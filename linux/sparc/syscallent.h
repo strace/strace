@@ -351,9 +351,8 @@
 	{ 5,	0,	NULL,			NULL		}, /* 350 */
 	{ 5,	0,	NULL,			NULL		}, /* 351 */
 	{ 5,	0,	NULL,			NULL		}, /* 352 */
-#if SYS_socket_subcall != 353
- #error fix me
-#endif
+#define SYS_socket_subcall	353
+#include "subcall.h"
 	{ 6,	0,	printargs,		"socket_subcall"}, /* 353 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 354 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 355 */

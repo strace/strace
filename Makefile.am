@@ -151,6 +151,7 @@ EXTRA_DIST =				\
 	linux/sparc64/syscallent.h	\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/syscallent2.h	\
+	linux/subcall.h			\
 	linux/syscall.h			\
 	linux/tile/ioctlent.h.in	\
 	linux/tile/syscallent.h		\

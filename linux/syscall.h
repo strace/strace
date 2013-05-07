@@ -313,30 +313,6 @@ int sys_osf_utimes();
 int sys_osf_wait4();
 #endif
 
-#if defined ALPHA \
- || defined __ARM_EABI__ \
- || defined BFIN \
- || defined HPPA \
- || defined METAG \
- || defined MIPS \
- || defined TILE \
- || defined XTENSA
-/*
- * This architecture does not have a socketcall or ipc subcall,
- * it has dedicated syscalls instead, so there is no need
- * to implement socket or ipc subcall decoding.
- */
-#else
-# if defined SPARC || defined SPARC64
-#  define SYS_socket_subcall	353
-# else
-#  define SYS_socket_subcall	400
-# endif
-# define SYS_socket_nsubcalls	20
-# define SYS_ipc_subcall	((SYS_socket_subcall)+(SYS_socket_nsubcalls))
-# define SYS_ipc_nsubcalls	25
-#endif
-
 #if defined(ALPHA) || defined(IA64) || defined(SPARC) || defined(SPARC64)
 int sys_getpagesize();
 #endif
