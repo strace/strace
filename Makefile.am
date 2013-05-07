@@ -105,6 +105,10 @@ EXTRA_DIST =				\
 	linux/mips/ioctlent.h.in	\
 	linux/mips/ioctlent.sh		\
 	linux/mips/signalent.h		\
+	linux/mips/syscallent-compat.h	\
+	linux/mips/syscallent-n32.h	\
+	linux/mips/syscallent-n64.h	\
+	linux/mips/syscallent-o32.h	\
 	linux/mips/syscallent.h		\
 	linux/mtd-abi.h			\
 	linux/powerpc/errnoent1.h	\
