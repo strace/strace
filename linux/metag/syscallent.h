@@ -60,7 +60,7 @@
 	{ 2,	TD,	sys_pipe2,			"pipe2"			}, /* 59 */
 	{ 4,	TF,	sys_quotactl,			"quotactl"		}, /* 60 */
 	{ 3,	TD,	sys_getdents64,			"getdents64"		}, /* 61 */
-	{ 5,	TD,	sys_llseek,			"llseek"		}, /* 62 */
+	{ 5,	TD,	sys_llseek,			"_llseek"		}, /* 62 */
 	{ 3,	TD,	sys_read,			"read"			}, /* 63 */
 	{ 3,	TD,	sys_write,			"write"			}, /* 64 */
 	{ 3,	TD,	sys_readv,			"readv"			}, /* 65 */
