@@ -293,8 +293,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 292 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 293 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 294 */
-	{ 5,	TD,	printargs,		"64:preadv"	}, /* 295 */
-	{ 5,	TD,	printargs,		"64:pwritev"	}, /* 296 */
+	{ 4,	TD,	printargs,		"64:preadv"	}, /* 295 */
+	{ 4,	TD,	printargs,		"64:pwritev"	}, /* 296 */
 	{ 4,	TP|TS,	printargs,		"64:rt_tgsigqueueinfo"}, /* 297 */
 	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"}, /* 298 */
 	{ 5,	TN,	printargs,		"64:recvmmsg"	}, /* 299 */
@@ -335,8 +335,8 @@
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 531 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 532 */
 	{ 6,	TM,	sys_move_pages,		"move_pages"	}, /* 533 */
-	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 534 */
-	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 535 */
+	{ 4,	TD,	sys_preadv,		"preadv"	}, /* 534 */
+	{ 4,	TD,	sys_pwritev,		"pwritev"	}, /* 535 */
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo" }, /* 536 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 537 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 538 */

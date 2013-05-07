@@ -516,8 +516,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"			}, /* 487 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"			}, /* 488 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"		}, /* 489 */
-	{ 5,	TD,	sys_preadv,		"preadv"		}, /* 490 */
-	{ 5,	TD,	sys_pwritev,		"pwritev"		}, /* 491 */
+	{ 4,	TD,	sys_preadv,		"preadv"		}, /* 490 */
+	{ 4,	TD,	sys_pwritev,		"pwritev"		}, /* 491 */
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"	}, /* 492 */
 	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"	}, /* 493 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"		}, /* 494 */
