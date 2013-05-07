@@ -221,7 +221,7 @@
 	{ 5,	TP,	sys_clone,			"clone"				}, /*  220 */
 	{ 3,	TF|TP,	sys_execve,			"execve"			}, /*  221 */
 	{ 6,	TD|TM,	sys_mmap_4koff,			"mmap2"				}, /*  222 */
-	{ 6,	TD,	sys_fadvise64,			"fadvise64"			}, /*  223 */
+	{ 5,	TD,	sys_fadvise64,			"fadvise64"			}, /*  223 */
 	{ 1,	TF,	sys_swapon,			"swapon"			}, /*  224 */
 	{ 1,	TF,	sys_swapoff,			"swapoff"			}, /*  225 */
 	{ 3,	TM,	sys_mprotect,			"mprotect"			}, /*  226 */

@@ -216,7 +216,7 @@
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address" }, /* 6213 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 6214 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 6215 */
-	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 6216 */
+	{ 4,	TD,	sys_fadvise64,		"fadvise64"	}, /* 6216 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 6217 */
 	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 6218 */
 	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 6219 */

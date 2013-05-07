@@ -281,7 +281,7 @@
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 251 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 252 */
-	{ 5,	TD,	printargs,		"fadvise64"	}, /* 253 */
+	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 253 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 254 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 255 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 256 */

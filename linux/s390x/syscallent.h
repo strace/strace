@@ -280,7 +280,7 @@
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 251 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 252 */
-	{ 5,	TD,	printargs,		"fadvise64"	}, /* 253 */
+	{ 4,	TD,	sys_fadvise64,		"fadvise64"	}, /* 253 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 254 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 255 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 256 */
@@ -291,7 +291,7 @@
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 261 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 262 */
 	{ 5,	0,	sys_vserver,		"vserver"	}, /* 263 */
-	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 264 */
+	{ 4,	TD,	sys_fadvise64,		"fadvise64_64"	}, /* 264 */
 	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 265 */
 	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 266 */
 	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages"}, /* 267 */

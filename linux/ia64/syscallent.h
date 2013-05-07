@@ -1025,7 +1025,7 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity"},/* 1231 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity"},/* 1232 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 1233 */
-	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 1234 */
+	{ 4,	TD,	sys_fadvise64,		"fadvise64"	}, /* 1234 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 1235 */
 	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
 	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 1237 */
