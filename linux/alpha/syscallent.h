@@ -506,7 +506,7 @@
 	{ 4,	TD,	sys_timerfd,		"timerfd"		}, /* 477 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 478 */
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"		}, /* 479 */
-	{ 6,	TD,	sys_fallocate,		"fallocate"		}, /* 480 */
+	{ 4,	TD,	sys_fallocate,		"fallocate"		}, /* 480 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 481 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"	}, /* 482 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"	}, /* 483 */

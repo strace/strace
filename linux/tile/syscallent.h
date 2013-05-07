@@ -45,7 +45,7 @@
 	{ 2,	TD,	sys_fstatfs,			"fstatfs"			}, /*   44 */
 	{ 2,	TF,	sys_truncate,			"truncate"			}, /*   45 */
 	{ 2,	TD,	sys_ftruncate,			"ftruncate"			}, /*   46 */
-	{ 6,	TD,	sys_fallocate,			"fallocate"			}, /*   47 */
+	{ 4,	TD,	sys_fallocate,			"fallocate"			}, /*   47 */
 	{ 3,	TD|TF,	sys_faccessat,			"faccessat"			}, /*   48 */
 	{ 1,	TF,	sys_chdir,			"chdir"				}, /*   49 */
 	{ 1,	TD,	sys_fchdir,			"fchdir"			}, /*   50 */

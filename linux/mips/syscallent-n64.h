@@ -279,7 +279,7 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 5276 */
 	{ 0,	0,	NULL,			NULL		}, /* 5277 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 5278 */
-	{ 6,	TD,	sys_fallocate,		"fallocate"	}, /* 5279 */
+	{ 4,	TD,	sys_fallocate,		"fallocate"	}, /* 5279 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create" }, /* 5280 */
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime" }, /* 5281 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime" }, /* 5282 */

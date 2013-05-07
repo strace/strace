@@ -341,7 +341,7 @@
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 311 */
 	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 312 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 313 */
-	{ 6,	TD,	sys_fallocate,		"fallocate"	}, /* 314 */
+	{ 4,	TD,	sys_fallocate,		"fallocate"	}, /* 314 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 315 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 316 */
 	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 317 */
