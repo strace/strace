@@ -279,7 +279,7 @@
 	{ 4,	0,	NULL,			NULL		}, /* 250 */
 	{ 4,	0,	NULL,			NULL		}, /* 251 */
 	{ 4,	0,	sys_gettid,		"gettid"	}, /* 252 */
-	{ 5,	TD,	sys_readahead,		"readahead"	}, /* 253 */
+	{ 3,	TD,	sys_readahead,		"readahead"	}, /* 253 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 254 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 255 */
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 256 */

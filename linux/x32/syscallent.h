@@ -185,7 +185,7 @@
 	{ 3,	0,	sys_tuxcall,		"tuxcall"	}, /* 184 */
 	{ 3,	0,	sys_security,		"security"	}, /* 185 */
 	{ 0,	0,	sys_gettid,		"gettid"	}, /* 186 */
-	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 187 */
+	{ 3,	TD,	sys_readahead,		"readahead"	}, /* 187 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 188 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 189 */
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 190 */

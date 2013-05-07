@@ -211,7 +211,7 @@
 	{ 2,	TN,	sys_shutdown,			"shutdown"		}, /* 210 */
 	{ 3,	TN,	sys_sendmsg,			"sendmsg"		}, /* 211 */
 	{ 3,	TN,	sys_recvmsg,			"recvmsg"		}, /* 212 */
-	{ 5,	TD,	sys_readahead,			"readahead"		}, /* 213 */
+	{ 4,	TD,	sys_readahead,			"readahead"		}, /* 213 */
 	{ 1,	TM,	sys_brk,			"brk"			}, /* 214 */
 	{ 2,	TM,	sys_munmap,			"munmap"		}, /* 215 */
 	{ 5,	TM,	sys_mremap,			"mremap"		}, /* 216 */

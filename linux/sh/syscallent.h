@@ -255,7 +255,7 @@
 	{ 4,	0,	NULL,			NULL		}, /* 222 */
 	{ 4,	0,	NULL,			NULL		}, /* 223 */
 	{ 4,	0,	sys_gettid,		"gettid"	}, /* 224 */
-	{ 5,	TD,	sys_readahead,		"readahead"	}, /* 225 */
+	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 225 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 226 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 227 */
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 228 */

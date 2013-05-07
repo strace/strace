@@ -249,7 +249,7 @@
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 219 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
 	{ MA,	0,	NULL,			NULL		}, /* 221 */
-	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 222 */
+	{ 3,	TD,	sys_readahead,		"readahead"	}, /* 222 */
 	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 223 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 224 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 225 */

@@ -405,7 +405,7 @@
 	{ 3,	0,	printargs,		"pciconfig_iobase"	}, /* 376 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"		}, /* 377 */
 	{ 0,	0,	sys_gettid,		"gettid"		}, /* 378 */
-	{ 4,	TD,	sys_readahead,		"readahead"		}, /* 379 */
+	{ 3,	TD,	sys_readahead,		"readahead"		}, /* 379 */
 	{ 5,	0,	NULL,			NULL			}, /* 380 */
 	{ 2,	TS,	sys_kill,		"tkill"			}, /* 381 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"		}, /* 382 */

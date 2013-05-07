@@ -250,7 +250,7 @@
 	{ 5,	0,	printargs,		"request_key"	}, /* 257 */
 	{ 5,	0,	printargs,		"keyctl"	}, /* 258 */
 	[259] = { },
-	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 260 */
+	{ 5,	TD,	sys_readahead,		"readahead"	}, /* 260 */
 	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages"}, /* 261 */
 	{ 5,	TM,	sys_migrate_pages,	"migrate_pages"	}, /* 262 */
 	{ 0,	TM,	sys_mbind,		"mbind"		}, /* 263 */

@@ -1007,7 +1007,7 @@
 	{ 6,	TP,	sys_clone,		"clone2"	}, /* 1213 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 1214 */
 	{ 2,	0,	printargs,		"getunwind"	}, /* 1215 */
-	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 1216 */
+	{ 3,	TD,	sys_readahead,		"readahead"	}, /* 1216 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 1217 */
 	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 1218 */
 	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 1219 */
