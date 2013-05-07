@@ -16,8 +16,8 @@
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 5013 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 5014 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 5015 */
-	{ 6,	TD,	sys_pread,		"pread"		}, /* 5016 */
-	{ 6,	TD,	sys_pwrite,		"pwrite"	}, /* 5017 */
+	{ 4,	TD,	sys_pread,		"pread"		}, /* 5016 */
+	{ 4,	TD,	sys_pwrite,		"pwrite"	}, /* 5017 */
 	{ 3,	TD,	sys_readv,		"readv"		}, /* 5018 */
 	{ 3,	TD,	sys_writev,		"writev"	}, /* 5019 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 5020 */

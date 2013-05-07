@@ -15,8 +15,8 @@
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"},  /* 14 */
 	{ 0,	TS,	printargs,		"64:rt_sigreturn"	},  /* 15 */
 	{ 3,	TD,	printargs,		"64:ioctl"	},  /* 16 */
-	{ 5,	TD,	sys_pread,		"pread"		},  /* 17 */
-	{ 5,	TD,	sys_pwrite,		"pwrite"	},  /* 18 */
+	{ 4,	TD,	sys_pread,		"pread"		},  /* 17 */
+	{ 4,	TD,	sys_pwrite,		"pwrite"	},  /* 18 */
 	{ 3,	TD,	printargs,		"64:readv"	},  /* 19 */
 	{ 3,	TD,	printargs,		"64:writev"	},  /* 20 */
 	{ 2,	TF,	sys_access,		"access"	},  /* 21 */

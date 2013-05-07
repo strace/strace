@@ -375,8 +375,8 @@
 	{ 5,	0,	printargs,		"pciconfig_write"	}, /* 346 */
 	{ 5,	0,	sys_query_module,	"query_module"		}, /* 347 */
 	{ 5,	0,	sys_prctl,		"prctl"			}, /* 348 */
-	{ 5,	TD,	sys_pread,		"pread"			}, /* 349 */
-	{ 5,	TD,	sys_pwrite,		"pwrite"		}, /* 350 */
+	{ 4,	TD,	sys_pread,		"pread"			}, /* 349 */
+	{ 4,	TD,	sys_pwrite,		"pwrite"		}, /* 350 */
 	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"		}, /* 351 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"		}, /* 352 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"	}, /* 353 */

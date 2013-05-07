@@ -206,8 +206,8 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 177 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,    "rt_sigqueueinfo"}, /* 178 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 179 */
-	{ 5,	TD,	sys_pread,		"pread"		}, /* 180 */
-	{ 5,	TD,	sys_pwrite,		"pwrite"	}, /* 181 */
+	{ 4,	TD,	sys_pread,		"pread"		}, /* 180 */
+	{ 4,	TD,	sys_pwrite,		"pwrite"	}, /* 181 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 182 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */

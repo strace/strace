@@ -65,8 +65,8 @@
 	{ 3,	TD,	sys_write,			"write"				}, /*   64 */
 	{ 3,	TD,	sys_readv,			"readv"				}, /*   65 */
 	{ 3,	TD,	sys_writev,			"writev"			}, /*   66 */
-	{ 6,	TD,	sys_pread,			"pread64"			}, /*   67 */
-	{ 6,	TD,	sys_pwrite,			"pwrite64"			}, /*   68 */
+	{ 4,	TD,	sys_pread,			"pread64"			}, /*   67 */
+	{ 4,	TD,	sys_pwrite,			"pwrite64"			}, /*   68 */
 	{ 4,	TD,	sys_preadv,			"preadv"			}, /*   69 */
 	{ 4,	TD,	sys_pwritev,			"pwritev"			}, /*   70 */
 	{ 4,	TD|TN,	sys_sendfile64,			"sendfile"			}, /*   71 */
