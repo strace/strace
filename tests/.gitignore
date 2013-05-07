@@ -1,2 +1,5 @@
+net-accept-connect
 *.log
+*.log.*
+*.o
 *.trs
