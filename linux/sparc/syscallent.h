@@ -338,9 +338,9 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 337 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 338 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 339 */
-	{ 5,	0,	NULL,			NULL		}, /* 340 */
-	{ 5,	0,	NULL,			NULL		}, /* 341 */
-	{ 5,	0,	NULL,			NULL		}, /* 342 */
+	{ 0,	NF,	printargs,		"kern_features"	}, /* 340 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 341 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 342 */
 	{ 5,	0,	NULL,			NULL		}, /* 343 */
 	{ 5,	0,	NULL,			NULL		}, /* 344 */
 	{ 5,	0,	NULL,			NULL		}, /* 345 */

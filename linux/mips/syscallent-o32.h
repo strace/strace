@@ -347,6 +347,8 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 4344 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 4345 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 4346 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 4347 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 4348 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
 	{ 0,	0,	printargs,		"o32_exit"		}, /* 4001 */
@@ -695,5 +697,7 @@
 	{ 2,	TD,	printargs,		"o32_setns"	}, /* 4344 */
 	{ 6,	0,	printargs,		"o32_process_vm_readv"	}, /* 4345 */
 	{ 6,	0,	printargs,		"o32_process_vm_writev"	}, /* 4346 */
+	{ 5,	0,	printargs,		"o32_kcmp"		}, /* 4347 */
+	{ 3,	TD,	printargs,		"o32_finit_module"	}, /* 4348 */
 #endif
-	[4347 ... 4999] = { }, /* 4999 */ /* end of Linux o32 */
+	[4349 ... 4999] = { }, /* 4999 */ /* end of Linux o32 */

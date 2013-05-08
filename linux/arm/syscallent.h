@@ -369,7 +369,7 @@
 	{ 2,	0,	sys_set_robust_list,	"set_robust_list" }, /* 338 */
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 339 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 340 */
-	{ 5,	0,	NULL,			NULL		}, /* 341 */
+	{ 6,	TD,	sys_sync_file_range2,	"sync_file_range2"}, /* 341 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 342 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 343 */
 	{ 6,	TM,	sys_move_pages,		"move_pages"	}, /* 344 */
@@ -406,11 +406,11 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 375 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 376 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 377 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 378 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 379 */
 #ifdef __ARM_EABI__
-# define ARM_LAST_ORDINARY_SYSCALL 377
+# define ARM_LAST_ORDINARY_SYSCALL 379
 #else
-	{ 5,	0,	NULL,			NULL		}, /* 378 */
-	{ 5,	0,	NULL,			NULL		}, /* 379 */
 	{ 5,	0,	NULL,			NULL		}, /* 380 */
 	{ 5,	0,	NULL,			NULL		}, /* 381 */
 	{ 5,	0,	NULL,			NULL		}, /* 382 */

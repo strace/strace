@@ -407,3 +407,5 @@
 	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 378 */
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 379 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"	}, /* 380 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 381 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 382 */

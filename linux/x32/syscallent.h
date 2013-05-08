@@ -310,8 +310,10 @@
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 309 */
 	{ 6,	0,	printargs,		"64:process_vm_readv"	}, /* 310 */
 	{ 6,	0,	printargs,		"64:process_vm_writev"	}, /* 311 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 312 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 313 */
 
-	[312 ... 511] = {},
+	[314 ... 511] = {},
 
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	},  /* 512 */
 	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	},  /* 513 */

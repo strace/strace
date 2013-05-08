@@ -332,3 +332,7 @@
 	{ 1,	TD,	sys_syncfs,		"syncfs"		}, /* 327 */
 	{ 2,	TD,	sys_setns,		"setns"			}, /* 328 */
 	{ 4,	TN,	sys_sendmmsg,		"sendmmsg"		}, /* 329 */
+	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 330 */
+	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 331 */
+	{ 5,	0,	sys_kcmp,		"kcmp"			}, /* 332 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"		}, /* 333 */

@@ -1117,3 +1117,4 @@
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 1332 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 1333 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 1334 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 1335 */

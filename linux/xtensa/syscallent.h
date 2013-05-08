@@ -321,6 +321,6 @@
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"}, /* 328 */
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 329 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 330 */
-	{ 5,	TP,	printargs,		"kcmp"		}, /* 331 */
-	{ 3,	TP,	printargs,		"finit_module"	}, /* 332 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 331 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 332 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 333 */

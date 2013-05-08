@@ -310,3 +310,5 @@
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 309 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 310 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 311 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 312 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 313 */

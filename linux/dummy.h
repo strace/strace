@@ -35,10 +35,12 @@
 #define	sys_add_key		printargs
 #define	sys_fanotify_init	printargs
 #define	sys_fanotify_mark	printargs
+#define	sys_finit_module	printargs
 #define	sys_ioperm		printargs
 #define	sys_iopl		printargs
 #define	sys_ioprio_get		printargs
 #define	sys_ioprio_set		printargs
+#define	sys_kcmp		printargs
 #define	sys_kexec_load		printargs
 #define	sys_keyctl		printargs
 #define	sys_lookup_dcookie	printargs
@@ -46,6 +48,7 @@
 #define	sys_open_by_handle_at	printargs
 #define	sys_request_key		printargs
 #define	sys_sync_file_range	printargs
+#define	sys_sync_file_range2	printargs
 #define	sys_sysfs		printargs
 #define	sys_vm86old		printargs
 #define	sys_vm86		printargs

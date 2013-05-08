@@ -306,6 +306,8 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 5303 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 5304 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 5305 */
+	{ 5,	0,	sys_kcmp,		"kcmp"			}, /* 5306 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"		}, /* 5307 */
 #else
 	{ 0,	0,	printargs,		"n64_read"		}, /* 5000 */
 	{ 0,	0,	printargs,		"n64_write"		}, /* 5001 */
@@ -613,5 +615,7 @@
 	{ 2,	TD,	printargs,		"n64_setns"		}, /* 5303 */
 	{ 6,	0,	printargs,		"n64_process_vm_readv"	}, /* 5304 */
 	{ 6,	0,	printargs,		"n64_process_vm_writev"	}, /* 5305 */
+	{ 5,	0,	printargs,		"kcmp"			}, /* 5306 */
+	{ 3,	TD,	printargs,		"finit_module"		}, /* 5307 */
 #endif
-	[5306 ... 5999] = { }, /* 5999 */ /* end of Linux N64 */
+	[5308 ... 5999] = { }, /* 5999 */ /* end of Linux N64 */

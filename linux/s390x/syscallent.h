@@ -369,9 +369,9 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 339 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 340 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 341 */
-	{ 5,	0,	NULL,			NULL		}, /* 342 */
-	{ 5,	0,	NULL,			NULL		}, /* 343 */
-	{ 5,	0,	NULL,			NULL		}, /* 344 */
+	{ 2,	0,	printargs,		"s390_runtime_instr"	}, /* 342 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 343 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 344 */
 	{ 5,	0,	NULL,			NULL		}, /* 345 */
 	{ 5,	0,	NULL,			NULL		}, /* 346 */
 	{ 5,	0,	NULL,			NULL		}, /* 347 */

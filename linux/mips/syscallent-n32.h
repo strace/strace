@@ -311,6 +311,8 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 6308 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 6309 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 6310 */
+	{ 5,	0,	sys_kcmp,		"kcmp"			}, /* 6311 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"		}, /* 6312 */
 #else
 	{ 0,	0,	printargs,		"n32_read"		}, /* 6000 */
 	{ 0,	0,	printargs,		"n32_write"		}, /* 6001 */
@@ -623,4 +625,6 @@
 	{ 2,	TD,	printargs,		"n32_setns"		}, /* 6308 */
 	{ 6,	0,	printargs,		"n32_process_vm_readv"	}, /* 6309 */
 	{ 6,	0,	printargs,		"n32_process_vm_writev"	}, /* 6310 */
+	{ 5,	0,	printargs,		"n32_kcmp"		}, /* 6311 */
+	{ 3,	TD,	printargs,		"n32_finit_module"	}, /* 6312 */
 #endif
