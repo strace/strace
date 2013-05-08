@@ -305,7 +305,7 @@
 	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 4302 */
 	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 4303 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 4304 */
-	{ 4,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 4305 */
+	{ 6,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 4305 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 4306 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 4307 */
 	{ 6,	TM,	sys_move_pages,		"move_pages"	}, /* 4308 */

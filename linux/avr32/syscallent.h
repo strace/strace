@@ -287,7 +287,7 @@
 	{ 2,	0,	sys_set_robust_list,	"set_robust_list" }, /* 259 */
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 260 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 261 */
-	{ 4,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 262 */
+	{ 6,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 262 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 263 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 264 */
 	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 265 */

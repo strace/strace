@@ -316,7 +316,7 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"}, /* 323 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 324 */
 	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 325 */
-	{ 6,	TD,	sys_sync_file_range,	"sync_file_range"}, /* 326 */
+	{ 6,	TD,	sys_sync_file_range2,	"sync_file_range2"}, /* 326 */
 	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"}, /* 327 */
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"}, /* 328 */
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 329 */

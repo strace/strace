@@ -82,7 +82,7 @@
 	{ 0,	0,	sys_sync,			"sync"				}, /*   81 */
 	{ 1,	TD,	sys_fsync,			"fsync"				}, /*   82 */
 	{ 1,	TD,	sys_fdatasync,			"fdatasync"			}, /*   83 */
-	{ 6,	TD,	sys_sync_file_range,		"sync_file_range"		}, /*   84 */
+	{ 6,	TD,	sys_sync_file_range2,		"sync_file_range2"		}, /*   84 */
 	{ 2,	TD,	sys_timerfd_create,		"timerfd_create"		}, /*   85 */
 	{ 4,	TD,	sys_timerfd_settime,		"timerfd_settime"		}, /*   86 */
 	{ 2,	TD,	sys_timerfd_gettime,		"timerfd_gettime"		}, /*   87 */

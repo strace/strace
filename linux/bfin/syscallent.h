@@ -369,7 +369,7 @@
 	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 340 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 341 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 342 */
-	{ 4,	TD,	sys_sync_file_range,	"sync_file_range"	}, /* 343 */
+	{ 6,	TD,	sys_sync_file_range,	"sync_file_range"	}, /* 343 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 344 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 345 */
 	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 346 */

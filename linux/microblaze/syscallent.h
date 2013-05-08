@@ -340,7 +340,7 @@
 	{ 2,	0,	sys_set_robust_list,	"set_robust_list"	}, /* 311 */
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list"	}, /* 312 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 313 */
-	{ 4,	TD,	sys_sync_file_range,	"sync_file_range"}, /* 314 */
+	{ 6,	TD,	sys_sync_file_range,	"sync_file_range"}, /* 314 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 315 */
 	{ 5,	TD,	sys_vmsplice,		"vmsplice"	}, /* 316 */
 	{ 6,	TM,	sys_move_pages,		"move_pages"	}, /* 317 */

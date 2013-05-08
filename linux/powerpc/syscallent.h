@@ -334,7 +334,7 @@
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"		}, /* 305 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"	}, /* 306 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"		}, /* 307 */
-	{ 4,	TD,	sys_sync_file_range,	"sync_file_range"	}, /* 308 */
+	{ 6,	TD,	sys_sync_file_range2,	"sync_file_range2"	}, /* 308 */
 	{ 6,	TD,	sys_fallocate,		"fallocate"		}, /* 309 */
 	{ 3,	0,	sys_subpage_prot,	"subpage_prot"		}, /* 310 */
 	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"	}, /* 311 */
