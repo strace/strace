@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -12,7 +13,7 @@ int main(void)
 		.sun_family = AF_UNIX,
 		.sun_path = SUN_PATH
 	};
-	socklen_t len = sizeof addr;
+	socklen_t len = offsetof(struct sockaddr_un, sun_path) + sizeof SUN_PATH;
 
 	unlink(SUN_PATH);
 	close(0);
@@ -38,7 +39,7 @@ int main(void)
 	} else {
 		assert(socket(PF_LOCAL, SOCK_STREAM, 0) == 1);
 		assert(close(0) == 0);
-		assert(connect(1, (struct sockaddr *) &addr, sizeof addr) == 0);
+		assert(connect(1, (struct sockaddr *) &addr, len) == 0);
 		assert(close(1) == 0);
 		return 0;
 	}
