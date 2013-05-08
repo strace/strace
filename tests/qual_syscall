@@ -5,12 +5,11 @@
 . "${srcdir=.}/init.sh"
 
 check_strace
-check_prog timeout
+check_timeout
 check_prog ls
 check_prog grep
 
-timeout -s 9 $check_timeout \
-$STRACE -e execve ls > /dev/null 2> check.log &&
+$TIMEOUT $STRACE -e execve ls > /dev/null 2> check.log &&
 grep '^execve(' check.log > /dev/null ||
 	{ cat check.log; fail_ 'strace -e execve does not work'; }
 
@@ -18,8 +17,7 @@ grep -v '^execve(' check.log |
 LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
 	{ cat check.log; fail_ 'strace -e execve does not work properly'; }
 
-timeout -s 9 $check_timeout \
-$STRACE -e trace=process ls > /dev/null 2> check.log &&
+$TIMEOUT $STRACE -e trace=process ls > /dev/null 2> check.log &&
 grep '^execve(' check.log > /dev/null ||
 	{ cat check.log; fail_ 'strace -e trace=process does not work'; }
 
