@@ -16,8 +16,8 @@
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 5013 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 5014 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 5015 */
-	{ 4,	TD,	sys_pread,		"pread"		}, /* 5016 */
-	{ 4,	TD,	sys_pwrite,		"pwrite"	}, /* 5017 */
+	{ 4,	TD,	sys_pread,		"pread64"	}, /* 5016 */
+	{ 4,	TD,	sys_pwrite,		"pwrite64"	}, /* 5017 */
 	{ 3,	TD,	sys_readv,		"readv"		}, /* 5018 */
 	{ 3,	TD,	sys_writev,		"writev"	}, /* 5019 */
 	{ 2,	TF,	sys_access,		"access"	}, /* 5020 */
@@ -29,7 +29,7 @@
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 5026 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 5027 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 5028 */
-	{ 3,	TI,	sys_shmat,		"shmgat"	}, /* 5029 */
+	{ 3,	TI,	sys_shmat,		"shmat"		}, /* 5029 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"	}, /* 5030 */
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 5031 */
 	{ 2,	TD,	sys_dup2,		"dup2"		}, /* 5032 */
@@ -40,7 +40,7 @@
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 5037 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 5038 */
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 5039 */
-	{ 2,	TD,	sys_socketcall,		"socketcall"	}, /* 5040 */
+	{ 3,	TN,	sys_socket,		"socket"	}, /* 5040 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 5041 */
 	{ 3,	TN,	sys_accept,		"accept"	}, /* 5042 */
 	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 5043 */
@@ -128,8 +128,8 @@
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 5125 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"},/* 5126 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"},/* 5127 */
-	{ 2,	TS,	sys_rt_sigsuspend,	"rt_siguspend"	}, /* 5128 */
-	{ 2,	TS,	sys_sigaltstack,	"sigaltstatck"	}, /* 5129 */
+	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 5128 */
+	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 5129 */
 	{ 2,	TF,	sys_utime,		"utime"		}, /* 5130 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 5131 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 5132 */
@@ -161,7 +161,7 @@
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 5158 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 5159 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 5160 */
-	{ 2,	TF,	sys_umount2,		"umount"	}, /* 5161 */
+	{ 2,	TF,	sys_umount2,		"umount2"	}, /* 5161 */
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 5162 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 5163 */
 	{ 4,	0,	sys_reboot,		"reboot"	}, /* 5164 */
@@ -228,17 +228,17 @@
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 5225 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 5226 */
 	{ 6,	TM,	sys_mbind,		"mbind"		}, /* 5227 */
-	{ 0,	0,	NULL,			NULL		}, /* 5228 */
-	{ 0,	0,	NULL,			NULL		}, /* 5229 */
+	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 5228 */
+	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"	}, /* 5229 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 5230 */
 	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 5231 */
 	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 5232 */
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 5233 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 5234 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 5235 */
-	{ 0,	0,	NULL,			NULL		}, /* 5236 */
+	{ 5,	0,	sys_vserver,		"vserver"	}, /* 5236 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 5237 */
-	{ 0,	0,	NULL,			NULL		}, /* 5238 */
+	[5238] = { },
 	{ 5,	0,	sys_add_key,		"add_key"	}, /* 5239 */
 	{ 4,	0,	sys_request_key,	"request_key"	}, /* 5230 */
 	{ 5,	0,	sys_keyctl,		"keyctl"	}, /* 5241 */
@@ -277,7 +277,7 @@
 	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 5274 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 5275 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 5276 */
-	{ 0,	0,	NULL,			NULL		}, /* 5277 */
+	{ 4,	TD,	sys_timerfd,		"timerfd"	}, /* 5277 */
 	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 5278 */
 	{ 4,	TD,	sys_fallocate,		"fallocate"	}, /* 5279 */
 	{ 2,	TD,	sys_timerfd_create,	"timerfd_create" }, /* 5280 */
@@ -338,7 +338,7 @@
 	{ 0,	TM,	printargs,		"n64_mincore"		}, /* 5026 */
 	{ 0,	TM,	printargs,		"n64_madvise"		}, /* 5027 */
 	{ 0,	0,	printargs,		"n64_shmget"		}, /* 5028 */
-	{ 0,	0,	printargs,		"n64_shmgat"		}, /* 5029 */
+	{ 0,	0,	printargs,		"n64_shmat"		}, /* 5029 */
 	{ 0,	0,	printargs,		"n64_shmctl"		}, /* 5030 */
 	{ 0,	0,	printargs,		"n64_dup"		}, /* 5031 */
 	{ 0,	0,	printargs,		"n64_dup2"		}, /* 5032 */
@@ -437,8 +437,8 @@
 	{ 0,	0,	printargs,		"n64_rt_sigpending"	}, /* 5125 */
 	{ 0,	0,	printargs,		"n64_rt_sigtimedwait"	}, /* 5126 */
 	{ 0,	0,	printargs,		"n64_rt_sigqueueinfo"	}, /* 5127 */
-	{ 0,	0,	printargs,		"n64_rt_siguspend"	}, /* 5128 */
-	{ 0,	0,	printargs,		"n64_sigaltstatck"	}, /* 5129 */
+	{ 0,	0,	printargs,		"n64_rt_sigsuspend"	}, /* 5128 */
+	{ 0,	0,	printargs,		"n64_sigaltstack"	}, /* 5129 */
 	{ 0,	0,	printargs,		"n64_utime"		}, /* 5130 */
 	{ 0,	0,	printargs,		"n64_mknod"		}, /* 5131 */
 	{ 0,	0,	printargs,		"n64_personality"	}, /* 5132 */
@@ -536,16 +536,16 @@
 	{ 0,	0,	printargs,		"n64_clock_nanosleep"	}, /* 5224 */
 	{ 0,	0,	printargs,		"n64_tgkill"		}, /* 5225 */
 	{ 0,	0,	printargs,		"n64_utimes"		}, /* 5226 */
-	{ 0,	TM,	printargs,		"n64_mbind"		}, /* 5227 */
-	{ 0,	0,	printargs,		"n64_SYS_5228"		}, /* 5228 */
-	{ 0,	0,	printargs,		"n64_SYS_5228"		}, /* 5229 */
+	{ 6,	TM,	printargs,		"n64_mbind"		}, /* 5227 */
+	{ 5,	TM,	printargs,		"n64_get_mempolicy"	}, /* 5228 */
+	{ 3,	TM,	printargs,		"n64_set_mempolicy"	}, /* 5229 */
 	{ 0,	0,	printargs,		"n64_mq_open"		}, /* 5230 */
 	{ 0,	0,	printargs,		"n64_mq_unlink"		}, /* 5231 */
 	{ 0,	0,	printargs,		"n64_mq_timedsend"	}, /* 5232 */
 	{ 0,	0,	printargs,		"n64_mq_timedreceive"	}, /* 5233 */
 	{ 0,	0,	printargs,		"n64_mq_notify"		}, /* 5234 */
 	{ 0,	0,	printargs,		"n64_mq_getsetattr"	}, /* 5235 */
-	{ 0,	0,	printargs,		"n64_SYS_5236"		}, /* 5236 */
+	{ 5,	0,	printargs,		"n64_vserver"		}, /* 5236 */
 	{ 0,	0,	printargs,		"n64_waitid"		}, /* 5237 */
 	{ 0,	0,	printargs,		"n64_SYS_5238"		}, /* 5238 */
 	{ 0,	0,	printargs,		"n64_add_key"		}, /* 5239 */
@@ -586,7 +586,7 @@
 	{ 0,	0,	printargs,		"n64_ioprio_get"	}, /* 5274 */
 	{ 0,	0,	printargs,		"n64_utimensat"		}, /* 5275 */
 	{ 0,	0,	printargs,		"n64_signalfd"		}, /* 5276 */
-	{ 0,	0,	printargs,		"n64_SYS_5277"		}, /* 5277 */
+	{ 4,	TD,	printargs,		"n64_timerfd"		}, /* 5277 */
 	{ 0,	0,	printargs,		"n64_eventfd"		}, /* 5278 */
 	{ 0,	0,	printargs,		"n64_fallocate"		}, /* 5279 */
 	{ 0,	0,	printargs,		"n64_timerfd_create"	}, /* 5280 */
