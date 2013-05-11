@@ -22,7 +22,7 @@
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 4019 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 4020 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 4021 */
-	{ 1,	TF,	sys_umount,		"oldumount"	}, /* 4022 */
+	{ 1,	TF,	sys_umount,		"umount"	}, /* 4022 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 4023 */
 	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 4024 */
 	{ 1,	0,	sys_stime,		"stime"		}, /* 4025 */
@@ -52,7 +52,7 @@
 	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 4049 */
 	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 4050 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 4051 */
-	{ 2,	TF,	sys_umount2,		"umount"	}, /* 4052 */
+	{ 2,	TF,	sys_umount2,		"umount2"	}, /* 4052 */
 	{ 0,	0,	sys_lock,		"lock"		}, /* 4053 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 4054 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"		}, /* 4055 */
@@ -90,7 +90,7 @@
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 4087 */
 	{ 4,	0,	sys_reboot,		"reboot"	}, /* 4088 */
 	{ 3,	TD,	sys_readdir,		"readdir"	}, /* 4089 */
-	{ 6,	TD|TM,	sys_mmap,		"old_mmap"	}, /* 4090 */
+	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 4090 */
 	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 4091 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 4092 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 4093 */
@@ -200,17 +200,17 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"},/* 4197 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,	"rt_sigqueueinfo"},/* 4198 */
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 4199 */
-	{ 6,	TD,	sys_pread,		"pread"		}, /* 4200 */
-	{ 6,	TD,	sys_pwrite,		"pwrite"	}, /* 4201 */
+	{ 6,	TD,	sys_pread,		"pread64"	}, /* 4200 */
+	{ 6,	TD,	sys_pwrite,		"pwrite64"	}, /* 4201 */
 	{ 3,	TF,	sys_chown,		"chown"		}, /* 4202 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 4203 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 4204 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 4205 */
-	{ 2,	TS,	sys_sigaltstack,	"sigaltstatck"	}, /* 4206 */
+	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 4206 */
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 4207 */
-	{ 0,	0,	NULL,			NULL		}, /* 4208 */
-	{ 0,	0,	NULL,			NULL		}, /* 4209 */
-	{ 6,	TD|TM,	sys_mmap_4koff,		"mmap"		}, /* 4210 */
+	{ 5,	TN,	printargs,		"getpmsg"	}, /* 4208 */
+	{ 5,	TN,	printargs,		"putpmsg"	}, /* 4209 */
+	{ 6,	TD|TM,	sys_mmap_4koff,		"mmap2"		}, /* 4210 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
 	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 4213 */
@@ -269,15 +269,15 @@
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 4266 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 4267 */
 	{ 4,	TM,	sys_mbind,		"mbind"		}, /* 4268 */
-	{ 0,	0,	NULL,			NULL		}, /* 4269 */
-	{ 0,	0,	NULL,			NULL		}, /* 4270 */
+	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 4269 */
+	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"	}, /* 4270 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 4271 */
 	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 4272 */
 	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 4273 */
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive"}, /* 4274 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 4275 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 4276 */
-	{ 0,	0,	NULL,			NULL		}, /* 4277 */
+	{ 5,	0,	sys_vserver,		"vserver"	}, /* 4277 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 4278 */
 	{ 0,	0,	NULL,			NULL		}, /* 4279 */
 	{ 5,	0,	sys_add_key,		"add_key"	}, /* 4280 */
@@ -293,7 +293,7 @@
 	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 4290 */
 	{ 5,	TD|TF,	sys_fchownat,		"fchownat"	}, /* 4291 */
 	{ 3,	TD|TF,	sys_futimesat,		"futimesat"	}, /* 4292 */
-	{ 4,	TD|TF,	sys_newfstatat,		"newfstatat"	}, /* 4293 */
+	{ 4,	TD|TF,	sys_newfstatat,		"fstatat64"	}, /* 4293 */
 	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"	}, /* 4294 */
 	{ 4,	TD|TF,	sys_renameat,		"renameat"	}, /* 4295 */
 	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 4296 */
@@ -372,7 +372,7 @@
 	{ 0,	0,	printargs,		"o32_lseek"		}, /* 4019 */
 	{ 0,	0,	printargs,		"o32_getpid"	}, /* 4020 */
 	{ 0,	0,	printargs,		"o32_mount"		}, /* 4021 */
-	{ 0,	0,	printargs,		"o32_oldumount"	}, /* 4022 */
+	{ 0,	0,	printargs,		"o32_umount"	}, /* 4022 */
 	{ 0,	0,	printargs,		"o32_setuid"	}, /* 4023 */
 	{ 0,	0,	printargs,		"o32_getuid"	}, /* 4024 */
 	{ 0,	0,	printargs,		"o32_stime"		}, /* 4025 */
@@ -402,7 +402,7 @@
 	{ 0,	0,	printargs,		"o32_geteuid"	}, /* 4049 */
 	{ 0,	0,	printargs,		"o32_getegid"	}, /* 4050 */
 	{ 0,	0,	printargs,		"o32_acct"		}, /* 4051 */
-	{ 0,	0,	printargs,		"o32_umount"	}, /* 4052 */
+	{ 0,	0,	printargs,		"o32_umount2"	}, /* 4052 */
 	{ 0,	0,	printargs,		"o32_lock"		}, /* 4053 */
 	{ 0,	0,	printargs,		"o32_ioctl"		}, /* 4054 */
 	{ 0,	0,	printargs,		"o32_fcntl"		}, /* 4055 */
@@ -440,7 +440,7 @@
 	{ 0,	0,	printargs,		"o32_swapon"	}, /* 4087 */
 	{ 0,	0,	printargs,		"o32_reboot"	}, /* 4088 */
 	{ 0,	0,	printargs,		"o32_readdir"	}, /* 4089 */
-	{ 0,	TD|TM,	printargs,		"o32_old_mmap"	}, /* 4090 */
+	{ 0,	TD|TM,	printargs,		"o32_mmap"	}, /* 4090 */
 	{ 0,	TM,	printargs,		"o32_munmap"	}, /* 4091 */
 	{ 0,	0,	printargs,		"o32_truncate"	}, /* 4092 */
 	{ 0,	0,	printargs,		"o32_ftruncate"	}, /* 4093 */
@@ -550,17 +550,17 @@
 	{ 0,	0,	printargs,		"o32_rt_sigtimedwait"},/* 4197 */
 	{ 0,	0,	printargs,		"o32_rt_sigqueueinfo"},/* 4198 */
 	{ 0,	0,	printargs,		"o32_rt_siguspend"	}, /* 4199 */
-	{ 0,	0,	printargs,		"o32_pread"		}, /* 4200 */
-	{ 0,	0,	printargs,		"o32_pwrite"	}, /* 4201 */
+	{ 0,	0,	printargs,		"o32_pread64"	}, /* 4200 */
+	{ 0,	0,	printargs,		"o32_pwrite64"	}, /* 4201 */
 	{ 0,	0,	printargs,		"o32_chown"		}, /* 4202 */
 	{ 0,	0,	printargs,		"o32_getcwd"	}, /* 4203 */
 	{ 0,	0,	printargs,		"o32_capget"	}, /* 4204 */
 	{ 0,	0,	printargs,		"o32_capset"	}, /* 4205 */
-	{ 0,	0,	printargs,		"o32_sigaltstatck"	}, /* 4206 */
+	{ 0,	0,	printargs,		"o32_sigaltstack"	}, /* 4206 */
 	{ 0,	0,	printargs,		"o32_sendfile"	}, /* 4207 */
-	{ 0,	0,	NULL,			NULL		}, /* 4208 */
-	{ 0,	0,	NULL,			NULL		}, /* 4209 */
-	{ 0,	TD|TM,	printargs,		"o32_mmap"		}, /* 4210 */
+	{ 5,	TN,	printargs,		"o32_getpmsg"	}, /* 4208 */
+	{ 5,	TN,	printargs,		"o32_putpmsg"	}, /* 4209 */
+	{ 6,	TD|TM,	printargs,		"o32_mmap2"	}, /* 4210 */
 	{ 0,	0,	printargs,		"o32_truncate64"	}, /* 4211 */
 	{ 0,	0,	printargs,		"o32_ftruncate64"	}, /* 4212 */
 	{ 0,	0,	printargs,		"o32_stat64"	}, /* 4213 */
@@ -619,15 +619,15 @@
 	{ 3,	TS,	printargs,		"o32_tgkill"	}, /* 4266 */
 	{ 2,	TF,	printargs,		"o32_utimes"	}, /* 4267 */
 	{ 4,	TM,	printargs,		"o32_mbind"		}, /* 4268 */
-	{ 0,	0,	printargs,		"o32_SYS_4269"	}, /* 4269 */
-	{ 0,	0,	printargs,		"o32_SYS_4270"	}, /* 4270 */
+	{ 5,	TM,	printargs,		"o32_get_mempolicy"	}, /* 4269 */
+	{ 3,	TM,	printargs,		"o32_set_mempolicy"	}, /* 4270 */
 	{ 4,	0,	printargs,		"o32_mq_open"	}, /* 4271 */
 	{ 1,	0,	printargs,		"o32_mq_unlink"	}, /* 4272 */
 	{ 5,	0,	printargs,		"o32_mq_timedsend"	}, /* 4273 */
 	{ 5,	0,	printargs,		"o32_mq_timedreceive"}, /* 4274 */
 	{ 2,	0,	printargs,		"o32_mq_notify"	}, /* 4275 */
 	{ 3,	0,	printargs,		"o32_mq_getsetattr"	}, /* 4276 */
-	{ 0,	0,	printargs,		"o32_SYS_4277"	}, /* 4277 */
+	{ 5,	0,	printargs,		"o32_vserver"	}, /* 4277 */
 	{ 5,	TP,	printargs,		"o32_waitid"	}, /* 4278 */
 	{ 0,	0,	printargs,		"o32_SYS_4279"	}, /* 4279 */
 	{ 5,	0,	printargs,		"o32_add_key"	}, /* 4280 */
@@ -643,7 +643,7 @@
 	{ 4,	TD|TF,	printargs,		"o32_mknodat"	}, /* 4290 */
 	{ 5,	TD|TF,	printargs,		"o32_fchownat"	}, /* 4291 */
 	{ 3,	TD|TF,	printargs,		"o32_futimesat"	}, /* 4292 */
-	{ 4,	TD|TF,	printargs,		"o32_newfstatat"	}, /* 4293 */
+	{ 4,	TD|TF,	printargs,		"o32_fstatat64"	}, /* 4293 */
 	{ 3,	TD|TF,	printargs,		"o32_unlinkat"	}, /* 4294 */
 	{ 4,	TD|TF,	printargs,		"o32_renameat"	}, /* 4295 */
 	{ 5,	TD|TF,	printargs,		"o32_linkat"	}, /* 4296 */
