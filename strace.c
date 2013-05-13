@@ -39,6 +39,9 @@
 #include <grp.h>
 #include <dirent.h>
 #include <sys/utsname.h>
+#ifdef HAVE_PRCTL
+# include <sys/prctl.h>
+#endif
 #if defined(IA64)
 # include <asm/ptrace_offsets.h>
 #endif
@@ -1133,6 +1136,11 @@ startup_child(char **argv)
 	 * It's hard to know when that happens, so we just leak it.
 	 */
 	params_for_tracee.pathname = NOMMU_SYSTEM ? strdup(pathname) : pathname;
+
+#if defined HAVE_PRCTL && defined PR_SET_PTRACER && defined PR_SET_PTRACER_ANY
+	if (daemonized_tracer)
+		prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY);
+#endif
 
 	strace_child = pid = fork();
 	if (pid < 0) {
