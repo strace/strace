@@ -74,7 +74,7 @@ unsigned int xflag = 0;
 bool need_fork_exec_workarounds = 0;
 bool debug_flag = 0;
 bool Tflag = 0;
-bool qflag = 0;
+unsigned int qflag = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
 static unsigned int syscall_trap_sig = SIGTRAP;
 static unsigned int tflag = 0;
@@ -1609,7 +1609,7 @@ init(int argc, char *argv[])
 			iflag = 1;
 			break;
 		case 'q':
-			qflag = 1;
+			qflag++;
 			break;
 		case 'r':
 			rflag = 1;
@@ -2112,7 +2112,8 @@ trace(void)
 		if (WIFEXITED(status)) {
 			if (pid == strace_child)
 				exit_code = WEXITSTATUS(status);
-			if (cflag != CFLAG_ONLY_STATS) {
+			if (cflag != CFLAG_ONLY_STATS &&
+			    qflag < 2) {
 				printleader(tcp);
 				tprintf("+++ exited with %d +++\n", WEXITSTATUS(status));
 				line_ended();
@@ -2221,17 +2222,19 @@ trace(void)
 # define PC_FORMAT_STR	""
 # define PC_FORMAT_ARG	/* nothing */
 #endif
-				printleader(tcp);
-				if (!stopped) {
-					tprintf("--- %s ", signame(sig));
-					printsiginfo(&si, verbose(tcp));
-					tprintf(PC_FORMAT_STR " ---\n"
-						PC_FORMAT_ARG);
-				} else
-					tprintf("--- stopped by %s" PC_FORMAT_STR " ---\n",
-						signame(sig)
-						PC_FORMAT_ARG);
-				line_ended();
+				if (qflag < 2) {
+					printleader(tcp);
+					if (!stopped) {
+						tprintf("--- %s ", signame(sig));
+						printsiginfo(&si, verbose(tcp));
+						tprintf(PC_FORMAT_STR " ---\n"
+							PC_FORMAT_ARG);
+					} else
+						tprintf("--- stopped by %s" PC_FORMAT_STR " ---\n",
+							signame(sig)
+							PC_FORMAT_ARG);
+					line_ended();
+				}
 			}
 
 			if (!stopped)
