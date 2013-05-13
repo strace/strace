@@ -259,6 +259,9 @@ static const struct xlat prctl_options[] = {
 #ifdef PR_SET_MM
 	{ PR_SET_MM,		"PR_SET_MM"		},
 #endif
+#ifdef PR_SET_PTRACER
+	{ PR_SET_PTRACER,	"PR_SET_PTRACER"	},
+#endif
 #ifdef PR_SET_CHILD_SUBREAPER
 	{ PR_SET_CHILD_SUBREAPER,	"PR_SET_CHILD_SUBREAPER"	},
 #endif
