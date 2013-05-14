@@ -1985,6 +1985,14 @@ trace_syscall_entering(struct tcb *tcp)
 		goto ret;
 	}
 
+	if (   sys_execve == tcp->s_ent->sys_func
+# if defined(SPARC) || defined(SPARC64)
+	    || sys_execv == tcp->s_ent->sys_func
+# endif
+	   ) {
+		hide_log_until_execve = 0;
+	}
+
 #if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
 	while (1) {
 # ifdef SYS_socket_subcall
@@ -2015,7 +2023,7 @@ trace_syscall_entering(struct tcb *tcp)
 
 	tcp->flags &= ~TCB_FILTERED;
 
-	if (cflag == CFLAG_ONLY_STATS) {
+	if (cflag == CFLAG_ONLY_STATS || hide_log_until_execve) {
 		res = 0;
 		goto ret;
 	}
@@ -2503,7 +2511,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		get_error(tcp); /* never fails */
 		if (need_fork_exec_workarounds)
 			syscall_fixup_for_fork_exec(tcp);
-		if (filtered(tcp))
+		if (filtered(tcp) || hide_log_until_execve)
 			goto ret;
 	}
 

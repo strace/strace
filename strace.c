@@ -124,7 +124,10 @@ bool not_failing_only = 0;
 bool show_fd_path = 0;
 
 static bool detach_on_execve = 0;
-static bool skip_startup_execve = 0;
+/* Are we "strace PROG" and need to skip detach on first execve? */
+static bool skip_one_b_execve = 0;
+/* Are we "strace PROG" and need to hide everything until execve? */
+bool hide_log_until_execve = 0;
 
 static int exit_code = 0;
 static int strace_child = 0;
@@ -1163,7 +1166,6 @@ startup_child(char **argv)
 					kill_save_errno(pid, SIGKILL);
 					perror_msg_and_die("Unexpected wait status %x", status);
 				}
-				skip_startup_execve = 1;
 			}
 			/* Else: NOMMU case, we have no way to sync.
 			 * Just attach to it as soon as possible.
@@ -1192,7 +1194,6 @@ startup_child(char **argv)
 		alloctcb(pid);
 		/* attaching will be done later, by startup_attach */
 		/* note: we don't do newoutf(tcp) here either! */
-		skip_startup_execve = 1;
 
 		/* NOMMU BUG! -D mode is active, we (child) return,
 		 * and we will scribble over parent's stack!
@@ -1788,6 +1789,8 @@ init(int argc, char *argv[])
 	 * in the startup_child() mode we kill the spawned process anyway.
 	 */
 	if (argv[0]) {
+		hide_log_until_execve = 1;
+		skip_one_b_execve = 1;
 		startup_child(argv);
 	}
 
@@ -2074,11 +2077,10 @@ trace(void)
 		}
  dont_switch_tcbs:
 
-		if (event == PTRACE_EVENT_EXEC && detach_on_execve) {
-			if (!skip_startup_execve)
-				detach(tcp);
-			/* This was initial execve for "strace PROG". Skip. */
-			skip_startup_execve = 0;
+		if (event == PTRACE_EVENT_EXEC) {
+			if (detach_on_execve && !skip_one_b_execve)
+				detach(tcp); /* do "-b execve" thingy */
+			skip_one_b_execve = 0;
 		}
 
 		/* Set current output file */
@@ -2222,7 +2224,7 @@ trace(void)
 # define PC_FORMAT_STR	""
 # define PC_FORMAT_ARG	/* nothing */
 #endif
-				if (qflag < 2) {
+				if (qflag < 2 && !hide_log_until_execve) {
 					printleader(tcp);
 					if (!stopped) {
 						tprintf("--- %s ", signame(sig));
