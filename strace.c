@@ -1797,7 +1797,8 @@ init(int argc, char *argv[])
 	 * in the startup_child() mode we kill the spawned process anyway.
 	 */
 	if (argv[0]) {
-		hide_log_until_execve = 1;
+		if (!NOMMU_SYSTEM || daemonized_tracer)
+			hide_log_until_execve = 1;
 		skip_one_b_execve = 1;
 		startup_child(argv);
 	}
