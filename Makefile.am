@@ -50,7 +50,7 @@ noinst_HEADERS = defs.h
 EXTRA_DIST =				\
 	$(man_MANS)			\
 	.version			\
-	COPYRIGHT			\
+	COPYING				\
 	CREDITS				\
 	ChangeLog			\
 	ChangeLog-CVS			\

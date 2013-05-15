@@ -1,7 +1,7 @@
 This is strace, a system call tracer for Linux.
 
 strace is released under a Berkeley-style license at the request
-of Paul Kranenburg; see the file COPYRIGHT for details.
+of Paul Kranenburg; see the file COPYING for details.
 
 See the file CREDITS for a list of authors and other contributors.
 

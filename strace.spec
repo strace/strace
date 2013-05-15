@@ -74,7 +74,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc CREDITS ChangeLog ChangeLog-CVS COPYRIGHT NEWS README
+%doc CREDITS ChangeLog ChangeLog-CVS COPYING NEWS README
 %{_bindir}/strace
 %{_bindir}/strace-log-merge
 %{_mandir}/man1/*
