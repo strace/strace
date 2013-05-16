@@ -103,200 +103,254 @@
 #define IPPROTO_MAX IPPROTO_MAX
 
 static const struct xlat domains[] = {
-#ifdef PF_AAL5
-	{ PF_AAL5,	"PF_AAL5"	},
-#endif
-#ifdef PF_APPLETALK
-	{ PF_APPLETALK,	"PF_APPLETALK"	},
-#endif
-#ifdef PF_ASH
-	{ PF_ASH,	"PF_ASH"	},
-#endif
-#ifdef PF_ATMPVC
-	{ PF_ATMPVC,	"PF_ATMPVC"	},
-#endif
-#ifdef PF_ATMSVC
-	{ PF_ATMSVC,	"PF_ATMSVC"	},
-#endif
-#ifdef PF_AX25
-	{ PF_AX25,	"PF_AX25"	},
-#endif
-#ifdef PF_BLUETOOTH
-	{ PF_BLUETOOTH,	"PF_BLUETOOTH"	},
-#endif
-#ifdef PF_BRIDGE
-	{ PF_BRIDGE,	"PF_BRIDGE"	},
-#endif
-#ifdef PF_DECnet
-	{ PF_DECnet,	"PF_DECnet"	},
-#endif
-#ifdef PF_DECNET
-	{ PF_DECNET,	"PF_DECNET"	},
-#endif
-#ifdef PF_ECONET
-	{ PF_ECONET,	"PF_ECONET"	},
-#endif
-#ifdef PF_FILE
-	{ PF_FILE,	"PF_FILE"	},
-#endif
-#ifdef PF_IMPLINK
-	{ PF_IMPLINK,	"PF_IMPLINK"	},
-#endif
-#ifdef PF_INET
-	{ PF_INET,	"PF_INET"	},
-#endif
-#ifdef PF_INET6
-	{ PF_INET6,	"PF_INET6"	},
-#endif
-#ifdef PF_IPX
-	{ PF_IPX,	"PF_IPX"	},
-#endif
-#ifdef PF_IRDA
-	{ PF_IRDA,	"PF_IRDA"	},
-#endif
-#ifdef PF_ISO
-	{ PF_ISO,	"PF_ISO"	},
-#endif
-#ifdef PF_KEY
-	{ PF_KEY,	"PF_KEY"	},
-#endif
-#ifdef PF_UNIX
-	{ PF_UNIX,	"PF_UNIX"	},
+#ifdef PF_UNSPEC
+	{ PF_UNSPEC,	"PF_UNSPEC"	},
 #endif
 #ifdef PF_LOCAL
 	{ PF_LOCAL,	"PF_LOCAL"	},
 #endif
-#ifdef PF_NETBEUI
-	{ PF_NETBEUI,	"PF_NETBEUI"	},
+#ifdef PF_UNIX
+	{ PF_UNIX,	"PF_UNIX"	},
 #endif
-#ifdef PF_NETLINK
-	{ PF_NETLINK,	"PF_NETLINK"	},
+#ifdef PF_INET
+	{ PF_INET,	"PF_INET"	},
+#endif
+#ifdef PF_AX25
+	{ PF_AX25,	"PF_AX25"	},
+#endif
+#ifdef PF_IPX
+	{ PF_IPX,	"PF_IPX"	},
+#endif
+#ifdef PF_APPLETALK
+	{ PF_APPLETALK,	"PF_APPLETALK"	},
 #endif
 #ifdef PF_NETROM
 	{ PF_NETROM,	"PF_NETROM"	},
 #endif
-#ifdef PF_PACKET
-	{ PF_PACKET,	"PF_PACKET"	},
+#ifdef PF_BRIDGE
+	{ PF_BRIDGE,	"PF_BRIDGE"	},
 #endif
-#ifdef PF_PPPOX
-	{ PF_PPPOX,	"PF_PPPOX"	},
-#endif
-#ifdef PF_ROSE
-	{ PF_ROSE,	"PF_ROSE"	},
-#endif
-#ifdef PF_ROUTE
-	{ PF_ROUTE,	"PF_ROUTE"	},
-#endif
-#ifdef PF_SECURITY
-	{ PF_SECURITY,	"PF_SECURITY"	},
-#endif
-#ifdef PF_SNA
-	{ PF_SNA,	"PF_SNA"	},
-#endif
-#ifdef PF_UNSPEC
-	{ PF_UNSPEC,	"PF_UNSPEC"	},
-#endif
-#ifdef PF_WANPIPE
-	{ PF_WANPIPE,	"PF_WANPIPE"	},
+#ifdef PF_ATMPVC
+	{ PF_ATMPVC,	"PF_ATMPVC"	},
 #endif
 #ifdef PF_X25
 	{ PF_X25,	"PF_X25"	},
 #endif
+#ifdef PF_INET6
+	{ PF_INET6,	"PF_INET6"	},
+#endif
+#ifdef PF_ROSE
+	{ PF_ROSE,	"PF_ROSE"	},
+#endif
+#ifdef PF_DECnet
+	{ PF_DECnet,	"PF_DECnet"	},
+#endif
+#ifdef PF_NETBEUI
+	{ PF_NETBEUI,	"PF_NETBEUI"	},
+#endif
+#ifdef PF_SECURITY
+	{ PF_SECURITY,	"PF_SECURITY"	},
+#endif
+#ifdef PF_KEY
+	{ PF_KEY,	"PF_KEY"	},
+#endif
+#ifdef PF_NETLINK
+	{ PF_NETLINK,	"PF_NETLINK"	},
+#endif
+#ifdef PF_ROUTE
+	{ PF_ROUTE,	"PF_ROUTE"	},
+#endif
+#ifdef PF_PACKET
+	{ PF_PACKET,	"PF_PACKET"	},
+#endif
+#ifdef PF_ASH
+	{ PF_ASH,	"PF_ASH"	},
+#endif
+#ifdef PF_ECONET
+	{ PF_ECONET,	"PF_ECONET"	},
+#endif
+#ifdef PF_ATMSVC
+	{ PF_ATMSVC,	"PF_ATMSVC"	},
+#endif
+#ifdef PF_RDS
+	{ PF_RDS,	"PF_RDS"	},
+#endif
+#ifdef PF_SNA
+	{ PF_SNA,	"PF_SNA"	},
+#endif
+#ifdef PF_IRDA
+	{ PF_IRDA,	"PF_IRDA"	},
+#endif
+#ifdef PF_PPPOX
+	{ PF_PPPOX,	"PF_PPPOX"	},
+#endif
+#ifdef PF_WANPIPE
+	{ PF_WANPIPE,	"PF_WANPIPE"	},
+#endif
+#ifdef PF_LLC
+	{ PF_LLC,	"PF_LLC"	},
+#endif
+#ifdef PF_CAN
+	{ PF_CAN,	"PF_CAN"	},
+#endif
+#ifdef PF_TIPC
+	{ PF_TIPC,	"PF_TIPC"	},
+#endif
+#ifdef PF_BLUETOOTH
+	{ PF_BLUETOOTH,	"PF_BLUETOOTH"	},
+#endif
+#ifdef PF_IUCV
+	{ PF_IUCV,	"PF_IUCV"	},
+#endif
+#ifdef PF_RXRPC
+	{ PF_RXRPC,	"PF_RXRPC"	},
+#endif
+#ifdef PF_ISDN
+	{ PF_ISDN,	"PF_ISDN"	},
+#endif
+#ifdef PF_PHONET
+	{ PF_PHONET,	"PF_PHONET"	},
+#endif
+#ifdef PF_IEEE802154
+	{ PF_IEEE802154,"PF_IEEE802154"	},
+#endif
+#ifdef PF_CAIF
+	{ PF_CAIF,	"PF_CAIF"	},
+#endif
+#ifdef PF_ALG
+	{ PF_ALG,	"PF_ALG"	},
+#endif
+#ifdef PF_NFC
+	{ PF_NFC,	"PF_NFC"	},
+#endif
+#ifdef PF_VSOCK
+	{ PF_VSOCK,	"PF_VSOCK"	},
+#endif
 	{ 0,		NULL		},
 };
 const struct xlat addrfams[] = {
-#ifdef AF_APPLETALK
-	{ AF_APPLETALK,	"AF_APPLETALK"	},
-#endif
-#ifdef AF_ASH
-	{ AF_ASH,	"AF_ASH"	},
-#endif
-#ifdef AF_ATMPVC
-	{ AF_ATMPVC,	"AF_ATMPVC"	},
-#endif
-#ifdef AF_ATMSVC
-	{ AF_ATMSVC,	"AF_ATMSVC"	},
-#endif
-#ifdef AF_AX25
-	{ AF_AX25,	"AF_AX25"	},
-#endif
-#ifdef AF_BLUETOOTH
-	{ AF_BLUETOOTH,	"AF_BLUETOOTH"	},
-#endif
-#ifdef AF_BRIDGE
-	{ AF_BRIDGE,	"AF_BRIDGE"	},
-#endif
-#ifdef AF_DECnet
-	{ AF_DECnet,	"AF_DECnet"	},
-#endif
-#ifdef AF_ECONET
-	{ AF_ECONET,	"AF_ECONET"	},
-#endif
-#ifdef AF_FILE
-	{ AF_FILE,	"AF_FILE"	},
-#endif
-#ifdef AF_IMPLINK
-	{ AF_IMPLINK,	"AF_IMPLINK"	},
-#endif
-#ifdef AF_INET
-	{ AF_INET,	"AF_INET"	},
-#endif
-#ifdef AF_INET6
-	{ AF_INET6,	"AF_INET6"	},
-#endif
-#ifdef AF_IPX
-	{ AF_IPX,	"AF_IPX"	},
-#endif
-#ifdef AF_IRDA
-	{ AF_IRDA,	"AF_IRDA"	},
-#endif
-#ifdef AF_ISO
-	{ AF_ISO,	"AF_ISO"	},
-#endif
-#ifdef AF_KEY
-	{ AF_KEY,	"AF_KEY"	},
-#endif
-#ifdef AF_UNIX
-	{ AF_UNIX,	"AF_UNIX"	},
+#ifdef AF_UNSPEC
+	{ AF_UNSPEC,	"AF_UNSPEC"	},
 #endif
 #ifdef AF_LOCAL
 	{ AF_LOCAL,	"AF_LOCAL"	},
 #endif
-#ifdef AF_NETBEUI
-	{ AF_NETBEUI,	"AF_NETBEUI"	},
+#ifdef AF_UNIX
+	{ AF_UNIX,	"AF_UNIX"	},
 #endif
-#ifdef AF_NETLINK
-	{ AF_NETLINK,	"AF_NETLINK"	},
+#ifdef AF_INET
+	{ AF_INET,	"AF_INET"	},
+#endif
+#ifdef AF_AX25
+	{ AF_AX25,	"AF_AX25"	},
+#endif
+#ifdef AF_IPX
+	{ AF_IPX,	"AF_IPX"	},
+#endif
+#ifdef AF_APPLETALK
+	{ AF_APPLETALK,	"AF_APPLETALK"	},
 #endif
 #ifdef AF_NETROM
 	{ AF_NETROM,	"AF_NETROM"	},
 #endif
-#ifdef AF_PACKET
-	{ AF_PACKET,	"AF_PACKET"	},
+#ifdef AF_BRIDGE
+	{ AF_BRIDGE,	"AF_BRIDGE"	},
 #endif
-#ifdef AF_PPPOX
-	{ AF_PPPOX,	"AF_PPPOX"	},
+#ifdef AF_ATMPVC
+	{ AF_ATMPVC,	"AF_ATMPVC"	},
+#endif
+#ifdef AF_X25
+	{ AF_X25,	"AF_X25"	},
+#endif
+#ifdef AF_INET6
+	{ AF_INET6,	"AF_INET6"	},
 #endif
 #ifdef AF_ROSE
 	{ AF_ROSE,	"AF_ROSE"	},
 #endif
-#ifdef AF_ROUTE
-	{ AF_ROUTE,	"AF_ROUTE"	},
+#ifdef AF_DECnet
+	{ AF_DECnet,	"AF_DECnet"	},
+#endif
+#ifdef AF_NETBEUI
+	{ AF_NETBEUI,	"AF_NETBEUI"	},
 #endif
 #ifdef AF_SECURITY
 	{ AF_SECURITY,	"AF_SECURITY"	},
 #endif
+#ifdef AF_KEY
+	{ AF_KEY,	"AF_KEY"	},
+#endif
+#ifdef AF_NETLINK
+	{ AF_NETLINK,	"AF_NETLINK"	},
+#endif
+#ifdef AF_ROUTE
+	{ AF_ROUTE,	"AF_ROUTE"	},
+#endif
+#ifdef AF_PACKET
+	{ AF_PACKET,	"AF_PACKET"	},
+#endif
+#ifdef AF_ASH
+	{ AF_ASH,	"AF_ASH"	},
+#endif
+#ifdef AF_ECONET
+	{ AF_ECONET,	"AF_ECONET"	},
+#endif
+#ifdef AF_ATMSVC
+	{ AF_ATMSVC,	"AF_ATMSVC"	},
+#endif
+#ifdef AF_RDS
+	{ AF_RDS,	"AF_RDS"	},
+#endif
 #ifdef AF_SNA
 	{ AF_SNA,	"AF_SNA"	},
 #endif
-#ifdef AF_UNSPEC
-	{ AF_UNSPEC,	"AF_UNSPEC"	},
+#ifdef AF_IRDA
+	{ AF_IRDA,	"AF_IRDA"	},
+#endif
+#ifdef AF_PPPOX
+	{ AF_PPPOX,	"AF_PPPOX"	},
 #endif
 #ifdef AF_WANPIPE
 	{ AF_WANPIPE,	"AF_WANPIPE"	},
 #endif
-#ifdef AF_X25
-	{ AF_X25,	"AF_X25"	},
+#ifdef AF_LLC
+	{ AF_LLC,	"AF_LLC"	},
+#endif
+#ifdef AF_CAN
+	{ AF_CAN,	"AF_CAN"	},
+#endif
+#ifdef AF_TIPC
+	{ AF_TIPC,	"AF_TIPC"	},
+#endif
+#ifdef AF_BLUETOOTH
+	{ AF_BLUETOOTH,	"AF_BLUETOOTH"	},
+#endif
+#ifdef AF_IUCV
+	{ AF_IUCV,	"AF_IUCV"	},
+#endif
+#ifdef AF_RXRPC
+	{ AF_RXRPC,	"AF_RXRPC"	},
+#endif
+#ifdef AF_ISDN
+	{ AF_ISDN,	"AF_ISDN"	},
+#endif
+#ifdef AF_PHONET
+	{ AF_PHONET,	"AF_PHONET"	},
+#endif
+#ifdef AF_IEEE802154
+	{ AF_IEEE802154,"AF_IEEE802154"	},
+#endif
+#ifdef AF_CAIF
+	{ AF_CAIF,	"AF_CAIF"	},
+#endif
+#ifdef AF_ALG
+	{ AF_ALG,	"AF_ALG"	},
+#endif
+#ifdef AF_NFC
+	{ AF_NFC,	"AF_NFC"	},
+#endif
+#ifdef AF_VSOCK
+	{ AF_VSOCK,	"AF_VSOCK"	},
 #endif
 	{ 0,		NULL		},
 };
@@ -527,17 +581,23 @@ static const struct xlat protocols[] = {
 };
 static const struct xlat msg_flags[] = {
 	{ MSG_OOB,		"MSG_OOB"		},
-#ifdef MSG_DONTROUTE
-	{ MSG_DONTROUTE,	"MSG_DONTROUTE"		},
-#endif
 #ifdef MSG_PEEK
 	{ MSG_PEEK,		"MSG_PEEK"		},
+#endif
+#ifdef MSG_DONTROUTE
+	{ MSG_DONTROUTE,	"MSG_DONTROUTE"		},
 #endif
 #ifdef MSG_CTRUNC
 	{ MSG_CTRUNC,		"MSG_CTRUNC"		},
 #endif
-#ifdef MSG_PROXY
-	{ MSG_PROXY,		"MSG_PROXY"		},
+#ifdef MSG_PROBE
+	{ MSG_PROBE,		"MSG_PROBE"		},
+#endif
+#ifdef MSG_TRUNC
+	{ MSG_TRUNC,		"MSG_TRUNC"		},
+#endif
+#ifdef MSG_DONTWAIT
+	{ MSG_DONTWAIT,		"MSG_DONTWAIT"		},
 #endif
 #ifdef MSG_EOR
 	{ MSG_EOR,		"MSG_EOR"		},
@@ -545,32 +605,20 @@ static const struct xlat msg_flags[] = {
 #ifdef MSG_WAITALL
 	{ MSG_WAITALL,		"MSG_WAITALL"		},
 #endif
-#ifdef MSG_TRUNC
-	{ MSG_TRUNC,		"MSG_TRUNC"		},
-#endif
-#ifdef MSG_CTRUNC
-	{ MSG_CTRUNC,		"MSG_CTRUNC"		},
-#endif
-#ifdef MSG_ERRQUEUE
-	{ MSG_ERRQUEUE,		"MSG_ERRQUEUE"		},
-#endif
-#ifdef MSG_DONTWAIT
-	{ MSG_DONTWAIT,		"MSG_DONTWAIT"		},
-#endif
-#ifdef MSG_CONFIRM
-	{ MSG_CONFIRM,		"MSG_CONFIRM"		},
-#endif
-#ifdef MSG_PROBE
-	{ MSG_PROBE,		"MSG_PROBE"		},
-#endif
 #ifdef MSG_FIN
 	{ MSG_FIN,		"MSG_FIN"		},
 #endif
 #ifdef MSG_SYN
 	{ MSG_SYN,		"MSG_SYN"		},
 #endif
+#ifdef MSG_CONFIRM
+	{ MSG_CONFIRM,		"MSG_CONFIRM"		},
+#endif
 #ifdef MSG_RST
 	{ MSG_RST,		"MSG_RST"		},
+#endif
+#ifdef MSG_ERRQUEUE
+	{ MSG_ERRQUEUE,		"MSG_ERRQUEUE"		},
 #endif
 #ifdef MSG_NOSIGNAL
 	{ MSG_NOSIGNAL,		"MSG_NOSIGNAL"		},
@@ -580,6 +628,12 @@ static const struct xlat msg_flags[] = {
 #endif
 #ifdef MSG_WAITFORONE
 	{ MSG_WAITFORONE,	"MSG_WAITFORONE"	},
+#endif
+#ifdef MSG_EOF
+	{ MSG_EOF,		"MSG_EOF"		},
+#endif
+#ifdef MSG_FASTOPEN
+	{ MSG_FASTOPEN,		"MSG_FASTOPEN"		},
 #endif
 #ifdef MSG_CMSG_CLOEXEC
 	{ MSG_CMSG_CLOEXEC,	"MSG_CMSG_CLOEXEC"	},
@@ -1072,56 +1126,71 @@ static const struct xlat socksctpoptions[] = {
 static const struct xlat socktcpoptions[] = {
 	{ TCP_NODELAY,		"TCP_NODELAY"	},
 	{ TCP_MAXSEG,		"TCP_MAXSEG"	},
-#if defined(TCP_CORK)
+#ifdef TCP_CORK
 	{ TCP_CORK,		"TCP_CORK"	},
 #endif
-#if defined(TCP_KEEPIDLE)
-	{ TCP_KEEPIDLE,		"TCP_KEEPIDLE" },
+#ifdef TCP_KEEPIDLE
+	{ TCP_KEEPIDLE,		"TCP_KEEPIDLE"	},
 #endif
-#if defined(TCP_KEEPINTVL)
-	{ TCP_KEEPINTVL,	"TCP_KEEPINTVL" },
+#ifdef TCP_KEEPINTVL
+	{ TCP_KEEPINTVL,	"TCP_KEEPINTVL"	},
 #endif
-#if defined(TCP_KEEPCNT)
-	{ TCP_KEEPCNT,		"TCP_KEEPCNT" },
+#ifdef TCP_KEEPCNT
+	{ TCP_KEEPCNT,		"TCP_KEEPCNT"	},
 #endif
-#if defined(TCP_NKEEP)
-	{ TCP_NKEEP,		"TCP_NKEEP"	},
+#ifdef TCP_SYNCNT
+	{ TCP_SYNCNT,		"TCP_SYNCNT"	},
 #endif
-#if defined(TCP_SYNCNT)
-	{ TCP_SYNCNT,		"TCP_SYNCNT" },
+#ifdef TCP_LINGER2
+	{ TCP_LINGER2,		"TCP_LINGER2"	},
 #endif
-#if defined(TCP_LINGER2)
-	{ TCP_LINGER2,		"TCP_LINGER2" },
+#ifdef TCP_DEFER_ACCEPT
+	{ TCP_DEFER_ACCEPT,	"TCP_DEFER_ACCEPT"	},
 #endif
-#if defined(TCP_DEFER_ACCEPT)
-	{ TCP_DEFER_ACCEPT,	"TCP_DEFER_ACCEPT" },
+#ifdef TCP_WINDOW_CLAMP
+	{ TCP_WINDOW_CLAMP,	"TCP_WINDOW_CLAMP"	},
 #endif
-#if defined(TCP_WINDOW_CLAMP)
-	{ TCP_WINDOW_CLAMP,	"TCP_WINDOW_CLAMP" },
+#ifdef TCP_INFO
+	{ TCP_INFO,		"TCP_INFO"	},
 #endif
-#if defined(TCP_INFO)
-	{ TCP_INFO,		"TCP_INFO" },
+#ifdef TCP_QUICKACK
+	{ TCP_QUICKACK,		"TCP_QUICKACK"	},
 #endif
-#if defined(TCP_QUICKACK)
-	{ TCP_QUICKACK,		"TCP_QUICKACK" },
+#ifdef TCP_CONGESTION
+	{ TCP_CONGESTION,	"TCP_CONGESTION"	},
 #endif
-#if defined(TCP_CONGESTION)
-	{ TCP_CONGESTION,	"TCP_CONGESTION" },
+#ifdef TCP_MD5SIG
+	{ TCP_MD5SIG,		"TCP_MD5SIG"	},
 #endif
-#if defined(TCP_MD5SIG)
-	{ TCP_MD5SIG,		"TCP_MD5SIG" },
+#ifdef TCP_COOKIE_TRANSACTIONS
+	{ TCP_COOKIE_TRANSACTIONS,	"TCP_COOKIE_TRANSACTIONS"	},
 #endif
-#if defined(TCP_COOKIE_TRANSACTIONS)
-	{ TCP_COOKIE_TRANSACTIONS,	"TCP_COOKIE_TRANSACTIONS" },
+#ifdef TCP_THIN_LINEAR_TIMEOUTS
+	{ TCP_THIN_LINEAR_TIMEOUTS,	"TCP_THIN_LINEAR_TIMEOUTS"	},
 #endif
-#if defined(TCP_THIN_LINEAR_TIMEOUTS)
-	{ TCP_THIN_LINEAR_TIMEOUTS,	"TCP_THIN_LINEAR_TIMEOUTS" },
+#ifdef TCP_THIN_DUPACK
+	{ TCP_THIN_DUPACK,	"TCP_THIN_DUPACK"	},
 #endif
-#if defined(TCP_THIN_DUPACK)
-	{ TCP_THIN_DUPACK,	"TCP_THIN_DUPACK" },
+#ifdef TCP_USER_TIMEOUT
+	{ TCP_USER_TIMEOUT,	"TCP_USER_TIMEOUT"	},
 #endif
-#if defined(TCP_USER_TIMEOUT)
-	{ TCP_USER_TIMEOUT,	"TCP_USER_TIMEOUT" },
+#ifdef TCP_REPAIR
+	{ TCP_REPAIR,		"TCP_REPAIR"	},
+#endif
+#ifdef TCP_REPAIR_QUEUE
+	{ TCP_REPAIR_QUEUE,	"TCP_REPAIR_QUEUE"	},
+#endif
+#ifdef TCP_QUEUE_SEQ
+	{ TCP_QUEUE_SEQ,	"TCP_QUEUE_SEQ"	},
+#endif
+#ifdef TCP_REPAIR_OPTIONS
+	{ TCP_REPAIR_OPTIONS,	"TCP_REPAIR_OPTIONS"	},
+#endif
+#ifdef TCP_FASTOPEN
+	{ TCP_FASTOPEN,		"TCP_FASTOPEN"	},
+#endif
+#ifdef TCP_TIMESTAMP
+	{ TCP_TIMESTAMP,	"TCP_TIMESTAMP"	},
 #endif
 	{ 0,			NULL		},
 };
