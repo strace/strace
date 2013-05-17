@@ -1,11 +1,12 @@
-strace (4.7-1) unstable; urgency=low
+strace (4.7-1) experimental; urgency=low
 
+  [ Dmitry V. Levin ]
   * New upstream version.
     + Fixed sockaddr_un.sun_path name in decoded output, closes: #554946
     + Avoid potential core file clobbering on exit, closes: #656398
     + Fixed a typo in documentation, closes: #653309
 
- -- Dmitry V. Levin <ldv@altlinux.org>  Wed, 02 May 2012 12:34:56 +0000
+ -- Frederik Schüler <fs@debian.org>  Tue, 12 Feb 2013 10:35:22 +0100
 
 strace (4.6-1) unstable; urgency=low
 
