@@ -1323,6 +1323,12 @@ static const struct xlat ptrace_setoptions_flags[] = {
 # ifdef PTRACE_O_TRACEEXIT
 	{ PTRACE_O_TRACEEXIT,	"PTRACE_O_TRACEEXIT"	},
 # endif
+# ifdef PTRACE_O_TRACESECCOMP
+	{ PTRACE_O_TRACESECCOMP,"PTRACE_O_TRACESECCOMP"	},
+# endif
+# ifdef PTRACE_O_EXITKILL
+	{ PTRACE_O_EXITKILL,	"PTRACE_O_EXITKILL"	},
+# endif
 	{ 0,			NULL			},
 };
 #endif /* PTRACE_SETOPTIONS */
