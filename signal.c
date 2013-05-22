@@ -971,7 +971,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigset_t sigm;
 
 		/* offset of ucontext in the kernel's sigframe structure */
-#		define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(struct siginfo)
+#		define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(siginfo_t)
 		if (umove(tcp, tile_regs.sp + SIGFRAME_UC_OFFSET, &uc) < 0)
 			return 0;
 		sigemptyset(&sigm);
