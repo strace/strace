@@ -2216,8 +2216,9 @@ trace(void)
  show_stopsig:
 #endif
 			if (cflag != CFLAG_ONLY_STATS
-			 && (qual_flags[sig] & QUAL_SIGNAL)
-			) {
+			    && !hide_log_until_execve
+			    && (qual_flags[sig] & QUAL_SIGNAL)
+			   ) {
 #if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
 				long pc = 0;
 				long psr = 0;
@@ -2233,19 +2234,17 @@ trace(void)
 # define PC_FORMAT_STR	""
 # define PC_FORMAT_ARG	/* nothing */
 #endif
-				if (qflag < 2 && !hide_log_until_execve) {
-					printleader(tcp);
-					if (!stopped) {
-						tprintf("--- %s ", signame(sig));
-						printsiginfo(&si, verbose(tcp));
-						tprintf(PC_FORMAT_STR " ---\n"
-							PC_FORMAT_ARG);
-					} else
-						tprintf("--- stopped by %s" PC_FORMAT_STR " ---\n",
-							signame(sig)
-							PC_FORMAT_ARG);
-					line_ended();
-				}
+				printleader(tcp);
+				if (!stopped) {
+					tprintf("--- %s ", signame(sig));
+					printsiginfo(&si, verbose(tcp));
+					tprintf(PC_FORMAT_STR " ---\n"
+						PC_FORMAT_ARG);
+				} else
+					tprintf("--- stopped by %s" PC_FORMAT_STR " ---\n",
+						signame(sig)
+						PC_FORMAT_ARG);
+				line_ended();
 			}
 
 			if (!stopped)
