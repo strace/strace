@@ -72,6 +72,12 @@ EXTRA_DIST =				\
 	debian/watch			\
 	errnoent.sh			\
 	ioctlsort.c			\
+	linux/aarch64/errnoent1.h	\
+	linux/aarch64/ioctlent.h.in	\
+	linux/aarch64/ioctlent1.h	\
+	linux/aarch64/signalent1.h	\
+	linux/aarch64/syscallent.h	\
+	linux/aarch64/syscallent1.h	\
 	linux/alpha/errnoent.h		\
 	linux/alpha/ioctlent.h.in	\
 	linux/alpha/signalent.h		\
@@ -99,6 +105,8 @@ EXTRA_DIST =				\
 	linux/ioctlsort.c		\
 	linux/m68k/ioctlent.h.in	\
 	linux/m68k/syscallent.h		\
+	linux/metag/ioctlent.h.in	\
+	linux/metag/syscallent.h	\
 	linux/microblaze/ioctlent.h.in	\
 	linux/microblaze/syscallent.h	\
 	linux/mips/errnoent.h		\
@@ -111,6 +119,8 @@ EXTRA_DIST =				\
 	linux/mips/syscallent-o32.h	\
 	linux/mips/syscallent.h		\
 	linux/mtd-abi.h			\
+	linux/or1k/ioctlent.h.in	\
+	linux/or1k/syscallent.h		\
 	linux/powerpc/errnoent1.h	\
 	linux/powerpc/ioctlent.h.in	\
 	linux/powerpc/ioctlent1.h	\
@@ -153,8 +163,12 @@ EXTRA_DIST =				\
 	linux/sparc64/syscallent2.h	\
 	linux/subcall.h			\
 	linux/syscall.h			\
+	linux/tile/errnoent1.h		\
 	linux/tile/ioctlent.h.in	\
+	linux/tile/ioctlent1.h		\
+	linux/tile/signalent1.h		\
 	linux/tile/syscallent.h		\
+	linux/tile/syscallent1.h	\
 	linux/ubi-user.h		\
 	linux/x32/errnoent.h		\
 	linux/x32/errnoent1.h		\
@@ -175,6 +189,8 @@ EXTRA_DIST =				\
 	linux/x86_64/syscallent.h	\
 	linux/x86_64/syscallent1.h	\
 	linux/x86_64/syscallent2.h	\
+	linux/xtensa/ioctlent.h.in	\
+	linux/xtensa/syscallent.h	\
 	signalent.sh			\
 	strace-graph			\
 	strace-log-merge		\
