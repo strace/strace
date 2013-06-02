@@ -155,6 +155,7 @@ EXTRA_DIST =				\
 	linux/syscall.h			\
 	linux/tile/ioctlent.h.in	\
 	linux/tile/syscallent.h		\
+	linux/ubi-user.h		\
 	linux/x32/errnoent.h		\
 	linux/x32/errnoent1.h		\
 	linux/x32/ioctlent.h.in		\
