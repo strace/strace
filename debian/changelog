@@ -1,3 +1,11 @@
+strace (4.8-1) experimental; urgency=low
+
+  * New upstream version.
+    + Added aarch64 support, closes: #693074
+    + Fixed kernel release string parsing, closes: #702309
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Mon, 03 Jun 2013 15:16:17 +0000
+
 strace (4.7-1) experimental; urgency=low
 
   [ Dmitry V. Levin ]

@@ -1,5 +1,54 @@
-Noteworthy changes in release ?.? (????-??-??)
+Noteworthy changes in release 4.8 (2013-06-03)
 ==============================================
+
+* Changes in behavior
+  * In case of normal strace termination, when the trace output is
+    redirected to a pipe, strace now closes it and waits for the pipe
+    process termination before exit.
+
+* Improvements
+  * Implemented tracing using PTRACE_SEIZE API (when available).
+  * Implemented more reliable PTRACE_GETREGSET-based process personality
+    detection on x86-64 and x32 (when available).
+  * Added -e trace=memory option for tracing memory mapping related syscalls.
+  * Documented -b option.
+  * Allowed exit status messages to be suppressed by giving -q option twice.
+  * Added AArch64 architecture support
+    (addresses Debian bug #693074 and Fedora bug #969858).
+  * Added support for OpenRISC 1000, Meta, and Xtensa architectures.
+  * Added tilegx personality support for Tile.
+  * Enhanced support of NOMMU architectures.
+  * Enhanced decoding of getdents, mmap, perf_event_open, ptrace, and
+    quotactl syscalls.
+  * Added new syscall entries to match Linux 3.9.
+  * Updated the list of errno constants.
+  * Updated lists of AF_*, MADV_*, MAP_*, MSG_*, MS_*, PF_*, PR_*,
+    PTRACE_O_*, and TCP_* constants.
+  * Implemented decoding of UBI ioctls.
+  * Removed redundant "*32" ioctl names.
+
+* Bug fixes
+  * Fixed ERESTARTNOINTR leaking to userspace on ancient kernels
+    (addresses Fedora bug #659382).
+  * Fixed kernel release string parsing
+    (addresses Debian bug #702309).
+  * Fixed decoding of *xattr syscalls
+    (addresses Fedora bug #885233).
+  * Fixed handling of files with 64-bit inode numbers by 32-bit strace
+    (addresses Fedora bug #912790).
+  * Fixed tracing forks on SPARC.
+  * Fixed decoding of fadvise64, fallocate, ftruncate64, io_submit, pread,
+    preadv, pwrite, pwritev, readahead, sigaltstack, sync_file_range, sysctl,
+    and truncate64 syscalls.
+  * Fixed categories of multiple syscalls on most of supported architectures.
+  * Fixed decoding of non-native 32-bit personality recv[m]msg syscalls.
+  * Fixed decoding of multiple 32-bit personality syscalls on x32.
+  * Fixed decoding of long long syscall arguments on ARM, MIPS/o32, PowerPC,
+    S390x, and Tile architectures.
+  * Fixed semtimedop decoding on S390x.
+  * Fixed sram_alloc decoding on Blackfin.
+  * Fixed build when process_vm_readv is a stab.
+  * Fixed build with older versions of libaio.h.
 
 Noteworthy changes in release 4.7 (2012-05-02)
 ==============================================
