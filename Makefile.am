@@ -253,6 +253,7 @@ export TAR_OPTIONS = --owner=0 --group=0 --numeric-owner --mode=go-w,go+rX
 
 IOCTLDIR = /usr/include
 IOCTLASM = asm
+IOCTLSORT_INCLUDEDIR = $(IOCTLDIR)
 
 ioctlent_h_in = linux/ioctlent.h.in
 
@@ -261,7 +262,8 @@ BUILT_SOURCES += $(ioctlent_h_in)
 $(srcdir)/$(ioctlent_h_in): ioctlsort
 	$(<D)/$(<F) > $@
 ioctlsort: $(srcdir)/linux/ioctlsort.c ioctls.h ioctldefs.h
-	$(filter-out -I%,$(LINK.c)) -I. -I$(IOCTLDIR) $(filter -I%,$(LINK.c)) \
+	$(filter-out -I%,$(LINK.c)) -I. -I$(IOCTLSORT_INCLUDEDIR) \
+	$(filter -I%,$(LINK.c)) \
 	  -o $@ $<
 ioctls.h: $(srcdir)/linux/ioctlent.sh
 	$(SHELL) $< $(IOCTLDIR) $(IOCTLASM)

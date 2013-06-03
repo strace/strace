@@ -21,6 +21,7 @@ Noteworthy changes in release 4.8 (2013-06-03)
   * Enhanced decoding of getdents, mmap, perf_event_open, ptrace, and
     quotactl syscalls.
   * Added new syscall entries to match Linux 3.9.
+  * Regenerated the list of common ioctl names from Linux 3.9.
   * Updated the list of errno constants.
   * Updated lists of AF_*, MADV_*, MAP_*, MSG_*, MS_*, PF_*, PR_*,
     PTRACE_O_*, and TCP_* constants.
