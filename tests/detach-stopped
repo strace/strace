@@ -14,7 +14,7 @@ set -e
 while ! [ -s set_ptracer_any.out ]; do
 	kill -0 $! 2> /dev/null ||
 		fail_ 'set_ptracer_any sleep failed'
-	sleep 1
+	$SLEEP_A_BIT
 done
 rm -f set_ptracer_any.out
 
@@ -34,13 +34,13 @@ $STRACE -p $tracee_pid 2> $LOG &
 while ! grep -F "Process $tracee_pid attached" $LOG > /dev/null; do
 	kill -0 $! 2> /dev/null ||
 		{ cat $LOG; cleanup; fail_ 'strace -p does not work'; }
-	sleep 1
+	$SLEEP_A_BIT
 done
 
 while ! grep -F -e '--- stopped by ' $LOG > /dev/null; do
 	kill -0 $! 2> /dev/null ||
 		{ cat $LOG; cleanup; fail_ 'strace -p does not work'; }
-	sleep 1
+	$SLEEP_A_BIT
 done
 
 kill -INT $!

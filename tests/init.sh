@@ -19,3 +19,4 @@ check_prog()
 
 : "${STRACE:=../strace}"
 : "${TIMEOUT_DURATION:=60}"
+: "${SLEEP_A_BIT:=sleep 1}"
