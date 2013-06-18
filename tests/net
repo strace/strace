@@ -4,18 +4,16 @@
 
 . "${srcdir=.}/init.sh"
 
-check_strace
-check_timeout
 check_prog grep
 check_prog rm
 
 rm -f $LOG.*
 
-$TIMEOUT ./net-accept-connect ||
+./net-accept-connect ||
 	fail_ 'net-accept-connect failed'
 
 args="-tt -ff -o $LOG -enetwork ./net-accept-connect"
-$TIMEOUT $STRACE $args ||
+$STRACE $args ||
 	fail_ "strace $args failed"
 
 "$srcdir"/../strace-log-merge $LOG > $LOG || {

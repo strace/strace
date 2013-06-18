@@ -17,17 +17,5 @@ check_prog()
 		framework_skip_ "$* is not available"
 }
 
-check_strace()
-{
-	STRACE=${*:-../strace}
-	$STRACE -V > /dev/null ||
-		framework_failure_ "$STRACE is not available"
-}
-
-timeout_duration=60
-check_timeout()
-{
-	TIMEOUT="timeout -s 9 $timeout_duration"
-	$TIMEOUT true > /dev/null 2>&1 ||
-		TIMEOUT=
-}
+: "${STRACE:=../strace}"
+: "${TIMEOUT_DURATION:=60}"

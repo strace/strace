@@ -4,10 +4,8 @@
 
 . "${srcdir=.}/init.sh"
 
-check_strace
-check_timeout
 time=/usr/bin/time
 check_prog $time
 
-$TIMEOUT $STRACE -f $time /bin/ls > $LOG 2>&1 ||
+$STRACE -f $time /bin/ls > $LOG 2>&1 ||
 	{ cat $LOG; fail_ 'strace -f does not work'; }

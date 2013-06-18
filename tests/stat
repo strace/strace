@@ -4,8 +4,6 @@
 
 . "${srcdir=.}/init.sh"
 
-check_strace
-check_timeout
 check_prog dd
 check_prog find
 check_prog grep
@@ -17,18 +15,18 @@ $truncate_cmd > $LOG 2>&1 ||
 	{ cat $LOG; framework_skip_ 'failed to create a large sparse file'; }
 rm -f sample
 
-$TIMEOUT $STRACE -edesc $truncate_cmd 2>&1 > /dev/null 2> $LOG &&
+$STRACE -edesc $truncate_cmd 2>&1 > /dev/null 2> $LOG &&
 LC_ALL=C grep -E -x 'ftruncate(64)?\(1, 46118400000\) += 0' $LOG > /dev/null ||
 	{ cat $LOG; fail_ 'strace -edesc failed to trace ftruncate/ftruncate64 properly'; }
 
 LC_ALL=C grep -E -x 'lseek\(1, 46118400000, SEEK_CUR\) += 46118400000|_llseek\(1, 46118400000, \[46118400000\], SEEK_CUR\) += 0' $LOG > /dev/null ||
 	{ cat $LOG; fail_ 'strace -edesc failed to trace lseek/_llseek properly'; }
 
-$TIMEOUT $STRACE -efile find -L sample > /dev/null 2> $LOG &&
+$STRACE -efile find -L sample > /dev/null 2> $LOG &&
 LC_ALL=C grep -E -x 'stat(64)?\("sample", \{st_mode=S_IFREG\|0644, st_size=46118400000, \.\.\.\}\) += 0|(new)?fstatat(64)?\(AT_FDCWD, "sample", \{st_mode=S_IFREG\|0644, st_size=46118400000, \.\.\.\}, 0\) += 0' $LOG > /dev/null ||
 	{ cat $LOG; fail_ 'strace -efile failed to trace stat/stat64 properly'; }
 
-$TIMEOUT $STRACE -efile find sample > /dev/null 2> $LOG &&
+$STRACE -efile find sample > /dev/null 2> $LOG &&
 LC_ALL=C grep -E -x 'lstat(64)?\("sample", \{st_mode=S_IFREG\|0644, st_size=46118400000, \.\.\.\}\) += 0|(new)?fstatat(64)?\(AT_FDCWD, "sample", \{st_mode=S_IFREG\|0644, st_size=46118400000, \.\.\.\}, AT_SYMLINK_NOFOLLOW\) += 0' $LOG > /dev/null ||
 	{ cat $LOG; fail_ 'strace -efile failed to trace fstatat/fstatat64 properly'; }
 

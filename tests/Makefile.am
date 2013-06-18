@@ -6,6 +6,8 @@ check_PROGRAMS = net-accept-connect
 
 TESTS = ptrace_setoptions strace-f qual_syscall stat net
 
-EXTRA_DIST = init.sh $(TESTS)
+LOG_COMPILER = $(srcdir)/run.sh
+
+EXTRA_DIST = init.sh run.sh $(TESTS)
 
 CLEANFILES = $(TESTS:=.tmp)
