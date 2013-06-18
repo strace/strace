@@ -1,4 +1,5 @@
 net-accept-connect
+set_ptracer_any
 *.log
 *.log.*
 *.o

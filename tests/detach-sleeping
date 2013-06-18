@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Ensure that strace can detach from sleeping processes.
+
+. "${srcdir=.}/init.sh"
+
+check_prog sleep
+check_prog grep
+
+set -e
+
+./set_ptracer_any sleep $((2*$TIMEOUT_DURATION)) > set_ptracer_any.out &
+
+while ! [ -s set_ptracer_any.out ]; do
+	kill -0 $! 2> /dev/null ||
+		fail_ 'set_ptracer_any sleep failed'
+	sleep 1
+done
+rm -f set_ptracer_any.out
+
+tracee_pid=$!
+
+cleanup()
+{
+	set +e
+	kill $tracee_pid
+	kill -CONT $tracee_pid
+	wait $tracee_pid 2> /dev/null
+}
+
+$STRACE -p $tracee_pid 2> $LOG &
+
+while ! grep -F "Process $tracee_pid attached" $LOG > /dev/null; do
+	kill -0 $! 2> /dev/null ||
+		{ cat $LOG; cleanup; fail_ 'strace -p does not work'; }
+	sleep 1
+done
+
+kill -INT $!
+wait $!
+
+grep -F "Process $tracee_pid detached" $LOG > /dev/null ||
+	{ cat $LOG; cleanup; fail_ 'strace -p failed to detach'; }
+
+cleanup
+exit 0
