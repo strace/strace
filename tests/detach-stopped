@@ -9,14 +9,14 @@ check_prog grep
 
 set -e
 
-./set_ptracer_any sleep $((2*$TIMEOUT_DURATION)) > set_ptracer_any.out &
+rm -f $LOG
+./set_ptracer_any sleep $((2*$TIMEOUT_DURATION)) > $LOG &
 
-while ! [ -s set_ptracer_any.out ]; do
+while ! [ -s $LOG ]; do
 	kill -0 $! 2> /dev/null ||
 		fail_ 'set_ptracer_any sleep failed'
 	$SLEEP_A_BIT
 done
-rm -f set_ptracer_any.out
 
 tracee_pid=$!
 kill -STOP $tracee_pid
@@ -29,6 +29,7 @@ cleanup()
 	wait $tracee_pid 2> /dev/null
 }
 
+rm -f $LOG
 $STRACE -p $tracee_pid 2> $LOG &
 
 while ! grep -F "Process $tracee_pid attached" $LOG > /dev/null; do
