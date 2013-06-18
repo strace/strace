@@ -724,7 +724,7 @@ droptcb(struct tcb *tcp)
 	memset(tcp, 0, sizeof(*tcp));
 }
 
-/* detach traced process; continue with sig
+/* Detach traced process.
  * Never call DETACH twice on the same process as both unattached and
  * attached-unstopped processes give the same ESRCH.  For unattached process we
  * would SIGSTOP it and wait for its SIGSTOP notification forever.
@@ -2252,7 +2252,6 @@ trace(void)
 				goto restart_tracee;
 
 			/* It's group-stop */
-#if USE_SEIZE
 			if (use_seize) {
 				/*
 				 * This ends ptrace-stop, but does *not* end group-stop.
@@ -2266,7 +2265,6 @@ trace(void)
 				continue;
 			}
 			/* We don't have PTRACE_LISTEN support... */
-#endif
 			goto restart_tracee;
 		}
 

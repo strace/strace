@@ -227,16 +227,14 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
 
-#if USE_SEIZE
-# undef PTRACE_SEIZE
-# define PTRACE_SEIZE		0x4206
-# undef PTRACE_INTERRUPT
-# define PTRACE_INTERRUPT	0x4207
-# undef PTRACE_LISTEN
-# define PTRACE_LISTEN		0x4208
-# undef PTRACE_EVENT_STOP
-# define PTRACE_EVENT_STOP	128
-#endif
+#undef PTRACE_SEIZE
+#define PTRACE_SEIZE		0x4206
+#undef PTRACE_INTERRUPT
+#define PTRACE_INTERRUPT	0x4207
+#undef PTRACE_LISTEN
+#define PTRACE_LISTEN		0x4208
+#undef PTRACE_EVENT_STOP
+#define PTRACE_EVENT_STOP	128
 
 #ifdef ALPHA
 # define REG_R0 0
