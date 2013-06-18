@@ -8,4 +8,4 @@ TESTS = ptrace_setoptions strace-f qual_syscall stat net
 
 EXTRA_DIST = init.sh $(TESTS)
 
-CLEANFILES = check.log
+CLEANFILES = $(TESTS:=.tmp)

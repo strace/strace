@@ -2,6 +2,9 @@
 
 ME_="${0##*/}"
 
+LOG="$ME_.tmp"
+rm -f "$LOG"
+
 warn_() { printf >&2 '%s\n' "$*"; }
 fail_() { warn_ "$ME_: failed test: $*"; exit 1; }
 skip_() { warn_ "$ME_: skipped test: $*"; exit 77; }

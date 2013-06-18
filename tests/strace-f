@@ -9,5 +9,5 @@ check_timeout
 time=/usr/bin/time
 check_prog $time
 
-$TIMEOUT $STRACE -f $time /bin/ls > check.log 2>&1 ||
-	{ cat check.log; fail_ 'strace -f does not work'; }
+$TIMEOUT $STRACE -f $time /bin/ls > $LOG 2>&1 ||
+	{ cat $LOG; fail_ 'strace -f does not work'; }
