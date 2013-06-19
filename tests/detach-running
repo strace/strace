@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Ensure that strace can detach from running processes.
+
+. "${srcdir=.}/init.sh"
+
+check_prog sleep
+check_prog grep
+
+set -e
+
+./set_ptracer_any sh -c "echo > $LOG; while :; do :; done" > /dev/null &
+
+while ! [ -s $LOG ]; do
+	kill -0 $! 2> /dev/null ||
+		fail_ 'set_ptracer_any sh failed'
+	$SLEEP_A_BIT
+done
+
+tracee_pid=$!
+
+cleanup()
+{
+	set +e
+	kill $tracee_pid
+	wait $tracee_pid 2> /dev/null
+}
+
+rm -f $LOG
+$STRACE -p $tracee_pid 2> $LOG &
+
+while ! grep -F "Process $tracee_pid attached" $LOG > /dev/null; do
+	kill -0 $! 2> /dev/null ||
+		{ cat $LOG; cleanup; fail_ 'strace -p does not work'; }
+	$SLEEP_A_BIT
+done
+
+kill -INT $!
+wait $!
+
+grep -F "Process $tracee_pid detached" $LOG > /dev/null ||
+	{ cat $LOG; cleanup; fail_ 'strace -p failed to detach'; }
+
+cleanup
+exit 0
