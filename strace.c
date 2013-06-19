@@ -733,7 +733,7 @@ static int
 detach(struct tcb *tcp)
 {
 	int error;
-	int status, sigstop_expected;
+	int status, sigstop_expected, interrupt_done;
 
 	if (tcp->flags & TCB_BPTSET)
 		clearbpt(tcp);
@@ -750,6 +750,7 @@ detach(struct tcb *tcp)
 
 	error = 0;
 	sigstop_expected = 0;
+	interrupt_done = 0;
 	if (tcp->flags & TCB_ATTACHED) {
 		/*
 		 * We attached but possibly didn't see the expected SIGSTOP.
@@ -757,7 +758,7 @@ detach(struct tcb *tcp)
 		 * would be left stopped (process state T).
 		 */
 		sigstop_expected = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
-		error = ptrace(PTRACE_DETACH, tcp->pid, (char *) 1, 0);
+		error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
 		if (error == 0) {
 			/* On a clear day, you can see forever. */
 		}
@@ -765,20 +766,46 @@ detach(struct tcb *tcp)
 			/* Shouldn't happen. */
 			perror_msg("detach: ptrace(PTRACE_DETACH, ...)");
 		}
-		else if (my_tkill(tcp->pid, 0) < 0) {
+		else
+		/* ESRCH: process is either not stopped or doesn't exist. */
+		if (my_tkill(tcp->pid, 0) < 0) {
 			if (errno != ESRCH)
+				/* Shouldn't happen. */
 				perror_msg("detach: checking sanity");
-		}
-		else if (!sigstop_expected && my_tkill(tcp->pid, SIGSTOP) < 0) {
-			if (errno != ESRCH)
-				perror_msg("detach: stopping child");
+			/* else: process doesn't exist. */
 		}
 		else
-			sigstop_expected = 1;
+		/* Process is not stopped. */
+		if (!sigstop_expected) {
+			/* We need to stop it. */
+			if (use_seize) {
+				/*
+				 * With SEIZE, tracee can be in group-stop already.
+				 * In this state sending it another SIGSTOP does nothing.
+				 * Need to use INTERRUPT.
+				 * Testcase: trying to ^C a "strace -p <stopped_process>".
+				 */
+				error = ptrace(PTRACE_INTERRUPT, tcp->pid, 0, 0);
+				if (!error)
+					interrupt_done = 1;
+			}
+			else {
+				error = my_tkill(tcp->pid, SIGSTOP);
+				if (!error)
+					sigstop_expected = 1;
+			}
+			if (error && errno != ESRCH) {
+				if (use_seize)
+					perror_msg("detach: ptrace(PTRACE_INTERRUPT, ...)");
+				else
+					perror_msg("detach: stopping child");
+			}
+		}
 	}
 
-	if (sigstop_expected) {
+	if (sigstop_expected || interrupt_done) {
 		for (;;) {
+			int sig;
 #ifdef __WALL
 			if (waitpid(tcp->pid, &status, __WALL) < 0) {
 				if (errno == ECHILD) /* Already gone.  */
@@ -810,13 +837,49 @@ detach(struct tcb *tcp)
 				/* Au revoir, mon ami. */
 				break;
 			}
-			if (WSTOPSIG(status) == SIGSTOP) {
+			sig = WSTOPSIG(status);
+			if (debug_flag)
+				fprintf(stderr, "detach wait: event:%d sig:%d\n",
+						(unsigned)status >> 16, sig);
+			if (sigstop_expected && sig == SIGSTOP) {
+				/* Detach, suppressing SIGSTOP */
 				ptrace_restart(PTRACE_DETACH, tcp, 0);
 				break;
 			}
-			error = ptrace_restart(PTRACE_CONT, tcp,
-					WSTOPSIG(status) == syscall_trap_sig ? 0
-					: WSTOPSIG(status));
+			if (interrupt_done) {
+				unsigned event = (unsigned)status >> 16;
+				if (event == PTRACE_EVENT_STOP /*&& sig == SIGTRAP*/) {
+					/*
+					 * sig == SIGTRAP: PTRACE_INTERRUPT stop.
+					 * sig == other: process was already stopped
+					 * with this stopping sig (see tests/detach-stopped).
+					 * Looks like re-injecting this sig is not necessary
+					 * in DETACH for the tracee to remain stopped.
+					 */
+					sig = 0;
+				}
+				/*
+				 * PTRACE_INTERRUPT is not guaranteed to produce
+				 * the above event if other ptrace-stop is pending.
+				 * See tests/detach-sleeping testcase:
+				 * strace got SIGINT while tracee is sleeping.
+				 * We sent PTRACE_INTERRUPT.
+				 * We see syscall exit, not PTRACE_INTERRUPT stop.
+				 * We won't get PTRACE_INTERRUPT stop
+				 * if we would CONT now. Need to DETACH.
+				 */
+				if (sig == syscall_trap_sig)
+					sig = 0;
+				/* else: not sure in which case we can be here.
+				 * Signal stop? Inject it while detaching.
+				 */
+				ptrace_restart(PTRACE_DETACH, tcp, sig);
+				break;
+			}
+			if (sig == syscall_trap_sig)
+				sig = 0;
+			/* Can't detach just yet, may need to wait for SIGSTOP */
+			error = ptrace_restart(PTRACE_CONT, tcp, sig);
 			if (error < 0)
 				break;
 		}
