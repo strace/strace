@@ -42,5 +42,15 @@ wait $!
 grep -F "Process $tracee_pid detached" $LOG > /dev/null ||
 	{ cat $LOG; cleanup; fail_ 'strace -p failed to detach'; }
 
+$SLEEP_A_BIT
+test -d /proc/$tracee_pid ||
+	{ cat $LOG; cleanup; fail_ 'tracee died after detach'; }
+grep '^State:.*S (sleeping)' </proc/$tracee_pid/status > /dev/null ||
+	{ cat $LOG
+	grep '^State:' </proc/$tracee_pid/status
+	cleanup
+	fail_ 'tracee is not sleeping after detach'
+	}
+
 cleanup
 exit 0
