@@ -157,7 +157,7 @@ static const char *progname;
 
 unsigned os_release; /* generated from uname()'s u.release */
 
-static int detach(struct tcb *tcp);
+static void detach(struct tcb *tcp);
 static int trace(void);
 static void cleanup(void);
 static void interrupt(int sig);
@@ -729,7 +729,7 @@ droptcb(struct tcb *tcp)
  * attached-unstopped processes give the same ESRCH.  For unattached process we
  * would SIGSTOP it and wait for its SIGSTOP notification forever.
  */
-static int
+static void
 detach(struct tcb *tcp)
 {
 	int error;
@@ -764,14 +764,14 @@ detach(struct tcb *tcp)
 		}
 		else if (errno != ESRCH) {
 			/* Shouldn't happen. */
-			perror_msg("detach: ptrace(PTRACE_DETACH, ...)");
+			perror_msg("detach: ptrace(%u,PTRACE_DETACH)", tcp->pid);
 		}
 		else
 		/* ESRCH: process is either not stopped or doesn't exist. */
 		if (my_tkill(tcp->pid, 0) < 0) {
 			if (errno != ESRCH)
 				/* Shouldn't happen. */
-				perror_msg("detach: checking sanity");
+				perror_msg("detach: tkill(%u,0)", tcp->pid);
 			/* else: process doesn't exist. */
 		}
 		else
@@ -788,17 +788,15 @@ detach(struct tcb *tcp)
 				error = ptrace(PTRACE_INTERRUPT, tcp->pid, 0, 0);
 				if (!error)
 					interrupt_done = 1;
+				else if (errno != ESRCH)
+					perror_msg("detach: ptrace(%u,PTRACE_INTERRUPT)", tcp->pid);
 			}
 			else {
 				error = my_tkill(tcp->pid, SIGSTOP);
 				if (!error)
 					sigstop_expected = 1;
-			}
-			if (error && errno != ESRCH) {
-				if (use_seize)
-					perror_msg("detach: ptrace(PTRACE_INTERRUPT, ...)");
-				else
-					perror_msg("detach: stopping child");
+				else if (errno != ESRCH)
+					perror_msg("detach: tkill(%u,SIGSTOP)", tcp->pid);
 			}
 		}
 	}
@@ -811,7 +809,7 @@ detach(struct tcb *tcp)
 					continue;
 				if (errno == ECHILD) /* Already gone.  */
 					break;
-				perror_msg("detach: waiting");
+				perror_msg("detach: waitpid(%u)", tcp->pid);
 				break;
 			}
 			if (!WIFSTOPPED(status)) {
@@ -870,8 +868,6 @@ detach(struct tcb *tcp)
 		fprintf(stderr, "Process %u detached\n", tcp->pid);
 
 	droptcb(tcp);
-
-	return error;
 }
 
 static void
