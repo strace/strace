@@ -764,7 +764,7 @@ detach(struct tcb *tcp)
 		}
 		else if (errno != ESRCH) {
 			/* Shouldn't happen. */
-			perror_msg("detach: ptrace(%u,PTRACE_DETACH)", tcp->pid);
+			perror_msg("detach: ptrace(PTRACE_DETACH,%u)", tcp->pid);
 		}
 		else
 		/* ESRCH: process is either not stopped or doesn't exist. */
@@ -789,7 +789,7 @@ detach(struct tcb *tcp)
 				if (!error)
 					interrupt_done = 1;
 				else if (errno != ESRCH)
-					perror_msg("detach: ptrace(%u,PTRACE_INTERRUPT)", tcp->pid);
+					perror_msg("detach: ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
 			}
 			else {
 				error = my_tkill(tcp->pid, SIGSTOP);
@@ -807,13 +807,25 @@ detach(struct tcb *tcp)
 			if (waitpid(tcp->pid, &status, __WALL) < 0) {
 				if (errno == EINTR)
 					continue;
-				if (errno == ECHILD) /* Already gone.  */
-					break;
+				/*
+				 * if (errno == ECHILD) break;
+				 * ^^^  WRONG! We expect this PID to exist,
+				 * and want to emit a message otherwise:
+				 */
 				perror_msg("detach: waitpid(%u)", tcp->pid);
 				break;
 			}
 			if (!WIFSTOPPED(status)) {
-				/* Au revoir, mon ami. */
+				/*
+				 * Tracee exited or was killed by signal.
+				 * We shouldn't normally reach this place:
+				 * we don't want to consume exit status.
+				 * Consider "strace -p PID" being ^C-ed:
+				 * we want merely to detach from PID.
+				 *
+				 * However, we _can_ end up here if tracee
+				 * was SIGKILLed.
+				 */
 				break;
 			}
 			sig = WSTOPSIG(status);
@@ -859,8 +871,13 @@ detach(struct tcb *tcp)
 				sig = 0;
 			/* Can't detach just yet, may need to wait for SIGSTOP */
 			error = ptrace_restart(PTRACE_CONT, tcp, sig);
-			if (error < 0)
+			if (error < 0) {
+				/* Should not happen.
+				 * Note: ptrace_restart returns 0 on ESRCH, so it's not it.
+				 * ptrace_restart already emitted error message.
+				 */
 				break;
+			}
 		}
 	}
 
