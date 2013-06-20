@@ -806,33 +806,14 @@ detach(struct tcb *tcp)
 	if (sigstop_expected || interrupt_done) {
 		for (;;) {
 			int sig;
-#ifdef __WALL
 			if (waitpid(tcp->pid, &status, __WALL) < 0) {
+				if (errno == EINTR)
+					continue;
 				if (errno == ECHILD) /* Already gone.  */
 					break;
-				if (errno != EINVAL) {
-					perror_msg("detach: waiting");
-					break;
-				}
-#endif /* __WALL */
-				/* No __WALL here.  */
-				if (waitpid(tcp->pid, &status, 0) < 0) {
-					if (errno != ECHILD) {
-						perror_msg("detach: waiting");
-						break;
-					}
-#ifdef __WCLONE
-					/* If no processes, try clones.  */
-					if (waitpid(tcp->pid, &status, __WCLONE) < 0) {
-						if (errno != ECHILD)
-							perror_msg("detach: waiting");
-						break;
-					}
-#endif /* __WCLONE */
-				}
-#ifdef __WALL
+				perror_msg("detach: waiting");
+				break;
 			}
-#endif
 			if (!WIFSTOPPED(status)) {
 				/* Au revoir, mon ami. */
 				break;
@@ -1962,10 +1943,6 @@ static int
 trace(void)
 {
 	struct rusage ru;
-	struct rusage *rup = cflag ? &ru : NULL;
-#ifdef __WALL
-	static int wait4_options = __WALL;
-#endif
 
 	while (nprocs != 0) {
 		int pid;
@@ -1977,47 +1954,25 @@ trace(void)
 
 		if (interrupted)
 			return 0;
+
 		if (interactive)
 			sigprocmask(SIG_SETMASK, &empty_set, NULL);
-#ifdef __WALL
-		pid = wait4(-1, &status, wait4_options, rup);
-		if (pid < 0 && (wait4_options & __WALL) && errno == EINVAL) {
-			/* this kernel does not support __WALL */
-			wait4_options &= ~__WALL;
-			pid = wait4(-1, &status, wait4_options, rup);
-		}
-		if (pid < 0 && !(wait4_options & __WALL) && errno == ECHILD) {
-			/* most likely a "cloned" process */
-			pid = wait4(-1, &status, __WCLONE, rup);
-			if (pid < 0) {
-				perror_msg("wait4(__WCLONE) failed");
-			}
-		}
-#else
-		pid = wait4(-1, &status, 0, rup);
-#endif /* __WALL */
+		pid = wait4(-1, &status, __WALL, (cflag ? &ru : NULL));
 		wait_errno = errno;
 		if (interactive)
 			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 
 		if (pid < 0) {
-			switch (wait_errno) {
-			case EINTR:
+			if (wait_errno == EINTR)
 				continue;
-			case ECHILD:
-				/*
-				 * We would like to verify this case
-				 * but sometimes a race in Solbourne's
-				 * version of SunOS sometimes reports
-				 * ECHILD before sending us SIGCHILD.
-				 */
+			if (wait_errno == ECHILD)
+				/* Should not happen since nprocs > 0 */
 				return 0;
-			default:
-				errno = wait_errno;
-				perror_msg("wait");
-				return -1;
-			}
+			errno = wait_errno;
+			perror_msg("wait4(__WALL)");
+			return -1;
 		}
+
 		if (pid == popen_pid) {
 			if (WIFEXITED(status) || WIFSIGNALED(status))
 				popen_pid = 0;
