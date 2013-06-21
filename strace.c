@@ -733,7 +733,7 @@ static void
 detach(struct tcb *tcp)
 {
 	int error;
-	int status, sigstop_expected, interrupt_done;
+	int status;
 
 	if (tcp->flags & TCB_BPTSET)
 		clearbpt(tcp);
@@ -748,142 +748,145 @@ detach(struct tcb *tcp)
 # define PTRACE_DETACH PTRACE_SUNDETACH
 #endif
 
-	error = 0;
-	sigstop_expected = 0;
-	interrupt_done = 0;
-	if (tcp->flags & TCB_ATTACHED) {
-		/*
-		 * We attached but possibly didn't see the expected SIGSTOP.
-		 * We must catch exactly one as otherwise the detached process
-		 * would be left stopped (process state T).
-		 */
-		sigstop_expected = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
-		if (sigstop_expected)
-			goto wait_loop;
-		error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
-		if (error == 0) {
-			/* On a clear day, you can see forever. */
-		}
-		else if (errno != ESRCH) {
-			/* Shouldn't happen. */
-			perror_msg("detach: ptrace(PTRACE_DETACH,%u)", tcp->pid);
-		}
-		else
-		/* ESRCH: process is either not stopped or doesn't exist. */
-		if (my_tkill(tcp->pid, 0) < 0) {
-			if (errno != ESRCH)
-				/* Shouldn't happen. */
-				perror_msg("detach: tkill(%u,0)", tcp->pid);
-			/* else: process doesn't exist. */
-		}
-		else
-		/* Process is not stopped. */
-		if (!sigstop_expected) {
-			/* We need to stop it. */
-			if (use_seize) {
-				/*
-				 * With SEIZE, tracee can be in group-stop already.
-				 * In this state sending it another SIGSTOP does nothing.
-				 * Need to use INTERRUPT.
-				 * Testcase: trying to ^C a "strace -p <stopped_process>".
-				 */
-				error = ptrace(PTRACE_INTERRUPT, tcp->pid, 0, 0);
-				if (!error)
-					interrupt_done = 1;
-				else if (errno != ESRCH)
-					perror_msg("detach: ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
-			}
-			else {
-				error = my_tkill(tcp->pid, SIGSTOP);
-				if (!error)
-					sigstop_expected = 1;
-				else if (errno != ESRCH)
-					perror_msg("detach: tkill(%u,SIGSTOP)", tcp->pid);
-			}
-		}
-	}
+	if (!(tcp->flags & TCB_ATTACHED))
+		goto drop;
 
-	if (sigstop_expected || interrupt_done) {
+	/* We attached but possibly didn't see the expected SIGSTOP.
+	 * We must catch exactly one as otherwise the detached process
+	 * would be left stopped (process state T).
+	 */
+	if (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)
+		goto wait_loop;
+
+	error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
+	if (!error) {
+		/* On a clear day, you can see forever. */
+		goto drop;
+	}
+	if (errno != ESRCH) {
+		/* Shouldn't happen. */
+		perror_msg("detach: ptrace(PTRACE_DETACH,%u)", tcp->pid);
+		goto drop;
+	}
+	/* ESRCH: process is either not stopped or doesn't exist. */
+	if (my_tkill(tcp->pid, 0) < 0) {
+		if (errno != ESRCH)
+			/* Shouldn't happen. */
+			perror_msg("detach: tkill(%u,0)", tcp->pid);
+		/* else: process doesn't exist. */
+		goto drop;
+	}
+	/* Process is not stopped, need to stop it. */
+	if (use_seize) {
+		/*
+		 * With SEIZE, tracee can be in group-stop already.
+		 * In this state sending it another SIGSTOP does nothing.
+		 * Need to use INTERRUPT.
+		 * Testcase: trying to ^C a "strace -p <stopped_process>".
+		 */
+		error = ptrace(PTRACE_INTERRUPT, tcp->pid, 0, 0);
+		if (!error)
+			goto wait_loop;
+		if (errno != ESRCH)
+			perror_msg("detach: ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
+	}
+	else {
+		error = my_tkill(tcp->pid, SIGSTOP);
+		if (!error)
+			goto wait_loop;
+		if (errno != ESRCH)
+			perror_msg("detach: tkill(%u,SIGSTOP)", tcp->pid);
+	}
+	/* Either process doesn't exist, or some weird error. */
+	goto drop;
+
  wait_loop:
-		for (;;) {
-			int sig;
-			if (waitpid(tcp->pid, &status, __WALL) < 0) {
-				if (errno == EINTR)
-					continue;
+	/* We end up here in three cases:
+	 * 1. We sent PTRACE_INTERRUPT (use_seize case)
+	 * 2. We sent SIGSTOP (!use_seize)
+	 * 3. Attach SIGSTOP was already pending (TCB_IGNORE_ONE_SIGSTOP set)
+	 */
+	for (;;) {
+		int sig;
+		if (waitpid(tcp->pid, &status, __WALL) < 0) {
+			if (errno == EINTR)
+				continue;
+			/*
+			 * if (errno == ECHILD) break;
+			 * ^^^  WRONG! We expect this PID to exist,
+			 * and want to emit a message otherwise:
+			 */
+			perror_msg("detach: waitpid(%u)", tcp->pid);
+			break;
+		}
+		if (!WIFSTOPPED(status)) {
+			/*
+			 * Tracee exited or was killed by signal.
+			 * We shouldn't normally reach this place:
+			 * we don't want to consume exit status.
+			 * Consider "strace -p PID" being ^C-ed:
+			 * we want merely to detach from PID.
+			 *
+			 * However, we _can_ end up here if tracee
+			 * was SIGKILLed.
+			 */
+			break;
+		}
+		sig = WSTOPSIG(status);
+		if (debug_flag)
+			fprintf(stderr, "detach wait: event:%d sig:%d\n",
+					(unsigned)status >> 16, sig);
+		if (use_seize) {
+			unsigned event = (unsigned)status >> 16;
+			if (event == PTRACE_EVENT_STOP /*&& sig == SIGTRAP*/) {
 				/*
-				 * if (errno == ECHILD) break;
-				 * ^^^  WRONG! We expect this PID to exist,
-				 * and want to emit a message otherwise:
+				 * sig == SIGTRAP: PTRACE_INTERRUPT stop.
+				 * sig == other: process was already stopped
+				 * with this stopping sig (see tests/detach-stopped).
+				 * Looks like re-injecting this sig is not necessary
+				 * in DETACH for the tracee to remain stopped.
 				 */
-				perror_msg("detach: waitpid(%u)", tcp->pid);
-				break;
+				sig = 0;
 			}
-			if (!WIFSTOPPED(status)) {
-				/*
-				 * Tracee exited or was killed by signal.
-				 * We shouldn't normally reach this place:
-				 * we don't want to consume exit status.
-				 * Consider "strace -p PID" being ^C-ed:
-				 * we want merely to detach from PID.
-				 *
-				 * However, we _can_ end up here if tracee
-				 * was SIGKILLed.
-				 */
-				break;
-			}
-			sig = WSTOPSIG(status);
-			if (debug_flag)
-				fprintf(stderr, "detach wait: event:%d sig:%d\n",
-						(unsigned)status >> 16, sig);
-			if (sigstop_expected && sig == SIGSTOP) {
-				/* Detach, suppressing SIGSTOP */
-				ptrace_restart(PTRACE_DETACH, tcp, 0);
-				break;
-			}
-			if (interrupt_done) {
-				unsigned event = (unsigned)status >> 16;
-				if (event == PTRACE_EVENT_STOP /*&& sig == SIGTRAP*/) {
-					/*
-					 * sig == SIGTRAP: PTRACE_INTERRUPT stop.
-					 * sig == other: process was already stopped
-					 * with this stopping sig (see tests/detach-stopped).
-					 * Looks like re-injecting this sig is not necessary
-					 * in DETACH for the tracee to remain stopped.
-					 */
-					sig = 0;
-				}
-				/*
-				 * PTRACE_INTERRUPT is not guaranteed to produce
-				 * the above event if other ptrace-stop is pending.
-				 * See tests/detach-sleeping testcase:
-				 * strace got SIGINT while tracee is sleeping.
-				 * We sent PTRACE_INTERRUPT.
-				 * We see syscall exit, not PTRACE_INTERRUPT stop.
-				 * We won't get PTRACE_INTERRUPT stop
-				 * if we would CONT now. Need to DETACH.
-				 */
-				if (sig == syscall_trap_sig)
-					sig = 0;
-				/* else: not sure in which case we can be here.
-				 * Signal stop? Inject it while detaching.
-				 */
-				ptrace_restart(PTRACE_DETACH, tcp, sig);
-				break;
-			}
+			/*
+			 * PTRACE_INTERRUPT is not guaranteed to produce
+			 * the above event if other ptrace-stop is pending.
+			 * See tests/detach-sleeping testcase:
+			 * strace got SIGINT while tracee is sleeping.
+			 * We sent PTRACE_INTERRUPT.
+			 * We see syscall exit, not PTRACE_INTERRUPT stop.
+			 * We won't get PTRACE_INTERRUPT stop
+			 * if we would CONT now. Need to DETACH.
+			 */
 			if (sig == syscall_trap_sig)
 				sig = 0;
-			/* Can't detach just yet, may need to wait for SIGSTOP */
-			error = ptrace_restart(PTRACE_CONT, tcp, sig);
-			if (error < 0) {
-				/* Should not happen.
-				 * Note: ptrace_restart returns 0 on ESRCH, so it's not it.
-				 * ptrace_restart already emitted error message.
-				 */
-				break;
-			}
+			/* else: not sure in which case we can be here.
+			 * Signal stop? Inject it while detaching.
+			 */
+			ptrace_restart(PTRACE_DETACH, tcp, sig);
+			break;
+		}
+		/* Note: this check has to be after use_seize check */
+		/* (else, in use_seize case SIGSTOP will be mistreated) */
+		if (sig == SIGSTOP) {
+			/* Detach, suppressing SIGSTOP */
+			ptrace_restart(PTRACE_DETACH, tcp, 0);
+			break;
+		}
+		if (sig == syscall_trap_sig)
+			sig = 0;
+		/* Can't detach just yet, may need to wait for SIGSTOP */
+		error = ptrace_restart(PTRACE_CONT, tcp, sig);
+		if (error < 0) {
+			/* Should not happen.
+			 * Note: ptrace_restart returns 0 on ESRCH, so it's not it.
+			 * ptrace_restart already emitted error message.
+			 */
+			break;
 		}
 	}
 
+ drop:
 	if (!qflag && (tcp->flags & TCB_ATTACHED))
 		fprintf(stderr, "Process %u detached\n", tcp->pid);
 
