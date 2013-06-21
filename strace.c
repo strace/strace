@@ -2055,10 +2055,17 @@ trace(void)
 						pid);
 			} else {
 				/* This can happen if a clone call used
-				   CLONE_PTRACE itself.  */
-				if (WIFSTOPPED(status))
+				 * CLONE_PTRACE itself, or if we inherited
+				 * an unknown child. Example:
+				 * (sleep 1 & exec strace sleep 2)
+				 */
+				if (WIFSTOPPED(status)) {
 					ptrace(PTRACE_CONT, pid, (char *) 0, 0);
-				error_msg_and_die("Unknown pid: %u", pid);
+					error_msg("Stop of unknown pid %u seen, PTRACE_CONTed it", pid);
+				} else {
+					error_msg("Exit of unknown pid %u seen", pid);
+				}
+				continue;
 			}
 		}
 
