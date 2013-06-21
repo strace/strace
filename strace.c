@@ -2029,10 +2029,13 @@ trace(void)
 					[PTRACE_EVENT_VFORK_DONE] = "VFORK_DONE",
 					[PTRACE_EVENT_EXEC]  = "EXEC",
 					[PTRACE_EVENT_EXIT]  = "EXIT",
+					/* [PTRACE_EVENT_STOP (=128)] would make biggish array */
 				};
 				const char *e;
 				if (event < ARRAY_SIZE(event_names))
 					e = event_names[event];
+				else if (event == PTRACE_EVENT_STOP)
+					e = "STOP";
 				else {
 					sprintf(buf, "?? (%u)", event);
 					e = buf;
