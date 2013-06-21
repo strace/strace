@@ -758,6 +758,8 @@ detach(struct tcb *tcp)
 		 * would be left stopped (process state T).
 		 */
 		sigstop_expected = (tcp->flags & TCB_IGNORE_ONE_SIGSTOP);
+		if (sigstop_expected)
+			goto wait_loop;
 		error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
 		if (error == 0) {
 			/* On a clear day, you can see forever. */
@@ -802,6 +804,7 @@ detach(struct tcb *tcp)
 	}
 
 	if (sigstop_expected || interrupt_done) {
+ wait_loop:
 		for (;;) {
 			int sig;
 			if (waitpid(tcp->pid, &status, __WALL) < 0) {
