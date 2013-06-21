@@ -2001,7 +2001,7 @@ trace(void)
 		event = ((unsigned)status >> 16);
 		if (debug_flag) {
 			char buf[sizeof("WIFEXITED,exitcode=%u") + sizeof(int)*3 /*paranoia:*/ + 16];
-			char evbuf[sizeof(",PTRACE_EVENT_?? (%u)") + sizeof(int)*3 /*paranoia:*/ + 16];
+			char evbuf[sizeof(",EVENT_VFORK_DONE (%u)") + sizeof(int)*3 /*paranoia:*/ + 16];
 			strcpy(buf, "???");
 			if (WIFSIGNALED(status))
 #ifdef WCOREDUMP
@@ -2031,16 +2031,12 @@ trace(void)
 					[PTRACE_EVENT_EXIT]  = "EXIT",
 					/* [PTRACE_EVENT_STOP (=128)] would make biggish array */
 				};
-				const char *e;
+				const char *e = "??";
 				if (event < ARRAY_SIZE(event_names))
 					e = event_names[event];
 				else if (event == PTRACE_EVENT_STOP)
 					e = "STOP";
-				else {
-					sprintf(buf, "?? (%u)", event);
-					e = buf;
-				}
-				sprintf(evbuf, ",PTRACE_EVENT_%s", e);
+				sprintf(evbuf, ",EVENT_%s (%u)", e, event);
 			}
 			fprintf(stderr, " [wait(0x%04x) = %u] %s%s\n", status, pid, buf, evbuf);
 		}
