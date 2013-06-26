@@ -1993,7 +1993,7 @@ trace(void)
 		}
 
 		if (pid == popen_pid) {
-			if (WIFEXITED(status) || WIFSIGNALED(status))
+			if (!WIFSTOPPED(status))
 				popen_pid = 0;
 			continue;
 		}
@@ -2017,6 +2017,7 @@ trace(void)
 			if (WIFSTOPPED(status))
 				sprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
 #ifdef WIFCONTINUED
+			/* Should never be seen */
 			if (WIFCONTINUED(status))
 				strcpy(buf, "WIFCONTINUED");
 #endif
@@ -2045,7 +2046,16 @@ trace(void)
 		tcp = pid2tcb(pid);
 
 		if (!tcp) {
+			if (!WIFSTOPPED(status)) {
+				/* This can happen if we inherited
+				 * an unknown child. Example:
+				 * (sleep 1 & exec strace sleep 2)
+				 */
+				error_msg("Exit of unknown pid %u seen", pid);
+				continue;
+			}
 			if (followfork) {
+				/* We assume it's a fork/vfork/clone child */
 				tcp = alloctcb(pid);
 				tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
 				newoutf(tcp);
@@ -2054,16 +2064,10 @@ trace(void)
 						pid);
 			} else {
 				/* This can happen if a clone call used
-				 * CLONE_PTRACE itself, or if we inherited
-				 * an unknown child. Example:
-				 * (sleep 1 & exec strace sleep 2)
+				 * CLONE_PTRACE itself.
 				 */
-				if (WIFSTOPPED(status)) {
-					ptrace(PTRACE_CONT, pid, (char *) 0, 0);
-					error_msg("Stop of unknown pid %u seen, PTRACE_CONTed it", pid);
-				} else {
-					error_msg("Exit of unknown pid %u seen", pid);
-				}
+				ptrace(PTRACE_CONT, pid, (char *) 0, 0);
+				error_msg("Stop of unknown pid %u seen, PTRACE_CONTed it", pid);
 				continue;
 			}
 		}
