@@ -92,7 +92,7 @@ attempting to capture race conditions.
 .LP
 Each line in the trace contains the system call name, followed
 by its arguments in parentheses and its return value.
-An example from stracing the command ``cat /dev/null'' is:
+An example from stracing the command "cat /dev/null" is:
 .CW
 open("/dev/null", O_RDONLY) = 3
 .CE
@@ -101,11 +101,11 @@ and error string appended.
 .CW
 open("/foo/bar", O_RDONLY) = -1 ENOENT (No such file or directory)
 .CE
-Signals are printed as a signal symbol and a signal string.
-An excerpt from stracing and interrupting the command ``sleep 666'' is:
+Signals are printed as signal symbol and decoded siginfo structure.
+An excerpt from stracing and interrupting the command "sleep 666" is:
 .CW
 sigsuspend([] <unfinished ...>
---- SIGINT (Interrupt) ---
+--- SIGINT {si_signo=SIGINT, si_code=SI_USER, si_pid=...} ---
 +++ killed by SIGINT +++
 .CE
 If a system call is being executed and meanwhile another one is being called
@@ -126,12 +126,12 @@ differently as kernel terminates the system call and also arranges its
 immediate reexecution after the signal handler completes.
 .CW
 read(0, 0x7ffff72cf5cf, 1)              = ? ERESTARTSYS (To be restarted)
---- SIGALRM (Alarm clock) @ 0 (0) ---
+--- SIGALRM ... ---
 rt_sigreturn(0xe)                       = 0
-read(0, ""..., 1)                       = 0
+read(0, "", 1)                          = 0
 .CE
 Arguments are printed in symbolic form with a passion.
-This example shows the shell performing ``>>xyzzy'' output redirection:
+This example shows the shell performing ">>xyzzy" output redirection:
 .CW
 open("xyzzy", O_WRONLY|O_APPEND|O_CREAT, 0666) = 3
 .CE
@@ -146,17 +146,17 @@ output has proven to be more readable than the source.
 Structure pointers are dereferenced and the members are displayed
 as appropriate.  In all cases arguments are formatted in the most C-like
 fashion possible.
-For example, the essence of the command ``ls \-l /dev/null'' is captured as:
+For example, the essence of the command "ls \-l /dev/null" is captured as:
 .CW
 lstat("/dev/null", {st_mode=S_IFCHR|0666, st_rdev=makedev(1, 3), ...}) = 0
 .CE
-Notice how the `struct stat' argument is dereferenced and how each member is
+Notice how the 'struct stat' argument is dereferenced and how each member is
 displayed symbolically.  In particular, observe how the st_mode member
 is carefully decoded into a bitwise-OR of symbolic and numeric values.
 Also notice in this example that the first argument to lstat is an input
 to the system call and the second argument is an output.  Since output
 arguments are not modified if the system call fails, arguments may not
-always be dereferenced.  For example, retrying the ``ls \-l'' example
+always be dereferenced.  For example, retrying the "ls \-l" example
 with a non-existent file produces the following line:
 .CW
 lstat("/foo/bar", 0xb004) = -1 ENOENT (No such file or directory)
@@ -170,7 +170,7 @@ Only the first
 .I strsize
 (32 by default) bytes of strings are printed;
 longer strings have an ellipsis appended following the closing quote.
-Here is a line from ``ls \-l'' where the
+Here is a line from "ls \-l" where the
 .B getpwuid
 library routine is reading the password file:
 .CW
@@ -178,7 +178,7 @@ read(3, "root::0:0:System Administrator:/"..., 1024) = 422
 .CE
 While structures are annotated using curly braces, simple pointers
 and arrays are printed using square brackets with commas separating
-elements.  Here is an example from the command ``id'' on a system with
+elements.  Here is an example from the command "id" on a system with
 supplementary group ids:
 .CW
 getgroups(32, [100, 0]) = 2
@@ -479,7 +479,7 @@ Use
 if
 .B \-ff
 is used.
-If the argument begins with `|' or with `!' then the rest of the
+If the argument begins with '|' or with '!' then the rest of the
 argument is treated as a command and all output is piped to it.
 This is convenient for piping the debugging output to a program
 without affecting the redirections of executed programs.
@@ -571,6 +571,11 @@ is terminated by a signal,
 terminates itself with the same signal, so that
 .B strace
 can be used as a wrapper process transparent to the invoking parent process.
+Note that parent-child relationship (signal stop notifications,
+getppid() value, etc) between traced process and its parent are not preserved
+unless
+.B \-D
+is used.
 .LP
 When using
 .BR \-p ,
@@ -592,7 +597,7 @@ as setuid to root when the users who can execute it are restricted
 to those users who have this trust.
 For example, it makes sense to install a special version of
 .B strace
-with mode `rwsr-xr--', user
+with mode 'rwsr-xr--', user
 .B root
 and group
 .BR trace ,
@@ -631,12 +636,13 @@ discrepancies are normal but idiosyncratic characteristics of the
 system call interface and are accounted for by C library wrapper
 functions.
 .LP
-On some platforms a process that has a system call trace applied
-to it with the
+On some platforms a process that is attached to with the
 .B \-p
-option will receive a
-.BR \s-1SIGSTOP\s0 .
-This signal may interrupt a system call that is not restartable.
+option may observe a spurious EINTR return from the current
+system call that is not restartable. (Ideally, all system calls
+should be restarted on strace attach, making the attach invisible
+to the traced process, but a few system calls aren't.
+Arguably, every instance of such behavior is a kernel bug.)
 This may have an unpredictable effect on the process
 if the process takes no action to restart the system call.
 .SH BUGS
