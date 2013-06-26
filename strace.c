@@ -678,10 +678,9 @@ alloctcb(int pid)
 
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
-		if ((tcp->flags & TCB_INUSE) == 0) {
+		if (!tcp->pid) {
 			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
-			tcp->flags = TCB_INUSE;
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
@@ -959,7 +958,7 @@ startup_attach(void)
 	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
 		tcp = tcbtab[tcbi];
 
-		if (!(tcp->flags & TCB_INUSE))
+		if (!tcp->pid)
 			continue;
 
 		/* Is this a process we should attach to, but not yet attached? */
@@ -1252,9 +1251,9 @@ startup_child(char **argv)
 		}
 		tcp = alloctcb(pid);
 		if (!NOMMU_SYSTEM)
-			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP | post_attach_sigstop;
+			tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
 		else
-			tcp->flags |= TCB_ATTACHED | TCB_STRACE_CHILD | TCB_STARTUP;
+			tcp->flags |= TCB_ATTACHED | TCB_STARTUP;
 		newoutf(tcp);
 	}
 	else {
@@ -1916,7 +1915,7 @@ pid2tcb(int pid)
 
 	for (i = 0; i < tcbtabsize; i++) {
 		struct tcb *tcp = tcbtab[i];
-		if (tcp->pid == pid && (tcp->flags & TCB_INUSE))
+		if (tcp->pid == pid)
 			return tcp;
 	}
 
@@ -1937,12 +1936,12 @@ cleanup(void)
 
 	for (i = 0; i < tcbtabsize; i++) {
 		tcp = tcbtab[i];
-		if (!(tcp->flags & TCB_INUSE))
+		if (!tcp->pid)
 			continue;
 		if (debug_flag)
 			fprintf(stderr,
 				"cleanup: looking at pid %u\n", tcp->pid);
-		if (tcp->flags & TCB_STRACE_CHILD) {
+		if (tcp->pid == strace_child) {
 			kill(tcp->pid, SIGCONT);
 			kill(tcp->pid, fatal_sig);
 		}

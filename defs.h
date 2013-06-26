@@ -393,7 +393,7 @@ typedef struct ioctlent {
 /* Trace Control Block */
 struct tcb {
 	int flags;		/* See below for TCB_ values */
-	int pid;		/* Process Id of this entry */
+	int pid;		/* If 0, this tcb is free */
 	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
 	int u_error;		/* Error code */
 	long scno;		/* System call number */
@@ -418,10 +418,9 @@ struct tcb {
 };
 
 /* TCB flags */
-#define TCB_INUSE		00001	/* This table entry is in use */
 /* We have attached to this process, but did not see it stopping yet */
-#define TCB_STARTUP		00002
-#define TCB_IGNORE_ONE_SIGSTOP	00004	/* Next SIGSTOP is to be ignored */
+#define TCB_STARTUP		0x01
+#define TCB_IGNORE_ONE_SIGSTOP	0x02	/* Next SIGSTOP is to be ignored */
 /*
  * Are we in system call entry or in syscall exit?
  *
@@ -440,14 +439,13 @@ struct tcb {
  *
  * Use entering(tcp) / exiting(tcp) to check this bit to make code more readable.
  */
-#define TCB_INSYSCALL	00010
-#define TCB_ATTACHED	00020   /* It is attached already */
-/* Are we PROG from "strace PROG [ARGS]" invocation? */
-#define TCB_STRACE_CHILD 0040
-#define TCB_BPTSET	00100	/* "Breakpoint" set after fork(2) */
-#define TCB_REPRINT	00200	/* We should reprint this syscall on exit */
-#define TCB_FILTERED	00400	/* This system call has been filtered out */
-/* x86 does not need TCB_WAITEXECVE.
+#define TCB_INSYSCALL	0x04
+#define TCB_ATTACHED	0x08	/* We attached to it already */
+#define TCB_BPTSET	0x10	/* "Breakpoint" set after fork(2) */
+#define TCB_REPRINT	0x20	/* We should reprint this syscall on exit */
+#define TCB_FILTERED	0x40	/* This system call has been filtered out */
+/*
+ * x86 does not need TCB_WAITEXECVE.
  * It can detect post-execve SIGTRAP by looking at eax/rax.
  * See "not a syscall entry (eax = %ld)\n" message.
  *
@@ -468,7 +466,7 @@ struct tcb {
 /* This tracee has entered into execve syscall. Expect post-execve SIGTRAP
  * to happen. (When it is detected, tracee is continued and this bit is cleared.)
  */
-# define TCB_WAITEXECVE	01000
+# define TCB_WAITEXECVE	0x80
 #endif
 
 /* qualifier flags */
