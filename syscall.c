@@ -994,6 +994,55 @@ undefined_scno_name(struct tcb *tcp)
 	return buf;
 }
 
+#ifdef POWERPC
+/*
+ * PTRACE_GETREGS was added to the PowerPC kernel in v2.6.23, so we
+ * provide a slow fallback for very old kernels.
+ */
+
+static long powerpc_getreg(pid_t pid, unsigned long offset, unsigned long *p)
+{
+	long val;
+
+	errno = 0;
+	val = ptrace(PTRACE_PEEKUSER, pid, (char *)offset, 0);
+	if (val == -1 && errno)
+		return -1;
+
+	*p = val;
+	return 0;
+}
+
+static long powerpc_getregs_old(pid_t pid)
+{
+	int i;
+	long r;
+
+	r = powerpc_getreg(pid, sizeof(unsigned long) * PT_MSR, &ppc_regs.msr);
+	if (r)
+		goto out;
+
+	r = powerpc_getreg(pid, sizeof(unsigned long) * PT_CCR, &ppc_regs.ccr);
+	if (r)
+		goto out;
+
+	r = powerpc_getreg(pid, sizeof(unsigned long) * PT_ORIG_R3,
+			   &ppc_regs.orig_gpr3);
+	if (r)
+		goto out;
+
+	for (i = 0; i <= 8; i++) {
+		r = powerpc_getreg(pid, sizeof(unsigned long) * (PT_R0 + i),
+				   &ppc_regs.gpr[i]);
+		if (r)
+			goto out;
+	}
+
+out:
+	return r;
+}
+#endif
+
 #ifndef get_regs
 long get_regs_error;
 
@@ -1042,6 +1091,8 @@ get_regs(pid_t pid)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&sparc_regs, 0);
 # elif defined(POWERPC)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &ppc_regs);
+	if (get_regs_error && errno == EIO)
+		get_regs_error = powerpc_getregs_old(pid);
 
 /* try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS */
 # else
