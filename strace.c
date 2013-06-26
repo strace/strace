@@ -1204,7 +1204,7 @@ startup_child(char **argv)
 		prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY);
 #endif
 
-	strace_child = pid = fork();
+	pid = fork();
 	if (pid < 0) {
 		perror_msg_and_die("fork");
 	}
@@ -1221,6 +1221,7 @@ startup_child(char **argv)
 	/* We are the tracer */
 
 	if (!daemonized_tracer) {
+		strace_child = pid;
 		if (!use_seize) {
 			/* child did PTRACE_TRACEME, nothing to do in parent */
 		} else {
