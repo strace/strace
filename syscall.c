@@ -751,6 +751,7 @@ static struct iovec x86_io = {
 long ia32 = 0; /* not static */
 static long ia64_r8, ia64_r10;
 #elif defined(POWERPC)
+struct pt_regs ppc_regs;
 static long ppc_result;
 #elif defined(M68K)
 static long m68k_d0;
@@ -849,11 +850,7 @@ printcall(struct tcb *tcp)
 	}
 	tprintf("[%08lx] ", ip);
 #elif defined(POWERPC)
-	long pc;
-	if (upeek(tcp, sizeof(unsigned long)*PT_NIP, &pc) < 0) {
-		PRINTBADPC;
-		return;
-	}
+	long pc = ppc_regs.nip;
 # ifdef POWERPC64
 	tprintf("[%016lx] ", pc);
 # else
@@ -1043,6 +1040,8 @@ get_regs(pid_t pid)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &tile_regs);
 # elif defined(SPARC) || defined(SPARC64)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&sparc_regs, 0);
+# elif defined(POWERPC)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &ppc_regs);
 
 /* try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS */
 # else
@@ -1195,20 +1194,13 @@ get_scno(struct tcb *tcp)
 		}
 	}
 #elif defined(POWERPC)
-	if (upeek(tcp, sizeof(unsigned long)*PT_R0, &scno) < 0)
-		return -1;
+	scno = ppc_regs.gpr[0];
 # ifdef POWERPC64
-	/* TODO: speed up strace by not doing this at every syscall.
-	 * We only need to do it after execve.
-	 */
 	int currpers;
-	long val;
 
 	/* Check for 64/32 bit mode. */
-	if (upeek(tcp, sizeof(unsigned long)*PT_MSR, &val) < 0)
-		return -1;
 	/* SF is bit 0 of MSR */
-	if (val < 0)
+	if ((ppc_regs.msr >> 63) & 1)
 		currpers = 0;
 	else
 		currpers = 1;
@@ -1805,16 +1797,14 @@ get_syscall_args(struct tcb *tcp)
 				return -1;
 	}
 #elif defined(POWERPC)
-# ifndef PT_ORIG_R3
-#  define PT_ORIG_R3 34
-# endif
-	for (i = 0; i < nargs; ++i) {
-		if (upeek(tcp, (i==0) ?
-			(sizeof(unsigned long) * PT_ORIG_R3) :
-			((i+PT_R3) * sizeof(unsigned long)),
-				&tcp->u_arg[i]) < 0)
-			return -1;
-	}
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = ppc_regs.orig_gpr3;
+	tcp->u_arg[1] = ppc_regs.gpr[4];
+	tcp->u_arg[2] = ppc_regs.gpr[5];
+	tcp->u_arg[3] = ppc_regs.gpr[6];
+	tcp->u_arg[4] = ppc_regs.gpr[7];
+	tcp->u_arg[5] = ppc_regs.gpr[8];
 #elif defined(SPARC) || defined(SPARC64)
 	for (i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = sparc_regs.u_regs[U_REG_O0 + i];
@@ -2060,15 +2050,9 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 #elif defined(POWERPC)
 # define SO_MASK 0x10000000
-	{
-		long flags;
-		if (upeek(tcp, sizeof(unsigned long)*PT_CCR, &flags) < 0)
-			return -1;
-		if (upeek(tcp, sizeof(unsigned long)*PT_R3, &ppc_result) < 0)
-			return -1;
-		if (flags & SO_MASK)
-			ppc_result = -ppc_result;
-	}
+	ppc_result = ppc_regs.gpr[3];
+	if (ppc_regs.ccr & SO_MASK)
+		ppc_result = -ppc_result;
 #elif defined(AVR32)
 	/* already done by get_regs */
 #elif defined(BFIN)

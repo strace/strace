@@ -866,8 +866,9 @@ sys_sigreturn(struct tcb *tcp)
 		long esp;
 		struct sigcontext_struct sc;
 		sigset_t sigm;
-		if (upeek(tcp, sizeof(unsigned long) * PT_R1, &esp) < 0)
-			return 0;
+
+		esp = ppc_regs.gpr[1];
+
 		/* Skip dummy stack frame. */
 #ifdef POWERPC64
 		if (current_personality == 0)

@@ -375,6 +375,8 @@ extern struct pt_regs sparc_regs;
 extern struct pt_regs arm_regs;
 #elif defined(TILE)
 extern struct pt_regs tile_regs;
+#elif defined(POWERPC)
+extern struct pt_regs ppc_regs;
 #endif
 
 typedef struct sysent {
@@ -591,7 +593,8 @@ extern void call_summary(FILE *);
  || defined(SPARC) || defined(SPARC64) \
  || defined(TILE) \
  || defined(OR1K) \
- || defined(METAG)
+ || defined(METAG) \
+ || defined(POWERPC)
 extern long get_regs_error;
 # define clear_regs()  (get_regs_error = -1)
 extern void get_regs(pid_t pid);
