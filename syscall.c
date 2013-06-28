@@ -1070,9 +1070,15 @@ get_regs(pid_t pid)
 # elif defined(SPARC) || defined(SPARC64)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&sparc_regs, 0);
 # elif defined(POWERPC)
+	static bool old_kernel = 0;
+	if (old_kernel)
+		goto old;
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &ppc_regs);
-	if (get_regs_error && errno == EIO)
+	if (get_regs_error && errno == EIO) {
+		old_kernel = 1;
+ old:
 		get_regs_error = powerpc_getregs_old(pid);
+	}
 
 /* try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS */
 # else
