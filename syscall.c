@@ -1004,9 +1004,16 @@ static int powerpc_getregs_old(pid_t pid)
 	int i;
 	long r;
 
+	if (iflag) {
+		r = upeek(pid, sizeof(long) * PT_NIP, &ppc_regs.nip);
+		if (r)
+			goto out;
+	}
+#ifdef POWERPC64 /* else we never use it */
 	r = upeek(pid, sizeof(long) * PT_MSR, &ppc_regs.msr);
 	if (r)
 		goto out;
+#endif
 	r = upeek(pid, sizeof(long) * PT_CCR, &ppc_regs.ccr);
 	if (r)
 		goto out;
