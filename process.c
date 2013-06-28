@@ -569,6 +569,18 @@ sys_clone(struct tcb *tcp)
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID))
 			tprintf(", child_tidptr=%#lx", tcp->u_arg[ARG_CTID]);
 	}
+	/* TODO on syscall entry:
+	 * We can clear CLONE_PTRACE here since it is an ancient hack
+	 * to allow us to catch children, and we use another hack for that.
+	 * But CLONE_PTRACE can conceivably be used by malicious programs
+	 * to subvert us. By clearing this bit, we can defend against it:
+	 * in untraced execution, CLONE_PTRACE should have no effect.
+	 *
+	 * We can also clear CLONE_UNTRACED, since it allows to start
+	 * children outside of our control. At the moment
+	 * I'm trying to figure out whether there is a *legitimate*
+	 * use of this flag which we should respect.
+	 */
 	return 0;
 }
 
