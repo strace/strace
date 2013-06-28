@@ -752,7 +752,6 @@ long ia32 = 0; /* not static */
 static long ia64_r8, ia64_r10;
 #elif defined(POWERPC)
 struct pt_regs ppc_regs;
-static long ppc_result;
 #elif defined(M68K)
 static long m68k_d0;
 #elif defined(BFIN)
@@ -2093,10 +2092,7 @@ get_syscall_result(struct tcb *tcp)
 	if (upeek(tcp->pid, PT_GPR2, &gpr2) < 0)
 		return -1;
 #elif defined(POWERPC)
-# define SO_MASK 0x10000000
-	ppc_result = ppc_regs.gpr[3];
-	if (ppc_regs.ccr & SO_MASK)
-		ppc_result = -ppc_result;
+	/* already done by get_regs */
 #elif defined(AVR32)
 	/* already done by get_regs */
 #elif defined(BFIN)
@@ -2326,12 +2322,12 @@ get_error(struct tcb *tcp)
 # endif
 	}
 #elif defined(POWERPC)
-	if (check_errno && is_negated_errno(ppc_result)) {
+	if (check_errno && (ppc_regs.ccr & 0x10000000)) {
 		tcp->u_rval = -1;
-		u_error = -ppc_result;
+		u_error = ppc_regs.gpr[3];
 	}
 	else {
-		tcp->u_rval = ppc_result;
+		tcp->u_rval = ppc_regs.gpr[3];
 	}
 #elif defined(M68K)
 	if (check_errno && is_negated_errno(m68k_d0)) {
