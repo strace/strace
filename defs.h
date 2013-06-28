@@ -607,7 +607,7 @@ extern int umoven(struct tcb *, long, int, char *);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (char *) (objp))
 extern int umovestr(struct tcb *, long, int, char *);
-extern int upeek(struct tcb *, long, long *);
+extern int upeek(int pid, long, long *);
 #if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
 extern long getrval2(struct tcb *);
 #endif

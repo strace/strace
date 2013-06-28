@@ -826,7 +826,7 @@ sys_sigreturn(struct tcb *tcp)
 	if (entering(tcp)) {
 		long usp;
 		struct sigcontext_struct sc;
-		if (upeek(tcp, PT_GPR15, &usp) < 0)
+		if (upeek(tcp->pid, PT_GPR15, &usp) < 0)
 			return 0;
 		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &sc) < 0)
 			return 0;
@@ -853,7 +853,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigset_t sigm;
 		/* offset of sigcontext in the kernel's sigframe structure: */
 #		define SIGFRAME_SC_OFFSET	0x90
-		if (upeek(tcp, PT_R12, &sp) < 0)
+		if (upeek(tcp->pid, PT_R12, &sp) < 0)
 			return 0;
 		if (umove(tcp, sp + 16 + SIGFRAME_SC_OFFSET, &sc) < 0)
 			return 0;
@@ -888,7 +888,7 @@ sys_sigreturn(struct tcb *tcp)
 		long usp;
 		struct sigcontext sc;
 		sigset_t sigm;
-		if (upeek(tcp, 4*PT_USP, &usp) < 0)
+		if (upeek(tcp->pid, 4*PT_USP, &usp) < 0)
 			return 0;
 		if (umove(tcp, usp, &sc) < 0)
 			return 0;
@@ -900,7 +900,7 @@ sys_sigreturn(struct tcb *tcp)
 		long fp;
 		struct sigcontext_struct sc;
 		sigset_t sigm;
-		if (upeek(tcp, REG_FP, &fp) < 0)
+		if (upeek(tcp->pid, REG_FP, &fp) < 0)
 			return 0;
 		if (umove(tcp, fp, &sc) < 0)
 			return 0;
@@ -927,7 +927,7 @@ sys_sigreturn(struct tcb *tcp)
 		long sp;
 		struct ucontext uc;
 		sigset_t sigm;
-		if (upeek(tcp, REG_SP, &sp) < 0)
+		if (upeek(tcp->pid, REG_SP, &sp) < 0)
 			return 0;
 		/* There are six words followed by a 128-byte siginfo.  */
 		sp = sp + 6 * 4 + 128;
@@ -986,7 +986,7 @@ sys_sigreturn(struct tcb *tcp)
 		long sp;
 		sigset_t sigm;
 		/* Read r1, the stack pointer.  */
-		if (upeek(tcp, 1 * 4, &sp) < 0)
+		if (upeek(tcp->pid, 1 * 4, &sp) < 0)
 			return 0;
 		if (umove(tcp, sp, &sc) < 0)
 			return 0;

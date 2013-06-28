@@ -1056,15 +1056,15 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 }
 
 int
-upeek(struct tcb *tcp, long off, long *res)
+upeek(int pid, long off, long *res)
 {
 	long val;
 
 	errno = 0;
-	val = ptrace(PTRACE_PEEKUSER, tcp->pid, (char *) off, 0);
+	val = ptrace(PTRACE_PEEKUSER, (pid_t)pid, (char *) off, 0);
 	if (val == -1 && errno) {
 		if (errno != ESRCH) {
-			perror_msg("upeek: PTRACE_PEEKUSER pid:%d @0x%lx)", tcp->pid, off);
+			perror_msg("upeek: PTRACE_PEEKUSER pid:%d @0x%lx)", pid, off);
 		}
 		return -1;
 	}
@@ -1112,9 +1112,9 @@ arg_setup(struct tcb *tcp, arg_setup_state *state)
 		return 0;
 	}
 
-	if (upeek(tcp, PT_AR_BSP, &bsp) < 0)
+	if (upeek(tcp->pid, PT_AR_BSP, &bsp) < 0)
 		return -1;
-	if (upeek(tcp, PT_CFM, (long *) &cfm) < 0)
+	if (upeek(tcp->pid, PT_CFM, (long *) &cfm) < 0)
 		return -1;
 
 	sof = (cfm >> 0) & 0x7f;
@@ -1133,7 +1133,7 @@ get_arg0(struct tcb *tcp, arg_setup_state *state, long *valp)
 	int ret;
 
 	if (ia32)
-		ret = upeek(tcp, PT_R11, valp);
+		ret = upeek(tcp->pid, PT_R11, valp);
 	else
 		ret = umoven(tcp,
 			      (unsigned long) ia64_rse_skip_regs(*state, 0),
@@ -1147,7 +1147,7 @@ get_arg1(struct tcb *tcp, arg_setup_state *state, long *valp)
 	int ret;
 
 	if (ia32)
-		ret = upeek(tcp, PT_R9, valp);
+		ret = upeek(tcp->pid, PT_R9, valp);
 	else
 		ret = umoven(tcp,
 			      (unsigned long) ia64_rse_skip_regs(*state, 1),
@@ -1268,8 +1268,8 @@ typedef int arg_setup_state;
 
 # define arg_setup(tcp, state)         (0)
 # define arg_finish_change(tcp, state) 0
-# define get_arg0(tcp, cookie, valp)   (upeek((tcp), arg0_offset, (valp)))
-# define get_arg1(tcp, cookie, valp)   (upeek((tcp), arg1_offset, (valp)))
+# define get_arg0(tcp, cookie, valp)   (upeek((tcp)->pid, arg0_offset, (valp)))
+# define get_arg1(tcp, cookie, valp)   (upeek((tcp)->pid, arg1_offset, (valp)))
 
 static int
 set_arg0(struct tcb *tcp, void *cookie, long val)

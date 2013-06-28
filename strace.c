@@ -2270,8 +2270,8 @@ trace(void)
 				long pc = 0;
 				long psr = 0;
 
-				upeek(tcp, PT_CR_IPSR, &psr);
-				upeek(tcp, PT_CR_IIP, &pc);
+				upeek(tcp->pid, PT_CR_IPSR, &psr);
+				upeek(tcp->pid, PT_CR_IIP, &pc);
 
 # define PSR_RI	41
 				pc += (psr >> PSR_RI) & 0x3;
