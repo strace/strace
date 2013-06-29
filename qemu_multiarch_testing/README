@@ -30,6 +30,16 @@ system-image-i686 (had to s/qemu-system-i386/qemu/ in run-emulator.sh)
 system-image-mipsel
 system-image-mips
 system-image-x86_64
+system-image-sparc   - needed small edit in native-build.sh:
+    # Getting this early:
+    #       Unhandled Exception 0x00000007
+    #       PC = 0xffd07cec NPC = 0xffd07cf0
+    #       Stopping execution
+    # and it looks like it's triggered just by too long kernel cmdline,
+    # not by specific options.
+    #export KERNEL_EXTRA="FTP_SERVER=$FTP_SERVER FTP_PORT=$FTP_PORT NATIVE_BUILD=$NATIVE_BUILD $KERNEL_EXTRA"
+    # This works:
+    export KERNEL_EXTRA="NATIVE_BUILD=$NATIVE_BUILD $KERNEL_EXTRA"
 
 And these did not:
 system-image-armv4eb - VFS: Cannot open root device "sda" or unknown-block(0,0)
@@ -37,6 +47,5 @@ system-image-m68k    - run-emulator.sh has no call of qemu-system-* (not support
 system-image-mips64  -
 	need to run ./native-build.sh ../hdc.img by hand;
 	copying in /mnt/init fails (segv?)
-system-image-powerpc - qemu-system-ppc: command not found
+system-image-powerpc - QEMU stuck very early
 system-image-sh4     - hdc does not mount (no support for 2 disks)
-system-image-sparc   - qemu-system-sparc: command not found
