@@ -174,6 +174,19 @@ extern long ptrace(int, int, char *, long);
 # include <asm/ptrace.h>  /* struct pt_regs */
 #endif
 
+#ifndef ERESTARTSYS
+# define ERESTARTSYS    512
+#endif
+#ifndef ERESTARTNOINTR
+# define ERESTARTNOINTR 513
+#endif
+#ifndef ERESTARTNOHAND
+# define ERESTARTNOHAND 514
+#endif
+#ifndef ERESTART_RESTARTBLOCK
+# define ERESTART_RESTARTBLOCK 516
+#endif
+
 #if !HAVE_DECL_PTRACE_SETOPTIONS
 # define PTRACE_SETOPTIONS	0x4200
 #endif
@@ -621,7 +634,6 @@ extern int setbpt(struct tcb *);
 extern int clearbpt(struct tcb *);
 
 extern const char *signame(int);
-extern int is_restart_error(struct tcb *);
 extern void pathtrace_select(const char *);
 extern int pathtrace_match(struct tcb *);
 extern int getfdpath(struct tcb *, int, char *, unsigned);

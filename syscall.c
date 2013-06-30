@@ -80,19 +80,6 @@
 # include <asm/ptrace.h>
 #endif
 
-#ifndef ERESTARTSYS
-# define ERESTARTSYS	512
-#endif
-#ifndef ERESTARTNOINTR
-# define ERESTARTNOINTR	513
-#endif
-#ifndef ERESTARTNOHAND
-# define ERESTARTNOHAND	514	/* restart if no handler */
-#endif
-#ifndef ERESTART_RESTARTBLOCK
-# define ERESTART_RESTARTBLOCK 516	/* restart by calling sys_restart_syscall */
-#endif
-
 #ifndef NSIG
 # warning: NSIG is not defined, using 32
 # define NSIG 32
@@ -693,21 +680,6 @@ getrval2(struct tcb *tcp)
 	return val;
 }
 #endif
-
-int
-is_restart_error(struct tcb *tcp)
-{
-	switch (tcp->u_error) {
-		case ERESTARTSYS:
-		case ERESTARTNOINTR:
-		case ERESTARTNOHAND:
-		case ERESTART_RESTARTBLOCK:
-			return 1;
-		default:
-			break;
-	}
-	return 0;
-}
 
 #if defined(I386)
 struct user_regs_struct i386_regs;

@@ -256,15 +256,25 @@ sys_nanosleep(struct tcb *tcp)
 		tprints(", ");
 	} else {
 		/* Second (returned) timespec is only significant
-		 * if syscall was interrupted. We print only its address
-		 * on _success_, since kernel doesn't modify its value.
+		 * if syscall was interrupted. On success, we print
+		 * only its address, since kernel doesn't modify it,
+		 * and printing the value may show uninitialized data.
 		 */
-		if (is_restart_error(tcp) || !tcp->u_arg[1])
-			/* Interrupted (or NULL) */
+		switch (tcp->u_error) {
+		default:
+			/* Not interrupted (slept entire interval) */
+			if (tcp->u_arg[1]) {
+				tprintf("%#lx", tcp->u_arg[1]);
+				break;
+			}
+			/* Fall through: print_timespec(NULL) prints "NULL" */
+		case ERESTARTSYS:
+		case ERESTARTNOINTR:
+		case ERESTARTNOHAND:
+		case ERESTART_RESTARTBLOCK:
+			/* Interrupted */
 			print_timespec(tcp, tcp->u_arg[1]);
-		else
-			/* Success */
-			tprintf("%#lx", tcp->u_arg[1]);
+		}
 	}
 	return 0;
 }
