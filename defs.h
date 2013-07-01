@@ -594,6 +594,7 @@ int strace_vfprintf(FILE *fp, const char *fmt, va_list args);
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void qualify(const char *);
+extern void print_pc(struct tcb *);
 extern int trace_syscall(struct tcb *);
 extern void count_syscall(struct tcb *, struct timeval *);
 extern void call_summary(FILE *);
@@ -691,7 +692,6 @@ extern void printrusage(struct tcb *, long);
 extern void printrusage32(struct tcb *, long);
 #endif
 extern void printuid(const char *, unsigned long);
-extern void printcall(struct tcb *);
 extern void print_sigset(struct tcb *, long, int);
 extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);

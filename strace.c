@@ -623,7 +623,7 @@ printleader(struct tcb *tcp)
 		}
 	}
 	if (iflag)
-		printcall(tcp);
+		print_pc(tcp);
 }
 
 void
@@ -2266,31 +2266,14 @@ trace(void)
 			    && !hide_log_until_execve
 			    && (qual_flags[sig] & QUAL_SIGNAL)
 			   ) {
-#if defined(PT_CR_IPSR) && defined(PT_CR_IIP)
-				long pc = 0;
-				long psr = 0;
-
-				upeek(tcp->pid, PT_CR_IPSR, &psr);
-				upeek(tcp->pid, PT_CR_IIP, &pc);
-
-# define PSR_RI	41
-				pc += (psr >> PSR_RI) & 0x3;
-# define PC_FORMAT_STR	" @ %lx"
-# define PC_FORMAT_ARG	, pc
-#else
-# define PC_FORMAT_STR	""
-# define PC_FORMAT_ARG	/* nothing */
-#endif
 				printleader(tcp);
 				if (!stopped) {
 					tprintf("--- %s ", signame(sig));
 					printsiginfo(&si, verbose(tcp));
-					tprintf(PC_FORMAT_STR " ---\n"
-						PC_FORMAT_ARG);
+					tprints(" ---\n");
 				} else
-					tprintf("--- stopped by %s" PC_FORMAT_STR " ---\n",
-						signame(sig)
-						PC_FORMAT_ARG);
+					tprintf("--- stopped by %s ---\n",
+						signame(sig));
 				line_ended();
 			}
 
