@@ -158,7 +158,6 @@ static const char *progname;
 unsigned os_release; /* generated from uname()'s u.release */
 
 static void detach(struct tcb *tcp);
-static int trace(void);
 static void cleanup(void);
 static void interrupt(int sig);
 static sigset_t empty_set, blocked_set;
@@ -1958,7 +1957,7 @@ interrupt(int sig)
 	interrupted = sig;
 }
 
-static int
+static void
 trace(void)
 {
 	struct rusage ru;
@@ -1972,7 +1971,7 @@ trace(void)
 		unsigned event;
 
 		if (interrupted)
-			return 0;
+			return;
 
 		if (interactive)
 			sigprocmask(SIG_SETMASK, &empty_set, NULL);
@@ -1986,10 +1985,9 @@ trace(void)
 				continue;
 			if (wait_errno == ECHILD)
 				/* Should not happen since nprocs > 0 */
-				return 0;
+				return;
 			errno = wait_errno;
-			perror_msg("wait4(__WALL)");
-			return -1;
+			perror_msg_and_die("wait4(__WALL)");
 		}
 
 		if (pid == popen_pid) {
@@ -2198,8 +2196,8 @@ trace(void)
 				if (clearbpt(tcp) < 0) {
 					/* Pretty fatal */
 					droptcb(tcp);
-					cleanup();
-					return -1;
+					exit_code = 1;
+					return;
 				}
 			}
 			if (ptrace_setoptions) {
@@ -2289,8 +2287,9 @@ trace(void)
 				 * (that is, process really stops. It used to continue to run).
 				 */
 				if (ptrace_restart(PTRACE_LISTEN, tcp, 0) < 0) {
-					cleanup();
-					return -1;
+					/* Note: ptrace_restart emitted error message */
+					exit_code = 1;
+					return;
 				}
 				continue;
 			}
@@ -2300,7 +2299,7 @@ trace(void)
 
 		/* We handled quick cases, we are permitted to interrupt now. */
 		if (interrupted)
-			return 0;
+			return;
 
 		/* This should be syscall entry or exit.
 		 * (Or it still can be that pesky post-execve SIGTRAP!)
@@ -2323,11 +2322,11 @@ trace(void)
 		sig = 0;
  restart_tracee:
 		if (ptrace_restart(PTRACE_SYSCALL, tcp, sig) < 0) {
-			cleanup();
-			return -1;
+			/* Note: ptrace_restart emitted error message */
+			exit_code = 1;
+			return;
 		}
-	}
-	return 0;
+	} /* while (nprocs != 0) */
 }
 
 int
@@ -2336,8 +2335,7 @@ main(int argc, char *argv[])
 	init(argc, argv);
 
 	/* Run main tracing loop */
-	if (trace() < 0)
-		return 1;
+	trace();
 
 	cleanup();
 	fflush(NULL);
