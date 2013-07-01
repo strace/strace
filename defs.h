@@ -381,7 +381,7 @@ struct arm_pt_regs {
 #if defined(I386)
 extern struct user_regs_struct i386_regs;
 #elif defined(IA64)
-extern long ia32;
+extern bool ia64_ia32mode;
 #elif defined(SPARC) || defined(SPARC64)
 extern struct pt_regs sparc_regs;
 #elif defined(ARM)

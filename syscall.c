@@ -720,7 +720,7 @@ static struct iovec x86_io = {
 	.iov_base = &x86_regs_union
 };
 #elif defined(IA64)
-long ia32 = 0; /* not static */
+bool ia64_ia32mode = 0; /* not static */
 static long ia64_r8, ia64_r10;
 #elif defined(POWERPC)
 struct pt_regs ppc_regs;
@@ -1322,8 +1322,8 @@ get_scno(struct tcb *tcp)
 #	define IA64_PSR_IS	((long)1 << 34)
 	long psr;
 	if (upeek(tcp->pid, PT_CR_IPSR, &psr) >= 0)
-		ia32 = (psr & IA64_PSR_IS) != 0;
-	if (ia32) {
+		ia64_ia32mode = ((psr & IA64_PSR_IS) != 0);
+	if (ia64_ia32mode) {
 		if (upeek(tcp->pid, PT_R1, &scno) < 0)
 			return -1;
 	} else {
@@ -1619,7 +1619,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 		return -1;
 	if (upeek(tcp->pid, PT_R8, &ia64_r8) < 0)
 		return -1;
-	if (ia32 && ia64_r8 != -ENOSYS) {
+	if (ia64_ia32mode && ia64_r8 != -ENOSYS) {
 		if (debug_flag)
 			fprintf(stderr, "not a syscall entry (r8 = %ld)\n", ia64_r8);
 		return 0;
@@ -1745,7 +1745,7 @@ get_syscall_args(struct tcb *tcp)
 		if (upeek(tcp->pid, REG_A0+i, &tcp->u_arg[i]) < 0)
 			return -1;
 #elif defined(IA64)
-	if (!ia32) {
+	if (!ia64_ia32mode) {
 		unsigned long *out0, cfm, sof, sol;
 		long rbs_end;
 		/* be backwards compatible with kernel < 2.4.4... */
@@ -2078,7 +2078,7 @@ get_syscall_result(struct tcb *tcp)
 #	define IA64_PSR_IS	((long)1 << 34)
 	long psr;
 	if (upeek(tcp->pid, PT_CR_IPSR, &psr) >= 0)
-		ia32 = (psr & IA64_PSR_IS) != 0;
+		ia64_ia32mode = ((psr & IA64_PSR_IS) != 0);
 	if (upeek(tcp->pid, PT_R8, &ia64_r8) < 0)
 		return -1;
 	if (upeek(tcp->pid, PT_R10, &ia64_r10) < 0)
@@ -2264,7 +2264,7 @@ get_error(struct tcb *tcp)
 		tcp->u_lrval = rax;
 	}
 #elif defined(IA64)
-	if (ia32) {
+	if (ia64_ia32mode) {
 		int err;
 
 		err = (int)ia64_r8;

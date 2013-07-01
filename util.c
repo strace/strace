@@ -1106,7 +1106,7 @@ arg_setup(struct tcb *tcp, arg_setup_state *state)
 	unsigned long cfm, sof, sol;
 	long bsp;
 
-	if (ia32) {
+	if (ia64_ia32mode) {
 		/* Satisfy a false GCC warning.  */
 		*state = NULL;
 		return 0;
@@ -1132,7 +1132,7 @@ get_arg0(struct tcb *tcp, arg_setup_state *state, long *valp)
 {
 	int ret;
 
-	if (ia32)
+	if (ia64_ia32mode)
 		ret = upeek(tcp->pid, PT_R11, valp);
 	else
 		ret = umoven(tcp,
@@ -1146,7 +1146,7 @@ get_arg1(struct tcb *tcp, arg_setup_state *state, long *valp)
 {
 	int ret;
 
-	if (ia32)
+	if (ia64_ia32mode)
 		ret = upeek(tcp->pid, PT_R9, valp);
 	else
 		ret = umoven(tcp,
@@ -1161,7 +1161,7 @@ set_arg0(struct tcb *tcp, arg_setup_state *state, long val)
 	int req = PTRACE_POKEDATA;
 	void *ap;
 
-	if (ia32) {
+	if (ia64_ia32mode) {
 		ap = (void *) (intptr_t) PT_R11;	 /* r11 == EBX */
 		req = PTRACE_POKEUSER;
 	} else
@@ -1177,7 +1177,7 @@ set_arg1(struct tcb *tcp, arg_setup_state *state, long val)
 	int req = PTRACE_POKEDATA;
 	void *ap;
 
-	if (ia32) {
+	if (ia64_ia32mode) {
 		ap = (void *) (intptr_t) PT_R9;		/* r9 == ECX */
 		req = PTRACE_POKEUSER;
 	} else
@@ -1343,7 +1343,7 @@ change_syscall(struct tcb *tcp, arg_setup_state *state, int new)
 	/* setbpt/clearbpt never used: */
 	/* Blackfin is only supported since about linux-2.6.23 */
 #elif defined(IA64)
-	if (ia32) {
+	if (ia64_ia32mode) {
 		switch (new) {
 		case 2:
 			break;	/* x86 SYS_fork */
