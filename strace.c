@@ -485,6 +485,7 @@ static FILE *
 strace_popen(const char *command)
 {
 	FILE *fp;
+	int pid;
 	int fds[2];
 
 	swap_uid();
@@ -493,11 +494,11 @@ strace_popen(const char *command)
 
 	set_cloexec_flag(fds[1]); /* never fails */
 
-	popen_pid = vfork();
-	if (popen_pid == -1)
+	pid = vfork();
+	if (pid < 0)
 		perror_msg_and_die("vfork");
 
-	if (popen_pid == 0) {
+	if (pid == 0) {
 		/* child */
 		close(fds[1]);
 		if (fds[0] != 0) {
@@ -510,6 +511,7 @@ strace_popen(const char *command)
 	}
 
 	/* parent */
+	popen_pid = pid;
 	close(fds[0]);
 	swap_uid();
 	fp = fdopen(fds[1], "w");
