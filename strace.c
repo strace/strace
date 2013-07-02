@@ -2039,7 +2039,7 @@ trace(void)
 					e = "STOP";
 				sprintf(evbuf, ",EVENT_%s (%u)", e, event);
 			}
-			fprintf(stderr, " [wait(0x%04x) = %u] %s%s\n", status, pid, buf, evbuf);
+			fprintf(stderr, " [wait(0x%06x) = %u] %s%s\n", status, pid, buf, evbuf);
 		}
 
 		/* Look up 'pid' in our table. */
