@@ -1339,6 +1339,7 @@ get_scno(struct tcb *tcp)
 			break;
 		case sizeof(arm_regs):
 			/* We are in 32-bit mode */
+			/* Note: we don't support OABI, unlike 32-bit ARM build */
 			scno = arm_regs.ARM_r7;
 			update_personality(tcp, 0);
 			break;
@@ -1352,30 +1353,34 @@ get_scno(struct tcb *tcp)
 	}
 	/* Note: we support only 32-bit CPUs, not 26-bit */
 
-	if (arm_regs.ARM_cpsr & 0x20) {
+# ifndef STRACE_KNOWS_ONLY_EABI
+# warning STRACE_KNOWS_ONLY_EABI not set, will PTRACE_PEEKTEXT on every syscall (slower tracing)
+	if (arm_regs.ARM_cpsr & 0x20)
 		/* Thumb mode */
-		scno = arm_regs.ARM_r7;
-	} else {
-		/* ARM mode */
-		errno = 0;
-		scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(arm_regs.ARM_pc - 4), NULL);
-		if (errno)
+		goto scno_in_r7;
+	/* ARM mode */
+	/* Check EABI/OABI by examining SVC insn's low 24 bits */
+	errno = 0;
+	scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *)(arm_regs.ARM_pc - 4), NULL);
+	if (errno)
+		return -1;
+	/* EABI syscall convention? */
+	if (scno != 0xef000000) {
+		/* No, it's OABI */
+		if ((scno & 0x0ff00000) != 0x0f900000) {
+			fprintf(stderr, "pid %d unknown syscall trap 0x%08lx\n",
+				tcp->pid, scno);
 			return -1;
-
-		/* EABI syscall convention? */
-		if (scno == 0xef000000) {
-			scno = arm_regs.ARM_r7; /* yes */
-		} else {
-			if ((scno & 0x0ff00000) != 0x0f900000) {
-				fprintf(stderr, "pid %d unknown syscall trap 0x%08lx\n",
-					tcp->pid, scno);
-				return -1;
-			}
-			/* Fixup the syscall number */
-			scno &= 0x000fffff;
 		}
+		/* Fixup the syscall number */
+		scno &= 0x000fffff;
+	} else {
+ scno_in_r7:
+		scno = arm_regs.ARM_r7;
 	}
-
+# else
+	scno = arm_regs.ARM_r7;
+# endif
 	scno = shuffle_scno(scno);
 #elif defined(M68K)
 	if (upeek(tcp->pid, 4*PT_ORIG_D0, &scno) < 0)
