@@ -2097,6 +2097,9 @@ trace(void)
 
 			if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, (long) &old_pid) < 0)
 				goto dont_switch_tcbs;
+			/* Avoid truncation in pid2tcb() param passing */
+			if (old_pid > UINT_MAX)
+				goto dont_switch_tcbs;
 			if (old_pid <= 0 || old_pid == pid)
 				goto dont_switch_tcbs;
 			execve_thread = pid2tcb(old_pid);
