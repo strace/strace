@@ -755,8 +755,7 @@ static long long mips_r2;
 static long mips_a3;
 static long mips_r2;
 #elif defined(S390) || defined(S390X)
-static long gpr2;
-static long syscall_mode;
+static long s390_gpr2;
 #elif defined(HPPA)
 static long hppa_r28;
 #elif defined(SH)
@@ -1127,14 +1126,14 @@ get_scno(struct tcb *tcp)
 	long scno = 0;
 
 #if defined(S390) || defined(S390X)
-	if (upeek(tcp->pid, PT_GPR2, &syscall_mode) < 0)
+	if (upeek(tcp->pid, PT_GPR2, &s390_gpr2) < 0)
 		return -1;
 
-	if (syscall_mode != -ENOSYS) {
+	if (s390_gpr2 != -ENOSYS) {
 		/*
 		 * Since kernel version 2.5.44 the scno gets passed in gpr2.
 		 */
-		scno = syscall_mode;
+		scno = s390_gpr2;
 	} else {
 		/*
 		 * Old style of "passing" the scno via the SVC instruction.
@@ -1596,20 +1595,6 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 			return 0;
 		}
 	}
-#elif defined(S390) || defined(S390X)
-	/* TODO: we already fetched PT_GPR2 in get_scno
-	 * and stored it in syscall_mode, reuse it here
-	 * instead of re-fetching?
-	 */
-	if (upeek(tcp->pid, PT_GPR2, &gpr2) < 0)
-		return -1;
-	if (syscall_mode != -ENOSYS)
-		syscall_mode = tcp->scno;
-	if (gpr2 != syscall_mode) {
-		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (gpr2 = %ld)\n", gpr2);
-		return 0;
-	}
 #elif defined(M68K)
 	/* TODO? Eliminate upeek's in arches below like we did in x86 */
 	if (upeek(tcp->pid, 4*PT_D0, &m68k_d0) < 0)
@@ -2066,7 +2051,7 @@ static int
 get_syscall_result(struct tcb *tcp)
 {
 #if defined(S390) || defined(S390X)
-	if (upeek(tcp->pid, PT_GPR2, &gpr2) < 0)
+	if (upeek(tcp->pid, PT_GPR2, &s390_gpr2) < 0)
 		return -1;
 #elif defined(POWERPC)
 	/* already done by get_regs */
@@ -2155,16 +2140,14 @@ static void
 syscall_fixup_on_sysexit(struct tcb *tcp)
 {
 #if defined(S390) || defined(S390X)
-	if (syscall_mode != -ENOSYS)
-		syscall_mode = tcp->scno;
 	if ((tcp->flags & TCB_WAITEXECVE)
-		 && (gpr2 == -ENOSYS || gpr2 == tcp->scno)) {
+		 && (s390_gpr2 == -ENOSYS || s390_gpr2 == tcp->scno)) {
 		/*
 		 * Return from execve.
 		 * Fake a return value of zero.  We leave the TCB_WAITEXECVE
 		 * flag set for the post-execve SIGTRAP to see and reset.
 		 */
-		gpr2 = 0;
+		s390_gpr2 = 0;
 	}
 #endif
 }
@@ -2218,12 +2201,12 @@ get_error(struct tcb *tcp)
 		check_errno = 0;
 	}
 #if defined(S390) || defined(S390X)
-	if (check_errno && is_negated_errno(gpr2)) {
+	if (check_errno && is_negated_errno(s390_gpr2)) {
 		tcp->u_rval = -1;
-		u_error = -gpr2;
+		u_error = -s390_gpr2;
 	}
 	else {
-		tcp->u_rval = gpr2;
+		tcp->u_rval = s390_gpr2;
 	}
 #elif defined(I386)
 	if (check_errno && is_negated_errno(i386_regs.eax)) {
