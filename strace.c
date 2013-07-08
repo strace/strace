@@ -1973,6 +1973,10 @@ trace(void)
 	 *  19923 exit_group(1)     = ?
 	 *  19923 +++ exited with 1 +++
 	 * Waiting for ECHILD works better.
+	 * (However, if -o|logger is in use, we can't do that.
+	 * Can work around that by double-forking the logger,
+	 * but that loses the ability to wait for its completion on exit.
+	 * Oh well...)
 	 */
 	while (1) {
 		int pid;
@@ -1983,6 +1987,9 @@ trace(void)
 		unsigned event;
 
 		if (interrupted)
+			return;
+
+		if (popen_pid != 0 && nprocs == 0)
 			return;
 
 		if (interactive)
@@ -2343,7 +2350,7 @@ trace(void)
 			exit_code = 1;
 			return;
 		}
-	} /* while (nprocs != 0) */
+	} /* while (1) */
 }
 
 int
