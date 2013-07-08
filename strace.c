@@ -1964,7 +1964,17 @@ trace(void)
 {
 	struct rusage ru;
 
-	while (nprocs != 0) {
+	/* Used to be "while (nprocs != 0)", but in this testcase:
+	 *  int main() { _exit(!!fork()); }
+	 * under strace -f, parent sometimes (rarely) manages
+	 * to exit before we see the first stop of the child,
+	 * and we are losing track of it:
+	 *  19923 clone(...) = 19924
+	 *  19923 exit_group(1)     = ?
+	 *  19923 +++ exited with 1 +++
+	 * Waiting for ECHILD works better.
+	 */
+	while (1) {
 		int pid;
 		int wait_errno;
 		int status, sig;
@@ -1985,9 +1995,11 @@ trace(void)
 		if (pid < 0) {
 			if (wait_errno == EINTR)
 				continue;
-			if (wait_errno == ECHILD)
-				/* Should not happen since nprocs > 0 */
+			if (nprocs == 0 && wait_errno == ECHILD)
 				return;
+			/* If nprocs > 0, ECHILD is not expected,
+			 * treat it as any other error here:
+			 */
 			errno = wait_errno;
 			perror_msg_and_die("wait4(__WALL)");
 		}
