@@ -335,11 +335,11 @@ ptrace_attach_or_seize(int pid)
 {
 	int r;
 	if (!use_seize)
-		return ptrace(PTRACE_ATTACH, pid, 0, 0);
-	r = ptrace(PTRACE_SEIZE, pid, 0, 0);
+		return ptrace(PTRACE_ATTACH, pid, 0L, 0L);
+	r = ptrace(PTRACE_SEIZE, pid, 0L, (unsigned long)ptrace_setoptions);
 	if (r)
 		return r;
-	r = ptrace(PTRACE_INTERRUPT, pid, 0, 0);
+	r = ptrace(PTRACE_INTERRUPT, pid, 0L, 0L);
 	return r;
 }
 #else
@@ -2224,9 +2224,9 @@ trace(void)
 					return;
 				}
 			}
-			if (ptrace_setoptions) {
+			if (!use_seize && ptrace_setoptions) {
 				if (debug_flag)
-					fprintf(stderr, "setting opts %x on pid %d\n", ptrace_setoptions, tcp->pid);
+					fprintf(stderr, "setting opts 0x%x on pid %d\n", ptrace_setoptions, tcp->pid);
 				if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, ptrace_setoptions) < 0) {
 					if (errno != ESRCH) {
 						/* Should never happen, really */
