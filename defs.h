@@ -550,6 +550,7 @@ typedef enum {
 extern cflag_t cflag;
 extern bool debug_flag;
 extern bool Tflag;
+extern bool iflag;
 extern unsigned int qflag;
 extern bool not_failing_only;
 extern bool show_fd_path;

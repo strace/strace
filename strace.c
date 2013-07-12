@@ -77,11 +77,11 @@ unsigned int xflag = 0;
 bool need_fork_exec_workarounds = 0;
 bool debug_flag = 0;
 bool Tflag = 0;
+bool iflag = 0;
 unsigned int qflag = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
 static unsigned int syscall_trap_sig = SIGTRAP;
 static unsigned int tflag = 0;
-static bool iflag = 0;
 static bool rflag = 0;
 static bool print_pid_pfx = 0;
 
