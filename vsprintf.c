@@ -11,7 +11,7 @@
 
 #include "defs.h"
 
-#ifdef USE_CUSTOM_PRINTF
+#if USE_CUSTOM_PRINTF
 
 #include <stdarg.h>
 #include <limits.h>
