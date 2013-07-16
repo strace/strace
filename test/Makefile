@@ -3,7 +3,7 @@ CFLAGS += -Wall
 PROGS = \
     vfork fork sig skodic clone leaderkill childthread \
     sigkill_rain wait_must_be_interruptible threaded_execve \
-    mtd ubi
+    mtd ubi sigreturn
 
 all: $(PROGS)
 

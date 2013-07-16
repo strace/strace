@@ -10,3 +10,4 @@ wait_must_be_interruptible
 threaded_execve
 mtd
 ubi
+sigreturn

@@ -378,8 +378,8 @@ struct arm_pt_regs {
 # define PERSONALITY0_WORDSIZE (int)(sizeof(long))
 #endif
 
-#if defined(I386)
-extern struct user_regs_struct i386_regs;
+#if defined(I386) || defined(X86_64)
+extern uint32_t *const i386_esp_ptr;
 #elif defined(IA64)
 extern bool ia64_ia32mode;
 #elif defined(SPARC) || defined(SPARC64)

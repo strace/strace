@@ -70,35 +70,8 @@ typedef struct {
 #  include <asm/sigcontext.h>
 # endif
 #else /* !HAVE_ASM_SIGCONTEXT_H */
-# if defined I386 && !defined HAVE_STRUCT_SIGCONTEXT_STRUCT
-struct sigcontext_struct {
-	unsigned short gs, __gsh;
-	unsigned short fs, __fsh;
-	unsigned short es, __esh;
-	unsigned short ds, __dsh;
-	unsigned long edi;
-	unsigned long esi;
-	unsigned long ebp;
-	unsigned long esp;
-	unsigned long ebx;
-	unsigned long edx;
-	unsigned long ecx;
-	unsigned long eax;
-	unsigned long trapno;
-	unsigned long err;
-	unsigned long eip;
-	unsigned short cs, __csh;
-	unsigned long eflags;
-	unsigned long esp_at_signal;
-	unsigned short ss, __ssh;
-	unsigned long i387;
-	unsigned long oldmask;
-	unsigned long cr2;
-};
-# else /* !I386 */
-#  if defined M68K && !defined HAVE_STRUCT_SIGCONTEXT
-struct sigcontext
-{
+# if defined M68K && !defined HAVE_STRUCT_SIGCONTEXT
+struct sigcontext {
 	unsigned long sc_mask;
 	unsigned long sc_usp;
 	unsigned long sc_d0;
@@ -109,9 +82,53 @@ struct sigcontext
 	unsigned long sc_pc;
 	unsigned short sc_formatvec;
 };
-#  endif /* M68K */
-# endif /* !I386 */
+# endif /* M68K */
 #endif /* !HAVE_ASM_SIGCONTEXT_H */
+#if defined(I386) || defined(X86_64)
+struct i386_sigcontext_struct {
+	uint16_t gs, __gsh;
+	uint16_t fs, __fsh;
+	uint16_t es, __esh;
+	uint16_t ds, __dsh;
+	uint32_t edi;
+	uint32_t esi;
+	uint32_t ebp;
+	uint32_t esp;
+	uint32_t ebx;
+	uint32_t edx;
+	uint32_t ecx;
+	uint32_t eax;
+	uint32_t trapno;
+	uint32_t err;
+	uint32_t eip;
+	uint16_t cs, __csh;
+	uint32_t eflags;
+	uint32_t esp_at_signal;
+	uint16_t ss, __ssh;
+	uint32_t i387;
+	uint32_t oldmask;
+	uint32_t cr2;
+};
+struct i386_fpstate {
+	uint32_t cw;
+	uint32_t sw;
+	uint32_t tag;
+	uint32_t ipoff;
+	uint32_t cssel;
+	uint32_t dataoff;
+	uint32_t datasel;
+	uint8_t  st[8][10]; /* 8*10 bytes: FP regs */
+	uint16_t status;
+	uint16_t magic;
+	uint32_t fxsr_env[6];
+	uint32_t mxcsr;
+	uint32_t reserved;
+	uint8_t  stx[8][16]; /* 8*16 bytes: FP regs, each padded to 16 bytes */
+	uint8_t  xmm[8][16]; /* 8 XMM regs */
+	uint32_t padding1[44];
+	uint32_t padding2[12]; /* union with struct _fpx_sw_bytes */
+};
+#endif
 
 #ifndef NSIG
 # warning: NSIG is not defined, using 32
@@ -288,10 +305,13 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 	char sep;
 	char *s;
 
+	/* Note: nsignals = ARRAY_SIZE(signalent[]),
+	 * and that array may not have SIGRTnn.
+	 */
 	maxsigs = nsignals;
 #ifdef __SIGRTMAX
 	if (rt)
-		maxsigs = __SIGRTMAX; /* instead */
+		maxsigs = __SIGRTMAX + 1; /* instead */
 #endif
 	s = stpcpy(outstr, str);
 	nsigs = 0;
@@ -308,23 +328,17 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 	sep = '[';
 	for (i = 1; i < maxsigs; i++) {
 		if (sigismember(mask, i) == show_members) {
-			/* real-time signals on solaris don't have
-			 * signalent entries
-			 */
-			char tsig[40];
 			*s++ = sep;
 			if (i < nsignals) {
 				s = stpcpy(s, signalent[i] + 3);
 			}
 #ifdef SIGRTMIN
 			else if (i >= __SIGRTMIN && i <= __SIGRTMAX) {
-				sprintf(tsig, "RT_%u", i - __SIGRTMIN);
-				s = stpcpy(s, tsig);
+				s += sprintf(s, "RT_%u", i - __SIGRTMIN);
 			}
 #endif /* SIGRTMIN */
 			else {
-				sprintf(tsig, "%u", i);
-				s = stpcpy(s, tsig);
+				s += sprintf(s, "%u", i);
 			}
 			sep = ' ';
 		}
@@ -832,19 +846,28 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		tprints(sprintsigmask(") (mask ", (sigset_t *)&sc.oldmask[0], 0));
 	}
-#elif defined(I386)
+#elif defined(I386) || defined(X86_64)
+# if defined(X86_64)
+	if (current_personality == 0) /* 64-bit */
+		return 0;
+# endif
 	if (entering(tcp)) {
-		struct sigcontext_struct sc;
-		/* Note: on i386, sc is followed on stack by struct fpstate
+		struct {
+			struct i386_sigcontext_struct sc;
+			struct i386_fpstate fp;
+			uint32_t extramask[1];
+		} signal_stack;
+		/* On i386, sc is followed on stack by struct fpstate
 		 * and after it an additional u32 extramask[1] which holds
-		 * upper half of the mask. We can fetch it there
-		 * if/when we'd want to display the full mask...
+		 * upper half of the mask.
 		 */
 		sigset_t sigm;
-		if (umove(tcp, i386_regs.esp, &sc) < 0)
+		if (umove(tcp, *i386_esp_ptr, &signal_stack) < 0)
 			return 0;
-		long_to_sigset(sc.oldmask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0));
+		sigemptyset(&sigm);
+		((uint32_t*)&sigm)[0] = signal_stack.sc.oldmask;
+		((uint32_t*)&sigm)[1] = signal_stack.extramask[0];
+		tprints(sprintsigmask(") (mask ", &sigm, /*RT sigs too?:*/ 1));
 	}
 #elif defined(IA64)
 	if (entering(tcp)) {
@@ -993,8 +1016,6 @@ sys_sigreturn(struct tcb *tcp)
 		long_to_sigset(sc.oldmask, &sigm);
 		tprints(sprintsigmask(") (mask ", &sigm, 0));
 	}
-#elif defined(X86_64)
-	/* no need to remind */
 #elif defined(XTENSA)
 	/* Xtensa only has rt_sys_sigreturn */
 #else
