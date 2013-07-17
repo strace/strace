@@ -84,51 +84,6 @@ struct sigcontext {
 };
 # endif /* M68K */
 #endif /* !HAVE_ASM_SIGCONTEXT_H */
-#if defined(I386) || defined(X86_64)
-struct i386_sigcontext_struct {
-	uint16_t gs, __gsh;
-	uint16_t fs, __fsh;
-	uint16_t es, __esh;
-	uint16_t ds, __dsh;
-	uint32_t edi;
-	uint32_t esi;
-	uint32_t ebp;
-	uint32_t esp;
-	uint32_t ebx;
-	uint32_t edx;
-	uint32_t ecx;
-	uint32_t eax;
-	uint32_t trapno;
-	uint32_t err;
-	uint32_t eip;
-	uint16_t cs, __csh;
-	uint32_t eflags;
-	uint32_t esp_at_signal;
-	uint16_t ss, __ssh;
-	uint32_t i387;
-	uint32_t oldmask;
-	uint32_t cr2;
-};
-struct i386_fpstate {
-	uint32_t cw;
-	uint32_t sw;
-	uint32_t tag;
-	uint32_t ipoff;
-	uint32_t cssel;
-	uint32_t dataoff;
-	uint32_t datasel;
-	uint8_t  st[8][10]; /* 8*10 bytes: FP regs */
-	uint16_t status;
-	uint16_t magic;
-	uint32_t fxsr_env[6];
-	uint32_t mxcsr;
-	uint32_t reserved;
-	uint8_t  stx[8][16]; /* 8*16 bytes: FP regs, each padded to 16 bytes */
-	uint8_t  xmm[8][16]; /* 8 XMM regs */
-	uint32_t padding1[44];
-	uint32_t padding2[12]; /* union with struct _fpx_sw_bytes */
-};
-#endif
 
 #ifndef NSIG
 # warning: NSIG is not defined, using 32
@@ -829,12 +784,54 @@ sys_sigreturn(struct tcb *tcp)
 {
 #if defined(ARM)
 	if (entering(tcp)) {
-		struct sigcontext_struct sc;
+		struct arm_sigcontext {
+			unsigned long trap_no;
+			unsigned long error_code;
+			unsigned long oldmask;
+			unsigned long arm_r0;
+			unsigned long arm_r1;
+			unsigned long arm_r2;
+			unsigned long arm_r3;
+			unsigned long arm_r4;
+			unsigned long arm_r5;
+			unsigned long arm_r6;
+			unsigned long arm_r7;
+			unsigned long arm_r8;
+			unsigned long arm_r9;
+			unsigned long arm_r10;
+			unsigned long arm_fp;
+			unsigned long arm_ip;
+			unsigned long arm_sp;
+			unsigned long arm_lr;
+			unsigned long arm_pc;
+			unsigned long arm_cpsr;
+			unsigned long fault_address;
+		};
+		struct arm_ucontext {
+			unsigned long uc_flags;
+			unsigned long uc_link;  /* struct ucontext* */
+			/* The next three members comprise stack_t struct: */
+			unsigned long ss_sp;    /* void*   */
+			unsigned long ss_flags; /* int     */
+			unsigned long ss_size;  /* size_t  */
+			struct arm_sigcontext sc;
+			/* These two members are sigset_t: */
+			unsigned long uc_sigmask[2];
+			/* more fields follow, which we aren't interested in */
+		};
+		struct arm_ucontext uc;
 		sigset_t sigm;
-		if (umove(tcp, arm_regs.ARM_sp, &sc) < 0)
+		if (umove(tcp, arm_regs.ARM_sp, &uc) < 0)
 			return 0;
-		long_to_sigset(sc.oldmask, &sigm);
-		tprints(sprintsigmask(") (mask ", &sigm, 0));
+		/* Kernel fills out uc.sc.oldmask too when it sets up signal stack,
+		 * but for sigmask restore, sigreturn syscall uses uc.uc_sigmask instead.
+		 *  long_to_sigset(uc.sc.oldmask, &sigm);
+		 *  tprints(sprintsigmask(") (mask ", &sigm, 0));
+		 */
+		sigemptyset(&sigm);
+		((uint32_t*)&sigm)[0] = uc.uc_sigmask[0];
+		((uint32_t*)&sigm)[1] = uc.uc_sigmask[1];
+		tprints(sprintsigmask(") (mask ", &sigm, /*rt:*/ 1));
 	}
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
@@ -852,6 +849,49 @@ sys_sigreturn(struct tcb *tcp)
 		return 0;
 # endif
 	if (entering(tcp)) {
+		struct i386_sigcontext_struct {
+			uint16_t gs, __gsh;
+			uint16_t fs, __fsh;
+			uint16_t es, __esh;
+			uint16_t ds, __dsh;
+			uint32_t edi;
+			uint32_t esi;
+			uint32_t ebp;
+			uint32_t esp;
+			uint32_t ebx;
+			uint32_t edx;
+			uint32_t ecx;
+			uint32_t eax;
+			uint32_t trapno;
+			uint32_t err;
+			uint32_t eip;
+			uint16_t cs, __csh;
+			uint32_t eflags;
+			uint32_t esp_at_signal;
+			uint16_t ss, __ssh;
+			uint32_t i387;
+			uint32_t oldmask;
+			uint32_t cr2;
+		};
+		struct i386_fpstate {
+			uint32_t cw;
+			uint32_t sw;
+			uint32_t tag;
+			uint32_t ipoff;
+			uint32_t cssel;
+			uint32_t dataoff;
+			uint32_t datasel;
+			uint8_t  st[8][10]; /* 8*10 bytes: FP regs */
+			uint16_t status;
+			uint16_t magic;
+			uint32_t fxsr_env[6];
+			uint32_t mxcsr;
+			uint32_t reserved;
+			uint8_t  stx[8][16]; /* 8*16 bytes: FP regs, each padded to 16 bytes */
+			uint8_t  xmm[8][16]; /* 8 XMM regs */
+			uint32_t padding1[44];
+			uint32_t padding2[12]; /* union with struct _fpx_sw_bytes */
+		};
 		struct {
 			struct i386_sigcontext_struct sc;
 			struct i386_fpstate fp;
