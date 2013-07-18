@@ -89,11 +89,6 @@ struct sigcontext {
 # warning: NSIG is not defined, using 32
 # define NSIG 32
 #endif
-#ifdef ARM
-/* Ugh. Is this really correct? ARM has no RT signals?! */
-# undef NSIG
-# define NSIG 32
-#endif
 
 #ifdef HAVE_SIGACTION
 
