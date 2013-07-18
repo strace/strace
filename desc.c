@@ -1048,16 +1048,29 @@ sys_pselect6(struct tcb *tcp)
 {
 	int rc = decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
 	if (entering(tcp)) {
+		long r;
 		struct {
-			void *ss;
+			unsigned long ptr;
 			unsigned long len;
 		} data;
-		if (umove(tcp, tcp->u_arg[5], &data) < 0)
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+		if (current_wordsize == 4) {
+			struct {
+				uint32_t ptr;
+				uint32_t len;
+			} data32;
+			r = umove(tcp, tcp->u_arg[5], &data32);
+			data.ptr = data32.ptr;
+			data.len = data32.len;
+		} else
+#endif
+			r = umove(tcp, tcp->u_arg[5], &data);
+		if (r < 0)
 			tprintf(", %#lx", tcp->u_arg[5]);
 		else {
 			tprints(", {");
 			/* NB: kernel requires data.len == NSIG / 8 */
-			print_sigset_addr_len(tcp, (long)data.ss, data.len);
+			print_sigset_addr_len(tcp, data.ptr, data.len);
 			tprintf(", %lu}", data.len);
 		}
 	}
