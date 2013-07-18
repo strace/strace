@@ -1140,13 +1140,12 @@ sys_sigprocmask(struct tcb *tcp)
 		 * Everyone else:
 		 *	ret = sigprocmask(how, &new, &old, ...);
 		 */
-		memcpy(&ss, &tcp->u_arg[1], sizeof(long));
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
-		tprints(", ");
-		printsigmask(&ss, 0);
+		long_to_sigset(tcp->u_arg[1], &ss);
+		tprints(sprintsigmask(", ", &ss, 0));
 	}
 	else if (!syserror(tcp)) {
-		memcpy(&ss, &tcp->u_rval, sizeof(long));
+		long_to_sigset(tcp->u_rval, &ss);
 		tcp->auxstr = sprintsigmask("old mask ", &ss, 0);
 		return RVAL_HEX | RVAL_STR;
 	}
