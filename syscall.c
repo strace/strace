@@ -678,7 +678,8 @@ getrval2(struct tcb *tcp)
 
 #if defined(I386)
 static struct user_regs_struct i386_regs;
-uint32_t *const i386_esp_ptr = &i386_regs.esp;
+/* Cast suppresses signedness warning (.esp is long, not unsigned long) */
+uint32_t *const i386_esp_ptr = (uint32_t*)&i386_regs.esp;
 # define ARCH_REGS_FOR_GETREGSET i386_regs
 #elif defined(X86_64) || defined(X32)
 /*
