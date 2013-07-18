@@ -214,7 +214,7 @@ signame(int sig)
 }
 
 static const char *
-sprintsigmask(const char *str, sigset_t *mask, int rt)
+sprintsigmask(const char *str, sigset_t *mask)
 /* set might include realtime sigs */
 {
 	/* Was [8 * sizeof(sigset_t) * 8], but
@@ -237,10 +237,10 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 	/* Note: nsignals = ARRAY_SIZE(signalent[]),
 	 * and that array may not have SIGRTnn.
 	 */
-	maxsigs = nsignals;
 #ifdef __SIGRTMAX
-	if (rt)
-		maxsigs = __SIGRTMAX + 1; /* instead */
+	maxsigs = __SIGRTMAX + 1; /* instead */
+#else
+	maxsigs = nsignals;
 #endif
 	s = stpcpy(outstr, str);
 	nsigs = 0;
@@ -265,7 +265,7 @@ sprintsigmask(const char *str, sigset_t *mask, int rt)
 			else if (i >= __SIGRTMIN && i <= __SIGRTMAX) {
 				s += sprintf(s, "RT_%u", i - __SIGRTMIN);
 			}
-#endif /* SIGRTMIN */
+#endif
 			else {
 				s += sprintf(s, "%u", i);
 			}
@@ -285,13 +285,13 @@ sprintsigmask_long(const char *str, long mask)
 	sigset_t s;
 	sigemptyset(&s);
 	*(long *)&s = mask;
-	return sprintsigmask(str, &s, /*rt:*/ 1);
+	return sprintsigmask(str, &s);
 }
 
 static void
-printsigmask(sigset_t *mask, int rt)
+printsigmask(sigset_t *mask)
 {
-	tprints(sprintsigmask("", mask, rt));
+	tprints(sprintsigmask("", mask));
 }
 
 void
@@ -322,7 +322,7 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 	sigemptyset(&ss);
 	if (umoven(tcp, addr, len, (char *)&ss) < 0)
 		goto bad;
-	printsigmask(&ss, /*rt:*/ 1);
+	printsigmask(&ss);
 }
 
 #ifndef ILL_ILLOPC
@@ -818,7 +818,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigemptyset(&sigm);
 		((uint32_t*)&sigm)[0] = uc.uc_sigmask[0];
 		((uint32_t*)&sigm)[1] = uc.uc_sigmask[1];
-		tprints(sprintsigmask(") (mask ", &sigm, /*rt:*/ 1));
+		tprints(sprintsigmask(") (mask ", &sigm));
 	}
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
@@ -828,7 +828,7 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &sc) < 0)
 			return 0;
-		tprints(sprintsigmask(") (mask ", (sigset_t *)&sc.oldmask[0], 0));
+		tprints(sprintsigmask(") (mask ", (sigset_t *)&sc.oldmask[0]));
 	}
 #elif defined(I386) || defined(X86_64)
 # if defined(X86_64)
@@ -894,7 +894,7 @@ sys_sigreturn(struct tcb *tcp)
 		sigemptyset(&sigm);
 		((uint32_t*)&sigm)[0] = signal_stack.sc.oldmask;
 		((uint32_t*)&sigm)[1] = signal_stack.extramask[0];
-		tprints(sprintsigmask(") (mask ", &sigm, /*RT sigs too?:*/ 1));
+		tprints(sprintsigmask(") (mask ", &sigm));
 	}
 #elif defined(IA64)
 	if (entering(tcp)) {
@@ -909,7 +909,7 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		sigemptyset(&sigm);
 		memcpy(&sigm, &sc.sc_mask, NSIG / 8);
-		tprints(sprintsigmask(") (mask ", &sigm, 0));
+		tprints(sprintsigmask(") (mask ", &sigm));
 	}
 #elif defined(POWERPC)
 	if (entering(tcp)) {
@@ -1014,7 +1014,7 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		sigemptyset(&sigm);
 		memcpy(&sigm, &uc.uc_sigmask, NSIG / 8);
-		tprints(sprintsigmask(") (mask ", &sigm, 0));
+		tprints(sprintsigmask(") (mask ", &sigm));
 	}
 #elif defined(MICROBLAZE)
 	/* TODO: Verify that this is correct...  */
@@ -1292,7 +1292,7 @@ sys_rt_sigaction(struct tcb *tcp)
 	 */
 	sigemptyset(&sigset);
 	memcpy(&sigset, &sa.sa_mask, NSIG / 8);
-	printsigmask(&sigset, /*rt:*/ 1);
+	printsigmask(&sigset);
 	tprints(", ");
 
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
