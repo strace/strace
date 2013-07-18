@@ -790,7 +790,9 @@ sys_epoll_pwait(struct tcb *tcp)
 	epoll_wait_common(tcp);
 	if (exiting(tcp)) {
 		tprints(", ");
-		print_sigset(tcp, tcp->u_arg[4], 0);
+		/* NB: kernel requires arg[5] == NSIG / 8 */
+		print_sigset_addr_len(tcp, tcp->u_arg[4], tcp->u_arg[5]);
+		tprintf(", %lu", tcp->u_arg[5]);
 	}
 	return 0;
 }
@@ -1054,10 +1056,8 @@ sys_pselect6(struct tcb *tcp)
 			tprintf(", %#lx", tcp->u_arg[5]);
 		else {
 			tprints(", {");
-			if (data.len < sizeof(long))
-				tprintf("%#lx", (long)data.ss);
-			else
-				print_sigset(tcp, (long)data.ss, 0);
+			/* NB: kernel requires data.len == NSIG / 8 */
+			print_sigset_addr_len(tcp, (long)data.ss, data.len);
 			tprintf(", %lu}", data.len);
 		}
 	}

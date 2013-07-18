@@ -695,7 +695,7 @@ extern void printrusage(struct tcb *, long);
 extern void printrusage32(struct tcb *, long);
 #endif
 extern void printuid(const char *, unsigned long);
-extern void print_sigset(struct tcb *, long, int);
+extern void print_sigset_addr_len(struct tcb *, long, long);
 extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int decode_iov, unsigned long);

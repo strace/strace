@@ -422,7 +422,8 @@ sys_ppoll(struct tcb *tcp)
 	if (entering(tcp)) {
 		print_timespec(tcp, tcp->u_arg[2]);
 		tprints(", ");
-		print_sigset(tcp, tcp->u_arg[3], 0);
+		/* NB: kernel requires arg[4] == NSIG / 8 */
+		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 		tprintf(", %lu", tcp->u_arg[4]);
 	}
 	return rc;
