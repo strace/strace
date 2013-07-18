@@ -1331,23 +1331,18 @@ sys_rt_sigaction(struct tcb *tcp)
 		tprints("{SIG_IGN, ");
 	else
 		tprintf("{%#lx, ", (long) sa.__sa_handler);
-	/* Questionable code below.
-	 * Kernel won't handle sys_rt_sigaction
-	 * with wrong sigset size (just returns EINVAL)
-	 * therefore tcp->u_arg[3(4)] _must_ be NSIG / 8 here,
-	 * and we always use smaller memcpy. */
+	/*
+	 * Sigset size is in tcp->u_arg[4] (SPARC)
+	 * or in tcp->u_arg[3] (all other),
+	 * but kernel won't handle sys_rt_sigaction
+	 * with wrong sigset size (just returns EINVAL instead).
+	 * We just fetch the right size, which is NSIG / 8.
+	 */
 	sigemptyset(&sigset);
-#if defined(SPARC) || defined(SPARC64)
-	if (tcp->u_arg[4] <= sizeof(sigset))
-		memcpy(&sigset, &sa.sa_mask, tcp->u_arg[4]);
-#else
-	if (tcp->u_arg[3] <= sizeof(sigset))
-		memcpy(&sigset, &sa.sa_mask, tcp->u_arg[3]);
-#endif
-	else
-		memcpy(&sigset, &sa.sa_mask, sizeof(sigset));
-	printsigmask(&sigset, 1);
+	memcpy(&sigset, &sa.sa_mask, NSIG / 8);
+	printsigmask(&sigset, /*rt:*/ 1);
 	tprints(", ");
+
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #ifdef SA_RESTORER
 	if (sa.sa_flags & SA_RESTORER)
