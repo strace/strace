@@ -54,6 +54,15 @@ strace_SOURCES =	\
 	util.c		\
 	vsprintf.c
 
+if USE_LIBUNWIND
+strace_SOURCES += unwind.c
+strace_CPPFLAGS = $(AM_CPPFLAGS) $(libunwind_CPPFLAGS)
+strace_LDFLAGS = $(libunwind_LDFLAGS)
+strace_LDADD = $(libunwind_LIBS)
+else
+strace_CPPFLAGS = $(AM_CPPFLAGS)
+endif
+
 noinst_HEADERS = defs.h
 # Enable this to get link map generated
 #strace_CFLAGS = $(AM_CFLAGS) -Wl,-Map=strace.mapfile

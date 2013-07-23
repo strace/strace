@@ -425,6 +425,12 @@ struct tcb {
 	struct timeval etime;	/* Syscall entry time */
 				/* Support for tracing forked processes: */
 	long inst[2];		/* Saved clone args (badly named) */
+
+#ifdef USE_LIBUNWIND
+	struct UPT_info* libunwind_ui;
+	struct mmap_cache_t* mmap_cache;
+	unsigned int mmap_cache_size;
+#endif
 };
 
 /* TCB flags */
@@ -559,6 +565,10 @@ extern const char **paths_selected;
 extern bool need_fork_exec_workarounds;
 extern unsigned xflag;
 extern unsigned followfork;
+#ifdef USE_LIBUNWIND
+/* if this is true do the stack trace for every system call */
+extern bool stack_trace_enabled;
+#endif
 extern unsigned ptrace_setoptions;
 extern unsigned max_strlen;
 extern unsigned os_release;
@@ -720,6 +730,15 @@ extern void tv_add(struct timeval *, const struct timeval *, const struct timeva
 extern void tv_sub(struct timeval *, const struct timeval *, const struct timeval *);
 extern void tv_mul(struct timeval *, const struct timeval *, int);
 extern void tv_div(struct timeval *, const struct timeval *, int);
+
+#ifdef USE_LIBUNWIND
+extern void init_unwind_addr_space(void);
+extern void init_libunwind_ui(struct tcb *tcp);
+extern void free_libunwind_ui(struct tcb *tcp);
+extern void alloc_mmap_cache(struct tcb* tcp);
+extern void delete_mmap_cache(struct tcb* tcp);
+extern void print_stacktrace(struct tcb* tcp);
+#endif
 
 /* Strace log generation machinery.
  *

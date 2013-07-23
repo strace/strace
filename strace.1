@@ -39,7 +39,7 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .B strace
-[\fB-CdffhiqrtttTvVxxy\fR]
+[\fB-CdffhikqrtttTvVxxy\fR]
 [\fB-I\fIn\fR]
 [\fB-b\fIexecve\fR]
 [\fB-e\fIexpr\fR]...
@@ -261,6 +261,9 @@ Print the help summary.
 .TP
 .B \-i
 Print the instruction pointer at the time of the system call.
+.TP
+.B \-k
+Print the execution stack trace of the traced processes after each system call.
 .TP
 .B \-q
 Suppress messages about attaching, detaching etc.  This happens

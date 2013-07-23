@@ -649,5 +649,94 @@ fi
 
 AC_PATH_PROG([PERL], [perl])
 
+dnl stack trace with libunwind
+libunwind_CPPFLAGS=
+libunwind_LDFLAGS=
+libunwind_LIBS=
+AC_ARG_WITH([libunwind],
+            [AS_HELP_STRING([--with-libunwind],
+                            [use libunwind to implement stack tracing support])],
+            [case "${withval}" in
+             yes|no|check) ;;
+             *) with_libunwind=yes
+                libunwind_CPPFLAGS="-I${withval}/include"
+                libunwind_LDFLAGS="-L${withval}/lib" ;;
+             esac],
+            [with_libunwind=check]
+)
+
+use_libunwind=no
+AS_IF([test "x$with_libunwind" != xno],
+      [saved_CPPFLAGS="$CPPFLAGS"
+       CPPFLAGS="$CPPFLAGS $libunwind_CPPFLAGS"
+
+       AC_CHECK_HEADERS([libunwind-ptrace.h],
+         [saved_LDFLAGS="$LDFLAGS"
+          LDFLAGS="$LDFLAGS $libunwind_LDFLAGS"
+
+          AC_CHECK_LIB([unwind], [backtrace],
+            [libunwind_LIBS="-lunwind $libunwind_LIBS"
+
+             AC_MSG_CHECKING([for unw_create_addr_space in libunwind-generic])
+             saved_LIBS="$LIBS"
+             LIBS="-lunwind-generic $libunwind_LIBS $LIBS"
+
+             AC_LINK_IFELSE(
+               [AC_LANG_PROGRAM([[#include <libunwind-ptrace.h>]],
+                                [[return !unw_create_addr_space(0, 0)]])
+               ],
+               [AC_MSG_RESULT([yes])
+                libunwind_LIBS="-lunwind-generic $libunwind_LIBS"
+
+                AC_CHECK_LIB([unwind-ptrace], [_UPT_create],
+                  [libunwind_LIBS="-lunwind-ptrace $libunwind_LIBS"
+                   use_libunwind=yes
+                  ],
+                  [if test "x$with_libunwind" != xcheck; then
+                     AC_MSG_FAILURE([failed to find _UPT_create in libunwind-ptrace])
+                   fi
+                  ],
+                  [$libunwind_LIBS]
+                )
+               ],
+               [AC_MSG_RESULT([no])
+                if test "x$with_libunwind" != xcheck; then
+                  AC_MSG_FAILURE([failed to find unw_create_addr_space in libunwind-generic])
+                fi
+               ]
+             )
+
+             LIBS="$saved_LIBS"
+            ],
+            [if test "x$with_libunwind" != xcheck; then
+               AC_MSG_FAILURE([failed to find libunwind])
+             fi
+            ],
+            [$libunwind_LIBS]
+          )
+
+          LDFLAGS="$saved_LDFLAGS"
+         ],
+         [if test "x$with_libunwind" != xcheck; then
+            AC_MSG_FAILURE([failed to find libunwind-ptrace.h])
+          fi
+         ]
+       )
+
+       CPPFLAGS="$saved_CPPFLAGS"
+      ]
+)
+
+dnl enable libunwind
+AC_MSG_CHECKING([whether to enable stack tracing support using libunwind])
+if test "x$use_libunwind" = xyes; then
+	AC_DEFINE([USE_LIBUNWIND], 1, [Compile stack tracing functionality])
+	AC_SUBST(libunwind_LIBS)
+	AC_SUBST(libunwind_LDFLAGS)
+	AC_SUBST(libunwind_CPPFLAGS)
+fi
+AM_CONDITIONAL([USE_LIBUNWIND], [test "x$use_libunwind" = xyes])
+AC_MSG_RESULT([$use_libunwind])
+
 AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_OUTPUT

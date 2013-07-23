@@ -50,6 +50,10 @@ extern char **environ;
 extern int optind;
 extern char *optarg;
 
+#ifdef USE_LIBUNWIND
+/* if this is true do the stack trace for every system call */
+bool stack_trace_enabled = false;
+#endif
 
 #if defined __NR_tkill
 # define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
@@ -233,6 +237,10 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -E var -- remove var from the environment for command\n\
 -P path -- trace accesses to path\n\
 "
+#ifdef USE_LIBUNWIND
+"-k obtain stack trace between each syscall\n\
+"
+#endif
 /* ancient, no one should use it
 -F -- attempt to follow vforks (deprecated, use -f)\n\
  */
@@ -695,6 +703,12 @@ alloctcb(int pid)
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
+
+#ifdef USE_LIBUNWIND
+			if (stack_trace_enabled)
+				init_libunwind_ui(tcp);
+#endif
+
 			nprocs++;
 			if (debug_flag)
 				fprintf(stderr, "new tcb for pid %d, active tcbs:%d\n", tcp->pid, nprocs);
@@ -731,6 +745,12 @@ droptcb(struct tcb *tcp)
 	if (printing_tcp == tcp)
 		printing_tcp = NULL;
 
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled) {
+		delete_mmap_cache(tcp);
+		free_libunwind_ui(tcp);
+	}
+#endif
 	memset(tcp, 0, sizeof(*tcp));
 }
 
@@ -1653,6 +1673,9 @@ init(int argc, char *argv[])
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
 		"+b:cCdfFhiqrtTvVwxyz"
+#ifdef USE_LIBUNWIND
+		"k"
+#endif
 		"D"
 		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
 		switch (c) {
@@ -1758,6 +1781,11 @@ init(int argc, char *argv[])
 		case 'u':
 			username = strdup(optarg);
 			break;
+#ifdef USE_LIBUNWIND
+		case 'k':
+			stack_trace_enabled = true;
+			break;
+#endif
 		case 'E':
 			if (putenv(optarg) < 0)
 				die_out_of_memory();
@@ -1788,6 +1816,11 @@ init(int argc, char *argv[])
 	if (nprocs != 0 && daemonized_tracer) {
 		error_msg_and_die("-D and -p are mutually exclusive");
 	}
+
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled)
+		init_unwind_addr_space();
+#endif
 
 	if (!followfork)
 		followfork = optF;
