@@ -267,6 +267,8 @@ int sys_statfs64();
 int sys_stime();
 int sys_swapon();
 int sys_symlinkat();
+int sys_sync_file_range();
+int sys_sync_file_range2();
 int sys_sysctl();
 int sys_sysinfo();
 int sys_syslog();

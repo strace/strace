@@ -2686,6 +2686,41 @@ sys_fadvise64_64(struct tcb *tcp)
 	return 0;
 }
 
+static const struct xlat sync_file_range_flags[] = {
+	{ SYNC_FILE_RANGE_WAIT_BEFORE,	"SYNC_FILE_RANGE_WAIT_BEFORE"	},
+	{ SYNC_FILE_RANGE_WRITE,	"SYNC_FILE_RANGE_WRITE"		},
+	{ SYNC_FILE_RANGE_WAIT_AFTER,	"SYNC_FILE_RANGE_WAIT_AFTER"	},
+	{ 0,				NULL				}
+};
+
+int
+sys_sync_file_range(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		int argn;
+		printfd(tcp, tcp->u_arg[0]);
+		argn = printllval(tcp, ", %lld, ", 1);
+		argn = printllval(tcp, "%lld, ", argn);
+		printflags(sync_file_range_flags, tcp->u_arg[argn],
+		           "SYNC_FILE_RANGE_???");
+	}
+	return 0;
+}
+
+int
+sys_sync_file_range2(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		int argn;
+		printfd(tcp, tcp->u_arg[0]);
+		printflags(sync_file_range_flags, 1,
+		           "SYNC_FILE_RANGE_???");
+		argn = printllval(tcp, ", %lld, ", 2);
+		argn = printllval(tcp, "%lld, ", argn);
+	}
+	return 0;
+}
+
 static const struct xlat inotify_modes[] = {
 	{ 0x00000001,	"IN_ACCESS"	},
 	{ 0x00000002,	"IN_MODIFY"	},
