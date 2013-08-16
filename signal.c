@@ -1033,6 +1033,8 @@ sys_sigreturn(struct tcb *tcp)
 	}
 #elif defined(XTENSA)
 	/* Xtensa only has rt_sys_sigreturn */
+#elif defined(ARC)
+	/* ARC syscall ABI only supports rt_sys_sigreturn */
 #else
 # warning No sys_sigreturn() for this architecture
 # warning         (no problem, just a reminder :-)

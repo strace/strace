@@ -82,6 +82,8 @@ EXTRA_DIST =				\
 	linux/alpha/ioctlent.h.in	\
 	linux/alpha/signalent.h		\
 	linux/alpha/syscallent.h	\
+	linux/arc/ioctlent.h.in		\
+	linux/arc/syscallent.h		\
 	linux/arm/ioctlent.h.in		\
 	linux/arm/syscallent.h		\
 	linux/avr32/ioctlent.h.in	\

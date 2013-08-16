@@ -164,6 +164,7 @@ extern char *stpcpy(char *dst, const char *src);
     || defined(METAG) \
     || defined(TILE) \
     || defined(XTENSA) \
+    || defined(ARC) \
     ) && defined(__GLIBC__)
 # include <sys/ptrace.h>
 #else
@@ -611,6 +612,7 @@ extern void call_summary(FILE *);
  || defined(TILE) \
  || defined(OR1K) \
  || defined(METAG) \
+ || defined(ARC) \
  || defined(POWERPC)
 extern long get_regs_error;
 # define clear_regs()  (get_regs_error = -1)

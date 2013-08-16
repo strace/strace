@@ -2513,6 +2513,8 @@ const struct xlat struct_user_offsets[] = {
 	/* nothing */
 #elif defined(XTENSA)
 	/* nothing */
+#elif defined(ARC)
+	/* nothing */
 #endif
 	{ 0,			NULL					},
 };
