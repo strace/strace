@@ -396,7 +396,7 @@
 	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 365 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 366 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 367 */
-	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 368 */
+	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 368 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 369 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 370 */
 	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 371 */

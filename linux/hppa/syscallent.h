@@ -325,7 +325,7 @@
 	{ 4,	TN,	sys_accept4,		"accept4"		}, /* 320 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"		}, /* 321 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"		}, /* 322 */
-	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"		}, /* 323 */
+	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"		}, /* 323 */
 	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"		}, /* 324 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"	}, /* 325 */
 	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"	}, /* 326 */

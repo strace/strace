@@ -350,7 +350,7 @@
 	{ 6,	TD,	sys_pwritev,		"pwritev"		}, /* 321 */
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"	}, /* 322 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"		}, /* 323 */
-	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"		}, /* 324 */
+	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"		}, /* 324 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"		}, /* 325 */
 	{ 3,	TN,	sys_socket,		"socket"		}, /* 326 */
 	{ 3,	TN,	sys_bind,		"bind"			}, /* 327 */

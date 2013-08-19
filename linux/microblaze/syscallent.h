@@ -395,7 +395,7 @@
 	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"	}, /* 366 */
 	{ 5,	TN,	printargs,		"recvmmsg"	}, /* 367 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 368 */
-	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 369 */
+	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 369 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 370 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 371 */
 	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 372 */

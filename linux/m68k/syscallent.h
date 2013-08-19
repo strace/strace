@@ -364,7 +364,7 @@
 	{ 6,	0,	printargs,		"atomic_comxchg_32"}, /* 335 */
 	{ 0,	0,	printargs,		"atomic_barrier"}, /* 336 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 337 */
-	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 338 */
+	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 338 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 339 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 340 */
 	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 341 */

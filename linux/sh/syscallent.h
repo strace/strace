@@ -368,7 +368,7 @@
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"}, /* 335 */
 	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"}, /* 336 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 337 */
-	{ 5,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 338 */
+	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 338 */
 	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 339 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 340 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 341 */

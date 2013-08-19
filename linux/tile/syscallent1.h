@@ -265,7 +265,7 @@
 	{ 4,	TP,	sys_wait4,			"wait4"				}, /*  260 */
 	{ 4,	0,	sys_prlimit64,			"prlimit64"			}, /*  261 */
 	{ 2,	TD,	sys_fanotify_init,		"fanotify_init"			}, /*  262 */
-	{ 5,	TD|TF,	sys_fanotify_mark,		"fanotify_mark"			}, /*  263 */
+	{ 6,	TD|TF,	sys_fanotify_mark,		"fanotify_mark"			}, /*  263 */
 	{ 5,	TD|TF,	sys_name_to_handle_at,		"name_to_handle_at"		}, /*  264 */
 	{ 3,	TD,	sys_open_by_handle_at,		"open_by_handle_at"		}, /*  265 */
 	{ 2,	0,	sys_clock_adjtime,		"clock_adjtime"			}, /*  266 */
