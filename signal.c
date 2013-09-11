@@ -888,13 +888,16 @@ sys_sigreturn(struct tcb *tcp)
 		 * and after it an additional u32 extramask[1] which holds
 		 * upper half of the mask.
 		 */
-		sigset_t sigm;
+		union {
+			sigset_t sig;
+			uint32_t mask[2];
+		} sigmask;
 		if (umove(tcp, *i386_esp_ptr, &signal_stack) < 0)
 			return 0;
-		sigemptyset(&sigm);
-		((uint32_t*)&sigm)[0] = signal_stack.sc.oldmask;
-		((uint32_t*)&sigm)[1] = signal_stack.extramask[0];
-		tprints(sprintsigmask(") (mask ", &sigm));
+		sigemptyset(&sigmask.sig);
+		sigmask.mask[0] = signal_stack.sc.oldmask;
+		sigmask.mask[1] = signal_stack.extramask[0];
+		tprints(sprintsigmask(") (mask ", &sigmask.sig));
 	}
 #elif defined(IA64)
 	if (entering(tcp)) {
