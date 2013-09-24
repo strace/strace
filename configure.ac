@@ -257,7 +257,7 @@ AC_CHECK_MEMBERS([struct T_conn_res.QUEUE_ptr,
 
 AC_CHECK_TYPES([struct __old_kernel_stat],,, [#include <asm/stat.h>])
 
-AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg],,,
+AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg, struct ptrace_peeksiginfo_args],,,
 	       [#include <sys/ptrace.h>])
 
 AC_CHECK_TYPES([struct user_desc],,, [#include <asm/ldt.h>])
