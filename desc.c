@@ -492,14 +492,17 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		fdsize = 1024*1024;
 	if (args[0] < 0)
 		fdsize = 0;
+	nfds = fdsize;
 	fdsize = (((fdsize + 7) / 8) + sizeof(long)-1) & -sizeof(long);
+	/* We had bugs a-la "while (j < args[0])" and "umoven(args[0])" below.
+	 * Instead of args[0], use nfds for fd count, fdsize for array lengths.
+	 */
 
 	if (entering(tcp)) {
 		fds = malloc(fdsize);
 		if (!fds)
 			die_out_of_memory();
-		nfds = args[0];
-		tprintf("%d", nfds);
+		tprintf("%ld", args[0]);
 		for (i = 0; i < 3; i++) {
 			arg = args[i+1];
 			if (arg == 0) {
@@ -533,12 +536,13 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		char *outptr;
 #define end_outstr (outstr + sizeof(outstr))
 		const char *sep;
+		long ready_fds;
 
 		if (syserror(tcp))
 			return 0;
 
-		nfds = tcp->u_rval;
-		if (nfds == 0) {
+		ready_fds = tcp->u_rval;
+		if (ready_fds == 0) {
 			tcp->auxstr = "Timeout";
 			return RVAL_STR;
 		}
@@ -555,7 +559,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			arg = args[i+1];
 			if (!arg || umoven(tcp, arg, fdsize, (char *) fds) < 0)
 				continue;
-			for (j = 0; j < args[0]; j++) {
+			for (j = 0; j < nfds; j++) {
 				if (FD_ISSET(j, fds)) {
 					/* +2 chars needed at the end: ']',NUL */
 					if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
@@ -572,12 +576,12 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 							outptr += sprintf(outptr, " %u", j);
 						}
 					}
-					nfds--;
+					ready_fds--;
 				}
 			}
 			if (outptr != outstr)
 				*outptr++ = ']';
-			if (nfds == 0)
+			if (ready_fds == 0)
 				break;
 		}
 		free(fds);
