@@ -478,6 +478,14 @@ sys_getdtablesize(struct tcb *tcp)
 #endif
 
 static int
+fd_isset(int d, fd_set *fds)
+{
+	const int bpl = 8 * sizeof(long);
+	long *s = (long *) fds;
+	return !!(s[d / bpl] & (1L << (d % bpl)));
+}
+
+static int
 decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 {
 	int i, j;
@@ -528,7 +536,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			}
 			tprints(", [");
 			for (j = 0, sep = ""; j < nfds; j++) {
-				if (FD_ISSET(j, fds)) {
+				if (fd_isset(j, fds)) {
 					tprints(sep);
 					printfd(tcp, j);
 					sep = " ";
@@ -568,7 +576,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			if (!arg || umoven(tcp, arg, fdsize, (char *) fds) < 0)
 				continue;
 			for (j = 0; j < nfds; j++) {
-				if (FD_ISSET(j, fds)) {
+				if (fd_isset(j, fds)) {
 					/* +2 chars needed at the end: ']',NUL */
 					if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
 						if (first) {
