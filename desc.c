@@ -481,16 +481,17 @@ static int
 decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 {
 	int i, j;
-	unsigned nfds, fdsize;
+	int nfds, fdsize;
 	fd_set *fds;
 	const char *sep;
 	long arg;
 
-	fdsize = args[0];
+	/* Kernel truncates arg[0] to int, we do the same */
+	fdsize = (int)args[0];
 	/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
-	if (args[0] > 1024*1024)
+	if (fdsize > 1024*1024)
 		fdsize = 1024*1024;
-	if (args[0] < 0)
+	if (fdsize < 0)
 		fdsize = 0;
 	nfds = fdsize;
 	fdsize = (((fdsize + 7) / 8) + sizeof(long)-1) & -sizeof(long);
