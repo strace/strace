@@ -486,31 +486,39 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	const char *sep;
 	long arg;
 
-	/* Kernel truncates arg[0] to int, we do the same */
-	fdsize = (int)args[0];
+	/* Kernel truncates arg[0] to int, we do the same. */
+	nfds = (int) args[0];
+
+	/* Kernel rejects negative nfds, so we don't parse it either. */
+	if (nfds < 0) {
+		nfds = 0;
+		fds = NULL;
+	}
 	/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
-	if (fdsize > 1024*1024)
-		fdsize = 1024*1024;
-	if (fdsize < 0)
-		fdsize = 0;
-	nfds = fdsize;
-	fdsize = (((fdsize + 7) / 8) + sizeof(long)-1) & -sizeof(long);
-	/* We had bugs a-la "while (j < args[0])" and "umoven(args[0])" below.
+	if (nfds > 1024*1024)
+		nfds = 1024*1024;
+
+	/*
+	 * We had bugs a-la "while (j < args[0])" and "umoven(args[0])" below.
 	 * Instead of args[0], use nfds for fd count, fdsize for array lengths.
 	 */
+	fdsize = (((nfds + 7) / 8) + sizeof(long)-1) & -sizeof(long);
 
 	if (entering(tcp)) {
-		fds = malloc(fdsize);
-		if (!fds)
-			die_out_of_memory();
-		tprintf("%ld", args[0]);
+		tprintf("%d", (int) args[0]);
+
+		if (fdsize > 0) {
+			fds = malloc(fdsize);
+			if (!fds)
+				die_out_of_memory();
+		}
 		for (i = 0; i < 3; i++) {
 			arg = args[i+1];
 			if (arg == 0) {
 				tprints(", NULL");
 				continue;
 			}
-			if (!verbose(tcp)) {
+			if (!verbose(tcp) || !fds) {
 				tprintf(", %#lx", arg);
 				continue;
 			}
@@ -536,8 +544,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		static char outstr[1024];
 		char *outptr;
 #define end_outstr (outstr + sizeof(outstr))
-		const char *sep;
-		long ready_fds;
+		int ready_fds;
 
 		if (syserror(tcp))
 			return 0;
@@ -554,7 +561,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 
 		outptr = outstr;
 		sep = "";
-		for (i = 0; i < 3; i++) {
+		for (i = 0; i < 3 && ready_fds > 0; i++) {
 			int first = 1;
 
 			arg = args[i+1];
@@ -577,13 +584,12 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 							outptr += sprintf(outptr, " %u", j);
 						}
 					}
-					ready_fds--;
+					if (--ready_fds == 0)
+						break;
 				}
 			}
 			if (outptr != outstr)
 				*outptr++ = ']';
-			if (ready_fds == 0)
-				break;
 		}
 		free(fds);
 		/* This contains no useful information on SunOS.  */
