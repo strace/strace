@@ -477,12 +477,20 @@ sys_getdtablesize(struct tcb *tcp)
 }
 #endif
 
-static int
-fd_isset(int d, fd_set *fds)
+/* FD_ISSET from libc would abort for large fd if built with
+ * debug flags/library hacks which enforce array bound checks
+ * (fd_set contains a fixed-size array of longs).
+ * We need to use a homegrown replacement.
+ */
+static inline int
+fd_isset(unsigned fd, fd_set *fds)
 {
-	const int bpl = 8 * sizeof(long);
-	long *s = (long *) fds;
-	return !!(s[d / bpl] & (1L << (d % bpl)));
+	/* Using unsigned types to avoid signed divisions and shifts,
+	 * which are slow(er) on many CPUs.
+	 */
+	const unsigned bpl = 8 * sizeof(long);
+	unsigned long *s = (unsigned long *) fds;
+	return s[fd / bpl] & (1UL << (fd % bpl));
 }
 
 static int
