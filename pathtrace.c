@@ -257,11 +257,12 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_pselect6)
 	{
 		int     i, j;
-		unsigned nfds;
+		int     nfds;
 		long   *args, oldargs[5];
 		unsigned fdsize;
 		fd_set *fds;
 
+		args = tcp->u_arg;
 		if (s->sys_func == sys_oldselect) {
 			if (umoven(tcp, tcp->u_arg[0], sizeof oldargs,
 				   (char*) oldargs) < 0)
@@ -270,17 +271,17 @@ pathtrace_match(struct tcb *tcp)
 				return 0;
 			}
 			args = oldargs;
-		} else
-			args = tcp->u_arg;
+		}
 
-		nfds = args[0];
+		/* Kernel truncates arg[0] to int, we do the same. */
+		nfds = (int) args[0];
+		/* Kernel rejects negative nfds, so we don't parse it either. */
+		if (nfds <= 0)
+			return 0;
 		/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
-		if (args[0] > 1024*1024)
+		if (nfds > 1024*1024)
 			nfds = 1024*1024;
-		if (args[0] < 0)
-			nfds = 0;
-		fdsize = ((((nfds + 7) / 8) + sizeof(long) - 1)
-			  & -sizeof(long));
+		fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
 		fds = malloc(fdsize);
 		if (!fds)
 			die_out_of_memory();
@@ -288,17 +289,19 @@ pathtrace_match(struct tcb *tcp)
 		for (i = 1; i <= 3; ++i) {
 			if (args[i] == 0)
 				continue;
-
 			if (umoven(tcp, args[i], fdsize, (char *) fds) < 0) {
 				fprintf(stderr, "umoven() failed\n");
 				continue;
 			}
-
-			for (j = 0; j < nfds; ++j)
-				if (FD_ISSET(j, fds) && fdmatch(tcp, j)) {
+			for (j = 0;; j++) {
+				j = next_set_bit(fds, j, nfds);
+				if (j < 0)
+					break;
+				if (fdmatch(tcp, j)) {
 					free(fds);
 					return 1;
 				}
+			}
 		}
 		free(fds);
 		return 0;
