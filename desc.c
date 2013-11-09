@@ -477,22 +477,6 @@ sys_getdtablesize(struct tcb *tcp)
 }
 #endif
 
-/* FD_ISSET from libc would abort for large fd if built with
- * debug flags/library hacks which enforce array bound checks
- * (fd_set contains a fixed-size array of longs).
- * We need to use a homegrown replacement.
- */
-static inline int
-fd_isset(unsigned fd, fd_set *fds)
-{
-	/* Using unsigned types to avoid signed divisions and shifts,
-	 * which are slow(er) on many CPUs.
-	 */
-	const unsigned bpl = 8 * sizeof(long);
-	unsigned long *s = (unsigned long *) fds;
-	return s[fd / bpl] & (1UL << (fd % bpl));
-}
-
 static int
 decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 {
@@ -518,7 +502,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	 * We had bugs a-la "while (j < args[0])" and "umoven(args[0])" below.
 	 * Instead of args[0], use nfds for fd count, fdsize for array lengths.
 	 */
-	fdsize = (((nfds + 7) / 8) + sizeof(long)-1) & -sizeof(long);
+	fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
 
 	if (entering(tcp)) {
 		tprintf("%d", (int) args[0]);
@@ -543,12 +527,13 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 				continue;
 			}
 			tprints(", [");
-			for (j = 0, sep = ""; j < nfds; j++) {
-				if (fd_isset(j, fds)) {
-					tprints(sep);
-					printfd(tcp, j);
-					sep = " ";
-				}
+			for (j = 0, sep = "";; j++) {
+				j = next_set_bit(fds, j, nfds);
+				if (j < 0)
+					break;
+				tprints(sep);
+				printfd(tcp, j);
+				sep = " ";
 			}
 			tprints("]");
 		}
@@ -583,26 +568,27 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			arg = args[i+1];
 			if (!arg || umoven(tcp, arg, fdsize, (char *) fds) < 0)
 				continue;
-			for (j = 0; j < nfds; j++) {
-				if (fd_isset(j, fds)) {
-					/* +2 chars needed at the end: ']',NUL */
-					if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
-						if (first) {
-							outptr += sprintf(outptr, "%s%s [%u",
-								sep,
-								i == 0 ? "in" : i == 1 ? "out" : "except",
-								j
-							);
-							first = 0;
-							sep = ", ";
-						}
-						else {
-							outptr += sprintf(outptr, " %u", j);
-						}
+			for (j = 0;; j++) {
+				j = next_set_bit(fds, j, nfds);
+				if (j < 0)
+					break;
+				/* +2 chars needed at the end: ']',NUL */
+				if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
+					if (first) {
+						outptr += sprintf(outptr, "%s%s [%u",
+							sep,
+							i == 0 ? "in" : i == 1 ? "out" : "except",
+							j
+						);
+						first = 0;
+						sep = ", ";
 					}
-					if (--ready_fds == 0)
-						break;
+					else {
+						outptr += sprintf(outptr, " %u", j);
+					}
 				}
+				if (--ready_fds == 0)
+					break;
 			}
 			if (outptr != outstr)
 				*outptr++ = ']';

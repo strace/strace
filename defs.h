@@ -648,6 +648,7 @@ extern const char *xlookup(const struct xlat *, int);
 
 extern int string_to_uint(const char *str);
 extern int string_quote(const char *, char *, long, int);
+extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits);
 
 /* a refers to the lower numbered u_arg,
  * b refers to the higher numbered u_arg
