@@ -15,6 +15,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS) -I$(builddir)/$(OS)
 
 strace_SOURCES =	\
+	aio.c		\
 	bjm.c		\
 	block.c		\
 	count.c		\
