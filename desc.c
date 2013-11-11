@@ -843,10 +843,9 @@ enum iocb_sub {
 	SUB_NONE, SUB_COMMON, SUB_POLL, SUB_VECTOR
 };
 
-static const char *
-iocb_cmd_lookup(unsigned cmd, enum iocb_sub *sub)
+static enum iocb_sub
+tprint_lio_opcode(unsigned cmd)
 {
-	static char buf[sizeof("%u /* SUB_??? */") + sizeof(int)*3];
 	static const struct {
 		const char *name;
 		enum iocb_sub sub;
@@ -863,12 +862,11 @@ iocb_cmd_lookup(unsigned cmd, enum iocb_sub *sub)
 	};
 
 	if (cmd < ARRAY_SIZE(cmds)) {
-		*sub = cmds[cmd].sub;
-		return cmds[cmd].name;
+		tprints(cmds[cmd].name);
+		return cmds[cmd].sub;
 	}
-	*sub = SUB_NONE;
-	sprintf(buf, "%u /* SUB_??? */", cmd);
-	return buf;
+	tprintf("%u /* SUB_??? */", cmd);
+	return SUB_NONE;
 }
 
 /* Not defined in libaio.h */
@@ -925,10 +923,10 @@ sys_io_submit(struct tcb *tcp)
 					tprintf("data:%p, ", iocb.data);
 				if (iocb.key)
 					tprintf("key:%u, ", iocb.key);
-				tprintf("%s, ", iocb_cmd_lookup(iocb.aio_lio_opcode, &sub));
+				sub = tprint_lio_opcode(iocb.aio_lio_opcode);
 				if (iocb.aio_reqprio)
-					tprintf("reqprio:%d, ", iocb.aio_reqprio);
-				tprintf("filedes:%d", iocb.aio_fildes);
+					tprintf(", reqprio:%d", iocb.aio_reqprio);
+				tprintf(", filedes:%d", iocb.aio_fildes);
 				switch (sub) {
 				case SUB_COMMON:
 #if HAVE_DECL_IO_CMD_PWRITE
