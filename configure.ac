@@ -309,11 +309,6 @@ AC_CHECK_SIZEOF([long])
 AC_CHECK_SIZEOF([long long])
 AC_CHECK_SIZEOF([rlim_t],,[#include <sys/resource.h>])
 
-AC_CHECK_HEADERS([libaio.h], [
-	AC_CHECK_MEMBERS([struct iocb.u.c.flags],,, [#include <libaio.h>])
-	AC_CHECK_DECLS([IO_CMD_PWRITE, IO_CMD_PWRITEV],,, [#include <libaio.h>])
-])
-
 AC_PATH_PROG([PERL], [perl])
 
 AC_CONFIG_FILES([Makefile tests/Makefile])
