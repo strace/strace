@@ -258,6 +258,9 @@ AC_CHECK_TYPES([struct user_desc],,, [#include <asm/ldt.h>])
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
+AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
+		  struct sigevent.__pad],,, [#include <signal.h>])
+
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
 AC_CHECK_DECLS(m4_normalize([

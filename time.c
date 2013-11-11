@@ -781,10 +781,17 @@ printsigevent(struct tcb *tcp, long arg)
 		printxval(sigev_value, sev.sigev_notify+1, "SIGEV_???");
 		tprints(", ");
 		if (sev.sigev_notify == SIGEV_THREAD_ID)
+#if defined(HAVE_STRUCT_SIGEVENT__SIGEV_UN__PAD)
 			/* _pad[0] is the _tid field which might not be
 			   present in the userlevel definition of the
 			   struct.  */
 			tprintf("{%d}", sev._sigev_un._pad[0]);
+#elif defined(HAVE_STRUCT_SIGEVENT___PAD)
+			tprintf("{%d}", sev.__pad[0]);
+#else
+# warning unfamiliar struct sigevent => incomplete SIGEV_THREAD_ID decoding
+			tprints("{...}");
+#endif
 		else if (sev.sigev_notify == SIGEV_THREAD)
 			tprintf("{%p, %p}", sev.sigev_notify_function,
 				sev.sigev_notify_attributes);
