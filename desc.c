@@ -894,29 +894,30 @@ print_common_flags(struct iocb *iocb)
 int
 sys_io_submit(struct tcb *tcp)
 {
-	long nr;
 	if (entering(tcp)) {
-		tprintf("%lu, %ld, ", tcp->u_arg[0], tcp->u_arg[1]);
-		nr = tcp->u_arg[1];
-		/* and if nr is negative? */
-		if (nr == 0)
-			tprints("{}");
-		else {
 #ifdef HAVE_LIBAIO_H
+		long nr = tcp->u_arg[1];
+		/* if nr <= 0, we end up printing just "{}" */
+		tprintf("%lu, %ld, {", tcp->u_arg[0], tcp->u_arg[1]);
+		{
 			long i;
-			struct iocb *iocbp, **iocbs = (void *)tcp->u_arg[2];
+			struct iocb **iocbs = (void *)tcp->u_arg[2];
 
 			for (i = 0; i < nr; i++, iocbs++) {
 				enum iocb_sub sub;
+				struct iocb *iocbp;
 				struct iocb iocb;
-				if (i == 0)
-					tprints("{");
-				else
+				if (i)
 					tprints(", ");
 
-				if (umove(tcp, (unsigned long)iocbs, &iocbp) ||
-				    umove(tcp, (unsigned long)iocbp, &iocb)) {
-					tprints("{...}");
+				if (umove(tcp, (unsigned long)iocbs, &iocbp)) {
+					tprintf("%#lx", (unsigned long)iocbs);
+					/* No point in trying to read iocbs+1 etc */
+					/* (nr can be ridiculously large): */
+					break;
+				}
+				if (umove(tcp, (unsigned long)iocbp, &iocb)) {
+					tprintf("{%#lx}", (unsigned long)iocbp);
 					continue;
 				}
 				tprints("{");
@@ -964,13 +965,12 @@ sys_io_submit(struct tcb *tcp)
 				}
 				tprints("}");
 			}
-			if (i)
-				tprints("}");
+		}
+		tprints("}");
 #else
 #warning "libaio.h is not available => no io_submit decoding"
-			tprintf("%#lx", tcp->u_arg[2]);
+		tprintf("%lu, %ld, %#lx", tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 #endif
-		}
 	}
 	return 0;
 }
