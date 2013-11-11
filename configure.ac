@@ -249,24 +249,12 @@ AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
 AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
 
-AC_CHECK_MEMBERS([struct T_conn_res.QUEUE_ptr,
-                  struct T_conn_res.ACCEPTOR_id],,,
-[#include <sys/stream.h>
-#include <sys/tihdr.h>])
-
 AC_CHECK_TYPES([struct __old_kernel_stat],,, [#include <asm/stat.h>])
 
 AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg, struct ptrace_peeksiginfo_args],,,
 	       [#include <sys/ptrace.h>])
 
 AC_CHECK_TYPES([struct user_desc],,, [#include <asm/ldt.h>])
-
-AC_CHECK_MEMBERS([struct dqblk.dqb_curblocks],,, [#include <sys/quota.h>])
-
-AC_CHECK_MEMBERS([struct sigcontext.sc_hi2],,, [#include <signal.h>
-#ifdef HAVE_ASM_SIGCONTEXT_H
-# include <asm/sigcontext.h>
-#endif])
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
