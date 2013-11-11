@@ -193,7 +193,6 @@ AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
 [#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>])
-AC_CHECK_TYPES([long long])
 AC_LITTLE_ENDIAN_LONG_LONG
 AC_OFF_T_IS_LONG_LONG
 AC_CHECK_TYPES([struct opthdr],,, [#include <sys/socket.h>])
