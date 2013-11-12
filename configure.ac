@@ -195,8 +195,6 @@ AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
 #include <netinet/in.h>])
 AC_LITTLE_ENDIAN_LONG_LONG
 AC_OFF_T_IS_LONG_LONG
-AC_CHECK_TYPES([struct opthdr],,, [#include <sys/socket.h>])
-AC_CHECK_TYPES([struct t_opthdr],,, [#include <sys/tiuser.h>])
 
 AC_CHECK_FUNCS(m4_normalize([
 	fork

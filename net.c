@@ -2287,41 +2287,6 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 	return 0;
 }
 
-#ifdef HAVE_STRUCT_OPTHDR
-
-void
-print_sock_optmgmt(struct tcb *tcp, long addr, int len)
-{
-	int c = 0;
-	struct opthdr hdr;
-
-	while (len >= (int) sizeof hdr) {
-		if (umove(tcp, addr, &hdr) < 0) break;
-		if (c++) {
-			tprints(", ");
-		}
-		else if (len > hdr.len + sizeof hdr) {
-			tprints("[");
-		}
-		tprints("{");
-		addr += sizeof hdr;
-		len -= sizeof hdr;
-		printsockopt(tcp, hdr.level, hdr.name, addr, hdr.len);
-		if (hdr.len > 0) {
-			addr += hdr.len;
-			len -= hdr.len;
-		}
-		tprints("}");
-	}
-	if (len > 0) {
-		if (c++) tprints(", ");
-		printstr(tcp, addr, len);
-	}
-	if (c > 1) tprints("]");
-}
-
-#endif
-
 int
 sys_setsockopt(struct tcb *tcp)
 {
