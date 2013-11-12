@@ -220,7 +220,35 @@ static const struct xlat perf_event_open_flags[] = {
 	{ 0,				NULL			},
 };
 
-#if _LFS64_LARGEFILE
+#if defined(F_SETLK64) && F_SETLK64 + 0 != F_SETLK
+# define HAVE_F_SETLK64 1
+#else
+# define HAVE_F_SETLK64 0
+#endif
+
+#if defined(F_SETLKW64) && F_SETLKW64 + 0 != F_SETLKW
+# define HAVE_F_SETLKW64 1
+#else
+# define HAVE_F_SETLKW64 0
+#endif
+
+#if defined(F_GETLK64) && F_GETLK64+0 != F_GETLK
+# define HAVE_F_GETLK64 1
+#else
+# define HAVE_F_GETLK64 0
+#endif
+
+#if defined(X32) || defined(F_FREESP64) || \
+    HAVE_F_SETLK64 || HAVE_F_SETLKW64 || HAVE_F_GETLK64
+
+#ifndef HAVE_STRUCT_FLOCK64
+struct flock64 {
+	short int l_type, l_whence;
+	int64_t l_start, l_len;
+	int l_pid;
+};
+#endif
+
 /* fcntl/lockf */
 static void
 printflock64(struct tcb *tcp, long addr, int getlk)
@@ -333,22 +361,22 @@ sys_fcntl(struct tcb *tcp)
 			tprints(", ");
 			printflock(tcp, tcp->u_arg[2], 0);
 			break;
-#if _LFS64_LARGEFILE
+#if defined(F_FREESP64) || HAVE_F_SETLK64 || HAVE_F_SETLKW64
 #ifdef F_FREESP64
 		case F_FREESP64:
 #endif
 		/* Linux glibc defines SETLK64 as SETLK,
 		   even though the kernel has different values - as does Solaris. */
-#if defined(F_SETLK64) && F_SETLK64 + 0 != F_SETLK
+#if HAVE_F_SETLK64
 		case F_SETLK64:
 #endif
-#if defined(F_SETLKW64) && F_SETLKW64 + 0 != F_SETLKW
+#if HAVE_F_SETLKW64
 		case F_SETLKW64:
 #endif
 			tprints(", ");
 			printflock64(tcp, tcp->u_arg[2], 0);
 			break;
-#endif
+#endif /* defined(F_FREESP64) || HAVE_F_SETLK64 || HAVE_F_SETLKW64 */
 #ifdef F_NOTIFY
 		case F_NOTIFY:
 			tprints(", ");
@@ -393,10 +421,8 @@ sys_fcntl(struct tcb *tcp)
 			tprints(", ");
 			printflock(tcp, tcp->u_arg[2], 1);
 			break;
-#if _LFS64_LARGEFILE
-#if defined(F_GETLK64) && F_GETLK64+0 != F_GETLK
+#if HAVE_F_GETLK64
 		case F_GETLK64:
-#endif
 			tprints(", ");
 			printflock64(tcp, tcp->u_arg[2], 1);
 			break;
