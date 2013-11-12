@@ -2875,7 +2875,7 @@ sys_sched_setscheduler(struct tcb *tcp)
 		if (umove(tcp, tcp->u_arg[2], &p) < 0)
 			tprintf(", %#lx", tcp->u_arg[2]);
 		else
-			tprintf(", { %d }", p.__sched_priority);
+			tprintf(", { %d }", p.sched_priority);
 	}
 	return 0;
 }
@@ -2890,7 +2890,7 @@ sys_sched_getparam(struct tcb *tcp)
 		if (umove(tcp, tcp->u_arg[1], &p) < 0)
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
-			tprintf("{ %d }", p.__sched_priority);
+			tprintf("{ %d }", p.sched_priority);
 	}
 	return 0;
 }
@@ -2903,7 +2903,7 @@ sys_sched_setparam(struct tcb *tcp)
 		if (umove(tcp, tcp->u_arg[1], &p) < 0)
 			tprintf("%d, %#lx", (int) tcp->u_arg[0], tcp->u_arg[1]);
 		else
-			tprintf("%d, { %d }", (int) tcp->u_arg[0], p.__sched_priority);
+			tprintf("%d, { %d }", (int) tcp->u_arg[0], p.sched_priority);
 	}
 	return 0;
 }
