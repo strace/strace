@@ -30,12 +30,6 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#ifdef _LARGEFILE64_SOURCE
-/* This is the macro everything checks before using foo64 names.  */
-# ifndef _LFS64_LARGEFILE
-#  define _LFS64_LARGEFILE 1
-# endif
-#endif
 
 #ifdef MIPS
 # include <sgidefs.h>

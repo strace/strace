@@ -438,7 +438,7 @@ swap_uid(void)
 	}
 }
 
-#if _LFS64_LARGEFILE
+#ifdef _LARGEFILE64_SOURCE
 # define fopen_for_output fopen64
 # define struct_stat struct stat64
 # define stat_file stat64
