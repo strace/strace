@@ -245,8 +245,10 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_EVENT_EXIT	6
 #endif
 
-#if !defined(__GLIBC__)
+#if !HAVE_DECL_PTRACE_PEEKUSER
 # define PTRACE_PEEKUSER PTRACE_PEEKUSR
+#endif
+#if !HAVE_DECL_PTRACE_POKEUSER
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
 
