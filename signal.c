@@ -827,7 +827,7 @@ sys_sigreturn(struct tcb *tcp)
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
 		long usp;
-		struct sigcontext_struct sc;
+		struct sigcontext sc;
 		if (upeek(tcp->pid, PT_GPR15, &usp) < 0)
 			return 0;
 		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &sc) < 0)
@@ -921,7 +921,7 @@ sys_sigreturn(struct tcb *tcp)
 #elif defined(POWERPC)
 	if (entering(tcp)) {
 		long esp;
-		struct sigcontext_struct sc;
+		struct sigcontext sc;
 
 		esp = ppc_regs.gpr[1];
 
@@ -951,7 +951,7 @@ sys_sigreturn(struct tcb *tcp)
 #elif defined(ALPHA)
 	if (entering(tcp)) {
 		long fp;
-		struct sigcontext_struct sc;
+		struct sigcontext sc;
 		if (upeek(tcp->pid, REG_FP, &fp) < 0)
 			return 0;
 		if (umove(tcp, fp, &sc) < 0)

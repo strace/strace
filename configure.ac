@@ -243,8 +243,7 @@ AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
 #include <sys/socket.h>
 #include <asm/types.h>])
 AC_CHECK_HEADERS([asm/sigcontext.h], [], [], [#include <signal.h>])
-AC_CHECK_TYPES([struct sigcontext_struct,
-		struct sigcontext],,, [#include <signal.h>])
+AC_CHECK_TYPES([struct sigcontext],,, [#include <signal.h>])
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
 AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
