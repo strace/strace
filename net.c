@@ -94,14 +94,6 @@
 # define PF_UNSPEC AF_UNSPEC
 #endif
 
-/* Under Linux these are enums so we can't test for them with ifdef. */
-#define IPPROTO_EGP IPPROTO_EGP
-#define IPPROTO_PUP IPPROTO_PUP
-#define IPPROTO_IDP IPPROTO_IDP
-#define IPPROTO_IGMP IPPROTO_IGMP
-#define IPPROTO_RAW IPPROTO_RAW
-#define IPPROTO_MAX IPPROTO_MAX
-
 static const struct xlat domains[] = {
 #ifdef PF_UNSPEC
 	{ PF_UNSPEC,	"PF_UNSPEC"	},
