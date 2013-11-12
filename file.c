@@ -632,7 +632,6 @@ sys_truncate(struct tcb *tcp)
 	return 0;
 }
 
-#if _LFS64_LARGEFILE
 int
 sys_truncate64(struct tcb *tcp)
 {
@@ -642,7 +641,6 @@ sys_truncate64(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 int
 sys_ftruncate(struct tcb *tcp)
@@ -654,7 +652,6 @@ sys_ftruncate(struct tcb *tcp)
 	return 0;
 }
 
-#if _LFS64_LARGEFILE
 int
 sys_ftruncate64(struct tcb *tcp)
 {
@@ -664,7 +661,6 @@ sys_ftruncate64(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 /* several stats */
 
@@ -2310,7 +2306,6 @@ sys_getdents(struct tcb *tcp)
 	return 0;
 }
 
-#if _LFS64_LARGEFILE
 int
 sys_getdents64(struct tcb *tcp)
 {
@@ -2372,7 +2367,6 @@ sys_getdents64(struct tcb *tcp)
 	free(buf);
 	return 0;
 }
-#endif
 
 int
 sys_getcwd(struct tcb *tcp)
