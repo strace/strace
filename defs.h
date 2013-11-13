@@ -150,28 +150,17 @@ extern char *stpcpy(char *dst, const char *src);
  */
 #define USE_CUSTOM_PRINTF 0
 
-#if (defined(SPARC) || defined(SPARC64) \
-    || defined(I386) || defined(X32) || defined(X86_64) \
-    || defined(ARM) || defined(AARCH64) \
-    || defined(AVR32) \
-    || defined(OR1K) \
-    || defined(METAG) \
-    || defined(TILE) \
-    || defined(XTENSA) \
-    || defined(ARC) \
-    ) && defined(__GLIBC__)
-# include <sys/ptrace.h>
-#else
-/* Work around awkward prototype in ptrace.h. */
+#ifdef NEED_PTRACE_PROTOTYPE_WORKAROUND
 # define ptrace xptrace
 # include <sys/ptrace.h>
 # undef ptrace
-# ifdef POWERPC
-#  define __KERNEL__
-#  include <asm/ptrace.h>
-#  undef __KERNEL__
-# endif
 extern long ptrace(int, int, char *, long);
+#else
+# include <sys/ptrace.h>
+#endif
+
+#if defined(POWERPC)
+# include <asm/ptrace.h>
 #endif
 
 #if defined(TILE)
