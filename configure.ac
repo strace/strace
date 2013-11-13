@@ -206,8 +206,6 @@ AC_CHECK_FUNCS(m4_normalize([
 	stpcpy
 	strerror
 	strsignal
-	_sys_siglist
-	sys_siglist
 ]))
 AC_CHECK_HEADERS(m4_normalize([
 	asm/cachectl.h
@@ -260,7 +258,6 @@ AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
 AC_CHECK_TYPES([struct flock64],,, [#include <fcntl.h>])
 
 AC_CHECK_DECLS([sys_errlist])
-AC_CHECK_DECLS([sys_siglist, _sys_siglist],,, [#include <signal.h>])
 AC_CHECK_DECLS(m4_normalize([
 	PTRACE_EVENT_CLONE,
 	PTRACE_EVENT_EXEC,
