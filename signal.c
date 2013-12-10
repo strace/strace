@@ -669,10 +669,17 @@ sys_sigsetmask(struct tcb *tcp)
 
 struct old_sigaction {
 	/* sa_handler may be a libc #define, need to use other name: */
+#ifdef MIPS
+	unsigned int sa_flags;
+	void (*__sa_handler)(int);
+	/* Kernel treats sa_mask as an array of longs. */
+	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
+#else
 	void (*__sa_handler)(int);
 	unsigned long sa_mask;
 	unsigned long sa_flags;
 	void (*sa_restorer)(void);
+#endif /* !MIPS */
 };
 
 static void
@@ -709,7 +716,11 @@ decode_old_sigaction(struct tcb *tcp, long addr)
 		tprints("{SIG_IGN, ");
 	else
 		tprintf("{%#lx, ", (long) sa.__sa_handler);
+#ifdef MIPS
+	tprints(sprintsigmask("", (sigset_t *)sa.sa_mask));
+#else
 	tprints(sprintsigmask_long("", sa.sa_mask));
+#endif
 	tprints(", ");
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #ifdef SA_RESTORER
@@ -1210,9 +1221,14 @@ sys_rt_sigprocmask(struct tcb *tcp)
 struct new_sigaction
 {
 	/* sa_handler may be a libc #define, need to use other name: */
+#ifdef MIPS
+	unsigned int sa_flags;
+	void (*__sa_handler)(int);
+#else
 	void (*__sa_handler)(int);
 	unsigned long sa_flags;
 	void (*sa_restorer)(void);
+#endif /* !MIPS */
 	/* Kernel treats sa_mask as an array of longs. */
 	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
 };
