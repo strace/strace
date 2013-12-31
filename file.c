@@ -274,6 +274,9 @@ const struct xlat open_mode_flags[] = {
 #ifdef O_CLOEXEC
 	{ O_CLOEXEC,	"O_CLOEXEC"	},
 #endif
+#ifdef O_PATH
+	{ O_PATH,	"O_PATH"	},
+#endif
 #ifdef FNDELAY
 	{ FNDELAY,	"FNDELAY"	},
 #endif
