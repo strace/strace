@@ -47,12 +47,6 @@
 
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
-# ifndef PTRACE_PEEKUSR
-#  define PTRACE_PEEKUSR PTRACE_PEEKUSER
-# endif
-# ifndef PTRACE_POKEUSR
-#  define PTRACE_POKEUSR PTRACE_POKEUSER
-# endif
 #endif
 
 #ifdef HAVE_LINUX_PTRACE_H

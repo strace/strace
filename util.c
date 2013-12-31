@@ -46,7 +46,6 @@
 
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
-# define PTRACE_PEEKUSR PTRACE_PEEKUSER
 #elif defined(HAVE_LINUX_PTRACE_H)
 # undef PTRACE_SYSCALL
 # ifdef HAVE_STRUCT_IA64_FPREG
