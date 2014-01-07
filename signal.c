@@ -675,54 +675,60 @@ struct old_sigaction {
 	void (*sa_restorer)(void);
 };
 
+static void
+decode_old_sigaction(struct tcb *tcp, long addr)
+{
+	struct old_sigaction sa;
+
+	if (!addr) {
+		tprints("NULL");
+		return;
+	}
+	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp))) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	if (umove(tcp, addr, &sa) < 0) {
+		tprints("{...}");
+		return;
+	}
+
+	/* Architectures using function pointers, like
+	 * hppa, may need to manipulate the function pointer
+	 * to compute the result of a comparison. However,
+	 * the __sa_handler function pointer exists only in
+	 * the address space of the traced process, and can't
+	 * be manipulated by strace. In order to prevent the
+	 * compiler from generating code to manipulate
+	 * __sa_handler we cast the function pointers to long. */
+	if ((long)sa.__sa_handler == (long)SIG_ERR)
+		tprints("{SIG_ERR, ");
+	else if ((long)sa.__sa_handler == (long)SIG_DFL)
+		tprints("{SIG_DFL, ");
+	else if ((long)sa.__sa_handler == (long)SIG_IGN)
+		tprints("{SIG_IGN, ");
+	else
+		tprintf("{%#lx, ", (long) sa.__sa_handler);
+	tprints(sprintsigmask_long("", sa.sa_mask));
+	tprints(", ");
+	printflags(sigact_flags, sa.sa_flags, "SA_???");
+#ifdef SA_RESTORER
+	if (sa.sa_flags & SA_RESTORER)
+		tprintf(", %p", sa.sa_restorer);
+#endif
+	tprints("}");
+}
+
 int
 sys_sigaction(struct tcb *tcp)
 {
-	long addr;
-	struct old_sigaction sa;
-
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
 		tprints(", ");
-		addr = tcp->u_arg[1];
+		decode_old_sigaction(tcp, tcp->u_arg[1]);
+		tprints(", ");
 	} else
-		addr = tcp->u_arg[2];
-	if (addr == 0)
-		tprints("NULL");
-	else if (!verbose(tcp))
-		tprintf("%#lx", addr);
-	else if (umove(tcp, addr, &sa) < 0)
-		tprints("{...}");
-	else {
-		/* Architectures using function pointers, like
-		 * hppa, may need to manipulate the function pointer
-		 * to compute the result of a comparison. However,
-		 * the __sa_handler function pointer exists only in
-		 * the address space of the traced process, and can't
-		 * be manipulated by strace. In order to prevent the
-		 * compiler from generating code to manipulate
-		 * __sa_handler we cast the function pointers to long. */
-		if ((long)sa.__sa_handler == (long)SIG_ERR)
-			tprints("{SIG_ERR, ");
-		else if ((long)sa.__sa_handler == (long)SIG_DFL)
-			tprints("{SIG_DFL, ");
-		else if ((long)sa.__sa_handler == (long)SIG_IGN)
-			tprints("{SIG_IGN, ");
-		else
-			tprintf("{%#lx, ", (long) sa.__sa_handler);
-		tprints(sprintsigmask_long("", sa.sa_mask));
-		tprints(", ");
-		printflags(sigact_flags, sa.sa_flags, "SA_???");
-#ifdef SA_RESTORER
-		if (sa.sa_flags & SA_RESTORER)
-			tprintf(", %p", sa.sa_restorer);
-#endif
-		tprints("}");
-	}
-	if (entering(tcp))
-		tprints(", ");
-	else
-		tprintf(", %#lx", (unsigned long) sa.sa_restorer);
+		decode_old_sigaction(tcp, tcp->u_arg[2]);
 	return 0;
 }
 
@@ -1219,28 +1225,20 @@ struct new_sigaction32
 	uint32_t sa_mask[2 * (NSIG / sizeof(long) ? NSIG / sizeof(long) : 1)];
 };
 
-int
-sys_rt_sigaction(struct tcb *tcp)
+static void
+decode_new_sigaction(struct tcb *tcp, long addr)
 {
 	struct new_sigaction sa;
 	sigset_t sigset;
-	long addr;
 	int r;
 
-	if (entering(tcp)) {
-		printsignal(tcp->u_arg[0]);
-		tprints(", ");
-		addr = tcp->u_arg[1];
-	} else
-		addr = tcp->u_arg[2];
-
-	if (addr == 0) {
+	if (!addr) {
 		tprints("NULL");
-		goto after_sa;
+		return;
 	}
-	if (!verbose(tcp)) {
+	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp))) {
 		tprintf("%#lx", addr);
-		goto after_sa;
+		return;
 	}
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize != sizeof(sa.sa_flags) && current_wordsize == 4) {
@@ -1268,7 +1266,7 @@ sys_rt_sigaction(struct tcb *tcp)
 	}
 	if (r < 0) {
 		tprints("{...}");
-		goto after_sa;
+		return;
 	}
 	/* Architectures using function pointers, like
 	 * hppa, may need to manipulate the function pointer
@@ -1304,11 +1302,18 @@ sys_rt_sigaction(struct tcb *tcp)
 		tprintf(", %p", sa.sa_restorer);
 #endif
 	tprints("}");
+}
 
- after_sa:
-	if (entering(tcp))
+int
+sys_rt_sigaction(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printsignal(tcp->u_arg[0]);
 		tprints(", ");
-	else
+		decode_new_sigaction(tcp, tcp->u_arg[1]);
+		tprints(", ");
+	} else {
+		decode_new_sigaction(tcp, tcp->u_arg[2]);
 #if defined(SPARC) || defined(SPARC64)
 		tprintf(", %#lx, %lu", tcp->u_arg[3], tcp->u_arg[4]);
 #elif defined(ALPHA)
@@ -1316,6 +1321,7 @@ sys_rt_sigaction(struct tcb *tcp)
 #else
 		tprintf(", %lu", tcp->u_arg[3]);
 #endif
+	}
 	return 0;
 }
 
