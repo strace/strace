@@ -422,11 +422,26 @@ static const struct xlat adjtimex_modes[] = {
 #ifdef ADJ_TIMECONST
 	{ ADJ_TIMECONST, "ADJ_TIMECONST"	},
 #endif
+#ifdef ADJ_TAI
+	{ ADJ_TAI, "ADJ_TAI"			},
+#endif
+#ifdef ADJ_SETOFFSET
+	{ ADJ_SETOFFSET, "ADJ_SETOFFSET"	},
+#endif
+#ifdef ADJ_MICRO
+	{ ADJ_MICRO, "ADJ_MICRO"		},
+#endif
+#ifdef ADJ_NANO
+	{ ADJ_NANO, "ADJ_NANO"			},
+#endif
 #ifdef ADJ_TICK
 	{ ADJ_TICK,	"ADJ_TICK"		},
 #endif
 #ifdef ADJ_OFFSET_SINGLESHOT
 	{ ADJ_OFFSET_SINGLESHOT, "ADJ_OFFSET_SINGLESHOT" },
+#endif
+#ifdef ADJ_OFFSET_SS_READ
+	{ ADJ_OFFSET_SS_READ, "ADJ_OFFSET_SS_READ" },
 #endif
 	{ 0,		NULL			}
 };
