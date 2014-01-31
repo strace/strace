@@ -30,6 +30,7 @@ strace_SOURCES =	\
 	net.c		\
 	pathtrace.c	\
 	process.c	\
+	ptp.c		\
 	quota.c		\
 	resource.c	\
 	scsi.c		\
@@ -130,6 +131,7 @@ EXTRA_DIST =				\
 	linux/powerpc/signalent1.h	\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/syscallent1.h	\
+	linux/ptp_clock.h		\
 	linux/s390/ioctlent.h.in	\
 	linux/s390/syscallent.h		\
 	linux/s390x/ioctlent.h.in	\
