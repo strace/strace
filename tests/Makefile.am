@@ -11,9 +11,12 @@ TESTS = \
 	sigaction.test \
 	stat.test \
 	net.test \
+	net-fd.test \
 	detach-sleeping.test \
 	detach-stopped.test \
 	detach-running.test
+
+net-fd.log: net.log
 
 TEST_LOG_COMPILER = $(srcdir)/run.sh
 

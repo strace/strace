@@ -1711,7 +1711,8 @@ int
 sys_bind(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printsock(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
@@ -1728,7 +1729,9 @@ int
 sys_listen(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %lu", tcp->u_arg[0], tcp->u_arg[1]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		tprintf("%lu", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -1737,7 +1740,8 @@ static int
 do_accept(struct tcb *tcp, int flags_arg)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		return 0;
 	}
 	if (!tcp->u_arg[2])
@@ -1777,7 +1781,8 @@ int
 sys_send(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
@@ -1790,7 +1795,8 @@ int
 sys_sendto(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
@@ -1810,7 +1816,8 @@ int
 sys_sendmsg(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printmsghdr(tcp, tcp->u_arg[1], (unsigned long) -1L);
 		/* flags */
 		tprints(", ");
@@ -1824,7 +1831,8 @@ sys_sendmmsg(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		/* sockfd */
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		if (!verbose(tcp)) {
 			tprintf("%#lx, %u, ",
 				tcp->u_arg[1], (unsigned int) tcp->u_arg[2]);
@@ -1843,7 +1851,8 @@ int
 sys_recv(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 	} else {
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
@@ -1862,7 +1871,8 @@ sys_recvfrom(struct tcb *tcp)
 	int fromlen;
 
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 	} else {
 		if (syserror(tcp)) {
 			tprintf("%#lx, %lu, %lu, %#lx, %#lx",
@@ -1906,7 +1916,8 @@ int
 sys_recvmsg(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 	} else {
 		if (syserror(tcp) || !verbose(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
@@ -1926,7 +1937,8 @@ sys_recvmmsg(struct tcb *tcp)
 	static char str[5 + TIMESPEC_TEXT_BUFSIZE];
 
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		if (verbose(tcp)) {
 			sprint_timespec(str, tcp, tcp->u_arg[4]);
 			/* Abusing tcp->auxstr as temp storage.
@@ -1976,7 +1988,8 @@ int
 sys_shutdown(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printxval(shutdown_modes, tcp->u_arg[1], "SHUT_???");
 	}
 	return 0;
@@ -2077,7 +2090,8 @@ int
 sys_getsockopt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printxval(socketlayers, tcp->u_arg[1], "SOL_???");
 		tprints(", ");
 		switch (tcp->u_arg[1]) {
@@ -2343,7 +2357,8 @@ int
 sys_setsockopt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			      tcp->u_arg[3], tcp->u_arg[4]);
 		tprintf(", %lu", tcp->u_arg[4]);

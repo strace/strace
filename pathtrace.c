@@ -80,7 +80,7 @@ fdmatch(struct tcb *tcp, int fd)
 
 /*
  * Add a path to the set we're tracing.
- * Secifying NULL will delete all paths.
+ * Specifying NULL will delete all paths.
  */
 static void
 storepath(const char *path)
@@ -158,7 +158,7 @@ pathtrace_match(struct tcb *tcp)
 
 	s = tcp->s_ent;
 
-	if (!(s->sys_flags & (TRACE_FILE | TRACE_DESC)))
+	if (!(s->sys_flags & (TRACE_FILE | TRACE_DESC | TRACE_NETWORK)))
 		return 0;
 
 	/*
@@ -339,11 +339,13 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_timerfd_settime ||
 	    s->sys_func == sys_timerfd_gettime ||
 	    s->sys_func == sys_epoll_create ||
+	    s->sys_func == sys_socket ||
+	    s->sys_func == sys_socketpair ||
 	    strcmp(s->sys_name, "fanotify_init") == 0)
 	{
 		/*
-		 * These have TRACE_FILE or TRACE_DESCRIPTOR set, but they
-		 * don't have any file descriptor or path args to test.
+		 * These have TRACE_FILE or TRACE_DESCRIPTOR or TRACE_NETWORK set,
+		 * but they don't have any file descriptor or path args to test.
 		 */
 		return 0;
 	}
@@ -356,7 +358,7 @@ pathtrace_match(struct tcb *tcp)
 	if (s->sys_flags & TRACE_FILE)
 		return upathmatch(tcp, tcp->u_arg[0]);
 
-	if (s->sys_flags & TRACE_DESC)
+	if (s->sys_flags & (TRACE_DESC | TRACE_NETWORK))
 		return fdmatch(tcp, tcp->u_arg[0]);
 
 	return 0;
