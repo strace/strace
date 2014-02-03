@@ -668,11 +668,41 @@ static const struct xlat clocknames[] = {
 	{ 0,				NULL }
 };
 
+#ifdef CLOCKID_TO_FD
+static const struct xlat cpuclocknames[] = {
+	{ CPUCLOCK_PROF,	"CPUCLOCK_PROF" },
+	{ CPUCLOCK_VIRT,	"CPUCLOCK_VIRT" },
+	{ CPUCLOCK_SCHED,	"CPUCLOCK_SCHED" },
+	{ 0, NULL }
+};
+#endif
+
+static void
+printclockname(int clockid)
+{
+#ifdef CLOCKID_TO_FD
+	if (clockid < 0) {
+		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
+			tprintf("FD_TO_CLOCKID(%d)", CLOCKID_TO_FD(clockid));
+		else {
+			if(CPUCLOCK_PERTHREAD(clockid))
+				tprintf("MAKE_THREAD_CPUCLOCK(%d,", CPUCLOCK_PID(clockid));
+			else
+				tprintf("MAKE_PROCESS_CPUCLOCK(%d,", CPUCLOCK_PID(clockid));
+			printxval(cpuclocknames, clockid & CLOCKFD_MASK, "CPUCLOCK_???");
+			tprints(")");
+		}
+	}
+	else
+#endif
+		printxval(clocknames, clockid, "CLOCK_???");
+}
+
 int
 sys_clock_settime(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 		printtv(tcp, tcp->u_arg[1]);
 	}
@@ -683,7 +713,7 @@ int
 sys_clock_gettime(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 	} else {
 		if (syserror(tcp))
@@ -698,7 +728,7 @@ int
 sys_clock_nanosleep(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprints(", ");
@@ -718,7 +748,7 @@ sys_clock_adjtime(struct tcb *tcp)
 {
 	if (exiting(tcp))
 		return do_adjtimex(tcp, tcp->u_arg[1]);
-	printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+	printclockname(tcp->u_arg[0]);
 	tprints(", ");
 	return 0;
 }
@@ -820,7 +850,7 @@ int
 sys_timer_create(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 		printsigevent(tcp, tcp->u_arg[1]);
 		tprints(", ");
@@ -968,7 +998,7 @@ sys_timerfd(struct tcb *tcp)
 	if (entering(tcp)) {
 		/* It does not matter that the kernel uses itimerspec.  */
 		tprintf("%ld, ", tcp->u_arg[0]);
-		printxval(clocknames, tcp->u_arg[1], "CLOCK_???");
+		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 		printflags(timerfdflags, tcp->u_arg[2], "TFD_???");
 		tprints(", ");
@@ -981,7 +1011,7 @@ int
 sys_timerfd_create(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(clocknames, tcp->u_arg[0], "CLOCK_???");
+		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 		printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
 	}
