@@ -1,5 +1,5 @@
-#ifndef _UAPI_LINUX_PERSONALITY_H
-#define _UAPI_LINUX_PERSONALITY_H
+#ifndef _LINUX_PERSONALITY_H
+#define _LINUX_PERSONALITY_H
 
 
 /*
@@ -66,4 +66,4 @@ enum {
 };
 
 
-#endif /* _UAPI_LINUX_PERSONALITY_H */
+#endif /* _LINUX_PERSONALITY_H */
