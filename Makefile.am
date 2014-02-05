@@ -28,6 +28,7 @@ strace_SOURCES =	\
 	ioprio.c	\
 	ipc.c		\
 	kexec.c		\
+	keyctl.c	\
 	loop.c		\
 	mem.c		\
 	mtd.c		\
@@ -115,6 +116,7 @@ EXTRA_DIST =				\
 	linux/ioctlent.sh		\
 	linux/ioctlsort.c		\
 	linux/kexec.h			\
+	linux/keyctl.h			\
 	linux/m68k/ioctlent.h.in	\
 	linux/m68k/syscallent.h		\
 	linux/metag/ioctlent.h.in	\
