@@ -80,8 +80,8 @@ struct blk_user_trace_setup {
 #endif
 
 static const struct xlat blkpg_ops[] = {
-	{ BLKPG_ADD_PARTITION,	"BLKPG_ADD_PARTITION", },
-	{ BLKPG_DEL_PARTITION,	"BLKPG_DEL_PARTITION", },
+	XLAT(BLKPG_ADD_PARTITION),
+	XLAT(BLKPG_DEL_PARTITION),
 	{ 0,			NULL },
 };
 

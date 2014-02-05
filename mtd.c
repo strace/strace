@@ -42,45 +42,45 @@
 #endif
 
 static const struct xlat mtd_mode_options[] = {
-	{ MTD_OPS_PLACE_OOB,	"MTD_OPS_PLACE_OOB"	},
-	{ MTD_OPS_AUTO_OOB,	"MTD_OPS_AUTO_OOB"	},
-	{ MTD_OPS_RAW,		"MTD_OPS_RAW"		},
+	XLAT(MTD_OPS_PLACE_OOB),
+	XLAT(MTD_OPS_AUTO_OOB),
+	XLAT(MTD_OPS_RAW),
 	{ 0,			NULL			},
 };
 
 static const struct xlat mtd_type_options[] = {
-	{ MTD_ABSENT,		"MTD_ABSENT"		},
-	{ MTD_RAM,		"MTD_RAM"		},
-	{ MTD_ROM,		"MTD_ROM"		},
-	{ MTD_NORFLASH,		"MTD_NORFLASH"		},
-	{ MTD_NANDFLASH,	"MTD_NANDFLASH"		},
-	{ MTD_DATAFLASH,	"MTD_DATAFLASH"		},
-	{ MTD_UBIVOLUME,	"MTD_UBIVOLUME"		},
-	{ MTD_MLCNANDFLASH,	"MTD_MLCNANDFLASH"	},
+	XLAT(MTD_ABSENT),
+	XLAT(MTD_RAM),
+	XLAT(MTD_ROM),
+	XLAT(MTD_NORFLASH),
+	XLAT(MTD_NANDFLASH),
+	XLAT(MTD_DATAFLASH),
+	XLAT(MTD_UBIVOLUME),
+	XLAT(MTD_MLCNANDFLASH),
 	{ 0,			NULL			},
 };
 
 static const struct xlat mtd_flags_options[] = {
-	{ MTD_WRITEABLE,	"MTD_WRITEABLE"		},
-	{ MTD_BIT_WRITEABLE,	"MTD_BIT_WRITEABLE"	},
-	{ MTD_NO_ERASE,		"MTD_NO_ERASE"		},
-	{ MTD_POWERUP_LOCK,	"MTD_POWERUP_LOCK"	},
+	XLAT(MTD_WRITEABLE),
+	XLAT(MTD_BIT_WRITEABLE),
+	XLAT(MTD_NO_ERASE),
+	XLAT(MTD_POWERUP_LOCK),
 	{ 0,			NULL			},
 };
 
 static const struct xlat mtd_otp_options[] = {
-	{ MTD_OTP_OFF,		"MTD_OTP_OFF"		},
-	{ MTD_OTP_FACTORY,	"MTD_OTP_FACTORY"	},
-	{ MTD_OTP_USER,		"MTD_OTP_USER"		},
+	XLAT(MTD_OTP_OFF),
+	XLAT(MTD_OTP_FACTORY),
+	XLAT(MTD_OTP_USER),
 	{ 0,			NULL			},
 };
 
 static const struct xlat mtd_nandecc_options[] = {
-	{ MTD_NANDECC_OFF,		"MTD_NANDECC_OFF"		},
-	{ MTD_NANDECC_PLACE,		"MTD_NANDECC_PLACE"		},
-	{ MTD_NANDECC_AUTOPLACE,	"MTD_NANDECC_AUTOPLACE"		},
-	{ MTD_NANDECC_PLACEONLY,	"MTD_NANDECC_PLACEONLY"		},
-	{ MTD_NANDECC_AUTOPL_USR,	"MTD_NANDECC_AUTOPL_USR"	},
+	XLAT(MTD_NANDECC_OFF),
+	XLAT(MTD_NANDECC_PLACE),
+	XLAT(MTD_NANDECC_AUTOPLACE),
+	XLAT(MTD_NANDECC_PLACEONLY),
+	XLAT(MTD_NANDECC_AUTOPL_USR),
 	{ 0,				NULL				},
 };
 
@@ -287,13 +287,13 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 }
 
 static const struct xlat ubi_volume_types[] = {
-	{ UBI_DYNAMIC_VOLUME,	"UBI_DYNAMIC_VOLUME"	},
-	{ UBI_STATIC_VOLUME,	"UBI_STATIC_VOLUME"	},
+	XLAT(UBI_DYNAMIC_VOLUME),
+	XLAT(UBI_STATIC_VOLUME),
 	{ 0,			NULL			},
 };
 
 static const struct xlat ubi_volume_props[] = {
-	{ UBI_VOL_PROP_DIRECT_WRITE,	"UBI_VOL_PROP_DIRECT_WRITE"	},
+	XLAT(UBI_VOL_PROP_DIRECT_WRITE),
 	{ 0,			NULL			},
 };
 

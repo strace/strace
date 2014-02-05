@@ -60,46 +60,46 @@ sys_brk(struct tcb *tcp)
 }
 
 static const struct xlat mmap_prot[] = {
-	{ PROT_NONE,	"PROT_NONE",	},
-	{ PROT_READ,	"PROT_READ"	},
-	{ PROT_WRITE,	"PROT_WRITE"	},
-	{ PROT_EXEC,	"PROT_EXEC"	},
+	XLAT(PROT_NONE),
+	XLAT(PROT_READ),
+	XLAT(PROT_WRITE),
+	XLAT(PROT_EXEC),
 #ifdef PROT_SEM
-	{ PROT_SEM,	"PROT_SEM"	},
+	XLAT(PROT_SEM),
 #endif
 #ifdef PROT_GROWSDOWN
-	{ PROT_GROWSDOWN,"PROT_GROWSDOWN"},
+	XLAT(PROT_GROWSDOWN),
 #endif
 #ifdef PROT_GROWSUP
-	{ PROT_GROWSUP, "PROT_GROWSUP"	},
+	XLAT(PROT_GROWSUP),
 #endif
 #ifdef PROT_SAO
-	{ PROT_SAO,	"PROT_SAO"	},
+	XLAT(PROT_SAO),
 #endif
 	{ 0,		NULL		},
 };
 
 static const struct xlat mmap_flags[] = {
-	{ MAP_SHARED,	"MAP_SHARED"	},
-	{ MAP_PRIVATE,	"MAP_PRIVATE"	},
-	{ MAP_FIXED,	"MAP_FIXED"	},
+	XLAT(MAP_SHARED),
+	XLAT(MAP_PRIVATE),
+	XLAT(MAP_FIXED),
 #ifdef MAP_ANONYMOUS
-	{ MAP_ANONYMOUS,"MAP_ANONYMOUS"	},
+	XLAT(MAP_ANONYMOUS),
 #endif
 #ifdef MAP_32BIT
-	{ MAP_32BIT,	"MAP_32BIT"	},
+	XLAT(MAP_32BIT),
 #endif
 #ifdef MAP_RENAME
-	{ MAP_RENAME,	"MAP_RENAME"	},
+	XLAT(MAP_RENAME),
 #endif
 #ifdef MAP_NORESERVE
-	{ MAP_NORESERVE,"MAP_NORESERVE"	},
+	XLAT(MAP_NORESERVE),
 #endif
 #ifdef MAP_POPULATE
-	{ MAP_POPULATE, "MAP_POPULATE" },
+	XLAT(MAP_POPULATE),
 #endif
 #ifdef MAP_NONBLOCK
-	{ MAP_NONBLOCK, "MAP_NONBLOCK" },
+	XLAT(MAP_NONBLOCK),
 #endif
 	/*
 	 * XXX - this was introduced in SunOS 4.x to distinguish between
@@ -129,47 +129,47 @@ static const struct xlat mmap_flags[] = {
 	 * and calls with it as "mmap()".
 	 */
 #ifdef _MAP_NEW
-	{ _MAP_NEW,	"_MAP_NEW"	},
+	XLAT(_MAP_NEW),
 #endif
 #ifdef MAP_GROWSDOWN
-	{ MAP_GROWSDOWN,"MAP_GROWSDOWN"	},
+	XLAT(MAP_GROWSDOWN),
 #endif
 #ifdef MAP_DENYWRITE
-	{ MAP_DENYWRITE,"MAP_DENYWRITE"	},
+	XLAT(MAP_DENYWRITE),
 #endif
 #ifdef MAP_EXECUTABLE
-	{ MAP_EXECUTABLE,"MAP_EXECUTABLE"},
+	XLAT(MAP_EXECUTABLE),
 #endif
 #ifdef MAP_INHERIT
-	{ MAP_INHERIT,	"MAP_INHERIT"	},
+	XLAT(MAP_INHERIT),
 #endif
 #ifdef MAP_FILE
-	{ MAP_FILE,	"MAP_FILE"	},
+	XLAT(MAP_FILE),
 #endif
 #ifdef MAP_LOCKED
-	{ MAP_LOCKED,	"MAP_LOCKED"	},
+	XLAT(MAP_LOCKED),
 #endif
 	/* FreeBSD ones */
 #if defined(MAP_ANON) && (!defined(MAP_ANONYMOUS) || MAP_ANON != MAP_ANONYMOUS)
-	{ MAP_ANON,	"MAP_ANON"	},
+	XLAT(MAP_ANON),
 #endif
 #ifdef MAP_HASSEMAPHORE
-	{ MAP_HASSEMAPHORE,"MAP_HASSEMAPHORE"},
+	XLAT(MAP_HASSEMAPHORE),
 #endif
 #ifdef MAP_STACK
-	{ MAP_STACK,	"MAP_STACK"	},
+	XLAT(MAP_STACK),
 #endif
 #ifdef MAP_HUGETLB
-	{ MAP_HUGETLB,	"MAP_HUGETLB"	},
+	XLAT(MAP_HUGETLB),
 #endif
 #if defined MAP_UNINITIALIZED && MAP_UNINITIALIZED > 0
-	{ MAP_UNINITIALIZED,"MAP_UNINITIALIZED"},
+	XLAT(MAP_UNINITIALIZED),
 #endif
 #ifdef MAP_NOSYNC
-	{ MAP_NOSYNC,	"MAP_NOSYNC"	},
+	XLAT(MAP_NOSYNC),
 #endif
 #ifdef MAP_NOCORE
-	{ MAP_NOCORE,	"MAP_NOCORE"	},
+	XLAT(MAP_NOCORE),
 #endif
 	{ 0,		NULL		},
 };
@@ -322,9 +322,9 @@ sys_mprotect(struct tcb *tcp)
 }
 
 static const struct xlat mremap_flags[] = {
-	{ MREMAP_MAYMOVE,	"MREMAP_MAYMOVE"	},
+	XLAT(MREMAP_MAYMOVE),
 #ifdef MREMAP_FIXED
-	{ MREMAP_FIXED,		"MREMAP_FIXED"		},
+	XLAT(MREMAP_FIXED),
 #endif
 	{ 0,			NULL			}
 };
@@ -347,52 +347,52 @@ sys_mremap(struct tcb *tcp)
 
 static const struct xlat madvise_cmds[] = {
 #ifdef MADV_NORMAL
-	{ MADV_NORMAL,		"MADV_NORMAL" },
+	XLAT(MADV_NORMAL),
 #endif
 #ifdef MADV_RANDOM
-	{ MADV_RANDOM,		"MADV_RANDOM" },
+	XLAT(MADV_RANDOM),
 #endif
 #ifdef MADV_SEQUENTIAL
-	{ MADV_SEQUENTIAL,	"MADV_SEQUENTIAL" },
+	XLAT(MADV_SEQUENTIAL),
 #endif
 #ifdef MADV_WILLNEED
-	{ MADV_WILLNEED,	"MADV_WILLNEED" },
+	XLAT(MADV_WILLNEED),
 #endif
 #ifdef MADV_DONTNEED
-	{ MADV_DONTNEED,	"MADV_DONTNEED" },
+	XLAT(MADV_DONTNEED),
 #endif
 #ifdef MADV_REMOVE
-	{ MADV_REMOVE,		"MADV_REMOVE" },
+	XLAT(MADV_REMOVE),
 #endif
 #ifdef MADV_DONTFORK
-	{ MADV_DONTFORK,	"MADV_DONTFORK" },
+	XLAT(MADV_DONTFORK),
 #endif
 #ifdef MADV_DOFORK
-	{ MADV_DOFORK,		"MADV_DOFORK" },
+	XLAT(MADV_DOFORK),
 #endif
 #ifdef MADV_HWPOISON
-	{ MADV_HWPOISON,	"MADV_HWPOISON" },
+	XLAT(MADV_HWPOISON),
 #endif
 #ifdef MADV_SOFT_OFFLINE
-	{ MADV_SOFT_OFFLINE,	"MADV_SOFT_OFFLINE" },
+	XLAT(MADV_SOFT_OFFLINE),
 #endif
 #ifdef MADV_MERGEABLE
-	{ MADV_MERGEABLE,	"MADV_MERGEABLE" },
+	XLAT(MADV_MERGEABLE),
 #endif
 #ifdef MADV_UNMERGEABLE
-	{ MADV_UNMERGEABLE,	"MADV_UNMERGEABLE" },
+	XLAT(MADV_UNMERGEABLE),
 #endif
 #ifdef MADV_HUGEPAGE
-	{ MADV_HUGEPAGE,	"MADV_HUGEPAGE" },
+	XLAT(MADV_HUGEPAGE),
 #endif
 #ifdef MADV_NOHUGEPAGE
-	{ MADV_NOHUGEPAGE,	"MADV_NOHUGEPAGE" },
+	XLAT(MADV_NOHUGEPAGE),
 #endif
 #ifdef MADV_DONTDUMP
-	{ MADV_DONTDUMP,	"MADV_DONTDUMP" },
+	XLAT(MADV_DONTDUMP),
 #endif
 #ifdef MADV_DODUMP
-	{ MADV_DODUMP,		"MADV_DODUMP" },
+	XLAT(MADV_DODUMP),
 #endif
 	{ 0,			NULL },
 };
@@ -409,10 +409,10 @@ sys_madvise(struct tcb *tcp)
 
 static const struct xlat mlockall_flags[] = {
 #ifdef MCL_CURRENT
-	{ MCL_CURRENT,	"MCL_CURRENT" },
+	XLAT(MCL_CURRENT),
 #endif
 #ifdef MCL_FUTURE
-	{ MCL_FUTURE,	"MCL_FUTURE" },
+	XLAT(MCL_FUTURE),
 #endif
 	{ 0,		NULL}
 };
@@ -430,10 +430,10 @@ sys_mlockall(struct tcb *tcp)
 
 static const struct xlat mctl_sync[] = {
 #ifdef MS_SYNC
-	{ MS_SYNC,	"MS_SYNC"	},
+	XLAT(MS_SYNC),
 #endif
-	{ MS_ASYNC,	"MS_ASYNC"	},
-	{ MS_INVALIDATE,"MS_INVALIDATE"	},
+	XLAT(MS_ASYNC),
+	XLAT(MS_INVALIDATE),
 	{ 0,		NULL		},
 };
 
@@ -456,17 +456,17 @@ sys_msync(struct tcb *tcp)
 #ifdef MC_SYNC
 
 static const struct xlat mctl_funcs[] = {
-	{ MC_LOCK,	"MC_LOCK"	},
-	{ MC_LOCKAS,	"MC_LOCKAS"	},
-	{ MC_SYNC,	"MC_SYNC"	},
-	{ MC_UNLOCK,	"MC_UNLOCK"	},
-	{ MC_UNLOCKAS,	"MC_UNLOCKAS"	},
+	XLAT(MC_LOCK),
+	XLAT(MC_LOCKAS),
+	XLAT(MC_SYNC),
+	XLAT(MC_UNLOCK),
+	XLAT(MC_UNLOCKAS),
 	{ 0,		NULL		},
 };
 
 static const struct xlat mctl_lockas[] = {
-	{ MCL_CURRENT,	"MCL_CURRENT"	},
-	{ MCL_FUTURE,	"MCL_FUTURE"	},
+	XLAT(MCL_CURRENT),
+	XLAT(MCL_FUTURE),
 	{ 0,		NULL		},
 };
 
@@ -684,29 +684,29 @@ sys_remap_file_pages(struct tcb *tcp)
 #define MPOL_MF_MOVE_ALL (1<<2)
 
 static const struct xlat policies[] = {
-	{ MPOL_DEFAULT,		"MPOL_DEFAULT"		},
-	{ MPOL_PREFERRED,	"MPOL_PREFERRED"	},
-	{ MPOL_BIND,		"MPOL_BIND"		},
-	{ MPOL_INTERLEAVE,	"MPOL_INTERLEAVE"	},
+	XLAT(MPOL_DEFAULT),
+	XLAT(MPOL_PREFERRED),
+	XLAT(MPOL_BIND),
+	XLAT(MPOL_INTERLEAVE),
 	{ 0,			NULL			}
 };
 
 static const struct xlat mbindflags[] = {
-	{ MPOL_MF_STRICT,	"MPOL_MF_STRICT"	},
-	{ MPOL_MF_MOVE,		"MPOL_MF_MOVE"		},
-	{ MPOL_MF_MOVE_ALL,	"MPOL_MF_MOVE_ALL"	},
+	XLAT(MPOL_MF_STRICT),
+	XLAT(MPOL_MF_MOVE),
+	XLAT(MPOL_MF_MOVE_ALL),
 	{ 0,			NULL			}
 };
 
 static const struct xlat mempolicyflags[] = {
-	{ MPOL_F_NODE,		"MPOL_F_NODE"		},
-	{ MPOL_F_ADDR,		"MPOL_F_ADDR"		},
+	XLAT(MPOL_F_NODE),
+	XLAT(MPOL_F_ADDR),
 	{ 0,			NULL			}
 };
 
 static const struct xlat move_pages_flags[] = {
-	{ MPOL_MF_MOVE,		"MPOL_MF_MOVE"		},
-	{ MPOL_MF_MOVE_ALL,	"MPOL_MF_MOVE_ALL"	},
+	XLAT(MPOL_MF_MOVE),
+	XLAT(MPOL_MF_MOVE_ALL),
 	{ 0,			NULL			}
 };
 

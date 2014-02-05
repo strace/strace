@@ -100,62 +100,62 @@ struct sigcontext {
 
 static const struct xlat sigact_flags[] = {
 #ifdef SA_RESTORER
-	{ SA_RESTORER,	"SA_RESTORER"	},
+	XLAT(SA_RESTORER),
 #endif
 #ifdef SA_STACK
-	{ SA_STACK,	"SA_STACK"	},
+	XLAT(SA_STACK),
 #endif
 #ifdef SA_RESTART
-	{ SA_RESTART,	"SA_RESTART"	},
+	XLAT(SA_RESTART),
 #endif
 #ifdef SA_INTERRUPT
-	{ SA_INTERRUPT,	"SA_INTERRUPT"	},
+	XLAT(SA_INTERRUPT),
 #endif
 #ifdef SA_NODEFER
-	{ SA_NODEFER,	"SA_NODEFER"	},
+	XLAT(SA_NODEFER),
 #endif
 #if defined SA_NOMASK && SA_NODEFER != SA_NOMASK
-	{ SA_NOMASK,	"SA_NOMASK"	},
+	XLAT(SA_NOMASK),
 #endif
 #ifdef SA_RESETHAND
-	{ SA_RESETHAND,	"SA_RESETHAND"	},
+	XLAT(SA_RESETHAND),
 #endif
 #if defined SA_ONESHOT && SA_ONESHOT != SA_RESETHAND
-	{ SA_ONESHOT,	"SA_ONESHOT"	},
+	XLAT(SA_ONESHOT),
 #endif
 #ifdef SA_SIGINFO
-	{ SA_SIGINFO,	"SA_SIGINFO"	},
+	XLAT(SA_SIGINFO),
 #endif
 #ifdef SA_RESETHAND
-	{ SA_RESETHAND,	"SA_RESETHAND"	},
+	XLAT(SA_RESETHAND),
 #endif
 #ifdef SA_ONSTACK
-	{ SA_ONSTACK,	"SA_ONSTACK"	},
+	XLAT(SA_ONSTACK),
 #endif
 #ifdef SA_NODEFER
-	{ SA_NODEFER,	"SA_NODEFER"	},
+	XLAT(SA_NODEFER),
 #endif
 #ifdef SA_NOCLDSTOP
-	{ SA_NOCLDSTOP,	"SA_NOCLDSTOP"	},
+	XLAT(SA_NOCLDSTOP),
 #endif
 #ifdef SA_NOCLDWAIT
-	{ SA_NOCLDWAIT,	"SA_NOCLDWAIT"	},
+	XLAT(SA_NOCLDWAIT),
 #endif
 #ifdef _SA_BSDCALL
-	{ _SA_BSDCALL,	"_SA_BSDCALL"	},
+	XLAT(_SA_BSDCALL),
 #endif
 #ifdef SA_NOPTRACE
-	{ SA_NOPTRACE,	"SA_NOPTRACE"	},
+	XLAT(SA_NOPTRACE),
 #endif
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigprocmaskcmds[] = {
-	{ SIG_BLOCK,	"SIG_BLOCK"	},
-	{ SIG_UNBLOCK,	"SIG_UNBLOCK"	},
-	{ SIG_SETMASK,	"SIG_SETMASK"	},
+	XLAT(SIG_BLOCK),
+	XLAT(SIG_UNBLOCK),
+	XLAT(SIG_SETMASK),
 #ifdef SIG_SETMASK32
-	{ SIG_SETMASK32,"SIG_SETMASK32"	},
+	XLAT(SIG_SETMASK32),
 #endif
 	{ 0,		NULL		},
 };
@@ -376,94 +376,94 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 
 static const struct xlat siginfo_codes[] = {
 #ifdef SI_KERNEL
-	{ SI_KERNEL,	"SI_KERNEL"	},
+	XLAT(SI_KERNEL),
 #endif
 #ifdef SI_USER
-	{ SI_USER,	"SI_USER"	},
+	XLAT(SI_USER),
 #endif
 #ifdef SI_QUEUE
-	{ SI_QUEUE,	"SI_QUEUE"	},
+	XLAT(SI_QUEUE),
 #endif
 #ifdef SI_TIMER
-	{ SI_TIMER,	"SI_TIMER"	},
+	XLAT(SI_TIMER),
 #endif
 #ifdef SI_MESGQ
-	{ SI_MESGQ,	"SI_MESGQ"	},
+	XLAT(SI_MESGQ),
 #endif
 #ifdef SI_ASYNCIO
-	{ SI_ASYNCIO,	"SI_ASYNCIO"	},
+	XLAT(SI_ASYNCIO),
 #endif
 #ifdef SI_SIGIO
-	{ SI_SIGIO,	"SI_SIGIO"	},
+	XLAT(SI_SIGIO),
 #endif
 #ifdef SI_TKILL
-	{ SI_TKILL,	"SI_TKILL"	},
+	XLAT(SI_TKILL),
 #endif
 #ifdef SI_ASYNCNL
-	{ SI_ASYNCNL,	"SI_ASYNCNL"	},
+	XLAT(SI_ASYNCNL),
 #endif
 #ifdef SI_NOINFO
-	{ SI_NOINFO,	"SI_NOINFO"	},
+	XLAT(SI_NOINFO),
 #endif
 #ifdef SI_LWP
-	{ SI_LWP,	"SI_LWP"	},
+	XLAT(SI_LWP),
 #endif
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigill_codes[] = {
-	{ ILL_ILLOPC,	"ILL_ILLOPC"	},
-	{ ILL_ILLOPN,	"ILL_ILLOPN"	},
-	{ ILL_ILLADR,	"ILL_ILLADR"	},
-	{ ILL_ILLTRP,	"ILL_ILLTRP"	},
-	{ ILL_PRVOPC,	"ILL_PRVOPC"	},
-	{ ILL_PRVREG,	"ILL_PRVREG"	},
-	{ ILL_COPROC,	"ILL_COPROC"	},
-	{ ILL_BADSTK,	"ILL_BADSTK"	},
+	XLAT(ILL_ILLOPC),
+	XLAT(ILL_ILLOPN),
+	XLAT(ILL_ILLADR),
+	XLAT(ILL_ILLTRP),
+	XLAT(ILL_PRVOPC),
+	XLAT(ILL_PRVREG),
+	XLAT(ILL_COPROC),
+	XLAT(ILL_BADSTK),
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigfpe_codes[] = {
-	{ FPE_INTDIV,	"FPE_INTDIV"	},
-	{ FPE_INTOVF,	"FPE_INTOVF"	},
-	{ FPE_FLTDIV,	"FPE_FLTDIV"	},
-	{ FPE_FLTOVF,	"FPE_FLTOVF"	},
-	{ FPE_FLTUND,	"FPE_FLTUND"	},
-	{ FPE_FLTRES,	"FPE_FLTRES"	},
-	{ FPE_FLTINV,	"FPE_FLTINV"	},
-	{ FPE_FLTSUB,	"FPE_FLTSUB"	},
+	XLAT(FPE_INTDIV),
+	XLAT(FPE_INTOVF),
+	XLAT(FPE_FLTDIV),
+	XLAT(FPE_FLTOVF),
+	XLAT(FPE_FLTUND),
+	XLAT(FPE_FLTRES),
+	XLAT(FPE_FLTINV),
+	XLAT(FPE_FLTSUB),
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigtrap_codes[] = {
-	{ TRAP_BRKPT,	"TRAP_BRKPT"	},
-	{ TRAP_TRACE,	"TRAP_TRACE"	},
+	XLAT(TRAP_BRKPT),
+	XLAT(TRAP_TRACE),
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigchld_codes[] = {
-	{ CLD_EXITED,	"CLD_EXITED"	},
-	{ CLD_KILLED,	"CLD_KILLED"	},
-	{ CLD_DUMPED,	"CLD_DUMPED"	},
-	{ CLD_TRAPPED,	"CLD_TRAPPED"	},
-	{ CLD_STOPPED,	"CLD_STOPPED"	},
-	{ CLD_CONTINUED,"CLD_CONTINUED"	},
+	XLAT(CLD_EXITED),
+	XLAT(CLD_KILLED),
+	XLAT(CLD_DUMPED),
+	XLAT(CLD_TRAPPED),
+	XLAT(CLD_STOPPED),
+	XLAT(CLD_CONTINUED),
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigpoll_codes[] = {
-	{ POLL_IN,	"POLL_IN"	},
-	{ POLL_OUT,	"POLL_OUT"	},
-	{ POLL_MSG,	"POLL_MSG"	},
-	{ POLL_ERR,	"POLL_ERR"	},
-	{ POLL_PRI,	"POLL_PRI"	},
-	{ POLL_HUP,	"POLL_HUP"	},
+	XLAT(POLL_IN),
+	XLAT(POLL_OUT),
+	XLAT(POLL_MSG),
+	XLAT(POLL_ERR),
+	XLAT(POLL_PRI),
+	XLAT(POLL_HUP),
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigprof_codes[] = {
 #ifdef PROF_SIG
-	{ PROF_SIG,	"PROF_SIG"	},
+	XLAT(PROF_SIG),
 #endif
 	{ 0,		NULL		},
 };
@@ -471,22 +471,22 @@ static const struct xlat sigprof_codes[] = {
 #ifdef SIGEMT
 static const struct xlat sigemt_codes[] = {
 #ifdef EMT_TAGOVF
-	{ EMT_TAGOVF,	"EMT_TAGOVF"	},
+	XLAT(EMT_TAGOVF),
 #endif
 	{ 0,		NULL		},
 };
 #endif
 
 static const struct xlat sigsegv_codes[] = {
-	{ SEGV_MAPERR,	"SEGV_MAPERR"	},
-	{ SEGV_ACCERR,	"SEGV_ACCERR"	},
+	XLAT(SEGV_MAPERR),
+	XLAT(SEGV_ACCERR),
 	{ 0,		NULL		},
 };
 
 static const struct xlat sigbus_codes[] = {
-	{ BUS_ADRALN,	"BUS_ADRALN"	},
-	{ BUS_ADRERR,	"BUS_ADRERR"	},
-	{ BUS_OBJERR,	"BUS_OBJERR"	},
+	XLAT(BUS_ADRALN),
+	XLAT(BUS_ADRERR),
+	XLAT(BUS_OBJERR),
 	{ 0,		NULL		},
 };
 
@@ -1081,8 +1081,8 @@ sys_sigsuspend(struct tcb *tcp)
 #endif
 
 static const struct xlat sigaltstack_flags[] = {
-	{ SS_ONSTACK,	"SS_ONSTACK"	},
-	{ SS_DISABLE,	"SS_DISABLE"	},
+	XLAT(SS_ONSTACK),
+	XLAT(SS_DISABLE),
 	{ 0,		NULL		},
 };
 

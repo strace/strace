@@ -212,42 +212,42 @@ struct kernel_dirent {
 };
 
 const struct xlat open_access_modes[] = {
-	{ O_RDONLY,	"O_RDONLY"	},
-	{ O_WRONLY,	"O_WRONLY"	},
-	{ O_RDWR,	"O_RDWR"	},
+	XLAT(O_RDONLY),
+	XLAT(O_WRONLY),
+	XLAT(O_RDWR),
 #ifdef O_ACCMODE
-	{ O_ACCMODE,	"O_ACCMODE"	},
+	XLAT(O_ACCMODE),
 #endif
 	{ 0,		NULL		},
 };
 
 const struct xlat open_mode_flags[] = {
-	{ O_CREAT,	"O_CREAT"	},
-	{ O_EXCL,	"O_EXCL"	},
-	{ O_NOCTTY,	"O_NOCTTY"	},
-	{ O_TRUNC,	"O_TRUNC"	},
-	{ O_APPEND,	"O_APPEND"	},
-	{ O_NONBLOCK,	"O_NONBLOCK"	},
+	XLAT(O_CREAT),
+	XLAT(O_EXCL),
+	XLAT(O_NOCTTY),
+	XLAT(O_TRUNC),
+	XLAT(O_APPEND),
+	XLAT(O_NONBLOCK),
 #ifdef O_SYNC
-	{ O_SYNC,	"O_SYNC"	},
+	XLAT(O_SYNC),
 #endif
 #ifdef O_ASYNC
-	{ O_ASYNC,	"O_ASYNC"	},
+	XLAT(O_ASYNC),
 #endif
 #ifdef O_DSYNC
-	{ O_DSYNC,	"O_DSYNC"	},
+	XLAT(O_DSYNC),
 #endif
 #ifdef O_RSYNC
-	{ O_RSYNC,	"O_RSYNC"	},
+	XLAT(O_RSYNC),
 #endif
 #if defined(O_NDELAY) && (O_NDELAY != O_NONBLOCK)
-	{ O_NDELAY,	"O_NDELAY"	},
+	XLAT(O_NDELAY),
 #endif
 #ifdef O_PRIV
-	{ O_PRIV,	"O_PRIV"	},
+	XLAT(O_PRIV),
 #endif
 #ifdef O_DIRECT
-	{ O_DIRECT,	"O_DIRECT"	},
+	XLAT(O_DIRECT),
 #endif
 #ifdef O_LARGEFILE
 # if O_LARGEFILE == 0		/* biarch platforms in 64-bit mode */
@@ -259,68 +259,68 @@ const struct xlat open_mode_flags[] = {
 #  endif
 # endif
 # ifdef O_LARGEFILE
-	{ O_LARGEFILE,	"O_LARGEFILE"	},
+	XLAT(O_LARGEFILE),
 # endif
 #endif
 #ifdef O_DIRECTORY
-	{ O_DIRECTORY,	"O_DIRECTORY"	},
+	XLAT(O_DIRECTORY),
 #endif
 #ifdef O_NOFOLLOW
-	{ O_NOFOLLOW,	"O_NOFOLLOW"	},
+	XLAT(O_NOFOLLOW),
 #endif
 #ifdef O_NOATIME
-	{ O_NOATIME,	"O_NOATIME"	},
+	XLAT(O_NOATIME),
 #endif
 #ifdef O_CLOEXEC
-	{ O_CLOEXEC,	"O_CLOEXEC"	},
+	XLAT(O_CLOEXEC),
 #endif
 #ifdef O_PATH
-	{ O_PATH,	"O_PATH"	},
+	XLAT(O_PATH),
 #endif
 #ifdef FNDELAY
-	{ FNDELAY,	"FNDELAY"	},
+	XLAT(FNDELAY),
 #endif
 #ifdef FAPPEND
-	{ FAPPEND,	"FAPPEND"	},
+	XLAT(FAPPEND),
 #endif
 #ifdef FMARK
-	{ FMARK,	"FMARK"		},
+	XLAT(FMARK),
 #endif
 #ifdef FDEFER
-	{ FDEFER,	"FDEFER"	},
+	XLAT(FDEFER),
 #endif
 #ifdef FASYNC
-	{ FASYNC,	"FASYNC"	},
+	XLAT(FASYNC),
 #endif
 #ifdef FSHLOCK
-	{ FSHLOCK,	"FSHLOCK"	},
+	XLAT(FSHLOCK),
 #endif
 #ifdef FEXLOCK
-	{ FEXLOCK,	"FEXLOCK"	},
+	XLAT(FEXLOCK),
 #endif
 #ifdef FCREAT
-	{ FCREAT,	"FCREAT"	},
+	XLAT(FCREAT),
 #endif
 #ifdef FTRUNC
-	{ FTRUNC,	"FTRUNC"	},
+	XLAT(FTRUNC),
 #endif
 #ifdef FEXCL
-	{ FEXCL,	"FEXCL"		},
+	XLAT(FEXCL),
 #endif
 #ifdef FNBIO
-	{ FNBIO,	"FNBIO"		},
+	XLAT(FNBIO),
 #endif
 #ifdef FSYNC
-	{ FSYNC,	"FSYNC"		},
+	XLAT(FSYNC),
 #endif
 #ifdef FNOCTTY
-	{ FNOCTTY,	"FNOCTTY"	},
+	XLAT(FNOCTTY),
 #endif
 #ifdef O_SHLOCK
-	{ O_SHLOCK,	"O_SHLOCK"	},
+	XLAT(O_SHLOCK),
 #endif
 #ifdef O_EXLOCK
-	{ O_EXLOCK,	"O_EXLOCK"	},
+	XLAT(O_EXLOCK),
 #endif
 	{ 0,		NULL		},
 };
@@ -468,15 +468,15 @@ sys_creat(struct tcb *tcp)
 }
 
 static const struct xlat access_flags[] = {
-	{ F_OK,		"F_OK",		},
-	{ R_OK,		"R_OK"		},
-	{ W_OK,		"W_OK"		},
-	{ X_OK,		"X_OK"		},
+	XLAT(F_OK),
+	XLAT(R_OK),
+	XLAT(W_OK),
+	XLAT(X_OK),
 #ifdef EFF_ONLY_OK
-	{ EFF_ONLY_OK,	"EFF_ONLY_OK"	},
+	XLAT(EFF_ONLY_OK),
 #endif
 #ifdef EX_OK
-	{ EX_OK,	"EX_OK"		},
+	XLAT(EX_OK),
 #endif
 	{ 0,		NULL		},
 };
@@ -516,14 +516,14 @@ sys_umask(struct tcb *tcp)
 }
 
 const struct xlat whence_codes[] = {
-	{ SEEK_SET,	"SEEK_SET"	},
-	{ SEEK_CUR,	"SEEK_CUR"	},
-	{ SEEK_END,	"SEEK_END"	},
+	XLAT(SEEK_SET),
+	XLAT(SEEK_CUR),
+	XLAT(SEEK_END),
 #ifdef SEEK_DATA
-	{ SEEK_DATA,	"SEEK_DATA"	},
+	XLAT(SEEK_DATA),
 #endif
 #ifdef SEEK_HOLE
-	{ SEEK_HOLE,	"SEEK_HOLE"	},
+	XLAT(SEEK_HOLE),
 #endif
 	{ 0,		NULL		},
 };
@@ -668,13 +668,13 @@ sys_ftruncate64(struct tcb *tcp)
 /* several stats */
 
 static const struct xlat modetypes[] = {
-	{ S_IFREG,	"S_IFREG"	},
-	{ S_IFSOCK,	"S_IFSOCK"	},
-	{ S_IFIFO,	"S_IFIFO"	},
-	{ S_IFLNK,	"S_IFLNK"	},
-	{ S_IFDIR,	"S_IFDIR"	},
-	{ S_IFBLK,	"S_IFBLK"	},
-	{ S_IFCHR,	"S_IFCHR"	},
+	XLAT(S_IFREG),
+	XLAT(S_IFSOCK),
+	XLAT(S_IFIFO),
+	XLAT(S_IFLNK),
+	XLAT(S_IFDIR),
+	XLAT(S_IFBLK),
+	XLAT(S_IFCHR),
 	{ 0,		NULL		},
 };
 
@@ -1323,11 +1323,11 @@ sys_stat64(struct tcb *tcp)
 #endif
 
 static const struct xlat at_flags[] = {
-	{ AT_SYMLINK_NOFOLLOW,	"AT_SYMLINK_NOFOLLOW"	},
-	{ AT_REMOVEDIR,		"AT_REMOVEDIR"		},
-	{ AT_SYMLINK_FOLLOW,	"AT_SYMLINK_FOLLOW"	},
-	{ AT_NO_AUTOMOUNT,	"AT_NO_AUTOMOUNT"	},
-	{ AT_EMPTY_PATH,	"AT_EMPTY_PATH"		},
+	XLAT(AT_SYMLINK_NOFOLLOW),
+	XLAT(AT_REMOVEDIR),
+	XLAT(AT_SYMLINK_FOLLOW),
+	XLAT(AT_NO_AUTOMOUNT),
+	XLAT(AT_EMPTY_PATH),
 	{ 0,			NULL			}
 };
 
@@ -1497,22 +1497,22 @@ sys_xmknod(struct tcb *tcp)
 
 static const struct xlat aclcmds[] = {
 #  ifdef SETACL
-	{ SETACL,	"SETACL"	},
+	XLAT(SETACL),
 #  endif
 #  ifdef GETACL
-	{ GETACL,	"GETACL"	},
+	XLAT(GETACL),
 #  endif
 #  ifdef GETACLCNT
-	{ GETACLCNT,	"GETACLCNT"	},
+	XLAT(GETACLCNT),
 #  endif
 #  ifdef ACL_GET
-	{ ACL_GET,	"ACL_GET"	},
+	XLAT(ACL_GET),
 #  endif
 #  ifdef ACL_SET
-	{ ACL_SET,	"ACL_SET"	},
+	XLAT(ACL_SET),
 #  endif
 #  ifdef ACL_CNT
-	{ ACL_CNT,	"ACL_CNT"	},
+	XLAT(ACL_CNT),
 #  endif
 	{ 0,		NULL		},
 };
@@ -1558,13 +1558,13 @@ sys_facl(struct tcb *tcp)
 
 static const struct xlat aclipc[] = {
 #  ifdef IPC_SHM
-	{ IPC_SHM,	"IPC_SHM"	},
+	XLAT(IPC_SHM),
 #  endif
 #  ifdef IPC_SEM
-	{ IPC_SEM,	"IPC_SEM"	},
+	XLAT(IPC_SEM),
 #  endif
 #  ifdef IPC_MSG
-	{ IPC_MSG,	"IPC_MSG"	},
+	XLAT(IPC_MSG),
 #  endif
 	{ 0,		NULL		},
 };
@@ -2240,15 +2240,15 @@ sys_readdir(struct tcb *tcp)
 }
 
 static const struct xlat direnttypes[] = {
-	{ DT_UNKNOWN,	"DT_UNKNOWN"	},
-	{ DT_FIFO,	"DT_FIFO"	},
-	{ DT_CHR,	"DT_CHR"	},
-	{ DT_DIR,	"DT_DIR"	},
-	{ DT_BLK,	"DT_BLK"	},
-	{ DT_REG,	"DT_REG"	},
-	{ DT_LNK,	"DT_LNK"	},
-	{ DT_SOCK,	"DT_SOCK"	},
-	{ DT_WHT,	"DT_WHT"	},
+	XLAT(DT_UNKNOWN),
+	XLAT(DT_FIFO),
+	XLAT(DT_CHR),
+	XLAT(DT_DIR),
+	XLAT(DT_BLK),
+	XLAT(DT_REG),
+	XLAT(DT_LNK),
+	XLAT(DT_SOCK),
+	XLAT(DT_WHT),
 	{ 0,		NULL		},
 };
 
@@ -2464,8 +2464,8 @@ sys_aiocancel(struct tcb *tcp)
 
 static const struct xlat xattrflags[] = {
 #ifdef XATTR_CREATE
-	{ XATTR_CREATE,	 "XATTR_CREATE" },
-	{ XATTR_REPLACE, "XATTR_REPLACE" },
+	XLAT(XATTR_CREATE),
+	XLAT(XATTR_REPLACE),
 #endif
 	{ 0,		 NULL }
 };
@@ -2632,12 +2632,12 @@ sys_fremovexattr(struct tcb *tcp)
 }
 
 static const struct xlat advise[] = {
-	{ POSIX_FADV_NORMAL,		"POSIX_FADV_NORMAL"	},
-	{ POSIX_FADV_RANDOM,		"POSIX_FADV_RANDOM"	},
-	{ POSIX_FADV_SEQUENTIAL,	"POSIX_FADV_SEQUENTIAL"	},
-	{ POSIX_FADV_WILLNEED,		"POSIX_FADV_WILLNEED"	},
-	{ POSIX_FADV_DONTNEED,		"POSIX_FADV_DONTNEED"	},
-	{ POSIX_FADV_NOREUSE,		"POSIX_FADV_NOREUSE"	},
+	XLAT(POSIX_FADV_NORMAL),
+	XLAT(POSIX_FADV_RANDOM),
+	XLAT(POSIX_FADV_SEQUENTIAL),
+	XLAT(POSIX_FADV_WILLNEED),
+	XLAT(POSIX_FADV_DONTNEED),
+	XLAT(POSIX_FADV_NOREUSE),
 	{ 0,				NULL			}
 };
 
@@ -2672,9 +2672,9 @@ sys_fadvise64_64(struct tcb *tcp)
 }
 
 static const struct xlat sync_file_range_flags[] = {
-	{ SYNC_FILE_RANGE_WAIT_BEFORE,	"SYNC_FILE_RANGE_WAIT_BEFORE"	},
-	{ SYNC_FILE_RANGE_WRITE,	"SYNC_FILE_RANGE_WRITE"		},
-	{ SYNC_FILE_RANGE_WAIT_AFTER,	"SYNC_FILE_RANGE_WAIT_AFTER"	},
+	XLAT(SYNC_FILE_RANGE_WAIT_BEFORE),
+	XLAT(SYNC_FILE_RANGE_WRITE),
+	XLAT(SYNC_FILE_RANGE_WAIT_AFTER),
 	{ 0,				NULL				}
 };
 
@@ -2787,8 +2787,8 @@ sys_fallocate(struct tcb *tcp)
 # define SWAP_FLAG_DISCARD 0x10000
 #endif
 static const struct xlat swap_flags[] = {
-	{ SWAP_FLAG_PREFER,	"SWAP_FLAG_PREFER"	},
-	{ SWAP_FLAG_DISCARD,	"SWAP_FLAG_DISCARD"	},
+	XLAT(SWAP_FLAG_PREFER),
+	XLAT(SWAP_FLAG_DISCARD),
 	{ 0,			NULL			}
 };
 

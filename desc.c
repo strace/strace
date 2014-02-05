@@ -39,118 +39,118 @@
 #endif
 
 static const struct xlat fcntlcmds[] = {
-	{ F_DUPFD,	"F_DUPFD"	},
-	{ F_GETFD,	"F_GETFD"	},
-	{ F_SETFD,	"F_SETFD"	},
-	{ F_GETFL,	"F_GETFL"	},
-	{ F_SETFL,	"F_SETFL"	},
-	{ F_GETLK,	"F_GETLK"	},
-	{ F_SETLK,	"F_SETLK"	},
-	{ F_SETLKW,	"F_SETLKW"	},
-	{ F_GETOWN,	"F_GETOWN"	},
-	{ F_SETOWN,	"F_SETOWN"	},
+	XLAT(F_DUPFD),
+	XLAT(F_GETFD),
+	XLAT(F_SETFD),
+	XLAT(F_GETFL),
+	XLAT(F_SETFL),
+	XLAT(F_GETLK),
+	XLAT(F_SETLK),
+	XLAT(F_SETLKW),
+	XLAT(F_GETOWN),
+	XLAT(F_SETOWN),
 #ifdef F_RSETLK
-	{ F_RSETLK,	"F_RSETLK"	},
+	XLAT(F_RSETLK),
 #endif
 #ifdef F_RSETLKW
-	{ F_RSETLKW,	"F_RSETLKW"	},
+	XLAT(F_RSETLKW),
 #endif
 #ifdef F_RGETLK
-	{ F_RGETLK,	"F_RGETLK"	},
+	XLAT(F_RGETLK),
 #endif
 #ifdef F_CNVT
-	{ F_CNVT,	"F_CNVT"	},
+	XLAT(F_CNVT),
 #endif
 #ifdef F_SETSIG
-	{ F_SETSIG,	"F_SETSIG"	},
+	XLAT(F_SETSIG),
 #endif
 #ifdef F_GETSIG
-	{ F_GETSIG,	"F_GETSIG"	},
+	XLAT(F_GETSIG),
 #endif
 #ifdef F_CHKFL
-	{ F_CHKFL,	"F_CHKFL"	},
+	XLAT(F_CHKFL),
 #endif
 #ifdef F_DUP2FD
-	{ F_DUP2FD,	"F_DUP2FD"	},
+	XLAT(F_DUP2FD),
 #endif
 #ifdef F_ALLOCSP
-	{ F_ALLOCSP,	"F_ALLOCSP"	},
+	XLAT(F_ALLOCSP),
 #endif
 #ifdef F_ISSTREAM
-	{ F_ISSTREAM,	"F_ISSTREAM"	},
+	XLAT(F_ISSTREAM),
 #endif
 #ifdef F_PRIV
-	{ F_PRIV,	"F_PRIV"	},
+	XLAT(F_PRIV),
 #endif
 #ifdef F_NPRIV
-	{ F_NPRIV,	"F_NPRIV"	},
+	XLAT(F_NPRIV),
 #endif
 #ifdef F_QUOTACL
-	{ F_QUOTACL,	"F_QUOTACL"	},
+	XLAT(F_QUOTACL),
 #endif
 #ifdef F_BLOCKS
-	{ F_BLOCKS,	"F_BLOCKS"	},
+	XLAT(F_BLOCKS),
 #endif
 #ifdef F_BLKSIZE
-	{ F_BLKSIZE,	"F_BLKSIZE"	},
+	XLAT(F_BLKSIZE),
 #endif
 #ifdef F_GETOWN
-	{ F_GETOWN,	"F_GETOWN"	},
+	XLAT(F_GETOWN),
 #endif
 #ifdef F_SETOWN
-	{ F_SETOWN,	"F_SETOWN"	},
+	XLAT(F_SETOWN),
 #endif
 #ifdef F_REVOKE
-	{ F_REVOKE,	"F_REVOKE"	},
+	XLAT(F_REVOKE),
 #endif
 #ifdef F_SETLK
-	{ F_SETLK,	"F_SETLK"	},
+	XLAT(F_SETLK),
 #endif
 #ifdef F_SETLKW
-	{ F_SETLKW,	"F_SETLKW"	},
+	XLAT(F_SETLKW),
 #endif
 #ifdef F_FREESP
-	{ F_FREESP,	"F_FREESP"	},
+	XLAT(F_FREESP),
 #endif
 #ifdef F_GETLK
-	{ F_GETLK,	"F_GETLK"	},
+	XLAT(F_GETLK),
 #endif
 #ifdef F_SETLK64
-	{ F_SETLK64,	"F_SETLK64"	},
+	XLAT(F_SETLK64),
 #endif
 #ifdef F_SETLKW64
-	{ F_SETLKW64,	"F_SETLKW64"	},
+	XLAT(F_SETLKW64),
 #endif
 #ifdef F_FREESP64
-	{ F_FREESP64,	"F_FREESP64"	},
+	XLAT(F_FREESP64),
 #endif
 #ifdef F_GETLK64
-	{ F_GETLK64,	"F_GETLK64"	},
+	XLAT(F_GETLK64),
 #endif
 #ifdef F_SHARE
-	{ F_SHARE,	"F_SHARE"	},
+	XLAT(F_SHARE),
 #endif
 #ifdef F_UNSHARE
-	{ F_UNSHARE,	"F_UNSHARE"	},
+	XLAT(F_UNSHARE),
 #endif
 #ifdef F_SETLEASE
-	{ F_SETLEASE,	"F_SETLEASE"	},
+	XLAT(F_SETLEASE),
 #endif
 #ifdef F_GETLEASE
-	{ F_GETLEASE,	"F_GETLEASE"	},
+	XLAT(F_GETLEASE),
 #endif
 #ifdef F_NOTIFY
-	{ F_NOTIFY,	"F_NOTIFY"	},
+	XLAT(F_NOTIFY),
 #endif
 #ifdef F_DUPFD_CLOEXEC
-	{ F_DUPFD_CLOEXEC,"F_DUPFD_CLOEXEC"},
+	XLAT(F_DUPFD_CLOEXEC),
 #endif
 	{ 0,		NULL		},
 };
 
 static const struct xlat fdflags[] = {
 #ifdef FD_CLOEXEC
-	{ FD_CLOEXEC,	"FD_CLOEXEC"	},
+	XLAT(FD_CLOEXEC),
 #endif
 	{ 0,		NULL		},
 };
@@ -158,24 +158,24 @@ static const struct xlat fdflags[] = {
 #ifdef LOCK_SH
 
 static const struct xlat flockcmds[] = {
-	{ LOCK_SH,	"LOCK_SH"	},
-	{ LOCK_EX,	"LOCK_EX"	},
-	{ LOCK_NB,	"LOCK_NB"	},
-	{ LOCK_UN,	"LOCK_UN"	},
+	XLAT(LOCK_SH),
+	XLAT(LOCK_EX),
+	XLAT(LOCK_NB),
+	XLAT(LOCK_UN),
 	{ 0,		NULL		},
 };
 
 #endif /* LOCK_SH */
 
 static const struct xlat lockfcmds[] = {
-	{ F_RDLCK,	"F_RDLCK"	},
-	{ F_WRLCK,	"F_WRLCK"	},
-	{ F_UNLCK,	"F_UNLCK"	},
+	XLAT(F_RDLCK),
+	XLAT(F_WRLCK),
+	XLAT(F_UNLCK),
 #ifdef F_EXLCK
-	{ F_EXLCK,	"F_EXLCK"	},
+	XLAT(F_EXLCK),
 #endif
 #ifdef F_SHLCK
-	{ F_SHLCK,	"F_SHLCK"	},
+	XLAT(F_SHLCK),
 #endif
 	{ 0,		NULL		},
 };
@@ -183,25 +183,25 @@ static const struct xlat lockfcmds[] = {
 #ifdef F_NOTIFY
 static const struct xlat notifyflags[] = {
 #ifdef DN_ACCESS
-	{ DN_ACCESS,	"DN_ACCESS"	},
+	XLAT(DN_ACCESS),
 #endif
 #ifdef DN_MODIFY
-	{ DN_MODIFY,	"DN_MODIFY"	},
+	XLAT(DN_MODIFY),
 #endif
 #ifdef DN_CREATE
-	{ DN_CREATE,	"DN_CREATE"	},
+	XLAT(DN_CREATE),
 #endif
 #ifdef DN_DELETE
-	{ DN_DELETE,	"DN_DELETE"	},
+	XLAT(DN_DELETE),
 #endif
 #ifdef DN_RENAME
-	{ DN_RENAME,	"DN_RENAME"	},
+	XLAT(DN_RENAME),
 #endif
 #ifdef DN_ATTRIB
-	{ DN_ATTRIB,	"DN_ATTRIB"	},
+	XLAT(DN_ATTRIB),
 #endif
 #ifdef DN_MULTISHOT
-	{ DN_MULTISHOT,	"DN_MULTISHOT"	},
+	XLAT(DN_MULTISHOT),
 #endif
 	{ 0,		NULL		},
 };
@@ -209,13 +209,13 @@ static const struct xlat notifyflags[] = {
 
 static const struct xlat perf_event_open_flags[] = {
 #ifdef PERF_FLAG_FD_NO_GROUP
-	{ PERF_FLAG_FD_NO_GROUP,	"PERF_FLAG_FD_NO_GROUP"	},
+	XLAT(PERF_FLAG_FD_NO_GROUP),
 #endif
 #ifdef PERF_FLAG_FD_OUTPUT
-	{ PERF_FLAG_FD_OUTPUT,		"PERF_FLAG_FD_OUTPUT"	},
+	XLAT(PERF_FLAG_FD_OUTPUT),
 #endif
 #ifdef PERF_FLAG_PID_CGROUP
-	{ PERF_FLAG_PID_CGROUP,		"PERF_FLAG_PID_CGROUP"	},
+	XLAT(PERF_FLAG_PID_CGROUP),
 #endif
 	{ 0,				NULL			},
 };
@@ -655,56 +655,56 @@ sys_osf_select(struct tcb *tcp)
 
 static const struct xlat epollctls[] = {
 #ifdef EPOLL_CTL_ADD
-	{ EPOLL_CTL_ADD,	"EPOLL_CTL_ADD"	},
+	XLAT(EPOLL_CTL_ADD),
 #endif
 #ifdef EPOLL_CTL_MOD
-	{ EPOLL_CTL_MOD,	"EPOLL_CTL_MOD"	},
+	XLAT(EPOLL_CTL_MOD),
 #endif
 #ifdef EPOLL_CTL_DEL
-	{ EPOLL_CTL_DEL,	"EPOLL_CTL_DEL"	},
+	XLAT(EPOLL_CTL_DEL),
 #endif
 	{ 0,			NULL		}
 };
 
 static const struct xlat epollevents[] = {
 #ifdef EPOLLIN
-	{ EPOLLIN,	"EPOLLIN"	},
+	XLAT(EPOLLIN),
 #endif
 #ifdef EPOLLPRI
-	{ EPOLLPRI,	"EPOLLPRI"	},
+	XLAT(EPOLLPRI),
 #endif
 #ifdef EPOLLOUT
-	{ EPOLLOUT,	"EPOLLOUT"	},
+	XLAT(EPOLLOUT),
 #endif
 #ifdef EPOLLRDNORM
-	{ EPOLLRDNORM,	"EPOLLRDNORM"	},
+	XLAT(EPOLLRDNORM),
 #endif
 #ifdef EPOLLRDBAND
-	{ EPOLLRDBAND,	"EPOLLRDBAND"	},
+	XLAT(EPOLLRDBAND),
 #endif
 #ifdef EPOLLWRNORM
-	{ EPOLLWRNORM,	"EPOLLWRNORM"	},
+	XLAT(EPOLLWRNORM),
 #endif
 #ifdef EPOLLWRBAND
-	{ EPOLLWRBAND,	"EPOLLWRBAND"	},
+	XLAT(EPOLLWRBAND),
 #endif
 #ifdef EPOLLMSG
-	{ EPOLLMSG,	"EPOLLMSG"	},
+	XLAT(EPOLLMSG),
 #endif
 #ifdef EPOLLERR
-	{ EPOLLERR,	"EPOLLERR"	},
+	XLAT(EPOLLERR),
 #endif
 #ifdef EPOLLHUP
-	{ EPOLLHUP,	"EPOLLHUP"	},
+	XLAT(EPOLLHUP),
 #endif
 #ifdef EPOLLRDHUP
-	{ EPOLLRDHUP,	"EPOLLRDHUP"	},
+	XLAT(EPOLLRDHUP),
 #endif
 #ifdef EPOLLONESHOT
-	{ EPOLLONESHOT,	"EPOLLONESHOT"	},
+	XLAT(EPOLLONESHOT),
 #endif
 #ifdef EPOLLET
-	{ EPOLLET,	"EPOLLET"	},
+	XLAT(EPOLLET),
 #endif
 	{ 0,		NULL		}
 };
@@ -718,10 +718,10 @@ sys_epoll_create(struct tcb *tcp)
 
 static const struct xlat epollflags[] = {
 #ifdef EPOLL_CLOEXEC
-	{ EPOLL_CLOEXEC,	"EPOLL_CLOEXEC"	},
+	XLAT(EPOLL_CLOEXEC),
 #endif
 #ifdef EPOLL_NONBLOCK
-	{ EPOLL_NONBLOCK,	"EPOLL_NONBLOCK"	},
+	XLAT(EPOLL_NONBLOCK),
 #endif
 	{ 0,		NULL		}
 };

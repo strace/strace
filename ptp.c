@@ -3,9 +3,9 @@
 #include <linux/ptp_clock.h>
 
 static const struct xlat ptp_flags_options[] = {
-	{ PTP_ENABLE_FEATURE,	"PTP_ENABLE_FEATURE"	},
-	{ PTP_RISING_EDGE,	"PTP_RISING_EDGE"	},
-	{ PTP_FALLING_EDGE,	"PTP_FALLING_EDGE"	},
+	XLAT(PTP_ENABLE_FEATURE),
+	XLAT(PTP_RISING_EDGE),
+	XLAT(PTP_FALLING_EDGE),
 	{ 0,			NULL			}
 };
 

@@ -35,55 +35,55 @@
 
 static const struct xlat resources[] = {
 #ifdef RLIMIT_AS
-	{ RLIMIT_AS,		"RLIMIT_AS"		},
+	XLAT(RLIMIT_AS),
 #endif
 #ifdef RLIMIT_CORE
-	{ RLIMIT_CORE,		"RLIMIT_CORE"		},
+	XLAT(RLIMIT_CORE),
 #endif
 #ifdef RLIMIT_CPU
-	{ RLIMIT_CPU,		"RLIMIT_CPU"		},
+	XLAT(RLIMIT_CPU),
 #endif
 #ifdef RLIMIT_DATA
-	{ RLIMIT_DATA,		"RLIMIT_DATA"		},
+	XLAT(RLIMIT_DATA),
 #endif
 #ifdef RLIMIT_FSIZE
-	{ RLIMIT_FSIZE,		"RLIMIT_FSIZE"		},
+	XLAT(RLIMIT_FSIZE),
 #endif
 #ifdef RLIMIT_LOCKS
-	{ RLIMIT_LOCKS,		"RLIMIT_LOCKS"		},
+	XLAT(RLIMIT_LOCKS),
 #endif
 #ifdef RLIMIT_MEMLOCK
-	{ RLIMIT_MEMLOCK,	"RLIMIT_MEMLOCK"	},
+	XLAT(RLIMIT_MEMLOCK),
 #endif
 #ifdef RLIMIT_MSGQUEUE
-	{ RLIMIT_MSGQUEUE,	"RLIMIT_MSGQUEUE"	},
+	XLAT(RLIMIT_MSGQUEUE),
 #endif
 #ifdef RLIMIT_NICE
-	{ RLIMIT_NICE,		"RLIMIT_NICE"		},
+	XLAT(RLIMIT_NICE),
 #endif
 #ifdef RLIMIT_NOFILE
-	{ RLIMIT_NOFILE,	"RLIMIT_NOFILE"		},
+	XLAT(RLIMIT_NOFILE),
 #endif
 #ifdef RLIMIT_NPROC
-	{ RLIMIT_NPROC,		"RLIMIT_NPROC"		},
+	XLAT(RLIMIT_NPROC),
 #endif
 #ifdef RLIMIT_RSS
-	{ RLIMIT_RSS,		"RLIMIT_RSS"		},
+	XLAT(RLIMIT_RSS),
 #endif
 #ifdef RLIMIT_RTPRIO
-	{ RLIMIT_RTPRIO,	"RLIMIT_RTPRIO"		},
+	XLAT(RLIMIT_RTPRIO),
 #endif
 #ifdef RLIMIT_RTTIME
-	{ RLIMIT_RTTIME,	"RLIMIT_RTTIME"		},
+	XLAT(RLIMIT_RTTIME),
 #endif
 #ifdef RLIMIT_SIGPENDING
-	{ RLIMIT_SIGPENDING,	"RLIMIT_SIGPENDING"	},
+	XLAT(RLIMIT_SIGPENDING),
 #endif
 #ifdef RLIMIT_STACK
-	{ RLIMIT_STACK,		"RLIMIT_STACK"		},
+	XLAT(RLIMIT_STACK),
 #endif
 #ifdef RLIMIT_VMEM
-	{ RLIMIT_VMEM,		"RLIMIT_VMEM"		},
+	XLAT(RLIMIT_VMEM),
 #endif
 	{ 0,			NULL			}
 };
@@ -233,10 +233,10 @@ sys_prlimit64(struct tcb *tcp)
 }
 
 static const struct xlat usagewho[] = {
-	{ RUSAGE_SELF,		"RUSAGE_SELF"		},
-	{ RUSAGE_CHILDREN,	"RUSAGE_CHILDREN"	},
+	XLAT(RUSAGE_SELF),
+	XLAT(RUSAGE_CHILDREN),
 #ifdef RUSAGE_BOTH
-	{ RUSAGE_BOTH,		"RUSAGE_BOTH"		},
+	XLAT(RUSAGE_BOTH),
 #endif
 	{ 0,			NULL			},
 };
@@ -387,9 +387,9 @@ sys_sysinfo(struct tcb *tcp)
 }
 
 static const struct xlat priorities[] = {
-	{ PRIO_PROCESS,	"PRIO_PROCESS"	},
-	{ PRIO_PGRP,	"PRIO_PGRP"	},
-	{ PRIO_USER,	"PRIO_USER"	},
+	XLAT(PRIO_PROCESS),
+	XLAT(PRIO_PGRP),
+	XLAT(PRIO_USER),
 	{ 0,		NULL		},
 };
 

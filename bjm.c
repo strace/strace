@@ -70,23 +70,23 @@ struct module_info
 };
 
 static const struct xlat which[] = {
-	{ 0,		"0"		},
-	{ QM_MODULES,	"QM_MODULES"	},
-	{ QM_DEPS,	"QM_DEPS"	},
-	{ QM_REFS,	"QM_REFS"	},
-	{ QM_SYMBOLS,	"QM_SYMBOLS"	},
-	{ QM_INFO,	"QM_INFO"	},
+	XLAT(0),
+	XLAT(QM_MODULES),
+	XLAT(QM_DEPS),
+	XLAT(QM_REFS),
+	XLAT(QM_SYMBOLS),
+	XLAT(QM_INFO),
 	{ 0,		NULL		},
 };
 
 static const struct xlat modflags[] = {
-	{ MOD_UNINITIALIZED,	"MOD_UNINITIALIZED"	},
-	{ MOD_RUNNING,		"MOD_RUNNING"		},
-	{ MOD_DELETED,		"MOD_DELETED"		},
-	{ MOD_AUTOCLEAN,	"MOD_AUTOCLEAN"		},
-	{ MOD_VISITED,		"MOD_VISITED"		},
-	{ MOD_USED_ONCE,	"MOD_USED_ONCE"		},
-	{ MOD_JUST_FREED,	"MOD_JUST_FREED"	},
+	XLAT(MOD_UNINITIALIZED),
+	XLAT(MOD_RUNNING),
+	XLAT(MOD_DELETED),
+	XLAT(MOD_AUTOCLEAN),
+	XLAT(MOD_VISITED),
+	XLAT(MOD_USED_ONCE),
+	XLAT(MOD_JUST_FREED),
 	{ 0,			NULL			},
 };
 

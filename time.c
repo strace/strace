@@ -280,9 +280,9 @@ sys_nanosleep(struct tcb *tcp)
 }
 
 static const struct xlat which[] = {
-	{ ITIMER_REAL,	"ITIMER_REAL"	},
-	{ ITIMER_VIRTUAL,"ITIMER_VIRTUAL"},
-	{ ITIMER_PROF,	"ITIMER_PROF"	},
+	XLAT(ITIMER_REAL),
+	XLAT(ITIMER_VIRTUAL),
+	XLAT(ITIMER_PROF),
 	{ 0,		NULL		},
 };
 
@@ -403,119 +403,119 @@ sys_osf_setitimer(struct tcb *tcp)
 #endif
 
 static const struct xlat adjtimex_modes[] = {
-	{ 0,		"0"			},
+	XLAT(0),
 #ifdef ADJ_OFFSET
-	{ ADJ_OFFSET,	"ADJ_OFFSET"		},
+	XLAT(ADJ_OFFSET),
 #endif
 #ifdef ADJ_FREQUENCY
-	{ ADJ_FREQUENCY, "ADJ_FREQUENCY"	},
+	XLAT(ADJ_FREQUENCY),
 #endif
 #ifdef ADJ_MAXERROR
-	{ ADJ_MAXERROR,	"ADJ_MAXERROR"		},
+	XLAT(ADJ_MAXERROR),
 #endif
 #ifdef ADJ_ESTERROR
-	{ ADJ_ESTERROR,	"ADJ_ESTERROR"		},
+	XLAT(ADJ_ESTERROR),
 #endif
 #ifdef ADJ_STATUS
-	{ ADJ_STATUS,	"ADJ_STATUS"		},
+	XLAT(ADJ_STATUS),
 #endif
 #ifdef ADJ_TIMECONST
-	{ ADJ_TIMECONST, "ADJ_TIMECONST"	},
+	XLAT(ADJ_TIMECONST),
 #endif
 #ifdef ADJ_TAI
-	{ ADJ_TAI, "ADJ_TAI"			},
+	XLAT(ADJ_TAI),
 #endif
 #ifdef ADJ_SETOFFSET
-	{ ADJ_SETOFFSET, "ADJ_SETOFFSET"	},
+	XLAT(ADJ_SETOFFSET),
 #endif
 #ifdef ADJ_MICRO
-	{ ADJ_MICRO, "ADJ_MICRO"		},
+	XLAT(ADJ_MICRO),
 #endif
 #ifdef ADJ_NANO
-	{ ADJ_NANO, "ADJ_NANO"			},
+	XLAT(ADJ_NANO),
 #endif
 #ifdef ADJ_TICK
-	{ ADJ_TICK,	"ADJ_TICK"		},
+	XLAT(ADJ_TICK),
 #endif
 #ifdef ADJ_OFFSET_SINGLESHOT
-	{ ADJ_OFFSET_SINGLESHOT, "ADJ_OFFSET_SINGLESHOT" },
+	XLAT(ADJ_OFFSET_SINGLESHOT),
 #endif
 #ifdef ADJ_OFFSET_SS_READ
-	{ ADJ_OFFSET_SS_READ, "ADJ_OFFSET_SS_READ" },
+	XLAT(ADJ_OFFSET_SS_READ),
 #endif
 	{ 0,		NULL			}
 };
 
 static const struct xlat adjtimex_status[] = {
 #ifdef STA_PLL
-	{ STA_PLL,	"STA_PLL"	},
+	XLAT(STA_PLL),
 #endif
 #ifdef STA_PPSFREQ
-	{ STA_PPSFREQ,	"STA_PPSFREQ"	},
+	XLAT(STA_PPSFREQ),
 #endif
 #ifdef STA_PPSTIME
-	{ STA_PPSTIME,	"STA_PPSTIME"	},
+	XLAT(STA_PPSTIME),
 #endif
 #ifdef STA_FLL
-	{ STA_FLL,	"STA_FLL"	},
+	XLAT(STA_FLL),
 #endif
 #ifdef STA_INS
-	{ STA_INS,	"STA_INS"	},
+	XLAT(STA_INS),
 #endif
 #ifdef STA_DEL
-	{ STA_DEL,	"STA_DEL"	},
+	XLAT(STA_DEL),
 #endif
 #ifdef STA_UNSYNC
-	{ STA_UNSYNC,	"STA_UNSYNC"	},
+	XLAT(STA_UNSYNC),
 #endif
 #ifdef STA_FREQHOLD
-	{ STA_FREQHOLD,	"STA_FREQHOLD"	},
+	XLAT(STA_FREQHOLD),
 #endif
 #ifdef STA_PPSSIGNAL
-	{ STA_PPSSIGNAL, "STA_PPSSIGNAL" },
+	XLAT(STA_PPSSIGNAL),
 #endif
 #ifdef STA_PPSJITTER
-	{ STA_PPSJITTER, "STA_PPSJITTER" },
+	XLAT(STA_PPSJITTER),
 #endif
 #ifdef STA_PPSWANDER
-	{ STA_PPSWANDER, "STA_PPSWANDER" },
+	XLAT(STA_PPSWANDER),
 #endif
 #ifdef STA_PPSERROR
-	{ STA_PPSERROR,	"STA_PPSERROR"	},
+	XLAT(STA_PPSERROR),
 #endif
 #ifdef STA_CLOCKERR
-	{ STA_CLOCKERR,	"STA_CLOCKERR"	},
+	XLAT(STA_CLOCKERR),
 #endif
 #ifdef STA_NANO
-	{ STA_NANO,	"STA_NANO"	},
+	XLAT(STA_NANO),
 #endif
 #ifdef STA_MODE
-	{ STA_MODE,	"STA_MODE"	},
+	XLAT(STA_MODE),
 #endif
 #ifdef STA_CLK
-	{ STA_CLK,	"STA_CLK"	},
+	XLAT(STA_CLK),
 #endif
 	{ 0,		NULL		}
 };
 
 static const struct xlat adjtimex_state[] = {
 #ifdef TIME_OK
-	{ TIME_OK,	"TIME_OK"	},
+	XLAT(TIME_OK),
 #endif
 #ifdef TIME_INS
-	{ TIME_INS,	"TIME_INS"	},
+	XLAT(TIME_INS),
 #endif
 #ifdef TIME_DEL
-	{ TIME_DEL,	"TIME_DEL"	},
+	XLAT(TIME_DEL),
 #endif
 #ifdef TIME_OOP
-	{ TIME_OOP,	"TIME_OOP"	},
+	XLAT(TIME_OOP),
 #endif
 #ifdef TIME_WAIT
-	{ TIME_WAIT,	"TIME_WAIT"	},
+	XLAT(TIME_WAIT),
 #endif
 #ifdef TIME_ERROR
-	{ TIME_ERROR,	"TIME_ERROR"	},
+	XLAT(TIME_ERROR),
 #endif
 	{ 0,		NULL		}
 };
@@ -639,40 +639,40 @@ sys_adjtimex(struct tcb *tcp)
 }
 
 static const struct xlat clockflags[] = {
-	{ TIMER_ABSTIME,	"TIMER_ABSTIME"	},
+	XLAT(TIMER_ABSTIME),
 	{ 0,			NULL		}
 };
 
 static const struct xlat clocknames[] = {
 #ifdef CLOCK_REALTIME
-	{ CLOCK_REALTIME,		"CLOCK_REALTIME" },
+	XLAT(CLOCK_REALTIME),
 #endif
 #ifdef CLOCK_MONOTONIC
-	{ CLOCK_MONOTONIC,		"CLOCK_MONOTONIC" },
+	XLAT(CLOCK_MONOTONIC),
 #endif
 #ifdef CLOCK_PROCESS_CPUTIME_ID
-	{ CLOCK_PROCESS_CPUTIME_ID,	"CLOCK_PROCESS_CPUTIME_ID" },
+	XLAT(CLOCK_PROCESS_CPUTIME_ID),
 #endif
 #ifdef CLOCK_THREAD_CPUTIME_ID
-	{ CLOCK_THREAD_CPUTIME_ID,	"CLOCK_THREAD_CPUTIME_ID" },
+	XLAT(CLOCK_THREAD_CPUTIME_ID),
 #endif
 #ifdef CLOCK_MONOTONIC_RAW
-	{ CLOCK_MONOTONIC_RAW,		"CLOCK_MONOTONIC_RAW" },
+	XLAT(CLOCK_MONOTONIC_RAW),
 #endif
 #ifdef CLOCK_REALTIME_COARSE
-	{ CLOCK_REALTIME_COARSE,	"CLOCK_REALTIME_COARSE" },
+	XLAT(CLOCK_REALTIME_COARSE),
 #endif
 #ifdef CLOCK_MONOTONIC_COARSE
-	{ CLOCK_MONOTONIC_COARSE,	"CLOCK_MONOTONIC_COARSE" },
+	XLAT(CLOCK_MONOTONIC_COARSE),
 #endif
 	{ 0,				NULL }
 };
 
 #ifdef CLOCKID_TO_FD
 static const struct xlat cpuclocknames[] = {
-	{ CPUCLOCK_PROF,	"CPUCLOCK_PROF" },
-	{ CPUCLOCK_VIRT,	"CPUCLOCK_VIRT" },
-	{ CPUCLOCK_SCHED,	"CPUCLOCK_SCHED" },
+	XLAT(CPUCLOCK_PROF),
+	XLAT(CPUCLOCK_VIRT),
+	XLAT(CPUCLOCK_SCHED),
 	{ 0, NULL }
 };
 #endif
@@ -988,7 +988,7 @@ rtc_ioctl(struct tcb *tcp, long code, long arg)
 #endif
 
 static const struct xlat timerfdflags[] = {
-	{ TFD_TIMER_ABSTIME,	"TFD_TIMER_ABSTIME"	},
+	XLAT(TFD_TIMER_ABSTIME),
 	{ 0,			NULL			}
 };
 

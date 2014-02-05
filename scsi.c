@@ -31,10 +31,10 @@
 #include <scsi/sg.h>
 
 static const struct xlat sg_io_dxfer_direction[] = {
-	{SG_DXFER_NONE,        "SG_DXFER_NONE"},
-	{SG_DXFER_TO_DEV,      "SG_DXFER_TO_DEV"},
-	{SG_DXFER_FROM_DEV,    "SG_DXFER_FROM_DEV"},
-	{SG_DXFER_TO_FROM_DEV, "SG_DXFER_TO_FROM_DEV"},
+	XLAT(SG_DXFER_NONE),
+	XLAT(SG_DXFER_TO_DEV),
+	XLAT(SG_DXFER_FROM_DEV),
+	XLAT(SG_DXFER_TO_FROM_DEV),
 	{0, NULL}
 };
 

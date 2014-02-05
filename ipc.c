@@ -64,81 +64,81 @@
 extern void printsigevent(struct tcb *tcp, long arg);
 
 static const struct xlat msgctl_flags[] = {
-	{ IPC_RMID,	"IPC_RMID"	},
-	{ IPC_SET,	"IPC_SET"	},
-	{ IPC_STAT,	"IPC_STAT"	},
-	{ IPC_INFO,	"IPC_INFO"	},
-	{ MSG_STAT,	"MSG_STAT"	},
-	{ MSG_INFO,	"MSG_INFO"	},
+	XLAT(IPC_RMID),
+	XLAT(IPC_SET),
+	XLAT(IPC_STAT),
+	XLAT(IPC_INFO),
+	XLAT(MSG_STAT),
+	XLAT(MSG_INFO),
 	{ 0,		NULL		},
 };
 
 static const struct xlat semctl_flags[] = {
-	{ IPC_RMID,	"IPC_RMID"	},
-	{ IPC_SET,	"IPC_SET"	},
-	{ IPC_STAT,	"IPC_STAT"	},
-	{ IPC_INFO,	"IPC_INFO"	},
-	{ SEM_STAT,	"SEM_STAT"	},
-	{ SEM_INFO,	"SEM_INFO"	},
-	{ GETPID,	"GETPID"	},
-	{ GETVAL,	"GETVAL"	},
-	{ GETALL,	"GETALL"	},
-	{ GETNCNT,	"GETNCNT"	},
-	{ GETZCNT,	"GETZCNT"	},
-	{ SETVAL,	"SETVAL"	},
-	{ SETALL,	"SETALL"	},
+	XLAT(IPC_RMID),
+	XLAT(IPC_SET),
+	XLAT(IPC_STAT),
+	XLAT(IPC_INFO),
+	XLAT(SEM_STAT),
+	XLAT(SEM_INFO),
+	XLAT(GETPID),
+	XLAT(GETVAL),
+	XLAT(GETALL),
+	XLAT(GETNCNT),
+	XLAT(GETZCNT),
+	XLAT(SETVAL),
+	XLAT(SETALL),
 	{ 0,		NULL		},
 };
 
 static const struct xlat shmctl_flags[] = {
-	{ IPC_RMID,	"IPC_RMID"	},
-	{ IPC_SET,	"IPC_SET"	},
-	{ IPC_STAT,	"IPC_STAT"	},
-	{ IPC_INFO,	"IPC_INFO"	},
-	{ SHM_STAT,	"SHM_STAT"	},
-	{ SHM_INFO,	"SHM_INFO"	},
+	XLAT(IPC_RMID),
+	XLAT(IPC_SET),
+	XLAT(IPC_STAT),
+	XLAT(IPC_INFO),
+	XLAT(SHM_STAT),
+	XLAT(SHM_INFO),
 #ifdef SHM_LOCK
-	{ SHM_LOCK,	"SHM_LOCK"	},
+	XLAT(SHM_LOCK),
 #endif
 #ifdef SHM_UNLOCK
-	{ SHM_UNLOCK,	"SHM_UNLOCK"	},
+	XLAT(SHM_UNLOCK),
 #endif
 	{ 0,		NULL		},
 };
 
 static const struct xlat resource_flags[] = {
-	{ IPC_CREAT,	"IPC_CREAT"	},
-	{ IPC_EXCL,	"IPC_EXCL"	},
-	{ IPC_NOWAIT,	"IPC_NOWAIT"	},
+	XLAT(IPC_CREAT),
+	XLAT(IPC_EXCL),
+	XLAT(IPC_NOWAIT),
 	{ 0,		NULL		},
 };
 
 static const struct xlat shm_resource_flags[] = {
-	{ IPC_CREAT,	"IPC_CREAT"	},
-	{ IPC_EXCL,	"IPC_EXCL"	},
+	XLAT(IPC_CREAT),
+	XLAT(IPC_EXCL),
 #ifdef SHM_HUGETLB
-	{ SHM_HUGETLB,	"SHM_HUGETLB"	},
+	XLAT(SHM_HUGETLB),
 #endif
 	{ 0,		NULL		},
 };
 
 static const struct xlat shm_flags[] = {
-	{ SHM_REMAP,	"SHM_REMAP"	},
-	{ SHM_RDONLY,	"SHM_RDONLY"	},
-	{ SHM_RND,	"SHM_RND"	},
+	XLAT(SHM_REMAP),
+	XLAT(SHM_RDONLY),
+	XLAT(SHM_RND),
 	{ 0,		NULL		},
 };
 
 static const struct xlat msg_flags[] = {
-	{ MSG_NOERROR,	"MSG_NOERROR"	},
-	{ MSG_EXCEPT,	"MSG_EXCEPT"	},
-	{ IPC_NOWAIT,	"IPC_NOWAIT"	},
+	XLAT(MSG_NOERROR),
+	XLAT(MSG_EXCEPT),
+	XLAT(IPC_NOWAIT),
 	{ 0,		NULL		},
 };
 
 static const struct xlat semop_flags[] = {
-	{ SEM_UNDO,	"SEM_UNDO"	},
-	{ IPC_NOWAIT,	"IPC_NOWAIT"	},
+	XLAT(SEM_UNDO),
+	XLAT(IPC_NOWAIT),
 	{ 0,		NULL		},
 };
 

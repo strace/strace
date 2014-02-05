@@ -36,130 +36,130 @@
 #endif
 
 static const struct xlat tcxonc_options[] = {
-	{ TCOOFF,	"TCOOFF"	},
-	{ TCOON,	"TCOON"		},
-	{ TCIOFF,	"TCIOFF"	},
-	{ TCION,	"TCION"		},
+	XLAT(TCOOFF),
+	XLAT(TCOON),
+	XLAT(TCIOFF),
+	XLAT(TCION),
 	{ 0,		NULL		},
 };
 
 #ifdef TCLFLSH
 static const struct xlat tcflsh_options[] = {
-	{ TCIFLUSH,	"TCIFLUSH"	},
-	{ TCOFLUSH,	"TCOFLUSH"	},
-	{ TCIOFLUSH,	"TCIOFLUSH"	},
+	XLAT(TCIFLUSH),
+	XLAT(TCOFLUSH),
+	XLAT(TCIOFLUSH),
 	{ 0,		NULL		},
 };
 #endif
 
 static const struct xlat baud_options[] = {
-	{ B0,		"B0"		},
-	{ B50,		"B50"		},
-	{ B75,		"B75"		},
-	{ B110,		"B110"		},
-	{ B134,		"B134"		},
-	{ B150,		"B150"		},
-	{ B200,		"B200"		},
-	{ B300,		"B300"		},
-	{ B600,		"B600"		},
-	{ B1200,	"B1200"		},
-	{ B1800,	"B1800"		},
-	{ B2400,	"B2400"		},
-	{ B4800,	"B4800"		},
-	{ B9600,	"B9600"		},
+	XLAT(B0),
+	XLAT(B50),
+	XLAT(B75),
+	XLAT(B110),
+	XLAT(B134),
+	XLAT(B150),
+	XLAT(B200),
+	XLAT(B300),
+	XLAT(B600),
+	XLAT(B1200),
+	XLAT(B1800),
+	XLAT(B2400),
+	XLAT(B4800),
+	XLAT(B9600),
 #ifdef B19200
-	{ B19200,	"B19200"	},
+	XLAT(B19200),
 #endif
 #ifdef B38400
-	{ B38400,	"B38400"	},
+	XLAT(B38400),
 #endif
 #ifdef B57600
-	{ B57600,	"B57600"	},
+	XLAT(B57600),
 #endif
 #ifdef B115200
-	{ B115200,	"B115200"	},
+	XLAT(B115200),
 #endif
 #ifdef B230400
-	{ B230400,	"B230400"	},
+	XLAT(B230400),
 #endif
 #ifdef B460800
-	{ B460800,	"B460800"	},
+	XLAT(B460800),
 #endif
 #ifdef B500000
-	{ B500000,	"B500000"	},
+	XLAT(B500000),
 #endif
 #ifdef B576000
-	{ B576000,	"B576000"	},
+	XLAT(B576000),
 #endif
 #ifdef B921600
-	{ B921600,	"B921600"	},
+	XLAT(B921600),
 #endif
 #ifdef B1000000
-	{ B1000000,	"B1000000"	},
+	XLAT(B1000000),
 #endif
 #ifdef B1152000
-	{ B1152000,	"B1152000"	},
+	XLAT(B1152000),
 #endif
 #ifdef B1500000
-	{ B1500000,	"B1500000"	},
+	XLAT(B1500000),
 #endif
 #ifdef B2000000
-	{ B2000000,	"B2000000"	},
+	XLAT(B2000000),
 #endif
 #ifdef B2500000
-	{ B2500000,	"B2500000"	},
+	XLAT(B2500000),
 #endif
 #ifdef B3000000
-	{ B3000000,	"B3000000"	},
+	XLAT(B3000000),
 #endif
 #ifdef B3500000
-	{ B3500000,	"B3500000"	},
+	XLAT(B3500000),
 #endif
 #ifdef B4000000
-	{ B4000000,	"B4000000"	},
+	XLAT(B4000000),
 #endif
 #ifdef EXTA
-	{ EXTA,		"EXTA"		},
+	XLAT(EXTA),
 #endif
 #ifdef EXTB
-	{ EXTB,		"EXTB"		},
+	XLAT(EXTB),
 #endif
 	{ 0,		NULL		},
 };
 
 static const struct xlat modem_flags[] = {
 #ifdef TIOCM_LE
-	{ TIOCM_LE,	"TIOCM_LE",	},
+	XLAT(TIOCM_LE),
 #endif
 #ifdef TIOCM_DTR
-	{ TIOCM_DTR,	"TIOCM_DTR",	},
+	XLAT(TIOCM_DTR),
 #endif
 #ifdef TIOCM_RTS
-	{ TIOCM_RTS,	"TIOCM_RTS",	},
+	XLAT(TIOCM_RTS),
 #endif
 #ifdef TIOCM_ST
-	{ TIOCM_ST,	"TIOCM_ST",	},
+	XLAT(TIOCM_ST),
 #endif
 #ifdef TIOCM_SR
-	{ TIOCM_SR,	"TIOCM_SR",	},
+	XLAT(TIOCM_SR),
 #endif
 #ifdef TIOCM_CTS
-	{ TIOCM_CTS,	"TIOCM_CTS",	},
+	XLAT(TIOCM_CTS),
 #endif
 #ifdef TIOCM_CAR
-	{ TIOCM_CAR,	"TIOCM_CAR",	},
+	XLAT(TIOCM_CAR),
 #endif
 #ifdef TIOCM_CD
-	{ TIOCM_CD,	"TIOCM_CD",	},
+	XLAT(TIOCM_CD),
 #endif
 #ifdef TIOCM_RNG
-	{ TIOCM_RNG,	"TIOCM_RNG",	},
+	XLAT(TIOCM_RNG),
 #endif
 #ifdef TIOCM_RI
-	{ TIOCM_RI,	"TIOCM_RI",	},
+	XLAT(TIOCM_RI),
 #endif
 #ifdef TIOCM_DSR
-	{ TIOCM_DSR,	"TIOCM_DSR",	},
+	XLAT(TIOCM_DSR),
 #endif
 	{ 0,		NULL,		},
 };

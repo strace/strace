@@ -56,7 +56,7 @@ struct strbuf {
 # endif
 
 static const struct xlat msgflags[] = {
-	{ RS_HIPRI,	"RS_HIPRI"	},
+	XLAT(RS_HIPRI),
 	{ 0,		NULL		},
 };
 
@@ -155,13 +155,13 @@ sys_getmsg(struct tcb *tcp)
 # if defined SYS_putpmsg || defined SYS_getpmsg
 static const struct xlat pmsgflags[] = {
 #  ifdef MSG_HIPRI
-	{ MSG_HIPRI,	"MSG_HIPRI"	},
+	XLAT(MSG_HIPRI),
 #  endif
 #  ifdef MSG_AND
-	{ MSG_ANY,	"MSG_ANY"	},
+	XLAT(MSG_ANY),
 #  endif
 #  ifdef MSG_BAND
-	{ MSG_BAND,	"MSG_BAND"	},
+	XLAT(MSG_BAND),
 #  endif
 	{ 0,		NULL		},
 };
@@ -244,24 +244,24 @@ sys_getpmsg(struct tcb *tcp)
 
 static const struct xlat pollflags[] = {
 # ifdef POLLIN
-	{ POLLIN,	"POLLIN"	},
-	{ POLLPRI,	"POLLPRI"	},
-	{ POLLOUT,	"POLLOUT"	},
+	XLAT(POLLIN),
+	XLAT(POLLPRI),
+	XLAT(POLLOUT),
 #  ifdef POLLRDNORM
-	{ POLLRDNORM,	"POLLRDNORM"	},
+	XLAT(POLLRDNORM),
 #  endif
 #  ifdef POLLWRNORM
-	{ POLLWRNORM,	"POLLWRNORM"	},
+	XLAT(POLLWRNORM),
 #  endif
 #  ifdef POLLRDBAND
-	{ POLLRDBAND,	"POLLRDBAND"	},
+	XLAT(POLLRDBAND),
 #  endif
 #  ifdef POLLWRBAND
-	{ POLLWRBAND,	"POLLWRBAND"	},
+	XLAT(POLLWRBAND),
 #  endif
-	{ POLLERR,	"POLLERR"	},
-	{ POLLHUP,	"POLLHUP"	},
-	{ POLLNVAL,	"POLLNVAL"	},
+	XLAT(POLLERR),
+	XLAT(POLLHUP),
+	XLAT(POLLNVAL),
 # endif
 	{ 0,		NULL		},
 };
