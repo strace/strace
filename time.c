@@ -757,10 +757,10 @@ sys_clock_adjtime(struct tcb *tcp)
 # define SIGEV_THREAD_ID 4
 #endif
 static const struct xlat sigev_value[] = {
-	{ SIGEV_SIGNAL+1, "SIGEV_SIGNAL" },
-	{ SIGEV_NONE+1, "SIGEV_NONE" },
-	{ SIGEV_THREAD+1, "SIGEV_THREAD" },
-	{ SIGEV_THREAD_ID+1, "SIGEV_THREAD_ID" },
+	XLAT(SIGEV_SIGNAL),
+	XLAT(SIGEV_NONE),
+	XLAT(SIGEV_THREAD),
+	XLAT(SIGEV_THREAD_ID),
 	{ 0, NULL }
 };
 
@@ -789,7 +789,7 @@ printsigevent32(struct tcb *tcp, long arg)
 			tprintf("%s, ", signame(sev.sigev_signo));
 		else
 			tprintf("%u, ", sev.sigev_signo);
-		printxval(sigev_value, sev.sigev_notify + 1, "SIGEV_???");
+		printxval(sigev_value, sev.sigev_notify, "SIGEV_???");
 		tprints(", ");
 		if (sev.sigev_notify == SIGEV_THREAD_ID)
 			tprintf("{%d}", sev.un.tid);
@@ -823,7 +823,7 @@ printsigevent(struct tcb *tcp, long arg)
 			tprintf("%s, ", signame(sev.sigev_signo));
 		else
 			tprintf("%u, ", sev.sigev_signo);
-		printxval(sigev_value, sev.sigev_notify+1, "SIGEV_???");
+		printxval(sigev_value, sev.sigev_notify, "SIGEV_???");
 		tprints(", ");
 		if (sev.sigev_notify == SIGEV_THREAD_ID)
 #if defined(HAVE_STRUCT_SIGEVENT__SIGEV_UN__PAD)
