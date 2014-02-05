@@ -39,7 +39,6 @@
 #define	sys_ioprio_get		printargs
 #define	sys_ioprio_set		printargs
 #define	sys_kcmp		printargs
-#define	sys_kexec_load		printargs
 #define	sys_keyctl		printargs
 #define	sys_lookup_dcookie	printargs
 #define	sys_name_to_handle_at	printargs

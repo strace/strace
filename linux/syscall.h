@@ -121,6 +121,7 @@ int sys_io_setup();
 int sys_io_submit();
 int sys_ioctl();
 int sys_ipc();
+int sys_kexec_load();
 int sys_kill();
 int sys_link();
 int sys_linkat();
