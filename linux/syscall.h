@@ -66,6 +66,8 @@ int sys_faccessat();
 int sys_fadvise64();
 int sys_fadvise64_64();
 int sys_fallocate();
+int sys_fanotify_init();
+int sys_fanotify_mark();
 int sys_fchmod();
 int sys_fchmodat();
 int sys_fchown();

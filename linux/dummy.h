@@ -33,8 +33,6 @@
 
 /* still unfinished */
 #define	sys_add_key		printargs
-#define	sys_fanotify_init	printargs
-#define	sys_fanotify_mark	printargs
 #define	sys_finit_module	printargs
 #define	sys_ioperm		printargs
 #define	sys_iopl		printargs

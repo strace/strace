@@ -20,6 +20,7 @@ strace_SOURCES =	\
 	block.c		\
 	count.c		\
 	desc.c		\
+	fanotify.c	\
 	file.c		\
 	io.c		\
 	ioctl.c		\
@@ -94,6 +95,7 @@ EXTRA_DIST =				\
 	linux/bfin/syscallent.h		\
 	linux/dummy.h			\
 	linux/errnoent.h		\
+	linux/fanotify.h		\
 	linux/hppa/errnoent.h		\
 	linux/hppa/ioctlent.h.in	\
 	linux/hppa/signalent.h		\

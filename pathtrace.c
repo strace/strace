@@ -251,6 +251,12 @@ pathtrace_match(struct tcb *tcp)
 		return fdmatch(tcp, tcp->u_arg[2]);
 	}
 
+	if (s->sys_func == sys_fanotify_mark) {
+		/* x, x, x, fd, path */
+		return fdmatch(tcp, tcp->u_arg[3]) ||
+			upathmatch(tcp, tcp->u_arg[4]);
+	}
+
 	if (s->sys_func == sys_select ||
 	    s->sys_func == sys_oldselect ||
 	    s->sys_func == sys_pselect6)
@@ -341,7 +347,7 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_epoll_create ||
 	    s->sys_func == sys_socket ||
 	    s->sys_func == sys_socketpair ||
-	    strcmp(s->sys_name, "fanotify_init") == 0)
+	    s->sys_func == sys_fanotify_init)
 	{
 		/*
 		 * These have TRACE_FILE or TRACE_DESCRIPTOR or TRACE_NETWORK set,
