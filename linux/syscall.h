@@ -74,6 +74,7 @@ int sys_fchown();
 int sys_fchownat();
 int sys_fcntl();
 int sys_fgetxattr();
+int sys_finit_module();
 int sys_flistxattr();
 int sys_flock();
 int sys_fork();

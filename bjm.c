@@ -200,3 +200,30 @@ sys_init_module(struct tcb *tcp)
 	}
 	return 0;
 }
+
+#define MODULE_INIT_IGNORE_MODVERSIONS  1
+#define MODULE_INIT_IGNORE_VERMAGIC     2
+
+static const struct xlat module_init_flags[] = {
+	XLAT(MODULE_INIT_IGNORE_MODVERSIONS),
+	XLAT(MODULE_INIT_IGNORE_VERMAGIC),
+	XLAT_END
+};
+
+int
+sys_finit_module(struct tcb *tcp)
+{
+	if (exiting(tcp))
+		return 0;
+
+	/* file descriptor */
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	/* param_values */
+	printstr(tcp, tcp->u_arg[1], -1);
+	tprints(", ");
+	/* flags */
+	printflags(module_init_flags, tcp->u_arg[2], "MODULE_INIT_???");
+
+	return 0;
+}

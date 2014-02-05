@@ -33,7 +33,6 @@
 
 /* still unfinished */
 #define	sys_add_key		printargs
-#define	sys_finit_module	printargs
 #define	sys_ioperm		printargs
 #define	sys_iopl		printargs
 #define	sys_ioprio_get		printargs
