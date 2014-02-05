@@ -504,6 +504,7 @@ struct xlat {
 	const char *str;
 };
 #define XLAT(x) { x, #x }
+#define XLAT_END { 0, NULL }
 
 extern const struct xlat open_mode_flags[];
 extern const struct xlat addrfams[];
