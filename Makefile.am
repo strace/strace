@@ -34,6 +34,7 @@ strace_SOURCES =	\
 	process.c	\
 	ptp.c		\
 	quota.c		\
+	reboot.c	\
 	resource.c	\
 	scsi.c		\
 	signal.c	\
@@ -137,6 +138,7 @@ EXTRA_DIST =				\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/syscallent1.h	\
 	linux/ptp_clock.h		\
+	linux/reboot.h			\
 	linux/s390/ioctlent.h.in	\
 	linux/s390/syscallent.h		\
 	linux/s390x/ioctlent.h.in	\
