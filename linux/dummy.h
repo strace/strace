@@ -35,8 +35,6 @@
 #define	sys_add_key		printargs
 #define	sys_ioperm		printargs
 #define	sys_iopl		printargs
-#define	sys_ioprio_get		printargs
-#define	sys_ioprio_set		printargs
 #define	sys_kcmp		printargs
 #define	sys_keyctl		printargs
 #define	sys_lookup_dcookie	printargs

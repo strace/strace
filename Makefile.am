@@ -25,6 +25,7 @@ strace_SOURCES =	\
 	inotify.c	\
 	io.c		\
 	ioctl.c		\
+	ioprio.c	\
 	ipc.c		\
 	kexec.c		\
 	loop.c		\

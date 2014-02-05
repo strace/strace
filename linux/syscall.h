@@ -121,6 +121,8 @@ int sys_io_getevents();
 int sys_io_setup();
 int sys_io_submit();
 int sys_ioctl();
+int sys_ioprio_get();
+int sys_ioprio_set();
 int sys_ipc();
 int sys_kexec_load();
 int sys_kill();
