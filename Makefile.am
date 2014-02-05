@@ -125,6 +125,7 @@ EXTRA_DIST =				\
 	linux/mtd-abi.h			\
 	linux/or1k/ioctlent.h.in	\
 	linux/or1k/syscallent.h		\
+	linux/personality.h		\
 	linux/powerpc/errnoent1.h	\
 	linux/powerpc/ioctlent.h.in	\
 	linux/powerpc/ioctlent1.h	\

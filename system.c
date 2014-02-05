@@ -79,6 +79,7 @@
 # include <asm/sysmips.h>
 #endif
 #include <linux/sysctl.h>
+#include <linux/personality.h>
 
 static const struct xlat mount_flags[] = {
 	XLAT(MS_MGC_VAL),
@@ -175,27 +176,28 @@ sys_umount2(struct tcb *tcp)
 /* These are not macros, but enums.  We just copy the values by hand
    from Linux 2.6.9 here.  */
 static const struct xlat personality_options[] = {
-	{ 0,		"PER_LINUX"	},
-	{ 0x00800000,	"PER_LINUX_32BIT"},
-	{ 0x04100001,	"PER_SVR4"	},
-	{ 0x05000002,	"PER_SVR3"	},
-	{ 0x07000003,	"PER_SCOSVR3"	},
-	{ 0x06000003,	"PER_OSR5"	},
-	{ 0x05000004,	"PER_WYSEV386"	},
-	{ 0x04000005,	"PER_ISCR4"	},
-	{ 0x00000006,	"PER_BSD"	},
-	{ 0x04000006,	"PER_SUNOS"	},
-	{ 0x05000007,	"PER_XENIX"	},
-	{ 0x00000008,	"PER_LINUX32"	},
-	{ 0x08000008,	"PER_LINUX32_3GB"},
-	{ 0x04000009,	"PER_IRIX32"	},
-	{ 0x0400000a,	"PER_IRIXN32"	},
-	{ 0x0400000b,	"PER_IRIX64"	},
-	{ 0x0000000c,	"PER_RISCOS"	},
-	{ 0x0400000d,	"PER_SOLARIS"	},
-	{ 0x0410000e,	"PER_UW7"	},
-	{ 0x0000000f,	"PER_OSF4"	},
-	{ 0x00000010,	"PER_HPUX"	},
+	XLAT(PER_LINUX),
+	XLAT(PER_LINUX_32BIT),
+	XLAT(PER_LINUX_FDPIC),
+	XLAT(PER_SVR4),
+	XLAT(PER_SVR3),
+	XLAT(PER_SCOSVR3),
+	XLAT(PER_OSR5),
+	XLAT(PER_WYSEV386),
+	XLAT(PER_ISCR4),
+	XLAT(PER_BSD),
+	XLAT(PER_SUNOS),
+	XLAT(PER_XENIX),
+	XLAT(PER_LINUX32),
+	XLAT(PER_LINUX32_3GB),
+	XLAT(PER_IRIX32),
+	XLAT(PER_IRIXN32),
+	XLAT(PER_IRIX64),
+	XLAT(PER_RISCOS),
+	XLAT(PER_SOLARIS),
+	XLAT(PER_UW7),
+	XLAT(PER_OSF4),
+	XLAT(PER_HPUX),
 	{ 0,		NULL		},
 };
 
