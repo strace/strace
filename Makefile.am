@@ -22,6 +22,7 @@ strace_SOURCES =	\
 	desc.c		\
 	fanotify.c	\
 	file.c		\
+	inotify.c	\
 	io.c		\
 	ioctl.c		\
 	ipc.c		\
@@ -107,6 +108,7 @@ EXTRA_DIST =				\
 	linux/ia64/ioctlent.h.in	\
 	linux/ia64/signalent.h		\
 	linux/ia64/syscallent.h		\
+	linux/inotify.h			\
 	linux/ioctlent-filter.awk	\
 	linux/ioctlent.h.in		\
 	linux/ioctlent.sh		\

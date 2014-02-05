@@ -2706,67 +2706,6 @@ sys_sync_file_range2(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat inotify_modes[] = {
-	{ 0x00000001,	"IN_ACCESS"	},
-	{ 0x00000002,	"IN_MODIFY"	},
-	{ 0x00000004,	"IN_ATTRIB"	},
-	{ 0x00000008,	"IN_CLOSE_WRITE"},
-	{ 0x00000010,	"IN_CLOSE_NOWRITE"},
-	{ 0x00000020,	"IN_OPEN"	},
-	{ 0x00000040,	"IN_MOVED_FROM"	},
-	{ 0x00000080,	"IN_MOVED_TO"	},
-	{ 0x00000100,	"IN_CREATE"	},
-	{ 0x00000200,	"IN_DELETE"	},
-	{ 0x00000400,	"IN_DELETE_SELF"},
-	{ 0x00000800,	"IN_MOVE_SELF"	},
-	{ 0x00002000,	"IN_UNMOUNT"	},
-	{ 0x00004000,	"IN_Q_OVERFLOW"	},
-	{ 0x00008000,	"IN_IGNORED"	},
-	{ 0x01000000,	"IN_ONLYDIR"	},
-	{ 0x02000000,	"IN_DONT_FOLLOW"},
-	{ 0x20000000,	"IN_MASK_ADD"	},
-	{ 0x40000000,	"IN_ISDIR"	},
-	{ 0x80000000,	"IN_ONESHOT"	},
-	XLAT_END
-};
-
-static const struct xlat inotify_init_flags[] = {
-	{ 0x00000800,	"IN_NONBLOCK"	},
-	{ 0x00080000,	"IN_CLOEXEC"	},
-	XLAT_END
-};
-
-int
-sys_inotify_add_watch(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printpath(tcp, tcp->u_arg[1]);
-		tprints(", ");
-		printflags(inotify_modes, tcp->u_arg[2], "IN_???");
-	}
-	return 0;
-}
-
-int
-sys_inotify_rm_watch(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprintf(", %d", (int) tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-int
-sys_inotify_init1(struct tcb *tcp)
-{
-	if (entering(tcp))
-		printflags(inotify_init_flags, tcp->u_arg[0], "IN_???");
-	return 0;
-}
-
 int
 sys_fallocate(struct tcb *tcp)
 {
