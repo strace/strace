@@ -145,14 +145,14 @@ static const struct xlat fcntlcmds[] = {
 #ifdef F_DUPFD_CLOEXEC
 	XLAT(F_DUPFD_CLOEXEC),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat fdflags[] = {
 #ifdef FD_CLOEXEC
 	XLAT(FD_CLOEXEC),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #ifdef LOCK_SH
@@ -162,7 +162,7 @@ static const struct xlat flockcmds[] = {
 	XLAT(LOCK_EX),
 	XLAT(LOCK_NB),
 	XLAT(LOCK_UN),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #endif /* LOCK_SH */
@@ -177,7 +177,7 @@ static const struct xlat lockfcmds[] = {
 #ifdef F_SHLCK
 	XLAT(F_SHLCK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #ifdef F_NOTIFY
@@ -203,7 +203,7 @@ static const struct xlat notifyflags[] = {
 #ifdef DN_MULTISHOT
 	XLAT(DN_MULTISHOT),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 #endif
 
@@ -217,7 +217,7 @@ static const struct xlat perf_event_open_flags[] = {
 #ifdef PERF_FLAG_PID_CGROUP
 	XLAT(PERF_FLAG_PID_CGROUP),
 #endif
-	{ 0,				NULL			},
+	XLAT_END
 };
 
 #if defined(F_SETLK64) && F_SETLK64 + 0 != F_SETLK
@@ -663,7 +663,7 @@ static const struct xlat epollctls[] = {
 #ifdef EPOLL_CTL_DEL
 	XLAT(EPOLL_CTL_DEL),
 #endif
-	{ 0,			NULL		}
+	XLAT_END
 };
 
 static const struct xlat epollevents[] = {
@@ -706,7 +706,7 @@ static const struct xlat epollevents[] = {
 #ifdef EPOLLET
 	XLAT(EPOLLET),
 #endif
-	{ 0,		NULL		}
+	XLAT_END
 };
 
 /* Not aliased to printargs_ld: we want it to have a distinct address */
@@ -723,7 +723,7 @@ static const struct xlat epollflags[] = {
 #ifdef EPOLL_NONBLOCK
 	XLAT(EPOLL_NONBLOCK),
 #endif
-	{ 0,		NULL		}
+	XLAT_END
 };
 
 int

@@ -85,7 +85,7 @@ static const struct xlat resources[] = {
 #ifdef RLIMIT_VMEM
 	XLAT(RLIMIT_VMEM),
 #endif
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 #if !(SIZEOF_RLIM_T == 4 || SIZEOF_RLIM_T == 8)
@@ -238,7 +238,7 @@ static const struct xlat usagewho[] = {
 #ifdef RUSAGE_BOTH
 	XLAT(RUSAGE_BOTH),
 #endif
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 #ifdef ALPHA
@@ -390,7 +390,7 @@ static const struct xlat priorities[] = {
 	XLAT(PRIO_PROCESS),
 	XLAT(PRIO_PGRP),
 	XLAT(PRIO_USER),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int

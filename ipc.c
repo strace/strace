@@ -70,7 +70,7 @@ static const struct xlat msgctl_flags[] = {
 	XLAT(IPC_INFO),
 	XLAT(MSG_STAT),
 	XLAT(MSG_INFO),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat semctl_flags[] = {
@@ -87,7 +87,7 @@ static const struct xlat semctl_flags[] = {
 	XLAT(GETZCNT),
 	XLAT(SETVAL),
 	XLAT(SETALL),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat shmctl_flags[] = {
@@ -103,14 +103,14 @@ static const struct xlat shmctl_flags[] = {
 #ifdef SHM_UNLOCK
 	XLAT(SHM_UNLOCK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat resource_flags[] = {
 	XLAT(IPC_CREAT),
 	XLAT(IPC_EXCL),
 	XLAT(IPC_NOWAIT),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat shm_resource_flags[] = {
@@ -119,27 +119,27 @@ static const struct xlat shm_resource_flags[] = {
 #ifdef SHM_HUGETLB
 	XLAT(SHM_HUGETLB),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat shm_flags[] = {
 	XLAT(SHM_REMAP),
 	XLAT(SHM_RDONLY),
 	XLAT(SHM_RND),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat msg_flags[] = {
 	XLAT(MSG_NOERROR),
 	XLAT(MSG_EXCEPT),
 	XLAT(IPC_NOWAIT),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat semop_flags[] = {
 	XLAT(SEM_UNDO),
 	XLAT(IPC_NOWAIT),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int sys_msgget(struct tcb *tcp)

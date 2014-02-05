@@ -76,7 +76,7 @@ static const struct xlat mmap_prot[] = {
 #ifdef PROT_SAO
 	XLAT(PROT_SAO),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat mmap_flags[] = {
@@ -171,7 +171,7 @@ static const struct xlat mmap_flags[] = {
 #ifdef MAP_NOCORE
 	XLAT(MAP_NOCORE),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static int
@@ -326,7 +326,7 @@ static const struct xlat mremap_flags[] = {
 #ifdef MREMAP_FIXED
 	XLAT(MREMAP_FIXED),
 #endif
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 int
@@ -394,7 +394,7 @@ static const struct xlat madvise_cmds[] = {
 #ifdef MADV_DODUMP
 	XLAT(MADV_DODUMP),
 #endif
-	{ 0,			NULL },
+	XLAT_END
 };
 
 int
@@ -414,7 +414,7 @@ static const struct xlat mlockall_flags[] = {
 #ifdef MCL_FUTURE
 	XLAT(MCL_FUTURE),
 #endif
-	{ 0,		NULL}
+	XLAT_END
 };
 
 int
@@ -434,7 +434,7 @@ static const struct xlat mctl_sync[] = {
 #endif
 	XLAT(MS_ASYNC),
 	XLAT(MS_INVALIDATE),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -461,13 +461,13 @@ static const struct xlat mctl_funcs[] = {
 	XLAT(MC_SYNC),
 	XLAT(MC_UNLOCK),
 	XLAT(MC_UNLOCKAS),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat mctl_lockas[] = {
 	XLAT(MCL_CURRENT),
 	XLAT(MCL_FUTURE),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -688,26 +688,26 @@ static const struct xlat policies[] = {
 	XLAT(MPOL_PREFERRED),
 	XLAT(MPOL_BIND),
 	XLAT(MPOL_INTERLEAVE),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 static const struct xlat mbindflags[] = {
 	XLAT(MPOL_MF_STRICT),
 	XLAT(MPOL_MF_MOVE),
 	XLAT(MPOL_MF_MOVE_ALL),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 static const struct xlat mempolicyflags[] = {
 	XLAT(MPOL_F_NODE),
 	XLAT(MPOL_F_ADDR),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 static const struct xlat move_pages_flags[] = {
 	XLAT(MPOL_MF_MOVE),
 	XLAT(MPOL_MF_MOVE_ALL),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 static void

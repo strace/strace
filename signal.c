@@ -147,7 +147,7 @@ static const struct xlat sigact_flags[] = {
 #ifdef SA_NOPTRACE
 	XLAT(SA_NOPTRACE),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigprocmaskcmds[] = {
@@ -157,7 +157,7 @@ static const struct xlat sigprocmaskcmds[] = {
 #ifdef SIG_SETMASK32
 	XLAT(SIG_SETMASK32),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #endif /* HAVE_SIGACTION */
@@ -408,7 +408,7 @@ static const struct xlat siginfo_codes[] = {
 #ifdef SI_LWP
 	XLAT(SI_LWP),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigill_codes[] = {
@@ -420,7 +420,7 @@ static const struct xlat sigill_codes[] = {
 	XLAT(ILL_PRVREG),
 	XLAT(ILL_COPROC),
 	XLAT(ILL_BADSTK),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigfpe_codes[] = {
@@ -432,13 +432,13 @@ static const struct xlat sigfpe_codes[] = {
 	XLAT(FPE_FLTRES),
 	XLAT(FPE_FLTINV),
 	XLAT(FPE_FLTSUB),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigtrap_codes[] = {
 	XLAT(TRAP_BRKPT),
 	XLAT(TRAP_TRACE),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigchld_codes[] = {
@@ -448,7 +448,7 @@ static const struct xlat sigchld_codes[] = {
 	XLAT(CLD_TRAPPED),
 	XLAT(CLD_STOPPED),
 	XLAT(CLD_CONTINUED),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigpoll_codes[] = {
@@ -458,14 +458,14 @@ static const struct xlat sigpoll_codes[] = {
 	XLAT(POLL_ERR),
 	XLAT(POLL_PRI),
 	XLAT(POLL_HUP),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigprof_codes[] = {
 #ifdef PROF_SIG
 	XLAT(PROF_SIG),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #ifdef SIGEMT
@@ -473,21 +473,21 @@ static const struct xlat sigemt_codes[] = {
 #ifdef EMT_TAGOVF
 	XLAT(EMT_TAGOVF),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 #endif
 
 static const struct xlat sigsegv_codes[] = {
 	XLAT(SEGV_MAPERR),
 	XLAT(SEGV_ACCERR),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat sigbus_codes[] = {
 	XLAT(BUS_ADRALN),
 	XLAT(BUS_ADRERR),
 	XLAT(BUS_OBJERR),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 void
@@ -1083,7 +1083,7 @@ sys_sigsuspend(struct tcb *tcp)
 static const struct xlat sigaltstack_flags[] = {
 	XLAT(SS_ONSTACK),
 	XLAT(SS_DISABLE),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static void

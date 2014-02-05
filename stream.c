@@ -57,7 +57,7 @@ struct strbuf {
 
 static const struct xlat msgflags[] = {
 	XLAT(RS_HIPRI),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static void
@@ -163,7 +163,7 @@ static const struct xlat pmsgflags[] = {
 #  ifdef MSG_BAND
 	XLAT(MSG_BAND),
 #  endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 #  ifdef SYS_putpmsg
 int
@@ -263,7 +263,7 @@ static const struct xlat pollflags[] = {
 	XLAT(POLLHUP),
 	XLAT(POLLNVAL),
 # endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static int

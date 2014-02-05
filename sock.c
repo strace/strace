@@ -54,7 +54,7 @@ static const struct xlat iffflags[] = {
 	XLAT(IFF_MULTICAST),
 	XLAT(IFF_PORTSEL),
 	XLAT(IFF_AUTOMEDIA),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 static void

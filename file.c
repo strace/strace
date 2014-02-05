@@ -218,7 +218,7 @@ const struct xlat open_access_modes[] = {
 #ifdef O_ACCMODE
 	XLAT(O_ACCMODE),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 const struct xlat open_mode_flags[] = {
@@ -322,7 +322,7 @@ const struct xlat open_mode_flags[] = {
 #ifdef O_EXLOCK
 	XLAT(O_EXLOCK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #ifndef AT_FDCWD
@@ -436,7 +436,7 @@ static const struct xlat openmodessol[] = {
 	{ 0x8000,	"O_RSYNC"	},
 	{ 4,		"O_NDELAY"	},
 	{ 0x1000,	"O_PRIV"	},
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -478,7 +478,7 @@ static const struct xlat access_flags[] = {
 #ifdef EX_OK
 	XLAT(EX_OK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static int
@@ -525,7 +525,7 @@ const struct xlat whence_codes[] = {
 #ifdef SEEK_HOLE
 	XLAT(SEEK_HOLE),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 /* Linux kernel has exactly one version of lseek:
@@ -675,7 +675,7 @@ static const struct xlat modetypes[] = {
 	XLAT(S_IFDIR),
 	XLAT(S_IFBLK),
 	XLAT(S_IFCHR),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const char *
@@ -908,7 +908,7 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 #endif /* POWERPC64 */
 
 static const struct xlat fileflags[] = {
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static void
@@ -1328,7 +1328,7 @@ static const struct xlat at_flags[] = {
 	XLAT(AT_SYMLINK_FOLLOW),
 	XLAT(AT_NO_AUTOMOUNT),
 	XLAT(AT_EMPTY_PATH),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 int
@@ -1514,7 +1514,7 @@ static const struct xlat aclcmds[] = {
 #  ifdef ACL_CNT
 	XLAT(ACL_CNT),
 #  endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -1566,7 +1566,7 @@ static const struct xlat aclipc[] = {
 #  ifdef IPC_MSG
 	XLAT(IPC_MSG),
 #  endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -1623,7 +1623,7 @@ static const struct xlat fsmagic[] = {
 	{ 0x012ff7b4,	"XENIX_SUPER_MAGIC"	},
 	{ 0x012fd16d,	"XIAFS_SUPER_MAGIC"	},
 	{ 0x62656572,	"SYSFS_MAGIC"		},
-	{ 0,		NULL			},
+	XLAT_END
 };
 
 static const char *
@@ -2249,7 +2249,7 @@ static const struct xlat direnttypes[] = {
 	XLAT(DT_LNK),
 	XLAT(DT_SOCK),
 	XLAT(DT_WHT),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -2467,7 +2467,7 @@ static const struct xlat xattrflags[] = {
 	XLAT(XATTR_CREATE),
 	XLAT(XATTR_REPLACE),
 #endif
-	{ 0,		 NULL }
+	XLAT_END
 };
 
 static void
@@ -2638,7 +2638,7 @@ static const struct xlat advise[] = {
 	XLAT(POSIX_FADV_WILLNEED),
 	XLAT(POSIX_FADV_DONTNEED),
 	XLAT(POSIX_FADV_NOREUSE),
-	{ 0,				NULL			}
+	XLAT_END
 };
 
 int
@@ -2675,7 +2675,7 @@ static const struct xlat sync_file_range_flags[] = {
 	XLAT(SYNC_FILE_RANGE_WAIT_BEFORE),
 	XLAT(SYNC_FILE_RANGE_WRITE),
 	XLAT(SYNC_FILE_RANGE_WAIT_AFTER),
-	{ 0,				NULL				}
+	XLAT_END
 };
 
 int
@@ -2727,13 +2727,13 @@ static const struct xlat inotify_modes[] = {
 	{ 0x20000000,	"IN_MASK_ADD"	},
 	{ 0x40000000,	"IN_ISDIR"	},
 	{ 0x80000000,	"IN_ONESHOT"	},
-	{ 0,		NULL		}
+	XLAT_END
 };
 
 static const struct xlat inotify_init_flags[] = {
 	{ 0x00000800,	"IN_NONBLOCK"	},
 	{ 0x00080000,	"IN_CLOEXEC"	},
-	{ 0,		NULL		}
+	XLAT_END
 };
 
 int
@@ -2789,7 +2789,7 @@ sys_fallocate(struct tcb *tcp)
 static const struct xlat swap_flags[] = {
 	XLAT(SWAP_FLAG_PREFER),
 	XLAT(SWAP_FLAG_DISCARD),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 int

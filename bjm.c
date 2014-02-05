@@ -76,7 +76,7 @@ static const struct xlat which[] = {
 	XLAT(QM_REFS),
 	XLAT(QM_SYMBOLS),
 	XLAT(QM_INFO),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat modflags[] = {
@@ -87,7 +87,7 @@ static const struct xlat modflags[] = {
 	XLAT(MOD_VISITED),
 	XLAT(MOD_USED_ONCE),
 	XLAT(MOD_JUST_FREED),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 int

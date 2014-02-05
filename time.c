@@ -283,7 +283,7 @@ static const struct xlat which[] = {
 	XLAT(ITIMER_REAL),
 	XLAT(ITIMER_VIRTUAL),
 	XLAT(ITIMER_PROF),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static void
@@ -443,7 +443,7 @@ static const struct xlat adjtimex_modes[] = {
 #ifdef ADJ_OFFSET_SS_READ
 	XLAT(ADJ_OFFSET_SS_READ),
 #endif
-	{ 0,		NULL			}
+	XLAT_END
 };
 
 static const struct xlat adjtimex_status[] = {
@@ -495,7 +495,7 @@ static const struct xlat adjtimex_status[] = {
 #ifdef STA_CLK
 	XLAT(STA_CLK),
 #endif
-	{ 0,		NULL		}
+	XLAT_END
 };
 
 static const struct xlat adjtimex_state[] = {
@@ -517,7 +517,7 @@ static const struct xlat adjtimex_state[] = {
 #ifdef TIME_ERROR
 	XLAT(TIME_ERROR),
 #endif
-	{ 0,		NULL		}
+	XLAT_END
 };
 
 #if SUPPORTED_PERSONALITIES > 1
@@ -640,7 +640,7 @@ sys_adjtimex(struct tcb *tcp)
 
 static const struct xlat clockflags[] = {
 	XLAT(TIMER_ABSTIME),
-	{ 0,			NULL		}
+	XLAT_END
 };
 
 static const struct xlat clocknames[] = {
@@ -665,7 +665,7 @@ static const struct xlat clocknames[] = {
 #ifdef CLOCK_MONOTONIC_COARSE
 	XLAT(CLOCK_MONOTONIC_COARSE),
 #endif
-	{ 0,				NULL }
+	XLAT_END
 };
 
 #ifdef CLOCKID_TO_FD
@@ -673,7 +673,7 @@ static const struct xlat cpuclocknames[] = {
 	XLAT(CPUCLOCK_PROF),
 	XLAT(CPUCLOCK_VIRT),
 	XLAT(CPUCLOCK_SCHED),
-	{ 0, NULL }
+	XLAT_END
 };
 #endif
 
@@ -761,7 +761,7 @@ static const struct xlat sigev_value[] = {
 	XLAT(SIGEV_NONE),
 	XLAT(SIGEV_THREAD),
 	XLAT(SIGEV_THREAD_ID),
-	{ 0, NULL }
+	XLAT_END
 };
 
 #if SUPPORTED_PERSONALITIES > 1
@@ -989,7 +989,7 @@ rtc_ioctl(struct tcb *tcp, long code, long arg)
 
 static const struct xlat timerfdflags[] = {
 	XLAT(TFD_TIMER_ABSTIME),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 int

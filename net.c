@@ -218,7 +218,7 @@ static const struct xlat domains[] = {
 #ifdef PF_VSOCK
 	XLAT(PF_VSOCK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 const struct xlat addrfams[] = {
 #ifdef AF_UNSPEC
@@ -344,7 +344,7 @@ const struct xlat addrfams[] = {
 #ifdef AF_VSOCK
 	XLAT(AF_VSOCK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 static const struct xlat socktypes[] = {
 	XLAT(SOCK_STREAM),
@@ -364,7 +364,7 @@ static const struct xlat socktypes[] = {
 #ifdef SOCK_PACKET
 	XLAT(SOCK_PACKET),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 static const struct xlat sock_type_flags[] = {
 #ifdef SOCK_CLOEXEC
@@ -373,7 +373,7 @@ static const struct xlat sock_type_flags[] = {
 #ifdef SOCK_NONBLOCK
 	XLAT(SOCK_NONBLOCK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 #ifndef SOCK_TYPE_MASK
 # define SOCK_TYPE_MASK 0xf
@@ -569,7 +569,7 @@ static const struct xlat protocols[] = {
 #ifdef IPPROTO_MAX
 	XLAT(IPPROTO_MAX),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 static const struct xlat msg_flags[] = {
 	XLAT(MSG_OOB),
@@ -630,7 +630,7 @@ static const struct xlat msg_flags[] = {
 #ifdef MSG_CMSG_CLOEXEC
 	XLAT(MSG_CMSG_CLOEXEC),
 #endif
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat sockoptions[] = {
@@ -760,7 +760,7 @@ static const struct xlat sockoptions[] = {
 #ifdef SO_USELOOPBACK
 	XLAT(SO_USELOOPBACK),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #if !defined(SOL_IP) && defined(IPPROTO_IP)
@@ -910,7 +910,7 @@ static const struct xlat sockipoptions[] = {
 #ifdef IP_UNICAST_IF
 	XLAT(IP_UNICAST_IF),
 #endif
-	{ 0,			NULL			},
+	XLAT_END
 };
 #endif /* SOL_IP */
 
@@ -979,14 +979,14 @@ static const struct xlat sockipv6options[] = {
 #ifdef IPV6_ROUTER_ALERT
 	XLAT(IPV6_ROUTER_ALERT),
 #endif
-	{ 0,			NULL			},
+	XLAT_END
 };
 #endif /* SOL_IPV6 */
 
 #ifdef SOL_IPX
 static const struct xlat sockipxoptions[] = {
 	XLAT(IPX_TYPE),
-	{ 0,		NULL		},
+	XLAT_END
 };
 #endif /* SOL_IPX */
 
@@ -995,7 +995,7 @@ static const struct xlat sockrawoptions[] = {
 #if defined(ICMP_FILTER)
 	XLAT(ICMP_FILTER),
 #endif
-	{ 0,			NULL		},
+	XLAT_END
 };
 #endif /* SOL_RAW */
 
@@ -1040,7 +1040,7 @@ static const struct xlat sockpacketoptions[] = {
 #if defined(PACKET_LOSS)
 	XLAT(PACKET_LOSS),
 #endif
-	{ 0,				NULL			},
+	XLAT_END
 };
 #endif /* SOL_PACKET */
 
@@ -1166,7 +1166,7 @@ static const struct xlat socksctpoptions[] = {
 	XLAT(SCTP_GET_LOCAL_ADDRS),
 #endif
 
-	{ 0,	NULL	},
+	XLAT_END
 };
 #endif
 
@@ -1244,7 +1244,7 @@ static const struct xlat socktcpoptions[] = {
 #ifdef TCP_TIMESTAMP
 	XLAT(TCP_TIMESTAMP),
 #endif
-	{ 0,			NULL		},
+	XLAT_END
 };
 #endif /* SOL_TCP */
 
@@ -1289,7 +1289,7 @@ static const struct xlat icmpfilterflags[] = {
 #if defined(ICMP_ADDRESSREPLY)
 	{ (1<<ICMP_ADDRESSREPLY),	"ICMP_ADDRESSREPLY"	},
 #endif
-	{ 0,				NULL			},
+	XLAT_END
 };
 #endif /* SOL_RAW */
 
@@ -1316,7 +1316,7 @@ static const struct xlat af_packet_types[] = {
 #if defined(PACKET_FASTROUTE)
 	XLAT(PACKET_FASTROUTE),
 #endif
-	{ 0,				NULL			},
+	XLAT_END
 };
 #endif /* defined(AF_PACKET) */
 
@@ -1471,7 +1471,7 @@ static const struct xlat scmvals[] = {
 #ifdef SCM_CREDENTIALS
 	XLAT(SCM_CREDENTIALS),
 #endif
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 static void
@@ -1981,7 +1981,7 @@ static const struct xlat shutdown_modes[] = {
 	{ 0,	"SHUT_RD"	},
 	{ 1,	"SHUT_WR"	},
 	{ 2,	"SHUT_RDWR"	},
-	{ 0,	NULL		}
+	XLAT_END
 };
 
 int

@@ -35,7 +35,7 @@ static const struct xlat sg_io_dxfer_direction[] = {
 	XLAT(SG_DXFER_TO_DEV),
 	XLAT(SG_DXFER_FROM_DEV),
 	XLAT(SG_DXFER_TO_FROM_DEV),
-	{0, NULL}
+	XLAT_END
 };
 
 static void

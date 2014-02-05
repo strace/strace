@@ -39,7 +39,7 @@ static const struct xlat loop_flags_options[] = {
 #if HAVE_DECL_LO_FLAGS_PARTSCAN
 	XLAT(LO_FLAGS_PARTSCAN),
 #endif
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat loop_crypt_type_options[] = {
@@ -53,7 +53,7 @@ static const struct xlat loop_crypt_type_options[] = {
 	XLAT(LO_CRYPT_DUMMY),
 	XLAT(LO_CRYPT_SKIPJACK),
 	XLAT(LO_CRYPT_CRYPTOAPI),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 int loop_ioctl(struct tcb *tcp, long code, long arg)

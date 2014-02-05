@@ -109,7 +109,7 @@ static const struct xlat mount_flags[] = {
 	XLAT(MS_SHARED),
 	XLAT(MS_ACTIVE),
 	XLAT(MS_NOUSER),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -159,7 +159,7 @@ static const struct xlat umount_flags[] = {
 	XLAT(MNT_FORCE),
 	XLAT(MNT_DETACH),
 	XLAT(MNT_EXPIRE),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -198,7 +198,7 @@ static const struct xlat personality_options[] = {
 	XLAT(PER_UW7),
 	XLAT(PER_OSF4),
 	XLAT(PER_HPUX),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -235,7 +235,7 @@ static const struct xlat syslog_action_type[] = {
 	XLAT(SYSLOG_ACTION_CONSOLE_LEVEL),
 	XLAT(SYSLOG_ACTION_SIZE_UNREAD),
 	XLAT(SYSLOG_ACTION_SIZE_BUFFER),
-	{ 0,				NULL				}
+	XLAT_END
 };
 
 int
@@ -278,14 +278,14 @@ sys_syslog(struct tcb *tcp)
 #include <linux/reboot.h>
 static const struct xlat bootflags1[] = {
 	XLAT(LINUX_REBOOT_MAGIC1),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat bootflags2[] = {
 	XLAT(LINUX_REBOOT_MAGIC2),
 	XLAT(LINUX_REBOOT_MAGIC2A),
 	XLAT(LINUX_REBOOT_MAGIC2B),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat bootflags3[] = {
@@ -295,7 +295,7 @@ static const struct xlat bootflags3[] = {
 	XLAT(LINUX_REBOOT_CMD_CAD_ON),
 	XLAT(LINUX_REBOOT_CMD_POWER_OFF),
 	XLAT(LINUX_REBOOT_CMD_RESTART2),
-	{ 0,				NULL				},
+	XLAT_END
 };
 
 int
@@ -326,7 +326,7 @@ static const struct xlat cacheflush_scope[] = {
 #ifdef FLUSH_SCOPE_ALL
 	XLAT(FLUSH_SCOPE_ALL),
 #endif
-	{ 0,			NULL },
+	XLAT_END
 };
 
 static const struct xlat cacheflush_flags[] = {
@@ -339,7 +339,7 @@ static const struct xlat cacheflush_flags[] = {
 #ifdef FLUSH_CACHE_INSN
 	XLAT(FLUSH_CACHE_INSN),
 #endif
-	{ 0,			NULL },
+	XLAT_END
 };
 
 int
@@ -370,7 +370,7 @@ static const struct xlat sram_alloc_flags[] = {
 	XLAT(L1_DATA_B_SRAM),
 	XLAT(L1_DATA_SRAM),
 	XLAT(L2_SRAM),
-	{ 0,			NULL },
+	XLAT_END
 };
 
 int
@@ -391,7 +391,7 @@ static const struct xlat cacheflush_flags[] = {
 	XLAT(ICACHE),
 	XLAT(DCACHE),
 	XLAT(BCACHE),
-	{ 0,		NULL },
+	XLAT_END
 };
 
 int
@@ -424,7 +424,7 @@ static const struct xlat cacheflush_flags[] = {
 #ifdef CACHEFLUSH_I
 	XLAT(CACHEFLUSH_I),
 #endif
-	{ 0,			NULL },
+	XLAT_END
 };
 
 int
@@ -487,7 +487,7 @@ static const struct xlat capabilities[] = {
 #ifdef CAP_SETFCAP
 	{ 1<<CAP_SETFCAP,	"CAP_SETFCAP"	},
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #ifndef _LINUX_CAPABILITY_VERSION_1
@@ -504,7 +504,7 @@ static const struct xlat cap_version[] = {
 	XLAT(_LINUX_CAPABILITY_VERSION_1),
 	XLAT(_LINUX_CAPABILITY_VERSION_2),
 	XLAT(_LINUX_CAPABILITY_VERSION_3),
-	{ 0,				NULL				}
+	XLAT_END
 };
 
 static void
@@ -602,7 +602,7 @@ static const struct xlat sysctl_root[] = {
 	XLAT(CTL_BUS),
 	XLAT(CTL_ABI),
 	XLAT(CTL_CPU),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_kern[] = {
@@ -644,7 +644,7 @@ static const struct xlat sysctl_kern[] = {
 	XLAT(KERN_MSGMAX),
 	XLAT(KERN_MSGMNB),
 	XLAT(KERN_MSGPOOL),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_vm[] = {
@@ -698,7 +698,7 @@ static const struct xlat sysctl_vm[] = {
 	XLAT(VM_UNUSED9),
 #endif
 	XLAT(VM_PAGE_CLUSTER),
-	{ 0, NULL },
+	XLAT_END
 };
 
 static const struct xlat sysctl_net[] = {
@@ -717,7 +717,7 @@ static const struct xlat sysctl_net[] = {
 	XLAT(NET_X25),
 	XLAT(NET_TR),
 	XLAT(NET_DECNET),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_net_core[] = {
@@ -730,13 +730,13 @@ static const struct xlat sysctl_net_core[] = {
 	XLAT(NET_CORE_MSG_COST),
 	XLAT(NET_CORE_MSG_BURST),
 	XLAT(NET_CORE_OPTMEM_MAX),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_net_unix[] = {
 	XLAT(NET_UNIX_DESTROY_DELAY),
 	XLAT(NET_UNIX_DELETE_DELAY),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_net_ipv4[] = {
@@ -779,7 +779,7 @@ static const struct xlat sysctl_net_ipv4[] = {
 	XLAT(NET_IPV4_ICMP_ECHOREPLY_RATE),
 	XLAT(NET_IPV4_ICMP_IGNORE_BOGUS_ERROR_RESPONSES),
 	XLAT(NET_IPV4_IGMP_MAX_MEMBERSHIPS),
-	{  0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_net_ipv4_route[] = {
@@ -797,7 +797,7 @@ static const struct xlat sysctl_net_ipv4_route[] = {
 	XLAT(NET_IPV4_ROUTE_ERROR_COST),
 	XLAT(NET_IPV4_ROUTE_ERROR_BURST),
 	XLAT(NET_IPV4_ROUTE_GC_ELASTICITY),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_net_ipv4_conf[] = {
@@ -812,14 +812,14 @@ static const struct xlat sysctl_net_ipv4_conf[] = {
 	XLAT(NET_IPV4_CONF_ACCEPT_SOURCE_ROUTE),
 	XLAT(NET_IPV4_CONF_BOOTP_RELAY),
 	XLAT(NET_IPV4_CONF_LOG_MARTIANS),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_net_ipv6[] = {
 	XLAT(NET_IPV6_CONF),
 	XLAT(NET_IPV6_NEIGH),
 	XLAT(NET_IPV6_ROUTE),
-	{ 0, NULL }
+	XLAT_END
 };
 
 static const struct xlat sysctl_net_ipv6_route[] = {
@@ -830,7 +830,7 @@ static const struct xlat sysctl_net_ipv6_route[] = {
 	XLAT(NET_IPV6_ROUTE_GC_TIMEOUT),
 	XLAT(NET_IPV6_ROUTE_GC_INTERVAL),
 	XLAT(NET_IPV6_ROUTE_GC_ELASTICITY),
-	{ 0, NULL }
+	XLAT_END
 };
 
 int
@@ -1000,7 +1000,7 @@ static const struct xlat sysmips_operations[] = {
 	XLAT(MIPS_FIXADE),
 	XLAT(MIPS_RDNVRAM),
 	XLAT(MIPS_ATOMIC_SET),
-	{ 0, NULL }
+	XLAT_END
 };
 
 int sys_sysmips(struct tcb *tcp)
@@ -1050,7 +1050,7 @@ static const struct xlat atomic_ops[] = {
 	{ OR1K_ATOMIC_OR,		"OR"		},
 	{ OR1K_ATOMIC_UMAX,		"UMAX"		},
 	{ OR1K_ATOMIC_UMIN,		"UMIN"		},
-	{ 0, NULL }
+	XLAT_END
 };
 
 int sys_or1k_atomic(struct tcb *tcp)

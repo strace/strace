@@ -113,7 +113,7 @@ static const struct xlat quotacmds[] = {
 	XLAT(Q_XQUOTARM),
 	XLAT(Q_XQUOTASYNC),
 
-	{0, NULL},
+	XLAT_END
 };
 
 #define USRQUOTA 0
@@ -122,7 +122,7 @@ static const struct xlat quotacmds[] = {
 static const struct xlat quotatypes[] = {
 	XLAT(USRQUOTA),
 	XLAT(GRPQUOTA),
-	{0, NULL},
+	XLAT_END
 };
 
 /* Quota format identifiers */
@@ -132,7 +132,7 @@ static const struct xlat quotatypes[] = {
 static const struct xlat quota_formats[] = {
 	XLAT(QFMT_VFS_OLD),
 	XLAT(QFMT_VFS_V0),
-	{0, NULL},
+	XLAT_END
 };
 
 #define XFS_QUOTA_UDQ_ACCT	(1<<0)	/* user quota accounting */
@@ -149,14 +149,14 @@ static const struct xlat xfs_quota_flags[] = {
 	XLAT(XFS_QUOTA_UDQ_ENFD),
 	XLAT(XFS_QUOTA_GDQ_ACCT),
 	XLAT(XFS_QUOTA_GDQ_ENFD),
-	{0, NULL}
+	XLAT_END
 };
 
 static const struct xlat xfs_dqblk_flags[] = {
 	XLAT(XFS_USER_QUOTA),
 	XLAT(XFS_PROJ_QUOTA),
 	XLAT(XFS_GROUP_QUOTA),
-	{0, NULL}
+	XLAT_END
 };
 
 /*
@@ -176,7 +176,7 @@ static const struct xlat if_dqblk_valid[] = {
 	XLAT(QIF_INODES),
 	XLAT(QIF_BTIME),
 	XLAT(QIF_ITIME),
-	{0, NULL}
+	XLAT_END
 };
 
 struct if_dqblk
@@ -253,7 +253,7 @@ static const struct xlat if_dqinfo_valid[] = {
 	XLAT(IIF_BGRACE),
 	XLAT(IIF_IGRACE),
 	XLAT(IIF_FLAGS),
-	{0, NULL}
+	XLAT_END
 };
 
 struct if_dqinfo

@@ -330,7 +330,7 @@ static const struct xlat splice_flags[] = {
 #ifdef SPLICE_F_GIFT
 	XLAT(SPLICE_F_GIFT),
 #endif
-	{ 0,                 NULL                },
+	XLAT_END
 };
 
 int

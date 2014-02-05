@@ -275,7 +275,7 @@ static const struct xlat prctl_options[] = {
 #ifdef PR_GET_TID_ADDRESS
 	XLAT(PR_GET_TID_ADDRESS),
 #endif
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const char *
@@ -488,7 +488,7 @@ static const struct xlat clone_flags[] = {
 	XLAT(CLONE_NEWPID),
 	XLAT(CLONE_NEWNET),
 	XLAT(CLONE_IO),
-	{ 0,			NULL		},
+	XLAT_END
 };
 
 #ifdef I386
@@ -1032,7 +1032,7 @@ static const struct xlat wait4_options[] = {
 #ifdef __WNOTHREAD
 	XLAT(__WNOTHREAD),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #if !defined WCOREFLAG && defined WCOREFLG
@@ -1180,7 +1180,7 @@ static const struct xlat waitid_types[] = {
 #ifdef P_LWPID
 	XLAT(P_LWPID),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 int
@@ -1307,7 +1307,7 @@ static const struct xlat ptrace_cmds[] = {
 #endif
 	XLAT(PTRACE_SYSCALL),
 
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 #ifdef PTRACE_SETOPTIONS
@@ -1339,7 +1339,7 @@ static const struct xlat ptrace_setoptions_flags[] = {
 # ifdef PTRACE_O_EXITKILL
 	XLAT(PTRACE_O_EXITKILL),
 # endif
-	{ 0,			NULL			},
+	XLAT_END
 };
 #endif /* PTRACE_SETOPTIONS */
 
@@ -1413,7 +1413,7 @@ static const struct xlat nt_descriptor_types[] = {
 #ifdef NT_X86_XSTATE
 	XLAT(NT_X86_XSTATE),
 #endif
-	{ 0,			NULL },
+	XLAT_END
 };
 
 #define uoff(member)	offsetof(struct user, member)
@@ -2514,7 +2514,7 @@ const struct xlat struct_user_offsets[] = {
 #elif defined(ARC)
 	/* nothing */
 #endif
-	{ 0,			NULL					},
+	XLAT_END
 };
 
 int
@@ -2718,7 +2718,7 @@ static const struct xlat futexops[] = {
 	XLAT(FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME),
 	XLAT(FUTEX_WAIT_REQUEUE_PI|FUTEX_CLOCK_REALTIME),
 	XLAT(FUTEX_WAIT_REQUEUE_PI_PRIVATE|FUTEX_CLOCK_REALTIME),
-	{ 0,						NULL }
+	XLAT_END
 };
 #ifndef FUTEX_OP_SET
 # define FUTEX_OP_SET		0
@@ -2739,7 +2739,7 @@ static const struct xlat futexwakeops[] = {
 	XLAT(FUTEX_OP_OR),
 	XLAT(FUTEX_OP_ANDN),
 	XLAT(FUTEX_OP_XOR),
-	{ 0,			NULL }
+	XLAT_END
 };
 static const struct xlat futexwakecmps[] = {
 	XLAT(FUTEX_OP_CMP_EQ),
@@ -2748,7 +2748,7 @@ static const struct xlat futexwakecmps[] = {
 	XLAT(FUTEX_OP_CMP_LE),
 	XLAT(FUTEX_OP_CMP_GT),
 	XLAT(FUTEX_OP_CMP_GE),
-	{ 0,			NULL }
+	XLAT_END
 };
 
 int
@@ -2879,7 +2879,7 @@ static const struct xlat schedulers[] = {
 	XLAT(SCHED_OTHER),
 	XLAT(SCHED_RR),
 	XLAT(SCHED_FIFO),
-	{ 0,		NULL }
+	XLAT_END
 };
 
 int
@@ -2969,7 +2969,7 @@ static const struct xlat archvals[] = {
 	XLAT(ARCH_SET_FS),
 	XLAT(ARCH_GET_FS),
 	XLAT(ARCH_GET_GS),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 int

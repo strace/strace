@@ -6,7 +6,7 @@ static const struct xlat ptp_flags_options[] = {
 	XLAT(PTP_ENABLE_FEATURE),
 	XLAT(PTP_RISING_EDGE),
 	XLAT(PTP_FALLING_EDGE),
-	{ 0,			NULL			}
+	XLAT_END
 };
 
 

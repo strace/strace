@@ -40,7 +40,7 @@ static const struct xlat tcxonc_options[] = {
 	XLAT(TCOON),
 	XLAT(TCIOFF),
 	XLAT(TCION),
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 #ifdef TCLFLSH
@@ -48,7 +48,7 @@ static const struct xlat tcflsh_options[] = {
 	XLAT(TCIFLUSH),
 	XLAT(TCOFLUSH),
 	XLAT(TCIOFLUSH),
-	{ 0,		NULL		},
+	XLAT_END
 };
 #endif
 
@@ -124,7 +124,7 @@ static const struct xlat baud_options[] = {
 #ifdef EXTB
 	XLAT(EXTB),
 #endif
-	{ 0,		NULL		},
+	XLAT_END
 };
 
 static const struct xlat modem_flags[] = {
@@ -161,7 +161,7 @@ static const struct xlat modem_flags[] = {
 #ifdef TIOCM_DSR
 	XLAT(TIOCM_DSR),
 #endif
-	{ 0,		NULL,		},
+	XLAT_END
 };
 
 int term_ioctl(struct tcb *tcp, long code, long arg)

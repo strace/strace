@@ -45,7 +45,7 @@ static const struct xlat mtd_mode_options[] = {
 	XLAT(MTD_OPS_PLACE_OOB),
 	XLAT(MTD_OPS_AUTO_OOB),
 	XLAT(MTD_OPS_RAW),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat mtd_type_options[] = {
@@ -57,7 +57,7 @@ static const struct xlat mtd_type_options[] = {
 	XLAT(MTD_DATAFLASH),
 	XLAT(MTD_UBIVOLUME),
 	XLAT(MTD_MLCNANDFLASH),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat mtd_flags_options[] = {
@@ -65,14 +65,14 @@ static const struct xlat mtd_flags_options[] = {
 	XLAT(MTD_BIT_WRITEABLE),
 	XLAT(MTD_NO_ERASE),
 	XLAT(MTD_POWERUP_LOCK),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat mtd_otp_options[] = {
 	XLAT(MTD_OTP_OFF),
 	XLAT(MTD_OTP_FACTORY),
 	XLAT(MTD_OTP_USER),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat mtd_nandecc_options[] = {
@@ -81,7 +81,7 @@ static const struct xlat mtd_nandecc_options[] = {
 	XLAT(MTD_NANDECC_AUTOPLACE),
 	XLAT(MTD_NANDECC_PLACEONLY),
 	XLAT(MTD_NANDECC_AUTOPL_USR),
-	{ 0,				NULL				},
+	XLAT_END
 };
 
 int mtd_ioctl(struct tcb *tcp, long code, long arg)
@@ -289,12 +289,12 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 static const struct xlat ubi_volume_types[] = {
 	XLAT(UBI_DYNAMIC_VOLUME),
 	XLAT(UBI_STATIC_VOLUME),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 static const struct xlat ubi_volume_props[] = {
 	XLAT(UBI_VOL_PROP_DIRECT_WRITE),
-	{ 0,			NULL			},
+	XLAT_END
 };
 
 int ubi_ioctl(struct tcb *tcp, long code, long arg)
