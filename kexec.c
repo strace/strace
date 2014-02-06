@@ -43,10 +43,10 @@ print_kexec_segments(struct tcb *tcp, unsigned long addr, unsigned long len)
 #else
 	struct kexec_segment seg;
 # define sizeof_seg sizeof(seg)
-# define seg_buf seg.seg_buf
-# define seg_bufsz seg.seg_bufsz
-# define seg_mem seg.seg_mem
-# define seg_memsz seg.seg_memsz
+# define seg_buf seg.buf
+# define seg_bufsz seg.bufsz
+# define seg_mem seg.mem
+# define seg_memsz seg.memsz
 #endif
 	unsigned int i, failed;
 
