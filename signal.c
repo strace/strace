@@ -831,8 +831,7 @@ sys_sigreturn(struct tcb *tcp)
 		 *  tprints(sprintsigmask_long(") (mask ", uc.sc.oldmask));
 		 */
 		sigemptyset(&sigm);
-		((uint32_t*)&sigm)[0] = uc.uc_sigmask[0];
-		((uint32_t*)&sigm)[1] = uc.uc_sigmask[1];
+		memcpy(&sigm, uc.uc_sigmask, 8);
 		tprints(sprintsigmask(") (mask ", &sigm));
 	}
 #elif defined(S390) || defined(S390X)
