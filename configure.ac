@@ -296,6 +296,16 @@ AC_CHECK_SIZEOF([long])
 AC_CHECK_SIZEOF([long long])
 AC_CHECK_SIZEOF([rlim_t],,[#include <sys/resource.h>])
 
+AC_CACHE_CHECK([for SA_RESTORER], [st_cv_sa_restorer],
+	       [st_cv_sa_restorer="$(echo SA_RESTORER |
+			$CPP $CPPFLAGS -P -imacros asm/signal.h - |
+			grep ^0x)"
+	        test -n "$st_cv_sa_restorer" || st_cv_sa_restorer=no])
+if test "x$st_cv_sa_restorer" != xno; then
+	AC_DEFINE_UNQUOTED([ASM_SA_RESTORER], [$st_cv_sa_restorer],
+			   [SA_RESTORER defined in <asm/signal.h>])
+fi
+
 AC_PATH_PROG([PERL], [perl])
 
 AC_CONFIG_FILES([Makefile tests/Makefile])
