@@ -24,7 +24,13 @@ NR == 3 && /^rt_sigaction\(SIGUSR2, {SIG_DFL, \[\], 0}, {0x[0-9a-f]+, \[QUIT TER
 NR == 4 && /^\+\+\+ exited with 0 \+\+\+$/ {next}
 
 {
-  print "Line " NR " does not match:"
-  print
+  print "Line " NR " does not match: " $0
   exit 1
+}
+
+END {
+  if (NR != 4) {
+    print "Expected 4 lines, found " NR " line(s)."
+    exit 1
+  }
 }
