@@ -14,6 +14,8 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS) -I$(builddir)/$(OS)
 
+include xlat/Makemodule.am
+
 strace_SOURCES =	\
 	aio.c		\
 	bjm.c		\
@@ -213,6 +215,9 @@ EXTRA_DIST =				\
 	strace-log-merge		\
 	strace.spec			\
 	syscallent.sh			\
+	$(XLAT_INPUT_FILES)		\
+	$(XLAT_HEADER_FILES)		\
+	xlat/gen.sh			\
 	xlate.el
 
 .PHONY: srpm
