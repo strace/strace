@@ -1218,12 +1218,13 @@ get_scno(struct tcb *tcp)
 # ifdef POWERPC64
 	int currpers;
 
-	/* Check for 64/32 bit mode. */
-	/* SF is bit 0 of MSR */
-	if ((ppc_regs.msr >> 63) & 1)
-		currpers = 0;
-	else
-		currpers = 1;
+	/*
+	 * Check for 64/32 bit mode.
+	 * Embedded implementations covered by Book E extension of PPC use
+	 * bit 0 (CM) of 32-bit Machine state register (MSR).
+	 * Other implementations use bit 0 (SF) of 64-bit MSR.
+	 */
+	currpers = (ppc_regs.msr & 0x8000000080000000) ? 0 : 1;
 	update_personality(tcp, currpers);
 # endif
 #elif defined(AVR32)
