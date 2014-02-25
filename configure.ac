@@ -220,6 +220,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	mqueue.h
 	netinet/sctp.h
 	poll.h
+	scsi/sg.h
 	stropts.h
 	sys/acl.h
 	sys/asynch.h
