@@ -196,7 +196,9 @@ AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
 AC_LITTLE_ENDIAN_LONG_LONG
 
 AC_CHECK_FUNCS(m4_normalize([
+	fopen64
 	fork
+	fputs_unlocked
 	if_indextoname
 	inet_ntop
 	prctl

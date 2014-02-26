@@ -439,7 +439,11 @@ swap_uid(void)
 }
 
 #ifdef _LARGEFILE64_SOURCE
-# define fopen_for_output fopen64
+# ifdef HAVE_FOPEN64
+#  define fopen_for_output fopen64
+# else
+#  define fopen_for_output fopen
+# endif
 # define struct_stat struct stat64
 # define stat_file stat64
 # define struct_dirent struct dirent64
@@ -536,6 +540,10 @@ tprintf(const char *fmt, ...)
 	}
 	va_end(args);
 }
+
+#ifndef HAVE_FPUTS_UNLOCKED
+# define fputs_unlocked fputs
+#endif
 
 void
 tprints(const char *str)
