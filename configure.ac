@@ -309,6 +309,15 @@ if test "x$st_cv_sa_restorer" != xno; then
 			   [SA_RESTORER defined in <asm/signal.h>])
 fi
 
+AC_CACHE_CHECK([for __builtin_popcount], [st_cv_have___builtin_popcount],
+	       [AC_LINK_IFELSE([AC_LANG_PROGRAM([], [__builtin_popcount(0)])],
+			       [st_cv_have___builtin_popcount=yes],
+			       [st_cv_have___builtin_popcount=no])])
+if test "x$st_cv_have___builtin_popcount" = xyes; then
+	AC_DEFINE([HAVE___BUILTIN_POPCOUNT], [1],
+		  [Define to 1 if the system provides __builtin_popcount function])
+fi
+
 AC_PATH_PROG([PERL], [perl])
 
 AC_CONFIG_FILES([Makefile tests/Makefile])

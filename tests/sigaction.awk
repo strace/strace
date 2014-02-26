@@ -8,6 +8,11 @@
 # the 1st is for any architecture with SA_RESTORER, including SPARC;
 # the 2nd is for any architecture without SA_RESTORER, including ALPHA.
 
+BEGIN {
+	lines = 5
+	fail = 0
+}
+
 # Test 1.
 NR == 1 && /^rt_sigaction\(SIGUSR2, {SIG_IGN, \[HUP INT\], SA_RESTORER\|SA_RESTART, 0x[0-9a-f]+}, {SIG_DFL, \[\], 0}, (0x[0-9a-f]+, )?(4|8|16)\) = 0$/ {next}
 NR == 1 && /^rt_sigaction\(SIGUSR2, {SIG_IGN, \[HUP INT\], SA_RESTART}, {SIG_DFL, \[\], 0}, (4|8|16)(, 0x[0-9a-f]+)?\) = 0$/ {next}
@@ -20,17 +25,26 @@ NR == 2 && /^rt_sigaction\(SIGUSR2, {0x[0-9a-f]+, \[QUIT TERM\], SA_SIGINFO}, {S
 NR == 3 && /^rt_sigaction\(SIGUSR2, {SIG_DFL, \[\], SA_RESTORER, 0x[0-9a-f]+}, {0x[0-9a-f]+, \[QUIT TERM\], SA_RESTORER\|SA_SIGINFO, 0x[0-9a-f]+}, (0x[0-9a-f]+, )?(4|8|16)\) = 0$/ {next}
 NR == 3 && /^rt_sigaction\(SIGUSR2, {SIG_DFL, \[\], 0}, {0x[0-9a-f]+, \[QUIT TERM\], SA_SIGINFO}, (4|8|16)(, 0x[0-9a-f]+)?\) = 0$/ {next}
 
+# Test 4.
+NR == 4 && /^rt_sigaction\(SIGUSR2, {SIG_DFL, ~\[HUP( ((RT|SIGRT)[^] ]+|[3-9][0-9]|1[0-9][0-9]))*\], SA_RESTORER, 0x[0-9a-f]+}, {SIG_DFL, \[\], SA_RESTORER, 0x[0-9a-f]+}, (0x[0-9a-f]+, )?(4|8|16)\) = 0$/ {next}
+NR == 4 && /^rt_sigaction\(SIGUSR2, {SIG_DFL, ~\[HUP( ((RT|SIGRT)[^] ]+|[3-9][0-9]|1[0-9][0-9]))*\], 0}, {SIG_DFL, \[\], 0}, (4|8|16)(, 0x[0-9a-f]+)?\) = 0$/ {next}
+
 # The last line.
-NR == 4 && /^\+\+\+ exited with 0 \+\+\+$/ {next}
+NR == lines && /^\+\+\+ exited with 0 \+\+\+$/ {next}
 
 {
   print "Line " NR " does not match: " $0
-  exit 1
+  fail=1
 }
 
 END {
-  if (NR != 4) {
-    print "Expected 4 lines, found " NR " line(s)."
+  if (NR != lines) {
+    print "Expected " lines " lines, found " NR " line(s)."
+    print ""
+    exit 1
+  }
+  if (fail) {
+    print ""
     exit 1
   }
 }
