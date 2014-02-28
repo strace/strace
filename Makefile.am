@@ -79,7 +79,6 @@ EXTRA_DIST =				\
 	debian/strace64.manpages	\
 	debian/watch			\
 	errnoent.sh			\
-	ioctlsort.c			\
 	linux/aarch64/errnoent1.h	\
 	linux/aarch64/ioctlent.h.in	\
 	linux/aarch64/ioctlent1.h	\
