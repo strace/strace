@@ -181,6 +181,10 @@ struct __old_kernel_stat {
 #undef st_mtime
 #undef st_ctime
 
+#ifdef AARCH64
+#define stat64 stat
+#endif /* AARCH64 */
+
 #include <fcntl.h>
 #ifdef HAVE_SYS_VFS_H
 # include <sys/vfs.h>
