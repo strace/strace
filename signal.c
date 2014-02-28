@@ -691,10 +691,19 @@ struct old_sigaction {
 #endif /* !MIPS */
 };
 
+struct old_sigaction32 {
+	/* sa_handler may be a libc #define, need to use other name: */
+	uint32_t __sa_handler;
+	uint32_t sa_mask;
+	uint32_t sa_flags;
+	uint32_t sa_restorer;
+};
+
 static void
 decode_old_sigaction(struct tcb *tcp, long addr)
 {
 	struct old_sigaction sa;
+	int r;
 
 	if (!addr) {
 		tprints("NULL");
@@ -704,7 +713,24 @@ decode_old_sigaction(struct tcb *tcp, long addr)
 		tprintf("%#lx", addr);
 		return;
 	}
-	if (umove(tcp, addr, &sa) < 0) {
+
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize != sizeof(sa.__sa_handler) && current_wordsize == 4) {
+		struct old_sigaction32 sa32;
+		r = umove(tcp, addr, &sa32);
+		if (r >= 0) {
+			memset(&sa, 0, sizeof(sa));
+			sa.__sa_handler = (void*)(uintptr_t)sa32.__sa_handler;
+			sa.sa_flags = sa32.sa_flags;
+			sa.sa_restorer = (void*)(uintptr_t)sa32.sa_restorer;
+			sa.sa_mask = sa32.sa_mask;
+		}
+	} else
+#endif
+	{
+		r = umove(tcp, addr, &sa);
+	}
+	if (r < 0) {
 		tprints("{...}");
 		return;
 	}
