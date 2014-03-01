@@ -109,9 +109,6 @@ static const struct xlat fcntlcmds[] = {
 #ifdef F_SETLKW
 	XLAT(F_SETLKW),
 #endif
-#ifdef F_FREESP
-	XLAT(F_FREESP),
-#endif
 #ifdef F_GETLK
 	XLAT(F_GETLK),
 #endif
@@ -120,9 +117,6 @@ static const struct xlat fcntlcmds[] = {
 #endif
 #ifdef F_SETLKW64
 	XLAT(F_SETLKW64),
-#endif
-#ifdef F_FREESP64
-	XLAT(F_FREESP64),
 #endif
 #ifdef F_GETLK64
 	XLAT(F_GETLK64),
@@ -238,8 +232,7 @@ static const struct xlat perf_event_open_flags[] = {
 # define HAVE_F_GETLK64 0
 #endif
 
-#if defined(X32) || defined(F_FREESP64) || \
-    HAVE_F_SETLK64 || HAVE_F_SETLKW64 || HAVE_F_GETLK64
+#if defined(X32) || HAVE_F_SETLK64 || HAVE_F_SETLKW64 || HAVE_F_GETLK64
 
 #ifndef HAVE_STRUCT_FLOCK64
 struct flock64 {
@@ -355,16 +348,10 @@ sys_fcntl(struct tcb *tcp)
 			tprint_open_modes(tcp->u_arg[2]);
 			break;
 		case F_SETLK: case F_SETLKW:
-#ifdef F_FREESP
-		case F_FREESP:
-#endif
 			tprints(", ");
 			printflock(tcp, tcp->u_arg[2], 0);
 			break;
-#if defined(F_FREESP64) || HAVE_F_SETLK64 || HAVE_F_SETLKW64
-#ifdef F_FREESP64
-		case F_FREESP64:
-#endif
+#if HAVE_F_SETLK64 || HAVE_F_SETLKW64
 		/* Linux glibc defines SETLK64 as SETLK,
 		   even though the kernel has different values - as does Solaris. */
 #if HAVE_F_SETLK64
@@ -376,7 +363,7 @@ sys_fcntl(struct tcb *tcp)
 			tprints(", ");
 			printflock64(tcp, tcp->u_arg[2], 0);
 			break;
-#endif /* defined(F_FREESP64) || HAVE_F_SETLK64 || HAVE_F_SETLKW64 */
+#endif /* HAVE_F_SETLK64 || HAVE_F_SETLKW64 */
 #ifdef F_NOTIFY
 		case F_NOTIFY:
 			tprints(", ");
