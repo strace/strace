@@ -926,7 +926,7 @@ print_pc(struct tcb *tcp)
 /* Shuffle syscall numbers so that we don't have huge gaps in syscall table.
  * The shuffling should be reversible: shuffle_scno(shuffle_scno(n)) == n.
  */
-#if defined(ARM) /* So far only ARM needs this */
+#if defined(ARM) || defined(AARCH64) /* So far only 32-bit ARM needs this */
 static long
 shuffle_scno(unsigned long scno)
 {
@@ -1347,6 +1347,7 @@ get_scno(struct tcb *tcp)
 			/* We are in 32-bit mode */
 			/* Note: we don't support OABI, unlike 32-bit ARM build */
 			scno = arm_regs.ARM_r7;
+			scno = shuffle_scno(scno);
 			update_personality(tcp, 0);
 			break;
 	}
