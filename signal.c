@@ -499,6 +499,17 @@ static const struct xlat sigbus_codes[] = {
 	XLAT_END
 };
 
+static void
+printsigval(siginfo_t *sip, int verbose)
+{
+	if (!verbose)
+		tprints(", ...");
+	else
+		tprintf(", si_value={int=%u, ptr=%#lx}",
+			sip->si_int,
+			(unsigned long) sip->si_ptr);
+}
+
 void
 printsiginfo(siginfo_t *sip, int verbose)
 {
@@ -561,32 +572,35 @@ printsiginfo(siginfo_t *sip, int verbose)
 		}
 #ifdef SI_FROMUSER
 		if (SI_FROMUSER(sip)) {
-			tprintf(", si_pid=%lu, si_uid=%lu",
-				(unsigned long) sip->si_pid,
-				(unsigned long) sip->si_uid);
 			switch (sip->si_code) {
 #ifdef SI_USER
 			case SI_USER:
+				tprintf(", si_pid=%lu, si_uid=%lu",
+					(unsigned long) sip->si_pid,
+					(unsigned long) sip->si_uid);
 				break;
 #endif
 #ifdef SI_TKILL
 			case SI_TKILL:
+				tprintf(", si_pid=%lu, si_uid=%lu",
+					(unsigned long) sip->si_pid,
+					(unsigned long) sip->si_uid);
 				break;
 #endif
 #ifdef SI_TIMER
 			case SI_TIMER:
-				tprintf(", si_value=%d", sip->si_int);
+				tprintf(", si_timerid=%#x, si_overrun=%d",
+					sip->si_timerid, sip->si_overrun);
+				printsigval(sip, verbose);
 				break;
 #endif
 			default:
+				tprintf(", si_pid=%lu, si_uid=%lu",
+					(unsigned long) sip->si_pid,
+					(unsigned long) sip->si_uid);
 				if (!sip->si_ptr)
 					break;
-				if (!verbose)
-					tprints(", ...");
-				else
-					tprintf(", si_value={int=%u, ptr=%#lx}",
-						sip->si_int,
-						(unsigned long) sip->si_ptr);
+				printsigval(sip, verbose);
 				break;
 			}
 		}
@@ -628,13 +642,7 @@ printsiginfo(siginfo_t *sip, int verbose)
 						(unsigned long) sip->si_uid);
 				if (!sip->si_ptr)
 					break;
-				if (!verbose)
-					tprints(", ...");
-				else {
-					tprintf(", si_value={int=%u, ptr=%#lx}",
-						sip->si_int,
-						(unsigned long) sip->si_ptr);
-				}
+				printsigval(sip, verbose);
 
 			}
 		}
