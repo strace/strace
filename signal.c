@@ -376,6 +376,7 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 #define SI_ASYNCIO      -4      /* sent by AIO completion */
 #define SI_SIGIO	-5	/* sent by SIGIO */
 #define SI_TKILL	-6	/* sent by tkill */
+#define SI_DETHREAD	-7	/* sent by execve killing subsidiary threads */
 #define SI_ASYNCNL	-60     /* sent by asynch name lookup completion */
 #endif
 
@@ -407,6 +408,9 @@ static const struct xlat siginfo_codes[] = {
 #endif
 #ifdef SI_TKILL
 	XLAT(SI_TKILL),
+#endif
+#ifdef SI_DETHREAD
+	XLAT(SI_DETHREAD),
 #endif
 #ifdef SI_ASYNCNL
 	XLAT(SI_ASYNCNL),
