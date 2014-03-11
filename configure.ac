@@ -256,7 +256,8 @@ AC_CHECK_TYPES([struct user_desc],,, [#include <asm/ldt.h>])
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
 AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
-		  struct sigevent.__pad],,, [#include <signal.h>])
+		  struct sigevent.__pad,
+		  siginfo_t.si_syscall],,, [#include <signal.h>])
 
 AC_CHECK_TYPES([struct flock64],,, [#include <fcntl.h>])
 

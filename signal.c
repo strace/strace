@@ -354,6 +354,7 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 #define BUS_ADRALN      1       /* invalid address alignment */
 #define BUS_ADRERR      2       /* non-existant physical address */
 #define BUS_OBJERR      3       /* object specific hardware error */
+#define SYS_SECCOMP     1       /* seccomp triggered */
 #define TRAP_BRKPT      1       /* process breakpoint */
 #define TRAP_TRACE      2       /* process trace trap */
 #define CLD_EXITED      1       /* child has exited */
@@ -503,6 +504,14 @@ static const struct xlat sigbus_codes[] = {
 	XLAT_END
 };
 
+#ifndef SYS_SECCOMP
+# define SYS_SECCOMP 1
+#endif
+static const struct xlat sigsys_codes[] = {
+	XLAT(SYS_SECCOMP),
+	XLAT_END
+};
+
 static void
 printsigsource(const siginfo_t *sip)
 {
@@ -564,6 +573,9 @@ printsiginfo(siginfo_t *sip, int verbose)
 			break;
 		case SIGBUS:
 			code = xlookup(sigbus_codes, sip->si_code);
+			break;
+		case SIGSYS:
+			code = xlookup(sigsys_codes, sip->si_code);
 			break;
 		}
 	}
@@ -640,6 +652,13 @@ printsiginfo(siginfo_t *sip, int verbose)
 					break;
 				}
 				break;
+#ifdef HAVE_SIGINFO_T_SI_SYSCALL
+			case SIGSYS:
+				tprintf(", si_call_addr=%#lx, si_syscall=%d, si_arch=%u",
+					(unsigned long) sip->si_call_addr,
+					sip->si_syscall, sip->si_arch);
+				break;
+#endif
 			default:
 				if (sip->si_pid || sip->si_uid)
 				        printsigsource(sip);
