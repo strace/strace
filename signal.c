@@ -500,7 +500,15 @@ static const struct xlat sigbus_codes[] = {
 };
 
 static void
-printsigval(siginfo_t *sip, int verbose)
+printsigsource(const siginfo_t *sip)
+{
+	tprintf(", si_pid=%lu, si_uid=%lu",
+		(unsigned long) sip->si_pid,
+		(unsigned long) sip->si_uid);
+}
+
+static void
+printsigval(const siginfo_t *sip, int verbose)
 {
 	if (!verbose)
 		tprints(", ...");
@@ -575,16 +583,12 @@ printsiginfo(siginfo_t *sip, int verbose)
 			switch (sip->si_code) {
 #ifdef SI_USER
 			case SI_USER:
-				tprintf(", si_pid=%lu, si_uid=%lu",
-					(unsigned long) sip->si_pid,
-					(unsigned long) sip->si_uid);
+				printsigsource(sip);
 				break;
 #endif
 #ifdef SI_TKILL
 			case SI_TKILL:
-				tprintf(", si_pid=%lu, si_uid=%lu",
-					(unsigned long) sip->si_pid,
-					(unsigned long) sip->si_uid);
+				printsigsource(sip);
 				break;
 #endif
 #ifdef SI_TIMER
@@ -595,12 +599,9 @@ printsiginfo(siginfo_t *sip, int verbose)
 				break;
 #endif
 			default:
-				tprintf(", si_pid=%lu, si_uid=%lu",
-					(unsigned long) sip->si_pid,
-					(unsigned long) sip->si_uid);
-				if (!sip->si_ptr)
-					break;
-				printsigval(sip, verbose);
+				printsigsource(sip);
+				if (sip->si_ptr)
+					printsigval(sip, verbose);
 				break;
 			}
 		}
@@ -609,8 +610,8 @@ printsiginfo(siginfo_t *sip, int verbose)
 		{
 			switch (sip->si_signo) {
 			case SIGCHLD:
-				tprintf(", si_pid=%ld, si_status=",
-					(long) sip->si_pid);
+				printsigsource(sip);
+				tprints(", si_status=");
 				if (sip->si_code == CLD_EXITED)
 					tprintf("%d", sip->si_status);
 				else
@@ -637,13 +638,9 @@ printsiginfo(siginfo_t *sip, int verbose)
 				break;
 			default:
 				if (sip->si_pid || sip->si_uid)
-				        tprintf(", si_pid=%lu, si_uid=%lu",
-						(unsigned long) sip->si_pid,
-						(unsigned long) sip->si_uid);
-				if (!sip->si_ptr)
-					break;
-				printsigval(sip, verbose);
-
+				        printsigsource(sip);
+				if (sip->si_ptr)
+					printsigval(sip, verbose);
 			}
 		}
 	}
