@@ -2056,23 +2056,7 @@ sys_socketpair(struct tcb *tcp)
 		printxval(domains, tcp->u_arg[0], "PF_???");
 		tprints(", ");
 		tprint_sock_type(tcp, tcp->u_arg[1]);
-		tprints(", ");
-		switch (tcp->u_arg[0]) {
-		case PF_INET:
-			printxval(protocols, tcp->u_arg[2], "IPPROTO_???");
-			break;
-#ifdef PF_IPX
-		case PF_IPX:
-			/* BTW: I don't believe this.. */
-			tprints("[");
-			printxval(domains, tcp->u_arg[2], "PF_???");
-			tprints("]");
-			break;
-#endif /* PF_IPX */
-		default:
-			tprintf("%lu", tcp->u_arg[2]);
-			break;
-		}
+		tprintf(", %lu", tcp->u_arg[2]);
 	} else {
 		if (syserror(tcp)) {
 			tprintf(", %#lx", tcp->u_arg[3]);
