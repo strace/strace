@@ -479,8 +479,8 @@ static const struct xlat socketlayers[] = {
 	/* The SOL_* array should remain not NULL-terminated. */
 };
 /*** WARNING: DANGER WILL ROBINSON: NOTE "socketlayers" array above
-     falls into "protocols" array below!!!!   This is intended!!! ***/
-static const struct xlat protocols[] = {
+     falls into "inet_protocols" array below!!!!   This is intended!!! ***/
+static const struct xlat inet_protocols[] = {
 	XLAT(IPPROTO_IP),
 	XLAT(IPPROTO_ICMP),
 	XLAT(IPPROTO_TCP),
@@ -571,6 +571,76 @@ static const struct xlat protocols[] = {
 #endif
 	XLAT_END
 };
+
+#ifdef PF_NETLINK
+static const struct xlat netlink_protocols[] = {
+#ifdef NETLINK_ROUTE
+	XLAT(NETLINK_ROUTE),
+#endif
+#ifdef NETLINK_UNUSED
+	XLAT(NETLINK_UNUSED),
+#endif
+#ifdef NETLINK_USERSOCK
+	XLAT(NETLINK_USERSOCK),
+#endif
+#ifdef NETLINK_FIREWALL
+	XLAT(NETLINK_FIREWALL),
+#endif
+#ifdef NETLINK_SOCK_DIAG
+	XLAT(NETLINK_SOCK_DIAG),
+#endif
+#ifdef NETLINK_NFLOG
+	XLAT(NETLINK_NFLOG),
+#endif
+#ifdef NETLINK_XFRM
+	XLAT(NETLINK_XFRM),
+#endif
+#ifdef NETLINK_SELINUX
+	XLAT(NETLINK_SELINUX),
+#endif
+#ifdef NETLINK_ISCSI
+	XLAT(NETLINK_ISCSI),
+#endif
+#ifdef NETLINK_AUDIT
+	XLAT(NETLINK_AUDIT),
+#endif
+#ifdef NETLINK_FIB_LOOKUP
+	XLAT(NETLINK_FIB_LOOKUP),
+#endif
+#ifdef NETLINK_CONNECTOR
+	XLAT(NETLINK_CONNECTOR),
+#endif
+#ifdef NETLINK_NETFILTER
+	XLAT(NETLINK_NETFILTER),
+#endif
+#ifdef NETLINK_IP6_FW
+	XLAT(NETLINK_IP6_FW),
+#endif
+#ifdef NETLINK_DNRTMSG
+	XLAT(NETLINK_DNRTMSG),
+#endif
+#ifdef NETLINK_KOBJECT_UEVENT
+	XLAT(NETLINK_KOBJECT_UEVENT),
+#endif
+#ifdef NETLINK_GENERIC
+	XLAT(NETLINK_GENERIC),
+#endif
+#ifdef NETLINK_SCSITRANSPORT
+	XLAT(NETLINK_SCSITRANSPORT),
+#endif
+#ifdef NETLINK_ECRYPTFS
+	XLAT(NETLINK_ECRYPTFS),
+#endif
+#ifdef NETLINK_RDMA
+	XLAT(NETLINK_RDMA),
+#endif
+#ifdef NETLINK_CRYPTO
+	XLAT(NETLINK_CRYPTO),
+#endif
+	XLAT_END
+};
+#endif
+
 static const struct xlat msg_flags[] = {
 	XLAT(MSG_OOB),
 #ifdef MSG_PEEK
@@ -1689,7 +1759,7 @@ sys_socket(struct tcb *tcp)
 #ifdef PF_INET6
 		case PF_INET6:
 #endif
-			printxval(protocols, tcp->u_arg[2], "IPPROTO_???");
+			printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 			break;
 #ifdef PF_IPX
 		case PF_IPX:
@@ -1699,6 +1769,11 @@ sys_socket(struct tcb *tcp)
 			tprints("]");
 			break;
 #endif /* PF_IPX */
+#ifdef PF_NETLINK
+		case PF_NETLINK:
+			printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
+			break;
+#endif
 		default:
 			tprintf("%lu", tcp->u_arg[2]);
 			break;
