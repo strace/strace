@@ -181,9 +181,13 @@ struct __old_kernel_stat {
 #undef st_mtime
 #undef st_ctime
 
-#ifdef AARCH64
+#if defined(__BIONIC__) && defined(__LP64__)
+/* Bionic's "libc" struct stat and struct stat64 are identical.
+ * LP64 bionic doesn't have a "kernel" stat64, so for LP64 we need to use the
+ * kernel stat.
+ */
 #define stat64 stat
-#endif /* AARCH64 */
+#endif /* defined(__BIONIC__) && defined(__LP64__) */
 
 #include <fcntl.h>
 #ifdef HAVE_SYS_VFS_H
