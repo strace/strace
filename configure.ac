@@ -150,6 +150,18 @@ AM_CONDITIONAL([X32], [test x$arch = xx32])
 
 AC_INCLUDEDIR
 
+AC_ARG_ENABLE([arm-oabi],
+	      [AS_HELP_STRING([--enable-arm-oabi],
+			      [enable OABI support on ARM EABI])],
+	      [], [enable_arm_oabi=no])
+case "$enable_arm_oabi" in
+	yes) enable_arm_oabi=1 ;;
+	no) enable_arm_oabi=0 ;;
+	*) AC_MSG_ERROR([bad value $enable_arm_oabi for arm-oabi option]) ;;
+esac
+AC_DEFINE_UNQUOTED([ENABLE_ARM_OABI], [$enable_arm_oabi],
+		   [Define to 1 if you want OABI support on ARM EABI.])
+
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wwrite-strings])
 AC_ARG_ENABLE([gcc-Werror],

@@ -1360,8 +1360,7 @@ get_scno(struct tcb *tcp)
 	}
 	/* Note: we support only 32-bit CPUs, not 26-bit */
 
-# ifndef STRACE_KNOWS_ONLY_EABI
-# warning STRACE_KNOWS_ONLY_EABI not set, will PTRACE_PEEKTEXT on every syscall (slower tracing)
+# if !defined(__ARM_EABI__) || ENABLE_ARM_OABI
 	if (arm_regs.ARM_cpsr & 0x20)
 		/* Thumb mode */
 		goto scno_in_r7;
@@ -1385,7 +1384,7 @@ get_scno(struct tcb *tcp)
  scno_in_r7:
 		scno = arm_regs.ARM_r7;
 	}
-# else
+# else /* __ARM_EABI__ || !ENABLE_ARM_OABI */
 	scno = arm_regs.ARM_r7;
 # endif
 	scno = shuffle_scno(scno);
