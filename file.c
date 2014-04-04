@@ -181,14 +181,6 @@ struct __old_kernel_stat {
 #undef st_mtime
 #undef st_ctime
 
-#if defined(__BIONIC__) && defined(__LP64__)
-/* Bionic's "libc" struct stat and struct stat64 are identical.
- * LP64 bionic doesn't have a "kernel" stat64, so for LP64 we need to use the
- * kernel stat.
- */
-#define stat64 stat
-#endif /* defined(__BIONIC__) && defined(__LP64__) */
-
 #include <fcntl.h>
 #ifdef HAVE_SYS_VFS_H
 # include <sys/vfs.h>
@@ -1030,12 +1022,16 @@ printstat(struct tcb *tcp, long addr)
 # define printstat printstat64
 #endif
 
-#if !defined HAVE_STAT64 && defined X86_64
+#if !defined HAVE_STAT64 && (defined AARCH64 || defined X86_64)
 /*
  * Linux x86_64 has unified `struct stat' but its i386 biarch needs
  * `struct stat64'.  Its <asm-i386/stat.h> definition expects 32-bit `long'.
  * <linux/include/asm-x86_64/ia32.h> is not in the public includes set.
  * __GNUC__ is needed for the required __attribute__ below.
+ *
+ * Similarly, aarch64 has a unified `struct stat' but its arm personality
+ * needs `struct stat64' (which also expects a 32-bit `long' but which
+ * shouldn't be packed).
  */
 struct stat64 {
 	unsigned long long	st_dev;
@@ -1057,9 +1053,15 @@ struct stat64 {
 	unsigned int	st_ctime;
 	unsigned int	st_ctime_nsec;
 	unsigned long long	st_ino;
-} __attribute__((packed));
+}
+# if defined X86_64
+   __attribute__((packed))
+#  define STAT64_SIZE	96
+#else
+#  define STAT64_SIZE	104
+# endif
+;
 # define HAVE_STAT64	1
-# define STAT64_SIZE	96
 #endif
 
 #ifdef HAVE_STAT64
@@ -1098,6 +1100,12 @@ printstat64(struct tcb *tcp, long addr)
 # endif
 #endif /* SPARC[64] */
 
+#if defined AARCH64
+	if (current_personality != 0) {
+		printstat(tcp, addr);
+		return;
+	}
+#endif
 #if defined X86_64
 	if (current_personality != 1) {
 		printstat(tcp, addr);
