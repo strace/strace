@@ -33,12 +33,12 @@
 #include "defs.h"
 #include <asm/mman.h>
 #include <sys/mman.h>
-#if defined(I386)
+#if defined(I386) || defined(X86_64)
 # include <asm/ldt.h>
 # ifdef HAVE_STRUCT_USER_DESC
 #  define modify_ldt_ldt_s user_desc
 # endif
-#endif
+#endif /* I386 || X86_64 */
 
 static unsigned long
 get_pagesize()
@@ -543,7 +543,7 @@ sys_getpagesize(struct tcb *tcp)
 }
 #endif
 
-#if defined(I386)
+#if defined(I386) || defined(X86_64)
 void
 print_ldt_entry(struct modify_ldt_ldt_s *ldt_entry)
 {
@@ -635,7 +635,7 @@ sys_get_thread_area(struct tcb *tcp)
 	return 0;
 
 }
-#endif /* I386 */
+#endif /* I386 || X86_64 */
 
 #if defined(M68K)
 int

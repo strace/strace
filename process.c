@@ -491,13 +491,13 @@ static const struct xlat clone_flags[] = {
 	XLAT_END
 };
 
-#ifdef I386
+#if defined I386 || defined X86_64
 # include <asm/ldt.h>
 #  ifdef HAVE_STRUCT_USER_DESC
 #   define modify_ldt_ldt_s user_desc
 #  endif
 extern void print_ldt_entry();
-#endif
+#endif /* I386 || X86_64 */
 
 #if defined IA64
 # define ARG_FLAGS	0
@@ -556,18 +556,23 @@ sys_clone(struct tcb *tcp)
 		if (flags & CLONE_PARENT_SETTID)
 			tprintf(", parent_tidptr=%#lx", tcp->u_arg[ARG_PTID]);
 		if (flags & CLONE_SETTLS) {
-#ifdef I386
-			struct modify_ldt_ldt_s copy;
-			if (umove(tcp, tcp->u_arg[ARG_TLS], &copy) != -1) {
-				tprintf(", {entry_number:%d, ",
-					copy.entry_number);
-				if (!verbose(tcp))
-					tprints("...}");
-				else
-					print_ldt_entry(&copy);
+#if defined I386 || defined X86_64
+# ifndef I386
+			if (current_personality == 1)
+# endif
+			{
+				struct modify_ldt_ldt_s copy;
+				if (umove(tcp, tcp->u_arg[ARG_TLS], &copy) != -1) {
+					tprintf(", {entry_number:%d, ",
+						copy.entry_number);
+					if (!verbose(tcp))
+						tprints("...}");
+					else
+						print_ldt_entry(&copy);
+				}
 			}
 			else
-#endif
+#endif /* I386 || X86_64 */
 				tprintf(", tls=%#lx", tcp->u_arg[ARG_TLS]);
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID))
