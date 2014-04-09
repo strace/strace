@@ -491,13 +491,13 @@ static const struct xlat clone_flags[] = {
 	XLAT_END
 };
 
-#if defined I386 || defined X86_64
+#if defined I386 || defined X86_64 || defined X32
 # include <asm/ldt.h>
 #  ifdef HAVE_STRUCT_USER_DESC
 #   define modify_ldt_ldt_s user_desc
 #  endif
 extern void print_ldt_entry();
-#endif /* I386 || X86_64 */
+#endif /* I386 || X86_64 || X32 */
 
 #if defined IA64
 # define ARG_FLAGS	0
@@ -556,7 +556,7 @@ sys_clone(struct tcb *tcp)
 		if (flags & CLONE_PARENT_SETTID)
 			tprintf(", parent_tidptr=%#lx", tcp->u_arg[ARG_PTID]);
 		if (flags & CLONE_SETTLS) {
-#if defined I386 || defined X86_64
+#if defined I386 || defined X86_64 || defined X32
 # ifndef I386
 			if (current_personality == 1)
 # endif
@@ -572,7 +572,7 @@ sys_clone(struct tcb *tcp)
 				}
 			}
 			else
-#endif /* I386 || X86_64 */
+#endif /* I386 || X86_64 || X32 */
 				tprintf(", tls=%#lx", tcp->u_arg[ARG_TLS]);
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID))
