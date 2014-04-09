@@ -43,12 +43,12 @@
 #define	sys_vm86		printargs
 
 /* machine-specific */
-#ifndef I386
-#define	sys_modify_ldt		printargs
-#ifndef M68K
-#define	sys_get_thread_area	printargs
-#define	sys_set_thread_area	printargs
-#endif
+#if !(defined I386 || defined X86_64 || defined X32)
+# define	sys_modify_ldt		printargs
+# ifndef M68K
+#  define	sys_get_thread_area	printargs
+#  define	sys_set_thread_area	printargs
+# endif
 #endif
 
 /* like another call */
