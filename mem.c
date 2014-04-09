@@ -637,7 +637,7 @@ sys_get_thread_area(struct tcb *tcp)
 }
 #endif /* I386 || X86_64 || X32 */
 
-#if defined(M68K)
+#if defined(M68K) || defined(MIPS)
 int
 sys_set_thread_area(struct tcb *tcp)
 {
@@ -646,7 +646,9 @@ sys_set_thread_area(struct tcb *tcp)
 	return 0;
 
 }
+#endif
 
+#if defined(M68K)
 int
 sys_get_thread_area(struct tcb *tcp)
 {
