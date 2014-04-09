@@ -512,14 +512,14 @@ extern void print_ldt_entry();
 # define ARG_PTID	2
 # define ARG_CTID	3
 # define ARG_TLS	4
-#elif defined X86_64
+#elif defined X86_64 || defined X32
 /* x86 personality processes have the last two arguments flipped. */
 # define ARG_FLAGS	0
 # define ARG_STACK	1
 # define ARG_PTID	2
 # define ARG_CTID	((current_personality != 1) ? 3 : 4)
 # define ARG_TLS	((current_personality != 1) ? 4 : 3)
-#elif defined X32 || defined ALPHA || defined TILE || defined OR1K
+#elif defined ALPHA || defined TILE || defined OR1K
 # define ARG_FLAGS	0
 # define ARG_STACK	1
 # define ARG_PTID	2
