@@ -492,11 +492,7 @@ static const struct xlat clone_flags[] = {
 };
 
 #if defined I386 || defined X86_64 || defined X32
-# include <asm/ldt.h>
-#  ifdef HAVE_STRUCT_USER_DESC
-#   define modify_ldt_ldt_s user_desc
-#  endif
-extern void print_ldt_entry();
+extern void print_user_desc(struct tcb *, long);
 #endif /* I386 || X86_64 || X32 */
 
 #if defined IA64
@@ -561,17 +557,12 @@ sys_clone(struct tcb *tcp)
 			if (current_personality == 1)
 # endif
 			{
-				struct modify_ldt_ldt_s copy;
-				if (umove(tcp, tcp->u_arg[ARG_TLS], &copy) != -1) {
-					tprintf(", {entry_number:%d, ",
-						copy.entry_number);
-					if (!verbose(tcp))
-						tprints("...}");
-					else
-						print_ldt_entry(&copy);
-				}
+				tprints(", tls=");
+				print_user_desc(tcp, tcp->u_arg[ARG_TLS]);
 			}
+# ifndef I386
 			else
+# endif
 #endif /* I386 || X86_64 || X32 */
 				tprintf(", tls=%#lx", tcp->u_arg[ARG_TLS]);
 		}

@@ -263,8 +263,6 @@ AC_CHECK_TYPES([struct __old_kernel_stat],,, [#include <asm/stat.h>])
 AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg, struct ptrace_peeksiginfo_args],,,
 	       [#include <sys/ptrace.h>])
 
-AC_CHECK_TYPES([struct user_desc],,, [#include <asm/ldt.h>])
-
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
 AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,

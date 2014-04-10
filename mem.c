@@ -33,12 +33,6 @@
 #include "defs.h"
 #include <asm/mman.h>
 #include <sys/mman.h>
-#if defined(I386) || defined(X86_64) || defined(X32)
-# include <asm/ldt.h>
-# ifdef HAVE_STRUCT_USER_DESC
-#  define modify_ldt_ldt_s user_desc
-# endif
-#endif /* I386 || X86_64 || X32 */
 
 static unsigned long
 get_pagesize()
@@ -540,119 +534,6 @@ sys_getpagesize(struct tcb *tcp)
 	if (exiting(tcp))
 		return RVAL_HEX;
 	return 0;
-}
-#endif
-
-#if defined(I386) || defined(X86_64) || defined(X32)
-void
-print_ldt_entry(struct modify_ldt_ldt_s *ldt_entry)
-{
-	tprintf("base_addr:%#08lx, "
-		"limit:%d, "
-		"seg_32bit:%d, "
-		"contents:%d, "
-		"read_exec_only:%d, "
-		"limit_in_pages:%d, "
-		"seg_not_present:%d, "
-		"useable:%d}",
-		(long) ldt_entry->base_addr,
-		ldt_entry->limit,
-		ldt_entry->seg_32bit,
-		ldt_entry->contents,
-		ldt_entry->read_exec_only,
-		ldt_entry->limit_in_pages,
-		ldt_entry->seg_not_present,
-		ldt_entry->useable);
-}
-
-int
-sys_modify_ldt(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		struct modify_ldt_ldt_s copy;
-		tprintf("%ld", tcp->u_arg[0]);
-		if (tcp->u_arg[1] == 0
-				|| tcp->u_arg[2] != sizeof(struct modify_ldt_ldt_s)
-				|| umove(tcp, tcp->u_arg[1], &copy) == -1)
-			tprintf(", %lx", tcp->u_arg[1]);
-		else {
-			tprintf(", {entry_number:%d, ", copy.entry_number);
-			if (!verbose(tcp))
-				tprints("...}");
-			else {
-				print_ldt_entry(&copy);
-			}
-		}
-		tprintf(", %lu", tcp->u_arg[2]);
-	}
-	return 0;
-}
-
-int
-sys_set_thread_area(struct tcb *tcp)
-{
-	struct modify_ldt_ldt_s copy;
-	if (entering(tcp)) {
-		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
-			if (copy.entry_number == -1)
-				tprintf("{entry_number:%d -> ",
-					copy.entry_number);
-			else
-				tprints("{entry_number:");
-		}
-	} else {
-		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
-			tprintf("%d, ", copy.entry_number);
-			if (!verbose(tcp))
-				tprints("...}");
-			else {
-				print_ldt_entry(&copy);
-			}
-		} else {
-			tprintf("%lx", tcp->u_arg[0]);
-		}
-	}
-	return 0;
-
-}
-
-int
-sys_get_thread_area(struct tcb *tcp)
-{
-	struct modify_ldt_ldt_s copy;
-	if (exiting(tcp)) {
-		if (umove(tcp, tcp->u_arg[0], &copy) != -1) {
-			tprintf("{entry_number:%d, ", copy.entry_number);
-			if (!verbose(tcp))
-				tprints("...}");
-			else {
-				print_ldt_entry(&copy);
-			}
-		} else {
-			tprintf("%lx", tcp->u_arg[0]);
-		}
-	}
-	return 0;
-
-}
-#endif /* I386 || X86_64 || X32 */
-
-#if defined(M68K) || defined(MIPS)
-int
-sys_set_thread_area(struct tcb *tcp)
-{
-	if (entering(tcp))
-		tprintf("%#lx", tcp->u_arg[0]);
-	return 0;
-
-}
-#endif
-
-#if defined(M68K)
-int
-sys_get_thread_area(struct tcb *tcp)
-{
-	return RVAL_HEX;
 }
 #endif
 
