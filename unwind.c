@@ -88,6 +88,7 @@ unwind_init(void)
 	libunwind_as = unw_create_addr_space(&_UPT_accessors, 0);
 	if (!libunwind_as)
 		error_msg_and_die("failed to create address space for stack tracing");
+	unw_set_caching_policy(libunwind_as, UNW_CACHE_GLOBAL);
 }
 
 void
@@ -138,6 +139,8 @@ build_mmap_cache(struct tcb* tcp)
 	const char *deleted = " (deleted)";
 	size_t blen;
 	size_t dlen;
+
+	unw_flush_cache (libunwind_as, 0, 0);
 
 	sprintf(filename, "/proc/%d/maps", tcp->pid);
 	fp = fopen(filename, "r");
