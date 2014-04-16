@@ -28,6 +28,8 @@
 #include <limits.h>
 #include <libunwind-ptrace.h>
 
+#define DPRINTF(F, A, ...) if (debug_flag) fprintf(stderr, " [unwind(" A ")] " F "\n", __VA_ARGS__)
+
 /*
  * Кeep a sorted array of cache entries,
  * so that we can binary search through it.
