@@ -724,6 +724,12 @@ droptcb(struct tcb *tcp)
 	if (tcp->pid == 0)
 		return;
 
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled) {
+		unwind_tcb_fin(tcp);
+	}
+#endif
+
 	nprocs--;
 	if (debug_flag)
 		fprintf(stderr, "dropped tcb for pid %d, %d remain\n", tcp->pid, nprocs);
@@ -745,11 +751,6 @@ droptcb(struct tcb *tcp)
 	if (printing_tcp == tcp)
 		printing_tcp = NULL;
 
-#ifdef USE_LIBUNWIND
-	if (stack_trace_enabled) {
-		unwind_tcb_fin(tcp);
-	}
-#endif
 	memset(tcp, 0, sizeof(*tcp));
 }
 
