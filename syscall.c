@@ -98,6 +98,8 @@
 #define TM TRACE_MEMORY
 #define NF SYSCALL_NEVER_FAILS
 #define MA MAX_ARGS
+#define SI STACKTRACE_INVALIDATE_CACHE
+#define SE STACKTRACE_CAPTURE_ON_ENTER
 
 const struct_sysent sysent0[] = {
 #include "syscallent.h"
@@ -125,6 +127,8 @@ static const struct_sysent sysent2[] = {
 #undef TM
 #undef NF
 #undef MA
+#undef SI
+#undef SE
 
 /*
  * `ioctlent.h' may be generated from `ioctlent.raw' by the auxiliary

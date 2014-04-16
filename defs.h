@@ -546,6 +546,8 @@ extern const struct xlat whence_codes[];
 #define TRACE_DESC	040	/* Trace file descriptor-related syscalls. */
 #define TRACE_MEMORY	0100	/* Trace memory mapping-related syscalls. */
 #define SYSCALL_NEVER_FAILS	0200	/* Syscall is always successful. */
+#define STACKTRACE_INVALIDATE_CACHE 0400  /* Trigger proc/maps cache updating */
+#define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
 
 typedef enum {
 	CFLAG_NONE = 0,
