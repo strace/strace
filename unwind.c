@@ -48,6 +48,7 @@ struct mmap_cache_t {
 	unsigned long end_addr;
 	unsigned long mmap_offset;
 	char* binary_filename;
+	bool deleted;
 };
 
 /*
@@ -134,6 +135,10 @@ build_mmap_cache(struct tcb* tcp)
 	struct mmap_cache_t *cache_head;
 	FILE *fp;
 
+	const char *deleted = " (deleted)";
+	size_t blen;
+	size_t dlen;
+
 	sprintf(filename, "/proc/%d/maps", tcp->pid);
 	fp = fopen(filename, "r");
 	if (!fp) {
@@ -169,6 +174,13 @@ build_mmap_cache(struct tcb* tcp)
 		cur_entry->end_addr = end_addr;
 		cur_entry->mmap_offset = mmap_offset;
 		cur_entry->binary_filename = strdup(binary_path);
+
+		dlen = strlen(deleted);
+		blen = strlen(binary_path);
+		if (blen >= dlen && strcmp(binary_path + blen - dlen, deleted) == 0)
+			cur_entry->deleted = true;
+		else
+			cur_entry->deleted = false;
 
 		/*
 		 * sanity check to make sure that we're storing
@@ -271,6 +283,7 @@ stacktrace_walk(struct tcb *tcp,
 	char * symbol_name;
 	struct mmap_cache_t* cur_mmap_cache;
 	unsigned long true_offset;
+	bool berror_expected = false;
 
 	if (!tcp->mmap_cache)
 		error_msg_and_die("bug: mmap_cache is NULL");
@@ -313,6 +326,9 @@ stacktrace_walk(struct tcb *tcp,
 						die_out_of_memory();
 				}
 
+				if (cur_mmap_cache->deleted)
+					berror_expected = true;
+
 				true_offset = ip - cur_mmap_cache->start_addr +
 					cur_mmap_cache->mmap_offset;
 				if (symbol_name[0]) {
@@ -349,7 +365,10 @@ stacktrace_walk(struct tcb *tcp,
 		}
 		if (lower > upper) {
 			error_action(data,
-				     "backtracing_error", ip);
+				     berror_expected
+				     ?"expected_backtracing_error"
+				     :"unexpected_backtracing_error",
+				     ip);
 			goto ret;
 		}
 
