@@ -798,20 +798,7 @@ sys_execve(struct tcb *tcp)
 			printargv(tcp, tcp->u_arg[2]);
 			tprints("]");
 		}
-#ifdef USE_LIBUNWIND
-		if (stack_trace_enabled) {
-			unwind_capture_stacktrace(tcp);
-		}
-#endif
 	}
-#ifdef USE_LIBUNWIND
-	else {
-		if (stack_trace_enabled) {
-			unwind_cache_invalidate(tcp);
-		}
-	}
-#endif
-
 	return 0;
 }
 

@@ -2040,6 +2040,13 @@ trace_syscall_entering(struct tcb *tcp)
 		goto ret;
 	}
 
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled) {
+		if (tcp->s_ent->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
+			unwind_capture_stacktrace(tcp);
+	}
+#endif
+
 	printleader(tcp);
 	if (tcp->qual_flg & UNDEFINED_SCNO)
 		tprintf("%s(", undefined_scno_name(tcp));
@@ -2512,6 +2519,13 @@ trace_syscall_exiting(struct tcb *tcp)
 	/* Measure the exit time as early as possible to avoid errors. */
 	if (Tflag || cflag)
 		gettimeofday(&tv, NULL);
+
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled) {
+		if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
+			unwind_cache_invalidate(tcp);
+	}
+#endif
 
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
