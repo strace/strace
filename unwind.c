@@ -78,7 +78,7 @@ free_libunwind_ui(struct tcb *tcp)
  *
  * The cache must be refreshed after some syscall: mmap, mprotect, munmap, execve
  */
-void
+static void
 alloc_mmap_cache(struct tcb* tcp)
 {
 	unsigned long start_addr, end_addr, mmap_offset;
