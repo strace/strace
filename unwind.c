@@ -258,7 +258,7 @@ print_stacktrace(struct tcb* tcp)
 				goto ret;
 			}
 			else if (ip < cur_mmap_cache->start_addr)
-				upper = mid - 1;
+				upper = mid;
 			else
 				lower = mid + 1;
 
