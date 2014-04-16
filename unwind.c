@@ -74,9 +74,12 @@ struct queue_t {
        struct call_t *tail;
        struct call_t *head;
 };
+
 static void queue_print(struct queue_t *queue);
+static void delete_mmap_cache(struct tcb *tcp, const char *caller);
 
 static unw_addr_space_t libunwind_as;
+static unsigned int mmap_cache_generation;
 
 void
 unwind_init(void)
@@ -107,7 +110,7 @@ unwind_tcb_fin(struct tcb *tcp)
 	free(tcp->queue);
 	tcp->queue = NULL;
 
-	unwind_cache_invalidate(tcp);
+	delete_mmap_cache(tcp, __FUNCTION__);
 
 	_UPT_destroy(tcp->libunwind_ui);
 	tcp->libunwind_ui = NULL;
@@ -119,7 +122,7 @@ unwind_tcb_fin(struct tcb *tcp)
  * The cache must be refreshed after some syscall: mmap, mprotect, munmap, execve
  */
 static void
-alloc_mmap_cache(struct tcb* tcp)
+build_mmap_cache(struct tcb* tcp)
 {
 	unsigned long start_addr, end_addr, mmap_offset;
 	char filename[sizeof ("/proc/0123456789/maps")];
@@ -192,13 +195,27 @@ alloc_mmap_cache(struct tcb* tcp)
 	}
 	fclose(fp);
 	tcp->mmap_cache = cache_head;
+	tcp->mmap_cache_generation = mmap_cache_generation;
+
+	DPRINTF("tgen=%u, ggen=%u, tcp=%p, cache=%p",
+		"cache-build",
+		tcp->mmap_cache_generation,
+		mmap_cache_generation,
+		tcp, tcp->mmap_cache);
 }
 
 /* deleting the cache */
-void
-unwind_cache_invalidate(struct tcb* tcp)
+static void
+delete_mmap_cache(struct tcb *tcp, const char *caller)
 {
 	unsigned int i;
+
+	DPRINTF("tgen=%u, ggen=%u, tcp=%p, cache=%p, caller=%s",
+		"cache-delete",
+		tcp->mmap_cache_generation,
+		mmap_cache_generation,
+		tcp, tcp->mmap_cache, caller);
+
 	for (i = 0; i < tcp->mmap_cache_size; i++) {
 		free(tcp->mmap_cache[i].binary_filename);
 		tcp->mmap_cache[i].binary_filename = NULL;
@@ -206,6 +223,33 @@ unwind_cache_invalidate(struct tcb* tcp)
 	free(tcp->mmap_cache);
 	tcp->mmap_cache = NULL;
 	tcp->mmap_cache_size = 0;
+}
+
+static bool
+rebuild_cache_if_invalid(struct tcb *tcp, const char *caller)
+{
+	if ((tcp->mmap_cache_generation != mmap_cache_generation)
+	    && tcp->mmap_cache)
+		delete_mmap_cache(tcp, caller);
+
+	if (!tcp->mmap_cache)
+		build_mmap_cache(tcp);
+
+	if (!tcp->mmap_cache || !tcp->mmap_cache_size)
+		return false;
+	else
+		return true;
+}
+
+void
+unwind_cache_invalidate(struct tcb* tcp)
+{
+	mmap_cache_generation++;
+	DPRINTF("tgen=%u, ggen=%u, tcp=%p, cache=%p", "increment",
+		tcp->mmap_cache_generation,
+		mmap_cache_generation,
+		tcp,
+		tcp->mmap_cache);
 }
 
 /*
@@ -229,9 +273,9 @@ stacktrace_walk(struct tcb *tcp,
 	unsigned long true_offset;
 
 	if (!tcp->mmap_cache)
-		alloc_mmap_cache(tcp);
-	if (!tcp->mmap_cache || !tcp->mmap_cache_size)
-		return;
+		error_msg_and_die("bug: mmap_cache is NULL");
+	if (tcp->mmap_cache_size == 0)
+		error_msg_and_die("bug: mmap_cache is empty");
 
 	symbol_name = malloc(symbol_name_size);
 	if (!symbol_name)
@@ -494,7 +538,7 @@ unwind_print_stacktrace(struct tcb* tcp)
 	       DPRINTF("tcp=%p, queue=%p", "queueprint", tcp, tcp->queue->head);
 	       queue_print(tcp->queue);
        }
-       else {
+       else if (rebuild_cache_if_invalid(tcp, __FUNCTION__)) {
                DPRINTF("tcp=%p, queue=%p", "stackprint", tcp, tcp->queue->head);
                stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
        }
@@ -509,7 +553,9 @@ unwind_capture_stacktrace(struct tcb *tcp)
 	if (tcp->queue->head)
 		error_msg_and_die("bug: unprinted entries in queue");
 
-	stacktrace_walk(tcp, queue_put_call, queue_put_error,
-			tcp->queue);
-	DPRINTF("tcp=%p, queue=%p", "captured", tcp, tcp->queue->head);
+	if (rebuild_cache_if_invalid(tcp, __FUNCTION__)) {
+		stacktrace_walk(tcp, queue_put_call, queue_put_error,
+				tcp->queue);
+		DPRINTF("tcp=%p, queue=%p", "captured", tcp, tcp->queue->head);
+	}
 }

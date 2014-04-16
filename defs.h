@@ -430,6 +430,7 @@ struct tcb {
 	struct UPT_info* libunwind_ui;
 	struct mmap_cache_t* mmap_cache;
 	unsigned int mmap_cache_size;
+	unsigned int mmap_cache_generation;
 	struct queue_t* queue;
 #endif
 };
