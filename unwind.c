@@ -62,6 +62,19 @@ typedef void (*error_action_fn)(void *data,
 				const char *error,
 				unsigned long true_offset);
 
+/*
+ * Type used in stacktrace capturing
+ */
+struct call_t {
+       struct call_t* next;
+       char *output_line;
+};
+
+struct queue_t {
+       struct call_t *tail;
+       struct call_t *head;
+};
+static void queue_print(struct queue_t *queue);
 
 static unw_addr_space_t libunwind_as;
 
@@ -79,12 +92,23 @@ unwind_tcb_init(struct tcb *tcp)
 	tcp->libunwind_ui = _UPT_create(tcp->pid);
 	if (!tcp->libunwind_ui)
 		die_out_of_memory();
+
+	tcp->queue = malloc(sizeof(*tcp->queue));
+	if (!tcp->queue)
+		die_out_of_memory();
+	tcp->queue->head = NULL;
+	tcp->queue->tail = NULL;
 }
 
 void
 unwind_tcb_fin(struct tcb *tcp)
 {
+	queue_print(tcp->queue);
+	free(tcp->queue);
+	tcp->queue = NULL;
+
 	unwind_cache_invalidate(tcp);
+
 	_UPT_destroy(tcp->libunwind_ui);
 	tcp->libunwind_ui = NULL;
 }
@@ -298,7 +322,7 @@ ret:
 }
 
 /*
- * printing an entry in stack
+ * printing an entry in stack to stream or buffer
  */
 /*
  * we want to keep the format used by backtrace_symbols from the glibc
@@ -355,11 +379,137 @@ print_error_cb(void *dummy,
 	line_ended();
 }
 
+static char *
+sprint_call_or_error(char *binary_filename,
+		     char *symbol_name,
+		     unw_word_t function_off_set,
+		     unsigned long true_offset,
+		     const char *error)
+{
+       char *output_line = NULL;
+       int n;
+
+       if (symbol_name)
+               n = asprintf(&output_line, STACK_ENTRY_SYMBOL_FMT);
+       else if (binary_filename)
+               n = asprintf(&output_line, STACK_ENTRY_NOSYMBOL_FMT);
+       else if (error)
+               n = true_offset
+                       ? asprintf(&output_line, STACK_ENTRY_ERROR_WITH_OFFSET_FMT)
+                       : asprintf(&output_line, STACK_ENTRY_ERROR_FMT);
+       else
+               n = asprintf(&output_line, STACK_ENTRY_BUG_FMT, __FUNCTION__);
+
+       if (n < 0)
+               error_msg_and_die("error in asprintf");
+
+       return output_line;
+}
+
+/*
+ * queue manipulators
+ */
+static void
+queue_put(struct queue_t *queue,
+	  char *binary_filename,
+	  char *symbol_name,
+	  unw_word_t function_off_set,
+	  unsigned long true_offset,
+	  const char *error)
+{
+	struct call_t *call;
+
+	call = malloc(sizeof(*call));
+	if (!call)
+		die_out_of_memory();
+
+	call->output_line = sprint_call_or_error(binary_filename,
+						 symbol_name,
+						 function_off_set,
+						 true_offset,
+						 error);
+	call->next = NULL;
+
+	if (!queue->head) {
+		queue->head = call;
+		queue->tail = call;
+	} else {
+		queue->tail->next = call;
+		queue->tail = call;
+	}
+}
+
+static void
+queue_put_call(void *queue,
+	       char *binary_filename,
+	       char *symbol_name,
+	       unw_word_t function_off_set,
+	       unsigned long true_offset)
+{
+	queue_put(queue,
+		  binary_filename,
+		  symbol_name,
+		  function_off_set,
+		  true_offset,
+		  NULL);
+}
+
+static void
+queue_put_error(void *queue,
+		const char *error,
+		unw_word_t ip)
+{
+	queue_put(queue, NULL, NULL, 0, ip, error);
+}
+
+static void
+queue_print(struct queue_t *queue)
+{
+	struct call_t *call, *tmp;
+
+	queue->tail = NULL;
+	call = queue->head;
+	queue->head = NULL;
+	while (call) {
+		tmp = call;
+		call = call->next;
+
+		tprints(tmp->output_line);
+		line_ended();
+
+		free(tmp->output_line);
+		tmp->output_line = NULL;
+		tmp->next = NULL;
+		free(tmp);
+	}
+}
+
 /*
  * printing stack
  */
 void
 unwind_print_stacktrace(struct tcb* tcp)
 {
-	stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
+       if (tcp->queue->head) {
+	       DPRINTF("tcp=%p, queue=%p", "queueprint", tcp, tcp->queue->head);
+	       queue_print(tcp->queue);
+       }
+       else {
+               DPRINTF("tcp=%p, queue=%p", "stackprint", tcp, tcp->queue->head);
+               stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
+       }
+}
+
+/*
+ * capturing stack
+ */
+void
+unwind_capture_stacktrace(struct tcb *tcp)
+{
+	if (tcp->queue->head)
+		error_msg_and_die("bug: unprinted entries in queue");
+
+	stacktrace_walk(tcp, queue_put_call, queue_put_error,
+			tcp->queue);
+	DPRINTF("tcp=%p, queue=%p", "captured", tcp, tcp->queue->head);
 }

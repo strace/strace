@@ -61,8 +61,10 @@ print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
 {
 	if (entering(tcp)) {
 #ifdef USE_LIBUNWIND
-		if (stack_trace_enabled)
+		if (stack_trace_enabled) {
+			unwind_capture_stacktrace(tcp);
 			unwind_cache_invalidate(tcp);
+		}
 #endif
 
 		/* addr */
@@ -193,6 +195,10 @@ sys_munmap(struct tcb *tcp)
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu",
 			tcp->u_arg[0], tcp->u_arg[1]);
+#ifdef USE_LIBUNWIND
+		if (stack_trace_enabled)
+			unwind_capture_stacktrace(tcp);
+#endif
 	}
 #ifdef USE_LIBUNWIND
 	else {
@@ -210,6 +216,10 @@ sys_mprotect(struct tcb *tcp)
 		tprintf("%#lx, %lu, ",
 			tcp->u_arg[0], tcp->u_arg[1]);
 		printflags(mmap_prot, tcp->u_arg[2], "PROT_???");
+#ifdef USE_LIBUNWIND
+		if (stack_trace_enabled)
+			unwind_capture_stacktrace(tcp);
+#endif
 	}
 #ifdef USE_LIBUNWIND
 	else {

@@ -430,6 +430,7 @@ struct tcb {
 	struct UPT_info* libunwind_ui;
 	struct mmap_cache_t* mmap_cache;
 	unsigned int mmap_cache_size;
+	struct queue_t* queue;
 #endif
 };
 
@@ -737,6 +738,7 @@ extern void unwind_tcb_init(struct tcb *tcp);
 extern void unwind_tcb_fin(struct tcb *tcp);
 extern void unwind_cache_invalidate(struct tcb* tcp);
 extern void unwind_print_stacktrace(struct tcb* tcp);
+extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
 
 /* Strace log generation machinery.
