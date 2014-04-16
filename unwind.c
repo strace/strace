@@ -48,6 +48,19 @@ struct mmap_cache_t {
 	char* binary_filename;
 };
 
+/*
+ * Type used in stacktrace walker
+ */
+typedef void (*call_action_fn)(void *data,
+			       char *binary_filename,
+			       char *symbol_name,
+			       unw_word_t function_off_set,
+			       unsigned long true_offset);
+typedef void (*error_action_fn)(void *data,
+				const char *error,
+				unsigned long true_offset);
+
+
 static unw_addr_space_t libunwind_as;
 
 void
@@ -169,9 +182,14 @@ unwind_cache_invalidate(struct tcb* tcp)
 	tcp->mmap_cache_size = 0;
 }
 
-/* use libunwind to unwind the stack and print a backtrace */
-void
-unwind_print_stacktrace(struct tcb* tcp)
+/*
+ * walking the stack
+ */
+static void
+stacktrace_walk(struct tcb *tcp,
+		call_action_fn call_action,
+		error_action_fn error_action,
+		void *data)
 {
 	unw_word_t ip;
 	unw_cursor_t cursor;
@@ -228,23 +246,18 @@ unwind_print_stacktrace(struct tcb* tcp)
 				true_offset = ip - cur_mmap_cache->start_addr +
 					cur_mmap_cache->mmap_offset;
 				if (symbol_name[0]) {
-					/*
-					 * we want to keep the format used by backtrace_symbols from the glibc
-					 *
-					 * ./a.out() [0x40063d]
-					 * ./a.out() [0x4006bb]
-					 * ./a.out() [0x4006c6]
-					 * /lib64/libc.so.6(__libc_start_main+0xed) [0x7fa2f8a5976d]
-					 * ./a.out() [0x400569]
-					 */
-					tprintf(" > %s(%s+0x%lx) [0x%lx]\n",
-						cur_mmap_cache->binary_filename,
-						symbol_name, function_off_set, true_offset);
+					call_action(data,
+						    cur_mmap_cache->binary_filename,
+						    symbol_name,
+						    function_off_set,
+						    true_offset);
 				} else {
-					tprintf(" > %s() [0x%lx]\n",
-						cur_mmap_cache->binary_filename, true_offset);
+					call_action(data,
+						    cur_mmap_cache->binary_filename,
+						    symbol_name,
+						    0,
+						    true_offset);
 				}
-				line_ended();
 				break; /* stack frame printed */
 			}
 			else if (mid == 0) {
@@ -254,8 +267,8 @@ unwind_print_stacktrace(struct tcb* tcp)
 				 * unw_get_reg returns IP == 0
 				 */
 				if(ip)
-					tprintf(" > backtracing_error\n");
-				line_ended();
+					error_action(data,
+						     "backtracing_error", 0);
 				goto ret;
 			}
 			else if (ip < cur_mmap_cache->start_addr)
@@ -265,19 +278,86 @@ unwind_print_stacktrace(struct tcb* tcp)
 
 		}
 		if (lower > upper) {
-			tprintf(" > backtracing_error [0x%lx]\n", ip);
-			line_ended();
+			error_action(data,
+				     "backtracing_error", ip);
 			goto ret;
 		}
 
 		ret_val = unw_step(&cursor);
 
 		if (++stack_depth > 255) {
-			tprintf("> too many stack frames\n");
-			line_ended();
+			error_action(data,
+				     "too many stack frames", 0);
 			break;
 		}
 	} while (ret_val > 0);
 ret:
 	free(symbol_name);
+}
+
+/*
+ * printing an entry in stack
+ */
+/*
+ * we want to keep the format used by backtrace_symbols from the glibc
+ *
+ * ./a.out() [0x40063d]
+ * ./a.out() [0x4006bb]
+ * ./a.out() [0x4006c6]
+ * /lib64/libc.so.6(__libc_start_main+0xed) [0x7fa2f8a5976d]
+ * ./a.out() [0x400569]
+ */
+#define STACK_ENTRY_SYMBOL_FMT			\
+	" > %s(%s+0x%lx) [0x%lx]\n",		\
+	binary_filename,			\
+	symbol_name,				\
+	function_off_set,			\
+	true_offset
+#define STACK_ENTRY_NOSYMBOL_FMT		\
+	" > %s() [0x%lx]\n",			\
+	binary_filename, true_offset
+#define STACK_ENTRY_BUG_FMT			\
+	" > BUG IN %s\n"
+#define STACK_ENTRY_ERROR_WITH_OFFSET_FMT	\
+	" > %s [0x%lx]\n", error, true_offset
+#define STACK_ENTRY_ERROR_FMT			\
+	" > %s\n", error
+
+static void
+print_call_cb(void *dummy,
+	      char *binary_filename,
+	      char *symbol_name,
+	      unw_word_t function_off_set,
+	      unsigned long true_offset)
+{
+	if (symbol_name)
+		tprintf(STACK_ENTRY_SYMBOL_FMT);
+	else if (binary_filename)
+		tprintf(STACK_ENTRY_NOSYMBOL_FMT);
+	else
+		tprintf(STACK_ENTRY_BUG_FMT, __FUNCTION__);
+
+	line_ended();
+}
+
+static void
+print_error_cb(void *dummy,
+	       const char *error,
+	       unsigned long true_offset)
+{
+	if (true_offset)
+		tprintf(STACK_ENTRY_ERROR_WITH_OFFSET_FMT);
+	else
+		tprintf(STACK_ENTRY_ERROR_FMT);
+
+	line_ended();
+}
+
+/*
+ * printing stack
+ */
+void
+unwind_print_stacktrace(struct tcb* tcp)
+{
+	stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
 }
