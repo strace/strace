@@ -51,7 +51,7 @@ struct mmap_cache_t {
 static unw_addr_space_t libunwind_as;
 
 void
-init_unwind_addr_space(void)
+unwind_init(void)
 {
 	libunwind_as = unw_create_addr_space(&_UPT_accessors, 0);
 	if (!libunwind_as)
@@ -59,7 +59,7 @@ init_unwind_addr_space(void)
 }
 
 void
-init_libunwind_ui(struct tcb *tcp)
+unwind_tcb_init(struct tcb *tcp)
 {
 	tcp->libunwind_ui = _UPT_create(tcp->pid);
 	if (!tcp->libunwind_ui)
@@ -67,9 +67,9 @@ init_libunwind_ui(struct tcb *tcp)
 }
 
 void
-free_libunwind_ui(struct tcb *tcp)
+unwind_tcb_fin(struct tcb *tcp)
 {
-	delete_mmap_cache(tcp);
+	unwind_cache_invalidate(tcp);
 	_UPT_destroy(tcp->libunwind_ui);
 	tcp->libunwind_ui = NULL;
 }
@@ -157,7 +157,7 @@ alloc_mmap_cache(struct tcb* tcp)
 
 /* deleting the cache */
 void
-delete_mmap_cache(struct tcb* tcp)
+unwind_cache_invalidate(struct tcb* tcp)
 {
 	unsigned int i;
 	for (i = 0; i < tcp->mmap_cache_size; i++) {
@@ -171,7 +171,7 @@ delete_mmap_cache(struct tcb* tcp)
 
 /* use libunwind to unwind the stack and print a backtrace */
 void
-print_stacktrace(struct tcb* tcp)
+unwind_print_stacktrace(struct tcb* tcp)
 {
 	unw_word_t ip;
 	unw_cursor_t cursor;

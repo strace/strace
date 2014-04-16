@@ -2708,7 +2708,7 @@ trace_syscall_exiting(struct tcb *tcp)
 
 #ifdef USE_LIBUNWIND
 	if (stack_trace_enabled)
-		print_stacktrace(tcp);
+		unwind_print_stacktrace(tcp);
 #endif
 
  ret:
