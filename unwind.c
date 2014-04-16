@@ -69,6 +69,7 @@ init_libunwind_ui(struct tcb *tcp)
 void
 free_libunwind_ui(struct tcb *tcp)
 {
+	delete_mmap_cache(tcp);
 	_UPT_destroy(tcp->libunwind_ui);
 	tcp->libunwind_ui = NULL;
 }
