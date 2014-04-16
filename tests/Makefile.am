@@ -2,7 +2,9 @@
 
 AM_CFLAGS = $(WARN_CFLAGS)
 
-check_PROGRAMS = net-accept-connect set_ptracer_any sigaction
+check_PROGRAMS = net-accept-connect set_ptracer_any sigaction uio
+
+uio_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 
 TESTS = \
 	ptrace_setoptions.test \
@@ -12,6 +14,7 @@ TESTS = \
 	stat.test \
 	net.test \
 	net-fd.test \
+	uio.test \
 	detach-sleeping.test \
 	detach-stopped.test \
 	detach-running.test

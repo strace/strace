@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Check how pread/pwrite and preadv/pwritev syscalls are traced.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+check_prog rm
+
+./uio ||
+	fail_ 'uio failed'
+
+args="-edesc ./uio"
+$STRACE $args > $LOG 2>&1 || {
+	cat $LOG
+	fail_ "$STRACE $args failed"
+}
+
+grep_log()
+{
+	local syscall="$1"; shift
+
+	LC_ALL=C grep -E -x "$syscall$*" $LOG > /dev/null || {
+		cat $LOG
+		fail_ "$STRACE $args failed to trace \"$syscall\" properly"
+	}
+}
+
+grep_log 'pread(64)?' '\(3, "\\0\\0\\0\\0", 4, 1004211379570065135\) += 4'
+grep_log 'preadv' '\(3, \[{"\\0\\0\\0\\0", 4}\], 1, 1004211379570065135\) += 4'
+grep_log 'pwrite(64)?' '\(3, "\\0\\0\\0\\0", 4, 1004211379570065135\) += 4'
+grep_log 'pwritev' '\(3, \[{"\\0\\0\\0\\0", 4}\], 1, 1004211379570065135\) += 4'
+
+exit 0
