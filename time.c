@@ -665,6 +665,21 @@ static const struct xlat clocknames[] = {
 #ifdef CLOCK_MONOTONIC_COARSE
 	XLAT(CLOCK_MONOTONIC_COARSE),
 #endif
+#ifdef CLOCK_BOOTTIME
+	XLAT(CLOCK_BOOTTIME),
+#endif
+#ifdef CLOCK_REALTIME_ALARM
+	XLAT(CLOCK_REALTIME_ALARM),
+#endif
+#ifdef CLOCK_BOOTTIME_ALARM
+	XLAT(CLOCK_BOOTTIME_ALARM),
+#endif
+#ifdef CLOCK_SGI_CYCLE
+	XLAT(CLOCK_SGI_CYCLE),
+#endif
+#ifdef CLOCK_TAI
+	XLAT(CLOCK_TAI),
+#endif
 	XLAT_END
 };
 
