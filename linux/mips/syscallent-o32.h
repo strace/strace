@@ -330,8 +330,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 4327 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 4328 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 4329 */
-	{ 6,	TD,	sys_preadv,		"preadv"	}, /* 4330 */
-	{ 6,	TD,	sys_pwritev,		"pwritev"	}, /* 4331 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 4330 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 4331 */
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo" }, /* 4332 */
 	{ 5,	TD,	sys_perf_event_open,	"perf_event_open" }, /* 4333 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 4334 */
@@ -680,8 +680,8 @@
 	{ 3,	TD,	printargs,		"o32_dup3"	}, /* 4327 */
 	{ 2,	TD,	printargs,		"o32_pipe2"	}, /* 4328 */
 	{ 1,	TD,	printargs,		"o32_inotify_init1" }, /* 4329 */
-	{ 6,	TD,	printargs,		"o32_preadv"	}, /* 4330 */
-	{ 6,	TD,	printargs,		"o32_pwritev"	}, /* 4331 */
+	{ 5,	TD,	printargs,		"o32_preadv"	}, /* 4330 */
+	{ 5,	TD,	printargs,		"o32_pwritev"	}, /* 4331 */
 	{ 4,	TP|TS,	printargs,		"o32_rt_tgsigqueueinfo" }, /* 4332 */
 	{ 5,	TD,	printargs,		"o32_perf_event_open" }, /* 4333 */
 	{ 4,	TN,	printargs,		"o32_accept4"	}, /* 4334 */

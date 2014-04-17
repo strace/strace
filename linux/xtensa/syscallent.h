@@ -307,8 +307,8 @@
 	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 314 */
 	{ 0,	0,	printargs,		"SYS_315"	}, /* 315 */
 	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 316 */
-	{ 6,	TD,	sys_preadv,		"preadv"	}, /* 317 */
-	{ 6,	TD,	sys_pwritev,		"pwritev"	}, /* 318 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 317 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 318 */
 	[319] = { },
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 320 */
 	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 321 */

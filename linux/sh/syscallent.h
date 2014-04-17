@@ -363,8 +363,8 @@
 	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 330 */
 	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 331 */
 	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 332 */
-	{ 6,	TD,	sys_preadv,		"preadv"	}, /* 333 */
-	{ 6,	TD,	sys_pwritev,		"pwritev"	}, /* 334 */
+	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 333 */
+	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 334 */
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"}, /* 335 */
 	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"}, /* 336 */
 	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 337 */

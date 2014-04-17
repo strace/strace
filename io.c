@@ -199,7 +199,7 @@ sys_pread(struct tcb *tcp)
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+		printllval_aligned(tcp, "%llu", PREAD_OFFSET_ARG);
 	}
 	return 0;
 }
@@ -212,7 +212,7 @@ sys_pwrite(struct tcb *tcp)
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+		printllval_aligned(tcp, "%llu", PREAD_OFFSET_ARG);
 	}
 	return 0;
 }
@@ -231,7 +231,7 @@ sys_preadv(struct tcb *tcp)
 		}
 		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+		printllval_unaligned(tcp, "%llu", 3);
 	}
 	return 0;
 }
@@ -244,7 +244,7 @@ sys_pwritev(struct tcb *tcp)
 		tprints(", ");
 		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+		printllval_unaligned(tcp, "%llu", 3);
 	}
 	return 0;
 }
