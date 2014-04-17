@@ -731,11 +731,15 @@ sys_epoll_ctl(struct tcb *tcp)
 		else {
 #ifdef HAVE_SYS_EPOLL_H
 			struct epoll_event ev;
-			if (umove(tcp, tcp->u_arg[3], &ev) == 0)
+			if (
+#ifdef EPOLL_CTL_DEL
+			    (tcp->u_arg[1] != EPOLL_CTL_DEL) &&
+#endif
+			    umove(tcp, tcp->u_arg[3], &ev) == 0)
 				print_epoll_event(&ev);
 			else
 #endif
-				tprints("{...}");
+				tprintf("%lx", tcp->u_arg[3]);
 		}
 	}
 	return 0;
