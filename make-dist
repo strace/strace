@@ -16,7 +16,7 @@ git checkout -f "$tag"
 
 ./git-set-file-times
 
-autoreconf -i -f
+./bootstrap
 
 ./configure --enable-maintainer-mode
 

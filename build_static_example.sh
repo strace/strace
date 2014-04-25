@@ -24,6 +24,6 @@ export CFLAGS="-Os\
  -Wl,-Map=strace.mapfile\
 "
 
-autoreconf -i -f
+./bootstrap
 ./configure $BUILDFLAG #--enable-maintainer-mode
 make CC="$CC" CFLAGS="$CFLAGS"
