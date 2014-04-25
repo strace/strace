@@ -69,7 +69,7 @@ struct module_info
 	long usecount;
 };
 
-static const struct xlat which[] = {
+static const struct xlat qm_which[] = {
 	XLAT(0),
 	XLAT(QM_MODULES),
 	XLAT(QM_DEPS),
@@ -96,7 +96,7 @@ sys_query_module(struct tcb *tcp)
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);
 		tprints(", ");
-		printxval(which, tcp->u_arg[1], "QM_???");
+		printxval(qm_which, tcp->u_arg[1], "QM_???");
 		tprints(", ");
 	} else {
 		size_t ret;

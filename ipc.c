@@ -129,7 +129,7 @@ static const struct xlat shm_flags[] = {
 	XLAT_END
 };
 
-static const struct xlat msg_flags[] = {
+static const struct xlat ipc_msg_flags[] = {
 	XLAT(MSG_NOERROR),
 	XLAT(MSG_EXCEPT),
 	XLAT(IPC_NOWAIT),
@@ -203,7 +203,7 @@ tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count,
 		tprints("}");
 	}
 	tprintf(", %lu, ", count);
-	printflags(msg_flags, flags, "MSG_???");
+	printflags(ipc_msg_flags, flags, "MSG_???");
 }
 
 int sys_msgsnd(struct tcb *tcp)
@@ -254,11 +254,11 @@ int sys_msgrcv(struct tcb *tcp)
 				tprint_msgrcv(tcp, (long) tmp.msgp,
 					tcp->u_arg[1], tmp.msgtyp);
 			}
-			printflags(msg_flags, tcp->u_arg[2], "MSG_???");
+			printflags(ipc_msg_flags, tcp->u_arg[2], "MSG_???");
 		} else {
 			tprint_msgrcv(tcp, tcp->u_arg[1],
 				tcp->u_arg[2], tcp->u_arg[3]);
-			printflags(msg_flags, tcp->u_arg[4], "MSG_???");
+			printflags(ipc_msg_flags, tcp->u_arg[4], "MSG_???");
 		}
 	}
 	return 0;

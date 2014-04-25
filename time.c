@@ -279,7 +279,7 @@ sys_nanosleep(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat which[] = {
+static const struct xlat itimer_which[] = {
 	XLAT(ITIMER_REAL),
 	XLAT(ITIMER_VIRTUAL),
 	XLAT(ITIMER_PROF),
@@ -338,7 +338,7 @@ int
 sys_getitimer(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(which, tcp->u_arg[0], "ITIMER_???");
+		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
 	} else {
 		if (syserror(tcp))
@@ -354,7 +354,7 @@ int
 sys_osf_getitimer(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(which, tcp->u_arg[0], "ITIMER_???");
+		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
 	} else {
 		if (syserror(tcp))
@@ -370,7 +370,7 @@ int
 sys_setitimer(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(which, tcp->u_arg[0], "ITIMER_???");
+		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
 		printitv(tcp, tcp->u_arg[1]);
 		tprints(", ");
@@ -388,7 +388,7 @@ int
 sys_osf_setitimer(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printxval(which, tcp->u_arg[0], "ITIMER_???");
+		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
 		printitv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
 		tprints(", ");
