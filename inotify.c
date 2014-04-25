@@ -2,38 +2,9 @@
 #include <fcntl.h>
 #include <linux/inotify.h>
 
-static const struct xlat inotify_flags[] = {
-	XLAT(IN_ACCESS),
-	XLAT(IN_MODIFY),
-	XLAT(IN_ATTRIB),
-	XLAT(IN_CLOSE),
-	XLAT(IN_CLOSE_WRITE),
-	XLAT(IN_CLOSE_NOWRITE),
-	XLAT(IN_OPEN),
-	XLAT(IN_MOVE),
-	XLAT(IN_MOVED_FROM),
-	XLAT(IN_MOVED_TO),
-	XLAT(IN_CREATE),
-	XLAT(IN_DELETE),
-	XLAT(IN_DELETE_SELF),
-	XLAT(IN_MOVE_SELF),
-	XLAT(IN_UNMOUNT),
-	XLAT(IN_Q_OVERFLOW),
-	XLAT(IN_IGNORED),
-	XLAT(IN_ONLYDIR),
-	XLAT(IN_DONT_FOLLOW),
-	XLAT(IN_EXCL_UNLINK),
-	XLAT(IN_MASK_ADD),
-	XLAT(IN_ISDIR),
-	XLAT(IN_ONESHOT),
-	XLAT_END
-};
+#include "xlat/inotify_flags.h"
 
-static const struct xlat inotify_init_flags[] = {
-	XLAT(O_NONBLOCK),
-	XLAT(O_CLOEXEC),
-	XLAT_END
-};
+#include "xlat/inotify_init_flags.h"
 
 int
 sys_inotify_add_watch(struct tcb *tcp)

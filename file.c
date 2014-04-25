@@ -211,119 +211,9 @@ struct kernel_dirent {
 	char            d_name[1];
 };
 
-const struct xlat open_access_modes[] = {
-	XLAT(O_RDONLY),
-	XLAT(O_WRONLY),
-	XLAT(O_RDWR),
-#ifdef O_ACCMODE
-	XLAT(O_ACCMODE),
-#endif
-	XLAT_END
-};
+#include "xlat/open_access_modes.h"
 
-const struct xlat open_mode_flags[] = {
-	XLAT(O_CREAT),
-	XLAT(O_EXCL),
-	XLAT(O_NOCTTY),
-	XLAT(O_TRUNC),
-	XLAT(O_APPEND),
-	XLAT(O_NONBLOCK),
-#ifdef O_SYNC
-	XLAT(O_SYNC),
-#endif
-#ifdef O_ASYNC
-	XLAT(O_ASYNC),
-#endif
-#ifdef O_DSYNC
-	XLAT(O_DSYNC),
-#endif
-#ifdef O_RSYNC
-	XLAT(O_RSYNC),
-#endif
-#if defined(O_NDELAY) && (O_NDELAY != O_NONBLOCK)
-	XLAT(O_NDELAY),
-#endif
-#ifdef O_PRIV
-	XLAT(O_PRIV),
-#endif
-#ifdef O_DIRECT
-	XLAT(O_DIRECT),
-#endif
-#ifdef O_LARGEFILE
-# if O_LARGEFILE == 0		/* biarch platforms in 64-bit mode */
-#  undef O_LARGEFILE
-#  ifdef SPARC64
-#   define O_LARGEFILE	0x40000
-#  elif defined X86_64 || defined S390X
-#   define O_LARGEFILE	0100000
-#  endif
-# endif
-# ifdef O_LARGEFILE
-	XLAT(O_LARGEFILE),
-# endif
-#endif
-#ifdef O_DIRECTORY
-	XLAT(O_DIRECTORY),
-#endif
-#ifdef O_NOFOLLOW
-	XLAT(O_NOFOLLOW),
-#endif
-#ifdef O_NOATIME
-	XLAT(O_NOATIME),
-#endif
-#ifdef O_CLOEXEC
-	XLAT(O_CLOEXEC),
-#endif
-#ifdef O_PATH
-	XLAT(O_PATH),
-#endif
-#ifdef FNDELAY
-	XLAT(FNDELAY),
-#endif
-#ifdef FAPPEND
-	XLAT(FAPPEND),
-#endif
-#ifdef FMARK
-	XLAT(FMARK),
-#endif
-#ifdef FDEFER
-	XLAT(FDEFER),
-#endif
-#ifdef FASYNC
-	XLAT(FASYNC),
-#endif
-#ifdef FSHLOCK
-	XLAT(FSHLOCK),
-#endif
-#ifdef FEXLOCK
-	XLAT(FEXLOCK),
-#endif
-#ifdef FCREAT
-	XLAT(FCREAT),
-#endif
-#ifdef FTRUNC
-	XLAT(FTRUNC),
-#endif
-#ifdef FEXCL
-	XLAT(FEXCL),
-#endif
-#ifdef FNBIO
-	XLAT(FNBIO),
-#endif
-#ifdef FSYNC
-	XLAT(FSYNC),
-#endif
-#ifdef FNOCTTY
-	XLAT(FNOCTTY),
-#endif
-#ifdef O_SHLOCK
-	XLAT(O_SHLOCK),
-#endif
-#ifdef O_EXLOCK
-	XLAT(O_EXLOCK),
-#endif
-	XLAT_END
-};
+#include "xlat/open_mode_flags.h"
 
 #ifndef AT_FDCWD
 # define AT_FDCWD                -100
@@ -421,23 +311,7 @@ sys_openat(struct tcb *tcp)
 }
 
 #if defined(SPARC) || defined(SPARC64)
-static const struct xlat openmodessol[] = {
-	{ 0,		"O_RDWR"	},
-	{ 1,		"O_RDONLY"	},
-	{ 2,		"O_WRONLY"	},
-	{ 0x80,		"O_NONBLOCK"	},
-	{ 8,		"O_APPEND"	},
-	{ 0x100,	"O_CREAT"	},
-	{ 0x200,	"O_TRUNC"	},
-	{ 0x400,	"O_EXCL"	},
-	{ 0x800,	"O_NOCTTY"	},
-	{ 0x10,		"O_SYNC"	},
-	{ 0x40,		"O_DSYNC"	},
-	{ 0x8000,	"O_RSYNC"	},
-	{ 4,		"O_NDELAY"	},
-	{ 0x1000,	"O_PRIV"	},
-	XLAT_END
-};
+#include "xlat/openmodessol.h"
 
 int
 solaris_open(struct tcb *tcp)
@@ -467,19 +341,7 @@ sys_creat(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat access_flags[] = {
-	XLAT(F_OK),
-	XLAT(R_OK),
-	XLAT(W_OK),
-	XLAT(X_OK),
-#ifdef EFF_ONLY_OK
-	XLAT(EFF_ONLY_OK),
-#endif
-#ifdef EX_OK
-	XLAT(EX_OK),
-#endif
-	XLAT_END
-};
+#include "xlat/access_flags.h"
 
 static int
 decode_access(struct tcb *tcp, int offset)
@@ -515,18 +377,7 @@ sys_umask(struct tcb *tcp)
 	return RVAL_OCTAL;
 }
 
-const struct xlat whence_codes[] = {
-	XLAT(SEEK_SET),
-	XLAT(SEEK_CUR),
-	XLAT(SEEK_END),
-#ifdef SEEK_DATA
-	XLAT(SEEK_DATA),
-#endif
-#ifdef SEEK_HOLE
-	XLAT(SEEK_HOLE),
-#endif
-	XLAT_END
-};
+#include "xlat/whence_codes.h"
 
 /* Linux kernel has exactly one version of lseek:
  * fs/read_write.c::SYSCALL_DEFINE3(lseek, unsigned, fd, off_t, offset, unsigned, origin)
@@ -667,16 +518,7 @@ sys_ftruncate64(struct tcb *tcp)
 
 /* several stats */
 
-static const struct xlat modetypes[] = {
-	XLAT(S_IFREG),
-	XLAT(S_IFSOCK),
-	XLAT(S_IFIFO),
-	XLAT(S_IFLNK),
-	XLAT(S_IFDIR),
-	XLAT(S_IFBLK),
-	XLAT(S_IFCHR),
-	XLAT_END
-};
+#include "xlat/modetypes.h"
 
 static const char *
 sprintmode(int mode)
@@ -907,9 +749,7 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 }
 #endif /* POWERPC64 */
 
-static const struct xlat fileflags[] = {
-	XLAT_END
-};
+#include "xlat/fileflags.h"
 
 static void
 realprintstat(struct tcb *tcp, struct stat *statbuf)
@@ -1338,14 +1178,7 @@ sys_stat64(struct tcb *tcp)
 # define AT_EMPTY_PATH		0x1000
 #endif
 
-static const struct xlat at_flags[] = {
-	XLAT(AT_SYMLINK_NOFOLLOW),
-	XLAT(AT_REMOVEDIR),
-	XLAT(AT_SYMLINK_FOLLOW),
-	XLAT(AT_NO_AUTOMOUNT),
-	XLAT(AT_EMPTY_PATH),
-	XLAT_END
-};
+#include "xlat/at_flags.h"
 
 int
 sys_newfstatat(struct tcb *tcp)
@@ -1511,27 +1344,7 @@ sys_xmknod(struct tcb *tcp)
 
 #  include <sys/acl.h>
 
-static const struct xlat aclcmds[] = {
-#  ifdef SETACL
-	XLAT(SETACL),
-#  endif
-#  ifdef GETACL
-	XLAT(GETACL),
-#  endif
-#  ifdef GETACLCNT
-	XLAT(GETACLCNT),
-#  endif
-#  ifdef ACL_GET
-	XLAT(ACL_GET),
-#  endif
-#  ifdef ACL_SET
-	XLAT(ACL_SET),
-#  endif
-#  ifdef ACL_CNT
-	XLAT(ACL_CNT),
-#  endif
-	XLAT_END
-};
+#include "xlat/aclcmds.h"
 
 int
 sys_acl(struct tcb *tcp)
@@ -1572,18 +1385,7 @@ sys_facl(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat aclipc[] = {
-#  ifdef IPC_SHM
-	XLAT(IPC_SHM),
-#  endif
-#  ifdef IPC_SEM
-	XLAT(IPC_SEM),
-#  endif
-#  ifdef IPC_MSG
-	XLAT(IPC_MSG),
-#  endif
-	XLAT_END
-};
+#include "xlat/aclipc.h"
 
 int
 sys_aclipc(struct tcb *tcp)
@@ -1609,38 +1411,7 @@ sys_aclipc(struct tcb *tcp)
 
 #endif /* SPARC[64] */
 
-static const struct xlat fsmagic[] = {
-	{ 0x73757245,	"CODA_SUPER_MAGIC"	},
-	{ 0x012ff7b7,	"COH_SUPER_MAGIC"	},
-	{ 0x1373,	"DEVFS_SUPER_MAGIC"	},
-	{ 0x1cd1,	"DEVPTS_SUPER_MAGIC"	},
-	{ 0x414A53,	"EFS_SUPER_MAGIC"	},
-	{ 0xef51,	"EXT2_OLD_SUPER_MAGIC"	},
-	{ 0xef53,	"EXT2_SUPER_MAGIC"	},
-	{ 0x137d,	"EXT_SUPER_MAGIC"	},
-	{ 0xf995e849,	"HPFS_SUPER_MAGIC"	},
-	{ 0x9660,	"ISOFS_SUPER_MAGIC"	},
-	{ 0x137f,	"MINIX_SUPER_MAGIC"	},
-	{ 0x138f,	"MINIX_SUPER_MAGIC2"	},
-	{ 0x2468,	"MINIX2_SUPER_MAGIC"	},
-	{ 0x2478,	"MINIX2_SUPER_MAGIC2"	},
-	{ 0x4d44,	"MSDOS_SUPER_MAGIC"	},
-	{ 0x564c,	"NCP_SUPER_MAGIC"	},
-	{ 0x6969,	"NFS_SUPER_MAGIC"	},
-	{ 0x9fa0,	"PROC_SUPER_MAGIC"	},
-	{ 0x002f,	"QNX4_SUPER_MAGIC"	},
-	{ 0x52654973,	"REISERFS_SUPER_MAGIC"	},
-	{ 0x02011994,	"SHMFS_SUPER_MAGIC"	},
-	{ 0x517b,	"SMB_SUPER_MAGIC"	},
-	{ 0x012ff7b6,	"SYSV2_SUPER_MAGIC"	},
-	{ 0x012ff7b5,	"SYSV4_SUPER_MAGIC"	},
-	{ 0x00011954,	"UFS_MAGIC"		},
-	{ 0x54190100,	"UFS_CIGAM"		},
-	{ 0x012ff7b4,	"XENIX_SUPER_MAGIC"	},
-	{ 0x012fd16d,	"XIAFS_SUPER_MAGIC"	},
-	{ 0x62656572,	"SYSFS_MAGIC"		},
-	XLAT_END
-};
+#include "xlat/fsmagic.h"
 
 static const char *
 sprintfstype(int magic)
@@ -2255,18 +2026,7 @@ sys_readdir(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat direnttypes[] = {
-	XLAT(DT_UNKNOWN),
-	XLAT(DT_FIFO),
-	XLAT(DT_CHR),
-	XLAT(DT_DIR),
-	XLAT(DT_BLK),
-	XLAT(DT_REG),
-	XLAT(DT_LNK),
-	XLAT(DT_SOCK),
-	XLAT(DT_WHT),
-	XLAT_END
-};
+#include "xlat/direnttypes.h"
 
 int
 sys_getdents(struct tcb *tcp)
@@ -2478,13 +2238,7 @@ sys_aiocancel(struct tcb *tcp)
 
 #endif /* HAVE_SYS_ASYNCH_H */
 
-static const struct xlat xattrflags[] = {
-#ifdef XATTR_CREATE
-	XLAT(XATTR_CREATE),
-	XLAT(XATTR_REPLACE),
-#endif
-	XLAT_END
-};
+#include "xlat/xattrflags.h"
 
 static void
 print_xattr_val(struct tcb *tcp, int failed,
@@ -2647,15 +2401,7 @@ sys_fremovexattr(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat advise[] = {
-	XLAT(POSIX_FADV_NORMAL),
-	XLAT(POSIX_FADV_RANDOM),
-	XLAT(POSIX_FADV_SEQUENTIAL),
-	XLAT(POSIX_FADV_WILLNEED),
-	XLAT(POSIX_FADV_DONTNEED),
-	XLAT(POSIX_FADV_NOREUSE),
-	XLAT_END
-};
+#include "xlat/advise.h"
 
 int
 sys_fadvise64(struct tcb *tcp)
@@ -2687,12 +2433,7 @@ sys_fadvise64_64(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat sync_file_range_flags[] = {
-	XLAT(SYNC_FILE_RANGE_WAIT_BEFORE),
-	XLAT(SYNC_FILE_RANGE_WRITE),
-	XLAT(SYNC_FILE_RANGE_WAIT_AFTER),
-	XLAT_END
-};
+#include "xlat/sync_file_range_flags.h"
 
 int
 sys_sync_file_range(struct tcb *tcp)
@@ -2741,11 +2482,7 @@ sys_fallocate(struct tcb *tcp)
 #ifndef SWAP_FLAG_DISCARD
 # define SWAP_FLAG_DISCARD 0x10000
 #endif
-static const struct xlat swap_flags[] = {
-	XLAT(SWAP_FLAG_PREFER),
-	XLAT(SWAP_FLAG_DISCARD),
-	XLAT_END
-};
+#include "xlat/swap_flags.h"
 
 int
 sys_swapon(struct tcb *tcp)

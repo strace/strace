@@ -76,64 +76,18 @@
 #define Q_XQUOTARM	XQM_CMD(0x6)
 #define Q_XQUOTASYNC	XQM_CMD(0x7)
 
-static const struct xlat quotacmds[] = {
-	XLAT(Q_V1_QUOTAON),
-	XLAT(Q_V1_QUOTAOFF),
-	XLAT(Q_V1_GETQUOTA),
-	XLAT(Q_V1_SETQUOTA),
-	XLAT(Q_V1_SETUSE),
-	XLAT(Q_V1_SYNC),
-	XLAT(Q_SETQLIM),
-	XLAT(Q_V1_GETSTATS),
-	XLAT(Q_V1_RSQUASH),
-
-	XLAT(Q_V2_GETQUOTA),
-	XLAT(Q_V2_SETQUOTA),
-	XLAT(Q_V2_SETUSE),
-	XLAT(Q_V2_GETINFO),
-	XLAT(Q_V2_SETINFO),
-	XLAT(Q_V2_SETGRACE),
-	XLAT(Q_V2_SETFLAGS),
-	XLAT(Q_V2_GETSTATS),
-
-	XLAT(Q_SYNC),
-	XLAT(Q_QUOTAON),
-	XLAT(Q_QUOTAOFF),
-	XLAT(Q_GETFMT),
-	XLAT(Q_GETINFO),
-	XLAT(Q_SETINFO),
-	XLAT(Q_GETQUOTA),
-	XLAT(Q_SETQUOTA),
-
-	XLAT(Q_XQUOTAON),
-	XLAT(Q_XQUOTAOFF),
-	XLAT(Q_XGETQUOTA),
-	XLAT(Q_XSETQLIM),
-	XLAT(Q_XGETQSTAT),
-	XLAT(Q_XQUOTARM),
-	XLAT(Q_XQUOTASYNC),
-
-	XLAT_END
-};
+#include "xlat/quotacmds.h"
 
 #define USRQUOTA 0
 #define GRPQUOTA 1
 
-static const struct xlat quotatypes[] = {
-	XLAT(USRQUOTA),
-	XLAT(GRPQUOTA),
-	XLAT_END
-};
+#include "xlat/quotatypes.h"
 
 /* Quota format identifiers */
 #define QFMT_VFS_OLD 1
 #define QFMT_VFS_V0  2
 
-static const struct xlat quota_formats[] = {
-	XLAT(QFMT_VFS_OLD),
-	XLAT(QFMT_VFS_V0),
-	XLAT_END
-};
+#include "xlat/quota_formats.h"
 
 #define XFS_QUOTA_UDQ_ACCT	(1<<0)	/* user quota accounting */
 #define XFS_QUOTA_UDQ_ENFD	(1<<1)	/* user quota limits enforcement */
@@ -144,20 +98,9 @@ static const struct xlat quota_formats[] = {
 #define XFS_PROJ_QUOTA		(1<<1)	/* (IRIX) project quota type */
 #define XFS_GROUP_QUOTA		(1<<2)	/* group quota type */
 
-static const struct xlat xfs_quota_flags[] = {
-	XLAT(XFS_QUOTA_UDQ_ACCT),
-	XLAT(XFS_QUOTA_UDQ_ENFD),
-	XLAT(XFS_QUOTA_GDQ_ACCT),
-	XLAT(XFS_QUOTA_GDQ_ENFD),
-	XLAT_END
-};
+#include "xlat/xfs_quota_flags.h"
 
-static const struct xlat xfs_dqblk_flags[] = {
-	XLAT(XFS_USER_QUOTA),
-	XLAT(XFS_PROJ_QUOTA),
-	XLAT(XFS_GROUP_QUOTA),
-	XLAT_END
-};
+#include "xlat/xfs_dqblk_flags.h"
 
 /*
  * Following flags are used to specify which fields are valid
@@ -169,15 +112,7 @@ static const struct xlat xfs_dqblk_flags[] = {
 #define QIF_BTIME	16
 #define QIF_ITIME	32
 
-static const struct xlat if_dqblk_valid[] = {
-	XLAT(QIF_BLIMITS),
-	XLAT(QIF_SPACE),
-	XLAT(QIF_ILIMITS),
-	XLAT(QIF_INODES),
-	XLAT(QIF_BTIME),
-	XLAT(QIF_ITIME),
-	XLAT_END
-};
+#include "xlat/if_dqblk_valid.h"
 
 struct if_dqblk
 {
@@ -249,12 +184,7 @@ struct xfs_dqblk
 #define IIF_IGRACE	2
 #define IIF_FLAGS	4
 
-static const struct xlat if_dqinfo_valid[] = {
-	XLAT(IIF_BGRACE),
-	XLAT(IIF_IGRACE),
-	XLAT(IIF_FLAGS),
-	XLAT_END
-};
+#include "xlat/if_dqinfo_valid.h"
 
 struct if_dqinfo
 {

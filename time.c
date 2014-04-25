@@ -279,12 +279,7 @@ sys_nanosleep(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat itimer_which[] = {
-	XLAT(ITIMER_REAL),
-	XLAT(ITIMER_VIRTUAL),
-	XLAT(ITIMER_PROF),
-	XLAT_END
-};
+#include "xlat/itimer_which.h"
 
 static void
 printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
@@ -402,123 +397,11 @@ sys_osf_setitimer(struct tcb *tcp)
 }
 #endif
 
-static const struct xlat adjtimex_modes[] = {
-	XLAT(0),
-#ifdef ADJ_OFFSET
-	XLAT(ADJ_OFFSET),
-#endif
-#ifdef ADJ_FREQUENCY
-	XLAT(ADJ_FREQUENCY),
-#endif
-#ifdef ADJ_MAXERROR
-	XLAT(ADJ_MAXERROR),
-#endif
-#ifdef ADJ_ESTERROR
-	XLAT(ADJ_ESTERROR),
-#endif
-#ifdef ADJ_STATUS
-	XLAT(ADJ_STATUS),
-#endif
-#ifdef ADJ_TIMECONST
-	XLAT(ADJ_TIMECONST),
-#endif
-#ifdef ADJ_TAI
-	XLAT(ADJ_TAI),
-#endif
-#ifdef ADJ_SETOFFSET
-	XLAT(ADJ_SETOFFSET),
-#endif
-#ifdef ADJ_MICRO
-	XLAT(ADJ_MICRO),
-#endif
-#ifdef ADJ_NANO
-	XLAT(ADJ_NANO),
-#endif
-#ifdef ADJ_TICK
-	XLAT(ADJ_TICK),
-#endif
-#ifdef ADJ_OFFSET_SINGLESHOT
-	XLAT(ADJ_OFFSET_SINGLESHOT),
-#endif
-#ifdef ADJ_OFFSET_SS_READ
-	XLAT(ADJ_OFFSET_SS_READ),
-#endif
-	XLAT_END
-};
+#include "xlat/adjtimex_modes.h"
 
-static const struct xlat adjtimex_status[] = {
-#ifdef STA_PLL
-	XLAT(STA_PLL),
-#endif
-#ifdef STA_PPSFREQ
-	XLAT(STA_PPSFREQ),
-#endif
-#ifdef STA_PPSTIME
-	XLAT(STA_PPSTIME),
-#endif
-#ifdef STA_FLL
-	XLAT(STA_FLL),
-#endif
-#ifdef STA_INS
-	XLAT(STA_INS),
-#endif
-#ifdef STA_DEL
-	XLAT(STA_DEL),
-#endif
-#ifdef STA_UNSYNC
-	XLAT(STA_UNSYNC),
-#endif
-#ifdef STA_FREQHOLD
-	XLAT(STA_FREQHOLD),
-#endif
-#ifdef STA_PPSSIGNAL
-	XLAT(STA_PPSSIGNAL),
-#endif
-#ifdef STA_PPSJITTER
-	XLAT(STA_PPSJITTER),
-#endif
-#ifdef STA_PPSWANDER
-	XLAT(STA_PPSWANDER),
-#endif
-#ifdef STA_PPSERROR
-	XLAT(STA_PPSERROR),
-#endif
-#ifdef STA_CLOCKERR
-	XLAT(STA_CLOCKERR),
-#endif
-#ifdef STA_NANO
-	XLAT(STA_NANO),
-#endif
-#ifdef STA_MODE
-	XLAT(STA_MODE),
-#endif
-#ifdef STA_CLK
-	XLAT(STA_CLK),
-#endif
-	XLAT_END
-};
+#include "xlat/adjtimex_status.h"
 
-static const struct xlat adjtimex_state[] = {
-#ifdef TIME_OK
-	XLAT(TIME_OK),
-#endif
-#ifdef TIME_INS
-	XLAT(TIME_INS),
-#endif
-#ifdef TIME_DEL
-	XLAT(TIME_DEL),
-#endif
-#ifdef TIME_OOP
-	XLAT(TIME_OOP),
-#endif
-#ifdef TIME_WAIT
-	XLAT(TIME_WAIT),
-#endif
-#ifdef TIME_ERROR
-	XLAT(TIME_ERROR),
-#endif
-	XLAT_END
-};
+#include "xlat/adjtimex_state.h"
 
 #if SUPPORTED_PERSONALITIES > 1
 static int
@@ -638,58 +521,12 @@ sys_adjtimex(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat clockflags[] = {
-	XLAT(TIMER_ABSTIME),
-	XLAT_END
-};
+#include "xlat/clockflags.h"
 
-static const struct xlat clocknames[] = {
-#ifdef CLOCK_REALTIME
-	XLAT(CLOCK_REALTIME),
-#endif
-#ifdef CLOCK_MONOTONIC
-	XLAT(CLOCK_MONOTONIC),
-#endif
-#ifdef CLOCK_PROCESS_CPUTIME_ID
-	XLAT(CLOCK_PROCESS_CPUTIME_ID),
-#endif
-#ifdef CLOCK_THREAD_CPUTIME_ID
-	XLAT(CLOCK_THREAD_CPUTIME_ID),
-#endif
-#ifdef CLOCK_MONOTONIC_RAW
-	XLAT(CLOCK_MONOTONIC_RAW),
-#endif
-#ifdef CLOCK_REALTIME_COARSE
-	XLAT(CLOCK_REALTIME_COARSE),
-#endif
-#ifdef CLOCK_MONOTONIC_COARSE
-	XLAT(CLOCK_MONOTONIC_COARSE),
-#endif
-#ifdef CLOCK_BOOTTIME
-	XLAT(CLOCK_BOOTTIME),
-#endif
-#ifdef CLOCK_REALTIME_ALARM
-	XLAT(CLOCK_REALTIME_ALARM),
-#endif
-#ifdef CLOCK_BOOTTIME_ALARM
-	XLAT(CLOCK_BOOTTIME_ALARM),
-#endif
-#ifdef CLOCK_SGI_CYCLE
-	XLAT(CLOCK_SGI_CYCLE),
-#endif
-#ifdef CLOCK_TAI
-	XLAT(CLOCK_TAI),
-#endif
-	XLAT_END
-};
+#include "xlat/clocknames.h"
 
 #ifdef CLOCKID_TO_FD
-static const struct xlat cpuclocknames[] = {
-	XLAT(CPUCLOCK_PROF),
-	XLAT(CPUCLOCK_VIRT),
-	XLAT(CPUCLOCK_SCHED),
-	XLAT_END
-};
+#include "xlat/cpuclocknames.h"
 #endif
 
 static void
@@ -771,13 +608,7 @@ sys_clock_adjtime(struct tcb *tcp)
 #ifndef SIGEV_THREAD_ID
 # define SIGEV_THREAD_ID 4
 #endif
-static const struct xlat sigev_value[] = {
-	XLAT(SIGEV_SIGNAL),
-	XLAT(SIGEV_NONE),
-	XLAT(SIGEV_THREAD),
-	XLAT(SIGEV_THREAD_ID),
-	XLAT_END
-};
+#include "xlat/sigev_value.h"
 
 #if SUPPORTED_PERSONALITIES > 1
 static void
@@ -1002,10 +833,7 @@ rtc_ioctl(struct tcb *tcp, long code, long arg)
 #define TFD_TIMER_ABSTIME (1 << 0)
 #endif
 
-static const struct xlat timerfdflags[] = {
-	XLAT(TFD_TIMER_ABSTIME),
-	XLAT_END
-};
+#include "xlat/timerfdflags.h"
 
 int
 sys_timerfd(struct tcb *tcp)

@@ -55,10 +55,7 @@ struct strbuf {
 #  define MOREDATA 2
 # endif
 
-static const struct xlat msgflags[] = {
-	XLAT(RS_HIPRI),
-	XLAT_END
-};
+#include "xlat/msgflags.h"
 
 static void
 printstrbuf(struct tcb *tcp, struct strbuf *sbp, int getting)
@@ -153,18 +150,7 @@ sys_getmsg(struct tcb *tcp)
 }
 
 # if defined SYS_putpmsg || defined SYS_getpmsg
-static const struct xlat pmsgflags[] = {
-#  ifdef MSG_HIPRI
-	XLAT(MSG_HIPRI),
-#  endif
-#  ifdef MSG_AND
-	XLAT(MSG_ANY),
-#  endif
-#  ifdef MSG_BAND
-	XLAT(MSG_BAND),
-#  endif
-	XLAT_END
-};
+#include "xlat/pmsgflags.h"
 #  ifdef SYS_putpmsg
 int
 sys_putpmsg(struct tcb *tcp)
@@ -242,29 +228,7 @@ sys_getpmsg(struct tcb *tcp)
 
 #ifdef HAVE_SYS_POLL_H
 
-static const struct xlat pollflags[] = {
-# ifdef POLLIN
-	XLAT(POLLIN),
-	XLAT(POLLPRI),
-	XLAT(POLLOUT),
-#  ifdef POLLRDNORM
-	XLAT(POLLRDNORM),
-#  endif
-#  ifdef POLLWRNORM
-	XLAT(POLLWRNORM),
-#  endif
-#  ifdef POLLRDBAND
-	XLAT(POLLRDBAND),
-#  endif
-#  ifdef POLLWRBAND
-	XLAT(POLLWRBAND),
-#  endif
-	XLAT(POLLERR),
-	XLAT(POLLHUP),
-	XLAT(POLLNVAL),
-# endif
-	XLAT_END
-};
+#include "xlat/pollflags.h"
 
 static int
 decode_poll(struct tcb *tcp, long pts)

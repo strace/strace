@@ -1,30 +1,11 @@
 #include "defs.h"
 #include <linux/reboot.h>
 
-static const struct xlat bootflags1[] = {
-	XLAT(LINUX_REBOOT_MAGIC1),
-	XLAT_END
-};
+#include "xlat/bootflags1.h"
 
-static const struct xlat bootflags2[] = {
-	XLAT(LINUX_REBOOT_MAGIC2),
-	XLAT(LINUX_REBOOT_MAGIC2A),
-	XLAT(LINUX_REBOOT_MAGIC2B),
-	XLAT(LINUX_REBOOT_MAGIC2C),
-	XLAT_END
-};
+#include "xlat/bootflags2.h"
 
-static const struct xlat bootflags3[] = {
-	XLAT(LINUX_REBOOT_CMD_RESTART),
-	XLAT(LINUX_REBOOT_CMD_HALT),
-	XLAT(LINUX_REBOOT_CMD_CAD_ON),
-	XLAT(LINUX_REBOOT_CMD_CAD_OFF),
-	XLAT(LINUX_REBOOT_CMD_POWER_OFF),
-	XLAT(LINUX_REBOOT_CMD_RESTART2),
-	XLAT(LINUX_REBOOT_CMD_SW_SUSPEND),
-	XLAT(LINUX_REBOOT_CMD_KEXEC),
-	XLAT_END
-};
+#include "xlat/bootflags3.h"
 
 int
 sys_reboot(struct tcb *tcp)

@@ -41,48 +41,15 @@
 # include <mtd/ubi-user.h>
 #endif
 
-static const struct xlat mtd_mode_options[] = {
-	XLAT(MTD_OPS_PLACE_OOB),
-	XLAT(MTD_OPS_AUTO_OOB),
-	XLAT(MTD_OPS_RAW),
-	XLAT_END
-};
+#include "xlat/mtd_mode_options.h"
 
-static const struct xlat mtd_type_options[] = {
-	XLAT(MTD_ABSENT),
-	XLAT(MTD_RAM),
-	XLAT(MTD_ROM),
-	XLAT(MTD_NORFLASH),
-	XLAT(MTD_NANDFLASH),
-	XLAT(MTD_DATAFLASH),
-	XLAT(MTD_UBIVOLUME),
-	XLAT(MTD_MLCNANDFLASH),
-	XLAT_END
-};
+#include "xlat/mtd_type_options.h"
 
-static const struct xlat mtd_flags_options[] = {
-	XLAT(MTD_WRITEABLE),
-	XLAT(MTD_BIT_WRITEABLE),
-	XLAT(MTD_NO_ERASE),
-	XLAT(MTD_POWERUP_LOCK),
-	XLAT_END
-};
+#include "xlat/mtd_flags_options.h"
 
-static const struct xlat mtd_otp_options[] = {
-	XLAT(MTD_OTP_OFF),
-	XLAT(MTD_OTP_FACTORY),
-	XLAT(MTD_OTP_USER),
-	XLAT_END
-};
+#include "xlat/mtd_otp_options.h"
 
-static const struct xlat mtd_nandecc_options[] = {
-	XLAT(MTD_NANDECC_OFF),
-	XLAT(MTD_NANDECC_PLACE),
-	XLAT(MTD_NANDECC_AUTOPLACE),
-	XLAT(MTD_NANDECC_PLACEONLY),
-	XLAT(MTD_NANDECC_AUTOPL_USR),
-	XLAT_END
-};
+#include "xlat/mtd_nandecc_options.h"
 
 int mtd_ioctl(struct tcb *tcp, long code, long arg)
 {
@@ -286,16 +253,9 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 	}
 }
 
-static const struct xlat ubi_volume_types[] = {
-	XLAT(UBI_DYNAMIC_VOLUME),
-	XLAT(UBI_STATIC_VOLUME),
-	XLAT_END
-};
+#include "xlat/ubi_volume_types.h"
 
-static const struct xlat ubi_volume_props[] = {
-	XLAT(UBI_VOL_PROP_DIRECT_WRITE),
-	XLAT_END
-};
+#include "xlat/ubi_volume_props.h"
 
 int ubi_ioctl(struct tcb *tcp, long code, long arg)
 {

@@ -100,67 +100,9 @@ struct sigcontext {
 # endif
 #endif
 
-static const struct xlat sigact_flags[] = {
-#ifdef SA_RESTORER
-	XLAT(SA_RESTORER),
-#endif
-#ifdef SA_STACK
-	XLAT(SA_STACK),
-#endif
-#ifdef SA_RESTART
-	XLAT(SA_RESTART),
-#endif
-#ifdef SA_INTERRUPT
-	XLAT(SA_INTERRUPT),
-#endif
-#ifdef SA_NODEFER
-	XLAT(SA_NODEFER),
-#endif
-#if defined SA_NOMASK && SA_NODEFER != SA_NOMASK
-	XLAT(SA_NOMASK),
-#endif
-#ifdef SA_RESETHAND
-	XLAT(SA_RESETHAND),
-#endif
-#if defined SA_ONESHOT && SA_ONESHOT != SA_RESETHAND
-	XLAT(SA_ONESHOT),
-#endif
-#ifdef SA_SIGINFO
-	XLAT(SA_SIGINFO),
-#endif
-#ifdef SA_RESETHAND
-	XLAT(SA_RESETHAND),
-#endif
-#ifdef SA_ONSTACK
-	XLAT(SA_ONSTACK),
-#endif
-#ifdef SA_NODEFER
-	XLAT(SA_NODEFER),
-#endif
-#ifdef SA_NOCLDSTOP
-	XLAT(SA_NOCLDSTOP),
-#endif
-#ifdef SA_NOCLDWAIT
-	XLAT(SA_NOCLDWAIT),
-#endif
-#ifdef _SA_BSDCALL
-	XLAT(_SA_BSDCALL),
-#endif
-#ifdef SA_NOPTRACE
-	XLAT(SA_NOPTRACE),
-#endif
-	XLAT_END
-};
+#include "xlat/sigact_flags.h"
 
-static const struct xlat sigprocmaskcmds[] = {
-	XLAT(SIG_BLOCK),
-	XLAT(SIG_UNBLOCK),
-	XLAT(SIG_SETMASK),
-#ifdef SIG_SETMASK32
-	XLAT(SIG_SETMASK32),
-#endif
-	XLAT_END
-};
+#include "xlat/sigprocmaskcmds.h"
 
 #endif /* HAVE_SIGACTION */
 
@@ -385,132 +327,32 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 # define SI_FROMUSER(sip)	((sip)->si_code <= 0)
 #endif
 
-static const struct xlat siginfo_codes[] = {
-#ifdef SI_KERNEL
-	XLAT(SI_KERNEL),
-#endif
-#ifdef SI_USER
-	XLAT(SI_USER),
-#endif
-#ifdef SI_QUEUE
-	XLAT(SI_QUEUE),
-#endif
-#ifdef SI_TIMER
-	XLAT(SI_TIMER),
-#endif
-#ifdef SI_MESGQ
-	XLAT(SI_MESGQ),
-#endif
-#ifdef SI_ASYNCIO
-	XLAT(SI_ASYNCIO),
-#endif
-#ifdef SI_SIGIO
-	XLAT(SI_SIGIO),
-#endif
-#ifdef SI_TKILL
-	XLAT(SI_TKILL),
-#endif
-#ifdef SI_DETHREAD
-	XLAT(SI_DETHREAD),
-#endif
-#ifdef SI_ASYNCNL
-	XLAT(SI_ASYNCNL),
-#endif
-#ifdef SI_NOINFO
-	XLAT(SI_NOINFO),
-#endif
-#ifdef SI_LWP
-	XLAT(SI_LWP),
-#endif
-	XLAT_END
-};
+#include "xlat/siginfo_codes.h"
 
-static const struct xlat sigill_codes[] = {
-	XLAT(ILL_ILLOPC),
-	XLAT(ILL_ILLOPN),
-	XLAT(ILL_ILLADR),
-	XLAT(ILL_ILLTRP),
-	XLAT(ILL_PRVOPC),
-	XLAT(ILL_PRVREG),
-	XLAT(ILL_COPROC),
-	XLAT(ILL_BADSTK),
-	XLAT_END
-};
+#include "xlat/sigill_codes.h"
 
-static const struct xlat sigfpe_codes[] = {
-	XLAT(FPE_INTDIV),
-	XLAT(FPE_INTOVF),
-	XLAT(FPE_FLTDIV),
-	XLAT(FPE_FLTOVF),
-	XLAT(FPE_FLTUND),
-	XLAT(FPE_FLTRES),
-	XLAT(FPE_FLTINV),
-	XLAT(FPE_FLTSUB),
-	XLAT_END
-};
+#include "xlat/sigfpe_codes.h"
 
-static const struct xlat sigtrap_codes[] = {
-	XLAT(TRAP_BRKPT),
-	XLAT(TRAP_TRACE),
-	XLAT_END
-};
+#include "xlat/sigtrap_codes.h"
 
-static const struct xlat sigchld_codes[] = {
-	XLAT(CLD_EXITED),
-	XLAT(CLD_KILLED),
-	XLAT(CLD_DUMPED),
-	XLAT(CLD_TRAPPED),
-	XLAT(CLD_STOPPED),
-	XLAT(CLD_CONTINUED),
-	XLAT_END
-};
+#include "xlat/sigchld_codes.h"
 
-static const struct xlat sigpoll_codes[] = {
-	XLAT(POLL_IN),
-	XLAT(POLL_OUT),
-	XLAT(POLL_MSG),
-	XLAT(POLL_ERR),
-	XLAT(POLL_PRI),
-	XLAT(POLL_HUP),
-	XLAT_END
-};
+#include "xlat/sigpoll_codes.h"
 
-static const struct xlat sigprof_codes[] = {
-#ifdef PROF_SIG
-	XLAT(PROF_SIG),
-#endif
-	XLAT_END
-};
+#include "xlat/sigprof_codes.h"
 
 #ifdef SIGEMT
-static const struct xlat sigemt_codes[] = {
-#ifdef EMT_TAGOVF
-	XLAT(EMT_TAGOVF),
-#endif
-	XLAT_END
-};
+#include "xlat/sigemt_codes.h"
 #endif
 
-static const struct xlat sigsegv_codes[] = {
-	XLAT(SEGV_MAPERR),
-	XLAT(SEGV_ACCERR),
-	XLAT_END
-};
+#include "xlat/sigsegv_codes.h"
 
-static const struct xlat sigbus_codes[] = {
-	XLAT(BUS_ADRALN),
-	XLAT(BUS_ADRERR),
-	XLAT(BUS_OBJERR),
-	XLAT_END
-};
+#include "xlat/sigbus_codes.h"
 
 #ifndef SYS_SECCOMP
 # define SYS_SECCOMP 1
 #endif
-static const struct xlat sigsys_codes[] = {
-	XLAT(SYS_SECCOMP),
-	XLAT_END
-};
+#include "xlat/sigsys_codes.h"
 
 static void
 printsigsource(const siginfo_t *sip)
@@ -1128,11 +970,7 @@ sys_sigsuspend(struct tcb *tcp)
 #define SS_DISABLE      2
 #endif
 
-static const struct xlat sigaltstack_flags[] = {
-	XLAT(SS_ONSTACK),
-	XLAT(SS_DISABLE),
-	XLAT_END
-};
+#include "xlat/sigaltstack_flags.h"
 
 static void
 print_stack_t(struct tcb *tcp, unsigned long addr)

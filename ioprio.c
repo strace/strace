@@ -6,12 +6,7 @@ enum {
 	IOPRIO_WHO_USER
 };
 
-static const struct xlat ioprio_who[] = {
-	XLAT(IOPRIO_WHO_PROCESS),
-	XLAT(IOPRIO_WHO_PGRP),
-	XLAT(IOPRIO_WHO_USER),
-	XLAT_END
-};
+#include "xlat/ioprio_who.h"
 
 enum {
 	IOPRIO_CLASS_NONE,
@@ -20,13 +15,7 @@ enum {
 	IOPRIO_CLASS_IDLE
 };
 
-static const struct xlat ioprio_class[] = {
-	XLAT(IOPRIO_CLASS_NONE),
-	XLAT(IOPRIO_CLASS_RT),
-	XLAT(IOPRIO_CLASS_BE),
-	XLAT(IOPRIO_CLASS_IDLE),
-	XLAT_END
-};
+#include "xlat/ioprio_class.h"
 
 #define IOPRIO_CLASS_SHIFT	(13)
 #define IOPRIO_PRIO_MASK	((1ul << IOPRIO_CLASS_SHIFT) - 1)

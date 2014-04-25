@@ -33,60 +33,7 @@
 #include <sys/times.h>
 #include <linux/kernel.h>
 
-static const struct xlat resources[] = {
-#ifdef RLIMIT_AS
-	XLAT(RLIMIT_AS),
-#endif
-#ifdef RLIMIT_CORE
-	XLAT(RLIMIT_CORE),
-#endif
-#ifdef RLIMIT_CPU
-	XLAT(RLIMIT_CPU),
-#endif
-#ifdef RLIMIT_DATA
-	XLAT(RLIMIT_DATA),
-#endif
-#ifdef RLIMIT_FSIZE
-	XLAT(RLIMIT_FSIZE),
-#endif
-#ifdef RLIMIT_LOCKS
-	XLAT(RLIMIT_LOCKS),
-#endif
-#ifdef RLIMIT_MEMLOCK
-	XLAT(RLIMIT_MEMLOCK),
-#endif
-#ifdef RLIMIT_MSGQUEUE
-	XLAT(RLIMIT_MSGQUEUE),
-#endif
-#ifdef RLIMIT_NICE
-	XLAT(RLIMIT_NICE),
-#endif
-#ifdef RLIMIT_NOFILE
-	XLAT(RLIMIT_NOFILE),
-#endif
-#ifdef RLIMIT_NPROC
-	XLAT(RLIMIT_NPROC),
-#endif
-#ifdef RLIMIT_RSS
-	XLAT(RLIMIT_RSS),
-#endif
-#ifdef RLIMIT_RTPRIO
-	XLAT(RLIMIT_RTPRIO),
-#endif
-#ifdef RLIMIT_RTTIME
-	XLAT(RLIMIT_RTTIME),
-#endif
-#ifdef RLIMIT_SIGPENDING
-	XLAT(RLIMIT_SIGPENDING),
-#endif
-#ifdef RLIMIT_STACK
-	XLAT(RLIMIT_STACK),
-#endif
-#ifdef RLIMIT_VMEM
-	XLAT(RLIMIT_VMEM),
-#endif
-	XLAT_END
-};
+#include "xlat/resources.h"
 
 static const char *
 sprint_rlim64(uint64_t lim)
@@ -234,14 +181,7 @@ sys_prlimit64(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat usagewho[] = {
-	XLAT(RUSAGE_SELF),
-	XLAT(RUSAGE_CHILDREN),
-#ifdef RUSAGE_BOTH
-	XLAT(RUSAGE_BOTH),
-#endif
-	XLAT_END
-};
+#include "xlat/usagewho.h"
 
 #ifdef ALPHA
 void
@@ -388,12 +328,7 @@ sys_sysinfo(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat priorities[] = {
-	XLAT(PRIO_PROCESS),
-	XLAT(PRIO_PGRP),
-	XLAT(PRIO_USER),
-	XLAT_END
-};
+#include "xlat/priorities.h"
 
 int
 sys_getpriority(struct tcb *tcp)

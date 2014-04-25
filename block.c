@@ -79,11 +79,7 @@ struct blk_user_trace_setup {
 #define BLKSECDISCARD _IO(0x12,125)
 #endif
 
-static const struct xlat blkpg_ops[] = {
-	XLAT(BLKPG_ADD_PARTITION),
-	XLAT(BLKPG_DEL_PARTITION),
-	XLAT_END
-};
+#include "xlat/blkpg_ops.h"
 
 static void
 print_blkpg_req(struct tcb *tcp, struct blkpg_ioctl_arg *blkpg)

@@ -35,134 +35,15 @@
 # include <sys/filio.h>
 #endif
 
-static const struct xlat tcxonc_options[] = {
-	XLAT(TCOOFF),
-	XLAT(TCOON),
-	XLAT(TCIOFF),
-	XLAT(TCION),
-	XLAT_END
-};
+#include "xlat/tcxonc_options.h"
 
 #ifdef TCLFLSH
-static const struct xlat tcflsh_options[] = {
-	XLAT(TCIFLUSH),
-	XLAT(TCOFLUSH),
-	XLAT(TCIOFLUSH),
-	XLAT_END
-};
+#include "xlat/tcflsh_options.h"
 #endif
 
-static const struct xlat baud_options[] = {
-	XLAT(B0),
-	XLAT(B50),
-	XLAT(B75),
-	XLAT(B110),
-	XLAT(B134),
-	XLAT(B150),
-	XLAT(B200),
-	XLAT(B300),
-	XLAT(B600),
-	XLAT(B1200),
-	XLAT(B1800),
-	XLAT(B2400),
-	XLAT(B4800),
-	XLAT(B9600),
-#ifdef B19200
-	XLAT(B19200),
-#endif
-#ifdef B38400
-	XLAT(B38400),
-#endif
-#ifdef B57600
-	XLAT(B57600),
-#endif
-#ifdef B115200
-	XLAT(B115200),
-#endif
-#ifdef B230400
-	XLAT(B230400),
-#endif
-#ifdef B460800
-	XLAT(B460800),
-#endif
-#ifdef B500000
-	XLAT(B500000),
-#endif
-#ifdef B576000
-	XLAT(B576000),
-#endif
-#ifdef B921600
-	XLAT(B921600),
-#endif
-#ifdef B1000000
-	XLAT(B1000000),
-#endif
-#ifdef B1152000
-	XLAT(B1152000),
-#endif
-#ifdef B1500000
-	XLAT(B1500000),
-#endif
-#ifdef B2000000
-	XLAT(B2000000),
-#endif
-#ifdef B2500000
-	XLAT(B2500000),
-#endif
-#ifdef B3000000
-	XLAT(B3000000),
-#endif
-#ifdef B3500000
-	XLAT(B3500000),
-#endif
-#ifdef B4000000
-	XLAT(B4000000),
-#endif
-#ifdef EXTA
-	XLAT(EXTA),
-#endif
-#ifdef EXTB
-	XLAT(EXTB),
-#endif
-	XLAT_END
-};
+#include "xlat/baud_options.h"
 
-static const struct xlat modem_flags[] = {
-#ifdef TIOCM_LE
-	XLAT(TIOCM_LE),
-#endif
-#ifdef TIOCM_DTR
-	XLAT(TIOCM_DTR),
-#endif
-#ifdef TIOCM_RTS
-	XLAT(TIOCM_RTS),
-#endif
-#ifdef TIOCM_ST
-	XLAT(TIOCM_ST),
-#endif
-#ifdef TIOCM_SR
-	XLAT(TIOCM_SR),
-#endif
-#ifdef TIOCM_CTS
-	XLAT(TIOCM_CTS),
-#endif
-#ifdef TIOCM_CAR
-	XLAT(TIOCM_CAR),
-#endif
-#ifdef TIOCM_CD
-	XLAT(TIOCM_CD),
-#endif
-#ifdef TIOCM_RNG
-	XLAT(TIOCM_RNG),
-#endif
-#ifdef TIOCM_RI
-	XLAT(TIOCM_RI),
-#endif
-#ifdef TIOCM_DSR
-	XLAT(TIOCM_DSR),
-#endif
-	XLAT_END
-};
+#include "xlat/modem_flags.h"
 
 int term_ioctl(struct tcb *tcp, long code, long arg)
 {

@@ -33,13 +33,7 @@
 # include <sys/ioctl.h>
 # include <scsi/sg.h>
 
-static const struct xlat sg_io_dxfer_direction[] = {
-	XLAT(SG_DXFER_NONE),
-	XLAT(SG_DXFER_TO_DEV),
-	XLAT(SG_DXFER_FROM_DEV),
-	XLAT(SG_DXFER_TO_FROM_DEV),
-	XLAT_END
-};
+#include "xlat/sg_io_dxfer_direction.h"
 
 static void
 print_sg_io_buffer(struct tcb *tcp, unsigned char *addr, int len)

@@ -38,181 +38,23 @@
 # include  <linux/perf_event.h>
 #endif
 
-static const struct xlat fcntlcmds[] = {
-	XLAT(F_DUPFD),
-	XLAT(F_GETFD),
-	XLAT(F_SETFD),
-	XLAT(F_GETFL),
-	XLAT(F_SETFL),
-	XLAT(F_GETLK),
-	XLAT(F_SETLK),
-	XLAT(F_SETLKW),
-	XLAT(F_GETOWN),
-	XLAT(F_SETOWN),
-#ifdef F_RSETLK
-	XLAT(F_RSETLK),
-#endif
-#ifdef F_RSETLKW
-	XLAT(F_RSETLKW),
-#endif
-#ifdef F_RGETLK
-	XLAT(F_RGETLK),
-#endif
-#ifdef F_CNVT
-	XLAT(F_CNVT),
-#endif
-#ifdef F_SETSIG
-	XLAT(F_SETSIG),
-#endif
-#ifdef F_GETSIG
-	XLAT(F_GETSIG),
-#endif
-#ifdef F_CHKFL
-	XLAT(F_CHKFL),
-#endif
-#ifdef F_DUP2FD
-	XLAT(F_DUP2FD),
-#endif
-#ifdef F_ALLOCSP
-	XLAT(F_ALLOCSP),
-#endif
-#ifdef F_ISSTREAM
-	XLAT(F_ISSTREAM),
-#endif
-#ifdef F_PRIV
-	XLAT(F_PRIV),
-#endif
-#ifdef F_NPRIV
-	XLAT(F_NPRIV),
-#endif
-#ifdef F_QUOTACL
-	XLAT(F_QUOTACL),
-#endif
-#ifdef F_BLOCKS
-	XLAT(F_BLOCKS),
-#endif
-#ifdef F_BLKSIZE
-	XLAT(F_BLKSIZE),
-#endif
-#ifdef F_GETOWN
-	XLAT(F_GETOWN),
-#endif
-#ifdef F_SETOWN
-	XLAT(F_SETOWN),
-#endif
-#ifdef F_REVOKE
-	XLAT(F_REVOKE),
-#endif
-#ifdef F_SETLK
-	XLAT(F_SETLK),
-#endif
-#ifdef F_SETLKW
-	XLAT(F_SETLKW),
-#endif
-#ifdef F_GETLK
-	XLAT(F_GETLK),
-#endif
-#ifdef F_SETLK64
-	XLAT(F_SETLK64),
-#endif
-#ifdef F_SETLKW64
-	XLAT(F_SETLKW64),
-#endif
-#ifdef F_GETLK64
-	XLAT(F_GETLK64),
-#endif
-#ifdef F_SHARE
-	XLAT(F_SHARE),
-#endif
-#ifdef F_UNSHARE
-	XLAT(F_UNSHARE),
-#endif
-#ifdef F_SETLEASE
-	XLAT(F_SETLEASE),
-#endif
-#ifdef F_GETLEASE
-	XLAT(F_GETLEASE),
-#endif
-#ifdef F_NOTIFY
-	XLAT(F_NOTIFY),
-#endif
-#ifdef F_DUPFD_CLOEXEC
-	XLAT(F_DUPFD_CLOEXEC),
-#endif
-	XLAT_END
-};
+#include "xlat/fcntlcmds.h"
 
-static const struct xlat fdflags[] = {
-#ifdef FD_CLOEXEC
-	XLAT(FD_CLOEXEC),
-#endif
-	XLAT_END
-};
+#include "xlat/fdflags.h"
 
 #ifdef LOCK_SH
 
-static const struct xlat flockcmds[] = {
-	XLAT(LOCK_SH),
-	XLAT(LOCK_EX),
-	XLAT(LOCK_NB),
-	XLAT(LOCK_UN),
-	XLAT_END
-};
+#include "xlat/flockcmds.h"
 
 #endif /* LOCK_SH */
 
-static const struct xlat lockfcmds[] = {
-	XLAT(F_RDLCK),
-	XLAT(F_WRLCK),
-	XLAT(F_UNLCK),
-#ifdef F_EXLCK
-	XLAT(F_EXLCK),
-#endif
-#ifdef F_SHLCK
-	XLAT(F_SHLCK),
-#endif
-	XLAT_END
-};
+#include "xlat/lockfcmds.h"
 
 #ifdef F_NOTIFY
-static const struct xlat notifyflags[] = {
-#ifdef DN_ACCESS
-	XLAT(DN_ACCESS),
-#endif
-#ifdef DN_MODIFY
-	XLAT(DN_MODIFY),
-#endif
-#ifdef DN_CREATE
-	XLAT(DN_CREATE),
-#endif
-#ifdef DN_DELETE
-	XLAT(DN_DELETE),
-#endif
-#ifdef DN_RENAME
-	XLAT(DN_RENAME),
-#endif
-#ifdef DN_ATTRIB
-	XLAT(DN_ATTRIB),
-#endif
-#ifdef DN_MULTISHOT
-	XLAT(DN_MULTISHOT),
-#endif
-	XLAT_END
-};
+#include "xlat/notifyflags.h"
 #endif
 
-static const struct xlat perf_event_open_flags[] = {
-#ifdef PERF_FLAG_FD_NO_GROUP
-	XLAT(PERF_FLAG_FD_NO_GROUP),
-#endif
-#ifdef PERF_FLAG_FD_OUTPUT
-	XLAT(PERF_FLAG_FD_OUTPUT),
-#endif
-#ifdef PERF_FLAG_PID_CGROUP
-	XLAT(PERF_FLAG_PID_CGROUP),
-#endif
-	XLAT_END
-};
+#include "xlat/perf_event_open_flags.h"
 
 /*
  * Assume that F_SETLK64, F_SETLKW64, and F_GETLK64 are either defined
@@ -622,61 +464,9 @@ sys_osf_select(struct tcb *tcp)
 }
 #endif
 
-static const struct xlat epollctls[] = {
-#ifdef EPOLL_CTL_ADD
-	XLAT(EPOLL_CTL_ADD),
-#endif
-#ifdef EPOLL_CTL_MOD
-	XLAT(EPOLL_CTL_MOD),
-#endif
-#ifdef EPOLL_CTL_DEL
-	XLAT(EPOLL_CTL_DEL),
-#endif
-	XLAT_END
-};
+#include "xlat/epollctls.h"
 
-static const struct xlat epollevents[] = {
-#ifdef EPOLLIN
-	XLAT(EPOLLIN),
-#endif
-#ifdef EPOLLPRI
-	XLAT(EPOLLPRI),
-#endif
-#ifdef EPOLLOUT
-	XLAT(EPOLLOUT),
-#endif
-#ifdef EPOLLRDNORM
-	XLAT(EPOLLRDNORM),
-#endif
-#ifdef EPOLLRDBAND
-	XLAT(EPOLLRDBAND),
-#endif
-#ifdef EPOLLWRNORM
-	XLAT(EPOLLWRNORM),
-#endif
-#ifdef EPOLLWRBAND
-	XLAT(EPOLLWRBAND),
-#endif
-#ifdef EPOLLMSG
-	XLAT(EPOLLMSG),
-#endif
-#ifdef EPOLLERR
-	XLAT(EPOLLERR),
-#endif
-#ifdef EPOLLHUP
-	XLAT(EPOLLHUP),
-#endif
-#ifdef EPOLLRDHUP
-	XLAT(EPOLLRDHUP),
-#endif
-#ifdef EPOLLONESHOT
-	XLAT(EPOLLONESHOT),
-#endif
-#ifdef EPOLLET
-	XLAT(EPOLLET),
-#endif
-	XLAT_END
-};
+#include "xlat/epollevents.h"
 
 /* Not aliased to printargs_ld: we want it to have a distinct address */
 int
@@ -685,15 +475,7 @@ sys_epoll_create(struct tcb *tcp)
 	return printargs_ld(tcp);
 }
 
-static const struct xlat epollflags[] = {
-#ifdef EPOLL_CLOEXEC
-	XLAT(EPOLL_CLOEXEC),
-#endif
-#ifdef EPOLL_NONBLOCK
-	XLAT(EPOLL_NONBLOCK),
-#endif
-	XLAT_END
-};
+#include "xlat/epollflags.h"
 
 int
 sys_epoll_create1(struct tcb *tcp)

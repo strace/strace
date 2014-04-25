@@ -1,20 +1,9 @@
 #include "defs.h"
 #include <linux/fanotify.h>
 
-static const struct xlat fan_classes[] = {
-	XLAT(FAN_CLASS_NOTIF),
-	XLAT(FAN_CLASS_CONTENT),
-	XLAT(FAN_CLASS_PRE_CONTENT),
-	XLAT_END
-};
+#include "xlat/fan_classes.h"
 
-static const struct xlat fan_init_flags[] = {
-	XLAT(FAN_CLOEXEC),
-	XLAT(FAN_NONBLOCK),
-	XLAT(FAN_UNLIMITED_QUEUE),
-	XLAT(FAN_UNLIMITED_MARKS),
-	XLAT_END
-};
+#include "xlat/fan_init_flags.h"
 
 int
 sys_fanotify_init(struct tcb *tcp)
@@ -37,32 +26,9 @@ sys_fanotify_init(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat fan_mark_flags[] = {
-	XLAT(FAN_MARK_ADD),
-	XLAT(FAN_MARK_REMOVE),
-	XLAT(FAN_MARK_DONT_FOLLOW),
-	XLAT(FAN_MARK_ONLYDIR),
-	XLAT(FAN_MARK_MOUNT),
-	XLAT(FAN_MARK_IGNORED_MASK),
-	XLAT(FAN_MARK_IGNORED_SURV_MODIFY),
-	XLAT(FAN_MARK_FLUSH),
-	XLAT_END
-};
+#include "xlat/fan_mark_flags.h"
 
-static const struct xlat fan_event_flags[] = {
-	XLAT(FAN_ACCESS),
-	XLAT(FAN_MODIFY),
-	XLAT(FAN_CLOSE),
-	XLAT(FAN_CLOSE_WRITE),
-	XLAT(FAN_CLOSE_NOWRITE),
-	XLAT(FAN_OPEN),
-	XLAT(FAN_Q_OVERFLOW),
-	XLAT(FAN_OPEN_PERM),
-	XLAT(FAN_ACCESS_PERM),
-	XLAT(FAN_ONDIR),
-	XLAT(FAN_EVENT_ON_CHILD),
-	XLAT_END
-};
+#include "xlat/fan_event_flags.h"
 
 int
 sys_fanotify_mark(struct tcb *tcp)

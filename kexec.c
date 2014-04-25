@@ -1,26 +1,9 @@
 #include "defs.h"
 #include <linux/kexec.h>
 
-static const struct xlat kexec_arch_values[] = {
-	XLAT(KEXEC_ARCH_DEFAULT),
-	XLAT(KEXEC_ARCH_386),
-	XLAT(KEXEC_ARCH_X86_64),
-	XLAT(KEXEC_ARCH_PPC),
-	XLAT(KEXEC_ARCH_PPC64),
-	XLAT(KEXEC_ARCH_IA_64),
-	XLAT(KEXEC_ARCH_ARM),
-	XLAT(KEXEC_ARCH_S390),
-	XLAT(KEXEC_ARCH_SH),
-	XLAT(KEXEC_ARCH_MIPS_LE),
-	XLAT(KEXEC_ARCH_MIPS),
-	XLAT_END
-};
+#include "xlat/kexec_arch_values.h"
 
-static const struct xlat kexec_flags[] = {
-	XLAT(KEXEC_ON_CRASH),
-	XLAT(KEXEC_PRESERVE_CONTEXT),
-	XLAT_END
-};
+#include "xlat/kexec_flags.h"
 
 static void
 print_kexec_segments(struct tcb *tcp, unsigned long addr, unsigned long len)

@@ -317,21 +317,7 @@ sys_sendfile64(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat splice_flags[] = {
-#ifdef SPLICE_F_MOVE
-	XLAT(SPLICE_F_MOVE),
-#endif
-#ifdef SPLICE_F_NONBLOCK
-	XLAT(SPLICE_F_NONBLOCK),
-#endif
-#ifdef SPLICE_F_MORE
-	XLAT(SPLICE_F_MORE),
-#endif
-#ifdef SPLICE_F_GIFT
-	XLAT(SPLICE_F_GIFT),
-#endif
-	XLAT_END
-};
+#include "xlat/splice_flags.h"
 
 int
 sys_tee(struct tcb *tcp)

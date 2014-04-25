@@ -105,178 +105,7 @@
 #ifdef HAVE_PRCTL
 # include <sys/prctl.h>
 
-static const struct xlat prctl_options[] = {
-#ifdef PR_MAXPROCS
-	XLAT(PR_MAXPROCS),
-#endif
-#ifdef PR_ISBLOCKED
-	XLAT(PR_ISBLOCKED),
-#endif
-#ifdef PR_SETSTACKSIZE
-	XLAT(PR_SETSTACKSIZE),
-#endif
-#ifdef PR_GETSTACKSIZE
-	XLAT(PR_GETSTACKSIZE),
-#endif
-#ifdef PR_MAXPPROCS
-	XLAT(PR_MAXPPROCS),
-#endif
-#ifdef PR_UNBLKONEXEC
-	XLAT(PR_UNBLKONEXEC),
-#endif
-#ifdef PR_ATOMICSIM
-	XLAT(PR_ATOMICSIM),
-#endif
-#ifdef PR_SETEXITSIG
-	XLAT(PR_SETEXITSIG),
-#endif
-#ifdef PR_RESIDENT
-	XLAT(PR_RESIDENT),
-#endif
-#ifdef PR_ATTACHADDR
-	XLAT(PR_ATTACHADDR),
-#endif
-#ifdef PR_DETACHADDR
-	XLAT(PR_DETACHADDR),
-#endif
-#ifdef PR_TERMCHILD
-	XLAT(PR_TERMCHILD),
-#endif
-#ifdef PR_GETSHMASK
-	XLAT(PR_GETSHMASK),
-#endif
-#ifdef PR_GETNSHARE
-	XLAT(PR_GETNSHARE),
-#endif
-#ifdef PR_COREPID
-	XLAT(PR_COREPID),
-#endif
-#ifdef PR_ATTACHADDRPERM
-	XLAT(PR_ATTACHADDRPERM),
-#endif
-#ifdef PR_PTHREADEXIT
-	XLAT(PR_PTHREADEXIT),
-#endif
-
-#ifdef PR_SET_PDEATHSIG
-	XLAT(PR_SET_PDEATHSIG),
-#endif
-#ifdef PR_GET_PDEATHSIG
-	XLAT(PR_GET_PDEATHSIG),
-#endif
-#ifdef PR_GET_DUMPABLE
-	XLAT(PR_GET_DUMPABLE),
-#endif
-#ifdef PR_SET_DUMPABLE
-	XLAT(PR_SET_DUMPABLE),
-#endif
-#ifdef PR_GET_UNALIGN
-	XLAT(PR_GET_UNALIGN),
-#endif
-#ifdef PR_SET_UNALIGN
-	XLAT(PR_SET_UNALIGN),
-#endif
-#ifdef PR_GET_KEEPCAPS
-	XLAT(PR_GET_KEEPCAPS),
-#endif
-#ifdef PR_SET_KEEPCAPS
-	XLAT(PR_SET_KEEPCAPS),
-#endif
-#ifdef PR_GET_FPEMU
-	XLAT(PR_GET_FPEMU),
-#endif
-#ifdef PR_SET_FPEMU
-	XLAT(PR_SET_FPEMU),
-#endif
-#ifdef PR_GET_FPEXC
-	XLAT(PR_GET_FPEXC),
-#endif
-#ifdef PR_SET_FPEXC
-	XLAT(PR_SET_FPEXC),
-#endif
-#ifdef PR_GET_TIMING
-	XLAT(PR_GET_TIMING),
-#endif
-#ifdef PR_SET_TIMING
-	XLAT(PR_SET_TIMING),
-#endif
-#ifdef PR_SET_NAME
-	XLAT(PR_SET_NAME),
-#endif
-#ifdef PR_GET_NAME
-	XLAT(PR_GET_NAME),
-#endif
-#ifdef PR_GET_ENDIAN
-	XLAT(PR_GET_ENDIAN),
-#endif
-#ifdef PR_SET_ENDIAN
-	XLAT(PR_SET_ENDIAN),
-#endif
-#ifdef PR_GET_SECCOMP
-	XLAT(PR_GET_SECCOMP),
-#endif
-#ifdef PR_SET_SECCOMP
-	XLAT(PR_SET_SECCOMP),
-#endif
-#ifdef PR_CAPBSET_READ
-	XLAT(PR_CAPBSET_READ),
-#endif
-#ifdef PR_CAPBSET_DROP
-	XLAT(PR_CAPBSET_DROP),
-#endif
-#ifdef PR_GET_TSC
-	XLAT(PR_GET_TSC),
-#endif
-#ifdef PR_SET_TSC
-	XLAT(PR_SET_TSC),
-#endif
-#ifdef PR_GET_SECUREBITS
-	XLAT(PR_GET_SECUREBITS),
-#endif
-#ifdef PR_SET_SECUREBITS
-	XLAT(PR_SET_SECUREBITS),
-#endif
-#ifdef PR_SET_TIMERSLACK
-	XLAT(PR_SET_TIMERSLACK),
-#endif
-#ifdef PR_GET_TIMERSLACK
-	XLAT(PR_GET_TIMERSLACK),
-#endif
-#ifdef PR_TASK_PERF_EVENTS_DISABLE
-	XLAT(PR_TASK_PERF_EVENTS_DISABLE),
-#endif
-#ifdef PR_TASK_PERF_EVENTS_ENABLE
-	XLAT(PR_TASK_PERF_EVENTS_ENABLE),
-#endif
-#ifdef PR_MCE_KILL
-	XLAT(PR_MCE_KILL),
-#endif
-#ifdef PR_MCE_KILL_GET
-	XLAT(PR_MCE_KILL_GET),
-#endif
-#ifdef PR_SET_MM
-	XLAT(PR_SET_MM),
-#endif
-#ifdef PR_SET_PTRACER
-	XLAT(PR_SET_PTRACER),
-#endif
-#ifdef PR_SET_CHILD_SUBREAPER
-	XLAT(PR_SET_CHILD_SUBREAPER),
-#endif
-#ifdef PR_GET_CHILD_SUBREAPER
-	XLAT(PR_GET_CHILD_SUBREAPER),
-#endif
-#ifdef PR_SET_NO_NEW_PRIVS
-	XLAT(PR_SET_NO_NEW_PRIVS),
-#endif
-#ifdef PR_GET_NO_NEW_PRIVS
-	XLAT(PR_GET_NO_NEW_PRIVS),
-#endif
-#ifdef PR_GET_TID_ADDRESS
-	XLAT(PR_GET_TID_ADDRESS),
-#endif
-	XLAT_END
-};
+#include "xlat/prctl_options.h"
 
 static const char *
 unalignctl_string(unsigned int ctl)
@@ -464,32 +293,7 @@ sys_exit(struct tcb *tcp)
 #define CLONE_NEWNET		0x40000000	/* New network namespace */
 #define CLONE_IO		0x80000000	/* Clone io context */
 
-static const struct xlat clone_flags[] = {
-	XLAT(CLONE_VM),
-	XLAT(CLONE_FS),
-	XLAT(CLONE_FILES),
-	XLAT(CLONE_SIGHAND),
-	XLAT(CLONE_IDLETASK),
-	XLAT(CLONE_PTRACE),
-	XLAT(CLONE_VFORK),
-	XLAT(CLONE_PARENT),
-	XLAT(CLONE_THREAD),
-	XLAT(CLONE_NEWNS),
-	XLAT(CLONE_SYSVSEM),
-	XLAT(CLONE_SETTLS),
-	XLAT(CLONE_PARENT_SETTID),
-	XLAT(CLONE_CHILD_CLEARTID),
-	XLAT(CLONE_UNTRACED),
-	XLAT(CLONE_CHILD_SETTID),
-	XLAT(CLONE_STOPPED),
-	XLAT(CLONE_NEWUTS),
-	XLAT(CLONE_NEWIPC),
-	XLAT(CLONE_NEWUSER),
-	XLAT(CLONE_NEWPID),
-	XLAT(CLONE_NEWNET),
-	XLAT(CLONE_IO),
-	XLAT_END
-};
+#include "xlat/clone_flags.h"
 
 #if defined I386 || defined X86_64 || defined X32
 extern void print_user_desc(struct tcb *, long);
@@ -1008,37 +812,7 @@ sys_execve(struct tcb *tcp)
 #define __WCLONE	0x80000000
 #endif
 
-static const struct xlat wait4_options[] = {
-	XLAT(WNOHANG),
-#ifndef WSTOPPED
-	XLAT(WUNTRACED),
-#endif
-#ifdef WEXITED
-	XLAT(WEXITED),
-#endif
-#ifdef WTRAPPED
-	XLAT(WTRAPPED),
-#endif
-#ifdef WSTOPPED
-	XLAT(WSTOPPED),
-#endif
-#ifdef WCONTINUED
-	XLAT(WCONTINUED),
-#endif
-#ifdef WNOWAIT
-	XLAT(WNOWAIT),
-#endif
-#ifdef __WCLONE
-	XLAT(__WCLONE),
-#endif
-#ifdef __WALL
-	XLAT(__WALL),
-#endif
-#ifdef __WNOTHREAD
-	XLAT(__WNOTHREAD),
-#endif
-	XLAT_END
-};
+#include "xlat/wait4_options.h"
 
 #if !defined WCOREFLAG && defined WCOREFLG
 # define WCOREFLAG WCOREFLG
@@ -1163,30 +937,7 @@ sys_osf_wait4(struct tcb *tcp)
 }
 #endif
 
-static const struct xlat waitid_types[] = {
-	XLAT(P_PID),
-#ifdef P_PPID
-	XLAT(P_PPID),
-#endif
-	XLAT(P_PGID),
-#ifdef P_SID
-	XLAT(P_SID),
-#endif
-#ifdef P_CID
-	XLAT(P_CID),
-#endif
-#ifdef P_UID
-	XLAT(P_UID),
-#endif
-#ifdef P_GID
-	XLAT(P_GID),
-#endif
-	XLAT(P_ALL),
-#ifdef P_LWPID
-	XLAT(P_LWPID),
-#endif
-	XLAT_END
-};
+#include "xlat/waitid_types.h"
 
 int
 sys_waitid(struct tcb *tcp)
@@ -1243,183 +994,13 @@ sys_uname(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat ptrace_cmds[] = {
-	XLAT(PTRACE_TRACEME),
-	XLAT(PTRACE_PEEKTEXT),
-	XLAT(PTRACE_PEEKDATA),
-	XLAT(PTRACE_PEEKUSER),
-	XLAT(PTRACE_POKETEXT),
-	XLAT(PTRACE_POKEDATA),
-	XLAT(PTRACE_POKEUSER),
-	XLAT(PTRACE_CONT),
-	XLAT(PTRACE_KILL),
-	XLAT(PTRACE_SINGLESTEP),
-	XLAT(PTRACE_ATTACH),
-	XLAT(PTRACE_DETACH),
-#ifdef PTRACE_GETREGS
-	XLAT(PTRACE_GETREGS),
-#endif
-#ifdef PTRACE_SETREGS
-	XLAT(PTRACE_SETREGS),
-#endif
-#ifdef PTRACE_GETFPREGS
-	XLAT(PTRACE_GETFPREGS),
-#endif
-#ifdef PTRACE_SETFPREGS
-	XLAT(PTRACE_SETFPREGS),
-#endif
-#ifdef PTRACE_GETFPXREGS
-	XLAT(PTRACE_GETFPXREGS),
-#endif
-#ifdef PTRACE_SETFPXREGS
-	XLAT(PTRACE_SETFPXREGS),
-#endif
-#ifdef PTRACE_GETVRREGS
-	XLAT(PTRACE_GETVRREGS),
-#endif
-#ifdef PTRACE_SETVRREGS
-	XLAT(PTRACE_SETVRREGS),
-#endif
-#ifdef PTRACE_SETOPTIONS
-	XLAT(PTRACE_SETOPTIONS),
-#endif
-#ifdef PTRACE_GETEVENTMSG
-	XLAT(PTRACE_GETEVENTMSG),
-#endif
-#ifdef PTRACE_GETSIGINFO
-	XLAT(PTRACE_GETSIGINFO),
-#endif
-#ifdef PTRACE_SETSIGINFO
-	XLAT(PTRACE_SETSIGINFO),
-#endif
-#ifdef PTRACE_GETREGSET
-	XLAT(PTRACE_GETREGSET),
-#endif
-#ifdef PTRACE_SETREGSET
-	XLAT(PTRACE_SETREGSET),
-#endif
-#ifdef PTRACE_SET_SYSCALL
-	XLAT(PTRACE_SET_SYSCALL),
-#endif
-#ifdef PTRACE_SEIZE
-	XLAT(PTRACE_SEIZE),
-#endif
-#ifdef PTRACE_INTERRUPT
-	XLAT(PTRACE_INTERRUPT),
-#endif
-#ifdef PTRACE_LISTEN
-	XLAT(PTRACE_LISTEN),
-#endif
-	XLAT(PTRACE_SYSCALL),
-
-	XLAT_END
-};
+#include "xlat/ptrace_cmds.h"
 
 #ifdef PTRACE_SETOPTIONS
-static const struct xlat ptrace_setoptions_flags[] = {
-# ifdef PTRACE_O_TRACESYSGOOD
-	XLAT(PTRACE_O_TRACESYSGOOD),
-# endif
-# ifdef PTRACE_O_TRACEFORK
-	XLAT(PTRACE_O_TRACEFORK),
-# endif
-# ifdef PTRACE_O_TRACEVFORK
-	XLAT(PTRACE_O_TRACEVFORK),
-# endif
-# ifdef PTRACE_O_TRACECLONE
-	XLAT(PTRACE_O_TRACECLONE),
-# endif
-# ifdef PTRACE_O_TRACEEXEC
-	XLAT(PTRACE_O_TRACEEXEC),
-# endif
-# ifdef PTRACE_O_TRACEVFORKDONE
-	XLAT(PTRACE_O_TRACEVFORKDONE),
-# endif
-# ifdef PTRACE_O_TRACEEXIT
-	XLAT(PTRACE_O_TRACEEXIT),
-# endif
-# ifdef PTRACE_O_TRACESECCOMP
-	XLAT(PTRACE_O_TRACESECCOMP),
-# endif
-# ifdef PTRACE_O_EXITKILL
-	XLAT(PTRACE_O_EXITKILL),
-# endif
-	XLAT_END
-};
+#include "xlat/ptrace_setoptions_flags.h"
 #endif /* PTRACE_SETOPTIONS */
 
-static const struct xlat nt_descriptor_types[] = {
-#ifdef NT_PRSTATUS
-	XLAT(NT_PRSTATUS),
-#endif
-#ifdef NT_FPREGSET
-	XLAT(NT_FPREGSET),
-#endif
-#ifdef NT_PRPSINFO
-	XLAT(NT_PRPSINFO),
-#endif
-#ifdef NT_PRXREG
-	XLAT(NT_PRXREG),
-#endif
-#ifdef NT_TASKSTRUCT
-	XLAT(NT_TASKSTRUCT),
-#endif
-#ifdef NT_PLATFORM
-	XLAT(NT_PLATFORM),
-#endif
-#ifdef NT_AUXV
-	XLAT(NT_AUXV),
-#endif
-#ifdef NT_GWINDOWS
-	XLAT(NT_GWINDOWS),
-#endif
-#ifdef NT_ASRS
-	XLAT(NT_ASRS),
-#endif
-#ifdef NT_PSTATUS
-	XLAT(NT_PSTATUS),
-#endif
-#ifdef NT_PSINFO
-	XLAT(NT_PSINFO),
-#endif
-#ifdef NT_PRCRED
-	XLAT(NT_PRCRED),
-#endif
-#ifdef NT_UTSNAME
-	XLAT(NT_UTSNAME),
-#endif
-#ifdef NT_LWPSTATUS
-	XLAT(NT_LWPSTATUS),
-#endif
-#ifdef NT_LWPSINFO
-	XLAT(NT_LWPSINFO),
-#endif
-#ifdef NT_PRFPXREG
-	XLAT(NT_PRFPXREG),
-#endif
-#ifdef NT_PRXFPREG
-	XLAT(NT_PRXFPREG),
-#endif
-#ifdef NT_PPC_VMX
-	XLAT(NT_PPC_VMX),
-#endif
-#ifdef NT_PPC_SPE
-	XLAT(NT_PPC_SPE),
-#endif
-#ifdef NT_PPC_VSX
-	XLAT(NT_PPC_VSX),
-#endif
-#ifdef NT_386_TLS
-	XLAT(NT_386_TLS),
-#endif
-#ifdef NT_386_IOPERM
-	XLAT(NT_386_IOPERM),
-#endif
-#ifdef NT_X86_XSTATE
-	XLAT(NT_X86_XSTATE),
-#endif
-	XLAT_END
-};
+#include "xlat/nt_descriptor_types.h"
 
 #define uoff(member)	offsetof(struct user, member)
 
@@ -2692,39 +2273,7 @@ sys_ptrace(struct tcb *tcp)
 #ifndef FUTEX_CMP_REQUEUE_PI_PRIVATE
 # define FUTEX_CMP_REQUEUE_PI_PRIVATE	(FUTEX_CMP_REQUEUE_PI | FUTEX_PRIVATE_FLAG)
 #endif
-static const struct xlat futexops[] = {
-	XLAT(FUTEX_WAIT),
-	XLAT(FUTEX_WAKE),
-	XLAT(FUTEX_FD),
-	XLAT(FUTEX_REQUEUE),
-	XLAT(FUTEX_CMP_REQUEUE),
-	XLAT(FUTEX_WAKE_OP),
-	XLAT(FUTEX_LOCK_PI),
-	XLAT(FUTEX_UNLOCK_PI),
-	XLAT(FUTEX_TRYLOCK_PI),
-	XLAT(FUTEX_WAIT_BITSET),
-	XLAT(FUTEX_WAKE_BITSET),
-	XLAT(FUTEX_WAIT_REQUEUE_PI),
-	XLAT(FUTEX_CMP_REQUEUE_PI),
-	XLAT(FUTEX_WAIT_PRIVATE),
-	XLAT(FUTEX_WAKE_PRIVATE),
-	XLAT(FUTEX_FD|FUTEX_PRIVATE_FLAG),
-	XLAT(FUTEX_REQUEUE_PRIVATE),
-	XLAT(FUTEX_CMP_REQUEUE_PRIVATE),
-	XLAT(FUTEX_WAKE_OP_PRIVATE),
-	XLAT(FUTEX_LOCK_PI_PRIVATE),
-	XLAT(FUTEX_UNLOCK_PI_PRIVATE),
-	XLAT(FUTEX_TRYLOCK_PI_PRIVATE),
-	XLAT(FUTEX_WAIT_BITSET_PRIVATE),
-	XLAT(FUTEX_WAKE_BITSET_PRIVATE),
-	XLAT(FUTEX_WAIT_REQUEUE_PI_PRIVATE),
-	XLAT(FUTEX_CMP_REQUEUE_PI_PRIVATE),
-	XLAT(FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME),
-	XLAT(FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME),
-	XLAT(FUTEX_WAIT_REQUEUE_PI|FUTEX_CLOCK_REALTIME),
-	XLAT(FUTEX_WAIT_REQUEUE_PI_PRIVATE|FUTEX_CLOCK_REALTIME),
-	XLAT_END
-};
+#include "xlat/futexops.h"
 #ifndef FUTEX_OP_SET
 # define FUTEX_OP_SET		0
 # define FUTEX_OP_ADD		1
@@ -2738,23 +2287,8 @@ static const struct xlat futexops[] = {
 # define FUTEX_OP_CMP_GT	4
 # define FUTEX_OP_CMP_GE	5
 #endif
-static const struct xlat futexwakeops[] = {
-	XLAT(FUTEX_OP_SET),
-	XLAT(FUTEX_OP_ADD),
-	XLAT(FUTEX_OP_OR),
-	XLAT(FUTEX_OP_ANDN),
-	XLAT(FUTEX_OP_XOR),
-	XLAT_END
-};
-static const struct xlat futexwakecmps[] = {
-	XLAT(FUTEX_OP_CMP_EQ),
-	XLAT(FUTEX_OP_CMP_NE),
-	XLAT(FUTEX_OP_CMP_LT),
-	XLAT(FUTEX_OP_CMP_LE),
-	XLAT(FUTEX_OP_CMP_GT),
-	XLAT(FUTEX_OP_CMP_GE),
-	XLAT_END
-};
+#include "xlat/futexwakeops.h"
+#include "xlat/futexwakecmps.h"
 
 int
 sys_futex(struct tcb *tcp)
@@ -2880,12 +2414,7 @@ sys_get_robust_list(struct tcb *tcp)
 	return 0;
 }
 
-static const struct xlat schedulers[] = {
-	XLAT(SCHED_OTHER),
-	XLAT(SCHED_RR),
-	XLAT(SCHED_FIFO),
-	XLAT_END
-};
+#include "xlat/schedulers.h"
 
 int
 sys_sched_getscheduler(struct tcb *tcp)
@@ -2969,13 +2498,7 @@ sys_sched_rr_get_interval(struct tcb *tcp)
 #if defined X86_64 || defined X32
 # include <asm/prctl.h>
 
-static const struct xlat archvals[] = {
-	XLAT(ARCH_SET_GS),
-	XLAT(ARCH_SET_FS),
-	XLAT(ARCH_GET_FS),
-	XLAT(ARCH_GET_GS),
-	XLAT_END
-};
+#include "xlat/archvals.h"
 
 int
 sys_arch_prctl(struct tcb *tcp)

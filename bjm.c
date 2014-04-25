@@ -69,26 +69,9 @@ struct module_info
 	long usecount;
 };
 
-static const struct xlat qm_which[] = {
-	XLAT(0),
-	XLAT(QM_MODULES),
-	XLAT(QM_DEPS),
-	XLAT(QM_REFS),
-	XLAT(QM_SYMBOLS),
-	XLAT(QM_INFO),
-	XLAT_END
-};
+#include "xlat/qm_which.h"
 
-static const struct xlat modflags[] = {
-	XLAT(MOD_UNINITIALIZED),
-	XLAT(MOD_RUNNING),
-	XLAT(MOD_DELETED),
-	XLAT(MOD_AUTOCLEAN),
-	XLAT(MOD_VISITED),
-	XLAT(MOD_USED_ONCE),
-	XLAT(MOD_JUST_FREED),
-	XLAT_END
-};
+#include "xlat/modflags.h"
 
 int
 sys_query_module(struct tcb *tcp)
@@ -204,11 +187,7 @@ sys_init_module(struct tcb *tcp)
 #define MODULE_INIT_IGNORE_MODVERSIONS  1
 #define MODULE_INIT_IGNORE_VERMAGIC     2
 
-static const struct xlat module_init_flags[] = {
-	XLAT(MODULE_INIT_IGNORE_MODVERSIONS),
-	XLAT(MODULE_INIT_IGNORE_VERMAGIC),
-	XLAT_END
-};
+#include "xlat/module_init_flags.h"
 
 int
 sys_finit_module(struct tcb *tcp)

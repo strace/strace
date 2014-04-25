@@ -3,17 +3,7 @@
 
 typedef int32_t key_serial_t;
 
-static const struct xlat key_spec[] = {
-	XLAT(KEY_SPEC_THREAD_KEYRING),
-	XLAT(KEY_SPEC_PROCESS_KEYRING),
-	XLAT(KEY_SPEC_SESSION_KEYRING),
-	XLAT(KEY_SPEC_USER_KEYRING),
-	XLAT(KEY_SPEC_USER_SESSION_KEYRING),
-	XLAT(KEY_SPEC_GROUP_KEYRING),
-	XLAT(KEY_SPEC_REQKEY_AUTH_KEY),
-	XLAT(KEY_SPEC_REQUESTOR_KEYRING),
-	XLAT_END
-};
+#include "xlat/key_spec.h"
 
 static void
 print_keyring_serial_number(key_serial_t id)
@@ -275,37 +265,7 @@ keyctl_get_persistent(struct tcb *tcp, int uid, key_serial_t id)
 #define KEY_OTH_SETATTR	0x00000020
 #define KEY_OTH_ALL	0x0000003f
 
-static const struct xlat key_perms[] = {
-	XLAT(KEY_POS_VIEW),
-	XLAT(KEY_POS_READ),
-	XLAT(KEY_POS_WRITE),
-	XLAT(KEY_POS_SEARCH),
-	XLAT(KEY_POS_LINK),
-	XLAT(KEY_POS_SETATTR),
-	XLAT(KEY_POS_ALL),
-	XLAT(KEY_USR_VIEW),
-	XLAT(KEY_USR_READ),
-	XLAT(KEY_USR_WRITE),
-	XLAT(KEY_USR_SEARCH),
-	XLAT(KEY_USR_LINK),
-	XLAT(KEY_USR_SETATTR),
-	XLAT(KEY_USR_ALL),
-	XLAT(KEY_GRP_VIEW),
-	XLAT(KEY_GRP_READ),
-	XLAT(KEY_GRP_WRITE),
-	XLAT(KEY_GRP_SEARCH),
-	XLAT(KEY_GRP_LINK),
-	XLAT(KEY_GRP_SETATTR),
-	XLAT(KEY_GRP_ALL),
-	XLAT(KEY_OTH_VIEW),
-	XLAT(KEY_OTH_READ),
-	XLAT(KEY_OTH_WRITE),
-	XLAT(KEY_OTH_SEARCH),
-	XLAT(KEY_OTH_LINK),
-	XLAT(KEY_OTH_SETATTR),
-	XLAT(KEY_OTH_ALL),
-	XLAT_END
-};
+#include "xlat/key_perms.h"
 
 static int
 keyctl_setperm_key(struct tcb *tcp, key_serial_t id, uint32_t perm)
@@ -319,18 +279,7 @@ keyctl_setperm_key(struct tcb *tcp, key_serial_t id, uint32_t perm)
 	return 0;
 }
 
-static const struct xlat key_reqkeys[] = {
-	XLAT(KEY_REQKEY_DEFL_NO_CHANGE),
-	XLAT(KEY_REQKEY_DEFL_DEFAULT),
-	XLAT(KEY_REQKEY_DEFL_THREAD_KEYRING),
-	XLAT(KEY_REQKEY_DEFL_PROCESS_KEYRING),
-	XLAT(KEY_REQKEY_DEFL_SESSION_KEYRING),
-	XLAT(KEY_REQKEY_DEFL_USER_KEYRING),
-	XLAT(KEY_REQKEY_DEFL_USER_SESSION_KEYRING),
-	XLAT(KEY_REQKEY_DEFL_GROUP_KEYRING),
-	XLAT(KEY_REQKEY_DEFL_REQUESTOR_KEYRING),
-	XLAT_END
-};
+#include "xlat/key_reqkeys.h"
 
 static int
 keyctl_set_reqkey_keyring(struct tcb *tcp, int reqkey)
@@ -342,32 +291,7 @@ keyctl_set_reqkey_keyring(struct tcb *tcp, int reqkey)
 	return 0;
 }
 
-static const struct xlat keyctl_commands[] = {
-	XLAT(KEYCTL_GET_KEYRING_ID),
-	XLAT(KEYCTL_JOIN_SESSION_KEYRING),
-	XLAT(KEYCTL_UPDATE),
-	XLAT(KEYCTL_REVOKE),
-	XLAT(KEYCTL_CHOWN),
-	XLAT(KEYCTL_SETPERM),
-	XLAT(KEYCTL_DESCRIBE),
-	XLAT(KEYCTL_CLEAR),
-	XLAT(KEYCTL_LINK),
-	XLAT(KEYCTL_UNLINK),
-	XLAT(KEYCTL_SEARCH),
-	XLAT(KEYCTL_READ),
-	XLAT(KEYCTL_INSTANTIATE),
-	XLAT(KEYCTL_NEGATE),
-	XLAT(KEYCTL_SET_REQKEY_KEYRING),
-	XLAT(KEYCTL_SET_TIMEOUT),
-	XLAT(KEYCTL_ASSUME_AUTHORITY),
-	XLAT(KEYCTL_GET_SECURITY),
-	XLAT(KEYCTL_SESSION_TO_PARENT),
-	XLAT(KEYCTL_REJECT),
-	XLAT(KEYCTL_INSTANTIATE_IOV),
-	XLAT(KEYCTL_INVALIDATE),
-	XLAT(KEYCTL_GET_PERSISTENT),
-	XLAT_END
-};
+#include "xlat/keyctl_commands.h"
 
 int
 sys_keyctl(struct tcb *tcp)

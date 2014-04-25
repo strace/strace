@@ -63,84 +63,21 @@
 
 extern void printsigevent(struct tcb *tcp, long arg);
 
-static const struct xlat msgctl_flags[] = {
-	XLAT(IPC_RMID),
-	XLAT(IPC_SET),
-	XLAT(IPC_STAT),
-	XLAT(IPC_INFO),
-	XLAT(MSG_STAT),
-	XLAT(MSG_INFO),
-	XLAT_END
-};
+#include "xlat/msgctl_flags.h"
 
-static const struct xlat semctl_flags[] = {
-	XLAT(IPC_RMID),
-	XLAT(IPC_SET),
-	XLAT(IPC_STAT),
-	XLAT(IPC_INFO),
-	XLAT(SEM_STAT),
-	XLAT(SEM_INFO),
-	XLAT(GETPID),
-	XLAT(GETVAL),
-	XLAT(GETALL),
-	XLAT(GETNCNT),
-	XLAT(GETZCNT),
-	XLAT(SETVAL),
-	XLAT(SETALL),
-	XLAT_END
-};
+#include "xlat/semctl_flags.h"
 
-static const struct xlat shmctl_flags[] = {
-	XLAT(IPC_RMID),
-	XLAT(IPC_SET),
-	XLAT(IPC_STAT),
-	XLAT(IPC_INFO),
-	XLAT(SHM_STAT),
-	XLAT(SHM_INFO),
-#ifdef SHM_LOCK
-	XLAT(SHM_LOCK),
-#endif
-#ifdef SHM_UNLOCK
-	XLAT(SHM_UNLOCK),
-#endif
-	XLAT_END
-};
+#include "xlat/shmctl_flags.h"
 
-static const struct xlat resource_flags[] = {
-	XLAT(IPC_CREAT),
-	XLAT(IPC_EXCL),
-	XLAT(IPC_NOWAIT),
-	XLAT_END
-};
+#include "xlat/resource_flags.h"
 
-static const struct xlat shm_resource_flags[] = {
-	XLAT(IPC_CREAT),
-	XLAT(IPC_EXCL),
-#ifdef SHM_HUGETLB
-	XLAT(SHM_HUGETLB),
-#endif
-	XLAT_END
-};
+#include "xlat/shm_resource_flags.h"
 
-static const struct xlat shm_flags[] = {
-	XLAT(SHM_REMAP),
-	XLAT(SHM_RDONLY),
-	XLAT(SHM_RND),
-	XLAT_END
-};
+#include "xlat/shm_flags.h"
 
-static const struct xlat ipc_msg_flags[] = {
-	XLAT(MSG_NOERROR),
-	XLAT(MSG_EXCEPT),
-	XLAT(IPC_NOWAIT),
-	XLAT_END
-};
+#include "xlat/ipc_msg_flags.h"
 
-static const struct xlat semop_flags[] = {
-	XLAT(SEM_UNDO),
-	XLAT(IPC_NOWAIT),
-	XLAT_END
-};
+#include "xlat/semop_flags.h"
 
 int sys_msgget(struct tcb *tcp)
 {

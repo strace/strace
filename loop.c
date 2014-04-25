@@ -31,30 +31,9 @@
 
 #include <linux/loop.h>
 
-static const struct xlat loop_flags_options[] = {
-	XLAT(LO_FLAGS_READ_ONLY),
-#if HAVE_DECL_LO_FLAGS_AUTOCLEAR
-	XLAT(LO_FLAGS_AUTOCLEAR),
-#endif
-#if HAVE_DECL_LO_FLAGS_PARTSCAN
-	XLAT(LO_FLAGS_PARTSCAN),
-#endif
-	XLAT_END
-};
+#include "xlat/loop_flags_options.h"
 
-static const struct xlat loop_crypt_type_options[] = {
-	XLAT(LO_CRYPT_NONE),
-	XLAT(LO_CRYPT_XOR),
-	XLAT(LO_CRYPT_DES),
-	XLAT(LO_CRYPT_FISH2),
-	XLAT(LO_CRYPT_BLOW),
-	XLAT(LO_CRYPT_CAST128),
-	XLAT(LO_CRYPT_IDEA),
-	XLAT(LO_CRYPT_DUMMY),
-	XLAT(LO_CRYPT_SKIPJACK),
-	XLAT(LO_CRYPT_CRYPTOAPI),
-	XLAT_END
-};
+#include "xlat/loop_crypt_type_options.h"
 
 int loop_ioctl(struct tcb *tcp, long code, long arg)
 {

@@ -1,0 +1,6 @@
+F_OK
+R_OK
+W_OK
+X_OK
+EFF_ONLY_OK
+EX_OK

@@ -81,36 +81,7 @@
 #include <linux/sysctl.h>
 #include <linux/personality.h>
 
-static const struct xlat mount_flags[] = {
-	XLAT(MS_MGC_VAL),
-	XLAT(MS_RDONLY),
-	XLAT(MS_NOSUID),
-	XLAT(MS_NODEV),
-	XLAT(MS_NOEXEC),
-	XLAT(MS_SYNCHRONOUS),
-	XLAT(MS_REMOUNT),
-	XLAT(MS_RELATIME),
-	XLAT(MS_KERNMOUNT),
-	XLAT(MS_I_VERSION),
-	XLAT(MS_STRICTATIME),
-	XLAT(MS_NOSEC),
-	XLAT(MS_BORN),
-	XLAT(MS_MANDLOCK),
-	XLAT(MS_NOATIME),
-	XLAT(MS_NODIRATIME),
-	XLAT(MS_BIND),
-	XLAT(MS_MOVE),
-	XLAT(MS_REC),
-	XLAT(MS_SILENT),
-	XLAT(MS_POSIXACL),
-	XLAT(MS_UNBINDABLE),
-	XLAT(MS_PRIVATE),
-	XLAT(MS_SLAVE),
-	XLAT(MS_SHARED),
-	XLAT(MS_ACTIVE),
-	XLAT(MS_NOUSER),
-	XLAT_END
-};
+#include "xlat/mount_flags.h"
 
 int
 sys_mount(struct tcb *tcp)
@@ -155,12 +126,7 @@ sys_mount(struct tcb *tcp)
 #define MNT_DETACH	0x00000002	/* Just detach from the tree */
 #define MNT_EXPIRE	0x00000004	/* Mark for expiry */
 
-static const struct xlat umount_flags[] = {
-	XLAT(MNT_FORCE),
-	XLAT(MNT_DETACH),
-	XLAT(MNT_EXPIRE),
-	XLAT_END
-};
+#include "xlat/umount_flags.h"
 
 int
 sys_umount2(struct tcb *tcp)
@@ -175,31 +141,7 @@ sys_umount2(struct tcb *tcp)
 
 /* These are not macros, but enums.  We just copy the values by hand
    from Linux 2.6.9 here.  */
-static const struct xlat personality_options[] = {
-	XLAT(PER_LINUX),
-	XLAT(PER_LINUX_32BIT),
-	XLAT(PER_LINUX_FDPIC),
-	XLAT(PER_SVR4),
-	XLAT(PER_SVR3),
-	XLAT(PER_SCOSVR3),
-	XLAT(PER_OSR5),
-	XLAT(PER_WYSEV386),
-	XLAT(PER_ISCR4),
-	XLAT(PER_BSD),
-	XLAT(PER_SUNOS),
-	XLAT(PER_XENIX),
-	XLAT(PER_LINUX32),
-	XLAT(PER_LINUX32_3GB),
-	XLAT(PER_IRIX32),
-	XLAT(PER_IRIXN32),
-	XLAT(PER_IRIX64),
-	XLAT(PER_RISCOS),
-	XLAT(PER_SOLARIS),
-	XLAT(PER_UW7),
-	XLAT(PER_OSF4),
-	XLAT(PER_HPUX),
-	XLAT_END
-};
+#include "xlat/personality_options.h"
 
 int
 sys_personality(struct tcb *tcp)
@@ -223,20 +165,7 @@ enum {
 	SYSLOG_ACTION_SIZE_BUFFER
 };
 
-static const struct xlat syslog_action_type[] = {
-	XLAT(SYSLOG_ACTION_CLOSE),
-	XLAT(SYSLOG_ACTION_OPEN),
-	XLAT(SYSLOG_ACTION_READ),
-	XLAT(SYSLOG_ACTION_READ_ALL),
-	XLAT(SYSLOG_ACTION_READ_CLEAR),
-	XLAT(SYSLOG_ACTION_CLEAR),
-	XLAT(SYSLOG_ACTION_CONSOLE_OFF),
-	XLAT(SYSLOG_ACTION_CONSOLE_ON),
-	XLAT(SYSLOG_ACTION_CONSOLE_LEVEL),
-	XLAT(SYSLOG_ACTION_SIZE_UNREAD),
-	XLAT(SYSLOG_ACTION_SIZE_BUFFER),
-	XLAT_END
-};
+#include "xlat/syslog_action_type.h"
 
 int
 sys_syslog(struct tcb *tcp)
@@ -276,18 +205,7 @@ sys_syslog(struct tcb *tcp)
 }
 
 #ifdef M68K
-static const struct xlat cacheflush_scope[] = {
-#ifdef FLUSH_SCOPE_LINE
-	XLAT(FLUSH_SCOPE_LINE),
-#endif
-#ifdef FLUSH_SCOPE_PAGE
-	XLAT(FLUSH_SCOPE_PAGE),
-#endif
-#ifdef FLUSH_SCOPE_ALL
-	XLAT(FLUSH_SCOPE_ALL),
-#endif
-	XLAT_END
-};
+#include "xlat/cacheflush_scope.h"
 
 static const struct xlat cacheflush_flags[] = {
 #ifdef FLUSH_CACHE_BOTH
@@ -324,14 +242,7 @@ sys_cacheflush(struct tcb *tcp)
 
 #include <bfin_sram.h>
 
-static const struct xlat sram_alloc_flags[] = {
-	XLAT(L1_INST_SRAM),
-	XLAT(L1_DATA_A_SRAM),
-	XLAT(L1_DATA_B_SRAM),
-	XLAT(L1_DATA_SRAM),
-	XLAT(L2_SRAM),
-	XLAT_END
-};
+#include "xlat/sram_alloc_flags.h"
 
 int
 sys_sram_alloc(struct tcb *tcp)
@@ -404,51 +315,7 @@ sys_cacheflush(struct tcb *tcp)
 
 #ifdef SYS_capget
 
-static const struct xlat capabilities[] = {
-	{ 1<<CAP_CHOWN,		"CAP_CHOWN"	},
-	{ 1<<CAP_DAC_OVERRIDE,	"CAP_DAC_OVERRIDE"},
-	{ 1<<CAP_DAC_READ_SEARCH,"CAP_DAC_READ_SEARCH"},
-	{ 1<<CAP_FOWNER,	"CAP_FOWNER"	},
-	{ 1<<CAP_FSETID,	"CAP_FSETID"	},
-	{ 1<<CAP_KILL,		"CAP_KILL"	},
-	{ 1<<CAP_SETGID,	"CAP_SETGID"	},
-	{ 1<<CAP_SETUID,	"CAP_SETUID"	},
-	{ 1<<CAP_SETPCAP,	"CAP_SETPCAP"	},
-	{ 1<<CAP_LINUX_IMMUTABLE,"CAP_LINUX_IMMUTABLE"},
-	{ 1<<CAP_NET_BIND_SERVICE,"CAP_NET_BIND_SERVICE"},
-	{ 1<<CAP_NET_BROADCAST,	"CAP_NET_BROADCAST"},
-	{ 1<<CAP_NET_ADMIN,	"CAP_NET_ADMIN"	},
-	{ 1<<CAP_NET_RAW,	"CAP_NET_RAW"	},
-	{ 1<<CAP_IPC_LOCK,	"CAP_IPC_LOCK"	},
-	{ 1<<CAP_IPC_OWNER,	"CAP_IPC_OWNER"	},
-	{ 1<<CAP_SYS_MODULE,	"CAP_SYS_MODULE"},
-	{ 1<<CAP_SYS_RAWIO,	"CAP_SYS_RAWIO"	},
-	{ 1<<CAP_SYS_CHROOT,	"CAP_SYS_CHROOT"},
-	{ 1<<CAP_SYS_PTRACE,	"CAP_SYS_PTRACE"},
-	{ 1<<CAP_SYS_PACCT,	"CAP_SYS_PACCT"	},
-	{ 1<<CAP_SYS_ADMIN,	"CAP_SYS_ADMIN"	},
-	{ 1<<CAP_SYS_BOOT,	"CAP_SYS_BOOT"	},
-	{ 1<<CAP_SYS_NICE,	"CAP_SYS_NICE"	},
-	{ 1<<CAP_SYS_RESOURCE,	"CAP_SYS_RESOURCE"},
-	{ 1<<CAP_SYS_TIME,	"CAP_SYS_TIME"	},
-	{ 1<<CAP_SYS_TTY_CONFIG,"CAP_SYS_TTY_CONFIG"},
-#ifdef CAP_MKNOD
-	{ 1<<CAP_MKNOD,		"CAP_MKNOD"	},
-#endif
-#ifdef CAP_LEASE
-	{ 1<<CAP_LEASE,		"CAP_LEASE"	},
-#endif
-#ifdef CAP_AUDIT_WRITE
-	{ 1<<CAP_AUDIT_WRITE,	"CAP_AUDIT_WRITE"},
-#endif
-#ifdef CAP_AUDIT_CONTROL
-	{ 1<<CAP_AUDIT_CONTROL,	"CAP_AUDIT_CONTROL"},
-#endif
-#ifdef CAP_SETFCAP
-	{ 1<<CAP_SETFCAP,	"CAP_SETFCAP"	},
-#endif
-	XLAT_END
-};
+#include "xlat/capabilities.h"
 
 #ifndef _LINUX_CAPABILITY_VERSION_1
 # define _LINUX_CAPABILITY_VERSION_1 0x19980330
@@ -460,12 +327,7 @@ static const struct xlat capabilities[] = {
 # define _LINUX_CAPABILITY_VERSION_3 0x20080522
 #endif
 
-static const struct xlat cap_version[] = {
-	XLAT(_LINUX_CAPABILITY_VERSION_1),
-	XLAT(_LINUX_CAPABILITY_VERSION_2),
-	XLAT(_LINUX_CAPABILITY_VERSION_3),
-	XLAT_END
-};
+#include "xlat/cap_version.h"
 
 static void
 print_cap_header(struct tcb *tcp, unsigned long addr)
@@ -551,247 +413,27 @@ int sys_capset(struct tcb *tcp)
 /* Linux 2.6.18+ headers removed CTL_PROC enum.  */
 # define CTL_PROC 4
 # define CTL_CPU 10		/* older headers lack */
-static const struct xlat sysctl_root[] = {
-	XLAT(CTL_KERN),
-	XLAT(CTL_VM),
-	XLAT(CTL_NET),
-	XLAT(CTL_PROC),
-	XLAT(CTL_FS),
-	XLAT(CTL_DEBUG),
-	XLAT(CTL_DEV),
-	XLAT(CTL_BUS),
-	XLAT(CTL_ABI),
-	XLAT(CTL_CPU),
-	XLAT_END
-};
+#include "xlat/sysctl_root.h"
 
-static const struct xlat sysctl_kern[] = {
-	XLAT(KERN_OSTYPE),
-	XLAT(KERN_OSRELEASE),
-	XLAT(KERN_OSREV),
-	XLAT(KERN_VERSION),
-	XLAT(KERN_SECUREMASK),
-	XLAT(KERN_PROF),
-	XLAT(KERN_NODENAME),
-	XLAT(KERN_DOMAINNAME),
-#ifdef KERN_SECURELVL
-	XLAT(KERN_SECURELVL),
-#endif
-	XLAT(KERN_PANIC),
-#ifdef KERN_REALROOTDEV
-	XLAT(KERN_REALROOTDEV),
-#endif
-#ifdef KERN_JAVA_INTERPRETER
-	XLAT(KERN_JAVA_INTERPRETER),
-#endif
-#ifdef KERN_JAVA_APPLETVIEWER
-	XLAT(KERN_JAVA_APPLETVIEWER),
-#endif
-	XLAT(KERN_SPARC_REBOOT),
-	XLAT(KERN_CTLALTDEL),
-	XLAT(KERN_PRINTK),
-	XLAT(KERN_NAMETRANS),
-	XLAT(KERN_PPC_HTABRECLAIM),
-	XLAT(KERN_PPC_ZEROPAGED),
-	XLAT(KERN_PPC_POWERSAVE_NAP),
-	XLAT(KERN_MODPROBE),
-	XLAT(KERN_SG_BIG_BUFF),
-	XLAT(KERN_ACCT),
-	XLAT(KERN_PPC_L2CR),
-	XLAT(KERN_RTSIGNR),
-	XLAT(KERN_RTSIGMAX),
-	XLAT(KERN_SHMMAX),
-	XLAT(KERN_MSGMAX),
-	XLAT(KERN_MSGMNB),
-	XLAT(KERN_MSGPOOL),
-	XLAT_END
-};
+#include "xlat/sysctl_kern.h"
 
-static const struct xlat sysctl_vm[] = {
-#ifdef VM_SWAPCTL
-	XLAT(VM_SWAPCTL),
-#endif
-#ifdef VM_UNUSED1
-	XLAT(VM_UNUSED1),
-#endif
-#ifdef VM_SWAPOUT
-	XLAT(VM_SWAPOUT),
-#endif
-#ifdef VM_UNUSED2
-	XLAT(VM_UNUSED2),
-#endif
-#ifdef VM_FREEPG
-	XLAT(VM_FREEPG),
-#endif
-#ifdef VM_UNUSED3
-	XLAT(VM_UNUSED3),
-#endif
-#ifdef VM_BDFLUSH
-	XLAT(VM_BDFLUSH),
-#endif
-#ifdef VM_UNUSED4
-	XLAT(VM_UNUSED4),
-#endif
-	XLAT(VM_OVERCOMMIT_MEMORY),
-#ifdef VM_BUFFERMEM
-	XLAT(VM_BUFFERMEM),
-#endif
-#ifdef VM_UNUSED5
-	XLAT(VM_UNUSED5),
-#endif
-#ifdef VM_PAGECACHE
-	XLAT(VM_PAGECACHE),
-#endif
-#ifdef VM_UNUSED7
-	XLAT(VM_UNUSED7),
-#endif
-#ifdef VM_PAGERDAEMON
-	XLAT(VM_PAGERDAEMON),
-#endif
-#ifdef VM_UNUSED8
-	XLAT(VM_UNUSED8),
-#endif
-#ifdef VM_PGT_CACHE
-	XLAT(VM_PGT_CACHE),
-#endif
-#ifdef VM_UNUSED9
-	XLAT(VM_UNUSED9),
-#endif
-	XLAT(VM_PAGE_CLUSTER),
-	XLAT_END
-};
+#include "xlat/sysctl_vm.h"
 
-static const struct xlat sysctl_net[] = {
-	XLAT(NET_CORE),
-	XLAT(NET_ETHER),
-	XLAT(NET_802),
-	XLAT(NET_UNIX),
-	XLAT(NET_IPV4),
-	XLAT(NET_IPX),
-	XLAT(NET_ATALK),
-	XLAT(NET_NETROM),
-	XLAT(NET_AX25),
-	XLAT(NET_BRIDGE),
-	XLAT(NET_ROSE),
-	XLAT(NET_IPV6),
-	XLAT(NET_X25),
-	XLAT(NET_TR),
-	XLAT(NET_DECNET),
-	XLAT_END
-};
+#include "xlat/sysctl_net.h"
 
-static const struct xlat sysctl_net_core[] = {
-	XLAT(NET_CORE_WMEM_MAX),
-	XLAT(NET_CORE_RMEM_MAX),
-	XLAT(NET_CORE_WMEM_DEFAULT),
-	XLAT(NET_CORE_RMEM_DEFAULT),
-	XLAT(NET_CORE_MAX_BACKLOG),
-	XLAT(NET_CORE_FASTROUTE),
-	XLAT(NET_CORE_MSG_COST),
-	XLAT(NET_CORE_MSG_BURST),
-	XLAT(NET_CORE_OPTMEM_MAX),
-	XLAT_END
-};
+#include "xlat/sysctl_net_core.h"
 
-static const struct xlat sysctl_net_unix[] = {
-	XLAT(NET_UNIX_DESTROY_DELAY),
-	XLAT(NET_UNIX_DELETE_DELAY),
-	XLAT_END
-};
+#include "xlat/sysctl_net_unix.h"
 
-static const struct xlat sysctl_net_ipv4[] = {
-	XLAT(NET_IPV4_FORWARD),
-	XLAT(NET_IPV4_DYNADDR),
-	XLAT(NET_IPV4_CONF),
-	XLAT(NET_IPV4_NEIGH),
-	XLAT(NET_IPV4_ROUTE),
-	XLAT(NET_IPV4_FIB_HASH),
-	XLAT(NET_IPV4_TCP_TIMESTAMPS),
-	XLAT(NET_IPV4_TCP_WINDOW_SCALING),
-	XLAT(NET_IPV4_TCP_SACK),
-	XLAT(NET_IPV4_TCP_RETRANS_COLLAPSE),
-	XLAT(NET_IPV4_DEFAULT_TTL),
-	XLAT(NET_IPV4_AUTOCONFIG),
-	XLAT(NET_IPV4_NO_PMTU_DISC),
-	XLAT(NET_IPV4_TCP_SYN_RETRIES),
-	XLAT(NET_IPV4_IPFRAG_HIGH_THRESH),
-	XLAT(NET_IPV4_IPFRAG_LOW_THRESH),
-	XLAT(NET_IPV4_IPFRAG_TIME),
-	XLAT(NET_IPV4_TCP_MAX_KA_PROBES),
-	XLAT(NET_IPV4_TCP_KEEPALIVE_TIME),
-	XLAT(NET_IPV4_TCP_KEEPALIVE_PROBES),
-	XLAT(NET_IPV4_TCP_RETRIES1),
-	XLAT(NET_IPV4_TCP_RETRIES2),
-	XLAT(NET_IPV4_TCP_FIN_TIMEOUT),
-	XLAT(NET_IPV4_IP_MASQ_DEBUG),
-	XLAT(NET_TCP_SYNCOOKIES),
-	XLAT(NET_TCP_STDURG),
-	XLAT(NET_TCP_RFC1337),
-	XLAT(NET_TCP_SYN_TAILDROP),
-	XLAT(NET_TCP_MAX_SYN_BACKLOG),
-	XLAT(NET_IPV4_LOCAL_PORT_RANGE),
-	XLAT(NET_IPV4_ICMP_ECHO_IGNORE_ALL),
-	XLAT(NET_IPV4_ICMP_ECHO_IGNORE_BROADCASTS),
-	XLAT(NET_IPV4_ICMP_SOURCEQUENCH_RATE),
-	XLAT(NET_IPV4_ICMP_DESTUNREACH_RATE),
-	XLAT(NET_IPV4_ICMP_TIMEEXCEED_RATE),
-	XLAT(NET_IPV4_ICMP_PARAMPROB_RATE),
-	XLAT(NET_IPV4_ICMP_ECHOREPLY_RATE),
-	XLAT(NET_IPV4_ICMP_IGNORE_BOGUS_ERROR_RESPONSES),
-	XLAT(NET_IPV4_IGMP_MAX_MEMBERSHIPS),
-	XLAT_END
-};
+#include "xlat/sysctl_net_ipv4.h"
 
-static const struct xlat sysctl_net_ipv4_route[] = {
-	XLAT(NET_IPV4_ROUTE_FLUSH),
-	XLAT(NET_IPV4_ROUTE_MIN_DELAY),
-	XLAT(NET_IPV4_ROUTE_MAX_DELAY),
-	XLAT(NET_IPV4_ROUTE_GC_THRESH),
-	XLAT(NET_IPV4_ROUTE_MAX_SIZE),
-	XLAT(NET_IPV4_ROUTE_GC_MIN_INTERVAL),
-	XLAT(NET_IPV4_ROUTE_GC_TIMEOUT),
-	XLAT(NET_IPV4_ROUTE_GC_INTERVAL),
-	XLAT(NET_IPV4_ROUTE_REDIRECT_LOAD),
-	XLAT(NET_IPV4_ROUTE_REDIRECT_NUMBER),
-	XLAT(NET_IPV4_ROUTE_REDIRECT_SILENCE),
-	XLAT(NET_IPV4_ROUTE_ERROR_COST),
-	XLAT(NET_IPV4_ROUTE_ERROR_BURST),
-	XLAT(NET_IPV4_ROUTE_GC_ELASTICITY),
-	XLAT_END
-};
+#include "xlat/sysctl_net_ipv4_route.h"
 
-static const struct xlat sysctl_net_ipv4_conf[] = {
-	XLAT(NET_IPV4_CONF_FORWARDING),
-	XLAT(NET_IPV4_CONF_MC_FORWARDING),
-	XLAT(NET_IPV4_CONF_PROXY_ARP),
-	XLAT(NET_IPV4_CONF_ACCEPT_REDIRECTS),
-	XLAT(NET_IPV4_CONF_SECURE_REDIRECTS),
-	XLAT(NET_IPV4_CONF_SEND_REDIRECTS),
-	XLAT(NET_IPV4_CONF_SHARED_MEDIA),
-	XLAT(NET_IPV4_CONF_RP_FILTER),
-	XLAT(NET_IPV4_CONF_ACCEPT_SOURCE_ROUTE),
-	XLAT(NET_IPV4_CONF_BOOTP_RELAY),
-	XLAT(NET_IPV4_CONF_LOG_MARTIANS),
-	XLAT_END
-};
+#include "xlat/sysctl_net_ipv4_conf.h"
 
-static const struct xlat sysctl_net_ipv6[] = {
-	XLAT(NET_IPV6_CONF),
-	XLAT(NET_IPV6_NEIGH),
-	XLAT(NET_IPV6_ROUTE),
-	XLAT_END
-};
+#include "xlat/sysctl_net_ipv6.h"
 
-static const struct xlat sysctl_net_ipv6_route[] = {
-	XLAT(NET_IPV6_ROUTE_FLUSH),
-	XLAT(NET_IPV6_ROUTE_GC_THRESH),
-	XLAT(NET_IPV6_ROUTE_MAX_SIZE),
-	XLAT(NET_IPV6_ROUTE_GC_MIN_INTERVAL),
-	XLAT(NET_IPV6_ROUTE_GC_TIMEOUT),
-	XLAT(NET_IPV6_ROUTE_GC_INTERVAL),
-	XLAT(NET_IPV6_ROUTE_GC_ELASTICITY),
-	XLAT_END
-};
+#include "xlat/sysctl_net_ipv6_route.h"
 
 int
 sys_sysctl(struct tcb *tcp)
@@ -954,14 +596,7 @@ sys_sysctl(struct tcb *tcp)
 #define __NEW_UTS_LEN 64
 #endif
 
-static const struct xlat sysmips_operations[] = {
-	XLAT(SETNAME),
-	XLAT(FLUSH_CACHE),
-	XLAT(MIPS_FIXADE),
-	XLAT(MIPS_RDNVRAM),
-	XLAT(MIPS_ATOMIC_SET),
-	XLAT_END
-};
+#include "xlat/sysmips_operations.h"
 
 int sys_sysmips(struct tcb *tcp)
 {
@@ -1000,18 +635,7 @@ int sys_sysmips(struct tcb *tcp)
 #define OR1K_ATOMIC_UMAX        8
 #define OR1K_ATOMIC_UMIN        9
 
-static const struct xlat atomic_ops[] = {
-	{ OR1K_ATOMIC_SWAP,		"SWAP"		},
-	{ OR1K_ATOMIC_CMPXCHG,		"CMPXCHG"	},
-	{ OR1K_ATOMIC_XCHG,		"XCHG"		},
-	{ OR1K_ATOMIC_ADD,		"ADD"		},
-	{ OR1K_ATOMIC_DECPOS,		"DECPOS"	},
-	{ OR1K_ATOMIC_AND,		"AND"		},
-	{ OR1K_ATOMIC_OR,		"OR"		},
-	{ OR1K_ATOMIC_UMAX,		"UMAX"		},
-	{ OR1K_ATOMIC_UMIN,		"UMIN"		},
-	XLAT_END
-};
+#include "xlat/atomic_ops.h"
 
 int sys_or1k_atomic(struct tcb *tcp)
 {

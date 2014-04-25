@@ -1,0 +1,3 @@
+	{ 0,	"SHUT_RD"	},
+	{ 1,	"SHUT_WR"	},
+	{ 2,	"SHUT_RDWR"	},

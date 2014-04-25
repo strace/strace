@@ -2,12 +2,7 @@
 #include <sys/ioctl.h>
 #include <linux/ptp_clock.h>
 
-static const struct xlat ptp_flags_options[] = {
-	XLAT(PTP_ENABLE_FEATURE),
-	XLAT(PTP_RISING_EDGE),
-	XLAT(PTP_FALLING_EDGE),
-	XLAT_END
-};
+#include "xlat/ptp_flags_options.h"
 
 
 int ptp_ioctl(struct tcb *tcp, long code, long arg)
