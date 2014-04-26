@@ -211,6 +211,17 @@ struct kernel_dirent {
 	char            d_name[1];
 };
 
+#ifdef O_LARGEFILE
+# if O_LARGEFILE == 0          /* biarch platforms in 64-bit mode */
+#  undef O_LARGEFILE
+#  ifdef SPARC64
+#   define O_LARGEFILE 0x40000
+#  elif defined X86_64 || defined S390X
+#   define O_LARGEFILE 0100000
+#  endif
+# endif
+#endif
+
 #include "xlat/open_access_modes.h"
 
 #include "xlat/open_mode_flags.h"
