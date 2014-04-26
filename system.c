@@ -410,9 +410,6 @@ int sys_capset(struct tcb *tcp)
 
 #endif
 
-/* Linux 2.6.18+ headers removed CTL_PROC enum.  */
-# define CTL_PROC 4
-# define CTL_CPU 10		/* older headers lack */
 #include "xlat/sysctl_root.h"
 #include "xlat/sysctl_kern.h"
 #include "xlat/sysctl_vm.h"
