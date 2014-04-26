@@ -995,11 +995,7 @@ sys_uname(struct tcb *tcp)
 }
 
 #include "xlat/ptrace_cmds.h"
-
-#ifdef PTRACE_SETOPTIONS
 #include "xlat/ptrace_setoptions_flags.h"
-#endif /* PTRACE_SETOPTIONS */
-
 #include "xlat/nt_descriptor_types.h"
 
 #define uoff(member)	offsetof(struct user, member)

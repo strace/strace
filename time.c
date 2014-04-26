@@ -398,9 +398,7 @@ sys_osf_setitimer(struct tcb *tcp)
 #endif
 
 #include "xlat/adjtimex_modes.h"
-
 #include "xlat/adjtimex_status.h"
-
 #include "xlat/adjtimex_state.h"
 
 #if SUPPORTED_PERSONALITIES > 1
@@ -522,17 +520,14 @@ sys_adjtimex(struct tcb *tcp)
 }
 
 #include "xlat/clockflags.h"
-
 #include "xlat/clocknames.h"
-
-#ifdef CLOCKID_TO_FD
-#include "xlat/cpuclocknames.h"
-#endif
 
 static void
 printclockname(int clockid)
 {
 #ifdef CLOCKID_TO_FD
+# include "xlat/cpuclocknames.h"
+
 	if (clockid < 0) {
 		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
 			tprintf("FD_TO_CLOCKID(%d)", CLOCKID_TO_FD(clockid));

@@ -3,7 +3,6 @@
 #include <linux/inotify.h>
 
 #include "xlat/inotify_flags.h"
-
 #include "xlat/inotify_init_flags.h"
 
 int

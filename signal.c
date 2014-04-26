@@ -101,7 +101,6 @@ struct sigcontext {
 #endif
 
 #include "xlat/sigact_flags.h"
-
 #include "xlat/sigprocmaskcmds.h"
 
 #endif /* HAVE_SIGACTION */
@@ -328,17 +327,11 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 #endif
 
 #include "xlat/siginfo_codes.h"
-
 #include "xlat/sigill_codes.h"
-
 #include "xlat/sigfpe_codes.h"
-
 #include "xlat/sigtrap_codes.h"
-
 #include "xlat/sigchld_codes.h"
-
 #include "xlat/sigpoll_codes.h"
-
 #include "xlat/sigprof_codes.h"
 
 #ifdef SIGEMT
@@ -346,7 +339,6 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 #endif
 
 #include "xlat/sigsegv_codes.h"
-
 #include "xlat/sigbus_codes.h"
 
 #ifndef SYS_SECCOMP

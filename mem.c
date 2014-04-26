@@ -54,7 +54,6 @@ sys_brk(struct tcb *tcp)
 }
 
 #include "xlat/mmap_prot.h"
-
 #include "xlat/mmap_flags.h"
 
 static int
@@ -268,7 +267,6 @@ sys_msync(struct tcb *tcp)
 #ifdef MC_SYNC
 
 #include "xlat/mctl_funcs.h"
-
 #include "xlat/mctl_lockas.h"
 
 int
@@ -374,11 +372,8 @@ sys_remap_file_pages(struct tcb *tcp)
 #define MPOL_MF_MOVE_ALL (1<<2)
 
 #include "xlat/policies.h"
-
 #include "xlat/mbindflags.h"
-
 #include "xlat/mempolicyflags.h"
-
 #include "xlat/move_pages_flags.h"
 
 static void

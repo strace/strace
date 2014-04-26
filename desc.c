@@ -39,21 +39,10 @@
 #endif
 
 #include "xlat/fcntlcmds.h"
-
 #include "xlat/fdflags.h"
-
-#ifdef LOCK_SH
-
 #include "xlat/flockcmds.h"
-
-#endif /* LOCK_SH */
-
 #include "xlat/lockfcmds.h"
-
-#ifdef F_NOTIFY
 #include "xlat/notifyflags.h"
-#endif
-
 #include "xlat/perf_event_open_flags.h"
 
 /*
@@ -465,8 +454,8 @@ sys_osf_select(struct tcb *tcp)
 #endif
 
 #include "xlat/epollctls.h"
-
 #include "xlat/epollevents.h"
+#include "xlat/epollflags.h"
 
 /* Not aliased to printargs_ld: we want it to have a distinct address */
 int
@@ -474,8 +463,6 @@ sys_epoll_create(struct tcb *tcp)
 {
 	return printargs_ld(tcp);
 }
-
-#include "xlat/epollflags.h"
 
 int
 sys_epoll_create1(struct tcb *tcp)

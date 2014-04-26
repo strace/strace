@@ -223,7 +223,6 @@ struct kernel_dirent {
 #endif
 
 #include "xlat/open_access_modes.h"
-
 #include "xlat/open_mode_flags.h"
 
 #ifndef AT_FDCWD

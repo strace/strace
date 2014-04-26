@@ -70,7 +70,6 @@ struct module_info
 };
 
 #include "xlat/qm_which.h"
-
 #include "xlat/modflags.h"
 
 int

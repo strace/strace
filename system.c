@@ -414,25 +414,15 @@ int sys_capset(struct tcb *tcp)
 # define CTL_PROC 4
 # define CTL_CPU 10		/* older headers lack */
 #include "xlat/sysctl_root.h"
-
 #include "xlat/sysctl_kern.h"
-
 #include "xlat/sysctl_vm.h"
-
 #include "xlat/sysctl_net.h"
-
 #include "xlat/sysctl_net_core.h"
-
 #include "xlat/sysctl_net_unix.h"
-
 #include "xlat/sysctl_net_ipv4.h"
-
 #include "xlat/sysctl_net_ipv4_route.h"
-
 #include "xlat/sysctl_net_ipv4_conf.h"
-
 #include "xlat/sysctl_net_ipv6.h"
-
 #include "xlat/sysctl_net_ipv6_route.h"
 
 int

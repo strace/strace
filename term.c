@@ -42,7 +42,6 @@
 #endif
 
 #include "xlat/baud_options.h"
-
 #include "xlat/modem_flags.h"
 
 int term_ioctl(struct tcb *tcp, long code, long arg)

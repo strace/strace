@@ -2,7 +2,6 @@
 #include <linux/fanotify.h>
 
 #include "xlat/fan_classes.h"
-
 #include "xlat/fan_init_flags.h"
 
 int
@@ -27,7 +26,6 @@ sys_fanotify_init(struct tcb *tcp)
 }
 
 #include "xlat/fan_mark_flags.h"
-
 #include "xlat/fan_event_flags.h"
 
 int

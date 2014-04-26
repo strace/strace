@@ -99,7 +99,6 @@
 #define XFS_GROUP_QUOTA		(1<<2)	/* group quota type */
 
 #include "xlat/xfs_quota_flags.h"
-
 #include "xlat/xfs_dqblk_flags.h"
 
 /*

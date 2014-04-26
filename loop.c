@@ -32,7 +32,6 @@
 #include <linux/loop.h>
 
 #include "xlat/loop_flags_options.h"
-
 #include "xlat/loop_crypt_type_options.h"
 
 int loop_ioctl(struct tcb *tcp, long code, long arg)

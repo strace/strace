@@ -111,7 +111,6 @@
 #endif
 
 #include "xlat/msg_flags.h"
-
 #include "xlat/sockoptions.h"
 
 #if !defined(SOL_IP) && defined(IPPROTO_IP)

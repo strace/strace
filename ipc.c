@@ -64,19 +64,12 @@
 extern void printsigevent(struct tcb *tcp, long arg);
 
 #include "xlat/msgctl_flags.h"
-
 #include "xlat/semctl_flags.h"
-
 #include "xlat/shmctl_flags.h"
-
 #include "xlat/resource_flags.h"
-
 #include "xlat/shm_resource_flags.h"
-
 #include "xlat/shm_flags.h"
-
 #include "xlat/ipc_msg_flags.h"
-
 #include "xlat/semop_flags.h"
 
 int sys_msgget(struct tcb *tcp)

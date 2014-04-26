@@ -2,7 +2,6 @@
 #include <linux/kexec.h>
 
 #include "xlat/kexec_arch_values.h"
-
 #include "xlat/kexec_flags.h"
 
 static void

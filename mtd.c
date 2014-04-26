@@ -42,13 +42,9 @@
 #endif
 
 #include "xlat/mtd_mode_options.h"
-
 #include "xlat/mtd_type_options.h"
-
 #include "xlat/mtd_flags_options.h"
-
 #include "xlat/mtd_otp_options.h"
-
 #include "xlat/mtd_nandecc_options.h"
 
 int mtd_ioctl(struct tcb *tcp, long code, long arg)
@@ -254,7 +250,6 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 }
 
 #include "xlat/ubi_volume_types.h"
-
 #include "xlat/ubi_volume_props.h"
 
 int ubi_ioctl(struct tcb *tcp, long code, long arg)

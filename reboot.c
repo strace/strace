@@ -2,9 +2,7 @@
 #include <linux/reboot.h>
 
 #include "xlat/bootflags1.h"
-
 #include "xlat/bootflags2.h"
-
 #include "xlat/bootflags3.h"
 
 int
