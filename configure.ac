@@ -293,6 +293,18 @@ AC_CHECK_DECLS(m4_normalize([
 ]),,, [#include <sys/ptrace.h>])
 
 AC_CHECK_DECLS(m4_normalize([
+	P_PID,
+	P_PPID,
+	P_PGID,
+	P_SID,
+	P_CID,
+	P_UID,
+	P_GID,
+	P_ALL,
+	P_LWPID
+]),,, [#include <sys/wait.h>])
+
+AC_CHECK_DECLS(m4_normalize([
 	LO_FLAGS_READ_ONLY,
 	LO_FLAGS_AUTOCLEAR,
 	LO_FLAGS_PARTSCAN
