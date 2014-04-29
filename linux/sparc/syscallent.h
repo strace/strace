@@ -397,8 +397,8 @@
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 391 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 392 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 393 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 394 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 395 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 394 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 395 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 396 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 397 */
 	{ 5,	0,	NULL,			NULL		}, /* 398 */

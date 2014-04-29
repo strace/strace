@@ -29,7 +29,7 @@
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 5026 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 5027 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 5028 */
-	{ 3,	TI,	sys_shmat,		"shmat"		}, /* 5029 */
+	{ 3,	TI|TM,	sys_shmat,		"shmat"		}, /* 5029 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"	}, /* 5030 */
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 5031 */
 	{ 2,	TD,	sys_dup2,		"dup2"		}, /* 5032 */
@@ -65,7 +65,7 @@
 	{ 3,	TI,	sys_semget,		"semget"	}, /* 5062 */
 	{ 3,	TI,	printargs,		"semop"		}, /* 5063 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 5064 */
-	{ 1,	TI,	sys_shmdt,		"shmdt"		}, /* 5065 */
+	{ 1,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 5065 */
 	{ 2,	TI,	sys_msgget,		"msgget"	}, /* 5066 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 5067 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 5068 */
@@ -338,7 +338,7 @@
 	{ 0,	TM,	printargs,		"n64_mincore"		}, /* 5026 */
 	{ 0,	TM,	printargs,		"n64_madvise"		}, /* 5027 */
 	{ 0,	0,	printargs,		"n64_shmget"		}, /* 5028 */
-	{ 0,	0,	printargs,		"n64_shmat"		}, /* 5029 */
+	{ 0,	TI|TM,	printargs,		"n64_shmat"		}, /* 5029 */
 	{ 0,	0,	printargs,		"n64_shmctl"		}, /* 5030 */
 	{ 0,	0,	printargs,		"n64_dup"		}, /* 5031 */
 	{ 0,	0,	printargs,		"n64_dup2"		}, /* 5032 */
@@ -374,7 +374,7 @@
 	{ 0,	0,	printargs,		"n64_semget"		}, /* 5062 */
 	{ 0,	0,	printargs,		"n64_semop"		}, /* 5063 */
 	{ 0,	0,	printargs,		"n64_semctl"		}, /* 5064 */
-	{ 0,	0,	printargs,		"n64_shmdt"		}, /* 5065 */
+	{ 0,	TI|TM,	printargs,		"n64_shmdt"		}, /* 5065 */
 	{ 0,	0,	printargs,		"n64_msgget"		}, /* 5066 */
 	{ 0,	0,	printargs,		"n64_msgsnd"		}, /* 5067 */
 	{ 0,	0,	printargs,		"n64_msgrcv"		}, /* 5068 */

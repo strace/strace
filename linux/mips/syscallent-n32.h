@@ -29,7 +29,7 @@
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 6026 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 6027 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 6028 */
-	{ 3,	TI,	sys_shmat,		"shmat"		}, /* 6029 */
+	{ 3,	TI|TM,	sys_shmat,		"shmat"		}, /* 6029 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"	}, /* 6030 */
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 6031 */
 	{ 2,	TD,	sys_dup2,		"dup2"		}, /* 6032 */
@@ -65,7 +65,7 @@
 	{ 3,	TI,	sys_semget,		"semget"	}, /* 6062 */
 	{ 3,	TI,	printargs,		"semop"		}, /* 6063 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 6064 */
-	{ 1,	TI,	sys_shmdt,		"shmdt"		}, /* 6065 */
+	{ 1,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 6065 */
 	{ 2,	TI,	sys_msgget,		"msgget"	}, /* 6066 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 6067 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 6068 */
@@ -343,7 +343,7 @@
 	{ 0,	TM,	printargs,		"n32_mincore"		}, /* 6026 */
 	{ 0,	TM,	printargs,		"n32_madvise"		}, /* 6027 */
 	{ 0,	0,	printargs,		"n32_shmget"		}, /* 6028 */
-	{ 0,	0,	printargs,		"n32_shmat"		}, /* 6029 */
+	{ 0,	TI|TM,	printargs,		"n32_shmat"		}, /* 6029 */
 	{ 0,	0,	printargs,		"n32_shmctl"		}, /* 6030 */
 	{ 0,	0,	printargs,		"n32_dup"		}, /* 6031 */
 	{ 0,	0,	printargs,		"n32_dup2"		}, /* 6032 */
@@ -379,7 +379,7 @@
 	{ 0,	0,	printargs,		"n32_semget"		}, /* 6062 */
 	{ 0,	0,	printargs,		"n32_semop"		}, /* 6063 */
 	{ 0,	0,	printargs,		"n32_semctl"		}, /* 6064 */
-	{ 0,	0,	printargs,		"n32_shmdt"		}, /* 6065 */
+	{ 0,	TI|TM,	printargs,		"n32_shmdt"		}, /* 6065 */
 	{ 0,	0,	printargs,		"n32_msgget"		}, /* 6066 */
 	{ 0,	0,	printargs,		"n32_msgsnd"		}, /* 6067 */
 	{ 0,	0,	printargs,		"n32_msgrcv"		}, /* 6068 */

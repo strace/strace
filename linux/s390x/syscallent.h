@@ -474,7 +474,7 @@
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 438 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 439 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 440 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 441 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 442 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 441 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 442 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 443 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 444 */

@@ -235,9 +235,9 @@
 	{ 4,	TI,	printargs,		"semop"			}, /* 206 */
 	{ 1,	0,	printargs,		"osf_utsname"		}, /* 207 */
 	{ 3,	TF,	sys_chown,		"lchown"		}, /* 208 */
-	{ 3,	TI,	printargs,		"osf_shmat"		}, /* 209 */
+	{ 3,	TI|TM,	printargs,		"osf_shmat"		}, /* 209 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"		}, /* 210 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"			}, /* 211 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"			}, /* 211 */
 	{ 4,	TI,	sys_shmget,		"shmget"		}, /* 212 */
 	{ 5,	0,	printargs,		"osf_mvalid"		}, /* 213, not implemented */
 	{ 5,	0,	printargs,		"osf_getaddressconf"	}, /* 214, not implemented */

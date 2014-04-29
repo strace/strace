@@ -364,9 +364,9 @@
 	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 335 */
 	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 336 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 337 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 338 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 338 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 339 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 340 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 340 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 341 */
 	{ 6,	TD,	sys_splice,		"splice"	}, /* 342 */
 	{ 6,	TD,	sys_sync_file_range,	"sync_file_range"	}, /* 343 */

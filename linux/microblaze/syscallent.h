@@ -361,9 +361,9 @@
 	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 332 */
 	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 333 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 334 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 335 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 335 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 336 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 337 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 337 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 338 */
 	{ 4,	TD|TS,	printargs,		"signalfd4"	}, /* 339 */
 	{ 2,	TD,	printargs,		"eventfd2"	}, /* 340 */

@@ -194,8 +194,8 @@
 	{ 3,	TI,	sys_semop,			"semop"			}, /* 193 */
 	{ 3,	TI,	sys_shmget,			"shmget"		}, /* 194 */
 	{ 3,	TI,	sys_shmctl,			"shmctl"		}, /* 195 */
-	{ 3,	TI,	sys_shmat,			"shmat"			}, /* 196 */
-	{ 1,	TI,	sys_shmdt,			"shmdt"			}, /* 197 */
+	{ 3,	TI|TM,	sys_shmat,			"shmat"			}, /* 196 */
+	{ 1,	TI|TM,	sys_shmdt,			"shmdt"			}, /* 197 */
 	{ 3,	TN,	sys_socket,			"socket"		}, /* 198 */
 	{ 4,	TN,	sys_socketpair,			"socketpair"		}, /* 199 */
 	{ 3,	TN,	sys_bind,			"bind"			}, /* 200 */

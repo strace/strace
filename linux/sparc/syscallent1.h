@@ -359,9 +359,9 @@
 	{ 6,	0,	NULL,			NULL		}, /* 328 */
 	{ 6,	0,	NULL,			NULL		}, /* 329 */
 
-	{ 6,	TI,	solaris_shmat,		"shmat"		}, /* 330 */
+	{ 6,	TI|TM,	solaris_shmat,		"shmat"		}, /* 330 */
 	{ 6,	TI,	solaris_shmctl,		"shmctl"	}, /* 331 */
-	{ 6,	TI,	solaris_shmdt,		"shmdt"		}, /* 332 */
+	{ 6,	TI|TM,	solaris_shmdt,		"shmdt"		}, /* 332 */
 	{ 6,	TI,	solaris_shmget,		"shmget"	}, /* 333 */
 	{ 6,	0,	NULL,			NULL		}, /* 334 */
 	{ 6,	0,	NULL,			NULL		}, /* 335 */

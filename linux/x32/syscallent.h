@@ -28,7 +28,7 @@
 	{ 3,	TM,	sys_mincore,		"mincore"	},  /* 27 */
 	{ 3,	TM,	sys_madvise,		"madvise"	},  /* 28 */
 	{ 4,	TI,	sys_shmget,		"shmget"	},  /* 29 */
-	{ 4,	TI,	sys_shmat,		"shmat"		},  /* 30 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		},  /* 30 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	},  /* 31 */
 	{ 1,	TD,	sys_dup,		"dup"		},  /* 32 */
 	{ 2,	TD,	sys_dup2,		"dup2"		},  /* 33 */
@@ -65,7 +65,7 @@
 	{ 4,	TI,	sys_semget,		"semget"	},  /* 64 */
 	{ 4,	TI,	sys_semop,		"semop"		},  /* 65 */
 	{ 4,	TI,	sys_semctl,		"semctl"	},  /* 66 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		},  /* 67 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		},  /* 67 */
 	{ 4,	TI,	sys_msgget,		"msgget"	},  /* 68 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	},  /* 69 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	},  /* 70 */

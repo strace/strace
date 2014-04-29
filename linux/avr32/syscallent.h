@@ -299,9 +299,9 @@
 	{ 4,	TI,	sys_semop,		"semop"		}, /* 271 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 272 */
 	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 273 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 274 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 274 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 275 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 276 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 276 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 277 */
 	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 278 */
 	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 279 */

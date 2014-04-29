@@ -905,8 +905,8 @@
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 1111 */
 	{ 3,	TI,	sys_msgctl,		"msgctl"	}, /* 1112 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 1113 */
-	{ 3,	TI,	sys_shmat,		"shmat"		}, /* 1114 */
-	{ 1,	TI,	sys_shmdt,		"shmdt"		}, /* 1115 */
+	{ 3,	TI|TM,	sys_shmat,		"shmat"		}, /* 1114 */
+	{ 1,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 1115 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"	}, /* 1116 */
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 1117 */
 	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 1118 */

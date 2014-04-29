@@ -333,8 +333,8 @@
 	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 302 */
 	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 303 */
 	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 304 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 305 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 306 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 305 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 306 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 307 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 308 */
 	{ 5,	0,	sys_add_key,		"add_key"	}, /* 309 */
@@ -478,8 +478,8 @@
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 438 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 439 */
 	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 440 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 441 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 442 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 441 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 442 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 443 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 444 */
 # define ARM_LAST_ORDINARY_SYSCALL 444

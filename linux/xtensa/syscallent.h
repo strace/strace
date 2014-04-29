@@ -86,9 +86,9 @@
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 90 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 91 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 92 */
-	{ 4,	TI,	sys_shmat,		"shmat"		}, /* 93 */
+	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 93 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 94 */
-	{ 4,	TI,	sys_shmdt,		"shmdt"		}, /* 95 */
+	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 95 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 96 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 97 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 98 */

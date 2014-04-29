@@ -194,8 +194,8 @@
 	{ 4,	TI,	sys_msgrcv,		"msgrcv"		}, /* 189 */
 	{ 4,	TI,	sys_msgget,		"msgget"		}, /* 190 */
 	{ 4,	TI,	sys_msgctl,		"msgctl"		}, /* 191 */
-	{ 3,	TI,	sys_shmat,		"shmat"			}, /* 192 */
-	{ 1,	TI,	sys_shmdt,		"shmdt"			}, /* 193 */
+	{ 3,	TI|TM,	sys_shmat,		"shmat"			}, /* 192 */
+	{ 1,	TI|TM,	sys_shmdt,		"shmdt"			}, /* 193 */
 	{ 3,	TI,	sys_shmget,		"shmget"		}, /* 194 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"		}, /* 195 */
 	{ 5,	0,	sys_getpmsg,		"getpmsg"		}, /* 196 */
