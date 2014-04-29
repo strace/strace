@@ -256,7 +256,7 @@
 	{ 0,	TM,	sys_mbind,		"mbind"		}, /* 263 */
 	{ 6,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 264 */
 	{ 5,	TM,	sys_set_mempolicy,	"set_mempolicy"	}, /* 265 */
-	{ 3,	TP,	sys_unshare,		"unshare"	}, /* 266 */
+	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 266 */
 	{ 1,	TM,	sys_move_pages,		"move_pages"	}, /* 267 */
 	{ 0,	TD,	sys_splice,		"splice"	}, /* 268 */
 	{ 0,	TD,	sys_tee,		"tee"		}, /* 269 */
