@@ -464,7 +464,7 @@
 	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive"	}, /* 435 */
 	{ 2,	0,	sys_mq_notify,		"mq_notify"		}, /* 436 */
 	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"		}, /* 437 */
-	{ 4,	0,	printargs,		"waitid"		}, /* 438 */
+	{ 5,	TP,	sys_waitid,		"waitid"		}, /* 438 */
 	{ 5,	0,	sys_add_key,		"add_key"		}, /* 439 */
 	{ 4,	0,	sys_request_key,	"request_key"		}, /* 440 */
 	{ 5,	0,	sys_keyctl,		"keyctl"		}, /* 441 */

@@ -237,7 +237,7 @@
 	{ 5,	0,	printargs,		"mq_timedreceive"		}, /* 232 */
 	{ 5,	0,	printargs,		"mq_notify"		}, /* 233 */
 	{ 5,	0,	printargs,		"mq_getsetattr"		}, /* 234 */
-	{ 4,	0,	printargs,		"waitid"		}, /* 235 */
+	{ 5,	TP,	sys_waitid,		"waitid"		}, /* 235 */
 	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"		}, /* 236 */
 	{ 5,	0,	sys_set_tid_address,	"set_tid_address"	}, /* 237 */
 	{ 5,	TF,	sys_setxattr,		"setxattr"		}, /* 238 */

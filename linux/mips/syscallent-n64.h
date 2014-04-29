@@ -546,7 +546,7 @@
 	{ 0,	0,	printargs,		"n64_mq_notify"		}, /* 5234 */
 	{ 0,	0,	printargs,		"n64_mq_getsetattr"	}, /* 5235 */
 	{ 5,	0,	printargs,		"n64_vserver"		}, /* 5236 */
-	{ 0,	0,	printargs,		"n64_waitid"		}, /* 5237 */
+	{ 5,	TP,	printargs,		"n64_waitid"		}, /* 5237 */
 	{ 0,	0,	printargs,		"n64_SYS_5238"		}, /* 5238 */
 	{ 0,	0,	printargs,		"n64_add_key"		}, /* 5239 */
 	{ 0,	0,	printargs,		"n64_request_key"	}, /* 5230 */
