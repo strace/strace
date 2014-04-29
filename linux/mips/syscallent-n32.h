@@ -55,7 +55,7 @@
 	{ 4,	TN,	sys_socketpair,		"socketpair"	}, /* 6052 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 6053 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 6054 */
-	{ 2,	TP,	sys_clone,		"clone"		}, /* 6055 */
+	{ 5,	TP,	sys_clone,		"clone"		}, /* 6055 */
 	{ 0,	TP,	sys_fork,		"fork"		}, /* 6056 */
 	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 6057 */
 	{ 1,	TP,	sys_exit,		"exit"		}, /* 6058 */
@@ -369,11 +369,11 @@
 	{ 0,	0,	printargs,		"n32_socketpair"	}, /* 6052 */
 	{ 0,	0,	printargs,		"n32_setsockopt"	}, /* 6053 */
 	{ 0,	0,	printargs,		"n32_getsockopt"	}, /* 6054 */
-	{ 0,	0,	printargs,		"n32_clone"		}, /* 6055 */
-	{ 0,	0,	printargs,		"n32_fork"		}, /* 6056 */
-	{ 0,	0,	printargs,		"n32_execve"		}, /* 6057 */
-	{ 0,	0,	printargs,		"n32_exit"		}, /* 6058 */
-	{ 0,	0,	printargs,		"n32_wait4"		}, /* 6059 */
+	{ 5,	TP,	printargs,		"n32_clone"		}, /* 6055 */
+	{ 0,	TP,	printargs,		"n32_fork"		}, /* 6056 */
+	{ 3,	TF|TP,	printargs,		"n32_execve"		}, /* 6057 */
+	{ 1,	TP,	printargs,		"n32_exit"		}, /* 6058 */
+	{ 4,	TP,	printargs,		"n32_wait4"		}, /* 6059 */
 	{ 0,	0,	printargs,		"n32_kill"		}, /* 6060 */
 	{ 0,	0,	printargs,		"n32_uname"		}, /* 6061 */
 	{ 0,	0,	printargs,		"n32_semget"		}, /* 6062 */

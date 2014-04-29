@@ -351,17 +351,17 @@
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 4348 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
-	{ 0,	0,	printargs,		"o32_exit"		}, /* 4001 */
-	{ 0,	0,	printargs,		"o32_fork"		}, /* 4002 */
+	{ 1,	TP,	printargs,		"o32_exit"		}, /* 4001 */
+	{ 0,	TP,	printargs,		"o32_fork"		}, /* 4002 */
 	{ 0,	0,	printargs,		"o32_read"		}, /* 4003 */
 	{ 0,	0,	printargs,		"o32_write"		}, /* 4004 */
 	{ 0,	0,	printargs,		"o32_open"		}, /* 4005 */
 	{ 0,	0,	printargs,		"o32_close"		}, /* 4006 */
-	{ 0,	0,	printargs,		"o32_waitpid"	}, /* 4007 */
+	{ 3,	TP,	printargs,		"o32_waitpid"	}, /* 4007 */
 	{ 0,	0,	printargs,		"o32_creat"		}, /* 4008 */
 	{ 0,	0,	printargs,		"o32_link"		}, /* 4009 */
 	{ 0,	0,	printargs,		"o32_unlink"	}, /* 4010 */
-	{ 0,	0,	printargs,		"o32_execve"	}, /* 4011 */
+	{ 3,	TF|TP,	printargs,		"o32_execve"	}, /* 4011 */
 	{ 0,	0,	printargs,		"o32_chdir"		}, /* 4012 */
 	{ 0,	0,	printargs,		"o32_time"		}, /* 4013 */
 	{ 0,	0,	printargs,		"o32_mknod"		}, /* 4014 */
@@ -464,13 +464,13 @@
 	{ 0,	0,	printargs,		"o32_vhangup"	}, /* 4111 */
 	{ 0,	0,	printargs,		"o32_idle"		}, /* 4112 */
 	{ 0,	0,	printargs,		"o32_vm86"		}, /* 4113 */
-	{ 0,	0,	printargs,		"o32_wait4"		}, /* 4114 */
+	{ 4,	TP,	printargs,		"o32_wait4"		}, /* 4114 */
 	{ 0,	0,	printargs,		"o32_swapoff"	}, /* 4115 */
 	{ 0,	0,	printargs,		"o32_sysinfo"	}, /* 4116 */
 	{ 0,	0,	printargs,		"o32_ipc"		}, /* 4117 */
 	{ 0,	0,	printargs,		"o32_fsync"		}, /* 4118 */
 	{ 0,	0,	printargs,		"o32_sigreturn"	}, /* 4119 */
-	{ 0,	0,	printargs,		"o32_clone"		}, /* 4120 */
+	{ 5,	TP,	printargs,		"o32_clone"		}, /* 4120 */
 	{ 0,	0,	printargs,		"o32_setdomainname"	}, /* 4121 */
 	{ 0,	0,	printargs,		"o32_uname"		}, /* 4122 */
 	{ 0,	0,	printargs,		"o32_modify_ldt"	}, /* 4123 */

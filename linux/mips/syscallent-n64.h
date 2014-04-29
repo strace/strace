@@ -55,7 +55,7 @@
 	{ 4,	TN,	sys_socketpair,		"socketpair"	}, /* 5052 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 5053 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 5054 */
-	{ 2,	TP,	sys_clone,		"clone"		}, /* 5055 */
+	{ 5,	TP,	sys_clone,		"clone"		}, /* 5055 */
 	{ 0,	TP,	sys_fork,		"fork"		}, /* 5056 */
 	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 5057 */
 	{ 1,	TP,	sys_exit,		"exit"		}, /* 5058 */
@@ -364,11 +364,11 @@
 	{ 0,	0,	printargs,		"n64_socketpair"	}, /* 5052 */
 	{ 0,	0,	printargs,		"n64_setsockopt"	}, /* 5053 */
 	{ 0,	0,	printargs,		"n64_getsockopt"	}, /* 5054 */
-	{ 0,	0,	printargs,		"n64_clone"		}, /* 5055 */
-	{ 0,	0,	printargs,		"n64_fork"		}, /* 5056 */
-	{ 0,	0,	printargs,		"n64_execve"		}, /* 5057 */
-	{ 0,	0,	printargs,		"n64_exit"		}, /* 5058 */
-	{ 0,	0,	printargs,		"n64_wait4"		}, /* 5059 */
+	{ 5,	TP,	printargs,		"n64_clone"		}, /* 5055 */
+	{ 0,	TP,	printargs,		"n64_fork"		}, /* 5056 */
+	{ 3,	TF|TP,	printargs,		"n64_execve"		}, /* 5057 */
+	{ 1,	TP,	printargs,		"n64_exit"		}, /* 5058 */
+	{ 4,	TP,	printargs,		"n64_wait4"		}, /* 5059 */
 	{ 0,	0,	printargs,		"n64_kill"		}, /* 5060 */
 	{ 0,	0,	printargs,		"n64_uname"		}, /* 5061 */
 	{ 0,	0,	printargs,		"n64_semget"		}, /* 5062 */
@@ -571,7 +571,7 @@
 	{ 0,	0,	printargs,		"n64_faccessat"		}, /* 5259 */
 	{ 0,	0,	printargs,		"n64_pselect6"		}, /* 5260 */
 	{ 0,	0,	printargs,		"n64_ppoll"		}, /* 5261 */
-	{ 0,	0,	printargs,		"n64_unshare"		}, /* 5262 */
+	{ 1,	TP,	printargs,		"n64_unshare"		}, /* 5262 */
 	{ 0,	0,	printargs,		"n64_splice"		}, /* 5263 */
 	{ 0,	0,	printargs,		"n64_sync_file_range"	}, /* 5264 */
 	{ 0,	0,	printargs,		"n64_tee"		}, /* 5265 */
@@ -600,7 +600,7 @@
 	{ 0,	0,	printargs,		"n64_inotify_init1"	}, /* 5288 */
 	{ 0,	0,	printargs,		"n64_preadv"		}, /* 5289 */
 	{ 0,	0,	printargs,		"n64_pwritev"		}, /* 5290 */
-	{ 0,	0,	printargs,		"n64_rt_tgsigqueueinfo" }, /* 5291 */
+	{ 4,	TP|TS,	printargs,		"n64_rt_tgsigqueueinfo" }, /* 5291 */
 	{ 0,	0,	printargs,		"n64_perf_event_open"	}, /* 5292 */
 	{ 0,	0,	printargs,		"n64_accept4"		}, /* 5293 */
 	{ 0,	0,	printargs,		"n64_recvmmsg"		}, /* 5294 */
