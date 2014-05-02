@@ -370,7 +370,7 @@ struct arm_pt_regs {
 # define DEFAULT_PERSONALITY 0
 #endif
 #ifndef PERSONALITY0_WORDSIZE
-# define PERSONALITY0_WORDSIZE (int)(sizeof(long))
+# define PERSONALITY0_WORDSIZE SIZEOF_LONG
 #endif
 
 #if defined(I386) || defined(X86_64)

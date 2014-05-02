@@ -88,10 +88,6 @@ static const struct xlat resources[] = {
 	XLAT_END
 };
 
-#if !(SIZEOF_RLIM_T == 4 || SIZEOF_RLIM_T == 8)
-# error "Unsupported SIZEOF_RLIM_T value"
-#endif
-
 static const char *
 sprint_rlim64(uint64_t lim)
 {
@@ -135,7 +131,7 @@ decode_rlimit64(struct tcb *tcp, unsigned long addr)
 		print_rlimit64(tcp, addr);
 }
 
-#if SIZEOF_RLIM_T == 4 || SUPPORTED_PERSONALITIES > 1
+#if !defined(current_wordsize) || current_wordsize == 4
 
 static const char *
 sprint_rlim32(uint32_t lim)
@@ -176,22 +172,28 @@ decode_rlimit(struct tcb *tcp, unsigned long addr)
 	else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)))
 		tprintf("%#lx", addr);
 	else {
-# if SIZEOF_RLIM_T == 4
-		print_rlimit32(tcp, addr);
+# if defined(X86_64) || defined(X32)
+		/*
+		 * i386 is the only personality on X86_64 and X32
+		 * with 32-bit rlim_t.
+		 * When current_personality is X32, current_wordsize
+		 * equals to 4 but rlim_t is 64-bit.
+		 */
+		if (current_personality == 1)
 # else
 		if (current_wordsize == 4)
+# endif
 			print_rlimit32(tcp, addr);
 		else
 			print_rlimit64(tcp, addr);
-# endif
 	}
 }
 
-#else /* SIZEOF_RLIM_T == 8 && SUPPORTED_PERSONALITIES == 1 */
+#else /* defined(current_wordsize) && current_wordsize != 4 */
 
 # define decode_rlimit decode_rlimit64
 
-#endif /* SIZEOF_RLIM_T == 4 || SUPPORTED_PERSONALITIES > 1 */
+#endif
 
 int
 sys_getrlimit(struct tcb *tcp)
