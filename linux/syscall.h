@@ -302,7 +302,6 @@ int sys_unshare();
 int sys_utime();
 int sys_utimensat();
 int sys_utimes();
-int sys_vfork();
 int sys_vmsplice();
 int sys_wait4();
 int sys_waitid();

@@ -600,14 +600,6 @@ sys_fork(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_vfork(struct tcb *tcp)
-{
-	if (exiting(tcp))
-		return RVAL_UDECIMAL;
-	return 0;
-}
-
 int sys_getuid(struct tcb *tcp)
 {
 	if (exiting(tcp))

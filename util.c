@@ -1492,8 +1492,7 @@ setbpt(struct tcb *tcp)
 			}
 	}
 
-	if (tcp->s_ent->sys_func == sys_fork ||
-	    tcp->s_ent->sys_func == sys_vfork) {
+	if (tcp->s_ent->sys_func == sys_fork) {
 		if (arg_setup(tcp, &state) < 0
 		    || get_arg0(tcp, &state, &tcp->inst[0]) < 0
 		    || get_arg1(tcp, &state, &tcp->inst[1]) < 0

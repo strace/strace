@@ -92,7 +92,7 @@
 	{ 0,	0,	sys_getpgrp,		"getpgrp"		}, /* 63 */
 	{ 0,	0,	sys_getpagesize,	"getpagesize"		}, /* 64 */
 	{ 5,	TM,	printargs,		"osf_mremap"		}, /* 65, not implemented */
-	{ 0,	TP,	sys_fork,		"vfork"			}, /* 66 */
+	{ 0,	TP,	sys_vfork,		"vfork"			}, /* 66 */
 	{ 2,	TF,	sys_stat,		"stat"			}, /* 67 */
 	{ 2,	TF,	sys_lstat,		"lstat"			}, /* 68 */
 	{ 5,	TM,	printargs,		"osf_sbrk"		}, /* 69, not implemented */

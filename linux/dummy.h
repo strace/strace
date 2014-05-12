@@ -88,6 +88,7 @@
 #define	sys_umount		sys_chdir
 #define	sys_unlink		sys_chdir
 #define	sys_uselib		sys_chdir
+#define	sys_vfork		sys_fork
 
 /* printargs does the right thing */
 #define	sys_getpgid		printargs

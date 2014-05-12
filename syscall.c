@@ -1708,7 +1708,6 @@ syscall_fixup_for_fork_exec(struct tcb *tcp)
 	func = tcp->s_ent->sys_func;
 
 	if (   sys_fork == func
-	    || sys_vfork == func
 	    || sys_clone == func
 	   ) {
 		internal_fork(tcp);
