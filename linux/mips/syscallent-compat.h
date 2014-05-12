@@ -113,9 +113,9 @@
 	{ 0,	0,	printargs,		"svr4_priocntlset"	}, /*  0112 */
 	{ 0,	0,	printargs,		"svr4_pathconf"	}, /*  0113 */
 	{ 0,	TM,	printargs,		"svr4_mincore"	}, /*  0114 */
-	{ 0,	TD|TM,	printargs,		"svr4_mmap"	}, /*  0115 */
-	{ 0,	TM,	printargs,		"svr4_mprotect"	}, /*  0116 */
-	{ 0,	TM,	printargs,		"svr4_munmap"	}, /*  0117 */
+	{ 0,	TD|TM|SI,	printargs,		"svr4_mmap"	}, /*  0115 */
+	{ 0,	TM|SI,	printargs,		"svr4_mprotect"	}, /*  0116 */
+	{ 0,	TM|SI,	printargs,		"svr4_munmap"	}, /*  0117 */
 	{ 0,	0,	printargs,		"svr4_fpathconf"	}, /*  0118 */
 	{ 0,	0,	printargs,		"svr4_vfork"	}, /*  0119 */
 	{ 0,	0,	printargs,		"svr4_fchdir"	}, /*  0120 */
@@ -227,7 +227,7 @@
 	{ 0,	0,	printargs,		"sysv_mknod"	}, /* 1014 */
 	{ 0,	0,	printargs,		"sysv_chmod"	}, /* 1015 */
 	{ 0,	0,	printargs,		"sysv_chown"	}, /* 1016 */
-	{ 0,	TM,	printargs,		"sysv_brk"	}, /* 1017 */
+	{ 0,	TM|SI,	printargs,		"sysv_brk"	}, /* 1017 */
 	{ 0,	0,	printargs,		"sysv_stat"	}, /* 1018 */
 	{ 0,	0,	printargs,		"sysv_lseek"	}, /* 1019 */
 	{ 0,	0,	printargs,		"sysv_getpid"	}, /* 1020 */
@@ -344,9 +344,9 @@
 	{ 0,	0,	printargs,		"sysv_procblk"	}, /* 1131 */
 	{ 0,	0,	printargs,		"sysv_sprocsp"	}, /* 1132 */
 	{ 0,	0,	printargs,		"sysv_sgigsc"	}, /* 1133 */
-	{ 0,	TD|TM,	printargs,		"sysv_mmap"	}, /* 1134 */
-	{ 0,	TM,	printargs,		"sysv_munmap"	}, /* 1135 */
-	{ 0,	TM,	printargs,		"sysv_mprotect"	}, /* 1136 */
+	{ 0,	TD|TM|SI,	printargs,		"sysv_mmap"	}, /* 1134 */
+	{ 0,	TM|SI,	printargs,		"sysv_munmap"	}, /* 1135 */
+	{ 0,	TM|SI,	printargs,		"sysv_mprotect"	}, /* 1136 */
 	{ 0,	TM,	printargs,		"sysv_msync"	}, /* 1137 */
 	{ 0,	TM,	printargs,		"sysv_madvise"	}, /* 1138 */
 	{ 0,	0,	printargs,		"sysv_pagelock"	}, /* 1139 */
@@ -395,7 +395,7 @@
 	{ 0,	0,	printargs,		"sysv_writev"	}, /* 1182 */
 	{ 0,	0,	printargs,		"sysv_truncate64"	}, /* 1183 */
 	{ 0,	0,	printargs,		"sysv_ftruncate64"	}, /* 1184 */
-	{ 0,	TD|TM,	printargs,		"sysv_mmap64"	}, /* 1185 */
+	{ 0,	TD|TM|SI,	printargs,		"sysv_mmap64"	}, /* 1185 */
 	{ 0,	0,	printargs,		"sysv_dmi"	}, /* 1186 */
 	{ 0,	0,	printargs,		"sysv_pread"	}, /* 1187 */
 	{ 0,	0,	printargs,		"sysv_pwrite"	}, /* 1188 */
@@ -467,16 +467,16 @@
 	{ 0,	0,	printargs,		"bsd43_fstat"	}, /* 2062 */
 	{ 0,	0,	NULL,			NULL		}, /* 2063 */
 	{ 0,	0,	printargs,		"bsd43_getpagesize"	}, /* 2064 */
-	{ 0,	TM,	printargs,		"bsd43_mremap"	}, /* 2065 */
+	{ 0,	TM|SI,	printargs,		"bsd43_mremap"	}, /* 2065 */
 	{ 0,	0,	printargs,		"bsd43_vfork"	}, /* 2066 */
 	{ 0,	0,	printargs,		"bsd43_vread"	}, /* 2067 */
 	{ 0,	0,	printargs,		"bsd43_vwrite"	}, /* 2068 */
-	{ 0,	TM,	printargs,		"bsd43_sbrk"	}, /* 2069 */
+	{ 0,	TM|SI,	printargs,		"bsd43_sbrk"	}, /* 2069 */
 	{ 0,	0,	printargs,		"bsd43_sstk"	}, /* 2070 */
-	{ 0,	TD|TM,	printargs,		"bsd43_mmap"	}, /* 2071 */
+	{ 0,	TD|TM|SI,	printargs,		"bsd43_mmap"	}, /* 2071 */
 	{ 0,	0,	printargs,		"bsd43_vadvise"	}, /* 2072 */
-	{ 0,	TM,	printargs,		"bsd43_munmap"	}, /* 2073 */
-	{ 0,	TM,	printargs,		"bsd43_mprotect"	}, /* 2074 */
+	{ 0,	TM|SI,	printargs,		"bsd43_munmap"	}, /* 2073 */
+	{ 0,	TM|SI,	printargs,		"bsd43_mprotect"	}, /* 2074 */
 	{ 0,	TM,	printargs,		"bsd43_madvise"	}, /* 2075 */
 	{ 0,	0,	printargs,		"bsd43_vhangup"	}, /* 2076 */
 	{ 0,	0,	printargs,		"bsd43_vlimit"	}, /* 2077 */
@@ -731,9 +731,9 @@
 	{ 0,	0,	printargs,		"posix_SGI_blkproc"	}, /* 3131 */
 	{ 0,	0,	NULL,			NULL		}, /* 3132 */
 	{ 0,	0,	printargs,		"posix_SGI_sgigsc"	}, /* 3133 */
-	{ 0,	TD|TM,	printargs,		"posix_SGI_mmap"	}, /* 3134 */
-	{ 0,	TM,	printargs,		"posix_SGI_munmap"	}, /* 3135 */
-	{ 0,	TM,	printargs,		"posix_SGI_mprotect"	}, /* 3136 */
+	{ 0,	TD|TM|SI,	printargs,		"posix_SGI_mmap"	}, /* 3134 */
+	{ 0,	TM|SI,	printargs,		"posix_SGI_munmap"	}, /* 3135 */
+	{ 0,	TM|SI,	printargs,		"posix_SGI_mprotect"	}, /* 3136 */
 	{ 0,	TM,	printargs,		"posix_SGI_msync"	}, /* 3137 */
 	{ 0,	TM,	printargs,		"posix_SGI_madvise"	}, /* 3138 */
 	{ 0,	0,	printargs,		"posix_SGI_mpin"	}, /* 3139 */
@@ -752,8 +752,8 @@
 	{ 0,	0,	printargs,		"posix_fchown"	}, /* 3152 */
 	{ 0,	0,	printargs,		"posix_fchmod"	}, /* 3153 */
 	{ 0,	0,	printargs,		"posix_wait3"	}, /* 3154 */
-	{ 0,	TD|TM,	printargs,		"posix_mmap"	}, /* 3155 */
-	{ 0,	TM,	printargs,		"posix_munmap"	}, /* 3156 */
+	{ 0,	TD|TM|SI,	printargs,		"posix_mmap"	}, /* 3155 */
+	{ 0,	TM|SI,	printargs,		"posix_munmap"	}, /* 3156 */
 	{ 0,	TM,	printargs,		"posix_madvise"	}, /* 3157 */
 	{ 0,	0,	printargs,		"posix_BSD_getpagesize"	}, /* 3158 */
 	{ 0,	0,	printargs,		"posix_setreuid"	}, /* 3159 */

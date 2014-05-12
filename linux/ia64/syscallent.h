@@ -816,7 +816,7 @@
 	{ MA,	0,	NULL,			NULL		}, /* 1022 */
 	{ MA,	0,	NULL,			NULL		}, /* 1023 */
 	{ 0,	0,	printargs,		"ni_syscall"	}, /* 1024 */
-	{ 1,	TP,	sys_exit,		"exit"		}, /* 1025 */
+	{ 1,	TP|SE,	sys_exit,		"exit"		}, /* 1025 */
 	{ 3,	TD,	sys_read,		"read"		}, /* 1026 */
 	{ 3,	TD,	sys_write,		"write"		}, /* 1027 */
 	{ 3,	TD|TF,	sys_open,		"open"		}, /* 1028 */
@@ -824,7 +824,7 @@
 	{ 2,	TD|TF,	sys_creat,		"creat"		}, /* 1030 */
 	{ 2,	TF,	sys_link,		"link"		}, /* 1031 */
 	{ 1,	TF,	sys_unlink,		"unlink"	}, /* 1032 */
-	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 1033 */
+	{ 3,	TF|TP|SE|SI,	sys_execve,		"execve"	}, /* 1033 */
 	{ 1,	TF,	sys_chdir,		"chdir"		}, /* 1034 */
 	{ 1,	TD,	sys_fchdir,		"fchdir"	}, /* 1035 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 1036 */
@@ -851,7 +851,7 @@
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 1057 */
 	{ 1,	TD,	sys_pipe,		"pipe"		}, /* 1058 */
 	{ 1,	0,	sys_times,		"times"		}, /* 1059 */
-	{ 1,	TM,	sys_brk,		"brk"		}, /* 1060 */
+	{ 1,	TM|SI,	sys_brk,		"brk"		}, /* 1060 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 1061 */
 	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 1062 */
 	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 1063 */
@@ -905,8 +905,8 @@
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 1111 */
 	{ 3,	TI,	sys_msgctl,		"msgctl"	}, /* 1112 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 1113 */
-	{ 3,	TI|TM,	sys_shmat,		"shmat"		}, /* 1114 */
-	{ 1,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 1115 */
+	{ 3,	TI|TM|SI,	sys_shmat,		"shmat"		}, /* 1114 */
+	{ 1,	TI|TM|SI,	sys_shmdt,		"shmdt"		}, /* 1115 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"	}, /* 1116 */
 	{ 3,	0,	sys_syslog,		"syslog"	}, /* 1117 */
 	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 1118 */
@@ -942,12 +942,12 @@
 	{ 4,	TD,	sys_pread,		"pread"		}, /* 1148 */
 	{ 4,	TD,	sys_pwrite,		"pwrite"	}, /* 1149 */
 	{ 1,	0,	printargs,		"_sysctl"	}, /* 1150 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 1151 */
-	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 1152 */
+	{ 6,	TD|TM|SI,	sys_mmap,		"mmap"		}, /* 1151 */
+	{ 2,	TM|SI,	sys_munmap,		"munmap"	}, /* 1152 */
 	{ 2,	TM,	sys_mlock,		"mlock"		}, /* 1153 */
 	{ 1,	TM,	sys_mlockall,		"mlockall"	}, /* 1154 */
-	{ 3,	TM,	sys_mprotect,		"mprotect"	}, /* 1155 */
-	{ 5,	TM,	sys_mremap,		"mremap"	}, /* 1156 */
+	{ 3,	TM|SI,	sys_mprotect,		"mprotect"	}, /* 1155 */
+	{ 5,	TM|SI,	sys_mremap,		"mremap"	}, /* 1156 */
 	{ 3,	TM,	sys_msync,		"msync"		}, /* 1157 */
 	{ 2,	TM,	sys_munlock,		"munlock"	}, /* 1158 */
 	{ 0,	TM,	sys_munlockall,		"munlockall"	}, /* 1159 */
@@ -963,7 +963,7 @@
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 1169 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 1170 */
 	{ 1,	0,	sys_getpagesize,	"getpagesize"	}, /* 1171 */
-	{ 6,	TD|TM,	sys_mmap_pgoff,		"mmap2"		}, /* 1172 */
+	{ 6,	TD|TM|SI,	sys_mmap_pgoff,		"mmap2"		}, /* 1172 */
 	{ 5,	0,	printargs,		"pciconfig_read"}, /* 1173 */
 	{ 5,	0,	printargs,		"pciconfig_write"}, /* 1174 */
 	{ MA,	0,	printargs,		"perfmonctl"	}, /* 1175 */
@@ -1027,7 +1027,7 @@
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 1233 */
 	{ 4,	TD,	sys_fadvise64,		"fadvise64"	}, /* 1234 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 1235 */
-	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 1236 */
+	{ 1,	TP|SE,	sys_exit,		"exit_group"	}, /* 1236 */
 	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 1237 */
 	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 1238 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 1239 */

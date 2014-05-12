@@ -73,22 +73,22 @@
 	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"	}, /* 77 */
 	{ 3,	TD,	sys_flistxattr,		"flistxattr"	}, /* 78 */
 	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 79 */
-	{ 6,	TD|TM,	sys_mmap_pgoff,		"mmap2"		}, /* 80 */
-	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 81 */
-	{ 3,	TM,	sys_mprotect,		"mprotect"	}, /* 82 */
-	{ 1,	TM,	sys_brk,		"brk"		}, /* 83 */
+	{ 6,	TD|TM|SI,	sys_mmap_pgoff,		"mmap2"		}, /* 80 */
+	{ 2,	TM|SI,	sys_munmap,		"munmap"	}, /* 81 */
+	{ 3,	TM|SI,	sys_mprotect,		"mprotect"	}, /* 82 */
+	{ 1,	TM|SI,	sys_brk,		"brk"		}, /* 83 */
 	{ 2,	TM,	sys_mlock,		"mlock"		}, /* 84 */
 	{ 2,	TM,	sys_munlock,		"munlock"	}, /* 85 */
 	{ 1,	TM,	sys_mlockall,		"mlockall"	}, /* 86 */
 	{ 0,	TM,	sys_munlockall,		"munlockall"	}, /* 87 */
-	{ 4,	TM,	sys_mremap,		"mremap"	}, /* 88 */
+	{ 4,	TM|SI,	sys_mremap,		"mremap"	}, /* 88 */
 	{ 3,	TM,	sys_msync,		"msync"		}, /* 89 */
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 90 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 91 */
 	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 92 */
-	{ 4,	TI|TM,	sys_shmat,		"shmat"		}, /* 93 */
+	{ 4,	TI|TM|SI,	sys_shmat,		"shmat"		}, /* 93 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 94 */
-	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 95 */
+	{ 4,	TI|TM|SI,	sys_shmdt,		"shmdt"		}, /* 95 */
 	{ 3,	TN,	sys_socket,		"socket"	}, /* 96 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 97 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 98 */
@@ -110,9 +110,9 @@
 	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 114 */
 	{ 4,	TN,	sys_sendmsg,		"sendmsg"	}, /* 115 */
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 116 */
-	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 117 */
-	{ 1,	TP,	sys_exit,		"exit"		}, /* 118 */
-	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 119 */
+	{ 3,	TF|TP|SE|SI,	sys_execve,		"execve"	}, /* 117 */
+	{ 1,	TP|SE,	sys_exit,		"exit"		}, /* 118 */
+	{ 1,	TP|SE,	sys_exit,		"exit_group"	}, /* 119 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 120 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 121 */
 	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 122 */
@@ -251,7 +251,7 @@
 	{ 5,	0,	printargs,		"keyctl"	}, /* 258 */
 	[259] = { },
 	{ 5,	TD,	sys_readahead,		"readahead"	}, /* 260 */
-	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages"}, /* 261 */
+	{ 5,	TM|SI,	sys_remap_file_pages,	"remap_file_pages"}, /* 261 */
 	{ 5,	TM,	sys_migrate_pages,	"migrate_pages"	}, /* 262 */
 	{ 0,	TM,	sys_mbind,		"mbind"		}, /* 263 */
 	{ 6,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 264 */

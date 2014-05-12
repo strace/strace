@@ -27,7 +27,7 @@
  */
 
 	{ 6,	0,	printargs,		"osf_syscall"		}, /* 0, not implemented */
-	{ 1,	TP,	sys_exit,		"exit"			}, /* 1 */
+	{ 1,	TP|SE,	sys_exit,		"exit"			}, /* 1 */
 	{ 0,	TP,	sys_fork,		"fork"			}, /* 2 */
 	{ 3,	TD,	sys_read,		"read"			}, /* 3 */
 	{ 3,	TD,	sys_write,		"write"			}, /* 4 */
@@ -43,7 +43,7 @@
 	{ 3,	TF,	sys_mknod,		"mknod"			}, /* 14 */
 	{ 2,	TF,	sys_chmod,		"chmod"			}, /* 15 */
 	{ 3,	TF,	sys_chown,		"chown"			}, /* 16 */
-	{ 1,	TM,	sys_brk,		"brk"			}, /* 17 */
+	{ 1,	TM|SI,	sys_brk,		"brk"			}, /* 17 */
 	{ 5,	0,	printargs,		"osf_getfsstat"		}, /* 18, not implemented */
 	{ 3,	TD,	sys_lseek,		"lseek"			}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getxpid"		}, /* 20 */
@@ -85,7 +85,7 @@
 	{ 5,	0,	printargs,		"osf_revoke"		}, /* 56, not implemented */
 	{ 2,	TF,	sys_symlink,		"symlink"		}, /* 57 */
 	{ 3,	TF,	sys_readlink,		"readlink"		}, /* 58 */
-	{ 3,	TF|TP,	sys_execve,		"execve"		}, /* 59 */
+	{ 3,	TF|TP|SE|SI,	sys_execve,		"execve"		}, /* 59 */
 	{ 1,	0,	sys_umask,		"umask"			}, /* 60 */
 	{ 1,	TF,	sys_chroot,		"chroot"		}, /* 61 */
 	{ 5,	0,	printargs,		"osf_old_fstat"		}, /* 62, not implemented */
@@ -97,10 +97,10 @@
 	{ 2,	TF,	sys_lstat,		"lstat"			}, /* 68 */
 	{ 5,	TM,	printargs,		"osf_sbrk"		}, /* 69, not implemented */
 	{ 5,	0,	printargs,		"osf_sstk"		}, /* 70, not implemented */
-	{ 6,	TD|TM,	sys_mmap,		"mmap"			}, /* 71 */
+	{ 6,	TD|TM|SI,	sys_mmap,		"mmap"			}, /* 71 */
 	{ 5,	0,	printargs,		"osf_old_vadvise"	}, /* 72, not implemented */
-	{ 2,	TM,	sys_munmap,		"munmap"		}, /* 73 */
-	{ 3,	TM,	sys_mprotect,		"mprotect"		}, /* 74 */
+	{ 2,	TM|SI,	sys_munmap,		"munmap"		}, /* 73 */
+	{ 3,	TM|SI,	sys_mprotect,		"mprotect"		}, /* 74 */
 	{ 3,	TM,	sys_madvise,		"madvise"		}, /* 75 */
 	{ 0,	0,	sys_vhangup,		"vhangup"		}, /* 76 */
 	{ 5,	0,	printargs,		"osf_kmodcall"		}, /* 77, not implemented */
@@ -237,7 +237,7 @@
 	{ 3,	TF,	sys_chown,		"lchown"		}, /* 208 */
 	{ 3,	TI|TM,	printargs,		"osf_shmat"		}, /* 209 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"		}, /* 210 */
-	{ 4,	TI|TM,	sys_shmdt,		"shmdt"			}, /* 211 */
+	{ 4,	TI|TM|SI,	sys_shmdt,		"shmdt"			}, /* 211 */
 	{ 4,	TI,	sys_shmget,		"shmget"		}, /* 212 */
 	{ 5,	0,	printargs,		"osf_mvalid"		}, /* 213, not implemented */
 	{ 5,	0,	printargs,		"osf_getaddressconf"	}, /* 214, not implemented */
@@ -367,7 +367,7 @@
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"		}, /* 338 */
 	{ 1,	0,	sys_uname,		"uname"			}, /* 339 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"		}, /* 340 */
-	{ 5,	TM,	sys_mremap,		"mremap"		}, /* 341 */
+	{ 5,	TM|SI,	sys_mremap,		"mremap"		}, /* 341 */
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"		}, /* 342 */
 	{ 3,	0,	sys_setresuid,		"setresuid"		}, /* 343 */
 	{ 3,	0,	sys_getresuid,		"getresuid"		}, /* 344 */
@@ -431,12 +431,12 @@
 	{ 3,	0,	sys_io_cancel,		"io_cancel"		}, /* 402 */
 	{ 5,	0,	NULL,			NULL			}, /* 403 */
 	{ 5,	0,	NULL,			NULL			}, /* 404 */
-	{ 1,	TP,	sys_exit,		"exit_group"		}, /* 405 */
+	{ 1,	TP|SE,	sys_exit,		"exit_group"		}, /* 405 */
 	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"	}, /* 406 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"		}, /* 407 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"		}, /* 408 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"		}, /* 409 */
-	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages"	}, /* 410 */
+	{ 5,	TM|SI,	sys_remap_file_pages,	"remap_file_pages"	}, /* 410 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"	}, /* 411 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"	}, /* 412 */
 	{ 4,	TD,	sys_fadvise64,		"fadvise"		}, /* 413 */

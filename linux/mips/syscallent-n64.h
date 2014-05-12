@@ -9,10 +9,10 @@
 	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 5006 */
 	{ 3,	TD,	sys_poll,		"poll"		}, /* 5007 */
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 5008 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 5009 */
-	{ 3,	TM,	sys_mprotect,		"mprotect"	}, /* 5010 */
-	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 5011 */
-	{ 1,	TM,	sys_brk,		"brk"		}, /* 5012 */
+	{ 6,	TD|TM|SI,	sys_mmap,		"mmap"		}, /* 5009 */
+	{ 3,	TM|SI,	sys_mprotect,		"mprotect"	}, /* 5010 */
+	{ 2,	TM|SI,	sys_munmap,		"munmap"	}, /* 5011 */
+	{ 1,	TM|SI,	sys_brk,		"brk"		}, /* 5012 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 5013 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 5014 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 5015 */
@@ -24,12 +24,12 @@
 	{ 1,	TD,	sys_pipe,		"pipe"		}, /* 5021 */
 	{ 5,	TD,	sys_select,		"_newselect"	}, /* 5022 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	}, /* 5023 */
-	{ 5,	TM,	sys_mremap,		"mremap"	}, /* 5024 */
+	{ 5,	TM|SI,	sys_mremap,		"mremap"	}, /* 5024 */
 	{ 3,	TM,	sys_msync,		"msync"		}, /* 5025 */
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 5026 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 5027 */
 	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 5028 */
-	{ 3,	TI|TM,	sys_shmat,		"shmat"		}, /* 5029 */
+	{ 3,	TI|TM|SI,	sys_shmat,		"shmat"		}, /* 5029 */
 	{ 3,	TI,	sys_shmctl,		"shmctl"	}, /* 5030 */
 	{ 1,	TD,	sys_dup,		"dup"		}, /* 5031 */
 	{ 2,	TD,	sys_dup2,		"dup2"		}, /* 5032 */
@@ -57,15 +57,15 @@
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 5054 */
 	{ 5,	TP,	sys_clone,		"clone"		}, /* 5055 */
 	{ 0,	TP,	sys_fork,		"fork"		}, /* 5056 */
-	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 5057 */
-	{ 1,	TP,	sys_exit,		"exit"		}, /* 5058 */
+	{ 3,	TF|TP|SE|SI,	sys_execve,		"execve"	}, /* 5057 */
+	{ 1,	TP|SE,	sys_exit,		"exit"		}, /* 5058 */
 	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 5059 */
 	{ 2,	TS,	sys_kill,		"kill"		}, /* 5060 */
 	{ 1,	0,	sys_uname,		"uname"		}, /* 5061 */
 	{ 3,	TI,	sys_semget,		"semget"	}, /* 5062 */
 	{ 3,	TI,	printargs,		"semop"		}, /* 5063 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 5064 */
-	{ 1,	TI|TM,	sys_shmdt,		"shmdt"		}, /* 5065 */
+	{ 1,	TI|TM|SI,	sys_shmdt,		"shmdt"		}, /* 5065 */
 	{ 2,	TI,	sys_msgget,		"msgget"	}, /* 5066 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 5067 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	}, /* 5068 */
@@ -205,12 +205,12 @@
 	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 5202 */
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 5203 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 5204 */
-	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 5205 */
+	{ 1,	TP|SE,	sys_exit,		"exit_group"	}, /* 5205 */
 	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie" }, /* 5206 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 5207 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 5208 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 5209 */
-	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages" }, /* 5210 */
+	{ 5,	TM|SI,	sys_remap_file_pages,	"remap_file_pages" }, /* 5210 */
 	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 5211 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address" }, /* 5212 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 5213 */
@@ -318,10 +318,10 @@
 	{ 0,	0,	printargs,		"n64_lstat"		}, /* 5006 */
 	{ 0,	0,	printargs,		"n64_poll"		}, /* 5007 */
 	{ 0,	0,	printargs,		"n64_lseek"		}, /* 5008 */
-	{ 0,	TD|TM,	printargs,		"n64_mmap"		}, /* 5009 */
-	{ 0,	TM,	printargs,		"n64_mprotect"		}, /* 5010 */
-	{ 0,	TM,	printargs,		"n64_munmap"		}, /* 5011 */
-	{ 0,	TM,	printargs,		"n64_brk"		}, /* 5012 */
+	{ 0,	TD|TM|SI,	printargs,		"n64_mmap"		}, /* 5009 */
+	{ 0,	TM|SI,	printargs,		"n64_mprotect"		}, /* 5010 */
+	{ 0,	TM|SI,	printargs,		"n64_munmap"		}, /* 5011 */
+	{ 0,	TM|SI,	printargs,		"n64_brk"		}, /* 5012 */
 	{ 0,	0,	printargs,		"n64_rt_sigaction"	}, /* 5013 */
 	{ 0,	0,	printargs,		"n64_rt_sigprocmask"	}, /* 5014 */
 	{ 0,	0,	printargs,		"n64_ioctl"		}, /* 5015 */
@@ -333,12 +333,12 @@
 	{ 0,	0,	printargs,		"n64_pipe"		}, /* 5021 */
 	{ 0,	0,	printargs,		"n64__newselect"	}, /* 5022 */
 	{ 0,	0,	printargs,		"n64_sched_yield"	}, /* 5023 */
-	{ 0,	TM,	printargs,		"n64_mremap"		}, /* 5024 */
+	{ 0,	TM|SI,	printargs,		"n64_mremap"		}, /* 5024 */
 	{ 0,	TM,	printargs,		"n64_msync"		}, /* 5025 */
 	{ 0,	TM,	printargs,		"n64_mincore"		}, /* 5026 */
 	{ 0,	TM,	printargs,		"n64_madvise"		}, /* 5027 */
 	{ 0,	0,	printargs,		"n64_shmget"		}, /* 5028 */
-	{ 0,	TI|TM,	printargs,		"n64_shmat"		}, /* 5029 */
+	{ 0,	TI|TM|SI,	printargs,		"n64_shmat"		}, /* 5029 */
 	{ 0,	0,	printargs,		"n64_shmctl"		}, /* 5030 */
 	{ 0,	0,	printargs,		"n64_dup"		}, /* 5031 */
 	{ 0,	0,	printargs,		"n64_dup2"		}, /* 5032 */
@@ -366,15 +366,15 @@
 	{ 0,	0,	printargs,		"n64_getsockopt"	}, /* 5054 */
 	{ 5,	TP,	printargs,		"n64_clone"		}, /* 5055 */
 	{ 0,	TP,	printargs,		"n64_fork"		}, /* 5056 */
-	{ 3,	TF|TP,	printargs,		"n64_execve"		}, /* 5057 */
-	{ 1,	TP,	printargs,		"n64_exit"		}, /* 5058 */
+	{ 3,	TF|TP|SE|SI,	printargs,		"n64_execve"		}, /* 5057 */
+	{ 1,	TP|SE,	printargs,		"n64_exit"		}, /* 5058 */
 	{ 4,	TP,	printargs,		"n64_wait4"		}, /* 5059 */
 	{ 0,	0,	printargs,		"n64_kill"		}, /* 5060 */
 	{ 0,	0,	printargs,		"n64_uname"		}, /* 5061 */
 	{ 0,	0,	printargs,		"n64_semget"		}, /* 5062 */
 	{ 0,	0,	printargs,		"n64_semop"		}, /* 5063 */
 	{ 0,	0,	printargs,		"n64_semctl"		}, /* 5064 */
-	{ 0,	TI|TM,	printargs,		"n64_shmdt"		}, /* 5065 */
+	{ 0,	TI|TM|SI,	printargs,		"n64_shmdt"		}, /* 5065 */
 	{ 0,	0,	printargs,		"n64_msgget"		}, /* 5066 */
 	{ 0,	0,	printargs,		"n64_msgsnd"		}, /* 5067 */
 	{ 0,	0,	printargs,		"n64_msgrcv"		}, /* 5068 */
@@ -514,12 +514,12 @@
 	{ 0,	0,	printargs,		"n64_io_getevents"	}, /* 5202 */
 	{ 0,	0,	printargs,		"n64_io_submit"		}, /* 5203 */
 	{ 0,	0,	printargs,		"n64_io_cancel"		}, /* 5204 */
-	{ 1,	TP,	printargs,		"n64_exit_group"	}, /* 5205 */
+	{ 1,	TP|SE,	printargs,		"n64_exit_group"	}, /* 5205 */
 	{ 0,	0,	printargs,		"n64_lookup_dcookie"	}, /* 5206 */
 	{ 0,	0,	printargs,		"n64_epoll_create"	}, /* 5207 */
 	{ 0,	0,	printargs,		"n64_epoll_ctl"		}, /* 5208 */
 	{ 0,	0,	printargs,		"n64_epoll_wait"	}, /* 5209 */
-	{ 0,	TM,	printargs,		"n64_remap_file_pages"	}, /* 5210 */
+	{ 0,	TM|SI,	printargs,		"n64_remap_file_pages"	}, /* 5210 */
 	{ 0,	0,	printargs,		"n64_rt_sigreturn"	}, /* 5211 */
 	{ 1,	0,	printargs,		"n64_set_tid_address"	}, /* 5212 */
 	{ 0,	0,	printargs,		"n64_restart_syscall"	}, /* 5213 */

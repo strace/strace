@@ -1,7 +1,7 @@
 #if defined LINUX_MIPSO32
 	/* For an O32 strace, decode the o32 syscalls.  */
 	{ MA,	0,	printargs,		"syscall"	}, /* 4000 */ /* start of Linux o32 */
-	{ 1,	TP,	sys_exit,		"exit"		}, /* 4001 */
+	{ 1,	TP|SE,	sys_exit,		"exit"		}, /* 4001 */
 	{ 0,	TP,	sys_fork,		"fork"		}, /* 4002 */
 	{ 3,	TD,	sys_read,		"read"		}, /* 4003 */
 	{ 3,	TD,	sys_write,		"write"		}, /* 4004 */
@@ -11,7 +11,7 @@
 	{ 2,	TD|TF,	sys_creat,		"creat"		}, /* 4008 */
 	{ 2,	TF,	sys_link,		"link"		}, /* 4009 */
 	{ 1,	TF,	sys_unlink,		"unlink"	}, /* 4010 */
-	{ 3,	TF|TP,	sys_execve,		"execve"	}, /* 4011 */
+	{ 3,	TF|TP|SE|SI,	sys_execve,		"execve"	}, /* 4011 */
 	{ 1,	TF,	sys_chdir,		"chdir"		}, /* 4012 */
 	{ 1,	0,	sys_time,		"time"		}, /* 4013 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 4014 */
@@ -45,7 +45,7 @@
 	{ 1,	TD,	sys_pipe,		"pipe"		}, /* 4042 */
 	{ 1,	0,	sys_times,		"times"		}, /* 4043 */
 	{ 0,	0,	sys_prof,		"prof"		}, /* 4044 */
-	{ 1,	TM,	sys_brk,		"brk"		}, /* 4045 */
+	{ 1,	TM|SI,	sys_brk,		"brk"		}, /* 4045 */
 	{ 1,	0,	sys_setgid,		"setgid"	}, /* 4046 */
 	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 4047 */
 	{ 1,	TS,	sys_signal,		"signal"	}, /* 4048 */
@@ -90,8 +90,8 @@
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 4087 */
 	{ 4,	0,	sys_reboot,		"reboot"	}, /* 4088 */
 	{ 3,	TD,	sys_readdir,		"readdir"	}, /* 4089 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap"		}, /* 4090 */
-	{ 2,	TM,	sys_munmap,		"munmap"	}, /* 4091 */
+	{ 6,	TD|TM|SI,	sys_mmap,		"mmap"		}, /* 4090 */
+	{ 2,	TM|SI,	sys_munmap,		"munmap"	}, /* 4091 */
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 4092 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 4093 */
 	{ 2,	TD,	sys_fchmod,		"fchmod"	}, /* 4094 */
@@ -125,7 +125,7 @@
 	{ 1,	0,	sys_uname,		"uname"		}, /* 4122 */
 	{ 0,	0,	sys_modify_ldt,		"modify_ldt"	}, /* 4123 */
 	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 4124 */
-	{ 3,	TM,	sys_mprotect,		"mprotect"	}, /* 4125 */
+	{ 3,	TM|SI,	sys_mprotect,		"mprotect"	}, /* 4125 */
 	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 4126 */
 	{ 2,	0,	sys_create_module,	"create_module"	}, /* 4127 */
 	{ 3,	0,	sys_init_module,	"init_module"	}, /* 4128 */
@@ -167,7 +167,7 @@
 	{ 1,	0,	sys_sched_get_priority_min,"sched_get_priority_min"}, /* 4164 */
 	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 4165 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 4166 */
-	{ 5,	TM,	sys_mremap,		"mremap"	}, /* 4167 */
+	{ 5,	TM|SI,	sys_mremap,		"mremap"	}, /* 4167 */
 	{ 3,	TN,	sys_accept,		"accept"	}, /* 4168 */
 	{ 3,	TN,	sys_bind,		"bind"		}, /* 4169 */
 	{ 3,	TN,	sys_connect,		"connect"	}, /* 4170 */
@@ -210,7 +210,7 @@
 	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 4207 */
 	{ 5,	TN,	printargs,		"getpmsg"	}, /* 4208 */
 	{ 5,	TN,	printargs,		"putpmsg"	}, /* 4209 */
-	{ 6,	TD|TM,	sys_mmap_4koff,		"mmap2"		}, /* 4210 */
+	{ 6,	TD|TM|SI,	sys_mmap_4koff,		"mmap2"		}, /* 4210 */
 	{ 4,	TF,	sys_truncate64,		"truncate64"	}, /* 4211 */
 	{ 4,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 4212 */
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 4213 */
@@ -246,12 +246,12 @@
 	{ 5,	0,	sys_io_getevents,		"io_getevents"	}, /* 4243 */
 	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 4244 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 4245 */
-	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 4246 */
+	{ 1,	TP|SE,	sys_exit,		"exit_group"	}, /* 4246 */
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 4247 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 4248 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 4249 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 4250 */
-	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages"}, /* 4251 */
+	{ 5,	TM|SI,	sys_remap_file_pages,	"remap_file_pages"}, /* 4251 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 4252 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 4253 */
 	{ 7,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 4254 */
@@ -351,7 +351,7 @@
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 4348 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
-	{ 1,	TP,	printargs,		"o32_exit"		}, /* 4001 */
+	{ 1,	TP|SE,	printargs,		"o32_exit"		}, /* 4001 */
 	{ 0,	TP,	printargs,		"o32_fork"		}, /* 4002 */
 	{ 0,	0,	printargs,		"o32_read"		}, /* 4003 */
 	{ 0,	0,	printargs,		"o32_write"		}, /* 4004 */
@@ -361,7 +361,7 @@
 	{ 0,	0,	printargs,		"o32_creat"		}, /* 4008 */
 	{ 0,	0,	printargs,		"o32_link"		}, /* 4009 */
 	{ 0,	0,	printargs,		"o32_unlink"	}, /* 4010 */
-	{ 3,	TF|TP,	printargs,		"o32_execve"	}, /* 4011 */
+	{ 3,	TF|TP|SE|SI,	printargs,		"o32_execve"	}, /* 4011 */
 	{ 0,	0,	printargs,		"o32_chdir"		}, /* 4012 */
 	{ 0,	0,	printargs,		"o32_time"		}, /* 4013 */
 	{ 0,	0,	printargs,		"o32_mknod"		}, /* 4014 */
@@ -395,7 +395,7 @@
 	{ 0,	0,	printargs,		"o32_pipe"		}, /* 4042 */
 	{ 0,	0,	printargs,		"o32_times"		}, /* 4043 */
 	{ 0,	0,	printargs,		"o32_prof"		}, /* 4044 */
-	{ 0,	TM,	printargs,		"o32_brk"		}, /* 4045 */
+	{ 0,	TM|SI,	printargs,		"o32_brk"		}, /* 4045 */
 	{ 0,	0,	printargs,		"o32_setgid"	}, /* 4046 */
 	{ 0,	0,	printargs,		"o32_getgid"	}, /* 4047 */
 	{ 0,	0,	printargs,		"o32_signal"	}, /* 4048 */
@@ -440,8 +440,8 @@
 	{ 0,	0,	printargs,		"o32_swapon"	}, /* 4087 */
 	{ 0,	0,	printargs,		"o32_reboot"	}, /* 4088 */
 	{ 0,	0,	printargs,		"o32_readdir"	}, /* 4089 */
-	{ 0,	TD|TM,	printargs,		"o32_mmap"	}, /* 4090 */
-	{ 0,	TM,	printargs,		"o32_munmap"	}, /* 4091 */
+	{ 0,	TD|TM|SI,	printargs,		"o32_mmap"	}, /* 4090 */
+	{ 0,	TM|SI,	printargs,		"o32_munmap"	}, /* 4091 */
 	{ 0,	0,	printargs,		"o32_truncate"	}, /* 4092 */
 	{ 0,	0,	printargs,		"o32_ftruncate"	}, /* 4093 */
 	{ 0,	0,	printargs,		"o32_fchmod"	}, /* 4094 */
@@ -475,7 +475,7 @@
 	{ 0,	0,	printargs,		"o32_uname"		}, /* 4122 */
 	{ 0,	0,	printargs,		"o32_modify_ldt"	}, /* 4123 */
 	{ 0,	0,	printargs,		"o32_adjtimex"	}, /* 4124 */
-	{ 0,	TM,	printargs,		"o32_mprotect"	}, /* 4125 */
+	{ 0,	TM|SI,	printargs,		"o32_mprotect"	}, /* 4125 */
 	{ 0,	0,	printargs,		"o32_sigprocmask"	}, /* 4126 */
 	{ 0,	0,	printargs,		"o32_create_module"	}, /* 4127 */
 	{ 0,	0,	printargs,		"o32_init_module"	}, /* 4128 */
@@ -517,7 +517,7 @@
 	{ 0,	0,	printargs,		"o32_sched_get_priority_min"},/* 4164 */
 	{ 0,	0,	printargs,		"o32_sched_rr_get_interval"}, /* 4165 */
 	{ 0,	0,	printargs,		"o32_nanosleep"	}, /* 4166 */
-	{ 0,	TM,	printargs,		"o32_mremap"	}, /* 4167 */
+	{ 0,	TM|SI,	printargs,		"o32_mremap"	}, /* 4167 */
 	{ 0,	0,	printargs,		"o32_accept"	}, /* 4168 */
 	{ 0,	0,	printargs,		"o32_bind"		}, /* 4169 */
 	{ 0,	0,	printargs,		"o32_connect"	}, /* 4170 */
@@ -560,7 +560,7 @@
 	{ 0,	0,	printargs,		"o32_sendfile"	}, /* 4207 */
 	{ 5,	TN,	printargs,		"o32_getpmsg"	}, /* 4208 */
 	{ 5,	TN,	printargs,		"o32_putpmsg"	}, /* 4209 */
-	{ 6,	TD|TM,	printargs,		"o32_mmap2"	}, /* 4210 */
+	{ 6,	TD|TM|SI,	printargs,		"o32_mmap2"	}, /* 4210 */
 	{ 0,	0,	printargs,		"o32_truncate64"	}, /* 4211 */
 	{ 0,	0,	printargs,		"o32_ftruncate64"	}, /* 4212 */
 	{ 0,	0,	printargs,		"o32_stat64"	}, /* 4213 */
@@ -596,12 +596,12 @@
 	{ 5,	0,	printargs,		"o32_io_getevents"	}, /* 4243 */
 	{ 3,	0,	printargs,		"o32_io_submit"	}, /* 4244 */
 	{ 3,	0,	printargs,		"o32_io_cancel"	}, /* 4245 */
-	{ 1,	TP,	printargs,		"o32_exit_group"	}, /* 4246 */
+	{ 1,	TP|SE,	printargs,		"o32_exit_group"	}, /* 4246 */
 	{ 3,	0,	printargs,		"o32_lookup_dcookie"}, /* 4247 */
 	{ 1,	TD,	printargs,		"o32_epoll_create"	}, /* 4248 */
 	{ 4,	TD,	printargs,		"o32_epoll_ctl"	}, /* 4249 */
 	{ 4,	TD,	printargs,		"o32_epoll_wait"	}, /* 4250 */
-	{ 5,	TM,	printargs,		"o32_remap_file_pages"}, /* 4251 */
+	{ 5,	TM|SI,	printargs,		"o32_remap_file_pages"}, /* 4251 */
 	{ 1,	0,	printargs,		"o32_set_tid_address"}, /* 4252 */
 	{ 0,	0,	printargs,		"o32_restart_syscall"}, /* 4253 */
 	{ MA,	0,	printargs,		"o32_fadvise64_64"	}, /* 4254 */

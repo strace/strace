@@ -7,10 +7,10 @@
 	{ 2,	TF,	sys_lstat,		"lstat"		},  /* 6 */
 	{ 3,	TD,	sys_poll,		"poll"		},  /* 7 */
 	{ 3,	TD,	sys_lseek,		"lseek"		},  /* 8 */
-	{ 6,	TD|TM,	sys_mmap,		"mmap"		},  /* 9 */
-	{ 3,	TM,	sys_mprotect,		"mprotect"	},  /* 10 */
-	{ 2,	TM,	sys_munmap,		"munmap"	},  /* 11 */
-	{ 1,	TM,	sys_brk,		"brk"		},  /* 12 */
+	{ 6,	TD|TM|SI,	sys_mmap,		"mmap"		},  /* 9 */
+	{ 3,	TM|SI,	sys_mprotect,		"mprotect"	},  /* 10 */
+	{ 2,	TM|SI,	sys_munmap,		"munmap"	},  /* 11 */
+	{ 1,	TM|SI,	sys_brk,		"brk"		},  /* 12 */
 	{ 4,	TS,	printargs,		"64:rt_sigaction"	},  /* 13 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"},  /* 14 */
 	{ 0,	TS,	printargs,		"64:rt_sigreturn"	},  /* 15 */
@@ -23,12 +23,12 @@
 	{ 1,	TD,	sys_pipe,		"pipe"		},  /* 22 */
 	{ 5,	TD,	sys_select,		"select"	},  /* 23 */
 	{ 0,	0,	sys_sched_yield,	"sched_yield"	},  /* 24 */
-	{ 5,	TM,	sys_mremap,		"mremap"	},  /* 25 */
+	{ 5,	TM|SI,	sys_mremap,		"mremap"	},  /* 25 */
 	{ 3,	TM,	sys_msync,		"msync"		},  /* 26 */
 	{ 3,	TM,	sys_mincore,		"mincore"	},  /* 27 */
 	{ 3,	TM,	sys_madvise,		"madvise"	},  /* 28 */
 	{ 4,	TI,	sys_shmget,		"shmget"	},  /* 29 */
-	{ 4,	TI|TM,	sys_shmat,		"shmat"		},  /* 30 */
+	{ 4,	TI|TM|SI,	sys_shmat,		"shmat"		},  /* 30 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	},  /* 31 */
 	{ 1,	TD,	sys_dup,		"dup"		},  /* 32 */
 	{ 2,	TD,	sys_dup2,		"dup2"		},  /* 33 */
@@ -57,15 +57,15 @@
 	{ 5,	TP,	sys_clone,		"clone"		},  /* 56 */
 	{ 0,	TP,	sys_fork,		"fork"		},  /* 57 */
 	{ 0,	TP,	sys_vfork,		"vfork"		},  /* 58 */
-	{ 3,	TF|TP,	printargs,		"64:execve"	},  /* 59 */
-	{ 1,	TP,	sys_exit,		"_exit"		},  /* 60 */
+	{ 3,	TF|TP|SE|SI,	printargs,		"64:execve"	},  /* 59 */
+	{ 1,	TP|SE,	sys_exit,		"_exit"		},  /* 60 */
 	{ 4,	TP,	sys_wait4,		"wait4"		},  /* 61 */
 	{ 2,	TS,	sys_kill,		"kill"		},  /* 62 */
 	{ 1,	0,	sys_uname,		"uname"		},  /* 63 */
 	{ 4,	TI,	sys_semget,		"semget"	},  /* 64 */
 	{ 4,	TI,	sys_semop,		"semop"		},  /* 65 */
 	{ 4,	TI,	sys_semctl,		"semctl"	},  /* 66 */
-	{ 4,	TI|TM,	sys_shmdt,		"shmdt"		},  /* 67 */
+	{ 4,	TI|TM|SI,	sys_shmdt,		"shmdt"		},  /* 67 */
 	{ 4,	TI,	sys_msgget,		"msgget"	},  /* 68 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	},  /* 69 */
 	{ 5,	TI,	sys_msgrcv,		"msgrcv"	},  /* 70 */
@@ -214,7 +214,7 @@
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 213 */
 	{ 4,	0,	printargs,		"64:epoll_ctl_old"	}, /* 214 */
 	{ 4,	0,	printargs,		"64:epoll_wait_old"	}, /* 215 */
-	{ 5,	TM,	sys_remap_file_pages,	"remap_file_pages"}, /* 216 */
+	{ 5,	TM|SI,	sys_remap_file_pages,	"remap_file_pages"}, /* 216 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 217 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 218 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"}, /* 219 */
@@ -229,7 +229,7 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 228 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 229 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 230 */
-	{ 1,	TP,	sys_exit,		"exit_group"	}, /* 231 */
+	{ 1,	TP|SE,	sys_exit,		"exit_group"	}, /* 231 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 232 */
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 233 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 234 */
@@ -323,7 +323,7 @@
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"	},  /* 517 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	},  /* 518 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"	},  /* 519 */
-	{ 3,	TF|TP,	sys_execve,		"execve"	},  /* 520 */
+	{ 3,	TF|TP|SE|SI,	sys_execve,		"execve"	},  /* 520 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	},  /* 521 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	},  /* 522 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait" },  /* 523 */
