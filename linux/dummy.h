@@ -79,7 +79,6 @@
 #define	sys_set_robust_list	sys_munmap
 #define	sys_setfsgid		sys_setfsuid
 #define	sys_setgid		sys_setuid
-#define	sys_setns		sys_inotify_rm_watch
 #define	sys_setregid		sys_setreuid
 #define	sys_setresgid		sys_setresuid
 #define	sys_swapoff		sys_chdir

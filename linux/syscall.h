@@ -241,6 +241,7 @@ int sys_setgroups();
 int sys_setgroups32();
 int sys_sethostname();
 int sys_setitimer();
+int sys_setns();
 int sys_setpriority();
 int sys_setresuid();
 int sys_setreuid();
