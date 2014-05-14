@@ -7,6 +7,7 @@ check_PROGRAMS = \
 	scm_rights \
 	set_ptracer_any \
 	sigaction \
+	stack-fcall \
 	uio
 
 uio_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -24,7 +25,8 @@ TESTS = \
 	count.test \
 	detach-sleeping.test \
 	detach-stopped.test \
-	detach-running.test
+	detach-running.test \
+	strace-k.test
 
 net-fd.log: net.log
 
