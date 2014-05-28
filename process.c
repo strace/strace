@@ -390,7 +390,7 @@ int
 sys_sethostname(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printpathn(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+		printstr(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 		tprintf(", %lu", tcp->u_arg[1]);
 	}
 	return 0;
@@ -404,7 +404,7 @@ sys_gethostname(struct tcb *tcp)
 		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[0]);
 		else
-			printpath(tcp, tcp->u_arg[0]);
+			printstr(tcp, tcp->u_arg[0], -1);
 		tprintf(", %lu", tcp->u_arg[1]);
 	}
 	return 0;
@@ -415,7 +415,7 @@ int
 sys_setdomainname(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printpathn(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+		printstr(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 		tprintf(", %lu", tcp->u_arg[1]);
 	}
 	return 0;
