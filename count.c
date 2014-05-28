@@ -37,7 +37,7 @@
 
 /* Per-syscall stats structure */
 struct call_counts {
-	/* system time spent in syscall (not wall clock time) */
+	/* time may be total latency or system time */
 	struct timeval time;
 	int calls, errors;
 };
@@ -102,7 +102,7 @@ count_syscall(struct tcb *tcp, const struct timeval *syscall_exiting_tv)
 	}
 	if (tv_cmp(tv, &shortest) < 0)
 		shortest = *tv;
-	tv_add(&cc->time, &cc->time, tv);
+	tv_add(&cc->time, &cc->time, count_wallclock ? &wtv : tv);
 }
 
 static int

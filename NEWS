@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Improvements
+  * Added -w option to produce stats on syscall latency
+
 Noteworthy changes in release 4.8 (2013-06-03)
 ==============================================
 

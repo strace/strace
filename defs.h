@@ -548,6 +548,7 @@ extern cflag_t cflag;
 extern bool debug_flag;
 extern bool Tflag;
 extern bool iflag;
+extern bool count_wallclock;
 extern unsigned int qflag;
 extern bool not_failing_only;
 extern bool show_fd_path;

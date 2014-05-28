@@ -78,6 +78,7 @@ bool need_fork_exec_workarounds = 0;
 bool debug_flag = 0;
 bool Tflag = 0;
 bool iflag = 0;
+bool count_wallclock = 0;
 unsigned int qflag = 0;
 /* Which WSTOPSIG(status) value marks syscall traps? */
 static unsigned int syscall_trap_sig = SIGTRAP;
@@ -200,6 +201,7 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
               -p pid... / [-D] [-E var=val]... [-u username] PROG [ARGS]\n\
 -c -- count time, calls, and errors for each syscall and report summary\n\
 -C -- like -c but also print regular output\n\
+-w -- summarise syscall latency (default is system time)\n\
 -d -- enable debug output to stderr\n\
 -D -- run tracer process as a detached grandchild, not as parent\n\
 -f -- follow forks, -ff -- with output into separate files\n\
@@ -1650,7 +1652,7 @@ init(int argc, char *argv[])
 #endif
 	qualify("signal=all");
 	while ((c = getopt(argc, argv,
-		"+b:cCdfFhiqrtTvVxyz"
+		"+b:cCdfFhiqrtTvVwxyz"
 		"D"
 		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
 		switch (c) {
@@ -1701,6 +1703,9 @@ init(int argc, char *argv[])
 			break;
 		case 'T':
 			Tflag = 1;
+			break;
+		case 'w':
+			count_wallclock = 1;
 			break;
 		case 'x':
 			xflag++;
@@ -1789,6 +1794,10 @@ init(int argc, char *argv[])
 
 	if (followfork >= 2 && cflag) {
 		error_msg_and_die("(-c or -C) and -ff are mutually exclusive");
+	}
+
+	if (count_wallclock && !cflag) {
+		error_msg_and_die("-w must be given with (-c or -C)");
 	}
 
 	/* See if they want to run as another user. */
