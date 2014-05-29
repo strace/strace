@@ -712,13 +712,13 @@ extern int ubi_ioctl(struct tcb *, long, long);
 extern int loop_ioctl(struct tcb *, long, long);
 extern int ptp_ioctl(struct tcb *, long, long);
 
-extern int tv_nz(struct timeval *);
-extern int tv_cmp(struct timeval *, struct timeval *);
-extern double tv_float(struct timeval *);
-extern void tv_add(struct timeval *, struct timeval *, struct timeval *);
-extern void tv_sub(struct timeval *, struct timeval *, struct timeval *);
-extern void tv_mul(struct timeval *, struct timeval *, int);
-extern void tv_div(struct timeval *, struct timeval *, int);
+extern int tv_nz(const struct timeval *);
+extern int tv_cmp(const struct timeval *, const struct timeval *);
+extern double tv_float(const struct timeval *);
+extern void tv_add(struct timeval *, const struct timeval *, const struct timeval *);
+extern void tv_sub(struct timeval *, const struct timeval *, const struct timeval *);
+extern void tv_mul(struct timeval *, const struct timeval *, int);
+extern void tv_div(struct timeval *, const struct timeval *, int);
 
 /* Strace log generation machinery.
  *

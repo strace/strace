@@ -79,13 +79,13 @@ string_to_uint(const char *str)
 }
 
 int
-tv_nz(struct timeval *a)
+tv_nz(const struct timeval *a)
 {
 	return a->tv_sec || a->tv_usec;
 }
 
 int
-tv_cmp(struct timeval *a, struct timeval *b)
+tv_cmp(const struct timeval *a, const struct timeval *b)
 {
 	if (a->tv_sec < b->tv_sec
 	    || (a->tv_sec == b->tv_sec && a->tv_usec < b->tv_usec))
@@ -97,13 +97,13 @@ tv_cmp(struct timeval *a, struct timeval *b)
 }
 
 double
-tv_float(struct timeval *tv)
+tv_float(const struct timeval *tv)
 {
 	return tv->tv_sec + tv->tv_usec/1000000.0;
 }
 
 void
-tv_add(struct timeval *tv, struct timeval *a, struct timeval *b)
+tv_add(struct timeval *tv, const struct timeval *a, const struct timeval *b)
 {
 	tv->tv_sec = a->tv_sec + b->tv_sec;
 	tv->tv_usec = a->tv_usec + b->tv_usec;
@@ -114,7 +114,7 @@ tv_add(struct timeval *tv, struct timeval *a, struct timeval *b)
 }
 
 void
-tv_sub(struct timeval *tv, struct timeval *a, struct timeval *b)
+tv_sub(struct timeval *tv, const struct timeval *a, const struct timeval *b)
 {
 	tv->tv_sec = a->tv_sec - b->tv_sec;
 	tv->tv_usec = a->tv_usec - b->tv_usec;
@@ -125,7 +125,7 @@ tv_sub(struct timeval *tv, struct timeval *a, struct timeval *b)
 }
 
 void
-tv_div(struct timeval *tv, struct timeval *a, int n)
+tv_div(struct timeval *tv, const struct timeval *a, int n)
 {
 	tv->tv_usec = (a->tv_sec % n * 1000000 + a->tv_usec + n / 2) / n;
 	tv->tv_sec = a->tv_sec / n + tv->tv_usec / 1000000;
@@ -133,7 +133,7 @@ tv_div(struct timeval *tv, struct timeval *a, int n)
 }
 
 void
-tv_mul(struct timeval *tv, struct timeval *a, int n)
+tv_mul(struct timeval *tv, const struct timeval *a, int n)
 {
 	tv->tv_usec = a->tv_usec * n;
 	tv->tv_sec = a->tv_sec * n + tv->tv_usec / 1000000;
