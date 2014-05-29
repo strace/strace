@@ -1574,7 +1574,7 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
 			while ((char *) fds < ((char *) cmsg + cmsg_len)) {
 				if (!first)
 					tprints(", ");
-				tprintf("%d", *fds++);
+				printfd(tcp, *fds++);
 				first = 0;
 			}
 			tprints("}}");

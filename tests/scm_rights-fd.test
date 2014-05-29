@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Check how SCM_RIGHTS control messages are decoded in -y mode.
+
+. "${srcdir=.}/init.sh"
+
+# strace -y is implemented using /proc/$pid/fd
+[ -d /proc/self/fd/ ] ||
+	framework_skip_ '/proc/self/fd/ is not available'
+
+check_prog grep
+check_prog rm
+
+rm -f $LOG.*
+
+./scm_rights ||
+	fail_ 'scm_rights failed'
+
+args="-tt -ff -y -xx -enetwork -o $LOG ./scm_rights"
+$STRACE $args ||
+	fail_ "$STRACE $args failed"
+
+"$srcdir"/../strace-log-merge $LOG > $LOG || {
+	cat $LOG
+	fail_ 'strace-log-merge failed'
+}
+rm -f $LOG.*
+
+grep_log()
+{
+	local syscall="$1"; shift
+	local prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
+
+	LC_ALL=C grep -E -x "$prefix$syscall$*" $LOG > /dev/null || {
+		cat $LOG
+		fail_ "$STRACE $args failed to trace \"$syscall\" properly"
+	}
+}
+
+grep_log sendmsg '\(1<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x03\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
+grep_log recvmsg '\(0<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x03\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
+
+exit 0

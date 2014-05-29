@@ -2,7 +2,12 @@
 
 AM_CFLAGS = $(WARN_CFLAGS)
 
-check_PROGRAMS = net-accept-connect set_ptracer_any sigaction uio
+check_PROGRAMS = \
+	net-accept-connect \
+	scm_rights \
+	set_ptracer_any \
+	sigaction \
+	uio
 
 uio_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 
@@ -10,6 +15,7 @@ TESTS = \
 	ptrace_setoptions.test \
 	strace-f.test \
 	qual_syscall.test \
+	scm_rights-fd.test \
 	sigaction.test \
 	stat.test \
 	net.test \
