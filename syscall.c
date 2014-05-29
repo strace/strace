@@ -2523,8 +2523,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 
 	if (cflag) {
-		struct timeval t = tv;
-		count_syscall(tcp, &t);
+		count_syscall(tcp, &tv);
 		if (cflag == CFLAG_ONLY_STATS) {
 			goto ret;
 		}

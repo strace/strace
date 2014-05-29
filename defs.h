@@ -587,7 +587,7 @@ extern void set_overhead(int);
 extern void qualify(const char *);
 extern void print_pc(struct tcb *);
 extern int trace_syscall(struct tcb *);
-extern void count_syscall(struct tcb *, struct timeval *);
+extern void count_syscall(struct tcb *, const struct timeval *);
 extern void call_summary(FILE *);
 
 #if defined(AVR32) \
