@@ -15,6 +15,7 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	uio.test \
+	count.test \
 	detach-sleeping.test \
 	detach-stopped.test \
 	detach-running.test

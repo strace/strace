@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Check whether -c and -w options work.
+
+. "${srcdir=.}/init.sh"
+
+check_prog sleep
+check_prog grep
+
+make_log()
+{
+	$STRACE $args > $LOG 2>&1 || {
+		cat $LOG
+		fail_ "$STRACE $args failed"
+	}
+}
+
+grep_log()
+{
+	LC_ALL=C grep -E -x -e "$*" $LOG > /dev/null || {
+		cat $LOG
+		fail_ "unexpected output from $STRACE $args"
+	}
+}
+
+args='-c sleep 1'
+make_log
+grep nanosleep $LOG > /dev/null ||
+	skip_ 'sleep does not use nanosleep'
+grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'
+
+args='-c -enanosleep sleep 1'
+make_log
+grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'
+
+args='-cw sleep 1'
+make_log
+grep_log ' *[^ ]+ +1\.0[^n]*nanosleep'
+
+args='-cw -enanosleep sleep 1'
+make_log
+grep_log '100\.00 +1\.0[^n]*nanosleep'
+
+exit 0
