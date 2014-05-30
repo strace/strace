@@ -15,8 +15,9 @@ int main(void)
 	} control = {};
 
 	int fd;
+	int data = 0;
 	struct iovec iov = {
-		.iov_base = &fd,
+		.iov_base = &data,
 		.iov_len = sizeof(iov)
 	};
 

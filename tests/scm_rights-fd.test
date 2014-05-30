@@ -37,7 +37,7 @@ grep_log()
 	}
 }
 
-grep_log sendmsg '\(1<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x03\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
-grep_log recvmsg '\(0<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x03\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
+grep_log sendmsg '\(1<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
+grep_log recvmsg '\(0<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
 
 exit 0
