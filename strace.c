@@ -1817,11 +1817,6 @@ init(int argc, char *argv[])
 		error_msg_and_die("-D and -p are mutually exclusive");
 	}
 
-#ifdef USE_LIBUNWIND
-	if (stack_trace_enabled)
-		unwind_init();
-#endif
-
 	if (!followfork)
 		followfork = optF;
 
@@ -1832,6 +1827,28 @@ init(int argc, char *argv[])
 	if (count_wallclock && !cflag) {
 		error_msg_and_die("-w must be given with (-c or -C)");
 	}
+
+	if (cflag == CFLAG_ONLY_STATS) {
+		if (iflag)
+			error_msg("-%c has no effect with -c", 'i');
+#ifdef USE_LIBUNWIND
+		if (stack_trace_enabled)
+			error_msg("-%c has no effect with -c", 'k');
+#endif
+		if (rflag)
+			error_msg("-%c has no effect with -c", 'r');
+		if (tflag)
+			error_msg("-%c has no effect with -c", 't');
+		if (Tflag)
+			error_msg("-%c has no effect with -c", 'T');
+		if (show_fd_path)
+			error_msg("-%c has no effect with -c", 'y');
+	}
+
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled)
+		unwind_init();
+#endif
 
 	/* See if they want to run as another user. */
 	if (username != NULL) {
