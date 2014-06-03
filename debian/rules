@@ -2,7 +2,11 @@
 
 #export DH_VERBOSE=1
 
-CFLAGS = -Wall -g
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+CFLAGS += -Wall -g
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
   CFLAGS += -O0
