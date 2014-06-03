@@ -34,6 +34,11 @@
 .fi
 .sp
 ..
+.\" Macro IX is not defined in the groff macros
+.if \n(.g \{\
+.  de IX
+..
+.\}
 .TH STRACE 1 "2010-03-30"
 .SH NAME
 strace \- trace system calls and signals
@@ -99,7 +104,7 @@ open("/dev/null", O_RDONLY) = 3
 Errors (typically a return value of \-1) have the errno symbol
 and error string appended.
 .CW
-open("/foo/bar", O_RDONLY) = -1 ENOENT (No such file or directory)
+open("/foo/bar", O_RDONLY) = \-1 ENOENT (No such file or directory)
 .CE
 Signals are printed as signal symbol and decoded siginfo structure.
 An excerpt from stracing and interrupting the command "sleep 666" is:
@@ -159,7 +164,7 @@ arguments are not modified if the system call fails, arguments may not
 always be dereferenced.  For example, retrying the "ls \-l" example
 with a non-existent file produces the following line:
 .CW
-lstat("/foo/bar", 0xb004) = -1 ENOENT (No such file or directory)
+lstat("/foo/bar", 0xb004) = \-1 ENOENT (No such file or directory)
 .CE
 In this case the porch light is on but nobody is home.
 .LP
@@ -234,7 +239,7 @@ processes as a result of the
 .BR vfork (2)
 and
 .BR clone (2)
-system calls. Note that
+system calls.  Note that
 .B \-p
 .I PID
 .B \-f
@@ -290,12 +295,12 @@ and the leading portion will be printed as the number
 of seconds since the epoch.
 .TP
 .B \-T
-Show the time spent in system calls. This records the time
+Show the time spent in system calls.  This records the time
 difference between the beginning and the end of each system call.
 .TP
 .B \-w
 Summarise the time difference between the beginning and end of
-each system call. The default is to summarise the system time.
+each system call.  The default is to summarise the system time.
 .TP
 .B \-v
 Print unabbreviated versions of environment, stat, termios, etc.
@@ -323,7 +328,7 @@ Align return values in a specific column (default column 40).
 If specified syscall is reached, detach from traced process.
 Currently, only
 .I execve
-syscall is supported. This option is useful if you want to trace
+syscall is supported.  This option is useful if you want to trace
 multi-threaded process and therefore require -f, but don't want
 to trace its (potentially very complex) children.
 .TP
@@ -332,7 +337,7 @@ A qualifying expression which modifies which events to trace
 or how to trace them.  The format of the expression is:
 .RS 15
 .IP
-[\fIqualifier\fB=\fR][\fB!\fR]\fIvalue1\fR[\fB,\fIvalue2\fR]...
+[\,\fIqualifier\/\fB=\fR][\fB!\fR]\,\fIvalue1\/\fR[\fB,\,\fIvalue2\/\fR]...
 .RE
 .IP
 where
@@ -371,7 +376,7 @@ Note that some shells use the exclamation point for history
 expansion even inside quoted arguments.  If so, you must escape
 the exclamation point with a backslash.
 .TP
-\fB\-e\ trace\fR=\fIset\fR
+\fB\-e\ trace\fR=\,\fIset\fR
 Trace only the specified set of system calls.  The
 .B \-c
 option is useful for determining which system calls might be useful
@@ -412,7 +417,7 @@ Trace all file descriptor related system calls.
 .BR "\-e\ trace" = memory
 Trace all memory mapping related system calls.
 .TP
-\fB\-e\ abbrev\fR=\fIset\fR
+\fB\-e\ abbrev\fR=\,\fIset\fR
 Abbreviate the output from printing each member of large structures.
 The default is
 .BR abbrev = all .
@@ -421,19 +426,19 @@ The
 option has the effect of
 .BR abbrev = none .
 .TP
-\fB\-e\ verbose\fR=\fIset\fR
+\fB\-e\ verbose\fR=\,\fIset\fR
 Dereference structures for the specified set of system calls.  The
 default is
 .BR verbose = all .
 .TP
-\fB\-e\ raw\fR=\fIset\fR
+\fB\-e\ raw\fR=\,\fIset\fR
 Print raw, undecoded arguments for the specified set of system calls.
 This option has the effect of causing all arguments to be printed
 in hexadecimal.  This is mostly useful if you don't trust the
 decoding or you need to know the actual numeric value of an
 argument.
 .TP
-\fB\-e\ signal\fR=\fIset\fR
+\fB\-e\ signal\fR=\,\fIset\fR
 Trace only the specified subset of signals.  The default is
 .BR signal = all .
 For example,
@@ -442,7 +447,7 @@ For example,
 .BR signal "=!" io )
 causes SIGIO signals not to be traced.
 .TP
-\fB\-e\ read\fR=\fIset\fR
+\fB\-e\ read\fR=\,\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data read from
 file descriptors listed in the specified set.  For example, to see
 all input activity on file descriptors
@@ -450,13 +455,13 @@ all input activity on file descriptors
 and
 .I 5
 use
-\fB\-e\ read\fR=\fI3\fR,\fI5\fR.
+\fB\-e\ read\fR=\,\fI3\fR,\fI5\fR.
 Note that this is independent from the normal tracing of the
 .BR read (2)
 system call which is controlled by the option
 .BR -e "\ " trace = read .
 .TP
-\fB\-e\ write\fR=\fIset\fR
+\fB\-e\ write\fR=\,\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data written to
 file descriptors listed in the specified set.  For example, to see
 all output activity on file descriptors
@@ -464,7 +469,7 @@ all output activity on file descriptors
 and
 .I 5
 use
-\fB\-e\ write\fR=\fI3\fR,\fI5\fR.
+\fB\-e\ write\fR=\,\fI3\fR,\,\fI5\fR.
 Note that this is independent from the normal tracing of the
 .BR write (2)
 system call which is controlled by the option
@@ -555,7 +560,7 @@ correct execution of setuid and/or setgid binaries.
 Unless this option is used setuid and setgid programs are executed
 without effective privileges.
 .TP
-\fB\-E\ \fIvar\fR=\fIval\fR
+\fB\-E\ \fIvar\fR=\,\fIval\fR
 Run command with
 .IR var = val
 in its list of environment variables.
@@ -646,7 +651,7 @@ functions.
 On some platforms a process that is attached to with the
 .B \-p
 option may observe a spurious EINTR return from the current
-system call that is not restartable. (Ideally, all system calls
+system call that is not restartable.  (Ideally, all system calls
 should be restarted on strace attach, making the attach invisible
 to the traced process, but a few system calls aren't.
 Arguably, every instance of such behavior is a kernel bug.)
