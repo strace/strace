@@ -1,8 +1,40 @@
-Noteworthy changes in release ?.? (????-??-??)
+Noteworthy changes in release 4.9 (????-??-??)
 ==============================================
 
+* Changes in behavior
+  * Disabled OABI support on ARM EABI systems by default,
+    added --enable-arm-oabi option to enable it at configure time.
+
 * Improvements
-  * Added -w option to produce stats on syscall latency
+  * Added -k option to print stack trace after each traced syscall.
+  * Added -w option to produce stats on syscall latency.
+    (addresses Debian bug #457497).
+  * Added ARC architecture support.
+  * Added PTRACE_GETREGS API support on PowerPC.
+  * Enhanced Bionic libc and musl libc support.
+  * Enhanced tracing of x86 personality processes on x86_64 and x32.
+  * Enhanced tracing of ARM personality processes on AArch64.
+  * Enhanced 32/64bit personality detection on PowerPC.
+  * Robustified decoding of select, pselect, and io_submit syscalls.
+  * Enhanced decoding of fcntl, setns, and sync_file_range syscalls.
+  * Enhanced decoding of signal bitmasks.
+  * Enhanced decoding of file descriptors.
+  * Enhanced siginfo_t decoding.
+  * Enhanced PF_NETLINK decoding.
+  * Updated CLOCK_* constants
+    (addresses Fedora bug #1088455).
+
+* Bug fixes
+  * Added shmat and shmdt to the set of memory mapping related syscalls.
+  * Fixed detaching from stopped processes.
+  * Fixed fanotify_mark decoding on 32bit architectures.
+  * Fixed offset decoding in preadv and pwritev syscalls.
+  * Fixed select decoding for glibc in _FORTIFY_SOURCE mode.
+  * Fixed decoding of epoll_ctl syscall with EPOLL_CTL_DEL argument.
+  * Fixed build when <sys/ptrace.h> and <linux/ptrace.h> conflict
+    (addresses Fedora bug #993384).
+  * Miscellaneous corrections in the manual page.
+    (Addresses Debian bug #725987).
 
 Noteworthy changes in release 4.8 (2013-06-03)
 ==============================================
