@@ -303,13 +303,19 @@ decode_open(struct tcb *tcp, int offset)
 			tprintf(", %#lo", tcp->u_arg[offset + 2]);
 		}
 	}
-	return 0;
+	return RVAL_FD;
 }
 
 int
 sys_open(struct tcb *tcp)
 {
 	return decode_open(tcp, 0);
+}
+
+int sys_delete_module(struct tcb *tcp)
+{
+	decode_open(tcp, 0);
+	return RVAL_DECIMAL;
 }
 
 int
@@ -348,7 +354,7 @@ sys_creat(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", %#lo", tcp->u_arg[1]);
 	}
-	return 0;
+	return RVAL_FD;
 }
 
 #include "xlat/access_flags.h"

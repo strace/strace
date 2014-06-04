@@ -52,6 +52,8 @@ int sys_close();
 int sys_connect();
 int sys_creat();
 int sys_create_module();
+int sys_delete_module();
+int sys_dup();
 int sys_dup2();
 int sys_dup3();
 int sys_epoll_create();

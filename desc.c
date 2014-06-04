@@ -265,6 +265,15 @@ sys_close(struct tcb *tcp)
 	return 0;
 }
 
+int
+sys_dup(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+	}
+	return RVAL_FD;
+}
+
 static int
 do_dup2(struct tcb *tcp, int flags_arg)
 {
@@ -277,7 +286,7 @@ do_dup2(struct tcb *tcp, int flags_arg)
 			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 		}
 	}
-	return 0;
+	return RVAL_FD;
 }
 
 int

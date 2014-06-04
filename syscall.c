@@ -2688,6 +2688,14 @@ trace_syscall_exiting(struct tcb *tcp)
 			case RVAL_DECIMAL:
 				tprintf("= %ld", tcp->u_rval);
 				break;
+			case RVAL_FD:
+				if (show_fd_path) {
+					tprints("= ");
+					printfd(tcp, tcp->u_rval);
+				}
+				else
+					tprintf("= %ld", tcp->u_rval);
+				break;
 #if defined(LINUX_MIPSN32) || defined(X32)
 			/*
 			case RVAL_LHEX:

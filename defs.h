@@ -533,10 +533,11 @@ extern const struct xlat whence_codes[];
 # endif
 # define RVAL_LUDECIMAL	007	/* long unsigned decimal format */
 #endif
-#define RVAL_MASK	007	/* mask for these values */
+#define RVAL_FD		010	/* file descriptor */
+#define RVAL_MASK	017	/* mask for these values */
 
-#define RVAL_STR	010	/* Print `auxstr' field after return val */
-#define RVAL_NONE	020	/* Print nothing */
+#define RVAL_STR	020	/* Print `auxstr' field after return val */
+#define RVAL_NONE	040	/* Print nothing */
 
 #define TRACE_FILE	001	/* Trace file-related syscalls. */
 #define TRACE_IPC	002	/* Trace IPC-related syscalls. */
