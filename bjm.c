@@ -71,6 +71,7 @@ struct module_info
 
 #include "xlat/qm_which.h"
 #include "xlat/modflags.h"
+#include "xlat/delete_module_flags.h"
 
 int
 sys_query_module(struct tcb *tcp)
@@ -171,6 +172,17 @@ sys_create_module(struct tcb *tcp)
 		tprintf(", %lu", tcp->u_arg[1]);
 	}
 	return RVAL_HEX;
+}
+
+int
+sys_delete_module(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printstr(tcp, tcp->u_arg[0], -1);
+		tprints(", ");
+		printflags(delete_module_flags, tcp->u_arg[1], "O_???");
+	}
+	return 0;
 }
 
 int

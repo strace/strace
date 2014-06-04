@@ -312,12 +312,6 @@ sys_open(struct tcb *tcp)
 	return decode_open(tcp, 0);
 }
 
-int sys_delete_module(struct tcb *tcp)
-{
-	decode_open(tcp, 0);
-	return RVAL_DECIMAL;
-}
-
 int
 sys_openat(struct tcb *tcp)
 {

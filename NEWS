@@ -16,7 +16,8 @@ Noteworthy changes in release 4.9 (????-??-??)
   * Enhanced tracing of ARM personality processes on AArch64.
   * Enhanced 32/64bit personality detection on PowerPC.
   * Robustified decoding of select, pselect, and io_submit syscalls.
-  * Enhanced decoding of fcntl, setns, and sync_file_range syscalls.
+  * Enhanced decoding of delete_module, fcntl, setdomainname, sethostname,
+    setns, and sync_file_range syscalls.
   * Enhanced decoding of signal bitmasks.
   * Enhanced decoding of file descriptors.
   * Enhanced siginfo_t decoding.
