@@ -28,6 +28,16 @@
 #include <limits.h>
 #include <libunwind-ptrace.h>
 
+#ifdef _LARGEFILE64_SOURCE
+# ifdef HAVE_FOPEN64
+#  define fopen_for_input fopen64
+# else
+#  define fopen_for_input fopen
+# endif
+#else
+# define fopen_for_input fopen
+#endif
+
 #define DPRINTF(F, A, ...) if (debug_flag) fprintf(stderr, " [unwind(" A ")] " F "\n", __VA_ARGS__)
 
 /*
@@ -143,7 +153,7 @@ build_mmap_cache(struct tcb* tcp)
 	unw_flush_cache (libunwind_as, 0, 0);
 
 	sprintf(filename, "/proc/%d/maps", tcp->pid);
-	fp = fopen(filename, "r");
+	fp = fopen_for_input(filename, "r");
 	if (!fp) {
 		perror_msg("fopen: %s", filename);
 		return;
