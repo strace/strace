@@ -291,7 +291,7 @@ stacktrace_walk(struct tcb *tcp,
 	unw_word_t function_off_set;
 	int stack_depth = 0, ret_val;
 	/* these are used for the binary search through the mmap_chace */
-	unsigned int lower, upper, mid;
+	int lower, upper, mid;
 	size_t symbol_name_size = 40;
 	char * symbol_name;
 	struct mmap_cache_t* cur_mmap_cache;
@@ -318,7 +318,7 @@ stacktrace_walk(struct tcb *tcp,
 		}
 
 		lower = 0;
-		upper = tcp->mmap_cache_size - 1;
+		upper = (int) tcp->mmap_cache_size - 1;
 
 		while (lower <= upper) {
 			/* find the mmap_cache and print the stack frame */
@@ -371,7 +371,7 @@ stacktrace_walk(struct tcb *tcp,
 				goto ret;
 			}
 			else if (ip < cur_mmap_cache->start_addr)
-				upper = mid;
+				upper = mid - 1;
 			else
 				lower = mid + 1;
 
