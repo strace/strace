@@ -57,7 +57,7 @@ struct mmap_cache_t {
 	unsigned long start_addr;
 	unsigned long end_addr;
 	unsigned long mmap_offset;
-	char* binary_filename;
+	char *binary_filename;
 	bool deleted;
 };
 
@@ -65,8 +65,8 @@ struct mmap_cache_t {
  * Type used in stacktrace walker
  */
 typedef void (*call_action_fn)(void *data,
-			       char *binary_filename,
-			       char *symbol_name,
+			       const char *binary_filename,
+			       const char *symbol_name,
 			       unw_word_t function_offset,
 			       unsigned long true_offset);
 typedef void (*error_action_fn)(void *data,
@@ -433,8 +433,8 @@ ret:
 
 static void
 print_call_cb(void *dummy,
-	      char *binary_filename,
-	      char *symbol_name,
+	      const char *binary_filename,
+	      const char *symbol_name,
 	      unw_word_t function_offset,
 	      unsigned long true_offset)
 {
@@ -462,8 +462,8 @@ print_error_cb(void *dummy,
 }
 
 static char *
-sprint_call_or_error(char *binary_filename,
-		     char *symbol_name,
+sprint_call_or_error(const char *binary_filename,
+		     const char *symbol_name,
 		     unw_word_t function_offset,
 		     unsigned long true_offset,
 		     const char *error)
@@ -493,8 +493,8 @@ sprint_call_or_error(char *binary_filename,
  */
 static void
 queue_put(struct queue_t *queue,
-	  char *binary_filename,
-	  char *symbol_name,
+	  const char *binary_filename,
+	  const char *symbol_name,
 	  unw_word_t function_offset,
 	  unsigned long true_offset,
 	  const char *error)
@@ -523,8 +523,8 @@ queue_put(struct queue_t *queue,
 
 static void
 queue_put_call(void *queue,
-	       char *binary_filename,
-	       char *symbol_name,
+	       const char *binary_filename,
+	       const char *symbol_name,
 	       unw_word_t function_offset,
 	       unsigned long true_offset)
 {
