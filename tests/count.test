@@ -35,10 +35,10 @@ grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'
 
 args='-cw sleep 1'
 make_log
-grep_log ' *[^ ]+ +1\.0[^n]*nanosleep'
+grep_log ' *[^ ]+ +(1\.0|0\.99)[^n]*nanosleep'
 
 args='-cw -enanosleep sleep 1'
 make_log
-grep_log '100\.00 +1\.0[^n]*nanosleep'
+grep_log '100\.00 +(1\.0|0\.99)[^n]*nanosleep'
 
 exit 0
