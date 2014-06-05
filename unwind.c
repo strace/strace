@@ -67,7 +67,7 @@ struct mmap_cache_t {
 typedef void (*call_action_fn)(void *data,
 			       char *binary_filename,
 			       char *symbol_name,
-			       unw_word_t function_off_set,
+			       unw_word_t function_offset,
 			       unsigned long true_offset);
 typedef void (*error_action_fn)(void *data,
 				const char *error,
@@ -288,7 +288,7 @@ stacktrace_walk(struct tcb *tcp,
 {
 	unw_word_t ip;
 	unw_cursor_t cursor;
-	unw_word_t function_off_set;
+	unw_word_t function_offset;
 	int stack_depth = 0, ret_val;
 	/* these are used for the binary search through the mmap_chace */
 	int lower, upper, mid;
@@ -330,7 +330,7 @@ stacktrace_walk(struct tcb *tcp,
 				for (;;) {
 					symbol_name[0] = '\0';
 					ret_val = unw_get_proc_name(&cursor, symbol_name,
-						symbol_name_size, &function_off_set);
+						symbol_name_size, &function_offset);
 					if (ret_val != -UNW_ENOMEM)
 						break;
 					symbol_name_size *= 2;
@@ -348,7 +348,7 @@ stacktrace_walk(struct tcb *tcp,
 					call_action(data,
 						    cur_mmap_cache->binary_filename,
 						    symbol_name,
-						    function_off_set,
+						    function_offset,
 						    true_offset);
 				} else {
 					call_action(data,
@@ -413,7 +413,7 @@ ret:
 	" > %s(%s+0x%lx) [0x%lx]\n",		\
 	binary_filename,			\
 	symbol_name,				\
-	(unsigned long) function_off_set,	\
+	(unsigned long) function_offset,	\
 	true_offset
 #define STACK_ENTRY_NOSYMBOL_FMT		\
 	" > %s() [0x%lx]\n",			\
@@ -429,7 +429,7 @@ static void
 print_call_cb(void *dummy,
 	      char *binary_filename,
 	      char *symbol_name,
-	      unw_word_t function_off_set,
+	      unw_word_t function_offset,
 	      unsigned long true_offset)
 {
 	if (symbol_name)
@@ -458,7 +458,7 @@ print_error_cb(void *dummy,
 static char *
 sprint_call_or_error(char *binary_filename,
 		     char *symbol_name,
-		     unw_word_t function_off_set,
+		     unw_word_t function_offset,
 		     unsigned long true_offset,
 		     const char *error)
 {
@@ -489,7 +489,7 @@ static void
 queue_put(struct queue_t *queue,
 	  char *binary_filename,
 	  char *symbol_name,
-	  unw_word_t function_off_set,
+	  unw_word_t function_offset,
 	  unsigned long true_offset,
 	  const char *error)
 {
@@ -501,7 +501,7 @@ queue_put(struct queue_t *queue,
 
 	call->output_line = sprint_call_or_error(binary_filename,
 						 symbol_name,
-						 function_off_set,
+						 function_offset,
 						 true_offset,
 						 error);
 	call->next = NULL;
@@ -519,13 +519,13 @@ static void
 queue_put_call(void *queue,
 	       char *binary_filename,
 	       char *symbol_name,
-	       unw_word_t function_off_set,
+	       unw_word_t function_offset,
 	       unsigned long true_offset)
 {
 	queue_put(queue,
 		  binary_filename,
 		  symbol_name,
-		  function_off_set,
+		  function_offset,
 		  true_offset,
 		  NULL);
 }
