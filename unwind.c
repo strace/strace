@@ -283,6 +283,82 @@ unwind_cache_invalidate(struct tcb* tcp)
 		tcp->mmap_cache);
 }
 
+static void
+get_symbol_name(unw_cursor_t *cursor, char **name,
+		size_t *size, unw_word_t *offset)
+{
+	for (;;) {
+		int rc = unw_get_proc_name(cursor, *name, *size, offset);
+		if (rc == 0)
+			break;
+		if (rc != -UNW_ENOMEM) {
+			**name = '\0';
+			*offset = 0;
+			break;
+		}
+		*size *= 2;
+		*name = realloc(*name, *size);
+		if (!*name)
+			die_out_of_memory();
+	}
+}
+
+static int
+print_stack_frame(struct tcb *tcp,
+		  call_action_fn call_action,
+		  error_action_fn error_action,
+		  void *data,
+		  unw_cursor_t *cursor,
+		  char **symbol_name,
+		  size_t *symbol_name_size)
+{
+	unw_word_t ip;
+	int lower = 0;
+	int upper = (int) tcp->mmap_cache_size - 1;
+
+	if (unw_get_reg(cursor, UNW_REG_IP, &ip) < 0) {
+		perror_msg("Can't walk the stack of process %d", tcp->pid);
+		return -1;
+	}
+
+	while (lower <= upper) {
+		struct mmap_cache_t *cur_mmap_cache;
+		int mid = (upper + lower) / 2;
+
+		cur_mmap_cache = &tcp->mmap_cache[mid];
+
+		if (ip >= cur_mmap_cache->start_addr &&
+		    ip < cur_mmap_cache->end_addr) {
+			unsigned long true_offset;
+			unw_word_t function_offset;
+
+			get_symbol_name(cursor, symbol_name, symbol_name_size,
+					&function_offset);
+			true_offset = ip - cur_mmap_cache->start_addr +
+				cur_mmap_cache->mmap_offset;
+			call_action(data,
+				    cur_mmap_cache->binary_filename,
+				    *symbol_name,
+				    function_offset,
+				    true_offset);
+			return 0;
+		}
+		else if (ip < cur_mmap_cache->start_addr)
+			upper = mid - 1;
+		else
+			lower = mid + 1;
+	}
+
+	/*
+	 * there is a bug in libunwind >= 1.0
+	 * after a set_tid_address syscall
+	 * unw_get_reg returns IP == 0
+	 */
+	if(ip)
+		error_action(data, "unexpected_backtracing_error", ip);
+	return -1;
+}
+
 /*
  * walking the stack
  */
@@ -292,17 +368,10 @@ stacktrace_walk(struct tcb *tcp,
 		error_action_fn error_action,
 		void *data)
 {
-	unw_word_t ip;
-	unw_cursor_t cursor;
-	unw_word_t function_offset;
-	int stack_depth = 0, ret_val;
-	/* these are used for the binary search through the mmap_chace */
-	int lower, upper, mid;
+	char *symbol_name;
 	size_t symbol_name_size = 40;
-	char * symbol_name;
-	struct mmap_cache_t* cur_mmap_cache;
-	unsigned long true_offset;
-	bool berror_expected = false;
+	unw_cursor_t cursor;
+	int stack_depth;
 
 	if (!tcp->mmap_cache)
 		error_msg_and_die("bug: mmap_cache is NULL");
@@ -316,90 +385,16 @@ stacktrace_walk(struct tcb *tcp,
 	if (unw_init_remote(&cursor, libunwind_as, tcp->libunwind_ui) < 0)
 		perror_msg_and_die("Can't initiate libunwind");
 
-	do {
-		/* looping on the stack frame */
-		if (unw_get_reg(&cursor, UNW_REG_IP, &ip) < 0) {
-			perror_msg("Can't walk the stack of process %d", tcp->pid);
+	for (stack_depth = 0; stack_depth < 256; ++stack_depth) {
+		if (print_stack_frame(tcp, call_action, error_action, data,
+				&cursor, &symbol_name, &symbol_name_size) < 0)
 			break;
-		}
-
-		lower = 0;
-		upper = (int) tcp->mmap_cache_size - 1;
-
-		while (lower <= upper) {
-			/* find the mmap_cache and print the stack frame */
-			mid = (upper + lower) / 2;
-			cur_mmap_cache = &tcp->mmap_cache[mid];
-
-			if (ip >= cur_mmap_cache->start_addr &&
-			    ip < cur_mmap_cache->end_addr) {
-				for (;;) {
-					symbol_name[0] = '\0';
-					ret_val = unw_get_proc_name(&cursor, symbol_name,
-						symbol_name_size, &function_offset);
-					if (ret_val != -UNW_ENOMEM)
-						break;
-					symbol_name_size *= 2;
-					symbol_name = realloc(symbol_name, symbol_name_size);
-					if (!symbol_name)
-						die_out_of_memory();
-				}
-
-				if (cur_mmap_cache->deleted)
-					berror_expected = true;
-
-				true_offset = ip - cur_mmap_cache->start_addr +
-					cur_mmap_cache->mmap_offset;
-				if (symbol_name[0]) {
-					call_action(data,
-						    cur_mmap_cache->binary_filename,
-						    symbol_name,
-						    function_offset,
-						    true_offset);
-				} else {
-					call_action(data,
-						    cur_mmap_cache->binary_filename,
-						    symbol_name,
-						    0,
-						    true_offset);
-				}
-				break; /* stack frame printed */
-			}
-			else if (mid == 0) {
-				/*
-				 * there is a bug in libunwind >= 1.0
-				 * after a set_tid_address syscall
-				 * unw_get_reg returns IP == 0
-				 */
-				if(ip)
-					error_action(data,
-						     "backtracing_error", 0);
-				goto ret;
-			}
-			else if (ip < cur_mmap_cache->start_addr)
-				upper = mid - 1;
-			else
-				lower = mid + 1;
-
-		}
-		if (lower > upper) {
-			error_action(data,
-				     berror_expected
-				     ?"expected_backtracing_error"
-				     :"unexpected_backtracing_error",
-				     ip);
-			goto ret;
-		}
-
-		ret_val = unw_step(&cursor);
-
-		if (++stack_depth > 255) {
-			error_action(data,
-				     "too many stack frames", 0);
+		if (unw_step(&cursor) <= 0)
 			break;
-		}
-	} while (ret_val > 0);
-ret:
+	}
+	if (stack_depth >= 256)
+		error_action(data, "too many stack frames", 0);
+
 	free(symbol_name);
 }
 
