@@ -403,7 +403,7 @@ ret:
 	" > %s(%s+0x%lx) [0x%lx]\n",		\
 	binary_filename,			\
 	symbol_name,				\
-	function_off_set,			\
+	(unsigned long) function_off_set,	\
 	true_offset
 #define STACK_ENTRY_NOSYMBOL_FMT		\
 	" > %s() [0x%lx]\n",			\
@@ -523,7 +523,7 @@ queue_put_call(void *queue,
 static void
 queue_put_error(void *queue,
 		const char *error,
-		unw_word_t ip)
+		unsigned long ip)
 {
 	queue_put(queue, NULL, NULL, 0, ip, error);
 }

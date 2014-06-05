@@ -5,7 +5,7 @@
 
 int f1(int i)
 {
-	static uid_t (* volatile g)(void) = getuid;
+	static pid_t (* volatile g)(void) = getpid;
 	return g() + i;
 }
 

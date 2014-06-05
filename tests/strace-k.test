@@ -17,13 +17,13 @@ check_prog tr
 $STRACE -h | grep '^-k' > /dev/null ||
 	skip_ 'strace -k is not available'
 
-args="-e getuid -k ./stack-fcall"
+args="-e getpid -k ./stack-fcall"
 $STRACE $args > $LOG 2>&1 || {
 	cat $LOG
 	fail_ "$STRACE $args failed"
 }
 
-expected='getuid f1 f0 main '
+expected='getpid f1 f0 main '
 result=$(sed -n '1,/(main+0x[a-f0-9]\+) .*/ s/^.*(\([^+]\+\)+0x[a-f0-9]\+) .*/\1/p' $LOG |
 	tr '\n' ' ')
 
