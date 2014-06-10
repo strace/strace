@@ -269,6 +269,12 @@ rebuild_cache_if_invalid(struct tcb *tcp, const char *caller)
 void
 unwind_cache_invalidate(struct tcb* tcp)
 {
+#if SUPPORTED_PERSONALITIES > 1
+	if (tcp->currpers != DEFAULT_PERSONALITY) {
+		/* disable strack trace */
+		return;
+	}
+#endif
 	mmap_cache_generation++;
 	DPRINTF("tgen=%u, ggen=%u, tcp=%p, cache=%p", "increment",
 		tcp->mmap_cache_generation,
@@ -566,6 +572,12 @@ queue_print(struct queue_t *queue)
 void
 unwind_print_stacktrace(struct tcb* tcp)
 {
+#if SUPPORTED_PERSONALITIES > 1
+	if (tcp->currpers != DEFAULT_PERSONALITY) {
+		/* disable strack trace */
+		return;
+	}
+#endif
        if (tcp->queue->head) {
 	       DPRINTF("tcp=%p, queue=%p", "queueprint", tcp, tcp->queue->head);
 	       queue_print(tcp->queue);
@@ -582,6 +594,12 @@ unwind_print_stacktrace(struct tcb* tcp)
 void
 unwind_capture_stacktrace(struct tcb *tcp)
 {
+#if SUPPORTED_PERSONALITIES > 1
+	if (tcp->currpers != DEFAULT_PERSONALITY) {
+		/* disable strack trace */
+		return;
+	}
+#endif
 	if (tcp->queue->head)
 		error_msg_and_die("bug: unprinted entries in queue");
 
