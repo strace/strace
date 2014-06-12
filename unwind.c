@@ -47,7 +47,7 @@
 struct mmap_cache_t {
 	/**
 	 * example entry:
-	 * 7fabbb09b000-7fabbb09f000 r--p 00179000 fc:00 1180246 /lib/libc-2.11.1.so
+	 * 7fabbb09b000-7fabbb09f000 r-xp 00179000 fc:00 1180246 /lib/libc-2.11.1.so
 	 *
 	 * start_addr  is 0x7fabbb09b000
 	 * end_addr    is 0x7fabbb09f000
@@ -130,24 +130,22 @@ unwind_tcb_fin(struct tcb *tcp)
 /*
  * caching of /proc/ID/maps for each process to speed up stack tracing
  *
- * The cache must be refreshed after some syscall: mmap, mprotect, munmap, execve
+ * The cache must be refreshed after syscalls that affect memory mappings,
+ * e.g. mmap, mprotect, munmap, execve.
  */
 static void
 build_mmap_cache(struct tcb* tcp)
 {
-	unsigned long start_addr, end_addr, mmap_offset;
-	char filename[sizeof ("/proc/0123456789/maps")];
-	char buffer[PATH_MAX + 80];
-	char binary_path[PATH_MAX];
-	struct mmap_cache_t *cur_entry, *prev_entry;
+	FILE *fp;
+	struct mmap_cache_t *cache_head;
 	/* start with a small dynamically-allocated array and then expand it */
 	size_t cur_array_size = 10;
-	struct mmap_cache_t *cache_head;
-	FILE *fp;
+	char filename[sizeof("/proc/4294967296/maps")];
+	char buffer[PATH_MAX + 80];
 
-	unw_flush_cache (libunwind_as, 0, 0);
+	unw_flush_cache(libunwind_as, 0, 0);
 
-	sprintf(filename, "/proc/%d/maps", tcp->pid);
+	sprintf(filename, "/proc/%u/maps", tcp->pid);
 	fp = fopen_for_input(filename, "r");
 	if (!fp) {
 		perror_msg("fopen: %s", filename);
@@ -159,52 +157,56 @@ build_mmap_cache(struct tcb* tcp)
 		die_out_of_memory();
 
 	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-		binary_path[0] = '\0'; // 'reset' it just to be paranoid
+		struct mmap_cache_t *entry;
+		unsigned long start_addr, end_addr, mmap_offset;
+		char binary_path[PATH_MAX];
 
-		sscanf(buffer, "%lx-%lx %*c%*c%*c%*c %lx %*x:%*x %*d %[^\n]",
-		       &start_addr, &end_addr, &mmap_offset, binary_path);
-
-		/* ignore special 'fake files' like "[vdso]", "[heap]", "[stack]", */
-		if (binary_path[0] == '[') {
+		if (sscanf(buffer, "%lx-%lx %*c%*c%c%*c %lx %*x:%*x %*d %[^\n]",
+			   &start_addr, &end_addr,
+			   &mmap_offset, binary_path) != 4)
 			continue;
+
+		if (end_addr < start_addr) {
+			error_msg("%s: unrecognized file format", filename);
+			break;
 		}
-
-		if (binary_path[0] == '\0') {
-			continue;
-		}
-
-		if (end_addr < start_addr)
-			perror_msg_and_die("%s: unrecognized maps file format",
-					   filename);
-
-		cur_entry = &cache_head[tcp->mmap_cache_size];
-		cur_entry->start_addr = start_addr;
-		cur_entry->end_addr = end_addr;
-		cur_entry->mmap_offset = mmap_offset;
-		cur_entry->binary_filename = strdup(binary_path);
 
 		/*
 		 * sanity check to make sure that we're storing
 		 * non-overlapping regions in ascending order
 		 */
 		if (tcp->mmap_cache_size > 0) {
-			prev_entry = &cache_head[tcp->mmap_cache_size - 1];
-			if (prev_entry->start_addr >= cur_entry->start_addr)
-				perror_msg_and_die("Overlaying memory region in %s",
-						   filename);
-			if (prev_entry->end_addr > cur_entry->start_addr)
-				perror_msg_and_die("Overlaying memory region in %s",
-						   filename);
-		}
-		tcp->mmap_cache_size++;
+			entry = &cache_head[tcp->mmap_cache_size - 1];
 
-		/* resize doubling its size */
+			if (entry->start_addr == start_addr &&
+			    entry->end_addr == end_addr) {
+				/* duplicate entry, e.g. [vsyscall] */
+				continue;
+			}
+			if (start_addr <= entry->start_addr ||
+			    start_addr < entry->end_addr) {
+				error_msg("%s: overlapping memory region",
+					  filename);
+				continue;
+			}
+		}
+
 		if (tcp->mmap_cache_size >= cur_array_size) {
 			cur_array_size *= 2;
-			cache_head = realloc(cache_head, cur_array_size * sizeof(*cache_head));
+			cache_head = realloc(cache_head,
+					     cur_array_size * sizeof(*cache_head));
 			if (!cache_head)
 				die_out_of_memory();
 		}
+
+		entry = &cache_head[tcp->mmap_cache_size];
+		entry->start_addr = start_addr;
+		entry->end_addr = end_addr;
+		entry->mmap_offset = mmap_offset;
+		entry->binary_filename = strdup(binary_path);
+		if (!entry->binary_filename)
+			die_out_of_memory();
+		tcp->mmap_cache_size++;
 	}
 	fclose(fp);
 	tcp->mmap_cache = cache_head;
