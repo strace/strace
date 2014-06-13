@@ -23,7 +23,7 @@ $STRACE $args > $LOG 2>&1 || {
 	fail_ "$STRACE $args failed"
 }
 
-expected='getpid f1 f0 main '
+expected='getpid f3 f2 f1 f0 main '
 result=$(sed -n '1,/(main+0x[a-f0-9]\+) .*/ s/^.*(\([^+]\+\)+0x[a-f0-9]\+) .*/\1/p' $LOG |
 	tr '\n' ' ')
 
