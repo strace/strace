@@ -159,11 +159,16 @@ build_mmap_cache(struct tcb* tcp)
 	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 		struct mmap_cache_t *entry;
 		unsigned long start_addr, end_addr, mmap_offset;
+		char exec_bit;
 		char binary_path[PATH_MAX];
 
 		if (sscanf(buffer, "%lx-%lx %*c%*c%c%*c %lx %*x:%*x %*d %[^\n]",
-			   &start_addr, &end_addr,
-			   &mmap_offset, binary_path) != 4)
+			   &start_addr, &end_addr, &exec_bit,
+			   &mmap_offset, binary_path) != 5)
+			continue;
+
+		/* ignore mappings that have no PROT_EXEC bit set */
+		if (exec_bit != 'x')
 			continue;
 
 		if (end_addr < start_addr) {
@@ -177,7 +182,6 @@ build_mmap_cache(struct tcb* tcp)
 		 */
 		if (tcp->mmap_cache_size > 0) {
 			entry = &cache_head[tcp->mmap_cache_size - 1];
-
 			if (entry->start_addr == start_addr &&
 			    entry->end_addr == end_addr) {
 				/* duplicate entry, e.g. [vsyscall] */
