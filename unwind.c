@@ -58,7 +58,6 @@ struct mmap_cache_t {
 	unsigned long end_addr;
 	unsigned long mmap_offset;
 	char *binary_filename;
-	bool deleted;
 };
 
 /*
@@ -146,10 +145,6 @@ build_mmap_cache(struct tcb* tcp)
 	struct mmap_cache_t *cache_head;
 	FILE *fp;
 
-	const char *deleted = " (deleted)";
-	size_t blen;
-	size_t dlen;
-
 	unw_flush_cache (libunwind_as, 0, 0);
 
 	sprintf(filename, "/proc/%d/maps", tcp->pid);
@@ -187,13 +182,6 @@ build_mmap_cache(struct tcb* tcp)
 		cur_entry->end_addr = end_addr;
 		cur_entry->mmap_offset = mmap_offset;
 		cur_entry->binary_filename = strdup(binary_path);
-
-		dlen = strlen(deleted);
-		blen = strlen(binary_path);
-		if (blen >= dlen && strcmp(binary_path + blen - dlen, deleted) == 0)
-			cur_entry->deleted = true;
-		else
-			cur_entry->deleted = false;
 
 		/*
 		 * sanity check to make sure that we're storing
