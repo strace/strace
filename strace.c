@@ -238,7 +238,7 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -P path -- trace accesses to path\n\
 "
 #ifdef USE_LIBUNWIND
-"-k obtain stack trace between each syscall\n\
+"-k obtain stack trace between each syscall (experimental)\n\
 "
 #endif
 /* ancient, no one should use it

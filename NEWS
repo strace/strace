@@ -6,7 +6,7 @@ Noteworthy changes in release 4.9 (????-??-??)
     added --enable-arm-oabi option to enable it at configure time.
 
 * Improvements
-  * Added -k option to print stack trace after each traced syscall.
+  * Added experimental -k option to print stack trace after each traced syscall.
   * Added -w option to produce stats on syscall latency.
     (addresses Debian bug #457497).
   * Added ARC architecture support.
