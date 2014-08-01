@@ -204,10 +204,10 @@
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 203 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 204 */
 	{ 1,	0,	printargs,		"64:set_thread_area" }, /* 205 */
-	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 206 */
+	{ 2,	0,	sys_io_setup,		"64:io_setup"	}, /* 206 */
 	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 207 */
 	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 208 */
-	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 209 */
+	{ 3,	0,	sys_io_submit,		"64:io_submit"	}, /* 209 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 210 */
 	{ 1,	0,	printargs,		"64:get_thread_area"	}, /* 211 */
 	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 212 */
@@ -346,3 +346,5 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev" }, /* 540 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	},  /* 541 */
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"	},  /* 542 */
+	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 543 */
+	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 544 */
