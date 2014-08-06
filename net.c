@@ -571,7 +571,7 @@ sys_listen(struct tcb *tcp)
 }
 
 static int
-do_accept(struct tcb *tcp, int flags_arg)
+do_sockname(struct tcb *tcp, int flags_arg)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -602,13 +602,15 @@ do_accept(struct tcb *tcp, int flags_arg)
 int
 sys_accept(struct tcb *tcp)
 {
-	return do_accept(tcp, -1);
+	do_sockname(tcp, -1);
+	return RVAL_FD;
 }
 
 int
 sys_accept4(struct tcb *tcp)
 {
-	return do_accept(tcp, 3);
+	do_sockname(tcp, 3);
+	return RVAL_FD;
 }
 
 int
@@ -827,13 +829,13 @@ sys_shutdown(struct tcb *tcp)
 int
 sys_getsockname(struct tcb *tcp)
 {
-	return sys_accept(tcp);
+	return do_sockname(tcp, -1);
 }
 
 int
 sys_getpeername(struct tcb *tcp)
 {
-	return sys_accept(tcp);
+	return do_sockname(tcp, -1);
 }
 
 static int

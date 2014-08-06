@@ -41,7 +41,7 @@ grep_log()
 grep_log bind '\(0<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="local-stream"\}, 15\) += 0'
 grep_log listen '\(0<socket:\[[0-9]+\]>, 5\) += 0'
 grep_log getsockname '\(0<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="local-stream"\}, \[15\]\) += 0'
-grep_log accept '\(0<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), NULL\}, \[2\]\) += 1'
+grep_log accept '\(0<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), NULL\}, \[2\]\) += 1<socket:\[[0-9]+\]>'
 grep_log connect '\(1<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="local-stream"\}, 15\) += 0'
 
 exit 0
