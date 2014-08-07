@@ -199,7 +199,7 @@ sys_pread(struct tcb *tcp)
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval_aligned(tcp, "%llu", PREAD_OFFSET_ARG);
+		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
 	}
 	return 0;
 }
@@ -212,12 +212,32 @@ sys_pwrite(struct tcb *tcp)
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval_aligned(tcp, "%llu", PREAD_OFFSET_ARG);
+		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
 	}
 	return 0;
 }
 
 #if HAVE_SYS_UIO_H
+
+static void
+print_llu_from_low_high_val(struct tcb *tcp, int arg)
+{
+#if SIZEOF_LONG == SIZEOF_LONG_LONG
+	tprintf("%llu", (unsigned long long) tcp->u_arg[arg]);
+#elif defined(LINUX_MIPSN32)
+	tprintf("%llu", (unsigned long long) tcp->ext_arg[arg]);
+#else
+# ifdef X32
+	if (current_personality == 0)
+		tprintf("%llu", (unsigned long long) tcp->ext_arg[arg]);
+	else
+# endif
+	tprintf("%llu",
+		((unsigned long long) tcp->u_arg[arg + 1] << (sizeof(long) * 8))
+		| (unsigned long long) tcp->u_arg[arg]);
+#endif
+}
+
 int
 sys_preadv(struct tcb *tcp)
 {
@@ -231,7 +251,7 @@ sys_preadv(struct tcb *tcp)
 		}
 		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval_unaligned(tcp, "%llu", 3);
+		print_llu_from_low_high_val(tcp, 3);
 	}
 	return 0;
 }
@@ -244,7 +264,7 @@ sys_pwritev(struct tcb *tcp)
 		tprints(", ");
 		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval_unaligned(tcp, "%llu", 3);
+		print_llu_from_low_high_val(tcp, 3);
 	}
 	return 0;
 }

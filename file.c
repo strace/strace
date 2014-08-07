@@ -480,7 +480,7 @@ sys_readahead(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);
-		argn = printllval_aligned(tcp, ", %lld", 1);
+		argn = printllval(tcp, ", %lld", 1);
 		tprintf(", %ld", tcp->u_arg[argn]);
 	}
 	return 0;
@@ -501,7 +501,7 @@ sys_truncate64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
-		printllval_aligned(tcp, ", %llu", 1);
+		printllval(tcp, ", %llu", 1);
 	}
 	return 0;
 }
@@ -521,7 +521,7 @@ sys_ftruncate64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
-		printllval_aligned(tcp, ", %llu", 1);
+		printllval(tcp, ", %llu", 1);
 	}
 	return 0;
 }
@@ -2419,7 +2419,7 @@ sys_fadvise64(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);
-		argn = printllval_aligned(tcp, ", %lld", 1);
+		argn = printllval(tcp, ", %lld", 1);
 		tprintf(", %ld, ", tcp->u_arg[argn++]);
 		printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
 	}
@@ -2432,8 +2432,8 @@ sys_fadvise64_64(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);
-		argn = printllval_aligned(tcp, ", %lld, ", 1);
-		argn = printllval_aligned(tcp, "%lld, ", argn);
+		argn = printllval(tcp, ", %lld, ", 1);
+		argn = printllval(tcp, "%lld, ", argn);
 #if defined __ARM_EABI__ || defined AARCH64 || defined POWERPC || defined XTENSA
 		printxval(advise, tcp->u_arg[1], "POSIX_FADV_???");
 #else
@@ -2451,8 +2451,8 @@ sys_sync_file_range(struct tcb *tcp)
 	if (entering(tcp)) {
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);
-		argn = printllval_aligned(tcp, ", %lld, ", 1);
-		argn = printllval_aligned(tcp, "%lld, ", argn);
+		argn = printllval(tcp, ", %lld, ", 1);
+		argn = printllval(tcp, "%lld, ", argn);
 		printflags(sync_file_range_flags, tcp->u_arg[argn],
 		           "SYNC_FILE_RANGE_???");
 	}
@@ -2467,8 +2467,8 @@ sys_sync_file_range2(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		printflags(sync_file_range_flags, 1,
 		           "SYNC_FILE_RANGE_???");
-		argn = printllval_aligned(tcp, ", %lld, ", 2);
-		argn = printllval_aligned(tcp, "%lld, ", argn);
+		argn = printllval(tcp, ", %lld, ", 2);
+		argn = printllval(tcp, "%lld, ", argn);
 	}
 	return 0;
 }
@@ -2480,8 +2480,8 @@ sys_fallocate(struct tcb *tcp)
 		int argn;
 		printfd(tcp, tcp->u_arg[0]);		/* fd */
 		tprintf(", %#lo, ", tcp->u_arg[1]);	/* mode */
-		argn = printllval_aligned(tcp, "%llu, ", 2);	/* offset */
-		printllval_aligned(tcp, "%llu", argn);		/* len */
+		argn = printllval(tcp, "%llu, ", 2);	/* offset */
+		printllval(tcp, "%llu", argn);		/* len */
 	}
 	return 0;
 }

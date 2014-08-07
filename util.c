@@ -225,7 +225,7 @@ printxval(const struct xlat *xlat, int val, const char *dflt)
  * argument.
  */
 int
-printllval(struct tcb *tcp, const char *format, int arg_no, bool align)
+printllval(struct tcb *tcp, const char *format, int arg_no)
 {
 #if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
 # if SUPPORTED_PERSONALITIES > 1
@@ -236,10 +236,8 @@ printllval(struct tcb *tcp, const char *format, int arg_no, bool align)
 # if SUPPORTED_PERSONALITIES > 1
 	} else {
 #  if defined(AARCH64) || defined(POWERPC64)
-		if (align) {
-			/* Align arg_no to the next even number. */
-			arg_no = (arg_no + 1) & 0xe;
-		}
+		/* Align arg_no to the next even number. */
+		arg_no = (arg_no + 1) & 0xe;
 #  endif
 		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
 		arg_no += 2;
@@ -263,10 +261,8 @@ printllval(struct tcb *tcp, const char *format, int arg_no, bool align)
      defined LINUX_MIPSO32 || \
      defined POWERPC || \
      defined XTENSA
-	if (align) {
-		/* Align arg_no to the next even number. */
-		arg_no = (arg_no + 1) & 0xe;
-	}
+	/* Align arg_no to the next even number. */
+	arg_no = (arg_no + 1) & 0xe;
 # endif
 	tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
 	arg_no += 2;
