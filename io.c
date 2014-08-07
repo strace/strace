@@ -223,7 +223,7 @@ static void
 print_llu_from_low_high_val(struct tcb *tcp, int arg)
 {
 #if SIZEOF_LONG == SIZEOF_LONG_LONG
-	tprintf("%llu", (unsigned long long) tcp->u_arg[arg]);
+	tprintf("%lu", (unsigned long) tcp->u_arg[arg]);
 #elif defined(LINUX_MIPSN32)
 	tprintf("%llu", (unsigned long long) tcp->ext_arg[arg]);
 #else
@@ -233,8 +233,8 @@ print_llu_from_low_high_val(struct tcb *tcp, int arg)
 	else
 # endif
 	tprintf("%llu",
-		((unsigned long long) tcp->u_arg[arg + 1] << (sizeof(long) * 8))
-		| (unsigned long long) tcp->u_arg[arg]);
+		((unsigned long long) (unsigned long) tcp->u_arg[arg + 1] << sizeof(long) * 8)
+		| (unsigned long long) (unsigned long) tcp->u_arg[arg]);
 #endif
 }
 
