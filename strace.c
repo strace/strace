@@ -129,7 +129,7 @@ static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 bool not_failing_only = 0;
 
 /* Show path associated with fd arguments */
-bool show_fd_path = 0;
+unsigned int show_fd_path = 0;
 
 static bool detach_on_execve = 0;
 /* Are we "strace PROG" and need to skip detach on first execve? */
@@ -1734,7 +1734,7 @@ init(int argc, char *argv[])
 			xflag++;
 			break;
 		case 'y':
-			show_fd_path = 1;
+			show_fd_path++;
 			break;
 		case 'v':
 			qualify("abbrev=none");

@@ -562,7 +562,7 @@ extern bool iflag;
 extern bool count_wallclock;
 extern unsigned int qflag;
 extern bool not_failing_only;
-extern bool show_fd_path;
+extern unsigned int show_fd_path;
 extern bool hide_log_until_execve;
 /* are we filtering traces based on paths? */
 extern const char **paths_selected;
