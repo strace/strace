@@ -1128,7 +1128,9 @@ struct new_sigaction
 #else
 	void (*__sa_handler)(int);
 	unsigned long sa_flags;
+# ifndef ALPHA
 	void (*sa_restorer)(void);
+# endif /* !ALPHA */
 #endif /* !MIPS */
 	/* Kernel treats sa_mask as an array of longs. */
 	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
