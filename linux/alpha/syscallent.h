@@ -378,7 +378,7 @@
 	{ 4,	TD,	sys_pread,		"pread"			}, /* 349 */
 	{ 4,	TD,	sys_pwrite,		"pwrite"		}, /* 350 */
 	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"		}, /* 351 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"		}, /* 352 */
+	{ 5,	TS,	sys_rt_sigaction,	"rt_sigaction"		}, /* 352 */
 	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"	}, /* 353 */
 	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"		}, /* 354 */
 	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"	}, /* 355 */

@@ -100,7 +100,7 @@
 	{ 3,	TN,	sys_accept,	"accept" },		/* 99 */
 	{ 2,	0,	sys_getpriority,"getpriority" },	/* 100 */
 	{ 0,	TS,	sys_rt_sigreturn,"rt_sigreturn" },	/* 101 */
-	{ 4,	TS,	sys_rt_sigaction,"rt_sigaction" },	/* 102 */
+	{ 5,	TS,	sys_rt_sigaction,"rt_sigaction" },	/* 102 */
 	{ 4,	TS,	sys_rt_sigprocmask,"rt_sigprocmask" },	/* 103 */
 	{ 2,	TS,	sys_rt_sigpending,"rt_sigpending" },	/* 104 */
 	{ 4,	TS,	sys_rt_sigtimedwait,"rt_sigtimedwait" },/* 105 */
