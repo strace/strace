@@ -100,6 +100,12 @@ struct sigcontext {
 # endif
 #endif
 
+/* HPPA defines this in their headers, but doesn't actually have it,
+   so we have to delete the define.  */
+#ifdef HPPA
+# undef SA_RESTORER
+#endif
+
 #include "xlat/sigact_flags.h"
 #include "xlat/sigprocmaskcmds.h"
 
@@ -1128,9 +1134,9 @@ struct new_sigaction
 #else
 	void (*__sa_handler)(int);
 	unsigned long sa_flags;
-# ifndef ALPHA
+# if !defined(ALPHA) || !defined(HPPA)
 	void (*sa_restorer)(void);
-# endif /* !ALPHA */
+# endif /* !ALPHA || !HPPA */
 #endif /* !MIPS */
 	/* Kernel treats sa_mask as an array of longs. */
 	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
