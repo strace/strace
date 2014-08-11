@@ -25,6 +25,7 @@ cleanup()
 	set +e
 	kill $tracee_pid
 	wait $tracee_pid 2> /dev/null
+	return 0
 }
 
 rm -f $LOG
