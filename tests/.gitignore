@@ -8,3 +8,4 @@ uio
 *.log.*
 *.o
 *.trs
+*.tmp
