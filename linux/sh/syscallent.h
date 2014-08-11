@@ -379,8 +379,8 @@
 	{ 3,	TN,	sys_getpeername,	"getpeername"	}, /* 346 */
 	{ 4,	TN,	sys_socketpair,		"socketpair"	}, /* 347 */
 	{ 4,	TN,	sys_send,		"send"		}, /* 348 */
-	{ 4,	TN,	sys_recv,		"recv"		}, /* 349 */
-	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 350 */
+	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 349 */
+	{ 4,	TN,	sys_recv,		"recv"		}, /* 350 */
 	{ 6,	TN,	sys_recvfrom,		"recvfrom"	}, /* 351 */
 	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 352 */
 	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 353 */
