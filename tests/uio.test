@@ -7,8 +7,13 @@
 check_prog grep
 check_prog rm
 
-./uio ||
-	fail_ 'uio failed'
+./uio || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ 'preadv/pwritev syscalls are not available'
+	else
+		fail_ 'uio failed'
+	fi
+}
 
 args="-edesc ./uio"
 $STRACE $args > $LOG 2>&1 || {

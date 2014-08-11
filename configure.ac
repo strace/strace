@@ -214,7 +214,9 @@ AC_CHECK_FUNCS(m4_normalize([
 	if_indextoname
 	inet_ntop
 	prctl
+	preadv
 	process_vm_readv
+	pwritev
 	sendmsg
 	sigaction
 	stpcpy

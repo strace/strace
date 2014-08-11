@@ -1,3 +1,6 @@
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/uio.h>
@@ -6,6 +9,7 @@
 int
 main(void)
 {
+#if defined(HAVE_PREADV) && defined(HAVE_PWRITEV)
 	const off_t offset = 0xdefaceddeadbeefLL;
 	int fd;
 	char buf[4];
@@ -22,4 +26,7 @@ main(void)
 	assert(!close(fd));
 
 	return 0;
+#else
+	return 77;
+#endif
 }
