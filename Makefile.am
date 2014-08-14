@@ -271,14 +271,14 @@ $(srcdir)/ChangeLog: $(srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
 $(srcdir)/CREDITS: $(srcdir)/CREDITS.in $(srcdir)/.mailmap \
 		   $(srcdir)/Makefile.in $(srcdir)/.version
 	$(AM_V_GEN)							\
-	{								\
+	(								\
 	  cd $(srcdir);							\
 	  sed '/^##/,$$d' CREDITS.in;					\
 	  { sed -n '1,/^##>/d; s/  \+/\t/; s/^./&/p' CREDITS.in;	\
 	    git log --pretty=format:'%aN	%aE';			\
 	  } | LC_ALL=C sort -u						\
 	    | awk -F'\t' '{printf("\t%s <%s>\n",$$1,$$2)}';		\
-	} > $@-t && mv $@-t $@
+	) > $@-t && mv $@-t $@
 
 export TAR_OPTIONS = --owner=0 --group=0 --numeric-owner --mode=go-w,go+rX
 
