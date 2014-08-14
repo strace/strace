@@ -207,6 +207,7 @@ int sys_recvmsg();
 int sys_remap_file_pages();
 int sys_removexattr();
 int sys_renameat();
+int sys_renameat2();
 int sys_request_key();
 int sys_restart_syscall();
 int sys_rt_sigaction();

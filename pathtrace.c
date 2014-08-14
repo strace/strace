@@ -211,6 +211,7 @@ pathtrace_match(struct tcb *tcp)
 	}
 
 	if (s->sys_func == sys_renameat ||
+	    s->sys_func == sys_renameat2 ||
 	    s->sys_func == sys_linkat)
 	{
 		/* fd, path, fd, path */

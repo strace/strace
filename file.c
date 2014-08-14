@@ -1767,15 +1767,34 @@ sys_readlinkat(struct tcb *tcp)
 	return decode_readlink(tcp, 1);
 }
 
+static void
+decode_renameat(struct tcb *tcp)
+{
+	print_dirfd(tcp, tcp->u_arg[0]);
+	printpath(tcp, tcp->u_arg[1]);
+	tprints(", ");
+	print_dirfd(tcp, tcp->u_arg[2]);
+	printpath(tcp, tcp->u_arg[3]);
+}
+
 int
 sys_renameat(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_dirfd(tcp, tcp->u_arg[0]);
-		printpath(tcp, tcp->u_arg[1]);
+		decode_renameat(tcp);
+	}
+	return 0;
+}
+
+#include "xlat/rename_flags.h"
+
+int
+sys_renameat2(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		decode_renameat(tcp);
 		tprints(", ");
-		print_dirfd(tcp, tcp->u_arg[2]);
-		printpath(tcp, tcp->u_arg[3]);
+		printflags(rename_flags, tcp->u_arg[4], "RENAME_??");
 	}
 	return 0;
 }
