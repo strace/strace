@@ -408,12 +408,12 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 377 */
 	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 378 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 379 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 380 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 381 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 382 */
 #ifdef __ARM_EABI__
-# define ARM_LAST_ORDINARY_SYSCALL 379
+# define ARM_LAST_ORDINARY_SYSCALL 382
 #else
-	{ 5,	0,	NULL,			NULL		}, /* 380 */
-	{ 5,	0,	NULL,			NULL		}, /* 381 */
-	{ 5,	0,	NULL,			NULL		}, /* 382 */
 	{ 5,	0,	NULL,			NULL		}, /* 383 */
 	{ 5,	0,	NULL,			NULL		}, /* 384 */
 	{ 5,	0,	NULL,			NULL		}, /* 385 */

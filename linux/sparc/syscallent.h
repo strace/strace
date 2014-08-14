@@ -341,9 +341,9 @@
 	{ 0,	NF,	printargs,		"kern_features"	}, /* 340 */
 	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 341 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 342 */
-	{ 5,	0,	NULL,			NULL		}, /* 343 */
-	{ 5,	0,	NULL,			NULL		}, /* 344 */
-	{ 5,	0,	NULL,			NULL		}, /* 345 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 343 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 344 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 345 */
 	{ 5,	0,	NULL,			NULL		}, /* 346 */
 	{ 5,	0,	NULL,			NULL		}, /* 347 */
 	{ 5,	0,	NULL,			NULL		}, /* 348 */

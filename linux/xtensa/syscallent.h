@@ -324,3 +324,5 @@
 	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 331 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 332 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 333 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 334 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 335 */

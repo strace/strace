@@ -38,6 +38,8 @@
 #define	sys_lookup_dcookie	printargs
 #define	sys_name_to_handle_at	printargs
 #define	sys_open_by_handle_at	printargs
+#define	sys_sched_getattr	printargs
+#define	sys_sched_setattr	printargs
 #define	sys_sysfs		printargs
 #define	sys_vm86old		printargs
 #define	sys_vm86		printargs

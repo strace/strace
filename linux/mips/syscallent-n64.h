@@ -308,6 +308,10 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 5305 */
 	{ 5,	0,	sys_kcmp,		"kcmp"			}, /* 5306 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"		}, /* 5307 */
+	{ 3,	TD,	sys_getdents64,		"getdents64"		}, /* 5308 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"		}, /* 5309 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"		}, /* 5310 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"		}, /* 5311 */
 #else
 	{ 0,	0,	printargs,		"n64_read"		}, /* 5000 */
 	{ 0,	0,	printargs,		"n64_write"		}, /* 5001 */
@@ -615,7 +619,11 @@
 	{ 2,	TD,	printargs,		"n64_setns"		}, /* 5303 */
 	{ 6,	0,	printargs,		"n64_process_vm_readv"	}, /* 5304 */
 	{ 6,	0,	printargs,		"n64_process_vm_writev"	}, /* 5305 */
-	{ 5,	0,	printargs,		"kcmp"			}, /* 5306 */
-	{ 3,	TD,	printargs,		"finit_module"		}, /* 5307 */
+	{ 5,	0,	printargs,		"n64_kcmp"		}, /* 5306 */
+	{ 3,	TD,	printargs,		"n64_finit_module"	}, /* 5307 */
+	{ 3,	TD,	printargs,		"n64_getdents64"	}, /* 5308 */
+	{ 3,	0,	printargs,		"n64_sched_setattr"	}, /* 5309 */
+	{ 4,	0,	printargs,		"n64_sched_getattr"	}, /* 5310 */
+	{ 5,	TD|TF,	printargs,		"n64_renameat2"		}, /* 5311 */
 #endif
 	[5308 ... 5999] = { }, /* 5999 */ /* end of Linux N64 */

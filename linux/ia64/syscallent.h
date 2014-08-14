@@ -1127,3 +1127,6 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 1333 */
 	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 1334 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 1335 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 1336 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 1337 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 1338 */

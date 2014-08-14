@@ -375,9 +375,9 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 346 */
 	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 347 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 348 */
-	{ 5,	0,	NULL,			NULL		}, /* 349 */
-	{ 5,	0,	NULL,			NULL		}, /* 350 */
-	{ 5,	0,	NULL,			NULL		}, /* 351 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 349 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 350 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 351 */
 	{ 5,	0,	NULL,			NULL		}, /* 352 */
 	{ 5,	0,	NULL,			NULL		}, /* 353 */
 	{ 5,	0,	NULL,			NULL		}, /* 354 */

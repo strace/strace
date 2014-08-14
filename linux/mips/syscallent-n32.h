@@ -311,8 +311,11 @@
 	{ 2,	TD,	sys_setns,		"setns"		}, /* 6308 */
 	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 6309 */
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 6310 */
-	{ 5,	0,	sys_kcmp,		"kcmp"			}, /* 6311 */
-	{ 3,	TD,	sys_finit_module,	"finit_module"		}, /* 6312 */
+	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 6311 */
+	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 6312 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 6313 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 6314 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 6315 */
 #else
 	{ 0,	0,	printargs,		"n32_read"		}, /* 6000 */
 	{ 0,	0,	printargs,		"n32_write"		}, /* 6001 */
@@ -627,4 +630,7 @@
 	{ 6,	0,	printargs,		"n32_process_vm_writev"	}, /* 6310 */
 	{ 5,	0,	printargs,		"n32_kcmp"		}, /* 6311 */
 	{ 3,	TD,	printargs,		"n32_finit_module"	}, /* 6312 */
+	{ 3,	0,	printargs,		"n32_sched_setattr"	}, /* 6313 */
+	{ 4,	0,	printargs,		"n32_sched_getattr"	}, /* 6314 */
+	{ 5,	TD|TF,	printargs,		"n32_renameat2"		}, /* 6315 */
 #endif

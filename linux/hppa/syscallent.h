@@ -336,3 +336,7 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 331 */
 	{ 5,	0,	sys_kcmp,		"kcmp"			}, /* 332 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"		}, /* 333 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"		}, /* 334 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"		}, /* 335 */
+	{ 2,	TF,	sys_utimes,		"utimes"		}, /* 336 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"		}, /* 337 */

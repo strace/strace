@@ -349,6 +349,9 @@
 	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 4346 */
 	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 4347 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 4348 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 4349 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 4350 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 4351 */
 #else
 	{ 0,	0,	printargs,		"o32_syscall"	}, /* 4000 */
 	{ 1,	TP|SE,	printargs,		"o32_exit"		}, /* 4001 */
@@ -699,5 +702,8 @@
 	{ 6,	0,	printargs,		"o32_process_vm_writev"	}, /* 4346 */
 	{ 5,	0,	printargs,		"o32_kcmp"		}, /* 4347 */
 	{ 3,	TD,	printargs,		"o32_finit_module"	}, /* 4348 */
+	{ 3,	0,	printargs,		"o32_sched_setattr"	}, /* 4349 */
+	{ 4,	0,	printargs,		"o32_sched_getattr"	}, /* 4350 */
+	{ 5,	TD|TF,	printargs,		"o32_renameat2"	}, /* 4351 */
 #endif
 	[4349 ... 4999] = { }, /* 4999 */ /* end of Linux o32 */

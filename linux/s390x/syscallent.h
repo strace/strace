@@ -372,9 +372,9 @@
 	{ 2,	0,	printargs,		"s390_runtime_instr"	}, /* 342 */
 	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 343 */
 	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 344 */
-	{ 5,	0,	NULL,			NULL		}, /* 345 */
-	{ 5,	0,	NULL,			NULL		}, /* 346 */
-	{ 5,	0,	NULL,			NULL		}, /* 347 */
+	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 345 */
+	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 346 */
+	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 347 */
 	{ 5,	0,	NULL,			NULL		}, /* 348 */
 	{ 5,	0,	NULL,			NULL		}, /* 349 */
 	{ 5,	0,	NULL,			NULL		}, /* 350 */

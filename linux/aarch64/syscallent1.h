@@ -258,9 +258,14 @@
 	{ 4,	TN,	sys_sendmmsg,			"sendmmsg"			}, /*  269 */
 	{ 6,	0,	sys_process_vm_readv,		"process_vm_readv"		}, /*  270 */
 	{ 6,	0,	sys_process_vm_writev,		"process_vm_writev"		}, /*  271 */
+	{ 5,	0,	sys_kcmp,			"kcmp"				}, /*  272 */
+	{ 3,	TD,	sys_finit_module,		"finit_module"			}, /*  273 */
+	{ 3,	0,	sys_sched_setattr,		"sched_setattr"			}, /*  274 */
+	{ 4,	0,	sys_sched_getattr,		"sched_getattr"			}, /*  275 */
+	{ 5,	TD|TF,	sys_renameat2,			"renameat2"			}, /*  276 */
 
 	/* Blank down to 1023 */
-	[272 ... 1023] = { },
+	[277 ... 1023] = { },
 
 	/* Quote from asm-generic/unistd.h:
 	 *
