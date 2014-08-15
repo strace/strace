@@ -15,15 +15,18 @@ Noteworthy changes in release 4.9 (????-??-??)
   * Enhanced tracing of x86 personality processes on x86_64 and x32.
   * Enhanced tracing of ARM personality processes on AArch64.
   * Enhanced 32/64bit personality detection on PowerPC.
+  * Implemented decoding of add_key, ioprio_get, ioprio_set, kexec_load, keyctl,
+    renameat2, and request_key syscalls.
   * Robustified decoding of select, pselect, and io_submit syscalls.
-  * Enhanced decoding of delete_module, fcntl, setdomainname, sethostname,
-    setns, and sync_file_range syscalls.
+  * Enhanced decoding of delete_module, fanotify_init, fanotify_mark, fcntl,
+    setdomainname, sethostname, setns, and sync_file_range syscalls.
   * Enhanced decoding of signal bitmasks.
   * Enhanced decoding of file descriptors.
   * Enhanced siginfo_t decoding.
   * Enhanced PF_NETLINK decoding.
   * Updated CLOCK_* constants
     (addresses Fedora bug #1088455).
+  * Added new syscall entries to match Linux 3.16.
 
 * Bug fixes
   * Added shmat and shmdt to the set of memory mapping related syscalls.
