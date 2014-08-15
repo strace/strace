@@ -1,3 +1,14 @@
+strace (4.9-1) experimental; urgency=low
+
+  * New upstream version.
+    + added -w option to produce stats on syscall latency, closes: #457497
+    + applied miscellaneous corrections to the manpage, closes: #725987
+    + fixed a typo in package description, closes: #697625
+    + enabled or1k build, closes: #742235
+    + enabled maximum security hardening, thanks to Markus <waldeck@gmx.de>
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Fri, 15 Aug 2014 13:14:15 +0000
+
 strace (4.8-1.1) unstable; urgency=low
 
   * NMU
