@@ -37,7 +37,12 @@ else
   CONFIG_OPTS = --build=$(DEB_BUILD_GNU_TYPE) --host=$(DEB_HOST_GNU_TYPE)
 endif
 
-all build: build-stamp $(extra_build_targets)
+all: build
+
+build: build-arch build-indep
+
+build-arch: build-stamp $(extra_build_targets)
+build-indep: build-stamp $(extra_build_targets)
 
 %-stamp: %/Makefile
 	$(MAKE) -C $*
