@@ -1,5 +1,5 @@
 Source: strace
-Maintainer: Frederik Schüler <fs@debian.org>
+Maintainer: Steve McIntyre <93sam@debian.org>
 Section: utils
 Priority: optional
 Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [i386 powerpc s390 sparc], debhelper (>= 7.0.0)
@@ -7,7 +7,7 @@ Standards-Version: 3.9.5
 Homepage: http://sourceforge.net/projects/strace/
 
 Package: strace
-Architecture: alpha amd64 arm64 armeb armel armhf hppa i386 ia64 m68k mips mipsel or1k powerpc powerpcspe ppc64 s390 s390x sh4 sparc sparc64 x32
+Architecture: alpha amd64 arm64 armeb armel armhf hppa i386 ia64 m68k mips mipsel or1k powerpc powerpcspe ppc64 ppc64el s390 s390x sh4 sparc sparc64 x32
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
@@ -40,7 +40,7 @@ Package: strace-udeb
 Section: debian-installer
 XC-Package-Type: udeb
 Priority: extra
-Architecture: alpha amd64 arm64 armeb armel armhf hppa i386 ia64 m68k mips mipsel or1k powerpc powerpcspe ppc64 s390 sh4 sparc sparc64 x32
+Architecture: alpha amd64 arm64 armeb armel armhf hppa i386 ia64 m68k mips mipsel or1k powerpc powerpcspe ppc64 ppc64el s390 sh4 sparc sparc64 x32
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out

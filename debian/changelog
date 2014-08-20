@@ -1,5 +1,13 @@
-strace (4.9-1) experimental; urgency=low
+strace (4.9-2) unstable; urgency=medium
 
+  * Turn on support for ppc64el, code is already in upstream.
+    Closes: #744121.
+
+ -- Steve McIntyre <93sam@debian.org>  Wed, 20 Aug 2014 18:00:20 +0100
+
+strace (4.9-1) unstable; urgency=medium
+
+  [ Dmitry V. Levin ]
   * New upstream version.
     + added -w option to produce stats on syscall latency, closes: #457497
     + applied miscellaneous corrections to the manpage, closes: #725987
@@ -7,7 +15,10 @@ strace (4.9-1) experimental; urgency=low
     + enabled or1k build, closes: #742235
     + enabled maximum security hardening, thanks to Markus <waldeck@gmx.de>
 
- -- Dmitry V. Levin <ldv@altlinux.org>  Fri, 15 Aug 2014 13:14:15 +0000
+  [ Steve McIntyre ]
+  * New maintainer. Thanks to Frederik for all his prior work!
+
+ -- Steve McIntyre <93sam@debian.org>  Wed, 20 Aug 2014 15:11:36 +0100
 
 strace (4.8-1.1) unstable; urgency=low
 
