@@ -404,10 +404,24 @@ void
 printfd(struct tcb *tcp, int fd)
 {
 	char path[PATH_MAX + 1];
+	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
+		static const char socket_prefix[] = "socket:[";
+		const size_t socket_prefix_len = sizeof(socket_prefix) - 1;
+		size_t path_len;
 
-	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0)
-		tprintf("%d<%s>", fd, path);
-	else
+		if (show_fd_path > 1 &&
+		    strncmp(path, socket_prefix, socket_prefix_len) == 0 &&
+		    path[(path_len = strlen(path)) - 1] == ']') {
+			unsigned long inodenr;
+			inodenr = strtoul(path + socket_prefix_len, NULL, 10);
+			tprintf("%d<", fd);
+			if (!print_sockaddr_by_inode(inodenr))
+				tprints(path);
+			tprints(">");
+		} else {
+			tprintf("%d<%s>", fd, path);
+		}
+	} else
 		tprintf("%d", fd);
 }
 

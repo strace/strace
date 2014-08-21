@@ -216,6 +216,7 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 -v -- verbose mode: print unabbreviated argv, stat, termios, etc. args\n\
 -x -- print non-ascii strings in hex, -xx -- print all strings in hex\n\
 -y -- print paths associated with file descriptor arguments\n\
+-yy -- print ip:port pairs associated with socket file descriptors\n\
 -h -- print help message, -V -- print version\n\
 -a column -- alignment COLUMN for printing syscall results (default %d)\n\
 -b execve -- detach on this syscall\n\

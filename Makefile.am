@@ -46,6 +46,7 @@ strace_SOURCES =	\
 	scsi.c		\
 	signal.c	\
 	sock.c		\
+	socketutils.c	\
 	strace.c	\
 	stream.c	\
 	syscall.c	\
@@ -122,6 +123,7 @@ EXTRA_DIST =				\
 	linux/ia64/ioctlent.h.in	\
 	linux/ia64/signalent.h		\
 	linux/ia64/syscallent.h		\
+	linux/inet_diag.h		\
 	linux/inotify.h			\
 	linux/ioctlent-filter.awk	\
 	linux/ioctlent.h.in		\
@@ -165,6 +167,7 @@ EXTRA_DIST =				\
 	linux/sh64/ioctlent.h.in	\
 	linux/sh64/syscallent.h		\
 	linux/signalent.h		\
+	linux/sock_diag.h		\
 	linux/sparc/dummy2.h		\
 	linux/sparc/errnoent.h		\
 	linux/sparc/errnoent1.h		\
