@@ -273,6 +273,11 @@ AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
 
 AC_CHECK_TYPES([struct flock64],,, [#include <fcntl.h>])
 
+AC_CHECK_HEADERS([libaio.h], [
+	AC_CHECK_MEMBERS([struct iocb.u.c.flags],,, [#include <libaio.h>])
+	AC_CHECK_DECLS([IO_CMD_PWRITE, IO_CMD_PWRITEV],,, [#include <libaio.h>])
+])
+
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS(m4_normalize([
 	PTRACE_EVENT_CLONE,

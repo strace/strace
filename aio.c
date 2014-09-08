@@ -29,124 +29,10 @@
  */
 
 #include "defs.h"
-
-/* --- Copied from libaio-0.3.109/src/libaio.h ---
- * Why keep a copy instead of using external libaio.h?
- * Because we want to properly decode 32-bit aio calls
- * by 64-bit strace. For that, we need more definitions than
- * libaio.h provides. (TODO).
- * Keeping our local 32-bit compat defs in sync with libaio.h
- * _without seeing libaio structs_ is hard/more bug-prone.
- * A smaller benefit is that we don't need libaio installed.
- */
-#define HAVE_LIBAIO_H 1
-typedef enum io_iocb_cmd {
-	IO_CMD_PREAD = 0,
-	IO_CMD_PWRITE = 1,
-
-	IO_CMD_FSYNC = 2,
-	IO_CMD_FDSYNC = 3,
-
-	IO_CMD_POLL = 5, /* Never implemented in mainline, see io_prep_poll */
-	IO_CMD_NOOP = 6,
-	IO_CMD_PREADV = 7,
-	IO_CMD_PWRITEV = 8,
-} io_iocb_cmd_t;
-
-#if defined(__i386__) /* little endian, 32 bits */
-#define PADDED(x, y)	x; unsigned y
-#define PADDEDptr(x, y)	x; unsigned y
-#define PADDEDul(x, y)	unsigned long x; unsigned y
-#elif defined(__ia64__) || defined(__x86_64__) || defined(__alpha__)
-#define PADDED(x, y)	x, y
-#define PADDEDptr(x, y)	x
-#define PADDEDul(x, y)	unsigned long x
-#elif defined(__powerpc64__) /* big endian, 64 bits */
-#define PADDED(x, y)	unsigned y; x
-#define PADDEDptr(x,y)	x
-#define PADDEDul(x, y)	unsigned long x
-#elif defined(__PPC__)  /* big endian, 32 bits */
-#define PADDED(x, y)	unsigned y; x
-#define PADDEDptr(x, y)	unsigned y; x
-#define PADDEDul(x, y)	unsigned y; unsigned long x
-#elif defined(__s390x__) /* big endian, 64 bits */
-#define PADDED(x, y)	unsigned y; x
-#define PADDEDptr(x,y)	x
-#define PADDEDul(x, y)	unsigned long x
-#elif defined(__s390__) /* big endian, 32 bits */
-#define PADDED(x, y)	unsigned y; x
-#define PADDEDptr(x, y) unsigned y; x
-#define PADDEDul(x, y)	unsigned y; unsigned long x
-#elif defined(__arm__)
-#  if defined (__ARMEB__) /* big endian, 32 bits */
-#define PADDED(x, y)	unsigned y; x
-#define PADDEDptr(x, y)	unsigned y; x
-#define PADDEDul(x, y)	unsigned y; unsigned long x
-#  else                   /* little endian, 32 bits */
-#define PADDED(x, y)	x; unsigned y
-#define PADDEDptr(x, y)	x; unsigned y
-#define PADDEDul(x, y)	unsigned long x; unsigned y
-#  endif
-#else
-#  warning No AIO definitions for this architecture => no io_submit decoding
-#  undef HAVE_LIBAIO_H
+#ifdef HAVE_LIBAIO_H
+# include <libaio.h>
 #endif
 
-#ifdef HAVE_LIBAIO_H
-struct io_iocb_poll {
-	PADDED(int events, __pad1);
-};	/* result code is the set of result flags or -'ve errno */
-
-struct io_iocb_sockaddr {
-	struct sockaddr *addr;
-	int		len;
-};	/* result code is the length of the sockaddr, or -'ve errno */
-
-struct io_iocb_common {
-	PADDEDptr(void	*buf, __pad1);
-	PADDEDul(nbytes, __pad2);
-	long long	offset;
-	long long	__pad3;
-	unsigned	flags;
-	unsigned	resfd;
-};	/* result code is the amount read or -'ve errno */
-
-struct io_iocb_vector {
-	const struct iovec	*vec;
-	int			nr;
-	long long		offset;
-};	/* result code is the amount read or -'ve errno */
-
-struct iocb {
-	PADDEDptr(void *data, __pad1);	/* Return in the io completion event */
-	PADDED(unsigned key, __pad2);	/* For use in identifying io requests */
-
-	short		aio_lio_opcode;
-	short		aio_reqprio;
-	int		aio_fildes;
-
-	union {
-		struct io_iocb_common		c;
-		struct io_iocb_vector		v;
-		struct io_iocb_poll		poll;
-		struct io_iocb_sockaddr	saddr;
-	} u;
-};
-
-struct io_event {
-	PADDEDptr(void *data, __pad1);
-	PADDEDptr(struct iocb *obj,  __pad2);
-	PADDEDul(res,  __pad3);
-	PADDEDul(res2, __pad4);
-};
-
-#undef PADDED
-#undef PADDEDptr
-#undef PADDEDul
-
-#endif /* HAVE_LIBAIO_H */
-
-/* --- End of a chunk of libaio.h --- */
 /* Not defined in libaio.h */
 #ifndef IOCB_RESFD
 # define IOCB_RESFD (1 << 0)
@@ -214,10 +100,14 @@ tprint_lio_opcode(unsigned cmd)
 static void
 print_common_flags(struct iocb *iocb)
 {
+#if HAVE_STRUCT_IOCB_U_C_FLAGS
 	if (iocb->u.c.flags & IOCB_RESFD)
 		tprintf(", resfd=%d", iocb->u.c.resfd);
 	if (iocb->u.c.flags & ~IOCB_RESFD)
 		tprintf(", flags=%x", iocb->u.c.flags);
+#else
+# warning "libaio.h is too old => limited io_submit decoding"
+#endif
 }
 
 #endif /* HAVE_LIBAIO_H */
@@ -263,11 +153,13 @@ sys_io_submit(struct tcb *tcp)
 				tprintf(", filedes:%d", iocb.aio_fildes);
 				switch (sub) {
 				case SUB_COMMON:
+#if HAVE_DECL_IO_CMD_PWRITE
 					if (iocb.aio_lio_opcode == IO_CMD_PWRITE) {
 						tprints(", str:");
 						printstr(tcp, (unsigned long)iocb.u.c.buf,
 							 iocb.u.c.nbytes);
 					} else
+#endif
 						tprintf(", buf:%p", iocb.u.c.buf);
 					tprintf(", nbytes:%lu, offset:%lld",
 						iocb.u.c.nbytes,
@@ -280,7 +172,11 @@ sys_io_submit(struct tcb *tcp)
 					tprints(", ");
 					tprint_iov(tcp, iocb.u.v.nr,
 						   (unsigned long)iocb.u.v.vec,
+#if HAVE_DECL_IO_CMD_PWRITEV
 						   iocb.aio_lio_opcode == IO_CMD_PWRITEV
+#else
+						   0
+#endif
 						  );
 					break;
 				case SUB_POLL:
@@ -294,6 +190,7 @@ sys_io_submit(struct tcb *tcp)
 		}
 		tprints("}");
 #else
+# warning "libaio.h is not available => no io_submit decoding"
 		tprintf("%lu, %ld, %#lx", tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 #endif
 	}
