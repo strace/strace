@@ -314,7 +314,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 {
 	int i, j;
 	int nfds, fdsize;
-	fd_set *fds;
+	fd_set *fds = NULL;
 	const char *sep;
 	long arg;
 
@@ -322,10 +322,9 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	nfds = (int) args[0];
 
 	/* Kernel rejects negative nfds, so we don't parse it either. */
-	if (nfds < 0) {
+	if (nfds < 0)
 		nfds = 0;
-		fds = NULL;
-	}
+
 	/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
 	if (nfds > 1024*1024)
 		nfds = 1024*1024;
