@@ -675,7 +675,7 @@ expand_tcbtab(void)
 	   callers have pointers and it would be a pain.
 	   So tcbtab is a table of pointers.  Since we never
 	   free the TCBs, we allocate a single chunk of many.  */
-	int i = tcbtabsize;
+	unsigned int i = tcbtabsize;
 	struct tcb *newtcbs = calloc(tcbtabsize, sizeof(newtcbs[0]));
 	struct tcb **newtab = realloc(tcbtab, tcbtabsize * 2 * sizeof(tcbtab[0]));
 	if (!newtab || !newtcbs)
@@ -689,7 +689,7 @@ expand_tcbtab(void)
 static struct tcb *
 alloctcb(int pid)
 {
-	int i;
+	unsigned int i;
 	struct tcb *tcp;
 
 	if (nprocs == tcbtabsize)
@@ -837,7 +837,7 @@ detach(struct tcb *tcp)
 	 * 3. Attach SIGSTOP was already pending (TCB_IGNORE_ONE_SIGSTOP set)
 	 */
 	for (;;) {
-		int sig;
+		unsigned int sig;
 		if (waitpid(tcp->pid, &status, __WALL) < 0) {
 			if (errno == EINTR)
 				continue;
@@ -954,7 +954,7 @@ process_opt_p_list(char *opt)
 static void
 startup_attach(void)
 {
-	int tcbi;
+	unsigned int tcbi;
 	struct tcb *tcp;
 
 	/*
@@ -1183,7 +1183,7 @@ startup_child(char **argv)
 #endif /* USE_DEBUGGING_EXEC */
 	else {
 		const char *path;
-		int m, n, len;
+		size_t m, n, len;
 
 		for (path = getenv("PATH"); path && *path; path += m) {
 			const char *colon = strchr(path, ':');
@@ -1635,6 +1635,7 @@ init(int argc, char *argv[])
 	struct tcb *tcp;
 	int c, i;
 	int optF = 0;
+	unsigned int tcbi;
 	struct sigaction sa;
 
 	progname = argv[0] ? argv[0] : "strace";
@@ -1658,8 +1659,8 @@ init(int argc, char *argv[])
 	tcp = calloc(tcbtabsize, sizeof(*tcp));
 	if (!tcp)
 		die_out_of_memory();
-	for (c = 0; c < tcbtabsize; c++)
-		tcbtab[c] = tcp++;
+	for (tcbi = 0; tcbi < tcbtabsize; tcbi++)
+		tcbtab[tcbi] = tcp++;
 
 	shared_log = stderr;
 	set_sortby(DEFAULT_SORTBY);
@@ -1978,7 +1979,7 @@ init(int argc, char *argv[])
 static struct tcb *
 pid2tcb(int pid)
 {
-	int i;
+	unsigned int i;
 
 	if (pid <= 0)
 		return NULL;
@@ -1995,7 +1996,7 @@ pid2tcb(int pid)
 static void
 cleanup(void)
 {
-	int i;
+	unsigned int i;
 	struct tcb *tcp;
 	int fatal_sig;
 
@@ -2049,10 +2050,11 @@ trace(void)
 	while (1) {
 		int pid;
 		int wait_errno;
-		int status, sig;
+		int status;
 		int stopped;
-		struct tcb *tcp;
+		unsigned int sig;
 		unsigned event;
+		struct tcb *tcp;
 
 		if (interrupted)
 			return;
@@ -2185,9 +2187,9 @@ trace(void)
 			if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, (long) &old_pid) < 0)
 				goto dont_switch_tcbs;
 			/* Avoid truncation in pid2tcb() param passing */
-			if (old_pid > UINT_MAX)
-				goto dont_switch_tcbs;
 			if (old_pid <= 0 || old_pid == pid)
+				goto dont_switch_tcbs;
+			if ((unsigned long) old_pid > UINT_MAX)
 				goto dont_switch_tcbs;
 			execve_thread = pid2tcb(old_pid);
 			/* It should be !NULL, but I feel paranoid */

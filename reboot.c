@@ -16,7 +16,7 @@ sys_reboot(struct tcb *tcp)
 	printflags(bootflags2, tcp->u_arg[1], "LINUX_REBOOT_MAGIC_???");
 	tprints(", ");
 	printflags(bootflags3, tcp->u_arg[2], "LINUX_REBOOT_CMD_???");
-	if (tcp->u_arg[2] == LINUX_REBOOT_CMD_RESTART2) {
+	if (tcp->u_arg[2] == (long) LINUX_REBOOT_CMD_RESTART2) {
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[3], -1);
 	}

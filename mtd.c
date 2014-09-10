@@ -60,7 +60,7 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 	struct mtd_write_req mreq;
 	struct nand_oobinfo ninfo;
 	struct nand_ecclayout_user nlay;
-	int i, j;
+	unsigned int i, j;
 
 	if (entering(tcp))
 		return 0;
@@ -235,7 +235,7 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 		if (!verbose(tcp) || umove(tcp, arg, &i) < 0)
 			return 0;
 
-		tprintf(", [%d]", i);
+		tprintf(", [%u]", i);
 		return 1;
 
 	case MTDFILEMODE:

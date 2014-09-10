@@ -189,7 +189,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 		return;
 	}
 
-	if (addrlen < 2 || addrlen > sizeof(addrbuf))
+	if (addrlen < 2 || addrlen > (int) sizeof(addrbuf))
 		addrlen = sizeof(addrbuf);
 
 	memset(&addrbuf, 0, sizeof(addrbuf));

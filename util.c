@@ -141,7 +141,7 @@ tv_mul(struct timeval *tv, const struct timeval *a, int n)
 }
 
 const char *
-xlookup(const struct xlat *xlat, int val)
+xlookup(const struct xlat *xlat, const unsigned int val)
 {
 	for (; xlat->str != NULL; xlat++)
 		if (xlat->val == val)
@@ -210,7 +210,7 @@ next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits)
  * Print entry in struct xlat table, if there.
  */
 void
-printxval(const struct xlat *xlat, int val, const char *dflt)
+printxval(const struct xlat *xlat, const unsigned int val, const char *dflt)
 {
 	const char *str = xlookup(xlat, val);
 
@@ -414,7 +414,7 @@ printfd(struct tcb *tcp, int fd)
 void
 printuid(const char *text, unsigned long uid)
 {
-	tprintf((uid == -1) ? "%s%ld" : "%s%lu", text, uid);
+	tprintf(((long) uid == -1) ? "%s%ld" : "%s%lu", text, uid);
 }
 
 /*
@@ -564,7 +564,7 @@ string_quote(const char *instr, char *outstr, long len, int size)
  * If path length exceeds `n', append `...' to the output.
  */
 void
-printpathn(struct tcb *tcp, long addr, int n)
+printpathn(struct tcb *tcp, long addr, unsigned int n)
 {
 	char path[MAXPATHLEN + 1];
 	int nul_seen;
@@ -612,7 +612,7 @@ printstr(struct tcb *tcp, long addr, long len)
 {
 	static char *str = NULL;
 	static char *outstr;
-	int size;
+	unsigned int size;
 	int ellipsis;
 
 	if (!addr) {
@@ -658,7 +658,7 @@ printstr(struct tcb *tcp, long addr, long len)
 	 * or we were requested to print more than -s NUM chars)...
 	 */
 	ellipsis = (string_quote(str, outstr, len, size) &&
-			(len < 0 || len > max_strlen));
+			(len < 0 || (unsigned long) len > max_strlen));
 
 	tprints(outstr);
 	if (ellipsis)
@@ -1480,7 +1480,7 @@ setbpt(struct tcb *tcp)
 	 * godforsaken tables.
 	 */
 	if (clone_scno[current_personality] == 0) {
-		int i;
+		unsigned int i;
 		for (i = 0; i < nsyscalls; ++i)
 			if (sysent[i].sys_func == sys_clone) {
 				clone_scno[current_personality] = i;

@@ -34,13 +34,13 @@
 static int
 compare(const void *a, const void *b)
 {
-	unsigned long code1 = (long) a;
+	unsigned long code1 = (unsigned long) a;
 	unsigned long code2 = ((struct_ioctlent *) b)->code;
 	return (code1 > code2) ? 1 : (code1 < code2) ? -1 : 0;
 }
 
 const struct_ioctlent *
-ioctl_lookup(long code)
+ioctl_lookup(unsigned long code)
 {
 	struct_ioctlent *iop;
 
@@ -60,7 +60,7 @@ ioctl_lookup(long code)
 const struct_ioctlent *
 ioctl_next_match(const struct_ioctlent *iop)
 {
-	long code;
+	unsigned long code;
 
 	code = iop->code;
 	iop++;

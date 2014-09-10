@@ -156,7 +156,7 @@ void set_overhead(int n)
 static void
 call_summary_pers(FILE *outf)
 {
-	int     i;
+	unsigned int i;
 	int     call_cum, error_cum;
 	struct timeval tv_cum, dtv;
 	double  float_tv_cum;
@@ -230,7 +230,7 @@ call_summary_pers(FILE *outf)
 void
 call_summary(FILE *outf)
 {
-	int i, old_pers = current_personality;
+	unsigned int i, old_pers = current_personality;
 
 	for (i = 0; i < SUPPORTED_PERSONALITIES; ++i) {
 		if (!countv[i])

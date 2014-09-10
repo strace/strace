@@ -323,7 +323,7 @@ set_personality(int personality)
 }
 
 static void
-update_personality(struct tcb *tcp, int personality)
+update_personality(struct tcb *tcp, unsigned int personality)
 {
 	if (personality == current_personality)
 		return;
@@ -370,7 +370,7 @@ update_personality(struct tcb *tcp, int personality)
 static int qual_syscall(), qual_signal(), qual_desc();
 
 static const struct qual_options {
-	int bitflag;
+	unsigned int bitflag;
 	const char *option_name;
 	int (*qualify)(const char *, int, int);
 	const char *argument_name;
@@ -396,7 +396,7 @@ static const struct qual_options {
 };
 
 static void
-reallocate_qual(int n)
+reallocate_qual(const unsigned int n)
 {
 	unsigned p;
 	qualbits_t *qp;
@@ -410,9 +410,9 @@ reallocate_qual(int n)
 }
 
 static void
-qualify_one(int n, int bitflag, int not, int pers)
+qualify_one(const unsigned int n, unsigned int bitflag, const int not, const int pers)
 {
-	unsigned p;
+	int p;
 
 	if (num_quals <= n)
 		reallocate_qual(n + 1);
@@ -428,10 +428,10 @@ qualify_one(int n, int bitflag, int not, int pers)
 }
 
 static int
-qual_syscall(const char *s, int bitflag, int not)
+qual_syscall(const char *s, const unsigned int bitflag, const int not)
 {
-	unsigned p;
-	unsigned i;
+	int p;
+	unsigned int i;
 	int rc = -1;
 
 	if (*s >= '0' && *s <= '9') {
@@ -457,9 +457,9 @@ qual_syscall(const char *s, int bitflag, int not)
 }
 
 static int
-qual_signal(const char *s, int bitflag, int not)
+qual_signal(const char *s, const unsigned int bitflag, const int not)
 {
-	int i;
+	unsigned int i;
 
 	if (*s >= '0' && *s <= '9') {
 		int signo = string_to_uint(s);
@@ -480,7 +480,7 @@ qual_signal(const char *s, int bitflag, int not)
 }
 
 static int
-qual_desc(const char *s, int bitflag, int not)
+qual_desc(const char *s, const unsigned int bitflag, const int not)
 {
 	if (*s >= '0' && *s <= '9') {
 		int desc = string_to_uint(s);
@@ -516,20 +516,20 @@ void
 qualify(const char *s)
 {
 	const struct qual_options *opt;
-	int not;
 	char *copy;
 	const char *p;
-	int i, n;
+	int not;
+	unsigned int i;
 
 	if (num_quals == 0)
 		reallocate_qual(MIN_QUALS);
 
 	opt = &qual_options[0];
 	for (i = 0; (p = qual_options[i].option_name); i++) {
-		n = strlen(p);
-		if (strncmp(s, p, n) == 0 && s[n] == '=') {
+		unsigned int len = strlen(p);
+		if (strncmp(s, p, len) == 0 && s[len] == '=') {
 			opt = &qual_options[i];
-			s += n + 1;
+			s += len + 1;
 			break;
 		}
 	}
@@ -555,6 +555,7 @@ qualify(const char *s)
 	if (!copy)
 		die_out_of_memory();
 	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
+		int n;
 		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {
 			unsigned pers;
 			for (pers = 0; pers < SUPPORTED_PERSONALITIES; pers++) {
@@ -1220,7 +1221,7 @@ get_scno(struct tcb *tcp)
 #elif defined(POWERPC)
 	scno = ppc_regs.gpr[0];
 # ifdef POWERPC64
-	int currpers;
+	unsigned int currpers;
 
 	/*
 	 * Check for 64/32 bit mode.
@@ -1242,7 +1243,7 @@ get_scno(struct tcb *tcp)
 # ifndef __X32_SYSCALL_BIT
 #  define __X32_SYSCALL_BIT	0x40000000
 # endif
-	int currpers;
+	unsigned int currpers;
 # if 1
 	/* GETREGSET of NT_PRSTATUS tells us regset size,
 	 * which unambiguously detects i386.
@@ -1530,7 +1531,7 @@ get_scno(struct tcb *tcp)
 	if (upeek(tcp->pid, 4*PT_R9, &scno) < 0)
 		return -1;
 #elif defined(TILE)
-	int currpers;
+	unsigned int currpers;
 	scno = tile_regs.regs[10];
 # ifdef __tilepro__
 	currpers = 1;
@@ -2660,7 +2661,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		default:
 			if (u_error < 0)
 				tprintf("= -1 E??? (errno %ld)", u_error);
-			else if (u_error < nerrnos)
+			else if ((unsigned long) u_error < nerrnos)
 				tprintf("= -1 %s (%s)", errnoent[u_error],
 					strerror(u_error));
 			else

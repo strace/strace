@@ -164,6 +164,7 @@ AC_DEFINE_UNQUOTED([ENABLE_ARM_OABI], [$enable_arm_oabi],
 
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wwrite-strings])
+gl_WARN_ADD([-Wsign-compare])
 AC_ARG_ENABLE([gcc-Werror],
   [AS_HELP_STRING([--enable-gcc-Werror], [turn on gcc's -Werror option])],
   [case $enableval in

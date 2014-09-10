@@ -131,7 +131,7 @@ unalignctl_string(unsigned int ctl)
 int
 sys_prctl(struct tcb *tcp)
 {
-	int i;
+	unsigned int i;
 
 	if (entering(tcp)) {
 		printxval(prctl_options, tcp->u_arg[0], "PR_???");
@@ -726,7 +726,7 @@ printargv(struct tcb *tcp, long addr)
 		char data[sizeof(long)];
 	} cp;
 	const char *sep;
-	int n = 0;
+	unsigned int n = 0;
 	unsigned wordsize = current_wordsize;
 
 	cp.p64 = 1;
@@ -2103,7 +2103,7 @@ int
 sys_ptrace(struct tcb *tcp)
 {
 	const struct xlat *x;
-	long addr;
+	unsigned long addr;
 
 	if (entering(tcp)) {
 		printxval(ptrace_cmds, tcp->u_arg[0], "PTRACE_???");

@@ -144,18 +144,22 @@ struct sigcontext {
  */
 
 const char *
-signame(int sig)
+signame(const int sig)
 {
-	static char buf[sizeof("SIGRT_%d") + sizeof(int)*3];
+	static char buf[sizeof("SIGRT_%u") + sizeof(int)*3];
 
-	if (sig >= 0 && sig < nsignals)
-		return signalent[sig];
+	if (sig >= 0) {
+		const unsigned int s = sig;
+
+		if (s < nsignals)
+			return signalent[s];
 #ifdef SIGRTMIN
-	if (sig >= __SIGRTMIN && sig <= __SIGRTMAX) {
-		sprintf(buf, "SIGRT_%d", (int)(sig - __SIGRTMIN));
-		return buf;
-	}
+		if (s >= __SIGRTMIN && s <= __SIGRTMAX) {
+			sprintf(buf, "SIGRT_%u", s - __SIGRTMIN);
+			return buf;
+		}
 #endif
+	}
 	sprintf(buf, "%d", sig);
 	return buf;
 }
@@ -217,7 +221,7 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 	for (i = 0; (i = next_set_bit(mask, i, size * 32)) >= 0; ) {
 		++i;
 		*s++ = sep;
-		if (i < nsignals) {
+		if ((unsigned) i < nsignals) {
 			s = stpcpy(s, signalent[i] + 3);
 		}
 #ifdef SIGRTMIN
@@ -428,7 +432,7 @@ printsiginfo(siginfo_t *sip, int verbose)
 #endif
 	{
 		if (sip->si_errno) {
-			if (sip->si_errno < 0 || sip->si_errno >= nerrnos)
+			if (sip->si_errno < 0 || (unsigned) sip->si_errno >= nerrnos)
 				tprintf(", si_errno=%d", sip->si_errno);
 			else
 				tprintf(", si_errno=%s",

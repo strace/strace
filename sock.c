@@ -224,8 +224,8 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 		} else if (ifc.ifc_buf == NULL) {
 			tprints("NULL");
 		} else {
-			int i;
-			unsigned nifra = ifc.ifc_len / sizeof(struct ifreq);
+			unsigned int i;
+			unsigned int nifra = ifc.ifc_len / sizeof(struct ifreq);
 			struct ifreq ifra[nifra];
 
 			if (umoven(tcp, (unsigned long) ifc.ifc_buf,

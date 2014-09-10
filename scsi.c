@@ -36,16 +36,15 @@
 #include "xlat/sg_io_dxfer_direction.h"
 
 static void
-print_sg_io_buffer(struct tcb *tcp, unsigned char *addr, int len)
+print_sg_io_buffer(struct tcb *tcp, unsigned char *addr, const unsigned int len)
 {
 	unsigned char *buf = NULL;
-	int     allocated, i;
+	unsigned int allocated, i;
 
 	if (len == 0)
 		return;
 	allocated = (len > max_strlen) ? max_strlen : len;
-	if (len < 0 ||
-	    (buf = malloc(allocated)) == NULL ||
+	if ((buf = malloc(allocated)) == NULL ||
 	    umoven(tcp, (unsigned long) addr, allocated, (char *) buf) < 0) {
 		tprintf("%p", addr);
 		free(buf);

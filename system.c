@@ -433,7 +433,7 @@ sys_sysctl(struct tcb *tcp)
 		return printargs(tcp);
 
 	size = sizeof(int) * (unsigned long) info.nlen;
-	name = (size / sizeof(int) != info.nlen) ? NULL : malloc(size);
+	name = (size / sizeof(int) != (unsigned long) info.nlen) ? NULL : malloc(size);
 	if (name == NULL ||
 	    umoven(tcp, (unsigned long) info.name, size, (char *) name) < 0) {
 		free(name);
@@ -445,7 +445,7 @@ sys_sysctl(struct tcb *tcp)
 	}
 
 	if (entering(tcp)) {
-		int cnt = 0, max_cnt;
+		unsigned int cnt = 0, max_cnt;
 
 		tprints("{{");
 
@@ -540,7 +540,7 @@ sys_sysctl(struct tcb *tcp)
 			max_cnt = max_strlen;
 		while (cnt < max_cnt)
 			tprintf(", %x", name[cnt++]);
-		if (cnt < info.nlen)
+		if (cnt < (unsigned) info.nlen)
 			tprints(", ...");
 		tprintf("}, %d, ", info.nlen);
 	} else {

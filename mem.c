@@ -481,7 +481,7 @@ sys_move_pages(struct tcb *tcp)
 		if (tcp->u_arg[2] == 0)
 			tprints("NULL, ");
 		else {
-			int i;
+			unsigned int i;
 			long puser = tcp->u_arg[2];
 			tprints("{");
 			for (i = 0; i < npages; ++i) {
@@ -500,7 +500,7 @@ sys_move_pages(struct tcb *tcp)
 		if (tcp->u_arg[3] == 0)
 			tprints("NULL, ");
 		else {
-			int i;
+			unsigned int i;
 			long nodeuser = tcp->u_arg[3];
 			tprints("{");
 			for (i = 0; i < npages; ++i) {
@@ -522,7 +522,7 @@ sys_move_pages(struct tcb *tcp)
 		if (tcp->u_arg[4] == 0)
 			tprints("NULL, ");
 		else {
-			int i;
+			unsigned int i;
 			long statususer = tcp->u_arg[4];
 			tprints("{");
 			for (i = 0; i < npages; ++i) {

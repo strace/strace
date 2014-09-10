@@ -2202,7 +2202,8 @@ print_xattr_list(struct tcb *tcp, unsigned long addr, unsigned long size)
 			tprints("NULL");
 		} else {
 			unsigned long len =
-				(size < tcp->u_rval) ? size : tcp->u_rval;
+				(size < (unsigned long) tcp->u_rval) ?
+					size : (unsigned long) tcp->u_rval;
 			printstr(tcp, addr, len);
 		}
 	}
