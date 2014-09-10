@@ -491,7 +491,7 @@ decode_mmsg(struct tcb *tcp, unsigned long msg_len)
  * other bits are socket type flags.
  */
 static void
-tprint_sock_type(struct tcb *tcp, int flags)
+tprint_sock_type(int flags)
 {
 	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
 
@@ -511,7 +511,7 @@ sys_socket(struct tcb *tcp)
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
 		tprints(", ");
-		tprint_sock_type(tcp, tcp->u_arg[1]);
+		tprint_sock_type(tcp->u_arg[1]);
 		tprints(", ");
 		switch (tcp->u_arg[0]) {
 		case PF_INET:
@@ -886,7 +886,7 @@ sys_socketpair(struct tcb *tcp)
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
 		tprints(", ");
-		tprint_sock_type(tcp, tcp->u_arg[1]);
+		tprint_sock_type(tcp->u_arg[1]);
 		tprintf(", %lu", tcp->u_arg[2]);
 	} else {
 		if (syserror(tcp)) {
