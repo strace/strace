@@ -18,6 +18,7 @@ TESTS = \
 	ptrace_setoptions.test \
 	strace-f.test \
 	qual_syscall.test \
+	getdents.test \
 	scm_rights-fd.test \
 	sigaction.test \
 	stat.test \
@@ -34,6 +35,6 @@ net-fd.log: net.log
 
 TEST_LOG_COMPILER = $(srcdir)/run.sh
 
-EXTRA_DIST = init.sh run.sh sigaction.awk $(TESTS)
+EXTRA_DIST = init.sh run.sh getdents.awk sigaction.awk $(TESTS)
 
 CLEANFILES = $(TESTS:=.tmp)

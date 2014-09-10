@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Check that getdents/getdents64 syscalls are traced properly.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+check_prog ls
+check_prog mkdir
+check_prog rmdir
+
+mkdir emptydir ||
+	framework_skip_ 'failed to create an empty directory'
+
+ls emptydir ||
+	{ rmdir emptydir; framework_skip_ 'failed to list an empty directory'; }
+
+args='-vegetdents,getdents64'
+$STRACE $args -o $LOG ls emptydir
+rc=$?
+rmdir emptydir
+[ $rc -eq 0 ] ||
+	{ cat $LOG; fail_ "strace $args failed"; }
+
+awk -f "$srcdir"/getdents.awk $LOG ||
+	{ cat $LOG; fail_ "strace $args failed to trace getdents/getdents64 properly"; }
+
+exit 0

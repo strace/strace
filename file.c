@@ -2060,7 +2060,7 @@ sys_readdir(struct tcb *tcp)
 int
 sys_getdents(struct tcb *tcp)
 {
-	int i, len, dents = 0;
+	unsigned int i, len, dents = 0;
 	char *buf;
 
 	if (entering(tcp)) {
@@ -2072,38 +2072,55 @@ sys_getdents(struct tcb *tcp)
 		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 		return 0;
 	}
-	len = tcp->u_rval;
-	/* Beware of insanely large or negative values in tcp->u_rval */
+
+	/* Beware of insanely large or too small values in tcp->u_rval */
 	if (tcp->u_rval > 1024*1024)
 		len = 1024*1024;
-	if (tcp->u_rval < 0)
+	else if (tcp->u_rval < (int) sizeof(struct kernel_dirent))
 		len = 0;
-	buf = len ? malloc(len) : NULL;
-	if (len && !buf)
-		die_out_of_memory();
-	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
-		free(buf);
-		return 0;
+	else
+		len = tcp->u_rval;
+
+	if (len) {
+		buf = malloc(len);
+		if (!buf)
+			die_out_of_memory();
+		if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
+			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+			free(buf);
+			return 0;
+		}
+	} else {
+		buf = NULL;
 	}
+
 	if (!abbrev(tcp))
 		tprints("{");
-	for (i = 0; i < len;) {
+	for (i = 0; len && i <= len - sizeof(struct kernel_dirent); ) {
 		struct kernel_dirent *d = (struct kernel_dirent *) &buf[i];
+
 		if (!abbrev(tcp)) {
+			int oob = d->d_reclen < sizeof(struct kernel_dirent) ||
+				  i + d->d_reclen - 1 >= len;
+			int d_name_len = oob ? len - i : d->d_reclen;
+			d_name_len -= offsetof(struct kernel_dirent, d_name) + 1;
+
 			tprintf("%s{d_ino=%lu, d_off=%lu, ",
 				i ? " " : "", d->d_ino, d->d_off);
-			tprintf("d_reclen=%u, d_name=\"%s\", d_type=",
-				d->d_reclen, d->d_name);
-			printxval(direnttypes, buf[i + d->d_reclen - 1], "DT_???");
+			tprintf("d_reclen=%u, d_name=\"%.*s\", d_type=",
+				d->d_reclen, d_name_len, d->d_name);
+			if (oob)
+				tprints("?");
+			else
+				printxval(direnttypes, buf[i + d->d_reclen - 1], "DT_???");
 			tprints("}");
 		}
-		if (!d->d_reclen) {
-			tprints("/* d_reclen == 0, problem here */");
+		dents++;
+		if (d->d_reclen < sizeof(struct kernel_dirent)) {
+			tprints("/* d_reclen < sizeof(struct kernel_dirent) */");
 			break;
 		}
 		i += d->d_reclen;
-		dents++;
 	}
 	if (!abbrev(tcp))
 		tprints("}");
@@ -2117,7 +2134,10 @@ sys_getdents(struct tcb *tcp)
 int
 sys_getdents64(struct tcb *tcp)
 {
-	int i, len, dents = 0;
+	/* the minimum size of a valid dirent64 structure */
+	const unsigned int d_name_offset = offsetof(struct dirent64, d_name);
+
+	unsigned int i, len, dents = 0;
 	char *buf;
 
 	if (entering(tcp)) {
@@ -2130,38 +2150,52 @@ sys_getdents64(struct tcb *tcp)
 		return 0;
 	}
 
-	len = tcp->u_rval;
-	/* Beware of insanely large or negative tcp->u_rval */
+	/* Beware of insanely large or too small tcp->u_rval */
 	if (tcp->u_rval > 1024*1024)
 		len = 1024*1024;
-	if (tcp->u_rval < 0)
+	else if (tcp->u_rval < (int) d_name_offset)
 		len = 0;
-	buf = len ? malloc(len) : NULL;
-	if (len && !buf)
-		die_out_of_memory();
+	else
+		len = tcp->u_rval;
 
-	if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
-		free(buf);
-		return 0;
+	if (len) {
+		buf = malloc(len);
+		if (!buf)
+			die_out_of_memory();
+		if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
+			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+			free(buf);
+			return 0;
+		}
+	} else {
+		buf = NULL;
 	}
+
 	if (!abbrev(tcp))
 		tprints("{");
-	for (i = 0; i < len;) {
+	for (i = 0; len && i <= len - d_name_offset; ) {
 		struct dirent64 *d = (struct dirent64 *) &buf[i];
 		if (!abbrev(tcp)) {
-			tprintf("%s{d_ino=%" PRIu64 ", d_off=%" PRId64 ", ",
+			int d_name_len;
+			if (d->d_reclen >= d_name_offset
+			    && i + d->d_reclen <= len) {
+				d_name_len = d->d_reclen - d_name_offset;
+			} else {
+				d_name_len = len - i - d_name_offset;
+			}
+
+			tprintf("%s{d_ino=%" PRIu64 ", d_off=%" PRId64
+				", d_reclen=%u, d_type=",
 				i ? " " : "",
 				d->d_ino,
-				d->d_off);
-			tprints("d_type=");
+				d->d_off,
+				d->d_reclen);
 			printxval(direnttypes, d->d_type, "DT_???");
-			tprints(", ");
-			tprintf("d_reclen=%u, d_name=\"%s\"}",
-				d->d_reclen, d->d_name);
+			tprintf(", d_name=\"%.*s\"}",
+				d_name_len, d->d_name);
 		}
-		if (!d->d_reclen) {
-			tprints("/* d_reclen == 0, problem here */");
+		if (d->d_reclen < d_name_offset) {
+			tprints("/* d_reclen < offsetof(struct dirent64, d_name) */");
 			break;
 		}
 		i += d->d_reclen;
