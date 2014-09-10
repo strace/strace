@@ -273,7 +273,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 			tprintf("proto=%#04x, if%d, pkttype=",
 					ntohs(addrbuf.ll.sll_protocol),
 					addrbuf.ll.sll_ifindex);
-			printxval(af_packet_types, addrbuf.ll.sll_pkttype, "?");
+			printxval(af_packet_types, addrbuf.ll.sll_pkttype, "PACKET_???");
 			tprintf(", addr(%d)={%d, ",
 					addrbuf.ll.sll_halen,
 					addrbuf.ll.sll_hatype);
