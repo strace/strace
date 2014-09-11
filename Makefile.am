@@ -22,6 +22,7 @@ strace_SOURCES =	\
 	block.c		\
 	count.c		\
 	desc.c		\
+	dirent.c	\
 	fanotify.c	\
 	file.c		\
 	inotify.c	\
