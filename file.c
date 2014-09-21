@@ -1421,7 +1421,7 @@ sprintfstype(int magic)
 	static char buf[32];
 	const char *s;
 
-	s = xlookup(fsmagic, magic);
+	s = xlat_search(fsmagic, ARRAY_SIZE(fsmagic), magic);
 	if (s) {
 		sprintf(buf, "\"%s\"", s);
 		return buf;

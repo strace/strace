@@ -648,6 +648,7 @@ extern int pathtrace_match(struct tcb *);
 extern int getfdpath(struct tcb *, int, char *, unsigned);
 
 extern const char *xlookup(const struct xlat *, const unsigned int);
+extern const char *xlat_search(const struct xlat *, const size_t, const unsigned int);
 
 extern int string_to_uint(const char *str);
 extern int string_quote(const char *, char *, long, int);

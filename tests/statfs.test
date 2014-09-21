@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Check how statfs/statfs64 syscalls are traced.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+# this test probes /proc/self/status
+[ -f /proc/self/status ] ||
+        framework_skip_ '/proc/self/status is not available'
+
+./statfs ||
+	fail_ 'statfs failed'
+
+args="-efile ./statfs"
+$STRACE $args > $LOG 2>&1 || {
+	cat $LOG
+	fail_ "$STRACE $args failed"
+}
+
+grep_log()
+{
+	local syscall="$1"; shift
+
+	LC_ALL=C grep -E -x "$syscall$*" $LOG > /dev/null || {
+		cat $LOG
+		fail_ "$STRACE $args failed to trace \"$syscall\" properly"
+	}
+}
+
+grep_log 'statfs(64)?' '\("/proc/self/status"(, [1-9][0-9]*)?, {f_type="PROC_SUPER_MAGIC", f_bsize=[1-9][0-9]*, f_blocks=[0-9]+, f_bfree=[0-9]+, f_bavail=[0-9]+, f_files=[0-9]+, f_ffree=[0-9]+, f_fsid={[0-9]+, [0-9]+}, f_namelen=[1-9][0-9]*(, f_frsize=[0-9]+)?(, f_flags=[0-9]+)?}\) += 0'
+
+exit 0

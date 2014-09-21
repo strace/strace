@@ -8,8 +8,10 @@ check_PROGRAMS = \
 	set_ptracer_any \
 	sigaction \
 	stack-fcall \
+	statfs \
 	uio
 
+statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
@@ -22,6 +24,7 @@ TESTS = \
 	scm_rights-fd.test \
 	sigaction.test \
 	stat.test \
+	statfs.test \
 	net.test \
 	net-fd.test \
 	uio.test \

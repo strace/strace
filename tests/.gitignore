@@ -3,6 +3,7 @@ scm_rights
 set_ptracer_any
 sigaction
 stack-fcall
+statfs
 uio
 *.log
 *.log.*

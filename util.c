@@ -149,6 +149,24 @@ xlookup(const struct xlat *xlat, const unsigned int val)
 	return NULL;
 }
 
+static int
+xlat_bsearch_compare(const void *a, const void *b)
+{
+	const unsigned int val1 = (const unsigned long) a;
+	const unsigned int val2 = ((const struct xlat *) b)->val;
+	return (val1 > val2) ? 1 : (val1 < val2) ? -1 : 0;
+}
+
+const char *
+xlat_search(const struct xlat *xlat, const size_t nmemb, const unsigned int val)
+{
+	const struct xlat *e =
+		bsearch((const void*) (const unsigned long) val,
+			xlat, nmemb, sizeof(*xlat), xlat_bsearch_compare);
+
+	return e ? e->str : NULL;
+}
+
 #if !defined HAVE_STPCPY
 char *
 stpcpy(char *dst, const char *src)
