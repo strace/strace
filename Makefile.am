@@ -47,6 +47,7 @@ strace_SOURCES =	\
 	signal.c	\
 	sock.c		\
 	socketutils.c	\
+	statfs.c	\
 	strace.c	\
 	stream.c	\
 	syscall.c	\
