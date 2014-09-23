@@ -9,7 +9,6 @@
 	framework_skip_ '/proc/self/fd/ is not available'
 
 check_prog grep
-check_prog rm
 
 rm -f $LOG.*
 

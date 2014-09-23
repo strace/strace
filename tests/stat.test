@@ -7,7 +7,6 @@
 check_prog dd
 check_prog find
 check_prog grep
-check_prog rm
 
 umask 022
 truncate_cmd='dd seek=46118400000 obs=1 count=0 if=/dev/null of=sample'

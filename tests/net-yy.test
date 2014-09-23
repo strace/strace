@@ -8,8 +8,8 @@
 [ -d /proc/self/fd/ ] ||
 	framework_skip_ '/proc/self/fd/ is not available'
 
-check_prog sed
 check_prog awk
+check_prog sed
 
 rm -f $LOG.* $LOG-*
 

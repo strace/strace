@@ -5,7 +5,6 @@
 . "${srcdir=.}/init.sh"
 
 check_prog grep
-check_prog rm
 
 ./uio || {
 	if [ $? -eq 77 ]; then

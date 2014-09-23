@@ -5,6 +5,8 @@
 
 . "${srcdir=.}/init.sh"
 
+check_prog grep
+
 [ "$(uname -s)" = Linux ] ||
 	skip_ 'The kernel is not a Linux kernel'
 case "$(uname -r)" in

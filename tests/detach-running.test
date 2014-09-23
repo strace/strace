@@ -4,8 +4,8 @@
 
 . "${srcdir=.}/init.sh"
 
-check_prog sleep
 check_prog grep
+check_prog sleep
 
 set -e
 
