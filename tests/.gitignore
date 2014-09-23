@@ -1,4 +1,6 @@
+inet-accept-connect-send-recv
 net-accept-connect
+netlink_inet_diag
 scm_rights
 set_ptracer_any
 sigaction
@@ -8,5 +10,7 @@ uio
 *.log
 *.log.*
 *.o
-*.trs
 *.tmp
+*.tmp-*
+*.tmp.*
+*.trs

@@ -3,7 +3,9 @@
 AM_CFLAGS = $(WARN_CFLAGS)
 
 check_PROGRAMS = \
+	inet-accept-connect-send-recv \
 	net-accept-connect \
+	netlink_inet_diag \
 	scm_rights \
 	set_ptracer_any \
 	sigaction \
@@ -27,6 +29,7 @@ TESTS = \
 	statfs.test \
 	net.test \
 	net-fd.test \
+	net-yy.test \
 	uio.test \
 	count.test \
 	detach-sleeping.test \
@@ -38,6 +41,11 @@ net-fd.log: net.log
 
 TEST_LOG_COMPILER = $(srcdir)/run.sh
 
-EXTRA_DIST = init.sh run.sh getdents.awk sigaction.awk $(TESTS)
+EXTRA_DIST = init.sh run.sh \
+	     getdents.awk \
+	     net-yy-accept.awk \
+	     net-yy-connect.awk \
+	     sigaction.awk \
+	     $(TESTS)
 
 CLEANFILES = $(TESTS:=.tmp)
