@@ -237,7 +237,7 @@ print_dirfd(struct tcb *tcp, int fd)
  * other bits are real flags.
  */
 const char *
-sprint_open_modes(mode_t flags)
+sprint_open_modes(int flags)
 {
 	static char outstr[(1 + ARRAY_SIZE(open_mode_flags)) * sizeof("O_LARGEFILE")];
 	char *p;
@@ -274,7 +274,7 @@ sprint_open_modes(mode_t flags)
 }
 
 void
-tprint_open_modes(mode_t flags)
+tprint_open_modes(int flags)
 {
 	tprints(sprint_open_modes(flags) + sizeof("flags"));
 }

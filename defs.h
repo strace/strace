@@ -708,8 +708,8 @@ extern void print_sigset_addr_len(struct tcb *, long, long);
 extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int decode_iov, unsigned long);
-extern void tprint_open_modes(mode_t);
-extern const char *sprint_open_modes(mode_t);
+extern void tprint_open_modes(int);
+extern const char *sprint_open_modes(int);
 extern void print_loff_t(struct tcb *, long);
 
 extern const struct_ioctlent *ioctl_lookup(unsigned long);
