@@ -272,6 +272,10 @@ AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
 		  struct sigevent.__pad,
 		  siginfo_t.si_syscall],,, [#include <signal.h>])
 
+AC_CHECK_MEMBERS([struct sysinfo.totalhigh,
+		  struct sysinfo.freehigh,
+		  struct sysinfo.mem_unit],,, [#include <sys/sysinfo.h>])
+
 AC_CHECK_TYPES([struct flock64],,, [#include <fcntl.h>])
 
 AC_CHECK_HEADERS([libaio.h], [
