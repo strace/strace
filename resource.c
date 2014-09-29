@@ -302,6 +302,8 @@ sys_osf_getrusage(struct tcb *tcp)
 }
 #endif /* ALPHA */
 
+#include <sys/sysinfo.h>
+
 int
 sys_sysinfo(struct tcb *tcp)
 {
