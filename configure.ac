@@ -227,6 +227,7 @@ AC_CHECK_FUNCS(m4_normalize([
 AC_CHECK_HEADERS(m4_normalize([
 	asm/cachectl.h
 	asm/sysmips.h
+	bluetooth/bluetooth.h
 	elf.h
 	inttypes.h
 	ioctls.h
