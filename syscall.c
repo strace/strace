@@ -2497,6 +2497,10 @@ dumpio(struct tcb *tcp)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		else if (func == sys_readv)
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+#if HAVE_SENDMSG
+		else if (func == sys_recvmsg)
+			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
+#endif
 		return;
 	}
 	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
@@ -2507,6 +2511,10 @@ dumpio(struct tcb *tcp)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		else if (func == sys_writev)
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+#if HAVE_SENDMSG
+		else if (func == sys_sendmsg)
+			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
+#endif
 		return;
 	}
 }

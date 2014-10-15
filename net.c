@@ -392,33 +392,47 @@ struct mmsghdr32 {
 	uint32_t /* unsigned */ msg_len;
 };
 
+static bool
+extractmsghdr(struct tcb *tcp, long addr, struct msghdr *msg)
+{
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize == 4) {
+		struct msghdr32 msg32;
+
+		if (umove(tcp, addr, &msg32) < 0)
+			return false;
+		msg->msg_name       = (void*)(long)msg32.msg_name;
+		msg->msg_namelen    =              msg32.msg_namelen;
+		msg->msg_iov        = (void*)(long)msg32.msg_iov;
+		msg->msg_iovlen     =              msg32.msg_iovlen;
+		msg->msg_control    = (void*)(long)msg32.msg_control;
+		msg->msg_controllen =              msg32.msg_controllen;
+		msg->msg_flags      =              msg32.msg_flags;
+	} else
+#endif
+	if (umove(tcp, addr, msg) < 0)
+		return false;
+	return true;
+}
+
 static void
 printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize == 4) {
-		struct msghdr32 msg32;
-
-		if (umove(tcp, addr, &msg32) < 0) {
-			tprintf("%#lx", addr);
-			return;
-		}
-		msg.msg_name       = (void*)(long)msg32.msg_name;
-		msg.msg_namelen    =              msg32.msg_namelen;
-		msg.msg_iov        = (void*)(long)msg32.msg_iov;
-		msg.msg_iovlen     =              msg32.msg_iovlen;
-		msg.msg_control    = (void*)(long)msg32.msg_control;
-		msg.msg_controllen =              msg32.msg_controllen;
-		msg.msg_flags      =              msg32.msg_flags;
-	} else
-#endif
-	if (umove(tcp, addr, &msg) < 0) {
+	if (extractmsghdr(tcp, addr, &msg))
+		do_msghdr(tcp, &msg, data_size);
+	else
 		tprintf("%#lx", addr);
-		return;
-	}
-	do_msghdr(tcp, &msg, data_size);
+}
+
+void
+dumpiov_in_msghdr(struct tcb *tcp, long addr)
+{
+	struct msghdr msg;
+
+	if (extractmsghdr(tcp, addr, &msg))
+		dumpiov(tcp, msg.msg_iovlen, (long)msg.msg_iov);
 }
 
 static void
