@@ -288,9 +288,16 @@ $(srcdir)/CREDITS: $(srcdir)/CREDITS.in $(srcdir)/.mailmap \
 
 export TAR_OPTIONS = --owner=0 --group=0 --numeric-owner --mode=go-w,go+rX
 
-IOCTLDIR = /usr/include
-IOCTLASM = asm
-IOCTLSORT_INCLUDEDIR = $(IOCTLDIR)
+INCLUDEDIR = /usr/include
+KERNEL_RELEASE = $(shell uname -r)
+# Candidates for the kernel headers tree.
+KERNEL_INCLUDE = \
+	/lib/modules/$(KERNEL_RELEASE)/build/include \
+	/usr/src/linux-$(KERNEL_RELEASE)/include \
+	$(INCLUDEDIR)
+IOCTLDIR = $(shell find $(KERNEL_INCLUDE) -maxdepth 0 -type d -print -quit 2>/dev/null)
+IOCTLASM = $(INCLUDEDIR)/asm
+IOCTLSORT_INCLUDEDIR = $(INCLUDEDIR)
 
 ioctlent_h_in = linux/ioctlent.h.in
 
