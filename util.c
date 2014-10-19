@@ -46,7 +46,9 @@
 
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
-#elif defined(HAVE_LINUX_PTRACE_H)
+#endif
+
+#ifdef HAVE_LINUX_PTRACE_H
 # undef PTRACE_SYSCALL
 # ifdef HAVE_STRUCT_IA64_FPREG
 #  define ia64_fpreg XXX_ia64_fpreg
