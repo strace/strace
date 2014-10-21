@@ -128,15 +128,23 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 		if (umove(tcp, tcp->u_arg[2], &ifr) < 0)
 			tprintf(", %#lx", tcp->u_arg[2]);
 		else if (syserror(tcp)) {
-			if (code == SIOCGIFNAME || code == SIOCSIFNAME)
-				tprintf(", {ifr_index=%d, ifr_name=???}", ifr.ifr_ifindex);
-			else
-				tprintf(", {ifr_name=\"%.*s\", ???}",
+			if (code == SIOCGIFNAME) {
+				tprintf(", {ifr_index=%d, ifr_name=???}",
+					ifr.ifr_ifindex);
+			} else {
+				tprintf(", {ifr_name=\"%.*s\", ",
 					IFNAMSIZ, ifr.ifr_name);
-		} else if (code == SIOCGIFNAME || code == SIOCSIFNAME)
+
+				if (code == SIOCSIFNAME)
+					tprintf("ifr_newname=\"%.*s\"}",
+						IFNAMSIZ, ifr.ifr_newname);
+				else
+					tprintf("???}");
+			}
+		} else if (code == SIOCGIFNAME) {
 			tprintf(", {ifr_index=%d, ifr_name=\"%.*s\"}",
 				ifr.ifr_ifindex, IFNAMSIZ, ifr.ifr_name);
-		else {
+		} else {
 			tprintf(", {ifr_name=\"%.*s\", ",
 				IFNAMSIZ, ifr.ifr_name);
 			switch (code) {
@@ -191,6 +199,10 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 			case SIOCSIFMTU:
 				tprintf("ifr_mtu=%d", ifr.ifr_mtu);
 				break;
+			case SIOCSIFNAME:
+				tprintf("ifr_newname=\"%.*s\"",
+					IFNAMSIZ, ifr.ifr_newname);
+				break;
 			case SIOCGIFSLAVE:
 			case SIOCSIFSLAVE:
 				tprintf("ifr_slave=\"%s\"", ifr.ifr_slave);
@@ -240,7 +252,7 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 				if (i > 0)
 					tprints(", ");
 				tprintf("{\"%.*s\", {",
-					IFNAMSIZ, ifra[i].ifr_name);
+					IFNAMSIZ, ifra[i].ifr_newname);
 				if (verbose(tcp)) {
 					printxval(addrfams,
 						  ifra[i].ifr_addr.sa_family,
