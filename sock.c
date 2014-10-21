@@ -131,12 +131,14 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 			if (code == SIOCGIFNAME || code == SIOCSIFNAME)
 				tprintf(", {ifr_index=%d, ifr_name=???}", ifr.ifr_ifindex);
 			else
-				tprintf(", {ifr_name=\"%s\", ???}", ifr.ifr_name);
+				tprintf(", {ifr_name=\"%.*s\", ???}",
+					IFNAMSIZ, ifr.ifr_name);
 		} else if (code == SIOCGIFNAME || code == SIOCSIFNAME)
-			tprintf(", {ifr_index=%d, ifr_name=\"%s\"}",
-				ifr.ifr_ifindex, ifr.ifr_name);
+			tprintf(", {ifr_index=%d, ifr_name=\"%.*s\"}",
+				ifr.ifr_ifindex, IFNAMSIZ, ifr.ifr_name);
 		else {
-			tprintf(", {ifr_name=\"%s\", ", ifr.ifr_name);
+			tprintf(", {ifr_name=\"%.*s\", ",
+				IFNAMSIZ, ifr.ifr_name);
 			switch (code) {
 			case SIOCGIFINDEX:
 				tprintf("ifr_index=%d", ifr.ifr_ifindex);
@@ -237,8 +239,8 @@ sock_ioctl(struct tcb *tcp, long code, long arg)
 			for (i = 0; i < nifra; ++i ) {
 				if (i > 0)
 					tprints(", ");
-				tprintf("{\"%s\", {",
-					ifra[i].ifr_name);
+				tprintf("{\"%.*s\", {",
+					IFNAMSIZ, ifra[i].ifr_name);
 				if (verbose(tcp)) {
 					printxval(addrfams,
 						  ifra[i].ifr_addr.sa_family,
