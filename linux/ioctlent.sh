@@ -79,8 +79,8 @@ if [ -e $dir/Kbuild ]; then
 	# special case: some headers aren't exported directly
 	files="${files} media/* net/bluetooth/* pcmcia/*"
 else
-	# older kernel so just assume some headers
-	files="linux/* $asm/* asm-generic/* scsi/* sound/*"
+	# older kernel tree or headers_install'ed tree, just assume some headers
+	files="linux/* $asm/* asm-generic/* drm/* mtd/* rdma/* scsi/* sound/* video/* xen/*"
 fi
 
 # Build the list of all ioctls
