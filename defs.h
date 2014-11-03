@@ -395,7 +395,6 @@ typedef struct sysent {
 } struct_sysent;
 
 typedef struct ioctlent {
-	const char *doth;
 	const char *symbol;
 	unsigned long code;
 } struct_ioctlent;
