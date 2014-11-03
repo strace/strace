@@ -56,6 +56,7 @@ strace_SOURCES =	\
 	term.c		\
 	time.c		\
 	util.c		\
+	v4l2.c		\
 	vsprintf.c
 
 if USE_LIBUNWIND

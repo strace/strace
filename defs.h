@@ -721,6 +721,7 @@ extern int proc_ioctl(struct tcb *, int, int);
 extern int rtc_ioctl(struct tcb *, long, long);
 extern int scsi_ioctl(struct tcb *, long, long);
 extern int block_ioctl(struct tcb *, long, long);
+extern int v4l2_ioctl(struct tcb *, unsigned long, long);
 extern int mtd_ioctl(struct tcb *, long, long);
 extern int ubi_ioctl(struct tcb *, long, long);
 extern int loop_ioctl(struct tcb *, long, long);
