@@ -127,7 +127,6 @@ EXTRA_DIST =				\
 	linux/ia64/syscallent.h		\
 	linux/inet_diag.h		\
 	linux/inotify.h			\
-	linux/ioctlent-filter.awk	\
 	linux/ioctlent.h.in		\
 	linux/ioctlent.sh		\
 	linux/ioctlsort.c		\
@@ -316,5 +315,4 @@ $(ioctlent_h): $(top_builddir)/config.status $(ioctlent_h_deps)
 	$(MKDIR_P) $(builddir)/$(OS)
 	cat $(ioctlent_h_deps) | \
 		$(COMPILE) -E -P - | \
-		LC_ALL=C sort -u -k3,3 -k2,2 | \
-		awk -f $(srcdir)/linux/ioctlent-filter.awk > $@
+		LC_ALL=C sort -u -k3,3 -k2,2 > $@
