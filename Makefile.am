@@ -96,6 +96,7 @@ EXTRA_DIST =				\
 	debian/strace64.manpages	\
 	debian/watch			\
 	errnoent.sh			\
+	ioctlsort.c			\
 	linux/aarch64/errnoent1.h	\
 	linux/aarch64/ioctlent.h.in	\
 	linux/aarch64/ioctlent1.h	\
@@ -130,7 +131,6 @@ EXTRA_DIST =				\
 	linux/inotify.h			\
 	linux/ioctlent.h.in		\
 	linux/ioctlent.sh		\
-	linux/ioctlsort.c		\
 	linux/kexec.h			\
 	linux/keyctl.h			\
 	linux/m68k/ioctlent.h.in	\
@@ -260,6 +260,17 @@ news-check: NEWS
 		exit 1;						\
 	fi
 
+ioctlent_h = $(builddir)/$(OS)/ioctlent.h
+BUILT_SOURCES += $(ioctlent_h)
+CLEANFILES = $(ioctlent_h)
+ioctlent_h_deps = $(srcdir)/$(OS)/ioctlent.h.in $(srcdir)/$(OS)/$(ARCH)/ioctlent.h.in
+$(ioctlent_h): $(top_builddir)/config.status $(ioctlent_h_deps)
+	$(MKDIR_P) $(builddir)/$(OS)
+	cat $(ioctlent_h_deps) | \
+		$(COMPILE) -E -P - | \
+		sed 's/^\([[:space:]]*{\)"[^"]\+",[[:space:]]*/\1/' | \
+		LC_ALL=C sort -u -k2,2 -k1,1 > $@
+
 if MAINTAINER_MODE
 
 gen_changelog_start_date = 2009-07-08 20:00
@@ -297,31 +308,19 @@ KERNEL_INCLUDE = \
 	$(INCLUDEDIR)
 IOCTLDIR = $(shell find $(KERNEL_INCLUDE) -maxdepth 0 -type d -print -quit 2>/dev/null)
 IOCTLASM = $(INCLUDEDIR)/asm
-IOCTLSORT_INCLUDEDIR = $(INCLUDEDIR)
 
-ioctlent_h_in = linux/ioctlent.h.in
-
-BUILT_SOURCES += $(ioctlent_h_in)
-
-$(srcdir)/$(ioctlent_h_in): ioctlsort
-	$(<D)/$(<F) > $@
-ioctlsort: $(srcdir)/linux/ioctlsort.c ioctls.h ioctldefs.h
-	$(filter-out -I%,$(LINK.c)) -I. -I$(IOCTLSORT_INCLUDEDIR) \
-	$(filter -I%,$(LINK.c)) \
-	  -o $@ $<
+noinst_PROGRAMS = ioctlsort
+ioctlsort_SOURCES = ioctlsort.c
+nodist_ioctlsort_SOURCES = ioctls.h ioctldefs.h
+CLEANFILES += $(nodist_ioctlsort_SOURCES)
+ioctlsort.$(OBJEXT): $(nodist_ioctlsort_SOURCES)
 ioctls.h: $(srcdir)/linux/ioctlent.sh
 	$(SHELL) $< $(IOCTLDIR) $(IOCTLASM)
 ioctldefs.h: ioctls.h ;
 
-endif
+ioctlent_h_in = linux/ioctlent.h.in
+BUILT_SOURCES += $(ioctlent_h_in)
+$(srcdir)/$(ioctlent_h_in): ioctlsort
+	$(<D)/$(<F) > $@
 
-ioctlent_h = $(builddir)/$(OS)/ioctlent.h
-BUILT_SOURCES += $(ioctlent_h)
-CLEANFILES = $(ioctlent_h)
-ioctlent_h_deps = $(srcdir)/$(OS)/ioctlent.h.in $(srcdir)/$(OS)/$(ARCH)/ioctlent.h.in
-$(ioctlent_h): $(top_builddir)/config.status $(ioctlent_h_deps)
-	$(MKDIR_P) $(builddir)/$(OS)
-	cat $(ioctlent_h_deps) | \
-		$(COMPILE) -E -P - | \
-		sed 's/^\([[:space:]]*{\)"[^"]\+",[[:space:]]*/\1/' | \
-		LC_ALL=C sort -u -k2,2 -k1,1 > $@
+endif
