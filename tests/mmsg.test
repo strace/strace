@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Check how iovecs in struct mmsghdr are decoded.
+
+. "${srcdir=.}/init.sh"
+
+mmsg_expected="${srcdir=.}/mmsg.expected"
+
+check_prog diff
+
+cat "$mmsg_expected" > /dev/null ||
+	fail_ "$mmsg_expected is not available"
+
+./mmsg || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ 'sendmmsg/recvmmsg syscalls are not available'
+	else
+		fail_ 'mmsg failed'
+	fi
+}
+
+args="-e trace=recvmmsg,sendmmsg -e read=0 -e write=1 -o $LOG ./mmsg"
+$STRACE $args || {
+	cat $LOG
+	fail_ "$STRACE $args failed"
+}
+
+diff "$mmsg_expected" $LOG ||
+	fail_ "$STRACE $args failed to decode mmsghdr properly"
+
+exit 0

@@ -1,0 +1,19 @@
+sendmmsg(1, {{{msg_name(0)=NULL, msg_iov(2)=[{"one", 3}, {"two", 3}], msg_controllen=0, msg_flags=0}, 6}, {{msg_name(0)=NULL, msg_iov(1)=[{"three", 5}], msg_controllen=0, msg_flags=0}, 5}}, 2, 0) = 2
+ = 2 buffers in vector 0
+ * 3 bytes in buffer 0
+ | 00000  6f 6e 65                                          one              |
+ * 3 bytes in buffer 1
+ | 00000  74 77 6f                                          two              |
+ = 1 buffers in vector 1
+ * 5 bytes in buffer 0
+ | 00000  74 68 72 65 65                                    three            |
+recvmmsg(0, {{{msg_name(0)=NULL, msg_iov(2)=[{"one", 3}, {"two", 3}], msg_controllen=0, msg_flags=0}, 6}, {{msg_name(0)=NULL, msg_iov(1)=[{"three", 5}], msg_controllen=0, msg_flags=0}, 5}}, 2, 0, NULL) = 2 (left NULL)
+ = 2 buffers in vector 0
+ * 3 bytes in buffer 0
+ | 00000  6f 6e 65                                          one              |
+ * 3 bytes in buffer 1
+ | 00000  74 77 6f                                          two              |
+ = 1 buffers in vector 1
+ * 5 bytes in buffer 0
+ | 00000  74 68 72 65 65                                    three            |
++++ exited with 0 +++

@@ -4,6 +4,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
 
 check_PROGRAMS = \
 	inet-accept-connect-send-recv \
+	mmsg \
 	net-accept-connect \
 	netlink_inet_diag \
 	scm_rights \
@@ -27,6 +28,7 @@ TESTS = \
 	sigaction.test \
 	stat.test \
 	statfs.test \
+	mmsg.test \
 	net.test \
 	net-fd.test \
 	net-yy.test \
@@ -43,6 +45,7 @@ TEST_LOG_COMPILER = $(srcdir)/run.sh
 
 EXTRA_DIST = init.sh run.sh \
 	     getdents.awk \
+	     mmsg.expected \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
 	     sigaction.awk \

@@ -219,6 +219,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	process_vm_readv
 	pwritev
 	sendmsg
+	sendmmsg
 	sigaction
 	stpcpy
 	strerror
