@@ -427,7 +427,7 @@ print_call_cb(void *dummy,
 	      unw_word_t function_offset,
 	      unsigned long true_offset)
 {
-	if (symbol_name)
+	if (symbol_name && (symbol_name[0] != '\0'))
 		tprintf(STACK_ENTRY_SYMBOL_FMT);
 	else if (binary_filename)
 		tprintf(STACK_ENTRY_NOSYMBOL_FMT);
