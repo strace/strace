@@ -429,6 +429,13 @@ struct mmsghdr32 {
 	uint32_t /* unsigned */ msg_len;
 };
 
+#ifndef HAVE_STRUCT_MMSGHDR
+struct mmsghdr {
+	struct msghdr msg_hdr;
+	unsigned msg_len;
+};
+#endif
+
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 static void
 copy_from_msghdr32(struct msghdr *to_msg, struct msghdr32 *from_msg32)
@@ -483,10 +490,7 @@ dumpiov_in_msghdr(struct tcb *tcp, long addr)
 static void
 printmmsghdr(struct tcb *tcp, long addr, unsigned int idx, unsigned long msg_len)
 {
-	struct mmsghdr {
-		struct msghdr msg_hdr;
-		unsigned msg_len;
-	} mmsg;
+	struct mmsghdr mmsg;
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize == 4) {
