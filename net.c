@@ -429,6 +429,20 @@ struct mmsghdr32 {
 	uint32_t /* unsigned */ msg_len;
 };
 
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+static void
+copy_from_msghdr32(struct msghdr *to_msg, struct msghdr32 *from_msg32)
+{
+	to_msg->msg_name       = (void*)(long)from_msg32->msg_name;
+	to_msg->msg_namelen    =              from_msg32->msg_namelen;
+	to_msg->msg_iov        = (void*)(long)from_msg32->msg_iov;
+	to_msg->msg_iovlen     =              from_msg32->msg_iovlen;
+	to_msg->msg_control    = (void*)(long)from_msg32->msg_control;
+	to_msg->msg_controllen =              from_msg32->msg_controllen;
+	to_msg->msg_flags      =              from_msg32->msg_flags;
+}
+#endif
+
 static bool
 extractmsghdr(struct tcb *tcp, long addr, struct msghdr *msg)
 {
@@ -438,13 +452,7 @@ extractmsghdr(struct tcb *tcp, long addr, struct msghdr *msg)
 
 		if (umove(tcp, addr, &msg32) < 0)
 			return false;
-		msg->msg_name       = (void*)(long)msg32.msg_name;
-		msg->msg_namelen    =              msg32.msg_namelen;
-		msg->msg_iov        = (void*)(long)msg32.msg_iov;
-		msg->msg_iovlen     =              msg32.msg_iovlen;
-		msg->msg_control    = (void*)(long)msg32.msg_control;
-		msg->msg_controllen =              msg32.msg_controllen;
-		msg->msg_flags      =              msg32.msg_flags;
+		copy_from_msghdr32(msg, &msg32);
 	} else
 #endif
 	if (umove(tcp, addr, msg) < 0)
