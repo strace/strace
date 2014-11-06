@@ -2500,6 +2500,8 @@ dumpio(struct tcb *tcp)
 #if HAVE_SENDMSG
 		else if (func == sys_recvmsg)
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
+		else if (func == sys_recvmmsg)
+			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 #endif
 		return;
 	}
@@ -2514,6 +2516,8 @@ dumpio(struct tcb *tcp)
 #if HAVE_SENDMSG
 		else if (func == sys_sendmsg)
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
+		else if (func == sys_sendmmsg)
+			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 #endif
 		return;
 	}

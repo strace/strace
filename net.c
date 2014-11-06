@@ -467,6 +467,29 @@ extractmsghdr(struct tcb *tcp, long addr, struct msghdr *msg)
 	return true;
 }
 
+static bool
+extractmmsghdr(struct tcb *tcp, long addr, unsigned int idx, struct mmsghdr *mmsg)
+{
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize == 4) {
+		struct mmsghdr32 mmsg32;
+
+		addr += sizeof(struct mmsghdr32) * idx;
+		if (umove(tcp, addr, &mmsg32) < 0)
+			return false;
+
+		copy_from_msghdr32(&mmsg->msg_hdr, &mmsg32.msg_hdr);
+		mmsg->msg_len = mmsg32.msg_len;
+	} else
+#endif
+	{
+		addr += sizeof(*mmsg) * idx;
+		if (umove(tcp, addr, mmsg) < 0)
+			return false;
+	}
+	return true;
+}
+
 static void
 printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
@@ -492,35 +515,13 @@ printmmsghdr(struct tcb *tcp, long addr, unsigned int idx, unsigned long msg_len
 {
 	struct mmsghdr mmsg;
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize == 4) {
-		struct mmsghdr32 mmsg32;
-
-		addr += sizeof(mmsg32) * idx;
-		if (umove(tcp, addr, &mmsg32) < 0) {
-			tprintf("%#lx", addr);
-			return;
-		}
-		mmsg.msg_hdr.msg_name       = (void*)(long)mmsg32.msg_hdr.msg_name;
-		mmsg.msg_hdr.msg_namelen    =              mmsg32.msg_hdr.msg_namelen;
-		mmsg.msg_hdr.msg_iov        = (void*)(long)mmsg32.msg_hdr.msg_iov;
-		mmsg.msg_hdr.msg_iovlen     =              mmsg32.msg_hdr.msg_iovlen;
-		mmsg.msg_hdr.msg_control    = (void*)(long)mmsg32.msg_hdr.msg_control;
-		mmsg.msg_hdr.msg_controllen =              mmsg32.msg_hdr.msg_controllen;
-		mmsg.msg_hdr.msg_flags      =              mmsg32.msg_hdr.msg_flags;
-		mmsg.msg_len                =              mmsg32.msg_len;
-	} else
-#endif
-	{
-		addr += sizeof(mmsg) * idx;
-		if (umove(tcp, addr, &mmsg) < 0) {
-			tprintf("%#lx", addr);
-			return;
-		}
+	if (extractmmsghdr(tcp, addr, idx, &mmsg)) {
+		tprints("{");
+		do_msghdr(tcp, &mmsg.msg_hdr, msg_len ? msg_len : mmsg.msg_len);
+		tprintf(", %u}", mmsg.msg_len);
 	}
-	tprints("{");
-	do_msghdr(tcp, &mmsg.msg_hdr, msg_len ? msg_len : mmsg.msg_len);
-	tprintf(", %u}", mmsg.msg_len);
+	else
+		tprintf("%#lx", addr);
 }
 
 static void
@@ -547,6 +548,22 @@ decode_mmsg(struct tcb *tcp, unsigned long msg_len)
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 }
 
+void
+dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
+{
+	unsigned int len = tcp->u_rval;
+	unsigned int i;
+	struct mmsghdr mmsg;
+
+	for (i = 0; i < len; ++i) {
+		if (extractmmsghdr(tcp, addr, i, &mmsg)) {
+			tprintf(" = %lu buffers in vector %u\n",
+				(unsigned long)mmsg.msg_hdr.msg_iovlen, i);
+			dumpiov(tcp, mmsg.msg_hdr.msg_iovlen,
+				(long)mmsg.msg_hdr.msg_iov);
+		}
+	}
+}
 #endif /* HAVE_SENDMSG */
 
 /*
