@@ -5,12 +5,12 @@
 	"SIGILL",	/* 4 */
 	"SIGTRAP",	/* 5 */
 	"SIGABRT",	/* 6 */
-	"SIGEMT",	/* 7 */
+	"SIGSTKFLT",	/* 7 */
 	"SIGFPE",	/* 8 */
 	"SIGKILL",	/* 9 */
 	"SIGBUS",	/* 10 */
 	"SIGSEGV",	/* 11 */
-	"SIGSYS",	/* 12 */
+	"SIGXCPU",	/* 12 */
 	"SIGPIPE",	/* 13 */
 	"SIGALRM",	/* 14 */
 	"SIGTERM",	/* 15 */
@@ -28,11 +28,6 @@
 	"SIGTTIN",	/* 27 */
 	"SIGTTOU",	/* 28 */
 	"SIGURG",	/* 29 */
-	"SIGLOST",	/* 30 */
+	"SIGXFSZ",	/* 30 */
 	"SIGUNUSED",	/* 31 */
-	"SIG_32",	/* 32 */
-	"SIGXCPU",	/* 33 */
-	"SIGXFSZ",	/* 34 */
-	"SIG_35",	/* 35 */
-	"SIGSTKFLT",	/* 36 */
-	"SIGRTMIN",	/* 37 */
+	"SIGRTMIN",	/* 32 */

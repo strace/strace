@@ -182,10 +182,10 @@
 	"EREMOTEIO", /* 181 */
 	"ENOMEDIUM", /* 182 */
 	"EMEDIUMTYPE", /* 183 */
-	"ERRNO_184", /* 184 */
-	"ERRNO_185", /* 185 */
-	"ERRNO_186", /* 186 */
-	"ERRNO_187", /* 187 */
+	"ENOKEY", /* 184 */
+	"EKEYEXPIRED", /* 185 */
+	"EKEYREVOKED", /* 186 */
+	"EKEYREJECTED", /* 187 */
 	"ERRNO_188", /* 188 */
 	"ERRNO_189", /* 189 */
 	"ERRNO_190", /* 190 */
@@ -244,7 +244,7 @@
 	"ERRNO_243", /* 243 */
 	"EALREADY", /* 244 */
 	"EINPROGRESS", /* 245 */
-	"EWOULDBLOCK", /* 246 */
+	"EWOULDBLOCK_OLD", /* 246 */  /* was EWOULDBLOCK before kernel 3.14 */
 	"ENOTEMPTY", /* 247 */
 	"ENAMETOOLONG", /* 248 */
 	"ELOOP", /* 249 */
@@ -252,3 +252,7 @@
 	"ENOSYS", /* 251 */
 	"ENOTSUP", /* 252 */
 	"ECANCELLED", /* 253 */
+	"EOWNERDEAD", /* 254 */
+	"ENOTRECOVERABLE", /* 255 */
+	"ERFKILL", /* 256 */
+	"EHWPOISON", /* 257 */
