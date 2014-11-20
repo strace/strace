@@ -19,6 +19,10 @@ O_NOFOLLOW
 O_NOATIME
 O_CLOEXEC
 O_PATH
+#if defined(O_TMPFILE) && defined(O_DIRECTORY)
+/* The kernel & C libraries often inline O_DIRECTORY */
+{ O_TMPFILE & ~O_DIRECTORY, "O_TMPFILE" },
+#endif
 FNDELAY
 FAPPEND
 FMARK
