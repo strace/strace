@@ -35,9 +35,7 @@
 #include <sys/user.h>
 #include <sys/param.h>
 #include <fcntl.h>
-#if HAVE_SYS_UIO_H
-# include <sys/uio.h>
-#endif
+#include <sys/uio.h>
 
 #if defined(IA64)
 # include <asm/ptrace_offsets.h>
@@ -699,7 +697,6 @@ printstr(struct tcb *tcp, long addr, long len)
 		tprints("...");
 }
 
-#if HAVE_SYS_UIO_H
 void
 dumpiov(struct tcb *tcp, int len, long addr)
 {
@@ -747,7 +744,6 @@ dumpiov(struct tcb *tcp, int len, long addr)
 #undef iov_iov_len
 #undef iov
 }
-#endif
 
 void
 dumpstr(struct tcb *tcp, long addr, int len)

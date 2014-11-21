@@ -31,6 +31,7 @@
 #include "defs.h"
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include <sys/un.h>
 #if defined(HAVE_SIN6_SCOPE_ID_LINUX)
 # define in6_addr in6_addr_libc
@@ -78,9 +79,6 @@
 # endif
 #endif
 
-#if defined(HAVE_SYS_UIO_H)
-# include <sys/uio.h>
-#endif
 #if defined(HAVE_LINUX_NETLINK_H)
 # include <linux/netlink.h>
 #endif

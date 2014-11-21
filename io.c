@@ -30,9 +30,7 @@
 
 #include "defs.h"
 #include <fcntl.h>
-#if HAVE_SYS_UIO_H
-# include <sys/uio.h>
-#endif
+#include <sys/uio.h>
 
 int
 sys_read(struct tcb *tcp)
@@ -62,7 +60,6 @@ sys_write(struct tcb *tcp)
 	return 0;
 }
 
-#if HAVE_SYS_UIO_H
 /*
  * data_size limits the cumulative size of printed data.
  * Example: recvmsg returing a short read.
@@ -174,7 +171,6 @@ sys_writev(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
 
 /* The SH4 ABI does allow long longs in odd-numbered registers, but
    does not allow them to be split between registers and memory - and
@@ -216,8 +212,6 @@ sys_pwrite(struct tcb *tcp)
 	}
 	return 0;
 }
-
-#if HAVE_SYS_UIO_H
 
 static void
 print_llu_from_low_high_val(struct tcb *tcp, int arg)
@@ -268,7 +262,6 @@ sys_pwritev(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* HAVE_SYS_UIO_H */
 
 static void
 print_off_t(struct tcb *tcp, long addr)
