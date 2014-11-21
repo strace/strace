@@ -116,6 +116,11 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 	/* take a signed int */
 	case BLKROSET:
 	case BLKBSZSET:
+#ifdef FIFREEZE
+	/* First seen in linux-2.6.29 */
+	case FIFREEZE:
+	case FITHAW:
+#endif
 		if (entering(tcp)) {
 			int val;
 			if (umove(tcp, arg, &val) < 0)
@@ -262,6 +267,21 @@ block_ioctl(struct tcb *tcp, long code, long arg)
 					(int) sizeof(buts.name), buts.name);
 		}
 		break;
+
+#ifdef FITRIM
+	/* First seen in linux-2.6.37 */
+	case FITRIM:
+		if (entering(tcp)) {
+			struct fstrim_range fstrim;
+			if (umove(tcp, arg, &fstrim))
+				tprintf(", %#lx", arg);
+			else
+				tprintf(", {start=%#" PRIx64 ", len=%#" PRIx64 ", "
+					"minlen=%#" PRIx64 "}", (uint64_t) fstrim.start,
+					(uint64_t) fstrim.len, (uint64_t) fstrim.minlen);
+		}
+		break;
+#endif
 
 	/* No arguments or unhandled */
 	case BLKTRACESTART:
