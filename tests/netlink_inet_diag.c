@@ -9,11 +9,24 @@
 static int
 send_query(const int fd, const int family, const int proto)
 {
-	struct sockaddr_nl nladdr;
+	struct sockaddr_nl nladdr = {
+		.nl_family = AF_NETLINK
+	};
 	struct {
 		struct nlmsghdr nlh;
 		struct inet_diag_req_v2 idr;
-	} req;
+	} req = {
+		.nlh = {
+			.nlmsg_len = sizeof(req),
+			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
+		},
+		.idr = {
+			.sdiag_family = family,
+			.sdiag_protocol = proto,
+			.idiag_states = -1
+		}
+	};
 	struct iovec iov = {
 		.iov_base = &req,
 		.iov_len = sizeof(req)
@@ -25,17 +38,6 @@ send_query(const int fd, const int family, const int proto)
 		.msg_iovlen = 1
 	};
 
-	memset(&nladdr, 0, sizeof(nladdr));
-	nladdr.nl_family = AF_NETLINK;
-
-	memset(&req, 0, sizeof(req));
-	req.nlh.nlmsg_len = sizeof(req);
-	req.nlh.nlmsg_type = SOCK_DIAG_BY_FAMILY;
-	req.nlh.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST;
-	req.idr.sdiag_family = family;
-	req.idr.sdiag_protocol = proto;
-	req.idr.idiag_states = -1;
-
 	return sendmsg(fd, &msg, 0) > 0;
 }
 
@@ -43,23 +45,18 @@ static int
 check_responses(const int fd)
 {
 	static char buf[8192];
-	struct sockaddr_nl nladdr;
+	struct sockaddr_nl nladdr = {
+		.nl_family = AF_NETLINK
+	};
 	struct iovec iov = {
 		.iov_base = buf,
 		.iov_len = sizeof(buf)
 	};
-
-	memset(&nladdr, 0, sizeof(nladdr));
-	nladdr.nl_family = AF_NETLINK;
-
 	struct msghdr msg = {
 		.msg_name = (void*)&nladdr,
 		.msg_namelen = sizeof(nladdr),
 		.msg_iov = &iov,
-		.msg_iovlen = 1,
-		.msg_control = NULL,
-		.msg_controllen = 0,
-		.msg_flags = 0
+		.msg_iovlen = 1
 	};
 
 	ssize_t ret = recvmsg(fd, &msg, 0);
