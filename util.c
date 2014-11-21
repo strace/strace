@@ -598,7 +598,7 @@ string_quote(const char *instr, char *outstr, long len, int size)
 void
 printpathn(struct tcb *tcp, long addr, unsigned int n)
 {
-	char path[MAXPATHLEN + 1];
+	char path[PATH_MAX + 1];
 	int nul_seen;
 
 	if (!addr) {
@@ -631,7 +631,7 @@ void
 printpath(struct tcb *tcp, long addr)
 {
 	/* Size must correspond to char path[] size in printpathn */
-	printpathn(tcp, addr, MAXPATHLEN);
+	printpathn(tcp, addr, PATH_MAX);
 }
 
 /*

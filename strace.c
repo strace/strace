@@ -1161,7 +1161,7 @@ startup_child(char **argv)
 {
 	struct_stat statbuf;
 	const char *filename;
-	char pathname[MAXPATHLEN];
+	char pathname[PATH_MAX];
 	int pid;
 	struct tcb *tcp;
 
@@ -1195,7 +1195,7 @@ startup_child(char **argv)
 			else
 				m = n = strlen(path);
 			if (n == 0) {
-				if (!getcwd(pathname, MAXPATHLEN))
+				if (!getcwd(pathname, PATH_MAX))
 					continue;
 				len = strlen(pathname);
 			}
@@ -1308,7 +1308,7 @@ startup_child(char **argv)
 		 * instead of call (won't push anything to stack),
 		 * (2) by trying very hard in exec_or_die()
 		 * to not use any stack,
-		 * (3) having a really big (MAXPATHLEN) stack object
+		 * (3) having a really big (PATH_MAX) stack object
 		 * in this function, which creates a "buffer" between
 		 * child's and parent's stack pointers.
 		 * This may save us if (1) and (2) failed
