@@ -241,7 +241,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	poll.h
 	scsi/sg.h
 	stropts.h
-	sys/acl.h
 	sys/conf.h
 	sys/epoll.h
 	sys/filio.h
