@@ -196,10 +196,6 @@ struct __old_kernel_stat {
 # include <sys/mkdev.h>
 #endif
 
-#ifdef HAVE_SYS_ASYNCH_H
-# include <sys/asynch.h>
-#endif
-
 #ifdef O_LARGEFILE
 # if O_LARGEFILE == 0          /* biarch platforms in 64-bit mode */
 #  undef O_LARGEFILE
@@ -1785,84 +1781,6 @@ sys_getcwd(struct tcb *tcp)
 	}
 	return 0;
 }
-
-#ifdef HAVE_SYS_ASYNCH_H
-
-int
-sys_aioread(struct tcb *tcp)
-{
-	struct aio_result_t res;
-
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, %lu, ", tcp->u_arg[2], tcp->u_arg[3]);
-		printxval(whence, tcp->u_arg[4], "L_???");
-		if (syserror(tcp) || tcp->u_arg[5] == 0
-		    || umove(tcp, tcp->u_arg[5], &res) < 0)
-			tprintf(", %#lx", tcp->u_arg[5]);
-		else
-			tprintf(", {aio_return %d aio_errno %d}",
-				res.aio_return, res.aio_errno);
-	}
-	return 0;
-}
-
-int
-sys_aiowrite(struct tcb *tcp)
-{
-	struct aio_result_t res;
-
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, %lu, ", tcp->u_arg[2], tcp->u_arg[3]);
-		printxval(whence, tcp->u_arg[4], "L_???");
-	}
-	else {
-		if (tcp->u_arg[5] == 0)
-			tprints(", NULL");
-		else if (syserror(tcp)
-		    || umove(tcp, tcp->u_arg[5], &res) < 0)
-			tprintf(", %#lx", tcp->u_arg[5]);
-		else
-			tprintf(", {aio_return %d aio_errno %d}",
-				res.aio_return, res.aio_errno);
-	}
-	return 0;
-}
-
-int
-sys_aiowait(struct tcb *tcp)
-{
-	if (entering(tcp))
-		printtv(tcp, tcp->u_arg[0]);
-	return 0;
-}
-
-int
-sys_aiocancel(struct tcb *tcp)
-{
-	struct aio_result_t res;
-
-	if (exiting(tcp)) {
-		if (tcp->u_arg[0] == 0)
-			tprints("NULL");
-		else if (syserror(tcp)
-		    || umove(tcp, tcp->u_arg[0], &res) < 0)
-			tprintf("%#lx", tcp->u_arg[0]);
-		else
-			tprintf("{aio_return %d aio_errno %d}",
-				res.aio_return, res.aio_errno);
-	}
-	return 0;
-}
-
-#endif /* HAVE_SYS_ASYNCH_H */
 
 #include "xlat/xattrflags.h"
 
