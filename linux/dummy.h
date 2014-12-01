@@ -68,6 +68,8 @@
 #define	sys_getresgid		sys_getresuid
 #define	sys_lstat		sys_stat
 #define	sys_lstat64		sys_stat64
+#define	sys_mkdir		sys_chmod
+#define	sys_mkdirat		sys_fchmodat
 #define	sys_mlock		sys_munmap
 #define	sys_mq_unlink		sys_chdir
 #define	sys_munlock		sys_munmap

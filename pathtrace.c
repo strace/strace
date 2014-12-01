@@ -181,7 +181,6 @@ pathtrace_match(struct tcb *tcp)
 	    s->sys_func == sys_faccessat ||
 	    s->sys_func == sys_fchmodat ||
 	    s->sys_func == sys_futimesat ||
-	    s->sys_func == sys_mkdirat ||
 	    s->sys_func == sys_unlinkat ||
 	    s->sys_func == sys_newfstatat ||
 	    s->sys_func == sys_mknodat ||

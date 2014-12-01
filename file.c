@@ -1347,30 +1347,6 @@ sys_chdir(struct tcb *tcp)
 	return 0;
 }
 
-static int
-decode_mkdir(struct tcb *tcp, int offset)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[offset]);
-		tprintf(", %#lo", tcp->u_arg[offset + 1]);
-	}
-	return 0;
-}
-
-int
-sys_mkdir(struct tcb *tcp)
-{
-	return decode_mkdir(tcp, 0);
-}
-
-int
-sys_mkdirat(struct tcb *tcp)
-{
-	if (entering(tcp))
-		print_dirfd(tcp, tcp->u_arg[0]);
-	return decode_mkdir(tcp, 1);
-}
-
 int
 sys_link(struct tcb *tcp)
 {
