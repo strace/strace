@@ -235,7 +235,6 @@ int sys_sendmsg();
 int sys_sendto();
 int sys_set_mempolicy();
 int sys_set_thread_area();
-int sys_setdomainname();
 int sys_setfsuid();
 int sys_setgroups();
 int sys_setgroups32();
