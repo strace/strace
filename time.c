@@ -168,15 +168,6 @@ sys_time(struct tcb *tcp)
 }
 
 int
-sys_stime(struct tcb *tcp)
-{
-	if (exiting(tcp)) {
-		printnum(tcp, tcp->u_arg[0], "%ld");
-	}
-	return 0;
-}
-
-int
 sys_gettimeofday(struct tcb *tcp)
 {
 	if (exiting(tcp)) {

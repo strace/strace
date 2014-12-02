@@ -83,6 +83,7 @@
 #define	sys_setgid		sys_setuid
 #define	sys_setregid		sys_setreuid
 #define	sys_setresgid		sys_setresuid
+#define	sys_stime		sys_time
 #define	sys_swapoff		sys_chdir
 #define	sys_symlink		sys_link
 #define	sys_syncfs		sys_close
