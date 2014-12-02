@@ -65,6 +65,7 @@
 #define	sys_getegid		sys_getuid
 #define	sys_geteuid		sys_getuid
 #define	sys_getgid		sys_getuid
+#define	sys_getpeername		sys_getsockname
 #define	sys_getresgid		sys_getresuid
 #define	sys_lstat		sys_stat
 #define	sys_lstat64		sys_stat64

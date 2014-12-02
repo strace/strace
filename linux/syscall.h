@@ -103,7 +103,6 @@ int sys_getgroups();
 int sys_getgroups32();
 int sys_gethostname();
 int sys_getitimer();
-int sys_getpeername();
 int sys_getpmsg(); /* TODO: non-Linux, remove? */
 int sys_getpriority();
 int sys_getresuid();

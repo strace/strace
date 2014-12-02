@@ -915,12 +915,6 @@ sys_getsockname(struct tcb *tcp)
 	return do_sockname(tcp, -1);
 }
 
-int
-sys_getpeername(struct tcb *tcp)
-{
-	return do_sockname(tcp, -1);
-}
-
 static int
 do_pipe(struct tcb *tcp, int flags_arg)
 {
