@@ -57,6 +57,7 @@ strace_SOURCES =	\
 	syscall.c	\
 	sysctl.c	\
 	sysinfo.c	\
+	syslog.c	\
 	sysmips.c	\
 	system.c	\
 	term.c		\
