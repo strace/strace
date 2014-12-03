@@ -224,24 +224,6 @@ sys_cacheflush(struct tcb *tcp)
 
 #ifdef BFIN
 
-#include <bfin_sram.h>
-
-#include "xlat/sram_alloc_flags.h"
-
-int
-sys_sram_alloc(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		/* size */
-		tprintf("%lu, ", tcp->u_arg[0]);
-		/* flags */
-		printflags(sram_alloc_flags, tcp->u_arg[1], "???_SRAM");
-	}
-	return 1;
-}
-
-#include <asm/cachectl.h>
-
 static const struct xlat cacheflush_flags[] = {
 	XLAT(ICACHE),
 	XLAT(DCACHE),
