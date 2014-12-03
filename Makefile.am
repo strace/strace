@@ -37,6 +37,7 @@ strace_SOURCES =	\
 	mem.c		\
 	mtd.c		\
 	net.c		\
+	or1k_atomic.c	\
 	pathtrace.c	\
 	process.c	\
 	ptp.c		\
