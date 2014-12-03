@@ -232,7 +232,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	inttypes.h
 	ioctls.h
-	linux/capability.h
 	linux/perf_event.h
 	linux/ptrace.h
 	linux/utsname.h

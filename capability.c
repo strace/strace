@@ -1,30 +1,60 @@
 #include "defs.h"
 
-#define _LINUX_SOCKET_H
-#define _LINUX_FS_H
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#ifdef HAVE_LINUX_CAPABILITY_H
-# include <linux/capability.h>
-#endif
-
-#ifdef SYS_capget
+enum {
+	CAP_CHOWN,
+	CAP_DAC_OVERRIDE,
+	CAP_DAC_READ_SEARCH,
+	CAP_FOWNER,
+	CAP_FSETID,
+	CAP_KILL,
+	CAP_SETGID,
+	CAP_SETUID,
+	CAP_SETPCAP,
+	CAP_LINUX_IMMUTABLE,
+	CAP_NET_BIND_SERVICE,
+	CAP_NET_BROADCAST,
+	CAP_NET_ADMIN,
+	CAP_NET_RAW,
+	CAP_IPC_LOCK,
+	CAP_IPC_OWNER,
+	CAP_SYS_MODULE,
+	CAP_SYS_RAWIO,
+	CAP_SYS_CHROOT,
+	CAP_SYS_PTRACE,
+	CAP_SYS_PACCT,
+	CAP_SYS_ADMIN,
+	CAP_SYS_BOOT,
+	CAP_SYS_NICE,
+	CAP_SYS_RESOURCE,
+	CAP_SYS_TIME,
+	CAP_SYS_TTY_CONFIG,
+	CAP_MKNOD,
+	CAP_LEASE,
+	CAP_AUDIT_WRITE,
+	CAP_AUDIT_CONTROL,
+	CAP_SETFCAP
+};
 
 #include "xlat/capabilities.h"
 
-#ifndef _LINUX_CAPABILITY_VERSION_1
-# define _LINUX_CAPABILITY_VERSION_1 0x19980330
-#endif
-#ifndef _LINUX_CAPABILITY_VERSION_2
-# define _LINUX_CAPABILITY_VERSION_2 0x20071026
-#endif
-#ifndef _LINUX_CAPABILITY_VERSION_3
-# define _LINUX_CAPABILITY_VERSION_3 0x20080522
-#endif
+enum {
+	_LINUX_CAPABILITY_VERSION_1 = 0x19980330,
+	_LINUX_CAPABILITY_VERSION_2 = 0x20071026,
+	_LINUX_CAPABILITY_VERSION_3 = 0x20080522
+};
 
 #include "xlat/cap_version.h"
+
+typedef struct user_cap_header_struct {
+	uint32_t version;
+	int pid;
+} *cap_user_header_t;
+
+typedef struct user_cap_data_struct {
+	uint32_t effective;
+	uint32_t permitted;
+	uint32_t inheritable;
+} *cap_user_data_t;
 
 static void
 print_cap_header(struct tcb *tcp, unsigned long addr)
@@ -92,17 +122,3 @@ sys_capset(struct tcb *tcp)
 	}
 	return 0;
 }
-
-#else
-
-int sys_capget(struct tcb *tcp)
-{
-	return printargs(tcp);
-}
-
-int sys_capset(struct tcb *tcp)
-{
-	return printargs(tcp);
-}
-
-#endif
