@@ -20,6 +20,7 @@ strace_SOURCES =	\
 	aio.c		\
 	bjm.c		\
 	block.c		\
+	cacheflush.c	\
 	capability.c	\
 	count.c		\
 	desc.c		\
