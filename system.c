@@ -60,8 +60,6 @@
 #define MS_MGC_VAL	0xc0ed0000	/* Magic flag number */
 #define MS_MGC_MSK	0xffff0000	/* Magic flag mask */
 
-#include <linux/personality.h>
-
 #include "xlat/mount_flags.h"
 
 int
@@ -117,17 +115,5 @@ sys_umount2(struct tcb *tcp)
 		tprints(", ");
 		printflags(umount_flags, tcp->u_arg[1], "MNT_???");
 	}
-	return 0;
-}
-
-/* These are not macros, but enums.  We just copy the values by hand
-   from Linux 2.6.9 here.  */
-#include "xlat/personality_options.h"
-
-int
-sys_personality(struct tcb *tcp)
-{
-	if (entering(tcp))
-		printxval(personality_options, tcp->u_arg[0], "PER_???");
 	return 0;
 }
