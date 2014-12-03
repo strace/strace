@@ -61,7 +61,6 @@ strace_SOURCES =	\
 	sysinfo.c	\
 	syslog.c	\
 	sysmips.c	\
-	system.c	\
 	term.c		\
 	time.c		\
 	umount.c	\
