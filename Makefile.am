@@ -37,6 +37,7 @@ strace_SOURCES =	\
 	ldt.c		\
 	loop.c		\
 	mem.c		\
+	mount.c		\
 	mtd.c		\
 	net.c		\
 	or1k_atomic.c	\
