@@ -53,6 +53,7 @@ strace_SOURCES =	\
 	stream.c	\
 	syscall.c	\
 	sysinfo.c	\
+	sysmips.c	\
 	system.c	\
 	term.c		\
 	time.c		\
