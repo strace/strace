@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Check capget/capset syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog awk
+
+./caps || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ 'capget/capset syscalls do not behave as expected'
+	else
+		fail_ 'caps failed'
+	fi
+}
+
+args="-e trace=capget,capset ./caps"
+$STRACE -o "$LOG" $args || {
+	cat "$LOG"
+	fail_ "$STRACE $args failed"
+}
+
+awk -f "$srcdir"/caps.awk "$LOG" ||
+	{ cat "$LOG"; fail_ 'unexpected output'; }
+
+exit 0

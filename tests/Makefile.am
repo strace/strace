@@ -4,6 +4,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
 
 check_PROGRAMS = \
 	inet-accept-connect-send-recv \
+	caps \
 	mmsg \
 	net-accept-connect \
 	netlink_inet_diag \
@@ -23,6 +24,7 @@ TESTS = \
 	ptrace_setoptions.test \
 	strace-f.test \
 	qual_syscall.test \
+	caps.test \
 	getdents.test \
 	scm_rights-fd.test \
 	sigaction.test \
@@ -44,6 +46,7 @@ net-fd.log: net.log
 TEST_LOG_COMPILER = $(srcdir)/run.sh
 
 EXTRA_DIST = init.sh run.sh \
+	     caps.awk \
 	     getdents.awk \
 	     mmsg.expected \
 	     net-yy-accept.awk \

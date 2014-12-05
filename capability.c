@@ -1,5 +1,6 @@
 #include "defs.h"
 
+/* these constants are the same as in <linux/capability.h> */
 enum {
 	CAP_CHOWN,
 	CAP_DAC_OVERRIDE,
@@ -37,6 +38,19 @@ enum {
 
 #include "xlat/capabilities.h"
 
+/* these constants are CAP_TO_INDEX'ed constants from <linux/capability.h> */
+enum {
+	CAP_MAC_OVERRIDE,
+	CAP_MAC_ADMIN,
+	CAP_SYSLOG,
+	CAP_WAKE_ALARM,
+	CAP_BLOCK_SUSPEND,
+	CAP_AUDIT_READ
+};
+
+#include "xlat/capabilities1.h"
+
+/* these constants are the same as in <linux/capability.h> */
 enum {
 	_LINUX_CAPABILITY_VERSION_1 = 0x19980330,
 	_LINUX_CAPABILITY_VERSION_2 = 0x20071026,
@@ -56,58 +70,101 @@ typedef struct user_cap_data_struct {
 	uint32_t inheritable;
 } *cap_user_data_t;
 
-static void
-print_cap_header(struct tcb *tcp, unsigned long addr)
+static cap_user_header_t
+get_cap_header(struct tcb *tcp, unsigned long addr)
 {
-	union { cap_user_header_t p; long *a; char *c; } arg;
-	long a[sizeof(*arg.p) / sizeof(long) + 1];
-	arg.a = a;
+	static struct user_cap_header_struct header;
 
-	if (!addr)
+	if (!addr || !verbose(tcp))
+		return NULL;
+
+	if (umove(tcp, addr, &header) < 0)
+		return NULL;
+
+	return &header;
+}
+
+static void
+print_cap_header(struct tcb *tcp, unsigned long addr, cap_user_header_t h)
+{
+	if (!addr) {
 		tprints("NULL");
-	else if (!verbose(tcp) ||
-		 umoven(tcp, addr, sizeof(*arg.p), arg.c) < 0)
+		return;
+	}
+
+	if (!h) {
 		tprintf("%#lx", addr);
-	else {
-		tprints("{");
-		printxval(cap_version, arg.p->version,
-			  "_LINUX_CAPABILITY_VERSION_???");
-		tprintf(", %d}", arg.p->pid);
+		return;
+	}
+
+	tprints("{");
+	printxval(cap_version, h->version,
+		  "_LINUX_CAPABILITY_VERSION_???");
+	tprintf(", %d}", h->pid);
+}
+
+static void
+print_cap_bits(const uint32_t lo, const uint32_t hi)
+{
+	if (lo || !hi)
+		printflags(capabilities, lo, "CAP_???");
+
+	if (hi) {
+		if (lo)
+			tprints("|");
+		printflags(capabilities1, hi, "CAP_???");
 	}
 }
 
 static void
-print_cap_data(struct tcb *tcp, unsigned long addr)
+print_cap_data(struct tcb *tcp, unsigned long addr, const cap_user_header_t h)
 {
-	union { cap_user_data_t p; long *a; char *c; } arg;
-	long a[sizeof(*arg.p) / sizeof(long) + 1];
-	arg.a = a;
+	struct user_cap_data_struct data[2];
+	unsigned int len;
 
-	if (!addr)
+	if (!addr) {
 		tprints("NULL");
-	else if (!verbose(tcp) ||
-		 (exiting(tcp) && syserror(tcp)) ||
-		 umoven(tcp, addr, sizeof(*arg.p), arg.c) < 0)
-		tprintf("%#lx", addr);
-	else {
-		tprints("{");
-		printflags(capabilities, arg.p->effective, "CAP_???");
-		tprints(", ");
-		printflags(capabilities, arg.p->permitted, "CAP_???");
-		tprints(", ");
-		printflags(capabilities, arg.p->inheritable, "CAP_???");
-		tprints("}");
+		return;
 	}
+
+	if (!h || !verbose(tcp) ||
+	    (exiting(tcp) && syserror(tcp))) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+	if (_LINUX_CAPABILITY_VERSION_2 == h->version ||
+	    _LINUX_CAPABILITY_VERSION_3 == h->version)
+		len = 2;
+	else
+		len = 1;
+
+	if (umoven(tcp, addr, len * sizeof(data[0]), (char *) data) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+	tprints("{");
+	print_cap_bits(data[0].effective, len > 1 ? data[1].effective : 0);
+	tprints(", ");
+	print_cap_bits(data[0].permitted, len > 1 ? data[1].permitted : 0);
+	tprints(", ");
+	print_cap_bits(data[0].inheritable, len > 1 ? data[1].inheritable : 0);
+	tprints("}");
 }
 
 int
 sys_capget(struct tcb *tcp)
 {
+	cap_user_header_t h;
+
 	if (entering(tcp)) {
-		print_cap_header(tcp, tcp->u_arg[0]);
+		h = get_cap_header(tcp, tcp->u_arg[0]);
+		print_cap_header(tcp, tcp->u_arg[0], h);
 		tprints(", ");
 	} else {
-		print_cap_data(tcp, tcp->u_arg[1]);
+		h = syserror(tcp) ? NULL : get_cap_header(tcp, tcp->u_arg[0]);
+		print_cap_data(tcp, tcp->u_arg[1], h);
 	}
 	return 0;
 }
@@ -116,9 +173,10 @@ int
 sys_capset(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		print_cap_header(tcp, tcp->u_arg[0]);
+		cap_user_header_t h = get_cap_header(tcp, tcp->u_arg[0]);
+		print_cap_header(tcp, tcp->u_arg[0], h);
 		tprints(", ");
-		print_cap_data(tcp, tcp->u_arg[1]);
+		print_cap_data(tcp, tcp->u_arg[1], h);
 	}
 	return 0;
 }
