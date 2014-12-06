@@ -25,6 +25,7 @@ strace_SOURCES =	\
 	count.c		\
 	desc.c		\
 	dirent.c	\
+	fadvise.c	\
 	fallocate.c	\
 	fanotify.c	\
 	file.c		\
