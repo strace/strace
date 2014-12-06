@@ -672,6 +672,7 @@ extern int printargs_ld(struct tcb *);
 extern void addflags(const struct xlat *, int);
 extern int printflags(const struct xlat *, int, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, int);
+extern const char *sprintmode(int);
 extern void dumpiov_in_msghdr(struct tcb *, long);
 extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov(struct tcb *, int, long);
