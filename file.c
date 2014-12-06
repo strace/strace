@@ -356,15 +356,6 @@ sys_faccessat(struct tcb *tcp)
 	return decode_access(tcp, 1);
 }
 
-int
-sys_umask(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%#lo", tcp->u_arg[0]);
-	}
-	return RVAL_OCTAL;
-}
-
 /* several stats */
 
 #if defined(SPARC) || defined(SPARC64)
