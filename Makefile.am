@@ -76,6 +76,7 @@ strace_SOURCES =	\
 	sysmips.c	\
 	term.c		\
 	time.c		\
+	truncate.c	\
 	umount.c	\
 	util.c		\
 	utime.c		\
