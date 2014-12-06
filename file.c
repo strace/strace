@@ -29,7 +29,6 @@
  */
 
 #include "defs.h"
-#include <sys/swap.h>
 
 #if defined(SPARC) || defined(SPARC64)
 struct stat {
@@ -1924,29 +1923,6 @@ sys_fallocate(struct tcb *tcp)
 		tprintf(", %#lo, ", tcp->u_arg[1]);	/* mode */
 		argn = printllval(tcp, "%llu, ", 2);	/* offset */
 		printllval(tcp, "%llu", argn);		/* len */
-	}
-	return 0;
-}
-
-#ifndef SWAP_FLAG_PREFER
-# define SWAP_FLAG_PREFER 0x8000
-#endif
-#ifndef SWAP_FLAG_DISCARD
-# define SWAP_FLAG_DISCARD 0x10000
-#endif
-#include "xlat/swap_flags.h"
-
-int
-sys_swapon(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		int flags = tcp->u_arg[1];
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printflags(swap_flags, flags & ~SWAP_FLAG_PRIO_MASK,
-			"SWAP_FLAG_???");
-		if (flags & SWAP_FLAG_PREFER)
-			tprintf("|%d", flags & SWAP_FLAG_PRIO_MASK);
 	}
 	return 0;
 }

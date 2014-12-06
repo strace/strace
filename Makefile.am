@@ -56,6 +56,7 @@ strace_SOURCES =	\
 	statfs.c	\
 	strace.c	\
 	stream.c	\
+	swapon.c	\
 	syscall.c	\
 	sysctl.c	\
 	sysinfo.c	\
