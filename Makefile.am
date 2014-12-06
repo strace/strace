@@ -70,7 +70,8 @@ strace_SOURCES =	\
 	umount.c	\
 	util.c		\
 	v4l2.c		\
-	vsprintf.c
+	vsprintf.c	\
+	xattr.c
 
 if USE_LIBUNWIND
 strace_SOURCES += unwind.c
