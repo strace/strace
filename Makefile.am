@@ -22,6 +22,7 @@ strace_SOURCES =	\
 	block.c		\
 	cacheflush.c	\
 	capability.c	\
+	chmod.c		\
 	count.c		\
 	desc.c		\
 	dirent.c	\
