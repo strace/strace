@@ -1241,13 +1241,3 @@ sys_lxstat(struct tcb *tcp)
 }
 
 #endif /* SPARC[64] */
-
-/* directory */
-int
-sys_chdir(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-	}
-	return 0;
-}
