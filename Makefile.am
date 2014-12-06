@@ -55,6 +55,7 @@ strace_SOURCES =	\
 	process.c	\
 	ptp.c		\
 	quota.c		\
+	readahead.c	\
 	readlink.c	\
 	reboot.c	\
 	renameat.c	\
