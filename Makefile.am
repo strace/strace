@@ -54,6 +54,7 @@ strace_SOURCES =	\
 	ptp.c		\
 	quota.c		\
 	reboot.c	\
+	renameat.c	\
 	resource.c	\
 	scsi.c		\
 	signal.c	\
