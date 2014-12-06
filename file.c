@@ -506,27 +506,6 @@ sys_ftruncate64(struct tcb *tcp)
 
 /* several stats */
 
-static char *
-sprinttime(time_t t)
-{
-	struct tm *tmp;
-	static char buf[sizeof("yyyy/mm/dd-hh:mm:ss")];
-
-	if (t == 0) {
-		strcpy(buf, "0");
-		return buf;
-	}
-	tmp = localtime(&t);
-	if (tmp)
-		snprintf(buf, sizeof buf, "%02d/%02d/%02d-%02d:%02d:%02d",
-			tmp->tm_year + 1900, tmp->tm_mon + 1, tmp->tm_mday,
-			tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
-	else
-		snprintf(buf, sizeof buf, "%lu", (unsigned long) t);
-
-	return buf;
-}
-
 #if defined(SPARC) || defined(SPARC64)
 typedef struct {
 	int     tv_sec;
