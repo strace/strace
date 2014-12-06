@@ -40,6 +40,7 @@ strace_SOURCES =	\
 	kexec.c		\
 	keyctl.c	\
 	ldt.c		\
+	link.c		\
 	loop.c		\
 	mem.c		\
 	mknod.c		\
