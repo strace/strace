@@ -1668,16 +1668,3 @@ sys_mknodat(struct tcb *tcp)
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_mknod(tcp, 1);
 }
-
-int
-sys_getcwd(struct tcb *tcp)
-{
-	if (exiting(tcp)) {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[0]);
-		else
-			printpathn(tcp, tcp->u_arg[0], tcp->u_rval - 1);
-		tprintf(", %lu", tcp->u_arg[1]);
-	}
-	return 0;
-}
