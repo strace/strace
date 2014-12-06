@@ -43,6 +43,7 @@ strace_SOURCES =	\
 	ldt.c		\
 	link.c		\
 	loop.c		\
+	lseek.c		\
 	mem.c		\
 	mknod.c		\
 	mount.c		\
