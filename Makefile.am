@@ -50,6 +50,7 @@ strace_SOURCES =	\
 	mount.c		\
 	mtd.c		\
 	net.c		\
+	open.c		\
 	or1k_atomic.c	\
 	pathtrace.c	\
 	personality.c	\
