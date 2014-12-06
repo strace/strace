@@ -17,6 +17,7 @@ AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS) -I$(builddir)/$(OS)
 include xlat/Makemodule.am
 
 strace_SOURCES =	\
+	access.c	\
 	aio.c		\
 	bjm.c		\
 	block.c		\
