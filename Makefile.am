@@ -72,6 +72,7 @@ strace_SOURCES =	\
 	time.c		\
 	umount.c	\
 	util.c		\
+	utime.c		\
 	v4l2.c		\
 	vsprintf.c	\
 	xattr.c
