@@ -138,33 +138,49 @@ receive_responses(const int fd, const unsigned long inode)
 	}
 }
 
+static bool
+inet_print(int fd, int family, int protocol, const unsigned long inode)
+{
+	return send_query(fd, family, protocol)
+		&& receive_responses(fd, inode);
+}
+
 /* Given an inode number of a socket, print out the details
  * of the ip address and port. */
 bool
-print_sockaddr_by_inode(const unsigned long inode)
+print_sockaddr_by_inode(const unsigned long inode, const char *proto_name)
 {
-	const int families[] = {AF_INET, AF_INET6};
-	const int protocols[] = {IPPROTO_TCP, IPPROTO_UDP};
-	const size_t flen = ARRAY_SIZE(families);
-	const size_t plen = ARRAY_SIZE(protocols);
-	size_t fi, pi;
 	int fd;
+	bool r = false;
 
 	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_INET_DIAG);
 	if (fd < 0)
 		return false;
 
-	for (fi = 0; fi < flen; ++fi) {
-		for (pi = 0; pi < plen; ++pi) {
-			if (!send_query(fd, families[fi], protocols[pi]))
-				continue;
-			if (receive_responses(fd, inode)) {
-				close(fd);
-				return true;
+	if (proto_name) {
+		if (strcmp(proto_name, "TCP") == 0)
+			r = inet_print(fd, AF_INET, IPPROTO_TCP, inode);
+		else if (strcmp(proto_name, "UDP") == 0)
+			r = inet_print(fd, AF_INET, IPPROTO_UDP, inode);
+		else if (strcmp(proto_name, "TCPv6") == 0)
+			r = inet_print(fd, AF_INET6, IPPROTO_TCP, inode);
+		else if (strcmp(proto_name, "UDPv6") == 0)
+			r = inet_print(fd, AF_INET6, IPPROTO_UDP, inode);
+	} else {
+		const int families[] = {AF_INET, AF_INET6};
+		const int protocols[] = {IPPROTO_TCP, IPPROTO_UDP};
+		const size_t flen = ARRAY_SIZE(families);
+		const size_t plen = ARRAY_SIZE(protocols);
+		size_t fi, pi;
+
+		for (fi = 0; fi < flen; ++fi) {
+			for (pi = 0; pi < plen; ++pi) {
+				if ((r = inet_print(fd, families[fi], protocols[pi], inode)))
+					goto out;
 			}
 		}
 	}
-
+out:
 	close(fd);
-	return false;
+	return r;
 }

@@ -482,14 +482,13 @@ printfd(struct tcb *tcp, int fd)
 		    strncmp(path, socket_prefix, socket_prefix_len) == 0 &&
 		    path[(path_len = strlen(path)) - 1] == ']') {
 			unsigned long inodenr;
+#define PROTO_NAME_LEN 32
+			char proto_buf[PROTO_NAME_LEN];
+			const char *proto =
+				getfdproto(tcp, fd, proto_buf, PROTO_NAME_LEN);
 			inodenr = strtoul(path + socket_prefix_len, NULL, 10);
 			tprintf("%d<", fd);
-			if (!print_sockaddr_by_inode(inodenr)) {
-#define PROTO_NAME_LEN 32
-				char proto_buf[PROTO_NAME_LEN];
-				const char *proto =
-					getfdproto(tcp, fd, proto_buf, PROTO_NAME_LEN);
-
+			if (!print_sockaddr_by_inode(inodenr, proto)) {
 				if (proto)
 					tprintf("%s:[%lu]", proto, inodenr);
 				else
