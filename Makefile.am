@@ -90,6 +90,7 @@ strace_SOURCES =	\
 	truncate.c	\
 	umask.c		\
 	umount.c	\
+	uname.c		\
 	util.c		\
 	utime.c		\
 	utimes.c	\
