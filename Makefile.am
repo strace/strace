@@ -153,14 +153,20 @@ EXTRA_DIST =				\
 	linux/alpha/ioctlent.h.in	\
 	linux/alpha/signalent.h		\
 	linux/alpha/syscallent.h	\
+	linux/alpha/userent.h		\
 	linux/arc/ioctlent.h.in		\
 	linux/arc/syscallent.h		\
 	linux/arm/ioctlent.h.in		\
 	linux/arm/syscallent.h		\
+	linux/arm/userent.h		\
 	linux/avr32/ioctlent.h.in	\
 	linux/avr32/syscallent.h	\
+	linux/avr32/userent.h		\
 	linux/bfin/ioctlent.h.in	\
 	linux/bfin/syscallent.h		\
+	linux/bfin/userent.h		\
+	linux/crisv10/userent.h		\
+	linux/crisv32/userent.h		\
 	linux/dummy.h			\
 	linux/errnoent.h		\
 	linux/fanotify.h		\
@@ -170,9 +176,12 @@ EXTRA_DIST =				\
 	linux/hppa/syscallent.h		\
 	linux/i386/ioctlent.h.in	\
 	linux/i386/syscallent.h		\
+	linux/i386/userent.h		\
+	linux/i386/userent0.h		\
 	linux/ia64/ioctlent.h.in	\
 	linux/ia64/signalent.h		\
 	linux/ia64/syscallent.h		\
+	linux/ia64/userent.h		\
 	linux/inet_diag.h		\
 	linux/inotify.h			\
 	linux/ioctlent.h.in		\
@@ -181,10 +190,12 @@ EXTRA_DIST =				\
 	linux/keyctl.h			\
 	linux/m68k/ioctlent.h.in	\
 	linux/m68k/syscallent.h		\
+	linux/m68k/userent.h		\
 	linux/metag/ioctlent.h.in	\
 	linux/metag/syscallent.h	\
 	linux/microblaze/ioctlent.h.in	\
 	linux/microblaze/syscallent.h	\
+	linux/microblaze/userent.h	\
 	linux/mips/errnoent.h		\
 	linux/mips/ioctlent.h.in	\
 	linux/mips/ioctlent.sh		\
@@ -194,9 +205,11 @@ EXTRA_DIST =				\
 	linux/mips/syscallent-n64.h	\
 	linux/mips/syscallent-o32.h	\
 	linux/mips/syscallent.h		\
+	linux/mips/userent.h		\
 	linux/mtd-abi.h			\
 	linux/or1k/ioctlent.h.in	\
 	linux/or1k/syscallent.h		\
+	linux/or1k/userent.h		\
 	linux/personality.h		\
 	linux/powerpc/errnoent1.h	\
 	linux/powerpc/ioctlent.h.in	\
@@ -204,16 +217,24 @@ EXTRA_DIST =				\
 	linux/powerpc/signalent1.h	\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/syscallent1.h	\
+	linux/powerpc/userent.h		\
 	linux/ptp_clock.h		\
 	linux/reboot.h			\
 	linux/s390/ioctlent.h.in	\
 	linux/s390/syscallent.h		\
+	linux/s390/userent.h		\
+	linux/s390/userent0.h		\
+	linux/s390/userent1.h		\
 	linux/s390x/ioctlent.h.in	\
 	linux/s390x/syscallent.h	\
+	linux/s390x/userent.h		\
 	linux/sh/ioctlent.h.in		\
 	linux/sh/syscallent.h		\
+	linux/sh/userent.h		\
+	linux/sh/userent0.h		\
 	linux/sh64/ioctlent.h.in	\
 	linux/sh64/syscallent.h		\
+	linux/sh64/userent.h		\
 	linux/signalent.h		\
 	linux/sock_diag.h		\
 	linux/sparc/dummy2.h		\
@@ -227,6 +248,7 @@ EXTRA_DIST =				\
 	linux/sparc/syscall1.h		\
 	linux/sparc/syscallent.h	\
 	linux/sparc/syscallent1.h	\
+	linux/sparc/userent.h		\
 	linux/sparc64/dummy2.h		\
 	linux/sparc64/errnoent.h	\
 	linux/sparc64/errnoent1.h	\
@@ -241,6 +263,7 @@ EXTRA_DIST =				\
 	linux/sparc64/syscallent.h	\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/syscallent2.h	\
+	linux/sparc64/userent.h		\
 	linux/subcall.h			\
 	linux/syscall.h			\
 	linux/tile/errnoent1.h		\
@@ -249,7 +272,10 @@ EXTRA_DIST =				\
 	linux/tile/signalent1.h		\
 	linux/tile/syscallent.h		\
 	linux/tile/syscallent1.h	\
+	linux/tile/userent.h		\
 	linux/ubi-user.h		\
+	linux/userent.h			\
+	linux/userent0.h		\
 	linux/x32/errnoent.h		\
 	linux/x32/errnoent1.h		\
 	linux/x32/ioctlent.h.in		\
@@ -258,6 +284,7 @@ EXTRA_DIST =				\
 	linux/x32/signalent1.h		\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
+	linux/x32/userent.h		\
 	linux/x86_64/errnoent1.h	\
 	linux/x86_64/errnoent2.h	\
 	linux/x86_64/gentab.pl		\
@@ -269,8 +296,10 @@ EXTRA_DIST =				\
 	linux/x86_64/syscallent.h	\
 	linux/x86_64/syscallent1.h	\
 	linux/x86_64/syscallent2.h	\
+	linux/x86_64/userent.h		\
 	linux/xtensa/ioctlent.h.in	\
 	linux/xtensa/syscallent.h	\
+	linux/xtensa/userent.h		\
 	signalent.sh			\
 	strace-graph			\
 	strace-log-merge		\
