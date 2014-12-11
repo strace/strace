@@ -34,6 +34,7 @@ strace_SOURCES =	\
 	fallocate.c	\
 	fanotify.c	\
 	file.c		\
+	futex.c		\
 	get_robust_list.c \
 	getcpu.c	\
 	getcwd.c	\
