@@ -67,6 +67,7 @@ strace_SOURCES =	\
 	reboot.c	\
 	renameat.c	\
 	resource.c	\
+	sched.c		\
 	scsi.c		\
 	signal.c	\
 	sock.c		\
