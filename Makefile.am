@@ -56,6 +56,7 @@ strace_SOURCES =	\
 	personality.c	\
 	printmode.c	\
 	process.c	\
+	process_vm.c	\
 	ptp.c		\
 	quota.c		\
 	readahead.c	\
