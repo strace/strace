@@ -42,6 +42,7 @@ strace_SOURCES =	\
 	getcpu.c	\
 	getcwd.c	\
 	groups.c	\
+	hostname.c	\
 	inotify.c	\
 	io.c		\
 	ioctl.c		\
