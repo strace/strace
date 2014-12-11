@@ -32,6 +32,7 @@ strace_SOURCES =	\
 	desc.c		\
 	dirent.c	\
 	execve.c	\
+	exit.c		\
 	fadvise.c	\
 	fallocate.c	\
 	fanotify.c	\
