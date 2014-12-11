@@ -27,6 +27,7 @@ strace_SOURCES =	\
 	chdir.c		\
 	chmod.c		\
 	chown.c		\
+	clone.c		\
 	count.c		\
 	desc.c		\
 	dirent.c	\
