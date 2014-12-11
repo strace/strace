@@ -33,6 +33,7 @@ strace_SOURCES =	\
 	fallocate.c	\
 	fanotify.c	\
 	file.c		\
+	getcpu.c	\
 	getcwd.c	\
 	inotify.c	\
 	io.c		\
