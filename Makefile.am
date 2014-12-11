@@ -55,6 +55,7 @@ strace_SOURCES =	\
 	or1k_atomic.c	\
 	pathtrace.c	\
 	personality.c	\
+	prctl.c		\
 	printmode.c	\
 	process.c	\
 	process_vm.c	\
