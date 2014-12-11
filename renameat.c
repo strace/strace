@@ -19,6 +19,7 @@ sys_renameat(struct tcb *tcp)
 	return 0;
 }
 
+#include <linux/fs.h>
 #include "xlat/rename_flags.h"
 
 int
