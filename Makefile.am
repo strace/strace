@@ -96,6 +96,7 @@ strace_SOURCES =	\
 	utimes.c	\
 	v4l2.c		\
 	vsprintf.c	\
+	wait.c		\
 	xattr.c
 
 if USE_LIBUNWIND
