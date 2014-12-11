@@ -83,7 +83,7 @@
 #define uoff(member)	offsetof(struct user, member)
 #define XLAT_UOFF(member)	{ uoff(member), "offsetof(struct user, " #member ")" }
 
-const struct xlat struct_user_offsets[] = {
+static const struct xlat struct_user_offsets[] = {
 #if defined(S390) || defined(S390X)
 	{ PT_PSWMASK,		"psw_mask"				},
 	{ PT_PSWADDR,		"psw_addr"				},
