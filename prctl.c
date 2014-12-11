@@ -1,6 +1,5 @@
 #include "defs.h"
 
-#ifdef HAVE_PRCTL
 #include <sys/prctl.h>
 
 #include "xlat/prctl_options.h"
@@ -111,7 +110,6 @@ sys_prctl(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* HAVE_PRCTL */
 
 #if defined X86_64 || defined X32
 # include <asm/prctl.h>
