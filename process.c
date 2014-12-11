@@ -35,13 +35,14 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/user.h>
+
 #ifdef HAVE_ELF_H
 # include <elf.h>
 #endif
 
+#include "xlat/nt_descriptor_types.h"
+
+#include <sys/user.h>
 #ifdef HAVE_SYS_REG_H
 # include <sys/reg.h>
 #endif
@@ -71,14 +72,13 @@
 # define PTRACE_SETREGS PTRACE_SETREGS64
 #endif
 
+#include "xlat/ptrace_cmds.h"
+#include "xlat/ptrace_setoptions_flags.h"
+
 #if defined(IA64)
 # include <asm/ptrace_offsets.h>
 # include <asm/rse.h>
 #endif
-
-#include "xlat/ptrace_cmds.h"
-#include "xlat/ptrace_setoptions_flags.h"
-#include "xlat/nt_descriptor_types.h"
 
 #define uoff(member)	offsetof(struct user, member)
 #define XLAT_UOFF(member)	{ uoff(member), "offsetof(struct user, " #member ")" }
