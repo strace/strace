@@ -18,6 +18,7 @@ include xlat/Makemodule.am
 
 strace_SOURCES =	\
 	access.c	\
+	affinity.c	\
 	aio.c		\
 	bjm.c		\
 	block.c		\
