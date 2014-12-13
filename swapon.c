@@ -8,6 +8,12 @@
 #ifndef SWAP_FLAG_DISCARD
 # define SWAP_FLAG_DISCARD 0x10000
 #endif
+#ifndef SWAP_FLAG_DISCARD_ONCE
+# define SWAP_FLAG_DISCARD_ONCE 0x20000
+#endif
+#ifndef SWAP_FLAG_DISCARD_PAGES
+# define SWAP_FLAG_DISCARD_PAGES 0x40000
+#endif
 
 #include "xlat/swap_flags.h"
 
