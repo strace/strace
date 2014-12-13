@@ -76,6 +76,28 @@ sys_setresuid(struct tcb *tcp)
 	return 0;
 }
 
+int
+sys_chown(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		printuid(", ", tcp->u_arg[1]);
+		printuid(", ", tcp->u_arg[2]);
+	}
+	return 0;
+}
+
+int
+sys_fchown(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		printuid(", ", tcp->u_arg[1]);
+		printuid(", ", tcp->u_arg[2]);
+	}
+	return 0;
+}
+
 void
 printuid(const char *text, const unsigned int uid)
 {

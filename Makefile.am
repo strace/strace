@@ -26,7 +26,6 @@ strace_SOURCES =	\
 	capability.c	\
 	chdir.c		\
 	chmod.c		\
-	chown.c		\
 	clone.c		\
 	count.c		\
 	desc.c		\
@@ -36,6 +35,7 @@ strace_SOURCES =	\
 	fadvise.c	\
 	fallocate.c	\
 	fanotify.c	\
+	fchownat.c	\
 	file.c		\
 	futex.c		\
 	get_robust_list.c \
