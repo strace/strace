@@ -549,6 +549,20 @@ extern const struct xlat whence_codes[];
 #define STACKTRACE_INVALIDATE_CACHE 0400  /* Trigger proc/maps cache updating */
 #define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
 
+#if defined(ARM) || defined(AARCH64) \
+ || defined(I386) || defined(X32) || defined(X86_64) \
+ || defined(BFIN) \
+ || defined(M68K) \
+ || defined(MICROBLAZE) \
+ || defined(S390) \
+ || defined(SH) || defined(SH64) \
+ || defined(SPARC) || defined(SPARC64) \
+ /**/
+# define NEED_UID16_PARSERS 1
+#else
+# define NEED_UID16_PARSERS 0
+#endif
+
 typedef enum {
 	CFLAG_NONE = 0,
 	CFLAG_ONLY_STATS,

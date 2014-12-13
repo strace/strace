@@ -42,15 +42,15 @@
 	{ 1,	0,	sys_time,		"time"		}, /* 13 */
 	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 14 */
 	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 15 */
-	{ 3,	TF,	sys_chown,		"chown"		}, /* 16 */
+	{ 3,	TF,	sys_chown16,		"chown"		}, /* 16 */
 	{ 0,	TM,	sys_break,		"break"		}, /* 17 */
 	{ 2,	TF,	sys_oldstat,		"oldstat"	}, /* 18 */
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
 	{ 1,	TF,	sys_umount,		"oldumount"	}, /* 22 */
-	{ 1,	0,	sys_setuid,		"setuid"	}, /* 23 */
-	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 24 */
+	{ 1,	0,	sys_setuid16,		"setuid"	}, /* 23 */
+	{ 0,	NF,	sys_getuid16,		"getuid"	}, /* 24 */
 	{ 1,	0,	sys_stime,		"stime"		}, /* 25 */
 	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 26 */
 	{ 1,	0,	sys_alarm,		"alarm"		}, /* 27 */
@@ -72,11 +72,11 @@
 	{ 1,	0,	sys_times,		"times"		}, /* 43 */
 	{ 0,	0,	sys_prof,		"prof"		}, /* 44 */
 	{ 1,	TM|SI,	sys_brk,		"brk"		}, /* 45 */
-	{ 1,	0,	sys_setgid,		"setgid"	}, /* 46 */
-	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 47 */
+	{ 1,	0,	sys_setgid16,		"setgid"	}, /* 46 */
+	{ 0,	NF,	sys_getgid16,		"getgid"	}, /* 47 */
 	{ 3,	TS,	sys_signal,		"signal"	}, /* 48 */
-	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 49 */
-	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 50 */
+	{ 0,	NF,	sys_geteuid16,		"geteuid"	}, /* 49 */
+	{ 0,	NF,	sys_getegid16,		"getegid"	}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
 	{ 2,	TF,	sys_umount2,		"umount"	}, /* 52 */
 	{ 0,	0,	sys_lock,		"lock"		}, /* 53 */
@@ -96,8 +96,8 @@
 	{ 3,	TS,	sys_sigaction,		"sigaction"	}, /* 67 */
 	{ 0,	TS,	sys_siggetmask,		"sgetmask"	}, /* 68 */
 	{ 1,	TS,	sys_sigsetmask,		"ssetmask"	}, /* 69 */
-	{ 2,	0,	sys_setreuid,		"setreuid"	}, /* 70 */
-	{ 2,	0,	sys_setregid,		"setregid"	}, /* 71 */
+	{ 2,	0,	sys_setreuid16,		"setreuid"	}, /* 70 */
+	{ 2,	0,	sys_setregid16,		"setregid"	}, /* 71 */
 	{ 3,	TS,	sys_sigsuspend,		"sigsuspend"	}, /* 72 */
 	{ 1,	TS,	sys_sigpending,		"sigpending"	}, /* 73 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 74 */
@@ -121,7 +121,7 @@
 	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 92 */
 	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 93 */
 	{ 2,	TD,	sys_fchmod,		"fchmod"	}, /* 94 */
-	{ 3,	TD,	sys_fchown,		"fchown"	}, /* 95 */
+	{ 3,	TD,	sys_fchown16,		"fchown"	}, /* 95 */
 	{ 2,	0,	sys_getpriority,	"getpriority"	}, /* 96 */
 	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 97 */
 	{ 4,	0,	sys_profil,		"profil"	}, /* 98 */
@@ -164,8 +164,8 @@
 	{ 3,	0,	sys_sysfs,		"sysfs"		}, /* 135 */
 	{ 1,	0,	sys_personality,	"personality"	}, /* 136 */
 	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
-	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 138 */
-	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 139 */
+	{ 1,	NF,	sys_setfsuid16,		"setfsuid"	}, /* 138 */
+	{ 1,	NF,	sys_setfsgid16,		"setfsgid"	}, /* 139 */
 	{ 5,	TD,	sys_llseek,		"_llseek"	}, /* 140 */
 	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
 	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
@@ -190,14 +190,14 @@
 	{ 2,	0,	sys_sched_rr_get_interval,	"sched_rr_get_interval"	}, /* 161 */
 	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 162 */
 	{ 5,	TM|SI,	sys_mremap,		"mremap"	}, /* 163 */
-	{ 3,	0,	sys_setresuid,		"setresuid"	}, /* 164 */
-	{ 3,	0,	sys_getresuid,		"getresuid"	}, /* 165 */
+	{ 3,	0,	sys_setresuid16,	"setresuid"	}, /* 164 */
+	{ 3,	0,	sys_getresuid16,	"getresuid"	}, /* 165 */
 	{ 5,	0,	sys_vm86,		"vm86"		}, /* 166 */
 	{ 5,	0,	sys_query_module,	"query_module"	}, /* 167 */
 	{ 3,	TD,	sys_poll,		"poll"		}, /* 168 */
 	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 169 */
-	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 170 */
-	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 171 */
+	{ 3,	0,	sys_setresgid16,	"setresgid"	}, /* 170 */
+	{ 3,	0,	sys_getresgid16,	"getresgid"	}, /* 171 */
 	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
 	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 173 */
 	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
@@ -208,7 +208,7 @@
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 179 */
 	{ 5,	TD,	sys_pread,		"pread"		}, /* 180 */
 	{ 5,	TD,	sys_pwrite,		"pwrite"	}, /* 181 */
-	{ 3,	TF,	sys_chown,		"lchown"	}, /* 182 */
+	{ 3,	TF,	sys_chown16,		"lchown"	}, /* 182 */
 	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
 	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
 	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */

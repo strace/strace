@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Check uid16_t decoding.
+
+uid_t_size=16
+
+. "${srcdir=.}/uid.test"

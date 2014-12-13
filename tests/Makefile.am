@@ -14,6 +14,7 @@ check_PROGRAMS = \
 	stack-fcall \
 	statfs \
 	uid \
+	uid16 \
 	uid32 \
 	uio
 
@@ -37,6 +38,7 @@ TESTS = \
 	net-fd.test \
 	net-yy.test \
 	uid.test \
+	uid16.test \
 	uid32.test \
 	uio.test \
 	count.test \

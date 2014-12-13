@@ -353,3 +353,14 @@ int sys_execv();
 int sys_getmsg();
 int sys_putmsg();
 #endif
+
+#if NEED_UID16_PARSERS
+int sys_chown16();
+int sys_fchown16();
+int sys_getresuid16();
+int sys_getuid16();
+int sys_setfsuid16();
+int sys_setresuid16();
+int sys_setreuid16();
+int sys_setuid16();
+#endif

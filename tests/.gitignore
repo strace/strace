@@ -9,6 +9,7 @@ sigaction
 stack-fcall
 statfs
 uid
+uid16
 uid32
 uio
 *.log

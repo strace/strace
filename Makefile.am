@@ -94,6 +94,7 @@ strace_SOURCES =	\
 	time.c		\
 	truncate.c	\
 	uid.c		\
+	uid16.c		\
 	umask.c		\
 	umount.c	\
 	uname.c		\
