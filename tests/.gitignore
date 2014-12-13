@@ -1,3 +1,4 @@
+caps
 inet-accept-connect-send-recv
 mmsg
 net-accept-connect
@@ -7,6 +8,8 @@ set_ptracer_any
 sigaction
 stack-fcall
 statfs
+uid
+uid32
 uio
 *.log
 *.log.*

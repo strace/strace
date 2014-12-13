@@ -13,6 +13,8 @@ check_PROGRAMS = \
 	sigaction \
 	stack-fcall \
 	statfs \
+	uid \
+	uid32 \
 	uio
 
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -34,6 +36,8 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	net-yy.test \
+	uid.test \
+	uid32.test \
 	uio.test \
 	count.test \
 	detach-sleeping.test \
@@ -52,6 +56,7 @@ EXTRA_DIST = init.sh run.sh \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
 	     sigaction.awk \
+	     uid.awk \
 	     $(TESTS)
 
 CLEANFILES = $(TESTS:=.tmp)

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Check uid decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog awk
+
+s="${uid_syscall_suffix-}"
+w="${uid_t_size-}"
+uid="uid$s$w"
+./"$uid" || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ "some uid$s or uid${w}_t syscalls are not available"
+	else
+		fail_ "$uid failed"
+	fi
+}
+
+syscalls="getuid$s,setuid$s,getresuid$s,setreuid$s,setresuid$s,chown$s"
+args="-e trace=$syscalls"
+$STRACE -o "$LOG" $args ./"$uid"|| {
+	cat "$LOG"
+	fail_ "$STRACE $args ./$uid failed"
+}
+
+awk -f "$srcdir"/uid.awk -v suffix="$s" "$LOG" || {
+	cat "$LOG"
+	fail_ 'unexpected output'
+}
+
+exit 0

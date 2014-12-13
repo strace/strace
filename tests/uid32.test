@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Check uid32 decoding.
+
+uid_syscall_suffix=32
+
+. "${srcdir=.}/uid.test"

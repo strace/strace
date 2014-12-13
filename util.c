@@ -504,9 +504,12 @@ printfd(struct tcb *tcp, int fd)
 }
 
 void
-printuid(const char *text, unsigned long uid)
+printuid(const char *text, const unsigned int uid)
 {
-	tprintf(((long) uid == -1) ? "%s%ld" : "%s%lu", text, uid);
+	if ((unsigned int) -1 == uid)
+		tprintf("%s-1", text);
+	else
+		tprintf("%s%u", text, uid);
 }
 
 /*
