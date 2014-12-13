@@ -503,15 +503,6 @@ printfd(struct tcb *tcp, int fd)
 		tprintf("%d", fd);
 }
 
-void
-printuid(const char *text, const unsigned int uid)
-{
-	if ((unsigned int) -1 == uid)
-		tprintf("%s-1", text);
-	else
-		tprintf("%s%u", text, uid);
-}
-
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.

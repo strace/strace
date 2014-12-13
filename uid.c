@@ -75,3 +75,12 @@ sys_setresuid(struct tcb *tcp)
 	}
 	return 0;
 }
+
+void
+printuid(const char *text, const unsigned int uid)
+{
+	if ((unsigned int) -1 == uid)
+		tprintf("%s-1", text);
+	else
+		tprintf("%s%u", text, uid);
+}
