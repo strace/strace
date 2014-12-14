@@ -106,8 +106,8 @@
 	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 77 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 78 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */
-	{ 2,	0,	sys_getgroups,		"getgroups"	}, /* 80 */
-	{ 2,	0,	sys_setgroups,		"setgroups"	}, /* 81 */
+	{ 2,	0,	sys_getgroups16,	"getgroups"	}, /* 80 */
+	{ 2,	0,	sys_setgroups16,	"setgroups"	}, /* 81 */
 	{ 1,	TD,	sys_oldselect,		"oldselect"	}, /* 82 */
 	{ 2,	TF,	sys_symlink,		"symlink"	}, /* 83 */
 	{ 2,	TF,	sys_oldlstat,		"oldlstat"	}, /* 84 */
@@ -233,8 +233,8 @@
 	{ 0,	NF,	sys_geteuid,		"getegid32"	}, /* 202 */
 	{ 2,	0,	sys_setreuid,		"setreuid32"	}, /* 203 */
 	{ 2,	0,	sys_setregid,		"setregid32"	}, /* 204 */
-	{ 2,	0,	sys_getgroups32,	"getgroups32"	}, /* 205 */
-	{ 2,	0,	sys_setgroups32,	"setgroups32"	}, /* 206 */
+	{ 2,	0,	sys_getgroups,		"getgroups32"	}, /* 205 */
+	{ 2,	0,	sys_setgroups,		"setgroups32"	}, /* 206 */
 	{ 3,	TD,	sys_fchown,		"fchown32"	}, /* 207 */
 	{ 3,	0,	sys_setresuid,		"setresuid32"	}, /* 208 */
 	{ 3,	0,	sys_getresuid,		"getresuid32"	}, /* 209 */

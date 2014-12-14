@@ -41,7 +41,6 @@ strace_SOURCES =	\
 	get_robust_list.c \
 	getcpu.c	\
 	getcwd.c	\
-	groups.c	\
 	hostname.c	\
 	inotify.c	\
 	io.c		\

@@ -2,6 +2,7 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/syscall.h>
 
@@ -13,8 +14,11 @@ main(void)
  && defined(__NR_getresuid32) \
  && defined(__NR_setreuid32) \
  && defined(__NR_setresuid32) \
- && defined(__NR_chown32)
-	uid_t r, e, s;
+ && defined(__NR_chown32) \
+ && defined(__NR_getgroups32)
+	int r, e, s;
+	int size;
+	int *list = 0;
 
 	e = syscall(__NR_getuid32);
 	assert(syscall(__NR_setuid32, e) == 0);
@@ -22,6 +26,9 @@ main(void)
 	assert(syscall(__NR_setreuid32, -1, -1L) == 0);
 	assert(syscall(__NR_setresuid32, -1, e, -1L) == 0);
 	assert(syscall(__NR_chown32, ".", -1, -1L) == 0);
+	assert((size = syscall(__NR_getgroups32, 0, list)) >= 0);
+	assert(list = calloc(size + 1, sizeof(*list)));
+	assert(syscall(__NR_getgroups32, size, list) == size);
 	return 0;
 #else
 	return 77;

@@ -77,10 +77,10 @@
 	{ 0,	0,	sys_vhangup,	"vhangup" },		/* 76 */
 	{ 3,	TF,	sys_truncate64,	"truncate64" },		/* 77 */
 	{ 3,	TM,	sys_mincore,	"mincore" },		/* 78 */
-	{ 2,	0,	sys_getgroups,	"getgroups" },		/* 79 */
-	{ 2,	0,	sys_setgroups,	"setgroups" },		/* 80 */
+	{ 2,	0,	sys_getgroups16,"getgroups" },		/* 79 */
+	{ 2,	0,	sys_setgroups16,"setgroups" },		/* 80 */
 	{ 0,	0,	sys_getpgrp,	"getpgrp" },		/* 81 */
-	{ 2,	0,	sys_setgroups32,"setgroups32" },	/* 82 */
+	{ 2,	0,	sys_setgroups,	"setgroups32" },	/* 82 */
 	{ 3,	0,	sys_setitimer,	"setitimer" },		/* 83 */
 	{ 3,	TD,	sys_ftruncate64,"ftruncate64" },	/* 84 */
 	{ 2,	TF,	sys_swapon,	"swapon" },		/* 85 */
@@ -113,7 +113,7 @@
 	{ 2,	0,	sys_setregid,	"setregid32" },		/* 112 */
 	{ 3,	TN,	sys_recvmsg,	"recvmsg" },		/* 113 */
 	{ 3,	TN,	sys_sendmsg,	"sendmsg" },		/* 114 */
-	{ 2,	0,	sys_getgroups32,"getgroups32" },	/* 115 */
+	{ 2,	0,	sys_getgroups,	"getgroups32" },	/* 115 */
 	{ 2,	0,	sys_gettimeofday,"gettimeofday" },	/* 116 */
 	{ 2,	0,	sys_getrusage,	"getrusage" },		/* 117 */
 	{ 5,	TN,	sys_getsockopt,	"getsockopt" },		/* 118 */

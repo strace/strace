@@ -108,8 +108,8 @@
 	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 77 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 78 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */
-	{ 2,	0,	sys_getgroups,		"getgroups"	}, /* 80 */
-	{ 2,	0,	sys_setgroups,		"setgroups"	}, /* 81 */
+	{ 2,	0,	sys_getgroups16,	"getgroups"	}, /* 80 */
+	{ 2,	0,	sys_setgroups16,	"setgroups"	}, /* 81 */
 	{ MA,	0,	NULL,			NULL		}, /* 82 */
 	{ 2,	TF,	sys_symlink,		"symlink"	}, /* 83 */
 	{ MA,	0,	NULL,			NULL		}, /* 84 */

@@ -100,7 +100,6 @@ int sys_getdents();
 int sys_getdents64();
 int sys_getdtablesize();
 int sys_getgroups();
-int sys_getgroups32();
 int sys_gethostname();
 int sys_getitimer();
 int sys_getpmsg(); /* TODO: non-Linux, remove? */
@@ -237,7 +236,6 @@ int sys_set_mempolicy();
 int sys_set_thread_area();
 int sys_setfsuid();
 int sys_setgroups();
-int sys_setgroups32();
 int sys_sethostname();
 int sys_setitimer();
 int sys_setns();
@@ -357,9 +355,11 @@ int sys_putmsg();
 #if NEED_UID16_PARSERS
 int sys_chown16();
 int sys_fchown16();
+int sys_getgroups16();
 int sys_getresuid16();
 int sys_getuid16();
 int sys_setfsuid16();
+int sys_setgroups16();
 int sys_setresuid16();
 int sys_setreuid16();
 int sys_setuid16();
