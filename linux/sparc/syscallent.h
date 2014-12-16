@@ -106,11 +106,11 @@
 	{ 4,	TS,	sys_rt_sigtimedwait,"rt_sigtimedwait" },/* 105 */
 	{ 3,	TS,	sys_rt_sigqueueinfo,"rt_sigqueueinfo" },/* 106 */
 	{ 2,	TS,	sys_rt_sigsuspend,"rt_sigsuspend" },	/* 107 */
-	{ 3,	0,	sys_setresuid,	"setresuid" },		/* 108 */
-	{ 3,    0,	sys_getresuid,	"getresuid" },		/* 109 */
-	{ 3,	0,	sys_setresgid,	"setresgid" },		/* 110 */
-	{ 3,	0,	sys_getresgid,	"getresgid" },		/* 111 */
-	{ 2,	0,	sys_setresgid,	"setresgid32" },	/* 112 */
+	{ 3,	0,	sys_setresuid,	"setresuid32" },	/* 108 */
+	{ 3,    0,	sys_getresuid,	"getresuid32" },	/* 109 */
+	{ 3,	0,	sys_setresgid,	"setresgid32" },	/* 110 */
+	{ 3,	0,	sys_getresgid,	"getresgid32" },	/* 111 */
+	{ 2,	0,	sys_setregid,	"setregid32" },		/* 112 */
 	{ 3,	TN,	sys_recvmsg,	"recvmsg" },		/* 113 */
 	{ 3,	TN,	sys_sendmsg,	"sendmsg" },		/* 114 */
 	{ 2,	0,	sys_getgroups32,"getgroups32" },	/* 115 */
@@ -220,7 +220,7 @@
 	{ 1,	0,	sys_adjtimex,	"adjtimex" },		/* 219 */
 	{ 3,	TS,	sys_sigprocmask,"sigprocmask" },	/* 220 */
 	{ 2,	0,	sys_create_module,"create_module" },	/* 221 */
-	{ 2,	0,	sys_delete_module,"delete_module" },
+	{ 2,	0,	sys_delete_module,"delete_module" },	/* 222 */
 	{ 1,	0,	sys_get_kernel_syms,"get_kernel_syms"},	/* 223 */
 	{ 1,	0,	sys_getpgid,	"getpgid" },		/* 224 */
 	{ 0,	0,	sys_bdflush,	"bdflush" },		/* 225 */
