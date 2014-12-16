@@ -226,25 +226,25 @@
 	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"	}, /* 197 */
-	{ 3,	TF,	sys_chown,		"lchown"	}, /* 198 */
-	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 199 */
-	{ 0,	NF,	sys_getgid,		"getgid"	}, /* 200 */
-	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 201 */
-	{ 0,	NF,	sys_getegid,		"getegid"	}, /* 202 */
-	{ 2,	0,	sys_setreuid,		"setreuid"	}, /* 203 */
-	{ 2,	0,	sys_setregid,		"setregid"	}, /* 204 */
-	{ 2,	0,	sys_getgroups,		"getgroups"	}, /* 205 */
-	{ 2,	0,	sys_setgroups,		"setgroups"	}, /* 206 */
-	{ 3,	TD,	sys_fchown,		"fchown"	}, /* 207 */
-	{ 3,	0,	sys_setresuid,		"setresuid"	}, /* 208 */
-	{ 3,	0,	sys_getresuid,		"getresuid"	}, /* 209 */
-	{ 3,	0,	sys_setresgid,		"setresgid"	}, /* 210 */
-	{ 3,	0,	sys_getresgid,		"getresgid"	}, /* 211 */
-	{ 3,	TF,	sys_chown,		"chown"		}, /* 212 */
-	{ 1,	0,	sys_setuid,		"setuid"	}, /* 213 */
-	{ 1,	0,	sys_setgid,		"setgid"	}, /* 214 */
-	{ 1,	NF,	sys_setfsuid,		"setfsuid"	}, /* 215 */
-	{ 1,	NF,	sys_setfsgid,		"setfsgid"	}, /* 216 */
+	{ 3,	TF,	sys_chown,		"lchown32"	}, /* 198 */
+	{ 0,	NF,	sys_getuid,		"getuid32"	}, /* 199 */
+	{ 0,	NF,	sys_getgid,		"getgid32"	}, /* 200 */
+	{ 0,	NF,	sys_geteuid,		"geteuid32"	}, /* 201 */
+	{ 0,	NF,	sys_getegid,		"getegid32"	}, /* 202 */
+	{ 2,	0,	sys_setreuid,		"setreuid32"	}, /* 203 */
+	{ 2,	0,	sys_setregid,		"setregid32"	}, /* 204 */
+	{ 2,	0,	sys_getgroups,		"getgroups32"	}, /* 205 */
+	{ 2,	0,	sys_setgroups,		"setgroups32"	}, /* 206 */
+	{ 3,	TD,	sys_fchown,		"fchown32"	}, /* 207 */
+	{ 3,	0,	sys_setresuid,		"setresuid32"	}, /* 208 */
+	{ 3,	0,	sys_getresuid,		"getresuid32"	}, /* 209 */
+	{ 3,	0,	sys_setresgid,		"setresgid32"	}, /* 210 */
+	{ 3,	0,	sys_getresgid,		"getresgid32"	}, /* 211 */
+	{ 3,	TF,	sys_chown,		"chown32"	}, /* 212 */
+	{ 1,	0,	sys_setuid,		"setuid32"	}, /* 213 */
+	{ 1,	0,	sys_setgid,		"setgid32"	}, /* 214 */
+	{ 1,	NF,	sys_setfsuid,		"setfsuid32"	}, /* 215 */
+	{ 1,	NF,	sys_setfsgid,		"setfsgid32"	}, /* 216 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
 	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 218 */
 	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 219 */
