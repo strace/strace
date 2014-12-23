@@ -87,7 +87,7 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 
 		rc = umove(tcp, addr, &tv);
 		if (rc >= 0) {
-			if (special && tv.tv_sec == 0) {
+			if (special) {
 				if (tv.tv_usec == UTIME_NOW)
 					return stpcpy(buf, "UTIME_NOW");
 				if (tv.tv_usec == UTIME_OMIT)
@@ -101,7 +101,7 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 
 		rc = umove(tcp, addr, &tv);
 		if (rc >= 0) {
-			if (special && tv.tv_sec == 0) {
+			if (special) {
 				if (tv.tv_usec == UTIME_NOW)
 					return stpcpy(buf, "UTIME_NOW");
 				if (tv.tv_usec == UTIME_OMIT)
