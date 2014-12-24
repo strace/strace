@@ -5,9 +5,16 @@
 #include <linux/netlink.h>
 #include <linux/sock_diag.h>
 #include <linux/inet_diag.h>
+#include <linux/unix_diag.h>
+#include <linux/rtnetlink.h>
+
+#include <sys/un.h>
+#ifndef UNIX_PATH_MAX
+# define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
+#endif
 
 static bool
-send_query(const int fd, const int family, const int proto)
+inet_send_query(const int fd, const int family, const int proto)
 {
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
@@ -49,8 +56,9 @@ send_query(const int fd, const int family, const int proto)
 }
 
 static bool
-parse_response(const struct inet_diag_msg *diag_msg, const unsigned long inode)
+inet_parse_response(const void *data, int data_len, const unsigned long inode)
 {
+	const struct inet_diag_msg *diag_msg = data;
 	static const char zero_addr[sizeof(struct in6_addr)];
 	socklen_t addr_size, text_size;
 
@@ -95,7 +103,8 @@ parse_response(const struct inet_diag_msg *diag_msg, const unsigned long inode)
 }
 
 static bool
-receive_responses(const int fd, const unsigned long inode)
+receive_responses(const int fd, const unsigned long inode,
+		  bool (* parser) (const void*, int, const unsigned long))
 {
 	static char buf[8192];
 	struct sockaddr_nl nladdr = {
@@ -132,7 +141,7 @@ receive_responses(const int fd, const unsigned long inode)
 				case NLMSG_ERROR:
 					return false;
 			}
-			if (parse_response(NLMSG_DATA(h), inode))
+			if (parser(NLMSG_DATA(h), h->nlmsg_len, inode))
 				return true;
 		}
 	}
@@ -141,8 +150,119 @@ receive_responses(const int fd, const unsigned long inode)
 static bool
 inet_print(int fd, int family, int protocol, const unsigned long inode)
 {
-	return send_query(fd, family, protocol)
-		&& receive_responses(fd, inode);
+	return inet_send_query(fd, family, protocol)
+		&& receive_responses(fd, inode, inet_parse_response);
+}
+
+static bool
+unix_send_query(const int fd, const unsigned long inode)
+{
+	struct sockaddr_nl nladdr = {
+		.nl_family = AF_NETLINK
+	};
+	struct {
+		struct nlmsghdr nlh;
+		struct unix_diag_req udr;
+	} req = {
+		.nlh = {
+			.nlmsg_len = sizeof(req),
+			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
+		},
+		.udr = {
+			.sdiag_family = AF_UNIX,
+			.udiag_ino = inode,
+			.udiag_states = -1,
+			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER
+		}
+	};
+	struct iovec iov = {
+		.iov_base = &req,
+		.iov_len = sizeof(req)
+	};
+	struct msghdr msg = {
+		.msg_name = (void*)&nladdr,
+		.msg_namelen = sizeof(nladdr),
+		.msg_iov = &iov,
+		.msg_iovlen = 1
+	};
+
+	for (;;) {
+		if (sendmsg(fd, &msg, 0) < 0) {
+			if (errno == EINTR)
+				continue;
+			return false;
+		}
+		return true;
+	}
+}
+
+static bool
+unix_parse_response(const void *data, int data_len, const unsigned long inode)
+{
+	const struct unix_diag_msg *diag_msg = data;
+	struct rtattr *attr;
+	int rta_len = data_len - NLMSG_LENGTH(sizeof(*diag_msg));
+	uint32_t peer = 0;
+	size_t path_len = 0;
+	char path[UNIX_PATH_MAX + 1];
+
+	if (diag_msg->udiag_ino != inode)
+		return false;
+	if (diag_msg->udiag_family != AF_UNIX)
+		return false;
+
+	for (attr = (struct rtattr *) (diag_msg + 1);
+	     RTA_OK(attr, rta_len);
+	     attr = RTA_NEXT(attr, rta_len)) {
+		switch (attr->rta_type) {
+		case UNIX_DIAG_NAME:
+			if (!path_len) {
+				path_len = RTA_PAYLOAD(attr);
+				if (path_len > UNIX_PATH_MAX)
+					path_len = UNIX_PATH_MAX;
+				memcpy(path, RTA_DATA(attr), path_len);
+				path[path_len] = '\0';
+			}
+			break;
+		case UNIX_DIAG_PEER:
+			if (RTA_PAYLOAD(attr) >= 4)
+				peer = *(uint32_t *)RTA_DATA(attr);
+			break;
+		}
+	}
+
+	/*
+	 * print obtained information in the following format:
+	 * "UNIX:[" SELF_INODE [ "->" PEER_INODE ][ "," SOCKET_FILE ] "]"
+	 */
+	if (peer || path_len) {
+		tprintf("UNIX:[%lu", inode);
+		if (peer)
+			tprintf("->%u", peer);
+		if (path_len) {
+			if (path[0] == '\0') {
+				char *outstr = alloca(4 * path_len - 1);
+				string_quote(path + 1, outstr, -1, path_len);
+				tprintf(",@%s", outstr);
+			} else {
+				char *outstr = alloca(4 * path_len + 3);
+				string_quote(path, outstr, -1, path_len + 1);
+				tprintf(",%s", outstr);
+			}
+		}
+		tprints("]");
+		return true;
+	}
+	else
+		return false;
+}
+
+static bool
+unix_print(int fd, const unsigned long inode)
+{
+	return unix_send_query(fd, inode)
+		&& receive_responses(fd, inode, unix_parse_response);
 }
 
 /* Given an inode number of a socket, print out the details
@@ -153,7 +273,7 @@ print_sockaddr_by_inode(const unsigned long inode, const char *proto_name)
 	int fd;
 	bool r = false;
 
-	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_INET_DIAG);
+	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
 	if (fd < 0)
 		return false;
 
@@ -166,6 +286,8 @@ print_sockaddr_by_inode(const unsigned long inode, const char *proto_name)
 			r = inet_print(fd, AF_INET6, IPPROTO_TCP, inode);
 		else if (strcmp(proto_name, "UDPv6") == 0)
 			r = inet_print(fd, AF_INET6, IPPROTO_UDP, inode);
+		else if (strcmp(proto_name, "UNIX") == 0)
+			r = unix_print(fd, inode);
 	} else {
 		const int families[] = {AF_INET, AF_INET6};
 		const int protocols[] = {IPPROTO_TCP, IPPROTO_UDP};
