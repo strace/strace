@@ -37,6 +37,7 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	net-yy.test \
+	unix-yy.test \
 	uid.test \
 	uid16.test \
 	uid32.test \
@@ -59,6 +60,8 @@ EXTRA_DIST = init.sh run.sh \
 	     net-yy-connect.awk \
 	     sigaction.awk \
 	     uid.awk \
+	     unix-yy-accept.awk \
+	     unix-yy-connect.awk \
 	     $(TESTS)
 
 CLEANFILES = $(TESTS:=.tmp)
