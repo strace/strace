@@ -17,11 +17,11 @@ rm -f $LOG.* $LOG-*
 ./net-accept-connect ||
 	fail_ 'net-accept-connect failed'
 
-./netlink_inet_diag || {
+./netlink_unix_diag || {
 	if [ $? -eq 77 ]; then
-		framework_skip_ 'NETLINK_INET_DIAG is not available'
+		framework_skip_ 'NETLINK_SOCK_DIAG for unix domain sockets is not available'
 	else
-		fail_ 'netlink_inet_diag failed'
+		fail_ 'netlink_unix_diag failed'
 	fi
 }
 

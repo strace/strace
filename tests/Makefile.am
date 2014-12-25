@@ -8,6 +8,7 @@ check_PROGRAMS = \
 	mmsg \
 	net-accept-connect \
 	netlink_inet_diag \
+	netlink_unix_diag \
 	scm_rights \
 	set_ptracer_any \
 	sigaction \
