@@ -2,50 +2,40 @@ BEGIN {
   lines = 8
   fail = 0
 
-  inode_listen = "?"
-  inode_accepted = "?"
-  inode_peer = "?"
-
   r_i = "[1-9][0-9]*"
-  r_bind = "^bind\\(0<UNIX:\\[(" r_i ")\\]>, {sa_family=AF_LOCAL, sun_path=\"local-stream\"}, " r_i "\\) += 0$"
-  r_listen = "^/$"
-  r_getsockname = "^/$"
-  r_accept = "^/$"
-  r_close0 = "^/$"
-  r_close1 = "^/$"
+  r_bind = "^bind\\(0<UNIX:\\[(" r_i ")\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"local-stream\"}, 15\\) += 0$"
 }
 
-NR == 1 && /^socket\(PF_LOCAL, SOCK_STREAM, 0\) += 0$/ {next}
+NR == 1 && /^socket\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\) += 0$/ {next}
 
 NR == 2 {
   if (match($0, r_bind, a)) {
     inode_listen = a[1]
     r_listen = "^listen\\(0<UNIX:\\[" inode_listen ",\"local-stream\"\\]>, 5\\) += 0$"
-    r_getsockname = "^getsockname\\(0<UNIX:\\[" inode_listen ",\"local-stream\"\\]>, {sa_family=AF_LOCAL, sun_path=\"local-stream\"}, \\[" r_i "\\]\\) += 0$"
-    r_accept = "^accept\\(0<UNIX:\\[" inode_listen ",\"local-stream\"\\]>, {sa_family=AF_LOCAL, NULL}, \\[" r_i "\\]\\) += 1<UNIX:\\[(" r_i ")->(" r_i "),\"local-stream\"\\]>"
+    r_getsockname = "^getsockname\\(0<UNIX:\\[" inode_listen ",\"local-stream\"\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"local-stream\"}, \\[15\\]\\) += 0$"
+    r_accept = "^accept\\(0<UNIX:\\[" inode_listen ",\"local-stream\"\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), NULL}, \\[2\\]\\) += 1<UNIX:\\[(" r_i ")->(" r_i "),\"local-stream\"\\]>"
     next
   }
 }
 
-NR == 3 {if (match($0, r_listen)) next}
+NR == 3 {if (r_listen != "" && match($0, r_listen)) next}
 
-NR == 4 {if (match($0, r_getsockname)) next}
+NR == 4 {if (r_getsockname != "" && match($0, r_getsockname)) next}
 
 NR == 5 {
-  if (match($0, r_accept, a)) {
-    inode_accepted = a[1]
-    inode_peer = a[2]
-    print inode_accepted
-    r_close0 = "^close\\(0<UNIX:\\[" inode_listen ",\"local-stream\"\\]>\\) += 0$"
-    r_close1 = "^close\\(1<UNIX:\\[" inode_accepted ",\"local-stream\"\\]>\\) += 0$"
+  if (r_accept != "" && match($0, r_accept, a)) {
+    inode_accepted = a[2]
+    inode_peer = a[3]
+    r_close_listen = "^close\\(0<UNIX:\\[" inode_listen ",\"local-stream\"\\]>\\) += 0$"
+    r_close_accepted = "^close\\(1<UNIX:\\[" inode_accepted ",\"local-stream\"\\]>\\) += 0$"
     next
   }
 }
 
-NR == 6 {if (match($0, r_close0)) next}
-NR == 7 {if (match($0, r_close1)) next}
+NR == 6 {if (r_close_listen != "" && match($0, r_close_listen)) next}
+NR == 7 {if (r_close_accepted != "" && match($0, r_close_accepted)) next}
 
-NR == lines && /^\+\+\+ exited with 0 \+\+\+$/ {next}
+NR == lines && $0 == "+++ exited with 0 +++" {next}
 
 {
   print "Line " NR " does not match: " $0

@@ -2,26 +2,30 @@ BEGIN {
   lines = 5
   fail = 0
 
-  inode = "?"
-
   r_i = "[1-9][0-9]*"
-  r_close0 = "^close\\(0<UNIX:[" r_i ",\"local-stream\"]>\\) += 0$"
-  r_connect = "^connect\\(1<UNIX:\\[(" r_i ")\\]>, {sa_family=AF_LOCAL, sun_path=\"local-stream\"}, " r_i "\\) += 0$"
-  r_close1 = "^/$"
+  r_close_listen = "^close\\(0<UNIX:[" r_i ",\"local-stream\"]>\\) += 0$"
+  r_connect = "^connect\\(1<UNIX:\\[(" r_i ")\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"local-stream\"}, 15\\) += 0$"
 }
 
-NR == 1 && /^socket\(PF_LOCAL, SOCK_STREAM, 0\) += 1$/ {next}
-NR == 2 {if (match($0, r_close0)) next}
+NR == 1 && /^socket\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\) += 1$/ {next}
+
+NR == 2 {if (match($0, r_close_listen)) next}
+
 NR == 3 {
   if (match($0, r_connect, a)) {
     inode = a[1]
-    r_close1 = "^close\\(1<UNIX:\\[(" r_i ")->" r_i "\\]>\\) += 0$"
+    r_close_connected = "^close\\(1<UNIX:\\[(" r_i ")->" r_i "\\]>\\) += 0$"
     next
   }
 }
-NR == 4 {if (match($0, r_close1, a) && a[1] == inode) {next}}
 
-NR == lines && /^\+\+\+ exited with 0 \+\+\+$/ {next}
+NR == 4 {
+  if (inode != "" && r_close_connected != "" && match($0, r_close_connected, a) && a[1] == inode) {
+    next
+  }
+}
+
+NR == lines && $0 == "+++ exited with 0 +++" {next}
 
 {
   print "Line " NR " does not match: " $0
