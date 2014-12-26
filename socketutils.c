@@ -56,7 +56,8 @@ inet_send_query(const int fd, const int family, const int proto)
 }
 
 static bool
-inet_parse_response(const void *data, int data_len, const unsigned long inode)
+inet_parse_response(const char *proto_name, const void *data, int data_len,
+		    const unsigned long inode)
 {
 	const struct inet_diag_msg *diag_msg = data;
 	static const char zero_addr[sizeof(struct in6_addr)];
@@ -92,11 +93,13 @@ inet_parse_response(const void *data, int data_len, const unsigned long inode)
 			       dst_buf, text_size))
 			return false;
 
-		tprintf("%s:%u->%s:%u",
+		tprintf("%s:[%s:%u->%s:%u]",
+			proto_name,
 			src_buf, ntohs(diag_msg->id.idiag_sport),
 			dst_buf, ntohs(diag_msg->id.idiag_dport));
 	} else {
-		tprintf("%s:%u", src_buf, ntohs(diag_msg->id.idiag_sport));
+		tprintf("%s:[%s:%u]", proto_name, src_buf,
+			ntohs(diag_msg->id.idiag_sport));
 	}
 
 	return true;
@@ -104,7 +107,8 @@ inet_parse_response(const void *data, int data_len, const unsigned long inode)
 
 static bool
 receive_responses(const int fd, const unsigned long inode,
-		  bool (* parser) (const void*, int, const unsigned long))
+		  const char *proto_name,
+		  bool (* parser) (const char *, const void *, int, const unsigned long))
 {
 	static char buf[8192];
 	struct sockaddr_nl nladdr = {
@@ -141,17 +145,18 @@ receive_responses(const int fd, const unsigned long inode,
 				case NLMSG_ERROR:
 					return false;
 			}
-			if (parser(NLMSG_DATA(h), h->nlmsg_len, inode))
+			if (parser(proto_name, NLMSG_DATA(h), h->nlmsg_len, inode))
 				return true;
 		}
 	}
 }
 
 static bool
-inet_print(int fd, int family, int protocol, const unsigned long inode)
+inet_print(const int fd, const int family, const int protocol,
+	   const unsigned long inode, const char *proto_name)
 {
 	return inet_send_query(fd, family, protocol)
-		&& receive_responses(fd, inode, inet_parse_response);
+		&& receive_responses(fd, inode, proto_name, inet_parse_response);
 }
 
 static bool
@@ -198,7 +203,8 @@ unix_send_query(const int fd, const unsigned long inode)
 }
 
 static bool
-unix_parse_response(const void *data, int data_len, const unsigned long inode)
+unix_parse_response(const char *proto_name, const void *data, int data_len,
+		    const unsigned long inode)
 {
 	const struct unix_diag_msg *diag_msg = data;
 	struct rtattr *attr;
@@ -237,7 +243,7 @@ unix_parse_response(const void *data, int data_len, const unsigned long inode)
 	 * "UNIX:[" SELF_INODE [ "->" PEER_INODE ][ "," SOCKET_FILE ] "]"
 	 */
 	if (peer || path_len) {
-		tprintf("UNIX:[%lu", inode);
+		tprintf("%s:[%lu", proto_name, inode);
 		if (peer)
 			tprintf("->%u", peer);
 		if (path_len) {
@@ -262,7 +268,7 @@ static bool
 unix_print(int fd, const unsigned long inode)
 {
 	return unix_send_query(fd, inode)
-		&& receive_responses(fd, inode, unix_parse_response);
+		&& receive_responses(fd, inode, "UNIX", unix_parse_response);
 }
 
 /* Given an inode number of a socket, print out the details
@@ -279,30 +285,36 @@ print_sockaddr_by_inode(const unsigned long inode, const char *proto_name)
 
 	if (proto_name) {
 		if (strcmp(proto_name, "TCP") == 0)
-			r = inet_print(fd, AF_INET, IPPROTO_TCP, inode);
+			r = inet_print(fd, AF_INET, IPPROTO_TCP, inode, "TCP");
 		else if (strcmp(proto_name, "UDP") == 0)
-			r = inet_print(fd, AF_INET, IPPROTO_UDP, inode);
+			r = inet_print(fd, AF_INET, IPPROTO_UDP, inode, "UDP");
 		else if (strcmp(proto_name, "TCPv6") == 0)
-			r = inet_print(fd, AF_INET6, IPPROTO_TCP, inode);
+			r = inet_print(fd, AF_INET6, IPPROTO_TCP, inode, "TCPv6");
 		else if (strcmp(proto_name, "UDPv6") == 0)
-			r = inet_print(fd, AF_INET6, IPPROTO_UDP, inode);
+			r = inet_print(fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
 		else if (strcmp(proto_name, "UNIX") == 0)
 			r = unix_print(fd, inode);
 	} else {
-		const int families[] = {AF_INET, AF_INET6};
-		const int protocols[] = {IPPROTO_TCP, IPPROTO_UDP};
-		const size_t flen = ARRAY_SIZE(families);
-		const size_t plen = ARRAY_SIZE(protocols);
-		size_t fi, pi;
+		const struct {
+			const int family;
+			const int protocol;
+			const char *name;
+		} protocols[] = {
+			{ AF_INET, IPPROTO_TCP, "TCP" },
+			{ AF_INET, IPPROTO_UDP, "UDP" },
+			{ AF_INET6, IPPROTO_TCP, "TCPv6" },
+			{ AF_INET6, IPPROTO_UDP, "UDPv6" }
+		};
+		size_t i;
 
-		for (fi = 0; fi < flen; ++fi) {
-			for (pi = 0; pi < plen; ++pi) {
-				if ((r = inet_print(fd, families[fi], protocols[pi], inode)))
-					goto out;
-			}
+		for (i = 0; i < ARRAY_SIZE(protocols); ++i) {
+			if ((r = inet_print(fd, protocols[i].family,
+					    protocols[i].protocol, inode,
+					    protocols[i].name)))
+				break;
 		}
 	}
-out:
+
 	close(fd);
 	return r;
 }
