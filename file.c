@@ -398,6 +398,14 @@ struct stat64 {
 #endif /* AARCH64 || X86_64 || X32 */
 
 #ifdef HAVE_STAT64
+
+# define DO_PRINTSTAT do_printstat64
+# define STRUCT_STAT struct stat64
+# undef HAVE_STRUCT_STAT_ST_FLAGS
+# undef HAVE_STRUCT_STAT_ST_FSTYPE
+# undef HAVE_STRUCT_STAT_ST_GEN
+# include "printstat.h"
+
 static void
 printstat64(struct tcb *tcp, long addr)
 {
@@ -447,60 +455,7 @@ printstat64(struct tcb *tcp, long addr)
 		return;
 	}
 
-	if (!abbrev(tcp)) {
-		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%llu, st_mode=%s, ",
-			(unsigned long) major(statbuf.st_dev),
-			(unsigned long) minor(statbuf.st_dev),
-			(unsigned long long) statbuf.st_ino,
-			sprintmode(statbuf.st_mode));
-		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
-			(unsigned long) statbuf.st_nlink,
-			(unsigned long) statbuf.st_uid,
-			(unsigned long) statbuf.st_gid);
-#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
-		tprintf("st_blksize=%lu, ",
-			(unsigned long) statbuf.st_blksize);
-#endif /* HAVE_STRUCT_STAT_ST_BLKSIZE */
-#ifdef HAVE_STRUCT_STAT_ST_BLOCKS
-		tprintf("st_blocks=%lu, ", (unsigned long) statbuf.st_blocks);
-#endif /* HAVE_STRUCT_STAT_ST_BLOCKS */
-	}
-	else
-		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
-	switch (statbuf.st_mode & S_IFMT) {
-	case S_IFCHR: case S_IFBLK:
-#ifdef HAVE_STRUCT_STAT_ST_RDEV
-		tprintf("st_rdev=makedev(%lu, %lu), ",
-			(unsigned long) major(statbuf.st_rdev),
-			(unsigned long) minor(statbuf.st_rdev));
-#else /* !HAVE_STRUCT_STAT_ST_RDEV */
-		tprintf("st_size=makedev(%lu, %lu), ",
-			(unsigned long) major(statbuf.st_size),
-			(unsigned long) minor(statbuf.st_size));
-#endif /* !HAVE_STRUCT_STAT_ST_RDEV */
-		break;
-	default:
-		tprintf("st_size=%llu, ", (unsigned long long) statbuf.st_size);
-		break;
-	}
-	if (!abbrev(tcp)) {
-		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
-		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
-#if HAVE_STRUCT_STAT_ST_FLAGS
-		tprintf(", st_flags=%u", statbuf->st_flags);
-#endif
-#if HAVE_STRUCT_STAT_ST_FSTYPE
-		tprintf(", st_fstype=%.*s",
-			(int) sizeof statbuf.st_fstype, statbuf.st_fstype);
-#endif
-#if HAVE_STRUCT_STAT_ST_GEN
-		tprintf(", st_gen=%u", statbuf.st_gen);
-#endif
-		tprints("}");
-	}
-	else
-		tprints("...}");
+	do_printstat64(tcp, &statbuf);
 }
 #endif /* HAVE_STAT64 */
 
