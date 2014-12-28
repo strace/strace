@@ -71,67 +71,7 @@ struct stat_sparc64 {
 # define stat kernel_stat
 # include <asm/stat.h>
 # undef stat
-#elif defined(X32)
-struct stat {
-	unsigned long long	st_dev;
-	unsigned long long	st_ino;
-	unsigned long long	st_nlink;
-
-	unsigned int		st_mode;
-	unsigned int		st_uid;
-	unsigned int		st_gid;
-	unsigned int		__pad0;
-	unsigned long long	st_rdev;
-	long long		st_size;
-	long long		st_blksize;
-	long long		st_blocks;
-
-	unsigned long long	st_atime;
-	unsigned long long	st_atime_nsec;
-	unsigned long long	st_mtime;
-	unsigned long long	st_mtime_nsec;
-	unsigned long long	st_ctime;
-	unsigned long long	st_ctime_nsec;
-	long long		__unused[3];
-};
-
-struct stat64 {
-	unsigned long long	st_dev;
-	unsigned char		__pad0[4];
-	unsigned long		__st_ino;
-	unsigned int		st_mode;
-	unsigned int		st_nlink;
-	unsigned long		st_uid;
-	unsigned long		st_gid;
-	unsigned long long	st_rdev;
-	unsigned char		__pad3[4];
-	long long		st_size;
-	unsigned long		st_blksize;
-	unsigned long long	st_blocks;
-	unsigned long		st_atime;
-	unsigned long		st_atime_nsec;
-	unsigned long		st_mtime;
-	unsigned int		st_mtime_nsec;
-	unsigned long		st_ctime;
-	unsigned long		st_ctime_nsec;
-	unsigned long long	st_ino;
-} __attribute__((packed));
-# define HAVE_STAT64	1
-
-struct __old_kernel_stat {
-	unsigned short st_dev;
-	unsigned short st_ino;
-	unsigned short st_mode;
-	unsigned short st_nlink;
-	unsigned short st_uid;
-	unsigned short st_gid;
-	unsigned short st_rdev;
-	unsigned int   st_size;
-	unsigned int   st_atime;
-	unsigned int   st_mtime;
-	unsigned int   st_ctime;
-};
-#else
+#else /* !SPARC && !SPARC64 */
 # undef dev_t
 # undef ino_t
 # undef mode_t
@@ -420,16 +360,15 @@ printstat(struct tcb *tcp, long addr)
 # define printstat printstat64
 #endif
 
-#if !defined HAVE_STAT64 && (defined AARCH64 || defined X86_64)
+#if !defined HAVE_STAT64 && (defined AARCH64 || defined X86_64 || defined X32)
 /*
- * Linux x86_64 has unified `struct stat' but its i386 biarch needs
- * `struct stat64'.  Its <asm-i386/stat.h> definition expects 32-bit `long'.
- * <linux/include/asm-x86_64/ia32.h> is not in the public includes set.
+ * Linux x86_64 and x32 have unified `struct stat' but their i386 personality
+ * needs `struct stat64'.
+ * linux/arch/x86/include/uapi/asm/stat.h defines `struct stat64' only for i386.
  * __GNUC__ is needed for the required __attribute__ below.
  *
  * Similarly, aarch64 has a unified `struct stat' but its arm personality
- * needs `struct stat64' (which also expects a 32-bit `long' but which
- * shouldn't be packed).
+ * needs `struct stat64' (unlike x86, it shouldn't be packed).
  */
 struct stat64 {
 	unsigned long long	st_dev;
@@ -452,7 +391,7 @@ struct stat64 {
 	unsigned int	st_ctime_nsec;
 	unsigned long long	st_ino;
 }
-# if defined X86_64
+# if defined X86_64 || defined X32
    __attribute__((packed))
 #  define STAT64_SIZE	96
 #else
@@ -460,7 +399,7 @@ struct stat64 {
 # endif
 ;
 # define HAVE_STAT64	1
-#endif
+#endif /* AARCH64 || X86_64 || X32 */
 
 #ifdef HAVE_STAT64
 static void
