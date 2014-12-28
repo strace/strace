@@ -459,57 +459,6 @@ printstat64(struct tcb *tcp, long addr)
 }
 #endif /* HAVE_STAT64 */
 
-#if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
-static void
-convertoldstat(const struct __old_kernel_stat *oldbuf, struct stat *newbuf)
-{
-	newbuf->st_dev = oldbuf->st_dev;
-	newbuf->st_ino = oldbuf->st_ino;
-	newbuf->st_mode = oldbuf->st_mode;
-	newbuf->st_nlink = oldbuf->st_nlink;
-	newbuf->st_uid = oldbuf->st_uid;
-	newbuf->st_gid = oldbuf->st_gid;
-	newbuf->st_rdev = oldbuf->st_rdev;
-	newbuf->st_size = oldbuf->st_size;
-	newbuf->st_atime = oldbuf->st_atime;
-	newbuf->st_mtime = oldbuf->st_mtime;
-	newbuf->st_ctime = oldbuf->st_ctime;
-	newbuf->st_blksize = 0; /* not supported in old_stat */
-	newbuf->st_blocks = 0; /* not supported in old_stat */
-}
-
-static void
-printoldstat(struct tcb *tcp, long addr)
-{
-	struct __old_kernel_stat statbuf;
-	struct stat newstatbuf;
-
-	if (!addr) {
-		tprints("NULL");
-		return;
-	}
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
-		return;
-	}
-
-# if defined(SPARC) || defined(SPARC64)
-	if (current_personality == 1) {
-		printstatsol(tcp, addr);
-		return;
-	}
-# endif
-
-	if (umove(tcp, addr, &statbuf) < 0) {
-		tprints("{...}");
-		return;
-	}
-
-	convertoldstat(&statbuf, &newstatbuf);
-	do_printstat(tcp, &newstatbuf);
-}
-#endif
-
 int
 sys_stat(struct tcb *tcp)
 {
@@ -562,20 +511,6 @@ sys_newfstatat(struct tcb *tcp)
 	return 0;
 }
 
-#if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
-int
-sys_oldstat(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printoldstat(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-#endif
-
 int
 sys_fstat(struct tcb *tcp)
 {
@@ -605,6 +540,67 @@ sys_fstat64(struct tcb *tcp)
 }
 
 #if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
+
+static void
+convertoldstat(const struct __old_kernel_stat *oldbuf, struct stat *newbuf)
+{
+	memset(newbuf, 0, sizeof(*newbuf));
+	newbuf->st_dev = oldbuf->st_dev;
+	newbuf->st_ino = oldbuf->st_ino;
+	newbuf->st_mode = oldbuf->st_mode;
+	newbuf->st_nlink = oldbuf->st_nlink;
+	newbuf->st_uid = oldbuf->st_uid;
+	newbuf->st_gid = oldbuf->st_gid;
+	newbuf->st_rdev = oldbuf->st_rdev;
+	newbuf->st_size = oldbuf->st_size;
+	newbuf->st_atime = oldbuf->st_atime;
+	newbuf->st_mtime = oldbuf->st_mtime;
+	newbuf->st_ctime = oldbuf->st_ctime;
+}
+
+static void
+printoldstat(struct tcb *tcp, long addr)
+{
+	struct __old_kernel_stat statbuf;
+	struct stat newstatbuf;
+
+	if (!addr) {
+		tprints("NULL");
+		return;
+	}
+	if (syserror(tcp) || !verbose(tcp)) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+# if defined(SPARC) || defined(SPARC64)
+	if (current_personality == 1) {
+		printstatsol(tcp, addr);
+		return;
+	}
+# endif
+
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprints("{...}");
+		return;
+	}
+
+	convertoldstat(&statbuf, &newstatbuf);
+	do_printstat(tcp, &newstatbuf);
+}
+
+int
+sys_oldstat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprints(", ");
+	} else {
+		printoldstat(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
 int
 sys_oldfstat(struct tcb *tcp)
 {
@@ -616,7 +612,8 @@ sys_oldfstat(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif
+
+#endif /* HAVE_STRUCT___OLD_KERNEL_STAT */
 
 #if defined(SPARC) || defined(SPARC64)
 
