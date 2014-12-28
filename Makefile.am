@@ -64,6 +64,7 @@ strace_SOURCES =	\
 	personality.c	\
 	prctl.c		\
 	printmode.c	\
+	printstat.h	\
 	process.c	\
 	process_vm.c	\
 	ptp.c		\
