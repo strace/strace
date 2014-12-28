@@ -372,8 +372,6 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 }
 #endif /* POWERPC64 */
 
-#include "xlat/fileflags.h"
-
 static void
 realprintstat(struct tcb *tcp, struct stat *statbuf)
 {
@@ -417,8 +415,7 @@ realprintstat(struct tcb *tcp, struct stat *statbuf)
 		tprintf("st_mtime=%s, ", sprinttime(statbuf->st_mtime));
 		tprintf("st_ctime=%s", sprinttime(statbuf->st_ctime));
 #if HAVE_STRUCT_STAT_ST_FLAGS
-		tprints(", st_flags=");
-		printflags(fileflags, statbuf->st_flags, "UF_???");
+		tprintf(", st_flags=%u", statbuf->st_flags);
 #endif
 #if HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
@@ -616,8 +613,7 @@ printstat64(struct tcb *tcp, long addr)
 		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
 		tprintf("st_ctime=%s", sprinttime(statbuf.st_ctime));
 #if HAVE_STRUCT_STAT_ST_FLAGS
-		tprints(", st_flags=");
-		printflags(fileflags, statbuf.st_flags, "UF_???");
+		tprintf(", st_flags=%u", statbuf->st_flags);
 #endif
 #if HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
