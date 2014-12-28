@@ -373,23 +373,24 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 #endif /* POWERPC64 */
 
 static void
-realprintstat(struct tcb *tcp, struct stat *statbuf)
+do_printstat(struct tcb *tcp, struct stat *statbuf)
 {
 	if (!abbrev(tcp)) {
-		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%lu, st_mode=%s, ",
-			(unsigned long) major(statbuf->st_dev),
-			(unsigned long) minor(statbuf->st_dev),
-			(unsigned long) statbuf->st_ino,
+		tprintf("{st_dev=makedev(%u, %u), st_ino=%llu, st_mode=%s, ",
+			(unsigned int) major(statbuf->st_dev),
+			(unsigned int) minor(statbuf->st_dev),
+			(unsigned long long) statbuf->st_ino,
 			sprintmode(statbuf->st_mode));
-		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
-			(unsigned long) statbuf->st_nlink,
-			(unsigned long) statbuf->st_uid,
-			(unsigned long) statbuf->st_gid);
+		tprintf("st_nlink=%u, st_uid=%u, st_gid=%u, ",
+			(unsigned int) statbuf->st_nlink,
+			(unsigned int) statbuf->st_uid,
+			(unsigned int) statbuf->st_gid);
 #ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
-		tprintf("st_blksize=%lu, ", (unsigned long) statbuf->st_blksize);
+		tprintf("st_blksize=%u, ", (unsigned int) statbuf->st_blksize);
 #endif
 #ifdef HAVE_STRUCT_STAT_ST_BLOCKS
-		tprintf("st_blocks=%lu, ", (unsigned long) statbuf->st_blocks);
+		tprintf("st_blocks=%llu, ",
+			(unsigned long long) statbuf->st_blocks);
 #endif
 	}
 	else
@@ -397,17 +398,18 @@ realprintstat(struct tcb *tcp, struct stat *statbuf)
 	switch (statbuf->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
 #ifdef HAVE_STRUCT_STAT_ST_RDEV
-		tprintf("st_rdev=makedev(%lu, %lu), ",
-			(unsigned long) major(statbuf->st_rdev),
-			(unsigned long) minor(statbuf->st_rdev));
+		tprintf("st_rdev=makedev(%u, %u), ",
+			(unsigned int) major(statbuf->st_rdev),
+			(unsigned int) minor(statbuf->st_rdev));
 #else /* !HAVE_STRUCT_STAT_ST_RDEV */
-		tprintf("st_size=makedev(%lu, %lu), ",
-			(unsigned long) major(statbuf->st_size),
-			(unsigned long) minor(statbuf->st_size));
+		tprintf("st_size=makedev(%u, %u), ",
+			(unsigned int) major(statbuf->st_size),
+			(unsigned int) minor(statbuf->st_size));
 #endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 		break;
 	default:
-		tprintf("st_size=%lu, ", (unsigned long) statbuf->st_size);
+		tprintf("st_size=%llu, ",
+			(unsigned long long) statbuf->st_size);
 		break;
 	}
 	if (!abbrev(tcp)) {
@@ -415,14 +417,14 @@ realprintstat(struct tcb *tcp, struct stat *statbuf)
 		tprintf("st_mtime=%s, ", sprinttime(statbuf->st_mtime));
 		tprintf("st_ctime=%s", sprinttime(statbuf->st_ctime));
 #if HAVE_STRUCT_STAT_ST_FLAGS
-		tprintf(", st_flags=%u", statbuf->st_flags);
+		tprintf(", st_flags=%u", (unsigned int) statbuf->st_flags);
 #endif
 #if HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
 			(int) sizeof statbuf->st_fstype, statbuf->st_fstype);
 #endif
 #if HAVE_STRUCT_STAT_ST_GEN
-		tprintf(", st_gen=%u", statbuf->st_gen);
+		tprintf(", st_gen=%u", (unsigned int) statbuf->st_gen);
 #endif
 		tprints("}");
 	}
@@ -470,7 +472,7 @@ printstat(struct tcb *tcp, long addr)
 		return;
 	}
 
-	realprintstat(tcp, &statbuf);
+	do_printstat(tcp, &statbuf);
 }
 #else /* X32 */
 # define printstat printstat64
@@ -676,7 +678,7 @@ printoldstat(struct tcb *tcp, long addr)
 	}
 
 	convertoldstat(&statbuf, &newstatbuf);
-	realprintstat(tcp, &newstatbuf);
+	do_printstat(tcp, &newstatbuf);
 }
 #endif
 
