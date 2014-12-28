@@ -179,8 +179,6 @@ struct __old_kernel_stat {
 #undef st_mtime
 #undef st_ctime
 
-#include <fcntl.h>
-
 #ifdef MAJOR_IN_SYSMACROS
 # include <sys/sysmacros.h>
 #endif
