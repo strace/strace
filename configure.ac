@@ -184,13 +184,11 @@ AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
 AC_HEADER_STAT
 AC_CHECK_MEMBERS(m4_normalize([
-	struct stat.st_aclcnt,
 	struct stat.st_blksize,
 	struct stat.st_blocks,
 	struct stat.st_flags,
 	struct stat.st_fstype,
 	struct stat.st_gen,
-	struct stat.st_level,
 	struct stat.st_rdev
 ]))
 AC_STAT64

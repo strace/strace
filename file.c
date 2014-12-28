@@ -420,12 +420,6 @@ realprintstat(struct tcb *tcp, struct stat *statbuf)
 		tprints(", st_flags=");
 		printflags(fileflags, statbuf->st_flags, "UF_???");
 #endif
-#if HAVE_STRUCT_STAT_ST_ACLCNT
-		tprintf(", st_aclcnt=%d", statbuf->st_aclcnt);
-#endif
-#if HAVE_STRUCT_STAT_ST_LEVEL
-		tprintf(", st_level=%ld", statbuf->st_level);
-#endif
 #if HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
 			(int) sizeof statbuf->st_fstype, statbuf->st_fstype);
@@ -624,12 +618,6 @@ printstat64(struct tcb *tcp, long addr)
 #if HAVE_STRUCT_STAT_ST_FLAGS
 		tprints(", st_flags=");
 		printflags(fileflags, statbuf.st_flags, "UF_???");
-#endif
-#if HAVE_STRUCT_STAT_ST_ACLCNT
-		tprintf(", st_aclcnt=%d", statbuf.st_aclcnt);
-#endif
-#if HAVE_STRUCT_STAT_ST_LEVEL
-		tprintf(", st_level=%ld", statbuf.st_level);
 #endif
 #if HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
