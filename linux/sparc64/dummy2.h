@@ -234,7 +234,7 @@
 /* These are handled according to current_personality */
 #define solaris_xstat sys_xstat
 #define solaris_fxstat sys_fxstat
-#define solaris_lxstat sys_lxstat
+#define solaris_lxstat sys_xstat
 #define solaris_xmknod sys_xmknod
 #define solaris_stat sys_stat
 #define solaris_fstat sys_fstat

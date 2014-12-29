@@ -905,22 +905,4 @@ sys_fxstat(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_lxstat(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
-		printpath(tcp, tcp->u_arg[1]);
-		tprints(", ");
-	} else {
-# ifdef _STAT64_VER
-		if (tcp->u_arg[0] == _STAT64_VER)
-			printstat64(tcp, tcp->u_arg[2]);
-		else
-# endif
-		printstat(tcp, tcp->u_arg[2]);
-	}
-	return 0;
-}
-
 #endif /* SPARC || SPARC64 */
