@@ -887,9 +887,11 @@ sys_xstat(struct tcb *tcp)
 int
 sys_fxstat(struct tcb *tcp)
 {
-	if (entering(tcp))
-		tprintf("%ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1]);
-	else {
+	if (entering(tcp)) {
+		tprintf("%ld, ", tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[1]);
+		tprints(", ");
+	} else {
 		printstat(tcp, tcp->u_arg[2]);
 	}
 	return 0;
