@@ -30,85 +30,43 @@
 
 #include "defs.h"
 
-#if defined(SPARC) || defined(SPARC64)
-struct stat {
-	unsigned short	st_dev;
-	unsigned int	st_ino;
-	unsigned short	st_mode;
-	short		st_nlink;
-	unsigned short	st_uid;
-	unsigned short	st_gid;
-	unsigned short	st_rdev;
-	unsigned int	st_size;
-	int		st_atime;
-	unsigned int	__unused1;
-	int		st_mtime;
-	unsigned int	__unused2;
-	int		st_ctime;
-	unsigned int	__unused3;
-	int		st_blksize;
-	int		st_blocks;
-	unsigned int	__unused4[2];
-};
-# if defined(SPARC64)
-struct stat_sparc64 {
-	unsigned int	st_dev;
-	unsigned long	st_ino;
-	unsigned int	st_mode;
-	unsigned int	st_nlink;
-	unsigned int	st_uid;
-	unsigned int	st_gid;
-	unsigned int	st_rdev;
-	long		st_size;
-	long		st_atime;
-	long		st_mtime;
-	long		st_ctime;
-	long		st_blksize;
-	long		st_blocks;
-	unsigned long	__unused4[2];
-};
-# endif /* SPARC64 */
-# define stat kernel_stat
-# include <asm/stat.h>
-# undef stat
-#else /* !SPARC && !SPARC64 */
-# undef dev_t
-# undef ino_t
-# undef mode_t
-# undef nlink_t
-# undef uid_t
-# undef gid_t
-# undef off_t
-# undef loff_t
-# define dev_t __kernel_dev_t
-# define ino_t __kernel_ino_t
-# define mode_t __kernel_mode_t
-# define nlink_t __kernel_nlink_t
-# define uid_t __kernel_uid_t
-# define gid_t __kernel_gid_t
-# define off_t __kernel_off_t
-# define loff_t __kernel_loff_t
+#undef dev_t
+#undef ino_t
+#undef mode_t
+#undef nlink_t
+#undef uid_t
+#undef gid_t
+#undef off_t
+#undef loff_t
+#define dev_t __kernel_dev_t
+#define ino_t __kernel_ino_t
+#define mode_t __kernel_mode_t
+#define nlink_t __kernel_nlink_t
+#define uid_t __kernel_uid_t
+#define gid_t __kernel_gid_t
+#define off_t __kernel_off_t
+#define loff_t __kernel_loff_t
 
-# include <asm/stat.h>
+#include <asm/stat.h>
 
-# undef dev_t
-# undef ino_t
-# undef mode_t
-# undef nlink_t
-# undef uid_t
-# undef gid_t
-# undef off_t
-# undef loff_t
-# define dev_t dev_t
-# define ino_t ino_t
-# define mode_t mode_t
-# define nlink_t nlink_t
-# define uid_t uid_t
-# define gid_t gid_t
-# define off_t off_t
-# define loff_t loff_t
-#endif
+#undef dev_t
+#undef ino_t
+#undef mode_t
+#undef nlink_t
+#undef uid_t
+#undef gid_t
+#undef off_t
+#undef loff_t
+#define dev_t dev_t
+#define ino_t ino_t
+#define mode_t mode_t
+#define nlink_t nlink_t
+#define uid_t uid_t
+#define gid_t gid_t
+#define off_t off_t
+#define loff_t loff_t
 
+/* for S_IFMT */
 #define stat libc_stat
 #define stat64 libc_stat64
 #include <sys/stat.h>
@@ -119,11 +77,9 @@ struct stat_sparc64 {
 #undef st_mtime
 #undef st_ctime
 
-#ifdef MAJOR_IN_SYSMACROS
+#if defined MAJOR_IN_SYSMACROS
 # include <sys/sysmacros.h>
-#endif
-
-#ifdef MAJOR_IN_MKDEV
+#elif defined MAJOR_IN_MKDEV
 # include <sys/mkdev.h>
 #endif
 
@@ -131,56 +87,36 @@ struct stat_sparc64 {
 
 #include "printstat.h"
 
-#ifdef SPARC64
-static void
-printstat_sparc64(struct tcb *tcp, long addr)
-{
-	struct stat_sparc64 statbuf;
-
-	if (umove(tcp, addr, &statbuf) < 0) {
-		tprints("{...}");
-		return;
-	}
-
-	if (!abbrev(tcp)) {
-		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%lu, st_mode=%s, ",
-			(unsigned long) major(statbuf.st_dev),
-			(unsigned long) minor(statbuf.st_dev),
-			(unsigned long) statbuf.st_ino,
-			sprintmode(statbuf.st_mode));
-		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
-			(unsigned long) statbuf.st_nlink,
-			(unsigned long) statbuf.st_uid,
-			(unsigned long) statbuf.st_gid);
-		tprintf("st_blksize=%lu, ",
-			(unsigned long) statbuf.st_blksize);
-		tprintf("st_blocks=%lu, ",
-			(unsigned long) statbuf.st_blocks);
-	}
-	else
-		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
-	switch (statbuf.st_mode & S_IFMT) {
-	case S_IFCHR: case S_IFBLK:
-		tprintf("st_rdev=makedev(%lu, %lu), ",
-			(unsigned long) major(statbuf.st_rdev),
-			(unsigned long) minor(statbuf.st_rdev));
-		break;
-	default:
-		tprintf("st_size=%lu, ", statbuf.st_size);
-		break;
-	}
-	if (!abbrev(tcp)) {
-		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
-		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
-	}
-	else
-		tprints("...}");
-}
-#endif /* SPARC64 */
-
-#if defined POWERPC64
-struct stat_powerpc32 {
+#undef STAT32_PERSONALITY
+#if SUPPORTED_PERSONALITIES > 1
+# if defined AARCH64 || defined X86_64 || defined X32
+struct stat32 {
+	unsigned int	st_dev;
+	unsigned int	st_ino;
+	unsigned short	st_mode;
+	unsigned short	st_nlink;
+	unsigned short	st_uid;
+	unsigned short	st_gid;
+	unsigned int	st_rdev;
+	unsigned int	st_size;
+	unsigned int	st_blksize;
+	unsigned int	st_blocks;
+	unsigned int	st_atime;
+	unsigned int	st_atime_nsec;
+	unsigned int	st_mtime;
+	unsigned int	st_mtime_nsec;
+	unsigned int	st_ctime;
+	unsigned int	st_ctime_nsec;
+	unsigned int	__unused4;
+	unsigned int	__unused5;
+};
+#  ifdef AARCH64
+#   define STAT32_PERSONALITY 0
+#  else
+#   define STAT32_PERSONALITY 1
+#  endif
+# elif defined POWERPC64
+struct stat32 {
 	unsigned int	st_dev;
 	unsigned int	st_ino;
 	unsigned int	st_mode;
@@ -200,18 +136,49 @@ struct stat_powerpc32 {
 	unsigned int	__unused4;
 	unsigned int	__unused5;
 };
+#  define STAT32_PERSONALITY 1
+# elif defined SPARC64
+struct stat32 {
+	unsigned short	st_dev;
+	unsigned int	st_ino;
+	unsigned short	st_mode;
+	unsigned short	st_nlink;
+	unsigned short	st_uid;
+	unsigned short	st_gid;
+	unsigned short	st_rdev;
+	unsigned int	st_size;
+	unsigned int	st_atime;
+	unsigned int	st_atime_nsec;
+	unsigned int	st_mtime;
+	unsigned int	st_mtime_nsec;
+	unsigned int	st_ctime;
+	unsigned int	st_ctime_nsec;
+	unsigned int	st_blksize;
+	unsigned int	st_blocks;
+	unsigned int	__unused4[2];
+};
+#  define STAT32_PERSONALITY 0
+# elif defined SPARC
+#  /* no 64-bit personalities */
+# elif defined TILE
+#  /* no 32-bit stat */
+# else
+#  warning FIXME: check whether struct stat32 definition is needed for this architecture!
+# endif /* X86_64 || X32 || POWERPC64 */
+#endif /* SUPPORTED_PERSONALITIES > 1 */
 
+#ifdef STAT32_PERSONALITY
 # define DO_PRINTSTAT do_printstat32
-# define STRUCT_STAT struct stat_powerpc32
+# define STRUCT_STAT struct stat32
 # undef HAVE_STRUCT_STAT_ST_FLAGS
 # undef HAVE_STRUCT_STAT_ST_FSTYPE
 # undef HAVE_STRUCT_STAT_ST_GEN
 # include "printstat.h"
 
 static void
-printstat_powerpc32(struct tcb *tcp, long addr)
+printstat32(struct tcb *tcp, long addr)
 {
-	struct stat_powerpc32 statbuf;
+	struct stat32 statbuf;
 
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprints("{...}");
@@ -220,7 +187,7 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 
 	do_printstat32(tcp, &statbuf);
 }
-#endif /* POWERPC64 */
+#endif /* STAT32_PERSONALITY */
 
 #if defined(SPARC) || defined(SPARC64)
 
@@ -286,25 +253,19 @@ printstat(struct tcb *tcp, long addr)
 		return;
 	}
 
+#ifdef STAT32_PERSONALITY
+	if (current_personality == STAT32_PERSONALITY) {
+		printstat32(tcp, addr);
+		return;
+	}
+#endif
+
 #if defined(SPARC) || defined(SPARC64)
 	if (current_personality == 1) {
 		printstatsol(tcp, addr);
 		return;
 	}
-# ifdef SPARC64
-	else if (current_personality == 2) {
-		printstat_sparc64(tcp, addr);
-		return;
-	}
-# endif
-#endif /* SPARC[64] */
-
-#if defined POWERPC64
-	if (current_personality == 1) {
-		printstat_powerpc32(tcp, addr);
-		return;
-	}
-#endif
+#endif /* SPARC || SPARC64 */
 
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprints("{...}");
@@ -338,7 +299,8 @@ sys_fstat(struct tcb *tcp)
 	return 0;
 }
 
-#if !defined HAVE_STAT64 && (defined AARCH64 || defined X86_64 || defined X32)
+#if defined STAT32_PERSONALITY && !defined HAVE_STAT64
+# if defined AARCH64 || defined X86_64 || defined X32
 /*
  * Linux x86_64 and x32 have unified `struct stat' but their i386 personality
  * needs `struct stat64'.
@@ -369,15 +331,18 @@ struct stat64 {
 	unsigned int	st_ctime_nsec;
 	unsigned long long	st_ino;
 }
-# if defined X86_64 || defined X32
-   __attribute__((packed))
-#  define STAT64_SIZE	96
-#else
-#  define STAT64_SIZE	104
-# endif
+#  if defined X86_64 || defined X32
+  __attribute__((packed))
+#   define STAT64_SIZE	96
+#  else
+#   define STAT64_SIZE	104
+#  endif
 ;
-# define HAVE_STAT64	1
-#endif /* AARCH64 || X86_64 || X32 */
+#  define HAVE_STAT64	1
+# else /* !(AARCH64 || X86_64 || X32) */
+#  warning FIXME: check whether struct stat64 definition is needed for this architecture!
+# endif
+#endif /* STAT32_PERSONALITY && !HAVE_STAT64 */
 
 #ifdef HAVE_STAT64
 
@@ -393,9 +358,9 @@ printstat64(struct tcb *tcp, long addr)
 {
 	struct stat64 statbuf;
 
-#ifdef STAT64_SIZE
+# ifdef STAT64_SIZE
 	(void) sizeof(char[sizeof statbuf == STAT64_SIZE ? 1 : -1]);
-#endif
+# endif
 
 	if (!addr) {
 		tprints("NULL");
@@ -406,31 +371,12 @@ printstat64(struct tcb *tcp, long addr)
 		return;
 	}
 
-#if defined(SPARC) || defined(SPARC64)
-	if (current_personality == 1) {
-		printstatsol(tcp, addr);
-		return;
-	}
-# ifdef SPARC64
-	else if (current_personality == 2) {
-		printstat_sparc64(tcp, addr);
-		return;
-	}
-# endif
-#endif /* SPARC[64] */
-
-#if defined AARCH64
-	if (current_personality != 0) {
+# ifdef STAT32_PERSONALITY
+	if (current_personality != STAT32_PERSONALITY) {
 		printstat(tcp, addr);
 		return;
 	}
-#endif
-#if defined X86_64 || defined X32
-	if (current_personality != 1) {
-		printstat(tcp, addr);
-		return;
-	}
-#endif
+# endif /* STAT32_PERSONALITY */
 
 	if (umove(tcp, addr, &statbuf) < 0) {
 		tprints("{...}");
@@ -439,12 +385,10 @@ printstat64(struct tcb *tcp, long addr)
 
 	do_printstat64(tcp, &statbuf);
 }
-#endif /* HAVE_STAT64 */
 
 int
 sys_stat64(struct tcb *tcp)
 {
-#ifdef HAVE_STAT64
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
 		tprints(", ");
@@ -452,15 +396,11 @@ sys_stat64(struct tcb *tcp)
 		printstat64(tcp, tcp->u_arg[1]);
 	}
 	return 0;
-#else
-	return printargs(tcp);
-#endif
 }
 
 int
 sys_fstat64(struct tcb *tcp)
 {
-#ifdef HAVE_STAT64
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
@@ -468,10 +408,23 @@ sys_fstat64(struct tcb *tcp)
 		printstat64(tcp, tcp->u_arg[1]);
 	}
 	return 0;
-#else
-	return printargs(tcp);
-#endif
 }
+
+#else
+
+int
+sys_stat64(struct tcb *tcp)
+{
+	return sys_stat(tcp);
+}
+
+int
+sys_fstat64(struct tcb *tcp)
+{
+	return sys_fstat(tcp);
+}
+
+#endif /* HAVE_STAT64 */
 
 int
 sys_newfstatat(struct tcb *tcp)
@@ -481,16 +434,16 @@ sys_newfstatat(struct tcb *tcp)
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else {
-#ifdef POWERPC64
-		if (current_personality == 0)
-			printstat(tcp, tcp->u_arg[2]);
-		else
+#if defined STAT32_PERSONALITY
+		if (current_personality == STAT32_PERSONALITY)
 			printstat64(tcp, tcp->u_arg[2]);
+		else
+			printstat(tcp, tcp->u_arg[2]);
 #elif defined HAVE_STAT64
 		printstat64(tcp, tcp->u_arg[2]);
 #else
 		printstat(tcp, tcp->u_arg[2]);
-#endif
+#endif /* STAT32_PERSONALITY || HAVE_STAT64 */
 		tprints(", ");
 		printflags(at_flags, tcp->u_arg[3], "AT_???");
 	}
