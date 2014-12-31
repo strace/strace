@@ -28,6 +28,7 @@
  */
 
 #include "defs.h"
+#include <fcntl.h>
 #include <linux/version.h>
 #include <sys/timex.h>
 #include <linux/ioctl.h>
@@ -808,10 +809,6 @@ rtc_ioctl(struct tcb *tcp, long code, long arg)
 	}
 	return 1;
 }
-
-#ifndef TFD_TIMER_ABSTIME
-#define TFD_TIMER_ABSTIME (1 << 0)
-#endif
 
 #include "xlat/timerfdflags.h"
 
