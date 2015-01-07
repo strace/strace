@@ -14,7 +14,8 @@ check_prog sed
 
 rm -f $LOG.* $LOG-*
 
-./net-accept-connect ||
+addr=unix-yy-local-stream
+./net-accept-connect $addr ||
 	fail_ 'net-accept-connect failed'
 
 ./netlink_unix_diag || {
@@ -25,9 +26,9 @@ rm -f $LOG.* $LOG-*
 	fi
 }
 
-args="-tt -ff -yy -o $LOG -eclose,network ./net-accept-connect"
-$STRACE $args ||
-	fail_ "strace $args failed"
+args="-tt -ff -yy -eclose,network ./net-accept-connect $addr"
+$STRACE -o "$LOG" $args ||
+	fail_ "$STRACE $args failed"
 
 "$srcdir"/../strace-log-merge $LOG > $LOG || {
 	cat $LOG
@@ -47,12 +48,12 @@ sed -rn "/^$child"' /d; /SIGCHLD/d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' $L
 	fail_ 'failed to separate logs'
 }
 
-awk -f "$srcdir"/unix-yy-connect.awk $LOG-connect || {
+awk -f "$srcdir"/unix-yy-connect.awk -v addr=$addr $LOG-connect || {
 	cat $LOG-connect
 	fail_ "strace $args failed to decode socket descriptors properly"
 }
 
-awk -f "$srcdir"/unix-yy-accept.awk $LOG-accept || {
+awk -f "$srcdir"/unix-yy-accept.awk -v addr=$addr $LOG-accept || {
 	cat $LOG-accept
 	fail_ "strace $args failed to decode socket descriptors properly"
 }

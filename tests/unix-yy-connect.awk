@@ -1,10 +1,11 @@
 BEGIN {
   lines = 5
   fail = 0
+  addrlen = length(addr) + 3
 
   r_i = "[1-9][0-9]*"
-  r_close_listen = "^close\\(0<UNIX:[" r_i ",\"local-stream\"]>\\) += 0$"
-  r_connect = "^connect\\(1<UNIX:\\[(" r_i ")\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"local-stream\"}, 15\\) += 0$"
+  r_close_listen = "^close\\(0<UNIX:[" r_i ",\"" addr "\"]>\\) += 0$"
+  r_connect = "^connect\\(1<UNIX:\\[(" r_i ")\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"" addr "\"}, " addrlen "\\) += 0$"
 }
 
 NR == 1 && /^socket\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\) += 1$/ {next}

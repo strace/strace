@@ -8,12 +8,13 @@ check_prog grep
 
 rm -f $LOG.*
 
-./net-accept-connect ||
+addr=net-local-stream
+./net-accept-connect $addr ||
 	fail_ 'net-accept-connect failed'
 
-args="-tt -ff -o $LOG -enetwork ./net-accept-connect"
-$STRACE $args ||
-	fail_ "strace $args failed"
+args="-tt -ff -enetwork ./net-accept-connect $addr"
+$STRACE -o "$LOG" $args ||
+	fail_ "$STRACE $args failed"
 
 "$srcdir"/../strace-log-merge $LOG > $LOG || {
 	cat $LOG
@@ -35,10 +36,10 @@ grep_log()
 
 grep_log socket '\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\) += 0'
 grep_log socket '\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\) += 1'
-grep_log bind '\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="local-stream"\}, 15\) += 0'
+grep_log bind '\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, 19\) += 0'
 grep_log listen '\(0, 5\) += 0'
-grep_log getsockname '\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="local-stream"\}, \[15\]\) += 0'
+grep_log getsockname '\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, \[19\]\) += 0'
 grep_log accept '\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), NULL\}, \[2\]\) += 1'
-grep_log connect '\(1, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="local-stream"\}, 15\) += 0'
+grep_log connect '\(1, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, 19\) += 0'
 
 exit 0
