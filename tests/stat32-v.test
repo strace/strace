@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Check verbose decoding of 32-bit stat syscall.
+
+. "${srcdir=.}/init.sh"
+
+check_prog dd
+check_prog grep
+check_prog touch
+
+OUT="$LOG.out"
+size=233811181
+sample=stat32_sample
+
+umask 022
+truncate_cmd="dd seek=$size obs=1 count=0 if=/dev/null of=$sample"
+$truncate_cmd > "$OUT" 2>&1 || {
+	cat "$OUT"
+	framework_skip_ 'failed to create a large sparse file'
+}
+
+./stat32 $sample > /dev/null || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ '32-bit stat syscall is not available'
+	else
+		fail_ 'stat32 failed'
+	fi
+}
+
+touch -t 0102030405 $sample
+
+for f in $sample . /dev/null; do
+	args="-v -efile ./stat32 $f"
+	$STRACE -o "$LOG" $args > "$OUT" &&
+	LC_ALL=C grep -E -x -f "$OUT" "$LOG" > /dev/null || {
+		cat "$OUT" "$LOG"
+		fail_ "$STRACE $args output mismatch"
+	}
+done
+
+rm -f $sample "$OUT"
+
+exit 0

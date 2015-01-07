@@ -8,6 +8,8 @@ scm_rights
 set_ptracer_any
 sigaction
 stack-fcall
+stat
+stat32
 statfs
 uid
 uid16
