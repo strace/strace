@@ -83,7 +83,7 @@ sys_fstatfs(struct tcb *tcp)
 	return 0;
 }
 
-#ifdef HAVE_STATFS64
+#ifdef HAVE_STRUCT_STATFS64
 static void
 printstatfs64(struct tcb *tcp, long addr)
 {
@@ -197,7 +197,7 @@ sys_fstatfs64(struct tcb *tcp)
 	}
 	return 0;
 }
-#endif /* HAVE_STATFS64 */
+#endif /* HAVE_STRUCT_STATFS64 */
 
 #ifdef ALPHA
 int
