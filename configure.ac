@@ -191,7 +191,6 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct stat.st_gen,
 	struct stat.st_rdev
 ]))
-AC_STAT64
 AC_STATFS64
 
 AC_TYPE_SIGNAL
@@ -260,6 +259,8 @@ AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 AC_CHECK_TYPES([struct mmsghdr],,, [#include <sys/socket.h>])
 AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
 
+AC_CHECK_TYPES([struct stat64],,, [#include <sys/types.h>
+#include <asm/stat.h>])
 AC_CHECK_TYPES([struct __old_kernel_stat],,, [#include <asm/stat.h>])
 
 AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg, struct ptrace_peeksiginfo_args],,,

@@ -299,7 +299,7 @@ sys_fstat(struct tcb *tcp)
 	return 0;
 }
 
-#if defined STAT32_PERSONALITY && !defined HAVE_STAT64
+#if defined STAT32_PERSONALITY && !defined HAVE_STRUCT_STAT64
 # if defined AARCH64 || defined X86_64 || defined X32
 /*
  * Linux x86_64 and x32 have unified `struct stat' but their i386 personality
@@ -338,13 +338,13 @@ struct stat64 {
 #   define STAT64_SIZE	104
 #  endif
 ;
-#  define HAVE_STAT64	1
+#  define HAVE_STRUCT_STAT64	1
 # else /* !(AARCH64 || X86_64 || X32) */
 #  warning FIXME: check whether struct stat64 definition is needed for this architecture!
 # endif
-#endif /* STAT32_PERSONALITY && !HAVE_STAT64 */
+#endif /* STAT32_PERSONALITY && !HAVE_STRUCT_STAT64 */
 
-#ifdef HAVE_STAT64
+#ifdef HAVE_STRUCT_STAT64
 
 # define DO_PRINTSTAT do_printstat64
 # define STRUCT_STAT struct stat64
@@ -424,7 +424,7 @@ sys_fstat64(struct tcb *tcp)
 	return sys_fstat(tcp);
 }
 
-#endif /* HAVE_STAT64 */
+#endif /* HAVE_STRUCT_STAT64 */
 
 int
 sys_newfstatat(struct tcb *tcp)
@@ -439,11 +439,11 @@ sys_newfstatat(struct tcb *tcp)
 			printstat64(tcp, tcp->u_arg[2]);
 		else
 			printstat(tcp, tcp->u_arg[2]);
-#elif defined HAVE_STAT64
+#elif defined HAVE_STRUCT_STAT64
 		printstat64(tcp, tcp->u_arg[2]);
 #else
 		printstat(tcp, tcp->u_arg[2]);
-#endif /* STAT32_PERSONALITY || HAVE_STAT64 */
+#endif /* STAT32_PERSONALITY || HAVE_STRUCT_STAT64 */
 		tprints(", ");
 		printflags(at_flags, tcp->u_arg[3], "AT_???");
 	}
