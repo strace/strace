@@ -356,6 +356,30 @@ printstat(struct tcb *tcp, long addr)
 	do_printstat(tcp, &statbuf);
 }
 
+int
+sys_stat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printpath(tcp, tcp->u_arg[0]);
+		tprints(", ");
+	} else {
+		printstat(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
+int
+sys_fstat(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+	} else {
+		printstat(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+}
+
 #if !defined HAVE_STAT64 && (defined AARCH64 || defined X86_64 || defined X32)
 /*
  * Linux x86_64 and x32 have unified `struct stat' but their i386 personality
@@ -460,23 +484,27 @@ printstat64(struct tcb *tcp, long addr)
 #endif /* HAVE_STAT64 */
 
 int
-sys_stat(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printstat(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-int
 sys_stat64(struct tcb *tcp)
 {
 #ifdef HAVE_STAT64
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
+		tprints(", ");
+	} else {
+		printstat64(tcp, tcp->u_arg[1]);
+	}
+	return 0;
+#else
+	return printargs(tcp);
+#endif
+}
+
+int
+sys_fstat64(struct tcb *tcp)
+{
+#ifdef HAVE_STAT64
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
 		printstat64(tcp, tcp->u_arg[1]);
@@ -509,34 +537,6 @@ sys_newfstatat(struct tcb *tcp)
 		printflags(at_flags, tcp->u_arg[3], "AT_???");
 	}
 	return 0;
-}
-
-int
-sys_fstat(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printstat(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-
-int
-sys_fstat64(struct tcb *tcp)
-{
-#ifdef HAVE_STAT64
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printstat64(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-#else
-	return printargs(tcp);
-#endif
 }
 
 #if defined(HAVE_STRUCT___OLD_KERNEL_STAT)
