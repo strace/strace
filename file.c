@@ -129,6 +129,8 @@ struct stat_sparc64 {
 
 /* several stats */
 
+#include "printstat.h"
+
 #if defined(SPARC) || defined(SPARC64)
 typedef struct {
 	int     tv_sec;
@@ -270,6 +272,13 @@ struct stat_powerpc32 {
 	unsigned int	__unused5;
 };
 
+# define DO_PRINTSTAT do_printstat32
+# define STRUCT_STAT struct stat_powerpc32
+# undef HAVE_STRUCT_STAT_ST_FLAGS
+# undef HAVE_STRUCT_STAT_ST_FSTYPE
+# undef HAVE_STRUCT_STAT_ST_GEN
+# include "printstat.h"
+
 static void
 printstat_powerpc32(struct tcb *tcp, long addr)
 {
@@ -280,39 +289,9 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 		return;
 	}
 
-	if (!abbrev(tcp)) {
-		tprintf("{st_dev=makedev(%u, %u), st_ino=%u, st_mode=%s, ",
-			major(statbuf.st_dev), minor(statbuf.st_dev),
-			statbuf.st_ino,
-			sprintmode(statbuf.st_mode));
-		tprintf("st_nlink=%u, st_uid=%u, st_gid=%u, ",
-			statbuf.st_nlink, statbuf.st_uid, statbuf.st_gid);
-		tprintf("st_blksize=%u, ", statbuf.st_blksize);
-		tprintf("st_blocks=%u, ", statbuf.st_blocks);
-	}
-	else
-		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
-	switch (statbuf.st_mode & S_IFMT) {
-	case S_IFCHR: case S_IFBLK:
-		tprintf("st_rdev=makedev(%lu, %lu), ",
-			(unsigned long) major(statbuf.st_rdev),
-			(unsigned long) minor(statbuf.st_rdev));
-		break;
-	default:
-		tprintf("st_size=%u, ", statbuf.st_size);
-		break;
-	}
-	if (!abbrev(tcp)) {
-		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime));
-		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime));
-		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime));
-	}
-	else
-		tprints("...}");
+	do_printstat32(tcp, &statbuf);
 }
 #endif /* POWERPC64 */
-
-#include "printstat.h"
 
 static void
 printstat(struct tcb *tcp, long addr)
