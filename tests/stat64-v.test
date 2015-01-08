@@ -22,6 +22,7 @@ $truncate_cmd > "$OUT" 2>&1 || {
 ./stat $sample > /dev/null ||
 	fail_ 'stat failed'
 
+touch -d '1970-01-01 36028797018963968 seconds' $sample ||
 touch -t 0102030405 $sample
 
 for f in $sample . /dev/null; do

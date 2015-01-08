@@ -425,7 +425,7 @@ const char *
 sprinttime(time_t t)
 {
 	struct tm *tmp;
-	static char buf[sizeof("yyyy/mm/dd-hh:mm:ss")];
+	static char buf[sizeof(int) * 3 * 6];
 
 	if (t == 0) {
 		strcpy(buf, "0");
