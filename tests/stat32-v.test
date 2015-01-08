@@ -21,6 +21,7 @@ $truncate_cmd > "$OUT" 2>&1 || {
 
 ./stat32 $sample > /dev/null || {
 	if [ $? -eq 77 ]; then
+		rm -f $sample "$OUT"
 		framework_skip_ '32-bit stat syscall is not available'
 	else
 		fail_ 'stat32 failed'
