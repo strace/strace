@@ -6,13 +6,21 @@
 # define STRUCT_STAT struct stat
 #endif
 
+#ifndef STAT_MAJOR
+# define STAT_MAJOR(x) major(x)
+#endif
+
+#ifndef STAT_MINOR
+# define STAT_MINOR(x) minor(x)
+#endif
+
 static void
 DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 {
 	if (!abbrev(tcp)) {
 		tprintf("{st_dev=makedev(%u, %u), st_ino=%llu, st_mode=%s, ",
-			(unsigned int) major(statbuf->st_dev),
-			(unsigned int) minor(statbuf->st_dev),
+			(unsigned int) STAT_MAJOR(statbuf->st_dev),
+			(unsigned int) STAT_MINOR(statbuf->st_dev),
 			(unsigned long long) statbuf->st_ino,
 			sprintmode(statbuf->st_mode));
 		tprintf("st_nlink=%u, st_uid=%u, st_gid=%u, ",
@@ -34,12 +42,12 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 	case S_IFCHR: case S_IFBLK:
 #ifdef HAVE_STRUCT_STAT_ST_RDEV
 		tprintf("st_rdev=makedev(%u, %u), ",
-			(unsigned int) major(statbuf->st_rdev),
-			(unsigned int) minor(statbuf->st_rdev));
+			(unsigned int) STAT_MAJOR(statbuf->st_rdev),
+			(unsigned int) STAT_MINOR(statbuf->st_rdev));
 #else /* !HAVE_STRUCT_STAT_ST_RDEV */
 		tprintf("st_size=makedev(%u, %u), ",
-			(unsigned int) major(statbuf->st_size),
-			(unsigned int) minor(statbuf->st_size));
+			(unsigned int) STAT_MAJOR(statbuf->st_size),
+			(unsigned int) STAT_MINOR(statbuf->st_size));
 #endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 		break;
 	default:
@@ -68,5 +76,7 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 	}
 }
 
+#undef STAT_MINOR
+#undef STAT_MAJOR
 #undef STRUCT_STAT
 #undef DO_PRINTSTAT

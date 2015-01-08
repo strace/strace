@@ -131,77 +131,7 @@ struct stat_sparc64 {
 
 #include "printstat.h"
 
-#if defined(SPARC) || defined(SPARC64)
-typedef struct {
-	int     tv_sec;
-	int     tv_nsec;
-} timestruct_t;
-
-struct solstat {
-	unsigned        st_dev;
-	int             st_pad1[3];     /* network id */
-	unsigned        st_ino;
-	unsigned        st_mode;
-	unsigned        st_nlink;
-	unsigned        st_uid;
-	unsigned        st_gid;
-	unsigned        st_rdev;
-	int             st_pad2[2];
-	int             st_size;
-	int             st_pad3;        /* st_size, off_t expansion */
-	timestruct_t    st_atime;
-	timestruct_t    st_mtime;
-	timestruct_t    st_ctime;
-	int             st_blksize;
-	int             st_blocks;
-	char            st_fstype[16];
-	int             st_pad4[8];     /* expansion area */
-};
-
-static void
-printstatsol(struct tcb *tcp, long addr)
-{
-	struct solstat statbuf;
-
-	if (umove(tcp, addr, &statbuf) < 0) {
-		tprints("{...}");
-		return;
-	}
-	if (!abbrev(tcp)) {
-		tprintf("{st_dev=makedev(%lu, %lu), st_ino=%lu, st_mode=%s, ",
-			(unsigned long) ((statbuf.st_dev >> 18) & 0x3fff),
-			(unsigned long) (statbuf.st_dev & 0x3ffff),
-			(unsigned long) statbuf.st_ino,
-			sprintmode(statbuf.st_mode));
-		tprintf("st_nlink=%lu, st_uid=%lu, st_gid=%lu, ",
-			(unsigned long) statbuf.st_nlink,
-			(unsigned long) statbuf.st_uid,
-			(unsigned long) statbuf.st_gid);
-		tprintf("st_blksize=%lu, ", (unsigned long) statbuf.st_blksize);
-		tprintf("st_blocks=%lu, ", (unsigned long) statbuf.st_blocks);
-	}
-	else
-		tprintf("{st_mode=%s, ", sprintmode(statbuf.st_mode));
-	switch (statbuf.st_mode & S_IFMT) {
-	case S_IFCHR: case S_IFBLK:
-		tprintf("st_rdev=makedev(%lu, %lu), ",
-			(unsigned long) ((statbuf.st_rdev >> 18) & 0x3fff),
-			(unsigned long) (statbuf.st_rdev & 0x3ffff));
-		break;
-	default:
-		tprintf("st_size=%u, ", statbuf.st_size);
-		break;
-	}
-	if (!abbrev(tcp)) {
-		tprintf("st_atime=%s, ", sprinttime(statbuf.st_atime.tv_sec));
-		tprintf("st_mtime=%s, ", sprinttime(statbuf.st_mtime.tv_sec));
-		tprintf("st_ctime=%s}", sprinttime(statbuf.st_ctime.tv_sec));
-	}
-	else
-		tprints("...}");
-}
-
-# if defined(SPARC64)
+#ifdef SPARC64
 static void
 printstat_sparc64(struct tcb *tcp, long addr)
 {
@@ -247,8 +177,7 @@ printstat_sparc64(struct tcb *tcp, long addr)
 	else
 		tprints("...}");
 }
-# endif /* SPARC64 */
-#endif /* SPARC[64] */
+#endif /* SPARC64 */
 
 #if defined POWERPC64
 struct stat_powerpc32 {
@@ -292,6 +221,56 @@ printstat_powerpc32(struct tcb *tcp, long addr)
 	do_printstat32(tcp, &statbuf);
 }
 #endif /* POWERPC64 */
+
+#if defined(SPARC) || defined(SPARC64)
+
+struct solstat {
+	unsigned	st_dev;
+	unsigned int	st_pad1[3];     /* network id */
+	unsigned	st_ino;
+	unsigned	st_mode;
+	unsigned	st_nlink;
+	unsigned	st_uid;
+	unsigned	st_gid;
+	unsigned	st_rdev;
+	unsigned int	st_pad2[2];
+	unsigned int	st_size;
+	unsigned int	st_pad3;        /* st_size, off_t expansion */
+	unsigned int	st_atime;
+	unsigned int	st_atime_nsec;
+	unsigned int	st_mtime;
+	unsigned int	st_mtime_nsec;
+	unsigned int	st_ctime;
+	unsigned int	st_ctime_nsec;
+	unsigned int	st_blksize;
+	unsigned int	st_blocks;
+	char		st_fstype[16];
+	unsigned int	st_pad4[8];     /* expansion area */
+};
+
+# define DO_PRINTSTAT	do_printstat_sol
+# define STRUCT_STAT	struct solstat
+# define STAT_MAJOR(x)	(((x) >> 18) & 0x3fff)
+# define STAT_MINOR(x)	((x) & 0x3ffff)
+# undef HAVE_STRUCT_STAT_ST_FLAGS
+# undef HAVE_STRUCT_STAT_ST_FSTYPE
+# undef HAVE_STRUCT_STAT_ST_GEN
+# include "printstat.h"
+
+static void
+printstatsol(struct tcb *tcp, long addr)
+{
+	struct solstat statbuf;
+
+	if (umove(tcp, addr, &statbuf) < 0) {
+		tprints("{...}");
+		return;
+	}
+
+	do_printstat_sol(tcp, &statbuf);
+}
+
+#endif /* SPARC || SPARC64 */
 
 static void
 printstat(struct tcb *tcp, long addr)
