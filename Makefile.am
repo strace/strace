@@ -275,6 +275,7 @@ EXTRA_DIST =				\
 	linux/tile/syscallent1.h	\
 	linux/tile/userent.h		\
 	linux/ubi-user.h		\
+	linux/unix_diag.h		\
 	linux/userent.h			\
 	linux/userent0.h		\
 	linux/x32/errnoent.h		\
