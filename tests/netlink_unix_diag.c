@@ -9,6 +9,10 @@
 #include <linux/sock_diag.h>
 #include <linux/unix_diag.h>
 
+#if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
+# define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
+#endif
+
 static int
 send_query(const int fd, const int family, const int proto)
 {

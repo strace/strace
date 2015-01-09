@@ -112,7 +112,10 @@
 #include "xlat/inet_protocols.h"
 
 #ifdef PF_NETLINK
-#include "xlat/netlink_protocols.h"
+# if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
+#  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
+# endif
+# include "xlat/netlink_protocols.h"
 #endif
 
 #if defined(HAVE_BLUETOOTH_BLUETOOTH_H)

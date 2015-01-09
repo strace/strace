@@ -8,6 +8,10 @@
 #include <linux/unix_diag.h>
 #include <linux/rtnetlink.h>
 
+#if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
+# define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
+#endif
+
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
 # define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
