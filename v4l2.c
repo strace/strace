@@ -126,7 +126,9 @@ static void print_v4l2_format_fmt(const struct v4l2_format *f)
 
 	/* TODO: Complete this switch statement */
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
+#endif
 		tprints("win={???}");
 		break;
 
@@ -173,6 +175,7 @@ v4l2_ioctl(struct tcb *tcp, unsigned long code, long arg)
 		return 1;
 	}
 
+#ifdef VIDIOC_ENUM_FRAMESIZES
 	case VIDIOC_ENUM_FRAMESIZES: /* decode on exit */ {
 		struct v4l2_frmsizeenum s;
 
@@ -202,6 +205,7 @@ v4l2_ioctl(struct tcb *tcp, unsigned long code, long arg)
 		tprints("}");
 		return 1;
 	}
+#endif /* VIDIOC_ENUM_FRAMESIZES */
 
 	case VIDIOC_G_FMT:
 	case VIDIOC_S_FMT:
@@ -450,6 +454,7 @@ v4l2_ioctl(struct tcb *tcp, unsigned long code, long arg)
 		return 1;
 	}
 
+#ifdef VIDIOC_ENUM_FRAMEINTERVALS
 	case VIDIOC_ENUM_FRAMEINTERVALS: {
 		struct v4l2_frmivalenum f;
 
@@ -480,6 +485,7 @@ v4l2_ioctl(struct tcb *tcp, unsigned long code, long arg)
 		tprints("}");
 		return 1;
 	}
+#endif /* VIDIOC_ENUM_FRAMEINTERVALS */
 
 	case VIDIOC_CROPCAP: {
 		struct v4l2_cropcap c;
