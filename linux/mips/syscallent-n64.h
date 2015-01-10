@@ -267,7 +267,7 @@
 	{ 4,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 5264 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 5265 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 5266 */
-	{ 6,	TM,	printargs,		"move_pages"	}, /* 5267 */
+	{ 6,	TM,	sys_move_pages,		"move_pages"	}, /* 5267 */
 	{ 2,	0,	sys_set_robust_list,	"set_robust_list" }, /* 5268 */
 	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 5269 */
 	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 5270 */

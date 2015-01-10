@@ -284,7 +284,7 @@
 	{ 1,	0,	printargs,		"rtas"			}, /* 255 */
 	{ 5,	0,	printargs,		"debug_setcontext"	}, /* 256 */
 	{ 5,	0,	sys_vserver,		"vserver"		}, /* 257 */
-	{ 5,	TM,	sys_migrate_pages,	"migrate_pages"		}, /* 258 */
+	{ 4,	TM,	sys_migrate_pages,	"migrate_pages"		}, /* 258 */
 	{ 6,	TM,	sys_mbind,		"mbind"			}, /* 259 */
 	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"		}, /* 260 */
 	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"		}, /* 261 */

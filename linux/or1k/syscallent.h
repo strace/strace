@@ -236,7 +236,7 @@
 	{ 6,	TM,	sys_mbind,			"mbind"			}, /* 235 */
 	{ 5,	TM,	sys_get_mempolicy,		"get_mempolicy"		}, /* 236 */
 	{ 3,	TM,	sys_set_mempolicy,		"set_mempolicy"		}, /* 237 */
-	{ 5,	TM,	sys_migrate_pages,		"migrate_pages"		}, /* 238 */
+	{ 4,	TM,	sys_migrate_pages,		"migrate_pages"		}, /* 238 */
 	{ 6,	TM,	sys_move_pages,			"move_pages"		}, /* 239 */
 	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,		"rt_tgsigqueueinfo"	}, /* 240 */
 	{ 5,	TD,	sys_perf_event_open,		"perf_event_open"	}, /* 241 */

@@ -262,9 +262,9 @@
 	{ 2,	0,	sys_clock_getres,	"clock_getres"		}, /* 257 */
 	{ 5,	0,	printargs,		"clock_nanosleep"	}, /* 258 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 259 */
-	{ 5,	TM,	printargs,		"mbind"			}, /* 260 */
-	{ 5,	TM,	printargs,		"get_mempolicy"		}, /* 261 */
-	{ 5,	TM,	printargs,		"set_mempolicy"		}, /* 262 */
+	{ 6,	TM,	sys_mbind,		"mbind"			}, /* 260 */
+	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"		}, /* 261 */
+	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"		}, /* 262 */
 	{ 5,	0,	sys_vserver,		"vserver"		}, /* 263 */
 	{ 5,	0,	sys_add_key,		"add_key"		}, /* 264 */
 	{ 4,	0,	sys_request_key,	"request_key"		}, /* 265 */

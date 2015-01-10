@@ -455,9 +455,9 @@
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 426 */
 	{ 2,	TD,	sys_fstat64,		"fstat64"		}, /* 427 */
 	{ 5,	0,	sys_vserver,		"vserver"		}, /* 428 ??? */
-	{ 5,	TM,	printargs,		"mbind"			}, /* 429 ??? */
-	{ 5,	TM,	printargs,		"get_mempolicy"		}, /* 430 ??? */
-	{ 5,	TM,	printargs,		"set_mempolicy"		}, /* 431 ??? */
+	{ 6,	TM,	sys_mbind,		"mbind"			}, /* 429 */
+	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"		}, /* 430 */
+	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"		}, /* 431 */
 	{ 4,	0,	sys_mq_open,		"mq_open"		}, /* 432 */
 	{ 1,	0,	sys_mq_unlink,		"mq_unlink"		}, /* 433 */
 	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"		}, /* 434 */

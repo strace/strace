@@ -328,7 +328,7 @@
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 299 */
 	{ 4,	TD,	sys_fadvise64,		"fadvise64_64"	}, /* 300 */
 	{ 0,	0,	NULL,			NULL		}, /* 301 */
-	{ 4,	TM,	sys_mbind,		"mbind"		}, /* 302 */
+	{ 6,	TM,	sys_mbind,		"mbind"		}, /* 302 */
 	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 303 */
 	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"	}, /* 304 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 305 */

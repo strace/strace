@@ -268,7 +268,7 @@
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 4265 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 4266 */
 	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 4267 */
-	{ 4,	TM,	sys_mbind,		"mbind"		}, /* 4268 */
+	{ 6,	TM,	sys_mbind,		"mbind"		}, /* 4268 */
 	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 4269 */
 	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"	}, /* 4270 */
 	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 4271 */
