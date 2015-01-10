@@ -116,7 +116,7 @@
 	{ 4,	0,	sys_clock_nanosleep,		"clock_nanosleep"		}, /*  115 */
 	{ 3,	0,	sys_syslog,			"syslog"			}, /*  116 */
 	{ 4,	0,	sys_ptrace,			"ptrace"			}, /*  117 */
-	{ 0,	0,	sys_sched_setparam,		"sched_setparam"		}, /*  118 */
+	{ 2,	0,	sys_sched_setparam,		"sched_setparam"		}, /*  118 */
 	{ 3,	0,	sys_sched_setscheduler,		"sched_setscheduler"		}, /*  119 */
 	{ 1,	0,	sys_sched_getscheduler,		"sched_getscheduler"		}, /*  120 */
 	{ 2,	0,	sys_sched_getparam,		"sched_getparam"		}, /*  121 */

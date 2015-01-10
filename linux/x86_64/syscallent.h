@@ -140,7 +140,7 @@
 	{ 3,	0,	sys_sysfs,		"sysfs"		},  /* 139 */
 	{ 2,	0,	sys_getpriority,	"getpriority"	},  /* 140 */
 	{ 3,	0,	sys_setpriority,	"setpriority"	},  /* 141 */
-	{ 0,	0,	sys_sched_setparam,	"sched_setparam"	},  /* 142 */
+	{ 2,	0,	sys_sched_setparam,	"sched_setparam"	},  /* 142 */
 	{ 2,	0,	sys_sched_getparam,	"sched_getparam"	},  /* 143 */
 	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"	},  /* 144 */
 	{ 1,	0,	sys_sched_getscheduler,	"sched_getscheduler"	},  /* 145 */

@@ -180,7 +180,7 @@
 	{ 2,	TM,	sys_munlock,		"munlock"	}, /* 151 */
 	{ 1,	TM,	sys_mlockall,		"mlockall"	}, /* 152 */
 	{ 0,	TM,	sys_munlockall,		"munlockall"	}, /* 153 */
-	{ 0,	0,	sys_sched_setparam,	"sched_setparam"	}, /* 154 */
+	{ 2,	0,	sys_sched_setparam,	"sched_setparam"	}, /* 154 */
 	{ 2,	0,	sys_sched_getparam,	"sched_getparam"	}, /* 155 */
 	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"	}, /* 156 */
 	{ 1,	0,	sys_sched_getscheduler,	"sched_getscheduler"	}, /* 157 */
