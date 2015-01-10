@@ -222,7 +222,7 @@
 	{ 3,	TF|TP|SE|SI,	sys_execve,			"execve"			}, /*  221 */
 	{ 6,	TD|TM|SI,	sys_mmap,			"mmap"				}, /*  222 */
 	{ 4,	TD,	sys_fadvise64,			"fadvise64"			}, /*  223 */
-	{ 1,	TF,	sys_swapon,			"swapon"			}, /*  224 */
+	{ 2,	TF,	sys_swapon,			"swapon"			}, /*  224 */
 	{ 1,	TF,	sys_swapoff,			"swapoff"			}, /*  225 */
 	{ 3,	TM|SI,	sys_mprotect,			"mprotect"			}, /*  226 */
 	{ 3,	TM,	sys_msync,			"msync"				}, /*  227 */
