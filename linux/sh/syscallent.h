@@ -239,7 +239,7 @@
 	{ 3,	0,	sys_setresuid,		"setresuid32"	}, /* 208 */
 	{ 3,	0,	sys_getresuid,		"getresuid32"	}, /* 209 */
 	{ 3,	0,	sys_setresgid,		"setresgid32"	}, /* 210 */
-	{ 3,	0,	sys_getsetgid,		"getsetgid32"	}, /* 211 */
+	{ 3,	0,	sys_getresgid,		"getresgid32"	}, /* 211 */
 	{ 3,	TF,	sys_chown,		"chown32"	}, /* 212 */
 	{ 1,	0,	sys_setuid,		"setuid32"	}, /* 213 */
 	{ 1,	0,	sys_setgid,		"setgid32"	}, /* 214 */
