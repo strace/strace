@@ -1094,7 +1094,7 @@
 	{ 4,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 1300 */
 	{ 4,	TD,	sys_tee,		"tee"		}, /* 1301 */
 	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 1302 */
-	{ MA,	0,	NULL,			NULL		}, /* 1303 */
+	{ 4,	TD,	sys_fallocate,		"fallocate"	}, /* 1303 */
 	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 1304 */
 	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 1305 */
 	{ MA,	0,	NULL,			NULL		}, /* 1306 */
