@@ -226,7 +226,7 @@
 	{ 1,	TF,	sys_swapoff,			"swapoff"			}, /*  225 */
 	{ 3,	TM|SI,	sys_mprotect,			"mprotect"			}, /*  226 */
 	{ 3,	TM,	sys_msync,			"msync"				}, /*  227 */
-	{ 3,	TM,	sys_msync,			"msync"				}, /*  228 */
+	{ 2,	TM,	sys_mlock,			"mlock"				}, /*  228 */
 	{ 2,	TM,	sys_munlock,			"munlock"			}, /*  229 */
 	{ 1,	TM,	sys_mlockall,			"mlockall"			}, /*  230 */
 	{ 0,	TM,	sys_munlockall,			"munlockall"			}, /*  231 */
