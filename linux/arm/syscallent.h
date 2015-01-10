@@ -327,15 +327,15 @@
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 296 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 297 */
 	{ 4,	TI,	sys_semop,		"semop"		}, /* 298 */
-	{ 4,	TI,	sys_semget,		"semget"	}, /* 299 */
+	{ 3,	TI,	sys_semget,		"semget"	}, /* 299 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 300 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 301 */
 	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 302 */
-	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 303 */
+	{ 2,	TI,	sys_msgget,		"msgget"	}, /* 303 */
 	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 304 */
 	{ 4,	TI|TM|SI,	sys_shmat,		"shmat"		}, /* 305 */
 	{ 4,	TI|TM|SI,	sys_shmdt,		"shmdt"		}, /* 306 */
-	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 307 */
+	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 307 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 308 */
 	{ 5,	0,	sys_add_key,		"add_key"	}, /* 309 */
 	{ 4,	0,	sys_request_key,	"request_key"	}, /* 310 */

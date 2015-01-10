@@ -184,18 +184,18 @@
 	{ 5,	0,	sys_mq_timedreceive,		"mq_timedreceive"	}, /* 183 */
 	{ 2,	0,	sys_mq_notify,			"mq_notify"		}, /* 184 */
 	{ 3,	0,	sys_mq_getsetattr,		"mq_getsetattr"		}, /* 185 */
-	{ 4,	TI,	sys_msgget,			"msgget"		}, /* 186 */
-	{ 4,	TI,	sys_msgctl,			"msgctl"		}, /* 187 */
-	{ 4,	TI,	sys_msgrcv,			"msgrcv"		}, /* 188 */
+	{ 2,	TI,	sys_msgget,			"msgget"		}, /* 186 */
+	{ 3,	TI,	sys_msgctl,			"msgctl"		}, /* 187 */
+	{ 5,	TI,	sys_msgrcv,			"msgrcv"		}, /* 188 */
 	{ 4,	TI,	sys_msgsnd,			"msgsnd"		}, /* 189 */
-	{ 4,	TI,	sys_semget,			"semget"		}, /* 190 */
+	{ 3,	TI,	sys_semget,			"semget"		}, /* 190 */
 	{ 4,	TI,	sys_semctl,			"semctl"		}, /* 191 */
-	{ 5,	TI,	sys_semtimedop,			"semtimedop"		}, /* 192 */
-	{ 4,	TI,	sys_semop,			"semop"			}, /* 193 */
-	{ 4,	TI,	sys_shmget,			"shmget"		}, /* 194 */
-	{ 4,	TI,	sys_shmctl,			"shmctl"		}, /* 195 */
-	{ 4,	TI|TM|SI,	sys_shmat,			"shmat"			}, /* 196 */
-	{ 4,	TI|TM|SI,	sys_shmdt,			"shmdt"			}, /* 197 */
+	{ 4,	TI,	sys_semtimedop,			"semtimedop"		}, /* 192 */
+	{ 3,	TI,	sys_semop,			"semop"			}, /* 193 */
+	{ 3,	TI,	sys_shmget,			"shmget"		}, /* 194 */
+	{ 3,	TI,	sys_shmctl,			"shmctl"		}, /* 195 */
+	{ 3,	TI|TM|SI,	sys_shmat,			"shmat"			}, /* 196 */
+	{ 1,	TI|TM|SI,	sys_shmdt,			"shmdt"			}, /* 197 */
 	{ 3,	TN,	sys_socket,			"socket"		}, /* 198 */
 	{ 4,	TN,	sys_socketpair,			"socketpair"		}, /* 199 */
 	{ 3,	TN,	sys_bind,			"bind"			}, /* 200 */

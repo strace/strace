@@ -214,7 +214,7 @@
 	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 5211 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address" }, /* 5212 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 5213 */
-	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 5214 */
+	{ 4,	TI,	sys_semtimedop,		"semtimedop"	}, /* 5214 */
 	{ 4,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 5215 */
 	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 5216 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 5217 */

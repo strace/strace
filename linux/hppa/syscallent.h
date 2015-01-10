@@ -187,13 +187,13 @@
 	{ 5,	TN,	sys_getsockopt,		"getsockopt"		}, /* 182 */
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"		}, /* 183 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"		}, /* 184 */
-	{ 4,	TI,	sys_semop,		"semop"			}, /* 185 */
-	{ 4,	TI,	sys_semget,		"semget"		}, /* 186 */
+	{ 3,	TI,	sys_semop,		"semop"			}, /* 185 */
+	{ 3,	TI,	sys_semget,		"semget"		}, /* 186 */
 	{ 4,	TI,	sys_semctl,		"semctl"		}, /* 187 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"		}, /* 188 */
-	{ 4,	TI,	sys_msgrcv,		"msgrcv"		}, /* 189 */
-	{ 4,	TI,	sys_msgget,		"msgget"		}, /* 190 */
-	{ 4,	TI,	sys_msgctl,		"msgctl"		}, /* 191 */
+	{ 5,	TI,	sys_msgrcv,		"msgrcv"		}, /* 189 */
+	{ 2,	TI,	sys_msgget,		"msgget"		}, /* 190 */
+	{ 3,	TI,	sys_msgctl,		"msgctl"		}, /* 191 */
 	{ 3,	TI|TM|SI,	sys_shmat,		"shmat"			}, /* 192 */
 	{ 1,	TI|TM|SI,	sys_shmdt,		"shmdt"			}, /* 193 */
 	{ 3,	TI,	sys_shmget,		"shmget"		}, /* 194 */
@@ -230,7 +230,7 @@
 	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"		}, /* 225 */
 	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"		}, /* 226 */
 	{ 5,	TM|SI,	printargs,		"remap_file_pages"	}, /* 227 */
-	{ 5,	TI,	sys_semtimedop,		"semtimedop"		}, /* 228 */
+	{ 4,	TI,	sys_semtimedop,		"semtimedop"		}, /* 228 */
 	{ 5,	0,	printargs,		"mq_open"		}, /* 229 */
 	{ 5,	0,	printargs,		"mq_unlink"		}, /* 230 */
 	{ 5,	0,	printargs,		"mq_timedsend"		}, /* 231 */

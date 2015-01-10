@@ -264,15 +264,15 @@
 	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 235 */
 	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 236 */
 	{ 4,	TI,	sys_semop,		"semop"		}, /* 237 */
-	{ 4,	TI,	sys_semget,		"semget"	}, /* 238 */
+	{ 3,	TI,	sys_semget,		"semget"	}, /* 238 */
 	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 239 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 240 */
 	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 241 */
-	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 242 */
+	{ 2,	TI,	sys_msgget,		"msgget"	}, /* 242 */
 	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 243 */
 	{ 4,	TI|TM|SI,	sys_shmat,		"shmat"		}, /* 244 */
 	{ 4,	TI|TM|SI,	sys_shmdt,		"shmdt"		}, /* 245 */
-	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 246 */
+	{ 3,	TI,	sys_shmget,		"shmget"	}, /* 246 */
 	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 247 */
 	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 248 */
 	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 249 */

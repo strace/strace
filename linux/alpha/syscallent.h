@@ -226,19 +226,19 @@
 	{ 5,	0,	NULL,			NULL			}, /* 197 */
 	{ 5,	0,	NULL,			NULL			}, /* 198 */
 	{ 4,	0,	printargs,		"osf_swapon"		}, /* 199 */
-	{ 4,	TI,	sys_msgctl,		"msgctl"		}, /* 200 */
-	{ 4,	TI,	sys_msgget,		"msgget"		}, /* 201 */
-	{ 4,	TI,	sys_msgrcv,		"msgrcv"		}, /* 202 */
+	{ 3,	TI,	sys_msgctl,		"msgctl"		}, /* 200 */
+	{ 2,	TI,	sys_msgget,		"msgget"		}, /* 201 */
+	{ 5,	TI,	sys_msgrcv,		"msgrcv"		}, /* 202 */
 	{ 4,	TI,	sys_msgsnd,		"msgsnd"		}, /* 203 */
 	{ 4,	TI,	sys_semctl,		"semctl"		}, /* 204 */
-	{ 4,	TI,	sys_semget,		"semget"		}, /* 205 */
+	{ 3,	TI,	sys_semget,		"semget"		}, /* 205 */
 	{ 4,	TI,	printargs,		"semop"			}, /* 206 */
 	{ 1,	0,	printargs,		"osf_utsname"		}, /* 207 */
 	{ 3,	TF,	sys_chown,		"lchown"		}, /* 208 */
 	{ 3,	TI|TM,	printargs,		"osf_shmat"		}, /* 209 */
-	{ 4,	TI,	sys_shmctl,		"shmctl"		}, /* 210 */
-	{ 4,	TI|TM|SI,	sys_shmdt,		"shmdt"			}, /* 211 */
-	{ 4,	TI,	sys_shmget,		"shmget"		}, /* 212 */
+	{ 3,	TI,	sys_shmctl,		"shmctl"		}, /* 210 */
+	{ 1,	TI|TM|SI,	sys_shmdt,		"shmdt"			}, /* 211 */
+	{ 3,	TI,	sys_shmget,		"shmget"		}, /* 212 */
 	{ 5,	0,	printargs,		"osf_mvalid"		}, /* 213, not implemented */
 	{ 5,	0,	printargs,		"osf_getaddressconf"	}, /* 214, not implemented */
 	{ 5,	0,	printargs,		"osf_msleep"		}, /* 215, not implemented */
@@ -449,7 +449,7 @@
 	{ 2,	0,	sys_clock_gettime,	"clock_gettime"		}, /* 420 */
 	{ 2,	0,	sys_clock_getres,	"clock_getres"		}, /* 421 */
 	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"	}, /* 422 */
-	{ 5,	TI,	sys_semtimedop,		"semtimedop"		}, /* 423 */
+	{ 4,	TI,	sys_semtimedop,		"semtimedop"		}, /* 423 */
 	{ 3,	TS,	sys_tgkill,		"tgkill"		}, /* 424 */
 	{ 2,	TF,	sys_stat64,		"stat64"		}, /* 425 */
 	{ 2,	TF,	sys_lstat64,		"lstat64"		}, /* 426 */
