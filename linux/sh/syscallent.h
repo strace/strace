@@ -178,7 +178,7 @@
 	{ 1,	0,	sys_getsid,		"getsid"	}, /* 147 */
 	{ 1,	TD,	sys_fdatasync,		"fdatasync"	}, /* 148 */
 	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 149 */
-	{ 1,	TM,	sys_mlock,		"mlock"		}, /* 150 */
+	{ 2,	TM,	sys_mlock,		"mlock"		}, /* 150 */
 	{ 2,	TM,	sys_munlock,		"munlock"	}, /* 151 */
 	{ 1,	TM,	sys_mlockall,		"mlockall"	}, /* 152 */
 	{ 1,	TM,	sys_munlockall,		"munlockall"	}, /* 153 */
