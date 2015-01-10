@@ -101,7 +101,7 @@
 	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 73 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 74 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 75 */
-	{ 2,	0,	sys_getrlimit,		"old_getrlimit"	}, /* 76 */
+	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 76 */
 	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 77 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 78 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */

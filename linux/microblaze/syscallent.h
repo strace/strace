@@ -102,7 +102,7 @@
 	{ 1,	TS,	sys_sigpending,		"sigpending"	}, /* 73 */
 	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 74 */
 	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 75 */
-	{ 2,	0,	sys_getrlimit,		"old_getrlimit"	}, /* 76 */
+	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 76 */
 	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 77 */
 	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 78 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */
@@ -217,7 +217,7 @@
 	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 188 */
 	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
-	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 191 */
+	{ 2,	0,	sys_getrlimit,		"ugetrlimit"	}, /* 191 */
 	{ 6,	TD|TM|SI,	sys_mmap_pgoff,		"mmap2"		}, /* 192 */
 	{ 3,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
 	{ 3,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */

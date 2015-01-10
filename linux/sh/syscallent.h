@@ -219,7 +219,7 @@
 	{ 5,	0,	NULL,			NULL		}, /* 188 */
 	{ 5,	0,	NULL,			NULL		}, /* 189 */
 	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
-	{ 5,	0,	printargs,		"getrlimit"	}, /* 191 */
+	{ 2,	0,	sys_getrlimit,		"ugetrlimit"	}, /* 191 */
 	{ 6,	TD|TM|SI,	sys_mmap_4koff,		"mmap2"		}, /* 192 */
 	{ 3,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
 	{ 3,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */

@@ -161,7 +161,7 @@
 	{ 1,	0,	sys_uname,			"uname"			}, /* 160 */
 	{ 2,	0,	sys_sethostname,		"sethostname"		}, /* 161 */
 	{ 2,	0,	sys_setdomainname,		"setdomainname"		}, /* 162 */
-	{ 2,	0,	sys_getrlimit,			"oldgetrlimit"		}, /* 163 */
+	{ 2,	0,	sys_getrlimit,			"getrlimit"		}, /* 163 */
 	{ 2,	0,	sys_setrlimit,			"setrlimit"		}, /* 164 */
 	{ 2,	0,	sys_getrusage,			"getrusage"		}, /* 165 */
 	{ 1,	0,	sys_umask,			"umask"			}, /* 166 */
