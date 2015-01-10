@@ -41,10 +41,10 @@
 	{ 5,	TF,	sys_mount,			"mount"				}, /*   40 */
 	{ 2,	TF,	sys_pivotroot,			"pivot_root"			}, /*   41 */
 	{ 3,	0,	sys_nfsservctl,			"nfsservctl"			}, /*   42 */
-	{ 2,	TF,	sys_statfs,			"statfs64"			}, /*   43 */
-	{ 2,	TD,	sys_fstatfs,			"fstatfs64"			}, /*   44 */
-	{ 2,	TF,	sys_truncate,			"truncate64"			}, /*   45 */
-	{ 2,	TD,	sys_ftruncate,			"ftruncate64"			}, /*   46 */
+	{ 2,	TF,	sys_statfs,			"statfs"			}, /*   43 */
+	{ 2,	TD,	sys_fstatfs,			"fstatfs"			}, /*   44 */
+	{ 2,	TF,	sys_truncate,			"truncate"			}, /*   45 */
+	{ 2,	TD,	sys_ftruncate,			"ftruncate"			}, /*   46 */
 	{ 4,	TD,	sys_fallocate,			"fallocate"			}, /*   47 */
 	{ 3,	TD|TF,	sys_faccessat,			"faccessat"			}, /*   48 */
 	{ 1,	TF,	sys_chdir,			"chdir"				}, /*   49 */
