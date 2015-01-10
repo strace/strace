@@ -144,6 +144,7 @@ EXTRA_DIST =				\
 	debian/watch			\
 	errnoent.sh			\
 	ioctlsort.c			\
+	linux/64/syscallent.h		\
 	linux/aarch64/errnoent1.h	\
 	linux/aarch64/ioctlent.h.in	\
 	linux/aarch64/ioctlent1.h	\
