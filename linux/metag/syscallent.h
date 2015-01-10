@@ -40,7 +40,7 @@
 	{ 2,	TF,	sys_umount2,			"umount"		}, /* 39 */
 	{ 5,	TF,	sys_mount,			"mount"			}, /* 40 */
 	{ 2,	TF,	sys_pivotroot,			"pivot_root"		}, /* 41 */
-	{									}, /* 42 */
+	{ 3,	0,	sys_nfsservctl,			"nfsservctl"		}, /* 42 */
 	{ 3,	TF,	sys_statfs64,			"statfs64"		}, /* 43 */
 	{ 3,	TD,	sys_fstatfs64,			"fstatfs64"		}, /* 44 */
 	{ 3,	TF,	sys_truncate64,			"truncate64"		}, /* 45 */
