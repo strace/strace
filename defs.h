@@ -677,6 +677,7 @@ extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_b
 # define LONG_LONG(a,b) \
 	((long long)((unsigned long long)(unsigned)(b) | ((unsigned long long)(a)<<32)))
 #endif
+extern int getllval(struct tcb *, unsigned long long *, int);
 extern int printllval(struct tcb *, const char *, int);
 
 extern void printxval(const struct xlat *, const unsigned int, const char *);

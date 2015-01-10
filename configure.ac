@@ -205,6 +205,7 @@ AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
 AC_LITTLE_ENDIAN_LONG_LONG
 
 AC_CHECK_FUNCS(m4_normalize([
+	fanotify_mark
 	fopen64
 	fork
 	fputs_unlocked
@@ -239,6 +240,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	stropts.h
 	sys/conf.h
 	sys/epoll.h
+	sys/fanotify.h
 	sys/filio.h
 	sys/ioctl.h
 	sys/poll.h

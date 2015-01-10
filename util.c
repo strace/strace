@@ -242,39 +242,39 @@ printxval(const struct xlat *xlat, const unsigned int val, const char *dflt)
 }
 
 /*
- * Print 64bit argument at position arg_no and return the index of the next
- * argument.
+ * Fetch 64bit argument at position arg_no and
+ * return the index of the next argument.
  */
 int
-printllval(struct tcb *tcp, const char *format, int arg_no)
+getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 {
 #if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
 # if SUPPORTED_PERSONALITIES > 1
 	if (current_wordsize > 4) {
 # endif
-		tprintf(format, tcp->u_arg[arg_no]);
+		*val = tcp->u_arg[arg_no];
 		arg_no++;
 # if SUPPORTED_PERSONALITIES > 1
 	} else {
 #  if defined(AARCH64) || defined(POWERPC64)
 		/* Align arg_no to the next even number. */
 		arg_no = (arg_no + 1) & 0xe;
-#  endif
-		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
+#  endif /* AARCH64 || POWERPC64 */
+		*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
 	}
-# endif /* SUPPORTED_PERSONALITIES */
+# endif /* SUPPORTED_PERSONALITIES > 1 */
 #elif SIZEOF_LONG > 4
 #  error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
 #elif defined LINUX_MIPSN32
-	tprintf(format, tcp->ext_arg[arg_no]);
+	*val = tcp->ext_arg[arg_no];
 	arg_no++;
 #elif defined X32
 	if (current_personality == 0) {
-		tprintf(format, tcp->ext_arg[arg_no]);
+		*val = tcp->ext_arg[arg_no];
 		arg_no++;
 	} else {
-		tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
+		*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
 	}
 #else
@@ -285,10 +285,24 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 	/* Align arg_no to the next even number. */
 	arg_no = (arg_no + 1) & 0xe;
 # endif
-	tprintf(format, LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]));
+	*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 	arg_no += 2;
 #endif
 
+	return arg_no;
+}
+
+/*
+ * Print 64bit argument at position arg_no and
+ * return the index of the next argument.
+ */
+int
+printllval(struct tcb *tcp, const char *format, int arg_no)
+{
+	unsigned long long val = 0;
+
+	arg_no = getllval(tcp, &val, arg_no);
+	tprintf(format, val);
 	return arg_no;
 }
 

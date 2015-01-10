@@ -5,6 +5,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
 check_PROGRAMS = \
 	inet-accept-connect-send-recv \
 	caps \
+	fanotify_mark \
 	mmsg \
 	net-accept-connect \
 	netlink_inet_diag \
@@ -32,6 +33,7 @@ TESTS = \
 	strace-f.test \
 	qual_syscall.test \
 	caps.test \
+	fanotify_mark.test \
 	getdents.test \
 	scm_rights-fd.test \
 	sigaction.test \

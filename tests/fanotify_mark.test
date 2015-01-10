@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# Check fanotify_mark syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+./fanotify_mark || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ 'fanotify_mark is not available'
+	else
+		fail_ 'fanotify_mark failed'
+	fi
+}
+
+args="-efanotify_mark ./fanotify_mark"
+$STRACE -o "$LOG" $args || {
+	cat "$LOG"
+	fail_ "$STRACE $args failed"
+}
+
+grep_log()
+{
+	local syscall="$1"; shift
+
+	LC_ALL=C grep -E -x "$syscall$*" $LOG > /dev/null || {
+		cat $LOG
+		fail_ "$STRACE $args failed to trace \"$syscall\" properly"
+	}
+}
+
+grep_log fanotify_mark '\(-1, FAN_MARK_ADD, FAN_MODIFY\|FAN_ONDIR, AT_FDCWD, "\."\) += -1.*'
+
+exit 0
