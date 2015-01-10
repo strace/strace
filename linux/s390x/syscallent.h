@@ -49,7 +49,7 @@
 	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
-	{ 1,	TF,	sys_umount,		"oldumount"	}, /* 22 */
+	{ 1,	TF,	sys_umount,		"umount"	}, /* 22 */
 	{ MA,	0,	NULL,			NULL		}, /* 23 */
 	{ MA,	0,	NULL,			NULL		}, /* 24 */
 	{ MA,	0,	NULL,			NULL		}, /* 25 */
@@ -79,7 +79,7 @@
 	{ MA,	0,	NULL,			NULL		}, /* 49 */
 	{ MA,	0,	NULL,			NULL		}, /* 50 */
 	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
-	{ 2,	TF,	sys_umount2,		"umount"	}, /* 52 */
+	{ 2,	TF,	sys_umount2,		"umount2"	}, /* 52 */
 	{ MA,	0,	NULL,			NULL		}, /* 53 */
 	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 54 */
 	{ 3,	TD,	sys_fcntl,		"fcntl"		}, /* 55 */

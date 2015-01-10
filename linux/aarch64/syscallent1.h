@@ -68,7 +68,7 @@
 [1073] = { 6,	TN,		sys_recv,		"recv"		},
 [1074] = { 4,	TN,		sys_send,		"send"		},
 [1075] = { 2,	0,		sys_bdflush,		"bdflush"	},
-[1076] = { 2,	TF,		sys_umount,		"umount"	},
+[1076] = { 1,	TF,		sys_umount,		"umount"	},
 [1077] = { 1,	TF,		sys_uselib,		"uselib"	},
 [1078] = { 1,	0,		sys_sysctl,		"sysctl"	},
 [1079] = { 0,	TP,		sys_fork,		"fork"		},

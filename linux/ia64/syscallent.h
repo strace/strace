@@ -835,7 +835,7 @@
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 1041 */
 	{ 0,	0,	sys_getppid,		"getppid"	}, /* 1042 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 1043 */
-	{ 1,	TF,	sys_umount2,		"umount"	}, /* 1044 */
+	{ 2,	TF,	sys_umount2,		"umount"	}, /* 1044 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 1045 */
 	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 1046 */
 	{ 0,	NF,	sys_geteuid,		"geteuid"	}, /* 1047 */

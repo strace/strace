@@ -47,7 +47,7 @@
 	{ 5,	TD,	sys_llseek,		"_llseek"	}, /* 19 */
 	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
 	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
-	{ 2,	TF,	sys_umount,		"umount"	}, /* 22 */
+	{ 1,	TF,	sys_umount,		"umount"	}, /* 22 */
 	{ 1,	0,	sys_setuid,		"setuid"	}, /* 23 */
 	{ 0,	NF,	sys_getuid,		"getuid"	}, /* 24 */
 	{ 1,	0,	sys_stime,		"stime"		}, /* 25 */

@@ -164,7 +164,7 @@
 	{ 1,	TF,	sys_acct,		"acct"		},  /* 163 */
 	{ 2,	0,	sys_settimeofday,	"settimeofday"	},  /* 164 */
 	{ 5,	TF,	sys_mount,		"mount"		},  /* 165 */
-	{ 2,	TF,	sys_umount2,		"umount"	}, /* 166 */
+	{ 2,	TF,	sys_umount2,		"umount2"	}, /* 166 */
 	{ 2,	TF,	sys_swapon,		"swapon"	},  /* 167 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	},  /* 168 */
 	{ 4,	0,	sys_reboot,		"reboot"	},  /* 169 */

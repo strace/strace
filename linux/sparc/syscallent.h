@@ -43,7 +43,7 @@
 	{ 0,	TD,	sys_pipe,	"pipe" },		/* 42 */
 	{ 1,	0,	sys_times,	"times" },		/* 43 */
 	{ 0,	NF,	sys_getuid,	"getuid32" },		/* 44 */
-	{ 2,	TF,	sys_umount2,	"umount" },		/* 45 */
+	{ 2,	TF,	sys_umount2,	"umount2" },		/* 45 */
 	{ 1,	0,	sys_setgid16,	"setgid" },		/* 46 */
 	{ 0,	NF,	sys_getgid16,	"getgid" },		/* 47 */
 	{ 3,	TS,	sys_signal,	"signal" },		/* 48 */
@@ -157,7 +157,7 @@
 	{ 4,	0,	printargs,	"getdirentries" },	/* 156 */
 	{ 2,	TF,	sys_statfs,	"statfs" },		/* 157 */
 	{ 2,	TD,	sys_fstatfs,	"fstatfs" },		/* 158 */
-	{ 1,	TF,	sys_umount,	"oldumount" },		/* 159 */
+	{ 1,	TF,	sys_umount,	"umount" },		/* 159 */
 	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 160 */
 	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 161 */
 	{ 2,	0,	printargs,	"getdomainname" },	/* 162 */

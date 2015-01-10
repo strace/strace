@@ -37,7 +37,7 @@
 	{ 3,	TD|TF,	sys_symlinkat,			"symlinkat"		}, /* 36 */
 	{ 5,	TD|TF,	sys_linkat,			"linkat"		}, /* 37 */
 	{ 4,	TD|TF,	sys_renameat,			"renameat"		}, /* 38 */
-	{ 2,	TF,	sys_umount2,			"umount"		}, /* 39 */
+	{ 2,	TF,	sys_umount2,			"umount2"		}, /* 39 */
 	{ 5,	TF,	sys_mount,			"mount"			}, /* 40 */
 	{ 2,	TF,	sys_pivotroot,			"pivot_root"		}, /* 41 */
 	{ 3,	0,	sys_nfsservctl,			"nfsservctl"		}, /* 42 */

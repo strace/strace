@@ -168,7 +168,7 @@
 	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 173 */
 	{ 1,	TF,	sys_chroot,		"chroot"	}, /* 174 */
 	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 175 */
-	{ 2,	TF,	sys_umount,		"umount"	}, /* 176 */
+	{ 1,	TF,	sys_umount,		"umount"	}, /* 176 */
 	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 177 */
 	{ 0,	0,	sys_sync,		"sync"		}, /* 178 */
 	[179] = { },
