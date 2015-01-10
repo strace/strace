@@ -548,6 +548,7 @@ extern const struct xlat whence_codes[];
 #define SYSCALL_NEVER_FAILS	0200	/* Syscall is always successful. */
 #define STACKTRACE_INVALIDATE_CACHE 0400  /* Trigger proc/maps cache updating */
 #define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
+#define TRACE_INDIRECT_SUBCALL	02000	/* Syscall is an indirect socket/ipc subcall. */
 
 #if defined(ARM) || defined(AARCH64) \
  || defined(I386) || defined(X32) || defined(X86_64) \

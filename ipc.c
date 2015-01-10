@@ -97,16 +97,7 @@ int sys_msgget(struct tcb *tcp)
 static int
 indirect_ipccall(struct tcb *tcp)
 {
-#ifdef X86_64
-	return current_personality == 1;
-#endif
-#if defined IA64
-	return tcp->scno < 1024; /* ia32 emulation syscalls are low */
-#endif
-#if defined(ALPHA) || defined(MIPS) || defined(HPPA) || defined(__ARM_EABI__) || defined(AARCH64)
-	return 0;
-#endif
-	return 1;
+	return tcp->s_ent->sys_flags & TRACE_INDIRECT_SUBCALL;
 }
 
 int sys_msgctl(struct tcb *tcp)
