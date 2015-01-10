@@ -244,7 +244,7 @@
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 251 */
 	{ 1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 252 */
 	[253] = { },
-	{ 4,	0,	printargs,		"lookup_dcookie"}, /* 254 */
+	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 254 */
 	[255] = { },
 	{ 5,	0,	printargs,		"add_key"	}, /* 256 */
 	{ 5,	0,	printargs,		"request_key"	}, /* 257 */

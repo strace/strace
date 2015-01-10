@@ -138,7 +138,7 @@
 	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 107 */
 	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 108 */
 	{ MA,	0,	NULL,			NULL		}, /* 109 */
-	{ MA,	0,	NULL,			NULL		}, /* 110 */
+	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 110 */
 	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 111 */
 	{ 0,	0,	sys_idle,		"idle"		}, /* 112 */
 	{ MA,	0,	NULL,			NULL		}, /* 113 */

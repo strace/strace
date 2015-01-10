@@ -210,7 +210,7 @@
 	{ 3,	0,	sys_io_submit,		"64:io_submit"	}, /* 209 */
 	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 210 */
 	{ 1,	0,	printargs,		"64:get_thread_area"	}, /* 211 */
-	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 212 */
+	{ 3,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 212 */
 	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 213 */
 	{ 4,	0,	printargs,		"64:epoll_ctl_old"	}, /* 214 */
 	{ 4,	0,	printargs,		"64:epoll_wait_old"	}, /* 215 */
