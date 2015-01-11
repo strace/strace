@@ -412,7 +412,7 @@
 	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 381 */
 	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 382 */
 #ifdef __ARM_EABI__
-# define ARM_LAST_ORDINARY_SYSCALL 382
+# define ARM_FIRST_SHUFFLED_SYSCALL 383
 #else
 	{ 5,	0,	NULL,			NULL		}, /* 383 */
 	{ 5,	0,	NULL,			NULL		}, /* 384 */
@@ -433,8 +433,8 @@
 	{ 5,	0,	NULL,			NULL		}, /* 399 */
 # define SYS_socket_subcall	400
 # include "subcall.h"
-# define ARM_LAST_ORDINARY_SYSCALL (SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls - 1)
-#endif /* !EABI */
+# define ARM_FIRST_SHUFFLED_SYSCALL (SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls)
+#endif /* !__ARM_EABI__ */
 
 	/* __ARM_NR_cmpxchg (0x000ffff0).
 	 * Remapped by shuffle_scno() to be directly after ordinary syscalls

@@ -930,34 +930,35 @@ print_pc(struct tcb *tcp)
 #endif /* architecture */
 }
 
-/* Shuffle syscall numbers so that we don't have huge gaps in syscall table.
- * The shuffling should be reversible: shuffle_scno(shuffle_scno(n)) == n.
+/*
+ * Shuffle syscall numbers so that we don't have huge gaps in syscall table.
+ * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
  */
 #if defined(ARM) || defined(AARCH64) /* So far only 32-bit ARM needs this */
 static long
 shuffle_scno(unsigned long scno)
 {
-	if (scno <= ARM_LAST_ORDINARY_SYSCALL)
+	if (scno < ARM_FIRST_SHUFFLED_SYSCALL)
 		return scno;
 
 	/* __ARM_NR_cmpxchg? Swap with LAST_ORDINARY+1 */
-	if (scno == 0x000ffff0)
-		return ARM_LAST_ORDINARY_SYSCALL+1;
-	if (scno == ARM_LAST_ORDINARY_SYSCALL+1)
+	if (scno == ARM_FIRST_SHUFFLED_SYSCALL)
 		return 0x000ffff0;
+	if (scno == 0x000ffff0)
+		return ARM_FIRST_SHUFFLED_SYSCALL;
 
-	/* Is it ARM specific syscall?
-	 * Swap with [LAST_ORDINARY+2, LAST_ORDINARY+2 + LAST_SPECIAL] range.
+#define ARM_SECOND_SHUFFLED_SYSCALL (ARM_FIRST_SHUFFLED_SYSCALL + 1)
+	/*
+	 * Is it ARM specific syscall?
+	 * Swap [0x000f0000, 0x000f0000 + LAST_SPECIAL] range
+	 * with [SECOND_SHUFFLED, SECOND_SHUFFLED + LAST_SPECIAL] range.
 	 */
-	if (scno >= 0x000f0000
-	 && scno <= 0x000f0000 + ARM_LAST_SPECIAL_SYSCALL
-	) {
-		return scno - 0x000f0000 + (ARM_LAST_ORDINARY_SYSCALL+2);
+	if (scno >= 0x000f0000 &&
+	    scno <= 0x000f0000 + ARM_LAST_SPECIAL_SYSCALL) {
+		return scno - 0x000f0000 + ARM_SECOND_SHUFFLED_SYSCALL;
 	}
-	if (/* scno >= ARM_LAST_ORDINARY_SYSCALL+2 - always true */ 1
-	 && scno <= (ARM_LAST_ORDINARY_SYSCALL+2) + ARM_LAST_SPECIAL_SYSCALL
-	) {
-		return scno + 0x000f0000 - (ARM_LAST_ORDINARY_SYSCALL+2);
+	if (scno <= ARM_SECOND_SHUFFLED_SYSCALL + ARM_LAST_SPECIAL_SYSCALL) {
+		return scno + 0x000f0000 - ARM_SECOND_SHUFFLED_SYSCALL;
 	}
 
 	return scno;
