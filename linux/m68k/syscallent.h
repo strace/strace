@@ -26,405 +26,357 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-	{ 0,	0,	sys_restart_syscall,	"restart_syscall" }, /* 0 */
-	{ 1,	TP|SE,	sys_exit,		"_exit"		}, /* 1 */
-	{ 0,	TP,	sys_fork,		"fork"		}, /* 2 */
-	{ 3,	TD,	sys_read,		"read"		}, /* 3 */
-	{ 3,	TD,	sys_write,		"write"		}, /* 4 */
-	{ 3,	TD|TF,	sys_open,		"open"		}, /* 5 */
-	{ 1,	TD,	sys_close,		"close"		}, /* 6 */
-	{ 3,	TP,	sys_waitpid,		"waitpid"	}, /* 7 */
-	{ 2,	TD|TF,	sys_creat,		"creat"		}, /* 8 */
-	{ 2,	TF,	sys_link,		"link"		}, /* 9 */
-	{ 1,	TF,	sys_unlink,		"unlink"	}, /* 10 */
-	{ 3,	TF|TP|SE|SI,	sys_execve,		"execve"	}, /* 11 */
-	{ 1,	TF,	sys_chdir,		"chdir"		}, /* 12 */
-	{ 1,	0,	sys_time,		"time"		}, /* 13 */
-	{ 3,	TF,	sys_mknod,		"mknod"		}, /* 14 */
-	{ 2,	TF,	sys_chmod,		"chmod"		}, /* 15 */
-	{ 3,	TF,	sys_chown16,		"chown"		}, /* 16 */
-	{ 0,	TM,	sys_break,		"break"		}, /* 17 */
-	{ 2,	TF,	sys_oldstat,		"oldstat"	}, /* 18 */
-	{ 3,	TD,	sys_lseek,		"lseek"		}, /* 19 */
-	{ 0,	0,	sys_getpid,		"getpid"	}, /* 20 */
-	{ 5,	TF,	sys_mount,		"mount"		}, /* 21 */
-	{ 1,	TF,	sys_umount,		"umount"	}, /* 22 */
-	{ 1,	0,	sys_setuid16,		"setuid"	}, /* 23 */
-	{ 0,	NF,	sys_getuid16,		"getuid"	}, /* 24 */
-	{ 1,	0,	sys_stime,		"stime"		}, /* 25 */
-	{ 4,	0,	sys_ptrace,		"ptrace"	}, /* 26 */
-	{ 1,	0,	sys_alarm,		"alarm"		}, /* 27 */
-	{ 2,	TD,	sys_oldfstat,		"oldfstat"	}, /* 28 */
-	{ 0,	TS,	sys_pause,		"pause"		}, /* 29 */
-	{ 2,	TF,	sys_utime,		"utime"		}, /* 30 */
-	{ 2,	0,	sys_stty,		"stty"		}, /* 31 */
-	{ 2,	0,	sys_gtty,		"gtty"		}, /* 32 */
-	{ 2,	TF,	sys_access,		"access"	}, /* 33 */
-	{ 1,	0,	sys_nice,		"nice"		}, /* 34 */
-	{ 0,	0,	sys_ftime,		"ftime"		}, /* 35 */
-	{ 0,	0,	sys_sync,		"sync"		}, /* 36 */
-	{ 2,	TS,	sys_kill,		"kill"		}, /* 37 */
-	{ 2,	TF,	sys_rename,		"rename"	}, /* 38 */
-	{ 2,	TF,	sys_mkdir,		"mkdir"		}, /* 39 */
-	{ 1,	TF,	sys_rmdir,		"rmdir"		}, /* 40 */
-	{ 1,	TD,	sys_dup,		"dup"		}, /* 41 */
-	{ 1,	TD,	sys_pipe,		"pipe"		}, /* 42 */
-	{ 1,	0,	sys_times,		"times"		}, /* 43 */
-	{ 0,	0,	sys_prof,		"prof"		}, /* 44 */
-	{ 1,	TM|SI,	sys_brk,		"brk"		}, /* 45 */
-	{ 1,	0,	sys_setgid16,		"setgid"	}, /* 46 */
-	{ 0,	NF,	sys_getgid16,		"getgid"	}, /* 47 */
-	{ 3,	TS,	sys_signal,		"signal"	}, /* 48 */
-	{ 0,	NF,	sys_geteuid16,		"geteuid"	}, /* 49 */
-	{ 0,	NF,	sys_getegid16,		"getegid"	}, /* 50 */
-	{ 1,	TF,	sys_acct,		"acct"		}, /* 51 */
-	{ 2,	TF,	sys_umount2,		"umount2"	}, /* 52 */
-	{ 0,	0,	sys_lock,		"lock"		}, /* 53 */
-	{ 3,	TD,	sys_ioctl,		"ioctl"		}, /* 54 */
-	{ 3,	TD,	sys_fcntl,		"fcntl"		}, /* 55 */
-	{ 0,	0,	sys_mpx,		"mpx"		}, /* 56 */
-	{ 2,	0,	sys_setpgid,		"setpgid"	}, /* 57 */
-	{ 2,	0,	sys_ulimit,		"ulimit"	}, /* 58 */
-	{ 1,	0,	sys_oldolduname,	"oldolduname"	}, /* 59 */
-	{ 1,	0,	sys_umask,		"umask"		}, /* 60 */
-	{ 1,	TF,	sys_chroot,		"chroot"	}, /* 61 */
-	{ 2,	0,	sys_ustat,		"ustat"		}, /* 62 */
-	{ 2,	TD,	sys_dup2,		"dup2"		}, /* 63 */
-	{ 0,	0,	sys_getppid,		"getppid"	}, /* 64 */
-	{ 0,	0,	sys_getpgrp,		"getpgrp"	}, /* 65 */
-	{ 0,	0,	sys_setsid,		"setsid"	}, /* 66 */
-	{ 3,	TS,	sys_sigaction,		"sigaction"	}, /* 67 */
-	{ 0,	TS,	sys_siggetmask,		"sgetmask"	}, /* 68 */
-	{ 1,	TS,	sys_sigsetmask,		"ssetmask"	}, /* 69 */
-	{ 2,	0,	sys_setreuid16,		"setreuid"	}, /* 70 */
-	{ 2,	0,	sys_setregid16,		"setregid"	}, /* 71 */
-	{ 3,	TS,	sys_sigsuspend,		"sigsuspend"	}, /* 72 */
-	{ 1,	TS,	sys_sigpending,		"sigpending"	}, /* 73 */
-	{ 2,	0,	sys_sethostname,	"sethostname"	}, /* 74 */
-	{ 2,	0,	sys_setrlimit,		"setrlimit"	}, /* 75 */
-	{ 2,	0,	sys_getrlimit,		"getrlimit"	}, /* 76 */
-	{ 2,	0,	sys_getrusage,		"getrusage"	}, /* 77 */
-	{ 2,	0,	sys_gettimeofday,	"gettimeofday"	}, /* 78 */
-	{ 2,	0,	sys_settimeofday,	"settimeofday"	}, /* 79 */
-	{ 2,	0,	sys_getgroups16,	"getgroups"	}, /* 80 */
-	{ 2,	0,	sys_setgroups16,	"setgroups"	}, /* 81 */
-	{ 1,	TD,	sys_oldselect,		"oldselect"	}, /* 82 */
-	{ 2,	TF,	sys_symlink,		"symlink"	}, /* 83 */
-	{ 2,	TF,	sys_oldlstat,		"oldlstat"	}, /* 84 */
-	{ 3,	TF,	sys_readlink,		"readlink"	}, /* 85 */
-	{ 1,	TF,	sys_uselib,		"uselib"	}, /* 86 */
-	{ 2,	TF,	sys_swapon,		"swapon"	}, /* 87 */
-	{ 4,	0,	sys_reboot,		"reboot"	}, /* 88 */
-	{ 3,	TD,	sys_readdir,		"readdir"	}, /* 89 */
-	{ 1,	TD|TM|SI,	sys_old_mmap,		"old_mmap"	}, /* 90 */
-	{ 2,	TM|SI,	sys_munmap,		"munmap"	}, /* 91 */
-	{ 2,	TF,	sys_truncate,		"truncate"	}, /* 92 */
-	{ 2,	TD,	sys_ftruncate,		"ftruncate"	}, /* 93 */
-	{ 2,	TD,	sys_fchmod,		"fchmod"	}, /* 94 */
-	{ 3,	TD,	sys_fchown16,		"fchown"	}, /* 95 */
-	{ 2,	0,	sys_getpriority,	"getpriority"	}, /* 96 */
-	{ 3,	0,	sys_setpriority,	"setpriority"	}, /* 97 */
-	{ 4,	0,	sys_profil,		"profil"	}, /* 98 */
-	{ 2,	TF,	sys_statfs,		"statfs"	}, /* 99 */
-	{ 2,	TD,	sys_fstatfs,		"fstatfs"	}, /* 100 */
-	{ 3,	0,	sys_ioperm,		"ioperm"	}, /* 101 */
-	{ 2,	TD,	sys_socketcall,		"socketcall"	}, /* 102 */
-	{ 3,	0,	sys_syslog,		"syslog"	}, /* 103 */
-	{ 3,	0,	sys_setitimer,		"setitimer"	}, /* 104 */
-	{ 2,	0,	sys_getitimer,		"getitimer"	}, /* 105 */
-	{ 2,	TF,	sys_stat,		"stat"		}, /* 106 */
-	{ 2,	TF,	sys_lstat,		"lstat"		}, /* 107 */
-	{ 2,	TD,	sys_fstat,		"fstat"		}, /* 108 */
-	{ 1,	0,	sys_olduname,		"olduname"	}, /* 109 */
-	{ 1,	0,	sys_iopl,		"iopl"		}, /* 110 */
-	{ 0,	0,	sys_vhangup,		"vhangup"	}, /* 111 */
-	{ 0,	0,	sys_idle,		"idle"		}, /* 112 */
-	{ 1,	0,	sys_vm86old,		"vm86old"	}, /* 113 */
-	{ 4,	TP,	sys_wait4,		"wait4"		}, /* 114 */
-	{ 1,	TF,	sys_swapoff,		"swapoff"	}, /* 115 */
-	{ 1,	0,	sys_sysinfo,		"sysinfo"	}, /* 116 */
-	{ 6,	TI,	sys_ipc,		"ipc"		}, /* 117 */
-	{ 1,	TD,	sys_fsync,		"fsync"		}, /* 118 */
-	{ 0,	TS,	sys_sigreturn,		"sigreturn"	}, /* 119 */
-	{ 5,	TP,	sys_clone,		"clone"		}, /* 120 */
-	{ 2,	0,	sys_setdomainname,	"setdomainname"	}, /* 121 */
-	{ 1,	0,	sys_uname,		"uname"		}, /* 122 */
-	{ 4,	0,	sys_cacheflush,		"cacheflush"	}, /* 123 */
-	{ 1,	0,	sys_adjtimex,		"adjtimex"	}, /* 124 */
-	{ 3,	TM|SI,	sys_mprotect,		"mprotect"	}, /* 125 */
-	{ 3,	TS,	sys_sigprocmask,	"sigprocmask"	}, /* 126 */
-	{ 2,	0,	sys_create_module,	"create_module"	}, /* 127 */
-	{ 3,	0,	sys_init_module,	"init_module"	}, /* 128 */
-	{ 2,	0,	sys_delete_module,	"delete_module"	}, /* 129 */
-	{ 1,	0,	sys_get_kernel_syms,	"get_kernel_syms"}, /* 130 */
-	{ 4,	TF,	sys_quotactl,		"quotactl"	}, /* 131 */
-	{ 1,	0,	sys_getpgid,		"getpgid"	}, /* 132 */
-	{ 1,	TD,	sys_fchdir,		"fchdir"	}, /* 133 */
-	{ 0,	0,	sys_bdflush,		"bdflush"	}, /* 134 */
-	{ 3,	0,	sys_sysfs,		"sysfs"		}, /* 135 */
-	{ 1,	0,	sys_personality,	"personality"	}, /* 136 */
-	{ 5,	0,	sys_afs_syscall,	"afs_syscall"	}, /* 137 */
-	{ 1,	NF,	sys_setfsuid16,		"setfsuid"	}, /* 138 */
-	{ 1,	NF,	sys_setfsgid16,		"setfsgid"	}, /* 139 */
-	{ 5,	TD,	sys_llseek,		"_llseek"	}, /* 140 */
-	{ 3,	TD,	sys_getdents,		"getdents"	}, /* 141 */
-	{ 5,	TD,	sys_select,		"select"	}, /* 142 */
-	{ 2,	TD,	sys_flock,		"flock"		}, /* 143 */
-	{ 3,	TM,	sys_msync,		"msync"		}, /* 144 */
-	{ 3,	TD,	sys_readv,		"readv"		}, /* 145 */
-	{ 3,	TD,	sys_writev,		"writev"	}, /* 146 */
-	{ 1,	0,	sys_getsid,		"getsid"	}, /* 147 */
-	{ 1,	TD,	sys_fdatasync,		"fdatasync"	}, /* 148 */
-	{ 1,	0,	sys_sysctl,		"_sysctl"	}, /* 149 */
-	{ 2,	TM,	sys_mlock,		"mlock"		}, /* 150 */
-	{ 2,	TM,	sys_munlock,		"munlock"	}, /* 151 */
-	{ 1,	TM,	sys_mlockall,		"mlockall"	}, /* 152 */
-	{ 0,	TM,	sys_munlockall,		"munlockall"	}, /* 153 */
-	{ 2,	0,	sys_sched_setparam,	"sched_setparam"}, /* 154 */
-	{ 2,	0,	sys_sched_getparam,	"sched_getparam"}, /* 155 */
-	{ 3,	0,	sys_sched_setscheduler,	"sched_setscheduler"}, /* 156 */
-	{ 1,	0,	sys_sched_getscheduler,	"sched_getscheduler"}, /* 157 */
-	{ 0,	0,	sys_sched_yield,	"sched_yield"}, /* 158 */
-	{ 1,	0,	sys_sched_get_priority_max,"sched_get_priority_max"}, /* 159 */
-	{ 1,	0,	sys_sched_get_priority_min,"sched_get_priority_min"}, /* 160 */
-	{ 2,	0,	sys_sched_rr_get_interval,"sched_rr_get_interval"}, /* 161 */
-	{ 2,	0,	sys_nanosleep,		"nanosleep"	}, /* 162 */
-	{ 5,	TM|SI,	sys_mremap,		"mremap"	}, /* 163 */
-	{ 3,	0,	sys_setresuid16,	"setresuid"	}, /* 164 */
-	{ 3,	0,	sys_getresuid16,	"getresuid"	}, /* 165 */
-	{ 5,	0,	printargs,		"getpagesize"	}, /* 166 */
-	{ 5,	0,	sys_query_module,	"query_module"	}, /* 167 */
-	{ 3,	TD,	sys_poll,		"poll"		}, /* 168 */
-	{ 3,	0,	sys_nfsservctl,		"nfsservctl"	}, /* 169 */
-	{ 3,	0,	sys_setresgid16,	"setresgid"	}, /* 170 */
-	{ 3,	0,	sys_getresgid16,	"getresgid"	}, /* 171 */
-	{ 5,	0,	sys_prctl,		"prctl"		}, /* 172 */
-	{ 0,	TS,	sys_rt_sigreturn,	"rt_sigreturn"	}, /* 173 */
-	{ 4,	TS,	sys_rt_sigaction,	"rt_sigaction"	}, /* 174 */
-	{ 4,	TS,	sys_rt_sigprocmask,	"rt_sigprocmask"}, /* 175 */
-	{ 2,	TS,	sys_rt_sigpending,	"rt_sigpending"	}, /* 176 */
-	{ 4,	TS,	sys_rt_sigtimedwait,	"rt_sigtimedwait"}, /* 177 */
-	{ 3,	TS,	sys_rt_sigqueueinfo,    "rt_sigqueueinfo"}, /* 178 */
-	{ 2,	TS,	sys_rt_sigsuspend,	"rt_sigsuspend"	}, /* 179 */
-	{ 5,	TD,	sys_pread,		"pread64"	}, /* 180 */
-	{ 5,	TD,	sys_pwrite,		"pwrite64"	}, /* 181 */
-	{ 3,	TF,	sys_chown16,		"lchown"	}, /* 182 */
-	{ 2,	TF,	sys_getcwd,		"getcwd"	}, /* 183 */
-	{ 2,	0,	sys_capget,		"capget"	}, /* 184 */
-	{ 2,	0,	sys_capset,		"capset"	}, /* 185 */
-	{ 2,	TS,	sys_sigaltstack,	"sigaltstack"	}, /* 186 */
-	{ 4,	TD|TN,	sys_sendfile,		"sendfile"	}, /* 187 */
-	{ 5,	0,	sys_getpmsg,		"getpmsg"	}, /* 188 */
-	{ 5,	0,	sys_putpmsg,		"putpmsg"	}, /* 189 */
-	{ 0,	TP,	sys_vfork,		"vfork"		}, /* 190 */
-	{ 2,	0,	sys_getrlimit,		"ugetrlimit"	}, /* 191 */
-	{ 6,	TD|TM|SI,	sys_mmap_pgoff,		"mmap2"		}, /* 192 */
-	{ 3,	TF,	sys_truncate64,		"truncate64"	}, /* 193 */
-	{ 3,	TD,	sys_ftruncate64,	"ftruncate64"	}, /* 194 */
-	{ 2,	TF,	sys_stat64,		"stat64"	}, /* 195 */
-	{ 2,	TF,	sys_lstat64,		"lstat64"	}, /* 196 */
-	{ 2,	TD,	sys_fstat64,		"fstat64"	}, /* 197 */
-	{ 3,	TF,	sys_chown,		"chown32"	}, /* 198 */
-	{ 0,	NF,	sys_getuid,		"getuid32"	}, /* 199 */
-	{ 0,	NF,	sys_getgid,		"getgid32"	}, /* 200 */
-	{ 0,	NF,	sys_geteuid,		"geteuid32"	}, /* 201 */
-	{ 0,	NF,	sys_geteuid,		"getegid32"	}, /* 202 */
-	{ 2,	0,	sys_setreuid,		"setreuid32"	}, /* 203 */
-	{ 2,	0,	sys_setregid,		"setregid32"	}, /* 204 */
-	{ 2,	0,	sys_getgroups,		"getgroups32"	}, /* 205 */
-	{ 2,	0,	sys_setgroups,		"setgroups32"	}, /* 206 */
-	{ 3,	TD,	sys_fchown,		"fchown32"	}, /* 207 */
-	{ 3,	0,	sys_setresuid,		"setresuid32"	}, /* 208 */
-	{ 3,	0,	sys_getresuid,		"getresuid32"	}, /* 209 */
-	{ 3,	0,	sys_setresgid,		"setresgid32"	}, /* 210 */
-	{ 3,	0,	sys_getresgid,		"getresgid32"	}, /* 211 */
-	{ 3,	TF,	sys_chown,		"lchown32"	}, /* 212 */
-	{ 1,	0,	sys_setuid,		"setuid32"	}, /* 213 */
-	{ 1,	0,	sys_setgid,		"setgid32"	}, /* 214 */
-	{ 1,	NF,	sys_setfsuid,		"setfsuid32"	}, /* 215 */
-	{ 1,	NF,	sys_setfsgid,		"setfsgid32"	}, /* 216 */
-	{ 2,	TF,	sys_pivotroot,		"pivot_root"	}, /* 217 */
-	{ 5,	0,	NULL,			NULL		}, /* 218 */
-	{ 5,	0,	NULL,			NULL		}, /* 219 */
-	{ 3,	TD,	sys_getdents64,		"getdents64"	}, /* 220 */
-	{ 0,	0,	sys_gettid,		"gettid"	}, /* 221 */
-	{ 2,	TS,	sys_kill,		"tkill"		}, /* 222 */
-	{ 5,	TF,	sys_setxattr,		"setxattr"	}, /* 223 */
-	{ 5,	TF,	sys_setxattr,		"lsetxattr"	}, /* 224 */
-	{ 5,	TD,	sys_fsetxattr,		"fsetxattr"	}, /* 225 */
-	{ 4,	TF,	sys_getxattr,		"getxattr"	}, /* 226 */
-	{ 4,	TF,	sys_getxattr,		"lgetxattr"	}, /* 227 */
-	{ 4,	TD,	sys_fgetxattr,		"fgetxattr"	}, /* 228 */
-	{ 3,	TF,	sys_listxattr,		"listxattr"	}, /* 229 */
-	{ 3,	TF,	sys_listxattr,		"llistxattr"	}, /* 230 */
-	{ 3,	TD,	sys_flistxattr,		"flistxattr"	}, /* 231 */
-	{ 2,	TF,	sys_removexattr,	"removexattr"	}, /* 232 */
-	{ 2,	TF,	sys_removexattr,	"lremovexattr"	}, /* 233 */
-	{ 2,	TD,	sys_fremovexattr,	"fremovexattr"	}, /* 234 */
-	{ 6,	0,	sys_futex,		"futex"		}, /* 235 */
-	{ 4,	TD|TN,	sys_sendfile64,		"sendfile64"	}, /* 236 */
-	{ 3,	TM,	sys_mincore,		"mincore"	}, /* 237 */
-	{ 3,	TM,	sys_madvise,		"madvise"	}, /* 238 */
-	{ 3,	TD,	sys_fcntl,		"fcntl64"	}, /* 239 */
-	{ 4,	TD,	sys_readahead,		"readahead"	}, /* 240 */
-	{ 2,	0,	sys_io_setup,		"io_setup"	}, /* 241 */
-	{ 1,	0,	sys_io_destroy,		"io_destroy"	}, /* 242 */
-	{ 5,	0,	sys_io_getevents,	"io_getevents"	}, /* 243 */
-	{ 3,	0,	sys_io_submit,		"io_submit"	}, /* 244 */
-	{ 3,	0,	sys_io_cancel,		"io_cancel"	}, /* 245 */
-	{ 5,	TD,	sys_fadvise64,		"fadvise64"	}, /* 246 */
-	{ 1,	TP|SE,	sys_exit,		"exit_group"	}, /* 247 */
-	{ 4,	0,	sys_lookup_dcookie,	"lookup_dcookie"}, /* 248 */
-	{ 1,	TD,	sys_epoll_create,	"epoll_create"	}, /* 249 */
-	{ 4,	TD,	sys_epoll_ctl,		"epoll_ctl"	}, /* 250 */
-	{ 4,	TD,	sys_epoll_wait,		"epoll_wait"	}, /* 251 */
-	{ 5,	TM|SI,	sys_remap_file_pages,	"remap_file_pages"}, /* 252 */
-	{ 1,	0,	sys_set_tid_address,	"set_tid_address"}, /* 253 */
-	{ 3,	0,	sys_timer_create,	"timer_create"	}, /* 254 */
-	{ 4,	0,	sys_timer_settime,	"timer_settime"	}, /* 255 */
-	{ 2,	0,	sys_timer_gettime,	"timer_gettime"	}, /* 256 */
-	{ 1,	0,	sys_timer_getoverrun,	"timer_getoverrun"}, /* 257 */
-	{ 1,	0,	sys_timer_delete,	"timer_delete"	}, /* 258 */
-	{ 2,	0,	sys_clock_settime,	"clock_settime"	}, /* 259 */
-	{ 2,	0,	sys_clock_gettime,	"clock_gettime"	}, /* 260 */
-	{ 2,	0,	sys_clock_getres,	"clock_getres"	}, /* 261 */
-	{ 4,	0,	sys_clock_nanosleep,	"clock_nanosleep"}, /* 262 */
-	{ 3,	TF,	sys_statfs64,		"statfs64"	}, /* 263 */
-	{ 3,	TD,	sys_fstatfs64,		"fstatfs64"	}, /* 264 */
-	{ 3,	TS,	sys_tgkill,		"tgkill"	}, /* 265 */
-	{ 2,	TF,	sys_utimes,		"utimes"	}, /* 266 */
-	{ 6,	TD,	sys_fadvise64_64,	"fadvise64_64"	}, /* 267 */
-	{ 6,	TM,	sys_mbind,		"mbind"		}, /* 268 */
-	{ 5,	TM,	sys_get_mempolicy,	"get_mempolicy"	}, /* 269 */
-	{ 3,	TM,	sys_set_mempolicy,	"set_mempolicy"	}, /* 270 */
-	{ 4,	0,	sys_mq_open,		"mq_open"	}, /* 271 */
-	{ 1,	0,	sys_mq_unlink,		"mq_unlink"	}, /* 272 */
-	{ 5,	0,	sys_mq_timedsend,	"mq_timedsend"	}, /* 273 */
-	{ 5,	0,	sys_mq_timedreceive,	"mq_timedreceive" }, /* 274 */
-	{ 2,	0,	sys_mq_notify,		"mq_notify"	}, /* 275 */
-	{ 3,	0,	sys_mq_getsetattr,	"mq_getsetattr"	}, /* 276 */
-	{ 5,	TP,	sys_waitid,		"waitid"	}, /* 277 */
-	{ 5,	0,	sys_vserver,		"vserver"	}, /* 278 */
-	{ 5,	0,	sys_add_key,		"add_key"	}, /* 279 */
-	{ 5,	0,	sys_request_key,	"request_key"	}, /* 280 */
-	{ 5,	0,	sys_keyctl,		"keyctl"	}, /* 281 */
-	{ 3,	0,	sys_ioprio_set,		"ioprio_set"	}, /* 282 */
-	{ 2,	0,	sys_ioprio_get,		"ioprio_get"	}, /* 283 */
-	{ 0,	TD,	sys_inotify_init,	"inotify_init"	}, /* 284 */
-	{ 3,	TD,	sys_inotify_add_watch,	"inotify_add_watch" }, /* 285 */
-	{ 2,	TD,	sys_inotify_rm_watch,	"inotify_rm_watch" }, /* 286 */
-	{ 4,	TM,	sys_migrate_pages,	"migrate_pages"	}, /* 287 */
-	{ 4,	TD|TF,	sys_openat,		"openat"	}, /* 288 */
-	{ 3,	TD|TF,	sys_mkdirat,		"mkdirat"	}, /* 289 */
-	{ 4,	TD|TF,	sys_mknodat,		"mknodat"	}, /* 290 */
-	{ 5,	TD|TF,	sys_fchownat,		"fchownat"	}, /* 291 */
-	{ 3,	TD|TF,	sys_futimesat,		"futimesat"	}, /* 292 */
-	{ 4,	TD|TF,	sys_newfstatat,		"fstatat64"	}, /* 293 */
-	{ 3,	TD|TF,	sys_unlinkat,		"unlinkat"	}, /* 294 */
-	{ 4,	TD|TF,	sys_renameat,		"renameat"	}, /* 295 */
-	{ 5,	TD|TF,	sys_linkat,		"linkat"	}, /* 296 */
-	{ 3,	TD|TF,	sys_symlinkat,		"symlinkat"	}, /* 297 */
-	{ 4,	TD|TF,	sys_readlinkat,		"readlinkat"	}, /* 298 */
-	{ 3,	TD|TF,	sys_fchmodat,		"fchmodat"	}, /* 299 */
-	{ 3,	TD|TF,	sys_faccessat,		"faccessat"	}, /* 300 */
-	{ 6,	TD,	sys_pselect6,		"pselect6"	}, /* 301 */
-	{ 5,	TD,	sys_ppoll,		"ppoll"		}, /* 302 */
-	{ 1,	TP,	sys_unshare,		"unshare"	}, /* 303 */
-	{ 2,	0,	sys_set_robust_list,	"set_robust_list" }, /* 304 */
-	{ 3,	0,	sys_get_robust_list,	"get_robust_list" }, /* 305 */
-	{ 6,	TD,	sys_splice,		"splice"	}, /* 306 */
-	{ 6,	TD,	sys_sync_file_range,	"sync_file_range" }, /* 307 */
-	{ 4,	TD,	sys_tee,		"tee"		}, /* 308 */
-	{ 4,	TD,	sys_vmsplice,		"vmsplice"	}, /* 309 */
-	{ 6,	TM,	sys_move_pages,		"move_pages"	}, /* 310 */
-	{ 3,	0,	sys_sched_setaffinity,	"sched_setaffinity" },/* 311 */
-	{ 3,	0,	sys_sched_getaffinity,	"sched_getaffinity" },/* 312 */
-	{ 4,	0,	sys_kexec_load,		"kexec_load"	}, /* 313 */
-	{ 3,	0,	sys_getcpu,		"getcpu"	}, /* 314 */
-	{ 6,	TD,	sys_epoll_pwait,	"epoll_pwait"	}, /* 315 */
-	{ 4,	TD|TF,	sys_utimensat,		"utimensat"	}, /* 316 */
-	{ 3,	TD|TS,	sys_signalfd,		"signalfd"	}, /* 317 */
-	{ 2,	TD,	sys_timerfd_create,	"timerfd_create"}, /* 318 */
-	{ 1,	TD,	sys_eventfd,		"eventfd"	}, /* 319 */
-	{ 6,	TD,	sys_fallocate,		"fallocate"	}, /* 320 */
-	{ 4,	TD,	sys_timerfd_settime,	"timerfd_settime"}, /* 321 */
-	{ 2,	TD,	sys_timerfd_gettime,	"timerfd_gettime"}, /* 322 */
-	{ 4,	TD|TS,	sys_signalfd4,		"signalfd4"	}, /* 323 */
-	{ 2,	TD,	sys_eventfd2,		"eventfd2"	}, /* 324 */
-	{ 1,	TD,	sys_epoll_create1,	"epoll_create1"	}, /* 325 */
-	{ 3,	TD,	sys_dup3,		"dup3"		}, /* 326 */
-	{ 2,	TD,	sys_pipe2,		"pipe2"		}, /* 327 */
-	{ 1,	TD,	sys_inotify_init1,	"inotify_init1"	}, /* 328 */
-	{ 5,	TD,	sys_preadv,		"preadv"	}, /* 329 */
-	{ 5,	TD,	sys_pwritev,		"pwritev"	}, /* 330 */
-	{ 4,	TP|TS,	sys_rt_tgsigqueueinfo,	"rt_tgsigqueueinfo"}, /* 331 */
-	{ 5,	TD,	sys_perf_event_open,	"perf_event_open"}, /* 332 */
-	{ 0,	0,	sys_get_thread_area,	"get_thread_area"}, /* 333 */
-	{ 1,	0,	sys_set_thread_area,	"set_thread_area"}, /* 334 */
-	{ 6,	0,	printargs,		"atomic_comxchg_32"}, /* 335 */
-	{ 0,	0,	printargs,		"atomic_barrier"}, /* 336 */
-	{ 2,	TD,	sys_fanotify_init,	"fanotify_init"	}, /* 337 */
-	{ 6,	TD|TF,	sys_fanotify_mark,	"fanotify_mark"	}, /* 338 */
-	{ 4,	0,	sys_prlimit64,		"prlimit64"	}, /* 339 */
-	{ 5,	TD|TF,	sys_name_to_handle_at,	"name_to_handle_at"}, /* 340 */
-	{ 3,	TD,	sys_open_by_handle_at,	"open_by_handle_at"}, /* 341 */
-	{ 2,	0,	sys_clock_adjtime,	"clock_adjtime"	}, /* 342 */
-	{ 1,	TD,	sys_syncfs,		"syncfs"	}, /* 343 */
-	{ 2,	TD,	sys_setns,		"setns"		}, /* 344 */
-	{ 6,	0,	sys_process_vm_readv,	"process_vm_readv"	}, /* 345 */
-	{ 6,	0,	sys_process_vm_writev,	"process_vm_writev"	}, /* 346 */
-	{ 5,	0,	sys_kcmp,		"kcmp"		}, /* 347 */
-	{ 3,	TD,	sys_finit_module,	"finit_module"	}, /* 348 */
-	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 349 */
-	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 350 */
-	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 351 */
-	{ 5,	0,	NULL,			NULL		}, /* 352 */
-	{ 5,	0,	NULL,			NULL		}, /* 353 */
-	{ 5,	0,	NULL,			NULL		}, /* 354 */
-	{ 5,	0,	NULL,			NULL		}, /* 355 */
-	{ 5,	0,	NULL,			NULL		}, /* 356 */
-	{ 5,	0,	NULL,			NULL		}, /* 357 */
-	{ 5,	0,	NULL,			NULL		}, /* 358 */
-	{ 5,	0,	NULL,			NULL		}, /* 359 */
-	{ 5,	0,	NULL,			NULL		}, /* 360 */
-	{ 5,	0,	NULL,			NULL		}, /* 361 */
-	{ 5,	0,	NULL,			NULL		}, /* 362 */
-	{ 5,	0,	NULL,			NULL		}, /* 363 */
-	{ 5,	0,	NULL,			NULL		}, /* 364 */
-	{ 5,	0,	NULL,			NULL		}, /* 365 */
-	{ 5,	0,	NULL,			NULL		}, /* 366 */
-	{ 5,	0,	NULL,			NULL		}, /* 367 */
-	{ 5,	0,	NULL,			NULL		}, /* 368 */
-	{ 5,	0,	NULL,			NULL		}, /* 369 */
-	{ 5,	0,	NULL,			NULL		}, /* 370 */
-	{ 5,	0,	NULL,			NULL		}, /* 371 */
-	{ 5,	0,	NULL,			NULL		}, /* 372 */
-	{ 5,	0,	NULL,			NULL		}, /* 373 */
-	{ 5,	0,	NULL,			NULL		}, /* 374 */
-	{ 5,	0,	NULL,			NULL		}, /* 375 */
-	{ 5,	0,	NULL,			NULL		}, /* 376 */
-	{ 5,	0,	NULL,			NULL		}, /* 377 */
-	{ 5,	0,	NULL,			NULL		}, /* 378 */
-	{ 5,	0,	NULL,			NULL		}, /* 379 */
-	{ 5,	0,	NULL,			NULL		}, /* 380 */
-	{ 5,	0,	NULL,			NULL		}, /* 381 */
-	{ 5,	0,	NULL,			NULL		}, /* 382 */
-	{ 5,	0,	NULL,			NULL		}, /* 383 */
-	{ 5,	0,	NULL,			NULL		}, /* 384 */
-	{ 5,	0,	NULL,			NULL		}, /* 385 */
-	{ 5,	0,	NULL,			NULL		}, /* 386 */
-	{ 5,	0,	NULL,			NULL		}, /* 387 */
-	{ 5,	0,	NULL,			NULL		}, /* 388 */
-	{ 5,	0,	NULL,			NULL		}, /* 389 */
-	{ 5,	0,	NULL,			NULL		}, /* 390 */
-	{ 5,	0,	NULL,			NULL		}, /* 391 */
-	{ 5,	0,	NULL,			NULL		}, /* 392 */
-	{ 5,	0,	NULL,			NULL		}, /* 393 */
-	{ 5,	0,	NULL,			NULL		}, /* 394 */
-	{ 5,	0,	NULL,			NULL		}, /* 395 */
-	{ 5,	0,	NULL,			NULL		}, /* 396 */
-	{ 5,	0,	NULL,			NULL		}, /* 397 */
-	{ 5,	0,	NULL,			NULL		}, /* 398 */
-	{ 5,	0,	NULL,			NULL		}, /* 399 */
+[  0] = { 0,	0,		sys_restart_syscall,		"restart_syscall"	},
+[  1] = { 1,	TP|SE,		sys_exit,			"_exit"			},
+[  2] = { 0,	TP,		sys_fork,			"fork"			},
+[  3] = { 3,	TD,		sys_read,			"read"			},
+[  4] = { 3,	TD,		sys_write,			"write"			},
+[  5] = { 3,	TD|TF,		sys_open,			"open"			},
+[  6] = { 1,	TD,		sys_close,			"close"			},
+[  7] = { 3,	TP,		sys_waitpid,			"waitpid"		},
+[  8] = { 2,	TD|TF,		sys_creat,			"creat"			},
+[  9] = { 2,	TF,		sys_link,			"link"			},
+[ 10] = { 1,	TF,		sys_unlink,			"unlink"		},
+[ 11] = { 3,	TF|TP|SE|SI,	sys_execve,			"execve"		},
+[ 12] = { 1,	TF,		sys_chdir,			"chdir"			},
+[ 13] = { 1,	0,		sys_time,			"time"			},
+[ 14] = { 3,	TF,		sys_mknod,			"mknod"			},
+[ 15] = { 2,	TF,		sys_chmod,			"chmod"			},
+[ 16] = { 3,	TF,		sys_chown16,			"chown"			},
+[ 17] = { 0,	TM,		sys_break,			"break"			},
+[ 18] = { 2,	TF,		sys_oldstat,			"oldstat"		},
+[ 19] = { 3,	TD,		sys_lseek,			"lseek"			},
+[ 20] = { 0,	0,		sys_getpid,			"getpid"		},
+[ 21] = { 5,	TF,		sys_mount,			"mount"			},
+[ 22] = { 1,	TF,		sys_umount,			"umount"		},
+[ 23] = { 1,	0,		sys_setuid16,			"setuid"		},
+[ 24] = { 0,	NF,		sys_getuid16,			"getuid"		},
+[ 25] = { 1,	0,		sys_stime,			"stime"			},
+[ 26] = { 4,	0,		sys_ptrace,			"ptrace"		},
+[ 27] = { 1,	0,		sys_alarm,			"alarm"			},
+[ 28] = { 2,	TD,		sys_oldfstat,			"oldfstat"		},
+[ 29] = { 0,	TS,		sys_pause,			"pause"			},
+[ 30] = { 2,	TF,		sys_utime,			"utime"			},
+[ 31] = { 2,	0,		sys_stty,			"stty"			},
+[ 32] = { 2,	0,		sys_gtty,			"gtty"			},
+[ 33] = { 2,	TF,		sys_access,			"access"		},
+[ 34] = { 1,	0,		sys_nice,			"nice"			},
+[ 35] = { 0,	0,		sys_ftime,			"ftime"			},
+[ 36] = { 0,	0,		sys_sync,			"sync"			},
+[ 37] = { 2,	TS,		sys_kill,			"kill"			},
+[ 38] = { 2,	TF,		sys_rename,			"rename"		},
+[ 39] = { 2,	TF,		sys_mkdir,			"mkdir"			},
+[ 40] = { 1,	TF,		sys_rmdir,			"rmdir"			},
+[ 41] = { 1,	TD,		sys_dup,			"dup"			},
+[ 42] = { 1,	TD,		sys_pipe,			"pipe"			},
+[ 43] = { 1,	0,		sys_times,			"times"			},
+[ 44] = { 0,	0,		sys_prof,			"prof"			},
+[ 45] = { 1,	TM|SI,		sys_brk,			"brk"			},
+[ 46] = { 1,	0,		sys_setgid16,			"setgid"		},
+[ 47] = { 0,	NF,		sys_getgid16,			"getgid"		},
+[ 48] = { 3,	TS,		sys_signal,			"signal"		},
+[ 49] = { 0,	NF,		sys_geteuid16,			"geteuid"		},
+[ 50] = { 0,	NF,		sys_getegid16,			"getegid"		},
+[ 51] = { 1,	TF,		sys_acct,			"acct"			},
+[ 52] = { 2,	TF,		sys_umount2,			"umount2"		},
+[ 53] = { 0,	0,		sys_lock,			"lock"			},
+[ 54] = { 3,	TD,		sys_ioctl,			"ioctl"			},
+[ 55] = { 3,	TD,		sys_fcntl,			"fcntl"			},
+[ 56] = { 0,	0,		sys_mpx,			"mpx"			},
+[ 57] = { 2,	0,		sys_setpgid,			"setpgid"		},
+[ 58] = { 2,	0,		sys_ulimit,			"ulimit"		},
+[ 59] = { 1,	0,		sys_oldolduname,		"oldolduname"		},
+[ 60] = { 1,	0,		sys_umask,			"umask"			},
+[ 61] = { 1,	TF,		sys_chroot,			"chroot"		},
+[ 62] = { 2,	0,		sys_ustat,			"ustat"			},
+[ 63] = { 2,	TD,		sys_dup2,			"dup2"			},
+[ 64] = { 0,	0,		sys_getppid,			"getppid"		},
+[ 65] = { 0,	0,		sys_getpgrp,			"getpgrp"		},
+[ 66] = { 0,	0,		sys_setsid,			"setsid"		},
+[ 67] = { 3,	TS,		sys_sigaction,			"sigaction"		},
+[ 68] = { 0,	TS,		sys_siggetmask,			"sgetmask"		},
+[ 69] = { 1,	TS,		sys_sigsetmask,			"ssetmask"		},
+[ 70] = { 2,	0,		sys_setreuid16,			"setreuid"		},
+[ 71] = { 2,	0,		sys_setregid16,			"setregid"		},
+[ 72] = { 3,	TS,		sys_sigsuspend,			"sigsuspend"		},
+[ 73] = { 1,	TS,		sys_sigpending,			"sigpending"		},
+[ 74] = { 2,	0,		sys_sethostname,		"sethostname"		},
+[ 75] = { 2,	0,		sys_setrlimit,			"setrlimit"		},
+[ 76] = { 2,	0,		sys_getrlimit,			"getrlimit"		},
+[ 77] = { 2,	0,		sys_getrusage,			"getrusage"		},
+[ 78] = { 2,	0,		sys_gettimeofday,		"gettimeofday"		},
+[ 79] = { 2,	0,		sys_settimeofday,		"settimeofday"		},
+[ 80] = { 2,	0,		sys_getgroups16,		"getgroups"		},
+[ 81] = { 2,	0,		sys_setgroups16,		"setgroups"		},
+[ 82] = { 1,	TD,		sys_oldselect,			"oldselect"		},
+[ 83] = { 2,	TF,		sys_symlink,			"symlink"		},
+[ 84] = { 2,	TF,		sys_oldlstat,			"oldlstat"		},
+[ 85] = { 3,	TF,		sys_readlink,			"readlink"		},
+[ 86] = { 1,	TF,		sys_uselib,			"uselib"		},
+[ 87] = { 2,	TF,		sys_swapon,			"swapon"		},
+[ 88] = { 4,	0,		sys_reboot,			"reboot"		},
+[ 89] = { 3,	TD,		sys_readdir,			"readdir"		},
+[ 90] = { 1,	TD|TM|SI,	sys_old_mmap,			"old_mmap"		},
+[ 91] = { 2,	TM|SI,		sys_munmap,			"munmap"		},
+[ 92] = { 2,	TF,		sys_truncate,			"truncate"		},
+[ 93] = { 2,	TD,		sys_ftruncate,			"ftruncate"		},
+[ 94] = { 2,	TD,		sys_fchmod,			"fchmod"		},
+[ 95] = { 3,	TD,		sys_fchown16,			"fchown"		},
+[ 96] = { 2,	0,		sys_getpriority,		"getpriority"		},
+[ 97] = { 3,	0,		sys_setpriority,		"setpriority"		},
+[ 98] = { 4,	0,		sys_profil,			"profil"		},
+[ 99] = { 2,	TF,		sys_statfs,			"statfs"		},
+[100] = { 2,	TD,		sys_fstatfs,			"fstatfs"		},
+[101] = { 3,	0,		sys_ioperm,			"ioperm"		},
+[102] = { 2,	TD,		sys_socketcall,			"socketcall"		},
+[103] = { 3,	0,		sys_syslog,			"syslog"		},
+[104] = { 3,	0,		sys_setitimer,			"setitimer"		},
+[105] = { 2,	0,		sys_getitimer,			"getitimer"		},
+[106] = { 2,	TF,		sys_stat,			"stat"			},
+[107] = { 2,	TF,		sys_lstat,			"lstat"			},
+[108] = { 2,	TD,		sys_fstat,			"fstat"			},
+[109] = { 1,	0,		sys_olduname,			"olduname"		},
+[110] = { 1,	0,		sys_iopl,			"iopl"			},
+[111] = { 0,	0,		sys_vhangup,			"vhangup"		},
+[112] = { 0,	0,		sys_idle,			"idle"			},
+[113] = { 1,	0,		sys_vm86old,			"vm86old"		},
+[114] = { 4,	TP,		sys_wait4,			"wait4"			},
+[115] = { 1,	TF,		sys_swapoff,			"swapoff"		},
+[116] = { 1,	0,		sys_sysinfo,			"sysinfo"		},
+[117] = { 6,	TI,		sys_ipc,			"ipc"			},
+[118] = { 1,	TD,		sys_fsync,			"fsync"			},
+[119] = { 0,	TS,		sys_sigreturn,			"sigreturn"		},
+[120] = { 5,	TP,		sys_clone,			"clone"			},
+[121] = { 2,	0,		sys_setdomainname,		"setdomainname"		},
+[122] = { 1,	0,		sys_uname,			"uname"			},
+[123] = { 4,	0,		sys_cacheflush,			"cacheflush"		},
+[124] = { 1,	0,		sys_adjtimex,			"adjtimex"		},
+[125] = { 3,	TM|SI,		sys_mprotect,			"mprotect"		},
+[126] = { 3,	TS,		sys_sigprocmask,		"sigprocmask"		},
+[127] = { 2,	0,		sys_create_module,		"create_module"		},
+[128] = { 3,	0,		sys_init_module,		"init_module"		},
+[129] = { 2,	0,		sys_delete_module,		"delete_module"		},
+[130] = { 1,	0,		sys_get_kernel_syms,		"get_kernel_syms"	},
+[131] = { 4,	TF,		sys_quotactl,			"quotactl"		},
+[132] = { 1,	0,		sys_getpgid,			"getpgid"		},
+[133] = { 1,	TD,		sys_fchdir,			"fchdir"		},
+[134] = { 0,	0,		sys_bdflush,			"bdflush"		},
+[135] = { 3,	0,		sys_sysfs,			"sysfs"			},
+[136] = { 1,	0,		sys_personality,		"personality"		},
+[137] = { 5,	0,		sys_afs_syscall,		"afs_syscall"		},
+[138] = { 1,	NF,		sys_setfsuid16,			"setfsuid"		},
+[139] = { 1,	NF,		sys_setfsgid16,			"setfsgid"		},
+[140] = { 5,	TD,		sys_llseek,			"_llseek"		},
+[141] = { 3,	TD,		sys_getdents,			"getdents"		},
+[142] = { 5,	TD,		sys_select,			"select"		},
+[143] = { 2,	TD,		sys_flock,			"flock"			},
+[144] = { 3,	TM,		sys_msync,			"msync"			},
+[145] = { 3,	TD,		sys_readv,			"readv"			},
+[146] = { 3,	TD,		sys_writev,			"writev"		},
+[147] = { 1,	0,		sys_getsid,			"getsid"		},
+[148] = { 1,	TD,		sys_fdatasync,			"fdatasync"		},
+[149] = { 1,	0,		sys_sysctl,			"_sysctl"		},
+[150] = { 2,	TM,		sys_mlock,			"mlock"			},
+[151] = { 2,	TM,		sys_munlock,			"munlock"		},
+[152] = { 1,	TM,		sys_mlockall,			"mlockall"		},
+[153] = { 0,	TM,		sys_munlockall,			"munlockall"		},
+[154] = { 2,	0,		sys_sched_setparam,		"sched_setparam"	},
+[155] = { 2,	0,		sys_sched_getparam,		"sched_getparam"	},
+[156] = { 3,	0,		sys_sched_setscheduler,		"sched_setscheduler"	},
+[157] = { 1,	0,		sys_sched_getscheduler,		"sched_getscheduler"	},
+[158] = { 0,	0,		sys_sched_yield,		"sched_yield"		},
+[159] = { 1,	0,		sys_sched_get_priority_max,	"sched_get_priority_max"},
+[160] = { 1,	0,		sys_sched_get_priority_min,	"sched_get_priority_min"},
+[161] = { 2,	0,		sys_sched_rr_get_interval,	"sched_rr_get_interval"	},
+[162] = { 2,	0,		sys_nanosleep,			"nanosleep"		},
+[163] = { 5,	TM|SI,		sys_mremap,			"mremap"		},
+[164] = { 3,	0,		sys_setresuid16,		"setresuid"		},
+[165] = { 3,	0,		sys_getresuid16,		"getresuid"		},
+[166] = { 5,	0,		printargs,			"getpagesize"		},
+[167] = { 5,	0,		sys_query_module,		"query_module"		},
+[168] = { 3,	TD,		sys_poll,			"poll"			},
+[169] = { 3,	0,		sys_nfsservctl,			"nfsservctl"		},
+[170] = { 3,	0,		sys_setresgid16,		"setresgid"		},
+[171] = { 3,	0,		sys_getresgid16,		"getresgid"		},
+[172] = { 5,	0,		sys_prctl,			"prctl"			},
+[173] = { 0,	TS,		sys_rt_sigreturn,		"rt_sigreturn"		},
+[174] = { 4,	TS,		sys_rt_sigaction,		"rt_sigaction"		},
+[175] = { 4,	TS,		sys_rt_sigprocmask,		"rt_sigprocmask"	},
+[176] = { 2,	TS,		sys_rt_sigpending,		"rt_sigpending"		},
+[177] = { 4,	TS,		sys_rt_sigtimedwait,		"rt_sigtimedwait"	},
+[178] = { 3,	TS,		sys_rt_sigqueueinfo,		"rt_sigqueueinfo"	},
+[179] = { 2,	TS,		sys_rt_sigsuspend,		"rt_sigsuspend"		},
+[180] = { 5,	TD,		sys_pread,			"pread64"		},
+[181] = { 5,	TD,		sys_pwrite,			"pwrite64"		},
+[182] = { 3,	TF,		sys_chown16,			"lchown"		},
+[183] = { 2,	TF,		sys_getcwd,			"getcwd"		},
+[184] = { 2,	0,		sys_capget,			"capget"		},
+[185] = { 2,	0,		sys_capset,			"capset"		},
+[186] = { 2,	TS,		sys_sigaltstack,		"sigaltstack"		},
+[187] = { 4,	TD|TN,		sys_sendfile,			"sendfile"		},
+[188] = { 5,	0,		sys_getpmsg,			"getpmsg"		},
+[189] = { 5,	0,		sys_putpmsg,			"putpmsg"		},
+[190] = { 0,	TP,		sys_vfork,			"vfork"			},
+[191] = { 2,	0,		sys_getrlimit,			"ugetrlimit"		},
+[192] = { 6,	TD|TM|SI,	sys_mmap_pgoff,			"mmap2"			},
+[193] = { 3,	TF,		sys_truncate64,			"truncate64"		},
+[194] = { 3,	TD,		sys_ftruncate64,		"ftruncate64"		},
+[195] = { 2,	TF,		sys_stat64,			"stat64"		},
+[196] = { 2,	TF,		sys_lstat64,			"lstat64"		},
+[197] = { 2,	TD,		sys_fstat64,			"fstat64"		},
+[198] = { 3,	TF,		sys_chown,			"chown32"		},
+[199] = { 0,	NF,		sys_getuid,			"getuid32"		},
+[200] = { 0,	NF,		sys_getgid,			"getgid32"		},
+[201] = { 0,	NF,		sys_geteuid,			"geteuid32"		},
+[202] = { 0,	NF,		sys_geteuid,			"getegid32"		},
+[203] = { 2,	0,		sys_setreuid,			"setreuid32"		},
+[204] = { 2,	0,		sys_setregid,			"setregid32"		},
+[205] = { 2,	0,		sys_getgroups,			"getgroups32"		},
+[206] = { 2,	0,		sys_setgroups,			"setgroups32"		},
+[207] = { 3,	TD,		sys_fchown,			"fchown32"		},
+[208] = { 3,	0,		sys_setresuid,			"setresuid32"		},
+[209] = { 3,	0,		sys_getresuid,			"getresuid32"		},
+[210] = { 3,	0,		sys_setresgid,			"setresgid32"		},
+[211] = { 3,	0,		sys_getresgid,			"getresgid32"		},
+[212] = { 3,	TF,		sys_chown,			"lchown32"		},
+[213] = { 1,	0,		sys_setuid,			"setuid32"		},
+[214] = { 1,	0,		sys_setgid,			"setgid32"		},
+[215] = { 1,	NF,		sys_setfsuid,			"setfsuid32"		},
+[216] = { 1,	NF,		sys_setfsgid,			"setfsgid32"		},
+[217] = { 2,	TF,		sys_pivotroot,			"pivot_root"		},
+[218 ... 219] = { },
+[220] = { 3,	TD,		sys_getdents64,			"getdents64"		},
+[221] = { 0,	0,		sys_gettid,			"gettid"		},
+[222] = { 2,	TS,		sys_kill,			"tkill"			},
+[223] = { 5,	TF,		sys_setxattr,			"setxattr"		},
+[224] = { 5,	TF,		sys_setxattr,			"lsetxattr"		},
+[225] = { 5,	TD,		sys_fsetxattr,			"fsetxattr"		},
+[226] = { 4,	TF,		sys_getxattr,			"getxattr"		},
+[227] = { 4,	TF,		sys_getxattr,			"lgetxattr"		},
+[228] = { 4,	TD,		sys_fgetxattr,			"fgetxattr"		},
+[229] = { 3,	TF,		sys_listxattr,			"listxattr"		},
+[230] = { 3,	TF,		sys_listxattr,			"llistxattr"		},
+[231] = { 3,	TD,		sys_flistxattr,			"flistxattr"		},
+[232] = { 2,	TF,		sys_removexattr,		"removexattr"		},
+[233] = { 2,	TF,		sys_removexattr,		"lremovexattr"		},
+[234] = { 2,	TD,		sys_fremovexattr,		"fremovexattr"		},
+[235] = { 6,	0,		sys_futex,			"futex"			},
+[236] = { 4,	TD|TN,		sys_sendfile64,			"sendfile64"		},
+[237] = { 3,	TM,		sys_mincore,			"mincore"		},
+[238] = { 3,	TM,		sys_madvise,			"madvise"		},
+[239] = { 3,	TD,		sys_fcntl,			"fcntl64"		},
+[240] = { 4,	TD,		sys_readahead,			"readahead"		},
+[241] = { 2,	0,		sys_io_setup,			"io_setup"		},
+[242] = { 1,	0,		sys_io_destroy,			"io_destroy"		},
+[243] = { 5,	0,		sys_io_getevents,		"io_getevents"		},
+[244] = { 3,	0,		sys_io_submit,			"io_submit"		},
+[245] = { 3,	0,		sys_io_cancel,			"io_cancel"		},
+[246] = { 5,	TD,		sys_fadvise64,			"fadvise64"		},
+[247] = { 1,	TP|SE,		sys_exit,			"exit_group"		},
+[248] = { 4,	0,		sys_lookup_dcookie,		"lookup_dcookie"	},
+[249] = { 1,	TD,		sys_epoll_create,		"epoll_create"		},
+[250] = { 4,	TD,		sys_epoll_ctl,			"epoll_ctl"		},
+[251] = { 4,	TD,		sys_epoll_wait,			"epoll_wait"		},
+[252] = { 5,	TM|SI,		sys_remap_file_pages,		"remap_file_pages"	},
+[253] = { 1,	0,		sys_set_tid_address,		"set_tid_address"	},
+[254] = { 3,	0,		sys_timer_create,		"timer_create"		},
+[255] = { 4,	0,		sys_timer_settime,		"timer_settime"		},
+[256] = { 2,	0,		sys_timer_gettime,		"timer_gettime"		},
+[257] = { 1,	0,		sys_timer_getoverrun,		"timer_getoverrun"	},
+[258] = { 1,	0,		sys_timer_delete,		"timer_delete"		},
+[259] = { 2,	0,		sys_clock_settime,		"clock_settime"		},
+[260] = { 2,	0,		sys_clock_gettime,		"clock_gettime"		},
+[261] = { 2,	0,		sys_clock_getres,		"clock_getres"		},
+[262] = { 4,	0,		sys_clock_nanosleep,		"clock_nanosleep"	},
+[263] = { 3,	TF,		sys_statfs64,			"statfs64"		},
+[264] = { 3,	TD,		sys_fstatfs64,			"fstatfs64"		},
+[265] = { 3,	TS,		sys_tgkill,			"tgkill"		},
+[266] = { 2,	TF,		sys_utimes,			"utimes"		},
+[267] = { 6,	TD,		sys_fadvise64_64,		"fadvise64_64"		},
+[268] = { 6,	TM,		sys_mbind,			"mbind"			},
+[269] = { 5,	TM,		sys_get_mempolicy,		"get_mempolicy"		},
+[270] = { 3,	TM,		sys_set_mempolicy,		"set_mempolicy"		},
+[271] = { 4,	0,		sys_mq_open,			"mq_open"		},
+[272] = { 1,	0,		sys_mq_unlink,			"mq_unlink"		},
+[273] = { 5,	0,		sys_mq_timedsend,		"mq_timedsend"		},
+[274] = { 5,	0,		sys_mq_timedreceive,		"mq_timedreceive"	},
+[275] = { 2,	0,		sys_mq_notify,			"mq_notify"		},
+[276] = { 3,	0,		sys_mq_getsetattr,		"mq_getsetattr"		},
+[277] = { 5,	TP,		sys_waitid,			"waitid"		},
+[278] = { 5,	0,		sys_vserver,			"vserver"		},
+[279] = { 5,	0,		sys_add_key,			"add_key"		},
+[280] = { 5,	0,		sys_request_key,		"request_key"		},
+[281] = { 5,	0,		sys_keyctl,			"keyctl"		},
+[282] = { 3,	0,		sys_ioprio_set,			"ioprio_set"		},
+[283] = { 2,	0,		sys_ioprio_get,			"ioprio_get"		},
+[284] = { 0,	TD,		sys_inotify_init,		"inotify_init"		},
+[285] = { 3,	TD,		sys_inotify_add_watch,		"inotify_add_watch"	},
+[286] = { 2,	TD,		sys_inotify_rm_watch,		"inotify_rm_watch"	},
+[287] = { 4,	TM,		sys_migrate_pages,		"migrate_pages"		},
+[288] = { 4,	TD|TF,		sys_openat,			"openat"		},
+[289] = { 3,	TD|TF,		sys_mkdirat,			"mkdirat"		},
+[290] = { 4,	TD|TF,		sys_mknodat,			"mknodat"		},
+[291] = { 5,	TD|TF,		sys_fchownat,			"fchownat"		},
+[292] = { 3,	TD|TF,		sys_futimesat,			"futimesat"		},
+[293] = { 4,	TD|TF,		sys_newfstatat,			"fstatat64"		},
+[294] = { 3,	TD|TF,		sys_unlinkat,			"unlinkat"		},
+[295] = { 4,	TD|TF,		sys_renameat,			"renameat"		},
+[296] = { 5,	TD|TF,		sys_linkat,			"linkat"		},
+[297] = { 3,	TD|TF,		sys_symlinkat,			"symlinkat"		},
+[298] = { 4,	TD|TF,		sys_readlinkat,			"readlinkat"		},
+[299] = { 3,	TD|TF,		sys_fchmodat,			"fchmodat"		},
+[300] = { 3,	TD|TF,		sys_faccessat,			"faccessat"		},
+[301] = { 6,	TD,		sys_pselect6,			"pselect6"		},
+[302] = { 5,	TD,		sys_ppoll,			"ppoll"			},
+[303] = { 1,	TP,		sys_unshare,			"unshare"		},
+[304] = { 2,	0,		sys_set_robust_list,		"set_robust_list"	},
+[305] = { 3,	0,		sys_get_robust_list,		"get_robust_list"	},
+[306] = { 6,	TD,		sys_splice,			"splice"		},
+[307] = { 6,	TD,		sys_sync_file_range,		"sync_file_range"	},
+[308] = { 4,	TD,		sys_tee,			"tee"			},
+[309] = { 4,	TD,		sys_vmsplice,			"vmsplice"		},
+[310] = { 6,	TM,		sys_move_pages,			"move_pages"		},
+[311] = { 3,	0,		sys_sched_setaffinity,		"sched_setaffinity"	},
+[312] = { 3,	0,		sys_sched_getaffinity,		"sched_getaffinity"	},
+[313] = { 4,	0,		sys_kexec_load,			"kexec_load"		},
+[314] = { 3,	0,		sys_getcpu,			"getcpu"		},
+[315] = { 6,	TD,		sys_epoll_pwait,		"epoll_pwait"		},
+[316] = { 4,	TD|TF,		sys_utimensat,			"utimensat"		},
+[317] = { 3,	TD|TS,		sys_signalfd,			"signalfd"		},
+[318] = { 2,	TD,		sys_timerfd_create,		"timerfd_create"	},
+[319] = { 1,	TD,		sys_eventfd,			"eventfd"		},
+[320] = { 6,	TD,		sys_fallocate,			"fallocate"		},
+[321] = { 4,	TD,		sys_timerfd_settime,		"timerfd_settime"	},
+[322] = { 2,	TD,		sys_timerfd_gettime,		"timerfd_gettime"	},
+[323] = { 4,	TD|TS,		sys_signalfd4,			"signalfd4"		},
+[324] = { 2,	TD,		sys_eventfd2,			"eventfd2"		},
+[325] = { 1,	TD,		sys_epoll_create1,		"epoll_create1"		},
+[326] = { 3,	TD,		sys_dup3,			"dup3"			},
+[327] = { 2,	TD,		sys_pipe2,			"pipe2"			},
+[328] = { 1,	TD,		sys_inotify_init1,		"inotify_init1"		},
+[329] = { 5,	TD,		sys_preadv,			"preadv"		},
+[330] = { 5,	TD,		sys_pwritev,			"pwritev"		},
+[331] = { 4,	TP|TS,		sys_rt_tgsigqueueinfo,		"rt_tgsigqueueinfo"	},
+[332] = { 5,	TD,		sys_perf_event_open,		"perf_event_open"	},
+[333] = { 0,	0,		sys_get_thread_area,		"get_thread_area"	},
+[334] = { 1,	0,		sys_set_thread_area,		"set_thread_area"	},
+[335] = { 6,	0,		printargs,			"atomic_comxchg_32"	},
+[336] = { 0,	0,		printargs,			"atomic_barrier"	},
+[337] = { 2,	TD,		sys_fanotify_init,		"fanotify_init"		},
+[338] = { 6,	TD|TF,		sys_fanotify_mark,		"fanotify_mark"		},
+[339] = { 4,	0,		sys_prlimit64,			"prlimit64"		},
+[340] = { 5,	TD|TF,		sys_name_to_handle_at,		"name_to_handle_at"	},
+[341] = { 3,	TD,		sys_open_by_handle_at,		"open_by_handle_at"	},
+[342] = { 2,	0,		sys_clock_adjtime,		"clock_adjtime"		},
+[343] = { 1,	TD,		sys_syncfs,			"syncfs"		},
+[344] = { 2,	TD,		sys_setns,			"setns"			},
+[345] = { 6,	0,		sys_process_vm_readv,		"process_vm_readv"	},
+[346] = { 6,	0,		sys_process_vm_writev,		"process_vm_writev"	},
+[347] = { 5,	0,		sys_kcmp,			"kcmp"			},
+[348] = { 3,	TD,		sys_finit_module,		"finit_module"		},
+[349] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
+[350] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
+[351] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[352 ... 399] = { },
 #define SYS_socket_subcall	400
 #include "subcall.h"
