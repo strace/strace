@@ -428,28 +428,3 @@
 	{ 5,	0,	NULL,			NULL		}, /* 399 */
 #define SYS_socket_subcall	400
 #include "subcall.h"
-	{ 6,	0,	printargs,		"socket_subcall"}, /* 400 */
-	{ 3,	TN,	sys_socket,		"socket"	}, /* 401 */
-	{ 3,	TN,	sys_bind,		"bind"		}, /* 402 */
-	{ 3,	TN,	sys_connect,		"connect"	}, /* 403 */
-	{ 2,	TN,	sys_listen,		"listen"	}, /* 404 */
-	{ 3,	TN,	sys_accept,		"accept"	}, /* 405 */
-	{ 3,	TN,	sys_getsockname,	"getsockname"	}, /* 406 */
-	{ 3,	TN,	sys_getpeername,	"getpeername"	}, /* 407 */
-	{ 4,	TN,	sys_socketpair,		"socketpair"	}, /* 408 */
-	{ 4,	TN,	sys_send,		"send"		}, /* 409 */
-	{ 4,	TN,	sys_recv,		"recv"		}, /* 410 */
-	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 411 */
-	{ 6,	TN,	sys_recvfrom,		"recvfrom"	}, /* 412 */
-	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 413 */
-	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 414 */
-	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
-	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
-	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
-	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
-	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
-
-#if SYS_ipc_subcall != 420
- #error fix me
-#endif
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 420 */

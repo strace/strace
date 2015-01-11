@@ -431,58 +431,9 @@
 	{ 5,	0,	NULL,			NULL		}, /* 397 */
 	{ 5,	0,	NULL,			NULL		}, /* 398 */
 	{ 5,	0,	NULL,			NULL		}, /* 399 */
-#define SYS_socket_subcall	400
-#include "subcall.h"
-	{ 6,	0,	printargs,		"socket_subcall"}, /* 400 */
-	{ 3,	TN,	sys_socket,		"socket"	}, /* 401 */
-	{ 3,	TN,	sys_bind,		"bind"		}, /* 402 */
-	{ 3,	TN,	sys_connect,		"connect"	}, /* 403 */
-	{ 2,	TN,	sys_listen,		"listen"	}, /* 404 */
-	{ 3,	TN,	sys_accept,		"accept"	}, /* 405 */
-	{ 3,	TN,	sys_getsockname,	"getsockname"	}, /* 406 */
-	{ 3,	TN,	sys_getpeername,	"getpeername"	}, /* 407 */
-	{ 4,	TN,	sys_socketpair,		"socketpair"	}, /* 408 */
-	{ 4,	TN,	sys_send,		"send"		}, /* 409 */
-	{ 4,	TN,	sys_recv,		"recv"		}, /* 410 */
-	{ 6,	TN,	sys_sendto,		"sendto"	}, /* 411 */
-	{ 6,	TN,	sys_recvfrom,		"recvfrom"	}, /* 412 */
-	{ 2,	TN,	sys_shutdown,		"shutdown"	}, /* 413 */
-	{ 5,	TN,	sys_setsockopt,		"setsockopt"	}, /* 414 */
-	{ 5,	TN,	sys_getsockopt,		"getsockopt"	}, /* 415 */
-	{ 3,	TN,	sys_sendmsg,		"sendmsg"	}, /* 416 */
-	{ 3,	TN,	sys_recvmsg,		"recvmsg"	}, /* 417 */
-	{ 4,	TN,	sys_accept4,		"accept4"	}, /* 418 */
-	{ 5,	TN,	sys_recvmmsg,		"recvmmsg"	}, /* 419 */
-
-# if SYS_ipc_subcall != 420
-#  error fix me
-# endif
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 420 */
-	{ 4,	TI,	sys_semop,		"semop"		}, /* 421 */
-	{ 4,	TI,	sys_semget,		"semget"	}, /* 422 */
-	{ 4,	TI,	sys_semctl,		"semctl"	}, /* 423 */
-	{ 5,	TI,	sys_semtimedop,		"semtimedop"	}, /* 424 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 425 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 426 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 427 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 428 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 429 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 430 */
-	{ 4,	TI,	sys_msgsnd,		"msgsnd"	}, /* 431 */
-	{ 4,	TI,	sys_msgrcv,		"msgrcv"	}, /* 432 */
-	{ 4,	TI,	sys_msgget,		"msgget"	}, /* 433 */
-	{ 4,	TI,	sys_msgctl,		"msgctl"	}, /* 434 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 435 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 436 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 437 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 438 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 439 */
-	{ 4,	0,	printargs,		"ipc_subcall"	}, /* 440 */
-	{ 4,	TI|TM|SI,	sys_shmat,		"shmat"		}, /* 441 */
-	{ 4,	TI|TM|SI,	sys_shmdt,		"shmdt"		}, /* 442 */
-	{ 4,	TI,	sys_shmget,		"shmget"	}, /* 443 */
-	{ 4,	TI,	sys_shmctl,		"shmctl"	}, /* 444 */
-# define ARM_LAST_ORDINARY_SYSCALL 444
+# define SYS_socket_subcall	400
+# include "subcall.h"
+# define ARM_LAST_ORDINARY_SYSCALL (SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls - 1)
 #endif /* !EABI */
 
 	/* __ARM_NR_cmpxchg (0x000ffff0).
