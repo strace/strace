@@ -43,8 +43,8 @@
 	{ 3,	0,	sys_nfsservctl,			"nfsservctl"			}, /*   42 */
 	{ 3,	TF,	sys_statfs64,			"statfs64"			}, /*   43 */
 	{ 3,	TD,	sys_fstatfs64,			"fstatfs64"			}, /*   44 */
-	{ 4,	TF,	sys_truncate64,			"truncate64"			}, /*   45 */
-	{ 4,	TD,	sys_ftruncate64,		"ftruncate64"			}, /*   46 */
+	{ 3,	TF,	sys_truncate64,			"truncate64"			}, /*   45 */
+	{ 3,	TD,	sys_ftruncate64,		"ftruncate64"			}, /*   46 */
 	{ 6,	TD,	sys_fallocate,			"fallocate"			}, /*   47 */
 	{ 3,	TD|TF,	sys_faccessat,			"faccessat"			}, /*   48 */
 	{ 1,	TF,	sys_chdir,			"chdir"				}, /*   49 */
@@ -60,13 +60,13 @@
 	{ 2,	TD,	sys_pipe2,			"pipe2"				}, /*   59 */
 	{ 4,	TF,	sys_quotactl,			"quotactl"			}, /*   60 */
 	{ 3,	TD,	sys_getdents64,			"getdents64"			}, /*   61 */
-	{ 5,	TD,	sys_llseek,			"llseek"			}, /*   62 */
+	{ 5,	TD,	sys_llseek,			"_llseek"			}, /*   62 */
 	{ 3,	TD,	sys_read,			"read"				}, /*   63 */
 	{ 3,	TD,	sys_write,			"write"				}, /*   64 */
 	{ 3,	TD,	sys_readv,			"readv"				}, /*   65 */
 	{ 3,	TD,	sys_writev,			"writev"			}, /*   66 */
-	{ 6,	TD,	sys_pread,			"pread64"			}, /*   67 */
-	{ 6,	TD,	sys_pwrite,			"pwrite64"			}, /*   68 */
+	{ 5,	TD,	sys_pread,			"pread64"			}, /*   67 */
+	{ 5,	TD,	sys_pwrite,			"pwrite64"			}, /*   68 */
 	{ 5,	TD,	sys_preadv,			"preadv"			}, /*   69 */
 	{ 5,	TD,	sys_pwritev,			"pwritev"			}, /*   70 */
 	{ 4,	TD|TN,	sys_sendfile64,			"sendfile64"			}, /*   71 */
