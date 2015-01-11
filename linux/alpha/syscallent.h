@@ -439,7 +439,7 @@
 	{ 5,	TM|SI,	sys_remap_file_pages,	"remap_file_pages"	}, /* 410 */
 	{ 1,	0,	sys_set_tid_address,	"set_tid_address"	}, /* 411 */
 	{ 0,	0,	sys_restart_syscall,	"restart_syscall"	}, /* 412 */
-	{ 4,	TD,	sys_fadvise64,		"fadvise"		}, /* 413 */
+	{ 4,	TD,	sys_fadvise64,		"fadvise64"		}, /* 413 */
 	{ 3,	0,	sys_timer_create,	"timer_create"		}, /* 414 */
 	{ 4,	0,	sys_timer_settime,	"timer_settime"		}, /* 415 */
 	{ 2,	0,	sys_timer_gettime,	"timer_gettime"		}, /* 416 */
