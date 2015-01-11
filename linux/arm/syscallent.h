@@ -411,26 +411,10 @@
 	{ 3,	0,	sys_sched_setattr,	"sched_setattr"	}, /* 380 */
 	{ 4,	0,	sys_sched_getattr,	"sched_getattr"	}, /* 381 */
 	{ 5,	TD|TF,	sys_renameat2,		"renameat2"	}, /* 382 */
+	[383 ... 399] = { },
 #ifdef __ARM_EABI__
-# define ARM_FIRST_SHUFFLED_SYSCALL 383
+# define ARM_FIRST_SHUFFLED_SYSCALL 400
 #else
-	{ 5,	0,	NULL,			NULL		}, /* 383 */
-	{ 5,	0,	NULL,			NULL		}, /* 384 */
-	{ 5,	0,	NULL,			NULL		}, /* 385 */
-	{ 5,	0,	NULL,			NULL		}, /* 386 */
-	{ 5,	0,	NULL,			NULL		}, /* 387 */
-	{ 5,	0,	NULL,			NULL		}, /* 388 */
-	{ 5,	0,	NULL,			NULL		}, /* 389 */
-	{ 5,	0,	NULL,			NULL		}, /* 390 */
-	{ 5,	0,	NULL,			NULL		}, /* 391 */
-	{ 5,	0,	NULL,			NULL		}, /* 392 */
-	{ 5,	0,	NULL,			NULL		}, /* 393 */
-	{ 5,	0,	NULL,			NULL		}, /* 394 */
-	{ 5,	0,	NULL,			NULL		}, /* 395 */
-	{ 5,	0,	NULL,			NULL		}, /* 396 */
-	{ 5,	0,	NULL,			NULL		}, /* 397 */
-	{ 5,	0,	NULL,			NULL		}, /* 398 */
-	{ 5,	0,	NULL,			NULL		}, /* 399 */
 # define SYS_socket_subcall	400
 # include "subcall.h"
 # define ARM_FIRST_SHUFFLED_SYSCALL (SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls)
