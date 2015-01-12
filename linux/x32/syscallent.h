@@ -315,7 +315,13 @@
 [314] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [315] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [316] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
-[317 ... 511] = { },
+[317] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[318] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[319] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[320] = { 5,	TD,		sys_kexec_file_load,		"kexec_file_load",	},
+[321] = { 3,	TD,		sys_bpf,			"bpf",			},
+[322] = { 5,	TD|TF|TP|SE|SI,	printargs,			"64:execveat",		},
+[323 ... 511] = { },
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.
@@ -353,3 +359,4 @@
 [542] = { 5,	TN,		sys_getsockopt,			"getsockopt"		},
 [543] = { 2,	0,		sys_io_setup,			"io_setup"		},
 [544] = { 3,	0,		sys_io_submit,			"io_submit"		},
+[545] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},

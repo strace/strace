@@ -312,6 +312,11 @@
 [5309] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [5310] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [5311] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[5312] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[5313] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[5314] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[5315] = { 3,	TD,		sys_bpf,			"bpf",			},
+[5316] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
 
 #else
 
@@ -627,7 +632,12 @@
 [5309] = { 3,	0,		printargs,	"n64_sched_setattr"		},
 [5310] = { 4,	0,		printargs,	"n64_sched_getattr"		},
 [5311] = { 5,	TD|TF,		printargs,	"n64_renameat2"			},
+[5312] = { 3,	0,		printargs,	"n64_seccomp",			},
+[5313] = { 3,	0,		printargs,	"n64_getrandom",		},
+[5314] = { 2,	TD,		printargs,	"n64_memfd_create",		},
+[5315] = { 3,	TD,		printargs,	"n64_bpf",			},
+[5316] = { 5,	TD|TF|TP|SE|SI,	printargs,	"n64_execveat",			},
 
 #endif
 
-[5312 ... 5999] = { }, /* end of Linux N64 */
+[5317 ... 5999] = { }, /* end of Linux N64 */

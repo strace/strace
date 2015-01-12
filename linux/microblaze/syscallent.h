@@ -409,3 +409,8 @@
 [381] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [382] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [383] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[384] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[385] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[386] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[387] = { 3,	TD,		sys_bpf,			"bpf",			},
+[388] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},

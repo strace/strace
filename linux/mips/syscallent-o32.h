@@ -352,6 +352,11 @@
 [4349] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [4350] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [4351] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[4352] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[4353] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[4354] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[4355] = { 3,	TD,		sys_bpf,			"bpf",			},
+[4356] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
 
 #else
 
@@ -707,7 +712,12 @@
 [4349] = { 3,	0,		printargs,	"o32_sched_setattr"		},
 [4350] = { 4,	0,		printargs,	"o32_sched_getattr"		},
 [4351] = { 5,	TD|TF,		printargs,	"o32_renameat2"			},
+[4352] = { 3,	0,		printargs,	"o32_seccomp",			},
+[4353] = { 3,	0,		printargs,	"o32_getrandom",		},
+[4354] = { 2,	TD,		printargs,	"o32_memfd_create",		},
+[4355] = { 3,	TD,		printargs,	"o32_bpf",			},
+[4356] = { 5,	TD|TF|TP|SE|SI,	printargs,	"o32_execveat",			},
 
 #endif
 
-[4352 ... 4999] = { }, /* end of Linux o32 */
+[4357 ... 4999] = { }, /* end of Linux o32 */

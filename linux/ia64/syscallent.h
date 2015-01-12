@@ -552,3 +552,7 @@
 [1336] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [1337] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [1338] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[1339] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[1340] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[1341] = { 3,	TD,		sys_bpf,			"bpf",			},
+[1342] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},

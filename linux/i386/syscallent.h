@@ -380,6 +380,12 @@
 [351] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [352] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [353] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
-[354 ... 399] = { },
+[354] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[355] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[356] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[357] = { 3,	TD,		sys_bpf,			"bpf",			},
+[358] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
+[359 ... 399] = { },
+
 #define SYS_socket_subcall	400
 #include "subcall.h"

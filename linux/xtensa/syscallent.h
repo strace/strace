@@ -325,3 +325,6 @@
 [334] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [335] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [336] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[337] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[338] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[339] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},

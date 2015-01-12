@@ -407,7 +407,12 @@
 [380] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [381] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [382] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
-[383 ... 399] = { },
+[383] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[384] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[385] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[386] = { 3,	TD,		sys_bpf,			"bpf",			},
+[387] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
+[388 ... 399] = { },
 
 #ifdef __ARM_EABI__
 # define ARM_FIRST_SHUFFLED_SYSCALL 400

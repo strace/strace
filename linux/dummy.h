@@ -32,17 +32,23 @@
 #endif
 
 /* still unfinished */
+#define	sys_bpf			printargs
+#define	sys_execveat		printargs
+#define	sys_getrandom		printargs
 #define	sys_ioperm		printargs
 #define	sys_iopl		printargs
 #define	sys_kcmp		printargs
+#define	sys_kexec_file_load	printargs
 #define	sys_lookup_dcookie	printargs
+#define	sys_memfd_create	printargs
 #define	sys_name_to_handle_at	printargs
 #define	sys_open_by_handle_at	printargs
 #define	sys_sched_getattr	printargs
 #define	sys_sched_setattr	printargs
+#define	sys_seccomp		printargs
 #define	sys_sysfs		printargs
-#define	sys_vm86old		printargs
 #define	sys_vm86		printargs
+#define	sys_vm86old		printargs
 
 /* machine-specific */
 #if !(defined I386 || defined X86_64 || defined X32)

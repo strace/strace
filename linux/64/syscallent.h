@@ -260,3 +260,8 @@
 [274] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [275] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [276] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[277] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[278] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[279] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[280] = { 3,	TD,		sys_bpf,			"bpf",			},
+[281] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},

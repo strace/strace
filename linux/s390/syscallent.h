@@ -376,6 +376,14 @@
 [345] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [346] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [347] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
-[348 ... 399] = { },
+[348] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[349] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[350] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[351] = { 3,	TD,		sys_bpf,			"bpf",			},
+[352] = { 3,	0,		printargs,			"s390_pci_mmio_write",	},
+[353] = { 3,	0,		printargs,			"s390_pci_mmio_read",	},
+[354] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
+[355 ... 399] = { },
+
 #define SYS_socket_subcall	400
 #include "subcall.h"

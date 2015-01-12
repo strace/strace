@@ -340,3 +340,8 @@
 [335] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [336] = { 2,	TF,		sys_utimes,			"utimes"		},
 [337] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[338] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[339] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[340] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[341] = { 3,	TD,		sys_bpf,			"bpf",			},
+[342] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},

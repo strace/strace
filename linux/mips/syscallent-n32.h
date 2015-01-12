@@ -316,6 +316,11 @@
 [6313] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [6314] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [6315] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[6316] = { 3,	0,		sys_seccomp,			"seccomp",		},
+[6317] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[6318] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[6319] = { 3,	TD,		sys_bpf,			"bpf",			},
+[6320] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
 
 #else
 
@@ -635,5 +640,10 @@
 [6313] = { 3,	0,		printargs,	"n32_sched_setattr"		},
 [6314] = { 4,	0,		printargs,	"n32_sched_getattr"		},
 [6315] = { 5,	TD|TF,		printargs,	"n32_renameat2"			},
+[6316] = { 3,	0,		printargs,	"n32_seccomp",			},
+[6317] = { 3,	0,		printargs,	"n32_getrandom",		},
+[6318] = { 2,	TD,		printargs,	"n32_memfd_create",		},
+[6319] = { 3,	TD,		printargs,	"n32_bpf",			},
+[6320] = { 5,	TD|TF|TP|SE|SI,	printargs,	"n32_execveat",			},
 
 #endif
