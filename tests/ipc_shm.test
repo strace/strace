@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Check decoding of ipc shmget/shmctl syscalls
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+OUT="$LOG.out"
+
+./ipc_shm > /dev/null || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ 'ipc shmget/shmctl syscalls do not behave as expected'
+	else
+		fail_ 'ipc_shm failed'
+	fi
+}
+
+args="-eipc ./ipc_shm $f"
+$STRACE -o "$LOG" $args > "$OUT" &&
+LC_ALL=C grep -E -x -f "$OUT" "$LOG" > /dev/null || {
+	cat "$OUT" "$LOG"
+	fail_ "$STRACE $args output mismatch"
+}
+
+rm -f "$OUT"
+
+exit 0

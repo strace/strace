@@ -1,6 +1,9 @@
 caps
 fanotify_mark
 inet-accept-connect-send-recv
+ipc_msg
+ipc_sem
+ipc_shm
 mmsg
 net-accept-connect
 netlink_inet_diag

@@ -4,6 +4,9 @@ AM_CFLAGS = $(WARN_CFLAGS)
 
 check_PROGRAMS = \
 	inet-accept-connect-send-recv \
+	ipc_msg \
+	ipc_shm \
+	ipc_sem \
 	caps \
 	fanotify_mark \
 	mmsg \
@@ -35,6 +38,9 @@ TESTS = \
 	caps.test \
 	fanotify_mark.test \
 	getdents.test \
+	ipc_msg.test \
+	ipc_shm.test \
+	ipc_sem.test \
 	scm_rights-fd.test \
 	sigaction.test \
 	stat.test \
