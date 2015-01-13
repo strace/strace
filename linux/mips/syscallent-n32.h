@@ -321,9 +321,13 @@
 [6318] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
 [6319] = { 3,	TD,		sys_bpf,			"bpf",			},
 [6320] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
+[6321 ... 6399] = { },
+
+# define SYS_socket_subcall      6400
+# include "subcall.h"
 
 #else
 
-#include "syscallent-n32-stub.h"
+# include "syscallent-n32-stub.h"
 
 #endif

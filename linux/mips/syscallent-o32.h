@@ -357,11 +357,16 @@
 [4354] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
 [4355] = { 3,	TD,		sys_bpf,			"bpf",			},
 [4356] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
+[4357 ... 4399] = { },
+
+# define SYS_socket_subcall      4400
+# include "subcall.h"
+
+/* end of Linux o32 */ [SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls ... 4999] = { },
 
 #else
 
-#include "syscallent-o32-stub.h"
+# include "syscallent-o32-stub.h"
+/* end of Linux o32 */ [4400 ... 4999] = { },
 
 #endif
-
-[4357 ... 4999] = { }, /* end of Linux o32 */

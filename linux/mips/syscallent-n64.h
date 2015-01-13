@@ -317,11 +317,16 @@
 [5314] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
 [5315] = { 3,	TD,		sys_bpf,			"bpf",			},
 [5316] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
+[5317 ... 5399] = { },
+
+# define SYS_socket_subcall      5400
+# include "subcall.h"
+
+/* end of Linux N64 */ [SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls ... 5999] = { },
 
 #else
 
-#include "syscallent-n64-stub.h"
+# include "syscallent-n64-stub.h"
+/* end of Linux N64 */ [5400 ... 5999] = { },
 
 #endif
-
-[5317 ... 5999] = { }, /* end of Linux N64 */
