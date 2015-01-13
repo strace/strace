@@ -12,7 +12,10 @@ ARCH		= @arch@
 
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WARN_CFLAGS)
-AM_CPPFLAGS = -I$(srcdir)/$(OS)/$(ARCH) -I$(srcdir)/$(OS) -I$(builddir)/$(OS)
+AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
+	      -I$(srcdir)/$(OS)/$(ARCH) \
+	      -I$(builddir)/$(OS) \
+	      -I$(srcdir)/$(OS)
 
 include xlat/Makemodule.am
 
