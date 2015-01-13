@@ -453,7 +453,8 @@ printsiginfo(siginfo_t *sip, int verbose)
 				printsigsource(sip);
 				break;
 #endif
-#ifdef SI_TIMER
+#if defined SI_TIMER \
+ && defined HAVE_SIGINFO_T_SI_TIMERID && defined HAVE_SIGINFO_T_SI_OVERRUN
 			case SI_TIMER:
 				tprintf(", si_timerid=%#x, si_overrun=%d",
 					sip->si_timerid, sip->si_overrun);
