@@ -144,10 +144,6 @@ AC_MSG_RESULT($arch)
 
 AC_SUBST(arch)
 
-AM_CONDITIONAL([I386], [test x$arch = xi386])
-AM_CONDITIONAL([X86_64], [test x$arch = xx86_64])
-AM_CONDITIONAL([X32], [test x$arch = xx32])
-
 AC_INCLUDEDIR
 
 AC_ARG_ENABLE([arm-oabi],
