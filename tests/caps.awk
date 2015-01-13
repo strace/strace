@@ -2,7 +2,7 @@ BEGIN {
   fail = 0
   lines = 3
   cap = "(0|CAP_[A-Z_]+(\\|CAP_[A-Z_]+)*)"
-  capget = "^capget\\({_LINUX_CAPABILITY_VERSION_3, 0}, {" cap ", " cap ", " cap "}\\) = 0$"
+  capget = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, \\{" cap ", " cap ", " cap "\\}\\) = 0$"
 }
 
 NR == 1 {if (match($0, capget)) next}

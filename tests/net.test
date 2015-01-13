@@ -28,7 +28,7 @@ grep_log()
 	local syscall="$1"; shift
 	local prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
 
-	LC_ALL=C grep -E -x "$prefix$syscall$@" $LOG > /dev/null || {
+	LC_ALL=C grep -E -x "$prefix$syscall$*" $LOG > /dev/null || {
 		cat $LOG
 		fail_ "strace -enetwork failed to trace \"$syscall\" properly"
 	}

@@ -5,7 +5,7 @@ BEGIN {
   r_i = "[1-9][0-9]*"
   r_port = "[1-9][0-9][0-9][0-9]+"
   r_localhost = "127\\.0\\.0\\.1"
-  r_connect = "^connect\\(0<TCP:\\[" r_i "\\]>, {sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)}, " r_i ") += 0$"
+  r_connect = "^connect\\(0<TCP:\\[" r_i "\\]>, \\{sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, " r_i ") += 0$"
 }
 
 NR == 1 && /^socket\(PF_INET, SOCK_STREAM, IPPROTO_IP\) += 0$/ {next}

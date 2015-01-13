@@ -5,8 +5,8 @@ BEGIN {
   r_i = "[1-9][0-9]*"
   r_port = "[1-9][0-9][0-9][0-9]+"
   r_localhost = "127\\.0\\.0\\.1"
-  r_bind = "^bind\\(0<TCP:\\[(" r_i ")\\]>, {sa_family=AF_INET, sin_port=htons\\(0\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)}, " r_i "\\) += 0$"
-  r_getsockname = "^getsockname\\(0<TCP:\\[" r_localhost ":(" r_port ")\\]>, {sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)}, \\[" r_i "\\]\\) += 0$"
+  r_bind = "^bind\\(0<TCP:\\[(" r_i ")\\]>, \\{sa_family=AF_INET, sin_port=htons\\(0\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, " r_i "\\) += 0$"
+  r_getsockname = "^getsockname\\(0<TCP:\\[" r_localhost ":(" r_port ")\\]>, \\{sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, \\[" r_i "\\]\\) += 0$"
 }
 
 NR == 1 && /^socket\(PF_INET, SOCK_STREAM, IPPROTO_IP\) += 0$/ {next}
@@ -24,7 +24,7 @@ NR == 3 {if (r_listen != "" && match($0, r_listen)) next}
 NR == 4 {
   if (match($0, r_getsockname, a) && a[1] == a[2]) {
     port_l = a[1]
-    r_accept = "^accept\\(0<TCP:\\[" r_localhost ":" port_l "\\]>, {sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)}, \\[" r_i "\\]\\) += 1<TCP:\\[" r_localhost ":" port_l "->" r_localhost ":(" r_port ")\\]>$"
+    r_accept = "^accept\\(0<TCP:\\[" r_localhost ":" port_l "\\]>, \\{sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, \\[" r_i "\\]\\) += 1<TCP:\\[" r_localhost ":" port_l "->" r_localhost ":(" r_port ")\\]>$"
     r_close0 = "^close\\(0<TCP:\\[" r_localhost ":" port_l "\\]>) += 0$"
     next
   }

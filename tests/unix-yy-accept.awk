@@ -4,7 +4,7 @@ BEGIN {
 
   addrlen = length(addr) + 3
   r_i = "[1-9][0-9]*"
-  r_bind = "^bind\\(0<UNIX:\\[(" r_i ")\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"" addr "\"}, " addrlen "\\) += 0$"
+  r_bind = "^bind\\(0<UNIX:\\[(" r_i ")\\]>, \\{sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"" addr "\"\\}, " addrlen "\\) += 0$"
 }
 
 NR == 1 && /^socket\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\) += 0$/ {next}
@@ -13,8 +13,8 @@ NR == 2 {
   if (match($0, r_bind, a)) {
     inode_listen = a[1]
     r_listen = "^listen\\(0<UNIX:\\[" inode_listen ",\"" addr "\"\\]>, 5\\) += 0$"
-    r_getsockname = "^getsockname\\(0<UNIX:\\[" inode_listen ",\"" addr "\"\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"" addr "\"}, \\[" addrlen "\\]\\) += 0$"
-    r_accept = "^accept\\(0<UNIX:\\[" inode_listen ",\"" addr "\"\\]>, {sa_family=AF_(LOCAL|UNIX|FILE), NULL}, \\[2\\]\\) += 1<UNIX:\\[(" r_i ")->(" r_i "),\"" addr "\"\\]>"
+    r_getsockname = "^getsockname\\(0<UNIX:\\[" inode_listen ",\"" addr "\"\\]>, \\{sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"" addr "\"\\}, \\[" addrlen "\\]\\) += 0$"
+    r_accept = "^accept\\(0<UNIX:\\[" inode_listen ",\"" addr "\"\\]>, \\{sa_family=AF_(LOCAL|UNIX|FILE), NULL\\}, \\[2\\]\\) += 1<UNIX:\\[(" r_i ")->(" r_i "),\"" addr "\"\\]>"
     next
   }
 }

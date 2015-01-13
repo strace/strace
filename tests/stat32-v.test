@@ -13,7 +13,7 @@ size=233811181
 sample=stat32_sample
 
 umask 022
-truncate_cmd="dd seek=$size obs=1 count=0 if=/dev/null of=$sample"
+truncate_cmd="dd seek=$size bs=1 count=0 if=/dev/null of=$sample"
 $truncate_cmd > "$OUT" 2>&1 || {
 	cat "$OUT"
 	framework_skip_ 'failed to create a large sparse file'
