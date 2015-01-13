@@ -1,0 +1,3 @@
+syscallent-n32-stub.h
+syscallent-n64-stub.h
+syscallent-o32-stub.h

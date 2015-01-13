@@ -203,6 +203,7 @@ EXTRA_DIST =				\
 	linux/microblaze/syscallent.h	\
 	linux/microblaze/userent.h	\
 	linux/mips/errnoent.h		\
+	linux/mips/genstub.sh		\
 	linux/mips/ioctlent.h.in	\
 	linux/mips/ioctlent.sh		\
 	linux/mips/signalent.h		\

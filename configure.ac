@@ -807,5 +807,14 @@ fi
 AM_CONDITIONAL([USE_LIBUNWIND], [test "x$use_libunwind" = xyes])
 AC_MSG_RESULT([$use_libunwind])
 
+if test "$arch" = mips && test "$no_create" != yes; then
+	mkdir -p linux/mips
+	if $srcdir/linux/mips/genstub.sh linux/mips; then
+		AC_MSG_RESULT([Generated MIPS syscallent stubs])
+	else
+		AC_MSG_FAILURE([Failed to generate syscallent stubs])
+	fi
+fi
+
 AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_OUTPUT
