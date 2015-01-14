@@ -517,7 +517,7 @@ sys_subpage_prot(struct tcb *tcp)
 		}
 		cur = tcp->u_arg[2];
 		end = cur + (sizeof(int) * entries);
-		if (!verbose(tcp) || end < tcp->u_arg[2]) {
+		if (!verbose(tcp) || end < (unsigned long) tcp->u_arg[2]) {
 			tprintf("%#lx", tcp->u_arg[2]);
 			return 0;
 		}
@@ -530,7 +530,7 @@ sys_subpage_prot(struct tcb *tcp)
 			abbrev_end = end;
 		tprints("{");
 		for (; cur < end; cur += sizeof(int)) {
-			if (cur > tcp->u_arg[2])
+			if (cur > (unsigned long) tcp->u_arg[2])
 				tprints(", ");
 			if (cur >= abbrev_end) {
 				tprints("...");
