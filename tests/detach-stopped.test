@@ -4,6 +4,9 @@
 
 . "${srcdir=.}/init.sh"
 
+kill -0 $$ ||
+	framework_skip_ 'kill -0 does not work'
+
 check_prog grep
 check_prog sleep
 
