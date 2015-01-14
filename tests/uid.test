@@ -4,7 +4,7 @@
 
 . "${srcdir=.}/init.sh"
 
-check_prog awk
+check_prog gawk
 
 s="${uid_syscall_suffix-}"
 w="${uid_t_size-}"
@@ -24,7 +24,7 @@ $STRACE -o "$LOG" $args ./"$uid"|| {
 	fail_ "$STRACE $args ./$uid failed"
 }
 
-awk -f "$srcdir"/uid.awk -v suffix="$s" "$LOG" || {
+gawk -f "$srcdir"/uid.awk -v suffix="$s" "$LOG" || {
 	cat "$LOG"
 	fail_ 'unexpected output'
 }
