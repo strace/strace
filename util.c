@@ -929,10 +929,10 @@ static bool process_vm_readv_not_supported = 1;
  * at address `addr' to our space at `laddr'
  */
 int
-umoven(struct tcb *tcp, long addr, int len, char *laddr)
+umoven(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 {
 	int pid = tcp->pid;
-	int n, m, nread;
+	unsigned int n, m, nread;
 	union {
 		long val;
 		char x[sizeof(long)];
@@ -951,11 +951,11 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 		remote[0].iov_base = (void*)addr;
 		local[0].iov_len = remote[0].iov_len = len;
 		r = process_vm_readv(pid, local, 1, remote, 1, 0);
-		if (r == len)
+		if ((unsigned int) r == len)
 			return 0;
 		if (r >= 0) {
-			error_msg("umoven: short read (%d < %d) @0x%lx",
-				  r, len, addr);
+			error_msg("umoven: short read (%u < %u) @0x%lx",
+				  (unsigned int) r, len, addr);
 			return -1;
 		}
 		switch (errno) {
@@ -978,8 +978,8 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 	nread = 0;
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
-		n = addr - (addr & -sizeof(long)); /* residue */
-		addr &= -sizeof(long); /* residue */
+		n = addr & (sizeof(long) - 1);	/* residue */
+		addr &= -sizeof(long);		/* aligned address */
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *) addr, 0);
 		switch (errno) {
@@ -1016,7 +1016,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
 			case EFAULT: case EIO: case EPERM:
 				/* address space is inaccessible */
 				if (nread) {
-					perror_msg("umoven: short read (%d < %d) @0x%lx",
+					perror_msg("umoven: short read (%u < %u) @0x%lx",
 						   nread, nread + len, addr - nread);
 				}
 				return -1;
@@ -1050,7 +1050,7 @@ umoven(struct tcb *tcp, long addr, int len, char *laddr)
  * we never write past laddr[len-1]).
  */
 int
-umovestr(struct tcb *tcp, long addr, int len, char *laddr)
+umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 {
 #if SIZEOF_LONG == 4
 	const unsigned long x01010101 = 0x01010101ul;
@@ -1063,7 +1063,7 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 #endif
 
 	int pid = tcp->pid;
-	int n, m, nread;
+	unsigned int n, m, nread;
 	union {
 		unsigned long val;
 		char x[sizeof(long)];
@@ -1082,9 +1082,9 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 		remote[0].iov_base = (void*)addr;
 
 		while (len > 0) {
-			int end_in_page;
+			unsigned int chunk_len;
+			unsigned int end_in_page;
 			int r;
-			int chunk_len;
 
 			/* Don't read kilobytes: most strings are short */
 			chunk_len = len;
@@ -1096,9 +1096,8 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 			 * (I hope there aren't arches with pages < 4K)
 			 */
 			end_in_page = ((addr + chunk_len) & 4095);
-			r = chunk_len - end_in_page;
-			if (r > 0) /* if chunk_len > end_in_page */
-				chunk_len = r; /* chunk_len -= end_in_page */
+			if (chunk_len > end_in_page) /* crosses to the next page */
+				chunk_len -= end_in_page;
 
 			local[0].iov_len = remote[0].iov_len = chunk_len;
 			r = process_vm_readv(pid, local, 1, remote, 1, 0);
@@ -1137,8 +1136,8 @@ umovestr(struct tcb *tcp, long addr, int len, char *laddr)
 
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
-		n = addr - (addr & -sizeof(long)); /* residue */
-		addr &= -sizeof(long); /* residue */
+		n = addr & (sizeof(long) - 1);	/* residue */
+		addr &= -sizeof(long);		/* aligned address */
 		errno = 0;
 		u.val = ptrace(PTRACE_PEEKDATA, pid, (char *)addr, 0);
 		switch (errno) {

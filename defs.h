@@ -639,10 +639,10 @@ extern void get_regs(pid_t pid);
 # define clear_regs()  ((void)0)
 # define get_regs(pid) ((void)0)
 #endif
-extern int umoven(struct tcb *, long, int, char *);
+extern int umoven(struct tcb *, long, unsigned int, char *);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (char *) (objp))
-extern int umovestr(struct tcb *, long, int, char *);
+extern int umovestr(struct tcb *, long, unsigned int, char *);
 extern int upeek(int pid, long, long *);
 #if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
 extern long getrval2(struct tcb *);
