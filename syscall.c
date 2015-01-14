@@ -1379,7 +1379,7 @@ get_scno(struct tcb *tcp)
 	if (errno)
 		return -1;
 	/* EABI syscall convention? */
-	if (scno != 0xef000000) {
+	if ((unsigned long) scno != 0xef000000) {
 		/* No, it's OABI */
 		if ((scno & 0x0ff00000) != 0x0f900000) {
 			fprintf(stderr, "pid %d unknown syscall trap 0x%08lx\n",
