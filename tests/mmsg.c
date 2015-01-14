@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <assert.h>
 
 int
@@ -61,7 +62,10 @@ main(void)
 	assert(dup2(sv[R], R) == R);
 	assert(close(sv[R]) == 0);
 
-	assert(sendmmsg(W, mmh, n_mmh, 0) == n_mmh);
+	int r = sendmmsg(W, mmh, n_mmh, 0);
+	if (r < 0 && errno == ENOSYS)
+		return 77;
+	assert((size_t)r == n_mmh);
 	assert(close(W) == 0);
 
 	assert(recvmmsg(R, mmh, n_mmh, 0, NULL) == n_mmh);
