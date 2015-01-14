@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -22,8 +23,14 @@ int main(void)
 	close(0);
 	close(1);
 
-	assert(socket(PF_INET, SOCK_STREAM, 0) == 0);
-	assert(bind(0, (struct sockaddr *) &addr, len) == 0);
+	if (socket(PF_INET, SOCK_STREAM, 0)) {
+		perror("socket");
+		return 77;
+	}
+	if (bind(0, (struct sockaddr *) &addr, len)) {
+		perror("bind");
+		return 77;
+	}
 	assert(listen(0, 5) == 0);
 
 	memset(&addr, 0, sizeof(addr));

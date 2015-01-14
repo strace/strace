@@ -13,8 +13,13 @@ check_prog sed
 
 rm -f $LOG.* $LOG-*
 
-./inet-accept-connect-send-recv ||
-	fail_ 'inet-accept-connect-send-recv failed'
+./inet-accept-connect-send-recv || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ 'PF_INET SOCK_STREAM is not available'
+	else
+		fail_ 'inet-accept-connect-send-recv failed'
+	fi
+}
 
 ./netlink_inet_diag || {
 	if [ $? -eq 77 ]; then
