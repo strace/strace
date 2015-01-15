@@ -1,17 +1,30 @@
-#!/bin/sh
+#!/bin/sh -ex
 
-export HDCMEGS=128
+mountpoint -q /
+[ ! -e hdc.img.dir ]
 
-rm hdc.img 2>/dev/null
-umount -d hdc.img.dir 2>/dev/null
-rm -rf hdc.img.dir 2>/dev/null
+cleanup()
+{
+	trap - EXIT
+	if mountpoint -q hdc.img.dir; then
+		umount -d hdc.img.dir
+	fi
+	mountpoint -q hdc.img.dir ||
+		rm -rf hdc.img.dir
+	exit $@
+}
 
-dd if=/dev/zero of=hdc.img bs=1024 seek=$((HDCMEGS*1024-1)) count=1 &&
-mke2fs -q -b 1024 -F -i 4096 hdc.img &&
-tune2fs -j -c 0 -i 0 hdc.img &&
-mkdir hdc.img.dir &&
-mount -o loop hdc.img hdc.img.dir &&
-cp -a hdc.dir/* hdc.img.dir &&
-umount -d hdc.img.dir &&
-rm -rf hdc.img.dir &&
-true
+trap 'cleanup $?' EXIT
+trap 'cleanup 1' HUP PIPE INT QUIT TERM
+
+size=$(du -ks hdc.dir | sed -rn 's/^([0-9]+).*/\1/p')
+[ "$size" -gt 0 ]
+
+rm -f hdc.img
+dd if=/dev/zero of=hdc.img count=1 bs=1024 seek=$(($size*2))
+mkfs.ext3 -q -F -b 1024 -i 4096 hdc.img
+tune2fs -c 0 -i 0 hdc.img
+mkdir hdc.img.dir
+mount -o loop hdc.img hdc.img.dir
+cp -a hdc.dir/* hdc.img.dir/
+umount -d hdc.img.dir

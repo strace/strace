@@ -1,19 +1,16 @@
 #!/bin/sh
 
 umount /mnt # optional
-echo "Building"
 (
-	cd strace &&
-	./configure &&
-	make &&
-	echo "Build: SUCCESS"
+	set -e -x
+	cd strace
+	./configure
+	make
 	size strace
-	./strace
-	# strace may segfault, let's see exit code
-	echo "Exit code: $?"
-	./strace /bin/true
-	echo "Exit code: $?"
-	ftpput -P "$FTP_PORT" "$FTP_SERVER" strace
+	make check VERBOSE=1 &&
+		cat tests/test-suite.log ||:
+	test "x$FTP_PORT" = x ||
+		ftpput -P "$FTP_PORT" "$FTP_SERVER" strace
 ) 2>&1 | tee strace_build.log
 mount -o remount,ro /home
 sync

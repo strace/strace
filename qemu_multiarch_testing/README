@@ -21,31 +21,21 @@ This runs a strace build in several qemu virtual machines in parallel.
 There is no automated detection of errors for now: you need to examine
 logs yourself.
 
-For me, the following system images worked:
-system-image-armv4l
-system-image-armv4tl
-system-image-armv5l
-system-image-armv6l
-system-image-i686 (had to s/qemu-system-i386/qemu/ in run-emulator.sh)
-system-image-mipsel
-system-image-mips
-system-image-x86_64
-system-image-sparc   - needed small edit in native-build.sh:
-    # Getting this early:
-    #       Unhandled Exception 0x00000007
-    #       PC = 0xffd07cec NPC = 0xffd07cf0
-    #       Stopping execution
-    # and it looks like it's triggered just by too long kernel cmdline,
-    # not by specific options.
-    #export KERNEL_EXTRA="FTP_SERVER=$FTP_SERVER FTP_PORT=$FTP_PORT NATIVE_BUILD=$NATIVE_BUILD $KERNEL_EXTRA"
-    # This works:
-    export KERNEL_EXTRA="NATIVE_BUILD=$NATIVE_BUILD $KERNEL_EXTRA"
+For me, the following system images worked (tests passed/skipped/failed):
+system-image-armv4l  - 14/14/1 (failed: stat32-v.test - wrong stat decoding)
+system-image-armv4tl - 15/14/0
+system-image-armv5l  - 15/14/0
+system-image-armv6l  - 15/14/0
+system-image-i486    - 14/14/1 (failed: count.test - grep segfault)
+system-image-i586    - 14/14/1 (failed: count.test - grep segfault)
+system-image-i686    - 14/14/1 (failed: count.test - grep segfault)
+system-image-mips    - 15/14/0
+system-image-mipsel  - 15/14/0
+system-image-powerpc - 13/14/2 (failed: ptrace_setoptions.test - grep segfault, ipc_sem.test - ipc_sem segfault)
+system-image-sparc   - 13/14/2 (failed: ipc_sem.test - ipc_sem segfault, sigaction.test - wrong rt_sigaction decoding)
+system-image-x86_64  - 14/15/0
 
 And these did not:
-system-image-armv4eb - VFS: Cannot open root device "sda" or unknown-block(0,0)
-system-image-m68k    - run-emulator.sh has no call of qemu-system-* (not supported yet??)
-system-image-mips64  -
-	need to run ./native-build.sh ../hdc.img by hand;
-	copying in /mnt/init fails (segv?)
-system-image-powerpc - QEMU stuck very early
+system-image-m68k    - qemu-system-m68k: -M q800: Unsupported machine type
+system-image-mips64  - init dies before reaching /mnt/init
 system-image-sh4     - hdc does not mount (no support for 2 disks)
