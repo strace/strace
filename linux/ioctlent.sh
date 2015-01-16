@@ -46,10 +46,10 @@ lookup_ioctls()
 	shift
 
 	# Build the list of all ioctls
-	regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+0x'"$type"'..\>'
-	(cd "$dir" && for f; do grep "$regexp" "$f" "uapi/$f" 2>/dev/null; done) |
-		sed -ne "s,$asm/,asm/,g"'
-s/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*\(0x'"$type"'..\).*/	{ "\1",	"\2",	\3	},/p' \
+	regexp='[[:space:]]*#[[:space:]]*define[[:space:]]\+\([A-Z][A-Z0-9_]*\)[[:space:]]\+\(0x'"$type"'..\)\>'
+	(cd "$dir" && for f; do grep "^$regexp" "$f" "uapi/$f" 2>/dev/null; done) |
+		sed -n -e "s,$asm/,asm/,g" \
+		       -e 's/^\([^:]*\):'"$regexp"'.*/	{ "\1",	"\2",	\3	},/p' \
 		>> ioctls.h
 }
 
@@ -87,11 +87,10 @@ fi
 # Example output:
 # { "asm/ioctls.h",	"TIOCSWINSZ",	0x5414  },
 # { "asm/mce.h",	"MCE_GETCLEAR_FLAGS",	_IOC(_IOC_NONE,'M',3,0) },
-regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+[A-Z][A-Z0-9_]*[[:space:]]\+_S\?\(IO\|IOW\|IOR\|IOWR\)\>'
-(cd $dir && grep $regexp $files 2>/dev/null) | \
-	sed -n \
-	-e "s,$asm/,asm/,g" \
-	-e 's/^\(.*\):[[:space:]]*#[[:space:]]*define[[:space:]]*\([A-Z0-9_]*\)[[:space:]]*_S\?I.*(\([^[,]*\)[[:space:]]*,[[:space:]]*\([^,)]*\).*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\3,\4,0)	},/p' \
+regexp='[[:space:]]*#[[:space:]]*define[[:space:]]\+\([A-Z][A-Z0-9_]*\)[[:space:]]\+_S\?\(IO\|IOW\|IOR\|IOWR\)[[:space:]]*(\([^,()]*\)[[:space:]]*,[[:space:]]*\([^,()]*\)[[:space:]]*[,)]'
+(cd $dir && grep "^$regexp" $files 2>/dev/null) | \
+	sed -n -e "s,$asm/,asm/,g" \
+	       -e 's/^\([^:]*\):'"$regexp"'.*/	{ "\1",	"\2",	_IOC(_IOC_NONE,\4,\5,0)	},/p' \
 	>> ioctls.h
 
 # Strip uapi/ prefix
