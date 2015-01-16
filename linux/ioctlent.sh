@@ -105,8 +105,8 @@ sort -u -o ioctls.h ioctls.h
 # Some use a special base to offset their ioctls on. Extract that as well.
 # Some use 2 defines: _IOC(_IOC_NONE,DM_IOCTL,DM_LIST_DEVICES_CMD,....)
 bases=$(sed -n \
-       -e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Za-z0-9_]\+\)[[:space:]]*,[[:space:]]*\([A-Z][A-Za-z0-9_]\+\)[[:space:]+,].*/\1\n\2/p' \
-       -e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Za-z0-9_]\+\)[[:space:]+,].*/\1/p' \
+	-e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Za-z0-9_]\+\)[[:space:]]*,[[:space:]]*\([A-Z][A-Za-z0-9_]\+\)[[:space:]]*[+,)].*/\1\n\2/p' \
+	-e 's/.*_IOC_NONE.*,[[:space:]]*\([A-Z][A-Za-z0-9_]\+\)[[:space:]]*[+,)].*/\1/p' \
        ioctls.h | sort -u)
 
 for base in $bases; do
