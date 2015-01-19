@@ -44,7 +44,8 @@
 #include "xlat/baud_options.h"
 #include "xlat/modem_flags.h"
 
-int term_ioctl(struct tcb *tcp, long code, long arg)
+int
+term_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	struct termios tios;
 	struct termio tio;

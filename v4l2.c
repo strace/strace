@@ -149,7 +149,7 @@ static void print_v4l2_format_fmt(const struct v4l2_format *f)
 }
 
 int
-v4l2_ioctl(struct tcb *tcp, unsigned long code, long arg)
+v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	if (!verbose(tcp))
 		return 0;

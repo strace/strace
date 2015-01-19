@@ -34,7 +34,8 @@
 #include "xlat/loop_flags_options.h"
 #include "xlat/loop_crypt_type_options.h"
 
-int loop_ioctl(struct tcb *tcp, long code, long arg)
+int
+loop_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	struct loop_info info;
 	struct loop_info64 info64;

@@ -739,7 +739,7 @@ print_rtc(struct tcb *tcp, const struct rtc_time *rt)
 }
 
 int
-rtc_ioctl(struct tcb *tcp, long code, long arg)
+rtc_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	switch (code) {
 	case RTC_ALM_SET:

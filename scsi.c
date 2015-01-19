@@ -103,7 +103,7 @@ print_sg_io_res(struct tcb *tcp, struct sg_io_hdr *sg_io)
 }
 
 int
-scsi_ioctl(struct tcb *tcp, long code, long arg)
+scsi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	switch (code) {
 	case SG_IO:

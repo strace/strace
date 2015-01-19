@@ -47,7 +47,8 @@
 #include "xlat/mtd_otp_options.h"
 #include "xlat/mtd_nandecc_options.h"
 
-int mtd_ioctl(struct tcb *tcp, long code, long arg)
+int
+mtd_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	struct mtd_info_user minfo;
 	struct erase_info_user einfo;
@@ -252,7 +253,8 @@ int mtd_ioctl(struct tcb *tcp, long code, long arg)
 #include "xlat/ubi_volume_types.h"
 #include "xlat/ubi_volume_props.h"
 
-int ubi_ioctl(struct tcb *tcp, long code, long arg)
+int
+ubi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	struct ubi_mkvol_req mkvol;
 	struct ubi_rsvol_req rsvol;

@@ -4,7 +4,8 @@
 
 #include "xlat/ptp_flags_options.h"
 
-int ptp_ioctl(struct tcb *tcp, long code, long arg)
+int
+ptp_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	if (!verbose(tcp))
 		return 0;

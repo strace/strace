@@ -34,18 +34,18 @@
 static int
 compare(const void *a, const void *b)
 {
-	unsigned long code1 = (unsigned long) a;
-	unsigned long code2 = ((struct_ioctlent *) b)->code;
+	const unsigned int code1 = (const unsigned long) a;
+	const unsigned int code2 = ((struct_ioctlent *) b)->code;
 	return (code1 > code2) ? 1 : (code1 < code2) ? -1 : 0;
 }
 
 const struct_ioctlent *
-ioctl_lookup(unsigned long code)
+ioctl_lookup(unsigned int code)
 {
 	struct_ioctlent *iop;
 
 	code &= (_IOC_NRMASK<<_IOC_NRSHIFT) | (_IOC_TYPEMASK<<_IOC_TYPESHIFT);
-	iop = bsearch((void*)code, ioctlent,
+	iop = bsearch((const void *) (const unsigned long) code, ioctlent,
 			nioctlents, sizeof(ioctlent[0]), compare);
 	while (iop > ioctlent) {
 		iop--;
@@ -60,9 +60,7 @@ ioctl_lookup(unsigned long code)
 const struct_ioctlent *
 ioctl_next_match(const struct_ioctlent *iop)
 {
-	unsigned long code;
-
-	code = iop->code;
+	const unsigned int code = iop->code;
 	iop++;
 	if (iop < ioctlent + nioctlents && iop->code == code)
 		return iop;
@@ -70,9 +68,9 @@ ioctl_next_match(const struct_ioctlent *iop)
 }
 
 int
-ioctl_decode(struct tcb *tcp, long code, long arg)
+ioctl_decode(struct tcb *tcp, unsigned int code, long arg)
 {
-	switch ((code >> 8) & 0xff) {
+	switch (_IOC_TYPE(code)) {
 #if defined(ALPHA) || defined(POWERPC)
 	case 'f': case 't': case 'T':
 #else /* !ALPHA */

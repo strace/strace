@@ -396,7 +396,7 @@ typedef struct sysent {
 
 typedef struct ioctlent {
 	const char *symbol;
-	unsigned long code;
+	unsigned int code;
 } struct_ioctlent;
 
 /* Trace Control Block */
@@ -731,20 +731,19 @@ extern void tprint_open_modes(int);
 extern const char *sprint_open_modes(int);
 extern void print_loff_t(struct tcb *, long);
 
-extern const struct_ioctlent *ioctl_lookup(unsigned long);
+extern const struct_ioctlent *ioctl_lookup(const unsigned int);
 extern const struct_ioctlent *ioctl_next_match(const struct_ioctlent *);
-extern int ioctl_decode(struct tcb *, long, long);
-extern int term_ioctl(struct tcb *, long, long);
-extern int sock_ioctl(struct tcb *, long, long);
-extern int proc_ioctl(struct tcb *, int, int);
-extern int rtc_ioctl(struct tcb *, long, long);
-extern int scsi_ioctl(struct tcb *, long, long);
-extern int block_ioctl(struct tcb *, long, long);
-extern int v4l2_ioctl(struct tcb *, unsigned long, long);
-extern int mtd_ioctl(struct tcb *, long, long);
-extern int ubi_ioctl(struct tcb *, long, long);
-extern int loop_ioctl(struct tcb *, long, long);
-extern int ptp_ioctl(struct tcb *, long, long);
+extern int ioctl_decode(struct tcb *, const unsigned int, long);
+extern int block_ioctl(struct tcb *, const unsigned int, long);
+extern int loop_ioctl(struct tcb *, const unsigned int, long);
+extern int mtd_ioctl(struct tcb *, const unsigned int, long);
+extern int ptp_ioctl(struct tcb *, const unsigned int, long);
+extern int rtc_ioctl(struct tcb *, const unsigned int, long);
+extern int scsi_ioctl(struct tcb *, const unsigned int, long);
+extern int sock_ioctl(struct tcb *, const unsigned int, long);
+extern int term_ioctl(struct tcb *, const unsigned int, long);
+extern int ubi_ioctl(struct tcb *, const unsigned int, long);
+extern int v4l2_ioctl(struct tcb *, const unsigned int, long);
 
 extern int tv_nz(const struct timeval *);
 extern int tv_cmp(const struct timeval *, const struct timeval *);

@@ -13,7 +13,7 @@
 struct ioctlent {
 	const char*	header;
 	const char*	name;
-	unsigned long	code;
+	unsigned int	code;
 };
 
 struct ioctlent ioctls[] = {
@@ -23,8 +23,8 @@ struct ioctlent ioctls[] = {
 int nioctls = sizeof(ioctls) / sizeof(ioctls[0]);
 
 int compare(const void* a, const void* b) {
-	unsigned long code1 = ((struct ioctlent *) a)->code;
-	unsigned long code2 = ((struct ioctlent *) b)->code;
+	unsigned int code1 = ((struct ioctlent *) a)->code;
+	unsigned int code2 = ((struct ioctlent *) b)->code;
 	const char *name1 = ((struct ioctlent *) a)->name;
 	const char *name2 = ((struct ioctlent *) b)->name;
 	return (code1 > code2) ? 1 : (code1 < code2) ? -1 : strcmp(name1, name2);
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 	for (i = 0; i < nioctls; i++)
 		if (i == 0 || ioctls[i-1].code != ioctls[i].code ||
 		    is_not_prefix(ioctls[i-1].name, ioctls[i].name))
-			printf("\t{\"%s\",\t\"%s\",\t%#06lx},\n",
+			printf("\t{\"%s\",\t\"%s\",\t%#06x},\n",
 				ioctls[i].header, ioctls[i].name, ioctls[i].code);
 
 	return 0;

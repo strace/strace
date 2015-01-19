@@ -103,7 +103,7 @@ print_blkpg_req(struct tcb *tcp, struct blkpg_ioctl_arg *blkpg)
 }
 
 int
-block_ioctl(struct tcb *tcp, long code, long arg)
+block_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	switch (code) {
 	/* take arg as a value, not as a pointer */

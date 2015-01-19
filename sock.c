@@ -52,7 +52,7 @@ print_addr(struct tcb *tcp, long addr, struct ifreq *ifr)
 }
 
 int
-sock_ioctl(struct tcb *tcp, long code, long arg)
+sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	struct ifreq ifr;
 	struct ifconf ifc;
