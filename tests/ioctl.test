@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Check ioctl syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+./ioctl || {
+	if [ $? -eq 77 ]; then
+		framework_skip_ 'ioctl does not behave as expected'
+	else
+		fail_ 'ioctl failed'
+	fi
+}
+
+args="-e ioctl ./ioctl"
+$STRACE -o "$LOG" $args || {
+	cat "$LOG"
+	fail_ "$STRACE $args failed"
+}
+
+grep_log()
+{
+	local syscall="$1"; shift
+
+	LC_ALL=C grep -E -x "$syscall$*" "$LOG" > /dev/null || {
+		cat "$LOG"
+		fail_ "$STRACE $args failed to trace \"$syscall\" properly"
+	}
+}
+
+grep_log ioctl '\(-1, TCGETS, 0x[0-9a-f]+\) += -1 EBADF .*'
+grep_log ioctl '\(-1, MMTIMER_GETRES, 0x[0-9a-f]+\) += -1 EBADF .*'
+grep_log ioctl '\(-1, HIDIOCGRDESCSIZE or HIDIOCGVERSION, 0x[0-9a-f]+\) += -1 EBADF .*'
+grep_log ioctl '\(-1, HIDIOCGPHYS\(8\), 0x[0-9a-f]+\) += -1 EBADF .*'
+grep_log ioctl '\(-1, EVIOCGBIT\(EV_KEY, 8\), 0x[0-9a-f]+\) += -1 EBADF .*'
+grep_log ioctl '\(-1, _IOC\(_IOC_READ, 0xde, 0xad, 0x08\), 0x[0-9a-f]+\) += -1 EBADF .*'
+
+exit 0

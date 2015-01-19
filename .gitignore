@@ -35,6 +35,7 @@ Makefile.in
 /strace
 /test-driver
 
-/linux/ioctlent.h
+/ioctlent[012].h
+/ioctls_all[012].h
 
 /strace-*.tar.xz

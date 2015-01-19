@@ -1,6 +1,7 @@
 caps
 fanotify_mark
 inet-accept-connect-send-recv
+ioctl
 ipc_msg
 ipc_sem
 ipc_shm

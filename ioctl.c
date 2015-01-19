@@ -48,11 +48,10 @@ compare(const void *a, const void *b)
 }
 
 const struct_ioctlent *
-ioctl_lookup(unsigned int code)
+ioctl_lookup(const unsigned int code)
 {
 	struct_ioctlent *iop;
 
-	code &= (_IOC_NRMASK<<_IOC_NRSHIFT) | (_IOC_TYPEMASK<<_IOC_TYPESHIFT);
 	iop = bsearch((const void *) (const unsigned long) code, ioctlent,
 			nioctlents, sizeof(ioctlent[0]), compare);
 	while (iop > ioctlent) {

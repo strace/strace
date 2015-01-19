@@ -14,7 +14,7 @@ architecture to be specific).  Hopefully, it'll be obvious how to swap out a
 different system or architecture as your circumstances apply.
 
 ksrc=/usr/src/linux
-asrc=$ksrc/arch/blackfin/include/asm
+asrc=$ksrc/arch/blackfin/include
 
 To use the errnoent.sh script, give it all the headers that might contain
 appropriate errno values.  Excessive headers are not a problem.  The resulting
@@ -22,30 +22,30 @@ output should be directly usable without modification.
 	sh ./errnoent.sh \
 		$ksrc/include/linux/*errno*.h \
 		$ksrc/include/asm-generic/*errno*.h \
-		$asrc/*errno*.h \
+		$asrc/asm/*errno*.h \
 		> errnoent.h
 
-To use the ioctlent.sh script, give it all the base include directories.  The
+To use the ioctls_gen.sh script, give it all the base include directories.  The
 script will crawl all the headers and try to discover appropriate ioctls.
 Unlike the other scripts, this one creates files for further processing.  This
-is because ioctls tend to have a lot of define indirection, and the ioctlent.h
+is because ioctls tend to have a lot of define indirection, and the ioctlent0.h
 header needs to be fully expanded into numeric form and sorted properly.  So
-first we process all of the ioctls with the ioctlent.sh into ioctldefs.h and
-ioctls.h, and then we compile them into ioctlsort.c.  The resulting output,
-while directly usable, only contains definitions that match exactly the current
-kernel version that the script ran against.  That means older/newer ioctl
-defines that might be present in the existing ioctlent.h header will be lost if
-things are copied directly.  A little creative use of `diff` and manual merging
-should be used to produce the final ioctlent.h header.
-	sh ./linux/ioctlent.sh $ksrc/include $asrc
-	gcc -Wall -I. linux/ioctlsort.c -o ioctlsort
-	./ioctlsort > ioctlent.h
+first we process all of the ioctls with the ioctls_gen.sh into ioctls_inc.h and
+ioctls_arch.h, and then we compile them into ioctlsort.c.  The resulting
+output, while directly usable, only contains definitions that match exactly the
+current kernel version that the script ran against.  That means older/newer
+ioctl defines that might be present in the existing ioctlent0.h header will be
+lost if things are copied directly.  A little creative use of `diff` and manual
+merging should be used to produce the final ioctlent0.h header.
+	sh ./maint/ioctls_gen.sh $ksrc/include $asrc
+	gcc -Wall -I. ioctlsort.c -o ioctlsort
+	./ioctlsort > ioctlent0.h
 
 To use the signalent.sh script, give it all the headers that might contain
 appropriate signal values.  Excessive headers are not a problem.  The resulting
 output should be directly usable without modification.
 	sh ./signalent.sh \
-		$asrc/signal.h \
+		$asrc/asm/signal.h \
 		> signalent.h
 
 To use the syscallent.sh script, give it the header with the list of your
@@ -54,5 +54,5 @@ a proper header as it can really only detect the system call number and its
 name.  It has no way of knowing the number of arguments or strace flags for
 decoding them (yet?).
 	sh ./syscallent.sh \
-		$asrc/unistd.h \
+		$asrc/asm/unistd.h \
 		> syscallent.h
