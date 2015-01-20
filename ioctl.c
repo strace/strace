@@ -30,6 +30,7 @@
 
 #include "defs.h"
 #include <asm/ioctl.h>
+#include "xlat/ioctl_dirs.h"
 
 static int
 compare(const void *a, const void *b)
@@ -65,6 +66,15 @@ ioctl_next_match(const struct_ioctlent *iop)
 	if (iop < ioctlent + nioctlents && iop->code == code)
 		return iop;
 	return NULL;
+}
+
+void
+ioctl_print_code(const unsigned int code)
+{
+	tprints("_IOC(");
+	printflags(ioctl_dirs, _IOC_DIR(code), "_IOC_???");
+	tprintf(", 0x%02x, 0x%02x, 0x%02x)",
+		_IOC_TYPE(code), _IOC_NR(code), _IOC_SIZE(code));
 }
 
 int
