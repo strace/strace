@@ -223,6 +223,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	inttypes.h
 	ioctls.h
 	linux/falloc.h
+	linux/input.h
 	linux/perf_event.h
 	linux/ptrace.h
 	linux/utsname.h

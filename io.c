@@ -398,13 +398,16 @@ sys_ioctl(struct tcb *tcp)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		iop = ioctl_lookup(tcp->u_arg[1]);
-		if (iop) {
-			tprints(iop->symbol);
-			while ((iop = ioctl_next_match(iop)))
-				tprintf(" or %s", iop->symbol);
-		} else
-			ioctl_print_code(tcp->u_arg[1]);
+		if (!ioctl_decode_command_number(tcp->u_arg[1])) {
+			iop = ioctl_lookup(tcp->u_arg[1]);
+			if (iop) {
+				tprints(iop->symbol);
+				while ((iop = ioctl_next_match(iop)))
+					tprintf(" or %s", iop->symbol);
+			} else {
+				ioctl_print_code(tcp->u_arg[1]);
+			}
+		}
 		ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
 	else {

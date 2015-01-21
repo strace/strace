@@ -735,6 +735,7 @@ extern const struct_ioctlent *ioctl_lookup(const unsigned int);
 extern const struct_ioctlent *ioctl_next_match(const struct_ioctlent *);
 extern void ioctl_print_code(const unsigned int);
 extern int ioctl_decode(struct tcb *, const unsigned int, long);
+extern int ioctl_decode_command_number(const unsigned int);
 extern int block_ioctl(struct tcb *, const unsigned int, long);
 extern int loop_ioctl(struct tcb *, const unsigned int, long);
 extern int mtd_ioctl(struct tcb *, const unsigned int, long);
