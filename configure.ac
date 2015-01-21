@@ -52,13 +52,12 @@ alpha*)
 	AC_DEFINE([ALPHA], 1, [Define for the Alpha architecture.])
 	;;
 powerpc*)
-	arch=powerpc
 	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
 	AC_TRY_COMPILE(
 [#ifndef __LP64__
 # error 32 bit
-#endif], [], ppc_bits=64, ppc_bits=32)
-	if test "$ppc_bits" = "64"; then
+#endif], [], arch=powerpc64, arch=powerpc)
+	if test "$arch" = "powerpc64"; then
 		AC_DEFINE([POWERPC64], 1, [Define for the PowerPC64 architecture.])
 	fi
 	;;

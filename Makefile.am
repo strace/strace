@@ -218,13 +218,16 @@ EXTRA_DIST =				\
 	linux/or1k/syscallent.h		\
 	linux/or1k/userent.h		\
 	linux/personality.h		\
-	linux/powerpc/errnoent1.h	\
 	linux/powerpc/ioctlent.h.in	\
-	linux/powerpc/ioctlent1.h	\
-	linux/powerpc/signalent1.h	\
 	linux/powerpc/syscallent.h	\
-	linux/powerpc/syscallent1.h	\
 	linux/powerpc/userent.h		\
+	linux/powerpc64/errnoent1.h	\
+	linux/powerpc64/ioctlent.h	\
+	linux/powerpc64/ioctlent1.h	\
+	linux/powerpc64/signalent1.h	\
+	linux/powerpc64/syscallent.h	\
+	linux/powerpc64/syscallent1.h	\
+	linux/powerpc64/userent.h	\
 	linux/ptp_clock.h		\
 	linux/reboot.h			\
 	linux/s390/ioctlent.h.in	\
