@@ -144,8 +144,6 @@ AC_MSG_RESULT($arch)
 
 AC_SUBST(arch)
 
-AC_INCLUDEDIR
-
 AC_ARG_ENABLE([arm-oabi],
 	      [AS_HELP_STRING([--enable-arm-oabi],
 			      [enable OABI support on ARM EABI])],
