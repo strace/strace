@@ -217,7 +217,16 @@ static void
 print_llu_from_low_high_val(struct tcb *tcp, int arg)
 {
 #if SIZEOF_LONG == SIZEOF_LONG_LONG
-	tprintf("%lu", (unsigned long) tcp->u_arg[arg]);
+# if SUPPORTED_PERSONALITIES > 1
+	if (current_wordsize == sizeof(long))
+# endif
+		tprintf("%lu", (unsigned long) tcp->u_arg[arg]);
+# if SUPPORTED_PERSONALITIES > 1
+	else
+		tprintf("%lu",
+			((unsigned long) tcp->u_arg[arg + 1] << current_wordsize * 8)
+			| (unsigned long) tcp->u_arg[arg]);
+# endif
 #elif defined(LINUX_MIPSN32)
 	tprintf("%llu", (unsigned long long) tcp->ext_arg[arg]);
 #else
