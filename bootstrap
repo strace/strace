@@ -1,3 +1,17 @@
-#!/bin/sh
+#!/bin/sh -eu
+
+for m in -m32 -mx32; do
+	mkdir tests$m ||
+		continue
+	sed "s/^AM_CFLAGS[[:space:]]*=.*/& $m/" \
+		tests/Makefile.am > tests$m/Makefile.am
+	for f in tests/*; do
+		[ "${f##*/}" != Makefile.am ] ||
+			continue
+		ln -s ../"$f" tests$m/
+	done
+done
+
 ./xlat/gen.sh
+
 exec autoreconf -f -i "$@"

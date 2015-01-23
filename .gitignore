@@ -29,13 +29,14 @@ Makefile.in
 /stamp-h1
 
 /*.gdb
-/ioctls.h
-/ioctldefs.h
-/ioctlsort
 /strace
 /test-driver
 
 /ioctlent[012].h
 /ioctls_all[012].h
+/ioctlsort[012]
 
 /strace-*.tar.xz
+
+/tests-m32
+/tests-mx32

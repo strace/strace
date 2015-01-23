@@ -1,6 +1,12 @@
 # Automake input for strace.
 
-SUBDIRS = tests
+if HAVE_M32_RUNTIME
+TESTS_M32 = tests-m32
+endif
+if HAVE_MX32_RUNTIME
+TESTS_MX32 = tests-mx32
+endif
+SUBDIRS = tests $(TESTS_M32) $(TESTS_MX32)
 
 bin_PROGRAMS = strace
 man_MANS = strace.1
