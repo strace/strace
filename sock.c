@@ -51,6 +51,12 @@ print_addr(struct tcb *tcp, long addr, struct ifreq *ifr)
 		printstr(tcp, addr, sizeof(ifr->ifr_addr.sa_data));
 }
 
+static void
+print_ifname(const char *ifname)
+{
+	print_quoted_string(ifname, IFNAMSIZ + 1, QUOTE_0_TERMINATED);
+}
+
 int
 sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
@@ -71,10 +77,13 @@ sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		case SIOCSIFNAME:
 			if (umove(tcp, tcp->u_arg[2], &ifr) < 0)
 				tprintf(", %#lx", tcp->u_arg[2]);
-			else
-				tprintf(", {ifr_name=\"%.*s\", ifr_newname=\"%.*s\"}",
-					IFNAMSIZ, ifr.ifr_name,
-					IFNAMSIZ, ifr.ifr_newname);
+			else {
+				tprints(", {ifr_name=");
+				print_ifname(ifr.ifr_name);
+				tprints(", ifr_newname=");
+				print_ifname(ifr.ifr_newname);
+				tprints("}");
+			}
 			break;
 		}
 		return 0;
@@ -142,15 +151,18 @@ sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 				tprintf(", {ifr_index=%d, ifr_name=???}",
 					ifr.ifr_ifindex);
 			} else {
-				tprintf(", {ifr_name=\"%.*s\", ???}",
-					IFNAMSIZ, ifr.ifr_name);
+				tprints(", {ifr_name=");
+				print_ifname(ifr.ifr_name);
+				tprints(", ???}");
 			}
 		} else if (code == SIOCGIFNAME) {
-			tprintf(", {ifr_index=%d, ifr_name=\"%.*s\"}",
-				ifr.ifr_ifindex, IFNAMSIZ, ifr.ifr_name);
+			tprintf(", {ifr_index=%d, ifr_name=", ifr.ifr_ifindex);
+			print_ifname(ifr.ifr_name);
+			tprints("}");
 		} else {
-			tprintf(", {ifr_name=\"%.*s\", ",
-				IFNAMSIZ, ifr.ifr_name);
+			tprints(", {ifr_name=");
+			print_ifname(ifr.ifr_name);
+			tprints(", ");
 			switch (code) {
 			case SIOCGIFINDEX:
 				tprintf("ifr_index=%d", ifr.ifr_ifindex);
@@ -205,7 +217,8 @@ sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 				break;
 			case SIOCGIFSLAVE:
 			case SIOCSIFSLAVE:
-				tprintf("ifr_slave=\"%s\"", ifr.ifr_slave);
+				tprints("ifr_slave=");
+				print_ifname(ifr.ifr_slave);
 				break;
 			case SIOCGIFTXQLEN:
 			case SIOCSIFTXQLEN:
@@ -251,8 +264,9 @@ sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			for (i = 0; i < nifra; ++i ) {
 				if (i > 0)
 					tprints(", ");
-				tprintf("{\"%.*s\", {",
-					IFNAMSIZ, ifra[i].ifr_newname);
+				tprints("{");
+				print_ifname(ifra[i].ifr_newname);
+				tprints(", {");
 				if (verbose(tcp)) {
 					printxval(addrfams,
 						  ifra[i].ifr_addr.sa_family,
