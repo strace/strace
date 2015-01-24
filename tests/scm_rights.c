@@ -7,17 +7,17 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 
-int main(void)
+int main(int ac, const char **av)
 {
-	int fd;
+	int i;
 	int data = 0;
 	struct iovec iov = {
 		.iov_base = &data,
 		.iov_len = sizeof(iov)
 	};
 
-	while ((fd = open("/dev/null", O_RDWR)) < 3)
-		assert(fd >= 0);
+	while ((i = open("/dev/null", O_RDWR)) < 3)
+		assert(i >= 0);
 	(void) close(3);
 
 	int sv[2];
@@ -33,21 +33,19 @@ int main(void)
 		assert(dup2(sv[1], 1) == 1);
 		assert(close(sv[1]) == 0);
 
-		int fds[2];
+		int fds[ac];
 		assert((fds[0] = open("/dev/null", O_RDWR)) == 3);
-		assert((fds[1] = open("/dev/zero", O_RDONLY)) == 4);
+		for (i = 1; i < ac; ++i)
+			assert((fds[i] = open(av[i], O_RDONLY)) == i + 3);
 
 		union {
 			struct cmsghdr cmsg;
 			char buf[CMSG_LEN(sizeof(fds))];
-		} control = {
-			.cmsg = {
-				.cmsg_level = SOL_SOCKET,
-				.cmsg_type = SCM_RIGHTS,
-				.cmsg_len = CMSG_LEN(sizeof(fds))
-			}
-		};
+		} control;
 
+		control.cmsg.cmsg_level = SOL_SOCKET;
+		control.cmsg.cmsg_type = SCM_RIGHTS;
+		control.cmsg.cmsg_len = CMSG_LEN(sizeof(fds));
 		memcpy(CMSG_DATA(&control.cmsg), fds, sizeof(fds));
 
 		struct msghdr mh = {
@@ -68,7 +66,7 @@ int main(void)
 		assert(dup2(sv[0], 0) == 0);
 		assert(close(sv[0]) == 0);
 
-		struct cmsghdr control[4];
+		struct cmsghdr control[4 + ac * sizeof(int) / sizeof(struct cmsghdr)];
 
 		struct msghdr mh = {
 			.msg_iov = &iov,

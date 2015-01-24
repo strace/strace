@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Check how SCM_RIGHTS control messages are decoded in -y mode.
+# Check how SCM_RIGHTS and SCM_CREDENTIALS control messages are decoded in -y mode.
 
 . "${srcdir=.}/init.sh"
 
@@ -9,21 +9,35 @@
 	framework_skip_ '/proc/self/fd/ is not available'
 
 check_prog grep
+check_prog mkdir
+check_prog rm
+check_prog seq
+check_prog touch
 
-rm -f $LOG.*
+rm -rf -- "$LOG".*
 
-./scm_rights ||
+dir="$LOG.dir"
+mkdir -- "$dir" ||
+	framework_skip_ 'failed to create a directory'
+
+file="$dir/$(for i in $(seq 1 127); do echo A; done; echo Z)"
+
+touch -- "$file" ||
+	framework_skip_ 'failed to create a file'
+
+./scm_rights /dev/zero ||
 	fail_ 'scm_rights failed'
 
-args="-tt -ff -y -xx -enetwork -o $LOG ./scm_rights"
-$STRACE $args ||
+args="-tt -ff -y -x -enetwork ./scm_rights /dev/zero"
+$STRACE -o "$LOG" $args "$file" ||
 	fail_ "$STRACE $args failed"
 
-"$srcdir"/../strace-log-merge $LOG > $LOG || {
+"$srcdir"/../strace-log-merge "$LOG" > "$LOG" || {
 	cat $LOG
 	fail_ 'strace-log-merge failed'
 }
-rm -f $LOG.*
+
+rm -rf -- "$LOG".*
 
 grep_log()
 {
@@ -38,7 +52,7 @@ grep_log()
 
 n='[1-9][0-9]*'
 msg='\{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", '"$n"'\}\], msg_controllen='"$n"
-rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[3</dev/null>, 4</dev/zero>\]\}'
+rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[3</dev/null>, 4</dev/zero>, 5</[^}>]*/(A\\n){127}Z>\]\}'
 creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, \{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}\}'
 grep_log sendmsg '\(1<socket:\[[0-9]+\]>, '"$msg"', \['"$rights"'\], msg_flags=0\}, 0\) += '"$n"
 grep_log recvmsg '\(0<socket:\[[0-9]+\]>, '"$msg"', \['"$creds"', '"$rights"'\], msg_flags=0\}, 0\) += '"$n"
