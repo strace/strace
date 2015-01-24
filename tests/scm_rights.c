@@ -9,23 +9,11 @@
 
 int main(void)
 {
-	union {
-		struct cmsghdr cmsghdr;
-		char buf[CMSG_SPACE(sizeof(int))];
-	} control = {};
-
 	int fd;
 	int data = 0;
 	struct iovec iov = {
 		.iov_base = &data,
 		.iov_len = sizeof(iov)
-	};
-
-	struct msghdr mh = {
-		.msg_iov = &iov,
-		.msg_iovlen = 1,
-		.msg_control = &control,
-		.msg_controllen = sizeof(control)
 	};
 
 	while ((fd = open("/dev/null", O_RDWR)) < 3)
@@ -34,6 +22,8 @@ int main(void)
 
 	int sv[2];
 	assert(socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == 0);
+	int one = 1;
+	assert(setsockopt(sv[0], SOL_SOCKET, SO_PASSCRED, &one, sizeof(one)) == 0);
 
 	pid_t pid = fork();
 	assert(pid >= 0);
@@ -43,14 +33,29 @@ int main(void)
 		assert(dup2(sv[1], 1) == 1);
 		assert(close(sv[1]) == 0);
 
-		assert((fd = open("/dev/null", O_RDWR)) == 3);
+		int fds[2];
+		assert((fds[0] = open("/dev/null", O_RDWR)) == 3);
+		assert((fds[1] = open("/dev/zero", O_RDONLY)) == 4);
 
-		struct cmsghdr *cmsg = CMSG_FIRSTHDR(&mh);
-		cmsg->cmsg_level = SOL_SOCKET;
-		cmsg->cmsg_type = SCM_RIGHTS;
-		cmsg->cmsg_len = CMSG_LEN(sizeof fd);
-		memcpy(CMSG_DATA(cmsg), &fd, sizeof fd);
-		mh.msg_controllen = cmsg->cmsg_len;
+		union {
+			struct cmsghdr cmsg;
+			char buf[CMSG_LEN(sizeof(fds))];
+		} control = {
+			.cmsg = {
+				.cmsg_level = SOL_SOCKET,
+				.cmsg_type = SCM_RIGHTS,
+				.cmsg_len = CMSG_LEN(sizeof(fds))
+			}
+		};
+
+		memcpy(CMSG_DATA(&control.cmsg), fds, sizeof(fds));
+
+		struct msghdr mh = {
+			.msg_iov = &iov,
+			.msg_iovlen = 1,
+			.msg_control = &control,
+			.msg_controllen = sizeof(control)
+		};
 
 		assert(sendmsg(1, &mh, 0) == sizeof(iov));
 		assert(close(1) == 0);
@@ -62,6 +67,15 @@ int main(void)
 		assert(close(sv[1]) == 0);
 		assert(dup2(sv[0], 0) == 0);
 		assert(close(sv[0]) == 0);
+
+		struct cmsghdr control[4];
+
+		struct msghdr mh = {
+			.msg_iov = &iov,
+			.msg_iovlen = 1,
+			.msg_control = control,
+			.msg_controllen = sizeof(control)
+		};
 
 		assert(recvmsg(0, &mh, 0) == sizeof(iov));
 		assert(close(0) == 0);

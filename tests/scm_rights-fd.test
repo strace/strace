@@ -36,7 +36,11 @@ grep_log()
 	}
 }
 
-grep_log sendmsg '\(1<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
-grep_log recvmsg '\(0<socket:\[[0-9]+\]>, \{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", [1-9][0-9]*\}\], msg_controllen=[1-9][0-9]*, \{cmsg_len=[1-9][0-9]*, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \{3</dev/null>\}\}, msg_flags=0\}, 0\) += [1-9][0-9]*'
+n='[1-9][0-9]*'
+msg='\{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", '"$n"'\}\], msg_controllen='"$n"
+rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[3</dev/null>, 4</dev/zero>\]\}'
+creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, \{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}\}'
+grep_log sendmsg '\(1<socket:\[[0-9]+\]>, '"$msg"', \['"$rights"'\], msg_flags=0\}, 0\) += '"$n"
+grep_log recvmsg '\(0<socket:\[[0-9]+\]>, '"$msg"', \['"$creds"', '"$rights"'\], msg_flags=0\}, 0\) += '"$n"
 
 exit 0

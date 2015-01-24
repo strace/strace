@@ -339,7 +339,10 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 }
 
 #if HAVE_SENDMSG
-#include "xlat/scmvals.h"
+# ifndef SCM_SECURITY
+#  define SCM_SECURITY 0x03
+# endif
+# include "xlat/scmvals.h"
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 struct cmsghdr32 {
@@ -350,91 +353,152 @@ struct cmsghdr32 {
 #endif
 
 typedef union {
-	char *buf;
+	char *ptr;
 	struct cmsghdr *cmsg;
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	struct cmsghdr32 *cmsg32;
 #endif
 } union_cmsghdr;
 
-static void
-printcmsghdr(struct tcb *tcp, unsigned long addr, unsigned long len)
+static bool
+print_scm_rights(struct tcb *tcp, size_t cmsg_size, char *ptr, size_t cmsg_len)
 {
-	union_cmsghdr u;
-	size_t cmsg_size;
-	unsigned long cmsg_len;
-	int cmsg_level;
-	int cmsg_type;
+	if (cmsg_size + sizeof(int) > cmsg_len)
+		return false;
 
-	cmsg_size =
+	int *fds = (int *) (ptr + cmsg_size);
+	bool seen = false;
+
+	tprints(", [");
+	while ((char *) fds < (ptr + cmsg_len)) {
+		if (seen)
+			tprints(", ");
+		else
+			seen = true;
+		printfd(tcp, *fds++);
+	}
+	tprints("]}");
+	return true;
+}
+
+static bool
+print_scm_creds(struct tcb *tcp, size_t cmsg_size, char *ptr, size_t cmsg_len)
+{
+	if (cmsg_size + sizeof(struct ucred) > cmsg_len)
+		return false;
+
+	const struct ucred *uc = (void *) (ptr + cmsg_size);
+
+	tprintf(", {pid=%u, uid=%u, gid=%u}}",
+		(unsigned) uc->pid, (unsigned) uc->uid, (unsigned) uc->gid);
+	return true;
+}
+
+static bool
+print_scm_security(struct tcb *tcp, size_t cmsg_size, char *ptr, size_t cmsg_len)
+{
+	if (cmsg_size + sizeof(char) > cmsg_len)
+		return false;
+
+	const char *label = (const char *) (ptr + cmsg_size);
+	const size_t label_len = cmsg_len - cmsg_size;
+	char *outstr;
+	const size_t alloc_len = 4 * label_len + 3;
+
+	if (label_len != alloc_len / 4 ||
+	    !(outstr = malloc(alloc_len)))
+		return false;
+
+	string_quote(label, outstr, 0, label_len);
+	tprintf(", %s}", outstr);
+
+	free(outstr);
+	return true;
+}
+
+static void
+printcmsghdr(struct tcb *tcp, unsigned long addr, size_t len)
+{
+	const size_t cmsg_size =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 		(current_wordsize < sizeof(long)) ? sizeof(struct cmsghdr32) :
 #endif
 			sizeof(struct cmsghdr);
 
-	u.buf = len < cmsg_size ? NULL : malloc(len);
-	if (!u.buf || umoven(tcp, addr, len, u.buf) < 0) {
+	char *buf = len < cmsg_size ? NULL : malloc(len);
+	if (!buf || umoven(tcp, addr, len, buf) < 0) {
 		tprintf(", msg_control=%#lx", addr);
-		free(u.buf);
+		free(buf);
 		return;
 	}
 
-	cmsg_len =
+	union_cmsghdr u = { .ptr = buf };
+
+	tprints(", [");
+	while (len >= cmsg_size) {
+		size_t cmsg_len =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-		(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_len :
+			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_len :
 #endif
-			u.cmsg->cmsg_len;
-	cmsg_level =
+				u.cmsg->cmsg_len;
+		int cmsg_level =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-		(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_level :
+			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_level :
 #endif
-			u.cmsg->cmsg_level;
-	cmsg_type =
+				u.cmsg->cmsg_level;
+		int cmsg_type =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-		(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_type :
+			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_type :
 #endif
-			u.cmsg->cmsg_type;
+				u.cmsg->cmsg_type;
 
-	tprintf(", {cmsg_len=%lu, cmsg_level=", cmsg_len);
-	printxval(socketlayers, cmsg_level, "SOL_???");
-	tprints(", cmsg_type=");
+		if (u.ptr != buf)
+			tprints(", ");
+		tprintf("{cmsg_len=%lu, cmsg_level=", (unsigned long) cmsg_len);
+		printxval(socketlayers, cmsg_level, "SOL_???");
+		tprints(", cmsg_type=");
 
-	if (cmsg_len > len)
-		cmsg_len = len;
+		if (cmsg_len > len)
+			cmsg_len = len;
 
-	if (cmsg_level == SOL_SOCKET) {
-		printxval(scmvals, cmsg_type, "SCM_???");
-
-		if (cmsg_type == SCM_RIGHTS
-		    && cmsg_size + sizeof(int) <= cmsg_len) {
-			int *fds = (int *) (u.buf + cmsg_size);
-			int first = 1;
-
-			tprints(", {");
-			while ((char *) fds < (u.buf + cmsg_len)) {
-				if (!first)
-					tprints(", ");
-				printfd(tcp, *fds++);
-				first = 0;
+		if (cmsg_level == SOL_SOCKET) {
+			printxval(scmvals, cmsg_type, "SCM_???");
+			switch (cmsg_type) {
+			case SCM_RIGHTS:
+				if (print_scm_rights(tcp, cmsg_size, u.ptr, cmsg_len))
+					goto next_cmsg;
+				break;
+			case SCM_CREDENTIALS:
+				if (print_scm_creds(tcp, cmsg_size, u.ptr, cmsg_len))
+					goto next_cmsg;
+				break;
+			case SCM_SECURITY:
+				if (print_scm_security(tcp, cmsg_size, u.ptr, cmsg_len))
+					goto next_cmsg;
+				break;
 			}
-			tprints("}}");
-			free(u.buf);
-			return;
+		} else {
+			tprintf("%u", cmsg_type);
 		}
-		if (cmsg_type == SCM_CREDENTIALS
-		    && cmsg_size + sizeof(struct ucred) <= cmsg_len) {
-			struct ucred *uc = (void *) (u.buf + cmsg_size);
-
-			tprintf("{pid=%ld, uid=%ld, gid=%ld}}",
-				(long)uc->pid, (long)uc->uid, (long)uc->gid);
-			free(u.buf);
-			return;
+		tprints(", ...}");
+next_cmsg:
+		if (cmsg_len < cmsg_size) {
+			len -= cmsg_size;
+			break;
 		}
-	} else {
-		tprintf("%u", cmsg_type);
+		cmsg_len = (cmsg_len + current_wordsize - 1) &
+			(size_t) ~(current_wordsize - 1);
+		if (cmsg_len >= len) {
+			len = 0;
+			break;
+		}
+		u.ptr += cmsg_len;
+		len -= cmsg_len;
 	}
-	free(u.buf);
-	tprints(", ...}");
+	if (len)
+		tprints(", ...");
+	tprints("]");
+	free(buf);
 }
 
 static void
