@@ -305,7 +305,7 @@
 [277] = { 3,	TI,		sys_shmctl,			"shmctl"		},
 [278] = { 4,	TD|TF,		sys_utimensat,			"utimensat"		},
 [279] = { 3,	TD|TS,		sys_signalfd,			"signalfd"		},
-[280] = { 2,	TD,		sys_timerfd,			"timerfd_create"	},
+[280] = { 2,	TD,		sys_timerfd,			"timerfd"		},
 [281] = { 1,	TD,		sys_eventfd,			"eventfd"		},
 [282] = { },
 [283] = { 2,	TD,		sys_setns,			"setns"			},
