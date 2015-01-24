@@ -253,8 +253,13 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 
 				if (if_indextoname(addrbuf.sa6.sin6_scope_id, scopebuf) == NULL)
 					numericscope++;
-				else
-					tprintf(", sin6_scope_id=if_nametoindex(\"%s\")", scopebuf);
+				else {
+					tprints(", sin6_scope_id=if_nametoindex(");
+					print_quoted_string(scopebuf,
+							    sizeof(scopebuf),
+							    QUOTE_0_TERMINATED);
+					tprints(")");
+				}
 			} else
 				numericscope++;
 
