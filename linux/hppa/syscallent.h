@@ -55,7 +55,7 @@
 [ 50] = { 0,	NF,		sys_getegid,			"getegid"		},
 [ 51] = { 1,	TF,		sys_acct,			"acct"			},
 [ 52] = { 2,	TF,		sys_umount2,			"umount2"		},
-[ 53] = { 3,	TN,		sys_getpeername,		"lock"			},
+[ 53] = { 3,	TN,		sys_getpeername,		"getpeername"		},
 [ 54] = { 3,	TD,		sys_ioctl,			"ioctl"			},
 [ 55] = { 3,	TD,		sys_fcntl,			"fcntl"			},
 [ 56] = { 4,	TN,		sys_socketpair,			"socketpair"		},
