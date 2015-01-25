@@ -5,25 +5,36 @@
 . "${srcdir=.}/init.sh"
 
 check_prog awk
-check_prog grep
 check_prog ls
 check_prog mkdir
-check_prog rmdir
+check_prog rm
+check_prog seq
+check_prog touch
 
-mkdir emptydir ||
-	framework_skip_ 'failed to create an empty directory'
+dir="$LOG.dir"
+mkdir -- "$dir" ||
+	framework_skip_ 'failed to create a directory'
 
-ls emptydir ||
-	{ rmdir emptydir; framework_skip_ 'failed to list an empty directory'; }
+touch -- "$dir/$(for i in $(seq 1 127); do echo A; done; echo Z)" ||
+	framework_skip_ 'failed to create a file'
+
+ls -- "$dir" > /dev/null || {
+	rm -rf -- "$dir"
+	framework_skip_ 'failed to list a directory'
+}
 
 args='-vegetdents,getdents64'
-$STRACE $args -o $LOG ls emptydir
+$STRACE -o "$LOG" $args ls -- "$dir" > /dev/null
 rc=$?
-rmdir emptydir
-[ $rc -eq 0 ] ||
-	{ cat $LOG; fail_ "strace $args failed"; }
+rm -rf -- "$dir"
+[ $rc -eq 0 ] || {
+	cat "$LOG"
+	fail_ "strace $args failed"
+}
 
-awk -f "$srcdir"/getdents.awk $LOG ||
-	{ cat $LOG; fail_ "strace $args failed to trace getdents/getdents64 properly"; }
+awk -f "$srcdir"/getdents.awk "$LOG" || {
+	cat "$LOG"
+	fail_ "strace $args failed to trace getdents/getdents64 properly"
+}
 
 exit 0

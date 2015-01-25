@@ -1,6 +1,8 @@
 #include "defs.h"
 #include <dirent.h>
 
+#define D_NAME_LEN_MAX 256
+
 struct kernel_dirent {
 	unsigned long   d_ino;
 	unsigned long   d_off;
@@ -28,12 +30,12 @@ print_old_dirent(struct tcb *tcp, long addr)
 		return;
 	}
 
-	tprintf("{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=\"",
+	tprintf("{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=",
 		(unsigned long) d.d_ino, (unsigned long) d.d_off, d.d_reclen);
-	if (d.d_reclen > 256)
-		d.d_reclen = 256;
+	if (d.d_reclen > D_NAME_LEN_MAX)
+		d.d_reclen = D_NAME_LEN_MAX;
 	printpathn(tcp, addr + offsetof(old_dirent_t, d_name), d.d_reclen);
-	tprints("\"}");
+	tprints("}");
 }
 
 int
@@ -103,11 +105,18 @@ sys_getdents(struct tcb *tcp)
 				  i + d->d_reclen - 1 >= len;
 			int d_name_len = oob ? len - i : d->d_reclen;
 			d_name_len -= offsetof(struct kernel_dirent, d_name) + 1;
+			if (d_name_len > D_NAME_LEN_MAX)
+				d_name_len = D_NAME_LEN_MAX;
 
-			tprintf("%s{d_ino=%lu, d_off=%lu, ",
-				i ? " " : "", d->d_ino, d->d_off);
-			tprintf("d_reclen=%u, d_name=\"%.*s\", d_type=",
-				d->d_reclen, d_name_len, d->d_name);
+			tprintf("%s{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=",
+				i ? " " : "", d->d_ino, d->d_off, d->d_reclen);
+
+			if (print_quoted_string(d->d_name, d_name_len,
+					        QUOTE_0_TERMINATED) > 0) {
+				tprints("...");
+			}
+
+			tprints(", d_type=");
 			if (oob)
 				tprints("?");
 			else
@@ -182,6 +191,8 @@ sys_getdents64(struct tcb *tcp)
 			} else {
 				d_name_len = len - i - d_name_offset;
 			}
+			if (d_name_len > D_NAME_LEN_MAX)
+				d_name_len = D_NAME_LEN_MAX;
 
 			tprintf("%s{d_ino=%" PRIu64 ", d_off=%" PRId64
 				", d_reclen=%u, d_type=",
@@ -190,8 +201,14 @@ sys_getdents64(struct tcb *tcp)
 				d->d_off,
 				d->d_reclen);
 			printxval(direnttypes, d->d_type, "DT_???");
-			tprintf(", d_name=\"%.*s\"}",
-				d_name_len, d->d_name);
+
+			tprints(", d_name=");
+			if (print_quoted_string(d->d_name, d_name_len,
+					        QUOTE_0_TERMINATED) > 0) {
+				tprints("...");
+			}
+
+			tprints("}");
 		}
 		if (d->d_reclen < d_name_offset) {
 			tprints("/* d_reclen < offsetof(struct dirent64, d_name) */");

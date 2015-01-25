@@ -8,17 +8,25 @@ BEGIN {
   d_ino = "d_ino=" i
   d_off = "d_off=" i
   d_reclen = "d_reclen=" len
-  d_name1 = "d_name=\"\\.\""
-  d_name2 = "d_name=\"\\.\\.\""
-  d_type = "d_type=DT_DIR"
+  d_name_1 = "d_name=\"\\.\""
+  d_name_2 = "d_name=\"\\.\\.\""
+  d_name_3 = "d_name=\"(A\\\\n){127}Z\""
+  d_type_dir = "d_type=DT_DIR"
+  d_type_reg = "d_type=DT_REG"
 
-  d1_1 = "\\{" d_ino ", " d_off ", " d_reclen ", " d_name1 ", " d_type "\\}"
-  d1_2 = "\\{" d_ino ", " d_off ", " d_reclen ", " d_name2 ", " d_type "\\}"
-  d2_1 = "\\{" d_ino ", " d_off ", " d_reclen ", " d_type ", " d_name1 "\\}"
-  d2_2 = "\\{" d_ino ", " d_off ", " d_reclen ", " d_type ", " d_name2 "\\}"
+  dirent_1   = "\\{" d_ino ", " d_off ", " d_reclen ", " d_name_1 ", " d_type_dir "\\}"
+  dirent_2   = "\\{" d_ino ", " d_off ", " d_reclen ", " d_name_2 ", " d_type_dir "\\}"
+  dirent_3   = "\\{" d_ino ", " d_off ", " d_reclen ", " d_name_3 ", " d_type_reg "\\}"
 
-  getdents   =   "^getdents\\(" i ", \\{(" d1_1 " " d1_2 "|" d1_2 " " d1_1 ")\\}, " len "\\) += " len "$"
-  getdents64 = "^getdents64\\(" i ", \\{(" d2_1 " " d2_2 "|" d2_2 " " d2_1 ")\\}, " len "\\) += " len "$"
+  dirent64_1 = "\\{" d_ino ", " d_off ", " d_reclen ", " d_type_dir ", " d_name_1 "\\}"
+  dirent64_2 = "\\{" d_ino ", " d_off ", " d_reclen ", " d_type_dir ", " d_name_2 "\\}"
+  dirent64_3 = "\\{" d_ino ", " d_off ", " d_reclen ", " d_type_reg ", " d_name_3 "\\}"
+
+  dents   = "\\{(" dirent_1   " " dirent_2   "|" dirent_2   " " dirent_1   ") " dirent_3   "\\}"
+  dents64 = "\\{(" dirent64_1 " " dirent64_2 "|" dirent64_2 " " dirent64_1 ") " dirent64_3 "\\}"
+
+  getdents   =   "^getdents\\(" i ", " dents   ", " len "\\) += " len "$"
+  getdents64 = "^getdents64\\(" i ", " dents64 ", " len "\\) += " len "$"
 }
 
 NR == 1 {if (match($0, getdents) || match($0, getdents64)) next}
