@@ -68,10 +68,49 @@
 
 static void print_pixelformat(uint32_t fourcc)
 {
+	union {
+		uint32_t pixelformat;
+		unsigned char cc[sizeof(uint32_t)];
+	} u = {
+		.pixelformat =
 #if WORDS_BIGENDIAN
-	fourcc = htole32(fourcc);
+			htole32(fourcc)
+#else
+			fourcc
 #endif
-	tprintf("%.4s", (char*)&fourcc);
+	};
+	unsigned int i;
+
+	tprints("v4l2_fourcc(");
+	for (i = 0; i < sizeof(u.cc); ++i) {
+		unsigned int c = u.cc[i];
+
+		if (i)
+			tprints(", ");
+		if (c == ' ' ||
+		    (c >= '0' && c <= '9') ||
+		    (c >= 'A' && c <= 'Z') ||
+		    (c >= 'a' && c <= 'z')) {
+			char sym[] = {
+				'\'',
+				u.cc[i],
+				'\''
+			};
+			tprints(sym);
+		} else {
+			char hex[] = {
+				'\'',
+				'\\',
+				'x',
+				"0123456789abcdef"[c >> 4],
+				"0123456789abcdef"[c & 0xf],
+				'\'',
+				'\0'
+			};
+			tprints(hex);
+		}
+	}
+	tprints(")");
 }
 
 static void print_v4l2_format_fmt(const struct v4l2_format *f)
