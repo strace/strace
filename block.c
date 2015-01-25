@@ -94,12 +94,16 @@ print_blkpg_req(struct tcb *tcp, struct blkpg_ioctl_arg *blkpg)
 
 	if (umove(tcp, (long) blkpg->data, &p) < 0)
 		tprintf("%#lx}", (long) blkpg->data);
-	else
-		tprintf("{start=%lld, length=%lld, pno=%d, "
-			"devname=\"%.*s\", volname=\"%.*s\"}}",
-			p.start, p.length, p.pno,
-			(int) sizeof(p.devname), p.devname,
-			(int) sizeof(p.volname), p.volname);
+	else {
+		tprintf("{start=%lld, length=%lld, pno=%d, devname=",
+			p.start, p.length, p.pno);
+		print_quoted_string(p.devname, sizeof(p.devname),
+				    QUOTE_0_TERMINATED);
+		tprints(", volname=");
+		print_quoted_string(p.volname, sizeof(p.volname),
+				    QUOTE_0_TERMINATED);
+		tprints("}}");
+	}
 }
 
 int
@@ -262,9 +266,12 @@ block_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			struct blk_user_trace_setup buts;
 			if (syserror(tcp) || umove(tcp, arg, &buts) < 0)
 				tprintf(", %#lx", arg);
-			else
-				tprintf(", {name=\"%.*s\"}",
-					(int) sizeof(buts.name), buts.name);
+			else {
+				tprints(", {name=");
+				print_quoted_string(buts.name, sizeof(buts.name),
+						    QUOTE_0_TERMINATED);
+				tprints("}");
+			}
 		}
 		break;
 
