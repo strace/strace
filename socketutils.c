@@ -252,13 +252,13 @@ unix_parse_response(const char *proto_name, const void *data, int data_len,
 			tprintf("->%u", peer);
 		if (path_len) {
 			if (path[0] == '\0') {
-				char *outstr = alloca(4 * path_len - 1);
-				string_quote(path + 1, outstr, -1, path_len);
-				tprintf(",@%s", outstr);
+				tprints(",@");
+				print_quoted_string(path + 1, path_len,
+						    QUOTE_0_TERMINATED);
 			} else {
-				char *outstr = alloca(4 * path_len + 3);
-				string_quote(path, outstr, -1, path_len + 1);
-				tprintf(",%s", outstr);
+				tprints(",");
+				print_quoted_string(path, path_len + 1,
+						    QUOTE_0_TERMINATED);
 			}
 		}
 		tprints("]");

@@ -39,7 +39,6 @@ loop_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	struct loop_info info;
 	struct loop_info64 info64;
-	char *s = alloca((LO_NAME_SIZE + LO_KEY_SIZE) * 4);
 
 	if (entering(tcp))
 		return 0;
@@ -72,12 +71,14 @@ loop_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		tprints(", flags=");
 		printflags(loop_flags_options, info.lo_flags, "LO_FLAGS_???");
 
-		string_quote(info.lo_name, s, -1, LO_NAME_SIZE);
-		tprintf(", name=%s", s);
+		tprints(", name=");
+		print_quoted_string(info.lo_name, LO_NAME_SIZE,
+				    QUOTE_0_TERMINATED);
 
 		if (!abbrev(tcp) || info.lo_encrypt_type != LO_CRYPT_NONE) {
-			string_quote((void *) info.lo_encrypt_key, s, 0, LO_KEY_SIZE);
-			tprintf(", encrypt_key=%s", s);
+			tprints(", encrypt_key=");
+			print_quoted_string((void *) info.lo_encrypt_key,
+					    LO_KEY_SIZE, 0);
 		}
 
 		if (!abbrev(tcp))
@@ -125,14 +126,17 @@ loop_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		tprints(", flags=");
 		printflags(loop_flags_options, info64.lo_flags, "LO_FLAGS_???");
 
-		string_quote((void *) info64.lo_file_name, s, -1, LO_NAME_SIZE);
-		tprintf(", file_name=%s", s);
+		tprints(", file_name=");
+		print_quoted_string((void *) info64.lo_file_name,
+				    LO_NAME_SIZE, QUOTE_0_TERMINATED);
 
 		if (!abbrev(tcp) || info64.lo_encrypt_type != LO_CRYPT_NONE) {
-			string_quote((void *) info64.lo_crypt_name, s, -1, LO_NAME_SIZE);
-			tprintf(", crypt_name=%s", s);
-			string_quote((void *) info64.lo_encrypt_key, s, 0, LO_KEY_SIZE);
-			tprintf(", encrypt_key=%s", s);
+			tprints(", crypt_name=");
+			print_quoted_string((void *) info64.lo_crypt_name,
+					    LO_NAME_SIZE, QUOTE_0_TERMINATED);
+			tprints(", encrypt_key=");
+			print_quoted_string((void *) info64.lo_encrypt_key,
+					    LO_KEY_SIZE, 0);
 		}
 
 		if (!abbrev(tcp))

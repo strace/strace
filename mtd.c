@@ -262,9 +262,6 @@ ubi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 	struct ubi_attach_req attach;
 	struct ubi_map_req map;
 	struct ubi_set_vol_prop_req prop;
-	/* 4*(n-1) + 3 for quotes and NUL */
-	char vol_name[(UBI_MAX_VOLUME_NAME + 1) * 4];
-	int ret;
 
 	if (entering(tcp))
 		return 0;
@@ -278,10 +275,12 @@ ubi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			", bytes=%" PRIi64 ", vol_type=", mkvol.vol_id,
 			mkvol.alignment, (int64_t)mkvol.bytes);
 		printxval(ubi_volume_types, mkvol.vol_type, "UBI_???_VOLUME");
-		ret = string_quote(mkvol.name, vol_name, -1,
-			CLAMP(mkvol.name_len, 0, UBI_MAX_VOLUME_NAME));
-		tprintf(", name_len=%" PRIi16 ", name=%s%s",
-			mkvol.name_len, vol_name, ret ? "..." : "");
+		tprintf(", name_len=%" PRIi16 ", name=", mkvol.name_len);
+		if (print_quoted_string(mkvol.name,
+				CLAMP(mkvol.name_len, 0, UBI_MAX_VOLUME_NAME),
+				QUOTE_0_TERMINATED) > 0) {
+			tprints("...");
+		}
 		tprints("}");
 		return 1;
 
@@ -303,11 +302,15 @@ ubi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		for (c = 0; c < CLAMP(rnvol.count, 0, UBI_MAX_RNVOL); ++c) {
 			if (c)
 				tprints(", ");
-			ret = string_quote(rnvol.ents[c].name, vol_name, -1,
-				CLAMP(rnvol.ents[c].name_len, 0, UBI_MAX_VOLUME_NAME));
 			tprintf("{vol_id=%" PRIi32 ", name_len=%" PRIi16
-				", name=%s%s}", rnvol.ents[c].vol_id,
-				rnvol.ents[c].name_len, vol_name, ret ? "..." : "");
+				", name=", rnvol.ents[c].vol_id,
+				rnvol.ents[c].name_len);
+			if (print_quoted_string(rnvol.ents[c].name,
+					CLAMP(rnvol.ents[c].name_len, 0, UBI_MAX_VOLUME_NAME),
+					QUOTE_0_TERMINATED) > 0) {
+				tprints("...");
+			}
+			tprints("}");
 		}
 		tprints("]}");
 		return 1;

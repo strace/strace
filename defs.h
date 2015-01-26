@@ -665,8 +665,12 @@ extern const char *xlookup(const struct xlat *, const unsigned int);
 extern const char *xlat_search(const struct xlat *, const size_t, const unsigned int);
 
 extern int string_to_uint(const char *str);
-extern int string_quote(const char *, char *, long, int);
 extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits);
+
+#define QUOTE_0_TERMINATED			0x01
+#define QUOTE_OMIT_LEADING_TRAILING_QUOTES	0x02
+
+extern int print_quoted_string(const char *, unsigned int, unsigned int);
 
 /* a refers to the lower numbered u_arg,
  * b refers to the higher numbered u_arg

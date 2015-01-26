@@ -402,17 +402,11 @@ print_scm_security(struct tcb *tcp, size_t cmsg_size, char *ptr, size_t cmsg_len
 
 	const char *label = (const char *) (ptr + cmsg_size);
 	const size_t label_len = cmsg_len - cmsg_size;
-	char *outstr;
-	const size_t alloc_len = 4 * label_len + 3;
 
-	if (label_len != alloc_len / 4 ||
-	    !(outstr = malloc(alloc_len)))
-		return false;
+	tprints(", ");
+	print_quoted_string(label, label_len, 0);
+	tprints("}");
 
-	string_quote(label, outstr, 0, label_len);
-	tprintf(", %s}", outstr);
-
-	free(outstr);
 	return true;
 }
 

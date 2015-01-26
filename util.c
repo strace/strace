@@ -519,24 +519,30 @@ printfd(struct tcb *tcp, int fd)
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
- * If `len' is -1, treat `instr' as a NUL-terminated string
- * and quote at most (`size' - 1) bytes.
  *
- * Returns 0 if len == -1 and NUL was seen, 1 otherwise.
- * Note that if len >= 0, always returns 1.
+ * If QUOTE_0_TERMINATED `style' flag is set,
+ * treat `instr' as a NUL-terminated string,
+ * checking up to (`size' + 1) bytes of `instr'.
+ *
+ * If QUOTE_OMIT_LEADING_TRAILING_QUOTES `style' flag is set,
+ * do not add leading and trailing quoting symbols.
+ *
+ * Returns 0 if QUOTE_0_TERMINATED is set and NUL was seen, 1 otherwise.
+ * Note that if QUOTE_0_TERMINATED is not set, always returns 1.
  */
-int
-string_quote(const char *instr, char *outstr, long len, int size)
+static int
+string_quote(const char *instr, char *outstr, const unsigned int size,
+	     const unsigned int style)
 {
 	const unsigned char *ustr = (const unsigned char *) instr;
 	char *s = outstr;
-	int usehex, c, i, eol;
+	unsigned int i;
+	int usehex, c, eol;
 
-	eol = 0x100; /* this can never match a char */
-	if (len == -1) {
-		size--;
+	if (style & QUOTE_0_TERMINATED)
 		eol = '\0';
-	}
+	else
+		eol = 0x100; /* this can never match a char */
 
 	usehex = 0;
 	if (xflag > 1)
@@ -565,7 +571,8 @@ string_quote(const char *instr, char *outstr, long len, int size)
 		}
 	}
 
-	*s++ = '\"';
+	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
+		*s++ = '\"';
 
 	if (usehex) {
 		/* Hex-quote the whole string. */
@@ -638,11 +645,12 @@ string_quote(const char *instr, char *outstr, long len, int size)
 		}
 	}
 
-	*s++ = '\"';
+	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
+		*s++ = '\"';
 	*s = '\0';
 
 	/* Return zero if we printed entire ASCIZ string (didn't truncate it) */
-	if (len == -1 && ustr[i] == '\0') {
+	if (style & QUOTE_0_TERMINATED && ustr[i] == '\0') {
 		/* We didn't see NUL yet (otherwise we'd jump to 'asciz_ended')
 		 * but next char is NUL.
 		 */
@@ -652,10 +660,68 @@ string_quote(const char *instr, char *outstr, long len, int size)
 	return 1;
 
  asciz_ended:
-	*s++ = '\"';
+	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
+		*s++ = '\"';
 	*s = '\0';
 	/* Return zero: we printed entire ASCIZ string (didn't truncate it) */
 	return 0;
+}
+
+#ifndef ALLOCA_CUTOFF
+# define ALLOCA_CUTOFF	4032
+#endif
+#define use_alloca(n) ((n) <= ALLOCA_CUTOFF)
+
+/*
+ * Quote string `str' of length `size' and print the result.
+ *
+ * If QUOTE_0_TERMINATED `style' flag is set,
+ * treat `str' as a NUL-terminated string and
+ * quote at most (`size' - 1) bytes.
+ *
+ * If QUOTE_OMIT_LEADING_TRAILING_QUOTES `style' flag is set,
+ * do not add leading and trailing quoting symbols.
+ *
+ * Returns 0 if QUOTE_0_TERMINATED is set and NUL was seen, 1 otherwise.
+ * Note that if QUOTE_0_TERMINATED is not set, always returns 1.
+ */
+int
+print_quoted_string(const char *str, unsigned int size,
+		    const unsigned int style)
+{
+	char *buf;
+	char *outstr;
+	unsigned int alloc_size;
+	int rc;
+
+	if (size && style & QUOTE_0_TERMINATED)
+		--size;
+
+	alloc_size = 4 * size;
+	if (alloc_size / 4 != size) {
+		error_msg("Out of memory");
+		tprints("???");
+		return -1;
+	}
+	alloc_size += 1 + (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES ? 0 : 2);
+
+	if (use_alloca(alloc_size)) {
+		outstr = alloca(alloc_size);
+		buf = NULL;
+	} else {
+		outstr = buf = malloc(alloc_size);
+		if (!buf) {
+			error_msg("Out of memory");
+			tprints("???");
+			return -1;
+		}
+	}
+
+	rc = string_quote(str, outstr, size, style);
+	tprints(outstr);
+
+	free(buf);
+	return rc;
 }
 
 /*
@@ -682,13 +748,8 @@ printpathn(struct tcb *tcp, long addr, unsigned int n)
 	if (nul_seen < 0)
 		tprintf("%#lx", addr);
 	else {
-		char *outstr;
-
-		path[n] = '\0';
-		n++;
-		outstr = alloca(4 * n); /* 4*(n-1) + 3 for quotes and NUL */
-		string_quote(path, outstr, -1, n);
-		tprints(outstr);
+		path[n++] = '\0';
+		print_quoted_string(path, n, QUOTE_0_TERMINATED);
 		if (!nul_seen)
 			tprints("...");
 	}
@@ -712,6 +773,7 @@ printstr(struct tcb *tcp, long addr, long len)
 	static char *str = NULL;
 	static char *outstr;
 	unsigned int size;
+	unsigned int style;
 	int ellipsis;
 
 	if (!addr) {
@@ -732,31 +794,32 @@ printstr(struct tcb *tcp, long addr, long len)
 			die_out_of_memory();
 	}
 
+	size = max_strlen;
 	if (len == -1) {
 		/*
 		 * Treat as a NUL-terminated string: fetch one byte more
-		 * because string_quote() quotes one byte less.
+		 * because string_quote may look one byte ahead.
 		 */
-		size = max_strlen + 1;
-		if (umovestr(tcp, addr, size, str) < 0) {
+		if (umovestr(tcp, addr, size + 1, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
+		style = QUOTE_0_TERMINATED;
 	}
 	else {
-		size = max_strlen;
 		if (size > (unsigned long)len)
 			size = (unsigned long)len;
 		if (umoven(tcp, addr, size, str) < 0) {
 			tprintf("%#lx", addr);
 			return;
 		}
+		style = 0;
 	}
 
 	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
 	 * or we were requested to print more than -s NUM chars)...
 	 */
-	ellipsis = (string_quote(str, outstr, len, size) &&
+	ellipsis = (string_quote(str, outstr, size, style) &&
 			(len < 0 || (unsigned long) len > max_strlen));
 
 	tprints(outstr);
