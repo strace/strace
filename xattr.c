@@ -15,40 +15,43 @@ print_xattr_val(struct tcb *tcp, int failed,
 		unsigned long insize,
 		unsigned long size)
 {
+	char *buf;
+	unsigned int len;
+
 	if (insize == 0)
-		failed = 1;
-	if (!failed) {
-		unsigned long capacity = 4 * size + 1;
-		unsigned char *buf = (capacity < size) ? NULL : malloc(capacity);
-		if (buf == NULL || /* probably a bogus size argument */
-			umoven(tcp, arg, size, (char *) &buf[3 * size]) < 0) {
-			failed = 1;
-		}
-		else {
-			unsigned char *out = buf;
-			unsigned char *in = &buf[3 * size];
-			size_t i;
-			for (i = 0; i < size; ++i) {
-				if (in[i] >= ' ' && in[i] <= 0x7e)
-					*out++ = in[i];
-				else {
-#define tohex(n) "0123456789abcdef"[n]
-					*out++ = '\\';
-					*out++ = 'x';
-					*out++ = tohex(in[i] / 16);
-					*out++ = tohex(in[i] % 16);
-				}
-			}
-			/* Don't print terminating NUL if there is one.  */
-			if (i > 0 && in[i - 1] == '\0')
-				out -= 4;
-			*out = '\0';
-			tprintf(", \"%s\", %ld", buf, insize);
-		}
-		free(buf);
+		goto failed;
+
+	len = size;
+	if (size != (unsigned long) len)
+		goto failed;
+
+	if (!len) {
+		tprintf(", \"\", %ld", insize);
+		return;
 	}
-	if (failed)
-		tprintf(", 0x%lx, %ld", arg, insize);
+
+	buf = malloc(len);
+	if (!buf)
+		goto failed;
+
+	if (umoven(tcp, arg, len, buf) < 0) {
+		free(buf);
+		goto failed;
+	}
+
+	/* Don't print terminating NUL if there is one. */
+	if (buf[len - 1] == '\0')
+		--len;
+
+	tprints(", ");
+	print_quoted_string(buf, len, 0);
+	tprintf(", %ld", insize);
+
+	free(buf);
+	return;
+
+failed:
+	tprintf(", 0x%lx, %ld", arg, insize);
 }
 
 int
