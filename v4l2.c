@@ -160,10 +160,19 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 
 		if (entering(tcp) || syserror(tcp) || umove(tcp, arg, &caps) < 0)
 			return 0;
-		tprintf(", {driver=\"%s\", card=\"%s\", bus_info=\"%s\", "
-			"version=%u.%u.%u, capabilities=", caps.driver, caps.card,
-			caps.bus_info, (caps.version >> 16) & 0xFF,
-			(caps.version >> 8) & 0xFF, caps.version & 0xFF);
+		tprints(", {driver=");
+		print_quoted_string((const char *) caps.driver,
+				    sizeof(caps.driver), QUOTE_0_TERMINATED);
+		tprints(", card=");
+		print_quoted_string((const char *) caps.card,
+				    sizeof(caps.card), QUOTE_0_TERMINATED);
+		tprints(", bus_info=");
+		print_quoted_string((const char *) caps.bus_info,
+				    sizeof(caps.bus_info), QUOTE_0_TERMINATED);
+		tprintf(", version=%u.%u.%u, capabilities=",
+			(caps.version >> 16) & 0xFF,
+			(caps.version >> 8) & 0xFF,
+			caps.version & 0xFF);
 		printflags(v4l2_device_capabilities_flags, caps.capabilities,
 			   "V4L2_CAP_???");
 #ifdef V4L2_CAP_DEVICE_CAPS
@@ -241,8 +250,11 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			tprints(", flags=");
 			printflags(v4l2_format_description_flags, f.flags,
 				   "V4L2_FMT_FLAG_???");
-			tprintf(", description=\"%s\", pixelformat=",
-				f.description);
+			tprints(", description=");
+			print_quoted_string((const char *) f.description,
+					    sizeof(f.description),
+					    QUOTE_0_TERMINATED);
+			tprints(", pixelformat=");
 			print_pixelformat(f.pixelformat);
 		}
 		tprints("}");
@@ -314,9 +326,13 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 				tprints(", type=");
 				printxval(v4l2_control_types, c.type,
 					  "V4L2_CTRL_TYPE_???");
-				tprintf(", name=\"%s\", minimum=%i, maximum=%i, step=%i, "
+				tprints(", name=");
+				print_quoted_string((const char *) c.name,
+						    sizeof(c.name),
+						    QUOTE_0_TERMINATED);
+				tprintf(", minimum=%i, maximum=%i, step=%i, "
 					"default_value=%i, flags=",
-					c.name, c.minimum, c.maximum,
+					c.minimum, c.maximum,
 					c.step, c.default_value);
 				printflags(v4l2_control_flags, c.flags,
 					   "V4L2_CTRL_FLAG_???");
@@ -406,7 +422,10 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			tprintf(", {index=%i", s.index);
 		else {
 			if (!syserror(tcp)) {
-				tprintf(", name=\"%s\"", s.name);
+				tprints(", name=");
+				print_quoted_string((const char *) s.name,
+						    sizeof(s.name),
+						    QUOTE_0_TERMINATED);
 				tprintf(", frameperiod=" FMT_FRACT, ARGS_FRACT(s.frameperiod));
 				tprintf(", framelines=%i", s.framelines);
 			}
@@ -435,7 +454,10 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			return 0;
 		tprintf(", {index=%i", i.index);
 		if (!syserror(tcp)) {
-			tprintf(", name=\"%s\", type=", i.name);
+			tprints(", name=");
+			print_quoted_string((const char *) i.name,
+					    sizeof(i.name), QUOTE_0_TERMINATED);
+			tprints(", type=");
 			printxval(v4l2_input_types, i.type,
 				  "V4L2_INPUT_TYPE_???");
 		}
