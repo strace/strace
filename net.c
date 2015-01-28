@@ -604,7 +604,7 @@ printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
-	if (extractmsghdr(tcp, addr, &msg))
+	if (verbose(tcp) && extractmsghdr(tcp, addr, &msg))
 		do_msghdr(tcp, &msg, data_size);
 	else
 		tprintf("%#lx", addr);
@@ -949,7 +949,7 @@ sys_recvmsg(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp) || !verbose(tcp))
+		if (syserror(tcp))
 			tprintf("%#lx", tcp->u_arg[1]);
 		else
 			printmsghdr(tcp, tcp->u_arg[1], tcp->u_rval);
