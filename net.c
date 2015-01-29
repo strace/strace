@@ -285,10 +285,14 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 			tprints("NULL");
 		} else if (addrbuf.sau.sun_path[0]) {
 			tprints("sun_path=");
-			printpathn(tcp, addr + 2, strlen(addrbuf.sau.sun_path));
+			print_quoted_string(addrbuf.sau.sun_path,
+					    sizeof(addrbuf.sau.sun_path),
+					    QUOTE_0_TERMINATED);
 		} else {
 			tprints("sun_path=@");
-			printpathn(tcp, addr + 3, strlen(addrbuf.sau.sun_path + 1));
+			print_quoted_string(addrbuf.sau.sun_path + 1,
+					    sizeof(addrbuf.sau.sun_path) - 1,
+					    QUOTE_0_TERMINATED);
 		}
 		break;
 	case AF_INET:
