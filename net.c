@@ -286,12 +286,12 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 		} else if (addrbuf.sau.sun_path[0]) {
 			tprints("sun_path=");
 			print_quoted_string(addrbuf.sau.sun_path,
-					    sizeof(addrbuf.sau.sun_path),
+					    sizeof(addrbuf.sau.sun_path) + 1,
 					    QUOTE_0_TERMINATED);
 		} else {
 			tprints("sun_path=@");
 			print_quoted_string(addrbuf.sau.sun_path + 1,
-					    sizeof(addrbuf.sau.sun_path) - 1,
+					    sizeof(addrbuf.sau.sun_path),
 					    QUOTE_0_TERMINATED);
 		}
 		break;
