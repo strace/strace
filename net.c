@@ -1089,185 +1089,17 @@ sys_socketpair(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_getsockopt(struct tcb *tcp)
+static void
+print_sockopt_fd_level_name(struct tcb *tcp, int fd, int level, int name)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printxval(socketlayers, tcp->u_arg[1], "SOL_???");
-		tprints(", ");
-		switch (tcp->u_arg[1]) {
-		case SOL_SOCKET:
-			printxval(sockoptions, tcp->u_arg[2], "SO_???");
-			break;
-#ifdef SOL_IP
-		case SOL_IP:
-			printxval(sockipoptions, tcp->u_arg[2], "IP_???");
-			break;
-#endif
-#ifdef SOL_IPV6
-		case SOL_IPV6:
-			printxval(sockipv6options, tcp->u_arg[2], "IPV6_???");
-			break;
-#endif
-#ifdef SOL_IPX
-		case SOL_IPX:
-			printxval(sockipxoptions, tcp->u_arg[2], "IPX_???");
-			break;
-#endif
-#ifdef SOL_PACKET
-		case SOL_PACKET:
-			printxval(sockpacketoptions, tcp->u_arg[2], "PACKET_???");
-			break;
-#endif
-#ifdef SOL_TCP
-		case SOL_TCP:
-			printxval(socktcpoptions, tcp->u_arg[2], "TCP_???");
-			break;
-#endif
-#ifdef SOL_SCTP
-		case SOL_SCTP:
-			printxval(socksctpoptions, tcp->u_arg[2], "SCTP_???");
-			break;
-#endif
-
-		/* SOL_AX25 SOL_ROSE SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25
-		 * etc. still need work */
-		default:
-			tprintf("%lu", tcp->u_arg[2]);
-			break;
-		}
-		tprints(", ");
-	} else {
-		int len;
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &len) < 0) {
-			tprintf("%#lx, %#lx",
-				tcp->u_arg[3], tcp->u_arg[4]);
-			return 0;
-		}
-
-		switch (tcp->u_arg[1]) {
-		case SOL_SOCKET:
-			switch (tcp->u_arg[2]) {
-#ifdef SO_LINGER
-			case SO_LINGER:
-				if (len == sizeof(struct linger)) {
-					struct linger linger;
-					if (umove(tcp,
-						   tcp->u_arg[3],
-						   &linger) < 0)
-						break;
-					tprintf("{onoff=%d, linger=%d}, "
-						"[%d]",
-						linger.l_onoff,
-						linger.l_linger,
-						len);
-					return 0;
-				}
-				break;
-#endif
-#ifdef SO_PEERCRED
-			case SO_PEERCRED:
-				if (len == sizeof(struct ucred)) {
-					struct ucred uc;
-					if (umove(tcp,
-						   tcp->u_arg[3],
-						   &uc) < 0)
-						break;
-					tprintf("{pid=%ld, uid=%ld, gid=%ld}, "
-						"[%d]",
-						(long)uc.pid,
-						(long)uc.uid,
-						(long)uc.gid,
-						len);
-					return 0;
-				}
-				break;
-#endif
-			}
-			break;
-		case SOL_PACKET:
-			switch (tcp->u_arg[2]) {
-#ifdef PACKET_STATISTICS
-			case PACKET_STATISTICS:
-				if (len == sizeof(struct tpacket_stats)) {
-					struct tpacket_stats stats;
-					if (umove(tcp,
-						   tcp->u_arg[3],
-						   &stats) < 0)
-						break;
-					tprintf("{packets=%u, drops=%u}, "
-						"[%d]",
-						stats.tp_packets,
-						stats.tp_drops,
-						len);
-					return 0;
-				}
-				break;
-#endif
-			}
-			break;
-		}
-
-		if (len == sizeof(int)) {
-			printnum_int(tcp, tcp->u_arg[3], "%d");
-		}
-		else {
-			printstr(tcp, tcp->u_arg[3], len);
-		}
-		tprintf(", [%d]", len);
-	}
-	return 0;
-}
-
-#if defined(ICMP_FILTER)
-static void printicmpfilter(struct tcb *tcp, long addr)
-{
-	struct icmp_filter	filter;
-
-	if (!addr) {
-		tprints("NULL");
-		return;
-	}
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
-		return;
-	}
-	if (umove(tcp, addr, &filter) < 0) {
-		tprints("{...}");
-		return;
-	}
-
-	tprints("~(");
-	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
-	tprints(")");
-}
-#endif /* ICMP_FILTER */
-
-static int
-printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
-{
+	printfd(tcp, fd);
+	tprints(", ");
 	printxval(socketlayers, level, "SOL_??");
 	tprints(", ");
+
 	switch (level) {
 	case SOL_SOCKET:
 		printxval(sockoptions, name, "SO_???");
-		switch (name) {
-#if defined(SO_LINGER)
-		case SO_LINGER:
-			if (len == sizeof(struct linger)) {
-				struct linger linger;
-				if (umove(tcp, addr, &linger) < 0)
-					break;
-				tprintf(", {onoff=%d, linger=%d}",
-					linger.l_onoff,
-					linger.l_linger);
-				return 0;
-			}
-			break;
-#endif
-		}
 		break;
 #ifdef SOL_IP
 	case SOL_IP:
@@ -1287,29 +1119,6 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 #ifdef SOL_PACKET
 	case SOL_PACKET:
 		printxval(sockpacketoptions, name, "PACKET_???");
-		/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
-		switch (name) {
-#ifdef PACKET_RX_RING
-		case PACKET_RX_RING:
-#endif
-#ifdef PACKET_TX_RING
-		case PACKET_TX_RING:
-#endif
-#if defined(PACKET_RX_RING) || defined(PACKET_TX_RING)
-			if (len == sizeof(struct tpacket_req)) {
-				struct tpacket_req req;
-				if (umove(tcp, addr, &req) < 0)
-					break;
-				tprintf(", {block_size=%u, block_nr=%u, frame_size=%u, frame_nr=%u}",
-					req.tp_block_size,
-					req.tp_block_nr,
-					req.tp_frame_size,
-					req.tp_frame_nr);
-				return 0;
-			}
-			break;
-#endif /* PACKET_RX_RING || PACKET_TX_RING */
-		}
 		break;
 #endif
 #ifdef SOL_TCP
@@ -1325,46 +1134,256 @@ printsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 #ifdef SOL_RAW
 	case SOL_RAW:
 		printxval(sockrawoptions, name, "RAW_???");
-		switch (name) {
-#if defined(ICMP_FILTER)
-			case ICMP_FILTER:
-				tprints(", ");
-				printicmpfilter(tcp, addr);
-				return 0;
-#endif
-		}
 		break;
 #endif
 
-		/* SOL_AX25 SOL_ATALK SOL_NETROM SOL_UDP SOL_DECNET SOL_X25
-		 * etc. still need work  */
+		/* Other SOL_* protocol levels still need work. */
 
 	default:
 		tprintf("%u", name);
 	}
 
+	tprints(", ");
+}
+
+#ifdef SO_LINGER
+static void
+print_linger(struct tcb *tcp, long addr, int len)
+{
+	struct linger linger;
+
+	if (len != sizeof(linger) ||
+	    umove(tcp, addr, &linger) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+	tprintf("{onoff=%d, linger=%d}",
+		linger.l_onoff,
+		linger.l_linger);
+}
+#endif /* SO_LINGER */
+
+#ifdef SO_PEERCRED
+static void
+print_ucred(struct tcb *tcp, long addr, int len)
+{
+	struct ucred uc;
+
+	if (len != sizeof(uc) ||
+	    umove(tcp, addr, &uc) < 0) {
+		tprintf("%#lx", addr);
+	} else {
+		tprintf("{pid=%u, uid=%u, gid=%u}",
+			(unsigned) uc.pid,
+			(unsigned) uc.uid,
+			(unsigned) uc.gid);
+	}
+}
+#endif /* SO_PEERCRED */
+
+#ifdef PACKET_STATISTICS
+static void
+print_tpacket_stats(struct tcb *tcp, long addr, int len)
+{
+	struct tpacket_stats stats;
+
+	if (len != sizeof(stats) ||
+	    umove(tcp, addr, &stats) < 0) {
+		tprintf("%#lx", addr);
+	} else {
+		tprintf("{packets=%u, drops=%u}",
+			stats.tp_packets,
+			stats.tp_drops);
+	}
+}
+#endif /* PACKET_STATISTICS */
+
+#ifdef ICMP_FILTER
+static void
+print_icmp_filter(struct tcb *tcp, long addr, int len)
+{
+	struct icmp_filter	filter;
+
+	if (len != sizeof(filter) ||
+	    umove(tcp, addr, &filter) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+	tprints("~(");
+	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
+	tprints(")");
+}
+#endif /* ICMP_FILTER */
+
+static void
+print_getsockopt(struct tcb *tcp, int level, int name, long addr, int len)
+{
+	if (addr && verbose(tcp))
+	switch (level) {
+	case SOL_SOCKET:
+		switch (name) {
+#ifdef SO_LINGER
+		case SO_LINGER:
+			print_linger(tcp, addr, len);
+			goto done;
+#endif
+#ifdef SO_PEERCRED
+		case SO_PEERCRED:
+			print_ucred(tcp, addr, len);
+			goto done;
+#endif
+		}
+		break;
+
+#ifdef SOL_PACKET
+	case SOL_PACKET:
+		switch (name) {
+# ifdef PACKET_STATISTICS
+		case PACKET_STATISTICS:
+			print_tpacket_stats(tcp, addr, len);
+			goto done;
+# endif
+		}
+		break;
+#endif /* SOL_PACKET */
+
+#ifdef SOL_RAW
+	case SOL_RAW:
+		switch (name) {
+# ifdef ICMP_FILTER
+		case ICMP_FILTER:
+			print_icmp_filter(tcp, addr, len);
+			goto done;
+# endif
+		}
+		break;
+#endif /* SOL_RAW */
+	}
+
 	/* default arg printing */
 
-	tprints(", ");
-
-	if (len == sizeof(int)) {
-		printnum_int(tcp, addr, "%d");
+	if (verbose(tcp)) {
+		if (len == sizeof(int)) {
+			printnum_int(tcp, addr, "%d");
+		} else {
+			printstr(tcp, addr, len);
+		}
+	} else {
+		tprintf("%#lx", addr);
 	}
-	else {
-		printstr(tcp, addr, len);
+done:
+	tprintf(", [%d]", len);
+}
+
+int
+sys_getsockopt(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
+					    tcp->u_arg[1], tcp->u_arg[2]);
+	} else {
+		int len;
+
+		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &len) < 0) {
+			tprintf("%#lx, %#lx",
+				tcp->u_arg[3], tcp->u_arg[4]);
+		} else {
+			print_getsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
+					 tcp->u_arg[3], len);
+		}
 	}
 	return 0;
+}
+
+#ifdef PACKET_RX_RING
+static void
+print_tpacket_req(struct tcb *tcp, long addr, int len)
+{
+	struct tpacket_req req;
+
+	if (len != sizeof(req) ||
+	    umove(tcp, addr, &req) < 0) {
+		tprintf("%#lx", addr);
+	} else {
+		tprintf("{block_size=%u, block_nr=%u, "
+			"frame_size=%u, frame_nr=%u}",
+			req.tp_block_size,
+			req.tp_block_nr,
+			req.tp_frame_size,
+			req.tp_frame_nr);
+	}
+}
+#endif /* PACKET_RX_RING */
+
+static void
+print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
+{
+	if (addr && verbose(tcp))
+	switch (level) {
+	case SOL_SOCKET:
+		switch (name) {
+#ifdef SO_LINGER
+		case SO_LINGER:
+			print_linger(tcp, addr, len);
+			goto done;
+#endif
+		}
+		break;
+
+#ifdef SOL_PACKET
+	case SOL_PACKET:
+		switch (name) {
+# ifdef PACKET_RX_RING
+		case PACKET_RX_RING:
+#  ifdef PACKET_TX_RING
+		case PACKET_TX_RING:
+#  endif
+			print_tpacket_req(tcp, addr, len);
+			goto done;
+# endif /* PACKET_RX_RING */
+		/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
+		}
+		break;
+#endif /* SOL_PACKET */
+
+#ifdef SOL_RAW
+	case SOL_RAW:
+		switch (name) {
+# ifdef ICMP_FILTER
+		case ICMP_FILTER:
+			print_icmp_filter(tcp, addr, len);
+			goto done;
+# endif
+		}
+		break;
+#endif /* SOL_RAW */
+	}
+
+	/* default arg printing */
+
+	if (verbose(tcp)) {
+		if (len == sizeof(int)) {
+			printnum_int(tcp, addr, "%d");
+		} else {
+			printstr(tcp, addr, len);
+		}
+	} else {
+		tprintf("%#lx", addr);
+	}
+done:
+	tprintf(", %d", len);
 }
 
 int
 sys_setsockopt(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
-			      tcp->u_arg[3], tcp->u_arg[4]);
-		tprintf(", %lu", tcp->u_arg[4]);
+		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
+					    tcp->u_arg[1], tcp->u_arg[2]);
+		print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
+				 tcp->u_arg[3], tcp->u_arg[4]);
 	}
 	return 0;
 }
