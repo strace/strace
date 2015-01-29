@@ -106,9 +106,108 @@
 #ifndef SOCK_TYPE_MASK
 # define SOCK_TYPE_MASK 0xf
 #endif
+
+#ifndef SOL_IP
+# define SOL_IP 0
+#endif
+#ifndef SOL_TCP
+# define SOL_TCP 6
+#endif
+#ifndef SOL_UDP
+# define SOL_UDP 17
+#endif
+#ifndef SOL_IPV6
+# define SOL_IPV6 41
+#endif
+#ifndef SOL_ICMPV6
+# define SOL_ICMPV6 58
+#endif
+#ifndef SOL_SCTP
+# define SOL_SCTP 132
+#endif
+#ifndef SOL_UDPLITE
+# define SOL_UDPLITE 136
+#endif
+#ifndef SOL_RAW
+# define SOL_RAW 255
+#endif
+#ifndef SOL_IPX
+# define SOL_IPX 256
+#endif
+#ifndef SOL_AX25
+# define SOL_AX25 257
+#endif
+#ifndef SOL_ATALK
+# define SOL_ATALK 258
+#endif
+#ifndef SOL_NETROM
+# define SOL_NETROM 259
+#endif
+#ifndef SOL_ROSE
+# define SOL_ROSE 260
+#endif
+#ifndef SOL_DECNET
+# define SOL_DECNET 261
+#endif
+#ifndef SOL_X25
+# define SOL_X25 262
+#endif
+#ifndef SOL_PACKET
+# define SOL_PACKET 263
+#endif
+#ifndef SOL_ATM
+# define SOL_ATM 264
+#endif
+#ifndef SOL_AAL
+# define SOL_AAL 265
+#endif
+#ifndef SOL_IRDA
+# define SOL_IRDA 266
+#endif
+#ifndef SOL_NETBEUI
+# define SOL_NETBEUI 267
+#endif
+#ifndef SOL_LLC
+# define SOL_LLC 268
+#endif
+#ifndef SOL_DCCP
+# define SOL_DCCP 269
+#endif
+#ifndef SOL_NETLINK
+# define SOL_NETLINK 270
+#endif
+#ifndef SOL_TIPC
+# define SOL_TIPC 271
+#endif
+#ifndef SOL_RXRPC
+# define SOL_RXRPC 272
+#endif
+#ifndef SOL_PPPOL2TP
+# define SOL_PPPOL2TP 273
+#endif
+#ifndef SOL_BLUETOOTH
+# define SOL_BLUETOOTH 274
+#endif
+#ifndef SOL_PNPIPE
+# define SOL_PNPIPE 275
+#endif
+#ifndef SOL_RDS
+# define SOL_RDS 276
+#endif
+#ifndef SOL_IUCV
+# define SOL_IUCV 277
+#endif
+#ifndef SOL_CAIF
+# define SOL_CAIF 278
+#endif
+#ifndef SOL_ALG
+# define SOL_ALG 279
+#endif
+#ifndef SOL_NFC
+# define SOL_NFC 280
+#endif
 #include "xlat/socketlayers.h"
-/*** WARNING: DANGER WILL ROBINSON: NOTE "socketlayers" array above
-     falls into "inet_protocols" array below!!!!   This is intended!!! ***/
+
 #include "xlat/inet_protocols.h"
 
 #ifdef PF_NETLINK
@@ -123,51 +222,10 @@
 #endif
 
 #include "xlat/msg_flags.h"
-#include "xlat/sockoptions.h"
-
-#if !defined(SOL_IP) && defined(IPPROTO_IP)
-#define SOL_IP IPPROTO_IP
-#endif
-
-#ifdef SOL_IP
-#include "xlat/sockipoptions.h"
-#endif /* SOL_IP */
-
-#ifdef SOL_IPV6
-#include "xlat/sockipv6options.h"
-#endif /* SOL_IPV6 */
-
-#ifdef SOL_IPX
-#include "xlat/sockipxoptions.h"
-#endif /* SOL_IPX */
-
-#ifdef SOL_RAW
-#include "xlat/sockrawoptions.h"
-#endif /* SOL_RAW */
-
-#ifdef SOL_PACKET
-#include "xlat/sockpacketoptions.h"
-#endif /* SOL_PACKET */
-
-#ifdef SOL_SCTP
-#include "xlat/socksctpoptions.h"
-#endif
-
-#if !defined(SOL_TCP) && defined(IPPROTO_TCP)
-#define SOL_TCP IPPROTO_TCP
-#endif
-
-#ifdef SOL_TCP
-#include "xlat/socktcpoptions.h"
-#endif /* SOL_TCP */
-
-#ifdef SOL_RAW
-#include "xlat/icmpfilterflags.h"
-#endif /* SOL_RAW */
 
 #if defined(AF_PACKET) /* from e.g. linux/if_packet.h */
-#include "xlat/af_packet_types.h"
-#endif /* defined(AF_PACKET) */
+# include "xlat/af_packet_types.h"
+#endif
 
 void
 printsock(struct tcb *tcp, long addr, int addrlen)
@@ -1089,6 +1147,15 @@ sys_socketpair(struct tcb *tcp)
 	return 0;
 }
 
+#include "xlat/sockoptions.h"
+#include "xlat/sockipoptions.h"
+#include "xlat/sockipv6options.h"
+#include "xlat/sockipxoptions.h"
+#include "xlat/sockrawoptions.h"
+#include "xlat/sockpacketoptions.h"
+#include "xlat/socksctpoptions.h"
+#include "xlat/socktcpoptions.h"
+
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, int level, int name)
 {
@@ -1101,41 +1168,27 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, int level, int name)
 	case SOL_SOCKET:
 		printxval(sockoptions, name, "SO_???");
 		break;
-#ifdef SOL_IP
 	case SOL_IP:
 		printxval(sockipoptions, name, "IP_???");
 		break;
-#endif
-#ifdef SOL_IPV6
 	case SOL_IPV6:
 		printxval(sockipv6options, name, "IPV6_???");
 		break;
-#endif
-#ifdef SOL_IPX
 	case SOL_IPX:
 		printxval(sockipxoptions, name, "IPX_???");
 		break;
-#endif
-#ifdef SOL_PACKET
 	case SOL_PACKET:
 		printxval(sockpacketoptions, name, "PACKET_???");
 		break;
-#endif
-#ifdef SOL_TCP
 	case SOL_TCP:
 		printxval(socktcpoptions, name, "TCP_???");
 		break;
-#endif
-#ifdef SOL_SCTP
 	case SOL_SCTP:
 		printxval(socksctpoptions, name, "SCTP_???");
 		break;
-#endif
-#ifdef SOL_RAW
 	case SOL_RAW:
 		printxval(sockrawoptions, name, "RAW_???");
 		break;
-#endif
 
 		/* Other SOL_* protocol levels still need work. */
 
@@ -1200,6 +1253,8 @@ print_tpacket_stats(struct tcb *tcp, long addr, int len)
 #endif /* PACKET_STATISTICS */
 
 #ifdef ICMP_FILTER
+# include "xlat/icmpfilterflags.h"
+
 static void
 print_icmp_filter(struct tcb *tcp, long addr, int len)
 {
@@ -1237,29 +1292,25 @@ print_getsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 		}
 		break;
 
-#ifdef SOL_PACKET
 	case SOL_PACKET:
 		switch (name) {
-# ifdef PACKET_STATISTICS
+#ifdef PACKET_STATISTICS
 		case PACKET_STATISTICS:
 			print_tpacket_stats(tcp, addr, len);
 			goto done;
-# endif
+#endif
 		}
 		break;
-#endif /* SOL_PACKET */
 
-#ifdef SOL_RAW
 	case SOL_RAW:
 		switch (name) {
-# ifdef ICMP_FILTER
+#ifdef ICMP_FILTER
 		case ICMP_FILTER:
 			print_icmp_filter(tcp, addr, len);
 			goto done;
-# endif
+#endif
 		}
 		break;
-#endif /* SOL_RAW */
 	}
 
 	/* default arg printing */
@@ -1358,38 +1409,34 @@ print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 		}
 		break;
 
-#ifdef SOL_PACKET
 	case SOL_PACKET:
 		switch (name) {
-# ifdef PACKET_RX_RING
+#ifdef PACKET_RX_RING
 		case PACKET_RX_RING:
-#  ifdef PACKET_TX_RING
+# ifdef PACKET_TX_RING
 		case PACKET_TX_RING:
-#  endif
+# endif
 			print_tpacket_req(tcp, addr, len);
 			goto done;
-# endif /* PACKET_RX_RING */
-# ifdef PACKET_ADD_MEMBERSHIP
+#endif /* PACKET_RX_RING */
+#ifdef PACKET_ADD_MEMBERSHIP
 		case PACKET_ADD_MEMBERSHIP:
 		case PACKET_DROP_MEMBERSHIP:
 			print_packet_mreq(tcp, addr, len);
 			goto done;
-# endif /* PACKET_ADD_MEMBERSHIP */
+#endif /* PACKET_ADD_MEMBERSHIP */
 		}
 		break;
-#endif /* SOL_PACKET */
 
-#ifdef SOL_RAW
 	case SOL_RAW:
 		switch (name) {
-# ifdef ICMP_FILTER
+#ifdef ICMP_FILTER
 		case ICMP_FILTER:
 			print_icmp_filter(tcp, addr, len);
 			goto done;
-# endif
+#endif
 		}
 		break;
-#endif /* SOL_RAW */
 	}
 
 	/* default arg printing */
