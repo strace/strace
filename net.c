@@ -1317,6 +1317,32 @@ print_tpacket_req(struct tcb *tcp, long addr, int len)
 }
 #endif /* PACKET_RX_RING */
 
+#ifdef PACKET_ADD_MEMBERSHIP
+# include "xlat/packet_mreq_type.h"
+
+static void
+print_packet_mreq(struct tcb *tcp, long addr, int len)
+{
+	struct packet_mreq mreq;
+
+	if (len != sizeof(mreq) ||
+	    umove(tcp, addr, &mreq) < 0) {
+		tprintf("%#lx", addr);
+	} else {
+		unsigned int i;
+
+		tprintf("{mr_ifindex=%u, mr_type=", mreq.mr_ifindex);
+		printxval(packet_mreq_type, mreq.mr_type, "PACKET_MR_???");
+		tprintf(", mr_alen=%u, mr_address=", mreq.mr_alen);
+		if (mreq.mr_alen > ARRAY_SIZE(mreq.mr_address))
+			mreq.mr_alen = ARRAY_SIZE(mreq.mr_address);
+		for (i = 0; i < mreq.mr_alen; ++i)
+			tprintf("%02x", mreq.mr_address[i]);
+		tprints("}");
+	}
+}
+#endif /* PACKET_ADD_MEMBERSHIP */
+
 static void
 print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 {
@@ -1343,7 +1369,12 @@ print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 			print_tpacket_req(tcp, addr, len);
 			goto done;
 # endif /* PACKET_RX_RING */
-		/* TODO: decode packate_mreq for PACKET_*_MEMBERSHIP */
+# ifdef PACKET_ADD_MEMBERSHIP
+		case PACKET_ADD_MEMBERSHIP:
+		case PACKET_DROP_MEMBERSHIP:
+			print_packet_mreq(tcp, addr, len);
+			goto done;
+# endif /* PACKET_ADD_MEMBERSHIP */
 		}
 		break;
 #endif /* SOL_PACKET */
