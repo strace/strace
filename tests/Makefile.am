@@ -53,6 +53,7 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	net-yy.test \
+	sun_path.test \
 	unix-yy.test \
 	uid.test \
 	uid16.test \

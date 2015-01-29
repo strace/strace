@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Check how long sun_path addresses are traced.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+rm -f $LOG.*
+
+addr=123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678
+./net-accept-connect $addr ||
+	fail_ 'net-accept-connect failed'
+
+args="-tt -ff -ebind,connect,getsockname ./net-accept-connect $addr"
+$STRACE -o "$LOG" $args ||
+	fail_ "$STRACE $args failed"
+
+"$srcdir"/../strace-log-merge $LOG > $LOG || {
+	cat $LOG
+	fail_ 'strace-log-merge failed'
+}
+
+rm -f $LOG.*
+
+grep_log()
+{
+	local syscall="$1"; shift
+	local prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
+
+	LC_ALL=C grep -E -x "$prefix$syscall$*" $LOG > /dev/null || {
+		cat $LOG
+		fail_ "strace -enetwork failed to trace \"$syscall\" properly"
+	}
+}
+
+grep_log bind '\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, 110\) += 0'
+grep_log getsockname '\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, \[111\]\) += 0'
+grep_log connect '\(1, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, 110\) += 0'
+
+exit 0
