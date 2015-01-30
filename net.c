@@ -1352,6 +1352,56 @@ sys_getsockopt(struct tcb *tcp)
 	return 0;
 }
 
+#ifdef MCAST_JOIN_GROUP
+static void
+print_group_req(struct tcb *tcp, long addr, int len)
+{
+	struct group_req greq;
+
+	if (len != sizeof(greq) ||
+	    umove(tcp, addr, &greq) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+	union {
+		struct sockaddr *sa;
+		struct sockaddr_in *sin;
+#ifdef HAVE_INET_NTOP
+		struct sockaddr_in6 *sin6;
+#endif
+	} a = { .sa = (struct sockaddr *) &greq.gr_group };
+#ifdef HAVE_INET_NTOP
+	char str[INET6_ADDRSTRLEN];
+#endif
+
+	tprintf("{gr_interface=%u, gr_group={sa_family=", greq.gr_interface);
+	printxval(addrfams, a.sa->sa_family, "AF_???");
+
+	switch (a.sa->sa_family) {
+	case AF_INET:
+		tprintf(", sin_port=htons(%u), sin_addr=inet_addr(\"%s\")}}",
+			ntohs(a.sin->sin_port),
+			inet_ntoa(a.sin->sin_addr));
+		return;
+#ifdef HAVE_INET_NTOP
+	case AF_INET6:
+		if (!inet_ntop(AF_INET6, &a.sin6->sin6_addr, str, sizeof(str)))
+			break;
+		tprintf(", sin6_port=htons(%u)"
+			", inet_pton(AF_INET6, \"%s\", &sin6_addr)}}",
+			ntohs(a.sin6->sin6_port), str);
+		return;
+#endif /* HAVE_INET_NTOP */
+	}
+
+	tprints(", sa_data=");
+	print_quoted_string(a.sa->sa_data, sizeof(a.sa->sa_data), 0);
+	tprintf("}}");
+
+}
+#endif /* MCAST_JOIN_GROUP */
+
 #ifdef PACKET_RX_RING
 static void
 print_tpacket_req(struct tcb *tcp, long addr, int len)
@@ -1412,6 +1462,16 @@ print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 #endif
 		}
 		break;
+
+	case SOL_IP:
+		switch (name) {
+#ifdef MCAST_JOIN_GROUP
+		case MCAST_JOIN_GROUP:
+		case MCAST_LEAVE_GROUP:
+			print_group_req(tcp, addr, len);
+			goto done;
+#endif /* MCAST_JOIN_GROUP */
+		}
 
 	case SOL_PACKET:
 		switch (name) {
