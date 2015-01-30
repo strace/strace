@@ -398,8 +398,8 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 
 	default:
 		tprints("sa_data=");
-		printstr(tcp, (long) &((struct sockaddr *) addr)->sa_data,
-			sizeof addrbuf.sa.sa_data);
+		print_quoted_string(addrbuf.sa.sa_data,
+				    sizeof(addrbuf.sa.sa_data), 0);
 		break;
 	}
 	tprints("}");
