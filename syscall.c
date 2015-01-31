@@ -2494,17 +2494,21 @@ dumpio(struct tcb *tcp)
 		if (func == sys_read ||
 		    func == sys_pread ||
 		    func == sys_recv ||
-		    func == sys_recvfrom)
+		    func == sys_recvfrom) {
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
-		else if (func == sys_readv)
+			return;
+		} else if (func == sys_readv) {
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+			return;
 #if HAVE_SENDMSG
-		else if (func == sys_recvmsg)
+		} else if (func == sys_recvmsg) {
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
-		else if (func == sys_recvmmsg)
+			return;
+		} else if (func == sys_recvmmsg) {
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
+			return;
 #endif
-		return;
+		}
 	}
 	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
 		if (func == sys_write ||
@@ -2520,7 +2524,6 @@ dumpio(struct tcb *tcp)
 		else if (func == sys_sendmmsg)
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 #endif
-		return;
 	}
 }
 
