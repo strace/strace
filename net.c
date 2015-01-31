@@ -33,11 +33,6 @@
 #include <sys/socket.h>
 #include <sys/uio.h>
 #include <sys/un.h>
-#if defined(HAVE_SIN6_SCOPE_ID_LINUX)
-# define in6_addr in6_addr_libc
-# define ipv6_mreq ipv6_mreq_libc
-# define sockaddr_in6 sockaddr_in6_libc
-#endif
 #include <netinet/in.h>
 #ifdef HAVE_NETINET_TCP_H
 # include <netinet/tcp.h>
@@ -55,28 +50,6 @@
 # include <netipx/ipx.h>
 #else
 # include <linux/ipx.h>
-#endif
-
-#if defined(__GLIBC__) && defined(HAVE_SIN6_SCOPE_ID_LINUX)
-# if defined(HAVE_LINUX_IN6_H)
-#  if defined(HAVE_SIN6_SCOPE_ID_LINUX)
-#   undef in6_addr
-#   undef ipv6_mreq
-#   undef sockaddr_in6
-#   define in6_addr in6_addr_kernel
-#   define ipv6_mreq ipv6_mreq_kernel
-#   define sockaddr_in6 sockaddr_in6_kernel
-#  endif
-#  include <linux/in6.h>
-#  if defined(HAVE_SIN6_SCOPE_ID_LINUX)
-#   undef in6_addr
-#   undef ipv6_mreq
-#   undef sockaddr_in6
-#   define in6_addr in6_addr_libc
-#   define ipv6_mreq ipv6_mreq_libc
-#   define sockaddr_in6 sockaddr_in6_kernel
-#  endif
-# endif
 #endif
 
 #if defined(HAVE_LINUX_NETLINK_H)
