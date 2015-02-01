@@ -24,7 +24,8 @@ check_PROGRAMS = \
 	uid \
 	uid16 \
 	uid32 \
-	uio
+	uio \
+	unix-pair-send-recv
 
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -37,6 +38,7 @@ TESTS = \
 	strace-f.test \
 	qual_syscall.test \
 	caps.test \
+	dumpio.test \
 	fanotify_mark.test \
 	getdents.test \
 	ioctl.test \
@@ -71,6 +73,7 @@ TEST_LOG_COMPILER = $(srcdir)/run.sh
 
 EXTRA_DIST = init.sh run.sh \
 	     caps.awk \
+	     dumpio.expected \
 	     getdents.awk \
 	     mmsg.expected \
 	     net-yy-accept.awk \
