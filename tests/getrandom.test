@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Check getrandom syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog awk
+
+./getrandom ||
+	framework_skip_ 'getrandom is not available'
+
+args="-e getrandom -xx -s3 ./getrandom"
+$STRACE -o "$LOG" $args || {
+	cat "$LOG"
+	fail_ "$STRACE $args failed"
+}
+
+awk -f "$srcdir"/getrandom.awk "$LOG" || {
+	cat "$LOG"
+	fail_ 'unexpected output'
+}
+
+exit 0

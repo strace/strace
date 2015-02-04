@@ -1,5 +1,6 @@
 caps
 fanotify_mark
+getrandom
 inet-accept-connect-send-recv
 ioctl
 ipc_msg

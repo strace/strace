@@ -1,0 +1,12 @@
+#unconditional
+
+#ifndef GRND_NONBLOCK
+# define GRND_NONBLOCK 1
+#endif
+
+#ifndef GRND_RANDOM
+# define GRND_RANDOM 2
+#endif
+
+GRND_NONBLOCK
+GRND_RANDOM

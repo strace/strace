@@ -3,13 +3,14 @@
 AM_CFLAGS = $(WARN_CFLAGS)
 
 check_PROGRAMS = \
+	caps \
+	fanotify_mark \
+	getrandom \
 	inet-accept-connect-send-recv \
 	ioctl \
 	ipc_msg \
-	ipc_shm \
 	ipc_sem \
-	caps \
-	fanotify_mark \
+	ipc_shm \
 	mmsg \
 	net-accept-connect \
 	netlink_inet_diag \
@@ -42,6 +43,7 @@ TESTS = \
 	dumpio.test \
 	fanotify_mark.test \
 	getdents.test \
+	getrandom.test \
 	ioctl.test \
 	ipc_msg.test \
 	ipc_shm.test \
