@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	netlink_inet_diag \
 	netlink_unix_diag \
 	scm_rights \
+	select \
 	set_ptracer_any \
 	sigaction \
 	stack-fcall \
@@ -46,6 +47,7 @@ TESTS = \
 	ipc_shm.test \
 	ipc_sem.test \
 	scm_rights-fd.test \
+	select.test \
 	sigaction.test \
 	stat.test \
 	stat32-v.test \
@@ -78,6 +80,7 @@ EXTRA_DIST = init.sh run.sh \
 	     mmsg.expected \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
+	     select.awk \
 	     sigaction.awk \
 	     uid.awk \
 	     unix-yy-accept.awk \

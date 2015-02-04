@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Check select syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog awk
+
+./select ||
+	framework_skip_ 'select syscall does not behave as expected'
+
+args="-eselect ./select"
+$STRACE -o "$LOG" $args || {
+	cat "$LOG"
+	fail_ "$STRACE $args failed"
+}
+
+awk -f "$srcdir"/select.awk "$LOG" || {
+	cat "$LOG"
+	fail_ 'unexpected output'
+}
+
+exit 0
