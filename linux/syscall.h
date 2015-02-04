@@ -222,6 +222,7 @@ int sys_sched_rr_get_interval();
 int sys_sched_setaffinity();
 int sys_sched_setparam();
 int sys_sched_setscheduler();
+int sys_seccomp();
 int sys_select();
 int sys_semctl();
 int sys_semget();

@@ -734,6 +734,7 @@ extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int deco
 extern void tprint_open_modes(int);
 extern const char *sprint_open_modes(int);
 extern void print_loff_t(struct tcb *, long);
+extern void print_seccomp_filter(struct tcb *tcp, unsigned long);
 
 extern const struct_ioctlent *ioctl_lookup(const unsigned int);
 extern const struct_ioctlent *ioctl_next_match(const struct_ioctlent *);

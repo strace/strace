@@ -25,6 +25,12 @@ unalignctl_string(unsigned int ctl)
 	return buf;
 }
 
+#ifdef HAVE_LINUX_SECCOMP_H
+# include <linux/seccomp.h>
+#endif
+
+#include "xlat/seccomp_mode.h"
+
 int
 sys_prctl(struct tcb *tcp)
 {
@@ -74,6 +80,28 @@ sys_prctl(struct tcb *tcp)
 		case PR_GET_KEEPCAPS:
 			break;
 #endif
+
+#ifdef PR_SET_SECCOMP
+		case PR_SET_SECCOMP:
+			tprints(", ");
+			printxval(seccomp_mode, tcp->u_arg[1],
+				  "SECCOMP_MODE_???");
+# ifdef SECCOMP_MODE_STRICT
+			if (SECCOMP_MODE_STRICT == tcp->u_arg[1])
+				break;
+# endif
+# ifdef SECCOMP_MODE_FILTER
+			if (SECCOMP_MODE_FILTER == tcp->u_arg[1]) {
+				tprints(", ");
+				print_seccomp_filter(tcp, tcp->u_arg[2]);
+				break;
+			}
+# endif
+			for (i = 2; i < tcp->s_ent->nargs; i++)
+				tprintf(", %#lx", tcp->u_arg[i]);
+			break;
+#endif /* PR_SET_SECCOMP */
+
 		default:
 			for (i = 1; i < tcp->s_ent->nargs; i++)
 				tprintf(", %#lx", tcp->u_arg[i]);

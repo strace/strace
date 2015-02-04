@@ -86,6 +86,7 @@ strace_SOURCES =	\
 	resource.c	\
 	sched.c		\
 	scsi.c		\
+	seccomp.c	\
 	signal.c	\
 	sock.c		\
 	socketutils.c	\
