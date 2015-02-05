@@ -1264,8 +1264,22 @@ get_scno(struct tcb *tcp)
 		scno = x86_64_regs.orig_rax;
 		currpers = 0;
 		if (scno & __X32_SYSCALL_BIT) {
-			scno -= __X32_SYSCALL_BIT;
-			currpers = 2;
+			/*
+			 * Syscall number -1 requires special treatment:
+			 * it might be a side effect of SECCOMP_RET_ERRNO
+			 * filtering that sets orig_rax to -1
+			 * in some versions of linux kernel.
+			 * If that is the case, then
+			 * __X32_SYSCALL_BIT logic does not apply.
+			 */
+			if ((long long) x86_64_regs.orig_rax != -1) {
+				scno -= __X32_SYSCALL_BIT;
+				currpers = 2;
+			} else {
+#  ifdef X32
+				currpers = 2;
+#  endif
+			}
 		}
 	}
 # elif 0
