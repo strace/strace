@@ -2216,29 +2216,37 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 }
 
 /*
+ * Cannot rely on __kernel_[u]long_t being defined,
+ * it is quite a recent feature of <asm/posix_types.h>.
+ */
+#ifdef __kernel_long_t
+typedef __kernel_long_t kernel_long_t;
+typedef __kernel_ulong_t kernel_ulong_t;
+#else
+# ifdef X32
+typedef long long kernel_long_t;
+typedef unsigned long long kernel_ulong_t;
+# else
+typedef long kernel_long_t;
+typedef unsigned long kernel_ulong_t;
+# endif
+#endif
+
+/*
  * Check the syscall return value register value for whether it is
  * a negated errno code indicating an error, or a success return value.
  */
-#ifndef X32
-static inline int
-is_negated_errno(unsigned long int val)
+static inline bool
+is_negated_errno(kernel_ulong_t val)
 {
-	unsigned long int max = -(long int) nerrnos;
+	kernel_ulong_t max = -(kernel_long_t) nerrnos;
+
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize < sizeof(val)) {
-		val = (unsigned int) val;
-		max = (unsigned int) max;
+		val = (uint32_t) val;
+		max = (uint32_t) max;
 	}
-#endif
-	return val > max;
-}
-
-#else /* X32 */
-
-static inline int
-is_negated_errno(unsigned long long val)
-{
-	unsigned long long max = -(long long) nerrnos;
+#elif defined X32
 	/*
 	 * current_wordsize is 4 even in personality 0 (native X32)
 	 * but truncation _must not_ be done in it.
@@ -2248,9 +2256,10 @@ is_negated_errno(unsigned long long val)
 		val = (uint32_t) val;
 		max = (uint32_t) max;
 	}
+#endif
+
 	return val > max;
 }
-#endif /* X32 */
 
 /* Returns:
  * 1: ok, continue in trace_syscall_exiting().
@@ -2281,11 +2290,16 @@ get_error(struct tcb *tcp)
 	else {
 		tcp->u_rval = i386_regs.eax;
 	}
-#elif defined(X86_64)
-	long rax;
+#elif defined(X86_64) || defined(X32)
+	/*
+	 * In X32, return value is 64-bit (llseek uses one).
+	 * Using merely "long rax" would not work.
+	 */
+	kernel_long_t rax;
+
 	if (x86_io.iov_len == sizeof(i386_regs)) {
 		/* Sign extend from 32 bits */
-		rax = (int32_t)i386_regs.eax;
+		rax = (int32_t) i386_regs.eax;
 	} else {
 		rax = x86_64_regs.rax;
 	}
@@ -2295,25 +2309,10 @@ get_error(struct tcb *tcp)
 	}
 	else {
 		tcp->u_rval = rax;
-	}
-#elif defined(X32)
-	/* In X32, return value is 64-bit (llseek uses one).
-	 * Using merely "long rax" would not work.
-	 */
-	long long rax;
-	if (x86_io.iov_len == sizeof(i386_regs)) {
-		/* Sign extend from 32 bits */
-		rax = (int32_t)i386_regs.eax;
-	} else {
-		rax = x86_64_regs.rax;
-	}
-	if (check_errno && is_negated_errno(rax)) {
-		tcp->u_rval = -1;
-		u_error = -rax;
-	}
-	else {
-		tcp->u_rval = rax; /* truncating */
+# ifdef X32
+		/* tcp->u_rval contains a truncated value */
 		tcp->u_lrval = rax;
+# endif
 	}
 #elif defined(IA64)
 	if (ia64_ia32mode) {
