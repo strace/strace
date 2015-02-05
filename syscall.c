@@ -2219,6 +2219,7 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
  * Check the syscall return value register value for whether it is
  * a negated errno code indicating an error, or a success return value.
  */
+#ifndef X32
 static inline int
 is_negated_errno(unsigned long int val)
 {
@@ -2232,9 +2233,10 @@ is_negated_errno(unsigned long int val)
 	return val > max;
 }
 
-#if defined(X32)
+#else /* X32 */
+
 static inline int
-is_negated_errno_x32(unsigned long long val)
+is_negated_errno(unsigned long long val)
 {
 	unsigned long long max = -(long long) nerrnos;
 	/*
@@ -2248,7 +2250,7 @@ is_negated_errno_x32(unsigned long long val)
 	}
 	return val > max;
 }
-#endif
+#endif /* X32 */
 
 /* Returns:
  * 1: ok, continue in trace_syscall_exiting().
@@ -2305,8 +2307,7 @@ get_error(struct tcb *tcp)
 	} else {
 		rax = x86_64_regs.rax;
 	}
-	/* Careful: is_negated_errno() works only on longs */
-	if (check_errno && is_negated_errno_x32(rax)) {
+	if (check_errno && is_negated_errno(rax)) {
 		tcp->u_rval = -1;
 		u_error = -rax;
 	}
