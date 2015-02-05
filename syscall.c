@@ -1593,6 +1593,52 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
+/*
+ * Cannot rely on __kernel_[u]long_t being defined,
+ * it is quite a recent feature of <asm/posix_types.h>.
+ */
+#ifdef __kernel_long_t
+typedef __kernel_long_t kernel_long_t;
+typedef __kernel_ulong_t kernel_ulong_t;
+#else
+# ifdef X32
+typedef long long kernel_long_t;
+typedef unsigned long long kernel_ulong_t;
+# else
+typedef long kernel_long_t;
+typedef unsigned long kernel_ulong_t;
+# endif
+#endif
+
+/*
+ * Check the syscall return value register value for whether it is
+ * a negated errno code indicating an error, or a success return value.
+ */
+static inline bool
+is_negated_errno(kernel_ulong_t val)
+{
+	kernel_ulong_t max = -(kernel_long_t) nerrnos;
+
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize < sizeof(val)) {
+		val = (uint32_t) val;
+		max = (uint32_t) max;
+	}
+#elif defined X32
+	/*
+	 * current_wordsize is 4 even in personality 0 (native X32)
+	 * but truncation _must not_ be done in it.
+	 * can't check current_wordsize here!
+	 */
+	if (current_personality != 0) {
+		val = (uint32_t) val;
+		max = (uint32_t) max;
+	}
+#endif
+
+	return val > max;
+}
+
 /* Called at each syscall entry.
  * Returns:
  * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
@@ -1611,7 +1657,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	 * that sets orig_eax to -1 in some versions of linux kernel.
 	 */
 	if (i386_regs.orig_eax != -1 &&
-	    i386_regs.eax != -ENOSYS) {
+	    !is_negated_errno(i386_regs.eax)) {
 		if (debug_flag)
 			fprintf(stderr,
 				"not a syscall entry (eax = %ld, orig_eax = %ld)\n",
@@ -1626,7 +1672,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 	 */
 	if (x86_io.iov_len == sizeof(i386_regs)) {
 		if ((int) i386_regs.orig_eax != -1 &&
-		    (int) i386_regs.eax != -ENOSYS) {
+		    !is_negated_errno(i386_regs.eax)) {
 			if (debug_flag)
 				fprintf(stderr,
 					"not a syscall entry (eax = %d, orig_eax = %d)\n",
@@ -1636,7 +1682,7 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 		}
 	} else {
 		if ((long long) x86_64_regs.orig_rax != -1 &&
-		    (long long) x86_64_regs.rax != -ENOSYS) {
+		    !is_negated_errno(x86_64_regs.rax)) {
 			if (debug_flag)
 				fprintf(stderr,
 					"not a syscall entry (rax = %lld, orig_rax = %lld)\n",
@@ -2213,52 +2259,6 @@ syscall_fixup_on_sysexit(struct tcb *tcp)
 		s390_gpr2 = 0;
 	}
 #endif
-}
-
-/*
- * Cannot rely on __kernel_[u]long_t being defined,
- * it is quite a recent feature of <asm/posix_types.h>.
- */
-#ifdef __kernel_long_t
-typedef __kernel_long_t kernel_long_t;
-typedef __kernel_ulong_t kernel_ulong_t;
-#else
-# ifdef X32
-typedef long long kernel_long_t;
-typedef unsigned long long kernel_ulong_t;
-# else
-typedef long kernel_long_t;
-typedef unsigned long kernel_ulong_t;
-# endif
-#endif
-
-/*
- * Check the syscall return value register value for whether it is
- * a negated errno code indicating an error, or a success return value.
- */
-static inline bool
-is_negated_errno(kernel_ulong_t val)
-{
-	kernel_ulong_t max = -(kernel_long_t) nerrnos;
-
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize < sizeof(val)) {
-		val = (uint32_t) val;
-		max = (uint32_t) max;
-	}
-#elif defined X32
-	/*
-	 * current_wordsize is 4 even in personality 0 (native X32)
-	 * but truncation _must not_ be done in it.
-	 * can't check current_wordsize here!
-	 */
-	if (current_personality != 0) {
-		val = (uint32_t) val;
-		max = (uint32_t) max;
-	}
-#endif
-
-	return val > max;
 }
 
 /* Returns:
