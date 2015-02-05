@@ -1617,7 +1617,12 @@ typedef unsigned long kernel_ulong_t;
 static inline bool
 is_negated_errno(kernel_ulong_t val)
 {
-	kernel_ulong_t max = -(kernel_long_t) nerrnos;
+	/*
+	 * Thanks to SECCOMP_RET_DATA == 0xffff, abnormally large errno
+	 * values could be easily seen when a seccomp filter is used, e.g.
+	 * BPF_STMT(BPF_RET, SECCOMP_RET_ERRNO | SECCOMP_RET_DATA)
+	 */
+	kernel_ulong_t max = -(kernel_long_t) 0x10000; /* SECCOMP_RET_DATA + 1 */
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize < sizeof(val)) {
