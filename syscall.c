@@ -1605,24 +1605,43 @@ syscall_fixup_on_sysenter(struct tcb *tcp)
 {
 	/* A common case of "not a syscall entry" is post-execve SIGTRAP */
 #if defined(I386)
-	if (i386_regs.eax != -ENOSYS) {
+	/*
+	 * Syscall number -1 requires special treatment.
+	 * On X86, it might be a side effect of SECCOMP_RET_ERRNO filtering
+	 * that sets orig_eax to -1 in some versions of linux kernel.
+	 */
+	if (i386_regs.orig_eax != -1 &&
+	    i386_regs.eax != -ENOSYS) {
 		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (eax = %ld)\n", i386_regs.eax);
+			fprintf(stderr,
+				"not a syscall entry (eax = %ld, orig_eax = %ld)\n",
+				i386_regs.eax, i386_regs.orig_eax);
 		return 0;
 	}
 #elif defined(X86_64) || defined(X32)
-	{
-		long rax;
-		if (x86_io.iov_len == sizeof(i386_regs)) {
-			/* Sign extend from 32 bits */
-			rax = (int32_t)i386_regs.eax;
-		} else {
-			/* Note: in X32 build, this truncates 64 to 32 bits */
-			rax = x86_64_regs.rax;
-		}
-		if (rax != -ENOSYS) {
+	/*
+	 * Syscall number -1 requires special treatment.
+	 * On X86_64/X32, it might be a side effect of SECCOMP_RET_ERRNO
+	 * filtering that sets orig_rax to -1 in some versions of linux kernel.
+	 */
+	if (x86_io.iov_len == sizeof(i386_regs)) {
+		if ((int) i386_regs.orig_eax != -1 &&
+		    (int) i386_regs.eax != -ENOSYS) {
 			if (debug_flag)
-				fprintf(stderr, "not a syscall entry (rax = %ld)\n", rax);
+				fprintf(stderr,
+					"not a syscall entry (eax = %d, orig_eax = %d)\n",
+					(int) i386_regs.eax,
+					(int) i386_regs.orig_eax);
+			return 0;
+		}
+	} else {
+		if ((long long) x86_64_regs.orig_rax != -1 &&
+		    (long long) x86_64_regs.rax != -ENOSYS) {
+			if (debug_flag)
+				fprintf(stderr,
+					"not a syscall entry (rax = %lld, orig_rax = %lld)\n",
+					(long long) x86_64_regs.rax,
+					(long long) x86_64_regs.orig_rax);
 			return 0;
 		}
 	}
