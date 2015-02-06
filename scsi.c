@@ -88,9 +88,13 @@ print_sg_io_res(struct tcb *tcp, struct sg_io_hdr *sg_io)
 {
 	if (sg_io->dxfer_direction == SG_DXFER_FROM_DEV ||
 	    sg_io->dxfer_direction == SG_DXFER_TO_FROM_DEV) {
-		tprintf(", data[%u]=[", sg_io->dxfer_len);
-		printstr(tcp, (unsigned long) sg_io->dxferp,
-			 sg_io->dxfer_len);
+		uint32_t din_len = sg_io->dxfer_len;
+
+		if (sg_io->resid > 0)
+			din_len -= sg_io->resid;
+
+		tprintf(", data[%u]=[", din_len);
+		printstr(tcp, (unsigned long) sg_io->dxferp, din_len);
 		tprints("]");
 	}
 	tprintf(", status=%02x, ", sg_io->status);
