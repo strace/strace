@@ -41,21 +41,23 @@ print_sg_io_buffer(struct tcb *tcp, unsigned long addr, const unsigned int len)
 	unsigned char *buf = NULL;
 	unsigned int allocated, i;
 
+	tprints("[");
 	if (len == 0)
-		return;
+		goto out;
 	allocated = (len > max_strlen) ? max_strlen : len;
 	if ((buf = malloc(allocated)) == NULL ||
 	    umoven(tcp, addr, allocated, (char *) buf) < 0) {
 		tprintf("%#lx", addr);
-		free(buf);
-		return;
+		goto out;
 	}
 	tprintf("%02x", buf[0]);
 	for (i = 1; i < allocated; ++i)
 		tprintf(", %02x", buf[i]);
-	free(buf);
 	if (allocated != len)
 		tprints(", ...");
+out:
+	free(buf);
+	tprints("]");
 }
 
 static void
@@ -64,9 +66,9 @@ print_sg_io_req(struct tcb *tcp, struct sg_io_hdr *sg_io)
 	tprintf("{'%c', ", sg_io->interface_id);
 	printxval(sg_io_dxfer_direction, sg_io->dxfer_direction,
 		  "SG_DXFER_???");
-	tprintf(", cmd[%u]=[", sg_io->cmd_len);
+	tprintf(", cmd[%u]=", sg_io->cmd_len);
 	print_sg_io_buffer(tcp, (unsigned long) sg_io->cmdp, sg_io->cmd_len);
-	tprintf("], mx_sb_len=%d, ", sg_io->mx_sb_len);
+	tprintf(", mx_sb_len=%d, ", sg_io->mx_sb_len);
 	tprintf("iovec_count=%d, ", sg_io->iovec_count);
 	tprintf("dxfer_len=%u, ", sg_io->dxfer_len);
 	tprintf("timeout=%u, ", sg_io->timeout);
@@ -93,9 +95,9 @@ print_sg_io_res(struct tcb *tcp, struct sg_io_hdr *sg_io)
 	}
 	tprintf(", status=%02x, ", sg_io->status);
 	tprintf("masked_status=%02x, ", sg_io->masked_status);
-	tprintf("sb[%u]=[", sg_io->sb_len_wr);
+	tprintf("sb[%u]=", sg_io->sb_len_wr);
 	print_sg_io_buffer(tcp, (unsigned long) sg_io->sbp, sg_io->sb_len_wr);
-	tprintf("], host_status=%#x, ", sg_io->host_status);
+	tprintf(", host_status=%#x, ", sg_io->host_status);
 	tprintf("driver_status=%#x, ", sg_io->driver_status);
 	tprintf("resid=%d, ", sg_io->resid);
 	tprintf("duration=%d, ", sg_io->duration);
