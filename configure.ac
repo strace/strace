@@ -222,6 +222,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	inttypes.h
 	ioctls.h
+	linux/bsg.h
 	linux/falloc.h
 	linux/filter.h
 	linux/hiddev.h
