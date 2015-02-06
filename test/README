@@ -1,3 +1,6 @@
+This directory contains some manual tests.
+For automated tests, see ../tests/.
+
 To run a test:
 * Run make
 * Run resulting executable(s) under strace
