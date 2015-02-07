@@ -378,7 +378,7 @@ printsigval(const siginfo_t *sip, int verbose)
 }
 
 void
-printsiginfo(siginfo_t *sip, int verbose)
+printsiginfo(const siginfo_t *sip, int verbose)
 {
 	const char *code;
 

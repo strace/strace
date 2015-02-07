@@ -713,10 +713,8 @@ extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
 extern char *sprinttv(char *, struct tcb *, long, enum bitness_t, int special);
 extern void print_timespec(struct tcb *, long);
 extern void sprint_timespec(char *, struct tcb *, long);
-#ifdef HAVE_SIGINFO_T
-extern void printsiginfo(siginfo_t *, int);
+extern void printsiginfo(const siginfo_t *, int);
 extern void printsiginfo_at(struct tcb *tcp, long addr);
-#endif
 extern void printfd(struct tcb *, int);
 extern bool print_sockaddr_by_inode(const unsigned long, const char *);
 extern void print_dirfd(struct tcb *, int);
