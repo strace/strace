@@ -2162,8 +2162,10 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 static void
 print_signalled(struct tcb *tcp, const int pid, const int status)
 {
-	if (pid == strace_child)
+	if (pid == strace_child) {
 		exit_code = 0x100 | WTERMSIG(status);
+		strace_child = 0;
+	}
 
 	if (cflag != CFLAG_ONLY_STATS
 	 && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)
@@ -2184,8 +2186,10 @@ print_signalled(struct tcb *tcp, const int pid, const int status)
 static void
 print_exited(struct tcb *tcp, const int pid, const int status)
 {
-	if (pid == strace_child)
+	if (pid == strace_child) {
 		exit_code = WEXITSTATUS(status);
+		strace_child = 0;
+	}
 
 	if (cflag != CFLAG_ONLY_STATS &&
 	    qflag < 2) {
