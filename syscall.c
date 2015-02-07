@@ -1654,45 +1654,38 @@ is_negated_errno(kernel_ulong_t val)
 static int
 syscall_fixup_on_sysenter(struct tcb *tcp)
 {
-	/* A common case of "not a syscall entry" is post-execve SIGTRAP */
-#if defined(I386)
+	/* Do we have post-execve SIGTRAP suppressed? */
+	if (ptrace_setoptions & PTRACE_O_TRACEEXEC)
+		return 1;
+
 	/*
-	 * Syscall number -1 requires special treatment.
-	 * On X86, it might be a side effect of SECCOMP_RET_ERRNO filtering
-	 * that sets orig_eax to -1 in some versions of linux kernel.
+	 * No, unfortunately.  Apply -ENOSYS heuristics.
+	 * We don't have to workaround SECCOMP_RET_ERRNO side effects
+	 * because any kernel with SECCOMP_RET_ERRNO support surely
+	 * implements PTRACE_O_TRACEEXEC.
 	 */
-	if (i386_regs.orig_eax != -1 &&
-	    !is_negated_errno(i386_regs.eax)) {
+#if defined(I386)
+	if (i386_regs.eax != -ENOSYS) {
 		if (debug_flag)
-			fprintf(stderr,
-				"not a syscall entry (eax = %ld, orig_eax = %ld)\n",
-				i386_regs.eax, i386_regs.orig_eax);
+			fprintf(stderr, "not a syscall entry (eax = %ld)\n",
+				i386_regs.eax);
 		return 0;
 	}
 #elif defined(X86_64) || defined(X32)
-	/*
-	 * Syscall number -1 requires special treatment.
-	 * On X86_64/X32, it might be a side effect of SECCOMP_RET_ERRNO
-	 * filtering that sets orig_rax to -1 in some versions of linux kernel.
-	 */
 	if (x86_io.iov_len == sizeof(i386_regs)) {
-		if ((int) i386_regs.orig_eax != -1 &&
-		    !is_negated_errno(i386_regs.eax)) {
+		if ((int) i386_regs.eax != -ENOSYS) {
 			if (debug_flag)
 				fprintf(stderr,
-					"not a syscall entry (eax = %d, orig_eax = %d)\n",
-					(int) i386_regs.eax,
-					(int) i386_regs.orig_eax);
+					"not a syscall entry (eax = %d)\n",
+					(int) i386_regs.eax);
 			return 0;
 		}
 	} else {
-		if ((long long) x86_64_regs.orig_rax != -1 &&
-		    !is_negated_errno(x86_64_regs.rax)) {
+		if ((long long) x86_64_regs.rax != -ENOSYS) {
 			if (debug_flag)
 				fprintf(stderr,
-					"not a syscall entry (rax = %lld, orig_rax = %lld)\n",
-					(long long) x86_64_regs.rax,
-					(long long) x86_64_regs.orig_rax);
+					"not a syscall entry (rax = %lld)\n",
+					(long long) x86_64_regs.rax);
 			return 0;
 		}
 	}
