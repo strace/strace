@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Check -bexecve behavior.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+args='-enone'
+what="$STRACE $args sh -c 'exec false'"
+
+$STRACE $args sh -c 'exec false' 2> "$LOG"
+if [ $? -ne 1 ]; then
+	cat "$LOG"
+	fail_ "$what: unexpected exit status"
+fi
+
+args='-bexecve -enone'
+what="$STRACE $args sh -c 'exec false'"
+
+$STRACE $args sh -c 'exec false' 2> "$LOG" || {
+	cat "$LOG"
+	fail_ "$what: unexpected exit status"
+}
+
+pattern='Process [1-9][0-9]* detached'
+
+LC_ALL=C grep -x "$pattern" "$LOG" > /dev/null || {
+	cat "$LOG"
+	fail_ "$what: unexpected output"
+}
+
+if LC_ALL=C grep -v -x "$pattern" "$LOG" > /dev/null; then
+	cat "$LOG"
+	fail_ "$what: unexpected output"
+fi
+
+exit 0

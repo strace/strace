@@ -2080,9 +2080,14 @@ static struct tcb *
 maybe_allocate_tcb(const int pid, const int status)
 {
 	if (!WIFSTOPPED(status)) {
+		if (detach_on_execve && pid == strace_child) {
+			/* example: strace -bexecve sh -c 'exec true' */
+			strace_child = 0;
+			return NULL;
+		}
 		/*
 		 * This can happen if we inherited an unknown child.
-		 * Example: (sleep 1 & exec strace sleep 2)
+		 * Example: (sleep 1 & exec strace true)
 		 */
 		error_msg("Exit of unknown pid %u ignored", pid);
 		return NULL;

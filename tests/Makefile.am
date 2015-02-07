@@ -39,6 +39,7 @@ TESTS = \
 	ptrace_setoptions.test \
 	strace-f.test \
 	qual_syscall.test \
+	bexecve.test \
 	caps.test \
 	dumpio.test \
 	fanotify_mark.test \
