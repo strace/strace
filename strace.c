@@ -2327,8 +2327,10 @@ trace(void)
 		if (os_release >= KERNEL_VERSION(3,0,0))
 			tcp = maybe_switch_tcbs(tcp, pid);
 
-		if (detach_on_execve && !skip_one_b_execve)
+		if (detach_on_execve && !skip_one_b_execve) {
 			detach(tcp); /* do "-b execve" thingy */
+			return true;
+		}
 		skip_one_b_execve = 0;
 	}
 
