@@ -702,10 +702,10 @@ static struct iovec x86_io = {
 # define ARCH_REGS_FOR_GETREGSET x86_regs_union
 # define ARCH_IOVEC_FOR_GETREGSET x86_io
 #elif defined(IA64)
-bool ia64_ia32mode = 0; /* not static */
+static bool ia64_ia32mode;
 static long ia64_r8, ia64_r10;
 #elif defined(POWERPC)
-struct pt_regs ppc_regs;
+struct pt_regs ppc_regs; /* not static */
 # define ARCH_REGS_FOR_GETREGS ppc_regs
 #elif defined(M68K)
 static long m68k_d0;
@@ -771,7 +771,7 @@ static long sh64_r9;
 #elif defined(CRISV10) || defined(CRISV32)
 static long cris_r10;
 #elif defined(TILE)
-struct pt_regs tile_regs;
+struct pt_regs tile_regs; /* not static */
 # define ARCH_REGS_FOR_GETREGS tile_regs
 #elif defined(MICROBLAZE)
 static long microblaze_r3;
@@ -1607,173 +1607,6 @@ is_negated_errno(kernel_ulong_t val)
 	return val >= max;
 }
 
-/* Called at each syscall entry.
- * Returns:
- * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
- * 1: ok, continue in trace_syscall_entering().
- * other: error, trace_syscall_entering() should print error indicator
- *    ("????" etc) and bail out.
- */
-static int
-syscall_fixup_on_sysenter(struct tcb *tcp)
-{
-	/* Do we have post-execve SIGTRAP suppressed? */
-	if (ptrace_setoptions & PTRACE_O_TRACEEXEC)
-		return 1;
-
-	/*
-	 * No, unfortunately.  Apply -ENOSYS heuristics.
-	 * We don't have to workaround SECCOMP_RET_ERRNO side effects
-	 * because any kernel with SECCOMP_RET_ERRNO support surely
-	 * implements PTRACE_O_TRACEEXEC.
-	 */
-#if defined(I386)
-	if (i386_regs.eax != -ENOSYS) {
-		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (eax = %ld)\n",
-				i386_regs.eax);
-		return 0;
-	}
-#elif defined(X86_64) || defined(X32)
-	if (x86_io.iov_len == sizeof(i386_regs)) {
-		if ((int) i386_regs.eax != -ENOSYS) {
-			if (debug_flag)
-				fprintf(stderr,
-					"not a syscall entry (eax = %d)\n",
-					(int) i386_regs.eax);
-			return 0;
-		}
-	} else {
-		if ((long long) x86_64_regs.rax != -ENOSYS) {
-			if (debug_flag)
-				fprintf(stderr,
-					"not a syscall entry (rax = %lld)\n",
-					(long long) x86_64_regs.rax);
-			return 0;
-		}
-	}
-#elif defined(M68K)
-	/* TODO? Eliminate upeek's in arches below like we did in x86 */
-	if (upeek(tcp->pid, 4*PT_D0, &m68k_d0) < 0)
-		return -1;
-	if (m68k_d0 != -ENOSYS) {
-		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (d0 = %ld)\n", m68k_d0);
-		return 0;
-	}
-#elif defined(IA64)
-	if (upeek(tcp->pid, PT_R10, &ia64_r10) < 0)
-		return -1;
-	if (upeek(tcp->pid, PT_R8, &ia64_r8) < 0)
-		return -1;
-	if (ia64_ia32mode && ia64_r8 != -ENOSYS) {
-		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (r8 = %ld)\n", ia64_r8);
-		return 0;
-	}
-#elif defined(CRISV10) || defined(CRISV32)
-	if (upeek(tcp->pid, 4*PT_R10, &cris_r10) < 0)
-		return -1;
-	if (cris_r10 != -ENOSYS) {
-		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (r10 = %ld)\n", cris_r10);
-		return 0;
-	}
-#elif defined(MICROBLAZE)
-	if (upeek(tcp->pid, 3 * 4, &microblaze_r3) < 0)
-		return -1;
-	if (microblaze_r3 != -ENOSYS) {
-		if (debug_flag)
-			fprintf(stderr, "not a syscall entry (r3 = %ld)\n", microblaze_r3);
-		return 0;
-	}
-#endif
-	return 1;
-}
-
-static void
-internal_fork(struct tcb *tcp)
-{
-#if defined S390 || defined S390X || defined CRISV10 || defined CRISV32
-# define ARG_FLAGS	1
-#else
-# define ARG_FLAGS	0
-#endif
-#ifndef CLONE_UNTRACED
-# define CLONE_UNTRACED	0x00800000
-#endif
-	if ((ptrace_setoptions
-	    & (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
-	   == (PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK))
-		return;
-
-	if (!followfork)
-		return;
-
-	if (entering(tcp)) {
-		/*
-		 * We won't see the new child if clone is called with
-		 * CLONE_UNTRACED, so we keep the same logic with that option
-		 * and don't trace it.
-		 */
-		if ((tcp->s_ent->sys_func == sys_clone)
-		 && (tcp->u_arg[ARG_FLAGS] & CLONE_UNTRACED)
-		)
-			return;
-		setbpt(tcp);
-	} else {
-		if (tcp->flags & TCB_BPTSET)
-			clearbpt(tcp);
-	}
-}
-
-#if defined(TCB_WAITEXECVE)
-static void
-internal_exec(struct tcb *tcp)
-{
-	/* Maybe we have post-execve SIGTRAP suppressed? */
-	if (ptrace_setoptions & PTRACE_O_TRACEEXEC)
-		return; /* yes, no need to do anything */
-
-	if (exiting(tcp) && syserror(tcp))
-		/* Error in execve, no post-execve SIGTRAP expected */
-		tcp->flags &= ~TCB_WAITEXECVE;
-	else
-		tcp->flags |= TCB_WAITEXECVE;
-}
-#endif
-
-static void
-syscall_fixup_for_fork_exec(struct tcb *tcp)
-{
-	/*
-	 * We must always trace a few critical system calls in order to
-	 * correctly support following forks in the presence of tracing
-	 * qualifiers.
-	 */
-	int (*func)();
-
-	func = tcp->s_ent->sys_func;
-
-	if (   sys_fork == func
-	    || sys_clone == func
-	   ) {
-		internal_fork(tcp);
-		return;
-	}
-
-#if defined(TCB_WAITEXECVE)
-	if (   sys_execve == func
-# if defined(SPARC) || defined(SPARC64)
-	    || sys_execv == func
-# endif
-	   ) {
-		internal_exec(tcp);
-		return;
-	}
-#endif
-}
-
 /* Return -1 on error or 1 on success (never 0!) */
 static int
 get_syscall_args(struct tcb *tcp)
@@ -2008,24 +1841,11 @@ trace_syscall_entering(struct tcb *tcp)
 {
 	int res, scno_good;
 
-#if defined TCB_WAITEXECVE
-	if (tcp->flags & TCB_WAITEXECVE) {
-		/* This is the post-execve SIGTRAP. */
-		tcp->flags &= ~TCB_WAITEXECVE;
-		return 0;
-	}
-#endif
-
 	scno_good = res = (get_regs_error ? -1 : get_scno(tcp));
 	if (res == 0)
 		return res;
-	if (res == 1) {
-		res = syscall_fixup_on_sysenter(tcp);
-		if (res == 0)
-			return res;
-		if (res == 1)
-			res = get_syscall_args(tcp);
-	}
+	if (res == 1)
+		res = get_syscall_args(tcp);
 
 	if (res != 1) {
 		printleader(tcp);
@@ -2067,9 +1887,6 @@ trace_syscall_entering(struct tcb *tcp)
 		break;
 	}
 #endif
-
-	if (need_fork_exec_workarounds)
-		syscall_fixup_for_fork_exec(tcp);
 
 	if (!(tcp->qual_flg & QUAL_TRACE)
 	 || (tracing_paths && !pathtrace_match(tcp))
@@ -2168,23 +1985,6 @@ get_syscall_result(struct tcb *tcp)
 # error get_syscall_result is not implemented for this architecture
 #endif
 	return 1;
-}
-
-/* Called at each syscall exit */
-static void
-syscall_fixup_on_sysexit(struct tcb *tcp)
-{
-#if defined(S390) || defined(S390X)
-	if ((tcp->flags & TCB_WAITEXECVE)
-		 && (s390_gpr2 == -ENOSYS || s390_gpr2 == tcp->scno)) {
-		/*
-		 * Return from execve.
-		 * Fake a return value of zero.  We leave the TCB_WAITEXECVE
-		 * flag set for the post-execve SIGTRAP to see and reset.
-		 */
-		s390_gpr2 = 0;
-	}
-#endif
 }
 
 /* Returns:
@@ -2510,10 +2310,7 @@ trace_syscall_exiting(struct tcb *tcp)
 #endif
 	res = (get_regs_error ? -1 : get_syscall_result(tcp));
 	if (res == 1) {
-		syscall_fixup_on_sysexit(tcp); /* never fails */
 		get_error(tcp); /* never fails */
-		if (need_fork_exec_workarounds)
-			syscall_fixup_for_fork_exec(tcp);
 		if (filtered(tcp) || hide_log_until_execve)
 			goto ret;
 	}

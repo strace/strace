@@ -274,41 +274,13 @@ struct tcb {
  * are limited to trace(), this condition is never observed in trace_syscall()
  * and below.
  * The bit is cleared after all syscall exit processing is done.
- * User-generated SIGTRAPs and post-execve SIGTRAP make it necessary
- * to be very careful and NOT set TCB_INSYSCALL bit when they are encountered.
- * TCB_WAITEXECVE bit is used for this purpose (see below).
  *
  * Use entering(tcp) / exiting(tcp) to check this bit to make code more readable.
  */
 #define TCB_INSYSCALL	0x04
 #define TCB_ATTACHED	0x08	/* We attached to it already */
-#define TCB_BPTSET	0x10	/* "Breakpoint" set after fork(2) */
-#define TCB_REPRINT	0x20	/* We should reprint this syscall on exit */
-#define TCB_FILTERED	0x40	/* This system call has been filtered out */
-/*
- * x86 does not need TCB_WAITEXECVE.
- * It can detect post-execve SIGTRAP by looking at eax/rax.
- * See "not a syscall entry (eax = %ld)\n" message.
- *
- * Note! On new kernels (about 2.5.46+), we use PTRACE_O_TRACEEXEC, which
- * suppresses post-execve SIGTRAP. If you are adding a new arch which is
- * only supported by newer kernels, you most likely don't need to define
- * TCB_WAITEXECVE!
- */
-#if defined(ALPHA) \
- || defined(SPARC) || defined(SPARC64) \
- || defined(POWERPC) \
- || defined(IA64) \
- || defined(HPPA) \
- || defined(SH) || defined(SH64) \
- || defined(S390) || defined(S390X) \
- || defined(ARM) \
- || defined(MIPS)
-/* This tracee has entered into execve syscall. Expect post-execve SIGTRAP
- * to happen. (When it is detected, tracee is continued and this bit is cleared.)
- */
-# define TCB_WAITEXECVE	0x80
-#endif
+#define TCB_REPRINT	0x10	/* We should reprint this syscall on exit */
+#define TCB_FILTERED	0x20	/* This system call has been filtered out */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -405,7 +377,6 @@ extern bool hide_log_until_execve;
 /* are we filtering traces based on paths? */
 extern const char **paths_selected;
 #define tracing_paths (paths_selected != NULL)
-extern bool need_fork_exec_workarounds;
 extern unsigned xflag;
 extern unsigned followfork;
 #ifdef USE_LIBUNWIND
@@ -455,14 +426,6 @@ extern int upeek(int pid, long, long *);
 #if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
 extern long getrval2(struct tcb *);
 #endif
-/*
- * On Linux, "setbpt" is a misnomer: we don't set a breakpoint
- * (IOW: no poking in user's text segment),
- * instead we change fork/vfork/clone into clone(CLONE_PTRACE).
- * On newer kernels, we use PTRACE_O_TRACECLONE/TRACE[V]FORK instead.
- */
-extern int setbpt(struct tcb *);
-extern int clearbpt(struct tcb *);
 
 extern const char *signame(const int);
 extern void pathtrace_select(const char *);

@@ -41,7 +41,6 @@ stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
 
 TESTS = \
-	ptrace_setoptions.test \
 	strace-f.test \
 	qual_syscall.test \
 	bexecve.test \
