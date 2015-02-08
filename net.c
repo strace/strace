@@ -1445,6 +1445,7 @@ print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 			goto done;
 #endif /* MCAST_JOIN_GROUP */
 		}
+		break;
 
 	case SOL_PACKET:
 		switch (name) {
