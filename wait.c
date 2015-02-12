@@ -29,6 +29,11 @@
 #ifndef W_EXITCODE
 # define W_EXITCODE(ret, sig)  ((ret) << 8 | (sig))
 #endif
+#ifndef W_CONTINUED
+# define W_CONTINUED 0xffff
+#endif
+
+#include "xlat/ptrace_events.h"
 
 static int
 printstatus(int status)
@@ -41,9 +46,11 @@ printstatus(int status)
 	 * are no wait status constructors it will have to do.
 	 */
 	if (WIFSTOPPED(status)) {
-		tprintf("[{WIFSTOPPED(s) && WSTOPSIG(s) == %s}",
-			signame(WSTOPSIG(status)));
-		status &= ~W_STOPCODE(WSTOPSIG(status));
+		int sig = WSTOPSIG(status);
+		tprintf("[{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
+			signame(sig & 0x7f),
+			sig & 0x80 ? " | 0x80" : "");
+		status &= ~W_STOPCODE(sig);
 	}
 	else if (WIFSIGNALED(status)) {
 		tprintf("[{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
@@ -57,15 +64,29 @@ printstatus(int status)
 		exited = 1;
 		status &= ~W_EXITCODE(WEXITSTATUS(status), 0);
 	}
+#ifdef WIFCONTINUED
+	else if (WIFCONTINUED(status)) {
+		tprints("[{WIFCONTINUED(s)}");
+		status &= ~W_CONTINUED;
+	}
+#endif
 	else {
 		tprintf("[%#x]", status);
 		return 0;
 	}
 
-	if (status == 0)
-		tprints("]");
-	else
-		tprintf(" | %#x]", status);
+	if (status) {
+		unsigned int event = (unsigned int) status >> 16;
+		if (event) {
+			tprints(" | ");
+			printxval(ptrace_events, event, "PTRACE_EVENT_???");
+			tprints(" << 16");
+			status &= 0xffff;
+		}
+		if (status)
+			tprintf(" | %#x", status);
+	}
+	tprints("]");
 
 	return exited;
 }
