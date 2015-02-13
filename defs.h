@@ -163,81 +163,13 @@ extern char *stpcpy(char *dst, const char *src);
 # define ERESTART_RESTARTBLOCK 516
 #endif
 
-#ifdef ALPHA
-# define REG_R0 0
-# define REG_A0 16
-# define REG_A3 19
-# define REG_FP 30
-# define REG_PC 64
-#endif /* ALPHA */
-#ifdef MIPS
-# define REG_V0 2
-# define REG_A0 4
-# define REG_A3 7
-# define REG_SP 29
-# define REG_EPC 64
-#endif /* MIPS */
-#ifdef HPPA
-# define PT_GR20 (20*4)
-# define PT_GR26 (26*4)
-# define PT_GR28 (28*4)
-# define PT_IAOQ0 (106*4)
-# define PT_IAOQ1 (107*4)
-#endif /* HPPA */
-#ifdef SH64
-   /* SH64 Linux - this code assumes the following kernel API for system calls:
-          PC           Offset 0
-          System Call  Offset 16 (actually, (syscall no.) | (0x1n << 16),
-                       where n = no. of parameters.
-          Other regs   Offset 24+
-
-          On entry:    R2-7 = parameters 1-6 (as many as necessary)
-          On return:   R9   = result. */
-
-   /* Offset for peeks of registers */
-# define REG_OFFSET         (24)
-# define REG_GENERAL(x)     (8*(x)+REG_OFFSET)
-# define REG_PC             (0*8)
-# define REG_SYSCALL        (2*8)
-#endif /* SH64 */
-#ifdef AARCH64
-struct arm_pt_regs {
-        int uregs[18];
-};
-# define ARM_cpsr       uregs[16]
-# define ARM_pc         uregs[15]
-# define ARM_lr         uregs[14]
-# define ARM_sp         uregs[13]
-# define ARM_ip         uregs[12]
-# define ARM_fp         uregs[11]
-# define ARM_r10        uregs[10]
-# define ARM_r9         uregs[9]
-# define ARM_r8         uregs[8]
-# define ARM_r7         uregs[7]
-# define ARM_r6         uregs[6]
-# define ARM_r5         uregs[5]
-# define ARM_r4         uregs[4]
-# define ARM_r3         uregs[3]
-# define ARM_r2         uregs[2]
-# define ARM_r1         uregs[1]
-# define ARM_r0         uregs[0]
-# define ARM_ORIG_r0    uregs[17]
-#endif /* AARCH64 */
-
 #if defined(SPARC) || defined(SPARC64)
-/* Indexes into the pt_regs.u_reg[] array -- UREG_XX from kernel are all off
- * by 1 and use Ix instead of Ox.  These work for both 32 and 64 bit Linux. */
-# define U_REG_G1 0
-# define U_REG_O0 7
-# define U_REG_O1 8
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 4
 # if defined(SPARC64)
-#  include <asm/psrcompat.h>
 #  define SUPPORTED_PERSONALITIES 3
 #  define PERSONALITY2_WORDSIZE 8
 # else
-#  include <asm/psr.h>
 #  define SUPPORTED_PERSONALITIES 2
 # endif /* SPARC64 */
 #endif /* SPARC[64] */
@@ -290,20 +222,6 @@ struct arm_pt_regs {
 #endif
 #ifndef PERSONALITY0_WORDSIZE
 # define PERSONALITY0_WORDSIZE SIZEOF_LONG
-#endif
-
-#if defined(I386) || defined(X86_64)
-extern uint32_t *const i386_esp_ptr;
-#elif defined(IA64)
-extern bool ia64_ia32mode;
-#elif defined(SPARC) || defined(SPARC64)
-extern struct pt_regs sparc_regs;
-#elif defined(ARM)
-extern struct pt_regs arm_regs;
-#elif defined(TILE)
-extern struct pt_regs tile_regs;
-#elif defined(POWERPC)
-extern struct pt_regs ppc_regs;
 #endif
 
 typedef struct sysent {

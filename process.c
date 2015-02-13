@@ -42,28 +42,11 @@
 
 #include "xlat/nt_descriptor_types.h"
 
-#include <sys/user.h>
-#ifdef HAVE_SYS_REG_H
-# include <sys/reg.h>
-#endif
-
 #include "ptrace.h"
-
-#if defined(SPARC64)
-# define r_pc r_tpc
-# undef PTRACE_GETREGS
-# define PTRACE_GETREGS PTRACE_GETREGS64
-# undef PTRACE_SETREGS
-# define PTRACE_SETREGS PTRACE_SETREGS64
-#endif
-
 #include "xlat/ptrace_cmds.h"
 #include "xlat/ptrace_setoptions_flags.h"
 
-#if defined(IA64)
-# include <asm/ptrace_offsets.h>
-# include <asm/rse.h>
-#endif
+#include "regs.h"
 
 #define uoff(member)	offsetof(struct user, member)
 #define XLAT_UOFF(member)	{ uoff(member), "offsetof(struct user, " #member ")" }

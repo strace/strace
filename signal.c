@@ -33,17 +33,9 @@
 
 #include "defs.h"
 #include <fcntl.h>
-#include <sys/user.h>
-
-#ifdef HAVE_SYS_REG_H
-# include <sys/reg.h>
-#endif
 
 #include "ptrace.h"
-
-#ifdef IA64
-# include <asm/ptrace_offsets.h>
-#endif
+#include "regs.h"
 
 #if defined(SPARC) || defined(SPARC64) || defined(MIPS)
 typedef struct {

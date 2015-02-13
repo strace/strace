@@ -42,9 +42,6 @@
 #ifdef HAVE_PRCTL
 # include <sys/prctl.h>
 #endif
-#if defined(IA64)
-# include <asm/ptrace_offsets.h>
-#endif
 
 #include "ptrace.h"
 

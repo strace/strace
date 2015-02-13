@@ -83,6 +83,7 @@ strace_SOURCES =	\
 	readahead.c	\
 	readlink.c	\
 	reboot.c	\
+	regs.h		\
 	renameat.c	\
 	resource.c	\
 	sched.c		\
@@ -168,6 +169,7 @@ EXTRA_DIST =				\
 	linux/aarch64/signalent1.h	\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
+	linux/alpha/arch_regs.h		\
 	linux/alpha/errnoent.h		\
 	linux/alpha/ioctls_arch0.h	\
 	linux/alpha/ioctls_inc0.h	\
@@ -177,6 +179,8 @@ EXTRA_DIST =				\
 	linux/arc/ioctls_arch0.h	\
 	linux/arc/ioctls_inc0.h		\
 	linux/arc/syscallent.h		\
+	linux/arch_regs.h		\
+	linux/arm/arch_regs.h		\
 	linux/arm/ioctls_arch0.h	\
 	linux/arm/ioctls_inc0.h		\
 	linux/arm/syscallent.h		\
@@ -194,16 +198,19 @@ EXTRA_DIST =				\
 	linux/dummy.h			\
 	linux/errnoent.h		\
 	linux/fanotify.h		\
+	linux/hppa/arch_regs.h		\
 	linux/hppa/errnoent.h		\
 	linux/hppa/ioctls_arch0.h	\
 	linux/hppa/ioctls_inc0.h	\
 	linux/hppa/signalent.h		\
 	linux/hppa/syscallent.h		\
+	linux/i386/arch_regs.h		\
 	linux/i386/ioctls_arch0.h	\
 	linux/i386/ioctls_inc0.h	\
 	linux/i386/syscallent.h		\
 	linux/i386/userent.h		\
 	linux/i386/userent0.h		\
+	linux/ia64/arch_regs.h		\
 	linux/ia64/ioctls_arch0.h	\
 	linux/ia64/ioctls_inc0.h	\
 	linux/ia64/signalent.h		\
@@ -224,6 +231,7 @@ EXTRA_DIST =				\
 	linux/microblaze/ioctls_inc0.h	\
 	linux/microblaze/syscallent.h	\
 	linux/microblaze/userent.h	\
+	linux/mips/arch_regs.h		\
 	linux/mips/errnoent.h		\
 	linux/mips/genstub.sh		\
 	linux/mips/ioctls_arch0.h	\
@@ -241,6 +249,7 @@ EXTRA_DIST =				\
 	linux/or1k/syscallent.h		\
 	linux/or1k/userent.h		\
 	linux/personality.h		\
+	linux/powerpc/arch_regs.h	\
 	linux/powerpc/ioctls_arch0.h	\
 	linux/powerpc/ioctls_inc0.h	\
 	linux/powerpc/syscallent.h	\
@@ -271,12 +280,14 @@ EXTRA_DIST =				\
 	linux/sh/syscallent.h		\
 	linux/sh/userent.h		\
 	linux/sh/userent0.h		\
+	linux/sh64/arch_regs.h		\
 	linux/sh64/ioctls_arch0.h	\
 	linux/sh64/ioctls_inc0.h	\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
 	linux/signalent.h		\
 	linux/sock_diag.h		\
+	linux/sparc/arch_regs.h		\
 	linux/sparc/dummy2.h		\
 	linux/sparc/errnoent.h		\
 	linux/sparc/errnoent1.h		\
@@ -290,6 +301,7 @@ EXTRA_DIST =				\
 	linux/sparc/syscallent.h	\
 	linux/sparc/syscallent1.h	\
 	linux/sparc/userent.h		\
+	linux/sparc64/arch_regs.h	\
 	linux/sparc64/dummy2.h		\
 	linux/sparc64/errnoent.h	\
 	linux/sparc64/errnoent1.h	\
@@ -309,6 +321,7 @@ EXTRA_DIST =				\
 	linux/sparc64/userent.h		\
 	linux/subcall.h			\
 	linux/syscall.h			\
+	linux/tile/arch_regs.h		\
 	linux/tile/errnoent1.h		\
 	linux/tile/ioctls_arch0.h	\
 	linux/tile/ioctls_arch1.h	\
@@ -333,6 +346,7 @@ EXTRA_DIST =				\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
 	linux/x32/userent.h		\
+	linux/x86_64/arch_regs.h	\
 	linux/x86_64/errnoent1.h	\
 	linux/x86_64/errnoent2.h	\
 	linux/x86_64/gentab.pl		\

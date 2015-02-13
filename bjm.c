@@ -34,7 +34,6 @@
 #include <sys/wait.h>
 #include <sys/resource.h>
 #include <sys/utsname.h>
-#include <sys/user.h>
 
 /* Bits of module.flags.  */
 

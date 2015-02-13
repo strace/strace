@@ -32,7 +32,6 @@
  */
 
 #include "defs.h"
-#include <sys/user.h>
 #include <sys/param.h>
 #include <fcntl.h>
 #if HAVE_SYS_XATTR_H
@@ -40,16 +39,8 @@
 #endif
 #include <sys/uio.h>
 
-#if defined(IA64)
-# include <asm/ptrace_offsets.h>
-# include <asm/rse.h>
-#endif
-
-#ifdef HAVE_SYS_REG_H
-# include <sys/reg.h>
-#endif
-
 #include "ptrace.h"
+#include "regs.h"
 
 int
 string_to_uint(const char *str)
