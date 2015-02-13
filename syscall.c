@@ -791,6 +791,8 @@ static struct user_regs_struct arc_regs;
 # define ARCH_REGS_FOR_GETREGSET arc_regs
 #endif
 
+static long get_regs_error;
+
 void
 print_pc(struct tcb *tcp)
 {
@@ -1017,8 +1019,11 @@ static int powerpc_getregs_old(pid_t pid)
 }
 #endif
 
-#ifndef get_regs
-long get_regs_error;
+void
+clear_regs(void)
+{
+	get_regs_error = -1;
+}
 
 #if defined ARCH_REGS_FOR_GETREGSET
 static long
@@ -1116,7 +1121,6 @@ get_regs(pid_t pid)
 	get_regs_error = 0;
 #endif
 }
-#endif /* !get_regs */
 
 /* Returns:
  * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.

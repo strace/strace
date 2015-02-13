@@ -457,25 +457,9 @@ extern int trace_syscall(struct tcb *);
 extern void count_syscall(struct tcb *, const struct timeval *);
 extern void call_summary(FILE *);
 
-#if defined(AVR32) \
- || defined(I386) \
- || defined(X86_64) || defined(X32) \
- || defined(AARCH64) \
- || defined(ARM) \
- || defined(SPARC) || defined(SPARC64) \
- || defined(TILE) \
- || defined(OR1K) \
- || defined(METAG) \
- || defined(ARC) \
- || defined(POWERPC)
-extern long get_regs_error;
-# define clear_regs()  (get_regs_error = -1)
+extern void clear_regs(void);
 extern void get_regs(pid_t pid);
-#else
-# define get_regs_error 0
-# define clear_regs()  ((void)0)
-# define get_regs(pid) ((void)0)
-#endif
+
 extern int umoven(struct tcb *, long, unsigned int, char *);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (char *) (objp))
