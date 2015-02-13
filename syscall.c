@@ -699,6 +699,8 @@ uint32_t *const i386_esp_ptr = &i386_regs.esp;
 static struct iovec x86_io = {
 	.iov_base = &x86_regs_union
 };
+# define ARCH_REGS_FOR_GETREGSET x86_regs_union
+# define ARCH_IOVEC_FOR_GETREGSET x86_io
 #elif defined(IA64)
 bool ia64_ia32mode = 0; /* not static */
 static long ia64_r8, ia64_r10;
@@ -741,6 +743,8 @@ static union {
 static struct iovec aarch64_io = {
 	.iov_base = &arm_regs_union
 };
+# define ARCH_REGS_FOR_GETREGSET arm_regs_union
+# define ARCH_IOVEC_FOR_GETREGSET aarch64_io
 #elif defined(ALPHA)
 static long alpha_r0;
 static long alpha_a3;
@@ -1010,38 +1014,33 @@ static int powerpc_getregs_old(pid_t pid)
 #ifndef get_regs
 long get_regs_error;
 
-static void get_regset(pid_t pid)
+#if defined ARCH_REGS_FOR_GETREGSET
+static long
+get_regset(pid_t pid)
 {
-/* constant iovec */
-# if defined(METAG) \
-  || defined(OR1K) \
-  || defined(ARC)
+# ifdef ARCH_IOVEC_FOR_GETREGSET
+	/* variable iovec */
+	ARCH_IOVEC_FOR_GETREGSET.iov_len = sizeof(ARCH_REGS_FOR_GETREGSET);
+	return ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS,
+		      &ARCH_IOVEC_FOR_GETREGSET);
+# else
+	/* constant iovec */
 	static struct iovec io = {
 		.iov_base = &ARCH_REGS_FOR_GETREGSET,
 		.iov_len = sizeof(ARCH_REGS_FOR_GETREGSET)
 	};
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &io);
+	return ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &io);
 
-/* variable iovec */
-# elif defined(X86_64) || defined(X32)
-	/* x86_io.iov_base = &x86_regs_union; - already is */
-	x86_io.iov_len = sizeof(x86_regs_union);
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &x86_io);
-# elif defined(AARCH64)
-	/* aarch64_io.iov_base = &arm_regs_union; - already is */
-	aarch64_io.iov_len = sizeof(arm_regs_union);
-	get_regs_error = ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &aarch64_io);
-# else
-#  warning both PTRACE_GETREGSET and NT_PRSTATUS are available but not yet used
 # endif
 }
+#endif /* ARCH_REGS_FOR_GETREGSET */
 
 void
 get_regs(pid_t pid)
 {
 /* PTRACE_GETREGSET only */
 # if defined(METAG) || defined(OR1K) || defined(X32) || defined(AARCH64) || defined(ARC)
-	get_regset(pid);
+	get_regs_error = get_regset(pid);
 
 /* PTRACE_GETREGS only */
 # elif defined(ARM)
@@ -1070,7 +1069,7 @@ get_regs(pid_t pid)
 	static int getregset_support;
 
 	if (getregset_support >= 0) {
-		get_regset(pid);
+		get_regs_error = get_regset(pid);
 		if (getregset_support > 0)
 			return;
 		if (get_regs_error >= 0) {
