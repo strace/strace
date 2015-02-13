@@ -2149,20 +2149,14 @@ trace_syscall_entering(struct tcb *tcp)
 static int
 get_syscall_result(struct tcb *tcp)
 {
-#if defined(S390) || defined(S390X)
+#if defined ARCH_REGS_FOR_GETREGSET || defined ARCH_REGS_FOR_GETREGS
+	/* already done by get_regs */
+#elif defined(S390) || defined(S390X)
 	if (upeek(tcp->pid, PT_GPR2, &s390_gpr2) < 0)
 		return -1;
-#elif defined(POWERPC)
-	/* already done by get_regs */
-#elif defined(AVR32)
-	/* already done by get_regs */
 #elif defined(BFIN)
 	if (upeek(tcp->pid, PT_R0, &bfin_r0) < 0)
 		return -1;
-#elif defined(I386)
-	/* already done by get_regs */
-#elif defined(X86_64) || defined(X32)
-	/* already done by get_regs */
 #elif defined(IA64)
 #	define IA64_PSR_IS	((long)1 << 34)
 	long psr;
@@ -2172,16 +2166,6 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 	if (upeek(tcp->pid, PT_R10, &ia64_r10) < 0)
 		return -1;
-#elif defined(ARM)
-	/* already done by get_regs */
-#elif defined(AARCH64)
-	/* register reading already done by get_regs */
-
-	/* Used to do this, but we did it on syscall entry already: */
-	/* We are in 64-bit mode (personality 1) if register struct is aarch64_regs,
-	 * else it's personality 0.
-	 */
-	/*update_personality(tcp, aarch64_io.iov_len == sizeof(aarch64_regs));*/
 #elif defined(M68K)
 	if (upeek(tcp->pid, 4*PT_D0, &m68k_d0) < 0)
 		return -1;
@@ -2202,8 +2186,6 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 	if (upeek(tcp->pid, REG_R0, &alpha_r0) < 0)
 		return -1;
-#elif defined(SPARC) || defined(SPARC64)
-	/* already done by get_regs */
 #elif defined(HPPA)
 	if (upeek(tcp->pid, PT_GR28, &hppa_r28) < 0)
 		return -1;
@@ -2218,20 +2200,14 @@ get_syscall_result(struct tcb *tcp)
 #elif defined(CRISV10) || defined(CRISV32)
 	if (upeek(tcp->pid, 4*PT_R10, &cris_r10) < 0)
 		return -1;
-#elif defined(TILE)
-	/* already done by get_regs */
 #elif defined(MICROBLAZE)
 	if (upeek(tcp->pid, 3 * 4, &microblaze_r3) < 0)
 		return -1;
-#elif defined(OR1K)
-	/* already done by get_regs */
-#elif defined(METAG)
-	/* already done by get_regs */
 #elif defined(XTENSA)
 	if (upeek(tcp->pid, REG_A_BASE + 2, &xtensa_a2) < 0)
 		return -1;
-#elif defined(ARC)
-	/* already done by get_regs */
+#else
+# error get_syscall_result is not implemented for this architecture
 #endif
 	return 1;
 }
