@@ -663,7 +663,6 @@ getrval2(struct tcb *tcp)
 static struct user_regs_struct i386_regs;
 /* Cast suppresses signedness warning (.esp is long, not unsigned long) */
 uint32_t *const i386_esp_ptr = (uint32_t*)&i386_regs.esp;
-# define ARCH_REGS_FOR_GETREGSET i386_regs
 #elif defined(X86_64) || defined(X32)
 /*
  * On i386, pt_regs and user_regs_struct are the same,
@@ -711,7 +710,6 @@ static long m68k_d0;
 static long bfin_r0;
 #elif defined(ARM)
 struct pt_regs arm_regs; /* not static */
-# define ARCH_REGS_FOR_GETREGSET arm_regs
 #elif defined(AARCH64)
 struct arm_pt_regs {
         int uregs[18];
@@ -1015,9 +1013,7 @@ long get_regs_error;
 static void get_regset(pid_t pid)
 {
 /* constant iovec */
-# if defined(ARM) \
-  || defined(I386) \
-  || defined(METAG) \
+# if defined(METAG) \
   || defined(OR1K) \
   || defined(ARC)
 	static struct iovec io = {
@@ -1048,8 +1044,12 @@ get_regs(pid_t pid)
 	get_regset(pid);
 
 /* PTRACE_GETREGS only */
+# elif defined(ARM)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &arm_regs);
 # elif defined(AVR32)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &avr32_regs);
+# elif defined(I386)
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &i386_regs);
 # elif defined(TILE)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &tile_regs);
 # elif defined(SPARC) || defined(SPARC64)
@@ -1081,11 +1081,7 @@ get_regs(pid_t pid)
 			return;
 		getregset_support = -1;
 	}
-#  if defined(ARM)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &arm_regs);
-#  elif defined(I386)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &i386_regs);
-#  elif defined(X86_64)
+#  if defined(X86_64)
 	/* Use old method, with unreliable heuristical detection of 32-bitness. */
 	x86_io.iov_len = sizeof(x86_64_regs);
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
@@ -1115,7 +1111,7 @@ get_regs(pid_t pid)
 	}
 #  else
 #   error unhandled architecture
-#  endif /* ARM || I386 || X86_64 */
+#  endif /* X86_64 */
 # endif
 }
 #endif /* !get_regs */
