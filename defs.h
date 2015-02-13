@@ -150,23 +150,6 @@ extern char *stpcpy(char *dst, const char *src);
  */
 #define USE_CUSTOM_PRINTF 0
 
-#ifdef NEED_PTRACE_PROTOTYPE_WORKAROUND
-# define ptrace xptrace
-# include <sys/ptrace.h>
-# undef ptrace
-extern long ptrace(int, int, char *, long);
-#else
-# include <sys/ptrace.h>
-#endif
-
-#if defined(POWERPC)
-# include <asm/ptrace.h>
-#endif
-
-#if defined(TILE)
-# include <asm/ptrace.h>  /* struct pt_regs */
-#endif
-
 #ifndef ERESTARTSYS
 # define ERESTARTSYS    512
 #endif
@@ -179,70 +162,6 @@ extern long ptrace(int, int, char *, long);
 #ifndef ERESTART_RESTARTBLOCK
 # define ERESTART_RESTARTBLOCK 516
 #endif
-
-#if !HAVE_DECL_PTRACE_SETOPTIONS
-# define PTRACE_SETOPTIONS	0x4200
-#endif
-#if !HAVE_DECL_PTRACE_GETEVENTMSG
-# define PTRACE_GETEVENTMSG	0x4201
-#endif
-#if !HAVE_DECL_PTRACE_GETSIGINFO
-# define PTRACE_GETSIGINFO	0x4202
-#endif
-
-#if !HAVE_DECL_PTRACE_O_TRACESYSGOOD
-# define PTRACE_O_TRACESYSGOOD	0x00000001
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEFORK
-# define PTRACE_O_TRACEFORK	0x00000002
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEVFORK
-# define PTRACE_O_TRACEVFORK	0x00000004
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACECLONE
-# define PTRACE_O_TRACECLONE	0x00000008
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEEXEC
-# define PTRACE_O_TRACEEXEC	0x00000010
-#endif
-#if !HAVE_DECL_PTRACE_O_TRACEEXIT
-# define PTRACE_O_TRACEEXIT	0x00000040
-#endif
-
-#if !HAVE_DECL_PTRACE_EVENT_FORK
-# define PTRACE_EVENT_FORK	1
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_VFORK
-# define PTRACE_EVENT_VFORK	2
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_CLONE
-# define PTRACE_EVENT_CLONE	3
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_EXEC
-# define PTRACE_EVENT_EXEC	4
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_VFORK_DONE
-# define PTRACE_EVENT_VFORK_DONE	5
-#endif
-#if !HAVE_DECL_PTRACE_EVENT_EXIT
-# define PTRACE_EVENT_EXIT	6
-#endif
-
-#if !HAVE_DECL_PTRACE_PEEKUSER
-# define PTRACE_PEEKUSER PTRACE_PEEKUSR
-#endif
-#if !HAVE_DECL_PTRACE_POKEUSER
-# define PTRACE_POKEUSER PTRACE_POKEUSR
-#endif
-
-#undef PTRACE_SEIZE
-#define PTRACE_SEIZE		0x4206
-#undef PTRACE_INTERRUPT
-#define PTRACE_INTERRUPT	0x4207
-#undef PTRACE_LISTEN
-#define PTRACE_LISTEN		0x4208
-#undef PTRACE_EVENT_STOP
-#define PTRACE_EVENT_STOP	128
 
 #ifdef ALPHA
 # define REG_R0 0

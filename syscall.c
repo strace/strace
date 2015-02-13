@@ -39,22 +39,7 @@
 # include <sys/reg.h>
 #endif
 
-#ifdef HAVE_LINUX_PTRACE_H
-# undef PTRACE_SYSCALL
-# ifdef HAVE_STRUCT_IA64_FPREG
-#  define ia64_fpreg XXX_ia64_fpreg
-# endif
-# ifdef HAVE_STRUCT_PT_ALL_USER_REGS
-#  define pt_all_user_regs XXX_pt_all_user_regs
-# endif
-# ifdef HAVE_STRUCT_PTRACE_PEEKSIGINFO_ARGS
-#  define ptrace_peeksiginfo_args XXX_ptrace_peeksiginfo_args
-# endif
-# include <linux/ptrace.h>
-# undef ptrace_peeksiginfo_args
-# undef ia64_fpreg
-# undef pt_all_user_regs
-#endif
+#include "ptrace.h"
 
 #if defined(SPARC64)
 # undef PTRACE_GETREGS
@@ -73,14 +58,6 @@
 /* for NT_PRSTATUS */
 #ifdef HAVE_ELF_H
 # include <elf.h>
-#endif
-
-#if defined(AARCH64)
-# include <asm/ptrace.h>
-#endif
-
-#if defined(XTENSA)
-# include <asm/ptrace.h>
 #endif
 
 #ifndef NSIG

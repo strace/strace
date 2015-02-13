@@ -47,22 +47,7 @@
 # include <sys/reg.h>
 #endif
 
-#ifdef HAVE_LINUX_PTRACE_H
-# undef PTRACE_SYSCALL
-# ifdef HAVE_STRUCT_IA64_FPREG
-#  define ia64_fpreg XXX_ia64_fpreg
-# endif
-# ifdef HAVE_STRUCT_PT_ALL_USER_REGS
-#  define pt_all_user_regs XXX_pt_all_user_regs
-# endif
-# ifdef HAVE_STRUCT_PTRACE_PEEKSIGINFO_ARGS
-#  define ptrace_peeksiginfo_args XXX_ptrace_peeksiginfo_args
-# endif
-# include <linux/ptrace.h>
-# undef ptrace_peeksiginfo_args
-# undef ia64_fpreg
-# undef pt_all_user_regs
-#endif
+#include "ptrace.h"
 
 #if defined(SPARC64)
 # define r_pc r_tpc
@@ -115,14 +100,12 @@ sys_ptrace(struct tcb *tcp)
 			else
 				tprintf("%s, ", x->str);
 		} else
-#ifdef PTRACE_GETREGSET
 		if (tcp->u_arg[0] == PTRACE_GETREGSET
 		 || tcp->u_arg[0] == PTRACE_SETREGSET
 		) {
 			printxval(nt_descriptor_types, tcp->u_arg[2], "NT_???");
 			tprints(", ");
 		} else
-#endif
 			tprintf("%#lx, ", addr);
 
 
@@ -139,29 +122,20 @@ sys_ptrace(struct tcb *tcp)
 		case PTRACE_DETACH:
 			printsignal(tcp->u_arg[3]);
 			break;
-#ifdef PTRACE_SETOPTIONS
 		case PTRACE_SETOPTIONS:
 			printflags(ptrace_setoptions_flags, tcp->u_arg[3], "PTRACE_O_???");
 			break;
-#endif
-#ifdef PTRACE_SETSIGINFO
 		case PTRACE_SETSIGINFO: {
 			printsiginfo_at(tcp, tcp->u_arg[3]);
 			break;
 		}
-#endif
-#ifdef PTRACE_GETSIGINFO
-		case PTRACE_GETSIGINFO:
-			/* Don't print anything, do it at syscall return. */
-			break;
-#endif
-#ifdef PTRACE_GETREGSET
-		case PTRACE_GETREGSET:
-			break;
 		case PTRACE_SETREGSET:
 			tprint_iov(tcp, /*len:*/ 1, tcp->u_arg[3], /*as string:*/ 0);
 			break;
-#endif
+		case PTRACE_GETSIGINFO:
+		case PTRACE_GETREGSET:
+			/* Don't print anything, do it at syscall return. */
+			break;
 		default:
 			tprintf("%#lx", tcp->u_arg[3]);
 			break;
@@ -177,17 +151,13 @@ sys_ptrace(struct tcb *tcp)
 			printnum(tcp, tcp->u_arg[3], "%#lx");
 			break;
 #endif
-#ifdef PTRACE_GETSIGINFO
 		case PTRACE_GETSIGINFO: {
 			printsiginfo_at(tcp, tcp->u_arg[3]);
 			break;
 		}
-#endif
-#ifdef PTRACE_GETREGSET
 		case PTRACE_GETREGSET:
 			tprint_iov(tcp, /*len:*/ 1, tcp->u_arg[3], /*as string:*/ 0);
 			break;
-#endif
 		}
 	}
 	return 0;

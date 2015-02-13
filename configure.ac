@@ -229,7 +229,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/input.h
 	linux/mmtimer.h
 	linux/perf_event.h
-	linux/ptrace.h
 	linux/seccomp.h
 	linux/utsname.h
 	mqueue.h
@@ -243,7 +242,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/filio.h
 	sys/ioctl.h
 	sys/poll.h
-	sys/ptrace.h
 	sys/reg.h
 	sys/vfs.h
 	sys/xattr.h
@@ -288,23 +286,8 @@ AC_CHECK_HEADERS([libaio.h], [
 
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS(m4_normalize([
-	PTRACE_EVENT_CLONE,
-	PTRACE_EVENT_EXEC,
-	PTRACE_EVENT_EXIT,
-	PTRACE_EVENT_FORK,
-	PTRACE_EVENT_VFORK,
-	PTRACE_EVENT_VFORK_DONE,
-	PTRACE_GETEVENTMSG,
-	PTRACE_GETSIGINFO,
-	PTRACE_O_TRACECLONE,
-	PTRACE_O_TRACEEXEC,
-	PTRACE_O_TRACEEXIT,
-	PTRACE_O_TRACEFORK,
-	PTRACE_O_TRACESYSGOOD,
-	PTRACE_O_TRACEVFORK,
 	PTRACE_PEEKUSER,
-	PTRACE_POKEUSER,
-	PTRACE_SETOPTIONS
+	PTRACE_POKEUSER
 ]),,, [#include <sys/ptrace.h>])
 
 AC_CHECK_DECLS(m4_normalize([

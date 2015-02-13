@@ -33,6 +33,7 @@
 # define W_CONTINUED 0xffff
 #endif
 
+#include "ptrace.h"
 #include "xlat/ptrace_events.h"
 
 static int

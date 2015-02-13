@@ -45,6 +45,9 @@
 #if defined(IA64)
 # include <asm/ptrace_offsets.h>
 #endif
+
+#include "ptrace.h"
+
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
 extern int optind;
