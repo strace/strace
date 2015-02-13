@@ -1012,7 +1012,6 @@ static int powerpc_getregs_old(pid_t pid)
 #ifndef get_regs
 long get_regs_error;
 
-#if defined(PTRACE_GETREGSET) && defined(NT_PRSTATUS)
 static void get_regset(pid_t pid)
 {
 /* constant iovec */
@@ -1040,7 +1039,6 @@ static void get_regset(pid_t pid)
 #  warning both PTRACE_GETREGSET and NT_PRSTATUS are available but not yet used
 # endif
 }
-#endif /* PTRACE_GETREGSET && NT_PRSTATUS */
 
 void
 get_regs(pid_t pid)
@@ -1069,7 +1067,6 @@ get_regs(pid_t pid)
 
 /* try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS */
 # else
-#  if defined(PTRACE_GETREGSET) && defined(NT_PRSTATUS)
 	static int getregset_support;
 
 	if (getregset_support >= 0) {
@@ -1084,7 +1081,6 @@ get_regs(pid_t pid)
 			return;
 		getregset_support = -1;
 	}
-#  endif /* PTRACE_GETREGSET && NT_PRSTATUS */
 #  if defined(ARM)
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &arm_regs);
 #  elif defined(I386)
