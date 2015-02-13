@@ -663,6 +663,7 @@ getrval2(struct tcb *tcp)
 static struct user_regs_struct i386_regs;
 /* Cast suppresses signedness warning (.esp is long, not unsigned long) */
 uint32_t *const i386_esp_ptr = (uint32_t*)&i386_regs.esp;
+# define ARCH_REGS_FOR_GETREGS i386_regs
 #elif defined(X86_64) || defined(X32)
 /*
  * On i386, pt_regs and user_regs_struct are the same,
@@ -706,12 +707,14 @@ bool ia64_ia32mode = 0; /* not static */
 static long ia64_r8, ia64_r10;
 #elif defined(POWERPC)
 struct pt_regs ppc_regs;
+# define ARCH_REGS_FOR_GETREGS ppc_regs
 #elif defined(M68K)
 static long m68k_d0;
 #elif defined(BFIN)
 static long bfin_r0;
 #elif defined(ARM)
 struct pt_regs arm_regs; /* not static */
+# define ARCH_REGS_FOR_GETREGS arm_regs
 #elif defined(AARCH64)
 struct arm_pt_regs {
         int uregs[18];
@@ -750,8 +753,10 @@ static long alpha_r0;
 static long alpha_a3;
 #elif defined(AVR32)
 static struct pt_regs avr32_regs;
+# define ARCH_REGS_FOR_GETREGS avr32_regs
 #elif defined(SPARC) || defined(SPARC64)
 struct pt_regs sparc_regs; /* not static */
+# define ARCH_REGS_FOR_GETREGS sparc_regs
 #elif defined(LINUX_MIPSN32)
 static long long mips_a3;
 static long long mips_r2;
@@ -770,6 +775,7 @@ static long sh64_r9;
 static long cris_r10;
 #elif defined(TILE)
 struct pt_regs tile_regs;
+# define ARCH_REGS_FOR_GETREGS tile_regs
 #elif defined(MICROBLAZE)
 static long microblaze_r3;
 #elif defined(OR1K)
@@ -1038,34 +1044,9 @@ get_regset(pid_t pid)
 void
 get_regs(pid_t pid)
 {
-/* PTRACE_GETREGSET only */
-# if defined(METAG) || defined(OR1K) || defined(X32) || defined(AARCH64) || defined(ARC)
-	get_regs_error = get_regset(pid);
-
-/* PTRACE_GETREGS only */
-# elif defined(ARM)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &arm_regs);
-# elif defined(AVR32)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &avr32_regs);
-# elif defined(I386)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &i386_regs);
-# elif defined(TILE)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &tile_regs);
-# elif defined(SPARC) || defined(SPARC64)
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&sparc_regs, 0);
-# elif defined(POWERPC)
-	static bool old_kernel = 0;
-	if (old_kernel)
-		goto old;
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, (long) &ppc_regs);
-	if (get_regs_error && errno == EIO) {
-		old_kernel = 1;
- old:
-		get_regs_error = powerpc_getregs_old(pid);
-	}
-
-/* try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS */
-# else
+#ifdef ARCH_REGS_FOR_GETREGSET
+# ifdef X86_64
+	/* Try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS. */
 	static int getregset_support;
 
 	if (getregset_support >= 0) {
@@ -1080,7 +1061,6 @@ get_regs(pid_t pid)
 			return;
 		getregset_support = -1;
 	}
-#  if defined(X86_64)
 	/* Use old method, with unreliable heuristical detection of 32-bitness. */
 	x86_io.iov_len = sizeof(x86_64_regs);
 	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
@@ -1108,10 +1088,33 @@ get_regs(pid_t pid)
 		i386_regs.esp = x86_64_regs.rsp;
 		/* i386_regs.xss = x86_64_regs.ss; */
 	}
-#  else
-#   error unhandled architecture
-#  endif /* X86_64 */
+# else /* !X86_64 */
+	/* Assume that PTRACE_GETREGSET works. */
+	get_regs_error = get_regset(pid);
 # endif
+#elif defined ARCH_REGS_FOR_GETREGS
+# if defined SPARC || defined SPARC64
+	/* SPARC systems have the meaning of data and addr reversed */
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&ARCH_REGS_FOR_GETREGS, 0);
+# elif defined POWERPC
+	static bool old_kernel = 0;
+	if (old_kernel)
+		goto old;
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &ARCH_REGS_FOR_GETREGS);
+	if (get_regs_error && errno == EIO) {
+		old_kernel = 1;
+ old:
+		get_regs_error = powerpc_getregs_old(pid);
+	}
+# else
+	/* Assume that PTRACE_GETREGS works. */
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &ARCH_REGS_FOR_GETREGS);
+# endif
+
+#else /* !ARCH_REGS_FOR_GETREGSET && !ARCH_REGS_FOR_GETREGS */
+#  warning get_regs is not implemented for this architecture yet
+	get_regs_error = 0;
+#endif
 }
 #endif /* !get_regs */
 
