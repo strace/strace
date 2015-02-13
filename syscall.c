@@ -36,10 +36,6 @@
 
 /* for struct iovec */
 #include <sys/uio.h>
-/* for NT_PRSTATUS */
-#ifdef HAVE_ELF_H
-# include <elf.h>
-#endif
 
 #include "ptrace.h"
 
@@ -56,6 +52,10 @@
 # include <asm/psrcompat.h>
 #elif defined SPARC
 # include <asm/psr.h>
+#endif
+
+#ifndef NT_PRSTATUS
+# define NT_PRSTATUS 1
 #endif
 
 #ifndef NSIG
