@@ -253,6 +253,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/mmtimer.h
 	linux/perf_event.h
 	linux/seccomp.h
+	linux/securebits.h
 	linux/utsname.h
 	mqueue.h
 	netinet/sctp.h
