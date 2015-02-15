@@ -866,27 +866,17 @@ sys_sigreturn(struct tcb *tcp)
 	/* This decodes rt_sigreturn.  The 64-bit ABIs do not have
 	   sigreturn.  */
 	if (entering(tcp)) {
-		long sp;
 		struct ucontext uc;
-		if (upeek(tcp->pid, REG_SP, &sp) < 0)
-			return 0;
 		/* There are six words followed by a 128-byte siginfo.  */
-		sp = sp + 6 * 4 + 128;
+		long sp = mips_REG_SP + 6 * 4 + 128;
 		if (umove(tcp, sp, &uc) < 0)
 			return 0;
 		tprintsigmask_val(") (mask ", uc.uc_sigmask);
 	}
-#elif defined(MIPS)
+#elif defined(LINUX_MIPSO32)
 	if (entering(tcp)) {
-		long sp;
-		struct pt_regs regs;
 		m_siginfo_t si;
-		if (ptrace(PTRACE_GETREGS, tcp->pid, (char *)&regs, 0) < 0) {
-			perror_msg("sigreturn: PTRACE_GETREGS");
-			return 0;
-		}
-		sp = regs.regs[29];
-		if (umove(tcp, sp, &si) < 0)
+		if (umove(tcp, mips_REG_SP, &si) < 0)
 			return 0;
 		tprintsigmask_val(") (mask ", si.si_mask);
 	}

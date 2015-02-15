@@ -756,12 +756,10 @@ static struct pt_regs avr32_regs;
 #elif defined(SPARC) || defined(SPARC64)
 struct pt_regs sparc_regs; /* not static */
 # define ARCH_REGS_FOR_GETREGS sparc_regs
-#elif defined(LINUX_MIPSN32)
-static long long mips_a3;
-static long long mips_r2;
 #elif defined(MIPS)
-static long mips_a3;
-static long mips_r2;
+struct mips_regs mips_regs; /* not static */
+/* PTRACE_GETREGS on MIPS is available since linux v2.6.15. */
+# define ARCH_REGS_FOR_GETREGS mips_regs
 #elif defined(S390) || defined(S390X)
 static long s390_gpr2;
 #elif defined(HPPA)
@@ -865,13 +863,10 @@ print_pc(struct tcb *tcp)
 		return;
 	}
 	tprintf("[%08lx] ", pc);
-#elif defined(MIPS)
-	long pc;
-	if (upeek(tcp->pid, REG_EPC, &pc) < 0) {
-		tprints("[????????] ");
-		return;
-	}
-	tprintf("[%08lx] ", pc);
+#elif defined LINUX_MIPSN64
+	tprintf("[%016lx] ", mips_REG_EPC);
+#elif defined MIPS
+	tprintf("[%08lx] ", (unsigned long) mips_REG_EPC);
 #elif defined(SH)
 	long pc;
 	if (upeek(tcp->pid, 4*REG_PC, &pc) < 0) {
@@ -1406,30 +1401,11 @@ get_scno(struct tcb *tcp)
 #elif defined(M68K)
 	if (upeek(tcp->pid, 4*PT_ORIG_D0, &scno) < 0)
 		return -1;
-#elif defined(LINUX_MIPSN32)
-	unsigned long long regs[38];
-
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
-		return -1;
-	mips_a3 = regs[REG_A3];
-	mips_r2 = regs[REG_V0];
-
-	scno = mips_r2;
-	if (!SCNO_IN_RANGE(scno)) {
-		if (mips_a3 == 0 || mips_a3 == -1) {
-			if (debug_flag)
-				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
-			return 0;
-		}
-	}
 #elif defined(MIPS)
-	if (upeek(tcp->pid, REG_A3, &mips_a3) < 0)
-		return -1;
-	if (upeek(tcp->pid, REG_V0, &scno) < 0)
-		return -1;
+	scno = mips_REG_V0;
 
 	if (!SCNO_IN_RANGE(scno)) {
-		if (mips_a3 == 0 || mips_a3 == -1) {
+		if (mips_REG_A3 == 0 || mips_REG_A3 == -1) {
 			if (debug_flag)
 				fprintf(stderr, "stray syscall exit: v0 = %ld\n", scno);
 			return 0;
@@ -1858,34 +1834,35 @@ get_syscall_args(struct tcb *tcp)
 			tcp->u_arg[i] &= 0xffffffff;
 		}
 	}
-#elif defined(LINUX_MIPSN32) || defined(LINUX_MIPSN64)
-	/* N32 and N64 both use up to six registers.  */
-	unsigned long long regs[38];
-
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
-		return -1;
-
-	for (i = 0; i < nargs; ++i) {
-		tcp->u_arg[i] = regs[REG_A0 + i];
-# if defined(LINUX_MIPSN32)
-		tcp->ext_arg[i] = regs[REG_A0 + i];
-# endif
-	}
-#elif defined(MIPS)
+#elif defined LINUX_MIPSN64
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = mips_REG_A0;
+	tcp->u_arg[1] = mips_REG_A1;
+	tcp->u_arg[2] = mips_REG_A2;
+	tcp->u_arg[3] = mips_REG_A3;
+	tcp->u_arg[4] = mips_REG_A4;
+	tcp->u_arg[5] = mips_REG_A5;
+#elif defined LINUX_MIPSN32
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = tcp->ext_arg[0] = mips_REG_A0;
+	tcp->u_arg[1] = tcp->ext_arg[1] = mips_REG_A1;
+	tcp->u_arg[2] = tcp->ext_arg[2] = mips_REG_A2;
+	tcp->u_arg[3] = tcp->ext_arg[3] = mips_REG_A3;
+	tcp->u_arg[4] = tcp->ext_arg[4] = mips_REG_A4;
+	tcp->u_arg[5] = tcp->ext_arg[5] = mips_REG_A5;
+#elif defined LINUX_MIPSO32
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = mips_REG_A0;
+	tcp->u_arg[1] = mips_REG_A1;
+	tcp->u_arg[2] = mips_REG_A2;
+	tcp->u_arg[3] = mips_REG_A3;
 	if (nargs > 4) {
-		long sp;
-
-		if (upeek(tcp->pid, REG_SP, &sp) < 0)
-			return -1;
-		for (i = 0; i < 4; ++i)
-			if (upeek(tcp->pid, REG_A0 + i, &tcp->u_arg[i]) < 0)
-				return -1;
-		umoven(tcp, sp + 16, (nargs - 4) * sizeof(tcp->u_arg[0]),
+		umoven(tcp, mips_REG_SP + 4 * 4,
+		       (nargs - 4) * sizeof(tcp->u_arg[0]),
 		       (char *)(tcp->u_arg + 4));
-	} else {
-		for (i = 0; i < nargs; ++i)
-			if (upeek(tcp->pid, REG_A0 + i, &tcp->u_arg[i]) < 0)
-				return -1;
 	}
 #elif defined(POWERPC)
 	(void)i;
@@ -2168,18 +2145,6 @@ get_syscall_result(struct tcb *tcp)
 #elif defined(M68K)
 	if (upeek(tcp->pid, 4*PT_D0, &m68k_d0) < 0)
 		return -1;
-#elif defined(LINUX_MIPSN32)
-	unsigned long long regs[38];
-
-	if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long) &regs) < 0)
-		return -1;
-	mips_a3 = regs[REG_A3];
-	mips_r2 = regs[REG_V0];
-#elif defined(MIPS)
-	if (upeek(tcp->pid, REG_A3, &mips_a3) < 0)
-		return -1;
-	if (upeek(tcp->pid, REG_V0, &mips_r2) < 0)
-		return -1;
 #elif defined(ALPHA)
 	if (upeek(tcp->pid, REG_A3, &alpha_a3) < 0)
 		return -1;
@@ -2302,14 +2267,14 @@ get_error(struct tcb *tcp)
 		}
 	}
 #elif defined(MIPS)
-	if (check_errno && mips_a3) {
+	if (check_errno && mips_REG_A3) {
 		tcp->u_rval = -1;
-		u_error = mips_r2;
+		u_error = mips_REG_V0;
 	} else {
-		tcp->u_rval = mips_r2;
-# if defined(LINUX_MIPSN32)
-		tcp->u_lrval = mips_r2;
+# if defined LINUX_MIPSN32
+		tcp->u_lrval = mips_REG_V0;
 # endif
+		tcp->u_rval = mips_REG_V0;
 	}
 #elif defined(POWERPC)
 	if (check_errno && (ppc_regs.ccr & 0x10000000)) {
