@@ -1,1 +1,1 @@
-#include "i386/arch_regs.h"
+extern uint32_t *const i386_esp_ptr;

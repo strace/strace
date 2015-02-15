@@ -1,1 +1,1 @@
-extern uint32_t *const i386_esp_ptr;
+extern long *const i386_esp_ptr;
