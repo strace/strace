@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Check -i option.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+OUT="$LOG.out"
+
+./pc > /dev/null ||
+	framework_skip_ 'munmap/fork/wait do not behave as expected'
+
+args="-if ./pc"
+$STRACE $args > "$OUT" 2> "$LOG" || {
+	cat "$LOG"
+	fail_ "$STRACE $args does not work"
+}
+
+len="$(sed -n 's/^\[[[:xdigit:]]\+\] write(-1, NULL, \([[:digit:]]\{1,2\}\))[[:space:]]\+= -1 .*/\1/p' "$LOG")" &&
+[ -n "$len" ] &&
+pid="$(sed -n 's/^\[[[:xdigit:]]\{'"$len"'\}\] --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_KILLED, si_pid=\([[:digit:]]\+\), .*/\1/p' "$LOG")" &&
+[ -n "$pid" ] &&
+ip="$(sed -n 's/^\[pid \+'"$pid"'\] \[\([[:xdigit:]]\{'"$len"'\}\)] --- SIGSEGV {.*} ---$/\1/p' "$LOG")" &&
+[ -n "$ip" ] &&
+addr="$(echo "$ip" |sed 's/^0\+//')" &&
+[ -n "$addr" ] || {
+	cat "$LOG"
+	fail_ "$STRACE $args output mismatch"
+}
+
+grep_log()
+{
+	LC_ALL=C grep -x -e "$*" < "$LOG" > /dev/null || {
+		cat "$LOG"
+		fail_ "$STRACE $args output mismatch"
+	}
+}
+
+grep_log '\[[[:xdigit:]]\{'"$len"'\}\] munmap(0x[[:xdigit:]]\+, 0)[[:space:]]\+= -1 .*'
+grep_log '\[pid \+'"$pid"'\] \['"$ip"'\] --- SIGSEGV {si_signo=SIGSEGV, si_code=SEGV_MAPERR, si_addr=0x'"$addr"'} ---'
+grep_log '\[pid \+'"$pid"'\] \[?\{'"$len"'\}\] +++ killed by SIGSEGV +++'
+grep_log '\[?\{'"$len"'\}\] +++ exited with 0 +++'
+
+rm -f "$OUT"
+
+exit 0

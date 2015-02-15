@@ -793,140 +793,138 @@ static long get_regs_error;
 void
 print_pc(struct tcb *tcp)
 {
-#define PRINTBADPC tprintf(sizeof(long) == 4 ? "[????????] " : \
-			   sizeof(long) == 8 ? "[????????????????] " : \
-			   NULL /* crash */)
+	const char *fmt;
+	const char *bad;
+
+#if SUPPORTED_PERSONALITIES > 1
+# define pc_wordsize personality_wordsize[tcp->currpers]
+#else
+# define pc_wordsize current_wordsize
+#endif
+
+	if (pc_wordsize == 4) {
+		fmt = "[%08lx] ";
+		bad = "[????????] ";
+	} else {
+		fmt = "[%016lx] ";
+		bad = "[????????????????] ";
+	}
+
+#undef pc_wordsize
+#define PRINTBADPC tprints(bad)
+
 	if (get_regs_error) {
 		PRINTBADPC;
 		return;
 	}
+
 #if defined(I386)
-	tprintf("[%08lx] ", i386_regs.eip);
+	tprintf(fmt, i386_regs.eip);
+#elif defined(X86_64) || defined(X32)
+	if (x86_io.iov_len == sizeof(i386_regs))
+		tprintf(fmt, (unsigned long) i386_regs.eip);
+	else
+		tprintf(fmt, (unsigned long) x86_64_regs.rip);
 #elif defined(S390) || defined(S390X)
 	long psw;
 	if (upeek(tcp->pid, PT_PSWADDR, &psw) < 0) {
 		PRINTBADPC;
 		return;
 	}
-# ifdef S390
-	tprintf("[%08lx] ", psw);
-# elif S390X
-	tprintf("[%016lx] ", psw);
-# endif
-#elif defined(X86_64) || defined(X32)
-	if (x86_io.iov_len == sizeof(i386_regs)) {
-		tprintf("[%08x] ", (unsigned) i386_regs.eip);
-	} else {
-# if defined(X86_64)
-		tprintf("[%016lx] ", (unsigned long) x86_64_regs.rip);
-# elif defined(X32)
-		/* Note: this truncates 64-bit rip to 32 bits */
-		tprintf("[%08lx] ", (unsigned long) x86_64_regs.rip);
-# endif
-	}
+	tprintf(fmt, psw);
 #elif defined(IA64)
 	long ip;
 	if (upeek(tcp->pid, PT_B0, &ip) < 0) {
 		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", ip);
+	tprintf(fmt, ip);
 #elif defined(POWERPC)
-	long pc = ppc_regs.nip;
-# ifdef POWERPC64
-	tprintf("[%016lx] ", pc);
-# else
-	tprintf("[%08lx] ", pc);
-# endif
+	tprintf(fmt, ppc_regs.nip);
 #elif defined(M68K)
 	long pc;
 	if (upeek(tcp->pid, 4*PT_PC, &pc) < 0) {
-		tprints("[????????] ");
+		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(ALPHA)
 	long pc;
 	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
-		tprints("[????????????????] ");
+		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(SPARC)
-	tprintf("[%08lx] ", sparc_regs.pc);
+	tprintf(fmt, sparc_regs.pc);
 #elif defined(SPARC64)
-	tprintf("[%08lx] ", sparc_regs.tpc);
+	tprintf(fmt, sparc_regs.tpc);
 #elif defined(HPPA)
 	long pc;
 	if (upeek(tcp->pid, PT_IAOQ0, &pc) < 0) {
-		tprints("[????????] ");
+		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
-#elif defined LINUX_MIPSN64
-	tprintf("[%016lx] ", mips_REG_EPC);
+	tprintf(fmt, pc);
 #elif defined MIPS
-	tprintf("[%08lx] ", (unsigned long) mips_REG_EPC);
+	tprintf(fmt, (unsigned long) mips_REG_EPC);
 #elif defined(SH)
 	long pc;
 	if (upeek(tcp->pid, 4*REG_PC, &pc) < 0) {
-		tprints("[????????] ");
+		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(SH64)
 	long pc;
 	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
-		tprints("[????????????????] ");
+		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(ARM)
-	tprintf("[%08lx] ", arm_regs.ARM_pc);
-#elif defined(AARCH64)
-	/* tprintf("[%016lx] ", aarch64_regs.regs[???]); */
+	tprintf(fmt, arm_regs.ARM_pc);
 #elif defined(AVR32)
-	tprintf("[%08lx] ", avr32_regs.pc);
+	tprintf(fmt, avr32_regs.pc);
 #elif defined(BFIN)
 	long pc;
 	if (upeek(tcp->pid, PT_PC, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(CRISV10)
 	long pc;
 	if (upeek(tcp->pid, 4*PT_IRP, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(CRISV32)
 	long pc;
 	if (upeek(tcp->pid, 4*PT_ERP, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(TILE)
-# ifdef _LP64
-	tprintf("[%016lx] ", (unsigned long) tile_regs.pc);
-# else
-	tprintf("[%08lx] ", (unsigned long) tile_regs.pc);
-# endif
+	tprintf(fmt, (unsigned long) tile_regs.pc);
 #elif defined(OR1K)
-	tprintf("[%08lx] ", or1k_regs.pc);
+	tprintf(fmt, or1k_regs.pc);
 #elif defined(METAG)
-	tprintf("[%08lx] ", metag_regs.pc);
+	tprintf(fmt, metag_regs.pc);
 #elif defined(XTENSA)
 	long pc;
 	if (upeek(tcp->pid, REG_PC, &pc) < 0) {
 		PRINTBADPC;
 		return;
 	}
-	tprintf("[%08lx] ", pc);
+	tprintf(fmt, pc);
 #elif defined(ARC)
-	tprintf("[%08lx] ", arc_regs.efa);
+	tprintf(fmt, arc_regs.efa);
+#else
+# warning print_pc is not implemented for this architecture
+	PRINTBADPC;
 #endif /* architecture */
 }
 

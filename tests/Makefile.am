@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	net-accept-connect \
 	netlink_inet_diag \
 	netlink_unix_diag \
+	pc \
 	scm_rights \
 	select \
 	set_ptracer_any \
@@ -60,6 +61,7 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	net-yy.test \
+	pc.test \
 	sun_path.test \
 	unix-yy.test \
 	uid.test \

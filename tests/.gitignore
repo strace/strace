@@ -10,6 +10,7 @@ mmsg
 net-accept-connect
 netlink_inet_diag
 netlink_unix_diag
+pc
 scm_rights
 select
 set_ptracer_any
