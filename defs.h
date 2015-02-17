@@ -507,8 +507,8 @@ extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr(struct tcb *, long, long);
-extern void printnum(struct tcb *, long, const char *);
 extern void printnum_int(struct tcb *, long, const char *);
+extern void printnum_long(struct tcb *, long, const char *);
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))

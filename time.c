@@ -157,7 +157,7 @@ int
 sys_time(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
-		printnum(tcp, tcp->u_arg[0], "%ld");
+		printnum_long(tcp, tcp->u_arg[0], "%ld");
 	}
 	return 0;
 }

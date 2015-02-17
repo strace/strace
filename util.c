@@ -376,7 +376,7 @@ printflags(const struct xlat *xlat, int flags, const char *dflt)
 }
 
 void
-printnum(struct tcb *tcp, long addr, const char *fmt)
+printnum_long(struct tcb *tcp, long addr, const char *fmt)
 {
 	long num;
 

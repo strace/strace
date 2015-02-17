@@ -131,7 +131,7 @@ sys_ptrace(struct tcb *tcp)
 #ifdef IA64
 			return RVAL_HEX;
 #else
-			printnum(tcp, tcp->u_arg[3], "%#lx");
+			printnum_long(tcp, tcp->u_arg[3], "%#lx");
 			break;
 #endif
 		case PTRACE_GETSIGINFO: {
