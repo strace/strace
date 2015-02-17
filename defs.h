@@ -491,7 +491,8 @@ extern int print_quoted_string(const char *, unsigned int, unsigned int);
 	((long long)((unsigned long long)(unsigned)(b) | ((unsigned long long)(a)<<32)))
 #endif
 extern int getllval(struct tcb *, unsigned long long *, int);
-extern int printllval(struct tcb *, const char *, int);
+extern int printllval(struct tcb *, const char *, int)
+	__attribute__ ((format (printf, 2, 0)));
 
 extern void printxval(const struct xlat *, const unsigned int, const char *);
 extern int printargs(struct tcb *);
@@ -507,8 +508,10 @@ extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr(struct tcb *, long, long);
-extern void printnum_int(struct tcb *, long, const char *);
-extern void printnum_long(struct tcb *, long, const char *);
+extern void printnum_int(struct tcb *, long, const char *)
+	__attribute__ ((format (printf, 3, 0)));
+extern void printnum_long(struct tcb *, long, const char *)
+	__attribute__ ((format (printf, 3, 0)));
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))
