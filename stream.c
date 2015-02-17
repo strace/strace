@@ -190,7 +190,7 @@ sys_getpmsg(struct tcb *tcp)
 		for (i = 1; i < 3; i++)
 			printstrbufarg(tcp, tcp->u_arg[i], 1);
 		/* pointer to band */
-		printnum(tcp, tcp->u_arg[3], "%d");
+		printnum_int(tcp, tcp->u_arg[3], "%d");
 		tprints(", ");
 		/* pointer to flags */
 		if (tcp->u_arg[4] == 0)

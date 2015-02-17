@@ -117,7 +117,7 @@ sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 #ifdef SIOCATMARK
 	case SIOCATMARK:
 #endif
-		printnum(tcp, arg, ", %#d");
+		printnum_int(tcp, arg, ", %#d");
 	case SIOCSIFNAME:
 		return 1;
 	case SIOCGIFNAME:
