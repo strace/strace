@@ -1,21 +1,8 @@
 /* The Linux userspace headers didn't export these for a long time. */
 
-#ifndef TFD_TIMER_ABSTIME
-# define TFD_TIMER_ABSTIME (1 << 0)
+TFD_TIMER_ABSTIME (1 << 0)
+TFD_TIMER_CANCEL_ON_SET (1 << 1)
+#ifdef O_CLOEXEC
+TFD_CLOEXEC O_CLOEXEC
 #endif
-TFD_TIMER_ABSTIME
-
-#ifndef TFD_TIMER_CANCEL_ON_SET
-# define TFD_TIMER_CANCEL_ON_SET (1 << 1)
-#endif
-TFD_TIMER_CANCEL_ON_SET
-
-#if !defined TFD_CLOEXEC && defined O_CLOEXEC
-# define TFD_CLOEXEC O_CLOEXEC
-#endif
-TFD_CLOEXEC
-
-#ifndef TFD_NONBLOCK
-# define TFD_NONBLOCK O_NONBLOCK
-#endif
-TFD_NONBLOCK
+TFD_NONBLOCK O_NONBLOCK

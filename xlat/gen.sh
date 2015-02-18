@@ -1,6 +1,7 @@
 #!/bin/sh
 
-usage() {
+usage()
+{
 	cat <<EOF
 Usage: $0 <input> <output>
 
@@ -10,7 +11,41 @@ EOF
 	exit 1
 }
 
-gen_header() {
+cond_xlat()
+{
+	local line val m def xlat
+	line="$1"; shift
+
+	val="$(printf %s "${line}" | sed -n 's/^\([^[:space:]]\+\).*$/\1/p')"
+	m="${val%%|*}"
+	def="$(printf %s "${line}" |
+	       sed -n 's/^[^[:space:]]\+[[:space:]]\+\([^[:space:]].*\)$/\1/p')"
+
+	if [ "${m}" = "${m#1<<}" ]; then
+		xlat="XLAT(${val}),"
+	else
+		m="${m#1<<}"
+		xlat=" { ${val}, \"${m}\" },"
+	fi
+
+	if [ -z "${def}" ]; then
+		cat <<-EOF
+		#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})
+		 ${xlat}
+		#endif
+		EOF
+	else
+		cat <<-EOF
+		#if !(defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m}))
+		# define ${m} ${def}
+		#endif
+		 ${xlat}
+		EOF
+	fi
+}
+
+gen_header()
+{
 	local input="$1" output="$2" name="$3"
 	echo "generating ${output}"
 	(
@@ -38,23 +73,22 @@ gen_header() {
 			unterminated=1
 			;;
 		[A-Z_]*)	# symbolic constants
-			local m="${line%%|*}"
-			[ -n "${unconditional}" ] ||
-				echo "#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})"
-			echo "	XLAT(${line}),"
-			[ -n "${unconditional}" ] ||
-				echo "#endif"
+			if [ -n "${unconditional}" ]; then
+				echo " XLAT(${line}),"
+			else
+				cond_xlat "${line}"
+			fi
 			;;
 		'1<<'[A-Z_]*)	# symbolic constants with shift
-			local m="${line#1<<}"
-			[ -n "${unconditional}" ] ||
-				echo "#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})"
-			echo "	{ ${line}, \"${m}\" },"
-			[ -n "${unconditional}" ] ||
-				echo "#endif"
+			m="${line%% *}"
+			if [ -n "${unconditional}" ]; then
+				echo " { ${line}, \"${line#1<<}\" },"
+			else
+				cond_xlat "${line}"
+			fi
 			;;
 		[0-9]*)	# numeric constants
-			echo "	XLAT(${line}),"
+			echo " XLAT(${line}),"
 			;;
 		*)	# verbatim lines
 			echo "${line}"
@@ -62,15 +96,16 @@ gen_header() {
 		esac
 	done < "${input}"
 	if [ -n "${unterminated}" ]; then
-		echo "  /* this array should remain not NULL-terminated */"
+		echo " /* this array should remain not NULL-terminated */"
 	else
-		echo "	XLAT_END"
+		echo " XLAT_END"
 	fi
 	echo "};"
 	) >"${output}"
 }
 
-gen_make() {
+gen_make()
+{
 	local output="$1"
 	local name
 	shift
@@ -90,7 +125,8 @@ gen_make() {
 	) >"${output}"
 }
 
-gen_git() {
+gen_git()
+{
 	local output="$1"
 	shift
 	echo "generating ${output}"
@@ -100,7 +136,8 @@ gen_git() {
 	) >"${output}"
 }
 
-main() {
+main()
+{
 	case $# in
 	0) set -- "${0%/*}" "${0%/*}" ;;
 	2) ;;
