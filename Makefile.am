@@ -33,6 +33,8 @@ strace_SOURCES =	\
 	block.c		\
 	cacheflush.c	\
 	capability.c	\
+	caps0.h		\
+	caps1.h		\
 	chdir.c		\
 	chmod.c		\
 	clone.c		\
