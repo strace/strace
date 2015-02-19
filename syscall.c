@@ -1584,12 +1584,8 @@ typedef unsigned long kernel_ulong_t;
 static inline bool
 is_negated_errno(kernel_ulong_t val)
 {
-	/*
-	 * Thanks to SECCOMP_RET_DATA == 0xffff, abnormally large errno
-	 * values could be easily seen when a seccomp filter is used, e.g.
-	 * BPF_STMT(BPF_RET, SECCOMP_RET_ERRNO | SECCOMP_RET_DATA)
-	 */
-	kernel_ulong_t max = -(kernel_long_t) 0x10000; /* SECCOMP_RET_DATA + 1 */
+	/* Linux kernel defines MAX_ERRNO to 4095. */
+	kernel_ulong_t max = -(kernel_long_t) 4095;
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize < sizeof(val)) {
@@ -1608,7 +1604,7 @@ is_negated_errno(kernel_ulong_t val)
 	}
 #endif
 
-	return val > max;
+	return val >= max;
 }
 
 /* Called at each syscall entry.
