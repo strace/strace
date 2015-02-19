@@ -219,7 +219,6 @@ EXTRA_DIST =				\
 	linux/ia64/syscallent.h		\
 	linux/ia64/userent.h		\
 	linux/inet_diag.h		\
-	linux/kexec.h			\
 	linux/keyctl.h			\
 	linux/m68k/ioctls_arch0.h	\
 	linux/m68k/ioctls_inc0.h	\
