@@ -1,8 +1,14 @@
 #include "defs.h"
-#include <linux/fanotify.h>
 
 #include "xlat/fan_classes.h"
 #include "xlat/fan_init_flags.h"
+
+#ifndef FAN_ALL_CLASS_BITS
+# define FAN_ALL_CLASS_BITS (FAN_CLASS_NOTIF | FAN_CLASS_CONTENT | FAN_CLASS_PRE_CONTENT)
+#endif
+#ifndef FAN_NOFD
+# define FAN_NOFD -1
+#endif
 
 int
 sys_fanotify_init(struct tcb *tcp)

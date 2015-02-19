@@ -199,7 +199,6 @@ EXTRA_DIST =				\
 	linux/crisv32/userent.h		\
 	linux/dummy.h			\
 	linux/errnoent.h		\
-	linux/fanotify.h		\
 	linux/hppa/arch_regs.h		\
 	linux/hppa/errnoent.h		\
 	linux/hppa/ioctls_arch0.h	\
