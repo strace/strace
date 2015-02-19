@@ -266,7 +266,6 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
 	linux/ptp_clock.h		\
-	linux/reboot.h			\
 	linux/s390/ioctls_arch0.h	\
 	linux/s390/ioctls_inc0.h	\
 	linux/s390/syscallent.h		\
