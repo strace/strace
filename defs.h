@@ -551,6 +551,7 @@ extern void ioctl_print_code(const unsigned int);
 extern int ioctl_decode(struct tcb *, const unsigned int, long);
 extern int ioctl_decode_command_number(const unsigned int);
 extern int block_ioctl(struct tcb *, const unsigned int, long);
+extern int evdev_ioctl(struct tcb *, const unsigned int, long);
 extern int loop_ioctl(struct tcb *, const unsigned int, long);
 extern int mtd_ioctl(struct tcb *, const unsigned int, long);
 extern int ptp_ioctl(struct tcb *, const unsigned int, long);

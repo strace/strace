@@ -254,6 +254,10 @@ ioctl_decode(struct tcb *tcp, unsigned int code, long arg)
 		return v4l2_ioctl(tcp, code, arg);
 	case '=':
 		return ptp_ioctl(tcp, code, arg);
+#ifdef HAVE_LINUX_INPUT_H
+	case 'E':
+		return evdev_ioctl(tcp, code, arg);
+#endif
 	default:
 		break;
 	}
