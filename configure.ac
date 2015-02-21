@@ -249,7 +249,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/falloc.h
 	linux/filter.h
 	linux/hiddev.h
-	linux/input.h
 	linux/mmtimer.h
 	linux/perf_event.h
 	linux/seccomp.h
@@ -306,6 +305,10 @@ AC_CHECK_TYPES([struct flock64],,, [#include <fcntl.h>])
 AC_CHECK_HEADERS([libaio.h], [
 	AC_CHECK_MEMBERS([struct iocb.u.c.flags],,, [#include <libaio.h>])
 	AC_CHECK_DECLS([IO_CMD_PWRITE, IO_CMD_PWRITEV],,, [#include <libaio.h>])
+])
+
+AC_CHECK_HEADERS([linux/input.h], [
+	AC_CHECK_MEMBERS([struct input_absinfo.resolution],,, [#include <linux/input.h>])
 ])
 
 AC_CHECK_DECLS([sys_errlist])

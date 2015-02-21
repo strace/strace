@@ -44,6 +44,10 @@
 #include "xlat/evdev_switch.h"
 #include "xlat/evdev_sync.h"
 
+#ifndef SYN_MAX
+# define SYN_MAX 0xf
+#endif
+
 static void
 decode_envelope(struct ff_envelope *envelope)
 {
@@ -139,8 +143,10 @@ abs_ioctl(struct tcb *tcp, long arg)
 	if (!abbrev(tcp)) {
 		tprintf(", maximum=%" PRIu32 ", fuzz=%" PRIu32,
 			absinfo.maximum, absinfo.fuzz);
-		tprintf(", flat=%" PRIu32 ", resolution=%" PRIu32,
-			absinfo.flat, absinfo.resolution);
+		tprintf(", flat=%" PRIu32, absinfo.flat);
+#ifdef HAVE_STRUCT_INPUT_ABSINFO_RESOLUTION
+		tprintf(", resolution=%" PRIu32, absinfo.resolution);
+#endif
 		tprints("}");
 	} else {
 		tprints(", ...}");
@@ -167,6 +173,7 @@ keycode_ioctl(struct tcb *tcp, long arg)
 	return 1;
 }
 
+#ifdef EVIOCGKEYCODE_V2
 static int
 keycode_V2_ioctl(struct tcb *tcp, long arg)
 {
@@ -195,6 +202,7 @@ keycode_V2_ioctl(struct tcb *tcp, long arg)
 	}
 	return 1;
 }
+#endif /* EVIOCGKEYCODE_V2 */
 
 static int
 getid_ioctl(struct tcb *tcp, long arg)
@@ -257,6 +265,7 @@ decode_bitset(struct tcb *tcp, long arg, const struct xlat decode_nr[],
 	return 1;
 }
 
+#ifdef EVIOCGMTSLOTS
 static int
 mtslots_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
@@ -281,7 +290,9 @@ mtslots_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 	tprints("]}");
 	return 1;
 }
+#endif /* EVIOCGMTSLOTS */
 
+#ifdef EVIOCGREP
 static int
 repeat_ioctl(struct tcb *tcp, long arg)
 {
@@ -293,6 +304,7 @@ repeat_ioctl(struct tcb *tcp, long arg)
 	tprintf(", [%" PRIu32 " %" PRIu32 "]", val[0], val[1]);
 	return 1;
 }
+#endif /* EVIOCGREP */
 
 static int
 evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
@@ -320,9 +332,11 @@ evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			case EV_MSC:
 				return decode_bitset(tcp, arg,
 						evdev_misc, MSC_MAX, "MSC_???");
+#ifdef EV_SW
 			case EV_SW:
 				return decode_bitset(tcp, arg,
 						evdev_switch, SW_MAX, "SW_???");
+#endif
 			case EV_LED:
 				return decode_bitset(tcp, arg,
 						evdev_leds, LED_MAX, "LED_???");
@@ -360,32 +374,42 @@ evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			return 1;
 		case EVIOCGID:
 			return getid_ioctl(tcp, arg);
+#ifdef EVIOCGREP
 		case EVIOCGREP:
 			return repeat_ioctl(tcp, arg);;
+#endif
 		case EVIOCGKEYCODE:
 			return keycode_ioctl(tcp, arg);
+#ifdef EVIOCGKEYCODE_V2
 		case EVIOCGKEYCODE_V2:
 			return keycode_V2_ioctl(tcp, arg);
+#endif
 	}
 
 	switch (_IOC_NR(code)) {
+#ifdef EVIOCGMTSLOTS
 		case _IOC_NR(EVIOCGMTSLOTS(0)):
 			return mtslots_ioctl(tcp, code, arg);
+#endif
 		case _IOC_NR(EVIOCGNAME(0)):
 		case _IOC_NR(EVIOCGPHYS(0)):
 		case _IOC_NR(EVIOCGUNIQ(0)):
 			tprints(", ");
 			printstr(tcp, arg, tcp->u_rval - 1);
 			return 1;
+#ifdef EVIOCGPROP
 		case _IOC_NR(EVIOCGPROP(0)):
 			return decode_bitset(tcp, arg,
 					evdev_prop, INPUT_PROP_MAX, "PROP_???");
+#endif
 		case _IOC_NR(EVIOCGSND(0)):
 			return decode_bitset(tcp, arg,
 					evdev_snd, SND_MAX, "SND_???");
+#ifdef EVIOCGSW
 		case _IOC_NR(EVIOCGSW(0)):
 			return decode_bitset(tcp, arg,
 					evdev_switch, SW_MAX, "SW_???");
+#endif
 		case _IOC_NR(EVIOCGKEY(0)):
 			return decode_bitset(tcp, arg,
 					evdev_keycode, KEY_MAX, "KEY_???");
@@ -407,18 +431,26 @@ evdev_write_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		return abs_ioctl(tcp, arg);
 
 	switch (code) {
+#ifdef EVIOCSREP
 		case EVIOCSREP:
 			return repeat_ioctl(tcp, arg);
+#endif
 		case EVIOCSKEYCODE:
 			return keycode_ioctl(tcp, arg);
+#ifdef EVIOCSKEYCODE_V2
 		case EVIOCSKEYCODE_V2:
 			return keycode_V2_ioctl(tcp, arg);
+#endif
 		case EVIOCSFF:
 			return ff_effect_ioctl(tcp, arg);
 		case EVIOCRMFF:
+#ifdef EVIOCSCLOCKID
 		case EVIOCSCLOCKID:
+#endif
 		case EVIOCGRAB:
+#ifdef EVIOCREVOKE
 		case EVIOCREVOKE:
+#endif
 			tprints(", ");
 			printnum_int(tcp, arg, "%u");
 			return 1;
