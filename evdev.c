@@ -178,7 +178,6 @@ static int
 keycode_V2_ioctl(struct tcb *tcp, long arg)
 {
 	struct input_keymap_entry ike;
-	unsigned i;
 
 	if (!arg) {
 		tprints(", NULL");
@@ -188,15 +187,19 @@ keycode_V2_ioctl(struct tcb *tcp, long arg)
 	if (!verbose(tcp) || umove(tcp, arg, &ike) < 0)
 		return 0;
 
-	tprintf(", {flags=%" PRIu8 ", len=%" PRIu8,
-		ike.flags, ike.len);
+	tprintf(", {flags=%" PRIu8 ", len=%" PRIu8, ike.flags, ike.len);
 	if (!abbrev(tcp)) {
-		tprintf(", index=%" PRIu16 ", keycode=%" PRIu32,
-			ike.index, ike.keycode);
-		tprints(", scancode={");
-		for (i = 0; i < ARRAY_SIZE(ike.scancode); i++)
-			tprintf(" %" PRIx8, ike.scancode[i]);
-		tprints("}}");
+		unsigned int i;
+
+		tprintf(", index=%" PRIu16 ", keycode=", ike.index);
+		printxval(evdev_keycode, ike.keycode, "KEY_???");
+		tprints(", scancode=[");
+		for (i = 0; i < ARRAY_SIZE(ike.scancode); i++) {
+			if (i > 0)
+				tprints(", ");
+			tprintf("%" PRIx8, ike.scancode[i]);
+		}
+		tprints("]}");
 	} else {
 		tprints(", ...}");
 	}
