@@ -31,6 +31,7 @@
 
 #include <stdint.h>
 #include <sys/ioctl.h>
+#include <linux/types.h>
 #include <linux/videodev2.h>
 /* some historical constants */
 #ifndef V4L2_CID_HCENTER
@@ -353,11 +354,13 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		if (entering(tcp)
 		    || (exiting(tcp) && tcp->auxstr && !syserror(tcp))) {
 			tprints(exiting(tcp) ? " => " : ", {id=");
+#ifdef V4L2_CTRL_FLAG_NEXT_CTRL
 			tcp->auxstr = (c.id & V4L2_CTRL_FLAG_NEXT_CTRL) ? "" : NULL;
 			if (tcp->auxstr) {
 				tprints("V4L2_CTRL_FLAG_NEXT_CTRL|");
 				c.id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
 			}
+#endif
 			printxval(v4l2_control_ids, c.id, "V4L2_CID_???");
 		}
 		if (exiting(tcp)) {
@@ -395,6 +398,7 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		return 1;
 	}
 
+#ifdef VIDIOC_S_EXT_CTRLS
 	case VIDIOC_S_EXT_CTRLS:
 	case VIDIOC_TRY_EXT_CTRLS:
 	case VIDIOC_G_EXT_CTRLS: {
@@ -431,7 +435,7 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			}
 			tprints("{id=");
 			printxval(v4l2_control_ids, ctrl.id, "V4L2_CID_???");
-#if HAVE_DECL_V4L2_CTRL_TYPE_STRING
+# if HAVE_DECL_V4L2_CTRL_TYPE_STRING
 			tprintf(", size=%u", ctrl.size);
 			if (ctrl.size > 0) {
 				if (must_print_values) {
@@ -439,7 +443,7 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 					printstr(tcp, (long) ctrl.string, ctrl.size);
 				}
 			} else
-#endif
+# endif
 			{
 				if (must_print_values) {
 					tprintf(", value=%i, value64=%lli", ctrl.value,
@@ -451,6 +455,7 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		tprints("]}");
 		return 1;
 	}
+#endif /* VIDIOC_S_EXT_CTRLS */
 
 	case VIDIOC_ENUMSTD: {
 		struct v4l2_standard s;

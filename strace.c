@@ -2030,7 +2030,7 @@ interrupt(int sig)
 }
 
 static void
-print_debug_info(const int pid, const int status)
+print_debug_info(const int pid, int status)
 {
 	const unsigned int event = (unsigned int) status >> 16;
 	char buf[sizeof("WIFEXITED,exitcode=%u") + sizeof(int)*3 /*paranoia:*/ + 16];
@@ -2077,7 +2077,7 @@ print_debug_info(const int pid, const int status)
 }
 
 static struct tcb *
-maybe_allocate_tcb(const int pid, const int status)
+maybe_allocate_tcb(const int pid, int status)
 {
 	if (!WIFSTOPPED(status)) {
 		if (detach_on_execve && pid == strace_child) {
@@ -2160,7 +2160,7 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 }
 
 static void
-print_signalled(struct tcb *tcp, const int pid, const int status)
+print_signalled(struct tcb *tcp, const int pid, int status)
 {
 	if (pid == strace_child) {
 		exit_code = 0x100 | WTERMSIG(status);
@@ -2184,7 +2184,7 @@ print_signalled(struct tcb *tcp, const int pid, const int status)
 }
 
 static void
-print_exited(struct tcb *tcp, const int pid, const int status)
+print_exited(struct tcb *tcp, const int pid, int status)
 {
 	if (pid == strace_child) {
 		exit_code = WEXITSTATUS(status);

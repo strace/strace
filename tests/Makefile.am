@@ -1,6 +1,10 @@
 # Automake input for strace tests.
 
 AM_CFLAGS = $(WARN_CFLAGS)
+AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
+	      -I$(top_srcdir)/$(OS)/$(ARCH) \
+	      -I$(top_builddir)/$(OS) \
+	      -I$(top_srcdir)/$(OS)
 
 check_PROGRAMS = \
 	caps \
