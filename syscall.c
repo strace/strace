@@ -2636,13 +2636,12 @@ trace_syscall_exiting(struct tcb *tcp)
 			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
 			break;
 		default:
-			if (u_error < 0)
-				tprintf("= -1 E??? (errno %ld)", u_error);
-			else if ((unsigned long) u_error < nerrnos)
+			if ((unsigned long) u_error < nerrnos
+			    && errnoent[u_error])
 				tprintf("= -1 %s (%s)", errnoent[u_error],
 					strerror(u_error));
 			else
-				tprintf("= -1 ERRNO_%ld (%s)", u_error,
+				tprintf("= -1 ERRNO_%lu (%s)", u_error,
 					strerror(u_error));
 			break;
 		}

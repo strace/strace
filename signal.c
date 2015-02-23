@@ -411,11 +411,12 @@ printsiginfo(const siginfo_t *sip, int verbose)
 #endif
 	{
 		if (sip->si_errno) {
-			if (sip->si_errno < 0 || (unsigned) sip->si_errno >= nerrnos)
-				tprintf(", si_errno=%d", sip->si_errno);
+			tprints(", si_errno=");
+			if ((unsigned) sip->si_errno < nerrnos
+			    && errnoent[sip->si_errno])
+				tprints(errnoent[sip->si_errno]);
 			else
-				tprintf(", si_errno=%s",
-					errnoent[sip->si_errno]);
+				tprintf("%d", sip->si_errno);
 		}
 #ifdef SI_FROMUSER
 		if (SI_FROMUSER(sip)) {

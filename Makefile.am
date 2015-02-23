@@ -248,10 +248,12 @@ EXTRA_DIST =				\
 	linux/or1k/userent.h		\
 	linux/personality.h		\
 	linux/powerpc/arch_regs.h	\
+	linux/powerpc/errnoent.h	\
 	linux/powerpc/ioctls_arch0.h	\
 	linux/powerpc/ioctls_inc0.h	\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/userent.h		\
+	linux/powerpc64/errnoent.h	\
 	linux/powerpc64/errnoent1.h	\
 	linux/powerpc64/ioctls_arch0.h	\
 	linux/powerpc64/ioctls_arch1.h	\

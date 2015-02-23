@@ -25,16 +25,14 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 awk '
-/^#define[ 	]+E[A-Z0-9_]+[ 	]+[0-9]+/ {
+$1 == "#define" && $2 ~ /^E[A-Z0-9_]+$/ && $3 ~ /^[0-9]+$/ {
 	errno[$3] = $2
 	if ($3 > max)
 		max = $3
 }
 END {
-	for (i = 0; i <= max; i++) {
-		if (!errno[i])
-			errno[i] = "ERRNO_" i
-		printf "\t\"%s\", /* %d */\n", errno[i], i
-	}
+	for (i = 0; i <= max; i++)
+		if (errno[i])
+			printf("[%3d] = \"%s\",\n", i, errno[i])
 }
-' $*
+' "$@"
