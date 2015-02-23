@@ -253,6 +253,7 @@ EXTRA_DIST =				\
 	linux/powerpc/ioctls_inc0.h	\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/userent.h		\
+	linux/powerpc64/arch_regs.h	\
 	linux/powerpc64/errnoent.h	\
 	linux/powerpc64/errnoent1.h	\
 	linux/powerpc64/ioctls_arch0.h	\
