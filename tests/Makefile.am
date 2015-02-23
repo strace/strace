@@ -87,6 +87,7 @@ EXTRA_DIST = init.sh run.sh \
 	     dumpio.expected \
 	     getdents.awk \
 	     getdents.out \
+	     getrandom.awk \
 	     mmsg.expected \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
