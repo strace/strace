@@ -796,10 +796,10 @@ print_pc(struct tcb *tcp)
 	const char *fmt;
 	const char *bad;
 
-#if SUPPORTED_PERSONALITIES > 1
-# define pc_wordsize personality_wordsize[tcp->currpers]
-#else
+#ifdef current_wordsize
 # define pc_wordsize current_wordsize
+#else
+# define pc_wordsize personality_wordsize[tcp->currpers]
 #endif
 
 	if (pc_wordsize == 4) {
