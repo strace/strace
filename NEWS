@@ -1,5 +1,68 @@
-Noteworthy changes in release ?.? (????-??-??)
+Noteworthy changes in release 4.10 (????-??-??)
 ==============================================
+
+* Improvements
+  * Added -yy option to print protocol and address information associated with
+    socket descriptors.
+  * Extended "-e read=set" and "-e write=set" options to cover sendmsg,
+    recvmsg, sendmmsg, and recvmmsg syscalls.
+  * Implemented full 32-bit decoding of ioctl commands
+    (addresses Fedora bug #902788).
+  * Implemented PTRACE_GETREGS API support on MIPS.
+  * Implemented decoding of getrandom and seccomp syscalls.
+  * Implemented full decoding of 64-bit capability sets.
+  * Implemented decoding of all prctl commands.
+  * Implemented decoding of parametrized ioctl commands.
+  * Implemented decoding of evdev ioctl commands.
+  * Implemented decoding of v4l ioctl commands.
+  * Implemented decoding of SG_IO v4 ioctl commands.
+  * Implemented decoding of FIFREEZE/FITHAW/FITRIM ioctl commands.
+  * Implemented decoding of FALLOC_FL_* fallocate flags.
+  * Enhanced socket decoder to support bluetooth sockets.
+  * Enhanced decoding of unlisted ioctl commands.
+  * Enhanced decoding of getsockopt and setsockopt syscall.
+  * Enhanced decoding of sysinfo syscall.
+  * Enhanced decoding of struct cmsghdr.
+  * Enhanced decoding of wait status.
+  * Enhanced aio support on non-x86 architectures by using external libaio.h.
+  * Added O_TMPFILE to the list of recognized open mode flags.
+  * Updated the list of filesystem type constants that is used in decoding
+    statfs family syscalls.
+  * Updated lists of CAP_*, PR_*, PTRACE_*, SCHED_*, SO_*, SOL_*, SWAP_FLAG_*,
+    and TFD_* constants.
+  * Updated lists of signal constants from Linux 3.19.
+  * Updated lists of errno constants from Linux 3.19.
+  * Updated lists of ioctl commands from Linux 3.9.
+  * Added new syscall entries to match Linux 3.19.
+
+* Bug fixes
+  * Fixed various errors in mapping between syscall numbers and associated
+    information like the number of syscall arguments, the name of syscall,
+    and syscall decoder.
+  * Fixed quoting issues in printing descriptors, filenames, network interface
+    names, struct utsname members, device/volume names of BLK* ioctl commands.
+  * Fixed uid_t/git_t decoding.
+  * Fixed potential out-of-bounds read issues in getdents/getdents64 decoders.
+  * Fixed potential open flags truncation on some architectures.
+  * Fixed decoding of struct ifreq.ifr_name.
+  * Fixed decoding of SIOCSIFNAME ioctl command.
+  * Fixed decoding of RENAME_* renameat2 flags.
+  * Fixed decoding of UTIME_NOW/UTIME_OMIT timeval structures.
+  * Fixed decoding of indirect ipc subcalls on some architectures.
+  * Fixed decoding of fanotify_mark syscall on 32-bit architectures.
+  * Fixed decoding of 32-bit stat structures on 64-bit architectures.
+  * Fixed decoding of 32-bit struct cmsghdr on 64-bit architectures.
+  * Fixed decoding of 32-bit preadv/pwritev offset on 64-bit architectures.
+  * Fixed instruction pointer output (-i option) on architectures that support
+    several personalities.
+  * Fixed behaviour of "-e read=set" and "-e write=set" when read and write
+    sets intersect.
+  * Fixed build on systems where struct sigaction has no sa_restorer member.
+  * Fixed build with uclibc and musl libc.
+
+* Portability
+  * Linux kernel >= 2.5.46 is required.
+    Older versions without a decent PTRACE_SETOPTIONS support will not work.
 
 Noteworthy changes in release 4.9 (2014-08-15)
 ==============================================
