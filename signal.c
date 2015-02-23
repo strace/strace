@@ -735,9 +735,10 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		tprintsigmask_addr(") (mask ", sc.oldmask);
 	}
-#elif defined(I386) || defined(X86_64)
-# if defined(X86_64)
-	if (current_personality == 0) /* 64-bit */
+#elif defined I386 || defined X86_64 || defined X32
+# ifndef I386
+	/* sys_sigreturn is i386 personality only */
+	if (current_personality != 1)
 		return 0;
 # endif
 	if (entering(tcp)) {
