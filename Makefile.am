@@ -332,7 +332,6 @@ EXTRA_DIST =				\
 	linux/unix_diag.h		\
 	linux/userent.h			\
 	linux/userent0.h		\
-	linux/x32/errnoent.h		\
 	linux/x32/errnoent1.h		\
 	linux/x32/ioctls_arch0.h	\
 	linux/x32/ioctls_arch1.h	\
