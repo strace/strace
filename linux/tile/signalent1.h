@@ -1,2 +1,2 @@
 /* tilegx32/tilepro */
-#include "../signalent.h"
+#include "signalent.h"

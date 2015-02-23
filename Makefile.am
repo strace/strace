@@ -339,7 +339,6 @@ EXTRA_DIST =				\
 	linux/x32/ioctls_arch1.h	\
 	linux/x32/ioctls_inc0.h		\
 	linux/x32/ioctls_inc1.h		\
-	linux/x32/signalent.h		\
 	linux/x32/signalent1.h		\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\

@@ -1,2 +1,2 @@
 /* i386 personality */
-#include "../signalent.h"
+#include "signalent.h"

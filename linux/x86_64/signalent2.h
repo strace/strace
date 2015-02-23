@@ -1,2 +1,2 @@
 /* x32 personality */
-#include "../signalent.h"
+#include "signalent.h"
