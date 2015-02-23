@@ -30,3 +30,4 @@
 	"SIGLOST",	/* 29 */
 	"SIGUSR1",	/* 30 */
 	"SIGUSR2",	/* 31 */
+	"SIGRTMIN",	/* 32 */

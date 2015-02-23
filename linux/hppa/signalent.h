@@ -29,5 +29,5 @@
 	"SIGTTOU",	/* 28 */
 	"SIGURG",	/* 29 */
 	"SIGXFSZ",	/* 30 */
-	"SIGUNUSED",	/* 31 */
+	"SIGSYS",	/* 31 */
 	"SIGRTMIN",	/* 32 */
