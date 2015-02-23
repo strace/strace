@@ -1,0 +1,3 @@
+getdents(3, {{d_ino=123456789, d_off=1, d_reclen=24, d_name=".", d_type=DT_DIR} {d_ino=234567890, d_off=2, d_reclen=24, d_name="..", d_type=DT_DIR} {d_ino=345678901, d_off=3, d_reclen=280, d_name="A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nZ", d_type=DT_REG}}, 4096) = 328
+getdents(3, {}, 4096)                   = 0
++++ exited with 0 +++

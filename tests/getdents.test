@@ -5,6 +5,9 @@
 . "${srcdir=.}/init.sh"
 
 check_prog awk
+awk -f "$srcdir"/getdents.awk "$srcdir"/getdents.out ||
+	framework_skip_ 'awk does not work properly'
+
 check_prog ls
 check_prog mkdir
 check_prog rm
