@@ -159,14 +159,14 @@
 	"ECANCELED", /* 158 */
 	"ENOMEDIUM", /* 159 */
 	"EMEDIUMTYPE", /* 160 */
-	"ERRNO_161", /* 161 */
-	"ERRNO_162", /* 162 */
-	"ERRNO_163", /* 163 */
-	"ERRNO_164", /* 164 */
-	"ERRNO_165", /* 165 */
-	"ERRNO_166", /* 166 */
-	"ERRNO_167", /* 167 */
-	"ERRNO_168", /* 168 */
+	"ENOKEY", /* 161 */
+	"EKEYEXPIRED", /* 162 */
+	"EKEYREVOKED", /* 163 */
+	"EKEYREJECTED", /* 164 */
+	"EOWNERDEAD", /* 165 */
+	"ENOTRECOVERABLE", /* 166 */
+	"ERFKILL", /* 167 */
+	"EHWPOISON", /* 168 */
 	"ERRNO_169", /* 169 */
 	"ERRNO_170", /* 170 */
 	"ERRNO_171", /* 171 */
@@ -510,24 +510,24 @@
 	"ERRNO_509", /* 509 */
 	"ERRNO_510", /* 510 */
 	"ERRNO_511", /* 511 */
-	"ERRNO_512", /* 512 */
-	"ERRNO_513", /* 513 */
-	"ERRNO_514", /* 514 */
-	"ERRNO_515", /* 515 */
-	"ERRNO_516", /* 516 */
-	"ERRNO_517", /* 517 */
-	"ERRNO_518", /* 518 */
+	"ERESTARTSYS", /* 512 */
+	"ERESTARTNOINTR", /* 513 */
+	"ERESTARTNOHAND", /* 514 */
+	"ENOIOCTLCMD", /* 515 */
+	"ERESTART_RESTARTBLOCK", /* 516 */
+	"EPROBE_DEFER", /* 517 */
+	"EOPENSTALE", /* 518 */
 	"ERRNO_519", /* 519 */
 	"ERRNO_520", /* 520 */
-	"ERRNO_521", /* 521 */
-	"ERRNO_522", /* 522 */
-	"ERRNO_523", /* 523 */
-	"ERRNO_524", /* 524 */
-	"ERRNO_525", /* 525 */
-	"ERRNO_526", /* 526 */
-	"ERRNO_527", /* 527 */
-	"ERRNO_528", /* 528 */
-	"ERRNO_529", /* 529 */
+	"EBADHANDLE", /* 521 */
+	"ENOTSYNC", /* 522 */
+	"EBADCOOKIE", /* 523 */
+	"ENOTSUPP", /* 524 */
+	"ETOOSMALL", /* 525 */
+	"ESERVERFAULT", /* 526 */
+	"EBADTYPE", /* 527 */
+	"EJUKEBOX", /* 528 */
+	"EIOCBQUEUED", /* 529 */
 	"ERRNO_530", /* 530 */
 	"ERRNO_531", /* 531 */
 	"ERRNO_532", /* 532 */
@@ -998,7 +998,7 @@
 	"ERRNO_997", /* 997 */
 	"ERRNO_998", /* 998 */
 	"ERRNO_999", /* 999 */
-	"ECANCELED", /* 1000 */
+	"ERRNO_1000", /* 1000 */
 	"ERRNO_1001", /* 1001 */
 	"ERRNO_1002", /* 1002 */
 	"ERRNO_1003", /* 1003 */
@@ -1132,4 +1132,3 @@
 	"ERRNO_1131", /* 1131 */
 	"ERRNO_1132", /* 1132 */
 	"EDQUOT", /* 1133 */
-	"EMAXERRNO", /* 1134 */

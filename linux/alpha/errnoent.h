@@ -127,17 +127,17 @@
 	"ELIBEXEC", /* 126 */
 	"ERESTART", /* 127 */
 	"ESTRPIPE", /* 128 */
-	"ERRNO_129", /* 129 */
-	"ERRNO_130", /* 130 */
-	"ERRNO_131", /* 131 */
-	"ERRNO_132", /* 132 */
-	"ERRNO_133", /* 133 */
-	"ERRNO_134", /* 134 */
-	"ERRNO_135", /* 135 */
-	"ERRNO_136", /* 136 */
-	"ERRNO_137", /* 137 */
-	"ERRNO_138", /* 138 */
-	"ERRNO_139", /* 139 */
+	"ENOMEDIUM", /* 129 */
+	"EMEDIUMTYPE", /* 130 */
+	"ECANCELED", /* 131 */
+	"ENOKEY", /* 132 */
+	"EKEYEXPIRED", /* 133 */
+	"EKEYREVOKED", /* 134 */
+	"EKEYREJECTED", /* 135 */
+	"EOWNERDEAD", /* 136 */
+	"ENOTRECOVERABLE", /* 137 */
+	"ERFKILL", /* 138 */
+	"EHWPOISON", /* 139 */
 	"ERRNO_140", /* 140 */
 	"ERRNO_141", /* 141 */
 	"ERRNO_142", /* 142 */
@@ -514,3 +514,17 @@
 	"ERESTARTNOINTR", /* 513 */
 	"ERESTARTNOHAND", /* 514 */
 	"ENOIOCTLCMD", /* 515 */
+	"ERESTART_RESTARTBLOCK", /* 516 */
+	"EPROBE_DEFER", /* 517 */
+	"EOPENSTALE", /* 518 */
+	"ERRNO_519", /* 519 */
+	"ERRNO_520", /* 520 */
+	"EBADHANDLE", /* 521 */
+	"ENOTSYNC", /* 522 */
+	"EBADCOOKIE", /* 523 */
+	"ENOTSUPP", /* 524 */
+	"ETOOSMALL", /* 525 */
+	"ESERVERFAULT", /* 526 */
+	"EBADTYPE", /* 527 */
+	"EJUKEBOX", /* 528 */
+	"EIOCBQUEUED", /* 529 */
