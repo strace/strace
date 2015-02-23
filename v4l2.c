@@ -446,8 +446,8 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 # endif
 			{
 				if (must_print_values) {
-					tprintf(", value=%i, value64=%lli", ctrl.value,
-						ctrl.value64);
+					tprintf(", value=%i, value64=%lld", ctrl.value,
+						(long long) ctrl.value64);
 				}
 			}
 			tprints("}");
@@ -487,7 +487,7 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		if (umove(tcp, arg, &s) < 0)
 			return 0;
 		if ((code == VIDIOC_S_STD) == entering(tcp))
-			tprintf(", std=%#llx", s);
+			tprintf(", std=%#llx", (unsigned long long) s);
 		return 1;
 	}
 

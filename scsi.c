@@ -155,7 +155,7 @@ print_sg_io_v4_req(struct tcb *tcp, long arg)
 	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
 	tprintf(", request[%u]=", sg_io.request_len);
 	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len);
-	tprintf(", request_tag=%llu", sg_io.request_tag);
+	tprintf(", request_tag=%llu", (unsigned long long) sg_io.request_tag);
 	tprintf(", request_attr=%u", sg_io.request_attr);
 	tprintf(", request_priority=%u", sg_io.request_priority);
 	tprintf(", request_extra=%u", sg_io.request_extra);
@@ -167,7 +167,7 @@ print_sg_io_v4_req(struct tcb *tcp, long arg)
 	tprintf(", din_xfer_len=%u", sg_io.din_xfer_len);
 	tprintf(", timeout=%u", sg_io.timeout);
 	tprintf(", flags=%u", sg_io.flags);
-	tprintf(", usr_ptr=%llu", sg_io.usr_ptr);
+	tprintf(", usr_ptr=%llu", (unsigned long long) sg_io.usr_ptr);
 	tprintf(", spare_in=%u", sg_io.spare_in);
 	tprintf(", dout[%u]=", sg_io.dout_xfer_len);
 	if (sg_io.dout_iovec_count)
@@ -208,7 +208,7 @@ print_sg_io_v4_res(struct tcb *tcp, long arg)
 	tprintf(", response_len=%u", sg_io.response_len);
 	tprintf(", din_resid=%u", sg_io.din_resid);
 	tprintf(", dout_resid=%u", sg_io.dout_resid);
-	tprintf(", generated_tag=%llu", sg_io.generated_tag);
+	tprintf(", generated_tag=%llu", (unsigned long long) sg_io.generated_tag);
 	tprintf(", spare_out=%u", sg_io.spare_out);
 }
 
