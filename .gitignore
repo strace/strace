@@ -5,6 +5,7 @@
 .version
 .*.swp
 *.gdb
+core
 .gdbinit
 .gdb_history
 
@@ -16,6 +17,7 @@ Makefile.in
 
 /aclocal.m4
 /autom4te.cache
+/compile
 /config.guess
 /config.h
 /config.h.in
