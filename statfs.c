@@ -32,15 +32,6 @@ printstatfs(struct tcb *tcp, const long addr)
 		tprints("{...}");
 		return;
 	}
-#ifdef ALPHA
-	tprintf("{f_type=%s, f_fbsize=%u, f_blocks=%u, f_bfree=%u, ",
-		sprintfstype(statbuf.f_type),
-		statbuf.f_bsize, statbuf.f_blocks, statbuf.f_bfree);
-	tprintf("f_bavail=%u, f_files=%u, f_ffree=%u, f_fsid={%d, %d}, f_namelen=%u",
-		statbuf.f_bavail, statbuf.f_files, statbuf.f_ffree,
-		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1],
-		statbuf.f_namelen);
-#else /* !ALPHA */
 	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%lu, f_bfree=%lu, ",
 		sprintfstype(statbuf.f_type),
 		(unsigned long)statbuf.f_bsize,
@@ -52,7 +43,6 @@ printstatfs(struct tcb *tcp, const long addr)
 		(unsigned long)statbuf.f_ffree,
 		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
 	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
-#endif /* !ALPHA */
 #ifdef _STATFS_F_FRSIZE
 	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
 #endif
