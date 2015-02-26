@@ -40,6 +40,7 @@
 #define sys_break		printargs
 #define sys_oldstat		printargs
 #define sys_lseek		printargs
+#undef sys_stime
 #define sys_stime		printargs
 #define sys_ptrace		printargs
 #define sys_oldfstat		printargs

@@ -348,6 +348,7 @@ extern const struct xlat whence_codes[];
 
 #if defined(ARM) || defined(AARCH64) \
  || defined(I386) || defined(X32) || defined(X86_64) \
+ || defined(IA64) \
  || defined(BFIN) \
  || defined(M68K) \
  || defined(MICROBLAZE) \
