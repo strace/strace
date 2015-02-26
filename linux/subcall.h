@@ -24,8 +24,9 @@
 [SYS_socket_subcall + 17] = { 3,	IS|TN,		sys_recvmsg,			"recvmsg"		},
 [SYS_socket_subcall + 18] = { 4,	IS|TN,		sys_accept4,			"accept4"		},
 [SYS_socket_subcall + 19] = { 5,	IS|TN,		sys_recvmmsg,			"recvmmsg"		},
+[SYS_socket_subcall + 20] = { 4,	IS|TN,		sys_sendmmsg,			"sendmmsg"		},
 
-#define SYS_socket_nsubcalls	20
+#define SYS_socket_nsubcalls	21
 #define SYS_ipc_subcall	((SYS_socket_subcall) + (SYS_socket_nsubcalls))
 
 [SYS_ipc_subcall +  0] = { 6,	0,		printargs,			"ipc_subcall"		},
