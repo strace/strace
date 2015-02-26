@@ -419,7 +419,7 @@
 #else
 # define SYS_socket_subcall	400
 # include "subcall.h"
-# define ARM_FIRST_SHUFFLED_SYSCALL (SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls)
+# define ARM_FIRST_SHUFFLED_SYSCALL (SYS_ipc_subcall + SYS_ipc_nsubcalls)
 #endif /* !__ARM_EABI__ */
 
 /*
