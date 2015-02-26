@@ -233,11 +233,7 @@
 /* You must be careful to check ../i386/syscallent.h so that this table
    starts where that one leaves off.
 */
-#if SYS_ipc_subcall + SYS_ipc_nsubcalls != 445
-# error fix me
-#endif
-
-[445 ... 1023] = { },
+[(SYS_ipc_subcall + SYS_ipc_nsubcalls) ... 1023] = { },
 [1024] = { 0,	0,		printargs,			"ni_syscall"		},
 [1025] = { 1,	TP|SE,		sys_exit,			"exit"			},
 [1026] = { 3,	TD,		sys_read,			"read"			},
