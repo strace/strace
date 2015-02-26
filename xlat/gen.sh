@@ -147,6 +147,10 @@ main()
 	local input="$1"
 	local output="$2"
 	local name
+	local jobs=0
+	local ncpus="$(getconf _NPROCESSORS_ONLN)"
+	[ "${ncpus}" -ge 1 ] ||
+		ncpus=1
 
 	if [ -d "${input}" ]; then
 		local f names=
@@ -156,6 +160,11 @@ main()
 			name=${name%.in}
 			gen_header "${f}" "${output}/${name}.h" "${name}" &
 			names="${names} ${name}"
+			: $(( jobs += 1 ))
+			if [ ${jobs} -ge ${ncpus} ]; then
+				jobs=0
+				wait
+			fi
 		done
 		gen_git "${output}/.gitignore" ${names}
 		gen_make "${output}/Makemodule.am" ${names}
