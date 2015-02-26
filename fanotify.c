@@ -52,6 +52,10 @@ sys_fanotify_mark(struct tcb *tcp)
 	 * but kernel uses the lower 32 bits only.
 	 */
 	argn = getllval(tcp, &mask, 2);
+#ifdef HPPA
+	/* Parsic is weird.  See arch/parisc/kernel/sys_parisc32.c.  */
+	mask = (mask << 32) | (mask >> 32);
+#endif
 	printflags(fan_event_flags, mask, "FAN_???");
 	tprints(", ");
 	if ((int) tcp->u_arg[argn] == FAN_NOFD)
