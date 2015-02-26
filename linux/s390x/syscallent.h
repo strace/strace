@@ -28,7 +28,7 @@
  */
 
 [  0] = { 0,	0,		sys_setup,			"setup"			},
-[  1] = { 1,	TP|SE,		sys_exit,			"_exit"			},
+[  1] = { 1,	TP|SE,		sys_exit,			"exit"			},
 [  2] = { 0,	TP,		sys_fork,			"fork"			},
 [  3] = { 3,	TD,		sys_read,			"read"			},
 [  4] = { 3,	TD,		sys_write,			"write"			},
@@ -197,8 +197,8 @@
 [177] = { 4,	TS,		sys_rt_sigtimedwait,		"rt_sigtimedwait"	},
 [178] = { 3,	TS,		sys_rt_sigqueueinfo,		"rt_sigqueueinfo"	},
 [179] = { 2,	TS,		sys_rt_sigsuspend,		"rt_sigsuspend"		},
-[180] = { 4,	TD,		sys_pread,			"pread"			},
-[181] = { 4,	TD,		sys_pwrite,			"pwrite"		},
+[180] = { 4,	TD,		sys_pread,			"pread64"		},
+[181] = { 4,	TD,		sys_pwrite,			"pwrite64"		},
 [182] = { },
 [183] = { 2,	TF,		sys_getcwd,			"getcwd"		},
 [184] = { 2,	0,		sys_capget,			"capget"		},
