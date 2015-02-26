@@ -633,9 +633,9 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 					b.length, b.bytesused);
 				printflags(v4l2_buf_flags, b.flags, "V4L2_BUF_FLAG_???");
 				if (code == VIDIOC_DQBUF)
-					tprintf(", timestamp = {%lu.%06lu}",
-						b.timestamp.tv_sec,
-						b.timestamp.tv_usec);
+					tprintf(", timestamp = {%ju.%06ju}",
+						(uintmax_t)b.timestamp.tv_sec,
+						(uintmax_t)b.timestamp.tv_usec);
 				tprints(", ...");
 			}
 			tprints("}");
