@@ -228,7 +228,7 @@
 [227] = { 5,	0,		sys_afs_syscall,		"afs_syscall"		},
 [228] = { 1,	NF,		sys_setfsuid16,			"setfsuid"		},
 [229] = { 1,	NF,		sys_setfsgid16,			"setfsgid"		},
-[230] = { 5,	TD,		sys_select,			"_newselect"		},
+[230] = { 5,	TD,		sys_select,			"select"		},
 [231] = { 1,	0,		sys_time,			"time"			},
 [232] = { 6,	TD,		sys_splice,			"splice"		},
 [233] = { 1,	0,		sys_stime,			"stime"			},

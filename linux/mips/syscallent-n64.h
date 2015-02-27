@@ -22,7 +22,7 @@
 [5019] = { 3,	TD,		sys_writev,			"writev"		},
 [5020] = { 2,	TF,		sys_access,			"access"		},
 [5021] = { 1,	TD,		sys_pipe,			"pipe"			},
-[5022] = { 5,	TD,		sys_select,			"_newselect"		},
+[5022] = { 5,	TD,		sys_select,			"select"		},
 [5023] = { 0,	0,		sys_sched_yield,		"sched_yield"		},
 [5024] = { 5,	TM|SI,		sys_mremap,			"mremap"		},
 [5025] = { 3,	TM,		sys_msync,			"msync"			},

@@ -108,7 +108,7 @@
 [ 79] = { 2,	0,		sys_settimeofday,		"settimeofday"		},
 [ 80] = { 2,	0,		sys_getgroups16,		"getgroups"		},
 [ 81] = { 2,	0,		sys_setgroups16,		"setgroups"		},
-[ 82] = { 1,	TD,		sys_oldselect,			"select"		},
+[ 82] = { 1,	TD,		sys_oldselect,			"oldselect"		},
 [ 83] = { 2,	TF,		sys_symlink,			"symlink"		},
 [ 84] = { 2,	TF,		sys_oldlstat,			"oldlstat"		},
 [ 85] = { 3,	TF,		sys_readlink,			"readlink"		},

@@ -144,7 +144,7 @@
 [139] = { 1,	NF,		sys_setfsgid,			"setfsgid"		},
 [140] = { 5,	TD,		sys_llseek,			"_llseek"		},
 [141] = { 3,	TD,		sys_getdents,			"getdents"		},
-[142] = { 5,	TD,		sys_select,			"_newselect"		},
+[142] = { 5,	TD,		sys_select,			"select"		},
 [143] = { 2,	TD,		sys_flock,			"flock"			},
 [144] = { 3,	TM,		sys_msync,			"msync"			},
 [145] = { 3,	TD,		sys_readv,			"readv"			},

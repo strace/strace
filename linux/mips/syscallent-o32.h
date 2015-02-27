@@ -142,7 +142,7 @@
 [4139] = { 1,	NF,		sys_setfsgid,			"setfsgid"		},
 [4140] = { 5,	TD,		sys_llseek,			"_llseek"		},
 [4141] = { 3,	TD,		sys_getdents,			"getdents"		},
-[4142] = { 5,	TD,		sys_select,			"_newselect"		},
+[4142] = { 5,	TD,		sys_select,			"select"		},
 [4143] = { 2,	TD,		sys_flock,			"flock"			},
 [4144] = { 3,	TM,		sys_msync,			"msync"			},
 [4145] = { 3,	TD,		sys_readv,			"readv"			},
