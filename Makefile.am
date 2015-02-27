@@ -403,13 +403,12 @@ news-check: NEWS
 		exit 1;						\
 	fi
 
-ioctlsort_CC = $(CC)
+ioctlsort_CC = $(CC_FOR_BUILD)
 ioctlsort_DEFS = $(DEFS)
 ioctlsort_INCLUDES = $(DEFAULT_INCLUDES) $(INCLUDES)
-ioctlsort_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS)
-ioctlsort_CFLAGS = $(AM_CFLAGS) $(CFLAGS)
-ioctlsort_LD = $(CCLD)
-ioctlsort_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS)
+ioctlsort_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_FOR_BUILD)
+ioctlsort_CFLAGS = $(AM_CFLAGS) $(CFLAGS_FOR_BUILD)
+ioctlsort_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_FOR_BUILD)
 
 ioctls_inc_h = $(wildcard $(srcdir)/$(OS)/$(ARCH)/ioctls_inc*.h)
 ioctlent_h = $(patsubst $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%,ioctlent%,$(ioctls_inc_h))
@@ -419,8 +418,8 @@ CLEANFILES = $(ioctlent_h)
 ioctlent%.h: ioctlsort%
 	./$< > $@
 
-ioctlsort%: ioctlsort%.o
-	$(ioctlsort_LD) $(ioctlsort_LDFLAGS) $< -o $@
+ioctlsort%$(BUILD_EXEEXT): ioctlsort%.o
+	$(ioctlsort_CC) $(ioctlsort_CFLAGS) $(ioctlsort_LDFLAGS) $< -o $@
 
 ioctlsort%.o: ioctls_all%.h $(srcdir)/ioctlsort.c
 	$(ioctlsort_CC) $(ioctlsort_DEFS) $(ioctlsort_INCLUDES) $(ioctlsort_CPPFLAGS) $(ioctlsort_CFLAGS) -DIOCTLSORT_INC=\"$<\" -c -o $@ $(srcdir)/ioctlsort.c
