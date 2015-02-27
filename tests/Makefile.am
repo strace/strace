@@ -34,6 +34,7 @@ check_PROGRAMS = \
 	uio \
 	unix-pair-send-recv
 
+pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64

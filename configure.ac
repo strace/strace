@@ -729,6 +729,14 @@ if test "x$st_cv_have___builtin_popcount" = xyes; then
 		  [Define to 1 if the system provides __builtin_popcount function])
 fi
 
+dl_LIBS=
+AC_CHECK_LIB([dl], [dladdr], [])
+if test "x$ac_cv_lib_dl_dladdr" = xyes; then
+	AC_DEFINE([HAVE_DLADDR], [1], [Define to 1 if the system provides dladdr])
+	dl_LIBS='-ldl'
+fi
+AC_SUBST(dl_LIBS)
+
 AC_PATH_PROG([PERL], [perl])
 
 dnl stack trace with libunwind

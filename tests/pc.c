@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#include <dlfcn.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -6,7 +10,7 @@
 
 int main(void)
 {
-	const unsigned long size = sysconf(_SC_PAGESIZE);
+	const unsigned long pagesize = sysconf(_SC_PAGESIZE);
 
 	/* write instruction pointer length to the log */
 	if (write(-1, NULL, 2 * sizeof(void *)) >= 0)
@@ -21,12 +25,29 @@ int main(void)
 		return 77;
 
 	if (!pid) {
-		const unsigned long mask = ~(size - 1);
-		const unsigned long addr = (unsigned long) &main;
+		const unsigned long mask = ~(pagesize - 1);
+		unsigned long addr = (unsigned long) &main & mask;
+		unsigned long size = pagesize << 1;
+
+#ifdef HAVE_DLADDR
+		Dl_info info;
+		if (dladdr(&main, &info)) {
+			const unsigned long base =
+				(unsigned long) info.dli_fbase & mask;
+			if (base < addr) {
+				size += addr - base;
+				addr = base;
+			}
+		} else
+#endif
+		{
+			addr -= size;
+			size <<= 1;
+		}
 
 		/* SIGSEGV is expected */
-		(void) munmap((void *) ((addr & mask) - size * 2), size * 4);
-		(void) munmap((void *) ((addr & mask) - size * 2), size * 4);
+		(void) munmap((void *) addr, size);
+		(void) munmap((void *) addr, size);
 		return 77;
 	}
 
@@ -39,7 +60,7 @@ int main(void)
 	/* dump process map for debug purposes */
 	close(0);
 	if (!open("/proc/self/maps", O_RDONLY))
-		(void) sendfile(1, 0, NULL, size);
+		(void) sendfile(1, 0, NULL, pagesize);
 
 	return 0;
 }
