@@ -44,6 +44,6 @@ done:
 	return rc;
 
 fail:
-	rc = 1;
+	rc = errno == EFAULT ? 99 : 1;
 	goto done;
 }

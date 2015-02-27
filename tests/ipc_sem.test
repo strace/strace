@@ -8,15 +8,26 @@ check_prog grep
 
 OUT="$LOG.out"
 
-./ipc_sem > /dev/null || {
-	if [ $? -eq 77 ]; then
+./ipc_sem > "$OUT" || {
+	case $? in
+	77)
+		rm -f "$OUT"
 		framework_skip_ 'ipc semget/semctl syscalls do not behave as expected'
-	else
+		;;
+	99)
+		cat "$OUT"
+		rm -f "$OUT"
+		framework_failure_ 'broken kernel detected'
+		;;
+	*)
+		cat "$OUT"
+		rm -f "$OUT"
 		fail_ 'ipc_sem failed'
-	fi
+		;;
+	esac
 }
 
-args="-eipc ./ipc_sem $f"
+args='-eipc ./ipc_sem'
 $STRACE -o "$LOG" $args > "$OUT" &&
 LC_ALL=C grep -E -x -f "$OUT" "$LOG" > /dev/null || {
 	cat "$OUT" "$LOG"
