@@ -50,6 +50,12 @@ extern long ptrace(int, int, char *, long);
 #ifndef PTRACE_EVENT_SECCOMP
 # define PTRACE_EVENT_SECCOMP	7
 #endif
+#ifdef PTRACE_EVENT_STOP
+/* Linux 3.1 - 3.3 releases had a broken value.  It was fixed in 3.4.  */
+# if PTRACE_EVENT_STOP == 7
+#  undef PTRACE_EVENT_STOP
+# endif
+#endif
 #ifndef PTRACE_EVENT_STOP
 # define PTRACE_EVENT_STOP	128
 #endif
