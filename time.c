@@ -41,6 +41,16 @@
 #define UTIME_OMIT ((1l << 30) - 2l)
 #endif
 
+#if SUPPORTED_PERSONALITIES > 1
+# if defined X86_64 || defined X32
+#  define current_time_t_is_compat (current_personality == 1)
+# else
+#  define current_time_t_is_compat (current_wordsize == 4)
+# endif
+#else
+# define current_time_t_is_compat 0
+#endif
+
 struct timeval32
 {
 	u_int32_t tv_sec, tv_usec;
@@ -55,8 +65,7 @@ tprint_timeval32(struct tcb *tcp, const struct timeval32 *tv)
 static void
 tprint_timeval(struct tcb *tcp, const struct timeval *tv)
 {
-	tprintf("{%lu, %lu}",
-		(unsigned long) tv->tv_sec, (unsigned long) tv->tv_usec);
+	tprintf("{%ju, %ju}", (uintmax_t) tv->tv_sec, (uintmax_t) tv->tv_usec);
 }
 
 void
@@ -68,7 +77,7 @@ printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 }
 
 static char *
-do_sprinttv(char *buf, const unsigned long sec, const unsigned long usec,
+do_sprinttv(char *buf, const uintmax_t sec, const uintmax_t usec,
 	    const int special)
 {
 	if (special) {
@@ -79,7 +88,7 @@ do_sprinttv(char *buf, const unsigned long sec, const unsigned long usec,
 				return stpcpy(buf, "UTIME_OMIT");
 		}
 	}
-	return buf + sprintf(buf, "{%lu, %lu}", sec, usec);
+	return buf + sprintf(buf, "{%ju, %ju}", sec, usec);
 }
 
 char *
@@ -91,11 +100,7 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 	if (!verbose(tcp))
 		return buf + sprintf(buf, "%#lx", addr);
 
-	if (bitness == BITNESS_32
-#if SUPPORTED_PERSONALITIES > 1
-	    || current_wordsize == 4
-#endif
-		)
+	if (bitness == BITNESS_32 || current_time_t_is_compat)
 	{
 		struct timeval32 tv;
 
@@ -130,7 +135,7 @@ sprint_timespec(char *buf, struct tcb *tcp, long addr)
 		int rc;
 
 #if SUPPORTED_PERSONALITIES > 1
-		if (current_wordsize == 4) {
+		if (current_time_t_is_compat) {
 			struct timeval32 tv;
 
 			rc = umove(tcp, addr, &tv);
@@ -144,9 +149,9 @@ sprint_timespec(char *buf, struct tcb *tcp, long addr)
 
 			rc = umove(tcp, addr, &ts);
 			if (rc >= 0)
-				sprintf(buf, "{%lu, %lu}",
-					(unsigned long) ts.tv_sec,
-					(unsigned long) ts.tv_nsec);
+				sprintf(buf, "{%ju, %ju}",
+					(uintmax_t) ts.tv_sec,
+					(uintmax_t) ts.tv_nsec);
 		}
 		if (rc < 0)
 			strcpy(buf, "{...}");
@@ -167,8 +172,7 @@ sys_gettimeofday(struct tcb *tcp)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp)) {
-			tprintf("%#lx, %#lx",
-				tcp->u_arg[0], tcp->u_arg[1]);
+			tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
 			return 0;
 		}
 		printtv(tcp, tcp->u_arg[0]);
@@ -277,12 +281,7 @@ printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
 	else {
 		int rc;
 
-		if (bitness == BITNESS_32
-#if SUPPORTED_PERSONALITIES > 1
-		    || current_wordsize == 4
-#endif
-			)
-		{
+		if (bitness == BITNESS_32 || current_time_t_is_compat) {
 			struct {
 				struct timeval32 it_interval, it_value;
 			} itv;
@@ -443,7 +442,7 @@ tprint_timex(struct tcb *tcp, long addr)
 	struct timex tx;
 
 #if SUPPORTED_PERSONALITIES > 1
-	if (current_wordsize == 4)
+	if (current_time_t_is_compat)
 		return tprint_timex32(tcp, addr);
 #endif
 	if (umove(tcp, addr, &tx) < 0)
@@ -461,20 +460,20 @@ tprint_timex(struct tcb *tcp, long addr)
 #else
 	tprints("{modes=");
 	printflags(adjtimex_modes, tx.modes, "ADJ_???");
-	tprintf(", offset=%ld, freq=%ld, maxerror=%ld, ",
-		(long) tx.offset, (long) tx.freq, (long) tx.maxerror);
-	tprintf("esterror=%lu, status=", (long) tx.esterror);
+	tprintf(", offset=%jd, freq=%jd, maxerror=%ju, esterror=%ju, status=",
+		(intmax_t) tx.offset, (intmax_t) tx.freq,
+		(uintmax_t) tx.maxerror, (uintmax_t) tx.esterror);
 	printflags(adjtimex_status, tx.status, "STA_???");
-	tprintf(", constant=%ld, precision=%lu, ",
-		(long) tx.constant, (long) tx.precision);
-	tprintf("tolerance=%ld, time=", (long) tx.tolerance);
+	tprintf(", constant=%jd, precision=%ju, tolerance=%jd, time=",
+		(intmax_t) tx.constant, (uintmax_t) tx.precision,
+		(intmax_t) tx.tolerance);
 	tprint_timeval(tcp, &tx.time);
-	tprintf(", tick=%ld, ppsfreq=%ld, jitter=%ld",
-		(long) tx.tick, (long) tx.ppsfreq, (long) tx.jitter);
-	tprintf(", shift=%d, stabil=%ld, jitcnt=%ld",
-		tx.shift, (long) tx.stabil, (long) tx.jitcnt);
-	tprintf(", calcnt=%ld, errcnt=%ld, stbcnt=%ld",
-		(long) tx.calcnt, (long) tx.errcnt, (long) tx.stbcnt);
+	tprintf(", tick=%jd, ppsfreq=%jd, jitter=%jd",
+		(intmax_t) tx.tick, (intmax_t) tx.ppsfreq, (intmax_t) tx.jitter);
+	tprintf(", shift=%d, stabil=%jd, jitcnt=%jd",
+		tx.shift, (intmax_t) tx.stabil, (intmax_t) tx.jitcnt);
+	tprintf(", calcnt=%jd, errcnt=%jd, stbcnt=%jd",
+		(intmax_t) tx.calcnt, (intmax_t) tx.errcnt, (intmax_t) tx.stbcnt);
 #endif
 	tprints("}");
 	return 0;
