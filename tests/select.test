@@ -6,20 +6,13 @@
 
 check_prog awk
 
+$STRACE -eselect -h > /dev/null ||
+	skip_ 'select syscall is not supported on this architecture'
+
 ./select ||
 	framework_skip_ 'select syscall does not behave as expected'
 
-syscall=
-for n in select _newselect; do
-	if $STRACE -e$n -h > /dev/null; then
-		syscall=$n
-		break
-	fi
-done
-[ -n "$syscall" ] ||
-	fail_ "$STRACE does not support select syscall?"
-
-args="-e$syscall ./select"
+args='-eselect ./select'
 $STRACE -o "$LOG" $args || {
 	cat "$LOG"
 	fail_ "$STRACE $args failed"
