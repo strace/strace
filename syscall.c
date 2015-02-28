@@ -2450,7 +2450,13 @@ trace_syscall_exiting(struct tcb *tcp)
 		else {
 			switch (sys_res & RVAL_MASK) {
 			case RVAL_HEX:
-				tprintf("= %#lx", tcp->u_rval);
+#if SUPPORTED_PERSONALITIES > 1
+				if (current_wordsize < sizeof(long))
+					tprintf("= %#x",
+						(unsigned int) tcp->u_rval);
+				else
+#endif
+					tprintf("= %#lx", tcp->u_rval);
 				break;
 			case RVAL_OCTAL:
 				tprintf("= %#lo", tcp->u_rval);
