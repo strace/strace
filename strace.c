@@ -1157,16 +1157,19 @@ startup_child(char **argv)
 {
 	struct_stat statbuf;
 	const char *filename;
+	size_t filename_len;
 	char pathname[PATH_MAX];
 	int pid;
 	struct tcb *tcp;
 
 	filename = argv[0];
+	filename_len = strlen(filename);
+
+	if (filename_len > sizeof(pathname) - 1) {
+		errno = ENAMETOOLONG;
+		perror_msg_and_die("exec");
+	}
 	if (strchr(filename, '/')) {
-		if (strlen(filename) > sizeof pathname - 1) {
-			errno = ENAMETOOLONG;
-			perror_msg_and_die("exec");
-		}
 		strcpy(pathname, filename);
 	}
 #ifdef USE_DEBUGGING_EXEC
@@ -1203,6 +1206,8 @@ startup_child(char **argv)
 			}
 			if (len && pathname[len - 1] != '/')
 				pathname[len++] = '/';
+			if (filename_len + len > sizeof(pathname) - 1)
+				continue;
 			strcpy(pathname + len, filename);
 			if (stat_file(pathname, &statbuf) == 0 &&
 			    /* Accept only regular files
@@ -1212,6 +1217,8 @@ startup_child(char **argv)
 			    (statbuf.st_mode & 0111))
 				break;
 		}
+		if (!path || !*path)
+			pathname[0] = '\0';
 	}
 	if (stat_file(pathname, &statbuf) < 0) {
 		perror_msg_and_die("Can't stat '%s'", filename);
