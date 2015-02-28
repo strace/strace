@@ -1553,6 +1553,8 @@
 { "linux/ptp_clock.h", "PTP_ENABLE_PPS", _IOC_WRITE, 0x3d04, 0x04 },
 { "linux/ptp_clock.h", "PTP_EXTTS_REQUEST", _IOC_WRITE, 0x3d02, 0x10 },
 { "linux/ptp_clock.h", "PTP_PEROUT_REQUEST", _IOC_WRITE, 0x3d03, 0x38 },
+{ "linux/ptp_clock.h", "PTP_PIN_GETFUNC", _IOC_READ|_IOC_WRITE, 0x3d06, 0x60 },
+{ "linux/ptp_clock.h", "PTP_PIN_SETFUNC", _IOC_WRITE, 0x3d07, 0x60 },
 { "linux/ptp_clock.h", "PTP_SYS_OFFSET", _IOC_WRITE, 0x3d05, 0x340 },
 { "linux/radeonfb.h", "FBIO_RADEON_GET_MIRROR", _IOC_READ, 0x4003, 0x08 },
 { "linux/radeonfb.h", "FBIO_RADEON_SET_MIRROR", _IOC_WRITE, 0x4004, 0x08 },
