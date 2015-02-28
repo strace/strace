@@ -69,8 +69,6 @@ struct sigcontext {
 # error: NSIG < 32
 #endif
 
-#ifdef HAVE_SIGACTION
-
 /* The libc headers do not define this constant since it should only be
    used by the implementation.  So we define it here.  */
 #ifndef SA_RESTORER
@@ -79,16 +77,29 @@ struct sigcontext {
 # endif
 #endif
 
-/* Some arches define this in their headers, but don't actually have it,
-   so we have to delete the define.  */
-#if defined(HPPA) || defined(IA64)
-# undef SA_RESTORER
+/*
+ * Some architectures define SA_RESTORER in their headers,
+ * but do not actually have sa_restorer.
+ *
+ * Some architectures, otherwise, do not define SA_RESTORER in their headers,
+ * but actually have sa_restorer.
+ */
+#ifdef SA_RESTORER
+# if defined HPPA || defined IA64
+#  define HAVE_SA_RESTORER 0
+# else
+#  define HAVE_SA_RESTORER 1
+# endif
+#else /* !SA_RESTORER */
+# if defined SPARC || defined SPARC64
+#  define HAVE_SA_RESTORER 1
+# else
+#  define HAVE_SA_RESTORER 0
+# endif
 #endif
 
 #include "xlat/sigact_flags.h"
 #include "xlat/sigprocmaskcmds.h"
-
-#endif /* HAVE_SIGACTION */
 
 /* Anonymous realtime signals. */
 /* Under glibc 2.1, SIGRTMIN et al are functions, but __SIGRTMIN is a
@@ -541,7 +552,7 @@ struct old_sigaction {
 	unsigned long sa_mask;
 	unsigned long sa_flags;
 #endif /* !MIPS */
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER
 	void (*sa_restorer)(void);
 #endif
 };
@@ -551,7 +562,7 @@ struct old_sigaction32 {
 	uint32_t __sa_handler;
 	uint32_t sa_mask;
 	uint32_t sa_flags;
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER
 	uint32_t sa_restorer;
 #endif
 };
@@ -579,7 +590,7 @@ decode_old_sigaction(struct tcb *tcp, long addr)
 			memset(&sa, 0, sizeof(sa));
 			sa.__sa_handler = (void*)(uintptr_t)sa32.__sa_handler;
 			sa.sa_flags = sa32.sa_flags;
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER && defined SA_RESTORER
 			sa.sa_restorer = (void*)(uintptr_t)sa32.sa_restorer;
 #endif
 			sa.sa_mask = sa32.sa_mask;
@@ -617,7 +628,7 @@ decode_old_sigaction(struct tcb *tcp, long addr)
 #endif
 	tprints(", ");
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER && defined SA_RESTORER
 	if (sa.sa_flags & SA_RESTORER)
 		tprintf(", %p", sa.sa_restorer);
 #endif
@@ -1117,7 +1128,7 @@ struct new_sigaction
 	void (*__sa_handler)(int);
 	unsigned long sa_flags;
 #endif /* !MIPS */
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER
 	void (*sa_restorer)(void);
 #endif
 	/* Kernel treats sa_mask as an array of longs. */
@@ -1128,7 +1139,7 @@ struct new_sigaction32
 {
 	uint32_t __sa_handler;
 	uint32_t sa_flags;
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER
 	uint32_t sa_restorer;
 #endif
 	uint32_t sa_mask[2 * (NSIG / sizeof(long) ? NSIG / sizeof(long) : 1)];
@@ -1156,7 +1167,7 @@ decode_new_sigaction(struct tcb *tcp, long addr)
 			memset(&sa, 0, sizeof(sa));
 			sa.__sa_handler = (void*)(unsigned long)sa32.__sa_handler;
 			sa.sa_flags     = sa32.sa_flags;
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER && defined SA_RESTORER
 			sa.sa_restorer  = (void*)(unsigned long)sa32.sa_restorer;
 #endif
 			/* Kernel treats sa_mask as an array of longs.
@@ -1205,7 +1216,7 @@ decode_new_sigaction(struct tcb *tcp, long addr)
 	tprints(", ");
 
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
-#ifdef SA_RESTORER
+#if HAVE_SA_RESTORER && defined SA_RESTORER
 	if (sa.sa_flags & SA_RESTORER)
 		tprintf(", %p", sa.sa_restorer);
 #endif
