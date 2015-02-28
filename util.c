@@ -39,8 +39,8 @@
 #endif
 #include <sys/uio.h>
 
-#include "ptrace.h"
 #include "regs.h"
+#include "ptrace.h"
 
 int
 string_to_uint(const char *str)

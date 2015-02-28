@@ -42,11 +42,10 @@
 
 #include "xlat/nt_descriptor_types.h"
 
+#include "regs.h"
 #include "ptrace.h"
 #include "xlat/ptrace_cmds.h"
 #include "xlat/ptrace_setoptions_flags.h"
-
-#include "regs.h"
 
 #define uoff(member)	offsetof(struct user, member)
 #define XLAT_UOFF(member)	{ uoff(member), "offsetof(struct user, " #member ")" }

@@ -34,8 +34,8 @@
 #include "defs.h"
 #include <fcntl.h>
 
-#include "ptrace.h"
 #include "regs.h"
+#include "ptrace.h"
 
 #if defined(SPARC) || defined(SPARC64) || defined(MIPS)
 typedef struct {

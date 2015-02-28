@@ -37,6 +37,7 @@
 /* for struct iovec */
 #include <sys/uio.h>
 
+#include "regs.h"
 #include "ptrace.h"
 
 #if defined(SPARC64)
@@ -45,8 +46,6 @@
 # undef PTRACE_SETREGS
 # define PTRACE_SETREGS PTRACE_SETREGS64
 #endif
-
-#include "regs.h"
 
 #if defined SPARC64
 # include <asm/psrcompat.h>
