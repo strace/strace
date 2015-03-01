@@ -11,8 +11,9 @@ BEGIN {
   d_name_1 = "d_name=\"\\.\""
   d_name_2 = "d_name=\"\\.\\.\""
   d_name_3 = "d_name=\"(A\\\\n){127}Z\""
-  d_type_dir = "d_type=DT_DIR"
-  d_type_reg = "d_type=DT_REG"
+  # Some older systems might not pass back d_type at all like Alpha.
+  d_type_dir = "d_type=DT_(DIR|UNKNOWN)"
+  d_type_reg = "d_type=DT_(REG|UNKNOWN)"
 
   dirent_1   = "\\{" d_ino ", " d_off ", " d_reclen ", " d_name_1 ", " d_type_dir "\\}"
   dirent_2   = "\\{" d_ino ", " d_off ", " d_reclen ", " d_name_2 ", " d_type_dir "\\}"
