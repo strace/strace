@@ -349,11 +349,12 @@ EXTRA_DIST =				\
 	linux/x86_64/errnoent1.h	\
 	linux/x86_64/errnoent2.h	\
 	linux/x86_64/gentab.pl		\
-	linux/x86_64/ioctlent2.h	\
 	linux/x86_64/ioctls_arch0.h	\
 	linux/x86_64/ioctls_arch1.h	\
+	linux/x86_64/ioctls_arch2.h	\
 	linux/x86_64/ioctls_inc0.h	\
 	linux/x86_64/ioctls_inc1.h	\
+	linux/x86_64/ioctls_inc2.h	\
 	linux/x86_64/signalent1.h	\
 	linux/x86_64/signalent2.h	\
 	linux/x86_64/syscallent.h	\
