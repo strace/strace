@@ -121,7 +121,7 @@ struct compat_statfs64 {
 	uint32_t f_flags;
 	uint32_t f_spare[4];
 }
-#if defined(X86_64) || defined(IA64)
+#if defined AARCH64 || defined X86_64 || defined X32 || defined IA64
   __attribute__ ((packed, aligned(4)))
 #endif
 ;
