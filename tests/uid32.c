@@ -20,11 +20,11 @@ main(void)
 	int size;
 	int *list = 0;
 
-	e = syscall(__NR_getuid32);
-	assert(syscall(__NR_setuid32, e) == 0);
+	r = syscall(__NR_getuid32);
+	assert(syscall(__NR_setuid32, r) == 0);
 	assert(syscall(__NR_getresuid32, &r, &e, &s) == 0);
 	assert(syscall(__NR_setreuid32, -1, -1L) == 0);
-	assert(syscall(__NR_setresuid32, -1, e, -1L) == 0);
+	assert(syscall(__NR_setresuid32, r, -1, -1L) == 0);
 	assert(syscall(__NR_chown32, ".", -1, -1L) == 0);
 	assert((size = syscall(__NR_getgroups32, 0, list)) >= 0);
 	assert(list = calloc(size + 1, sizeof(*list)));

@@ -24,7 +24,7 @@ regexp == "" {
       regexp = "^setreuid" suffix "\\(-1, -1\\)[[:space:]]+= 0$"
     } else if (expected == "setreuid") {
       expected = "setresuid"
-      regexp = "^setresuid" suffix "\\(-1, " uid ", -1\\)[[:space:]]+= 0$"
+      regexp = "^setresuid" suffix "\\(" uid ", -1, -1\\)[[:space:]]+= 0$"
     } else if (expected == "setresuid") {
       expected = "chown"
       regexp = "^chown" suffix "\\(\".\", -1, -1\\)[[:space:]]+= 0$"
