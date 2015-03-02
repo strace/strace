@@ -881,6 +881,11 @@ print_pc(struct tcb *tcp)
 		return;
 	}
 	tprintf(fmt, pc);
+#elif defined(AARCH64)
+	if (aarch64_io.iov_len == sizeof(arm_regs))
+		tprintf(fmt, (unsigned long) arm_regs.ARM_pc);
+	else
+		tprintf(fmt, (unsigned long) aarch64_regs.pc);
 #elif defined(ARM)
 	tprintf(fmt, arm_regs.ARM_pc);
 #elif defined(AVR32)
