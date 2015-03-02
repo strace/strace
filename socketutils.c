@@ -114,7 +114,7 @@ receive_responses(const int fd, const unsigned long inode,
 		  const char *proto_name,
 		  bool (* parser) (const char *, const void *, int, const unsigned long))
 {
-	static char buf[8192];
+	static long buf[8192 / sizeof(long)];
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
 	};
