@@ -44,6 +44,10 @@ done:
 	return rc;
 
 fail:
-	rc = errno == EFAULT ? 99 : 1;
+	/*
+	 * If the kernel failed, SKIP the test.  We want to ignore
+	 * such failures as they're out of scope for this project.
+	 */
+	rc = errno == EFAULT ? 77 : 1;
 	goto done;
 }
