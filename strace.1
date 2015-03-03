@@ -269,6 +269,9 @@ Print the instruction pointer at the time of the system call.
 .TP
 .B \-k
 Print the execution stack trace of the traced processes after each system call (experimental).
+This option is available only if
+.B strace
+is built with libunwind.
 .TP
 .B \-q
 Suppress messages about attaching, detaching etc.  This happens
