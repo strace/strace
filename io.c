@@ -227,8 +227,6 @@ print_llu_from_low_high_val(struct tcb *tcp, int arg)
 			((unsigned long) tcp->u_arg[arg + 1] << current_wordsize * 8)
 			| (unsigned long) tcp->u_arg[arg]);
 # endif
-#elif defined(LINUX_MIPSN32)
-	tprintf("%llu", (unsigned long long) tcp->ext_arg[arg]);
 #else
 # ifdef X32
 	if (current_personality == 0)
