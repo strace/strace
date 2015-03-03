@@ -20,7 +20,7 @@ addr=unix-yy-local-stream
 
 ./netlink_unix_diag || {
 	if [ $? -eq 77 ]; then
-		framework_skip_ 'NETLINK_SOCK_DIAG for unix domain sockets is not available'
+		framework_skip_ 'NETLINK_SOCK_DIAG for unix domain sockets (CONFIG_UNIX_DIAG) is not available'
 	else
 		fail_ 'netlink_unix_diag failed'
 	fi

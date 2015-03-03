@@ -15,7 +15,7 @@ rm -f $LOG.* $LOG-*
 
 ./inet-accept-connect-send-recv || {
 	if [ $? -eq 77 ]; then
-		framework_skip_ 'PF_INET SOCK_STREAM is not available'
+		framework_skip_ 'PF_INET SOCK_STREAM (CONFIG_INET_TCP_DIAG) is not available'
 	else
 		fail_ 'inet-accept-connect-send-recv failed'
 	fi
