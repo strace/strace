@@ -12,6 +12,14 @@ int main(void)
 {
 	const unsigned long pagesize = sysconf(_SC_PAGESIZE);
 
+#ifdef __s390__
+	/*
+	 * The si_addr field is unreliable:
+	 * https://marc.info/?l=linux-s390&m=142515870124248&w=2
+	 */
+	return 77;
+#endif
+
 	/* write instruction pointer length to the log */
 	if (write(-1, NULL, 2 * sizeof(void *)) >= 0)
 		return 77;
