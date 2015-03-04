@@ -826,23 +826,33 @@ sys_sigreturn(struct tcb *tcp)
 	}
 #elif defined(POWERPC)
 	if (entering(tcp)) {
-		long esp;
+		long esp = ppc_regs.gpr[1];
 		struct sigcontext sc;
-
-		esp = ppc_regs.gpr[1];
 
 		/* Skip dummy stack frame. */
 #ifdef POWERPC64
 		if (current_personality == 0)
 			esp += 128;
 		else
-			esp += 64;
-#else
-		esp += 64;
 #endif
-		if (umove(tcp, esp, &sc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", sc.oldmask);
+			esp += 64;
+
+		tprints(") (mask ");
+		if (umove(tcp, esp, &sc) < 0) {
+			tprintf("%#lx", esp);
+		} else {
+			unsigned long mask[NSIG / 8 / sizeof(long)];
+#ifdef POWERPC64
+			if (current_personality == 0)
+				mask[0] = sc.oldmask | (sc._unused[3] << 32);
+			else
+#endif
+			{
+				mask[0] = sc.oldmask;
+				mask[1] = sc._unused[3];
+			}
+			tprintsigmask_val("", mask);
+		}
 	}
 #elif defined(M68K)
 	if (entering(tcp)) {
