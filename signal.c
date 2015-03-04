@@ -703,8 +703,9 @@ sys_sigreturn(struct tcb *tcp)
 # endif
 				(*arm_sp_ptr +
 				 OFFSETOF_STRUCT_UCONTEXT_UC_SIGMASK);
-		tprints(") (mask ");
+		tprints("{mask=");
 		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
@@ -712,14 +713,19 @@ sys_sigreturn(struct tcb *tcp)
 		long mask[NSIG / 8 / sizeof(long)];
 		if (upeek(tcp->pid, PT_GPR15, &usp) < 0)
 			return 0;
-		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &mask) < 0)
-			return 0;
+		tprints("{mask=");
+		const long addr = usp + __SIGNAL_FRAMESIZE;
+		if (umove(tcp, addr, &mask) < 0) {
+			tprintf("%#lx", addr);
+		} else {
 # ifdef S390
-		usp = mask[0];
-		mask[0] = mask[1];
-		mask[1] = usp;
+			usp = mask[0];
+			mask[0] = mask[1];
+			mask[1] = usp;
 # endif
-		tprintsigmask_addr(") (mask ", mask);
+			tprintsigmask_addr("", mask);
+		}
+		tprints("}");
 	}
 #elif defined I386 || defined X86_64 || defined X32
 	if (entering(tcp)) {
@@ -728,8 +734,9 @@ sys_sigreturn(struct tcb *tcp)
 			const unsigned long addr =
 				(unsigned long) *x86_64_rsp_ptr +
 				offsetof(struct ucontext, uc_sigmask);
-			tprints(") (mask ");
+			tprints("{mask=");
 			print_sigset_addr_len(tcp, addr, NSIG / 8);
+			tprints("}");
 			return 0;
 		}
 # endif
@@ -785,12 +792,16 @@ sys_sigreturn(struct tcb *tcp)
 		 * and after it an additional u32 extramask[1] which holds
 		 * upper half of the mask.
 		 */
-		uint32_t sigmask[2];
-		if (umove(tcp, *i386_esp_ptr, &signal_stack) < 0)
-			return 0;
-		sigmask[0] = signal_stack.sc.oldmask;
-		sigmask[1] = signal_stack.extramask[0];
-		tprintsigmask_addr(") (mask ", sigmask);
+		tprints("{mask=");
+		if (umove(tcp, *i386_esp_ptr, &signal_stack) < 0) {
+			tprintf("%#lx", (unsigned long) *i386_esp_ptr);
+		} else {
+			uint32_t sigmask[2];
+			sigmask[0] = signal_stack.sc.oldmask;
+			sigmask[1] = signal_stack.extramask[0];
+			tprintsigmask_addr("", sigmask);
+		}
+		tprints("}");
 	}
 #elif defined(IA64)
 	if (entering(tcp)) {
@@ -801,8 +812,9 @@ sys_sigreturn(struct tcb *tcp)
 #		define OFFSETOF_STRUCT_SIGFRAME_SC	0xA0
 		addr += 16 + OFFSETOF_STRUCT_SIGFRAME_SC +
 			offsetof(struct sigcontext, sc_mask);
-		tprints(") (mask ");
+		tprints("{mask=");
 		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #elif defined(POWERPC)
 	if (entering(tcp)) {
@@ -817,7 +829,7 @@ sys_sigreturn(struct tcb *tcp)
 #endif
 			esp += 64;
 
-		tprints(") (mask ");
+		tprints("{mask=");
 		if (umove(tcp, esp, &sc) < 0) {
 			tprintf("%#lx", esp);
 		} else {
@@ -833,26 +845,27 @@ sys_sigreturn(struct tcb *tcp)
 			}
 			tprintsigmask_val("", mask);
 		}
+		tprints("}");
 	}
 #elif defined(M68K)
 	if (entering(tcp)) {
-		long usp;
-		struct sigcontext sc;
-		if (upeek(tcp->pid, 4*PT_USP, &usp) < 0)
+		long addr;
+		if (upeek(tcp->pid, 4*PT_USP, &addr) < 0)
 			return 0;
-		if (umove(tcp, usp, &sc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", sc.sc_mask);
+		addr += offsetof(struct sigcontext, sc_mask);
+		tprints("{mask=");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #elif defined(ALPHA)
 	if (entering(tcp)) {
-		long fp;
-		struct sigcontext sc;
-		if (upeek(tcp->pid, REG_FP, &fp) < 0)
+		long addr;
+		if (upeek(tcp->pid, REG_FP, &addr) < 0)
 			return 0;
-		if (umove(tcp, fp, &sc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", sc.sc_mask);
+		addr += offsetof(struct sigcontext, sc_mask);
+		tprints("{mask=");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #elif defined(SPARC) || defined(SPARC64)
 	if (entering(tcp)) {
@@ -864,7 +877,7 @@ sys_sigreturn(struct tcb *tcp)
 			unsigned int extramask[NSIG / 8 / sizeof(int) - 1];
 		} frame;
 
-		tprints(") (mask ");
+		tprints("{mask=");
 		if (umove(tcp, fp, &frame) < 0) {
 			tprintf("%#lx", fp);
 		} else {
@@ -874,6 +887,7 @@ sys_sigreturn(struct tcb *tcp)
 			memcpy(mask + 1, frame.extramask, sizeof(frame.extramask));
 			tprintsigmask_val("", mask);
 		}
+		tprints("}");
 	}
 #elif defined MIPS
 	if (entering(tcp)) {
@@ -895,42 +909,44 @@ sys_sigreturn(struct tcb *tcp)
 		const long addr = mips_REG_SP + 6 * 4 + 128 +
 				  offsetof(struct ucontext, uc_sigmask);
 # endif
-		tprints(") (mask ");
+		tprints("{mask=");
 		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #elif defined(CRISV10) || defined(CRISV32)
 	if (entering(tcp)) {
-		struct sigcontext sc;
 		long regs[PT_MAX+1];
 		if (ptrace(PTRACE_GETREGS, tcp->pid, NULL, (long)regs) < 0) {
 			perror_msg("sigreturn: PTRACE_GETREGS");
 			return 0;
 		}
-		if (umove(tcp, regs[PT_USP], &sc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", sc.oldmask);
+		const long addr = regs[PT_USP] +
+			offsetof(struct sigcontext, oldmask);
+		tprints("{mask=");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #elif defined(TILE)
 	if (entering(tcp)) {
-		struct ucontext uc;
-
 		/* offset of ucontext in the kernel's sigframe structure */
-#		define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(siginfo_t)
-		if (umove(tcp, tile_regs.sp + SIGFRAME_UC_OFFSET, &uc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", uc.uc_sigmask);
+# define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(siginfo_t)
+		const long addr = tile_regs.sp + SIGFRAME_UC_OFFSET +
+				  offsetof(struct ucontext, uc_sigmask);
+		tprints("{mask=");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #elif defined(MICROBLAZE)
 	/* TODO: Verify that this is correct...  */
 	if (entering(tcp)) {
-		struct sigcontext sc;
-		long sp;
+		long addr;
 		/* Read r1, the stack pointer.  */
-		if (upeek(tcp->pid, 1 * 4, &sp) < 0)
+		if (upeek(tcp->pid, 1 * 4, &addr) < 0)
 			return 0;
-		if (umove(tcp, sp, &sc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", sc.oldmask);
+		addr += offsetof(struct sigcontext, oldmask);
+		tprints("{mask=");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
+		tprints("}");
 	}
 #else
 # warning sigreturn/rt_sigreturn signal mask decoding is not implemented for this architecture
