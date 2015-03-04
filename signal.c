@@ -927,13 +927,8 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		tprintsigmask_val(") (mask ", sc.oldmask);
 	}
-#elif defined(XTENSA)
-	/* Xtensa only has rt_sys_sigreturn */
-#elif defined(ARC)
-	/* ARC syscall ABI only supports rt_sys_sigreturn */
 #else
-# warning No sys_sigreturn() for this architecture
-# warning         (no problem, just a reminder :-)
+# warning sigreturn/rt_sigreturn signal mask decoding is not implemented for this architecture
 #endif
 	return 0;
 }
