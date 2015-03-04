@@ -876,14 +876,24 @@ sys_sigreturn(struct tcb *tcp)
 	}
 #elif defined(SPARC) || defined(SPARC64)
 	if (entering(tcp)) {
-		long i1;
-		m_siginfo_t si;
-		i1 = sparc_regs.u_regs[U_REG_O1];
-		if (umove(tcp, i1, &si) < 0) {
-			perror_msg("sigreturn: umove");
-			return 0;
+		long fp = sparc_regs.u_regs[U_REG_FP] + sizeof(struct sparc_stackf);
+		struct {
+			m_siginfo_t si;
+			void *fpu_save;
+			long insns[2] __attribute__ ((aligned (8)));
+			unsigned int extramask[NSIG / 8 / sizeof(int) - 1];
+		} frame;
+
+		tprints(") (mask ");
+		if (umove(tcp, fp, &frame) < 0) {
+			tprintf("%#lx", fp);
+		} else {
+			unsigned int mask[NSIG / 8 / sizeof(int)];
+
+			mask[0] = frame.si.si_mask;
+			memcpy(mask + 1, frame.extramask, sizeof(frame.extramask));
+			tprintsigmask_val("", mask);
 		}
-		tprintsigmask_val(") (mask ", si.si_mask);
 	}
 #elif defined(LINUX_MIPSN32) || defined(LINUX_MIPSN64)
 	/* This decodes rt_sigreturn.  The 64-bit ABIs do not have

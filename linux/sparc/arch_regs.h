@@ -4,3 +4,4 @@ extern struct pt_regs sparc_regs;
 #define U_REG_G1 0
 #define U_REG_O0 7
 #define U_REG_O1 8
+#define U_REG_FP 13
