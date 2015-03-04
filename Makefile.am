@@ -214,7 +214,6 @@ EXTRA_DIST =				\
 	linux/ia64/arch_regs.h		\
 	linux/ia64/ioctls_arch0.h	\
 	linux/ia64/ioctls_inc0.h	\
-	linux/ia64/signalent.h		\
 	linux/ia64/syscallent.h		\
 	linux/ia64/userent.h		\
 	linux/inet_diag.h		\
