@@ -7,7 +7,7 @@ for m in -m32 -mx32; do
 		tests/Makefile.am > tests$m/Makefile.am
 	for f in tests/*; do
 		case "${f##*/}" in
-		Makefile.am|Makefile.in) continue;;
+		Makefile*) continue;;
 		esac
 		ln -s ../"$f" tests$m/
 	done
