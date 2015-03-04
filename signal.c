@@ -747,12 +747,17 @@ sys_sigreturn(struct tcb *tcp)
 		tprintsigmask_addr(") (mask ", sc.oldmask);
 	}
 #elif defined I386 || defined X86_64 || defined X32
-# ifndef I386
-	/* sys_sigreturn is i386 personality only */
-	if (current_personality != 1)
-		return 0;
-# endif
 	if (entering(tcp)) {
+# ifndef I386
+		if (current_personality != 1) {
+			const unsigned long addr =
+				(unsigned long) *x86_64_rsp_ptr +
+				offsetof(struct ucontext, uc_sigmask);
+			tprints(") (mask ");
+			print_sigset_addr_len(tcp, addr, NSIG / 8);
+			return 0;
+		}
+# endif
 		struct i386_sigcontext_struct {
 			uint16_t gs, __gsh;
 			uint16_t fs, __fsh;

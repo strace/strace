@@ -327,7 +327,7 @@
  * for native 64-bit operation.
  */
 [512] = { 4,	TS,		sys_rt_sigaction,		"rt_sigaction"		},
-[513] = { 0,	TS,		sys_rt_sigreturn,		"rt_sigreturn"		},
+[513] = { 0,	TS,		sys_sigreturn,			"rt_sigreturn"		},
 [514] = { 3,	TD,		sys_ioctl,			"ioctl"			},
 [515] = { 3,	TD,		sys_readv,			"readv"			},
 [516] = { 3,	TD,		sys_writev,			"writev"		},

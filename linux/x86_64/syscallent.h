@@ -13,7 +13,7 @@
 [ 12] = { 1,	TM|SI,		sys_brk,			"brk"			},
 [ 13] = { 4,	TS,		sys_rt_sigaction,		"rt_sigaction"		},
 [ 14] = { 4,	TS,		sys_rt_sigprocmask,		"rt_sigprocmask"	},
-[ 15] = { 0,	TS,		sys_rt_sigreturn,		"rt_sigreturn"		},
+[ 15] = { 0,	TS,		sys_sigreturn,			"rt_sigreturn"		},
 [ 16] = { 3,	TD,		sys_ioctl,			"ioctl"			},
 [ 17] = { 4,	TD,		sys_pread,			"pread"			},
 [ 18] = { 4,	TD,		sys_pwrite,			"pwrite"		},
