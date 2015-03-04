@@ -814,15 +814,15 @@ sys_sigreturn(struct tcb *tcp)
 	}
 #elif defined(IA64)
 	if (entering(tcp)) {
-		struct sigcontext sc;
-		long sp;
-		/* offset of sigcontext in the kernel's sigframe structure: */
-#		define SIGFRAME_SC_OFFSET	0x90
-		if (upeek(tcp->pid, PT_R12, &sp) < 0)
+		long addr;
+		if (upeek(tcp->pid, PT_R12, &addr) < 0)
 			return 0;
-		if (umove(tcp, sp + 16 + SIGFRAME_SC_OFFSET, &sc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", sc.sc_mask);
+		/* offsetof(struct sigframe, sc) */
+#		define OFFSETOF_STRUCT_SIGFRAME_SC	0xA0
+		addr += 16 + OFFSETOF_STRUCT_SIGFRAME_SC +
+			offsetof(struct sigcontext, sc_mask);
+		tprints(") (mask ");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
 	}
 #elif defined(POWERPC)
 	if (entering(tcp)) {
