@@ -739,12 +739,17 @@ sys_sigreturn(struct tcb *tcp)
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
 		long usp;
-		struct sigcontext sc;
+		long mask[NSIG / 8 / sizeof(long)];
 		if (upeek(tcp->pid, PT_GPR15, &usp) < 0)
 			return 0;
-		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &sc) < 0)
+		if (umove(tcp, usp + __SIGNAL_FRAMESIZE, &mask) < 0)
 			return 0;
-		tprintsigmask_addr(") (mask ", sc.oldmask);
+# ifdef S390
+		usp = mask[0];
+		mask[0] = mask[1];
+		mask[1] = usp;
+# endif
+		tprintsigmask_addr(") (mask ", mask);
 	}
 #elif defined I386 || defined X86_64 || defined X32
 	if (entering(tcp)) {
