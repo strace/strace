@@ -24,6 +24,7 @@ check_PROGRAMS = \
 	select \
 	set_ptracer_any \
 	sigaction \
+	sigreturn \
 	stack-fcall \
 	stat \
 	stat32 \
@@ -57,6 +58,7 @@ TESTS = \
 	scm_rights-fd.test \
 	select.test \
 	sigaction.test \
+	sigreturn.test \
 	stat.test \
 	stat32-v.test \
 	stat64-v.test \

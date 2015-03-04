@@ -6,7 +6,6 @@ mtd
 seccomp
 sig
 sigkill_rain
-sigreturn
 skodic
 threaded_execve
 ubi

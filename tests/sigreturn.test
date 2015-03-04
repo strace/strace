@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Check rt_sigprocmask and sigreturn/rt_sigreturn decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+
+./sigreturn ||
+	fail_ 'sigreturn failed'
+
+args='-esignal ./sigreturn'
+$STRACE -o "$LOG" $args ||
+	fail_ "$STRACE $args does not work"
+
+grep_log()
+{
+	LC_ALL=C grep -E -x -e "$*" < "$LOG" > /dev/null || {
+		cat "$LOG"
+		fail_ "$STRACE $args output mismatch"
+	}
+}
+
+mask='\[(USR2 CHLD|CHLD USR2) RT_2 RT_3 RT_4 RT_31 RT_32\]'
+rt_sigprocmask='rt_sigprocmask\(SIG_SETMASK, '"$mask"', NULL, [[:digit:]]+\) += 0'
+osf_sigprocmask='osf_sigprocmask\(SIG_SETMASK, '"$mask"'\) += 0 +\(old mask \[[^]]*\]\)'
+grep_log "$rt_sigprocmask|$osf_sigprocmask"
+grep_log '(rt_)?sigreturn\((\{mask='"$mask"'\})?\) += 0'
+
+
+exit 0

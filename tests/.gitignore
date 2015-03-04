@@ -15,6 +15,7 @@ scm_rights
 select
 set_ptracer_any
 sigaction
+sigreturn
 stack-fcall
 stat
 stat32
