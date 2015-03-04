@@ -692,49 +692,16 @@ sys_sigreturn(struct tcb *tcp)
 {
 #if defined(ARM)
 	if (entering(tcp)) {
-		struct arm_sigcontext {
-			unsigned long trap_no;
-			unsigned long error_code;
-			unsigned long oldmask;
-			unsigned long arm_r0;
-			unsigned long arm_r1;
-			unsigned long arm_r2;
-			unsigned long arm_r3;
-			unsigned long arm_r4;
-			unsigned long arm_r5;
-			unsigned long arm_r6;
-			unsigned long arm_r7;
-			unsigned long arm_r8;
-			unsigned long arm_r9;
-			unsigned long arm_r10;
-			unsigned long arm_fp;
-			unsigned long arm_ip;
-			unsigned long arm_sp;
-			unsigned long arm_lr;
-			unsigned long arm_pc;
-			unsigned long arm_cpsr;
-			unsigned long fault_address;
-		};
-		struct arm_ucontext {
-			unsigned long uc_flags;
-			unsigned long uc_link;  /* struct ucontext* */
-			/* The next three members comprise stack_t struct: */
-			unsigned long ss_sp;    /* void*   */
-			unsigned long ss_flags; /* int     */
-			unsigned long ss_size;  /* size_t  */
-			struct arm_sigcontext sc;
-			/* These two members are sigset_t: */
-			unsigned long uc_sigmask[2];
-			/* more fields follow, which we aren't interested in */
-		};
-		struct arm_ucontext uc;
-		if (umove(tcp, arm_regs.ARM_sp, &uc) < 0)
-			return 0;
 		/*
 		 * Kernel fills out uc.sc.oldmask too when it sets up signal stack,
 		 * but for sigmask restore, sigreturn syscall uses uc.uc_sigmask instead.
 		 */
-		tprintsigmask_addr(") (mask ", uc.uc_sigmask);
+# define SIZEOF_STRUCT_SIGCONTEXT (21 * 4)
+# define OFFSETOF_STRUCT_UCONTEXT_UC_SIGMASK (5 * 4 + SIZEOF_STRUCT_SIGCONTEXT)
+		const long addr = arm_regs.ARM_sp +
+			OFFSETOF_STRUCT_UCONTEXT_UC_SIGMASK;
+		tprints(") (mask ");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
 	}
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
