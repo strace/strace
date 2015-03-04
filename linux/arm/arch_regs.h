@@ -1,1 +1,1 @@
-extern struct pt_regs arm_regs;
+extern long *const arm_sp_ptr;

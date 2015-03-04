@@ -137,7 +137,7 @@
 [136] = { 2,	TS,		sys_rt_sigpending,		"rt_sigpending"		},
 [137] = { 4,	TS,		sys_rt_sigtimedwait,		"rt_sigtimedwait"	},
 [138] = { 3,	TS,		sys_rt_sigqueueinfo,		"rt_sigqueueinfo"	},
-[139] = { 0,	TS,		sys_rt_sigreturn,		"rt_sigreturn"		},
+[139] = { 0,	TS,		sys_sigreturn,			"rt_sigreturn"		},
 [140] = { 3,	0,		sys_setpriority,		"setpriority"		},
 [141] = { 2,	0,		sys_getpriority,		"getpriority"		},
 [142] = { 4,	0,		sys_reboot,			"reboot"		},

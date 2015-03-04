@@ -712,7 +712,8 @@ static long m68k_d0;
 #elif defined(BFIN)
 static long bfin_r0;
 #elif defined(ARM)
-struct pt_regs arm_regs; /* not static */
+static struct pt_regs arm_regs;
+long *const arm_sp_ptr = &arm_regs.ARM_sp;
 # define ARCH_REGS_FOR_GETREGS arm_regs
 #elif defined(AARCH64)
 struct arm_pt_regs {
@@ -742,6 +743,8 @@ static union {
 } arm_regs_union;
 # define aarch64_regs arm_regs_union.aarch64_r
 # define arm_regs     arm_regs_union.arm_r
+uint64_t *const aarch64_sp_ptr = &aarch64_regs.sp;
+int *const arm_sp_ptr = &arm_regs.ARM_sp;
 static struct iovec aarch64_io = {
 	.iov_base = &arm_regs_union
 };
