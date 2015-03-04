@@ -900,23 +900,28 @@ sys_sigreturn(struct tcb *tcp)
 			tprintsigmask_val("", mask);
 		}
 	}
-#elif defined(LINUX_MIPSN32) || defined(LINUX_MIPSN64)
-	/* This decodes rt_sigreturn.  The 64-bit ABIs do not have
-	   sigreturn.  */
+#elif defined MIPS
 	if (entering(tcp)) {
-		struct ucontext uc;
-		/* There are six words followed by a 128-byte siginfo.  */
-		long sp = mips_REG_SP + 6 * 4 + 128;
-		if (umove(tcp, sp, &uc) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", uc.uc_sigmask);
-	}
-#elif defined(LINUX_MIPSO32)
-	if (entering(tcp)) {
-		m_siginfo_t si;
-		if (umove(tcp, mips_REG_SP, &si) < 0)
-			return 0;
-		tprintsigmask_val(") (mask ", si.si_mask);
+# if defined LINUX_MIPSO32
+		/*
+		 * offsetof(struct sigframe, sf_mask) ==
+		 * sizeof(sf_ass) + sizeof(sf_pad) + sizeof(struct sigcontext)
+		 */
+		const long addr = mips_REG_SP + 6 * 4 +
+				  sizeof(struct sigcontext);
+# else
+		/*
+		 * This decodes rt_sigreturn.
+		 * The 64-bit ABIs do not have sigreturn.
+		 *
+		 * offsetof(struct rt_sigframe, rs_uc) ==
+		 * sizeof(sf_ass) + sizeof(sf_pad) + sizeof(struct siginfo)
+		 */
+		const long addr = mips_REG_SP + 6 * 4 + 128 +
+				  offsetof(struct ucontext, uc_sigmask);
+# endif
+		tprints(") (mask ");
+		print_sigset_addr_len(tcp, addr, NSIG / 8);
 	}
 #elif defined(CRISV10) || defined(CRISV32)
 	if (entering(tcp)) {
