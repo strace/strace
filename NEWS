@@ -8,6 +8,7 @@ Noteworthy changes in release 4.10 (????-??-??)
     recvmsg, sendmmsg, and recvmmsg syscalls.
   * Implemented full 32-bit decoding of ioctl commands
     (addresses Fedora bug #902788).
+  * Implemented PTRACE_GETREGS API support on IA64.
   * Implemented PTRACE_GETREGS API support on MIPS.
   * Implemented PTRACE_GETREGSET API support on S390/S390x.
   * Implemented decoding of getrandom and seccomp syscalls.

@@ -768,13 +768,11 @@ sys_sigreturn(struct tcb *tcp)
 	}
 #elif defined(IA64)
 	if (entering(tcp)) {
-		long addr;
-		if (upeek(tcp->pid, PT_R12, &addr) < 0)
-			return 0;
 		/* offsetof(struct sigframe, sc) */
 #		define OFFSETOF_STRUCT_SIGFRAME_SC	0xA0
-		addr += 16 + OFFSETOF_STRUCT_SIGFRAME_SC +
-			offsetof(struct sigcontext, sc_mask);
+		const long addr = *ia64_frame_ptr + 16 +
+				  OFFSETOF_STRUCT_SIGFRAME_SC +
+				  offsetof(struct sigcontext, sc_mask);
 		tprints("{mask=");
 		print_sigset_addr_len(tcp, addr, NSIG / 8);
 		tprints("}");

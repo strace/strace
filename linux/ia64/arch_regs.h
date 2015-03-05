@@ -1,2 +1,2 @@
 #include <asm/ptrace_offsets.h>
-#include <asm/rse.h>
+extern unsigned long *const ia64_frame_ptr;
