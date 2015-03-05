@@ -22,7 +22,7 @@ There is no automated detection of errors for now: you need to examine
 logs yourself.
 
 For me, the following system images worked (tests passed/skipped/failed):
-system-image-armv4l  - 14/14/1 (failed: stat32-v.test - wrong stat decoding)
+system-image-armv4l  - 14/14/1 (failed: stat32-v.test - wrong stat decoding, sun_path.test - libc error)
 system-image-armv4tl - 15/14/0
 system-image-armv5l  - 15/14/0
 system-image-armv6l  - 15/14/0
@@ -31,8 +31,8 @@ system-image-i586    - 14/14/1 (failed: count.test - grep segfault)
 system-image-i686    - 14/14/1 (failed: count.test - grep segfault)
 system-image-mips    - 15/14/0
 system-image-mipsel  - 15/14/0
-system-image-powerpc - 13/14/2 (failed: ptrace_setoptions.test - grep segfault, ipc_sem.test - ipc_sem segfault)
-system-image-sparc   - 13/14/2 (failed: ipc_sem.test - ipc_sem segfault, sigaction.test - wrong rt_sigaction decoding)
+system-image-powerpc - 13/14/2 (failed: ipc_sem.test - ipc_sem segfault)
+system-image-sparc   - 13/14/2 (failed: ipc_sem.test - ipc_sem segfault)
 system-image-x86_64  - 14/15/0
 
 And these did not:
