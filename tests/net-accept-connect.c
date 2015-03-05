@@ -1,12 +1,21 @@
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
-int main(int ac, const char **av)
+static void
+handler(int sig)
+{
+	assert(close(1) == 0);
+	_exit(0);
+}
+
+int
+main(int ac, const char **av)
 {
 	struct sockaddr_un addr = {
 		.sun_family = AF_UNIX,
@@ -40,16 +49,24 @@ int main(int ac, const char **av)
 	if (pid) {
 		assert(accept(0, (struct sockaddr *) &addr, &len) == 1);
 		assert(close(0) == 0);
+		assert(kill(pid, SIGUSR1) == 0);
 		int status;
 		assert(waitpid(pid, &status, 0) == pid);
 		assert(status == 0);
 		assert(close(1) == 0);
 	} else {
+		sigset_t set;
+		sigemptyset(&set);
+		sigaddset(&set, SIGUSR1);
+
+		assert(sigprocmask(SIG_BLOCK, &set, NULL) == 0);
+		assert(signal(SIGUSR1, handler) != SIG_ERR);
 		assert(socket(PF_LOCAL, SOCK_STREAM, 0) == 1);
 		assert(close(0) == 0);
 		assert(connect(1, (struct sockaddr *) &addr, len) == 0);
-		assert(close(1) == 0);
-		return 0;
+		assert(sigprocmask(SIG_UNBLOCK, &set, NULL) == 0);
+		assert(pause() == 99);
+		return 1;
 	}
 
 	unlink(av[1]);

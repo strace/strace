@@ -1,5 +1,5 @@
 BEGIN {
-  lines = 5
+  lines = 6
   fail = 0
   addrlen = length(addr) + 3
 
@@ -20,7 +20,9 @@ NR == 3 {
   }
 }
 
-NR == 4 {
+NR == 4 && /^--- SIGUSR1 / {next}
+
+NR == 5 {
   if (inode != "" && r_close_connected != "" && match($0, r_close_connected, a) && a[1] == inode) {
     next
   }
