@@ -717,19 +717,16 @@ sys_sigreturn(struct tcb *tcp)
 	}
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
-		long usp;
 		long mask[NSIG / 8 / sizeof(long)];
-		if (upeek(tcp->pid, PT_GPR15, &usp) < 0)
-			return 0;
 		tprints("{mask=");
-		const long addr = usp + __SIGNAL_FRAMESIZE;
+		const long addr = *s390_frame_ptr + __SIGNAL_FRAMESIZE;
 		if (umove(tcp, addr, &mask) < 0) {
 			tprintf("%#lx", addr);
 		} else {
 # ifdef S390
-			usp = mask[0];
+			long v = mask[0];
 			mask[0] = mask[1];
-			mask[1] = usp;
+			mask[1] = v;
 # endif
 			tprintsigmask_addr("", mask);
 		}

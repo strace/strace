@@ -764,7 +764,10 @@ struct mips_regs mips_regs; /* not static */
 /* PTRACE_GETREGS on MIPS is available since linux v2.6.15. */
 # define ARCH_REGS_FOR_GETREGS mips_regs
 #elif defined(S390) || defined(S390X)
-static long s390_gpr2;
+/* PTRACE_GETREGSET on S390 is available since linux v2.6.27. */
+static struct user_regs_struct s390_regset;
+unsigned long *const s390_frame_ptr = &s390_regset.gprs[15];
+# define ARCH_REGS_FOR_GETREGSET s390_regset
 #elif defined(HPPA)
 static long hppa_r28;
 #elif defined(SH)
@@ -829,12 +832,7 @@ print_pc(struct tcb *tcp)
 	else
 		tprintf(fmt, (unsigned long) x86_64_regs.rip);
 #elif defined(S390) || defined(S390X)
-	long psw;
-	if (upeek(tcp->pid, PT_PSWADDR, &psw) < 0) {
-		PRINTBADPC;
-		return;
-	}
-	tprintf(fmt, psw);
+	tprintf(fmt, s390_regset.psw.addr);
 #elif defined(IA64)
 	long ip;
 	if (upeek(tcp->pid, PT_B0, &ip) < 0) {
@@ -1134,87 +1132,7 @@ get_scno(struct tcb *tcp)
 	long scno = 0;
 
 #if defined(S390) || defined(S390X)
-	if (upeek(tcp->pid, PT_GPR2, &s390_gpr2) < 0)
-		return -1;
-
-	if (s390_gpr2 != -ENOSYS) {
-		/*
-		 * Since kernel version 2.5.44 the scno gets passed in gpr2.
-		 */
-		scno = s390_gpr2;
-	} else {
-		/*
-		 * Old style of "passing" the scno via the SVC instruction.
-		 */
-		long psw;
-		long opcode, offset_reg, tmp;
-		void *svc_addr;
-		static const int gpr_offset[16] = {
-				PT_GPR0,  PT_GPR1,  PT_ORIGGPR2, PT_GPR3,
-				PT_GPR4,  PT_GPR5,  PT_GPR6,     PT_GPR7,
-				PT_GPR8,  PT_GPR9,  PT_GPR10,    PT_GPR11,
-				PT_GPR12, PT_GPR13, PT_GPR14,    PT_GPR15
-		};
-
-		if (upeek(tcp->pid, PT_PSWADDR, &psw) < 0)
-			return -1;
-		errno = 0;
-		opcode = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)(psw - sizeof(long)), 0);
-		if (errno) {
-			perror_msg("peektext(psw-oneword)");
-			return -1;
-		}
-
-		/*
-		 *  We have to check if the SVC got executed directly or via an
-		 *  EXECUTE instruction. In case of EXECUTE it is necessary to do
-		 *  instruction decoding to derive the system call number.
-		 *  Unfortunately the opcode sizes of EXECUTE and SVC are differently,
-		 *  so that this doesn't work if a SVC opcode is part of an EXECUTE
-		 *  opcode. Since there is no way to find out the opcode size this
-		 *  is the best we can do...
-		 */
-		if ((opcode & 0xff00) == 0x0a00) {
-			/* SVC opcode */
-			scno = opcode & 0xff;
-		}
-		else {
-			/* SVC got executed by EXECUTE instruction */
-
-			/*
-			 *  Do instruction decoding of EXECUTE. If you really want to
-			 *  understand this, read the Principles of Operations.
-			 */
-			svc_addr = (void *) (opcode & 0xfff);
-
-			tmp = 0;
-			offset_reg = (opcode & 0x000f0000) >> 16;
-			if (offset_reg && (upeek(tcp->pid, gpr_offset[offset_reg], &tmp) < 0))
-				return -1;
-			svc_addr += tmp;
-
-			tmp = 0;
-			offset_reg = (opcode & 0x0000f000) >> 12;
-			if (offset_reg && (upeek(tcp->pid, gpr_offset[offset_reg], &tmp) < 0))
-				return -1;
-			svc_addr += tmp;
-
-			scno = ptrace(PTRACE_PEEKTEXT, tcp->pid, svc_addr, 0);
-			if (errno)
-				return -1;
-# if defined(S390X)
-			scno >>= 48;
-# else
-			scno >>= 16;
-# endif
-			tmp = 0;
-			offset_reg = (opcode & 0x00f00000) >> 20;
-			if (offset_reg && (upeek(tcp->pid, gpr_offset[offset_reg], &tmp) < 0))
-				return -1;
-
-			scno = (scno | tmp) & 0xff;
-		}
-	}
+	scno = s390_regset.gprs[2];
 #elif defined(POWERPC)
 	scno = ppc_regs.gpr[0];
 # ifdef POWERPC64
@@ -1624,9 +1542,14 @@ get_syscall_args(struct tcb *tcp)
 	nargs = tcp->s_ent->nargs;
 
 #if defined(S390) || defined(S390X)
-	for (i = 0; i < nargs; ++i)
-		if (upeek(tcp->pid, i==0 ? PT_ORIGGPR2 : PT_GPR2 + i*sizeof(long), &tcp->u_arg[i]) < 0)
-			return -1;
+	(void)i;
+	(void)nargs;
+	tcp->u_arg[0] = s390_regset.orig_gpr2;
+	tcp->u_arg[1] = s390_regset.gprs[3];
+	tcp->u_arg[2] = s390_regset.gprs[4];
+	tcp->u_arg[3] = s390_regset.gprs[5];
+	tcp->u_arg[4] = s390_regset.gprs[6];
+	tcp->u_arg[5] = s390_regset.gprs[7];
 #elif defined(ALPHA)
 	for (i = 0; i < nargs; ++i)
 		if (upeek(tcp->pid, REG_A0+i, &tcp->u_arg[i]) < 0)
@@ -1946,9 +1869,6 @@ get_syscall_result(struct tcb *tcp)
 {
 #if defined ARCH_REGS_FOR_GETREGSET || defined ARCH_REGS_FOR_GETREGS
 	/* already done by get_regs */
-#elif defined(S390) || defined(S390X)
-	if (upeek(tcp->pid, PT_GPR2, &s390_gpr2) < 0)
-		return -1;
 #elif defined(BFIN)
 	if (upeek(tcp->pid, PT_R0, &bfin_r0) < 0)
 		return -1;
@@ -2009,12 +1929,12 @@ get_error(struct tcb *tcp)
 		check_errno = 0;
 	}
 #if defined(S390) || defined(S390X)
-	if (check_errno && is_negated_errno(s390_gpr2)) {
+	if (check_errno && is_negated_errno(s390_regset.gprs[2])) {
 		tcp->u_rval = -1;
-		u_error = -s390_gpr2;
+		u_error = -s390_regset.gprs[2];
 	}
 	else {
-		tcp->u_rval = s390_gpr2;
+		tcp->u_rval = s390_regset.gprs[2];
 	}
 #elif defined(I386)
 	if (check_errno && is_negated_errno(i386_regs.eax)) {

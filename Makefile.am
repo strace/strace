@@ -264,12 +264,14 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
 	linux/ptp_clock.h		\
+	linux/s390/arch_regs.h		\
 	linux/s390/ioctls_arch0.h	\
 	linux/s390/ioctls_inc0.h	\
 	linux/s390/syscallent.h		\
 	linux/s390/userent.h		\
 	linux/s390/userent0.h		\
 	linux/s390/userent1.h		\
+	linux/s390x/arch_regs.h		\
 	linux/s390x/ioctls_arch0.h	\
 	linux/s390x/ioctls_inc0.h	\
 	linux/s390x/syscallent.h	\
