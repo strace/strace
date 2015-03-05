@@ -793,14 +793,11 @@ sys_sigreturn(struct tcb *tcp)
 		} else {
 			unsigned long mask[NSIG / 8 / sizeof(long)];
 #ifdef POWERPC64
-			if (current_personality == 0)
-				mask[0] = sc.oldmask | (sc._unused[3] << 32);
-			else
+			mask[0] = sc.oldmask | (sc._unused[3] << 32);
+#else
+			mask[0] = sc.oldmask;
+			mask[1] = sc._unused[3];
 #endif
-			{
-				mask[0] = sc.oldmask;
-				mask[1] = sc._unused[3];
-			}
 			tprintsigmask_val("", mask);
 		}
 		tprints("}");
