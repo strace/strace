@@ -102,13 +102,21 @@ struct sigcontext {
 #include "xlat/sigprocmaskcmds.h"
 
 /* Anonymous realtime signals. */
-/* Under glibc 2.1, SIGRTMIN et al are functions, but __SIGRTMIN is a
-   constant.  This is what we want.  Otherwise, just use SIGRTMIN. */
-#ifdef SIGRTMIN
-#ifndef __SIGRTMIN
-#define __SIGRTMIN SIGRTMIN
-#define __SIGRTMAX SIGRTMAX /* likewise */
+#ifndef ASM_SIGRTMIN
+/* Linux kernel >= 3.18 defines SIGRTMIN to 32 on all architectures. */
+# define ASM_SIGRTMIN 32
 #endif
+#ifndef ASM_SIGRTMAX
+/* Under glibc 2.1, SIGRTMAX et al are functions, but __SIGRTMAX is a
+   constant.  This is what we want.  Otherwise, just use SIGRTMAX. */
+# ifdef SIGRTMAX
+#  ifndef __SIGRTMAX
+#   define __SIGRTMAX SIGRTMAX
+#  endif
+# endif
+# ifdef __SIGRTMAX
+#  define ASM_SIGRTMAX __SIGRTMAX
+# endif
 #endif
 
 /* Note on the size of sigset_t:
@@ -143,9 +151,9 @@ signame(const int sig)
 
 		if (s < nsignals)
 			return signalent[s];
-#ifdef SIGRTMIN
-		if (s >= __SIGRTMIN && s <= __SIGRTMAX) {
-			sprintf(buf, "SIGRT_%u", s - __SIGRTMIN);
+#ifdef ASM_SIGRTMAX
+		if (s >= ASM_SIGRTMIN && s <= ASM_SIGRTMAX) {
+			sprintf(buf, "SIGRT_%u", s - ASM_SIGRTMIN);
 			return buf;
 		}
 #endif
@@ -214,9 +222,9 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 		if ((unsigned) i < nsignals) {
 			s = stpcpy(s, signalent[i] + 3);
 		}
-#ifdef SIGRTMIN
-		else if (i >= __SIGRTMIN && i <= __SIGRTMAX) {
-			s += sprintf(s, "RT_%u", i - __SIGRTMIN);
+#ifdef ASM_SIGRTMAX
+		else if (i >= ASM_SIGRTMIN && i <= ASM_SIGRTMAX) {
+			s += sprintf(s, "RT_%u", i - ASM_SIGRTMIN);
 		}
 #endif
 		else {

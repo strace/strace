@@ -21,7 +21,7 @@ grep_log()
 	}
 }
 
-mask='\[(USR2 CHLD|CHLD USR2) RT_2 RT_3 RT_4 RT_31 RT_32\]'
+mask='\[(USR2 CHLD|CHLD USR2) RT_2 RT_3 RT_4 RT_26 RT_27\]'
 rt_sigprocmask='rt_sigprocmask\(SIG_SETMASK, '"$mask"', NULL, [[:digit:]]+\) += 0'
 osf_sigprocmask='osf_sigprocmask\(SIG_SETMASK, '"$mask"'\) += 0 +\(old mask \[[^]]*\]\)'
 grep_log "$rt_sigprocmask|$osf_sigprocmask"

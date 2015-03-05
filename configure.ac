@@ -711,13 +711,22 @@ AC_CHECK_SIZEOF([long])
 AC_CHECK_SIZEOF([long long])
 AC_CHECK_SIZEOF([off_t],,[#include <sys/types.h>])
 
-AC_CACHE_CHECK([for SA_RESTORER], [st_cv_sa_restorer],
-	       [st_cv_sa_restorer="$(echo SA_RESTORER |
+AC_CACHE_CHECK([for SIGRTMIN], [st_cv_SIGRTMIN],
+	       [[st_cv_SIGRTMIN="$(echo SIGRTMIN |
+			$CPP $CPPFLAGS -P -imacros asm/signal.h - |
+			grep '^[0-9]')"
+	         test -n "$st_cv_SIGRTMIN" || st_cv_SIGRTMIN=no]])
+if test "x$st_cv_SIGRTMIN" != xno; then
+	AC_DEFINE_UNQUOTED([ASM_SIGRTMIN], [$st_cv_SIGRTMIN],
+			   [SIGRTMIN defined in <asm/signal.h>])
+fi
+AC_CACHE_CHECK([for SA_RESTORER], [st_cv_SA_RESTORER],
+	       [st_cv_SA_RESTORER="$(echo SA_RESTORER |
 			$CPP $CPPFLAGS -P -imacros asm/signal.h - |
 			grep ^0x)"
-	        test -n "$st_cv_sa_restorer" || st_cv_sa_restorer=no])
-if test "x$st_cv_sa_restorer" != xno; then
-	AC_DEFINE_UNQUOTED([ASM_SA_RESTORER], [$st_cv_sa_restorer],
+	        test -n "$st_cv_SA_RESTORER" || st_cv_SA_RESTORER=no])
+if test "x$st_cv_SA_RESTORER" != xno; then
+	AC_DEFINE_UNQUOTED([ASM_SA_RESTORER], [$st_cv_SA_RESTORER],
 			   [SA_RESTORER defined in <asm/signal.h>])
 fi
 
