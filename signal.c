@@ -740,66 +740,24 @@ sys_sigreturn(struct tcb *tcp)
 			return 0;
 		}
 # endif
-		struct i386_sigcontext_struct {
-			uint16_t gs, __gsh;
-			uint16_t fs, __fsh;
-			uint16_t es, __esh;
-			uint16_t ds, __dsh;
-			uint32_t edi;
-			uint32_t esi;
-			uint32_t ebp;
-			uint32_t esp;
-			uint32_t ebx;
-			uint32_t edx;
-			uint32_t ecx;
-			uint32_t eax;
-			uint32_t trapno;
-			uint32_t err;
-			uint32_t eip;
-			uint16_t cs, __csh;
-			uint32_t eflags;
-			uint32_t esp_at_signal;
-			uint16_t ss, __ssh;
-			uint32_t i387;
-			uint32_t oldmask;
-			uint32_t cr2;
-		};
-		struct i386_fpstate {
-			uint32_t cw;
-			uint32_t sw;
-			uint32_t tag;
-			uint32_t ipoff;
-			uint32_t cssel;
-			uint32_t dataoff;
-			uint32_t datasel;
-			uint8_t  st[8][10]; /* 8*10 bytes: FP regs */
-			uint16_t status;
-			uint16_t magic;
-			uint32_t fxsr_env[6];
-			uint32_t mxcsr;
-			uint32_t reserved;
-			uint8_t  stx[8][16]; /* 8*16 bytes: FP regs, each padded to 16 bytes */
-			uint8_t  xmm[8][16]; /* 8 XMM regs */
-			uint32_t padding1[44];
-			uint32_t padding2[12]; /* union with struct _fpx_sw_bytes */
-		};
-		struct {
-			struct i386_sigcontext_struct sc;
-			struct i386_fpstate fp;
-			uint32_t extramask[1];
-		} signal_stack;
-		/* On i386, sc is followed on stack by struct fpstate
-		 * and after it an additional u32 extramask[1] which holds
+		/*
+		 * On i386, sigcontext is followed on stack by struct fpstate
+		 * and after it an additional u32 extramask which holds
 		 * upper half of the mask.
 		 */
+		struct {
+			uint32_t struct_sigcontext_padding1[20];
+			uint32_t oldmask;
+			uint32_t struct_sigcontext_padding2;
+			uint32_t struct_fpstate_padding[156];
+			uint32_t extramask;
+		} frame;
 		tprints("{mask=");
-		if (umove(tcp, *i386_esp_ptr, &signal_stack) < 0) {
+		if (umove(tcp, *i386_esp_ptr, &frame) < 0) {
 			tprintf("%#lx", (unsigned long) *i386_esp_ptr);
 		} else {
-			uint32_t sigmask[2];
-			sigmask[0] = signal_stack.sc.oldmask;
-			sigmask[1] = signal_stack.extramask[0];
-			tprintsigmask_addr("", sigmask);
+			uint32_t mask[2] = { frame.oldmask, frame.extramask };
+			tprintsigmask_addr("", mask);
 		}
 		tprints("}");
 	}
