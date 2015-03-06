@@ -1,5 +1,5 @@
-Noteworthy changes in release 4.10 (????-??-??)
-==============================================
+Noteworthy changes in release 4.10 (2015-03-06)
+===============================================
 
 * Improvements
   * Added -yy option to print protocol and address information associated with
@@ -7,10 +7,10 @@ Noteworthy changes in release 4.10 (????-??-??)
   * Extended "-e read=set" and "-e write=set" options to cover sendmsg,
     recvmsg, sendmmsg, and recvmmsg syscalls.
   * Implemented full 32-bit decoding of ioctl commands
-    (addresses Fedora bug #902788).
-  * Implemented PTRACE_GETREGS API support on IA64.
-  * Implemented PTRACE_GETREGS API support on MIPS.
-  * Implemented PTRACE_GETREGSET API support on S390/S390x.
+    (addresses Debian bug #692913 and Fedora bug #902788).
+  * Implemented PTRACE_GETREGS API support on ia64.
+  * Implemented PTRACE_GETREGS API support on mips.
+  * Implemented PTRACE_GETREGSET API support on s390/s390x.
   * Implemented decoding of getrandom and seccomp syscalls.
   * Implemented full decoding of 64-bit capability sets.
   * Implemented decoding of all prctl commands.
@@ -20,6 +20,8 @@ Noteworthy changes in release 4.10 (????-??-??)
   * Implemented decoding of SG_IO v4 ioctl commands.
   * Implemented decoding of FIFREEZE/FITHAW/FITRIM ioctl commands.
   * Implemented decoding of FALLOC_FL_* fallocate flags.
+  * Implemented decoding of rt_sigreturn signal mask on aarch64,
+    x32, and x86_64.
   * Enhanced socket decoder to support bluetooth sockets.
   * Enhanced decoding of unlisted ioctl commands.
   * Enhanced decoding of getsockopt and setsockopt syscall.
@@ -55,6 +57,8 @@ Noteworthy changes in release 4.10 (????-??-??)
   * Fixed decoding of 32-bit stat structures on 64-bit architectures.
   * Fixed decoding of 32-bit struct cmsghdr on 64-bit architectures.
   * Fixed decoding of 32-bit preadv/pwritev offset on 64-bit architectures.
+  * Fixed decoding of sigreturn/rt_sigreturn signal mask on ia64, ppc, ppc64,
+    sparc, sparc64, mips, and s390.
   * Fixed instruction pointer output (-i option) on architectures that support
     several personalities.
   * Fixed behaviour of "-e read=set" and "-e write=set" when read and write
@@ -65,6 +69,10 @@ Noteworthy changes in release 4.10 (????-??-??)
 * Portability
   * Linux kernel >= 2.5.46 is required.
     Older versions without a decent PTRACE_SETOPTIONS support will not work.
+  * On mips, linux kernel >= 2.6.15 is required.
+    Older versions without a decent PTRACE_GETREGS support will not work.
+  * On s390 and s390x, linux kernel >= 2.6.27 is required.
+    Older versions without a decent PTRACE_GETREGSET support will not work.
 
 Noteworthy changes in release 4.9 (2014-08-15)
 ==============================================

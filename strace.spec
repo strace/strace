@@ -1,6 +1,6 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.9
+Version: 4.10
 Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
@@ -79,6 +79,16 @@ make -k check VERBOSE=1
 %endif
 
 %changelog
+* Fri Mar 06 2015 Dmitry V. Levin <ldv@altlinux.org> - 4.10-1
+- New upstream release:
+  + enhanced ioctl decoding (#902788).
+
+* Mon Nov 03 2014 Lubomir Rintel <lkundrak@v3.sk> - 4.9-3
+- Regenerate ioctl entries with proper kernel headers
+
+* Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Fri Aug 15 2014 Dmitry V. Levin <ldv@altlinux.org> - 4.9-1
 - New upstream release:
   + fixed build when <sys/ptrace.h> and <linux/ptrace.h> conflict (#993384);

@@ -1,3 +1,14 @@
+strace (4.10-1) experimental; urgency=low
+
+  * New upstream version.
+    + enhanced ioctl decoding,  closes: #692913
+    + enabled mips64el build, closes: #773375
+    + updated signal and errno numbers, closes: #768642
+    + updated generic and added arch-specific PTRACE_* constants,
+      closes: #734554
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Fri, 06 Mar 2015 13:14:15 +0000
+
 strace (4.9-2) unstable; urgency=medium
 
   * Turn on support for ppc64el, code is already in upstream.
