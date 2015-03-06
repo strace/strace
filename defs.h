@@ -501,6 +501,9 @@ extern void printrusage32(struct tcb *, long);
 #endif
 extern void printuid(const char *, const unsigned int);
 extern void print_sigset_addr_len(struct tcb *, long, long);
+extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
+#define tprintsigmask_addr(prefix, mask) \
+	tprints(sprintsigmask_n((prefix), (mask), sizeof(mask)))
 extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int decode_iov, unsigned long);

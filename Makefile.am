@@ -93,6 +93,7 @@ strace_SOURCES =	\
 	scsi.c		\
 	seccomp.c	\
 	signal.c	\
+	sigreturn.c	\
 	sock.c		\
 	socketutils.c	\
 	sram_alloc.c	\
