@@ -218,7 +218,7 @@
 [189] = { 5,	0,		sys_putpmsg,			"putpmsg"		},
 [190] = { 0,	TP,		sys_vfork,			"vfork"			},
 [191] = { 2,	0,		sys_getrlimit,			"ugetrlimit"		},
-[192] = { 6,	TD|TM|SI,	sys_mmap_pgoff,			"mmap2"			},
+[192] = { 6,	TD|TM|SI,	sys_mmap_4koff,			"mmap2"			},
 [193] = { 4,	TF,		sys_truncate64,			"truncate64"		},
 [194] = { 4,	TD,		sys_ftruncate64,		"ftruncate64"		},
 [195] = { 2,	TF,		sys_stat64,			"stat64"		},
