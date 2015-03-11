@@ -27,7 +27,9 @@ touch -d '1970-01-01 -42 seconds' $sample
 for f in $sample . /dev/null; do
 	args="-v -efile ./stat $f"
 	$STRACE -o "$LOG" $args > "$OUT" &&
-	LC_ALL=C grep -E -x -f "$OUT" "$LOG" > /dev/null || {
+	exp_lines=$(wc -l < "$OUT") &&
+	matched_lines=$(LC_ALL=C grep -c -E -x -f "$OUT" "$LOG") &&
+	test $exp_lines -eq $matched_lines || {
 		cat "$OUT" "$LOG"
 		fail_ "$STRACE $args output mismatch"
 	}
