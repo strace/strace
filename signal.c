@@ -62,7 +62,7 @@
 #  define HAVE_SA_RESTORER 1
 # endif
 #else /* !SA_RESTORER */
-# if defined SPARC || defined SPARC64
+# if defined SPARC || defined SPARC64 || defined M68K
 #  define HAVE_SA_RESTORER 1
 # else
 #  define HAVE_SA_RESTORER 0
