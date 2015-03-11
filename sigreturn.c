@@ -23,7 +23,7 @@ sys_sigreturn(struct tcb *tcp)
 # define OFFSETOF_STRUCT_UCONTEXT_UC_SIGMASK (5 * 4 + SIZEOF_STRUCT_SIGCONTEXT)
 		const long addr =
 # ifdef AARCH64
-			current_personality == 0 ?
+			current_personality == 1 ?
 				(*aarch64_sp_ptr + SIZEOF_STRUCT_SIGINFO +
 				 offsetof(struct ucontext, uc_sigmask)) :
 # endif
