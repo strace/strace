@@ -15,12 +15,12 @@ main(void)
 
 	if (shmctl(id, IPC_STAT, &ds))
 		goto fail;
-	printf("shmctl\\(%d, IPC_STAT, %p\\) += 0\n", id, &ds);
+	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, %p\\) += 0\n", id, &ds);
 
 	int max = shmctl(0, SHM_INFO, &ds);
 	if (max < 0)
 		goto fail;
-	printf("shmctl\\(0, SHM_INFO, %p\\) += %d\n", &ds, max);
+	printf("shmctl\\(0, (IPC_64\\|)?SHM_INFO, %p\\) += %d\n", &ds, max);
 
 	rc = shmctl(id, SHM_STAT, &ds);
 	if (rc != id) {
@@ -30,16 +30,16 @@ main(void)
 		 */
 		if (-1 != rc || EINVAL != errno)
 			goto fail;
-		printf("shmctl\\(%d, SHM_STAT, %p\\) += -1 EINVAL \\(Invalid argument\\)\n", id, &ds);
+		printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) += -1 EINVAL \\(Invalid argument\\)\n", id, &ds);
 	} else {
-		printf("shmctl\\(%d, SHM_STAT, %p\\) += %d\n", id, &ds, id);
+		printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) += %d\n", id, &ds, id);
 	}
 
 	rc = 0;
 done:
 	if (shmctl(id, IPC_RMID, 0) < 0)
 		return 1;
-	printf("shmctl\\(%d, IPC_RMID, 0\\) += 0\n", id);
+	printf("shmctl\\(%d, (IPC_64\\|)?IPC_RMID, 0\\) += 0\n", id);
 	return rc;
 
 fail:
