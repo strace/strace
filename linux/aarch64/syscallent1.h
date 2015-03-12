@@ -3,9 +3,6 @@
 /* Arch-specific block, not used on AArch64 */
 [244 ... 259] = { },
 
-/* Blank down to 1023 */
-[277 ... 1023] = { },
-
 /* Quote from asm-generic/unistd.h:
  *
  * All syscalls below here should go away really,
