@@ -6,13 +6,16 @@
 
 check_prog awk
 
-$STRACE -eselect -h > /dev/null ||
+syscall=
+$STRACE -epselect6 -h > /dev/null && syscall=$syscall,pselect6
+$STRACE -eselect -h > /dev/null && syscall=$syscall,select
+test -n "$syscall" ||
 	skip_ 'select syscall is not supported on this architecture'
 
 ./select ||
 	framework_skip_ 'select syscall does not behave as expected'
 
-args='-eselect ./select'
+args="-e$syscall ./select"
 $STRACE -o "$LOG" $args || {
 	cat "$LOG"
 	fail_ "$STRACE $args failed"
