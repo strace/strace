@@ -57,9 +57,17 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 	}
 
 	if (!abbrev(tcp)) {
-		tprintf("st_atime=%s, ", sprinttime(statbuf->st_atime));
-		tprintf("st_mtime=%s, ", sprinttime(statbuf->st_mtime));
-		tprintf("st_ctime=%s", sprinttime(statbuf->st_ctime));
+		const bool cast = sizeof(statbuf->st_atime) == sizeof(int);
+
+		tprintf("st_atime=%s, ",
+			sprinttime(cast ? (time_t) (int) statbuf->st_atime:
+					  (time_t) statbuf->st_atime));
+		tprintf("st_mtime=%s, ",
+			sprinttime(cast ? (time_t) (int) statbuf->st_mtime:
+					  (time_t) statbuf->st_mtime));
+		tprintf("st_ctime=%s",
+			sprinttime(cast ? (time_t) (int) statbuf->st_ctime:
+					  (time_t) statbuf->st_ctime));
 #if HAVE_STRUCT_STAT_ST_FLAGS
 		tprintf(", st_flags=%u", (unsigned int) statbuf->st_flags);
 #endif
