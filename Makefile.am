@@ -164,6 +164,7 @@ EXTRA_DIST =				\
 	linux/32/syscallent.h		\
 	linux/64/ioctls_inc.h		\
 	linux/64/syscallent.h		\
+	linux/aarch64/arch_regs.h	\
 	linux/aarch64/errnoent1.h	\
 	linux/aarch64/ioctls_arch0.h	\
 	linux/aarch64/ioctls_arch1.h	\
