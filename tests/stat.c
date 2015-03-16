@@ -14,22 +14,22 @@
 # include <sys/types.h>
 #endif
 
-#undef STAT_FNAME
+#undef STAT_PREFIX
 #undef NR_stat
 
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
 # include <sys/stat.h>
-# define STAT_FNAME "stat(64)?"
+# define STAT_PREFIX "(stat(64)?\\(|newfstatat\\(AT_FDCWD, )"
 #else
 # include <sys/syscall.h>
 # if defined __NR_stat
 #  define NR_stat __NR_stat
-#  define STAT_FNAME "stat"
+#  define STAT_PREFIX "stat\\("
 # elif defined __NR_newstat
 #  define NR_stat __NR_newstat
-#  define STAT_FNAME "newstat"
+#  define STAT_PREFIX "newstat\\("
 # endif
-# ifdef STAT_FNAME
+# ifdef STAT_PREFIX
 /* for S_IFMT */
 #  define stat libc_stat
 #  define stat64 libc_stat64
@@ -57,10 +57,10 @@
 #  define off_t __kernel_off_t
 #  define loff_t __kernel_loff_t
 #  include <asm/stat.h>
-#  endif /* STAT_FNAME */
+#  endif /* STAT_PREFIX */
 #endif /* _FILE_OFFSET_BITS */
 
-#ifdef STAT_FNAME
+#ifdef STAT_PREFIX
 
 static void
 print_ftype(unsigned int mode)
@@ -115,7 +115,7 @@ main(int ac, const char **av)
 	assert(stat(av[1], &stb) == 0);
 #endif
 
-	printf(STAT_FNAME "\\(\"%s\", \\{", av[1]);
+	printf(STAT_PREFIX "\"%s\", \\{", av[1]);
 	printf("st_dev=makedev\\(%u, %u\\)",
 	       (unsigned int) major(stb.st_dev),
 	       (unsigned int) minor(stb.st_dev));
@@ -159,11 +159,15 @@ main(int ac, const char **av)
 	printf("(, st_flags=[0-9]+)?");
 	printf("(, st_fstype=[^,]*)?");
 	printf("(, st_gen=[0-9]+)?");
-	printf("\\}\\) += 0\n");
+	printf("\\}");
+#ifndef NR_stat
+	printf("(, 0)?");
+#endif
+	printf("\\) += 0\n");
 	return 0;
 }
 
-#else /* !STAT_FNAME */
+#else /* !STAT_PREFIX */
 int main(void)
 {
 	return 77;
