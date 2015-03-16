@@ -26,9 +26,9 @@ regexp == "" {
       expected = "setresuid"
       regexp = "^setresuid" suffix "\\(" uid ", -1, -1\\)[[:space:]]+= 0$"
     } else if (expected == "setresuid") {
-      expected = "chown"
-      regexp = "^chown" suffix "\\(\".\", -1, -1\\)[[:space:]]+= 0$"
-    } else if (expected == "chown") {
+      expected = "fchown"
+      regexp = "^fchown" suffix "\\(1, -1, -1\\)[[:space:]]+= 0$"
+    } else if (expected == "fchown") {
       expected = "1st getgroups"
       regexp = "^getgroups" suffix "\\(0, NULL\\)[[:space:]]+= " r_uint "$"
     } else if (expected == "1st getgroups") {

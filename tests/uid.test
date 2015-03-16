@@ -17,7 +17,7 @@ uid="uid$s$w"
 	fi
 }
 
-syscalls="getuid$s,setuid$s,getresuid$s,setreuid$s,setresuid$s,chown$s,getgroups$s"
+syscalls="getuid$s,setuid$s,getresuid$s,setreuid$s,setresuid$s,fchown$s,getgroups$s"
 args="-e trace=$syscalls"
 $STRACE -o "$LOG" $args ./"$uid"|| {
 	cat "$LOG"

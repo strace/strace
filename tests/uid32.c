@@ -14,7 +14,7 @@ main(void)
  && defined(__NR_getresuid32) \
  && defined(__NR_setreuid32) \
  && defined(__NR_setresuid32) \
- && defined(__NR_chown32) \
+ && defined(__NR_fchown32) \
  && defined(__NR_getgroups32)
 	int r, e, s;
 	int size;
@@ -25,7 +25,7 @@ main(void)
 	assert(syscall(__NR_getresuid32, &r, &e, &s) == 0);
 	assert(syscall(__NR_setreuid32, -1, -1L) == 0);
 	assert(syscall(__NR_setresuid32, r, -1, -1L) == 0);
-	assert(syscall(__NR_chown32, ".", -1, -1L) == 0);
+	assert(syscall(__NR_fchown32, 1, -1, -1L) == 0);
 	assert((size = syscall(__NR_getgroups32, 0, list)) >= 0);
 	assert(list = calloc(size + 1, sizeof(*list)));
 	assert(syscall(__NR_getgroups32, size, list) == size);

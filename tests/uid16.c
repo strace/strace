@@ -15,7 +15,7 @@ main(void)
  && defined(__NR_getresuid) \
  && defined(__NR_setreuid) \
  && defined(__NR_setresuid) \
- && defined(__NR_chown) \
+ && defined(__NR_fchown) \
  && defined(__NR_getgroups) \
  \
  && defined(__NR_getuid32) \
@@ -23,7 +23,7 @@ main(void)
  && defined(__NR_getresuid32) \
  && defined(__NR_setreuid32) \
  && defined(__NR_setresuid32) \
- && defined(__NR_chown32) \
+ && defined(__NR_fchown32) \
  && defined(__NR_getgroups32) \
  \
  && __NR_getuid != __NR_getuid32 \
@@ -31,7 +31,7 @@ main(void)
  && __NR_getresuid != __NR_getresuid32 \
  && __NR_setreuid != __NR_setreuid32 \
  && __NR_setresuid != __NR_setresuid32 \
- && __NR_chown != __NR_chown32 \
+ && __NR_fchown != __NR_fchown32 \
  && __NR_getgroups != __NR_getgroups32 \
  /**/
 	int uid;
@@ -65,7 +65,7 @@ main(void)
 	}
 	assert(syscall(__NR_setreuid, -1, 0xffff) == 0);
 	assert(syscall(__NR_setresuid, uid, -1, 0xffff) == 0);
-	assert(syscall(__NR_chown, ".", -1, 0xffff) == 0);
+	assert(syscall(__NR_fchown, 1, -1, 0xffff) == 0);
 	assert((size = syscall(__NR_getgroups, 0, list)) >= 0);
 	assert(list = calloc(size + 1, sizeof(*list)));
 	assert(syscall(__NR_getgroups, size, list) == size);
