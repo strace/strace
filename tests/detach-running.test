@@ -4,17 +4,16 @@
 
 . "${srcdir=.}/init.sh"
 
-kill -0 $$ ||
-	framework_skip_ 'kill -0 does not work'
+run_prog_skip_if_failed \
+	kill -0 $$
 
-check_prog grep
 check_prog sleep
 
 set -e
 
 ./set_ptracer_any sh -c "echo > $LOG; while :; do :; done" > /dev/null &
 
-while ! [ -s $LOG ]; do
+while ! [ -s "$LOG" ]; do
 	kill -0 $! 2> /dev/null ||
 		fail_ 'set_ptracer_any sh failed'
 	$SLEEP_A_BIT
@@ -30,30 +29,35 @@ cleanup()
 	return 0
 }
 
-rm -f $LOG
-$STRACE -p $tracee_pid 2> $LOG &
+rm -f "$LOG"
+$STRACE -p $tracee_pid 2> "$LOG" &
 
-while ! grep -F "Process $tracee_pid attached" $LOG > /dev/null; do
-	kill -0 $! 2> /dev/null ||
-		{ cat $LOG; cleanup; fail_ 'strace -p does not work'; }
+while ! grep -F "Process $tracee_pid attached" "$LOG" > /dev/null; do
+	kill -0 $! 2> /dev/null || {
+		cleanup
+		dump_log_and_fail_with "$STRACE -p failed to attach"
+	}
 	$SLEEP_A_BIT
 done
 
 kill -INT $!
 wait $!
 
-grep -F "Process $tracee_pid detached" $LOG > /dev/null ||
-	{ cat $LOG; cleanup; fail_ 'strace -p failed to detach'; }
+grep -F "Process $tracee_pid detached" "$LOG" > /dev/null || {
+		cleanup
+		dump_log_and_fail_with "$STRACE -p failed to detach"
+	}
 
 if [ -f /proc/self/status ]; then
 	$SLEEP_A_BIT
-	test -d /proc/$tracee_pid ||
-		{ cat $LOG; cleanup; fail_ 'tracee died after detach'; }
+	test -d /proc/$tracee_pid || {
+		cleanup
+		dump_log_and_fail_with 'tracee died after detach'
+	}
 	grep '^State:.*R (running)' < /proc/$tracee_pid/status > /dev/null || {
-		cat $LOG
 		grep '^State:' < /proc/$tracee_pid/status
 		cleanup
-		fail_ 'tracee is not running after detach'
+		dump_log_and_fail_with 'tracee is not running after detach'
 	}
 fi
 

@@ -6,74 +6,56 @@
 
 check_prog dd
 check_prog find
-check_prog grep
 
-OUT="$LOG.out"
+EXPECTED="$LOG.expected"
 size=46118400000
 sample=stat_sample
 
 rm -f $sample
 umask 022
 
-truncate_cmd="dd seek=$size bs=1 count=0 if=/dev/null of=$sample"
-$truncate_cmd > "$OUT" 2>&1 || {
-	cat "$OUT"
-	framework_skip_ 'failed to create a large sparse file'
-}
-
-find_cmd="find $sample -quit"
-$find_cmd || framework_skip_ "$find_cmd failed"
-
-find_L_cmd="find -L $sample -quit"
-$find_L_cmd || framework_skip_ "$find_L_cmd failed"
-
-rm -f $sample
-
-$STRACE -o "$LOG" -edesc $truncate_cmd 2>&1 > "$OUT" 2>&1 || {
-	cat "$LOG" "$OUT"
-	fail_ "$STRACE -edesc $truncate_cmd failed"
-}
-
-rm -f "$OUT"
+run_prog_skip_if_failed \
+	dd seek=$size bs=1 count=0 if=/dev/null of=$sample
+run_strace -edesc $args
 
 r_ftruncate="ftruncate(64)?\\(1, $size\\) += 0"
-LC_ALL=C grep -E -x "$r_ftruncate" "$LOG" > /dev/null || {
-	cat "$LOG"
-	fail_ 'strace -edesc failed to trace ftruncate/ftruncate64 properly'
-}
-
 r_lseek="lseek\\(1, $size, SEEK_CUR\\) += $size"
 r_llseek="_llseek\\(1, $size, \\[$size\\], SEEK_CUR\\) += 0"
-LC_ALL=C grep -E -x "$r_lseek|$r_llseek" "$LOG" > /dev/null || {
-	cat "$LOG"
-	fail_ 'strace -edesc failed to trace lseek/_llseek properly'
-}
 
-$STRACE -o "$LOG" -efile $find_L_cmd || {
-	cat "$LOG"
-	fail_ "$STRACE -efile $find_L_cmd failed"
-}
+cat > "$EXPECTED" << __EOF__
+$r_ftruncate
+$r_lseek|$r_llseek
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+
+run_prog_skip_if_failed \
+	find -L $sample -quit
+run_strace -efile $args
 
 stat="\\{st_mode=S_IFREG\\|0644, st_size=$size, \\.\\.\\.\\}"
 r_stat="stat(64)?\\(\"$sample\", $stat\\) += 0"
 r_fstatat="(new)?fstatat(64)?\\(AT_FDCWD, \"$sample\", $stat, 0\\) += 0"
-LC_ALL=C grep -E -x "$r_stat|$r_fstatat" "$LOG" > /dev/null || {
-	cat "$LOG"
-	fail_ 'strace -efile failed to trace stat/stat64 properly'
-}
 
-$STRACE -o "$LOG" -efile $find_cmd || {
-	cat "$LOG"
-	fail_ "$STRACE -efile $find_cmd failed"
-}
+cat > "$EXPECTED" << __EOF__
+$r_stat|$r_fstatat
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+
+run_prog_skip_if_failed \
+	find $sample -quit
+run_strace -efile $args
 
 r_lstat="lstat(64)?\\(\"$sample\", $stat\\) += 0"
 r_lfstatat="(new)?fstatat(64)?\\(AT_FDCWD, \"$sample\", $stat, AT_SYMLINK_NOFOLLOW\\) += 0"
-LC_ALL=C grep -E -x "$r_lstat|$r_lfstatat" "$LOG" > /dev/null || {
-	cat "$LOG"
-	fail_ 'strace -efile failed to trace fstatat/fstatat64 properly'
-}
 
-rm -f $sample
+cat > "$EXPECTED" << __EOF__
+$r_lstat|$r_lfstatat
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+
+rm -f "$EXPECTED" $sample
 
 exit 0

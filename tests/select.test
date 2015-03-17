@@ -4,26 +4,14 @@
 
 . "${srcdir=.}/init.sh"
 
-check_prog awk
-
 syscall=
 $STRACE -epselect6 -h > /dev/null && syscall=$syscall,pselect6
 $STRACE -eselect -h > /dev/null && syscall=$syscall,select
 test -n "$syscall" ||
-	skip_ 'select syscall is not supported on this architecture'
+	fail_ 'neither select not pselect6 syscall is supported on this architecture'
 
-./select ||
-	framework_skip_ 'select syscall does not behave as expected'
-
-args="-e$syscall ./select"
-$STRACE -o "$LOG" $args || {
-	cat "$LOG"
-	fail_ "$STRACE $args failed"
-}
-
-awk -f "$srcdir"/select.awk "$LOG" || {
-	cat "$LOG"
-	fail_ 'unexpected output'
-}
+run_prog
+run_strace -e$syscall $args
+match_awk
 
 exit 0

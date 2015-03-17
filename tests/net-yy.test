@@ -8,57 +8,22 @@
 [ -d /proc/self/fd/ ] ||
 	framework_skip_ '/proc/self/fd/ is not available'
 
-check_prog awk
 check_prog sed
 
-rm -f $LOG.* $LOG-*
+run_prog ./netlink_inet_diag
+run_prog ./inet-accept-connect-send-recv
+run_strace_merge -yy -eclose,network $args
 
-./inet-accept-connect-send-recv || {
-	if [ $? -eq 77 ]; then
-		framework_skip_ 'PF_INET SOCK_STREAM (CONFIG_INET_TCP_DIAG) is not available'
-	else
-		fail_ 'inet-accept-connect-send-recv failed'
-	fi
-}
+child="$(sed -rn '/SIGCHLD/ s/^.*, si_pid=([1-9][0-9]*), .*/\1/p' "$LOG")"
+[ -n "$child" ] ||
+	dump_log_and_fail_with 'failed to find pid of child process'
 
-./netlink_inet_diag || {
-	if [ $? -eq 77 ]; then
-		framework_skip_ 'NETLINK_INET_DIAG is not available'
-	else
-		fail_ 'netlink_inet_diag failed'
-	fi
-}
+rm -f "$LOG"-*
+sed -rn "/^$child"' /!d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' "$LOG" > "$LOG"-connect &&
+sed -rn "/^$child"' /d; /SIGCHLD/d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' "$LOG" > "$LOG"-accept ||
+	dump_log_and_fail_with 'failed to separate logs'
 
-args="-tt -ff -yy -o $LOG -eclose,network ./inet-accept-connect-send-recv"
-$STRACE $args ||
-	fail_ "strace $args failed"
-
-"$srcdir"/../strace-log-merge $LOG > $LOG || {
-	cat $LOG
-	fail_ 'strace-log-merge failed'
-}
-rm -f $LOG.*
-
-child="$(sed -rn '/SIGCHLD/ s/^.*, si_pid=([1-9][0-9]*), .*/\1/p' $LOG)"
-[ -n "$child" ] || {
-	cat $LOG
-	fail_ 'failed to find pid of child process'
-}
-
-sed -rn "/^$child"' /!d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' $LOG > $LOG-connect &&
-sed -rn "/^$child"' /d; /SIGCHLD/d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' $LOG > $LOG-accept || {
-	cat $LOG
-	fail_ 'failed to separate logs'
-}
-
-awk -f "$srcdir"/net-yy-connect.awk $LOG-connect || {
-	cat $LOG-connect
-	fail_ "strace $args failed to decode socket descriptors properly"
-}
-
-awk -f "$srcdir"/net-yy-accept.awk $LOG-accept || {
-	cat $LOG-accept
-	fail_ "strace $args failed to decode socket descriptors properly"
-}
+match_awk "$LOG-connect" "$srcdir"/net-yy-connect.awk "$STRACE $args connect output mismatch"
+match_awk "$LOG-accept" "$srcdir"/net-yy-accept.awk "$STRACE $args accept output mismatch"
 
 exit 0

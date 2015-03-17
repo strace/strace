@@ -8,15 +8,13 @@
 [ -d /proc/self/fd/ ] ||
 	framework_skip_ '/proc/self/fd/ is not available'
 
-check_prog grep
 check_prog mkdir
 check_prog rm
 check_prog seq
 check_prog touch
 
-rm -rf -- "$LOG".*
-
 dir="$LOG.dir"
+rm -rf -- "$dir"
 mkdir -- "$dir" ||
 	framework_skip_ 'failed to create a directory'
 
@@ -25,36 +23,23 @@ file="$dir/$(for i in $(seq 1 127); do echo A; done; echo Z)"
 touch -- "$file" ||
 	framework_skip_ 'failed to create a file'
 
-./scm_rights /dev/zero ||
-	fail_ 'scm_rights failed'
-
-args="-tt -ff -y -x -enetwork ./scm_rights /dev/zero"
-$STRACE -o "$LOG" $args "$file" ||
-	fail_ "$STRACE $args failed"
-
-"$srcdir"/../strace-log-merge "$LOG" > "$LOG" || {
-	cat $LOG
-	fail_ 'strace-log-merge failed'
-}
-
-rm -rf -- "$LOG".*
-
-grep_log()
-{
-	local syscall="$1"; shift
-	local prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
-
-	LC_ALL=C grep -E -x "$prefix$syscall$*" $LOG > /dev/null || {
-		cat $LOG
-		fail_ "$STRACE $args failed to trace \"$syscall\" properly"
-	}
-}
+run_prog ./scm_rights /dev/zero
+run_strace_merge -y -x -enetwork $args "$file"
 
 n='[1-9][0-9]*'
 msg='\{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", '"$n"'\}\], msg_controllen='"$n"
 rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[3</dev/null>, 4</dev/zero>, 5</[^}>]*/(A\\n){127}Z>\]\}'
 creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, \{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}\}'
-grep_log sendmsg '\(1<socket:\[[0-9]+\]>, '"$msg"', \['"$rights"'\], msg_flags=0\}, 0\) += '"$n"
-grep_log recvmsg '\(0<socket:\[[0-9]+\]>, '"$msg"', \['"$creds"', '"$rights"'\], msg_flags=0\}, 0\) += '"$n"
+prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
+EXPECTED="$LOG.expected"
+
+cat > "$EXPECTED" << __EOF__
+${prefix}sendmsg\\(1<socket:\\[[0-9]+\\]>, $msg, \\[$rights\\], msg_flags=0\\}, 0\\) += $n
+${prefix}recvmsg\\(0<socket:\\[[0-9]+\\]>, $msg, \\[$creds, $rights\\], msg_flags=0\\}, 0\\) += $n
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+rm -f "$EXPECTED"
+rm -rf -- "$dir"
 
 exit 0

@@ -6,6 +6,5 @@
 
 time=/usr/bin/time
 check_prog $time
-
-$STRACE -f $time /bin/ls > $LOG 2>&1 ||
-	{ cat $LOG; fail_ 'strace -f does not work'; }
+check_prog ls
+run_strace -f $time ls > /dev/null

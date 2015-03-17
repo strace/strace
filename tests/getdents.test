@@ -15,29 +15,19 @@ check_prog seq
 check_prog touch
 
 dir="$LOG.dir"
+rm -rf -- "$dir"
 mkdir -- "$dir" ||
 	framework_skip_ 'failed to create a directory'
 
 touch -- "$dir/$(for i in $(seq 1 127); do echo A; done; echo Z)" ||
 	framework_skip_ 'failed to create a file'
 
-ls -- "$dir" > /dev/null || {
-	rm -rf -- "$dir"
+ls -- "$dir" > /dev/null ||
 	framework_skip_ 'failed to list a directory'
-}
 
-args='-vegetdents,getdents64'
-$STRACE -o "$LOG" $args ls -- "$dir" > /dev/null
-rc=$?
+run_strace -vegetdents,getdents64 ls -- "$dir" > /dev/null
+match_awk
+
 rm -rf -- "$dir"
-[ $rc -eq 0 ] || {
-	cat "$LOG"
-	fail_ "strace $args failed"
-}
-
-awk -f "$srcdir"/getdents.awk "$LOG" || {
-	cat "$LOG"
-	fail_ "strace $args failed to trace getdents/getdents64 properly"
-}
 
 exit 0

@@ -5,21 +5,21 @@
 . "${srcdir=.}/init.sh"
 
 check_prog ls
-check_prog grep
+run_strace -e execve ls
 
-$STRACE -e execve ls > /dev/null 2> $LOG &&
-grep '^execve(' $LOG > /dev/null ||
-	{ cat $LOG; fail_ 'strace -e execve does not work'; }
+grep '^execve(' "$LOG" > /dev/null ||
+	dump_log_and_fail_with "$STRACE $args output mismatch"
 
-grep -v '^execve(' $LOG |
+grep -v '^execve(' "$LOG" |
 LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
-	{ cat $LOG; fail_ 'strace -e execve does not work properly'; }
+	dump_log_and_fail_with "$STRACE $args unexpected output"
 
-$STRACE -e trace=process ls > /dev/null 2> $LOG &&
-grep '^execve(' $LOG > /dev/null ||
-	{ cat $LOG; fail_ 'strace -e trace=process does not work'; }
+run_strace -e trace=process ls
 
-grep '^open' $LOG > /dev/null &&
-	{ cat $LOG; fail_ 'strace -e trace=process does not work properly'; }
+grep '^execve(' "$LOG" > /dev/null ||
+	dump_log_and_fail_with "$STRACE $args output mismatch"
+
+grep '^open' "$LOG" > /dev/null &&
+	dump_log_and_fail_with "$STRACE $args unexpected output"
 
 exit 0

@@ -4,23 +4,8 @@
 
 . "${srcdir=.}/init.sh"
 
-dumpio_expected="${srcdir=.}/dumpio.expected"
-cat "$dumpio_expected" > /dev/null ||
-	fail_ "$dumpio_expected is not available"
-
-check_prog diff
-
-args='./unix-pair-send-recv abcdefghijklmnopqrstuvwxyz'
-$args ||
-	fail_ "$args failed"
-
-args="-esignal=none -esendto,recvfrom -eread=0 -ewrite=0 $args"
-$STRACE -o "$LOG" $args || {
-	cat "$LOG"
-	fail_ "$STRACE $args failed"
-}
-
-diff "$dumpio_expected" "$LOG" ||
-	fail_ "$STRACE $args failed to dump i/o properly"
+run_prog ./unix-pair-send-recv abcdefghijklmnopqrstuvwxyz
+run_strace -esignal=none -esendto,recvfrom -eread=0 -ewrite=0 $args
+match_diff
 
 exit 0

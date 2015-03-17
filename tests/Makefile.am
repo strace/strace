@@ -87,15 +87,23 @@ TEST_LOG_COMPILER = $(srcdir)/run.sh
 EXTRA_DIST = init.sh run.sh \
 	     caps.awk \
 	     dumpio.expected \
+	     fanotify_mark.expected \
 	     getdents.awk \
 	     getdents.out \
 	     getrandom.awk \
+	     ioctl.expected \
+	     ipc.sh \
 	     mmsg.expected \
+	     net.expected \
+	     net-fd.expected \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
 	     select.awk \
 	     sigaction.awk \
+	     statfs.expected \
+	     sun_path.expected \
 	     uid.awk \
+	     uio.expected \
 	     unix-yy-accept.awk \
 	     unix-yy-connect.awk \
 	     $(TESTS)

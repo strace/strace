@@ -4,8 +4,9 @@
 
 . "${srcdir=.}/init.sh"
 
+run_prog ./stat . > /dev/null
+
 check_prog dd
-check_prog grep
 check_prog touch
 
 OUT="$LOG.out"
@@ -13,26 +14,15 @@ size=46118400000
 sample=stat64_sample
 
 umask 022
-truncate_cmd="dd seek=$size bs=1 count=0 if=/dev/null of=$sample"
-$truncate_cmd > "$OUT" 2>&1 || {
-	cat "$OUT"
-	framework_skip_ 'failed to create a large sparse file'
-}
+run_prog_skip_if_failed \
+	dd seek=$size bs=1 count=0 if=/dev/null of=$sample
 
-./stat $sample > /dev/null ||
-	fail_ 'stat failed'
-
-touch -d '1970-01-01 -42 seconds' $sample
+run_prog_skip_if_failed \
+	touch -d '1970-01-01 -42 seconds' $sample
 
 for f in $sample . /dev/null; do
-	args="-v -efile ./stat $f"
-	$STRACE -o "$LOG" $args > "$OUT" &&
-	exp_lines=$(wc -l < "$OUT") &&
-	matched_lines=$(LC_ALL=C grep -c -E -x -f "$OUT" "$LOG") &&
-	test $exp_lines -eq $matched_lines || {
-		cat "$OUT" "$LOG"
-		fail_ "$STRACE $args output mismatch"
-	}
+	run_strace -v -efile ./stat $f > "$OUT"
+	match_grep "$LOG" "$OUT"
 done
 
 rm -f $sample "$OUT"

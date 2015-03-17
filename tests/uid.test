@@ -4,29 +4,15 @@
 
 . "${srcdir=.}/init.sh"
 
-check_prog gawk
-
 s="${uid_syscall_suffix-}"
 w="${uid_t_size-}"
-uid="uid$s$w"
-./"$uid" || {
-	if [ $? -eq 77 ]; then
-		framework_skip_ "some uid$s or uid${w}_t syscalls are not available"
-	else
-		fail_ "$uid failed"
-	fi
-}
+
+run_prog ./uid$s$w
 
 syscalls="getuid$s,setuid$s,getresuid$s,setreuid$s,setresuid$s,fchown$s,getgroups$s"
-args="-e trace=$syscalls"
-$STRACE -o "$LOG" $args ./"$uid"|| {
-	cat "$LOG"
-	fail_ "$STRACE $args ./$uid failed"
-}
+run_strace -e trace="$syscalls" $args
 
-gawk -f "$srcdir"/uid.awk -v suffix="$s" "$LOG" || {
-	cat "$LOG"
-	fail_ 'unexpected output'
-}
+AWK=gawk
+match_awk "$LOG" "$srcdir"/uid.awk "$STRACE $args output mismatch" -v suffix="$s"
 
 exit 0

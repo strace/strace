@@ -1,0 +1,6 @@
+ioctl\(-1, TCGETS, 0x[0-9a-f]+\) += -1 EBADF .*
+ioctl\(-1, MMTIMER_GETRES, 0x[0-9a-f]+\) += -1 EBADF .*
+ioctl\(-1, HIDIOCGRDESCSIZE or HIDIOCGVERSION, 0x[0-9a-f]+\) += -1 EBADF .*
+ioctl\(-1, HIDIOCGPHYS\(8\), 0x[0-9a-f]+\) += -1 EBADF .*
+ioctl\(-1, EVIOCGBIT\(EV_KEY, 8\), 0x[0-9a-f]+\) += -1 EBADF .*
+ioctl\(-1, _IOC\(_IOC_READ, 0xde, 0xad, 0x08\), 0x[0-9a-f]+\) += -1 EBADF .*

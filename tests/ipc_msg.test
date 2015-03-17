@@ -2,29 +2,4 @@
 
 # Check decoding of ipc msgget/msgctl syscalls
 
-. "${srcdir=.}/init.sh"
-
-check_prog grep
-
-OUT="$LOG.out"
-
-./ipc_msg > /dev/null || {
-	if [ $? -eq 77 ]; then
-		framework_skip_ 'ipc msgget/msgctl syscalls do not behave as expected'
-	else
-		fail_ 'ipc_msg failed'
-	fi
-}
-
-args="-eipc ./ipc_msg"
-$STRACE -o "$LOG" $args > "$OUT" &&
-exp_lines=$(wc -l < "$OUT") &&
-matched_lines=$(LC_ALL=C grep -c -E -x -f "$OUT" "$LOG") &&
-test $exp_lines -eq $matched_lines || {
-	cat "$OUT" "$LOG"
-	fail_ "$STRACE $args output mismatch"
-}
-
-rm -f "$OUT"
-
-exit 0
+. "${srcdir=.}/ipc.sh"

@@ -7,38 +7,25 @@
 check_prog grep
 check_prog sleep
 
-make_log()
-{
-	$STRACE $args > $LOG 2>&1 || {
-		cat $LOG
-		fail_ "$STRACE $args failed"
-	}
-}
-
 grep_log()
 {
-	LC_ALL=C grep -E -x -e "$*" $LOG > /dev/null || {
-		cat $LOG
-		fail_ "unexpected output from $STRACE $args"
+	local pattern="$1"; shift
+
+	run_strace "$@"
+
+	grep nanosleep "$LOG" > /dev/null ||
+		framework_skip_ 'sleep does not use nanosleep'
+
+	LC_ALL=C grep -E -x -e "$pattern" "$LOG" > /dev/null || {
+		echo "Pattern of expected output: $pattern"
+		echo 'Actual output:'
+		dump_log_and_fail_with "$STRACE $args output mismatch"
 	}
 }
 
-args='-c sleep 1'
-make_log
-grep nanosleep $LOG > /dev/null ||
-	skip_ 'sleep does not use nanosleep'
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'
-
-args='-c -enanosleep sleep 1'
-make_log
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'
-
-args='-cw sleep 1'
-make_log
-grep_log ' *[^ ]+ +(1\.0|0\.99)[^n]*nanosleep'
-
-args='-cw -enanosleep sleep 1'
-make_log
-grep_log '100\.00 +(1\.0|0\.99)[^n]*nanosleep'
+grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c sleep 1
+grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c -enanosleep sleep 1
+grep_log ' *[^ ]+ +(1\.0|0\.99)[^n]*nanosleep'	-cw sleep 1
+grep_log '100\.00 +(1\.0|0\.99)[^n]*nanosleep'	-cw -enanosleep sleep 1
 
 exit 0

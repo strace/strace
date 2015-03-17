@@ -1,0 +1,1 @@
+statfs(64)?\("/proc/self/status"(, [1-9][0-9]*)?, \{f_type="PROC_SUPER_MAGIC", f_bsize=[1-9][0-9]*, f_blocks=[0-9]+, f_bfree=[0-9]+, f_bavail=[0-9]+, f_files=[0-9]+, f_ffree=[0-9]+, f_fsid=\{[0-9]+, [0-9]+\}, f_namelen=[1-9][0-9]*(, f_frsize=[0-9]+)?(, f_flags=[0-9]+)?\}\) += 0

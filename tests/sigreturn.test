@@ -4,28 +4,20 @@
 
 . "${srcdir=.}/init.sh"
 
-check_prog grep
-
-./sigreturn ||
-	fail_ 'sigreturn failed'
-
-args='-esignal ./sigreturn'
-$STRACE -o "$LOG" $args ||
-	fail_ "$STRACE $args does not work"
-
-grep_log()
-{
-	LC_ALL=C grep -E -x -e "$*" < "$LOG" > /dev/null || {
-		cat "$LOG"
-		fail_ "$STRACE $args output mismatch"
-	}
-}
+run_prog
+run_strace -esignal $args
 
 mask='\[(USR2 CHLD|CHLD USR2) RT_2 RT_3 RT_4 RT_26 RT_27\]'
 rt_sigprocmask='rt_sigprocmask\(SIG_SETMASK, '"$mask"', NULL, [[:digit:]]+\) += 0'
 osf_sigprocmask='osf_sigprocmask\(SIG_SETMASK, '"$mask"'\) += 0 +\(old mask \[[^]]*\]\)'
-grep_log "$rt_sigprocmask|$osf_sigprocmask"
-grep_log '(rt_)?sigreturn\((\{mask='"$mask"'\})?\) += 0'
+EXPECTED="$LOG.expected"
 
+cat > "$EXPECTED" << __EOF__
+$rt_sigprocmask|$osf_sigprocmask
+(rt_)?sigreturn\\((\\{mask=$mask\\})?\\) += 0
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+rm -f "$EXPECTED"
 
 exit 0

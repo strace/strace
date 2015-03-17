@@ -9,53 +9,23 @@
 [ -d /proc/self/fd/ ] ||
 	framework_skip_ '/proc/self/fd/ is not available'
 
-check_prog awk
 check_prog sed
 
-rm -f $LOG.* $LOG-*
-
+run_prog ./netlink_unix_diag
 addr=unix-yy-local-stream
-./net-accept-connect $addr ||
-	fail_ 'net-accept-connect failed'
+run_prog ./net-accept-connect $addr
+run_strace_merge -yy -eclose,network $args
 
-./netlink_unix_diag || {
-	if [ $? -eq 77 ]; then
-		framework_skip_ 'NETLINK_SOCK_DIAG for unix domain sockets (CONFIG_UNIX_DIAG) is not available'
-	else
-		fail_ 'netlink_unix_diag failed'
-	fi
-}
+child="$(sed -rn '/SIGCHLD/ s/^.*, si_pid=([1-9][0-9]*), .*/\1/p' "$LOG")"
+[ -n "$child" ] ||
+	dump_log_and_fail_with 'failed to find pid of child process'
 
-args="-tt -ff -yy -eclose,network ./net-accept-connect $addr"
-$STRACE -o "$LOG" $args ||
-	fail_ "$STRACE $args failed"
+rm -f "$LOG"-*
+sed -rn "/^$child"' /!d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' "$LOG" > "$LOG"-connect &&
+sed -rn "/^$child"' /d; /SIGCHLD/d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' "$LOG" > "$LOG"-accept ||
+	dump_log_and_fail_with 'failed to separate logs'
 
-"$srcdir"/../strace-log-merge $LOG > $LOG || {
-	cat $LOG
-	fail_ 'strace-log-merge failed'
-}
-rm -f $LOG.*
-
-child="$(sed -rn '/SIGCHLD/ s/^.*, si_pid=([1-9][0-9]*), .*/\1/p' $LOG)"
-[ -n "$child" ] || {
-	cat $LOG
-	fail_ 'failed to find pid of child process'
-}
-
-sed -rn "/^$child"' /!d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' $LOG > $LOG-connect &&
-sed -rn "/^$child"' /d; /SIGCHLD/d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' $LOG > $LOG-accept || {
-	cat $LOG
-	fail_ 'failed to separate logs'
-}
-
-awk -f "$srcdir"/unix-yy-connect.awk -v addr=$addr $LOG-connect || {
-	cat $LOG-connect
-	fail_ "strace $args failed to decode socket descriptors properly"
-}
-
-awk -f "$srcdir"/unix-yy-accept.awk -v addr=$addr $LOG-accept || {
-	cat $LOG-accept
-	fail_ "strace $args failed to decode socket descriptors properly"
-}
+match_awk "$LOG-connect" "$srcdir"/unix-yy-connect.awk "$STRACE $args connect output mismatch" -v addr=$addr
+match_awk "$LOG-accept" "$srcdir"/unix-yy-accept.awk "$STRACE $args accept output mismatch" -v addr=$addr
 
 exit 0

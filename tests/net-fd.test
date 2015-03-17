@@ -8,40 +8,9 @@
 [ -d /proc/self/fd/ ] ||
 	framework_skip_ '/proc/self/fd/ is not available'
 
-check_prog grep
-
-rm -f $LOG.*
-
-addr=net-fd-local-stream
-./net-accept-connect $addr ||
-	fail_ 'net-accept-connect failed'
-
+run_prog ./net-accept-connect net-fd-local-stream
 # using -y to test socket descriptors 'paths' decoding
-args="-tt -ff -y -enetwork ./net-accept-connect $addr"
-$STRACE -o "$LOG" $args ||
-	fail_ "$STRACE $args failed"
-
-"$srcdir"/../strace-log-merge $LOG > $LOG || {
-	cat $LOG
-	fail_ 'strace-log-merge failed'
-}
-
-rm -f $LOG.*
-
-grep_log()
-{
-	local syscall="$1"; shift
-	local prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
-
-	LC_ALL=C grep -E -x "$prefix$syscall$*" $LOG > /dev/null || {
-		cat $LOG
-		fail_ "strace -enetwork failed to trace \"$syscall\" properly"
-	}
-}
-grep_log bind '\(0<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, 22\) += 0'
-grep_log listen '\(0<socket:\[[0-9]+\]>, 5\) += 0'
-grep_log getsockname '\(0<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, \[22\]\) += 0'
-grep_log accept '\(0<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), NULL\}, \[2\]\) += 1<socket:\[[0-9]+\]>'
-grep_log connect '\(1<socket:\[[0-9]+\]>, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="'$addr'"\}, 22\) += 0'
+run_strace_merge -y -enetwork $args
+match_grep
 
 exit 0
