@@ -46,6 +46,9 @@ printstatfs(struct tcb *tcp, const long addr)
 #ifdef _STATFS_F_FRSIZE
 	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
 #endif
+#ifdef _STATFS_F_FLAGS
+	tprintf(", f_flags=%lu", (unsigned long)statbuf.f_flags);
+#endif
 	tprints("}");
 }
 
