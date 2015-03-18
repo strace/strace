@@ -90,9 +90,11 @@ int main(void)
 	close(1);
 
 	(void) unlink(SUN_PATH);
-	assert(socket(PF_LOCAL, SOCK_STREAM, 0) == 0);
-	assert(bind(0, (struct sockaddr *) &addr, len) == 0);
-	assert(listen(0, 5) == 0);
+	if (socket(PF_LOCAL, SOCK_STREAM, 0) ||
+	    bind(0, (struct sockaddr *) &addr, len) ||
+	    listen(0, 5))
+		return 77;
+
 	assert(unlink(SUN_PATH) == 0);
 
 	if (socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG) != 1)

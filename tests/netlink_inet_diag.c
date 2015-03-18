@@ -81,11 +81,10 @@ int main(void)
 	close(0);
 	close(1);
 
-	assert(socket(PF_INET, SOCK_STREAM, 0) == 0);
-	assert(bind(0, (struct sockaddr *) &addr, len) == 0);
-	assert(listen(0, 5) == 0);
-
-	if (socket(AF_NETLINK, SOCK_RAW, NETLINK_INET_DIAG) != 1)
+	if (socket(PF_INET, SOCK_STREAM, 0) ||
+	    bind(0, (struct sockaddr *) &addr, len) ||
+	    listen(0, 5) ||
+	    socket(AF_NETLINK, SOCK_RAW, NETLINK_INET_DIAG) != 1)
 		return 77;
 
 	return (send_query(1, AF_INET, IPPROTO_TCP) &&
