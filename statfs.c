@@ -128,6 +128,10 @@ struct compat_statfs64 {
   __attribute__ ((packed, aligned(4)))
 #endif
 ;
+#if defined AARCH64 || defined ARM
+/* See arch/arm/kernel/sys_oabi-compat.c for details. */
+# define COMPAT_STATFS64_PADDED_SIZE (sizeof(struct compat_statfs64) + 4)
+#endif
 
 static void
 printcompat_statfs64(struct tcb *tcp, const long addr)
@@ -157,16 +161,19 @@ printcompat_statfs64(struct tcb *tcp, const long addr)
 	tprintf(", f_flags=%lu}", (unsigned long)statbuf.f_frsize);
 }
 
-int
-sys_statfs64(struct tcb *tcp)
+static int
+do_statfs64_fstatfs64(struct tcb *tcp)
 {
 	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
 		tprintf(", %lu, ", tcp->u_arg[1]);
 	} else {
 		if (tcp->u_arg[1] == sizeof(struct statfs64))
 			printstatfs64(tcp, tcp->u_arg[2]);
-		else if (tcp->u_arg[1] == sizeof(struct compat_statfs64))
+		else if (tcp->u_arg[1] == sizeof(struct compat_statfs64)
+#ifdef COMPAT_STATFS64_PADDED_SIZE
+			 || tcp->u_arg[1] == COMPAT_STATFS64_PADDED_SIZE
+#endif
+									)
 			printcompat_statfs64(tcp, tcp->u_arg[2]);
 		else
 			tprints("{???}");
@@ -175,20 +182,19 @@ sys_statfs64(struct tcb *tcp)
 }
 
 int
+sys_statfs64(struct tcb *tcp)
+{
+	if (entering(tcp))
+		printpath(tcp, tcp->u_arg[0]);
+	return do_statfs64_fstatfs64(tcp);
+}
+
+int
 sys_fstatfs64(struct tcb *tcp)
 {
-	if (entering(tcp)) {
+	if (entering(tcp))
 		printfd(tcp, tcp->u_arg[0]);
-		tprintf(", %lu, ", tcp->u_arg[1]);
-	} else {
-		if (tcp->u_arg[1] == sizeof(struct statfs64))
-			printstatfs64(tcp, tcp->u_arg[2]);
-		else if (tcp->u_arg[1] == sizeof(struct compat_statfs64))
-			printcompat_statfs64(tcp, tcp->u_arg[2]);
-		else
-			tprints("{???}");
-	}
-	return 0;
+	return do_statfs64_fstatfs64(tcp);
 }
 #endif /* HAVE_STRUCT_STATFS64 */
 
