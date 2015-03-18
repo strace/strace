@@ -66,7 +66,7 @@ run_strace_merge()
 # dump both files and fail with ERROR_MESSAGE.
 match_awk()
 {
-	local output program error awk
+	local output program error
 	if [ $# -eq 0 ]; then
 		output="$LOG"
 	else
@@ -82,11 +82,10 @@ match_awk()
 	else
 		error="$1"; shift
 	fi
-	awk=${AWK:-awk}
 
-	check_prog "$awk"
+	check_prog gawk
 
-	"$awk" -f "$program" "$@" < "$output" || {
+	AWKPATH="$srcdir" gawk -f "$program" "$@" < "$output" || {
 		cat < "$output"
 		fail_ "$error"
 	}

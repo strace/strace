@@ -84,7 +84,7 @@ net-fd.log: net.log
 
 TEST_LOG_COMPILER = $(srcdir)/run.sh
 
-EXTRA_DIST = init.sh run.sh \
+EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     dumpio.expected \
 	     fanotify_mark.expected \

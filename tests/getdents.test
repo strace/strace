@@ -4,9 +4,9 @@
 
 . "${srcdir=.}/init.sh"
 
-check_prog awk
-awk -f "$srcdir"/getdents.awk "$srcdir"/getdents.out ||
-	framework_skip_ 'awk does not work properly'
+check_prog gawk
+AWKPATH="$srcdir" gawk -f "$srcdir"/getdents.awk "$srcdir"/getdents.out ||
+	framework_skip_ 'gawk does not work properly'
 
 check_prog ls
 check_prog mkdir
