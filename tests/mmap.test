@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Check mmap/mprotect/munmap syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+syscall=mprotect,munmap
+for n in mmap mmap2 old_mmap; do
+	$STRACE -e$n -h > /dev/null && syscall=$syscall,$n
+done
+
+OUT="$LOG.out"
+
+run_prog > /dev/null
+run_strace -e$syscall $args > "$OUT"
+match_grep "$LOG" "$OUT"
+
+rm -f "$OUT"
+
+exit 0

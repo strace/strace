@@ -15,6 +15,8 @@ check_PROGRAMS = \
 	ipc_msg \
 	ipc_sem \
 	ipc_shm \
+	mmap \
+	mmap64 \
 	mmsg \
 	net-accept-connect \
 	netlink_inet_diag \
@@ -36,6 +38,7 @@ check_PROGRAMS = \
 	uio \
 	unix-pair-send-recv
 
+mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -65,6 +68,8 @@ TESTS = \
 	stat32-v.test \
 	stat64-v.test \
 	statfs.test \
+	mmap.test \
+	mmap64.test \
 	mmsg.test \
 	net.test \
 	net-fd.test \

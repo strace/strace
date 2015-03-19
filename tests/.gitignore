@@ -6,6 +6,8 @@ ioctl
 ipc_msg
 ipc_sem
 ipc_shm
+mmap
+mmap64
 mmsg
 net-accept-connect
 netlink_inet_diag

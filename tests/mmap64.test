@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check mmap/mprotect/munmap syscalls decoding.
+# Target executable was compiled with -D_FILE_OFFSET_BITS=64.
+
+. "${srcdir=.}/mmap.test"
