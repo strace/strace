@@ -21,6 +21,7 @@ check_PROGRAMS = \
 	netlink_unix_diag \
 	pc \
 	scm_rights \
+	seccomp \
 	select \
 	set_ptracer_any \
 	sigaction \
@@ -56,6 +57,7 @@ TESTS = \
 	ipc_shm.test \
 	ipc_sem.test \
 	scm_rights-fd.test \
+	seccomp.test \
 	select.test \
 	sigaction.test \
 	sigreturn.test \

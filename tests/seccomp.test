@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Check how SECCOMP_MODE_FILTER is decoded.
+
+. "${srcdir=.}/init.sh"
+
+OUT="$LOG.out"
+
+run_prog > /dev/null
+run_strace -veprctl $args > "$OUT"
+match_diff "$LOG" "$OUT"
+
+rm -f "$OUT"
+
+exit 0

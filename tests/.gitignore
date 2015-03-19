@@ -12,6 +12,7 @@ netlink_inet_diag
 netlink_unix_diag
 pc
 scm_rights
+seccomp
 select
 set_ptracer_any
 sigaction
