@@ -54,7 +54,7 @@
 [ 53] = { 0,	NF,		sys_getgid,			"getgid32"		},
 [ 54] = { 3,	TD,		sys_ioctl,			"ioctl"			},
 [ 55] = { 4,	0,		sys_reboot,			"reboot"		},
-[ 56] = { 6,	TD|TM|SI,	sys_mmap,			"mmap2"			},
+[ 56] = { 6,	TD|TM|SI,	sys_mmap_4koff,			"mmap2"			},
 [ 57] = { 2,	TF,		sys_symlink,			"symlink"		},
 [ 58] = { 3,	TF,		sys_readlink,			"readlink"		},
 [ 59] = { 3,	TF|TP|SE|SI,	sys_execve,			"execve"		},
