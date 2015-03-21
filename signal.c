@@ -1056,8 +1056,13 @@ int sys_rt_sigtimedwait(struct tcb *tcp)
 int
 sys_restart_syscall(struct tcb *tcp)
 {
-	if (entering(tcp))
-		tprints("<... resuming interrupted call ...>");
+	if (entering(tcp)) {
+		tprintf("<... resuming interrupted %s ...>",
+			tcp->s_prev_ent
+			? tcp->s_prev_ent->sys_name
+			: "system call"
+		);
+	}
 	return 0;
 }
 

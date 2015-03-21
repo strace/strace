@@ -2153,6 +2153,8 @@ trace(void)
 	if (tcp->flags & TCB_STARTUP) {
 		if (!startup_tcb(tcp))
 			return false;
+		if (get_scno(tcp) == 1)
+			tcp->s_prev_ent = tcp->s_ent;
 	}
 
 	sig = WSTOPSIG(status);

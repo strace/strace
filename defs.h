@@ -243,6 +243,7 @@ struct tcb {
 	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
+	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
@@ -418,6 +419,7 @@ extern void call_summary(FILE *);
 
 extern void clear_regs(void);
 extern void get_regs(pid_t pid);
+extern int get_scno(struct tcb *tcp);
 
 extern int umoven(struct tcb *, long, unsigned int, char *);
 #define umove(pid, addr, objp)	\

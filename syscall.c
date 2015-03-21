@@ -1127,7 +1127,7 @@ get_regs(pid_t pid)
  * other: error, trace_syscall_entering() should print error indicator
  *    ("????" etc) and bail out.
  */
-static int
+int
 get_scno(struct tcb *tcp)
 {
 	long scno = 0;
@@ -2239,6 +2239,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 	printing_tcp = tcp;
 
+	tcp->s_prev_ent = NULL;
 	if (res != 1) {
 		/* There was error in one of prior ptrace ops */
 		tprints(") ");
@@ -2248,6 +2249,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		tcp->flags &= ~TCB_INSYSCALL;
 		return res;
 	}
+	tcp->s_prev_ent = tcp->s_ent;
 
 	sys_res = 0;
 	if (tcp->qual_flg & QUAL_RAW) {
