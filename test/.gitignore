@@ -2,8 +2,10 @@ childthread
 clone
 fork
 leaderkill
+mmap_offset_decode
 mtd
 seccomp
+sfd
 sig
 sigkill_rain
 skodic
@@ -11,3 +13,5 @@ threaded_execve
 ubi
 vfork
 wait_must_be_interruptible
+x32_lseek
+x32_mmap
