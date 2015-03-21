@@ -1071,7 +1071,7 @@ do_pipe(struct tcb *tcp, int flags_arg)
 #if !defined(SPARC) && !defined(SPARC64) && !defined(SH) && !defined(IA64)
 			int fds[2];
 
-			if (umoven(tcp, tcp->u_arg[0], sizeof fds, (char *) fds) < 0)
+			if (umoven(tcp, tcp->u_arg[0], sizeof fds, fds) < 0)
 				tprints("[...]");
 			else
 				tprintf("[%u, %u]", fds[0], fds[1]);
@@ -1116,7 +1116,7 @@ sys_socketpair(struct tcb *tcp)
 			tprintf(", %#lx", tcp->u_arg[3]);
 			return 0;
 		}
-		if (umoven(tcp, tcp->u_arg[3], sizeof fds, (char *) fds) < 0)
+		if (umoven(tcp, tcp->u_arg[3], sizeof fds, fds) < 0)
 			tprints(", [...]");
 		else
 			tprintf(", [%u, %u]", fds[0], fds[1]);

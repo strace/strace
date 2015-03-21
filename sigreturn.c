@@ -138,7 +138,7 @@ sys_sigreturn(struct tcb *tcp)
 		/* Fetch remaining words of signal mask, located
 		   immediately before.  */
 		addr -= sizeof(mask) - sizeof(long);
-		if (umoven(tcp, addr, sizeof(mask) - sizeof(long), (char *) &mask[1]) < 0)
+		if (umoven(tcp, addr, sizeof(mask) - sizeof(long), &mask[1]) < 0)
 			return 0;
 		tprints("{mask=");
 		tprintsigmask_addr("", mask);

@@ -58,8 +58,7 @@ print_kexec_segments(struct tcb *tcp, unsigned long addr, unsigned long len)
 	for (i = 0; i < len; ++i) {
 		if (i)
 			tprints(", ");
-		if (umoven(tcp, addr + i * sizeof_seg, sizeof_seg,
-			   (char *) &seg) < 0) {
+		if (umoven(tcp, addr + i * sizeof_seg, sizeof_seg, &seg) < 0) {
 			tprints("?");
 			failed = 1;
 			break;

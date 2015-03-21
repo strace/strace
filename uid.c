@@ -183,7 +183,7 @@ sys_setgroups(struct tcb *tcp)
 				tprints("...");
 				break;
 			}
-			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
+			if (umoven(tcp, cur, sizeof(gid), &gid) < 0) {
 				tprints("?");
 				failed = 1;
 				break;
@@ -242,7 +242,7 @@ sys_getgroups(struct tcb *tcp)
 				tprints("...");
 				break;
 			}
-			if (umoven(tcp, cur, sizeof(gid), (char *) &gid) < 0) {
+			if (umoven(tcp, cur, sizeof(gid), &gid) < 0) {
 				tprints("?");
 				failed = 1;
 				break;

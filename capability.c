@@ -103,7 +103,7 @@ print_cap_data(struct tcb *tcp, unsigned long addr, const cap_user_header_t h)
 	else
 		len = 1;
 
-	if (umoven(tcp, addr, len * sizeof(data[0]), (char *) data) < 0) {
+	if (umoven(tcp, addr, len * sizeof(data[0]), data) < 0) {
 		tprintf("%#lx", addr);
 		return;
 	}

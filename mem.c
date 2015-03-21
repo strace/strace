@@ -106,7 +106,7 @@ sys_old_mmap(struct tcb *tcp)
 	 */
 	int i;
 	unsigned narrow_arg[6];
-	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), (char *) narrow_arg) == -1)
+	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), narrow_arg) == -1)
 		return 0;
 	for (i = 0; i < 6; i++)
 		u_arg[i] = (unsigned long) narrow_arg[i];
@@ -114,12 +114,12 @@ sys_old_mmap(struct tcb *tcp)
 	/* We are here only in personality 1 (i386) */
 	int i;
 	unsigned narrow_arg[6];
-	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), (char *) narrow_arg) == -1)
+	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), narrow_arg) == -1)
 		return 0;
 	for (i = 0; i < 6; ++i)
 		u_arg[i] = (unsigned long) narrow_arg[i];
 #else
-	if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), (char *) u_arg) == -1)
+	if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), u_arg) == -1)
 		return 0;
 #endif
 	return print_mmap(tcp, u_arg, (unsigned long) u_arg[5]);
@@ -134,7 +134,7 @@ sys_old_mmap_pgoff(struct tcb *tcp)
 	int i;
 	unsigned narrow_arg[6];
 	unsigned long long offset;
-	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), (char *) narrow_arg) == -1)
+	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), narrow_arg) == -1)
 		return 0;
 	for (i = 0; i < 5; i++)
 		u_arg[i] = (unsigned long) narrow_arg[i];
@@ -362,7 +362,7 @@ get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)
 				tprints("...");
 				break;
 			}
-			if (umoven(tcp, cur, sizeof(n), (char *) &n) < 0) {
+			if (umoven(tcp, cur, sizeof(n), &n) < 0) {
 				tprints("?");
 				failed = 1;
 				break;

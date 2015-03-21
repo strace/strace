@@ -419,9 +419,9 @@ extern void clear_regs(void);
 extern void get_regs(pid_t pid);
 extern int get_scno(struct tcb *tcp);
 
-extern int umoven(struct tcb *, long, unsigned int, char *);
+extern int umoven(struct tcb *, long, unsigned int, void *);
 #define umove(pid, addr, objp)	\
-	umoven((pid), (addr), sizeof(*(objp)), (char *) (objp))
+	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
 extern int umovestr(struct tcb *, long, unsigned int, char *);
 extern int upeek(int pid, long, long *);
 #if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)

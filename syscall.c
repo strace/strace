@@ -1559,7 +1559,7 @@ get_syscall_args(struct tcb *tcp)
 
 		for (i = 0; i < nargs; ++i) {
 			if (umoven(tcp, (unsigned long) ia64_rse_skip_regs(out0, i),
-				   sizeof(long), (char *) &tcp->u_arg[i]) < 0)
+				   sizeof(long), &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	} else {
@@ -1601,7 +1601,7 @@ get_syscall_args(struct tcb *tcp)
 	if (nargs > 4) {
 		umoven(tcp, mips_REG_SP + 4 * 4,
 		       (nargs - 4) * sizeof(tcp->u_arg[0]),
-		       (char *)(tcp->u_arg + 4));
+		       &tcp->u_arg[4]);
 	}
 #elif defined(POWERPC)
 	(void)i;

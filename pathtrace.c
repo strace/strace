@@ -270,7 +270,7 @@ pathtrace_match(struct tcb *tcp)
 		args = tcp->u_arg;
 		if (s->sys_func == sys_oldselect) {
 			if (umoven(tcp, tcp->u_arg[0], sizeof oldargs,
-				   (char*) oldargs) < 0)
+				   oldargs) < 0)
 			{
 				fprintf(stderr, "umoven() failed\n");
 				return 0;
@@ -294,7 +294,7 @@ pathtrace_match(struct tcb *tcp)
 		for (i = 1; i <= 3; ++i) {
 			if (args[i] == 0)
 				continue;
-			if (umoven(tcp, args[i], fdsize, (char *) fds) < 0) {
+			if (umoven(tcp, args[i], fdsize, fds) < 0) {
 				fprintf(stderr, "umoven() failed\n");
 				continue;
 			}
@@ -328,7 +328,7 @@ pathtrace_match(struct tcb *tcp)
 			return 0;
 
 		for (cur = start; cur < end; cur += sizeof(fds))
-			if ((umoven(tcp, cur, sizeof fds, (char *) &fds) == 0)
+			if ((umoven(tcp, cur, sizeof fds, &fds) == 0)
 			    && fdmatch(tcp, fds.fd))
 				return 1;
 

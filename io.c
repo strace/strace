@@ -112,7 +112,7 @@ tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr, int deco
 			tprints("...");
 			break;
 		}
-		if (umoven(tcp, cur, sizeof_iov, (char *) &iov) < 0) {
+		if (umoven(tcp, cur, sizeof_iov, &iov) < 0) {
 			tprints("?");
 			failed = 1;
 			break;

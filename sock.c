@@ -256,7 +256,7 @@ sock_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			struct ifreq ifra[nifra];
 
 			if (umoven(tcp, (unsigned long) ifc.ifc_buf,
-				sizeof(ifra), (char *) ifra) < 0) {
+				sizeof(ifra), ifra) < 0) {
 				tprintf("%lx}", (unsigned long) ifc.ifc_buf);
 				return 1;
 			}

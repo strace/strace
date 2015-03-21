@@ -353,7 +353,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 				tprintf(", %#lx", arg);
 				continue;
 			}
-			if (umoven(tcp, arg, fdsize, (char *) fds) < 0) {
+			if (umoven(tcp, arg, fdsize, fds) < 0) {
 				tprints(", [?]");
 				continue;
 			}
@@ -397,7 +397,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			int first = 1;
 
 			arg = args[i+1];
-			if (!arg || umoven(tcp, arg, fdsize, (char *) fds) < 0)
+			if (!arg || umoven(tcp, arg, fdsize, fds) < 0)
 				continue;
 			for (j = 0;; j++) {
 				j = next_set_bit(fds, j, nfds);
@@ -445,7 +445,7 @@ sys_oldselect(struct tcb *tcp)
 {
 	long args[5];
 
-	if (umoven(tcp, tcp->u_arg[0], sizeof args, (char *) args) < 0) {
+	if (umoven(tcp, tcp->u_arg[0], sizeof args, args) < 0) {
 		tprints("[...]");
 		return 0;
 	}

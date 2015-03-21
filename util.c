@@ -835,7 +835,7 @@ dumpiov(struct tcb *tcp, int len, long addr)
 		fprintf(stderr, "Out of memory\n");
 		return;
 	}
-	if (umoven(tcp, addr, size, (char *) iov) >= 0) {
+	if (umoven(tcp, addr, size, iov) >= 0) {
 		for (i = 0; i < len; i++) {
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
@@ -881,7 +881,7 @@ dumpstr(struct tcb *tcp, long addr, int len)
 		strsize = len + 16;
 	}
 
-	if (umoven(tcp, addr, len, (char *) str) < 0)
+	if (umoven(tcp, addr, len, str) < 0)
 		return;
 
 	/* Space-pad to 16 bytes */
@@ -966,11 +966,12 @@ static bool process_vm_readv_not_supported = 1;
 #define PAGMASK	(~(PAGSIZ - 1))
 /*
  * move `len' bytes of data from process `pid'
- * at address `addr' to our space at `laddr'
+ * at address `addr' to our space at `our_addr'
  */
 int
-umoven(struct tcb *tcp, long addr, unsigned int len, char *laddr)
+umoven(struct tcb *tcp, long addr, unsigned int len, void *our_addr)
 {
+	char *laddr = our_addr;
 	int pid = tcp->pid;
 	unsigned int n, m, nread;
 	union {

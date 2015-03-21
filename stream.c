@@ -263,7 +263,7 @@ decode_poll(struct tcb *tcp, long pts)
 				tprints("...");
 				break;
 			}
-			if (umoven(tcp, cur, sizeof fds, (char *) &fds) < 0) {
+			if (umoven(tcp, cur, sizeof fds, &fds) < 0) {
 				tprints("?");
 				failed = 1;
 				break;
@@ -313,7 +313,7 @@ decode_poll(struct tcb *tcp, long pts)
 		outptr = outstr;
 
 		for (cur = start; cur < end; cur += sizeof(fds)) {
-			if (umoven(tcp, cur, sizeof fds, (char *) &fds) < 0) {
+			if (umoven(tcp, cur, sizeof fds, &fds) < 0) {
 				if (outptr < end_outstr - 2)
 					*outptr++ = '?';
 				failed = 1;
