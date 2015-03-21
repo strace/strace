@@ -2005,7 +2005,7 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 	}
 }
 
-static bool
+static void
 startup_tcb(struct tcb *tcp)
 {
 	if (debug_flag)
@@ -2025,8 +2025,6 @@ startup_tcb(struct tcb *tcp)
 			}
 		}
 	}
-
-	return true;
 }
 
 /* Returns true iff the main trace loop has to continue. */
@@ -2151,8 +2149,7 @@ trace(void)
 
 	/* Is this the very first time we see this tracee stopped? */
 	if (tcp->flags & TCB_STARTUP) {
-		if (!startup_tcb(tcp))
-			return false;
+		startup_tcb(tcp);
 		if (get_scno(tcp) == 1)
 			tcp->s_prev_ent = tcp->s_ent;
 	}
