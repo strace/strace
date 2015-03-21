@@ -36,19 +36,18 @@ sys_sigreturn(struct tcb *tcp)
 #elif defined(S390) || defined(S390X)
 	if (entering(tcp)) {
 		long mask[NSIG / 8 / sizeof(long)];
-		tprints("{mask=");
 		const long addr = *s390_frame_ptr + __SIGNAL_FRAMESIZE;
 		if (umove(tcp, addr, &mask) < 0) {
-			tprintf("%#lx", addr);
+			tprintf("{mask=%#lx}", addr);
 		} else {
 # ifdef S390
 			long v = mask[0];
 			mask[0] = mask[1];
 			mask[1] = v;
 # endif
-			tprintsigmask_addr("", mask);
+			tprintsigmask_addr("{mask=", mask);
+			tprints("}");
 		}
-		tprints("}");
 	}
 #elif defined I386 || defined X86_64 || defined X32
 	if (entering(tcp)) {
@@ -75,14 +74,13 @@ sys_sigreturn(struct tcb *tcp)
 			uint32_t struct_fpstate_padding[156];
 			uint32_t extramask;
 		} frame;
-		tprints("{mask=");
 		if (umove(tcp, *i386_esp_ptr, &frame) < 0) {
-			tprintf("%#lx", (unsigned long) *i386_esp_ptr);
+			tprintf("{mask=%#lx}", (unsigned long) *i386_esp_ptr);
 		} else {
 			uint32_t mask[2] = { frame.oldmask, frame.extramask };
-			tprintsigmask_addr("", mask);
+			tprintsigmask_addr("{mask=", mask);
+			tprints("}");
 		}
-		tprints("}");
 	}
 #elif defined(IA64)
 	if (entering(tcp)) {
@@ -108,9 +106,8 @@ sys_sigreturn(struct tcb *tcp)
 #endif
 			esp += 64;
 
-		tprints("{mask=");
 		if (umove(tcp, esp, &sc) < 0) {
-			tprintf("%#lx", esp);
+			tprintf("{mask=%#lx}", esp);
 		} else {
 			unsigned long mask[NSIG / 8 / sizeof(long)];
 #ifdef POWERPC64
@@ -119,9 +116,9 @@ sys_sigreturn(struct tcb *tcp)
 			mask[0] = sc.oldmask;
 			mask[1] = sc._unused[3];
 #endif
-			tprintsigmask_addr("", mask);
+			tprintsigmask_addr("{mask=", mask);
+			tprints("}");
 		}
-		tprints("}");
 	}
 #elif defined(M68K)
 	if (entering(tcp)) {
@@ -140,8 +137,7 @@ sys_sigreturn(struct tcb *tcp)
 		addr -= sizeof(mask) - sizeof(long);
 		if (umoven(tcp, addr, sizeof(mask) - sizeof(long), &mask[1]) < 0)
 			return 0;
-		tprints("{mask=");
-		tprintsigmask_addr("", mask);
+		tprintsigmask_addr("{mask=", mask);
 		tprints("}");
 	}
 #elif defined(ALPHA)
@@ -165,17 +161,16 @@ sys_sigreturn(struct tcb *tcp)
 			unsigned int extramask[NSIG / 8 / sizeof(int) - 1];
 		} frame;
 
-		tprints("{mask=");
 		if (umove(tcp, fp, &frame) < 0) {
-			tprintf("%#lx", fp);
+			tprintf("{mask=%#lx}", fp);
 		} else {
 			unsigned int mask[NSIG / 8 / sizeof(int)];
 
 			mask[0] = frame.si_mask;
 			memcpy(mask + 1, frame.extramask, sizeof(frame.extramask));
-			tprintsigmask_addr("", mask);
+			tprintsigmask_addr("{mask=", mask);
+			tprints("}");
 		}
-		tprints("}");
 	}
 #elif defined MIPS
 	if (entering(tcp)) {
