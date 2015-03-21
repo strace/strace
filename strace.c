@@ -2043,8 +2043,26 @@ trace(void)
 	if (interrupted)
 		return false;
 
-	if (popen_pid != 0 && nprocs == 0)
-		return false;
+	/*
+	 * Used to exit simply when nprocs hits zero, but in this testcase:
+	 *  int main() { _exit(!!fork()); }
+	 * under strace -f, parent sometimes (rarely) manages
+	 * to exit before we see the first stop of the child,
+	 * and we are losing track of it:
+	 *  19923 clone(...) = 19924
+	 *  19923 exit_group(1)     = ?
+	 *  19923 +++ exited with 1 +++
+	 * Exiting only when wait() returns ECHILD works better.
+	 */
+	if (popen_pid != 0) {
+		/* However, if -o|logger is in use, we can't do that.
+		 * Can work around that by double-forking the logger,
+		 * but that loses the ability to wait for its completion
+		 * on exit. Oh well...
+		 */
+		if (nprocs == 0)
+			return false;
+	}
 
 	if (interactive)
 		sigprocmask(SIG_SETMASK, &empty_set, NULL);
@@ -2269,23 +2287,6 @@ main(int argc, char *argv[])
 {
 	init(argc, argv);
 
-	/*
-	 * Run main tracing loop.
-	 *
-	 * Used to be "while (nprocs != 0)", but in this testcase:
-	 *  int main() { _exit(!!fork()); }
-	 * under strace -f, parent sometimes (rarely) manages
-	 * to exit before we see the first stop of the child,
-	 * and we are losing track of it:
-	 *  19923 clone(...) = 19924
-	 *  19923 exit_group(1)     = ?
-	 *  19923 +++ exited with 1 +++
-	 * Waiting for ECHILD works better.
-	 * (However, if -o|logger is in use, we can't do that.
-	 * Can work around that by double-forking the logger,
-	 * but that loses the ability to wait for its completion on exit.
-	 * Oh well...)
-	 */
 	while (trace())
 		;
 
