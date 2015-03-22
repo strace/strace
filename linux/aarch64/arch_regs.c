@@ -1,0 +1,37 @@
+struct arm_pt_regs {
+        int uregs[18];
+};
+#define ARM_cpsr       uregs[16]
+#define ARM_pc         uregs[15]
+#define ARM_lr         uregs[14]
+#define ARM_sp         uregs[13]
+#define ARM_ip         uregs[12]
+#define ARM_fp         uregs[11]
+#define ARM_r10        uregs[10]
+#define ARM_r9         uregs[9]
+#define ARM_r8         uregs[8]
+#define ARM_r7         uregs[7]
+#define ARM_r6         uregs[6]
+#define ARM_r5         uregs[5]
+#define ARM_r4         uregs[4]
+#define ARM_r3         uregs[3]
+#define ARM_r2         uregs[2]
+#define ARM_r1         uregs[1]
+#define ARM_r0         uregs[0]
+#define ARM_ORIG_r0    uregs[17]
+
+static union {
+	struct user_pt_regs aarch64_r;
+	struct arm_pt_regs  arm_r;
+} arm_regs_union;
+#define aarch64_regs arm_regs_union.aarch64_r
+#define arm_regs     arm_regs_union.arm_r
+
+uint64_t *const aarch64_sp_ptr = (uint64_t *) &aarch64_regs.sp;
+uint32_t *const arm_sp_ptr = (uint32_t *) &arm_regs.ARM_sp;
+static struct iovec aarch64_io = {
+	.iov_base = &arm_regs_union
+};
+
+#define ARCH_REGS_FOR_GETREGSET arm_regs_union
+#define ARCH_IOVEC_FOR_GETREGSET aarch64_io
