@@ -638,6 +638,496 @@ printargs_ld(struct tcb *tcp)
 	return 0;
 }
 
+static void
+dumpio(struct tcb *tcp)
+{
+	int (*func)();
+
+	if (syserror(tcp))
+		return;
+	if ((unsigned long) tcp->u_arg[0] >= num_quals)
+		return;
+	func = tcp->s_ent->sys_func;
+	if (func == printargs)
+		return;
+	if (qual_flags[tcp->u_arg[0]] & QUAL_READ) {
+		if (func == sys_read ||
+		    func == sys_pread ||
+		    func == sys_recv ||
+		    func == sys_recvfrom) {
+			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
+			return;
+		} else if (func == sys_readv) {
+			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+			return;
+#if HAVE_SENDMSG
+		} else if (func == sys_recvmsg) {
+			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
+			return;
+		} else if (func == sys_recvmmsg) {
+			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
+			return;
+#endif
+		}
+	}
+	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
+		if (func == sys_write ||
+		    func == sys_pwrite ||
+		    func == sys_send ||
+		    func == sys_sendto)
+			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		else if (func == sys_writev)
+			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+#if HAVE_SENDMSG
+		else if (func == sys_sendmsg)
+			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
+		else if (func == sys_sendmmsg)
+			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
+#endif
+	}
+}
+
+/*
+ * Shuffle syscall numbers so that we don't have huge gaps in syscall table.
+ * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
+ */
+#if defined(ARM) || defined(AARCH64) /* So far only 32-bit ARM needs this */
+static long
+shuffle_scno(unsigned long scno)
+{
+	if (scno < ARM_FIRST_SHUFFLED_SYSCALL)
+		return scno;
+
+	/* __ARM_NR_cmpxchg? Swap with LAST_ORDINARY+1 */
+	if (scno == ARM_FIRST_SHUFFLED_SYSCALL)
+		return 0x000ffff0;
+	if (scno == 0x000ffff0)
+		return ARM_FIRST_SHUFFLED_SYSCALL;
+
+#define ARM_SECOND_SHUFFLED_SYSCALL (ARM_FIRST_SHUFFLED_SYSCALL + 1)
+	/*
+	 * Is it ARM specific syscall?
+	 * Swap [0x000f0000, 0x000f0000 + LAST_SPECIAL] range
+	 * with [SECOND_SHUFFLED, SECOND_SHUFFLED + LAST_SPECIAL] range.
+	 */
+	if (scno >= 0x000f0000 &&
+	    scno <= 0x000f0000 + ARM_LAST_SPECIAL_SYSCALL) {
+		return scno - 0x000f0000 + ARM_SECOND_SHUFFLED_SYSCALL;
+	}
+	if (scno <= ARM_SECOND_SHUFFLED_SYSCALL + ARM_LAST_SPECIAL_SYSCALL) {
+		return scno + 0x000f0000 - ARM_SECOND_SHUFFLED_SYSCALL;
+	}
+
+	return scno;
+}
+#else
+# define shuffle_scno(scno) ((long)(scno))
+#endif
+
+static char*
+undefined_scno_name(struct tcb *tcp)
+{
+	static char buf[sizeof("syscall_%lu") + sizeof(long)*3];
+
+	sprintf(buf, "syscall_%lu", shuffle_scno(tcp->scno));
+	return buf;
+}
+
+static long get_regs_error;
+
+void
+clear_regs(void)
+{
+	get_regs_error = -1;
+}
+
+static int get_syscall_args(struct tcb *);
+static int get_syscall_result(struct tcb *);
+
+static int
+trace_syscall_entering(struct tcb *tcp)
+{
+	int res, scno_good;
+
+	scno_good = res = get_scno(tcp);
+	if (res == 0)
+		return res;
+	if (res == 1)
+		res = get_syscall_args(tcp);
+
+	if (res != 1) {
+		printleader(tcp);
+		if (scno_good != 1)
+			tprints("????" /* anti-trigraph gap */ "(");
+		else if (tcp->qual_flg & UNDEFINED_SCNO)
+			tprintf("%s(", undefined_scno_name(tcp));
+		else
+			tprintf("%s(", tcp->s_ent->sys_name);
+		/*
+		 * " <unavailable>" will be added later by the code which
+		 * detects ptrace errors.
+		 */
+		goto ret;
+	}
+
+	if (   sys_execve == tcp->s_ent->sys_func
+# if defined(SPARC) || defined(SPARC64)
+	    || sys_execv == tcp->s_ent->sys_func
+# endif
+	   ) {
+		hide_log_until_execve = 0;
+	}
+
+#if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
+	while (1) {
+# ifdef SYS_socket_subcall
+		if (tcp->s_ent->sys_func == sys_socketcall) {
+			decode_socket_subcall(tcp);
+			break;
+		}
+# endif
+# ifdef SYS_ipc_subcall
+		if (tcp->s_ent->sys_func == sys_ipc) {
+			decode_ipc_subcall(tcp);
+			break;
+		}
+# endif
+		break;
+	}
+#endif
+
+	if (!(tcp->qual_flg & QUAL_TRACE)
+	 || (tracing_paths && !pathtrace_match(tcp))
+	) {
+		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
+		return 0;
+	}
+
+	tcp->flags &= ~TCB_FILTERED;
+
+	if (cflag == CFLAG_ONLY_STATS || hide_log_until_execve) {
+		res = 0;
+		goto ret;
+	}
+
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled) {
+		if (tcp->s_ent->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
+			unwind_capture_stacktrace(tcp);
+	}
+#endif
+
+	printleader(tcp);
+	if (tcp->qual_flg & UNDEFINED_SCNO)
+		tprintf("%s(", undefined_scno_name(tcp));
+	else
+		tprintf("%s(", tcp->s_ent->sys_name);
+	if ((tcp->qual_flg & QUAL_RAW) && tcp->s_ent->sys_func != sys_exit)
+		res = printargs(tcp);
+	else
+		res = tcp->s_ent->sys_func(tcp);
+
+	fflush(tcp->outf);
+ ret:
+	tcp->flags |= TCB_INSYSCALL;
+	/* Measure the entrance time as late as possible to avoid errors. */
+	if (Tflag || cflag)
+		gettimeofday(&tcp->etime, NULL);
+	return res;
+}
+
+static int
+trace_syscall_exiting(struct tcb *tcp)
+{
+	int sys_res;
+	struct timeval tv;
+	int res;
+	long u_error;
+
+	/* Measure the exit time as early as possible to avoid errors. */
+	if (Tflag || cflag)
+		gettimeofday(&tv, NULL);
+
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled) {
+		if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
+			unwind_cache_invalidate(tcp);
+	}
+#endif
+
+#if SUPPORTED_PERSONALITIES > 1
+	update_personality(tcp, tcp->currpers);
+#endif
+	res = (get_regs_error ? -1 : get_syscall_result(tcp));
+	if (res == 1) {
+		if (filtered(tcp) || hide_log_until_execve)
+			goto ret;
+	}
+
+	if (cflag) {
+		count_syscall(tcp, &tv);
+		if (cflag == CFLAG_ONLY_STATS) {
+			goto ret;
+		}
+	}
+
+	/* If not in -ff mode, and printing_tcp != tcp,
+	 * then the log currently does not end with output
+	 * of _our syscall entry_, but with something else.
+	 * We need to say which syscall's return is this.
+	 *
+	 * Forced reprinting via TCB_REPRINT is used only by
+	 * "strace -ff -oLOG test/threaded_execve" corner case.
+	 * It's the only case when -ff mode needs reprinting.
+	 */
+	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
+		tcp->flags &= ~TCB_REPRINT;
+		printleader(tcp);
+		if (tcp->qual_flg & UNDEFINED_SCNO)
+			tprintf("<... %s resumed> ", undefined_scno_name(tcp));
+		else
+			tprintf("<... %s resumed> ", tcp->s_ent->sys_name);
+	}
+	printing_tcp = tcp;
+
+	tcp->s_prev_ent = NULL;
+	if (res != 1) {
+		/* There was error in one of prior ptrace ops */
+		tprints(") ");
+		tabto();
+		tprints("= ? <unavailable>\n");
+		line_ended();
+		tcp->flags &= ~TCB_INSYSCALL;
+		return res;
+	}
+	tcp->s_prev_ent = tcp->s_ent;
+
+	sys_res = 0;
+	if (tcp->qual_flg & QUAL_RAW) {
+		/* sys_res = printargs(tcp); - but it's nop on sysexit */
+	} else {
+	/* FIXME: not_failing_only (IOW, option -z) is broken:
+	 * failure of syscall is known only after syscall return.
+	 * Thus we end up with something like this on, say, ENOENT:
+	 *     open("doesnt_exist", O_RDONLY <unfinished ...>
+	 *     {next syscall decode}
+	 * whereas the intended result is that open(...) line
+	 * is not shown at all.
+	 */
+		if (not_failing_only && tcp->u_error)
+			goto ret;	/* ignore failed syscalls */
+		sys_res = tcp->s_ent->sys_func(tcp);
+	}
+
+	tprints(") ");
+	tabto();
+	u_error = tcp->u_error;
+	if (tcp->qual_flg & QUAL_RAW) {
+		if (u_error)
+			tprintf("= -1 (errno %ld)", u_error);
+		else
+			tprintf("= %#lx", tcp->u_rval);
+	}
+	else if (!(sys_res & RVAL_NONE) && u_error) {
+		switch (u_error) {
+		/* Blocked signals do not interrupt any syscalls.
+		 * In this case syscalls don't return ERESTARTfoo codes.
+		 *
+		 * Deadly signals set to SIG_DFL interrupt syscalls
+		 * and kill the process regardless of which of the codes below
+		 * is returned by the interrupted syscall.
+		 * In some cases, kernel forces a kernel-generated deadly
+		 * signal to be unblocked and set to SIG_DFL (and thus cause
+		 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
+		 * or SIGILL. (The alternative is to leave process spinning
+		 * forever on the faulty instruction - not useful).
+		 *
+		 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
+		 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
+		 * but kernel will always restart them.
+		 */
+		case ERESTARTSYS:
+			/* Most common type of signal-interrupted syscall exit code.
+			 * The system call will be restarted with the same arguments
+			 * if SA_RESTART is set; otherwise, it will fail with EINTR.
+			 */
+			tprints("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
+			break;
+		case ERESTARTNOINTR:
+			/* Rare. For example, fork() returns this if interrupted.
+			 * SA_RESTART is ignored (assumed set): the restart is unconditional.
+			 */
+			tprints("= ? ERESTARTNOINTR (To be restarted)");
+			break;
+		case ERESTARTNOHAND:
+			/* pause(), rt_sigsuspend() etc use this code.
+			 * SA_RESTART is ignored (assumed not set):
+			 * syscall won't restart (will return EINTR instead)
+			 * even after signal with SA_RESTART set. However,
+			 * after SIG_IGN or SIG_DFL signal it will restart
+			 * (thus the name "restart only if has no handler").
+			 */
+			tprints("= ? ERESTARTNOHAND (To be restarted if no handler)");
+			break;
+		case ERESTART_RESTARTBLOCK:
+			/* Syscalls like nanosleep(), poll() which can't be
+			 * restarted with their original arguments use this
+			 * code. Kernel will execute restart_syscall() instead,
+			 * which changes arguments before restarting syscall.
+			 * SA_RESTART is ignored (assumed not set) similarly
+			 * to ERESTARTNOHAND. (Kernel can't honor SA_RESTART
+			 * since restart data is saved in "restart block"
+			 * in task struct, and if signal handler uses a syscall
+			 * which in turn saves another such restart block,
+			 * old data is lost and restart becomes impossible)
+			 */
+			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
+			break;
+		default:
+			if ((unsigned long) u_error < nerrnos
+			    && errnoent[u_error])
+				tprintf("= -1 %s (%s)", errnoent[u_error],
+					strerror(u_error));
+			else
+				tprintf("= -1 ERRNO_%lu (%s)", u_error,
+					strerror(u_error));
+			break;
+		}
+		if ((sys_res & RVAL_STR) && tcp->auxstr)
+			tprintf(" (%s)", tcp->auxstr);
+	}
+	else {
+		if (sys_res & RVAL_NONE)
+			tprints("= ?");
+		else {
+			switch (sys_res & RVAL_MASK) {
+			case RVAL_HEX:
+#if SUPPORTED_PERSONALITIES > 1
+				if (current_wordsize < sizeof(long))
+					tprintf("= %#x",
+						(unsigned int) tcp->u_rval);
+				else
+#endif
+					tprintf("= %#lx", tcp->u_rval);
+				break;
+			case RVAL_OCTAL:
+				tprintf("= %#lo", tcp->u_rval);
+				break;
+			case RVAL_UDECIMAL:
+				tprintf("= %lu", tcp->u_rval);
+				break;
+			case RVAL_DECIMAL:
+				tprintf("= %ld", tcp->u_rval);
+				break;
+			case RVAL_FD:
+				if (show_fd_path) {
+					tprints("= ");
+					printfd(tcp, tcp->u_rval);
+				}
+				else
+					tprintf("= %ld", tcp->u_rval);
+				break;
+#if defined(LINUX_MIPSN32) || defined(X32)
+			/*
+			case RVAL_LHEX:
+				tprintf("= %#llx", tcp->u_lrval);
+				break;
+			case RVAL_LOCTAL:
+				tprintf("= %#llo", tcp->u_lrval);
+				break;
+			*/
+			case RVAL_LUDECIMAL:
+				tprintf("= %llu", tcp->u_lrval);
+				break;
+			/*
+			case RVAL_LDECIMAL:
+				tprintf("= %lld", tcp->u_lrval);
+				break;
+			*/
+#endif
+			default:
+				fprintf(stderr,
+					"invalid rval format\n");
+				break;
+			}
+		}
+		if ((sys_res & RVAL_STR) && tcp->auxstr)
+			tprintf(" (%s)", tcp->auxstr);
+	}
+	if (Tflag) {
+		tv_sub(&tv, &tv, &tcp->etime);
+		tprintf(" <%ld.%06ld>",
+			(long) tv.tv_sec, (long) tv.tv_usec);
+	}
+	tprints("\n");
+	dumpio(tcp);
+	line_ended();
+
+#ifdef USE_LIBUNWIND
+	if (stack_trace_enabled)
+		unwind_print_stacktrace(tcp);
+#endif
+
+ ret:
+	tcp->flags &= ~TCB_INSYSCALL;
+	return 0;
+}
+
+int
+trace_syscall(struct tcb *tcp)
+{
+	return exiting(tcp) ?
+		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp);
+}
+
+/*
+ * Cannot rely on __kernel_[u]long_t being defined,
+ * it is quite a recent feature of <asm/posix_types.h>.
+ */
+#ifdef __kernel_long_t
+typedef __kernel_long_t kernel_long_t;
+typedef __kernel_ulong_t kernel_ulong_t;
+#else
+# ifdef X32
+typedef long long kernel_long_t;
+typedef unsigned long long kernel_ulong_t;
+# else
+typedef long kernel_long_t;
+typedef unsigned long kernel_ulong_t;
+# endif
+#endif
+
+/*
+ * Check the syscall return value register value for whether it is
+ * a negated errno code indicating an error, or a success return value.
+ */
+static inline bool
+is_negated_errno(kernel_ulong_t val)
+{
+	/* Linux kernel defines MAX_ERRNO to 4095. */
+	kernel_ulong_t max = -(kernel_long_t) 4095;
+
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize < sizeof(val)) {
+		val = (uint32_t) val;
+		max = (uint32_t) max;
+	}
+#elif defined X32
+	/*
+	 * current_wordsize is 4 even in personality 0 (native X32)
+	 * but truncation _must not_ be done in it.
+	 * can't check current_wordsize here!
+	 */
+	if (current_personality != 0) {
+		val = (uint32_t) val;
+		max = (uint32_t) max;
+	}
+#endif
+
+	return val >= max;
+}
+
+
 #if defined(I386)
 static struct user_regs_struct i386_regs;
 long *const i386_esp_ptr = &i386_regs.esp;
@@ -776,8 +1266,6 @@ static long xtensa_a2;
 static struct user_regs_struct arc_regs;
 # define ARCH_REGS_FOR_GETREGSET arc_regs
 #endif
-
-static long get_regs_error;
 
 #ifdef HAVE_GETRVAL2
 long
@@ -934,58 +1422,55 @@ print_pc(struct tcb *tcp)
 #endif /* architecture */
 }
 
+#ifdef X86_64
 /*
- * Shuffle syscall numbers so that we don't have huge gaps in syscall table.
- * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
+ * PTRACE_GETREGSET was added to the kernel in v2.6.25,
+ * a PTRACE_GETREGS based fallback is provided for old kernels.
  */
-#if defined(ARM) || defined(AARCH64) /* So far only 32-bit ARM needs this */
-static long
-shuffle_scno(unsigned long scno)
+static void
+x86_64_getregs_old(pid_t pid)
 {
-	if (scno < ARM_FIRST_SHUFFLED_SYSCALL)
-		return scno;
+	/* Use old method, with unreliable heuristical detection of 32-bitness. */
+	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
+	if (get_regs_error)
+		return;
 
-	/* __ARM_NR_cmpxchg? Swap with LAST_ORDINARY+1 */
-	if (scno == ARM_FIRST_SHUFFLED_SYSCALL)
-		return 0x000ffff0;
-	if (scno == 0x000ffff0)
-		return ARM_FIRST_SHUFFLED_SYSCALL;
-
-#define ARM_SECOND_SHUFFLED_SYSCALL (ARM_FIRST_SHUFFLED_SYSCALL + 1)
-	/*
-	 * Is it ARM specific syscall?
-	 * Swap [0x000f0000, 0x000f0000 + LAST_SPECIAL] range
-	 * with [SECOND_SHUFFLED, SECOND_SHUFFLED + LAST_SPECIAL] range.
-	 */
-	if (scno >= 0x000f0000 &&
-	    scno <= 0x000f0000 + ARM_LAST_SPECIAL_SYSCALL) {
-		return scno - 0x000f0000 + ARM_SECOND_SHUFFLED_SYSCALL;
+	if (x86_64_regs.cs == 0x23) {
+		x86_io.iov_len = sizeof(i386_regs);
+		/*
+		 * The order is important: i386_regs and x86_64_regs
+		 * are overlaid in memory!
+		 */
+		i386_regs.ebx = x86_64_regs.rbx;
+		i386_regs.ecx = x86_64_regs.rcx;
+		i386_regs.edx = x86_64_regs.rdx;
+		i386_regs.esi = x86_64_regs.rsi;
+		i386_regs.edi = x86_64_regs.rdi;
+		i386_regs.ebp = x86_64_regs.rbp;
+		i386_regs.eax = x86_64_regs.rax;
+		/* i386_regs.xds = x86_64_regs.ds; unused by strace */
+		/* i386_regs.xes = x86_64_regs.es; ditto... */
+		/* i386_regs.xfs = x86_64_regs.fs; */
+		/* i386_regs.xgs = x86_64_regs.gs; */
+		i386_regs.orig_eax = x86_64_regs.orig_rax;
+		i386_regs.eip = x86_64_regs.rip;
+		/* i386_regs.xcs = x86_64_regs.cs; */
+		/* i386_regs.eflags = x86_64_regs.eflags; */
+		i386_regs.esp = x86_64_regs.rsp;
+		/* i386_regs.xss = x86_64_regs.ss; */
+	} else {
+		x86_io.iov_len = sizeof(x86_64_regs);
 	}
-	if (scno <= ARM_SECOND_SHUFFLED_SYSCALL + ARM_LAST_SPECIAL_SYSCALL) {
-		return scno + 0x000f0000 - ARM_SECOND_SHUFFLED_SYSCALL;
-	}
-
-	return scno;
 }
-#else
-# define shuffle_scno(scno) ((long)(scno))
-#endif
-
-static char*
-undefined_scno_name(struct tcb *tcp)
-{
-	static char buf[sizeof("syscall_%lu") + sizeof(long)*3];
-
-	sprintf(buf, "syscall_%lu", shuffle_scno(tcp->scno));
-	return buf;
-}
+#endif /* X86_64 */
 
 #ifdef POWERPC
 /*
  * PTRACE_GETREGS was added to the PowerPC kernel in v2.6.23,
  * we provide a slow fallback for old kernels.
  */
-static int powerpc_getregs_old(pid_t pid)
+static int
+powerpc_getregs_old(pid_t pid)
 {
 	int i;
 	long r;
@@ -1016,12 +1501,6 @@ static int powerpc_getregs_old(pid_t pid)
 	return r;
 }
 #endif
-
-void
-clear_regs(void)
-{
-	get_regs_error = -1;
-}
 
 #if defined ARCH_REGS_FOR_GETREGSET
 static long
@@ -1064,33 +1543,7 @@ get_regs(pid_t pid)
 			return;
 		getregset_support = -1;
 	}
-	/* Use old method, with unreliable heuristical detection of 32-bitness. */
-	x86_io.iov_len = sizeof(x86_64_regs);
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
-	if (!get_regs_error && x86_64_regs.cs == 0x23) {
-		x86_io.iov_len = sizeof(i386_regs);
-		/*
-		 * The order is important: i386_regs and x86_64_regs
-		 * are overlaid in memory!
-		 */
-		i386_regs.ebx = x86_64_regs.rbx;
-		i386_regs.ecx = x86_64_regs.rcx;
-		i386_regs.edx = x86_64_regs.rdx;
-		i386_regs.esi = x86_64_regs.rsi;
-		i386_regs.edi = x86_64_regs.rdi;
-		i386_regs.ebp = x86_64_regs.rbp;
-		i386_regs.eax = x86_64_regs.rax;
-		/* i386_regs.xds = x86_64_regs.ds; unused by strace */
-		/* i386_regs.xes = x86_64_regs.es; ditto... */
-		/* i386_regs.xfs = x86_64_regs.fs; */
-		/* i386_regs.xgs = x86_64_regs.gs; */
-		i386_regs.orig_eax = x86_64_regs.orig_rax;
-		i386_regs.eip = x86_64_regs.rip;
-		/* i386_regs.xcs = x86_64_regs.cs; */
-		/* i386_regs.eflags = x86_64_regs.eflags; */
-		i386_regs.esp = x86_64_regs.rsp;
-		/* i386_regs.xss = x86_64_regs.ss; */
-	}
+	x86_64_getregs_old(pid);
 # else /* !X86_64 */
 	/* Assume that PTRACE_GETREGSET works. */
 	get_regs_error = get_regset(pid);
@@ -1483,53 +1936,6 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
-/*
- * Cannot rely on __kernel_[u]long_t being defined,
- * it is quite a recent feature of <asm/posix_types.h>.
- */
-#ifdef __kernel_long_t
-typedef __kernel_long_t kernel_long_t;
-typedef __kernel_ulong_t kernel_ulong_t;
-#else
-# ifdef X32
-typedef long long kernel_long_t;
-typedef unsigned long long kernel_ulong_t;
-# else
-typedef long kernel_long_t;
-typedef unsigned long kernel_ulong_t;
-# endif
-#endif
-
-/*
- * Check the syscall return value register value for whether it is
- * a negated errno code indicating an error, or a success return value.
- */
-static inline bool
-is_negated_errno(kernel_ulong_t val)
-{
-	/* Linux kernel defines MAX_ERRNO to 4095. */
-	kernel_ulong_t max = -(kernel_long_t) 4095;
-
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize < sizeof(val)) {
-		val = (uint32_t) val;
-		max = (uint32_t) max;
-	}
-#elif defined X32
-	/*
-	 * current_wordsize is 4 even in personality 0 (native X32)
-	 * but truncation _must not_ be done in it.
-	 * can't check current_wordsize here!
-	 */
-	if (current_personality != 0) {
-		val = (uint32_t) val;
-		max = (uint32_t) max;
-	}
-#endif
-
-	return val >= max;
-}
-
 /* Return -1 on error or 1 on success (never 0!) */
 static int
 get_syscall_args(struct tcb *tcp)
@@ -1750,150 +2156,6 @@ get_syscall_args(struct tcb *tcp)
 	return 1;
 }
 
-static int
-trace_syscall_entering(struct tcb *tcp)
-{
-	int res, scno_good;
-
-	scno_good = res = get_scno(tcp);
-	if (res == 0)
-		return res;
-	if (res == 1)
-		res = get_syscall_args(tcp);
-
-	if (res != 1) {
-		printleader(tcp);
-		if (scno_good != 1)
-			tprints("????" /* anti-trigraph gap */ "(");
-		else if (tcp->qual_flg & UNDEFINED_SCNO)
-			tprintf("%s(", undefined_scno_name(tcp));
-		else
-			tprintf("%s(", tcp->s_ent->sys_name);
-		/*
-		 * " <unavailable>" will be added later by the code which
-		 * detects ptrace errors.
-		 */
-		goto ret;
-	}
-
-	if (   sys_execve == tcp->s_ent->sys_func
-# if defined(SPARC) || defined(SPARC64)
-	    || sys_execv == tcp->s_ent->sys_func
-# endif
-	   ) {
-		hide_log_until_execve = 0;
-	}
-
-#if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
-	while (1) {
-# ifdef SYS_socket_subcall
-		if (tcp->s_ent->sys_func == sys_socketcall) {
-			decode_socket_subcall(tcp);
-			break;
-		}
-# endif
-# ifdef SYS_ipc_subcall
-		if (tcp->s_ent->sys_func == sys_ipc) {
-			decode_ipc_subcall(tcp);
-			break;
-		}
-# endif
-		break;
-	}
-#endif
-
-	if (!(tcp->qual_flg & QUAL_TRACE)
-	 || (tracing_paths && !pathtrace_match(tcp))
-	) {
-		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
-		return 0;
-	}
-
-	tcp->flags &= ~TCB_FILTERED;
-
-	if (cflag == CFLAG_ONLY_STATS || hide_log_until_execve) {
-		res = 0;
-		goto ret;
-	}
-
-#ifdef USE_LIBUNWIND
-	if (stack_trace_enabled) {
-		if (tcp->s_ent->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
-			unwind_capture_stacktrace(tcp);
-	}
-#endif
-
-	printleader(tcp);
-	if (tcp->qual_flg & UNDEFINED_SCNO)
-		tprintf("%s(", undefined_scno_name(tcp));
-	else
-		tprintf("%s(", tcp->s_ent->sys_name);
-	if ((tcp->qual_flg & QUAL_RAW) && tcp->s_ent->sys_func != sys_exit)
-		res = printargs(tcp);
-	else
-		res = tcp->s_ent->sys_func(tcp);
-
-	fflush(tcp->outf);
- ret:
-	tcp->flags |= TCB_INSYSCALL;
-	/* Measure the entrance time as late as possible to avoid errors. */
-	if (Tflag || cflag)
-		gettimeofday(&tcp->etime, NULL);
-	return res;
-}
-
-/* Returns:
- * 1: ok, continue in trace_syscall_exiting().
- * -1: error, trace_syscall_exiting() should print error indicator
- *    ("????" etc) and bail out.
- */
-static int
-get_syscall_result(struct tcb *tcp)
-{
-#if defined ARCH_REGS_FOR_GETREGSET || defined ARCH_REGS_FOR_GETREGS
-	/* already done by get_regs */
-#elif defined(BFIN)
-	if (upeek(tcp->pid, PT_R0, &bfin_r0) < 0)
-		return -1;
-#elif defined(M68K)
-	if (upeek(tcp->pid, 4*PT_D0, &m68k_d0) < 0)
-		return -1;
-#elif defined(ALPHA)
-	if (upeek(tcp->pid, REG_A3, &alpha_a3) < 0)
-		return -1;
-	if (upeek(tcp->pid, REG_R0, &alpha_r0) < 0)
-		return -1;
-#elif defined(HPPA)
-	if (upeek(tcp->pid, PT_GR28, &hppa_r28) < 0)
-		return -1;
-#elif defined(SH)
-	/* new syscall ABI returns result in R0 */
-	if (upeek(tcp->pid, 4*REG_REG0, (long *)&sh_r0) < 0)
-		return -1;
-#elif defined(SH64)
-	/* ABI defines result returned in r9 */
-	if (upeek(tcp->pid, REG_GENERAL(9), (long *)&sh64_r9) < 0)
-		return -1;
-#elif defined(CRISV10) || defined(CRISV32)
-	if (upeek(tcp->pid, 4*PT_R10, &cris_r10) < 0)
-		return -1;
-#elif defined(MICROBLAZE)
-	if (upeek(tcp->pid, 3 * 4, &microblaze_r3) < 0)
-		return -1;
-#elif defined(XTENSA)
-	if (upeek(tcp->pid, REG_A_BASE + 2, &xtensa_a2) < 0)
-		return -1;
-#else
-# error get_syscall_result is not implemented for this architecture
-#endif
-	return 1;
-}
-
-/* Returns:
- * 1: ok, continue in trace_syscall_exiting().
- * -1: error, trace_syscall_exiting() should print error indicator
- *    ("????" etc) and bail out.
- */
 static void
 get_error(struct tcb *tcp)
 {
@@ -1923,7 +2185,7 @@ get_error(struct tcb *tcp)
 	 * In X32, return value is 64-bit (llseek uses one).
 	 * Using merely "long rax" would not work.
 	 */
-	kernel_long_t rax;
+	long long rax;
 
 	if (x86_io.iov_len == sizeof(i386_regs)) {
 		/* Sign extend from 32 bits */
@@ -2137,296 +2399,50 @@ get_error(struct tcb *tcp)
 	tcp->u_error = u_error;
 }
 
-static void
-dumpio(struct tcb *tcp)
-{
-	int (*func)();
-
-	if (syserror(tcp))
-		return;
-	if ((unsigned long) tcp->u_arg[0] >= num_quals)
-		return;
-	func = tcp->s_ent->sys_func;
-	if (func == printargs)
-		return;
-	if (qual_flags[tcp->u_arg[0]] & QUAL_READ) {
-		if (func == sys_read ||
-		    func == sys_pread ||
-		    func == sys_recv ||
-		    func == sys_recvfrom) {
-			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
-			return;
-		} else if (func == sys_readv) {
-			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-			return;
-#if HAVE_SENDMSG
-		} else if (func == sys_recvmsg) {
-			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
-			return;
-		} else if (func == sys_recvmmsg) {
-			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
-			return;
-#endif
-		}
-	}
-	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
-		if (func == sys_write ||
-		    func == sys_pwrite ||
-		    func == sys_send ||
-		    func == sys_sendto)
-			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		else if (func == sys_writev)
-			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-#if HAVE_SENDMSG
-		else if (func == sys_sendmsg)
-			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
-		else if (func == sys_sendmmsg)
-			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
-#endif
-	}
-}
-
+/* Returns:
+ * 1: ok, continue in trace_syscall_exiting().
+ * -1: error, trace_syscall_exiting() should print error indicator
+ *    ("????" etc) and bail out.
+ */
 static int
-trace_syscall_exiting(struct tcb *tcp)
+get_syscall_result(struct tcb *tcp)
 {
-	int sys_res;
-	struct timeval tv;
-	int res;
-	long u_error;
-
-	/* Measure the exit time as early as possible to avoid errors. */
-	if (Tflag || cflag)
-		gettimeofday(&tv, NULL);
-
-#ifdef USE_LIBUNWIND
-	if (stack_trace_enabled) {
-		if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
-			unwind_cache_invalidate(tcp);
-	}
+#if defined ARCH_REGS_FOR_GETREGSET || defined ARCH_REGS_FOR_GETREGS
+	/* already done by get_regs */
+#elif defined(BFIN)
+	if (upeek(tcp->pid, PT_R0, &bfin_r0) < 0)
+		return -1;
+#elif defined(M68K)
+	if (upeek(tcp->pid, 4*PT_D0, &m68k_d0) < 0)
+		return -1;
+#elif defined(ALPHA)
+	if (upeek(tcp->pid, REG_A3, &alpha_a3) < 0)
+		return -1;
+	if (upeek(tcp->pid, REG_R0, &alpha_r0) < 0)
+		return -1;
+#elif defined(HPPA)
+	if (upeek(tcp->pid, PT_GR28, &hppa_r28) < 0)
+		return -1;
+#elif defined(SH)
+	/* new syscall ABI returns result in R0 */
+	if (upeek(tcp->pid, 4*REG_REG0, (long *)&sh_r0) < 0)
+		return -1;
+#elif defined(SH64)
+	/* ABI defines result returned in r9 */
+	if (upeek(tcp->pid, REG_GENERAL(9), (long *)&sh64_r9) < 0)
+		return -1;
+#elif defined(CRISV10) || defined(CRISV32)
+	if (upeek(tcp->pid, 4*PT_R10, &cris_r10) < 0)
+		return -1;
+#elif defined(MICROBLAZE)
+	if (upeek(tcp->pid, 3 * 4, &microblaze_r3) < 0)
+		return -1;
+#elif defined(XTENSA)
+	if (upeek(tcp->pid, REG_A_BASE + 2, &xtensa_a2) < 0)
+		return -1;
+#else
+# error get_syscall_result is not implemented for this architecture
 #endif
-
-#if SUPPORTED_PERSONALITIES > 1
-	update_personality(tcp, tcp->currpers);
-#endif
-	res = (get_regs_error ? -1 : get_syscall_result(tcp));
-	if (res == 1) {
-		get_error(tcp); /* never fails */
-		if (filtered(tcp) || hide_log_until_execve)
-			goto ret;
-	}
-
-	if (cflag) {
-		count_syscall(tcp, &tv);
-		if (cflag == CFLAG_ONLY_STATS) {
-			goto ret;
-		}
-	}
-
-	/* If not in -ff mode, and printing_tcp != tcp,
-	 * then the log currently does not end with output
-	 * of _our syscall entry_, but with something else.
-	 * We need to say which syscall's return is this.
-	 *
-	 * Forced reprinting via TCB_REPRINT is used only by
-	 * "strace -ff -oLOG test/threaded_execve" corner case.
-	 * It's the only case when -ff mode needs reprinting.
-	 */
-	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
-		tcp->flags &= ~TCB_REPRINT;
-		printleader(tcp);
-		if (tcp->qual_flg & UNDEFINED_SCNO)
-			tprintf("<... %s resumed> ", undefined_scno_name(tcp));
-		else
-			tprintf("<... %s resumed> ", tcp->s_ent->sys_name);
-	}
-	printing_tcp = tcp;
-
-	tcp->s_prev_ent = NULL;
-	if (res != 1) {
-		/* There was error in one of prior ptrace ops */
-		tprints(") ");
-		tabto();
-		tprints("= ? <unavailable>\n");
-		line_ended();
-		tcp->flags &= ~TCB_INSYSCALL;
-		return res;
-	}
-	tcp->s_prev_ent = tcp->s_ent;
-
-	sys_res = 0;
-	if (tcp->qual_flg & QUAL_RAW) {
-		/* sys_res = printargs(tcp); - but it's nop on sysexit */
-	} else {
-	/* FIXME: not_failing_only (IOW, option -z) is broken:
-	 * failure of syscall is known only after syscall return.
-	 * Thus we end up with something like this on, say, ENOENT:
-	 *     open("doesnt_exist", O_RDONLY <unfinished ...>
-	 *     {next syscall decode}
-	 * whereas the intended result is that open(...) line
-	 * is not shown at all.
-	 */
-		if (not_failing_only && tcp->u_error)
-			goto ret;	/* ignore failed syscalls */
-		sys_res = tcp->s_ent->sys_func(tcp);
-	}
-
-	tprints(") ");
-	tabto();
-	u_error = tcp->u_error;
-	if (tcp->qual_flg & QUAL_RAW) {
-		if (u_error)
-			tprintf("= -1 (errno %ld)", u_error);
-		else
-			tprintf("= %#lx", tcp->u_rval);
-	}
-	else if (!(sys_res & RVAL_NONE) && u_error) {
-		switch (u_error) {
-		/* Blocked signals do not interrupt any syscalls.
-		 * In this case syscalls don't return ERESTARTfoo codes.
-		 *
-		 * Deadly signals set to SIG_DFL interrupt syscalls
-		 * and kill the process regardless of which of the codes below
-		 * is returned by the interrupted syscall.
-		 * In some cases, kernel forces a kernel-generated deadly
-		 * signal to be unblocked and set to SIG_DFL (and thus cause
-		 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
-		 * or SIGILL. (The alternative is to leave process spinning
-		 * forever on the faulty instruction - not useful).
-		 *
-		 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
-		 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
-		 * but kernel will always restart them.
-		 */
-		case ERESTARTSYS:
-			/* Most common type of signal-interrupted syscall exit code.
-			 * The system call will be restarted with the same arguments
-			 * if SA_RESTART is set; otherwise, it will fail with EINTR.
-			 */
-			tprints("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
-			break;
-		case ERESTARTNOINTR:
-			/* Rare. For example, fork() returns this if interrupted.
-			 * SA_RESTART is ignored (assumed set): the restart is unconditional.
-			 */
-			tprints("= ? ERESTARTNOINTR (To be restarted)");
-			break;
-		case ERESTARTNOHAND:
-			/* pause(), rt_sigsuspend() etc use this code.
-			 * SA_RESTART is ignored (assumed not set):
-			 * syscall won't restart (will return EINTR instead)
-			 * even after signal with SA_RESTART set. However,
-			 * after SIG_IGN or SIG_DFL signal it will restart
-			 * (thus the name "restart only if has no handler").
-			 */
-			tprints("= ? ERESTARTNOHAND (To be restarted if no handler)");
-			break;
-		case ERESTART_RESTARTBLOCK:
-			/* Syscalls like nanosleep(), poll() which can't be
-			 * restarted with their original arguments use this
-			 * code. Kernel will execute restart_syscall() instead,
-			 * which changes arguments before restarting syscall.
-			 * SA_RESTART is ignored (assumed not set) similarly
-			 * to ERESTARTNOHAND. (Kernel can't honor SA_RESTART
-			 * since restart data is saved in "restart block"
-			 * in task struct, and if signal handler uses a syscall
-			 * which in turn saves another such restart block,
-			 * old data is lost and restart becomes impossible)
-			 */
-			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
-			break;
-		default:
-			if ((unsigned long) u_error < nerrnos
-			    && errnoent[u_error])
-				tprintf("= -1 %s (%s)", errnoent[u_error],
-					strerror(u_error));
-			else
-				tprintf("= -1 ERRNO_%lu (%s)", u_error,
-					strerror(u_error));
-			break;
-		}
-		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf(" (%s)", tcp->auxstr);
-	}
-	else {
-		if (sys_res & RVAL_NONE)
-			tprints("= ?");
-		else {
-			switch (sys_res & RVAL_MASK) {
-			case RVAL_HEX:
-#if SUPPORTED_PERSONALITIES > 1
-				if (current_wordsize < sizeof(long))
-					tprintf("= %#x",
-						(unsigned int) tcp->u_rval);
-				else
-#endif
-					tprintf("= %#lx", tcp->u_rval);
-				break;
-			case RVAL_OCTAL:
-				tprintf("= %#lo", tcp->u_rval);
-				break;
-			case RVAL_UDECIMAL:
-				tprintf("= %lu", tcp->u_rval);
-				break;
-			case RVAL_DECIMAL:
-				tprintf("= %ld", tcp->u_rval);
-				break;
-			case RVAL_FD:
-				if (show_fd_path) {
-					tprints("= ");
-					printfd(tcp, tcp->u_rval);
-				}
-				else
-					tprintf("= %ld", tcp->u_rval);
-				break;
-#if defined(LINUX_MIPSN32) || defined(X32)
-			/*
-			case RVAL_LHEX:
-				tprintf("= %#llx", tcp->u_lrval);
-				break;
-			case RVAL_LOCTAL:
-				tprintf("= %#llo", tcp->u_lrval);
-				break;
-			*/
-			case RVAL_LUDECIMAL:
-				tprintf("= %llu", tcp->u_lrval);
-				break;
-			/*
-			case RVAL_LDECIMAL:
-				tprintf("= %lld", tcp->u_lrval);
-				break;
-			*/
-#endif
-			default:
-				fprintf(stderr,
-					"invalid rval format\n");
-				break;
-			}
-		}
-		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf(" (%s)", tcp->auxstr);
-	}
-	if (Tflag) {
-		tv_sub(&tv, &tv, &tcp->etime);
-		tprintf(" <%ld.%06ld>",
-			(long) tv.tv_sec, (long) tv.tv_usec);
-	}
-	tprints("\n");
-	dumpio(tcp);
-	line_ended();
-
-#ifdef USE_LIBUNWIND
-	if (stack_trace_enabled)
-		unwind_print_stacktrace(tcp);
-#endif
-
- ret:
-	tcp->flags &= ~TCB_INSYSCALL;
-	return 0;
-}
-
-int
-trace_syscall(struct tcb *tcp)
-{
-	return exiting(tcp) ?
-		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp);
+	get_error(tcp);
+	return 1;
 }
