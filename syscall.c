@@ -559,7 +559,7 @@ static void
 decode_socket_subcall(struct tcb *tcp)
 {
 	unsigned long addr;
-	unsigned int i, n, size;
+	unsigned int n;
 
 	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= SYS_socket_nsubcalls)
 		return;
@@ -568,22 +568,18 @@ decode_socket_subcall(struct tcb *tcp)
 	tcp->qual_flg = qual_flags[tcp->scno];
 	tcp->s_ent = &sysent[tcp->scno];
 	addr = tcp->u_arg[1];
-	size = current_wordsize;
 	n = tcp->s_ent->nargs;
-	for (i = 0; i < n; ++i) {
-		if (size == sizeof(int)) {
-			unsigned int arg;
-			if (umove(tcp, addr, &arg) < 0)
-				arg = 0;
-			tcp->u_arg[i] = arg;
-		}
-		else {
-			unsigned long arg;
-			if (umove(tcp, addr, &arg) < 0)
-				arg = 0;
-			tcp->u_arg[i] = arg;
-		}
-		addr += size;
+	if (sizeof(tcp->u_arg[0]) == current_wordsize) {
+		memset(tcp->u_arg, 0, n * sizeof(tcp->u_arg[0]));
+		(void) umoven(tcp, addr, n * sizeof(tcp->u_arg[0]), tcp->u_arg);
+	} else {
+		unsigned int args[n];
+		unsigned int i;
+
+		memset(args, 0, sizeof(args));
+		(void) umove(tcp, addr, &args);
+		for (i = 0; i < n; ++i)
+			tcp->u_arg[i] = args[i];
 	}
 }
 #endif
