@@ -425,7 +425,8 @@ extern int umoven(struct tcb *, long, unsigned int, void *);
 extern int umovestr(struct tcb *, long, unsigned int, char *);
 extern int upeek(int pid, long, long *);
 
-#if defined ALPHA || defined IA64 || defined SH || defined SPARC || defined SPARC64
+#if defined ALPHA || defined IA64 || defined MIPS \
+ || defined SH || defined SPARC || defined SPARC64
 # define HAVE_GETRVAL2
 extern long getrval2(struct tcb *);
 #else

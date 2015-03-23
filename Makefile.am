@@ -319,6 +319,7 @@ EXTRA_DIST =				\
 	linux/microblaze/print_pc.c	\
 	linux/microblaze/syscallent.h	\
 	linux/microblaze/userent.h	\
+	linux/mips/arch_getrval2.c	\
 	linux/mips/arch_regs.c		\
 	linux/mips/arch_regs.h		\
 	linux/mips/arch_sigreturn.c	\
