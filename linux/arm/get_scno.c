@@ -1,10 +1,3 @@
-if (arm_regs.ARM_ip != 0) {
-	/* It is not a syscall entry */
-	fprintf(stderr, "pid %d stray syscall exit\n", tcp->pid);
-	tcp->flags |= TCB_INSYSCALL;
-	return 0;
-}
-
 /* Note: we support only 32-bit CPUs, not 26-bit */
 
 #if !defined(__ARM_EABI__) || ENABLE_ARM_OABI
@@ -39,3 +32,15 @@ scno = arm_regs.ARM_r7;
 #endif
 
 scno = shuffle_scno(scno);
+
+/*
+ * Do some sanity checks to figure out
+ * whether it's really a syscall entry.
+ */
+if (arm_regs.ARM_ip && !SCNO_IN_RANGE(scno)) {
+	if (debug_flag)
+		fprintf(stderr,
+			"pid %d stray syscall exit: ARM_ip = %ld, scno = %ld\n",
+			tcp->pid, arm_regs.ARM_ip, shuffle_scno(scno));
+	return 0;
+}
