@@ -166,6 +166,7 @@ EXTRA_DIST =				\
 	linux/64/syscallent.h		\
 	linux/aarch64/arch_regs.c	\
 	linux/aarch64/arch_regs.h	\
+	linux/aarch64/arch_sigreturn.c	\
 	linux/aarch64/errnoent1.h	\
 	linux/aarch64/get_error.c	\
 	linux/aarch64/get_scno.c	\
@@ -181,6 +182,7 @@ EXTRA_DIST =				\
 	linux/alpha/arch_getrval2.c	\
 	linux/alpha/arch_regs.c		\
 	linux/alpha/arch_regs.h		\
+	linux/alpha/arch_sigreturn.c	\
 	linux/alpha/errnoent.h		\
 	linux/alpha/get_error.c		\
 	linux/alpha/get_scno.c		\
@@ -201,8 +203,10 @@ EXTRA_DIST =				\
 	linux/arc/print_pc.c		\
 	linux/arc/syscallent.h		\
 	linux/arch_regs.h		\
+	linux/arch_sigreturn.c		\
 	linux/arm/arch_regs.c		\
 	linux/arm/arch_regs.h		\
+	linux/arm/arch_sigreturn.c	\
 	linux/arm/get_error.c		\
 	linux/arm/get_scno.c		\
 	linux/arm/get_syscall_args.c	\
@@ -231,6 +235,7 @@ EXTRA_DIST =				\
 	linux/bfin/syscallent.h		\
 	linux/bfin/userent.h		\
 	linux/crisv10/arch_regs.c	\
+	linux/crisv10/arch_sigreturn.c	\
 	linux/crisv10/get_error.c	\
 	linux/crisv10/get_scno.c	\
 	linux/crisv10/get_syscall_args.c	\
@@ -238,6 +243,7 @@ EXTRA_DIST =				\
 	linux/crisv10/print_pc.c	\
 	linux/crisv10/userent.h		\
 	linux/crisv32/arch_regs.c	\
+	linux/crisv32/arch_sigreturn.c	\
 	linux/crisv32/get_error.c	\
 	linux/crisv32/get_scno.c	\
 	linux/crisv32/get_syscall_args.c	\
@@ -260,6 +266,7 @@ EXTRA_DIST =				\
 	linux/hppa/syscallent.h		\
 	linux/i386/arch_regs.c		\
 	linux/i386/arch_regs.h		\
+	linux/i386/arch_sigreturn.c	\
 	linux/i386/get_error.c		\
 	linux/i386/get_scno.c		\
 	linux/i386/get_syscall_args.c	\
@@ -272,6 +279,7 @@ EXTRA_DIST =				\
 	linux/ia64/arch_getrval2.c	\
 	linux/ia64/arch_regs.c		\
 	linux/ia64/arch_regs.h		\
+	linux/ia64/arch_sigreturn.c	\
 	linux/ia64/get_error.c		\
 	linux/ia64/get_scno.c		\
 	linux/ia64/get_syscall_args.c	\
@@ -282,6 +290,7 @@ EXTRA_DIST =				\
 	linux/ia64/userent.h		\
 	linux/inet_diag.h		\
 	linux/m68k/arch_regs.c		\
+	linux/m68k/arch_sigreturn.c	\
 	linux/m68k/get_error.c		\
 	linux/m68k/get_scno.c		\
 	linux/m68k/get_syscall_args.c	\
@@ -300,6 +309,7 @@ EXTRA_DIST =				\
 	linux/metag/print_pc.c		\
 	linux/metag/syscallent.h	\
 	linux/microblaze/arch_regs.c	\
+	linux/microblaze/arch_sigreturn.c	\
 	linux/microblaze/get_error.c	\
 	linux/microblaze/get_scno.c	\
 	linux/microblaze/get_syscall_args.c	\
@@ -311,6 +321,7 @@ EXTRA_DIST =				\
 	linux/microblaze/userent.h	\
 	linux/mips/arch_regs.c		\
 	linux/mips/arch_regs.h		\
+	linux/mips/arch_sigreturn.c	\
 	linux/mips/errnoent.h		\
 	linux/mips/genstub.sh		\
 	linux/mips/get_error.c		\
@@ -339,6 +350,7 @@ EXTRA_DIST =				\
 	linux/personality.h		\
 	linux/powerpc/arch_regs.c	\
 	linux/powerpc/arch_regs.h	\
+	linux/powerpc/arch_sigreturn.c	\
 	linux/powerpc/errnoent.h	\
 	linux/powerpc/get_error.c	\
 	linux/powerpc/get_scno.c	\
@@ -351,6 +363,7 @@ EXTRA_DIST =				\
 	linux/powerpc/userent.h		\
 	linux/powerpc64/arch_regs.c	\
 	linux/powerpc64/arch_regs.h	\
+	linux/powerpc64/arch_sigreturn.c	\
 	linux/powerpc64/errnoent.h	\
 	linux/powerpc64/errnoent1.h	\
 	linux/powerpc64/get_error.c	\
@@ -369,6 +382,7 @@ EXTRA_DIST =				\
 	linux/ptp_clock.h		\
 	linux/s390/arch_regs.c		\
 	linux/s390/arch_regs.h		\
+	linux/s390/arch_sigreturn.c	\
 	linux/s390/get_error.c		\
 	linux/s390/get_scno.c		\
 	linux/s390/get_syscall_args.c	\
@@ -381,6 +395,7 @@ EXTRA_DIST =				\
 	linux/s390/userent1.h		\
 	linux/s390x/arch_regs.c		\
 	linux/s390x/arch_regs.h		\
+	linux/s390x/arch_sigreturn.c	\
 	linux/s390x/get_error.c		\
 	linux/s390x/get_scno.c		\
 	linux/s390x/get_syscall_args.c	\
@@ -417,6 +432,7 @@ EXTRA_DIST =				\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_regs.c		\
 	linux/sparc/arch_regs.h		\
+	linux/sparc/arch_sigreturn.c	\
 	linux/sparc/dummy2.h		\
 	linux/sparc/errnoent.h		\
 	linux/sparc/errnoent1.h		\
@@ -437,6 +453,7 @@ EXTRA_DIST =				\
 	linux/sparc64/arch_getrval2.c	\
 	linux/sparc64/arch_regs.c	\
 	linux/sparc64/arch_regs.h	\
+	linux/sparc64/arch_sigreturn.c	\
 	linux/sparc64/dummy2.h		\
 	linux/sparc64/errnoent.h	\
 	linux/sparc64/errnoent1.h	\
@@ -462,6 +479,7 @@ EXTRA_DIST =				\
 	linux/syscall.h			\
 	linux/tile/arch_regs.c		\
 	linux/tile/arch_regs.h		\
+	linux/tile/arch_sigreturn.c	\
 	linux/tile/errnoent1.h		\
 	linux/tile/get_error.c		\
 	linux/tile/get_scno.c		\
@@ -481,6 +499,7 @@ EXTRA_DIST =				\
 	linux/userent0.h		\
 	linux/x32/arch_regs.c		\
 	linux/x32/arch_regs.h		\
+	linux/x32/arch_sigreturn.c	\
 	linux/x32/errnoent1.h		\
 	linux/x32/get_error.c		\
 	linux/x32/get_scno.c		\
@@ -496,6 +515,7 @@ EXTRA_DIST =				\
 	linux/x32/userent.h		\
 	linux/x86_64/arch_regs.c	\
 	linux/x86_64/arch_regs.h	\
+	linux/x86_64/arch_sigreturn.c	\
 	linux/x86_64/errnoent1.h	\
 	linux/x86_64/errnoent2.h	\
 	linux/x86_64/gentab.pl		\
