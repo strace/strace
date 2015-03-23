@@ -1129,6 +1129,9 @@ get_regs(pid_t pid)
 int
 get_scno(struct tcb *tcp)
 {
+	if (get_regs_error)
+		return -1;
+
 	long scno = 0;
 
 #if defined(S390) || defined(S390X)
@@ -1752,7 +1755,7 @@ trace_syscall_entering(struct tcb *tcp)
 {
 	int res, scno_good;
 
-	scno_good = res = (get_regs_error ? -1 : get_scno(tcp));
+	scno_good = res = get_scno(tcp);
 	if (res == 0)
 		return res;
 	if (res == 1)
