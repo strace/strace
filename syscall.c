@@ -779,7 +779,7 @@ static struct user_regs_struct arc_regs;
 
 static long get_regs_error;
 
-#if defined(SPARC) || defined(SPARC64) || defined(IA64) || defined(SH)
+#ifdef HAVE_GETRVAL2
 long
 getrval2(struct tcb *tcp)
 {
@@ -789,6 +789,9 @@ getrval2(struct tcb *tcp)
 	val = sparc_regs.u_regs[U_REG_O1];
 # elif defined(SH)
 	if (upeek(tcp->pid, 4*(REG_REG0+1), &val) < 0)
+		return -1;
+# elif defined ALPHA
+	if (upeek(tcp->pid, 20, &val) < 0)
 		return -1;
 # elif defined(IA64)
 	val = ia64_regs.gr[9];

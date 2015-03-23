@@ -1068,18 +1068,19 @@ do_pipe(struct tcb *tcp, int flags_arg)
 		if (syserror(tcp)) {
 			tprintf("%#lx", tcp->u_arg[0]);
 		} else {
-#if !defined(SPARC) && !defined(SPARC64) && !defined(SH) && !defined(IA64)
-			int fds[2];
-
-			if (umoven(tcp, tcp->u_arg[0], sizeof fds, fds) < 0)
-				tprints("[...]");
-			else
-				tprintf("[%u, %u]", fds[0], fds[1]);
-#elif defined(SPARC) || defined(SPARC64) || defined(SH) || defined(IA64)
-			tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
-#else
-			tprintf("%#lx", tcp->u_arg[0]);
+#ifdef HAVE_GETRVAL2
+			if (flags_arg < 0) {
+				tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
+			} else
 #endif
+			{
+				int fds[2];
+
+				if (umove(tcp, tcp->u_arg[0], &fds) < 0)
+					tprintf("%#lx", tcp->u_arg[0]);
+				else
+					tprintf("[%u, %u]", fds[0], fds[1]);
+			}
 		}
 		if (flags_arg >= 0) {
 			tprints(", ");

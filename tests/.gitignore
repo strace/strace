@@ -13,6 +13,7 @@ net-accept-connect
 netlink_inet_diag
 netlink_unix_diag
 pc
+pipe
 scm_rights
 seccomp
 select

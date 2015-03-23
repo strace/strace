@@ -22,6 +22,7 @@ check_PROGRAMS = \
 	netlink_inet_diag \
 	netlink_unix_diag \
 	pc \
+	pipe \
 	scm_rights \
 	seccomp \
 	select \
@@ -74,6 +75,7 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	net-yy.test \
+	pipe.test \
 	pc.test \
 	sun_path.test \
 	unix-yy.test \
@@ -105,6 +107,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     net-fd.expected \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
+	     pipe.expected \
 	     select.awk \
 	     sigaction.awk \
 	     statfs.expected \
