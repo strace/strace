@@ -1268,6 +1268,9 @@ get_scno(struct tcb *tcp)
 		};
 		tcp->s_ent = &unknown;
 		tcp->qual_flg = UNDEFINED_SCNO | QUAL_RAW | DEFAULT_QUAL_FLAGS;
+		if (debug_flag)
+			fprintf(stderr, "pid %d invalid syscall %ld\n",
+				tcp->pid, scno);
 	}
 	return 1;
 }
