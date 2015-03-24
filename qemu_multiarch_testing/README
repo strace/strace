@@ -39,3 +39,11 @@ And these did not:
 system-image-m68k    - qemu-system-m68k: -M q800: Unsupported machine type
 system-image-mips64  - init dies before reaching /mnt/init
 system-image-sh4     - hdc does not mount (no support for 2 disks)
+
+
+To debug a build problem in one of sandboxes, change keep_hdb
+to "keep_hdb=true" in parallel-build-hdc-img.sh
+
+This preserves system-image-DIR1/hdb.img after the build,
+so you can go into system-image-DIR1 and run
+"HDB=hdb.img ./dev-environment.sh" to debug the problem.

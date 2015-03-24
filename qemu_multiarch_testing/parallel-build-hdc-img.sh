@@ -1,13 +1,14 @@
 #!/bin/sh
 
 export HDBMEGS=64
+keep_hdb=false
 
 build_in_dir()
 {
 	cd "$1" || exit 1
 	rm -f hdb.img
 	nice -n10 time ./native-build.sh ../hdc.img
-	rm -f hdb.img
+	$keep_hdb || rm -f hdb.img
 	echo >&3 "Finished: $1"
 }
 
