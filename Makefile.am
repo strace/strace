@@ -434,46 +434,34 @@ EXTRA_DIST =				\
 	linux/sparc/arch_regs.c		\
 	linux/sparc/arch_regs.h		\
 	linux/sparc/arch_sigreturn.c	\
-	linux/sparc/dummy2.h		\
 	linux/sparc/errnoent.h		\
-	linux/sparc/errnoent1.h		\
 	linux/sparc/gen.pl		\
 	linux/sparc/get_error.c		\
 	linux/sparc/get_scno.c		\
 	linux/sparc/get_syscall_args.c	\
-	linux/sparc/ioctlent1.h		\
 	linux/sparc/ioctls_arch0.h	\
 	linux/sparc/ioctls_inc0.h	\
 	linux/sparc/print_pc.c		\
 	linux/sparc/signalent.h		\
-	linux/sparc/signalent1.h	\
-	linux/sparc/syscall1.h		\
 	linux/sparc/syscallent.h	\
-	linux/sparc/syscallent1.h	\
 	linux/sparc/userent.h		\
 	linux/sparc64/arch_getrval2.c	\
 	linux/sparc64/arch_regs.c	\
 	linux/sparc64/arch_regs.h	\
 	linux/sparc64/arch_sigreturn.c	\
-	linux/sparc64/dummy2.h		\
 	linux/sparc64/errnoent.h	\
-	linux/sparc64/errnoent1.h	\
 	linux/sparc64/errnoent2.h	\
 	linux/sparc64/get_error.c	\
 	linux/sparc64/get_scno.c	\
 	linux/sparc64/get_syscall_args.c\
-	linux/sparc64/ioctlent1.h	\
 	linux/sparc64/ioctls_arch0.h	\
 	linux/sparc64/ioctls_arch2.h	\
 	linux/sparc64/ioctls_inc0.h	\
 	linux/sparc64/ioctls_inc2.h	\
 	linux/sparc64/print_pc.c	\
 	linux/sparc64/signalent.h	\
-	linux/sparc64/signalent1.h	\
 	linux/sparc64/signalent2.h	\
-	linux/sparc64/syscall1.h	\
 	linux/sparc64/syscallent.h	\
-	linux/sparc64/syscallent1.h	\
 	linux/sparc64/syscallent2.h	\
 	linux/sparc64/userent.h		\
 	linux/subcall.h			\

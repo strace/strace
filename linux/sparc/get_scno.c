@@ -13,7 +13,7 @@ case 0x91d02010:
 	break;
 case 0x91d0206d:
 	/* Linux/SPARC64 syscall trap. */
-	update_personality(tcp, 2);
+	update_personality(tcp, 1);
 	break;
 }
 #endif

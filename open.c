@@ -120,24 +120,3 @@ sys_creat(struct tcb *tcp)
 	}
 	return RVAL_FD;
 }
-
-#if defined(SPARC) || defined(SPARC64)
-# include "xlat/openmodessol.h"
-
-int
-solaris_open(struct tcb *tcp)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		/* flags */
-		printflags(openmodessol, tcp->u_arg[1] + 1, "O_???");
-		if (tcp->u_arg[1] & 0x100) {
-			/* mode */
-			tprintf(", %#lo", tcp->u_arg[2]);
-		}
-	}
-	return 0;
-}
-
-#endif /* SPARC || SPARC64 */

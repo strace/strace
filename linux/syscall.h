@@ -348,7 +348,6 @@ int sys_sram_alloc();
 #endif
 
 #if defined SPARC || defined SPARC64
-#include "sparc/syscall1.h"
 int sys_execv();
 int sys_getmsg();
 int sys_putmsg();

@@ -152,14 +152,11 @@ extern char *stpcpy(char *dst, const char *src);
 
 #if defined(SPARC) || defined(SPARC64)
 # define PERSONALITY0_WORDSIZE 4
-# define PERSONALITY1_WORDSIZE 4
 # if defined(SPARC64)
-#  define SUPPORTED_PERSONALITIES 3
-#  define PERSONALITY2_WORDSIZE 8
-# else
 #  define SUPPORTED_PERSONALITIES 2
-# endif /* SPARC64 */
-#endif /* SPARC[64] */
+#  define PERSONALITY1_WORDSIZE 8
+# endif
+#endif
 
 #ifdef X86_64
 # define SUPPORTED_PERSONALITIES 3
