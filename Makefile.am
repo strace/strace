@@ -450,19 +450,19 @@ EXTRA_DIST =				\
 	linux/sparc64/arch_regs.h	\
 	linux/sparc64/arch_sigreturn.c	\
 	linux/sparc64/errnoent.h	\
-	linux/sparc64/errnoent2.h	\
+	linux/sparc64/errnoent1.h	\
 	linux/sparc64/get_error.c	\
 	linux/sparc64/get_scno.c	\
 	linux/sparc64/get_syscall_args.c\
 	linux/sparc64/ioctls_arch0.h	\
-	linux/sparc64/ioctls_arch2.h	\
+	linux/sparc64/ioctls_arch1.h	\
 	linux/sparc64/ioctls_inc0.h	\
-	linux/sparc64/ioctls_inc2.h	\
+	linux/sparc64/ioctls_inc1.h	\
 	linux/sparc64/print_pc.c	\
 	linux/sparc64/signalent.h	\
-	linux/sparc64/signalent2.h	\
+	linux/sparc64/signalent1.h	\
 	linux/sparc64/syscallent.h	\
-	linux/sparc64/syscallent2.h	\
+	linux/sparc64/syscallent1.h	\
 	linux/sparc64/userent.h		\
 	linux/subcall.h			\
 	linux/syscall.h			\
