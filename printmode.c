@@ -1,6 +1,7 @@
 #include "defs.h"
 
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #include "xlat/modetypes.h"
 

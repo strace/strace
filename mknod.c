@@ -1,6 +1,7 @@
 #include "defs.h"
 
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #ifdef MAJOR_IN_SYSMACROS
 # include <sys/sysmacros.h>
