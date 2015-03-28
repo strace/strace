@@ -28,6 +28,8 @@
 
 #include "defs.h"
 
+#include <linux/ioctl.h>
+
 #ifdef HAVE_LINUX_INPUT_H
 #include <linux/input.h>
 #include "xlat/evdev_abs.h"

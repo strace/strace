@@ -29,7 +29,7 @@
  */
 
 #include "defs.h"
-#include <asm/ioctl.h>
+#include <linux/ioctl.h>
 #include "xlat/ioctl_dirs.h"
 
 #ifdef HAVE_LINUX_INPUT_H
