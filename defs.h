@@ -67,8 +67,46 @@ const char *strerror(int);
 extern char *stpcpy(char *dst, const char *src);
 #endif
 
-#if !defined __GNUC__
-# define __attribute__(x) /*nothing*/
+#if defined __GNUC__ && defined __GNUC_MINOR__
+# define GNUC_PREREQ(maj, min)	\
+	((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+# define __attribute__(x)	/* empty */
+# define GNUC_PREREQ(maj, min)	0
+#endif
+
+#if GNUC_PREREQ(2, 5)
+# define ATTRIBUTE_NORETURN	__attribute__((__noreturn__))
+#else
+# define ATTRIBUTE_NORETURN	/* empty */
+#endif
+
+#if GNUC_PREREQ(2, 7)
+# define ATTRIBUTE_FORMAT(args)	__attribute__((__format__ args))
+# define ATTRIBUTE_ALIGNED(arg)	__attribute__((__aligned__(arg)))
+# define ATTRIBUTE_PACKED	__attribute__((__packed__))
+#else
+# define ATTRIBUTE_FORMAT(args)	/* empty */
+# define ATTRIBUTE_ALIGNED(arg)	/* empty */
+# define ATTRIBUTE_PACKED	/* empty */
+#endif
+
+#if GNUC_PREREQ(3, 0)
+# define ATTRIBUTE_MALLOC	__attribute__((__malloc__))
+#else
+# define ATTRIBUTE_MALLOC	/* empty */
+#endif
+
+#if GNUC_PREREQ(3, 1)
+# define ATTRIBUTE_NOINLINE	__attribute__((__noinline__))
+#else
+# define ATTRIBUTE_NOINLINE	/* empty */
+#endif
+
+#if GNUC_PREREQ(4, 3)
+# define ATTRIBUTE_ALLOC_SIZE(args)	__attribute__((__alloc_size__ args))
+#else
+# define ATTRIBUTE_ALLOC_SIZE(args)	/* empty */
 #endif
 
 #ifndef offsetof
