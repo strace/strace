@@ -125,7 +125,7 @@ struct compat_statfs64 {
 	uint32_t f_spare[4];
 }
 #if defined AARCH64 || defined X86_64 || defined X32 || defined IA64
-  __attribute__ ((packed, aligned(4)))
+  ATTRIBUTE_PACKED ATTRIBUTE_ALIGNED(4)
 #endif
 ;
 #if defined AARCH64 || defined ARM

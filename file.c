@@ -305,7 +305,6 @@ sys_fstat(struct tcb *tcp)
  * Linux x86_64 and x32 have unified `struct stat' but their i386 personality
  * needs `struct stat64'.
  * linux/arch/x86/include/uapi/asm/stat.h defines `struct stat64' only for i386.
- * __GNUC__ is needed for the required __attribute__ below.
  *
  * Similarly, aarch64 has a unified `struct stat' but its arm personality
  * needs `struct stat64' (unlike x86, it shouldn't be packed).
@@ -332,7 +331,7 @@ struct stat64 {
 	unsigned long long	st_ino;
 }
 #  if defined X86_64 || defined X32
-  __attribute__((packed))
+  ATTRIBUTE_PACKED
 #   define STAT64_SIZE	96
 #  else
 #   define STAT64_SIZE	104

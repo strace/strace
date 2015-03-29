@@ -426,11 +426,13 @@ extern unsigned os_release;
 
 enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
 
-void error_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-void perror_msg(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-void error_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
-void perror_msg_and_die(const char *fmt, ...) __attribute__ ((noreturn, format(printf, 1, 2)));
-void die_out_of_memory(void) __attribute__ ((noreturn));
+void error_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
+void perror_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
+void error_msg_and_die(const char *fmt, ...)
+	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
+void perror_msg_and_die(const char *fmt, ...)
+	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
+void die_out_of_memory(void) ATTRIBUTE_NORETURN;
 
 #if USE_CUSTOM_PRINTF
 /*
@@ -496,7 +498,7 @@ extern int print_quoted_string(const char *, unsigned int, unsigned int);
 #endif
 extern int getllval(struct tcb *, unsigned long long *, int);
 extern int printllval(struct tcb *, const char *, int)
-	__attribute__ ((format (printf, 2, 0)));
+	ATTRIBUTE_FORMAT((printf, 2, 0));
 
 extern void printxval(const struct xlat *, const unsigned int, const char *);
 extern int printargs(struct tcb *);
@@ -513,9 +515,9 @@ extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr(struct tcb *, long, long);
 extern void printnum_int(struct tcb *, long, const char *)
-	__attribute__ ((format (printf, 3, 0)));
+	ATTRIBUTE_FORMAT((printf, 3, 0));
 extern void printnum_long(struct tcb *, long, const char *)
-	__attribute__ ((format (printf, 3, 0)));
+	ATTRIBUTE_FORMAT((printf, 3, 0));
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))
@@ -607,7 +609,7 @@ extern struct tcb *printing_tcp;
 extern void printleader(struct tcb *);
 extern void line_ended(void);
 extern void tabto(void);
-extern void tprintf(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
+extern void tprintf(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints(const char *str);
 
 #if SUPPORTED_PERSONALITIES > 1

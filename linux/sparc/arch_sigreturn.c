@@ -3,7 +3,7 @@ struct {
 	struct pt_regs si_regs;
 	int si_mask;
 	void *fpu_save;
-	long insns[2] __attribute__ ((aligned (8)));
+	long insns[2] ATTRIBUTE_ALIGNED(8);
 	unsigned int extramask[NSIG / 8 / sizeof(int) - 1];
 } frame;
 

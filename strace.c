@@ -251,8 +251,8 @@ usage: strace [-CdffhiqrtttTvVxxy] [-I n] [-e expr]...\n\
 	exit(exitval);
 }
 
-static void die(void) __attribute__ ((noreturn));
-static void die(void)
+static void ATTRIBUTE_NORETURN
+die(void)
 {
 	if (strace_tracer_pid == getpid()) {
 		cflag = 0;
@@ -1097,7 +1097,8 @@ struct exec_params {
 	char *pathname;
 };
 static struct exec_params params_for_tracee;
-static void __attribute__ ((noinline, noreturn))
+
+static void ATTRIBUTE_NOINLINE ATTRIBUTE_NORETURN
 exec_or_die(void)
 {
 	struct exec_params *params = &params_for_tracee;
@@ -1420,7 +1421,7 @@ get_os_release(void)
  * Don't want main() to inline us and defeat the reason
  * we have a separate function.
  */
-static void __attribute__ ((noinline))
+static void ATTRIBUTE_NOINLINE
 init(int argc, char *argv[])
 {
 	struct tcb *tcp;
