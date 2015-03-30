@@ -1003,10 +1003,13 @@ umoven(struct tcb *tcp, long addr, unsigned int len, void *our_addr)
 			case ENOSYS:
 				process_vm_readv_not_supported = 1;
 				break;
+			case EPERM:
+				/* operation not permitted, try PTRACE_PEEKDATA */
+				break;
 			case ESRCH:
 				/* the process is gone */
 				return -1;
-			case EFAULT: case EIO: case EPERM:
+			case EFAULT: case EIO:
 				/* address space is inaccessible */
 				return -1;
 			default:
@@ -1158,7 +1161,12 @@ umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 				case ESRCH:
 					/* the process is gone */
 					return -1;
-				case EFAULT: case EIO: case EPERM:
+				case EPERM:
+					/* operation not permitted, try PTRACE_PEEKDATA */
+					if (!nread)
+						goto vm_readv_didnt_work;
+					/* fall through */
+				case EFAULT: case EIO:
 					/* address space is inaccessible */
 					if (nread) {
 						perror_msg("umovestr: short read (%d < %d) @0x%lx",
