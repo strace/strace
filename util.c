@@ -1139,7 +1139,7 @@ umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 			 * in the existing (first) page.
 			 * (I hope there aren't arches with pages < 4K)
 			 */
-			end_in_page = ((addr + chunk_len) & 4095);
+			end_in_page = ((long) remote[0].iov_base + chunk_len) & 4095;
 			if (chunk_len > end_in_page) /* crosses to the next page */
 				chunk_len -= end_in_page;
 

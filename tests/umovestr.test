@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# umovestr short read regression test
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -e chdir $args
+match_diff
+
+exit 0

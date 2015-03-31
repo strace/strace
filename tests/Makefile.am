@@ -37,6 +37,8 @@ check_PROGRAMS = \
 	uid16 \
 	uid32 \
 	uio \
+	umovestr \
+	umovestr2 \
 	unix-pair-send-recv
 
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -78,6 +80,8 @@ TESTS = \
 	pipe.test \
 	pc.test \
 	sun_path.test \
+	umovestr.test \
+	umovestr2.test \
 	unix-yy.test \
 	uid.test \
 	uid16.test \
@@ -114,6 +118,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sun_path.expected \
 	     uid.awk \
 	     uio.expected \
+	     umovestr.expected \
 	     unix-yy-accept.awk \
 	     unix-yy-connect.awk \
 	     $(TESTS)

@@ -28,6 +28,8 @@ uid
 uid16
 uid32
 uio
+umovestr
+umovestr2
 unix-pair-send-recv
 *.log
 *.log.*
