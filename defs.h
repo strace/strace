@@ -478,6 +478,7 @@ extern int getfdpath(struct tcb *, int, char *, unsigned);
 extern const char *xlookup(const struct xlat *, const unsigned int);
 extern const char *xlat_search(const struct xlat *, const size_t, const unsigned int);
 
+extern unsigned long get_pagesize(void);
 extern int string_to_uint(const char *str);
 extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits);
 

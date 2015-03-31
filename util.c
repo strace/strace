@@ -963,7 +963,21 @@ static bool process_vm_readv_not_supported = 1;
 
 #endif /* end of hack */
 
-#define PAGMASK	(~(PAGSIZ - 1))
+static ssize_t
+vm_read_mem(pid_t pid, void *laddr, long raddr, size_t len)
+{
+	const struct iovec local = {
+		.iov_base = laddr,
+		.iov_len = len
+	};
+	const struct iovec remote = {
+		.iov_base = (void *) raddr,
+		.iov_len = len
+	};
+
+	return process_vm_readv(pid, &local, 1, &remote, 1, 0);
+}
+
 /*
  * move `len' bytes of data from process `pid'
  * at address `addr' to our space at `our_addr'
@@ -985,13 +999,7 @@ umoven(struct tcb *tcp, long addr, unsigned int len, void *our_addr)
 #endif
 
 	if (!process_vm_readv_not_supported) {
-		struct iovec local[1], remote[1];
-		int r;
-
-		local[0].iov_base = laddr;
-		remote[0].iov_base = (void*)addr;
-		local[0].iov_len = remote[0].iov_len = len;
-		r = process_vm_readv(pid, local, 1, remote, 1, 0);
+		int r = vm_read_mem(pid, laddr, addr, len);
 		if ((unsigned int) r == len)
 			return 0;
 		if (r >= 0) {
@@ -1120,38 +1128,31 @@ umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 
 	nread = 0;
 	if (!process_vm_readv_not_supported) {
-		struct iovec local[1], remote[1];
-
-		local[0].iov_base = laddr;
-		remote[0].iov_base = (void*)addr;
+		const size_t page_size = get_pagesize();
+		const size_t page_mask = page_size - 1;
 
 		while (len > 0) {
 			unsigned int chunk_len;
 			unsigned int end_in_page;
-			int r;
 
-			/* Don't read kilobytes: most strings are short */
-			chunk_len = len;
-			if (chunk_len > 256)
-				chunk_len = 256;
-			/* Don't cross pages. I guess otherwise we can get EFAULT
+			/*
+			 * Don't cross pages, otherwise we can get EFAULT
 			 * and fail to notice that terminating NUL lies
 			 * in the existing (first) page.
-			 * (I hope there aren't arches with pages < 4K)
 			 */
-			end_in_page = ((long) remote[0].iov_base + chunk_len) & 4095;
+			chunk_len = len > page_size ? page_size : len;
+			end_in_page = (addr + chunk_len) & page_mask;
 			if (chunk_len > end_in_page) /* crosses to the next page */
 				chunk_len -= end_in_page;
 
-			local[0].iov_len = remote[0].iov_len = chunk_len;
-			r = process_vm_readv(pid, local, 1, remote, 1, 0);
+			int r = vm_read_mem(pid, laddr, addr, chunk_len);
 			if (r > 0) {
-				if (memchr(local[0].iov_base, '\0', r))
+				if (memchr(laddr, '\0', r))
 					return 1;
-				local[0].iov_base += r;
-				remote[0].iov_base += r;
-				len -= r;
+				addr += r;
+				laddr += r;
 				nread += r;
+				len -= r;
 				continue;
 			}
 			switch (errno) {
@@ -1170,7 +1171,7 @@ umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 					/* address space is inaccessible */
 					if (nread) {
 						perror_msg("umovestr: short read (%d < %d) @0x%lx",
-							   nread, nread + len, addr);
+							   nread, nread + len, addr - nread);
 					}
 					return -1;
 				default:

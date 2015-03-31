@@ -34,8 +34,8 @@
 #include <asm/mman.h>
 #include <sys/mman.h>
 
-static unsigned long
-get_pagesize()
+unsigned long
+get_pagesize(void)
 {
 	static unsigned long pagesize;
 
