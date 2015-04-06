@@ -5,11 +5,14 @@
 . "${srcdir=.}/init.sh"
 
 OUT="$LOG.out"
+EXP="$LOG.exp"
 
 run_prog > /dev/null
-run_strace -veexecve -s262144 $args > "$OUT"
-match_grep "$LOG" "$OUT"
+run_strace -veexecve -s262144 $args > "$EXP"
+check_prog sed
+sed 1d < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
 
-rm -f "$OUT"
+rm -f "$EXP" "$OUT"
 
 exit 0

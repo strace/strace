@@ -23,8 +23,9 @@ main(void)
 	char *envp[] = { addr, NULL };
 	execve("", argv, envp);
 
-	printf("execve\\(\"\", \\[\\], \\[\"%0*u\"\\]\\) = -1 .*\n",
+	printf("execve(\"\", [], [\"%0*u\"]) = -1 ENOENT (No such file or directory)\n",
 	       (int) tail_len - 1, 0);
+	puts("+++ exited with 0 +++");
 
 	return 0;
 }
