@@ -1264,7 +1264,7 @@ get_scno(struct tcb *tcp)
 			.nargs = MAX_ARGS,
 			.sys_flags = 0,
 			.sys_func = printargs,
-			.sys_name = "unknown", /* not used */
+			.sys_name = "system call",
 		};
 		tcp->s_ent = &unknown;
 		tcp->qual_flg = UNDEFINED_SCNO | QUAL_RAW | DEFAULT_QUAL_FLAGS;
