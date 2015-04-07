@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Check how "resuming interrupted nanosleep" works.
+
+. "${srcdir=.}/init.sh"
+
+check_prog sleep
+check_prog grep
+run_strace -enanosleep sleep 1
+grep nanosleep < "$LOG" > /dev/null ||
+	framework_skip_ 'sleep does not use nanosleep'
+
+./set_ptracer_any sleep 2 &
+sleep 1
+run_strace -q -erestart_syscall -p $!
+
+case "$STRACE_ARCH" in
+	alpha|mips|or1k|s390|s390x)
+		# These architectures use the same register
+		# both for syscall number and syscall return code.
+		match_diff "$LOG" "$srcdir/restart_syscall_unknown.expected"
+		;;
+	*) match_diff
+		;;
+esac

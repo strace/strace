@@ -1,5 +1,7 @@
 # Automake input for strace tests.
 
+OS = linux
+ARCH = @arch@
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 	      -I$(top_srcdir)/$(OS)/$(ARCH) \
@@ -91,11 +93,13 @@ TESTS = \
 	detach-sleeping.test \
 	detach-stopped.test \
 	detach-running.test \
+	restart_syscall.test \
 	strace-k.test
 
 net-fd.log: net.log
 
-TEST_LOG_COMPILER = $(srcdir)/run.sh
+TEST_LOG_COMPILER = env
+AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
@@ -112,6 +116,8 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
 	     pipe.expected \
+	     restart_syscall.expected \
+	     restart_syscall_unknown.expected \
 	     select.awk \
 	     sigaction.awk \
 	     statfs.expected \
