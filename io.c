@@ -32,8 +32,7 @@
 #include <fcntl.h>
 #include <sys/uio.h>
 
-int
-sys_read(struct tcb *tcp)
+SYS_FUNC(read)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -48,8 +47,7 @@ sys_read(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_write(struct tcb *tcp)
+SYS_FUNC(write)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -142,8 +140,7 @@ tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_io
 	tprint_iov_upto(tcp, len, addr, decode_iov, (unsigned long) -1L);
 }
 
-int
-sys_readv(struct tcb *tcp)
+SYS_FUNC(readv)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -160,8 +157,7 @@ sys_readv(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_writev(struct tcb *tcp)
+SYS_FUNC(writev)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -183,8 +179,7 @@ sys_writev(struct tcb *tcp)
 #define PREAD_OFFSET_ARG 3
 #endif
 
-int
-sys_pread(struct tcb *tcp)
+SYS_FUNC(pread)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -200,8 +195,7 @@ sys_pread(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_pwrite(struct tcb *tcp)
+SYS_FUNC(pwrite)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -239,8 +233,7 @@ print_llu_from_low_high_val(struct tcb *tcp, int arg)
 #endif
 }
 
-int
-sys_preadv(struct tcb *tcp)
+SYS_FUNC(preadv)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -257,8 +250,7 @@ sys_preadv(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_pwritev(struct tcb *tcp)
+SYS_FUNC(pwritev)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -296,8 +288,7 @@ print_off_t(struct tcb *tcp, long addr)
 		tprintf("[%lu]", offset);
 }
 
-int
-sys_sendfile(struct tcb *tcp)
+SYS_FUNC(sendfile)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -323,8 +314,7 @@ print_loff_t(struct tcb *tcp, long addr)
 		tprintf("[%llu]", (unsigned long long int) offset);
 }
 
-int
-sys_sendfile64(struct tcb *tcp)
+SYS_FUNC(sendfile64)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -339,8 +329,7 @@ sys_sendfile64(struct tcb *tcp)
 
 #include "xlat/splice_flags.h"
 
-int
-sys_tee(struct tcb *tcp)
+SYS_FUNC(tee)
 {
 	if (entering(tcp)) {
 		/* int fd_in */
@@ -357,8 +346,7 @@ sys_tee(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_splice(struct tcb *tcp)
+SYS_FUNC(splice)
 {
 	if (entering(tcp)) {
 		/* int fd_in */
@@ -381,8 +369,7 @@ sys_splice(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_vmsplice(struct tcb *tcp)
+SYS_FUNC(vmsplice)
 {
 	if (entering(tcp)) {
 		/* int fd */
@@ -397,8 +384,7 @@ sys_vmsplice(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_ioctl(struct tcb *tcp)
+SYS_FUNC(ioctl)
 {
 	const struct_ioctlent *iop;
 

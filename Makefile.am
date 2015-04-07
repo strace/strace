@@ -555,10 +555,17 @@ EXTRA_DIST =				\
 srpm: dist-xz
 	rpmbuild --define '%_srcrpmdir .' -ts $(distdir).tar.xz
 
-BUILT_SOURCES = .version
+BUILT_SOURCES = .version sys_func.h
 
 $(srcdir)/.version:
 	$(AM_V_GEN)echo $(VERSION) > $@-t && mv $@-t $@
+
+strace_SOURCES_c = $(filter %.c,$(strace_SOURCES))
+
+sys_func.h: $(patsubst %,$(srcdir)/%,$(strace_SOURCES_c))
+	for f in $^; do \
+		sed -n 's/^SYS_FUNC(.*/extern &;/p' $$f; \
+	done | sort -u > $@
 
 dist-hook:
 	$(AM_V_GEN)echo $(VERSION) > $(distdir)/.tarball-version
@@ -586,7 +593,7 @@ ioctlsort_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_FOR_BUILD)
 ioctls_inc_h = $(wildcard $(srcdir)/$(OS)/$(ARCH)/ioctls_inc*.h)
 ioctlent_h = $(patsubst $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%,ioctlent%,$(ioctls_inc_h))
 BUILT_SOURCES += $(ioctlent_h)
-CLEANFILES = $(ioctlent_h)
+CLEANFILES = sys_func.h $(ioctlent_h)
 
 ioctlent%.h: ioctlsort%
 	./$< > $@

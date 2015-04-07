@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_chdir(struct tcb *tcp)
+SYS_FUNC(chdir)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);

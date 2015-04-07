@@ -10,8 +10,7 @@
  * Use test/x32_lseek.c to test lseek decoding.
  */
 #if defined(LINUX_MIPSN32) || defined(X32)
-int
-sys_lseek(struct tcb *tcp)
+SYS_FUNC(lseek)
 {
 	long long offset;
 	int whence;
@@ -29,8 +28,7 @@ sys_lseek(struct tcb *tcp)
 	return RVAL_LUDECIMAL;
 }
 #else
-int
-sys_lseek(struct tcb *tcp)
+SYS_FUNC(lseek)
 {
 	long offset;
 	int whence;
@@ -62,8 +60,7 @@ sys_lseek(struct tcb *tcp)
  * for hi and lo. We would need to use tcp->ext_arg[N] on x32...
  * ...however, x32 (and x86_64) does not _have_ llseek syscall as such.
  */
-int
-sys_llseek(struct tcb *tcp)
+SYS_FUNC(llseek)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);

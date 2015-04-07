@@ -22,22 +22,19 @@ decode_utimes(struct tcb *tcp, int offset, int special)
 	return 0;
 }
 
-int
-sys_utimes(struct tcb *tcp)
+SYS_FUNC(utimes)
 {
 	return decode_utimes(tcp, 0, 0);
 }
 
-int
-sys_futimesat(struct tcb *tcp)
+SYS_FUNC(futimesat)
 {
 	if (entering(tcp))
 		print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_utimes(tcp, 1, 0);
 }
 
-int
-sys_utimensat(struct tcb *tcp)
+SYS_FUNC(utimensat)
 {
 	if (entering(tcp)) {
 		print_dirfd(tcp, tcp->u_arg[0]);
@@ -49,8 +46,7 @@ sys_utimensat(struct tcb *tcp)
 }
 
 #ifdef ALPHA
-int
-sys_osf_utimes(struct tcb *tcp)
+SYS_FUNC(osf_utimes)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);

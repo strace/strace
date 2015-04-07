@@ -20,8 +20,7 @@ static const struct xlat cacheflush_flags[] = {
 	XLAT_END
 };
 
-int
-sys_cacheflush(struct tcb *tcp)
+SYS_FUNC(cacheflush)
 {
 	if (entering(tcp)) {
 		/* addr */
@@ -46,8 +45,7 @@ static const struct xlat cacheflush_flags[] = {
 	XLAT_END
 };
 
-int
-sys_cacheflush(struct tcb *tcp)
+SYS_FUNC(cacheflush)
 {
 	if (entering(tcp)) {
 		/* start addr */
@@ -78,8 +76,7 @@ static const struct xlat cacheflush_flags[] = {
 	XLAT_END
 };
 
-int
-sys_cacheflush(struct tcb *tcp)
+SYS_FUNC(cacheflush)
 {
 	if (entering(tcp)) {
 		/* addr */

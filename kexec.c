@@ -72,8 +72,7 @@ print_kexec_segments(struct tcb *tcp, unsigned long addr, unsigned long len)
 		tprintf(" %#lx", addr);
 }
 
-int
-sys_kexec_load(struct tcb *tcp)
+SYS_FUNC(kexec_load)
 {
 	unsigned long n;
 

@@ -6,8 +6,7 @@
 
 #include "xlat/umount_flags.h"
 
-int
-sys_umount2(struct tcb *tcp)
+SYS_FUNC(umount2)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], -1);

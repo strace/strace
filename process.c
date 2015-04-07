@@ -55,8 +55,7 @@ static const struct xlat struct_user_offsets[] = {
 	XLAT_END
 };
 
-int
-sys_ptrace(struct tcb *tcp)
+SYS_FUNC(ptrace)
 {
 	const struct xlat *x;
 	unsigned long addr;

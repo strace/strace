@@ -275,8 +275,7 @@ printstat(struct tcb *tcp, long addr)
 	do_printstat(tcp, &statbuf);
 }
 
-int
-sys_stat(struct tcb *tcp)
+SYS_FUNC(stat)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -287,8 +286,7 @@ sys_stat(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fstat(struct tcb *tcp)
+SYS_FUNC(fstat)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -385,8 +383,7 @@ printstat64(struct tcb *tcp, long addr)
 	do_printstat64(tcp, &statbuf);
 }
 
-int
-sys_stat64(struct tcb *tcp)
+SYS_FUNC(stat64)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -397,8 +394,7 @@ sys_stat64(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fstat64(struct tcb *tcp)
+SYS_FUNC(fstat64)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -411,22 +407,19 @@ sys_fstat64(struct tcb *tcp)
 
 #else
 
-int
-sys_stat64(struct tcb *tcp)
+SYS_FUNC(stat64)
 {
 	return sys_stat(tcp);
 }
 
-int
-sys_fstat64(struct tcb *tcp)
+SYS_FUNC(fstat64)
 {
 	return sys_fstat(tcp);
 }
 
 #endif /* HAVE_STRUCT_STAT64 */
 
-int
-sys_newfstatat(struct tcb *tcp)
+SYS_FUNC(newfstatat)
 {
 	if (entering(tcp)) {
 		print_dirfd(tcp, tcp->u_arg[0]);
@@ -499,8 +492,7 @@ printoldstat(struct tcb *tcp, long addr)
 	do_printstat(tcp, &newstatbuf);
 }
 
-int
-sys_oldstat(struct tcb *tcp)
+SYS_FUNC(oldstat)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -511,8 +503,7 @@ sys_oldstat(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_oldfstat(struct tcb *tcp)
+SYS_FUNC(oldfstat)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -527,8 +518,7 @@ sys_oldfstat(struct tcb *tcp)
 
 #if defined(SPARC) || defined(SPARC64)
 
-int
-sys_xstat(struct tcb *tcp)
+SYS_FUNC(xstat)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -540,8 +530,7 @@ sys_xstat(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fxstat(struct tcb *tcp)
+SYS_FUNC(fxstat)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);

@@ -281,8 +281,7 @@ prctl_exit(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_prctl(struct tcb *tcp)
+SYS_FUNC(prctl)
 {
 	return entering(tcp) ? prctl_enter(tcp) : prctl_exit(tcp);
 }
@@ -291,8 +290,7 @@ sys_prctl(struct tcb *tcp)
 # include <asm/prctl.h>
 # include "xlat/archvals.h"
 
-int
-sys_arch_prctl(struct tcb *tcp)
+SYS_FUNC(arch_prctl)
 {
 	if (entering(tcp))
 		printxval(archvals, tcp->u_arg[0], "ARCH_???");

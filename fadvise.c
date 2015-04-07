@@ -4,8 +4,7 @@
 
 #include "xlat/advise.h"
 
-int
-sys_fadvise64(struct tcb *tcp)
+SYS_FUNC(fadvise64)
 {
 	if (entering(tcp)) {
 		int argn;
@@ -17,8 +16,7 @@ sys_fadvise64(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fadvise64_64(struct tcb *tcp)
+SYS_FUNC(fadvise64_64)
 {
 	if (entering(tcp)) {
 		int argn;

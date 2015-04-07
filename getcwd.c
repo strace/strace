@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_getcwd(struct tcb *tcp)
+SYS_FUNC(getcwd)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp))

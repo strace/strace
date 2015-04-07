@@ -68,8 +68,7 @@
 extern void print_user_desc(struct tcb *, long);
 #endif /* I386 || X86_64 || X32 */
 
-int
-sys_clone(struct tcb *tcp)
+SYS_FUNC(clone)
 {
 	if (exiting(tcp)) {
 		const char *sep = "|";
@@ -123,8 +122,7 @@ sys_clone(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_setns(struct tcb *tcp)
+SYS_FUNC(setns)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -134,16 +132,14 @@ sys_setns(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_unshare(struct tcb *tcp)
+SYS_FUNC(unshare)
 {
 	if (entering(tcp))
 		printflags(clone_flags, tcp->u_arg[0], "CLONE_???");
 	return 0;
 }
 
-int
-sys_fork(struct tcb *tcp)
+SYS_FUNC(fork)
 {
 	if (exiting(tcp))
 		return RVAL_UDECIMAL;

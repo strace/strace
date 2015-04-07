@@ -10,8 +10,7 @@ decode_renameat(struct tcb *tcp)
 	printpath(tcp, tcp->u_arg[3]);
 }
 
-int
-sys_renameat(struct tcb *tcp)
+SYS_FUNC(renameat)
 {
 	if (entering(tcp)) {
 		decode_renameat(tcp);
@@ -22,8 +21,7 @@ sys_renameat(struct tcb *tcp)
 #include <linux/fs.h>
 #include "xlat/rename_flags.h"
 
-int
-sys_renameat2(struct tcb *tcp)
+SYS_FUNC(renameat2)
 {
 	if (entering(tcp)) {
 		decode_renameat(tcp);

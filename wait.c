@@ -139,21 +139,18 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 	return 0;
 }
 
-int
-sys_waitpid(struct tcb *tcp)
+SYS_FUNC(waitpid)
 {
 	return printwaitn(tcp, 3, 0);
 }
 
-int
-sys_wait4(struct tcb *tcp)
+SYS_FUNC(wait4)
 {
 	return printwaitn(tcp, 4, 0);
 }
 
 #ifdef ALPHA
-int
-sys_osf_wait4(struct tcb *tcp)
+SYS_FUNC(osf_wait4)
 {
 	return printwaitn(tcp, 4, 1);
 }
@@ -161,8 +158,7 @@ sys_osf_wait4(struct tcb *tcp)
 
 #include "xlat/waitid_types.h"
 
-int
-sys_waitid(struct tcb *tcp)
+SYS_FUNC(waitid)
 {
 	if (entering(tcp)) {
 		printxval(waitid_types, tcp->u_arg[0], "P_???");

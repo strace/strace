@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_getcpu(struct tcb *tcp)
+SYS_FUNC(getcpu)
 {
 	if (exiting(tcp)) {
 		unsigned u;

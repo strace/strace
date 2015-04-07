@@ -32,8 +32,7 @@ print_affinitylist(struct tcb *tcp, long list, unsigned int len)
 	}
 }
 
-int
-sys_sched_setaffinity(struct tcb *tcp)
+SYS_FUNC(sched_setaffinity)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -42,8 +41,7 @@ sys_sched_setaffinity(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sched_getaffinity(struct tcb *tcp)
+SYS_FUNC(sched_getaffinity)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);

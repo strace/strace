@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_utime(struct tcb *tcp)
+SYS_FUNC(utime)
 {
 	union {
 		long utl[2];

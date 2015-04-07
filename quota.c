@@ -524,8 +524,7 @@ decode_cmd_data(struct tcb *tcp, u_int32_t cmd, unsigned long data)
 	}
 }
 
-int
-sys_quotactl(struct tcb *tcp)
+SYS_FUNC(quotactl)
 {
 	/*
 	 * The Linux kernel only looks at the low 32 bits of command and id

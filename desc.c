@@ -145,8 +145,7 @@ printflock(struct tcb *tcp, long addr, int getlk)
 		tprints("}");
 }
 
-int
-sys_fcntl(struct tcb *tcp)
+SYS_FUNC(fcntl)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -244,8 +243,7 @@ sys_fcntl(struct tcb *tcp)
 
 #ifdef LOCK_SH
 
-int
-sys_flock(struct tcb *tcp)
+SYS_FUNC(flock)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -256,8 +254,7 @@ sys_flock(struct tcb *tcp)
 }
 #endif /* LOCK_SH */
 
-int
-sys_close(struct tcb *tcp)
+SYS_FUNC(close)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -265,8 +262,7 @@ sys_close(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_dup(struct tcb *tcp)
+SYS_FUNC(dup)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -289,21 +285,18 @@ do_dup2(struct tcb *tcp, int flags_arg)
 	return RVAL_FD;
 }
 
-int
-sys_dup2(struct tcb *tcp)
+SYS_FUNC(dup2)
 {
 	return do_dup2(tcp, -1);
 }
 
-int
-sys_dup3(struct tcb *tcp)
+SYS_FUNC(dup3)
 {
 	return do_dup2(tcp, 2);
 }
 
 #if defined(ALPHA)
-int
-sys_getdtablesize(struct tcb *tcp)
+SYS_FUNC(getdtablesize)
 {
 	return 0;
 }
@@ -440,8 +433,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	return 0;
 }
 
-int
-sys_oldselect(struct tcb *tcp)
+SYS_FUNC(oldselect)
 {
 	long args[5];
 
@@ -453,8 +445,7 @@ sys_oldselect(struct tcb *tcp)
 }
 
 #ifdef ALPHA
-int
-sys_osf_select(struct tcb *tcp)
+SYS_FUNC(osf_select)
 {
 	long *args = tcp->u_arg;
 	return decode_select(tcp, args, BITNESS_32);
@@ -466,14 +457,12 @@ sys_osf_select(struct tcb *tcp)
 #include "xlat/epollflags.h"
 
 /* Not aliased to printargs_ld: we want it to have a distinct address */
-int
-sys_epoll_create(struct tcb *tcp)
+SYS_FUNC(epoll_create)
 {
 	return printargs_ld(tcp);
 }
 
-int
-sys_epoll_create1(struct tcb *tcp)
+SYS_FUNC(epoll_create1)
 {
 	if (entering(tcp))
 		printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
@@ -493,8 +482,7 @@ print_epoll_event(struct epoll_event *ev)
 }
 #endif
 
-int
-sys_epoll_ctl(struct tcb *tcp)
+SYS_FUNC(epoll_ctl)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -563,15 +551,13 @@ epoll_wait_common(struct tcb *tcp)
 	}
 }
 
-int
-sys_epoll_wait(struct tcb *tcp)
+SYS_FUNC(epoll_wait)
 {
 	epoll_wait_common(tcp);
 	return 0;
 }
 
-int
-sys_epoll_pwait(struct tcb *tcp)
+SYS_FUNC(epoll_pwait)
 {
 	epoll_wait_common(tcp);
 	if (exiting(tcp)) {
@@ -583,14 +569,12 @@ sys_epoll_pwait(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_select(struct tcb *tcp)
+SYS_FUNC(select)
 {
 	return decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
 }
 
-int
-sys_pselect6(struct tcb *tcp)
+SYS_FUNC(pselect6)
 {
 	int rc = decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
 	if (entering(tcp)) {
@@ -636,20 +620,17 @@ do_eventfd(struct tcb *tcp, int flags_arg)
 	return 0;
 }
 
-int
-sys_eventfd(struct tcb *tcp)
+SYS_FUNC(eventfd)
 {
 	return do_eventfd(tcp, -1);
 }
 
-int
-sys_eventfd2(struct tcb *tcp)
+SYS_FUNC(eventfd2)
 {
 	return do_eventfd(tcp, 1);
 }
 
-int
-sys_perf_event_open(struct tcb *tcp)
+SYS_FUNC(perf_event_open)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %d, %d, %d, ",

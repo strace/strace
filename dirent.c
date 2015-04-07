@@ -38,8 +38,7 @@ print_old_dirent(struct tcb *tcp, long addr)
 	tprints("}");
 }
 
-int
-sys_readdir(struct tcb *tcp)
+SYS_FUNC(readdir)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -58,8 +57,7 @@ sys_readdir(struct tcb *tcp)
 
 #include "xlat/direnttypes.h"
 
-int
-sys_getdents(struct tcb *tcp)
+SYS_FUNC(getdents)
 {
 	unsigned int i, len, dents = 0;
 	char *buf;
@@ -139,8 +137,7 @@ sys_getdents(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_getdents64(struct tcb *tcp)
+SYS_FUNC(getdents64)
 {
 	/* the minimum size of a valid dirent64 structure */
 	const unsigned int d_name_offset = offsetof(struct dirent64, d_name);

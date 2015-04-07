@@ -4,8 +4,7 @@
 #include "xlat/bootflags2.h"
 #include "xlat/bootflags3.h"
 
-int
-sys_reboot(struct tcb *tcp)
+SYS_FUNC(reboot)
 {
 	if (exiting(tcp))
 		return 0;

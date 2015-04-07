@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_sethostname(struct tcb *tcp)
+SYS_FUNC(sethostname)
 {
 	if (entering(tcp)) {
 		printstr(tcp, tcp->u_arg[0], tcp->u_arg[1]);
@@ -11,8 +10,7 @@ sys_sethostname(struct tcb *tcp)
 }
 
 #if defined(ALPHA)
-int
-sys_gethostname(struct tcb *tcp)
+SYS_FUNC(gethostname)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp))

@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_get_robust_list(struct tcb *tcp)
+SYS_FUNC(get_robust_list)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", (long) (pid_t) tcp->u_arg[0]);

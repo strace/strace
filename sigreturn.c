@@ -13,8 +13,7 @@
 # error NSIG < 32
 #endif
 
-int
-sys_sigreturn(struct tcb *tcp)
+SYS_FUNC(sigreturn)
 {
 	if (entering(tcp)) {
 #include "arch_sigreturn.c"

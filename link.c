@@ -20,8 +20,7 @@
 
 #include "xlat/at_flags.h"
 
-int
-sys_link(struct tcb *tcp)
+SYS_FUNC(link)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -31,8 +30,7 @@ sys_link(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_linkat(struct tcb *tcp)
+SYS_FUNC(linkat)
 {
 	if (entering(tcp)) {
 		print_dirfd(tcp, tcp->u_arg[0]);
@@ -46,8 +44,7 @@ sys_linkat(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_unlinkat(struct tcb *tcp)
+SYS_FUNC(unlinkat)
 {
 	if (entering(tcp)) {
 		print_dirfd(tcp, tcp->u_arg[0]);
@@ -58,8 +55,7 @@ sys_unlinkat(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_symlinkat(struct tcb *tcp)
+SYS_FUNC(symlinkat)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);

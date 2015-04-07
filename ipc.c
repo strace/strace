@@ -72,7 +72,7 @@ extern void printsigevent(struct tcb *tcp, long arg);
 #include "xlat/ipc_msg_flags.h"
 #include "xlat/semop_flags.h"
 
-int sys_msgget(struct tcb *tcp)
+SYS_FUNC(msgget)
 {
 	if (entering(tcp)) {
 		if (tcp->u_arg[0])
@@ -100,7 +100,7 @@ indirect_ipccall(struct tcb *tcp)
 	return tcp->s_ent->sys_flags & TRACE_INDIRECT_SUBCALL;
 }
 
-int sys_msgctl(struct tcb *tcp)
+SYS_FUNC(msgctl)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -127,7 +127,7 @@ tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count,
 	printflags(ipc_msg_flags, flags, "MSG_???");
 }
 
-int sys_msgsnd(struct tcb *tcp)
+SYS_FUNC(msgsnd)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
@@ -157,7 +157,7 @@ tprint_msgrcv(struct tcb *tcp, long addr, unsigned long count, long msgtyp)
 	tprintf(", %lu, %ld, ", count, msgtyp);
 }
 
-int sys_msgrcv(struct tcb *tcp)
+SYS_FUNC(msgrcv)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
@@ -227,7 +227,7 @@ tprint_sembuf(struct tcb *tcp, long addr, unsigned long count)
 	tprintf("}, %lu", count);
 }
 
-int sys_semop(struct tcb *tcp)
+SYS_FUNC(semop)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -240,7 +240,7 @@ int sys_semop(struct tcb *tcp)
 	return 0;
 }
 
-int sys_semtimedop(struct tcb *tcp)
+SYS_FUNC(semtimedop)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -261,7 +261,7 @@ int sys_semtimedop(struct tcb *tcp)
 	return 0;
 }
 
-int sys_semget(struct tcb *tcp)
+SYS_FUNC(semget)
 {
 	if (entering(tcp)) {
 		if (tcp->u_arg[0])
@@ -276,7 +276,7 @@ int sys_semget(struct tcb *tcp)
 	return 0;
 }
 
-int sys_semctl(struct tcb *tcp)
+SYS_FUNC(semctl)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -295,7 +295,7 @@ int sys_semctl(struct tcb *tcp)
 	return 0;
 }
 
-int sys_shmget(struct tcb *tcp)
+SYS_FUNC(shmget)
 {
 	if (entering(tcp)) {
 		if (tcp->u_arg[0])
@@ -310,7 +310,7 @@ int sys_shmget(struct tcb *tcp)
 	return 0;
 }
 
-int sys_shmctl(struct tcb *tcp)
+SYS_FUNC(shmctl)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -324,7 +324,7 @@ int sys_shmctl(struct tcb *tcp)
 	return 0;
 }
 
-int sys_shmat(struct tcb *tcp)
+SYS_FUNC(shmat)
 {
 	if (exiting(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
@@ -348,7 +348,7 @@ int sys_shmat(struct tcb *tcp)
 	return 0;
 }
 
-int sys_shmdt(struct tcb *tcp)
+SYS_FUNC(shmdt)
 {
 	if (entering(tcp)) {
 		if (indirect_ipccall(tcp)) {
@@ -360,8 +360,7 @@ int sys_shmdt(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_mq_open(struct tcb *tcp)
+SYS_FUNC(mq_open)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -387,8 +386,7 @@ sys_mq_open(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_mq_timedsend(struct tcb *tcp)
+SYS_FUNC(mq_timedsend)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -399,8 +397,7 @@ sys_mq_timedsend(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_mq_timedreceive(struct tcb *tcp)
+SYS_FUNC(mq_timedreceive)
 {
 	if (entering(tcp))
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -412,8 +409,7 @@ sys_mq_timedreceive(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_mq_notify(struct tcb *tcp)
+SYS_FUNC(mq_notify)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -445,8 +441,7 @@ printmqattr(struct tcb *tcp, long addr)
 	}
 }
 
-int
-sys_mq_getsetattr(struct tcb *tcp)
+SYS_FUNC(mq_getsetattr)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -457,8 +452,7 @@ sys_mq_getsetattr(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_ipc(struct tcb *tcp)
+SYS_FUNC(ipc)
 {
 	return printargs(tcp);
 }

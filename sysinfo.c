@@ -1,8 +1,7 @@
 #include "defs.h"
 #include <sys/sysinfo.h>
 
-int
-sys_sysinfo(struct tcb *tcp)
+SYS_FUNC(sysinfo)
 {
 	struct sysinfo si;
 

@@ -44,8 +44,7 @@ get_pagesize(void)
 	return pagesize;
 }
 
-int
-sys_brk(struct tcb *tcp)
+SYS_FUNC(brk)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx", tcp->u_arg[0]);
@@ -95,8 +94,7 @@ print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
  */
 
 /* Params are pointed to by u_arg[0], offset is in bytes */
-int
-sys_old_mmap(struct tcb *tcp)
+SYS_FUNC(old_mmap)
 {
 	long u_arg[6];
 #if defined(IA64)
@@ -127,8 +125,7 @@ sys_old_mmap(struct tcb *tcp)
 
 #if defined(S390)
 /* Params are pointed to by u_arg[0], offset is in pages */
-int
-sys_old_mmap_pgoff(struct tcb *tcp)
+SYS_FUNC(old_mmap_pgoff)
 {
 	long u_arg[5];
 	int i;
@@ -145,8 +142,7 @@ sys_old_mmap_pgoff(struct tcb *tcp)
 #endif
 
 /* Params are passed directly, offset is in bytes */
-int
-sys_mmap(struct tcb *tcp)
+SYS_FUNC(mmap)
 {
 	unsigned long long offset = (unsigned long) tcp->u_arg[5];
 #if defined(LINUX_MIPSN32) || defined(X32)
@@ -162,8 +158,7 @@ sys_mmap(struct tcb *tcp)
 }
 
 /* Params are passed directly, offset is in pages */
-int
-sys_mmap_pgoff(struct tcb *tcp)
+SYS_FUNC(mmap_pgoff)
 {
 	/* Try test/mmap_offset_decode.c */
 	unsigned long long offset;
@@ -173,8 +168,7 @@ sys_mmap_pgoff(struct tcb *tcp)
 }
 
 /* Params are passed directly, offset is in 4k units */
-int
-sys_mmap_4koff(struct tcb *tcp)
+SYS_FUNC(mmap_4koff)
 {
 	unsigned long long offset;
 	offset = (unsigned long) tcp->u_arg[5];
@@ -182,8 +176,7 @@ sys_mmap_4koff(struct tcb *tcp)
 	return print_mmap(tcp, tcp->u_arg, offset);
 }
 
-int
-sys_munmap(struct tcb *tcp)
+SYS_FUNC(munmap)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu",
@@ -192,8 +185,7 @@ sys_munmap(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_mprotect(struct tcb *tcp)
+SYS_FUNC(mprotect)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ",
@@ -205,8 +197,7 @@ sys_mprotect(struct tcb *tcp)
 
 #include "xlat/mremap_flags.h"
 
-int
-sys_mremap(struct tcb *tcp)
+SYS_FUNC(mremap)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1],
@@ -223,8 +214,7 @@ sys_mremap(struct tcb *tcp)
 
 #include "xlat/madvise_cmds.h"
 
-int
-sys_madvise(struct tcb *tcp)
+SYS_FUNC(madvise)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -235,8 +225,7 @@ sys_madvise(struct tcb *tcp)
 
 #include "xlat/mlockall_flags.h"
 
-int
-sys_mlockall(struct tcb *tcp)
+SYS_FUNC(mlockall)
 {
 	if (entering(tcp)) {
 		printflags(mlockall_flags, tcp->u_arg[0], "MCL_???");
@@ -246,8 +235,7 @@ sys_mlockall(struct tcb *tcp)
 
 #include "xlat/mctl_sync.h"
 
-int
-sys_msync(struct tcb *tcp)
+SYS_FUNC(msync)
 {
 	if (entering(tcp)) {
 		/* addr */
@@ -260,8 +248,7 @@ sys_msync(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_mincore(struct tcb *tcp)
+SYS_FUNC(mincore)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -291,8 +278,7 @@ sys_mincore(struct tcb *tcp)
 }
 
 #if defined(ALPHA) || defined(IA64) || defined(SPARC) || defined(SPARC64)
-int
-sys_getpagesize(struct tcb *tcp)
+SYS_FUNC(getpagesize)
 {
 	if (exiting(tcp))
 		return RVAL_HEX;
@@ -300,8 +286,7 @@ sys_getpagesize(struct tcb *tcp)
 }
 #endif
 
-int
-sys_remap_file_pages(struct tcb *tcp)
+SYS_FUNC(remap_file_pages)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -377,8 +362,7 @@ get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)
 	tprintf(", %lu", maxnodes);
 }
 
-int
-sys_mbind(struct tcb *tcp)
+SYS_FUNC(mbind)
 {
 	if (entering(tcp)) {
 		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -390,8 +374,7 @@ sys_mbind(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_set_mempolicy(struct tcb *tcp)
+SYS_FUNC(set_mempolicy)
 {
 	if (entering(tcp)) {
 		printxval(policies, tcp->u_arg[0], "MPOL_???");
@@ -400,8 +383,7 @@ sys_set_mempolicy(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_get_mempolicy(struct tcb *tcp)
+SYS_FUNC(get_mempolicy)
 {
 	if (exiting(tcp)) {
 		int pol;
@@ -418,8 +400,7 @@ sys_get_mempolicy(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_migrate_pages(struct tcb *tcp)
+SYS_FUNC(migrate_pages)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", (long) (pid_t) tcp->u_arg[0]);
@@ -430,8 +411,7 @@ sys_migrate_pages(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_move_pages(struct tcb *tcp)
+SYS_FUNC(move_pages)
 {
 	if (entering(tcp)) {
 		unsigned long npages = tcp->u_arg[1];
@@ -502,8 +482,7 @@ sys_move_pages(struct tcb *tcp)
 }
 
 #if defined(POWERPC)
-int
-sys_subpage_prot(struct tcb *tcp)
+SYS_FUNC(subpage_prot)
 {
 	if (entering(tcp)) {
 		unsigned long cur, end, abbrev_end, entries;

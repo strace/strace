@@ -39,8 +39,7 @@ print_user_desc(struct tcb *tcp, long addr)
 		desc.useable);
 }
 
-int
-sys_modify_ldt(struct tcb *tcp)
+SYS_FUNC(modify_ldt)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -55,8 +54,7 @@ sys_modify_ldt(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_set_thread_area(struct tcb *tcp)
+SYS_FUNC(set_thread_area)
 {
 	if (entering(tcp)) {
 		print_user_desc(tcp, tcp->u_arg[0]);
@@ -76,8 +74,7 @@ sys_set_thread_area(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_get_thread_area(struct tcb *tcp)
+SYS_FUNC(get_thread_area)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp))
@@ -91,8 +88,7 @@ sys_get_thread_area(struct tcb *tcp)
 #endif /* I386 || X86_64 || X32 */
 
 #if defined(M68K) || defined(MIPS)
-int
-sys_set_thread_area(struct tcb *tcp)
+SYS_FUNC(set_thread_area)
 {
 	if (entering(tcp))
 		tprintf("%#lx", tcp->u_arg[0]);
@@ -102,8 +98,7 @@ sys_set_thread_area(struct tcb *tcp)
 #endif
 
 #if defined(M68K)
-int
-sys_get_thread_area(struct tcb *tcp)
+SYS_FUNC(get_thread_area)
 {
 	return RVAL_HEX;
 }

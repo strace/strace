@@ -16,8 +16,7 @@ enum {
 
 #include "xlat/syslog_action_type.h"
 
-int
-sys_syslog(struct tcb *tcp)
+SYS_FUNC(syslog)
 {
 	int type = tcp->u_arg[0];
 

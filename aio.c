@@ -38,8 +38,7 @@
 # define IOCB_RESFD (1 << 0)
 #endif
 
-int
-sys_io_setup(struct tcb *tcp)
+SYS_FUNC(io_setup)
 {
 	if (entering(tcp))
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -57,8 +56,7 @@ sys_io_setup(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_io_destroy(struct tcb *tcp)
+SYS_FUNC(io_destroy)
 {
 	if (entering(tcp))
 		tprintf("%lu", tcp->u_arg[0]);
@@ -112,8 +110,7 @@ print_common_flags(struct iocb *iocb)
 
 #endif /* HAVE_LIBAIO_H */
 
-int
-sys_io_submit(struct tcb *tcp)
+SYS_FUNC(io_submit)
 {
 	if (entering(tcp)) {
 #ifdef HAVE_LIBAIO_H
@@ -197,8 +194,7 @@ sys_io_submit(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_io_cancel(struct tcb *tcp)
+SYS_FUNC(io_cancel)
 {
 	if (entering(tcp)) {
 #ifdef HAVE_LIBAIO_H
@@ -232,8 +228,7 @@ sys_io_cancel(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_io_getevents(struct tcb *tcp)
+SYS_FUNC(io_getevents)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1],

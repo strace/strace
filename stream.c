@@ -86,8 +86,7 @@ printstrbufarg(struct tcb *tcp, long arg, int getting)
 	tprints(", ");
 }
 
-int
-sys_putmsg(struct tcb *tcp)
+SYS_FUNC(putmsg)
 {
 	int i;
 
@@ -103,8 +102,7 @@ sys_putmsg(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_getmsg(struct tcb *tcp)
+SYS_FUNC(getmsg)
 {
 	int i, flags;
 
@@ -152,8 +150,7 @@ sys_getmsg(struct tcb *tcp)
 # if defined SYS_putpmsg || defined SYS_getpmsg
 #include "xlat/pmsgflags.h"
 #  ifdef SYS_putpmsg
-int
-sys_putpmsg(struct tcb *tcp)
+SYS_FUNC(putpmsg)
 {
 	int i;
 
@@ -172,8 +169,7 @@ sys_putpmsg(struct tcb *tcp)
 }
 #  endif
 #  ifdef SYS_getpmsg
-int
-sys_getpmsg(struct tcb *tcp)
+SYS_FUNC(getpmsg)
 {
 	int i, flags;
 
@@ -363,8 +359,7 @@ decode_poll(struct tcb *tcp, long pts)
 	}
 }
 
-int
-sys_poll(struct tcb *tcp)
+SYS_FUNC(poll)
 {
 	int rc = decode_poll(tcp, 0);
 	if (entering(tcp)) {
@@ -378,8 +373,7 @@ sys_poll(struct tcb *tcp)
 	return rc;
 }
 
-int
-sys_ppoll(struct tcb *tcp)
+SYS_FUNC(ppoll)
 {
 	int rc = decode_poll(tcp, tcp->u_arg[2]);
 	if (entering(tcp)) {
@@ -393,8 +387,7 @@ sys_ppoll(struct tcb *tcp)
 }
 
 #else /* !HAVE_SYS_POLL_H */
-int
-sys_poll(struct tcb *tcp)
+SYS_FUNC(poll)
 {
 	return 0;
 }

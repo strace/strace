@@ -142,8 +142,7 @@ decode_rlimit(struct tcb *tcp, unsigned long addr)
 
 #endif
 
-int
-sys_getrlimit(struct tcb *tcp)
+SYS_FUNC(getrlimit)
 {
 	if (entering(tcp)) {
 		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
@@ -155,8 +154,7 @@ sys_getrlimit(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_setrlimit(struct tcb *tcp)
+SYS_FUNC(setrlimit)
 {
 	if (entering(tcp)) {
 		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
@@ -166,8 +164,7 @@ sys_setrlimit(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_prlimit64(struct tcb *tcp)
+SYS_FUNC(prlimit64)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
@@ -276,8 +273,7 @@ printrusage(struct tcb *tcp, long addr)
 	}
 }
 
-int
-sys_getrusage(struct tcb *tcp)
+SYS_FUNC(getrusage)
 {
 	if (entering(tcp)) {
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
@@ -289,8 +285,7 @@ sys_getrusage(struct tcb *tcp)
 }
 
 #ifdef ALPHA
-int
-sys_osf_getrusage(struct tcb *tcp)
+SYS_FUNC(osf_getrusage)
 {
 	if (entering(tcp)) {
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
@@ -304,8 +299,7 @@ sys_osf_getrusage(struct tcb *tcp)
 
 #include "xlat/priorities.h"
 
-int
-sys_getpriority(struct tcb *tcp)
+SYS_FUNC(getpriority)
 {
 	if (entering(tcp)) {
 		printxval(priorities, tcp->u_arg[0], "PRIO_???");
@@ -314,8 +308,7 @@ sys_getpriority(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_setpriority(struct tcb *tcp)
+SYS_FUNC(setpriority)
 {
 	if (entering(tcp)) {
 		printxval(priorities, tcp->u_arg[0], "PRIO_???");
@@ -324,8 +317,7 @@ sys_setpriority(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_times(struct tcb *tcp)
+SYS_FUNC(times)
 {
 	struct tms tbuf;
 

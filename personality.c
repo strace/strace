@@ -4,8 +4,7 @@
 
 #include "xlat/personality_options.h"
 
-int
-sys_personality(struct tcb *tcp)
+SYS_FUNC(personality)
 {
 	if (entering(tcp))
 		printxval(personality_options, tcp->u_arg[0], "PER_???");

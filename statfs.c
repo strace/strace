@@ -52,8 +52,7 @@ printstatfs(struct tcb *tcp, const long addr)
 	tprints("}");
 }
 
-int
-sys_statfs(struct tcb *tcp)
+SYS_FUNC(statfs)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -64,8 +63,7 @@ sys_statfs(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fstatfs(struct tcb *tcp)
+SYS_FUNC(fstatfs)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -181,16 +179,14 @@ do_statfs64_fstatfs64(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_statfs64(struct tcb *tcp)
+SYS_FUNC(statfs64)
 {
 	if (entering(tcp))
 		printpath(tcp, tcp->u_arg[0]);
 	return do_statfs64_fstatfs64(tcp);
 }
 
-int
-sys_fstatfs64(struct tcb *tcp)
+SYS_FUNC(fstatfs64)
 {
 	if (entering(tcp))
 		printfd(tcp, tcp->u_arg[0]);
@@ -199,8 +195,7 @@ sys_fstatfs64(struct tcb *tcp)
 #endif /* HAVE_STRUCT_STATFS64 */
 
 #ifdef ALPHA
-int
-osf_statfs(struct tcb *tcp)
+SYS_FUNC(osf_statfs)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -212,8 +207,7 @@ osf_statfs(struct tcb *tcp)
 	return 0;
 }
 
-int
-osf_fstatfs(struct tcb *tcp)
+SYS_FUNC(osf_fstatfs)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);

@@ -14,8 +14,7 @@
 #include "xlat/sysctl_net_ipv6.h"
 #include "xlat/sysctl_net_ipv6_route.h"
 
-int
-sys_sysctl(struct tcb *tcp)
+SYS_FUNC(sysctl)
 {
 	struct __sysctl_args info;
 	int *name;

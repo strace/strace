@@ -4,8 +4,7 @@
 
 #include "xlat/sync_file_range_flags.h"
 
-int
-sys_sync_file_range(struct tcb *tcp)
+SYS_FUNC(sync_file_range)
 {
 	if (entering(tcp)) {
 		int argn;
@@ -18,8 +17,7 @@ sys_sync_file_range(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sync_file_range2(struct tcb *tcp)
+SYS_FUNC(sync_file_range2)
 {
 	if (entering(tcp)) {
 		int argn;

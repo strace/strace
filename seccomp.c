@@ -230,8 +230,7 @@ decode_seccomp_set_mode_strict(unsigned int flags, unsigned long addr)
 		tprints("NULL");
 }
 
-int
-sys_seccomp(struct tcb *tcp)
+SYS_FUNC(seccomp)
 {
 	if (entering(tcp)) {
 		unsigned int op = tcp->u_arg[0];

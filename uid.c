@@ -37,16 +37,14 @@
 # define uid_t_(size)	uid_t__(size)
 # define uid_t__(size)	uint ## size ## _t
 
-int
-sys_getuid(struct tcb *tcp)
+SYS_FUNC(getuid)
 {
 	if (exiting(tcp))
 		tcp->u_rval = (uid_t) tcp->u_rval;
 	return RVAL_UDECIMAL;
 }
 
-int
-sys_setfsuid(struct tcb *tcp)
+SYS_FUNC(setfsuid)
 {
 	if (entering(tcp))
 		tprintf("%u", (uid_t) tcp->u_arg[0]);
@@ -55,8 +53,7 @@ sys_setfsuid(struct tcb *tcp)
 	return RVAL_UDECIMAL;
 }
 
-int
-sys_setuid(struct tcb *tcp)
+SYS_FUNC(setuid)
 {
 	if (entering(tcp)) {
 		tprintf("%u", (uid_t) tcp->u_arg[0]);
@@ -75,8 +72,7 @@ get_print_uid(struct tcb *tcp, const char *prefix, const long addr)
 		tprintf("%s[%u]", prefix, uid);
 }
 
-int
-sys_getresuid(struct tcb *tcp)
+SYS_FUNC(getresuid)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp)) {
@@ -91,8 +87,7 @@ sys_getresuid(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_setreuid(struct tcb *tcp)
+SYS_FUNC(setreuid)
 {
 	if (entering(tcp)) {
 		printuid("", tcp->u_arg[0]);
@@ -101,8 +96,7 @@ sys_setreuid(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_setresuid(struct tcb *tcp)
+SYS_FUNC(setresuid)
 {
 	if (entering(tcp)) {
 		printuid("", tcp->u_arg[0]);
@@ -112,8 +106,7 @@ sys_setresuid(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_chown(struct tcb *tcp)
+SYS_FUNC(chown)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -123,8 +116,7 @@ sys_chown(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fchown(struct tcb *tcp)
+SYS_FUNC(fchown)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -143,8 +135,7 @@ printuid(const char *text, const unsigned int uid)
 		tprintf("%s%u", text, uid);
 }
 
-int
-sys_setgroups(struct tcb *tcp)
+SYS_FUNC(setgroups)
 {
 	if (entering(tcp)) {
 		unsigned long len, size, start, cur, end, abbrev_end;
@@ -197,8 +188,7 @@ sys_setgroups(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_getgroups(struct tcb *tcp)
+SYS_FUNC(getgroups)
 {
 	unsigned long len;
 

@@ -23,14 +23,12 @@ decode_readlink(struct tcb *tcp, int offset)
 	return 0;
 }
 
-int
-sys_readlink(struct tcb *tcp)
+SYS_FUNC(readlink)
 {
 	return decode_readlink(tcp, 0);
 }
 
-int
-sys_readlinkat(struct tcb *tcp)
+SYS_FUNC(readlinkat)
 {
 	if (entering(tcp))
 		print_dirfd(tcp, tcp->u_arg[0]);

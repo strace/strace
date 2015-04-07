@@ -32,8 +32,7 @@
 
 #include "xlat/mount_flags.h"
 
-int
-sys_mount(struct tcb *tcp)
+SYS_FUNC(mount)
 {
 	if (entering(tcp)) {
 		int ignore_type = 0, ignore_data = 0;

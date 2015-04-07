@@ -4,8 +4,7 @@
 
 #include "xlat/schedulers.h"
 
-int
-sys_sched_getscheduler(struct tcb *tcp)
+SYS_FUNC(sched_getscheduler)
 {
 	if (entering(tcp)) {
 		tprintf("%d", (int) tcp->u_arg[0]);
@@ -17,8 +16,7 @@ sys_sched_getscheduler(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sched_setscheduler(struct tcb *tcp)
+SYS_FUNC(sched_setscheduler)
 {
 	if (entering(tcp)) {
 		struct sched_param p;
@@ -32,8 +30,7 @@ sys_sched_setscheduler(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sched_getparam(struct tcb *tcp)
+SYS_FUNC(sched_getparam)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
@@ -47,8 +44,7 @@ sys_sched_getparam(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sched_setparam(struct tcb *tcp)
+SYS_FUNC(sched_setparam)
 {
 	if (entering(tcp)) {
 		struct sched_param p;
@@ -60,8 +56,7 @@ sys_sched_setparam(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sched_get_priority_min(struct tcb *tcp)
+SYS_FUNC(sched_get_priority_min)
 {
 	if (entering(tcp)) {
 		printxval(schedulers, tcp->u_arg[0], "SCHED_???");
@@ -69,8 +64,7 @@ sys_sched_get_priority_min(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sched_rr_get_interval(struct tcb *tcp)
+SYS_FUNC(sched_rr_get_interval)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", (long) (pid_t) tcp->u_arg[0]);

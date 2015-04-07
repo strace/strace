@@ -15,8 +15,7 @@ print_keyring_serial_number(key_serial_t id)
 		tprintf("%d", id);
 }
 
-int
-sys_add_key(struct tcb *tcp)
+SYS_FUNC(add_key)
 {
 	if (entering(tcp)) {
 		/* type */
@@ -35,8 +34,7 @@ sys_add_key(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_request_key(struct tcb *tcp)
+SYS_FUNC(request_key)
 {
 	if (entering(tcp)) {
 		/* type */
@@ -263,8 +261,7 @@ keyctl_set_reqkey_keyring(struct tcb *tcp, int reqkey)
 
 #include "xlat/keyctl_commands.h"
 
-int
-sys_keyctl(struct tcb *tcp)
+SYS_FUNC(keyctl)
 {
 	int cmd = tcp->u_arg[0];
 

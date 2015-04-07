@@ -17,8 +17,7 @@
 
 #include "xlat/swap_flags.h"
 
-int
-sys_swapon(struct tcb *tcp)
+SYS_FUNC(swapon)
 {
 	if (entering(tcp)) {
 		int flags = tcp->u_arg[1];

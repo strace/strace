@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_exit(struct tcb *tcp)
+SYS_FUNC(exit)
 {
 	if (exiting(tcp)) {
 		fprintf(stderr, "_exit returned!\n");

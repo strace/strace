@@ -40,8 +40,7 @@ print_stack_t(struct tcb *tcp, unsigned long addr)
 	}
 }
 
-int
-sys_sigaltstack(struct tcb *tcp)
+SYS_FUNC(sigaltstack)
 {
 	if (entering(tcp)) {
 		print_stack_t(tcp, tcp->u_arg[0]);

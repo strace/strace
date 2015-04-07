@@ -54,8 +54,7 @@ failed:
 	tprintf(", 0x%lx, %ld", arg, insize);
 }
 
-int
-sys_setxattr(struct tcb *tcp)
+SYS_FUNC(setxattr)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -68,8 +67,7 @@ sys_setxattr(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fsetxattr(struct tcb *tcp)
+SYS_FUNC(fsetxattr)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -82,8 +80,7 @@ sys_fsetxattr(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_getxattr(struct tcb *tcp)
+SYS_FUNC(getxattr)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -96,8 +93,7 @@ sys_getxattr(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fgetxattr(struct tcb *tcp)
+SYS_FUNC(fgetxattr)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -128,8 +124,7 @@ print_xattr_list(struct tcb *tcp, unsigned long addr, unsigned long size)
 	tprintf(", %lu", size);
 }
 
-int
-sys_listxattr(struct tcb *tcp)
+SYS_FUNC(listxattr)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -140,8 +135,7 @@ sys_listxattr(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_flistxattr(struct tcb *tcp)
+SYS_FUNC(flistxattr)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -152,8 +146,7 @@ sys_flistxattr(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_removexattr(struct tcb *tcp)
+SYS_FUNC(removexattr)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -163,8 +156,7 @@ sys_removexattr(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_fremovexattr(struct tcb *tcp)
+SYS_FUNC(fremovexattr)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);

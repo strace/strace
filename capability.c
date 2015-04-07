@@ -117,8 +117,7 @@ print_cap_data(struct tcb *tcp, unsigned long addr, const cap_user_header_t h)
 	tprints("}");
 }
 
-int
-sys_capget(struct tcb *tcp)
+SYS_FUNC(capget)
 {
 	cap_user_header_t h;
 
@@ -133,8 +132,7 @@ sys_capget(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_capset(struct tcb *tcp)
+SYS_FUNC(capset)
 {
 	if (entering(tcp)) {
 		cap_user_header_t h = get_cap_header(tcp, tcp->u_arg[0]);

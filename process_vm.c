@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_process_vm_readv(struct tcb *tcp)
+SYS_FUNC(process_vm_readv)
 {
 	if (entering(tcp)) {
 		/* arg 1: pid */
@@ -28,8 +27,7 @@ sys_process_vm_readv(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_process_vm_writev(struct tcb *tcp)
+SYS_FUNC(process_vm_writev)
 {
 	if (entering(tcp)) {
 		/* arg 1: pid */

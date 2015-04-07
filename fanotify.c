@@ -10,8 +10,7 @@
 # define FAN_NOFD -1
 #endif
 
-int
-sys_fanotify_init(struct tcb *tcp)
+SYS_FUNC(fanotify_init)
 {
 	unsigned flags;
 
@@ -34,8 +33,7 @@ sys_fanotify_init(struct tcb *tcp)
 #include "xlat/fan_mark_flags.h"
 #include "xlat/fan_event_flags.h"
 
-int
-sys_fanotify_mark(struct tcb *tcp)
+SYS_FUNC(fanotify_mark)
 {
 	unsigned long long mask = 0;
 	int argn;

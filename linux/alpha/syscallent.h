@@ -185,8 +185,8 @@
 [157] = { 5,	0,		printargs,			"osf_sigwaitprim"	}, /*not implemented */
 [158] = { 5,	0,		printargs,			"osf_nfssvc"		}, /*not implemented */
 [159] = { 4,	0,		printargs,			"osf_getdirentries"	},
-[160] = { 3,	0,		osf_statfs,		"osf_statfs"			},
-[161] = { 3,	0,		osf_fstatfs,		"osf_fstatfs"			},
+[160] = { 3,	0,		sys_osf_statfs,			"osf_statfs"		},
+[161] = { 3,	0,		sys_osf_fstatfs,		"osf_fstatfs"		},
 [162] = { },
 [163] = { 5,	0,		printargs,			"osf_asynch_daemon"	}, /*not implemented */
 [164] = { 5,	0,		printargs,			"osf_getfh"		}, /*not implemented */

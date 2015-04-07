@@ -4,8 +4,7 @@
 #include "xlat/inotify_flags.h"
 #include "xlat/inotify_init_flags.h"
 
-int
-sys_inotify_add_watch(struct tcb *tcp)
+SYS_FUNC(inotify_add_watch)
 {
 	if (entering(tcp)) {
 		/* file descriptor */
@@ -20,8 +19,7 @@ sys_inotify_add_watch(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_inotify_rm_watch(struct tcb *tcp)
+SYS_FUNC(inotify_rm_watch)
 {
 	if (entering(tcp)) {
 		/* file descriptor */
@@ -32,8 +30,7 @@ sys_inotify_rm_watch(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_inotify_init1(struct tcb *tcp)
+SYS_FUNC(inotify_init1)
 {
 	if (entering(tcp))
 		printflags(inotify_init_flags, tcp->u_arg[0], "IN_???");

@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_fchownat(struct tcb *tcp)
+SYS_FUNC(fchownat)
 {
 	if (entering(tcp)) {
 		print_dirfd(tcp, tcp->u_arg[0]);

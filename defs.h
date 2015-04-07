@@ -673,3 +673,9 @@ extern unsigned num_quals;
 /* Only ensures that sysent[scno] isn't out of range */
 #define SCNO_IN_RANGE(scno) \
 	((unsigned long)(scno) < nsyscalls)
+
+#ifndef SYS_FUNC_NAME
+# define SYS_FUNC_NAME(syscall_name) sys_ ## syscall_name
+#endif
+
+#define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(syscall_name)(struct tcb *tcp)

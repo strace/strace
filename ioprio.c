@@ -42,8 +42,7 @@ sprint_ioprio(int ioprio)
 	return outstr;
 }
 
-int
-sys_ioprio_get(struct tcb *tcp)
+SYS_FUNC(ioprio_get)
 {
 	if (entering(tcp)) {
 		/* int which */
@@ -60,8 +59,7 @@ sys_ioprio_get(struct tcb *tcp)
 	}
 }
 
-int
-sys_ioprio_set(struct tcb *tcp)
+SYS_FUNC(ioprio_set)
 {
 	if (entering(tcp)) {
 		/* int which */

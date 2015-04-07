@@ -14,7 +14,7 @@
 
 #include "xlat/atomic_ops.h"
 
-int sys_or1k_atomic(struct tcb *tcp)
+SYS_FUNC(or1k_atomic)
 {
 	if (entering(tcp)) {
 		printxval(atomic_ops, tcp->u_arg[0], "???");

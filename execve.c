@@ -42,8 +42,7 @@ printargc(const char *fmt, struct tcb *tcp, long addr)
 	tprintf(fmt, count, count == 1 ? "" : "s");
 }
 
-int
-sys_execve(struct tcb *tcp)
+SYS_FUNC(execve)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);
@@ -68,8 +67,7 @@ sys_execve(struct tcb *tcp)
 }
 
 #if defined(SPARC) || defined(SPARC64)
-int
-sys_execv(struct tcb *tcp)
+SYS_FUNC(execv)
 {
 	if (entering(tcp)) {
 		printpath(tcp, tcp->u_arg[0]);

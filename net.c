@@ -729,8 +729,7 @@ tprint_sock_type(int flags)
 	printflags(sock_type_flags, flags, "SOCK_???");
 }
 
-int
-sys_socket(struct tcb *tcp)
+SYS_FUNC(socket)
 {
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
@@ -770,8 +769,7 @@ sys_socket(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_bind(struct tcb *tcp)
+SYS_FUNC(bind)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -782,14 +780,12 @@ sys_bind(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_connect(struct tcb *tcp)
+SYS_FUNC(connect)
 {
 	return sys_bind(tcp);
 }
 
-int
-sys_listen(struct tcb *tcp)
+SYS_FUNC(listen)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -828,22 +824,19 @@ do_sockname(struct tcb *tcp, int flags_arg)
 	return 0;
 }
 
-int
-sys_accept(struct tcb *tcp)
+SYS_FUNC(accept)
 {
 	do_sockname(tcp, -1);
 	return RVAL_FD;
 }
 
-int
-sys_accept4(struct tcb *tcp)
+SYS_FUNC(accept4)
 {
 	do_sockname(tcp, 3);
 	return RVAL_FD;
 }
 
-int
-sys_send(struct tcb *tcp)
+SYS_FUNC(send)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -856,8 +849,7 @@ sys_send(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sendto(struct tcb *tcp)
+SYS_FUNC(sendto)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -877,8 +869,7 @@ sys_sendto(struct tcb *tcp)
 
 #ifdef HAVE_SENDMSG
 
-int
-sys_sendmsg(struct tcb *tcp)
+SYS_FUNC(sendmsg)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -891,8 +882,7 @@ sys_sendmsg(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sendmmsg(struct tcb *tcp)
+SYS_FUNC(sendmmsg)
 {
 	if (entering(tcp)) {
 		/* sockfd */
@@ -912,8 +902,7 @@ sys_sendmmsg(struct tcb *tcp)
 
 #endif /* HAVE_SENDMSG */
 
-int
-sys_recv(struct tcb *tcp)
+SYS_FUNC(recv)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -930,8 +919,7 @@ sys_recv(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_recvfrom(struct tcb *tcp)
+SYS_FUNC(recvfrom)
 {
 	int fromlen;
 
@@ -977,8 +965,7 @@ sys_recvfrom(struct tcb *tcp)
 
 #ifdef HAVE_SENDMSG
 
-int
-sys_recvmsg(struct tcb *tcp)
+SYS_FUNC(recvmsg)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -995,8 +982,7 @@ sys_recvmsg(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_recvmmsg(struct tcb *tcp)
+SYS_FUNC(recvmmsg)
 {
 	/* +5 chars are for "left " prefix */
 	static char str[5 + TIMESPEC_TEXT_BUFSIZE];
@@ -1044,8 +1030,7 @@ sys_recvmmsg(struct tcb *tcp)
 
 #include "xlat/shutdown_modes.h"
 
-int
-sys_shutdown(struct tcb *tcp)
+SYS_FUNC(shutdown)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -1055,8 +1040,7 @@ sys_shutdown(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_getsockname(struct tcb *tcp)
+SYS_FUNC(getsockname)
 {
 	return do_sockname(tcp, -1);
 }
@@ -1090,20 +1074,17 @@ do_pipe(struct tcb *tcp, int flags_arg)
 	return 0;
 }
 
-int
-sys_pipe(struct tcb *tcp)
+SYS_FUNC(pipe)
 {
 	return do_pipe(tcp, -1);
 }
 
-int
-sys_pipe2(struct tcb *tcp)
+SYS_FUNC(pipe2)
 {
 	return do_pipe(tcp, 1);
 }
 
-int
-sys_socketpair(struct tcb *tcp)
+SYS_FUNC(socketpair)
 {
 	int fds[2];
 
@@ -1306,8 +1287,7 @@ done:
 	tprintf(", [%d]", len);
 }
 
-int
-sys_getsockopt(struct tcb *tcp)
+SYS_FUNC(getsockopt)
 {
 	if (entering(tcp)) {
 		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
@@ -1493,8 +1473,7 @@ done:
 	tprintf(", %d", len);
 }
 
-int
-sys_setsockopt(struct tcb *tcp)
+SYS_FUNC(setsockopt)
 {
 	if (entering(tcp)) {
 		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],

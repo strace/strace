@@ -15,7 +15,7 @@
 
 #include "xlat/sysmips_operations.h"
 
-int sys_sysmips(struct tcb *tcp)
+SYS_FUNC(sysmips)
 {
 	if (entering(tcp)) {
 		printxval(sysmips_operations, tcp->u_arg[0], "???");

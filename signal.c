@@ -249,8 +249,7 @@ print_sigset_addr_len(struct tcb *tcp, long addr, long len)
 	tprints(sprintsigmask_n("", mask, len));
 }
 
-int
-sys_sigsetmask(struct tcb *tcp)
+SYS_FUNC(sigsetmask)
 {
 	if (entering(tcp)) {
 		tprintsigmask_val("", tcp->u_arg[0]);
@@ -359,8 +358,7 @@ decode_old_sigaction(struct tcb *tcp, long addr)
 	tprints("}");
 }
 
-int
-sys_sigaction(struct tcb *tcp)
+SYS_FUNC(sigaction)
 {
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -372,8 +370,7 @@ sys_sigaction(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_signal(struct tcb *tcp)
+SYS_FUNC(signal)
 {
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -411,8 +408,7 @@ sys_signal(struct tcb *tcp)
 
 #endif /* HAVE_SIGACTION */
 
-int
-sys_siggetmask(struct tcb *tcp)
+SYS_FUNC(siggetmask)
 {
 	if (exiting(tcp)) {
 		tcp->auxstr = sprintsigmask_val("mask ", tcp->u_rval);
@@ -420,8 +416,7 @@ sys_siggetmask(struct tcb *tcp)
 	return RVAL_HEX | RVAL_STR;
 }
 
-int
-sys_sigsuspend(struct tcb *tcp)
+SYS_FUNC(sigsuspend)
 {
 	if (entering(tcp)) {
 		tprintsigmask_val("", tcp->u_arg[2]);
@@ -432,8 +427,7 @@ sys_sigsuspend(struct tcb *tcp)
 #ifdef HAVE_SIGACTION
 
 /* "Old" sigprocmask, which operates with word-sized signal masks */
-int
-sys_sigprocmask(struct tcb *tcp)
+SYS_FUNC(sigprocmask)
 {
 # ifdef ALPHA
 	if (entering(tcp)) {
@@ -474,8 +468,7 @@ sys_sigprocmask(struct tcb *tcp)
 
 #endif /* HAVE_SIGACTION */
 
-int
-sys_kill(struct tcb *tcp)
+SYS_FUNC(kill)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %s",
@@ -486,8 +479,7 @@ sys_kill(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_tgkill(struct tcb *tcp)
+SYS_FUNC(tgkill)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, %ld, %s",
@@ -499,8 +491,7 @@ sys_tgkill(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_sigpending(struct tcb *tcp)
+SYS_FUNC(sigpending)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp))
@@ -511,8 +502,7 @@ sys_sigpending(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_rt_sigprocmask(struct tcb *tcp)
+SYS_FUNC(rt_sigprocmask)
 {
 	/* Note: arg[3] is the length of the sigset. Kernel requires NSIG / 8 */
 	if (entering(tcp)) {
@@ -637,8 +627,7 @@ decode_new_sigaction(struct tcb *tcp, long addr)
 	tprints("}");
 }
 
-int
-sys_rt_sigaction(struct tcb *tcp)
+SYS_FUNC(rt_sigaction)
 {
 	if (entering(tcp)) {
 		printsignal(tcp->u_arg[0]);
@@ -658,8 +647,7 @@ sys_rt_sigaction(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_rt_sigpending(struct tcb *tcp)
+SYS_FUNC(rt_sigpending)
 {
 	if (exiting(tcp)) {
 		/*
@@ -677,8 +665,7 @@ sys_rt_sigpending(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_rt_sigsuspend(struct tcb *tcp)
+SYS_FUNC(rt_sigsuspend)
 {
 	if (entering(tcp)) {
 		/* NB: kernel requires arg[1] == NSIG / 8 */
@@ -696,8 +683,7 @@ print_sigqueueinfo(struct tcb *tcp, int sig, unsigned long uinfo)
 	printsiginfo_at(tcp, uinfo);
 }
 
-int
-sys_rt_sigqueueinfo(struct tcb *tcp)
+SYS_FUNC(rt_sigqueueinfo)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, ", tcp->u_arg[0]);
@@ -706,8 +692,7 @@ sys_rt_sigqueueinfo(struct tcb *tcp)
 	return 0;
 }
 
-int
-sys_rt_tgsigqueueinfo(struct tcb *tcp)
+SYS_FUNC(rt_tgsigqueueinfo)
 {
 	if (entering(tcp)) {
 		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
@@ -716,7 +701,7 @@ sys_rt_tgsigqueueinfo(struct tcb *tcp)
 	return 0;
 }
 
-int sys_rt_sigtimedwait(struct tcb *tcp)
+SYS_FUNC(rt_sigtimedwait)
 {
 	/* NB: kernel requires arg[3] == NSIG / 8 */
 	if (entering(tcp)) {
@@ -742,8 +727,7 @@ int sys_rt_sigtimedwait(struct tcb *tcp)
 	return 0;
 };
 
-int
-sys_restart_syscall(struct tcb *tcp)
+SYS_FUNC(restart_syscall)
 {
 	if (entering(tcp)) {
 		tprintf("<... resuming interrupted %s ...>",
@@ -772,14 +756,12 @@ do_signalfd(struct tcb *tcp, int flags_arg)
 	return 0;
 }
 
-int
-sys_signalfd(struct tcb *tcp)
+SYS_FUNC(signalfd)
 {
 	return do_signalfd(tcp, -1);
 }
 
-int
-sys_signalfd4(struct tcb *tcp)
+SYS_FUNC(signalfd4)
 {
 	return do_signalfd(tcp, 3);
 }

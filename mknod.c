@@ -40,14 +40,12 @@ decode_mknod(struct tcb *tcp, int offset)
 	return 0;
 }
 
-int
-sys_mknod(struct tcb *tcp)
+SYS_FUNC(mknod)
 {
 	return decode_mknod(tcp, 0);
 }
 
-int
-sys_mknodat(struct tcb *tcp)
+SYS_FUNC(mknodat)
 {
 	if (entering(tcp))
 		print_dirfd(tcp, tcp->u_arg[0]);
@@ -55,8 +53,7 @@ sys_mknodat(struct tcb *tcp)
 }
 
 #if defined(SPARC) || defined(SPARC64)
-int
-sys_xmknod(struct tcb *tcp)
+SYS_FUNC(xmknod)
 {
 	int mode = tcp->u_arg[2];
 

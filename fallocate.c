@@ -6,8 +6,7 @@
 
 #include "xlat/falloc_flags.h"
 
-int
-sys_fallocate(struct tcb *tcp)
+SYS_FUNC(fallocate)
 {
 	if (entering(tcp)) {
 		int argn;

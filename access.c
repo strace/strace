@@ -15,14 +15,12 @@ decode_access(struct tcb *tcp, int offset)
 	return 0;
 }
 
-int
-sys_access(struct tcb *tcp)
+SYS_FUNC(access)
 {
 	return decode_access(tcp, 0);
 }
 
-int
-sys_faccessat(struct tcb *tcp)
+SYS_FUNC(faccessat)
 {
 	if (entering(tcp))
 		print_dirfd(tcp, tcp->u_arg[0]);

@@ -2,8 +2,7 @@
 
 #include <sys/utsname.h>
 
-int
-sys_uname(struct tcb *tcp)
+SYS_FUNC(uname)
 {
 	struct utsname uname;
 

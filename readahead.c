@@ -1,7 +1,6 @@
 #include "defs.h"
 
-int
-sys_readahead(struct tcb *tcp)
+SYS_FUNC(readahead)
 {
 	if (entering(tcp)) {
 		int argn;

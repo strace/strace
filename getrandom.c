@@ -1,8 +1,7 @@
 #include "defs.h"
 #include "xlat/getrandom_flags.h"
 
-int
-sys_getrandom(struct tcb *tcp)
+SYS_FUNC(getrandom)
 {
 	if (exiting(tcp)) {
 		if (syserror(tcp))

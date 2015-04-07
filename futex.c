@@ -98,8 +98,7 @@
 #include "xlat/futexwakeops.h"
 #include "xlat/futexwakecmps.h"
 
-int
-sys_futex(struct tcb *tcp)
+SYS_FUNC(futex)
 {
 	if (entering(tcp)) {
 		long int cmd = tcp->u_arg[1] & 127;

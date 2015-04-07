@@ -6,8 +6,7 @@
 
 #include "xlat/sram_alloc_flags.h"
 
-int
-sys_sram_alloc(struct tcb *tcp)
+SYS_FUNC(sram_alloc)
 {
 	if (entering(tcp)) {
 		/* size */
