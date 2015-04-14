@@ -10,19 +10,23 @@ run_strace_redir()
 	$STRACE "$@" 2> "$LOG"
 }
 
-run_strace_redir -enone sh -c 'exec false'
+run_strace_redir -enone ./set_ptracer_any true ||
+	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
+
+run_strace_redir -enone ./set_ptracer_any false
 [ $? -eq 1 ] ||
 	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
 
-run_strace_redir -bexecve -enone sh -c 'exec false' ||
+run_strace_redir -bexecve -enone ./set_ptracer_any false ||
 	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
 
-pattern='Process [1-9][0-9]* detached'
+pattern_detached='Process [1-9][0-9]* detached'
+pattern_personality='\[ Process PID=[1-9][0-9]* runs in .* mode. \]'
 
-LC_ALL=C grep -x "$pattern" "$LOG" > /dev/null ||
+LC_ALL=C grep -x "$pattern_detached" "$LOG" > /dev/null ||
 	dump_log_and_fail_with "$STRACE $args: output mismatch"
 
-if LC_ALL=C grep -v -x "$pattern" "$LOG" > /dev/null; then
+if LC_ALL=C grep -E -v -x "($pattern_detached|$pattern_personality)" "$LOG" > /dev/null; then
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 fi
 
