@@ -1,6 +1,6 @@
 #if defined LINUX_MIPSO32
 /* For an O32 strace, decode the o32 syscalls.  */
-[4000] = { MA,	0,		printargs,			"syscall"		}, /* start of Linux o32 */
+[4000] = { MA,	0,		sys_syscall,			"syscall"		}, /* start of Linux o32 */
 [4001] = { 1,	TP|SE,		sys_exit,			"exit"			},
 [4002] = { 0,	TP,		sys_fork,			"fork"			},
 [4003] = { 3,	TD,		sys_read,			"read"			},

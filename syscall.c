@@ -602,6 +602,30 @@ decode_ipc_subcall(struct tcb *tcp)
 }
 #endif
 
+#ifdef LINUX_MIPSO32
+static void
+decode_mips_subcall(struct tcb *tcp)
+{
+	if (!SCNO_IS_VALID(tcp->u_arg[0]))
+		return;
+	tcp->scno = tcp->u_arg[0];
+	tcp->qual_flg = qual_flags[tcp->scno];
+	tcp->s_ent = &sysent[tcp->scno];
+	memmove(&tcp->u_arg[0], &tcp->u_arg[1],
+		sizeof(tcp->u_arg) - sizeof(tcp->u_arg[0]));
+	/*
+	 * Fetching the last arg of 7-arg syscalls (fadvise64_64
+	 * and sync_file_range) would require additional code,
+	 * see linux/mips/get_syscall_args.c
+	 */
+}
+
+SYS_FUNC(syscall)
+{
+	return printargs(tcp);
+}
+#endif
+
 int
 printargs(struct tcb *tcp)
 {
@@ -769,6 +793,11 @@ trace_syscall_entering(struct tcb *tcp)
 		 */
 		goto ret;
 	}
+
+#ifdef LINUX_MIPSO32
+	if (sys_syscall == tcp->s_ent->sys_func)
+		decode_mips_subcall(tcp);
+#endif
 
 	if (   sys_execve == tcp->s_ent->sys_func
 # if defined(SPARC) || defined(SPARC64)
