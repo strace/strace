@@ -89,3 +89,15 @@ SYS_FUNC(cacheflush)
 	return 0;
 }
 #endif /* SH */
+
+#ifdef NIOS2
+SYS_FUNC(cacheflush)
+{
+	if (entering(tcp)) {
+		/* addr and len */
+		tprintf("%#lx, %lu", tcp->u_arg[0], tcp->u_arg[3]);
+		/* scope and flags (cache type) are currently ignored */
+	}
+	return 0;
+}
+#endif /* NIOS2 */

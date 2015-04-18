@@ -125,6 +125,11 @@ microblaze*)
 	arch=microblaze
 	AC_DEFINE([MICROBLAZE], 1, [Define for the MicroBlaze architecture.])
 	;;
+nios2*)
+	arch=nios2
+	AC_DEFINE([NIOS2], 1, [Define for the Nios-II architecture.])
+	;;
+
 or1k*)
 	arch=or1k
 	AC_DEFINE([OR1K], 1, [Define for the OpenRISC 1000 architecture.])

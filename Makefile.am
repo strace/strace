@@ -341,6 +341,14 @@ EXTRA_DIST =				\
 	linux/mips/syscallent.h		\
 	linux/mips/userent.h		\
 	linux/mtd-abi.h			\
+	linux/nios2/arch_regs.c		\
+	linux/nios2/get_error.c		\
+	linux/nios2/get_scno.c		\
+	linux/nios2/get_syscall_args.c	\
+	linux/nios2/ioctls_arch0.h	\
+	linux/nios2/ioctls_inc0.h	\
+	linux/nios2/print_pc.c		\
+	linux/nios2/syscallent.h	\
 	linux/or1k/arch_regs.c		\
 	linux/or1k/get_error.c		\
 	linux/or1k/get_scno.c		\
