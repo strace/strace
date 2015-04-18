@@ -581,6 +581,32 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		return 1;
 	}
 
+	case VIDIOC_CREATE_BUFS: {
+		struct v4l2_create_buffers b;
+
+		if (exiting(tcp) && syserror(tcp))
+			return 1;
+		if (umove(tcp, arg, &b) < 0)
+			return 0;
+		if (entering(tcp)) {
+			tprintf(", {count=%u, memory=", b.count);
+			printxval(v4l2_memories, b.memory, "V4L2_MEMORY_???");
+			tprints(", format={type=");
+			printxval(v4l2_buf_types, b.format.type, "V4L2_BUF_TYPE_???");
+			tprints(", ");
+			print_v4l2_format_fmt(&b.format);
+			tprints("}}");
+			return 1;
+		} else {
+			static const char fmt[] = "{index=%u, count=%u}";
+			static char outstr[sizeof(fmt) + sizeof(int) * 6];
+
+			sprintf(outstr, fmt, b.index, b.count);
+			tcp->auxstr = outstr;
+			return 1 + RVAL_STR;
+		}
+	}
+
 	case VIDIOC_REQBUFS: {
 		struct v4l2_requestbuffers reqbufs;
 
