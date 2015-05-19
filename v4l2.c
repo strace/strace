@@ -558,13 +558,13 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 
 		if (entering(tcp) || umove(tcp, arg, &c) < 0)
 			return 0;
-		tprints(", type=");
+		tprints(", {type=");
 		printxval(v4l2_buf_types, c.type, "V4L2_BUF_TYPE_???");
-		if (syserror(tcp))
-			return 1;
-		tprintf(", bounds=" FMT_RECT ", defrect=" FMT_RECT ", "
-			"pixelaspect=" FMT_FRACT, ARGS_RECT(c.bounds),
-			ARGS_RECT(c.defrect), ARGS_FRACT(c.pixelaspect));
+		if (!syserror(tcp))
+			tprintf(", bounds=" FMT_RECT ", defrect=" FMT_RECT ", "
+				"pixelaspect=" FMT_FRACT, ARGS_RECT(c.bounds),
+				ARGS_RECT(c.defrect), ARGS_FRACT(c.pixelaspect));
+		tprints("}");
 		return 1;
 	}
 
