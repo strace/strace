@@ -78,7 +78,7 @@ find . -type f -name '*.h' -print0 |
 		exit 0
 cd - > /dev/null
 sed 's|^\./\(uapi/\)\?||' < "$tmpdir"/headers1.list > "$tmpdir"/headers.list
-sort -u -o "$tmpdir"/headers.list "$tmpdir"/headers.list
+LC_COLLATE=C sort -u -o "$tmpdir"/headers.list "$tmpdir"/headers.list
 
 msg "processing $(wc -l < "$tmpdir"/headers.list) header files from $inc_dir"
 failed=0

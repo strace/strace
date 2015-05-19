@@ -46,4 +46,4 @@ for f; do
 done |
 	sed 's|^uapi/||' |
 	sed -n 's/^\([^:]*\):'"$regexp"'.*/{ "\1", "\2", 0, \3, 0 },/p' |
-	sort -u
+	LC_COLLATE=C sort -u
