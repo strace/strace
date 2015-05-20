@@ -568,6 +568,17 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		return 1;
 	}
 
+	case VIDIOC_S_CROP: {
+		struct v4l2_crop c;
+
+		if (exiting(tcp) || umove(tcp, arg, &c) < 0)
+			return 0;
+		tprints(", {type=");
+		printxval(v4l2_buf_types, c.type, "V4L2_BUF_TYPE_???");
+		tprintf(", c=" FMT_RECT "}", ARGS_RECT(c.c));
+		return 1;
+	}
+
 	case VIDIOC_G_FBUF:
 	case VIDIOC_S_FBUF: {
 		struct v4l2_framebuffer b;
