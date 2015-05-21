@@ -17,7 +17,10 @@
 # include <linux/input.h>
 #endif
 
+#include <linux/videodev2.h>
+
 #if defined MMTIMER_GETRES \
+ && defined VIDIOC_ENUMINPUT \
  && defined HIDIOCGVERSION \
  && defined HIDIOCGPHYS \
  && defined EVIOCGBIT \
@@ -31,6 +34,7 @@ main(void )
 
 	if (ioctl(-1, TCGETS, &tty) != -1 ||
 	    ioctl(-1, MMTIMER_GETRES, &data) != -1 ||
+	    ioctl(-1, VIDIOC_ENUMINPUT, 0) != -1 ||
 	    ioctl(-1, HIDIOCGVERSION, &data) != -1 ||
 	    ioctl(-1, HIDIOCGPHYS(8), &data) != -1 ||
 	    ioctl(-1, EVIOCGBIT(EV_KEY, 8), &data) != -1 ||
