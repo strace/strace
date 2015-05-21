@@ -237,11 +237,30 @@ __EOF__
 		*linux/kvm.h)
 			cat <<'__EOF__'
 #if defined __x86_64__ || defined __i386__
-struct kvm_create_spapr_tce { __u32 unused[3]; };
 struct kvm_allocate_rma { __u32 unused[2]; };
+struct kvm_create_spapr_tce { __u32 unused[3]; };
 struct kvm_get_htab_fd { __u32 unused[8]; };
 struct kvm_rtas_token_args { __u8 unused[128]; };
 struct kvm_vcpu_init { __u32 unused[8]; };
+#elif defined __arm64__ || defined __arm__
+struct kvm_allocate_rma { __u32 unused[2]; };
+struct kvm_cpuid { __u32 unused[2]; };
+struct kvm_cpuid2 { __u32 unused[2]; };
+struct kvm_create_spapr_tce { __u32 unused[3]; };
+struct kvm_debugregs { __u32 unused[32]; };
+struct kvm_get_htab_fd { __u32 unused[8]; };
+struct kvm_lapic_state { __u32 unused[256]; };
+struct kvm_memory_alias { __u32 unused[8]; };
+struct kvm_msr_list { __u32 unused[1]; };
+struct kvm_msrs { __u32 unused[2]; };
+struct kvm_pit_state { __u32 unused[18]; };
+struct kvm_pit_state2 { __u32 unused[28]; };
+struct kvm_rtas_token_args { __u32 unused[128]; };
+struct kvm_vcpu_events { __u32 unused[16]; };
+struct kvm_x86_mce { __u32 unused[16]; };
+struct kvm_xcrs { __u32 unused[98]; };
+struct kvm_xen_hvm_config { __u32 unused[14]; };
+struct kvm_xsave { __u32 unused[1024]; };
 #endif
 __EOF__
 			;;
