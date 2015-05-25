@@ -107,7 +107,7 @@ SYS_FUNC(query_module)
 				size_t	idx;
 
 				if (!data) {
-					fprintf(stderr, "out of memory\n");
+					error_msg("Out of memory");
 					tprintf(" /* %lu entries */ ", (unsigned long)ret);
 				} else {
 					if (umoven(tcp, tcp->u_arg[2],
@@ -134,7 +134,7 @@ SYS_FUNC(query_module)
 				size_t			idx;
 
 				if (!data) {
-					fprintf(stderr, "out of memory\n");
+					error_msg("Out of memory");
 					tprintf(" /* %lu entries */ ", (unsigned long)ret);
 				} else {
 					if (umoven(tcp, tcp->u_arg[2],

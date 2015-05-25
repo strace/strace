@@ -828,7 +828,7 @@ dumpiov(struct tcb *tcp, int len, long addr)
 	/* Assuming no sane program has millions of iovs */
 	if ((unsigned)len > 1024*1024 /* insane or negative size? */
 	    || (iov = malloc(size)) == NULL) {
-		fprintf(stderr, "Out of memory\n");
+		error_msg("Out of memory");
 		return;
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
@@ -871,7 +871,7 @@ dumpstr(struct tcb *tcp, long addr, int len)
 		str = malloc(len + 16);
 		if (!str) {
 			strsize = -1;
-			fprintf(stderr, "Out of memory\n");
+			error_msg("Out of memory");
 			return;
 		}
 		strsize = len + 16;
