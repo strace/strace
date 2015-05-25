@@ -313,35 +313,23 @@ update_personality(struct tcb *tcp, unsigned int personality)
 		return;
 	tcp->currpers = personality;
 
-# if defined(POWERPC64)
+# undef PERSONALITY_NAMES
+# if defined POWERPC64
+#  define PERSONALITY_NAMES {"64 bit", "32 bit"}
+# elif defined X86_64
+#  define PERSONALITY_NAMES {"64 bit", "32 bit", "x32"}
+# elif defined X32
+#  define PERSONALITY_NAMES {"x32", "32 bit"}
+# elif defined AARCH64
+#  define PERSONALITY_NAMES {"32-bit", "AArch64"}
+# elif defined TILE
+#  define PERSONALITY_NAMES {"64-bit", "32-bit"}
+# endif
+# ifdef PERSONALITY_NAMES
 	if (!qflag) {
-		static const char *const names[] = {"64 bit", "32 bit"};
-		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, names[personality]);
-	}
-# elif defined(X86_64)
-	if (!qflag) {
-		static const char *const names[] = {"64 bit", "32 bit", "x32"};
-		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, names[personality]);
-	}
-# elif defined(X32)
-	if (!qflag) {
-		static const char *const names[] = {"x32", "32 bit"};
-		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, names[personality]);
-	}
-# elif defined(AARCH64)
-	if (!qflag) {
-		static const char *const names[] = {"32-bit", "AArch64"};
-		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, names[personality]);
-	}
-# elif defined(TILE)
-	if (!qflag) {
-		static const char *const names[] = {"64-bit", "32-bit"};
-		fprintf(stderr, "[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, names[personality]);
+		static const char *const names[] = PERSONALITY_NAMES;
+		error_msg("[ Process PID=%d runs in %s mode. ]",
+			  tcp->pid, names[personality]);
 	}
 # endif
 }
@@ -1072,8 +1060,7 @@ trace_syscall_exiting(struct tcb *tcp)
 			*/
 #endif
 			default:
-				fprintf(stderr,
-					"invalid rval format\n");
+				error_msg("invalid rval format");
 				break;
 			}
 		}
@@ -1295,8 +1282,7 @@ get_scno(struct tcb *tcp)
 		tcp->s_ent = &unknown;
 		tcp->qual_flg = UNDEFINED_SCNO | QUAL_RAW | DEFAULT_QUAL_FLAGS;
 		if (debug_flag)
-			fprintf(stderr, "pid %d invalid syscall %ld\n",
-				tcp->pid, scno);
+			error_msg("pid %d invalid syscall %ld", tcp->pid, scno);
 	}
 	return 1;
 }

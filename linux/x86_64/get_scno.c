@@ -56,9 +56,9 @@ switch (x86_64_regs.cs) {
 			currpers = 0;
 		break;
 	default:
-		fprintf(stderr, "Unknown value CS=0x%08X while "
-			 "detecting personality of process "
-			 "PID=%d\n", (int)x86_64_regs.cs, tcp->pid);
+		error_msg("Unknown value CS=0x%08X while "
+			  "detecting personality of process PID=%d",
+			  (int)x86_64_regs.cs, tcp->pid);
 		currpers = current_personality;
 		break;
 }
@@ -73,8 +73,7 @@ rip -= 2;
 errno = 0;
 call = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)rip, (char *)0);
 if (errno)
-	fprintf(stderr, "ptrace_peektext failed: %s\n",
-			strerror(errno));
+	perror_msg("ptrace_peektext failed");
 switch (call & 0xffff) {
 	/* x86-64: syscall = 0x0f 0x05 */
 	case 0x050f: currpers = 0; break;
@@ -82,10 +81,9 @@ switch (call & 0xffff) {
 	case 0x80cd: currpers = 1; break;
 	default:
 		currpers = current_personality;
-		fprintf(stderr,
-			"Unknown syscall opcode (0x%04X) while "
-			"detecting personality of process "
-			"PID=%d\n", (int)call, tcp->pid);
+		error_msg("Unknown syscall opcode (0x%04X) while "
+			  "detecting personality of process PID=%d",
+			  (int)call, tcp->pid);
 		break;
 }
 #endif
@@ -96,9 +94,8 @@ switch (call & 0xffff) {
  * Stracing of i386 apps is still supported.
  */
 if (currpers == 0) {
-	fprintf(stderr, "syscall_%lu(...) in unsupported "
-			"64-bit mode of process PID=%d\n",
-		scno, tcp->pid);
+	error_msg("syscall_%lu(...) in unsupported "
+		  "64-bit mode of process PID=%d", scno, tcp->pid);
 	return 0;
 }
 currpers &= ~2; /* map 2,1 to 0,1 */

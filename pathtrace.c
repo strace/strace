@@ -141,8 +141,7 @@ pathtrace_select(const char *path)
 		return;
 	}
 
-	fprintf(stderr, "Requested path '%s' resolved into '%s'\n",
-		path, rpath);
+	error_msg("Requested path '%s' resolved into '%s'", path, rpath);
 	storepath(rpath);
 }
 
@@ -271,7 +270,7 @@ pathtrace_match(struct tcb *tcp)
 			if (umoven(tcp, tcp->u_arg[0], sizeof oldargs,
 				   oldargs) < 0)
 			{
-				fprintf(stderr, "umoven() failed\n");
+				error_msg("umoven() failed");
 				return 0;
 			}
 			args = oldargs;
@@ -292,7 +291,7 @@ pathtrace_match(struct tcb *tcp)
 			if (args[i] == 0)
 				continue;
 			if (umoven(tcp, args[i], fdsize, fds) < 0) {
-				fprintf(stderr, "umoven() failed\n");
+				error_msg("umoven() failed");
 				continue;
 			}
 			for (j = 0;; j++) {

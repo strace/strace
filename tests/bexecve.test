@@ -20,8 +20,8 @@ run_strace_redir -enone ./set_ptracer_any false
 run_strace_redir -bexecve -enone ./set_ptracer_any false ||
 	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
 
-pattern_detached='Process [1-9][0-9]* detached'
-pattern_personality='\[ Process PID=[1-9][0-9]* runs in .* mode. \]'
+pattern_detached='[^:]*strace: Process [1-9][0-9]* detached'
+pattern_personality='[^:]*strace: \[ Process PID=[1-9][0-9]* runs in .* mode. \]'
 
 LC_ALL=C grep -x "$pattern_detached" "$LOG" > /dev/null ||
 	dump_log_and_fail_with "$STRACE $args: output mismatch"

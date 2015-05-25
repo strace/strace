@@ -10,7 +10,7 @@ if (upeek(tcp->pid, REG_R0, &scno) < 0)
 if (!SCNO_IN_RANGE(scno)) {
 	if (alpha_a3 == 0 || alpha_a3 == -1) {
 		if (debug_flag)
-			fprintf(stderr, "stray syscall exit: r0 = %ld\n", scno);
+			error_msg("stray syscall exit: r0 = %ld", scno);
 		return 0;
 	}
 }

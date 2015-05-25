@@ -15,7 +15,7 @@ if (errno)
 if ((unsigned long) scno != 0xef000000) {
 	/* No, it's OABI */
 	if ((scno & 0x0ff00000) != 0x0f900000) {
-		fprintf(stderr, "pid %d unknown syscall trap 0x%08lx\n",
+		error_msg("pid %d unknown syscall trap 0x%08lx",
 			tcp->pid, scno);
 		return -1;
 	}
@@ -39,8 +39,7 @@ scno = shuffle_scno(scno);
  */
 if (arm_regs.ARM_ip && !SCNO_IN_RANGE(scno)) {
 	if (debug_flag)
-		fprintf(stderr,
-			"pid %d stray syscall exit: ARM_ip = %ld, scno = %ld\n",
-			tcp->pid, arm_regs.ARM_ip, shuffle_scno(scno));
+		error_msg("pid %d stray syscall exit: ARM_ip = %ld, scno = %ld",
+			  tcp->pid, arm_regs.ARM_ip, shuffle_scno(scno));
 	return 0;
 }

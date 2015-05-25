@@ -38,7 +38,7 @@
 # define fopen_for_input fopen
 #endif
 
-#define DPRINTF(F, A, ...) if (debug_flag) fprintf(stderr, " [unwind(" A ")] " F "\n", __VA_ARGS__)
+#define DPRINTF(F, A, ...) if (debug_flag) error_msg("[unwind(" A ")] " F, __VA_ARGS__)
 
 /*
  * Кeep a sorted array of cache entries,

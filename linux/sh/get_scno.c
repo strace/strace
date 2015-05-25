@@ -10,10 +10,8 @@ if (scno < 0) {
 	   our purposes, make strace print what it *should* have been */
 	long correct_scno = (scno & 0xff);
 	if (debug_flag)
-		fprintf(stderr,
-			"Detected glibc bug: bogus system call"
-			" number = %ld, correcting to %ld\n",
-			scno,
-			correct_scno);
+		error_msg("Detected glibc bug: bogus system call"
+			  " number = %ld, correcting to %ld",
+			  scno, correct_scno);
 	scno = correct_scno;
 }

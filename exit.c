@@ -3,7 +3,7 @@
 SYS_FUNC(exit)
 {
 	if (exiting(tcp)) {
-		fprintf(stderr, "_exit returned!\n");
+		error_msg("_exit returned!");
 		return -1;
 	}
 	/* special case: we stop tracing this process, finish line now */

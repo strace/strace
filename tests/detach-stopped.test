@@ -10,7 +10,7 @@ run_prog_skip_if_failed \
 check_prog sleep
 
 $STRACE -d -enone / > /dev/null 2> "$LOG"
-if grep -F -x "PTRACE_SEIZE doesn't work" "$LOG" > /dev/null; then
+if grep -x "[^:]*strace: PTRACE_SEIZE doesn't work" "$LOG" > /dev/null; then
 	skip_ "PTRACE_SEIZE doesn't work"
 fi
 
