@@ -763,12 +763,8 @@ printstr(struct tcb *tcp, long addr, long len)
 
 		if (outstr_size / 4 != max_strlen)
 			die_out_of_memory();
-		str = malloc(max_strlen + 1);
-		if (!str)
-			die_out_of_memory();
-		outstr = malloc(outstr_size);
-		if (!outstr)
-			die_out_of_memory();
+		str = xmalloc(max_strlen + 1);
+		outstr = xmalloc(outstr_size);
 	}
 
 	size = max_strlen;

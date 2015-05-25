@@ -434,6 +434,13 @@ void perror_msg_and_die(const char *fmt, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 void die_out_of_memory(void) ATTRIBUTE_NORETURN;
 
+void *xmalloc(size_t size) ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
+void *xcalloc(size_t nmemb, size_t size)
+	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1, 2));
+void *xreallocarray(void *ptr, size_t nmemb, size_t size)
+	ATTRIBUTE_ALLOC_SIZE((2, 3));
+char *xstrdup(const char *str) ATTRIBUTE_MALLOC;
+
 #if USE_CUSTOM_PRINTF
 /*
  * See comment in vsprintf.c for allowed formats.

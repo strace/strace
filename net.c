@@ -995,7 +995,7 @@ SYS_FUNC(recvmmsg)
 			/* Abusing tcp->auxstr as temp storage.
 			 * Will be used and freed on syscall exit.
 			 */
-			tcp->auxstr = strdup(str);
+			tcp->auxstr = xstrdup(str);
 		} else {
 			tprintf("%#lx, %ld, ", tcp->u_arg[1], tcp->u_arg[2]);
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");

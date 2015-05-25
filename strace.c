@@ -324,15 +324,6 @@ void perror_msg_and_die(const char *fmt, ...)
 	die();
 }
 
-void die_out_of_memory(void)
-{
-	static bool recursed = 0;
-	if (recursed)
-		exit(1);
-	recursed = 1;
-	error_msg_and_die("Out of memory");
-}
-
 static void
 error_opt_arg(int opt, const char *arg)
 {
@@ -676,10 +667,9 @@ expand_tcbtab(void)
 	   So tcbtab is a table of pointers.  Since we never
 	   free the TCBs, we allocate a single chunk of many.  */
 	unsigned int i = tcbtabsize;
-	struct tcb *newtcbs = calloc(tcbtabsize, sizeof(newtcbs[0]));
-	struct tcb **newtab = realloc(tcbtab, tcbtabsize * 2 * sizeof(tcbtab[0]));
-	if (!newtab || !newtcbs)
-		die_out_of_memory();
+	struct tcb *newtcbs = xcalloc(tcbtabsize, sizeof(newtcbs[0]));
+	struct tcb **newtab = xreallocarray(tcbtab, tcbtabsize * 2,
+					    sizeof(tcbtab[0]));
 	tcbtabsize *= 2;
 	tcbtab = newtab;
 	while (i < tcbtabsize)
@@ -1233,7 +1223,7 @@ startup_child(char **argv)
 	 * On NOMMU, can be safely freed only after execve in tracee.
 	 * It's hard to know when that happens, so we just leak it.
 	 */
-	params_for_tracee.pathname = NOMMU_SYSTEM ? strdup(pathname) : pathname;
+	params_for_tracee.pathname = NOMMU_SYSTEM ? xstrdup(pathname) : pathname;
 
 #if defined HAVE_PRCTL && defined PR_SET_PTRACER && defined PR_SET_PTRACER_ANY
 	if (daemonized_tracer)
@@ -1445,12 +1435,8 @@ init(int argc, char *argv[])
 
 	/* Allocate the initial tcbtab.  */
 	tcbtabsize = argc;	/* Surely enough for all -p args.  */
-	tcbtab = calloc(tcbtabsize, sizeof(tcbtab[0]));
-	if (!tcbtab)
-		die_out_of_memory();
-	tcp = calloc(tcbtabsize, sizeof(*tcp));
-	if (!tcp)
-		die_out_of_memory();
+	tcbtab = xcalloc(tcbtabsize, sizeof(tcbtab[0]));
+	tcp = xcalloc(tcbtabsize, sizeof(*tcp));
 	for (tcbi = 0; tcbi < tcbtabsize; tcbi++)
 		tcbtab[tcbi] = tcp++;
 
@@ -1548,7 +1534,7 @@ init(int argc, char *argv[])
 			qualify(optarg);
 			break;
 		case 'o':
-			outfname = strdup(optarg);
+			outfname = xstrdup(optarg);
 			break;
 		case 'O':
 			i = string_to_uint(optarg);
@@ -1572,7 +1558,7 @@ init(int argc, char *argv[])
 			set_sortby(optarg);
 			break;
 		case 'u':
-			username = strdup(optarg);
+			username = xstrdup(optarg);
 			break;
 #ifdef USE_LIBUNWIND
 		case 'k':
@@ -1596,9 +1582,7 @@ init(int argc, char *argv[])
 	argv += optind;
 	/* argc -= optind; - no need, argc is not used below */
 
-	acolumn_spaces = malloc(acolumn + 1);
-	if (!acolumn_spaces)
-		die_out_of_memory();
+	acolumn_spaces = xmalloc(acolumn + 1);
 	memset(acolumn_spaces, ' ', acolumn);
 	acolumn_spaces[acolumn] = '\0';
 
@@ -1691,9 +1675,7 @@ init(int argc, char *argv[])
 	}
 
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
-		char *buf = malloc(BUFSIZ);
-		if (!buf)
-			die_out_of_memory();
+		char *buf = xmalloc(BUFSIZ);
 		setvbuf(shared_log, buf, _IOLBF, BUFSIZ);
 	}
 	if (outfname && argv[0]) {

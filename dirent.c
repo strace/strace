@@ -81,9 +81,7 @@ SYS_FUNC(getdents)
 		len = tcp->u_rval;
 
 	if (len) {
-		buf = malloc(len);
-		if (!buf)
-			die_out_of_memory();
+		buf = xmalloc(len);
 		if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 			free(buf);
@@ -164,9 +162,7 @@ SYS_FUNC(getdents64)
 		len = tcp->u_rval;
 
 	if (len) {
-		buf = malloc(len);
-		if (!buf)
-			die_out_of_memory();
+		buf = xmalloc(len);
 		if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
 			free(buf);

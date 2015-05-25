@@ -91,9 +91,8 @@ storepath(const char *path)
 		return; /* already in table */
 
 	i = num_selected++;
-	paths_selected = realloc(paths_selected, num_selected * sizeof(paths_selected[0]));
-	if (!paths_selected)
-		die_out_of_memory();
+	paths_selected = xreallocarray(paths_selected, num_selected,
+				       sizeof(paths_selected[0]));
 	paths_selected[i] = path;
 }
 
@@ -287,9 +286,7 @@ pathtrace_match(struct tcb *tcp)
 		if (nfds > 1024*1024)
 			nfds = 1024*1024;
 		fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
-		fds = malloc(fdsize);
-		if (!fds)
-			die_out_of_memory();
+		fds = xmalloc(fdsize);
 
 		for (i = 1; i <= 3; ++i) {
 			if (args[i] == 0)

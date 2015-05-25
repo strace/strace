@@ -381,9 +381,8 @@ reallocate_qual(const unsigned int n)
 	unsigned p;
 	qualbits_t *qp;
 	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
-		qp = qual_vec[p] = realloc(qual_vec[p], n * sizeof(qualbits_t));
-		if (!qp)
-			die_out_of_memory();
+		qp = qual_vec[p] = xreallocarray(qual_vec[p], n,
+						 sizeof(qualbits_t));
 		memset(&qp[num_quals], 0, (n - num_quals) * sizeof(qualbits_t));
 	}
 	num_quals = n;
@@ -531,9 +530,7 @@ qualify(const char *s)
 	for (i = 0; i < num_quals; i++) {
 		qualify_one(i, opt->bitflag, !not, -1);
 	}
-	copy = strdup(s);
-	if (!copy)
-		die_out_of_memory();
+	copy = xstrdup(s);
 	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
 		int n;
 		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {

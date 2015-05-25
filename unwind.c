@@ -107,9 +107,7 @@ unwind_tcb_init(struct tcb *tcp)
 	if (!tcp->libunwind_ui)
 		die_out_of_memory();
 
-	tcp->queue = malloc(sizeof(*tcp->queue));
-	if (!tcp->queue)
-		die_out_of_memory();
+	tcp->queue = xmalloc(sizeof(*tcp->queue));
 	tcp->queue->head = NULL;
 	tcp->queue->tail = NULL;
 }
@@ -152,9 +150,7 @@ build_mmap_cache(struct tcb* tcp)
 		return;
 	}
 
-	cache_head = calloc(cur_array_size, sizeof(*cache_head));
-	if (!cache_head)
-		die_out_of_memory();
+	cache_head = xcalloc(cur_array_size, sizeof(*cache_head));
 
 	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 		struct mmap_cache_t *entry;
@@ -197,19 +193,15 @@ build_mmap_cache(struct tcb* tcp)
 
 		if (tcp->mmap_cache_size >= cur_array_size) {
 			cur_array_size *= 2;
-			cache_head = realloc(cache_head,
-					     cur_array_size * sizeof(*cache_head));
-			if (!cache_head)
-				die_out_of_memory();
+			cache_head = xreallocarray(cache_head, cur_array_size,
+						   sizeof(*cache_head));
 		}
 
 		entry = &cache_head[tcp->mmap_cache_size];
 		entry->start_addr = start_addr;
 		entry->end_addr = end_addr;
 		entry->mmap_offset = mmap_offset;
-		entry->binary_filename = strdup(binary_path);
-		if (!entry->binary_filename)
-			die_out_of_memory();
+		entry->binary_filename = xstrdup(binary_path);
 		tcp->mmap_cache_size++;
 	}
 	fclose(fp);
@@ -290,10 +282,8 @@ get_symbol_name(unw_cursor_t *cursor, char **name,
 			*offset = 0;
 			break;
 		}
+		*name = xreallocarray(*name, 2, *size);
 		*size *= 2;
-		*name = realloc(*name, *size);
-		if (!*name)
-			die_out_of_memory();
 	}
 }
 
@@ -372,9 +362,7 @@ stacktrace_walk(struct tcb *tcp,
 	if (tcp->mmap_cache_size == 0)
 		error_msg_and_die("bug: mmap_cache is empty");
 
-	symbol_name = malloc(symbol_name_size);
-	if (!symbol_name)
-		die_out_of_memory();
+	symbol_name = xmalloc(symbol_name_size);
 
 	if (unw_init_remote(&cursor, libunwind_as, tcp->libunwind_ui) < 0)
 		perror_msg_and_die("Can't initiate libunwind");
@@ -490,10 +478,7 @@ queue_put(struct queue_t *queue,
 {
 	struct call_t *call;
 
-	call = malloc(sizeof(*call));
-	if (!call)
-		die_out_of_memory();
-
+	call = xmalloc(sizeof(*call));
 	call->output_line = sprint_call_or_error(binary_filename,
 						 symbol_name,
 						 function_offset,

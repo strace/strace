@@ -58,11 +58,8 @@ count_syscall(struct tcb *tcp, const struct timeval *syscall_exiting_tv)
 	if (!SCNO_IN_RANGE(scno))
 		return;
 
-	if (!counts) {
-		counts = calloc(nsyscalls, sizeof(*counts));
-		if (!counts)
-			die_out_of_memory();
-	}
+	if (!counts)
+		counts = xcalloc(nsyscalls, sizeof(*counts));
 	cc = &counts[scno];
 
 	cc->calls++;
@@ -171,9 +168,7 @@ call_summary_pers(FILE *outf)
 	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
 		dashes, dashes, dashes, dashes, dashes, dashes);
 
-	sorted_count = calloc(sizeof(int), nsyscalls);
-	if (!sorted_count)
-		die_out_of_memory();
+	sorted_count = xcalloc(sizeof(int), nsyscalls);
 	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
 	if (overhead.tv_sec == -1) {
 		tv_mul(&overhead, &shortest, 8);

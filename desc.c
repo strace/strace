@@ -331,11 +331,8 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 	if (entering(tcp)) {
 		tprintf("%d", (int) args[0]);
 
-		if (verbose(tcp) && fdsize > 0) {
-			fds = malloc(fdsize);
-			if (!fds)
-				die_out_of_memory();
-		}
+		if (verbose(tcp) && fdsize > 0)
+			fds = xmalloc(fdsize);
 		for (i = 0; i < 3; i++) {
 			arg = args[i+1];
 			if (arg == 0) {
@@ -380,9 +377,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			return RVAL_STR;
 		}
 
-		fds = malloc(fdsize);
-		if (!fds)
-			die_out_of_memory();
+		fds = xmalloc(fdsize);
 
 		outptr = outstr;
 		sep = "";

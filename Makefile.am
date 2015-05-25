@@ -123,7 +123,8 @@ strace_SOURCES =	\
 	v4l2.c		\
 	vsprintf.c	\
 	wait.c		\
-	xattr.c
+	xattr.c		\
+	xmalloc.c
 
 if USE_LIBUNWIND
 strace_SOURCES += unwind.c

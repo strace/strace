@@ -776,9 +776,7 @@ int strace_vfprintf(FILE *fp, const char *fmt, va_list args)
 	if (len >= buflen) {
 		buflen = len + 256;
 		free(buf);
-		buf = malloc(buflen);
-		if (!buf)
-			die_out_of_memory();
+		buf = xmalloc(buflen);
 		/*len =*/ kernel_vsnprintf(buf, buflen, fmt, args);
 	}
 
