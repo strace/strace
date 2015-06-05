@@ -200,6 +200,22 @@
 # include "xlat/af_packet_types.h"
 #endif
 
+static void
+print_ifindex(unsigned int ifindex)
+{
+#ifdef HAVE_IF_INDEXTONAME
+	char buf[IFNAMSIZ + 1];
+
+	if (if_indextoname(ifindex, buf)) {
+		tprints("if_nametoindex(");
+		print_quoted_string(buf, sizeof(buf), QUOTE_0_TERMINATED);
+		tprints(")");
+		return;
+	}
+#endif
+	tprintf("%u", ifindex);
+}
+
 void
 printsock(struct tcb *tcp, long addr, int addrlen)
 {
@@ -279,30 +295,15 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 				ntohs(addrbuf.sa6.sin6_port), string_addr,
 				addrbuf.sa6.sin6_flowinfo);
 #ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
-		{
-#if defined(HAVE_IF_INDEXTONAME) && defined(IN6_IS_ADDR_LINKLOCAL) && defined(IN6_IS_ADDR_MC_LINKLOCAL)
-			int numericscope = 0;
-			if (IN6_IS_ADDR_LINKLOCAL(&addrbuf.sa6.sin6_addr)
-			    || IN6_IS_ADDR_MC_LINKLOCAL(&addrbuf.sa6.sin6_addr)) {
-				char scopebuf[IFNAMSIZ + 1];
-
-				if (if_indextoname(addrbuf.sa6.sin6_scope_id, scopebuf) == NULL)
-					numericscope++;
-				else {
-					tprints(", sin6_scope_id=if_nametoindex(");
-					print_quoted_string(scopebuf,
-							    sizeof(scopebuf),
-							    QUOTE_0_TERMINATED);
-					tprints(")");
-				}
-			} else
-				numericscope++;
-
-			if (numericscope)
+		tprints(", sin6_scope_id=");
+#if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
+		if (IN6_IS_ADDR_LINKLOCAL(&addrbuf.sa6.sin6_addr)
+		    || IN6_IS_ADDR_MC_LINKLOCAL(&addrbuf.sa6.sin6_addr))
+			print_ifindex(addrbuf.sa6.sin6_scope_id);
+		else
 #endif
-				tprintf(", sin6_scope_id=%u", addrbuf.sa6.sin6_scope_id);
-		}
-#endif
+			tprintf("%u", addrbuf.sa6.sin6_scope_id);
+#endif /* HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID */
 		break;
 #endif
 #if defined(AF_IPX)
