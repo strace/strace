@@ -1,0 +1,12 @@
+setsockopt\(0, SOL_IP, IP_ADD_MEMBERSHIP, "\\340", 1\) = -1 EINVAL .*
+setsockopt\(0, SOL_IP, IP_DROP_MEMBERSHIP, "\\340", 1\) = -1 EINVAL .*
+setsockopt\(0, SOL_IP, IP_ADD_MEMBERSHIP, \{imr_multiaddr=inet_addr\("224\.0\.0\.3"\), imr_interface=inet_addr\("127\.0\.0\.1"\)\}, 8\) = 0
+setsockopt\(0, SOL_IP, IP_DROP_MEMBERSHIP, \{imr_multiaddr=inet_addr\("224\.0\.0\.3"\), imr_interface=inet_addr\("127\.0\.0\.1"\)\}, 8\) = 0
+setsockopt\(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, "\\377", 1\) = -1 ENOPROTOOPT .*
+setsockopt\(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, "\\377", 1\) = -1 ENOPROTOOPT .*
+setsockopt\(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, \{ipv6mr_multiaddr=inet_pton\("ff01::c"\), ipv6mr_interface=if_nametoindex\("lo"\)\}, 20\) = -1 ENOPROTOOPT .*
+setsockopt\(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, \{ipv6mr_multiaddr=inet_pton\("ff01::c"\), ipv6mr_interface=if_nametoindex\("lo"\)\}, 20\) = -1 ENOPROTOOPT .*
+setsockopt\(0, SOL_IPV6, IPV6_JOIN_ANYCAST, "\\377", 1\) = -1 ENOPROTOOPT .*
+setsockopt\(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, "\\377", 1\) = -1 ENOPROTOOPT .*
+setsockopt\(0, SOL_IPV6, IPV6_JOIN_ANYCAST, \{ipv6mr_multiaddr=inet_pton\("ff01::c"\), ipv6mr_interface=if_nametoindex\("lo"\)\}, 20\) = -1 ENOPROTOOPT .*
+setsockopt\(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, \{ipv6mr_multiaddr=inet_pton\("ff01::c"\), ipv6mr_interface=if_nametoindex\("lo"\)\}, 20\) = -1 ENOPROTOOPT .*

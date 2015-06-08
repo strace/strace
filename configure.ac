@@ -233,6 +233,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	fputs_unlocked
 	if_indextoname
 	inet_ntop
+	inet_pton
 	pipe2
 	prctl
 	preadv

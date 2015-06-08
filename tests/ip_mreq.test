@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check {IP,IPV6}_{ADD,DROP}_MEMBERSHIP setsockopt decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -e setsockopt $args
+match_grep
+
+exit 0

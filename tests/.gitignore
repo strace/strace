@@ -3,6 +3,7 @@ fanotify_mark
 getrandom
 inet-accept-connect-send-recv
 ioctl
+ip_mreq
 ipc_msg
 ipc_sem
 ipc_shm

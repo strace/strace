@@ -1307,6 +1307,64 @@ SYS_FUNC(getsockopt)
 	return 0;
 }
 
+#ifdef IP_ADD_MEMBERSHIP
+static void
+print_mreq(struct tcb *tcp, long addr, unsigned int len)
+{
+	struct ip_mreq mreq;
+
+	if (len < sizeof(mreq)) {
+		printstr(tcp, addr, len);
+		return;
+	}
+	if (umove(tcp, addr, &mreq) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+	tprints("{imr_multiaddr=inet_addr(");
+	print_quoted_string(inet_ntoa(mreq.imr_multiaddr),
+			    16, QUOTE_0_TERMINATED);
+	tprints("), imr_interface=inet_addr(");
+	print_quoted_string(inet_ntoa(mreq.imr_interface),
+			    16, QUOTE_0_TERMINATED);
+	tprints(")}");
+}
+#endif /* IP_ADD_MEMBERSHIP */
+
+#ifdef IPV6_ADD_MEMBERSHIP
+static void
+print_mreq6(struct tcb *tcp, long addr, unsigned int len)
+{
+	struct ipv6_mreq mreq;
+
+	if (len < sizeof(mreq))
+		goto fail;
+
+	if (umove(tcp, addr, &mreq) < 0) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+#ifdef HAVE_INET_NTOP
+	const struct in6_addr *in6 = &mreq.ipv6mr_multiaddr;
+	char address[INET6_ADDRSTRLEN];
+
+	if (!inet_ntop(AF_INET6, in6, address, sizeof(address)))
+		goto fail;
+
+	tprints("{ipv6mr_multiaddr=inet_pton(");
+	print_quoted_string(address, sizeof(address), QUOTE_0_TERMINATED);
+	tprints("), ipv6mr_interface=");
+	print_ifindex(mreq.ipv6mr_interface);
+	tprints("}");
+	return;
+#endif /* HAVE_INET_NTOP */
+
+fail:
+	printstr(tcp, addr, len);
+}
+#endif /* IPV6_ADD_MEMBERSHIP */
+
 #ifdef MCAST_JOIN_GROUP
 static void
 print_group_req(struct tcb *tcp, long addr, int len)
@@ -1420,12 +1478,35 @@ print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
 
 	case SOL_IP:
 		switch (name) {
+#ifdef IP_ADD_MEMBERSHIP
+		case IP_ADD_MEMBERSHIP:
+		case IP_DROP_MEMBERSHIP:
+			print_mreq(tcp, addr, len);
+			goto done;
+#endif /* IP_ADD_MEMBERSHIP */
 #ifdef MCAST_JOIN_GROUP
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
 			goto done;
 #endif /* MCAST_JOIN_GROUP */
+		}
+		break;
+
+	case SOL_IPV6:
+		switch (name) {
+#ifdef IPV6_ADD_MEMBERSHIP
+		case IPV6_ADD_MEMBERSHIP:
+		case IPV6_DROP_MEMBERSHIP:
+# ifdef IPV6_JOIN_ANYCAST
+		case IPV6_JOIN_ANYCAST:
+# endif
+# ifdef IPV6_LEAVE_ANYCAST
+		case IPV6_LEAVE_ANYCAST:
+# endif
+			print_mreq6(tcp, addr, len);
+			goto done;
+#endif /* IPV6_ADD_MEMBERSHIP */
 		}
 		break;
 

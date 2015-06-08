@@ -14,6 +14,7 @@ check_PROGRAMS = \
 	getrandom \
 	inet-accept-connect-send-recv \
 	ioctl \
+	ip_mreq \
 	ipc_msg \
 	ipc_sem \
 	ipc_shm \
@@ -61,6 +62,7 @@ TESTS = \
 	getdents.test \
 	getrandom.test \
 	ioctl.test \
+	ip_mreq.test \
 	ipc_msg.test \
 	ipc_shm.test \
 	ipc_sem.test \
@@ -109,6 +111,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     getdents.out \
 	     getrandom.awk \
 	     ioctl.expected \
+	     ip_mreq.expected \
 	     ipc.sh \
 	     mmsg.expected \
 	     net.expected \
