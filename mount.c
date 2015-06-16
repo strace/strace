@@ -48,7 +48,8 @@ SYS_FUNC(mount)
 
 		if (flags & MS_REMOUNT)
 			ignore_type = true;
-		else if (flags & (MS_BIND | MS_MOVE))
+		else if (flags & (MS_BIND | MS_MOVE | MS_SHARED
+				  | MS_PRIVATE | MS_SLAVE | MS_UNBINDABLE))
 			ignore_type = ignore_data = true;
 
 		printpath(tcp, tcp->u_arg[0]);
