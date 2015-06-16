@@ -35,17 +35,21 @@
 SYS_FUNC(mount)
 {
 	if (entering(tcp)) {
-		int ignore_type = 0, ignore_data = 0;
+		bool ignore_type = false;
+		bool ignore_data = false;
+		bool old_magic = false;
 		unsigned long flags = tcp->u_arg[3];
 
 		/* Discard magic */
-		if ((flags & MS_MGC_MSK) == MS_MGC_VAL)
+		if ((flags & MS_MGC_MSK) == MS_MGC_VAL) {
 			flags &= ~MS_MGC_MSK;
+			old_magic = true;
+		}
 
 		if (flags & MS_REMOUNT)
-			ignore_type = 1;
+			ignore_type = true;
 		else if (flags & (MS_BIND | MS_MOVE))
-			ignore_type = ignore_data = 1;
+			ignore_type = ignore_data = true;
 
 		printpath(tcp, tcp->u_arg[0]);
 		tprints(", ");
@@ -59,7 +63,13 @@ SYS_FUNC(mount)
 			printstr(tcp, tcp->u_arg[2], -1);
 		tprints(", ");
 
-		printflags(mount_flags, tcp->u_arg[3], "MS_???");
+		if (old_magic) {
+			tprints("MS_MGC_VAL");
+			if (flags)
+				tprints("|");
+		}
+		if (flags || !old_magic)
+			printflags(mount_flags, flags, "MS_???");
 		tprints(", ");
 
 		if (ignore_data && tcp->u_arg[4])
