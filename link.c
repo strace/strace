@@ -2,22 +2,6 @@
 
 #include <fcntl.h>
 
-#ifndef AT_SYMLINK_NOFOLLOW
-# define AT_SYMLINK_NOFOLLOW	0x100
-#endif
-#ifndef AT_REMOVEDIR
-# define AT_REMOVEDIR		0x200
-#endif
-#ifndef AT_SYMLINK_FOLLOW
-# define AT_SYMLINK_FOLLOW	0x400
-#endif
-#ifndef AT_NO_AUTOMOUNT
-# define AT_NO_AUTOMOUNT	0x800
-#endif
-#ifndef AT_EMPTY_PATH
-# define AT_EMPTY_PATH		0x1000
-#endif
-
 #include "xlat/at_flags.h"
 
 SYS_FUNC(link)
