@@ -1,10 +1,7 @@
 #include "defs.h"
 
-#ifdef HAVE_LINUX_XATTR_H
-# include <linux/xattr.h>
-#else
-# define XATTR_CREATE 1
-# define XATTR_REPLACE 2
+#ifdef HAVE_SYS_XATTR_H
+# include <sys/xattr.h>
 #endif
 
 #include "xlat/xattrflags.h"
