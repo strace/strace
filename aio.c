@@ -98,7 +98,7 @@ tprint_lio_opcode(unsigned cmd)
 static void
 print_common_flags(struct iocb *iocb)
 {
-#if HAVE_STRUCT_IOCB_U_C_FLAGS
+#ifdef HAVE_STRUCT_IOCB_U_C_FLAGS
 	if (iocb->u.c.flags & IOCB_RESFD)
 		tprintf(", resfd=%d", iocb->u.c.resfd);
 	if (iocb->u.c.flags & ~IOCB_RESFD)

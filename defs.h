@@ -497,7 +497,7 @@ extern int print_quoted_string(const char *, unsigned int, unsigned int);
 /* a refers to the lower numbered u_arg,
  * b refers to the higher numbered u_arg
  */
-#if HAVE_LITTLE_ENDIAN_LONG_LONG
+#ifdef HAVE_LITTLE_ENDIAN_LONG_LONG
 # define LONG_LONG(a,b) \
 	((long long)((unsigned long long)(unsigned)(a) | ((unsigned long long)(b)<<32)))
 #else

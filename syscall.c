@@ -669,7 +669,7 @@ dumpio(struct tcb *tcp)
 		} else if (func == sys_readv) {
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 			return;
-#if HAVE_SENDMSG
+#ifdef HAVE_SENDMSG
 		} else if (func == sys_recvmsg) {
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
 			return;
@@ -687,7 +687,7 @@ dumpio(struct tcb *tcp)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		else if (func == sys_writev)
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-#if HAVE_SENDMSG
+#ifdef HAVE_SENDMSG
 		else if (func == sys_sendmsg)
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
 		else if (func == sys_sendmmsg)

@@ -34,7 +34,7 @@
 #include "defs.h"
 #include <sys/param.h>
 #include <fcntl.h>
-#if HAVE_SYS_XATTR_H
+#ifdef HAVE_SYS_XATTR_H
 # include <sys/xattr.h>
 #endif
 #include <sys/uio.h>
@@ -435,7 +435,7 @@ sprinttime(time_t t)
 static char *
 getfdproto(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 {
-#if HAVE_SYS_XATTR_H
+#ifdef HAVE_SYS_XATTR_H
 	ssize_t r;
 	char path[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 

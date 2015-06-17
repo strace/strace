@@ -280,7 +280,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 	tprints("}");
 }
 
-#if HAVE_SENDMSG
+#ifdef HAVE_SENDMSG
 # ifndef SCM_SECURITY
 #  define SCM_SECURITY 0x03
 # endif

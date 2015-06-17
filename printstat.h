@@ -68,14 +68,14 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 		tprintf("st_ctime=%s",
 			sprinttime(cast ? (time_t) (int) statbuf->st_ctime:
 					  (time_t) statbuf->st_ctime));
-#if HAVE_STRUCT_STAT_ST_FLAGS
+#ifdef HAVE_STRUCT_STAT_ST_FLAGS
 		tprintf(", st_flags=%u", (unsigned int) statbuf->st_flags);
 #endif
-#if HAVE_STRUCT_STAT_ST_FSTYPE
+#ifdef HAVE_STRUCT_STAT_ST_FSTYPE
 		tprintf(", st_fstype=%.*s",
 			(int) sizeof statbuf->st_fstype, statbuf->st_fstype);
 #endif
-#if HAVE_STRUCT_STAT_ST_GEN
+#ifdef HAVE_STRUCT_STAT_ST_GEN
 		tprintf(", st_gen=%u", (unsigned int) statbuf->st_gen);
 #endif
 		tprints("}");
