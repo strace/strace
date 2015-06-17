@@ -111,6 +111,8 @@ main(int ac, const char **av)
 	if (sizeof(stb.st_size) > 4)
 		return 77;
 	assert(syscall(NR_stat, av[1], &stb) == 0);
+	if (!stb.st_mode)
+		return 77;
 #else
 	assert(stat(av[1], &stb) == 0);
 #endif
