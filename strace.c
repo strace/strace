@@ -1681,7 +1681,8 @@ init(int argc, char *argv[])
 	if (outfname && argv[0]) {
 		if (!opt_intr)
 			opt_intr = INTR_NEVER;
-		qflag = 1;
+		if (!qflag)
+			qflag = 1;
 	}
 	if (!opt_intr)
 		opt_intr = INTR_WHILE_WAIT;
