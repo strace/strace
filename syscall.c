@@ -873,10 +873,8 @@ trace_syscall_exiting(struct tcb *tcp)
 	update_personality(tcp, tcp->currpers);
 #endif
 	res = (get_regs_error ? -1 : get_syscall_result(tcp));
-	if (res == 1) {
-		if (filtered(tcp) || hide_log_until_execve)
-			goto ret;
-	}
+	if (filtered(tcp) || hide_log_until_execve)
+		goto ret;
 
 	if (cflag) {
 		count_syscall(tcp, &tv);

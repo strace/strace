@@ -11,6 +11,7 @@ AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 check_PROGRAMS = \
 	caps \
 	fanotify_mark \
+	filter-unavailable \
 	getrandom \
 	inet-accept-connect-send-recv \
 	ioctl \
@@ -44,6 +45,7 @@ check_PROGRAMS = \
 	umovestr2 \
 	unix-pair-send-recv
 
+filter_unavailable_LDFLAGS = -pthread
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -59,6 +61,7 @@ TESTS = \
 	caps.test \
 	dumpio.test \
 	fanotify_mark.test \
+	filter-unavailable.test \
 	getdents.test \
 	getrandom.test \
 	ioctl.test \
@@ -107,6 +110,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     dumpio.expected \
 	     fanotify_mark.expected \
+	     filter-unavailable.expected \
 	     getdents.awk \
 	     getdents.out \
 	     getrandom.awk \

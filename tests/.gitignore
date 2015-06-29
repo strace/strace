@@ -1,5 +1,6 @@
 caps
 fanotify_mark
+filter-unavailable
 getrandom
 inet-accept-connect-send-recv
 ioctl

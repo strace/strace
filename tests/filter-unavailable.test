@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# check that <unavailable> syscalls are filtered properly
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -qq -f -echdir -esignal=none $args
+match_diff
+
+exit 0
