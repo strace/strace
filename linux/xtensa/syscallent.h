@@ -328,3 +328,5 @@
 [337] = { 3,	0,		sys_seccomp,			"seccomp",		},
 [338] = { 3,	0,		sys_getrandom,			"getrandom",		},
 [339] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[340] = { 3,	TD,		sys_bpf,			"bpf",			},
+[341] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
