@@ -468,3 +468,6 @@
 [508] = { 3,	0,		sys_sched_setattr,		"sched_setattr"		},
 [509] = { 4,	0,		sys_sched_getattr,		"sched_getattr"		},
 [510] = { 5,	TD|TF,		sys_renameat2,			"renameat2"		},
+[511] = { 3,	0,		sys_getrandom,			"getrandom",		},
+[512] = { 2,	TD,		sys_memfd_create,		"memfd_create",		},
+[513] = { 5,	TD|TF|TP|SE|SI,	sys_execveat,			"execveat",		},
