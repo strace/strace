@@ -84,11 +84,11 @@ ioctl_print_code(const unsigned int code)
 }
 
 static int
-evdev_decode_number(unsigned int arg)
+evdev_decode_number(const unsigned int code)
 {
-	unsigned int nr = _IOC_NR(arg);
+	const unsigned int nr = _IOC_NR(code);
 
-	if (_IOC_DIR(arg) == _IOC_WRITE) {
+	if (_IOC_DIR(code) == _IOC_WRITE) {
 		if (nr >= 0xc0 && nr <= 0xc0 + 0x3f) {
 			tprints("EVIOCSABS(");
 			printxval(evdev_abs, nr - 0xc0, "EV_???");
@@ -97,13 +97,13 @@ evdev_decode_number(unsigned int arg)
 		}
 	}
 
-	if (_IOC_DIR(arg) != _IOC_READ)
+	if (_IOC_DIR(code) != _IOC_READ)
 		return 0;
 
 	if (nr >= 0x20 && nr <= 0x20 + 0x1f) {
 		tprints("EVIOCGBIT(");
 		printxval(evdev_ev, nr - 0x20, "EV_???");
-		tprintf(", %u)", _IOC_SIZE(arg));
+		tprintf(", %u)", _IOC_SIZE(code));
 		return 1;
 	} else if (nr >= 0x40 && nr <= 0x40 + 0x3f) {
 		tprints("EVIOCGABS(");
@@ -114,31 +114,31 @@ evdev_decode_number(unsigned int arg)
 
 	switch (_IOC_NR(nr)) {
 		case 0x06:
-			tprintf("EVIOCGNAME(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGNAME(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x07:
-			tprintf("EVIOCGPHYS(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGPHYS(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x08:
-			tprintf("EVIOCGUNIQ(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGUNIQ(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x09:
-			tprintf("EVIOCGPROP(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGPROP(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x0a:
-			tprintf("EVIOCGMTSLOTS(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGMTSLOTS(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x18:
-			tprintf("EVIOCGKEY(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGKEY(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x19:
-			tprintf("EVIOCGLED(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGLED(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x1a:
-			tprintf("EVIOCGSND(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGSND(%u)", _IOC_SIZE(code));
 			return 1;
 		case 0x1b:
-			tprintf("EVIOCGSW(%u)", _IOC_SIZE(arg));
+			tprintf("EVIOCGSW(%u)", _IOC_SIZE(code));
 			return 1;
 		default:
 			return 0;
@@ -146,32 +146,32 @@ evdev_decode_number(unsigned int arg)
 }
 
 static int
-hiddev_decode_number(unsigned int arg)
+hiddev_decode_number(const unsigned int code)
 {
-	if (_IOC_DIR(arg) == _IOC_READ) {
-		switch (_IOC_NR(arg)) {
+	if (_IOC_DIR(code) == _IOC_READ) {
+		switch (_IOC_NR(code)) {
 			case 0x04:
-				tprintf("HIDIOCGRAWNAME(%u)", _IOC_SIZE(arg));
+				tprintf("HIDIOCGRAWNAME(%u)", _IOC_SIZE(code));
 				return 1;
 			case 0x05:
-				tprintf("HIDIOCGRAWPHYS(%u)", _IOC_SIZE(arg));
+				tprintf("HIDIOCGRAWPHYS(%u)", _IOC_SIZE(code));
 				return 1;
 			case 0x06:
-				tprintf("HIDIOCSFEATURE(%u)", _IOC_SIZE(arg));
+				tprintf("HIDIOCSFEATURE(%u)", _IOC_SIZE(code));
 				return 1;
 			case 0x12:
-				tprintf("HIDIOCGPHYS(%u)", _IOC_SIZE(arg));
+				tprintf("HIDIOCGPHYS(%u)", _IOC_SIZE(code));
 				return 1;
 			default:
 				return 0;
 		}
-	} else if (_IOC_DIR(arg) == (_IOC_READ | _IOC_WRITE)) {
-		switch (_IOC_NR(arg)) {
+	} else if (_IOC_DIR(code) == (_IOC_READ | _IOC_WRITE)) {
+		switch (_IOC_NR(code)) {
 			case 0x06:
-				tprintf("HIDIOCSFEATURE(%u)", _IOC_SIZE(arg));
+				tprintf("HIDIOCSFEATURE(%u)", _IOC_SIZE(code));
 				return 1;
 			case 0x07:
-				tprintf("HIDIOCGFEATURE(%u)", _IOC_SIZE(arg));
+				tprintf("HIDIOCGFEATURE(%u)", _IOC_SIZE(code));
 				return 1;
 			default:
 				return 0;
@@ -182,37 +182,37 @@ hiddev_decode_number(unsigned int arg)
 }
 
 static int
-ioctl_decode_command_number(unsigned int arg)
+ioctl_decode_command_number(const unsigned int code)
 {
-	switch (_IOC_TYPE(arg)) {
+	switch (_IOC_TYPE(code)) {
 		case 'E':
-			return evdev_decode_number(arg);
+			return evdev_decode_number(code);
 		case 'H':
-			return hiddev_decode_number(arg);
+			return hiddev_decode_number(code);
 		case 'M':
-			if (_IOC_DIR(arg) == _IOC_WRITE) {
-				tprintf("MIXER_WRITE(%u)", _IOC_NR(arg));
+			if (_IOC_DIR(code) == _IOC_WRITE) {
+				tprintf("MIXER_WRITE(%u)", _IOC_NR(code));
 				return 1;
-			} else if (_IOC_DIR(arg) == _IOC_READ) {
-				tprintf("MIXER_READ(%u)", _IOC_NR(arg));
+			} else if (_IOC_DIR(code) == _IOC_READ) {
+				tprintf("MIXER_READ(%u)", _IOC_NR(code));
 				return 1;
 			}
 			return 0;
 		case 'U':
-			if (_IOC_DIR(arg) == _IOC_READ && _IOC_NR(arg) == 0x2c) {
-				tprintf("UI_GET_SYSNAME(%u)", _IOC_SIZE(arg));
+			if (_IOC_DIR(code) == _IOC_READ && _IOC_NR(code) == 0x2c) {
+				tprintf("UI_GET_SYSNAME(%u)", _IOC_SIZE(code));
 				return 1;
 			}
 			return 0;
 		case 'j':
-			if (_IOC_DIR(arg) == _IOC_READ && _IOC_NR(arg) == 0x13) {
-				tprintf("JSIOCGNAME(%u)", _IOC_SIZE(arg));
+			if (_IOC_DIR(code) == _IOC_READ && _IOC_NR(code) == 0x13) {
+				tprintf("JSIOCGNAME(%u)", _IOC_SIZE(code));
 				return 1;
 			}
 			return 0;
 		case 'k':
-			if (_IOC_DIR(arg) == _IOC_WRITE && _IOC_NR(arg) == 0) {
-				tprintf("SPI_IOC_MESSAGE(%u)", _IOC_SIZE(arg));
+			if (_IOC_DIR(code) == _IOC_WRITE && _IOC_NR(code) == 0) {
+				tprintf("SPI_IOC_MESSAGE(%u)", _IOC_SIZE(code));
 				return 1;
 			}
 			return 0;
