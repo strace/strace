@@ -222,8 +222,11 @@ ioctl_decode_command_number(const unsigned int code)
 }
 
 static int
-ioctl_decode(struct tcb *tcp, unsigned int code, long arg)
+ioctl_decode(struct tcb *tcp)
 {
+	const unsigned int code = tcp->u_arg[1];
+	const long arg = tcp->u_arg[2];
+
 	switch (_IOC_TYPE(code)) {
 #if defined(ALPHA) || defined(POWERPC)
 	case 'f': case 't': case 'T':
@@ -281,10 +284,10 @@ SYS_FUNC(ioctl)
 				ioctl_print_code(tcp->u_arg[1]);
 			}
 		}
-		ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		ioctl_decode(tcp);
 	}
 	else {
-		int ret = ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		int ret = ioctl_decode(tcp);
 		if (!ret)
 			tprintf(", %#lx", tcp->u_arg[2]);
 		else
