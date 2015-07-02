@@ -182,8 +182,10 @@ hiddev_decode_number(const unsigned int code)
 }
 
 static int
-ioctl_decode_command_number(const unsigned int code)
+ioctl_decode_command_number(struct tcb *tcp)
 {
+	const unsigned int code = tcp->u_arg[1];
+
 	switch (_IOC_TYPE(code)) {
 		case 'E':
 			return evdev_decode_number(code);
@@ -274,7 +276,7 @@ SYS_FUNC(ioctl)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		if (!ioctl_decode_command_number(tcp->u_arg[1])) {
+		if (!ioctl_decode_command_number(tcp)) {
 			iop = ioctl_lookup(tcp->u_arg[1]);
 			if (iop) {
 				tprints(iop->symbol);
