@@ -47,7 +47,7 @@ compare(const void *a, const void *b)
 	return (code1 > code2) ? 1 : (code1 < code2) ? -1 : 0;
 }
 
-const struct_ioctlent *
+static const struct_ioctlent *
 ioctl_lookup(const unsigned int code)
 {
 	struct_ioctlent *iop;
@@ -64,7 +64,7 @@ ioctl_lookup(const unsigned int code)
 	return iop;
 }
 
-const struct_ioctlent *
+static const struct_ioctlent *
 ioctl_next_match(const struct_ioctlent *iop)
 {
 	const unsigned int code = iop->code;
@@ -74,7 +74,7 @@ ioctl_next_match(const struct_ioctlent *iop)
 	return NULL;
 }
 
-void
+static void
 ioctl_print_code(const unsigned int code)
 {
 	tprints("_IOC(");
@@ -181,7 +181,7 @@ hiddev_decode_number(unsigned int arg)
 	return 0;
 }
 
-int
+static int
 ioctl_decode_command_number(unsigned int arg)
 {
 	switch (_IOC_TYPE(arg)) {
@@ -221,7 +221,7 @@ ioctl_decode_command_number(unsigned int arg)
 	}
 }
 
-int
+static int
 ioctl_decode(struct tcb *tcp, unsigned int code, long arg)
 {
 	switch (_IOC_TYPE(code)) {
@@ -260,6 +260,35 @@ ioctl_decode(struct tcb *tcp, unsigned int code, long arg)
 #endif
 	default:
 		break;
+	}
+	return 0;
+}
+
+SYS_FUNC(ioctl)
+{
+	const struct_ioctlent *iop;
+
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		if (!ioctl_decode_command_number(tcp->u_arg[1])) {
+			iop = ioctl_lookup(tcp->u_arg[1]);
+			if (iop) {
+				tprints(iop->symbol);
+				while ((iop = ioctl_next_match(iop)))
+					tprintf(" or %s", iop->symbol);
+			} else {
+				ioctl_print_code(tcp->u_arg[1]);
+			}
+		}
+		ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	}
+	else {
+		int ret = ioctl_decode(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		if (!ret)
+			tprintf(", %#lx", tcp->u_arg[2]);
+		else
+			return ret - 1;
 	}
 	return 0;
 }
