@@ -90,6 +90,7 @@ strace_SOURCES =	\
 	regs.h		\
 	renameat.c	\
 	resource.c	\
+	rtc.c		\
 	sched.c		\
 	scsi.c		\
 	seccomp.c	\

@@ -31,8 +31,6 @@
 #include <fcntl.h>
 #include <linux/version.h>
 #include <sys/timex.h>
-#include <linux/ioctl.h>
-#include <linux/rtc.h>
 
 #ifndef UTIME_NOW
 #define UTIME_NOW ((1l << 30) - 1l)
@@ -702,92 +700,6 @@ SYS_FUNC(timer_gettime)
 			printitv(tcp, tcp->u_arg[1]);
 	}
 	return 0;
-}
-
-static void
-print_rtc(struct tcb *tcp, const struct rtc_time *rt)
-{
-	tprintf("{tm_sec=%d, tm_min=%d, tm_hour=%d, "
-		"tm_mday=%d, tm_mon=%d, tm_year=%d, ",
-		rt->tm_sec, rt->tm_min, rt->tm_hour,
-		rt->tm_mday, rt->tm_mon, rt->tm_year);
-	if (!abbrev(tcp))
-		tprintf("tm_wday=%d, tm_yday=%d, tm_isdst=%d}",
-			rt->tm_wday, rt->tm_yday, rt->tm_isdst);
-	else
-		tprints("...}");
-}
-
-int
-rtc_ioctl(struct tcb *tcp, const unsigned int code, long arg)
-{
-	switch (code) {
-	case RTC_ALM_SET:
-	case RTC_SET_TIME:
-		if (entering(tcp)) {
-			struct rtc_time rt;
-			if (umove(tcp, arg, &rt) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprints(", ");
-				print_rtc(tcp, &rt);
-			}
-		}
-		break;
-	case RTC_ALM_READ:
-	case RTC_RD_TIME:
-		if (exiting(tcp)) {
-			struct rtc_time rt;
-			if (syserror(tcp) || umove(tcp, arg, &rt) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprints(", ");
-				print_rtc(tcp, &rt);
-			}
-		}
-		break;
-	case RTC_IRQP_SET:
-	case RTC_EPOCH_SET:
-		if (entering(tcp))
-			tprintf(", %lu", arg);
-		break;
-	case RTC_IRQP_READ:
-	case RTC_EPOCH_READ:
-		if (exiting(tcp))
-			tprintf(", %lu", arg);
-		break;
-	case RTC_WKALM_SET:
-		if (entering(tcp)) {
-			struct rtc_wkalrm wk;
-			if (umove(tcp, arg, &wk) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprintf(", {enabled=%d, pending=%d, ",
-					wk.enabled, wk.pending);
-				print_rtc(tcp, &wk.time);
-				tprints("}");
-			}
-		}
-		break;
-	case RTC_WKALM_RD:
-		if (exiting(tcp)) {
-			struct rtc_wkalrm wk;
-			if (syserror(tcp) || umove(tcp, arg, &wk) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprintf(", {enabled=%d, pending=%d, ",
-					wk.enabled, wk.pending);
-				print_rtc(tcp, &wk.time);
-				tprints("}");
-			}
-		}
-		break;
-	default:
-		if (entering(tcp))
-			tprintf(", %#lx", arg);
-		break;
-	}
-	return 1;
 }
 
 #include "xlat/timerfdflags.h"
