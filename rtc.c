@@ -31,7 +31,7 @@
 #include <linux/rtc.h>
 
 static void
-print_rtc(struct tcb *tcp, const struct rtc_time *rt)
+print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 {
 	tprintf("{tm_sec=%d, tm_min=%d, tm_hour=%d, "
 		"tm_mday=%d, tm_mon=%d, tm_year=%d, ",
@@ -44,72 +44,73 @@ print_rtc(struct tcb *tcp, const struct rtc_time *rt)
 		tprints("...}");
 }
 
+static void
+decode_rtc_time(struct tcb *tcp, const long addr)
+{
+	struct rtc_time rt;
+
+	tprints(", ");
+	if (!umove_or_printaddr(tcp, addr, &rt))
+		print_rtc_time(tcp, &rt);
+}
+
+static void
+decode_rtc_wkalrm(struct tcb *tcp, const long addr)
+{
+	struct rtc_wkalrm wk;
+
+	tprints(", ");
+	if (!umove_or_printaddr(tcp, addr, &wk)) {
+		tprintf("{enabled=%d, pending=%d, ", wk.enabled, wk.pending);
+		print_rtc_time(tcp, &wk.time);
+		tprints("}");
+	}
+}
+
 int
 rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
 	switch (code) {
 	case RTC_ALM_SET:
 	case RTC_SET_TIME:
-		if (entering(tcp)) {
-			struct rtc_time rt;
-			if (umove(tcp, arg, &rt) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprints(", ");
-				print_rtc(tcp, &rt);
-			}
-		}
+		decode_rtc_time(tcp, arg);
 		break;
 	case RTC_ALM_READ:
 	case RTC_RD_TIME:
-		if (exiting(tcp)) {
-			struct rtc_time rt;
-			if (syserror(tcp) || umove(tcp, arg, &rt) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprints(", ");
-				print_rtc(tcp, &rt);
-			}
-		}
+		if (entering(tcp))
+			return 0;
+		decode_rtc_time(tcp, arg);
 		break;
 	case RTC_IRQP_SET:
 	case RTC_EPOCH_SET:
-		if (entering(tcp))
-			tprintf(", %lu", arg);
+		tprintf(", %lu", arg);
 		break;
 	case RTC_IRQP_READ:
 	case RTC_EPOCH_READ:
-		if (exiting(tcp))
-			tprintf(", %lu", arg);
+		if (entering(tcp))
+			return 0;
+		tprints(", ");
+		printnum_long(tcp, arg, "%lu");
 		break;
 	case RTC_WKALM_SET:
-		if (entering(tcp)) {
-			struct rtc_wkalrm wk;
-			if (umove(tcp, arg, &wk) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprintf(", {enabled=%d, pending=%d, ",
-					wk.enabled, wk.pending);
-				print_rtc(tcp, &wk.time);
-				tprints("}");
-			}
-		}
+		decode_rtc_wkalrm(tcp, arg);
 		break;
 	case RTC_WKALM_RD:
-		if (exiting(tcp)) {
-			struct rtc_wkalrm wk;
-			if (syserror(tcp) || umove(tcp, arg, &wk) < 0)
-				tprintf(", %#lx", arg);
-			else {
-				tprintf(", {enabled=%d, pending=%d, ",
-					wk.enabled, wk.pending);
-				print_rtc(tcp, &wk.time);
-				tprints("}");
-			}
-		}
+		if (entering(tcp))
+			return 0;
+		decode_rtc_wkalrm(tcp, arg);
 		break;
+#ifdef RTC_VL_READ
+	case RTC_VL_READ:
+		if (entering(tcp))
+			return 0;
+		tprints(", ");
+		printnum_int(tcp, arg, "%d");
+		break;
+#endif
 	default:
-		return 0;
+		return RVAL_DECODED;
 	}
-	return 1;
+
+	return RVAL_DECODED | 1;
 }
