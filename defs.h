@@ -541,6 +541,16 @@ extern void printnum_long(struct tcb *, long, const char *)
 extern void printnum_int64(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
 #endif
+extern void printpair_int(struct tcb *, long, const char *)
+	ATTRIBUTE_FORMAT((printf, 3, 0));
+extern void printpair_long(struct tcb *, long, const char *)
+	ATTRIBUTE_FORMAT((printf, 3, 0));
+#if SIZEOF_LONG == 8
+# define printpair_int64 printpair_long
+#else
+extern void printpair_int64(struct tcb *, long, const char *)
+	ATTRIBUTE_FORMAT((printf, 3, 0));
+#endif
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))

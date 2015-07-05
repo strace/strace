@@ -400,11 +400,33 @@ printnum_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
 	}								\
 }
 
+#define DEF_PRINTPAIR(name, type) \
+void									\
+printpair_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
+{									\
+	type pair[2];							\
+	if (!addr)							\
+		tprints("NULL");					\
+	else if ((exiting(tcp) && syserror(tcp)) ||			\
+		 umove(tcp, addr, &pair) < 0)				\
+		tprintf("%#lx", addr);					\
+	else {								\
+		tprints("[");						\
+		tprintf(fmt, pair[0]);					\
+		tprints(", ");						\
+		tprintf(fmt, pair[1]);					\
+		tprints("]");						\
+	}								\
+}
+
 DEF_PRINTNUM(long, long)
+DEF_PRINTPAIR(long, long)
 DEF_PRINTNUM(int, int)
+DEF_PRINTPAIR(int, int)
 DEF_PRINTNUM(short, short)
 #if SIZEOF_LONG != 8
 DEF_PRINTNUM(int64, uint64_t)
+DEF_PRINTPAIR(int64, uint64_t)
 #endif
 
 const char *
