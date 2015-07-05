@@ -31,9 +31,6 @@
  * the kernel one, and we need to use the kernel layout.
  */
 #include <linux/termios.h>
-#ifdef HAVE_SYS_FILIO_H
-# include <sys/filio.h>
-#endif
 
 #include "xlat/tcxonc_options.h"
 

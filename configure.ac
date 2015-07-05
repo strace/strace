@@ -270,7 +270,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/conf.h
 	sys/epoll.h
 	sys/fanotify.h
-	sys/filio.h
 	sys/ioctl.h
 	sys/poll.h
 	sys/reg.h
