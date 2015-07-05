@@ -529,10 +529,18 @@ extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr(struct tcb *, long, long);
+extern void printnum_short(struct tcb *, long, const char *)
+	ATTRIBUTE_FORMAT((printf, 3, 0));
 extern void printnum_int(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
 extern void printnum_long(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
+#if SIZEOF_LONG == 8
+# define printnum_int64 printnum_long
+#else
+extern void printnum_int64(struct tcb *, long, const char *)
+	ATTRIBUTE_FORMAT((printf, 3, 0));
+#endif
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))

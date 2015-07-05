@@ -384,41 +384,28 @@ printaddr(const long addr)
 		tprintf("%#lx", addr);
 }
 
-void
-printnum_long(struct tcb *tcp, long addr, const char *fmt)
-{
-	long num;
-
-	if (!addr) {
-		tprints("NULL");
-		return;
-	}
-	if (umove(tcp, addr, &num) < 0) {
-		tprintf("%#lx", addr);
-		return;
-	}
-	tprints("[");
-	tprintf(fmt, num);
-	tprints("]");
+#define DEF_PRINTNUM(name, type) \
+void									\
+printnum_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
+{									\
+	type num;							\
+	if (!addr)							\
+		tprints("NULL");					\
+	else if (umove(tcp, addr, &num) < 0)				\
+		tprintf("%#lx", addr);					\
+	else {								\
+		tprints("[");						\
+		tprintf(fmt, num);					\
+		tprints("]");						\
+	}								\
 }
 
-void
-printnum_int(struct tcb *tcp, long addr, const char *fmt)
-{
-	int num;
-
-	if (!addr) {
-		tprints("NULL");
-		return;
-	}
-	if (umove(tcp, addr, &num) < 0) {
-		tprintf("%#lx", addr);
-		return;
-	}
-	tprints("[");
-	tprintf(fmt, num);
-	tprints("]");
-}
+DEF_PRINTNUM(long, long)
+DEF_PRINTNUM(int, int)
+DEF_PRINTNUM(short, short)
+#if SIZEOF_LONG != 8
+DEF_PRINTNUM(int64, uint64_t)
+#endif
 
 const char *
 sprinttime(time_t t)
