@@ -32,10 +32,12 @@
  */
 #include <linux/termios.h>
 
-#include "xlat/tcxonc_options.h"
+#ifdef TCXONC
+# include "xlat/tcxonc_options.h"
+#endif
 
-#ifdef TCLFLSH
-#include "xlat/tcflsh_options.h"
+#ifdef TCFLSH
+# include "xlat/tcflsh_options.h"
 #endif
 
 #include "xlat/baud_options.h"
@@ -166,7 +168,7 @@ term_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		printxval(tcxonc_options, arg, "TC???");
 		return 1;
 #endif
-#ifdef TCLFLSH
+#ifdef TCFLSH
 	case TCFLSH:
 		tprints(", ");
 		printxval(tcflsh_options, arg, "TC???");
