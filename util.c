@@ -376,6 +376,15 @@ printflags(const struct xlat *xlat, int flags, const char *dflt)
 }
 
 void
+printaddr(const long addr)
+{
+	if (!addr)
+		tprints("NULL");
+	else
+		tprintf("%#lx", addr);
+}
+
+void
 printnum_long(struct tcb *tcp, long addr, const char *fmt)
 {
 	long num;
@@ -1082,6 +1091,22 @@ umoven(struct tcb *tcp, long addr, unsigned int len, void *our_addr)
 		len -= m;
 	}
 
+	return 0;
+}
+
+int
+umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
+		    void *our_addr)
+{
+	if (!addr) {
+		tprints("NULL");
+		return -1;
+	}
+	if ((exiting(tcp) && syserror(tcp)) ||
+	    umoven(tcp, addr, len, our_addr) < 0) {
+		tprintf("%#lx", addr);
+		return -1;
+	}
 	return 0;
 }
 

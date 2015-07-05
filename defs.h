@@ -469,6 +469,9 @@ extern int get_scno(struct tcb *tcp);
 extern int umoven(struct tcb *, long, unsigned int, void *);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
+extern int umoven_or_printaddr(struct tcb *, long, unsigned int, void *);
+#define umove_or_printaddr(pid, addr, objp)	\
+	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
 extern int umovestr(struct tcb *, long, unsigned int, char *);
 extern int upeek(int pid, long, long *);
 
@@ -511,6 +514,7 @@ extern int getllval(struct tcb *, unsigned long long *, int);
 extern int printllval(struct tcb *, const char *, int)
 	ATTRIBUTE_FORMAT((printf, 2, 0));
 
+extern void printaddr(long);
 extern void printxval(const struct xlat *, const unsigned int, const char *);
 extern int printargs(struct tcb *);
 extern int printargs_lu(struct tcb *);
