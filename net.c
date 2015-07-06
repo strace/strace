@@ -955,18 +955,11 @@ do_pipe(struct tcb *tcp, int flags_arg)
 			tprintf("%#lx", tcp->u_arg[0]);
 		} else {
 #ifdef HAVE_GETRVAL2
-			if (flags_arg < 0) {
+			if (flags_arg < 0)
 				tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
-			} else
+			else
 #endif
-			{
-				int fds[2];
-
-				if (umove(tcp, tcp->u_arg[0], &fds) < 0)
-					tprintf("%#lx", tcp->u_arg[0]);
-				else
-					tprintf("[%u, %u]", fds[0], fds[1]);
-			}
+				printpair_int(tcp, tcp->u_arg[0], "%u");
 		}
 		if (flags_arg >= 0) {
 			tprints(", ");
@@ -988,22 +981,14 @@ SYS_FUNC(pipe2)
 
 SYS_FUNC(socketpair)
 {
-	int fds[2];
-
 	if (entering(tcp)) {
 		printxval(domains, tcp->u_arg[0], "PF_???");
 		tprints(", ");
 		tprint_sock_type(tcp->u_arg[1]);
 		tprintf(", %lu", tcp->u_arg[2]);
 	} else {
-		if (syserror(tcp)) {
-			tprintf(", %#lx", tcp->u_arg[3]);
-			return 0;
-		}
-		if (umoven(tcp, tcp->u_arg[3], sizeof fds, fds) < 0)
-			tprints(", [...]");
-		else
-			tprintf(", [%u, %u]", fds[0], fds[1]);
+		tprints(", ");
+		printpair_int(tcp, tcp->u_arg[3], "%u");
 	}
 	return 0;
 }

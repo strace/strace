@@ -297,19 +297,15 @@ mtslots_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 }
 #endif /* EVIOCGMTSLOTS */
 
-#ifdef EVIOCGREP
+#if defined EVIOCGREP || defined EVIOCSREP
 static int
 repeat_ioctl(struct tcb *tcp, long arg)
 {
-	unsigned int val[2];
-
-	if (!verbose(tcp) || umove(tcp, arg, &val) < 0)
-		return 0;
-
-	tprintf(", [%" PRIu32 " %" PRIu32 "]", val[0], val[1]);
+	tprints(", ");
+	printpair_int(tcp, arg, "%u");
 	return 1;
 }
-#endif /* EVIOCGREP */
+#endif /* EVIOCGREP || EVIOCSREP */
 
 static int
 evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
