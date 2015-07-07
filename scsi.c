@@ -30,7 +30,7 @@
 
 #ifdef HAVE_SCSI_SG_H
 
-# include <sys/ioctl.h>
+# include <linux/ioctl.h>
 # include <scsi/sg.h>
 
 # include "xlat/sg_io_dxfer_direction.h"
@@ -67,17 +67,16 @@ out:
 	tprints("]");
 }
 
-static void
-print_sg_io_v3_req(struct tcb *tcp, long arg)
+static int
+print_sg_io_v3_req(struct tcb *tcp, const long arg)
 {
 	struct sg_io_hdr sg_io;
 
 	if (umove(tcp, arg, &sg_io) < 0) {
-		tprintf(", %#lx", arg);
-		return;
+		tprints("???}");
+		return RVAL_DECODED | 1;
 	}
 
-	tprints(", ");
 	printxval(sg_io_dxfer_direction, sg_io.dxfer_direction,
 		  "SG_DXFER_???");
 	tprintf(", cmd[%u]=", sg_io.cmd_len);
@@ -99,15 +98,16 @@ print_sg_io_v3_req(struct tcb *tcp, long arg)
 			print_sg_io_buffer(tcp, (unsigned long) sg_io.dxferp,
 					   sg_io.dxfer_len);
 	}
+	return 1;
 }
 
 static void
-print_sg_io_v3_res(struct tcb *tcp, long arg)
+print_sg_io_v3_res(struct tcb *tcp, const long arg)
 {
 	struct sg_io_hdr sg_io;
 
 	if (umove(tcp, arg, &sg_io) < 0) {
-		tprintf(", %#lx", arg);
+		tprints(", ???");
 		return;
 	}
 
@@ -139,17 +139,16 @@ print_sg_io_v3_res(struct tcb *tcp, long arg)
 
 #ifdef HAVE_LINUX_BSG_H
 
-static void
-print_sg_io_v4_req(struct tcb *tcp, long arg)
+static int
+print_sg_io_v4_req(struct tcb *tcp, const long arg)
 {
 	struct sg_io_v4 sg_io;
 
 	if (umove(tcp, arg, &sg_io) < 0) {
-		tprintf(", %#lx", arg);
-		return;
+		tprints("???}");
+		return RVAL_DECODED | 1;
 	}
 
-	tprints(", ");
 	printxval(bsg_protocol, sg_io.protocol, "BSG_PROTOCOL_???");
 	tprints(", ");
 	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
@@ -175,16 +174,17 @@ print_sg_io_v4_req(struct tcb *tcp, long arg)
 				1, sg_io.dout_xfer_len);
 	else
 		print_sg_io_buffer(tcp, sg_io.dout_xferp, sg_io.dout_xfer_len);
+	return 1;
 }
 
 static void
-print_sg_io_v4_res(struct tcb *tcp, long arg)
+print_sg_io_v4_res(struct tcb *tcp, const long arg)
 {
 	struct sg_io_v4 sg_io;
 	uint32_t din_len;
 
 	if (umove(tcp, arg, &sg_io) < 0) {
-		tprintf(", %#lx", arg);
+		tprints(", ???");
 		return;
 	}
 
@@ -214,78 +214,76 @@ print_sg_io_v4_res(struct tcb *tcp, long arg)
 
 #else /* !HAVE_LINUX_BSG_H */
 
-static void
-print_sg_io_v4_req(struct tcb *tcp, long arg)
+static int
+print_sg_io_v4_req(struct tcb *tcp, const long arg)
 {
-	tprintf(", %#lx", arg);
+	tprints("...}");
+	return RVAL_DECODED | 1;
 }
 
 static void
-print_sg_io_v4_res(struct tcb *tcp, long arg)
+print_sg_io_v4_res(struct tcb *tcp, const long arg)
 {
 }
 
 #endif
 
-static void
-print_sg_io_req(struct tcb *tcp, uint32_t iid, long arg)
+static int
+print_sg_io_req(struct tcb *tcp, uint32_t iid, const long arg)
 {
-	tprintf("{'%c'", iid);
+	tprintf("{'%c', ", iid);
 
 	switch (iid) {
 	case 'S':
-		print_sg_io_v3_req(tcp, arg);
-		break;
+		return print_sg_io_v3_req(tcp, arg);
 	case 'Q':
-		print_sg_io_v4_req(tcp, arg);
-		break;
+		return print_sg_io_v4_req(tcp, arg);
 	default:
-		tprints(", ...");
+		tprints("...}");
+		return RVAL_DECODED | 1;
 	}
 
 }
 
 static void
-print_sg_io_res(struct tcb *tcp, uint32_t iid, long arg)
+print_sg_io_res(struct tcb *tcp, uint32_t iid, const long arg)
 {
-	if (!syserror(tcp)) {
-		switch (iid) {
-		case 'S':
-			print_sg_io_v3_res(tcp, arg);
-			break;
-		case 'Q':
-			print_sg_io_v4_res(tcp, arg);
-			break;
-		}
+	switch (iid) {
+	case 'S':
+		print_sg_io_v3_res(tcp, arg);
+		break;
+	case 'Q':
+		print_sg_io_v4_res(tcp, arg);
+		break;
 	}
-
-	tprintf("}");
 }
 
 int
-scsi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+scsi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
 	uint32_t iid;
 
-	switch (code) {
-	case SG_IO:
-		if (entering(tcp)) {
-			tprints(", ");
-			if (umove(tcp, arg, &iid) < 0)
-				tprintf("%#lx", arg);
-			else
-				print_sg_io_req(tcp, iid, arg);
+	if (SG_IO != code)
+		return RVAL_DECODED;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (!arg || umove(tcp, arg, &iid) < 0) {
+			printaddr(arg);
+			return RVAL_DECODED | 1;
 		} else {
-			if (umove(tcp, arg, &iid) >= 0)
+			return print_sg_io_req(tcp, iid, arg);
+		}
+	} else {
+		if (!syserror(tcp)) {
+			if (umove(tcp, arg, &iid) < 0)
+				tprints(", ???");
+			else
 				print_sg_io_res(tcp, iid, arg);
 		}
-		break;
-	default:
-		if (entering(tcp))
-			tprintf(", %#lx", arg);
-		break;
+		tprintf("}");
+		return RVAL_DECODED | 1;
 	}
-	return 1;
 }
 
 #endif /* HAVE_SCSI_SG_H */
