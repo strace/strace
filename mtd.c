@@ -26,7 +26,7 @@
 
 #include "defs.h"
 
-#include <sys/ioctl.h>
+#include <linux/ioctl.h>
 
 /* The mtd api changes quickly, so we have to keep a local copy */
 #include <linux/version.h>
@@ -42,37 +42,161 @@
 #endif
 
 #include "xlat/mtd_mode_options.h"
+#include "xlat/mtd_file_mode_options.h"
 #include "xlat/mtd_type_options.h"
 #include "xlat/mtd_flags_options.h"
 #include "xlat/mtd_otp_options.h"
 #include "xlat/mtd_nandecc_options.h"
 
 int
-mtd_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+mtd_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
-	struct mtd_info_user minfo;
-	struct erase_info_user einfo;
-	struct erase_info_user64 einfo64;
-	struct mtd_oob_buf mbuf;
-	struct mtd_oob_buf64 mbuf64;
-	struct region_info_user rinfo;
-	struct otp_info oinfo;
-	struct mtd_ecc_stats estat;
-	struct mtd_write_req mreq;
-	struct nand_oobinfo ninfo;
-	struct nand_ecclayout_user nlay;
-	unsigned int i, j;
-
-	if (entering(tcp))
-		return 0;
+	if (!verbose(tcp))
+		return RVAL_DECODED;
 
 	switch (code) {
+	case MEMERASE:
+	case MEMLOCK:
+	case MEMUNLOCK:
+	case MEMISLOCKED: {
+		struct erase_info_user einfo;
 
-	case MEMGETINFO:
-		if (!verbose(tcp) || umove(tcp, arg, &minfo) < 0)
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &einfo))
+			break;
+
+		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 "}",
+			einfo.start, einfo.length);
+		break;
+	}
+
+	case MEMERASE64: {
+		struct erase_info_user64 einfo64;
+
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &einfo64))
+			break;
+
+		tprintf("{start=%#" PRIx64 ", length=%#" PRIx64 "}",
+			(uint64_t) einfo64.start, (uint64_t) einfo64.length);
+		break;
+	}
+
+	case MEMWRITEOOB:
+	case MEMREADOOB: {
+		struct mtd_oob_buf mbuf;
+
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &mbuf))
+			break;
+
+		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 ", ptr=...}",
+			mbuf.start, mbuf.length);
+		break;
+	}
+
+	case MEMWRITEOOB64:
+	case MEMREADOOB64: {
+		struct mtd_oob_buf64 mbuf64;
+
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &mbuf64))
+			break;
+
+		tprintf("{start=%#" PRIx64 ", length=%#" PRIx64 ", ptr=...}",
+			(uint64_t) mbuf64.start, (uint64_t) mbuf64.length);
+		break;
+	}
+
+	case MEMGETREGIONINFO: {
+		struct region_info_user rinfo;
+
+		if (entering(tcp)) {
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &rinfo))
+				break;
+			tprintf("{regionindex=%#x", rinfo.regionindex);
+			return 1;
+		} else {
+			if (syserror(tcp)) {
+				tprints("}");
+				break;
+			}
+			if (umove(tcp, arg, &rinfo) < 0) {
+				tprints(", ???}");
+				break;
+			}
+			tprintf(", offset=%#x, erasesize=%#x, numblocks=%#x}",
+				rinfo.offset, rinfo.erasesize, rinfo.numblocks);
+			break;
+		}
+	}
+
+	case OTPLOCK: {
+		struct otp_info oinfo;
+
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &oinfo))
+			break;
+
+		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 ", locked=%" PRIu32 "}",
+			oinfo.start, oinfo.length, oinfo.locked);
+		break;
+	}
+
+	case MEMWRITE: {
+		struct mtd_write_req mreq;
+
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &mreq))
+			break;
+
+		tprintf("{start=%#" PRIx64 ", len=%#" PRIx64,
+			(uint64_t) mreq.start, (uint64_t) mreq.len);
+		tprintf(", ooblen=%#" PRIx64 ", usr_data=%#" PRIx64,
+			(uint64_t) mreq.ooblen, (uint64_t) mreq.usr_data);
+		tprintf(", usr_oob=%#" PRIx64 ", mode=",
+			(uint64_t) mreq.usr_oob);
+		printxval(mtd_mode_options, mreq.mode, "MTD_OPS_???");
+		tprints(", padding=...}");
+		break;
+	}
+
+	case OTPSELECT: {
+		unsigned int i;
+
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &i))
+			break;
+
+		tprints("[");
+		printxval(mtd_otp_options, i, "MTD_OTP_???");
+		tprints("]");
+		break;
+	}
+
+	case MTDFILEMODE:
+		tprints(", ");
+		printxval(mtd_file_mode_options, arg, "MTD_FILE_MODE_???");
+		break;
+
+	case MEMGETBADBLOCK:
+	case MEMSETBADBLOCK:
+		tprints(", ");
+		print_loff_t(tcp, arg);
+		break;
+
+	case MEMGETINFO: {
+		struct mtd_info_user minfo;
+
+		if (entering(tcp))
 			return 0;
 
-		tprints(", {type=");
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &minfo))
+			break;
+
+		tprints("{type=");
 		printxval(mtd_type_options, minfo.type, "MTD_???");
 		tprints(", flags=");
 		printflags(mtd_flags_options, minfo.flags, "MTD_???");
@@ -82,65 +206,28 @@ mtd_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			minfo.writesize, minfo.oobsize);
 		tprintf(", padding=%#" PRIx64 "}",
 			(uint64_t) minfo.padding);
-		return 1;
+		break;
+	}
 
-	case MEMERASE:
-	case MEMLOCK:
-	case MEMUNLOCK:
-	case MEMISLOCKED:
-		if (!verbose(tcp) || umove(tcp, arg, &einfo) < 0)
+	case MEMGETOOBSEL: {
+		struct nand_oobinfo ninfo;
+		unsigned int i;
+
+		if (entering(tcp))
 			return 0;
 
-		tprintf(", {start=%#" PRIx32 ", length=%#" PRIx32 "}",
-			einfo.start, einfo.length);
-		return 1;
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &ninfo))
+			break;
 
-	case MEMERASE64:
-		if (!verbose(tcp) || umove(tcp, arg, &einfo64) < 0)
-			return 0;
-
-		tprintf(", {start=%#" PRIx64 ", length=%#" PRIx64 "}",
-			(uint64_t) einfo64.start, (uint64_t) einfo64.length);
-		return 1;
-
-	case MEMWRITEOOB:
-	case MEMREADOOB:
-		if (!verbose(tcp) || umove(tcp, arg, &mbuf) < 0)
-			return 0;
-
-		tprintf(", {start=%#" PRIx32 ", length=%#" PRIx32 ", ptr=...}",
-			mbuf.start, mbuf.length);
-		return 1;
-
-	case MEMWRITEOOB64:
-	case MEMREADOOB64:
-		if (!verbose(tcp) || umove(tcp, arg, &mbuf64) < 0)
-			return 0;
-
-		tprintf(", {start=%#" PRIx64 ", length=%#" PRIx64 ", ptr=...}",
-			(uint64_t) mbuf64.start, (uint64_t) mbuf64.length);
-		return 1;
-
-	case MEMGETREGIONINFO:
-		if (!verbose(tcp) || umove(tcp, arg, &rinfo) < 0)
-			return 0;
-
-		tprintf(", {offset=%#" PRIx32 ", erasesize=%#" PRIx32,
-			rinfo.offset, rinfo.erasesize);
-		tprintf(", numblocks=%#" PRIx32 ", regionindex=%#" PRIx32 "}",
-			rinfo.numblocks, rinfo.regionindex);
-		return 1;
-
-	case MEMGETOOBSEL:
-		if (!verbose(tcp) || umove(tcp, arg, &ninfo) < 0)
-			return 0;
-
-		tprints(", {useecc=");
+		tprints("{useecc=");
 		printxval(mtd_nandecc_options, ninfo.useecc, "MTD_NANDECC_???");
 		tprintf(", eccbytes=%#" PRIx32, ninfo.eccbytes);
 
 		tprints(", oobfree={");
 		for (i = 0; i < ARRAY_SIZE(ninfo.oobfree); ++i) {
+			unsigned int j;
+
 			if (i)
 				tprints("}, ");
 			tprints("{");
@@ -159,22 +246,36 @@ mtd_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		}
 
 		tprints("}");
-		return 1;
+		break;
+	}
 
-	case OTPGETREGIONINFO:
-	case OTPLOCK:
-		if (!verbose(tcp) || umove(tcp, arg, &oinfo) < 0)
+	case OTPGETREGIONINFO: {
+		struct otp_info oinfo;
+
+		if (entering(tcp))
 			return 0;
 
-		tprintf(", {start=%#" PRIx32 ", length=%#" PRIx32 ", locked=%" PRIu32 "}",
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &oinfo))
+			break;
+
+		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 ", locked=%" PRIu32 "}",
 			oinfo.start, oinfo.length, oinfo.locked);
-		return 1;
+		break;
+	}
 
-	case ECCGETLAYOUT:
-		if (!verbose(tcp) || umove(tcp, arg, &nlay) < 0)
+	case ECCGETLAYOUT: {
+		struct nand_ecclayout_user nlay;
+		unsigned int i;
+
+		if (entering(tcp))
 			return 0;
 
-		tprintf(", {eccbytes=%#" PRIx32 ", eccpos={", nlay.eccbytes);
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &nlay))
+			break;
+
+		tprintf("{eccbytes=%#" PRIx32 ", eccpos={", nlay.eccbytes);
 		for (i = 0; i < ARRAY_SIZE(nlay.eccpos); ++i) {
 			if (i)
 				tprints(", ");
@@ -188,117 +289,107 @@ mtd_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 				nlay.oobfree[i].offset, nlay.oobfree[i].length);
 		}
 		tprints("}");
-		return 1;
+		break;
+	}
 
-	case ECCGETSTATS:
-		if (!verbose(tcp) || umove(tcp, arg, &estat) < 0)
-			return 0;
+	case ECCGETSTATS: {
+		struct mtd_ecc_stats estat;
 
-		tprintf(", {corrected=%#" PRIx32 ", failed=%#" PRIx32,
-			estat.corrected, estat.failed);
-		tprintf(", badblocks=%#" PRIx32 ", bbtblocks=%#" PRIx32 "}",
-			estat.badblocks, estat.bbtblocks);
-		return 1;
-
-	case MEMWRITE:
-		if (!verbose(tcp) || umove(tcp, arg, &mreq) < 0)
-			return 0;
-
-		tprintf(", {start=%#" PRIx64 ", len=%#" PRIx64,
-			(uint64_t) mreq.start, (uint64_t) mreq.len);
-		tprintf(", ooblen=%#" PRIx64 ", usr_data=%#" PRIx64,
-			(uint64_t) mreq.ooblen, (uint64_t) mreq.usr_data);
-		tprintf(", usr_oob=%#" PRIx64 ", mode=",
-			(uint64_t) mreq.usr_oob);
-		printxval(mtd_mode_options, mreq.mode, "MTD_OPS_???");
-		tprints(", padding=...}");
-		return 1;
-
-	case OTPSELECT:
-		if (!verbose(tcp) || umove(tcp, arg, &i) < 0)
-			return 0;
-
-		tprints(", [");
-		printxval(mtd_otp_options, i, "MTD_OTP_???");
-		tprints("]");
-		return 1;
-
-	case MEMGETBADBLOCK:
-	case MEMSETBADBLOCK:
-		if (!verbose(tcp))
+		if (entering(tcp))
 			return 0;
 
 		tprints(", ");
-		print_loff_t(tcp, arg);
-		return 1;
+		if (umove_or_printaddr(tcp, arg, &estat))
+			break;
+
+		tprintf("{corrected=%#" PRIx32 ", failed=%#" PRIx32,
+			estat.corrected, estat.failed);
+		tprintf(", badblocks=%#" PRIx32 ", bbtblocks=%#" PRIx32 "}",
+			estat.badblocks, estat.bbtblocks);
+		break;
+	}
 
 	case OTPGETREGIONCOUNT:
-		if (!verbose(tcp) || umove(tcp, arg, &i) < 0)
+		if (entering(tcp))
 			return 0;
 
-		tprintf(", [%u]", i);
-		return 1;
-
-	case MTDFILEMODE:
-		/* XXX: process return value as enum mtd_file_modes */
+		tprints(", ");
+		printnum_int(tcp, arg, "%u");
+		break;
 
 	case MEMGETREGIONCOUNT:
-		/* These ones take simple args, so let default printer handle it */
+		if (entering(tcp))
+			return 0;
+
+		tprints(", ");
+		printnum_int(tcp, arg, "%d");
+		break;
 
 	default:
-		return 0;
+		return RVAL_DECODED;
 	}
+
+	return RVAL_DECODED | 1;
 }
 
 #include "xlat/ubi_volume_types.h"
 #include "xlat/ubi_volume_props.h"
 
 int
-ubi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+ubi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
-	struct ubi_mkvol_req mkvol;
-	struct ubi_rsvol_req rsvol;
-	struct ubi_rnvol_req rnvol;
-	struct ubi_attach_req attach;
-	struct ubi_map_req map;
-	struct ubi_set_vol_prop_req prop;
-
-	if (entering(tcp))
-		return 0;
+	if (!verbose(tcp))
+		return RVAL_DECODED;
 
 	switch (code) {
 	case UBI_IOCMKVOL:
-		if (!verbose(tcp) || umove(tcp, arg, &mkvol) < 0)
-			return 0;
+		if (entering(tcp)) {
+			struct ubi_mkvol_req mkvol;
 
-		tprintf(", {vol_id=%" PRIi32 ", alignment=%" PRIi32
-			", bytes=%" PRIi64 ", vol_type=", mkvol.vol_id,
-			mkvol.alignment, (int64_t)mkvol.bytes);
-		printxval(ubi_volume_types, mkvol.vol_type, "UBI_???_VOLUME");
-		tprintf(", name_len=%" PRIi16 ", name=", mkvol.name_len);
-		if (print_quoted_string(mkvol.name,
-				CLAMP(mkvol.name_len, 0, UBI_MAX_VOLUME_NAME),
-				QUOTE_0_TERMINATED) > 0) {
-			tprints("...");
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &mkvol))
+				break;
+
+			tprintf("{vol_id=%" PRIi32 ", alignment=%" PRIi32
+				", bytes=%" PRIi64 ", vol_type=", mkvol.vol_id,
+				mkvol.alignment, (int64_t)mkvol.bytes);
+			printxval(ubi_volume_types, mkvol.vol_type, "UBI_???_VOLUME");
+			tprintf(", name_len=%" PRIi16 ", name=", mkvol.name_len);
+			if (print_quoted_string(mkvol.name,
+					CLAMP(mkvol.name_len, 0, UBI_MAX_VOLUME_NAME),
+					QUOTE_0_TERMINATED) > 0) {
+				tprints("...");
+			}
+			tprints("}");
+			return 1;
 		}
-		tprints("}");
-		return 1;
+		if (!syserror(tcp)) {
+			tprints(" => ");
+			printnum_int(tcp, arg, "%d");
+		}
+		break;
 
-	case UBI_IOCRSVOL:
-		if (!verbose(tcp) || umove(tcp, arg, &rsvol) < 0)
-			return 0;
+	case UBI_IOCRSVOL: {
+		struct ubi_rsvol_req rsvol;
 
-		tprintf(", {vol_id=%" PRIi32 ", bytes=%" PRIi64 "}",
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &rsvol))
+			break;
+
+		tprintf("{vol_id=%" PRIi32 ", bytes=%" PRIi64 "}",
 			rsvol.vol_id, (int64_t)rsvol.bytes);
-		return 1;
+		break;
+	}
 
 	case UBI_IOCRNVOL: {
-		__s32 c;
+		struct ubi_rnvol_req rnvol;
+		int c;
 
-		if (!verbose(tcp) || umove(tcp, arg, &rnvol) < 0)
-			return 0;
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &rnvol))
+			break;
 
-		tprintf(", {count=%" PRIi32 ", ents=[", rnvol.count);
+		tprintf("{count=%" PRIi32 ", ents=[", rnvol.count);
 		for (c = 0; c < CLAMP(rnvol.count, 0, UBI_MAX_RNVOL); ++c) {
 			if (c)
 				tprints(", ");
@@ -313,56 +404,89 @@ ubi_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			tprints("}");
 		}
 		tprints("]}");
-		return 1;
+		break;
 	}
 
-	case UBI_IOCVOLUP: {
-		__s64 bytes;
+	case UBI_IOCEBCH: {
+		struct ubi_leb_change_req leb;
 
-		if (!verbose(tcp) || umove(tcp, arg, &bytes) < 0)
-			return 0;
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &leb))
+			break;
 
-		tprintf(", %" PRIi64, (int64_t)bytes);
-		return 1;
+		tprintf("{lnum=%d, bytes=%d}", leb.lnum, leb.bytes);
+		break;
 	}
 
 	case UBI_IOCATT:
-		if (!verbose(tcp) || umove(tcp, arg, &attach) < 0)
-			return 0;
+		if (entering(tcp)) {
+			struct ubi_attach_req attach;
 
-		tprintf(", {ubi_num=%" PRIi32 ", mtd_num=%" PRIi32
-			", vid_hdr_offset=%" PRIi32
-			", max_beb_per1024=%" PRIi16 "}",
-			attach.ubi_num, attach.mtd_num,
-			attach.vid_hdr_offset, attach.max_beb_per1024);
-		return 1;
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &attach))
+				break;
 
-	case UBI_IOCEBMAP:
-		if (!verbose(tcp) || umove(tcp, arg, &map) < 0)
-			return 0;
+			tprintf("{ubi_num=%" PRIi32 ", mtd_num=%" PRIi32
+				", vid_hdr_offset=%" PRIi32
+				", max_beb_per1024=%" PRIi16 "}",
+				attach.ubi_num, attach.mtd_num,
+				attach.vid_hdr_offset, attach.max_beb_per1024);
+			return 1;
+		}
+		if (!syserror(tcp)) {
+			tprints(" => ");
+			printnum_int(tcp, arg, "%d");
+		}
+		break;
 
-		tprintf(", {lnum=%" PRIi32 ", dtype=%" PRIi8 "}",
+	case UBI_IOCEBMAP: {
+		struct ubi_map_req map;
+
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &map))
+			break;
+
+		tprintf("{lnum=%" PRIi32 ", dtype=%" PRIi8 "}",
 			map.lnum, map.dtype);
-		return 1;
+		break;
+	}
 
-	case UBI_IOCSETVOLPROP:
-		if (!verbose(tcp) || umove(tcp, arg, &prop) < 0)
-			return 0;
+	case UBI_IOCSETVOLPROP: {
+		struct ubi_set_vol_prop_req prop;
 
-		tprints(", {property=");
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &prop))
+			break;
+
+		tprints("{property=");
 		printxval(ubi_volume_props, prop.property, "UBI_VOL_PROP_???");
 		tprintf(", value=%#" PRIx64 "}", (uint64_t)prop.value);
-		return 1;
+		break;
+	}
 
-	case UBI_IOCRMVOL:
+
+	case UBI_IOCVOLUP:
+		tprints(", ");
+		printnum_int64(tcp, arg, "%" PRIi64);
+		break;
+
 	case UBI_IOCDET:
 	case UBI_IOCEBER:
-	case UBI_IOCEBCH:
-	case UBI_IOCEBUNMAP:
 	case UBI_IOCEBISMAP:
-		/* These ones take simple args, so let default printer handle it */
+	case UBI_IOCEBUNMAP:
+	case UBI_IOCRMVOL:
+		tprints(", ");
+		printnum_int(tcp, arg, "%d");
+		break;
+
+	case UBI_IOCVOLCRBLK:
+	case UBI_IOCVOLRMBLK:
+		/* no arguments */
+		break;
 
 	default:
-		return 0;
+		return RVAL_DECODED;
 	}
+
+	return RVAL_DECODED | 1;
 }
