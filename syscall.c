@@ -814,6 +814,7 @@ trace_syscall_entering(struct tcb *tcp)
 	 || (tracing_paths && !pathtrace_match(tcp))
 	) {
 		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
+		tcp->sys_func_rval = 0;
 		return 0;
 	}
 
@@ -844,6 +845,7 @@ trace_syscall_entering(struct tcb *tcp)
 	fflush(tcp->outf);
  ret:
 	tcp->flags |= TCB_INSYSCALL;
+	tcp->sys_func_rval = res;
 	/* Measure the entrance time as late as possible to avoid errors. */
 	if (Tflag || cflag)
 		gettimeofday(&tcp->etime, NULL);
@@ -910,6 +912,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		tprints("= ? <unavailable>\n");
 		line_ended();
 		tcp->flags &= ~TCB_INSYSCALL;
+		tcp->sys_func_rval = 0;
 		return res;
 	}
 	tcp->s_prev_ent = tcp->s_ent;
@@ -928,7 +931,10 @@ trace_syscall_exiting(struct tcb *tcp)
 	 */
 		if (not_failing_only && tcp->u_error)
 			goto ret;	/* ignore failed syscalls */
-		sys_res = tcp->s_ent->sys_func(tcp);
+		if (tcp->sys_func_rval & RVAL_DECODED)
+			sys_res = tcp->sys_func_rval;
+		else
+			sys_res = tcp->s_ent->sys_func(tcp);
 	}
 
 	tprints(") ");
@@ -1081,6 +1087,7 @@ trace_syscall_exiting(struct tcb *tcp)
 
  ret:
 	tcp->flags &= ~TCB_INSYSCALL;
+	tcp->sys_func_rval = 0;
 	return 0;
 }
 

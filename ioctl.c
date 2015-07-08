@@ -272,6 +272,7 @@ ioctl_decode(struct tcb *tcp)
 SYS_FUNC(ioctl)
 {
 	const struct_ioctlent *iop;
+	int ret;
 
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -286,14 +287,22 @@ SYS_FUNC(ioctl)
 				ioctl_print_code(tcp->u_arg[1]);
 			}
 		}
-		ioctl_decode(tcp);
+		ret = ioctl_decode(tcp);
+	} else {
+		ret = ioctl_decode(tcp) | RVAL_DECODED;
 	}
-	else {
-		int ret = ioctl_decode(tcp);
-		if (!ret)
-			tprintf(", %#lx", tcp->u_arg[2]);
+
+	if (ret & RVAL_DECODED) {
+		ret &= ~RVAL_DECODED;
+		if (ret)
+			--ret;
 		else
-			return ret - 1;
+			tprintf(", %#lx", tcp->u_arg[2]);
+		ret |= RVAL_DECODED;
+	} else {
+		if (ret)
+			--ret;
 	}
-	return 0;
+
+	return ret;
 }

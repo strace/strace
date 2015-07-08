@@ -274,6 +274,7 @@ struct tcb {
 #if SUPPORTED_PERSONALITIES > 1
 	unsigned int currpers;	/* Personality at the time of scno update */
 #endif
+	int sys_func_rval;	/* Syscall entry parser's return value */
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
@@ -367,6 +368,8 @@ extern const struct xlat whence_codes[];
 
 #define RVAL_STR	020	/* Print `auxstr' field after return val */
 #define RVAL_NONE	040	/* Print nothing */
+
+#define RVAL_DECODED	0100	/* syscall decoding finished */
 
 #define TRACE_FILE	001	/* Trace file-related syscalls. */
 #define TRACE_IPC	002	/* Trace IPC-related syscalls. */
