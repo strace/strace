@@ -28,6 +28,7 @@
 
 #include "dummy.h"
 #include "sys_func.h"
+#include "sen.h"
 
 #if NEED_UID16_PARSERS
 extern SYS_FUNC(chown16);

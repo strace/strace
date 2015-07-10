@@ -81,7 +81,8 @@
 #define SI STACKTRACE_INVALIDATE_CACHE
 #define SE STACKTRACE_CAPTURE_ON_ENTER
 
-#define SEN(syscall_name) SYS_FUNC_NAME(syscall_name)
+#define SEN_NAME(syscall_name) SEN_ ## syscall_name
+#define SEN(syscall_name) SEN_NAME(syscall_name), SYS_FUNC_NAME(syscall_name)
 
 const struct_sysent sysent0[] = {
 #include "syscallent.h"
@@ -101,6 +102,7 @@ static const struct_sysent sysent2[] = {
 
 /* Now undef them since short defines cause wicked namespace pollution. */
 #undef SEN
+#undef SEN_NAME
 #undef TD
 #undef TF
 #undef TI

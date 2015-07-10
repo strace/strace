@@ -249,6 +249,7 @@ extern char *stpcpy(char *dst, const char *src);
 typedef struct sysent {
 	unsigned nargs;
 	int	sys_flags;
+	int	sen;
 	int	(*sys_func)();
 	const char *sys_name;
 } struct_sysent;
