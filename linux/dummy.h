@@ -115,6 +115,7 @@
 #define	sys_inotify_init	printargs
 #define	sys_munlockall		printargs
 #define	sys_pause		printargs
+#define	sys_printargs		printargs
 #define	sys_rt_sigreturn	printargs
 #define	sys_sched_yield		printargs
 #define	sys_setsid		printargs
