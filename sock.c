@@ -348,8 +348,3 @@ sock_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	return RVAL_DECODED | 1;
 }
-
-SYS_FUNC(socketcall)
-{
-	return printargs(tcp);
-}

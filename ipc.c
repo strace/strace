@@ -451,8 +451,3 @@ SYS_FUNC(mq_getsetattr)
 		printmqattr(tcp, tcp->u_arg[2]);
 	return 0;
 }
-
-SYS_FUNC(ipc)
-{
-	return printargs(tcp);
-}

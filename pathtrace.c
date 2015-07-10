@@ -164,100 +164,87 @@ pathtrace_match(struct tcb *tcp)
 	 * other than test arg[0].
 	 */
 
-	if (s->sys_func == sys_dup2 ||
-	    s->sys_func == sys_dup3 ||
-	    s->sys_func == sys_sendfile ||
-	    s->sys_func == sys_sendfile64 ||
-	    s->sys_func == sys_tee)
-	{
+	switch (s->sen) {
+	case SEN_dup2:
+	case SEN_dup3:
+	case SEN_sendfile:
+	case SEN_sendfile64:
+	case SEN_tee:
 		/* fd, fd */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
 			fdmatch(tcp, tcp->u_arg[1]);
-	}
 
-	if (s->sys_func == sys_inotify_add_watch ||
-	    s->sys_func == sys_faccessat ||
-	    s->sys_func == sys_fchmodat ||
-	    s->sys_func == sys_futimesat ||
-	    s->sys_func == sys_unlinkat ||
-	    s->sys_func == sys_newfstatat ||
-	    s->sys_func == sys_mknodat ||
-	    s->sys_func == sys_openat ||
-	    s->sys_func == sys_readlinkat ||
-	    s->sys_func == sys_utimensat ||
-	    s->sys_func == sys_fchownat ||
-	    s->sys_func == sys_pipe2)
-	{
+	case SEN_faccessat:
+	case SEN_fchmodat:
+	case SEN_fchownat:
+	case SEN_futimesat:
+	case SEN_inotify_add_watch:
+	case SEN_mkdirat:
+	case SEN_mknodat:
+	case SEN_newfstatat:
+	case SEN_openat:
+	case SEN_pipe2:
+	case SEN_readlinkat:
+	case SEN_unlinkat:
+	case SEN_utimensat:
 		/* fd, path */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
 			upathmatch(tcp, tcp->u_arg[1]);
-	}
 
-	if (s->sys_func == sys_link ||
-	    s->sys_func == sys_mount)
-	{
+	case SEN_link:
+	case SEN_mount:
+	case SEN_pivotroot:
 		/* path, path */
 		return upathmatch(tcp, tcp->u_arg[0]) ||
 			upathmatch(tcp, tcp->u_arg[1]);
-	}
 
-	if (s->sys_func == sys_quotactl)
-	{
+	case SEN_quotactl:
 		/* x, path */
 		return upathmatch(tcp, tcp->u_arg[1]);
-	}
 
-	if (s->sys_func == sys_renameat ||
-	    s->sys_func == sys_renameat2 ||
-	    s->sys_func == sys_linkat)
-	{
+	case SEN_linkat:
+	case SEN_renameat2:
+	case SEN_renameat:
 		/* fd, path, fd, path */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
 			fdmatch(tcp, tcp->u_arg[2]) ||
 			upathmatch(tcp, tcp->u_arg[1]) ||
 			upathmatch(tcp, tcp->u_arg[3]);
-	}
 
-	if (
-	    s->sys_func == sys_old_mmap ||
+	case SEN_old_mmap:
 #if defined(S390)
-	    s->sys_func == sys_old_mmap_pgoff ||
+	case SEN_old_mmap_pgoff:
 #endif
-	    s->sys_func == sys_mmap ||
-	    s->sys_func == sys_mmap_pgoff ||
-	    s->sys_func == sys_mmap_4koff
-	) {
+	case SEN_mmap:
+	case SEN_mmap_4koff:
+	case SEN_mmap_pgoff:
 		/* x, x, x, x, fd */
 		return fdmatch(tcp, tcp->u_arg[4]);
-	}
 
-	if (s->sys_func == sys_symlinkat) {
+	case SEN_symlinkat:
 		/* path, fd, path */
 		return fdmatch(tcp, tcp->u_arg[1]) ||
 			upathmatch(tcp, tcp->u_arg[0]) ||
 			upathmatch(tcp, tcp->u_arg[2]);
-	}
 
-	if (s->sys_func == sys_splice) {
+	case SEN_splice:
 		/* fd, x, fd, x, x */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
 			fdmatch(tcp, tcp->u_arg[2]);
-	}
 
-	if (s->sys_func == sys_epoll_ctl) {
+	case SEN_epoll_ctl:
 		/* x, x, fd, x */
 		return fdmatch(tcp, tcp->u_arg[2]);
-	}
 
-	if (s->sys_func == sys_fanotify_mark) {
+
+	case SEN_fanotify_mark:
 		/* x, x, x, fd, path */
 		return fdmatch(tcp, tcp->u_arg[3]) ||
 			upathmatch(tcp, tcp->u_arg[4]);
-	}
 
-	if (s->sys_func == sys_select ||
-	    s->sys_func == sys_oldselect ||
-	    s->sys_func == sys_pselect6)
+	case SEN_oldselect:
+	case SEN_pselect6:
+	case SEN_select:
 	{
 		int     i, j;
 		int     nfds;
@@ -266,7 +253,7 @@ pathtrace_match(struct tcb *tcp)
 		fd_set *fds;
 
 		args = tcp->u_arg;
-		if (s->sys_func == sys_oldselect) {
+		if (SEN_oldselect == s->sen) {
 			if (umoven(tcp, tcp->u_arg[0], sizeof oldargs,
 				   oldargs) < 0)
 			{
@@ -308,8 +295,8 @@ pathtrace_match(struct tcb *tcp)
 		return 0;
 	}
 
-	if (s->sys_func == sys_poll ||
-	    s->sys_func == sys_ppoll)
+	case SEN_poll:
+	case SEN_ppoll:
 	{
 		struct pollfd fds;
 		unsigned nfds;
@@ -331,20 +318,19 @@ pathtrace_match(struct tcb *tcp)
 		return 0;
 	}
 
-	if (s->sys_func == printargs ||
-	    s->sys_func == sys_pipe ||
-	    s->sys_func == sys_pipe2 ||
-	    s->sys_func == sys_eventfd2 ||
-	    s->sys_func == sys_eventfd ||
-	    s->sys_func == sys_inotify_init1 ||
-	    s->sys_func == sys_timerfd_create ||
-	    s->sys_func == sys_timerfd_settime ||
-	    s->sys_func == sys_timerfd_gettime ||
-	    s->sys_func == sys_epoll_create ||
-	    s->sys_func == sys_socket ||
-	    s->sys_func == sys_socketpair ||
-	    s->sys_func == sys_fanotify_init)
-	{
+	case SEN_epoll_create:
+	case SEN_eventfd2:
+	case SEN_eventfd:
+	case SEN_fanotify_init:
+	case SEN_inotify_init1:
+	case SEN_perf_event_open:
+	case SEN_pipe:
+	case SEN_printargs:
+	case SEN_socket:
+	case SEN_socketpair:
+	case SEN_timerfd_create:
+	case SEN_timerfd_gettime:
+	case SEN_timerfd_settime:
 		/*
 		 * These have TRACE_FILE or TRACE_DESCRIPTOR or TRACE_NETWORK set,
 		 * but they don't have any file descriptor or path args to test.
