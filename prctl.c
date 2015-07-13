@@ -175,7 +175,6 @@ prctl_enter(struct tcb *tcp)
 static int
 prctl_exit(struct tcb *tcp)
 {
-	unsigned long addr;
 	unsigned int i;
 
 	switch (tcp->u_arg[0]) {
@@ -194,13 +193,7 @@ prctl_exit(struct tcb *tcp)
 	case PR_GET_FPEMU:
 	case PR_GET_FPEXC:
 		tprints(", ");
-		/* cannot use printnum_int() because of syserror() */
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (syserror(tcp) || umove(tcp, tcp->u_arg[1], &i) < 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			tprintf("[%u]", i);
+		printnum_int(tcp, tcp->u_arg[1], "%u");
 		break;
 
 	case PR_GET_NAME:
@@ -234,13 +227,7 @@ prctl_exit(struct tcb *tcp)
 
 	case PR_GET_TID_ADDRESS:
 		tprints(", ");
-		/* cannot use printnum_long() because of syserror() */
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (syserror(tcp) || umove(tcp, tcp->u_arg[1], &addr) < 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			tprintf("[%#lx]", addr);
+		printnum_long(tcp, tcp->u_arg[1], "%#lx");
 		break;
 
 	case PR_GET_TSC:
@@ -299,8 +286,6 @@ SYS_FUNC(arch_prctl)
 	case ARCH_GET_GS:
 	case ARCH_GET_FS:
 		if (exiting(tcp)) {
-			if (syserror(tcp))
-				break;
 			tprints(", ");
 			printnum_long(tcp, tcp->u_arg[1], "%#lx");
 		}

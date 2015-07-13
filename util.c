@@ -389,11 +389,7 @@ void									\
 printnum_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
 {									\
 	type num;							\
-	if (!addr)							\
-		tprints("NULL");					\
-	else if (umove(tcp, addr, &num) < 0)				\
-		tprintf("%#lx", addr);					\
-	else {								\
+	if (!umove_or_printaddr(tcp, addr, &num)) {			\
 		tprints("[");						\
 		tprintf(fmt, num);					\
 		tprints("]");						\
@@ -405,12 +401,7 @@ void									\
 printpair_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
 {									\
 	type pair[2];							\
-	if (!addr)							\
-		tprints("NULL");					\
-	else if ((exiting(tcp) && syserror(tcp)) ||			\
-		 umove(tcp, addr, &pair) < 0)				\
-		tprintf("%#lx", addr);					\
-	else {								\
+	if (!umove_or_printaddr(tcp, addr, &pair)) {			\
 		tprints("[");						\
 		tprintf(fmt, pair[0]);					\
 		tprints(", ");						\
