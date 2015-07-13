@@ -74,16 +74,14 @@ extern void printsigevent(struct tcb *tcp, long arg);
 
 SYS_FUNC(msgget)
 {
-	if (entering(tcp)) {
-		if (tcp->u_arg[0])
-			tprintf("%#lx, ", tcp->u_arg[0]);
-		else
-			tprints("IPC_PRIVATE, ");
-		if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
-			tprints("|");
-		tprintf("%#lo", tcp->u_arg[1] & 0777);
-	}
-	return 0;
+	if (tcp->u_arg[0])
+		tprintf("%#lx, ", tcp->u_arg[0]);
+	else
+		tprints("IPC_PRIVATE, ");
+	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
+		tprints("|");
+	tprintf("%#lo", tcp->u_arg[1] & 0777);
+	return RVAL_DECODED;
 }
 
 #ifdef IPC_64
@@ -102,12 +100,10 @@ indirect_ipccall(struct tcb *tcp)
 
 SYS_FUNC(msgctl)
 {
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-		PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
-		tprintf(", %#lx", tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2]);
-	}
-	return 0;
+	tprintf("%lu, ", tcp->u_arg[0]);
+	PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
+	tprintf(", %#lx", tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2]);
+	return RVAL_DECODED;
 }
 
 static void
@@ -129,17 +125,15 @@ tprint_msgsnd(struct tcb *tcp, long addr, unsigned long count,
 
 SYS_FUNC(msgsnd)
 {
-	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
-		if (indirect_ipccall(tcp)) {
-			tprint_msgsnd(tcp, tcp->u_arg[3], tcp->u_arg[1],
-				      tcp->u_arg[2]);
-		} else {
-			tprint_msgsnd(tcp, tcp->u_arg[1], tcp->u_arg[2],
-				      tcp->u_arg[3]);
-		}
+	tprintf("%d, ", (int) tcp->u_arg[0]);
+	if (indirect_ipccall(tcp)) {
+		tprint_msgsnd(tcp, tcp->u_arg[3], tcp->u_arg[1],
+			      tcp->u_arg[2]);
+	} else {
+		tprint_msgsnd(tcp, tcp->u_arg[1], tcp->u_arg[2],
+			      tcp->u_arg[3]);
 	}
-	return 0;
+	return RVAL_DECODED;
 }
 
 static void
@@ -229,104 +223,88 @@ tprint_sembuf(struct tcb *tcp, long addr, unsigned long count)
 
 SYS_FUNC(semop)
 {
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-		if (indirect_ipccall(tcp)) {
-			tprint_sembuf(tcp, tcp->u_arg[3], tcp->u_arg[1]);
-		} else {
-			tprint_sembuf(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		}
+	tprintf("%lu, ", tcp->u_arg[0]);
+	if (indirect_ipccall(tcp)) {
+		tprint_sembuf(tcp, tcp->u_arg[3], tcp->u_arg[1]);
+	} else {
+		tprint_sembuf(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
-	return 0;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(semtimedop)
 {
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-		if (indirect_ipccall(tcp)) {
-			tprint_sembuf(tcp, tcp->u_arg[3], tcp->u_arg[1]);
-			tprints(", ");
+	tprintf("%lu, ", tcp->u_arg[0]);
+	if (indirect_ipccall(tcp)) {
+		tprint_sembuf(tcp, tcp->u_arg[3], tcp->u_arg[1]);
+		tprints(", ");
 #if defined(S390) || defined(S390X)
-			printtv(tcp, tcp->u_arg[2]);
+		printtv(tcp, tcp->u_arg[2]);
 #else
-			printtv(tcp, tcp->u_arg[4]);
+		printtv(tcp, tcp->u_arg[4]);
 #endif
-		} else {
-			tprint_sembuf(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-			tprints(", ");
-			printtv(tcp, tcp->u_arg[3]);
-		}
+	} else {
+		tprint_sembuf(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		tprints(", ");
+		printtv(tcp, tcp->u_arg[3]);
 	}
-	return 0;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(semget)
 {
-	if (entering(tcp)) {
-		if (tcp->u_arg[0])
-			tprintf("%#lx", tcp->u_arg[0]);
-		else
-			tprints("IPC_PRIVATE");
-		tprintf(", %lu, ", tcp->u_arg[1]);
-		if (printflags(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
-			tprints("|");
-		tprintf("%#lo", tcp->u_arg[2] & 0777);
-	}
-	return 0;
+	if (tcp->u_arg[0])
+		tprintf("%#lx", tcp->u_arg[0]);
+	else
+		tprints("IPC_PRIVATE");
+	tprintf(", %lu, ", tcp->u_arg[1]);
+	if (printflags(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
+		tprints("|");
+	tprintf("%#lo", tcp->u_arg[2] & 0777);
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(semctl)
 {
-	if (entering(tcp)) {
-		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
-		tprints(", ");
-		if (indirect_ipccall(tcp)) {
-			if (current_wordsize == sizeof(int)) {
-				printnum_int(tcp, tcp->u_arg[3], "%#x");
-			} else {
-				printnum_long(tcp, tcp->u_arg[3], "%#lx");
-			}
+	tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
+	tprints(", ");
+	if (indirect_ipccall(tcp)) {
+		if (current_wordsize == sizeof(int)) {
+			printnum_int(tcp, tcp->u_arg[3], "%#x");
 		} else {
-			tprintf("%#lx", tcp->u_arg[3]);
+			printnum_long(tcp, tcp->u_arg[3], "%#lx");
 		}
+	} else {
+		tprintf("%#lx", tcp->u_arg[3]);
 	}
-	return 0;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(shmget)
 {
-	if (entering(tcp)) {
-		if (tcp->u_arg[0])
-			tprintf("%#lx", tcp->u_arg[0]);
-		else
-			tprints("IPC_PRIVATE");
-		tprintf(", %lu, ", tcp->u_arg[1]);
-		if (printflags(shm_resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
-			tprints("|");
-		tprintf("%#lo", tcp->u_arg[2] & 0777);
-	}
-	return 0;
+	if (tcp->u_arg[0])
+		tprintf("%#lx", tcp->u_arg[0]);
+	else
+		tprints("IPC_PRIVATE");
+	tprintf(", %lu, ", tcp->u_arg[1]);
+	if (printflags(shm_resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
+		tprints("|");
+	tprintf("%#lo", tcp->u_arg[2] & 0777);
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(shmctl)
 {
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-		PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
-		if (indirect_ipccall(tcp)) {
-			tprintf(", %#lx", tcp->u_arg[3]);
-		} else {
-			tprintf(", %#lx", tcp->u_arg[2]);
-		}
-	}
-	return 0;
+	tprintf("%lu, ", tcp->u_arg[0]);
+	PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
+	tprintf(", %#lx", tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2]);
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(shmat)
 {
-	if (exiting(tcp)) {
+	if (entering(tcp)) {
 		tprintf("%lu", tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
 			tprintf(", %#lx, ", tcp->u_arg[3]);
@@ -335,6 +313,8 @@ SYS_FUNC(shmat)
 			tprintf(", %#lx, ", tcp->u_arg[1]);
 			printflags(shm_flags, tcp->u_arg[2], "SHM_???");
 		}
+		return 0;
+	} else {
 		if (syserror(tcp))
 			return 0;
 		if (indirect_ipccall(tcp)) {
@@ -345,56 +325,45 @@ SYS_FUNC(shmat)
 		}
 		return RVAL_HEX;
 	}
-	return 0;
 }
 
 SYS_FUNC(shmdt)
 {
-	if (entering(tcp)) {
-		if (indirect_ipccall(tcp)) {
-			tprintf("%#lx", tcp->u_arg[3]);
-		} else {
-			tprintf("%#lx", tcp->u_arg[0]);
-		}
-	}
-	return 0;
+	tprintf("%#lx", tcp->u_arg[indirect_ipccall(tcp) ? 3 : 0]);
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(mq_open)
 {
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		/* flags */
-		tprint_open_modes(tcp->u_arg[1]);
-		if (tcp->u_arg[1] & O_CREAT) {
+	printpath(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	/* flags */
+	tprint_open_modes(tcp->u_arg[1]);
+	if (tcp->u_arg[1] & O_CREAT) {
 # ifndef HAVE_MQUEUE_H
-			tprintf(", %lx", tcp->u_arg[2]);
+		tprintf(", %lx", tcp->u_arg[2]);
 # else
-			struct mq_attr attr;
-			/* mode */
-			tprintf(", %#lo, ", tcp->u_arg[2]);
-			if (umove(tcp, tcp->u_arg[3], &attr) < 0)
-				tprints("{???}");
-			else
-				tprintf("{mq_maxmsg=%ld, mq_msgsize=%ld}",
-					(long) attr.mq_maxmsg,
-					(long) attr.mq_msgsize);
+		struct mq_attr attr;
+		/* mode */
+		tprintf(", %#lo, ", tcp->u_arg[2]);
+		if (umove(tcp, tcp->u_arg[3], &attr) < 0)
+			tprints("{???}");
+		else
+			tprintf("{mq_maxmsg=%ld, mq_msgsize=%ld}",
+				(long) attr.mq_maxmsg,
+				(long) attr.mq_msgsize);
 # endif
-		}
 	}
-	return 0;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(mq_timedsend)
 {
-	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
-		printtv(tcp, tcp->u_arg[4]);
-	}
-	return 0;
+	tprintf("%ld, ", tcp->u_arg[0]);
+	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
+	printtv(tcp, tcp->u_arg[4]);
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(mq_timedreceive)
@@ -411,11 +380,9 @@ SYS_FUNC(mq_timedreceive)
 
 SYS_FUNC(mq_notify)
 {
-	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
-		printsigevent(tcp, tcp->u_arg[1]);
-	}
-	return 0;
+	tprintf("%ld, ", tcp->u_arg[0]);
+	printsigevent(tcp, tcp->u_arg[1]);
+	return RVAL_DECODED;
 }
 
 static void
