@@ -1102,7 +1102,7 @@ umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
 		tprints("NULL");
 		return -1;
 	}
-	if ((exiting(tcp) && syserror(tcp)) ||
+	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 	    umoven(tcp, addr, len, our_addr) < 0) {
 		tprintf("%#lx", addr);
 		return -1;
