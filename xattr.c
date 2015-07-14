@@ -109,14 +109,10 @@ print_xattr_list(struct tcb *tcp, unsigned long addr, unsigned long size)
 	if (syserror(tcp)) {
 		tprintf("%#lx", addr);
 	} else {
-		if (!addr) {
-			tprints("NULL");
-		} else {
-			unsigned long len =
-				(size < (unsigned long) tcp->u_rval) ?
-					size : (unsigned long) tcp->u_rval;
-			printstr(tcp, addr, len);
-		}
+		unsigned long len =
+			(size < (unsigned long) tcp->u_rval) ?
+				size : (unsigned long) tcp->u_rval;
+		printstr(tcp, addr, len);
 	}
 	tprintf(", %lu", size);
 }
