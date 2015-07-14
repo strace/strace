@@ -12,43 +12,48 @@ print_xattr_val(struct tcb *tcp,
 		unsigned long insize,
 		unsigned long size)
 {
-	char *buf;
+	char *buf = NULL;
 	unsigned int len;
 
+	tprints(", ");
+
 	if (insize == 0)
-		goto failed;
+		goto done;
 
 	len = size;
 	if (size != (unsigned long) len)
-		goto failed;
+		goto done;
 
 	if (!len) {
-		tprintf(", \"\", %ld", insize);
+		tprintf("\"\", %ld", insize);
 		return;
 	}
 
+	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)))
+		goto done;
+
 	buf = malloc(len);
 	if (!buf)
-		goto failed;
+		goto done;
 
-	if (umoven(tcp, arg, len, buf) < 0) {
+	if (umoven(tcp, addr, len, buf) < 0) {
 		free(buf);
-		goto failed;
+		buf = NULL;
+		goto done;
 	}
 
 	/* Don't print terminating NUL if there is one. */
 	if (buf[len - 1] == '\0')
 		--len;
 
-	tprints(", ");
-	print_quoted_string(buf, len, 0);
+done:
+	if (buf) {
+		print_quoted_string(buf, len, 0);
+		free(buf);
+	} else {
+		printaddr(addr);
+	}
 	tprintf(", %ld", insize);
-
-	free(buf);
-	return;
-
-failed:
-	tprintf(", 0x%lx, %ld", arg, insize);
 }
 
 SYS_FUNC(setxattr)
