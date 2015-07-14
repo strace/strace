@@ -58,28 +58,24 @@ done:
 
 SYS_FUNC(setxattr)
 {
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], -1);
-		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
-		tprints(", ");
-		printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
-	}
-	return 0;
+	printpath(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printstr(tcp, tcp->u_arg[1], -1);
+	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
+	tprints(", ");
+	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(fsetxattr)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], -1);
-		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
-		tprints(", ");
-		printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printstr(tcp, tcp->u_arg[1], -1);
+	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
+	tprints(", ");
+	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(getxattr)
@@ -144,20 +140,16 @@ SYS_FUNC(flistxattr)
 
 SYS_FUNC(removexattr)
 {
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], -1);
-	}
-	return 0;
+	printpath(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printstr(tcp, tcp->u_arg[1], -1);
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(fremovexattr)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], -1);
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printstr(tcp, tcp->u_arg[1], -1);
+	return RVAL_DECODED;
 }
