@@ -7,8 +7,8 @@
 #include "xlat/xattrflags.h"
 
 static void
-print_xattr_val(struct tcb *tcp, int failed,
-		unsigned long arg,
+print_xattr_val(struct tcb *tcp,
+		unsigned long addr,
 		unsigned long insize,
 		unsigned long size)
 {
@@ -57,7 +57,7 @@ SYS_FUNC(setxattr)
 		printpath(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
-		print_xattr_val(tcp, 0, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
+		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
 		tprints(", ");
 		printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
 	}
@@ -70,7 +70,7 @@ SYS_FUNC(fsetxattr)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
-		print_xattr_val(tcp, 0, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
+		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
 		tprints(", ");
 		printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
 	}
@@ -84,8 +84,7 @@ SYS_FUNC(getxattr)
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
 	} else {
-		print_xattr_val(tcp, syserror(tcp), tcp->u_arg[2], tcp->u_arg[3],
-				tcp->u_rval);
+		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_rval);
 	}
 	return 0;
 }
@@ -97,8 +96,7 @@ SYS_FUNC(fgetxattr)
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[1], -1);
 	} else {
-		print_xattr_val(tcp, syserror(tcp), tcp->u_arg[2], tcp->u_arg[3],
-				tcp->u_rval);
+		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_rval);
 	}
 	return 0;
 }
