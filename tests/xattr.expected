@@ -1,0 +1,2 @@
+removexattr\("\.", "strace\.test"\) += -1 .*
+setxattr\("\.", "strace\.test", "foo\\0bar", 8, XATTR_CREATE\) += -1 .*

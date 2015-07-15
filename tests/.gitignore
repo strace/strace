@@ -33,6 +33,7 @@ uio
 umovestr
 umovestr2
 unix-pair-send-recv
+xattr
 *.log
 *.log.*
 *.o

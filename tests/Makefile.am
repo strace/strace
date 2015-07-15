@@ -43,7 +43,8 @@ check_PROGRAMS = \
 	uio \
 	umovestr \
 	umovestr2 \
-	unix-pair-send-recv
+	unix-pair-send-recv \
+	xattr
 
 filter_unavailable_LDFLAGS = -pthread
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -94,6 +95,7 @@ TESTS = \
 	uid16.test \
 	uid32.test \
 	uio.test \
+	xattr.test \
 	count.test \
 	detach-sleeping.test \
 	detach-stopped.test \
@@ -134,6 +136,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     umovestr.expected \
 	     unix-yy-accept.awk \
 	     unix-yy-connect.awk \
+	     xattr.expected \
 	     $(TESTS)
 
 CLEANFILES = $(TESTS:=.tmp)
