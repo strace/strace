@@ -9,11 +9,7 @@ SYS_FUNC(uname)
 	if (entering(tcp))
 		return 0;
 
-	if (syserror(tcp) || !verbose(tcp))
-		tprintf("%#lx", tcp->u_arg[0]);
-	else if (umove(tcp, tcp->u_arg[0], &uname) < 0)
-		tprints("{...}");
-	else {
+	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &uname)) {
 #define PRINT_UTS_MEMBER(prefix, member) \
 		tprints(prefix #member "="); \
 		print_quoted_string(uname.member, sizeof(uname.member), \
