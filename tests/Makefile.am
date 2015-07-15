@@ -44,6 +44,7 @@ check_PROGRAMS = \
 	umovestr \
 	umovestr2 \
 	unix-pair-send-recv \
+	utime \
 	xattr
 
 filter_unavailable_LDFLAGS = -pthread
@@ -95,6 +96,7 @@ TESTS = \
 	uid16.test \
 	uid32.test \
 	uio.test \
+	utime.test \
 	xattr.test \
 	count.test \
 	detach-sleeping.test \

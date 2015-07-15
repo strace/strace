@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Check decoding of utime syscall.
+
+. "${srcdir=.}/init.sh"
+
+$STRACE -e utime -h > /dev/null ||
+	        skip_ 'utime syscall is not supported on this architecture'
+
+OUT="$LOG.out"
+run_prog > /dev/null
+run_strace -e utime $args > "$OUT"
+
+check_prog grep
+LC_ALL=C grep -x "utime(.*" "$LOG" > /dev/null || {
+	rm -f "$OUT"
+	skip_ 'test executable does not use utime syscall'
+}
+match_grep "$LOG" "$OUT"
+
+rm -f "$OUT"
+
+exit 0
