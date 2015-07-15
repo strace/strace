@@ -66,24 +66,20 @@ get_print_uid(struct tcb *tcp, const char *prefix, const long addr)
 {
 	uid_t uid;
 
-	if (umove(tcp, addr, &uid) < 0)
-		tprintf("%s%#lx", prefix, addr);
-	else
-		tprintf("%s[%u]", prefix, uid);
+	tprints(prefix);
+	if (!umove_or_printaddr(tcp, addr, &uid))
+		tprintf("[%u]", uid);
 }
 
 SYS_FUNC(getresuid)
 {
-	if (exiting(tcp)) {
-		if (syserror(tcp)) {
-			tprintf("%#lx, %#lx, %#lx", tcp->u_arg[0],
-				tcp->u_arg[1], tcp->u_arg[2]);
-		} else {
-			get_print_uid(tcp, "", tcp->u_arg[0]);
-			get_print_uid(tcp, ", ", tcp->u_arg[1]);
-			get_print_uid(tcp, ", ", tcp->u_arg[2]);
-		}
-	}
+	if (entering(tcp))
+		return 0;
+
+	get_print_uid(tcp, "", tcp->u_arg[0]);
+	get_print_uid(tcp, ", ", tcp->u_arg[1]);
+	get_print_uid(tcp, ", ", tcp->u_arg[2]);
+
 	return 0;
 }
 
@@ -138,25 +134,22 @@ printuid(const char *text, const unsigned int uid)
 SYS_FUNC(setgroups)
 {
 	if (entering(tcp)) {
-		unsigned long len, size, start, cur, end, abbrev_end;
+		unsigned long cur, abbrev_end;
 		uid_t gid;
 		int failed = 0;
+		const unsigned long len = tcp->u_arg[0];
+		const unsigned long start = tcp->u_arg[1];
+		const unsigned long size = len * sizeof(gid);
+		const unsigned long end = start + size;
 
-		len = tcp->u_arg[0];
 		tprintf("%lu, ", len);
 		if (len == 0) {
 			tprints("[]");
 			return 0;
 		}
-		start = tcp->u_arg[1];
-		if (start == 0) {
-			tprints("NULL");
-			return 0;
-		}
-		size = len * sizeof(gid);
-		end = start + size;
-		if (!verbose(tcp) || size / sizeof(gid) != len || end < start) {
-			tprintf("%#lx", start);
+		if (!start || !verbose(tcp) ||
+		    size / sizeof(gid) != len || end < start) {
+			printaddr(start);
 			return 0;
 		}
 		if (abbrev(tcp)) {
@@ -182,39 +175,38 @@ SYS_FUNC(setgroups)
 			tprintf("%u", (unsigned int) gid);
 		}
 		tprints("]");
-		if (failed)
-			tprintf(" %#lx", tcp->u_arg[1]);
+		if (failed) {
+			tprints(" ");
+			printaddr(start);
+		}
 	}
 	return 0;
 }
 
 SYS_FUNC(getgroups)
 {
-	unsigned long len;
-
 	if (entering(tcp)) {
-		len = tcp->u_arg[0];
-		tprintf("%lu, ", len);
+		tprintf("%lu, ", tcp->u_arg[0]);
 	} else {
-		unsigned long size, start, cur, end, abbrev_end;
+		unsigned long cur, abbrev_end;
 		uid_t gid;
 		int failed = 0;
+		const unsigned long len = tcp->u_rval;
+		const unsigned long size = len * sizeof(gid);
+		const unsigned long start = tcp->u_arg[1];
+		const unsigned long end = start + size;
 
-		start = tcp->u_arg[1];
-		if (start == 0) {
-			tprints("NULL");
+		if (!start) {
+			printaddr(start);
 			return 0;
 		}
-		len = tcp->u_rval;
 		if (len == 0) {
 			tprints("[]");
 			return 0;
 		}
-		size = len * sizeof(gid);
-		end = start + size;
-		if (!verbose(tcp) || tcp->u_arg[0] == 0 ||
+		if (!verbose(tcp) || syserror(tcp) ||
 		    size / sizeof(gid) != len || end < start) {
-			tprintf("%#lx", start);
+			printaddr(start);
 			return 0;
 		}
 		if (abbrev(tcp)) {
@@ -240,8 +232,10 @@ SYS_FUNC(getgroups)
 			tprintf("%u", (unsigned int) gid);
 		}
 		tprints("]");
-		if (failed)
-			tprintf(" %#lx", tcp->u_arg[1]);
+		if (failed) {
+			tprints(" ");
+			printaddr(start);
+		}
 	}
 	return 0;
 }
