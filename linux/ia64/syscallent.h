@@ -516,7 +516,7 @@
 [1303] = { 4,	TD,		SEN(fallocate),			"fallocate"		},
 [1304] = { 3,	0,		SEN(getcpu),			"getcpu"		},
 [1305] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
-[1306] = { },
+[1306] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
 [1307] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [1308] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
 [1309] = { 1,	TD,		SEN(eventfd),			"eventfd"		},
