@@ -14,12 +14,8 @@ SYS_FUNC(utime)
 		tprints(", ");
 
 		wordsize = current_wordsize;
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (!verbose(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umoven(tcp, tcp->u_arg[1], 2 * wordsize, &u) < 0)
-			tprints("[?, ?]");
+		if (umoven_or_printaddr(tcp, tcp->u_arg[1], 2 * wordsize, &u))
+			;
 		else if (wordsize == sizeof u.utl[0]) {
 			tprintf("[%s,", sprinttime(u.utl[0]));
 			tprintf(" %s]", sprinttime(u.utl[1]));
