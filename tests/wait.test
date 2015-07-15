@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check wait4 and waitid syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -v -e wait4,waitid $args
+match_grep
+
+exit 0

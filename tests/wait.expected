@@ -1,0 +1,11 @@
+wait4\([[:digit:]]+, 0x[[:xdigit:]]+, WNOHANG\|__WALL, NULL\) += 0
+waitid\(P_PID, [[:digit:]]+, \{\}, WNOHANG\|WEXITED, NULL\) += 0
+wait4\([[:digit:]]+, \[\{WIFEXITED\(s\) && WEXITSTATUS\(s\) == 42\}\], 0, \{ru_utime=\{[[:digit:]], [[:digit:]]+\}, ru_stime=\{[[:digit:]], [[:digit:]]+\}, ru_maxrss=[[:digit:]]+, ru_ixrss=0, ru_idrss=0, ru_isrss=0, ru_minflt=[[:digit:]]+, ru_majflt=[[:digit:]]+, ru_nswap=0, ru_inblock=[[:digit:]]+, ru_oublock=[[:digit:]]+, ru_msgsnd=0, ru_msgrcv=0, ru_nsignals=0, ru_nvcsw=[[:digit:]]+, ru_nivcsw=[[:digit:]]+\}\) += [[:digit:]]+
+--- SIGCHLD \{si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=[[:digit:]]+, si_uid=[[:digit:]]+, si_status=42, si_utime=[[:digit:]], si_stime=[[:digit:]]} ---
+wait4\([[:digit:]]+, \[\{WIFSIGNALED\(s\) && WTERMSIG\(s\) == SIGUSR1\}\], __WALL, NULL\) += [[:digit:]]+
+--- SIGCHLD \{si_signo=SIGCHLD, si_code=CLD_KILLED, si_pid=[[:digit:]]+, si_uid=[[:digit:]]+, si_status=SIGUSR1, si_utime=[[:digit:]], si_stime=[[:digit:]]\} ---
+wait4\([[:digit:]]+, \[\{WIFSTOPPED\(s\) && WSTOPSIG\(s\) == SIGSTOP\}\], WSTOPPED, NULL\) += [[:digit:]]+
+--- SIGCHLD \{si_signo=SIGCHLD, si_code=CLD_STOPPED, si_pid=[[:digit:]]+, si_uid=[[:digit:]]+, si_status=SIGSTOP, si_utime=[[:digit:]], si_stime=[[:digit:]]\} ---
+--- SIGCHLD \{si_signo=SIGCHLD, si_code=CLD_CONTINUED, si_pid=[[:digit:]]+, si_uid=[[:digit:]]+, si_status=SIGCONT, si_utime=[[:digit:]], si_stime=[[:digit:]]\} ---
+waitid\(P_PID, [[:digit:]]+, \{si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=[[:digit:]]+, si_uid=[[:digit:]]+, si_status=0, si_utime=[[:digit:]], si_stime=[[:digit:]]\}, WEXITED\|WSTOPPED, NULL\) += 0
+wait4\(-1, 0x[[:xdigit:]]+, WNOHANG\|WSTOPPED\|__WALL, 0x[[:xdigit:]]+\) += -1 ECHILD .*

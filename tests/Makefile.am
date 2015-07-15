@@ -66,6 +66,7 @@ check_PROGRAMS = \
 	unix-pair-send-recv \
 	utime \
 	utimensat \
+	wait \
 	xattr \
 	xet_robust_list \
 	# end of check_PROGRAMS
@@ -139,6 +140,7 @@ TESTS = \
 	uio.test \
 	utime.test \
 	utimensat.test \
+	wait.test \
 	xattr.test \
 	xet_robust_list.test \
 	count.test \
@@ -191,6 +193,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     umovestr.expected \
 	     unix-yy-accept.awk \
 	     unix-yy-connect.awk \
+	     wait.expected \
 	     xattr.expected \
 	     $(TESTS)
 
