@@ -51,6 +51,7 @@ umovestr
 umovestr2
 unix-pair-send-recv
 utime
+utimensat
 xattr
 xet_robust_list
 *.log

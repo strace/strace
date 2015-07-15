@@ -64,6 +64,7 @@ check_PROGRAMS = \
 	umovestr2 \
 	unix-pair-send-recv \
 	utime \
+	utimensat \
 	xattr \
 	xet_robust_list \
 	# end of check_PROGRAMS
@@ -135,6 +136,7 @@ TESTS = \
 	uid32.test \
 	uio.test \
 	utime.test \
+	utimensat.test \
 	xattr.test \
 	xet_robust_list.test \
 	count.test \

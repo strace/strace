@@ -256,6 +256,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	stpcpy
 	strerror
 	strsignal
+	utimensat
 ]))
 AC_CHECK_HEADERS(m4_normalize([
 	asm/cachectl.h
