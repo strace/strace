@@ -9,14 +9,14 @@ decode_utimes(struct tcb *tcp, int offset, int special)
 		if (tcp->u_arg[offset + 1] == 0)
 			tprints("NULL");
 		else {
-			tprints("{");
+			tprints("[");
 			printtv_bitness(tcp, tcp->u_arg[offset + 1],
 					BITNESS_CURRENT, special);
 			tprints(", ");
 			printtv_bitness(tcp, tcp->u_arg[offset + 1]
 					+ sizeof(struct timeval),
 					BITNESS_CURRENT, special);
-			tprints("}");
+			tprints("]");
 		}
 	}
 	return 0;
