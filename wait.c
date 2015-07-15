@@ -98,13 +98,9 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 		tprintf("%d, ", pid);
 	} else {
 		/* status */
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (syserror(tcp) || tcp->u_rval == 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else if (umove(tcp, tcp->u_arg[1], &status) < 0)
-			tprints("[?]");
-		else
+		if (tcp->u_rval == 0)
+			printaddr(tcp->u_arg[1]);
+		else if (!umove_or_printaddr(tcp, tcp->u_arg[1], &status))
 			printstatus(status);
 		/* options */
 		tprints(", ");
@@ -112,9 +108,7 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 		if (n == 4) {
 			tprints(", ");
 			/* usage */
-			if (!tcp->u_arg[3])
-				tprints("NULL");
-			else if (tcp->u_rval > 0) {
+			if (tcp->u_rval > 0) {
 #ifdef ALPHA
 				if (bitness)
 					printrusage32(tcp, tcp->u_arg[3]);
@@ -123,7 +117,7 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 					printrusage(tcp, tcp->u_arg[3]);
 			}
 			else
-				tprintf("%#lx", tcp->u_arg[3]);
+				printaddr(tcp->u_arg[3]);
 		}
 	}
 	return 0;
@@ -153,8 +147,7 @@ SYS_FUNC(waitid)
 	if (entering(tcp)) {
 		printxval(waitid_types, tcp->u_arg[0], "P_???");
 		tprintf(", %ld, ", tcp->u_arg[1]);
-	}
-	else {
+	} else {
 		/* siginfo */
 		printsiginfo_at(tcp, tcp->u_arg[2]);
 		/* options */
@@ -163,12 +156,7 @@ SYS_FUNC(waitid)
 		if (tcp->s_ent->nargs > 4) {
 			/* usage */
 			tprints(", ");
-			if (!tcp->u_arg[4])
-				tprints("NULL");
-			else if (tcp->u_error)
-				tprintf("%#lx", tcp->u_arg[4]);
-			else
-				printrusage(tcp, tcp->u_arg[4]);
+			printrusage(tcp, tcp->u_arg[4]);
 		}
 	}
 	return 0;
