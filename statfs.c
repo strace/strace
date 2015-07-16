@@ -24,14 +24,8 @@ printstatfs(struct tcb *tcp, const long addr)
 {
 	struct statfs statbuf;
 
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
+	if (umove_or_printaddr(tcp, addr, &statbuf))
 		return;
-	}
-	if (umove(tcp, addr, &statbuf) < 0) {
-		tprints("{...}");
-		return;
-	}
 	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%lu, f_bfree=%lu, ",
 		sprintfstype(statbuf.f_type),
 		(unsigned long)statbuf.f_bsize,
@@ -80,14 +74,8 @@ printstatfs64(struct tcb *tcp, long addr)
 {
 	struct statfs64 statbuf;
 
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
+	if (umove_or_printaddr(tcp, addr, &statbuf))
 		return;
-	}
-	if (umove(tcp, addr, &statbuf) < 0) {
-		tprints("{...}");
-		return;
-	}
 	tprintf("{f_type=%s, f_bsize=%llu, f_blocks=%llu, f_bfree=%llu, ",
 		sprintfstype(statbuf.f_type),
 		(unsigned long long)statbuf.f_bsize,
@@ -136,14 +124,8 @@ printcompat_statfs64(struct tcb *tcp, const long addr)
 {
 	struct compat_statfs64 statbuf;
 
-	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx", addr);
+	if (umove_or_printaddr(tcp, addr, &statbuf))
 		return;
-	}
-	if (umove(tcp, addr, &statbuf) < 0) {
-		tprints("{...}");
-		return;
-	}
 	tprintf("{f_type=%s, f_bsize=%lu, f_blocks=%llu, f_bfree=%llu, ",
 		sprintfstype(statbuf.f_type),
 		(unsigned long)statbuf.f_bsize,
