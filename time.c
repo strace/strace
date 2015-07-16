@@ -188,23 +188,21 @@ SYS_FUNC(osf_gettimeofday)
 
 SYS_FUNC(settimeofday)
 {
-	if (entering(tcp)) {
-		printtv(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printtv(tcp, tcp->u_arg[1]);
-	}
-	return 0;
+	printtv(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printtv(tcp, tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 #ifdef ALPHA
 SYS_FUNC(osf_settimeofday)
 {
-	if (entering(tcp)) {
-		printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
-		tprints(", ");
-		printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
-	}
-	return 0;
+	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
+	tprints(", ");
+	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
+
+	return RVAL_DECODED;
 }
 #endif
 
@@ -474,12 +472,11 @@ printclockname(int clockid)
 
 SYS_FUNC(clock_settime)
 {
-	if (entering(tcp)) {
-		printclockname(tcp->u_arg[0]);
-		tprints(", ");
-		printtv(tcp, tcp->u_arg[1]);
-	}
-	return 0;
+	printclockname(tcp->u_arg[0]);
+	tprints(", ");
+	printtv(tcp, tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(clock_gettime)
@@ -641,40 +638,37 @@ SYS_FUNC(timer_gettime)
 
 SYS_FUNC(timerfd)
 {
-	if (entering(tcp)) {
-		/* It does not matter that the kernel uses itimerspec.  */
-		tprintf("%ld, ", tcp->u_arg[0]);
-		printclockname(tcp->u_arg[0]);
-		tprints(", ");
-		printflags(timerfdflags, tcp->u_arg[2], "TFD_???");
-		tprints(", ");
-		printitv(tcp, tcp->u_arg[3]);
-	}
-	return 0;
+	/* It does not matter that the kernel uses itimerspec.  */
+	tprintf("%ld, ", tcp->u_arg[0]);
+	printclockname(tcp->u_arg[0]);
+	tprints(", ");
+	printflags(timerfdflags, tcp->u_arg[2], "TFD_???");
+	tprints(", ");
+	printitv(tcp, tcp->u_arg[3]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(timerfd_create)
 {
-	if (entering(tcp)) {
-		printclockname(tcp->u_arg[0]);
-		tprints(", ");
-		printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
-	}
-	return 0;
+	printclockname(tcp->u_arg[0]);
+	tprints(", ");
+	printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(timerfd_settime)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
-		tprints(", ");
-		printitv(tcp, tcp->u_arg[2]);
-		tprints(", ");
-		printitv(tcp, tcp->u_arg[3]);
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
+	tprints(", ");
+	printitv(tcp, tcp->u_arg[2]);
+	tprints(", ");
+	printitv(tcp, tcp->u_arg[3]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(timerfd_gettime)
@@ -682,6 +676,7 @@ SYS_FUNC(timerfd_gettime)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
+	} else {
 		printitv(tcp, tcp->u_arg[1]);
 	}
 	return 0;
