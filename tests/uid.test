@@ -9,7 +9,17 @@ w="${uid_t_size-}"
 
 run_prog ./uid$s$w
 
-syscalls="getuid$s,setuid$s,getresuid$s,setreuid$s,setresuid$s,fchown$s,getgroups$s"
+syscalls=
+for n in "getuid$s" "getxuid$s"; do
+	if $STRACE -e "$n" -h > /dev/null; then
+		syscalls="$n"
+		break
+	fi
+done
+test -n "$syscalls" ||
+        fail_ "neither getuid$s nor getxuid$s is supported on this architecture"
+
+syscalls="$syscalls,setuid$s,getresuid$s,setreuid$s,setresuid$s,fchown$s,getgroups$s"
 run_strace -e trace="$syscalls" $args
 
 AWK=gawk

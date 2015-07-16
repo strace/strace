@@ -9,7 +9,7 @@
 int
 main(void)
 {
-#if defined(__NR_getuid) \
+#if (defined __NR_getuid || defined __NR_getxuid) \
  && defined(__NR_setuid) \
  && defined(__NR_getresuid) \
  && defined(__NR_setreuid) \
@@ -20,6 +20,9 @@ main(void)
 	int size;
 	int *list = 0;
 
+#ifndef __NR_getuid
+# define __NR_getuid __NR_getxuid
+#endif
 	uid = syscall(__NR_getuid);
 	assert(syscall(__NR_setuid, uid) == 0);
 	{

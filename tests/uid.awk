@@ -1,6 +1,6 @@
 BEGIN {
   r_uint = "(0|[1-9][0-9]*)"
-  regexp = "^getuid" suffix "\\(\\)[[:space:]]+= " r_uint "$"
+  regexp = "^getx?uid" suffix "\\(\\)[[:space:]]+= " r_uint "$"
   expected = "getuid"
   fail = 0
 }
