@@ -34,11 +34,9 @@ SYS_FUNC(syslog)
 				return 0;
 			break;
 		default:
-			if (entering(tcp)) {
-				printaddr(tcp->u_arg[1]);
-				tprintf(", %lu", tcp->u_arg[2]);
-			}
-			return 0;
+			printaddr(tcp->u_arg[1]);
+			tprintf(", %lu", tcp->u_arg[2]);
+			return RVAL_DECODED;
 	}
 
 	/* bufp */
