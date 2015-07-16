@@ -95,7 +95,7 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 	if (addr == 0)
 		return stpcpy(buf, "NULL");
 
-	if (!verbose(tcp))
+	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)))
 		return buf + sprintf(buf, "%#lx", addr);
 
 	if (bitness == BITNESS_32 || current_time_t_is_compat)
@@ -111,7 +111,7 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 			return do_sprinttv(buf, tv.tv_sec, tv.tv_usec, special);
 	}
 
-	return stpcpy(buf, "{...}");
+	return buf + sprintf(buf, "%#lx", addr);
 }
 
 void
@@ -167,10 +167,6 @@ SYS_FUNC(time)
 SYS_FUNC(gettimeofday)
 {
 	if (exiting(tcp)) {
-		if (syserror(tcp)) {
-			tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-			return 0;
-		}
 		printtv(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		printtv(tcp, tcp->u_arg[1]);
@@ -182,10 +178,6 @@ SYS_FUNC(gettimeofday)
 SYS_FUNC(osf_gettimeofday)
 {
 	if (exiting(tcp)) {
-		if (syserror(tcp)) {
-			tprintf("%#lx, %#lx", tcp->u_arg[0], tcp->u_arg[1]);
-			return 0;
-		}
 		printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
 		tprints(", ");
 		printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
@@ -222,10 +214,7 @@ SYS_FUNC(adjtime)
 		printtv(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			printtv(tcp, tcp->u_arg[1]);
+		printtv(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -532,10 +521,7 @@ SYS_FUNC(clock_gettime)
 		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			printtv(tcp, tcp->u_arg[1]);
+		printtv(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -550,10 +536,7 @@ SYS_FUNC(clock_nanosleep)
 		printtv(tcp, tcp->u_arg[2]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[3]);
-		else
-			printtv(tcp, tcp->u_arg[3]);
+		printtv(tcp, tcp->u_arg[3]);
 	}
 	return 0;
 }
