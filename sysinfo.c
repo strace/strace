@@ -8,10 +8,7 @@ SYS_FUNC(sysinfo)
 	if (entering(tcp))
 		return 0;
 
-	if (syserror(tcp) || !verbose(tcp) ||
-	    umove(tcp, tcp->u_arg[0], &si) < 0) {
-		tprintf("%#lx", tcp->u_arg[0]);
-	} else {
+	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &si)) {
 		tprintf("{uptime=%llu"
 			", loads=[%llu, %llu, %llu]"
 			", totalram=%llu"
