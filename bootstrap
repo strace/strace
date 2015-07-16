@@ -1,15 +1,16 @@
 #!/bin/sh -eu
 
 for m in -m32 -mx32; do
-	mkdir -p tests$m
-	find tests$m -type l -delete
+	tests=tests$m
+	rm -rf $tests
+	mkdir $tests
 	sed "s/^AM_CFLAGS[[:space:]]*=.*/& $m/" \
-		tests/Makefile.am > tests$m/Makefile.am
+		tests/Makefile.am > $tests/Makefile.am
 	for f in tests/*; do
 		case "${f##*/}" in
 		Makefile*) continue;;
 		esac
-		ln -s ../"$f" tests$m/
+		ln -s ../"$f" $tests/
 	done
 done
 
