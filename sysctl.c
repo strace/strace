@@ -20,8 +20,8 @@ SYS_FUNC(sysctl)
 	int *name;
 	unsigned long size;
 
-	if (umove(tcp, tcp->u_arg[0], &info) < 0)
-		return printargs(tcp);
+	if (umove_or_printaddr(tcp, tcp->u_arg[0], &info))
+		return RVAL_DECODED;
 
 	size = sizeof(int) * (unsigned long) info.nlen;
 	name = (size / sizeof(int) != (unsigned long) info.nlen) ? NULL : malloc(size);
@@ -32,7 +32,7 @@ SYS_FUNC(sysctl)
 			tprintf("{%p, %d, %p, %p, %p, %lu}",
 				info.name, info.nlen, info.oldval,
 				info.oldlenp, info.newval, (unsigned long)info.newlen);
-		return 0;
+		return RVAL_DECODED;
 	}
 
 	if (entering(tcp)) {
