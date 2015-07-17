@@ -52,9 +52,9 @@ print_sg_io_buffer(struct tcb *tcp, unsigned long addr, const unsigned int len)
 	if (len == 0)
 		goto out;
 	allocated = (len > max_strlen) ? max_strlen : len;
-	if ((buf = malloc(allocated)) == NULL ||
-	    umoven(tcp, addr, allocated, buf) < 0) {
-		tprintf("%#lx", addr);
+	buf = malloc(allocated);
+	if (!buf || umoven(tcp, addr, allocated, buf) < 0) {
+		printaddr(addr);
 		goto out;
 	}
 	tprintf("%02x", buf[0]);
