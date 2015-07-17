@@ -198,21 +198,15 @@ prctl_exit(struct tcb *tcp)
 
 	case PR_GET_NAME:
 		tprints(", ");
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
+		if (syserror(tcp))
+			printaddr(tcp->u_arg[1]);
 		else
 			printstr(tcp, tcp->u_arg[1], -1);
 		break;
 
 	case PR_GET_PDEATHSIG:
 		tprints(", ");
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (syserror(tcp) || umove(tcp, tcp->u_arg[1], &i) < 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else {
+		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &i)) {
 			tprints("[");
 			tprints(signame(i));
 			tprints("]");
@@ -232,11 +226,7 @@ prctl_exit(struct tcb *tcp)
 
 	case PR_GET_TSC:
 		tprints(", ");
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (syserror(tcp) || umove(tcp, tcp->u_arg[1], &i) < 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else {
+		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &i)) {
 			tprints("[");
 			printxval(pr_tsc, i, "PR_TSC_???");
 			tprints("]");
@@ -245,11 +235,7 @@ prctl_exit(struct tcb *tcp)
 
 	case PR_GET_UNALIGN:
 		tprints(", ");
-		if (!tcp->u_arg[1])
-			tprints("NULL");
-		else if (syserror(tcp) || umove(tcp, tcp->u_arg[1], &i) < 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else {
+		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &i)) {
 			tprints("[");
 			printflags(pr_unalign_flags, i, "PR_UNALIGN_???");
 			tprints("]");
