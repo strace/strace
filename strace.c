@@ -32,6 +32,7 @@
 #include <stdarg.h>
 #include <sys/param.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
@@ -44,6 +45,7 @@
 #endif
 
 #include "ptrace.h"
+#include "printsiginfo.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;

@@ -79,6 +79,7 @@ strace_SOURCES =	\
 	printmode.c	\
 	printrusage.c	\
 	printsiginfo.c	\
+	printsiginfo.h	\
 	printstat.h	\
 	process.c	\
 	process_vm.c	\

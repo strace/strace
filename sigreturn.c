@@ -1,4 +1,5 @@
 #include "defs.h"
+#include <signal.h>
 #include "regs.h"
 #include "ptrace.h"
 

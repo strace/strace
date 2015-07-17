@@ -32,6 +32,7 @@
  */
 
 #include "defs.h"
+#include <signal.h>
 
 #ifndef NSIG
 # warning NSIG is not defined, using 32

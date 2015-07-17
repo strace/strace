@@ -1,4 +1,7 @@
 #include "defs.h"
+
+#include <signal.h>
+
 #include "xlat/sigaltstack_flags.h"
 
 static void

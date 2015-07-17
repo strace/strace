@@ -1,5 +1,9 @@
 #include "defs.h"
 
+#include <signal.h>
+
+#include "printsiginfo.h"
+
 #include "xlat/sigbus_codes.h"
 #include "xlat/sigchld_codes.h"
 #include "xlat/sigfpe_codes.h"

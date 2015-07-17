@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include <fcntl.h>
+#include <signal.h>
 #include <linux/version.h>
 #include <sys/timex.h>
 
