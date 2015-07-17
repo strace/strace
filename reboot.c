@@ -6,9 +6,6 @@
 
 SYS_FUNC(reboot)
 {
-	if (exiting(tcp))
-		return 0;
-
 	printflags(bootflags1, tcp->u_arg[0], "LINUX_REBOOT_MAGIC_???");
 	tprints(", ");
 	printflags(bootflags2, tcp->u_arg[1], "LINUX_REBOOT_MAGIC_???");
@@ -18,5 +15,5 @@ SYS_FUNC(reboot)
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[3], -1);
 	}
-	return 0;
+	return RVAL_DECODED;
 }
