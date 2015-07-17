@@ -18,13 +18,12 @@ SYS_FUNC(sched_getscheduler)
 
 SYS_FUNC(sched_setscheduler)
 {
-	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
-		printxval(schedulers, tcp->u_arg[1], "SCHED_???");
-		tprints(", ");
-		printnum_int(tcp, tcp->u_arg[2], "%d");
-	}
-	return 0;
+	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printxval(schedulers, tcp->u_arg[1], "SCHED_???");
+	tprints(", ");
+	printnum_int(tcp, tcp->u_arg[2], "%d");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(sched_getparam)
@@ -38,19 +37,17 @@ SYS_FUNC(sched_getparam)
 
 SYS_FUNC(sched_setparam)
 {
-	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
-		printnum_int(tcp, tcp->u_arg[1], "%d");
-	}
-	return 0;
+	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printnum_int(tcp, tcp->u_arg[1], "%d");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(sched_get_priority_min)
 {
-	if (entering(tcp)) {
-		printxval(schedulers, tcp->u_arg[0], "SCHED_???");
-	}
-	return 0;
+	printxval(schedulers, tcp->u_arg[0], "SCHED_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(sched_rr_get_interval)
