@@ -134,12 +134,11 @@ SYS_FUNC(getrlimit)
 
 SYS_FUNC(setrlimit)
 {
-	if (entering(tcp)) {
-		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
-		tprints(", ");
-		decode_rlimit(tcp, tcp->u_arg[1]);
-	}
-	return 0;
+	printxval(resources, tcp->u_arg[0], "RLIMIT_???");
+	tprints(", ");
+	decode_rlimit(tcp, tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(prlimit64)
@@ -271,20 +270,18 @@ SYS_FUNC(osf_getrusage)
 
 SYS_FUNC(getpriority)
 {
-	if (entering(tcp)) {
-		printxval(priorities, tcp->u_arg[0], "PRIO_???");
-		tprintf(", %lu", tcp->u_arg[1]);
-	}
-	return 0;
+	printxval(priorities, tcp->u_arg[0], "PRIO_???");
+	tprintf(", %lu", tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(setpriority)
 {
-	if (entering(tcp)) {
-		printxval(priorities, tcp->u_arg[0], "PRIO_???");
-		tprintf(", %lu, %ld", tcp->u_arg[1], tcp->u_arg[2]);
-	}
-	return 0;
+	printxval(priorities, tcp->u_arg[0], "PRIO_???");
+	tprintf(", %lu, %d", tcp->u_arg[1], (int) tcp->u_arg[2]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(times)
