@@ -12,10 +12,9 @@ decode_renameat(struct tcb *tcp)
 
 SYS_FUNC(renameat)
 {
-	if (entering(tcp)) {
-		decode_renameat(tcp);
-	}
-	return 0;
+	decode_renameat(tcp);
+
+	return RVAL_DECODED;
 }
 
 #include <linux/fs.h>
@@ -23,10 +22,9 @@ SYS_FUNC(renameat)
 
 SYS_FUNC(renameat2)
 {
-	if (entering(tcp)) {
-		decode_renameat(tcp);
-		tprints(", ");
-		printflags(rename_flags, tcp->u_arg[4], "RENAME_??");
-	}
-	return 0;
+	decode_renameat(tcp);
+	tprints(", ");
+	printflags(rename_flags, tcp->u_arg[4], "RENAME_??");
+
+	return RVAL_DECODED;
 }
