@@ -103,8 +103,7 @@ SYS_FUNC(open)
 
 SYS_FUNC(openat)
 {
-	if (entering(tcp))
-		print_dirfd(tcp, tcp->u_arg[0]);
+	print_dirfd(tcp, tcp->u_arg[0]);
 	return decode_open(tcp, 1);
 }
 
