@@ -8,7 +8,7 @@ decode_readlink(struct tcb *tcp, int offset)
 		tprints(", ");
 	} else {
 		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[offset + 1]);
+			printaddr(tcp->u_arg[offset + 1]);
 		else
 			/* Used to use printpathn(), but readlink
 			 * neither includes NUL in the returned count,
