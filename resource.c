@@ -58,24 +58,10 @@ print_rlimit64(struct tcb *tcp, unsigned long addr)
 		uint64_t rlim_max;
 	} rlim;
 
-	if (umove(tcp, addr, &rlim) < 0)
-		tprintf("%#lx", addr);
-	else {
+	if (!umove_or_printaddr(tcp, addr, &rlim)) {
 		tprintf("{rlim_cur=%s,", sprint_rlim64(rlim.rlim_cur));
 		tprintf(" rlim_max=%s}", sprint_rlim64(rlim.rlim_max));
 	}
-}
-
-static void
-decode_rlimit64(struct tcb *tcp, unsigned long addr)
-{
-	if (!addr)
-		tprints("NULL");
-	else if (!verbose(tcp) ||
-		 (exiting(tcp) && syserror(tcp)))
-		tprintf("%#lx", addr);
-	else
-		print_rlimit64(tcp, addr);
 }
 
 #if !defined(current_wordsize) || current_wordsize == 4
@@ -103,9 +89,7 @@ print_rlimit32(struct tcb *tcp, unsigned long addr)
 		uint32_t rlim_max;
 	} rlim;
 
-	if (umove(tcp, addr, &rlim) < 0)
-		tprintf("%#lx", addr);
-	else {
+	if (!umove_or_printaddr(tcp, addr, &rlim)) {
 		tprintf("{rlim_cur=%s,", sprint_rlim32(rlim.rlim_cur));
 		tprintf(" rlim_max=%s}", sprint_rlim32(rlim.rlim_max));
 	}
@@ -114,31 +98,25 @@ print_rlimit32(struct tcb *tcp, unsigned long addr)
 static void
 decode_rlimit(struct tcb *tcp, unsigned long addr)
 {
-	if (!addr)
-		tprints("NULL");
-	else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)))
-		tprintf("%#lx", addr);
-	else {
 # if defined(X86_64) || defined(X32)
-		/*
-		 * i386 is the only personality on X86_64 and X32
-		 * with 32-bit rlim_t.
-		 * When current_personality is X32, current_wordsize
-		 * equals to 4 but rlim_t is 64-bit.
-		 */
-		if (current_personality == 1)
+	/*
+	 * i386 is the only personality on X86_64 and X32
+	 * with 32-bit rlim_t.
+	 * When current_personality is X32, current_wordsize
+	 * equals to 4 but rlim_t is 64-bit.
+	 */
+	if (current_personality == 1)
 # else
-		if (current_wordsize == 4)
+	if (current_wordsize == 4)
 # endif
-			print_rlimit32(tcp, addr);
-		else
-			print_rlimit64(tcp, addr);
-	}
+		print_rlimit32(tcp, addr);
+	else
+		print_rlimit64(tcp, addr);
 }
 
 #else /* defined(current_wordsize) && current_wordsize != 4 */
 
-# define decode_rlimit decode_rlimit64
+# define decode_rlimit print_rlimit64
 
 #endif
 
@@ -170,10 +148,10 @@ SYS_FUNC(prlimit64)
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printxval(resources, tcp->u_arg[1], "RLIMIT_???");
 		tprints(", ");
-		decode_rlimit64(tcp, tcp->u_arg[2]);
+		print_rlimit64(tcp, tcp->u_arg[2]);
 		tprints(", ");
 	} else {
-		decode_rlimit64(tcp, tcp->u_arg[3]);
+		print_rlimit64(tcp, tcp->u_arg[3]);
 	}
 	return 0;
 }
@@ -207,13 +185,9 @@ printrusage32(struct tcb *tcp, long addr)
 		long	ru_nivcsw;		/* involuntary " */
 	} ru;
 
-	if (!addr)
-		tprints("NULL");
-	else if (syserror(tcp) || !verbose(tcp))
-		tprintf("%#lx", addr);
-	else if (umove(tcp, addr, &ru) < 0)
-		tprints("{...}");
-	else if (!abbrev(tcp)) {
+	if (umove_or_printaddr(tcp, addr, &ru))
+		return;
+	if (!abbrev(tcp)) {
 		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
 			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
 			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
@@ -243,13 +217,9 @@ printrusage(struct tcb *tcp, long addr)
 {
 	struct rusage ru;
 
-	if (!addr)
-		tprints("NULL");
-	else if (syserror(tcp) || !verbose(tcp))
-		tprintf("%#lx", addr);
-	else if (umove(tcp, addr, &ru) < 0)
-		tprints("{...}");
-	else if (!abbrev(tcp)) {
+	if (umove_or_printaddr(tcp, addr, &ru))
+		return;
+	if (!abbrev(tcp)) {
 		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
 			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
 			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
@@ -322,13 +292,7 @@ SYS_FUNC(times)
 	struct tms tbuf;
 
 	if (exiting(tcp)) {
-		if (tcp->u_arg[0] == 0)
-			tprints("NULL");
-		else if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[0]);
-		else if (umove(tcp, tcp->u_arg[0], &tbuf) < 0)
-			tprints("{...}");
-		else {
+		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
 			tprintf("{tms_utime=%llu, tms_stime=%llu, ",
 				(unsigned long long) tbuf.tms_utime,
 				(unsigned long long) tbuf.tms_stime);
