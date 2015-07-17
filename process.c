@@ -73,22 +73,20 @@ SYS_FUNC(ptrace)
 					break;
 			}
 			if (!x->str)
-				tprintf("%#lx, ", addr);
+				printaddr(addr);
 			else if (x->val > addr && x != struct_user_offsets) {
 				x--;
-				tprintf("%s + %ld, ", x->str, addr - x->val);
+				tprintf("%s + %ld", x->str, addr - x->val);
 			}
 			else
-				tprintf("%s, ", x->str);
+				tprints(x->str);
 		} else
 		if (tcp->u_arg[0] == PTRACE_GETREGSET
-		 || tcp->u_arg[0] == PTRACE_SETREGSET
-		) {
+		 || tcp->u_arg[0] == PTRACE_SETREGSET)
 			printxval(nt_descriptor_types, tcp->u_arg[2], "NT_???");
-			tprints(", ");
-		} else
-			tprintf("%#lx, ", addr);
-
+		else
+			printaddr(addr);
+		tprints(", ");
 
 		switch (tcp->u_arg[0]) {
 #ifndef IA64
@@ -118,7 +116,7 @@ SYS_FUNC(ptrace)
 			/* Don't print anything, do it at syscall return. */
 			break;
 		default:
-			tprintf("%#lx", tcp->u_arg[3]);
+			printaddr(tcp->u_arg[3]);
 			break;
 		}
 	} else {
