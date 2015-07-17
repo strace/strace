@@ -225,21 +225,20 @@ decode_seccomp_set_mode_strict(unsigned int flags, unsigned long addr)
 
 SYS_FUNC(seccomp)
 {
-	if (entering(tcp)) {
-		unsigned int op = tcp->u_arg[0];
+	unsigned int op = tcp->u_arg[0];
 
-		printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
+	printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
+	tprints(", ");
+
+	if (op == SECCOMP_SET_MODE_FILTER) {
+		printflags(seccomp_filter_flags, tcp->u_arg[1],
+			   "SECCOMP_FILTER_FLAG_???");
 		tprints(", ");
-
-		if (op == SECCOMP_SET_MODE_FILTER) {
-			printflags(seccomp_filter_flags, tcp->u_arg[1],
-				   "SECCOMP_FILTER_FLAG_???");
-			tprints(", ");
-			print_seccomp_filter(tcp, tcp->u_arg[2]);
-		} else {
-			decode_seccomp_set_mode_strict(tcp->u_arg[1],
-						       tcp->u_arg[2]);
-		}
+		print_seccomp_filter(tcp, tcp->u_arg[2]);
+	} else {
+		decode_seccomp_set_mode_strict(tcp->u_arg[1],
+					       tcp->u_arg[2]);
 	}
-	return 0;
+
+	return RVAL_DECODED;
 }
