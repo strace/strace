@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check sigaltstack syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -e sigaltstack $args
+match_diff
+
+exit 0

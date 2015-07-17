@@ -32,6 +32,7 @@ check_PROGRAMS = \
 	select \
 	set_ptracer_any \
 	sigaction \
+	sigaltstack \
 	sigreturn \
 	stack-fcall \
 	stat \
@@ -75,6 +76,7 @@ TESTS = \
 	seccomp.test \
 	select.test \
 	sigaction.test \
+	sigaltstack.test \
 	sigreturn.test \
 	stat.test \
 	stat32-v.test \
@@ -131,6 +133,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     restart_syscall_unknown.expected \
 	     select.awk \
 	     sigaction.awk \
+	     sigaltstack.expected \
 	     statfs.expected \
 	     sun_path.expected \
 	     uid.awk \

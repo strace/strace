@@ -1,0 +1,2 @@
+sigaltstack({ss_sp=0xbaadf00d, ss_flags=SS_DISABLE, ss_size=3735928559}, NULL) = 0
++++ exited with 0 +++

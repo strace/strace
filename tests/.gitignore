@@ -21,6 +21,7 @@ seccomp
 select
 set_ptracer_any
 sigaction
+sigaltstack
 sigreturn
 stack-fcall
 stat
