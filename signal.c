@@ -401,10 +401,9 @@ SYS_FUNC(siggetmask)
 
 SYS_FUNC(sigsuspend)
 {
-	if (entering(tcp)) {
-		tprintsigmask_val("", tcp->u_arg[2]);
-	}
-	return 0;
+	tprintsigmask_val("", tcp->u_arg[2]);
+
+	return RVAL_DECODED;
 }
 
 #ifdef HAVE_SIGACTION
@@ -450,25 +449,21 @@ SYS_FUNC(sigprocmask)
 
 SYS_FUNC(kill)
 {
-	if (entering(tcp)) {
-		tprintf("%ld, %s",
-			widen_to_long(tcp->u_arg[0]),
-			signame(tcp->u_arg[1])
-		);
-	}
-	return 0;
+	tprintf("%ld, %s",
+		widen_to_long(tcp->u_arg[0]),
+		signame(tcp->u_arg[1]));
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(tgkill)
 {
-	if (entering(tcp)) {
-		tprintf("%ld, %ld, %s",
-			widen_to_long(tcp->u_arg[0]),
-			widen_to_long(tcp->u_arg[1]),
-			signame(tcp->u_arg[2])
-		);
-	}
-	return 0;
+	tprintf("%ld, %ld, %s",
+		widen_to_long(tcp->u_arg[0]),
+		widen_to_long(tcp->u_arg[1]),
+		signame(tcp->u_arg[2]));
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(sigpending)
@@ -625,12 +620,11 @@ SYS_FUNC(rt_sigpending)
 
 SYS_FUNC(rt_sigsuspend)
 {
-	if (entering(tcp)) {
-		/* NB: kernel requires arg[1] == NSIG / 8 */
-		print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[1]);
-		tprintf(", %lu", tcp->u_arg[1]);
-	}
-	return 0;
+	/* NB: kernel requires arg[1] == NSIG / 8 */
+	print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf(", %lu", tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 static void
@@ -643,20 +637,18 @@ print_sigqueueinfo(struct tcb *tcp, int sig, unsigned long uinfo)
 
 SYS_FUNC(rt_sigqueueinfo)
 {
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-		print_sigqueueinfo(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	}
-	return 0;
+	tprintf("%lu, ", tcp->u_arg[0]);
+	print_sigqueueinfo(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(rt_tgsigqueueinfo)
 {
-	if (entering(tcp)) {
-		tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-		print_sigqueueinfo(tcp, tcp->u_arg[2], tcp->u_arg[3]);
-	}
-	return 0;
+	tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	print_sigqueueinfo(tcp, tcp->u_arg[2], tcp->u_arg[3]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(rt_sigtimedwait)
@@ -687,31 +679,26 @@ SYS_FUNC(rt_sigtimedwait)
 
 SYS_FUNC(restart_syscall)
 {
-	if (entering(tcp)) {
-		tprintf("<... resuming interrupted %s ...>",
-			tcp->s_prev_ent
-			? tcp->s_prev_ent->sys_name
-			: "system call"
-		);
-	}
-	return 0;
+	tprintf("<... resuming interrupted %s ...>",
+		tcp->s_prev_ent ? tcp->s_prev_ent->sys_name : "system call");
+
+	return RVAL_DECODED;
 }
 
 static int
 do_signalfd(struct tcb *tcp, int flags_arg)
 {
 	/* NB: kernel requires arg[2] == NSIG / 8 */
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	print_sigset_addr_len(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	tprintf(", %lu", tcp->u_arg[2]);
+	if (flags_arg >= 0) {
 		tprints(", ");
-		print_sigset_addr_len(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu", tcp->u_arg[2]);
-		if (flags_arg >= 0) {
-			tprints(", ");
-			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
-		}
+		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 	}
-	return 0;
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(signalfd)
