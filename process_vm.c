@@ -8,7 +8,7 @@ SYS_FUNC(process_vm_readv)
 	} else {
 		/* arg 2: local iov */
 		if (syserror(tcp)) {
-			tprintf("%#lx", tcp->u_arg[1]);
+			printaddr(tcp->u_arg[1]);
 		} else {
 			tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		}
@@ -16,7 +16,7 @@ SYS_FUNC(process_vm_readv)
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* arg 4: remote iov */
 		if (syserror(tcp)) {
-			tprintf("%#lx", tcp->u_arg[3]);
+			printaddr(tcp->u_arg[3]);
 		} else {
 			tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3], 0);
 		}
