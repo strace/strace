@@ -19,39 +19,28 @@ SYS_FUNC(sched_getscheduler)
 SYS_FUNC(sched_setscheduler)
 {
 	if (entering(tcp)) {
-		struct sched_param p;
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 		printxval(schedulers, tcp->u_arg[1], "SCHED_???");
-		if (umove(tcp, tcp->u_arg[2], &p) < 0)
-			tprintf(", %#lx", tcp->u_arg[2]);
-		else
-			tprintf(", { %d }", p.sched_priority);
+		tprints(", ");
+		printnum_int(tcp, tcp->u_arg[2], "%d");
 	}
 	return 0;
 }
 
 SYS_FUNC(sched_getparam)
 {
-	if (entering(tcp)) {
+	if (entering(tcp))
 		tprintf("%d, ", (int) tcp->u_arg[0]);
-	} else {
-		struct sched_param p;
-		if (umove(tcp, tcp->u_arg[1], &p) < 0)
-			tprintf("%#lx", tcp->u_arg[1]);
-		else
-			tprintf("{ %d }", p.sched_priority);
-	}
+	else
+		printnum_int(tcp, tcp->u_arg[1], "%d");
 	return 0;
 }
 
 SYS_FUNC(sched_setparam)
 {
 	if (entering(tcp)) {
-		struct sched_param p;
-		if (umove(tcp, tcp->u_arg[1], &p) < 0)
-			tprintf("%d, %#lx", (int) tcp->u_arg[0], tcp->u_arg[1]);
-		else
-			tprintf("%d, { %d }", (int) tcp->u_arg[0], p.sched_priority);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printnum_int(tcp, tcp->u_arg[1], "%d");
 	}
 	return 0;
 }
@@ -67,10 +56,10 @@ SYS_FUNC(sched_get_priority_min)
 SYS_FUNC(sched_rr_get_interval)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", (long) (pid_t) tcp->u_arg[0]);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
 		if (syserror(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
+			printaddr(tcp->u_arg[1]);
 		else
 			print_timespec(tcp, tcp->u_arg[1]);
 	}
