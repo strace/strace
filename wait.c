@@ -114,7 +114,7 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 					printrusage32(tcp, tcp->u_arg[3]);
 				else
 #endif
-					printrusage(tcp, tcp->u_arg[3]);
+					MPERS_PRINTER_NAME(printrusage)(tcp, tcp->u_arg[3]);
 			}
 			else
 				printaddr(tcp->u_arg[3]);
@@ -156,7 +156,7 @@ SYS_FUNC(waitid)
 		if (tcp->s_ent->nargs > 4) {
 			/* usage */
 			tprints(", ");
-			printrusage(tcp, tcp->u_arg[4]);
+			MPERS_PRINTER_NAME(printrusage)(tcp, tcp->u_arg[4]);
 		}
 	}
 	return 0;

@@ -31,34 +31,39 @@
 #include "defs.h"
 #include <sys/resource.h>
 
-void
-printrusage(struct tcb *tcp, long addr)
+#include DEF_MPERS_TYPE(rusage_t)
+
+typedef struct rusage rusage_t;
+
+#include MPERS_DEFS
+
+MPERS_PRINTER_DECL(void, printrusage)(struct tcb *tcp, long addr)
 {
-	struct rusage ru;
+	rusage_t ru;
 
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
-	if (!abbrev(tcp)) {
-		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
-			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
-			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
-		tprintf("ru_maxrss=%lu, ru_ixrss=%lu, ",
-			ru.ru_maxrss, ru.ru_ixrss);
-		tprintf("ru_idrss=%lu, ru_isrss=%lu, ",
-			ru.ru_idrss, ru.ru_isrss);
-		tprintf("ru_minflt=%lu, ru_majflt=%lu, ru_nswap=%lu, ",
-			ru.ru_minflt, ru.ru_majflt, ru.ru_nswap);
-		tprintf("ru_inblock=%lu, ru_oublock=%lu, ",
-			ru.ru_inblock, ru.ru_oublock);
-		tprintf("ru_msgsnd=%lu, ru_msgrcv=%lu, ",
-			ru.ru_msgsnd, ru.ru_msgrcv);
-		tprintf("ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}",
-			ru.ru_nsignals, ru.ru_nvcsw, ru.ru_nivcsw);
-	}
+
+	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
+		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
+		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+	if (abbrev(tcp))
+		tprints("...}");
 	else {
-		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ...}",
-			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
-			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+		tprintf("ru_maxrss=%lu, ", (long) ru.ru_maxrss);
+		tprintf("ru_ixrss=%lu, ", (long) ru.ru_ixrss);
+		tprintf("ru_idrss=%lu, ", (long) ru.ru_idrss);
+		tprintf("ru_isrss=%lu, ", (long) ru.ru_isrss);
+		tprintf("ru_minflt=%lu, ", (long) ru.ru_minflt);
+		tprintf("ru_majflt=%lu, ", (long) ru.ru_majflt);
+		tprintf("ru_nswap=%lu, ", (long) ru.ru_nswap);
+		tprintf("ru_inblock=%lu, ", (long) ru.ru_inblock);
+		tprintf("ru_oublock=%lu, ", (long) ru.ru_oublock);
+		tprintf("ru_msgsnd=%lu, ", (long) ru.ru_msgsnd);
+		tprintf("ru_msgrcv=%lu, ", (long) ru.ru_msgrcv);
+		tprintf("ru_nsignals=%lu, ", (long) ru.ru_nsignals);
+		tprintf("ru_nvcsw=%lu, ", (long) ru.ru_nvcsw);
+		tprintf("ru_nivcsw=%lu}", (long) ru.ru_nivcsw);
 	}
 }
 
@@ -91,27 +96,27 @@ printrusage32(struct tcb *tcp, long addr)
 
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
-	if (!abbrev(tcp)) {
-		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
-			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
-			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
-		tprintf("ru_maxrss=%lu, ru_ixrss=%lu, ",
-			ru.ru_maxrss, ru.ru_ixrss);
-		tprintf("ru_idrss=%lu, ru_isrss=%lu, ",
-			ru.ru_idrss, ru.ru_isrss);
-		tprintf("ru_minflt=%lu, ru_majflt=%lu, ru_nswap=%lu, ",
-			ru.ru_minflt, ru.ru_majflt, ru.ru_nswap);
-		tprintf("ru_inblock=%lu, ru_oublock=%lu, ",
-			ru.ru_inblock, ru.ru_oublock);
-		tprintf("ru_msgsnd=%lu, ru_msgrcv=%lu, ",
-			ru.ru_msgsnd, ru.ru_msgrcv);
-		tprintf("ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}",
-			ru.ru_nsignals, ru.ru_nvcsw, ru.ru_nivcsw);
-	}
+
+	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
+		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
+		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+	if (abbrev(tcp))
+		tprints("...}");
 	else {
-		tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ...}",
-			(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
-			(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+		tprintf("ru_maxrss=%lu, ", ru.ru_maxrss);
+		tprintf("ru_ixrss=%lu, ", ru.ru_ixrss);
+		tprintf("ru_idrss=%lu, ", ru.ru_idrss);
+		tprintf("ru_isrss=%lu, ", ru.ru_isrss);
+		tprintf("ru_minflt=%lu, ", ru.ru_minflt);
+		tprintf("ru_majflt=%lu, ", ru.ru_majflt);
+		tprintf("ru_nswap=%lu, ", ru.ru_nswap);
+		tprintf("ru_inblock=%lu, ", ru.ru_inblock);
+		tprintf("ru_oublock=%lu, ", ru.ru_oublock);
+		tprintf("ru_msgsnd=%lu, ", ru.ru_msgsnd);
+		tprintf("ru_msgrcv=%lu, ", ru.ru_msgrcv);
+		tprintf("ru_nsignals=%lu, ", ru.ru_nsignals);
+		tprintf("ru_nvcsw=%lu, ", ru.ru_nvcsw);
+		tprintf("ru_nivcsw=%lu}", ru.ru_nivcsw);
 	}
 }
 #endif
