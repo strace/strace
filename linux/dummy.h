@@ -63,6 +63,7 @@
 #define	sys_acct		sys_chdir
 #define	sys_chroot		sys_chdir
 #define	sys_clock_getres	sys_clock_gettime
+#define	sys_connect		sys_bind
 #define	sys_fchdir		sys_close
 #define	sys_fdatasync		sys_close
 #define	sys_fsync		sys_close

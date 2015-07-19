@@ -670,11 +670,6 @@ SYS_FUNC(bind)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(connect)
-{
-	return sys_bind(tcp);
-}
-
 SYS_FUNC(listen)
 {
 	printfd(tcp, tcp->u_arg[0]);
