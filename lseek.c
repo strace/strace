@@ -72,13 +72,9 @@ SYS_FUNC(llseek)
 			tprintf(", %lld, ",
 				((long long) tcp->u_arg[1]) << 32 |
 				(unsigned long long) (unsigned) tcp->u_arg[2]);
-	}
-	else {
-		long long off;
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[3], &off) < 0)
-			tprintf("%#lx, ", tcp->u_arg[3]);
-		else
-			tprintf("[%llu], ", off);
+	} else {
+		printnum_int64(tcp, tcp->u_arg[3], "%" PRIu64);
+		tprints(", ");
 		printxval(whence_codes, tcp->u_arg[4], "SEEK_???");
 	}
 	return 0;
