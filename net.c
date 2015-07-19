@@ -623,53 +623,51 @@ tprint_sock_type(int flags)
 
 SYS_FUNC(socket)
 {
-	if (entering(tcp)) {
-		printxval(domains, tcp->u_arg[0], "PF_???");
-		tprints(", ");
-		tprint_sock_type(tcp->u_arg[1]);
-		tprints(", ");
-		switch (tcp->u_arg[0]) {
-		case PF_INET:
+	printxval(domains, tcp->u_arg[0], "PF_???");
+	tprints(", ");
+	tprint_sock_type(tcp->u_arg[1]);
+	tprints(", ");
+	switch (tcp->u_arg[0]) {
+	case PF_INET:
 #ifdef PF_INET6
-		case PF_INET6:
+	case PF_INET6:
 #endif
-			printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
-			break;
+		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
+		break;
 #ifdef PF_IPX
-		case PF_IPX:
-			/* BTW: I don't believe this.. */
-			tprints("[");
-			printxval(domains, tcp->u_arg[2], "PF_???");
-			tprints("]");
-			break;
+	case PF_IPX:
+		/* BTW: I don't believe this.. */
+		tprints("[");
+		printxval(domains, tcp->u_arg[2], "PF_???");
+		tprints("]");
+		break;
 #endif /* PF_IPX */
 #ifdef PF_NETLINK
-		case PF_NETLINK:
-			printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
-			break;
+	case PF_NETLINK:
+		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
+		break;
 #endif
 #if defined(PF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
-		case PF_BLUETOOTH:
-			printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
-			break;
+	case PF_BLUETOOTH:
+		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
+		break;
 #endif
-		default:
-			tprintf("%lu", tcp->u_arg[2]);
-			break;
-		}
+	default:
+		tprintf("%lu", tcp->u_arg[2]);
+		break;
 	}
-	return 0;
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(bind)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printsock(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu", tcp->u_arg[2]);
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printsock(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	tprintf(", %lu", tcp->u_arg[2]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(connect)
@@ -679,12 +677,11 @@ SYS_FUNC(connect)
 
 SYS_FUNC(listen)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		tprintf("%lu", tcp->u_arg[1]);
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	tprintf("%lu", tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 static int
@@ -729,48 +726,45 @@ SYS_FUNC(accept4)
 
 SYS_FUNC(send)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, ", tcp->u_arg[2]);
-		/* flags */
-		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	tprintf(", %lu, ", tcp->u_arg[2]);
+	/* flags */
+	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(sendto)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, ", tcp->u_arg[2]);
-		/* flags */
-		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-		/* to address */
-		tprints(", ");
-		printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
-		/* to length */
-		tprintf(", %lu", tcp->u_arg[5]);
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	tprintf(", %lu, ", tcp->u_arg[2]);
+	/* flags */
+	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+	/* to address */
+	tprints(", ");
+	printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
+	/* to length */
+	tprintf(", %lu", tcp->u_arg[5]);
+
+	return RVAL_DECODED;
 }
 
 #ifdef HAVE_SENDMSG
 
 SYS_FUNC(sendmsg)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printmsghdr(tcp, tcp->u_arg[1], (unsigned long) -1L);
-		/* flags */
-		tprints(", ");
-		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printmsghdr(tcp, tcp->u_arg[1], (unsigned long) -1L);
+	/* flags */
+	tprints(", ");
+	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(sendmmsg)
@@ -915,12 +909,11 @@ SYS_FUNC(recvmmsg)
 
 SYS_FUNC(shutdown)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printxval(shutdown_modes, tcp->u_arg[1], "SHUT_???");
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printxval(shutdown_modes, tcp->u_arg[1], "SHUT_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(getsockname)
@@ -1421,11 +1414,10 @@ done:
 
 SYS_FUNC(setsockopt)
 {
-	if (entering(tcp)) {
-		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
-					    tcp->u_arg[1], tcp->u_arg[2]);
-		print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
-				 tcp->u_arg[3], tcp->u_arg[4]);
-	}
-	return 0;
+	print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
+				    tcp->u_arg[1], tcp->u_arg[2]);
+	print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
+			 tcp->u_arg[3], tcp->u_arg[4]);
+
+	return RVAL_DECODED;
 }
