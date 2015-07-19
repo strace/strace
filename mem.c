@@ -47,7 +47,7 @@ get_pagesize(void)
 SYS_FUNC(brk)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx", tcp->u_arg[0]);
+		printaddr(tcp->u_arg[0]);
 	}
 	return RVAL_HEX;
 }
@@ -60,12 +60,9 @@ print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
 {
 	if (entering(tcp)) {
 		/* addr */
-		if (!u_arg[0])
-			tprints("NULL, ");
-		else
-			tprintf("%#lx, ", u_arg[0]);
+		printaddr(u_arg[0]);
 		/* len */
-		tprintf("%lu, ", u_arg[1]);
+		tprintf(", %lu, ", u_arg[1]);
 		/* prot */
 		printflags(mmap_prot, u_arg[2], "PROT_???");
 		tprints(", ");
@@ -179,8 +176,8 @@ SYS_FUNC(mmap_4koff)
 SYS_FUNC(munmap)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %lu",
-			tcp->u_arg[0], tcp->u_arg[1]);
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %lu", tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -188,8 +185,8 @@ SYS_FUNC(munmap)
 SYS_FUNC(mprotect)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %lu, ",
-			tcp->u_arg[0], tcp->u_arg[1]);
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 		printflags(mmap_prot, tcp->u_arg[2], "PROT_???");
 	}
 	return 0;
@@ -200,13 +197,15 @@ SYS_FUNC(mprotect)
 SYS_FUNC(mremap)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1],
-			tcp->u_arg[2]);
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %lu, %lu, ", tcp->u_arg[1], tcp->u_arg[2]);
 		printflags(mremap_flags, tcp->u_arg[3], "MREMAP_???");
 #ifdef MREMAP_FIXED
 		if ((tcp->u_arg[3] & (MREMAP_MAYMOVE | MREMAP_FIXED)) ==
-		    (MREMAP_MAYMOVE | MREMAP_FIXED))
-			tprintf(", %#lx", tcp->u_arg[4]);
+		    (MREMAP_MAYMOVE | MREMAP_FIXED)) {
+			tprints(", ");
+			printaddr(tcp->u_arg[4]);
+		}
 #endif
 	}
 	return RVAL_HEX;
@@ -217,7 +216,8 @@ SYS_FUNC(mremap)
 SYS_FUNC(madvise)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 		printxval(madvise_cmds, tcp->u_arg[2], "MADV_???");
 	}
 	return 0;
@@ -239,7 +239,7 @@ SYS_FUNC(msync)
 {
 	if (entering(tcp)) {
 		/* addr */
-		tprintf("%#lx", tcp->u_arg[0]);
+		printaddr(tcp->u_arg[0]);
 		/* len */
 		tprintf(", %lu, ", tcp->u_arg[1]);
 		/* flags */
@@ -251,16 +251,17 @@ SYS_FUNC(msync)
 SYS_FUNC(mincore)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 	} else {
 		unsigned long i, len;
 		char *vec = NULL;
 
 		len = tcp->u_arg[1];
-		if (syserror(tcp) || tcp->u_arg[2] == 0 ||
-			(vec = malloc(len)) == NULL ||
-			umoven(tcp, tcp->u_arg[2], len, vec) < 0)
-			tprintf("%#lx", tcp->u_arg[2]);
+		if (syserror(tcp) || !verbose(tcp) ||
+		    !tcp->u_arg[2] || !(vec = malloc(len)) ||
+		    umoven(tcp, tcp->u_arg[2], len, vec) < 0)
+			printaddr(tcp->u_arg[2]);
 		else {
 			tprints("[");
 			for (i = 0; i < len; i++) {
@@ -289,7 +290,8 @@ SYS_FUNC(getpagesize)
 SYS_FUNC(remap_file_pages)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 		printflags(mmap_prot, tcp->u_arg[2], "PROT_???");
 		tprintf(", %lu, ", tcp->u_arg[3]);
 #ifdef MAP_TYPE
@@ -355,17 +357,22 @@ get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)
 			tprintf("%#0*lx", (int) sizeof(long) * 2 + 2, n);
 		}
 		tprints("}");
-		if (failed)
-			tprintf(" %#lx", ptr);
-	} else
-		tprintf(", %#lx", ptr);
+		if (failed) {
+			tprints(" ");
+			printaddr(ptr);
+		}
+	} else {
+		tprints(" ");
+		printaddr(ptr);
+	}
 	tprintf(", %lu", maxnodes);
 }
 
 SYS_FUNC(mbind)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 		printxval(policies, tcp->u_arg[2], "MPOL_???");
 		get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[4], 0);
 		tprints(", ");
@@ -387,14 +394,12 @@ SYS_FUNC(get_mempolicy)
 {
 	if (exiting(tcp)) {
 		int pol;
-		if (tcp->u_arg[0] == 0)
-			tprints("NULL");
-		else if (syserror(tcp) || umove(tcp, tcp->u_arg[0], &pol) < 0)
-			tprintf("%#lx", tcp->u_arg[0]);
-		else
+		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &pol))
 			printxval(policies, pol, "MPOL_???");
 		get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], syserror(tcp));
-		tprintf(", %#lx, ", tcp->u_arg[3]);
+		tprints(", ");
+		printaddr(tcp->u_arg[3]);
+		tprints(", ");
 		printflags(mempolicyflags, tcp->u_arg[4], "MPOL_???");
 	}
 	return 0;
@@ -488,7 +493,10 @@ SYS_FUNC(subpage_prot)
 		unsigned long cur, end, abbrev_end, entries;
 		unsigned int entry;
 
-		tprintf("%#lx, %#lx, ", tcp->u_arg[0], tcp->u_arg[1]);
+		printaddr(tcp->u_arg[0]);
+		tprints(", ");
+		printaddr(tcp->u_arg[1]);
+		tprints(", ");
 		entries = tcp->u_arg[1] >> 16;
 		if (!entries || !tcp->u_arg[2]) {
 			tprints("{}");
@@ -497,7 +505,7 @@ SYS_FUNC(subpage_prot)
 		cur = tcp->u_arg[2];
 		end = cur + (sizeof(int) * entries);
 		if (!verbose(tcp) || end < (unsigned long) tcp->u_arg[2]) {
-			tprintf("%#lx", tcp->u_arg[2]);
+			printaddr(tcp->u_arg[2]);
 			return 0;
 		}
 		if (abbrev(tcp)) {
