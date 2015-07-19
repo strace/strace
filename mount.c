@@ -31,8 +31,8 @@ SYS_FUNC(mount)
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 
-		if (ignore_type && tcp->u_arg[2])
-			tprintf("%#lx", tcp->u_arg[2]);
+		if (ignore_type)
+			printaddr(tcp->u_arg[2]);
 		else
 			printstr(tcp, tcp->u_arg[2], -1);
 		tprints(", ");
@@ -46,8 +46,8 @@ SYS_FUNC(mount)
 			printflags(mount_flags, flags, "MS_???");
 		tprints(", ");
 
-		if (ignore_data && tcp->u_arg[4])
-			tprintf("%#lx", tcp->u_arg[4]);
+		if (ignore_data)
+			printaddr(tcp->u_arg[4]);
 		else
 			printstr(tcp, tcp->u_arg[4], -1);
 	}
