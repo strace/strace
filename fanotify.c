@@ -14,9 +14,6 @@ SYS_FUNC(fanotify_init)
 {
 	unsigned flags;
 
-	if (exiting(tcp))
-		return 0;
-
 	flags = tcp->u_arg[0];
 	printxval(fan_classes, flags & FAN_ALL_CLASS_BITS, "FAN_CLASS_???");
 	flags &= ~FAN_ALL_CLASS_BITS;
@@ -27,7 +24,7 @@ SYS_FUNC(fanotify_init)
 	tprints(", ");
 	tprint_open_modes((unsigned) tcp->u_arg[1]);
 
-	return 0;
+	return RVAL_DECODED;
 }
 
 #include "xlat/fan_mark_flags.h"
@@ -37,9 +34,6 @@ SYS_FUNC(fanotify_mark)
 {
 	unsigned long long mask = 0;
 	int argn;
-
-	if (exiting(tcp))
-		return 0;
 
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
@@ -62,5 +56,5 @@ SYS_FUNC(fanotify_mark)
 		print_dirfd(tcp, tcp->u_arg[argn]);
 	printpath(tcp, tcp->u_arg[argn + 1]);
 
-	return 0;
+	return RVAL_DECODED;
 }
