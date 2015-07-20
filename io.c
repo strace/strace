@@ -270,15 +270,6 @@ SYS_FUNC(sendfile)
 	return 0;
 }
 
-void
-print_loff_t(struct tcb *tcp, long addr)
-{
-	loff_t offset;
-
-	if (!umove_or_printaddr(tcp, addr, &offset))
-		tprintf("[%llu]", (unsigned long long int) offset);
-}
-
 SYS_FUNC(sendfile64)
 {
 	if (entering(tcp)) {
@@ -286,7 +277,7 @@ SYS_FUNC(sendfile64)
 		tprints(", ");
 		printfd(tcp, tcp->u_arg[1]);
 		tprints(", ");
-		print_loff_t(tcp, tcp->u_arg[2]);
+		printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64);
 		tprintf(", %lu", tcp->u_arg[3]);
 	}
 	return 0;
@@ -318,13 +309,13 @@ SYS_FUNC(splice)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		/* loff_t *off_in */
-		print_loff_t(tcp, tcp->u_arg[1]);
+		printnum_int64(tcp, tcp->u_arg[1], "%" PRIu64);
 		tprints(", ");
 		/* int fd_out */
 		printfd(tcp, tcp->u_arg[2]);
 		tprints(", ");
 		/* loff_t *off_out */
-		print_loff_t(tcp, tcp->u_arg[3]);
+		printnum_int64(tcp, tcp->u_arg[3], "%" PRIu64);
 		tprints(", ");
 		/* size_t len */
 		tprintf("%lu, ", tcp->u_arg[4]);

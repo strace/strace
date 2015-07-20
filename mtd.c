@@ -183,7 +183,7 @@ mtd_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	case MEMGETBADBLOCK:
 	case MEMSETBADBLOCK:
 		tprints(", ");
-		print_loff_t(tcp, arg);
+		printnum_int64(tcp, arg, "%" PRIu64);
 		break;
 
 	case MEMGETINFO: {
