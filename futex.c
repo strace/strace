@@ -17,39 +17,70 @@
 
 SYS_FUNC(futex)
 {
-	if (entering(tcp)) {
-		long int cmd = tcp->u_arg[1] & 127;
-		tprintf("%p, ", (void *) tcp->u_arg[0]);
-		printxval(futexops, tcp->u_arg[1], "FUTEX_???");
-		tprintf(", %ld", tcp->u_arg[2]);
-		if (cmd == FUTEX_WAKE_BITSET)
-			tprintf(", %lx", tcp->u_arg[5]);
-		else if (cmd == FUTEX_WAIT) {
-			tprints(", ");
-			printtv(tcp, tcp->u_arg[3]);
-		} else if (cmd == FUTEX_WAIT_BITSET) {
-			tprints(", ");
-			printtv(tcp, tcp->u_arg[3]);
-			tprintf(", %lx", tcp->u_arg[5]);
-		} else if (cmd == FUTEX_REQUEUE)
-			tprintf(", %ld, %p", tcp->u_arg[3], (void *) tcp->u_arg[4]);
-		else if (cmd == FUTEX_CMP_REQUEUE || cmd == FUTEX_CMP_REQUEUE_PI)
-			tprintf(", %ld, %p, %ld", tcp->u_arg[3], (void *) tcp->u_arg[4], tcp->u_arg[5]);
-		else if (cmd == FUTEX_WAKE_OP) {
-			tprintf(", %ld, %p, {", tcp->u_arg[3], (void *) tcp->u_arg[4]);
-			if ((tcp->u_arg[5] >> 28) & 8)
-				tprints("FUTEX_OP_OPARG_SHIFT|");
-			printxval(futexwakeops, (tcp->u_arg[5] >> 28) & 0x7, "FUTEX_OP_???");
-			tprintf(", %ld, ", (tcp->u_arg[5] >> 12) & 0xfff);
-			if ((tcp->u_arg[5] >> 24) & 8)
-				tprints("FUTEX_OP_OPARG_SHIFT|");
-			printxval(futexwakecmps, (tcp->u_arg[5] >> 24) & 0x7, "FUTEX_OP_CMP_???");
-			tprintf(", %ld}", tcp->u_arg[5] & 0xfff);
-		} else if (cmd == FUTEX_WAIT_REQUEUE_PI) {
-			tprints(", ");
-			printtv(tcp, tcp->u_arg[3]);
-			tprintf(", %p", (void *) tcp->u_arg[4]);
-		}
+	const long uaddr = tcp->u_arg[0];
+	const int op = tcp->u_arg[1];
+	const int cmd = op & 127;
+	const long timeout = tcp->u_arg[3];
+	const long uaddr2 = tcp->u_arg[4];
+	const unsigned int val = tcp->u_arg[2];
+	const unsigned int val2 = tcp->u_arg[3];
+	const unsigned int val3 = tcp->u_arg[5];
+
+	printaddr(uaddr);
+	tprints(", ");
+	printxval(futexops, op, "FUTEX_???");
+	tprintf(", %u", val);
+	switch (cmd) {
+	case FUTEX_WAIT:
+	case FUTEX_LOCK_PI:
+		tprints(", ");
+		printtv(tcp, timeout);
+		break;
+	case FUTEX_WAIT_BITSET:
+		tprints(", ");
+		printtv(tcp, timeout);
+		tprintf(", %x", val3);
+		break;
+	case FUTEX_WAKE_BITSET:
+		tprintf(", %x", val3);
+		break;
+	case FUTEX_REQUEUE:
+		tprintf(", %u, ", val2);
+		printaddr(uaddr2);
+		break;
+	case FUTEX_CMP_REQUEUE:
+	case FUTEX_CMP_REQUEUE_PI:
+		tprintf(", %u, ", val2);
+		printaddr(uaddr2);
+		tprintf(", %u", val3);
+		break;
+	case FUTEX_WAKE_OP:
+		tprintf(", %u, ", val2);
+		printaddr(uaddr2);
+		tprints(", {");
+		if ((val3 >> 28) & 8)
+			tprints("FUTEX_OP_OPARG_SHIFT|");
+		printxval(futexwakeops, (val3 >> 28) & 0x7, "FUTEX_OP_???");
+		tprintf(", %u, ", (val3 >> 12) & 0xfff);
+		if ((val3 >> 24) & 8)
+			tprints("FUTEX_OP_OPARG_SHIFT|");
+		printxval(futexwakecmps, (val3 >> 24) & 0x7, "FUTEX_OP_CMP_???");
+		tprintf(", %u}", val3 & 0xfff);
+		break;
+	case FUTEX_WAIT_REQUEUE_PI:
+		tprints(", ");
+		printtv(tcp, timeout);
+		tprints(", ");
+		printaddr(uaddr2);
+		break;
+	case FUTEX_WAKE:
+	case FUTEX_UNLOCK_PI:
+	case FUTEX_TRYLOCK_PI:
+		break;
+	default:
+		tprintf(", %lx, %lx, %x", timeout, uaddr2, val3);
+		break;
 	}
-	return 0;
+
+	return RVAL_DECODED;
 }
