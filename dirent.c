@@ -25,10 +25,8 @@ print_old_dirent(struct tcb *tcp, long addr)
 #endif
 	old_dirent_t d;
 
-	if (!verbose(tcp) || umove(tcp, addr, &d) < 0) {
-		tprintf("%#lx", addr);
+	if (umove_or_printaddr(tcp, addr, &d))
 		return;
-	}
 
 	tprintf("{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=",
 		(unsigned long) d.d_ino, (unsigned long) d.d_off, d.d_reclen);
@@ -44,8 +42,8 @@ SYS_FUNC(readdir)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp) || tcp->u_rval == 0 || !verbose(tcp))
-			tprintf("%#lx", tcp->u_arg[1]);
+		if (tcp->u_rval == 0)
+			printaddr(tcp->u_arg[1]);
 		else
 			print_old_dirent(tcp, tcp->u_arg[1]);
 		/* Not much point in printing this out, it is always 1. */
@@ -68,7 +66,8 @@ SYS_FUNC(getdents)
 		return 0;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		printaddr(tcp->u_arg[1]);
+		tprintf(", %lu", tcp->u_arg[2]);
 		return 0;
 	}
 
@@ -81,9 +80,10 @@ SYS_FUNC(getdents)
 		len = tcp->u_rval;
 
 	if (len) {
-		buf = xmalloc(len);
-		if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		buf = malloc(len);
+		if (!buf || umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
+			printaddr(tcp->u_arg[1]);
+			tprintf(", %lu", tcp->u_arg[2]);
 			free(buf);
 			return 0;
 		}
@@ -149,7 +149,8 @@ SYS_FUNC(getdents64)
 		return 0;
 	}
 	if (syserror(tcp) || !verbose(tcp)) {
-		tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		printaddr(tcp->u_arg[1]);
+		tprintf(", %lu", tcp->u_arg[2]);
 		return 0;
 	}
 
@@ -162,9 +163,10 @@ SYS_FUNC(getdents64)
 		len = tcp->u_rval;
 
 	if (len) {
-		buf = xmalloc(len);
-		if (umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-			tprintf("%#lx, %lu", tcp->u_arg[1], tcp->u_arg[2]);
+		buf = malloc(len);
+		if (!buf || umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
+			printaddr(tcp->u_arg[1]);
+			tprintf(", %lu", tcp->u_arg[2]);
 			free(buf);
 			return 0;
 		}
