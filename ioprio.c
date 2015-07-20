@@ -61,13 +61,12 @@ SYS_FUNC(ioprio_get)
 
 SYS_FUNC(ioprio_set)
 {
-	if (entering(tcp)) {
-		/* int which */
-		printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
-		/* int who */
-		tprintf(", %d, ", (int) tcp->u_arg[1]);
-		/* int ioprio */
-		tprints(sprint_ioprio(tcp->u_arg[2]));
-	}
-	return 0;
+	/* int which */
+	printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
+	/* int who */
+	tprintf(", %d, ", (int) tcp->u_arg[1]);
+	/* int ioprio */
+	tprints(sprint_ioprio(tcp->u_arg[2]));
+
+	return RVAL_DECODED;
 }
