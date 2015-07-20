@@ -164,30 +164,27 @@ SYS_FUNC(query_module)
 
 SYS_FUNC(create_module)
 {
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprintf(", %lu", tcp->u_arg[1]);
-	}
-	return RVAL_HEX;
+	printpath(tcp, tcp->u_arg[0]);
+	tprintf(", %lu", tcp->u_arg[1]);
+
+	return RVAL_DECODED | RVAL_HEX;
 }
 
 SYS_FUNC(delete_module)
 {
-	if (entering(tcp)) {
-		printstr(tcp, tcp->u_arg[0], -1);
-		tprints(", ");
-		printflags(delete_module_flags, tcp->u_arg[1], "O_???");
-	}
-	return 0;
+	printstr(tcp, tcp->u_arg[0], -1);
+	tprints(", ");
+	printflags(delete_module_flags, tcp->u_arg[1], "O_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(init_module)
 {
-	if (entering(tcp)) {
-		tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-		printstr(tcp, tcp->u_arg[2], -1);
-	}
-	return 0;
+	tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	printstr(tcp, tcp->u_arg[2], -1);
+
+	return RVAL_DECODED;
 }
 
 #define MODULE_INIT_IGNORE_MODVERSIONS  1
@@ -197,9 +194,6 @@ SYS_FUNC(init_module)
 
 SYS_FUNC(finit_module)
 {
-	if (exiting(tcp))
-		return 0;
-
 	/* file descriptor */
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
@@ -209,5 +203,5 @@ SYS_FUNC(finit_module)
 	/* flags */
 	printflags(module_init_flags, tcp->u_arg[2], "MODULE_INIT_???");
 
-	return 0;
+	return RVAL_DECODED;
 }
