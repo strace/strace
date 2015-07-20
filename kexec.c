@@ -11,7 +11,19 @@
 #endif
 
 static void
-print_kexec_segments(struct tcb *tcp, unsigned long addr, unsigned long len)
+print_seg(const long seg_buf, const unsigned long seg_bufsz,
+	  const long seg_mem, const unsigned long seg_memsz)
+{
+	tprints("{");
+	printaddr(seg_buf);
+	tprintf(", %lu, ", seg_bufsz);
+	printaddr(seg_mem);
+	tprintf(", %lu}", seg_memsz);
+}
+
+static void
+print_kexec_segments(struct tcb *tcp, const unsigned long addr,
+		     const unsigned long len)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	union {
@@ -41,7 +53,7 @@ print_kexec_segments(struct tcb *tcp, unsigned long addr, unsigned long len)
 # define seg_mem seg.mem
 # define seg_memsz seg.memsz
 #endif
-	unsigned int i, failed;
+	unsigned int i;
 
 	if (!len) {
 		tprints("[]");
@@ -49,38 +61,36 @@ print_kexec_segments(struct tcb *tcp, unsigned long addr, unsigned long len)
 	}
 
 	if (len > KEXEC_SEGMENT_MAX) {
-		tprintf("%#lx", addr);
+		printaddr(addr);
 		return;
 	}
 
-	failed = 0;
+	if (umoven_or_printaddr(tcp, addr, sizeof_seg, &seg))
+		return;
+
 	tprints("[");
-	for (i = 0; i < len; ++i) {
-		if (i)
-			tprints(", ");
-		if (umoven(tcp, addr + i * sizeof_seg, sizeof_seg, &seg) < 0) {
-			tprints("?");
-			failed = 1;
+	print_seg((unsigned long) seg_buf, seg_bufsz,
+		  (unsigned long) seg_mem, seg_memsz);
+
+	for (i = 1; i < len; ++i) {
+		tprints(", ");
+		if (umoven_or_printaddr(tcp, addr + i * sizeof_seg,
+					sizeof_seg, &seg))
 			break;
-		}
-		tprintf("{%#lx, %lu, %#lx, %lu}",
-			(long) seg_buf, (unsigned long) seg_bufsz,
-			(long) seg_mem, (unsigned long) seg_memsz);
+		print_seg((unsigned long) seg_buf, seg_bufsz,
+			  (unsigned long) seg_mem, seg_memsz);
 	}
+
 	tprints("]");
-	if (failed)
-		tprintf(" %#lx", addr);
 }
 
 SYS_FUNC(kexec_load)
 {
 	unsigned long n;
 
-	if (exiting(tcp))
-		return 0;
-
 	/* entry, nr_segments */
-	tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	printaddr(tcp->u_arg[0]);
+	tprintf(", %lu, ", tcp->u_arg[1]);
 
 	/* segments */
 	print_kexec_segments(tcp, tcp->u_arg[2], tcp->u_arg[1]);
@@ -95,5 +105,5 @@ SYS_FUNC(kexec_load)
 		printflags(kexec_load_flags, n, "KEXEC_???");
 	}
 
-	return 0;
+	return RVAL_DECODED;
 }
