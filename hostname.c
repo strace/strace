@@ -2,11 +2,10 @@
 
 SYS_FUNC(sethostname)
 {
-	if (entering(tcp)) {
-		printstr(tcp, tcp->u_arg[0], tcp->u_arg[1]);
-		tprintf(", %lu", tcp->u_arg[1]);
-	}
-	return 0;
+	printstr(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf(", %lu", tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 #if defined(ALPHA)
