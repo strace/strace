@@ -5,19 +5,12 @@
 # include <asm/ldt.h>
 
 void
-print_user_desc(struct tcb *tcp, long addr)
+print_user_desc(struct tcb *tcp, const long addr)
 {
 	struct user_desc desc;
 
-	if (umove(tcp, addr, &desc) < 0) {
-		tprintf("%lx", addr);
+	if (umove_or_printaddr(tcp, addr, &desc))
 		return;
-	}
-
-	if (!verbose(tcp)) {
-		tprintf("{entry_number:%d, ...}", desc.entry_number);
-		return;
-	}
 
 	tprintf("{entry_number:%d, "
 		"base_addr:%#08x, "
@@ -43,12 +36,10 @@ SYS_FUNC(modify_ldt)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		if (tcp->u_arg[1] == 0
-		    || tcp->u_arg[2] != sizeof(struct user_desc)) {
-			tprintf("%lx", tcp->u_arg[1]);
-		} else {
+		if (tcp->u_arg[2] != sizeof(struct user_desc))
+			printaddr(tcp->u_arg[1]);
+		else
 			print_user_desc(tcp, tcp->u_arg[1]);
-		}
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
@@ -61,7 +52,8 @@ SYS_FUNC(set_thread_area)
 	} else {
 		struct user_desc desc;
 
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[0], &desc) < 0) {
+		if (!verbose(tcp) || syserror(tcp) ||
+		    umove(tcp, tcp->u_arg[0], &desc) < 0) {
 			/* returned entry_number is not available */
 		} else {
 			static char outstr[32];
@@ -76,12 +68,8 @@ SYS_FUNC(set_thread_area)
 
 SYS_FUNC(get_thread_area)
 {
-	if (exiting(tcp)) {
-		if (syserror(tcp))
-			tprintf("%lx", tcp->u_arg[0]);
-		else
-			print_user_desc(tcp, tcp->u_arg[0]);
-	}
+	if (exiting(tcp))
+		print_user_desc(tcp, tcp->u_arg[0]);
 	return 0;
 }
 
@@ -91,7 +79,7 @@ SYS_FUNC(get_thread_area)
 SYS_FUNC(set_thread_area)
 {
 	if (entering(tcp))
-		tprintf("%#lx", tcp->u_arg[0]);
+		printaddr(tcp->u_arg[0]);
 	return 0;
 
 }
