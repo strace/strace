@@ -180,8 +180,7 @@ SYS_FUNC(fcntl)
 			break;
 #endif
 		}
-	}
-	else {
+	} else {
 		switch (tcp->u_arg[1]) {
 		case F_DUPFD:
 #ifdef F_DUPFD_CLOEXEC
@@ -236,44 +235,40 @@ SYS_FUNC(fcntl)
 
 SYS_FUNC(flock)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printflags(flockcmds, tcp->u_arg[1], "LOCK_???");
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printflags(flockcmds, tcp->u_arg[1], "LOCK_???");
+
+	return RVAL_DECODED;
 }
 #endif /* LOCK_SH */
 
 SYS_FUNC(close)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(dup)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-	}
-	return RVAL_FD;
+	printfd(tcp, tcp->u_arg[0]);
+
+	return RVAL_DECODED | RVAL_FD;
 }
 
 static int
 do_dup2(struct tcb *tcp, int flags_arg)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printfd(tcp, tcp->u_arg[1]);
+	if (flags_arg >= 0) {
 		tprints(", ");
-		printfd(tcp, tcp->u_arg[1]);
-		if (flags_arg >= 0) {
-			tprints(", ");
-			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
-		}
+		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 	}
-	return RVAL_FD;
+
+	return RVAL_DECODED | RVAL_FD;
 }
 
 SYS_FUNC(dup2)
@@ -347,8 +342,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		free(fds);
 		tprints(", ");
 		printtv_bitness(tcp, args[4], bitness, 0);
-	}
-	else {
+	} else {
 		static char outstr[1024];
 		char *outptr;
 #define end_outstr (outstr + sizeof(outstr))
@@ -444,9 +438,9 @@ SYS_FUNC(epoll_create)
 
 SYS_FUNC(epoll_create1)
 {
-	if (entering(tcp))
-		printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
-	return 0;
+	printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
+
+	return RVAL_DECODED;
 }
 
 #ifdef HAVE_SYS_EPOLL_H
@@ -464,25 +458,24 @@ print_epoll_event(struct epoll_event *ev)
 
 SYS_FUNC(epoll_ctl)
 {
-	if (entering(tcp)) {
-		struct epoll_event ev;
+	struct epoll_event ev;
 
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
-		tprints(", ");
-		printfd(tcp, tcp->u_arg[2]);
-		tprints(", ");
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
+	tprints(", ");
+	printfd(tcp, tcp->u_arg[2]);
+	tprints(", ");
 #ifdef HAVE_SYS_EPOLL_H
-		if (EPOLL_CTL_DEL == tcp->u_arg[1])
-			printaddr(tcp->u_arg[3]);
-		else if (!umove_or_printaddr(tcp, tcp->u_arg[3], &ev))
-			print_epoll_event(&ev);
-#else
+	if (EPOLL_CTL_DEL == tcp->u_arg[1])
 		printaddr(tcp->u_arg[3]);
+	else if (!umove_or_printaddr(tcp, tcp->u_arg[3], &ev))
+		print_epoll_event(&ev);
+#else
+	printaddr(tcp->u_arg[3]);
 #endif
-	}
-	return 0;
+
+	return RVAL_DECODED;
 }
 
 static void
@@ -587,14 +580,13 @@ SYS_FUNC(pselect6)
 static int
 do_eventfd(struct tcb *tcp, int flags_arg)
 {
-	if (entering(tcp)) {
-		tprintf("%lu", tcp->u_arg[0]);
-		if (flags_arg >= 0) {
-			tprints(", ");
-			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
-		}
+	tprintf("%lu", tcp->u_arg[0]);
+	if (flags_arg >= 0) {
+		tprints(", ");
+		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 	}
-	return 0;
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(eventfd)
@@ -609,14 +601,13 @@ SYS_FUNC(eventfd2)
 
 SYS_FUNC(perf_event_open)
 {
-	if (entering(tcp)) {
-		printaddr(tcp->u_arg[0]);
-		tprintf(", %d, %d, %d, ",
-			(int) tcp->u_arg[1],
-			(int) tcp->u_arg[2],
-			(int) tcp->u_arg[3]);
-		printflags(perf_event_open_flags, tcp->u_arg[4],
-			   "PERF_FLAG_???");
-	}
-	return 0;
+	printaddr(tcp->u_arg[0]);
+	tprintf(", %d, %d, %d, ",
+		(int) tcp->u_arg[1],
+		(int) tcp->u_arg[2],
+		(int) tcp->u_arg[3]);
+	printflags(perf_event_open_flags, tcp->u_arg[4],
+		   "PERF_FLAG_???");
+
+	return RVAL_DECODED;
 }
