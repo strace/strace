@@ -70,10 +70,8 @@ printflock64(struct tcb *tcp, long addr, int getlk)
 {
 	struct flock64 fl;
 
-	if (umove(tcp, addr, &fl) < 0) {
-		tprints("{...}");
+	if (umove_or_printaddr(tcp, addr, &fl))
 		return;
-	}
 	tprints("{type=");
 	printxval(lockfcmds, fl.l_type, "F_???");
 	tprints(", whence=");
@@ -90,13 +88,12 @@ static void
 printflock(struct tcb *tcp, long addr, int getlk)
 {
 	struct flock fl;
-	int r;
 
 #if SUPPORTED_PERSONALITIES > 1
 	if (
 # if SIZEOF_OFF_T > SIZEOF_LONG
-	    current_personality > 0 &&
-#endif
+	    current_personality != DEFAULT_PERSONALITY &&
+# endif
 	    current_wordsize != sizeof(fl.l_start)) {
 		if (current_wordsize == 4) {
 			/* 32-bit x86 app on x86_64 and similar cases */
@@ -107,14 +104,13 @@ printflock(struct tcb *tcp, long addr, int getlk)
 				int32_t l_len; /* off_t */
 				int32_t l_pid; /* pid_t */
 			} fl32;
-			r = umove(tcp, addr, &fl32);
-			if (r >= 0) {
-				fl.l_type = fl32.l_type;
-				fl.l_whence = fl32.l_whence;
-				fl.l_start = fl32.l_start;
-				fl.l_len = fl32.l_len;
-				fl.l_pid = fl32.l_pid;
-			}
+			if (umove_or_printaddr(tcp, addr, &fl32))
+				return;
+			fl.l_type = fl32.l_type;
+			fl.l_whence = fl32.l_whence;
+			fl.l_start = fl32.l_start;
+			fl.l_len = fl32.l_len;
+			fl.l_pid = fl32.l_pid;
 		} else {
 			/* let people know we have a problem here */
 			tprintf("<decode error: unsupported wordsize %d>",
@@ -123,13 +119,8 @@ printflock(struct tcb *tcp, long addr, int getlk)
 		}
 	} else
 #endif
-	{
-		r = umove(tcp, addr, &fl);
-	}
-	if (r < 0) {
-		tprints("{...}");
+	if (umove_or_printaddr(tcp, addr, &fl))
 		return;
-	}
 	tprints("{type=");
 	printxval(lockfcmds, fl.l_type, "F_???");
 	tprints(", whence=");
@@ -332,22 +323,17 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		tprintf("%d", (int) args[0]);
 
 		if (verbose(tcp) && fdsize > 0)
-			fds = xmalloc(fdsize);
+			fds = malloc(fdsize);
 		for (i = 0; i < 3; i++) {
 			arg = args[i+1];
-			if (arg == 0) {
-				tprints(", NULL");
-				continue;
-			}
+			tprints(", ");
 			if (!fds) {
-				tprintf(", %#lx", arg);
+				printaddr(arg);
 				continue;
 			}
-			if (umoven(tcp, arg, fdsize, fds) < 0) {
-				tprints(", [?]");
+			if (umoven_or_printaddr(tcp, arg, fdsize, fds))
 				continue;
-			}
-			tprints(", [");
+			tprints("[");
 			for (j = 0, sep = "";; j++) {
 				j = next_set_bit(fds, j, nfds);
 				if (j < 0)
@@ -377,7 +363,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			return RVAL_STR;
 		}
 
-		fds = xmalloc(fdsize);
+		fds = malloc(fdsize);
 
 		outptr = outstr;
 		sep = "";
@@ -385,7 +371,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 			int first = 1;
 
 			arg = args[i+1];
-			if (!arg || umoven(tcp, arg, fdsize, fds) < 0)
+			if (!arg || !fds || umoven(tcp, arg, fdsize, fds) < 0)
 				continue;
 			for (j = 0;; j++) {
 				j = next_set_bit(fds, j, nfds);
@@ -432,8 +418,8 @@ SYS_FUNC(oldselect)
 {
 	long args[5];
 
-	if (umoven(tcp, tcp->u_arg[0], sizeof args, args) < 0) {
-		tprints("[...]");
+	if (umove(tcp, tcp->u_arg[0], &args) < 0) {
+		printaddr(tcp->u_arg[0]);
 		return 0;
 	}
 	return decode_select(tcp, args, BITNESS_CURRENT);
@@ -442,8 +428,7 @@ SYS_FUNC(oldselect)
 #ifdef ALPHA
 SYS_FUNC(osf_select)
 {
-	long *args = tcp->u_arg;
-	return decode_select(tcp, args, BITNESS_32);
+	return decode_select(tcp, tcp->u_arg, BITNESS_32);
 }
 #endif
 
@@ -480,29 +465,55 @@ print_epoll_event(struct epoll_event *ev)
 SYS_FUNC(epoll_ctl)
 {
 	if (entering(tcp)) {
+		struct epoll_event ev;
+
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
 		tprints(", ");
 		printfd(tcp, tcp->u_arg[2]);
 		tprints(", ");
-		if (tcp->u_arg[3] == 0)
-			tprints("NULL");
-		else {
 #ifdef HAVE_SYS_EPOLL_H
-			struct epoll_event ev;
-			if (
-#ifdef EPOLL_CTL_DEL
-			    (tcp->u_arg[1] != EPOLL_CTL_DEL) &&
+		if (EPOLL_CTL_DEL == tcp->u_arg[1])
+			printaddr(tcp->u_arg[3]);
+		else if (!umove_or_printaddr(tcp, tcp->u_arg[3], &ev))
+			print_epoll_event(&ev);
+#else
+		printaddr(tcp->u_arg[3]);
 #endif
-			    umove(tcp, tcp->u_arg[3], &ev) == 0)
-				print_epoll_event(&ev);
-			else
-#endif
-				tprintf("%lx", tcp->u_arg[3]);
-		}
 	}
 	return 0;
+}
+
+static void
+print_epoll_event_array(struct tcb *tcp, const long addr, const long len)
+{
+#ifdef HAVE_SYS_EPOLL_H
+	struct epoll_event ev, *start, *cur, *end;
+
+	if (!len) {
+		tprints("[]");
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &ev))
+		return;
+
+	tprints("[");
+	print_epoll_event(&ev);
+
+	start = (struct epoll_event *) addr;
+	end = start + len;
+	for (cur = start + 1; cur < end; ++cur) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, (long) cur, &ev))
+			break;
+		print_epoll_event(&ev);
+	}
+	tprints("]");
+#else
+	printaddr(addr);
+#endif
 }
 
 static void
@@ -512,36 +523,7 @@ epoll_wait_common(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp))
-			tprintf("%lx", tcp->u_arg[1]);
-		else if (tcp->u_rval == 0)
-			tprints("{}");
-		else {
-#ifdef HAVE_SYS_EPOLL_H
-			struct epoll_event ev, *start, *cur, *end;
-			int failed = 0;
-
-			tprints("{");
-			start = (struct epoll_event *) tcp->u_arg[1];
-			end = start + tcp->u_rval;
-			for (cur = start; cur < end; ++cur) {
-				if (cur > start)
-					tprints(", ");
-				if (umove(tcp, (long) cur, &ev) == 0)
-					print_epoll_event(&ev);
-				else {
-					tprints("?");
-					failed = 1;
-					break;
-				}
-			}
-			tprints("}");
-			if (failed)
-				tprintf(" %#lx", (long) start);
-#else
-			tprints("{...}");
-#endif
-		}
+		print_epoll_event_array(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %d, %d", (int) tcp->u_arg[2], (int) tcp->u_arg[3]);
 	}
 }
@@ -578,22 +560,22 @@ SYS_FUNC(pselect6)
 			unsigned long ptr;
 			unsigned long len;
 		} data;
+
+		tprints(", ");
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 		if (current_wordsize == 4) {
 			struct {
 				uint32_t ptr;
 				uint32_t len;
 			} data32;
-			r = umove(tcp, tcp->u_arg[5], &data32);
+			r = umove_or_printaddr(tcp, tcp->u_arg[5], &data32);
 			data.ptr = data32.ptr;
 			data.len = data32.len;
 		} else
 #endif
-			r = umove(tcp, tcp->u_arg[5], &data);
-		if (r < 0)
-			tprintf(", %#lx", tcp->u_arg[5]);
-		else {
-			tprints(", {");
+			r = umove_or_printaddr(tcp, tcp->u_arg[5], &data);
+		if (r == 0) {
+			tprints("{");
 			/* NB: kernel requires data.len == NSIG / 8 */
 			print_sigset_addr_len(tcp, data.ptr, data.len);
 			tprintf(", %lu}", data.len);
@@ -628,8 +610,8 @@ SYS_FUNC(eventfd2)
 SYS_FUNC(perf_event_open)
 {
 	if (entering(tcp)) {
-		tprintf("%#lx, %d, %d, %d, ",
-			tcp->u_arg[0],
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %d, %d, %d, ",
 			(int) tcp->u_arg[1],
 			(int) tcp->u_arg[2],
 			(int) tcp->u_arg[3]);
