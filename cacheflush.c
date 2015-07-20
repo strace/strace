@@ -24,7 +24,8 @@ SYS_FUNC(cacheflush)
 {
 	if (entering(tcp)) {
 		/* addr */
-		tprintf("%#lx, ", tcp->u_arg[0]);
+		printaddr(tcp->u_arg[0]);
+		tprints(", ");
 		/* scope */
 		printxval(cacheflush_scope, tcp->u_arg[1], "FLUSH_SCOPE_???");
 		tprints(", ");
@@ -49,9 +50,9 @@ SYS_FUNC(cacheflush)
 {
 	if (entering(tcp)) {
 		/* start addr */
-		tprintf("%#lx, ", tcp->u_arg[0]);
+		printaddr(tcp->u_arg[0]);
 		/* length */
-		tprintf("%ld, ", tcp->u_arg[1]);
+		tprintf(", %ld, ", tcp->u_arg[1]);
 		/* flags */
 		printxval(cacheflush_flags, tcp->u_arg[1], "?CACHE");
 	}
@@ -80,9 +81,9 @@ SYS_FUNC(cacheflush)
 {
 	if (entering(tcp)) {
 		/* addr */
-		tprintf("%#lx, ", tcp->u_arg[0]);
+		printaddr(tcp->u_arg[0]);
 		/* len */
-		tprintf("%lu, ", tcp->u_arg[1]);
+		tprintf(", %lu, ", tcp->u_arg[1]);
 		/* flags */
 		printflags(cacheflush_flags, tcp->u_arg[2], "CACHEFLUSH_???");
 	}
@@ -94,8 +95,10 @@ SYS_FUNC(cacheflush)
 SYS_FUNC(cacheflush)
 {
 	if (entering(tcp)) {
-		/* addr and len */
-		tprintf("%#lx, %lu", tcp->u_arg[0], tcp->u_arg[3]);
+		/* addr */
+		printaddr(tcp->u_arg[0]);
+		/* len */
+		tprintf(", %lu, ", tcp->u_arg[3]);
 		/* scope and flags (cache type) are currently ignored */
 	}
 	return 0;
