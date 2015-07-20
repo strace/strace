@@ -430,12 +430,6 @@ SYS_FUNC(osf_select)
 #include "xlat/epollevents.h"
 #include "xlat/epollflags.h"
 
-/* Not aliased to printargs_ld: we want it to have a distinct address */
-SYS_FUNC(epoll_create)
-{
-	return printargs_ld(tcp);
-}
-
 SYS_FUNC(epoll_create1)
 {
 	printflags(epollflags, tcp->u_arg[0], "EPOLL_???");

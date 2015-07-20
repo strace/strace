@@ -131,6 +131,7 @@
 
 /* printargs_lu/ld does the right thing */
 #define	sys_alarm		printargs_lu
+#define	sys_epoll_create	printargs_ld
 #define	sys_getpgrp		printargs_lu
 #define	sys_getsid		printargs_lu
 #define	sys_nice		printargs_ld
