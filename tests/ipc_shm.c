@@ -37,9 +37,9 @@ main(void)
 
 	rc = 0;
 done:
-	if (shmctl(id, IPC_RMID, 0) < 0)
+	if (shmctl(id, IPC_RMID, NULL) < 0)
 		return 1;
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_RMID, 0\\) += 0\n", id);
+	printf("shmctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) += 0\n", id);
 	return rc;
 
 fail:

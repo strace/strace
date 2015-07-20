@@ -37,9 +37,9 @@ main(void)
 
 	rc = 0;
 done:
-	if (msgctl(id, IPC_RMID, 0) < 0)
+	if (msgctl(id, IPC_RMID, NULL) < 0)
 		return 1;
-	printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, 0\\) += 0\n", id);
+	printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) += 0\n", id);
 	return rc;
 
 fail:
