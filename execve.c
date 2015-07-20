@@ -42,46 +42,44 @@ printargc(const char *fmt, struct tcb *tcp, long addr)
 
 SYS_FUNC(execve)
 {
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
+	printpath(tcp, tcp->u_arg[0]);
+	tprints(", ");
 
-		if (!tcp->u_arg[1] || !verbose(tcp))
-			printaddr(tcp->u_arg[1]);
-		else {
-			tprints("[");
-			printargv(tcp, tcp->u_arg[1]);
-			tprints("]");
-		}
-		tprints(", ");
-
-		if (!tcp->u_arg[2] || !verbose(tcp))
-			printaddr(tcp->u_arg[2]);
-		else if (abbrev(tcp))
-			printargc("[/* %d var%s */]", tcp, tcp->u_arg[2]);
-		else {
-			tprints("[");
-			printargv(tcp, tcp->u_arg[2]);
-			tprints("]");
-		}
+	if (!tcp->u_arg[1] || !verbose(tcp))
+		printaddr(tcp->u_arg[1]);
+	else {
+		tprints("[");
+		printargv(tcp, tcp->u_arg[1]);
+		tprints("]");
 	}
-	return 0;
+	tprints(", ");
+
+	if (!tcp->u_arg[2] || !verbose(tcp))
+		printaddr(tcp->u_arg[2]);
+	else if (abbrev(tcp))
+		printargc("[/* %d var%s */]", tcp, tcp->u_arg[2]);
+	else {
+		tprints("[");
+		printargv(tcp, tcp->u_arg[2]);
+		tprints("]");
+	}
+
+	return RVAL_DECODED;
 }
 
 #if defined(SPARC) || defined(SPARC64)
 SYS_FUNC(execv)
 {
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		if (!tcp->u_arg[1] || !verbose(tcp))
-			printaddr(tcp->u_arg[1]);
-		else {
-			tprints("[");
-			printargv(tcp, tcp->u_arg[1]);
-			tprints("]");
-		}
+	printpath(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	if (!tcp->u_arg[1] || !verbose(tcp))
+		printaddr(tcp->u_arg[1]);
+	else {
+		tprints("[");
+		printargv(tcp, tcp->u_arg[1]);
+		tprints("]");
 	}
-	return 0;
+
+	return RVAL_DECODED;
 }
 #endif /* SPARC || SPARC64 */
