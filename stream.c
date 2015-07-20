@@ -40,12 +40,12 @@
  * Linux hasn't. Solaris has (had?).
  * Just in case I miss something, retain in for Sparc...
  */
-#if defined(SPARC) || defined(SPARC64)
+#if (defined SPARC || defined SPARC64) \
+ && (defined SYS_putpmsg || defined SYS_getpmsg)
 
 # ifdef HAVE_STROPTS_H
 #  include <stropts.h>
 # else
-#  define RS_HIPRI 1
 struct strbuf {
 	int     maxlen;                 /* no. of bytes in buffer */
 	int     len;                    /* no. of bytes returned */
@@ -54,8 +54,6 @@ struct strbuf {
 #  define MORECTL 1
 #  define MOREDATA 2
 # endif
-
-#include "xlat/msgflags.h"
 
 static void
 printstrbuf(struct tcb *tcp, struct strbuf *sbp, int getting)
@@ -86,70 +84,8 @@ printstrbufarg(struct tcb *tcp, long arg, int getting)
 	tprints(", ");
 }
 
-SYS_FUNC(putmsg)
-{
-	int i;
-
-	if (entering(tcp)) {
-		/* fd */
-		tprintf("%ld, ", tcp->u_arg[0]);
-		/* control and data */
-		for (i = 1; i < 3; i++)
-			printstrbufarg(tcp, tcp->u_arg[i], 0);
-		/* flags */
-		printflags(msgflags, tcp->u_arg[3], "RS_???");
-	}
-	return 0;
-}
-
-SYS_FUNC(getmsg)
-{
-	int i, flags;
-
-	if (entering(tcp)) {
-		/* fd */
-		tprintf("%lu, ", tcp->u_arg[0]);
-	} else {
-		if (syserror(tcp)) {
-			tprintf("%#lx, %#lx, %#lx",
-				tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
-			return 0;
-		}
-		/* control and data */
-		for (i = 1; i < 3; i++)
-			printstrbufarg(tcp, tcp->u_arg[i], 1);
-		/* pointer to flags */
-		if (tcp->u_arg[3] == 0)
-			tprints("NULL");
-		else if (umove(tcp, tcp->u_arg[3], &flags) < 0)
-			tprints("[?]");
-		else {
-			tprints("[");
-			printflags(msgflags, flags, "RS_???");
-			tprints("]");
-		}
-		/* decode return value */
-		switch (tcp->u_rval) {
-		case MORECTL:
-			tcp->auxstr = "MORECTL";
-			break;
-		case MORECTL|MOREDATA:
-			tcp->auxstr = "MORECTL|MOREDATA";
-			break;
-		case MOREDATA:
-			tcp->auxstr = "MORECTL";
-			break;
-		default:
-			tcp->auxstr = NULL;
-			break;
-		}
-	}
-	return RVAL_HEX | RVAL_STR;
-}
-
-# if defined SYS_putpmsg || defined SYS_getpmsg
-#include "xlat/pmsgflags.h"
-#  ifdef SYS_putpmsg
+# include "xlat/pmsgflags.h"
+# ifdef SYS_putpmsg
 SYS_FUNC(putpmsg)
 {
 	int i;
@@ -167,8 +103,8 @@ SYS_FUNC(putpmsg)
 	}
 	return 0;
 }
-#  endif
-#  ifdef SYS_getpmsg
+# endif
+# ifdef SYS_getpmsg
 SYS_FUNC(getpmsg)
 {
 	int i, flags;
@@ -216,9 +152,7 @@ SYS_FUNC(getpmsg)
 	}
 	return RVAL_HEX | RVAL_STR;
 }
-#  endif
-# endif /* getpmsg/putpmsg */
-
+# endif
 #endif /* STREAMS syscalls support */
 
 
