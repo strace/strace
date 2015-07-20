@@ -8,22 +8,21 @@
 
 SYS_FUNC(fallocate)
 {
-	if (entering(tcp)) {
-		int argn;
+	int argn;
 
-		/* fd */
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+	/* fd */
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 
-		/* mode */
-		printflags(falloc_flags, tcp->u_arg[1], "FALLOC_FL_???");
-		tprints(", ");
+	/* mode */
+	printflags(falloc_flags, tcp->u_arg[1], "FALLOC_FL_???");
+	tprints(", ");
 
-		/* offset */
-		argn = printllval(tcp, "%llu, ", 2);
+	/* offset */
+	argn = printllval(tcp, "%llu, ", 2);
 
-		/* len */
-		printllval(tcp, "%llu", argn);
-	}
-	return 0;
+	/* len */
+	printllval(tcp, "%llu", argn);
+
+	return RVAL_DECODED;
 }
