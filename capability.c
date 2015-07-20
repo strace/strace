@@ -121,11 +121,10 @@ SYS_FUNC(capget)
 
 SYS_FUNC(capset)
 {
-	if (entering(tcp)) {
-		cap_user_header_t h = get_cap_header(tcp, tcp->u_arg[0]);
-		print_cap_header(tcp, tcp->u_arg[0], h);
-		tprints(", ");
-		print_cap_data(tcp, tcp->u_arg[1], h);
-	}
-	return 0;
+	cap_user_header_t h = get_cap_header(tcp, tcp->u_arg[0]);
+	print_cap_header(tcp, tcp->u_arg[0], h);
+	tprints(", ");
+	print_cap_data(tcp, tcp->u_arg[1], h);
+
+	return RVAL_DECODED;
 }
