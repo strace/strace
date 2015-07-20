@@ -1,35 +1,40 @@
 #include "defs.h"
 
 static void
-print_affinitylist(struct tcb *tcp, long list, unsigned int len)
+print_affinitylist(struct tcb *tcp, const unsigned long addr, const unsigned int len)
 {
-	int first = 1;
-	unsigned long w, min_len;
+	unsigned long w;
+	const unsigned int size = len * sizeof(w);
+	const unsigned long end = addr + size;
+	unsigned long cur, abbrev_end;
 
-	if (abbrev(tcp) && len / sizeof(w) > max_strlen)
-		min_len = len - max_strlen * sizeof(w);
-	else
-		min_len = 0;
-	for (; len >= sizeof(w) && len > min_len;
-	     len -= sizeof(w), list += sizeof(w)) {
-		if (umove(tcp, list, &w) < 0)
-			break;
-		if (first)
-			tprints("{");
-		else
+	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
+	    !addr || !len || size / sizeof(w) != len || end < addr) {
+		printaddr(addr);
+		return;
+	}
+
+	if (abbrev(tcp)) {
+		abbrev_end = addr + max_strlen *  sizeof(w);
+		if (abbrev_end < addr)
+			abbrev_end = end;
+	} else {
+		abbrev_end = end;
+	}
+
+	tprints("[");
+	for (cur = addr; cur < end; cur += sizeof(w)) {
+		if (cur > addr)
 			tprints(", ");
-		first = 0;
+		if (cur >= abbrev_end) {
+			tprints("...");
+			break;
+		}
+		if (umove_or_printaddr(tcp, cur, &w))
+			break;
 		tprintf("%lx", w);
 	}
-	if (len) {
-		if (first)
-			tprintf("%#lx", list);
-		else
-			tprintf(", %s}", (len >= sizeof(w) && len > min_len ?
-				"???" : "..."));
-	} else {
-		tprints(first ? "{}" : "}");
-	}
+	tprints("]");
 }
 
 SYS_FUNC(sched_setaffinity)
@@ -46,10 +51,7 @@ SYS_FUNC(sched_getaffinity)
 	if (entering(tcp)) {
 		tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
 	} else {
-		if (tcp->u_rval == -1)
-			tprintf("%#lx", tcp->u_arg[2]);
-		else
-			print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
+		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
 	}
 	return 0;
 }
