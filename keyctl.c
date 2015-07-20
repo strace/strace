@@ -116,8 +116,8 @@ keyctl_read_key(struct tcb *tcp, key_serial_t id, long addr, long len)
 		print_keyring_serial_number(id);
 		tprints(", ");
 	} else {
-		if (addr && syserror(tcp))
-			tprintf("%#lx", addr);
+		if (syserror(tcp))
+			printaddr(addr);
 		else {
 			long rval = tcp->u_rval > len ?
 				    len : (tcp->u_rval ? -1 : 0);
