@@ -102,24 +102,20 @@ SYS_FUNC(clone)
 
 SYS_FUNC(setns)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printflags(clone_flags, tcp->u_arg[1], "CLONE_???");
-	}
-	return 0;
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printflags(clone_flags, tcp->u_arg[1], "CLONE_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(unshare)
 {
-	if (entering(tcp))
-		printflags(clone_flags, tcp->u_arg[0], "CLONE_???");
-	return 0;
+	printflags(clone_flags, tcp->u_arg[0], "CLONE_???");
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(fork)
 {
-	if (exiting(tcp))
-		return RVAL_UDECIMAL;
-	return 0;
+	return RVAL_DECODED | RVAL_UDECIMAL;
 }
