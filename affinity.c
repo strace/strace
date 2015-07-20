@@ -39,11 +39,10 @@ print_affinitylist(struct tcb *tcp, const unsigned long addr, const unsigned int
 
 SYS_FUNC(sched_setaffinity)
 {
-	if (entering(tcp)) {
-		tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-	}
-	return 0;
+	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	print_affinitylist(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(sched_getaffinity)
