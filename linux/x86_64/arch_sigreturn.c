@@ -5,6 +5,6 @@ if (current_personality != 1) {
 	tprints("{mask=");
 	print_sigset_addr_len(tcp, addr, NSIG / 8);
 	tprints("}");
-	return 0;
+	return;
 }
 #include "i386/arch_sigreturn.c"

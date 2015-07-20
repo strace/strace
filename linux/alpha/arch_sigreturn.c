@@ -1,7 +1,7 @@
 long addr;
 
 if (upeek(tcp->pid, REG_FP, &addr) < 0)
-	return 0;
+	return;
 addr += offsetof(struct sigcontext, sc_mask);
 
 tprints("{mask=");

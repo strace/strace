@@ -4,7 +4,7 @@ long addr;
 
 /* Read r1, the stack pointer.  */
 if (upeek(tcp->pid, 1 * 4, &addr) < 0)
-	return 0;
+	return;
 addr += offsetof(struct sigcontext, oldmask);
 
 tprints("{mask=");
