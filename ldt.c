@@ -34,15 +34,14 @@ print_user_desc(struct tcb *tcp, const long addr)
 
 SYS_FUNC(modify_ldt)
 {
-	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
-		if (tcp->u_arg[2] != sizeof(struct user_desc))
-			printaddr(tcp->u_arg[1]);
-		else
-			print_user_desc(tcp, tcp->u_arg[1]);
-		tprintf(", %lu", tcp->u_arg[2]);
-	}
-	return 0;
+	tprintf("%ld, ", tcp->u_arg[0]);
+	if (tcp->u_arg[2] != sizeof(struct user_desc))
+		printaddr(tcp->u_arg[1]);
+	else
+		print_user_desc(tcp, tcp->u_arg[1]);
+	tprintf(", %lu", tcp->u_arg[2]);
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(set_thread_area)
@@ -78,9 +77,9 @@ SYS_FUNC(get_thread_area)
 #if defined(M68K) || defined(MIPS)
 SYS_FUNC(set_thread_area)
 {
-	if (entering(tcp))
-		printaddr(tcp->u_arg[0]);
-	return 0;
+	printaddr(tcp->u_arg[0]);
+
+	return RVAL_DECODED;
 
 }
 #endif
@@ -88,6 +87,6 @@ SYS_FUNC(set_thread_area)
 #if defined(M68K)
 SYS_FUNC(get_thread_area)
 {
-	return RVAL_HEX;
+	return RVAL_DECODED | RVAL_HEX;
 }
 #endif
