@@ -381,7 +381,7 @@
 [1168] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
 [1169] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [1170] = { 5,	0,		SEN(prctl),			"prctl"			},
-[1171] = { 1,	0,		SEN(getpagesize),		"getpagesize"		},
+[1171] = { 0,	0,		SEN(getpagesize),		"getpagesize"		},
 [1172] = { 6,	TD|TM|SI,	SEN(mmap_pgoff),		"mmap2"			},
 [1173] = { 5,	0,		SEN(printargs),			"pciconfig_read"	},
 [1174] = { 5,	0,		SEN(printargs),			"pciconfig_write"	},
