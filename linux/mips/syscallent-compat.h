@@ -62,18 +62,18 @@
 	{ 0,	0,	SEN(printargs),		"svr4_chroot"	}, /*  061 */
 	{ 0,	0,	SEN(printargs),		"svr4_fcntl"	}, /*  062 */
 	{ 0,	0,	SEN(printargs),		"svr4_ulimit"	}, /*  063 */
-	{ 0,	0,	NULL,			NULL		}, /*  064 */
-	{ 0,	0,	NULL,			NULL		}, /*  065 */
-	{ 0,	0,	NULL,			NULL		}, /*  066 */
-	{ 0,	0,	NULL,			NULL		}, /*  067 */
-	{ 0,	0,	NULL,			NULL		}, /*  068 */
-	{ 0,	0,	NULL,			NULL		}, /*  069 */
+	{ }, /*  064 */
+	{ }, /*  065 */
+	{ }, /*  066 */
+	{ }, /*  067 */
+	{ }, /*  068 */
+	{ }, /*  069 */
 	{ 0,	0,	SEN(printargs),		"svr4_advfs"	}, /*  070 */
 	{ 0,	0,	SEN(printargs),		"svr4_unadvfs"	}, /*  071 */
-	{ 0,	0,	NULL,			NULL		}, /*  072 */
-	{ 0,	0,	NULL,			NULL		}, /*  073 */
+	{ }, /*  072 */
+	{ }, /*  073 */
 	{ 0,	0,	SEN(printargs),		"svr4_rfstart"	}, /*  074 */
-	{ 0,	0,	NULL,			NULL		}, /*  075 */
+	{ }, /*  075 */
 	{ 0,	0,	SEN(printargs),		"svr4_rdebug"	}, /*  076 */
 	{ 0,	0,	SEN(printargs),		"svr4_rfstop"	}, /*  077 */
 	{ 0,	0,	SEN(printargs),		"svr4_rfsys"	}, /*  078 */
@@ -103,7 +103,7 @@
 	{ 0,	0,	SEN(printargs),		"svr4_evtrapret"	}, /*  0102 */
 	{ 0,	0,	SEN(printargs),		"svr4_statvfs"	}, /*  0103 */
 	{ 0,	0,	SEN(printargs),		"svr4_fstatvfs"	}, /*  0104 */
-	{ 0,	0,	NULL,			NULL		}, /* 105 */
+	{ }, /* 105 */
 	{ 0,	0,	SEN(printargs),		"svr4_nfssys"	}, /*  0106 */
 	{ 0,	0,	SEN(printargs),		"svr4_waitid"	}, /*  0107 */
 	{ 0,	0,	SEN(printargs),		"svr4_sigsendset"	}, /*  0108 */
@@ -138,67 +138,67 @@
 	{ 0,	0,	SEN(printargs),		"svr4_sysconf"	}, /*  0137 */
 	{ 0,	0,	SEN(printargs),		"svr4_adjtime"	}, /*  0138 */
 	{ 0,	0,	SEN(printargs),		"svr4_sysinfo"	}, /*  0139 */
-	{ 0,	0,	NULL,			NULL		}, /* 140 */
+	{ }, /* 140 */
 	{ 0,	0,	SEN(printargs),		"svr4_seteuid"	}, /*  0141 */
 	{ 0,	0,	SEN(printargs),		"svr4_PYRAMID_statis"	}, /*  0142 */
 	{ 0,	0,	SEN(printargs),		"svr4_PYRAMID_tuning"	}, /*  0143 */
 	{ 0,	0,	SEN(printargs),		"svr4_PYRAMID_forcerr"	}, /*  0144 */
 	{ 0,	0,	SEN(printargs),		"svr4_PYRAMID_mpcntl"	}, /*  0145 */
-	{ 0,	0,	NULL,			NULL		}, /* 146 */
-	{ 0,	0,	NULL,			NULL		}, /* 147 */
-	{ 0,	0,	NULL,			NULL		}, /* 148 */
-	{ 0,	0,	NULL,			NULL		}, /* 149 */
-	{ 0,	0,	NULL,			NULL		}, /* 150 */
-	{ 0,	0,	NULL,			NULL		}, /* 151 */
-	{ 0,	0,	NULL,			NULL		}, /* 152 */
-	{ 0,	0,	NULL,			NULL		}, /* 153 */
-	{ 0,	0,	NULL,			NULL		}, /* 154 */
-	{ 0,	0,	NULL,			NULL		}, /* 155 */
-	{ 0,	0,	NULL,			NULL		}, /* 156 */
-	{ 0,	0,	NULL,			NULL		}, /* 157 */
-	{ 0,	0,	NULL,			NULL		}, /* 158 */
-	{ 0,	0,	NULL,			NULL		}, /* 159 */
-	{ 0,	0,	NULL,			NULL		}, /* 160 */
-	{ 0,	0,	NULL,			NULL		}, /* 161 */
-	{ 0,	0,	NULL,			NULL		}, /* 162 */
-	{ 0,	0,	NULL,			NULL		}, /* 163 */
-	{ 0,	0,	NULL,			NULL		}, /* 164 */
-	{ 0,	0,	NULL,			NULL		}, /* 165 */
-	{ 0,	0,	NULL,			NULL		}, /* 166 */
-	{ 0,	0,	NULL,			NULL		}, /* 167 */
-	{ 0,	0,	NULL,			NULL		}, /* 168 */
-	{ 0,	0,	NULL,			NULL		}, /* 169 */
-	{ 0,	0,	NULL,			NULL		}, /* 170 */
-	{ 0,	0,	NULL,			NULL		}, /* 171 */
-	{ 0,	0,	NULL,			NULL		}, /* 172 */
-	{ 0,	0,	NULL,			NULL		}, /* 173 */
-	{ 0,	0,	NULL,			NULL		}, /* 174 */
-	{ 0,	0,	NULL,			NULL		}, /* 175 */
-	{ 0,	0,	NULL,			NULL		}, /* 176 */
-	{ 0,	0,	NULL,			NULL		}, /* 177 */
-	{ 0,	0,	NULL,			NULL		}, /* 178 */
-	{ 0,	0,	NULL,			NULL		}, /* 179 */
-	{ 0,	0,	NULL,			NULL		}, /* 180 */
-	{ 0,	0,	NULL,			NULL		}, /* 181 */
-	{ 0,	0,	NULL,			NULL		}, /* 182 */
-	{ 0,	0,	NULL,			NULL		}, /* 183 */
-	{ 0,	0,	NULL,			NULL		}, /* 184 */
-	{ 0,	0,	NULL,			NULL		}, /* 185 */
-	{ 0,	0,	NULL,			NULL		}, /* 186 */
-	{ 0,	0,	NULL,			NULL		}, /* 187 */
-	{ 0,	0,	NULL,			NULL		}, /* 188 */
-	{ 0,	0,	NULL,			NULL		}, /* 189 */
-	{ 0,	0,	NULL,			NULL		}, /* 190 */
-	{ 0,	0,	NULL,			NULL		}, /* 191 */
-	{ 0,	0,	NULL,			NULL		}, /* 192 */
-	{ 0,	0,	NULL,			NULL		}, /* 193 */
-	{ 0,	0,	NULL,			NULL		}, /* 194 */
-	{ 0,	0,	NULL,			NULL		}, /* 195 */
-	{ 0,	0,	NULL,			NULL		}, /* 196 */
-	{ 0,	0,	NULL,			NULL		}, /* 197 */
-	{ 0,	0,	NULL,			NULL		}, /* 198 */
-	{ 0,	0,	NULL,			NULL		}, /* 199 */
-	{ 0,	0,	NULL,			NULL		}, /* 200 */
+	{ }, /* 146 */
+	{ }, /* 147 */
+	{ }, /* 148 */
+	{ }, /* 149 */
+	{ }, /* 150 */
+	{ }, /* 151 */
+	{ }, /* 152 */
+	{ }, /* 153 */
+	{ }, /* 154 */
+	{ }, /* 155 */
+	{ }, /* 156 */
+	{ }, /* 157 */
+	{ }, /* 158 */
+	{ }, /* 159 */
+	{ }, /* 160 */
+	{ }, /* 161 */
+	{ }, /* 162 */
+	{ }, /* 163 */
+	{ }, /* 164 */
+	{ }, /* 165 */
+	{ }, /* 166 */
+	{ }, /* 167 */
+	{ }, /* 168 */
+	{ }, /* 169 */
+	{ }, /* 170 */
+	{ }, /* 171 */
+	{ }, /* 172 */
+	{ }, /* 173 */
+	{ }, /* 174 */
+	{ }, /* 175 */
+	{ }, /* 176 */
+	{ }, /* 177 */
+	{ }, /* 178 */
+	{ }, /* 179 */
+	{ }, /* 180 */
+	{ }, /* 181 */
+	{ }, /* 182 */
+	{ }, /* 183 */
+	{ }, /* 184 */
+	{ }, /* 185 */
+	{ }, /* 186 */
+	{ }, /* 187 */
+	{ }, /* 188 */
+	{ }, /* 189 */
+	{ }, /* 190 */
+	{ }, /* 191 */
+	{ }, /* 192 */
+	{ }, /* 193 */
+	{ }, /* 194 */
+	{ }, /* 195 */
+	{ }, /* 196 */
+	{ }, /* 197 */
+	{ }, /* 198 */
+	{ }, /* 199 */
+	{ }, /* 200 */
 	{ 0,	0,	SEN(printargs),		"svr4_aread"	}, /*  0201 */
 	{ 0,	0,	SEN(printargs),		"svr4_awrite"	}, /*  0202 */
 	{ 0,	0,	SEN(printargs),		"svr4_listio"	}, /*  0203 */
@@ -268,18 +268,18 @@
 	{ 0,	0,	SEN(printargs),		"sysv_uadmin"	}, /* 1055 */
 	{ 0,	0,	SEN(printargs),		"sysv_sysmp"	}, /* 1056 */
 	{ 0,	0,	SEN(printargs),		"sysv_utssys"	}, /* 1057 */
-	{ 0,	0,	NULL,			NULL		}, /* 1058 */
+	{ }, /* 1058 */
 	{ 0,	0,	SEN(printargs),		"sysv_execve"	}, /* 1059 */
 	{ 0,	0,	SEN(printargs),		"sysv_umask"	}, /* 1060 */
 	{ 0,	0,	SEN(printargs),		"sysv_chroot"	}, /* 1061 */
 	{ 0,	0,	SEN(printargs),		"sysv_fcntl"	}, /* 1062 */
 	{ 0,	0,	SEN(printargs),		"sysv_ulimit"	}, /* 1063 */
-	{ 0,	0,	NULL,			NULL		}, /* 1064 */
-	{ 0,	0,	NULL,			NULL		}, /* 1065 */
-	{ 0,	0,	NULL,			NULL		}, /* 1066 */
-	{ 0,	0,	NULL,			NULL		}, /* 1067 */
-	{ 0,	0,	NULL,			NULL		}, /* 1068 */
-	{ 0,	0,	NULL,			NULL		}, /* 1069 */
+	{ }, /* 1064 */
+	{ }, /* 1065 */
+	{ }, /* 1066 */
+	{ }, /* 1067 */
+	{ }, /* 1068 */
+	{ }, /* 1069 */
 	{ 0,	0,	SEN(printargs),		"sysv_advfs"	}, /* 1070 */
 	{ 0,	0,	SEN(printargs),		"sysv_unadvfs"	}, /* 1071 */
 	{ 0,	0,	SEN(printargs),		"sysv_rmount"	}, /* 1072 */
@@ -451,8 +451,8 @@
 	{ 0,	0,	SEN(printargs),		"bsd43_setgid"	}, /* 2046 */
 	{ 0,	0,	SEN(printargs),		"bsd43_getgid"	}, /* 2047 */
 	{ 0,	0,	SEN(printargs),		"bsd43_ssig"	}, /* 2048 */
-	{ 0,	0,	NULL,			NULL		}, /* 2049 */
-	{ 0,	0,	NULL,			NULL		}, /* 2050 */
+	{ }, /* 2049 */
+	{ }, /* 2050 */
 	{ 0,	0,	SEN(printargs),		"bsd43_sysacct"	}, /* 2051 */
 	{ 0,	0,	SEN(printargs),		"bsd43_phys"	}, /* 2052 */
 	{ 0,	0,	SEN(printargs),		"bsd43_lock"	}, /* 2053 */
@@ -465,7 +465,7 @@
 	{ 0,	0,	SEN(printargs),		"bsd43_umask"	}, /* 2060 */
 	{ 0,	0,	SEN(printargs),		"bsd43_chroot"	}, /* 2061 */
 	{ 0,	0,	SEN(printargs),		"bsd43_fstat"	}, /* 2062 */
-	{ 0,	0,	NULL,			NULL		}, /* 2063 */
+	{ }, /* 2063 */
 	{ 0,	0,	SEN(printargs),		"bsd43_getpagesize"	}, /* 2064 */
 	{ 0,	TM|SI,	SEN(printargs),		"bsd43_mremap"	}, /* 2065 */
 	{ 0,	0,	SEN(printargs),		"bsd43_vfork"	}, /* 2066 */
@@ -521,7 +521,7 @@
 	{ 0,	0,	SEN(printargs),		"bsd43_gettimeofday"	}, /* 2116 */
 	{ 0,	0,	SEN(printargs),		"bsd43_getrusage"	}, /* 2117 */
 	{ 0,	0,	SEN(printargs),		"bsd43_getsockopt"	}, /* 2118 */
-	{ 0,	0,	NULL,			NULL		}, /* 2119 */
+	{ }, /* 2119 */
 	{ 0,	0,	SEN(printargs),		"bsd43_readv"	}, /* 2120 */
 	{ 0,	0,	SEN(printargs),		"bsd43_writev"	}, /* 2121 */
 	{ 0,	0,	SEN(printargs),		"bsd43_settimeofday"	}, /* 2122 */
@@ -557,8 +557,8 @@
 	{ 0,	0,	SEN(printargs),		"bsd43_cacheflush"	}, /* 2152 */
 	{ 0,	0,	SEN(printargs),		"bsd43_cachectl"	}, /* 2153 */
 	{ 0,	0,	SEN(printargs),		"bsd43_debug"	}, /* 2154 */
-	{ 0,	0,	NULL,			NULL		}, /* 2155 */
-	{ 0,	0,	NULL,			NULL		}, /* 2156 */
+	{ }, /* 2155 */
+	{ }, /* 2156 */
 	{ 0,	0,	SEN(printargs),		"bsd43_nfs_mount"	}, /* 2157 */
 	{ 0,	0,	SEN(printargs),		"bsd43_nfs_svc"	}, /* 2158 */
 	{ 0,	0,	SEN(printargs),		"bsd43_getdirentries"	}, /* 2159 */
@@ -579,8 +579,8 @@
 	{ 0,	0,	SEN(printargs),		"bsd43_libattach"	}, /* 2174 */
 	{ 0,	0,	SEN(printargs),		"bsd43_libdetach"	}, /* 2175 */
 	{ 0,	0,	SEN(printargs),		"bsd43_accept"	}, /* 2176 */
-	{ 0,	0,	NULL,			NULL		}, /* 2177 */
-	{ 0,	0,	NULL,			NULL		}, /* 2178 */
+	{ }, /* 2177 */
+	{ }, /* 2178 */
 	{ 0,	0,	SEN(printargs),		"bsd43_recvmsg"	}, /* 2179 */
 	{ 0,	0,	SEN(printargs),		"bsd43_recvfrom"	}, /* 2180 */
 	{ 0,	0,	SEN(printargs),		"bsd43_sendmsg"	}, /* 2181 */
@@ -655,24 +655,24 @@
 	{ 0,	0,	SEN(printargs),		"posix_uadmin"	}, /* 3055 */
 	{ 0,	0,	SEN(printargs),		"posix_exch"	}, /* 3056 */
 	{ 0,	0,	SEN(printargs),		"posix_utssys"	}, /* 3057 */
-	{ 0,	0,	NULL,			NULL		}, /* 3058 */
+	{ }, /* 3058 */
 	{ 0,	0,	SEN(printargs),		"posix_exece"	}, /* 3059 */
 	{ 0,	0,	SEN(printargs),		"posix_umask"	}, /* 3060 */
 	{ 0,	0,	SEN(printargs),		"posix_chroot"	}, /* 3061 */
 	{ 0,	0,	SEN(printargs),		"posix_fcntl"	}, /* 3062 */
 	{ 0,	0,	SEN(printargs),		"posix_ulimit"	}, /* 3063 */
-	{ 0,	0,	NULL,			NULL		}, /* 3064 */
-	{ 0,	0,	NULL,			NULL		}, /* 3065 */
-	{ 0,	0,	NULL,			NULL		}, /* 3066 */
-	{ 0,	0,	NULL,			NULL		}, /* 3067 */
-	{ 0,	0,	NULL,			NULL		}, /* 3068 */
-	{ 0,	0,	NULL,			NULL		}, /* 3069 */
+	{ }, /* 3064 */
+	{ }, /* 3065 */
+	{ }, /* 3066 */
+	{ }, /* 3067 */
+	{ }, /* 3068 */
+	{ }, /* 3069 */
 	{ 0,	0,	SEN(printargs),		"posix_advfs"	}, /* 3070 */
 	{ 0,	0,	SEN(printargs),		"posix_unadvfs"	}, /* 3071 */
 	{ 0,	0,	SEN(printargs),		"posix_rmount"	}, /* 3072 */
 	{ 0,	0,	SEN(printargs),		"posix_rumount"	}, /* 3073 */
 	{ 0,	0,	SEN(printargs),		"posix_rfstart"	}, /* 3074 */
-	{ 0,	0,	NULL,			NULL		}, /* 3075 */
+	{ }, /* 3075 */
 	{ 0,	0,	SEN(printargs),		"posix_rdebug"	}, /* 3076 */
 	{ 0,	0,	SEN(printargs),		"posix_rfstop"	}, /* 3077 */
 	{ 0,	0,	SEN(printargs),		"posix_rfsys"	}, /* 3078 */
@@ -729,7 +729,7 @@
 	{ 0,	0,	SEN(printargs),		"posix_SGI_sproc"	}, /* 3129 */
 	{ 0,	0,	SEN(printargs),		"posix_SGI_prctl"	}, /* 3130 */
 	{ 0,	0,	SEN(printargs),		"posix_SGI_blkproc"	}, /* 3131 */
-	{ 0,	0,	NULL,			NULL		}, /* 3132 */
+	{ }, /* 3132 */
 	{ 0,	0,	SEN(printargs),		"posix_SGI_sgigsc"	}, /* 3133 */
 	{ 0,	TD|TM|SI,	SEN(printargs),		"posix_SGI_mmap"	}, /* 3134 */
 	{ 0,	TM|SI,	SEN(printargs),		"posix_SGI_munmap"	}, /* 3135 */
@@ -742,11 +742,11 @@
 	{ 0,	0,	SEN(printargs),		"posix_SGI_libdetach"	}, /* 3142 */
 	{ 0,	0,	SEN(printargs),		"posix_SGI_getpgrp"	}, /* 3143 */
 	{ 0,	0,	SEN(printargs),		"posix_SGI_setpgrp"	}, /* 3144 */
-	{ 0,	0,	NULL,			NULL		}, /* 3145 */
-	{ 0,	0,	NULL,			NULL		}, /* 3146 */
-	{ 0,	0,	NULL,			NULL		}, /* 3147 */
-	{ 0,	0,	NULL,			NULL		}, /* 3148 */
-	{ 0,	0,	NULL,			NULL		}, /* 3149 */
+	{ }, /* 3145 */
+	{ }, /* 3146 */
+	{ }, /* 3147 */
+	{ }, /* 3148 */
+	{ }, /* 3149 */
 	{ 0,	0,	SEN(printargs),		"posix_cacheflush"	}, /* 3150 */
 	{ 0,	0,	SEN(printargs),		"posix_cachectl"	}, /* 3151 */
 	{ 0,	0,	SEN(printargs),		"posix_fchown"	}, /* 3152 */
@@ -767,96 +767,96 @@
 	{ 0,	0,	SEN(printargs),		"posix_setrlimit"	}, /* 3167 */
 	{ 0,	0,	SEN(printargs),		"posix_waitpid"	}, /* 3168 */
 	{ 0,	0,	SEN(printargs),		"posix_dup2"	}, /* 3169 */
-	{ 0,	0,	NULL,			NULL		}, /* 3170 */
-	{ 0,	0,	NULL,			NULL		}, /* 3171 */
-	{ 0,	0,	NULL,			NULL		}, /* 3172 */
-	{ 0,	0,	NULL,			NULL		}, /* 3173 */
-	{ 0,	0,	NULL,			NULL		}, /* 3174 */
-	{ 0,	0,	NULL,			NULL		}, /* 3175 */
-	{ 0,	0,	NULL,			NULL		}, /* 3176 */
-	{ 0,	0,	NULL,			NULL		}, /* 3177 */
-	{ 0,	0,	NULL,			NULL		}, /* 3178 */
-	{ 0,	0,	NULL,			NULL		}, /* 3179 */
-	{ 0,	0,	NULL,			NULL		}, /* 3180 */
-	{ 0,	0,	NULL,			NULL		}, /* 3181 */
-	{ 0,	0,	NULL,			NULL		}, /* 3182 */
-	{ 0,	0,	NULL,			NULL		}, /* 3183 */
-	{ 0,	0,	NULL,			NULL		}, /* 3184 */
-	{ 0,	0,	NULL,			NULL		}, /* 3185 */
-	{ 0,	0,	NULL,			NULL		}, /* 3186 */
-	{ 0,	0,	NULL,			NULL		}, /* 3187 */
-	{ 0,	0,	NULL,			NULL		}, /* 3188 */
-	{ 0,	0,	NULL,			NULL		}, /* 3189 */
-	{ 0,	0,	NULL,			NULL		}, /* 3190 */
-	{ 0,	0,	NULL,			NULL		}, /* 3191 */
-	{ 0,	0,	NULL,			NULL		}, /* 3192 */
-	{ 0,	0,	NULL,			NULL		}, /* 3193 */
-	{ 0,	0,	NULL,			NULL		}, /* 3194 */
-	{ 0,	0,	NULL,			NULL		}, /* 3195 */
-	{ 0,	0,	NULL,			NULL		}, /* 3196 */
-	{ 0,	0,	NULL,			NULL		}, /* 3197 */
-	{ 0,	0,	NULL,			NULL		}, /* 3198 */
-	{ 0,	0,	NULL,			NULL		}, /* 3199 */
-	{ 0,	0,	NULL,			NULL		}, /* 3200 */
-	{ 0,	0,	NULL,			NULL		}, /* 3201 */
-	{ 0,	0,	NULL,			NULL		}, /* 3202 */
-	{ 0,	0,	NULL,			NULL		}, /* 3203 */
-	{ 0,	0,	NULL,			NULL		}, /* 3204 */
-	{ 0,	0,	NULL,			NULL		}, /* 3205 */
-	{ 0,	0,	NULL,			NULL		}, /* 3206 */
-	{ 0,	0,	NULL,			NULL		}, /* 3207 */
-	{ 0,	0,	NULL,			NULL		}, /* 3208 */
-	{ 0,	0,	NULL,			NULL		}, /* 3209 */
-	{ 0,	0,	NULL,			NULL		}, /* 3210 */
-	{ 0,	0,	NULL,			NULL		}, /* 3211 */
-	{ 0,	0,	NULL,			NULL		}, /* 3212 */
-	{ 0,	0,	NULL,			NULL		}, /* 3213 */
-	{ 0,	0,	NULL,			NULL		}, /* 3214 */
-	{ 0,	0,	NULL,			NULL		}, /* 3215 */
-	{ 0,	0,	NULL,			NULL		}, /* 3216 */
-	{ 0,	0,	NULL,			NULL		}, /* 3217 */
-	{ 0,	0,	NULL,			NULL		}, /* 3218 */
-	{ 0,	0,	NULL,			NULL		}, /* 3219 */
-	{ 0,	0,	NULL,			NULL		}, /* 3220 */
-	{ 0,	0,	NULL,			NULL		}, /* 3221 */
-	{ 0,	0,	NULL,			NULL		}, /* 3222 */
-	{ 0,	0,	NULL,			NULL		}, /* 3223 */
-	{ 0,	0,	NULL,			NULL		}, /* 3224 */
-	{ 0,	0,	NULL,			NULL		}, /* 3225 */
-	{ 0,	0,	NULL,			NULL		}, /* 3226 */
-	{ 0,	0,	NULL,			NULL		}, /* 3227 */
-	{ 0,	0,	NULL,			NULL		}, /* 3228 */
-	{ 0,	0,	NULL,			NULL		}, /* 3229 */
-	{ 0,	0,	NULL,			NULL		}, /* 3230 */
-	{ 0,	0,	NULL,			NULL		}, /* 3231 */
-	{ 0,	0,	NULL,			NULL		}, /* 3232 */
-	{ 0,	0,	NULL,			NULL		}, /* 3233 */
-	{ 0,	0,	NULL,			NULL		}, /* 3234 */
-	{ 0,	0,	NULL,			NULL		}, /* 3235 */
-	{ 0,	0,	NULL,			NULL		}, /* 3236 */
-	{ 0,	0,	NULL,			NULL		}, /* 3237 */
-	{ 0,	0,	NULL,			NULL		}, /* 3238 */
-	{ 0,	0,	NULL,			NULL		}, /* 3239 */
-	{ 0,	0,	NULL,			NULL		}, /* 3240 */
-	{ 0,	0,	NULL,			NULL		}, /* 3241 */
-	{ 0,	0,	NULL,			NULL		}, /* 3242 */
-	{ 0,	0,	NULL,			NULL		}, /* 3243 */
-	{ 0,	0,	NULL,			NULL		}, /* 3244 */
-	{ 0,	0,	NULL,			NULL		}, /* 3245 */
-	{ 0,	0,	NULL,			NULL		}, /* 3246 */
-	{ 0,	0,	NULL,			NULL		}, /* 3247 */
-	{ 0,	0,	NULL,			NULL		}, /* 3248 */
-	{ 0,	0,	NULL,			NULL		}, /* 3249 */
-	{ 0,	0,	NULL,			NULL		}, /* 3250 */
-	{ 0,	0,	NULL,			NULL		}, /* 3251 */
-	{ 0,	0,	NULL,			NULL		}, /* 3252 */
-	{ 0,	0,	NULL,			NULL		}, /* 3253 */
-	{ 0,	0,	NULL,			NULL		}, /* 3254 */
-	{ 0,	0,	NULL,			NULL		}, /* 3255 */
-	{ 0,	0,	NULL,			NULL		}, /* 3256 */
-	{ 0,	0,	NULL,			NULL		}, /* 3257 */
-	{ 0,	0,	NULL,			NULL		}, /* 3258 */
-	{ 0,	0,	NULL,			NULL		}, /* 3259 */
+	{ }, /* 3170 */
+	{ }, /* 3171 */
+	{ }, /* 3172 */
+	{ }, /* 3173 */
+	{ }, /* 3174 */
+	{ }, /* 3175 */
+	{ }, /* 3176 */
+	{ }, /* 3177 */
+	{ }, /* 3178 */
+	{ }, /* 3179 */
+	{ }, /* 3180 */
+	{ }, /* 3181 */
+	{ }, /* 3182 */
+	{ }, /* 3183 */
+	{ }, /* 3184 */
+	{ }, /* 3185 */
+	{ }, /* 3186 */
+	{ }, /* 3187 */
+	{ }, /* 3188 */
+	{ }, /* 3189 */
+	{ }, /* 3190 */
+	{ }, /* 3191 */
+	{ }, /* 3192 */
+	{ }, /* 3193 */
+	{ }, /* 3194 */
+	{ }, /* 3195 */
+	{ }, /* 3196 */
+	{ }, /* 3197 */
+	{ }, /* 3198 */
+	{ }, /* 3199 */
+	{ }, /* 3200 */
+	{ }, /* 3201 */
+	{ }, /* 3202 */
+	{ }, /* 3203 */
+	{ }, /* 3204 */
+	{ }, /* 3205 */
+	{ }, /* 3206 */
+	{ }, /* 3207 */
+	{ }, /* 3208 */
+	{ }, /* 3209 */
+	{ }, /* 3210 */
+	{ }, /* 3211 */
+	{ }, /* 3212 */
+	{ }, /* 3213 */
+	{ }, /* 3214 */
+	{ }, /* 3215 */
+	{ }, /* 3216 */
+	{ }, /* 3217 */
+	{ }, /* 3218 */
+	{ }, /* 3219 */
+	{ }, /* 3220 */
+	{ }, /* 3221 */
+	{ }, /* 3222 */
+	{ }, /* 3223 */
+	{ }, /* 3224 */
+	{ }, /* 3225 */
+	{ }, /* 3226 */
+	{ }, /* 3227 */
+	{ }, /* 3228 */
+	{ }, /* 3229 */
+	{ }, /* 3230 */
+	{ }, /* 3231 */
+	{ }, /* 3232 */
+	{ }, /* 3233 */
+	{ }, /* 3234 */
+	{ }, /* 3235 */
+	{ }, /* 3236 */
+	{ }, /* 3237 */
+	{ }, /* 3238 */
+	{ }, /* 3239 */
+	{ }, /* 3240 */
+	{ }, /* 3241 */
+	{ }, /* 3242 */
+	{ }, /* 3243 */
+	{ }, /* 3244 */
+	{ }, /* 3245 */
+	{ }, /* 3246 */
+	{ }, /* 3247 */
+	{ }, /* 3248 */
+	{ }, /* 3249 */
+	{ }, /* 3250 */
+	{ }, /* 3251 */
+	{ }, /* 3252 */
+	{ }, /* 3253 */
+	{ }, /* 3254 */
+	{ }, /* 3255 */
+	{ }, /* 3256 */
+	{ }, /* 3257 */
+	{ }, /* 3258 */
+	{ }, /* 3259 */
 	{ 0,	0,	SEN(printargs),		"posix_netboot"	}, /* 3260 */
 	{ 0,	0,	SEN(printargs),		"posix_netunboot"	}, /* 3261 */
 	{ 0,	0,	SEN(printargs),		"posix_rdump"	}, /* 3262 */
