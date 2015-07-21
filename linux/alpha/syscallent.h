@@ -69,7 +69,7 @@
 [ 40] = { 5,	0,		SEN(printargs),			"osf_old_lstat"		}, /*not implemented */
 [ 41] = { 1,	TD,		SEN(dup),			"dup"			},
 [ 42] = { 1,	TD,		SEN(pipe),			"pipe"			},
-[ 43] = { 5,	0,		SEN(printargs),			"osf_set_program_attributes"	},
+[ 43] = { 4,	0,		SEN(printargs),			"osf_set_program_attributes"	},
 [ 44] = { 5,	0,		SEN(printargs),			"osf_profil"		}, /*not implemented */
 [ 45] = { 3,	TD|TF,		SEN(open),			"open"			},
 [ 46] = { 5,	0,		SEN(printargs),			"osf_old_sigaction"	}, /*not implemented */
@@ -138,7 +138,7 @@
 [109] = { 5,	0,		SEN(printargs),			"osf_old_sigblock"	}, /*not implemented */
 [110] = { 5,	0,		SEN(printargs),			"osf_old_sigsetmask"	}, /*not implemented */
 [111] = { 3,	TS,		SEN(sigsuspend),		"sigsuspend"		},
-[112] = { 5,	0,		SEN(printargs),			"sigstack"		},
+[112] = { 2,	0,		SEN(printargs),			"osf_sigstack"		},
 [113] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
 [114] = { 3,	TN,		SEN(sendmsg),			"sendmsg"		},
 [115] = { 5,	0,		SEN(printargs),			"osf_old_vtrace"	}, /*not implemented */
