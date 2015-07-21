@@ -317,7 +317,7 @@
 [1104] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},
 [1105] = { 3,	0,		SEN(gettid),			"gettid"		},
 [1106] = { 3,	TI,		SEN(semget),			"semget"		},
-[1107] = { 3,	TI,		SEN(printargs),			"semop"			},
+[1107] = { 3,	TI,		SEN(semop),			"semop"			},
 [1108] = { 4,	TI,		SEN(semctl),			"semctl"		},
 [1109] = { 2,	TI,		SEN(msgget),			"msgget"		},
 [1110] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},

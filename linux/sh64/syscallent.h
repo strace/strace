@@ -262,7 +262,7 @@
 [234] = { 5,	TN,		SEN(getsockopt),		"getsockopt"		},
 [235] = { 3,	TN,		SEN(sendmsg),			"sendmsg"		},
 [236] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
-[237] = { 4,	TI,		SEN(semop),			"semop"			},
+[237] = { 3,	TI,		SEN(semop),			"semop"			},
 [238] = { 3,	TI,		SEN(semget),			"semget"		},
 [239] = { 4,	TI,		SEN(semctl),			"semctl"		},
 [240] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},

@@ -63,7 +63,7 @@
 [5060] = { 2,	TS,		SEN(kill),			"kill"			},
 [5061] = { 1,	0,		SEN(uname),			"uname"			},
 [5062] = { 3,	TI,		SEN(semget),			"semget"		},
-[5063] = { 3,	TI,		SEN(printargs),			"semop"			},
+[5063] = { 3,	TI,		SEN(semop),			"semop"			},
 [5064] = { 4,	TI,		SEN(semctl),			"semctl"		},
 [5065] = { 1,	TI|TM|SI,	SEN(shmdt),			"shmdt"			},
 [5066] = { 2,	TI,		SEN(msgget),			"msgget"		},

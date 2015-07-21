@@ -209,7 +209,7 @@
 [203] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
 [204] = { 4,	TI,		SEN(semctl),			"semctl"		},
 [205] = { 3,	TI,		SEN(semget),			"semget"		},
-[206] = { 4,	TI,		SEN(printargs),			"semop"			},
+[206] = { 3,	TI,		SEN(semop),			"semop"			},
 [207] = { 1,	0,		SEN(printargs),			"osf_utsname"		},
 [208] = { 3,	TF,		SEN(chown),			"lchown"		},
 [209] = { 3,	TI|TM,		SEN(printargs),			"osf_shmat"		},

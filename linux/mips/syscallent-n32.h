@@ -63,7 +63,7 @@
 [6060] = { 2,	TS,		SEN(kill),			"kill"			},
 [6061] = { 1,	0,		SEN(uname),			"uname"			},
 [6062] = { 3,	TI,		SEN(semget),			"semget"		},
-[6063] = { 3,	TI,		SEN(printargs),			"semop"			},
+[6063] = { 3,	TI,		SEN(semop),			"semop"			},
 [6064] = { 4,	TI,		SEN(semctl),			"semctl"		},
 [6065] = { 1,	TI|TM|SI,	SEN(shmdt),			"shmdt"			},
 [6066] = { 2,	TI,		SEN(msgget),			"msgget"		},
