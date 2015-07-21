@@ -277,7 +277,8 @@ SYS_FUNC(mincore)
 	return 0;
 }
 
-#if defined(ALPHA) || defined(IA64) || defined(SPARC) || defined(SPARC64)
+#if defined ALPHA || defined IA64 || defined M68K \
+ || defined SPARC || defined SPARC64
 SYS_FUNC(getpagesize)
 {
 	if (exiting(tcp))

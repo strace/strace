@@ -192,7 +192,7 @@
 [163] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},
 [164] = { 3,	0,		SEN(setresuid16),		"setresuid"		},
 [165] = { 3,	0,		SEN(getresuid16),		"getresuid"		},
-[166] = { 5,	0,		SEN(printargs),			"getpagesize"		},
+[166] = { 0,	0,		SEN(getpagesize),		"getpagesize"		},
 [167] = { 5,	0,		SEN(query_module),		"query_module"		},
 [168] = { 3,	TD,		SEN(poll),			"poll"			},
 [169] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
