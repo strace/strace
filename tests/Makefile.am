@@ -48,7 +48,7 @@ check_PROGRAMS = \
 	utime \
 	xattr
 
-filter_unavailable_LDFLAGS = -pthread
+filter_unavailable_LDADD = -lpthread
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
