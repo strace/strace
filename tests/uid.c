@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/syscall.h>
 
 int
@@ -24,6 +25,21 @@ main(void)
 # define __NR_getuid __NR_getxuid
 #endif
 	uid = syscall(__NR_getuid);
+
+	(void) close(0);
+	if (open("/proc/sys/kernel/overflowuid", O_RDONLY) == 0) {
+		/* we trust the kernel */
+		char buf[sizeof(int)*3];
+		int n = read(0, buf, sizeof(buf) - 1);
+		if (n) {
+			buf[n] = '\0';
+			n = atoi(buf);
+			if (uid == n)
+				return 77;
+		}
+		(void) close(0);
+	}
+
 	assert(syscall(__NR_setuid, uid) == 0);
 	{
 		/*
