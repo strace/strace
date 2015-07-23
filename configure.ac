@@ -852,33 +852,8 @@ if test "$arch" = mips && test "$no_create" != yes; then
 	fi
 fi
 
-have_m32=no
-case "$arch" in
-	aarch64|powerpc64|sparc64|tile|x32|x86_64)
-	AC_MSG_CHECKING([for -m32 runtime support])
-	saved_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -m32"
-	AC_RUN_IFELSE([AC_LANG_SOURCE([[int main(){return 0;}]])],
-		[have_m32=yes],[have_m32=no],[have_m32=no])
-	CFLAGS="$saved_CFLAGS"
-	AC_MSG_RESULT($have_m32)
-	;;
-esac
-AM_CONDITIONAL([HAVE_M32_RUNTIME], [test "$have_m32" = yes])
-
-have_mx32=no
-case "$arch" in
-	x86_64)
-	AC_MSG_CHECKING([for -mx32 runtime support])
-	saved_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -mx32"
-	AC_RUN_IFELSE([AC_LANG_SOURCE([[int main(){return 0;}]])],
-		[have_mx32=yes],[have_mx32=no],[have_mx32=no])
-	CFLAGS="$saved_CFLAGS"
-	AC_MSG_RESULT($have_mx32)
-	;;
-esac
-AM_CONDITIONAL([HAVE_MX32_RUNTIME], [test "$have_mx32" = yes])
+st_MPERS([m32], [aarch64|powerpc64|sparc64|tile|x32|x86_64])
+st_MPERS([mx32], [x86_64])
 
 AC_CONFIG_FILES([Makefile tests/Makefile tests-m32/Makefile tests-mx32/Makefile])
 AC_OUTPUT
