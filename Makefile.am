@@ -31,6 +31,7 @@ strace_SOURCES =	\
 	aio.c		\
 	bjm.c		\
 	block.c		\
+	bpf.c		\
 	cacheflush.c	\
 	capability.c	\
 	caps0.h		\

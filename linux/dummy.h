@@ -32,7 +32,6 @@
 #endif
 
 /* still unfinished */
-#define	sys_bpf			printargs
 #define	sys_execveat		printargs
 #define	sys_ioperm		printargs
 #define	sys_iopl		printargs

@@ -318,6 +318,7 @@ pathtrace_match(struct tcb *tcp)
 		return 0;
 	}
 
+	case SEN_bpf:
 	case SEN_epoll_create:
 	case SEN_eventfd2:
 	case SEN_eventfd:

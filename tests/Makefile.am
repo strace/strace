@@ -9,6 +9,7 @@ AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 	      -I$(top_srcdir)/$(OS)
 
 check_PROGRAMS = \
+	bpf \
 	caps \
 	fanotify_mark \
 	filter-unavailable \
@@ -61,6 +62,7 @@ TESTS = \
 	strace-f.test \
 	qual_syscall.test \
 	bexecve.test \
+	bpf.test \
 	caps.test \
 	dumpio.test \
 	fanotify_mark.test \
