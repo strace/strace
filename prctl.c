@@ -31,6 +31,15 @@ enum {
 
 #include "xlat/cap.h"
 
+static void
+print_prctl_args(struct tcb *tcp, const unsigned int first)
+{
+	unsigned int i;
+
+	for (i = first; i < tcp->s_ent->nargs; ++i)
+		tprintf(", %#lx", tcp->u_arg[i]);
+}
+
 SYS_FUNC(prctl)
 {
 	unsigned int i;
@@ -151,8 +160,7 @@ SYS_FUNC(prctl)
 				   "PR_MCE_KILL_???");
 		else
 			tprintf("%#lx", tcp->u_arg[2]);
-		for (i = 3; i < tcp->s_ent->nargs; i++)
-			tprintf(", %#lx", tcp->u_arg[i]);
+		print_prctl_args(tcp, 3);
 		return RVAL_DECODED;
 
 	case PR_SET_NAME:
@@ -163,8 +171,7 @@ SYS_FUNC(prctl)
 	case PR_SET_MM:
 		tprints(", ");
 		printxval(pr_set_mm, tcp->u_arg[1], "PR_SET_MM_???");
-		for (i = 2; i < tcp->s_ent->nargs; i++)
-			tprintf(", %#lx", tcp->u_arg[i]);
+		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
 	case PR_SET_PDEATHSIG:
@@ -194,8 +201,7 @@ SYS_FUNC(prctl)
 			print_seccomp_filter(tcp, tcp->u_arg[2]);
 			return RVAL_DECODED;
 		}
-		for (i = 2; i < tcp->s_ent->nargs; i++)
-			tprintf(", %#lx", tcp->u_arg[i]);
+		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
 	case PR_SET_SECUREBITS:
@@ -220,19 +226,22 @@ SYS_FUNC(prctl)
 	case PR_SET_NO_NEW_PRIVS:
 	case PR_SET_THP_DISABLE:
 		tprintf(", %lu", tcp->u_arg[1]);
-		for (i = 2; i < tcp->s_ent->nargs; i++)
-			tprintf(", %#lx", tcp->u_arg[i]);
+		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
 	case PR_GET_NO_NEW_PRIVS:
 	case PR_GET_THP_DISABLE:
-		if (entering(tcp))
-			return printargs(tcp);
+		if (entering(tcp)) {
+			print_prctl_args(tcp, 1);
+			return 0;
+		}
 		return syserror(tcp) ? 0 : RVAL_UDECIMAL;
 
 	case PR_MCE_KILL_GET:
-		if (entering(tcp))
-			return printargs(tcp);
+		if (entering(tcp)) {
+			print_prctl_args(tcp, 1);
+			return 0;
+		}
 		if (syserror(tcp))
 			return 0;
 		tcp->auxstr = xlookup(pr_mce_kill_policy, tcp->u_rval);
@@ -241,7 +250,7 @@ SYS_FUNC(prctl)
 	case PR_MPX_DISABLE_MANAGEMENT:
 	case PR_MPX_ENABLE_MANAGEMENT:
 	default:
-		printargs(tcp);
+		print_prctl_args(tcp, 1);
 		return RVAL_DECODED;
 	}
 	return 0;
