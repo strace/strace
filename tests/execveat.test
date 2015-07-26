@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check execveat syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace $args
+match_grep
+run_strace -v $args
+match_grep "$LOG" "$srcdir/${ME_%.test}-v.expected"
+
+exit 0

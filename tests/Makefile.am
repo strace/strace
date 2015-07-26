@@ -12,6 +12,7 @@ check_PROGRAMS = \
 	bpf \
 	caps \
 	execve \
+	execveat \
 	fanotify_mark \
 	filter-unavailable \
 	getrandom \
@@ -67,6 +68,7 @@ TESTS = \
 	caps.test \
 	dumpio.test \
 	execve.test \
+	execveat.test \
 	fanotify_mark.test \
 	filter-unavailable.test \
 	getdents.test \
@@ -121,6 +123,8 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     dumpio.expected \
 	     execve.expected \
 	     execve-v.expected \
+	     execveat.expected \
+	     execveat-v.expected \
 	     fanotify_mark.expected \
 	     filter-unavailable.expected \
 	     getdents.awk \

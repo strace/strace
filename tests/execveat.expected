@@ -1,0 +1,1 @@
+execveat\(AT_FDCWD, "execveat\\nfilename", \["execveat\\nfilename", "first", "second"\], \[/\* 2 vars \*/\], AT_SYMLINK_NOFOLLOW\|AT_EMPTY_PATH\) += -1 .*

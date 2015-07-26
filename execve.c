@@ -40,29 +40,45 @@ printargc(const char *fmt, struct tcb *tcp, long addr)
 	tprintf(fmt, count, count == 1 ? "" : "s");
 }
 
+static void
+decode_execve(struct tcb *tcp, const unsigned int index)
+{
+	printpath(tcp, tcp->u_arg[index + 0]);
+	tprints(", ");
+
+	if (!tcp->u_arg[index + 1] || !verbose(tcp))
+		printaddr(tcp->u_arg[index + 1]);
+	else {
+		tprints("[");
+		printargv(tcp, tcp->u_arg[index + 1]);
+		tprints("]");
+	}
+	tprints(", ");
+
+	if (!tcp->u_arg[index + 2] || !verbose(tcp))
+		printaddr(tcp->u_arg[index + 2]);
+	else if (abbrev(tcp))
+		printargc("[/* %d var%s */]", tcp, tcp->u_arg[index + 2]);
+	else {
+		tprints("[");
+		printargv(tcp, tcp->u_arg[index + 2]);
+		tprints("]");
+	}
+}
+
 SYS_FUNC(execve)
 {
-	printpath(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	decode_execve(tcp, 0);
 
-	if (!tcp->u_arg[1] || !verbose(tcp))
-		printaddr(tcp->u_arg[1]);
-	else {
-		tprints("[");
-		printargv(tcp, tcp->u_arg[1]);
-		tprints("]");
-	}
-	tprints(", ");
+	return RVAL_DECODED;
+}
 
-	if (!tcp->u_arg[2] || !verbose(tcp))
-		printaddr(tcp->u_arg[2]);
-	else if (abbrev(tcp))
-		printargc("[/* %d var%s */]", tcp, tcp->u_arg[2]);
-	else {
-		tprints("[");
-		printargv(tcp, tcp->u_arg[2]);
-		tprints("]");
-	}
+SYS_FUNC(execveat)
+{
+	print_dirfd(tcp, tcp->u_arg[0]);
+	decode_execve(tcp, 1);
+	tprints(", ");
+	printflags(at_flags, tcp->u_arg[4], "AT_???");
 
 	return RVAL_DECODED;
 }
