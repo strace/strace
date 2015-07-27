@@ -1,5 +1,6 @@
 bpf
 caps
+execve
 fanotify_mark
 filter-unavailable
 getrandom

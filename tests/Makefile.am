@@ -11,6 +11,7 @@ AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 check_PROGRAMS = \
 	bpf \
 	caps \
+	execve \
 	fanotify_mark \
 	filter-unavailable \
 	getrandom \
@@ -65,6 +66,7 @@ TESTS = \
 	bpf.test \
 	caps.test \
 	dumpio.test \
+	execve.test \
 	fanotify_mark.test \
 	filter-unavailable.test \
 	getdents.test \
@@ -117,6 +119,8 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     dumpio.expected \
+	     execve.expected \
+	     execve-v.expected \
 	     fanotify_mark.expected \
 	     filter-unavailable.expected \
 	     getdents.awk \

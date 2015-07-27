@@ -32,10 +32,10 @@ static void
 printargc(const char *fmt, struct tcb *tcp, long addr)
 {
 	int count;
-	char *cp;
+	char *cp = NULL;
 
-	for (count = 0; umove(tcp, addr, &cp) >= 0 && cp != NULL; count++) {
-		addr += sizeof(char *);
+	for (count = 0; !umoven(tcp, addr, current_wordsize, &cp) && cp; count++) {
+		addr += current_wordsize;
 	}
 	tprintf(fmt, count, count == 1 ? "" : "s");
 }
