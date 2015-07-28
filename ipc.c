@@ -342,7 +342,7 @@ SYS_FUNC(mq_open)
 		/* mode */
 		tprintf(", %#lo, ", tcp->u_arg[2]);
 # ifndef HAVE_MQUEUE_H
-		printaddr(tcp, tcp->u_arg[3]);
+		printaddr(tcp->u_arg[3]);
 # else
 		struct mq_attr attr;
 
