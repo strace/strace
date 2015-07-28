@@ -324,6 +324,7 @@ pathtrace_match(struct tcb *tcp)
 	case SEN_eventfd:
 	case SEN_fanotify_init:
 	case SEN_inotify_init1:
+	case SEN_memfd_create:
 	case SEN_perf_event_open:
 	case SEN_pipe:
 	case SEN_printargs:

@@ -22,6 +22,7 @@ check_PROGRAMS = \
 	ipc_msg \
 	ipc_sem \
 	ipc_shm \
+	memfd_create \
 	mmap \
 	mmap64 \
 	mmsg \
@@ -88,6 +89,7 @@ TESTS = \
 	stat32-v.test \
 	stat64-v.test \
 	statfs.test \
+	memfd_create.test \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \
@@ -133,6 +135,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ioctl.expected \
 	     ip_mreq.expected \
 	     ipc.sh \
+	     memfd_create.expected \
 	     mmsg.expected \
 	     net.expected \
 	     net-fd.expected \

@@ -1,0 +1,1 @@
+memfd_create\("strace", MFD_CLOEXEC\|MFD_ALLOW_SEALING\|0x4\) += -1 .*

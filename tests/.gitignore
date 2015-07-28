@@ -11,6 +11,7 @@ ip_mreq
 ipc_msg
 ipc_sem
 ipc_shm
+memfd_create
 mmap
 mmap64
 mmsg
