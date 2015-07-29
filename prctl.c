@@ -168,6 +168,27 @@ SYS_FUNC(prctl)
 		printstr(tcp, tcp->u_arg[1], TASK_COMM_LEN);
 		return RVAL_DECODED;
 
+#ifdef __ANDROID__
+# ifndef PR_SET_VMA
+#  define PR_SET_VMA   0x53564d41
+# endif
+# ifndef PR_SET_VMA_ANON_NAME
+#  define PR_SET_VMA_ANON_NAME    0
+# endif
+	case PR_SET_VMA:
+		if (tcp->u_arg[1] == PR_SET_VMA_ANON_NAME) {
+			tprintf(", %lu", tcp->u_arg[1]);
+			tprintf(", %#lx", tcp->u_arg[2]);
+			tprintf(", %lu, ", tcp->u_arg[3]);
+			printstr(tcp, tcp->u_arg[4], -1);
+		} else {
+			/* There are no other sub-options now, but there
+			 * might be in future... */
+			print_prctl_args(tcp, 1);
+		}
+		return RVAL_DECODED;
+#endif
+
 	case PR_SET_MM:
 		tprints(", ");
 		printxval(pr_set_mm, tcp->u_arg[1], "PR_SET_MM_???");
