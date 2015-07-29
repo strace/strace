@@ -253,7 +253,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	inttypes.h
 	ioctls.h
-	linux/bpf.h
 	linux/bsg.h
 	linux/falloc.h
 	linux/filter.h
@@ -317,6 +316,20 @@ AC_CHECK_HEADERS([libaio.h], [
 
 AC_CHECK_HEADERS([linux/input.h], [
 	AC_CHECK_MEMBERS([struct input_absinfo.resolution],,, [#include <linux/input.h>])
+])
+
+AC_CHECK_HEADERS([linux/bpf.h], [
+	AC_CACHE_CHECK([whether union bpf_attr.log_buf initialization works],
+		       [st_cv_have_union_bpf_attr_log_buf],
+		[AC_COMPILE_IFELSE(
+			[AC_LANG_PROGRAM([[#include <linux/bpf.h>]],
+					 [[union bpf_attr a = { .log_buf = 0 };]])],
+			[st_cv_have_union_bpf_attr_log_buf=yes],
+			[st_cv_have_union_bpf_attr_log_buf=no])])
+	if test $st_cv_have_union_bpf_attr_log_buf = yes; then
+		AC_DEFINE(HAVE_UNION_BPF_ATTR_LOG_BUF, [1],
+			  [Define to 1 if union bpf_attr.log_buf initialization works])
+	fi
 ])
 
 AC_CHECK_DECLS([sys_errlist])

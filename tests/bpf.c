@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
-#if defined HAVE_LINUX_BPF_H && defined __NR_bpf
+#if defined HAVE_UNION_BPF_ATTR_LOG_BUF && defined __NR_bpf
 # include <linux/bpf.h>
 
 static const struct bpf_insn insns[] = {
