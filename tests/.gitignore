@@ -20,6 +20,7 @@ netlink_inet_diag
 netlink_unix_diag
 pc
 pipe
+sched_xetattr
 scm_rights
 seccomp
 select

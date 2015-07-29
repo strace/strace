@@ -31,6 +31,7 @@ check_PROGRAMS = \
 	netlink_unix_diag \
 	pc \
 	pipe \
+	sched_xetattr \
 	scm_rights \
 	seccomp \
 	select \
@@ -79,6 +80,7 @@ TESTS = \
 	ipc_msg.test \
 	ipc_shm.test \
 	ipc_sem.test \
+	sched_xetattr.test \
 	scm_rights-fd.test \
 	seccomp.test \
 	select.test \

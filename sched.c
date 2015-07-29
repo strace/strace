@@ -3,6 +3,7 @@
 #include <sched.h>
 
 #include "xlat/schedulers.h"
+#include "xlat/sched_flags.h"
 
 SYS_FUNC(sched_getscheduler)
 {
@@ -60,5 +61,58 @@ SYS_FUNC(sched_rr_get_interval)
 		else
 			print_timespec(tcp, tcp->u_arg[1]);
 	}
+	return 0;
+}
+
+static void
+print_sched_attr(struct tcb *tcp, const long addr, unsigned int size)
+{
+	struct {
+		uint32_t size;
+		uint32_t sched_policy;
+		uint64_t sched_flags;
+		uint32_t sched_nice;
+		uint32_t sched_priority;
+		uint64_t sched_runtime;
+		uint64_t sched_deadline;
+		uint64_t sched_period;
+	} attr = {};
+
+	if (size > sizeof(attr))
+		size = sizeof(attr);
+	if (umoven_or_printaddr(tcp, addr, size, &attr))
+		return;
+
+	tprintf("{size=%u, sched_policy=", attr.size);
+	printxval(schedulers, attr.sched_policy, "SCHED_???");
+	tprints(", sched_flags=");
+	printflags(sched_flags, attr.sched_flags, "SCHED_FLAG_???");
+	tprintf(", sched_nice=%d", attr.sched_nice);
+	tprintf(", sched_priority=%u", attr.sched_priority);
+	tprintf(", sched_runtime=%" PRIu64, attr.sched_runtime);
+	tprintf(", sched_deadline=%" PRIu64, attr.sched_deadline);
+	tprintf(", sched_period=%" PRIu64 "}", attr.sched_period);
+}
+
+SYS_FUNC(sched_setattr)
+{
+	tprintf("%d, ", (int) tcp->u_arg[0]);
+	print_sched_attr(tcp, tcp->u_arg[1], 0x100);
+	tprintf(", %u", (unsigned int) tcp->u_arg[2]);
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(sched_getattr)
+{
+	if (entering(tcp)) {
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+	} else {
+		print_sched_attr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		tprintf(", %u, %u",
+			(unsigned int) tcp->u_arg[2],
+			(unsigned int) tcp->u_arg[3]);
+	}
+
 	return 0;
 }
