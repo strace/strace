@@ -108,7 +108,7 @@
 [ 79] = { 2,	0,		SEN(settimeofday),		"settimeofday"		},
 [ 80] = { 2,	0,		SEN(getgroups16),		"getgroups"		},
 [ 81] = { 2,	0,		SEN(setgroups16),		"setgroups"		},
-[ 82] = { 1,	TD,		SEN(oldselect),			"oldselect"		},
+[ 82] = { },
 [ 83] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [ 84] = { 2,	TF,		SEN(oldlstat),			"oldlstat"		},
 [ 85] = { 3,	TF,		SEN(readlink),			"readlink"		},

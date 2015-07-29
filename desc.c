@@ -410,13 +410,26 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 
 SYS_FUNC(oldselect)
 {
-	long args[5];
+	long long_args[5];
+#undef oldselect_args
+#if SIZEOF_LONG == 4
+# define oldselect_args long_args
+#else
+	unsigned int oldselect_args[5];
+	unsigned int i;
+#endif
 
-	if (umove(tcp, tcp->u_arg[0], &args) < 0) {
+	if (umove(tcp, tcp->u_arg[0], &oldselect_args) < 0) {
 		printaddr(tcp->u_arg[0]);
 		return 0;
 	}
-	return decode_select(tcp, args, BITNESS_CURRENT);
+#ifndef oldselect_args
+	for (i = 0; i < 5; i++) {
+		long_args[i] = oldselect_args[i];
+	}
+#endif
+	return decode_select(tcp, long_args, BITNESS_CURRENT);
+#undef oldselect_args
 }
 
 #ifdef ALPHA
