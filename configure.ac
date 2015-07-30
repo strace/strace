@@ -264,14 +264,12 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/utsname.h
 	mqueue.h
 	netinet/sctp.h
-	poll.h
 	scsi/sg.h
 	stropts.h
 	sys/conf.h
 	sys/epoll.h
 	sys/fanotify.h
 	sys/ioctl.h
-	sys/poll.h
 	sys/reg.h
 	sys/vfs.h
 	sys/xattr.h

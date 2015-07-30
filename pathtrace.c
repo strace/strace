@@ -28,11 +28,7 @@
 
 #include "defs.h"
 #include <sys/param.h>
-#if defined HAVE_POLL_H
-# include <poll.h>
-#elif defined HAVE_SYS_POLL_H
-# include <sys/poll.h>
-#endif
+#include <poll.h>
 
 #include "syscall.h"
 

@@ -27,11 +27,7 @@
  */
 
 #include "defs.h"
-#if defined HAVE_POLL_H
-# include <poll.h>
-#elif defined HAVE_SYS_POLL_H
-# include <sys/poll.h>
-#endif
+#include <poll.h>
 #ifdef HAVE_SYS_CONF_H
 # include <sys/conf.h>
 #endif
@@ -155,8 +151,6 @@ SYS_FUNC(getpmsg)
 # endif
 #endif /* STREAMS syscalls support */
 
-
-#ifdef HAVE_SYS_POLL_H
 
 #include "xlat/pollflags.h"
 
@@ -319,10 +313,3 @@ SYS_FUNC(ppoll)
 	}
 	return rc;
 }
-
-#else /* !HAVE_SYS_POLL_H */
-SYS_FUNC(poll)
-{
-	return 0;
-}
-#endif
