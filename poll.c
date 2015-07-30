@@ -169,11 +169,11 @@ SYS_FUNC(poll)
 	int rc = decode_poll(tcp, 0);
 	if (entering(tcp)) {
 #ifdef INFTIM
-		if (tcp->u_arg[2] == INFTIM)
+		if (INFTIM == (int) tcp->u_arg[2])
 			tprints("INFTIM");
 		else
 #endif
-			tprintf("%ld", tcp->u_arg[2]);
+			tprintf("%d", (int) tcp->u_arg[2]);
 	}
 	return rc;
 }
