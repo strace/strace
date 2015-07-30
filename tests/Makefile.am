@@ -32,6 +32,7 @@ check_PROGRAMS = \
 	oldselect \
 	pc \
 	pipe \
+	ppoll \
 	sched_xetattr \
 	scm_rights \
 	seccomp \
@@ -102,6 +103,7 @@ TESTS = \
 	oldselect.test \
 	pipe.test \
 	pc.test \
+	ppoll.test \
 	sun_path.test \
 	umovestr.test \
 	umovestr2.test \
@@ -147,6 +149,8 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     net-yy-connect.awk \
 	     oldselect.expected \
 	     pipe.expected \
+	     ppoll.expected \
+	     ppoll-v.expected \
 	     restart_syscall.expected \
 	     restart_syscall_unknown.expected \
 	     select.awk \

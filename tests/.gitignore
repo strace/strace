@@ -21,6 +21,7 @@ netlink_unix_diag
 oldselect
 pc
 pipe
+ppoll
 sched_xetattr
 scm_rights
 seccomp
