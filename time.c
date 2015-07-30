@@ -396,16 +396,6 @@ tprint_timex(struct tcb *tcp, long addr)
 	if (umove_or_printaddr(tcp, addr, &tx))
 		return -1;
 
-#if LINUX_VERSION_CODE < 66332
-	tprintf("{mode=%d, offset=%ld, frequency=%ld, ",
-		tx.mode, tx.offset, tx.frequency);
-	tprintf("maxerror=%ld, esterror=%lu, status=%u, ",
-		tx.maxerror, tx.esterror, tx.status);
-	tprintf("time_constant=%ld, precision=%lu, ",
-		tx.time_constant, tx.precision);
-	tprintf("tolerance=%ld, time=", tx.tolerance);
-	tprint_timeval(tcp, &tx.time);
-#else
 	tprints("{modes=");
 	printflags(adjtimex_modes, tx.modes, "ADJ_???");
 	tprintf(", offset=%jd, freq=%jd, maxerror=%ju, esterror=%ju, status=",
@@ -422,7 +412,6 @@ tprint_timex(struct tcb *tcp, long addr)
 		tx.shift, (intmax_t) tx.stabil, (intmax_t) tx.jitcnt);
 	tprintf(", calcnt=%jd, errcnt=%jd, stbcnt=%jd",
 		(intmax_t) tx.calcnt, (intmax_t) tx.errcnt, (intmax_t) tx.stbcnt);
-#endif
 	tprints("}");
 	return 0;
 }
