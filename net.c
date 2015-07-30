@@ -146,7 +146,12 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 	} addrbuf;
 	char string_addr[100];
 
-	if (addrlen < 2 || addrlen > (int) sizeof(addrbuf))
+	if (addrlen < 2) {
+		tprintf("%#lx", addr);
+		return;
+	}
+
+	if (addrlen > (int) sizeof(addrbuf))
 		addrlen = sizeof(addrbuf);
 
 	memset(&addrbuf, 0, sizeof(addrbuf));
@@ -807,28 +812,31 @@ SYS_FUNC(recvfrom)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp)) {
-			tprintf("%#lx, %lu, %lu, %#lx, %#lx",
-				tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3],
-				tcp->u_arg[4], tcp->u_arg[5]);
-			return 0;
-		}
 		/* buf */
-		printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+		if (syserror(tcp)) {
+			tprintf("%#lx",	tcp->u_arg[1]);
+		} else {
+			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+		}
 		/* len */
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-		/* from address, len */
+		if (syserror(tcp)) {
+			tprintf(", %#lx, %#lx", tcp->u_arg[4], tcp->u_arg[5]);
+			return 0;
+		}
 		tprints(", ");
 		if (!tcp->u_arg[4] || !tcp->u_arg[5] ||
 		    umove(tcp, tcp->u_arg[5], &fromlen) < 0) {
+			/* from address, len */
 			printaddr(tcp->u_arg[4]);
 			tprints(", ");
 			printaddr(tcp->u_arg[5]);
 			return 0;
 		}
-		printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
+		/* from address */
+		printsock(tcp, tcp->u_arg[4], fromlen);
 		/* from length */
 		tprintf(", [%u]", fromlen);
 	}
