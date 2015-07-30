@@ -147,7 +147,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 	char string_addr[100];
 
 	if (addrlen < 2) {
-		tprintf("%#lx", addr);
+		printaddr(addr);
 		return;
 	}
 
@@ -814,7 +814,7 @@ SYS_FUNC(recvfrom)
 	} else {
 		/* buf */
 		if (syserror(tcp)) {
-			tprintf("%#lx",	tcp->u_arg[1]);
+			printaddr(tcp->u_arg[1]);
 		} else {
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		}
@@ -822,12 +822,8 @@ SYS_FUNC(recvfrom)
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-		if (syserror(tcp)) {
-			tprintf(", %#lx, %#lx", tcp->u_arg[4], tcp->u_arg[5]);
-			return 0;
-		}
 		tprints(", ");
-		if (!tcp->u_arg[4] || !tcp->u_arg[5] ||
+		if (syserror(tcp) || !tcp->u_arg[4] || !tcp->u_arg[5] ||
 		    umove(tcp, tcp->u_arg[5], &fromlen) < 0) {
 			/* from address, len */
 			printaddr(tcp->u_arg[4]);
