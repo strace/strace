@@ -77,6 +77,7 @@ strace_SOURCES =	\
 	or1k_atomic.c	\
 	pathtrace.c	\
 	personality.c	\
+	poll.c		\
 	prctl.c		\
 	printmode.c	\
 	printrusage.c	\
