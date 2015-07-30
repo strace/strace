@@ -29,6 +29,7 @@ check_PROGRAMS = \
 	net-accept-connect \
 	netlink_inet_diag \
 	netlink_unix_diag \
+	oldselect \
 	pc \
 	pipe \
 	sched_xetattr \
@@ -98,6 +99,7 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	net-yy.test \
+	oldselect.test \
 	pipe.test \
 	pc.test \
 	sun_path.test \
@@ -143,6 +145,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     net-fd.expected \
 	     net-yy-accept.awk \
 	     net-yy-connect.awk \
+	     oldselect.expected \
 	     pipe.expected \
 	     restart_syscall.expected \
 	     restart_syscall_unknown.expected \

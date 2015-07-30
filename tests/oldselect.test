@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check oldselect syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -e oldselect $args
+match_grep
+
+exit 0
