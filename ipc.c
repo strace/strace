@@ -38,25 +38,6 @@
 #include <sys/msg.h>
 #include <sys/shm.h>
 
-#ifndef MSG_STAT
-#define MSG_STAT 11
-#endif
-#ifndef MSG_INFO
-#define MSG_INFO 12
-#endif
-#ifndef SHM_STAT
-#define SHM_STAT 13
-#endif
-#ifndef SHM_INFO
-#define SHM_INFO 14
-#endif
-#ifndef SEM_STAT
-#define SEM_STAT 18
-#endif
-#ifndef SEM_INFO
-#define SEM_INFO 19
-#endif
-
 #if !defined IPC_64
 # define IPC_64 0x100
 #endif
