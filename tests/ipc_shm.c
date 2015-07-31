@@ -15,7 +15,17 @@ main(void)
 
 	if (shmctl(id, IPC_STAT, &ds))
 		goto fail;
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, %p\\) += 0\n", id, &ds);
+	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, \\{shm_perm=\\{uid=%u, gid=%u, "
+		"mode=%#o, key=%u, cuid=%u, cgid=%u\\}, shm_segsz=%u, shm_cpid=%u, "
+		"shm_lpid=%u, shm_nattch=%u, shm_atime=%u, shm_dtime=%u, "
+		"shm_ctime=%u\\}\\) += 0\n",
+		id, (unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
+		(unsigned) ds.shm_perm.mode, (unsigned) ds.shm_perm.__key,
+		(unsigned) ds.shm_perm.cuid, (unsigned) ds.shm_perm.cgid,
+		(unsigned) ds.shm_segsz, (unsigned) ds.shm_cpid,
+		(unsigned) ds.shm_lpid, (unsigned) ds.shm_nattch,
+		(unsigned) ds.shm_atime, (unsigned) ds.shm_dtime,
+		(unsigned) ds. shm_ctime);
 
 	int max = shmctl(0, SHM_INFO, &ds);
 	if (max < 0)

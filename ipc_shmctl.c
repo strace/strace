@@ -35,13 +35,65 @@
 
 #include <sys/shm.h>
 
+#include DEF_MPERS_TYPE(shmid_ds_t)
+#include <sys/shm.h>
+typedef struct shmid_ds shmid_ds_t;
+#include MPERS_DEFS
+
 #include "xlat/shmctl_flags.h"
+
+static void
+print_shmid_ds(struct tcb *tcp, const long addr, int cmd)
+{
+	if (cmd & IPC_64)
+		cmd &= ~IPC_64;
+	shmid_ds_t shmid_ds;
+	switch (cmd) {
+	case IPC_SET:
+	case IPC_STAT:
+		if (umove_or_printaddr(tcp, addr, &shmid_ds))
+			return;
+
+		tprints("{shm_perm={");
+		printuid("uid=", shmid_ds.shm_perm.uid);
+		printuid(", gid=", shmid_ds.shm_perm.gid);
+		tprints(", mode=");
+		tprints(sprintmode(shmid_ds.shm_perm.mode));
+
+		if (cmd != IPC_STAT) {
+			tprints("}, ...}");
+			break;
+		}
+
+		tprintf(", key=%u", (unsigned) shmid_ds.shm_perm.__key);
+		printuid(", cuid=", shmid_ds.shm_perm.cuid);
+		printuid(", cgid=", shmid_ds.shm_perm.cgid);
+		tprints("}");
+		tprintf(", shm_segsz=%u", (unsigned) shmid_ds.shm_segsz);
+		tprintf(", shm_cpid=%u", (unsigned) shmid_ds.shm_cpid);
+		tprintf(", shm_lpid=%u", (unsigned) shmid_ds.shm_lpid);
+		tprintf(", shm_nattch=%u", (unsigned) shmid_ds.shm_nattch);
+		tprintf(", shm_atime=%u", (unsigned) shmid_ds.shm_atime);
+		tprintf(", shm_dtime=%u", (unsigned) shmid_ds.shm_dtime);
+		tprintf(", shm_ctime=%u", (unsigned) shmid_ds.shm_ctime);
+		tprints("}");
+		break;
+
+	default:
+		printaddr(addr);
+		break;
+	}
+}
 
 SYS_FUNC(shmctl)
 {
-	tprintf("%lu, ", tcp->u_arg[0]);
-	PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
-	tprints(", ");
-	printaddr(tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2]);
-	return RVAL_DECODED;
+	if (entering(tcp)) {
+		tprintf("%lu, ", tcp->u_arg[0]);
+		PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
+		tprints(", ");
+	} else {
+		const long addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
+		print_shmid_ds(tcp, addr, tcp->u_arg[1]);
+	}
+	return 0;
 }
