@@ -1,0 +1,2 @@
+eventfd2(4294967295, EFD_SEMAPHORE|EFD_CLOEXEC|EFD_NONBLOCK) = 0
++++ exited with 0 +++

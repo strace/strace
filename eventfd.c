@@ -1,4 +1,10 @@
 #include "defs.h"
+#include <fcntl.h>
+#ifdef HAVE_SYS_EVENTFD_H
+# include <sys/eventfd.h>
+#endif
+
+#include "xlat/efd_flags.h"
 
 static int
 do_eventfd(struct tcb *tcp, int flags_arg)
@@ -6,7 +12,7 @@ do_eventfd(struct tcb *tcp, int flags_arg)
 	tprintf("%u", (unsigned int) tcp->u_arg[0]);
 	if (flags_arg >= 0) {
 		tprints(", ");
-		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
+		printflags(efd_flags, tcp->u_arg[flags_arg], "EFD_???");
 	}
 
 	return RVAL_DECODED | RVAL_FD;

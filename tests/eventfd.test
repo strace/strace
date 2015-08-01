@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check eventfd2 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -e eventfd2 $args
+match_diff
+
+exit 0

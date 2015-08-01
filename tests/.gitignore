@@ -1,5 +1,6 @@
 bpf
 caps
+eventfd
 execve
 execveat
 fanotify_mark

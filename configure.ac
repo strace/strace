@@ -268,6 +268,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	stropts.h
 	sys/conf.h
 	sys/epoll.h
+	sys/eventfd.h
 	sys/fanotify.h
 	sys/ioctl.h
 	sys/reg.h

@@ -11,6 +11,7 @@ AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 check_PROGRAMS = \
 	bpf \
 	caps \
+	eventfd \
 	execve \
 	execveat \
 	fanotify_mark \
@@ -71,6 +72,7 @@ TESTS = \
 	bpf.test \
 	caps.test \
 	dumpio.test \
+	eventfd.test \
 	execve.test \
 	execveat.test \
 	fanotify_mark.test \
@@ -129,6 +131,7 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     dumpio.expected \
+	     eventfd.expected \
 	     execve.expected \
 	     execve-v.expected \
 	     execveat.expected \
