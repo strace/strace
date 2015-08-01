@@ -43,6 +43,7 @@ strace_SOURCES =	\
 	desc.c		\
 	dirent.c	\
 	evdev.c		\
+	eventfd.c	\
 	execve.c	\
 	exit.c		\
 	fadvise.c	\
