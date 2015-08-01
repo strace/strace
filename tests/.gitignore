@@ -1,5 +1,6 @@
 bpf
 caps
+epoll_create1
 eventfd
 execve
 execveat

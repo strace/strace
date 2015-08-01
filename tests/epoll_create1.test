@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check epoll_create1 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -e epoll_create1 $args
+match_grep
+
+exit 0

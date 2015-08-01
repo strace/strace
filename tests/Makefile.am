@@ -11,6 +11,7 @@ AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 check_PROGRAMS = \
 	bpf \
 	caps \
+	epoll_create1 \
 	eventfd \
 	execve \
 	execveat \
@@ -72,6 +73,7 @@ TESTS = \
 	bpf.test \
 	caps.test \
 	dumpio.test \
+	epoll_create1.test \
 	eventfd.test \
 	execve.test \
 	execveat.test \
@@ -131,6 +133,7 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     dumpio.expected \
+	     epoll_create1.expected \
 	     eventfd.expected \
 	     execve.expected \
 	     execve-v.expected \
