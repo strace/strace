@@ -4,6 +4,13 @@
 # include <sys/epoll.h>
 #endif
 
+SYS_FUNC(epoll_create)
+{
+	tprintf("%d", (int) tcp->u_arg[0]);
+
+	return RVAL_DECODED | RVAL_FD;
+}
+
 #include "xlat/epollflags.h"
 
 SYS_FUNC(epoll_create1)
