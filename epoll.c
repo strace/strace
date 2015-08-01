@@ -10,7 +10,7 @@ SYS_FUNC(epoll_create1)
 {
 	printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 #ifdef HAVE_SYS_EPOLL_H
