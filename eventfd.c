@@ -3,7 +3,7 @@
 static int
 do_eventfd(struct tcb *tcp, int flags_arg)
 {
-	tprintf("%lu", tcp->u_arg[0]);
+	tprintf("%u", (unsigned int) tcp->u_arg[0]);
 	if (flags_arg >= 0) {
 		tprints(", ");
 		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
