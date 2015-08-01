@@ -155,7 +155,7 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 		const char *flagstr = sprintflags("", pollflags, fds.revents);
 
 		if (outptr + strlen(fdstr) + strlen(flagstr) + 1
-		    >= end_outstr - sizeof(", ...]")) {
+		    >= end_outstr - sizeof(", ...], ...")) {
 			outptr = stpcpy(outptr, "...");
 			break;
 		}
