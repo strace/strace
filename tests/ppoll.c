@@ -36,7 +36,7 @@ test2(void)
 	};
 
 	sigfillset(&mask);
-	sigdelset(&mask, SIGABRT);
+	sigdelset(&mask, SIGHUP);
 	sigdelset(&mask, SIGKILL);
 	sigdelset(&mask, SIGSTOP);
 
