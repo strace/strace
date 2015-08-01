@@ -9,7 +9,7 @@ do_eventfd(struct tcb *tcp, int flags_arg)
 		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 	}
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 SYS_FUNC(eventfd)
