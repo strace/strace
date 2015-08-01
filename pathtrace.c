@@ -316,6 +316,7 @@ pathtrace_match(struct tcb *tcp)
 
 	case SEN_bpf:
 	case SEN_epoll_create:
+	case SEN_epoll_create1:
 	case SEN_eventfd2:
 	case SEN_eventfd:
 	case SEN_fanotify_init:
