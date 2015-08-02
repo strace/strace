@@ -24,7 +24,7 @@ SYS_FUNC(fanotify_init)
 	tprints(", ");
 	tprint_open_modes((unsigned) tcp->u_arg[1]);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 #include "xlat/fan_mark_flags.h"
