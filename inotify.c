@@ -32,5 +32,5 @@ SYS_FUNC(inotify_init1)
 {
 	printflags(inotify_init_flags, tcp->u_arg[0], "IN_???");
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
