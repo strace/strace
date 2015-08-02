@@ -4,17 +4,22 @@ BEGIN {
   addrlen = length(addr) + 3
 
   r_i = "[1-9][0-9]*"
+  r_socket = "^socket\\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\\) += 1<UNIX:\\[(" r_i ")\\]>$"
   r_close_listen = "^close\\(0<UNIX:[" r_i ",\"" addr "\"]>\\) += 0$"
-  r_connect = "^connect\\(1<UNIX:\\[(" r_i ")\\]>, \\{sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"" addr "\"\\}, " addrlen "\\) += 0$"
 }
 
-NR == 1 && /^socket\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\) += 1$/ {next}
+NR == 1 {
+  if (match($0, r_socket, a)) {
+    inode = a[2]
+    r_connect = "^connect\\(1<UNIX:\\[" inode "\\]>, \\{sa_family=AF_(LOCAL|UNIX|FILE), sun_path=\"" addr "\"\\}, " addrlen "\\) += 0$"
+    next
+  }
+}
 
 NR == 2 {if (match($0, r_close_listen)) next}
 
 NR == 3 {
-  if (match($0, r_connect, a)) {
-    inode = a[1]
+  if (r_connect != "" && match($0, r_connect)) {
     r_close_connected = "^close\\(1<UNIX:\\[(" r_i ")->" r_i "\\]>\\) += 0$"
     next
   }

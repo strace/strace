@@ -5,19 +5,20 @@ BEGIN {
   r_i = "[1-9][0-9]*"
   r_port = "[1-9][0-9][0-9][0-9]+"
   r_localhost = "127\\.0\\.0\\.1"
-  r_bind = "^bind\\(0<TCP:\\[(" r_i ")\\]>, \\{sa_family=AF_INET, sin_port=htons\\(0\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, " r_i "\\) += 0$"
+  r_socket = "^socket\\(PF_INET, SOCK_STREAM, IPPROTO_IP\\) += 0<TCP:\\[(" r_i ")\\]>$"
   r_getsockname = "^getsockname\\(0<TCP:\\[" r_localhost ":(" r_port ")\\]>, \\{sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, \\[" r_i "\\]\\) += 0$"
 }
 
-NR == 1 && /^socket\(PF_INET, SOCK_STREAM, IPPROTO_IP\) += 0$/ {next}
-
-NR == 2 {
-  if (match($0, r_bind, a)) {
+NR == 1 {
+  if (match($0, r_socket, a)) {
     inode = a[1]
+    r_bind = "^bind\\(0<TCP:\\[" inode "\\]>, \\{sa_family=AF_INET, sin_port=htons\\(0\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, " r_i "\\) += 0$"
     r_listen = "^listen\\(0<TCP:\\[" inode "\\]>, 5\\) += 0$"
     next
   }
 }
+
+NR == 2 {if (r_bind != "" && match($0, r_bind)) next}
 
 NR == 3 {if (r_listen != "" && match($0, r_listen)) next}
 

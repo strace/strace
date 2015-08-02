@@ -662,7 +662,7 @@ SYS_FUNC(socket)
 		break;
 	}
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 SYS_FUNC(bind)

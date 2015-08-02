@@ -5,13 +5,19 @@ BEGIN {
   r_i = "[1-9][0-9]*"
   r_port = "[1-9][0-9][0-9][0-9]+"
   r_localhost = "127\\.0\\.0\\.1"
-  r_connect = "^connect\\(0<TCP:\\[" r_i "\\]>, \\{sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, " r_i ") += 0$"
+  r_socket = "^socket\\(PF_INET, SOCK_STREAM, IPPROTO_IP\\) += 0<TCP:\\[(" r_i ")\\]>$"
 }
 
-NR == 1 && /^socket\(PF_INET, SOCK_STREAM, IPPROTO_IP\) += 0$/ {next}
+NR == 1 {
+  if (match($0, r_socket, a)) {
+    inode = a[1]
+    r_connect = "^connect\\(0<TCP:\\[" inode "\\]>, \\{sa_family=AF_INET, sin_port=htons\\((" r_port ")\\), sin_addr=inet_addr\\(\"" r_localhost "\"\\)\\}, " r_i ") += 0$"
+    next
+  }
+}
 
 NR == 2 {
-  if (match($0, r_connect, a)) {
+  if (r_connect != "" && match($0, r_connect, a)) {
     port_r = a[1]
     r_send = "^send\\(0<TCP:\\[" r_localhost ":(" r_port ")->" r_localhost ":" port_r "\\]>, \"data\", 4, MSG_DONTROUTE\\) += 4$"
     r_sendto = "^sendto\\(0<TCP:\\[" r_localhost ":(" r_port ")->" r_localhost ":" port_r "\\]>, \"data\", 4, MSG_DONTROUTE, NULL, 0\\) += 4$"
