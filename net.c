@@ -920,6 +920,27 @@ SYS_FUNC(getsockname)
 	return do_sockname(tcp, -1);
 }
 
+static void
+printpair_fd(struct tcb *tcp, const int i0, const int i1)
+{
+	tprints("[");
+	printfd(tcp, i0);
+	tprints(", ");
+	printfd(tcp, i1);
+	tprints("]");
+}
+
+static void
+decode_pair_fd(struct tcb *tcp, const long addr)
+{
+	int pair[2];
+
+	if (umove_or_printaddr(tcp, addr, &pair))
+		return;
+
+	printpair_fd(tcp, pair[0], pair[1]);
+}
+
 static int
 do_pipe(struct tcb *tcp, int flags_arg)
 {
@@ -928,11 +949,11 @@ do_pipe(struct tcb *tcp, int flags_arg)
 			printaddr(tcp->u_arg[0]);
 		} else {
 #ifdef HAVE_GETRVAL2
-			if (flags_arg < 0)
-				tprintf("[%lu, %lu]", tcp->u_rval, getrval2(tcp));
-			else
+			if (flags_arg < 0) {
+				printpair_fd(tcp, tcp->u_rval, getrval2(tcp));
+			} else
 #endif
-				printpair_int(tcp, tcp->u_arg[0], "%u");
+				decode_pair_fd(tcp, tcp->u_arg[0]);
 		}
 		if (flags_arg >= 0) {
 			tprints(", ");
@@ -961,7 +982,7 @@ SYS_FUNC(socketpair)
 		tprintf(", %lu", tcp->u_arg[2]);
 	} else {
 		tprints(", ");
-		printpair_int(tcp, tcp->u_arg[3], "%u");
+		decode_pair_fd(tcp, tcp->u_arg[3]);
 	}
 	return 0;
 }
