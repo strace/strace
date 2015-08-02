@@ -636,7 +636,7 @@ SYS_FUNC(timerfd)
 	tprints(", ");
 	printitv(tcp, tcp->u_arg[3]);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 SYS_FUNC(timerfd_create)
@@ -645,7 +645,7 @@ SYS_FUNC(timerfd_create)
 	tprints(", ");
 	printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 SYS_FUNC(timerfd_settime)
