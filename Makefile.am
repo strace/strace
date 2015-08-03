@@ -104,6 +104,7 @@ strace_SOURCES =	\
 	seccomp.c	\
 	sigaltstack.c	\
 	signal.c	\
+	signalfd.c	\
 	sigreturn.c	\
 	sock.c		\
 	socketutils.c	\
