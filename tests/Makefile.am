@@ -42,6 +42,7 @@ check_PROGRAMS = \
 	set_ptracer_any \
 	sigaction \
 	sigaltstack \
+	signalfd \
 	sigreturn \
 	stack-fcall \
 	stat \
@@ -92,6 +93,7 @@ TESTS = \
 	select.test \
 	sigaction.test \
 	sigaltstack.test \
+	signalfd.test \
 	sigreturn.test \
 	stat.test \
 	stat32-v.test \
@@ -162,6 +164,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     select.awk \
 	     sigaction.awk \
 	     sigaltstack.expected \
+	     signalfd.expected \
 	     statfs.expected \
 	     sun_path.expected \
 	     uid.awk \

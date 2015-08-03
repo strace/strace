@@ -242,6 +242,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	sendmsg
 	sendmmsg
 	sigaction
+	signalfd
 	stpcpy
 	strerror
 	strsignal
@@ -272,6 +273,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/fanotify.h
 	sys/ioctl.h
 	sys/reg.h
+	sys/signalfd.h
 	sys/vfs.h
 	sys/xattr.h
 ]))

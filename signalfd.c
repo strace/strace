@@ -1,4 +1,10 @@
 #include "defs.h"
+#include <fcntl.h>
+#ifdef HAVE_SYS_SIGNALFD_H
+# include <sys/signalfd.h>
+#endif
+
+#include "xlat/sfd_flags.h"
 
 static int
 do_signalfd(struct tcb *tcp, int flags_arg)
@@ -10,7 +16,7 @@ do_signalfd(struct tcb *tcp, int flags_arg)
 	tprintf(", %lu", tcp->u_arg[2]);
 	if (flags_arg >= 0) {
 		tprints(", ");
-		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
+		printflags(sfd_flags, tcp->u_arg[flags_arg], "SFD_???");
 	}
 
 	return RVAL_DECODED | RVAL_FD;

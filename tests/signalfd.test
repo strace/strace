@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check signalfd4 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -e signalfd4 $args
+match_grep
+
+exit 0
