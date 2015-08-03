@@ -1,6 +1,10 @@
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(stack_t)
+
 #include <signal.h>
+
+#include MPERS_DEFS
 
 #include "xlat/sigaltstack_flags.h"
 
@@ -9,23 +13,6 @@ print_stack_t(struct tcb *tcp, unsigned long addr)
 {
 	stack_t ss;
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize != sizeof(ss.ss_sp) && current_wordsize == 4) {
-		struct {
-			uint32_t ss_sp;
-			int32_t ss_flags;
-			uint32_t ss_size;
-		} ss32;
-
-		if (umove_or_printaddr(tcp, addr, &ss32))
-			return;
-
-		memset(&ss, 0, sizeof(ss));
-		ss.ss_sp = (void*)(unsigned long) ss32.ss_sp;
-		ss.ss_flags = ss32.ss_flags;
-		ss.ss_size = (unsigned long) ss32.ss_size;
-	} else
-#endif
 	if (umove_or_printaddr(tcp, addr, &ss))
 		return;
 
