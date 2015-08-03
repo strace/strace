@@ -105,7 +105,7 @@ SYS_FUNC(ptrace)
 			printflags(ptrace_setoptions_flags, tcp->u_arg[3], "PTRACE_O_???");
 			break;
 		case PTRACE_SETSIGINFO: {
-			printsiginfo_at(tcp, tcp->u_arg[3]);
+			MPERS_PRINTER_NAME(printsiginfo_at)(tcp, tcp->u_arg[3]);
 			break;
 		}
 		case PTRACE_SETREGSET:
@@ -131,7 +131,7 @@ SYS_FUNC(ptrace)
 			break;
 #endif
 		case PTRACE_GETSIGINFO: {
-			printsiginfo_at(tcp, tcp->u_arg[3]);
+			MPERS_PRINTER_NAME(printsiginfo_at)(tcp, tcp->u_arg[3]);
 			break;
 		}
 		case PTRACE_GETREGSET:

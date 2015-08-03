@@ -1,9 +1,15 @@
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(siginfo_t)
+
 #include <signal.h>
 #include <linux/audit.h>
 
+#include MPERS_DEFS
+
+#ifndef IN_MPERS
 #include "printsiginfo.h"
+#endif
 
 #include "xlat/audit_arch.h"
 #include "xlat/sigbus_codes.h"
@@ -171,6 +177,9 @@ print_si_info(const siginfo_t *sip, bool verbose)
 	}
 }
 
+#ifdef IN_MPERS
+static
+#endif
 void
 printsiginfo(const siginfo_t *sip, bool verbose)
 {
@@ -192,8 +201,7 @@ printsiginfo(const siginfo_t *sip, bool verbose)
 	tprints("}");
 }
 
-void
-printsiginfo_at(struct tcb *tcp, long addr)
+MPERS_PRINTER_DECL(void, printsiginfo_at)(struct tcb *tcp, long addr)
 {
 	siginfo_t si;
 

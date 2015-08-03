@@ -149,7 +149,7 @@ SYS_FUNC(waitid)
 		tprintf(", %ld, ", tcp->u_arg[1]);
 	} else {
 		/* siginfo */
-		printsiginfo_at(tcp, tcp->u_arg[2]);
+		MPERS_PRINTER_NAME(printsiginfo_at)(tcp, tcp->u_arg[2]);
 		/* options */
 		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
