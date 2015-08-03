@@ -143,12 +143,6 @@ SYS_FUNC(sysctl)
 			   && ((name[0] == CTL_KERN
 				&& (name[1] == KERN_OSRELEASE
 				    || name[1] == KERN_OSTYPE
-#ifdef KERN_JAVA_INTERPRETER
-				    || name[1] == KERN_JAVA_INTERPRETER
-#endif
-#ifdef KERN_JAVA_APPLETVIEWER
-				    || name[1] == KERN_JAVA_APPLETVIEWER
-#endif
 					)))) {
 			printpath(tcp, (size_t)info.oldval);
 		} else {
