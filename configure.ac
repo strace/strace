@@ -13,6 +13,7 @@ AC_CANONICAL_HOST
 AC_PROG_CC
 AX_PROG_CC_FOR_BUILD
 AC_USE_SYSTEM_EXTENSIONS
+AC_PROG_RANLIB
 
 AC_MSG_CHECKING([for supported architecture])
 case "$host_cpu" in

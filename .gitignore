@@ -45,3 +45,22 @@ Makefile.in
 
 /tests-m32
 /tests-mx32
+
+/libmpers-m32.a
+/libmpers-mx32.a
+/m32_defs.h
+/m32_funcs.h
+/m32_printer_decls.h
+/m32_printer_defs.h
+/mpers-m32
+/mpers-m32.stamp
+/mpers-mx32
+/mpers-mx32.stamp
+/mpers.am
+/mx32_defs.h
+/mx32_funcs.h
+/mx32_printer_decls.h
+/mx32_printer_defs.h
+/native_printer_decls.h
+/native_printer_defs.h
+/printers.h

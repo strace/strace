@@ -89,12 +89,14 @@ const struct_sysent sysent0[] = {
 };
 
 #if SUPPORTED_PERSONALITIES > 1
+# include PERSONALITY1_INCLUDE_FUNCS
 static const struct_sysent sysent1[] = {
 # include "syscallent1.h"
 };
 #endif
 
 #if SUPPORTED_PERSONALITIES > 2
+# include PERSONALITY2_INCLUDE_FUNCS
 static const struct_sysent sysent2[] = {
 # include "syscallent2.h"
 };
@@ -143,6 +145,14 @@ static const char *const signalent1[] = {
 static const struct_ioctlent ioctlent1[] = {
 # include "ioctlent1.h"
 };
+# include PERSONALITY0_INCLUDE_PRINTERS_DECLS
+static const struct_printers printers0 = {
+# include PERSONALITY0_INCLUDE_PRINTERS_DEFS
+};
+# include PERSONALITY1_INCLUDE_PRINTERS_DECLS
+static const struct_printers printers1 = {
+# include PERSONALITY1_INCLUDE_PRINTERS_DEFS
+};
 #endif
 
 #if SUPPORTED_PERSONALITIES > 2
@@ -154,6 +164,10 @@ static const char *const signalent2[] = {
 };
 static const struct_ioctlent ioctlent2[] = {
 # include "ioctlent2.h"
+};
+# include PERSONALITY2_INCLUDE_PRINTERS_DECLS
+static const struct_printers printers2 = {
+# include PERSONALITY2_INCLUDE_PRINTERS_DEFS
 };
 #endif
 
@@ -202,7 +216,9 @@ const struct_sysent *sysent = sysent0;
 const char *const *errnoent = errnoent0;
 const char *const *signalent = signalent0;
 const struct_ioctlent *ioctlent = ioctlent0;
+const struct_printers *printers = &printers0;
 #endif
+
 unsigned nsyscalls = nsyscalls0;
 unsigned nerrnos = nerrnos0;
 unsigned nsignals = nsignals0;
@@ -278,6 +294,7 @@ set_personality(int personality)
 		nioctlents = nioctlents0;
 		signalent = signalent0;
 		nsignals = nsignals0;
+		printers = &printers0;
 		break;
 
 	case 1:
@@ -287,6 +304,7 @@ set_personality(int personality)
 		nioctlents = nioctlents1;
 		signalent = signalent1;
 		nsignals = nsignals1;
+		printers = &printers1;
 		break;
 
 # if SUPPORTED_PERSONALITIES > 2
@@ -297,6 +315,7 @@ set_personality(int personality)
 		nioctlents = nioctlents2;
 		signalent = signalent2;
 		nsignals = nsignals2;
+		printers = &printers2;
 		break;
 # endif
 	}

@@ -15,5 +15,6 @@ for m in -m32 -mx32; do
 done
 
 ./xlat/gen.sh
+./generate_mpers_am.sh
 
 exec autoreconf -f -i "$@"

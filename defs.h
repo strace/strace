@@ -54,6 +54,8 @@
 #include <sys/time.h>
 #include <sys/syscall.h>
 
+#include "mpers_type.h"
+
 #ifndef HAVE_STRERROR
 const char *strerror(int);
 #endif
@@ -200,12 +202,27 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
 # define PERSONALITY2_WORDSIZE 4
+# ifdef HAVE_M32_MPERS
+#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+# endif
+# ifdef HAVE_MX32_MPERS
+#  define PERSONALITY2_INCLUDE_FUNCS "mx32_funcs.h"
+#  define PERSONALITY2_INCLUDE_PRINTERS_DECLS "mx32_printer_decls.h"
+#  define PERSONALITY2_INCLUDE_PRINTERS_DEFS "mx32_printer_defs.h"
+# endif
 #endif
 
 #ifdef X32
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 4
+# ifdef HAVE_M32_MPERS
+#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+# endif
 #endif
 
 #ifdef ARM
@@ -243,6 +260,34 @@ extern char *stpcpy(char *dst, const char *src);
 #endif
 #ifndef PERSONALITY0_WORDSIZE
 # define PERSONALITY0_WORDSIZE SIZEOF_LONG
+#endif
+
+#ifndef PERSONALITY0_INCLUDE_PRINTERS_DECLS
+# define PERSONALITY0_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
+#endif
+#ifndef PERSONALITY0_INCLUDE_PRINTERS_DEFS
+# define PERSONALITY0_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
+#endif
+
+#ifndef PERSONALITY1_INCLUDE_PRINTERS_DECLS
+# define PERSONALITY1_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
+#endif
+#ifndef PERSONALITY1_INCLUDE_PRINTERS_DEFS
+# define PERSONALITY1_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
+#endif
+
+#ifndef PERSONALITY2_INCLUDE_PRINTERS_DECLS
+# define PERSONALITY2_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
+#endif
+#ifndef PERSONALITY2_INCLUDE_PRINTERS_DEFS
+# define PERSONALITY2_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
+#endif
+
+#ifndef PERSONALITY1_INCLUDE_FUNCS
+# define PERSONALITY1_INCLUDE_FUNCS "empty.h"
+#endif
+#ifndef PERSONALITY2_INCLUDE_FUNCS
+# define PERSONALITY2_INCLUDE_FUNCS "empty.h"
 #endif
 
 typedef struct sysent {
@@ -694,6 +739,7 @@ extern const char *const signalent0[];
 extern const struct_ioctlent ioctlent0[];
 extern qualbits_t *qual_vec[SUPPORTED_PERSONALITIES];
 #define qual_flags (qual_vec[current_personality])
+
 #if SUPPORTED_PERSONALITIES > 1
 extern const struct_sysent *sysent;
 extern const char *const *errnoent;
@@ -705,11 +751,21 @@ extern const struct_ioctlent *ioctlent;
 # define signalent  signalent0
 # define ioctlent   ioctlent0
 #endif
+
 extern unsigned nsyscalls;
 extern unsigned nerrnos;
 extern unsigned nsignals;
 extern unsigned nioctlents;
 extern unsigned num_quals;
+
+#if SUPPORTED_PERSONALITIES > 1
+# include "printers.h"
+extern const struct_printers *printers;
+# define MPERS_PRINTER_NAME(printer_name) printers->printer_name
+#else
+# include "native_printer_decls.h"
+# define MPERS_PRINTER_NAME(printer_name) printer_name
+#endif
 
 /*
  * If you need non-NULL sysent[scno].sys_func and sysent[scno].sys_name
@@ -721,8 +777,12 @@ extern unsigned num_quals;
 #define SCNO_IN_RANGE(scno) \
 	((unsigned long)(scno) < nsyscalls)
 
-#ifndef SYS_FUNC_NAME
-# define SYS_FUNC_NAME(syscall_name) sys_ ## syscall_name
-#endif
+#define MPERS_FUNC_NAME__(prefix, name) prefix ## name
+#define MPERS_FUNC_NAME_(prefix, name) MPERS_FUNC_NAME__(prefix, name)
+#define MPERS_FUNC_NAME(name) MPERS_FUNC_NAME_(MPERS_PREFIX, name)
+
+#define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(sys_ ## syscall_name)
 
 #define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(syscall_name)(struct tcb *tcp)
+
+#define MPERS_PRINTER_DECL(type, name) type MPERS_FUNC_NAME(name)

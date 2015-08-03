@@ -1,0 +1,12 @@
+To use mpers functionality, one should:
+* typedef all of the target types which are compound and not typedefed
+already;
+* for each target type, include DEF_MPERS_TYPE(target_type_t), these can
+be included conditionally;
+* include MPERS_DEFS once;
+* before inclusion of MPERS_DEFS include all important headers
+(containing definitions of these types or other behaviour-affecting
+defines);
+* printers should be defined
+as MPERS_PRINTER_DECL(return type, function name)(args) and called
+as MPERS_PRINTER_NAME(function name)(args).
