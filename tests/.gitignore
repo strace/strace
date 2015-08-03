@@ -45,6 +45,7 @@ stack-fcall
 stat
 stat32
 statfs
+sysinfo
 time
 uid
 uid16

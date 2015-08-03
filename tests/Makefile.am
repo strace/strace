@@ -58,6 +58,7 @@ check_PROGRAMS = \
 	stat \
 	stat32 \
 	statfs \
+	sysinfo \
 	time \
 	uid \
 	uid16 \
@@ -123,6 +124,7 @@ TESTS = \
 	stat32-v.test \
 	stat64-v.test \
 	statfs.test \
+	sysinfo.test \
 	memfd_create.test \
 	mmap.test \
 	mmap64.test \
