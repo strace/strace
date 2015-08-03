@@ -1,9 +1,12 @@
 #include "defs.h"
+#include DEF_MPERS_TYPE(tms_t)
 #include <sys/times.h>
+typedef struct tms tms_t;
+#include MPERS_DEFS
 
 SYS_FUNC(times)
 {
-	struct tms tbuf;
+	tms_t tbuf;
 
 	if (entering(tcp))
 		return 0;
