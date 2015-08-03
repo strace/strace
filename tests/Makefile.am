@@ -25,6 +25,7 @@ check_PROGRAMS = \
 	ioctl \
 	ip_mreq \
 	ipc_msg \
+	ipc_msgbuf \
 	ipc_sem \
 	ipc_shm \
 	memfd_create \
@@ -101,6 +102,7 @@ TESTS = \
 	ioctl.test \
 	ip_mreq.test \
 	ipc_msg.test \
+	ipc_msgbuf.test \
 	ipc_shm.test \
 	ipc_sem.test \
 	mq.test \
@@ -174,6 +176,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ioctl.expected \
 	     ip_mreq.expected \
 	     ipc.sh \
+	     ipc_msgbuf.expected \
 	     memfd_create.expected \
 	     mmsg.expected \
 	     mq.expected \

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check msgget, msgsnd, msgrcv, msgctl syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -v -e msgget,msgsnd,msgrcv,msgctl $args
+match_grep
+
+exit 0
