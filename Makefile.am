@@ -99,6 +99,7 @@ strace_SOURCES =	\
 	prctl.c		\
 	print_mq_attr.c	\
 	print_msgbuf.c	\
+	print_time.c	\
 	printmode.c	\
 	printrusage.c	\
 	printsiginfo.c	\
