@@ -1,9 +1,12 @@
 #include "defs.h"
+#include DEF_MPERS_TYPE(sysinfo_t)
 #include <sys/sysinfo.h>
+typedef struct sysinfo sysinfo_t;
+#include MPERS_DEFS
 
 SYS_FUNC(sysinfo)
 {
-	struct sysinfo si;
+	sysinfo_t si;
 
 	if (entering(tcp))
 		return 0;
