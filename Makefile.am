@@ -121,6 +121,7 @@ strace_SOURCES =	\
 	sysmips.c	\
 	term.c		\
 	time.c		\
+	times.c		\
 	truncate.c	\
 	uid.c		\
 	uid16.c		\
