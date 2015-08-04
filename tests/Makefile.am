@@ -60,6 +60,7 @@ check_PROGRAMS = \
 	statfs \
 	sysinfo \
 	time \
+	times \
 	uid \
 	uid16 \
 	uid32 \
@@ -80,6 +81,7 @@ mq_LDADD = -lrt
 pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
+times_LDADD = -lrt
 uio_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
@@ -138,6 +140,7 @@ TESTS = \
 	ppoll.test \
 	sun_path.test \
 	time.test \
+	times.test \
 	umovestr.test \
 	umovestr2.test \
 	unix-yy.test \
