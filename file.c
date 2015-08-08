@@ -87,6 +87,14 @@
 
 #include "printstat.h"
 
+/* all locally defined structures provide these fields */
+#undef HAVE_STRUCT_STAT_ST_ATIME_NSEC
+#define HAVE_STRUCT_STAT_ST_ATIME_NSEC 1
+#undef HAVE_STRUCT_STAT_ST_CTIME_NSEC
+#define HAVE_STRUCT_STAT_ST_CTIME_NSEC 1
+#undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+#define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+
 #undef STAT32_PERSONALITY
 #if SUPPORTED_PERSONALITIES > 1
 # if defined AARCH64 || defined X86_64 || defined X32

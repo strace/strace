@@ -206,11 +206,14 @@ AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
 AC_HEADER_STAT
 AC_CHECK_MEMBERS(m4_normalize([
+	struct stat.st_atim.tv_nsec,
 	struct stat.st_blksize,
 	struct stat.st_blocks,
+	struct stat.st_ctim.tv_nsec,
 	struct stat.st_flags,
 	struct stat.st_fstype,
 	struct stat.st_gen,
+	struct stat.st_mtim.tv_nsec,
 	struct stat.st_rdev
 ]))
 
@@ -287,6 +290,13 @@ AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
 AC_CHECK_TYPES([struct mmsghdr],,, [#include <sys/socket.h>])
 AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
+
+AC_CHECK_MEMBERS(m4_normalize([
+	struct stat.st_atime_nsec,
+	struct stat.st_ctime_nsec,
+	struct stat.st_mtime_nsec
+]),,, [#include <sys/types.h>
+#include <asm/stat.h>])
 
 AC_CHECK_TYPES([struct stat64],,, [#include <sys/types.h>
 #include <asm/stat.h>])

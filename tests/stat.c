@@ -20,6 +20,21 @@
 #if defined _FILE_OFFSET_BITS && _FILE_OFFSET_BITS == 64
 # include <sys/stat.h>
 # define STAT_PREFIX "(stat(64)?\\(|newfstatat\\(AT_FDCWD, )"
+# undef HAVE_STRUCT_STAT_ST_ATIME_NSEC
+# ifdef HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC
+#  define HAVE_STRUCT_STAT_ST_ATIME_NSEC 1
+#  define st_atime_nsec st_atim.tv_nsec
+# endif
+# undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+# ifdef HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
+#  define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#  define st_mtime_nsec st_mtim.tv_nsec
+# endif
+# undef HAVE_STRUCT_STAT_ST_CTIME_NSEC
+# ifdef HAVE_STRUCT_STAT_ST_CTIM_TV_NSEC
+#  define HAVE_STRUCT_STAT_ST_CTIME_NSEC 1
+#  define st_ctime_nsec st_ctim.tv_nsec
+# endif
 #else
 # include <sys/syscall.h>
 # if defined __NR_stat
@@ -154,10 +169,22 @@ main(int ac, const char **av)
 
 	printf(", st_atime=");
 		print_time(stb.st_atime);
+#ifdef HAVE_STRUCT_STAT_ST_ATIME_NSEC
+	if (stb.st_atime_nsec)
+		printf(".%09lu", (unsigned long) stb.st_atime_nsec);
+#endif
 	printf(", st_mtime=");
 		print_time(stb.st_mtime);
+#ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+	if (stb.st_mtime_nsec)
+		printf(".%09lu", (unsigned long) stb.st_mtime_nsec);
+#endif
 	printf(", st_ctime=");
 		print_time(stb.st_ctime);
+#ifdef HAVE_STRUCT_STAT_ST_CTIME_NSEC
+	if (stb.st_ctime_nsec)
+		printf(".%09lu", (unsigned long) stb.st_ctime_nsec);
+#endif
 	printf("(, st_flags=[0-9]+)?");
 	printf("(, st_fstype=[^,]*)?");
 	printf("(, st_gen=[0-9]+)?");
