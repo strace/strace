@@ -35,6 +35,8 @@ check_PROGRAMS = \
 	pc \
 	pipe \
 	ppoll \
+	readlink \
+	readlinkat \
 	sched_xetattr \
 	scm_rights \
 	seccomp \
@@ -87,6 +89,8 @@ TESTS = \
 	ipc_msg.test \
 	ipc_shm.test \
 	ipc_sem.test \
+	readlink.test \
+	readlinkat.test \
 	sched_xetattr.test \
 	scm_rights-fd.test \
 	seccomp.test \
@@ -159,6 +163,8 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
+	     readlink.awk \
+	     readlinkat.awk \
 	     restart_syscall.expected \
 	     restart_syscall_unknown.expected \
 	     select.awk \

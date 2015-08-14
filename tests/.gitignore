@@ -24,6 +24,8 @@ oldselect
 pc
 pipe
 ppoll
+readlink
+readlinkat
 sched_xetattr
 scm_rights
 seccomp
