@@ -65,13 +65,9 @@ SYS_FUNC(msgget)
 	return RVAL_DECODED;
 }
 
-#ifdef IPC_64
-# define PRINTCTL(flagset, arg, dflt) \
+#define PRINTCTL(flagset, arg, dflt) \
 	if ((arg) & IPC_64) tprints("IPC_64|"); \
 	printxval((flagset), (arg) &~ IPC_64, dflt)
-#else
-# define PRINTCTL printxval
-#endif
 
 static int
 indirect_ipccall(struct tcb *tcp)
