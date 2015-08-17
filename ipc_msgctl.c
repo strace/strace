@@ -34,14 +34,64 @@
 #include "ipc_defs.h"
 
 #include <sys/msg.h>
+#include DEF_MPERS_TYPE(msqid_ds_t)
+typedef struct msqid_ds msqid_ds_t;
+#include MPERS_DEFS
 
 #include "xlat/msgctl_flags.h"
 
+static void
+print_msqid_ds(struct tcb *tcp, const long addr, int cmd)
+{
+	if (cmd & IPC_64)
+		cmd &= ~IPC_64;
+	msqid_ds_t msqid_ds;
+	switch (cmd) {
+	case IPC_SET:
+	case IPC_STAT:
+		if (umove_or_printaddr(tcp, addr, &msqid_ds))
+			return;
+
+		tprints("{msg_perm={");
+		printuid("uid=", msqid_ds.msg_perm.uid);
+		printuid(", gid=", msqid_ds.msg_perm.gid);
+		tprints(", mode=");
+		tprints(sprintmode(msqid_ds.msg_perm.mode));
+
+		if (cmd != IPC_STAT) {
+			tprints("}, ...}");
+			break;
+		}
+
+		tprintf(", key=%u", (unsigned) msqid_ds.msg_perm.__key);
+		printuid(", cuid=", msqid_ds.msg_perm.cuid);
+		printuid(", cgid=", msqid_ds.msg_perm.cgid);
+		tprints("}");
+		tprintf(", msg_stime=%u", (unsigned) msqid_ds.msg_stime);
+		tprintf(", msg_rtime=%u", (unsigned) msqid_ds.msg_rtime);
+		tprintf(", msg_ctime=%u", (unsigned) msqid_ds.msg_ctime);
+		tprintf(", msg_qnum=%u", (unsigned) msqid_ds.msg_qnum);
+		tprintf(", msg_qbytes=%u", (unsigned) msqid_ds.msg_qbytes);
+		tprintf(", msg_lspid=%u", (unsigned) msqid_ds.msg_lspid);
+		tprintf(", msg_lrpid=%u", (unsigned) msqid_ds.msg_lrpid);
+		tprints("}");
+		break;
+
+	default:
+		printaddr(addr);
+		break;
+	}
+}
+
 SYS_FUNC(msgctl)
 {
-	tprintf("%lu, ", tcp->u_arg[0]);
-	PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
-	tprints(", ");
-	printaddr(tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2]);
-	return RVAL_DECODED;
+	if (entering(tcp)) {
+		tprintf("%lu, ", tcp->u_arg[0]);
+		PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
+		tprints(", ");
+	} else {
+		const long addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
+		print_msqid_ds(tcp, addr, tcp->u_arg[1]);
+	}
+	return 0;
 }
