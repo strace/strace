@@ -59,7 +59,9 @@ check_PROGRAMS = \
 	umovestr2 \
 	unix-pair-send-recv \
 	utime \
-	xattr
+	xattr \
+	xet_robust_list \
+	# end of check_PROGRAMS
 
 filter_unavailable_LDADD = -lpthread
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -126,6 +128,7 @@ TESTS = \
 	uio.test \
 	utime.test \
 	xattr.test \
+	xet_robust_list.test \
 	count.test \
 	detach-sleeping.test \
 	detach-stopped.test \
