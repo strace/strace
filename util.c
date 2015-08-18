@@ -385,29 +385,31 @@ printaddr(const long addr)
 }
 
 #define DEF_PRINTNUM(name, type) \
-void									\
+bool									\
 printnum_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
 {									\
 	type num;							\
-	if (!umove_or_printaddr(tcp, addr, &num)) {			\
-		tprints("[");						\
-		tprintf(fmt, num);					\
-		tprints("]");						\
-	}								\
+	if (umove_or_printaddr(tcp, addr, &num))			\
+		return false;						\
+	tprints("[");							\
+	tprintf(fmt, num);						\
+	tprints("]");							\
+	return true;							\
 }
 
 #define DEF_PRINTPAIR(name, type) \
-void									\
+bool									\
 printpair_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
 {									\
 	type pair[2];							\
-	if (!umove_or_printaddr(tcp, addr, &pair)) {			\
-		tprints("[");						\
-		tprintf(fmt, pair[0]);					\
-		tprints(", ");						\
-		tprintf(fmt, pair[1]);					\
-		tprints("]");						\
-	}								\
+	if (umove_or_printaddr(tcp, addr, &pair))			\
+		return false;						\
+	tprints("[");							\
+	tprintf(fmt, pair[0]);						\
+	tprints(", ");							\
+	tprintf(fmt, pair[1]);						\
+	tprints("]");							\
+	return true;							\
 }
 
 DEF_PRINTNUM(int, int)
@@ -417,14 +419,14 @@ DEF_PRINTNUM(int64, uint64_t)
 DEF_PRINTPAIR(int64, uint64_t)
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-void
+bool
 printnum_long_int(struct tcb *tcp, const long addr,
 		  const char *fmt_long, const char *fmt_int)
 {
 	if (current_wordsize > sizeof(int)) {
-		printnum_int64(tcp, addr, fmt_long);
+		return printnum_int64(tcp, addr, fmt_long);
 	} else {
-		printnum_int(tcp, addr, fmt_int);
+		return printnum_int(tcp, addr, fmt_int);
 	}
 }
 #endif

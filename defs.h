@@ -530,15 +530,15 @@ extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov(struct tcb *, int, long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr(struct tcb *, long, long);
-extern void printnum_short(struct tcb *, long, const char *)
+extern bool printnum_short(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern void printnum_int(struct tcb *, long, const char *)
+extern bool printnum_int(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern void printnum_int64(struct tcb *, long, const char *)
+extern bool printnum_int64(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-extern void printnum_long_int(struct tcb *, long, const char *, const char *)
+extern bool printnum_long_int(struct tcb *, long, const char *, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 	ATTRIBUTE_FORMAT((printf, 4, 0));
 # define printnum_slong(tcp, addr) \
@@ -563,9 +563,9 @@ extern void printnum_long_int(struct tcb *, long, const char *, const char *)
 	printnum_int((tcp), (addr), "%#x")
 #endif
 
-extern void printpair_int(struct tcb *, long, const char *)
+extern bool printpair_int(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern void printpair_int64(struct tcb *, long, const char *)
+extern bool printpair_int64(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
