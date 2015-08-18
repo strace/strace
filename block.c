@@ -165,7 +165,7 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
-		printnum_long(tcp, arg, "%ld");
+		printnum_slong(tcp, arg);
 		break;
 
 	/* returns an unsigned long */
@@ -173,7 +173,7 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
-		printnum_long(tcp, arg, "%lu");
+		printnum_ulong(tcp, arg);
 		break;
 
 #ifdef HAVE_BLKGETSIZE64

@@ -244,10 +244,7 @@ SYS_FUNC(semctl)
 	PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 	tprints(", ");
 	if (indirect_ipccall(tcp)) {
-		if (current_wordsize == sizeof(int))
-			printnum_int(tcp, tcp->u_arg[3], "%#x");
-		else
-			printnum_long(tcp, tcp->u_arg[3], "%#lx");
+		printnum_ptr(tcp, tcp->u_arg[3]);
 	} else {
 		tprintf("%#lx", tcp->u_arg[3]);
 	}

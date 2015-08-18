@@ -43,11 +43,7 @@ SYS_FUNC(io_setup)
 	if (entering(tcp))
 		tprintf("%ld, ", tcp->u_arg[0]);
 	else
-#ifdef X32
-		printnum_int64(tcp, tcp->u_arg[1], "%" PRIu64);
-#else
-		printnum_long(tcp, tcp->u_arg[1], "%lu");
-#endif
+		printnum_ulong(tcp, tcp->u_arg[1]);
 	return 0;
 }
 

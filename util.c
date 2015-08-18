@@ -410,14 +410,23 @@ printpair_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
 	}								\
 }
 
-DEF_PRINTNUM(long, long)
-DEF_PRINTPAIR(long, long)
 DEF_PRINTNUM(int, int)
 DEF_PRINTPAIR(int, int)
 DEF_PRINTNUM(short, short)
-#if SIZEOF_LONG != 8
 DEF_PRINTNUM(int64, uint64_t)
 DEF_PRINTPAIR(int64, uint64_t)
+
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+void
+printnum_long_int(struct tcb *tcp, const long addr,
+		  const char *fmt_long, const char *fmt_int)
+{
+	if (current_wordsize > sizeof(int)) {
+		printnum_int64(tcp, addr, fmt_long);
+	} else {
+		printnum_int(tcp, addr, fmt_int);
+	}
+}
 #endif
 
 const char *

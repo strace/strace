@@ -100,7 +100,7 @@ SYS_FUNC(prctl)
 		if (entering(tcp))
 			tprints(", ");
 		else
-			printnum_long(tcp, tcp->u_arg[1], "%#lx");
+			printnum_ptr(tcp, tcp->u_arg[1]);
 		break;
 
 	case PR_GET_TSC:
@@ -292,7 +292,7 @@ SYS_FUNC(arch_prctl)
 		if (entering(tcp))
 			tprints(", ");
 		else
-			printnum_long(tcp, tcp->u_arg[1], "%#lx");
+			printnum_ptr(tcp, tcp->u_arg[1]);
 		return 0;
 	}
 

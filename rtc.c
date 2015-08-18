@@ -90,7 +90,7 @@ rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
-		printnum_long(tcp, arg, "%lu");
+		printnum_ulong(tcp, arg);
 		break;
 	case RTC_WKALM_SET:
 		decode_rtc_wkalrm(tcp, arg);

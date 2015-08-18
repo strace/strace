@@ -127,7 +127,7 @@ SYS_FUNC(ptrace)
 #ifdef IA64
 			return RVAL_HEX;
 #else
-			printnum_long(tcp, tcp->u_arg[3], "%#lx");
+			printnum_ptr(tcp, tcp->u_arg[3]);
 			break;
 #endif
 		case PTRACE_GETSIGINFO: {

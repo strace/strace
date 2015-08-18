@@ -534,24 +534,39 @@ extern void printnum_short(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
 extern void printnum_int(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern void printnum_long(struct tcb *, long, const char *)
-	ATTRIBUTE_FORMAT((printf, 3, 0));
-#if SIZEOF_LONG == 8
-# define printnum_int64 printnum_long
-#else
 extern void printnum_int64(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
+
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+extern void printnum_long_int(struct tcb *, long, const char *, const char *)
+	ATTRIBUTE_FORMAT((printf, 3, 0))
+	ATTRIBUTE_FORMAT((printf, 4, 0));
+# define printnum_slong(tcp, addr) \
+	printnum_long_int((tcp), (addr), "%" PRId64, "%d")
+# define printnum_ulong(tcp, addr) \
+	printnum_long_int((tcp), (addr), "%" PRIu64, "%u")
+# define printnum_ptr(tcp, addr) \
+	printnum_long_int((tcp), (addr), "%#" PRIx64, "%#x")
+#elif SIZEOF_LONG > 4
+# define printnum_slong(tcp, addr) \
+	printnum_int64((tcp), (addr), "%" PRId64)
+# define printnum_ulong(tcp, addr) \
+	printnum_int64((tcp), (addr), "%" PRIu64)
+# define printnum_ptr(tcp, addr) \
+	printnum_int64((tcp), (addr), "%#" PRIx64)
+#else
+# define printnum_slong(tcp, addr) \
+	printnum_int((tcp), (addr), "%d")
+# define printnum_ulong(tcp, addr) \
+	printnum_int((tcp), (addr), "%u")
+# define printnum_ptr(tcp, addr) \
+	printnum_int((tcp), (addr), "%#x")
 #endif
+
 extern void printpair_int(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern void printpair_long(struct tcb *, long, const char *)
-	ATTRIBUTE_FORMAT((printf, 3, 0));
-#if SIZEOF_LONG == 8
-# define printpair_int64 printpair_long
-#else
 extern void printpair_int64(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
-#endif
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))

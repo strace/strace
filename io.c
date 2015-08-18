@@ -244,22 +244,13 @@ SYS_FUNC(pwritev)
 	return RVAL_DECODED;
 }
 
-static void
-print_off_t(struct tcb *tcp, long addr)
-{
-	if (current_wordsize == sizeof(int))
-		printnum_int(tcp, addr, "%u");
-	else
-		printnum_long(tcp, addr, "%lu");
-}
-
 SYS_FUNC(sendfile)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	printfd(tcp, tcp->u_arg[1]);
 	tprints(", ");
-	print_off_t(tcp, tcp->u_arg[2]);
+	printnum_ulong(tcp, tcp->u_arg[2]);
 	tprintf(", %lu", tcp->u_arg[3]);
 
 	return RVAL_DECODED;
