@@ -39,6 +39,7 @@ stack-fcall
 stat
 stat32
 statfs
+time
 uid
 uid16
 uid32

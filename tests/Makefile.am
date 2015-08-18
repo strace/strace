@@ -50,6 +50,7 @@ check_PROGRAMS = \
 	stat \
 	stat32 \
 	statfs \
+	time \
 	uid \
 	uid16 \
 	uid32 \
@@ -115,6 +116,7 @@ TESTS = \
 	pc.test \
 	ppoll.test \
 	sun_path.test \
+	time.test \
 	umovestr.test \
 	umovestr2.test \
 	unix-yy.test \

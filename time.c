@@ -46,8 +46,10 @@
 # else
 #  define current_time_t_is_compat (current_wordsize == 4)
 # endif
+# define current_time_t_is_int32 current_time_t_is_compat
 #else
 # define current_time_t_is_compat 0
+# define current_time_t_is_int32 (sizeof(time_t) == 4)
 #endif
 
 struct timeval32
@@ -160,7 +162,10 @@ sprint_timespec(char *buf, struct tcb *tcp, long addr)
 SYS_FUNC(time)
 {
 	if (exiting(tcp)) {
-		printnum_long(tcp, tcp->u_arg[0], "%ld");
+		if (current_time_t_is_int32)
+			printnum_int(tcp, tcp->u_arg[0], "%d");
+		else
+			printnum_int64(tcp, tcp->u_arg[0], "%" PRId64);
 	}
 	return 0;
 }

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check time syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -etime $args > "$OUT"
+match_grep "$LOG" "$OUT"
+rm -f "$OUT"
+
+exit 0
