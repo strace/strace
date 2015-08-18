@@ -1,9 +1,11 @@
 #include "defs.h"
 
 #include <signal.h>
+#include <linux/audit.h>
 
 #include "printsiginfo.h"
 
+#include "xlat/audit_arch.h"
 #include "xlat/sigbus_codes.h"
 #include "xlat/sigchld_codes.h"
 #include "xlat/sigfpe_codes.h"
@@ -154,9 +156,10 @@ print_si_info(const siginfo_t *sip, bool verbose)
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS:
-			tprintf(", si_call_addr=%#lx, si_syscall=%d, si_arch=%u",
+			tprintf(", si_call_addr=%#lx, si_syscall=__NR_%s, si_arch=",
 				(unsigned long) sip->si_call_addr,
-				sip->si_syscall, sip->si_arch);
+				syscall_name(sip->si_syscall));
+			printxval(audit_arch, sip->si_arch, "AUDIT_ARCH_???");
 			break;
 #endif
 		default:

@@ -745,13 +745,17 @@ shuffle_scno(unsigned long scno)
 # define shuffle_scno(scno) ((long)(scno))
 #endif
 
-static char*
-undefined_scno_name(struct tcb *tcp)
+const char *
+syscall_name(long scno)
 {
 	static char buf[sizeof("syscall_%lu") + sizeof(long)*3];
 
-	sprintf(buf, "syscall_%lu", shuffle_scno(tcp->scno));
-	return buf;
+	if (SCNO_IS_VALID(scno))
+		return sysent[scno].sys_name;
+	else {
+		sprintf(buf, "syscall_%lu", shuffle_scno(scno));
+		return buf;
+	}
 }
 
 static long get_regs_error;
@@ -781,7 +785,7 @@ trace_syscall_entering(struct tcb *tcp)
 		if (scno_good != 1)
 			tprints("????" /* anti-trigraph gap */ "(");
 		else if (tcp->qual_flg & UNDEFINED_SCNO)
-			tprintf("%s(", undefined_scno_name(tcp));
+			tprintf("%s(", syscall_name(tcp->scno));
 		else
 			tprintf("%s(", tcp->s_ent->sys_name);
 		/*
@@ -843,7 +847,7 @@ trace_syscall_entering(struct tcb *tcp)
 
 	printleader(tcp);
 	if (tcp->qual_flg & UNDEFINED_SCNO)
-		tprintf("%s(", undefined_scno_name(tcp));
+		tprintf("%s(", syscall_name(tcp->scno));
 	else
 		tprintf("%s(", tcp->s_ent->sys_name);
 	if ((tcp->qual_flg & QUAL_RAW) && SEN_exit != tcp->s_ent->sen)
@@ -907,7 +911,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
 		if (tcp->qual_flg & UNDEFINED_SCNO)
-			tprintf("<... %s resumed> ", undefined_scno_name(tcp));
+			tprintf("<... %s resumed> ", syscall_name(tcp->scno));
 		else
 			tprintf("<... %s resumed> ", tcp->s_ent->sys_name);
 	}
