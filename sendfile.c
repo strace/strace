@@ -29,24 +29,45 @@
 
 SYS_FUNC(sendfile64)
 {
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	printfd(tcp, tcp->u_arg[1]);
-	tprints(", ");
-	printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64);
-	tprintf(", %lu", tcp->u_arg[3]);
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		printfd(tcp, tcp->u_arg[1]);
+		tprints(", ");
+		if (!printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64)) {
+			tprintf(", %lu", tcp->u_arg[3]);
+			return RVAL_DECODED;
+		}
+	} else {
+		if (!syserror(tcp) && tcp->u_rval) {
+			tprints(" => ");
+			printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64);
+		}
+		tprintf(", %lu", tcp->u_arg[3]);
+	}
 
-	return RVAL_DECODED;
+	return 0;
 }
 
 SYS_FUNC(sendfile)
 {
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	printfd(tcp, tcp->u_arg[1]);
-	tprints(", ");
-	printnum_ulong(tcp, tcp->u_arg[2]);
-	tprintf(", %lu", tcp->u_arg[3]);
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		printfd(tcp, tcp->u_arg[1]);
+		tprints(", ");
+		if (!printnum_ulong(tcp, tcp->u_arg[2])
+		    || !tcp->u_arg[3]) {
+			tprintf(", %lu", tcp->u_arg[3]);
+			return RVAL_DECODED;
+		}
+	} else {
+		if (!syserror(tcp) && tcp->u_rval) {
+			tprints(" => ");
+			printnum_ulong(tcp, tcp->u_arg[2]);
+		}
+		tprintf(", %lu", tcp->u_arg[3]);
+	}
 
-	return RVAL_DECODED;
+	return 0;
 }
