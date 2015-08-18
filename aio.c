@@ -41,7 +41,7 @@
 SYS_FUNC(io_setup)
 {
 	if (entering(tcp))
-		tprintf("%ld, ", tcp->u_arg[0]);
+		tprintf("%u, ", (unsigned int) tcp->u_arg[0]);
 	else
 		printnum_ulong(tcp, tcp->u_arg[1]);
 	return 0;
