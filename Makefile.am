@@ -102,6 +102,7 @@ strace_SOURCES =	\
 	sched.c		\
 	scsi.c		\
 	seccomp.c	\
+	sendfile.c	\
 	sigaltstack.c	\
 	signal.c	\
 	signalfd.c	\
