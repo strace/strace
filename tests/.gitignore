@@ -30,6 +30,8 @@ sched_xetattr
 scm_rights
 seccomp
 select
+sendfile
+sendfile64
 set_ptracer_any
 sigaction
 sigaltstack

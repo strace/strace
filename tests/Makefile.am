@@ -41,6 +41,8 @@ check_PROGRAMS = \
 	scm_rights \
 	seccomp \
 	select \
+	sendfile \
+	sendfile64 \
 	set_ptracer_any \
 	sigaction \
 	sigaltstack \
@@ -98,6 +100,8 @@ TESTS = \
 	scm_rights-fd.test \
 	seccomp.test \
 	select.test \
+	sendfile.test \
+	sendfile64.test \
 	sigaction.test \
 	sigaltstack.test \
 	signalfd.test \

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Check sendfile64 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+exe="./${ME_%.test}"
+run_prog "$exe" "$exe" > /dev/null
+OUT="$LOG.out"
+run_strace -esendfile64 $args > "$OUT"
+match_grep "$LOG" "$OUT"
+rm -f "$OUT"
+
+exit 0
