@@ -31,6 +31,7 @@ check_PROGRAMS = \
 	mmap \
 	mmap64 \
 	mmsg \
+	mq \
 	net-accept-connect \
 	netlink_inet_diag \
 	netlink_unix_diag \
@@ -73,6 +74,7 @@ check_PROGRAMS = \
 
 filter_unavailable_LDADD = -lpthread
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
+mq_LDADD = -lrt
 pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -101,6 +103,7 @@ TESTS = \
 	ipc_msg.test \
 	ipc_shm.test \
 	ipc_sem.test \
+	mq.test \
 	readlink.test \
 	readlinkat.test \
 	rt_sigqueueinfo.test \
@@ -173,6 +176,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ipc.sh \
 	     memfd_create.expected \
 	     mmsg.expected \
+	     mq.expected \
 	     net.expected \
 	     net-fd.expected \
 	     net-yy-accept.awk \
