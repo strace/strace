@@ -81,22 +81,35 @@ tprint_msgrcv(struct tcb *tcp, const long addr, const unsigned long count,
 	tprintf("%ld, ", msgtyp);
 }
 
+static int
+fetch_msgrcv_args(struct tcb *tcp, const long addr, long *pair)
+{
+	if (current_wordsize == sizeof(long)) {
+		if (umoven_or_printaddr(tcp, addr, 2 * sizeof(long), pair))
+			return -1;
+	} else {
+		unsigned int tmp[2];
+
+		if (umove_or_printaddr(tcp, addr, &tmp))
+			return -1;
+		pair[0] = tmp[0];
+		pair[1] = tmp[1];
+	}
+	return 0;
+}
+
 SYS_FUNC(msgrcv)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
 		if (indirect_ipccall(tcp)) {
-			struct ipc_wrapper {
-				struct msgbuf *msgp;
-				long msgtyp;
-			} tmp;
+			long pair[2];
 
-			if (umove_or_printaddr(tcp, tcp->u_arg[3], &tmp))
+			if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair))
 				tprintf(", %lu, ", tcp->u_arg[1]);
 			else
-				tprint_msgrcv(tcp, (long) tmp.msgp,
-					tcp->u_arg[1], tmp.msgtyp);
+				tprint_msgrcv(tcp, pair[0], tcp->u_arg[1], pair[1]);
 			printflags(ipc_msg_flags, tcp->u_arg[2], "MSG_???");
 		} else {
 			tprint_msgrcv(tcp, tcp->u_arg[1],
