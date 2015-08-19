@@ -348,6 +348,7 @@ extern const struct xlat addrfams[];
 extern const struct xlat at_flags[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
+extern const struct xlat resource_flags[];
 extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */
@@ -382,6 +383,8 @@ extern const struct xlat whence_codes[];
 #define STACKTRACE_INVALIDATE_CACHE 0400  /* Trigger proc/maps cache updating */
 #define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
 #define TRACE_INDIRECT_SUBCALL	02000	/* Syscall is an indirect socket/ipc subcall. */
+
+#define indirect_ipccall(tcp) (tcp->s_ent->sys_flags & TRACE_INDIRECT_SUBCALL)
 
 #if defined(ARM) || defined(AARCH64) \
  || defined(I386) || defined(X32) || defined(X86_64) \
@@ -579,6 +582,7 @@ extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
 extern char *sprinttv(char *, struct tcb *, long, enum bitness_t, int special);
 extern void print_timespec(struct tcb *, long);
 extern void sprint_timespec(char *, struct tcb *, long);
+extern void printsigevent(struct tcb *tcp, long arg);
 extern void printsiginfo_at(struct tcb *tcp, long addr);
 extern void printfd(struct tcb *, int);
 extern bool print_sockaddr_by_inode(const unsigned long, const char *);

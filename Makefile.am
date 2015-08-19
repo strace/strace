@@ -62,7 +62,12 @@ strace_SOURCES =	\
 	io.c		\
 	ioctl.c		\
 	ioprio.c	\
-	ipc.c		\
+	ipc_defs.h	\
+	ipc_msg.c	\
+	ipc_msgctl.c	\
+	ipc_sem.c	\
+	ipc_shm.c	\
+	ipc_shmctl.c	\
 	kexec.c		\
 	keyctl.c	\
 	ldt.c		\
@@ -73,6 +78,7 @@ strace_SOURCES =	\
 	memfd_create.c	\
 	mknod.c		\
 	mount.c		\
+	mq.c	\
 	mtd.c		\
 	net.c		\
 	open.c		\
@@ -82,6 +88,8 @@ strace_SOURCES =	\
 	personality.c	\
 	poll.c		\
 	prctl.c		\
+	print_mq_attr.c	\
+	print_msgbuf.c	\
 	printmode.c	\
 	printrusage.c	\
 	printsiginfo.c	\
