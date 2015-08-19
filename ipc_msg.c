@@ -38,8 +38,6 @@
 #include "xlat/ipc_msg_flags.h"
 #include "xlat/resource_flags.h"
 
-extern void tprint_msgbuf(struct tcb *tcp, const long addr, const unsigned long count);
-
 SYS_FUNC(msgget)
 {
 	if (tcp->u_arg[0])
@@ -56,7 +54,7 @@ static void
 tprint_msgsnd(struct tcb *tcp, const long addr, const unsigned long count,
 	      const unsigned long flags)
 {
-	tprint_msgbuf(tcp, addr, count);
+	MPERS_PRINTER_NAME(tprint_msgbuf)(tcp, addr, count);
 	printflags(ipc_msg_flags, flags, "MSG_???");
 }
 
@@ -77,7 +75,7 @@ static void
 tprint_msgrcv(struct tcb *tcp, const long addr, const unsigned long count,
 	      const long msgtyp)
 {
-	tprint_msgbuf(tcp, addr, count);
+	MPERS_PRINTER_NAME(tprint_msgbuf)(tcp, addr, count);
 	tprintf("%ld, ", msgtyp);
 }
 
