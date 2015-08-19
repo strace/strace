@@ -34,6 +34,7 @@
 #include "defs.h"
 #include <sys/param.h>
 #include <fcntl.h>
+#include <stdarg.h>
 #ifdef HAVE_SYS_XATTR_H
 # include <sys/xattr.h>
 #endif
@@ -207,14 +208,24 @@ next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits)
  * Print entry in struct xlat table, if there.
  */
 void
-printxval(const struct xlat *xlat, const unsigned int val, const char *dflt)
+printxvals(const unsigned int val, const char *dflt, const struct xlat *xlat, ...)
 {
-	const char *str = xlookup(xlat, val);
+	va_list args;
 
-	if (str)
-		tprints(str);
-	else
-		tprintf("%#x /* %s */", val, dflt);
+	va_start(args, xlat);
+	for (; xlat; xlat = va_arg(args, const struct xlat *)) {
+		const char *str = xlookup(xlat, val);
+
+		if (str) {
+			tprints(str);
+			va_end(args);
+			return;
+		}
+	}
+	/* No hits -- print raw # instead. */
+	tprintf("%#x /* %s */", val, dflt);
+
+	va_end(args);
 }
 
 /*

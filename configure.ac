@@ -267,6 +267,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/falloc.h
 	linux/filter.h
 	linux/hiddev.h
+	linux/ip_vs.h
 	linux/mmtimer.h
 	linux/perf_event.h
 	linux/seccomp.h
@@ -293,6 +294,13 @@ AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
 AC_CHECK_HEADERS([asm/sigcontext.h], [], [], [#include <signal.h>])
 AC_CHECK_TYPES([struct sigcontext],,, [#include <signal.h>])
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
+AC_CHECK_HEADERS(m4_normalize([
+	linux/netfilter_arp/arp_tables.h
+	linux/netfilter_bridge/ebtables.h
+	linux/netfilter_ipv4/ip_tables.h
+	linux/netfilter_ipv6/ip6_tables.h
+]), [], [], [#include <netinet/in.h>
+#include <net/if.h>])
 
 AC_CHECK_TYPES([struct mmsghdr],,, [#include <sys/socket.h>])
 AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])

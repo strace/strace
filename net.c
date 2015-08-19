@@ -52,8 +52,23 @@
 # include <linux/ipx.h>
 #endif
 
+#if defined(HAVE_LINUX_IP_VS_H)
+# include <linux/ip_vs.h>
+#endif
 #if defined(HAVE_LINUX_NETLINK_H)
 # include <linux/netlink.h>
+#endif
+#if defined(HAVE_LINUX_NETFILTER_ARP_ARP_TABLES_H)
+# include <linux/netfilter_arp/arp_tables.h>
+#endif
+#if defined(HAVE_LINUX_NETFILTER_BRIDGE_EBTABLES_H)
+# include <linux/netfilter_bridge/ebtables.h>
+#endif
+#if defined(HAVE_LINUX_NETFILTER_IPV4_IP_TABLES_H)
+# include <linux/netfilter_ipv4/ip_tables.h>
+#endif
+#if defined(HAVE_LINUX_NETFILTER_IPV6_IP6_TABLES_H)
+# include <linux/netfilter_ipv6/ip6_tables.h>
 #endif
 #if defined(HAVE_LINUX_IF_PACKET_H)
 # include <linux/if_packet.h>
@@ -989,7 +1004,11 @@ SYS_FUNC(socketpair)
 
 #include "xlat/sockoptions.h"
 #include "xlat/sockipoptions.h"
+#include "xlat/getsockipoptions.h"
+#include "xlat/setsockipoptions.h"
 #include "xlat/sockipv6options.h"
+#include "xlat/getsockipv6options.h"
+#include "xlat/setsockipv6options.h"
 #include "xlat/sockipxoptions.h"
 #include "xlat/sockrawoptions.h"
 #include "xlat/sockpacketoptions.h"
@@ -997,7 +1016,7 @@ SYS_FUNC(socketpair)
 #include "xlat/socktcpoptions.h"
 
 static void
-print_sockopt_fd_level_name(struct tcb *tcp, int fd, int level, int name)
+print_sockopt_fd_level_name(struct tcb *tcp, int fd, int level, int name, bool is_getsockopt)
 {
 	printfd(tcp, fd);
 	tprints(", ");
@@ -1009,10 +1028,12 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, int level, int name)
 		printxval(sockoptions, name, "SO_???");
 		break;
 	case SOL_IP:
-		printxval(sockipoptions, name, "IP_???");
+		printxvals(name, "IP_???", sockipoptions,
+			is_getsockopt ? getsockipoptions : setsockipoptions, NULL);
 		break;
 	case SOL_IPV6:
-		printxval(sockipv6options, name, "IPV6_???");
+		printxvals(name, "IPV6_???", sockipv6options,
+			is_getsockopt ? getsockipv6options : setsockipv6options, NULL);
 		break;
 	case SOL_IPX:
 		printxval(sockipxoptions, name, "IPX_???");
@@ -1172,7 +1193,7 @@ SYS_FUNC(getsockopt)
 {
 	if (entering(tcp)) {
 		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
-					    tcp->u_arg[1], tcp->u_arg[2]);
+					    tcp->u_arg[1], tcp->u_arg[2], true);
 	} else {
 		int len;
 
@@ -1435,7 +1456,7 @@ done:
 SYS_FUNC(setsockopt)
 {
 	print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
-				    tcp->u_arg[1], tcp->u_arg[2]);
+				    tcp->u_arg[1], tcp->u_arg[2], false);
 	print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			 tcp->u_arg[3], tcp->u_arg[4]);
 
