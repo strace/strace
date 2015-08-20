@@ -61,6 +61,7 @@ check_PROGRAMS = \
 	sysinfo \
 	time \
 	times \
+	times-fail \
 	uid \
 	uid16 \
 	uid32 \
@@ -141,6 +142,7 @@ TESTS = \
 	sun_path.test \
 	time.test \
 	times.test \
+	times-fail.test \
 	umovestr.test \
 	umovestr2.test \
 	unix-yy.test \

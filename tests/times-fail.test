@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check decoding of failing times syscall
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -a12 -etimes $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
+
+exit 0

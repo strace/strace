@@ -48,6 +48,7 @@ statfs
 sysinfo
 time
 times
+times-fail
 uid
 uid16
 uid32
