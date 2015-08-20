@@ -29,10 +29,6 @@
 #include "defs.h"
 #include <fcntl.h>
 
-#ifdef HAVE_MQUEUE_H
-# include <mqueue.h>
-#endif
-
 extern void printmqattr(struct tcb *tcp, const long addr);
 
 SYS_FUNC(mq_open)
@@ -44,16 +40,7 @@ SYS_FUNC(mq_open)
 	if (tcp->u_arg[1] & O_CREAT) {
 		/* mode */
 		tprintf(", %#lo, ", tcp->u_arg[2]);
-# ifndef HAVE_MQUEUE_H
-		printaddr(tcp->u_arg[3]);
-# else
-		struct mq_attr attr;
-
-		if (!umove_or_printaddr(tcp, tcp->u_arg[3], &attr))
-			tprintf("{mq_maxmsg=%ld, mq_msgsize=%ld}",
-				(long) attr.mq_maxmsg,
-				(long) attr.mq_msgsize);
-# endif
+		printmqattr(tcp, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;
 }
