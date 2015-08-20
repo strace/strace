@@ -28,17 +28,19 @@
 
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(mq_attr_t)
 #ifdef HAVE_MQUEUE_H
 # include <mqueue.h>
+typedef struct mq_attr mq_attr_t;
 #endif
+#include MPERS_DEFS
 
-void
-printmqattr(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, printmqattr)(struct tcb *tcp, const long addr)
 {
 # ifndef HAVE_MQUEUE_H
 	printaddr(addr);
 # else
-	struct mq_attr attr;
+	mq_attr_t attr;
 	if (umove_or_printaddr(tcp, addr, &attr))
 		return;
 	tprints("{mq_flags=");
