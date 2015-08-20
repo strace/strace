@@ -38,6 +38,9 @@ Makefile.in
 /ioctls_all[012].h
 /ioctlsort[012]
 
+/sen.h
+/sys_func.h
+
 /strace-*.tar.xz
 
 /tests-m32
