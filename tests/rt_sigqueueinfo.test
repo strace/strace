@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check decoding of rt_sigqueueinfo syscall
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -ert_sigqueueinfo -esignal=none $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
+
+exit 0

@@ -40,6 +40,7 @@ check_PROGRAMS = \
 	ppoll \
 	readlink \
 	readlinkat \
+	rt_sigqueueinfo \
 	sched_xetattr \
 	scm_rights \
 	seccomp \
@@ -101,6 +102,7 @@ TESTS = \
 	ipc_sem.test \
 	readlink.test \
 	readlinkat.test \
+	rt_sigqueueinfo.test \
 	sched_xetattr.test \
 	scm_rights-fd.test \
 	seccomp.test \
