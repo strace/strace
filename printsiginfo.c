@@ -28,9 +28,9 @@
 static void
 printsigsource(const siginfo_t *sip)
 {
-	tprintf(", si_pid=%lu, si_uid=%lu",
-		(unsigned long) sip->si_pid,
-		(unsigned long) sip->si_uid);
+	tprintf(", si_pid=%u, si_uid=%u",
+		(unsigned int) sip->si_pid,
+		(unsigned int) sip->si_uid);
 }
 
 static void
@@ -39,7 +39,7 @@ printsigval(const siginfo_t *sip, bool verbose)
 	if (!verbose)
 		tprints(", ...");
 	else
-		tprintf(", si_value={int=%u, ptr=%#lx}",
+		tprintf(", si_value={int=%d, ptr=%#lx}",
 			sip->si_int,
 			(unsigned long) sip->si_ptr);
 }
