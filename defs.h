@@ -314,6 +314,8 @@ struct tcb {
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
+	void *_priv_data;	/* Private data for syscall decoding functions */
+	void (*_free_priv_data)(void *); /* Callback for freeing priv_data */
 	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
 	struct timeval stime;	/* System time usage as of last process wait */
@@ -530,6 +532,21 @@ extern const char *syscall_name(long scno);
 extern bool is_erestart(struct tcb *);
 extern void temporarily_clear_syserror(struct tcb *);
 extern void restore_cleared_syserror(struct tcb *);
+
+extern void *get_tcb_priv_data(const struct tcb *);
+extern int set_tcb_priv_data(struct tcb *, void *priv_data,
+			     void (*free_priv_data)(void *));
+extern void free_tcb_priv_data(struct tcb *);
+
+static inline unsigned long get_tcb_priv_ulong(const struct tcb *tcp)
+{
+	return (unsigned long) get_tcb_priv_data(tcp);
+}
+
+static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
+{
+	return set_tcb_priv_data(tcp, (void *) val, 0);
+}
 
 extern int umoven(struct tcb *, long, unsigned int, void *);
 #define umove(pid, addr, objp)	\

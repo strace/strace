@@ -904,6 +904,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		line_ended();
 		tcp->flags &= ~TCB_INSYSCALL;
 		tcp->sys_func_rval = 0;
+		free_tcb_priv_data(tcp);
 		return res;
 	}
 	tcp->s_prev_ent = tcp->s_ent;
@@ -1085,6 +1086,7 @@ trace_syscall_exiting(struct tcb *tcp)
  ret:
 	tcp->flags &= ~TCB_INSYSCALL;
 	tcp->sys_func_rval = 0;
+	free_tcb_priv_data(tcp);
 	return 0;
 }
 
