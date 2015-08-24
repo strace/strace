@@ -1,1 +1,3 @@
+#if defined EPOLL_CLOEXEC || defined O_CLOEXEC
 EPOLL_CLOEXEC	O_CLOEXEC
+#endif
