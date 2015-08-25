@@ -479,8 +479,12 @@ ubi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		printnum_int(tcp, arg, "%d");
 		break;
 
+#ifdef UBI_IOCVOLCRBLK
 	case UBI_IOCVOLCRBLK:
+#endif
+#ifdef UBI_IOCVOLRMBLK
 	case UBI_IOCVOLRMBLK:
+#endif
 		/* no arguments */
 		break;
 
