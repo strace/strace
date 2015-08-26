@@ -232,8 +232,8 @@ SYS_FUNC(io_cancel)
 SYS_FUNC(io_getevents)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, %ld, %ld, ", tcp->u_arg[0], tcp->u_arg[1],
-			tcp->u_arg[2]);
+		tprintf("%lu, %ld, %ld, ",
+			tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 	} else {
 		if (tcp->u_rval == 0) {
 			tprints("[]");
