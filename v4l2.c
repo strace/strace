@@ -592,6 +592,7 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		return 1;
 	}
 
+#ifdef VIDIOC_CREATE_BUFS
 	case VIDIOC_CREATE_BUFS: {
 		struct v4l2_create_buffers b;
 
@@ -617,6 +618,7 @@ v4l2_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			return 1 + RVAL_STR;
 		}
 	}
+#endif /* VIDIOC_CREATE_BUFS */
 
 	case VIDIOC_REQBUFS: {
 		struct v4l2_requestbuffers reqbufs;
