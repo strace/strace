@@ -6,7 +6,7 @@
 
 run_prog > /dev/null
 OUT="$LOG.out"
-syscalls=io_setup,io_submit,io_getevents,io_destroy
+syscalls=io_setup,io_submit,io_getevents,io_cancel,io_destroy
 run_strace -a14 -e trace=$syscalls $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"

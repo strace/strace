@@ -7,7 +7,7 @@ Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
 Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
 
-BuildRequires: libacl-devel, libaio-devel, time
+BuildRequires: libacl-devel, time
 
 %define strace64_arches ppc64 sparc64
 
