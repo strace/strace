@@ -1132,6 +1132,19 @@ umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
 	return 0;
 }
 
+int
+umove_long_or_printaddr(struct tcb *tcp, const long addr, long *ptr)
+{
+	if (current_wordsize < sizeof(*ptr)) {
+		uint32_t val32;
+		int r = umove_or_printaddr(tcp, addr, &val32);
+		if (!r)
+			*ptr = (unsigned long) val32;
+		return r;
+	}
+	return umove_or_printaddr(tcp, addr, ptr);
+}
+
 /*
  * Like `umove' but make the additional effort of looking
  * for a terminating zero byte.

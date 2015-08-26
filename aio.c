@@ -109,26 +109,30 @@ SYS_FUNC(io_submit)
 	tprintf("%lu, %ld, [", tcp->u_arg[0], tcp->u_arg[1]);
 	{
 		long i;
-		struct iocb **iocbs = (void *)tcp->u_arg[2];
-//FIXME: decoding of 32-bit call by 64-bit strace
+		long iocbs = tcp->u_arg[2];
 
-		for (i = 0; i < nr; i++, iocbs++) {
+		for (i = 0; i < nr; ++i, iocbs += current_wordsize) {
 			enum iocb_sub sub;
-			struct iocb *iocbp;
+			long iocbp;
 			struct iocb iocb;
+
 			if (i)
 				tprints(", ");
 
-			if (umove_or_printaddr(tcp, (unsigned long)iocbs, &iocbp)) {
-				/* No point in trying to read iocbs+1 etc */
-				/* (nr can be ridiculously large): */
+			if (umove_long_or_printaddr(tcp, iocbs, &iocbp)) {
+				/*
+				 * No point in trying to read the whole array
+				 * because nr can be ridiculously large.
+				 */
 				break;
 			}
+
 			tprints("{");
-			if (umove_or_printaddr(tcp, (unsigned long)iocbp, &iocb)) {
+			if (umove_or_printaddr(tcp, iocbp, &iocb)) {
 				tprints("}");
 				continue;
 			}
+
 			if (iocb.data) {
 				tprints("data=");
 				printaddr((long) iocb.data);

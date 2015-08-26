@@ -9,6 +9,7 @@ AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 	      -I$(top_srcdir)/$(OS)
 
 check_PROGRAMS = \
+	aio \
 	bpf \
 	caps \
 	epoll_create1 \
@@ -78,6 +79,7 @@ TESTS = \
 	strace-f.test \
 	qual_syscall.test \
 	bexecve.test \
+	aio.test \
 	bpf.test \
 	caps.test \
 	dumpio.test \
