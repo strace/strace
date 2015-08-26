@@ -6,7 +6,9 @@ AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(top_builddir)/$(OS)/$(ARCH) \
 	      -I$(top_srcdir)/$(OS)/$(ARCH) \
 	      -I$(top_builddir)/$(OS) \
-	      -I$(top_srcdir)/$(OS)
+	      -I$(top_srcdir)/$(OS) \
+	      -I$(top_builddir) \
+	      -I$(top_srcdir)
 
 check_PROGRAMS = \
 	aio \
