@@ -70,7 +70,7 @@ main(int ac, const char **av)
 	if (!syscall(__NR_sendfile, 0, 1, NULL, page_len) ||
 	    EBADF != errno)
 		return 77;
-	printf("sendfile\\(0, 1, NULL, %lu\\) += -1 EBADF .*\n",
+	printf("sendfile(0, 1, NULL, %lu) = -1 EBADF (Bad file descriptor)\n",
 	       (unsigned long) page_len);
 
 	void *p = mmap(NULL, page_len * 2, PROT_READ | PROT_WRITE,
@@ -80,18 +80,18 @@ main(int ac, const char **av)
 
 	if (!syscall(__NR_sendfile, 0, 1, p + page_len, page_len))
 		return 77;
-	printf("sendfile\\(0, 1, %#lx, %lu\\) += -1 EFAULT .*\n",
+	printf("sendfile(0, 1, %#lx, %lu) = -1 EFAULT (Bad address)\n",
 	       (unsigned long) p + page_len, (unsigned long) page_len);
 
 	if (syscall(__NR_sendfile, sv[1], reg_in, NULL, alen) != (long) alen)
 		return 77;
-	printf("sendfile\\(%d, %d, NULL, %lu\\) += %lu\n",
+	printf("sendfile(%d, %d, NULL, %lu) = %lu\n",
 	       sv[1], reg_in, (unsigned long) alen,
 	       (unsigned long) alen);
 
 	uint32_t *p_off = p + page_len - sizeof(uint32_t);
 	if (syscall(__NR_sendfile, sv[1], reg_in, p_off, alen) != (long) alen) {
-		printf("sendfile\\(%d, %d, %#lx, %lu\\) += -1 EFAULT .*\n",
+		printf("sendfile(%d, %d, %#lx, %lu) = -1 EFAULT (Bad address)\n",
 		       sv[1], reg_in, (unsigned long) p_off,
 		       (unsigned long) alen);
 		--p_off;
@@ -99,14 +99,14 @@ main(int ac, const char **av)
 		    != (long) alen)
 			return 77;
 	}
-	printf("sendfile\\(%d, %d, \\[0\\] => \\[%lu\\], %lu\\) += %lu\n",
+	printf("sendfile(%d, %d, [0] => [%lu], %lu) = %lu\n",
 	       sv[1], reg_in, (unsigned long) alen,
 	       (unsigned long) alen, (unsigned long) alen);
 
 	if (syscall(__NR_sendfile, sv[1], reg_in, p_off, stb.st_size + 1)
 	    != (long) blen)
 		return 77;
-	printf("sendfile\\(%d, %d, \\[%lu\\] => \\[%lu\\], %lu\\) += %lu\n",
+	printf("sendfile(%d, %d, [%lu] => [%lu], %lu) = %lu\n",
 	       sv[1], reg_in, (unsigned long) alen,
 	       (unsigned long) stb.st_size,
 	       (unsigned long) stb.st_size + 1,
@@ -117,7 +117,7 @@ main(int ac, const char **av)
 		*p_off64 = 0xcafef00dfacefeed;
 		if (!syscall(__NR_sendfile, sv[1], reg_in, p_off64, 1))
 			return 77;
-		printf("sendfile\\(%d, %d, \\[14627392582579060461\\], 1\\) += -1 EINVAL .*\n",
+		printf("sendfile(%d, %d, [14627392582579060461], 1) = -1 EINVAL (Invalid argument)\n",
 		       sv[1], reg_in);
 		*p_off64 = 0xdefaced;
 	} else {
@@ -125,9 +125,10 @@ main(int ac, const char **av)
 	}
 	if (syscall(__NR_sendfile, sv[1], reg_in, p_off, 1))
 		return 77;
-	printf("sendfile\\(%d, %d, \\[233811181\\], 1\\) += 0\n",
+	printf("sendfile(%d, %d, [233811181], 1) = 0\n",
 	       sv[1], reg_in);
 
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 

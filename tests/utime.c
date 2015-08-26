@@ -18,11 +18,12 @@ main(void)
 	struct utimbuf u = { .actime = t, .modtime = t };
 	struct tm *p = localtime(&t);
 
-	printf("utime\\(\"utime\\\\nfilename\", \\[");
+	printf("utime(\"utime\\nfilename\", [");
 	print_tm(p);
 	printf(", ");
 	print_tm(p);
-	printf("\\]\\) += -1 ENOENT .*\n");
+	puts("]) = -1 ENOENT (No such file or directory)");
+	puts("+++ exited with 0 +++");
 
 	return utime("utime\nfilename", &u) == -1 && errno == ENOENT ? 0 : 77;
 }

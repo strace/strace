@@ -16,7 +16,7 @@ LC_ALL=C grep -x "utime(.*" "$LOG" > /dev/null || {
 	rm -f "$OUT"
 	skip_ 'test executable does not use utime syscall'
 }
-match_grep "$LOG" "$OUT"
+match_diff "$OUT" "$LOG"
 
 rm -f "$OUT"
 

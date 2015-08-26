@@ -27,8 +27,9 @@ main(void)
 	if ((time_t) -1 == t || t != *p_t)
 		return 77;
 
-	printf("time\\(\\[%jd\\]\\) += %jd\n", (intmax_t) t, (intmax_t) t);
+	printf("time([%jd]) = %jd\n", (intmax_t) t, (intmax_t) t);
 
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 

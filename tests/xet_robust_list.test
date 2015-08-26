@@ -6,8 +6,8 @@
 
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -eget_robust_list,set_robust_list $args > "$OUT"
-match_grep "$LOG" "$OUT"
+run_strace -a24 -eget_robust_list,set_robust_list $args > "$OUT"
+match_diff "$OUT" "$LOG"
 rm -f "$OUT"
 
 exit 0

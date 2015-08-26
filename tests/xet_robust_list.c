@@ -28,19 +28,20 @@ main(void)
 
 	if (syscall(__NR_get_robust_list, long_pid, p_head, p_len))
 		return 77;
-	printf("get_robust_list\\(%d, \\[%#lx\\], \\[%lu\\]\\) += 0\n",
+	printf("get_robust_list(%d, [%#lx], [%lu]) = 0\n",
 	       (int) pid, (unsigned long) *p_head, (unsigned long) *p_len);
 
 	if (syscall(__NR_set_robust_list, p, *p_len))
 		return 77;
-	printf("set_robust_list\\(%#lx, %lu\\) += 0\n",
+	printf("set_robust_list(%#lx, %lu) = 0\n",
 	       (unsigned long) p, (unsigned long) *p_len);
 
 	if (syscall(__NR_get_robust_list, long_pid, p_head, p_len))
 		return 77;
-	printf("get_robust_list\\(%d, \\[%#lx\\], \\[%lu\\]\\) += 0\n",
+	printf("get_robust_list(%d, [%#lx], [%lu]) = 0\n",
 	       (int) pid, (unsigned long) *p_head, (unsigned long) *p_len);
 
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 

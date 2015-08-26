@@ -6,8 +6,8 @@
 
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -etime $args > "$OUT"
-match_grep "$LOG" "$OUT"
+run_strace -a10 -etime $args > "$OUT"
+match_diff "$OUT" "$LOG"
 rm -f "$OUT"
 
 exit 0

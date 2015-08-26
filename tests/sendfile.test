@@ -7,8 +7,8 @@
 exe="./${ME_%.test}"
 run_prog "$exe" "$exe" > /dev/null
 OUT="$LOG.out"
-run_strace -esendfile $args > "$OUT"
-match_grep "$LOG" "$OUT"
+run_strace -a24 -esendfile $args > "$OUT"
+match_diff "$OUT" "$LOG"
 rm -f "$OUT"
 
 exit 0
