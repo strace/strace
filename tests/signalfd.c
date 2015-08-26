@@ -12,7 +12,7 @@
 int
 main(void)
 {
-#if defined HAVE_SYS_SIGNALFD_H && defined HAVE_SIGNALFD
+#if defined HAVE_SYS_SIGNALFD_H && defined HAVE_SIGNALFD && defined O_CLOEXEC
 	sigset_t mask;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR2);

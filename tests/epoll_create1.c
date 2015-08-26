@@ -9,7 +9,7 @@
 int
 main(void)
 {
-#ifdef __NR_epoll_create1
+#if defined __NR_epoll_create1 && defined O_CLOEXEC
 	(void) close(0);
 	if (syscall(__NR_epoll_create1, O_CLOEXEC))
 		return 77;

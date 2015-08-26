@@ -9,7 +9,7 @@
 int
 main(void)
 {
-#ifdef __NR_eventfd2
+#if defined __NR_eventfd2 && defined O_CLOEXEC
 	(void) close(0);
 	return syscall(__NR_eventfd2, -1L, 1 | O_CLOEXEC | O_NONBLOCK) == 0 ?
 		0 : 77;
