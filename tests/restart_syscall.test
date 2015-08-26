@@ -23,7 +23,7 @@ case "$STRACE_ARCH" in
 	alpha|mips|or1k|s390|s390x)
 		# These architectures use the same register
 		# both for syscall number and syscall return code.
-		match_diff "$LOG" "$srcdir/restart_syscall_unknown.expected"
+		match_diff "$srcdir/restart_syscall_unknown.expected" "$LOG"
 		;;
 	*) match_diff
 		;;

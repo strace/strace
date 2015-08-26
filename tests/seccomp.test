@@ -8,7 +8,7 @@ OUT="$LOG.out"
 
 run_prog > /dev/null
 run_strace -veprctl $args > "$OUT"
-match_diff "$LOG" "$OUT"
+match_diff "$OUT" "$LOG"
 
 rm -f "$OUT"
 
