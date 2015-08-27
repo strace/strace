@@ -1,17 +1,23 @@
 #!/bin/sh
 
-# Check select syscall decoding.
+# Check select/pselect6 syscall decoding.
 
 . "${srcdir=.}/init.sh"
 
-syscall=
-$STRACE -epselect6 -h > /dev/null && syscall=$syscall,pselect6
-$STRACE -eselect -h > /dev/null && syscall=$syscall,select
-test -n "$syscall" ||
-	fail_ 'neither select not pselect6 syscall is supported on this architecture'
+exe="./${ME_%.test}"
+syscall=select
+run_prog "$exe" $syscall > /dev/null
+run_strace $args > /dev/null
 
-run_prog
-run_strace -e$syscall $args
-match_awk
+check_prog grep
+if LC_ALL=C grep -x "pselect6(.*" "$LOG" > /dev/null; then
+	syscall=pselect6
+	run_prog "$exe" $syscall > /dev/null
+fi
+
+OUT="$LOG.out"
+run_strace -a36 -e$syscall $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
 
 exit 0

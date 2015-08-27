@@ -180,7 +180,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     readlinkat.awk \
 	     restart_syscall.expected \
 	     restart_syscall_unknown.expected \
-	     select.awk \
 	     sigaction.awk \
 	     sigaltstack.expected \
 	     signalfd.expected \
