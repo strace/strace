@@ -658,6 +658,7 @@ ioctls_all%.h: $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%.h $(srcdir)/$(OS)/$(ARCH)/ioc
 
 BUILT_SOURCES = $(ioctlent_h) native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h .version
 CLEANFILES    = $(ioctlent_h) native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h
+DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h
 
 # defines mpers_source_files
 include mpers.am

@@ -10,8 +10,19 @@ pushdef([st_cv_mpers], [st_cv_$1_mpers])
 
 case "$arch" in
 	[$2])
+	AH_TEMPLATE([HAVE_GNU_STUBS_32_H],
+		    [Define to 1 if you have the <gnu/stubs-32.h> header file.])
+	AH_TEMPLATE([HAVE_GNU_STUBS_X32_H],
+		    [Define to 1 if you have the <gnu/stubs-x32.h> header file.])
+	pushdef([gnu_stubs], [gnu/stubs-][m4_substr([$1], 1)][.h])
+	AC_CHECK_HEADERS([gnu_stubs], [IFLAG=],
+			 [mkdir -p gnu
+			  : > gnu_stubs
+			  AC_MSG_NOTICE([Created empty gnu_stubs])
+			  IFLAG=-I.])
+	popdef([gnu_stubs])
 	saved_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS CFLAG"
+	CFLAGS="$CFLAGS CFLAG $IFLAG"
 	AC_CACHE_CHECK([for CFLAG compile support], [st_cv_cc],
 		[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <stdint.h>
 						     int main(){return 0;}]])],
