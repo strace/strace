@@ -4,13 +4,18 @@
 
 . "${srcdir=.}/init.sh"
 
-ln -sf readlink.c readlink.link ||
+syscall=readlink
+target=$syscall.c
+link=$syscall.link
+OUT="$LOG.out"
+
+ln -snf $target $link ||
 	framework_skip_ 'failed to create a symlink'
 
-run_prog
-run_strace -e readlink -xx -s3 $args
-match_awk
+run_prog > /dev/null
+run_strace -e $syscall -xx -s3 $args > "$OUT"
+match_diff "$OUT" "$LOG"
 
-rm -f readlink.link
+rm -f -- "$OUT" $link
 
 exit 0

@@ -175,8 +175,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
-	     readlink.awk \
-	     readlinkat.awk \
 	     restart_syscall.expected \
 	     restart_syscall_unknown.expected \
 	     sigaction.awk \
