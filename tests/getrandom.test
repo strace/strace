@@ -4,8 +4,10 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog
-run_strace -e getrandom -xx -s3 $args
-match_awk
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -e getrandom -xx -s3 -a32 $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
 
 exit 0
