@@ -164,13 +164,13 @@ SYS_FUNC(io_submit)
 		long iocbs = tcp->u_arg[2];
 
 		for (i = 0; i < nr; ++i, iocbs += current_wordsize) {
-			long iocbp;
+			unsigned long iocbp;
 			struct iocb cb;
 
 			if (i)
 				tprints(", ");
 
-			if (umove_long_or_printaddr(tcp, iocbs, &iocbp)) {
+			if (umove_ulong_or_printaddr(tcp, iocbs, &iocbp)) {
 				/*
 				 * No point in trying to read the whole array
 				 * because nr can be ridiculously large.

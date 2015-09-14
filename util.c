@@ -1133,7 +1133,7 @@ umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
 }
 
 int
-umove_long_or_printaddr(struct tcb *tcp, const long addr, long *ptr)
+umove_ulong_or_printaddr(struct tcb *tcp, const long addr, unsigned long *ptr)
 {
 	if (current_wordsize < sizeof(*ptr)) {
 		uint32_t val32;
