@@ -194,6 +194,11 @@ extern char *stpcpy(char *dst, const char *src);
 # if defined(SPARC64)
 #  define SUPPORTED_PERSONALITIES 2
 #  define PERSONALITY1_WORDSIZE 8
+#  ifdef HAVE_M32_MPERS
+#   define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
+#   define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+#   define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#  endif
 # endif
 #endif
 
@@ -235,12 +240,22 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 8
 # define DEFAULT_PERSONALITY 1
+# ifdef HAVE_M32_MPERS
+#  define PERSONALITY0_INCLUDE_FUNCS "m32_funcs.h"
+#  define PERSONALITY0_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+#  define PERSONALITY0_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+# endif
 #endif
 
 #ifdef POWERPC64
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
+# ifdef HAVE_M32_MPERS
+#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+# endif
 #endif
 
 #ifdef TILE
@@ -249,6 +264,11 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY1_WORDSIZE 4
 # ifdef __tilepro__
 #  define DEFAULT_PERSONALITY 1
+# endif
+# ifdef HAVE_M32_MPERS
+#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
 # endif
 #endif
 
