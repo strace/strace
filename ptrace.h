@@ -87,6 +87,9 @@ extern long ptrace(int, int, char *, long);
 #ifndef PTRACE_O_EXITKILL
 # define PTRACE_O_EXITKILL	(1 << 20)
 #endif
+#ifndef PTRACE_O_SUSPEND_SECCOMP
+# define PTRACE_O_SUSPEND_SECCOMP	(1 << 21)
+#endif
 
 #ifndef PTRACE_SETOPTIONS
 # define PTRACE_SETOPTIONS	0x4200
