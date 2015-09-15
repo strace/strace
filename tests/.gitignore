@@ -27,6 +27,7 @@ oldselect
 pc
 pipe
 ppoll
+pselect6
 readlink
 readlinkat
 rt_sigqueueinfo

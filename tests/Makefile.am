@@ -40,6 +40,7 @@ check_PROGRAMS = \
 	pc \
 	pipe \
 	ppoll \
+	pselect6 \
 	readlink \
 	readlinkat \
 	rt_sigqueueinfo \
@@ -110,6 +111,7 @@ TESTS = \
 	ipc_shm.test \
 	ipc_sem.test \
 	mq.test \
+	pselect6.test \
 	readlink.test \
 	readlinkat.test \
 	rt_sigqueueinfo.test \
