@@ -32,6 +32,7 @@
  */
 
 #include "defs.h"
+#include "native_defs.h"
 #include <sys/param.h>
 
 /* for struct iovec */

@@ -11,5 +11,5 @@
 #else
 # define MPERS_PREFIX
 # define DEF_MPERS_TYPE(args) "empty.h"
-# define MPERS_DEFS "empty.h"
+# define MPERS_DEFS "native_defs.h"
 #endif

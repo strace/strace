@@ -54,7 +54,7 @@ static void
 tprint_msgsnd(struct tcb *tcp, const long addr, const unsigned long count,
 	      const unsigned long flags)
 {
-	MPERS_PRINTER_NAME(tprint_msgbuf)(tcp, addr, count);
+	tprint_msgbuf(tcp, addr, count);
 	printflags(ipc_msg_flags, flags, "MSG_???");
 }
 
@@ -75,7 +75,7 @@ static void
 tprint_msgrcv(struct tcb *tcp, const long addr, const unsigned long count,
 	      const long msgtyp)
 {
-	MPERS_PRINTER_NAME(tprint_msgbuf)(tcp, addr, count);
+	tprint_msgbuf(tcp, addr, count);
 	tprintf("%ld, ", msgtyp);
 }
 

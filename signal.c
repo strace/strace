@@ -633,7 +633,7 @@ print_sigqueueinfo(struct tcb *tcp, int sig, unsigned long uinfo)
 {
 	printsignal(sig);
 	tprints(", ");
-	MPERS_PRINTER_NAME(printsiginfo_at)(tcp, uinfo);
+	printsiginfo_at(tcp, uinfo);
 }
 
 SYS_FUNC(rt_sigqueueinfo)
@@ -666,7 +666,7 @@ SYS_FUNC(rt_sigtimedwait)
 	}
 	else if (tcp->u_arg[1] != 0) {
 		/* syscall exit, and u_arg[1] wasn't NULL */
-		MPERS_PRINTER_NAME(printsiginfo_at)(tcp, tcp->u_arg[1]);
+		printsiginfo_at(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	}
 	else {

@@ -38,7 +38,7 @@ SYS_FUNC(mq_open)
 	if (tcp->u_arg[1] & O_CREAT) {
 		/* mode */
 		tprintf(", %#lo, ", tcp->u_arg[2]);
-		MPERS_PRINTER_NAME(printmqattr)(tcp, tcp->u_arg[3]);
+		printmqattr(tcp, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;
 }
@@ -75,9 +75,9 @@ SYS_FUNC(mq_getsetattr)
 {
 	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-		MPERS_PRINTER_NAME(printmqattr)(tcp, tcp->u_arg[1]);
+		printmqattr(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else
-		MPERS_PRINTER_NAME(printmqattr)(tcp, tcp->u_arg[2]);
+		printmqattr(tcp, tcp->u_arg[2]);
 	return 0;
 }

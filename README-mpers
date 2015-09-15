@@ -8,5 +8,7 @@ be included conditionally;
 (containing definitions of these types or other behaviour-affecting
 defines);
 * printers should be defined
-as MPERS_PRINTER_DECL(return type, function name)(args) and called
-as MPERS_PRINTER_NAME(function name)(args).
+as MPERS_PRINTER_DECL(return_type, function_name)(args),
+inside files that include MPERS_DEFS these printers should be called
+as MPERS_FUNC_NAME(function_name)(args), in other files
+they should be called just as function_name(args).

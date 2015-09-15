@@ -4,7 +4,7 @@ SYS_FUNC(utimes)
 {
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	MPERS_PRINTER_NAME(print_timeval_pair)(tcp, tcp->u_arg[1]);
+	print_timeval_pair(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -14,7 +14,7 @@ SYS_FUNC(futimesat)
 	print_dirfd(tcp, tcp->u_arg[0]);
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
-	MPERS_PRINTER_NAME(print_timeval_pair)(tcp, tcp->u_arg[2]);
+	print_timeval_pair(tcp, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -24,7 +24,7 @@ SYS_FUNC(utimensat)
 	print_dirfd(tcp, tcp->u_arg[0]);
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
-	MPERS_PRINTER_NAME(print_timespec_utime_pair)(tcp, tcp->u_arg[2]);
+	print_timespec_utime_pair(tcp, tcp->u_arg[2]);
 	tprints(", ");
 	printflags(at_flags, tcp->u_arg[3], "AT_???");
 

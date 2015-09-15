@@ -114,7 +114,7 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 					printrusage32(tcp, tcp->u_arg[3]);
 				else
 #endif
-					MPERS_PRINTER_NAME(printrusage)(tcp, tcp->u_arg[3]);
+					printrusage(tcp, tcp->u_arg[3]);
 			}
 			else
 				printaddr(tcp->u_arg[3]);
@@ -149,14 +149,14 @@ SYS_FUNC(waitid)
 		tprintf(", %ld, ", tcp->u_arg[1]);
 	} else {
 		/* siginfo */
-		MPERS_PRINTER_NAME(printsiginfo_at)(tcp, tcp->u_arg[2]);
+		printsiginfo_at(tcp, tcp->u_arg[2]);
 		/* options */
 		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
 		if (tcp->s_ent->nargs > 4) {
 			/* usage */
 			tprints(", ");
-			MPERS_PRINTER_NAME(printrusage)(tcp, tcp->u_arg[4]);
+			printrusage(tcp, tcp->u_arg[4]);
 		}
 	}
 	return 0;

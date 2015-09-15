@@ -779,11 +779,8 @@ extern unsigned num_quals;
 
 #if SUPPORTED_PERSONALITIES > 1
 # include "printers.h"
-extern const struct_printers *printers;
-# define MPERS_PRINTER_NAME(printer_name) printers->printer_name
 #else
 # include "native_printer_decls.h"
-# define MPERS_PRINTER_NAME(printer_name) printer_name
 #endif
 
 /*

@@ -162,7 +162,7 @@ SYS_FUNC(getrusage)
 		tprints(", ");
 	}
 	else
-		MPERS_PRINTER_NAME(printrusage)(tcp, tcp->u_arg[1]);
+		printrusage(tcp, tcp->u_arg[1]);
 	return 0;
 }
 
