@@ -1145,6 +1145,24 @@ umove_ulong_or_printaddr(struct tcb *tcp, const long addr, unsigned long *ptr)
 	return umove_or_printaddr(tcp, addr, ptr);
 }
 
+int
+umove_ulong_array_or_printaddr(struct tcb *tcp, const long addr,
+			       unsigned long *ptr, size_t n)
+{
+	if (current_wordsize < sizeof(*ptr)) {
+		uint32_t ptr32[n];
+		int r = umove_or_printaddr(tcp, addr, &ptr32);
+		if (!r) {
+			size_t i;
+
+			for (i = 0; i < n; ++i)
+				ptr[i] = (unsigned long) ptr32[i];
+		}
+		return r;
+	}
+	return umoven_or_printaddr(tcp, addr, n * sizeof(*ptr), ptr);
+}
+
 /*
  * Like `umove' but make the additional effort of looking
  * for a terminating zero byte.

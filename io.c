@@ -64,24 +64,9 @@ SYS_FUNC(write)
 void
 tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr, int decode_iov, unsigned long data_size)
 {
-#if SUPPORTED_PERSONALITIES > 1
-	union {
-		struct { u_int32_t base; u_int32_t len; } iov32;
-		struct { u_int64_t base; u_int64_t len; } iov64;
-	} iov;
-#define sizeof_iov \
-	(current_wordsize == 4 ? sizeof(iov.iov32) : sizeof(iov.iov64))
-#define iov_iov_base \
-	(current_wordsize == 4 ? (uint64_t) iov.iov32.base : iov.iov64.base)
-#define iov_iov_len \
-	(current_wordsize == 4 ? (uint64_t) iov.iov32.len : iov.iov64.len)
-#else
-	struct iovec iov;
-#define sizeof_iov sizeof(iov)
-#define iov_iov_base iov.iov_base
-#define iov_iov_len iov.iov_len
-#endif
+	unsigned long iov[2];
 	unsigned long size, cur, end, abbrev_end;
+	const unsigned long sizeof_iov = current_wordsize * 2;
 
 	if (!len) {
 		tprints("[]");
@@ -109,23 +94,21 @@ tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr, int deco
 			tprints("...");
 			break;
 		}
-		if (umoven_or_printaddr(tcp, cur, sizeof_iov, &iov))
+		if (umove_ulong_array_or_printaddr(tcp, cur, iov,
+						   ARRAY_SIZE(iov)))
 			break;
 		tprints("{");
 		if (decode_iov) {
-			unsigned long len = iov_iov_len;
+			unsigned long len = iov[1];
 			if (len > data_size)
 				len = data_size;
 			data_size -= len;
-			printstr(tcp, (long) iov_iov_base, len);
+			printstr(tcp, iov[0], len);
 		} else
-			printaddr((long) iov_iov_base);
-		tprintf(", %lu}", (unsigned long)iov_iov_len);
+			printaddr(iov[0]);
+		tprintf(", %lu}", iov[1]);
 	}
 	tprints("]");
-#undef sizeof_iov
-#undef iov_iov_base
-#undef iov_iov_len
 }
 
 void

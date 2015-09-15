@@ -441,30 +441,15 @@ SYS_FUNC(pselect6)
 {
 	int rc = decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
 	if (entering(tcp)) {
-		long r;
-		struct {
-			unsigned long ptr;
-			unsigned long len;
-		} data;
+		unsigned long data[2];
 
 		tprints(", ");
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-		if (current_wordsize == 4) {
-			struct {
-				uint32_t ptr;
-				uint32_t len;
-			} data32;
-			r = umove_or_printaddr(tcp, tcp->u_arg[5], &data32);
-			data.ptr = data32.ptr;
-			data.len = data32.len;
-		} else
-#endif
-			r = umove_or_printaddr(tcp, tcp->u_arg[5], &data);
-		if (r == 0) {
+		if (!umove_ulong_array_or_printaddr(tcp, tcp->u_arg[5], data,
+						    ARRAY_SIZE(data))) {
 			tprints("{");
-			/* NB: kernel requires data.len == NSIG / 8 */
-			print_sigset_addr_len(tcp, data.ptr, data.len);
-			tprintf(", %lu}", data.len);
+			/* NB: kernel requires data[1] == NSIG / 8 */
+			print_sigset_addr_len(tcp, data[0], data[1]);
+			tprintf(", %lu}", data[1]);
 		}
 	}
 	return rc;
