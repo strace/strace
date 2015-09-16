@@ -102,6 +102,7 @@ strace_SOURCES =	\
 	print_msgbuf.c	\
 	print_sigevent.c \
 	print_time.c	\
+	print_timex.c	\
 	printmode.c	\
 	printrusage.c	\
 	printsiginfo.c	\

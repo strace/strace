@@ -30,7 +30,6 @@
 #include "defs.h"
 #include <fcntl.h>
 #include <signal.h>
-#include <linux/version.h>
 #include <sys/timex.h>
 
 #ifndef UTIME_NOW
@@ -335,91 +334,9 @@ SYS_FUNC(osf_setitimer)
 }
 #endif
 
-#include "xlat/adjtimex_modes.h"
-#include "xlat/adjtimex_status.h"
 #include "xlat/adjtimex_state.h"
 
-#if SUPPORTED_PERSONALITIES > 1
-static int
-tprint_timex32(struct tcb *tcp, long addr)
-{
-	struct {
-		unsigned int modes;
-		int     offset;
-		int     freq;
-		int     maxerror;
-		int     esterror;
-		int     status;
-		int     constant;
-		int     precision;
-		int     tolerance;
-		struct timeval32 time;
-		int     tick;
-		int     ppsfreq;
-		int     jitter;
-		int     shift;
-		int     stabil;
-		int     jitcnt;
-		int     calcnt;
-		int     errcnt;
-		int     stbcnt;
-	} tx;
-
-	if (umove_or_printaddr(tcp, addr, &tx))
-		return -1;
-
-	tprints("{modes=");
-	printflags(adjtimex_modes, tx.modes, "ADJ_???");
-	tprintf(", offset=%d, freq=%d, maxerror=%d, ",
-		tx.offset, tx.freq, tx.maxerror);
-	tprintf("esterror=%u, status=", tx.esterror);
-	printflags(adjtimex_status, tx.status, "STA_???");
-	tprintf(", constant=%d, precision=%u, ",
-		tx.constant, tx.precision);
-	tprintf("tolerance=%d, time=", tx.tolerance);
-	tprint_timeval32(tcp, &tx.time);
-	tprintf(", tick=%d, ppsfreq=%d, jitter=%d",
-		tx.tick, tx.ppsfreq, tx.jitter);
-	tprintf(", shift=%d, stabil=%d, jitcnt=%d",
-		tx.shift, tx.stabil, tx.jitcnt);
-	tprintf(", calcnt=%d, errcnt=%d, stbcnt=%d",
-		tx.calcnt, tx.errcnt, tx.stbcnt);
-	tprints("}");
-	return 0;
-}
-#endif /* SUPPORTED_PERSONALITIES > 1 */
-
-static int
-tprint_timex(struct tcb *tcp, long addr)
-{
-	struct timex tx;
-
-#if SUPPORTED_PERSONALITIES > 1
-	if (current_time_t_is_compat)
-		return tprint_timex32(tcp, addr);
-#endif
-	if (umove_or_printaddr(tcp, addr, &tx))
-		return -1;
-
-	tprints("{modes=");
-	printflags(adjtimex_modes, tx.modes, "ADJ_???");
-	tprintf(", offset=%jd, freq=%jd, maxerror=%ju, esterror=%ju, status=",
-		(intmax_t) tx.offset, (intmax_t) tx.freq,
-		(uintmax_t) tx.maxerror, (uintmax_t) tx.esterror);
-	printflags(adjtimex_status, tx.status, "STA_???");
-	tprintf(", constant=%jd, precision=%ju, tolerance=%jd, time=",
-		(intmax_t) tx.constant, (uintmax_t) tx.precision,
-		(intmax_t) tx.tolerance);
-	tprint_timeval(tcp, &tx.time);
-	tprintf(", tick=%jd, ppsfreq=%jd, jitter=%jd",
-		(intmax_t) tx.tick, (intmax_t) tx.ppsfreq, (intmax_t) tx.jitter);
-	tprintf(", shift=%d, stabil=%jd, jitcnt=%jd",
-		tx.shift, (intmax_t) tx.stabil, (intmax_t) tx.jitcnt);
-	tprintf(", calcnt=%jd, errcnt=%jd, stbcnt=%jd",
-		(intmax_t) tx.calcnt, (intmax_t) tx.errcnt, (intmax_t) tx.stbcnt);
-	tprints("}");
-	return 0;
-}
+extern int tprint_timex(struct tcb *tcp, long addr);
 
 static int
 do_adjtimex(struct tcb *tcp, long addr)
