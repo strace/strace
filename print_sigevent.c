@@ -28,61 +28,23 @@
 
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(struct_sigevent)
+
 #include <signal.h>
+typedef struct sigevent struct_sigevent;
 
-#include "xlat/sigev_value.h"
+#include MPERS_DEFS
 
-#if SUPPORTED_PERSONALITIES > 1
-static void
-printsigevent32(struct tcb *tcp, long arg)
-{
-	struct {
-		int     sigev_value;
-		int     sigev_signo;
-		int     sigev_notify;
-
-		union {
-			int     tid;
-			struct {
-				int     function, attribute;
-			} thread;
-		} un;
-	} sev;
-
-	if (!umove_or_printaddr(tcp, arg, &sev)) {
-		tprintf("{%#x, ", sev.sigev_value);
-		if (sev.sigev_notify == SIGEV_SIGNAL)
-			tprintf("%s, ", signame(sev.sigev_signo));
-		else
-			tprintf("%u, ", sev.sigev_signo);
-		printxval(sigev_value, sev.sigev_notify, "SIGEV_???");
-		tprints(", ");
-		if (sev.sigev_notify == SIGEV_THREAD_ID)
-			tprintf("{%d}", sev.un.tid);
-		else if (sev.sigev_notify == SIGEV_THREAD)
-			tprintf("{%#x, %#x}",
-				sev.un.thread.function,
-				sev.un.thread.attribute);
-		else
-			tprints("{...}");
-		tprints("}");
-	}
-}
+#ifndef IN_MPERS
+# include "xlat/sigev_value.h"
 #endif
 
-void
-printsigevent(struct tcb *tcp, long arg)
+MPERS_PRINTER_DECL(void, print_sigevent)(struct tcb *tcp, const long addr)
 {
-	struct sigevent sev;
+	struct_sigevent sev;
 
-#if SUPPORTED_PERSONALITIES > 1
-	if (current_wordsize == 4) {
-		printsigevent32(tcp, arg);
-		return;
-	}
-#endif
-	if (!umove_or_printaddr(tcp, arg, &sev)) {
-		tprintf("{%p, ", sev.sigev_value.sival_ptr);
+	if (!umove_or_printaddr(tcp, addr, &sev)) {
+		tprintf("{%#lx, ", (unsigned long) sev.sigev_value.sival_ptr);
 		if (sev.sigev_notify == SIGEV_SIGNAL)
 			tprintf("%s, ", signame(sev.sigev_signo));
 		else
@@ -102,8 +64,9 @@ printsigevent(struct tcb *tcp, long arg)
 			tprints("{...}");
 #endif
 		else if (sev.sigev_notify == SIGEV_THREAD)
-			tprintf("{%p, %p}", sev.sigev_notify_function,
-				sev.sigev_notify_attributes);
+			tprintf("{%#lx, %#lx}",
+				(unsigned long) sev.sigev_notify_function,
+				(unsigned long) sev.sigev_notify_attributes);
 		else
 			tprints("{...}");
 		tprints("}");

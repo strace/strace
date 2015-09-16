@@ -514,7 +514,7 @@ SYS_FUNC(timer_create)
 	if (entering(tcp)) {
 		printclockname(tcp->u_arg[0]);
 		tprints(", ");
-		printsigevent(tcp, tcp->u_arg[1]);
+		print_sigevent(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else {
 		printnum_int(tcp, tcp->u_arg[2], "%d");

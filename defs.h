@@ -414,6 +414,7 @@ extern const struct xlat at_flags[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
 extern const struct xlat resource_flags[];
+extern const struct xlat sigev_value[];
 extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */
@@ -650,7 +651,6 @@ extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
 extern char *sprinttv(char *, struct tcb *, long, enum bitness_t, int special);
 extern void print_timespec(struct tcb *, long);
 extern void sprint_timespec(char *, struct tcb *, long);
-extern void printsigevent(struct tcb *tcp, long arg);
 extern void printfd(struct tcb *, int);
 extern bool print_sockaddr_by_inode(const unsigned long, const char *);
 extern void print_dirfd(struct tcb *, int);
