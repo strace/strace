@@ -61,6 +61,7 @@ check_PROGRAMS = \
 	statfs \
 	sysinfo \
 	time \
+	timer_create \
 	times \
 	times-fail \
 	uid \
@@ -143,6 +144,7 @@ TESTS = \
 	ppoll.test \
 	sun_path.test \
 	time.test \
+	timer_create.test \
 	times.test \
 	times-fail.test \
 	umovestr.test \

@@ -43,32 +43,56 @@ MPERS_PRINTER_DECL(void, print_sigevent)(struct tcb *tcp, const long addr)
 {
 	struct_sigevent sev;
 
-	if (!umove_or_printaddr(tcp, addr, &sev)) {
-		tprintf("{%#lx, ", (unsigned long) sev.sigev_value.sival_ptr);
-		if (sev.sigev_notify == SIGEV_SIGNAL)
-			tprintf("%s, ", signame(sev.sigev_signo));
-		else
-			tprintf("%u, ", sev.sigev_signo);
-		printxval(sigev_value, sev.sigev_notify, "SIGEV_???");
-		tprints(", ");
-		if (sev.sigev_notify == SIGEV_THREAD_ID)
-#if defined(HAVE_STRUCT_SIGEVENT__SIGEV_UN__PAD)
-			/* _pad[0] is the _tid field which might not be
-			   present in the userlevel definition of the
-			   struct.  */
-			tprintf("{%d}", sev._sigev_un._pad[0]);
-#elif defined(HAVE_STRUCT_SIGEVENT___PAD)
-			tprintf("{%d}", sev.__pad[0]);
+	if (umove_or_printaddr(tcp, addr, &sev))
+		return;
+
+	tprints("{");
+	if (sev.sigev_value.sival_ptr)
+		tprintf("sigev_value={int=%d, ptr=%#lx}, ",
+			sev.sigev_value.sival_int,
+			(unsigned long) sev.sigev_value.sival_ptr);
+
+	tprints("sigev_signo=");
+	switch (sev.sigev_notify) {
+	case SIGEV_SIGNAL:
+	case SIGEV_THREAD:
+	case SIGEV_THREAD_ID:
+		tprints(signame(sev.sigev_signo));
+		break;
+	default:
+		tprintf("%u", sev.sigev_signo);
+	}
+
+	tprints(", sigev_notify=");
+	printxval(sigev_value, sev.sigev_notify, "SIGEV_???");
+
+	switch (sev.sigev_notify) {
+	case SIGEV_THREAD_ID:
+#ifndef sigev_notify_thread_id
+		/*
+		 * _pad[0] is the _tid field which might not be
+		 * present in the userlevel definition of the struct.
+		 */
+# if defined HAVE_STRUCT_SIGEVENT__SIGEV_UN__PAD
+#  define sigev_notify_thread_id _sigev_un._pad[0]
+# elif defined HAVE_STRUCT_SIGEVENT___PAD
+#  define sigev_notify_thread_id __pad[0]
+# endif
+#endif
+
+#ifdef sigev_notify_thread_id
+		tprintf(", sigev_notify_thread_id=%d",
+			sev.sigev_notify_thread_id);
 #else
 # warning unfamiliar struct sigevent => incomplete SIGEV_THREAD_ID decoding
-			tprints("{...}");
 #endif
-		else if (sev.sigev_notify == SIGEV_THREAD)
-			tprintf("{%#lx, %#lx}",
-				(unsigned long) sev.sigev_notify_function,
-				(unsigned long) sev.sigev_notify_attributes);
-		else
-			tprints("{...}");
-		tprints("}");
+		break;
+	case SIGEV_THREAD:
+		tprints(", sigev_notify_function=");
+		printaddr((unsigned long) sev.sigev_notify_function);
+		tprints(", sigev_notify_attributes=");
+		printaddr((unsigned long) sev.sigev_notify_attributes);
+		break;
 	}
+	tprints("}");
 }

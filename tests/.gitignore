@@ -48,6 +48,7 @@ stat32
 statfs
 sysinfo
 time
+timer_create
 times
 times-fail
 uid
