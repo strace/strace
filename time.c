@@ -336,12 +336,10 @@ SYS_FUNC(osf_setitimer)
 
 #include "xlat/adjtimex_state.h"
 
-extern int tprint_timex(struct tcb *tcp, long addr);
-
 static int
 do_adjtimex(struct tcb *tcp, long addr)
 {
-	if (tprint_timex(tcp, addr))
+	if (print_timex(tcp, addr))
 		return 0;
 	tcp->auxstr = xlookup(adjtimex_state, tcp->u_rval);
 	if (tcp->auxstr)
