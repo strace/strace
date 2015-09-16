@@ -509,9 +509,6 @@ SYS_FUNC(clock_adjtime)
 	return 0;
 }
 
-#ifndef SIGEV_THREAD_ID
-# define SIGEV_THREAD_ID 4
-#endif
 #include "xlat/sigev_value.h"
 
 #if SUPPORTED_PERSONALITIES > 1
