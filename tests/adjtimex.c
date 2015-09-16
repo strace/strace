@@ -46,7 +46,11 @@ main(void)
 	       ", esterror=%jd, status=%s, constant=%jd, precision=%jd"
 	       ", tolerance=%jd, time={%jd, %jd}, tick=%jd, ppsfreq=%jd"
 	       ", jitter=%jd, shift=%d, stabil=%jd, jitcnt=%jd, calcnt=%jd"
-	       ", errcnt=%jd, stbcnt=%jd\\}\\) = %d \\(TIME_[A-Z]+\\)\n",
+	       ", errcnt=%jd, stbcnt=%jd"
+#ifdef HAVE_STRUCT_TIMEX_TAI
+	       ", tai=%d"
+#endif
+	       "\\}\\) = %d \\(TIME_[A-Z]+\\)\n",
 	       (intmax_t) tx.offset,
 	       (intmax_t) tx.freq,
 	       (intmax_t) tx.maxerror,
@@ -66,6 +70,9 @@ main(void)
 	       (intmax_t) tx.calcnt,
 	       (intmax_t) tx.errcnt,
 	       (intmax_t) tx.stbcnt,
+#ifdef HAVE_STRUCT_TIMEX_TAI
+	       tx.tai,
+#endif
 	       state);
 
 	return 0;

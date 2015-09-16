@@ -66,6 +66,9 @@ MPERS_PRINTER_DECL(int, print_timex)(struct tcb *tcp, const long addr)
 		tx.shift, (intmax_t) tx.stabil, (intmax_t) tx.jitcnt);
 	tprintf(", calcnt=%jd, errcnt=%jd, stbcnt=%jd",
 		(intmax_t) tx.calcnt, (intmax_t) tx.errcnt, (intmax_t) tx.stbcnt);
+#ifdef HAVE_STRUCT_TIMEX_TAI
+	tprintf(", tai=%d", tx.tai);
+#endif
 	tprints("}");
 	return 0;
 }
