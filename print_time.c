@@ -1,5 +1,6 @@
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(time_t)
 #include DEF_MPERS_TYPE(timespec_t)
 #include DEF_MPERS_TYPE(timeval_t)
 
@@ -64,4 +65,16 @@ MPERS_PRINTER_DECL(void, print_timeval_pair)(struct tcb *tcp, const long addr)
 	tprints(", ");
 	print_timeval_t(&t[1]);
 	tprints("]");
+}
+
+SYS_FUNC(time)
+{
+	if (exiting(tcp)) {
+		time_t t;
+
+		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &t))
+			tprintf("[%jd]", (intmax_t) t);
+	}
+
+	return 0;
 }
