@@ -430,10 +430,10 @@ SYS_FUNC(timer_settime)
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprints(", ");
-		printitv(tcp, tcp->u_arg[2]);
+		print_itimerspec(tcp, tcp->u_arg[2]);
 		tprints(", ");
 	} else {
-		printitv(tcp, tcp->u_arg[3]);
+		print_itimerspec(tcp, tcp->u_arg[3]);
 	}
 	return 0;
 }
@@ -443,7 +443,7 @@ SYS_FUNC(timer_gettime)
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
-		printitv(tcp, tcp->u_arg[1]);
+		print_itimerspec(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -452,13 +452,12 @@ SYS_FUNC(timer_gettime)
 
 SYS_FUNC(timerfd)
 {
-	/* It does not matter that the kernel uses itimerspec.  */
 	tprintf("%ld, ", tcp->u_arg[0]);
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
 	printflags(timerfdflags, tcp->u_arg[2], "TFD_???");
 	tprints(", ");
-	printitv(tcp, tcp->u_arg[3]);
+	print_itimerspec(tcp, tcp->u_arg[3]);
 
 	return RVAL_DECODED | RVAL_FD;
 }
@@ -478,9 +477,9 @@ SYS_FUNC(timerfd_settime)
 	tprints(", ");
 	printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
 	tprints(", ");
-	printitv(tcp, tcp->u_arg[2]);
+	print_itimerspec(tcp, tcp->u_arg[2]);
 	tprints(", ");
-	printitv(tcp, tcp->u_arg[3]);
+	print_itimerspec(tcp, tcp->u_arg[3]);
 
 	return RVAL_DECODED;
 }
@@ -491,7 +490,7 @@ SYS_FUNC(timerfd_gettime)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		printitv(tcp, tcp->u_arg[1]);
+		print_itimerspec(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
