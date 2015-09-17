@@ -64,6 +64,7 @@ check_PROGRAMS = \
 	time \
 	timer_create \
 	timer_xettime \
+	timerfd_xettime \
 	times \
 	times-fail \
 	uid \
@@ -149,6 +150,7 @@ TESTS = \
 	time.test \
 	timer_create.test \
 	timer_xettime.test \
+	timerfd_xettime.test \
 	times.test \
 	times-fail.test \
 	umovestr.test \
