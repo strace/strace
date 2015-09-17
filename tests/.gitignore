@@ -66,6 +66,7 @@ utimensat
 wait
 xattr
 xet_robust_list
+xetitimer
 *.log
 *.log.*
 *.o

@@ -79,6 +79,7 @@ check_PROGRAMS = \
 	wait \
 	xattr \
 	xet_robust_list \
+	xetitimer \
 	# end of check_PROGRAMS
 
 filter_unavailable_LDADD = -lpthread
@@ -165,6 +166,7 @@ TESTS = \
 	wait.test \
 	xattr.test \
 	xet_robust_list.test \
+	xetitimer.test \
 	count.test \
 	detach-sleeping.test \
 	detach-stopped.test \
