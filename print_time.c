@@ -16,6 +16,14 @@ typedef struct timeval timeval_t;
 # define UTIME_OMIT ((1l << 30) - 2l)
 #endif
 
+static const char time_fmt[] = "{%jd, %jd}";
+
+static void
+print_timespec_t(const timespec_t *t)
+{
+	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_nsec);
+}
+
 static void
 print_timespec_t_utime(const timespec_t *t)
 {
@@ -27,8 +35,7 @@ print_timespec_t_utime(const timespec_t *t)
 		tprints("UTIME_OMIT");
 		break;
 	default:
-		tprintf("{%jd, %jd}",
-			(intmax_t) t->tv_sec, (intmax_t) t->tv_nsec);
+		print_timespec_t(t);
 		break;
 	}
 }
@@ -36,7 +43,7 @@ print_timespec_t_utime(const timespec_t *t)
 static void
 print_timeval_t(const timeval_t *t)
 {
-	tprintf("{%jd, %jd}", (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
+	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
 }
 
 MPERS_PRINTER_DECL(void, print_timespec_utime_pair)(struct tcb *tcp, const long addr)
