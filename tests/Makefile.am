@@ -63,6 +63,7 @@ check_PROGRAMS = \
 	sysinfo \
 	time \
 	timer_create \
+	timer_xettime \
 	times \
 	times-fail \
 	uid \
@@ -147,6 +148,7 @@ TESTS = \
 	sun_path.test \
 	time.test \
 	timer_create.test \
+	timer_xettime.test \
 	times.test \
 	times-fail.test \
 	umovestr.test \

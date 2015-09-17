@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Check timer_settime and timer_gettime syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+syscalls=timer_create,timer_settime,timer_gettime
+run_strace -e trace=$syscalls $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
+
+exit 0

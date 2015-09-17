@@ -50,6 +50,7 @@ statfs
 sysinfo
 time
 timer_create
+timer_xettime
 times
 times-fail
 uid
