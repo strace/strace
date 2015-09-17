@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	aio \
 	bpf \
 	caps \
+	clock_xettime \
 	epoll_create1 \
 	eventfd \
 	execve \
@@ -82,6 +83,7 @@ check_PROGRAMS = \
 	xetitimer \
 	# end of check_PROGRAMS
 
+clock_xettime_LDADD = -lrt
 filter_unavailable_LDADD = -lpthread
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt
@@ -101,6 +103,7 @@ TESTS = \
 	aio.test \
 	bpf.test \
 	caps.test \
+	clock_xettime.test \
 	dumpio.test \
 	epoll_create1.test \
 	eventfd.test \

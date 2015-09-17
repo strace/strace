@@ -2,6 +2,7 @@ adjtimex
 aio
 bpf
 caps
+clock_xettime
 epoll_create1
 eventfd
 execve
