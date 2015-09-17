@@ -660,6 +660,7 @@ extern void printsock(struct tcb *, long, int);
 extern void print_sock_optmgmt(struct tcb *, long, int);
 #ifdef ALPHA
 extern void printrusage32(struct tcb *, long);
+extern void print_itimerval32(struct tcb *tcp, long);
 #endif
 extern void printuid(const char *, const unsigned int);
 extern void print_sigset_addr_len(struct tcb *, long, long);

@@ -54,18 +54,6 @@ struct timeval32
 	u_int32_t tv_sec, tv_usec;
 };
 
-static void
-tprint_timeval32(struct tcb *tcp, const struct timeval32 *tv)
-{
-	tprintf("{%u, %u}", tv->tv_sec, tv->tv_usec);
-}
-
-static void
-tprint_timeval(struct tcb *tcp, const struct timeval *tv)
-{
-	tprintf("{%ju, %ju}", (uintmax_t) tv->tv_sec, (uintmax_t) tv->tv_usec);
-}
-
 void
 printtv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness, int special)
 {
@@ -238,44 +226,13 @@ SYS_FUNC(nanosleep)
 
 #include "xlat/itimer_which.h"
 
-static void
-printitv_bitness(struct tcb *tcp, long addr, enum bitness_t bitness)
-{
-	if (bitness == BITNESS_32 || current_time_t_is_compat) {
-		struct {
-			struct timeval32 it_interval, it_value;
-		} itv;
-
-		if (!umove_or_printaddr(tcp, addr, &itv)) {
-			tprints("{it_interval=");
-			tprint_timeval32(tcp, &itv.it_interval);
-			tprints(", it_value=");
-			tprint_timeval32(tcp, &itv.it_value);
-			tprints("}");
-		}
-	} else {
-		struct itimerval itv;
-
-		if (!umove_or_printaddr(tcp, addr, &itv)) {
-			tprints("{it_interval=");
-			tprint_timeval(tcp, &itv.it_interval);
-			tprints(", it_value=");
-			tprint_timeval(tcp, &itv.it_value);
-			tprints("}");
-		}
-	}
-}
-
-#define printitv(tcp, addr)	\
-	printitv_bitness((tcp), (addr), BITNESS_CURRENT)
-
 SYS_FUNC(getitimer)
 {
 	if (entering(tcp)) {
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
 	} else {
-		printitv(tcp, tcp->u_arg[1]);
+		print_itimerval(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -287,7 +244,7 @@ SYS_FUNC(osf_getitimer)
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
 	} else {
-		printitv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
+		print_itimerval32(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -298,10 +255,10 @@ SYS_FUNC(setitimer)
 	if (entering(tcp)) {
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
-		printitv(tcp, tcp->u_arg[1]);
+		print_itimerval(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else {
-		printitv(tcp, tcp->u_arg[2]);
+		print_itimerval(tcp, tcp->u_arg[2]);
 	}
 	return 0;
 }
@@ -312,10 +269,10 @@ SYS_FUNC(osf_setitimer)
 	if (entering(tcp)) {
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
 		tprints(", ");
-		printitv_bitness(tcp, tcp->u_arg[1], BITNESS_32);
+		print_itimerval32(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else {
-		printitv_bitness(tcp, tcp->u_arg[2], BITNESS_32);
+		print_itimerval32(tcp, tcp->u_arg[2]);
 	}
 	return 0;
 }

@@ -88,6 +88,20 @@ MPERS_PRINTER_DECL(void, print_timeval_pair)(struct tcb *tcp, const long addr)
 	tprints("]");
 }
 
+MPERS_PRINTER_DECL(void, print_itimerval)(struct tcb *tcp, const long addr)
+{
+	timeval_t t[2];
+
+	if (umove_or_printaddr(tcp, addr, &t))
+		return;
+
+	tprints("{it_interval=");
+	print_timeval_t(&t[0]);
+	tprints(", it_value=");
+	print_timeval_t(&t[1]);
+	tprints("}");
+}
+
 SYS_FUNC(time)
 {
 	if (exiting(tcp)) {
@@ -99,3 +113,32 @@ SYS_FUNC(time)
 
 	return 0;
 }
+
+#ifdef ALPHA
+
+typedef struct {
+	int tv_sec, tv_usec;
+} timeval32_t;
+
+static void
+print_timeval32_t(const timeval32_t *t)
+{
+	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
+}
+
+void
+print_itimerval32(struct tcb *tcp, const long addr)
+{
+	timeval32_t t[2];
+
+	if (umove_or_printaddr(tcp, addr, &t))
+		return;
+
+	tprints("{it_interval=");
+	print_timeval32_t(&t[0]);
+	tprints(", it_value=");
+	print_timeval32_t(&t[1]);
+	tprints("}");
+}
+
+#endif /* ALPHA */
