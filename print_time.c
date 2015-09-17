@@ -16,7 +16,7 @@ typedef struct timeval timeval_t;
 #endif
 
 static void
-print_timespec_t_utime(struct tcb *tcp, const timespec_t *t)
+print_timespec_t_utime(const timespec_t *t)
 {
 	switch (t->tv_nsec) {
 	case UTIME_NOW:
@@ -33,7 +33,7 @@ print_timespec_t_utime(struct tcb *tcp, const timespec_t *t)
 }
 
 static void
-print_timeval_t(struct tcb *tcp, const timeval_t *t)
+print_timeval_t(const timeval_t *t)
 {
 	tprintf("{%jd, %jd}", (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
 }
@@ -46,9 +46,9 @@ MPERS_PRINTER_DECL(void, print_timespec_utime_pair)(struct tcb *tcp, const long 
 		return;
 
 	tprints("[");
-	print_timespec_t_utime(tcp, &t[0]);
+	print_timespec_t_utime(&t[0]);
 	tprints(", ");
-	print_timespec_t_utime(tcp, &t[1]);
+	print_timespec_t_utime(&t[1]);
 	tprints("]");
 }
 
@@ -60,8 +60,8 @@ MPERS_PRINTER_DECL(void, print_timeval_pair)(struct tcb *tcp, const long addr)
 		return;
 
 	tprints("[");
-	print_timeval_t(tcp, &t[0]);
+	print_timeval_t(&t[0]);
 	tprints(", ");
-	print_timeval_t(tcp, &t[1]);
+	print_timeval_t(&t[1]);
 	tprints("]");
 }
