@@ -55,10 +55,10 @@ int main(int ac, char **av)
 	struct {
 		struct timespec ts;
 		int pad[2];
-	} tm = {
-		.ts = { .tv_nsec = 123 },
+	} tm_in = {
+		.ts = { .tv_sec = 0xc0de1, .tv_nsec = 0xc0de2 },
 		.pad = { 0xdeadbeef, 0xbadc0ded }
-	};
+	}, tm = tm_in;
 	sigset_t mask;
 	const struct sigaction act = { .sa_handler = handler };
 	const struct itimerval itv = { .it_value.tv_usec = 111111 };
@@ -88,6 +88,22 @@ int main(int ac, char **av)
 	       NSIG / 8, fds[1]);
 
 	/*
+	 * Another simple one, with a timeout.
+	 */
+	FD_SET(1, set[1]);
+	FD_SET(2, set[1]);
+	FD_SET(fds[0], set[1]);
+	FD_SET(fds[1], set[1]);
+	if (syscall(__NR_pselect6, fds[1] + 1, NULL, set[1], NULL, &tm.ts, NULL) != 3)
+		return 77;
+	printf("pselect6(%d, NULL, [1 2 %d %d], NULL, {%Ld, %Ld}, NULL)"
+	       " = 3 (out [1 2 %d], left {%Ld, %Ld})\n",
+	       fds[1] + 1, fds[0], fds[1],
+	       (long long) tm_in.ts.tv_sec, (long long) tm_in.ts.tv_nsec,
+	       fds[1],
+	       (long long) tm.ts.tv_sec, (long long) tm.ts.tv_nsec);
+
+	/*
 	 * Now the crash case that trinity found, negative nfds
 	 * but with a pointer to a large chunk of valid memory.
 	 */
@@ -104,6 +120,8 @@ int main(int ac, char **av)
 	FD_ZERO(set[0]);
 	FD_SET(fds[0],set[0]);
 	FD_ZERO(set[1]);
+	tm.ts.tv_sec = 0;
+	tm.ts.tv_nsec = 123;
 	if (pselect(FD_SETSIZE + 1, set[0], set[1], NULL, &tm.ts, &mask) != 0)
 		return 77;
 	printf("pselect6(%d, [%d], [], NULL, {0, 123}, {[HUP CHLD], %u}) "
