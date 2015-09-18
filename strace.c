@@ -2194,7 +2194,7 @@ trace(void)
 	}
 
 	if (sig != syscall_trap_sig) {
-		siginfo_t si;
+		siginfo_t si = {};
 
 		/*
 		 * True if tracee is stopped by signal
