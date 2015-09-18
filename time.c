@@ -103,14 +103,6 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 }
 
 void
-print_timespec(struct tcb *tcp, long addr)
-{
-	char buf[TIMESPEC_TEXT_BUFSIZE];
-	sprint_timespec(buf, tcp, addr);
-	tprints(buf);
-}
-
-void
 sprint_timespec(char *buf, struct tcb *tcp, long addr)
 {
 	if (addr == 0)
@@ -314,7 +306,7 @@ SYS_FUNC(clock_settime)
 {
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
-	printtv(tcp, tcp->u_arg[1]);
+	print_timespec(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -325,7 +317,7 @@ SYS_FUNC(clock_gettime)
 		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		printtv(tcp, tcp->u_arg[1]);
+		print_timespec(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -337,7 +329,7 @@ SYS_FUNC(clock_nanosleep)
 		tprints(", ");
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprints(", ");
-		printtv(tcp, tcp->u_arg[2]);
+		print_timespec(tcp, tcp->u_arg[2]);
 		tprints(", ");
 	} else {
 		/*
@@ -346,7 +338,7 @@ SYS_FUNC(clock_nanosleep)
 		 */
 		if (!tcp->u_arg[1] && is_erestart(tcp)) {
 			temporarily_clear_syserror(tcp);
-			printtv(tcp, tcp->u_arg[3]);
+			print_timespec(tcp, tcp->u_arg[3]);
 			restore_cleared_syserror(tcp);
 		} else {
 			printaddr(tcp->u_arg[3]);

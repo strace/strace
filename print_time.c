@@ -46,6 +46,16 @@ print_timeval_t(const timeval_t *t)
 	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
 }
 
+MPERS_PRINTER_DECL(void, print_timespec)(struct tcb *tcp, const long addr)
+{
+	timespec_t t;
+
+	if (umove_or_printaddr(tcp, addr, &t))
+		return;
+
+	print_timespec_t(&t);
+}
+
 MPERS_PRINTER_DECL(void, print_timespec_utime_pair)(struct tcb *tcp, const long addr)
 {
 	timespec_t t[2];

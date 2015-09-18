@@ -34,11 +34,11 @@ SYS_FUNC(futex)
 	case FUTEX_WAIT:
 	case FUTEX_LOCK_PI:
 		tprints(", ");
-		printtv(tcp, timeout);
+		print_timespec(tcp, timeout);
 		break;
 	case FUTEX_WAIT_BITSET:
 		tprints(", ");
-		printtv(tcp, timeout);
+		print_timespec(tcp, timeout);
 		tprintf(", %x", val3);
 		break;
 	case FUTEX_WAKE_BITSET:
@@ -69,7 +69,7 @@ SYS_FUNC(futex)
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
 		tprints(", ");
-		printtv(tcp, timeout);
+		print_timespec(tcp, timeout);
 		tprints(", ");
 		printaddr(uaddr2);
 		break;

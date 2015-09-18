@@ -48,7 +48,7 @@ SYS_FUNC(mq_timedsend)
 	tprintf("%ld, ", tcp->u_arg[0]);
 	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
-	printtv(tcp, tcp->u_arg[4]);
+	print_timespec(tcp, tcp->u_arg[4]);
 	return RVAL_DECODED;
 }
 
@@ -65,7 +65,7 @@ SYS_FUNC(mq_timedreceive)
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
-		printtv(tcp, tcp->u_arg[4]);
+		print_timespec(tcp, tcp->u_arg[4]);
 		restore_cleared_syserror(tcp);
 	}
 	return 0;
