@@ -673,7 +673,16 @@ SYS_FUNC(rt_sigtimedwait)
 		/* syscall exit, and u_arg[1] was NULL */
 		return 0;
 	}
+
+	/*
+	 * Since the timeout parameter is read by the kernel
+	 * on entering syscall, it has to be decoded the same way
+	 * whether the syscall has failed or not.
+	 */
+	temporarily_clear_syserror(tcp);
 	print_timespec(tcp, tcp->u_arg[2]);
+	restore_cleared_syserror(tcp);
+
 	tprintf(", %lu", tcp->u_arg[3]);
 	return 0;
 };

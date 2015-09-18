@@ -1131,6 +1131,21 @@ trace_syscall(struct tcb *tcp)
 		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp);
 }
 
+static int saved_u_error;
+
+void
+temporarily_clear_syserror(struct tcb *tcp)
+{
+	saved_u_error = tcp->u_error;
+	tcp->u_error = 0;
+}
+
+void
+restore_cleared_syserror(struct tcb *tcp)
+{
+	tcp->u_error = saved_u_error;
+}
+
 /*
  * Cannot rely on __kernel_[u]long_t being defined,
  * it is quite a recent feature of <asm/posix_types.h>.
