@@ -45,6 +45,7 @@ check_PROGRAMS = \
 	pselect6 \
 	readlink \
 	readlinkat \
+	restart_syscall \
 	rt_sigqueueinfo \
 	sched_xetattr \
 	scm_rights \
@@ -210,8 +211,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
-	     restart_syscall.expected \
-	     restart_syscall_unknown.expected \
 	     sigaction.awk \
 	     sigaltstack.expected \
 	     signalfd.expected \

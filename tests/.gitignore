@@ -32,6 +32,7 @@ ppoll
 pselect6
 readlink
 readlinkat
+restart_syscall
 rt_sigqueueinfo
 sched_xetattr
 scm_rights
