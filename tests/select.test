@@ -1,23 +1,14 @@
 #!/bin/sh
 
-# Check select/pselect6 syscall decoding.
+# Check select syscall decoding.
 
 . "${srcdir=.}/init.sh"
 
-exe="./${ME_%.test}"
-syscall=select
-run_prog "$exe" $syscall > /dev/null
-run_strace $args > /dev/null
-
-check_prog grep
-if LC_ALL=C grep -x "pselect6(.*" "$LOG" > /dev/null; then
-	syscall=pselect6
-	run_prog "$exe" $syscall > /dev/null
-fi
-
+run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -a36 -e$syscall $args > "$OUT"
+run_strace -a36 -eselect $args > "$OUT"
 match_diff "$OUT" "$LOG"
+
 rm -f "$OUT"
 
 exit 0
