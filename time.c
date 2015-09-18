@@ -186,17 +186,6 @@ SYS_FUNC(osf_settimeofday)
 }
 #endif
 
-SYS_FUNC(adjtime)
-{
-	if (entering(tcp)) {
-		printtv(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printtv(tcp, tcp->u_arg[1]);
-	}
-	return 0;
-}
-
 SYS_FUNC(nanosleep)
 {
 	if (entering(tcp)) {
