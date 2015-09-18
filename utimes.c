@@ -36,7 +36,7 @@ SYS_FUNC(osf_utimes)
 {
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
+	print_timeval32_pair(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }

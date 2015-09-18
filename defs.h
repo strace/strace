@@ -650,10 +650,6 @@ extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE (sizeof(long)*3 * 2 + sizeof("{%u, %u}"))
 #define TIMEVAL_TEXT_BUFSIZE  TIMESPEC_TEXT_BUFSIZE
 extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
-#define printtv(tcp, addr)	\
-	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 0)
-#define printtv_special(tcp, addr)	\
-	printtv_bitness((tcp), (addr), BITNESS_CURRENT, 1)
 extern char *sprinttv(char *, struct tcb *, long, enum bitness_t, int special);
 extern void sprint_timespec(char *, struct tcb *, long);
 extern void printfd(struct tcb *, int);
@@ -663,6 +659,8 @@ extern void printsock(struct tcb *, long, int);
 extern void print_sock_optmgmt(struct tcb *, long, int);
 #ifdef ALPHA
 extern void printrusage32(struct tcb *, long);
+extern void print_timeval32(struct tcb *tcp, long);
+extern void print_timeval32_pair(struct tcb *tcp, long);
 extern void print_itimerval32(struct tcb *tcp, long);
 #endif
 extern void printuid(const char *, const unsigned int);

@@ -139,9 +139,9 @@ sprint_timespec(char *buf, struct tcb *tcp, long addr)
 SYS_FUNC(gettimeofday)
 {
 	if (exiting(tcp)) {
-		printtv(tcp, tcp->u_arg[0]);
+		print_timeval(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		printtv(tcp, tcp->u_arg[1]);
+		print_timeval(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -150,9 +150,9 @@ SYS_FUNC(gettimeofday)
 SYS_FUNC(osf_gettimeofday)
 {
 	if (exiting(tcp)) {
-		printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
+		print_timeval32(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
+		print_timeval32(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -160,9 +160,9 @@ SYS_FUNC(osf_gettimeofday)
 
 SYS_FUNC(settimeofday)
 {
-	printtv(tcp, tcp->u_arg[0]);
+	print_timeval(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printtv(tcp, tcp->u_arg[1]);
+	print_timeval(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -170,9 +170,9 @@ SYS_FUNC(settimeofday)
 #ifdef ALPHA
 SYS_FUNC(osf_settimeofday)
 {
-	printtv_bitness(tcp, tcp->u_arg[0], BITNESS_32, 0);
+	print_timeval32(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printtv_bitness(tcp, tcp->u_arg[1], BITNESS_32, 0);
+	print_timeval32(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }

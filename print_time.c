@@ -84,6 +84,16 @@ MPERS_PRINTER_DECL(void, print_itimerspec)(struct tcb *tcp, const long addr)
 	tprints("}");
 }
 
+MPERS_PRINTER_DECL(void, print_timeval)(struct tcb *tcp, const long addr)
+{
+	timeval_t t;
+
+	if (umove_or_printaddr(tcp, addr, &t))
+		return;
+
+	print_timeval_t(&t);
+}
+
 MPERS_PRINTER_DECL(void, print_timeval_pair)(struct tcb *tcp, const long addr)
 {
 	timeval_t t[2];
@@ -134,6 +144,32 @@ static void
 print_timeval32_t(const timeval32_t *t)
 {
 	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
+}
+
+void
+print_timeval32(struct tcb *tcp, const long addr)
+{
+	timeval32_t t;
+
+	if (umove_or_printaddr(tcp, addr, &t))
+		return;
+
+	print_timeval32_t(&t);
+}
+
+void
+print_timeval32_pair(struct tcb *tcp, const long addr)
+{
+	timeval32_t t[2];
+
+	if (umove_or_printaddr(tcp, addr, &t))
+		return;
+
+	tprints("[");
+	print_timeval32_t(&t[0]);
+	tprints(", ");
+	print_timeval32_t(&t[1]);
+	tprints("]");
 }
 
 void
