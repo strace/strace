@@ -1,7 +1,6 @@
 /*
  * Based on test by Dr. David Alan Gilbert <dave@treblig.org>
  */
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -12,10 +11,17 @@ static fd_set set[0x1000000 / sizeof(fd_set)];
 int main(int ac, char **av)
 {
 	int fds[2];
-	struct timeval timeout = { .tv_sec = 0, .tv_usec = 100 };
+	struct {
+		struct timeval tv;
+		int pad[2];
+	} tm = {
+		.tv = { .tv_usec = 123 },
+		.pad = { 0xdeadbeef, 0xbadc0ded }
+	};
 	int is_select = ac < 2 || strcmp(av[1], "pselect6");
 
-	assert(pipe(fds) == 0);
+	if (pipe(fds))
+		return 77;
 
 	/*
 	 * Start with a nice simple select.
@@ -23,7 +29,8 @@ int main(int ac, char **av)
 	FD_ZERO(set);
 	FD_SET(fds[0], set);
 	FD_SET(fds[1], set);
-	assert(select(fds[1] + 1, set, set, set, NULL) == 1);
+	if (select(fds[1] + 1, set, set, set, NULL) != 1)
+		return 77;
 	if (is_select)
 		printf("select(%d, [%d %d], [%d %d], [%d %d], NULL) = 1 ()\n",
 		       fds[1] + 1, fds[0], fds[1],
@@ -40,7 +47,8 @@ int main(int ac, char **av)
 	 */
 	FD_ZERO(set);
 	FD_SET(fds[1],set);
-	assert(select(-1, NULL, set, NULL, NULL) == -1);
+	if (select(-1, NULL, set, NULL, NULL) != -1)
+		return 77;
 	if (is_select)
 		printf("select(-1, NULL, %p, NULL, NULL) "
 		       "= -1 EINVAL (Invalid argument)\n", set);
@@ -53,12 +61,13 @@ int main(int ac, char **av)
 	 */
 	FD_ZERO(set);
 	FD_SET(fds[0],set);
-	assert(select(FD_SETSIZE + 1, set, set + 1, NULL, &timeout) == 0);
+	if (select(FD_SETSIZE + 1, set, set + 1, NULL, &tm.tv))
+		return 77;
 	if (is_select)
-		printf("select(%d, [%d], [], NULL, {0, 100}) = 0 (Timeout)\n",
+		printf("select(%d, [%d], [], NULL, {0, 123}) = 0 (Timeout)\n",
 		       FD_SETSIZE + 1, fds[0]);
 	else
-		printf("pselect6(%d, [%d], [], NULL, {0, 100000}, NULL) "
+		printf("pselect6(%d, [%d], [], NULL, {0, 123000}, NULL) "
 		       "= 0 (Timeout)\n", FD_SETSIZE + 1, fds[0]);
 
 	puts("+++ exited with 0 +++");
