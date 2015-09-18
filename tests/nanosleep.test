@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Check nanosleep syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+syscalls=nanosleep,setitimer
+run_strace -a20 -e trace=$syscalls $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
+
+exit 0

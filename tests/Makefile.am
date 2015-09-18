@@ -35,6 +35,7 @@ check_PROGRAMS = \
 	mmap64 \
 	mmsg \
 	mq \
+	nanosleep \
 	net-accept-connect \
 	netlink_inet_diag \
 	netlink_unix_diag \
@@ -144,6 +145,7 @@ TESTS = \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \
+	nanosleep.test \
 	net.test \
 	net-fd.test \
 	net-yy.test \

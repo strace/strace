@@ -22,6 +22,7 @@ mmap
 mmap64
 mmsg
 mq
+nanosleep
 net-accept-connect
 netlink_inet_diag
 netlink_unix_diag
