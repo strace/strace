@@ -102,40 +102,6 @@ sprinttv(char *buf, struct tcb *tcp, long addr, enum bitness_t bitness, int spec
 	return buf + sprintf(buf, "%#lx", addr);
 }
 
-void
-sprint_timespec(char *buf, struct tcb *tcp, long addr)
-{
-	if (addr == 0)
-		strcpy(buf, "NULL");
-	else if (!verbose(tcp))
-		sprintf(buf, "%#lx", addr);
-	else {
-		int rc;
-
-#if SUPPORTED_PERSONALITIES > 1
-		if (current_time_t_is_compat) {
-			struct timeval32 tv;
-
-			rc = umove(tcp, addr, &tv);
-			if (rc >= 0)
-				sprintf(buf, "{%u, %u}",
-					tv.tv_sec, tv.tv_usec);
-		} else
-#endif
-		{
-			struct timespec ts;
-
-			rc = umove(tcp, addr, &ts);
-			if (rc >= 0)
-				sprintf(buf, "{%ju, %ju}",
-					(uintmax_t) ts.tv_sec,
-					(uintmax_t) ts.tv_nsec);
-		}
-		if (rc < 0)
-			strcpy(buf, "{...}");
-	}
-}
-
 static void
 print_timezone(struct tcb *tcp, const long addr)
 {

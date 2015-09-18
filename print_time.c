@@ -56,6 +56,24 @@ MPERS_PRINTER_DECL(void, print_timespec)(struct tcb *tcp, const long addr)
 	print_timespec_t(&t);
 }
 
+MPERS_PRINTER_DECL(const char *, sprint_timespec)(struct tcb *tcp, const long addr)
+{
+	timespec_t t;
+	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
+
+	if (!addr) {
+		strcpy(buf, "NULL");
+	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
+		   umove(tcp, addr, &t)) {
+		snprintf(buf, sizeof(buf), "%#lx", addr);
+	} else {
+		snprintf(buf, sizeof(buf), time_fmt,
+			 (intmax_t) t.tv_sec, (intmax_t) t.tv_nsec);
+	}
+
+	return buf;
+}
+
 MPERS_PRINTER_DECL(void, print_timespec_utime_pair)(struct tcb *tcp, const long addr)
 {
 	timespec_t t[2];

@@ -875,18 +875,16 @@ SYS_FUNC(recvmsg)
 
 SYS_FUNC(recvmmsg)
 {
-	/* +5 chars are for "left " prefix */
-	static char str[5 + TIMESPEC_TEXT_BUFSIZE];
+	static char str[sizeof("left") + TIMESPEC_TEXT_BUFSIZE];
 
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (verbose(tcp)) {
-			sprint_timespec(str, tcp, tcp->u_arg[4]);
 			/* Abusing tcp->auxstr as temp storage.
-			 * Will be used and freed on syscall exit.
+			 * Will be used and cleared on syscall exit.
 			 */
-			tcp->auxstr = xstrdup(str);
+			tcp->auxstr = sprint_timespec(tcp, tcp->u_arg[4]);
 		} else {
 			tprintf("%#lx, %ld, ", tcp->u_arg[1], tcp->u_arg[2]);
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
@@ -897,9 +895,9 @@ SYS_FUNC(recvmmsg)
 	} else {
 		if (verbose(tcp)) {
 			decode_mmsg(tcp, 0);
+			tprints(", ");
 			/* timeout on entrance */
-			tprintf(", %s", tcp->auxstr ? tcp->auxstr : "{...}");
-			free((void *) tcp->auxstr);
+			tprints(tcp->auxstr);
 			tcp->auxstr = NULL;
 		}
 		if (syserror(tcp))
@@ -911,7 +909,8 @@ SYS_FUNC(recvmmsg)
 		if (!verbose(tcp))
 			return 0;
 		/* timeout on exit */
-		sprint_timespec(stpcpy(str, "left "), tcp, tcp->u_arg[4]);
+		snprintf(str, sizeof(str), "left %s",
+			 sprint_timespec(tcp, tcp->u_arg[4]));
 		tcp->auxstr = str;
 		return RVAL_STR;
 	}

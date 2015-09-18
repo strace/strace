@@ -169,12 +169,11 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 
 	*outptr = '\0';
 	if (pts) {
-		char tmbuf[TIMESPEC_TEXT_BUFSIZE];
+		const char *str = sprint_timespec(tcp, pts);
 
-		sprint_timespec(tmbuf, tcp, pts);
-		if (outptr + sizeof(", left ") + strlen(tmbuf) < end_outstr) {
+		if (outptr + sizeof(", left ") + strlen(str) < end_outstr) {
 			outptr = stpcpy(outptr, outptr == outstr ? "left " : ", left ");
-			outptr = stpcpy(outptr, tmbuf);
+			outptr = stpcpy(outptr, str);
 		} else {
 			outptr = stpcpy(outptr, ", ...");
 		}
