@@ -203,22 +203,19 @@ SYS_FUNC(nanosleep)
 		print_timespec(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		/* Second (returned) timespec is only significant
-		 * if syscall was interrupted. On success, we print
-		 * only its address, since kernel doesn't modify it,
+
+		/*
+		 * Second (returned) timespec is only significant if syscall
+		 * was interrupted.  On success and in case of other errors we
+		 * print only its address, since kernel doesn't modify it,
 		 * and printing the value may show uninitialized data.
 		 */
-		switch (tcp->u_error) {
-		default:
-			/* Not interrupted (slept entire interval) */
-			printaddr(tcp->u_arg[1]);
-			break;
-		case ERESTARTSYS:
-		case ERESTARTNOINTR:
-		case ERESTARTNOHAND:
-		case ERESTART_RESTARTBLOCK:
-			/* Interrupted */
+		if (is_erestart(tcp)) {
+			temporarily_clear_syserror(tcp);
 			print_timespec(tcp, tcp->u_arg[1]);
+			restore_cleared_syserror(tcp);
+		} else {
+			printaddr(tcp->u_arg[1]);
 		}
 	}
 	return 0;

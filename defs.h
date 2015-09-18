@@ -538,6 +538,7 @@ extern void get_regs(pid_t pid);
 extern int get_scno(struct tcb *tcp);
 extern const char *syscall_name(long scno);
 
+extern bool is_erestart(struct tcb *);
 extern void temporarily_clear_syserror(struct tcb *);
 extern void restore_cleared_syserror(struct tcb *);
 

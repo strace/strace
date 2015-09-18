@@ -1131,6 +1131,20 @@ trace_syscall(struct tcb *tcp)
 		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp);
 }
 
+bool
+is_erestart(struct tcb *tcp)
+{
+	switch (tcp->u_error) {
+		case ERESTARTSYS:
+		case ERESTARTNOINTR:
+		case ERESTARTNOHAND:
+		case ERESTART_RESTARTBLOCK:
+			return true;
+		default:
+			return false;
+	}
+}
+
 static int saved_u_error;
 
 void
