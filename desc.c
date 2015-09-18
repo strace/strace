@@ -282,7 +282,9 @@ SYS_FUNC(getdtablesize)
 #endif
 
 static int
-decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
+decode_select(struct tcb *tcp, long *args,
+	      void (*print_tv_ts) (struct tcb *, const long),
+	      const char * (*sprint_tv_ts) (struct tcb *, const long))
 {
 	int i, j;
 	int nfds, fdsize;
@@ -334,7 +336,7 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		}
 		free(fds);
 		tprints(", ");
-		printtv_bitness(tcp, args[4], bitness, 0);
+		print_tv_ts(tcp, args[4]);
 	} else {
 		static char outstr[1024];
 		char *outptr;
@@ -388,9 +390,9 @@ decode_select(struct tcb *tcp, long *args, enum bitness_t bitness)
 		free(fds);
 		/* This contains no useful information on SunOS.  */
 		if (args[4]) {
-			if (outptr < end_outstr - (10 + TIMEVAL_TEXT_BUFSIZE)) {
-				outptr += sprintf(outptr, "%sleft ", sep);
-				outptr = sprinttv(outptr, tcp, args[4], bitness, /*special:*/ 0);
+			const char *str = sprint_tv_ts(tcp, args[4]);
+			if (outptr + sizeof("left ") + strlen(sep) + strlen(str) < end_outstr) {
+				outptr += sprintf(outptr, "%sleft %s", sep, str);
 			}
 		}
 		*outptr = '\0';
@@ -421,25 +423,25 @@ SYS_FUNC(oldselect)
 		long_args[i] = oldselect_args[i];
 	}
 #endif
-	return decode_select(tcp, long_args, BITNESS_CURRENT);
+	return decode_select(tcp, long_args, print_timeval, sprint_timeval);
 #undef oldselect_args
 }
 
 #ifdef ALPHA
 SYS_FUNC(osf_select)
 {
-	return decode_select(tcp, tcp->u_arg, BITNESS_32);
+	return decode_select(tcp, tcp->u_arg, print_timeval32, sprint_timeval32);
 }
 #endif
 
 SYS_FUNC(select)
 {
-	return decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
+	return decode_select(tcp, tcp->u_arg, print_timeval, sprint_timeval);
 }
 
 SYS_FUNC(pselect6)
 {
-	int rc = decode_select(tcp, tcp->u_arg, BITNESS_CURRENT);
+	int rc = decode_select(tcp, tcp->u_arg, print_timespec, sprint_timespec);
 	if (entering(tcp)) {
 		unsigned long data[2];
 

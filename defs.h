@@ -498,8 +498,6 @@ extern unsigned os_release;
 #undef KERNEL_VERSION
 #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 
-enum bitness_t { BITNESS_CURRENT = 0, BITNESS_32 };
-
 void error_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 void perror_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 void error_msg_and_die(const char *fmt, ...)
@@ -649,9 +647,6 @@ extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(intmax_t)*3 * 2 + sizeof("{tv_sec=%jd, tv_nsec=%jd}"))
-#define TIMEVAL_TEXT_BUFSIZE  TIMESPEC_TEXT_BUFSIZE
-extern void printtv_bitness(struct tcb *, long, enum bitness_t, int);
-extern char *sprinttv(char *, struct tcb *, long, enum bitness_t, int special);
 extern void printfd(struct tcb *, int);
 extern bool print_sockaddr_by_inode(const unsigned long, const char *);
 extern void print_dirfd(struct tcb *, int);
@@ -659,6 +654,7 @@ extern void printsock(struct tcb *, long, int);
 extern void print_sock_optmgmt(struct tcb *, long, int);
 #ifdef ALPHA
 extern void printrusage32(struct tcb *, long);
+extern const char *sprint_timeval32(struct tcb *tcp, long);
 extern void print_timeval32(struct tcb *tcp, long);
 extern void print_timeval32_pair(struct tcb *tcp, long);
 extern void print_itimerval32(struct tcb *tcp, long);

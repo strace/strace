@@ -126,6 +126,24 @@ MPERS_PRINTER_DECL(void, print_timeval_pair)(struct tcb *tcp, const long addr)
 	tprints("]");
 }
 
+MPERS_PRINTER_DECL(const char *, sprint_timeval)(struct tcb *tcp, const long addr)
+{
+	timeval_t t;
+	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
+
+	if (!addr) {
+		strcpy(buf, "NULL");
+	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
+		   umove(tcp, addr, &t)) {
+		snprintf(buf, sizeof(buf), "%#lx", addr);
+	} else {
+		snprintf(buf, sizeof(buf), time_fmt,
+			 (intmax_t) t.tv_sec, (intmax_t) t.tv_usec);
+	}
+
+	return buf;
+}
+
 MPERS_PRINTER_DECL(void, print_itimerval)(struct tcb *tcp, const long addr)
 {
 	timeval_t t[2];
@@ -203,6 +221,25 @@ print_itimerval32(struct tcb *tcp, const long addr)
 	tprints(", it_value=");
 	print_timeval32_t(&t[1]);
 	tprints("}");
+}
+
+const char *
+sprint_timeval32(struct tcb *tcp, const long addr)
+{
+	timeval32_t t;
+	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
+
+	if (!addr) {
+		strcpy(buf, "NULL");
+	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
+		   umove(tcp, addr, &t)) {
+		snprintf(buf, sizeof(buf), "%#lx", addr);
+	} else {
+		snprintf(buf, sizeof(buf), time_fmt,
+			 (intmax_t) t.tv_sec, (intmax_t) t.tv_usec);
+	}
+
+	return buf;
 }
 
 #endif /* ALPHA */
