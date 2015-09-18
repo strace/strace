@@ -84,6 +84,7 @@ check_PROGRAMS = \
 	xattr \
 	xet_robust_list \
 	xetitimer \
+	xettimeofday \
 	# end of check_PROGRAMS
 
 clock_xettime_LDADD = -lrt
@@ -175,6 +176,7 @@ TESTS = \
 	xattr.test \
 	xet_robust_list.test \
 	xetitimer.test \
+	xettimeofday.test \
 	count.test \
 	detach-sleeping.test \
 	detach-stopped.test \

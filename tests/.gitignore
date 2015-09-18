@@ -71,6 +71,7 @@ wait
 xattr
 xet_robust_list
 xetitimer
+xettimeofday
 *.log
 *.log.*
 *.o

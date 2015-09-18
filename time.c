@@ -136,12 +136,24 @@ sprint_timespec(char *buf, struct tcb *tcp, long addr)
 	}
 }
 
+static void
+print_timezone(struct tcb *tcp, const long addr)
+{
+	struct timezone tz;
+
+	if (umove_or_printaddr(tcp, addr, &tz))
+		return;
+
+	tprintf("{tz_minuteswest=%d, tz_dsttime=%d}",
+		tz.tz_minuteswest, tz.tz_dsttime);
+}
+
 SYS_FUNC(gettimeofday)
 {
 	if (exiting(tcp)) {
 		print_timeval(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		print_timeval(tcp, tcp->u_arg[1]);
+		print_timezone(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -152,7 +164,7 @@ SYS_FUNC(osf_gettimeofday)
 	if (exiting(tcp)) {
 		print_timeval32(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		print_timeval32(tcp, tcp->u_arg[1]);
+		print_timezone(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
@@ -162,7 +174,7 @@ SYS_FUNC(settimeofday)
 {
 	print_timeval(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	print_timeval(tcp, tcp->u_arg[1]);
+	print_timezone(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -172,7 +184,7 @@ SYS_FUNC(osf_settimeofday)
 {
 	print_timeval32(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	print_timeval32(tcp, tcp->u_arg[1]);
+	print_timezone(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
