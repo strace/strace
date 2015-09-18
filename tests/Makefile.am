@@ -15,6 +15,7 @@ check_PROGRAMS = \
 	aio \
 	bpf \
 	caps \
+	clock_nanosleep \
 	clock_xettime \
 	epoll_create1 \
 	eventfd \
@@ -105,6 +106,7 @@ TESTS = \
 	aio.test \
 	bpf.test \
 	caps.test \
+	clock_nanosleep.test \
 	clock_xettime.test \
 	dumpio.test \
 	epoll_create1.test \

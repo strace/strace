@@ -351,7 +351,17 @@ SYS_FUNC(clock_nanosleep)
 		printtv(tcp, tcp->u_arg[2]);
 		tprints(", ");
 	} else {
-		printtv(tcp, tcp->u_arg[3]);
+		/*
+		 * Second (returned) timespec is only significant
+		 * if syscall was interrupted and flags is not TIMER_ABSTIME.
+		 */
+		if (!tcp->u_arg[1] && is_erestart(tcp)) {
+			temporarily_clear_syserror(tcp);
+			printtv(tcp, tcp->u_arg[3]);
+			restore_cleared_syserror(tcp);
+		} else {
+			printaddr(tcp->u_arg[3]);
+		}
 	}
 	return 0;
 }

@@ -2,6 +2,7 @@ adjtimex
 aio
 bpf
 caps
+clock_nanosleep
 clock_xettime
 epoll_create1
 eventfd
