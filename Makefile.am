@@ -62,6 +62,7 @@ strace_SOURCES =	\
 	fchownat.c	\
 	fcntl.c		\
 	fetch_seccomp_fprog.c \
+	fetch_struct_flock.c \
 	file.c		\
 	file_handle.c	\
 	flock.c		\
