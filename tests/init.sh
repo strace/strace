@@ -72,10 +72,8 @@ check_gawk()
 }
 
 # Usage: [FILE_TO_CHECK [AWK_PROGRAM [ERROR_MESSAGE [EXTRA_AWK_OPTIONS...]]]]
-# Check whether all patterns listed in AWK_PROGRAM
-# match FILE_TO_CHECK using egrep.
-# If at least one of these patterns does not match,
-# dump both files and fail with ERROR_MESSAGE.
+# Check whether AWK_PROGRAM matches FILE_TO_CHECK using gawk.
+# If it doesn't, dump FILE_TO_CHECK and fail with ERROR_MESSAGE.
 match_awk()
 {
 	local output program error
