@@ -190,30 +190,15 @@ decode_fprog(struct tcb *tcp, unsigned short len, unsigned long addr)
 	}
 }
 
+#include "seccomp_fprog.h"
+
 void
 print_seccomp_filter(struct tcb *tcp, unsigned long addr)
 {
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize == 4) {
-		struct {
-			unsigned short len;
-			uint32_t filter;
-		} fprog;
+	struct seccomp_fprog fprog;
 
-		if (!umove_or_printaddr(tcp, addr, &fprog))
-			decode_fprog(tcp, fprog.len, fprog.filter);
-	} else {
-#endif
-		struct {
-			unsigned short len;
-			unsigned long filter;
-		} fprog;
-
-		if (!umove_or_printaddr(tcp, addr, &fprog))
-			decode_fprog(tcp, fprog.len, fprog.filter);
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	}
-#endif
+	if (fetch_seccomp_fprog(tcp, addr, &fprog))
+		decode_fprog(tcp, fprog.len, fprog.filter);
 }
 
 static void

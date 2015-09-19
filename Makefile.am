@@ -59,6 +59,7 @@ strace_SOURCES =	\
 	fallocate.c	\
 	fanotify.c	\
 	fchownat.c	\
+	fetch_seccomp_fprog.c \
 	file.c		\
 	futex.c		\
 	get_robust_list.c \
@@ -123,6 +124,7 @@ strace_SOURCES =	\
 	sched.c		\
 	scsi.c		\
 	seccomp.c	\
+	seccomp_fprog.h \
 	sendfile.c	\
 	sigaltstack.c	\
 	signal.c	\
