@@ -1,7 +1,9 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <termios.h>
@@ -30,17 +32,37 @@ int
 main(void )
 {
 	struct termios tty;
-	uint64_t data;
+	uint64_t data = 0;
 
-	if (ioctl(-1, TCGETS, &tty) != -1 ||
-	    ioctl(-1, MMTIMER_GETRES, &data) != -1 ||
-	    ioctl(-1, VIDIOC_ENUMINPUT, 0) != -1 ||
-	    ioctl(-1, HIDIOCGVERSION, &data) != -1 ||
-	    ioctl(-1, HIDIOCGPHYS(8), &data) != -1 ||
-	    ioctl(-1, EVIOCGBIT(EV_KEY, 8), &data) != -1 ||
-	    ioctl(-1, _IOR(0xde, 0xad, data), &data) != -1)
-		return 77;
+	(void) ioctl(-1, TCGETS, &tty);
+	printf("ioctl(-1, TCGETS, %p)"
+	       " = -1 EBADF (Bad file descriptor)\n", &tty);
 
+	(void) ioctl(-1, MMTIMER_GETRES, &data);
+	printf("ioctl(-1, MMTIMER_GETRES, %p)"
+	       " = -1 EBADF (Bad file descriptor)\n", &data);
+
+	(void) ioctl(-1, VIDIOC_ENUMINPUT, 0);
+	printf("ioctl(-1, VIDIOC_ENUMINPUT, 0)"
+	       " = -1 EBADF (Bad file descriptor)\n");
+
+	(void) ioctl(-1, HIDIOCGVERSION, &data);
+	printf("ioctl(-1, HIDIOCGRDESCSIZE or HIDIOCGVERSION, %p)"
+	       " = -1 EBADF (Bad file descriptor)\n", &data);
+
+	(void) ioctl(-1, HIDIOCGPHYS(8), &data);
+	printf("ioctl(-1, HIDIOCGPHYS(8), %p)"
+	       " = -1 EBADF (Bad file descriptor)\n", &data);
+
+	(void) ioctl(-1, EVIOCGBIT(EV_KEY, 8), &data);
+	printf("ioctl(-1, EVIOCGBIT(EV_KEY, 8), %p)"
+	       " = -1 EBADF (Bad file descriptor)\n", &data);
+
+	(void) ioctl(-1, _IOR(0xde, 0xad, data), &data);
+	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x08), %p)"
+	       " = -1 EBADF (Bad file descriptor)\n", &data);
+
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 

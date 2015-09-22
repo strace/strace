@@ -4,8 +4,10 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog
-run_strace -e ioctl $args
-match_grep
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -a16 -e ioctl $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
 
 exit 0

@@ -202,7 +202,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     filter-unavailable.expected \
 	     getdents.awk \
 	     getdents.out \
-	     ioctl.expected \
 	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
