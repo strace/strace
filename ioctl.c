@@ -277,15 +277,16 @@ SYS_FUNC(ioctl)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		if (!ioctl_decode_command_number(tcp)) {
-			iop = ioctl_lookup(tcp->u_arg[1]);
-			if (iop) {
-				tprints(iop->symbol);
-				while ((iop = ioctl_next_match(iop)))
-					tprintf(" or %s", iop->symbol);
-			} else {
-				ioctl_print_code(tcp->u_arg[1]);
-			}
+		ret = ioctl_decode_command_number(tcp);
+		iop = ioctl_lookup(tcp->u_arg[1]);
+		if (iop) {
+			if (ret)
+				tprints(" or ");
+			tprints(iop->symbol);
+			while ((iop = ioctl_next_match(iop)))
+				tprintf(" or %s", iop->symbol);
+		} else if (!ret) {
+			ioctl_print_code(tcp->u_arg[1]);
 		}
 		ret = ioctl_decode(tcp);
 	} else {

@@ -58,6 +58,10 @@ main(void )
 	printf("ioctl(-1, EVIOCGBIT(EV_KEY, 8), %p)"
 	       " = -1 EBADF (Bad file descriptor)\n", &data);
 
+	(void) ioctl(-1, _IOR('M', 13, int), &data);
+	printf("ioctl(-1, MIXER_READ(13) or OTPSELECT, [MTD_OTP_OFF])"
+	       " = -1 EBADF (Bad file descriptor)\n");
+
 	(void) ioctl(-1, _IOR(0xde, 0xad, data), &data);
 	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x08), %p)"
 	       " = -1 EBADF (Bad file descriptor)\n", &data);
