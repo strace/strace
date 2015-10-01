@@ -30,11 +30,9 @@
 
 #include "defs.h"
 #include <fcntl.h>
-#include <sys/file.h>
 
 #include "xlat/fcntlcmds.h"
 #include "xlat/fdflags.h"
-#include "xlat/flockcmds.h"
 #include "xlat/lockfcmds.h"
 #include "xlat/notifyflags.h"
 
@@ -223,18 +221,6 @@ SYS_FUNC(fcntl)
 	}
 	return 0;
 }
-
-#ifdef LOCK_SH
-
-SYS_FUNC(flock)
-{
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	printflags(flockcmds, tcp->u_arg[1], "LOCK_???");
-
-	return RVAL_DECODED;
-}
-#endif /* LOCK_SH */
 
 SYS_FUNC(close)
 {

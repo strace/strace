@@ -61,6 +61,7 @@ strace_SOURCES =	\
 	fchownat.c	\
 	fetch_seccomp_fprog.c \
 	file.c		\
+	flock.c		\
 	futex.c		\
 	get_robust_list.c \
 	getcpu.c	\
