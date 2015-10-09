@@ -170,23 +170,14 @@ SYS_FUNC(fcntl)
 			printxval(lockfcmds, tcp->u_arg[2], "F_???");
 			break;
 #endif
+		case F_GETOWN:
+			break;
+		default:
+			return 0;
 		}
+		return RVAL_DECODED;
 	} else {
 		switch (tcp->u_arg[1]) {
-		case F_DUPFD:
-#ifdef F_DUPFD_CLOEXEC
-		case F_DUPFD_CLOEXEC:
-#endif
-		case F_SETFD: case F_SETFL:
-		case F_SETLK: case F_SETLKW:
-		case F_SETOWN: case F_GETOWN:
-#ifdef F_NOTIFY
-		case F_NOTIFY:
-#endif
-#ifdef F_SETLEASE
-		case F_SETLEASE:
-#endif
-			break;
 		case F_GETFD:
 			if (syserror(tcp) || tcp->u_rval == 0)
 				return 0;
