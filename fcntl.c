@@ -117,10 +117,13 @@ SYS_FUNC(fcntl)
 			tprints(", ");
 			printflags(fdflags, tcp->u_arg[2], "FD_???");
 			break;
-		case F_SETOWN: case F_DUPFD:
-		case F_DUPFD_CLOEXEC:
+		case F_SETOWN:
 			tprintf(", %ld", tcp->u_arg[2]);
 			break;
+		case F_DUPFD:
+		case F_DUPFD_CLOEXEC:
+			tprintf(", %ld", tcp->u_arg[2]);
+			return RVAL_DECODED | RVAL_FD;
 		case F_SETFL:
 			tprints(", ");
 			tprint_open_modes(tcp->u_arg[2]);
