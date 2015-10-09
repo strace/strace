@@ -338,7 +338,10 @@ AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
 		  siginfo_t.si_timerid,
 		  siginfo_t.si_overrun],,, [#include <signal.h>])
 
-AC_CHECK_TYPES([struct flock64],,, [#include <fcntl.h>])
+AC_CHECK_TYPES([struct flock,
+		struct flock64,
+		struct __kernel_flock,
+		struct __kernel_flock64],,, [#include <linux/fcntl.h>])
 
 AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
 

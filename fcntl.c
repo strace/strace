@@ -29,7 +29,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
+#include "flock.h"
 
 #include "xlat/fcntlcmds.h"
 #include "xlat/fdflags.h"
@@ -48,18 +48,10 @@
 
 #if USE_PRINTFLOCK64
 
-# ifndef HAVE_STRUCT_FLOCK64
-struct flock64 {
-	short int l_type, l_whence;
-	int64_t l_start, l_len;
-	int l_pid;
-};
-# endif
-
 static void
 printflock64(struct tcb *tcp, long addr, int getlk)
 {
-	struct flock64 fl;
+	struct_kernel_flock64 fl;
 
 	if (umove_or_printaddr(tcp, addr, &fl))
 		return;
@@ -78,7 +70,7 @@ printflock64(struct tcb *tcp, long addr, int getlk)
 static void
 printflock(struct tcb *tcp, long addr, int getlk)
 {
-	struct flock fl;
+	struct_kernel_flock fl;
 
 #if SUPPORTED_PERSONALITIES > 1
 	if (

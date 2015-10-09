@@ -65,6 +65,7 @@ strace_SOURCES =	\
 	file.c		\
 	file_handle.c	\
 	flock.c		\
+	flock.h		\
 	futex.c		\
 	get_robust_list.c \
 	getcpu.c	\
