@@ -71,6 +71,7 @@ check_PROGRAMS = \
 	stat \
 	stat32 \
 	statfs \
+	struct_flock \
 	sysinfo \
 	time \
 	timer_create \
@@ -155,6 +156,7 @@ TESTS = \
 	stat32-v.test \
 	stat64-v.test \
 	statfs.test \
+	struct_flock.test \
 	sysinfo.test \
 	membarrier.test \
 	memfd_create.test \

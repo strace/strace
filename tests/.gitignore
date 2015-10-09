@@ -58,6 +58,7 @@ stack-fcall
 stat
 stat32
 statfs
+struct_flock
 sysinfo
 time
 timer_create
