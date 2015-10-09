@@ -36,18 +36,6 @@
 #include "xlat/lockfcmds.h"
 #include "xlat/notifyflags.h"
 
-/*
- * Assume that F_SETLK64, F_SETLKW64, and F_GETLK64 are either defined
- * or not defined altogether.
- */
-#if defined(F_SETLK64) && F_SETLK64 + 0 != F_SETLK
-# define USE_PRINTFLOCK64 1
-#else
-# define USE_PRINTFLOCK64 0
-#endif
-
-#if USE_PRINTFLOCK64
-
 static void
 printflock64(struct tcb *tcp, long addr, int getlk)
 {
@@ -65,7 +53,6 @@ printflock64(struct tcb *tcp, long addr, int getlk)
 	else
 		tprints("}");
 }
-#endif /* USE_PRINTFLOCK64 */
 
 static void
 printflock(struct tcb *tcp, long addr, int getlk)
@@ -131,9 +118,7 @@ SYS_FUNC(fcntl)
 			printflags(fdflags, tcp->u_arg[2], "FD_???");
 			break;
 		case F_SETOWN: case F_DUPFD:
-#ifdef F_DUPFD_CLOEXEC
 		case F_DUPFD_CLOEXEC:
-#endif
 			tprintf(", %ld", tcp->u_arg[2]);
 			break;
 		case F_SETFL:
@@ -144,24 +129,18 @@ SYS_FUNC(fcntl)
 			tprints(", ");
 			printflock(tcp, tcp->u_arg[2], 0);
 			break;
-#if USE_PRINTFLOCK64
 		case F_SETLK64: case F_SETLKW64:
 			tprints(", ");
 			printflock64(tcp, tcp->u_arg[2], 0);
 			break;
-#endif /* USE_PRINTFLOCK64 */
-#ifdef F_NOTIFY
 		case F_NOTIFY:
 			tprints(", ");
 			printflags(notifyflags, tcp->u_arg[2], "DN_???");
 			break;
-#endif
-#ifdef F_SETLEASE
 		case F_SETLEASE:
 			tprints(", ");
 			printxval(lockfcmds, tcp->u_arg[2], "F_???");
 			break;
-#endif
 		case F_GETOWN:
 			break;
 		default:
@@ -184,19 +163,15 @@ SYS_FUNC(fcntl)
 			tprints(", ");
 			printflock(tcp, tcp->u_arg[2], 1);
 			break;
-#if USE_PRINTFLOCK64
 		case F_GETLK64:
 			tprints(", ");
 			printflock64(tcp, tcp->u_arg[2], 1);
 			break;
-#endif
-#ifdef F_GETLEASE
 		case F_GETLEASE:
 			if (syserror(tcp))
 				return 0;
 			tcp->auxstr = xlookup(lockfcmds, tcp->u_rval);
 			return RVAL_HEX|RVAL_STR;
-#endif
 		default:
 			tprintf(", %#lx", tcp->u_arg[2]);
 			break;
