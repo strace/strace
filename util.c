@@ -352,7 +352,7 @@ printflags(const struct xlat *xlat, int flags, const char *dflt)
 	int n;
 	const char *sep;
 
-	if (flags == 0 && xlat->val == 0) {
+	if (flags == 0 && xlat->val == 0 && xlat->str) {
 		tprints(xlat->str);
 		return 1;
 	}
