@@ -32,7 +32,11 @@
 
 #include "defs.h"
 
-#include <sys/shm.h>
+#ifdef HAVE_SYS_SHM_H
+# include <sys/shm.h>
+#elif defined HAVE_LINUX_SHM_H
+# include <linux/shm.h>
+#endif
 
 #include "xlat/shm_resource_flags.h"
 #include "xlat/shm_flags.h"

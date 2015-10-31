@@ -33,11 +33,16 @@
 #include "defs.h"
 #include "ipc_defs.h"
 
-#include <sys/sem.h>
+#ifdef HAVE_SYS_SEM_H
+# include <sys/sem.h>
+#elif defined HAVE_LINUX_SEM_H
+# include <linux/sem.h>
+#endif
 
 #include "xlat/semctl_flags.h"
 #include "xlat/semop_flags.h"
 
+#if defined HAVE_SYS_SEM_H || defined HAVE_LINUX_SEM_H
 static void
 tprint_sembuf(const struct sembuf *sb)
 {
@@ -45,10 +50,12 @@ tprint_sembuf(const struct sembuf *sb)
 	printflags(semop_flags, sb->sem_flg, "SEM_???");
 	tprints("}");
 }
+#endif
 
 static void
 tprint_sembuf_array(struct tcb *tcp, const long addr, const unsigned long count)
 {
+#if defined HAVE_SYS_SEM_H || defined HAVE_LINUX_SEM_H
 	unsigned long max_count;
 	struct sembuf sb;
 
@@ -78,6 +85,9 @@ tprint_sembuf_array(struct tcb *tcp, const long addr, const unsigned long count)
 
 		tprints("]");
 	}
+#else
+	printaddr(addr);
+#endif
 	tprintf(", %lu", count);
 }
 

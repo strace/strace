@@ -31,11 +31,21 @@
  */
 
 #include "defs.h"
+
+#include DEF_MPERS_TYPE(msqid_ds_t)
+
 #include "ipc_defs.h"
 
-#include <sys/msg.h>
-#include DEF_MPERS_TYPE(msqid_ds_t)
+#ifdef HAVE_SYS_MSG_H
+/* The C library generally exports the struct the current kernel expects. */
+# include <sys/msg.h>
 typedef struct msqid_ds msqid_ds_t;
+#elif defined HAVE_LINUX_MSG_H
+/* The linux header might provide the right struct. */
+# include <linux/msg.h>
+typedef struct msqid64_ds msqid_ds_t;
+#endif
+
 #include MPERS_DEFS
 
 #include "xlat/msgctl_flags.h"
@@ -43,6 +53,7 @@ typedef struct msqid_ds msqid_ds_t;
 static void
 print_msqid_ds(struct tcb *tcp, const long addr, int cmd)
 {
+	/* TODO: We don't properly decode old compat ipc calls. */
 	if (cmd & IPC_64)
 		cmd &= ~IPC_64;
 	msqid_ds_t msqid_ds;

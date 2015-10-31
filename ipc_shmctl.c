@@ -31,13 +31,21 @@
  */
 
 #include "defs.h"
-#include "ipc_defs.h"
-
-#include <sys/shm.h>
 
 #include DEF_MPERS_TYPE(shmid_ds_t)
-#include <sys/shm.h>
+
+#include "ipc_defs.h"
+
+#ifdef HAVE_SYS_SHM_H
+/* The C library generally exports the struct the current kernel expects. */
+# include <sys/shm.h>
 typedef struct shmid_ds shmid_ds_t;
+#elif defined HAVE_LINUX_SHM_H
+/* The linux header might provide the right struct. */
+# include <linux/shm.h>
+typedef struct shmid64_ds shmid_ds_t;
+#endif
+
 #include MPERS_DEFS
 
 #include "xlat/shmctl_flags.h"
@@ -45,6 +53,7 @@ typedef struct shmid_ds shmid_ds_t;
 static void
 print_shmid_ds(struct tcb *tcp, const long addr, int cmd)
 {
+	/* TODO: We don't properly decode old compat ipc calls. */
 	if (cmd & IPC_64)
 		cmd &= ~IPC_64;
 	shmid_ds_t shmid_ds;

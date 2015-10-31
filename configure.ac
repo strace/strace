@@ -269,10 +269,14 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/filter.h
 	linux/hiddev.h
 	linux/ip_vs.h
+	linux/ipc.h
 	linux/mmtimer.h
+	linux/msg.h
 	linux/perf_event.h
 	linux/seccomp.h
 	linux/securebits.h
+	linux/sem.h
+	linux/shm.h
 	linux/utsname.h
 	mqueue.h
 	netinet/sctp.h
@@ -283,11 +287,16 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/eventfd.h
 	sys/fanotify.h
 	sys/ioctl.h
+	sys/ipc.h
+	sys/msg.h
 	sys/reg.h
+	sys/sem.h
+	sys/shm.h
 	sys/signalfd.h
 	sys/vfs.h
 	sys/xattr.h
 ]))
+AC_CHECK_HEADERS([linux/mqueue.h],,, [#include <linux/types.h>])
 AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
                  [], [], [#include <stddef.h>
 #include <sys/socket.h>
