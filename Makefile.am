@@ -689,7 +689,7 @@ mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 	done
 	> $@
 
-m%_defs.h: $(srcdir_mpers_source_files)
+m%_type_defs.h: $(srcdir_mpers_source_files)
 	for f in $^; do \
 		sed -n 's/^#include DEF_MPERS_TYPE(\([^)]\+\))/#ifdef MPERS_$(mpers_PREFIX)\1\n# define \1 MPERS_$(mpers_PREFIX)\1\n#endif/p' $$f || exit; \
 	done > $@-t
@@ -740,7 +740,7 @@ strace_LDADD += libmpers-m32.a
 noinst_LIBRARIES += libmpers-m32.a
 libmpers_m32_a_SOURCES = $(mpers_source_files)
 libmpers_m32_a_CPPFLAGS = $(libmpers_CPPFLAGS) -DMPERS_IS_m32 -I$(builddir)/mpers-m32
-mpers_m32_targets = mpers-m32.stamp m32_defs.h m32_funcs.h m32_printer_decls.h m32_printer_defs.h
+mpers_m32_targets = mpers-m32.stamp m32_type_defs.h m32_funcs.h m32_printer_decls.h m32_printer_defs.h
 
 BUILT_SOURCES += $(mpers_m32_targets)
 CLEANFILES    += $(mpers_m32_targets)
@@ -755,7 +755,7 @@ strace_LDADD += libmpers-mx32.a
 noinst_LIBRARIES += libmpers-mx32.a
 libmpers_mx32_a_SOURCES = $(mpers_source_files)
 libmpers_mx32_a_CPPFLAGS = $(libmpers_CPPFLAGS) -DMPERS_IS_mx32 -I$(builddir)/mpers-mx32
-mpers_mx32_targets = mpers-mx32.stamp mx32_defs.h mx32_funcs.h mx32_printer_decls.h mx32_printer_defs.h
+mpers_mx32_targets = mpers-mx32.stamp mx32_type_defs.h mx32_funcs.h mx32_printer_decls.h mx32_printer_defs.h
 
 BUILT_SOURCES += $(mpers_mx32_targets)
 CLEANFILES    += $(mpers_mx32_targets)
