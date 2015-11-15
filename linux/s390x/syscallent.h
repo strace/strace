@@ -367,8 +367,8 @@
 [352] = { 3,	0,		SEN(printargs),			"s390_pci_mmio_write",	},
 [353] = { 3,	0,		SEN(printargs),			"s390_pci_mmio_read",	},
 [354] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
-[355] = { 1,	0,		SEN(printargs),			"userfaultfd",		},
-[356] = { 2,	0,		SEN(printargs),			"membarrier",		},
+[355] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[356] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [357] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
 [358] = { 4,	TN,		SEN(sendmmsg),			"sendmmsg"		},
 [359] = { 3,	TN,		SEN(socket),			"socket"		},
@@ -386,7 +386,8 @@
 [371] = { 6,	TN,		SEN(recvfrom),			"recvfrom"		},
 [372] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
 [373] = { 2,	TN,		SEN(shutdown),			"shutdown"		},
-[374 ... 399] = { },
+[374] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[375 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

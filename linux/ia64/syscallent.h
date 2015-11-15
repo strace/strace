@@ -553,3 +553,5 @@
 [1340] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [1341] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [1342] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
+[1343] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[1344] = { 2,	0,		SEN(membarrier),		"membarrier",		},

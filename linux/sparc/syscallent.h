@@ -349,7 +349,10 @@
 [348] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [349] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [350] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
-[351 ... 399] = { },
+[351] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[352] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[353] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[354 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

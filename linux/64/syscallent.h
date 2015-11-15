@@ -265,3 +265,6 @@
 [279] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [280] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [281] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
+[282] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[283] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[284] = { 3,	TM,		SEN(mlock2),			"mlock2"		},

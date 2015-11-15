@@ -400,7 +400,10 @@
 [371] = { 6,	TN,		SEN(recvfrom),			"recvfrom"		},
 [372] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
 [373] = { 2,	TN,		SEN(shutdown),			"shutdown"		},
-[374 ... 399] = { },
+[374] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[375] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[376] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[377 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

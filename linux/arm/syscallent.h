@@ -412,7 +412,10 @@
 [385] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [386] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [387] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
-[388 ... 399] = { },
+[388] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[389] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[390] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[391 ... 399] = { },
 
 #ifdef __ARM_EABI__
 # define ARM_FIRST_SHUFFLED_SYSCALL 400

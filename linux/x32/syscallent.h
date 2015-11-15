@@ -321,7 +321,10 @@
 [320] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load",	},
 [321] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [322] = { 5,	TD|TF|TP|SE|SI,	SEN(printargs),			"64:execveat",		},
-[323 ... 511] = { },
+[323] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[324] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[325] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[326 ... 511] = { },
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.

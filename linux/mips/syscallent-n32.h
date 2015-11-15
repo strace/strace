@@ -321,7 +321,10 @@
 [6318] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [6319] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [6320] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
-[6321 ... 6399] = { },
+[6321] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[6322] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[6323] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[6324 ... 6399] = { },
 
 # define SYS_socket_subcall      6400
 # include "subcall.h"

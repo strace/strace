@@ -317,7 +317,10 @@
 [5314] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [5315] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [5316] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
-[5317 ... 5399] = { },
+[5317] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[5318] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[5319] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[5320 ... 5399] = { },
 
 # define SYS_socket_subcall      5400
 # include "subcall.h"
