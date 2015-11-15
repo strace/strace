@@ -86,6 +86,7 @@ strace_SOURCES =	\
 	loop.c		\
 	lseek.c		\
 	mem.c		\
+	membarrier.c	\
 	memfd_create.c	\
 	mknod.c		\
 	mount.c		\

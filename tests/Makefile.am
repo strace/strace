@@ -31,6 +31,7 @@ check_PROGRAMS = \
 	ipc_msgbuf \
 	ipc_sem \
 	ipc_shm \
+	membarrier \
 	memfd_create \
 	mmap \
 	mmap64 \
@@ -145,6 +146,7 @@ TESTS = \
 	stat64-v.test \
 	statfs.test \
 	sysinfo.test \
+	membarrier.test \
 	memfd_create.test \
 	mmap.test \
 	mmap64.test \

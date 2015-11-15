@@ -18,6 +18,7 @@ ipc_msg
 ipc_msgbuf
 ipc_sem
 ipc_shm
+membarrier
 memfd_create
 mmap
 mmap64
