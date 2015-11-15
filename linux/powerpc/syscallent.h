@@ -389,7 +389,8 @@
 [360] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [361] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [362] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
-[363 ... 399] = { },
+[363] = { 0,	0,		SEN(printargs),			"switch_endian"		},
+[364 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
