@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check mlock2 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -e mlock2 $args > "$OUT"
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
+
+exit 0

@@ -33,6 +33,7 @@ check_PROGRAMS = \
 	ipc_shm \
 	membarrier \
 	memfd_create \
+	mlock2 \
 	mmap \
 	mmap64 \
 	mmsg \
@@ -148,6 +149,7 @@ TESTS = \
 	sysinfo.test \
 	membarrier.test \
 	memfd_create.test \
+	mlock2.test \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \

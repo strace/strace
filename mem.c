@@ -247,6 +247,17 @@ SYS_FUNC(msync)
 	return RVAL_DECODED;
 }
 
+#include "xlat/mlock_flags.h"
+
+SYS_FUNC(mlock2)
+{
+	printaddr(tcp->u_arg[0]);
+	tprintf(", %lu, ", tcp->u_arg[1]);
+	printflags(mlock_flags, tcp->u_arg[2], "MLOCK_???");
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(mincore)
 {
 	if (entering(tcp)) {
