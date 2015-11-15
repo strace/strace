@@ -392,7 +392,19 @@
 [363] = { 0,	0,		SEN(printargs),			"switch_endian"		},
 [364] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
 [365] = { 2,	0,		SEN(membarrier),		"membarrier",		},
-[366 ... 399] = { },
+[366] = { 3,	TI,		SEN(semop),			"semop"			},
+[367] = { 3,	TI,		SEN(semget),			"semget"		},
+[368] = { 4,	TI,		SEN(semctl),			"semctl"		},
+[369] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[370] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
+[371] = { 5,	TI,		SEN(msgrcv),			"msgrcv"		},
+[372] = { 2,	TI,		SEN(msgget),			"msgget"		},
+[373] = { 3,	TI,		SEN(msgctl),			"msgctl"		},
+[374] = { 3,	TI|TM|SI,	SEN(shmat),			"shmat"			},
+[375] = { 1,	TI|TM|SI,	SEN(shmdt),			"shmdt"			},
+[376] = { 3,	TI,		SEN(shmget),			"shmget"		},
+[377] = { 3,	TI,		SEN(shmctl),			"shmctl"		},
+[378 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
