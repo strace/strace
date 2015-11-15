@@ -154,6 +154,7 @@ strace_SOURCES =	\
 	umask.c		\
 	umount.c	\
 	uname.c		\
+	userfaultfd.c	\
 	util.c		\
 	utime.c		\
 	utimes.c	\

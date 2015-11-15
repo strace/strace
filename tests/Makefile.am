@@ -78,6 +78,7 @@ check_PROGRAMS = \
 	umovestr \
 	umovestr2 \
 	unix-pair-send-recv \
+	userfaultfd \
 	utime \
 	utimensat \
 	wait \
@@ -170,6 +171,7 @@ TESTS = \
 	uid16.test \
 	uid32.test \
 	uio.test \
+	userfaultfd.test \
 	utime.test \
 	utimensat.test \
 	wait.test \

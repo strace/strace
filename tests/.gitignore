@@ -65,6 +65,7 @@ uio
 umovestr
 umovestr2
 unix-pair-send-recv
+userfaultfd
 utime
 utimensat
 wait
