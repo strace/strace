@@ -385,7 +385,22 @@
 [356] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [357] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [358] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
-[359 ... 399] = { },
+[359] = { 3,	TN,		SEN(socket),			"socket"		},
+[360] = { 4,	TN,		SEN(socketpair),		"socketpair"		},
+[361] = { 3,	TN,		SEN(bind),			"bind"			},
+[362] = { 3,	TN,		SEN(connect),			"connect"		},
+[363] = { 2,	TN,		SEN(listen),			"listen"		},
+[364] = { 4,	TN,		SEN(accept4),			"accept4"		},
+[365] = { 5,	TN,		SEN(getsockopt),		"getsockopt"		},
+[366] = { 5,	TN,		SEN(setsockopt),		"setsockopt"		},
+[367] = { 3,	TN,		SEN(getsockname),		"getsockname"		},
+[368] = { 3,	TN,		SEN(getpeername),		"getpeername"		},
+[369] = { 6,	TN,		SEN(sendto),			"sendto"		},
+[370] = { 3,	TN,		SEN(sendmsg),			"sendmsg"		},
+[371] = { 6,	TN,		SEN(recvfrom),			"recvfrom"		},
+[372] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
+[373] = { 2,	TN,		SEN(shutdown),			"shutdown"		},
+[374 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
