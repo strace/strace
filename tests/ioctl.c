@@ -31,12 +31,14 @@
 int
 main(void )
 {
-	struct termios tty;
 	uint64_t data = 0;
 
+#ifndef POWERPC
+	struct termios tty;
 	(void) ioctl(-1, TCGETS, &tty);
 	printf("ioctl(-1, TCGETS, %p)"
 	       " = -1 EBADF (Bad file descriptor)\n", &tty);
+#endif
 
 	(void) ioctl(-1, MMTIMER_GETRES, &data);
 	printf("ioctl(-1, MMTIMER_GETRES, %p)"
