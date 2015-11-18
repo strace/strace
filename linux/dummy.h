@@ -156,12 +156,6 @@
 #define	sys_oldolduname		printargs
 #define	sys_olduname		printargs
 
-/* no library support */
-#ifndef HAVE_SENDMSG
-#define	sys_recvmsg		printargs
-#define	sys_sendmsg		printargs
-#endif
-
 /* Who has STREAMS syscalls?
  * Linux hasn't. Solaris has (had?).
  * Just in case I miss something, retain in for Sparc.

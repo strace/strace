@@ -289,8 +289,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 	tprints("}");
 }
 
-#ifdef HAVE_SENDMSG
-# include "xlat/scmvals.h"
+#include "xlat/scmvals.h"
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 struct cmsghdr32 {
@@ -617,7 +616,6 @@ dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
 		}
 	}
 }
-#endif /* HAVE_SENDMSG */
 
 /*
  * low bits of the socket type define real socket type,
@@ -765,8 +763,6 @@ SYS_FUNC(sendto)
 	return RVAL_DECODED;
 }
 
-#ifdef HAVE_SENDMSG
-
 SYS_FUNC(sendmsg)
 {
 	printfd(tcp, tcp->u_arg[0]);
@@ -796,8 +792,6 @@ SYS_FUNC(sendmmsg)
 	}
 	return 0;
 }
-
-#endif /* HAVE_SENDMSG */
 
 SYS_FUNC(recv)
 {
@@ -850,8 +844,6 @@ SYS_FUNC(recvfrom)
 	}
 	return 0;
 }
-
-#ifdef HAVE_SENDMSG
 
 SYS_FUNC(recvmsg)
 {
@@ -912,8 +904,6 @@ SYS_FUNC(recvmmsg)
 		return RVAL_STR;
 	}
 }
-
-#endif /* HAVE_SENDMSG */
 
 #include "xlat/shutdown_modes.h"
 

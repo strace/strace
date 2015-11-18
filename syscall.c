@@ -695,14 +695,12 @@ dumpio(struct tcb *tcp)
 		case SEN_readv:
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 			return;
-#ifdef HAVE_SENDMSG
 		case SEN_recvmsg:
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
 			return;
 		case SEN_recvmmsg:
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 			return;
-#endif
 		}
 	}
 	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
@@ -716,14 +714,12 @@ dumpio(struct tcb *tcp)
 		case SEN_writev:
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 			break;
-#ifdef HAVE_SENDMSG
 		case SEN_sendmsg:
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);
 			break;
 		case SEN_sendmmsg:
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 			break;
-#endif
 		}
 	}
 }
