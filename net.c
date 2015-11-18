@@ -290,9 +290,6 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 }
 
 #ifdef HAVE_SENDMSG
-# ifndef SCM_SECURITY
-#  define SCM_SECURITY 0x03
-# endif
 # include "xlat/scmvals.h"
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
