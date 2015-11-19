@@ -92,7 +92,7 @@ SYS_FUNC(getdents)
 	}
 
 	if (!abbrev(tcp))
-		tprints("{");
+		tprints("[");
 	for (i = 0; len && i <= len - sizeof(struct kernel_dirent); ) {
 		struct kernel_dirent *d = (struct kernel_dirent *) &buf[i];
 
@@ -105,7 +105,7 @@ SYS_FUNC(getdents)
 				d_name_len = D_NAME_LEN_MAX;
 
 			tprintf("%s{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=",
-				i ? " " : "", d->d_ino, d->d_off, d->d_reclen);
+				i ? ", " : "", d->d_ino, d->d_off, d->d_reclen);
 
 			if (print_quoted_string(d->d_name, d_name_len,
 					        QUOTE_0_TERMINATED) > 0) {
@@ -127,7 +127,7 @@ SYS_FUNC(getdents)
 		i += d->d_reclen;
 	}
 	if (!abbrev(tcp))
-		tprints("}");
+		tprints("]");
 	else
 		tprintf("/* %u entries */", dents);
 	tprintf(", %lu", tcp->u_arg[2]);
@@ -175,7 +175,7 @@ SYS_FUNC(getdents64)
 	}
 
 	if (!abbrev(tcp))
-		tprints("{");
+		tprints("[");
 	for (i = 0; len && i <= len - d_name_offset; ) {
 		struct dirent64 *d = (struct dirent64 *) &buf[i];
 		if (!abbrev(tcp)) {
@@ -191,7 +191,7 @@ SYS_FUNC(getdents64)
 
 			tprintf("%s{d_ino=%" PRIu64 ", d_off=%" PRId64
 				", d_reclen=%u, d_type=",
-				i ? " " : "",
+				i ? ", " : "",
 				d->d_ino,
 				d->d_off,
 				d->d_reclen);
@@ -213,7 +213,7 @@ SYS_FUNC(getdents64)
 		dents++;
 	}
 	if (!abbrev(tcp))
-		tprints("}");
+		tprints("]");
 	else
 		tprintf("/* %u entries */", dents);
 	tprintf(", %lu", tcp->u_arg[2]);
