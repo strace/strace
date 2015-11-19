@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Check getdents syscall decoding.
+# Check getdents64 syscall decoding.
 
 . "${srcdir=.}/init.sh"
 
@@ -8,7 +8,7 @@ rm -rf -- "$LOG".dir
 run_prog > /dev/null
 
 OUT="$LOG.out"
-run_strace -a22 -vegetdents $args > "$OUT"
+run_strace -a24 -vegetdents64 $args > "$OUT"
 
 match_diff "$OUT" "$LOG"
 rm -f "$OUT"

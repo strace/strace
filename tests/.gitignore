@@ -10,6 +10,8 @@ execve
 execveat
 fanotify_mark
 filter-unavailable
+getdents
+getdents64
 getrandom
 inet-accept-connect-send-recv
 ioctl

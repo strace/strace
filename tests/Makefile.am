@@ -23,6 +23,8 @@ check_PROGRAMS = \
 	execveat \
 	fanotify_mark \
 	filter-unavailable \
+	getdents \
+	getdents64 \
 	getrandom \
 	inet-accept-connect-send-recv \
 	ioctl \
@@ -121,6 +123,7 @@ TESTS = \
 	fanotify_mark.test \
 	filter-unavailable.test \
 	getdents.test \
+	getdents64.test \
 	getrandom.test \
 	ioctl.test \
 	ip_mreq.test \
@@ -208,8 +211,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     execveat-v.expected \
 	     fanotify_mark.expected \
 	     filter-unavailable.expected \
-	     getdents.awk \
-	     getdents.out \
 	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
