@@ -413,6 +413,7 @@ extern const struct xlat addrfams[];
 extern const struct xlat adjtimex_modes[];
 extern const struct xlat adjtimex_status[];
 extern const struct xlat at_flags[];
+extern const struct xlat dirent_types[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
 extern const struct xlat resource_flags[];
