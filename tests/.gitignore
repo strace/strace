@@ -34,6 +34,7 @@ pc
 pipe
 ppoll
 pselect6
+readdir
 readlink
 readlinkat
 restart_syscall

@@ -47,6 +47,7 @@ check_PROGRAMS = \
 	pipe \
 	ppoll \
 	pselect6 \
+	readdir \
 	readlink \
 	readlinkat \
 	restart_syscall \
@@ -129,6 +130,7 @@ TESTS = \
 	ipc_sem.test \
 	mq.test \
 	pselect6.test \
+	readdir.test \
 	readlink.test \
 	readlinkat.test \
 	rt_sigqueueinfo.test \
