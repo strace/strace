@@ -595,6 +595,7 @@ EXTRA_DIST =				\
 	mpers.awk			\
 	mpers.sh			\
 	mpers_test.sh			\
+	mpers_xlat.h			\
 	signalent.sh			\
 	strace-graph			\
 	strace-log-merge		\

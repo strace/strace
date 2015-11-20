@@ -35,9 +35,7 @@ typedef struct sigevent struct_sigevent;
 
 #include MPERS_DEFS
 
-#ifndef IN_MPERS
-# include "xlat/sigev_value.h"
-#endif
+#include "xlat/sigev_value.h"
 
 MPERS_PRINTER_DECL(void, print_sigevent)(struct tcb *tcp, const long addr)
 {

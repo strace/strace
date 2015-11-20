@@ -37,10 +37,8 @@ typedef struct timex struct_timex;
 
 #include MPERS_DEFS
 
-#ifndef IN_MPERS
-# include "xlat/adjtimex_modes.h"
-# include "xlat/adjtimex_status.h"
-#endif
+#include "xlat/adjtimex_modes.h"
+#include "xlat/adjtimex_status.h"
 
 MPERS_PRINTER_DECL(int, print_timex)(struct tcb *tcp, const long addr)
 {

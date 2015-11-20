@@ -410,14 +410,11 @@ struct xlat {
 #define XLAT_END { 0, NULL }
 
 extern const struct xlat addrfams[];
-extern const struct xlat adjtimex_modes[];
-extern const struct xlat adjtimex_status[];
 extern const struct xlat at_flags[];
 extern const struct xlat dirent_types[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
 extern const struct xlat resource_flags[];
-extern const struct xlat sigev_value[];
 extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */
