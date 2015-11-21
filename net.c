@@ -320,17 +320,18 @@ typedef union {
 } union_cmsghdr;
 
 static void
-print_scm_rights(struct tcb *tcp, const size_t cmsg_size, const char *ptr,
-		 const size_t cmsg_len)
+print_scm_rights(struct tcb *tcp, const void *cmsg_data,
+		 const size_t data_len)
 {
-	if (cmsg_size + sizeof(int) > cmsg_len)
-		return;
-
-	const int *fds = (const int *) (ptr + cmsg_size);
+	const int *fds = cmsg_data;
+	const char *end = (const char *) cmsg_data + data_len;
 	bool seen = false;
 
+	if (sizeof(*fds) > data_len)
+		return;
+
 	tprints(", [");
-	while ((const char *) fds < (ptr + cmsg_len)) {
+	while ((const char *) fds < end) {
 		if (seen)
 			tprints(", ");
 		else
@@ -341,48 +342,45 @@ print_scm_rights(struct tcb *tcp, const size_t cmsg_size, const char *ptr,
 }
 
 static void
-print_scm_creds(struct tcb *tcp, const size_t cmsg_size, const char *ptr,
-		const size_t cmsg_len)
+print_scm_creds(struct tcb *tcp, const void *cmsg_data,
+		const size_t data_len)
 {
-	if (cmsg_size + sizeof(struct ucred) > cmsg_len)
-		return;
+	const struct ucred *uc = cmsg_data;
 
-	const struct ucred *uc = (const void *) (ptr + cmsg_size);
+	if (sizeof(*uc) > data_len)
+		return;
 
 	tprintf(", {pid=%u, uid=%u, gid=%u}",
 		(unsigned) uc->pid, (unsigned) uc->uid, (unsigned) uc->gid);
 }
 
 static void
-print_scm_security(struct tcb *tcp, const size_t cmsg_size, const char *ptr,
-		   const size_t cmsg_len)
+print_scm_security(struct tcb *tcp, const void *cmsg_data,
+		   const size_t data_len)
 {
-	if (cmsg_size + sizeof(char) > cmsg_len)
+	if (!data_len)
 		return;
 
-	const char *label = ptr + cmsg_size;
-	const size_t label_len = cmsg_len - cmsg_size;
-
 	tprints(", ");
-	print_quoted_string(label, label_len, 0);
+	print_quoted_string(cmsg_data, data_len, 0);
 }
 
 static void
 print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
-		     const size_t cmsg_size, const char *ptr, const size_t cmsg_len)
+		     const void *cmsg_data, const size_t data_len)
 {
 	switch (cmsg_level) {
 	case SOL_SOCKET:
 		printxval(scmvals, cmsg_type, "SCM_???");
 		switch (cmsg_type) {
 		case SCM_RIGHTS:
-			print_scm_rights(tcp, cmsg_size, ptr, cmsg_len);
+			print_scm_rights(tcp, cmsg_data, data_len);
 			break;
 		case SCM_CREDENTIALS:
-			print_scm_creds(tcp, cmsg_size, ptr, cmsg_len);
+			print_scm_creds(tcp, cmsg_data, data_len);
 			break;
 		case SCM_SECURITY:
-			print_scm_security(tcp, cmsg_size, ptr, cmsg_len);
+			print_scm_security(tcp, cmsg_data, data_len);
 			break;
 		}
 		break;
@@ -438,7 +436,8 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, size_t len)
 			cmsg_len = len;
 
 		print_cmsg_type_data(tcp, cmsg_level, cmsg_type,
-				     cmsg_size, u.ptr, cmsg_len);
+				     (const void *) (u.ptr + cmsg_size),
+				     cmsg_len > cmsg_size ? cmsg_len - cmsg_size: 0);
 		tprints("}");
 
 		if (cmsg_len < cmsg_size) {
