@@ -302,6 +302,7 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 }
 
 #include "xlat/scmvals.h"
+#include "xlat/ip_cmsg_types.h"
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 struct cmsghdr32 {
@@ -366,6 +367,111 @@ print_scm_security(struct tcb *tcp, const void *cmsg_data,
 }
 
 static void
+print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
+		      const size_t data_len)
+{
+	const struct in_pktinfo *info = cmsg_data;
+
+	if (sizeof(*info) > data_len)
+		return;
+
+	tprints(", {ipi_ifindex=");
+	print_ifindex(info->ipi_ifindex);
+	tprintf(", ipi_spec_dst=inet_addr(\"%s\"), ipi_addr=inet_addr(\"%s\")}",
+		inet_ntoa(info->ipi_spec_dst), inet_ntoa(info->ipi_addr));
+}
+
+static void
+print_cmsg_ip_ttl(struct tcb *tcp, const void *cmsg_data,
+		  const size_t data_len)
+{
+	const unsigned int *ttl = cmsg_data;
+
+	if (sizeof(*ttl) > data_len)
+		return;
+
+	tprintf(", {ttl=%u}", *ttl);
+}
+
+static void
+print_cmsg_ip_tos(struct tcb *tcp, const void *cmsg_data,
+		  const size_t data_len)
+{
+	const uint8_t *tos = cmsg_data;
+
+	if (sizeof(*tos) > data_len)
+		return;
+
+	tprintf(", {tos=%x}", *tos);
+}
+
+static void
+print_cmsg_ip_checksum(struct tcb *tcp, const void *cmsg_data,
+		       const size_t data_len)
+{
+	const uint32_t *csum = cmsg_data;
+
+	if (sizeof(*csum) > data_len)
+		return;
+
+	tprintf(", {csum=%u}", *csum);
+}
+
+static void
+print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
+		   const size_t data_len)
+{
+	const char *opts = cmsg_data;
+	size_t i;
+
+	if (!data_len)
+		return;
+
+	tprints(", {opts=0x");
+	for (i = 0; i < data_len; ++i)
+		tprintf("%02x", opts[i]);
+	tprints("}");
+}
+
+static void
+print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
+		      const size_t data_len)
+{
+	const struct {
+		uint32_t ee_errno;
+		uint8_t  ee_origin;
+		uint8_t  ee_type;
+		uint8_t  ee_code;
+		uint8_t  ee_pad;
+		uint32_t ee_info;
+		uint32_t ee_data;
+		struct sockaddr_in offender;
+	} *err = cmsg_data;
+
+	if (sizeof(*err) > data_len)
+		return;
+
+	tprintf(", {ee_errno=%u, ee_origin=%u, ee_type=%u, ee_code=%u"
+		", ee_info=%u, ee_data=%u, offender=",
+		err->ee_errno, err->ee_origin, err->ee_type,
+		err->ee_code, err->ee_info, err->ee_data);
+	print_sockaddr(tcp, (const void *) &err->offender,
+		sizeof(err->offender));
+	tprints("}");
+}
+
+static void
+print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
+			  const size_t data_len)
+{
+	if (sizeof(struct sockaddr_in) > data_len)
+		return;
+
+	tprints(", ");
+	print_sockaddr(tcp, cmsg_data, data_len);
+}
+
+static void
 print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		     const void *cmsg_data, const size_t data_len)
 {
@@ -378,6 +484,36 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 			break;
 		case SCM_CREDENTIALS:
 			print_scm_creds(tcp, cmsg_data, data_len);
+			break;
+		case SCM_SECURITY:
+			print_scm_security(tcp, cmsg_data, data_len);
+			break;
+		}
+		break;
+	case SOL_IP:
+		printxval(ip_cmsg_types, cmsg_type, "IP_???");
+		switch (cmsg_type) {
+		case IP_PKTINFO:
+			print_cmsg_ip_pktinfo(tcp, cmsg_data, data_len);
+			break;
+		case IP_TTL:
+			print_cmsg_ip_ttl(tcp, cmsg_data, data_len);
+			break;
+		case IP_TOS:
+			print_cmsg_ip_tos(tcp, cmsg_data, data_len);
+			break;
+		case IP_RECVOPTS:
+		case IP_RETOPTS:
+			print_cmsg_ip_opts(tcp, cmsg_data, data_len);
+			break;
+		case IP_RECVERR:
+			print_cmsg_ip_recverr(tcp, cmsg_data, data_len);
+			break;
+		case IP_ORIGDSTADDR:
+			print_cmsg_ip_origdstaddr(tcp, cmsg_data, data_len);
+			break;
+		case IP_CHECKSUM:
+			print_cmsg_ip_checksum(tcp, cmsg_data, data_len);
 			break;
 		case SCM_SECURITY:
 			print_scm_security(tcp, cmsg_data, data_len);

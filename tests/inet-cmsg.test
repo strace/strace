@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Check IPPROTO_IP control messages decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+
+OUT="$LOG.out"
+run_strace -erecvmsg $args > "$OUT"
+
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
+
+exit 0

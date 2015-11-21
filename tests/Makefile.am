@@ -27,6 +27,7 @@ check_PROGRAMS = \
 	getdents64 \
 	getrandom \
 	inet-accept-connect-send-recv \
+	inet-cmsg \
 	ioctl \
 	ip_mreq \
 	ipc_msg \
@@ -125,6 +126,7 @@ TESTS = \
 	getdents.test \
 	getdents64.test \
 	getrandom.test \
+	inet-cmsg.test \
 	ioctl.test \
 	ip_mreq.test \
 	ipc_msg.test \
