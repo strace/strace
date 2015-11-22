@@ -330,6 +330,7 @@ pathtrace_match(struct tcb *tcp)
 	case SEN_timerfd_create:
 	case SEN_timerfd_gettime:
 	case SEN_timerfd_settime:
+	case SEN_userfaultfd:
 		/*
 		 * These have TRACE_FILE or TRACE_DESCRIPTOR or TRACE_NETWORK set,
 		 * but they don't have any file descriptor or path args to test.
