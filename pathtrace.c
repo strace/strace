@@ -163,6 +163,7 @@ pathtrace_match(struct tcb *tcp)
 	switch (s->sen) {
 	case SEN_dup2:
 	case SEN_dup3:
+	case SEN_kexec_file_load:
 	case SEN_sendfile:
 	case SEN_sendfile64:
 	case SEN_tee:

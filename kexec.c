@@ -79,3 +79,24 @@ SYS_FUNC(kexec_load)
 
 	return RVAL_DECODED;
 }
+
+#include "xlat/kexec_file_load_flags.h"
+
+SYS_FUNC(kexec_file_load)
+{
+	/* kernel_fd */
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	/* initrd_fd */
+	printfd(tcp, tcp->u_arg[1]);
+	tprints(", ");
+	/* cmdline_len */
+	tprintf("%lu, ", tcp->u_arg[2]);
+	/* cmdline */
+	printstr(tcp, tcp->u_arg[3], tcp->u_arg[2]);
+	tprints(", ");
+	/* flags */
+	printflags(kexec_file_load_flags, tcp->u_arg[4], "KEXEC_FILE_???");
+
+	return RVAL_DECODED;
+}
