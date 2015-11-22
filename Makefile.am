@@ -82,6 +82,7 @@ strace_SOURCES =	\
 	ipc_sem.c	\
 	ipc_shm.c	\
 	ipc_shmctl.c	\
+	kcmp.c		\
 	kexec.c		\
 	keyctl.c	\
 	ldt.c		\
