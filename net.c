@@ -421,7 +421,7 @@ static void
 print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
 		   const size_t data_len)
 {
-	const char *opts = cmsg_data;
+	const unsigned char *opts = cmsg_data;
 	size_t i;
 
 	if (!data_len)
