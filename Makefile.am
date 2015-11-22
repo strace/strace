@@ -73,6 +73,7 @@ strace_SOURCES =	\
 	inotify.c	\
 	io.c		\
 	ioctl.c		\
+	ioperm.c	\
 	ioprio.c	\
 	ipc_defs.h	\
 	ipc_msg.c	\

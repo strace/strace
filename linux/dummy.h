@@ -32,7 +32,6 @@
 #endif
 
 /* still unfinished */
-#define	sys_ioperm		printargs
 #define	sys_iopl		printargs
 #define	sys_kcmp		printargs
 #define	sys_kexec_file_load	printargs
