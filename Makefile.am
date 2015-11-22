@@ -87,6 +87,7 @@ strace_SOURCES =	\
 	keyctl.c	\
 	ldt.c		\
 	link.c		\
+	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\
 	mem.c		\
