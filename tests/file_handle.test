@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Check name_to_handle_at and open_by_handle_at syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+
+OUT="$LOG.out"
+run_strace -ename_to_handle_at,open_by_handle_at $args > "$OUT"
+
+match_diff "$OUT" "$LOG"
+rm -f "$OUT"
+
+exit 0

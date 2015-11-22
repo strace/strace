@@ -178,6 +178,7 @@ pathtrace_match(struct tcb *tcp)
 	case SEN_inotify_add_watch:
 	case SEN_mkdirat:
 	case SEN_mknodat:
+	case SEN_name_to_handle_at:
 	case SEN_newfstatat:
 	case SEN_openat:
 	case SEN_pipe2:

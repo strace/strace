@@ -32,8 +32,6 @@
 #endif
 
 /* still unfinished */
-#define	sys_name_to_handle_at	printargs
-#define	sys_open_by_handle_at	printargs
 #define	sys_sysfs		printargs
 #define	sys_vm86		printargs
 #define	sys_vm86old		printargs

@@ -22,6 +22,7 @@ check_PROGRAMS = \
 	execve \
 	execveat \
 	fanotify_mark \
+	file_handle \
 	filter-unavailable \
 	getdents \
 	getdents64 \
@@ -122,6 +123,7 @@ TESTS = \
 	execve.test \
 	execveat.test \
 	fanotify_mark.test \
+	file_handle.test \
 	filter-unavailable.test \
 	getdents.test \
 	getdents64.test \

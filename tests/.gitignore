@@ -9,6 +9,7 @@ eventfd
 execve
 execveat
 fanotify_mark
+file_handle
 filter-unavailable
 getdents
 getdents64

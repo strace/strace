@@ -63,6 +63,7 @@ strace_SOURCES =	\
 	fcntl.c		\
 	fetch_seccomp_fprog.c \
 	file.c		\
+	file_handle.c	\
 	flock.c		\
 	futex.c		\
 	get_robust_list.c \
