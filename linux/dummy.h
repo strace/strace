@@ -136,6 +136,7 @@
 #define	sys_phys		printargs
 #define	sys_profil		printargs
 #define	sys_prof		printargs
+#define	sys_query_module	printargs
 #define	sys_security		printargs
 #define	sys_stty		printargs
 #define	sys_tuxcall		printargs
