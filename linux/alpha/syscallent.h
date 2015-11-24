@@ -249,7 +249,7 @@
 [251] = { 2,	0,		SEN(printargs),			"osf_usleep_thread"	},
 [252] = { 5,	0,		SEN(printargs),			"osf_audcntl"		}, /*not implemented */
 [253] = { 5,	0,		SEN(printargs),			"osf_audgen"		}, /*not implemented */
-[254] = { 5,	0,		SEN(sysfs),			"sysfs"			},
+[254] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [255] = { 5,	0,		SEN(printargs),			"osf_subsysinfo"	}, /*not implemented */
 [256] = { 5,	0,		SEN(printargs),			"osf_getsysinfo"	},
 [257] = { 5,	0,		SEN(printargs),			"osf_setsysinfo"	},

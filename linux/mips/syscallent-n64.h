@@ -136,7 +136,7 @@
 [5133] = { 2,	0,		SEN(ustat),			"ustat"			},
 [5134] = { 3,	TF,		SEN(statfs),			"statfs"		},
 [5135] = { 3,	TD,		SEN(fstatfs),			"fstatfs"		},
-[5136] = { 5,	0,		SEN(sysfs),			"sysfs"			},
+[5136] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [5137] = { 2,	0,		SEN(getpriority),		"getpriority"		},
 [5138] = { 3,	0,		SEN(setpriority),		"setpriority"		},
 [5139] = { 2,	0,		SEN(sched_setparam),		"sched_setparam"	},
