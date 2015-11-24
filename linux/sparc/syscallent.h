@@ -223,7 +223,7 @@
 [222] = { 2,	0,		SEN(delete_module),		"delete_module"		},
 [223] = { 1,	0,		SEN(get_kernel_syms),		"get_kernel_syms"	},
 [224] = { 1,	0,		SEN(getpgid),			"getpgid"		},
-[225] = { 0,	0,		SEN(bdflush),			"bdflush"		},
+[225] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [226] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [227] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},
 [228] = { 1,	NF,		SEN(setfsuid16),		"setfsuid"		},

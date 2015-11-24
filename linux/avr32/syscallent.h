@@ -144,7 +144,7 @@
 [116] = { 2,	0,		SEN(delete_module),		"delete_module"		},
 [117] = { 4,	TF,		SEN(quotactl),			"quotactl"		},
 [118] = { 1,	0,		SEN(getpgid),			"getpgid"		},
-[119] = { 0,	0,		SEN(bdflush),			"bdflush"		},
+[119] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [120] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [121] = { 1,	0,		SEN(personality),		"personality"		},
 [122] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},

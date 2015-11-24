@@ -156,7 +156,7 @@
 [131] = { 4,	TF,		SEN(quotactl),			"quotactl"		},
 [132] = { 1,	0,		SEN(getpgid),			"getpgid"		},
 [133] = { 1,	TD,		SEN(fchdir),			"fchdir"		},
-[134] = { 0,	0,		SEN(bdflush),			"bdflush"		},
+[134] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [135] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [136] = { 1,	0,		SEN(personality),		"personality"		},
 [137] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},

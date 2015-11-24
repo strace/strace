@@ -348,7 +348,7 @@
 [1135] = { 1,	0,		SEN(get_kernel_syms),		"get_kernel_syms"	},
 [1136] = { 5,	0,		SEN(query_module),		"query_module"		},
 [1137] = { 4,	TF,		SEN(quotactl),			"quotactl"		},
-[1138] = { 0,	0,		SEN(bdflush),			"bdflush"		},
+[1138] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [1139] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [1140] = { 1,	0,		SEN(personality),		"personality"		},
 [1141] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},

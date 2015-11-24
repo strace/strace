@@ -258,7 +258,7 @@
 [260] = { 5,	0,		SEN(printargs),			"osf_memcntl"		}, /*not implemented */
 [261] = { 5,	0,		SEN(printargs),			"osf_fdatasync"		}, /*not implemented */
 [262 ... 299] = { },
-[300] = { 0,	0,		SEN(bdflush),			"bdflush"		},
+[300] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [301] = { 3,	0,		SEN(printargs),			"sethae"		},
 [302] = { 5,	TF,		SEN(mount),			"mount"			},
 [303] = { 1,	0,		SEN(adjtimex),			"adjtimex32"		},
