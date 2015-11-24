@@ -129,13 +129,15 @@
 #define	sys_break		printargs
 #define	sys_ftime		printargs
 #define	sys_get_kernel_syms	printargs
+#define	sys_getpmsg		printargs
 #define	sys_gtty		printargs
 #define	sys_lock		printargs
 #define	sys_mpx			printargs
 #define	sys_nfsservctl		printargs
 #define	sys_phys		printargs
-#define	sys_profil		printargs
 #define	sys_prof		printargs
+#define	sys_profil		printargs
+#define	sys_putpmsg		printargs
 #define	sys_query_module	printargs
 #define	sys_security		printargs
 #define	sys_stty		printargs
@@ -149,16 +151,3 @@
 #define	sys_oldolduname		printargs
 #define	sys_olduname		printargs
 #define	sys_sysfs		printargs
-
-/* Who has STREAMS syscalls?
- * Linux hasn't. Solaris has (had?).
- * Just in case I miss something, retain in for Sparc.
- * Note: SYS_get/putpmsg may be defined even though syscalls
- * return ENOSYS. Can't just check defined(SYS_getpmsg).
- */
-#if (!defined(SPARC) && !defined(SPARC64)) || !defined(SYS_getpmsg)
-#define	sys_getpmsg		printargs
-#endif
-#if (!defined(SPARC) && !defined(SPARC64)) || !defined(SYS_putpmsg)
-#define	sys_putpmsg		printargs
-#endif

@@ -144,7 +144,6 @@ strace_SOURCES =	\
 	sram_alloc.c	\
 	statfs.c	\
 	strace.c	\
-	stream.c	\
 	swapon.c	\
 	sync_file_range.c \
 	syscall.c	\
