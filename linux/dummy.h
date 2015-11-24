@@ -32,7 +32,6 @@
 #endif
 
 /* still unfinished */
-#define	sys_sysfs		printargs
 #define	sys_vm86		printargs
 #define	sys_vm86old		printargs
 
@@ -148,6 +147,7 @@
 #define	sys_bdflush		printargs
 #define	sys_oldolduname		printargs
 #define	sys_olduname		printargs
+#define	sys_sysfs		printargs
 
 /* Who has STREAMS syscalls?
  * Linux hasn't. Solaris has (had?).
