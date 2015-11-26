@@ -5,7 +5,8 @@ function compare_indices(i1, v1, i2, v2) {
 		return -1
 	return (c1 != c2)
 }
-function what_is(what_idx, type_idx, special, item)
+function what_is(what_idx, type_idx, special, item, \
+		 location, prev_location, prev_returned_size)
 {
 	type_idx = array[what_idx]["type"]
 	special = array[what_idx]["special"]
@@ -24,28 +25,62 @@ function what_is(what_idx, type_idx, special, item)
 			printf("%s ", array[what_idx]["name"])
 			break
 		}
+		returned_size = array[what_idx]["byte_size"]
 		break
 	case "enumeration_type":
 		printf("%s ", "uint" 8*array[type_idx]["byte_size"] "_t")
+		returned_size = array[what_idx]["byte_size"]
 		break
 	case "pointer_type":
 		printf("%s", "mpers_ptr_t ")
+		returned_size = array[what_idx]["byte_size"]
 		break
 	case "array_type":
 		what_is(type_idx)
 		to_return = array[what_idx]["upper_bound"]
+		returned_size = array[what_idx]["upper_bound"] * returned_size
 		return to_return
 		break
 	case "structure_type":
-	case "union_type":
-		if (special == "structure_type") {
-			print "struct {"
-		} else {
-			print "union {"
-		}
+		print "struct {"
+		prev_location = 0
+		location = 0
+		returned_size = 0
+		prev_returned_size = 0
 		for (item in array) {
-			if ("parent" in array[item] && array[item]["parent"] \
-				== what_idx) {
+			if ("parent" in array[item] && \
+				array[item]["parent"] == what_idx) {
+				location = array[item]["location"]
+				loc_diff = location - prev_location - \
+					prev_returned_size
+				if (loc_diff != 0) {
+					printf("%s", \
+						"unsigned char mpers_filler_" \
+						item "[" loc_diff "];\n")
+				}
+				prev_location = location
+				returned = what_is(item)
+				prev_returned_size = returned_size
+				printf("%s", array[item]["name"])
+				if (returned) {
+					printf("%s", "[" returned "]")
+				}
+				print ";"
+			}
+		}
+		returned_size = array[what_idx]["byte_size"]
+		loc_diff = returned_size - prev_location - prev_returned_size
+		if (loc_diff != 0) {
+			printf("%s", "unsigned char mpers_end_filler_" \
+				item "[" loc_diff "];\n")
+		}
+		printf("%s", "} ATTRIBUTE_PACKED ")
+		break
+	case "union_type":
+		print "union {"
+		for (item in array) {
+			if ("parent" in array[item] && \
+				array[item]["parent"] == what_idx) {
 				returned = what_is(item)
 				printf("%s", array[item]["name"])
 				if (returned) {
@@ -55,6 +90,7 @@ function what_is(what_idx, type_idx, special, item)
 			}
 		}
 		printf("%s", "} ")
+		returned_size = array[what_idx]["byte_size"]
 		break
 	case "typedef":
 		return what_is(type_idx)
@@ -83,10 +119,11 @@ BEGIN {
 }
 /^DW_AT_data_member_location/ {
 	match($0, /[[:digit:]]+/, temparray)
-	array[idx]["location"] = temparray[1]
+	array[idx]["location"] = temparray[0]
 }
 /^DW_AT_name/ {
-	match($0, /:[[:space:]]+([[:alpha:]_][[:alnum:]_[:space:]]*)/, temparray)
+	match($0, /:[[:space:]]+([[:alpha:]_][[:alnum:]_[:space:]]*)/, \
+		temparray)
 	array[idx]["name"] = temparray[1]
 }
 /^DW_AT_byte_size/ {
