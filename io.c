@@ -182,7 +182,11 @@ print_llu_from_low_high_val(struct tcb *tcp, int arg)
 {
 #if SIZEOF_LONG == SIZEOF_LONG_LONG
 # if SUPPORTED_PERSONALITIES > 1
+#  ifdef X86_64
+	if (current_personality != 1)
+#  else
 	if (current_wordsize == sizeof(long))
+#  endif
 # endif
 		tprintf("%lu", (unsigned long) tcp->u_arg[arg]);
 # if SUPPORTED_PERSONALITIES > 1
