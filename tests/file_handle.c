@@ -77,8 +77,8 @@ main(void)
 	printf("}, [%d], AT_SYMLINK_FOLLOW) = 0\n", mount_id);
 
 	assert(open_by_handle_at(-1, handle, O_RDONLY | O_DIRECTORY));
-	printf("open_by_handle_at(-1, {handle_bytes=%u, handle_type=1, f_handle=0x",
-	       handle->handle_bytes);
+	printf("open_by_handle_at(-1, {handle_bytes=%u, handle_type=%d"
+	       ", f_handle=0x", handle->handle_bytes, handle->handle_type);
 	for (i = 0; i < handle->handle_bytes; ++i)
 		printf("%02x", handle->f_handle[i]);
 	printf("}, O_RDONLY|O_DIRECTORY) = -1 %s\n",
