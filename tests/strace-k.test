@@ -4,7 +4,7 @@
 
 . "${srcdir=.}/init.sh"
 
-$STRACE -h | grep '^-k' > /dev/null ||
+$STRACE -h | grep '^[[:space:]]*-k[[:space:]]' > /dev/null ||
 	skip_ 'strace -k is not available'
 
 # strace -k is implemented using /proc/$pid/maps
