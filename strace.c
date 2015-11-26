@@ -1036,10 +1036,13 @@ startup_attach(void)
 					continue;
 				}
 				if (!qflag) {
-					error_msg(ntid > 1
-? "Process %u attached with %u threads"
-: "Process %u attached",
-						tcp->pid, ntid);
+					if (ntid > 1)
+						error_msg("Process %u attached"
+							  " with %u threads",
+							  tcp->pid, ntid);
+					else
+						error_msg("Process %u attached",
+							  tcp->pid);
 				}
 				if (!(tcp->flags & TCB_ATTACHED)) {
 					/* -p PID, we failed to attach to PID itself
