@@ -9,7 +9,7 @@ run_prog > /dev/null
 OUT="$LOG.out"
 run_strace -erecvmsg $args > "$OUT"
 
-match_diff "$OUT" "$LOG"
+match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
 exit 0

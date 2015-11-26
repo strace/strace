@@ -9,7 +9,7 @@ run_prog > /dev/null
 OUT="$LOG.out"
 run_strace -ename_to_handle_at,open_by_handle_at $args > "$OUT"
 
-match_diff "$OUT" "$LOG"
+match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
 exit 0

@@ -14,7 +14,7 @@ LC_ALL=C grep -x "utimensat(.*" "$LOG" > /dev/null || {
         skip_ 'test executable does not use utimensat syscall'
 }
 
-match_diff "$OUT" "$LOG"
+match_diff "$LOG" "$OUT"
 
 rm -f "$OUT"
 

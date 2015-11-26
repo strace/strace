@@ -14,7 +14,7 @@ ln -snf $target $link ||
 
 run_prog > /dev/null
 run_strace -e $syscall -xx -s3 $args > "$OUT"
-match_diff "$OUT" "$LOG"
+match_diff "$LOG" "$OUT"
 
 rm -f -- "$OUT" $link
 

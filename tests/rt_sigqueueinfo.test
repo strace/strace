@@ -7,7 +7,7 @@
 run_prog > /dev/null
 OUT="$LOG.out"
 run_strace -ert_sigqueueinfo -esignal=none $args > "$OUT"
-match_diff "$OUT" "$LOG"
+match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
 exit 0

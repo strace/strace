@@ -11,7 +11,7 @@ for n in fcntl fcntl64; do
 	$STRACE -e$n -h > /dev/null && syscalls=$syscalls,$n
 done
 run_strace -e trace=$syscalls $args > "$OUT"
-match_diff "$OUT" "$LOG"
+match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
 exit 0

@@ -10,7 +10,7 @@ run_prog > /dev/null
 OUT="$LOG.out"
 run_strace -a24 -vegetdents64 $args > "$OUT"
 
-match_diff "$OUT" "$LOG"
+match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
 exit 0
