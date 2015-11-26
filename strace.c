@@ -196,9 +196,9 @@ strerror(int err_no)
 #endif /* HAVE_STERRROR */
 
 static void
-usage(FILE *ofp, int exitval)
+usage()
 {
-	fprintf(ofp, "\
+	printf("\
 usage: strace [-CdffhiqrtttTvVwxxy] [-I n] [-e expr]...\n\
               [-a column] [-o file] [-s strsize] [-P path]...\n\
               -p pid... / [-D] [-E var=val]... [-u username] PROG [ARGS]\n\
@@ -267,7 +267,7 @@ Miscellaneous:\n\
 -z -- print only succeeding syscalls\n\
  */
 , DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
-	exit(exitval);
+	exit(0);
 }
 
 static void ATTRIBUTE_NORETURN
@@ -327,6 +327,17 @@ void error_msg_and_die(const char *fmt, ...)
 	die();
 }
 
+void error_msg_and_help(const char *fmt, ...)
+{
+	if (fmt != NULL) {
+		va_list p;
+		va_start(p, fmt);
+		verror_msg(0, fmt, p);
+	}
+	fprintf(stderr, "Try '%s -h' for more information.\n", progname);
+	die();
+}
+
 void perror_msg(const char *fmt, ...)
 {
 	va_list p;
@@ -346,7 +357,7 @@ void perror_msg_and_die(const char *fmt, ...)
 static void
 error_opt_arg(int opt, const char *arg)
 {
-	error_msg_and_die("Invalid -%c argument: '%s'", opt, arg);
+	error_msg_and_help("invalid -%c argument: '%s'", opt, arg);
 }
 
 #if USE_SEIZE
@@ -1488,13 +1499,13 @@ init(int argc, char *argv[])
 			break;
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
-				error_msg_and_die("-c and -C are mutually exclusive");
+				error_msg_and_help("-c and -C are mutually exclusive");
 			}
 			cflag = CFLAG_ONLY_STATS;
 			break;
 		case 'C':
 			if (cflag == CFLAG_ONLY_STATS) {
-				error_msg_and_die("-c and -C are mutually exclusive");
+				error_msg_and_help("-c and -C are mutually exclusive");
 			}
 			cflag = CFLAG_BOTH;
 			break;
@@ -1511,7 +1522,7 @@ init(int argc, char *argv[])
 			followfork++;
 			break;
 		case 'h':
-			usage(stdout, 0);
+			usage();
 			break;
 		case 'i':
 			iflag = 1;
@@ -1597,7 +1608,7 @@ init(int argc, char *argv[])
 				error_opt_arg(c, optarg);
 			break;
 		default:
-			usage(stderr, 1);
+			error_msg_and_help(NULL);
 			break;
 		}
 	}
@@ -1609,22 +1620,23 @@ init(int argc, char *argv[])
 	acolumn_spaces[acolumn] = '\0';
 
 	/* Must have PROG [ARGS], or -p PID. Not both. */
-	if (!argv[0] == !nprocs)
-		usage(stderr, 1);
+	if (!argv[0] == !nprocs) {
+		error_msg_and_help("must have PROG [ARGS] or -p PID");
+	}
 
 	if (nprocs != 0 && daemonized_tracer) {
-		error_msg_and_die("-D and -p are mutually exclusive");
+		error_msg_and_help("-D and -p are mutually exclusive");
 	}
 
 	if (!followfork)
 		followfork = optF;
 
 	if (followfork >= 2 && cflag) {
-		error_msg_and_die("(-c or -C) and -ff are mutually exclusive");
+		error_msg_and_help("(-c or -C) and -ff are mutually exclusive");
 	}
 
 	if (count_wallclock && !cflag) {
-		error_msg_and_die("-w must be given with (-c or -C)");
+		error_msg_and_help("-w must be given with (-c or -C)");
 	}
 
 	if (cflag == CFLAG_ONLY_STATS) {
@@ -1685,7 +1697,7 @@ init(int argc, char *argv[])
 			 * when using popen, so prohibit it.
 			 */
 			if (followfork >= 2)
-				error_msg_and_die("Piping the output and -ff are mutually exclusive");
+				error_msg_and_help("piping the output and -ff are mutually exclusive");
 			shared_log = strace_popen(outfname + 1);
 		}
 		else if (followfork < 2)

@@ -500,6 +500,8 @@ void error_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 void perror_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 void error_msg_and_die(const char *fmt, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
+void error_msg_and_help(const char *fmt, ...)
+	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 void perror_msg_and_die(const char *fmt, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 void die_out_of_memory(void) ATTRIBUTE_NORETURN;
