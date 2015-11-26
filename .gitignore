@@ -57,6 +57,7 @@ Makefile.in
 /mpers-mx32
 /mpers-mx32.stamp
 /mpers.am
+/mpers_xlat.h
 /mx32_funcs.h
 /mx32_printer_decls.h
 /mx32_printer_defs.h
