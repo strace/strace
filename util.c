@@ -237,7 +237,11 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 {
 #if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
 # if SUPPORTED_PERSONALITIES > 1
+#  ifdef X86_64
+	if (current_personality != 1) {
+#  else
 	if (current_wordsize > 4) {
+#  endif
 # endif
 		*val = tcp->u_arg[arg_no];
 		arg_no++;
