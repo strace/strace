@@ -1156,22 +1156,7 @@ restore_cleared_syserror(struct tcb *tcp)
 	tcp->u_error = saved_u_error;
 }
 
-/*
- * Cannot rely on __kernel_[u]long_t being defined,
- * it is quite a recent feature of <asm/posix_types.h>.
- */
-#ifdef __kernel_long_t
-typedef __kernel_long_t kernel_long_t;
-typedef __kernel_ulong_t kernel_ulong_t;
-#else
-# ifdef X32
-typedef long long kernel_long_t;
-typedef unsigned long long kernel_ulong_t;
-# else
-typedef long kernel_long_t;
-typedef unsigned long kernel_ulong_t;
-# endif
-#endif
+#include "kernel_types.h"
 
 /*
  * Check the syscall return value register value for whether it is

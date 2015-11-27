@@ -41,6 +41,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "kernel_types.h"
+
 static const char fname[] =
 	"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"
 	"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"
@@ -59,13 +61,6 @@ static const char qname[] =
 	"A\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\n"
 	"A\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\n"
 	"A\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nZ";
-
-typedef struct {
-		unsigned long d_ino;
-		unsigned long d_off;
-		unsigned short d_reclen;
-		char d_name[256];
-} kernel_dirent;
 
 static char buf[8192];
 
@@ -88,8 +83,9 @@ print_dirent(const kernel_dirent *d)
 	int d_name_len = d->d_reclen - d_name_offset - 1;
 	assert(d_name_len > 0);
 
-	printf("{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=",
-	       d->d_ino, d->d_off, d->d_reclen);
+	printf("{d_ino=%Lu, d_off=%Lu, d_reclen=%u, d_name=",
+	       (unsigned long long) d->d_ino,
+	       (unsigned long long) d->d_off, d->d_reclen);
 
 	if (d->d_name[0] == '.')
 		printf("\"%.*s\"", d_name_len, d->d_name);

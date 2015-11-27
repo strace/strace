@@ -343,6 +343,8 @@ AC_CHECK_TYPES([struct flock,
 		struct __kernel_flock,
 		struct __kernel_flock64],,, [#include <linux/fcntl.h>])
 
+AC_CHECK_TYPES([__kernel_long_t, __kernel_ulong_t],,, [#include <asm/posix_types.h>])
+
 AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
 
 AC_CHECK_HEADERS([linux/input.h], [

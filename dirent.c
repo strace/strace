@@ -33,14 +33,7 @@
 
 #include DEF_MPERS_TYPE(kernel_dirent)
 
-#include <dirent.h>
-
-typedef struct {
-	unsigned long   d_ino;
-	unsigned long   d_off;
-	unsigned short  d_reclen;
-	char            d_name[1];
-} kernel_dirent;
+#include "kernel_types.h"
 
 #include MPERS_DEFS
 
@@ -54,8 +47,9 @@ print_old_dirent(struct tcb *tcp, long addr)
 	if (umove_or_printaddr(tcp, addr, &d))
 		return;
 
-	tprintf("{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=",
-		(unsigned long) d.d_ino, (unsigned long) d.d_off, d.d_reclen);
+	tprintf("{d_ino=%Lu, d_off=%Lu, d_reclen=%u, d_name=",
+		(unsigned long long) d.d_ino,
+		(unsigned long long) d.d_off, d.d_reclen);
 	if (d.d_reclen > D_NAME_LEN_MAX)
 		d.d_reclen = D_NAME_LEN_MAX;
 	printpathn(tcp, addr + offsetof(kernel_dirent, d_name), d.d_reclen);
@@ -128,9 +122,10 @@ SYS_FUNC(getdents)
 			if (d_name_len > D_NAME_LEN_MAX)
 				d_name_len = D_NAME_LEN_MAX;
 
-			tprintf("%s{d_ino=%lu, d_off=%lu, d_reclen=%u, d_name=",
-				i ? ", " : "", (unsigned long) d->d_ino,
-				(unsigned long) d->d_off, d->d_reclen);
+			tprintf("%s{d_ino=%Lu, d_off=%Lu, d_reclen=%u"
+				", d_name=", i ? ", " : "",
+				(unsigned long long) d->d_ino,
+				(unsigned long long) d->d_off, d->d_reclen);
 
 			if (print_quoted_string(d->d_name, d_name_len,
 					        QUOTE_0_TERMINATED) > 0) {
@@ -146,7 +141,7 @@ SYS_FUNC(getdents)
 		}
 		dents++;
 		if (d->d_reclen < sizeof(kernel_dirent)) {
-			tprints("/* d_reclen < sizeof(kernel_dirent) */");
+			tprints("/* d_reclen < sizeof(struct dirent) */");
 			break;
 		}
 		i += d->d_reclen;
