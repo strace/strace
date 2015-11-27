@@ -123,11 +123,15 @@ main(int ac, const char **av)
 	struct stat stb;
 
 #ifdef NR_stat
+# if defined __x86_64__ && defined __ILP32__
+	return 77;	/* x32 stat is 64-bit */
+# else
 	if (sizeof(stb.st_size) > 4)
 		return 77;
 	assert(syscall(NR_stat, av[1], &stb) == 0);
 	if (!stb.st_mode)
 		return 77;
+# endif
 #else
 	assert(stat(av[1], &stb) == 0);
 #endif
