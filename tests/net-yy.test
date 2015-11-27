@@ -26,4 +26,6 @@ sed -rn "/^$child"' /d; /SIGCHLD/d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' "$
 match_awk "$LOG-connect" "$srcdir"/net-yy-connect.awk "$STRACE $args connect output mismatch"
 match_awk "$LOG-accept" "$srcdir"/net-yy-accept.awk "$STRACE $args accept output mismatch"
 
+rm -f "$LOG"-connect "$LOG"-accept
+
 exit 0
