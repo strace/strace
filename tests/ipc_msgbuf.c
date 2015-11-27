@@ -1,6 +1,12 @@
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/stat.h>
+
+#include "kernel_types.h"
 
 #define text_string "STRACE_STRING"
 #define msgsz sizeof(text_string)
@@ -10,7 +16,7 @@ main (void)
 {
 	const long mtype = 0xdefaced;
 	struct {
-		long mtype;
+		kernel_long_t mtype;
 		char mtext[msgsz];
 	} msg = {
 		.mtype = mtype,
