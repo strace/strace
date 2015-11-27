@@ -233,20 +233,46 @@ SYS_FUNC(select)
 	return decode_select(tcp, tcp->u_arg, print_timeval, sprint_timeval);
 }
 
+#include "kernel_types.h"
+
+static int
+umove_kulong_array_or_printaddr(struct tcb *tcp, const long addr,
+				kernel_ulong_t *ptr, size_t n)
+{
+#if defined X86_64 || defined X32
+	if (current_personality == 1) {
+#else
+	if (current_wordsize < sizeof(*ptr)) {
+#endif
+		uint32_t ptr32[n];
+		int r = umove_or_printaddr(tcp, addr, &ptr32);
+		if (!r) {
+			size_t i;
+
+			for (i = 0; i < n; ++i)
+				ptr[i] = (kernel_ulong_t) ptr32[i];
+		}
+		return r;
+	}
+	return umoven_or_printaddr(tcp, addr, n * sizeof(*ptr), ptr);
+}
+
 SYS_FUNC(pselect6)
 {
 	int rc = decode_select(tcp, tcp->u_arg, print_timespec, sprint_timespec);
 	if (entering(tcp)) {
-		unsigned long data[2];
+		kernel_ulong_t data[2];
 
 		tprints(", ");
-		if (!umove_ulong_array_or_printaddr(tcp, tcp->u_arg[5], data,
-						    ARRAY_SIZE(data))) {
+		if (!umove_kulong_array_or_printaddr(tcp, tcp->u_arg[5],
+						     data, ARRAY_SIZE(data))) {
 			tprints("{");
 			/* NB: kernel requires data[1] == NSIG / 8 */
-			print_sigset_addr_len(tcp, data[0], data[1]);
-			tprintf(", %lu}", data[1]);
+			print_sigset_addr_len(tcp, (unsigned long) data[0],
+					      (unsigned long) data[1]);
+			tprintf(", %Lu}", (unsigned long long) data[1]);
 		}
 	}
+
 	return rc;
 }
