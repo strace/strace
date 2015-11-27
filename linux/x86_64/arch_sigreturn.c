@@ -1,4 +1,4 @@
-if (current_personality != 1) {
+if (current_personality == 0) {
 	const unsigned long addr =
 		(unsigned long) *x86_64_rsp_ptr +
 		offsetof(struct ucontext, uc_sigmask);
@@ -7,4 +7,4 @@ if (current_personality != 1) {
 	tprints("}");
 	return;
 }
-#include "i386/arch_sigreturn.c"
+#include "x32/arch_sigreturn.c"
