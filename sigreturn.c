@@ -14,11 +14,7 @@
 # error NSIG < 32
 #endif
 
-static void
-arch_sigreturn(struct tcb *tcp)
-{
 #include "arch_sigreturn.c"
-}
 
 SYS_FUNC(sigreturn)
 {
