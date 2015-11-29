@@ -1343,14 +1343,7 @@ get_syscall_args(struct tcb *tcp)
 	return 1;
 }
 
-static void
-get_error(struct tcb *tcp)
-{
-	const bool check_errno = !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS);
-	tcp->u_error = 0;
-
 #include "get_error.c"
-}
 
 /* Returns:
  * 1: ok, continue in trace_syscall_exiting().
@@ -1365,6 +1358,8 @@ get_syscall_result(struct tcb *tcp)
 #else
 # include "get_syscall_result.c"
 #endif
-	get_error(tcp);
+	tcp->u_error = 0;
+	get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
+
 	return 1;
 }
