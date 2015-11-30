@@ -1,3 +1,6 @@
-/* new syscall ABI returns result in R0 */
-if (upeek(tcp->pid, 4*REG_REG0, (long *)&sh_r0) < 0)
-	return -1;
+static int
+get_syscall_result_regs(struct tcb *tcp)
+{
+	/* new syscall ABI returns result in R0 */
+	return upeek(tcp->pid, 4 * REG_REG0, (long *)&sh_r0) < 0 ? -1 : 0;
+}

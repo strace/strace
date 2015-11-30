@@ -1253,6 +1253,7 @@ get_regset(pid_t pid)
 void
 get_regs(pid_t pid)
 {
+#undef USE_GET_SYSCALL_RESULT_REGS
 #ifdef ARCH_REGS_FOR_GETREGSET
 # ifdef X86_64
 	/* Try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS. */
@@ -1295,7 +1296,8 @@ get_regs(pid_t pid)
 # endif
 
 #else /* !ARCH_REGS_FOR_GETREGSET && !ARCH_REGS_FOR_GETREGS */
-#  warning get_regs is not implemented for this architecture yet
+# define USE_GET_SYSCALL_RESULT_REGS 1
+# warning get_regs is not implemented for this architecture yet
 	get_regs_error = 0;
 #endif
 }
@@ -1343,6 +1345,9 @@ get_syscall_args(struct tcb *tcp)
 	return 1;
 }
 
+#ifdef USE_GET_SYSCALL_RESULT_REGS
+# include "get_syscall_result.c"
+#endif
 #include "get_error.c"
 
 /* Returns:
@@ -1353,10 +1358,9 @@ get_syscall_args(struct tcb *tcp)
 static int
 get_syscall_result(struct tcb *tcp)
 {
-#if defined ARCH_REGS_FOR_GETREGSET || defined ARCH_REGS_FOR_GETREGS
-	/* already done by get_regs */
-#else
-# include "get_syscall_result.c"
+#ifdef USE_GET_SYSCALL_RESULT_REGS
+	if (get_syscall_result_regs(tcp))
+		return -1;
 #endif
 	tcp->u_error = 0;
 	get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
