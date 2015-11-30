@@ -784,6 +784,11 @@ clear_regs(void)
 
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
+static int arch_get_scno(struct tcb *tcp);
+static void get_error(struct tcb *, const bool);
+#if defined X86_64 || defined POWERPC
+static int getregs_old(pid_t);
+#endif
 
 static int
 trace_syscall_entering(struct tcb *tcp)
@@ -1214,10 +1219,6 @@ print_pc(struct tcb *tcp)
 			(unsigned long) ARCH_PC_REG);
 }
 
-#if defined X86_64 || defined POWERPC
-# include "getregs_old.c"
-#endif
-
 #if defined ARCH_REGS_FOR_GETREGSET
 static long
 get_regset(pid_t pid)
@@ -1291,9 +1292,6 @@ get_regs(pid_t pid)
 #endif
 }
 
-static int arch_get_scno(struct tcb *tcp);
-#include "get_scno.c"
-
 /*
  * Returns:
  * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
@@ -1329,11 +1327,9 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
-#include "get_syscall_args.c"
 #ifdef USE_GET_SYSCALL_RESULT_REGS
-# include "get_syscall_result.c"
+static int get_syscall_result_regs(struct tcb *);
 #endif
-#include "get_error.c"
 
 /* Returns:
  * 1: ok, continue in trace_syscall_exiting().
@@ -1352,3 +1348,13 @@ get_syscall_result(struct tcb *tcp)
 
 	return 1;
 }
+
+#include "get_scno.c"
+#include "get_syscall_args.c"
+#ifdef USE_GET_SYSCALL_RESULT_REGS
+# include "get_syscall_result.c"
+#endif
+#include "get_error.c"
+#if defined X86_64 || defined POWERPC
+# include "getregs_old.c"
+#endif
