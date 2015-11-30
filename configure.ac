@@ -341,7 +341,8 @@ AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
 AC_CHECK_TYPES([struct flock,
 		struct flock64,
 		struct __kernel_flock,
-		struct __kernel_flock64],,, [#include <linux/fcntl.h>])
+		struct __kernel_flock64],,, [#include <sys/types.h>
+#include <linux/fcntl.h>])
 
 AC_CHECK_TYPES([__kernel_long_t, __kernel_ulong_t],,, [#include <asm/posix_types.h>])
 
