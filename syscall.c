@@ -1337,14 +1337,7 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
-/* Return -1 on error or 1 on success (never 0!) */
-static int
-get_syscall_args(struct tcb *tcp)
-{
 #include "get_syscall_args.c"
-	return 1;
-}
-
 #ifdef USE_GET_SYSCALL_RESULT_REGS
 # include "get_syscall_result.c"
 #endif
