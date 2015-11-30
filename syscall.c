@@ -1302,7 +1302,11 @@ get_regs(pid_t pid)
 #endif
 }
 
-/* Returns:
+static int arch_get_scno(struct tcb *tcp);
+#include "get_scno.c"
+
+/*
+ * Returns:
  * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
  * 1: ok, continue in trace_syscall_entering().
  * other: error, trace_syscall_entering() should print error indicator
@@ -1314,14 +1318,13 @@ get_scno(struct tcb *tcp)
 	if (get_regs_error)
 		return -1;
 
-	long scno = 0;
+	int rc = arch_get_scno(tcp);
+	if (rc != 1)
+		return rc;
 
-#include "get_scno.c"
-
-	tcp->scno = scno;
 	if (SCNO_IS_VALID(tcp->scno)) {
-		tcp->s_ent = &sysent[scno];
-		tcp->qual_flg = qual_flags[scno];
+		tcp->s_ent = &sysent[tcp->scno];
+		tcp->qual_flg = qual_flags[tcp->scno];
 	} else {
 		static const struct_sysent unknown = {
 			.nargs = MAX_ARGS,
@@ -1332,7 +1335,7 @@ get_scno(struct tcb *tcp)
 		tcp->s_ent = &unknown;
 		tcp->qual_flg = UNDEFINED_SCNO | QUAL_RAW | DEFAULT_QUAL_FLAGS;
 		if (debug_flag)
-			error_msg("pid %d invalid syscall %ld", tcp->pid, scno);
+			error_msg("pid %d invalid syscall %ld", tcp->pid, tcp->scno);
 	}
 	return 1;
 }
