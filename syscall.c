@@ -1260,7 +1260,7 @@ get_regs(pid_t pid)
 			return;
 		getregset_support = -1;
 	}
-	getregs_old(pid);
+	get_regs_error = getregs_old(pid);
 # else /* !X86_64 */
 	/* Assume that PTRACE_GETREGSET works. */
 	get_regs_error = get_regset(pid);

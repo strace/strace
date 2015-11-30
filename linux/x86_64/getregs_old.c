@@ -2,13 +2,13 @@
  * PTRACE_GETREGSET was added to the kernel in v2.6.25,
  * a PTRACE_GETREGS based fallback is provided for old kernels.
  */
-static void
+static int
 getregs_old(pid_t pid)
 {
 	/* Use old method, with unreliable heuristical detection of 32-bitness. */
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
-	if (get_regs_error)
-		return;
+	long r = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
+	if (r)
+		return r;
 
 	if (x86_64_regs.cs == 0x23) {
 		x86_io.iov_len = sizeof(i386_regs);
@@ -36,4 +36,5 @@ getregs_old(pid_t pid)
 	} else {
 		x86_io.iov_len = sizeof(x86_64_regs);
 	}
+	return 0;
 }
