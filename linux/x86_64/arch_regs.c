@@ -38,3 +38,4 @@ static struct iovec x86_io = {
 
 #define ARCH_REGS_FOR_GETREGSET x86_regs_union
 #define ARCH_IOVEC_FOR_GETREGSET x86_io
+#define ARCH_PC_REG (x86_io.iov_len == sizeof(i386_regs) ? i386_regs.eip : x86_64_regs.rip)

@@ -5,3 +5,4 @@ unsigned long *const ia64_frame_ptr = &ia64_regs.gr[12];
 #define ia64_ia32mode	(ia64_regs.cr_ipsr & IA64_PSR_IS)
 
 #define ARCH_REGS_FOR_GETREGS ia64_regs
+#define ARCH_PC_REG ia64_regs.br[0]

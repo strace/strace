@@ -1197,32 +1197,21 @@ is_negated_errno(kernel_ulong_t val)
 void
 print_pc(struct tcb *tcp)
 {
-	const char *fmt;
-	const char *bad;
-
-#ifdef current_wordsize
-# define pc_wordsize current_wordsize
+#if defined ARCH_PC_REG
+# define ARCH_GET_PC 0
+#elif defined ARCH_PC_PEEK_ADDR
+	long pc;
+# define ARCH_PC_REG pc
+# define ARCH_GET_PC upeek(tcp->pid, ARCH_PC_PEEK_ADDR, &pc)
 #else
-# define pc_wordsize personality_wordsize[tcp->currpers]
+# error Neither ARCH_PC_REG nor ARCH_PC_PEEK_ADDR is defined
 #endif
-
-	if (pc_wordsize == 4) {
-		fmt = "[%08lx] ";
-		bad = "[????????] ";
-	} else {
-		fmt = "[%016lx] ";
-		bad = "[????????????????] ";
-	}
-
-#undef pc_wordsize
-#define PRINTBADPC tprints(bad)
-
-	if (get_regs_error) {
-		PRINTBADPC;
-		return;
-	}
-
-#include "print_pc.c"
+	if (get_regs_error || ARCH_GET_PC)
+		tprints(current_wordsize == 4 ? "[????????] "
+					      : "[????????????????] ");
+	else
+		tprintf(current_wordsize == 4 ? "[%08lx] " : "[%016lx] ",
+			(unsigned long) ARCH_PC_REG);
 }
 
 #if defined X86_64 || defined POWERPC
