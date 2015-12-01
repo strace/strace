@@ -24,6 +24,7 @@ check_PROGRAMS = \
 	fanotify_mark \
 	file_handle \
 	filter-unavailable \
+	ftruncate \
 	getdents \
 	getdents64 \
 	getrandom \
@@ -79,6 +80,7 @@ check_PROGRAMS = \
 	timerfd_xettime \
 	times \
 	times-fail \
+	truncate \
 	uid \
 	uid16 \
 	uid32 \
@@ -126,6 +128,7 @@ TESTS = \
 	fanotify_mark.test \
 	file_handle.test \
 	filter-unavailable.test \
+	ftruncate.test \
 	getdents.test \
 	getdents64.test \
 	getrandom.test \
@@ -179,6 +182,7 @@ TESTS = \
 	timerfd_xettime.test \
 	times.test \
 	times-fail.test \
+	truncate.test \
 	umovestr.test \
 	umovestr2.test \
 	unix-yy.test \

@@ -11,6 +11,7 @@ execveat
 fanotify_mark
 file_handle
 filter-unavailable
+ftruncate
 getdents
 getdents64
 getrandom
@@ -66,6 +67,7 @@ timer_xettime
 timerfd_xettime
 times
 times-fail
+truncate
 uid
 uid16
 uid32
