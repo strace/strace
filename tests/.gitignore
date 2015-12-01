@@ -12,6 +12,7 @@ fanotify_mark
 file_handle
 filter-unavailable
 ftruncate
+ftruncate64
 getdents
 getdents64
 getrandom
@@ -68,6 +69,7 @@ timerfd_xettime
 times
 times-fail
 truncate
+truncate64
 uid
 uid16
 uid32

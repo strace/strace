@@ -25,6 +25,7 @@ check_PROGRAMS = \
 	file_handle \
 	filter-unavailable \
 	ftruncate \
+	ftruncate64 \
 	getdents \
 	getdents64 \
 	getrandom \
@@ -81,6 +82,7 @@ check_PROGRAMS = \
 	times \
 	times-fail \
 	truncate \
+	truncate64 \
 	uid \
 	uid16 \
 	uid32 \
@@ -100,12 +102,14 @@ check_PROGRAMS = \
 
 clock_xettime_LDADD = -lrt
 filter_unavailable_LDADD = -lpthread
+ftruncate64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt
 pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 times_LDADD = -lrt
+truncate64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
@@ -129,6 +133,7 @@ TESTS = \
 	file_handle.test \
 	filter-unavailable.test \
 	ftruncate.test \
+	ftruncate64.test \
 	getdents.test \
 	getdents64.test \
 	getrandom.test \
@@ -183,6 +188,7 @@ TESTS = \
 	times.test \
 	times-fail.test \
 	truncate.test \
+	truncate64.test \
 	umovestr.test \
 	umovestr2.test \
 	unix-yy.test \
