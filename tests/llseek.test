@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check _llseek syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -e_llseek $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
+
+exit 0

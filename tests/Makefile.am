@@ -37,6 +37,8 @@ check_PROGRAMS = \
 	ipc_msgbuf \
 	ipc_sem \
 	ipc_shm \
+	llseek \
+	lseek \
 	membarrier \
 	memfd_create \
 	mlock2 \
@@ -144,6 +146,8 @@ TESTS = \
 	ipc_msgbuf.test \
 	ipc_shm.test \
 	ipc_sem.test \
+	llseek.test \
+	lseek.test \
 	mq.test \
 	pselect6.test \
 	readdir.test \
