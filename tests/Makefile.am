@@ -24,6 +24,7 @@ check_PROGRAMS = \
 	fanotify_mark \
 	file_handle \
 	filter-unavailable \
+	fstatat64 \
 	ftruncate \
 	ftruncate64 \
 	getdents \
@@ -50,6 +51,7 @@ check_PROGRAMS = \
 	net-accept-connect \
 	netlink_inet_diag \
 	netlink_unix_diag \
+	newfstatat \
 	oldselect \
 	pc \
 	pipe \
@@ -104,9 +106,11 @@ check_PROGRAMS = \
 
 clock_xettime_LDADD = -lrt
 filter_unavailable_LDADD = -lpthread
+fstatat64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt
+newfstatat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS)
 stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -134,6 +138,7 @@ TESTS = \
 	fanotify_mark.test \
 	file_handle.test \
 	filter-unavailable.test \
+	fstatat64.test \
 	ftruncate.test \
 	ftruncate64.test \
 	getdents.test \
@@ -180,6 +185,7 @@ TESTS = \
 	net.test \
 	net-fd.test \
 	net-yy.test \
+	newfstatat.test \
 	oldselect.test \
 	pipe.test \
 	pc.test \
@@ -231,6 +237,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     execveat-v.expected \
 	     fanotify_mark.expected \
 	     filter-unavailable.expected \
+	     fstatat.c \
 	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \

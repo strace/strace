@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check newfstatat syscall decoding.
+
+. "${srcdir=.}/fstatat64.test"

@@ -241,6 +241,9 @@ AC_CHECK_FUNCS(m4_normalize([
 	fopen64
 	fork
 	fputs_unlocked
+	fstatat
+	ftruncate
+	futimens
 	if_indextoname
 	inet_ntop
 	inet_pton

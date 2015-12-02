@@ -11,6 +11,7 @@ execveat
 fanotify_mark
 file_handle
 filter-unavailable
+fstatat64
 ftruncate
 ftruncate64
 getdents
@@ -37,6 +38,7 @@ nanosleep
 net-accept-connect
 netlink_inet_diag
 netlink_unix_diag
+newfstatat
 oldselect
 pc
 pipe
