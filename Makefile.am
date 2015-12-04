@@ -91,6 +91,7 @@ strace_SOURCES =	\
 	keyctl.c	\
 	ldt.c		\
 	link.c		\
+	linux/asm_stat.h \
 	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\

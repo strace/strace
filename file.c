@@ -47,7 +47,7 @@
 #define off_t __kernel_off_t
 #define loff_t __kernel_loff_t
 
-#include <asm/stat.h>
+#include "asm_stat.h"
 
 #undef dev_t
 #undef ino_t
