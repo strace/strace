@@ -83,7 +83,8 @@ print_f_owner_ex(struct tcb *tcp, const long addr)
 	tprintf(", pid=%d}", owner.pid);
 }
 
-SYS_FUNC(fcntl)
+static int
+print_fcntl(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -191,4 +192,14 @@ SYS_FUNC(fcntl)
 		}
 	}
 	return 0;
+}
+
+SYS_FUNC(fcntl)
+{
+	return print_fcntl(tcp);
+}
+
+SYS_FUNC(fcntl64)
+{
+	return print_fcntl(tcp);
 }

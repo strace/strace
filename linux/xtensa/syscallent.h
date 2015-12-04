@@ -54,7 +54,7 @@
 [ 58] = { 1,	0,		SEN(umask),			"umask"			},
 [ 59] = { 3,	TD,		SEN(getdents),			"getdents"		},
 [ 60] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[ 61] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[ 61] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [ 62] = { 6,	TD,		SEN(fallocate),			"fallocate"		},
 [ 63] = { 6,	TD,		SEN(fadvise64_64),		"fadvise64_64"		},
 [ 64] = { 2,	TF,		SEN(utime),			"utime"			},

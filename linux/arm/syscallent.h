@@ -247,7 +247,7 @@
 [218] = { 2,	TF,		SEN(pivotroot),			"pivot_root"		},
 [219] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [220] = { 3,	TM,		SEN(madvise),			"madvise"		},
-[221] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[221] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [222 ... 223] = { },
 [224] = { 0,	0,		SEN(gettid),			"gettid"		},
 [225] = { 5,	TD,		SEN(readahead),			"readahead"		},

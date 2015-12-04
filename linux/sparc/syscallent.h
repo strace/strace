@@ -153,7 +153,7 @@
 [152] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [153] = { 3,	TD,		SEN(poll),			"poll"			},
 [154] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[155] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[155] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [156] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [157] = { 2,	TF,		SEN(statfs),			"statfs"		},
 [158] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},

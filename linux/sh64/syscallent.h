@@ -274,7 +274,7 @@
 [246] = { 3,	TI,		SEN(shmget),			"shmget"		},
 [247] = { 4,	TI,		SEN(shmctl),			"shmctl"		},
 [248] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[249] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[249] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [250 ... 251] = { },
 [252] = { 4,	0,		SEN(gettid),			"gettid"		},
 [253] = { 3,	TD,		SEN(readahead),			"readahead"		},

@@ -204,7 +204,7 @@
 [199] = { 3,	TF,		SEN(truncate64),		"truncate64"		},
 [200] = { 3,	TD,		SEN(ftruncate64),		"ftruncate64"		},
 [201] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[202] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[202] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [203] = { 5,	0,		SEN(printargs),			"attrctl"		},
 [204] = { 5,	0,		SEN(printargs),			"acl_get"		},
 [205] = { 5,	0,		SEN(printargs),			"acl_set"		},

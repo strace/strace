@@ -230,7 +230,7 @@
 [201] = { 6,	0,		SEN(printargs),			"MOL"			},
 [202] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
 [203] = { 2,	TF,		SEN(pivotroot),			"pivot_root"		},
-[204] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[204] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [205] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [206] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [207] = { 0,	0,		SEN(gettid),			"gettid"		},

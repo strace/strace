@@ -200,7 +200,7 @@
 [172] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [173] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [174] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[175] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[175] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [176] = { 0,	0,		SEN(gettid),			"gettid"		},
 [177] = { 4,	TD,		SEN(readahead),			"readahead"		},
 [178] = { 5,	TF,		SEN(setxattr),			"setxattr"		},

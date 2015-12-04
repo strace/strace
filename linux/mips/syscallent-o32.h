@@ -220,7 +220,7 @@
 [4217] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [4218] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [4219] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[4220] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[4220] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [4221] = { },
 [4222] = { 0,	0,		SEN(gettid),			"gettid"		},
 [4223] = { 5,	TD,		SEN(readahead),			"readahead"		},

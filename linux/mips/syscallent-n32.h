@@ -212,7 +212,7 @@
 [6209] = { 4,	TD,		SEN(epoll_wait),		"epoll_wait"		},
 [6210] = { 5,	TM|SI,		SEN(remap_file_pages),		"remap_file_pages"	},
 [6211] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
-[6212] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[6212] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [6213] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [6214] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [6215] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},

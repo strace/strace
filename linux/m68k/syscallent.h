@@ -264,7 +264,7 @@
 [236] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [237] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [238] = { 3,	TM,		SEN(madvise),			"madvise"		},
-[239] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[239] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [240] = { 4,	TD,		SEN(readahead),			"readahead"		},
 [241] = { 2,	0,		SEN(io_setup),			"io_setup"		},
 [242] = { 1,	0,		SEN(io_destroy),		"io_destroy"		},

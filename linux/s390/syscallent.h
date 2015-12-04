@@ -249,7 +249,7 @@
 [218] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [219] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [220] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[221] = { 3,	TD,		SEN(fcntl),			"fcntl64"		},
+[221] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
 [222] = { 4,	TD,		SEN(readahead),			"readahead"		},
 [223] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [224] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
