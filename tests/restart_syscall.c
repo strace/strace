@@ -38,6 +38,13 @@
 int
 main(void)
 {
+#if defined __x86_64__ && defined __ILP32__
+	/*
+	 * x32 is broken from the beginning:
+	 * https://lkml.org/lkml/2015/11/30/790
+	 */
+	return 77;
+#else
 	const sigset_t set = {};
 	const struct sigaction act = { .sa_handler = SIG_IGN };
 	const struct itimerval itv = { .it_value.tv_usec = 111111 };
@@ -60,7 +67,8 @@ main(void)
 	printf("(nanosleep\\(\\{%jd, %jd\\}, %p|restart_syscall\\(<\\.\\.\\."
 	       " resuming interrupted nanosleep \\.\\.\\.>)\\) = 0\n",
 	       (intmax_t) req.tv_sec, (intmax_t) req.tv_nsec, &rem);
-	puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
 
+	puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
 	return 0;
+#endif
 }
