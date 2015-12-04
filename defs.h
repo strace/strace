@@ -450,6 +450,10 @@ extern const struct xlat whence_codes[];
 #define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
 #define TRACE_INDIRECT_SUBCALL	02000	/* Syscall is an indirect socket/ipc subcall. */
 
+#define IOCTL_NUMBER_UNKNOWN 0
+#define IOCTL_NUMBER_HANDLED 1
+#define IOCTL_NUMBER_STOP_LOOKUP 010
+
 #define indirect_ipccall(tcp) (tcp->s_ent->sys_flags & TRACE_INDIRECT_SUBCALL)
 
 #if defined(ARM) || defined(AARCH64) \
