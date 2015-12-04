@@ -16,6 +16,12 @@ SYS_FUNC(lseek)
 	int whence;
 
 	printfd(tcp, tcp->u_arg[0]);
+# ifdef X32
+	/* tcp->ext_arg is not initialized for i386 personality */
+	if (current_personality == 1)
+		offset = tcp->u_arg[1];
+	else
+# endif
 	offset = tcp->ext_arg[1];
 	whence = tcp->u_arg[2];
 	if (whence == SEEK_SET)
