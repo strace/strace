@@ -42,6 +42,8 @@ check_PROGRAMS = \
 	ipc_shm \
 	llseek \
 	lseek \
+	lstat \
+	lstat64 \
 	membarrier \
 	memfd_create \
 	mlock2 \
@@ -111,6 +113,7 @@ filter_unavailable_LDADD = -lpthread
 fstat64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
+lstat64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt
 newfstatat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -158,6 +161,8 @@ TESTS = \
 	ipc_sem.test \
 	llseek.test \
 	lseek.test \
+	lstat.test \
+	lstat64.test \
 	mq.test \
 	pselect6.test \
 	readdir.test \
@@ -247,6 +252,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
+	     lstatx.c \
 	     memfd_create.expected \
 	     mmsg.expected \
 	     mq.expected \

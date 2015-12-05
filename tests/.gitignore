@@ -29,6 +29,8 @@ ipc_sem
 ipc_shm
 llseek
 lseek
+lstat
+lstat64
 membarrier
 memfd_create
 mlock2

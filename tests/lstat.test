@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check lstat syscall decoding.
+
+. "${srcdir=.}/statx.sh"
