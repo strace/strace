@@ -24,6 +24,8 @@ check_PROGRAMS = \
 	fanotify_mark \
 	file_handle \
 	filter-unavailable \
+	fstat \
+	fstat64 \
 	fstatat64 \
 	ftruncate \
 	ftruncate64 \
@@ -106,6 +108,7 @@ check_PROGRAMS = \
 
 clock_xettime_LDADD = -lrt
 filter_unavailable_LDADD = -lpthread
+fstat64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -138,6 +141,8 @@ TESTS = \
 	fanotify_mark.test \
 	file_handle.test \
 	filter-unavailable.test \
+	fstat.test \
+	fstat64.test \
 	fstatat64.test \
 	ftruncate.test \
 	ftruncate64.test \
@@ -238,6 +243,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     fanotify_mark.expected \
 	     filter-unavailable.expected \
 	     fstatat.c \
+	     fstatx.c \
 	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \

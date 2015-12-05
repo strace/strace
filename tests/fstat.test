@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Check fstat syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+# strace -P is implemented using /proc/self/fd
+[ -d /proc/self/fd/ ] ||
+	framework_skip_ '/proc/self/fd/ is not available'
+
+syscall=${ME_%.test}
+run_prog > /dev/null
+OUT="$LOG.out"
+sample=$syscall.sample
+> "$sample"
+run_strace -ve$syscall -P$sample $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
+
+exit 0

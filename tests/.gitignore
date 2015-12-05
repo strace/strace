@@ -11,6 +11,8 @@ execveat
 fanotify_mark
 file_handle
 filter-unavailable
+fstat
+fstat64
 fstatat64
 ftruncate
 ftruncate64
