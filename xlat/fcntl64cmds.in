@@ -1,0 +1,4 @@
+/* asm-generic/fcntl.h */
+F_GETLK64	12
+F_SETLK64	13
+F_SETLKW64	14

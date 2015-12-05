@@ -25,33 +25,26 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include "flock.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#define FILE_LEN 4096
-#define EINVAL_STR "-1 EINVAL (Invalid argument)"
+#include <sys/syscall.h>
 
-# define TEST_SYSCALL_STR stringify(TEST_SYSCALL_NAME)
-# define stringify(arg) stringify_(arg)
-# define stringify_(arg) #arg
+#ifdef __NR_fcntl64
 
-#define TEST_SYSCALL_NR nrify(TEST_SYSCALL_NAME)
-#define nrify(arg) nrify_(arg)
-#define nrify_(arg) __NR_ ## arg
+# define TEST_SYSCALL_NAME fcntl64
+# include "struct_flock.c"
 
-#define TEST_FLOCK_EINVAL(cmd) test_flock_einval(cmd, #cmd)
+#define TEST_FLOCK64_EINVAL(cmd) test_flock64_einval(cmd, #cmd)
 
 static void
-test_flock_einval(const int cmd, const char *name)
+test_flock64_einval(const int cmd, const char *name)
 {
-	struct_kernel_flock fl = {
+	struct_kernel_flock64 fl = {
 		.l_type = F_RDLCK,
-		.l_start = (off_t) 0xdefaced1facefeed,
-		.l_len = (off_t) 0xdefaced2cafef00d
+		.l_start = 0xdefaced1facefeed,
+		.l_len = 0xdefaced2cafef00d
 	};
 	syscall(TEST_SYSCALL_NR, 0, cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
@@ -60,38 +53,57 @@ test_flock_einval(const int cmd, const char *name)
 }
 
 static void
-test_flock(void)
+test_flock64(void)
 {
-	TEST_FLOCK_EINVAL(F_SETLK);
-	TEST_FLOCK_EINVAL(F_SETLKW);
+	TEST_FLOCK64_EINVAL(F_SETLK64);
+	TEST_FLOCK64_EINVAL(F_SETLKW64);
+#ifdef F_OFD_SETLK
+	TEST_FLOCK64_EINVAL(F_OFD_SETLK);
+	TEST_FLOCK64_EINVAL(F_OFD_SETLKW);
+#endif
 
-	struct_kernel_flock fl = {
+	struct_kernel_flock64 fl = {
 		.l_type = F_RDLCK,
 		.l_len = FILE_LEN
 	};
-	int rc = syscall(TEST_SYSCALL_NR, 0, F_SETLK, &fl);
-	printf("%s(0, F_SETLK, {l_type=F_RDLCK, l_whence=SEEK_SET"
+	int rc = syscall(TEST_SYSCALL_NR, 0, F_SETLK64, &fl);
+	printf("%s(0, F_SETLK64, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = %s\n",
 	       TEST_SYSCALL_STR, FILE_LEN, rc ? EINVAL_STR : "0");
+
 	if (rc)
 		return;
 
-	syscall(TEST_SYSCALL_NR, 0, F_GETLK, &fl);
-	printf("%s(0, F_GETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
+	syscall(TEST_SYSCALL_NR, 0, F_GETLK64, &fl);
+	printf("%s(0, F_GETLK64, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d, l_pid=0}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
 
-	syscall(TEST_SYSCALL_NR, 0, F_SETLK, &fl);
-	printf("%s(0, F_SETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
+	syscall(TEST_SYSCALL_NR, 0, F_SETLK64, &fl);
+	printf("%s(0, F_SETLK64, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
 }
 
-static int
-create_sample(void)
+int
+main(void)
 {
-	char fname[] = TEST_SYSCALL_STR "_XXXXXX";
+	if (create_sample())
+		return 77;
 
-	(void) close(0);
-	return mkstemp(fname) || unlink(fname) || ftruncate(0, FILE_LEN) ? 77 : 0;
+	test_flock();
+	test_flock64();
+
+	puts("+++ exited with 0 +++");
+	return 0;
 }
+
+#else
+
+int
+main(void)
+{
+	return 77;
+}
+
+#endif

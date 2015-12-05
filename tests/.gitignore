@@ -9,6 +9,8 @@ eventfd
 execve
 execveat
 fanotify_mark
+fcntl
+fcntl64
 file_handle
 filter-unavailable
 fstat
@@ -68,7 +70,6 @@ stack-fcall
 stat
 stat64
 statfs
-struct_flock
 sysinfo
 time
 timer_create

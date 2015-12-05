@@ -34,6 +34,7 @@
 #include "xlat/f_owner_types.h"
 #include "xlat/f_seals.h"
 #include "xlat/fcntlcmds.h"
+#include "xlat/fcntl64cmds.h"
 #include "xlat/fdflags.h"
 #include "xlat/lockfcmds.h"
 #include "xlat/notifyflags.h"
@@ -86,11 +87,6 @@ print_f_owner_ex(struct tcb *tcp, const long addr)
 static int
 print_fcntl(struct tcb *tcp)
 {
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printxval(fcntlcmds, tcp->u_arg[1], "F_???");
-	}
 	switch (tcp->u_arg[1]) {
 	case F_SETFD:
 		tprints(", ");
@@ -113,8 +109,6 @@ print_fcntl(struct tcb *tcp)
 		tprints(", ");
 		printflock(tcp, tcp->u_arg[2], 0);
 		break;
-	case F_SETLK64:
-	case F_SETLKW64:
 	case F_OFD_SETLK:
 	case F_OFD_SETLKW:
 		tprints(", ");
@@ -159,7 +153,6 @@ print_fcntl(struct tcb *tcp)
 		tprints(", ");
 		printflock(tcp, tcp->u_arg[2], 1);
 		break;
-	case F_GETLK64:
 	case F_OFD_GETLK:
 		if (entering(tcp))
 			return 0;
@@ -196,10 +189,48 @@ print_fcntl(struct tcb *tcp)
 
 SYS_FUNC(fcntl)
 {
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		const char *str = xlookup(fcntlcmds, tcp->u_arg[1]);
+		if (str) {
+			tprints(str);
+		} else {
+			/*
+			 * fcntl syscall does not recognize these
+			 * constants, but we would like to show them
+			 * for better debugging experience.
+			 */
+			printxval(fcntl64cmds, tcp->u_arg[1], "F_???");
+		}
+	}
 	return print_fcntl(tcp);
 }
 
 SYS_FUNC(fcntl64)
 {
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		const char *str = xlookup(fcntl64cmds, tcp->u_arg[1]);
+		if (str) {
+			tprints(str);
+		} else {
+			printxval(fcntlcmds, tcp->u_arg[1], "F_???");
+		}
+	}
+	switch (tcp->u_arg[1]) {
+		case F_SETLK64:
+		case F_SETLKW64:
+			tprints(", ");
+			printflock64(tcp, tcp->u_arg[2], 0);
+			return RVAL_DECODED;
+		case F_GETLK64:
+			if (exiting(tcp)) {
+				tprints(", ");
+				printflock64(tcp, tcp->u_arg[2], 1);
+			}
+			return 0;
+	}
 	return print_fcntl(tcp);
 }

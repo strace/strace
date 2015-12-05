@@ -22,6 +22,8 @@ check_PROGRAMS = \
 	execve \
 	execveat \
 	fanotify_mark \
+	fcntl \
+	fcntl64 \
 	file_handle \
 	filter-unavailable \
 	fstat \
@@ -81,7 +83,6 @@ check_PROGRAMS = \
 	stat \
 	stat64 \
 	statfs \
-	struct_flock \
 	sysinfo \
 	time \
 	timer_create \
@@ -142,6 +143,8 @@ TESTS = \
 	execve.test \
 	execveat.test \
 	fanotify_mark.test \
+	fcntl.test \
+	fcntl64.test \
 	file_handle.test \
 	filter-unavailable.test \
 	fstat.test \
@@ -182,7 +185,6 @@ TESTS = \
 	stat.test \
 	stat64.test \
 	statfs.test \
-	struct_flock.test \
 	sysinfo.test \
 	membarrier.test \
 	memfd_create.test \
@@ -268,6 +270,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     signalfd.expected \
 	     statfs.expected \
 	     statx.sh \
+	     struct_flock.c \
 	     sun_path.expected \
 	     uid.awk \
 	     uio.expected \
