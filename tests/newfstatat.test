@@ -2,4 +2,4 @@
 
 # Check newfstatat syscall decoding.
 
-. "${srcdir=.}/fstatat64.test"
+. "${srcdir=.}/statx.sh"

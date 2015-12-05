@@ -256,6 +256,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sigaltstack.expected \
 	     signalfd.expected \
 	     statfs.expected \
+	     statx.sh \
 	     sun_path.expected \
 	     uid.awk \
 	     uio.expected \
@@ -264,6 +265,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     unix-yy-connect.awk \
 	     wait.expected \
 	     xattr.expected \
+	     xstatx.c \
 	     $(TESTS)
 
 CLEANFILES = $(TESTS:=.tmp)

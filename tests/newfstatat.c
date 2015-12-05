@@ -4,9 +4,9 @@
 
 #include <sys/syscall.h>
 
-#undef FSTATAT_NAME
+#undef TEST_SYSCALL_NAME
 #ifdef __NR_newfstatat
-# define FSTATAT_NAME "newfstatat"
+# define TEST_SYSCALL_NAME newfstatat
 #endif
 
 #include "fstatat.c"
