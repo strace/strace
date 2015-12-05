@@ -90,108 +90,108 @@ print_fcntl(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		printxval(fcntlcmds, tcp->u_arg[1], "F_???");
-		switch (tcp->u_arg[1]) {
-		case F_SETFD:
-			tprints(", ");
-			printflags(fdflags, tcp->u_arg[2], "FD_???");
-			break;
-		case F_SETOWN:
-		case F_SETPIPE_SZ:
-			tprintf(", %ld", tcp->u_arg[2]);
-			break;
-		case F_DUPFD:
-		case F_DUPFD_CLOEXEC:
-			tprintf(", %ld", tcp->u_arg[2]);
-			return RVAL_DECODED | RVAL_FD;
-		case F_SETFL:
-			tprints(", ");
-			tprint_open_modes(tcp->u_arg[2]);
-			break;
-		case F_SETLK:
-		case F_SETLKW:
-			tprints(", ");
-			printflock(tcp, tcp->u_arg[2], 0);
-			break;
-		case F_SETLK64:
-		case F_SETLKW64:
-		case F_OFD_SETLK:
-		case F_OFD_SETLKW:
-			tprints(", ");
-			printflock64(tcp, tcp->u_arg[2], 0);
-			break;
-		case F_SETOWN_EX:
-			tprints(", ");
-			print_f_owner_ex(tcp, tcp->u_arg[2]);
-			break;
-		case F_NOTIFY:
-			tprints(", ");
-			printflags(notifyflags, tcp->u_arg[2], "DN_???");
-			break;
-		case F_SETLEASE:
-			tprints(", ");
-			printxval(lockfcmds, tcp->u_arg[2], "F_???");
-			break;
-		case F_ADD_SEALS:
-			tprints(", ");
-			printflags(f_seals, tcp->u_arg[2], "F_SEAL_???");
-			break;
-		case F_SETSIG:
-			tprints(", ");
-			tprints(signame(tcp->u_arg[2]));
-			break;
-		case F_GETOWN:
-		case F_GETPIPE_SZ:
-			break;
-		default:
-			return 0;
-		}
-		return RVAL_DECODED;
-	} else {
-		switch (tcp->u_arg[1]) {
-		case F_GETFD:
-			if (syserror(tcp) || tcp->u_rval == 0)
-				return 0;
-			tcp->auxstr = sprintflags("flags ", fdflags, tcp->u_rval);
-			return RVAL_HEX | RVAL_STR;
-		case F_GETFL:
-			if (syserror(tcp))
-				return 0;
-			tcp->auxstr = sprint_open_modes(tcp->u_rval);
-			return RVAL_HEX | RVAL_STR;
-		case F_GETLK:
-			tprints(", ");
-			printflock(tcp, tcp->u_arg[2], 1);
-			break;
-		case F_GETLK64:
-		case F_OFD_GETLK:
-			tprints(", ");
-			printflock64(tcp, tcp->u_arg[2], 1);
-			break;
-		case F_GETOWN_EX:
-			tprints(", ");
-			print_f_owner_ex(tcp, tcp->u_arg[2]);
-			break;
-		case F_GETLEASE:
-			if (syserror(tcp))
-				return 0;
-			tcp->auxstr = xlookup(lockfcmds, tcp->u_rval);
-			return RVAL_HEX | RVAL_STR;
-		case F_GET_SEALS:
-			if (syserror(tcp) || tcp->u_rval == 0)
-				return 0;
-			tcp->auxstr = sprintflags("seals ", f_seals, tcp->u_rval);
-			return RVAL_HEX | RVAL_STR;
-		case F_GETSIG:
-			if (syserror(tcp) || tcp->u_rval == 0)
-				return 0;
-			tcp->auxstr = signame(tcp->u_rval);
-			return RVAL_STR;
-		default:
-			tprintf(", %#lx", tcp->u_arg[2]);
-			break;
-		}
 	}
-	return 0;
+	switch (tcp->u_arg[1]) {
+	case F_SETFD:
+		tprints(", ");
+		printflags(fdflags, tcp->u_arg[2], "FD_???");
+		break;
+	case F_SETOWN:
+	case F_SETPIPE_SZ:
+		tprintf(", %ld", tcp->u_arg[2]);
+		break;
+	case F_DUPFD:
+	case F_DUPFD_CLOEXEC:
+		tprintf(", %ld", tcp->u_arg[2]);
+		return RVAL_DECODED | RVAL_FD;
+	case F_SETFL:
+		tprints(", ");
+		tprint_open_modes(tcp->u_arg[2]);
+		break;
+	case F_SETLK:
+	case F_SETLKW:
+		tprints(", ");
+		printflock(tcp, tcp->u_arg[2], 0);
+		break;
+	case F_SETLK64:
+	case F_SETLKW64:
+	case F_OFD_SETLK:
+	case F_OFD_SETLKW:
+		tprints(", ");
+		printflock64(tcp, tcp->u_arg[2], 0);
+		break;
+	case F_SETOWN_EX:
+		tprints(", ");
+		print_f_owner_ex(tcp, tcp->u_arg[2]);
+		break;
+	case F_NOTIFY:
+		tprints(", ");
+		printflags(notifyflags, tcp->u_arg[2], "DN_???");
+		break;
+	case F_SETLEASE:
+		tprints(", ");
+		printxval(lockfcmds, tcp->u_arg[2], "F_???");
+		break;
+	case F_ADD_SEALS:
+		tprints(", ");
+		printflags(f_seals, tcp->u_arg[2], "F_SEAL_???");
+		break;
+	case F_SETSIG:
+		tprints(", ");
+		tprints(signame(tcp->u_arg[2]));
+		break;
+	case F_GETOWN:
+	case F_GETPIPE_SZ:
+		break;
+	case F_GETFD:
+		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+		tcp->auxstr = sprintflags("flags ", fdflags, tcp->u_rval);
+		return RVAL_HEX | RVAL_STR;
+	case F_GETFL:
+		if (entering(tcp) || syserror(tcp))
+			return 0;
+		tcp->auxstr = sprint_open_modes(tcp->u_rval);
+		return RVAL_HEX | RVAL_STR;
+	case F_GETLK:
+		if (entering(tcp))
+			return 0;
+		tprints(", ");
+		printflock(tcp, tcp->u_arg[2], 1);
+		break;
+	case F_GETLK64:
+	case F_OFD_GETLK:
+		if (entering(tcp))
+			return 0;
+		tprints(", ");
+		printflock64(tcp, tcp->u_arg[2], 1);
+		break;
+	case F_GETOWN_EX:
+		if (entering(tcp))
+			return 0;
+		tprints(", ");
+		print_f_owner_ex(tcp, tcp->u_arg[2]);
+		break;
+	case F_GETLEASE:
+		if (entering(tcp) || syserror(tcp))
+			return 0;
+		tcp->auxstr = xlookup(lockfcmds, tcp->u_rval);
+		return RVAL_HEX | RVAL_STR;
+	case F_GET_SEALS:
+		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+		tcp->auxstr = sprintflags("seals ", f_seals, tcp->u_rval);
+		return RVAL_HEX | RVAL_STR;
+	case F_GETSIG:
+		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+		tcp->auxstr = signame(tcp->u_rval);
+		return RVAL_STR;
+	default:
+		tprintf(", %#lx", tcp->u_arg[2]);
+		break;
+	}
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(fcntl)
