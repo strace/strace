@@ -79,7 +79,7 @@ check_PROGRAMS = \
 	sigreturn \
 	stack-fcall \
 	stat \
-	stat32 \
+	stat64 \
 	statfs \
 	struct_flock \
 	sysinfo \
@@ -118,7 +118,7 @@ mmap64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt
 newfstatat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS)
-stat_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
+stat64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
 times_LDADD = -lrt
 truncate64_CFLAGS = $(AM_CFLAGS) -D_FILE_OFFSET_BITS=64
@@ -180,8 +180,7 @@ TESTS = \
 	signalfd.test \
 	sigreturn.test \
 	stat.test \
-	stat32-v.test \
-	stat64-v.test \
+	stat64.test \
 	statfs.test \
 	struct_flock.test \
 	sysinfo.test \
