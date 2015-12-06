@@ -13,6 +13,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <sys/syscall.h>
 #include <sys/times.h>
 #include <sys/wait.h>
 
@@ -61,16 +62,32 @@ main (void)
 	}
 
 	struct tms tbuf;
+	unsigned long long llres;
+
+	/*
+	 * On systems where user's and kernel's long types are the same,
+	 * prefer direct times syscall over libc's times function because
+	 * the latter is more prone to return value truncation.
+	 */
+#if !defined __NR_times \
+ || defined LINUX_MIPSN32 \
+ || defined __x86_64__ && defined __ILP32__
 	clock_t res = times(&tbuf);
 
-	if (res == (clock_t) -1)
+	if ((clock_t) -1 == res)
 		return 77;
-
-	unsigned long long llres;
-	if (sizeof(llres) > sizeof(res))
+	if (sizeof(res) < sizeof(unsigned long long))
 		llres = (unsigned long) res;
 	else
 		llres = res;
+#else
+	long res = syscall(__NR_times, &tbuf);
+
+	if (-1L == res)
+		return 77;
+	else
+		llres = (unsigned long) res;
+#endif
 
 	printf("times({tms_utime=%llu, tms_stime=%llu, ",
 		(unsigned long long) tbuf.tms_utime,
