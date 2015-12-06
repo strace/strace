@@ -53,9 +53,7 @@ SYS_FUNC(prctl)
 	case PR_GET_SECCOMP:
 	case PR_GET_TIMERSLACK:
 	case PR_GET_TIMING:
-		if (entering(tcp))
-			break;
-		return syserror(tcp) ? 0 : RVAL_UDECIMAL;
+		return RVAL_DECODED;
 
 	case PR_GET_CHILD_SUBREAPER:
 	case PR_GET_ENDIAN:
@@ -139,17 +137,10 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_CAPBSET_DROP:
+	case PR_CAPBSET_READ:
 		tprints(", ");
 		printxval(cap, tcp->u_arg[1], "CAP_???");
 		return RVAL_DECODED;
-
-	case PR_CAPBSET_READ:
-		if (entering(tcp)) {
-			tprints(", ");
-			printxval(cap, tcp->u_arg[1], "CAP_???");
-			break;
-		}
-		return syserror(tcp) ? 0 : RVAL_UDECIMAL;
 
 	case PR_MCE_KILL:
 		tprints(", ");
@@ -250,14 +241,6 @@ SYS_FUNC(prctl)
 		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
-	case PR_GET_NO_NEW_PRIVS:
-	case PR_GET_THP_DISABLE:
-		if (entering(tcp)) {
-			print_prctl_args(tcp, 1);
-			return 0;
-		}
-		return syserror(tcp) ? 0 : RVAL_UDECIMAL;
-
 	case PR_MCE_KILL_GET:
 		if (entering(tcp)) {
 			print_prctl_args(tcp, 1);
@@ -268,6 +251,8 @@ SYS_FUNC(prctl)
 		tcp->auxstr = xlookup(pr_mce_kill_policy, tcp->u_rval);
 		return tcp->auxstr ? RVAL_STR : RVAL_UDECIMAL;
 
+	case PR_GET_NO_NEW_PRIVS:
+	case PR_GET_THP_DISABLE:
 	case PR_MPX_DISABLE_MANAGEMENT:
 	case PR_MPX_ENABLE_MANAGEMENT:
 	default:
