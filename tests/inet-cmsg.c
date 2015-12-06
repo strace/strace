@@ -103,7 +103,10 @@ main(void)
 		.sin_addr.s_addr = htonl(INADDR_LOOPBACK)
 	};
 	socklen_t len = sizeof(addr);
-	assert(!bind(0, (struct sockaddr *) &addr, len));
+	if (bind(0, (struct sockaddr *) &addr, len)) {
+		perror("bind");
+		return 77;
+	}
 	assert(!getsockname(0, (struct sockaddr *) &addr, &len));
 
 	assert(socket(PF_INET, SOCK_DGRAM, 0) == 3);
