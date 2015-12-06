@@ -18,37 +18,37 @@
 
 enum {
 	NUM_USER_ITERS = 1000000,
-	CPUTIME_LIMIT_SEC = 2,
+	PARENT_CPUTIME_LIMIT_NSEC = 200000000,
+	CHILD_CPUTIME_LIMIT_NSEC = 300000000
 };
 
 int
 main (void)
 {
-	struct tms tbuf;
 	struct timespec ts;
-	clock_t res;
-	unsigned long long llres;
 	volatile int dummy;
-	pid_t pid;
 	int i;
 
-	pid = fork();
+	pid_t pid = fork();
 
 	if (pid < 0)
 		return 77;
 
+	const long cputime_limit =
+		pid ? PARENT_CPUTIME_LIMIT_NSEC : CHILD_CPUTIME_LIMIT_NSEC;
+
 	/* Enjoying my user time */
 	while (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
-		if (ts.tv_sec >= CPUTIME_LIMIT_SEC)
+		if (ts.tv_sec || ts.tv_nsec >= cputime_limit)
 			break;
 
-		for (i = 0; i < NUM_USER_ITERS; i++, dummy++)
-			;
+		for (i = 0; i < NUM_USER_ITERS; ++i)
+			++dummy;
 	}
 
 	/* Enjoying my system time */
 	while (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
-		if (ts.tv_sec >= (CPUTIME_LIMIT_SEC * 2))
+		if (ts.tv_sec || ts.tv_nsec >= cputime_limit * 2)
 			break;
 
 		sched_yield();
@@ -60,11 +60,13 @@ main (void)
 		wait(NULL);
 	}
 
-	res = times(&tbuf);
+	struct tms tbuf;
+	clock_t res = times(&tbuf);
 
 	if (res == (clock_t) -1)
 		return 77;
 
+	unsigned long long llres;
 	if (sizeof(llres) > sizeof(res))
 		llres = (unsigned long) res;
 	else
