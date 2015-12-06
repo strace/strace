@@ -3,11 +3,12 @@
 #include <sys/prctl.h>
 
 #include "xlat/prctl_options.h"
-#include "xlat/pr_unalign_flags.h"
+#include "xlat/pr_cap_ambient.h"
 #include "xlat/pr_mce_kill.h"
 #include "xlat/pr_mce_kill_policy.h"
 #include "xlat/pr_set_mm.h"
 #include "xlat/pr_tsc.h"
+#include "xlat/pr_unalign_flags.h"
 
 #ifndef TASK_COMM_LEN
 # define TASK_COMM_LEN 16
@@ -140,6 +141,23 @@ SYS_FUNC(prctl)
 	case PR_CAPBSET_READ:
 		tprints(", ");
 		printxval(cap, tcp->u_arg[1], "CAP_???");
+		return RVAL_DECODED;
+
+	case PR_CAP_AMBIENT:
+		tprints(", ");
+		printxval(pr_cap_ambient, tcp->u_arg[1], "PR_CAP_AMBIENT_???");
+		switch (tcp->u_arg[1]) {
+		case PR_CAP_AMBIENT_RAISE:
+		case PR_CAP_AMBIENT_LOWER:
+		case PR_CAP_AMBIENT_IS_SET:
+			tprints(", ");
+			printxval(cap, tcp->u_arg[2], "CAP_???");
+			print_prctl_args(tcp, 3);
+			break;
+		default:
+			print_prctl_args(tcp, 2);
+			break;
+		}
 		return RVAL_DECODED;
 
 	case PR_MCE_KILL:
