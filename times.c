@@ -12,13 +12,18 @@ SYS_FUNC(times)
 		return 0;
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
-		tprintf("{tms_utime=%llu, tms_stime=%llu, ",
+		tprintf("{tms_utime=%Lu, tms_stime=%Lu, ",
 			(unsigned long long) tbuf.tms_utime,
 			(unsigned long long) tbuf.tms_stime);
-		tprintf("tms_cutime=%llu, tms_cstime=%llu}",
+		tprintf("tms_cutime=%Lu, tms_cstime=%Lu}",
 			(unsigned long long) tbuf.tms_cutime,
 			(unsigned long long) tbuf.tms_cstime);
 	}
 
-	return syserror(tcp) ? RVAL_DECIMAL : RVAL_UDECIMAL;
+	return syserror(tcp) ? RVAL_DECIMAL :
+#if defined(RVAL_LUDECIMAL) && !defined(IN_MPERS)
+			       RVAL_LUDECIMAL;
+#else
+			       RVAL_UDECIMAL;
+#endif
 }
