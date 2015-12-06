@@ -5,7 +5,7 @@ BEGIN {
 
   r_i = "[1-9][0-9]*"
   r_socket = "^socket\\(PF_(LOCAL|UNIX|FILE), SOCK_STREAM, 0\\) += 1<UNIX:\\[(" r_i ")\\]>$"
-  r_close_listen = "^close\\(0<UNIX:[" r_i ",\"" addr "\"]>\\) += 0$"
+  r_close_listen = "^close\\(0<UNIX:\\[" r_i ",\"" addr "\"\\]>\\) += 0$"
 }
 
 NR == 1 {
