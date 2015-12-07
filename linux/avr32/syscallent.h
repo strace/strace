@@ -47,7 +47,7 @@
 [ 19] = { 5,	TD,		SEN(llseek),			"_llseek"		},
 [ 20] = { 0,	0,		SEN(getpid),			"getpid"		},
 [ 21] = { 5,	TF,		SEN(mount),			"mount"			},
-[ 22] = { 1,	TF,		SEN(umount),			"umount"		},
+[ 22] = { 1,	TF,		SEN(umount2),			"umount2"		},
 [ 23] = { 1,	0,		SEN(setuid),			"setuid"		},
 [ 24] = { 0,	NF,		SEN(getuid),			"getuid"		},
 [ 25] = { 1,	0,		SEN(stime),			"stime"			},
