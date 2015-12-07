@@ -8,7 +8,7 @@
 
 SYS_FUNC(umount2)
 {
-	printstr(tcp, tcp->u_arg[0], -1);
+	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	printflags(umount_flags, tcp->u_arg[1], "MNT_???");
 
