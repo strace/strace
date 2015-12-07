@@ -96,6 +96,8 @@ check_PROGRAMS = \
 	uid16 \
 	uid32 \
 	uio \
+	umount \
+	umount2 \
 	umovestr \
 	umovestr2 \
 	unix-pair-send-recv \
@@ -210,6 +212,8 @@ TESTS = \
 	times-fail.test \
 	truncate.test \
 	truncate64.test \
+	umount.test \
+	umount2.test \
 	umovestr.test \
 	umovestr2.test \
 	unix-yy.test \

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Check umount syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+case "$STRACE_ARCH" in
+	alpha) syscall=oldumount ;;
+	*) syscall=umount ;;
+esac
+OUT="$LOG.out"
+run_strace -a24 -s6 -e$syscall $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
+
+exit 0

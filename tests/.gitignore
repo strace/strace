@@ -83,6 +83,8 @@ uid
 uid16
 uid32
 uio
+umount
+umount2
 umovestr
 umovestr2
 unix-pair-send-recv
