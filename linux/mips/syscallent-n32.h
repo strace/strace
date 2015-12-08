@@ -216,7 +216,7 @@
 [6213] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [6214] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [6215] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
-[6216] = { 4,	TD,		SEN(fadvise64),			"fadvise64"		},
+[6216] = { 4,	TD,		SEN(fadvise64_64),		"fadvise64"		},
 [6217] = { 3,	TF,		SEN(statfs64),			"statfs64"		},
 [6218] = { 3,	TD,		SEN(fstatfs64),			"fstatfs64"		},
 [6219] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},

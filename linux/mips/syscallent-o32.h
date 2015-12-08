@@ -254,7 +254,7 @@
 [4251] = { 5,	TM|SI,		SEN(remap_file_pages),		"remap_file_pages"	},
 [4252] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [4253] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
-[4254] = { 7,	TD,		SEN(fadvise64_64),		"fadvise64_64"		},
+[4254] = { 7,	TD,		SEN(fadvise64_64),		"fadvise64"		},
 [4255] = { 3,	TF,		SEN(statfs64),			"statfs64"		},
 [4256] = { 2,	TD,		SEN(fstatfs64),			"fstatfs64"		},
 [4257] = { 3,	0,		SEN(timer_create),		"timer_create"		},
