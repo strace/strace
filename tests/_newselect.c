@@ -5,8 +5,8 @@
 #include <sys/syscall.h>
 
 #undef TEST_SYSCALL_NAME
-#if defined __NR_select && !defined __NR__newselect
-# define TEST_SYSCALL_NAME select
+#ifdef __NR__newselect
+# define TEST_SYSCALL_NAME _newselect
 #endif
 
 #include "xselect.c"

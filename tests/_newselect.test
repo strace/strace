@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check _newselect syscall decoding.
+
+. "${srcdir=.}/select.test"

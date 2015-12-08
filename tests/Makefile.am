@@ -14,6 +14,7 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 AM_LDFLAGS = $(ARCH_MFLAGS)
 
 check_PROGRAMS = \
+	_newselect \
 	adjtimex \
 	aio \
 	bpf \
@@ -136,6 +137,7 @@ TESTS = \
 	strace-f.test \
 	qual_syscall.test \
 	\
+	_newselect.test \
 	adjtimex.test \
 	aio.test \
 	bexecve.test \
@@ -288,6 +290,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     unix-yy-connect.awk \
 	     wait.expected \
 	     xattr.expected \
+	     xselect.c \
 	     xstatx.c \
 	     $(TESTS)
 

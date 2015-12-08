@@ -144,7 +144,7 @@
 [139] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},
 [140] = { 5,	TD,		SEN(llseek),			"_llseek"		},
 [141] = { 3,	TD,		SEN(getdents),			"getdents"		},
-[142] = { 5,	TD,		SEN(select),			"select"		},
+[142] = { 5,	TD,		SEN(select),			"_newselect"		},
 [143] = { 2,	TD,		SEN(flock),			"flock"			},
 [144] = { 3,	TM,		SEN(msync),			"msync"			},
 [145] = { 3,	TD,		SEN(readv),			"readv"			},

@@ -142,7 +142,7 @@
 [4139] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},
 [4140] = { 5,	TD,		SEN(llseek),			"_llseek"		},
 [4141] = { 3,	TD,		SEN(getdents),			"getdents"		},
-[4142] = { 5,	TD,		SEN(select),			"select"		},
+[4142] = { 5,	TD,		SEN(select),			"_newselect"		},
 [4143] = { 2,	TD,		SEN(flock),			"flock"			},
 [4144] = { 3,	TM,		SEN(msync),			"msync"			},
 [4145] = { 3,	TD,		SEN(readv),			"readv"			},

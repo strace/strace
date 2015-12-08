@@ -228,7 +228,7 @@
 [227] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},
 [228] = { 1,	NF,		SEN(setfsuid16),		"setfsuid"		},
 [229] = { 1,	NF,		SEN(setfsgid16),		"setfsgid"		},
-[230] = { 5,	TD,		SEN(select),			"select"		},
+[230] = { 5,	TD,		SEN(select),			"_newselect"		},
 [231] = { 1,	0,		SEN(time),			"time"			},
 [232] = { 6,	TD,		SEN(splice),			"splice"		},
 [233] = { 1,	0,		SEN(stime),			"stime"			},
