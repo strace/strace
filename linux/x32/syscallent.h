@@ -58,7 +58,7 @@
 [ 57] = { 0,	TP,		SEN(fork),			"fork"			},
 [ 58] = { 0,	TP,		SEN(vfork),			"vfork"			},
 [ 59] = { 3,	TF|TP|SE|SI,	SEN(printargs),			"64:execve"		},
-[ 60] = { 1,	TP|SE,		SEN(exit),			"_exit"			},
+[ 60] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [ 61] = { 4,	TP,		SEN(wait4),			"wait4"			},
 [ 62] = { 2,	TS,		SEN(kill),			"kill"			},
 [ 63] = { 1,	0,		SEN(uname),			"uname"			},

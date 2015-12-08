@@ -29,7 +29,7 @@
  */
 
 [  0] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
-[  1] = { 1,	TP|SE,		SEN(exit),			"_exit"			},
+[  1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [  2] = { 0,	TP,		SEN(fork),			"fork"			},
 [  3] = { 3,	TD,		SEN(read),			"read"			},
 [  4] = { 3,	TD,		SEN(write),			"write"			},
