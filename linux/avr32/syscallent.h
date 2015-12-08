@@ -115,7 +115,7 @@
 [ 87] = { 5,	TD,		SEN(pwrite),			"pwrite"		},
 [ 88] = { 2,	TF,		SEN(swapon),			"swapon"		},
 [ 89] = { 4,	0,		SEN(reboot),			"reboot"		},
-[ 90] = { 6,	TD|TM|SI,	SEN(mmap_pgoff),		"mmap"			},
+[ 90] = { 6,	TD|TM|SI,	SEN(mmap_pgoff),		"mmap2"			},
 [ 91] = { 2,	TM|SI,		SEN(munmap),			"munmap"		},
 [ 92] = { 2,	TF,		SEN(truncate),			"truncate"		},
 [ 93] = { 2,	TD,		SEN(ftruncate),			"ftruncate"		},

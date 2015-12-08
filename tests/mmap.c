@@ -33,7 +33,7 @@ main(void)
 		return 77;
 
 	if (sizeof(offset) == sizeof(int))
-		printf("(mmap2?|old_mmap)\\(%p, %lu, PROT_READ\\|PROT_WRITE, "
+		printf("mmap2?\\(%p, %lu, PROT_READ\\|PROT_WRITE, "
 		       "MAP_PRIVATE\\|MAP_ANONYMOUS, %d, %#x\\) = %p\n",
 		       addr, length, fd, (unsigned int) offset, p);
 	else
