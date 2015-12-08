@@ -171,7 +171,7 @@
 [176] = { 1,	TF,		SEN(umount),			"umount"		},
 [177] = { 1,	TF,		SEN(swapoff),			"swapoff"		},
 [178] = { 0,	0,		SEN(sync),			"sync"			},
-[179] = { },
+[179] = { 1,	TD,		SEN(syncfs),			"syncfs"		},
 [180] = { 1,	NF,		SEN(setfsuid),			"setfsuid"		},
 [181] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},
 [182] = { 3,	0,		SEN(sysfs),			"sysfs"			},
