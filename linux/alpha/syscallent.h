@@ -126,7 +126,7 @@
 [ 97] = { 3,	TN,		SEN(socket),			"socket"		},
 [ 98] = { 3,	TN,		SEN(connect),			"connect"		},
 [ 99] = { 3,	TN,		SEN(accept),			"accept"		},
-[100] = { 2,	0,		SEN(getpriority),		"osf_getpriority"	},
+[100] = { 2,	0,		SEN(getpriority),		"getpriority"		},
 [101] = { 4,	TN,		SEN(send),			"send"			},
 [102] = { 4,	TN,		SEN(recv),			"recv"			},
 [103] = { 0,	TS,		SEN(sigreturn),			"sigreturn"		},
@@ -227,7 +227,12 @@
 [221] = { },
 [222] = { 5,	0,		SEN(printargs),			"osf_security"		}, /*not implemented */
 [223] = { 5,	0,		SEN(printargs),			"osf_kloadcall"		}, /*not implemented */
-[224 ... 232] = { },
+[224] = { 5,	0,		SEN(printargs),			"osf_stat"		}, /*not implemented */
+[225] = { 5,	0,		SEN(printargs),			"osf_lstat"		}, /*not implemented */
+[226] = { 5,	0,		SEN(printargs),			"osf_fstat"		}, /*not implemented */
+[227] = { 5,	0,		SEN(printargs),			"osf_statfs64"		}, /*not implemented */
+[228] = { 5,	0,		SEN(printargs),			"osf_fstatfs64"		}, /*not implemented */
+[229 ... 232] = { },
 [233] = { 1,	0,		SEN(getpgid),			"getpgid"		},
 [234] = { 1,	0,		SEN(getsid),			"getsid"		},
 [235] = { 5,	TS,		SEN(sigaltstack),		"sigaltstack"		},
@@ -250,7 +255,7 @@
 [252] = { 5,	0,		SEN(printargs),			"osf_audcntl"		}, /*not implemented */
 [253] = { 5,	0,		SEN(printargs),			"osf_audgen"		}, /*not implemented */
 [254] = { 3,	0,		SEN(sysfs),			"sysfs"			},
-[255] = { 5,	0,		SEN(printargs),			"osf_subsysinfo"	}, /*not implemented */
+[255] = { 5,	0,		SEN(printargs),			"osf_subsys_info"	}, /*not implemented */
 [256] = { 5,	0,		SEN(printargs),			"osf_getsysinfo"	},
 [257] = { 5,	0,		SEN(printargs),			"osf_setsysinfo"	},
 [258] = { 5,	0,		SEN(printargs),			"osf_afs_syscall"	}, /*not implemented */
@@ -261,7 +266,7 @@
 [300] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [301] = { 3,	0,		SEN(printargs),			"sethae"		},
 [302] = { 5,	TF,		SEN(mount),			"mount"			},
-[303] = { 1,	0,		SEN(adjtimex),			"adjtimex32"		},
+[303] = { 1,	0,		SEN(adjtimex),			"old_adjtimex"		},
 [304] = { 1,	TF,		SEN(swapoff),			"swapoff"		},
 [305] = { 3,	TD,		SEN(getdents),			"getdents"		},
 [306] = { 2,	0,		SEN(create_module),		"create_module"		},
@@ -277,8 +282,8 @@
 [316] = { 1,	TM,		SEN(mlockall),			"mlockall"		},
 [317] = { 0,	TM,		SEN(munlockall),		"munlockall"		},
 [318] = { 1,	0,		SEN(sysinfo),			"sysinfo"		},
-[319] = { 1,	0,		SEN(sysctl),			"sysctl"		},
-[320] = { 0,	0,		SEN(idle),			"idle"			},
+[319] = { 1,	0,		SEN(sysctl),			"_sysctl"		},
+[320] = { },
 [321] = { 1,	TF,		SEN(umount),			"oldumount"		},
 [322] = { 2,	TF,		SEN(swapon),			"swapon"		},
 [323] = { 1,	0,		SEN(times),			"times"			},
