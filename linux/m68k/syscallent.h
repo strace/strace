@@ -360,7 +360,7 @@
 [332] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
 [333] = { 0,	0,		SEN(get_thread_area),		"get_thread_area"	},
 [334] = { 1,	0,		SEN(set_thread_area),		"set_thread_area"	},
-[335] = { 6,	0,		SEN(printargs),			"atomic_comxchg_32"	},
+[335] = { 6,	0,		SEN(printargs),			"atomic_cmpxchg_32"	},
 [336] = { 0,	0,		SEN(printargs),			"atomic_barrier"	},
 [337] = { 2,	TD,		SEN(fanotify_init),		"fanotify_init"		},
 [338] = { 6,	TD|TF,		SEN(fanotify_mark),		"fanotify_mark"		},
