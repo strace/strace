@@ -335,7 +335,7 @@
 [1122] = { 2,	TD,		SEN(fstat),			"fstat"			},
 [1123] = { 0,	0,		SEN(vhangup),			"vhangup"		},
 [1124] = { 3,	TF,		SEN(chown),			"lchown"		},
-[1125] = { 5,	0,		SEN(vm86),			"vm86"			},
+[1125] = { 5,	TM|SI,		SEN(remap_file_pages),		"remap_file_pages"	},
 [1126] = { 4,	TP,		SEN(wait4),			"wait4"			},
 [1127] = { 1,	0,		SEN(sysinfo),			"sysinfo"		},
 [1128] = { 5,	TP,		SEN(clone),			"clone"			},
