@@ -399,7 +399,8 @@
 [375] = { 1,	TI|TM|SI,	SEN(shmdt),			"shmdt"			},
 [376] = { 3,	TI,		SEN(shmget),			"shmget"		},
 [377] = { 3,	TI,		SEN(shmctl),			"shmctl"		},
-[378 ... 399] = { },
+[378] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[379 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
