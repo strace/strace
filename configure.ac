@@ -16,6 +16,8 @@ AC_USE_SYSTEM_EXTENSIONS
 AC_PROG_RANLIB
 
 AC_MSG_CHECKING([for supported architecture])
+arch_m32=
+arch_mx32=
 case "$host_cpu" in
 bfin)
 	arch=bfin
@@ -35,6 +37,7 @@ m68k)
 	;;
 sparc64*)
 	arch=sparc64
+	arch_m32=sparc
 	AC_DEFINE([SPARC64], 1, [Define for the SPARC64 architecture.])
 	;;
 sparc*)
@@ -60,6 +63,7 @@ powerpc*)
 # error 32 bit
 #endif], [], arch=powerpc64, arch=powerpc)
 	if test "$arch" = "powerpc64"; then
+		arch_m32=powerpc
 		AC_DEFINE([POWERPC64], 1, [Define for the PowerPC64 architecture.])
 	fi
 	;;
@@ -69,6 +73,7 @@ arm*)
 	;;
 aarch64*)
 	arch=aarch64
+	arch_m32=arm
 	AC_DEFINE([AARCH64], 1, [Define for the AArch64 architecture.])
 	;;
 avr32*)
@@ -100,11 +105,13 @@ sh*)
 	AC_DEFINE([SH], 1, [Define for the SH architecture.])
 	;;
 x86?64*)
+	arch_m32=i386
 	AC_TRY_COMPILE(
 [#ifndef __ILP32__
 # error not x32
 #endif], [], arch=x32, arch=x86_64)
 	if test "$arch" = "x86_64"; then
+		arch_mx32=x32
 		AC_DEFINE([X86_64], 1, [Define for the 64bit AMD x86-64 architecture.])
 	else
 		AC_DEFINE([X32], 1, [Define for the 32bit AMD x86-64 architecture.])
@@ -148,7 +155,13 @@ xtensa*)
 esac
 AC_MSG_RESULT($arch)
 
+test -n "$arch_m32" ||
+	arch_m32=$arch
+test -n "$arch_mx32" ||
+	arch_mx32=$arch
 AC_SUBST(arch)
+AC_SUBST(arch_m32)
+AC_SUBST(arch_mx32)
 
 if test "$arch" = mips; then
 	AC_CACHE_CHECK([for _MIPS_SIM], [st_cv__MIPS_SIM],
