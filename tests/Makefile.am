@@ -135,9 +135,10 @@ stack_fcall_SOURCES = stack-fcall.c \
 TESTS = \
 	strace-f.test \
 	qual_syscall.test \
-	bexecve.test \
+	\
 	adjtimex.test \
 	aio.test \
+	bexecve.test \
 	bpf.test \
 	caps.test \
 	clock_nanosleep.test \
@@ -165,13 +166,28 @@ TESTS = \
 	ip_mreq.test \
 	ipc_msg.test \
 	ipc_msgbuf.test \
-	ipc_shm.test \
 	ipc_sem.test \
+	ipc_shm.test \
 	llseek.test \
 	lseek.test \
 	lstat.test \
 	lstat64.test \
+	membarrier.test \
+	memfd_create.test \
+	mlock2.test \
+	mmap.test \
+	mmap64.test \
+	mmsg.test \
 	mq.test \
+	nanosleep.test \
+	net-fd.test \
+	net-yy.test \
+	net.test \
+	newfstatat.test \
+	oldselect.test \
+	pc.test \
+	pipe.test \
+	ppoll.test \
 	pselect6.test \
 	readdir.test \
 	readlink.test \
@@ -190,40 +206,25 @@ TESTS = \
 	stat.test \
 	stat64.test \
 	statfs.test \
-	sysinfo.test \
-	membarrier.test \
-	memfd_create.test \
-	mlock2.test \
-	mmap.test \
-	mmap64.test \
-	mmsg.test \
-	nanosleep.test \
-	net.test \
-	net-fd.test \
-	net-yy.test \
-	newfstatat.test \
-	oldselect.test \
-	pipe.test \
-	pc.test \
-	ppoll.test \
 	sun_path.test \
+	sysinfo.test \
 	time.test \
 	timer_create.test \
 	timer_xettime.test \
 	timerfd_xettime.test \
-	times.test \
 	times-fail.test \
+	times.test \
 	truncate.test \
 	truncate64.test \
+	uid.test \
+	uid16.test \
+	uid32.test \
+	uio.test \
 	umount.test \
 	umount2.test \
 	umovestr.test \
 	umovestr2.test \
 	unix-yy.test \
-	uid.test \
-	uid16.test \
-	uid32.test \
-	uio.test \
 	userfaultfd.test \
 	utime.test \
 	utimensat.test \
@@ -232,6 +233,7 @@ TESTS = \
 	xet_robust_list.test \
 	xetitimer.test \
 	xettimeofday.test \
+	\
 	count.test \
 	detach-sleeping.test \
 	detach-stopped.test \

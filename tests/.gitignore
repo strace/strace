@@ -1,3 +1,10 @@
+*.log
+*.log.*
+*.o
+*.tmp
+*.tmp-*
+*.tmp.*
+*.trs
 adjtimex
 aio
 bpf
@@ -96,10 +103,3 @@ xattr
 xet_robust_list
 xetitimer
 xettimeofday
-*.log
-*.log.*
-*.o
-*.tmp
-*.tmp-*
-*.tmp.*
-*.trs
