@@ -26,7 +26,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-[  0] = { 0,	0,		SEN(setup),			"setup"			},
+[  0] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [  1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [  2] = { 0,	TP,		SEN(fork),			"fork"			},
 [  3] = { 3,	TD,		SEN(read),			"read"			},
@@ -373,7 +373,7 @@
 [347] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
 [348] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
 [349] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
-[350] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
+[350] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [351] = { 1,	TD,		SEN(eventfd),			"eventfd"		},
 [352] = { 4,	TD,		SEN(fallocate),			"fallocate"		},
 [353] = { 4,	TD,		SEN(timerfd_settime),		"timerfd_settime"	},

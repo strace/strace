@@ -347,7 +347,7 @@
 [319] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
 [320] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
 [321] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
-[322] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
+[322] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [323] = { 1,	TD,		SEN(eventfd),			"eventfd"		},
 [324] = { 6,	TD,		SEN(fallocate),			"fallocate"		},
 [325] = { 4,	TD,		SEN(timerfd_settime),		"timerfd_settime"	},
