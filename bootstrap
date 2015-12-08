@@ -4,7 +4,7 @@ for m in m32 mx32; do
 	tests=tests-$m
 	rm -rf $tests
 	mkdir $tests
-	sed "s/@arch@/@arch_$m@/;s/^AM_CFLAGS[[:space:]]*=.*/& -$m/" \
+	sed "s/@arch@/@arch_$m@/;s/^ARCH_MFLAGS[[:space:]]*=.*/& -$m/" \
 		tests/Makefile.am > $tests/Makefile.am
 	for f in tests/*; do
 		case "${f##*/}" in
