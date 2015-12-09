@@ -5,7 +5,7 @@
 static void
 get_error(struct tcb *tcp, const bool check_errno)
 {
-	if (tcp->currpers == 0) {
+	if (tcp->currpers == 1) {
 		arm_get_error(tcp, check_errno);
 		return;
 	}

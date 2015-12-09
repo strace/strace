@@ -7,7 +7,7 @@ arch_sigreturn(struct tcb *tcp)
 
 	const long addr =
 #ifdef AARCH64
-		current_personality == 1 ?
+		tcp->currpers == 0 ?
 			(*aarch64_sp_ptr + SIZEOF_STRUCT_SIGINFO +
 			 offsetof(struct ucontext, uc_sigmask)) :
 #endif

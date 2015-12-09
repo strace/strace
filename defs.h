@@ -237,13 +237,12 @@ extern char *stpcpy(char *dst, const char *src);
 #ifdef AARCH64
 /* The existing ARM personality, then AArch64 */
 # define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY0_WORDSIZE 4
-# define PERSONALITY1_WORDSIZE 8
-# define DEFAULT_PERSONALITY 1
+# define PERSONALITY0_WORDSIZE 8
+# define PERSONALITY1_WORDSIZE 4
 # ifdef HAVE_M32_MPERS
-#  define PERSONALITY0_INCLUDE_FUNCS "m32_funcs.h"
-#  define PERSONALITY0_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
-#  define PERSONALITY0_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
 # endif
 #endif
 

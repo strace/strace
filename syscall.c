@@ -346,7 +346,7 @@ update_personality(struct tcb *tcp, unsigned int personality)
 # elif defined X32
 #  define PERSONALITY_NAMES {"x32", "32 bit"}
 # elif defined AARCH64
-#  define PERSONALITY_NAMES {"32-bit", "AArch64"}
+#  define PERSONALITY_NAMES {"64 bit", "32 bit"}
 # elif defined TILE
 #  define PERSONALITY_NAMES {"64-bit", "32-bit"}
 # endif

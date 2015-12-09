@@ -118,11 +118,7 @@ struct stat32 {
 	unsigned int	__unused4;
 	unsigned int	__unused5;
 };
-#  ifdef AARCH64
-#   define STAT32_PERSONALITY 0
-#  else
-#   define STAT32_PERSONALITY 1
-#  endif
+#  define STAT32_PERSONALITY 1
 # elif defined POWERPC64
 struct stat32 {
 	unsigned int	st_dev;

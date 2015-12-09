@@ -6,7 +6,7 @@
 static int
 get_syscall_args(struct tcb *tcp)
 {
-	if (tcp->currpers == 0)
+	if (tcp->currpers == 1)
 		return arm_get_syscall_args(tcp);
 	tcp->u_arg[0] = aarch64_regs.regs[0];
 	tcp->u_arg[1] = aarch64_regs.regs[1];
