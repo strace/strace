@@ -654,6 +654,18 @@ discrepancies are normal but idiosyncratic characteristics of the
 system call interface and are accounted for by C library wrapper
 functions.
 .LP
+Some system calls have different names in different architectures and
+personalities.  In these cases, system call filtering and printing
+uses the names that match corresponding
+.BR __NR_ *
+kernel macros of the tracee's architecture and personality.
+There are two exceptions from this general rule:
+.BR arm_fadvise64_64 (2)
+ARM syscall and
+.BR xtensa_fadvise64_64 (2)
+Xtensa syscall are filtered and printed as
+.BR fadvise64_64 (2).
+.LP
 On some platforms a process that is attached to with the
 .B \-p
 option may observe a spurious EINTR return from the current
