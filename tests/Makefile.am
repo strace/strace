@@ -5,6 +5,7 @@ ARCH = @arch@
 ARCH_MFLAGS =
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = $(ARCH_MFLAGS) \
+	      -I$(builddir) \
 	      -I$(top_builddir)/$(OS)/$(ARCH) \
 	      -I$(top_srcdir)/$(OS)/$(ARCH) \
 	      -I$(top_builddir)/$(OS) \
@@ -46,6 +47,7 @@ check_PROGRAMS = \
 	ipc_msgbuf \
 	ipc_sem \
 	ipc_shm \
+	ksysent \
 	llseek \
 	lseek \
 	lstat \
@@ -136,6 +138,7 @@ stack_fcall_SOURCES = stack-fcall.c \
 TESTS = \
 	strace-f.test \
 	qual_syscall.test \
+	ksysent.test \
 	\
 	_newselect.test \
 	adjtimex.test \
@@ -264,6 +267,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
+	     ksysent.sed \
 	     lstatx.c \
 	     memfd_create.expected \
 	     mmsg.expected \
@@ -294,4 +298,12 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     xstatx.c \
 	     $(TESTS)
 
-CLEANFILES = $(TESTS:=.tmp)
+ksysent.h: $(srcdir)/ksysent.sed
+	echo '#include <asm/unistd.h>' | \
+		$(CPP) $(AM_CPPFLAGS) $(CPPFLAGS) -dD - > $@.t1
+	LC_COLLATE=C sed -n -f $(srcdir)/ksysent.sed < $@.t1 > $@.t2
+	mv -f $@.t2 $@
+	rm -f $@.t1
+
+BUILT_SOURCES = ksysent.h
+CLEANFILES = ksysent.h $(TESTS:=.tmp)
