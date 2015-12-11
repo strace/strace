@@ -1,5 +1,5 @@
 struct arm_pt_regs {
-        int uregs[18];
+        uint32_t uregs[18];
 };
 #define ARM_cpsr       uregs[16]
 #define ARM_pc         uregs[15]
