@@ -49,26 +49,3 @@ SYS_FUNC(mknodat)
 
 	return RVAL_DECODED;
 }
-
-#if defined(SPARC) || defined(SPARC64)
-SYS_FUNC(xmknod)
-{
-	int mode = tcp->u_arg[2];
-
-	tprintf("%ld, ", tcp->u_arg[0]);
-	printpath(tcp, tcp->u_arg[1]);
-	tprintf(", %s", sprintmode(mode));
-	switch (mode & S_IFMT) {
-	case S_IFCHR:
-	case S_IFBLK:
-		tprintf(", makedev(%lu, %lu)",
-			(unsigned long) ((tcp->u_arg[3] >> 18) & 0x3fff),
-			(unsigned long) (tcp->u_arg[3] & 0x3ffff));
-		break;
-	default:
-		break;
-	}
-
-	return RVAL_DECODED;
-}
-#endif /* SPARC || SPARC64 */
