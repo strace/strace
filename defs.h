@@ -582,12 +582,12 @@ extern int print_quoted_string(const char *, unsigned int, unsigned int);
 /* a refers to the lower numbered u_arg,
  * b refers to the higher numbered u_arg
  */
-#ifdef HAVE_LITTLE_ENDIAN_LONG_LONG
-# define LONG_LONG(a,b) \
-	((long long)((unsigned long long)(unsigned)(a) | ((unsigned long long)(b)<<32)))
-#else
+#ifdef WORDS_BIGENDIAN
 # define LONG_LONG(a,b) \
 	((long long)((unsigned long long)(unsigned)(b) | ((unsigned long long)(a)<<32)))
+#else
+# define LONG_LONG(a,b) \
+	((long long)((unsigned long long)(unsigned)(a) | ((unsigned long long)(b)<<32)))
 #endif
 extern int getllval(struct tcb *, unsigned long long *, int);
 extern int printllval(struct tcb *, const char *, int)
