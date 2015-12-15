@@ -5,40 +5,53 @@ function compare_indices(i1, v1, i2, v2) {
 		return -1
 	return (c1 != c2)
 }
+function array_get(array_idx, array_member, array_return)
+{
+	array_return = array[array_idx][array_member]
+	if ("" == array_return) {
+		printf("%s: index [%s] without %s\n",
+		       FILENAME, array_idx, array_member) > "/dev/stderr"
+		exit 1
+	}
+	return array_return
+}
 function what_is(what_idx, type_idx, special, item, \
 		 location, prev_location, prev_returned_size)
 {
-	type_idx = array[what_idx]["type"]
-	special = array[what_idx]["special"]
+	special = array_get(what_idx, "special")
 	switch (special) {
 	case "base_type":
-		switch (array[what_idx]["encoding"]) {
+		switch (array_get(what_idx, "encoding")) {
 		case 5: # signed
 			printf("%s ", "int" \
-			8*array[what_idx]["byte_size"] "_t")
+			8 * array_get(what_idx, "byte_size") "_t")
 			break
 		case 7: # unsigned
 			printf("%s ", "uint" \
-			8*array[what_idx]["byte_size"] "_t")
+			8 * array_get(what_idx, "byte_size") "_t")
 			break
 		default: # float, signed/unsigned char
-			printf("%s ", array[what_idx]["name"])
+			printf("%s ", array_get(what_idx, "name"))
 			break
 		}
-		returned_size = array[what_idx]["byte_size"]
+		returned_size = array_get(what_idx, "byte_size")
 		break
 	case "enumeration_type":
-		printf("%s ", "uint" 8*array[type_idx]["byte_size"] "_t")
-		returned_size = array[what_idx]["byte_size"]
+		type_idx = array_get(what_idx, "type")
+		returned_size = array_get(what_idx, "byte_size")
+		printf("%s ", "uint" 8 * returned_size "_t")
 		break
 	case "pointer_type":
 		printf("%s", "mpers_ptr_t ")
-		returned_size = array[what_idx]["byte_size"]
+		returned_size = array_get(what_idx, "byte_size")
 		break
 	case "array_type":
+		type_idx = array_get(what_idx, "type")
 		what_is(type_idx)
 		to_return = array[what_idx]["upper_bound"]
-		returned_size = array[what_idx]["upper_bound"] * returned_size
+		returned_size = to_return * returned_size
+		if ("" == to_return)
+			to_return = "00"
 		return to_return
 		break
 	case "structure_type":
@@ -49,8 +62,8 @@ function what_is(what_idx, type_idx, special, item, \
 		prev_returned_size = 0
 		for (item in array) {
 			if ("parent" in array[item] && \
-				array[item]["parent"] == what_idx) {
-				location = array[item]["location"]
+				array_get(item, "parent") == what_idx) {
+				location = array_get(item, "location")
 				loc_diff = location - prev_location - \
 					prev_returned_size
 				if (loc_diff != 0) {
@@ -63,12 +76,12 @@ function what_is(what_idx, type_idx, special, item, \
 				prev_returned_size = returned_size
 				printf("%s", array[item]["name"])
 				if (returned) {
-					printf("%s", "[" returned "]")
+					printf("[%s]", returned)
 				}
 				print ";"
 			}
 		}
-		returned_size = array[what_idx]["byte_size"]
+		returned_size = array_get(what_idx, "byte_size")
 		loc_diff = returned_size - prev_location - prev_returned_size
 		if (loc_diff != 0) {
 			printf("%s", "unsigned char mpers_end_filler_" \
@@ -80,25 +93,28 @@ function what_is(what_idx, type_idx, special, item, \
 		print "union {"
 		for (item in array) {
 			if ("parent" in array[item] && \
-				array[item]["parent"] == what_idx) {
+				array_get(item, "parent") == what_idx) {
 				returned = what_is(item)
-				printf("%s", array[item]["name"])
+				printf("%s", array_get(item, "name"))
 				if (returned) {
-					printf("%s", "[" returned "]")
+					printf("[%s]", returned)
 				}
 				print ";"
 			}
 		}
 		printf("%s", "} ")
-		returned_size = array[what_idx]["byte_size"]
+		returned_size = array_get(what_idx, "byte_size")
 		break
 	case "typedef":
+		type_idx = array_get(what_idx, "type")
 		return what_is(type_idx)
 		break
 	case "member":
+		type_idx = array_get(what_idx, "type")
 		return what_is(type_idx)
 		break
 	default:
+		type_idx = array_get(what_idx, "type")
 		what_is(type_idx)
 		break
 	}
@@ -153,19 +169,20 @@ END {
 	for (item in array) {
 		if (array[item]["special"] == "pointer_type") {
 			print "typedef uint" \
-				8*array[item]["byte_size"] "_t mpers_ptr_t;"
+				8 * array_get(item, "byte_size") "_t mpers_ptr_t;"
 			break
 		}
 	}
 	for (item in array) {
 		if (array[item]["name"] == VAR_NAME) {
-			type=array[item]["type"]
+			type = array_get(item, "type")
 			print "typedef"
-			what_is(array[item]["type"])
-			print ARCH_FLAG "_" array[type]["name"] ";"
+			what_is(type)
+			name = array_get(type, "name")
+			print ARCH_FLAG "_" name ";"
 			print "#define MPERS_" \
-				ARCH_FLAG "_" array[type]["name"] " " \
-				ARCH_FLAG "_" array[type]["name"]
+				ARCH_FLAG "_" name " " \
+				ARCH_FLAG "_" name
 			break
 		}
 	}
