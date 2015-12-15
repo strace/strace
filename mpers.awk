@@ -15,9 +15,26 @@ function array_get(array_idx, array_member, array_return)
 	}
 	return array_return
 }
+function enter(array_idx)
+{
+	if (called[array_idx]) {
+		printf("%s: index loop detected:", FILENAME) > "/dev/stderr"
+		for (item in called)
+			printf(" %s", item) > "/dev/stderr"
+		print "" > "/dev/stderr"
+		exit 1
+	}
+	called[array_idx] = 1
+}
+function leave(array_idx, to_return)
+{
+	delete called[array_idx]
+	return to_return
+}
 function what_is(what_idx, type_idx, special, item, \
 		 location, prev_location, prev_returned_size)
 {
+	enter(what_idx)
 	special = array_get(what_idx, "special")
 	switch (special) {
 	case "base_type":
@@ -52,7 +69,7 @@ function what_is(what_idx, type_idx, special, item, \
 		returned_size = to_return * returned_size
 		if ("" == to_return)
 			to_return = "00"
-		return to_return
+		return leave(what_idx, to_return)
 		break
 	case "structure_type":
 		print "struct {"
@@ -107,18 +124,18 @@ function what_is(what_idx, type_idx, special, item, \
 		break
 	case "typedef":
 		type_idx = array_get(what_idx, "type")
-		return what_is(type_idx)
+		return leave(what_idx, what_is(type_idx))
 		break
 	case "member":
 		type_idx = array_get(what_idx, "type")
-		return what_is(type_idx)
+		return leave(what_idx, what_is(type_idx))
 		break
 	default:
 		type_idx = array_get(what_idx, "type")
 		what_is(type_idx)
 		break
 	}
-	return 0
+	return leave(what_idx, 0)
 }
 BEGIN {
 	print "#include <inttypes.h>"
