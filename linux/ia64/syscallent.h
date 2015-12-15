@@ -34,7 +34,7 @@
 #define SYS_FUNC_NAME(syscall_name) printargs
 #include "../i386/syscallent.h"
 #undef SYS_FUNC_NAME
-#define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(sys_ ## syscall_name)
+#define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(syscall_name)
 
 /* You must be careful to check ../i386/syscallent.h so that this table
    starts where that one leaves off.

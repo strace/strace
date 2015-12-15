@@ -800,8 +800,8 @@ extern unsigned num_quals;
 #define MPERS_FUNC_NAME_(prefix, name) MPERS_FUNC_NAME__(prefix, name)
 #define MPERS_FUNC_NAME(name) MPERS_FUNC_NAME_(MPERS_PREFIX, name)
 
-#define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(sys_ ## syscall_name)
+#define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(syscall_name)
 
-#define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(syscall_name)(struct tcb *tcp)
+#define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(sys_ ## syscall_name)(struct tcb *tcp)
 
 #define MPERS_PRINTER_DECL(type, name) type MPERS_FUNC_NAME(name)
