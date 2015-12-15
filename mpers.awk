@@ -15,9 +15,17 @@ function array_get(array_idx, array_member, array_return)
 	}
 	return array_return
 }
+function array_seq(array_idx)
+{
+	if ("seq" in array[array_idx])
+		return array[array_idx]["seq"]
+	index_seq++
+	array[array_idx]["seq"] = index_seq
+	return index_seq
+}
 function enter(array_idx)
 {
-	if (called[array_idx]) {
+	if (array_idx in called) {
 		printf("%s: index loop detected:", FILENAME) > "/dev/stderr"
 		for (item in called)
 			printf(" %s", item) > "/dev/stderr"
@@ -40,12 +48,12 @@ function what_is(what_idx, type_idx, special, item, \
 	case "base_type":
 		switch (array_get(what_idx, "encoding")) {
 		case 5: # signed
-			printf("%s ", "int" \
-			8 * array_get(what_idx, "byte_size") "_t")
+			printf("int%s_t ",
+			       8 * array_get(what_idx, "byte_size"))
 			break
 		case 7: # unsigned
-			printf("%s ", "uint" \
-			8 * array_get(what_idx, "byte_size") "_t")
+			printf("uint%s_t ",
+			       8 * array_get(what_idx, "byte_size"))
 			break
 		default: # float, signed/unsigned char
 			printf("%s ", array_get(what_idx, "name"))
@@ -56,19 +64,19 @@ function what_is(what_idx, type_idx, special, item, \
 	case "enumeration_type":
 		type_idx = array_get(what_idx, "type")
 		returned_size = array_get(what_idx, "byte_size")
-		printf("%s ", "uint" 8 * returned_size "_t")
+		printf("uint%s_t ", 8 * returned_size)
 		break
 	case "pointer_type":
-		printf("%s", "mpers_ptr_t ")
+		printf("mpers_ptr_t ")
 		returned_size = array_get(what_idx, "byte_size")
 		break
 	case "array_type":
 		type_idx = array_get(what_idx, "type")
 		what_is(type_idx)
 		to_return = array[what_idx]["upper_bound"]
-		returned_size = to_return * returned_size
 		if ("" == to_return)
-			to_return = "00"
+			to_return = 0
+		returned_size = to_return * returned_size
 		return leave(what_idx, to_return)
 		break
 	case "structure_type":
@@ -84,15 +92,14 @@ function what_is(what_idx, type_idx, special, item, \
 				loc_diff = location - prev_location - \
 					prev_returned_size
 				if (loc_diff != 0) {
-					printf("%s", \
-						"unsigned char mpers_filler_" \
-						item "[" loc_diff "];\n")
+					printf("unsigned char mpers_%s_%s[%s];\n",
+					       "filler", array_seq(item), loc_diff)
 				}
 				prev_location = location
 				returned = what_is(item)
 				prev_returned_size = returned_size
 				printf("%s", array[item]["name"])
-				if (returned) {
+				if ("" != returned) {
 					printf("[%s]", returned)
 				}
 				print ";"
@@ -101,10 +108,10 @@ function what_is(what_idx, type_idx, special, item, \
 		returned_size = array_get(what_idx, "byte_size")
 		loc_diff = returned_size - prev_location - prev_returned_size
 		if (loc_diff != 0) {
-			printf("%s", "unsigned char mpers_end_filler_" \
-				item "[" loc_diff "];\n")
+			printf("unsigned char mpers_%s_%s[%s];\n",
+			       "end_filler", array_seq(item), loc_diff)
 		}
-		printf("%s", "} ATTRIBUTE_PACKED ")
+		printf("} ATTRIBUTE_PACKED ")
 		break
 	case "union_type":
 		print "union {"
@@ -113,13 +120,13 @@ function what_is(what_idx, type_idx, special, item, \
 				array_get(item, "parent") == what_idx) {
 				returned = what_is(item)
 				printf("%s", array_get(item, "name"))
-				if (returned) {
+				if ("" != returned) {
 					printf("[%s]", returned)
 				}
 				print ";"
 			}
 		}
-		printf("%s", "} ")
+		printf("} ")
 		returned_size = array_get(what_idx, "byte_size")
 		break
 	case "typedef":
@@ -135,7 +142,7 @@ function what_is(what_idx, type_idx, special, item, \
 		what_is(type_idx)
 		break
 	}
-	return leave(what_idx, 0)
+	return leave(what_idx, "")
 }
 BEGIN {
 	print "#include <inttypes.h>"
