@@ -53,7 +53,7 @@ main(void)
 	if (rc != -1 || EBADF != errno)
 		return 77;
 
-	printf("ftruncate(-1, %Lu) = -1 EBADF (Bad file descriptor)\n",
+	printf("ftruncate(-1, %llu) = -1 EBADF (Bad file descriptor)\n",
 	       (unsigned long long) len);
 
 	puts("+++ exited with 0 +++");

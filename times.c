@@ -12,10 +12,10 @@ SYS_FUNC(times)
 		return 0;
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
-		tprintf("{tms_utime=%Lu, tms_stime=%Lu, ",
+		tprintf("{tms_utime=%llu, tms_stime=%llu, ",
 			(unsigned long long) tbuf.tms_utime,
 			(unsigned long long) tbuf.tms_stime);
-		tprintf("tms_cutime=%Lu, tms_cstime=%Lu}",
+		tprintf("tms_cutime=%llu, tms_cstime=%llu}",
 			(unsigned long long) tbuf.tms_cutime,
 			(unsigned long long) tbuf.tms_cstime);
 	}

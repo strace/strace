@@ -96,8 +96,8 @@ int main(int ac, char **av)
 	FD_SET(fds[1], set[1]);
 	if (syscall(__NR_pselect6, fds[1] + 1, NULL, set[1], NULL, &tm.ts, NULL) != 3)
 		return 77;
-	printf("pselect6(%d, NULL, [1 2 %d %d], NULL, {%Ld, %Ld}, NULL)"
-	       " = 3 (out [1 2 %d], left {%Ld, %Ld})\n",
+	printf("pselect6(%d, NULL, [1 2 %d %d], NULL, {%lld, %lld}, NULL)"
+	       " = 3 (out [1 2 %d], left {%lld, %lld})\n",
 	       fds[1] + 1, fds[0], fds[1],
 	       (long long) tm_in.ts.tv_sec, (long long) tm_in.ts.tv_nsec,
 	       fds[1],

@@ -53,7 +53,7 @@ main(void)
 	if (rc != -1 || EBADF != errno)
 		return 77;
 
-	printf("lseek(-1, %Lu, SEEK_SET) = -1 EBADF (Bad file descriptor)\n",
+	printf("lseek(-1, %llu, SEEK_SET) = -1 EBADF (Bad file descriptor)\n",
 	       (unsigned long long) offset);
 
 	puts("+++ exited with 0 +++");

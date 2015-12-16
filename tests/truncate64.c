@@ -48,7 +48,7 @@ main(void)
 	if (rc != -1 || ENOENT != errno)
 		return 77;
 
-	printf("truncate64(\"%s\", %Lu) = -1 ENOENT (No such file or directory)\n",
+	printf("truncate64(\"%s\", %llu) = -1 ENOENT (No such file or directory)\n",
 	       qname, (unsigned long long) len);
 
 	puts("+++ exited with 0 +++");

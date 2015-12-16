@@ -83,7 +83,7 @@ print_dirent(const kernel_dirent *d)
 	int d_name_len = d->d_reclen - d_name_offset - 1;
 	assert(d_name_len > 0);
 
-	printf("{d_ino=%Lu, d_off=%Lu, d_reclen=%u, d_name=",
+	printf("{d_ino=%llu, d_off=%llu, d_reclen=%u, d_name=",
 	       (unsigned long long) d->d_ino,
 	       (unsigned long long) d->d_off, d->d_reclen);
 

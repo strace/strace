@@ -163,7 +163,7 @@ print_stat(const STRUCT_STAT *st)
 	printf("{st_dev=makedev(%u, %u)",
 	       (unsigned int) major(st->st_dev),
 	       (unsigned int) minor(st->st_dev));
-	printf(", st_ino=%Lu", (unsigned long long) st->st_ino);
+	printf(", st_ino=%llu", (unsigned long long) st->st_ino);
 	printf(", st_mode=");
 	print_ftype(st->st_mode);
 	printf("|");
@@ -181,7 +181,7 @@ print_stat(const STRUCT_STAT *st)
 		       (unsigned int) minor(st->st_rdev));
 		break;
 	default:
-		printf(", st_size=%Lu", (unsigned long long) st->st_size);
+		printf(", st_size=%llu", (unsigned long long) st->st_size);
 	}
 
 	printf(", st_atime=");
@@ -254,7 +254,7 @@ main(void)
 	if ((unsigned long long) SAMPLE_SIZE !=
 	    (unsigned long long) st[0].st_size) {
 		fprintf(stderr, "Size mismatch: "
-				"requested size(%Lu) != st_size(%Lu)\n",
+				"requested size(%llu) != st_size(%llu)\n",
 			(unsigned long long) SAMPLE_SIZE,
 			(unsigned long long) st[0].st_size);
 		fprintf(stderr, "The most likely reason for this is incorrect"

@@ -47,7 +47,7 @@ print_old_dirent(struct tcb *tcp, long addr)
 	if (umove_or_printaddr(tcp, addr, &d))
 		return;
 
-	tprintf("{d_ino=%Lu, d_off=%Lu, d_reclen=%u, d_name=",
+	tprintf("{d_ino=%llu, d_off=%llu, d_reclen=%u, d_name=",
 		(unsigned long long) d.d_ino,
 		(unsigned long long) d.d_off, d.d_reclen);
 	if (d.d_reclen > D_NAME_LEN_MAX)
@@ -122,7 +122,7 @@ SYS_FUNC(getdents)
 			if (d_name_len > D_NAME_LEN_MAX)
 				d_name_len = D_NAME_LEN_MAX;
 
-			tprintf("%s{d_ino=%Lu, d_off=%Lu, d_reclen=%u"
+			tprintf("%s{d_ino=%llu, d_off=%llu, d_reclen=%u"
 				", d_name=", i ? ", " : "",
 				(unsigned long long) d->d_ino,
 				(unsigned long long) d->d_off, d->d_reclen);

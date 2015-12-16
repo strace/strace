@@ -80,8 +80,8 @@ int main(void)
 	FD_SET(fds[1], set);
 	if (syscall(TEST_SYSCALL_NR, fds[1] + 1, NULL, set, NULL, &tm.tv) != 3)
 		return 77;
-	printf("%s(%d, NULL, [1 2 %d %d], NULL, {%Ld, %Ld})"
-	       " = 3 (out [1 2 %d], left {%Ld, %Ld})\n",
+	printf("%s(%d, NULL, [1 2 %d %d], NULL, {%lld, %lld})"
+	       " = 3 (out [1 2 %d], left {%lld, %lld})\n",
 	       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
 	       (long long) tm_in.tv.tv_sec, (long long) tm_in.tv.tv_usec,
 	       fds[1],
