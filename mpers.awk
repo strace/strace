@@ -158,8 +158,9 @@ BEGIN {
 	}
 }
 /^DW_AT_data_member_location/ {
-	match($0, /[[:digit:]]+/, temparray)
-	array[idx]["location"] = temparray[0]
+	if (!match($0, /\(DW_OP_plus_uconst:[[:space:]]+([[:digit:]]+)\)/, temparray))
+		match($0, /([[:digit:]]+)/, temparray)
+	array[idx]["location"] = temparray[1]
 }
 /^DW_AT_name/ {
 	match($0, /:[[:space:]]+([[:alpha:]_][[:alnum:]_[:space:]]*)/, \
