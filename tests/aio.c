@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <sys/syscall.h>
