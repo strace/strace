@@ -7,7 +7,7 @@ ARCH_FLAG=$1
 PARSER_FILE=$2
 
 CC="${CC-gcc}"
-CFLAGS="$CFLAGS -gdwarf-4 -c"
+CFLAGS="$CFLAGS -gdwarf-2 -c"
 CPP="${CPP-$CC -E}"
 CPPFLAGS="$CPPFLAGS -MM -MG"
 
