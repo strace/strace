@@ -362,3 +362,4 @@
 [1343] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
 [1344] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [1345] = { 5,	0,		SEN(kcmp),			"kcmp"			},
+[1346] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
