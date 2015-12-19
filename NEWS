@@ -1,5 +1,82 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 4.11 (????-??-??)
 ===============================================
+
+* Changes in behavior
+  * Some syscalls have different names depending on architecture and
+    personality.  In these cases, syscall filtering and printing now
+    consistently uses the names that match corresponding __NR_* kernel
+    macros of the tracee's architecture and personality.
+  * Added strace prefix to all diagnostic messages.
+
+* Improvements
+  * Enhanced and extended test suite.
+  * Implemented reliable tracing of processes whose personality differs
+    from the personality of strace, fixed decoding of 32-bit personality
+    syscalls on 64-bit architectures.
+  * When some data referenced by syscall arguments is irrelevant or cannot
+    be read from tracee's memory, strace now prints its address consistently.
+  * When a syscall is restarted using restart_syscall mechanism, strace now
+    shows the syscall name on architectures that expose this information.
+  * Print values returned by epoll_create1, eventfd, eventfd2, fanotify_init,
+    inotify_init1, perf_event_open, pipe, pipe2, signalfd, signalfd4, socket,
+    socketpair, timerfd, and timerfd_create syscalls, as well as F_DUPFD and
+    F_DUPFD_CLOEXEC fcntl commands, as file descriptors.
+  * Optimized decoding of indirect socket syscalls.
+  * Implemented decoding of nanoseconds along with seconds in stat family
+    syscalls (addresses Fedora bug #1251176).
+  * Implemented decoding of struct statfs.f_flags in statfs syscall.
+  * Implemented decoding of siginfo_t.si_syscall and siginfo_t.si_arch
+    in SIGSYS signal.
+  * Implemented decoding of indirect syscall on mips o32.
+  * Implemented decoding of IPPROTO_IP control messages.
+  * Implemented decoding of setsockopt syscall multicast arguments.
+  * Enhanced decoding of struct sigevent.
+  * Enhanced decoding of block, loop, mtd, ptp, rtc, SG_IO, socket, tty,
+    and v4l2 ioctl syscall arguments.
+  * Enhanced decoding of epoll_create, fcntl, fcntl64, futex, getdents,
+    getdents64, getsockopt, io_*, mount, msgctl, prctl, quotactl, recvfrom,
+    sendfile, setsockopt, and shmctl syscalls.
+  * Implemented decoding of bpf, execveat, ioperm, iopl, kcmp, kexec_file_load,
+    lookup_dcookie, membarrier, memfd_create, mlock2, name_to_handle_at,
+    open_by_handle_at, sched_getattr, sched_setattr, and userfaultfd syscalls.
+  * Updated lists of AF_*, EPOLL_*, FALLOC_FL_*, F_*, INPUT_PROP_*, IPPROTO_*,
+    IPV6_*, IP_*, KEY_*, LOCK_*, MNT_*, MS_*, PACKET_*, PERF_FLAG_*, PF_*,
+    PR_*, PTRACE_O_*, RENAME_*, SCTP_*, SECBIT_*, SO_*, TCP_*, and siginfo_t
+    constants.
+  * Added Nios II architecture support.
+  * Added new syscall entries to match Linux 4.4.
+
+* Bug fixes
+  * Fixed potential short read of strings from tracee's memory.
+  * Fixed -qq option in conjunction with -o option.
+  * Fixed filtering of <unavailable> syscalls.
+  * Fixed decoding of ioctl syscall command on aarch64 and 32-bit architectures
+    with 64-bit aligned structures.
+  * Fixed decoding of eventfd2, epoll_create1, signalfd4, and sync_file_range2
+    syscall flags arguments.
+  * Fixed decoding of 4th argument of clock_nanosleep syscall.
+  * Fixed decoding of getpagesize syscall on m68k.
+  * Fixed decoding of getrandom and seccomp syscalls on aarch64.
+  * Fixed decoding of timezone argument of gettimeofday and settimeofday
+  * syscalls.
+  * Fixed decoding of offset argument of mmap2 syscall on arm, sparc,
+    and sparc64.
+  * Fixed decoding of pipe syscall on alpha and mips.
+  * Fixed decoding of pipe2 syscall on ia64, sh, sparc, and sparc64.
+  * Fixed decoding of signal mask argument of pselect6 syscall on x32.
+  * Fixed decoding of signal mask of rt_sigreturn syscall on aarch64, m68k,
+    and x32.
+  * Fixed decoding of 4th argument of semctl indirect syscall.
+  * Fixed decoding of sa_restorer and sa_mask of sigaction syscall on m68k.
+  * Fixed decoding of statfs64 and fstatfs64 syscalls on arm eabi.
+  * Fixed decoding of struct dirent on x32.
+  * Fixed decoding of times syscall return value on mips n32 and x32.
+  * Fixed decoding of path argument of umount2 syscall
+    (addresses Debian bug #785050).
+  * Worked around a kernel bug in tracing privileged executables.
+  * Fixed various errors in mapping between syscall numbers and associated
+    information like the number of syscall arguments, the name of syscall,
+    and syscall decoder.
 
 Noteworthy changes in release 4.10 (2015-03-06)
 ===============================================
