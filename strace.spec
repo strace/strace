@@ -1,14 +1,12 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
 Version: 4.10
-Release: 1%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
 Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
-
 BuildRequires: libacl-devel, time
-
 %define strace64_arches ppc64 sparc64
 
 %description
@@ -79,6 +77,12 @@ make -k check VERBOSE=1
 %endif
 
 %changelog
+* Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Mon May 11 2015 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 4.10-2
+- Backport set of upstream patches to get it buildable on AArch64
+
 * Fri Mar 06 2015 Dmitry V. Levin <ldv@altlinux.org> - 4.10-1
 - New upstream release:
   + enhanced ioctl decoding (#902788).

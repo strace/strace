@@ -1,5 +1,27 @@
-strace (4.10-1) experimental; urgency=low
+strace (4.10-3) unstable; urgency=medium
 
+  * Really fix mips* builds - fix sys_syscall() handling.
+    Closes: #781753
+  * Clean up strace64.substvars at clean time
+  * Remove ancient changelog entries that annoy lintian
+  * Update Standards-Version to 3.9.6 (no changes needed)
+
+ -- Steve McIntyre <93sam@debian.org>  Wed, 08 Jul 2015 23:44:03 +0100
+
+strace (4.10-2) unstable; urgency=medium
+
+  * Fix building on arm64 using patches from upstream. Closes: #790770
+  * Fix various test suite failures using patches from upstream.
+    Closes: #781040
+  * Fix mips o32 build. Thanks to Arturo Borrero Gonzalez
+    <arturo.borrero.glez@gmail.com> for tracking this.
+  * Add build-dependency on gawk for the test suite. Closes: #780992
+
+ -- Steve McIntyre <93sam@debian.org>  Thu, 02 Jul 2015 02:03:25 +0100
+
+strace (4.10-1) unstable; urgency=low
+
+  [ Dmitry V. Levin ]
   * New upstream version.
     + enhanced ioctl decoding,  closes: #692913
     + enabled mips64el build, closes: #773375
@@ -7,7 +29,7 @@ strace (4.10-1) experimental; urgency=low
     + updated generic and added arch-specific PTRACE_* constants,
       closes: #734554
 
- -- Dmitry V. Levin <ldv@altlinux.org>  Fri, 06 Mar 2015 13:14:15 +0000
+ -- Steve McIntyre <93sam@debian.org>  Sat, 21 Mar 2015 22:18:25 +0000
 
 strace (4.9-2) unstable; urgency=medium
 
@@ -767,7 +789,7 @@ strace (3.1-11) unstable; urgency=low
   * Ported to libc6 / glibc2 (Bug# 11729)
   * Compress manpage
 
- -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Fri,  1 Aug 1997 00:13:38 +02
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Fri,  1 Aug 1997 00:13:38 +0200
 
 strace (3.1-10) unstable; urgency=low
 

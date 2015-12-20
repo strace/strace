@@ -62,7 +62,7 @@ build64/Makefile:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf build build64 strace64.1
+	rm -rf build build64 strace64.1 debian/strace64.substvars
 	dh_clean
 
 binary: binary-indep binary-arch
