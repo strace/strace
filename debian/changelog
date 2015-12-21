@@ -1,3 +1,11 @@
+strace (4.11-1) unstable; urgency=low
+
+  [ Dmitry V. Levin ]
+  * New upstream version.
+    + fixed decoding of path argument of umount2 syscall, closes: #785050
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Mon, 21 Dec 2015 20:21:22 +0000
+
 strace (4.10-3) unstable; urgency=medium
 
   * Really fix mips* builds - fix sys_syscall() handling.

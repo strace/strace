@@ -1,7 +1,7 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.10
-Release: 3%{?dist}
+Version: 4.11
+Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
@@ -77,6 +77,10 @@ make -k check VERBOSE=1
 %endif
 
 %changelog
+* Mon Dec 21 2015 Dmitry V. Levin <ldv@altlinux.org> - 4.11-1
+- New upstream release:
+  + print nanoseconds along with seconds in stat family syscalls (#1251176).
+
 * Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.10-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
