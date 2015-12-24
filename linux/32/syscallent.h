@@ -1,5 +1,5 @@
-#ifndef ARCH_mmap
-# define ARCH_mmap mmap
+#ifndef sys_ARCH_mmap
+# define sys_ARCH_mmap sys_mmap
 #endif
 [  0] = { 2,	0,		SEN(io_setup),			"io_setup"		},
 [  1] = { 1,	0,		SEN(io_destroy),		"io_destroy"		},
@@ -276,5 +276,5 @@
 [283] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [284] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 
-#undef ARCH_mmap
+#undef sys_ARCH_mmap
 #undef ARCH_WANT_SYNC_FILE_RANGE2

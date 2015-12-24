@@ -216,6 +216,7 @@ pathtrace_match(struct tcb *tcp)
 	case SEN_mmap:
 	case SEN_mmap_4koff:
 	case SEN_mmap_pgoff:
+	case SEN_ARCH_mmap:
 		/* x, x, x, x, fd */
 		return fdmatch(tcp, tcp->u_arg[4]);
 

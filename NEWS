@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Bug fixes
+  * Fixed build on arc, metag, nios2, or1k, and tile architectures.
+
 Noteworthy changes in release 4.11 (2015-12-21)
 ===============================================
 

@@ -1,4 +1,4 @@
-#define ARCH_mmap mmap_4koff
+#define sys_ARCH_mmap sys_mmap_4koff
 #define ARCH_WANT_SYNC_FILE_RANGE2 1
 #include "32/syscallent.h"
 [244] = { 1,	0,	SEN(printargs),	"cmpxchg_badaddr"	},
