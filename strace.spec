@@ -6,7 +6,7 @@ License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
 Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
-BuildRequires: libacl-devel, time
+BuildRequires: time
 %ifarch x86_64
 # for experimental -k option
 BuildRequires: libunwind-devel
