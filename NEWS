@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Enhanced decoding of personality syscall.
+
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.
 

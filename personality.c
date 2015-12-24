@@ -6,7 +6,11 @@
 
 SYS_FUNC(personality)
 {
-	printxval(personality_options, tcp->u_arg[0], "PER_???");
+	if (entering(tcp)) {
+		printflags(personality_options, tcp->u_arg[0], "PER_???");
+		return 0;
+	}
 
-	return RVAL_DECODED;
+	tcp->auxstr = sprintflags("", personality_options, tcp->u_rval);
+	return RVAL_HEX | RVAL_STR;
 }
