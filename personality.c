@@ -7,7 +7,11 @@
 SYS_FUNC(personality)
 {
 	if (entering(tcp)) {
-		printflags(personality_options, tcp->u_arg[0], "PER_???");
+		const unsigned int pers = tcp->u_arg[0];
+		if (0xffffffff == pers)
+			tprints("0xffffffff");
+		else
+			printflags(personality_options, pers, "PER_???");
 		return 0;
 	}
 

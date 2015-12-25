@@ -8,9 +8,16 @@ int main(void)
 	const unsigned int saved_pers = personality(0);
 
 	printf("personality\\(PER_LINUX\\) = %#x \\([^)]*\\)\n", saved_pers);
+
 	personality(test_pers);
 	puts("personality\\(SHORT_INODE\\|WHOLE_SECONDS\\|STICKY_TIMEOUTS\\)"
 	     " = 0 \\(PER_LINUX\\)");
+
+	personality(0xffffffff);
+	printf("personality\\(0xffffffff\\) = %#x"
+	       " \\(SHORT_INODE\\|WHOLE_SECONDS\\|STICKY_TIMEOUTS\\)\n",
+	       test_pers);
+
 	personality(saved_pers);
 	printf("personality\\([^)]*\\) = %#x"
 	       " \\(SHORT_INODE\\|WHOLE_SECONDS\\|STICKY_TIMEOUTS\\)\n",
