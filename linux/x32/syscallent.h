@@ -133,7 +133,7 @@
 [132] = { 2,	TF,		SEN(utime),			"utime"			},
 [133] = { 3,	TF,		SEN(mknod),			"mknod"			},
 [134] = { 1,	TF,		SEN(printargs),			"64:uselib"		},
-[135] = { 1,	0,		SEN(personality),		"personality"		},
+[135] = { 1,	NF,		SEN(personality),		"personality"		},
 [136] = { 2,	0,		SEN(ustat),			"ustat"			},
 [137] = { 2,	TF,		SEN(statfs),			"statfs"		},
 [138] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},

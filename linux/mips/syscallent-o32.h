@@ -136,7 +136,7 @@
 [4133] = { 1,	TD,		SEN(fchdir),			"fchdir"		},
 [4134] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [4135] = { 3,	0,		SEN(sysfs),			"sysfs"			},
-[4136] = { 1,	0,		SEN(personality),		"personality"		},
+[4136] = { 1,	NF,		SEN(personality),		"personality"		},
 [4137] = { 0,	0,		SEN(afs_syscall),		"afs_syscall"		},
 [4138] = { 1,	NF,		SEN(setfsuid),			"setfsuid"		},
 [4139] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},

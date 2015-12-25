@@ -132,7 +132,7 @@
 [5129] = { 2,	TS,		SEN(sigaltstack),		"sigaltstack"		},
 [5130] = { 2,	TF,		SEN(utime),			"utime"			},
 [5131] = { 3,	TF,		SEN(mknod),			"mknod"			},
-[5132] = { 1,	0,		SEN(personality),		"personality"		},
+[5132] = { 1,	NF,		SEN(personality),		"personality"		},
 [5133] = { 2,	0,		SEN(ustat),			"ustat"			},
 [5134] = { 3,	TF,		SEN(statfs),			"statfs"		},
 [5135] = { 3,	TD,		SEN(fstatfs),			"fstatfs"		},

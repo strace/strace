@@ -189,7 +189,7 @@
 [188] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
 [189] = { 1,	0,		SEN(uname),			"uname"			},
 [190] = { 3,	0,		SEN(init_module),		"init_module"		},
-[191] = { 1,	0,		SEN(personality),		"personality"		},
+[191] = { 1,	NF,		SEN(personality),		"personality"		},
 [192] = { 5,	TM|SI,		SEN(remap_file_pages),		"remap_file_pages"	},
 [193] = { 1,	TD,		SEN(epoll_create),		"epoll_create"		},
 [194] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},

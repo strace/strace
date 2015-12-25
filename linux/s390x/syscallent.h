@@ -158,7 +158,7 @@
 [133] = { 1,	TD,		SEN(fchdir),			"fchdir"		},
 [134] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [135] = { 3,	0,		SEN(sysfs),			"sysfs"			},
-[136] = { 1,	0,		SEN(personality),		"personality"		},
+[136] = { 1,	NF,		SEN(personality),		"personality"		},
 [137] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},
 [138 ... 140] = { },
 [141] = { 3,	TD,		SEN(getdents),			"getdents"		},

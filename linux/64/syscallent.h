@@ -90,7 +90,7 @@
 [ 89] = { 1,	TF,		SEN(acct),			"acct"			},
 [ 90] = { 2,	0,		SEN(capget),			"capget"		},
 [ 91] = { 2,	0,		SEN(capset),			"capset"		},
-[ 92] = { 1,	0,		SEN(personality),		"personality"		},
+[ 92] = { 1,	NF,		SEN(personality),		"personality"		},
 [ 93] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [ 94] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
 [ 95] = { 5,	TP,		SEN(waitid),			"waitid"		},

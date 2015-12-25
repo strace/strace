@@ -124,7 +124,7 @@
 [128] = { 0,	0,		SEN(setsid),			"setsid"		},
 [129] = { 1,	0,		SEN(getsid),			"getsid"		},
 [130] = { 5,	0,		SEN(prctl),			"prctl"			},
-[131] = { 1,	0,		SEN(personality),		"personality"		},
+[131] = { 1,	NF,		SEN(personality),		"personality"		},
 [132] = { 2,	0,		SEN(getpriority),		"getpriority"		},
 [133] = { 3,	0,		SEN(setpriority),		"setpriority"		},
 [134] = { 3,	0,		SEN(setitimer),			"setitimer"		},

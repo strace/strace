@@ -156,7 +156,7 @@
 [1137] = { 4,	TF,		SEN(quotactl),			"quotactl"		},
 [1138] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [1139] = { 3,	0,		SEN(sysfs),			"sysfs"			},
-[1140] = { 1,	0,		SEN(personality),		"personality"		},
+[1140] = { 1,	NF,		SEN(personality),		"personality"		},
 [1141] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},
 [1142] = { 1,	NF,		SEN(setfsuid),			"setfsuid"		},
 [1143] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},

@@ -287,7 +287,7 @@
 [321] = { 1,	TF,		SEN(umount),			"oldumount"		},
 [322] = { 2,	TF,		SEN(swapon),			"swapon"		},
 [323] = { 1,	0,		SEN(times),			"times"			},
-[324] = { 1,	0,		SEN(personality),		"personality"		},
+[324] = { 1,	NF,		SEN(personality),		"personality"		},
 [325] = { 1,	NF,		SEN(setfsuid),			"setfsuid"		},
 [326] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},
 [327] = { 2,	0,		SEN(ustat),			"ustat"			},

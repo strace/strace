@@ -146,7 +146,7 @@
 [118] = { 1,	0,		SEN(getpgid),			"getpgid"		},
 [119] = { 2,	0,		SEN(bdflush),			"bdflush"		},
 [120] = { 3,	0,		SEN(sysfs),			"sysfs"			},
-[121] = { 1,	0,		SEN(personality),		"personality"		},
+[121] = { 1,	NF,		SEN(personality),		"personality"		},
 [122] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		},
 [123] = { 3,	TD,		SEN(getdents),			"getdents"		},
 [124] = { 2,	TD,		SEN(flock),			"flock"			},
