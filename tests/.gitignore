@@ -57,6 +57,7 @@ netlink_unix_diag
 newfstatat
 oldselect
 pc
+personality
 pipe
 ppoll
 pselect6

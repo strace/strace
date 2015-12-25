@@ -91,6 +91,7 @@ check_PROGRAMS = \
 	newfstatat \
 	oldselect \
 	pc \
+	personality \
 	pipe \
 	ppoll \
 	pselect6 \
@@ -216,6 +217,7 @@ TESTS = \
 	newfstatat.test \
 	oldselect.test \
 	pc.test \
+	personality.test \
 	pipe.test \
 	ppoll.test \
 	pselect6.test \
