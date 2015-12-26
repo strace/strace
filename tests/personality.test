@@ -6,7 +6,7 @@
 
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -a22 -epersonality $args > "$OUT"
+run_strace -a20 -epersonality $args > "$OUT"
 match_grep "$LOG" "$OUT"
 rm -f "$OUT"
 
