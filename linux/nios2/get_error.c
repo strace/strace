@@ -8,7 +8,7 @@ get_error(struct tcb *tcp, const bool check_errno)
 	 * the system call success, r7=1 indicates an error.  The positive
 	 * errno value written in r2.
 	 */
-	if (check_errno && nios2_regs.regs[7]) {
+	if (nios2_regs.regs[7]) {
 		tcp->u_rval = -1;
 		tcp->u_error = nios2_regs.regs[2];
 	} else {

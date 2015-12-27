@@ -10,7 +10,7 @@ get_error(struct tcb *tcp, const bool check_errno)
 			tcp->u_rval = err;
 		}
 	} else {
-		if (check_errno && ia64_regs.gr[10]) {
+		if (ia64_regs.gr[10]) {
 			tcp->u_rval = -1;
 			tcp->u_error = ia64_regs.gr[8];
 		} else {

@@ -1,7 +1,7 @@
 static void
 get_error(struct tcb *tcp, const bool check_errno)
 {
-	if (check_errno && mips_REG_A3) {
+	if (mips_REG_A3) {
 		tcp->u_rval = -1;
 		tcp->u_error = mips_REG_V0;
 	} else {

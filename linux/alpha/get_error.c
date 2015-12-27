@@ -1,7 +1,7 @@
 static void
 get_error(struct tcb *tcp, const bool check_errno)
 {
-	if (check_errno && alpha_a3) {
+	if (alpha_a3) {
 		tcp->u_rval = -1;
 		tcp->u_error = alpha_r0;
 	} else {

@@ -1,7 +1,7 @@
 static void
 get_error(struct tcb *tcp, const bool check_errno)
 {
-	if (check_errno && (ppc_regs.ccr & 0x10000000)) {
+	if (ppc_regs.ccr & 0x10000000) {
 		tcp->u_rval = -1;
 		tcp->u_error = ppc_regs.gpr[3];
 	} else {
