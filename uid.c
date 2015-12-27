@@ -70,18 +70,15 @@
 
 SYS_FUNC(getuid)
 {
-	if (exiting(tcp))
-		tcp->u_rval = (uid_t) tcp->u_rval;
-	return RVAL_UDECIMAL;
+	return RVAL_UDECIMAL | RVAL_DECODED;
 }
 
 SYS_FUNC(setfsuid)
 {
 	if (entering(tcp))
 		tprintf("%u", (uid_t) tcp->u_arg[0]);
-	else
-		tcp->u_rval = (uid_t) tcp->u_rval;
-	return RVAL_UDECIMAL;
+
+	return RVAL_UDECIMAL | RVAL_DECODED;
 }
 
 SYS_FUNC(setuid)
