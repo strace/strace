@@ -50,6 +50,9 @@ SYS_FUNC(personality)
 		return 0;
 	}
 
+	if (syserror(tcp))
+		return 0;
+
 	pers = tcp->u_rval;
 	const char *type = xlookup(personality_types, pers & PER_MASK);
 	char *p;
