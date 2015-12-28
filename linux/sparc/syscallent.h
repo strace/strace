@@ -58,7 +58,7 @@
 [ 57] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [ 58] = { 3,	TF,		SEN(readlink),			"readlink"		},
 [ 59] = { 3,	TF|TP|SE|SI,	SEN(execve),			"execve"		},
-[ 60] = { 1,	0,		SEN(umask),			"umask"			},
+[ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 2,	TD,		SEN(fstat),			"fstat"			},
 [ 63] = { 2,	TD,		SEN(fstat64),			"fstat64"		},

@@ -86,7 +86,7 @@
 [ 57] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [ 58] = { 3,	TF,		SEN(readlink),			"readlink"		},
 [ 59] = { 3,	TF|TP|SE|SI,	SEN(execve),			"execve"		},
-[ 60] = { 1,	0,		SEN(umask),			"umask"			},
+[ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 5,	0,		SEN(printargs),			"osf_old_fstat"		}, /*not implemented */
 [ 63] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},

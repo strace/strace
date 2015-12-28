@@ -93,7 +93,7 @@
 [ 92] = { 3,	TF,		SEN(chown),			"chown"			},
 [ 93] = { 3,	TD,		SEN(fchown),			"fchown"		},
 [ 94] = { 3,	TF,		SEN(chown),			"lchown"		},
-[ 95] = { 1,	0,		SEN(umask),			"umask"			},
+[ 95] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 96] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
 [ 97] = { 2,	0,		SEN(getrlimit),			"getrlimit"		},
 [ 98] = { 2,	0,		SEN(getrusage),			"getrusage"		},

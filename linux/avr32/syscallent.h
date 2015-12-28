@@ -32,7 +32,7 @@
 [  4] = { 3,	TD,		SEN(write),			"write"			},
 [  5] = { 3,	TD|TF,		SEN(open),			"open"			},
 [  6] = { 1,	TD,		SEN(close),			"close"			},
-[  7] = { 1,	0,		SEN(umask),			"umask"			},
+[  7] = { 1,	NF,		SEN(umask),			"umask"			},
 [  8] = { 2,	TD|TF,		SEN(creat),			"creat"			},
 [  9] = { 2,	TF,		SEN(link),			"link"			},
 [ 10] = { 1,	TF,		SEN(unlink),			"unlink"		},

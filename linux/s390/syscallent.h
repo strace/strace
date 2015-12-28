@@ -88,7 +88,7 @@
 [ 57] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [ 58] = { },
 [ 59] = { },
-[ 60] = { 1,	0,		SEN(umask),			"umask"			},
+[ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 2,	0,		SEN(ustat),			"ustat"			},
 [ 63] = { 2,	TD,		SEN(dup2),			"dup2"			},

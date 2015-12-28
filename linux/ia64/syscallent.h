@@ -83,7 +83,7 @@
 [1064] = { 1,	TF,		SEN(acct),			"acct"			},
 [1065] = { 3,	TD,		SEN(ioctl),			"ioctl"			},
 [1066] = { 3,	TD,		SEN(fcntl),			"fcntl"			},
-[1067] = { 1,	0,		SEN(umask),			"umask"			},
+[1067] = { 1,	NF,		SEN(umask),			"umask"			},
 [1068] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [1069] = { 2,	0,		SEN(ustat),			"ustat"			},
 [1070] = { 2,	TD,		SEN(dup2),			"dup2"			},

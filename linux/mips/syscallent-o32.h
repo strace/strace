@@ -60,7 +60,7 @@
 [4057] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [4058] = { 0,	0,		SEN(ulimit),			"ulimit"		},
 [4059] = { 1,	0,		SEN(oldolduname),		"oldolduname"		},
-[4060] = { 1,	0,		SEN(umask),			"umask"			},
+[4060] = { 1,	NF,		SEN(umask),			"umask"			},
 [4061] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [4062] = { 2,	0,		SEN(ustat),			"ustat"			},
 [4063] = { 2,	TD,		SEN(dup2),			"dup2"			},

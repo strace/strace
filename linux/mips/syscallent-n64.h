@@ -93,7 +93,7 @@
 [5090] = { 3,	TF,		SEN(chown),			"chown"			},
 [5091] = { 3,	TD,		SEN(fchown),			"fchown"		},
 [5092] = { 3,	TF,		SEN(chown),			"lchown"		},
-[5093] = { 1,	0,		SEN(umask),			"umask"			},
+[5093] = { 1,	NF,		SEN(umask),			"umask"			},
 [5094] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
 [5095] = { 2,	0,		SEN(getrlimit),			"getrlimit"		},
 [5096] = { 2,	0,		SEN(getrusage),			"getrusage"		},

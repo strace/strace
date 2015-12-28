@@ -51,7 +51,7 @@
 [ 55] = { 2,	TD,		SEN(fstat64),			"fstat64"		},
 [ 56] = { 2,	TD,		SEN(flock),			"flock"			},
 [ 57] = { 2,	TF,		SEN(access),			"access"		},
-[ 58] = { 1,	0,		SEN(umask),			"umask"			},
+[ 58] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 59] = { 3,	TD,		SEN(getdents),			"getdents"		},
 [ 60] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
 [ 61] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},

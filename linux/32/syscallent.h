@@ -171,7 +171,7 @@
 [163] = { 2,	0,		SEN(getrlimit),			"getrlimit"		},
 [164] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},
 [165] = { 2,	0,		SEN(getrusage),			"getrusage"		},
-[166] = { 1,	0,		SEN(umask),			"umask"			},
+[166] = { 1,	NF,		SEN(umask),			"umask"			},
 [167] = { 5,	0,		SEN(prctl),			"prctl"			},
 [168] = { 3,	0,		SEN(getcpu),			"getcpu"		},
 [169] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
