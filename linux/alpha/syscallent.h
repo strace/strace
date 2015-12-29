@@ -46,7 +46,7 @@
 [ 17] = { 1,	TM|SI,		SEN(brk),			"brk"			},
 [ 18] = { 5,	0,		SEN(printargs),			"osf_getfsstat"		}, /*not implemented */
 [ 19] = { 3,	TD,		SEN(lseek),			"lseek"			},
-[ 20] = { 0,	0,		SEN(getpid),			"getxpid"		},
+[ 20] = { 0,	NF,		SEN(getpid),			"getxpid"		},
 [ 21] = { 4,	0,		SEN(printargs),			"osf_mount"		},
 [ 22] = { 2,	TF,		SEN(umount2),			"umount"		},
 [ 23] = { 1,	0,		SEN(setuid),			"setuid"		},
@@ -341,7 +341,7 @@
 [375] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [376] = { 3,	0,		SEN(printargs),			"pciconfig_iobase"	},
 [377] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[378] = { 0,	0,		SEN(gettid),			"gettid"		},
+[378] = { 0,	NF,		SEN(gettid),			"gettid"		},
 [379] = { 3,	TD,		SEN(readahead),			"readahead"		},
 [380] = { },
 [381] = { 2,	TS,		SEN(kill),			"tkill"			},
