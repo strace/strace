@@ -1,6 +1,5 @@
 childthread
 clone
-fork
 leaderkill
 many_looping_threads
 mmap_offset_decode
@@ -12,7 +11,6 @@ sigkill_rain
 skodic
 threaded_execve
 ubi
-vfork
 wait_must_be_interruptible
 x32_lseek
 x32_mmap
