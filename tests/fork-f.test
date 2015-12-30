@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check how strace -f follows fork syscall.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -a32 -qq -f -epwrite64 -esignal=none $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
+
+exit 0

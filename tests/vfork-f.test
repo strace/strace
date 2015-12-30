@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check how strace -f follows vfork syscall.
+
+. "${srcdir=.}/fork-f.test"

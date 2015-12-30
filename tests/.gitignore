@@ -21,6 +21,7 @@ fcntl
 fcntl64
 file_handle
 filter-unavailable
+fork-f
 fstat
 fstat64
 fstatat64
@@ -102,6 +103,7 @@ unix-pair-send-recv
 userfaultfd
 utime
 utimensat
+vfork-f
 wait
 xattr
 xet_robust_list
