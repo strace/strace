@@ -75,6 +75,7 @@ strace_SOURCES =	\
 	chmod.c		\
 	clone.c		\
 	count.c		\
+	defs.h		\
 	desc.c		\
 	dirent.c	\
 	dirent64.c	\
@@ -211,7 +212,6 @@ strace_LDFLAGS += $(libunwind_LDFLAGS)
 strace_LDADD += $(libunwind_LIBS)
 endif
 
-noinst_HEADERS = defs.h
 # Enable this to get link map generated
 #strace_CFLAGS = $(AM_CFLAGS) -Wl,-Map=strace.mapfile
 
