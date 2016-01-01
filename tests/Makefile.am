@@ -1,6 +1,6 @@
 # Automake input for strace tests.
 #
-# Copyright (c) 2011-2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2011-2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 
 OS = linux
 ARCH = @arch@
+MPERS_NAME =
 ARCH_MFLAGS =
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = $(ARCH_MFLAGS) \
@@ -163,6 +164,12 @@ uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
 
+if USE_LIBUNWIND
+LIBUNWIND_TESTS = strace-k.test
+else
+LIBUNWIND_TESTS =
+endif
+
 TESTS = \
 	strace-f.test \
 	qual_syscall.test \
@@ -275,7 +282,12 @@ TESTS = \
 	detach-stopped.test \
 	detach-running.test \
 	restart_syscall.test \
-	strace-k.test
+	$(LIBUNWIND_TESTS)
+
+XFAIL_TESTS_ =
+XFAIL_TESTS_m32 = $(LIBUNWIND_TESTS)
+XFAIL_TESTS_mx32 = $(LIBUNWIND_TESTS)
+XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME))
 
 net-fd.log: net.log
 
