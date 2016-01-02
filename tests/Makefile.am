@@ -40,6 +40,16 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(top_srcdir)
 AM_LDFLAGS = $(ARCH_MFLAGS)
 
+libtests_a_SOURCES = \
+	get_page_size.c \
+	error_msg.c \
+	tail_alloc.c \
+	tests.h \
+	# end of libtests_a_SOURCES
+libtests_a_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+check_LIBRARIES = libtests.a
+LDADD = libtests.a
+
 check_PROGRAMS = \
 	_newselect \
 	adjtimex \
@@ -146,19 +156,19 @@ check_PROGRAMS = \
 	xettimeofday \
 	# end of check_PROGRAMS
 
-clock_xettime_LDADD = -lrt
-filter_unavailable_LDADD = -lpthread
+clock_xettime_LDADD = -lrt $(LDADD)
+filter_unavailable_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 lstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
-mq_LDADD = -lrt
+mq_LDADD = -lrt $(LDADD)
 newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
-pc_LDADD = $(dl_LIBS)
+pc_LDADD = $(dl_LIBS) $(LDADD)
 stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
-times_LDADD = -lrt
+times_LDADD = -lrt $(LDADD)
 truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stack_fcall_SOURCES = stack-fcall.c \

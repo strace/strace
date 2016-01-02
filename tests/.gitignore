@@ -40,6 +40,7 @@ ipc_sem
 ipc_shm
 ksysent
 ksysent.h
+libtests.a
 llseek
 lseek
 lstat
