@@ -32,10 +32,7 @@
  * get some non-zero values returned by times(2).
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
+#include "tests.h"
 #include <sched.h>
 #include <stdio.h>
 #include <time.h>

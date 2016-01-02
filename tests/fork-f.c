@@ -25,10 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
+#include "tests.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>

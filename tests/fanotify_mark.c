@@ -1,7 +1,4 @@
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
+#include "tests.h"
 #if defined HAVE_SYS_FANOTIFY_H && defined HAVE_FANOTIFY_MARK
 # include <sys/fanotify.h>
 int
