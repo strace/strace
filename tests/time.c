@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,32 +26,25 @@
  */
 
 #include "tests.h"
-#include <time.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <sys/mman.h>
 #include <sys/syscall.h>
 
 #ifdef __NR_time
 
+# include <time.h>
+# include <stdio.h>
+# include <stdint.h>
+# include <unistd.h>
+
 int
 main(void)
 {
-	const size_t page_len = sysconf(_SC_PAGESIZE);
+	time_t *p = tail_alloc(sizeof(time_t));
+	time_t t = syscall(__NR_time, p);
 
-	void *p = mmap(NULL, page_len * 2, PROT_READ | PROT_WRITE,
-		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (p == MAP_FAILED || mprotect(p + page_len, page_len, PROT_NONE))
-		return 77;
+	if ((time_t) -1 == t)
+		perror_msg_and_skip("time");
 
-	time_t *p_t = p + page_len - sizeof(time_t);
-	time_t t = syscall(__NR_time, p_t);
-
-	if ((time_t) -1 == t || t != *p_t)
-		return 77;
-
-	printf("time([%jd]) = %jd\n", (intmax_t) t, (intmax_t) t);
+	printf("time([%jd]) = %jd\n", (intmax_t) *p, (intmax_t) t);
 
 	puts("+++ exited with 0 +++");
 	return 0;
@@ -59,10 +52,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_time")
 
 #endif
