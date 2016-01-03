@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,29 +25,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <string.h>
 #include <unistd.h>
-#include <sys/mman.h>
 
 int
 main(void)
 {
-	const size_t page_len = sysconf(_SC_PAGESIZE);
 	const size_t tail_len = 257;
-
-	if (tail_len >= page_len)
-		return 77;
-
-	void *p = mmap(NULL, page_len * 2, PROT_READ | PROT_WRITE,
-		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (p == MAP_FAILED || mprotect(p + page_len, page_len, PROT_NONE))
-		return 77;
-
-	memset(p, 0, page_len);
-	char *addr = p + page_len - tail_len;
+	char *addr = tail_alloc(tail_len);
 	memset(addr, '/', tail_len - 1);
+	addr[tail_len - 1] = '\0';
 	if (chdir(addr))
-		return 77;
-
+		perror_msg_and_skip("chdir");
 	return 0;
 }
