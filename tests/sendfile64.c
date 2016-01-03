@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,18 +26,18 @@
  */
 
 #include "tests.h"
-#include <assert.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
 #include <sys/syscall.h>
 
 #ifdef __NR_sendfile64
+
+# include <assert.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <stdint.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <sys/stat.h>
 
 int
 main(int ac, const char **av)
@@ -46,56 +46,51 @@ main(int ac, const char **av)
 
 	(void) close(0);
 	if (open("/dev/zero", O_RDONLY) != 0)
-		return 77;
+		perror_msg_and_skip("open: %s", "/dev/zero");
 
 	int sv[2];
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
-		return 77;
+		perror_msg_and_skip("socketpair");
 
 	int reg_in = open(av[1], O_RDONLY);
 	if (reg_in < 0)
-		return 77;
+		perror_msg_and_fail("open: %s", av[1]);
 
 	struct stat stb;
-	if (fstat(reg_in, &stb))
-		return 77;
+	assert(fstat(reg_in, &stb) == 0);
 	const size_t blen = stb.st_size / 3;
 	const size_t alen = stb.st_size - blen;
 	assert(S_ISREG(stb.st_mode) && blen > 0);
 
-	const size_t page_len = sysconf(_SC_PAGESIZE);
-	if (!syscall(__NR_sendfile64, 0, 1, NULL, page_len) ||
-	    EBADF != errno)
-		return 77;
-	printf("sendfile64(0, 1, NULL, %lu) = -1 EBADF (Bad file descriptor)\n",
+	const size_t page_len = get_page_size();
+	assert(syscall(__NR_sendfile64, 0, 1, NULL, page_len) == -1);
+	if (EBADF != errno)
+		perror_msg_and_skip("sendfile64");
+	printf("sendfile64(0, 1, NULL, %lu) = -1 EBADF (%m)\n",
 	       (unsigned long) page_len);
 
-	void *p = mmap(NULL, page_len * 2, PROT_READ | PROT_WRITE,
-		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (MAP_FAILED == p || munmap(p + page_len, page_len))
-		return 77;
+	uint64_t *p_off = tail_alloc(sizeof(uint64_t));
+	void *p = p_off + 1;
+	*p_off = 0;
 
-	if (!syscall(__NR_sendfile64, 0, 1, p + page_len, page_len))
-		return 77;
-	printf("sendfile64(0, 1, %#lx, %lu) = -1 EFAULT (Bad address)\n",
-	       (unsigned long) p + page_len, (unsigned long) page_len);
+	assert(syscall(__NR_sendfile64, 0, 1, p, page_len) == -1);
+	printf("sendfile64(0, 1, %#lx, %lu) = -1 EFAULT (%m)\n",
+	       (unsigned long) p, (unsigned long) page_len);
 
-	if (syscall(__NR_sendfile64, sv[1], reg_in, NULL, alen) != (long) alen)
-		return 77;
+	assert(syscall(__NR_sendfile64, sv[1], reg_in, NULL, alen)
+	       == (long) alen);
 	printf("sendfile64(%d, %d, NULL, %lu) = %lu\n",
 	       sv[1], reg_in, (unsigned long) alen,
 	       (unsigned long) alen);
 
-	uint64_t *p_off = p + page_len - sizeof(uint64_t);
-	if (syscall(__NR_sendfile64, sv[1], reg_in, p_off, alen) != (long) alen)
-		return 77;
+	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, alen)
+	       == (long) alen);
 	printf("sendfile64(%d, %d, [0] => [%lu], %lu) = %lu\n",
 	       sv[1], reg_in, (unsigned long) alen,
 	       (unsigned long) alen, (unsigned long) alen);
 
-	if (syscall(__NR_sendfile64, sv[1], reg_in, p_off, stb.st_size + 1)
-	    != (long) blen)
-		return 77;
+	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, stb.st_size + 1)
+	       == (long) blen);
 	printf("sendfile64(%d, %d, [%lu] => [%lu], %lu) = %lu\n",
 	       sv[1], reg_in, (unsigned long) alen,
 	       (unsigned long) stb.st_size,
@@ -103,17 +98,13 @@ main(int ac, const char **av)
 	       (unsigned long) blen);
 
 	*p_off = 0xcafef00dfacefeed;
-	if (!syscall(__NR_sendfile64, sv[1], reg_in, p_off, 1))
-		return 77;
+	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, 1) == -1);
 	printf("sendfile64(%d, %d, [14627392582579060461], 1)"
-		" = -1 EINVAL (Invalid argument)\n",
-	       sv[1], reg_in);
+		" = -1 EINVAL (%m)\n", sv[1], reg_in);
 
 	*p_off = 0xfacefeed;
-	if (syscall(__NR_sendfile64, sv[1], reg_in, p_off, 1))
-		return 77;
-	printf("sendfile64(%d, %d, [4207869677], 1) = 0\n",
-	       sv[1], reg_in);
+	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, 1) == 0);
+	printf("sendfile64(%d, %d, [4207869677], 1) = 0\n", sv[1], reg_in);
 
 	puts("+++ exited with 0 +++");
 	return 0;
@@ -121,10 +112,6 @@ main(int ac, const char **av)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_sendfile64")
 
 #endif
