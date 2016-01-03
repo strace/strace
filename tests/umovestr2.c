@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,33 +25,28 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/mman.h>
 
 int
 main(void)
 {
-	const size_t page_len = sysconf(_SC_PAGESIZE);
-	const size_t work_len = page_len * 2;
-	const size_t tail_len = work_len - 1;
+	const size_t page_len = get_page_size();
+	const size_t tail_len = page_len * 2 - 1;
+	const size_t str_len = tail_len - 1;
 
-	void *p = mmap(NULL, page_len * 3, PROT_READ | PROT_WRITE,
-		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (p == MAP_FAILED || mprotect(p + work_len, page_len, PROT_NONE))
-		return 77;
-
-	memset(p, 0, work_len);
-	char *addr = p + work_len - tail_len;
-	memset(addr, '0', tail_len - 1);
+	char *addr = tail_alloc(tail_len);
+	memset(addr, '0', str_len);
+	addr[str_len] = '\0';
 
 	char *argv[] = { NULL };
 	char *envp[] = { addr, NULL };
 	execve("", argv, envp);
 
-	printf("execve(\"\", [], [\"%0*u\"]) = -1 ENOENT (No such file or directory)\n",
-	       (int) tail_len - 1, 0);
+	printf("execve(\"\", [], [\"%0*u\"]) = -1 ENOENT (%m)\n",
+	       (int) str_len, 0);
 	puts("+++ exited with 0 +++");
 
 	return 0;
