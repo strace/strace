@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -45,12 +47,12 @@ main(void)
 	};
 
 	if (syscall(__NR_gettimeofday, &t.tv, NULL))
-		return 77;
+		perror_msg_and_skip("gettimeofday");
 	printf("gettimeofday({%jd, %jd}, NULL) = 0\n",
 	       (intmax_t) t.tv.tv_sec, (intmax_t) t.tv.tv_usec);
 
 	if (syscall(__NR_gettimeofday, &t.tv, &t.tz))
-		return 77;
+		perror_msg_and_skip("gettimeofday");
 	printf("gettimeofday({%jd, %jd}"
 	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = 0\n",
 	       (intmax_t) t.tv.tv_sec, (intmax_t) t.tv.tv_usec,
@@ -58,11 +60,10 @@ main(void)
 
 	t.tv.tv_sec = -1;
 	t.tv.tv_usec = 1000000000;
-	if (!settimeofday(&t.tv, &t.tz))
-		return 77;
+	assert(settimeofday(&t.tv, &t.tz) == -1);
 	printf("settimeofday({%jd, %jd}"
 	       ", {tz_minuteswest=%d, tz_dsttime=%d})"
-	       " = -1 EINVAL (Invalid argument)\n",
+	       " = -1 EINVAL (%m)\n",
 	       (intmax_t) t.tv.tv_sec, (intmax_t) t.tv.tv_usec,
 	       t.tz.tz_minuteswest, t.tz.tz_dsttime);
 
