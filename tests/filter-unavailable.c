@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -52,7 +53,8 @@ process(void)
 
 	(void) close(0);
 	(void) close(1);
-	assert(pipe(fds) == 0 && fds[0] == 0 && fds[1] == 1);
+	if (pipe(fds))
+		perror_msg_and_fail("pipe");
 
 	for (i = 0; i < T; ++i)
 		assert(pthread_create(&t, NULL, thread, NULL) == 0);
@@ -70,10 +72,13 @@ main(void)
 	pid_t p;
 
 	for (i = 0; i < P; ++i) {
-		assert((p = fork()) >= 0);
+		p = fork();
+		if (p < 0)
+			perror_msg_and_fail("fork");
 		if (p == 0)
 			return process();
-		assert(waitpid(p, &s, 0) == p && WIFEXITED(s));
+		assert(waitpid(p, &s, 0) == p);
+		assert(WIFEXITED(s));
 		if (WEXITSTATUS(s))
 			return WEXITSTATUS(s);
 	}
