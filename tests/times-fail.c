@@ -1,4 +1,5 @@
 #include "tests.h"
+#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -6,9 +7,8 @@
 int
 main (void)
 {
-	if (syscall(__NR_times, 0x42) != -1)
-		return 77;
-	puts("times(0x42) = -1 EFAULT (Bad address)");
+	assert(syscall(__NR_times, 0x42) == -1);
+	printf("times(0x42) = -1 EFAULT (%m)\n");
 	puts("+++ exited with 0 +++");
 
 	return 0;
