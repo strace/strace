@@ -1,3 +1,4 @@
+#include "tests.h"
 #include <signal.h>
 
 int
@@ -8,5 +9,7 @@ main(void)
 		.ss_flags = SS_DISABLE,
 		.ss_size = 0xdeadbeef
 	};
-	return sigaltstack(&ss, (stack_t *) 0) ? 77 : 0;
+	if (sigaltstack(&ss, (stack_t *) 0))
+		perror_msg_and_skip("sigaltstack");
+	return 0;
 }
