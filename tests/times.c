@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,9 +56,8 @@ main (void)
 	int i;
 
 	pid_t pid = fork();
-
 	if (pid < 0)
-		return 77;
+		perror_msg_and_fail("fork");
 
 	const long cputime_limit =
 		pid ? PARENT_CPUTIME_LIMIT_NSEC : CHILD_CPUTIME_LIMIT_NSEC;
@@ -105,7 +104,7 @@ main (void)
 	long res = syscall(__NR_times, &tbuf);
 
 	if (-1L == res)
-		return 77;
+		perror_msg_and_skip("times");
 	else
 		llres = (unsigned long) res;
 #elif defined __NR_times && defined __x86_64__ && defined __ILP32__
@@ -120,7 +119,7 @@ main (void)
 	clock_t res = times(&tbuf);
 
 	if ((clock_t) -1 == res)
-		return 77;
+		perror_msg_and_skip("times");
 	if (sizeof(res) < sizeof(unsigned long long))
 		llres = (unsigned long) res;
 	else
