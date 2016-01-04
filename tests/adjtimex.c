@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ main(void)
 	int state = adjtimex(&tx);
 
 	if (state < 0)
-		return 77;
+		perror_msg_and_skip("adjtimex");
 
 	printf("adjtimex\\(\\{modes=0, offset=%jd, freq=%jd, maxerror=%jd"
 	       ", esterror=%jd, status=%s, constant=%jd, precision=%jd"
