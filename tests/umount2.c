@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -42,14 +43,13 @@ int
 main(void)
 {
 	static const char sample[] = "umount2.sample";
-	if (mkdir(sample, 0700)) {
-		perror(sample);
-		return 77;
-	}
+	if (mkdir(sample, 0700))
+		perror_msg_and_fail("mkdir: %s", sample);
 	(void) syscall(__NR_umount2, sample, 31);
 	printf("%s(\"%s\", MNT_FORCE|MNT_DETACH|MNT_EXPIRE|UMOUNT_NOFOLLOW|0x10)"
 	       " = -1 EINVAL (%m)\n", TEST_SYSCALL_STR, sample);
-	(void) rmdir(sample);
+	if (rmdir(sample))
+		perror_msg_and_fail("rmdir: %s", sample);
 	puts("+++ exited with 0 +++");
 	return 0;
 }
