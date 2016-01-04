@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <stdio.h>
 #include <sys/sysinfo.h>
 
@@ -32,8 +33,8 @@ int
 main (void)
 {
 	struct sysinfo si;
-	if (sysinfo(&si) == -1)
-		return 77;
+	if (sysinfo(&si))
+		perror_msg_and_skip("sysinfo");
 	printf("sysinfo({uptime=%llu"
 		", loads=[%llu, %llu, %llu]"
 		", totalram=%llu"
