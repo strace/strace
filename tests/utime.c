@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
+#include <assert.h>
 #include <time.h>
 #include <utime.h>
 #include <errno.h>
@@ -49,8 +51,11 @@ main(void)
 	print_tm(p);
 	printf(", ");
 	print_tm(p);
-	puts("]) = -1 ENOENT (No such file or directory)");
+	printf("]) = -1 ENOENT ");
+	assert(utime("utime\nfilename", &u) == -1);
+	if (ENOENT != errno)
+		perror_msg_and_skip("utime");
+	printf("(%m)\n");
 	puts("+++ exited with 0 +++");
-
-	return utime("utime\nfilename", &u) == -1 && errno == ENOENT ? 0 : 77;
+	return 0;
 }
