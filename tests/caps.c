@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <errno.h>
 
 extern int capget(int *, int *);
@@ -38,9 +39,12 @@ main(void)
 	const int v3 = 0x20080522;
 	int head[] = { v3, 0 };
 
-	if (capget(head, unused) || head[0] != v3 ||
-	    capset(head, data) == 0 || errno != EPERM)
-		return 77;
+	if (capget(head, unused))
+		perror_msg_and_skip("capget");
+	if (head[0] != v3)
+		error_msg_and_skip("capget: v3 expected");
+	if (capset(head, data) == 0 || errno != EPERM)
+		perror_msg_and_skip("capset");
 
 	return 0;
 }
