@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/time.h>
@@ -46,7 +47,7 @@ main(void)
 	};
 
 	if (setitimer(ITIMER_REAL, &new.itv, &old.itv))
-		return 77;
+		perror_msg_and_skip("setitimer");
 	printf("setitimer(ITIMER_REAL"
 	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
 	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
@@ -61,7 +62,7 @@ main(void)
 	       (intmax_t) old.itv.it_value.tv_usec);
 
 	if (getitimer(ITIMER_REAL, &old.itv))
-		return 77;
+		perror_msg_and_skip("getitimer");
 	printf("getitimer(ITIMER_REAL"
 	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
 	       ") = 0\n",
