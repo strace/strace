@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,9 +25,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined TEST_SYSCALL_NAME \
- && defined HAVE_FTRUNCATE && defined HAVE_FUTIMENS
+#if defined HAVE_FTRUNCATE && defined HAVE_FUTIMENS
 
+# ifndef TEST_SYSCALL_NAME
+#  error TEST_SYSCALL_NAME must be defined
+# endif
 # ifndef TEST_SYSCALL_INVOKE
 #  error TEST_SYSCALL_INVOKE must be defined
 # endif
@@ -314,10 +316,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("HAVE_FTRUNCATE && HAVE_FUTIMENS")
 
 #endif
