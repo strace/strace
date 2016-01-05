@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <assert.h>
 #include <string.h>
 #include <unistd.h>
@@ -54,12 +55,12 @@ main(int ac, char **av)
 	(void) close(1);
 
 	int sv[2];
-	assert(socketpair(AF_UNIX, SOCK_STREAM, 0, sv) == 0);
-	assert(sv[0] == 0);
-	assert(sv[1] == 1);
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
+		perror_msg_and_skip("socketpair");
 
 	pid_t pid = fork();
-	assert(pid >= 0);
+	if (pid < 0)
+		perror_msg_and_fail("fork");
 
 	if (pid) {
 		assert(close(1) == 0);
