@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,9 @@
  */
 
 #include "tests.h"
+
 #ifdef HAVE_SYS_XATTR_H
+
 # include <sys/xattr.h>
 
 int
@@ -34,18 +36,15 @@ main(void)
 {
 #define NAME "strace.test"
 #define VALUE "foo\0bar"
-	if (!removexattr(".", NAME) ||
-	    !setxattr(".", NAME, VALUE, sizeof(VALUE), XATTR_CREATE))
-		return 77;
+	if (!removexattr(".", NAME))
+		error_msg_and_skip("removexattr: error expected");
+	if (!setxattr(".", NAME, VALUE, sizeof(VALUE), XATTR_CREATE))
+		error_msg_and_skip("setxattr: error expected");
 	return 0;
 }
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("HAVE_SYS_XATTR_H")
 
 #endif
