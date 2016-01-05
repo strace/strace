@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015 Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,14 +27,16 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/syscall.h>
+
+#ifdef __NR_readlink
+
+# include <stdio.h>
+# include <unistd.h>
 
 int
 main(void)
 {
-#ifdef __NR_readlink
 	static const char fname[] = "readlink.link";
 	unsigned char buf[31];
 	long rc;
@@ -42,7 +44,7 @@ main(void)
 
 	rc = syscall(__NR_readlink, fname, buf, sizeof(buf));
 	if (rc < 0)
-		return 77;
+		perror_msg_and_skip("readlink");
 
 	printf("readlink(\"");
 	for (i = 0; fname[i]; ++i)
@@ -54,7 +56,10 @@ main(void)
 
 	puts("+++ exited with 0 +++");
 	return 0;
-#else
-	return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_readlink")
+
+#endif
