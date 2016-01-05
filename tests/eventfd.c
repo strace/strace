@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,14 +30,19 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
+#if defined __NR_eventfd2 && defined O_CLOEXEC
+
 int
 main(void)
 {
-#if defined __NR_eventfd2 && defined O_CLOEXEC
 	(void) close(0);
-	return syscall(__NR_eventfd2, -1L, 1 | O_CLOEXEC | O_NONBLOCK) == 0 ?
-		0 : 77;
-#else
-        return 77;
-#endif
+	if (syscall(__NR_eventfd2, -1L, 1 | O_CLOEXEC | O_NONBLOCK))
+		perror_msg_and_skip("eventfd2");
+	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_eventfd2 && O_CLOEXEC")
+
+#endif
