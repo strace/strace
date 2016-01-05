@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,19 +29,18 @@
  * Based on test by Dr. David Alan Gilbert <dave@treblig.org>
  */
 
-#ifdef TEST_SYSCALL_NAME
+#include <assert.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/select.h>
 
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/select.h>
+#define TEST_SYSCALL_NR nrify(TEST_SYSCALL_NAME)
+#define nrify(arg) nrify_(arg)
+#define nrify_(arg) __NR_ ## arg
 
-# define TEST_SYSCALL_NR nrify(TEST_SYSCALL_NAME)
-# define nrify(arg) nrify_(arg)
-# define nrify_(arg) __NR_ ## arg
-
-# define TEST_SYSCALL_STR stringify(TEST_SYSCALL_NAME)
-# define stringify(arg) stringify_(arg)
-# define stringify_(arg) #arg
+#define TEST_SYSCALL_STR stringify(TEST_SYSCALL_NAME)
+#define stringify(arg) stringify_(arg)
+#define stringify_(arg) #arg
 
 static fd_set set[0x1000000 / sizeof(fd_set)];
 
@@ -57,7 +56,7 @@ int main(void)
 	}, tm = tm_in;
 
 	if (pipe(fds))
-		return 77;
+		perror_msg_and_fail("pipe");
 
 	/*
 	 * Start with a nice simple select.
@@ -65,8 +64,10 @@ int main(void)
 	FD_ZERO(set);
 	FD_SET(fds[0], set);
 	FD_SET(fds[1], set);
-	if (syscall(TEST_SYSCALL_NR, fds[1] + 1, set, set, set, NULL) != 1)
-		return 77;
+	int rc = syscall(TEST_SYSCALL_NR, fds[1] + 1, set, set, set, NULL);
+	if (rc < 0)
+		perror_msg_and_skip(TEST_SYSCALL_STR);
+	assert(rc == 1);
 	printf("%s(%d, [%d %d], [%d %d], [%d %d], NULL) = 1 ()\n",
 	       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
 	       fds[0], fds[1], fds[0], fds[1]);
@@ -78,8 +79,7 @@ int main(void)
 	FD_SET(2, set);
 	FD_SET(fds[0], set);
 	FD_SET(fds[1], set);
-	if (syscall(TEST_SYSCALL_NR, fds[1] + 1, NULL, set, NULL, &tm.tv) != 3)
-		return 77;
+	assert(syscall(TEST_SYSCALL_NR, fds[1] + 1, NULL, set, NULL, &tm.tv) == 3);
 	printf("%s(%d, NULL, [1 2 %d %d], NULL, {%lld, %lld})"
 	       " = 3 (out [1 2 %d], left {%lld, %lld})\n",
 	       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
@@ -93,8 +93,7 @@ int main(void)
 	 */
 	FD_ZERO(set);
 	FD_SET(fds[1],set);
-	if (syscall(TEST_SYSCALL_NR, -1, NULL, set, NULL, NULL) != -1)
-		return 77;
+	assert(syscall(TEST_SYSCALL_NR, -1, NULL, set, NULL, NULL) == -1);
 	printf("%s(-1, NULL, %p, NULL, NULL) = -1 EINVAL (%m)\n",
 	       TEST_SYSCALL_STR, set);
 
@@ -105,21 +104,10 @@ int main(void)
 	FD_SET(fds[0],set);
 	tm.tv.tv_sec = 0;
 	tm.tv.tv_usec = 123;
-	if (syscall(TEST_SYSCALL_NR, FD_SETSIZE + 1, set, set + 1, NULL, &tm.tv))
-		return 77;
+	assert(syscall(TEST_SYSCALL_NR, FD_SETSIZE + 1, set, set + 1, NULL, &tm.tv) == 0);
 	printf("%s(%d, [%d], [], NULL, {0, 123}) = 0 (Timeout)\n",
 	       TEST_SYSCALL_STR, FD_SETSIZE + 1, fds[0]);
 
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-int
-main(void)
-{
-	return 77;
-}
-
-#endif
