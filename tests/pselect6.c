@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,9 @@
 /*
  * Based on test by Dr. David Alan Gilbert <dave@treblig.org>
  */
+
+#include "tests.h"
+#include <assert.h>
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
@@ -68,7 +71,7 @@ int main(int ac, char **av)
 	sigaddset(&mask, SIGCHLD);
 
 	if (pipe(fds))
-		return 77;
+		perror_msg_and_fail("pipe");
 
 	/*
 	 * Start with a nice simple pselect.
@@ -79,8 +82,10 @@ int main(int ac, char **av)
 	FD_SET(fds[1], set[1]);
 	FD_SET(1, set[2]);
 	FD_SET(2, set[2]);
-	if (pselect(fds[1] + 1, set[0], set[1], set[2], NULL, NULL) != 1)
-		return 77;
+	int rc = pselect(fds[1] + 1, set[0], set[1], set[2], NULL, NULL);
+	if (rc < 0)
+		perror_msg_and_skip("pselect");
+	assert(rc == 1);
 	printf("pselect6(%d, [%d %d], [%d %d], [1 2], NULL, {NULL, %u}) "
 	       "= 1 (out [%d])\n",
 	       fds[1] + 1, fds[0], fds[1],
@@ -94,8 +99,7 @@ int main(int ac, char **av)
 	FD_SET(2, set[1]);
 	FD_SET(fds[0], set[1]);
 	FD_SET(fds[1], set[1]);
-	if (syscall(__NR_pselect6, fds[1] + 1, NULL, set[1], NULL, &tm.ts, NULL) != 3)
-		return 77;
+	assert(syscall(__NR_pselect6, fds[1] + 1, NULL, set[1], NULL, &tm.ts, NULL) == 3);
 	printf("pselect6(%d, NULL, [1 2 %d %d], NULL, {%lld, %lld}, NULL)"
 	       " = 3 (out [1 2 %d], left {%lld, %lld})\n",
 	       fds[1] + 1, fds[0], fds[1],
@@ -109,10 +113,9 @@ int main(int ac, char **av)
 	 */
 	FD_ZERO(set[0]);
 	FD_SET(fds[1],set[0]);
-	if (pselect(-1, NULL, set[0], NULL, NULL, &mask) != -1)
-		return 77;
+	assert(pselect(-1, NULL, set[0], NULL, NULL, &mask) == -1);
 	printf("pselect6(-1, NULL, %p, NULL, NULL, {[HUP CHLD], %u}) "
-	       "= -1 EINVAL (Invalid argument)\n", set[0], NSIG / 8);
+	       "= -1 EINVAL (%m)\n", set[0], NSIG / 8);
 
 	/*
 	 * Another variant, with nfds exceeding FD_SETSIZE limit.
@@ -122,22 +125,18 @@ int main(int ac, char **av)
 	FD_ZERO(set[1]);
 	tm.ts.tv_sec = 0;
 	tm.ts.tv_nsec = 123;
-	if (pselect(FD_SETSIZE + 1, set[0], set[1], NULL, &tm.ts, &mask) != 0)
-		return 77;
+	assert(pselect(FD_SETSIZE + 1, set[0], set[1], NULL, &tm.ts, &mask) == 0);
 	printf("pselect6(%d, [%d], [], NULL, {0, 123}, {[HUP CHLD], %u}) "
 	       "= 0 (Timeout)\n", FD_SETSIZE + 1, fds[0], NSIG / 8);
 
 	/*
 	 * See how timeouts are decoded.
 	 */
-	if (sigaction(SIGALRM, &act, NULL) != 0)
-		return 77;
-	if (setitimer(ITIMER_REAL, &itv, NULL) != 0)
-		return 77;
+	assert(sigaction(SIGALRM, &act, NULL) == 0);
+	assert(setitimer(ITIMER_REAL, &itv, NULL) == 0);
 
 	tm.ts.tv_nsec = 222222222;
-	if (pselect(0, NULL, NULL, NULL, &tm.ts, &mask) != -1)
-		return 77;
+	assert(pselect(0, NULL, NULL, NULL, &tm.ts, &mask) == -1);
 	puts("pselect6(0, NULL, NULL, NULL, {0, 222222222}, {[HUP CHLD], 8})"
 	     " = ? ERESTARTNOHAND (To be restarted if no handler)");
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
@@ -148,10 +147,6 @@ int main(int ac, char **av)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_pselect6")
 
 #endif
