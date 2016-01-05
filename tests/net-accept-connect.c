@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2013-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -61,9 +62,12 @@ main(int ac, const char **av)
 	close(0);
 	close(1);
 
-	assert(socket(PF_LOCAL, SOCK_STREAM, 0) == 0);
-	assert(bind(0, (struct sockaddr *) &addr, len) == 0);
-	assert(listen(0, 5) == 0);
+	if (socket(PF_LOCAL, SOCK_STREAM, 0))
+		perror_msg_and_skip("socket");
+	if (bind(0, (struct sockaddr *) &addr, len))
+		perror_msg_and_skip("bind");
+	if (listen(0, 5))
+		perror_msg_and_skip("listen");
 
 	memset(&addr, 0, sizeof addr);
 	assert(getsockname(0, (struct sockaddr *) &addr, &len) == 0);
@@ -71,7 +75,8 @@ main(int ac, const char **av)
 		len = sizeof(addr);
 
 	pid_t pid = fork();
-	assert(pid >= 0);
+	if (pid < 0)
+		perror_msg_and_fail("fork");
 
 	if (pid) {
 		assert(accept(0, (struct sockaddr *) &addr, &len) == 1);
