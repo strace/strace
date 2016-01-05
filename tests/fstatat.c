@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,15 +25,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef HAVE_FSTATAT
-# undef TEST_SYSCALL_NAME
-#endif
+#ifdef HAVE_FSTATAT
 
-#define TEST_SYSCALL_INVOKE(sample, pst) \
+# define TEST_SYSCALL_INVOKE(sample, pst) \
 	fstatat(AT_FDCWD, sample, pst, AT_SYMLINK_NOFOLLOW)
-#define PRINT_SYSCALL_HEADER(sample) \
+# define PRINT_SYSCALL_HEADER(sample) \
 	printf("%s(AT_FDCWD, \"%s\", ", TEST_SYSCALL_STR, sample)
-#define PRINT_SYSCALL_FOOTER \
+# define PRINT_SYSCALL_FOOTER \
 	puts(", AT_SYMLINK_NOFOLLOW) = 0")
 
-#include "xstatx.c"
+# include "xstatx.c"
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_FSTATAT")
+
+#endif
