@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,19 +26,25 @@
  */
 
 #include "tests.h"
+#include <assert.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/syscall.h>
 
+#if defined __NR_epoll_create1 && defined O_CLOEXEC
+
 int
 main(void)
 {
-#if defined __NR_epoll_create1 && defined O_CLOEXEC
 	(void) close(0);
 	if (syscall(__NR_epoll_create1, O_CLOEXEC))
-		return 77;
-	return syscall(__NR_epoll_create1, O_CLOEXEC | O_NONBLOCK) >= 0;
-#else
-        return 77;
-#endif
+		perror_msg_and_skip("epoll_create1 O_CLOEXEC");
+	assert(syscall(__NR_epoll_create1, O_CLOEXEC | O_NONBLOCK) == -1);
+	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_epoll_create1 && O_CLOEXEC")
+
+#endif
