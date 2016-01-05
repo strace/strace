@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -121,10 +121,13 @@ main(void)
 	close(0);
 	close(1);
 
-	if (pipe(fds) ||
-	    prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) ||
-	    prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog) ||
-	    close(0) || close(1))
+	if (pipe(fds))
+		perror_msg_and_fail("pipe");
+	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0))
+		perror_msg_and_skip("PR_SET_NO_NEW_PRIVS");
+	if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog))
+		perror_msg_and_skip("PR_SET_SECCOMP");
+	if (close(0) || close(1))
 		_exit(77);
 
 	_exit(0);
@@ -132,6 +135,8 @@ main(void)
 
 #else
 
-int main(void) { return 77; }
+SKIP_MAIN_UNDEFINED("HAVE_PRCTL && PR_SET_NO_NEW_PRIVS && PR_SET_SECCOMP"
+		    " && SECCOMP_MODE_FILTER && SECCOMP_RET_ERRNO"
+		    " && BPF_JUMP && BPF_STMT")
 
 #endif
