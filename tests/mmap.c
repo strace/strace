@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@
 int
 main(void)
 {
-	const intmax_t pagesize = sysconf(_SC_PAGESIZE);
+	const intmax_t pagesize = get_page_size();
 	const unsigned long length = pagesize * 3;
 	const int fd = -1;
 	off_t offset;
@@ -51,10 +51,12 @@ main(void)
 
 	p = mmap(addr, length, PROT_READ | PROT_WRITE,
 		 MAP_PRIVATE | MAP_ANONYMOUS, fd, offset);
-	if (p == MAP_FAILED ||
-	    mprotect(p, length, PROT_NONE) ||
-	    munmap(p, length))
-		return 77;
+	if (MAP_FAILED == p)
+		perror_msg_and_fail("mmap");
+	if (mprotect(p, length, PROT_NONE))
+		perror_msg_and_fail("mprotect");
+	if (munmap(p, length))
+		perror_msg_and_fail("munmap");
 
 	if (sizeof(offset) == sizeof(int))
 		printf("mmap2?\\(%p, %lu, PROT_READ\\|PROT_WRITE, "
