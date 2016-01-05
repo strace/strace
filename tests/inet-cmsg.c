@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -94,19 +95,15 @@ main(void)
 	assert(!close(0));
 	assert(!close(3));
 
-	if (socket(PF_INET, SOCK_DGRAM, 0)) {
-		perror("socket");
-		return 77;
-	}
+	if (socket(PF_INET, SOCK_DGRAM, 0))
+		perror_msg_and_skip("socket");
 	struct sockaddr_in addr = {
 		.sin_family = AF_INET,
 		.sin_addr.s_addr = htonl(INADDR_LOOPBACK)
 	};
 	socklen_t len = sizeof(addr);
-	if (bind(0, (struct sockaddr *) &addr, len)) {
-		perror("bind");
-		return 77;
-	}
+	if (bind(0, (struct sockaddr *) &addr, len))
+		perror_msg_and_skip("bind");
 	assert(!getsockname(0, (struct sockaddr *) &addr, &len));
 
 	assert(socket(PF_INET, SOCK_DGRAM, 0) == 3);
