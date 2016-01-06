@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,14 @@
  */
 
 #include "tests.h"
+#include <assert.h>
 #include <poll.h>
 #include <signal.h>
 #include <unistd.h>
 
-static int
+static void
 test1(void)
 {
-	sigset_t mask;
 	const struct timespec timeout = { .tv_sec = 42, .tv_nsec = 999999999 };
 	struct pollfd fds[] = {
 		{ .fd = 0, .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
@@ -42,35 +42,41 @@ test1(void)
 		{ .fd = 4, .events = POLLOUT }
 	};
 
+	sigset_t mask;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGCHLD);
 
-	return ppoll(fds, sizeof(fds) / sizeof(*fds), &timeout, &mask) == 2 ? 0 : 77;
+	int rc = ppoll(fds, sizeof(fds) / sizeof(*fds), &timeout, &mask);
+	if (rc < 0)
+		perror_msg_and_skip("ppoll");
+	assert(rc == 2);
 }
 
-static int
+static void
 test2(void)
 {
-	sigset_t mask;
 	const struct timespec timeout = { .tv_sec = 0, .tv_nsec = 999 };
 	struct pollfd fds[] = {
 		{ .fd = 1, .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
 		{ .fd = 0, .events = POLLOUT | POLLWRNORM | POLLWRBAND }
 	};
 
+	sigset_t mask;
 	sigfillset(&mask);
 	sigdelset(&mask, SIGHUP);
 	sigdelset(&mask, SIGKILL);
 	sigdelset(&mask, SIGSTOP);
 
-	return ppoll(fds, sizeof(fds) / sizeof(*fds), &timeout, &mask) == 0 ? 0 : 77;
+	int rc = ppoll(fds, sizeof(fds) / sizeof(*fds), &timeout, &mask);
+	if (rc < 0)
+		perror_msg_and_skip("ppoll");
+	assert(rc == 0);
 }
 
 int
 main(void)
 {
-	int rc;
 	int fds[2];
 
 	(void) close(0);
@@ -78,14 +84,11 @@ main(void)
 	(void) close(3);
 	(void) close(4);
 	if (pipe(fds) || pipe(fds))
-		return 77;
+		perror_msg_and_fail("pipe");
 
+	test1();
+	test2();
 
-	if ((rc = test1()))
-		return rc;
-
-	if ((rc = test2()))
-		return rc;
-
-	return ppoll(NULL, 42, NULL, NULL) < 0 ? 0 : 77;
+	assert(ppoll(NULL, 42, NULL, NULL) < 0);
+	return 0;
 }
