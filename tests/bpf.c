@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -80,39 +80,39 @@ int
 main(void)
 {
 	if (!map_create())
-		return 77;
+		perror_msg_and_skip("BPF_MAP_CREATE");
 	printf("bpf\\(BPF_MAP_CREATE, "
 	       "\\{map_type=BPF_MAP_TYPE_UNSPEC, key_size=4, value_size=8, max_entries=256\\}, "
 	       "%u\\) += -1 .*\n",
 		(unsigned) sizeof(union bpf_attr));
 
 	if (!map_any(BPF_MAP_LOOKUP_ELEM))
-		return 77;
+		perror_msg_and_skip("BPF_MAP_LOOKUP_ELEM");
 	printf("bpf\\(BPF_MAP_LOOKUP_ELEM, "
 	       "\\{map_fd=-1, key=0xdeadbeef\\}, %u\\) += -1 .*\n",
 		(unsigned) sizeof(union bpf_attr));
 
 	if (!map_any(BPF_MAP_UPDATE_ELEM))
-		return 77;
+		perror_msg_and_skip("BPF_MAP_UPDATE_ELEM");
 	printf("bpf\\(BPF_MAP_UPDATE_ELEM, "
 	       "\\{map_fd=-1, key=0xdeadbeef, value=0xbadc0ded, flags=BPF_ANY\\}, "
 	       "%u\\) += -1 .*\n",
 		(unsigned) sizeof(union bpf_attr));
 
 	if (!map_any(BPF_MAP_DELETE_ELEM))
-		return 77;
+		perror_msg_and_skip("BPF_MAP_DELETE_ELEM");
 	printf("bpf\\(BPF_MAP_DELETE_ELEM, "
 	       "\\{map_fd=-1, key=0xdeadbeef\\}, %u\\) += -1 .*\n",
 		(unsigned) sizeof(union bpf_attr));
 
 	if (!map_any(BPF_MAP_GET_NEXT_KEY))
-		return 77;
+		perror_msg_and_skip("BPF_MAP_GET_NEXT_KEY");
 	printf("bpf\\(BPF_MAP_GET_NEXT_KEY, "
 	       "\\{map_fd=-1, key=0xdeadbeef\\}, %u\\) += -1 .*\n",
 		(unsigned) sizeof(union bpf_attr));
 
 	if (!prog_load())
-		return 77;
+		perror_msg_and_skip("BPF_PROG_LOAD");
 	printf("bpf\\(BPF_PROG_LOAD, "
 	       "\\{prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=1, insns=%p, "
 	       "license=\"GPL\", log_level=42, log_size=4096, log_buf=%p, "
@@ -124,10 +124,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_bpf")
 
 #endif
