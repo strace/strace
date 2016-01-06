@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,24 +27,28 @@
 
 #include "tests.h"
 #include <fcntl.h>
-#include <signal.h>
-#include <unistd.h>
-#ifdef HAVE_SYS_SIGNALFD_H
+
+#if defined HAVE_SYS_SIGNALFD_H && defined HAVE_SIGNALFD && defined O_CLOEXEC
+
+# include <signal.h>
+# include <unistd.h>
 # include <sys/signalfd.h>
-#endif
 
 int
 main(void)
 {
-#if defined HAVE_SYS_SIGNALFD_H && defined HAVE_SIGNALFD && defined O_CLOEXEC
 	sigset_t mask;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGCHLD);
 	(void) close(0);
-	return signalfd(-1, &mask, O_CLOEXEC | O_NONBLOCK) == 0 ?
-		0 : 77;
-#else
-        return 77;
-#endif
+	if (signalfd(-1, &mask, O_CLOEXEC | O_NONBLOCK))
+		perror_msg_and_skip("signalfd");
+	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_SYS_SIGNALFD_H && HAVE_SIGNALFD && O_CLOEXEC")
+
+#endif
