@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 
 #include "tests.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <signal.h>
@@ -60,34 +61,32 @@ main(void)
 	};
 
 	if (syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, &req.ts, NULL))
-		return 77;
+		perror_msg_and_skip("clock_nanosleep CLOCK_REALTIME");
 	printf("clock_nanosleep(CLOCK_REALTIME, 0, {%jd, %jd}, NULL) = 0\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec);
 
-	if (!syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, NULL, &rem.ts))
-		return 77;
+	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
+		       NULL, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, 0, NULL, %p)"
-	       " = -1 EFAULT (Bad address)\n", &rem.ts);
+	       " = -1 EFAULT (%m)\n", &rem.ts);
 
-	if (syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, &req.ts, &rem.ts))
-		return 77;
+	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
+		       &req.ts, &rem.ts) == 0);
 	printf("clock_nanosleep(CLOCK_REALTIME, 0, {%jd, %jd}, %p) = 0\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec, &rem.ts);
 
 	req.ts.tv_nsec = 999999999 + 1;
-	if (!syscall(__NR_clock_nanosleep, CLOCK_MONOTONIC, 0, &req.ts, &rem.ts))
-		return 77;
+	assert(syscall(__NR_clock_nanosleep, CLOCK_MONOTONIC, 0,
+		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_MONOTONIC, 0"
-	       ", {%jd, %jd}, %p) = -1 EINVAL (Invalid argument)\n",
+	       ", {%jd, %jd}, %p) = -1 EINVAL (%m)\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec, &rem.ts);
 
-	if (sigaction(SIGALRM, &act, NULL))
-		return 77;
-	if (sigprocmask(SIG_SETMASK, &set, NULL))
-		return 77;
+	assert(sigaction(SIGALRM, &act, NULL) == 0);
+	assert(sigprocmask(SIG_SETMASK, &set, NULL) == 0);
 
 	if (setitimer(ITIMER_REAL, &itv, NULL))
-		return 77;
+		perror_msg_and_skip("setitimer");
 	printf("setitimer(ITIMER_REAL, {it_interval={%jd, %jd}"
 	       ", it_value={%jd, %jd}}, NULL) = 0\n",
 	       (intmax_t) itv.it_interval.tv_sec,
@@ -96,25 +95,23 @@ main(void)
 	       (intmax_t) itv.it_value.tv_usec);
 
 	--req.ts.tv_nsec;
-	if (!syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, &req.ts, &rem.ts))
-		return 77;
+	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
+		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, 0, {%jd, %jd}, {%jd, %jd})"
 	       " = ? ERESTART_RESTARTBLOCK (Interrupted by signal)\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec,
 	       (intmax_t) rem.ts.tv_sec, (intmax_t) rem.ts.tv_nsec);
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
 
-	if (syscall(__NR_clock_gettime, CLOCK_REALTIME, &req.ts))
-		return 77;
+	assert(syscall(__NR_clock_gettime, CLOCK_REALTIME, &req.ts) == 0);
 	printf("clock_gettime(CLOCK_REALTIME, {%jd, %jd}) = 0\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec);
 
 	++req.ts.tv_sec;
 	rem.ts.tv_sec = 0xc0de4;
 	rem.ts.tv_nsec = 0xc0de5;
-	if (!syscall(__NR_clock_nanosleep, CLOCK_REALTIME, TIMER_ABSTIME,
-		     &req.ts, &rem.ts))
-		return 77;
+	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, TIMER_ABSTIME,
+		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, {%jd, %jd}, %p)"
 	       " = ? ERESTARTNOHAND (To be restarted if no handler)\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec, &rem.ts);
