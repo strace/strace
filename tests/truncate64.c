@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,10 @@
 
 #ifdef __NR_truncate64
 
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
+# include <assert.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
 
 int
 main(void)
@@ -40,12 +41,11 @@ main(void)
 	static const char fname[] = "truncate64\nfilename";
 	static const char qname[] = "truncate64\\nfilename";
 	const off_t len = 0xdefaceddeadbeef;
-	int rc = truncate(fname, len);
 
-	if (rc != -1 || ENOENT != errno)
-		return 77;
-
-	printf("truncate64(\"%s\", %llu) = -1 ENOENT (No such file or directory)\n",
+	assert(truncate(fname, len) == -1);
+	if (ENOENT != errno)
+		perror_msg_and_skip("truncate");
+	printf("truncate64(\"%s\", %llu) = -1 ENOENT (%m)\n",
 	       qname, (unsigned long long) len);
 
 	puts("+++ exited with 0 +++");
@@ -54,10 +54,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_truncate64")
 
 #endif
