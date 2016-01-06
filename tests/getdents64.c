@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,14 +30,14 @@
 
 #ifdef __NR_getdents64
 
-#include <assert.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <inttypes.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <unistd.h>
+# include <assert.h>
+# include <dirent.h>
+# include <fcntl.h>
+# include <inttypes.h>
+# include <stddef.h>
+# include <stdio.h>
+# include <sys/stat.h>
+# include <unistd.h>
 
 static const char fname[] =
 	"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"
@@ -116,7 +116,7 @@ main(int ac, const char **av)
 		int i;
 
 		if (rc < 0)
-			return 77;
+			perror_msg_and_skip("getdents64");
 		printf("getdents64(0, [");
 		for (i = 0; i < rc; i += d->d_reclen) {
 			d = (kernel_dirent64 *) &buf[i];
@@ -137,10 +137,6 @@ main(int ac, const char **av)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_getdents64")
 
 #endif
