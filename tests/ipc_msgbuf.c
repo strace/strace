@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +27,23 @@
  */
 
 #include "tests.h"
+#include <stdlib.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/stat.h>
-
 #include "kernel_types.h"
 
 #define text_string "STRACE_STRING"
 #define msgsz sizeof(text_string)
+
+static int msqid = -1;
+
+static void
+cleanup(void)
+{
+	msgctl(msqid, IPC_RMID, 0);
+	msqid = -1;
+}
 
 int
 main (void)
@@ -46,18 +56,13 @@ main (void)
 		.mtype = mtype,
 		.mtext = text_string
 	};
-	int msqid = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU);
+	msqid = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU);
 	if (msqid == -1)
-		return 77;
+		perror_msg_and_skip("msgget");
+	atexit(cleanup);
 	if (msgsnd(msqid, &msg, msgsz, 0) == -1)
-		goto cleanup;
+		perror_msg_and_skip("msgsnd");
 	if (msgrcv(msqid, &msg, msgsz, mtype, 0) != msgsz)
-		goto cleanup;
-	if (msgctl(msqid, IPC_RMID, 0) == -1)
-		return 77;
+		perror_msg_and_skip("msgrcv");
 	return 0;
-
-cleanup:
-	msgctl(msqid, IPC_RMID, 0);
-	return 77;
 }
