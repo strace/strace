@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,16 +27,18 @@
  */
 
 #include "tests.h"
-#include <sys/socket.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <assert.h>
+
+#if defined(HAVE_SENDMMSG) && defined(HAVE_STRUCT_MMSGHDR)
+
+# include <assert.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/socket.h>
 
 int
 main(void)
 {
-#if defined(HAVE_SENDMMSG) && defined(HAVE_STRUCT_MMSGHDR)
 	const int R = 0, W = 1;
 	int fd;
 	int sv[2];
@@ -70,7 +72,7 @@ main(void)
 			}
 		}
 	};
-#define n_mmh (sizeof(mmh)/sizeof(mmh[0]))
+# define n_mmh (sizeof(mmh)/sizeof(mmh[0]))
 
 	/*
 	 * Following open/dup2/close calls make the output of strace
@@ -81,7 +83,8 @@ main(void)
 		assert(fd >= 0);
 	(void) close(3);
 
-	assert(socketpair(AF_UNIX, SOCK_DGRAM, 0, sv) == 0);
+	if (socketpair(AF_UNIX, SOCK_DGRAM, 0, sv))
+		perror_msg_and_skip("socketpair");
 
 	assert(dup2(sv[W], W) == W);
 	assert(close(sv[W]) == 0);
@@ -90,7 +93,7 @@ main(void)
 
 	int r = sendmmsg(W, mmh, n_mmh, 0);
 	if (r < 0 && errno == ENOSYS)
-		return 77;
+		perror_msg_and_skip("sendmmsg");
 	assert((size_t)r == n_mmh);
 	assert(close(W) == 0);
 
@@ -98,7 +101,10 @@ main(void)
 	assert(close(R) == 0);
 
 	return 0;
-#else
-	return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_SENDMMSG && HAVE_STRUCT_MMSGHDR")
+
+#endif
