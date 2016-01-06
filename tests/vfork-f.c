@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 
 #include "tests.h"
+#include <assert.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -52,22 +53,16 @@ int main(int ac, char **av, char **ep)
 
 	int fds[2];
 	(void) close(0);
-	if (pipe(fds)) {
-		perror("pipe");
-		return 77;
-	}
-	if (fcntl(fds[1], F_SETFD, FD_CLOEXEC)) {
-		perror("fcntl");
-		return 77;
-	}
+	if (pipe(fds))
+		perror_msg_and_fail("pipe");
+	if (fcntl(fds[1], F_SETFD, FD_CLOEXEC))
+		perror_msg_and_fail("fcntl");
 
 	char *const args[] = { av[0], (char *) "exec", NULL };
 	pid_t pid = vfork();
 
-	if (pid < 0) {
-		perror("vfork");
-		return 77;
-	}
+	if (pid < 0)
+		perror_msg_and_fail("vfork");
 
 	if (!pid) {
 		if (logit("child") || execve(args[0], args, args + 1))
@@ -80,14 +75,8 @@ int main(int ac, char **av, char **ep)
 	close(fds[1]);
 
 	int status;
-	if (wait(&status) != pid) {
-		perror("wait");
-		return 77;
-	}
-	if (status) {
-		fprintf(stderr, "status = %d\n", status);
-		return 77;
-	}
+	assert(wait(&status) == pid);
+	assert(status == 0);
 
 	logit("finish");
 
