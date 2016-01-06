@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,23 +26,36 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
+#include "tests.h"
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/msg.h>
+
+static int id = -1;
+
+static void
+cleanup(void)
+{
+	msgctl(id, IPC_RMID, NULL);
+	printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) += 0\n", id);
+	id = -1;
+}
 
 int
 main(void)
 {
-	int rc, id;
+	int rc;
 	struct msqid_ds ds;
 
 	id = msgget(IPC_PRIVATE, 0600);
 	if (id < 0)
-		return 77;
+		perror_msg_and_skip("msgget");
 	printf("msgget\\(IPC_PRIVATE, 0600\\) += %d\n", id);
+	atexit(cleanup);
 
 	if (msgctl(id, IPC_STAT, &ds))
-		goto fail;
+		perror_msg_and_skip("msgctl IPC_STAT");
 	printf("msgctl\\(%d, (IPC_64\\|)?IPC_STAT, \\{msg_perm=\\{uid=%u, gid=%u, "
 		"mode=%#o, key=%u, cuid=%u, cgid=%u\\}, msg_stime=%u, msg_rtime=%u, "
 		"msg_ctime=%u, msg_qnum=%u, msg_qbytes=%u, msg_lspid=%u, "
@@ -57,7 +70,7 @@ main(void)
 
 	int max = msgctl(0, MSG_INFO, &ds);
 	if (max < 0)
-		goto fail;
+		perror_msg_and_skip("msgctl MSG_INFO");
 	printf("msgctl\\(0, (IPC_64\\|)?MSG_INFO, %p\\) += %d\n", &ds, max);
 
 	rc = msgctl(id, MSG_STAT, &ds);
@@ -67,20 +80,11 @@ main(void)
 		 * an index in the kernel's internal array.
 		 */
 		if (-1 != rc || EINVAL != errno)
-			goto fail;
-		printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) += -1 EINVAL \\(Invalid argument\\)\n", id, &ds);
+			perror_msg_and_skip("msgctl MSG_STAT");
+		printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) += -1 EINVAL \\(%m\\)\n", id, &ds);
 	} else {
 		printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) += %d\n", id, &ds, id);
 	}
 
-	rc = 0;
-done:
-	if (msgctl(id, IPC_RMID, NULL) < 0)
-		return 1;
-	printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) += 0\n", id);
-	return rc;
-
-fail:
-	rc = 1;
-	goto done;
+	return 0;
 }
