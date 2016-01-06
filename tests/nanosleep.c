@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <signal.h>
@@ -54,32 +56,28 @@ main(void)
 	const struct itimerval itv = { .it_value.tv_usec = 111111 };
 
 	if (nanosleep(&req.ts, NULL))
-		return 77;
+		perror_msg_and_fail("nanosleep");
 	printf("nanosleep({%jd, %jd}, NULL) = 0\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec);
 
-	if (!nanosleep(NULL, &rem.ts))
-		return 77;
-	printf("nanosleep(NULL, %p) = -1 EFAULT (Bad address)\n", &rem.ts);
+	assert(nanosleep(NULL, &rem.ts) == -1);
+	printf("nanosleep(NULL, %p) = -1 EFAULT (%m)\n", &rem.ts);
 
 	if (nanosleep(&req.ts, &rem.ts))
-		return 77;
+		perror_msg_and_fail("nanosleep");
 	printf("nanosleep({%jd, %jd}, %p) = 0\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec, &rem.ts);
 
 	req.ts.tv_nsec = 1000000000;
-	if (!nanosleep(&req.ts, &rem.ts))
-		return 77;
-	printf("nanosleep({%jd, %jd}, %p) = -1 EINVAL (Invalid argument)\n",
+	assert(nanosleep(&req.ts, &rem.ts) == -1);
+	printf("nanosleep({%jd, %jd}, %p) = -1 EINVAL (%m)\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec, &rem.ts);
 
-	if (sigaction(SIGALRM, &act, NULL))
-		return 77;
-	if (sigprocmask(SIG_SETMASK, &set, NULL))
-		return 77;
+	assert(sigaction(SIGALRM, &act, NULL) == 0);
+	assert(sigprocmask(SIG_SETMASK, &set, NULL) == 0);
 
 	if (setitimer(ITIMER_REAL, &itv, NULL))
-		return 77;
+		perror_msg_and_skip("setitimer");
 	printf("setitimer(ITIMER_REAL, {it_interval={%jd, %jd}"
 	       ", it_value={%jd, %jd}}, NULL) = 0\n",
 	       (intmax_t) itv.it_interval.tv_sec,
@@ -88,8 +86,7 @@ main(void)
 	       (intmax_t) itv.it_value.tv_usec);
 
 	req.ts.tv_nsec = 999999999;
-	if (!nanosleep(&req.ts, &rem.ts))
-		return 77;
+	assert(nanosleep(&req.ts, &rem.ts) == -1);
 	printf("nanosleep({%jd, %jd}, {%jd, %jd})"
 	       " = ? ERESTART_RESTARTBLOCK (Interrupted by signal)\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec,
