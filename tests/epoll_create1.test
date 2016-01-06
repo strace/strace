@@ -4,8 +4,10 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog
-run_strace -e epoll_create1 $args
-match_grep
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -a28 -eepoll_create1 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
 
 exit 0

@@ -307,7 +307,6 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     dumpio.expected \
-	     epoll_create1.expected \
 	     eventfd.expected \
 	     execve.expected \
 	     execve-v.expected \
