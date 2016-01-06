@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -40,7 +41,7 @@
 # define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
 #endif
 
-static int
+static void
 send_query(const int fd, const int family, const int proto)
 {
 	struct sockaddr_nl nladdr = {
@@ -73,10 +74,11 @@ send_query(const int fd, const int family, const int proto)
 		.msg_iovlen = 1
 	};
 
-	return sendmsg(fd, &msg, 0) > 0;
+	if (sendmsg(fd, &msg, 0) <= 0)
+		perror_msg_and_skip("sendmsg");
 }
 
-static int
+static void
 check_responses(const int fd)
 {
 	static char buf[8192];
@@ -96,12 +98,15 @@ check_responses(const int fd)
 
 	ssize_t ret = recvmsg(fd, &msg, 0);
 	if (ret <= 0)
-		return 0;
+		perror_msg_and_skip("recvmsg");
 
 	struct nlmsghdr *h = (struct nlmsghdr*)buf;
-	return (NLMSG_OK(h, ret) &&
-		h->nlmsg_type != NLMSG_ERROR &&
-		h->nlmsg_type != NLMSG_DONE) ? 1 : 0;
+	if (!NLMSG_OK(h, ret))
+		error_msg_and_skip("!NLMSG_OK");
+	if (h->nlmsg_type == NLMSG_ERROR)
+		error_msg_and_skip("NLMSG_ERROR");
+	if (h->nlmsg_type == NLMSG_DONE)
+		error_msg_and_skip("NLMSG_DONE");
 }
 
 #define SUN_PATH "netlink_unix_diag_socket"
@@ -117,16 +122,19 @@ int main(void)
 	close(1);
 
 	(void) unlink(SUN_PATH);
-	if (socket(PF_LOCAL, SOCK_STREAM, 0) ||
-	    bind(0, (struct sockaddr *) &addr, len) ||
-	    listen(0, 5))
-		return 77;
+	if (socket(PF_LOCAL, SOCK_STREAM, 0))
+		perror_msg_and_skip("socket PF_LOCAL");
+	if (bind(0, (struct sockaddr *) &addr, len))
+		perror_msg_and_skip("bind");
+	if (listen(0, 5))
+		perror_msg_and_skip("listen");
 
 	assert(unlink(SUN_PATH) == 0);
 
 	if (socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG) != 1)
-		return 77;
+		perror_msg_and_skip("socket AF_NETLINK");
 
-	return (send_query(1, AF_UNIX, 0) &&
-		check_responses(1)) ? 0 : 77;
+	send_query(1, AF_UNIX, 0);
+	check_responses(1);
+	return 0;
 }
