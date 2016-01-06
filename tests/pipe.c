@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,9 +26,12 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
+
+#ifdef HAVE_PIPE2
+
+# include <stdio.h>
+# include <fcntl.h>
+# include <unistd.h>
 
 int
 main(void)
@@ -36,16 +39,19 @@ main(void)
 	(void) close(0);
 	(void) close(1);
 	int fds[2];
-	if (pipe(fds) || fds[0] != 0 || fds[1] != 1)
-		return 77;
+	if (pipe(fds))
+		perror_msg_and_fail("pipe");
 
-#ifdef HAVE_PIPE2
 	(void) close(0);
 	(void) close(1);
-	if (pipe2(fds, O_NONBLOCK) || fds[0] != 0 || fds[1] != 1)
-		return 77;
+	if (pipe2(fds, O_NONBLOCK))
+		perror_msg_and_skip("pipe2");
+
 	return 0;
-#else
-	return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_PIPE2")
+
+#endif
