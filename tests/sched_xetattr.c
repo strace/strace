@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,13 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <inttypes.h>
-#include <unistd.h>
 #include <sys/syscall.h>
 
 #if defined __NR_sched_getattr && defined __NR_sched_setattr
+
+# include <inttypes.h>
+# include <stdio.h>
+# include <unistd.h>
 
 int
 main(void)
@@ -51,7 +52,7 @@ main(void)
 	} sched;
 
 	if (syscall(__NR_sched_getattr, 0, &sched, sizeof(sched), 0))
-		return 77;
+		perror_msg_and_skip("sched_getattr");
 
 	printf("sched_getattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+, sched_flags=%s, sched_nice=%u, sched_priority=%u, sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "\\}, 256, 0\\) += 0\n",
 		sched.attr.size,
@@ -64,7 +65,7 @@ main(void)
 
 	sched.attr.sched_flags |= 1;
 	if (syscall(__NR_sched_setattr, 0, &sched, 0))
-		return 77;
+		perror_msg_and_skip("sched_setattr");
 
 	printf("sched_setattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+, sched_flags=%s, sched_nice=%u, sched_priority=%u, sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "\\}, 0\\) += 0\n",
 		sched.attr.size,
@@ -80,10 +81,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_sched_getattr && __NR_sched_setattr")
 
 #endif
