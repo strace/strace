@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@
  && defined __NR_io_destroy
 # include <linux/aio_abi.h>
 
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+# define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 int
 main(void)
@@ -128,14 +128,14 @@ main(void)
 
 	(void) close(0);
 	if (open("/dev/zero", O_RDONLY))
-		return 77;
+		perror_msg_and_skip("open: %s", "/dev/zero");
 
 	if (syscall(__NR_io_setup, lnr, &ctx))
-		return 77;
+		perror_msg_and_skip("io_setup");
 	printf("io_setup(%u, [%lu]) = 0\n", nr, ctx);
 
 	if (syscall(__NR_io_submit, ctx, nr, cbs) != (long) nr)
-		return 77;
+		perror_msg_and_skip("io_submit");
 	printf("io_submit(%lu, %u, ["
 		"{data=%#llx, pread, reqprio=11, fildes=0, "
 			"buf=%p, nbytes=%u, offset=%lld}, "
@@ -163,11 +163,11 @@ main(void)
 
 	assert(syscall(__NR_io_cancel, ctx, &cbc, ev) == -1 && EINVAL == errno);
 	printf("io_cancel(%lu, {data=%#llx, pread, reqprio=99, fildes=-42}, %p) "
-		"= -1 EINVAL (Invalid argument)\n",
+		"= -1 EINVAL (%m)\n",
 	       ctx, (unsigned long long) cbc.aio_data, ev);
 
 	if (syscall(__NR_io_submit, ctx, nr, cbvs) != (long) nr)
-		return 77;
+		perror_msg_and_skip("io_submit");
 	printf("io_submit(%lu, %u, ["
 		"{data=%#llx, preadv, reqprio=%hd, fildes=0, "
 			"iovec=[{%p, %u}, {%p, %u}], offset=%lld}, "
@@ -194,10 +194,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_io_*")
 
 #endif
