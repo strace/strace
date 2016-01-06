@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
  */
 
 #include "tests.h"
+#include <assert.h>
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -35,27 +36,25 @@
 
 int main(void)
 {
-	const unsigned long pagesize = sysconf(_SC_PAGESIZE);
+	const unsigned long pagesize = get_page_size();
 
 #ifdef __s390__
 	/*
 	 * The si_addr field is unreliable:
 	 * https://marc.info/?l=linux-s390&m=142515870124248&w=2
 	 */
-	return 77;
+	error_msg_and_skip("s390: si_addr is unreliable");
 #endif
 
 	/* write instruction pointer length to the log */
-	if (write(-1, NULL, 2 * sizeof(void *)) >= 0)
-		return 77;
+	assert(write(-1, NULL, 2 * sizeof(void *)) < 0);
 
 	/* just a noticeable line in the log */
-	if (munmap(&main, 0) >= 0)
-		return 77;
+	assert(munmap(&main, 0) < 0);
 
 	int pid = fork();
 	if (pid < 0)
-		return 77;
+		perror_msg_and_fail("fork");
 
 	if (!pid) {
 		const unsigned long mask = ~(pagesize - 1);
@@ -81,14 +80,13 @@ int main(void)
 		/* SIGSEGV is expected */
 		(void) munmap((void *) addr, size);
 		(void) munmap((void *) addr, size);
-		return 77;
+		error_msg_and_skip("SIGSEGV did not happen");
 	}
 
 	int status;
-	if (wait(&status) != pid ||
-	    !WIFSIGNALED(status) ||
-	    WTERMSIG(status) != SIGSEGV)
-		return 77;
+	assert(wait(&status) == pid);
+	assert(WIFSIGNALED(status));
+	assert(WTERMSIG(status) == SIGSEGV);
 
 	/* dump process map for debug purposes */
 	close(0);
