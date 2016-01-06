@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,14 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <signal.h>
-#include <time.h>
-#include <unistd.h>
 #include <sys/syscall.h>
 
 #ifdef __NR_timer_create
+
+# include <stdio.h>
+# include <signal.h>
+# include <time.h>
+# include <unistd.h>
 
 int
 main(void)
@@ -46,7 +47,7 @@ main(void)
 	};
 
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[0]))
-		return 77;
+		perror_msg_and_skip("timer_create CLOCK_REALTIME");
 	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%p}"
 	       ", sigev_signo=%u, sigev_notify=SIGEV_NONE}"
 	       ", [%d]) = 0\n",
@@ -57,7 +58,7 @@ main(void)
 	sev.sigev_notify = SIGEV_SIGNAL;
 	sev.sigev_signo = SIGALRM;
 	if (syscall(__NR_timer_create, CLOCK_MONOTONIC, &sev, &tid[1]))
-		return 77;
+		perror_msg_and_skip("timer_create CLOCK_MONOTONIC");
 	printf("timer_create(CLOCK_MONOTONIC, {sigev_value={int=%d, ptr=%p}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_SIGNAL}"
 	       ", [%d]) = 0\n",
@@ -70,7 +71,7 @@ main(void)
 	sev.sigev_notify_attributes =
 		(void *) (unsigned long) 0xcafef00dfacefeed;
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[2]))
-		return 77;
+		perror_msg_and_skip("timer_create CLOCK_REALTIME");
 	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%p}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD"
 	       ", sigev_notify_function=%p, sigev_notify_attributes=%p}"
@@ -96,7 +97,7 @@ main(void)
 	sev.sigev_notify = SIGEV_THREAD_ID;
 	sev.sigev_notify_thread_id = getpid();
 	if (syscall(__NR_timer_create, CLOCK_MONOTONIC, &sev, &tid[3]))
-		return 77;
+		perror_msg_and_skip("timer_create CLOCK_MONOTONIC");
 	printf("timer_create(CLOCK_MONOTONIC, {sigev_value={int=%d, ptr=%p}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD_ID"
 	       ", sigev_notify_thread_id=%d}"
@@ -113,10 +114,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_timer_create")
 
 #endif
