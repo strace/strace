@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,15 +26,17 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/uio.h>
-#include <assert.h>
+
+#if defined(HAVE_PREADV) && defined(HAVE_PWRITEV)
+
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/uio.h>
+# include <assert.h>
 
 int
 main(void)
 {
-#if defined(HAVE_PREADV) && defined(HAVE_PWRITEV)
 	const off_t offset = 0xdefaceddeadbeefLL;
 	char buf[4];
 	struct iovec iov = { buf, sizeof buf };
@@ -51,7 +53,10 @@ main(void)
 	assert(!close(0));
 
 	return 0;
-#else
-	return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_PREADV && HAVE_PWRITEV")
+
+#endif
