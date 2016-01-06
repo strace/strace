@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,30 +26,33 @@
  */
 
 #include "tests.h"
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/syscall.h>
+
+#ifdef __NR_membarrier
+
+# include <assert.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
 
 int
 main(void)
 {
-#ifdef __NR_membarrier
-	if (syscall(__NR_membarrier, 3, 255) != -1)
-		return 77;
-	printf("membarrier(0x3 /* MEMBARRIER_CMD_??? */, 255) = -1 %s\n",
-	       errno == ENOSYS ?
-			"ENOSYS (Function not implemented)" :
-			"EINVAL (Invalid argument)");
+	assert(syscall(__NR_membarrier, 3, 255) == -1);
+	printf("membarrier(0x3 /* MEMBARRIER_CMD_??? */, 255) = -1 %s (%m)\n",
+	       errno == ENOSYS ? "ENOSYS" : "EINVAL");
 	if (errno != ENOSYS) {
-		if (syscall(__NR_membarrier, 0, 0) != 1)
-			return 1;  /* the test needs to be updated? */
+		/* the test needs to be updated? */
+		assert(syscall(__NR_membarrier, 0, 0) == 1);
 		puts("membarrier(MEMBARRIER_CMD_QUERY, 0)"
 		     " = 0x1 (MEMBARRIER_CMD_SHARED)");
 	}
 	puts("+++ exited with 0 +++");
 	return 0;
-#else
-        return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_membarrier")
+
+#endif
