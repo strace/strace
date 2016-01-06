@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2015 Andreas Schwab <schwab@suse.de>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
+#include "tests.h"
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/sem.h>
 
 union semun {
@@ -38,29 +40,40 @@ union semun {
 				    (Linux-specific) */
 };
 
+static int id = -1;
+
+static void
+cleanup(void)
+{
+	semctl(id, 0, IPC_RMID, 0);
+	printf("semctl\\(%d, 0, (IPC_64\\|)?IPC_RMID, \\[?0\\]?\\) += 0\n", id);
+	id = -1;
+}
+
 int
 main(void)
 {
-	int rc, id;
+	int rc;
 	union semun un;
 	struct semid_ds ds;
 	struct seminfo info;
 
 	id = semget(IPC_PRIVATE, 1, 0600);
 	if (id < 0)
-		return 77;
+		perror_msg_and_skip("semget");
 	printf("semget\\(IPC_PRIVATE, 1, 0600\\) += %d\n", id);
+	atexit(cleanup);
 
 	un.buf = &ds;
 	if (semctl(id, 0, IPC_STAT, un))
-		goto fail;
+		perror_msg_and_skip("semctl IPC_STAT");
 	printf("semctl\\(%d, 0, (IPC_64\\|)?IPC_STAT, \\[?%p\\]?\\) += 0\n",
 	       id, &ds);
 
 	un.__buf = &info;
 	int max = semctl(0, 0, SEM_INFO, un);
 	if (max < 0)
-		goto fail;
+		perror_msg_and_skip("semctl SEM_INFO");
 	printf("semctl\\(0, 0, (IPC_64\\|)?SEM_INFO, \\[?%p\\]?\\) += %d\n",
 	       &info, max);
 
@@ -72,22 +85,13 @@ main(void)
 		 * an index in the kernel's internal array.
 		 */
 		if (-1 != rc || EINVAL != errno)
-			goto fail;
+			perror_msg_and_skip("semctl SEM_STAT");
 		printf("semctl\\(%d, 0, (IPC_64\\|)?SEM_STAT, \\[?%p\\]?\\)"
-		       " += -1 EINVAL \\(Invalid argument\\)\n", id, &ds);
+		       " += -1 EINVAL \\(%m\\)\n", id, &ds);
 	} else {
 		printf("semctl\\(%d, 0, (IPC_64\\|)?SEM_STAT, \\[?%p\\]?\\)"
 		       " += %d\n", id, &ds, id);
 	}
 
-	rc = 0;
-done:
-	if (semctl(id, 0, IPC_RMID, 0) < 0)
-		return 1;
-	printf("semctl\\(%d, 0, (IPC_64\\|)?IPC_RMID, \\[?0\\]?\\) += 0\n", id);
-	return rc;
-
-fail:
-	rc = 1;
-	goto done;
+	return 0;
 }
