@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,11 +30,11 @@
 
 #ifdef __NR_truncate
 
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-
-#include "kernel_types.h"
+# include <assert.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
+# include "kernel_types.h"
 
 int
 main(void)
@@ -42,17 +42,16 @@ main(void)
 	static const char fname[] = "truncate\nfilename";
 	static const char qname[] = "truncate\\nfilename";
 	const kernel_ulong_t len = (kernel_ulong_t) 0xdefaced0badc0deULL;
-	int rc;
 
 	if (sizeof(len) > sizeof(long))
-		rc = truncate(fname, len);
+		assert(truncate(fname, len) == -1);
 	else
-		rc = syscall(__NR_truncate, fname, len);
+		assert(syscall(__NR_truncate, fname, len) == -1);
 
-	if (rc != -1 || ENOENT != errno)
-		return 77;
+	if (ENOENT != errno)
+		perror_msg_and_skip("truncate");
 
-	printf("truncate(\"%s\", %llu) = -1 ENOENT (No such file or directory)\n",
+	printf("truncate(\"%s\", %llu) = -1 ENOENT (%m)\n",
 	       qname, (unsigned long long) len);
 
 	puts("+++ exited with 0 +++");
@@ -61,10 +60,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_truncate")
 
 #endif
