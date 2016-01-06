@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tests.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>
@@ -46,13 +47,13 @@ main(void)
 	};
 
 	if (syscall(__NR_clock_getres, CLOCK_REALTIME, &t.ts))
-		return 77;
+		perror_msg_and_skip("clock_getres CLOCK_REALTIME");
 	printf("clock_getres(CLOCK_REALTIME, {%jd, %jd}) = 0\n",
 	       (intmax_t) t.ts.tv_sec,
 	       (intmax_t) t.ts.tv_nsec);
 
 	if (syscall(__NR_clock_gettime, CLOCK_PROCESS_CPUTIME_ID, &t.ts))
-		return 77;
+		perror_msg_and_skip("clock_gettime CLOCK_PROCESS_CPUTIME_ID");
 	printf("clock_gettime(CLOCK_PROCESS_CPUTIME_ID, {%jd, %jd}) = 0\n",
 	       (intmax_t) t.ts.tv_sec,
 	       (intmax_t) t.ts.tv_nsec);
@@ -60,9 +61,10 @@ main(void)
 	t.ts.tv_sec = 0xdeface1;
 	t.ts.tv_nsec = 0xdeface2;
 	if (!syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts))
-		return 77;
+		error_msg_and_skip("clock_settime CLOCK_THREAD_CPUTIME_ID:"
+				   " EINVAL expected");
 	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID, {%jd, %jd})"
-	       " = -1 EINVAL (Invalid argument)\n",
+	       " = -1 EINVAL (%m)\n",
 	       (intmax_t) t.ts.tv_sec,
 	       (intmax_t) t.ts.tv_nsec);
 
@@ -72,10 +74,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_clock_getres && __NR_clock_gettime && __NR_clock_settime")
 
 #endif
