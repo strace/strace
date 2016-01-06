@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,36 +61,36 @@ main(void )
 	struct termios tty;
 	(void) ioctl(-1, TCGETS, &tty);
 	printf("ioctl(-1, TCGETS, %p)"
-	       " = -1 EBADF (Bad file descriptor)\n", &tty);
+	       " = -1 EBADF (%m)\n", &tty);
 #endif
 
 	(void) ioctl(-1, MMTIMER_GETRES, &data);
 	printf("ioctl(-1, MMTIMER_GETRES, %p)"
-	       " = -1 EBADF (Bad file descriptor)\n", &data);
+	       " = -1 EBADF (%m)\n", &data);
 
 	(void) ioctl(-1, VIDIOC_ENUMINPUT, 0);
 	printf("ioctl(-1, VIDIOC_ENUMINPUT, 0)"
-	       " = -1 EBADF (Bad file descriptor)\n");
+	       " = -1 EBADF (%m)\n");
 
 	(void) ioctl(-1, HIDIOCGVERSION, &data);
 	printf("ioctl(-1, HIDIOCGRDESCSIZE or HIDIOCGVERSION, %p)"
-	       " = -1 EBADF (Bad file descriptor)\n", &data);
+	       " = -1 EBADF (%m)\n", &data);
 
 	(void) ioctl(-1, HIDIOCGPHYS(8), &data);
 	printf("ioctl(-1, HIDIOCGPHYS(8), %p)"
-	       " = -1 EBADF (Bad file descriptor)\n", &data);
+	       " = -1 EBADF (%m)\n", &data);
 
 	(void) ioctl(-1, EVIOCGBIT(EV_KEY, 8), &data);
 	printf("ioctl(-1, EVIOCGBIT(EV_KEY, 8), %p)"
-	       " = -1 EBADF (Bad file descriptor)\n", &data);
+	       " = -1 EBADF (%m)\n", &data);
 
 	(void) ioctl(-1, _IOR('M', 13, int), &data);
 	printf("ioctl(-1, MIXER_READ(13) or OTPSELECT, [MTD_OTP_OFF])"
-	       " = -1 EBADF (Bad file descriptor)\n");
+	       " = -1 EBADF (%m)\n");
 
 	(void) ioctl(-1, _IOR(0xde, 0xad, data), &data);
 	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x08), %p)"
-	       " = -1 EBADF (Bad file descriptor)\n", &data);
+	       " = -1 EBADF (%m)\n", &data);
 
 	puts("+++ exited with 0 +++");
 	return 0;
@@ -98,10 +98,8 @@ main(void )
 
 #else
 
-int
-main(void )
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("MMTIMER_GETRES && VIDIOC_ENUMINPUT"
+		    " && HIDIOCGVERSION && HIDIOCGPHYS"
+		    " && EVIOCGBIT && EV_KEY")
 
 #endif
