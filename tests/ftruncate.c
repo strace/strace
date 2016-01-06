@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,27 +30,27 @@
 
 #ifdef __NR_ftruncate
 
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
+# include <assert.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
 
-#include "kernel_types.h"
+# include "kernel_types.h"
 
 int
 main(void)
 {
 	const kernel_ulong_t len = (kernel_ulong_t) 0xdefaced0badc0deULL;
-	int rc;
 
 	if (sizeof(len) > sizeof(long))
-		rc = ftruncate(-1, len);
+		assert(ftruncate(-1, len) == -1);
 	else
-		rc = syscall(__NR_ftruncate, -1L, len);
+		assert(syscall(__NR_ftruncate, -1L, len) == -1);
 
-	if (rc != -1 || EBADF != errno)
-		return 77;
+	if (EBADF != errno)
+		perror_msg_and_skip("ftruncate");
 
-	printf("ftruncate(-1, %llu) = -1 EBADF (Bad file descriptor)\n",
+	printf("ftruncate(-1, %llu) = -1 EBADF (%m)\n",
 	       (unsigned long long) len);
 
 	puts("+++ exited with 0 +++");
@@ -59,10 +59,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_ftruncate")
 
 #endif
