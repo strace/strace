@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,24 +26,27 @@
  */
 
 #include "tests.h"
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/syscall.h>
+
+#ifdef __NR_mlock2
+
+# include <assert.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
 
 int
 main(void)
 {
-#ifdef __NR_mlock2
-	if (syscall(__NR_mlock2, 0xdeadbeef, 0xdefaced, 0xffff) != -1)
-		return 77;
-	printf("mlock2(0xdeadbeef, 233811181, MLOCK_ONFAULT|0xfffe) = -1 %s\n",
-	       errno == ENOSYS ?
-			"ENOSYS (Function not implemented)" :
-			"EINVAL (Invalid argument)");
+	assert(syscall(__NR_mlock2, 0xdeadbeef, 0xdefaced, 0xffff) == -1);
+	printf("mlock2(0xdeadbeef, 233811181, MLOCK_ONFAULT|0xfffe)"
+	       " = -1 %s (%m)\n", errno == ENOSYS ? "ENOSYS" : "EINVAL");
 	puts("+++ exited with 0 +++");
 	return 0;
-#else
-        return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_mlock2")
+
+#endif
