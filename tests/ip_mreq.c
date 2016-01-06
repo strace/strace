@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,17 +26,19 @@
  */
 
 #include "tests.h"
-#include <assert.h>
-#include <unistd.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
+
+#if defined IP_ADD_MEMBERSHIP && defined IPV6_ADD_MEMBERSHIP \
+ && defined IPV6_JOIN_ANYCAST && defined HAVE_INET_PTON
+
+# include <assert.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <arpa/inet.h>
 
 int
 main(void)
 {
-#if defined IP_ADD_MEMBERSHIP && defined IPV6_ADD_MEMBERSHIP \
- && defined IPV6_JOIN_ANYCAST && defined HAVE_INET_PTON
 	struct ip_mreq m4;
 	struct ipv6_mreq m6;
 
@@ -46,13 +48,14 @@ main(void)
 	m6.ipv6mr_interface = 1;
 
 	(void) close(0);
-	assert(socket(AF_INET, SOCK_DGRAM, 0) == 0);
+	if (socket(AF_INET, SOCK_DGRAM, 0))
+		perror_msg_and_skip("socket");
 
 	assert(setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP, &m4, 1) == -1);
 	assert(setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP, &m4, 1) == -1);
 	if (setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP, &m4, sizeof(m4)) ||
 	    setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP, &m4, sizeof(m4)))
-		return 77;
+		perror_msg_and_skip("setsockopt");
 
 	assert(setsockopt(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, &m6, 1) == -1);
 	assert(setsockopt(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, &m6, 1) == -1);
@@ -65,7 +68,11 @@ main(void)
 	assert(setsockopt(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, &m6, sizeof(m6)) == -1);
 
 	return 0;
-#else
-	return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("IP_ADD_MEMBERSHIP && IPV6_ADD_MEMBERSHIP"
+		    " && IPV6_JOIN_ANYCAST && HAVE_INET_PTON")
+
+#endif
