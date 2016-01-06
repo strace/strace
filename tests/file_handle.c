@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,14 @@
  */
 
 #include "tests.h"
-#include <alloca.h>
-#include <assert.h>
-#include <errno.h>
 #include <fcntl.h>
-#include <stdio.h>
 
 #ifdef MAX_HANDLE_SZ
+
+# include <alloca.h>
+# include <assert.h>
+# include <errno.h>
+# include <stdio.h>
 
 int
 main(void)
@@ -46,26 +47,20 @@ main(void)
 
 	handle->handle_bytes = 0;
 
-	if (name_to_handle_at(dirfd, ".", handle, &mount_id, flags | 1) != -1
-	    || EINVAL != errno) {
-		perror("name_to_handle_at");
-		return 77;
-	}
+	assert(name_to_handle_at(dirfd, ".", handle, &mount_id, flags | 1) == -1);
+	if (EINVAL != errno)
+		perror_msg_and_skip("name_to_handle_at");
 	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=0}, %p"
-	       ", AT_SYMLINK_FOLLOW|0x1) = -1 EINVAL (Invalid argument)\n",
-	       &mount_id);
+	       ", AT_SYMLINK_FOLLOW|0x1) = -1 EINVAL (%m)\n", &mount_id);
 
-	if (name_to_handle_at(dirfd, ".", handle, &mount_id, flags) != -1
-	    || EOVERFLOW != errno) {
-		perror("name_to_handle_at");
-		return 77;
-	}
+	assert(name_to_handle_at(dirfd, ".", handle, &mount_id, flags) == -1);
+	if (EOVERFLOW != errno)
+		perror_msg_and_skip("name_to_handle_at");
 	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=0 => %u}"
-	       ", %p, AT_SYMLINK_FOLLOW) = -1 EOVERFLOW"
-	       " (Value too large for defined data type)\n",
+	       ", %p, AT_SYMLINK_FOLLOW) = -1 EOVERFLOW (%m)\n",
 	       handle->handle_bytes, &mount_id);
 
-	assert(!name_to_handle_at(dirfd, ".", handle, &mount_id, flags));
+	assert(name_to_handle_at(dirfd, ".", handle, &mount_id, flags) == 0);
 	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=%u"
 	       ", handle_type=%d, f_handle=0x",
 	       handle->handle_bytes, handle->handle_type);
@@ -73,15 +68,24 @@ main(void)
 		printf("%02x", handle->f_handle[i]);
 	printf("}, [%d], AT_SYMLINK_FOLLOW) = 0\n", mount_id);
 
-	assert(open_by_handle_at(-1, handle, O_RDONLY | O_DIRECTORY));
 	printf("open_by_handle_at(-1, {handle_bytes=%u, handle_type=%d"
 	       ", f_handle=0x", handle->handle_bytes, handle->handle_type);
 	for (i = 0; i < handle->handle_bytes; ++i)
 		printf("%02x", handle->f_handle[i]);
-	printf("}, O_RDONLY|O_DIRECTORY) = -1 %s\n",
-	       EPERM == errno ? "EPERM (Operation not permitted)" :
-	       EINVAL == errno ? "EINVAL (Invalid argument)" :
-				 "EBADF (Bad file descriptor)");
+	printf("}, O_RDONLY|O_DIRECTORY) = -1 ");
+	assert(open_by_handle_at(-1, handle, O_RDONLY | O_DIRECTORY) == -1);
+	const char *errno_text;
+	switch (errno) {
+		case EPERM:
+			errno_text = "EPERM";
+			break;
+		case EINVAL:
+			errno_text = "EINVAL";
+			break;
+		default:
+			errno_text = "EBADF";
+	}
+	printf("%s (%m)\n", errno_text);
 
 	puts("+++ exited with 0 +++");
 	return 0;
@@ -89,10 +93,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("MAX_HANDLE_SZ")
 
 #endif
