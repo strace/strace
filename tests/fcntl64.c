@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 # define TEST_SYSCALL_NAME fcntl64
 # include "struct_flock.c"
 
-#define TEST_FLOCK64_EINVAL(cmd) test_flock64_einval(cmd, #cmd)
+# define TEST_FLOCK64_EINVAL(cmd) test_flock64_einval(cmd, #cmd)
 
 static void
 test_flock64_einval(const int cmd, const char *name)
@@ -54,10 +54,10 @@ test_flock64(void)
 {
 	TEST_FLOCK64_EINVAL(F_SETLK64);
 	TEST_FLOCK64_EINVAL(F_SETLKW64);
-#ifdef F_OFD_SETLK
+# ifdef F_OFD_SETLK
 	TEST_FLOCK64_EINVAL(F_OFD_SETLK);
 	TEST_FLOCK64_EINVAL(F_OFD_SETLKW);
-#endif
+# endif
 
 	struct_kernel_flock64 fl = {
 		.l_type = F_RDLCK,
@@ -85,9 +85,7 @@ test_flock64(void)
 int
 main(void)
 {
-	if (create_sample())
-		return 77;
-
+	create_sample();
 	test_flock();
 	test_flock64();
 
@@ -97,10 +95,6 @@ main(void)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_fcntl64")
 
 #endif

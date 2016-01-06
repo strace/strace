@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -87,11 +87,16 @@ test_flock(void)
 	       TEST_SYSCALL_STR, FILE_LEN);
 }
 
-static int
+static void
 create_sample(void)
 {
 	char fname[] = TEST_SYSCALL_STR "_XXXXXX";
 
 	(void) close(0);
-	return mkstemp(fname) || unlink(fname) || ftruncate(0, FILE_LEN) ? 77 : 0;
+	if (mkstemp(fname))
+		perror_msg_and_fail("mkstemp: %s", fname);
+	if (unlink(fname))
+		perror_msg_and_fail("unlink: %s", fname);
+	if (ftruncate(0, FILE_LEN))
+		perror_msg_and_fail("ftruncate");
 }
