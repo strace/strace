@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,10 @@
  */
 
 #include "tests.h"
-#include <stdint.h>
+#include <assert.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -49,15 +51,12 @@ main(void)
 	struct timespec ts[2];
 
 	if (gettimeofday(&tv, NULL))
-		return 77;
+		perror_msg_and_skip("gettimeofday");
 
 	ts[0].tv_sec = tv.tv_sec;
 	ts[0].tv_nsec = tv.tv_usec;
 	ts[1].tv_sec = tv.tv_sec - 1;
 	ts[1].tv_nsec = tv.tv_usec + 1;
-	if (!utimensat(AT_FDCWD, "utimensat\nfilename", ts,
-	     AT_SYMLINK_NOFOLLOW))
-		return 77;
 
 	#define PREFIX "utimensat(AT_FDCWD, \"utimensat\\nfilename\", ["
 
@@ -65,27 +64,31 @@ main(void)
 	print_ts(&ts[0]);
 	printf(", ");
 	print_ts(&ts[1]);
-	puts("], AT_SYMLINK_NOFOLLOW) = -1 ENOENT (No such file or directory)");
+	printf("], AT_SYMLINK_NOFOLLOW) = -1 ENOENT ");
+
+	assert(utimensat(AT_FDCWD, "utimensat\nfilename", ts,
+			 AT_SYMLINK_NOFOLLOW) == -1);
+	if (ENOENT != errno)
+		error_msg_and_skip("utimensat");
+	printf("(%m)\n");
+
+	printf(PREFIX "UTIME_NOW, UTIME_OMIT], AT_SYMLINK_NOFOLLOW) = -1 ENOENT ");
 
 	ts[0].tv_nsec = UTIME_NOW;
 	ts[1].tv_nsec = UTIME_OMIT;
-	if (!utimensat(AT_FDCWD, "utimensat\nfilename", ts,
-	     AT_SYMLINK_NOFOLLOW))
-		return 77;
+	assert(utimensat(AT_FDCWD, "utimensat\nfilename", ts,
+			 AT_SYMLINK_NOFOLLOW) == -1);
+	if (ENOENT != errno)
+		error_msg_and_skip("utimensat");
+	printf("(%m)\n");
 
-	printf(PREFIX);
-	puts("UTIME_NOW, UTIME_OMIT], AT_SYMLINK_NOFOLLOW) = -1 ENOENT (No such file or directory)");
 	puts("+++ exited with 0 +++");
-
 	return 0;
 }
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("HAVE_UTIMENSAT && AT_FDCWD && AT_SYMLINK_NOFOLLOW"
+		    " && UTIME_NOW && UTIME_OMIT")
 
 #endif
