@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,13 @@
 
 #ifdef __NR_readdir
 
-#include <assert.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
+# include <assert.h>
+# include <dirent.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <string.h>
+# include <sys/stat.h>
+# include <unistd.h>
 
 static const char fname[] =
 	"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"
@@ -79,7 +79,7 @@ main(int ac, const char **av)
 	assert(!open(".", O_RDONLY | O_DIRECTORY));
 	while ((rc = syscall(__NR_readdir, 0, &e, 1))) {
 		if (rc < 0)
-			return 77;
+			perror_msg_and_skip("readdir");
 		e.d_name[e.d_reclen] = '\0';
 		printf("readdir(0, {d_ino=%lu, d_off=%lu, d_reclen=%u"
 		       ", d_name=\"%s\"}) = %d\n",
@@ -97,10 +97,6 @@ main(int ac, const char **av)
 
 #else
 
-int
-main(void)
-{
-	return 77;
-}
+SKIP_MAIN_UNDEFINED("__NR_readdir")
 
 #endif
