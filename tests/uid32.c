@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,8 @@
  */
 
 #include "tests.h"
-#include <assert.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <sys/syscall.h>
 
-int
-main(void)
-{
 #if defined(__NR_getuid32) \
  && defined(__NR_setuid32) \
  && defined(__NR_getresuid32) \
@@ -41,6 +35,14 @@ main(void)
  && defined(__NR_setresuid32) \
  && defined(__NR_fchown32) \
  && defined(__NR_getgroups32)
+
+# include <assert.h>
+# include <stdlib.h>
+# include <unistd.h>
+
+int
+main(void)
+{
 	int r, e, s;
 	int size;
 	int *list = 0;
@@ -55,7 +57,12 @@ main(void)
 	assert(list = calloc(size + 1, sizeof(*list)));
 	assert(syscall(__NR_getgroups32, size, list) == size);
 	return 0;
-#else
-	return 77;
-#endif
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_getuid32 && __NR_setuid32 && __NR_getresuid32"
+		    " && __NR_setreuid32 && __NR_setresuid32"
+		    " && __NR_fchown32 && __NR_getgroups32")
+
+#endif
