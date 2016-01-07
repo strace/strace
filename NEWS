@@ -2,7 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Enhanced decoding of personality syscall.
+  * Enhanced decoding of personality, sched_getaffinity,
+    and sched_setaffinity syscalls.
 
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.

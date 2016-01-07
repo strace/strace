@@ -112,6 +112,7 @@ check_PROGRAMS = \
 	readlinkat \
 	restart_syscall \
 	rt_sigqueueinfo \
+	sched_xetaffinity \
 	sched_xetattr \
 	scm_rights \
 	seccomp \
@@ -245,6 +246,7 @@ TESTS = \
 	readlink.test \
 	readlinkat.test \
 	rt_sigqueueinfo.test \
+	sched_xetaffinity.test \
 	sched_xetattr.test \
 	scm_rights-fd.test \
 	seccomp.test \

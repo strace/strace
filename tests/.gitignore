@@ -68,6 +68,7 @@ readlink
 readlinkat
 restart_syscall
 rt_sigqueueinfo
+sched_xetaffinity
 sched_xetattr
 scm_rights
 seccomp

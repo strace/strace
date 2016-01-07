@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2002-2004 Roland McGrath <roland@redhat.com>
- * Copyright (c) 2009-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2009-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,56 +27,82 @@
  */
 
 #include "defs.h"
+#include <sched.h>
+
+static unsigned int
+get_cpuset_size(void)
+{
+	static unsigned int cpuset_size;
+
+	if (!cpuset_size) {
+		pid_t pid = getpid();
+		cpuset_size = 128;
+		while (cpuset_size &&
+		       sched_getaffinity(pid, cpuset_size, NULL) == -1 &&
+		       EINVAL == errno) {
+			cpuset_size <<= 1;
+		}
+		if (!cpuset_size)
+			cpuset_size = 128;
+	}
+
+	return cpuset_size;
+}
 
 static void
 print_affinitylist(struct tcb *tcp, const unsigned long addr, const unsigned int len)
 {
-	unsigned long w;
-	const unsigned int size = len * sizeof(w);
-	const unsigned long end = addr + size;
-	unsigned long cur, abbrev_end;
+	const unsigned int max_size = get_cpuset_size();
+	const unsigned int umove_size = len < max_size ? len : max_size;
+	const unsigned int size =
+		(umove_size + current_wordsize - 1) & -current_wordsize;
+	const unsigned int ncpu = size * 8;
+	void *cpu;
 
 	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
-	    !addr || !len || size / sizeof(w) != len || end < addr) {
+	    !addr || !len || !(cpu = calloc(size, 1))) {
 		printaddr(addr);
 		return;
 	}
 
-	if (abbrev(tcp)) {
-		abbrev_end = addr + max_strlen *  sizeof(w);
-		if (abbrev_end < addr)
-			abbrev_end = end;
-	} else {
-		abbrev_end = end;
+	if (!umoven_or_printaddr(tcp, addr, umove_size, cpu)) {
+		int i = 0;
+		const char *sep = "";
+
+		tprints("[");
+		for (;; i++) {
+			i = next_set_bit(cpu, i, ncpu);
+			if (i < 0)
+				break;
+			tprintf("%s%d", sep, i);
+			sep = " ";
+		}
+		if (size < len)
+			tprintf("%s...", sep);
+		tprints("]");
 	}
 
-	tprints("[");
-	for (cur = addr; cur < end; cur += sizeof(w)) {
-		if (cur > addr)
-			tprints(", ");
-		if (cur >= abbrev_end) {
-			tprints("...");
-			break;
-		}
-		if (umove_or_printaddr(tcp, cur, &w))
-			break;
-		tprintf("%lx", w);
-	}
-	tprints("]");
+	free(cpu);
 }
 
 SYS_FUNC(sched_setaffinity)
 {
-	tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
-	print_affinitylist(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+	const int pid = tcp->u_arg[0];
+	const unsigned int len = tcp->u_arg[1];
+
+	tprintf("%d, %u, ", pid, len);
+	print_affinitylist(tcp, tcp->u_arg[2], len);
 
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(sched_getaffinity)
 {
+	const int pid = tcp->u_arg[0];
+	const unsigned int len = tcp->u_arg[1];
+
 	if (entering(tcp)) {
-		tprintf("%ld, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+		tprintf("%d, %u, ", pid, len);
 	} else {
 		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
 	}
