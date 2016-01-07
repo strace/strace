@@ -1064,7 +1064,13 @@ trace_syscall_exiting(struct tcb *tcp)
 				tprintf("= %#lo", tcp->u_rval);
 				break;
 			case RVAL_UDECIMAL:
-				tprintf("= %lu", tcp->u_rval);
+#if SUPPORTED_PERSONALITIES > 1
+				if (current_wordsize < sizeof(long))
+					tprintf("= %u",
+						(unsigned int) tcp->u_rval);
+				else
+#endif
+					tprintf("= %lu", tcp->u_rval);
 				break;
 			case RVAL_DECIMAL:
 				tprintf("= %ld", tcp->u_rval);
