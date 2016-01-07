@@ -51,11 +51,19 @@ int main(int ac, char **av, char **ep)
 
 	logit("start");
 
-	int fds[2];
+	int child_wait_fds[2];
 	(void) close(0);
-	if (pipe(fds))
+	if (pipe(child_wait_fds))
 		perror_msg_and_fail("pipe");
-	if (fcntl(fds[1], F_SETFD, FD_CLOEXEC))
+	if (fcntl(child_wait_fds[1], F_SETFD, FD_CLOEXEC))
+		perror_msg_and_fail("fcntl");
+
+	int parent_wait_fds[2];
+	if (pipe(parent_wait_fds))
+		perror_msg_and_fail("pipe");
+	if (fcntl(parent_wait_fds[0], F_SETFD, FD_CLOEXEC))
+		perror_msg_and_fail("fcntl");
+	if (fcntl(parent_wait_fds[1], F_SETFD, FD_CLOEXEC))
 		perror_msg_and_fail("fcntl");
 
 	char *const args[] = { av[0], (char *) "exec", NULL };
@@ -70,9 +78,12 @@ int main(int ac, char **av, char **ep)
 	}
 
 	close(0);
+	close(parent_wait_fds[1]);
 
+	if (read(parent_wait_fds[0], &parent_wait_fds[1], sizeof(int)))
+		perror_msg_and_fail("read");
 	logit("parent");
-	close(fds[1]);
+	close(child_wait_fds[1]);
 
 	int status;
 	assert(wait(&status) == pid);
