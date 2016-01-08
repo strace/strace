@@ -32,24 +32,27 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-static int
-logit(const char *const str)
+static inline int
+logit_(const char *const str)
 {
-	return pwrite(-1, str, strlen(str), 0) >= 0;
+	return !chdir(str);
 }
 
-int main(int ac, char **av, char **ep)
+#define prefix "fork-f."
+#define logit(arg) logit_(prefix arg)
+
+int main(int ac, char **av)
 {
 	if (ac < 1)
 		return 1;
 	if (ac > 1)
-		return logit(av[1]);
+		return logit("exec");
 
 	logit("start");
 
-	int fds[2];
+	int child_wait_fds[2];
 	(void) close(0);
-	if (pipe(fds))
+	if (pipe(child_wait_fds))
 		perror_msg_and_fail("pipe");
 
 	pid_t pid = fork();
@@ -58,12 +61,12 @@ int main(int ac, char **av, char **ep)
 		perror_msg_and_fail("fork");
 
 	if (!pid) {
-		close(fds[1]);
+		close(child_wait_fds[1]);
 
-		if (read(0, fds, sizeof(int)))
+		if (read(0, child_wait_fds, sizeof(int)))
 			_exit(2);
 
-		char *const args[] = { av[0], (char *) "exec", NULL };
+		char *const args[] = { av[0], (char *) "", NULL };
 		if (logit("child") || execve(args[0], args, args + 1))
 			_exit(2);
 	}
@@ -71,21 +74,24 @@ int main(int ac, char **av, char **ep)
 	close(0);
 
 	logit("parent");
-	close(fds[1]);
+	close(child_wait_fds[1]);
 
 	int status;
 	assert(wait(&status) == pid);
 	assert(status == 0);
 
+	pid_t ppid = getpid();
 	logit("finish");
 
-	pid_t ppid = getpid();
-	close(-1);
-	printf("%-5d pwrite64(-1, \"start\", 5, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"parent\", 6, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"child\", 5, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"exec\", 4, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"finish\", 6, 0) = -1 EBADF (%m)\n",
-	       ppid, ppid, pid, pid, ppid);
+	printf("%-5d chdir(\"%sstart\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%sparent\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%schild\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%sexec\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%sfinish\") = -1 ENOENT (%m)\n",
+	       ppid, prefix,
+	       ppid, prefix,
+	       pid, prefix,
+	       pid, prefix,
+	       ppid, prefix);
 	return 0;
 }

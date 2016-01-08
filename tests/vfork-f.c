@@ -34,19 +34,22 @@
 #include <sys/wait.h>
 
 static inline int
-logit(const char *const str)
+logit_(const char *const str)
 {
-	return pwrite(-1, str, strlen(str), 0) >= 0;
+	return !chdir(str);
 }
 
-int main(int ac, char **av, char **ep)
+#define prefix "vfork-f."
+#define logit(arg) logit_(prefix arg)
+
+int main(int ac, char **av)
 {
 	if (ac < 1)
 		return 1;
 	if (ac > 1) {
 		if (read(0, &ac, sizeof(int)))
 			return 2;
-		return logit(av[1]);
+		return logit("exec");
 	}
 
 	logit("start");
@@ -66,7 +69,7 @@ int main(int ac, char **av, char **ep)
 	if (fcntl(parent_wait_fds[1], F_SETFD, FD_CLOEXEC))
 		perror_msg_and_fail("fcntl");
 
-	char *const args[] = { av[0], (char *) "exec", NULL };
+	char *const args[] = { av[0], (char *) "", NULL };
 	pid_t pid = vfork();
 
 	if (pid < 0)
@@ -89,15 +92,18 @@ int main(int ac, char **av, char **ep)
 	assert(wait(&status) == pid);
 	assert(status == 0);
 
+	pid_t ppid = getpid();
 	logit("finish");
 
-	pid_t ppid = getpid();
-	close(-1);
-	printf("%-5d pwrite64(-1, \"start\", 5, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"child\", 5, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"parent\", 6, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"exec\", 4, 0) = -1 EBADF (%m)\n"
-	       "%-5d pwrite64(-1, \"finish\", 6, 0) = -1 EBADF (%m)\n",
-	       ppid, pid, ppid, pid, ppid);
+	printf("%-5d chdir(\"%sstart\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%schild\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%sparent\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%sexec\") = -1 ENOENT (%m)\n"
+	       "%-5d chdir(\"%sfinish\") = -1 ENOENT (%m)\n",
+	       ppid, prefix,
+	       pid, prefix,
+	       ppid, prefix,
+	       pid, prefix,
+	       ppid, prefix);
 	return 0;
 }
