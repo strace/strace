@@ -292,9 +292,7 @@ SYS_FUNC(mincore)
  || defined SPARC || defined SPARC64
 SYS_FUNC(getpagesize)
 {
-	if (exiting(tcp))
-		return RVAL_HEX;
-	return 0;
+	return RVAL_DECODED | RVAL_HEX;
 }
 #endif
 
