@@ -45,6 +45,9 @@
 #  endif
 # endif
 #endif
+#ifdef ALPHA
+# define	sys_getdtablesize	printargs
+#endif
 
 /* like another call */
 #define	sys_acct		sys_chdir

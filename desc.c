@@ -68,13 +68,6 @@ SYS_FUNC(dup3)
 	return do_dup2(tcp, 2);
 }
 
-#if defined(ALPHA)
-SYS_FUNC(getdtablesize)
-{
-	return 0;
-}
-#endif
-
 static int
 decode_select(struct tcb *tcp, long *args,
 	      void (*print_tv_ts) (struct tcb *, const long),
