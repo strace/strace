@@ -5,10 +5,12 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of personality, sched_getaffinity,
     and sched_setaffinity syscalls.
   * Enhanced decoding of getxpid, getxuid, and getxgid syscalls on alpha.
+  * Added decoding of bind, listen, and setsockopt direct syscalls on sparc.
 
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.
   * Fixed decoding of 32-bit times syscall return value on 64-bit architectures.
+  * Fixed decoding of mlock2 syscall on sparc.
 
 Noteworthy changes in release 4.11 (2015-12-21)
 ===============================================
