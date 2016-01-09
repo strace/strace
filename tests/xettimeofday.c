@@ -60,7 +60,7 @@ main(void)
 
 	t.tv.tv_sec = -1;
 	t.tv.tv_usec = 1000000000;
-	assert(settimeofday(&t.tv, &t.tz) == -1);
+	assert(syscall(__NR_settimeofday, &t.tv, &t.tz) == -1);
 	printf("settimeofday({%jd, %jd}"
 	       ", {tz_minuteswest=%d, tz_dsttime=%d})"
 	       " = -1 EINVAL (%m)\n",
