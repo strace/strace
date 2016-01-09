@@ -27,7 +27,9 @@
 
 BEGIN {
   r_uint = "(0|[1-9][0-9]*)"
-  regexp = "^getx?uid" suffix "\\(\\)[[:space:]]+= " r_uint "$"
+  r_getuid = "getuid" suffix "\\(\\)[[:space:]]+= " r_uint
+  r_getxuid = "getxuid" suffix "\\(\\)[[:space:]]+= " r_uint " \\(euid " r_uint "\\)"
+  regexp = "^(" r_getuid "|" r_getxuid ")$"
   expected = "getuid"
   fail = 0
 }
@@ -40,7 +42,10 @@ regexp == "" {
 {
   if (match($0, regexp, a)) {
     if (expected == "getuid") {
-      uid = a[1]
+      if ("" != a[2])
+        uid = a[2]
+      else
+        uid = a[3]
       expected = "setuid"
       regexp = "^setuid" suffix "\\(" uid "\\)[[:space:]]+= 0$"
     } else if (expected == "setuid") {

@@ -30,6 +30,7 @@ ftruncate64
 getdents
 getdents64
 getrandom
+getxxid
 inet-accept-connect-send-recv
 inet-cmsg
 ioctl

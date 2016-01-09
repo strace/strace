@@ -46,11 +46,11 @@
 [ 17] = { 1,	TM|SI,		SEN(brk),			"brk"			},
 [ 18] = { 5,	0,		SEN(printargs),			"osf_getfsstat"		}, /*not implemented */
 [ 19] = { 3,	TD,		SEN(lseek),			"lseek"			},
-[ 20] = { 0,	NF,		SEN(getpid),			"getxpid"		},
+[ 20] = { 0,	NF,		SEN(getxpid),			"getxpid"		},
 [ 21] = { 4,	0,		SEN(printargs),			"osf_mount"		},
 [ 22] = { 2,	TF,		SEN(umount2),			"umount"		},
 [ 23] = { 1,	0,		SEN(setuid),			"setuid"		},
-[ 24] = { 0,	NF,		SEN(getuid),			"getxuid"		},
+[ 24] = { 0,	NF,		SEN(getxuid),			"getxuid"		},
 [ 25] = { 5,	0,		SEN(printargs),			"exec_with_loader"	}, /*not implemented */
 [ 26] = { 4,	0,		SEN(ptrace),			"ptrace"		},
 [ 27] = { 5,	0,		SEN(printargs),			"osf_nrecvmsg"		}, /*not implemented */
@@ -73,7 +73,7 @@
 [ 44] = { 5,	0,		SEN(printargs),			"osf_profil"		}, /*not implemented */
 [ 45] = { 3,	TD|TF,		SEN(open),			"open"			},
 [ 46] = { 5,	0,		SEN(printargs),			"osf_old_sigaction"	}, /*not implemented */
-[ 47] = { 1,	NF,		SEN(getgid),			"getxgid"		},
+[ 47] = { 1,	NF,		SEN(getxgid),			"getxgid"		},
 [ 48] = { 2,	TS,		SEN(sigprocmask),		"osf_sigprocmask"	},
 [ 49] = { 5,	0,		SEN(printargs),			"osf_getlogin"		}, /*not implemented */
 [ 50] = { 5,	0,		SEN(printargs),			"osf_setlogin"		}, /*not implemented */

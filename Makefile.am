@@ -64,6 +64,7 @@ strace_SOURCES =	\
 	access.c	\
 	affinity.c	\
 	aio.c		\
+	alpha.c		\
 	bjm.c		\
 	block.c		\
 	bpf.c		\
