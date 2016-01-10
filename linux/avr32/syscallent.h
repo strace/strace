@@ -346,3 +346,4 @@
 [318] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
 [319] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [320] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
+[321] = { 4,	TN,		SEN(accept4),			"accept4"		},
