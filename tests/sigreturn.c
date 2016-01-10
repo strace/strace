@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,9 +45,9 @@ int main(void) {
 	sigemptyset(&set);
 	sigaddset(&set, SIGUSR2);
 	sigaddset(&set, SIGCHLD);
-	sigaddset(&set, RT_0 +  2);
 	sigaddset(&set, RT_0 +  3);
 	sigaddset(&set, RT_0 +  4);
+	sigaddset(&set, RT_0 +  5);
 	sigaddset(&set, RT_0 + 26);
 	sigaddset(&set, RT_0 + 27);
 	sigprocmask(SIG_SETMASK, &set, NULL);

@@ -2,7 +2,7 @@
 #
 # Check rt_sigprocmask and sigreturn/rt_sigreturn decoding.
 #
-# Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 run_prog
 run_strace -esignal $args
 
-mask='\[(USR2 CHLD|CHLD USR2) RT_2 RT_3 RT_4 RT_26 RT_27\]'
+mask='\[(USR2 CHLD|CHLD USR2) RT_3 RT_4 RT_5 RT_26 RT_27\]'
 rt_sigprocmask='rt_sigprocmask\(SIG_SETMASK, '"$mask"', NULL, [[:digit:]]+\) += 0'
 osf_sigprocmask='osf_sigprocmask\(SIG_SETMASK, '"$mask"'\) += 0 +\(old mask \[[^]]*\]\)'
 EXPECTED="$LOG.expected"
