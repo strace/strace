@@ -50,3 +50,11 @@ tail_alloc(const size_t size)
 	memset(start_work, 0xff, len);
 	return tail_guard - size;
 }
+
+void *
+tail_memdup(const void *p, const size_t size)
+{
+	void *dest = tail_alloc(size);
+	memcpy(dest, p, size);
+	return dest;
+}

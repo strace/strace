@@ -55,6 +55,9 @@ void perror_msg_and_skip(const char *, ...)
  */
 void *tail_alloc(const size_t)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
+/* Allocate memory using tail_alloc, then memcpy. */
+void *tail_memdup(const void *, const size_t)
+	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((2));
 
 # define SKIP_MAIN_UNDEFINED(arg) \
 	int main(void) { error_msg_and_skip("undefined: %s", arg); }
