@@ -27,14 +27,55 @@
  */
 
 #include "tests.h"
+# include <sys/syscall.h>
 
-#if defined(HAVE_SENDMMSG) && defined(HAVE_STRUCT_MMSGHDR)
+#if defined __NR_sendmmsg || defined HAVE_SENDMMSG
 
 # include <assert.h>
 # include <errno.h>
 # include <fcntl.h>
 # include <unistd.h>
 # include <sys/socket.h>
+
+#ifndef HAVE_STRUCT_MMSGHDR
+struct mmsghdr {
+	struct msghdr msg_hdr;
+	unsigned msg_len;
+};
+#endif
+
+static int
+send_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags)
+{
+	int rc;
+#ifdef __NR_sendmmsg
+	rc = syscall(__NR_sendmmsg, (long) fd, vec, (unsigned long) vlen,
+		     (unsigned long) flags);
+	if (rc >= 0 || ENOSYS != errno)
+		return rc;
+#endif
+#ifdef HAVE_SENDMMSG
+	rc = sendmmsg(fd, vec, vlen, flags);
+#endif
+	return rc;
+}
+
+static int
+recv_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags,
+	  struct timespec *timeout)
+{
+	int rc;
+#ifdef __NR_sendmmsg
+	rc = syscall(__NR_recvmmsg, (long) fd, vec, (unsigned long) vlen,
+		     (unsigned long) flags, timeout);
+	if (rc >= 0 || ENOSYS != errno)
+		return rc;
+#endif
+#ifdef HAVE_SENDMMSG
+	rc = recvmmsg(fd, vec, vlen, flags, timeout);
+#endif
+	return rc;
+}
 
 int
 main(void)
@@ -91,13 +132,13 @@ main(void)
 	assert(dup2(sv[R], R) == R);
 	assert(close(sv[R]) == 0);
 
-	int r = sendmmsg(W, mmh, n_mmh, 0);
+	int r = send_mmsg(W, mmh, n_mmh, 0);
 	if (r < 0 && errno == ENOSYS)
 		perror_msg_and_skip("sendmmsg");
 	assert((size_t)r == n_mmh);
 	assert(close(W) == 0);
 
-	assert(recvmmsg(R, mmh, n_mmh, 0, NULL) == n_mmh);
+	assert(recv_mmsg(R, mmh, n_mmh, 0, NULL) == n_mmh);
 	assert(close(R) == 0);
 
 	return 0;
@@ -105,6 +146,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_SENDMMSG && HAVE_STRUCT_MMSGHDR")
+SKIP_MAIN_UNDEFINED("__NR_sendmmsg || HAVE_SENDMMSG")
 
 #endif
