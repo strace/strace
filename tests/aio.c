@@ -28,11 +28,11 @@
 #include "tests.h"
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/fcntl.h>
 #include <sys/syscall.h>
 
 #if defined __NR_io_setup \
