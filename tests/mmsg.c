@@ -132,13 +132,13 @@ main(void)
 	assert(dup2(sv[R], R) == R);
 	assert(close(sv[R]) == 0);
 
-	int r = send_mmsg(W, mmh, n_mmh, 0);
+	int r = send_mmsg(W, mmh, n_mmh, MSG_DONTROUTE | MSG_NOSIGNAL);
 	if (r < 0 && errno == ENOSYS)
 		perror_msg_and_skip("sendmmsg");
 	assert((size_t)r == n_mmh);
 	assert(close(W) == 0);
 
-	assert(recv_mmsg(R, mmh, n_mmh, 0, NULL) == n_mmh);
+	assert(recv_mmsg(R, mmh, n_mmh, MSG_DONTWAIT, NULL) == n_mmh);
 	assert(close(R) == 0);
 
 	return 0;
