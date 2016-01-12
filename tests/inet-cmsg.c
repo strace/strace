@@ -146,9 +146,9 @@ main(void)
 
 	printf("recvmsg(0, {msg_name(%u)={sa_family=AF_INET, sin_port=htons(%u)"
 	       ", sin_addr=inet_addr(\"127.0.0.1\")}, msg_iov(1)=[{\"%s\", %zu}]"
-	       ", msg_controllen=%zu, [",
+	       ", msg_controllen=%lu, [",
 	       (unsigned) mh.msg_namelen, ntohs(addr.sin_port),
-	       data, size, mh.msg_controllen);
+	       data, size, (unsigned long) mh.msg_controllen);
 
 	struct cmsghdr *c;
 	for (c = CMSG_FIRSTHDR(&mh); c; c = CMSG_NXTHDR(&mh, c)) {
@@ -156,8 +156,8 @@ main(void)
 			continue;
 		if (c != control)
 			printf(", ");
-		printf("{cmsg_len=%zu, cmsg_level=SOL_IP, cmsg_type=",
-		       c->cmsg_len);
+		printf("{cmsg_len=%lu, cmsg_level=SOL_IP, cmsg_type=",
+		       (unsigned long) c->cmsg_len);
 		switch (c->cmsg_type) {
 			case IP_PKTINFO:
 				print_pktinfo(c);
