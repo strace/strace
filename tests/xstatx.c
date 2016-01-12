@@ -27,8 +27,8 @@
 
 #if defined HAVE_FTRUNCATE && defined HAVE_FUTIMENS
 
-# ifndef TEST_SYSCALL_NAME
-#  error TEST_SYSCALL_NAME must be defined
+# ifndef TEST_SYSCALL_STR
+#  error TEST_SYSCALL_STR must be defined
 # endif
 # ifndef TEST_SYSCALL_INVOKE
 #  error TEST_SYSCALL_INVOKE must be defined
@@ -133,6 +133,7 @@ typedef off_t libc_off_t;
 
 # ifndef STRUCT_STAT
 #  define STRUCT_STAT struct stat
+#  define STRUCT_STAT_STR "struct stat"
 # endif
 # ifndef SAMPLE_SIZE
 #  define SAMPLE_SIZE 43147718418
@@ -229,11 +230,6 @@ create_sample(const char *fname, const libc_off_t size)
 	}
 	return 0;
 }
-
-# define stringify_(arg) #arg
-# define stringify(arg) stringify_(arg)
-# define TEST_SYSCALL_STR stringify(TEST_SYSCALL_NAME)
-# define STRUCT_STAT_STR stringify(STRUCT_STAT)
 
 int
 main(void)

@@ -35,14 +35,6 @@
 #define FILE_LEN 4096
 #define EINVAL_STR "-1 EINVAL (Invalid argument)"
 
-# define TEST_SYSCALL_STR stringify(TEST_SYSCALL_NAME)
-# define stringify(arg) stringify_(arg)
-# define stringify_(arg) #arg
-
-#define TEST_SYSCALL_NR nrify(TEST_SYSCALL_NAME)
-#define nrify(arg) nrify_(arg)
-#define nrify_(arg) __NR_ ## arg
-
 #define TEST_FLOCK_EINVAL(cmd) test_flock_einval(cmd, #cmd)
 
 #ifdef HAVE_TYPEOF

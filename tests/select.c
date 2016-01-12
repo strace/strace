@@ -30,7 +30,8 @@
 
 #if defined __NR_select && !defined __NR__newselect
 
-# define TEST_SYSCALL_NAME select
+# define TEST_SYSCALL_NR __NR_select
+# define TEST_SYSCALL_STR "select"
 # include "xselect.c"
 
 #else

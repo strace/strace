@@ -30,8 +30,10 @@
 
 #ifdef __NR_fstat64
 
-# define TEST_SYSCALL_NAME fstat64
+# define TEST_SYSCALL_NR __NR_fstat64
+# define TEST_SYSCALL_STR "fstat64"
 # define STRUCT_STAT struct stat64
+# define STRUCT_STAT_STR "struct stat64"
 # define SAMPLE_SIZE ((libc_off_t) 43147718418)
 # include "fstatx.c"
 

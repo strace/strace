@@ -30,7 +30,8 @@
 
 #ifdef __NR_lstat
 
-# define TEST_SYSCALL_NAME lstat
+# define TEST_SYSCALL_NR __NR_lstat
+# define TEST_SYSCALL_STR "lstat"
 # define SAMPLE_SIZE ((kernel_ulong_t) 43147718418)
 # include "lstatx.c"
 

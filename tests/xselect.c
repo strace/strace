@@ -34,14 +34,6 @@
 #include <unistd.h>
 #include <sys/select.h>
 
-#define TEST_SYSCALL_NR nrify(TEST_SYSCALL_NAME)
-#define nrify(arg) nrify_(arg)
-#define nrify_(arg) __NR_ ## arg
-
-#define TEST_SYSCALL_STR stringify(TEST_SYSCALL_NAME)
-#define stringify(arg) stringify_(arg)
-#define stringify_(arg) #arg
-
 static fd_set set[0x1000000 / sizeof(fd_set)];
 
 int main(void)

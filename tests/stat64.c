@@ -30,8 +30,10 @@
 
 #ifdef __NR_stat64
 
-# define TEST_SYSCALL_NAME stat64
+# define TEST_SYSCALL_NR __NR_stat64
+# define TEST_SYSCALL_STR "stat64"
 # define STRUCT_STAT struct stat64
+# define STRUCT_STAT_STR "struct stat64"
 # define SAMPLE_SIZE ((libc_off_t) 43147718418)
 # include "lstatx.c"
 

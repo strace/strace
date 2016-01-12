@@ -30,7 +30,8 @@
 
 #ifdef __NR_fstatat64
 
-# define TEST_SYSCALL_NAME fstatat64
+# define TEST_SYSCALL_NR __NR_fstatat64
+# define TEST_SYSCALL_STR "fstatat64"
 # include "fstatat.c"
 
 #else
