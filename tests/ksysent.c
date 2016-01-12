@@ -45,7 +45,7 @@ static const struct_sysent syscallent[] = {
 #include "syscallent.h"
 };
 
-typedef const char const *pstr_t;
+typedef const char *pstr_t;
 static const pstr_t ksyslist[] = {
 #include "ksysent.h"
 };

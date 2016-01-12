@@ -90,9 +90,9 @@ main(void)
 	assert(R == sv[0]);
 	assert(W == sv[1]);
 
-	static const char const one[] = "one";
-	static const char const two[] = "two";
-	static const char const three[] = "three";
+	static const char one[] = "one";
+	static const char two[] = "two";
+	static const char three[] = "three";
 	void *copy_one = tail_memdup(one, sizeof(one) - 1);
 	void *copy_two = tail_memdup(two, sizeof(two) - 1);
 	void *copy_three = tail_memdup(three, sizeof(three) - 1);
