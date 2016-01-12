@@ -45,13 +45,19 @@
 
 #define TEST_FLOCK_EINVAL(cmd) test_flock_einval(cmd, #cmd)
 
+#ifdef HAVE_TYPEOF
+# define TYPEOF_FLOCK_OFF_T typeof(((struct_kernel_flock *) NULL)->l_len)
+#else
+# define TYPEOF_FLOCK_OFF_T off_t
+#endif
+
 static void
 test_flock_einval(const int cmd, const char *name)
 {
 	struct_kernel_flock fl = {
 		.l_type = F_RDLCK,
-		.l_start = (off_t) 0xdefaced1facefeed,
-		.l_len = (off_t) 0xdefaced2cafef00d
+		.l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeed,
+		.l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00d
 	};
 	syscall(TEST_SYSCALL_NR, 0, cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"

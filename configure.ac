@@ -2,7 +2,7 @@
 #
 # Copyright (c) 1999-2001 Wichert Akkerman <wichert@deephackmode.org>
 # Copyright (c) 2002-2009 Roland McGrath <roland@redhat.com>
-# Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2006-2016 Dmitry V. Levin <ldv@altlinux.org>
 # Copyright (c) 2008-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
 # All rights reserved.
@@ -251,6 +251,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_C_CONST
 AC_C_BIGENDIAN
+AC_C_TYPEOF
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_HEADER_DIRENT
