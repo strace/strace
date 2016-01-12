@@ -7,11 +7,6 @@ arch_sigreturn(struct tcb *tcp)
 	if (umove(tcp, addr, &mask) < 0) {
 		tprintf("{mask=%#lx}", addr);
 	} else {
-#ifdef S390
-		long v = mask[0];
-		mask[0] = mask[1];
-		mask[1] = v;
-#endif
 		tprintsigmask_addr("{mask=", mask);
 		tprints("}");
 	}
