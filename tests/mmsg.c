@@ -29,7 +29,8 @@
 #include "tests.h"
 # include <sys/syscall.h>
 
-#if defined __NR_sendmmsg || defined HAVE_SENDMMSG
+#if (defined __NR_sendmmsg || defined HAVE_SENDMMSG) \
+ && (defined __NR_recvmmsg || defined HAVE_RECVMMSG)
 
 # include <assert.h>
 # include <errno.h>
@@ -64,13 +65,13 @@ recv_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags,
 	  struct timespec *timeout)
 {
 	int rc;
-#ifdef __NR_sendmmsg
+#ifdef __NR_recvmmsg
 	rc = syscall(__NR_recvmmsg, (long) fd, vec, (unsigned long) vlen,
 		     (unsigned long) flags, timeout);
 	if (rc >= 0 || ENOSYS != errno)
 		return rc;
 #endif
-#ifdef HAVE_SENDMMSG
+#ifdef HAVE_RECVMMSG
 	rc = recvmmsg(fd, vec, vlen, flags, timeout);
 #endif
 	return rc;
@@ -140,6 +141,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_sendmmsg || HAVE_SENDMMSG")
+SKIP_MAIN_UNDEFINED("(__NR_sendmmsg || HAVE_SENDMMSG) && (__NR_recvmmsg || HAVE_RECVMMSG)")
 
 #endif
