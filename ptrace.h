@@ -5,7 +5,7 @@
  * Copyright (c) 2004 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2010 Wang Chao <wang.chao@cn.fujitsu.com>
  * Copyright (c) 2011-2013 Denys Vlasenko <vda.linux@googlemail.com>
- * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2011-2016 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2013 Ali Polatel <alip@exherbo.org>
  * Copyright (c) 2015 Mike Frysinger <vapier@gentoo.org>
  * All rights reserved.
@@ -161,6 +161,9 @@ extern long ptrace(int, int, char *, long);
 #endif
 #ifndef PTRACE_SETSIGMASK
 # define PTRACE_SETSIGMASK	0x420b
+#endif
+#ifndef PTRACE_SECCOMP_GET_FILTER
+# define PTRACE_SECCOMP_GET_FILTER	0x420c
 #endif
 
 #if !HAVE_DECL_PTRACE_PEEKUSER
