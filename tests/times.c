@@ -52,7 +52,7 @@ int
 main (void)
 {
 	struct timespec ts;
-	volatile int dummy;
+	volatile int dummy = 0;
 	int i;
 
 	pid_t pid = fork();
