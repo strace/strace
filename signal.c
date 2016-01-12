@@ -124,7 +124,7 @@ signame(const int sig)
 		if (s < nsignals)
 			return signalent[s];
 #ifdef ASM_SIGRTMAX
-		if (s >= ASM_SIGRTMIN && s <= ASM_SIGRTMAX) {
+		if (s >= ASM_SIGRTMIN && s <= (unsigned int) ASM_SIGRTMAX) {
 			sprintf(buf, "SIGRT_%u", s - ASM_SIGRTMIN);
 			return buf;
 		}
