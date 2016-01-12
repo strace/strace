@@ -49,18 +49,18 @@ touch -- "$file" ||
 	framework_skip_ 'failed to create a file'
 
 run_prog ./scm_rights /dev/zero
-run_strace_merge -y -x -enetwork $args "$file"
+run_strace -y -x -enetwork $args "$file"
 
+sample='\\xf1\\xf2\\xf3\\xf4\\xf5\\xf6\\xf7\\xf8\\xf9\\xfa\\xfb\\xfc\\xfd\\xfe\\xff'
 n='[1-9][0-9]*'
-msg='\{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"\\x00\\x00\\x00\\x00[^"]*", '"$n"'\}\], msg_controllen='"$n"
-rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[3</dev/null>, 4</dev/zero>, 5</[^}>]*/(A\\n){127}Z>\]\}'
+msg='\{msg_name\(0\)=NULL, msg_iov\(1\)=\[\{"'"$sample"'", 15\}\], msg_controllen='"$n"
+rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, \[4</dev/null>, 5</dev/zero>, 6</[^}>]*/(A\\n){127}Z>\]\}'
 creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, \{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}\}'
-prefix='[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +'
 EXPECTED="$LOG.expected"
 
 cat > "$EXPECTED" << __EOF__
-${prefix}sendmsg\\(1<socket:\\[[0-9]+\\]>, $msg, \\[$rights\\], msg_flags=0\\}, 0\\) += $n
-${prefix}recvmsg\\(0<socket:\\[[0-9]+\\]>, $msg, \\[$creds, $rights\\], msg_flags=0\\}, 0\\) += $n
+sendmsg\\(3<socket:\\[[0-9]+\\]>, $msg, \\[$rights\\], msg_flags=0\\}, 0\\) = 15
+recvmsg\\(0<socket:\\[[0-9]+\\]>, $msg, \\[$creds, $rights\\], msg_flags=0\\}, 0\\) = 15
 __EOF__
 
 match_grep "$LOG" "$EXPECTED"

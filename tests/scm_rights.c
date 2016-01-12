@@ -27,26 +27,39 @@
 
 #include "tests.h"
 #include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/socket.h>
-#include <sys/wait.h>
 
 int main(int ac, const char **av)
 {
-	int i;
-	int data = 0;
-	struct iovec iov = {
-		.iov_base = &data,
-		.iov_len = sizeof(iov)
-	};
+	assert(ac > 0);
+	int fds[ac];
 
-	while ((i = open("/dev/null", O_RDWR)) < 3)
+	static const char sample[] =
+		"\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff";
+	const unsigned int data_size = sizeof(sample) - 1;
+	void *data = tail_alloc(data_size);
+	memcpy(data, sample, data_size);
+
+	struct iovec *iov = tail_alloc(sizeof(struct iovec));
+	iov->iov_base = data;
+	iov->iov_len = data_size;
+
+	struct msghdr *mh = tail_alloc(sizeof(struct msghdr));
+	memset(mh, 0, sizeof(*mh));
+	mh->msg_iov = iov;
+	mh->msg_iovlen = 1;
+
+	int i;
+	while ((i = open("/dev/null", O_RDWR)) <= ac + 2)
 		assert(i >= 0);
-	(void) close(3);
+	while (i > 2)
+		assert(close(i--) == 0);
+	assert(close(0) == 0);
 
 	int sv[2];
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
@@ -55,60 +68,39 @@ int main(int ac, const char **av)
 	if (setsockopt(sv[0], SOL_SOCKET, SO_PASSCRED, &one, sizeof(one)))
 		perror_msg_and_skip("setsockopt");
 
-	pid_t pid = fork();
-	if (pid < 0)
-		perror_msg_and_fail("fork");
+	assert((fds[0] = open("/dev/null", O_RDWR)) == 4);
+	for (i = 1; i < ac; ++i)
+		assert((fds[i] = open(av[i], O_RDONLY)) == i + 4);
 
-	if (pid) {
-		assert(close(sv[0]) == 0);
-		assert(dup2(sv[1], 1) == 1);
-		assert(close(sv[1]) == 0);
+	unsigned int cmsg_size = CMSG_SPACE(sizeof(fds));
+	struct cmsghdr *cmsg = tail_alloc(cmsg_size);
+	memset(cmsg, 0, cmsg_size);
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_RIGHTS;
+	cmsg->cmsg_len = CMSG_LEN(sizeof(fds));
+	memcpy(CMSG_DATA(cmsg), fds, sizeof(fds));
 
-		int fds[ac];
-		assert((fds[0] = open("/dev/null", O_RDWR)) == 3);
-		for (i = 1; i < ac; ++i)
-			assert((fds[i] = open(av[i], O_RDONLY)) == i + 3);
+	mh->msg_control = cmsg;
+	mh->msg_controllen = cmsg_size;
 
-		union {
-			struct cmsghdr cmsg;
-			char buf[CMSG_LEN(sizeof(fds))];
-		} control;
+	assert(sendmsg(sv[1], mh, 0) == (int) data_size);
 
-		control.cmsg.cmsg_level = SOL_SOCKET;
-		control.cmsg.cmsg_type = SCM_RIGHTS;
-		control.cmsg.cmsg_len = CMSG_LEN(sizeof(fds));
-		memcpy(CMSG_DATA(&control.cmsg), fds, sizeof(fds));
+	assert(close(sv[1]) == 0);
+	assert(open("/dev/null", O_RDWR) == sv[1]);
 
-		struct msghdr mh = {
-			.msg_iov = &iov,
-			.msg_iovlen = 1,
-			.msg_control = &control,
-			.msg_controllen = sizeof(control)
-		};
-
-		assert(sendmsg(1, &mh, 0) == sizeof(iov));
-		assert(close(1) == 0);
-
-                int status;
-		assert(waitpid(pid, &status, 0) == pid);
-		assert(status == 0);
-	} else {
-		assert(close(sv[1]) == 0);
-		assert(dup2(sv[0], 0) == 0);
-		assert(close(sv[0]) == 0);
-
-		struct cmsghdr control[4 + ac * sizeof(int) / sizeof(struct cmsghdr)];
-
-		struct msghdr mh = {
-			.msg_iov = &iov,
-			.msg_iovlen = 1,
-			.msg_control = control,
-			.msg_controllen = sizeof(control)
-		};
-
-		assert(recvmsg(0, &mh, 0) == sizeof(iov));
-		assert(close(0) == 0);
+	for (i = 0; i < ac; ++i) {
+		assert(close(fds[i]) == 0);
+		fds[i] = 0;
 	}
+
+	cmsg_size += CMSG_SPACE(sizeof(struct ucred));
+	cmsg = tail_alloc(cmsg_size);
+	memset(cmsg, 0, cmsg_size);
+	mh->msg_control = cmsg;
+	mh->msg_controllen = cmsg_size;
+
+	assert(recvmsg(0, mh, 0) == (int) data_size);
+	assert(close(0) == 0);
 
 	return 0;
 }
