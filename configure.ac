@@ -378,9 +378,7 @@ AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg, struct ptrace_peeksi
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
-AC_CHECK_MEMBERS([struct sigevent._sigev_un._pad,
-		  struct sigevent.__pad,
-		  siginfo_t.si_syscall,
+AC_CHECK_MEMBERS([siginfo_t.si_syscall,
 		  siginfo_t.si_timerid,
 		  siginfo_t.si_overrun],,, [#include <signal.h>])
 

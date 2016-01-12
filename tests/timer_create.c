@@ -34,21 +34,21 @@
 # include <signal.h>
 # include <time.h>
 # include <unistd.h>
+# include "sigevent.h"
 
 int
 main(void)
 {
 	int tid[4] = {};
-	struct sigevent sev = {
+	struct_sigevent sev = {
 		.sigev_notify = SIGEV_NONE,
 		.sigev_signo = 0xfacefeed,
-		.sigev_value.sival_ptr =
-			(void *) (unsigned long) 0xdeadbeefbadc0ded
+		.sigev_value.sival_ptr = (unsigned long) 0xdeadbeefbadc0ded
 	};
 
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[0]))
 		perror_msg_and_skip("timer_create CLOCK_REALTIME");
-	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%p}"
+	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%#lx}"
 	       ", sigev_signo=%u, sigev_notify=SIGEV_NONE}"
 	       ", [%d]) = 0\n",
 	       sev.sigev_value.sival_int,
@@ -59,54 +59,42 @@ main(void)
 	sev.sigev_signo = SIGALRM;
 	if (syscall(__NR_timer_create, CLOCK_MONOTONIC, &sev, &tid[1]))
 		perror_msg_and_skip("timer_create CLOCK_MONOTONIC");
-	printf("timer_create(CLOCK_MONOTONIC, {sigev_value={int=%d, ptr=%p}"
+	printf("timer_create(CLOCK_MONOTONIC, {sigev_value={int=%d, ptr=%#lx}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_SIGNAL}"
 	       ", [%d]) = 0\n",
 	       sev.sigev_value.sival_int,
 	       sev.sigev_value.sival_ptr, tid[1]);
 
 	sev.sigev_notify = SIGEV_THREAD;
-	sev.sigev_notify_function =
-		(void *) (unsigned long) 0xdeadbeefbadc0ded;
-	sev.sigev_notify_attributes =
-		(void *) (unsigned long) 0xcafef00dfacefeed;
+	sev.sigev_un.sigev_thread.function = (unsigned long) 0xdeadbeefbadc0ded;
+	sev.sigev_un.sigev_thread.attribute = (unsigned long) 0xcafef00dfacefeed;
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[2]))
 		perror_msg_and_skip("timer_create CLOCK_REALTIME");
-	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%p}"
+	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%#lx}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD"
-	       ", sigev_notify_function=%p, sigev_notify_attributes=%p}"
+	       ", sigev_notify_function=%#lx, sigev_notify_attributes=%#lx}"
 	       ", [%d]) = 0\n",
 	       sev.sigev_value.sival_int,
 	       sev.sigev_value.sival_ptr,
-	       sev.sigev_notify_function,
-	       sev.sigev_notify_attributes,
+	       sev.sigev_un.sigev_thread.function,
+	       sev.sigev_un.sigev_thread.attribute,
 	       tid[2]);
 
-#ifndef sigev_notify_thread_id
-# if defined HAVE_STRUCT_SIGEVENT__SIGEV_UN__PAD
-#  define sigev_notify_thread_id _sigev_un._pad[0]
-# elif defined HAVE_STRUCT_SIGEVENT___PAD
-#  define sigev_notify_thread_id __pad[0]
-# endif
-#endif /* !sigev_notify_thread_id */
-
-#ifdef sigev_notify_thread_id
-# ifndef SIGEV_THREAD_ID
-#  define SIGEV_THREAD_ID 4
-# endif
+#ifndef SIGEV_THREAD_ID
+# define SIGEV_THREAD_ID 4
+#endif
 	sev.sigev_notify = SIGEV_THREAD_ID;
-	sev.sigev_notify_thread_id = getpid();
+	sev.sigev_un.tid = getpid();
 	if (syscall(__NR_timer_create, CLOCK_MONOTONIC, &sev, &tid[3]))
 		perror_msg_and_skip("timer_create CLOCK_MONOTONIC");
-	printf("timer_create(CLOCK_MONOTONIC, {sigev_value={int=%d, ptr=%p}"
+	printf("timer_create(CLOCK_MONOTONIC, {sigev_value={int=%d, ptr=%#lx}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD_ID"
 	       ", sigev_notify_thread_id=%d}"
 	       ", [%d]) = 0\n",
 	       sev.sigev_value.sival_int,
 	       sev.sigev_value.sival_ptr,
-	       sev.sigev_notify_thread_id,
+	       sev.sigev_un.tid,
 	       tid[3]);
-#endif /* sigev_notify_thread_id */
 
 	puts("+++ exited with 0 +++");
 	return 0;

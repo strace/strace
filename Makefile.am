@@ -1,7 +1,7 @@
 # Automake input for strace.
 #
 # Copyright (c) 2002-2009 Roland McGrath <roland@redhat.com>
-# Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2006-2016 Dmitry V. Levin <ldv@altlinux.org>
 # Copyright (c) 2008-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
 # All rights reserved.
@@ -172,6 +172,7 @@ strace_SOURCES =	\
 	seccomp_fprog.h \
 	sendfile.c	\
 	sigaltstack.c	\
+	sigevent.h	\
 	signal.c	\
 	signalfd.c	\
 	sigreturn.c	\

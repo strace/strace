@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2003, 2004 Ulrich Drepper <drepper@redhat.com>
- * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,52 +25,23 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
+#ifndef SIGEVENT_H_
+#define SIGEVENT_H_
 
-#include DEF_MPERS_TYPE(struct_sigevent)
-#include "sigevent.h"
-#include MPERS_DEFS
+typedef struct {
+	union {
+		int sival_int;
+		unsigned long sival_ptr;
+	} sigev_value;
+	int sigev_signo;
+	int sigev_notify;
+	union {
+		int tid;
+		struct {
+			unsigned long function;
+			unsigned long attribute;
+		} sigev_thread;
+	} sigev_un;
+} struct_sigevent;
 
-#include <signal.h>
-#include "xlat/sigev_value.h"
-
-MPERS_PRINTER_DECL(void, print_sigevent)(struct tcb *tcp, const long addr)
-{
-	struct_sigevent sev;
-
-	if (umove_or_printaddr(tcp, addr, &sev))
-		return;
-
-	tprints("{");
-	if (sev.sigev_value.sival_ptr)
-		tprintf("sigev_value={int=%d, ptr=%#lx}, ",
-			sev.sigev_value.sival_int,
-			(unsigned long) sev.sigev_value.sival_ptr);
-
-	tprints("sigev_signo=");
-	switch (sev.sigev_notify) {
-	case SIGEV_SIGNAL:
-	case SIGEV_THREAD:
-	case SIGEV_THREAD_ID:
-		tprints(signame(sev.sigev_signo));
-		break;
-	default:
-		tprintf("%u", sev.sigev_signo);
-	}
-
-	tprints(", sigev_notify=");
-	printxval(sigev_value, sev.sigev_notify, "SIGEV_???");
-
-	switch (sev.sigev_notify) {
-	case SIGEV_THREAD_ID:
-		tprintf(", sigev_notify_thread_id=%d", sev.sigev_un.tid);
-		break;
-	case SIGEV_THREAD:
-		tprints(", sigev_notify_function=");
-		printaddr(sev.sigev_un.sigev_thread.function);
-		tprints(", sigev_notify_attributes=");
-		printaddr(sev.sigev_un.sigev_thread.attribute);
-		break;
-	}
-	tprints("}");
-}
+#endif
