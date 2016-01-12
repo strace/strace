@@ -34,6 +34,7 @@
 #include "defs.h"
 #include "native_defs.h"
 #include <sys/param.h>
+#include <signal.h>
 
 /* for struct iovec */
 #include <sys/uio.h>
