@@ -41,9 +41,12 @@ AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
 AC_PROG_CC
+AC_PROG_CPP
 AX_PROG_CC_FOR_BUILD
-AC_USE_SYSTEM_EXTENSIONS
+AC_PROG_INSTALL
 AC_PROG_RANLIB
+
+AC_USE_SYSTEM_EXTENSIONS
 
 AC_MSG_CHECKING([for supported architecture])
 arch_m32=
@@ -247,37 +250,20 @@ AC_ARG_ENABLE([gcc-Werror],
 )
 AC_SUBST([WARN_CFLAGS])
 
-AC_PROG_CPP
-AC_PROG_INSTALL
-AC_C_CONST
 AC_C_BIGENDIAN
+AC_C_CONST
 AC_C_TYPEOF
-AC_HEADER_STDC
-AC_HEADER_STDBOOL
-AC_HEADER_DIRENT
-AC_HEADER_STAT
-AC_CHECK_MEMBERS(m4_normalize([
-	struct stat.st_atim.tv_nsec,
-	struct stat.st_blksize,
-	struct stat.st_blocks,
-	struct stat.st_ctim.tv_nsec,
-	struct stat.st_flags,
-	struct stat.st_fstype,
-	struct stat.st_gen,
-	struct stat.st_mtim.tv_nsec,
-	struct stat.st_rdev
-]))
 
+AC_TYPE_GETGROUPS
+AC_TYPE_MODE_T
 AC_TYPE_SIGNAL
 AC_TYPE_UID_T
-AC_TYPE_MODE_T
-AC_TYPE_GETGROUPS
+
+AC_HEADER_DIRENT
 AC_HEADER_MAJOR
-AC_CHECK_TYPES([sig_atomic_t],,, [#include <signal.h>])
-AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
-[#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>])
+AC_HEADER_STAT
+AC_HEADER_STDBOOL
+AC_HEADER_STDC
 
 AC_CHECK_FUNCS(m4_normalize([
 	fanotify_mark
@@ -304,6 +290,71 @@ AC_CHECK_FUNCS(m4_normalize([
 	strsignal
 	utimensat
 ]))
+
+AC_CHECK_TYPES([sig_atomic_t, struct sigcontext],,, [#include <signal.h>])
+
+AC_CHECK_TYPES([struct mmsghdr],,, [#include <sys/socket.h>])
+
+AC_CHECK_TYPES([__kernel_long_t, __kernel_ulong_t],,,
+[#include <asm/posix_types.h>])
+
+AC_CHECK_TYPES([struct stat64, struct __old_kernel_stat],,,
+[#include <sys/types.h>
+#include <asm/stat.h>])
+
+AC_CHECK_TYPES([struct statfs64],,, [#include <sys/vfs.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct pt_all_user_regs,
+	struct ia64_fpreg,
+	struct ptrace_peeksiginfo_args
+]),,, [#include <sys/ptrace.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct flock,
+	struct flock64,
+	struct __kernel_flock,
+	struct __kernel_flock64
+]),,,
+[#include <sys/types.h>
+#include <linux/fcntl.h>])
+
+AC_CHECK_MEMBERS(m4_normalize([
+	struct stat.st_atim.tv_nsec,
+	struct stat.st_blksize,
+	struct stat.st_blocks,
+	struct stat.st_ctim.tv_nsec,
+	struct stat.st_flags,
+	struct stat.st_fstype,
+	struct stat.st_gen,
+	struct stat.st_mtim.tv_nsec,
+	struct stat.st_rdev
+]))
+
+AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
+
+AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
+
+AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
+
+AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
+[#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>])
+
+AC_CHECK_MEMBERS(m4_normalize([
+	struct stat.st_atime_nsec,
+	struct stat.st_ctime_nsec,
+	struct stat.st_mtime_nsec
+]),,, [#include <sys/types.h>
+#include <asm/stat.h>])
+
+AC_CHECK_MEMBERS(m4_normalize([
+	siginfo_t.si_syscall,
+	siginfo_t.si_timerid,
+	siginfo_t.si_overrun
+]),,, [#include <signal.h>])
+
 AC_CHECK_HEADERS(m4_normalize([
 	asm/cachectl.h
 	asm/sysmips.h
@@ -343,55 +394,25 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/vfs.h
 	sys/xattr.h
 ]))
+
+AC_CHECK_HEADERS([asm/sigcontext.h],,, [#include <signal.h>])
+
+AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
+
 AC_CHECK_HEADERS([linux/mqueue.h],,, [#include <linux/types.h>])
-AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],
-                 [], [], [#include <stddef.h>
+
+AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],,,
+[#include <stddef.h>
 #include <sys/socket.h>
 #include <asm/types.h>])
-AC_CHECK_HEADERS([asm/sigcontext.h], [], [], [#include <signal.h>])
-AC_CHECK_TYPES([struct sigcontext],,, [#include <signal.h>])
-AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
+
 AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter_arp/arp_tables.h
 	linux/netfilter_bridge/ebtables.h
 	linux/netfilter_ipv4/ip_tables.h
 	linux/netfilter_ipv6/ip6_tables.h
-]), [], [], [#include <netinet/in.h>
+]),,, [#include <netinet/in.h>
 #include <net/if.h>])
-
-AC_CHECK_TYPES([struct mmsghdr],,, [#include <sys/socket.h>])
-AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
-
-AC_CHECK_MEMBERS(m4_normalize([
-	struct stat.st_atime_nsec,
-	struct stat.st_ctime_nsec,
-	struct stat.st_mtime_nsec
-]),,, [#include <sys/types.h>
-#include <asm/stat.h>])
-
-AC_CHECK_TYPES([struct stat64],,, [#include <sys/types.h>
-#include <asm/stat.h>])
-AC_CHECK_TYPES([struct __old_kernel_stat],,, [#include <asm/stat.h>])
-AC_CHECK_TYPES([struct statfs64],,, [#include <sys/vfs.h>])
-
-AC_CHECK_TYPES([struct pt_all_user_regs, struct ia64_fpreg, struct ptrace_peeksiginfo_args],,,
-	       [#include <sys/ptrace.h>])
-
-AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
-
-AC_CHECK_MEMBERS([siginfo_t.si_syscall,
-		  siginfo_t.si_timerid,
-		  siginfo_t.si_overrun],,, [#include <signal.h>])
-
-AC_CHECK_TYPES([struct flock,
-		struct flock64,
-		struct __kernel_flock,
-		struct __kernel_flock64],,, [#include <sys/types.h>
-#include <linux/fcntl.h>])
-
-AC_CHECK_TYPES([__kernel_long_t, __kernel_ulong_t],,, [#include <asm/posix_types.h>])
-
-AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
 
 AC_CHECK_HEADERS([linux/input.h], [
 	AC_CHECK_MEMBERS([struct input_absinfo.resolution],,, [#include <linux/input.h>])
