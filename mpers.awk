@@ -1,7 +1,7 @@
 #!/bin/gawk
 #
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
-# Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -173,6 +173,8 @@ function what_is(what_idx, type_idx, special, item, \
 	return leave(what_idx, "")
 }
 BEGIN {
+	match(ARCH_FLAG, /[[:digit:]]+/, temparray)
+	default_pointer_size = temparray[0] / 8
 	print "#include <inttypes.h>"
 }
 /^<[[:xdigit:]]+>/ {
@@ -181,9 +183,6 @@ BEGIN {
 	idx = "0x" matches[2]
 	array[idx]["idx"] = idx
 	parent[level] = idx
-	if (level > 1) {
-		array[idx]["parent"] = parent[level-1]
-	}
 }
 /^DW_AT_data_member_location/ {
 	if (!match($0, /\(DW_OP_plus_uconst:[[:space:]]+([[:digit:]]+)\)/, temparray))
@@ -211,10 +210,18 @@ BEGIN {
 	match($0, /[[:digit:]]+/, temparray)
 	array[parent[level-1]]["upper_bound"] = temparray[0] + 1
 }
+/^DW_AT_count/ {
+	match($0, /[[:digit:]]+/, temparray)
+	array[parent[level-1]]["upper_bound"] = temparray[0]
+}
 /^Abbrev Number:[^(]+\(DW_TAG_/ {
 	if (match($0, /typedef|union_type|structure_type|pointer_type\
 |enumeration_type|array_type|base_type|member/, temparray)) {
 		array[idx]["special"] = temparray[0]
+		if ("pointer_type" == temparray[0])
+			array[idx]["byte_size"] = default_pointer_size
+		if (level > 1 && "member" == temparray[0])
+			array[idx]["parent"] = parent[level-1]
 	}
 }
 END {
