@@ -628,11 +628,6 @@ decode_mips_subcall(struct tcb *tcp)
 	 * see linux/mips/get_syscall_args.c
 	 */
 }
-
-SYS_FUNC(syscall)
-{
-	return printargs(tcp);
-}
 #endif
 
 int

@@ -115,6 +115,7 @@
 #define	sys_setup		printargs
 #define	sys_socketcall		printargs
 #define	sys_sync		printargs
+#define	sys_syscall		printargs
 #define	sys_timer_delete	printargs
 #define	sys_timer_getoverrun	printargs
 #define	sys_vhangup		printargs
