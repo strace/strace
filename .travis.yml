@@ -6,6 +6,11 @@ script: ./travis-ci.sh
 
 sudo: required
 
+compiler:
+  - gcc
+  - clang-3.6
+  - musl-gcc
+
 addons:
   apt:
     packages:
@@ -13,12 +18,18 @@ addons:
 
 env:
   global:
-    - ENABLE_GCC_WERROR="--enable-gcc-Werror"
     - SLEEP_A_BIT="sleep 0.1"
     - VERBOSE="1"
+  matrix:
+    - TARGET=x86_64
+    - TARGET=x32
+    - TARGET=x86
 
 matrix:
-  include:
-    - env: TARGET=x86_64
-    - env: TARGET=x32
-    - env: TARGET=x86
+  exclude:
+    - compiler: clang-3.6
+      env: TARGET=x32
+    - compiler: musl-gcc
+      env: TARGET=x32
+    - compiler: musl-gcc
+      env: TARGET=x86
