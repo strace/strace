@@ -28,7 +28,7 @@
  *
  */
 
-[  0] = { 0,	0,		SEN(setup),			"setup"			},
+[  0] = {MA,	0,		SEN(setup),			"setup"			},
 [  1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [  2] = { 0,	TP,		SEN(fork),			"fork"			},
 [  3] = { 3,	TD,		SEN(read),			"read"			},
