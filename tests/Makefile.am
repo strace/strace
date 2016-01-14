@@ -326,7 +326,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ksysent.sed \
 	     lstatx.c \
 	     memfd_create.expected \
-	     mmsg.expected \
 	     mq.expected \
 	     net.expected \
 	     net-fd.expected \

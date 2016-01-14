@@ -4,8 +4,10 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog
-run_strace -e trace=recvmmsg,sendmmsg -e read=0 -e write=1 $args
-match_diff
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -e trace=recvmmsg,sendmmsg -e read=0 -e write=1 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
 
 exit 0
