@@ -4,10 +4,15 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -e_llseek $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
+EXP="$LOG.exp"
+
+check_prog grep
+run_prog > /dev/null
+run_strace -e_llseek $args > "$EXP"
+grep -v '^lseek([0-9]' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"
 
 exit 0
