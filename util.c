@@ -845,8 +845,8 @@ dumpiov(struct tcb *tcp, int len, long addr)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	union {
-		struct { u_int32_t base; u_int32_t len; } *iov32;
-		struct { u_int64_t base; u_int64_t len; } *iov64;
+		struct { uint32_t base; uint32_t len; } *iov32;
+		struct { uint64_t base; uint64_t len; } *iov64;
 	} iovu;
 #define iov iovu.iov64
 #define sizeof_iov \

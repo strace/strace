@@ -33,12 +33,12 @@
 
 #define SUBCMDMASK  0x00ff
 #define SUBCMDSHIFT 8
-#define QCMD_CMD(cmd)	((u_int32_t)(cmd) >> SUBCMDSHIFT)
-#define QCMD_TYPE(cmd)	((u_int32_t)(cmd) & SUBCMDMASK)
+#define QCMD_CMD(cmd)	((uint32_t)(cmd) >> SUBCMDSHIFT)
+#define QCMD_TYPE(cmd)	((uint32_t)(cmd) & SUBCMDMASK)
 
-#define OLD_CMD(cmd)	((u_int32_t)(cmd) << SUBCMDSHIFT)
-#define NEW_CMD(cmd)	((u_int32_t)(cmd) | 0x800000)
-#define XQM_CMD(cmd)	((u_int32_t)(cmd) | ('X' << SUBCMDSHIFT))
+#define OLD_CMD(cmd)	((uint32_t)(cmd) << SUBCMDSHIFT)
+#define NEW_CMD(cmd)	((uint32_t)(cmd) | 0x800000)
+#define XQM_CMD(cmd)	((uint32_t)(cmd) | ('X' << SUBCMDSHIFT))
 
 #include "xlat/quotacmds.h"
 #include "xlat/quotatypes.h"
@@ -50,27 +50,27 @@
 
 struct if_dqblk
 {
-	u_int64_t dqb_bhardlimit;
-	u_int64_t dqb_bsoftlimit;
-	u_int64_t dqb_curspace;
-	u_int64_t dqb_ihardlimit;
-	u_int64_t dqb_isoftlimit;
-	u_int64_t dqb_curinodes;
-	u_int64_t dqb_btime;
-	u_int64_t dqb_itime;
-	u_int32_t dqb_valid;
+	uint64_t dqb_bhardlimit;
+	uint64_t dqb_bsoftlimit;
+	uint64_t dqb_curspace;
+	uint64_t dqb_ihardlimit;
+	uint64_t dqb_isoftlimit;
+	uint64_t dqb_curinodes;
+	uint64_t dqb_btime;
+	uint64_t dqb_itime;
+	uint32_t dqb_valid;
 };
 
 struct v1_dqblk
 {
-	u_int32_t dqb_bhardlimit;	/* absolute limit on disk blks alloc */
-	u_int32_t dqb_bsoftlimit;	/* preferred limit on disk blks */
-	u_int32_t dqb_curblocks;	/* current block count */
-	u_int32_t dqb_ihardlimit;	/* maximum # allocated inodes */
-	u_int32_t dqb_isoftlimit;	/* preferred inode limit */
-	u_int32_t dqb_curinodes;	/* current # allocated inodes */
-	time_t  dqb_btime;	/* time limit for excessive disk use */
-	time_t  dqb_itime;	/* time limit for excessive files */
+	uint32_t dqb_bhardlimit;	/* absolute limit on disk blks alloc */
+	uint32_t dqb_bsoftlimit;	/* preferred limit on disk blks */
+	uint32_t dqb_curblocks;		/* current block count */
+	uint32_t dqb_ihardlimit;	/* maximum # allocated inodes */
+	uint32_t dqb_isoftlimit;	/* preferred inode limit */
+	uint32_t dqb_curinodes;		/* current # allocated inodes */
+	time_t  dqb_btime;		/* time limit for excessive disk use */
+	time_t  dqb_itime;		/* time limit for excessive files */
 };
 
 struct v2_dqblk
@@ -80,43 +80,43 @@ struct v2_dqblk
 	unsigned int dqb_curinodes;
 	unsigned int dqb_bhardlimit;
 	unsigned int dqb_bsoftlimit;
-	u_int64_t dqb_curspace;
+	uint64_t dqb_curspace;
 	time_t  dqb_btime;
 	time_t  dqb_itime;
 };
 
 struct xfs_dqblk
 {
-	int8_t  d_version;	/* version of this structure */
-	int8_t  d_flags;	/* XFS_{USER,PROJ,GROUP}_QUOTA */
-	u_int16_t d_fieldmask;	/* field specifier */
-	u_int32_t d_id;		/* user, project, or group ID */
-	u_int64_t d_blk_hardlimit;	/* absolute limit on disk blks */
-	u_int64_t d_blk_softlimit;	/* preferred limit on disk blks */
-	u_int64_t d_ino_hardlimit;	/* maximum # allocated inodes */
-	u_int64_t d_ino_softlimit;	/* preferred inode limit */
-	u_int64_t d_bcount;	/* # disk blocks owned by the user */
-	u_int64_t d_icount;	/* # inodes owned by the user */
-	int32_t d_itimer;	/* zero if within inode limits */
-	int32_t d_btimer;	/* similar to above; for disk blocks */
-	u_int16_t d_iwarns;	/* # warnings issued wrt num inodes */
-	u_int16_t d_bwarns;	/* # warnings issued wrt disk blocks */
-	int32_t d_padding2;	/* padding2 - for future use */
-	u_int64_t d_rtb_hardlimit;	/* absolute limit on realtime blks */
-	u_int64_t d_rtb_softlimit;	/* preferred limit on RT disk blks */
-	u_int64_t d_rtbcount;	/* # realtime blocks owned */
-	int32_t d_rtbtimer;	/* similar to above; for RT disk blks */
-	u_int16_t d_rtbwarns;	/* # warnings issued wrt RT disk blks */
-	int16_t d_padding3;	/* padding3 - for future use */
-	char    d_padding4[8];	/* yet more padding */
+	int8_t  d_version;		/* version of this structure */
+	int8_t  d_flags;		/* XFS_{USER,PROJ,GROUP}_QUOTA */
+	uint16_t d_fieldmask;		/* field specifier */
+	uint32_t d_id;			/* user, project, or group ID */
+	uint64_t d_blk_hardlimit;	/* absolute limit on disk blks */
+	uint64_t d_blk_softlimit;	/* preferred limit on disk blks */
+	uint64_t d_ino_hardlimit;	/* maximum # allocated inodes */
+	uint64_t d_ino_softlimit;	/* preferred inode limit */
+	uint64_t d_bcount;		/* # disk blocks owned by the user */
+	uint64_t d_icount;		/* # inodes owned by the user */
+	int32_t d_itimer;		/* zero if within inode limits */
+	int32_t d_btimer;		/* similar to above; for disk blocks */
+	uint16_t d_iwarns;		/* # warnings issued wrt num inodes */
+	uint16_t d_bwarns;		/* # warnings issued wrt disk blocks */
+	int32_t d_padding2;		/* padding2 - for future use */
+	uint64_t d_rtb_hardlimit;	/* absolute limit on realtime blks */
+	uint64_t d_rtb_softlimit;	/* preferred limit on RT disk blks */
+	uint64_t d_rtbcount;		/* # realtime blocks owned */
+	int32_t d_rtbtimer;		/* similar to above; for RT disk blks */
+	uint16_t d_rtbwarns;		/* # warnings issued wrt RT disk blks */
+	int16_t d_padding3;		/* padding3 - for future use */
+	char    d_padding4[8];		/* yet more padding */
 };
 
 struct if_dqinfo
 {
-	u_int64_t dqi_bgrace;
-	u_int64_t dqi_igrace;
-	u_int32_t dqi_flags;
-	u_int32_t dqi_valid;
+	uint64_t dqi_bgrace;
+	uint64_t dqi_igrace;
+	uint32_t dqi_flags;
+	uint32_t dqi_valid;
 };
 
 struct v2_dqinfo
@@ -131,53 +131,53 @@ struct v2_dqinfo
 
 struct v1_dqstats
 {
-	u_int32_t lookups;
-	u_int32_t drops;
-	u_int32_t reads;
-	u_int32_t writes;
-	u_int32_t cache_hits;
-	u_int32_t allocated_dquots;
-	u_int32_t free_dquots;
-	u_int32_t syncs;
+	uint32_t lookups;
+	uint32_t drops;
+	uint32_t reads;
+	uint32_t writes;
+	uint32_t cache_hits;
+	uint32_t allocated_dquots;
+	uint32_t free_dquots;
+	uint32_t syncs;
 };
 
 struct v2_dqstats
 {
-	u_int32_t lookups;
-	u_int32_t drops;
-	u_int32_t reads;
-	u_int32_t writes;
-	u_int32_t cache_hits;
-	u_int32_t allocated_dquots;
-	u_int32_t free_dquots;
-	u_int32_t syncs;
-	u_int32_t version;
+	uint32_t lookups;
+	uint32_t drops;
+	uint32_t reads;
+	uint32_t writes;
+	uint32_t cache_hits;
+	uint32_t allocated_dquots;
+	uint32_t free_dquots;
+	uint32_t syncs;
+	uint32_t version;
 };
 
 typedef struct fs_qfilestat
 {
-	u_int64_t qfs_ino;	/* inode number */
-	u_int64_t qfs_nblks;	/* number of BBs 512-byte-blks */
-	u_int32_t qfs_nextents;	/* number of extents */
+	uint64_t qfs_ino;	/* inode number */
+	uint64_t qfs_nblks;	/* number of BBs 512-byte-blks */
+	uint32_t qfs_nextents;	/* number of extents */
 } fs_qfilestat_t;
 
 struct xfs_dqstats
 {
-	int8_t  qs_version;	/* version number for future changes */
-	u_int16_t qs_flags;	/* XFS_QUOTA_{U,P,G}DQ_{ACCT,ENFD} */
-	int8_t  qs_pad;		/* unused */
+	int8_t  qs_version;		/* version number for future changes */
+	uint16_t qs_flags;		/* XFS_QUOTA_{U,P,G}DQ_{ACCT,ENFD} */
+	int8_t  qs_pad;			/* unused */
 	fs_qfilestat_t qs_uquota;	/* user quota storage information */
 	fs_qfilestat_t qs_gquota;	/* group quota storage information */
-	u_int32_t qs_incoredqs;	/* number of dquots incore */
-	int32_t qs_btimelimit;	/* limit for blks timer */
-	int32_t qs_itimelimit;	/* limit for inodes timer */
+	uint32_t qs_incoredqs;		/* number of dquots incore */
+	int32_t qs_btimelimit;		/* limit for blks timer */
+	int32_t qs_itimelimit;		/* limit for inodes timer */
 	int32_t qs_rtbtimelimit;	/* limit for rt blks timer */
-	u_int16_t qs_bwarnlimit;	/* limit for num warnings */
-	u_int16_t qs_iwarnlimit;	/* limit for num warnings */
+	uint16_t qs_bwarnlimit;		/* limit for num warnings */
+	uint16_t qs_iwarnlimit;		/* limit for num warnings */
 };
 
 static void
-decode_cmd_data(struct tcb *tcp, u_int32_t cmd, unsigned long data)
+decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 {
 	switch (cmd) {
 		case Q_GETQUOTA:
@@ -271,7 +271,7 @@ decode_cmd_data(struct tcb *tcp, u_int32_t cmd, unsigned long data)
 		}
 		case Q_GETFMT:
 		{
-			u_int32_t fmt;
+			uint32_t fmt;
 
 			if (umove_or_printaddr(tcp, data, &fmt))
 				break;
@@ -373,7 +373,7 @@ decode_cmd_data(struct tcb *tcp, u_int32_t cmd, unsigned long data)
 		}
 		case Q_XQUOTAON:
 		{
-			u_int32_t flag;
+			uint32_t flag;
 
 			if (umove_or_printaddr(tcp, data, &flag))
 				break;
@@ -396,10 +396,10 @@ SYS_FUNC(quotactl)
 	 * will have been sign-extended when we see it.  The high 1 bits
 	 * don't mean anything, so don't confuse the output with them.
 	 */
-	u_int32_t qcmd = tcp->u_arg[0];
-	u_int32_t cmd = QCMD_CMD(qcmd);
-	u_int32_t type = QCMD_TYPE(qcmd);
-	u_int32_t id = tcp->u_arg[2];
+	uint32_t qcmd = tcp->u_arg[0];
+	uint32_t cmd = QCMD_CMD(qcmd);
+	uint32_t type = QCMD_TYPE(qcmd);
+	uint32_t id = tcp->u_arg[2];
 
 	if (entering(tcp)) {
 		printxval(quotacmds, cmd, "Q_???");
