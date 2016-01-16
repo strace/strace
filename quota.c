@@ -36,82 +36,17 @@
 #define QCMD_CMD(cmd)	((u_int32_t)(cmd) >> SUBCMDSHIFT)
 #define QCMD_TYPE(cmd)	((u_int32_t)(cmd) & SUBCMDMASK)
 
-#define OLD_CMD(cmd)	((u_int32_t)(cmd) << 8)
+#define OLD_CMD(cmd)	((u_int32_t)(cmd) << SUBCMDSHIFT)
 #define NEW_CMD(cmd)	((u_int32_t)(cmd) | 0x800000)
-#define XQM_CMD(cmd)	((u_int32_t)(cmd) | ('X'<<8))
-
-#define Q_V1_QUOTAON	OLD_CMD(0x1)
-#define Q_V1_QUOTAOFF	OLD_CMD(0x2)
-#define Q_V1_GETQUOTA	OLD_CMD(0x3)
-#define Q_V1_SETQUOTA	OLD_CMD(0x4)
-#define Q_V1_SETUSE	OLD_CMD(0x5)
-#define Q_V1_SYNC	OLD_CMD(0x6)
-#define Q_SETQLIM	OLD_CMD(0x7)
-#define Q_V1_GETSTATS	OLD_CMD(0x8)
-#define Q_V1_RSQUASH	OLD_CMD(0x10)
-
-#define Q_V2_GETQUOTA	OLD_CMD(0xD)
-#define Q_V2_SETQUOTA	OLD_CMD(0xE)
-#define Q_V2_SETUSE	OLD_CMD(0xF)
-#define Q_V2_GETINFO	OLD_CMD(0x9)
-#define Q_V2_SETINFO	OLD_CMD(0xA)
-#define Q_V2_SETGRACE	OLD_CMD(0xB)
-#define Q_V2_SETFLAGS	OLD_CMD(0xC)
-#define Q_V2_GETSTATS	OLD_CMD(0x11)
-
-#define Q_SYNC		NEW_CMD(0x1)
-#define Q_QUOTAON	NEW_CMD(0x2)
-#define Q_QUOTAOFF	NEW_CMD(0x3)
-#define Q_GETFMT	NEW_CMD(0x4)
-#define Q_GETINFO	NEW_CMD(0x5)
-#define Q_SETINFO	NEW_CMD(0x6)
-#define Q_GETQUOTA	NEW_CMD(0x7)
-#define Q_SETQUOTA	NEW_CMD(0x8)
-
-#define Q_XQUOTAON	XQM_CMD(0x1)
-#define Q_XQUOTAOFF	XQM_CMD(0x2)
-#define Q_XGETQUOTA	XQM_CMD(0x3)
-#define Q_XSETQLIM	XQM_CMD(0x4)
-#define Q_XGETQSTAT	XQM_CMD(0x5)
-#define Q_XQUOTARM	XQM_CMD(0x6)
-#define Q_XQUOTASYNC	XQM_CMD(0x7)
+#define XQM_CMD(cmd)	((u_int32_t)(cmd) | ('X' << SUBCMDSHIFT))
 
 #include "xlat/quotacmds.h"
-
-#define USRQUOTA 0
-#define GRPQUOTA 1
-
 #include "xlat/quotatypes.h"
-
-/* Quota format identifiers */
-#define QFMT_VFS_OLD 1
-#define QFMT_VFS_V0  2
-
 #include "xlat/quota_formats.h"
-
-#define XFS_QUOTA_UDQ_ACCT	(1<<0)	/* user quota accounting */
-#define XFS_QUOTA_UDQ_ENFD	(1<<1)	/* user quota limits enforcement */
-#define XFS_QUOTA_GDQ_ACCT	(1<<2)	/* group quota accounting */
-#define XFS_QUOTA_GDQ_ENFD	(1<<3)	/* group quota limits enforcement */
-
-#define XFS_USER_QUOTA		(1<<0)	/* user quota type */
-#define XFS_PROJ_QUOTA		(1<<1)	/* (IRIX) project quota type */
-#define XFS_GROUP_QUOTA		(1<<2)	/* group quota type */
-
 #include "xlat/xfs_quota_flags.h"
 #include "xlat/xfs_dqblk_flags.h"
-
-/*
- * Following flags are used to specify which fields are valid
- */
-#define QIF_BLIMITS	1
-#define QIF_SPACE	2
-#define QIF_ILIMITS	4
-#define QIF_INODES	8
-#define QIF_BTIME	16
-#define QIF_ITIME	32
-
 #include "xlat/if_dqblk_valid.h"
+#include "xlat/if_dqinfo_valid.h"
 
 struct if_dqblk
 {
@@ -175,15 +110,6 @@ struct xfs_dqblk
 	int16_t d_padding3;	/* padding3 - for future use */
 	char    d_padding4[8];	/* yet more padding */
 };
-
-/*
- * Following flags are used to specify which fields are valid
- */
-#define IIF_BGRACE	1
-#define IIF_IGRACE	2
-#define IIF_FLAGS	4
-
-#include "xlat/if_dqinfo_valid.h"
 
 struct if_dqinfo
 {
