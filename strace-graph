@@ -33,7 +33,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+use strict;
+use warnings;
+
 my %unfinished;
+my $floatform;
 
 # Scales for strace slowdown.  Make configurable!
 my $scale_factor = 3.5;
@@ -41,6 +45,7 @@ my $scale_factor = 3.5;
 while (<>) {
     my ($pid, $call, $args, $result, $time);
     chop;
+    $floatform = 0;
 
     s/^(\d+)\s+//;
     $pid = $1;
@@ -119,13 +124,14 @@ sub parse_one {
     my ($in) = @_;
 
     if ($in =~ s/^\"//) {
+	my $tmp;
 	($tmp, $in) = parse_str($in);
 	if (not defined $tmp) {
 	    print STDERR "$0: $ARGV: $.: cannot parse string.\n";
 	    return (undef, $in);
 	}
 	return ($tmp, $in);
-    } elsif ($in =~ s/^0x(\x+)//) {
+    } elsif ($in =~ s/^0x([[:xdigit:]]+)//) {
 	return (hex $1, $in);
     } elsif ($in =~ s/^(\d+)//) {
 	return (int $1, $in);
@@ -214,10 +220,10 @@ sub handle_trace {
     }
 
     if ($call eq 'execve') {
-	return if $result != 0;
+	return if $result ne '0';
 
 	my ($filename, $argv) = parseargs($args);
-	($basename) = $filename =~ m/([^\/]*)$/;
+	my ($basename) = $filename =~ m/([^\/]*)$/;
 	if ($basename ne $$argv[0]) {
 	    $$argv[0] = "$basename($$argv[0])";
         }
@@ -249,7 +255,7 @@ sub straight_seq {
     my ($pid) = @_;
     my $seq = $pr{$pid}{seq};
 
-    for $elem (@$seq) {
+    for my $elem (@$seq) {
 	if ($$elem[0] eq 'EXEC') {
 	    my $argv = $$elem[2];
 	    print "$$elem[0] $$elem[1] @$argv\n";
@@ -265,7 +271,7 @@ sub first_exec {
     my ($pid) = @_;
     my $seq = $pr{$pid}{seq};
 
-    for $elem (@$seq) {
+    for my $elem (@$seq) {
 	if ($$elem[0] eq 'EXEC') {
 	    return $elem;
 	}
@@ -293,7 +299,7 @@ sub display_pid_trace {
 	}
     }
 
-    for $elem (@seq) {
+    for my $elem (@seq) {
 	$i++;
 	if ($$elem[0] eq 'EXEC') {
 	    my $argv = $$elem[2];
