@@ -212,7 +212,7 @@ my $depth = "";
 # process info, indexed by pid.
 # fields:
 #    parent         pid number
-#    seq            forks and execs for this pid, in sequence  (array)
+#    seq            clones, forks and execs for this pid, in sequence  (array)
 
 #  filename and argv (from latest exec)
 #  basename (derived from filename)
@@ -250,6 +250,7 @@ sub handle_trace {
 	push @$seq, ['FORK', $result];
 	$pr{$pid}{seq} = $seq;
 	$pr{$result}{parent} = $pid;
+	$pr{$result}{seq} = [];
     } elsif ($call eq '_exit' || $call eq 'exit_group') {
 	$pr{$pid}{end} = $time if defined $time;
     }
