@@ -75,7 +75,7 @@ while (<>) {
 	delete $unfinished{$pid};
     }
 
-    if (/^--- SIG(\S+) \(.*\) ---$/) {
+    if (/^--- SIG(\S+) (.*) ---$/) {
 	# $pid received signal $1
 	# currently we don't do anything with this
 	next;
@@ -84,6 +84,12 @@ while (<>) {
     if (/^\+\+\+ killed by SIG(\S+) \+\+\+$/) {
 	# $pid received signal $1
 	handle_killed($pid, $time);
+	next;
+    }
+
+    if (/^\+\+\+ exited with (\d+) \+\+\+$/) {
+	# $pid exited $1
+	# currently we don't do anything with this
 	next;
     }
 
@@ -244,7 +250,7 @@ sub handle_trace {
 	push @$seq, ['FORK', $result];
 	$pr{$pid}{seq} = $seq;
 	$pr{$result}{parent} = $pid;
-    } elsif ($call eq '_exit') {
+    } elsif ($call eq '_exit' || $call eq 'exit_group') {
 	$pr{$pid}{end} = $time if defined $time;
     }
 }
