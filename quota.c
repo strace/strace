@@ -410,10 +410,12 @@ SYS_FUNC(quotactl)
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 		switch (cmd) {
-			case Q_V1_QUOTAON:
 			case Q_QUOTAON:
+			case Q_V1_QUOTAON:
 				printxval(quota_formats, id, "QFMT_VFS_???");
-				break;
+				tprints(", ");
+				printpath(tcp, tcp->u_arg[3]);
+				return RVAL_DECODED;
 			case Q_SETQLIM:
 			case Q_SETQUOTA:
 			case Q_V1_SETQUOTA:
