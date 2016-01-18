@@ -275,9 +275,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 
 			if (umove_or_printaddr(tcp, data, &fmt))
 				break;
-			tprints("{");
+			tprints("[");
 			printxval(quota_formats, fmt, "QFMT_VFS_???");
-			tprints("}");
+			tprints("]");
 			break;
 		}
 		case Q_GETINFO:
@@ -377,9 +377,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 
 			if (umove_or_printaddr(tcp, data, &flag))
 				break;
-			tprints("{");
+			tprints("[");
 			printflags(xfs_quota_flags, flag, "XFS_QUOTA_???");
-			tprints("}");
+			tprints("]");
 			break;
 		}
 		default:
