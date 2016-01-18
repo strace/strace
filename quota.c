@@ -372,6 +372,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_XQUOTAON:
+		case Q_XQUOTAOFF:
 		{
 			uint32_t flag;
 
