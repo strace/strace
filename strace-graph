@@ -314,10 +314,10 @@ sub display_pid_trace {
 	if ($$elem[0] eq 'EXEC') {
 	    my $argv = $$elem[2];
 	    if (defined $elapsed) {
-		print "$lead [$elapsed] @$argv\n";
+		print "$lead [$elapsed] $pid @$argv\n";
 		undef $elapsed;
 	    } else {
-		print "$lead @$argv\n";
+		print "$lead $pid @$argv\n";
 	    }
 	} elsif ($$elem[0] eq 'FORK') {
 	    if ($i == 1) {
