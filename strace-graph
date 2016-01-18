@@ -43,7 +43,7 @@ my $floatform;
 my $scale_factor = 3.5;
 
 while (<>) {
-    my ($pid, $call, $args, $result, $time);
+    my ($pid, $call, $args, $result, $time, $time_spent);
     chop;
     $floatform = 0;
 
@@ -88,6 +88,9 @@ while (<>) {
     }
 
     ($call, $args, $result) = /(\S+)\((.*)\)\s+= (.*)$/;
+    if ($result =~ /^(.*) <([0-9.]*)>$/) {
+	($result, $time_spent) = ($1, $2);
+    }
     unless (defined $result) {
 	print STDERR "$0: $ARGV: $.: cannot parse line.\n";
 	next;
