@@ -414,12 +414,6 @@ SYS_FUNC(quotactl)
 			case Q_QUOTAON:
 				printxval(quota_formats, id, "QFMT_VFS_???");
 				break;
-			case Q_V1_GETQUOTA:
-			case Q_V2_GETQUOTA:
-			case Q_GETQUOTA:
-			case Q_XGETQUOTA:
-				tprintf("%u", id);
-				break;
 			case Q_SETQLIM:
 			case Q_SETQUOTA:
 			case Q_V1_SETQUOTA:
@@ -434,9 +428,8 @@ SYS_FUNC(quotactl)
 			case Q_V2_SETINFO:
 				decode_cmd_data(tcp, cmd, tcp->u_arg[3]);
 				return RVAL_DECODED;
-				break;
 			default:
-				printaddr(tcp->u_arg[2]);
+				tprintf("%u", id);
 				break;
 		}
 		tprints(", ");
