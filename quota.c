@@ -3,7 +3,7 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 2005, 2006 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -176,11 +176,13 @@ struct xfs_dqstats
 	uint16_t qs_iwarnlimit;		/* limit for num warnings */
 };
 
-static void
+static int
 decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 {
 	switch (cmd) {
 		case Q_GETQUOTA:
+			if (entering(tcp))
+				return 0;
 		case Q_SETQUOTA:
 		{
 			struct if_dqblk dq;
@@ -205,6 +207,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_V1_GETQUOTA:
+			if (entering(tcp))
+				return 0;
 		case Q_V1_SETQUOTA:
 		{
 			struct v1_dqblk dq;
@@ -222,6 +226,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_V2_GETQUOTA:
+			if (entering(tcp))
+				return 0;
 		case Q_V2_SETQUOTA:
 		{
 			struct v2_dqblk dq;
@@ -239,6 +245,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_XGETQUOTA:
+			if (entering(tcp))
+				return 0;
 		case Q_XSETQLIM:
 		{
 			struct xfs_dqblk dq;
@@ -273,6 +281,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			uint32_t fmt;
 
+			if (entering(tcp))
+				return 0;
 			if (umove_or_printaddr(tcp, data, &fmt))
 				break;
 			tprints("[");
@@ -281,6 +291,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_GETINFO:
+			if (entering(tcp))
+				return 0;
 		case Q_SETINFO:
 		{
 			struct if_dqinfo dq;
@@ -296,6 +308,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_V2_GETINFO:
+			if (entering(tcp))
+				return 0;
 		case Q_V2_SETINFO:
 		{
 			struct v2_dqinfo dq;
@@ -314,6 +328,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct v1_dqstats dq;
 
+			if (entering(tcp))
+				return 0;
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{lookups=%u, ", dq.lookups);
@@ -330,6 +346,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct v2_dqstats dq;
 
+			if (entering(tcp))
+				return 0;
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{lookups=%u, ", dq.lookups);
@@ -347,6 +365,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct xfs_dqstats dq;
 
+			if (entering(tcp))
+				return 0;
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{version=%d, ", dq.qs_version);
@@ -387,6 +407,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			printaddr(data);
 			break;
 	}
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(quotactl)
@@ -416,27 +437,8 @@ SYS_FUNC(quotactl)
 				tprints(", ");
 				printpath(tcp, tcp->u_arg[3]);
 				return RVAL_DECODED;
-			case Q_SETQLIM:
-			case Q_SETQUOTA:
-			case Q_V1_SETQUOTA:
-			case Q_V1_SETUSE:
-			case Q_V2_SETQUOTA:
-			case Q_V2_SETUSE:
-			case Q_XSETQLIM:
-				tprintf("%u, ", id);
-			case Q_SETINFO:
-			case Q_V2_SETFLAGS:
-			case Q_V2_SETGRACE:
-			case Q_V2_SETINFO:
-				decode_cmd_data(tcp, cmd, tcp->u_arg[3]);
-				return RVAL_DECODED;
-			default:
-				tprintf("%u", id);
-				break;
 		}
-		tprints(", ");
-	} else {
-		decode_cmd_data(tcp, cmd, tcp->u_arg[3]);
+		tprintf("%u, ", id);
 	}
-	return 0;
+	return decode_cmd_data(tcp, cmd, tcp->u_arg[3]);
 }
