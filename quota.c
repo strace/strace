@@ -46,6 +46,7 @@
 #include "xlat/xfs_quota_flags.h"
 #include "xlat/xfs_dqblk_flags.h"
 #include "xlat/if_dqblk_valid.h"
+#include "xlat/if_dqinfo_flags.h"
 #include "xlat/if_dqinfo_valid.h"
 
 struct if_dqblk
@@ -301,8 +302,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 				break;
 			tprintf("{bgrace=%" PRIu64 ", ", dq.dqi_bgrace);
 			tprintf("igrace=%" PRIu64 ", ", dq.dqi_igrace);
-			tprintf("flags=%#x, ", dq.dqi_flags);
-			tprints("valid=");
+			tprints("flags=");
+			printflags(if_dqinfo_flags, dq.dqi_flags, "DQF_???");
+			tprints(", valid=");
 			printflags(if_dqinfo_valid, dq.dqi_valid, "IIF_???");
 			tprints("}");
 			break;
@@ -318,8 +320,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 				break;
 			tprintf("{bgrace=%u, ", dq.dqi_bgrace);
 			tprintf("igrace=%u, ", dq.dqi_igrace);
-			tprintf("flags=%#x, ", dq.dqi_flags);
-			tprintf("blocks=%u, ", dq.dqi_blocks);
+			tprints("flags=");
+			printflags(if_dqinfo_flags, dq.dqi_flags, "DQF_???");
+			tprintf(", blocks=%u, ", dq.dqi_blocks);
 			tprintf("free_blk=%u, ", dq.dqi_free_blk);
 			tprintf("free_entry=%u}", dq.dqi_free_entry);
 			break;
