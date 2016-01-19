@@ -177,6 +177,27 @@ struct xfs_dqstats
 	uint16_t qs_iwarnlimit;		/* limit for num warnings */
 };
 
+struct fs_qfilestatv {
+	uint64_t qfs_ino, qfs_nblks;
+	uint32_t qfs_nextents, qfs_pad;
+};
+
+struct fs_quota_statv {
+	int8_t qs_version;
+	uint8_t qs_pad1;
+	uint16_t qs_flags;
+	uint32_t qs_incoredqs;
+	struct fs_qfilestatv qs_uquota;
+	struct fs_qfilestatv qs_gquota;
+	struct fs_qfilestatv qs_pquota;
+	int32_t qs_btimelimit;
+	int32_t qs_itimelimit;
+	int32_t qs_rtbtimelimit;
+	uint16_t qs_bwarnlimit;
+	uint16_t qs_iwarnlimit;
+	uint64_t qs_pad2[8];
+};
+
 static int
 decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 {
@@ -387,6 +408,39 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			tprintf("g_ino=%" PRIu64 ", ", dq.qs_gquota.qfs_ino);
 			tprintf("g_nblks=%" PRIu64 ", ", dq.qs_gquota.qfs_nblks);
 			tprintf("g_nextents=%u, ", dq.qs_gquota.qfs_nextents);
+			tprintf("btimelimit=%d, ", dq.qs_btimelimit);
+			tprintf("itimelimit=%d, ", dq.qs_itimelimit);
+			tprintf("rtbtimelimit=%d, ", dq.qs_rtbtimelimit);
+			tprintf("bwarnlimit=%u, ", dq.qs_bwarnlimit);
+			tprintf("iwarnlimit=%u}", dq.qs_iwarnlimit);
+			break;
+		}
+		case Q_XGETQSTATV:
+		{
+			struct fs_quota_statv dq;
+
+			if (entering(tcp))
+				return 0;
+			if (umove_or_printaddr(tcp, data, &dq))
+				break;
+			tprintf("{version=%d, ", dq.qs_version);
+			if (abbrev(tcp)) {
+				tprints("...}");
+				break;
+			}
+			tprints("flags=");
+			printflags(xfs_quota_flags,
+				   dq.qs_flags, "XFS_QUOTA_???");
+			tprintf(", incoredqs=%u, ", dq.qs_incoredqs);
+			tprintf("u_ino=%" PRIu64 ", ", dq.qs_uquota.qfs_ino);
+			tprintf("u_nblks=%" PRIu64 ", ", dq.qs_uquota.qfs_nblks);
+			tprintf("u_nextents=%u, ", dq.qs_uquota.qfs_nextents);
+			tprintf("g_ino=%" PRIu64 ", ", dq.qs_gquota.qfs_ino);
+			tprintf("g_nblks=%" PRIu64 ", ", dq.qs_gquota.qfs_nblks);
+			tprintf("g_nextents=%u, ", dq.qs_gquota.qfs_nextents);
+			tprintf("p_ino=%" PRIu64 ", ", dq.qs_pquota.qfs_ino);
+			tprintf("p_nblks=%" PRIu64 ", ", dq.qs_pquota.qfs_nblks);
+			tprintf("p_nextents=%u, ", dq.qs_pquota.qfs_nextents);
 			tprintf("btimelimit=%d, ", dq.qs_btimelimit);
 			tprintf("itimelimit=%d, ", dq.qs_itimelimit);
 			tprintf("rtbtimelimit=%d, ", dq.qs_rtbtimelimit);
