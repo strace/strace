@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check decoding of recvmsg and sendmsg syscalls.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -eread=0 -ewrite=1 -erecvmsg,sendmsg $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
+
+exit 0

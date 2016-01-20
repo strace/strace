@@ -68,6 +68,7 @@ readdir
 readlink
 readlinkat
 readv
+recvmsg
 restart_syscall
 rt_sigqueueinfo
 sched_xetaffinity

@@ -706,12 +706,12 @@ printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
 }
 
 void
-dumpiov_in_msghdr(struct tcb *tcp, long addr)
+dumpiov_in_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
 	if (extractmsghdr(tcp, addr, &msg))
-		dumpiov(tcp, msg.msg_iovlen, (long)msg.msg_iov);
+		dumpiov_upto(tcp, msg.msg_iovlen, (long)msg.msg_iov, data_size);
 }
 
 static void
