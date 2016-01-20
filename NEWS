@@ -13,6 +13,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed decoding of mlock2 syscall on sparc.
   * Fixed decoding of syscalls unknown to the kernel on s390/s390x.
     (addresses Debian bug #485979 and Fedora bug #1298294).
+  * Fixed decoding and dumping of readv syscall in case of short read.
 
 Noteworthy changes in release 4.11 (2015-12-21)
 ===============================================

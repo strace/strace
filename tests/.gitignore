@@ -67,6 +67,7 @@ pselect6
 readdir
 readlink
 readlinkat
+readv
 restart_syscall
 rt_sigqueueinfo
 sched_xetaffinity

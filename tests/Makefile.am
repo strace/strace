@@ -113,6 +113,7 @@ check_PROGRAMS = \
 	readdir \
 	readlink \
 	readlinkat \
+	readv \
 	restart_syscall \
 	rt_sigqueueinfo \
 	sched_xetaffinity \
@@ -249,6 +250,7 @@ TESTS = \
 	readdir.test \
 	readlink.test \
 	readlinkat.test \
+	readv.test \
 	rt_sigqueueinfo.test \
 	sched_xetaffinity.test \
 	sched_xetattr.test \

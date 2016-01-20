@@ -841,7 +841,7 @@ printstr(struct tcb *tcp, long addr, long len)
 }
 
 void
-dumpiov(struct tcb *tcp, int len, long addr)
+dumpiov_upto(struct tcb *tcp, int len, long addr, unsigned long data_size)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	union {
@@ -873,12 +873,16 @@ dumpiov(struct tcb *tcp, int len, long addr)
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
 		for (i = 0; i < len; i++) {
+			unsigned long iov_len = iov_iov_len(i);
+			if (iov_len > data_size)
+				iov_len = data_size;
+			if (!iov_len)
+				break;
+			data_size -= iov_len;
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
-			tprintf(" * %lu bytes in buffer %d\n",
-				(unsigned long)iov_iov_len(i), i);
-			dumpstr(tcp, (long) iov_iov_base(i),
-				iov_iov_len(i));
+			tprintf(" * %lu bytes in buffer %d\n", iov_len, i);
+			dumpstr(tcp, (long) iov_iov_base(i), iov_len);
 		}
 	}
 	free(iov);

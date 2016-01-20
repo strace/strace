@@ -687,7 +687,8 @@ dumpio(struct tcb *tcp)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
 			return;
 		case SEN_readv:
-			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+			dumpiov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
+				     tcp->u_rval);
 			return;
 		case SEN_recvmsg:
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1]);

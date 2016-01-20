@@ -123,7 +123,8 @@ SYS_FUNC(readv)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
+		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], 1,
+				tcp->u_rval);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
