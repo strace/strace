@@ -45,8 +45,6 @@ struct mmsghdr {
 };
 # endif
 
-# define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
-
 static int
 send_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags)
 {

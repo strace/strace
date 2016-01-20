@@ -42,8 +42,6 @@
  && defined __NR_io_destroy
 # include <linux/aio_abi.h>
 
-# define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
-
 int
 main(void)
 {
