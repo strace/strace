@@ -45,6 +45,7 @@ libtests_a_SOURCES = \
 	error_msg.c \
 	tail_alloc.c \
 	tests.h \
+	tprintf.c \
 	# end of libtests_a_SOURCES
 libtests_a_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 check_LIBRARIES = libtests.a

@@ -47,8 +47,6 @@ struct mmsghdr {
 
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 
-static FILE *logfp;
-
 static int
 send_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags)
 {
@@ -58,8 +56,7 @@ send_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags)
 		     (unsigned long) flags);
 	if (rc >= 0 || ENOSYS != errno)
 		return rc;
-	fprintf(logfp,
-		"sendmmsg(%d, %p, %u, MSG_DONTROUTE|MSG_NOSIGNAL)"
+	tprintf("sendmmsg(%d, %p, %u, MSG_DONTROUTE|MSG_NOSIGNAL)"
 		" = -1 ENOSYS (%m)\n", fd, vec, vlen);
 #endif
 #ifdef HAVE_SENDMMSG
@@ -78,8 +75,7 @@ recv_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags,
 		     (unsigned long) flags, timeout);
 	if (rc >= 0 || ENOSYS != errno)
 		return rc;
-	fprintf(logfp,
-		"recvmmsg(%d, %p, %u, MSG_DONTWAIT, NULL)"
+	tprintf("recvmmsg(%d, %p, %u, MSG_DONTWAIT, NULL)"
 		" = -1 ENOSYS (%m)\n", fd, vec, vlen);
 #endif
 #ifdef HAVE_RECVMMSG
@@ -91,15 +87,10 @@ recv_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags,
 int
 main(void)
 {
+	tprintf("%s", "");
+
 	const int R = 0, W = 1;
 	int sv[2];
-
-	int logfd = dup(1);
-	assert(logfd > 2);
-	assert((logfp = fdopen(logfd, "w")));
-
-	(void) close(0);
-	(void) close(1);
 	if (socketpair(AF_UNIX, SOCK_DGRAM, 0, sv))
 		perror_msg_and_skip("socketpair");
 	assert(R == sv[0]);
@@ -151,8 +142,7 @@ main(void)
 		perror_msg_and_skip("sendmmsg");
 	assert(r == (int) n_mmh);
 	assert(close(W) == 0);
-	fprintf(logfp,
-		"sendmmsg(%d, {{{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}"
+	tprintf("sendmmsg(%d, {{{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}"
 		", {\"%s\", %u}], msg_controllen=0, msg_flags=0}, %u}"
 		", {{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}]"
 		", msg_controllen=0, msg_flags=0}, %u}}, %u"
@@ -166,7 +156,7 @@ main(void)
 		" * %u bytes in buffer 0\n"
 		" | 00000  %-48s  %-16s |\n",
 		W, 2, one, LENGTH_OF(one), two, LENGTH_OF(two),
-		LENGTH_OF(one) +  LENGTH_OF(two),
+		LENGTH_OF(one) + LENGTH_OF(two),
 		1, three, LENGTH_OF(three), LENGTH_OF(three),
 		n_mmh, r,
 		2, LENGTH_OF(one), ascii_one, one,
@@ -175,8 +165,7 @@ main(void)
 
 	assert(recv_mmsg(R, copy_mmh, n_mmh, MSG_DONTWAIT, NULL) == (int) n_mmh);
 	assert(close(R) == 0);
-	fprintf(logfp,
-		"recvmmsg(%d, {{{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}"
+	tprintf("recvmmsg(%d, {{{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}"
 		", {\"%s\", %u}], msg_controllen=0, msg_flags=0}, %u}"
 		", {{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}]"
 		", msg_controllen=0, msg_flags=0}, %u}}, %u"
@@ -190,14 +179,14 @@ main(void)
 		" * %u bytes in buffer 0\n"
 		" | 00000  %-48s  %-16s |\n",
 		R, 2, one, LENGTH_OF(one), two, LENGTH_OF(two),
-		LENGTH_OF(one) +  LENGTH_OF(two),
+		LENGTH_OF(one) + LENGTH_OF(two),
 		1, three, LENGTH_OF(three), LENGTH_OF(three),
 		n_mmh, r,
 		2, LENGTH_OF(one), ascii_one, one,
 		LENGTH_OF(two), ascii_two, two,
 		1, LENGTH_OF(three), ascii_three, three);
 
-	fprintf(logfp, "+++ exited with 0 +++\n");
+	tprintf("+++ exited with 0 +++\n");
 	return 0;
 }
 
