@@ -41,8 +41,9 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 AM_LDFLAGS = $(ARCH_MFLAGS)
 
 libtests_a_SOURCES = \
-	get_page_size.c \
 	error_msg.c \
+	get_page_size.c \
+	hexdump_strdup.c \
 	tail_alloc.c \
 	tests.h \
 	tprintf.c \

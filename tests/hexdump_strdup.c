@@ -1,4 +1,6 @@
 /*
+ * Make a hexdump copy of C string
+ *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -25,48 +27,32 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TESTS_H_
-# define TESTS_H_
+#include "tests.h"
 
-# ifdef HAVE_CONFIG_H
-#  include "config.h"
-# endif
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
-# include <sys/types.h>
-# include "gcc_compat.h"
+const char *
+hexdump_strdup(const char *src)
+{
+	size_t src_len = strlen(src);
+	size_t dst_size = 3 * src_len + 1;
+	assert(dst_size > src_len);
 
-/* Cached sysconf(_SC_PAGESIZE). */
-size_t get_page_size(void);
+	char *dst = malloc(dst_size);
+	if (!dst)
+		perror_msg_and_fail("malloc(%zu)", dst_size);
 
-/* Print message and strerror(errno) to stderr, then exit(1). */
-void perror_msg_and_fail(const char *, ...)
-	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
-/* Print message to stderr, then exit(77). */
-void error_msg_and_skip(const char *, ...)
-	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
-/* Print message and strerror(errno) to stderr, then exit(77). */
-void perror_msg_and_skip(const char *, ...)
-	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
+	char *p = dst;
+	const unsigned char *usrc = (const unsigned char *) src;
+	for (; *usrc; ++usrc) {
+		unsigned int c = *usrc;
+		*(p++) = ' ';
+		*(p++) = "0123456789abcdef"[c >> 4];
+		*(p++) = "0123456789abcdef"[c & 0xf];
+	}
+	*p = '\0';
 
-/*
- * Allocate memory that ends on the page boundary.
- * Pages allocated by this call are preceeded by an unmapped page
- * and followed also by an unmapped page.
- */
-void *tail_alloc(const size_t)
-	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
-/* Allocate memory using tail_alloc, then memcpy. */
-void *tail_memdup(const void *, const size_t)
-	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((2));
-
-/* Close stdin, move stdout to a non-standard descriptor, and print. */
-void tprintf(const char *, ...)
-	ATTRIBUTE_FORMAT((printf, 1, 2));
-
-/* Make a hexdump copy of C string */
-const char *hexdump_strdup(const char *);
-
-# define SKIP_MAIN_UNDEFINED(arg) \
-	int main(void) { error_msg_and_skip("undefined: %s", arg); }
-
-#endif
+	return dst;
+}
