@@ -130,6 +130,7 @@ check_PROGRAMS = \
 	signalfd \
 	sigreturn \
 	stack-fcall \
+	sleep \
 	stat \
 	stat64 \
 	statfs \

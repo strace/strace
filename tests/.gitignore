@@ -83,6 +83,7 @@ sigaction
 sigaltstack
 signalfd
 sigreturn
+sleep
 stack-fcall
 stat
 stat64

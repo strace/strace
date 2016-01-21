@@ -2,7 +2,7 @@
 #
 # Check whether -c and -w options work.
 #
-# Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,14 +29,14 @@
 
 . "${srcdir=.}/init.sh"
 
+run_prog ./sleep 0
 check_prog grep
-check_prog sleep
 
 grep_log()
 {
 	local pattern="$1"; shift
 
-	run_strace "$@"
+	run_strace "$@" ./sleep 1
 
 	grep nanosleep "$LOG" > /dev/null ||
 		framework_skip_ 'sleep does not use nanosleep'
@@ -48,9 +48,9 @@ grep_log()
 	}
 }
 
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c sleep 1
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c -enanosleep sleep 1
-grep_log ' *[^ ]+ +(1\.0|0\.99)[^n]*nanosleep'	-cw sleep 1
-grep_log '100\.00 +(1\.0|0\.99)[^n]*nanosleep'	-cw -enanosleep sleep 1
+grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c
+grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c -enanosleep
+grep_log ' *[^ ]+ +(1\.0|0\.99)[^n]*nanosleep'	-cw
+grep_log '100\.00 +(1\.0|0\.99)[^n]*nanosleep'	-cw -enanosleep
 
 exit 0
