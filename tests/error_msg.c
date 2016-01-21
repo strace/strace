@@ -48,6 +48,17 @@ perror_msg_and_fail(const char *fmt, ...)
 }
 
 void
+error_msg_and_fail(const char *fmt, ...)
+{
+	va_list p;
+
+	va_start(p, fmt);
+	vfprintf(stderr, fmt, p);
+	putc('\n', stderr);
+	exit(1);
+}
+
+void
 error_msg_and_skip(const char *fmt, ...)
 {
 	va_list p;
