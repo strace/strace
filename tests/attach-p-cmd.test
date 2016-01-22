@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Check that simultaneous use of -p option and tracing of a command works.
+#
+# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/init.sh"
+
+run_prog_skip_if_failed \
+	kill -0 $$
+run_prog ./attach-p-cmd-cmd > /dev/null
+run_prog ./attach-p-cmd-p 1 > /dev/null
+
+OUT="$LOG.out"
+./set_ptracer_any ./attach-p-cmd-p 1 > "$OUT" &
+tracee_pid=$!
+
+while ! [ -s "$OUT" ]; do
+	kill -0 $tracee_pid 2> /dev/null ||
+		fail_ 'set_ptracer_any sleep failed'
+done
+
+run_strace -a30 -echdir -p $tracee_pid ./attach-p-cmd-cmd > "$OUT"
+{
+printf '%-5d --- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---\n' $tracee_pid
+printf '%-5d chdir("attach-p-cmd.test -p") = -1 ENOENT (No such file or directory)\n' $tracee_pid
+printf '%-5d +++ exited with 0 +++\n' $tracee_pid
+} >> "$OUT"
+
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

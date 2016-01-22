@@ -8,6 +8,8 @@
 _newselect
 adjtimex
 aio
+attach-p-cmd-cmd
+attach-p-cmd-p
 bpf
 caps
 clock_nanosleep

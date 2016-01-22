@@ -530,8 +530,13 @@ will respond by detaching itself from the traced process(es)
 leaving it (them) to continue running.
 Multiple
 .B \-p
-options can be used to attach to many processes.
--p "`pidof PROG`" syntax is supported.
+options can be used to attach to many processes in addition to
+.I command
+(which is optional if at least one
+.B \-p
+option is given).
+.B \-p
+"`pidof PROG`" syntax is supported.
 .TP
 .BI "\-P " path
 Trace only system calls accessing

@@ -56,6 +56,8 @@ check_PROGRAMS = \
 	_newselect \
 	adjtimex \
 	aio \
+	attach-p-cmd-cmd \
+	attach-p-cmd-p \
 	bpf \
 	caps \
 	clock_nanosleep \
@@ -299,6 +301,7 @@ TESTS = \
 	xettimeofday.test \
 	\
 	count.test \
+	attach-p-cmd.test \
 	detach-sleeping.test \
 	detach-stopped.test \
 	detach-running.test \

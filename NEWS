@@ -2,6 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented simultaneous use of -p option and tracing of a command.
+    (addresses Debian bug #549942).
   * Enhanced decoding of personality, sched_getaffinity,
     and sched_setaffinity syscalls.
   * Enhanced decoding of getxpid, getxuid, and getxgid syscalls on alpha.

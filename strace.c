@@ -973,6 +973,7 @@ process_opt_p_list(char *opt)
 static void
 startup_attach(void)
 {
+	pid_t parent_pid = strace_tracer_pid;
 	unsigned int tcbi;
 	struct tcb *tcp;
 
@@ -1015,7 +1016,13 @@ startup_attach(void)
 		if (tcp->flags & TCB_ATTACHED)
 			continue; /* no, we already attached it */
 
-		if (followfork && !daemonized_tracer) {
+		if (tcp->pid == parent_pid || tcp->pid == strace_tracer_pid) {
+			errno = EPERM;
+			perror_msg("attach: %d", tcp->pid);
+			droptcb(tcp);
+			continue;
+		}
+		if (followfork && tcp->pid != strace_child) {
 			char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
 			DIR *dir;
 
@@ -1092,17 +1099,18 @@ startup_attach(void)
 		if (debug_flag)
 			error_msg("attach to pid %d (main) succeeded", tcp->pid);
 
-		if (daemonized_tracer) {
-			/*
-			 * Make parent go away.
-			 * Also makes grandparent's wait() unblock.
-			 */
-			kill(getppid(), SIGKILL);
-		}
-
 		if (!qflag)
 			error_msg("Process %u attached", tcp->pid);
 	} /* for each tcbtab[] */
+
+	if (daemonized_tracer) {
+		/*
+		 * Make parent go away.
+		 * Also makes grandparent's wait() unblock.
+		 */
+		kill(parent_pid, SIGKILL);
+		strace_child = 0;
+	}
 
  ret:
 	if (interactive)
@@ -1317,11 +1325,10 @@ startup_child(char **argv)
 		newoutf(tcp);
 	}
 	else {
-		/* With -D, we are *child* here, IOW: different pid. Fetch it: */
+		/* With -D, we are *child* here, the tracee is our parent. */
+		strace_child = strace_tracer_pid;
 		strace_tracer_pid = getpid();
-		/* The tracee is our parent: */
-		pid = getppid();
-		alloctcb(pid);
+		alloctcb(strace_child);
 		/* attaching will be done later, by startup_attach */
 		/* note: we don't do newoutf(tcp) here either! */
 
@@ -1619,13 +1626,12 @@ init(int argc, char *argv[])
 	memset(acolumn_spaces, ' ', acolumn);
 	acolumn_spaces[acolumn] = '\0';
 
-	/* Must have PROG [ARGS], or -p PID. Not both. */
-	if (!argv[0] == !nprocs) {
+	if (!argv[0] && !nprocs) {
 		error_msg_and_help("must have PROG [ARGS] or -p PID");
 	}
 
-	if (nprocs != 0 && daemonized_tracer) {
-		error_msg_and_help("-D and -p are mutually exclusive");
+	if (!argv[0] && daemonized_tracer) {
+		error_msg_and_help("PROG [ARGS] must be specified with -D");
 	}
 
 	if (!followfork)
@@ -1722,9 +1728,9 @@ init(int argc, char *argv[])
 		opt_intr = INTR_WHILE_WAIT;
 
 	/* argv[0]	-pPID	-oFILE	Default interactive setting
-	 * yes		0	0	INTR_WHILE_WAIT
+	 * yes		*	0	INTR_WHILE_WAIT
 	 * no		1	0	INTR_WHILE_WAIT
-	 * yes		0	1	INTR_NEVER
+	 * yes		*	1	INTR_NEVER
 	 * no		1	1	INTR_WHILE_WAIT
 	 */
 
