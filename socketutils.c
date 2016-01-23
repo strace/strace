@@ -245,6 +245,8 @@ unix_parse_response(const char *proto_name, const void *data, int data_len,
 	size_t path_len = 0;
 	char path[UNIX_PATH_MAX + 1];
 
+	if (rta_len < 0)
+		return false;
 	if (diag_msg->udiag_ino != inode)
 		return false;
 	if (diag_msg->udiag_family != AF_UNIX)
