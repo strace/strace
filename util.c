@@ -512,18 +512,14 @@ printfd(struct tcb *tcp, int fd)
 		if (show_fd_path > 1 &&
 		    strncmp(path, socket_prefix, socket_prefix_len) == 0 &&
 		    path[path_len - 1] == ']') {
-			unsigned long inodenr;
+			unsigned long inodenr =
+				strtoul(path + socket_prefix_len, NULL, 10);
 #define PROTO_NAME_LEN 32
 			char proto_buf[PROTO_NAME_LEN];
 			const char *proto =
 				getfdproto(tcp, fd, proto_buf, PROTO_NAME_LEN);
-			inodenr = strtoul(path + socket_prefix_len, NULL, 10);
-			if (!print_sockaddr_by_inode(inodenr, proto)) {
-				if (proto)
-					tprintf("%s:[%lu]", proto, inodenr);
-				else
-					tprints(path);
-			}
+			if (!print_sockaddr_by_inode(inodenr, proto))
+				tprints(path);
 		} else {
 			print_quoted_string(path, path_len,
 					    QUOTE_OMIT_LEADING_TRAILING_QUOTES);

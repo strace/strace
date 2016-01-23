@@ -326,6 +326,11 @@ print_sockaddr_by_inode(const unsigned long inode, const char *proto_name)
 			r = inet_print(fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
 		else if (strcmp(proto_name, "UNIX") == 0)
 			r = unix_print(fd, inode);
+
+		if (!r) {
+			tprintf("%s:[%lu]", proto_name, inode);
+			r = true;
+		}
 	} else {
 		const struct {
 			const int family;
