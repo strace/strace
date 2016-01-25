@@ -69,6 +69,9 @@ void tprintf(const char *, ...)
 /* Make a hexdump copy of C string */
 const char *hexdump_strdup(const char *);
 
+/* Return inode number of socket descriptor. */
+unsigned long inode_of_sockfd(int);
+
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 

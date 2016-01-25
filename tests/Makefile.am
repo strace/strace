@@ -44,6 +44,7 @@ libtests_a_SOURCES = \
 	error_msg.c \
 	get_page_size.c \
 	hexdump_strdup.c \
+	inode_of_sockfd.c \
 	tail_alloc.c \
 	tests.h \
 	tprintf.c \
