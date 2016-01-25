@@ -105,6 +105,7 @@ check_PROGRAMS = \
 	mq \
 	nanosleep \
 	net-accept-connect \
+	net-yy-unix \
 	netlink_inet_diag \
 	netlink_unix_diag \
 	newfstatat \
@@ -246,6 +247,7 @@ TESTS = \
 	nanosleep.test \
 	net-fd.test \
 	net-yy.test \
+	net-yy-unix.test \
 	net.test \
 	newfstatat.test \
 	oldselect.test \
@@ -292,7 +294,6 @@ TESTS = \
 	umount2.test \
 	umovestr.test \
 	umovestr2.test \
-	unix-yy.test \
 	userfaultfd.test \
 	utime.test \
 	utimensat.test \
@@ -358,8 +359,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     uid.awk \
 	     uio.expected \
 	     umovestr.expected \
-	     unix-yy-accept.awk \
-	     unix-yy-connect.awk \
 	     wait.expected \
 	     xattr.expected \
 	     xselect.c \

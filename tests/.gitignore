@@ -58,6 +58,7 @@ mmsg
 mq
 nanosleep
 net-accept-connect
+net-yy-unix
 netlink_inet_diag
 netlink_unix_diag
 newfstatat
