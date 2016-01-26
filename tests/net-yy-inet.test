@@ -2,7 +2,7 @@
 #
 # Check decoding of ip:port pairs associated with socket descriptors
 #
-# Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,23 +34,16 @@
 	framework_skip_ '/proc/self/fd/ is not available'
 
 check_prog sed
-
 run_prog ./netlink_inet_diag
-run_prog ./inet-accept-connect-send-recv
-run_strace_merge -yy -eclose,network $args
 
-child="$(sed -rn '/SIGCHLD/ s/^.*, si_pid=([1-9][0-9]*), .*/\1/p' "$LOG")"
-[ -n "$child" ] ||
-	dump_log_and_fail_with 'failed to find pid of child process'
+addr="${ME_%.test}-local-stream"
+run_prog "./${ME_%.test}" $addr > /dev/null
 
-rm -f "$LOG"-*
-sed -rn "/^$child"' /!d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' "$LOG" > "$LOG"-connect &&
-sed -rn "/^$child"' /d; /SIGCHLD/d; / socket\(/,$ s/^[0-9]+ +[^ ]+ (.+)/\1/p' "$LOG" > "$LOG"-accept ||
-	dump_log_and_fail_with 'failed to separate logs'
+OUT="$LOG.out"
+EXP="$LOG.exp"
+run_strace -a22 -yy -eclose,network $args > "$EXP"
+# Filter out close() calls made by ld.so and libc.
+sed -n '/socket/,$p' < "$LOG" > "$OUT"
 
-match_awk "$LOG-connect" "$srcdir"/net-yy-connect.awk "$STRACE $args connect output mismatch"
-match_awk "$LOG-accept" "$srcdir"/net-yy-accept.awk "$STRACE $args accept output mismatch"
-
-rm -f "$LOG"-connect "$LOG"-accept
-
-exit 0
+match_diff "$OUT" "$EXP"
+rm -f "$EXP" "$OUT"

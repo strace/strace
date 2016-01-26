@@ -82,7 +82,6 @@ check_PROGRAMS = \
 	getdents64 \
 	getrandom \
 	getxxid \
-	inet-accept-connect-send-recv \
 	inet-cmsg \
 	ioctl \
 	ip_mreq \
@@ -105,6 +104,7 @@ check_PROGRAMS = \
 	mq \
 	nanosleep \
 	net-accept-connect \
+	net-yy-inet \
 	net-yy-unix \
 	netlink_inet_diag \
 	netlink_unix_diag \
@@ -246,7 +246,7 @@ TESTS = \
 	mq.test \
 	nanosleep.test \
 	net-fd.test \
-	net-yy.test \
+	net-yy-inet.test \
 	net-yy-unix.test \
 	net.test \
 	newfstatat.test \
@@ -343,8 +343,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     mq.expected \
 	     net.expected \
 	     net-fd.expected \
-	     net-yy-accept.awk \
-	     net-yy-connect.awk \
 	     oldselect.expected \
 	     pipe.expected \
 	     ppoll.expected \

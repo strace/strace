@@ -33,7 +33,6 @@ getdents
 getdents64
 getrandom
 getxxid
-inet-accept-connect-send-recv
 inet-cmsg
 ioctl
 ip_mreq
@@ -58,6 +57,7 @@ mmsg
 mq
 nanosleep
 net-accept-connect
+net-yy-inet
 net-yy-unix
 netlink_inet_diag
 netlink_unix_diag
