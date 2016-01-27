@@ -150,6 +150,7 @@ receive_responses(const int fd, const unsigned long inode,
 		.iov_base = buf,
 		.iov_len = sizeof(buf)
 	};
+	int flags = 0;
 
 	for (;;) {
 		ssize_t ret;
@@ -161,7 +162,7 @@ receive_responses(const int fd, const unsigned long inode,
 			.msg_iovlen = 1
 		};
 
-		ret = recvmsg(fd, &msg, 0);
+		ret = recvmsg(fd, &msg, flags);
 		if (ret < 0) {
 			if (errno == EINTR)
 				continue;
@@ -180,6 +181,7 @@ receive_responses(const int fd, const unsigned long inode,
 			if (parser(proto_name, NLMSG_DATA(h), h->nlmsg_len, inode))
 				return true;
 		}
+		flags = MSG_DONTWAIT;
 	}
 }
 
