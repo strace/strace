@@ -95,6 +95,8 @@ inet_parse_response(const char *proto_name, const void *data, int data_len,
 	static const char zero_addr[sizeof(struct in6_addr)];
 	socklen_t addr_size, text_size;
 
+	if (data_len < (int) NLMSG_LENGTH(sizeof(*diag_msg)))
+		return false;
 	if (diag_msg->idiag_inode != inode)
 		return false;
 
