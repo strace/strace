@@ -50,6 +50,7 @@ lstat
 lstat64
 membarrier
 memfd_create
+mincore
 mlock2
 mmap
 mmap64

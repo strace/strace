@@ -264,15 +264,18 @@ SYS_FUNC(mincore)
 		printaddr(tcp->u_arg[0]);
 		tprintf(", %lu, ", tcp->u_arg[1]);
 	} else {
-		unsigned long i, len;
-		char *vec = NULL;
+		const unsigned long page_size = get_pagesize();
+		const unsigned long page_mask = page_size - 1;
+		unsigned long len = tcp->u_arg[1];
+		unsigned char *vec = NULL;
 
-		len = tcp->u_arg[1];
+		len = len / page_size + (len & page_mask ? 1 : 0);
 		if (syserror(tcp) || !verbose(tcp) ||
 		    !tcp->u_arg[2] || !(vec = malloc(len)) ||
 		    umoven(tcp, tcp->u_arg[2], len, vec) < 0)
 			printaddr(tcp->u_arg[2]);
 		else {
+			unsigned long i;
 			tprints("[");
 			for (i = 0; i < len; i++) {
 				if (abbrev(tcp) && i >= max_strlen) {

@@ -96,6 +96,7 @@ check_PROGRAMS = \
 	lstat64 \
 	membarrier \
 	memfd_create \
+	mincore \
 	mlock2 \
 	mmap \
 	mmap64 \
@@ -235,6 +236,7 @@ TESTS = \
 	lstat64.test \
 	membarrier.test \
 	memfd_create.test \
+	mincore.test \
 	mlock2.test \
 	mmap.test \
 	mmap64.test \
