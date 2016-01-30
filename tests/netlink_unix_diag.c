@@ -1,4 +1,6 @@
 /*
+ * This file is part of net-yy-unix strace test.
+ *
  * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -27,6 +29,7 @@
 
 #include "tests.h"
 #include <assert.h>
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -68,7 +71,7 @@ send_query(const int fd, const int family, const int proto)
 		.iov_len = sizeof(req)
 	};
 	struct msghdr msg = {
-		.msg_name = (void*)&nladdr,
+		.msg_name = (void *) &nladdr,
 		.msg_namelen = sizeof(nladdr),
 		.msg_iov = &iov,
 		.msg_iovlen = 1
@@ -90,7 +93,7 @@ check_responses(const int fd)
 		.iov_len = sizeof(buf)
 	};
 	struct msghdr msg = {
-		.msg_name = (void*)&nladdr,
+		.msg_name = (void *) &nladdr,
 		.msg_namelen = sizeof(nladdr),
 		.msg_iov = &iov,
 		.msg_iovlen = 1
@@ -100,13 +103,23 @@ check_responses(const int fd)
 	if (ret <= 0)
 		perror_msg_and_skip("recvmsg");
 
-	struct nlmsghdr *h = (struct nlmsghdr*)buf;
+	struct nlmsghdr *h = (struct nlmsghdr *) buf;
 	if (!NLMSG_OK(h, ret))
 		error_msg_and_skip("!NLMSG_OK");
-	if (h->nlmsg_type == NLMSG_ERROR)
-		error_msg_and_skip("NLMSG_ERROR");
-	if (h->nlmsg_type == NLMSG_DONE)
-		error_msg_and_skip("NLMSG_DONE");
+	if (h->nlmsg_type == NLMSG_ERROR) {
+		const struct nlmsgerr *err = NLMSG_DATA(h);
+		if (h->nlmsg_len < NLMSG_LENGTH(sizeof(*err)))
+			error_msg_and_skip("NLMSG_ERROR");
+		errno = -err->error;
+		perror_msg_and_skip("NLMSG_ERROR");
+	}
+	if (h->nlmsg_type != SOCK_DIAG_BY_FAMILY)
+		error_msg_and_skip("unexpected nlmsg_type %u",
+				   (unsigned) h->nlmsg_type);
+
+	const struct unix_diag_msg *diag = NLMSG_DATA(h);
+	if (h->nlmsg_len < NLMSG_LENGTH(sizeof(*diag)))
+		error_msg_and_skip("short response");
 }
 
 #define SUN_PATH "netlink_unix_diag_socket"

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Zubin Mithra <zubin.mithra@gmail.com>
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,7 +71,7 @@ inet_send_query(const int fd, const int family, const int proto)
 		.iov_len = sizeof(req)
 	};
 	struct msghdr msg = {
-		.msg_name = (void*)&nladdr,
+		.msg_name = (void *) &nladdr,
 		.msg_namelen = sizeof(nladdr),
 		.msg_iov = &iov,
 		.msg_iovlen = 1
@@ -87,18 +87,18 @@ inet_send_query(const int fd, const int family, const int proto)
 	}
 }
 
-static bool
-inet_parse_response(const char *proto_name, const void *data, int data_len,
-		    const unsigned long inode)
+static int
+inet_parse_response(const char *proto_name, const void *data,
+		    const int data_len, const unsigned long inode)
 {
 	const struct inet_diag_msg *diag_msg = data;
 	static const char zero_addr[sizeof(struct in6_addr)];
 	socklen_t addr_size, text_size;
 
 	if (data_len < (int) NLMSG_LENGTH(sizeof(*diag_msg)))
-		return false;
+		return -1;
 	if (diag_msg->idiag_inode != inode)
-		return false;
+		return 0;
 
 	switch(diag_msg->idiag_family) {
 		case AF_INET:
@@ -110,14 +110,14 @@ inet_parse_response(const char *proto_name, const void *data, int data_len,
 			text_size = INET6_ADDRSTRLEN;
 			break;
 		default:
-			return false;
+			return -1;
 	}
 
 	char src_buf[text_size];
 
 	if (!inet_ntop(diag_msg->idiag_family, diag_msg->id.idiag_src,
 		       src_buf, text_size))
-		return false;
+		return -1;
 
 	if (diag_msg->id.idiag_dport ||
 	    memcmp(zero_addr, diag_msg->id.idiag_dst, addr_size)) {
@@ -125,7 +125,7 @@ inet_parse_response(const char *proto_name, const void *data, int data_len,
 
 		if (!inet_ntop(diag_msg->idiag_family, diag_msg->id.idiag_dst,
 			       dst_buf, text_size))
-			return false;
+			return -1;
 
 		tprintf("%s:[%s:%u->%s:%u]",
 			proto_name,
@@ -136,13 +136,14 @@ inet_parse_response(const char *proto_name, const void *data, int data_len,
 			ntohs(diag_msg->id.idiag_sport));
 	}
 
-	return true;
+	return 1;
 }
 
 static bool
 receive_responses(const int fd, const unsigned long inode,
 		  const char *proto_name,
-		  bool (* parser) (const char *, const void *, int, const unsigned long))
+		  int (* parser) (const char *, const void *,
+				  int, unsigned long))
 {
 	static long buf[8192 / sizeof(long)];
 	struct sockaddr_nl nladdr = {
@@ -156,9 +157,8 @@ receive_responses(const int fd, const unsigned long inode,
 
 	for (;;) {
 		ssize_t ret;
-		struct nlmsghdr *h;
 		struct msghdr msg = {
-			.msg_name = (void*)&nladdr,
+			.msg_name = (void *) &nladdr,
 			.msg_namelen = sizeof(nladdr),
 			.msg_iov = &iov,
 			.msg_iovlen = 1
@@ -170,18 +170,19 @@ receive_responses(const int fd, const unsigned long inode,
 				continue;
 			return false;
 		}
-		if (!ret)
+
+		struct nlmsghdr *h = (struct nlmsghdr *) buf;
+		if (!NLMSG_OK(h, ret))
 			return false;
-		for (h = (struct nlmsghdr*)buf;
-		     NLMSG_OK(h, ret);
-		     h = NLMSG_NEXT(h, ret)) {
-			switch (h->nlmsg_type) {
-				case NLMSG_DONE:
-				case NLMSG_ERROR:
-					return false;
-			}
-			if (parser(proto_name, NLMSG_DATA(h), h->nlmsg_len, inode))
+		for (; NLMSG_OK(h, ret); h = NLMSG_NEXT(h, ret)) {
+			if (h->nlmsg_type != SOCK_DIAG_BY_FAMILY)
+				return false;
+			int rc = parser(proto_name, NLMSG_DATA(h),
+					h->nlmsg_len, inode);
+			if (rc > 0)
 				return true;
+			if (rc < 0)
+				return false;
 		}
 		flags = MSG_DONTWAIT;
 	}
@@ -222,7 +223,7 @@ unix_send_query(const int fd, const unsigned long inode)
 		.iov_len = sizeof(req)
 	};
 	struct msghdr msg = {
-		.msg_name = (void*)&nladdr,
+		.msg_name = (void *) &nladdr,
 		.msg_namelen = sizeof(nladdr),
 		.msg_iov = &iov,
 		.msg_iovlen = 1
@@ -238,9 +239,9 @@ unix_send_query(const int fd, const unsigned long inode)
 	}
 }
 
-static bool
-unix_parse_response(const char *proto_name, const void *data, int data_len,
-		    const unsigned long inode)
+static int
+unix_parse_response(const char *proto_name, const void *data,
+		    const int data_len, const unsigned long inode)
 {
 	const struct unix_diag_msg *diag_msg = data;
 	struct rtattr *attr;
@@ -250,11 +251,11 @@ unix_parse_response(const char *proto_name, const void *data, int data_len,
 	char path[UNIX_PATH_MAX + 1];
 
 	if (rta_len < 0)
-		return false;
+		return -1;
 	if (diag_msg->udiag_ino != inode)
-		return false;
+		return 0;
 	if (diag_msg->udiag_family != AF_UNIX)
-		return false;
+		return -1;
 
 	for (attr = (struct rtattr *) (diag_msg + 1);
 	     RTA_OK(attr, rta_len);
@@ -271,7 +272,7 @@ unix_parse_response(const char *proto_name, const void *data, int data_len,
 			break;
 		case UNIX_DIAG_PEER:
 			if (RTA_PAYLOAD(attr) >= 4)
-				peer = *(uint32_t *)RTA_DATA(attr);
+				peer = *(uint32_t *) RTA_DATA(attr);
 			break;
 		}
 	}
@@ -296,10 +297,10 @@ unix_parse_response(const char *proto_name, const void *data, int data_len,
 			}
 		}
 		tprints("]");
-		return true;
+		return 1;
 	}
 	else
-		return false;
+		return -1;
 }
 
 static bool
