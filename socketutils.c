@@ -209,13 +209,14 @@ unix_send_query(const int fd, const unsigned long inode)
 		.nlh = {
 			.nlmsg_len = sizeof(req),
 			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
+			.nlmsg_flags = NLM_F_REQUEST
 		},
 		.udr = {
 			.sdiag_family = AF_UNIX,
 			.udiag_ino = inode,
 			.udiag_states = -1,
-			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER
+			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER,
+			.udiag_cookie = { ~0U, ~0U }
 		}
 	};
 	struct iovec iov = {
