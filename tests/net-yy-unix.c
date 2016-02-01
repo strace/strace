@@ -141,8 +141,8 @@ main(int ac, const char **av)
 	       connect_fd, connect_inode, accept_inode);
 
 	assert(close(accept_fd) == 0);
-	printf("close(%d<UNIX:[%lu,\"%s\"]>) = 0\n",
-	       accept_fd, accept_inode, av[1]);
+	printf("close(%d<UNIX:[%lu->%lu,\"%s\"]>) = 0\n",
+	       accept_fd, accept_inode, connect_inode, av[1]);
 
 	connect_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
 	if (connect_fd < 0)
@@ -213,8 +213,8 @@ main(int ac, const char **av)
 	       connect_fd, connect_inode, accept_inode, sun_path1);
 
 	assert(close(accept_fd) == 0);
-	printf("close(%d<UNIX:[%lu,\"%s\"]>) = 0\n",
-	       accept_fd, accept_inode, av[1]);
+	printf("close(%d<UNIX:[%lu->%lu,\"%s\"]>) = 0\n",
+	       accept_fd, accept_inode, connect_inode, av[1]);
 
 	assert(unlink(av[1]) == 0);
 

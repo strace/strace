@@ -45,6 +45,38 @@
 # define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
 #endif
 
+typedef struct {
+	unsigned long inode;
+	char *details;
+} cache_entry;
+
+#define CACHE_SIZE 1024U
+static cache_entry cache[CACHE_SIZE];
+#define CACHE_MASK (CACHE_SIZE - 1)
+
+static int
+cache_and_print_inode_details(const unsigned long inode, char *details)
+{
+	cache_entry *e = &cache[inode & CACHE_MASK];
+	free(e->details);
+	e->inode = inode;
+	e->details = details;
+
+	tprints(details);
+	return 1;
+}
+
+bool
+print_sockaddr_by_inode_cached(const unsigned long inode)
+{
+	const cache_entry *e = &cache[inode & CACHE_MASK];
+	if (e && inode == e->inode) {
+		tprints(e->details);
+		return true;
+	}
+	return false;
+}
+
 static bool
 inet_send_query(const int fd, const int family, const int proto)
 {
@@ -114,6 +146,7 @@ inet_parse_response(const char *proto_name, const void *data,
 	}
 
 	char src_buf[text_size];
+	char *details;
 
 	if (!inet_ntop(diag_msg->idiag_family, diag_msg->id.idiag_src,
 		       src_buf, text_size))
@@ -127,16 +160,17 @@ inet_parse_response(const char *proto_name, const void *data,
 			       dst_buf, text_size))
 			return -1;
 
-		tprintf("%s:[%s:%u->%s:%u]",
-			proto_name,
-			src_buf, ntohs(diag_msg->id.idiag_sport),
-			dst_buf, ntohs(diag_msg->id.idiag_dport));
+		if (asprintf(&details, "%s:[%s:%u->%s:%u]", proto_name,
+			     src_buf, ntohs(diag_msg->id.idiag_sport),
+			     dst_buf, ntohs(diag_msg->id.idiag_dport)) < 0)
+			return false;
 	} else {
-		tprintf("%s:[%s:%u]", proto_name, src_buf,
-			ntohs(diag_msg->id.idiag_sport));
+		if (asprintf(&details, "%s:[%s:%u]", proto_name, src_buf,
+			     ntohs(diag_msg->id.idiag_sport)) < 0)
+			return false;
 	}
 
-	return 1;
+	return cache_and_print_inode_details(inode, details);
 }
 
 static bool
@@ -282,26 +316,39 @@ unix_parse_response(const char *proto_name, const void *data,
 	 * print obtained information in the following format:
 	 * "UNIX:[" SELF_INODE [ "->" PEER_INODE ][ "," SOCKET_FILE ] "]"
 	 */
-	if (peer || path_len) {
-		tprintf("%s:[%lu", proto_name, inode);
-		if (peer)
-			tprintf("->%u", peer);
-		if (path_len) {
-			if (path[0] == '\0') {
-				tprints(",@");
-				print_quoted_string(path + 1, path_len,
-						    QUOTE_0_TERMINATED);
-			} else {
-				tprints(",");
-				print_quoted_string(path, path_len + 1,
-						    QUOTE_0_TERMINATED);
-			}
-		}
-		tprints("]");
-		return 1;
-	}
-	else
+	if (!peer && !path_len)
 		return -1;
+
+	char peer_str[3 + sizeof(peer) * 3];
+	if (peer)
+		snprintf(peer_str, sizeof(peer_str), "->%u", peer);
+	else
+		peer_str[0] = '\0';
+
+	const char *path_str;
+	if (path_len) {
+		char *outstr = alloca(4 * path_len + 4);
+
+		outstr[0] = ',';
+		if (path[0] == '\0') {
+			outstr[1] = '@';
+			string_quote(path + 1, outstr + 2,
+				     path_len - 1, QUOTE_0_TERMINATED);
+		} else {
+			string_quote(path, outstr + 1,
+				     path_len, QUOTE_0_TERMINATED);
+		}
+		path_str = outstr;
+	} else {
+		path_str = "";
+	}
+
+	char *details;
+	if (asprintf(&details, "%s:[%lu%s%s]", proto_name, inode,
+		     peer_str, path_str) < 0)
+		return -1;
+
+	return cache_and_print_inode_details(inode, details);
 }
 
 static bool

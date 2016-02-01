@@ -8,6 +8,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     and sched_setaffinity syscalls.
   * Enhanced decoding of getxpid, getxuid, and getxgid syscalls on alpha.
   * Added decoding of bind, listen, and setsockopt direct syscalls on sparc.
+  * Implemented caching of netlink conversations to reduce amount of time
+    spent in decoding socket details in -yy mode.
 
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.
