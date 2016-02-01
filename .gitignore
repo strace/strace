@@ -4,6 +4,8 @@
 .libs
 .version
 .*.swp
+*.gcda
+*.gcno
 *.gdb
 core
 .gdbinit

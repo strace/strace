@@ -216,6 +216,15 @@ strace_LDFLAGS += $(libunwind_LDFLAGS)
 strace_LDADD += $(libunwind_LIBS)
 endif
 
+@CODE_COVERAGE_RULES@
+CODE_COVERAGE_LCOV_OPTIONS = \
+	$(CODE_COVERAGE_LCOV_OPTIONS_DEFAULT) --rc lcov_branch_coverage=1
+CODE_COVERAGE_GENHTML_OPTIONS = --rc lcov_branch_coverage=1
+CODE_COVERAGE_IGNORE_PATTERN = '/usr/include/*'
+strace_CPPFLAGS += $(CODE_COVERAGE_CPPFLAGS)
+strace_CFLAGS += $(CODE_COVERAGE_CFLAGS)
+strace_LDADD += $(CODE_COVERAGE_LDFLAGS)
+
 # Enable this to get link map generated
 #strace_LDFLAGS += -Wl,-Map=strace.mapfile
 
