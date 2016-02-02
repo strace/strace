@@ -104,6 +104,7 @@ check_PROGRAMS = \
 	mq \
 	nanosleep \
 	net-accept-connect \
+	net-y-unix \
 	net-yy-inet \
 	net-yy-unix \
 	netlink_inet_diag \
@@ -245,7 +246,7 @@ TESTS = \
 	mmsg.test \
 	mq.test \
 	nanosleep.test \
-	net-fd.test \
+	net-y-unix.test \
 	net-yy-inet.test \
 	net-yy-unix.test \
 	net.test \
@@ -317,8 +318,6 @@ XFAIL_TESTS_m32 = $(LIBUNWIND_TESTS)
 XFAIL_TESTS_mx32 = $(LIBUNWIND_TESTS)
 XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME))
 
-net-fd.log: net.log
-
 TEST_LOG_COMPILER = env
 AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 
@@ -342,7 +341,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     memfd_create.expected \
 	     mq.expected \
 	     net.expected \
-	     net-fd.expected \
 	     oldselect.expected \
 	     pipe.expected \
 	     ppoll.expected \
