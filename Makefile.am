@@ -692,7 +692,7 @@ mpers_DEFS = $(DEFS)
 mpers_INCLUDES = $(DEFAULT_INCLUDES) $(INCLUDES)
 mpers_CPPFLAGS = $(strace_CPPFLAGS) $(CPPFLAGS)
 mpers_sh_opts = $(mpers_DEFS) $(mpers_INCLUDES) $(mpers_CPPFLAGS)
-libmpers_CPPFLAGS = $(AM_CPPFLAGS) -DIN_MPERS
+libmpers_CPPFLAGS = $(strace_CPPFLAGS) -DIN_MPERS
 
 # mpers targets
 
