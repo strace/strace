@@ -56,6 +56,7 @@ AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 include xlat/Makemodule.am
 
 strace_CPPFLAGS = $(AM_CPPFLAGS)
+strace_CFLAGS = $(AM_CFLAGS)
 strace_LDFLAGS =
 strace_LDADD =
 noinst_LIBRARIES =
@@ -216,7 +217,7 @@ strace_LDADD += $(libunwind_LIBS)
 endif
 
 # Enable this to get link map generated
-#strace_CFLAGS = $(AM_CFLAGS) -Wl,-Map=strace.mapfile
+#strace_LDFLAGS += -Wl,-Map=strace.mapfile
 
 EXTRA_DIST =				\
 	$(man_MANS)			\
@@ -693,6 +694,7 @@ mpers_INCLUDES = $(DEFAULT_INCLUDES) $(INCLUDES)
 mpers_CPPFLAGS = $(strace_CPPFLAGS) $(CPPFLAGS)
 mpers_sh_opts = $(mpers_DEFS) $(mpers_INCLUDES) $(mpers_CPPFLAGS)
 libmpers_CPPFLAGS = $(strace_CPPFLAGS) -DIN_MPERS
+libmpers_CFLAGS = $(strace_CFLAGS)
 
 # mpers targets
 
@@ -755,6 +757,7 @@ strace_LDADD += libmpers-m32.a
 noinst_LIBRARIES += libmpers-m32.a
 libmpers_m32_a_SOURCES = $(mpers_source_files)
 libmpers_m32_a_CPPFLAGS = $(libmpers_CPPFLAGS) -DMPERS_IS_m32 -I$(builddir)/mpers-m32
+libmpers_m32_a_CFLAGS = $(libmpers_CFLAGS)
 mpers_m32_targets = mpers-m32.stamp m32_type_defs.h m32_funcs.h m32_printer_decls.h m32_printer_defs.h
 
 BUILT_SOURCES += $(mpers_m32_targets)
@@ -770,6 +773,7 @@ strace_LDADD += libmpers-mx32.a
 noinst_LIBRARIES += libmpers-mx32.a
 libmpers_mx32_a_SOURCES = $(mpers_source_files)
 libmpers_mx32_a_CPPFLAGS = $(libmpers_CPPFLAGS) -DMPERS_IS_mx32 -I$(builddir)/mpers-mx32
+libmpers_mx32_a_CFLAGS = $(libmpers_CFLAGS)
 mpers_mx32_targets = mpers-mx32.stamp mx32_type_defs.h mx32_funcs.h mx32_printer_decls.h mx32_printer_defs.h
 
 BUILT_SOURCES += $(mpers_mx32_targets)
