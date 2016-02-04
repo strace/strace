@@ -4,7 +4,7 @@
 
 . "${srcdir=.}/init.sh"
 
-syscall=readlink
+syscall=${ME_%.test}
 target=$syscall.c
 link=$syscall.link
 OUT="$LOG.out"

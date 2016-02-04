@@ -2,20 +2,4 @@
 
 # Check readlinkat syscall decoding.
 
-. "${srcdir=.}/init.sh"
-
-syscall=readlinkat
-target=$syscall.c
-link=$syscall.link
-OUT="$LOG.out"
-
-ln -snf $target $link ||
-	framework_skip_ 'failed to create a symlink'
-
-run_prog > /dev/null
-run_strace -e $syscall -xx -s3 $args > "$OUT"
-match_diff "$LOG" "$OUT"
-
-rm -f -- "$OUT" $link
-
-exit 0
+. "${srcdir=.}/readlink.test"
