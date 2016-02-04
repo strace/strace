@@ -58,8 +58,14 @@ include xlat/Makemodule.am
 strace_CPPFLAGS = $(AM_CPPFLAGS)
 strace_CFLAGS = $(AM_CFLAGS)
 strace_LDFLAGS =
-strace_LDADD =
-noinst_LIBRARIES =
+strace_LDADD = libstrace.a
+noinst_LIBRARIES = libstrace.a
+
+libstrace_a_CPPFLAGS = $(strace_CPPFLAGS)
+libstrace_a_CFLAGS = $(strace_CFLAGS)
+libstrace_a_SOURCES =	\
+	upeek.c		\
+	# end of libstrace_a_SOURCES
 
 strace_SOURCES =	\
 	access.c	\
