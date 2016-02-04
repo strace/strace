@@ -34,25 +34,41 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# define PREFIX "test.readlinkat"
+# define TARGET (PREFIX ".target")
+# define LINKPATH (PREFIX ".link")
+
 int
 main(void)
 {
-	static const char fname[] = "readlinkat.link";
-	unsigned char buf[31];
-	long rc;
-	unsigned int i;
+	const char * const fname = tail_memdup(LINKPATH, sizeof(LINKPATH));
+	const char * const hex_fname =
+		hexquote_strndup(fname, sizeof(LINKPATH) - 1);
 
-	rc = syscall(__NR_readlinkat, -100, fname, buf, sizeof(buf));
-	if (rc < 0)
-		perror_msg_and_skip("readlinkat");
+	const unsigned int size = sizeof(TARGET) - 1;
+	char * const buf = tail_alloc(size);
 
-	printf("readlinkat(AT_FDCWD, \"");
-	for (i = 0; fname[i]; ++i)
-		printf("\\x%02x", (int) (unsigned char) fname[i]);
-	printf("\", \"");
-	for (i = 0; i < 3; ++i)
-		printf("\\x%02x", (int) buf[i]);
-	printf("\"..., %zu) = %ld\n", sizeof(buf), rc);
+	(void) unlink(fname);
+
+	long rc = syscall(__NR_readlinkat, -100, fname, buf, size);
+	printf("readlinkat(AT_FDCWD, \"%s\", %p, %u) = -1 ENOENT (%m)\n",
+	       hex_fname, buf, size);
+
+	if (symlink(TARGET, fname))
+		perror_msg_and_fail("symlink");
+
+	rc = syscall(__NR_readlinkat, -100, fname, buf, size);
+	if (rc < 0) {
+		perror("readlinkat");
+		(void) unlink(fname);
+		return 77;
+	}
+	const char * const hex_buf = hexquote_strndup(buf, size);
+	printf("readlinkat(AT_FDCWD, \"%s\", \"%s\", %u) = %u\n",
+	       hex_fname, hex_buf, size, size);
+
+	if (unlink(fname))
+		perror_msg_and_fail("unlink");
 
 	puts("+++ exited with 0 +++");
 	return 0;
@@ -60,6 +76,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_readlinkat")
+SKIP_MAIN_UNDEFINED("__NR_readlink")
 
 #endif
