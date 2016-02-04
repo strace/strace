@@ -15,6 +15,10 @@ addons:
   apt:
     packages:
     - gcc-multilib
+    - lcov
+
+install:
+  - pip install --user codecov
 
 env:
   global:

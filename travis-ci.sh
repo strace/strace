@@ -39,3 +39,14 @@ git fetch --unshallow
 ./configure --enable-maintainer-mode ${ENABLE_GCC_WERROR-} ${DISTCHECK_CONFIGURE_FLAGS-}
 j=-j`getconf _NPROCESSORS_ONLN 2> /dev/null` || j=
 make -k $j distcheck VERBOSE=${VERBOSE-}
+
+if [ "$CC:${TARGET-}" = 'gcc:x86_64' ]; then
+	set -- strace-*.tar.xz
+	tar -xf "$1"
+	dir="${1%.tar.xz}"
+	cd "$dir"
+	./configure --enable-code-coverage ${ENABLE_GCC_WERROR-} ${DISTCHECK_CONFIGURE_FLAGS-}
+	make -k $j
+	make -k $j check VERBOSE=${VERBOSE-}
+	codecov ||:
+fi
