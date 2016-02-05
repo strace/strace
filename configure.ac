@@ -216,20 +216,20 @@ MIPS_ABI=
 if test "$arch" = mips; then
 	AC_CACHE_CHECK([for _MIPS_SIM], [st_cv__MIPS_SIM],
 		       [AC_COMPUTE_INT([st_cv__MIPS_SIM], [_MIPS_SIM],
-				       [#include <sgidefs.h>],
+				       [#include <asm/sgidefs.h>],
 				       [AC_MSG_ERROR([_MIPS_SIM cannot be determined])])])
 
 	AC_CACHE_CHECK([for MIPS ABI], [st_cv_mips_abi],
 		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <sgidefs.h>]],
+			[AC_LANG_PROGRAM([[#include <asm/sgidefs.h>]],
 					 [[int i[_MIPS_SIM == _MIPS_SIM_ABI32 ? 1 : - 1];]])],
 			[st_cv_mips_abi=o32],
 		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <sgidefs.h>]],
+			[AC_LANG_PROGRAM([[#include <asm/sgidefs.h>]],
 					 [[int i[_MIPS_SIM == _MIPS_SIM_NABI32 ? 1 : - 1];]])],
 			[st_cv_mips_abi=n32],
 		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <sgidefs.h>]],
+			[AC_LANG_PROGRAM([[#include <asm/sgidefs.h>]],
 					 [[int i[_MIPS_SIM == _MIPS_SIM_ABI64 ? 1 : - 1];]])],
 			[st_cv_mips_abi=n64],
 			[st_cv_mips_abi=unknown])])])])
