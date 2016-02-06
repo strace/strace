@@ -1,6 +1,8 @@
 #!/bin/gawk
 #
-# Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+# This file is part of caps strace test.
+#
+# Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,12 +29,18 @@
 
 BEGIN {
 	cap = "(0|CAP_[A-Z_]+(\\|CAP_[A-Z_]+)*|CAP_[A-Z_]+(\\|CAP_[A-Z_]+){37}\\|0xffffffc0)"
-	r[1] = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, \\{" cap ", " cap ", " cap "\\}\\) = 0$"
+	s_efault = "-1 EFAULT (Bad address)"
+	r_efault = "-1 EFAULT \\(Bad address\\)"
+	r_addr = "0x[[:xdigit:]]+"
+	s[1] = "capget(NULL, NULL) = " s_efault
+	r[2] = "^capget\\(" r_addr ", " r_addr "\\) = " r_efault
+	r[3] = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, " r_addr "\\) = " r_efault
+	r[4] = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, \\{" cap ", " cap ", " cap "\\}\\) = 0$"
 	capset_data = "{CAP_DAC_OVERRIDE|CAP_WAKE_ALARM, CAP_DAC_READ_SEARCH|CAP_BLOCK_SUSPEND, 0}"
-	s[2] = "capset({_LINUX_CAPABILITY_VERSION_3, 0}, " capset_data ") = -1 EPERM (Operation not permitted)"
-	s[3] = "+++ exited with 0 +++"
+	s[5] = "capset({_LINUX_CAPABILITY_VERSION_3, 0}, " capset_data ") = -1 EPERM (Operation not permitted)"
+	s[6] = "+++ exited with 0 +++"
 
-	lines = 3
+	lines = 6
 	fail = 0
 }
 

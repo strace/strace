@@ -5,7 +5,7 @@
 . "${srcdir=.}/init.sh"
 
 run_prog
-run_strace -e trace=capget,capset $args
+run_strace -a 19 -e trace=capget,capset $args
 match_awk
 
 exit 0

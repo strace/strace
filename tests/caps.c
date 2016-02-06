@@ -1,4 +1,6 @@
 /*
+ * This file is part of caps strace test.
+ *
  * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -27,6 +29,7 @@
 
 #include "tests.h"
 #include <errno.h>
+#include <string.h>
 
 extern int capget(int *, int *);
 extern int capset(int *, const int *);
@@ -34,15 +37,24 @@ extern int capset(int *, const int *);
 int
 main(void)
 {
-	int unused[6];
 	const int data[] = { 2, 4, 0, 8, 16, 0 };
 	const int v3 = 0x20080522;
-	int head[] = { v3, 0 };
 
-	if (capget(head, unused))
+	int * const head = tail_alloc(sizeof(int) * 2);
+	head[0] = v3;
+	head[1] = 0;
+	int * const tail_data = tail_alloc(sizeof(data));
+
+	capget(NULL, NULL);
+	capget(head + 2, tail_data);
+	capget(head, tail_data + ARRAY_SIZE(data));
+
+	if (capget(head, tail_data))
 		perror_msg_and_skip("capget");
 	if (head[0] != v3)
 		error_msg_and_skip("capget: v3 expected");
+
+	memcpy(tail_data, data, sizeof(data));
 	if (capset(head, data) == 0 || errno != EPERM)
 		perror_msg_and_skip("capset");
 
