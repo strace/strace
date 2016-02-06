@@ -9,7 +9,7 @@ $STRACE -e utime -h > /dev/null ||
 
 OUT="$LOG.out"
 run_prog > /dev/null
-run_strace -e utime $args > "$OUT"
+run_strace -a 16 -e utime $args > "$OUT"
 
 check_prog grep
 LC_ALL=C grep -x "utime(.*" "$LOG" > /dev/null || {
