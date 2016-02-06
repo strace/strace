@@ -6,7 +6,7 @@
 
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -esysinfo $args > "$OUT"
+run_strace -a14 -esysinfo $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
