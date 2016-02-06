@@ -1,4 +1,6 @@
 /*
+ * This file is part of sched_xetaffinity strace test.
+ *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -53,7 +55,7 @@ int
 main(void)
 {
 	unsigned int cpuset_size = 1;
-	pid_t pid = getpid();
+	const pid_t pid = getpid();
 
 	while (cpuset_size) {
 		assert(getaffinity(pid, cpuset_size, NULL) == -1);
@@ -70,6 +72,10 @@ main(void)
 	       pid, cpuset_size);
 
 	cpu_set_t *cpuset = tail_alloc(cpuset_size);
+	assert(getaffinity(pid, cpuset_size, cpuset + 1) == -1);
+	printf("sched_getaffinity(%d, %u, %p) = -1 EFAULT (%m)\n",
+		pid, cpuset_size, cpuset + 1);
+
 	assert(getaffinity(pid, cpuset_size, cpuset) == (int) cpuset_size);
 	printf("sched_getaffinity(%d, %u, [", pid, cpuset_size);
 	const char *sep;
