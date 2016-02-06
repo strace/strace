@@ -1,4 +1,6 @@
 /*
+ * This file is part of adjtimex strace test.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -28,14 +30,19 @@
 #include "tests.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <sys/timex.h>
 
 int
 main(void)
 {
-	struct timex tx = {};
-	int state = adjtimex(&tx);
+	adjtimex(NULL);
+	printf("adjtimex\\(NULL\\) = -1 EFAULT \\(%m\\)\n");
 
+	struct timex * const tx = tail_alloc(sizeof(*tx));
+	memset(tx, 0, sizeof(*tx));
+
+	int state = adjtimex(tx);
 	if (state < 0)
 		perror_msg_and_skip("adjtimex");
 
@@ -48,27 +55,27 @@ main(void)
 	       ", tai=%d"
 #endif
 	       "\\}\\) = %d \\(TIME_[A-Z]+\\)\n",
-	       (intmax_t) tx.offset,
-	       (intmax_t) tx.freq,
-	       (intmax_t) tx.maxerror,
-	       (intmax_t) tx.esterror,
-	       tx.status ? "STA_[A-Z]+(\\|STA_[A-Z]+)*" : "0",
-	       (intmax_t) tx.constant,
-	       (intmax_t) tx.precision,
-	       (intmax_t) tx.tolerance,
-	       (intmax_t) tx.time.tv_sec,
-	       (intmax_t) tx.time.tv_usec,
-	       (intmax_t) tx.tick,
-	       (intmax_t) tx.ppsfreq,
-	       (intmax_t) tx.jitter,
-	       tx.shift,
-	       (intmax_t) tx.stabil,
-	       (intmax_t) tx.jitcnt,
-	       (intmax_t) tx.calcnt,
-	       (intmax_t) tx.errcnt,
-	       (intmax_t) tx.stbcnt,
+	       (intmax_t) tx->offset,
+	       (intmax_t) tx->freq,
+	       (intmax_t) tx->maxerror,
+	       (intmax_t) tx->esterror,
+	       tx->status ? "STA_[A-Z]+(\\|STA_[A-Z]+)*" : "0",
+	       (intmax_t) tx->constant,
+	       (intmax_t) tx->precision,
+	       (intmax_t) tx->tolerance,
+	       (intmax_t) tx->time.tv_sec,
+	       (intmax_t) tx->time.tv_usec,
+	       (intmax_t) tx->tick,
+	       (intmax_t) tx->ppsfreq,
+	       (intmax_t) tx->jitter,
+	       tx->shift,
+	       (intmax_t) tx->stabil,
+	       (intmax_t) tx->jitcnt,
+	       (intmax_t) tx->calcnt,
+	       (intmax_t) tx->errcnt,
+	       (intmax_t) tx->stbcnt,
 #ifdef HAVE_STRUCT_TIMEX_TAI
-	       tx.tai,
+	       tx->tai,
 #endif
 	       state);
 
