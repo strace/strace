@@ -48,5 +48,5 @@ if [ "$CC:${TARGET-}" = 'gcc:x86_64' ]; then
 	./configure --enable-code-coverage ${ENABLE_GCC_WERROR-} ${DISTCHECK_CONFIGURE_FLAGS-}
 	make -k $j
 	make -k $j check VERBOSE=${VERBOSE-}
-	codecov ||:
+	codecov --gcov-args=-abcp ||:
 fi
