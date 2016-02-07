@@ -1,4 +1,6 @@
 /*
+ * This file is part of timer_create strace test.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -39,18 +41,29 @@
 int
 main(void)
 {
+	syscall(__NR_timer_create, CLOCK_REALTIME, NULL, NULL);
+	printf("timer_create(CLOCK_REALTIME, NULL, NULL) = -1 EFAULT (%m)\n");
+
 	int tid[4] = {};
 	struct_sigevent sev = {
-		.sigev_notify = SIGEV_NONE,
+		.sigev_notify = 0xdefaced,
 		.sigev_signo = 0xfacefeed,
 		.sigev_value.sival_ptr = (unsigned long) 0xdeadbeefbadc0ded
 	};
 
+	syscall(__NR_timer_create, CLOCK_REALTIME, &sev, NULL);
+	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%#lx}"
+	       ", sigev_signo=%u, sigev_notify=%#x /* SIGEV_??? */}"
+	       ", NULL) = -1 EINVAL (%m)\n",
+	       sev.sigev_value.sival_int,
+	       sev.sigev_value.sival_ptr,
+	       sev.sigev_signo, sev.sigev_notify);
+
+	sev.sigev_notify = SIGEV_NONE;
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[0]))
 		perror_msg_and_skip("timer_create CLOCK_REALTIME");
 	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%#lx}"
-	       ", sigev_signo=%u, sigev_notify=SIGEV_NONE}"
-	       ", [%d]) = 0\n",
+	       ", sigev_signo=%u, sigev_notify=SIGEV_NONE}, [%d]) = 0\n",
 	       sev.sigev_value.sival_int,
 	       sev.sigev_value.sival_ptr,
 	       sev.sigev_signo, tid[0]);
