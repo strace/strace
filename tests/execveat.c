@@ -1,4 +1,6 @@
 /*
+ * This file is part of execveat strace test.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -26,21 +28,156 @@
  */
 
 #include "tests.h"
+#include <errno.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/syscall.h>
 
 #ifdef __NR_execveat
 
-#define FILENAME "execveat\nfilename"
-static const char * const argv[] =
-	{ FILENAME, "first", "second", NULL, NULL, NULL };
-static const char * const envp[] =
-	{ "foobar=1", "foo\nbar=2", NULL , "", NULL , "", NULL, NULL};
+# define FILENAME "test.execveat\nfilename"
+# define Q_FILENAME "test.execveat\\nfilename"
+
+static const char * const argv[] = {
+	FILENAME, "first", "second", (const char *) -1L,
+	(const char *) -2L, (const char *) -3L
+};
+static const char * const q_argv[] = {
+	Q_FILENAME, "first", "second"
+};
+
+static const char * const envp[] = {
+	"foobar=1", "foo\nbar=2", (const char *) -1L,
+	(const char *) -2L, (const char *) -3L
+};
+static const char * const q_envp[] = {
+	"foobar=1", "foo\\nbar=2"
+};
 
 int
 main(void)
 {
-	syscall(__NR_execveat, -100, FILENAME, argv, envp, 0x1100);
+	const char ** const tail_argv = tail_memdup(argv, sizeof(argv));
+	const char ** const tail_envp = tail_memdup(envp, sizeof(envp));
+
+	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\""
+	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ???]"
+#ifdef VERBOSE_EXECVEAT
+	       ", [\"%s\", \"%s\", %p, %p, %p, ???]"
+#else
+	       ", [/* 5 vars, unterminated */]"
+#endif
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
+	       argv[3], argv[4], argv[5],
+#ifdef VERBOSE_EXECVEAT
+	       q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
+#endif
+	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	tail_argv[ARRAY_SIZE(q_argv)] = NULL;
+	tail_envp[ARRAY_SIZE(q_envp)] = NULL;
+
+	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"
+#ifdef VERBOSE_EXECVEAT
+	       ", [\"%s\", \"%s\"]"
+#else
+	       ", [/* 2 vars */]"
+#endif
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
+#ifdef VERBOSE_EXECVEAT
+	       q_envp[0], q_envp[1],
+#endif
+	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	syscall(__NR_execveat, -100, FILENAME, tail_argv + 2, tail_envp + 1, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\", [\"%s\"]"
+#ifdef VERBOSE_EXECVEAT
+	       ", [\"%s\"]"
+#else
+	       ", [/* 1 var */]"
+#endif
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       Q_FILENAME, q_argv[2],
+#ifdef VERBOSE_EXECVEAT
+	       q_envp[1],
+#endif
+	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	const char **const empty = tail_alloc(sizeof(*empty));
+	*empty = NULL;
+
+	syscall(__NR_execveat, -100, FILENAME, empty, empty, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\", []"
+#ifdef VERBOSE_EXECVEAT
+	       ", []"
+#else
+	       ", [/* 0 vars */]"
+#endif
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       Q_FILENAME, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	char str_a[] = "012345678901234567890123456789012";
+	char str_b[] = "_abcdefghijklmnopqrstuvwxyz()[]{}";
+#define DEFAULT_STRLEN ((unsigned int) sizeof(str_a) - 2)
+	char **const a = tail_alloc(sizeof(*a) * (DEFAULT_STRLEN + 2));
+	char **const b = tail_alloc(sizeof(*b) * (DEFAULT_STRLEN + 2));
+	unsigned int i;
+	for (i = 0; i <= DEFAULT_STRLEN; ++i) {
+		a[i] = &str_a[i];
+		b[i] = &str_b[i];
+	}
+	a[i] = b[i] = NULL;
+
+	syscall(__NR_execveat, -100, FILENAME, a, b, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\", [\"%.*s\"...", Q_FILENAME, DEFAULT_STRLEN, a[0]);
+	for (i = 1; i < DEFAULT_STRLEN; ++i)
+		printf(", \"%s\"", a[i]);
+#ifdef VERBOSE_EXECVEAT
+	printf(", \"%s\"", a[i]);
+#else
+	printf(", ...");
+#endif
+#ifdef VERBOSE_EXECVEAT
+	printf("], [\"%.*s\"...", DEFAULT_STRLEN, b[0]);
+	for (i = 1; i <= DEFAULT_STRLEN; ++i)
+		printf(", \"%s\"", b[i]);
+#else
+	printf("], [/* %u vars */", DEFAULT_STRLEN + 1);
+#endif
+	printf("], AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	syscall(__NR_execveat, -100, FILENAME, a + 1, b + 1, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\", [\"%s\"", Q_FILENAME, a[1]);
+	for (i = 2; i <= DEFAULT_STRLEN; ++i)
+		printf(", \"%s\"", a[i]);
+#ifdef VERBOSE_EXECVEAT
+	printf("], [\"%s\"", b[1]);
+	for (i = 2; i <= DEFAULT_STRLEN; ++i)
+		printf(", \"%s\"", b[i]);
+#else
+	printf("], [/* %d vars */", DEFAULT_STRLEN);
+#endif
+	printf("], AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	const void * const efault = tail_alloc(0);
+
+	syscall(__NR_execveat, -100, FILENAME, NULL, efault, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\", NULL, %p"
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       Q_FILENAME, efault, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	syscall(__NR_execveat, -100, FILENAME, efault, NULL, 0x1100);
+	printf("execveat(AT_FDCWD, \"%s\", %p, NULL"
+	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       Q_FILENAME, efault, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 

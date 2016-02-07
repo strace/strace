@@ -1,11 +1,11 @@
 #!/bin/sh
 
-# Check execveat syscall decoding.
+# Check verbose decoding of execveat syscall.
 
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -eexecveat $args > "$OUT"
+run_strace -veexecveat $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"

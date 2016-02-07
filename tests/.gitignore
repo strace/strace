@@ -17,7 +17,9 @@ clock_xettime
 epoll_create1
 eventfd
 execve
+execve-v
 execveat
+execveat-v
 fanotify_mark
 fcntl
 fcntl64

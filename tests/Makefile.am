@@ -67,7 +67,9 @@ check_PROGRAMS = \
 	epoll_create1 \
 	eventfd \
 	execve \
+	execve-v \
 	execveat \
+	execveat-v \
 	fanotify_mark \
 	fcntl \
 	fcntl64 \
@@ -211,7 +213,9 @@ TESTS = \
 	epoll_create1.test \
 	eventfd.test \
 	execve.test \
+	execve-v.test \
 	execveat.test \
+	execveat-v.test \
 	fanotify_mark.test \
 	fcntl.test \
 	fcntl64.test \
@@ -328,10 +332,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     dumpio.expected \
 	     eventfd.expected \
-	     execve.expected \
-	     execve-v.expected \
-	     execveat.expected \
-	     execveat-v.expected \
 	     fanotify_mark.expected \
 	     filter-unavailable.expected \
 	     fstatat.c \
