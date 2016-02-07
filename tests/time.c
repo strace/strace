@@ -1,4 +1,6 @@
 /*
+ * This file is part of time strace test.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -39,11 +41,13 @@ int
 main(void)
 {
 	time_t *p = tail_alloc(sizeof(time_t));
-	time_t t = syscall(__NR_time, p);
 
+	time_t t = syscall(__NR_time, NULL);
 	if ((time_t) -1 == t)
 		perror_msg_and_skip("time");
+	printf("time(NULL) = %jd\n", (intmax_t) t);
 
+	t = syscall(__NR_time, p);
 	printf("time([%jd]) = %jd\n", (intmax_t) *p, (intmax_t) t);
 
 	puts("+++ exited with 0 +++");
