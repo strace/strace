@@ -36,41 +36,72 @@
 static void
 printargv(struct tcb *tcp, long addr)
 {
-	union {
-		unsigned int p32;
-		unsigned long p64;
-		char data[sizeof(long)];
-	} cp;
-	const char *sep;
-	unsigned int n = 0;
-	const unsigned wordsize = current_wordsize;
-
-	cp.p64 = 1;
-	for (sep = ""; !abbrev(tcp) || n < max_strlen / 2; sep = ", ", ++n) {
-		if (umoven_or_printaddr(tcp, addr, wordsize, cp.data))
-			return;
-		if (wordsize == 4)
-			cp.p64 = cp.p32;
-		if (cp.p64 == 0)
-			break;
-		tprints(sep);
-		printstr(tcp, cp.p64, -1);
-		addr += wordsize;
+	if (!addr || !verbose(tcp)) {
+		printaddr(addr);
+		return;
 	}
-	if (cp.p64)
-		tprintf("%s...", sep);
+
+	const char *const start_sep = "[";
+	const char *sep = start_sep;
+	const unsigned int wordsize = current_wordsize;
+	unsigned int n;
+
+	for (n = 0; addr; sep = ", ", addr += wordsize, ++n) {
+		union {
+			unsigned int p32;
+			unsigned long p64;
+			char data[sizeof(long)];
+		} cp;
+
+		if (umoven(tcp, addr, wordsize, cp.data)) {
+			if (sep == start_sep)
+				printaddr(addr);
+			else
+				tprints(", ???]");
+			return;
+		}
+		if (!(wordsize < sizeof(cp.p64) ? cp.p32 : cp.p64)) {
+			if (sep == start_sep)
+				tprints(start_sep);
+			break;
+		}
+		if (abbrev(tcp) && n >= max_strlen) {
+			tprintf("%s...", sep);
+			break;
+		}
+		tprints(sep);
+		printstr(tcp, wordsize < sizeof(cp.p64) ? cp.p32 : cp.p64, -1);
+	}
+	tprints("]");
 }
 
 static void
-printargc(const char *fmt, struct tcb *tcp, long addr)
+printargc(struct tcb *tcp, long addr)
 {
-	int count;
+	if (!addr || !verbose(tcp)) {
+		printaddr(addr);
+		return;
+	}
+
+	bool unterminated = false;
+	unsigned int count = 0;
 	char *cp = NULL;
 
-	for (count = 0; !umoven(tcp, addr, current_wordsize, &cp) && cp; count++) {
-		addr += current_wordsize;
+	for (; addr; addr += current_wordsize, ++count) {
+		if (umoven(tcp, addr, current_wordsize, &cp)) {
+			if (count) {
+				unterminated = true;
+				break;
+			}
+			printaddr(addr);
+			return;
+		}
+		if (!cp)
+			break;
 	}
-	tprintf(fmt, count, count == 1 ? "" : "s");
+	tprintf("[/* %u var%s%s */]",
+		count, count == 1 ? "" : "s",
+		unterminated ? ", unterminated" : "");
 }
 
 static void
@@ -79,24 +110,10 @@ decode_execve(struct tcb *tcp, const unsigned int index)
 	printpath(tcp, tcp->u_arg[index + 0]);
 	tprints(", ");
 
-	if (!tcp->u_arg[index + 1] || !verbose(tcp))
-		printaddr(tcp->u_arg[index + 1]);
-	else {
-		tprints("[");
-		printargv(tcp, tcp->u_arg[index + 1]);
-		tprints("]");
-	}
+	printargv(tcp, tcp->u_arg[index + 1]);
 	tprints(", ");
 
-	if (!tcp->u_arg[index + 2] || !verbose(tcp))
-		printaddr(tcp->u_arg[index + 2]);
-	else if (abbrev(tcp))
-		printargc("[/* %d var%s */]", tcp, tcp->u_arg[index + 2]);
-	else {
-		tprints("[");
-		printargv(tcp, tcp->u_arg[index + 2]);
-		tprints("]");
-	}
+	(abbrev(tcp) ? printargc : printargv) (tcp, tcp->u_arg[index + 2]);
 }
 
 SYS_FUNC(execve)
@@ -121,13 +138,7 @@ SYS_FUNC(execv)
 {
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	if (!tcp->u_arg[1] || !verbose(tcp))
-		printaddr(tcp->u_arg[1]);
-	else {
-		tprints("[");
-		printargv(tcp, tcp->u_arg[1]);
-		tprints("]");
-	}
+	printargv(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
