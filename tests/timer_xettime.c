@@ -1,4 +1,6 @@
 /*
+ * This file is part of timer_xettime strace test.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -41,6 +43,10 @@
 int
 main(void)
 {
+	syscall(__NR_timer_settime, 0xdefaced, TIMER_ABSTIME, NULL, NULL);
+	printf("timer_settime(%d, TIMER_ABSTIME, NULL, NULL)"
+	       " = -1 EINVAL (%m)\n", 0xdefaced);
+
 	int tid;
 	struct sigevent sev = { .sigev_notify = SIGEV_NONE };
 
