@@ -312,6 +312,7 @@ TESTS = \
 	detach-stopped.test \
 	detach-running.test \
 	opipe.test \
+	redirect.test \
 	restart_syscall.test \
 	$(LIBUNWIND_TESTS)
 
