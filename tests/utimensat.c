@@ -1,4 +1,6 @@
 /*
+ * This file is part of utimensat strace test.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -47,6 +49,15 @@ print_ts(const struct timespec *ts)
 int
 main(void)
 {
+	static const char fname[] = "utimensat\nfilename";
+
+	assert(utimensat(AT_FDCWD, fname, NULL, 0) == -1);
+	if (ENOENT != errno)
+		error_msg_and_skip("utimensat");
+
+	#define PREFIX "utimensat(AT_FDCWD, \"utimensat\\nfilename\", "
+	printf(PREFIX "NULL, 0) = -1 ENOENT (%m)\n");
+
 	struct timeval tv;
 	struct timespec ts[2];
 
@@ -58,29 +69,24 @@ main(void)
 	ts[1].tv_sec = tv.tv_sec - 1;
 	ts[1].tv_nsec = tv.tv_usec + 1;
 
-	#define PREFIX "utimensat(AT_FDCWD, \"utimensat\\nfilename\", ["
-
-	printf(PREFIX);
+	printf(PREFIX "[");
 	print_ts(&ts[0]);
 	printf(", ");
 	print_ts(&ts[1]);
 	printf("], AT_SYMLINK_NOFOLLOW) = -1 ENOENT ");
 
-	assert(utimensat(AT_FDCWD, "utimensat\nfilename", ts,
-			 AT_SYMLINK_NOFOLLOW) == -1);
+	assert(utimensat(AT_FDCWD, fname, ts, AT_SYMLINK_NOFOLLOW) == -1);
 	if (ENOENT != errno)
 		error_msg_and_skip("utimensat");
 	printf("(%m)\n");
-
-	printf(PREFIX "UTIME_NOW, UTIME_OMIT], AT_SYMLINK_NOFOLLOW) = -1 ENOENT ");
 
 	ts[0].tv_nsec = UTIME_NOW;
 	ts[1].tv_nsec = UTIME_OMIT;
-	assert(utimensat(AT_FDCWD, "utimensat\nfilename", ts,
-			 AT_SYMLINK_NOFOLLOW) == -1);
+	assert(utimensat(AT_FDCWD, fname, ts, AT_SYMLINK_NOFOLLOW) == -1);
 	if (ENOENT != errno)
 		error_msg_and_skip("utimensat");
-	printf("(%m)\n");
+	printf(PREFIX "[UTIME_NOW, UTIME_OMIT], AT_SYMLINK_NOFOLLOW)"
+	       " = -1 ENOENT (%m)\n");
 
 	puts("+++ exited with 0 +++");
 	return 0;
