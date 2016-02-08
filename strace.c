@@ -1184,14 +1184,15 @@ exec_or_die(void)
 	perror_msg_and_die("exec");
 }
 
-static int open_dev_null(void)
+static int
+open_dummy_desc(void)
 {
-	int fd = open("/dev/null", O_RDWR);
-	if (fd < 0) /* /dev not populated? Give me _something_... */
-		fd = open("/", O_RDWR);
-	if (fd < 0) /* shouldn't happen... */
-		perror_msg_and_die("Can't open '/'");
-	return fd;
+	int fds[2];
+
+	if (pipe(fds))
+		perror_msg_and_die("pipe");
+	close(fds[1]);
+	return fds[0];
 }
 
 static void
@@ -1375,7 +1376,7 @@ startup_child(char **argv)
 	 * will reuse them, unexpectedly making a newly opened object "stdin").
 	 */
 	close(0);
-	open_dev_null(); /* opens to fd#0 */
+	open_dummy_desc(); /* opens to fd#0 */
 	dup2(0, 1);
 #if 0
 	/* A good idea too, but we sometimes need to print error messages */
@@ -1735,7 +1736,7 @@ init(int argc, char *argv[])
 		 * therefore LOG gets opened to fd#1, and fd#1 is closed by
 		 * "don't hold up stdin/out open" code soon after.
 		 */
-		int fd = open_dev_null();
+		int fd = open_dummy_desc();
 		while (fd >= 0 && fd < 2)
 			fd = dup(fd);
 		if (fd > 2)
