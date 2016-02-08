@@ -1184,6 +1184,16 @@ exec_or_die(void)
 	perror_msg_and_die("exec");
 }
 
+static int open_dev_null(void)
+{
+	int fd = open("/dev/null", O_RDWR);
+	if (fd < 0) /* /dev not populated? Give me _something_... */
+		fd = open("/", O_RDWR);
+	if (fd < 0) /* shouldn't happen... */
+		perror_msg_and_die("Can't open '/'");
+	return fd;
+}
+
 static void
 startup_child(char **argv)
 {
@@ -1365,9 +1375,7 @@ startup_child(char **argv)
 	 * will reuse them, unexpectedly making a newly opened object "stdin").
 	 */
 	close(0);
-	if (open("/dev/null", O_RDWR) != 0) /* /dev not populated? */
-		if (open("/", O_RDONLY) != 0) /* shouldn't happen... */
-			perror_msg_and_die("Can't open '/'");
+	open_dev_null(); /* opens to fd#0 */
 	dup2(0, 1);
 #if 0
 	/* A good idea too, but we sometimes need to print error messages */
@@ -1714,6 +1722,25 @@ init(int argc, char *argv[])
 	if (debug_flag)
 		error_msg("ptrace_setoptions = %#x", ptrace_setoptions);
 	test_ptrace_seize();
+
+	if (fcntl(0, F_GETFD) == -1 || fcntl(1, F_GETFD) == -1) {
+		/*
+		 * Something weird with our stdin and/or stdout -
+		 * for example, may be not open? In this case,
+		 * ensure that none of the future opens uses them.
+		 *
+		 * This was seen in the wild when /proc/sys/kernel/core_pattern
+		 * was set to "|/bin/strace -o/tmp/LOG PROG":
+		 * kernel runs coredump helper with fd#0 open but fd#1 closed (!),
+		 * therefore LOG gets opened to fd#1, and fd#1 is closed by
+		 * "don't hold up stdin/out open" code soon after.
+		 */
+		int fd = open_dev_null();
+		while (fd >= 0 && fd < 2)
+			fd = dup(fd);
+		if (fd > 2)
+			close(fd);
+	}
 
 	/* Check if they want to redirect the output. */
 	if (outfname) {
