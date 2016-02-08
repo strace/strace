@@ -1353,6 +1353,27 @@ startup_child(char **argv)
 		 * to create a genuine separate stack and execute on it.
 		 */
 	}
+	/*
+	 * A case where straced process is part of a pipe:
+	 * { sleep 1; yes | head -n99999; } | strace -o/dev/null sh -c 'exec <&-; sleep 9'
+	 * If strace won't close its fd#0, closing it in tracee is not enough:
+	 * the pipe is still open, it has a reader. Thus, "head" will not get its
+	 * SIGPIPE at once, on the first write.
+	 *
+	 * Preventing it by closing strace's stdin/out.
+	 * (Don't leave fds 0 and 1 closed, this is bad practice: future opens
+	 * will reuse them, unexpectedly making a newly opened object "stdin").
+	 */
+	close(0);
+	if (open("/dev/null", O_RDWR) != 0) /* /dev not populated? */
+		if (open("/", O_RDONLY) != 0) /* shouldn't happen... */
+			perror_msg_and_die("Can't open '/'");
+	dup2(0, 1);
+#if 0
+	/* A good idea too, but we sometimes need to print error messages */
+	if (shared_log != stderr)
+		dup2(0, 2);
+#endif
 }
 
 #if USE_SEIZE
