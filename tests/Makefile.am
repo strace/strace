@@ -58,6 +58,7 @@ check_PROGRAMS = \
 	_newselect \
 	adjtimex \
 	aio \
+	attach-f-p \
 	attach-p-cmd-cmd \
 	attach-p-cmd-p \
 	bpf \
@@ -172,6 +173,7 @@ check_PROGRAMS = \
 	xettimeofday \
 	# end of check_PROGRAMS
 
+attach_f_p_LDADD = -lrt -lpthread $(LDADD)
 clock_xettime_LDADD = -lrt $(LDADD)
 filter_unavailable_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -311,6 +313,7 @@ TESTS = \
 	xettimeofday.test \
 	\
 	count.test \
+	attach-f-p.test \
 	attach-p-cmd.test \
 	detach-sleeping.test \
 	detach-stopped.test \

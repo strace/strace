@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# Check that -f -p attaches to threads properly.
+#
+# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/init.sh"
+
+# strace -f -p is implemented using /proc/$pid/task/
+[ -d /proc/self/task/ ] ||
+	framework_skip_ '/proc/self/task/ is not available'
+run_prog_skip_if_failed \
+	kill -0 $$
+run_prog ./attach-f-p > /dev/null 3>&1
+
+OUT="$LOG.out"
+EXP="$LOG.exp"
+./set_ptracer_any sh -c "exec ./attach-f-p > $EXP 3> $OUT" > /dev/null &
+tracee_pid=$!
+
+while ! [ -s "$OUT" ]; do
+	kill -0 $tracee_pid 2> /dev/null ||
+		fail_ 'set_ptracer_any sleep failed'
+done
+
+run_strace -a32 -f -echdir -esignal=none -p $tracee_pid
+match_diff "$LOG" "$EXP"
+rm -f "$EXP" "$OUT"

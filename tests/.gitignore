@@ -8,6 +8,7 @@
 _newselect
 adjtimex
 aio
+attach-f-p
 attach-p-cmd-cmd
 attach-p-cmd-p
 bpf
