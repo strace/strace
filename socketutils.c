@@ -358,51 +358,67 @@ unix_print(int fd, const unsigned long inode)
 		&& receive_responses(fd, inode, "UNIX", unix_parse_response);
 }
 
+static bool
+tcp_v4_print(const int fd, const unsigned long inode)
+{
+	return inet_print(fd, AF_INET, IPPROTO_TCP, inode, "TCP");
+}
+
+static bool
+udp_v4_print(const int fd, const unsigned long inode)
+{
+	return inet_print(fd, AF_INET, IPPROTO_UDP, inode, "UDP");
+}
+
+static bool
+tcp_v6_print(const int fd, const unsigned long inode)
+{
+	return inet_print(fd, AF_INET6, IPPROTO_TCP, inode, "TCPv6");
+}
+
+static bool
+udp_v6_print(const int fd, const unsigned long inode)
+{
+	return inet_print(fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
+}
+
 /* Given an inode number of a socket, print out the details
  * of the ip address and port. */
 bool
 print_sockaddr_by_inode(const unsigned long inode, const char *proto_name)
 {
-	int fd;
-	bool r = false;
+	static const struct {
+		const char *const name;
+		bool (*const print)(int, unsigned long);
+	} protocols[] = {
+		{ "TCP", tcp_v4_print },
+		{ "UDP", udp_v4_print },
+		{ "TCPv6", tcp_v6_print },
+		{ "UDPv6", udp_v6_print },
+		{ "UNIX", unix_print }
+	};
 
-	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
+	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
 	if (fd < 0)
 		return false;
+	bool r = false;
+	unsigned int i;
 
 	if (proto_name) {
-		if (strcmp(proto_name, "TCP") == 0)
-			r = inet_print(fd, AF_INET, IPPROTO_TCP, inode, "TCP");
-		else if (strcmp(proto_name, "UDP") == 0)
-			r = inet_print(fd, AF_INET, IPPROTO_UDP, inode, "UDP");
-		else if (strcmp(proto_name, "TCPv6") == 0)
-			r = inet_print(fd, AF_INET6, IPPROTO_TCP, inode, "TCPv6");
-		else if (strcmp(proto_name, "UDPv6") == 0)
-			r = inet_print(fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
-		else if (strcmp(proto_name, "UNIX") == 0)
-			r = unix_print(fd, inode);
+		for (i = 0; i < ARRAY_SIZE(protocols); ++i) {
+			if (strcmp(proto_name, protocols[i].name) == 0) {
+				r = protocols[i].print(fd, inode);
+				break;
+			}
+		}
 
 		if (!r) {
 			tprintf("%s:[%lu]", proto_name, inode);
 			r = true;
 		}
 	} else {
-		const struct {
-			const int family;
-			const int protocol;
-			const char *name;
-		} protocols[] = {
-			{ AF_INET, IPPROTO_TCP, "TCP" },
-			{ AF_INET, IPPROTO_UDP, "UDP" },
-			{ AF_INET6, IPPROTO_TCP, "TCPv6" },
-			{ AF_INET6, IPPROTO_UDP, "UDPv6" }
-		};
-		size_t i;
-
 		for (i = 0; i < ARRAY_SIZE(protocols); ++i) {
-			if ((r = inet_print(fd, protocols[i].family,
-					    protocols[i].protocol, inode,
-					    protocols[i].name)))
+			if ((r = protocols[i].print(fd, inode)))
 				break;
 		}
 	}
