@@ -55,7 +55,7 @@ static cache_entry cache[CACHE_SIZE];
 #define CACHE_MASK (CACHE_SIZE - 1)
 
 static int
-cache_and_print_inode_details(const unsigned long inode, char *details)
+cache_and_print_inode_details(const unsigned long inode, char *const details)
 {
 	cache_entry *e = &cache[inode & CACHE_MASK];
 	free(e->details);
@@ -69,7 +69,7 @@ cache_and_print_inode_details(const unsigned long inode, char *details)
 bool
 print_sockaddr_by_inode_cached(const unsigned long inode)
 {
-	const cache_entry *e = &cache[inode & CACHE_MASK];
+	const cache_entry *const e = &cache[inode & CACHE_MASK];
 	if (e && inode == e->inode) {
 		tprints(e->details);
 		return true;
@@ -84,8 +84,8 @@ inet_send_query(const int fd, const int family, const int proto)
 		.nl_family = AF_NETLINK
 	};
 	struct {
-		struct nlmsghdr nlh;
-		struct inet_diag_req_v2 idr;
+		const struct nlmsghdr nlh;
+		const struct inet_diag_req_v2 idr;
 	} req = {
 		.nlh = {
 			.nlmsg_len = sizeof(req),
@@ -102,8 +102,8 @@ inet_send_query(const int fd, const int family, const int proto)
 		.iov_base = &req,
 		.iov_len = sizeof(req)
 	};
-	struct msghdr msg = {
-		.msg_name = (void *) &nladdr,
+	const struct msghdr msg = {
+		.msg_name = &nladdr,
 		.msg_namelen = sizeof(nladdr),
 		.msg_iov = &iov,
 		.msg_iovlen = 1
@@ -120,10 +120,10 @@ inet_send_query(const int fd, const int family, const int proto)
 }
 
 static int
-inet_parse_response(const char *proto_name, const void *data,
+inet_parse_response(const char *const proto_name, const void *const data,
 		    const int data_len, const unsigned long inode)
 {
-	const struct inet_diag_msg *diag_msg = data;
+	const struct inet_diag_msg *const diag_msg = data;
 	static const char zero_addr[sizeof(struct in6_addr)];
 	socklen_t addr_size, text_size;
 
@@ -190,29 +190,28 @@ receive_responses(const int fd, const unsigned long inode,
 	int flags = 0;
 
 	for (;;) {
-		ssize_t ret;
 		struct msghdr msg = {
-			.msg_name = (void *) &nladdr,
+			.msg_name = &nladdr,
 			.msg_namelen = sizeof(nladdr),
 			.msg_iov = &iov,
 			.msg_iovlen = 1
 		};
 
-		ret = recvmsg(fd, &msg, flags);
+		ssize_t ret = recvmsg(fd, &msg, flags);
 		if (ret < 0) {
 			if (errno == EINTR)
 				continue;
 			return false;
 		}
 
-		struct nlmsghdr *h = (struct nlmsghdr *) buf;
+		const struct nlmsghdr *h = (struct nlmsghdr *) buf;
 		if (!NLMSG_OK(h, ret))
 			return false;
 		for (; NLMSG_OK(h, ret); h = NLMSG_NEXT(h, ret)) {
 			if (h->nlmsg_type != SOCK_DIAG_BY_FAMILY)
 				return false;
-			int rc = parser(proto_name, NLMSG_DATA(h),
-					h->nlmsg_len, inode);
+			const int rc = parser(proto_name, NLMSG_DATA(h),
+					      h->nlmsg_len, inode);
 			if (rc > 0)
 				return true;
 			if (rc < 0)
@@ -237,8 +236,8 @@ unix_send_query(const int fd, const unsigned long inode)
 		.nl_family = AF_NETLINK
 	};
 	struct {
-		struct nlmsghdr nlh;
-		struct unix_diag_req udr;
+		const struct nlmsghdr nlh;
+		const struct unix_diag_req udr;
 	} req = {
 		.nlh = {
 			.nlmsg_len = sizeof(req),
@@ -257,8 +256,8 @@ unix_send_query(const int fd, const unsigned long inode)
 		.iov_base = &req,
 		.iov_len = sizeof(req)
 	};
-	struct msghdr msg = {
-		.msg_name = (void *) &nladdr,
+	const struct msghdr msg = {
+		.msg_name = &nladdr,
 		.msg_namelen = sizeof(nladdr),
 		.msg_iov = &iov,
 		.msg_iovlen = 1
@@ -352,7 +351,7 @@ unix_parse_response(const char *proto_name, const void *data,
 }
 
 static bool
-unix_print(int fd, const unsigned long inode)
+unix_print(const int fd, const unsigned long inode)
 {
 	return unix_send_query(fd, inode)
 		&& receive_responses(fd, inode, "UNIX", unix_parse_response);
@@ -385,7 +384,7 @@ udp_v6_print(const int fd, const unsigned long inode)
 /* Given an inode number of a socket, print out the details
  * of the ip address and port. */
 bool
-print_sockaddr_by_inode(const unsigned long inode, const char *proto_name)
+print_sockaddr_by_inode(const unsigned long inode, const char *const proto_name)
 {
 	static const struct {
 		const char *const name;
