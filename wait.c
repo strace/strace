@@ -187,11 +187,9 @@ SYS_FUNC(waitid)
 		/* options */
 		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
-		if (tcp->s_ent->nargs > 4) {
-			/* usage */
-			tprints(", ");
-			printrusage(tcp, tcp->u_arg[4]);
-		}
+		/* usage */
+		tprints(", ");
+		printrusage(tcp, tcp->u_arg[4]);
 	}
 	return 0;
 }
