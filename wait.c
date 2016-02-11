@@ -180,7 +180,8 @@ SYS_FUNC(waitid)
 {
 	if (entering(tcp)) {
 		printxval(waitid_types, tcp->u_arg[0], "P_???");
-		tprintf(", %ld, ", tcp->u_arg[1]);
+		int pid = tcp->u_arg[1];
+		tprintf(", %d, ", pid);
 	} else {
 		/* siginfo */
 		printsiginfo_at(tcp, tcp->u_arg[2]);
