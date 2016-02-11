@@ -117,10 +117,8 @@ printstatus(int status)
 }
 
 static int
-printwaitn(struct tcb *tcp, int n, int bitness)
+printwaitn(struct tcb *tcp, void (*const print_rusage)(struct tcb *, long))
 {
-	int status;
-
 	if (entering(tcp)) {
 		/* On Linux, kernel-side pid_t is typedef'ed to int
 		 * on all arches. Also, glibc-2.8 truncates wait3 and wait4
@@ -131,6 +129,8 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 		int pid = tcp->u_arg[0];
 		tprintf("%d, ", pid);
 	} else {
+		int status;
+
 		/* status */
 		if (tcp->u_rval == 0)
 			printaddr(tcp->u_arg[1]);
@@ -139,17 +139,11 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 		/* options */
 		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[2], "W???");
-		if (n == 4) {
-			tprints(", ");
+		if (print_rusage) {
 			/* usage */
-			if (tcp->u_rval > 0) {
-#ifdef ALPHA
-				if (bitness)
-					printrusage32(tcp, tcp->u_arg[3]);
-				else
-#endif
-					printrusage(tcp, tcp->u_arg[3]);
-			}
+			tprints(", ");
+			if (tcp->u_rval > 0)
+				print_rusage(tcp, tcp->u_arg[3]);
 			else
 				printaddr(tcp->u_arg[3]);
 		}
@@ -159,18 +153,18 @@ printwaitn(struct tcb *tcp, int n, int bitness)
 
 SYS_FUNC(waitpid)
 {
-	return printwaitn(tcp, 3, 0);
+	return printwaitn(tcp, NULL);
 }
 
 SYS_FUNC(wait4)
 {
-	return printwaitn(tcp, 4, 0);
+	return printwaitn(tcp, printrusage);
 }
 
 #ifdef ALPHA
 SYS_FUNC(osf_wait4)
 {
-	return printwaitn(tcp, 4, 1);
+	return printwaitn(tcp, printrusage32);
 }
 #endif
 
