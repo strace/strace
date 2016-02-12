@@ -33,10 +33,13 @@
 #include <sys/mman.h>
 
 int
-main(void)
+main(int ac, char **av)
 {
+	const char *const name = ac > 1 ? av[1] : "mmap";
 	const intmax_t pagesize = get_page_size();
-	const unsigned long length = pagesize * 3;
+	const unsigned long length1 = pagesize * 6;
+	const unsigned long length2 = pagesize * 3;
+	const unsigned long length3 = pagesize * 2;
 	const int fd = -1;
 	off_t offset;
 	void *addr, *p;
@@ -48,25 +51,56 @@ main(void)
 	offset = 0xdeadbeef000 & -pagesize;
 	addr = (void *) (unsigned int) (0xfaced000 & -pagesize);
 #endif
+	const uintmax_t uoffset =
+	       sizeof(offset) == sizeof(int) ? (uintmax_t) (unsigned int) offset
+					     : (uintmax_t) offset;
 
-	p = mmap(addr, length, PROT_READ | PROT_WRITE,
+	(void) close(0);
+	(void) close(0);
+	printf("%s(NULL, 0, PROT_NONE, MAP_FILE, 0, 0) = -1 EBADF (%m)\n",
+	       name);
+	mmap(NULL, 0, PROT_NONE, MAP_FILE, 0, 0);
+
+	p = mmap(addr, length1, PROT_READ | PROT_WRITE,
 		 MAP_PRIVATE | MAP_ANONYMOUS, fd, offset);
 	if (MAP_FAILED == p)
 		perror_msg_and_fail("mmap");
-	if (mprotect(p, length, PROT_NONE))
-		perror_msg_and_fail("mprotect");
-	if (munmap(p, length))
-		perror_msg_and_fail("munmap");
+	printf("%s(%p, %lu, PROT_READ|PROT_WRITE, "
+	       "MAP_PRIVATE|MAP_ANONYMOUS, %d, %#jx) = %p\n",
+	       name, addr, length1, fd, uoffset, p);
 
-	if (sizeof(offset) == sizeof(int))
-		printf("mmap2?\\(%p, %lu, PROT_READ\\|PROT_WRITE, "
-		       "MAP_PRIVATE\\|MAP_ANONYMOUS, %d, %#x\\) = %p\n",
-		       addr, length, fd, (unsigned int) offset, p);
-	else
-		printf("(mmap2?|old_mmap)\\(%p, %lu, PROT_READ\\|PROT_WRITE, "
-		       "MAP_PRIVATE\\|MAP_ANONYMOUS, %d, %#jx\\) = %p\n",
-		       addr, length, fd, (uintmax_t) offset, p);
-	printf("mprotect\\(%p, %lu, PROT_NONE\\) += 0\n", p, length);
-	printf("munmap\\(%p, %lu\\) += 0\n", p, length);
+	if (msync(p, length1, MS_SYNC))
+		perror_msg_and_fail("msync");
+	printf("msync(%p, %lu, MS_SYNC) = 0\n", p, length1);
+
+	if (mprotect(p, length1, PROT_NONE))
+		perror_msg_and_fail("mprotect");
+	printf("mprotect(%p, %lu, PROT_NONE) = 0\n", p, length1);
+
+	addr = mremap(p, length1, length2, 0);
+	if (MAP_FAILED == addr)
+		perror_msg_and_fail("mremap");
+	printf("mremap(%p, %lu, %lu, 0) = %p\n", p, length1, length2, addr);
+
+	p =  mremap(addr, length2, length3, MREMAP_MAYMOVE | MREMAP_FIXED,
+		    addr + length2);
+	if (MAP_FAILED == p)
+		perror_msg_and_fail("mremap");
+	printf("mremap(%p, %lu, %lu, MREMAP_MAYMOVE|MREMAP_FIXED"
+	       ", %p) = %p\n", addr, length2, length3, addr + length2, p);
+
+	if (madvise(p, length3, MADV_NORMAL))
+		perror_msg_and_fail("madvise");
+	printf("madvise(%p, %lu, MADV_NORMAL) = 0\n", p, length3);
+
+	if (munmap(p, length3))
+		perror_msg_and_fail("munmap");
+	printf("munmap(%p, %lu) = 0\n", p, length3);
+
+	if (mlockall(MCL_FUTURE))
+		perror_msg_and_fail("mlockall");
+	puts("mlockall(MCL_FUTURE) = 0");
+
+	puts("+++ exited with 0 +++");
 	return 0;
 }
