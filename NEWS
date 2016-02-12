@@ -20,6 +20,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed decoding and dumping of readv syscall in case of short read.
   * Fixed dumping of recvmsg and recvmmsg syscalls in case of short read.
   * Fixed decoding of mincore syscall's last argument.
+  * Fixed remaining errors in mapping between syscall numbers and numbers
+    of syscall arguments.
 
 Noteworthy changes in release 4.11 (2015-12-21)
 ===============================================

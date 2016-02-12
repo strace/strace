@@ -45,7 +45,7 @@
 [ 44] = { 6,	TN,		SEN(sendto),			"sendto"		},
 [ 45] = { 6,	TN,		SEN(printargs),			"64:recvfrom"		},
 [ 46] = { 3,	TN,		SEN(printargs),			"64:sendmsg"		},
-[ 47] = { 5,	TN,		SEN(printargs),			"64:recvmsg"		},
+[ 47] = { 3,	TN,		SEN(printargs),			"64:recvmsg"		},
 [ 48] = { 2,	TN,		SEN(shutdown),			"shutdown"		},
 [ 49] = { 3,	TN,		SEN(bind),			"bind"			},
 [ 50] = { 2,	TN,		SEN(listen),			"listen"		},

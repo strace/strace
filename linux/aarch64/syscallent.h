@@ -62,7 +62,7 @@
 [1070] = { 2,	0,		SEN(ustat),		"ustat"		},
 [1071] = { 0,	TP,		SEN(vfork),		"vfork"		},
 [1072] = { 4,	TP,		SEN(wait4),		"wait4"		},
-[1073] = { 6,	TN,		SEN(recv),		"recv"		},
+[1073] = { 4,	TN,		SEN(recv),		"recv"		},
 [1074] = { 4,	TN,		SEN(send),		"send"		},
 [1075] = { 2,	0,		SEN(bdflush),		"bdflush"	},
 [1076] = { 1,	TF,		SEN(umount),		"umount"	},
