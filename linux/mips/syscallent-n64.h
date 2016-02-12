@@ -21,7 +21,7 @@
 [5018] = { 3,	TD,		SEN(readv),			"readv"			},
 [5019] = { 3,	TD,		SEN(writev),			"writev"		},
 [5020] = { 2,	TF,		SEN(access),			"access"		},
-[5021] = { 1,	TD,		SEN(pipe),			"pipe"			},
+[5021] = { 0,	TD,		SEN(pipe),			"pipe"			},
 [5022] = { 5,	TD,		SEN(select),			"_newselect"		},
 [5023] = { 0,	0,		SEN(sched_yield),		"sched_yield"		},
 [5024] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},

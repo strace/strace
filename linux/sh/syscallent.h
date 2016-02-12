@@ -70,7 +70,7 @@
 [ 39] = { 2,	TF,		SEN(mkdir),			"mkdir"			},
 [ 40] = { 1,	TF,		SEN(rmdir),			"rmdir"			},
 [ 41] = { 1,	TD,		SEN(dup),			"dup"			},
-[ 42] = { 1,	TD,		SEN(pipe),			"pipe"			},
+[ 42] = { 0,	TD,		SEN(pipe),			"pipe"			},
 [ 43] = { 1,	0,		SEN(times),			"times"			},
 [ 44] = { 0,	0,		SEN(prof),			"prof"			},
 [ 45] = { 1,	TM|SI,		SEN(brk),			"brk"			},

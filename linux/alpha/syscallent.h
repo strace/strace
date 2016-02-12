@@ -68,7 +68,7 @@
 [ 39] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [ 40] = { 5,	0,		SEN(printargs),			"osf_old_lstat"		}, /*not implemented */
 [ 41] = { 1,	TD,		SEN(dup),			"dup"			},
-[ 42] = { 1,	TD,		SEN(pipe),			"pipe"			},
+[ 42] = { 0,	TD,		SEN(pipe),			"pipe"			},
 [ 43] = { 4,	0,		SEN(printargs),			"osf_set_program_attributes"	},
 [ 44] = { 5,	0,		SEN(printargs),			"osf_profil"		}, /*not implemented */
 [ 45] = { 3,	TD|TF,		SEN(open),			"open"			},

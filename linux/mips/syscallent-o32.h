@@ -42,7 +42,7 @@
 [4039] = { 2,	TF,		SEN(mkdir),			"mkdir"			},
 [4040] = { 1,	TF,		SEN(rmdir),			"rmdir"			},
 [4041] = { 1,	TD,		SEN(dup),			"dup"			},
-[4042] = { 1,	TD,		SEN(pipe),			"pipe"			},
+[4042] = { 0,	TD,		SEN(pipe),			"pipe"			},
 [4043] = { 1,	0,		SEN(times),			"times"			},
 [4044] = { 0,	0,		SEN(prof),			"prof"			},
 [4045] = { 1,	TM|SI,		SEN(brk),			"brk"			},

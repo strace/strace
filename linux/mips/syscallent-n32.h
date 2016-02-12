@@ -21,7 +21,7 @@
 [6018] = { 3,	TD,		SEN(readv),			"readv"			},
 [6019] = { 3,	TD,		SEN(writev),			"writev"		},
 [6020] = { 2,	TF,		SEN(access),			"access"		},
-[6021] = { 1,	TD,		SEN(pipe),			"pipe"			},
+[6021] = { 0,	TD,		SEN(pipe),			"pipe"			},
 [6022] = { 5,	TD,		SEN(select),			"_newselect"		},
 [6023] = { 0,	0,		SEN(sched_yield),		"sched_yield"		},
 [6024] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},

@@ -74,7 +74,7 @@
 [1055] = { 2,	TF,		SEN(mkdir),			"mkdir"			},
 [1056] = { 1,	TF,		SEN(rmdir),			"rmdir"			},
 [1057] = { 1,	TD,		SEN(dup),			"dup"			},
-[1058] = { 1,	TD,		SEN(pipe),			"pipe"			},
+[1058] = { 0,	TD,		SEN(pipe),			"pipe"			},
 [1059] = { 1,	0,		SEN(times),			"times"			},
 [1060] = { 1,	TM|SI,		SEN(brk),			"brk"			},
 [1061] = { 1,	0,		SEN(setgid),			"setgid"		},
