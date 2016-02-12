@@ -347,3 +347,6 @@
 [319] = { 3,	TD,		SEN(bpf),			"bpf",			},
 [320] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
 [321] = { 4,	TN,		SEN(accept4),			"accept4"		},
+[322] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[323] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[324] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
