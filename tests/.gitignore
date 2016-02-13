@@ -93,6 +93,7 @@ sigaltstack
 signalfd
 sigreturn
 sleep
+splice
 stack-fcall
 stat
 stat64

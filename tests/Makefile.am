@@ -140,6 +140,7 @@ check_PROGRAMS = \
 	sigaltstack \
 	signalfd \
 	sigreturn \
+	splice \
 	stack-fcall \
 	sleep \
 	stat \
@@ -283,6 +284,7 @@ TESTS = \
 	sigaltstack.test \
 	signalfd.test \
 	sigreturn.test \
+	splice.test \
 	stat.test \
 	stat64.test \
 	statfs.test \
