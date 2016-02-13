@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check decoding of vmsplice syscall.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -ewrite=1 -evmsplice $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

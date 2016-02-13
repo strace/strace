@@ -121,6 +121,7 @@ userfaultfd
 utime
 utimensat
 vfork-f
+vmsplice
 wait
 xattr
 xet_robust_list

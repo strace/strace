@@ -169,6 +169,7 @@ check_PROGRAMS = \
 	utime \
 	utimensat \
 	vfork-f \
+	vmsplice \
 	wait \
 	xattr \
 	xet_robust_list \
@@ -312,6 +313,7 @@ TESTS = \
 	utime.test \
 	utimensat.test \
 	vfork-f.test \
+	vmsplice.test \
 	wait.test \
 	xattr.test \
 	xet_robust_list.test \

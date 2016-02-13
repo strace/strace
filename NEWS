@@ -11,6 +11,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented caching of netlink conversations to reduce amount of time
     spent in decoding socket details in -yy mode.
   * Implemented decoding of copy_file_range syscall.
+  * Implemented dumping of vmsplice syscall.
 
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.
