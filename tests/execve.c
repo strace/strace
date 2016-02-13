@@ -65,13 +65,13 @@ main(void)
 #else
 	       ", [/* 5 vars, unterminated */]"
 #endif
-	       ") = -1 %s (%m)\n",
+	       ") = -1 ENOENT (%m)\n",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
-	       argv[3], argv[4], argv[5],
+	       argv[3], argv[4], argv[5]
 #ifdef VERBOSE_EXECVE
-	       q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
+	       , q_envp[0], q_envp[1], envp[2], envp[3], envp[4]
 #endif
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       );
 
 	tail_argv[ARRAY_SIZE(q_argv)] = NULL;
 	tail_envp[ARRAY_SIZE(q_envp)] = NULL;
@@ -83,12 +83,12 @@ main(void)
 #else
 	       ", [/* 2 vars */]"
 #endif
-	       ") = -1 %s (%m)\n",
-	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
+	       ") = -1 ENOENT (%m)\n",
+	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2]
 #ifdef VERBOSE_EXECVE
-	       q_envp[0], q_envp[1],
+	       , q_envp[0], q_envp[1]
 #endif
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       );
 
 	execve(FILENAME, tail_argv + 2, tail_envp + 1);
 	printf("execve(\"%s\", [\"%s\"]"
@@ -97,12 +97,12 @@ main(void)
 #else
 	       ", [/* 1 var */]"
 #endif
-	       ") = -1 %s (%m)\n",
-	       Q_FILENAME, q_argv[2],
+	       ") = -1 ENOENT (%m)\n",
+	       Q_FILENAME, q_argv[2]
 #ifdef VERBOSE_EXECVE
-	       q_envp[1],
+	       , q_envp[1]
 #endif
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       );
 
 	char **const empty = tail_alloc(sizeof(*empty));
 	*empty = NULL;
@@ -114,8 +114,7 @@ main(void)
 #else
 	       ", [/* 0 vars */]"
 #endif
-	       ") = -1 %s (%m)\n",
-	       Q_FILENAME, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       ") = -1 ENOENT (%m)\n", Q_FILENAME);
 
 	char str_a[] = "012345678901234567890123456789012";
 	char str_b[] = "_abcdefghijklmnopqrstuvwxyz()[]{}";
@@ -145,7 +144,7 @@ main(void)
 #else
 	printf("], [/* %u vars */", DEFAULT_STRLEN + 1);
 #endif
-	printf("]) = -1 %s (%m)\n", errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	printf("]) = -1 ENOENT (%m)\n");
 
 	execve(FILENAME, a + 1, b + 1);
 	printf("execve(\"%s\", [\"%s\"", Q_FILENAME, a[1]);
@@ -158,19 +157,17 @@ main(void)
 #else
 	printf("], [/* %d vars */", DEFAULT_STRLEN);
 #endif
-	printf("]) = -1 %s (%m)\n", errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	printf("]) = -1 ENOENT (%m)\n");
 
 	const void * const efault = tail_alloc(0);
 
 	execve(FILENAME, (char **) tail_argv[ARRAY_SIZE(q_argv)], efault);
-	printf("execve(\"%s\", NULL, %p"
-	       ") = -1 %s (%m)\n",
-	       Q_FILENAME, efault, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	printf("execve(\"%s\", NULL, %p) = -1 ENOENT (%m)\n",
+	       Q_FILENAME, efault);
 
 	execve(FILENAME, efault, NULL);
-	printf("execve(\"%s\", %p, NULL"
-	       ") = -1 %s (%m)\n",
-	       Q_FILENAME, efault, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	printf("execve(\"%s\", %p, NULL) = -1 ENOENT (%m)\n",
+	       Q_FILENAME, efault);
 
 	return 0;
 }
