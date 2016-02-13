@@ -10,6 +10,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added decoding of bind, listen, and setsockopt direct syscalls on sparc.
   * Implemented caching of netlink conversations to reduce amount of time
     spent in decoding socket details in -yy mode.
+  * Implemented decoding of copy_file_range syscall.
 
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.

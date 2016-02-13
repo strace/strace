@@ -15,6 +15,7 @@ bpf
 caps
 clock_nanosleep
 clock_xettime
+copy_file_range
 epoll_create1
 eventfd
 execve

@@ -324,7 +324,8 @@
 [323] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
 [324] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [325] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
-[326 ... 511] = { },
+[326] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[327 ... 511] = { },
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.

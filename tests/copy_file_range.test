@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check copy_file_range syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -ecopy_file_range $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

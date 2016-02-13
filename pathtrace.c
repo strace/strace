@@ -225,8 +225,9 @@ pathtrace_match(struct tcb *tcp)
 			upathmatch(tcp, tcp->u_arg[0]) ||
 			upathmatch(tcp, tcp->u_arg[2]);
 
+	case SEN_copy_file_range:
 	case SEN_splice:
-		/* fd, x, fd, x, x */
+		/* fd, x, fd, x, x, x */
 		return fdmatch(tcp, tcp->u_arg[0]) ||
 			fdmatch(tcp, tcp->u_arg[2]);
 

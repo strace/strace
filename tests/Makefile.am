@@ -65,6 +65,7 @@ check_PROGRAMS = \
 	caps \
 	clock_nanosleep \
 	clock_xettime \
+	copy_file_range \
 	epoll_create1 \
 	eventfd \
 	execve \
@@ -211,6 +212,7 @@ TESTS = \
 	caps.test \
 	clock_nanosleep.test \
 	clock_xettime.test \
+	copy_file_range.test \
 	dumpio.test \
 	epoll_create1.test \
 	eventfd.test \

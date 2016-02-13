@@ -401,7 +401,8 @@
 [373] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
 [374] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [375] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
-[376 ... 399] = { },
+[376] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[377 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

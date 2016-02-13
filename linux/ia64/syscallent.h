@@ -363,3 +363,4 @@
 [1344] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [1345] = { 5,	0,		SEN(kcmp),			"kcmp"			},
 [1346] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[1347] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},

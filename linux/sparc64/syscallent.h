@@ -353,7 +353,8 @@
 [354] = { 2,	TN,		SEN(listen),			"listen"		},
 [355] = { 5,	TN,		SEN(setsockopt),		"setsockopt"		},
 [356] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
-[357 ... 399] = { },
+[357] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[358 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
