@@ -105,6 +105,7 @@ main(void)
 	       );
 
 	char **const empty = tail_alloc(sizeof(*empty));
+	char **const efault = empty + 1;
 	*empty = NULL;
 
 	execve(FILENAME, empty, empty);
@@ -158,8 +159,6 @@ main(void)
 	printf("], [/* %d vars */", DEFAULT_STRLEN);
 #endif
 	printf("]) = -1 ENOENT (%m)\n");
-
-	const void * const efault = tail_alloc(0);
 
 	execve(FILENAME, (char **) tail_argv[ARRAY_SIZE(q_argv)], efault);
 	printf("execve(\"%s\", NULL, %p) = -1 ENOENT (%m)\n",

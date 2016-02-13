@@ -107,7 +107,8 @@ main(void)
 #endif
 	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
 
-	const char **const empty = tail_alloc(sizeof(*empty));
+	char **const empty = tail_alloc(sizeof(*empty));
+	char **const efault = empty + 1;
 	*empty = NULL;
 
 	syscall(__NR_execveat, -100, FILENAME, empty, empty, 0x1100);
@@ -164,8 +165,6 @@ main(void)
 #endif
 	printf("], AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
 	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
-
-	const void * const efault = tail_alloc(0);
 
 	syscall(__NR_execveat, -100, FILENAME, NULL, efault, 0x1100);
 	printf("execveat(AT_FDCWD, \"%s\", NULL, %p"
