@@ -147,6 +147,7 @@ check_PROGRAMS = \
 	stat64 \
 	statfs \
 	sysinfo \
+	tee \
 	time \
 	timer_create \
 	timer_xettime \
@@ -290,6 +291,7 @@ TESTS = \
 	statfs.test \
 	sun_path.test \
 	sysinfo.test \
+	tee.test \
 	time.test \
 	timer_create.test \
 	timer_xettime.test \

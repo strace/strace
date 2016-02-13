@@ -99,6 +99,7 @@ stat
 stat64
 statfs
 sysinfo
+tee
 time
 timer_create
 timer_xettime
