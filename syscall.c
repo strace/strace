@@ -645,25 +645,21 @@ printargs(struct tcb *tcp)
 int
 printargs_lu(struct tcb *tcp)
 {
-	if (entering(tcp)) {
-		int i;
-		int n = tcp->s_ent->nargs;
-		for (i = 0; i < n; i++)
-			tprintf("%s%lu", i ? ", " : "", tcp->u_arg[i]);
-	}
-	return 0;
+	const int n = tcp->s_ent->nargs;
+	int i;
+	for (i = 0; i < n; ++i)
+		tprintf("%s%lu", i ? ", " : "", tcp->u_arg[i]);
+	return RVAL_DECODED;
 }
 
 int
 printargs_ld(struct tcb *tcp)
 {
-	if (entering(tcp)) {
-		int i;
-		int n = tcp->s_ent->nargs;
-		for (i = 0; i < n; i++)
-			tprintf("%s%ld", i ? ", " : "", tcp->u_arg[i]);
-	}
-	return 0;
+	const int n = tcp->s_ent->nargs;
+	int i;
+	for (i = 0; i < n; ++i)
+		tprintf("%s%ld", i ? ", " : "", tcp->u_arg[i]);
+	return RVAL_DECODED;
 }
 
 static void
