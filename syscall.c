@@ -643,22 +643,24 @@ printargs(struct tcb *tcp)
 }
 
 int
-printargs_lu(struct tcb *tcp)
+printargs_u(struct tcb *tcp)
 {
 	const int n = tcp->s_ent->nargs;
 	int i;
 	for (i = 0; i < n; ++i)
-		tprintf("%s%lu", i ? ", " : "", tcp->u_arg[i]);
+		tprintf("%s%u", i ? ", " : "",
+			(unsigned int) tcp->u_arg[i]);
 	return RVAL_DECODED;
 }
 
 int
-printargs_ld(struct tcb *tcp)
+printargs_d(struct tcb *tcp)
 {
 	const int n = tcp->s_ent->nargs;
 	int i;
 	for (i = 0; i < n; ++i)
-		tprintf("%s%ld", i ? ", " : "", tcp->u_arg[i]);
+		tprintf("%s%d", i ? ", " : "",
+			(int) tcp->u_arg[i]);
 	return RVAL_DECODED;
 }
 

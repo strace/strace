@@ -557,8 +557,9 @@ extern void printaddr(long);
 extern void printxvals(const unsigned int, const char *, const struct xlat *, ...);
 #define printxval(xlat, val, dflt) printxvals(val, dflt, xlat, NULL)
 extern int printargs(struct tcb *);
-extern int printargs_lu(struct tcb *);
-extern int printargs_ld(struct tcb *);
+extern int printargs_u(struct tcb *);
+extern int printargs_d(struct tcb *);
+
 extern void addflags(const struct xlat *, int);
 extern int printflags(const struct xlat *, int, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, int);

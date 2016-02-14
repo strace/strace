@@ -98,7 +98,7 @@
 #define	sys_vfork		sys_fork
 
 /* printargs does the right thing */
-#define	sys_getpgid		printargs
+#define	sys_getpgrp		printargs
 #define	sys_getpid		printargs
 #define	sys_getppid		printargs
 #define	sys_gettid		printargs
@@ -116,17 +116,19 @@
 #define	sys_socketcall		printargs
 #define	sys_sync		printargs
 #define	sys_syscall		printargs
-#define	sys_timer_delete	printargs
-#define	sys_timer_getoverrun	printargs
 #define	sys_vhangup		printargs
 
-/* printargs_lu/ld does the right thing */
-#define	sys_alarm		printargs_lu
-#define	sys_getpgrp		printargs_lu
-#define	sys_getsid		printargs_lu
-#define	sys_nice		printargs_ld
-#define	sys_setpgid		printargs_lu
-#define	sys_setpgrp		printargs_lu
+/* printargs_u does the right thing */
+#define	sys_alarm		printargs_u
+
+/* printargs_d does the right thing */
+#define	sys_getpgid		printargs_d
+#define	sys_getsid		printargs_d
+#define	sys_nice		printargs_d
+#define	sys_setpgid		printargs_d
+#define	sys_setpgrp		printargs_d
+#define	sys_timer_delete	printargs_d
+#define	sys_timer_getoverrun	printargs_d
 
 /* unimplemented */
 #define	sys_afs_syscall		printargs
