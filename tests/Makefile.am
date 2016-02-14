@@ -58,6 +58,7 @@ check_PROGRAMS = \
 	_newselect \
 	adjtimex \
 	aio \
+	alarm \
 	attach-f-p \
 	attach-p-cmd-cmd \
 	attach-p-cmd-p \
@@ -210,6 +211,7 @@ TESTS = \
 	_newselect.test \
 	adjtimex.test \
 	aio.test \
+	alarm.test \
 	bexecve.test \
 	bpf.test \
 	caps.test \
