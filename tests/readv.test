@@ -6,7 +6,7 @@
 
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -a30 -eread=0 -ewrite=1 -ereadv,writev $args > "$OUT"
+run_strace -a16 -eread=0 -ewrite=1 -ereadv,writev $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
