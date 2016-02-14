@@ -45,13 +45,15 @@ check_prog yes
 	else
 		echo TIMEOUT >> $LOG
 	fi
-) | $STRACE -o/dev/null sh -c "exec <&- >&-; $SLEEP_A_BIT; $SLEEP_A_BIT"
+) | $STRACE -qq -enone -esignal=none \
+	sh -c "exec <&- >&-; $SLEEP_A_BIT; $SLEEP_A_BIT"
 
 if [ -s "$LOG" ]; then
 	fail_ "$STRACE failed to redirect standard input"
 fi
 
-$STRACE -o/dev/null sh -c "exec <&- >&-; $SLEEP_A_BIT; $SLEEP_A_BIT" |
+$STRACE -qq -enone -esignal=none \
+	sh -c "exec <&- >&-; $SLEEP_A_BIT; $SLEEP_A_BIT" |
 (
 	$SLEEP_A_BIT &
 	cat > /dev/null
