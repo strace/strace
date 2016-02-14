@@ -175,6 +175,7 @@ check_PROGRAMS = \
 	xattr \
 	xet_robust_list \
 	xetitimer \
+	xetpgid \
 	xettimeofday \
 	# end of check_PROGRAMS
 
@@ -320,6 +321,7 @@ TESTS = \
 	xattr.test \
 	xet_robust_list.test \
 	xetitimer.test \
+	xetpgid.test \
 	xettimeofday.test \
 	\
 	count.test \
