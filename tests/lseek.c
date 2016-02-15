@@ -39,7 +39,7 @@
 int
 main(void)
 {
-	const kernel_ulong_t offset = (kernel_ulong_t) 0xdefaced0badc0deULL;
+	const kernel_ulong_t offset = (kernel_ulong_t) 0xfacefeeddeadbeefULL;
 
 	if (sizeof(offset) > sizeof(long))
 		assert(lseek(-1, offset, SEEK_SET) == -1);
@@ -49,8 +49,12 @@ main(void)
 	if (EBADF != errno)
 		perror_msg_and_skip("lseek");
 
-	printf("lseek(-1, %llu, SEEK_SET) = -1 EBADF (%m)\n",
-	       (unsigned long long) offset);
+	if (sizeof(offset) > sizeof(long))
+		printf("lseek(-1, %lld, SEEK_SET) = -1 EBADF (%m)\n",
+		       (long long) offset);
+	else
+		printf("lseek(-1, %ld, SEEK_SET) = -1 EBADF (%m)\n",
+		       (long) offset);
 
 	puts("+++ exited with 0 +++");
 	return 0;

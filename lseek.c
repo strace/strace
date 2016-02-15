@@ -7,7 +7,7 @@
  * Copyright (c) 2009 Andreas Schwab <schwab@redhat.com>
  * Copyright (c) 2012 H.J. Lu <hongjiu.lu@intel.com>
  * Copyright (c) 2013 Denys Vlasenko <vda.linux@googlemail.com>
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,10 +47,9 @@
 #if defined(LINUX_MIPSN32) || defined(X32)
 SYS_FUNC(lseek)
 {
-	long long offset;
-	int whence;
-
 	printfd(tcp, tcp->u_arg[0]);
+
+	long long offset;
 # ifdef X32
 	/* tcp->ext_arg is not initialized for i386 personality */
 	if (current_personality == 1)
@@ -58,11 +57,9 @@ SYS_FUNC(lseek)
 	else
 # endif
 	offset = tcp->ext_arg[1];
-	whence = tcp->u_arg[2];
-	if (whence == SEEK_SET)
-		tprintf(", %llu, ", offset);
-	else
-		tprintf(", %lld, ", offset);
+	int whence = tcp->u_arg[2];
+
+	tprintf(", %lld, ", offset);
 	printxval(whence_codes, whence, "SEEK_???");
 
 	return RVAL_DECODED | RVAL_LUDECIMAL;
@@ -70,16 +67,23 @@ SYS_FUNC(lseek)
 #else
 SYS_FUNC(lseek)
 {
-	long offset;
-	int whence;
-
 	printfd(tcp, tcp->u_arg[0]);
-	offset = tcp->u_arg[1];
-	whence = tcp->u_arg[2];
-	if (whence == SEEK_SET)
-		tprintf(", %lu, ", offset);
-	else
-		tprintf(", %ld, ", offset);
+
+	long offset =
+# if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#  ifdef X86_64
+		current_personality == 1 ?
+			(long)(int) tcp->u_arg[1] : tcp->u_arg[1];
+#  else
+		current_wordsize == 4 ?
+			(long)(int) tcp->u_arg[1] : tcp->u_arg[1];
+#  endif
+# else
+		tcp->u_arg[1];
+# endif
+	int whence = tcp->u_arg[2];
+
+	tprintf(", %ld, ", offset);
 	printxval(whence_codes, whence, "SEEK_???");
 
 	return RVAL_DECODED | RVAL_UDECIMAL;
@@ -103,14 +107,9 @@ SYS_FUNC(llseek)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
-		if (tcp->u_arg[4] == SEEK_SET)
-			tprintf(", %llu, ",
-				((long long) tcp->u_arg[1]) << 32 |
-				(unsigned long long) (unsigned) tcp->u_arg[2]);
-		else
-			tprintf(", %lld, ",
-				((long long) tcp->u_arg[1]) << 32 |
-				(unsigned long long) (unsigned) tcp->u_arg[2]);
+		tprintf(", %lld, ",
+			((unsigned long long) (unsigned long) tcp->u_arg[1]) << 32
+			| (unsigned long long) (unsigned long) tcp->u_arg[2]);
 	} else {
 		printnum_int64(tcp, tcp->u_arg[3], "%" PRIu64);
 		tprints(", ");

@@ -38,16 +38,16 @@
 int
 main(void)
 {
-	const unsigned long high = 0xdefaced;
+	const unsigned long high = 0xfacefeed;
 	const unsigned long low = 0xdeadbeef;
-	const unsigned long long offset = 0xdefaceddeadbeef;
+	const long long offset = 0xfacefeeddeadbeefLL;
 	unsigned long long result;
 
 	assert(syscall(__NR__llseek, -1, high, low, &result, SEEK_SET) == -1);
 	if (EBADF != errno)
 		perror_msg_and_skip("_llseek");
 
-	printf("_llseek(-1, %llu, %p, SEEK_SET) = -1 EBADF (%m)\n",
+	printf("_llseek(-1, %lld, %p, SEEK_SET) = -1 EBADF (%m)\n",
 	       offset, &result);
 
 	puts("+++ exited with 0 +++");
