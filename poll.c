@@ -82,10 +82,8 @@ decode_poll_entering(struct tcb *tcp)
 			tprints("...");
 			break;
 		}
-		if (umove(tcp, cur, &fds) < 0) {
-			tprints("???");
+		if (umove_or_printaddr(tcp, cur, &fds))
 			break;
-		}
 		print_pollfd(tcp, &fds);
 
 	}
@@ -134,7 +132,7 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 				*outptr++ = '[';
 			else
 				outptr = stpcpy(outptr, ", ");
-			outptr = stpcpy(outptr, "???");
+			outptr += sprintf(outptr, "%#lx", cur);
 			break;
 		}
 		if (!fds.revents)
@@ -154,8 +152,8 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 
 		const char *flagstr = sprintflags("", pollflags, fds.revents);
 
-		if (outptr + strlen(fdstr) + strlen(flagstr) + 1
-		    >= end_outstr - sizeof(", ...], ...")) {
+		if (outptr + strlen(fdstr) + strlen(flagstr) + 1 >=
+		    end_outstr - (2 + 2 * sizeof(long) + sizeof(", ], ..."))) {
 			outptr = stpcpy(outptr, "...");
 			break;
 		}
