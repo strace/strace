@@ -51,7 +51,8 @@ decode_poll_entering(struct tcb *tcp)
 	const unsigned long size = sizeof(fds) * nfds;
 	const unsigned long start = tcp->u_arg[0];
 	const unsigned long end = start + size;
-	unsigned long cur, abbrev_end;
+	const unsigned long max_printed =
+		abbrev(tcp) ? max_strlen : (unsigned int) -1;
 
 	if (!verbose(tcp) || !start || !nfds ||
 	    size / sizeof(fds) != nfds || end < start) {
@@ -60,32 +61,31 @@ decode_poll_entering(struct tcb *tcp)
 		return 0;
 	}
 
-	if (abbrev(tcp)) {
-		abbrev_end = start + max_strlen * sizeof(fds);
-		if (abbrev_end < start)
-			abbrev_end = end;
-	} else {
-		abbrev_end = end;
-	}
-
-	if (start >= abbrev_end || umove(tcp, start, &fds) < 0) {
+	if (umove(tcp, start, &fds) < 0) {
 		printaddr(start);
 		tprintf(", %u, ", nfds);
 		return 0;
 	}
 
 	tprints("[");
-	print_pollfd(tcp, &fds);
-	for (cur = start + sizeof(fds); cur < end; cur += sizeof(fds)) {
-		tprints(", ");
-		if (cur >= abbrev_end) {
-			tprints("...");
-			break;
-		}
-		if (umove_or_printaddr(tcp, cur, &fds))
-			break;
-		print_pollfd(tcp, &fds);
+	if (max_printed) {
+		unsigned long printed = 1;
+		unsigned long cur = start + sizeof(fds);
 
+		print_pollfd(tcp, &fds);
+		for (; cur < end; ++printed, cur += sizeof(fds)) {
+			tprints(", ");
+			if (printed >= max_printed) {
+				tprints("...");
+				break;
+			}
+			if (umove_or_printaddr(tcp, cur, &fds))
+				break;
+			print_pollfd(tcp, &fds);
+
+		}
+	} else {
+		tprints("...");
 	}
 	tprintf("], %u, ", nfds);
 
@@ -100,7 +100,9 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 	const unsigned long size = sizeof(fds) * nfds;
 	const unsigned long start = tcp->u_arg[0];
 	const unsigned long end = start + size;
-	unsigned long cur, abbrev_end;
+	const unsigned long max_printed =
+		abbrev(tcp) ? max_strlen : (unsigned int) -1;
+	unsigned long printed, cur;
 
 	static char outstr[1024];
 	char *outptr;
@@ -116,17 +118,10 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 	if (!verbose(tcp) || !start || !nfds ||
 	    size / sizeof(fds) != nfds || end < start)
 		return 0;
-	if (abbrev(tcp)) {
-		abbrev_end = start + max_strlen * sizeof(fds);
-		if (abbrev_end < start)
-			abbrev_end = end;
-	} else {
-		abbrev_end = end;
-	}
 
 	outptr = outstr;
 
-	for (cur = start; cur < end; cur += sizeof(fds)) {
+	for (printed = 0, cur = start; cur < end; cur += sizeof(fds)) {
 		if (umove(tcp, cur, &fds) < 0) {
 			if (outptr == outstr)
 				*outptr++ = '[';
@@ -141,7 +136,7 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 			*outptr++ = '[';
 		else
 			outptr = stpcpy(outptr, ", ");
-		if (cur >= abbrev_end) {
+		if (printed >= max_printed) {
 			outptr = stpcpy(outptr, "...");
 			break;
 		}
@@ -160,6 +155,7 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 		outptr = stpcpy(outptr, fdstr);
 		outptr = stpcpy(outptr, flagstr);
 		*outptr++ = '}';
+		++printed;
 	}
 
 	if (outptr != outstr)

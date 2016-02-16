@@ -1,3 +1,3 @@
-ppoll\(\[\{fd=0, events=POLLIN\|POLLPRI\|POLLRDNORM\|POLLRDBAND\}, \{fd=1, events=POLLOUT(\|POLLWRNORM)?\|POLLWRBAND\}, \.\.\.\], 4, \{42, 999999999\}, \[(USR2 CHLD|CHLD USR2)\], (4|8|16)\) += 2 \(\[\{fd=1, revents=POLLOUT(\|POLLWRNORM)?\}, \.\.\.\], left \{42, 9[0-9]{8}\}\)
-ppoll\(\[\{fd=1, events=POLLIN\|POLLPRI\|POLLRDNORM\|POLLRDBAND\}, \{fd=0, events=POLLOUT(\|POLLWRNORM)?\|POLLWRBAND\}\], 2, \{0, 999\}, ~\[HUP KILL STOP[^]]*\], (4|8|16)\) += 0 \(Timeout\)
-ppoll\(NULL, 42, NULL, NULL, (4|8|16)\) += -1 EFAULT .*
+ppoll\(\[\{fd=0, events=POLLIN\|POLLPRI\|POLLRDNORM\|POLLRDBAND\}, \{fd=1, events=POLLOUT(\|POLLWRNORM)?\|POLLWRBAND\}, \.\.\.\], 4, \{42, 999999999\}, \[(USR2 CHLD|CHLD USR2)\], (4|8|16)\) = 2 \(\[\{fd=1, revents=POLLOUT(\|POLLWRNORM)?\}, \{fd=4, revents=POLLOUT\}\], left \{42, 9[0-9]{8}\}\)
+ppoll\(\[\{fd=1, events=POLLIN\|POLLPRI\|POLLRDNORM\|POLLRDBAND\}, \{fd=0, events=POLLOUT(\|POLLWRNORM)?\|POLLWRBAND\}\], 2, \{0, 999\}, ~\[HUP KILL STOP[^]]*\], (4|8|16)\) = 0 \(Timeout\)
+ppoll\(NULL, 42, NULL, NULL, (4|8|16)\) = -1 EFAULT .*
