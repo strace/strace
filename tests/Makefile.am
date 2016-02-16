@@ -120,6 +120,7 @@ check_PROGRAMS = \
 	pc \
 	personality \
 	pipe \
+	poll \
 	ppoll \
 	pselect6 \
 	readdir \
@@ -270,6 +271,7 @@ TESTS = \
 	pc.test \
 	personality.test \
 	pipe.test \
+	poll.test \
 	ppoll.test \
 	pselect6.test \
 	readdir.test \

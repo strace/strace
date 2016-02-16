@@ -72,6 +72,7 @@ oldselect
 pc
 personality
 pipe
+poll
 ppoll
 pselect6
 readdir
