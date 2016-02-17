@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check decoding of rt_tgsigqueueinfo syscall
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -ert_tgsigqueueinfo -esignal=none $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

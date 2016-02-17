@@ -86,6 +86,7 @@ rt_sigpending
 rt_sigprocmask
 rt_sigqueueinfo
 rt_sigtimedwait
+rt_tgsigqueueinfo
 sched_xetaffinity
 sched_xetattr
 scm_rights

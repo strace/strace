@@ -134,6 +134,7 @@ check_PROGRAMS = \
 	rt_sigprocmask \
 	rt_sigqueueinfo \
 	rt_sigtimedwait \
+	rt_tgsigqueueinfo \
 	sched_xetaffinity \
 	sched_xetattr \
 	scm_rights \
@@ -288,6 +289,7 @@ TESTS = \
 	rt_sigprocmask.test \
 	rt_sigqueueinfo.test \
 	rt_sigtimedwait.test \
+	rt_tgsigqueueinfo.test \
 	sched_xetaffinity.test \
 	sched_xetattr.test \
 	scm_rights-fd.test \

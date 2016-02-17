@@ -640,7 +640,7 @@ print_sigqueueinfo(struct tcb *tcp, int sig, unsigned long uinfo)
 
 SYS_FUNC(rt_sigqueueinfo)
 {
-	tprintf("%lu, ", tcp->u_arg[0]);
+	tprintf("%d, ", (int) tcp->u_arg[0]);
 	print_sigqueueinfo(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -648,7 +648,7 @@ SYS_FUNC(rt_sigqueueinfo)
 
 SYS_FUNC(rt_tgsigqueueinfo)
 {
-	tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf("%d, %d, ", (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
 	print_sigqueueinfo(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 
 	return RVAL_DECODED;
