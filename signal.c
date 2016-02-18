@@ -223,26 +223,27 @@ printsignal(int nr)
 	tprints(signame(nr));
 }
 
-void
-print_sigset_addr_len(struct tcb *tcp, long addr, long len)
+static void
+print_sigset_addr_len_limit(struct tcb *tcp, long addr, long len, long min_len)
 {
-	char mask[NSIG / 8];
-
-	/* Here len is usually equals NSIG / 8 or current_wordsize.
+	/*
+	 * Here len is usually equal to NSIG / 8 or current_wordsize.
 	 * But we code this defensively:
 	 */
-	if (len < 0) {
+	if (len < min_len || len > NSIG / 8) {
 		printaddr(addr);
 		return;
 	}
-	if (len >= NSIG / 8)
-		len = NSIG / 8;
-	else
-		len = (len + 3) & ~3;
-
+	int mask[NSIG / 8 / sizeof(int)] = {};
 	if (umoven_or_printaddr(tcp, addr, len, mask))
 		return;
 	tprints(sprintsigmask_n("", mask, len));
+}
+
+void
+print_sigset_addr_len(struct tcb *tcp, long addr, long len)
+{
+	print_sigset_addr_len_limit(tcp, addr, len, current_wordsize);
 }
 
 SYS_FUNC(sigsetmask)
@@ -613,7 +614,8 @@ SYS_FUNC(rt_sigpending)
 		 * This allows non-rt sigpending() syscall
 		 * to reuse rt_sigpending() code in kernel.
 		 */
-		print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+		print_sigset_addr_len_limit(tcp, tcp->u_arg[0],
+					    tcp->u_arg[1], 1);
 		tprintf(", %lu", tcp->u_arg[1]);
 	}
 	return 0;

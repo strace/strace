@@ -81,6 +81,7 @@ readlinkat
 readv
 recvmsg
 restart_syscall
+rt_sigpending
 rt_sigqueueinfo
 sched_xetaffinity
 sched_xetattr
