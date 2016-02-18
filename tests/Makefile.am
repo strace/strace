@@ -130,6 +130,7 @@ check_PROGRAMS = \
 	recvmsg \
 	restart_syscall \
 	rt_sigpending \
+	rt_sigprocmask \
 	rt_sigqueueinfo \
 	sched_xetaffinity \
 	sched_xetattr \
@@ -281,6 +282,7 @@ TESTS = \
 	readv.test \
 	recvmsg.test \
 	rt_sigpending.test \
+	rt_sigprocmask.test \
 	rt_sigqueueinfo.test \
 	sched_xetaffinity.test \
 	sched_xetattr.test \
