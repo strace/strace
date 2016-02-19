@@ -45,7 +45,7 @@
 #endif
 
 static void
-send_query(const int fd, const unsigned int inode)
+send_query(const int fd)
 {
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
@@ -57,14 +57,12 @@ send_query(const int fd, const unsigned int inode)
 		.nlh = {
 			.nlmsg_len = sizeof(req),
 			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-			.nlmsg_flags = NLM_F_REQUEST
+			.nlmsg_flags = NLM_F_REQUEST | NLM_F_DUMP
 		},
 		.udr = {
 			.sdiag_family = AF_UNIX,
-			.udiag_ino = inode,
 			.udiag_states = -1,
-			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER,
-			.udiag_cookie = { ~0U, ~0U }
+			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER
 		}
 	};
 	struct iovec iov = {
@@ -83,7 +81,7 @@ send_query(const int fd, const unsigned int inode)
 }
 
 static void
-check_responses(const int fd, const unsigned int inode)
+check_responses(const int fd)
 {
 	static char buf[8192];
 	struct sockaddr_nl nladdr = {
@@ -121,8 +119,6 @@ check_responses(const int fd, const unsigned int inode)
 	const struct unix_diag_msg *diag = NLMSG_DATA(h);
 	if (h->nlmsg_len < NLMSG_LENGTH(sizeof(*diag)))
 		error_msg_and_skip("short response");
-	if (diag->udiag_ino != inode)
-		error_msg_and_skip("inode mismatch");
 }
 
 #define SUN_PATH "netlink_unix_diag_socket"
@@ -150,8 +146,7 @@ int main(void)
 	if (socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG) != 1)
 		perror_msg_and_skip("socket AF_NETLINK");
 
-	unsigned int inode = inode_of_sockfd(0);
-	send_query(1, inode);
-	check_responses(1, inode);
+	send_query(1);
+	check_responses(1);
 	return 0;
 }
