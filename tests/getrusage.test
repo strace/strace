@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check getrusage syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -v -egetrusage $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

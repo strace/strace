@@ -37,6 +37,7 @@ ftruncate64
 getdents
 getdents64
 getrandom
+getrusage
 getxxid
 inet-cmsg
 ioctl

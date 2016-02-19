@@ -87,6 +87,7 @@ check_PROGRAMS = \
 	getdents \
 	getdents64 \
 	getrandom \
+	getrusage \
 	getxxid \
 	inet-cmsg \
 	ioctl \
@@ -244,6 +245,7 @@ TESTS = \
 	getdents.test \
 	getdents64.test \
 	getrandom.test \
+	getrusage.test \
 	getxxid.test \
 	inet-cmsg.test \
 	ioctl.test \
