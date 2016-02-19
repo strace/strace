@@ -660,32 +660,30 @@ SYS_FUNC(rt_sigtimedwait)
 	if (entering(tcp)) {
 		print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[3]);
 		tprints(", ");
-		/* This is the only "return" parameter, */
-		if (tcp->u_arg[1] != 0)
-			return 0;
-		/* ... if it's NULL, can decode all on entry */
-		tprints("NULL, ");
-	}
-	else if (tcp->u_arg[1] != 0) {
-		/* syscall exit, and u_arg[1] wasn't NULL */
-		printsiginfo_at(tcp, tcp->u_arg[1]);
-		tprints(", ");
-	}
-	else {
-		/* syscall exit, and u_arg[1] was NULL */
-		return 0;
-	}
+		if (!tcp->u_arg[1]) {
+			/*
+			 * This is the only "return" parameter,
+			 * if it's NULL, decode all parameters on entry.
+			 */
+			tprints("NULL, ");
+			print_timespec(tcp, tcp->u_arg[2]);
+			tprintf(", %lu", tcp->u_arg[3]);
+			tcp->auxstr = NULL;
+		} else {
+			tcp->auxstr = sprint_timespec(tcp, tcp->u_arg[2]);
+		}
+	} else {
+		if (tcp->auxstr) {
+			printsiginfo_at(tcp, tcp->u_arg[1]);
+			tprintf(", %s, %lu", tcp->auxstr, tcp->u_arg[3]);
+			tcp->auxstr = NULL;
+		}
 
-	/*
-	 * Since the timeout parameter is read by the kernel
-	 * on entering syscall, it has to be decoded the same way
-	 * whether the syscall has failed or not.
-	 */
-	temporarily_clear_syserror(tcp);
-	print_timespec(tcp, tcp->u_arg[2]);
-	restore_cleared_syserror(tcp);
-
-	tprintf(", %lu", tcp->u_arg[3]);
+		if (!syserror(tcp) && tcp->u_rval) {
+			tcp->auxstr = signame(tcp->u_rval);
+			return RVAL_STR;
+		}
+	}
 	return 0;
 };
 

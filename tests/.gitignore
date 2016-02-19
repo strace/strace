@@ -84,6 +84,7 @@ restart_syscall
 rt_sigpending
 rt_sigprocmask
 rt_sigqueueinfo
+rt_sigtimedwait
 sched_xetaffinity
 sched_xetattr
 scm_rights
