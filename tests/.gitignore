@@ -85,6 +85,7 @@ restart_syscall
 rt_sigpending
 rt_sigprocmask
 rt_sigqueueinfo
+rt_sigsuspend
 rt_sigtimedwait
 rt_tgsigqueueinfo
 sched_xetaffinity

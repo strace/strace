@@ -133,6 +133,7 @@ check_PROGRAMS = \
 	rt_sigpending \
 	rt_sigprocmask \
 	rt_sigqueueinfo \
+	rt_sigsuspend \
 	rt_sigtimedwait \
 	rt_tgsigqueueinfo \
 	sched_xetaffinity \
@@ -288,6 +289,7 @@ TESTS = \
 	rt_sigpending.test \
 	rt_sigprocmask.test \
 	rt_sigqueueinfo.test \
+	rt_sigsuspend.test \
 	rt_sigtimedwait.test \
 	rt_tgsigqueueinfo.test \
 	sched_xetaffinity.test \
