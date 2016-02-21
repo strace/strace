@@ -348,3 +348,4 @@
 [343] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [344] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
 [345] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[346] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
