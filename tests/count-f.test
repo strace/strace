@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check whether -c counts through forks and clones properly
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -q -f -c $args
+match_grep
+
+exit 0

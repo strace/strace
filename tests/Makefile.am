@@ -69,6 +69,7 @@ check_PROGRAMS = \
 	clock_nanosleep \
 	clock_xettime \
 	copy_file_range \
+	count-f \
 	dup \
 	dup2 \
 	dup3 \
@@ -199,6 +200,7 @@ check_PROGRAMS = \
 
 attach_f_p_LDADD = -lrt -lpthread $(LDADD)
 clock_xettime_LDADD = -lrt $(LDADD)
+count_f_LDADD = -lpthread $(LDADD)
 filter_unavailable_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -239,6 +241,7 @@ TESTS = \
 	clock_nanosleep.test \
 	clock_xettime.test \
 	copy_file_range.test \
+	count-f.test \
 	dumpio.test \
 	dup.test \
 	dup2.test \
@@ -381,6 +384,7 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
+	     count-f.expected \
 	     dumpio.expected \
 	     eventfd.expected \
 	     fanotify_mark.expected \

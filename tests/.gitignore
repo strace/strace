@@ -19,6 +19,7 @@ chmod
 clock_nanosleep
 clock_xettime
 copy_file_range
+count-f
 dup
 dup2
 dup3
