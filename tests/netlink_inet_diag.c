@@ -76,7 +76,7 @@ send_query(const int fd, const int family, const int proto)
 static void
 check_responses(const int fd)
 {
-	static char buf[8192];
+	static long buf[8192 / sizeof(long)];
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
 	};
