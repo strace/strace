@@ -172,6 +172,7 @@ check_PROGRAMS = \
 	umount2 \
 	umovestr \
 	umovestr2 \
+	uname \
 	unix-pair-send-recv \
 	userfaultfd \
 	utime \
@@ -326,6 +327,7 @@ TESTS = \
 	umount2.test \
 	umovestr.test \
 	umovestr2.test \
+	uname.test \
 	userfaultfd.test \
 	utime.test \
 	utimensat.test \

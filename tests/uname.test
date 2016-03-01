@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check uname syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -v -euname $args >"$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

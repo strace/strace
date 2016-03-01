@@ -124,6 +124,7 @@ umount
 umount2
 umovestr
 umovestr2
+uname
 unix-pair-send-recv
 userfaultfd
 utime
