@@ -129,6 +129,7 @@ check_PROGRAMS = \
 	readlinkat \
 	readv \
 	recvmsg \
+	rename \
 	restart_syscall \
 	rt_sigpending \
 	rt_sigprocmask \
@@ -287,6 +288,7 @@ TESTS = \
 	readlinkat.test \
 	readv.test \
 	recvmsg.test \
+	rename.test \
 	rt_sigpending.test \
 	rt_sigprocmask.test \
 	rt_sigqueueinfo.test \

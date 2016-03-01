@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check rename syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -erename -a35 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
