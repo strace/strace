@@ -1913,17 +1913,25 @@ init(int argc, char *argv[])
 }
 
 static struct tcb *
-pid2tcb(int pid)
+pid2tcb(const int pid)
 {
-	unsigned int i;
-
 	if (pid <= 0)
 		return NULL;
 
-	for (i = 0; i < tcbtabsize; i++) {
-		struct tcb *tcp = tcbtab[i];
+#define PID2TCB_CACHE_SIZE 1024U
+#define PID2TCB_CACHE_MASK (PID2TCB_CACHE_SIZE - 1)
+
+	static struct tcb *pid2tcb_cache[PID2TCB_CACHE_SIZE];
+	struct tcb **const ptcp = &pid2tcb_cache[pid & PID2TCB_CACHE_MASK];
+	struct tcb *tcp = *ptcp;
+
+	if (tcp && tcp->pid == pid)
+		return tcp;
+
+	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+		tcp = tcbtab[i];
 		if (tcp->pid == pid)
-			return tcp;
+			return *ptcp = tcp;
 	}
 
 	return NULL;
