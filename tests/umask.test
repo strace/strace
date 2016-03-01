@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check umask syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -eumask -a11 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

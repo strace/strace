@@ -121,6 +121,7 @@ uid
 uid16
 uid32
 uio
+umask
 umount
 umount2
 umovestr

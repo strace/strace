@@ -169,6 +169,7 @@ check_PROGRAMS = \
 	uid16 \
 	uid32 \
 	uio \
+	umask \
 	umount \
 	umount2 \
 	umovestr \
@@ -325,6 +326,7 @@ TESTS = \
 	uid16.test \
 	uid32.test \
 	uio.test \
+	umask.test \
 	umount.test \
 	umount2.test \
 	umovestr.test \
