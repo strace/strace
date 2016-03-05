@@ -691,19 +691,25 @@ newoutf(struct tcb *tcp)
 static void
 expand_tcbtab(void)
 {
-	/* Allocate some more TCBs and expand the table.
+	/* Allocate some (more) TCBs (and expand the table).
 	   We don't want to relocate the TCBs because our
 	   callers have pointers and it would be a pain.
 	   So tcbtab is a table of pointers.  Since we never
 	   free the TCBs, we allocate a single chunk of many.  */
-	unsigned int i = tcbtabsize;
-	struct tcb *newtcbs = xcalloc(tcbtabsize, sizeof(newtcbs[0]));
-	struct tcb **newtab = xreallocarray(tcbtab, tcbtabsize * 2,
-					    sizeof(tcbtab[0]));
-	tcbtabsize *= 2;
-	tcbtab = newtab;
-	while (i < tcbtabsize)
-		tcbtab[i++] = newtcbs++;
+	unsigned int new_tcbtabsize, alloc_tcbtabsize;
+	struct tcb *newtcbs;
+
+	if (tcbtabsize) {
+		alloc_tcbtabsize = tcbtabsize;
+		new_tcbtabsize = tcbtabsize * 2;
+	} else {
+		new_tcbtabsize = alloc_tcbtabsize = 1;
+	}
+
+	newtcbs = xcalloc(alloc_tcbtabsize, sizeof(newtcbs[0]));
+	tcbtab = xreallocarray(tcbtab, new_tcbtabsize, sizeof(tcbtab[0]));
+	while (tcbtabsize < new_tcbtabsize)
+		tcbtab[tcbtabsize++] = newtcbs++;
 }
 
 static struct tcb *
@@ -1484,10 +1490,8 @@ get_os_release(void)
 static void ATTRIBUTE_NOINLINE
 init(int argc, char *argv[])
 {
-	struct tcb *tcp;
 	int c, i;
 	int optF = 0;
-	unsigned int tcbi;
 	struct sigaction sa;
 
 	progname = argv[0] ? argv[0] : "strace";
@@ -1502,13 +1506,6 @@ init(int argc, char *argv[])
 	strace_tracer_pid = getpid();
 
 	os_release = get_os_release();
-
-	/* Allocate the initial tcbtab.  */
-	tcbtabsize = argc;	/* Surely enough for all -p args.  */
-	tcbtab = xcalloc(tcbtabsize, sizeof(tcbtab[0]));
-	tcp = xcalloc(tcbtabsize, sizeof(*tcp));
-	for (tcbi = 0; tcbi < tcbtabsize; tcbi++)
-		tcbtab[tcbi] = tcp++;
 
 	shared_log = stderr;
 	set_sortby(DEFAULT_SORTBY);
