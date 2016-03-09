@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check acct syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -eacct -a21 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

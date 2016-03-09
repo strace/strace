@@ -56,6 +56,7 @@ LDADD = libtests.a
 
 check_PROGRAMS = \
 	_newselect \
+	acct \
 	adjtimex \
 	aio \
 	alarm \
@@ -221,6 +222,7 @@ TESTS = \
 	ksysent.test \
 	\
 	_newselect.test \
+	acct.test \
 	adjtimex.test \
 	aio.test \
 	alarm.test \

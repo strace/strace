@@ -6,6 +6,7 @@
 *.tmp.*
 *.trs
 _newselect
+acct
 adjtimex
 aio
 alarm
