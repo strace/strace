@@ -146,6 +146,7 @@ check_PROGRAMS = \
 	sched_get_priority_mxx \
 	sched_xetaffinity \
 	sched_xetattr \
+	sched_xetparam \
 	scm_rights \
 	seccomp \
 	select \
@@ -312,6 +313,7 @@ TESTS = \
 	sched_get_priority_mxx.test \
 	sched_xetaffinity.test \
 	sched_xetattr.test \
+	sched_xetparam.test \
 	scm_rights-fd.test \
 	seccomp.test \
 	select.test \

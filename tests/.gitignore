@@ -98,6 +98,7 @@ rt_tgsigqueueinfo
 sched_get_priority_mxx
 sched_xetaffinity
 sched_xetattr
+sched_xetparam
 scm_rights
 seccomp
 select
