@@ -19,6 +19,9 @@ chmod
 clock_nanosleep
 clock_xettime
 copy_file_range
+dup
+dup2
+dup3
 epoll_create1
 eventfd
 execve
