@@ -76,6 +76,7 @@ check_PROGRAMS = \
 	execveat \
 	execveat-v \
 	fanotify_mark \
+	fchmod \
 	fcntl \
 	fcntl64 \
 	file_handle \
@@ -241,6 +242,7 @@ TESTS = \
 	execveat.test \
 	execveat-v.test \
 	fanotify_mark.test \
+	fchmod.test \
 	fcntl.test \
 	fcntl64.test \
 	file_handle.test \

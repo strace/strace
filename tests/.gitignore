@@ -26,6 +26,7 @@ execve-v
 execveat
 execveat-v
 fanotify_mark
+fchmod
 fcntl
 fcntl64
 file_handle
