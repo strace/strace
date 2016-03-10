@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check sched_get_priority_min and sched_get_priority_max syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -esched_get_priority_min,sched_get_priority_max -a33 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

@@ -143,6 +143,7 @@ check_PROGRAMS = \
 	rt_sigsuspend \
 	rt_sigtimedwait \
 	rt_tgsigqueueinfo \
+	sched_get_priority_mxx \
 	sched_xetaffinity \
 	sched_xetattr \
 	scm_rights \
@@ -308,6 +309,7 @@ TESTS = \
 	rt_sigsuspend.test \
 	rt_sigtimedwait.test \
 	rt_tgsigqueueinfo.test \
+	sched_get_priority_mxx.test \
 	sched_xetaffinity.test \
 	sched_xetattr.test \
 	scm_rights-fd.test \

@@ -95,6 +95,7 @@ rt_sigqueueinfo
 rt_sigsuspend
 rt_sigtimedwait
 rt_tgsigqueueinfo
+sched_get_priority_mxx
 sched_xetaffinity
 sched_xetattr
 scm_rights
