@@ -4,8 +4,12 @@
 
 . "${srcdir=.}/init.sh"
 
+check_prog uniq
+
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -v -euname $args >"$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
+EXP="$LOG.exp"
+run_strace -v -euname $args > "$EXP"
+uniq < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+rm -f "$OUT" "$EXP"
