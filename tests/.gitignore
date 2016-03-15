@@ -100,6 +100,7 @@ sched_get_priority_mxx
 sched_xetaffinity
 sched_xetattr
 sched_xetparam
+sched_xetscheduler
 scm_rights
 seccomp
 select

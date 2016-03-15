@@ -148,6 +148,7 @@ check_PROGRAMS = \
 	sched_xetaffinity \
 	sched_xetattr \
 	sched_xetparam \
+	sched_xetscheduler \
 	scm_rights \
 	seccomp \
 	select \
@@ -317,6 +318,7 @@ TESTS = \
 	sched_xetaffinity.test \
 	sched_xetattr.test \
 	sched_xetparam.test \
+	sched_xetscheduler.test \
 	scm_rights-fd.test \
 	seccomp.test \
 	select.test \

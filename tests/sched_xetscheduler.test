@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check sched_getscheduler and sched_setscheduler syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -esched_getscheduler,sched_setscheduler -a22 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
