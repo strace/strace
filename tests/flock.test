@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check flock syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -eflock -a19 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

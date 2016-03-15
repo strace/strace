@@ -85,6 +85,7 @@ check_PROGRAMS = \
 	fcntl64 \
 	file_handle \
 	filter-unavailable \
+	flock \
 	fork-f \
 	fstat \
 	fstat64 \
@@ -259,6 +260,7 @@ TESTS = \
 	fcntl64.test \
 	file_handle.test \
 	filter-unavailable.test \
+	flock.test \
 	fork-f.test \
 	fstat.test \
 	fstat64.test \

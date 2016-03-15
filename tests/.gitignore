@@ -35,6 +35,7 @@ fcntl
 fcntl64
 file_handle
 filter-unavailable
+flock
 fork-f
 fstat
 fstat64
