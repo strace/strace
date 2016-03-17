@@ -149,4 +149,5 @@ xattr
 xet_robust_list
 xetitimer
 xetpgid
+xetpriority
 xettimeofday
