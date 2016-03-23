@@ -93,6 +93,7 @@ check_PROGRAMS = \
 	fstatat64 \
 	ftruncate \
 	ftruncate64 \
+	getcwd \
 	getdents \
 	getdents64 \
 	getrandom \
@@ -269,6 +270,7 @@ TESTS = \
 	fstatat64.test \
 	ftruncate.test \
 	ftruncate64.test \
+	getcwd.test \
 	getdents.test \
 	getdents64.test \
 	getrandom.test \

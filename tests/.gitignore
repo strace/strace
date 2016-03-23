@@ -42,6 +42,7 @@ fstat64
 fstatat64
 ftruncate
 ftruncate64
+getcwd
 getdents
 getdents64
 getrandom
