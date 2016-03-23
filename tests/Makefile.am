@@ -229,25 +229,18 @@ else
 LIBUNWIND_TESTS =
 endif
 
-TESTS = \
-	strace-f.test \
-	qual_syscall.test \
-	ksysent.test \
-	\
+DECODER_TESTS = \
 	_newselect.test \
 	acct.test \
 	adjtimex.test \
 	aio.test \
 	alarm.test \
-	bexecve.test \
 	bpf.test \
 	caps.test \
 	chmod.test \
 	clock_nanosleep.test \
 	clock_xettime.test \
 	copy_file_range.test \
-	count-f.test \
-	dumpio.test \
 	dup.test \
 	dup2.test \
 	dup3.test \
@@ -262,9 +255,7 @@ TESTS = \
 	fcntl.test \
 	fcntl64.test \
 	file_handle.test \
-	filter-unavailable.test \
 	flock.test \
-	fork-f.test \
 	fstat.test \
 	fstat64.test \
 	fstatat64.test \
@@ -302,7 +293,6 @@ TESTS = \
 	net.test \
 	newfstatat.test \
 	oldselect.test \
-	pc.test \
 	personality.test \
 	pipe.test \
 	poll.test \
@@ -362,7 +352,6 @@ TESTS = \
 	userfaultfd.test \
 	utime.test \
 	utimensat.test \
-	vfork-f.test \
 	vmsplice.test \
 	wait.test \
 	xattr.test \
@@ -371,17 +360,31 @@ TESTS = \
 	xetpgid.test \
 	xetpriority.test \
 	xettimeofday.test \
-	\
-	count.test \
+	# end of DECODER_TESTS
+
+MISC_TESTS = \
 	attach-f-p.test \
 	attach-p-cmd.test \
+	bexecve.test \
+	count-f.test \
+	count.test \
+	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
-	detach-running.test \
+	dumpio.test \
+	filter-unavailable.test \
+	fork-f.test \
+	ksysent.test \
 	opipe.test \
+	pc.test \
+	qual_syscall.test \
 	redirect.test \
 	restart_syscall.test \
-	$(LIBUNWIND_TESTS)
+	strace-f.test \
+	vfork-f.test \
+	# end of MISC_TESTS
+
+TESTS = $(DECODER_TESTS) $(MISC_TESTS) $(LIBUNWIND_TESTS)
 
 XFAIL_TESTS_ =
 XFAIL_TESTS_m32 = $(LIBUNWIND_TESTS)
