@@ -46,6 +46,7 @@ libtests_a_SOURCES = \
 	hexdump_strdup.c \
 	hexquote_strndup.c \
 	inode_of_sockfd.c \
+	print_quoted_string.c \
 	tail_alloc.c \
 	tests.h \
 	tprintf.c \
