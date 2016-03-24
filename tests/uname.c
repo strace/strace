@@ -7,25 +7,31 @@
 # include <sys/utsname.h>
 # include <unistd.h>
 
-int main()
+int main(int ac, char **av)
 {
+	int abbrev = ac > 1;
 	struct utsname *const uname = tail_alloc(sizeof(struct utsname));
 	int rc = syscall(__NR_uname, uname);
-	printf("uname({sysname=\"%s\", nodename=\"%s\", release=\"%s\""
-	       ", version=\"%s\", machine=\"%s\""
+	printf("uname({sysname=\"");
+	print_quoted_string(uname->sysname);
+	printf("\", nodename=\"");
+	print_quoted_string(uname->nodename);
+	if (abbrev) {
+		printf("\", ...");
+	} else {
+		printf("\", release=\"");
+		print_quoted_string(uname->release);
+		printf("\", version=\"");
+		print_quoted_string(uname->version);
+		printf("\", machine=\"");
+		print_quoted_string(uname->machine);
 # ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
-	       ", domainname=\"%s\""
+		printf("\", domainname=\"");
+		print_quoted_string(uname->domainname);
 # endif
-	       "}) = %d\n",
-	       uname->sysname,
-	       uname->nodename,
-	       uname->release,
-	       uname->version,
-	       uname->machine,
-# ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
-	       uname->domainname,
-# endif
-	       rc);
+		printf("\"");
+	}
+	printf("}) = %d\n", rc);
 
 	puts("+++ exited with 0 +++");
 	return 0;

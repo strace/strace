@@ -6,10 +6,16 @@
 
 check_prog uniq
 
-run_prog > /dev/null
 OUT="$LOG.out"
 EXP="$LOG.exp"
+
+run_prog > /dev/null
 run_strace -v -euname $args > "$EXP"
 uniq < "$LOG" > "$OUT"
+
+run_prog "./${ME_%.test}" abbrev > /dev/null
+run_strace -euname $args >> "$EXP"
+uniq < "$LOG" >> "$OUT"
+
 match_diff "$OUT" "$EXP"
 rm -f "$OUT" "$EXP"
