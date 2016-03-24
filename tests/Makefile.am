@@ -383,6 +383,7 @@ MISC_TESTS = \
 	strace-T.test \
 	strace-f.test \
 	strace-t.test \
+	strace-tt.test \
 	vfork-f.test \
 	# end of MISC_TESTS
 
