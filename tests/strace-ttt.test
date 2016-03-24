@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Check -ttt option.
+
+. "${srcdir=.}/init.sh"
+
+run_prog_skip_if_failed date +%s > /dev/null
+run_prog ./sleep 0
+
+t0="$(date +%s)"
+run_strace -ttt -eexecve $args
+t1="$(date +%s)"
+
+EXPECTED="$LOG.expected"
+cat > "$EXPECTED" << __EOF__
+($t0|$t1)\\.[[:digit:]]{6} execve\\("\\./sleep", \\["\\./sleep", "0"\\], \\[/\\* [[:digit:]]+ vars \\*/\\]\\) = 0
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+rm -f "$EXPECTED"
