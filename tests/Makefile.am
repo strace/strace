@@ -382,6 +382,7 @@ MISC_TESTS = \
 	restart_syscall.test \
 	strace-T.test \
 	strace-f.test \
+	strace-r.test \
 	strace-t.test \
 	strace-tt.test \
 	strace-ttt.test \
@@ -425,6 +426,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     statfs.expected \
 	     statx.sh \
 	     strace-T.expected \
+	     strace-r.expected \
 	     struct_flock.c \
 	     sun_path.expected \
 	     uid.awk \
