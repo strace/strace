@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Check -T option.
+
+. "${srcdir=.}/init.sh"
+
+run_prog ./sleep 0
+run_strace -a24 -T -enanosleep ./sleep 1
+match_grep

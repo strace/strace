@@ -380,6 +380,7 @@ MISC_TESTS = \
 	qual_syscall.test \
 	redirect.test \
 	restart_syscall.test \
+	strace-T.test \
 	strace-f.test \
 	vfork-f.test \
 	# end of MISC_TESTS
@@ -420,6 +421,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     signalfd.expected \
 	     statfs.expected \
 	     statx.sh \
+	     strace-T.expected \
 	     struct_flock.c \
 	     sun_path.expected \
 	     uid.awk \
