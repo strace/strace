@@ -382,6 +382,7 @@ MISC_TESTS = \
 	restart_syscall.test \
 	strace-T.test \
 	strace-f.test \
+	strace-t.test \
 	vfork-f.test \
 	# end of MISC_TESTS
 
