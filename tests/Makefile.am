@@ -81,6 +81,7 @@ check_PROGRAMS = \
 	execve-v \
 	execveat \
 	execveat-v \
+	faccessat \
 	fanotify_mark \
 	fchmod \
 	fcntl \
@@ -254,6 +255,7 @@ DECODER_TESTS = \
 	execve-v.test \
 	execveat.test \
 	execveat-v.test \
+	faccessat.test \
 	fanotify_mark.test \
 	fchmod.test \
 	fcntl.test \

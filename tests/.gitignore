@@ -30,6 +30,7 @@ execve
 execve-v
 execveat
 execveat-v
+faccessat
 fanotify_mark
 fchmod
 fcntl
