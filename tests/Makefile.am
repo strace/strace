@@ -169,6 +169,7 @@ check_PROGRAMS = \
 	stat64 \
 	statfs \
 	sysinfo \
+	syslog \
 	tee \
 	time \
 	timer_create \
@@ -330,6 +331,7 @@ DECODER_TESTS = \
 	statfs.test \
 	sun_path.test \
 	sysinfo.test \
+	syslog.test \
 	tee.test \
 	time.test \
 	timer_create.test \

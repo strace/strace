@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check syslog syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -esyslog -a36 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

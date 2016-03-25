@@ -120,6 +120,7 @@ stat
 stat64
 statfs
 sysinfo
+syslog
 tee
 time
 timer_create
