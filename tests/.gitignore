@@ -20,6 +20,7 @@ clock_nanosleep
 clock_xettime
 copy_file_range
 count-f
+creat
 dup
 dup2
 dup3

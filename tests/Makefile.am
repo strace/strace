@@ -71,6 +71,7 @@ check_PROGRAMS = \
 	clock_xettime \
 	copy_file_range \
 	count-f \
+	creat \
 	dup \
 	dup2 \
 	dup3 \
@@ -243,6 +244,7 @@ DECODER_TESTS = \
 	clock_nanosleep.test \
 	clock_xettime.test \
 	copy_file_range.test \
+	creat.test \
 	dup.test \
 	dup2.test \
 	dup3.test \
