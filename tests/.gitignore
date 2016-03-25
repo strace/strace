@@ -65,6 +65,7 @@ lstat64
 membarrier
 memfd_create
 mincore
+mknod
 mlock2
 mmap
 mmap64

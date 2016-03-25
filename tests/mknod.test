@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check mknod syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -emknod -a29 $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
