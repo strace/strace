@@ -94,6 +94,7 @@ readlinkat
 readv
 recvmsg
 rename
+renameat
 restart_syscall
 rt_sigpending
 rt_sigprocmask

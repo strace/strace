@@ -143,6 +143,7 @@ check_PROGRAMS = \
 	readv \
 	recvmsg \
 	rename \
+	renameat\
 	restart_syscall \
 	rt_sigpending \
 	rt_sigprocmask \
@@ -311,6 +312,7 @@ DECODER_TESTS = \
 	readv.test \
 	recvmsg.test \
 	rename.test \
+	renameat.test \
 	rt_sigpending.test \
 	rt_sigprocmask.test \
 	rt_sigqueueinfo.test \
