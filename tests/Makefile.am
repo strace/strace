@@ -131,6 +131,7 @@ check_PROGRAMS = \
 	netlink_unix_diag \
 	newfstatat \
 	oldselect \
+	openat \
 	pc \
 	personality \
 	pipe \
@@ -301,6 +302,7 @@ DECODER_TESTS = \
 	net.test \
 	newfstatat.test \
 	oldselect.test \
+	openat.test \
 	personality.test \
 	pipe.test \
 	poll.test \

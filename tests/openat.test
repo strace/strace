@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check openat syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+OUT="$LOG.out"
+run_strace -eopenat $args > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

@@ -82,6 +82,7 @@ netlink_inet_diag
 netlink_unix_diag
 newfstatat
 oldselect
+openat
 pc
 personality
 pipe
