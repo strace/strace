@@ -177,8 +177,11 @@ __EOF__
 #include <linux/serial.h>
 __EOF__
 			;;
-		*drm/*_drm.h)
+		drm/sis_drm.h)
 			echo '#include <drm/drm.h>'
+			;;
+		*drm/*_drm.h)
+			echo '#include <drm/drm.h>' > "$tmpdir/drm.h"
 			;;
 		fbio.h|*/fbio.h)
 			cat <<'__EOF__'
@@ -228,7 +231,7 @@ __EOF__
 		*linux/isdn_ppp.h|*linux/gsmmux.h)
 			echo '#include <linux/if.h>'
 			;;
-		*media/saa6588.h)
+		*media*/saa6588.h)
 			echo 'typedef struct poll_table_struct poll_table;'
 			;;
 		*linux/ivtvfb.h|*linux/meye.h|*media/*.h)
@@ -298,6 +301,12 @@ __EOF__
 		*video/sstfb.h)
 			echo 'struct fb_info;'
 			;;
+		*xen/gntdev.h)
+			cat <<'__EOF__'
+typedef uint32_t grant_ref_t;
+typedef uint16_t domid_t;
+__EOF__
+			;;
 		*xen/interface/*.h)
 			return 0 # false positives
 			;;
@@ -327,7 +336,7 @@ __EOF__
 		mkdir -p "$tmpdir/${f%/*}"
 	# Hard workarounds for some processed files.  Very fragile.
 	case "$f" in
-		*acpi/*|*linux/i2o.h|*media/exynos-fimc.h|*media/v4l2-subdev.h|*net/bluetooth/*)
+		*acpi/*|*linux/i2o.h|*media*/exynos-fimc.h|*media/v4l2-subdev.h|*net/bluetooth/*|net/nfc/nci_core.h)
 			# Fetch macros only.
 			grep "${r_define}${r_cmd_name}" < "$s" > "$tmpdir/$f"
 			;;
