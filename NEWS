@@ -12,6 +12,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     spent in decoding socket details in -yy mode.
   * Implemented decoding of copy_file_range syscall.
   * Implemented dumping of vmsplice syscall.
+  * Updated lists of ioctl commands from Linux 4.5.
 
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.
