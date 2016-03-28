@@ -7,15 +7,15 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# define TMP_FILE "faccessat_tmpfile"
-
 int
 main(void)
 {
+	static const char sample[] = "faccessat.sample";
 	const long int fd = (long int) 0xdeadbeefffffffff;
-	int rc = syscall(__NR_faccessat, fd, TMP_FILE, F_OK);
+
+	int rc = syscall(__NR_faccessat, fd, sample, F_OK);
 	printf("faccessat(%d, \"%s\", F_OK) = %d %s (%m)\n",
-	       (int) fd, TMP_FILE, rc,
+	       (int) fd, sample, rc,
 	       errno == ENOSYS ? "ENOSYS" : "EBADF");
 
 	puts("+++ exited with 0 +++");
