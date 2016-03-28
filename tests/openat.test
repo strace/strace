@@ -4,8 +4,14 @@
 
 . "${srcdir=.}/init.sh"
 
+# strace -P is implemented using /proc/self/fd
+[ -d /proc/self/fd/ ] ||
+	framework_skip_ '/proc/self/fd/ is not available'
+
 run_prog > /dev/null
 OUT="$LOG.out"
-run_strace -eopenat $args > "$OUT"
+syscall=${ME_%.test}
+sample=$syscall.sample
+run_strace -e$syscall -P$sample $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"

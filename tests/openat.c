@@ -38,27 +38,27 @@
 int
 main(void)
 {
-	static const char fname[] = "openat_test_file";
+	static const char sample[] = "openat.sample";
 	int fd;
 
-	fd = syscall(__NR_openat, -100, fname, O_RDONLY|O_CREAT, 0400);
+	fd = syscall(__NR_openat, -100, sample, O_RDONLY|O_CREAT, 0400);
 	if (fd == -1) {
 		if (errno == ENOSYS) {
 			printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT"
-		               ", 0400) = -1 ENOSYS (%m)\n", fname);
+		               ", 0400) = -1 ENOSYS (%m)\n", sample);
 		} else {
 			perror_msg_and_fail("openat");
 		}
 	} else {
 		printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT"
-		       ", 0400) = %d\n", fname, fd);
+		       ", 0400) = %d\n", sample, fd);
 		close(fd);
-		if (unlink(fname) == -1)
+		if (unlink(sample) == -1)
 			perror_msg_and_fail("unlink");
-		fd = syscall(__NR_openat, -100, fname, O_RDONLY);
+		fd = syscall(__NR_openat, -100, sample, O_RDONLY);
 		if (fd == -1 && errno == ENOENT) {
 			printf("openat(AT_FDCWD, \"%s\", O_RDONLY) = %d ENOENT"
-			       " (%m)\n", fname, fd);
+			       " (%m)\n", sample, fd);
 		} else {
 			perror_msg_and_fail("openat");
 		}
