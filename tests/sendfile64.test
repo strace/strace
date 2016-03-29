@@ -4,8 +4,7 @@
 
 . "${srcdir=.}/init.sh"
 
-exe="./${ME_%.test}"
-run_prog "$exe" "$exe" > /dev/null
+run_prog > /dev/null
 OUT="$LOG.out"
 run_strace -a24 -esendfile64 $args > "$OUT"
 match_diff "$LOG" "$OUT"

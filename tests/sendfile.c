@@ -42,7 +42,7 @@
 int
 main(int ac, const char **av)
 {
-	assert(ac == 2);
+	assert(ac == 1);
 
 	(void) close(0);
 	if (open("/dev/zero", O_RDONLY) != 0)
@@ -52,9 +52,9 @@ main(int ac, const char **av)
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
 		perror_msg_and_skip("socketpair");
 
-	int reg_in = open(av[1], O_RDONLY);
+	int reg_in = open(av[0], O_RDONLY);
 	if (reg_in < 0)
-		perror_msg_and_fail("open: %s", av[1]);
+		perror_msg_and_fail("open: %s", av[0]);
 
 	struct stat stb;
 	assert(fstat(reg_in, &stb) == 0);
