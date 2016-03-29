@@ -350,3 +350,4 @@
 [322] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
 [323] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [324] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[325] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
