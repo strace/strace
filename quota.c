@@ -62,6 +62,19 @@ struct if_dqblk
 	uint32_t dqb_valid;
 };
 
+struct if_nextdqblk {
+	uint64_t dqb_bhardlimit;
+	uint64_t dqb_bsoftlimit;
+	uint64_t dqb_curspace;
+	uint64_t dqb_ihardlimit;
+	uint64_t dqb_isoftlimit;
+	uint64_t dqb_curinodes;
+	uint64_t dqb_btime;
+	uint64_t dqb_itime;
+	uint32_t dqb_valid;
+	uint32_t dqb_id;
+};
+
 struct v1_dqblk
 {
 	uint32_t dqb_bhardlimit;	/* absolute limit on disk blks alloc */
@@ -228,6 +241,31 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 				tprints("...}");
 			break;
 		}
+		case Q_GETNEXTQUOTA:
+		{
+			struct if_nextdqblk dq;
+
+			if (entering(tcp))
+				return 0;
+			if (umove_or_printaddr(tcp, data, &dq))
+				break;
+			tprintf("{bhardlimit=%" PRIu64 ", ", dq.dqb_bhardlimit);
+			tprintf("bsoftlimit=%" PRIu64 ", ", dq.dqb_bsoftlimit);
+			tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
+			tprintf("ihardlimit=%" PRIu64 ", ", dq.dqb_ihardlimit);
+			tprintf("isoftlimit=%" PRIu64 ", ", dq.dqb_isoftlimit);
+			tprintf("curinodes=%" PRIu64 ", ", dq.dqb_curinodes);
+			if (!abbrev(tcp)) {
+				tprintf("btime=%" PRIu64 ", ", dq.dqb_btime);
+				tprintf("itime=%" PRIu64 ", ", dq.dqb_itime);
+				tprints("valid=");
+				printflags(if_dqblk_valid,
+					   dq.dqb_valid, "QIF_???");
+				tprintf(", id=%u}", dq.dqb_id);
+			} else
+				tprintf("id=%u, ...}", dq.dqb_id);
+			break;
+		}
 		case Q_V1_GETQUOTA:
 			if (entering(tcp))
 				return 0;
@@ -267,6 +305,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_XGETQUOTA:
+		case Q_XGETNEXTQUOTA:
 			if (entering(tcp))
 				return 0;
 		case Q_XSETQLIM:
