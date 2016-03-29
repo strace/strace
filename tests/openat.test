@@ -4,10 +4,6 @@
 
 . "${srcdir=.}/init.sh"
 
-# strace -P is implemented using /proc/self/fd
-[ -d /proc/self/fd/ ] ||
-	framework_skip_ '/proc/self/fd/ is not available'
-
 run_prog > /dev/null
 OUT="$LOG.out"
 syscall=${ME_%.test}
