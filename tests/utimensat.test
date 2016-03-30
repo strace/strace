@@ -5,7 +5,6 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-OUT="$LOG.out"
 run_strace -e utimensat $args > "$OUT"
 
 check_prog grep

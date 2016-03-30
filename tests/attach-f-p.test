@@ -36,8 +36,6 @@ run_prog_skip_if_failed \
 	kill -0 $$
 run_prog ./attach-f-p > /dev/null 3>&1
 
-OUT="$LOG.out"
-EXP="$LOG.exp"
 ./set_ptracer_any sh -c "exec ./attach-f-p > $EXP 3> $OUT" > /dev/null &
 tracee_pid=$!
 

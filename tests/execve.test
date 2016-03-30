@@ -6,9 +6,6 @@
 
 check_prog grep
 run_prog > /dev/null
-
-OUT="$LOG.out"
-EXP="$LOG.exp"
 run_strace -eexecve $args > "$EXP"
 
 # Filter out execve() call made by strace.

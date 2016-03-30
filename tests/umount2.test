@@ -9,7 +9,6 @@ case "$STRACE_ARCH" in
 	alpha|ia64) syscall=umount ;;
 	*) syscall=umount2 ;;
 esac
-OUT="$LOG.out"
 run_strace -s7 -e$syscall $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"

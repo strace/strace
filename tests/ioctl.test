@@ -4,9 +4,6 @@
 
 . "${srcdir=.}/init.sh"
 
-OUT="$LOG.out"
-EXP="$LOG.exp"
-
 run_prog > /dev/null
 run_strace -a16 -eioctl $args > "$EXP"
 check_prog grep

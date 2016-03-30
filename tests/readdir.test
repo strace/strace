@@ -6,10 +6,7 @@
 
 rm -rf -- "$LOG".dir
 run_prog > /dev/null
-
-OUT="$LOG.out"
 run_strace -a16 -ereaddir $args > "$OUT"
-
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 

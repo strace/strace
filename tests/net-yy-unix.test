@@ -41,8 +41,6 @@ run_prog ./netlink_unix_diag
 addr="${ME_%.test}-local-stream"
 run_prog "./${ME_%.test}" $addr > /dev/null
 
-OUT="$LOG.out"
-EXP="$LOG.exp"
 run_strace -a22 -yy -eclose,network $args > "$EXP"
 # Filter out close() calls made by ld.so and libc.
 sed -n '/socket/,$p' < "$LOG" > "$OUT"

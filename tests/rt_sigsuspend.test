@@ -5,7 +5,6 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-OUT="$LOG.out"
 run_strace -a20 -ert_sigsuspend -esignal=none $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"

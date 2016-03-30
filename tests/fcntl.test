@@ -5,7 +5,6 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-OUT="$LOG.out"
 syscall=${ME_%.test}
 run_strace -a8 -e$syscall $args > "$OUT"
 match_diff "$LOG" "$OUT"

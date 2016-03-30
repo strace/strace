@@ -5,7 +5,6 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-OUT="$LOG.out"
 syscall=${ME_%.test}
 sample=$syscall.sample
 run_strace -a30 -e$syscall -P$sample $args > "$OUT"

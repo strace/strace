@@ -5,7 +5,6 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-OUT="$LOG.out"
 syscalls=clock_getres,clock_gettime,clock_settime
 run_strace -a36 -e trace=$syscalls $args > "$OUT"
 match_diff "$LOG" "$OUT"

@@ -34,7 +34,6 @@ run_prog_skip_if_failed \
 run_prog ./attach-p-cmd-cmd > /dev/null
 run_prog ./attach-p-cmd-p 1 > /dev/null
 
-OUT="$LOG.out"
 ./set_ptracer_any ./attach-p-cmd-p 1 > "$OUT" &
 tracee_pid=$!
 

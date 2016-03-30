@@ -7,7 +7,6 @@
 $STRACE -e utime -h > /dev/null ||
 	        skip_ 'utime syscall is not supported on this architecture'
 
-OUT="$LOG.out"
 run_prog > /dev/null
 run_strace -a 16 -e utime $args > "$OUT"
 

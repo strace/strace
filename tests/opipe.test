@@ -4,9 +4,6 @@
 
 . "${srcdir=.}/init.sh"
 
-OUT="$LOG.out"
-EXP="$LOG.exp"
-
 check_prog grep
 run_prog grep chdir $srcdir/umovestr.expected > "$EXP"
 run_prog ./umovestr

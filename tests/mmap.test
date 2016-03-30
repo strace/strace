@@ -49,8 +49,6 @@ else
 fi
 
 syscall=$mmap,madvise,mlockall,mprotect,mremap,msync,munmap
-EXP="$LOG.exp"
-OUT="$LOG.out"
 
 run_prog "./${ME_%.test}" $mmap > /dev/null
 run_strace -a20 -e$syscall $args > "$EXP"

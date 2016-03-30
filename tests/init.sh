@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2011-2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2011-2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,9 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ME_="${0##*/}"
+LOG="$ME_.tmp"
+OUT="$LOG.out"
+EXP="$LOG.exp"
 
 warn_() { printf >&2 '%s\n' "$*"; }
 fail_() { warn_ "$ME_: failed test: $*"; exit 1; }
@@ -200,7 +203,6 @@ match_grep()
 check_prog cat
 check_prog rm
 
-LOG="$ME_.tmp"
 rm -f "$LOG"
 
 : "${STRACE:=../strace}"

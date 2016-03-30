@@ -5,7 +5,6 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-OUT="$LOG.out"
 run_strace -a24 -esendfile64 $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"

@@ -4,9 +4,6 @@
 
 . "${srcdir=.}/init.sh"
 
-OUT="$LOG.out"
-EXP="$LOG.exp"
-
 run_prog > /dev/null
 run_strace -veexecve -s262144 $args > "$EXP"
 check_prog sed

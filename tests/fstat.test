@@ -10,7 +10,6 @@
 
 syscall=${ME_%.test}
 run_prog > /dev/null
-OUT="$LOG.out"
 sample=$syscall.sample
 > "$sample"
 run_strace -ve$syscall -P$sample $args > "$OUT"

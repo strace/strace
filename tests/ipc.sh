@@ -4,8 +4,6 @@
 
 . "${srcdir=.}/init.sh"
 
-OUT="$LOG.out"
-
 run_prog > /dev/null
 run_strace -eipc $args > "$OUT"
 match_grep "$LOG" "$OUT"

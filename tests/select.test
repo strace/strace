@@ -6,7 +6,6 @@
 
 run_prog > /dev/null
 syscall=${ME_%.test}
-OUT="$LOG.out"
 run_strace -a36 -e$syscall $args > "$OUT"
 match_diff "$LOG" "$OUT"
 

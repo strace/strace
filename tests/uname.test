@@ -6,9 +6,6 @@
 
 check_prog uniq
 
-OUT="$LOG.out"
-EXP="$LOG.exp"
-
 run_prog > /dev/null
 run_strace -v -euname $args > "$EXP"
 uniq < "$LOG" > "$OUT"
