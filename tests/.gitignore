@@ -89,7 +89,9 @@ personality
 pipe
 poll
 ppoll
+preadv
 pselect6
+pwritev
 readdir
 readlink
 readlinkat

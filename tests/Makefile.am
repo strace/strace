@@ -138,7 +138,9 @@ check_PROGRAMS = \
 	pipe \
 	poll \
 	ppoll \
+	preadv \
 	pselect6 \
+	pwritev \
 	readdir \
 	readlink \
 	readlinkat \
@@ -222,11 +224,14 @@ mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt $(LDADD)
 newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS) $(LDADD)
+preadv_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 times_LDADD = -lrt $(LDADD)
 truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
 
@@ -309,7 +314,9 @@ DECODER_TESTS = \
 	pipe.test \
 	poll.test \
 	ppoll.test \
+	preadv.test \
 	pselect6.test \
+	pwritev.test \
 	readdir.test \
 	readlink.test \
 	readlinkat.test \

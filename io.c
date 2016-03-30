@@ -186,7 +186,7 @@ SYS_FUNC(pwrite)
 }
 
 static void
-print_llu_from_low_high_val(struct tcb *tcp, int arg)
+print_lld_from_low_high_val(struct tcb *tcp, int arg)
 {
 #if SIZEOF_LONG == SIZEOF_LONG_LONG
 # if SUPPORTED_PERSONALITIES > 1
@@ -196,20 +196,20 @@ print_llu_from_low_high_val(struct tcb *tcp, int arg)
 	if (current_wordsize == sizeof(long))
 #  endif
 # endif
-		tprintf("%lu", (unsigned long) tcp->u_arg[arg]);
+		tprintf("%ld", tcp->u_arg[arg]);
 # if SUPPORTED_PERSONALITIES > 1
 	else
-		tprintf("%lu",
+		tprintf("%ld",
 			((unsigned long) tcp->u_arg[arg + 1] << current_wordsize * 8)
 			| (unsigned long) tcp->u_arg[arg]);
 # endif
 #else
 # ifdef X32
 	if (current_personality == 0)
-		tprintf("%llu", (unsigned long long) tcp->ext_arg[arg]);
+		tprintf("%lld", tcp->ext_arg[arg]);
 	else
 # endif
-	tprintf("%llu",
+	tprintf("%lld",
 		((unsigned long long) (unsigned long) tcp->u_arg[arg + 1] << sizeof(long) * 8)
 		| (unsigned long long) (unsigned long) tcp->u_arg[arg]);
 #endif
@@ -223,7 +223,7 @@ SYS_FUNC(preadv)
 	} else {
 		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		print_llu_from_low_high_val(tcp, 3);
+		print_lld_from_low_high_val(tcp, 3);
 	}
 	return 0;
 }
@@ -234,7 +234,7 @@ SYS_FUNC(pwritev)
 	tprints(", ");
 	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 	tprintf(", %lu, ", tcp->u_arg[2]);
-	print_llu_from_low_high_val(tcp, 3);
+	print_lld_from_low_high_val(tcp, 3);
 
 	return RVAL_DECODED;
 }
