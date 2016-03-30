@@ -92,6 +92,61 @@ main(void)
 		perror_msg_and_fail("preadv");
 	printf("preadv(0, [], 0, -3) = -1 EINVAL (%m)\n");
 
+	static const char tmp[] = "preadv-tmpfile";
+	int fd = open(tmp, O_RDWR | O_CREAT | O_TRUNC, 0600);
+	if (fd < 0)
+		perror_msg_and_fail("open");
+	if (unlink(tmp))
+		perror_msg_and_fail("unlink");
+
+	static const char w[] = "0123456789abcde";
+	if (write(fd, w, LENGTH_OF(w)) != LENGTH_OF(w))
+		perror_msg_and_fail("write");
+
+	static const char r0_c[] = "01234567";
+	static const char r1_c[] = "89abcde";
+
+	const unsigned int r_len = (LENGTH_OF(w) + 1) / 2;
+	void *r0 = tail_alloc(r_len);
+	const struct iovec r0_iov_[] = {
+		{
+			.iov_base = r0,
+			.iov_len = r_len
+		}
+	};
+	const struct iovec *r_iov = tail_memdup(r0_iov_, sizeof(r0_iov_));
+
+	long rc;
+
+	rc = preadv(fd, r_iov, ARRAY_SIZE(r0_iov_), 0);
+	if (rc != (int) r_len)
+		perror_msg_and_fail("preadv: expected %u, returned %ld",
+				    r_len, rc);
+	printf("preadv(%d, [{\"%s\", %u}], %u, 0) = %u\n",
+	       fd, r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len);
+
+	void *r1 = tail_alloc(r_len);
+	void *r2 = tail_alloc(LENGTH_OF(w));
+	const struct iovec r1_iov_[] = {
+		{
+			.iov_base = r1,
+			.iov_len = r_len
+		},
+		{
+			.iov_base = r2,
+			.iov_len = LENGTH_OF(w)
+		}
+	};
+	r_iov = tail_memdup(r1_iov_, sizeof(r1_iov_));
+
+	rc = preadv(fd, r_iov, ARRAY_SIZE(r1_iov_), r_len);
+	if (rc != (int) LENGTH_OF(w) - r_len)
+		perror_msg_and_fail("preadv: expected %d, returned %ld",
+				    (int) LENGTH_OF(w) - r_len, rc);
+	printf("preadv(%d, [{\"%s\", %u}, {\"\", %u}], %u, %u) = %u\n",
+	       fd, r1_c, r_len, LENGTH_OF(w), ARRAY_SIZE(r1_iov_),
+		r_len, LENGTH_OF(w) - r_len);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

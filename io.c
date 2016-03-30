@@ -221,7 +221,8 @@ SYS_FUNC(preadv)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
+		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], 1,
+				tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		print_lld_from_low_high_val(tcp, 3);
 	}
