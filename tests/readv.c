@@ -60,7 +60,7 @@ main(void)
 	void *w2 = tail_memdup(w2_c, LENGTH_OF(w2_c));
 
 	assert(writev(1, efault, 42) == -1);
-	tprintf("writev(1, [%p], 42) = -1 EFAULT (%m)\n", efault);
+	tprintf("writev(1, %p, 42) = -1 EFAULT (%m)\n", efault);
 
 	assert(readv(0, efault, 42) == -1);
 	tprintf("readv(0, %p, 42) = -1 EFAULT (%m)\n", efault);

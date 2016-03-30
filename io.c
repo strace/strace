@@ -86,17 +86,23 @@ tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr, int deco
 	} else {
 		abbrev_end = end;
 	}
-	tprints("[");
+	if (addr >= abbrev_end) {
+		tprints("[...]");
+		return;
+	}
 	for (cur = addr; cur < end; cur += sizeof_iov) {
-		if (cur > addr)
+		if (cur > addr) {
 			tprints(", ");
-		if (cur >= abbrev_end) {
-			tprints("...");
-			break;
+			if (cur >= abbrev_end) {
+				tprints("...");
+				break;
+			}
 		}
 		if (umove_ulong_array_or_printaddr(tcp, cur, iov,
 						   ARRAY_SIZE(iov)))
 			break;
+		if (cur <= addr)
+			tprints("[");
 		tprints("{");
 		if (decode_iov) {
 			unsigned long len = iov[1];
@@ -108,7 +114,8 @@ tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr, int deco
 			printaddr(iov[0]);
 		tprintf(", %lu}", iov[1]);
 	}
-	tprints("]");
+	if (cur > addr)
+		tprints("]");
 }
 
 void
