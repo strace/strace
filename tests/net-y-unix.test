@@ -35,8 +35,8 @@
 
 check_prog sed
 
-addr="${ME_%.test}-local-stream"
-run_prog "./${ME_%.test}" $addr > /dev/null
+addr="$NAME-local-stream"
+run_prog "./$NAME" $addr > /dev/null
 
 run_strace -a20 -y -eclose,network $args > "$EXP"
 # Filter out close() calls made by ld.so and libc.

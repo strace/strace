@@ -50,7 +50,7 @@ fi
 
 syscall=$mmap,madvise,mlockall,mprotect,mremap,msync,munmap
 
-run_prog "./${ME_%.test}" $mmap > /dev/null
+run_prog "./$NAME" $mmap > /dev/null
 run_strace -a20 -e$syscall $args > "$EXP"
 sed -n "/^$mmap(NULL, 0, PROT_NONE,/,\$p" < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

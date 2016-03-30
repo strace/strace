@@ -10,7 +10,7 @@ run_prog > /dev/null
 run_strace -v -euname $args > "$EXP"
 uniq < "$LOG" > "$OUT"
 
-run_prog "./${ME_%.test}" abbrev > /dev/null
+run_prog "./$NAME" abbrev > /dev/null
 run_strace -euname $args >> "$EXP"
 uniq < "$LOG" >> "$OUT"
 

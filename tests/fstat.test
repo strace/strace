@@ -8,7 +8,7 @@
 [ -d /proc/self/fd/ ] ||
 	framework_skip_ '/proc/self/fd/ is not available'
 
-syscall=${ME_%.test}
+syscall=$NAME
 run_prog > /dev/null
 sample=$syscall.sample
 > "$sample"

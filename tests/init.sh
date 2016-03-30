@@ -29,6 +29,7 @@ ME_="${0##*/}"
 LOG="$ME_.tmp"
 OUT="$LOG.out"
 EXP="$LOG.exp"
+NAME="${ME_%.test}"
 
 warn_() { printf >&2 '%s\n' "$*"; }
 fail_() { warn_ "$ME_: failed test: $*"; exit 1; }
@@ -51,7 +52,7 @@ dump_log_and_fail_with()
 run_prog()
 {
 	if [ $# -eq 0 ]; then
-		set -- "./${ME_%.test}"
+		set -- "./$NAME"
 	fi
 	args="$*"
 	"$@" || {
@@ -111,7 +112,7 @@ match_awk()
 		output="$1"; shift
 	fi
 	if [ $# -eq 0 ]; then
-		program="$srcdir/${ME_%.test}.awk"
+		program="$srcdir/$NAME.awk"
 	else
 		program="$1"; shift
 	fi
@@ -141,7 +142,7 @@ match_diff()
 		output="$1"; shift
 	fi
 	if [ $# -eq 0 ]; then
-		expected="$srcdir/${ME_%.test}.expected"
+		expected="$srcdir/$NAME.expected"
 	else
 		expected="$1"; shift
 	fi
@@ -171,7 +172,7 @@ match_grep()
 		output="$1"; shift
 	fi
 	if [ $# -eq 0 ]; then
-		patterns="$srcdir/${ME_%.test}.expected"
+		patterns="$srcdir/$NAME.expected"
 	else
 		patterns="$1"; shift
 	fi
