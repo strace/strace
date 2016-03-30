@@ -3,11 +3,4 @@
 # Check gettimeofday and settimeofday syscalls decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-syscalls=gettimeofday,settimeofday
-run_strace -a20 -e trace=$syscalls $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -a20 -e trace=gettimeofday,settimeofday

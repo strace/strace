@@ -3,10 +3,4 @@
 # Check epoll_create1 syscall decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -a28 -eepoll_create1 $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -a28

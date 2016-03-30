@@ -3,8 +3,4 @@
 # Check dup2 syscall decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -edup2 -a13 $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
+run_strace_match_diff -a13

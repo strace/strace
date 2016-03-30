@@ -201,6 +201,18 @@ match_grep()
 	}
 }
 
+# Usage: run_strace_match_diff [args to run_strace]
+run_strace_match_diff()
+{
+	args="$*"
+	[ -n "$args" -a -z "${args##*-e trace=*}" ] ||
+		set -- -e trace="$NAME" "$@"
+	run_prog > /dev/null
+	run_strace "$@" $args > "$EXP"
+	match_diff "$LOG" "$EXP"
+	rm -f "$EXP"
+}
+
 check_prog cat
 check_prog rm
 

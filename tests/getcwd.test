@@ -3,8 +3,4 @@
 # Check getcwd syscall decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -egetcwd -a18 $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
+run_strace_match_diff -a18

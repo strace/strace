@@ -3,8 +3,4 @@
 # Check getpriority and setpriority syscalls decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -egetpriority,setpriority -a29 $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
+run_strace_match_diff -a29 -e trace=getpriority,setpriority

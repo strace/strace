@@ -1,13 +1,6 @@
 #!/bin/sh
 
-# Check clock_nanosleep syscall decoding.
+# Check clock_nanosleep, clock_gettime, and setitimer syscalls decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-syscalls=clock_nanosleep,clock_gettime,setitimer
-run_strace -e trace=$syscalls $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -e trace=clock_nanosleep,clock_gettime,setitimer

@@ -4,13 +4,8 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog > /dev/null
 case "$STRACE_ARCH" in
 	alpha|ia64) syscall=umount ;;
 	*) syscall=umount2 ;;
 esac
-run_strace -s7 -e$syscall $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -s7 -e trace=$syscall

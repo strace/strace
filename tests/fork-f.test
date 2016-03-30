@@ -3,10 +3,4 @@
 # Check how strace -f follows fork syscall.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -a26 -qq -f -echdir -esignal=none $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -a26 -qq -f -e trace=chdir -e signal=none

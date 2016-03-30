@@ -3,10 +3,4 @@
 # Check getxpid, getxuid, and getxgid syscalls decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -a10 -egetxpid,getxuid,getxgid $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -a10 -e trace=getxpid,getxuid,getxgid

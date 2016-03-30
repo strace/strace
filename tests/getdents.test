@@ -5,9 +5,4 @@
 . "${srcdir=.}/init.sh"
 
 rm -rf -- "$LOG".dir
-run_prog > /dev/null
-run_strace -a22 -vegetdents $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -a22 -v

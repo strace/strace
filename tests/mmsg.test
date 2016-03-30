@@ -3,10 +3,4 @@
 # Check how iovecs in struct mmsghdr are decoded.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -e trace=recvmmsg,sendmmsg -e read=0 -e write=1 $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -e trace=recvmmsg,sendmmsg -e read=0 -e write=1

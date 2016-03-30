@@ -3,8 +3,4 @@
 # Check rt_sigprocmask syscall decoding.
 
 . "${srcdir=.}/init.sh"
-
-run_prog > /dev/null
-run_strace -ert_sigprocmask $args > "$OUT"
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
+run_strace_match_diff
