@@ -167,6 +167,7 @@ check_PROGRAMS = \
 	sendfile \
 	sendfile64 \
 	set_ptracer_any \
+	sethostname \
 	sigaction \
 	sigaltstack \
 	signalfd \
@@ -343,6 +344,7 @@ DECODER_TESTS = \
 	select.test \
 	sendfile.test \
 	sendfile64.test \
+	sethostname.test \
 	sigaction.test \
 	sigaltstack.test \
 	signalfd.test \
