@@ -35,6 +35,7 @@ fanotify_mark
 fchmod
 fcntl
 fcntl64
+fdatasync
 file_handle
 filter-unavailable
 flock

@@ -86,6 +86,7 @@ check_PROGRAMS = \
 	fchmod \
 	fcntl \
 	fcntl64 \
+	fdatasync \
 	file_handle \
 	filter-unavailable \
 	flock \
@@ -272,6 +273,7 @@ DECODER_TESTS = \
 	fchmod.test \
 	fcntl.test \
 	fcntl64.test \
+	fdatasync.test \
 	file_handle.test \
 	flock.test \
 	fstat.test \
