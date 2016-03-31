@@ -93,6 +93,7 @@ check_PROGRAMS = \
 	fstat \
 	fstat64 \
 	fstatat64 \
+	fsync \
 	ftruncate \
 	ftruncate64 \
 	getcwd \
@@ -276,6 +277,7 @@ DECODER_TESTS = \
 	fstat.test \
 	fstat64.test \
 	fstatat64.test \
+	fsync.test \
 	ftruncate.test \
 	ftruncate64.test \
 	getcwd.test \

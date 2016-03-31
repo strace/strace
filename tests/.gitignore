@@ -42,6 +42,7 @@ fork-f
 fstat
 fstat64
 fstatat64
+fsync
 ftruncate
 ftruncate64
 getcwd
