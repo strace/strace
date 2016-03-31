@@ -67,6 +67,7 @@ check_PROGRAMS = \
 	bpf \
 	caps \
 	chmod \
+	chroot \
 	clock_nanosleep \
 	clock_xettime \
 	copy_file_range \
@@ -255,6 +256,7 @@ DECODER_TESTS = \
 	bpf.test \
 	caps.test \
 	chmod.test \
+	chroot.test \
 	clock_nanosleep.test \
 	clock_xettime.test \
 	copy_file_range.test \

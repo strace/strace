@@ -16,6 +16,7 @@ attach-p-cmd-p
 bpf
 caps
 chmod
+chroot
 clock_nanosleep
 clock_xettime
 copy_file_range
