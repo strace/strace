@@ -685,6 +685,7 @@ dumpio(struct tcb *tcp)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
 			return;
 		case SEN_readv:
+		case SEN_preadv:
 			dumpiov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
 				     tcp->u_rval);
 			return;
@@ -705,6 +706,7 @@ dumpio(struct tcb *tcp)
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 			break;
 		case SEN_writev:
+		case SEN_pwritev:
 		case SEN_vmsplice:
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 			break;

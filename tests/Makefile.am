@@ -139,6 +139,7 @@ check_PROGRAMS = \
 	poll \
 	ppoll \
 	preadv \
+	preadv-pwritev \
 	pselect6 \
 	pwritev \
 	readdir \
@@ -225,6 +226,7 @@ mq_LDADD = -lrt $(LDADD)
 newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS) $(LDADD)
 preadv_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+preadv_pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -315,6 +317,7 @@ DECODER_TESTS = \
 	poll.test \
 	ppoll.test \
 	preadv.test \
+	preadv-pwritev.test \
 	pselect6.test \
 	pwritev.test \
 	readdir.test \

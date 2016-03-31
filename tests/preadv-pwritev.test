@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding and dumping of preadv and pwritev syscalls.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a19 -eread=0 -ewrite=1 -e trace=preadv,pwritev

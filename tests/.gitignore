@@ -90,6 +90,7 @@ pipe
 poll
 ppoll
 preadv
+preadv-pwritev
 pselect6
 pwritev
 readdir
