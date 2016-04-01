@@ -55,40 +55,58 @@ static const struct xlat struct_user_offsets[] = {
 	XLAT_END
 };
 
-SYS_FUNC(ptrace)
+static void
+print_user_offset_addr(const unsigned long addr)
 {
 	const struct xlat *x;
-	unsigned long addr;
+
+	for (x = struct_user_offsets; x->str; ++x) {
+		if (x->val >= addr)
+			break;
+	}
+
+	if (!x->str) {
+		printaddr(addr);
+	} else if (x->val > addr) {
+		if (x == struct_user_offsets) {
+			printaddr(addr);
+		} else {
+			--x;
+			tprintf("%s + %lu",
+				x->str, addr - (unsigned long) x->val);
+		}
+	} else {
+		tprints(x->str);
+	}
+}
+
+SYS_FUNC(ptrace)
+{
+	const long request = tcp->u_arg[0];
+	const int pid = tcp->u_arg[1];
+	const unsigned long addr = tcp->u_arg[2];
+	const unsigned long data = tcp->u_arg[3];
 
 	if (entering(tcp)) {
-		printxval(ptrace_cmds, tcp->u_arg[0], "PTRACE_???");
-		tprintf(", %lu, ", tcp->u_arg[1]);
+		printxval(ptrace_cmds, request, "PTRACE_???");
+		tprintf(", %d, ", pid);
 
-		addr = tcp->u_arg[2];
-		if (tcp->u_arg[0] == PTRACE_PEEKUSER
-		 || tcp->u_arg[0] == PTRACE_POKEUSER
-		) {
-			for (x = struct_user_offsets; x->str; x++) {
-				if (x->val >= addr)
-					break;
-			}
-			if (!x->str)
-				printaddr(addr);
-			else if (x->val > addr && x != struct_user_offsets) {
-				x--;
-				tprintf("%s + %ld", x->str, addr - x->val);
-			}
-			else
-				tprints(x->str);
-		} else
-		if (tcp->u_arg[0] == PTRACE_GETREGSET
-		 || tcp->u_arg[0] == PTRACE_SETREGSET)
-			printxval(nt_descriptor_types, tcp->u_arg[2], "NT_???");
-		else
+		switch (request) {
+		case PTRACE_PEEKUSER:
+		case PTRACE_POKEUSER:
+			print_user_offset_addr(addr);
+			break;
+		case PTRACE_GETREGSET:
+		case PTRACE_SETREGSET:
+			printxval(nt_descriptor_types, addr, "NT_???");
+			break;
+		default:
 			printaddr(addr);
+		}
+
 		tprints(", ");
 
-		switch (tcp->u_arg[0]) {
+		switch (request) {
 #ifndef IA64
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
@@ -99,43 +117,41 @@ SYS_FUNC(ptrace)
 		case PTRACE_SINGLESTEP:
 		case PTRACE_SYSCALL:
 		case PTRACE_DETACH:
-			printsignal(tcp->u_arg[3]);
+			printsignal(data);
 			break;
 		case PTRACE_SETOPTIONS:
-			printflags(ptrace_setoptions_flags, tcp->u_arg[3], "PTRACE_O_???");
+			printflags(ptrace_setoptions_flags, data, "PTRACE_O_???");
 			break;
-		case PTRACE_SETSIGINFO: {
-			printsiginfo_at(tcp, tcp->u_arg[3]);
+		case PTRACE_SETSIGINFO:
+			printsiginfo_at(tcp, data);
 			break;
-		}
 		case PTRACE_SETREGSET:
-			tprint_iov(tcp, /*len:*/ 1, tcp->u_arg[3], /*as string:*/ 0);
+			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
 			break;
 		case PTRACE_GETSIGINFO:
 		case PTRACE_GETREGSET:
 			/* Don't print anything, do it at syscall return. */
 			break;
 		default:
-			printaddr(tcp->u_arg[3]);
+			printaddr(data);
 			break;
 		}
 	} else {
-		switch (tcp->u_arg[0]) {
+		switch (request) {
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
 #ifdef IA64
 			return RVAL_HEX;
 #else
-			printnum_ptr(tcp, tcp->u_arg[3]);
+			printnum_ptr(tcp, data);
 			break;
 #endif
-		case PTRACE_GETSIGINFO: {
-			printsiginfo_at(tcp, tcp->u_arg[3]);
+		case PTRACE_GETSIGINFO:
+			printsiginfo_at(tcp, data);
 			break;
-		}
 		case PTRACE_GETREGSET:
-			tprint_iov(tcp, /*len:*/ 1, tcp->u_arg[3], /*as string:*/ 0);
+			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
 			break;
 		}
 	}
