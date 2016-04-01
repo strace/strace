@@ -1151,7 +1151,8 @@ SYS_FUNC(socketpair)
 #include "xlat/socktcpoptions.h"
 
 static void
-print_sockopt_fd_level_name(struct tcb *tcp, int fd, int level, int name, bool is_getsockopt)
+print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
+			    unsigned int name, bool is_getsockopt)
 {
 	printfd(tcp, fd);
 	tprints(", ");
@@ -1269,7 +1270,8 @@ print_icmp_filter(struct tcb *tcp, long addr, int len)
 #endif /* ICMP_FILTER */
 
 static void
-print_getsockopt(struct tcb *tcp, int level, int name, long addr, int len)
+print_getsockopt(struct tcb *tcp, unsigned int level, unsigned int name,
+		 long addr, int len)
 {
 	if (addr && verbose(tcp))
 	switch (level) {
@@ -1465,7 +1467,8 @@ print_packet_mreq(struct tcb *tcp, long addr, int len)
 #endif /* PACKET_ADD_MEMBERSHIP */
 
 static void
-print_setsockopt(struct tcb *tcp, int level, int name, long addr, int len)
+print_setsockopt(struct tcb *tcp, unsigned int level, unsigned int name,
+		 long addr, int len)
 {
 	if (addr && verbose(tcp))
 	switch (level) {
