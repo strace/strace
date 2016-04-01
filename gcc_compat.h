@@ -64,6 +64,12 @@
 # define ATTRIBUTE_NOINLINE	/* empty */
 #endif
 
+#if GNUC_PREREQ(4, 0)
+# define ATTRIBUTE_SENTINEL	__attribute__((__sentinel__))
+#else
+# define ATTRIBUTE_SENTINEL	/* empty */
+#endif
+
 #if GNUC_PREREQ(4, 3)
 # define ATTRIBUTE_ALLOC_SIZE(args)	__attribute__((__alloc_size__ args))
 #else
