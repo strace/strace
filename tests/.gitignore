@@ -34,6 +34,7 @@ execveat-v
 faccessat
 fanotify_mark
 fchmod
+fchmodat
 fcntl
 fcntl64
 fdatasync

@@ -85,6 +85,7 @@ check_PROGRAMS = \
 	faccessat \
 	fanotify_mark \
 	fchmod \
+	fchmodat \
 	fcntl \
 	fcntl64 \
 	fdatasync \
@@ -275,6 +276,7 @@ DECODER_TESTS = \
 	faccessat.test \
 	fanotify_mark.test \
 	fchmod.test \
+	fchmodat.test \
 	fcntl.test \
 	fcntl64.test \
 	fdatasync.test \
