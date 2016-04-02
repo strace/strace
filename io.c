@@ -169,7 +169,7 @@ SYS_FUNC(pread)
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+		printllval(tcp, "%lld", PREAD_OFFSET_ARG);
 	}
 	return 0;
 }
@@ -180,7 +180,7 @@ SYS_FUNC(pwrite)
 	tprints(", ");
 	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu, ", tcp->u_arg[2]);
-	printllval(tcp, "%llu", PREAD_OFFSET_ARG);
+	printllval(tcp, "%lld", PREAD_OFFSET_ARG);
 
 	return RVAL_DECODED;
 }

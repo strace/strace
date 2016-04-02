@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Check decoding and dumping of pread64 and pwrite64 syscalls.
+
+. "${srcdir=.}/init.sh"
+
+# strace -P is implemented using /proc/self/fd
+[ -d /proc/self/fd/ ] ||
+	framework_skip_ '/proc/self/fd/ is not available'
+
+tmpfile=pread64-pwrite64-tmpfile
+> $tmpfile
+
+run_strace_match_diff \
+	-a22 -eread=0 -ewrite=1 -e trace=pread64,pwrite64 \
+	-P $tmpfile -P /dev/zero -P /dev/null
+
+rm -f $tmpfile

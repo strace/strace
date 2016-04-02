@@ -92,6 +92,7 @@ personality
 pipe
 poll
 ppoll
+pread64-pwrite64
 preadv
 preadv-pwritev
 pselect6

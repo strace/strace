@@ -141,6 +141,7 @@ check_PROGRAMS = \
 	pipe \
 	poll \
 	ppoll \
+	pread64-pwrite64 \
 	preadv \
 	preadv-pwritev \
 	pselect6 \
@@ -229,6 +230,7 @@ mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt $(LDADD)
 newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS) $(LDADD)
+pread64_pwrite64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 preadv_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 preadv_pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -323,6 +325,7 @@ DECODER_TESTS = \
 	pipe.test \
 	poll.test \
 	ppoll.test \
+	pread64-pwrite64.test \
 	preadv.test \
 	preadv-pwritev.test \
 	pselect6.test \
