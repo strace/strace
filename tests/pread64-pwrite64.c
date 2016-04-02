@@ -31,8 +31,93 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/uio.h>
 #include <unistd.h>
+
+static void
+dump_str(const char *str, const unsigned int len)
+{
+	static const char dots[16] = "................";
+	unsigned int i;
+
+	for (i = 0; i < len; i += 16) {
+		unsigned int n = len - i > 16 ? 16 : len - i;
+		const char *dump = hexdump_memdup(str + i, n);
+
+		tprintf(" | %05x %-49s  %-16.*s |\n",
+			i, dump, n, dots);
+
+		free((void *) dump);
+	}
+}
+
+static void
+print_hex(const char *str, const unsigned int len)
+{
+	const unsigned char *ustr = (const unsigned char *) str;
+	unsigned int i;
+
+	for (i = 0; i < len; ++i) {
+		unsigned int c = ustr[i];
+
+		switch (c) {
+		case '\t':
+			tprintf("\\t"); break;
+		case '\n':
+			tprintf("\\n"); break;
+		case '\v':
+			tprintf("\\v"); break;
+		case '\f':
+			tprintf("\\f"); break;
+		case '\r':
+			tprintf("\\r"); break;
+		default:
+			tprintf("\\%o", ustr[i]);
+		}
+	}
+}
+
+static void
+test_dump(const unsigned int len)
+{
+	static char *buf;
+
+	if (buf) {
+		size_t ps1 = get_page_size() - 1;
+		buf = (void *) (((size_t) buf + ps1) & ~ps1) - len;
+	} else {
+		buf = tail_alloc(len);
+	}
+
+	const off_t offset = 0xdefaceddeadbeefLL + len;
+	long rc = pread(0, buf, len, offset);
+	if (rc != (int) len)
+		perror_msg_and_fail("pread64: expected %d, returned %ld",
+				    len, rc);
+
+	tprintf("%s(%d, \"", "pread64", 0);
+	print_hex(buf, len);
+	tprintf("\", %d, %lld) = %ld\n", len, (long long) offset, rc);
+	dump_str(buf, len);
+
+	unsigned int i;
+	for (i = 0; i < len; ++i)
+		buf[i] = i;
+
+	rc = pwrite(1, buf, len, offset);
+	if (rc != (int) len)
+		perror_msg_and_fail("pwrite64: expected %d, returned %ld",
+				    len, rc);
+
+	tprintf("%s(%d, \"", "pwrite64", 1);
+	print_hex(buf, len);
+	tprintf("\", %d, %lld) = %ld\n", len, (long long) offset, rc);
+	dump_str(buf, len);
+
+	if (!len)
+		buf = 0;
+}
 
 int
 main(void)
@@ -93,6 +178,11 @@ main(void)
 		w_c, w_len, rc, w_d, w_c);
 	close(1);
 
+	rc = pread(0, r0, 0, 0);
+	if (rc)
+		perror_msg_and_fail("pread64: expected 0, returned %ld", rc);
+	tprintf("pread64(0, \"\", 0, 0) = 0\n");
+
 	rc = pread(0, efault, 1, 0);
 	if (rc != -1)
 		perror_msg_and_fail("pread64: expected -1, returned %ld", rc);
@@ -120,37 +210,15 @@ main(void)
 		r1_c, w_len, r0_len, rc, r1_d, r1_c);
 	close(0);
 
-	const off_t offset = 0xdefaceddeadbeefLL;
-	const int rw_len = 8;
-	char *rw_buf = tail_alloc(rw_len);
-
 	if (open("/dev/zero", O_RDONLY))
 		perror_msg_and_fail("open");
-
-	rc = pread(0, rw_buf, rw_len, offset);
-	if (rc != rw_len)
-		perror_msg_and_fail("pread64: expected %d, returned %ld",
-				    rw_len, rc);
-
-	tprintf("%s(%d, \"%s\", %d, %lld) = %ld\n"
-		" | 00000 %-49s  %-16s |\n",
-		"pread64", 0, "\\0\\0\\0\\0\\0\\0\\0\\0",
-		rw_len, (long long) offset, rc,
-		" 00 00 00 00 00 00 00 00", "........");
 
 	if (open("/dev/null", O_WRONLY) != 1)
 		perror_msg_and_fail("open");
 
-	rc = pwrite(1, rw_buf, rw_len, offset);
-	if (rc != rw_len)
-		perror_msg_and_fail("pwrite64: expected %d, returned %ld",
-				    rw_len, rc);
-
-	tprintf("%s(%d, \"%s\", %d, %lld) = %ld\n"
-		" | 00000 %-49s  %-16s |\n",
-		"pwrite64", 1, "\\0\\0\\0\\0\\0\\0\\0\\0",
-		rw_len, (long long) offset, rc,
-		" 00 00 00 00 00 00 00 00", "........");
+	unsigned int i;
+	for (i = 0; i <= 32; ++i)
+		test_dump(i);
 
 	tprintf("+++ exited with 0 +++\n");
 	return 0;
