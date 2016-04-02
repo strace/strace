@@ -96,7 +96,7 @@ main(void)
 
 	rc = pwritev(1, w_iov, 0, 0);
 	if (rc)
-		perror_msg_and_fail("preadv: expected 0, returned %ld", rc);
+		perror_msg_and_fail("pwritev: expected 0, returned %ld", rc);
 	tprintf("pwritev(1, [], 0, 0) = 0\n");
 
 	rc = pwritev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2, 0);
