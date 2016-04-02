@@ -34,11 +34,10 @@
 #include <string.h>
 
 const char *
-hexdump_strdup(const char *src)
+hexdump_memdup(const char *src, size_t len)
 {
-	size_t src_len = strlen(src);
-	size_t dst_size = 3 * src_len + 2;
-	assert(dst_size > src_len);
+	size_t dst_size = 3 * len + 2;
+	assert(dst_size > len);
 
 	char *dst = malloc(dst_size);
 	if (!dst)
@@ -46,8 +45,8 @@ hexdump_strdup(const char *src)
 
 	char *p = dst;
 	const unsigned char *usrc = (const unsigned char *) src;
-	unsigned int i;
-	for (i = 0; usrc[i]; ++i) {
+	size_t i;
+	for (i = 0; i < len; ++i) {
 		unsigned int c = usrc[i];
 		*(p++) = ' ';
 		if (i == 8)
@@ -58,4 +57,10 @@ hexdump_strdup(const char *src)
 	*p = '\0';
 
 	return dst;
+}
+
+const char *
+hexdump_strdup(const char *src)
+{
+	return hexdump_memdup(src, strlen(src));
 }

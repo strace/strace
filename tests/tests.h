@@ -69,6 +69,9 @@ void tprintf(const char *, ...)
 /* Make a hexdump copy of C string */
 const char *hexdump_strdup(const char *);
 
+/* Make a hexdump copy of memory */
+const char *hexdump_memdup(const char *, size_t);
+
 /* Make a hexquoted copy of a string */
 const char *hexquote_strndup(const char *, size_t);
 
