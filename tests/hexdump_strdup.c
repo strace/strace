@@ -37,7 +37,7 @@ const char *
 hexdump_strdup(const char *src)
 {
 	size_t src_len = strlen(src);
-	size_t dst_size = 3 * src_len + 1;
+	size_t dst_size = 3 * src_len + 2;
 	assert(dst_size > src_len);
 
 	char *dst = malloc(dst_size);
@@ -46,9 +46,12 @@ hexdump_strdup(const char *src)
 
 	char *p = dst;
 	const unsigned char *usrc = (const unsigned char *) src;
-	for (; *usrc; ++usrc) {
-		unsigned int c = *usrc;
+	unsigned int i;
+	for (i = 0; usrc[i]; ++i) {
+		unsigned int c = usrc[i];
 		*(p++) = ' ';
+		if (i == 8)
+			*(p++) = ' ';
 		*(p++) = "0123456789abcdef"[c >> 4];
 		*(p++) = "0123456789abcdef"[c & 0xf];
 	}
