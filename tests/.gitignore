@@ -35,6 +35,7 @@ faccessat
 fanotify_mark
 fchmod
 fchmodat
+fchownat
 fcntl
 fcntl64
 fdatasync
