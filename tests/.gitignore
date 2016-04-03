@@ -99,6 +99,7 @@ preadv
 preadv-pwritev
 pselect6
 pwritev
+read-write
 readdir
 readlink
 readlinkat

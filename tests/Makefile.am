@@ -148,6 +148,7 @@ check_PROGRAMS = \
 	preadv-pwritev \
 	pselect6 \
 	pwritev \
+	read-write \
 	readdir \
 	readlink \
 	readlinkat \
@@ -334,6 +335,7 @@ DECODER_TESTS = \
 	preadv-pwritev.test \
 	pselect6.test \
 	pwritev.test \
+	read-write.test \
 	readdir.test \
 	readlink.test \
 	readlinkat.test \
