@@ -54,11 +54,11 @@ main(int ac, const char **av)
 	if (*len > sizeof(addr))
 		*len = sizeof(addr);
 
-	int listen_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
+	int listen_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (listen_fd < 0)
 		perror_msg_and_skip("socket");
 	unsigned long listen_inode = inode_of_sockfd(listen_fd);
-	printf("socket(PF_LOCAL, SOCK_STREAM, 0) = %d<socket:[%lu]>\n",
+	printf("socket(AF_LOCAL, SOCK_STREAM, 0) = %d<socket:[%lu]>\n",
 	       listen_fd, listen_inode);
 
 	(void) unlink(av[1]);
@@ -87,11 +87,11 @@ main(int ac, const char **av)
 	       ", sun_path=\"%s\"}, [%u]) = 0\n", listen_fd, listen_inode,
 	       av[1], (unsigned) *len);
 
-	int connect_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
+	int connect_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (connect_fd < 0)
 		perror_msg_and_fail("socket");
 	unsigned long connect_inode = inode_of_sockfd(connect_fd);
-	printf("socket(PF_LOCAL, SOCK_STREAM, 0) = %d<socket:[%lu]>\n",
+	printf("socket(AF_LOCAL, SOCK_STREAM, 0) = %d<socket:[%lu]>\n",
 	       connect_fd, connect_inode);
 
 	if (connect(connect_fd, listen_sa, *len))
@@ -141,11 +141,11 @@ main(int ac, const char **av)
 	assert(close(accept_fd) == 0);
 	printf("close(%d<socket:[%lu]>) = 0\n", accept_fd, accept_inode);
 
-	connect_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
+	connect_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
 	if (connect_fd < 0)
 		perror_msg_and_fail("socket");
 	connect_inode = inode_of_sockfd(connect_fd);
-	printf("socket(PF_LOCAL, SOCK_STREAM, 0) = %d<socket:[%lu]>\n",
+	printf("socket(AF_LOCAL, SOCK_STREAM, 0) = %d<socket:[%lu]>\n",
 	       connect_fd, connect_inode);
 
 	*optval = 1;

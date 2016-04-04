@@ -49,11 +49,11 @@ main(void)
 	socklen_t * const len = tail_alloc(sizeof(socklen_t));
 	*len = sizeof(addr);
 
-	const int listen_fd = socket(PF_INET, SOCK_STREAM, 0);
+	const int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (listen_fd < 0)
 		perror_msg_and_skip("socket");
 	const unsigned long listen_inode = inode_of_sockfd(listen_fd);
-	printf("socket(PF_INET, SOCK_STREAM, IPPROTO_IP) = %d<TCP:[%lu]>\n",
+	printf("socket(AF_INET, SOCK_STREAM, IPPROTO_IP) = %d<TCP:[%lu]>\n",
 	       listen_fd, listen_inode);
 
 	if (bind(listen_fd, listen_sa, *len))
@@ -85,11 +85,11 @@ main(void)
 	       ", [%u], [%u]) = 0\n",
 	       listen_fd, listen_port, *optval, (unsigned) *len);
 
-	const int connect_fd = socket(PF_INET, SOCK_STREAM, 0);
+	const int connect_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect_fd < 0)
 		perror_msg_and_fail("socket");
 	const unsigned long connect_inode = inode_of_sockfd(connect_fd);
-	printf("socket(PF_INET, SOCK_STREAM, IPPROTO_IP) = %d<TCP:[%lu]>\n",
+	printf("socket(AF_INET, SOCK_STREAM, IPPROTO_IP) = %d<TCP:[%lu]>\n",
 	       connect_fd, connect_inode);
 
 	*len = sizeof(addr);

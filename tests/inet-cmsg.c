@@ -95,7 +95,7 @@ main(void)
 	assert(!close(0));
 	assert(!close(3));
 
-	if (socket(PF_INET, SOCK_DGRAM, 0))
+	if (socket(AF_INET, SOCK_DGRAM, 0))
 		perror_msg_and_skip("socket");
 	struct sockaddr_in addr = {
 		.sin_family = AF_INET,
@@ -106,7 +106,7 @@ main(void)
 		perror_msg_and_skip("bind");
 	assert(!getsockname(0, (struct sockaddr *) &addr, &len));
 
-	assert(socket(PF_INET, SOCK_DGRAM, 0) == 3);
+	assert(socket(AF_INET, SOCK_DGRAM, 0) == 3);
 	assert(!connect(3, (struct sockaddr *) &addr, len));
 
 	const int opt_1 = htonl(0x01000000);

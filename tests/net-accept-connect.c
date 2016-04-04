@@ -62,7 +62,7 @@ main(int ac, const char **av)
 	close(0);
 	close(1);
 
-	if (socket(PF_LOCAL, SOCK_STREAM, 0))
+	if (socket(AF_LOCAL, SOCK_STREAM, 0))
 		perror_msg_and_skip("socket");
 	if (bind(0, (struct sockaddr *) &addr, len))
 		perror_msg_and_skip("bind");
@@ -93,7 +93,7 @@ main(int ac, const char **av)
 
 		assert(sigprocmask(SIG_BLOCK, &set, NULL) == 0);
 		assert(signal(SIGUSR1, handler) != SIG_ERR);
-		assert(socket(PF_LOCAL, SOCK_STREAM, 0) == 1);
+		assert(socket(AF_LOCAL, SOCK_STREAM, 0) == 1);
 		assert(close(0) == 0);
 		assert(connect(1, (struct sockaddr *) &addr, len) == 0);
 		assert(sigprocmask(SIG_UNBLOCK, &set, NULL) == 0);

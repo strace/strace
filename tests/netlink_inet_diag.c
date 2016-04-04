@@ -126,8 +126,8 @@ int main(void)
 	close(0);
 	close(1);
 
-	if (socket(PF_INET, SOCK_STREAM, 0))
-		perror_msg_and_skip("socket PF_INET");
+	if (socket(AF_INET, SOCK_STREAM, 0))
+		perror_msg_and_skip("socket AF_INET");
 	if (bind(0, (struct sockaddr *) &addr, len))
 		perror_msg_and_skip("bind");
 	if (listen(0, 5))

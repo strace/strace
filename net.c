@@ -83,11 +83,7 @@
 # include <bluetooth/rfcomm.h>
 # include <bluetooth/sco.h>
 #endif
-#ifndef PF_UNSPEC
-# define PF_UNSPEC AF_UNSPEC
-#endif
 
-#include "xlat/domains.h"
 #include "xlat/addrfams.h"
 #include "xlat/socktypes.h"
 #include "xlat/sock_type_flags.h"
@@ -99,7 +95,7 @@
 
 #include "xlat/inet_protocols.h"
 
-#ifdef PF_NETLINK
+#ifdef AF_NETLINK
 # if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
 #  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
 # endif
@@ -790,32 +786,32 @@ tprint_sock_type(int flags)
 
 SYS_FUNC(socket)
 {
-	printxval(domains, tcp->u_arg[0], "PF_???");
+	printxval(addrfams, tcp->u_arg[0], "AF_???");
 	tprints(", ");
 	tprint_sock_type(tcp->u_arg[1]);
 	tprints(", ");
 	switch (tcp->u_arg[0]) {
-	case PF_INET:
-#ifdef PF_INET6
-	case PF_INET6:
+	case AF_INET:
+#ifdef AF_INET6
+	case AF_INET6:
 #endif
 		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 		break;
-#ifdef PF_IPX
-	case PF_IPX:
+#ifdef AF_IPX
+	case AF_IPX:
 		/* BTW: I don't believe this.. */
 		tprints("[");
-		printxval(domains, tcp->u_arg[2], "PF_???");
+		printxval(addrfams, tcp->u_arg[2], "AF_???");
 		tprints("]");
 		break;
-#endif /* PF_IPX */
-#ifdef PF_NETLINK
-	case PF_NETLINK:
+#endif /* AF_IPX */
+#ifdef AF_NETLINK
+	case AF_NETLINK:
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
 #endif
-#if defined(PF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
-	case PF_BLUETOOTH:
+#if defined(AF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
+	case AF_BLUETOOTH:
 		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
 		break;
 #endif
@@ -1126,7 +1122,7 @@ SYS_FUNC(pipe2)
 SYS_FUNC(socketpair)
 {
 	if (entering(tcp)) {
-		printxval(domains, tcp->u_arg[0], "PF_???");
+		printxval(addrfams, tcp->u_arg[0], "AF_???");
 		tprints(", ");
 		tprint_sock_type(tcp->u_arg[1]);
 		tprintf(", %lu", tcp->u_arg[2]);
