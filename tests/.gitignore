@@ -65,6 +65,7 @@ ipc_shm
 ksysent
 ksysent.h
 libtests.a
+linkat
 llseek
 lseek
 lstat

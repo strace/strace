@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check linkat syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff
