@@ -289,6 +289,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	stpcpy
 	strerror
 	strsignal
+	sync_file_range
 	utimensat
 ]))
 

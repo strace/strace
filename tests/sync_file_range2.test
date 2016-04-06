@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check sync_file_range2 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff

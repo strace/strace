@@ -185,6 +185,8 @@ check_PROGRAMS = \
 	stat \
 	stat64 \
 	statfs \
+	sync_file_range \
+	sync_file_range2 \
 	sysinfo \
 	syslog \
 	tee \
@@ -369,6 +371,8 @@ DECODER_TESTS = \
 	stat64.test \
 	statfs.test \
 	sun_path.test \
+	sync_file_range.test \
+	sync_file_range2.test \
 	sysinfo.test \
 	syslog.test \
 	tee.test \
