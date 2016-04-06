@@ -73,6 +73,7 @@ lstat64
 membarrier
 memfd_create
 mincore
+mkdirat
 mknod
 mlock2
 mmap
