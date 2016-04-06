@@ -208,16 +208,12 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 #ifdef __ANDROID__
-# ifndef PR_SET_VMA
-#  define PR_SET_VMA   0x53564d41
-# endif
 # ifndef PR_SET_VMA_ANON_NAME
 #  define PR_SET_VMA_ANON_NAME    0
 # endif
 	case PR_SET_VMA:
 		if (tcp->u_arg[1] == PR_SET_VMA_ANON_NAME) {
-			tprintf(", %lu", tcp->u_arg[1]);
-			tprintf(", %#lx", tcp->u_arg[2]);
+			tprintf(", PR_SET_VMA_ANON_NAME, %#lx", tcp->u_arg[2]);
 			tprintf(", %lu, ", tcp->u_arg[3]);
 			printstr(tcp, tcp->u_arg[4], -1);
 		} else {
