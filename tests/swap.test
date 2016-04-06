@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check swapon and swapoff syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a23 -e trace=swapon,swapoff
