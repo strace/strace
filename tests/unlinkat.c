@@ -18,6 +18,13 @@ main(void)
 	       (int) fd, sample, rc,
 	       errno == ENOSYS ? "ENOSYS" : "EBADF");
 
+	rc = syscall(__NR_unlinkat, -100, sample, -1L);
+	printf("unlinkat(%s, \"%s\", %s) = %d %s (%m)\n",
+	       "AT_FDCWD", sample,
+	       "AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
+	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff",
+	       rc, errno == ENOSYS ? "ENOSYS" : "EINVAL");
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
