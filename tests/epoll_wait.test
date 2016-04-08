@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check epoll_wait syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a26

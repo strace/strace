@@ -1,0 +1,28 @@
+#include "tests.h"
+#include <sys/syscall.h>
+
+#if defined __NR_epoll_wait && defined HAVE_SYS_EPOLL_H
+
+# include <errno.h>
+# include <stdio.h>
+# include <sys/epoll.h>
+# include <unistd.h>
+
+int
+main(void)
+{
+	struct epoll_event *const ev = tail_alloc(sizeof(*ev));
+
+	int rc = syscall(__NR_epoll_wait, -1, ev, 1, -2);
+	printf("epoll_wait(-1, %p, 1, -2) = %d %s (%m)\n",
+	       ev, rc, errno == ENOSYS ? "ENOSYS" : "EBADF");
+
+	puts("+++ exited with 0 +++");
+	return 0;
+}
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_epoll_wait && HAVE_SYS_EPOLL_H")
+
+#endif
