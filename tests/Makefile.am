@@ -78,6 +78,7 @@ check_PROGRAMS = \
 	dup3 \
 	epoll_create \
 	epoll_create1 \
+	epoll_ctl \
 	eventfd \
 	execve \
 	execve-v \
@@ -278,6 +279,7 @@ DECODER_TESTS = \
 	dup3.test \
 	epoll_create.test \
 	epoll_create1.test \
+	epoll_ctl.test \
 	eventfd.test \
 	execve.test \
 	execve-v.test \
