@@ -79,6 +79,7 @@ mincore
 mkdirat
 mknod
 mlock2
+mlockall
 mmap
 mmap64
 mmsg

@@ -128,6 +128,7 @@ check_PROGRAMS = \
 	mkdirat \
 	mknod \
 	mlock2 \
+	mlockall \
 	mmap \
 	mmap64 \
 	mmsg \
@@ -327,6 +328,7 @@ DECODER_TESTS = \
 	mkdirat.test \
 	mknod.test \
 	mlock2.test \
+	mlockall.test \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \
