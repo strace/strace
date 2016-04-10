@@ -21,6 +21,14 @@ main(void)
 	       ev->data.u32, ev->data.u64, rc,
 	       errno == ENOSYS ? "ENOSYS" : "EBADF");
 
+	rc = syscall(__NR_epoll_ctl, -3, EPOLL_CTL_DEL, -4, ev);
+	printf("epoll_ctl(-3, EPOLL_CTL_DEL, -4, %p) = %d %s (%m)\n",
+	       ev, rc, errno == ENOSYS ? "ENOSYS" : "EBADF");
+
+	rc = syscall(__NR_epoll_ctl, -1L, EPOLL_CTL_MOD, -16L, 0);
+	printf("epoll_ctl(-1, EPOLL_CTL_MOD, -16, NULL) = %d %s (%m)\n",
+	       rc, errno == ENOSYS ? "ENOSYS" : "EFAULT");
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
