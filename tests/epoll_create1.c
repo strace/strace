@@ -26,25 +26,31 @@
  */
 
 #include "tests.h"
-#include <assert.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/syscall.h>
 
 #if defined __NR_epoll_create1 && defined O_CLOEXEC
 
+# include <assert.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
+
 int
 main(void)
 {
-	(void) close(0);
-
-	if (syscall(__NR_epoll_create1, O_CLOEXEC))
-		perror_msg_and_skip("epoll_create1 O_CLOEXEC");
-	puts("epoll_create1(EPOLL_CLOEXEC) = 0");
+	int rc = syscall(__NR_epoll_create1, O_CLOEXEC);
+	if (rc == -1) {
+		if (ENOSYS != errno)
+			perror_msg_and_fail("epoll_create1 O_CLOEXEC");
+		printf("epoll_create1(EPOLL_CLOEXEC) = -1 ENOSYS (%m)\n");
+	} else {
+		printf("epoll_create1(EPOLL_CLOEXEC) = %d\n", rc);
+	}
 
 	assert(syscall(__NR_epoll_create1, O_CLOEXEC | O_NONBLOCK) == -1);
-	printf("epoll_create1(EPOLL_CLOEXEC|%#x) = -1 EINVAL (%m)\n", O_NONBLOCK);
+	printf("epoll_create1(EPOLL_CLOEXEC|%#x) = -1 %s (%m)\n",
+	       O_NONBLOCK, ENOSYS == errno ? "ENOSYS" : "EINVAL");
 
 	puts("+++ exited with 0 +++");
 	return 0;
