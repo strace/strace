@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check how prctl PR_SET_SECCOMP SECCOMP_MODE_STRICT is decoded.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=prctl

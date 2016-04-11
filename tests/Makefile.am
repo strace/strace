@@ -149,6 +149,7 @@ check_PROGRAMS = \
 	pipe \
 	poll \
 	ppoll \
+	prctl-seccomp-strict \
 	pread64-pwrite64 \
 	preadv \
 	preadv-pwritev \
@@ -346,6 +347,7 @@ DECODER_TESTS = \
 	pipe.test \
 	poll.test \
 	ppoll.test \
+	prctl-seccomp-strict.test \
 	pread64-pwrite64.test \
 	preadv-pwritev.test \
 	preadv.test \
