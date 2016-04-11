@@ -185,9 +185,9 @@ check_PROGRAMS = \
 	sigaltstack \
 	signalfd \
 	sigreturn \
+	sleep \
 	splice \
 	stack-fcall \
-	sleep \
 	stat \
 	stat64 \
 	statfs \
@@ -215,8 +215,8 @@ check_PROGRAMS = \
 	umovestr \
 	umovestr2 \
 	uname \
-	unlinkat \
 	unix-pair-send-recv \
+	unlinkat \
 	userfaultfd \
 	utime \
 	utimensat \
@@ -284,10 +284,10 @@ DECODER_TESTS = \
 	epoll_ctl.test \
 	epoll_wait.test \
 	eventfd.test \
-	execve.test \
 	execve-v.test \
-	execveat.test \
+	execve.test \
 	execveat-v.test \
+	execveat.test \
 	faccessat.test \
 	fanotify_mark.test \
 	fchmod.test \
@@ -347,8 +347,8 @@ DECODER_TESTS = \
 	poll.test \
 	ppoll.test \
 	pread64-pwrite64.test \
-	preadv.test \
 	preadv-pwritev.test \
+	preadv.test \
 	pselect6.test \
 	pwritev.test \
 	read-write.test \

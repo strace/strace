@@ -166,8 +166,8 @@ umount2
 umovestr
 umovestr2
 uname
-unlinkat
 unix-pair-send-recv
+unlinkat
 userfaultfd
 utime
 utimensat
