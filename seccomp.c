@@ -68,41 +68,41 @@ decode_bpf_code(uint16_t code)
 	switch (BPF_CLASS(code)) {
 		case BPF_LD:
 		case BPF_LDX:
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_size, BPF_SIZE(code), "BPF_???");
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_mode, BPF_MODE(code), "BPF_???");
 			break;
 		case BPF_ST:
 		case BPF_STX:
 			if (i)
-				tprintf(" | %#x /* %s */", i, "BPF_???");
+				tprintf("|%#x /* %s */", i, "BPF_???");
 			break;
 		case BPF_ALU:
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_src, BPF_SRC(code), "BPF_???");
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_op_alu, BPF_OP(code), "BPF_???");
 			break;
 		case BPF_JMP:
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_src, BPF_SRC(code), "BPF_???");
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_op_jmp, BPF_OP(code), "BPF_???");
 			break;
 		case BPF_RET:
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_rval, BPF_RVAL(code), "BPF_???");
 			i &= ~BPF_RVAL(code);
 			if (i)
-				tprintf(" | %#x /* %s */", i, "BPF_???");
+				tprintf("|%#x /* %s */", i, "BPF_???");
 			break;
 		case BPF_MISC:
-			tprints(" | ");
+			tprints("|");
 			printxval(bpf_miscop, BPF_MISCOP(code), "BPF_???");
 			i &= ~BPF_MISCOP(code);
 			if (i)
-				tprintf(" | %#x /* %s */", i, "BPF_???");
+				tprintf("|%#x /* %s */", i, "BPF_???");
 			break;
 	}
 
@@ -121,7 +121,7 @@ decode_bpf_stmt(const struct bpf_filter *filter)
 
 		printxval(seccomp_ret_action, action, "SECCOMP_RET_???");
 		if (data)
-			tprintf(" | %#x)", data);
+			tprintf("|%#x)", data);
 		else
 			tprints(")");
 	} else {

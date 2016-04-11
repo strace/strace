@@ -53,29 +53,29 @@
  && defined BPF_STMT
 
 #define SOCK_FILTER_ALLOW_SYSCALL(nr) \
-		BPF_JUMP(BPF_JMP | BPF_K | BPF_JEQ, __NR_ ## nr, 0, 1), \
-		BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW)
+		BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, __NR_ ## nr, 0, 1), \
+		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW)
 
 #define SOCK_FILTER_DENY_SYSCALL(nr, err) \
-		BPF_JUMP(BPF_JMP | BPF_K | BPF_JEQ, __NR_ ## nr, 0, 1), \
-		BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | (SECCOMP_RET_DATA & (err)))
+		BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, __NR_ ## nr, 0, 1), \
+		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|(SECCOMP_RET_DATA & (err)))
 
 #define SOCK_FILTER_KILL_PROCESS \
-		BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL)
+		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)
 
 #define PRINT_ALLOW_SYSCALL(nr) \
-	printf("BPF_JUMP(BPF_JMP | BPF_K | BPF_JEQ, %#x, 0, 0x1), " \
-	       "BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW), ", \
+	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
+	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW), ", \
 	       __NR_ ## nr)
 
 #define PRINT_DENY_SYSCALL(nr, err) \
-	printf("BPF_JUMP(BPF_JMP | BPF_K | BPF_JEQ, %#x, 0, 0x1), " \
-	       "BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | %#x), ", \
+	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
+	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|%#x), ", \
 	       __NR_ ## nr, err)
 
 static const struct sock_filter filter[] = {
 	/* load syscall number */
-	BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
+	BPF_STMT(BPF_LD|BPF_W|BPF_ABS, offsetof(struct seccomp_data, nr)),
 
 	/* allow syscalls */
 	SOCK_FILTER_ALLOW_SYSCALL(close),
@@ -104,7 +104,7 @@ main(void)
 
 	printf("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, [");
 
-	printf("BPF_STMT(BPF_LD | BPF_W | BPF_ABS, %#x), ",
+	printf("BPF_STMT(BPF_LD|BPF_W|BPF_ABS, %#x), ",
 	       (unsigned) offsetof(struct seccomp_data, nr));
 
 	PRINT_ALLOW_SYSCALL(close);
@@ -114,7 +114,7 @@ main(void)
 	PRINT_DENY_SYSCALL(sync, EBUSY),
 	PRINT_DENY_SYSCALL(setsid, EPERM),
 
-	printf("BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL)");
+	printf("BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)");
 
 	puts("]) = 0");
 	puts("+++ exited with 0 +++");
