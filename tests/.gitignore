@@ -100,6 +100,7 @@ personality
 pipe
 poll
 ppoll
+prctl-seccomp-filter-v
 prctl-seccomp-strict
 pread64-pwrite64
 preadv
@@ -127,7 +128,6 @@ sched_xetattr
 sched_xetparam
 sched_xetscheduler
 scm_rights
-seccomp
 seccomp-strict
 select
 sendfile

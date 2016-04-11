@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Check how SECCOMP_MODE_FILTER is decoded.
+# Check verbose decoding of prctl PR_SET_SECCOMP SECCOMP_MODE_FILTER.
 
 . "${srcdir=.}/init.sh"
 run_strace_match_diff -v -e trace=prctl

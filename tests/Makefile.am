@@ -149,6 +149,7 @@ check_PROGRAMS = \
 	pipe \
 	poll \
 	ppoll \
+	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	pread64-pwrite64 \
 	preadv \
@@ -176,7 +177,6 @@ check_PROGRAMS = \
 	sched_xetparam \
 	sched_xetscheduler \
 	scm_rights \
-	seccomp \
 	seccomp-strict \
 	select \
 	sendfile \
@@ -348,6 +348,7 @@ DECODER_TESTS = \
 	pipe.test \
 	poll.test \
 	ppoll.test \
+	prctl-seccomp-filter-v.test \
 	prctl-seccomp-strict.test \
 	pread64-pwrite64.test \
 	preadv-pwritev.test \
@@ -375,7 +376,6 @@ DECODER_TESTS = \
 	sched_xetscheduler.test \
 	scm_rights-fd.test \
 	seccomp-strict.test \
-	seccomp.test \
 	select.test \
 	sendfile.test \
 	sendfile64.test \
