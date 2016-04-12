@@ -40,6 +40,14 @@
 int
 main(void)
 {
+# if defined __x86_64__ && defined __ILP32__
+	/*
+	 * Syscall numbers are hardcoded in
+	 * kernel/seccomp.c:__secure_computing_strict(),
+	 * but x32 syscall numbers are not supported.
+	 */
+	error_msg_and_skip("SECCOMP_SET_MODE_STRICT is not supported on x32");
+# else
 	static const char text1[] =
 		"seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL) = 0\n";
 	static const char text2[] = "+++ exited with 0 +++\n";
@@ -61,6 +69,7 @@ main(void)
 
 	rc += write(1, text2, LENGTH_OF(text2)) != LENGTH_OF(text2);
 	return !!syscall(__NR_exit, rc);
+# endif
 }
 
 #else
