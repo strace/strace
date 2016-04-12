@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of seccomp SECCOMP_SET_MODE_FILTER.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=seccomp

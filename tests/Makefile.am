@@ -177,6 +177,7 @@ check_PROGRAMS = \
 	sched_xetparam \
 	sched_xetscheduler \
 	scm_rights \
+	seccomp-filter \
 	seccomp-filter-v \
 	seccomp-strict \
 	select \
@@ -377,6 +378,7 @@ DECODER_TESTS = \
 	sched_xetscheduler.test \
 	scm_rights-fd.test \
 	seccomp-filter-v.test \
+	seccomp-filter.test \
 	seccomp-strict.test \
 	select.test \
 	sendfile.test \
