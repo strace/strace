@@ -162,32 +162,39 @@ decode_filter(const struct bpf_filter *filter)
 #endif
 
 static void
-decode_fprog(struct tcb *tcp, unsigned short len, unsigned long addr)
+decode_seccomp_fprog(struct tcb *tcp, unsigned short len, unsigned long addr)
 {
-	if (!len || abbrev(tcp)) {
-		tprintf("{len = %u, filter = ", len);
-		printaddr(addr);
-		tprints("}");
-	} else {
-		unsigned int i = 0;
+	struct bpf_filter filter;
+	const unsigned long start_addr = addr;
+	unsigned int i = 0;
 
-		tprints("[");
-		while (i < len && i < BPF_MAXINSNS) {
-			struct bpf_filter filter;
-
-			if (umove(tcp, addr, &filter) < 0)
+	for (; addr >= start_addr && i < len; ++i, addr += sizeof(filter)) {
+		if (i) {
+			tprints(", ");
+			if (i >= BPF_MAXINSNS) {
+				tprints("...");
 				break;
-			if (i)
-				tprints(", ");
-			decode_filter(&filter);
-
-			addr += sizeof(filter);
-			++i;
+			}
 		}
-		if (i < len)
-			tprints("...");
-		tprints("]");
+		if (umove_or_printaddr(tcp, addr, &filter))
+			break;
+		if (!i)
+			tprints("[");
+		decode_filter(&filter);
 	}
+	if (i)
+		tprints("]");
+}
+
+static void
+print_seccomp_fprog(struct tcb *tcp, unsigned short len, unsigned long addr)
+{
+	tprintf("{len=%u, filter=", len);
+	if (abbrev(tcp) || !len)
+		printaddr(addr);
+	else
+		decode_seccomp_fprog(tcp, len, addr);
+	tprints("}");
 }
 
 #include "seccomp_fprog.h"
@@ -198,7 +205,7 @@ print_seccomp_filter(struct tcb *tcp, unsigned long addr)
 	struct seccomp_fprog fprog;
 
 	if (fetch_seccomp_fprog(tcp, addr, &fprog))
-		decode_fprog(tcp, fprog.len, fprog.filter);
+		print_seccomp_fprog(tcp, fprog.len, fprog.filter);
 }
 
 static void

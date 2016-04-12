@@ -128,6 +128,7 @@ sched_xetattr
 sched_xetparam
 sched_xetscheduler
 scm_rights
+seccomp-filter-v
 seccomp-strict
 select
 sendfile

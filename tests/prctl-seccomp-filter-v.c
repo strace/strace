@@ -91,7 +91,7 @@ static const struct sock_filter filter[] = {
 };
 
 static const struct sock_fprog prog = {
-	.len = sizeof(filter) / sizeof(filter[0]),
+	.len = ARRAY_SIZE(filter),
 	.filter = (struct sock_filter *) filter,
 };
 
@@ -102,7 +102,8 @@ main(void)
 
 	puts("prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)  = 0");
 
-	printf("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, [");
+	printf("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, {len=%u, filter=[",
+	       prog.len);
 
 	printf("BPF_STMT(BPF_LD|BPF_W|BPF_ABS, %#x), ",
 	       (unsigned) offsetof(struct seccomp_data, nr));
@@ -116,7 +117,7 @@ main(void)
 
 	printf("BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)");
 
-	puts("]) = 0");
+	puts("]}) = 0");
 	puts("+++ exited with 0 +++");
 
 	fflush(stdout);
