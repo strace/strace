@@ -79,7 +79,13 @@ const char *hexquote_strndup(const char *, size_t);
 unsigned long inode_of_sockfd(int);
 
 /* Print string in quoted form. */
-void print_quoted_string(const char *str);
+void print_quoted_string(const char *);
+
+/* Check whether given uid matches kernel overflowuid. */
+void check_overflowuid(const int);
+
+/* Check whether given gid matches kernel overflowgid. */
+void check_overflowgid(const int);
 
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)

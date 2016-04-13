@@ -66,20 +66,7 @@ main(void)
 	int *list = 0;
 
 	uid = syscall(__NR_getuid);
-
-	(void) close(0);
-	if (open("/proc/sys/kernel/overflowuid", O_RDONLY) == 0) {
-		/* we trust the kernel */
-		char buf[sizeof(int)*3];
-		int n = read(0, buf, sizeof(buf) - 1);
-		if (n) {
-			buf[n] = '\0';
-			n = atoi(buf);
-			if (uid == n)
-				error_msg_and_skip("getuid() == overflowuid");
-		}
-		close(0);
-	}
+	check_overflowuid(uid);
 
 	assert(syscall(__NR_setuid, uid) == 0);
 	{

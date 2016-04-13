@@ -26,56 +26,42 @@
  */
 
 #include "tests.h"
-#include <sys/syscall.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#if (defined __NR_getuid || defined __NR_getxuid) \
- && defined(__NR_setuid) \
- && defined(__NR_getresuid) \
- && defined(__NR_setreuid) \
- && defined(__NR_setresuid) \
- && defined(__NR_fchown) \
- && defined(__NR_getgroups)
-
-# include <assert.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <fcntl.h>
-
-int
-main(void)
+static void
+check_overflow_id(const int id, const char *overflowid)
 {
-	int uid;
-	int size;
-	int *list = 0;
-
-# ifndef __NR_getuid
-#  define __NR_getuid __NR_getxuid
-# endif
-	uid = syscall(__NR_getuid);
-	check_overflowuid(uid);
-
-	assert(syscall(__NR_setuid, uid) == 0);
-	{
-		/*
-		 * uids returned by getresuid should be ignored
-		 * to avoid 16bit vs 32bit issues.
-		 */
-		int r, e, s;
-		assert(syscall(__NR_getresuid, &r, &e, &s) == 0);
+	int fd = open(overflowid, O_RDONLY);
+	if (fd < 0) {
+		if (ENOENT == errno)
+			return;
+		perror_msg_and_fail("open: %s", overflowid);
 	}
-	assert(syscall(__NR_setreuid, -1, -1L) == 0);
-	assert(syscall(__NR_setresuid, uid, -1, -1L) == 0);
-	assert(syscall(__NR_fchown, 1, -1, -1L) == 0);
-	assert((size = syscall(__NR_getgroups, 0, list)) >= 0);
-	assert(list = calloc(size + 1, sizeof(*list)));
-	assert(syscall(__NR_getgroups, size, list) == size);
-	return 0;
+
+	/* we trust the kernel */
+	char buf[sizeof(int)*3];
+	int n = read(fd, buf, sizeof(buf) - 1);
+	if (n > 0) {
+		buf[n] = '\0';
+		n = atoi(buf);
+		if (id == n)
+			error_msg_and_skip("%d matches %s", id, overflowid);
+	}
+
+	close(fd);
 }
 
-#else
+void
+check_overflowuid(const int uid)
+{
+	check_overflow_id(uid, "/proc/sys/kernel/overflowuid");
+}
 
-SKIP_MAIN_UNDEFINED("(__NR_getuid || __NR_getxuid)"
-		    " && __NR_setuid && __NR_getresuid && __NR_setreuid"
-		    " && __NR_setresuid && __NR_fchown && __NR_getgroups")
-
-#endif
+void
+check_overflowgid(const int gid)
+{
+	check_overflow_id(gid, "/proc/sys/kernel/overflowgid");
+}
