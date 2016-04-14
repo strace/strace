@@ -148,10 +148,10 @@ SYS_FUNC(fchown)
 void
 printuid(const char *text, const unsigned int uid)
 {
-	if ((unsigned int) -1 == uid || (uid_t) -1 == uid)
+	if ((uid_t) -1U == (uid_t) uid)
 		tprintf("%s-1", text);
 	else
-		tprintf("%s%u", text, uid);
+		tprintf("%s%u", text, (uid_t) uid);
 }
 
 SYS_FUNC(setgroups)
