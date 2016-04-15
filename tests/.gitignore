@@ -16,6 +16,7 @@ attach-p-cmd-p
 bpf
 caps
 chmod
+chown
 chroot
 clock_nanosleep
 clock_xettime

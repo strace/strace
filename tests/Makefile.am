@@ -68,6 +68,7 @@ check_PROGRAMS = \
 	bpf \
 	caps \
 	chmod \
+	chown \
 	chroot \
 	clock_nanosleep \
 	clock_xettime \
@@ -276,6 +277,7 @@ DECODER_TESTS = \
 	bpf.test \
 	caps.test \
 	chmod.test \
+	chown.test \
 	chroot.test \
 	clock_nanosleep.test \
 	clock_xettime.test \
@@ -504,6 +506,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     umovestr.expected \
 	     wait.expected \
 	     xattr.expected \
+	     xchownx.c \
 	     xselect.c \
 	     xstatx.c \
 	     $(TESTS)

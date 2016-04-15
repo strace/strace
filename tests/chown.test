@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check chown syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a29
