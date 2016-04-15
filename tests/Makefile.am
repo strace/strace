@@ -69,6 +69,7 @@ check_PROGRAMS = \
 	caps \
 	chmod \
 	chown \
+	chown32 \
 	chroot \
 	clock_nanosleep \
 	clock_xettime \
@@ -278,6 +279,7 @@ DECODER_TESTS = \
 	caps.test \
 	chmod.test \
 	chown.test \
+	chown32.test \
 	chroot.test \
 	clock_nanosleep.test \
 	clock_xettime.test \

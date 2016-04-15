@@ -17,6 +17,7 @@ bpf
 caps
 chmod
 chown
+chown32
 chroot
 clock_nanosleep
 clock_xettime
