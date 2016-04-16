@@ -120,6 +120,7 @@ check_PROGRAMS = \
 	ipc_sem \
 	ipc_shm \
 	ksysent \
+	lchown \
 	linkat \
 	llseek \
 	lseek \
@@ -326,6 +327,7 @@ DECODER_TESTS = \
 	ipc_msgbuf.test \
 	ipc_sem.test \
 	ipc_shm.test \
+	lchown.test \
 	linkat.test \
 	llseek.test \
 	lseek.test \

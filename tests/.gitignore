@@ -69,6 +69,7 @@ ipc_sem
 ipc_shm
 ksysent
 ksysent.h
+lchown
 libtests.a
 linkat
 llseek
