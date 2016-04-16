@@ -70,6 +70,7 @@ ipc_shm
 ksysent
 ksysent.h
 lchown
+lchown32
 libtests.a
 linkat
 llseek

@@ -121,6 +121,7 @@ check_PROGRAMS = \
 	ipc_shm \
 	ksysent \
 	lchown \
+	lchown32 \
 	linkat \
 	llseek \
 	lseek \
@@ -328,6 +329,7 @@ DECODER_TESTS = \
 	ipc_sem.test \
 	ipc_shm.test \
 	lchown.test \
+	lchown32.test \
 	linkat.test \
 	llseek.test \
 	lseek.test \
