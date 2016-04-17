@@ -93,6 +93,7 @@ check_PROGRAMS = \
 	fchmod \
 	fchmodat \
 	fchown \
+	fchown32 \
 	fchownat \
 	fcntl \
 	fcntl64 \
@@ -305,6 +306,7 @@ DECODER_TESTS = \
 	fchmod.test \
 	fchmodat.test \
 	fchown.test \
+	fchown32.test \
 	fchownat.test \
 	fcntl.test \
 	fcntl64.test \

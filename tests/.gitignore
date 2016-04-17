@@ -41,6 +41,7 @@ fanotify_mark
 fchmod
 fchmodat
 fchown
+fchown32
 fchownat
 fcntl
 fcntl64
