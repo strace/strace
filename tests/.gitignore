@@ -40,6 +40,7 @@ faccessat
 fanotify_mark
 fchmod
 fchmodat
+fchown
 fchownat
 fcntl
 fcntl64

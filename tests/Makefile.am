@@ -92,6 +92,7 @@ check_PROGRAMS = \
 	fanotify_mark \
 	fchmod \
 	fchmodat \
+	fchown \
 	fchownat \
 	fcntl \
 	fcntl64 \
@@ -303,6 +304,7 @@ DECODER_TESTS = \
 	fanotify_mark.test \
 	fchmod.test \
 	fchmodat.test \
+	fchown.test \
 	fchownat.test \
 	fcntl.test \
 	fcntl64.test \
