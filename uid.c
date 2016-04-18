@@ -75,8 +75,7 @@ SYS_FUNC(getuid)
 
 SYS_FUNC(setfsuid)
 {
-	if (entering(tcp))
-		tprintf("%u", (uid_t) tcp->u_arg[0]);
+	tprintf("%u", (uid_t) tcp->u_arg[0]);
 
 	return RVAL_UDECIMAL | RVAL_DECODED;
 }
