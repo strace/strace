@@ -193,6 +193,7 @@ check_PROGRAMS = \
 	sendfile64 \
 	set_ptracer_any \
 	setfsuid \
+	setfsuid32 \
 	setgid \
 	setgid32 \
 	sethostname \
@@ -413,6 +414,7 @@ DECODER_TESTS = \
 	sendfile.test \
 	sendfile64.test \
 	setfsuid.test \
+	setfsuid32.test \
 	setgid.test \
 	setgid32.test \
 	sethostname.test \

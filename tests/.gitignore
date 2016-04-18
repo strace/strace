@@ -143,6 +143,7 @@ sendfile
 sendfile64
 set_ptracer_any
 setfsuid
+setfsuid32
 setgid
 setgid32
 sethostname
