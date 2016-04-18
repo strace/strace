@@ -195,6 +195,7 @@ check_PROGRAMS = \
 	setgid \
 	setgid32 \
 	sethostname \
+	setreuid \
 	setuid \
 	setuid32 \
 	shmxt \
@@ -406,6 +407,7 @@ DECODER_TESTS = \
 	setgid.test \
 	setgid32.test \
 	sethostname.test \
+	setreuid.test \
 	setuid.test \
 	setuid32.test \
 	shmxt.test \
@@ -514,6 +516,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
+	     setreugid.c \
 	     setugid.c \
 	     sigaction.awk \
 	     sigaltstack.expected \
