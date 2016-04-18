@@ -198,6 +198,7 @@ check_PROGRAMS = \
 	setregid \
 	setregid32 \
 	setresgid \
+	setresgid32 \
 	setresuid \
 	setresuid32 \
 	setreuid \
@@ -416,6 +417,7 @@ DECODER_TESTS = \
 	setregid.test \
 	setregid32.test \
 	setresgid.test \
+	setresgid32.test \
 	setresuid.test \
 	setresuid32.test \
 	setreuid.test \
