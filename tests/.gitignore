@@ -146,6 +146,7 @@ setgid
 setgid32
 sethostname
 setreuid
+setreuid32
 setuid
 setuid32
 shmxt
