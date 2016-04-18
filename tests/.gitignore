@@ -143,6 +143,7 @@ sendfile
 sendfile64
 set_ptracer_any
 sethostname
+shmxt
 sigaction
 sigaltstack
 signalfd

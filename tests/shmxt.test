@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Check shmat and shmdt syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+case "$STRACE_ARCH" in
+	alpha) shmat=osf_shmat ;;
+	*) shmat=shmat ;;
+esac
+
+run_strace_match_diff -e trace=$shmat,shmdt -a11
