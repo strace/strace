@@ -196,6 +196,7 @@ check_PROGRAMS = \
 	setgid32 \
 	sethostname \
 	setregid \
+	setregid32 \
 	setreuid \
 	setreuid32 \
 	setuid \
@@ -410,6 +411,7 @@ DECODER_TESTS = \
 	setgid32.test \
 	sethostname.test \
 	setregid.test \
+	setregid32.test \
 	setreuid.test \
 	setreuid32.test \
 	setuid.test \
