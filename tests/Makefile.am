@@ -193,6 +193,7 @@ check_PROGRAMS = \
 	sendfile64 \
 	set_ptracer_any \
 	sethostname \
+	setuid \
 	shmxt \
 	sigaction \
 	sigaltstack \
@@ -400,6 +401,7 @@ DECODER_TESTS = \
 	sendfile.test \
 	sendfile64.test \
 	sethostname.test \
+	setuid.test \
 	shmxt.test \
 	sigaction.test \
 	sigaltstack.test \
@@ -506,6 +508,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
+	     setugid.c \
 	     sigaction.awk \
 	     sigaltstack.expected \
 	     signalfd.expected \
