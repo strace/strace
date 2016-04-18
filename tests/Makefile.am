@@ -194,6 +194,7 @@ check_PROGRAMS = \
 	set_ptracer_any \
 	sethostname \
 	setuid \
+	setuid32 \
 	shmxt \
 	sigaction \
 	sigaltstack \
@@ -402,6 +403,7 @@ DECODER_TESTS = \
 	sendfile64.test \
 	sethostname.test \
 	setuid.test \
+	setuid32.test \
 	shmxt.test \
 	sigaction.test \
 	sigaltstack.test \

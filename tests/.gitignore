@@ -144,6 +144,7 @@ sendfile64
 set_ptracer_any
 sethostname
 setuid
+setuid32
 shmxt
 sigaction
 sigaltstack
