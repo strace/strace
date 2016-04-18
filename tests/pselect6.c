@@ -137,8 +137,9 @@ int main(int ac, char **av)
 
 	tm.ts.tv_nsec = 222222222;
 	assert(pselect(0, NULL, NULL, NULL, &tm.ts, &mask) == -1);
-	puts("pselect6(0, NULL, NULL, NULL, {0, 222222222}, {[HUP CHLD], 8})"
-	     " = ? ERESTARTNOHAND (To be restarted if no handler)");
+	printf("pselect6(0, NULL, NULL, NULL, {0, 222222222}, {[HUP CHLD], %u})"
+	       " = ? ERESTARTNOHAND (To be restarted if no handler)\n",
+	       NSIG / 8);
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
 
 	puts("+++ exited with 0 +++");
