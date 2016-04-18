@@ -148,6 +148,7 @@ sethostname
 setregid
 setregid32
 setresuid
+setresuid32
 setreuid
 setreuid32
 setuid
