@@ -192,6 +192,7 @@ check_PROGRAMS = \
 	sendfile \
 	sendfile64 \
 	set_ptracer_any \
+	setfsuid \
 	setgid \
 	setgid32 \
 	sethostname \
@@ -411,6 +412,7 @@ DECODER_TESTS = \
 	semop.test \
 	sendfile.test \
 	sendfile64.test \
+	setfsuid.test \
 	setgid.test \
 	setgid32.test \
 	sethostname.test \
@@ -530,6 +532,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
+	     setfsugid.c \
 	     setreugid.c \
 	     setresugid.c \
 	     setugid.c \
