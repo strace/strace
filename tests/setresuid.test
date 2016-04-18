@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check setresuid syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a19
