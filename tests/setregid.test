@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check setregid syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a15
