@@ -138,6 +138,7 @@ seccomp-filter
 seccomp-filter-v
 seccomp-strict
 select
+semop
 sendfile
 sendfile64
 set_ptracer_any

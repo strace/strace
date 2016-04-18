@@ -188,6 +188,7 @@ check_PROGRAMS = \
 	seccomp-filter-v \
 	seccomp-strict \
 	select \
+	semop \
 	sendfile \
 	sendfile64 \
 	set_ptracer_any \
@@ -394,6 +395,7 @@ DECODER_TESTS = \
 	seccomp-filter.test \
 	seccomp-strict.test \
 	select.test \
+	semop.test \
 	sendfile.test \
 	sendfile64.test \
 	sethostname.test \
