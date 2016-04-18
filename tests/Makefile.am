@@ -192,6 +192,7 @@ check_PROGRAMS = \
 	sendfile \
 	sendfile64 \
 	set_ptracer_any \
+	setgid \
 	sethostname \
 	setuid \
 	setuid32 \
@@ -401,6 +402,7 @@ DECODER_TESTS = \
 	semop.test \
 	sendfile.test \
 	sendfile64.test \
+	setgid.test \
 	sethostname.test \
 	setuid.test \
 	setuid32.test \

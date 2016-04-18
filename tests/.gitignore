@@ -142,6 +142,7 @@ semop
 sendfile
 sendfile64
 set_ptracer_any
+setgid
 sethostname
 setuid
 setuid32
