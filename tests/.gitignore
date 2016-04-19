@@ -59,6 +59,12 @@ ftruncate64
 getcwd
 getdents
 getdents64
+getegid
+getegid32
+geteuid
+geteuid32
+getgid
+getgid32
 getgroups
 getgroups32
 getrandom
@@ -67,6 +73,8 @@ getresgid32
 getresuid
 getresuid32
 getrusage
+getuid
+getuid32
 getxxid
 inet-cmsg
 ioctl

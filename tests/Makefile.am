@@ -111,6 +111,12 @@ check_PROGRAMS = \
 	getcwd \
 	getdents \
 	getdents64 \
+	getegid \
+	getegid32 \
+	geteuid \
+	geteuid32 \
+	getgid \
+	getgid32 \
 	getgroups \
 	getgroups32 \
 	getrandom \
@@ -119,6 +125,8 @@ check_PROGRAMS = \
 	getresuid \
 	getresuid32 \
 	getrusage \
+	getuid \
+	getuid32 \
 	getxxid \
 	inet-cmsg \
 	ioctl \
@@ -351,6 +359,12 @@ DECODER_TESTS = \
 	getcwd.test \
 	getdents.test \
 	getdents64.test \
+	getegid.test \
+	getegid32.test \
+	geteuid.test \
+	geteuid32.test \
+	getgid.test \
+	getgid32.test \
 	getgroups.test \
 	getgroups32.test \
 	getrandom.test \
@@ -359,6 +373,8 @@ DECODER_TESTS = \
 	getresuid.test \
 	getresuid32.test \
 	getrusage.test \
+	getuid.test \
+	getuid32.test \
 	getxxid.test \
 	inet-cmsg.test \
 	ioctl.test \

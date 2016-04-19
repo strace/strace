@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Check getuid syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+check_prog uniq
+run_prog > /dev/null
+run_strace -qq -a9 -e$NAME $args > "$EXP"
+uniq < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+rm -f "$OUT" "$EXP"

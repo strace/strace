@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check geteuid syscall decoding.
+
+. "${srcdir=.}/getuid.test"
