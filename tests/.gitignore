@@ -203,9 +203,6 @@ times
 times-fail
 truncate
 truncate64
-uid
-uid16
-uid32
 uio
 umask
 umount

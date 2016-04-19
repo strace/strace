@@ -253,9 +253,6 @@ check_PROGRAMS = \
 	times-fail \
 	truncate \
 	truncate64 \
-	uid \
-	uid16 \
-	uid32 \
 	uio \
 	umask \
 	umount \
@@ -494,9 +491,6 @@ DECODER_TESTS = \
 	times.test \
 	truncate.test \
 	truncate64.test \
-	uid.test \
-	uid16.test \
-	uid32.test \
 	uio.test \
 	umask.test \
 	umount.test \
@@ -590,7 +584,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     strace-r.expected \
 	     struct_flock.c \
 	     sun_path.expected \
-	     uid.awk \
 	     uio.expected \
 	     umovestr.expected \
 	     wait.expected \
