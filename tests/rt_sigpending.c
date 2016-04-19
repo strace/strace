@@ -48,8 +48,11 @@ static void
 iterate(const char *const text, unsigned int size, void *set)
 {
 	for (;;) {
-		if (k_sigpending(set, size))
-			perror_msg_and_fail("rt_sigpending");
+		if (k_sigpending(set, size)) {
+			tprintf("rt_sigpending(%p, %u) = -1 EFAULT (%m)\n",
+				set, size);
+			break;
+		}
 		if (size) {
 #if WORDS_BIGENDIAN
 			if (size < sizeof(long))
