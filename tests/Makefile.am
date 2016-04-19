@@ -115,6 +115,7 @@ check_PROGRAMS = \
 	getgroups32 \
 	getrandom \
 	getresuid \
+	getresuid32 \
 	getrusage \
 	getxxid \
 	inet-cmsg \
@@ -352,6 +353,7 @@ DECODER_TESTS = \
 	getgroups32.test \
 	getrandom.test \
 	getresuid.test \
+	getresuid32.test \
 	getrusage.test \
 	getxxid.test \
 	inet-cmsg.test \

@@ -63,6 +63,7 @@ getgroups
 getgroups32
 getrandom
 getresuid
+getresuid32
 getrusage
 getxxid
 inet-cmsg
