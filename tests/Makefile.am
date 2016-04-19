@@ -111,6 +111,8 @@ check_PROGRAMS = \
 	getcwd \
 	getdents \
 	getdents64 \
+	getgroups \
+	getgroups32 \
 	getrandom \
 	getrusage \
 	getxxid \
@@ -198,6 +200,8 @@ check_PROGRAMS = \
 	setfsuid32 \
 	setgid \
 	setgid32 \
+	setgroups \
+	setgroups32 \
 	sethostname \
 	setregid \
 	setregid32 \
@@ -340,6 +344,8 @@ DECODER_TESTS = \
 	getcwd.test \
 	getdents.test \
 	getdents64.test \
+	getgroups.test \
+	getgroups32.test \
 	getrandom.test \
 	getrusage.test \
 	getxxid.test \
@@ -421,6 +427,8 @@ DECODER_TESTS = \
 	setfsuid32.test \
 	setgid.test \
 	setgid32.test \
+	setgroups.test \
+	setgroups32.test \
 	sethostname.test \
 	setregid.test \
 	setregid32.test \

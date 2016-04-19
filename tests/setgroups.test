@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check setgroups syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -s2 -a17

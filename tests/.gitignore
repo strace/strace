@@ -59,6 +59,8 @@ ftruncate64
 getcwd
 getdents
 getdents64
+getgroups
+getgroups32
 getrandom
 getrusage
 getxxid
@@ -148,6 +150,8 @@ setfsuid
 setfsuid32
 setgid
 setgid32
+setgroups
+setgroups32
 sethostname
 setregid
 setregid32

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check getgroups32 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a19
