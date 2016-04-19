@@ -62,6 +62,7 @@ getdents64
 getgroups
 getgroups32
 getrandom
+getresuid
 getrusage
 getxxid
 inet-cmsg

@@ -114,6 +114,7 @@ check_PROGRAMS = \
 	getgroups \
 	getgroups32 \
 	getrandom \
+	getresuid \
 	getrusage \
 	getxxid \
 	inet-cmsg \
@@ -350,6 +351,7 @@ DECODER_TESTS = \
 	getgroups.test \
 	getgroups32.test \
 	getrandom.test \
+	getresuid.test \
 	getrusage.test \
 	getxxid.test \
 	inet-cmsg.test \
@@ -540,6 +542,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     filter-unavailable.expected \
 	     fstatat.c \
 	     fstatx.c \
+	     getresugid.c \
 	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
