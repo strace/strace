@@ -67,6 +67,7 @@ getxxid
 inet-cmsg
 ioctl
 ioperm
+iopl
 ip_mreq
 ipc_msg
 ipc_msgbuf

@@ -119,6 +119,7 @@ check_PROGRAMS = \
 	inet-cmsg \
 	ioctl \
 	ioperm \
+	iopl \
 	ip_mreq \
 	ipc_msg \
 	ipc_msgbuf \
@@ -353,6 +354,7 @@ DECODER_TESTS = \
 	inet-cmsg.test \
 	ioctl.test \
 	ioperm.test \
+	iopl.test \
 	ip_mreq.test \
 	ipc_msg.test \
 	ipc_msgbuf.test \
