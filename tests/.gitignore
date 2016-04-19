@@ -66,6 +66,7 @@ getrusage
 getxxid
 inet-cmsg
 ioctl
+ioperm
 ip_mreq
 ipc_msg
 ipc_msgbuf

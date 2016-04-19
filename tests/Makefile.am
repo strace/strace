@@ -118,6 +118,7 @@ check_PROGRAMS = \
 	getxxid \
 	inet-cmsg \
 	ioctl \
+	ioperm \
 	ip_mreq \
 	ipc_msg \
 	ipc_msgbuf \
@@ -351,6 +352,7 @@ DECODER_TESTS = \
 	getxxid.test \
 	inet-cmsg.test \
 	ioctl.test \
+	ioperm.test \
 	ip_mreq.test \
 	ipc_msg.test \
 	ipc_msgbuf.test \

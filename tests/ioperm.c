@@ -1,0 +1,40 @@
+#include "tests.h"
+#include <sys/syscall.h>
+
+#ifdef __NR_ioperm
+
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
+
+int
+main(void)
+{
+	const unsigned long port = (unsigned long) 0xdeafbeefffffffff;
+	long rc = syscall(__NR_ioperm, port, 1, 0);
+	const char *error_text;
+	switch (errno) {
+		case EIO:
+			error_text = "EIO";
+			break;
+		case ENOSYS:
+			error_text = "ENOSYS";
+			break;
+		case EPERM:
+			error_text = "EPERM";
+			break;
+		default:
+			error_text = "EINVAL";
+	}
+	printf("ioperm(%#lx, %#lx, %d) = %ld %s (%m)\n",
+	       port, 1UL, 0, rc, error_text);
+
+	puts("+++ exited with 0 +++");
+	return 0;
+}
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_ioperm")
+
+#endif
