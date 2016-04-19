@@ -29,6 +29,7 @@
 
 #ifdef HAVE_PWRITEV
 
+# include <errno.h>
 # include <fcntl.h>
 # include <stdio.h>
 # include <sys/uio.h>
@@ -115,8 +116,9 @@ main(void)
 			perror_msg_and_fail("pwritev");
 		fputs("pwritev(0, ", stdout);
 		print_iovec(iov + i, n, LEN - i);
-		printf(", %u, %lld) = -1 EFAULT (%m)\n",
-		       n, (long long) offset + LEN + i);
+		printf(", %u, %lld) = -1 %s (%m)\n",
+		       n, (long long) offset + LEN + i,
+		       errno == EINVAL ? "EINVAL" : "EFAULT");
 	}
 
 	iov->iov_base = iov + LEN * 2;

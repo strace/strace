@@ -30,6 +30,7 @@
 #include "tests.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/uio.h>
@@ -60,10 +61,12 @@ main(void)
 	void *w2 = tail_memdup(w2_c, LENGTH_OF(w2_c));
 
 	assert(writev(1, efault, 42) == -1);
-	tprintf("writev(1, %p, 42) = -1 EFAULT (%m)\n", efault);
+	tprintf("writev(1, %p, 42) = -1 %s (%m)\n",
+		efault, errno == EINVAL ? "EINVAL" : "EFAULT");
 
 	assert(readv(0, efault, 42) == -1);
-	tprintf("readv(0, %p, 42) = -1 EFAULT (%m)\n", efault);
+	tprintf("readv(0, %p, 42) = -1 %s (%m)\n",
+		efault, errno == EINVAL ? "EINVAL" : "EFAULT");
 
 	static const char r0_c[] = "01234567";
 	const char *r0_d = hexdump_strdup(r0_c);
@@ -88,8 +91,9 @@ main(void)
 	tprintf("writev(1, [], 0) = 0\n");
 
 	assert(writev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2) == -1);
-	tprintf("writev(1, [{\"%s\", %u}, %p], 2) = -1 EFAULT (%m)\n",
-		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_));
+	tprintf("writev(1, [{\"%s\", %u}, %p], 2) = -1 %s (%m)\n",
+		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
+		errno == EINVAL ? "EINVAL" : "EFAULT");
 
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);
