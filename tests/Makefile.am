@@ -114,6 +114,7 @@ check_PROGRAMS = \
 	getgroups \
 	getgroups32 \
 	getrandom \
+	getresgid \
 	getresuid \
 	getresuid32 \
 	getrusage \
@@ -352,6 +353,7 @@ DECODER_TESTS = \
 	getgroups.test \
 	getgroups32.test \
 	getrandom.test \
+	getresgid.test \
 	getresuid.test \
 	getresuid32.test \
 	getrusage.test \
