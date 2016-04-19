@@ -63,6 +63,7 @@ getgroups
 getgroups32
 getrandom
 getresgid
+getresgid32
 getresuid
 getresuid32
 getrusage
