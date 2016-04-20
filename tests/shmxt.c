@@ -40,10 +40,10 @@ main(void)
 		perror_msg_and_skip("shmdt");
 	printf("shmdt(%p) = 0\n", shmaddr);
 
-	void *shmaddr2 = shmat(id, shmaddr, SHM_RND);
+	void *shmaddr2 = shmat(id, shmaddr, 0);
 	if (shmaddr2 == (void *)(-1))
-		perror_msg_and_skip("shmat SHM_RND");
-	printf("%s(%d, %p, SHM_RND) = %p\n",
+		perror_msg_and_skip("shmat %p", shmaddr);
+	printf("%s(%d, %p, 0) = %p\n",
 	       SHMAT, id, shmaddr, shmaddr2);
 
 	puts("+++ exited with 0 +++");
