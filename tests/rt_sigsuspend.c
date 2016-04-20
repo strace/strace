@@ -48,11 +48,13 @@ k_sigsuspend(const sigset_t *const set, const unsigned long size)
 
 static void
 iterate(const char *const text, const int sig,
-	const void *set, unsigned int size)
+	const void *const set, unsigned int size)
 {
-	for (;;) {
+	const void *mask;
+
+	for (mask = set;; size >>= 1, mask += size) {
 		raise(sig);
-		assert(k_sigsuspend(set, size) == -1);
+		assert(k_sigsuspend(mask, size) == -1);
 		if (EINTR == errno) {
 			tprintf("rt_sigsuspend(%s, %u) = ? ERESTARTNOHAND"
 				" (To be restarted if no handler)\n",
@@ -61,16 +63,14 @@ iterate(const char *const text, const int sig,
 			if (size < sizeof(long))
 				tprintf("rt_sigsuspend(%p, %u)"
 					" = -1 EINVAL (%m)\n",
-					set, size);
+					mask, size);
 			else
 				tprintf("rt_sigsuspend(%s, %u)"
 					" = -1 EINVAL (%m)\n",
-					text, size);
+					set == mask ? text : "~[]", size);
 		}
 		if (!size)
 			break;
-		size >>= 1;
-		set += size;
 	}
 }
 
