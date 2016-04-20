@@ -110,7 +110,7 @@
 [4107] = { 2,	TF,		SEN(lstat),			"lstat"			},
 [4108] = { 2,	TD,		SEN(fstat),			"fstat"			},
 [4109] = { 1,	0,		SEN(olduname),			"olduname"		},
-[4110] = { 0,	0,		SEN(iopl),			"iopl"			},
+[4110] = { 1,	0,		SEN(iopl),			"iopl"			},
 [4111] = { 0,	0,		SEN(vhangup),			"vhangup"		},
 [4112] = { 0,	0,		SEN(idle),			"idle"			},
 [4113] = { 5,	0,		SEN(vm86old),			"vm86"			},

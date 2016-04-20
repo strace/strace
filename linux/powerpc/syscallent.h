@@ -136,7 +136,7 @@
 [107] = { 2,	TF,		SEN(lstat),			"lstat"			},
 [108] = { 2,	TD,		SEN(fstat),			"fstat"			},
 [109] = { 1,	0,		SEN(olduname),			"olduname"		},
-[110] = { 5,	0,		SEN(printargs),			"iopl"			},
+[110] = { 1,	0,		SEN(iopl),			"iopl"			},
 [111] = { 0,	0,		SEN(vhangup),			"vhangup"		},
 [112] = { 0,	0,		SEN(idle),			"idle"			},
 [113] = { 5,	0,		SEN(vm86),			"vm86"			},
