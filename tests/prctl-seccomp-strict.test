@@ -3,4 +3,11 @@
 # Check how prctl PR_SET_SECCOMP SECCOMP_MODE_STRICT is decoded.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=prctl
+
+check_prog grep
+run_prog > /dev/null
+run_strace -eprctl $args > "$EXP"
+grep -v '^prctl(PR_GET_' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"
