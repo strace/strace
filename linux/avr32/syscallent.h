@@ -305,7 +305,7 @@
 [277] = { 3,	TI,		SEN(shmctl),			"shmctl"		},
 [278] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
 [279] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
-[280] = { 2,	TD,		SEN(timerfd),			"timerfd"		},
+[280] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
 [281] = { 1,	TD,		SEN(eventfd),			"eventfd"		},
 [282] = { },
 [283] = { 2,	TD,		SEN(setns),			"setns"			},

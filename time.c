@@ -303,18 +303,6 @@ SYS_FUNC(timer_gettime)
 
 #include "xlat/timerfdflags.h"
 
-SYS_FUNC(timerfd)
-{
-	tprintf("%ld, ", tcp->u_arg[0]);
-	printclockname(tcp->u_arg[0]);
-	tprints(", ");
-	printflags(timerfdflags, tcp->u_arg[2], "TFD_???");
-	tprints(", ");
-	print_itimerspec(tcp, tcp->u_arg[3]);
-
-	return RVAL_DECODED | RVAL_FD;
-}
-
 SYS_FUNC(timerfd_create)
 {
 	printclockname(tcp->u_arg[0]);

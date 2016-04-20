@@ -147,6 +147,7 @@
 #define	sys_query_module	printargs
 #define	sys_security		printargs
 #define	sys_stty		printargs
+#define	sys_timerfd		printargs
 #define	sys_tuxcall		printargs
 #define	sys_ulimit		printargs
 #define	sys_ustat		printargs
