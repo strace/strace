@@ -1,0 +1,30 @@
+#include "tests.h"
+#include <sys/syscall.h>
+
+#ifdef __NR_access
+
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
+
+int
+main(void)
+{
+	static const char sample[] = "access_sample";
+
+	long rc = syscall(__NR_access, sample, F_OK);
+	printf("access(\"%s\", F_OK) = %ld %s (%m)\n",
+	       sample, rc, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	rc = syscall(__NR_access, sample, R_OK|W_OK|X_OK);
+	printf("access(\"%s\", R_OK|W_OK|X_OK) = %ld %s (%m)\n",
+	       sample, rc, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+
+	return 0;
+}
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_access")
+
+#endif

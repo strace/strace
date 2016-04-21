@@ -6,6 +6,7 @@
 *.tmp.*
 *.trs
 _newselect
+access
 acct
 adjtimex
 aio

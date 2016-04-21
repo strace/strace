@@ -59,6 +59,7 @@ LDADD = libtests.a
 
 check_PROGRAMS = \
 	_newselect \
+	access \
 	acct \
 	adjtimex \
 	aio \
@@ -313,6 +314,7 @@ endif
 
 DECODER_TESTS = \
 	_newselect.test \
+	access.test \
 	acct.test \
 	adjtimex.test \
 	aio.test \
