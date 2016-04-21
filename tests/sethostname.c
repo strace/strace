@@ -10,21 +10,9 @@
 int
 main(void)
 {
-	const char *hostname = NULL;
-	int rc = syscall(__NR_sethostname, hostname, 63);
-	const char *errno_text;
-	switch (errno) {
-		case ENOSYS:
-			errno_text = "ENOSYS";
-			break;
-		case EPERM:
-			errno_text = "EPERM";
-			break;
-		default:
-			errno_text = "EFAULT";
-	}
-	printf("sethostname(NULL, %d) = %d %s (%m)\n",
-	       63, rc, errno_text);
+	long rc = syscall(__NR_sethostname, 0, 63);
+	printf("sethostname(NULL, 63) = %ld %s (%m)\n",
+	       rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
