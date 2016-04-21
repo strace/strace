@@ -38,6 +38,7 @@ execveat
 execveat-v
 faccessat
 fanotify_mark
+fchdir
 fchmod
 fchmodat
 fchown
