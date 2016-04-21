@@ -150,6 +150,7 @@ check_PROGRAMS = \
 	membarrier \
 	memfd_create \
 	mincore \
+	mkdir \
 	mkdirat \
 	mknod \
 	mlock2 \
@@ -395,6 +396,7 @@ DECODER_TESTS = \
 	membarrier.test \
 	memfd_create.test \
 	mincore.test \
+	mkdir.test \
 	mkdirat.test \
 	mknod.test \
 	mlock2.test \

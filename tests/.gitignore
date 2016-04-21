@@ -99,6 +99,7 @@ lstat64
 membarrier
 memfd_create
 mincore
+mkdir
 mkdirat
 mknod
 mlock2
