@@ -42,10 +42,8 @@ main(void)
 	int fd = syscall(__NR_open, sample, O_RDONLY|O_CREAT, 0400);
 
 	if (fd < 0) {
-		if (errno != ENOSYS)
-			perror_msg_and_fail("open");
 		printf("open(\"%s\", O_RDONLY|O_CREAT, 0400)"
-		       " = %d ENOSYS (%m)\n", sample, fd);
+		       " = %d %s (%m)\n", sample, fd, errno2name());
 	} else {
 		printf("open(\"%s\", O_RDONLY|O_CREAT, 0400) = %d\n",
 		       sample, fd);
@@ -54,16 +52,12 @@ main(void)
 			perror_msg_and_fail("unlink");
 
 		fd = syscall(__NR_open, sample, O_RDONLY);
-		if (fd >= 0 || errno != ENOENT)
-			perror_msg_and_fail("open");
-		printf("open(\"%s\", O_RDONLY) = %d ENOENT (%m)\n",
-		       sample, fd);
+		printf("open(\"%s\", O_RDONLY) = %d %s (%m)\n",
+		       sample, fd, errno2name());
 
 		fd = syscall(__NR_open, sample, O_WRONLY|O_NONBLOCK|0x80000000);
-		if (fd >= 0 || errno != ENOENT)
-			perror_msg_and_fail("open");
 		printf("open(\"%s\", O_WRONLY|O_NONBLOCK|0x80000000)"
-		       " = %d ENOENT (%m)\n", sample, fd);
+		       " = %d %s (%m)\n", sample, fd, errno2name());
 	}
 
 	puts("+++ exited with 0 +++");
