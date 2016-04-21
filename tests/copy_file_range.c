@@ -49,11 +49,13 @@ main(void)
 	const size_t len = (size_t) 0xdeadbef3facefed3ULL;
 	const unsigned int flags = 0;
 
-	assert(syscall(__NR_copy_file_range, fd_in, off_in, fd_out, off_out,
-		       len, flags) == -1);
-	printf("copy_file_range(%d, [%lld], %d, [%lld], %zu, %u) = -1 %s (%m)\n",
+	long rc = syscall(__NR_copy_file_range,
+			  fd_in, off_in, fd_out, off_out, len, flags);
+	printf("copy_file_range(%d, [%lld], %d, [%lld], %zu, %u)"
+	       " = %ld %s (%m)\n",
 	       (int) fd_in, *off_in, (int) fd_out, *off_out, len, flags,
-	       errno2name());
+	       rc, errno2name());
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
