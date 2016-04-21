@@ -11,18 +11,7 @@ int
 main(void)
 {
 	long rc = syscall(__NR_iopl, 4);
-	const char *error_text;
-	switch (errno) {
-		case ENOSYS:
-			error_text = "ENOSYS";
-			break;
-		case EPERM:
-			error_text = "EPERM";
-			break;
-		default:
-			error_text = "EINVAL";
-	}
-	printf("iopl(4) = %ld %s (%m)\n", rc, error_text);
+	printf("iopl(4) = %ld %s (%m)\n", rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
