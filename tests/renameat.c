@@ -15,10 +15,11 @@ main(void)
 {
 	const long int fd_old = (long int) 0xdeadbeefffffffff;
 	const long int fd_new = (long int) 0xdeadbeeffffffffe;
-	int rc = syscall(__NR_renameat, fd_old, OLD_FILE, fd_new, NEW_FILE);
-	printf("renameat(%d, \"%s\", %d, \"%s\") = %d %s (%m)\n",
-	       (int) fd_old, OLD_FILE, (int) fd_new, NEW_FILE, rc,
-	       errno2name());
+
+	long rc = syscall(__NR_renameat, fd_old, OLD_FILE, fd_new, NEW_FILE);
+	printf("renameat(%d, \"%s\", %d, \"%s\") = %ld %s (%m)\n",
+	       (int) fd_old, OLD_FILE, (int) fd_new, NEW_FILE,
+	       rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
