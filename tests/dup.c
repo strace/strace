@@ -6,11 +6,8 @@
 int
 main(void)
 {
-	const int fd = -1;
-	int rc = dup(fd);
-	printf("dup(%d) = %d %s (%m)\n",
-	       fd, rc,
-	       errno2name());
+	int rc = dup(-1);
+	printf("dup(-1) = %d %s (%m)\n", rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
