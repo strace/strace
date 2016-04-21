@@ -10,7 +10,7 @@ main(void)
 	int rc = dup(fd);
 	printf("dup(%d) = %d %s (%m)\n",
 	       fd, rc,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

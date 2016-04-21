@@ -88,7 +88,7 @@ main(void)
 		errno = saved_errno;
 		if (expected)
 			printf(") = -1 %s (%m)\n",
-			       errno == EPERM ? "EPERM" : "EINVAL");
+			       errno2name());
 		else
 			printf(") = 0\n");
 	}

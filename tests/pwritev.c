@@ -118,7 +118,7 @@ main(void)
 		print_iovec(iov + i, n, LEN - i);
 		printf(", %u, %lld) = -1 %s (%m)\n",
 		       n, (long long) offset + LEN + i,
-		       errno == EINVAL ? "EINVAL" : "EFAULT");
+		       errno2name());
 	}
 
 	iov->iov_base = iov + LEN * 2;

@@ -62,11 +62,11 @@ main(void)
 
 	assert(writev(1, efault, 42) == -1);
 	tprintf("writev(1, %p, 42) = -1 %s (%m)\n",
-		efault, errno == EINVAL ? "EINVAL" : "EFAULT");
+		efault, errno2name());
 
 	assert(readv(0, efault, 42) == -1);
 	tprintf("readv(0, %p, 42) = -1 %s (%m)\n",
-		efault, errno == EINVAL ? "EINVAL" : "EFAULT");
+		efault, errno2name());
 
 	static const char r0_c[] = "01234567";
 	const char *r0_d = hexdump_strdup(r0_c);
@@ -93,7 +93,7 @@ main(void)
 	assert(writev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2) == -1);
 	tprintf("writev(1, [{\"%s\", %u}, %p], 2) = -1 %s (%m)\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
-		errno == EINVAL ? "EINVAL" : "EFAULT");
+		errno2name());
 
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);

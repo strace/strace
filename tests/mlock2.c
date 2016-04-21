@@ -40,7 +40,7 @@ main(void)
 {
 	assert(syscall(__NR_mlock2, 0xdeadbeef, 0xdefaced, 0xffff) == -1);
 	printf("mlock2(0xdeadbeef, 233811181, MLOCK_ONFAULT|0xfffe)"
-	       " = -1 %s (%m)\n", errno == ENOSYS ? "ENOSYS" : "EINVAL");
+	       " = -1 %s (%m)\n", errno2name());
 	puts("+++ exited with 0 +++");
 	return 0;
 }

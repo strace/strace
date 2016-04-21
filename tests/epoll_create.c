@@ -12,7 +12,7 @@ main(void)
 {
 	int rc = syscall(__NR_epoll_create, -1);
 	printf("epoll_create(-1) = %d %s (%m)\n",
-	       rc, errno == ENOSYS ? "ENOSYS" : "EINVAL");
+	       rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

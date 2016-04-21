@@ -40,7 +40,7 @@ main(void)
 {
 	assert(syscall(__NR_membarrier, 3, 255) == -1);
 	printf("membarrier(0x3 /* MEMBARRIER_CMD_??? */, 255) = -1 %s (%m)\n",
-	       errno == ENOSYS ? "ENOSYS" : "EINVAL");
+	       errno2name());
 	if (errno != ENOSYS) {
 		/* the test needs to be updated? */
 		assert(syscall(__NR_membarrier, 0, 0) == 1);

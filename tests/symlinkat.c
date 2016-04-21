@@ -16,7 +16,7 @@ main(void)
 	long rc = syscall(__NR_symlinkat, oldpath, fd, newpath);
 	printf("symlinkat(\"%s\", %d, \"%s\") = %ld %s (%m)\n",
 	       oldpath, (int) fd, newpath, rc,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

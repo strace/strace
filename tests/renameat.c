@@ -18,7 +18,7 @@ main(void)
 	int rc = syscall(__NR_renameat, fd_old, OLD_FILE, fd_new, NEW_FILE);
 	printf("renameat(%d, \"%s\", %d, \"%s\") = %d %s (%m)\n",
 	       (int) fd_old, OLD_FILE, (int) fd_new, NEW_FILE, rc,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

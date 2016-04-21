@@ -15,7 +15,7 @@ main(void)
 
 	int rc = syscall(__NR_epoll_wait, -1, ev, 1, -2);
 	printf("epoll_wait(-1, %p, 1, -2) = %d %s (%m)\n",
-	       ev, rc, errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       ev, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

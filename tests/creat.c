@@ -16,7 +16,7 @@ main(void)
 	int rc = syscall(__NR_creat, TMP_FILE, S_IRUSR);
 	printf("creat(\"%s\", %#o) = %d %s (%m)\n",
 	       TMP_FILE, S_IRUSR, rc,
-	       errno == ENOSYS ? "ENOSYS" : "ETXTBSY");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

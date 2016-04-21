@@ -14,11 +14,11 @@ main(void)
 
 	long rc = syscall(__NR_access, sample, F_OK);
 	printf("access(\"%s\", F_OK) = %ld %s (%m)\n",
-	       sample, rc, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       sample, rc, errno2name());
 
 	rc = syscall(__NR_access, sample, R_OK|W_OK|X_OK);
 	printf("access(\"%s\", R_OK|W_OK|X_OK) = %ld %s (%m)\n",
-	       sample, rc, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       sample, rc, errno2name());
 
 	return 0;
 }

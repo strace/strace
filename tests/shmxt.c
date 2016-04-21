@@ -29,7 +29,7 @@ main(void)
 
 	shmat(id, NULL, SHM_REMAP);
 	printf("%s(%d, NULL, SHM_REMAP) = -1 %s (%m)\n",
-	       SHMAT, id, errno == ENOSYS ? "ENOSYS" : "EINVAL");
+	       SHMAT, id, errno2name());
 
 	void *shmaddr = shmat(id, NULL, SHM_RDONLY);
 	if (shmaddr == (void *)(-1))

@@ -14,7 +14,7 @@ main(void)
 	int rc = syscall(__NR_fsync, fd);
 	printf("fsync(%d) = %d %s (%m)\n",
 	       (int) fd, rc,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

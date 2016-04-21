@@ -70,13 +70,13 @@ main(void)
 	if (rc != -1)
 		perror_msg_and_fail("pwritev: expected -1, returned %ld", rc);
 	tprintf("pwritev(1, %p, 42, 0) = -1 %s (%m)\n",
-		efault, errno == EINVAL ? "EINVAL" : "EFAULT");
+		efault, errno2name());
 
 	rc = preadv(0, efault, 42, 0);
 	if (rc != -1)
 		perror_msg_and_fail("preadv: expected -1, returned %ld", rc);
 	tprintf("preadv(0, %p, 42, 0) = -1 %s (%m)\n",
-		efault, errno == EINVAL ? "EINVAL" : "EFAULT");
+		efault, errno2name());
 
 	static const char r0_c[] = "01234567";
 	const char *r0_d = hexdump_strdup(r0_c);
@@ -108,7 +108,7 @@ main(void)
 				    rc);
 	tprintf("pwritev(1, [{\"%s\", %u}, %p], 2, 0) = -1 %s (%m)\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
-		errno == EINVAL ? "EINVAL" : "EFAULT");
+		errno2name());
 
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);

@@ -50,7 +50,7 @@ main(void)
 	printf("tee(%d, %d, %zu, %s) = -1 %s (%m)\n",
 	       (int) fd_in, (int) fd_out, len,
 	       "SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT",
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 	puts("+++ exited with 0 +++");
 	return 0;
 }

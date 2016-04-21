@@ -51,7 +51,7 @@ main(void)
 	rc = syscall(__NR_sched_setscheduler, 0, SCHED_FIFO, param);
 	printf("sched_setscheduler(0, SCHED_FIFO, [%d]) = %d %s (%m)\n",
 	       param->sched_priority, rc,
-	       errno == EPERM ? "EPERM" : "EINVAL");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

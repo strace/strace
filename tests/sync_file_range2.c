@@ -52,7 +52,7 @@ main(void)
 	       "sync_file_range2", fd,
 	       (long long) offset,
 	       (long long) nbytes,
-	       errno == ENOSYS ? "ENOSYS" : "EINVAL");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

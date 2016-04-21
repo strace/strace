@@ -15,7 +15,7 @@ main(void)
 	int rc = syscall(__NR_flock, fd, LOCK_SH);
 	printf("flock(%d, LOCK_SH) = %d %s (%m)\n",
 	       (int) fd, rc,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

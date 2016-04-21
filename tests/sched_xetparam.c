@@ -20,7 +20,7 @@ main(void)
 	rc = syscall(__NR_sched_setparam, 0, param);
 	printf("sched_setparam(0, [%d]) = %d %s (%m)\n",
 	       param->sched_priority, rc,
-	       errno == EPERM ? "EPERM" : "EINVAL");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

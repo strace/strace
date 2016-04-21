@@ -15,7 +15,7 @@ main(void)
 	int rc = syscall(__NR_dup2, fd_old, fd_new);
 	printf("dup2(%d, %d) = %d %s (%m)\n",
 	       (int) fd_old, (int) fd_new, rc,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

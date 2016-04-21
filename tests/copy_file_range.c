@@ -53,7 +53,7 @@ main(void)
 		       len, flags) == -1);
 	printf("copy_file_range(%d, [%lld], %d, [%lld], %zu, %u) = -1 %s (%m)\n",
 	       (int) fd_in, *off_in, (int) fd_out, *off_out, len, flags,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 	puts("+++ exited with 0 +++");
 	return 0;
 }

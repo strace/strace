@@ -14,7 +14,7 @@ main(void)
 
 	long rc = syscall(__NR_mkdir, sample, 0600);
 	printf("mkdir(\"%s\", 0600) = %ld %s (%m)\n",
-	       sample, rc, errno == ENOSYS ? "ENOSYS" : "EEXIST");
+	       sample, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

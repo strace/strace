@@ -54,7 +54,7 @@ main(void)
 	printf("splice(%d, [%lld], %d, [%lld], %zu, %s) = -1 %s (%m)\n",
 	       (int) fd_in, *off_in, (int) fd_out, *off_out, len,
 	       "SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT",
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 	puts("+++ exited with 0 +++");
 	return 0;
 }

@@ -16,7 +16,7 @@ main(void)
 	int rc = syscall(__NR_rename, OLD_FILE, NEW_FILE);
 	printf("rename(\"%s\", \"%s\") = %d %s (%m)\n",
 	       OLD_FILE, NEW_FILE, rc,
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

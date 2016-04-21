@@ -24,7 +24,7 @@ main(void)
 		printf("setpriority(PRIO_PROCESS, %d, 0) = 0\n", pid);
 	} else {
 		printf("setpriority(PRIO_PROCESS, %d, 0) = -1 %s (%m)\n",
-		       pid, errno == EPERM ? "EPERM" : "EACCES");
+		       pid, errno2name());
 	}
 
 	puts("+++ exited with 0 +++");

@@ -42,7 +42,7 @@ main(void)
 		puts("mlockall(MCL_CURRENT) = 0");
 	} else {
 		printf("mlockall(MCL_CURRENT) = -1 %s (%m)\n",
-		       errno == ENOMEM ? "ENOMEM" : "EPERM");
+		       errno2name());
 	}
 
 	puts("+++ exited with 0 +++");

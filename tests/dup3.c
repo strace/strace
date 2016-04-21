@@ -16,7 +16,7 @@ main(void)
 	int rc = syscall(__NR_dup3, fd_old, fd_new, O_CLOEXEC);
 	printf("dup3(%d, %d, O_CLOEXEC) = %d %s (%m)\n",
 	       (int) fd_old, (int) fd_new, rc,
-	       errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

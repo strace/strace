@@ -74,7 +74,7 @@ main(void)
 #ifdef VERBOSE_EXECVEAT
 	       q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
 #endif
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       errno2name());
 
 	tail_argv[ARRAY_SIZE(q_argv)] = NULL;
 	tail_envp[ARRAY_SIZE(q_envp)] = NULL;
@@ -91,7 +91,7 @@ main(void)
 #ifdef VERBOSE_EXECVEAT
 	       q_envp[0], q_envp[1],
 #endif
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv + 2, tail_envp + 1, 0x1100);
 	printf("execveat(AT_FDCWD, \"%s\", [\"%s\"]"
@@ -105,7 +105,7 @@ main(void)
 #ifdef VERBOSE_EXECVEAT
 	       q_envp[1],
 #endif
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       errno2name());
 
 	char **const empty = tail_alloc(sizeof(*empty));
 	char **const efault = empty + 1;
@@ -119,7 +119,7 @@ main(void)
 	       ", [/* 0 vars */]"
 #endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       Q_FILENAME, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       Q_FILENAME, errno2name());
 
 	char str_a[] = "012345678901234567890123456789012";
 	char str_b[] = "_abcdefghijklmnopqrstuvwxyz()[]{}";
@@ -150,7 +150,7 @@ main(void)
 	printf("], [/* %u vars */", DEFAULT_STRLEN + 1);
 #endif
 	printf("], AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, a + 1, b + 1, 0x1100);
 	printf("execveat(AT_FDCWD, \"%s\", [\"%s\"", Q_FILENAME, a[1]);
@@ -164,17 +164,17 @@ main(void)
 	printf("], [/* %d vars */", DEFAULT_STRLEN);
 #endif
 	printf("], AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, NULL, efault, 0x1100);
 	printf("execveat(AT_FDCWD, \"%s\", NULL, %p"
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       Q_FILENAME, efault, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       Q_FILENAME, efault, errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, efault, NULL, 0x1100);
 	printf("execveat(AT_FDCWD, \"%s\", %p, NULL"
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       Q_FILENAME, efault, errno == ENOSYS ? "ENOSYS" : "ENOENT");
+	       Q_FILENAME, efault, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

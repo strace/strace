@@ -14,7 +14,7 @@ main(void)
 
 	long rc = syscall(__NR_fchdir, fd);
 	printf("fchdir(%d) = %ld %s (%m)\n",
-	       (int) fd, rc, errno == ENOSYS ? "ENOSYS" : "EBADF");
+	       (int) fd, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
