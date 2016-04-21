@@ -69,6 +69,7 @@ getgid
 getgid32
 getgroups
 getgroups32
+getpgrp
 getrandom
 getresgid
 getresgid32
