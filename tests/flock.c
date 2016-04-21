@@ -4,18 +4,18 @@
 #ifdef __NR_flock
 
 # include <errno.h>
-# include <sys/file.h>
 # include <stdio.h>
+# include <sys/file.h>
 # include <unistd.h>
 
 int
 main(void)
 {
 	const unsigned long fd = (long int) 0xdeadbeefffffffff;
-	int rc = syscall(__NR_flock, fd, LOCK_SH);
-	printf("flock(%d, LOCK_SH) = %d %s (%m)\n",
-	       (int) fd, rc,
-	       errno2name());
+
+	long rc = syscall(__NR_flock, fd, LOCK_SH);
+	printf("flock(%d, LOCK_SH) = %ld %s (%m)\n",
+	       (int) fd, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
