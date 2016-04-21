@@ -38,12 +38,10 @@ main(void)
 {
 	printf("mlockall(0) = %d EINVAL (%m)\n", mlockall(0));
 
-	if (mlockall(MCL_CURRENT) == 0) {
+	if (mlockall(MCL_CURRENT) == 0)
 		puts("mlockall(MCL_CURRENT) = 0");
-	} else {
-		printf("mlockall(MCL_CURRENT) = -1 %s (%m)\n",
-		       errno2name());
-	}
+	else
+		printf("mlockall(MCL_CURRENT) = -1 %s (%m)\n", errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
