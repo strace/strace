@@ -58,17 +58,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-static const char *
-errno2str(void)
-{
-	switch (errno) {
-#define CASE(x) case x: return #x
-		CASE(EINVAL);
-		CASE(EFAULT);
-		default: perror_msg_and_fail(SYSCALL_NAME);
-	}
-}
-
 #define MAX_STRLEN 32
 static long ngroups;
 
@@ -108,18 +97,18 @@ main(void)
 
 	rc = syscall(SYSCALL_NR, -1U, 0);
 	printf("%s(%u, NULL) = %ld %s (%m)\n",
-	       SYSCALL_NAME, -1U, rc, errno2str());
+	       SYSCALL_NAME, -1U, rc, errno2name());
 
 	rc = syscall(SYSCALL_NR, -1L, 0);
 	printf("%s(%u, NULL) = %ld %s (%m)\n",
-	       SYSCALL_NAME, -1U, rc, errno2str());
+	       SYSCALL_NAME, -1U, rc, errno2name());
 
 	const unsigned int ngroups_max = sysconf(_SC_NGROUPS_MAX);
 
 	rc = syscall(SYSCALL_NR, ngroups_max, 0);
 	if (rc < 0)
 		printf("%s(%u, NULL) = %ld %s (%m)\n",
-		       SYSCALL_NAME, ngroups_max, rc, errno2str());
+		       SYSCALL_NAME, ngroups_max, rc, errno2name());
 	else
 		printf("%s(%u, NULL) = %ld\n",
 		       SYSCALL_NAME, ngroups_max, rc);
@@ -127,7 +116,7 @@ main(void)
 	rc = syscall(SYSCALL_NR, (long) 0xffffffff00000000ULL | ngroups_max, 0);
 	if (rc < 0)
 		printf("%s(%u, NULL) = %ld %s (%m)\n",
-		       SYSCALL_NAME, ngroups_max, rc, errno2str());
+		       SYSCALL_NAME, ngroups_max, rc, errno2name());
 	else
 		printf("%s(%u, NULL) = %ld\n",
 		       SYSCALL_NAME, ngroups_max, rc);
@@ -147,7 +136,7 @@ main(void)
 		rc = syscall(SYSCALL_NR, ngroups, efault);
 		printf("%s(%u, %p) = %ld %s (%m)\n",
 		       SYSCALL_NAME, (unsigned) ngroups, efault,
-		       rc, errno2str());
+		       rc, errno2name());
 	}
 
 	puts("+++ exited with 0 +++");
