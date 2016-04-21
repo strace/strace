@@ -10,9 +10,11 @@
 int
 main(void)
 {
-	int rc = syscall(__NR_epoll_create, -1);
-	printf("epoll_create(-1) = %d %s (%m)\n",
-	       rc, errno2name());
+	const long int size = (long int) 0xdeadbeefffffffff;
+
+	long rc = syscall(__NR_epoll_create, size);
+	printf("epoll_create(%d) = %ld %s (%m)\n",
+	       (int) size, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
