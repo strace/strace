@@ -42,17 +42,15 @@ main(void)
 	static const char fname[] = "truncate\nfilename";
 	static const char qname[] = "truncate\\nfilename";
 	const kernel_ulong_t len = (kernel_ulong_t) 0xdefaced0badc0deULL;
+	long rc;
 
 	if (sizeof(len) > sizeof(long))
-		assert(truncate(fname, len) == -1);
+		rc = truncate(fname, len);
 	else
-		assert(syscall(__NR_truncate, fname, len) == -1);
+		rc = syscall(__NR_truncate, fname, len);
 
-	if (ENOENT != errno)
-		perror_msg_and_skip("truncate");
-
-	printf("truncate(\"%s\", %llu) = -1 ENOENT (%m)\n",
-	       qname, (unsigned long long) len);
+	printf("truncate(\"%s\", %llu) = %ld %s (%m)\n",
+	       qname, (unsigned long long) len, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
