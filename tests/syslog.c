@@ -12,21 +12,10 @@
 int
 main(void)
 {
-	const char *errno_text;
-	const void *bufp = &errno_text;
-	int rc = syscall(__NR_syslog, SYSLOG_ACTION_READ, bufp, -1);
-	switch (errno) {
-		case ENOSYS:
-			errno_text = "ENOSYS";
-			break;
-		case EPERM:
-			errno_text = "EPERM";
-			break;
-		default:
-			errno_text = "EINVAL";
-	}
-	printf("syslog(SYSLOG_ACTION_READ, %p, -1) = %d %s (%m)\n",
-	       bufp, rc, errno_text);
+	const long addr = (long) 0xfacefeeddeadbeef;
+	int rc = syscall(__NR_syslog, SYSLOG_ACTION_READ, addr, -1);
+	printf("syslog(SYSLOG_ACTION_READ, %#lx, -1) = %d %s (%m)\n",
+	       addr, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
