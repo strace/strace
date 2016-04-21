@@ -126,6 +126,7 @@ check_PROGRAMS = \
 	getresuid \
 	getresuid32 \
 	getrusage \
+	getsid \
 	getuid \
 	getuid32 \
 	getxxid \
@@ -371,6 +372,7 @@ DECODER_TESTS = \
 	getresuid.test \
 	getresuid32.test \
 	getrusage.test \
+	getsid.test \
 	getuid.test \
 	getuid32.test \
 	getxxid.test \

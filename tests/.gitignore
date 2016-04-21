@@ -73,6 +73,7 @@ getresgid32
 getresuid
 getresuid32
 getrusage
+getsid
 getuid
 getuid32
 getxxid
