@@ -38,9 +38,10 @@
 int
 main(void)
 {
-	assert(syscall(__NR_mlock2, 0xdeadbeef, 0xdefaced, 0xffff) == -1);
+	long rc = syscall(__NR_mlock2, 0xdeadbeef, 0xdefaced, 0xffff);
 	printf("mlock2(0xdeadbeef, 233811181, MLOCK_ONFAULT|0xfffe)"
-	       " = -1 %s (%m)\n", errno2name());
+	       " = %ld %s (%m)\n", rc, errno2name());
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
