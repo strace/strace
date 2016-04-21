@@ -59,14 +59,15 @@ main(void)
 	static const char w2_c[] = "89abcde";
 	const char *w2_d = hexdump_strdup(w2_c);
 	void *w2 = tail_memdup(w2_c, LENGTH_OF(w2_c));
+	long rc;
 
-	assert(writev(1, efault, 42) == -1);
-	tprintf("writev(1, %p, 42) = -1 %s (%m)\n",
-		efault, errno2name());
+	rc = writev(1, efault, 42);
+	tprintf("writev(1, %p, 42) = %ld %s (%m)\n",
+		efault, rc, errno2name());
 
-	assert(readv(0, efault, 42) == -1);
-	tprintf("readv(0, %p, 42) = -1 %s (%m)\n",
-		efault, errno2name());
+	rc = readv(0, efault, 42);
+	tprintf("readv(0, %p, 42) = %ld %s (%m)\n",
+		efault, rc, errno2name());
 
 	static const char r0_c[] = "01234567";
 	const char *r0_d = hexdump_strdup(r0_c);
@@ -87,13 +88,13 @@ main(void)
 	};
 	const struct iovec *w_iov = tail_memdup(w_iov_, sizeof(w_iov_));
 
-	assert(writev(1, w_iov, 0) == 0);
-	tprintf("writev(1, [], 0) = 0\n");
+	tprintf("writev(1, [], 0) = %ld\n",
+		(long) writev(1, w_iov, 0));
 
-	assert(writev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2) == -1);
-	tprintf("writev(1, [{\"%s\", %u}, %p], 2) = -1 %s (%m)\n",
+	rc = writev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2);
+	tprintf("writev(1, [{\"%s\", %u}, %p], 2) = %ld %s (%m)\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
-		errno2name());
+		rc, errno2name());
 
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);
