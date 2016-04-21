@@ -29,7 +29,6 @@
 
 #include "tests.h"
 
-#include <errno.h>
 #include <stdio.h>
 #include <sys/mman.h>
 

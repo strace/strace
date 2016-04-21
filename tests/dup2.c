@@ -3,7 +3,6 @@
 
 #ifdef __NR_dup2
 
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

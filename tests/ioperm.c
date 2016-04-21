@@ -3,7 +3,6 @@
 
 #ifdef __NR_ioperm
 
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

@@ -31,7 +31,6 @@
 #ifdef __NR_lseek
 
 # include <assert.h>
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 # include "kernel_types.h"

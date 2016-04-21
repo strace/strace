@@ -28,7 +28,6 @@
  */
 
 #include "tests.h"
-#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/syscall.h>

@@ -32,7 +32,6 @@
 
 #ifdef __NR_fchmodat
 
-# include <errno.h>
 # include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>

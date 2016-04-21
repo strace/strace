@@ -3,7 +3,6 @@
 
 #if defined __NR_getpriority && defined __NR_setpriority
 
-# include <errno.h>
 # include <stdio.h>
 # include <sys/resource.h>
 # include <unistd.h>

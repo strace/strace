@@ -4,7 +4,6 @@
 
 #if defined __NR_dup3 && defined O_CLOEXEC
 
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

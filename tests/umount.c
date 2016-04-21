@@ -26,7 +26,6 @@
  */
 
 #include "tests.h"
-#include <errno.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/mount.h>

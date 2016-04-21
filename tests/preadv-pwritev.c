@@ -31,7 +31,6 @@
 
 #if defined HAVE_PREADV && defined HAVE_PWRITEV
 
-# include <errno.h>
 # include <fcntl.h>
 # include <stdio.h>
 # include <sys/uio.h>

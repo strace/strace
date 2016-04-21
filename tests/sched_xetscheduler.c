@@ -3,7 +3,6 @@
 
 #if defined __NR_sched_getscheduler && defined __NR_sched_setscheduler
 
-# include <errno.h>
 # include <sched.h>
 # include <stdio.h>
 # include <unistd.h>

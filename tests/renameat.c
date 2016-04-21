@@ -1,5 +1,4 @@
 #include "tests.h"
-#include <errno.h>
 #include <sys/syscall.h>
 
 #ifdef __NR_renameat

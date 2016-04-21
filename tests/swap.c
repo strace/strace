@@ -3,7 +3,6 @@
 
 #if defined __NR_swapon && defined __NR_swapoff
 
-# include <errno.h>
 # include <stdio.h>
 # include <sys/swap.h>
 # include <unistd.h>

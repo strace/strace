@@ -3,7 +3,6 @@
 
 #ifdef __NR_creat
 
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

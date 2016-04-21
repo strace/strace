@@ -3,7 +3,6 @@
 
 #if defined __NR_sched_getparam && defined __NR_sched_setparam
 
-# include <errno.h>
 # include <sched.h>
 # include <stdio.h>
 # include <unistd.h>

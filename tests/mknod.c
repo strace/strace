@@ -3,7 +3,6 @@
 
 #ifdef __NR_mknod
 
-# include <errno.h>
 # include <stdio.h>
 # include <sys/stat.h>
 # include <unistd.h>

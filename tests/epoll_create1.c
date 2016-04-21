@@ -32,7 +32,6 @@
 #if defined __NR_epoll_create1 && defined O_CLOEXEC
 
 # include <assert.h>
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

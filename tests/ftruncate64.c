@@ -31,7 +31,6 @@
 #ifdef __NR_ftruncate64
 
 # include <assert.h>
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

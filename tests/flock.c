@@ -3,7 +3,6 @@
 
 #ifdef __NR_flock
 
-# include <errno.h>
 # include <stdio.h>
 # include <sys/file.h>
 # include <unistd.h>

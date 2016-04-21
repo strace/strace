@@ -33,7 +33,6 @@
 
 #if defined __NR_fchownat && defined AT_FDCWD && defined AT_SYMLINK_NOFOLLOW
 
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

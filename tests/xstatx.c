@@ -40,7 +40,6 @@
 #  error PRINT_SYSCALL_FOOTER must be defined
 # endif
 
-# include <errno.h>
 # include <stdio.h>
 # include <stddef.h>
 # include <time.h>

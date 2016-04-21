@@ -31,7 +31,6 @@
 #ifdef __NR_truncate
 
 # include <assert.h>
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 # include "kernel_types.h"

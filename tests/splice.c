@@ -33,7 +33,6 @@
 #if defined __NR_splice
 
 # include <assert.h>
-# include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
 

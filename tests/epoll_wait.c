@@ -3,7 +3,6 @@
 
 #if defined __NR_epoll_wait && defined HAVE_SYS_EPOLL_H
 
-# include <errno.h>
 # include <stdio.h>
 # include <sys/epoll.h>
 # include <unistd.h>

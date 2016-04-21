@@ -3,7 +3,6 @@
 
 #if defined __NR_epoll_ctl && defined HAVE_SYS_EPOLL_H
 
-# include <errno.h>
 # include <inttypes.h>
 # include <stdio.h>
 # include <sys/epoll.h>
