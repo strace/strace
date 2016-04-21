@@ -54,13 +54,11 @@
 #ifdef ACCESS_BY_DESCRIPTOR
 # define SYSCALL_ARG1 fd
 # define FMT_ARG1 "%d"
-# define ERRNO_STR "EBADF"
 # define EOK_CMD CLOSE_SAMPLE
 # define CLEANUP_CMD UNLINK_SAMPLE
 #else
 # define SYSCALL_ARG1 sample
 # define FMT_ARG1 "\"%s\""
-# define ERRNO_STR "ENOENT"
 # define EOK_CMD UNLINK_SAMPLE
 # define CLEANUP_CMD CLOSE_SAMPLE
 #endif
@@ -163,7 +161,7 @@ main(void)
 		print_int(gnum);
 		errno = saved_errno;
 		if (expected)
-			printf(") = %ld " ERRNO_STR " (%m)\n", expected);
+			printf(") = %ld %s (%m)\n", expected, errno2name());
 		else
 			printf(") = 0\n");
 	}
