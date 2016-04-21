@@ -72,20 +72,8 @@ main(void)
 	       ", f_handle=0x", handle->handle_bytes, handle->handle_type);
 	for (i = 0; i < handle->handle_bytes; ++i)
 		printf("%02x", handle->f_handle[i]);
-	printf("}, O_RDONLY|O_DIRECTORY) = -1 ");
-	assert(open_by_handle_at(-1, handle, O_RDONLY | O_DIRECTORY) == -1);
-	const char *errno_text;
-	switch (errno) {
-		case EPERM:
-			errno_text = "EPERM";
-			break;
-		case EINVAL:
-			errno_text = "EINVAL";
-			break;
-		default:
-			errno_text = "EBADF";
-	}
-	printf("%s (%m)\n", errno_text);
+	int rc = open_by_handle_at(-1, handle, O_RDONLY | O_DIRECTORY);
+	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
