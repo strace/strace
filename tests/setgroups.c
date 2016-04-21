@@ -58,45 +58,32 @@
 # include <stdio.h>
 # include <unistd.h>
 
-static const char *
-errno2str(void)
-{
-	switch (errno) {
-#define CASE(x) case x: return #x
-		CASE(EPERM);
-		CASE(EINVAL);
-		CASE(ENOMEM);
-		CASE(EFAULT);
-		default: perror_msg_and_fail(SYSCALL_NAME);
-	}
-}
-
 int
 main(void)
 {
 	/* check how the first argument is decoded */
 	if (syscall(SYSCALL_NR, 0, 0))
-		printf("%s(0, NULL) = -1 %s (%m)\n", SYSCALL_NAME, errno2str());
+		printf("%s(0, NULL) = -1 %s (%m)\n", SYSCALL_NAME, errno2name());
 	else
 		printf("%s(0, NULL) = 0\n", SYSCALL_NAME);
 
 	if (syscall(SYSCALL_NR, (long) 0xffffffff00000000ULL, 0))
 		printf("%s(0, NULL) = -1 %s (%m)\n",
-		       SYSCALL_NAME, errno2str());
+		       SYSCALL_NAME, errno2name());
 	else
 		printf("%s(0, NULL) = 0\n", SYSCALL_NAME);
 
 	syscall(SYSCALL_NR, 1, 0);
-	printf("%s(1, NULL) = -1 %s (%m)\n", SYSCALL_NAME, errno2str());
+	printf("%s(1, NULL) = -1 %s (%m)\n", SYSCALL_NAME, errno2name());
 
 	syscall(SYSCALL_NR, (long) 0xffffffff00000001ULL, 0);
-	printf("%s(1, NULL) = -1 %s (%m)\n", SYSCALL_NAME, errno2str());
+	printf("%s(1, NULL) = -1 %s (%m)\n", SYSCALL_NAME, errno2name());
 
 	syscall(SYSCALL_NR, -1U, 0);
-	printf("%s(%u, NULL) = -1 %s (%m)\n", SYSCALL_NAME, -1U, errno2str());
+	printf("%s(%u, NULL) = -1 %s (%m)\n", SYSCALL_NAME, -1U, errno2name());
 
 	syscall(SYSCALL_NR, -1L, 0);
-	printf("%s(%u, NULL) = -1 %s (%m)\n", SYSCALL_NAME, -1U, errno2str());
+	printf("%s(%u, NULL) = -1 %s (%m)\n", SYSCALL_NAME, -1U, errno2name());
 
 	/* check how the second argument is decoded */
 	const GID_TYPE *const g1 = tail_alloc(sizeof(*g1));
@@ -106,53 +93,53 @@ main(void)
 
 	if (syscall(SYSCALL_NR, 0, g1 + 1))
 		printf("%s(0, []) = -1 %s (%m)\n",
-		       SYSCALL_NAME, errno2str());
+		       SYSCALL_NAME, errno2name());
 	else
 		printf("%s(0, []) = 0\n", SYSCALL_NAME);
 
 	if (syscall(SYSCALL_NR, 1, g1))
 		printf("%s(1, [%u]) = -1 %s (%m)\n",
-		       SYSCALL_NAME, (unsigned) *g1, errno2str());
+		       SYSCALL_NAME, (unsigned) *g1, errno2name());
 	else
 		printf("%s(1, [%u]) = 0\n",
 		       SYSCALL_NAME, (unsigned) *g1);
 
 	syscall(SYSCALL_NR, 1, g1 + 1);
 	printf("%s(1, %p) = -1 %s (%m)\n",
-	       SYSCALL_NAME, g1 + 1, errno2str());
+	       SYSCALL_NAME, g1 + 1, errno2name());
 
 	syscall(SYSCALL_NR, 1, -1L);
-	printf("%s(1, %#lx) = -1 %s (%m)\n", SYSCALL_NAME, -1L, errno2str());
+	printf("%s(1, %#lx) = -1 %s (%m)\n", SYSCALL_NAME, -1L, errno2name());
 
 	syscall(SYSCALL_NR, 2, g1);
 	printf("%s(2, [%u, %p]) = -1 %s (%m)\n",
-	       SYSCALL_NAME, (unsigned) *g1, g1 + 1, errno2str());
+	       SYSCALL_NAME, (unsigned) *g1, g1 + 1, errno2name());
 
 	g2[0] = -2;
 	g2[1] = -3;
 	if (syscall(SYSCALL_NR, 2, g2))
 		printf("%s(2, [%u, %u]) = -1 %s (%m)\n", SYSCALL_NAME,
-		       (unsigned) g2[0], (unsigned) g2[1], errno2str());
+		       (unsigned) g2[0], (unsigned) g2[1], errno2name());
 	else
 		printf("%s(2, [%u, %u]) = 0\n", SYSCALL_NAME,
 		       (unsigned) g2[0], (unsigned) g2[1]);
 
 	syscall(SYSCALL_NR, 3, g2);
 	printf("%s(3, [%u, %u, %p]) = -1 %s (%m)\n", SYSCALL_NAME,
-	       (unsigned) g2[0], (unsigned) g2[1], g2 + 2, errno2str());
+	       (unsigned) g2[0], (unsigned) g2[1], g2 + 2, errno2name());
 
 	g3[0] = 0;
 	g3[1] = 1;
 	if (syscall(SYSCALL_NR, 3, g3))
 		printf("%s(3, [%u, %u, ...]) = -1 %s (%m)\n", SYSCALL_NAME,
-		       (unsigned) g3[0], (unsigned) g3[1], errno2str());
+		       (unsigned) g3[0], (unsigned) g3[1], errno2name());
 	else
 		printf("%s(3, [%u, %u]) = 0\n", SYSCALL_NAME,
 		       (unsigned) g3[0], (unsigned) g3[1]);
 
 	syscall(SYSCALL_NR, 4, g3);
 	printf("%s(4, [%u, %u, ...]) = -1 %s (%m)\n", SYSCALL_NAME,
-	       (unsigned) g3[0], (unsigned) g3[1], errno2str());
+	       (unsigned) g3[0], (unsigned) g3[1], errno2name());
 
 	long rc = sysconf(_SC_NGROUPS_MAX);
 	const unsigned ngroups_max = rc;
@@ -161,18 +148,18 @@ main(void)
 		syscall(SYSCALL_NR, ngroups_max, g3);
 		printf("%s(%u, [%u, %u, ...]) = -1 %s (%m)\n", SYSCALL_NAME,
 		       ngroups_max, (unsigned) g3[0], (unsigned) g3[1],
-		       errno2str());
+		       errno2name());
 
 		const unsigned long size =
 			(unsigned long) 0xffffffff00000000ULL | ngroups_max;
 		syscall(SYSCALL_NR, size, g3);
 		printf("%s(%u, [%u, %u, ...]) = -1 %s (%m)\n", SYSCALL_NAME,
 		       ngroups_max, (unsigned) g3[0], (unsigned) g3[1],
-		       errno2str());
+		       errno2name());
 
 		syscall(SYSCALL_NR, ngroups_max + 1, g3);
 		printf("%s(%u, %p) = -1 %s (%m)\n", SYSCALL_NAME,
-		       ngroups_max + 1, g3, errno2str());
+		       ngroups_max + 1, g3, errno2name());
 	}
 
 	puts("+++ exited with 0 +++");
