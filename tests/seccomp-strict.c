@@ -44,23 +44,25 @@ main(void)
 		"seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL) = 0\n";
 	static const char text2[] = "+++ exited with 0 +++\n";
 	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeef;
-	int rc = 0;
+	long rc;
 
-	assert(syscall(__NR_seccomp, -1L, -1L, addr) == -1);
-	printf("seccomp(%#x /* SECCOMP_SET_MODE_??? */, %u, %#lx) = -1 %s (%m)\n",
-	       -1, -1, addr, ENOSYS == errno ? "ENOSYS" : "EINVAL");
+	rc = syscall(__NR_seccomp, -1L, -1L, addr);
+	printf("seccomp(%#x /* SECCOMP_SET_MODE_??? */, %u, %#lx)"
+	       " = %ld %s (%m)\n", -1, -1, addr, rc, errno2name());
 	fflush(stdout);
 
-	if (syscall(__NR_seccomp, 0, 0, 0)) {
-		printf("seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL) = -1 %s (%m)\n",
-		       ENOSYS == errno ? "ENOSYS" : "EINVAL");
+	rc = syscall(__NR_seccomp, 0, 0, 0);
+	if (rc) {
+		printf("seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL)"
+		       " = %ld %s (%m)\n", rc, errno2name());
 		fflush(stdout);
+		rc = 0;
 	} else {
 		/*
 		 * If kernel implementaton of SECCOMP_MODE_STRICT is buggy,
 		 * the following syscall will result to SIGKILL.
 		 */
-		rc += write(1, text1, LENGTH_OF(text1)) != LENGTH_OF(text1);
+		rc = write(1, text1, LENGTH_OF(text1)) != LENGTH_OF(text1);
 	}
 
 	rc += write(1, text2, LENGTH_OF(text2)) != LENGTH_OF(text2);
