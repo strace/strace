@@ -41,17 +41,15 @@ int
 main(void)
 {
 	const kernel_ulong_t len = (kernel_ulong_t) 0xdefaced0badc0deULL;
+	long rc;
 
 	if (sizeof(len) > sizeof(long))
-		assert(ftruncate(-1, len) == -1);
+		rc = ftruncate(-1, len);
 	else
-		assert(syscall(__NR_ftruncate, -1L, len) == -1);
+		rc = syscall(__NR_ftruncate, -1L, len);
 
-	if (EBADF != errno)
-		perror_msg_and_skip("ftruncate");
-
-	printf("ftruncate(-1, %llu) = -1 EBADF (%m)\n",
-	       (unsigned long long) len);
+	printf("ftruncate(-1, %llu) = %ld %s (%m)\n",
+	       (unsigned long long) len, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
