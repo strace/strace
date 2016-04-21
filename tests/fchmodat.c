@@ -41,7 +41,6 @@ int
 main(void)
 {
 	static const char sample[] = "fchmodat_sample";
-	const char *err;
 
 	if (open(sample, O_RDONLY | O_CREAT, 0400) == -1)
 		perror_msg_and_fail("open");
@@ -54,16 +53,10 @@ main(void)
 
 		if (syscall(__NR_fchmodat, -100, sample, 0600) != -1)
 			perror_msg_and_fail("fchmodat");
-
-		err = "ENOENT";
-	} else {
-		if (errno != ENOSYS)
-			perror_msg_and_fail("fchmodat");
-		err = "ENOSYS";
 	}
 
 	printf("fchmodat(AT_FDCWD, \"%s\", 0600) = -1 %s (%m)\n",
-	       sample, err);
+	       sample, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
