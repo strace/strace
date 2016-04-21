@@ -11,20 +11,10 @@ int
 main(void)
 {
 	static const char sample[] = "chroot.sample";
-	int rc = syscall(__NR_chroot ,sample);
-	const char *errno_text;
-	switch (errno) {
-		case ENOSYS:
-			errno_text = "ENOSYS";
-			break;
-		case EPERM:
-			errno_text = "EPERM";
-			break;
-		default:
-			errno_text = "ENOENT";
-	}
-	printf("chroot(\"%s\") = %d %s (%m)\n",
-	       sample, rc, errno_text);
+
+	long rc = syscall(__NR_chroot, sample);
+	printf("chroot(\"%s\") = %ld %s (%m)\n",
+	       sample, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
