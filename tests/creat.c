@@ -5,7 +5,6 @@
 
 # include <errno.h>
 # include <stdio.h>
-# include <sys/stat.h>
 # include <unistd.h>
 
 # define TMP_FILE "creat"
@@ -13,10 +12,9 @@
 int
 main(void)
 {
-	int rc = syscall(__NR_creat, TMP_FILE, S_IRUSR);
-	printf("creat(\"%s\", %#o) = %d %s (%m)\n",
-	       TMP_FILE, S_IRUSR, rc,
-	       errno2name());
+	long rc = syscall(__NR_creat, TMP_FILE, 0400);
+	printf("creat(\"%s\", %#o) = %ld %s (%m)\n",
+	       TMP_FILE, 0400, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
