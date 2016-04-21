@@ -47,24 +47,22 @@ main(void)
 	if (open(sample, O_RDONLY | O_CREAT, 0400) == -1)
 		perror_msg_and_fail("open");
 
-	if (syscall(__NR_fchownat, AT_FDCWD, sample, uid, gid, 0) == 0) {
+	long rc = syscall(__NR_fchownat, AT_FDCWD, sample, uid, gid, 0);
+	if (rc == 0) {
 		printf("fchownat(AT_FDCWD, \"%s\", %d, %d, 0) = 0\n",
 		       sample, uid, gid);
 
 		if (unlink(sample))
 			perror_msg_and_fail("unlink");
 
-		if (syscall(__NR_fchownat, AT_FDCWD, sample,
-			    -1, -1L, AT_SYMLINK_NOFOLLOW) != -1)
-			perror_msg_and_fail("fchownat");
+		rc = syscall(__NR_fchownat, AT_FDCWD,
+			     sample, -1, -1L, AT_SYMLINK_NOFOLLOW);
 
 		printf("fchownat(AT_FDCWD, \"%s\", -1, -1, AT_SYMLINK_NOFOLLOW)"
-		       " = -1 ENOENT (%m)\n", sample);
+		       " = %ld %s (%m)\n", sample, rc, errno2name());
 	} else {
-		if (errno != ENOSYS)
-			perror_msg_and_fail("fchownat");
 		printf("fchownat(AT_FDCWD, \"%s\", %d, %d, 0)"
-		       " = -1 ENOSYS (%m)\n", sample, uid, gid);
+		       " = %ld %s (%m)\n", sample, uid, gid, rc, errno2name());
 	}
 
 	puts("+++ exited with 0 +++");
