@@ -30,7 +30,6 @@
 
 #ifdef __NR_ftruncate
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

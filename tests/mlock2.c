@@ -30,7 +30,6 @@
 
 #ifdef __NR_mlock2
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

@@ -3,7 +3,6 @@
 
 #ifdef __NR_acct
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

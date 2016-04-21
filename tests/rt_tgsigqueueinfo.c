@@ -32,7 +32,6 @@
 
 #ifdef __NR_rt_tgsigqueueinfo
 
-# include <assert.h>
 # include <errno.h>
 # include <signal.h>
 # include <stdio.h>

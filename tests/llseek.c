@@ -30,7 +30,6 @@
 
 #ifdef __NR__llseek
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

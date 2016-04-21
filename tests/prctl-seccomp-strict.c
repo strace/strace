@@ -33,7 +33,6 @@
 
 #if defined HAVE_PRCTL && defined PR_SET_SECCOMP && defined __NR_exit
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

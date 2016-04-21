@@ -32,7 +32,6 @@
 
 #if defined __NR_seccomp && defined __NR_exit
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

@@ -33,7 +33,6 @@
 
 #if defined HAVE_SYNC_FILE_RANGE && defined __NR_sync_file_range
 
-# include <assert.h>
 # include <stdio.h>
 
 int

@@ -30,7 +30,6 @@
 
 #ifdef __NR_truncate64
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

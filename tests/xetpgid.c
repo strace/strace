@@ -32,7 +32,6 @@
 
 #if defined __NR_getpgid && defined __NR_setpgid
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

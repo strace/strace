@@ -32,7 +32,6 @@
 
 #if defined __NR_tee
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 

@@ -28,7 +28,6 @@
  */
 
 #include "tests.h"
-#include <assert.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>

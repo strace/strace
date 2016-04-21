@@ -32,7 +32,6 @@
 
 #if defined __NR_splice
 
-# include <assert.h>
 # include <stdio.h>
 # include <unistd.h>
 
