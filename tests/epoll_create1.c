@@ -39,18 +39,17 @@
 int
 main(void)
 {
-	int rc = syscall(__NR_epoll_create1, O_CLOEXEC);
+	long rc = syscall(__NR_epoll_create1, O_CLOEXEC);
 	if (rc == -1) {
-		if (ENOSYS != errno)
-			perror_msg_and_fail("epoll_create1 O_CLOEXEC");
-		printf("epoll_create1(EPOLL_CLOEXEC) = -1 ENOSYS (%m)\n");
+		printf("epoll_create1(EPOLL_CLOEXEC) = -1 %s (%m)\n",
+		       errno2name());
 	} else {
-		printf("epoll_create1(EPOLL_CLOEXEC) = %d\n", rc);
+		printf("epoll_create1(EPOLL_CLOEXEC) = %ld\n", rc);
 	}
 
-	assert(syscall(__NR_epoll_create1, O_CLOEXEC | O_NONBLOCK) == -1);
-	printf("epoll_create1(EPOLL_CLOEXEC|%#x) = -1 %s (%m)\n",
-	       O_NONBLOCK, ENOSYS == errno ? "ENOSYS" : "EINVAL");
+	rc = syscall(__NR_epoll_create1, O_CLOEXEC | O_NONBLOCK);
+	printf("epoll_create1(EPOLL_CLOEXEC|%#x) = %ld %s (%m)\n",
+	       O_NONBLOCK, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
