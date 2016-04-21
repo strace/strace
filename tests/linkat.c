@@ -15,13 +15,13 @@ main(void)
 	const long fd_old = (long) 0xdeadbeefffffffff;
 	const long fd_new = (long) 0xdeadbeeffffffffe;
 
-	int rc = syscall(__NR_linkat, fd_old, sample_1, fd_new, sample_2, 0);
-	printf("linkat(%d, \"%s\", %d, \"%s\", 0) = %d %s (%m)\n",
-	       (int) fd_old, sample_1, (int) fd_new, sample_2, rc,
-	       errno2name());
+	long rc = syscall(__NR_linkat, fd_old, sample_1, fd_new, sample_2, 0);
+	printf("linkat(%d, \"%s\", %d, \"%s\", 0) = %ld %s (%m)\n",
+	       (int) fd_old, sample_1, (int) fd_new, sample_2,
+	       rc, errno2name());
 
 	rc = syscall(__NR_linkat, -100, sample_1, -100, sample_2, -1L);
-	printf("linkat(%s, \"%s\", %s, \"%s\", %s) = %d %s (%m)\n",
+	printf("linkat(%s, \"%s\", %s, \"%s\", %s) = %ld %s (%m)\n",
 	       "AT_FDCWD", sample_1, "AT_FDCWD", sample_2,
 	       "AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
 	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff",
