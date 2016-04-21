@@ -87,8 +87,7 @@ main(void)
 			printf("%u", num);
 		errno = saved_errno;
 		if (expected)
-			printf(") = -1 %s (%m)\n",
-			       errno2name());
+			printf(") = -1 %s (%m)\n", errno2name());
 		else
 			printf(") = 0\n");
 	}
