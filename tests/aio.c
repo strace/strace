@@ -172,10 +172,10 @@ main(void)
 	       (unsigned long long) cb[1].aio_data, &cb[1], sizeof_data1,
 	       nr);
 
-	assert(syscall(__NR_io_cancel, *ctx, cbc, ev) == -1 && EINVAL == errno);
+	assert(syscall(__NR_io_cancel, *ctx, cbc, ev) == -1);
 	printf("io_cancel(%lu, {data=%#llx, pread, reqprio=99, fildes=-42}, %p) "
-		"= -1 EINVAL (%m)\n",
-	       *ctx, (unsigned long long) cbc->aio_data, ev);
+		"= -1 %s (%m)\n",
+	       *ctx, (unsigned long long) cbc->aio_data, ev, errno2name());
 
 	if (syscall(__NR_io_submit, *ctx, nr, cbvs) != (long) nr)
 		perror_msg_and_skip("io_submit");
