@@ -56,15 +56,8 @@ main(void)
 
 		if (syscall(__NR_fchmod, fd, 0600) != -1)
 			perror_msg_and_fail("fchmod");
-
-		printf("fchmod(%d, 0600) = -1 EBADF (%m)\n", fd);
-	} else {
-		if (errno == ENOSYS) {
-			printf("fchmod(%d, 0600) = -1 ENOSYS (%m)\n", fd);
-		} else {
-			perror_msg_and_fail("fchmod");
-		}
 	}
+	printf("fchmod(%d, 0600) = -1 %s (%m)\n", fd, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
