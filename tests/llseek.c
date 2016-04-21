@@ -43,12 +43,9 @@ main(void)
 	const long long offset = 0xfacefeeddeadbeefLL;
 	unsigned long long result;
 
-	assert(syscall(__NR__llseek, -1, high, low, &result, SEEK_SET) == -1);
-	if (EBADF != errno)
-		perror_msg_and_skip("_llseek");
-
-	printf("_llseek(-1, %lld, %p, SEEK_SET) = -1 EBADF (%m)\n",
-	       offset, &result);
+	long rc = syscall(__NR__llseek, -1, high, low, &result, SEEK_SET);
+	printf("_llseek(-1, %lld, %p, SEEK_SET) = %ld %s (%m)\n",
+	       offset, &result, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
