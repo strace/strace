@@ -40,12 +40,9 @@ main(void)
 {
 	const off_t len = 0xdefaceddeadbeef;
 
-	assert(ftruncate(-1, len) == -1);
-	if (EBADF != errno)
-		perror_msg_and_skip("ftruncate");
-
-	printf("ftruncate64(-1, %llu) = -1 EBADF (%m)\n",
-	       (unsigned long long) len);
+	int rc = ftruncate(-1, len);
+	printf("ftruncate64(-1, %llu) = %d %s (%m)\n",
+	       (unsigned long long) len, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
