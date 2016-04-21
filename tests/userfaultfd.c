@@ -39,9 +39,9 @@
 int
 main(void)
 {
-	assert(syscall(__NR_userfaultfd, 1 | O_NONBLOCK | O_CLOEXEC) == -1);
-	printf("userfaultfd(O_NONBLOCK|O_CLOEXEC|0x1) = -1 %s (%m)\n",
-	       errno2name());
+	long rc = syscall(__NR_userfaultfd, 1 | O_NONBLOCK | O_CLOEXEC);
+	printf("userfaultfd(O_NONBLOCK|O_CLOEXEC|0x1) = %ld %s (%m)\n",
+	       rc, errno2name());
 	puts("+++ exited with 0 +++");
 	return 0;
 }
