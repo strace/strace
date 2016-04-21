@@ -52,19 +52,19 @@ main(void)
 	struct sock_filter *const filter = tail_alloc(sizeof(*filter) * N);
 	const void *const efault = tail_alloc(1);
 	struct sock_fprog *const prog = tail_alloc(sizeof(*prog));
+	long rc;
 
 	prog->filter = filter;
 	prog->len = N;
-	assert(syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -1, prog) == -1);
+	rc = syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -1, prog);
 	printf("seccomp(SECCOMP_SET_MODE_FILTER, %s, {len=%u, filter=%p})"
-	       " = -1 %s (%m)\n", "SECCOMP_FILTER_FLAG_TSYNC|0xfffffffe",
-	       prog->len, prog->filter,
-	       ENOSYS == errno ? "ENOSYS" : "EINVAL");
+	       " = %ld %s (%m)\n", "SECCOMP_FILTER_FLAG_TSYNC|0xfffffffe",
+	       prog->len, prog->filter, rc, errno2name());
 
-	assert(syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -2L, efault) == -1);
-	printf("seccomp(SECCOMP_SET_MODE_FILTER, %s, %p) = -1 %s (%m)\n",
-	       "0xfffffffe /* SECCOMP_FILTER_FLAG_??? */", efault,
-	       ENOSYS == errno ? "ENOSYS" : "EINVAL");
+	rc = syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -2L, efault);
+	printf("seccomp(SECCOMP_SET_MODE_FILTER, %s, %p) = %ld %s (%m)\n",
+	       "0xfffffffe /* SECCOMP_FILTER_FLAG_??? */",
+	       efault, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
