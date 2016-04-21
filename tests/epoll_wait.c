@@ -13,8 +13,8 @@ main(void)
 {
 	struct epoll_event *const ev = tail_alloc(sizeof(*ev));
 
-	int rc = syscall(__NR_epoll_wait, -1, ev, 1, -2);
-	printf("epoll_wait(-1, %p, 1, -2) = %d %s (%m)\n",
+	long rc = syscall(__NR_epoll_wait, -1, ev, 1, -2);
+	printf("epoll_wait(-1, %p, 1, -2) = %ld %s (%m)\n",
 	       ev, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
