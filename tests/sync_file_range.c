@@ -45,14 +45,14 @@ main(void)
 	const off64_t nbytes = 0xfacefeedcafef00d;
 	const unsigned int flags = -1;
 
-	assert(sync_file_range(fd, offset, nbytes, flags) == -1);
+	int rc = sync_file_range(fd, offset, nbytes, flags);
 	printf("%s(%d, %lld, %lld, SYNC_FILE_RANGE_WAIT_BEFORE"
 	       "|SYNC_FILE_RANGE_WRITE|SYNC_FILE_RANGE_WAIT_AFTER"
-	       "|0xfffffff8) = -1 %s (%m)\n",
+	       "|0xfffffff8) = %d %s (%m)\n",
 	       "sync_file_range", fd,
 	       (long long) offset,
 	       (long long) nbytes,
-	       errno2name());
+	       rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
