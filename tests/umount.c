@@ -28,10 +28,10 @@
 #include "tests.h"
 #include <errno.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
 #ifdef __NR_oldumount
 # define TEST_SYSCALL_STR "oldumount"
@@ -48,24 +48,16 @@ int
 main(void)
 {
 	static const char sample[] = "umount.sample";
-	const char *errno_text;
 	if (mkdir(sample, 0700))
 		perror_msg_and_fail("mkdir: %s", sample);
-	(void) syscall(__NR_oldumount, sample);
-	switch (errno) {
-		case ENOSYS:
-			errno_text = "ENOSYS";
-			break;
-		case EPERM:
-			errno_text = "EPERM";
-			break;
-		default:
-			errno_text = "EINVAL";
-	}
-	printf("%s(\"%s\") = -1 %s (%m)\n",
-	       TEST_SYSCALL_STR, sample, errno_text);
+
+	long rc = syscall(__NR_oldumount, sample);
+	printf("%s(\"%s\") = %ld %s (%m)\n",
+	       TEST_SYSCALL_STR, sample, rc, errno2name());
+
 	if (rmdir(sample))
 		perror_msg_and_fail("rmdir: %s", sample);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
