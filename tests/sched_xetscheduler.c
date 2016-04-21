@@ -12,7 +12,7 @@ int
 main(void)
 {
 	struct sched_param *const param = tail_alloc(sizeof(struct sched_param));
-	int rc = syscall(__NR_sched_getscheduler, 0);
+	long rc = syscall(__NR_sched_getscheduler, 0);
 	const char *scheduler;
 	switch (rc) {
 		case SCHED_FIFO:
@@ -44,14 +44,13 @@ main(void)
 		default:
 			scheduler = "SCHED_OTHER";
 	}
-	printf("sched_getscheduler(0) = %d (%s)\n",
+	printf("sched_getscheduler(0) = %ld (%s)\n",
 	       rc, scheduler);
 
 	param->sched_priority = -1;
 	rc = syscall(__NR_sched_setscheduler, 0, SCHED_FIFO, param);
-	printf("sched_setscheduler(0, SCHED_FIFO, [%d]) = %d %s (%m)\n",
-	       param->sched_priority, rc,
-	       errno2name());
+	printf("sched_setscheduler(0, SCHED_FIFO, [%d]) = %ld %s (%m)\n",
+	       param->sched_priority, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;
