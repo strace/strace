@@ -787,6 +787,6 @@ extern unsigned num_quals;
 # define PRI__64 "ll"
 #endif
 
-#define PRI__s64 PRI__64"d"
+#define PRI__d64 PRI__64"d"
 #define PRI__u64 PRI__64"u"
 #define PRI__x64 PRI__64"x"
