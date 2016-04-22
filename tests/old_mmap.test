@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of "old mmap" edition of mmap syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=mmap

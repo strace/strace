@@ -120,6 +120,7 @@ net-yy-unix
 netlink_inet_diag
 netlink_unix_diag
 newfstatat
+old_mmap
 oldselect
 open
 openat
