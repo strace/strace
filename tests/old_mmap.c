@@ -51,6 +51,9 @@
 int
 main(void)
 {
+	long rc = syscall(__NR_mmap, 0);
+	printf("mmap(NULL) = %ld %s (%m)\n", rc, errno2name());
+
 	const unsigned int args1_c[6] = {
 		0xdeadbeef,		/* addr */
 		0xfacefeed,		/* len */
@@ -70,7 +73,7 @@ main(void)
 	};
 	void *args = tail_memdup(args1_c, sizeof(args1_c));
 
-	long rc = syscall(__NR_mmap, args);
+	rc = syscall(__NR_mmap, args);
 	printf("mmap(%#x, %u, PROT_READ|PROT_EXEC, MAP_FILE|MAP_FIXED"
 	       ", %d, %#x) = %ld %s (%m)\n",
 	       args1_c[0], args1_c[1], args1_c[4], args1_c[5],

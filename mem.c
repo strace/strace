@@ -96,15 +96,15 @@ SYS_FUNC(old_mmap)
 	long u_arg[6];
 # if defined AARCH64 || defined X86_64
 	/* We are here only in a 32-bit personality. */
-	int i;
-	unsigned narrow_arg[6];
-	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), narrow_arg) == -1)
-		return 0;
-	for (i = 0; i < 6; ++i)
-		u_arg[i] = (unsigned long) narrow_arg[i];
+	unsigned int narrow_arg[6];
+	if (umove_or_printaddr(tcp, tcp->u_arg[0], &narrow_arg))
+		return RVAL_DECODED | RVAL_HEX;
+	unsigned int i;
+	for (i = 0; i < 6; i++)
+		u_arg[i] = narrow_arg[i];
 # else
-	if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), u_arg) == -1)
-		return 0;
+	if (umove_or_printaddr(tcp, tcp->u_arg[0], &u_arg))
+		return RVAL_DECODED | RVAL_HEX;
 # endif
 	print_mmap(tcp, u_arg, (unsigned long) u_arg[5]);
 
