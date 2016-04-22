@@ -30,15 +30,16 @@
 #include <fcntl.h>
 #include "xlat/sync_file_range_flags.h"
 
-SYS_FUNC(sync_file_range)
+SYS_FUNC(sync_file_range2)
 {
 	int argn;
 
 	printfd(tcp, tcp->u_arg[0]);
-	argn = printllval(tcp, ", %lld, ", 1);
-	argn = printllval(tcp, "%lld, ", argn);
-	printflags(sync_file_range_flags, tcp->u_arg[argn],
+	tprints(", ");
+	printflags(sync_file_range_flags, tcp->u_arg[1],
 		   "SYNC_FILE_RANGE_???");
+	argn = printllval(tcp, ", %lld, ", 2);
+	argn = printllval(tcp, "%lld", argn);
 
 	return RVAL_DECODED;
 }

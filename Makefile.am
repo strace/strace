@@ -64,6 +64,8 @@ noinst_LIBRARIES = libstrace.a
 libstrace_a_CPPFLAGS = $(strace_CPPFLAGS)
 libstrace_a_CFLAGS = $(strace_CFLAGS)
 libstrace_a_SOURCES =	\
+	sync_file_range.c \
+	sync_file_range2.c \
 	upeek.c		\
 	# end of libstrace_a_SOURCES
 
@@ -190,7 +192,6 @@ strace_SOURCES =	\
 	statfs.c	\
 	strace.c	\
 	swapon.c	\
-	sync_file_range.c \
 	syscall.c	\
 	sysctl.c	\
 	sysinfo.c	\
@@ -641,7 +642,8 @@ srpm: dist-xz
 $(srcdir)/.version:
 	$(AM_V_GEN)echo $(VERSION) > $@-t && mv $@-t $@
 
-strace_SOURCES_c = $(filter %.c,$(strace_SOURCES))
+strace_SOURCES_c = \
+	$(filter %.c,$(strace_SOURCES)) $(filter %.c,$(libstrace_a_SOURCES))
 
 sys_func.h: $(patsubst %,$(srcdir)/%,$(strace_SOURCES_c))
 	for f in $^; do \
