@@ -86,22 +86,15 @@ print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
  * Confused? Me too!
  */
 
+#if defined AARCH64 || defined ARM \
+ || defined I386 || defined X86_64 || defined X32 \
+ || defined M68K \
+ || defined S390 || defined S390X
 /* Params are pointed to by u_arg[0], offset is in bytes */
 SYS_FUNC(old_mmap)
 {
 	long u_arg[6];
-#if defined(IA64)
-	/*
-	 * IA64 processes never call this routine, they only use the
-	 * new 'sys_mmap' interface. Only IA32 processes come here.
-	 */
-	int i;
-	unsigned narrow_arg[6];
-	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), narrow_arg) == -1)
-		return 0;
-	for (i = 0; i < 6; i++)
-		u_arg[i] = (unsigned long) narrow_arg[i];
-#elif defined(X86_64)
+# if defined(X86_64)
 	/* We are here only in personality 1 (i386) */
 	int i;
 	unsigned narrow_arg[6];
@@ -109,14 +102,15 @@ SYS_FUNC(old_mmap)
 		return 0;
 	for (i = 0; i < 6; ++i)
 		u_arg[i] = (unsigned long) narrow_arg[i];
-#else
+# else
 	if (umoven(tcp, tcp->u_arg[0], sizeof(u_arg), u_arg) == -1)
 		return 0;
-#endif
+# endif
 	print_mmap(tcp, u_arg, (unsigned long) u_arg[5]);
 
 	return RVAL_DECODED | RVAL_HEX;
 }
+#endif /* old_mmap architectures */
 
 #if defined(S390)
 /* Params are pointed to by u_arg[0], offset is in pages */
