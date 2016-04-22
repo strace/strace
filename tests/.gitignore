@@ -20,6 +20,7 @@ chmod
 chown
 chown32
 chroot
+clock_adjtime
 clock_nanosleep
 clock_xettime
 copy_file_range

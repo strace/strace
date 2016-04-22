@@ -73,6 +73,7 @@ check_PROGRAMS = \
 	chown \
 	chown32 \
 	chroot \
+	clock_adjtime \
 	clock_nanosleep \
 	clock_xettime \
 	copy_file_range \
@@ -326,6 +327,7 @@ DECODER_TESTS = \
 	chown.test \
 	chown32.test \
 	chroot.test \
+	clock_adjtime.test \
 	clock_nanosleep.test \
 	clock_xettime.test \
 	copy_file_range.test \
