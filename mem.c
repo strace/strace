@@ -94,8 +94,8 @@ print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
 SYS_FUNC(old_mmap)
 {
 	long u_arg[6];
-# if defined(X86_64)
-	/* We are here only in personality 1 (i386) */
+# if defined AARCH64 || defined X86_64
+	/* We are here only in a 32-bit personality. */
 	int i;
 	unsigned narrow_arg[6];
 	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), narrow_arg) == -1)
