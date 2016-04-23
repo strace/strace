@@ -39,11 +39,14 @@ main(void)
 		perror_msg_and_skip("shmdt");
 	printf("shmdt(%p) = 0\n", shmaddr);
 
-	void *shmaddr2 = shmat(id, shmaddr, 0);
+	++shmaddr;
+	void *shmaddr2 = shmat(id, shmaddr, SHM_RND);
 	if (shmaddr2 == (void *)(-1))
-		perror_msg_and_skip("shmat %p", shmaddr);
-	printf("%s(%d, %p, 0) = %p\n",
-	       SHMAT, id, shmaddr, shmaddr2);
+		printf("%s(%d, %p, SHM_RND) = -1 %s (%m)\n",
+		       SHMAT, id, shmaddr, errno2name());
+	else
+		printf("%s(%d, %p, SHM_RND) = %p\n",
+		       SHMAT, id, shmaddr, shmaddr2);
 
 	puts("+++ exited with 0 +++");
 	return 0;
