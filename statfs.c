@@ -44,10 +44,8 @@ sprintfstype(const unsigned int magic)
 	const char *s;
 
 	s = xlat_search(fsmagic, ARRAY_SIZE(fsmagic), magic);
-	if (s) {
-		sprintf(buf, "\"%s\"", s);
-		return buf;
-	}
+	if (s)
+		return s;
 	sprintf(buf, "%#x", magic);
 	return buf;
 }
