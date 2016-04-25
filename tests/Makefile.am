@@ -203,6 +203,7 @@ check_PROGRAMS = \
 	rt_sigtimedwait \
 	rt_tgsigqueueinfo \
 	sched_get_priority_mxx \
+	sched_rr_get_interval \
 	sched_xetaffinity \
 	sched_xetattr \
 	sched_xetparam \
@@ -450,6 +451,7 @@ DECODER_TESTS = \
 	rt_sigtimedwait.test \
 	rt_tgsigqueueinfo.test \
 	sched_get_priority_mxx.test \
+	sched_rr_get_interval.test \
 	sched_xetaffinity.test \
 	sched_xetattr.test \
 	sched_xetparam.test \

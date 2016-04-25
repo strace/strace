@@ -152,6 +152,7 @@ rt_sigsuspend
 rt_sigtimedwait
 rt_tgsigqueueinfo
 sched_get_priority_mxx
+sched_rr_get_interval
 sched_xetaffinity
 sched_xetattr
 sched_xetparam
