@@ -166,6 +166,7 @@ semop
 sendfile
 sendfile64
 set_ptracer_any
+setdomainname
 setfsgid
 setfsgid32
 setfsuid
