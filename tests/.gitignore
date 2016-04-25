@@ -145,6 +145,7 @@ recvmsg
 rename
 renameat
 restart_syscall
+rmdir
 rt_sigpending
 rt_sigprocmask
 rt_sigqueueinfo
