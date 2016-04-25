@@ -250,6 +250,7 @@ check_PROGRAMS = \
 	stat64 \
 	statfs \
 	swap \
+	symlink \
 	symlinkat \
 	sync_file_range \
 	sync_file_range2 \
@@ -498,6 +499,7 @@ DECODER_TESTS = \
 	statfs.test \
 	sun_path.test \
 	swap.test \
+	symlink.test \
 	symlinkat.test \
 	sync_file_range.test \
 	sync_file_range2.test \

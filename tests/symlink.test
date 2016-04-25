@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check symlink syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a34
