@@ -60,4 +60,24 @@ SYS_FUNC(getxgid)
 	return decode_getxxid(tcp, "egid");
 }
 
+SYS_FUNC(osf_statfs)
+{
+	printpath(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printaddr(tcp->u_arg[1]);
+	tprints(", ");
+	tprintf("%lu", tcp->u_arg[2]);
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(osf_fstatfs)
+{
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	printaddr(tcp->u_arg[1]);
+	tprints(", ");
+	tprintf("%lu", tcp->u_arg[2]);
+	return RVAL_DECODED;
+}
+
 #endif /* ALPHA */

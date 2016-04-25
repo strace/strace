@@ -217,28 +217,3 @@ SYS_FUNC(fstatfs64)
 	return do_statfs64_fstatfs64(tcp);
 }
 #endif /* HAVE_STRUCT_STATFS64 */
-
-#ifdef ALPHA
-SYS_FUNC(osf_statfs)
-{
-	if (entering(tcp)) {
-		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
-	} else {
-		printstatfs(tcp, tcp->u_arg[1]);
-		tprintf(", %lu", tcp->u_arg[2]);
-	}
-	return 0;
-}
-
-SYS_FUNC(osf_fstatfs)
-{
-	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
-	} else {
-		printstatfs(tcp, tcp->u_arg[1]);
-		tprintf(", %lu", tcp->u_arg[2]);
-	}
-	return 0;
-}
-#endif /* ALPHA */
