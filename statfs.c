@@ -52,6 +52,15 @@ sprintfstype(const unsigned int magic)
 }
 
 static void
+print_statfs_flags(const char *const prefix, const unsigned int flags)
+{
+	if (flags & ST_VALID) {
+		tprints(prefix);
+		printflags(statfs_flags, flags, "ST_???");
+	}
+}
+
+static void
 printstatfs(struct tcb *tcp, const long addr)
 {
 	struct statfs statbuf;
@@ -73,8 +82,7 @@ printstatfs(struct tcb *tcp, const long addr)
 	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
 #endif
 #ifdef _STATFS_F_FLAGS
-	tprints(", f_flags=");
-	printflags(statfs_flags, statbuf.f_flags, "ST_???");
+	print_statfs_flags(", f_flags=", statbuf.f_flags);
 #endif
 	tprints("}");
 }
@@ -124,8 +132,7 @@ printstatfs64(struct tcb *tcp, long addr)
 	tprintf(", f_frsize=%llu", (unsigned long long)statbuf.f_frsize);
 #endif
 #ifdef _STATFS_F_FLAGS
-	tprints(", f_flags=");
-	printflags(statfs_flags, statbuf.f_flags, "ST_???");
+	print_statfs_flags(", f_flags=", statbuf.f_flags);
 #endif
 	tprints("}");
 }
@@ -172,8 +179,7 @@ printcompat_statfs64(struct tcb *tcp, const long addr)
 		statbuf.f_fsid.__val[0], statbuf.f_fsid.__val[1]);
 	tprintf(", f_namelen=%lu", (unsigned long)statbuf.f_namelen);
 	tprintf(", f_frsize=%lu", (unsigned long)statbuf.f_frsize);
-	tprints(", f_flags=");
-	printflags(statfs_flags, statbuf.f_flags, "ST_???");
+	print_statfs_flags(", f_flags=", statbuf.f_flags);
 	tprints("}");
 }
 
