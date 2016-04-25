@@ -230,8 +230,8 @@
 [224] = { 5,	0,		SEN(printargs),			"osf_stat"		}, /*not implemented */
 [225] = { 5,	0,		SEN(printargs),			"osf_lstat"		}, /*not implemented */
 [226] = { 5,	0,		SEN(printargs),			"osf_fstat"		}, /*not implemented */
-[227] = { 5,	0,		SEN(printargs),			"osf_statfs64"		}, /*not implemented */
-[228] = { 5,	0,		SEN(printargs),			"osf_fstatfs64"		}, /*not implemented */
+[227] = { 3,	0,		SEN(osf_statfs),		"osf_statfs64"		}, /*not implemented */
+[228] = { 3,	0,		SEN(osf_fstatfs),		"osf_fstatfs64"		}, /*not implemented */
 [229 ... 232] = { },
 [233] = { 1,	0,		SEN(getpgid),			"getpgid"		},
 [234] = { 1,	0,		SEN(getsid),			"getsid"		},
