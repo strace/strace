@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of out-of-range syscalls.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=none

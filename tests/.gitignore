@@ -124,6 +124,7 @@ net-yy-unix
 netlink_inet_diag
 netlink_unix_diag
 newfstatat
+nsyscalls
 old_mmap
 oldselect
 open
