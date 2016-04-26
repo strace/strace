@@ -49,6 +49,7 @@ libtests_a_SOURCES = \
 	inode_of_sockfd.c \
 	overflowuid.c \
 	print_quoted_string.c \
+	printflags.c \
 	tail_alloc.c \
 	tests.h \
 	tprintf.c \

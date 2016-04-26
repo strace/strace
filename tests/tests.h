@@ -87,8 +87,12 @@ void check_overflowuid(const int);
 /* Check whether given gid matches kernel overflowgid. */
 void check_overflowgid(const int);
 
-/* Translate errno to its name */
+/* Translate errno to its name. */
 const char *errno2name(void);
+
+/* Print flags in symbolic form according to xlat table. */
+struct xlat;
+int printflags(const struct xlat *, const unsigned long long, const char *);
 
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
