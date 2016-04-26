@@ -226,6 +226,7 @@ umovestr
 umovestr2
 uname
 unix-pair-send-recv
+unlink
 unlinkat
 userfaultfd
 utime

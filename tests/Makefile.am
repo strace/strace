@@ -278,6 +278,7 @@ check_PROGRAMS = \
 	umovestr2 \
 	uname \
 	unix-pair-send-recv \
+	unlink \
 	unlinkat \
 	userfaultfd \
 	utime \
@@ -530,6 +531,7 @@ DECODER_TESTS = \
 	umovestr.test \
 	umovestr2.test \
 	uname.test \
+	unlink.test \
 	unlinkat.test \
 	userfaultfd.test \
 	utime.test \
