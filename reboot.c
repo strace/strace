@@ -6,12 +6,16 @@
 
 SYS_FUNC(reboot)
 {
-	printflags(bootflags1, tcp->u_arg[0], "LINUX_REBOOT_MAGIC_???");
+	const unsigned int magic1 = tcp->u_arg[0];
+	const unsigned int magic2 = tcp->u_arg[1];
+	const unsigned int cmd = tcp->u_arg[2];
+
+	printflags(bootflags1, magic1, "LINUX_REBOOT_MAGIC_???");
 	tprints(", ");
-	printflags(bootflags2, tcp->u_arg[1], "LINUX_REBOOT_MAGIC_???");
+	printflags(bootflags2, magic2, "LINUX_REBOOT_MAGIC_???");
 	tprints(", ");
-	printflags(bootflags3, tcp->u_arg[2], "LINUX_REBOOT_CMD_???");
-	if (tcp->u_arg[2] == (long) LINUX_REBOOT_CMD_RESTART2) {
+	printflags(bootflags3, cmd, "LINUX_REBOOT_CMD_???");
+	if (cmd == LINUX_REBOOT_CMD_RESTART2) {
 		tprints(", ");
 		printstr(tcp, tcp->u_arg[3], -1);
 	}
