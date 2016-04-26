@@ -258,6 +258,7 @@ check_PROGRAMS = \
 	swap \
 	symlink \
 	symlinkat \
+	sync \
 	sync_file_range \
 	sync_file_range2 \
 	sysinfo \
@@ -513,6 +514,7 @@ DECODER_TESTS = \
 	swap.test \
 	symlink.test \
 	symlinkat.test \
+	sync.test \
 	sync_file_range.test \
 	sync_file_range2.test \
 	sysinfo.test \
