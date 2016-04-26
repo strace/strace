@@ -143,6 +143,7 @@ readdir
 readlink
 readlinkat
 readv
+reboot
 recvmsg
 rename
 renameat

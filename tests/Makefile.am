@@ -195,6 +195,7 @@ check_PROGRAMS = \
 	readlink \
 	readlinkat \
 	readv \
+	reboot \
 	recvmsg \
 	rename \
 	renameat\
@@ -450,6 +451,7 @@ DECODER_TESTS = \
 	readlink.test \
 	readlinkat.test \
 	readv.test \
+	reboot.test \
 	recvmsg.test \
 	rename.test \
 	renameat.test \
