@@ -110,6 +110,8 @@ check_PROGRAMS = \
 	fstat \
 	fstat64 \
 	fstatat64 \
+	fstatfs \
+	fstatfs64 \
 	fsync \
 	ftruncate \
 	ftruncate64 \
@@ -250,6 +252,7 @@ check_PROGRAMS = \
 	stat \
 	stat64 \
 	statfs \
+	statfs64 \
 	swap \
 	symlink \
 	symlinkat \
@@ -366,6 +369,8 @@ DECODER_TESTS = \
 	fstat.test \
 	fstat64.test \
 	fstatat64.test \
+	fstatfs.test \
+	fstatfs64.test \
 	fsync.test \
 	ftruncate.test \
 	ftruncate64.test \
@@ -498,6 +503,7 @@ DECODER_TESTS = \
 	stat.test \
 	stat64.test \
 	statfs.test \
+	statfs64.test \
 	sun_path.test \
 	swap.test \
 	symlink.test \
@@ -614,6 +620,9 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     xattr.expected \
 	     xchownx.c \
 	     xselect.c \
+	     xstatfs.c \
+	     xstatfs64.c \
+	     xstatfsx.c \
 	     xstatx.c \
 	     $(TESTS)
 

@@ -64,6 +64,10 @@ noinst_LIBRARIES = libstrace.a
 libstrace_a_CPPFLAGS = $(strace_CPPFLAGS)
 libstrace_a_CFLAGS = $(strace_CFLAGS)
 libstrace_a_SOURCES =	\
+	fstatfs.c \
+	fstatfs64.c \
+	statfs.c \
+	statfs64.c \
 	sync_file_range.c \
 	sync_file_range2.c \
 	upeek.c		\
@@ -103,6 +107,7 @@ strace_SOURCES =	\
 	fcntl.c		\
 	fetch_seccomp_fprog.c \
 	fetch_struct_flock.c \
+	fetch_struct_statfs.c \
 	file.c		\
 	file_handle.c	\
 	flock.c		\
@@ -157,6 +162,7 @@ strace_SOURCES =	\
 	print_mq_attr.c	\
 	print_msgbuf.c	\
 	print_sigevent.c \
+	print_statfs.c	\
 	print_time.c	\
 	print_timex.c	\
 	printmode.c	\
@@ -190,6 +196,7 @@ strace_SOURCES =	\
 	socketutils.c	\
 	sram_alloc.c	\
 	statfs.c	\
+	statfs.h	\
 	strace.c	\
 	swapon.c	\
 	syscall.c	\

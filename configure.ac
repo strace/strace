@@ -304,8 +304,6 @@ AC_CHECK_TYPES([struct stat64, struct __old_kernel_stat],,,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 
-AC_CHECK_TYPES([struct statfs64],,, [#include <sys/vfs.h>])
-
 AC_CHECK_TYPES(m4_normalize([
 	struct pt_all_user_regs,
 	struct ia64_fpreg,
@@ -393,7 +391,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/sem.h
 	sys/shm.h
 	sys/signalfd.h
-	sys/vfs.h
 	sys/xattr.h
 ]))
 
@@ -433,6 +430,30 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 			  [Define to 1 if union bpf_attr.log_buf initialization works])
 	fi
 ])
+
+AC_CHECK_TYPES([struct statfs], [
+	AC_CHECK_MEMBERS([struct statfs.f_frsize],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+	AC_CHECK_MEMBERS([struct statfs.f_flags],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+	AC_CHECK_MEMBERS([struct statfs.f_fsid.val],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+	AC_CHECK_MEMBERS([struct statfs.f_fsid.__val],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+],, [#include <linux/types.h>
+#include <asm/statfs.h>])
+
+AC_CHECK_TYPES([struct statfs64], [
+	AC_CHECK_MEMBERS([struct statfs64.f_frsize],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+	AC_CHECK_MEMBERS([struct statfs64.f_flags],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+	AC_CHECK_MEMBERS([struct statfs64.f_fsid.val],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+	AC_CHECK_MEMBERS([struct statfs64.f_fsid.__val],,, [#include <linux/types.h>
+#include <asm/statfs.h>])
+],, [#include <linux/types.h>
+#include <asm/statfs.h>])
 
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS(m4_normalize([

@@ -56,6 +56,8 @@ fork-f
 fstat
 fstat64
 fstatat64
+fstatfs
+fstatfs64
 fsync
 ftruncate
 ftruncate64
@@ -198,6 +200,7 @@ stack-fcall
 stat
 stat64
 statfs
+statfs64
 swap
 symlink
 symlinkat

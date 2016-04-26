@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check statfs64 syscall decoding.
+
+. "${srcdir=.}/statfs.test"

@@ -25,19 +25,22 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "tests.h"
-#include <sys/syscall.h>
+#define SYSCALL_INVOKE(file, desc, ptr, size) \
+	syscall(SYSCALL_NR, SYSCALL_ARG(file, desc), ptr)
+#define PRINT_SYSCALL_HEADER(file, desc, size) \
+	printf("%s(" SYSCALL_ARG_FMT ", ", SYSCALL_NAME, SYSCALL_ARG(file, desc))
 
-#ifdef __NR_statfs
-
-# define SYSCALL_ARG_FMT		"\"%s\""
-# define SYSCALL_ARG(file, desc)	(file)
-# define SYSCALL_NR			__NR_statfs
-# define SYSCALL_NAME			"statfs"
-# include "xstatfs.c"
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_statfs")
-
+#define STRUCT_STATFS	struct statfs
+#ifdef HAVE_STRUCT_STATFS_F_FRSIZE
+# define PRINT_F_FRSIZE
 #endif
+#ifdef HAVE_STRUCT_STATFS_F_FLAGS
+# define PRINT_F_FLAGS
+#endif
+#if defined HAVE_STRUCT_STATFS_F_FSID_VAL
+# define PRINT_F_FSID	f_fsid.val
+#elif defined HAVE_STRUCT_STATFS_F_FSID___VAL
+# define PRINT_F_FSID	f_fsid.__val
+#endif
+
+#include "xstatfsx.c"

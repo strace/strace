@@ -634,6 +634,10 @@ extern void tprint_open_modes(int);
 extern const char *sprint_open_modes(int);
 extern void print_seccomp_filter(struct tcb *tcp, unsigned long);
 
+struct strace_statfs;
+extern void print_struct_statfs(struct tcb *tcp, long);
+extern void print_struct_statfs64(struct tcb *tcp, long, unsigned long);
+
 extern int block_ioctl(struct tcb *, const unsigned int, long);
 extern int evdev_ioctl(struct tcb *, const unsigned int, long);
 extern int loop_ioctl(struct tcb *, const unsigned int, long);

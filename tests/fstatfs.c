@@ -28,16 +28,16 @@
 #include "tests.h"
 #include <sys/syscall.h>
 
-#ifdef __NR_statfs
+#ifdef __NR_fstatfs
 
-# define SYSCALL_ARG_FMT		"\"%s\""
-# define SYSCALL_ARG(file, desc)	(file)
-# define SYSCALL_NR			__NR_statfs
-# define SYSCALL_NAME			"statfs"
+# define SYSCALL_ARG_FMT		"%d"
+# define SYSCALL_ARG(file, desc)	(desc)
+# define SYSCALL_NR			__NR_fstatfs
+# define SYSCALL_NAME			"fstatfs"
 # include "xstatfs.c"
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_statfs")
+SKIP_MAIN_UNDEFINED("__NR_fstatfs")
 
 #endif

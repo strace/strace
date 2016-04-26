@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,19 +25,21 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "tests.h"
-#include <sys/syscall.h>
+#ifndef STRACE_STATFS_H
+#define STRACE_STATFS_H
 
-#ifdef __NR_statfs
+struct strace_statfs {
+	unsigned long long f_type;
+	unsigned long long f_bsize;
+	unsigned long long f_blocks;
+	unsigned long long f_bfree;
+	unsigned long long f_bavail;
+	unsigned long long f_files;
+	unsigned long long f_ffree;
+	unsigned long f_fsid[2];
+	unsigned long long f_namelen;
+	unsigned long long f_frsize;
+	unsigned long long f_flags;
+};
 
-# define SYSCALL_ARG_FMT		"\"%s\""
-# define SYSCALL_ARG(file, desc)	(file)
-# define SYSCALL_NR			__NR_statfs
-# define SYSCALL_NAME			"statfs"
-# include "xstatfs.c"
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_statfs")
-
-#endif
+#endif /* STRACE_STATFS_H */
