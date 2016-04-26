@@ -1,5 +1,5 @@
 /*
- * Check decoding of futimesat syscall.
+ * Check decoding of utimes syscall.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
@@ -30,7 +30,7 @@
 #include "tests.h"
 #include <sys/syscall.h>
 
-#ifdef __NR_futimesat
+#ifdef __NR_utimes
 
 # include <stdio.h>
 # include <sys/time.h>
@@ -48,29 +48,26 @@ main(void)
 	if (gettimeofday(&tv, NULL))
 		perror_msg_and_fail("gettimeofday");
 
-	static const char sample[] = "futimesat_sample";
-	unsigned long dirfd = (unsigned long) 0xdeadbeef00000000 | -100U;
+	static const char sample[] = "utimes_sample";
 
-	long rc = syscall(__NR_futimesat, dirfd, sample, 0);
-	printf("futimesat(AT_FDCWD, \"%s\", NULL) = %ld %s (%m)\n",
+	long rc = syscall(__NR_utimes, sample, 0);
+	printf("utimes(\"%s\", NULL) = %ld %s (%m)\n",
 	       sample, rc, errno2name());
 
 	struct timeval *const ts = tail_alloc(sizeof(*ts) * 2);
 	(void) tail_alloc(1);
-	dirfd = (unsigned long) 0xdeadbeefffffffff;
 
-	rc = syscall(__NR_futimesat, dirfd, 0, ts + 1);
-	printf("futimesat(%d, NULL, %p) = %ld %s (%m)\n",
-	       (int) dirfd, ts + 1, rc, errno2name());
+	rc = syscall(__NR_utimes, 0, ts + 1);
+	printf("utimes(NULL, %p) = %ld %s (%m)\n",
+	       ts + 1, rc, errno2name());
 
 	ts[0].tv_sec = tv.tv_sec;
 	ts[0].tv_usec = tv.tv_usec;
 	ts[1].tv_sec = tv.tv_sec - 1;
 	ts[1].tv_usec = tv.tv_usec + 1;
 
-	(void) close(0);
-	rc = syscall(__NR_futimesat, 0, "", ts);
-	printf("futimesat(0, \"\", [{%llu, %llu}, {%llu, %llu}])"
+	rc = syscall(__NR_utimes, "", ts);
+	printf("utimes(\"\", [{%llu, %llu}, {%llu, %llu}])"
 	       " = %ld %s (%m)\n",
 	       CAST_NUM(ts[0].tv_sec), CAST_NUM(ts[0].tv_usec),
 	       CAST_NUM(ts[1].tv_sec), CAST_NUM(ts[1].tv_usec),
@@ -82,6 +79,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_futimesat")
+SKIP_MAIN_UNDEFINED("__NR_utimes")
 
 #endif

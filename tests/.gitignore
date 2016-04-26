@@ -235,6 +235,7 @@ unlinkat
 userfaultfd
 utime
 utimensat
+utimes
 vfork-f
 vmsplice
 wait

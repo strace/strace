@@ -287,6 +287,7 @@ check_PROGRAMS = \
 	userfaultfd \
 	utime \
 	utimensat \
+	utimes \
 	vfork-f \
 	vmsplice \
 	wait \
@@ -544,6 +545,7 @@ DECODER_TESTS = \
 	userfaultfd.test \
 	utime.test \
 	utimensat.test \
+	utimes.test \
 	vmsplice.test \
 	wait.test \
 	xattr.test \
