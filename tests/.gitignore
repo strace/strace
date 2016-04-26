@@ -108,6 +108,7 @@ mincore
 mkdir
 mkdirat
 mknod
+mknodat
 mlock2
 mlockall
 mmap
