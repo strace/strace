@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check renameat2 syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff

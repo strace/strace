@@ -200,7 +200,8 @@ check_PROGRAMS = \
 	reboot \
 	recvmsg \
 	rename \
-	renameat\
+	renameat \
+	renameat2 \
 	restart_syscall \
 	rmdir \
 	rt_sigpending \
@@ -463,6 +464,7 @@ DECODER_TESTS = \
 	recvmsg.test \
 	rename.test \
 	renameat.test \
+	renameat2.test \
 	rmdir.test \
 	rt_sigpending.test \
 	rt_sigprocmask.test \
