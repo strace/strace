@@ -214,6 +214,7 @@ strace_SOURCES =	\
 	vsprintf.c	\
 	wait.c		\
 	xattr.c		\
+	xlat.h		\
 	xmalloc.c	\
 	# end of strace_SOURCES
 

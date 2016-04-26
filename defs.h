@@ -360,12 +360,7 @@ typedef uint8_t qualbits_t;
 #define abbrev(tcp)	((tcp)->qual_flg & QUAL_ABBREV)
 #define filtered(tcp)	((tcp)->flags & TCB_FILTERED)
 
-struct xlat {
-	unsigned int val;
-	const char *str;
-};
-#define XLAT(x) { x, #x }
-#define XLAT_END { 0, NULL }
+#include "xlat.h"
 
 extern const struct xlat addrfams[];
 extern const struct xlat at_flags[];
