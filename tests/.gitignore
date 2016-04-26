@@ -162,6 +162,7 @@ sched_xetaffinity
 sched_xetattr
 sched_xetparam
 sched_xetscheduler
+sched_yield
 scm_rights
 seccomp-filter
 seccomp-filter-v

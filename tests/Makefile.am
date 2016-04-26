@@ -214,6 +214,7 @@ check_PROGRAMS = \
 	sched_xetattr \
 	sched_xetparam \
 	sched_xetscheduler \
+	sched_yield \
 	scm_rights \
 	seccomp-filter \
 	seccomp-filter-v \
@@ -472,6 +473,7 @@ DECODER_TESTS = \
 	sched_xetattr.test \
 	sched_xetparam.test \
 	sched_xetscheduler.test \
+	sched_yield.test \
 	scm_rights-fd.test \
 	seccomp-filter-v.test \
 	seccomp-filter.test \
