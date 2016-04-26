@@ -61,6 +61,7 @@ fstatfs64
 fsync
 ftruncate
 ftruncate64
+futimesat
 getcwd
 getdents
 getdents64

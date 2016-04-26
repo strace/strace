@@ -115,6 +115,7 @@ check_PROGRAMS = \
 	fsync \
 	ftruncate \
 	ftruncate64 \
+	futimesat \
 	getcwd \
 	getdents \
 	getdents64 \
@@ -379,6 +380,7 @@ DECODER_TESTS = \
 	fsync.test \
 	ftruncate.test \
 	ftruncate64.test \
+	futimesat.test \
 	getcwd.test \
 	getdents.test \
 	getdents64.test \
