@@ -315,18 +315,6 @@ SYS_FUNC(remap_file_pages)
 	return RVAL_DECODED;
 }
 
-#define MPOL_DEFAULT    0
-#define MPOL_PREFERRED  1
-#define MPOL_BIND       2
-#define MPOL_INTERLEAVE 3
-
-#define MPOL_F_NODE     (1<<0)
-#define MPOL_F_ADDR     (1<<1)
-
-#define MPOL_MF_STRICT  (1<<0)
-#define MPOL_MF_MOVE	(1<<1)
-#define MPOL_MF_MOVE_ALL (1<<2)
-
 #include "xlat/policies.h"
 #include "xlat/mbindflags.h"
 #include "xlat/mempolicyflags.h"
