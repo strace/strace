@@ -101,7 +101,6 @@ int
 main(int ac, const char **av)
 {
 	char *dname;
-	int rc;
 
 	assert(ac == 1);
 	assert(asprintf(&dname, "%s.test.tmp.dir", av[0]) > 0);
@@ -111,9 +110,16 @@ main(int ac, const char **av)
 	assert(!creat(fname, 0600));
 	assert(!close(0));
 	assert(!open(".", O_RDONLY | O_DIRECTORY));
-	while ((rc = syscall(__NR_getdents64, 0, buf, sizeof(buf)))) {
+
+	unsigned long count = (unsigned long) 0xfacefeeddeadbeef;
+	long rc = syscall(__NR_getdents64, (long) 0xdefacedffffffff, NULL, count);
+	printf("getdents64(-1, NULL, %u) = %ld %s (%m)\n",
+	       (unsigned) count, rc, errno2name());
+
+	count = (unsigned long) 0xfacefeed00000000 | sizeof(buf);
+	while ((rc = syscall(__NR_getdents64, 0, buf, count))) {
 		kernel_dirent64 *d;
-		int i;
+		long i;
 
 		if (rc < 0)
 			perror_msg_and_skip("getdents64");
@@ -124,9 +130,9 @@ main(int ac, const char **av)
 				printf(", ");
 			print_dirent(d);
 		}
-		printf("], %zu) = %d\n", sizeof(buf), rc);
+		printf("], %u) = %ld\n", (unsigned) count, rc);
 	}
-	printf("getdents64(0, [], %zu) = 0\n", sizeof(buf));
+	printf("getdents64(0, [], %u) = 0\n", (unsigned) count);
 	puts("+++ exited with 0 +++");
 	assert(!unlink(fname));
 	assert(!chdir(".."));

@@ -83,9 +83,12 @@ SYS_FUNC(getdents)
 		tprints(", ");
 		return 0;
 	}
+
+	const unsigned int count = tcp->u_arg[2];
+
 	if (syserror(tcp) || !verbose(tcp)) {
 		printaddr(tcp->u_arg[1]);
-		tprintf(", %lu", tcp->u_arg[2]);
+		tprintf(", %u", count);
 		return 0;
 	}
 
@@ -101,7 +104,7 @@ SYS_FUNC(getdents)
 		buf = malloc(len);
 		if (!buf || umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
 			printaddr(tcp->u_arg[1]);
-			tprintf(", %lu", tcp->u_arg[2]);
+			tprintf(", %u", count);
 			free(buf);
 			return 0;
 		}
@@ -150,7 +153,7 @@ SYS_FUNC(getdents)
 		tprints("]");
 	else
 		tprintf("/* %u entries */", dents);
-	tprintf(", %lu", tcp->u_arg[2]);
+	tprintf(", %u", count);
 	free(buf);
 	return 0;
 }
