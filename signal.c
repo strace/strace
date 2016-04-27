@@ -451,8 +451,8 @@ SYS_FUNC(sigprocmask)
 
 SYS_FUNC(kill)
 {
-	tprintf("%ld, %s",
-		widen_to_long(tcp->u_arg[0]),
+	tprintf("%d, %s",
+		(int) tcp->u_arg[0],
 		signame(tcp->u_arg[1]));
 
 	return RVAL_DECODED;
@@ -460,9 +460,9 @@ SYS_FUNC(kill)
 
 SYS_FUNC(tgkill)
 {
-	tprintf("%ld, %ld, %s",
-		widen_to_long(tcp->u_arg[0]),
-		widen_to_long(tcp->u_arg[1]),
+	tprintf("%d, %d, %s",
+		(int) tcp->u_arg[0],
+		(int) tcp->u_arg[1],
 		signame(tcp->u_arg[2]));
 
 	return RVAL_DECODED;
