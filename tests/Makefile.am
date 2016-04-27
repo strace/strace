@@ -147,6 +147,7 @@ check_PROGRAMS = \
 	ipc_msgbuf \
 	ipc_sem \
 	ipc_shm \
+	kill \
 	ksysent \
 	lchown \
 	lchown32 \
@@ -417,6 +418,7 @@ DECODER_TESTS = \
 	ipc_msgbuf.test \
 	ipc_sem.test \
 	ipc_shm.test \
+	kill.test \
 	lchown.test \
 	lchown32.test \
 	linkat.test \

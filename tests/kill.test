@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of kill syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a12 -esignal=none
