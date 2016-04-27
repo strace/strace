@@ -131,6 +131,7 @@ old_mmap
 oldselect
 open
 openat
+pause
 pc
 personality
 pipe

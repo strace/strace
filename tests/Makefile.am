@@ -183,6 +183,7 @@ check_PROGRAMS = \
 	oldselect \
 	open \
 	openat \
+	pause \
 	pc \
 	personality \
 	pipe \
@@ -451,6 +452,7 @@ DECODER_TESTS = \
 	oldselect.test \
 	open.test \
 	openat.test \
+	pause.test \
 	personality.test \
 	pipe.test \
 	poll.test \
