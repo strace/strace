@@ -32,6 +32,7 @@
 int
 main(void)
 {
+	(void) tail_alloc(1);
 	const unsigned int size = 8;
 	const char *const p = tail_alloc(size);
 	const char *const efault = p + size;
