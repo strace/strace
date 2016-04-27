@@ -29,58 +29,54 @@
 #include "defs.h"
 
 static void
-get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)
+print_nodemask(struct tcb *tcp, unsigned long addr, unsigned long maxnodes)
 {
-	unsigned long nlongs, size, end;
+	const unsigned long nlongs =
+		(maxnodes + 8 * current_wordsize - 2) / (8 * current_wordsize);
+	const unsigned long size = nlongs * current_wordsize;
+	const unsigned long end = addr + size;
 
-	nlongs = (maxnodes + 8 * sizeof(long) - 1) / (8 * sizeof(long));
-	size = nlongs * sizeof(long);
-	end = ptr + size;
-	if (nlongs == 0 || ((err || verbose(tcp)) && (size * 8 == maxnodes)
-			    && (end > ptr))) {
-		unsigned long n, cur, abbrev_end;
-		int failed = 0;
-
-		if (abbrev(tcp)) {
-			abbrev_end = ptr + max_strlen * sizeof(long);
-			if (abbrev_end < ptr)
-				abbrev_end = end;
-		} else {
-			abbrev_end = end;
-		}
-		tprints(", {");
-		for (cur = ptr; cur < end; cur += sizeof(long)) {
-			if (cur > ptr)
-				tprints(", ");
-			if (cur >= abbrev_end) {
-				tprints("...");
-				break;
-			}
-			if (umoven(tcp, cur, sizeof(n), &n) < 0) {
-				tprints("?");
-				failed = 1;
-				break;
-			}
-			tprintf("%#0*lx", (int) sizeof(long) * 2 + 2, n);
-		}
-		tprints("}");
-		if (failed) {
-			tprints(" ");
-			printaddr(ptr);
-		}
-	} else {
-		tprints(" ");
-		printaddr(ptr);
+	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp))
+	    || end <= addr || size / current_wordsize != nlongs
+	    || nlongs < maxnodes / (8 * current_wordsize)) {
+		printaddr(addr);
+		return;
 	}
-	tprintf(", %lu", maxnodes);
+
+	const unsigned long abbrev_end =
+		(abbrev(tcp) && max_strlen < nlongs) ?
+			addr + max_strlen * current_wordsize : end;
+	unsigned long cur;
+	for (cur = addr; cur < end; cur += current_wordsize) {
+		if (cur != addr)
+			tprints(", ");
+
+		unsigned long n;
+		if (umove_ulong_or_printaddr(tcp, cur, &n))
+			break;
+
+		if (cur == addr)
+			tprints("[");
+
+		if (cur >= abbrev_end) {
+			tprints("...");
+			cur = end;
+			break;
+		}
+
+		tprintf("%#0*lx", (int) current_wordsize * 2 + 2, n);
+	}
+	if (cur != addr)
+		tprints("]");
 }
 
 SYS_FUNC(migrate_pages)
 {
 	tprintf("%d, ", (int) tcp->u_arg[0]);
-	get_nodes(tcp, tcp->u_arg[2], tcp->u_arg[1], 0);
-	tprints(", ");
-	get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[1], 0);
+	print_nodemask(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+	tprintf(", %lu, ", tcp->u_arg[1]);
+	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[1]);
+	tprintf(", %lu", tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -93,8 +89,9 @@ SYS_FUNC(mbind)
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %lu, ", tcp->u_arg[1]);
 	printxval(policies, tcp->u_arg[2], "MPOL_???");
-	get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[4], 0);
 	tprints(", ");
+	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
+	tprintf(", %lu, ", tcp->u_arg[4]);
 	printflags(mbindflags, tcp->u_arg[5], "MPOL_???");
 
 	return RVAL_DECODED;
@@ -103,7 +100,9 @@ SYS_FUNC(mbind)
 SYS_FUNC(set_mempolicy)
 {
 	printxval(policies, tcp->u_arg[0], "MPOL_???");
-	get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], 0);
+	tprints(", ");
+	print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	tprintf(", %lu", tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -119,8 +118,9 @@ SYS_FUNC(get_mempolicy)
 			printxval(policies, pol, "MPOL_???");
 			tprints("]");
 		}
-		get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], syserror(tcp));
 		tprints(", ");
+		print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		tprintf(", %lu, ", tcp->u_arg[2]);
 		printaddr(tcp->u_arg[3]);
 		tprints(", ");
 		printflags(mempolicyflags, tcp->u_arg[4], "MPOL_???");
