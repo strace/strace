@@ -232,6 +232,7 @@ check_PROGRAMS = \
 	semop \
 	sendfile \
 	sendfile64 \
+	set_mempolicy \
 	set_ptracer_any \
 	setdomainname \
 	setfsgid \
@@ -501,6 +502,7 @@ DECODER_TESTS = \
 	semop.test \
 	sendfile.test \
 	sendfile64.test \
+	set_mempolicy.test \
 	setdomainname.test \
 	setfsgid.test \
 	setfsgid32.test \

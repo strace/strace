@@ -179,6 +179,7 @@ select
 semop
 sendfile
 sendfile64
+set_mempolicy
 set_ptracer_any
 setdomainname
 setfsgid
