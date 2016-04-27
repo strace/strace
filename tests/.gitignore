@@ -151,6 +151,7 @@ readlinkat
 readv
 reboot
 recvmsg
+remap_file_pages
 rename
 renameat
 renameat2
