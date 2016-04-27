@@ -90,9 +90,13 @@ void check_overflowgid(const int);
 /* Translate errno to its name. */
 const char *errno2name(void);
 
-/* Print flags in symbolic form according to xlat table. */
 struct xlat;
+
+/* Print flags in symbolic form according to xlat table. */
 int printflags(const struct xlat *, const unsigned long long, const char *);
+
+/* Print constant in symbolic form according to xlat table. */
+int printxval(const struct xlat *, const unsigned long long, const char *);
 
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)

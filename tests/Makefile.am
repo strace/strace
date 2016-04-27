@@ -50,6 +50,7 @@ libtests_a_SOURCES = \
 	overflowuid.c \
 	print_quoted_string.c \
 	printflags.c \
+	printxval.c \
 	tail_alloc.c \
 	tests.h \
 	tprintf.c \
