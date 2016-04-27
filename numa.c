@@ -114,8 +114,11 @@ SYS_FUNC(get_mempolicy)
 {
 	if (exiting(tcp)) {
 		int pol;
-		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &pol))
+		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &pol)) {
+			tprints("[");
 			printxval(policies, pol, "MPOL_???");
+			tprints("]");
+		}
 		get_nodes(tcp, tcp->u_arg[1], tcp->u_arg[2], syserror(tcp));
 		tprints(", ");
 		printaddr(tcp->u_arg[3]);
