@@ -117,6 +117,7 @@ check_PROGRAMS = \
 	ftruncate \
 	ftruncate64 \
 	futimesat \
+	get_mempolicy \
 	getcwd \
 	getdents \
 	getdents64 \
@@ -390,6 +391,7 @@ DECODER_TESTS = \
 	ftruncate.test \
 	ftruncate64.test \
 	futimesat.test \
+	get_mempolicy.test \
 	getcwd.test \
 	getdents.test \
 	getdents64.test \

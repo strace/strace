@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check get_mempolicy syscall decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -s3 -a38

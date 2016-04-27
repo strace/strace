@@ -62,6 +62,7 @@ fsync
 ftruncate
 ftruncate64
 futimesat
+get_mempolicy
 getcwd
 getdents
 getdents64
