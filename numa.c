@@ -77,7 +77,7 @@ get_nodes(struct tcb *tcp, unsigned long ptr, unsigned long maxnodes, int err)
 
 SYS_FUNC(migrate_pages)
 {
-	tprintf("%ld, ", (long) (pid_t) tcp->u_arg[0]);
+	tprintf("%d, ", (int) tcp->u_arg[0]);
 	get_nodes(tcp, tcp->u_arg[2], tcp->u_arg[1], 0);
 	tprints(", ");
 	get_nodes(tcp, tcp->u_arg[3], tcp->u_arg[1], 0);
