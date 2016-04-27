@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check mlock and munlock syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=mlock,munlock -a20

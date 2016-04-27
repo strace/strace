@@ -110,6 +110,7 @@ mkdir
 mkdirat
 mknod
 mknodat
+mlock
 mlock2
 mlockall
 mmap
