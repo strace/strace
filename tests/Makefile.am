@@ -282,6 +282,7 @@ check_PROGRAMS = \
 	umount2 \
 	umovestr \
 	umovestr2 \
+	umovestr3 \
 	uname \
 	unix-pair-send-recv \
 	unlink \
@@ -543,6 +544,7 @@ DECODER_TESTS = \
 	umount2.test \
 	umovestr.test \
 	umovestr2.test \
+	umovestr3.test \
 	uname.test \
 	unlink.test \
 	unlinkat.test \

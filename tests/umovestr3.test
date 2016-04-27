@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# yet another umovestr short read test
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a14 -e trace=chdir
