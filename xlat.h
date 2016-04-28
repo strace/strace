@@ -1,7 +1,9 @@
 #ifndef STRACE_XLAT_H
 
+# include <stdint.h>
+
 struct xlat {
-	unsigned int val;
+	uint64_t val;
 	const char *str;
 };
 
