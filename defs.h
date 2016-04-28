@@ -549,7 +549,7 @@ extern int printllval(struct tcb *, const char *, int)
 	ATTRIBUTE_FORMAT((printf, 2, 0));
 
 extern void printaddr(long);
-extern void printxvals(const unsigned int, const char *, const struct xlat *, ...)
+extern void printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);

@@ -208,7 +208,7 @@ next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits)
  * Print entry in struct xlat table, if there.
  */
 void
-printxvals(const unsigned int val, const char *dflt, const struct xlat *xlat, ...)
+printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 {
 	va_list args;
 
@@ -223,7 +223,7 @@ printxvals(const unsigned int val, const char *dflt, const struct xlat *xlat, ..
 		}
 	}
 	/* No hits -- print raw # instead. */
-	tprintf("%#x /* %s */", val, dflt);
+	tprintf("%#" PRIx64 " /* %s */", val, dflt);
 
 	va_end(args);
 }
