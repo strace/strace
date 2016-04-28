@@ -107,6 +107,7 @@ lstat
 lstat64
 membarrier
 memfd_create
+migrate_pages
 mincore
 mkdir
 mkdirat

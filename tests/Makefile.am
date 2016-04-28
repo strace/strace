@@ -160,6 +160,7 @@ check_PROGRAMS = \
 	lstat64 \
 	membarrier \
 	memfd_create \
+	migrate_pages \
 	mincore \
 	mkdir \
 	mkdirat \
@@ -434,6 +435,7 @@ DECODER_TESTS = \
 	lstat64.test \
 	membarrier.test \
 	memfd_create.test \
+	migrate_pages.test \
 	mincore.test \
 	mkdir.test \
 	mkdirat.test \
