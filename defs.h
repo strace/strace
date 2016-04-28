@@ -555,7 +555,7 @@ extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
 
-extern void addflags(const struct xlat *, int);
+extern void addflags(const struct xlat *, uint64_t);
 extern int printflags(const struct xlat *, int, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, int);
 extern const char *sprintmode(int);

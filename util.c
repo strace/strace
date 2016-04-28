@@ -303,7 +303,7 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
  * return # of flags printed.
  */
 void
-addflags(const struct xlat *xlat, int flags)
+addflags(const struct xlat *xlat, uint64_t flags)
 {
 	for (; xlat->str; xlat++) {
 		if (xlat->val && (flags & xlat->val) == xlat->val) {
@@ -312,7 +312,7 @@ addflags(const struct xlat *xlat, int flags)
 		}
 	}
 	if (flags) {
-		tprintf("|%#x", flags);
+		tprintf("|%#" PRIx64, flags);
 	}
 }
 
