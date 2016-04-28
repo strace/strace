@@ -629,8 +629,8 @@ extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
 extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int decode_iov, unsigned long);
-extern void tprint_open_modes(int);
-extern const char *sprint_open_modes(int);
+extern void tprint_open_modes(unsigned int);
+extern const char *sprint_open_modes(unsigned int);
 extern void print_seccomp_filter(struct tcb *tcp, unsigned long);
 
 struct strace_statfs;
