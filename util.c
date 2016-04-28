@@ -121,7 +121,7 @@ tv_mul(struct timeval *tv, const struct timeval *a, int n)
 }
 
 const char *
-xlookup(const struct xlat *xlat, const unsigned int val)
+xlookup64(const struct xlat *xlat, const uint64_t val)
 {
 	for (; xlat->str != NULL; xlat++)
 		if (xlat->val == val)

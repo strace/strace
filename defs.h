@@ -521,7 +521,7 @@ extern void pathtrace_select(const char *);
 extern int pathtrace_match(struct tcb *);
 extern int getfdpath(struct tcb *, int, char *, unsigned);
 
-extern const char *xlookup(const struct xlat *, const unsigned int);
+extern const char *xlookup64(const struct xlat *, const uint64_t);
 extern const char *xlat_search(const struct xlat *, const size_t, const unsigned int);
 
 extern unsigned long get_pagesize(void);
@@ -676,6 +676,12 @@ static inline void
 printxval(const struct xlat *x, const unsigned int val, const char *dflt)
 {
 	printxvals(val, dflt, x, NULL);
+}
+
+static inline const char *
+xlookup(const struct xlat *x, const unsigned int val)
+{
+	return xlookup64(x, val);
 }
 
 /* Strace log generation machinery.
