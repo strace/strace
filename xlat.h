@@ -5,7 +5,7 @@ struct xlat {
 	const char *str;
 };
 
-# define XLAT(x) { x, #x }
-# define XLAT_END { 0, 0 }
+# define XLAT(val)			{ (unsigned)(val), #val }
+# define XLAT_END			{		0, 0    }
 
 #endif
