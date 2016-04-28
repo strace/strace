@@ -522,7 +522,7 @@ extern int pathtrace_match(struct tcb *);
 extern int getfdpath(struct tcb *, int, char *, unsigned);
 
 extern const char *xlookup64(const struct xlat *, const uint64_t);
-extern const char *xlat_search(const struct xlat *, const size_t, const unsigned int);
+extern const char *xlat_search(const struct xlat *, const size_t, const uint64_t);
 
 extern unsigned long get_pagesize(void);
 extern int string_to_uint(const char *str);

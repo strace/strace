@@ -132,16 +132,16 @@ xlookup64(const struct xlat *xlat, const uint64_t val)
 static int
 xlat_bsearch_compare(const void *a, const void *b)
 {
-	const unsigned int val1 = (const unsigned long) a;
-	const unsigned int val2 = ((const struct xlat *) b)->val;
+	const uint64_t val1 = *(const uint64_t *) a;
+	const uint64_t val2 = ((const struct xlat *) b)->val;
 	return (val1 > val2) ? 1 : (val1 < val2) ? -1 : 0;
 }
 
 const char *
-xlat_search(const struct xlat *xlat, const size_t nmemb, const unsigned int val)
+xlat_search(const struct xlat *xlat, const size_t nmemb, const uint64_t val)
 {
 	const struct xlat *e =
-		bsearch((const void*) (const unsigned long) val,
+		bsearch((const void*) &val,
 			xlat, nmemb, sizeof(*xlat), xlat_bsearch_compare);
 
 	return e ? e->str : NULL;
