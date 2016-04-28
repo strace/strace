@@ -44,8 +44,7 @@ main(void)
 	const unsigned long prot = (unsigned long) 0xacedcafe00000000
 				   | PROT_READ|PROT_WRITE|PROT_EXEC;
 	const unsigned long pgoff = (unsigned long) 0xcaf3babebad4deed;
-	const unsigned long flags = (unsigned long) 0xbadc0ded00000000
-				   | MAP_PRIVATE|MAP_ANONYMOUS;
+	const unsigned long flags = MAP_PRIVATE|MAP_ANONYMOUS;
 
 	long rc = syscall(__NR_remap_file_pages, addr, size, prot, pgoff, flags);
 	printf("remap_file_pages(%#lx, %lu, %s, %lu, %s) = %ld %s (%m)\n",
