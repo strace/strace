@@ -72,11 +72,10 @@ print_nodemask(struct tcb *tcp, unsigned long addr, unsigned long maxnodes)
 
 SYS_FUNC(migrate_pages)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	tprintf("%d, %lu, ", (int) tcp->u_arg[0], tcp->u_arg[1]);
 	print_nodemask(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-	tprintf(", %lu, ", tcp->u_arg[1]);
+	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[1]);
-	tprintf(", %lu", tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
