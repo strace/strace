@@ -551,7 +551,6 @@ extern int printllval(struct tcb *, const char *, int)
 extern void printaddr(long);
 extern void printxvals(const unsigned int, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
-#define printxval(xlat, val, dflt) printxvals(val, dflt, xlat, NULL)
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
@@ -666,6 +665,12 @@ extern void unwind_cache_invalidate(struct tcb* tcp);
 extern void unwind_print_stacktrace(struct tcb* tcp);
 extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
+
+static inline void
+printxval(const struct xlat *x, const unsigned int val, const char *dflt)
+{
+	printxvals(val, dflt, x, NULL);
+}
 
 /* Strace log generation machinery.
  *
