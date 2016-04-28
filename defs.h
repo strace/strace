@@ -667,6 +667,12 @@ extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
 
 static inline void
+printxval64(const struct xlat *x, const uint64_t val, const char *dflt)
+{
+	printxvals(val, dflt, x, NULL);
+}
+
+static inline void
 printxval(const struct xlat *x, const unsigned int val, const char *dflt)
 {
 	printxvals(val, dflt, x, NULL);
