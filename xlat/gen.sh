@@ -73,7 +73,7 @@ cond_xlat()
 		xlat=" XLAT(${val}),"
 	else
 		m="${m#1<<}"
-		xlat=" { ${val}, \"${m}\" },"
+		xlat=" XLAT_PAIR(${val}, \"${m}\"),"
 	fi
 
 	if [ -z "${def}" ]; then
@@ -177,7 +177,7 @@ gen_header()
 			;;
 		'1<<'[A-Z_]*)	# symbolic constants with shift
 			if [ -n "${unconditional}" ]; then
-				echo " { ${line}, \"${line#1<<}\" },"
+				echo " XLAT_PAIR(${line}, \"${line#1<<}\"),"
 			else
 				cond_xlat "${line}"
 			fi

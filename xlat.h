@@ -6,6 +6,7 @@ struct xlat {
 };
 
 # define XLAT(val)			{ (unsigned)(val), #val }
+# define XLAT_PAIR(val, str)		{ (unsigned)(val), str  }
 # define XLAT_END			{		0, 0    }
 
 #endif
