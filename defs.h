@@ -557,7 +557,7 @@ extern int printargs_d(struct tcb *);
 
 extern void addflags(const struct xlat *, uint64_t);
 extern int printflags(const struct xlat *, int, const char *);
-extern const char *sprintflags(const char *, const struct xlat *, int);
+extern const char *sprintflags64(const char *, const struct xlat *, uint64_t);
 extern const char *sprintmode(int);
 extern const char *sprinttime(time_t);
 extern void dumpiov_in_msghdr(struct tcb *, long, unsigned long);
@@ -665,6 +665,12 @@ extern void unwind_cache_invalidate(struct tcb* tcp);
 extern void unwind_print_stacktrace(struct tcb* tcp);
 extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
+
+static inline const char *
+sprintflags(const char *prefix, const struct xlat *x, unsigned int flags)
+{
+	return sprintflags64(prefix, x, flags);
+}
 
 static inline void
 printxval64(const struct xlat *x, const uint64_t val, const char *dflt)

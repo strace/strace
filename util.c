@@ -322,7 +322,7 @@ addflags(const struct xlat *xlat, uint64_t flags)
  * Return static string.
  */
 const char *
-sprintflags(const char *prefix, const struct xlat *xlat, int flags)
+sprintflags64(const char *prefix, const struct xlat *xlat, uint64_t flags)
 {
 	static char outstr[1024];
 	char *outptr;
@@ -349,7 +349,7 @@ sprintflags(const char *prefix, const struct xlat *xlat, int flags)
 	if (flags) {
 		if (found)
 			*outptr++ = '|';
-		outptr += sprintf(outptr, "%#x", flags);
+		outptr += sprintf(outptr, "%#" PRIx64, flags);
 	}
 
 	return outstr;
