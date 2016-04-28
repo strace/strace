@@ -356,7 +356,7 @@ sprintflags64(const char *prefix, const struct xlat *xlat, uint64_t flags)
 }
 
 int
-printflags(const struct xlat *xlat, int flags, const char *dflt)
+printflags64(const struct xlat *xlat, uint64_t flags, const char *dflt)
 {
 	int n;
 	const char *sep;
@@ -378,12 +378,12 @@ printflags(const struct xlat *xlat, int flags, const char *dflt)
 
 	if (n) {
 		if (flags) {
-			tprintf("%s%#x", sep, flags);
+			tprintf("%s%#" PRIx64, sep, flags);
 			n++;
 		}
 	} else {
 		if (flags) {
-			tprintf("%#x", flags);
+			tprintf("%#" PRIx64, flags);
 			if (dflt)
 				tprintf(" /* %s */", dflt);
 		} else {

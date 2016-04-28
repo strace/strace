@@ -556,7 +556,7 @@ extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
 
 extern void addflags(const struct xlat *, uint64_t);
-extern int printflags(const struct xlat *, int, const char *);
+extern int printflags64(const struct xlat *, uint64_t, const char *);
 extern const char *sprintflags64(const char *, const struct xlat *, uint64_t);
 extern const char *sprintmode(int);
 extern const char *sprinttime(time_t);
@@ -670,6 +670,12 @@ static inline const char *
 sprintflags(const char *prefix, const struct xlat *x, unsigned int flags)
 {
 	return sprintflags64(prefix, x, flags);
+}
+
+static inline int
+printflags(const struct xlat *x, unsigned int flags, const char *dflt)
+{
+	return printflags64(x, flags, dflt);
 }
 
 static inline void
