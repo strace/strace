@@ -105,6 +105,7 @@ llseek
 lseek
 lstat
 lstat64
+mbind
 membarrier
 memfd_create
 migrate_pages

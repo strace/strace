@@ -158,6 +158,7 @@ check_PROGRAMS = \
 	lseek \
 	lstat \
 	lstat64 \
+	mbind \
 	membarrier \
 	memfd_create \
 	migrate_pages \
@@ -433,6 +434,7 @@ DECODER_TESTS = \
 	lseek.test \
 	lstat.test \
 	lstat64.test \
+	mbind.test \
 	membarrier.test \
 	memfd_create.test \
 	migrate_pages.test \
