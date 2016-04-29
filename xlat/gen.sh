@@ -99,7 +99,7 @@ cond_xlat()
 		xlat="$(print_xlat "${val}")"
 	else
 		m="${m#1<<}"
-		xlat="$(print_xlat_pair "${val}" "${str}")"
+		xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${str}")"
 	fi
 
 	if [ -z "${def}" ]; then
@@ -209,7 +209,7 @@ gen_header()
 			;;
 		'1<<'[A-Z_]*)	# symbolic constants with shift
 			if [ -n "${unconditional}" ]; then
-				print_xlat_pair "${line}" "${line#1<<}"
+				print_xlat_pair "1ULL<<${line#1<<}" "${line#1<<}"
 			else
 				cond_xlat "${line}" "${line#1<<}"
 			fi
