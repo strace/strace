@@ -416,7 +416,6 @@
 [389] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [390] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [391] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
-[392 ... 399] = { },
 
 #ifdef __ARM_EABI__
 # define ARM_FIRST_SHUFFLED_SYSCALL 400

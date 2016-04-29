@@ -394,6 +394,6 @@
 [366] = { 6,	0,		SEN(process_vm_writev),		"process_vm_writev"	},
 [367] = { 5,	0,		SEN(kcmp),			"kcmp"			},
 [368] = { 3,	TD,		SEN(finit_module),		"finit_module"		},
-[369 ... 399] = { },
+
 #define SYS_socket_subcall	400
 #include "subcall.h"

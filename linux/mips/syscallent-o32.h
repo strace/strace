@@ -361,16 +361,12 @@
 [4358] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [4359] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [4360] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
-[4361 ... 4399] = { },
 
 # define SYS_socket_subcall      4400
 # include "subcall.h"
 
-/* end of Linux o32 */ [SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls ... 4999] = { },
-
 #else
 
 # include "syscallent-o32-stub.h"
-/* end of Linux o32 */ [4400 ... 4999] = { },
 
 #endif

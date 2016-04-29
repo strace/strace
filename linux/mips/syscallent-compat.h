@@ -149,8 +149,6 @@
 [ 207] = { 0,	0,	SEN(printargs),		"svr4_areadv"	},
 [ 208] = { 0,	0,	SEN(printargs),		"svr4_awritev"	},
 
-[209 ... 999] = { }, /* end of SVR4 */
-
 [1000] = { 0,	0,	SEN(printargs),		"sysv_syscall"	}, /* start of SYSV */
 [1001] = { 0,	0,	SEN(printargs),		"sysv_exit"	},
 [1002] = { 0,	0,	SEN(printargs),		"sysv_fork"	},
@@ -335,8 +333,6 @@
 [1186] = { 0,	0,	SEN(printargs),		"sysv_dmi"	},
 [1187] = { 0,	0,	SEN(printargs),		"sysv_pread"	},
 [1188] = { 0,	0,	SEN(printargs),		"sysv_pwrite"	},
-
-[1189 ... 1999] = { }, /* end of SYSV */
 
 [2000] = { 0,	0,	SEN(printargs),		"bsd43_syscall"	}, /* start of BSD 4.3 */
 [2001] = { 0,	0,	SEN(printargs),		"bsd43_exit"	},
@@ -531,8 +527,6 @@
 [2190] = { 0,	0,	SEN(printargs),		"bsd43_areadv"	},
 [2191] = { 0,	0,	SEN(printargs),		"bsd43_awritev"	},
 
-[2192 ... 2999] = { }, /* end of BSD 4.3 */
-
 [3000] = { 0,	0,	SEN(printargs),		"posix_syscall"	}, /* start of POSIX */
 [3001] = { 0,	0,	SEN(printargs),		"posix_exit"	},
 [3002] = { 0,	0,	SEN(printargs),		"posix_fork"	},
@@ -704,5 +698,3 @@
 [3266] = { 0,	0,	SEN(printargs),		"posix_sigprocmask"	},
 [3267] = { 0,	0,	SEN(printargs),		"posix_sigsuspend"	},
 [3268] = { 0,	0,	SEN(printargs),		"posix_sigaction"	},
-
-[3269 ... 3999] = { }, /* end of POSIX */

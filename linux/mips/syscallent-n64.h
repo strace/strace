@@ -321,16 +321,12 @@
 [5318] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [5319] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [5320] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
-[5321 ... 5399] = { },
 
 # define SYS_socket_subcall      5400
 # include "subcall.h"
 
-/* end of Linux N64 */ [SYS_socket_subcall + SYS_socket_nsubcalls + SYS_ipc_nsubcalls ... 5999] = { },
-
 #else
 
 # include "syscallent-n64-stub.h"
-/* end of Linux N64 */ [5400 ... 5999] = { },
 
 #endif

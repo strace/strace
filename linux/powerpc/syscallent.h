@@ -406,7 +406,6 @@
 [377] = { 3,	TI,		SEN(shmctl),			"shmctl"		},
 [378] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [379] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
-[380 ... 399] = { },
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
