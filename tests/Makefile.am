@@ -173,6 +173,7 @@ check_PROGRAMS = \
 	mmap \
 	mmap64 \
 	mmsg \
+	move_pages \
 	mq \
 	nanosleep \
 	net-accept-connect \
@@ -449,6 +450,7 @@ DECODER_TESTS = \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \
+	move_pages.test \
 	mq.test \
 	nanosleep.test \
 	net-y-unix.test \

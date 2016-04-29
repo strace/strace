@@ -120,6 +120,7 @@ mlockall
 mmap
 mmap64
 mmsg
+move_pages
 mq
 nanosleep
 net-accept-connect
