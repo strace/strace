@@ -71,9 +71,15 @@ main(void)
 	};
 
 	long rc = syscall(nr, a[0], a[1], a[2], a[3], a[4], a[5]);
+#ifdef LINUX_MIPSO32
+	printf("syscall(%#lx, %#lx, %#lx, %#lx, %#lx, %#lx, %#lx)"
+	       " = %ld ENOSYS (%m)\n", nr,
+	       a[0], a[1], a[2], a[3], a[4], a[5], rc);
+#else
 	printf("syscall_%lu(%#lx, %#lx, %#lx, %#lx, %#lx, %#lx)"
 	       " = %ld (errno %d)\n", nr & (~SYSCALL_BIT),
 	       a[0], a[1], a[2], a[3], a[4], a[5], rc, errno);
+#endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

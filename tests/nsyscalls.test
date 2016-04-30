@@ -3,4 +3,10 @@
 # Check decoding of out-of-range syscalls.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=none
+
+case "$STRACE_ARCH" in
+	mips) syscall=syscall ;;
+	*) syscall=none ;;
+esac
+
+run_strace_match_diff -e trace=$syscall
