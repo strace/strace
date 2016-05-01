@@ -69,7 +69,7 @@ main(void )
 	       " = -1 EBADF (%m)\n", &data);
 
 	(void) ioctl(-1, VIDIOC_ENUMINPUT, 0);
-	printf("ioctl(-1, VIDIOC_ENUMINPUT, 0)"
+	printf("ioctl(-1, VIDIOC_ENUMINPUT, NULL)"
 	       " = -1 EBADF (%m)\n");
 
 	(void) ioctl(-1, HIDIOCGVERSION, &data);
