@@ -693,6 +693,15 @@ ioctlsort_LDFLAGS = $(AM_LDFLAGS) $(LDFLAGS_FOR_BUILD)
 
 ioctls_inc_h = $(wildcard $(srcdir)/$(OS)/$(ARCH)/ioctls_inc*.h)
 ioctlent_h = $(patsubst $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%,ioctlent%,$(ioctls_inc_h))
+ioctl_redefs_h = $(filter-out ioctl_redefs0.h,$(subst ioctlent,ioctl_redefs,$(ioctlent_h)))
+
+ioctl_redefs%.h: ioctlent%.h ioctlent0.h
+	sort $< > $<-t
+	sort ioctlent0.h | comm -23 $<-t - | \
+		sed -n 's/^{ "\([^"]\+\)", \(0x[[:xdigit:]]\+\) },$$/#ifdef \1\n# undef \1\n# define \1 \2\n#endif/p' \
+		> $@-t
+	rm -f $<-t
+	mv $@-t $@
 
 ioctlent%.h: ioctlsort%
 	./$< > $@
@@ -706,8 +715,10 @@ ioctlsort%.o: ioctls_all%.h $(srcdir)/ioctlsort.c
 ioctls_all%.h: $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%.h $(srcdir)/$(OS)/$(ARCH)/ioctls_arch%.h
 	cat $^ > $@
 
-BUILT_SOURCES = $(ioctlent_h) native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h .version
-CLEANFILES    = $(ioctlent_h) native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h
+BUILT_SOURCES = $(ioctl_redefs_h) $(ioctlent_h) \
+		native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h .version
+CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) \
+		native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h
 DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h
 
 # defines mpers_source_files
@@ -740,6 +751,7 @@ m%_type_defs.h: $(srcdir_mpers_source_files)
 	echo '#undef MPERS_PRINTER_NAME' >> $@-t
 	echo '#define MPERS_PRINTER_NAME(printer_name) printer_name' >> $@-t
 	echo '#include "$(mpers_PREFIX)printer_decls.h"' >> $@-t
+	echo '#include MPERS_$(mpers_PREFIX)IOCTL_MACROS' >> $@-t
 	mv $@-t $@
 
 m%_funcs.h: $(srcdir_mpers_source_files)

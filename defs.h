@@ -157,6 +157,7 @@ extern char *stpcpy(char *dst, const char *src);
 #   define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
 #   define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
 #   define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#   define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
 #  endif
 # endif
 #endif
@@ -170,11 +171,13 @@ extern char *stpcpy(char *dst, const char *src);
 #  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
 # endif
 # ifdef HAVE_MX32_MPERS
 #  define PERSONALITY2_INCLUDE_FUNCS "mx32_funcs.h"
 #  define PERSONALITY2_INCLUDE_PRINTERS_DECLS "mx32_printer_decls.h"
 #  define PERSONALITY2_INCLUDE_PRINTERS_DEFS "mx32_printer_defs.h"
+#  define MPERS_mx32_IOCTL_MACROS "ioctl_redefs2.h"
 # endif
 #endif
 
@@ -186,6 +189,7 @@ extern char *stpcpy(char *dst, const char *src);
 #  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
 # endif
 #endif
 
@@ -202,6 +206,7 @@ extern char *stpcpy(char *dst, const char *src);
 #  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
 # endif
 #endif
 
@@ -213,6 +218,7 @@ extern char *stpcpy(char *dst, const char *src);
 #  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
 # endif
 #endif
 
@@ -227,6 +233,7 @@ extern char *stpcpy(char *dst, const char *src);
 #  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
 #  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
 # endif
 #endif
 
