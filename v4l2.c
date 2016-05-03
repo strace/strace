@@ -29,10 +29,30 @@
 
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(struct_v4l2_buffer)
+#include DEF_MPERS_TYPE(struct_v4l2_create_buffers)
+#include DEF_MPERS_TYPE(struct_v4l2_ext_control)
+#include DEF_MPERS_TYPE(struct_v4l2_ext_controls)
+#include DEF_MPERS_TYPE(struct_v4l2_format)
+#include DEF_MPERS_TYPE(struct_v4l2_framebuffer)
+#include DEF_MPERS_TYPE(struct_v4l2_input)
+#include DEF_MPERS_TYPE(struct_v4l2_standard)
+
 #include <stdint.h>
 #include <sys/ioctl.h>
 #include <linux/types.h>
 #include <linux/videodev2.h>
+
+typedef struct v4l2_buffer struct_v4l2_buffer;
+typedef struct v4l2_create_buffers struct_v4l2_create_buffers;
+typedef struct v4l2_ext_control struct_v4l2_ext_control;
+typedef struct v4l2_ext_controls struct_v4l2_ext_controls;
+typedef struct v4l2_format struct_v4l2_format;
+typedef struct v4l2_framebuffer struct_v4l2_framebuffer;
+typedef struct v4l2_input struct_v4l2_input;
+typedef struct v4l2_standard struct_v4l2_standard;
+
+#include MPERS_DEFS
 
 /* some historical constants */
 #ifndef V4L2_CID_HCENTER
@@ -171,7 +191,7 @@ print_v4l2_fmtdesc(struct tcb *tcp, const long arg)
 #include "xlat/v4l2_colorspaces.h"
 
 static void
-print_v4l2_format_fmt(const char *prefix, const struct v4l2_format *f)
+print_v4l2_format_fmt(const char *prefix, const struct_v4l2_format *f)
 {
 	switch (f->type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
@@ -254,7 +274,7 @@ print_v4l2_format_fmt(const char *prefix, const struct v4l2_format *f)
 static int
 print_v4l2_format(struct tcb *tcp, const long arg, const bool is_get)
 {
-	struct v4l2_format f;
+	struct_v4l2_format f;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -308,7 +328,7 @@ print_v4l2_requestbuffers(struct tcb *tcp, const long arg)
 static int
 print_v4l2_buffer(struct tcb *tcp, const unsigned int code, const long arg)
 {
-	struct v4l2_buffer b;
+	struct_v4l2_buffer b;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -349,7 +369,7 @@ print_v4l2_buffer(struct tcb *tcp, const unsigned int code, const long arg)
 static int
 print_v4l2_framebuffer(struct tcb *tcp, const long arg)
 {
-	struct v4l2_framebuffer b;
+	struct_v4l2_framebuffer b;
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &b)) {
@@ -444,7 +464,7 @@ print_v4l2_streamparm(struct tcb *tcp, const long arg, const bool is_get)
 static int
 print_v4l2_standard(struct tcb *tcp, const long arg)
 {
-	struct v4l2_standard s;
+	struct_v4l2_standard s;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -471,7 +491,7 @@ print_v4l2_standard(struct tcb *tcp, const long arg)
 static int
 print_v4l2_input(struct tcb *tcp, const long arg)
 {
-	struct v4l2_input i;
+	struct_v4l2_input i;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -622,7 +642,7 @@ static int
 print_v4l2_ext_control_array(struct tcb *tcp, const unsigned long addr,
 			     const unsigned count)
 {
-	struct v4l2_ext_control ctrl;
+	struct_v4l2_ext_control ctrl;
 	const unsigned long size = count * sizeof(ctrl);
 	const unsigned long end = addr + size;
 	int rc = 0;
@@ -677,7 +697,7 @@ print_v4l2_ext_control_array(struct tcb *tcp, const unsigned long addr,
 static int
 print_v4l2_ext_controls(struct tcb *tcp, const long arg, const bool is_get)
 {
-	struct v4l2_ext_controls c;
+	struct_v4l2_ext_controls c;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -803,7 +823,7 @@ print_v4l2_frmivalenum(struct tcb *tcp, const long arg)
 static int
 print_v4l2_create_buffers(struct tcb *tcp, const long arg)
 {
-	struct v4l2_create_buffers b;
+	struct_v4l2_create_buffers b;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -815,7 +835,7 @@ print_v4l2_create_buffers(struct tcb *tcp, const long arg)
 		printxval(v4l2_buf_types, b.format.type,
 			  "V4L2_BUF_TYPE_???");
 		print_v4l2_format_fmt(", ",
-				      (struct v4l2_format *) &b.format);
+				      (struct_v4l2_format *) &b.format);
 		tprints("}}");
 		return 0;
 	} else {
@@ -831,8 +851,7 @@ print_v4l2_create_buffers(struct tcb *tcp, const long arg)
 }
 #endif /* VIDIOC_CREATE_BUFS */
 
-int
-v4l2_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, v4l2_ioctl)(struct tcb *tcp, const unsigned int code, const long arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;

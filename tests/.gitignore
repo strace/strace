@@ -87,6 +87,7 @@ getuid32
 getxxid
 inet-cmsg
 ioctl
+ioctl_v4l2
 ioperm
 iopl
 ip_mreq

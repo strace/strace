@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check basic VIDIOC_* ioctl decoding.
+
+. "${srcdir=.}/ioctl.test"
