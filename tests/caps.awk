@@ -28,7 +28,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 BEGIN {
-	cap = "(0|CAP_[A-Z_]+(\\|CAP_[A-Z_]+)*|CAP_[A-Z_]+(\\|CAP_[A-Z_]+){37}\\|0xffffffc0)"
+	cap = "(0|1<<CAP_[A-Z_]+(\\|1<<CAP_[A-Z_]+)*|1<<CAP_[A-Z_]+(\\|1<<CAP_[A-Z_]+){37}\\|0xffffffc0)"
 	s_efault = "-1 EFAULT (Bad address)"
 	r_efault = "-1 EFAULT \\(Bad address\\)"
 	r_addr = "0x[[:xdigit:]]+"
@@ -36,7 +36,7 @@ BEGIN {
 	r[2] = "^capget\\(" r_addr ", " r_addr "\\) = " r_efault
 	r[3] = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, " r_addr "\\) = " r_efault
 	r[4] = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, \\{" cap ", " cap ", " cap "\\}\\) = 0$"
-	capset_data = "{CAP_DAC_OVERRIDE|CAP_WAKE_ALARM, CAP_DAC_READ_SEARCH|CAP_BLOCK_SUSPEND, 0}"
+	capset_data = "{1<<CAP_DAC_OVERRIDE|1<<CAP_WAKE_ALARM, 1<<CAP_DAC_READ_SEARCH|1<<CAP_BLOCK_SUSPEND, 0}"
 	s[5] = "capset({_LINUX_CAPABILITY_VERSION_3, 0}, " capset_data ") = -1 EPERM (Operation not permitted)"
 	s[6] = "+++ exited with 0 +++"
 

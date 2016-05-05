@@ -86,20 +86,19 @@ print_xlat_pair()
 
 cond_xlat()
 {
-	local line val m def xlat str
+	local line val m def xlat
 	line="$1"; shift
-	str="$1"; shift
 
 	val="$(printf %s "${line}" | sed -n 's/^\([^[:space:]]\+\).*$/\1/p')"
 	m="${val%%|*}"
 	def="$(printf %s "${line}" |
 	       sed -n 's/^[^[:space:]]\+[[:space:]]\+\([^[:space:]].*\)$/\1/p')"
 
-	if [ -z "${str}" ]; then
+	if [ "${m}" = "${m#1<<}" ]; then
 		xlat="$(print_xlat "${val}")"
 	else
+		xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}")"
 		m="${m#1<<}"
-		xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${str}")"
 	fi
 
 	if [ -z "${def}" ]; then
@@ -204,14 +203,14 @@ gen_header()
 			if [ -n "${unconditional}" ]; then
 				print_xlat "${line}"
 			else
-				cond_xlat "${line}" ''
+				cond_xlat "${line}"
 			fi
 			;;
 		'1<<'[A-Z_]*)	# symbolic constants with shift
 			if [ -n "${unconditional}" ]; then
-				print_xlat_pair "1ULL<<${line#1<<}" "${line#1<<}"
+				print_xlat_pair "1ULL<<${line#1<<}" "${line}"
 			else
-				cond_xlat "${line}" "${line#1<<}"
+				cond_xlat "${line}"
 			fi
 			;;
 		[0-9]*)	# numeric constants
