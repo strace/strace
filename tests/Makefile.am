@@ -605,6 +605,7 @@ MISC_TESTS = \
 	qual_syscall.test \
 	redirect.test \
 	restart_syscall.test \
+	strace-S.test \
 	strace-T.test \
 	strace-V.test \
 	strace-f.test \

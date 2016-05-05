@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Check -S option.
+
+. "${srcdir=.}/init.sh"
+
+run_prog_skip_if_failed date > /dev/null
+run_strace -c -S calls $args
+OUT="$LOG.out"
+EXP="$LOG.exp"
+
+rm -f "$OUT" "$EXP"
+
+check_prog awk
+check_prog sort
+awk '{print $4}' "$LOG" > "$OUT"
+
+exec 4<&0 0<"$OUT"
+while
+read item
+do
+	if [ "$item" = "---------" ]
+	then
+		break
+	fi
+done
+
+while
+read item
+do
+	if [ "$item" = "---------" ]
+	then
+		break
+	fi
+
+	echo "$item" >> "$EXP"
+done
+
+exec 0<&4
+
+if [ -s $EXP ]
+then
+	sort -c -g -r "$EXP"
+	if [ "$?" = "1" ]
+	then
+		fail_ "not sorted"
+	fi
+else
+	fail_ "no file"
+fi
+
+rm -f "$OUT" "$EXP"
