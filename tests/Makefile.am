@@ -178,6 +178,7 @@ check_PROGRAMS = \
 	mq \
 	nanosleep \
 	net-accept-connect \
+	net-icmp_filter \
 	net-y-unix \
 	net-yy-inet \
 	net-yy-unix \
@@ -455,6 +456,7 @@ DECODER_TESTS = \
 	move_pages.test \
 	mq.test \
 	nanosleep.test \
+	net-icmp_filter.test \
 	net-y-unix.test \
 	net-yy-inet.test \
 	net-yy-unix.test \

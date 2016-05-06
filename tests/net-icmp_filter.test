@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of ICMP_FILTER.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=getsockopt,setsockopt

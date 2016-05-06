@@ -1249,15 +1249,19 @@ print_tpacket_stats(struct tcb *tcp, long addr, int len)
 # include "xlat/icmpfilterflags.h"
 
 static void
-print_icmp_filter(struct tcb *tcp, long addr, int len)
+print_icmp_filter(struct tcb *tcp, const long addr, int len)
 {
-	struct icmp_filter	filter;
+	struct icmp_filter filter = {};
 
-	if (len != sizeof(filter) ||
-	    umove(tcp, addr, &filter) < 0) {
+	if (len > (int) sizeof(filter))
+		len = sizeof(filter);
+	else if (len <= 0) {
 		printaddr(addr);
 		return;
 	}
+
+	if (umoven_or_printaddr(tcp, addr, len, &filter))
+		return;
 
 	tprints("~(");
 	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
