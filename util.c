@@ -1335,3 +1335,103 @@ umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 	}
 	return 0;
 }
+
+/*
+ * Iteratively fetch and print up to nmemb elements of elem_size size
+ * from the array that starts at tracee's address start_addr.
+ *
+ * Array elements are being fetched to the address specified by elem_buf.
+ *
+ * The fetcher callback function specified by umoven_func should follow
+ * the same semantics as umoven_or_printaddr function.
+ *
+ * The printer callback function specified by print_func is expected
+ * to print something; if it returns false, no more iterations will be made.
+ *
+ * The pointer specified by opaque_data is passed to each invocation
+ * of print_func callback function.
+ *
+ * This function prints:
+ * - "NULL", if start_addr is NULL;
+ * - "[]", if nmemb is 0;
+ * - start_addr, if nmemb * elem_size overflows or wraps around;
+ * - nothing, if the first element cannot be fetched
+ *   (if umoven_func returns non-zero), but it is assumed that
+ *   umoven_func has printed the address it failed to fetch data from;
+ * - elements of the array, delimited by ", ", with the array itself
+ *   enclosed with [] brackets.
+ *
+ * If abbrev(tcp) is true, then
+ * - the maximum number of elements printed equals to max_strlen;
+ * - "..." is printed instead of max_strlen+1 element
+ *   and no more iterations will be made.
+ *
+ * This function returns true only if
+ * - umoven_func has been called at least once AND
+ * - umoven_func has not returned false.
+ */
+bool
+print_array(struct tcb *tcp,
+	    const unsigned long start_addr,
+	    const size_t nmemb,
+	    void *const elem_buf,
+	    const size_t elem_size,
+	    int (*const umoven_func)(struct tcb *,
+				     long,
+				     unsigned int,
+				     void *),
+	    bool (*const print_func)(struct tcb *,
+				     void *elem_buf,
+				     size_t elem_size,
+				     void *opaque_data),
+	    void *const opaque_data)
+{
+	if (!start_addr) {
+		tprints("NULL");
+		return false;
+	}
+
+	if (!nmemb) {
+		tprints("[]");
+		return false;
+	}
+
+	const size_t size = nmemb * elem_size;
+	const unsigned long end_addr = start_addr + size;
+
+	if (end_addr <= start_addr || size / elem_size != nmemb) {
+		printaddr(start_addr);
+		return false;
+	}
+
+	const unsigned long abbrev_end =
+		(abbrev(tcp) && max_strlen < nmemb) ?
+			start_addr + elem_size * max_strlen : end_addr;
+	unsigned long cur;
+
+	for (cur = start_addr; cur < end_addr; cur += elem_size) {
+		if (cur != start_addr)
+			tprints(", ");
+
+		if (umoven_func(tcp, cur, elem_size, elem_buf))
+			break;
+
+		if (cur == start_addr)
+			tprints("[");
+
+		if (cur >= abbrev_end) {
+			tprints("...");
+			cur = end_addr;
+			break;
+		}
+
+		if (!print_func(tcp, elem_buf, elem_size, opaque_data)) {
+			cur = end_addr;
+			break;
+		}
+	}
+	if (cur != start_addr)
+		tprints("]");
+
+	return cur >= end_addr;
+}
