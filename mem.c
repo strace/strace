@@ -316,49 +316,27 @@ SYS_FUNC(remap_file_pages)
 }
 
 #if defined(POWERPC)
+static bool
+print_protmap_entry(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	tprintf("%#08x", * (unsigned int *) elem_buf);
+
+	return true;
+}
+
 SYS_FUNC(subpage_prot)
 {
-	unsigned long cur, end, abbrev_end, entries;
-	unsigned int entry;
+	unsigned long addr = tcp->u_arg[0];
+	unsigned long len = tcp->u_arg[1];
+	unsigned long nmemb = len >> 16;
+	unsigned long map = tcp->u_arg[2];
 
-	printaddr(tcp->u_arg[0]);
-	tprints(", ");
-	printaddr(tcp->u_arg[1]);
-	tprints(", ");
-	entries = tcp->u_arg[1] >> 16;
-	if (!entries || !tcp->u_arg[2]) {
-		tprints("{}");
-		return 0;
-	}
-	cur = tcp->u_arg[2];
-	end = cur + (sizeof(int) * entries);
-	if (!verbose(tcp) || end < (unsigned long) tcp->u_arg[2]) {
-		printaddr(tcp->u_arg[2]);
-		return 0;
-	}
-	if (abbrev(tcp)) {
-		abbrev_end = cur + (sizeof(int) * max_strlen);
-		if (abbrev_end > end)
-			abbrev_end = end;
-	}
-	else
-		abbrev_end = end;
-	tprints("{");
-	for (; cur < end; cur += sizeof(int)) {
-		if (cur > (unsigned long) tcp->u_arg[2])
-			tprints(", ");
-		if (cur >= abbrev_end) {
-			tprints("...");
-			break;
-		}
-		if (umove(tcp, cur, &entry) < 0) {
-			tprintf("??? [%#lx]", cur);
-			break;
-		}
-		else
-			tprintf("%#08x", entry);
-	}
-	tprints("}");
+	printaddr(addr);
+	tprintf(", %lu, ", len);
+
+	unsigned int entry;
+	print_array(tcp, map, nmemb, &entry, sizeof(entry),
+		    umoven_or_printaddr, print_protmap_entry, 0);
 
 	return RVAL_DECODED;
 }
