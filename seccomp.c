@@ -108,6 +108,8 @@ decode_bpf_code(uint16_t code)
 
 }
 
+#endif /* HAVE_LINUX_FILTER_H */
+
 static void
 decode_bpf_stmt(const struct bpf_filter *filter)
 {
@@ -146,54 +148,44 @@ decode_bpf_jump(const struct bpf_filter *filter)
 #endif /* HAVE_LINUX_FILTER_H */
 }
 
-static void
-decode_filter(const struct bpf_filter *filter)
-{
-	if (filter->jt || filter->jf)
-		decode_bpf_jump(filter);
-	else
-		decode_bpf_stmt(filter);
-}
-
-#endif /* HAVE_LINUX_FILTER_H */
-
 #ifndef BPF_MAXINSNS
 # define BPF_MAXINSNS 4096
 #endif
 
-static void
-decode_seccomp_fprog(struct tcb *tcp, unsigned short len, unsigned long addr)
+static bool
+print_bpf_filter(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	struct bpf_filter filter;
-	const unsigned long start_addr = addr;
-	unsigned int i = 0;
+	const struct bpf_filter *filter = elem_buf;
+	unsigned int *pn = data;
 
-	for (; addr >= start_addr && i < len; ++i, addr += sizeof(filter)) {
-		if (i) {
-			tprints(", ");
-			if (i >= BPF_MAXINSNS) {
-				tprints("...");
-				break;
-			}
-		}
-		if (umove_or_printaddr(tcp, addr, &filter))
-			break;
-		if (!i)
-			tprints("[");
-		decode_filter(&filter);
+	if ((*pn)++ >= BPF_MAXINSNS) {
+		tprints("...");
+		return false;
 	}
-	if (i)
-		tprints("]");
+
+	if (filter->jt || filter->jf)
+		decode_bpf_jump(filter);
+	else
+		decode_bpf_stmt(filter);
+
+	return true;
 }
 
 static void
-print_seccomp_fprog(struct tcb *tcp, unsigned short len, unsigned long addr)
+print_seccomp_fprog(struct tcb *tcp, unsigned long addr, unsigned short len)
 {
 	tprintf("{len=%u, filter=", len);
-	if (abbrev(tcp) || !len)
+
+	if (abbrev(tcp)) {
 		printaddr(addr);
-	else
-		decode_seccomp_fprog(tcp, len, addr);
+	} else {
+		unsigned int insns = 0;
+		struct bpf_filter filter;
+
+		print_array(tcp, addr, len, &filter, sizeof(filter),
+			    umoven_or_printaddr, print_bpf_filter, &insns);
+	}
+
 	tprints("}");
 }
 
@@ -205,7 +197,7 @@ print_seccomp_filter(struct tcb *tcp, unsigned long addr)
 	struct seccomp_fprog fprog;
 
 	if (fetch_seccomp_fprog(tcp, addr, &fprog))
-		print_seccomp_fprog(tcp, fprog.len, fprog.filter);
+		print_seccomp_fprog(tcp, fprog.filter, fprog.len);
 }
 
 static void

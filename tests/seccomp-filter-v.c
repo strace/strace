@@ -128,8 +128,8 @@ main(void)
 
 	prog->len = 0;
 	syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, 0, prog);
-	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=0, filter=%p})"
-		" = -1 EINVAL (%m)\n", prog->filter);
+	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=0, filter=[]})"
+		" = -1 EINVAL (%m)\n");
 
 	unsigned int i;
 	for (i = 0; i <= BPF_MAXINSNS; ++i) {
