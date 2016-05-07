@@ -42,29 +42,21 @@
 #  include "xlat/bsg_subprotocol.h"
 # endif
 
-static void
-print_sg_io_buffer(struct tcb *tcp, unsigned long addr, const unsigned int len)
+static bool
+print_uchar(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	unsigned char *buf = NULL;
-	unsigned int allocated, i;
+	tprintf("%02x", (unsigned int) (* (unsigned char *) elem_buf));
 
-	tprints("[");
-	if (len == 0)
-		goto out;
-	allocated = (len > max_strlen) ? max_strlen : len;
-	buf = malloc(allocated);
-	if (!buf || umoven(tcp, addr, allocated, buf) < 0) {
-		printaddr(addr);
-		goto out;
-	}
-	tprintf("%02x", buf[0]);
-	for (i = 1; i < allocated; ++i)
-		tprintf(", %02x", buf[i]);
-	if (allocated != len)
-		tprints(", ...");
-out:
-	free(buf);
-	tprints("]");
+	return true;
+}
+
+static void
+print_sg_io_buffer(struct tcb *tcp, const unsigned long addr, const unsigned int len)
+{
+	unsigned char buf;
+
+	print_array(tcp, addr, len, &buf, sizeof(buf),
+		    umoven_or_printaddr, print_uchar, 0);
 }
 
 static int
