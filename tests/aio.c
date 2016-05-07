@@ -146,6 +146,10 @@ main(void)
 		perror_msg_and_skip("io_setup");
 	printf("io_setup(%u, [%lu]) = 0\n", nr, *ctx);
 
+	assert(syscall(__NR_io_submit, *ctx, -1L, cbs) == -1);
+	printf("io_submit(%lu, -1, %p) = -1 %s (%m)\n",
+	       *ctx, cbs, errno2name());
+
 	if (syscall(__NR_io_submit, *ctx, nr, cbs) != (long) nr)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%lu, %u, ["
