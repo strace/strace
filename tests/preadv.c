@@ -88,7 +88,7 @@ main(void)
 		perror_msg_and_fail("preadv");
 	printf("preadv(0, NULL, 1, -2) = -1 EINVAL (%m)\n");
 
-	if (preadv(0, NULL, 0, -3) != -1)
+	if (preadv(0, iov, 0, -3) != -1)
 		perror_msg_and_fail("preadv");
 	printf("preadv(0, [], 0, -3) = -1 EINVAL (%m)\n");
 

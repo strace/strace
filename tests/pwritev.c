@@ -64,12 +64,12 @@ print_iovec(const struct iovec *iov, unsigned int cnt, unsigned int size)
 	for (i = 0; i < cnt; ++i) {
 		if (i)
 			fputs(", ", stdout);
-		if (i == LIM) {
-			fputs("...", stdout);
-			break;
-		}
 		if (i == size) {
 			printf("%p", &iov[i]);
+			break;
+		}
+		if (i == LIM) {
+			fputs("...", stdout);
 			break;
 		}
 		print_iov(&iov[i]);
@@ -133,7 +133,7 @@ main(void)
 	printf("pwritev(0, NULL, 1, -3) = %ld %s (%m)\n",
 	       rc, errno2name());
 
-	rc = pwritev(0, NULL, 0, -4);
+	rc = pwritev(0, iov, 0, -4);
 	printf("pwritev(0, [], 0, -4) = %ld %s (%m)\n",
 	       rc, errno2name());
 
