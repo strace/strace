@@ -58,9 +58,9 @@ static const char *child[N] = {
 };
 static const int sigs[N] = { SIGALRM, SIGUSR1, SIGUSR2 };
 static const struct itimerspec its[N] = {
-	{ .it_value.tv_nsec = 500000000 },
-	{ .it_value.tv_nsec = 700000000 },
-	{ .it_value.tv_nsec = 900000000 },
+	{ .it_value.tv_sec = 1 },
+	{ .it_value.tv_sec = 2 },
+	{ .it_value.tv_sec = 3 }
 };
 static thread_arg_t args[N] = {
 	{ .no = 0 },
