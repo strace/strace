@@ -153,6 +153,14 @@ printuid(const char *text, const unsigned int uid)
 		tprintf("%s%u", text, (uid_t) uid);
 }
 
+static bool
+print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	tprintf("%u", (unsigned int) (* (uid_t *) elem_buf));
+
+	return true;
+}
+
 static void
 print_groups(struct tcb *tcp, const unsigned int len, const unsigned long addr)
 {
@@ -160,45 +168,14 @@ print_groups(struct tcb *tcp, const unsigned int len, const unsigned long addr)
 	if (!ngroups_max)
 		ngroups_max = sysconf(_SC_NGROUPS_MAX);
 
-	const unsigned int size = len * sizeof(uid_t);
-	const unsigned long end = addr + size;
-	if (!addr || !verbose(tcp) || size / sizeof(uid_t) != len
-	    || len > ngroups_max || end < addr) {
+	if (len > ngroups_max) {
 		printaddr(addr);
 		return;
 	}
 
-	if (len == 0) {
-		tprints("[]");
-		return;
-	}
-
-	const unsigned long abbrev_end =
-		(abbrev(tcp) && max_strlen < len) ?
-			addr + max_strlen * sizeof(uid_t) : end;
-
-	unsigned long cur;
-	for (cur = addr; cur < end; cur += sizeof(uid_t)) {
-		if (cur != addr)
-			tprints(", ");
-
-		uid_t gid;
-		if (umove_or_printaddr(tcp, cur, &gid))
-			break;
-
-		if (cur == addr)
-			tprints("[");
-
-		if (cur >= abbrev_end) {
-			tprints("...");
-			cur = end;
-			break;
-		}
-
-		tprintf("%u", (unsigned int) gid);
-	}
-	if (cur != addr)
-		tprints("]");
+	uid_t gid;
+	print_array(tcp, addr, len, &gid, sizeof(gid),
+		    umoven_or_printaddr, print_gid, 0);
 }
 
 SYS_FUNC(setgroups)
