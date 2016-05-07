@@ -43,12 +43,16 @@
 #include "xlat/semop_flags.h"
 
 #if defined HAVE_SYS_SEM_H || defined HAVE_LINUX_SEM_H
-static void
-tprint_sembuf(const struct sembuf *sb)
+static bool
+print_sembuf(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
+	const struct sembuf *sb = elem_buf;
+
 	tprintf("{%u, %d, ", sb->sem_num, sb->sem_op);
 	printflags(semop_flags, sb->sem_flg, "SEM_???");
 	tprints("}");
+
+	return true;
 }
 #endif
 
@@ -56,35 +60,9 @@ static void
 tprint_sembuf_array(struct tcb *tcp, const long addr, const unsigned long count)
 {
 #if defined HAVE_SYS_SEM_H || defined HAVE_LINUX_SEM_H
-	unsigned long max_count;
 	struct sembuf sb;
-
-	if (abbrev(tcp))
-		max_count = (max_strlen < count) ? max_strlen : count;
-	else
-		max_count = count;
-
-	if (!max_count)
-		printaddr(addr);
-	else if (!umove_or_printaddr(tcp, addr, &sb)) {
-		unsigned long i;
-
-		tprints("[");
-		tprint_sembuf(&sb);
-
-		for (i = 1; i < max_count; ++i) {
-			tprints(", ");
-			if (umove_or_printaddr(tcp, addr + i * sizeof(sb), &sb))
-				break;
-			else
-				tprint_sembuf(&sb);
-		}
-
-		if (i < max_count || max_count < count)
-			tprints(", ...");
-
-		tprints("]");
-	}
+	print_array(tcp, addr, count, &sb, sizeof(sb),
+		    umoven_or_printaddr, print_sembuf, 0);
 #else
 	printaddr(addr);
 #endif
