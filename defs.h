@@ -510,8 +510,6 @@ extern int umoven(struct tcb *, long, unsigned int, void *);
 extern int umoven_or_printaddr(struct tcb *, long, unsigned int, void *);
 #define umove_or_printaddr(pid, addr, objp)	\
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
-extern int umove_ulong_or_printaddr(struct tcb *, long, unsigned long *);
-extern int umove_ulong_array_or_printaddr(struct tcb *, long, unsigned long *, size_t);
 extern int umovestr(struct tcb *, long, unsigned int, char *);
 extern int upeek(int pid, long, long *);
 
