@@ -43,6 +43,10 @@ print_page_array(const void **const pages,
 		 const unsigned long count,
 		 const unsigned int offset)
 {
+	if (!count) {
+		printf("%s", pages ? "[]" : "NULL");
+		return;
+	}
 	if (count <= offset) {
 		printf("%p", pages);
 		return;
@@ -75,6 +79,10 @@ print_node_array(const int *const nodes,
 		 const unsigned long count,
 		 const unsigned int offset)
 {
+	if (!count) {
+		printf("%s", nodes ? "[]" : "NULL");
+		return;
+	}
 	if (count <= offset) {
 		printf("%p", nodes);
 		return;
@@ -102,7 +110,7 @@ static void
 print_status_array(const int *const status, const unsigned long count)
 {
 	if (!count) {
-		printf("%p", status);
+		printf("%s", status ? "[]" : "NULL");
 		return;
 	}
 	printf("[");
@@ -136,9 +144,14 @@ print_stat_pages(const unsigned long pid, const unsigned long count,
 		int saved_errno = errno;
 		printf("move_pages(%d, %lu, ", (int) pid, count);
 		print_page_array(pages, count, 0);
+		printf(", NULL, ");
+		if (count)
+			printf("%p", status);
+		else
+			printf("[]");
 		errno = saved_errno;
-		printf(", NULL, %p, MPOL_MF_MOVE) = %ld %s (%m)\n",
-		       status, rc, errno2name());
+		printf(", MPOL_MF_MOVE) = %ld %s (%m)\n",
+		       rc, errno2name());
 	} else {
 		printf("move_pages(%d, %lu, ", (int) pid, count);
 		print_page_array(pages, count, 0);
@@ -166,7 +179,12 @@ print_move_pages(const unsigned long pid,
 	print_page_array(pages, count, offset);
 	printf(", ");
 	print_node_array(nodes, count, offset);
-	printf(", %p, MPOL_MF_MOVE_ALL) = ", status);
+	printf(", ");
+	if (count)
+		printf("%p", status);
+	else
+		printf("[]");
+	printf(", MPOL_MF_MOVE_ALL) = ");
 	if (rc) {
 		errno = saved_errno;
 		printf("%ld %s (%m)\n", rc, errno2name());

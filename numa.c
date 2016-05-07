@@ -28,46 +28,35 @@
 
 #include "defs.h"
 
+static bool
+print_node(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	if (elem_size < sizeof(long)) {
+		tprintf("%#0*x", (int) elem_size * 2 + 2,
+			* (unsigned int *) elem_buf);
+	} else {
+		tprintf("%#0*lx", (int) elem_size * 2 + 2,
+			* (unsigned long *) elem_buf);
+	}
+
+	return true;
+}
+
 static void
 print_nodemask(struct tcb *tcp, unsigned long addr, unsigned long maxnodes)
 {
-	const unsigned long nlongs =
+	const unsigned long nmemb =
 		(maxnodes + 8 * current_wordsize - 2) / (8 * current_wordsize);
-	const unsigned long size = nlongs * current_wordsize;
-	const unsigned long end = addr + size;
 
-	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp))
-	    || end <= addr || size / current_wordsize != nlongs
-	    || nlongs < maxnodes / (8 * current_wordsize)) {
+	if (nmemb < maxnodes / (8 * current_wordsize) ||
+	    (maxnodes && !nmemb)) {
 		printaddr(addr);
 		return;
 	}
 
-	const unsigned long abbrev_end =
-		(abbrev(tcp) && max_strlen < nlongs) ?
-			addr + max_strlen * current_wordsize : end;
-	unsigned long cur;
-	for (cur = addr; cur < end; cur += current_wordsize) {
-		if (cur != addr)
-			tprints(", ");
-
-		unsigned long n;
-		if (umove_ulong_or_printaddr(tcp, cur, &n))
-			break;
-
-		if (cur == addr)
-			tprints("[");
-
-		if (cur >= abbrev_end) {
-			tprints("...");
-			cur = end;
-			break;
-		}
-
-		tprintf("%#0*lx", (int) current_wordsize * 2 + 2, n);
-	}
-	if (cur != addr)
-		tprints("]");
+	unsigned long buf;
+	print_array(tcp, addr, nmemb, &buf, current_wordsize,
+		    umoven_or_printaddr, print_node, 0);
 }
 
 SYS_FUNC(migrate_pages)
@@ -129,107 +118,59 @@ SYS_FUNC(get_mempolicy)
 
 #include "xlat/move_pages_flags.h"
 
-static void
-print_page_array(struct tcb *tcp, const unsigned long addr,
-		 const unsigned long count)
+static bool
+print_addr(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const unsigned long size = count * current_wordsize;
-	const unsigned long end = addr + size;
+	unsigned long addr;
 
-	if (end <= addr || size / current_wordsize != count) {
-		printaddr(addr);
-		return;
+	if (elem_size < sizeof(long)) {
+		addr = * (unsigned int *) elem_buf;
+	} else {
+		addr = * (unsigned long *) elem_buf;
 	}
-	const unsigned long abbrev_end =
-		(abbrev(tcp) && max_strlen < count) ?
-			addr + max_strlen * current_wordsize : end;
-	unsigned long cur;
-	for (cur = addr; cur < end; cur += current_wordsize) {
-		if (cur != addr)
-			tprints(", ");
 
-		unsigned long n;
-		if (umove_ulong_or_printaddr(tcp, cur, &n))
-			break;
+	printaddr(addr);
 
-		if (cur == addr)
-			tprints("[");
-
-		if (cur >= abbrev_end) {
-			tprints("...");
-			cur = end;
-			break;
-		}
-		printaddr(n);
-	}
-	if (cur != addr)
-		tprints("]");
+	return true;
 }
 
-static void
-print_status(const int status)
+static bool
+print_status(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
+	const int status = * (int *) elem_buf;
+
 	if (status < 0 && (unsigned) -status < nerrnos)
 		tprintf("%s", errnoent[-status]);
 	else
 		tprintf("%d", status);
+
+	return true;
 }
 
-static void
-print_int(const int i)
+static bool
+print_int(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	tprintf("%d", i);
-}
+	tprintf("%d", * (int *) elem_buf);
 
-static void
-print_int_array(struct tcb *tcp, const unsigned long addr,
-		const unsigned long count, void (*func)(int))
-{
-	int i;
-	const unsigned long size = count * sizeof(i);
-	const unsigned long end = addr + size;
-
-	if (end <= addr || size / sizeof(i) != count) {
-		printaddr(addr);
-		return;
-	}
-	const unsigned long abbrev_end =
-		(abbrev(tcp) && max_strlen < count) ?
-			addr + max_strlen * sizeof(i) : end;
-	unsigned long cur;
-	for (cur = addr; cur < end; cur += sizeof(i)) {
-		if (cur != addr)
-			tprints(", ");
-
-		if (umove_or_printaddr(tcp, cur, &i))
-			break;
-
-		if (cur == addr)
-			tprints("[");
-
-		if (cur >= abbrev_end) {
-			tprints("...");
-			cur = end;
-			break;
-		}
-		func(i);
-	}
-	if (cur != addr)
-		tprints("]");
+	return true;
 }
 
 SYS_FUNC(move_pages)
 {
 	const unsigned long npages = tcp->u_arg[1];
+	long buf;
 
 	if (entering(tcp)) {
 		tprintf("%d, %lu, ", (int) tcp->u_arg[0], npages);
-		print_page_array(tcp, tcp->u_arg[2], npages);
+		print_array(tcp, tcp->u_arg[2], npages, &buf, current_wordsize,
+			    umoven_or_printaddr, print_addr, 0);
 		tprints(", ");
-		print_int_array(tcp, tcp->u_arg[3], npages, print_int);
+		print_array(tcp, tcp->u_arg[3], npages, &buf, sizeof(int),
+			    umoven_or_printaddr, print_int, 0);
 		tprints(", ");
 	} else {
-		print_int_array(tcp, tcp->u_arg[4], npages, print_status);
+		print_array(tcp, tcp->u_arg[4], npages, &buf, sizeof(int),
+			    umoven_or_printaddr, print_status, 0);
 		tprints(", ");
 		printflags(move_pages_flags, tcp->u_arg[5], "MPOL_???");
 	}

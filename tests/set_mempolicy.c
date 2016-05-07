@@ -83,7 +83,10 @@ print_nodes(const unsigned long maxnode, unsigned int offset)
 		}
 		putc(']', stdout);
 	} else {
-		printf("%p", nodemask);
+		if (maxnode)
+			printf("%p", nodemask);
+		else
+			printf("[]");
 	}
 
 	printf(", %lu) = ", maxnode);
