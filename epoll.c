@@ -52,15 +52,19 @@ SYS_FUNC(epoll_create1)
 #ifdef HAVE_SYS_EPOLL_H
 # include "xlat/epollevents.h"
 
-static void
-print_epoll_event(struct epoll_event *ev)
+static bool
+print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
+	const struct epoll_event *ev = elem_buf;
+
 	tprints("{");
 	printflags(epollevents, ev->events, "EPOLL???");
 	/* We cannot know what format the program uses, so print u32 and u64
 	   which will cover every value.  */
 	tprintf(", {u32=%" PRIu32 ", u64=%" PRIu64 "}}",
 		ev->data.u32, ev->data.u64);
+
+	return true;
 }
 #endif
 
@@ -68,8 +72,6 @@ print_epoll_event(struct epoll_event *ev)
 
 SYS_FUNC(epoll_ctl)
 {
-	struct epoll_event ev;
-
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
@@ -77,46 +79,16 @@ SYS_FUNC(epoll_ctl)
 	printfd(tcp, tcp->u_arg[2]);
 	tprints(", ");
 #ifdef HAVE_SYS_EPOLL_H
+	struct epoll_event ev;
 	if (EPOLL_CTL_DEL == tcp->u_arg[1])
 		printaddr(tcp->u_arg[3]);
 	else if (!umove_or_printaddr(tcp, tcp->u_arg[3], &ev))
-		print_epoll_event(&ev);
+		print_epoll_event(tcp, &ev, sizeof(ev), 0);
 #else
 	printaddr(tcp->u_arg[3]);
 #endif
 
 	return RVAL_DECODED;
-}
-
-static void
-print_epoll_event_array(struct tcb *tcp, const long addr, const long len)
-{
-#ifdef HAVE_SYS_EPOLL_H
-	struct epoll_event ev, *start, *cur, *end;
-
-	if (!len) {
-		tprints("[]");
-		return;
-	}
-
-	if (umove_or_printaddr(tcp, addr, &ev))
-		return;
-
-	tprints("[");
-	print_epoll_event(&ev);
-
-	start = (struct epoll_event *) addr;
-	end = start + len;
-	for (cur = start + 1; cur < end; ++cur) {
-		tprints(", ");
-		if (umove_or_printaddr(tcp, (long) cur, &ev))
-			break;
-		print_epoll_event(&ev);
-	}
-	tprints("]");
-#else
-	printaddr(addr);
-#endif
 }
 
 static void
@@ -126,7 +98,13 @@ epoll_wait_common(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		print_epoll_event_array(tcp, tcp->u_arg[1], tcp->u_rval);
+#ifdef HAVE_SYS_EPOLL_H
+		struct epoll_event ev;
+		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
+			    umoven_or_printaddr, print_epoll_event, 0);
+#else
+		printaddr(tcp->u_arg[1]);
+#endif
 		tprintf(", %d, %d", (int) tcp->u_arg[2], (int) tcp->u_arg[3]);
 	}
 }
