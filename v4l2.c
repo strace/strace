@@ -638,61 +638,43 @@ print_v4l2_crop(struct tcb *tcp, const long arg, const bool is_get)
 }
 
 #ifdef VIDIOC_S_EXT_CTRLS
-static int
-print_v4l2_ext_control_array(struct tcb *tcp, const unsigned long addr,
-			     const unsigned count)
+static bool
+print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	struct_v4l2_ext_control ctrl;
-	const unsigned long size = count * sizeof(ctrl);
-	const unsigned long end = addr + size;
-	int rc = 0;
+	const struct_v4l2_ext_control *p = elem_buf;
 
-	if (!addr || end <= addr || size / sizeof(ctrl) != count) {
-		printaddr(addr);
-		return -1;
-	}
-	const unsigned long abbrev_end =
-		(abbrev(tcp) && max_strlen < count) ?
-			addr + max_strlen * sizeof(ctrl) : end;
-	unsigned long cur;
-	for (cur = addr; cur < end; cur += sizeof(ctrl)) {
-		if (cur != addr)
-			tprints(", ");
-
-		if (umove(tcp, cur, &ctrl)) {
-			printaddr(cur);
-			rc = -1;
-			break;
-		}
-
-		if (cur == addr)
-			tprints("[");
-
-		if (cur >= abbrev_end) {
-			tprints("...");
-			cur = end;
-			break;
-		}
-
-		tprints("{id=");
-		printxval(v4l2_control_ids, ctrl.id, "V4L2_CID_???");
+	tprints("{id=");
+	printxval(v4l2_control_ids, p->id, "V4L2_CID_???");
 # if HAVE_DECL_V4L2_CTRL_TYPE_STRING
-		tprintf(", size=%u", ctrl.size);
-		if (ctrl.size > 0) {
-			tprints(", string=");
-			printstr(tcp, (long) ctrl.string, ctrl.size);
-		} else
+	tprintf(", size=%u", p->size);
+	if (p->size > 0) {
+		tprints(", string=");
+		printstr(tcp, (long) p->string, p->size);
+	} else
 # endif
-		tprintf(", value=%d, value64=%lld", ctrl.value,
-			(long long) ctrl.value64);
-		tprints("}");
-	}
-	if (cur != addr)
-		tprints("]");
-	return rc;
+	tprintf(", value=%d, value64=%lld", p->value,
+		(long long) p->value64);
+	tprints("}");
+
+	return true;
 }
 
 #include "xlat/v4l2_control_classes.h"
+
+static int
+umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
+				    const unsigned int len, void *our_addr)
+{
+	if (!addr) {
+		tprints("NULL");
+		return -1;
+	}
+	if (umoven(tcp, addr, len, our_addr) < 0) {
+		tprintf("%#lx", addr);
+		return -1;
+	}
+	return 0;
+}
 
 static int
 print_v4l2_ext_controls(struct tcb *tcp, const long arg, const bool is_get)
@@ -723,9 +705,11 @@ print_v4l2_ext_controls(struct tcb *tcp, const long arg, const bool is_get)
 	}
 
 	tprints("controls=");
-	int fail = print_v4l2_ext_control_array(tcp,
-						(unsigned long) c.controls,
-						c.count);
+	struct_v4l2_ext_control ctrl;
+	bool fail = !print_array(tcp, (unsigned long) c.controls, c.count,
+				 &ctrl, sizeof(ctrl),
+				 umoven_or_printaddr_ignore_syserror,
+				 print_v4l2_ext_control, 0);
 
 	if (exiting(tcp) && syserror(tcp))
 		tprintf(", error_idx=%u", c.error_idx);
