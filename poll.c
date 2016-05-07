@@ -31,9 +31,11 @@
 
 #include "xlat/pollflags.h"
 
-static void
-print_pollfd(struct tcb *tcp, const struct pollfd *fds)
+static bool
+print_pollfd(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
+	const struct pollfd *fds = elem_buf;
+
 	tprints("{fd=");
 	printfd(tcp, fds->fd);
 	if (fds->fd >= 0) {
@@ -41,55 +43,20 @@ print_pollfd(struct tcb *tcp, const struct pollfd *fds)
 		printflags(pollflags, fds->events, "POLL???");
 	}
 	tprints("}");
+
+	return true;
 }
 
-static int
+static void
 decode_poll_entering(struct tcb *tcp)
 {
-	struct pollfd fds;
+	const unsigned long addr = tcp->u_arg[0];
 	const unsigned int nfds = tcp->u_arg[1];
-	const unsigned long size = sizeof(fds) * nfds;
-	const unsigned long start = tcp->u_arg[0];
-	const unsigned long end = start + size;
-	const unsigned long max_printed =
-		abbrev(tcp) ? max_strlen : (unsigned int) -1;
+	struct pollfd fds;
 
-	if (!verbose(tcp) || !start || !nfds ||
-	    size / sizeof(fds) != nfds || end < start) {
-		printaddr(start);
-		tprintf(", %u, ", nfds);
-		return 0;
-	}
-
-	if (umove(tcp, start, &fds) < 0) {
-		printaddr(start);
-		tprintf(", %u, ", nfds);
-		return 0;
-	}
-
-	tprints("[");
-	if (max_printed) {
-		unsigned long printed = 1;
-		unsigned long cur = start + sizeof(fds);
-
-		print_pollfd(tcp, &fds);
-		for (; cur < end; ++printed, cur += sizeof(fds)) {
-			tprints(", ");
-			if (printed >= max_printed) {
-				tprints("...");
-				break;
-			}
-			if (umove_or_printaddr(tcp, cur, &fds))
-				break;
-			print_pollfd(tcp, &fds);
-
-		}
-	} else {
-		tprints("...");
-	}
-	tprintf("], %u, ", nfds);
-
-	return 0;
+	print_array(tcp, addr, nfds, &fds, sizeof(fds),
+		    umoven_or_printaddr, print_pollfd, 0);
+	tprintf(", %u, ", nfds);
 }
 
 static int
@@ -184,16 +151,17 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 SYS_FUNC(poll)
 {
 	if (entering(tcp)) {
-		int rc = decode_poll_entering(tcp);
+		decode_poll_entering(tcp);
+		int timeout = tcp->u_arg[2];
 
 #ifdef INFTIM
-		if (INFTIM == (int) tcp->u_arg[2])
+		if (INFTIM == timeout)
 			tprints("INFTIM");
 		else
 #endif
-			tprintf("%d", (int) tcp->u_arg[2]);
+			tprintf("%d", timeout);
 
-		return rc;
+		return 0;
 	} else {
 		return decode_poll_exiting(tcp, 0);
 	}
@@ -202,7 +170,7 @@ SYS_FUNC(poll)
 SYS_FUNC(ppoll)
 {
 	if (entering(tcp)) {
-		int rc = decode_poll_entering(tcp);
+		decode_poll_entering(tcp);
 
 		print_timespec(tcp, tcp->u_arg[2]);
 		tprints(", ");
@@ -210,7 +178,7 @@ SYS_FUNC(ppoll)
 		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 		tprintf(", %lu", tcp->u_arg[4]);
 
-		return rc;
+		return 0;
 	} else {
 		return decode_poll_exiting(tcp, tcp->u_arg[2]);
 	}

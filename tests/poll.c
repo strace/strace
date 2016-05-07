@@ -91,16 +91,15 @@ print_pollfd_array_entering(const struct pollfd *const pfd,
 	for (i = 0; i < size; ++i) {
 		if (i)
 			tprintf(", ");
+		if (i >= valid) {
+			tprintf("%p", &pfd[i]);
+			break;
+		}
 		if (i >= abbrev) {
 			tprintf("...");
 			break;
 		}
-		if (i < valid)
-			print_pollfd_entering(&pfd[i]);
-		else {
-			tprintf("%p", &pfd[i]);
-			break;
-		}
+		print_pollfd_entering(&pfd[i]);
 	}
 	tprintf("]");
 }
@@ -185,7 +184,7 @@ main(int ac, char **av)
 	int rc = syscall(__NR_poll, tail_fds0, 0, timeout);
 	assert(rc == 0);
 
-	tprintf("poll(%p, 0, %d) = %d (Timeout)\n", tail_fds0, timeout, rc);
+	tprintf("poll([], 0, %d) = %d (Timeout)\n", timeout, rc);
 
 	rc = syscall(__NR_poll, tail_fds0, ARRAY_SIZE(pfds0), timeout);
 	assert(rc == 3);
