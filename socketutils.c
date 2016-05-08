@@ -78,29 +78,14 @@ print_sockaddr_by_inode_cached(const unsigned long inode)
 }
 
 static bool
-inet_send_query(const int fd, const int family, const int proto)
+send_query(const int fd, void *req, size_t req_size)
 {
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
 	};
-	struct {
-		const struct nlmsghdr nlh;
-		const struct inet_diag_req_v2 idr;
-	} req = {
-		.nlh = {
-			.nlmsg_len = sizeof(req),
-			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
-		},
-		.idr = {
-			.sdiag_family = family,
-			.sdiag_protocol = proto,
-			.idiag_states = -1
-		}
-	};
 	struct iovec iov = {
-		.iov_base = &req,
-		.iov_len = sizeof(req)
+		.iov_base = req,
+		.iov_len = req_size
 	};
 	const struct msghdr msg = {
 		.msg_name = &nladdr,
@@ -117,6 +102,27 @@ inet_send_query(const int fd, const int family, const int proto)
 		}
 		return true;
 	}
+}
+
+static bool
+inet_send_query(const int fd, const int family, const int proto)
+{
+	struct {
+		const struct nlmsghdr nlh;
+		const struct inet_diag_req_v2 idr;
+	} req = {
+		.nlh = {
+			.nlmsg_len = sizeof(req),
+			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
+		},
+		.idr = {
+			.sdiag_family = family,
+			.sdiag_protocol = proto,
+			.idiag_states = -1
+		}
+	};
+	return send_query(fd, &req, sizeof(req));
 }
 
 static int
@@ -232,9 +238,6 @@ inet_print(const int fd, const int family, const int protocol,
 static bool
 unix_send_query(const int fd, const unsigned long inode)
 {
-	struct sockaddr_nl nladdr = {
-		.nl_family = AF_NETLINK
-	};
 	struct {
 		const struct nlmsghdr nlh;
 		const struct unix_diag_req udr;
@@ -251,25 +254,7 @@ unix_send_query(const int fd, const unsigned long inode)
 			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER
 		}
 	};
-	struct iovec iov = {
-		.iov_base = &req,
-		.iov_len = sizeof(req)
-	};
-	const struct msghdr msg = {
-		.msg_name = &nladdr,
-		.msg_namelen = sizeof(nladdr),
-		.msg_iov = &iov,
-		.msg_iovlen = 1
-	};
-
-	for (;;) {
-		if (sendmsg(fd, &msg, 0) < 0) {
-			if (errno == EINTR)
-				continue;
-			return false;
-		}
-		return true;
-	}
+	return send_query(fd, &req, sizeof(req));
 }
 
 static int
