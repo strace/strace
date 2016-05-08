@@ -50,7 +50,7 @@ grep_log()
 
 grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c
 grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c -enanosleep
-grep_log ' *[^ ]+ +(1\.0|0\.99)[^n]*nanosleep'	-cw
-grep_log '100\.00 +(1\.0|0\.99)[^n]*nanosleep'	-cw -enanosleep
+grep_log ' *[^ ]+ +(1\.[01]|0\.99)[^n]*nanosleep'	-cw
+grep_log '100\.00 +(1\.[01]|0\.99)[^n]*nanosleep'	-cw -enanosleep
 
 exit 0
