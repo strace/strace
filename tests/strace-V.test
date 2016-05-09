@@ -6,10 +6,12 @@
 
 run_strace -V > "$LOG"
 
-PACKAGE_NAME="$(sed -n 's/#define[[:space:]]*PACKAGE_NAME[[:space:]]*"\([^"]*\)".*/\1/p' ../config.h)"
-VERSION="$(sed -n 's/#define[[:space:]]*VERSION[[:space:]]*"\([^"]*\)".*/\1/p' ../config.h)"
+getval()
+{
+	sed -n 's/#define[[:space:]]*'"$1"'[[:space:]]*"\([^"]*\)".*/\1/p' ../config.h
+}
 
-printf "%s -- version %s\n" "$PACKAGE_NAME" "$VERSION" > "$OUT"
+printf "%s -- version %s\n" "$(getval PACKAGE_NAME)" "$(getval VERSION)" > "$EXP"
 
-match_diff "$LOG" "$OUT"
-rm -f "$OUT"
+match_diff "$EXP" "$LOG"
+rm -f "$EXP"
