@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Check -ff option.
+
+. "${srcdir=.}/init.sh"
+
+./set_ptracer_any ./sleep 1 > /dev/null &
+PID=$!
+run_strace -a14 -eexit_group -ff -p $PID
+printf "exit_group(0) = ?\n+++ exited with 0 +++\n" > "$LOG"
+
+match_diff "$LOG" "$LOG.$PID"
+
+rm -f "$LOG".*
