@@ -658,6 +658,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     statfs.expected \
 	     statx.sh \
 	     strace-T.expected \
+	     strace-ff.expected \
 	     strace-r.expected \
 	     struct_flock.c \
 	     sun_path.expected \

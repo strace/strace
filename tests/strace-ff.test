@@ -4,11 +4,18 @@
 
 . "${srcdir=.}/init.sh"
 
+rm -f "$LOG".*
+
 ./set_ptracer_any ./sleep 1 > /dev/null &
 PID=$!
 run_strace -a14 -eexit_group -ff -p $PID
-printf "exit_group(0) = ?\n+++ exited with 0 +++\n" > "$LOG"
 
-match_diff "$LOG" "$LOG.$PID"
+# check that output matches
+match_diff "$LOG.$PID"
 
-rm -f "$LOG".*
+# check that no other output files have been created
+set -- "$LOG".*
+[ "$LOG.$PID" = "$*" ] ||
+	fail_ "too many output files: $*"
+
+rm -f "$LOG.$PID"
