@@ -5,48 +5,24 @@
 . "${srcdir=.}/init.sh"
 
 run_prog_skip_if_failed date > /dev/null
-run_strace -c -S calls $args
-OUT="$LOG.out"
-EXP="$LOG.exp"
 
-rm -f "$OUT" "$EXP"
+test_c()
+{
+	local sortby sortopts sedexpr
+	sortby="$1"; shift
+	sortopts="$1"; shift
+	sedexpr="$1"; shift
 
-check_prog awk
-check_prog sort
-awk '{print $4}' "$LOG" > "$OUT"
+	run_strace -c -S "$sortby" date > /dev/null
+	sed -ne "$sedexpr" < "$LOG" > "$OUT"
 
-exec 4<&0 0<"$OUT"
-while
-read item
-do
-	if [ "$item" = "---------" ]
-	then
-		break
-	fi
-done
+	[ -s "$OUT" ] ||
+		fail_ "$STRACE $args output mismatch"
+	LC_ALL=C sort -c $sortopts "$OUT" ||
+		fail_ "$STRACE $args output not sorted properly"
+}
 
-while
-read item
-do
-	if [ "$item" = "---------" ]
-	then
-		break
-	fi
+c='[[:space:]]\+\([^[:space:]]\+\)'
+test_c calls '-n -r' '/^[[:space:]]\+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'
 
-	echo "$item" >> "$EXP"
-done
-
-exec 0<&4
-
-if [ -s $EXP ]
-then
-	sort -c -g -r "$EXP"
-	if [ "$?" = "1" ]
-	then
-		fail_ "not sorted"
-	fi
-else
-	fail_ "no file"
-fi
-
-rm -f "$OUT" "$EXP"
+rm -f "$OUT"
