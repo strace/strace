@@ -29,9 +29,7 @@
 
 #include "defs.h"
 #include <fcntl.h>
-#ifdef HAVE_SYS_EPOLL_H
-# include <sys/epoll.h>
-#endif
+#include <sys/epoll.h>
 
 SYS_FUNC(epoll_create)
 {
@@ -49,8 +47,7 @@ SYS_FUNC(epoll_create1)
 	return RVAL_DECODED | RVAL_FD;
 }
 
-#ifdef HAVE_SYS_EPOLL_H
-# include "xlat/epollevents.h"
+#include "xlat/epollevents.h"
 
 static bool
 print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
@@ -66,7 +63,6 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 	return true;
 }
-#endif
 
 #include "xlat/epollctls.h"
 
@@ -78,15 +74,11 @@ SYS_FUNC(epoll_ctl)
 	tprints(", ");
 	printfd(tcp, tcp->u_arg[2]);
 	tprints(", ");
-#ifdef HAVE_SYS_EPOLL_H
 	struct epoll_event ev;
 	if (EPOLL_CTL_DEL == tcp->u_arg[1])
 		printaddr(tcp->u_arg[3]);
 	else if (!umove_or_printaddr(tcp, tcp->u_arg[3], &ev))
 		print_epoll_event(tcp, &ev, sizeof(ev), 0);
-#else
-	printaddr(tcp->u_arg[3]);
-#endif
 
 	return RVAL_DECODED;
 }
@@ -98,13 +90,9 @@ epoll_wait_common(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-#ifdef HAVE_SYS_EPOLL_H
 		struct epoll_event ev;
 		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
 			    umoven_or_printaddr, print_epoll_event, 0);
-#else
-		printaddr(tcp->u_arg[1]);
-#endif
 		tprintf(", %d, %d", (int) tcp->u_arg[2], (int) tcp->u_arg[3]);
 	}
 }

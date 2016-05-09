@@ -1,7 +1,7 @@
 #include "tests.h"
 #include <sys/syscall.h>
 
-#if defined __NR_epoll_ctl && defined HAVE_SYS_EPOLL_H
+#ifdef __NR_epoll_ctl
 
 # include <inttypes.h>
 # include <stdio.h>
@@ -33,6 +33,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_epoll_ctl && HAVE_SYS_EPOLL_H")
+SKIP_MAIN_UNDEFINED("__NR_epoll_ctl")
 
 #endif

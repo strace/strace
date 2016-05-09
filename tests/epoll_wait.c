@@ -1,7 +1,7 @@
 #include "tests.h"
 #include <sys/syscall.h>
 
-#if defined __NR_epoll_wait && defined HAVE_SYS_EPOLL_H
+#ifdef __NR_epoll_wait
 
 # include <stdio.h>
 # include <sys/epoll.h>
@@ -22,6 +22,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_epoll_wait && HAVE_SYS_EPOLL_H")
+SKIP_MAIN_UNDEFINED("__NR_epoll_wait")
 
 #endif
