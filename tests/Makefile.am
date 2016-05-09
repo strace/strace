@@ -87,6 +87,7 @@ check_PROGRAMS = \
 	epoll_create \
 	epoll_create1 \
 	epoll_ctl \
+	epoll_pwait \
 	epoll_wait \
 	eventfd \
 	execve \
@@ -369,6 +370,7 @@ DECODER_TESTS = \
 	epoll_create.test \
 	epoll_create1.test \
 	epoll_ctl.test \
+	epoll_pwait.test \
 	epoll_wait.test \
 	eventfd.test \
 	execve-v.test \

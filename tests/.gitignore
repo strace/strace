@@ -32,6 +32,7 @@ dup3
 epoll_create
 epoll_create1
 epoll_ctl
+epoll_pwait
 epoll_wait
 eventfd
 execve
