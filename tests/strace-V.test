@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Check -V option.
+
+. "${srcdir=.}/init.sh"
+
+run_strace -V > "$LOG"
+
+PACKAGE_NAME="$(sed -n 's/#define[[:space:]]*PACKAGE_NAME[[:space:]]*"\([^"]*\)".*/\1/p' ../config.h)"
+VERSION="$(sed -n 's/#define[[:space:]]*VERSION[[:space:]]*"\([^"]*\)".*/\1/p' ../config.h)"
+
+printf "%s -- version %s\n" "$PACKAGE_NAME" "$VERSION" > "$OUT"
+
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"
