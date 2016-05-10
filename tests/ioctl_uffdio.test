@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check userfaultfd ioctl decoding.
+
+. "${srcdir=.}/ioctl.test"
