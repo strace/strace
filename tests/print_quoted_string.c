@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
  * Based on string_quote() from util.c.
@@ -11,10 +12,17 @@
 void
 print_quoted_string(const char *instr)
 {
-	const unsigned char *str = (const unsigned char*) instr;
-	int c;
+	print_quoted_memory(instr, strlen(instr));
+}
 
-	while ((c = *(str++))) {
+void
+print_quoted_memory(const char *instr, const size_t len)
+{
+	const unsigned char *str = (const unsigned char*) instr;
+	size_t i;
+
+	for (i = 0; i < len; ++i) {
+		const int c = str[i];
 		switch (c) {
 			case '\"':
 				printf("\\\"");

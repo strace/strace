@@ -78,8 +78,11 @@ const char *hexquote_strndup(const char *, size_t);
 /* Return inode number of socket descriptor. */
 unsigned long inode_of_sockfd(int);
 
-/* Print string in quoted form. */
+/* Print string in a quoted form. */
 void print_quoted_string(const char *);
+
+/* Print memory in a quoted form. */
+void print_quoted_memory(const char *, size_t);
 
 /* Check whether given uid matches kernel overflowuid. */
 void check_overflowuid(const int);
