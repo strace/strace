@@ -24,5 +24,6 @@ test_c()
 
 c='[[:space:]]\+\([^[:space:]]\+\)'
 test_c calls '-n -r' '/^[[:space:]]\+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'
+test_c name '' '/^[[:space:]]\+[0-9]/ s/^'"$c$c$c$c"'\([[:space:]]\+[0-9]\+\)\?'"$c"'$/\6/p'
 
 rm -f "$OUT"
