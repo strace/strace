@@ -4,18 +4,26 @@
 
 . "${srcdir=.}/init.sh"
 
-rm -f "$LOG".*
+run_prog_skip_if_failed \
+	kill -0 $$
 
-./set_ptracer_any ./sleep 1 > /dev/null &
-PID=$!
-run_strace -a14 -eexit_group -ff -p $PID
+./set_ptracer_any ./sleep 1 > "$OUT" &
+tracee_pid=$!
+
+while ! [ -s "$OUT" ]; do
+	kill -0 $tracee_pid 2> /dev/null ||
+		fail_ 'set_ptracer_any sleep failed'
+done
+
+rm -f "$LOG".*
+run_strace -a14 -eexit_group -ff -p $tracee_pid
 
 # check that output matches
-match_diff "$LOG.$PID"
+match_diff "$LOG.$tracee_pid"
 
 # check that no other output files have been created
 set -- "$LOG".*
-[ "$LOG.$PID" = "$*" ] ||
+[ "$LOG.$tracee_pid" = "$*" ] ||
 	fail_ "too many output files: $*"
 
-rm -f "$LOG.$PID"
+rm -f "$OUT" "$LOG.$tracee_pid"
