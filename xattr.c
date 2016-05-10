@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2002-2005 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2004 Ulrich Drepper <drepper@redhat.com>
- * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,54 +35,30 @@
 
 #include "xlat/xattrflags.h"
 
+#ifndef XATTR_SIZE_MAX
+# define XATTR_SIZE_MAX 65536
+#endif
+
 static void
 print_xattr_val(struct tcb *tcp,
 		unsigned long addr,
 		unsigned long insize,
 		unsigned long size)
 {
-	char *buf = NULL;
-	unsigned int len;
+	static char buf[XATTR_SIZE_MAX];
 
 	tprints(", ");
 
-	if (insize == 0)
-		goto done;
-
-	len = size;
-	if (size != (unsigned long) len)
-		goto done;
-
-	if (!len) {
-		tprintf("\"\", %ld", insize);
-		return;
-	}
-
-	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)))
-		goto done;
-
-	buf = malloc(len);
-	if (!buf)
-		goto done;
-
-	if (umoven(tcp, addr, len, buf) < 0) {
-		free(buf);
-		buf = NULL;
-		goto done;
-	}
-
-	/* Don't print terminating NUL if there is one. */
-	if (buf[len - 1] == '\0')
-		--len;
-
-done:
-	if (buf) {
-		print_quoted_string(buf, len, 0);
-		free(buf);
-	} else {
+	if (!addr || size > sizeof(buf))
 		printaddr(addr);
+	else if (!size || !umoven_or_printaddr(tcp, addr, size, buf)) {
+		/* Don't print terminating NUL if there is one. */
+		if (size && buf[size - 1] == '\0')
+			--size;
+
+		print_quoted_string(buf, size, 0);
 	}
-	tprintf(", %ld", insize);
+	tprintf(", %lu", insize);
 }
 
 SYS_FUNC(setxattr)
@@ -134,13 +110,10 @@ SYS_FUNC(fgetxattr)
 static void
 print_xattr_list(struct tcb *tcp, unsigned long addr, unsigned long size)
 {
-	if (syserror(tcp)) {
+	if (!size || syserror(tcp)) {
 		printaddr(addr);
 	} else {
-		unsigned long len =
-			(size < (unsigned long) tcp->u_rval) ?
-				size : (unsigned long) tcp->u_rval;
-		printstr(tcp, addr, len);
+		printstr(tcp, addr, tcp->u_rval);
 	}
 	tprintf(", %lu", size);
 }
