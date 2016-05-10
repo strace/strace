@@ -112,8 +112,9 @@ time_cmp(void *a, void *b)
 static int
 syscall_cmp(void *a, void *b)
 {
-	return strcmp(sysent[*((int *) a)].sys_name,
-		      sysent[*((int *) b)].sys_name);
+	const char *a_name = sysent[*((int *) a)].sys_name;
+	const char *b_name = sysent[*((int *) b)].sys_name;
+	return strcmp(a_name ? a_name : "", b_name ? b_name : "");
 }
 
 static int
