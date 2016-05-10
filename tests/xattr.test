@@ -4,8 +4,9 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog
-run_strace -e removexattr,setxattr $args
-match_grep
+syscalls=
+for n in getxattr setxattr listxattr removexattr; do
+	syscalls="$syscalls,${n},f${n},l${n}"
+done
 
-exit 0
+run_strace_match_diff -a22 -e trace=$syscalls

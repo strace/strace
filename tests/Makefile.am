@@ -668,7 +668,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     uio.expected \
 	     umovestr.expected \
 	     wait.expected \
-	     xattr.expected \
 	     xchownx.c \
 	     xselect.c \
 	     xstatfs.c \
