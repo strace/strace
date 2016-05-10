@@ -36,3 +36,123 @@ SYS_FUNC(userfaultfd)
 
 	return RVAL_DECODED | RVAL_FD;
 }
+
+#ifdef HAVE_LINUX_USERFAULTFD_H
+# include <linux/ioctl.h>
+# include <linux/userfaultfd.h>
+
+# include "xlat/uffd_api_flags.h"
+# include "xlat/uffd_copy_flags.h"
+# include "xlat/uffd_register_ioctl_flags.h"
+# include "xlat/uffd_register_mode_flags.h"
+# include "xlat/uffd_zeropage_flags.h"
+
+static void
+tprintf_uffdio_range(const struct uffdio_range *range)
+{
+	tprintf("{start=%#" PRI__x64 ", len=%#" PRI__x64 "}",
+		range->start, range->len);
+}
+
+int
+uffdio_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+{
+	switch (code) {
+	case UFFDIO_API: {
+		struct uffdio_api ua;
+		if (entering(tcp)) {
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &ua))
+				return RVAL_DECODED | 1;
+			/* Features is intended to contain some flags, but
+			 * there aren't any defined yet.
+			 */
+			tprintf("{api=%#" PRI__x64
+				", features=%#" PRI__x64,
+				ua.api, ua.features);
+		} else {
+			if (!syserror(tcp) && !umove(tcp, arg, &ua)) {
+				tprintf(", features.out=%#" PRI__x64
+					", ioctls=", ua.features);
+				printflags64(uffd_api_flags, ua.ioctls,
+					     "_UFFDIO_???");
+			}
+			tprintf("}");
+		}
+		return 1;
+	}
+
+	case UFFDIO_COPY: {
+		struct uffdio_copy uc;
+		if (entering(tcp)) {
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &uc))
+				return RVAL_DECODED | 1;
+			tprintf("{dst=%#" PRI__x64 ", src=%#" PRI__x64
+				", len=%#" PRI__x64 ", mode=",
+				uc.dst, uc.src, uc.len);
+			printflags64(uffd_copy_flags, uc.mode,
+				     "UFFDIO_COPY_???");
+		} else {
+			if (!syserror(tcp) && !umove(tcp, arg, &uc))
+				tprintf(", copy=%#" PRI__x64, uc.copy);
+			tprints("}");
+		}
+		return 1;
+	}
+
+	case UFFDIO_REGISTER: {
+		struct uffdio_register ur;
+		if (entering(tcp)) {
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &ur))
+				return RVAL_DECODED | 1;
+			tprintf("{range=");
+			tprintf_uffdio_range(&ur.range);
+			tprintf(", mode=");
+			printflags64(uffd_register_mode_flags, ur.mode,
+				     "UFFDIO_REGISTER_MODE_???");
+		} else {
+			if (!syserror(tcp) && !umove(tcp, arg, &ur)) {
+				tprintf(", ioctls=");
+				printflags64(uffd_register_ioctl_flags,
+					     ur.ioctls, "UFFDIO_???");
+			}
+			tprints("}");
+		}
+		return 1;
+	}
+
+	case UFFDIO_UNREGISTER:
+	case UFFDIO_WAKE: {
+		struct uffdio_range ura;
+		tprints(", ");
+		if (!umove_or_printaddr(tcp, arg, &ura))
+			tprintf_uffdio_range(&ura);
+		return RVAL_DECODED | 1;
+	}
+
+	case UFFDIO_ZEROPAGE: {
+		struct uffdio_zeropage uz;
+		if (entering(tcp)) {
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &uz))
+				return RVAL_DECODED | 1;
+			tprintf("{range=");
+			tprintf_uffdio_range(&uz.range);
+			tprintf(", mode=");
+			printflags64(uffd_zeropage_flags, uz.mode,
+				     "UFFDIO_ZEROPAGE_???");
+		} else {
+			if (!syserror(tcp) && !umove(tcp, arg, &uz))
+				tprintf(", zeropage=%#" PRI__x64, uz.zeropage);
+			tprints("}");
+		}
+		return 1;
+	}
+
+	default:
+		return RVAL_DECODED;
+	}
+}
+#endif /* HAVE_LINUX_USERFAULTFD_H */

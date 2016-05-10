@@ -375,6 +375,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/securebits.h
 	linux/sem.h
 	linux/shm.h
+	linux/userfaultfd.h
 	linux/utsname.h
 	mqueue.h
 	netinet/sctp.h

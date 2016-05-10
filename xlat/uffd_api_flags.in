@@ -1,0 +1,4 @@
+#val_type uint64_t
+1<<_UFFDIO_REGISTER
+1<<_UFFDIO_UNREGISTER
+1<<_UFFDIO_API
