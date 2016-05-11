@@ -321,6 +321,8 @@
 [5318] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [5319] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [5320] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[5321] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
+[5322] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 
 # define SYS_socket_subcall      5400
 # include "subcall.h"

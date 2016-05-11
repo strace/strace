@@ -325,6 +325,8 @@
 [324] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [325] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [326] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[327] = { 6,	TD,		SEN(printargs),			"64:preadv2"		},
+[328] = { 6,	TD,		SEN(printargs),			"64:pwritev2"		},
 [327 ... 511] = { },
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact

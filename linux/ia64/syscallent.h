@@ -364,3 +364,5 @@
 [1345] = { 5,	0,		SEN(kcmp),			"kcmp"			},
 [1346] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [1347] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[1348] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
+[1349] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},

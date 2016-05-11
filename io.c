@@ -207,7 +207,10 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 #endif
 }
 
-SYS_FUNC(preadv)
+#include "xlat/rwf_flags.h"
+
+static int
+do_preadv(struct tcb *tcp, const int flags_arg)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -217,19 +220,48 @@ SYS_FUNC(preadv)
 				tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		print_lld_from_low_high_val(tcp, 3);
+		if (flags_arg >= 0) {
+			tprints(", ");
+			printflags(rwf_flags, tcp->u_arg[flags_arg], "RWF_???");
+		}
 	}
 	return 0;
 }
 
-SYS_FUNC(pwritev)
+SYS_FUNC(preadv)
+{
+	return do_preadv(tcp, -1);
+}
+
+SYS_FUNC(preadv2)
+{
+	return do_preadv(tcp, 5);
+}
+
+static int
+do_pwritev(struct tcb *tcp, const int flags_arg)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
 	tprintf(", %lu, ", tcp->u_arg[2]);
 	print_lld_from_low_high_val(tcp, 3);
+	if (flags_arg >= 0) {
+		tprints(", ");
+		printflags(rwf_flags, tcp->u_arg[flags_arg], "RWF_???");
+	}
 
 	return RVAL_DECODED;
+}
+
+SYS_FUNC(pwritev)
+{
+	return do_pwritev(tcp, -1);
+}
+
+SYS_FUNC(pwritev2)
+{
+	return do_pwritev(tcp, 5);
 }
 
 #include "xlat/splice_flags.h"

@@ -325,6 +325,8 @@
 [6322] = { 2,	0,		SEN(membarrier),		"membarrier",		},
 [6323] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [6324] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[6325] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
+[6326] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 
 # define SYS_socket_subcall      6400
 # include "subcall.h"

@@ -354,6 +354,8 @@
 [355] = { 5,	TN,		SEN(setsockopt),		"setsockopt"		},
 [356] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [357] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[358] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
+[359] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

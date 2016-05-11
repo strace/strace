@@ -349,3 +349,5 @@
 [344] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
 [345] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [346] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[347] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
+[348] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
