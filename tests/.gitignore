@@ -103,6 +103,7 @@ ksysent.h
 lchown
 lchown32
 libtests.a
+link
 linkat
 llseek
 lseek

@@ -156,6 +156,7 @@ check_PROGRAMS = \
 	ksysent \
 	lchown \
 	lchown32 \
+	link \
 	linkat \
 	llseek \
 	lseek \
@@ -438,6 +439,7 @@ DECODER_TESTS = \
 	kill.test \
 	lchown.test \
 	lchown32.test \
+	link.test \
 	linkat.test \
 	llseek.test \
 	lseek.test \
