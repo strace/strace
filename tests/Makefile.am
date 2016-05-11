@@ -179,6 +179,7 @@ check_PROGRAMS = \
 	mmsg \
 	move_pages \
 	mq \
+	munlockall \
 	nanosleep \
 	net-accept-connect \
 	net-icmp_filter \
@@ -462,6 +463,7 @@ DECODER_TESTS = \
 	mmsg.test \
 	move_pages.test \
 	mq.test \
+	munlockall.test \
 	nanosleep.test \
 	net-icmp_filter.test \
 	net-y-unix.test \

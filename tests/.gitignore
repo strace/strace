@@ -126,6 +126,7 @@ mmap64
 mmsg
 move_pages
 mq
+munlockall
 nanosleep
 net-accept-connect
 net-icmp_filter
