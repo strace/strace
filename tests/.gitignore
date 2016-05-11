@@ -150,6 +150,7 @@ prctl-seccomp-strict
 pread64-pwrite64
 preadv
 preadv-pwritev
+preadv2-pwritev2
 pselect6
 pwritev
 read-write

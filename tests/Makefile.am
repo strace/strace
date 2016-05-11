@@ -203,6 +203,7 @@ check_PROGRAMS = \
 	pread64-pwrite64 \
 	preadv \
 	preadv-pwritev \
+	preadv2-pwritev2 \
 	pselect6 \
 	pwritev \
 	read-write \
@@ -480,6 +481,7 @@ DECODER_TESTS = \
 	prctl-seccomp-strict.test \
 	pread64-pwrite64.test \
 	preadv-pwritev.test \
+	preadv2-pwritev2.test \
 	preadv.test \
 	pselect6.test \
 	pwritev.test \
