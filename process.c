@@ -46,6 +46,7 @@
 #include "ptrace.h"
 #include "xlat/ptrace_cmds.h"
 #include "xlat/ptrace_setoptions_flags.h"
+#include "xlat/ptrace_peeksiginfo_flags.h"
 
 #define uoff(member)	offsetof(struct user, member)
 #define XLAT_UOFF(member)	{ uoff(member), "offsetof(struct user, " #member ")" }
@@ -122,6 +123,24 @@ SYS_FUNC(ptrace)
 		case PTRACE_SECCOMP_GET_FILTER:
 			tprintf(", %lu", addr);
 			break;
+		case PTRACE_PEEKSIGINFO: {
+			tprints(", ");
+			struct {
+				uint64_t off;
+				uint32_t flags;
+				uint32_t nr;
+			} psi;
+			if (umove_or_printaddr(tcp, addr, &psi)) {
+				tprints(", ");
+				printaddr(data);
+				return RVAL_DECODED;
+			}
+			tprintf("{off=%" PRIu64 ", flags=", psi.off);
+			printflags(ptrace_peeksiginfo_flags, psi.flags,
+				   "PTRACE_PEEKSIGINFO_???");
+			tprintf(", nr=%u}", psi.nr);
+			break;
+		}
 #if defined SPARC || defined SPARC64
 		case PTRACE_GETREGS:
 		case PTRACE_SETREGS:
