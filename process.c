@@ -197,6 +197,9 @@ SYS_FUNC(ptrace)
 		case PTRACE_SETSIGINFO:
 			printsiginfo_at(tcp, data);
 			break;
+		case PTRACE_SETSIGMASK:
+			print_sigset_addr_len(tcp, data, addr);
+			break;
 		case PTRACE_SETREGSET:
 			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
 			break;
@@ -207,6 +210,7 @@ SYS_FUNC(ptrace)
 #endif
 		case PTRACE_GETREGSET:
 		case PTRACE_GETSIGINFO:
+		case PTRACE_GETSIGMASK:
 			if (verbose(tcp)) {
 				/* print data on exiting syscall */
 				return 0;
@@ -229,6 +233,9 @@ SYS_FUNC(ptrace)
 #endif
 		case PTRACE_GETSIGINFO:
 			printsiginfo_at(tcp, data);
+			break;
+		case PTRACE_GETSIGMASK:
+			print_sigset_addr_len(tcp, data, addr);
 			break;
 		case PTRACE_GETREGSET:
 			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
