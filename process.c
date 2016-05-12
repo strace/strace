@@ -117,6 +117,11 @@ SYS_FUNC(ptrace)
 			tprints(", ");
 			printxval(nt_descriptor_types, addr, "NT_???");
 			break;
+		case PTRACE_GETSIGMASK:
+		case PTRACE_SETSIGMASK:
+		case PTRACE_SECCOMP_GET_FILTER:
+			tprintf(", %lu", addr);
+			break;
 #if defined SPARC || defined SPARC64
 		case PTRACE_GETREGS:
 		case PTRACE_SETREGS:
