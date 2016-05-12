@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of ptrace syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a23 -e signal=none

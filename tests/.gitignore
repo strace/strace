@@ -154,6 +154,7 @@ preadv
 preadv-pwritev
 preadv2-pwritev2
 pselect6
+ptrace
 pwritev
 read-write
 readdir
