@@ -198,7 +198,7 @@ print_si_info(const siginfo_t *sip, bool verbose)
 		case SIGSYS:
 			tprintf(", si_call_addr=%#lx, si_syscall=__NR_%s, si_arch=",
 				(unsigned long) sip->si_call_addr,
-				syscall_name(sip->si_syscall));
+				syscall_name((unsigned) sip->si_syscall));
 			printxval(audit_arch, sip->si_arch, "AUDIT_ARCH_???");
 			break;
 #endif
