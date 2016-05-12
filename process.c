@@ -82,15 +82,19 @@ print_user_offset_addr(const unsigned long addr)
 
 SYS_FUNC(ptrace)
 {
-	const long request = tcp->u_arg[0];
+	const unsigned long request = tcp->u_arg[0];
 	const int pid = tcp->u_arg[1];
 	const unsigned long addr = tcp->u_arg[2];
 	const unsigned long data = tcp->u_arg[3];
 
 	if (entering(tcp)) {
-		printxval(ptrace_cmds, request, "PTRACE_???");
+		/* request */
+		printxval64(ptrace_cmds, request, "PTRACE_???");
+
+		/* pid */
 		tprintf(", %d, ", pid);
 
+		/* addr */
 		switch (request) {
 		case PTRACE_PEEKUSER:
 		case PTRACE_POKEUSER:
