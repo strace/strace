@@ -652,7 +652,8 @@ extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_io
 extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int decode_iov, unsigned long);
 extern void tprint_open_modes(unsigned int);
 extern const char *sprint_open_modes(unsigned int);
-extern void print_seccomp_filter(struct tcb *tcp, unsigned long);
+extern void print_seccomp_filter(struct tcb *, unsigned long);
+extern void print_seccomp_fprog(struct tcb *, unsigned long, unsigned short);
 
 struct strace_statfs;
 extern void print_struct_statfs(struct tcb *tcp, long);

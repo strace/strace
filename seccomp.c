@@ -171,11 +171,9 @@ print_bpf_filter(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	return true;
 }
 
-static void
+void
 print_seccomp_fprog(struct tcb *tcp, unsigned long addr, unsigned short len)
 {
-	tprintf("{len=%u, filter=", len);
-
 	if (abbrev(tcp)) {
 		printaddr(addr);
 	} else {
@@ -185,8 +183,6 @@ print_seccomp_fprog(struct tcb *tcp, unsigned long addr, unsigned short len)
 		print_array(tcp, addr, len, &filter, sizeof(filter),
 			    umoven_or_printaddr, print_bpf_filter, &insns);
 	}
-
-	tprints("}");
 }
 
 #include "seccomp_fprog.h"
@@ -196,8 +192,11 @@ print_seccomp_filter(struct tcb *tcp, unsigned long addr)
 {
 	struct seccomp_fprog fprog;
 
-	if (fetch_seccomp_fprog(tcp, addr, &fprog))
+	if (fetch_seccomp_fprog(tcp, addr, &fprog)) {
+		tprintf("{len=%hu, filter=", fprog.len);
 		print_seccomp_fprog(tcp, fprog.filter, fprog.len);
+		tprints("}");
+	}
 }
 
 static void
