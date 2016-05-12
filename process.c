@@ -97,24 +97,34 @@ SYS_FUNC(ptrace)
 		}
 
 		/* pid */
-		tprintf(", %d, ", pid);
+		tprintf(", %d", pid);
 
 		/* addr */
 		switch (request) {
+		case PTRACE_ATTACH:
+		case PTRACE_INTERRUPT:
+		case PTRACE_KILL:
+		case PTRACE_LISTEN:
+			/* addr and data are ignored */
+			return RVAL_DECODED;
 		case PTRACE_PEEKUSER:
 		case PTRACE_POKEUSER:
+			tprints(", ");
 			print_user_offset_addr(addr);
 			break;
 		case PTRACE_GETREGSET:
 		case PTRACE_SETREGSET:
+			tprints(", ");
 			printxval(nt_descriptor_types, addr, "NT_???");
 			break;
 		default:
+			tprints(", ");
 			printaddr(addr);
 		}
 
 		tprints(", ");
 
+		/* data */
 		switch (request) {
 #ifndef IA64
 		case PTRACE_PEEKDATA:
