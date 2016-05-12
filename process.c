@@ -208,6 +208,7 @@ SYS_FUNC(ptrace)
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
 #endif
+		case PTRACE_GETEVENTMSG:
 		case PTRACE_GETREGSET:
 		case PTRACE_GETSIGINFO:
 		case PTRACE_GETSIGMASK:
@@ -231,14 +232,17 @@ SYS_FUNC(ptrace)
 			printnum_ptr(tcp, data);
 			break;
 #endif
+		case PTRACE_GETEVENTMSG:
+			printnum_ulong(tcp, data);
+			break;
+		case PTRACE_GETREGSET:
+			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
+			break;
 		case PTRACE_GETSIGINFO:
 			printsiginfo_at(tcp, data);
 			break;
 		case PTRACE_GETSIGMASK:
 			print_sigset_addr_len(tcp, data, addr);
-			break;
-		case PTRACE_GETREGSET:
-			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
 			break;
 		}
 	}
