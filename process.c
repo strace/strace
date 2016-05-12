@@ -117,6 +117,16 @@ SYS_FUNC(ptrace)
 			tprints(", ");
 			printxval(nt_descriptor_types, addr, "NT_???");
 			break;
+#if defined SPARC || defined SPARC64
+		case PTRACE_GETREGS:
+		case PTRACE_SETREGS:
+		case PTRACE_GETFPREGS:
+		case PTRACE_SETFPREGS:
+			tprints(", ");
+			printaddr(addr);
+			/* data is ignored */
+			return RVAL_DECODED;
+#endif
 		default:
 			tprints(", ");
 			printaddr(addr);
