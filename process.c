@@ -91,6 +91,11 @@ SYS_FUNC(ptrace)
 		/* request */
 		printxval64(ptrace_cmds, request, "PTRACE_???");
 
+		if (request == PTRACE_TRACEME) {
+			/* pid, addr, and data are ignored. */
+			return RVAL_DECODED;
+		}
+
 		/* pid */
 		tprintf(", %d, ", pid);
 
