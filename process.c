@@ -167,9 +167,20 @@ SYS_FUNC(ptrace)
 			break;
 #endif
 		case PTRACE_CONT:
-		case PTRACE_SINGLESTEP:
-		case PTRACE_SYSCALL:
 		case PTRACE_DETACH:
+		case PTRACE_SYSCALL:
+#ifdef PTRACE_SINGLESTEP
+		case PTRACE_SINGLESTEP:
+#endif
+#ifdef PTRACE_SINGLEBLOCK
+		case PTRACE_SINGLEBLOCK:
+#endif
+#ifdef PTRACE_SYSEMU
+		case PTRACE_SYSEMU:
+#endif
+#ifdef PTRACE_SYSEMU_SINGLESTEP
+		case PTRACE_SYSEMU_SINGLESTEP:
+#endif
 			printsignal(data);
 			break;
 		case PTRACE_SETOPTIONS:
