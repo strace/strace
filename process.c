@@ -141,31 +141,35 @@ SYS_FUNC(ptrace)
 			tprintf(", nr=%u}", psi.nr);
 			break;
 		}
-#if defined SPARC || defined SPARC64
-		case PTRACE_GETREGS:
-		case PTRACE_SETREGS:
-		case PTRACE_GETFPREGS:
-		case PTRACE_SETFPREGS:
-			tprints(", ");
-			printaddr(addr);
-			/* data is ignored */
-			return RVAL_DECODED;
-#endif
 		default:
 			tprints(", ");
 			printaddr(addr);
 		}
 
+# if defined IA64 || defined SPARC || defined SPARC64
+		switch (request) {
+#  ifdef IA64
+		case PTRACE_PEEKDATA:
+		case PTRACE_PEEKTEXT:
+		case PTRACE_PEEKUSER:
+			/* data is ignored */
+			return RVAL_DECODED | RVAL_HEX;
+#  endif /* IA64 */
+#  if defined SPARC || defined SPARC64
+		case PTRACE_GETREGS:
+		case PTRACE_SETREGS:
+		case PTRACE_GETFPREGS:
+		case PTRACE_SETFPREGS:
+			/* data is ignored */
+			return RVAL_DECODED;
+#  endif /* SPARC || SPARC64 */
+		}
+# endif /* IA64 || SPARC || SPARC64 */
+
 		tprints(", ");
 
 		/* data */
 		switch (request) {
-#ifndef IA64
-		case PTRACE_PEEKDATA:
-		case PTRACE_PEEKTEXT:
-		case PTRACE_PEEKUSER:
-			break;
-#endif
 		case PTRACE_CONT:
 		case PTRACE_DETACH:
 		case PTRACE_SYSCALL:
@@ -196,22 +200,30 @@ SYS_FUNC(ptrace)
 		case PTRACE_SETREGSET:
 			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
 			break;
-		case PTRACE_GETSIGINFO:
+#ifndef IA64
+		case PTRACE_PEEKDATA:
+		case PTRACE_PEEKTEXT:
+		case PTRACE_PEEKUSER:
+#endif
 		case PTRACE_GETREGSET:
-			/* Don't print anything, do it at syscall return. */
-			break;
+		case PTRACE_GETSIGINFO:
+			if (verbose(tcp)) {
+				/* print data on exiting syscall */
+				return 0;
+			}
+			/* fall through */
 		default:
 			printaddr(data);
 			break;
 		}
+
+		return RVAL_DECODED;
 	} else {
 		switch (request) {
+#ifndef IA64
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
-#ifdef IA64
-			return RVAL_HEX;
-#else
 			printnum_ptr(tcp, data);
 			break;
 #endif
