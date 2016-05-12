@@ -188,7 +188,7 @@ SYS_FUNC(ptrace)
 #ifdef PTRACE_OLDSETOPTIONS
 		case PTRACE_OLDSETOPTIONS:
 #endif
-			printflags(ptrace_setoptions_flags, data, "PTRACE_O_???");
+			printflags64(ptrace_setoptions_flags, data, "PTRACE_O_???");
 			break;
 		case PTRACE_SETSIGINFO:
 			printsiginfo_at(tcp, data);
