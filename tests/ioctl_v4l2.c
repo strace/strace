@@ -152,7 +152,7 @@ main(void )
 # else
 	ioctl(-1, VIDIOC_TRY_FMT, page);
 	printf("ioctl(-1, VIDIOC_TRY_FMT, {type=%#x /* V4L2_BUF_TYPE_??? */})"
-	       "= -1 EBADF (%m)\n", magic);
+	       " = -1 EBADF (%m)\n", magic);
 # endif
 
 	/* VIDIOC_REQBUFS */
