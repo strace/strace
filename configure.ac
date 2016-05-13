@@ -361,7 +361,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	bluetooth/bluetooth.h
 	elf.h
 	inttypes.h
-	ioctls.h
 	linux/bsg.h
 	linux/falloc.h
 	linux/filter.h
@@ -384,7 +383,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/conf.h
 	sys/eventfd.h
 	sys/fanotify.h
-	sys/ioctl.h
 	sys/ipc.h
 	sys/msg.h
 	sys/reg.h
