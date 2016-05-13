@@ -27,15 +27,11 @@
 
 #include "defs.h"
 #include <sys/socket.h>
+#if defined ALPHA || defined SH || defined SH64
+# include <linux/ioctl.h>
+#endif
 #include <linux/sockios.h>
 #include <arpa/inet.h>
-#if defined(ALPHA) || defined(SH) || defined(SH64)
-# if defined(HAVE_SYS_IOCTL_H)
-#  include <sys/ioctl.h>
-# elif defined(HAVE_IOCTLS_H)
-#  include <ioctls.h>
-# endif
-#endif
 #include <net/if.h>
 
 #include "xlat/iffflags.h"
