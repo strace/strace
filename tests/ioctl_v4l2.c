@@ -26,7 +26,6 @@
  */
 
 #include "tests.h"
-#include <endian.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -58,7 +57,18 @@ main(void )
 	const union u_pixel_format {
 		unsigned int pixelformat;
 		unsigned char cc[sizeof(int)];
-	} u = { .pixelformat = htole32(magic) };
+	} u = {
+#if WORDS_BIGENDIAN
+		.cc = {
+			(unsigned char) (magic >> 24),
+			(unsigned char) (magic >> 16),
+			(unsigned char) (magic >> 8),
+			(unsigned char) magic
+		}
+#else
+		.pixelformat = magic
+#endif
+	};
 	unsigned int i;
 
 
@@ -465,10 +475,19 @@ main(void )
 	struct v4l2_frmsizeenum *const p_frmsizeenum =
 		tail_alloc(sizeof(*p_frmsizeenum));
 	p_frmsizeenum->index = magic;
-	p_frmsizeenum->pixel_format = 0xfa5c2741;
 	const union u_pixel_format u_frmsizeenum = {
-		.pixelformat = htole32(p_frmsizeenum->pixel_format)
+		.cc = { 'A', '\'', '\\', '\xfa' }
 	};
+#if WORDS_BIGENDIAN
+	p_frmsizeenum->pixel_format =
+		(unsigned) u_frmsizeenum.cc[0] << 24 |
+		(unsigned) u_frmsizeenum.cc[1] << 16 |
+		(unsigned) u_frmsizeenum.cc[2] << 8 |
+		(unsigned) u_frmsizeenum.cc[3];
+#else
+	p_frmsizeenum->pixel_format = u_frmsizeenum.pixelformat;
+#endif
+
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, p_frmsizeenum);
 	printf("ioctl(-1, VIDIOC_ENUM_FRAMESIZES, {index=%u"
 	       ", pixel_format=v4l2_fourcc('%c', '\\%c', '\\%c', '\\x%x')})"
