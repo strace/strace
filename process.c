@@ -212,6 +212,7 @@ SYS_FUNC(ptrace)
 		case PTRACE_GETREGSET:
 		case PTRACE_GETSIGINFO:
 		case PTRACE_GETSIGMASK:
+		case PTRACE_PEEKSIGINFO:
 		case PTRACE_SECCOMP_GET_FILTER:
 			if (verbose(tcp)) {
 				/* print data on exiting syscall */
@@ -244,6 +245,12 @@ SYS_FUNC(ptrace)
 			break;
 		case PTRACE_GETSIGMASK:
 			print_sigset_addr_len(tcp, data, addr);
+			break;
+		case PTRACE_PEEKSIGINFO:
+			if (syserror(tcp))
+				printaddr(data);
+			else
+				print_siginfo_array(tcp, data, tcp->u_rval);
 			break;
 		case PTRACE_SECCOMP_GET_FILTER:
 			if (syserror(tcp))

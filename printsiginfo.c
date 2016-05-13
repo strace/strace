@@ -242,3 +242,21 @@ MPERS_PRINTER_DECL(void, printsiginfo_at)(struct tcb *tcp, long addr)
 	if (!umove_or_printaddr(tcp, addr, &si))
 		printsiginfo(&si, verbose(tcp));
 }
+
+static bool
+print_siginfo_t(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	const siginfo_t *si = elem_buf;
+
+	printsiginfo(si, verbose(tcp));
+
+	return true;
+}
+
+MPERS_PRINTER_DECL(void, print_siginfo_array)(struct tcb *tcp, unsigned long addr, unsigned long len)
+{
+	siginfo_t si;
+
+	print_array(tcp, addr, len, &si, sizeof(si),
+		    umoven_or_printaddr, print_siginfo_t, 0);
+}
