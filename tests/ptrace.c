@@ -172,9 +172,9 @@ int
 main(void)
 {
 	const unsigned long bad_request =
-		(unsigned long) 0xdeadbeeffacefeed;
+		(unsigned long) 0xdeadbeeffffffeed;
 	const unsigned long bad_data =
-		(unsigned long) 0xdeadcafefacef00d;
+		(unsigned long) 0xdeadcafefffff00d;
 	const unsigned long pid =
 		(unsigned long) 0xdefaced00000000 | (unsigned) getpid();
 
