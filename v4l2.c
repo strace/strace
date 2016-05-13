@@ -39,7 +39,7 @@
 #include DEF_MPERS_TYPE(struct_v4l2_standard)
 
 #include <stdint.h>
-#include <sys/ioctl.h>
+#include <linux/ioctl.h>
 #include <linux/types.h>
 #include <linux/videodev2.h>
 
