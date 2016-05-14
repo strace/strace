@@ -837,7 +837,10 @@ AC_CHECK_DECLS(m4_normalize([
 	V4L2_CTRL_TYPE_STRING,
 	V4L2_CTRL_TYPE_BITMASK,
 	V4L2_CTRL_TYPE_INTEGER_MENU
-]),,, [#include <linux/videodev2.h>])
+]),,, [#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>])
 
 AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
