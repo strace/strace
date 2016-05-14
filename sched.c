@@ -39,7 +39,7 @@ SYS_FUNC(sched_getscheduler)
 	if (entering(tcp)) {
 		tprintf("%d", (int) tcp->u_arg[0]);
 	} else if (!syserror(tcp)) {
-		tcp->auxstr = xlookup(schedulers, tcp->u_rval);
+		tcp->auxstr = xlookup(schedulers, (unsigned long) tcp->u_rval);
 		if (tcp->auxstr != NULL)
 			return RVAL_STR;
 	}

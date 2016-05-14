@@ -168,7 +168,7 @@ print_fcntl(struct tcb *tcp)
 	case F_GETLEASE:
 		if (entering(tcp) || syserror(tcp))
 			return 0;
-		tcp->auxstr = xlookup(lockfcmds, tcp->u_rval);
+		tcp->auxstr = xlookup(lockfcmds, (unsigned long) tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	case F_GET_SEALS:
 		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)
@@ -192,7 +192,8 @@ SYS_FUNC(fcntl)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		const char *str = xlookup(fcntlcmds, tcp->u_arg[1]);
+		const char *str =
+			xlookup(fcntlcmds, (unsigned long) tcp->u_arg[1]);
 		if (str) {
 			tprints(str);
 		} else {
@@ -212,7 +213,8 @@ SYS_FUNC(fcntl64)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		const char *str = xlookup(fcntl64cmds, tcp->u_arg[1]);
+		const char *str =
+			xlookup(fcntl64cmds, (unsigned long) tcp->u_arg[1]);
 		if (str) {
 			tprints(str);
 		} else {

@@ -292,7 +292,8 @@ SYS_FUNC(prctl)
 		}
 		if (syserror(tcp))
 			return 0;
-		tcp->auxstr = xlookup(pr_mce_kill_policy, tcp->u_rval);
+		tcp->auxstr = xlookup(pr_mce_kill_policy,
+				      (unsigned long) tcp->u_rval);
 		return tcp->auxstr ? RVAL_STR : RVAL_UDECIMAL;
 
 	case PR_GET_NO_NEW_PRIVS:

@@ -37,7 +37,7 @@
 #include "xlat/modetypes.h"
 
 const char *
-sprintmode(int mode)
+sprintmode(unsigned int mode)
 {
 	static char buf[sizeof("S_IFSOCK|S_ISUID|S_ISGID|S_ISVTX|%o")
 			+ sizeof(int)*3

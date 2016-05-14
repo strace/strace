@@ -171,7 +171,7 @@ do_adjtimex(struct tcb *tcp, long addr)
 {
 	if (print_timex(tcp, addr))
 		return 0;
-	tcp->auxstr = xlookup(adjtimex_state, tcp->u_rval);
+	tcp->auxstr = xlookup(adjtimex_state, (unsigned long) tcp->u_rval);
 	if (tcp->auxstr)
 		return RVAL_STR;
 	return 0;

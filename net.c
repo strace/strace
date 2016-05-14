@@ -770,7 +770,7 @@ dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
  * other bits are socket type flags.
  */
 static void
-tprint_sock_type(int flags)
+tprint_sock_type(unsigned int flags)
 {
 	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
 

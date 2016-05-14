@@ -34,7 +34,7 @@ typedef int32_t key_serial_t;
 static void
 print_keyring_serial_number(key_serial_t id)
 {
-	const char *str = xlookup(key_spec, id);
+	const char *str = xlookup(key_spec, (unsigned int) id);
 
 	if (str)
 		tprints(str);

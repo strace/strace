@@ -51,19 +51,19 @@ enum {
 #define IOPRIO_PRIO_DATA(mask)	((mask) & IOPRIO_PRIO_MASK)
 
 static const char *
-sprint_ioprio(int ioprio)
+sprint_ioprio(unsigned int ioprio)
 {
 	static char outstr[256];
 	const char *str;
-	int class, data;
+	unsigned int class, data;
 
 	class = IOPRIO_PRIO_CLASS(ioprio);
 	data = IOPRIO_PRIO_DATA(ioprio);
 	str = xlookup(ioprio_class, class);
 	if (str)
-		sprintf(outstr, "IOPRIO_PRIO_VALUE(%s,%d)", str, data);
+		sprintf(outstr, "IOPRIO_PRIO_VALUE(%s, %d)", str, data);
 	else
-		sprintf(outstr, "IOPRIO_PRIO_VALUE(%#x /* %s */,%d)",
+		sprintf(outstr, "IOPRIO_PRIO_VALUE(%#x /* %s */, %d)",
 			class, "IOPRIO_CLASS_???", data);
 
 	return outstr;

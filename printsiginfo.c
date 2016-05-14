@@ -81,7 +81,7 @@ printsigval(const siginfo_t *sip)
 }
 
 static void
-print_si_code(int si_signo, int si_code)
+print_si_code(int si_signo, unsigned int si_code)
 {
 	const char *code = xlookup(siginfo_codes, si_code);
 
