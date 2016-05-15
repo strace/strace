@@ -122,7 +122,8 @@ SYS_FUNC(prctl)
 			break;
 		if (syserror(tcp) || tcp->u_rval == 0)
 			return 0;
-		tcp->auxstr = sprintflags("", secbits, tcp->u_rval);
+		tcp->auxstr = sprintflags("", secbits,
+					  (unsigned long) tcp->u_rval);
 		return RVAL_STR;
 
 	case PR_GET_TID_ADDRESS:

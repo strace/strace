@@ -112,7 +112,8 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 		char fdstr[sizeof(fmt) + sizeof(int) * 3];
 		sprintf(fdstr, fmt, fds.fd);
 
-		const char *flagstr = sprintflags("", pollflags, fds.revents);
+		const char *flagstr = sprintflags("", pollflags,
+						  (unsigned short) fds.revents);
 
 		if (outptr + strlen(fdstr) + strlen(flagstr) + 1 >=
 		    end_outstr - (2 + 2 * sizeof(long) + sizeof(", ], ..."))) {
