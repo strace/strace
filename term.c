@@ -222,11 +222,11 @@ term_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	/* ioctls with a direct decodable arg */
 	case TCXONC:
 		tprints(", ");
-		printxval(tcxonc_options, arg, "TC???");
+		printxval_long(tcxonc_options, arg, "TC???");
 		break;
 	case TCFLSH:
 		tprints(", ");
-		printxval(tcflsh_options, arg, "TC???");
+		printxval_long(tcflsh_options, arg, "TC???");
 		break;
 	case TCSBRK:
 	case TCSBRKP:
