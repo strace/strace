@@ -46,7 +46,7 @@ print_statfs_flags(const char *const prefix, const unsigned long long flags)
 {
 	if (flags & ST_VALID) {
 		tprints(prefix);
-		printflags(statfs_flags, flags, "ST_???");
+		printflags64(statfs_flags, flags, "ST_???");
 	}
 }
 
