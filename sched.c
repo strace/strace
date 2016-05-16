@@ -115,7 +115,7 @@ print_sched_attr(struct tcb *tcp, const long addr, unsigned int size)
 	tprintf("{size=%u, sched_policy=", attr.size);
 	printxval(schedulers, attr.sched_policy, "SCHED_???");
 	tprints(", sched_flags=");
-	printflags(sched_flags, attr.sched_flags, "SCHED_FLAG_???");
+	printflags64(sched_flags, attr.sched_flags, "SCHED_FLAG_???");
 	tprintf(", sched_nice=%d", attr.sched_nice);
 	tprintf(", sched_priority=%u", attr.sched_priority);
 	tprintf(", sched_runtime=%" PRIu64, attr.sched_runtime);
