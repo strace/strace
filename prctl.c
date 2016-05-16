@@ -73,12 +73,13 @@ print_prctl_args(struct tcb *tcp, const unsigned int first)
 
 SYS_FUNC(prctl)
 {
+	const unsigned int option = tcp->u_arg[0];
 	unsigned int i;
 
 	if (entering(tcp))
-		printxval(prctl_options, tcp->u_arg[0], "PR_???");
+		printxval(prctl_options, option, "PR_???");
 
-	switch (tcp->u_arg[0]) {
+	switch (option) {
 	case PR_GET_DUMPABLE:
 	case PR_GET_KEEPCAPS:
 	case PR_GET_SECCOMP:
@@ -314,10 +315,12 @@ SYS_FUNC(prctl)
 
 SYS_FUNC(arch_prctl)
 {
-	if (entering(tcp))
-		printxval(archvals, tcp->u_arg[0], "ARCH_???");
+	const unsigned int option = tcp->u_arg[0];
 
-	switch (tcp->u_arg[0]) {
+	if (entering(tcp))
+		printxval(archvals, option, "ARCH_???");
+
+	switch (option) {
 	case ARCH_GET_GS:
 	case ARCH_GET_FS:
 		if (entering(tcp))
