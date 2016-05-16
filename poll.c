@@ -40,7 +40,7 @@ print_pollfd(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	printfd(tcp, fds->fd);
 	if (fds->fd >= 0) {
 		tprints(", events=");
-		printflags(pollflags, fds->events, "POLL???");
+		printflags(pollflags, (unsigned short) fds->events, "POLL???");
 	}
 	tprints("}");
 
