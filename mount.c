@@ -74,7 +74,7 @@ SYS_FUNC(mount)
 			tprints("|");
 	}
 	if (flags || !old_magic)
-		printflags(mount_flags, flags, "MS_???");
+		printflags_long(mount_flags, flags, "MS_???");
 	tprints(", ");
 
 	if (ignore_data)
