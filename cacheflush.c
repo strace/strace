@@ -81,9 +81,9 @@ SYS_FUNC(cacheflush)
 	/* start addr */
 	printaddr(tcp->u_arg[0]);
 	/* length */
-	tprintf(", %ld, ", tcp->u_arg[1]);
+	tprintf(", %lu, ", tcp->u_arg[1]);
 	/* flags */
-	printxval(cacheflush_flags, tcp->u_arg[1], "?CACHE");
+	printxval(cacheflush_flags, tcp->u_arg[2], "?CACHE");
 
 	return RVAL_DECODED;
 }
