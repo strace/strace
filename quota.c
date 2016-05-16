@@ -317,7 +317,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			tprintf("{version=%d, ", dq.d_version);
 			tprints("flags=");
 			printflags(xfs_dqblk_flags,
-				   dq.d_flags, "XFS_???_QUOTA");
+				   (uint8_t) dq.d_flags, "XFS_???_QUOTA");
 			tprintf(", fieldmask=%#x, ", dq.d_fieldmask);
 			tprintf("id=%u, ", dq.d_id);
 			tprintf("blk_hardlimit=%" PRIu64 ", ", dq.d_blk_hardlimit);
