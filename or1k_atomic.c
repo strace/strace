@@ -44,7 +44,7 @@
 
 SYS_FUNC(or1k_atomic)
 {
-	printxval(atomic_ops, tcp->u_arg[0], "???");
+	printxval_long(atomic_ops, tcp->u_arg[0], "???");
 	switch(tcp->u_arg[0]) {
 	case OR1K_ATOMIC_SWAP:
 		tprintf(", 0x%lx, 0x%lx", tcp->u_arg[1], tcp->u_arg[2]);
