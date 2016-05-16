@@ -111,7 +111,7 @@ SYS_FUNC(get_mempolicy)
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		printaddr(tcp->u_arg[3]);
 		tprints(", ");
-		printflags(mempolicyflags, tcp->u_arg[4], "MPOL_???");
+		printflags_long(mempolicyflags, tcp->u_arg[4], "MPOL_???");
 	}
 	return 0;
 }
