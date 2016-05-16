@@ -76,7 +76,7 @@ SYS_FUNC(readdir)
 SYS_FUNC(getdents)
 {
 	unsigned int i, len, dents = 0;
-	char *buf;
+	unsigned char *buf;
 
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
