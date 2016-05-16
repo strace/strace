@@ -65,13 +65,13 @@ print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
 
 	printaddr(addr);
 	tprintf(", %lu, ", len);
-	printflags(mmap_prot, prot, "PROT_???");
+	printflags_long(mmap_prot, prot, "PROT_???");
 	tprints(", ");
 #ifdef MAP_TYPE
-	printxval(mmap_flags, flags & MAP_TYPE, "MAP_???");
+	printxval_long(mmap_flags, flags & MAP_TYPE, "MAP_???");
 	addflags(mmap_flags, flags & ~MAP_TYPE);
 #else
-	printflags(mmap_flags, flags, "MAP_???");
+	printflags_long(mmap_flags, flags, "MAP_???");
 #endif
 	tprints(", ");
 	printfd(tcp, fd);
@@ -185,7 +185,7 @@ SYS_FUNC(mprotect)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %lu, ", tcp->u_arg[1]);
-	printflags(mmap_prot, tcp->u_arg[2], "PROT_???");
+	printflags_long(mmap_prot, tcp->u_arg[2], "PROT_???");
 
 	return RVAL_DECODED;
 }
@@ -196,7 +196,7 @@ SYS_FUNC(mremap)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %lu, %lu, ", tcp->u_arg[1], tcp->u_arg[2]);
-	printflags(mremap_flags, tcp->u_arg[3], "MREMAP_???");
+	printflags_long(mremap_flags, tcp->u_arg[3], "MREMAP_???");
 #ifdef MREMAP_FIXED
 	if ((tcp->u_arg[3] & (MREMAP_MAYMOVE | MREMAP_FIXED)) ==
 	    (MREMAP_MAYMOVE | MREMAP_FIXED)) {
@@ -303,13 +303,13 @@ SYS_FUNC(remap_file_pages)
 
 	printaddr(addr);
 	tprintf(", %lu, ", size);
-	printflags(mmap_prot, prot, "PROT_???");
+	printflags_long(mmap_prot, prot, "PROT_???");
 	tprintf(", %lu, ", pgoff);
 #ifdef MAP_TYPE
-	printxval(mmap_flags, flags & MAP_TYPE, "MAP_???");
+	printxval_long(mmap_flags, flags & MAP_TYPE, "MAP_???");
 	addflags(mmap_flags, flags & ~MAP_TYPE);
 #else
-	printflags(mmap_flags, flags, "MAP_???");
+	printflags_long(mmap_flags, flags, "MAP_???");
 #endif
 
 	return RVAL_DECODED;

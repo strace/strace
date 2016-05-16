@@ -41,8 +41,7 @@ main(void)
 {
 	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeef;
 	const unsigned long size = (unsigned long) 0xdefaced1bad2f00d;
-	const unsigned long prot = (unsigned long) 0xacedcafe00000000
-				   | PROT_READ|PROT_WRITE|PROT_EXEC;
+	const unsigned long prot = PROT_READ|PROT_WRITE|PROT_EXEC;
 	const unsigned long pgoff = (unsigned long) 0xcaf3babebad4deed;
 	const unsigned long flags = MAP_PRIVATE|MAP_ANONYMOUS;
 
