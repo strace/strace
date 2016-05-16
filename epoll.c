@@ -70,12 +70,13 @@ SYS_FUNC(epoll_ctl)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printxval(epollctls, tcp->u_arg[1], "EPOLL_CTL_???");
+	const unsigned int op = tcp->u_arg[1];
+	printxval(epollctls, op, "EPOLL_CTL_???");
 	tprints(", ");
 	printfd(tcp, tcp->u_arg[2]);
 	tprints(", ");
 	struct epoll_event ev;
-	if (EPOLL_CTL_DEL == tcp->u_arg[1])
+	if (EPOLL_CTL_DEL == op)
 		printaddr(tcp->u_arg[3]);
 	else if (!umove_or_printaddr(tcp, tcp->u_arg[3], &ev))
 		print_epoll_event(tcp, &ev, sizeof(ev), 0);
