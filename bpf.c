@@ -83,7 +83,7 @@ bpf_map_update_elem(struct tcb *tcp, const long addr, unsigned int size)
 	printfd(tcp, attr.map_fd);
 	tprintf(", key=%#" PRIx64 ", value=%#" PRIx64 ", flags=",
 		attr.key, attr.value);
-	printxval(bpf_map_update_elem_flags, attr.flags, "BPF_???");
+	printxval64(bpf_map_update_elem_flags, attr.flags, "BPF_???");
 	tprints("}");
 }
 
