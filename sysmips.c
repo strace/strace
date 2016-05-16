@@ -45,7 +45,7 @@
 
 SYS_FUNC(sysmips)
 {
-	printxval(sysmips_operations, tcp->u_arg[0], "???");
+	printxval_long(sysmips_operations, tcp->u_arg[0], "???");
 	tprints(", ");
 
 	switch (tcp->u_arg[0]) {
