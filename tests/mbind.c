@@ -39,7 +39,7 @@ int
 main(void)
 {
 	const unsigned long len = (unsigned long) 0xcafef00dbadc0ded;
-	const unsigned long mode = (unsigned long) 0xdefaced00000003;
+	const unsigned long mode = 3;
 	const unsigned long nodemask = (unsigned long) 0xfacefeedfffffff1;
 	const unsigned long maxnode = (unsigned long) 0xdeadbeeffffffff2;
 	const unsigned long flags = -1UL;
