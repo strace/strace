@@ -80,8 +80,6 @@ print_kexec_segments(struct tcb *tcp, const unsigned long addr,
 
 SYS_FUNC(kexec_load)
 {
-	unsigned long n;
-
 	/* entry, nr_segments */
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %lu, ", tcp->u_arg[1]);
@@ -91,12 +89,12 @@ SYS_FUNC(kexec_load)
 	tprints(", ");
 
 	/* flags */
-	n = tcp->u_arg[3];
-	printxval(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
+	unsigned long n = tcp->u_arg[3];
+	printxval_long(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
 	n &= ~KEXEC_ARCH_MASK;
 	if (n) {
 		tprints("|");
-		printflags(kexec_load_flags, n, "KEXEC_???");
+		printflags_long(kexec_load_flags, n, "KEXEC_???");
 	}
 
 	return RVAL_DECODED;
@@ -118,7 +116,7 @@ SYS_FUNC(kexec_file_load)
 	printstr(tcp, tcp->u_arg[3], tcp->u_arg[2]);
 	tprints(", ");
 	/* flags */
-	printflags(kexec_file_load_flags, tcp->u_arg[4], "KEXEC_FILE_???");
+	printflags_long(kexec_file_load_flags, tcp->u_arg[4], "KEXEC_FILE_???");
 
 	return RVAL_DECODED;
 }
