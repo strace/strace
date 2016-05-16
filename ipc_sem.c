@@ -49,7 +49,7 @@ print_sembuf(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	const struct sembuf *sb = elem_buf;
 
 	tprintf("{%u, %d, ", sb->sem_num, sb->sem_op);
-	printflags(semop_flags, sb->sem_flg, "SEM_???");
+	printflags(semop_flags, (unsigned short) sb->sem_flg, "SEM_???");
 	tprints("}");
 
 	return true;
