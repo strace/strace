@@ -42,6 +42,14 @@
 # define TYPEOF_FLOCK_OFF_T off_t
 #endif
 
+static long
+invoke_test_syscall(const unsigned int cmd, void *const p)
+{
+	const unsigned long op = (unsigned long) 0xffffffff00000000 | cmd;
+
+	return syscall(TEST_SYSCALL_NR, 0, op, (unsigned long) p);
+}
+
 static void
 test_flock_einval(const int cmd, const char *name)
 {
@@ -50,7 +58,7 @@ test_flock_einval(const int cmd, const char *name)
 		.l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeed,
 		.l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00d
 	};
-	syscall(TEST_SYSCALL_NR, 0, cmd, &fl);
+	invoke_test_syscall(cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
 	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, EINVAL_STR);
@@ -66,19 +74,19 @@ test_flock(void)
 		.l_type = F_RDLCK,
 		.l_len = FILE_LEN
 	};
-	int rc = syscall(TEST_SYSCALL_NR, 0, F_SETLK, &fl);
+	long rc = invoke_test_syscall(F_SETLK, &fl);
 	printf("%s(0, F_SETLK, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = %s\n",
 	       TEST_SYSCALL_STR, FILE_LEN, rc ? EINVAL_STR : "0");
 	if (rc)
 		return;
 
-	syscall(TEST_SYSCALL_NR, 0, F_GETLK, &fl);
+	invoke_test_syscall(F_GETLK, &fl);
 	printf("%s(0, F_GETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d, l_pid=0}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
 
-	syscall(TEST_SYSCALL_NR, 0, F_SETLK, &fl);
+	invoke_test_syscall(F_SETLK, &fl);
 	printf("%s(0, F_SETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);

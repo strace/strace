@@ -87,7 +87,9 @@ print_f_owner_ex(struct tcb *tcp, const long addr)
 static int
 print_fcntl(struct tcb *tcp)
 {
-	switch (tcp->u_arg[1]) {
+	const unsigned int cmd = tcp->u_arg[1];
+
+	switch (cmd) {
 	case F_SETFD:
 		tprints(", ");
 		printflags(fdflags, tcp->u_arg[2], "FD_???");
@@ -194,8 +196,8 @@ SYS_FUNC(fcntl)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		const char *str =
-			xlookup(fcntlcmds, (unsigned long) tcp->u_arg[1]);
+		const unsigned int cmd = tcp->u_arg[1];
+		const char *str = xlookup(fcntlcmds, cmd);
 		if (str) {
 			tprints(str);
 		} else {
@@ -204,7 +206,7 @@ SYS_FUNC(fcntl)
 			 * constants, but we would like to show them
 			 * for better debugging experience.
 			 */
-			printxval(fcntl64cmds, tcp->u_arg[1], "F_???");
+			printxval(fcntl64cmds, cmd, "F_???");
 		}
 	}
 	return print_fcntl(tcp);
@@ -212,18 +214,18 @@ SYS_FUNC(fcntl)
 
 SYS_FUNC(fcntl64)
 {
+	const unsigned int cmd = tcp->u_arg[1];
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		const char *str =
-			xlookup(fcntl64cmds, (unsigned long) tcp->u_arg[1]);
+		const char *str = xlookup(fcntl64cmds, cmd);
 		if (str) {
 			tprints(str);
 		} else {
-			printxval(fcntlcmds, tcp->u_arg[1], "F_???");
+			printxval(fcntlcmds, cmd, "F_???");
 		}
 	}
-	switch (tcp->u_arg[1]) {
+	switch (cmd) {
 		case F_SETLK64:
 		case F_SETLKW64:
 			tprints(", ");
