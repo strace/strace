@@ -44,8 +44,8 @@ main(void)
 	static const char text2[] = "+++ exited with 0 +++\n";
 
 	int rc = prctl(PR_SET_SECCOMP, -1L, 1, 2, 3);
-	printf("prctl(PR_SET_SECCOMP, %#x /* SECCOMP_MODE_??? */, 0x1, 0x2, 0x3)"
-	       " = %d %s (%m)\n", -1, rc, errno2name());
+	printf("prctl(PR_SET_SECCOMP, %#lx /* SECCOMP_MODE_??? */, 0x1, 0x2, 0x3)"
+	       " = %d %s (%m)\n", -1L, rc, errno2name());
 	fflush(stdout);
 
 	rc = prctl(PR_SET_SECCOMP, 1);

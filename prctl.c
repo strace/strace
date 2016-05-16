@@ -172,18 +172,19 @@ SYS_FUNC(prctl)
 	case PR_CAPBSET_DROP:
 	case PR_CAPBSET_READ:
 		tprints(", ");
-		printxval(cap, tcp->u_arg[1], "CAP_???");
+		printxval_long(cap, tcp->u_arg[1], "CAP_???");
 		return RVAL_DECODED;
 
 	case PR_CAP_AMBIENT:
 		tprints(", ");
-		printxval(pr_cap_ambient, tcp->u_arg[1], "PR_CAP_AMBIENT_???");
+		printxval_long(pr_cap_ambient, tcp->u_arg[1],
+			       "PR_CAP_AMBIENT_???");
 		switch (tcp->u_arg[1]) {
 		case PR_CAP_AMBIENT_RAISE:
 		case PR_CAP_AMBIENT_LOWER:
 		case PR_CAP_AMBIENT_IS_SET:
 			tprints(", ");
-			printxval(cap, tcp->u_arg[2], "CAP_???");
+			printxval_long(cap, tcp->u_arg[2], "CAP_???");
 			print_prctl_args(tcp, 3);
 			break;
 		default:
@@ -194,10 +195,10 @@ SYS_FUNC(prctl)
 
 	case PR_MCE_KILL:
 		tprints(", ");
-		printxval(pr_mce_kill, tcp->u_arg[1], "PR_MCE_KILL_???");
+		printxval_long(pr_mce_kill, tcp->u_arg[1], "PR_MCE_KILL_???");
 		tprints(", ");
 		if (PR_MCE_KILL_SET == tcp->u_arg[1])
-			printxval(pr_mce_kill_policy, tcp->u_arg[2],
+			printxval_long(pr_mce_kill_policy, tcp->u_arg[2],
 				   "PR_MCE_KILL_???");
 		else
 			tprintf("%#lx", tcp->u_arg[2]);
@@ -250,7 +251,7 @@ SYS_FUNC(prctl)
 
 	case PR_SET_SECCOMP:
 		tprints(", ");
-		printxval(seccomp_mode, tcp->u_arg[1],
+		printxval_long(seccomp_mode, tcp->u_arg[1],
 			  "SECCOMP_MODE_???");
 		if (SECCOMP_MODE_STRICT == tcp->u_arg[1])
 			return RVAL_DECODED;
@@ -264,7 +265,7 @@ SYS_FUNC(prctl)
 
 	case PR_SET_SECUREBITS:
 		tprints(", ");
-		printflags(secbits, tcp->u_arg[1], "SECBIT_???");
+		printflags_long(secbits, tcp->u_arg[1], "SECBIT_???");
 		return RVAL_DECODED;
 
 	case PR_SET_TIMERSLACK:
