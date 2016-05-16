@@ -41,7 +41,7 @@ SYS_FUNC(perf_event_open)
 		(int) tcp->u_arg[1],
 		(int) tcp->u_arg[2],
 		(int) tcp->u_arg[3]);
-	printflags(perf_event_open_flags, tcp->u_arg[4], "PERF_FLAG_???");
+	printflags_long(perf_event_open_flags, tcp->u_arg[4], "PERF_FLAG_???");
 
 	return RVAL_DECODED | RVAL_FD;
 }
