@@ -353,7 +353,8 @@ ubi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			tprintf("{vol_id=%" PRIi32 ", alignment=%" PRIi32
 				", bytes=%" PRIi64 ", vol_type=", mkvol.vol_id,
 				mkvol.alignment, (int64_t)mkvol.bytes);
-			printxval(ubi_volume_types, mkvol.vol_type, "UBI_???_VOLUME");
+			printxval(ubi_volume_types,
+				    (uint8_t) mkvol.vol_type, "UBI_???_VOLUME");
 			tprintf(", name_len=%" PRIi16 ", name=", mkvol.name_len);
 			if (print_quoted_string(mkvol.name,
 					CLAMP(mkvol.name_len, 0, UBI_MAX_VOLUME_NAME),
