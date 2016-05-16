@@ -177,7 +177,7 @@ mtd_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	case MTDFILEMODE:
 		tprints(", ");
-		printxval(mtd_file_mode_options, arg, "MTD_FILE_MODE_???");
+		printxval_long(mtd_file_mode_options, arg, "MTD_FILE_MODE_???");
 		break;
 
 	case MEMGETBADBLOCK:
