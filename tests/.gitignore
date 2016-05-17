@@ -15,6 +15,7 @@ attach-f-p
 attach-p-cmd-cmd
 attach-p-cmd-p
 bpf
+brk
 caps
 chmod
 chown

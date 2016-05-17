@@ -70,6 +70,7 @@ check_PROGRAMS = \
 	attach-p-cmd-cmd \
 	attach-p-cmd-p \
 	bpf \
+	brk \
 	caps \
 	chmod \
 	chown \
@@ -359,6 +360,7 @@ DECODER_TESTS = \
 	aio.test \
 	alarm.test \
 	bpf.test \
+	brk.test \
 	caps.test \
 	chmod.test \
 	chown.test \
