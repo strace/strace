@@ -42,7 +42,8 @@ int
 main(void)
 {
 	syscall(__NR_timer_create, CLOCK_REALTIME, NULL, NULL);
-	printf("timer_create(CLOCK_REALTIME, NULL, NULL) = -1 EFAULT (%m)\n");
+	printf("timer_create(CLOCK_REALTIME, NULL, NULL) = -1 %s (%m)\n",
+	       errno2name());
 
 	int tid[4] = {};
 	struct_sigevent sev = {
@@ -54,10 +55,11 @@ main(void)
 	syscall(__NR_timer_create, CLOCK_REALTIME, &sev, NULL);
 	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%#lx}"
 	       ", sigev_signo=%u, sigev_notify=%#x /* SIGEV_??? */}"
-	       ", NULL) = -1 EINVAL (%m)\n",
+	       ", NULL) = -1 %s (%m)\n",
 	       sev.sigev_value.sival_int,
 	       sev.sigev_value.sival_ptr,
-	       sev.sigev_signo, sev.sigev_notify);
+	       sev.sigev_signo, sev.sigev_notify,
+	       errno2name());
 
 	sev.sigev_notify = SIGEV_NONE;
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[0]))
