@@ -13,7 +13,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of copy_file_range, preadv2, and pwritev2 syscalls.
   * Implemented dumping of preadv, preadv2, pwritev, pwritev2, and vmsplice
     syscalls.
-  * Updated lists of ioctl commands from Linux 4.5.
+  * Updated lists of ioctl commands from Linux 4.6.
 
 * Bug fixes
   * Fixed build on arc, metag, nios2, or1k, and tile architectures.
