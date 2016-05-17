@@ -41,6 +41,7 @@ print_statfs_type(const char *const prefix, const unsigned long long magic)
 		tprintf("%#llx", magic);
 }
 
+#if defined HAVE_STRUCT_STATFS_F_FLAGS || defined HAVE_STRUCT_STATFS64_F_FLAGS
 static void
 print_statfs_flags(const char *const prefix, const unsigned long long flags)
 {
@@ -49,6 +50,7 @@ print_statfs_flags(const char *const prefix, const unsigned long long flags)
 		printflags64(statfs_flags, flags, "ST_???");
 	}
 }
+#endif /* HAVE_STRUCT_STATFS_F_FLAGS || HAVE_STRUCT_STATFS64_F_FLAGS */
 
 static void
 print_statfs_number(const char *const prefix, const unsigned long long number)

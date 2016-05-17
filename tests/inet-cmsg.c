@@ -75,6 +75,7 @@ print_opts(const char *name, const struct cmsghdr *c)
 	}
 }
 
+#ifdef IP_ORIGDSTADDR
 static void
 print_origdstaddr(const struct cmsghdr *c)
 {
@@ -84,6 +85,7 @@ print_origdstaddr(const struct cmsghdr *c)
 	printf("IP_ORIGDSTADDR, {sa_family=AF_INET, sin_port=htons(%u)"
 	       ", sin_addr=inet_addr(\"127.0.0.1\")}", ntohs(sin->sin_port));
 }
+#endif
 
 int
 main(void)
