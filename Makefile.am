@@ -436,6 +436,7 @@ EXTRA_DIST =				\
 	linux/mips/syscallent.h		\
 	linux/mips/userent.h		\
 	linux/mtd-abi.h			\
+	linux/netlink_diag.h		\
 	linux/nios2/arch_regs.c		\
 	linux/nios2/get_error.c		\
 	linux/nios2/get_scno.c		\
