@@ -28,21 +28,22 @@
 #include "tests.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/param.h>
 
 int
 main(void)
 {
 	(void) tail_alloc(1);
-	const unsigned int size = 8;
-	const char *const p = tail_alloc(size);
+	const unsigned int size = PATH_MAX - 1;
+	const char *p = tail_alloc(size);
 	const char *const efault = p + size;
 	(void) tail_alloc(1);
+	(void) tail_alloc(1);
 
-	int rc = chdir(p);
-	printf("chdir(%p) = %d %s (%m)\n", p, rc, errno2name());
-
-	rc = chdir(efault);
-	printf("chdir(%p) = %d %s (%m)\n", efault, rc, errno2name());
+	for (; p <= efault; ++p) {
+		int rc = chdir(p);
+		printf("chdir(%p) = %d %s (%m)\n", p, rc, errno2name());
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;
