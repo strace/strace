@@ -107,4 +107,24 @@ int printxval(const struct xlat *, const unsigned long long, const char *);
 # define SKIP_MAIN_UNDEFINED(arg) \
 	int main(void) { error_msg_and_skip("undefined: %s", arg); }
 
+/*
+ * The kernel used to define 64-bit types on 64-bit systems on a per-arch
+ * basis.  Some architectures would use unsigned long and others would use
+ * unsigned long long.  These types were exported as part of the
+ * kernel-userspace ABI and now must be maintained forever.  This matches
+ * what the kernel exports for each architecture so we don't need to cast
+ * every printing of __u64 or __s64 to stdint types.
+ */
+# if SIZEOF_LONG == 4
+#  define PRI__64 "ll"
+# elif defined ALPHA || defined IA64 || defined MIPS || defined POWERPC
+#  define PRI__64 "l"
+# else
+#  define PRI__64 "ll"
+# endif
+
+# define PRI__d64 PRI__64"d"
+# define PRI__u64 PRI__64"u"
+# define PRI__x64 PRI__64"x"
+
 #endif
