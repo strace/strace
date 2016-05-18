@@ -453,6 +453,18 @@ AC_CHECK_TYPES([struct statfs64], [
 ],, [#include <linux/types.h>
 #include <asm/statfs.h>])
 
+AC_CHECK_HEADERS([linux/btrfs.h], [
+	AC_CHECK_MEMBERS(m4_normalize([
+		struct btrfs_ioctl_feature_flags.compat_flags,
+		struct btrfs_ioctl_fs_info_args.nodesize,
+		struct btrfs_ioctl_defrag_range_args.start
+		struct btrfs_ioctl_search_args_v2.buf_size
+		]),,, [ #include <stdio.h>
+#include <linux/btrfs.h>])
+        AC_CHECK_DECLS(m4_normalize([BTRFS_COMPRESS_NONE, BTRFS_COMPRESS_ZLIB,
+	                        BTRFS_COMPRESS_LZO]),,,[ #include <stdio.h>
+#include <linux/btrfs.h>])])
+
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS(m4_normalize([
 	PTRACE_PEEKUSER,

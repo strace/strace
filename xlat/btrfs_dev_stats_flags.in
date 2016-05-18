@@ -1,0 +1,2 @@
+#val_type uint64_t
+BTRFS_DEV_STATS_RESET

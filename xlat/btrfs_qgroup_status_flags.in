@@ -1,0 +1,3 @@
+#val_type uint64_t
+BTRFS_QGROUP_STATUS_FLAG_ON             (1ULL << 0)
+BTRFS_QGROUP_STATUS_FLAG_RESCAN         (1ULL << 1)

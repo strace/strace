@@ -1,0 +1,2 @@
+#val_type uint64_t
+BTRFS_FEATURE_COMPAT_RO_FREE_SPACE_TREE (1ULL << 0)

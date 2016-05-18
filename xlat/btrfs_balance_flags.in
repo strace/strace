@@ -1,0 +1,6 @@
+#val_type uint64_t
+BTRFS_BALANCE_DATA              (1ULL << 0)
+BTRFS_BALANCE_SYSTEM            (1ULL << 1)
+BTRFS_BALANCE_METADATA          (1ULL << 2)
+BTRFS_BALANCE_FORCE		(1ULL << 3)
+BTRFS_BALANCE_RESUME		(1ULL << 4)

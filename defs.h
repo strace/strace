@@ -660,7 +660,9 @@ extern void print_struct_statfs(struct tcb *tcp, long);
 extern void print_struct_statfs64(struct tcb *tcp, long, unsigned long);
 
 extern int block_ioctl(struct tcb *, const unsigned int, long);
+extern int btrfs_ioctl(struct tcb *, const unsigned int, long);
 extern int evdev_ioctl(struct tcb *, const unsigned int, long);
+extern int file_ioctl(struct tcb *, const unsigned int, long);
 extern int loop_ioctl(struct tcb *, const unsigned int, long);
 extern int mtd_ioctl(struct tcb *, const unsigned int, long);
 extern int ptp_ioctl(struct tcb *, const unsigned int, long);

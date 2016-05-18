@@ -81,6 +81,7 @@ strace_SOURCES =	\
 	bjm.c		\
 	block.c		\
 	bpf.c		\
+	btrfs.c		\
 	cacheflush.c	\
 	capability.c	\
 	caps0.h		\
@@ -110,6 +111,7 @@ strace_SOURCES =	\
 	fetch_struct_statfs.c \
 	file.c		\
 	file_handle.c	\
+	file_ioctl.c	\
 	flock.c		\
 	flock.h		\
 	futex.c		\
