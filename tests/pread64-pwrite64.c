@@ -156,12 +156,11 @@ main(void)
 		perror_msg_and_fail("pwrite64: expected 0, returned %ld", rc);
 	tprintf("pwrite64(1, \"\", 0, 0) = 0\n");
 
-	rc = pwrite(1, w, w_len + 1, 0);
+	rc = pwrite(1, efault, 1, 0);
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1 EFAULT"
 				    ", returned %ld", rc);
-	tprintf("pwrite64(1, %p, %u, 0) = -1 EFAULT (%m)\n",
-		w, w_len + 1);
+	tprintf("pwrite64(1, %p, 1, 0) = -1 EFAULT (%m)\n", efault);
 
 	rc = pwrite(1, nil, 1, -3);
 	if (rc != -1)
