@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Check verbose decoding of btrfs ioctl
+
+. "${srcdir=.}/init.sh"
+
+run_prog ./btrfs -v > /dev/null
+run_strace -a16 -veioctl $args > "$EXP"
+check_prog grep
+grep -v '^ioctl([012],' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"
+
+exit 0

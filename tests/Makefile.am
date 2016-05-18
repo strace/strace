@@ -71,6 +71,7 @@ check_PROGRAMS = \
 	attach-p-cmd-p \
 	bpf \
 	brk \
+	btrfs \
 	caps \
 	chmod \
 	chown \
@@ -364,6 +365,8 @@ DECODER_TESTS = \
 	alarm.test \
 	bpf.test \
 	brk.test \
+	btrfs.test \
+	btrfs-v.test \
 	caps.test \
 	chmod.test \
 	chown.test \

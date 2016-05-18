@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check basic btrfs ioctl decoding.
+
+. "${srcdir=.}/ioctl.test"

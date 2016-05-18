@@ -22,6 +22,8 @@ test_fiemap(void)
 	printf(", fm_extent_count=%u})", args->fm_extent_count);
 	ioctl(-1, FS_IOC_FIEMAP, args);
 	printf(" = -1 EBADF (%m)\n");
+
+	/* The live version of this test is in btrfs.c */
 }
 
 /* clone and dedupe ioctls are in btrfs.c since they originated there */
