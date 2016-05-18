@@ -152,12 +152,11 @@ main(void)
 		perror_msg_and_fail("write: expected 0, returned %ld", rc);
 	tprintf("write(1, \"\", 0) = 0\n");
 
-	rc = write(1, w, w_len + 1);
+	rc = write(1, efault, 1);
 	if (rc != -1)
 		perror_msg_and_fail("write: expected -1 EFAULT"
 				    ", returned %ld", rc);
-	tprintf("write(1, %p, %u) = -1 EFAULT (%m)\n",
-		w, w_len + 1);
+	tprintf("write(1, %p, 1) = -1 EFAULT (%m)\n", efault);
 
 	rc = write(1, w, w_len);
 	if (rc != (int) w_len)
