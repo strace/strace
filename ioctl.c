@@ -228,11 +228,20 @@ ioctl_decode(struct tcb *tcp)
 {
 	const unsigned int code = tcp->u_arg[1];
 	const long arg = tcp->u_arg[2];
+	int ret;
 
 	switch (_IOC_TYPE(code)) {
 #if defined(ALPHA) || defined(POWERPC)
-	case 'f': case 't': case 'T':
+	case 'f':
+		ret = file_ioctl(tcp, code, arg);
+		if (ret != RVAL_DECODED)
+			return ret;
+	case 't'
+	case 'T':
+		return term_ioctl(tcp, code, arg);
 #else /* !ALPHA */
+	case 'f':
+		return file_ioctl(tcp, code, arg);
 	case 0x54:
 #endif /* !ALPHA */
 		return term_ioctl(tcp, code, arg);

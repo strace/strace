@@ -28,6 +28,11 @@
 #include "defs.h"
 #include <sys/ioctl.h>
 #include <linux/fs.h>
+#include <linux/fiemap.h>
+
+#include "xlat/fiemap_flags.h"
+#include "xlat/fiemap_extent_flags.h"
+
 #ifndef FICLONE
 #define FICLONE         _IOW(0x94, 9, int)
 #endif
@@ -151,6 +156,69 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		}
 		if (entering(tcp))
 			return 0;
+		break;
+	}
+
+	case FS_IOC_FIEMAP: {
+		struct fiemap args;
+		struct fiemap_extent fe;
+		unsigned int i;
+
+		if (entering(tcp))
+			tprints(", ");
+		else if (syserror(tcp))
+			break;
+		else
+			tprints(" => ");
+
+		if (umove_or_printaddr(tcp, arg, &args))
+			break;
+
+		if (entering(tcp)) {
+			tprintf("{fm_start=%" PRI__u64 ", "
+				"fm_length=%" PRI__u64 ", "
+				"fm_flags=",
+				args.fm_start, args.fm_length);
+			printflags64(fiemap_flags, args.fm_flags,
+				     "FIEMAP_FLAG_???");
+			tprintf(", fm_extent_count=%u}", args.fm_extent_count);
+			return 0;
+		}
+
+		tprints("{fm_flags=");
+		printflags64(fiemap_flags, args.fm_flags,
+			     "FIEMAP_FLAG_???");
+		tprintf(", fm_mapped_extents=%u",
+			args.fm_mapped_extents);
+		tprints(", fm_extents=");
+		if (abbrev(tcp)) {
+			tprints("...}");
+			break;
+		}
+
+		tprints("[");
+		for (i = 0; i < args.fm_mapped_extents; i++) {
+			unsigned long offset;
+			offset = offsetof(typeof(args), fm_extents[i]);
+			if (i)
+				tprints(", ");
+
+			if (i > max_strlen ||
+			    umoven(tcp, arg + offset, sizeof(fe), &fe)) {
+				tprints("...");
+				break;
+			}
+
+			tprintf("{fe_logical=%" PRI__u64
+				", fe_physical=%" PRI__u64
+				", fe_length=%" PRI__u64 ", ",
+				fe.fe_logical, fe.fe_physical, fe.fe_length);
+
+			printflags64(fiemap_extent_flags, fe.fe_flags,
+				     "FIEMAP_EXTENT_???");
+			tprints("}");
+		}
+		tprints("]}");
 		break;
 	}
 
