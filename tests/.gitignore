@@ -52,6 +52,7 @@ fcntl
 fcntl64
 fdatasync
 file_handle
+file_ioctl
 filter-unavailable
 flock
 fork-f

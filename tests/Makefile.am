@@ -107,6 +107,7 @@ check_PROGRAMS = \
 	fcntl64 \
 	fdatasync \
 	file_handle \
+	file_ioctl \
 	filter-unavailable \
 	flock \
 	fork-f \
@@ -398,6 +399,7 @@ DECODER_TESTS = \
 	fcntl64.test \
 	fdatasync.test \
 	file_handle.test \
+	file_ioctl.test \
 	flock.test \
 	fstat.test \
 	fstat64.test \

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check FS_IOC_FIEMAP ioctl decoding.
+
+. "${srcdir=.}/ioctl.test"
