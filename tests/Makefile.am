@@ -315,6 +315,7 @@ check_PROGRAMS = \
 	utimensat \
 	utimes \
 	vfork-f \
+	vhangup \
 	vmsplice \
 	wait \
 	xattr \
@@ -597,6 +598,7 @@ DECODER_TESTS = \
 	utime.test \
 	utimensat.test \
 	utimes.test \
+	vhangup.test \
 	vmsplice.test \
 	wait.test \
 	xattr.test \

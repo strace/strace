@@ -262,6 +262,7 @@ utime
 utimensat
 utimes
 vfork-f
+vhangup
 vmsplice
 wait
 xattr
