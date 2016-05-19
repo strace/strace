@@ -187,13 +187,17 @@ receive_responses(const int fd, const unsigned long inode,
 		  int (* parser) (const char *, const void *,
 				  int, unsigned long))
 {
-	static long buf[8192 / sizeof(long)];
+	static union {
+		struct nlmsghdr hdr;
+		long buf[8192 / sizeof(long)];
+	} hdr_buf;
+
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
 	};
 	struct iovec iov = {
-		.iov_base = buf,
-		.iov_len = sizeof(buf)
+		.iov_base = hdr_buf.buf,
+		.iov_len = sizeof(hdr_buf.buf)
 	};
 	int flags = 0;
 
@@ -212,7 +216,7 @@ receive_responses(const int fd, const unsigned long inode,
 			return false;
 		}
 
-		const struct nlmsghdr *h = (struct nlmsghdr *) buf;
+		const struct nlmsghdr *h = &hdr_buf.hdr;
 		if (!NLMSG_OK(h, ret))
 			return false;
 		for (; NLMSG_OK(h, ret); h = NLMSG_NEXT(h, ret)) {

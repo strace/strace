@@ -83,13 +83,17 @@ send_query(const int fd)
 static void
 check_responses(const int fd)
 {
-	static long buf[8192 / sizeof(long)];
+	static union {
+		struct nlmsghdr hdr;
+		long buf[8192 / sizeof(long)];
+	} hdr_buf;
+
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
 	};
 	struct iovec iov = {
-		.iov_base = buf,
-		.iov_len = sizeof(buf)
+		.iov_base = hdr_buf.buf,
+		.iov_len = sizeof(hdr_buf.buf)
 	};
 	struct msghdr msg = {
 		.msg_name = (void *) &nladdr,
@@ -102,7 +106,7 @@ check_responses(const int fd)
 	if (ret <= 0)
 		perror_msg_and_skip("recvmsg");
 
-	struct nlmsghdr *h = (struct nlmsghdr *) buf;
+	struct nlmsghdr *h = &hdr_buf.hdr;
 	if (!NLMSG_OK(h, ret))
 		error_msg_and_skip("!NLMSG_OK");
 	if (h->nlmsg_type == NLMSG_ERROR) {
