@@ -670,7 +670,6 @@ extern int sock_ioctl(struct tcb *, const unsigned int, long);
 extern int term_ioctl(struct tcb *, const unsigned int, long);
 extern int ubi_ioctl(struct tcb *, const unsigned int, long);
 extern int uffdio_ioctl(struct tcb *, const unsigned int, long);
-extern int v4l2_ioctl(struct tcb *, const unsigned int, long);
 
 extern int tv_nz(const struct timeval *);
 extern int tv_cmp(const struct timeval *, const struct timeval *);
