@@ -186,8 +186,10 @@ check_PROGRAMS = \
 	net-icmp_filter \
 	net-y-unix \
 	net-yy-inet \
+	net-yy-netlink \
 	net-yy-unix \
 	netlink_inet_diag \
+	netlink_netlink_diag \
 	netlink_unix_diag \
 	newfstatat \
 	nsyscalls \
@@ -471,6 +473,7 @@ DECODER_TESTS = \
 	net-icmp_filter.test \
 	net-y-unix.test \
 	net-yy-inet.test \
+	net-yy-netlink.test \
 	net-yy-unix.test \
 	net.test \
 	newfstatat.test \
