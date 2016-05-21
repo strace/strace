@@ -846,7 +846,8 @@ print_v4l2_create_buffers(struct tcb *tcp, const long arg)
 }
 #endif /* VIDIOC_CREATE_BUFS */
 
-MPERS_PRINTER_DECL(int, v4l2_ioctl)(struct tcb *tcp, const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, v4l2_ioctl,
+		   struct tcb *tcp, const unsigned int code, const long arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;

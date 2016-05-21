@@ -73,7 +73,8 @@ print_timeval_t(const timeval_t *t)
 	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
 }
 
-MPERS_PRINTER_DECL(void, print_timespec)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, print_timespec,
+		   struct tcb *tcp, const long addr)
 {
 	timespec_t t;
 
@@ -83,7 +84,8 @@ MPERS_PRINTER_DECL(void, print_timespec)(struct tcb *tcp, const long addr)
 	print_timespec_t(&t);
 }
 
-MPERS_PRINTER_DECL(const char *, sprint_timespec)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(const char *, sprint_timespec,
+		   struct tcb *tcp, const long addr)
 {
 	timespec_t t;
 	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
@@ -101,7 +103,8 @@ MPERS_PRINTER_DECL(const char *, sprint_timespec)(struct tcb *tcp, const long ad
 	return buf;
 }
 
-MPERS_PRINTER_DECL(void, print_timespec_utime_pair)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, print_timespec_utime_pair,
+		   struct tcb *tcp, const long addr)
 {
 	timespec_t t[2];
 
@@ -115,7 +118,8 @@ MPERS_PRINTER_DECL(void, print_timespec_utime_pair)(struct tcb *tcp, const long 
 	tprints("]");
 }
 
-MPERS_PRINTER_DECL(void, print_itimerspec)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, print_itimerspec,
+		   struct tcb *tcp, const long addr)
 {
 	timespec_t t[2];
 
@@ -129,7 +133,8 @@ MPERS_PRINTER_DECL(void, print_itimerspec)(struct tcb *tcp, const long addr)
 	tprints("}");
 }
 
-MPERS_PRINTER_DECL(void, print_timeval)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, print_timeval,
+		   struct tcb *tcp, const long addr)
 {
 	timeval_t t;
 
@@ -139,7 +144,8 @@ MPERS_PRINTER_DECL(void, print_timeval)(struct tcb *tcp, const long addr)
 	print_timeval_t(&t);
 }
 
-MPERS_PRINTER_DECL(void, print_timeval_pair)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, print_timeval_pair,
+		   struct tcb *tcp, const long addr)
 {
 	timeval_t t[2];
 
@@ -153,7 +159,8 @@ MPERS_PRINTER_DECL(void, print_timeval_pair)(struct tcb *tcp, const long addr)
 	tprints("]");
 }
 
-MPERS_PRINTER_DECL(const char *, sprint_timeval)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(const char *, sprint_timeval,
+		   struct tcb *tcp, const long addr)
 {
 	timeval_t t;
 	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
@@ -171,7 +178,8 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval)(struct tcb *tcp, const long add
 	return buf;
 }
 
-MPERS_PRINTER_DECL(void, print_itimerval)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, print_itimerval,
+		   struct tcb *tcp, const long addr)
 {
 	timeval_t t[2];
 

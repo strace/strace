@@ -47,7 +47,8 @@ typedef struct statfs64 struct_statfs64;
 	else						\
 		dst = (unsigned long long) (src)
 
-MPERS_PRINTER_DECL(bool, fetch_struct_statfs)(struct tcb *tcp, const long addr, struct strace_statfs *p)
+MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
+		   struct tcb *tcp, const long addr, struct strace_statfs *p)
 {
 	struct_statfs b;
 
@@ -84,7 +85,9 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs)(struct tcb *tcp, const long addr, 
 # define COMPAT_STATFS64_PADDED_SIZE (sizeof(struct_statfs64) + 4)
 #endif
 
-MPERS_PRINTER_DECL(bool, fetch_struct_statfs64)(struct tcb *tcp, const long addr, const unsigned long size, struct strace_statfs *p)
+MPERS_PRINTER_DECL(bool, fetch_struct_statfs64,
+		   struct tcb *tcp, const long addr, const unsigned long size,
+		   struct strace_statfs *p)
 {
 	struct_statfs64 b;
 

@@ -34,7 +34,8 @@ typedef struct seccomp_fprog seccomp_fprog_t;
 
 #include MPERS_DEFS
 
-MPERS_PRINTER_DECL(bool, fetch_seccomp_fprog)(struct tcb *tcp, const long addr, void *p)
+MPERS_PRINTER_DECL(bool, fetch_seccomp_fprog,
+		   struct tcb *tcp, const long addr, void *p)
 {
 	struct seccomp_fprog *pfp = p;
 	seccomp_fprog_t mfp;

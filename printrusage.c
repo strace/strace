@@ -37,7 +37,7 @@ typedef struct rusage rusage_t;
 
 #include MPERS_DEFS
 
-MPERS_PRINTER_DECL(void, printrusage)(struct tcb *tcp, long addr)
+MPERS_PRINTER_DECL(void, printrusage, struct tcb *tcp, long addr)
 {
 	rusage_t ru;
 

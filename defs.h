@@ -795,11 +795,17 @@ extern unsigned nsignals;
 extern unsigned nioctlents;
 extern unsigned num_quals;
 
-#if SUPPORTED_PERSONALITIES > 1
-# include "printers.h"
-#else
-# include "native_printer_decls.h"
-#endif
+#ifdef IN_MPERS_BOOTSTRAP
+/* Transform multi-line MPERS_PRINTER_DECL statements to one-liners.  */
+# define MPERS_PRINTER_DECL(type, name, ...) MPERS_PRINTER_DECL(type, name, __VA_ARGS__)
+#else /* !IN_MPERS_BOOTSTRAP */
+# if SUPPORTED_PERSONALITIES > 1
+#  include "printers.h"
+# else
+#  include "native_printer_decls.h"
+# endif
+# define MPERS_PRINTER_DECL(type, name, ...) type MPERS_FUNC_NAME(name)(__VA_ARGS__)
+#endif /* !IN_MPERS_BOOTSTRAP */
 
 /*
  * If you need non-NULL sysent[scno].sys_func and sysent[scno].sys_name
@@ -818,8 +824,6 @@ extern unsigned num_quals;
 #define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(syscall_name)
 
 #define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(sys_ ## syscall_name)(struct tcb *tcp)
-
-#define MPERS_PRINTER_DECL(type, name) type MPERS_FUNC_NAME(name)
 
 /*
  * The kernel used to define 64-bit types on 64-bit systems on a per-arch

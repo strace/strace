@@ -41,7 +41,7 @@ typedef struct mq_attr mq_attr_t;
 
 #include MPERS_DEFS
 
-MPERS_PRINTER_DECL(void, printmqattr)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, printmqattr, struct tcb *tcp, const long addr)
 {
 #if defined HAVE_MQUEUE_H || defined HAVE_LINUX_MQUEUE_H
 	mq_attr_t attr;

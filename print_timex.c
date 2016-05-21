@@ -40,7 +40,7 @@ typedef struct timex struct_timex;
 #include "xlat/adjtimex_modes.h"
 #include "xlat/adjtimex_status.h"
 
-MPERS_PRINTER_DECL(int, print_timex)(struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(int, print_timex, struct tcb *tcp, const long addr)
 {
 	struct_timex tx;
 
