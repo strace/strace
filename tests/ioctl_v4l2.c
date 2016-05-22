@@ -47,11 +47,8 @@ init_magic(void *addr, const unsigned int size)
 int
 main(void )
 {
-	(void) tail_alloc(1);
 	const unsigned int size = get_page_size();
-	(void) tail_alloc(1);
 	void *const page = tail_alloc(size);
-	(void) tail_alloc(1);
 	init_magic(page, size);
 
 	const union u_pixel_format {

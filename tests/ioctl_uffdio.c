@@ -54,7 +54,6 @@ main(void)
 		perror_msg_and_skip("userfaultfd");
 
 	/* ---- API ---- */
-	(void) tail_alloc(1);
 	struct uffdio_api *api_struct = tail_alloc(sizeof(*api_struct));
 
 	/* With a bad fd */
@@ -96,7 +95,6 @@ main(void)
 	*(char *)area1 = 42;
 
 	/* ---- REGISTER ---- */
-	(void) tail_alloc(1);
 	struct uffdio_register *register_struct =
 					 tail_alloc(sizeof(*register_struct));
 	memset(register_struct, 0, sizeof(*register_struct));
@@ -129,7 +127,6 @@ main(void)
 	 * userfaultfd will cause us to stall.
 	 */
 	/* ---- COPY ---- */
-	(void) tail_alloc(1);
 	struct uffdio_copy *copy_struct = tail_alloc(sizeof(*copy_struct));
 
 	memset(copy_struct, 0, sizeof(*copy_struct));
@@ -151,7 +148,6 @@ main(void)
 	       fd, area2, area1, pagesize, pagesize, rc);
 
 	/* ---- ZEROPAGE ---- */
-	(void) tail_alloc(1);
 	struct uffdio_zeropage *zero_struct = tail_alloc(sizeof(*zero_struct));
 	madvise(area2, pagesize, MADV_DONTNEED);
 
@@ -173,7 +169,6 @@ main(void)
 	       fd, area2, pagesize, pagesize, rc);
 
 	/* ---- WAKE ---- */
-	(void) tail_alloc(1);
 	struct uffdio_range *range_struct = tail_alloc(sizeof(*range_struct));
 	memset(range_struct, 0, sizeof(*range_struct));
 

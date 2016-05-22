@@ -43,7 +43,6 @@ main(void)
 	printf("setsockopt(-1, SOL_RAW, ICMP_FILTER, NULL, 0) = -1 %s (%m)\n",
 	       errno2name());
 
-	(void) tail_alloc(1);
 	socklen_t *const plen = tail_alloc(sizeof(*plen));
 	void *const efault = plen + 1;
 	struct icmp_filter *const f = tail_alloc(sizeof(*f));

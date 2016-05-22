@@ -125,7 +125,6 @@ main(void)
 		tail_alloc(ngroups ? sizeof(*g1) * ngroups : 1);
 	GID_TYPE *const g2 = tail_alloc(sizeof(*g2) * (ngroups + 1));
 	void *efault = g2 + ngroups + 1;
-	(void) tail_alloc(1);
 
 	get_groups(ngroups, g1);
 	get_groups(ngroups + 1, g1);

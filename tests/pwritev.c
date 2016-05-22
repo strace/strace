@@ -95,7 +95,6 @@ main(void)
 		iov[i].iov_base = &buf[i];
 		iov[i].iov_len = LEN - i;
 	}
-	tail_alloc(1);
 
 	const off_t offset = 0xdefaceddeadbeefLL;
 	long rc;

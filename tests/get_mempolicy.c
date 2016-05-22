@@ -47,7 +47,6 @@ print_nodes(unsigned long maxnode)
 {
 	unsigned long *const nodemask =
 		tail_alloc(sizeof(*nodemask) * NLONGS(maxnode));
-	(void) tail_alloc(1);
 
 	if (syscall(__NR_get_mempolicy, 0, nodemask, maxnode, 0, 0)) {
 		printf("get_mempolicy(NULL, %p, %lu, NULL, 0) = -1 %s (%m)\n",
@@ -92,9 +91,7 @@ main(void)
 	       "MPOL_F_NODE|MPOL_F_ADDR",
 	       flags & ~3, rc, errno2name());
 
-	(void) tail_alloc(1);
 	mode = tail_alloc(sizeof(*mode));
-	(void) tail_alloc(1);
 
 	rc = syscall(__NR_get_mempolicy, mode, 0, 0, 0, 0);
 	printf("get_mempolicy([");

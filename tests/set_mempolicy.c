@@ -56,7 +56,6 @@ print_nodes(const unsigned long maxnode, unsigned int offset)
 	unsigned long *const nodemask =
 		tail_alloc(size ? size : (offset ? 1 : 0));
 	memset(nodemask, 0, size);
-	(void) tail_alloc(1);
 
 	long rc = syscall(__NR_set_mempolicy, 0, nodemask, maxnode);
 	int saved_errno = errno;

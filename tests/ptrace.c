@@ -59,7 +59,6 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 		unsigned long long off;
 		unsigned int flags, nr;
 	} *const psi = tail_alloc(sizeof(*psi));
-	(void) tail_alloc(1);
 
 	psi->off = 0xdeadbeeffacefeed;
 	psi->flags = 1;
@@ -100,7 +99,6 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 	const unsigned int nsigs = 4;
 	const uid_t uid = geteuid();
 	siginfo_t *sigs = tail_alloc(sizeof(*sigs) * nsigs);
-	(void) tail_alloc(1);
 
 	psi->off = 0;
 	psi->flags = 0;
@@ -188,10 +186,8 @@ main(void)
 	if (!sigset_size)
 		perror_msg_and_fail("rt_sigprocmask");
 
-	(void) tail_alloc(1);
 	void *const k_set = tail_alloc(sigset_size);
 	siginfo_t *const sip = tail_alloc(sizeof(*sip));
-	(void) tail_alloc(1);
 
 	long rc = do_ptrace(bad_request, pid, 0, 0);
 	printf("ptrace(%#lx /* PTRACE_??? */, %u, NULL, NULL) = %ld %s (%m)\n",

@@ -56,7 +56,6 @@ main(void)
 	       sample, rc, errno2name());
 
 	struct timeval *const ts = tail_alloc(sizeof(*ts) * 2);
-	(void) tail_alloc(1);
 	dirfd = (unsigned long) 0xdeadbeefffffffff;
 
 	rc = syscall(__NR_futimesat, dirfd, 0, ts + 1);

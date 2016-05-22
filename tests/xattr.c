@@ -44,12 +44,10 @@ main(void)
 	static const char c_value[] = "foo\0bar";
 	static const char q_value[] = "foo\\0bar";
 
-	tail_alloc(1);
 	const char *const z_value = tail_memdup(c_value, sizeof(c_value));
 	char *const efault = tail_alloc(1) + 1;
 	const char *const value = tail_memdup(c_value, sizeof(c_value) - 1);
 	char *const big = tail_alloc(XATTR_SIZE_MAX + 1);
-	tail_alloc(1);
 
 	assert(fsetxattr(-1, 0, 0, 0, XATTR_CREATE) == -1);
 	printf("fsetxattr(-1, NULL, NULL, 0, XATTR_CREATE) = -1 %s (%m)\n",

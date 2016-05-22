@@ -33,12 +33,9 @@
 int
 main(void)
 {
-	(void) tail_alloc(1);
 	const unsigned int size = PATH_MAX - 1;
 	const char *p = tail_alloc(size);
 	const char *const efault = p + size;
-	(void) tail_alloc(1);
-	(void) tail_alloc(1);
 
 	for (; p <= efault; ++p) {
 		int rc = chdir(p);

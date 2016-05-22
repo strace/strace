@@ -44,7 +44,6 @@ main(void)
 	       rc, errno2name());
 
 	void *efault = tail_alloc(1);
-	(void) tail_alloc(1);
 
 	rc = syscall(__NR_clock_adjtime, CLOCK_REALTIME, efault);
 	printf("clock_adjtime(CLOCK_REALTIME, %p) = %ld %s (%m)\n",

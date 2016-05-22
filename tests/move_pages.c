@@ -199,14 +199,12 @@ main(void)
 	const unsigned long pid =
 		(unsigned long) 0xfacefeed00000000 | getpid();
 	unsigned long count = 1;
-	(void) tail_alloc(1);
 	const unsigned page_size = get_page_size();
 	const void *const page = tail_alloc(page_size);
 	const void *const efault = page + page_size;
 	const void **pages = tail_alloc(sizeof(*pages));
 	int *nodes = tail_alloc(sizeof(*nodes));
 	int *status = tail_alloc(sizeof(*status));
-	(void) tail_alloc(1);
 
 	print_stat_pages(pid, 0, pages, status);
 	print_move_pages(pid, 0, 0, pages, nodes, status);

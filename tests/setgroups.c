@@ -88,7 +88,6 @@ main(void)
 	const GID_TYPE *const g1 = tail_alloc(sizeof(*g1));
 	GID_TYPE *const g2 = tail_alloc(sizeof(*g2) * 2);
 	GID_TYPE *const g3 = tail_alloc(sizeof(*g3) * 3);
-	(void) tail_alloc(1);
 
 	if (syscall(SYSCALL_NR, 0, g1 + 1))
 		printf("%s(0, []) = -1 %s (%m)\n",
