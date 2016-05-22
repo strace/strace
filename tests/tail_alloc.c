@@ -34,17 +34,20 @@ tail_alloc(const size_t size)
 {
 	const size_t page_size = get_page_size();
 	const size_t len = (size + page_size - 1) & -page_size;
-	const size_t alloc_size = len + 2 * page_size;
+	const size_t alloc_size = len + 6 * page_size;
 
 	void *p = mmap(NULL, alloc_size, PROT_READ | PROT_WRITE,
 		       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (MAP_FAILED == p)
 		perror_msg_and_fail("mmap(%zu)", alloc_size);
 
-	void *start_work = p + page_size;
+	void *start_work = p + 3 * page_size;
 	void *tail_guard = start_work + len;
 
-	if (munmap(p, page_size) || munmap(tail_guard, page_size))
+	if (munmap(p, page_size) ||
+	    munmap(p + 2 * page_size, page_size) ||
+	    munmap(tail_guard, page_size) ||
+	    munmap(tail_guard + 2 * page_size, page_size))
 		perror_msg_and_fail("munmap");
 
 	memset(start_work, 0xff, len);
