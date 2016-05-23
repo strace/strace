@@ -36,8 +36,7 @@
 check_prog sed
 run_prog ./netlink_inet_diag
 
-addr="$NAME-local-stream"
-run_prog "./$NAME" $addr > /dev/null
+run_prog "./$NAME" > /dev/null
 
 run_strace -a22 -yy -eclose,network $args > "$EXP"
 # Filter out close() calls made by ld.so and libc.
