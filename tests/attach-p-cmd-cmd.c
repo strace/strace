@@ -36,8 +36,8 @@ int
 main(void)
 {
 	static const char text[] = "attach-p-cmd.test cmd";
-	assert(chdir(text) == -1);
 	pid_t pid = getpid();
+	assert(chdir(text) == -1);
 	printf("%-5d chdir(\"%s\") = -1 ENOENT (%m)\n"
 	       "%-5d +++ exited with 0 +++\n", pid, text, pid);
 	return 0;
