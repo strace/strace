@@ -56,6 +56,7 @@ main(void)
 	};
 	struct sockaddr *const sa = tail_memdup(&addr, sizeof(addr));
 	socklen_t * const len = tail_alloc(sizeof(socklen_t));
+	struct msghdr *const mh = tail_alloc(sizeof(*mh));
 	*len = sizeof(addr);
 
 	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
@@ -71,9 +72,9 @@ main(void)
 	       "groups=00000000}, %u) = 0\n", fd, inode, magic,
 	       (unsigned) *len);
 
-	assert(recvmsg(fd, NULL, MSG_DONTWAIT) == -1);
-	printf("recvmsg(%d<NETLINK:[SOCK_DIAG:%u]>, NULL, MSG_DONTWAIT)"
-	       " = -1 %s (%m)\n", fd, magic, errno2name());
+	assert(recvmsg(fd, mh, MSG_DONTWAIT) == -1);
+	printf("recvmsg(%d<NETLINK:[SOCK_DIAG:%u]>, %p, MSG_DONTWAIT)"
+	       " = -1 %s (%m)\n", fd, magic, mh, errno2name());
 
 	assert(close(fd) == 0);
 	printf("close(%d<NETLINK:[SOCK_DIAG:%u]>) = 0\n", fd, magic);
