@@ -29,14 +29,12 @@
  */
 
 #include "tests.h"
-#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/param.h>
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/sock_diag.h>
@@ -56,7 +54,6 @@ main(void)
 	};
 	struct sockaddr *const sa = tail_memdup(&addr, sizeof(addr));
 	socklen_t * const len = tail_alloc(sizeof(socklen_t));
-	struct msghdr *const mh = tail_alloc(sizeof(*mh));
 	*len = sizeof(addr);
 
 	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
@@ -68,15 +65,18 @@ main(void)
 
 	if (bind(fd, sa, *len))
 		perror_msg_and_skip("bind");
-	printf("bind(%d<NETLINK:[%lu]>, {sa_family=AF_NETLINK, pid=%u, "
-	       "groups=00000000}, %u) = 0\n", fd, inode, magic,
-	       (unsigned) *len);
+	printf("bind(%d<NETLINK:[%lu]>, {sa_family=AF_NETLINK"
+	       ", pid=%u, groups=00000000}, %u) = 0\n",
+	       fd, inode, magic, (unsigned) *len);
 
-	assert(recvmsg(fd, mh, MSG_DONTWAIT) == -1);
-	printf("recvmsg(%d<NETLINK:[SOCK_DIAG:%u]>, %p, MSG_DONTWAIT)"
-	       " = -1 %s (%m)\n", fd, magic, mh, errno2name());
+	if (getsockname(fd, sa, len))
+		perror_msg_and_fail("getsockname");
+	printf("getsockname(%d<NETLINK:[SOCK_DIAG:%u]>, {sa_family=AF_NETLINK"
+	       ", pid=%u, groups=00000000}, [%u]) = 0\n",
+	       fd, magic, magic, (unsigned) *len);
 
-	assert(close(fd) == 0);
+	if (close(fd))
+		perror_msg_and_fail("close");
 	printf("close(%d<NETLINK:[SOCK_DIAG:%u]>) = 0\n", fd, magic);
 
 	puts("+++ exited with 0 +++");
