@@ -1264,8 +1264,8 @@ btrfs_test_ino_path_ioctls(void)
 			data->bytes_left, data->bytes_missing, data->elem_cnt,
 			data->elem_missed);
 		if (verbose) {
-			printf("[{inum=%lu, offset=0, root=5}]",
-				si.st_ino);
+			printf("[{inum=%llu, offset=0, root=5}]",
+			       (unsigned long long) si.st_ino);
 		} else
 			printf("...");
 		printf("}}) = 0\n");
