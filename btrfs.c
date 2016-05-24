@@ -254,10 +254,16 @@ btrfs_print_data_container_footer(void)
 	tprints("}");
 }
 
-static uint64_t
-data_container_record_offset(unsigned int index)
+static bool
+print_btrfs_data_container_logical_ino(struct tcb *tcp, void *elem_buf,
+				       size_t elem_size, void *data)
 {
-	return offsetof(struct btrfs_data_container, val[index]);
+	const uint64_t *const record = elem_buf;
+
+	tprintf("{inum=%" PRIu64 ", offset=%" PRIu64 ", root=%" PRIu64 "}",
+		record[0], record[1], record[2]);
+
+	return true;
 }
 
 static void
@@ -265,38 +271,37 @@ btrfs_print_logical_ino_container(struct tcb *tcp,
 				  const uint64_t inodes_addr)
 {
 	struct btrfs_data_container container;
-	uint32_t i;
-	uint32_t printed = 0;
 
 	if (umove_or_printaddr(tcp, inodes_addr, &container))
 		return;
 
 	btrfs_print_data_container_header(&container);
+
 	if (abbrev(tcp)) {
 		tprints("...");
-		btrfs_print_data_container_footer();
-		return;
-	}
-
-	tprints("[");
-
-	for (i = 0; i < container.elem_cnt; i += 3, printed++) {
-		uint64_t offset = data_container_record_offset(i);
+	} else {
+		const uint64_t val_addr =
+			inodes_addr + offsetof(typeof(container), val);
 		uint64_t record[3];
-
-		if (i)
-			tprints(", ");
-
-		if (printed > max_strlen ||
-		    umove(tcp, inodes_addr + offset, &record)) {
-			tprints("...");
-			break;
-		}
-		tprintf("{inum=%" PRIu64 ", offset=%" PRIu64
-			", root=%" PRIu64 "}", record[0], record[1], record[2]);
+		print_array(tcp, val_addr, container.elem_cnt,
+			    record, sizeof(record),
+			    umoven_or_printaddr,
+			    print_btrfs_data_container_logical_ino, 0);
 	}
-	tprints("]");
+
 	btrfs_print_data_container_footer();
+}
+
+static bool
+print_btrfs_data_container_ino_path(struct tcb *tcp, void *elem_buf,
+				       size_t elem_size, void *data)
+{
+	const uint64_t *const offset = elem_buf;
+	const uint64_t *const val_addr = data;
+
+	printpath(tcp, *val_addr + *offset);
+
+	return true;
 }
 
 static void
@@ -304,38 +309,33 @@ btrfs_print_ino_path_container(struct tcb *tcp,
 			       const uint64_t fspath_addr)
 {
 	struct btrfs_data_container container;
-	uint32_t i;
 
 	if (umove_or_printaddr(tcp, fspath_addr, &container))
 		return;
 
 	btrfs_print_data_container_header(&container);
+
 	if (abbrev(tcp)) {
 		tprints("...");
-		btrfs_print_data_container_footer();
-		return;
+	} else {
+		uint64_t val_addr =
+			fspath_addr + offsetof(typeof(container), val);
+		uint64_t offset;
+		print_array(tcp, val_addr, container.elem_cnt,
+			    &offset, sizeof(offset),
+			    umoven_or_printaddr,
+			    print_btrfs_data_container_ino_path, &val_addr);
 	}
 
-	tprints("[");
-
-	for (i = 0; i < container.elem_cnt; i++) {
-		uint64_t offset = data_container_record_offset(i);
-		uint64_t ptr;
-
-		if (i)
-			tprints(", ");
-
-		if (i > max_strlen ||
-		    umove(tcp, fspath_addr + offset, &ptr)) {
-			tprints("...");
-			break;
-		}
-
-		printpath(tcp,
-			  fspath_addr + data_container_record_offset(0) + ptr);
-	}
-	tprints("]");
 	btrfs_print_data_container_footer();
+}
+
+static bool
+print_uint64(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	tprintf("%" PRIu64, * (uint64_t *) elem_buf);
+
+	return true;
 }
 
 static void
@@ -361,23 +361,10 @@ btrfs_print_qgroup_inherit(struct tcb *tcp, const uint64_t qgi_addr)
 	if (abbrev(tcp)) {
 		tprints("...");
 	} else {
-		uint32_t i;
-
-		tprints("[");
-		for (i = 0; i < inherit.num_qgroups; i++) {
-			uint64_t offset = offsetof(typeof(inherit), qgroups[i]);
-			uint64_t record;
-			if (i)
-				tprints(", ");
-			if (i > max_strlen ||
-			    umove(tcp, qgi_addr + offset, &record)) {
-				tprints("...");
-				break;
-			}
-
-			tprintf("%" PRIu64, record);
-		}
-		tprints("]");
+		uint64_t record;
+		print_array(tcp, qgi_addr + offsetof(typeof(inherit), qgroups),
+			    inherit.num_qgroups, &record, sizeof(record),
+			    umoven_or_printaddr, print_uint64, 0);
 	}
 	tprints("}");
 }
@@ -393,6 +380,21 @@ print_key_value_internal(struct tcb *tcp, const char *name, uint64_t value)
 }
 #define print_key_value(tcp, key, name)					\
 	print_key_value_internal((tcp), #name, (key)->name)
+
+static bool
+print_btrfs_ioctl_search_header(struct tcb *tcp, void *elem_buf,
+				size_t elem_size, void *data)
+{
+	const struct btrfs_ioctl_search_header *sh = elem_buf;
+
+	tprintf("{transid=%" PRI__u64 ", objectid=", sh->transid);
+	btrfs_print_objectid(sh->objectid);
+	tprintf(", offset=%" PRI__u64 ", type=", sh->offset);
+	btrfs_print_key_type(sh->type);
+	tprintf(", len=%u}", sh->len);
+
+	return true;
+}
 
 static void
 btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
@@ -427,40 +429,47 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 		if (print_size)
 			tprintf(", buf_size=%" PRIu64, buf_size);
 		tprints("}");
-		return;
-	}
-	tprintf("{key={nr_items=%u}", key->nr_items);
-	if (print_size)
-		tprintf(", buf_size=%" PRIu64, buf_size);
-	tprints(", buf=");
-	if (abbrev(tcp))
-		tprints("...");
-	else {
-		uint64_t i;
-		uint64_t off = 0;
-		tprints("[");
-		for (i = 0; i < key->nr_items; i++) {
+	} else {
+		tprintf("{key={nr_items=%u}", key->nr_items);
+		if (print_size)
+			tprintf(", buf_size=%" PRIu64, buf_size);
+		tprints(", buf=");
+		if (abbrev(tcp))
+			tprints("...");
+		else {
 			struct btrfs_ioctl_search_header sh;
-			uint64_t addr = buf_addr + off;
-			if (i)
-				tprints(", ");
-			if (i > max_strlen ||
-			    umove(tcp, addr, &sh)) {
-				tprints("...");
-				break;
-			}
-			tprintf("{transid=%" PRI__u64 ", objectid=",
-				sh.transid);
-			btrfs_print_objectid(sh.objectid);
-			tprintf(", offset=%" PRI__u64 ", type=", sh.offset);
-			btrfs_print_key_type(sh.type);
-			tprintf(", len=%u}", sh.len);
-			off += sizeof(sh) + sh.len;
-		}
-		tprints("]");
-	}
 
-	tprints("}");
+			print_array(tcp, buf_addr, key->nr_items,
+				    &sh, sizeof(sh),
+				    umoven_or_printaddr,
+				    print_btrfs_ioctl_search_header, 0);
+		}
+		tprints("}");
+	}
+}
+
+static bool
+print_objectid_callback(struct tcb *tcp, void *elem_buf,
+			size_t elem_size, void *data)
+{
+	btrfs_print_objectid(* (uint64_t *) elem_buf);
+
+	return true;
+}
+
+static bool
+print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
+			     size_t elem_size, void *data)
+{
+	const struct btrfs_ioctl_space_info *info = elem_buf;
+
+	tprints("{flags=");
+	printflags64(btrfs_space_info_flags, info->flags,
+		     "BTRFS_SPACE_INFO_???");
+	tprintf(", total_bytes=%" PRI__u64 ", used_bytes=%" PRI__u64 "}",
+		info->total_bytes, info->used_bytes);
+
+	return true;
 }
 
 int
@@ -1178,8 +1187,6 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	case BTRFS_IOC_SEND: { /* W */
 		struct btrfs_ioctl_send_args args;
-		uint64_t base_addr;
-		uint64_t i;
 
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &args))
@@ -1189,24 +1196,15 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			", clone_sources=", args.send_fd,
 			args.clone_sources_count);
 
-		if (abbrev(tcp)) {
+		if (abbrev(tcp))
 			tprints("...");
-		} else {
-			tprints("[");
-			base_addr = (unsigned long)args.clone_sources;
-			for (i = 0; i < args.clone_sources_count; i++) {
-				uint64_t offset = sizeof(uint64_t) * i;
-				uint64_t record;
-				if (i)
-					tprints(", ");
-				if (i > max_strlen ||
-				    umove(tcp, base_addr + offset, &record)) {
-					tprints("...");
-					break;
-				}
-				btrfs_print_objectid(record);
-			}
-			tprints("]");
+		else {
+			uint64_t record;
+			print_array(tcp, (unsigned long) args.clone_sources,
+				    args.clone_sources_count,
+				    &record, sizeof(record),
+				    umoven_or_printaddr,
+				    print_objectid_callback, 0);
 		}
 		tprints(", parent_root=");
 		btrfs_print_objectid(args.parent_root);
@@ -1219,7 +1217,6 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	case BTRFS_IOC_SPACE_INFO: { /* RW */
 		struct btrfs_ioctl_space_args args;
-		uint64_t i;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -1246,33 +1243,16 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 		tprints(", spaces=");
 
-		if (abbrev(tcp)) {
-			tprints("...}");
-			break;
-		}
-
-		tprints("[");
-
-		for (i = 0; i < args.total_spaces; i++) {
+		if (abbrev(tcp))
+			tprints("...");
+		else {
 			struct btrfs_ioctl_space_info info;
-			uint64_t off = offsetof(typeof(args), spaces[i]);
-			if (i)
-				tprints(", ");
-
-			if (i > max_strlen ||
-			    umove(tcp, arg + off, &info)) {
-				tprints("...");
-				break;
-			}
-
-			tprints("{flags=");
-			printflags64(btrfs_space_info_flags, info.flags,
-				     "BTRFS_SPACE_INFO_???");
-			tprintf(", total_bytes=%" PRI__u64
-			        ", used_bytes=%" PRI__u64 "}",
-				info.total_bytes, info.used_bytes);
+			print_array(tcp, arg + offsetof(typeof(args), spaces),
+				    args.total_spaces,
+				    &info, sizeof(info), umoven_or_printaddr,
+				    print_btrfs_ioctl_space_info, 0);
 		}
-		tprints("]}");
+		tprints("}");
 		break;
 	}
 
