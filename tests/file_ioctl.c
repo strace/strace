@@ -1,11 +1,13 @@
-#include <stdio.h>
-#include <sys/ioctl.h>
-#include <linux/fiemap.h>
-#include <linux/fs.h>
 #include "tests.h"
-#include "xlat.h"
 
-#include "xlat/fiemap_flags.h"
+#ifdef HAVE_LINUX_FIEMAP_H
+
+# include <stdio.h>
+# include <sys/ioctl.h>
+# include <linux/fiemap.h>
+# include <linux/fs.h>
+# include "xlat.h"
+# include "xlat/fiemap_flags.h"
 
 static void
 test_fiemap(void)
@@ -31,3 +33,9 @@ main(int argc, char *argv[])
 
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_LINUX_FIEMAP_H")
+
+#endif
