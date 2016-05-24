@@ -54,6 +54,12 @@
 # define BTRFS_NAME_LEN 255
 #endif
 
+/*
+ * Prior to Linux 3.12, the BTRFS_IOC_DEFAULT_SUBVOL used u64 in
+ * its definition, which isn't exported by the kernel.
+ */
+typedef __u64 u64;
+
 static const char *btrfs_test_root;
 static int btrfs_test_dir_fd;
 static bool verbose = false;
