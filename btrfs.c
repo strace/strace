@@ -26,15 +26,35 @@
  */
 
 #include "defs.h"
-#include <linux/fs.h>
+
 #ifdef HAVE_LINUX_BTRFS_H
+
+#include DEF_MPERS_TYPE(struct_btrfs_ioctl_dev_replace_args)
+#include DEF_MPERS_TYPE(struct_btrfs_ioctl_send_args)
+#include DEF_MPERS_TYPE(struct_btrfs_ioctl_received_subvol_args)
+
+# include <linux/btrfs.h>
+
+typedef struct btrfs_ioctl_dev_replace_args
+	struct_btrfs_ioctl_dev_replace_args;
+typedef struct btrfs_ioctl_send_args
+	struct_btrfs_ioctl_send_args;
+typedef struct btrfs_ioctl_received_subvol_args
+	struct_btrfs_ioctl_received_subvol_args;
+
+#endif /* HAVE_LINUX_BTRFS_H */
+
+#include MPERS_DEFS
+
+#ifdef HAVE_LINUX_BTRFS_H
+
+#include <linux/fs.h>
+
 /*
  * Prior to Linux 3.12, the BTRFS_IOC_DEFAULT_SUBVOL used u64 in
  * its definition, which isn't exported by the kernel.
  */
 typedef __u64 u64;
-
-#include <linux/btrfs.h>
 
 #ifndef HAVE_STRUCT_BTRFS_IOCTL_FEATURE_FLAGS_COMPAT_FLAGS
 struct btrfs_ioctl_feature_flags {
@@ -472,8 +492,8 @@ print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
 	return true;
 }
 
-int
-btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, btrfs_ioctl,
+		   struct tcb *tcp, const unsigned int code, const long arg)
 {
 	switch (code) {
 	/* Take no arguments; command only. */
@@ -618,7 +638,7 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	}
 
 	case BTRFS_IOC_DEV_REPLACE: { /* RW */
-		struct btrfs_ioctl_dev_replace_args args;
+		struct_btrfs_ioctl_dev_replace_args args;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -636,11 +656,11 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 				    "BTRFS_IOCTL_DEV_REPLACE_CMD_???");
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
 				const char *str;
-				tprintf(", start={srcdevid=%" PRI__u64
-				   ", cont_reading_from_srcdev_mode=%" PRI__u64
+				tprintf(", start={srcdevid=%" PRIu64
+				   ", cont_reading_from_srcdev_mode=%" PRIu64
 				   ", srcdev_name=",
-				   args.start.srcdevid,
-				   args.start.cont_reading_from_srcdev_mode);
+				   (uint64_t) args.start.srcdevid,
+				   (uint64_t) args.start.cont_reading_from_srcdev_mode);
 
 				str = (const char*) args.start.srcdev_name;
 				print_quoted_string(str,
@@ -668,12 +688,12 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			printxval64(btrfs_dev_replace_state,
 				   args.status.replace_state,
 				   "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
-			tprintf(", progress_1000=%" PRI__u64 " /* ",
-				args.status.progress_1000);
+			tprintf(", progress_1000=%" PRIu64 " /* ",
+				(uint64_t) args.status.progress_1000);
 			if (args.status.progress_1000 <= 1000)
-				tprintf("%" PRI__u64 ".%.2" PRI__u64 "%%",
-					args.status.progress_1000 / 10,
-					args.status.progress_1000 % 10);
+				tprintf("%" PRIu64 ".%.2" PRIu64 "%%",
+					(uint64_t) args.status.progress_1000 / 10,
+					(uint64_t) args.status.progress_1000 % 10);
 			else
 				tprints("???");
 			tprints(" */ ,");
@@ -681,19 +701,19 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			time = args.status.time_started;
 			strftime(buf, sizeof(buf), "%T",
 				 localtime(&time));
-			tprintf("time_started=%" PRI__u64" /* %s */, ",
-				args.status.time_started, buf);
+			tprintf("time_started=%" PRIu64" /* %s */, ",
+				(uint64_t) args.status.time_started, buf);
 
 			time = args.status.time_stopped;
 			strftime(buf, sizeof(buf), "%T",
 				 localtime(&time));
-			tprintf("time_stopped=%" PRI__u64" /* %s */, ",
-				args.status.time_stopped, buf);
+			tprintf("time_stopped=%" PRIu64" /* %s */, ",
+				(uint64_t) args.status.time_stopped, buf);
 
-			tprintf("num_write_errors=%" PRI__u64
-				", num_uncorrectable_read_errors=%" PRI__u64,
-				args.status.num_write_errors,
-				args.status.num_uncorrectable_read_errors);
+			tprintf("num_write_errors=%" PRIu64
+				", num_uncorrectable_read_errors=%" PRIu64,
+				(uint64_t) args.status.num_write_errors,
+				(uint64_t) args.status.num_uncorrectable_read_errors);
 		}
 		tprints("}");
 		break;
@@ -1023,11 +1043,7 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	}
 
 	case BTRFS_IOC_SET_RECEIVED_SUBVOL: { /* RW */
-#ifdef BTRFS_IOC_SET_RECEIVED_SUBVOL_32
-	case BTRFS_IOC_SET_RECEIVED_SUBVOL_32: { /* RW */
-		struct btrfs_ioctl_received_subvol_args_32 args32;
-#endif
-		struct btrfs_ioctl_received_subvol_args args;
+		struct_btrfs_ioctl_received_subvol_args args;
 		char uuid[UUID_STRING_SIZE+1];
 
 		if (entering(tcp))
@@ -1037,37 +1053,21 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		else
 			tprints(" => ");
 
-#ifdef BTRFS_IOC_SET_RECEIVED_SUBVOL_32
-		/*
-		 * This is a compat ioctl for 32 bit tools on
-		 * 64 bit systems.
-		 */
-		if (code == BTRFS_IOC_SET_RECEIVED_SUBVOL_32) {
-			if (umove_or_printaddr(tcp, arg, &args32))
-				break;
-			memcpy(args.uuid, args32.uuid, sizeof(uuid));
-			args.stransid = args32.stransid;
-			args.rtransid = args32.rtransid;
-			args.stime.sec = args32.stime.sec;
-			args.stime.nsec = args32.stime.nsec;
-			args.rtime.sec = args32.rtime.sec;
-			args.rtime.nsec = args32.rtime.nsec;
-			args.flags = args32.flags;
-		} else
-#endif
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
 		if (entering(tcp)) {
 			btrfs_unparse_uuid((unsigned char *)args.uuid, uuid);
-			tprintf("{uuid=%s, stransid=%" PRI__u64
-				", stime=%" PRI__u64 ".%u, flags=%" PRI__u64
-				"}", uuid, args.stransid, args.stime.sec,
-				args.stime.nsec, args.flags);
+			tprintf("{uuid=%s, stransid=%" PRIu64
+				", stime=%" PRIu64 ".%u, flags=%" PRIu64
+				"}", uuid, (uint64_t) args.stransid,
+				(uint64_t) args.stime.sec, args.stime.nsec,
+				(uint64_t) args.flags);
 			return 0;
 		}
-		tprintf("{rtransid=%" PRI__u64 ", rtime=%" PRI__u64 ".%u}",
-			args.rtransid, args.rtime.sec, args.rtime.nsec);
+		tprintf("{rtransid=%" PRIu64 ", rtime=%" PRIu64 ".%u}",
+			(uint64_t) args.rtransid, (uint64_t) args.rtime.sec,
+			args.rtime.nsec);
 		break;
 	}
 
@@ -1186,15 +1186,15 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	}
 
 	case BTRFS_IOC_SEND: { /* W */
-		struct btrfs_ioctl_send_args args;
+		struct_btrfs_ioctl_send_args args;
 
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{send_fd=%" PRI__d64 ", clone_sources_count=%" PRI__u64
-			", clone_sources=", args.send_fd,
-			args.clone_sources_count);
+		tprintf("{send_fd=%" PRId64 ", clone_sources_count=%" PRIu64
+			", clone_sources=",
+			(uint64_t) args.send_fd, (uint64_t) args.clone_sources_count);
 
 		if (abbrev(tcp))
 			tprints("...");
