@@ -75,6 +75,44 @@ struct file_dedupe_range {
 };
 #endif
 
+static bool
+print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
+			     size_t elem_size, void *data)
+{
+	const struct file_dedupe_range_info *info = elem_buf;
+
+	if (entering(tcp)) {
+		tprintf("{dest_fd=%" PRIi64
+			", dest_offset=%" PRIu64 "}",
+			(int64_t) info->dest_fd,
+			(uint64_t) info->dest_offset);
+	} else {
+		tprintf("{bytes_deduped=%" PRIu64 ", status=%d}",
+			(uint64_t) info->bytes_deduped, info->status);
+	}
+
+	return true;
+}
+
+#ifdef HAVE_LINUX_FIEMAP_H
+static bool
+print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	const struct fiemap_extent *fe = elem_buf;
+
+	tprintf("{fe_logical=%" PRI__u64
+		", fe_physical=%" PRI__u64
+		", fe_length=%" PRI__u64 ", ",
+		fe->fe_logical, fe->fe_physical, fe->fe_length);
+
+	printflags64(fiemap_extent_flags, fe->fe_flags,
+		     "FIEMAP_EXTENT_???");
+	tprints("}");
+
+	return true;
+}
+#endif /* HAVE_LINUX_FIEMAP_H */
+
 int
 file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
@@ -103,8 +141,6 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	case FIDEDUPERANGE: { /* RW */
 		struct file_dedupe_range args;
-		uint64_t info_addr;
-		uint16_t i;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -116,56 +152,40 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
+		tprints("{");
 		if (entering(tcp)) {
-			tprintf("{src_offset=%" PRIu64 ", "
-				"src_length=%" PRIu64 ", "
-				"dest_count=%hu, info=",
-				(uint64_t)args.src_offset,
-				(uint64_t)args.src_length,
-				(uint16_t)args.dest_count);
-		} else
-			tprints("{info=");
-
-		if (abbrev(tcp)) {
-			tprints("...}");
-		} else {
-			tprints("[");
-			info_addr = arg + offsetof(typeof(args), info);
-			for (i = 0; i < args.dest_count; i++) {
-				struct file_dedupe_range_info info;
-				uint64_t addr = info_addr + sizeof(info) * i;
-				if (i)
-					tprints(", ");
-
-				if (umoven(tcp, addr, sizeof(info), &info)) {
-					tprints("...");
-					break;
-				}
-
-				if (entering(tcp))
-					tprintf("{dest_fd=%" PRIi64 ", "
-						"dest_offset=%" PRIu64 "}",
-						(int64_t)info.dest_fd,
-						(uint64_t)info.dest_offset);
-				else {
-					tprintf("{bytes_deduped=%" PRIu64 ", "
-						"status=%d}",
-						(uint64_t)info.bytes_deduped,
-						info.status);
-				}
-			}
-			tprints("]}");
+			tprintf("src_offset=%" PRIu64
+				", src_length=%" PRIu64
+				", dest_count=%hu, ",
+				(uint64_t) args.src_offset,
+				(uint64_t) args.src_length,
+				(uint16_t) args.dest_count);
 		}
-		if (entering(tcp))
-			return 0;
-		break;
+
+		bool rc = false;
+		tprints("info=");
+		if (abbrev(tcp)) {
+			tprints("...");
+		} else {
+			struct file_dedupe_range_info info;
+			rc = print_array(tcp,
+					 arg + offsetof(typeof(args), info),
+					 args.dest_count,
+					 &info, sizeof(info),
+					 umoven_or_printaddr,
+					 print_file_dedupe_range_info, 0);
+		}
+
+		tprints("}");
+		if (!rc || exiting(tcp))
+			break;
+
+		return 0;
 	}
 
 #ifdef HAVE_LINUX_FIEMAP_H
 	case FS_IOC_FIEMAP: {
 		struct fiemap args;
-		struct fiemap_extent fe;
-		unsigned int i;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -195,33 +215,17 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			args.fm_mapped_extents);
 		tprints(", fm_extents=");
 		if (abbrev(tcp)) {
-			tprints("...}");
-			break;
+			tprints("...");
+		} else {
+			struct fiemap_extent fe;
+			print_array(tcp,
+				    arg + offsetof(typeof(args), fm_extents),
+				    args.fm_mapped_extents, &fe, sizeof(fe),
+				    umoven_or_printaddr,
+				    print_fiemap_extent, 0);
 		}
+		tprints("}");
 
-		tprints("[");
-		for (i = 0; i < args.fm_mapped_extents; i++) {
-			unsigned long offset;
-			offset = offsetof(typeof(args), fm_extents[i]);
-			if (i)
-				tprints(", ");
-
-			if (i > max_strlen ||
-			    umoven(tcp, arg + offset, sizeof(fe), &fe)) {
-				tprints("...");
-				break;
-			}
-
-			tprintf("{fe_logical=%" PRI__u64
-				", fe_physical=%" PRI__u64
-				", fe_length=%" PRI__u64 ", ",
-				fe.fe_logical, fe.fe_physical, fe.fe_length);
-
-			printflags64(fiemap_extent_flags, fe.fe_flags,
-				     "FIEMAP_EXTENT_???");
-			tprints("}");
-		}
-		tprints("]}");
 		break;
 	}
 #endif /* HAVE_LINUX_FIEMAP_H */
