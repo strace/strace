@@ -55,10 +55,6 @@ struct btrfs_ioctl_defrag_range_args {
 };
 #endif
 
-#ifndef BTRFS_SUBVOL_NAME_MAX
-# define BTRFS_SUBVOL_NAME_MAX 4039
-#endif
-
 #ifndef BTRFS_LABEL_SIZE
 # define BTRFS_LABEL_SIZE 256
 #endif
@@ -1326,11 +1322,9 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 				btrfs_print_qgroup_inherit(tcp,
 					(unsigned long)args.qgroup_inherit);
-
 			}
 			tprintf(", name=");
-			print_quoted_string(args.name,
-					    BTRFS_SUBVOL_NAME_MAX + 1,
+			print_quoted_string(args.name, sizeof(args.name),
 					    QUOTE_0_TERMINATED);
 			tprints("}");
 			return 0;
