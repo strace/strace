@@ -860,11 +860,11 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 		tprints("{");
 		if (tcp->auxstr) {
+			tcp->auxstr = NULL;
 			tprints("treeid=");
 			btrfs_print_objectid(args.treeid);
 			tprints(", ");
 		}
-		tcp->auxstr = NULL;
 
 		tprints("name=");
 		print_quoted_string(args.name, sizeof(args.name),
