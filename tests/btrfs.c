@@ -1,3 +1,7 @@
+#include "tests.h"
+
+#ifdef HAVE_LINUX_BTRFS_H
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -16,9 +20,6 @@
 #include <linux/fs.h>
 #include <linux/btrfs.h>
 #include <linux/magic.h>
-#include <linux/fiemap.h>
-#include "config.h"
-#include "tests.h"
 #include "xlat.h"
 
 #include "xlat/btrfs_balance_args.h"
@@ -40,8 +41,11 @@
 #include "xlat/btrfs_features_incompat.h"
 #include "xlat/btrfs_key_types.h"
 
-#include "xlat/fiemap_flags.h"
-#include "xlat/fiemap_extent_flags.h"
+#ifdef HAVE_LINUX_FIEMAP_H
+# include <linux/fiemap.h>
+# include "xlat/fiemap_flags.h"
+# include "xlat/fiemap_extent_flags.h"
+#endif
 
 #ifndef BTRFS_LABEL_SIZE
 #define BTRFS_LABEL_SIZE 256
@@ -1155,6 +1159,7 @@ btrfs_test_ino_path_ioctls(void)
 	       ", size=%" PRI__u64", inodes=0x%" PRI__x64
 	       "}) = -1 EBADF (%m)\n", args.inum, args.size, args.fspath);
 
+#ifdef HAVE_LINUX_FIEMAP_H
 	if (btrfs_test_root) {
 		int size;
 		struct stat si;
@@ -1262,6 +1267,7 @@ btrfs_test_ino_path_ioctls(void)
 		close(fd);
 		free(fiemap);
 	}
+#endif /* HAVE_LINUX_FIEMAP_H */
 }
 
 /*
@@ -1849,3 +1855,9 @@ main(int argc, char *argv[])
 
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_LINUX_BTRFS_H")
+
+#endif
