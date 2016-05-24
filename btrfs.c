@@ -56,29 +56,29 @@ struct btrfs_ioctl_defrag_range_args {
 #endif
 
 #ifndef BTRFS_SUBVOL_NAME_MAX
-#define BTRFS_SUBVOL_NAME_MAX 4039
+# define BTRFS_SUBVOL_NAME_MAX 4039
 #endif
 
 #ifndef BTRFS_LABEL_SIZE
-#define BTRFS_LABEL_SIZE 256
+# define BTRFS_LABEL_SIZE 256
 #endif
 
 #ifndef BTRFS_FIRST_FREE_OBJECTID
-#define BTRFS_FIRST_FREE_OBJECTID 256ULL
+# define BTRFS_FIRST_FREE_OBJECTID 256ULL
 #endif
 
 #ifndef BTRFS_IOC_GET_FEATURES
-#define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
-                                   struct btrfs_ioctl_feature_flags)
-#define BTRFS_IOC_SET_FEATURES _IOW(BTRFS_IOCTL_MAGIC, 57, \
-                                   struct btrfs_ioctl_feature_flags[2])
-#define BTRFS_IOC_GET_SUPPORTED_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
-                                   struct btrfs_ioctl_feature_flags[3])
+# define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
+					struct btrfs_ioctl_feature_flags)
+# define BTRFS_IOC_SET_FEATURES _IOW(BTRFS_IOCTL_MAGIC, 57, \
+					struct btrfs_ioctl_feature_flags[2])
+# define BTRFS_IOC_GET_SUPPORTED_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
+					struct btrfs_ioctl_feature_flags[3])
 #endif
 
 #ifndef BTRFS_IOC_TREE_SEARCH_V2
-#define BTRFS_IOC_TREE_SEARCH_V2 _IOWR(BTRFS_IOCTL_MAGIC, 17, \
-                                           struct btrfs_ioctl_search_args_v2)
+# define BTRFS_IOC_TREE_SEARCH_V2 _IOWR(BTRFS_IOCTL_MAGIC, 17, \
+					struct btrfs_ioctl_search_args_v2)
 struct btrfs_ioctl_search_args_v2 {
 	struct btrfs_ioctl_search_key key; /* in/out - search parameters */
 	uint64_t buf_size;		   /* in - size of buffer
@@ -246,8 +246,8 @@ btrfs_print_objectid(uint64_t objectid)
 static void
 btrfs_print_data_container_header(struct btrfs_data_container *container)
 {
-	tprintf("{bytes_left=%u, bytes_missing=%u, "
-		"elem_cnt=%u, elem_missed=%u, val=",
+	tprintf("{bytes_left=%u, bytes_missing=%u"
+		", elem_cnt=%u, elem_missed=%u, val=",
 		container->bytes_left, container->bytes_missing,
 		container->elem_cnt, container->elem_missed);
 }
@@ -606,8 +606,8 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		}
 		if (valid)
 			tprintf("uuid=%s, ", uuid);
-		tprintf("bytes_used=%" PRI__u64 ", "
-			"total_bytes=%" PRI__u64 ", path=",
+		tprintf("bytes_used=%" PRI__u64
+			", total_bytes=%" PRI__u64 ", path=",
 			args.bytes_used, args.total_bytes);
 		print_quoted_string((const char *)args.path, sizeof(args.path),
 				    QUOTE_0_TERMINATED);
@@ -634,8 +634,8 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 				   btrfs_dev_replace_cmds, NULL);
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
 				const char *str;
-				tprintf(", start={srcdevid=%" PRI__u64 ", "
-				   "cont_reading_from_srcdev_mode=%" PRI__u64
+				tprintf(", start={srcdevid=%" PRI__u64
+				   ", cont_reading_from_srcdev_mode=%" PRI__u64
 				   ", srcdev_name=",
 				   args.start.srcdevid,
 				   args.start.cont_reading_from_srcdev_mode);
@@ -688,8 +688,8 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			tprintf("time_stopped=%" PRI__u64" /* %s */, ",
 				args.status.time_stopped, buf);
 
-			tprintf("num_write_errors=%" PRI__u64 ", "
-				"num_uncorrectable_read_errors=%" PRI__u64,
+			tprintf("num_write_errors=%" PRI__u64
+				", num_uncorrectable_read_errors=%" PRI__u64,
 				args.status.num_write_errors,
 				args.status.num_uncorrectable_read_errors);
 		}
@@ -776,9 +776,9 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		btrfs_unparse_uuid(args.fsid, uuid);
 
 		tprints("{");
-		tprintf("max_id=%" PRI__u64 ", num_devices=%" PRI__u64 ", "
-			"fsid=%s, nodesize=%u, sectorsize=%u, "
-			"clone_alignment=%u",
+		tprintf("max_id=%" PRI__u64 ", num_devices=%" PRI__u64
+			", fsid=%s, nodesize=%u, sectorsize=%u"
+			", clone_alignment=%u",
 			args.max_id, args.num_devices, uuid,
 			nodesize, sectorsize, clone_alignment);
 		tprints("}");
@@ -1094,21 +1094,21 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			tprints("}");
 			return 0;
 		}
-		tprintf("{data_extents_scrubbed=%" PRI__u64 ", "
-			"tree_extents_scrubbed=%" PRI__u64 ", "
-			"data_bytes_scrubbed=%" PRI__u64 ", "
-			"tree_bytes_scrubbed=%" PRI__u64 ", "
-			"read_errors=%" PRI__u64 ", "
-			"csum_errors=%" PRI__u64 ", "
-			"verify_errors=%" PRI__u64 ", "
-			"no_csum=%" PRI__u64 ", "
-			"csum_discards=%" PRI__u64 ", "
-			"super_errors=%" PRI__u64 ", "
-			"malloc_errors=%" PRI__u64 ", "
-			"uncorrectable_errors=%" PRI__u64 ", "
-			"corrected_errors=%" PRI__u64 ", "
-			"last_physical=%" PRI__u64 ", "
-			"unverified_errors=%" PRI__u64 "}",
+		tprintf("{data_extents_scrubbed=%" PRI__u64
+			", tree_extents_scrubbed=%" PRI__u64
+			", data_bytes_scrubbed=%" PRI__u64
+			", tree_bytes_scrubbed=%" PRI__u64
+			", read_errors=%" PRI__u64
+			", csum_errors=%" PRI__u64
+			", verify_errors=%" PRI__u64
+			", no_csum=%" PRI__u64
+			", csum_discards=%" PRI__u64
+			", super_errors=%" PRI__u64
+			", malloc_errors=%" PRI__u64
+			", uncorrectable_errors=%" PRI__u64
+			", corrected_errors=%" PRI__u64
+			", last_physical=%" PRI__u64
+			", unverified_errors=%" PRI__u64 "}",
 			args.progress.data_extents_scrubbed,
 			args.progress.tree_extents_scrubbed,
 			args.progress.data_bytes_scrubbed,
@@ -1236,8 +1236,7 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 		tprints("{");
 		if (entering(tcp)) {
-			tprintf("space_slots=%" PRI__u64 "}",
-				args.space_slots);
+			tprintf("space_slots=%" PRI__u64 "}", args.space_slots);
 			return 0;
 		}
 
