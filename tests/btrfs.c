@@ -658,7 +658,8 @@ btrfs_test_clone_ioctls(void)
 
 	ioctl(-1, BTRFS_IOC_CLONE_RANGE, &args);
 	printf("ioctl(-1, BTRFS_IOC_CLONE_RANGE or FICLONERANGE, "
-	       "{src_fd=%d, src_offset=%llu, src_length=%llu, dest_offset=%llu}) = -1 EBADF (%m)\n",
+	       "{src_fd=%d, src_offset=%" PRI__u64 ", src_length=%" PRI__u64
+	       ", dest_offset=%" PRI__u64 "}) = -1 EBADF (%m)\n",
 		(int) args.src_fd, args.src_offset, args.src_length,
 		args.dest_offset);
 }
