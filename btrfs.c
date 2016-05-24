@@ -271,8 +271,7 @@ btrfs_print_logical_ino_container(struct tcb *tcp, uint64_t inodes_addr)
 	uint32_t i;
 	uint32_t printed = 0;
 
-	if (umoven_or_printaddr(tcp, inodes_addr,
-				sizeof(container), &container))
+	if (umove_or_printaddr(tcp, inodes_addr, &container))
 		return;
 
 	btrfs_print_data_container_header(&container);
@@ -292,7 +291,7 @@ btrfs_print_logical_ino_container(struct tcb *tcp, uint64_t inodes_addr)
 			tprints(", ");
 
 		if (printed > max_strlen ||
-		    umoven(tcp, inodes_addr + offset, sizeof(record), record)) {
+		    umove(tcp, inodes_addr + offset, &record)) {
 			tprints("...");
 			break;
 		}
@@ -309,8 +308,7 @@ btrfs_print_ino_path_container(struct tcb *tcp, uint64_t fspath_addr)
 	struct btrfs_data_container container;
 	uint32_t i;
 
-	if (umoven_or_printaddr(tcp, fspath_addr,
-				sizeof(container), &container))
+	if (umove_or_printaddr(tcp, fspath_addr, &container))
 		return;
 
 	btrfs_print_data_container_header(&container);
@@ -330,7 +328,7 @@ btrfs_print_ino_path_container(struct tcb *tcp, uint64_t fspath_addr)
 			tprints(", ");
 
 		if (i > max_strlen ||
-		    umoven(tcp, fspath_addr + offset, sizeof(ptr), &ptr)) {
+		    umove(tcp, fspath_addr + offset, &ptr)) {
 			tprints("...");
 			break;
 		}
@@ -347,7 +345,7 @@ btrfs_print_qgroup_inherit(struct tcb *tcp, uint64_t qgi_addr)
 {
 	struct btrfs_qgroup_inherit inherit;
 
-	if (umoven_or_printaddr(tcp, qgi_addr, sizeof(inherit), &inherit) < 0)
+	if (umove_or_printaddr(tcp, qgi_addr, &inherit))
 		return;
 
 	tprintf("{flags=");
@@ -374,8 +372,7 @@ btrfs_print_qgroup_inherit(struct tcb *tcp, uint64_t qgi_addr)
 			if (i)
 				tprints(", ");
 			if (i > max_strlen ||
-			    umoven(tcp, qgi_addr + offset,
-				   sizeof(record), &record)) {
+			    umove(tcp, qgi_addr + offset, &record)) {
 				tprints("...");
 				break;
 			}
@@ -450,7 +447,7 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 			if (i)
 				tprints(", ");
 			if (i > max_strlen ||
-			    umoven(tcp, addr, sizeof(sh), &sh)) {
+			    umove(tcp, addr, &sh)) {
 				tprints("...");
 				break;
 			}
@@ -1206,8 +1203,7 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 				if (i)
 					tprints(", ");
 				if (i > max_strlen ||
-				    umoven(tcp, base_addr + offset,
-					   sizeof(record), &record)) {
+				    umove(tcp, base_addr + offset, &record)) {
 					tprints("...");
 					break;
 				}
@@ -1267,7 +1263,7 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 				tprints(", ");
 
 			if (i > max_strlen ||
-			    umoven(tcp, arg + off, sizeof(info), &info)) {
+			    umove(tcp, arg + off, &info)) {
 				tprints("...");
 				break;
 			}
@@ -1347,7 +1343,7 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			return 0;
 
 		tprints(", ");
-		if (umoven_or_printaddr(tcp, arg, sizeof(label), label))
+		if (umove_or_printaddr(tcp, arg, &label))
 			break;
 		print_quoted_string(label, sizeof(label), QUOTE_0_TERMINATED);
 		break;
