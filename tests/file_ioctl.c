@@ -12,13 +12,15 @@
 static void
 test_fiemap(void)
 {
-	struct fiemap args = {};
+	(void) tail_alloc(1);
+	struct fiemap *const args = tail_alloc(sizeof(*args));
+
 	printf("ioctl(-1, FS_IOC_FIEMAP, {fm_start=%" PRI__u64
 	       ", fm_length=%" PRI__u64", fm_flags=",
-	       args.fm_start, args.fm_length);
-	printflags(fiemap_flags, args.fm_flags, "FIEMAP_FLAG_???");
-	printf(", fm_extent_count=%u})", args.fm_extent_count);
-	ioctl(-1, FS_IOC_FIEMAP, &args);
+	       args->fm_start, args->fm_length);
+	printflags(fiemap_flags, args->fm_flags, "FIEMAP_FLAG_???");
+	printf(", fm_extent_count=%u})", args->fm_extent_count);
+	ioctl(-1, FS_IOC_FIEMAP, args);
 	printf(" = -1 EBADF (%m)\n");
 }
 
