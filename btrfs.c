@@ -153,7 +153,7 @@ print_u64(const char *name, uint64_t value)
 #define print_member_u64(obj, name) print_u64(#name, obj->name)
 
 static void
-btrfs_print_balance_args(const char *name, struct btrfs_balance_args *bba)
+btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 {
 	tprintf(", %s={profiles=", name);
 	printflags64(btrfs_space_info_flags, bba->profiles,
@@ -197,7 +197,7 @@ btrfs_print_balance(struct tcb *tcp, const long arg, bool out)
 }
 
 static void
-btrfs_print_features(struct btrfs_ioctl_feature_flags *flags)
+btrfs_print_features(const struct btrfs_ioctl_feature_flags *flags)
 {
 	tprints("{compat_flags=");
 	printflags64(btrfs_features_compat, flags->compat_flags,
@@ -214,7 +214,7 @@ btrfs_print_features(struct btrfs_ioctl_feature_flags *flags)
 }
 
 static void
-btrfs_print_qgroup_limit(struct btrfs_qgroup_limit *lim)
+btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 {
 	tprints("{flags=");
 	printflags64(btrfs_qgroup_limit_flags, lim->flags,
@@ -244,7 +244,7 @@ btrfs_print_objectid(uint64_t objectid)
 }
 
 static void
-btrfs_print_data_container_header(struct btrfs_data_container *container)
+btrfs_print_data_container_header(const struct btrfs_data_container *container)
 {
 	tprintf("{bytes_left=%u, bytes_missing=%u"
 		", elem_cnt=%u, elem_missed=%u, val=",
@@ -265,7 +265,8 @@ data_container_record_offset(unsigned int index)
 }
 
 static void
-btrfs_print_logical_ino_container(struct tcb *tcp, uint64_t inodes_addr)
+btrfs_print_logical_ino_container(struct tcb *tcp,
+				  const uint64_t inodes_addr)
 {
 	struct btrfs_data_container container;
 	uint32_t i;
@@ -303,7 +304,8 @@ btrfs_print_logical_ino_container(struct tcb *tcp, uint64_t inodes_addr)
 }
 
 static void
-btrfs_print_ino_path_container(struct tcb *tcp, uint64_t fspath_addr)
+btrfs_print_ino_path_container(struct tcb *tcp,
+			       const uint64_t fspath_addr)
 {
 	struct btrfs_data_container container;
 	uint32_t i;
@@ -341,7 +343,7 @@ btrfs_print_ino_path_container(struct tcb *tcp, uint64_t fspath_addr)
 }
 
 static void
-btrfs_print_qgroup_inherit(struct tcb *tcp, uint64_t qgi_addr)
+btrfs_print_qgroup_inherit(struct tcb *tcp, const uint64_t qgi_addr)
 {
 	struct btrfs_qgroup_inherit inherit;
 
