@@ -9,6 +9,9 @@
 int
 main(void)
 {
+	if (setsid() == -1)
+		perror_msg_and_skip("setsid");
+
 	long rc = syscall(__NR_vhangup);
 	printf("vhangup() = %ld %s (%m)\n", rc, errno2name());
 
