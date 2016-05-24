@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <alloca.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -273,7 +272,6 @@ btrfs_test_subvol_ioctls(void)
 		.fd = 2,
 		.flags = max_flags_plus_one(2),
 	};
-	struct btrfs_qgroup_inherit *inherit = NULL;
 
 	long_subvol_name = malloc(BTRFS_PATH_NAME_MAX);
 	if (!long_subvol_name)
@@ -338,55 +336,53 @@ btrfs_test_subvol_ioctls(void)
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
 	printf(") = -1 EBADF (%m)\n");
 
-	vol_args_v2 = vol_args_v2;
 	printf("ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, ");
 	btrfs_print_vol_args_v2(&vol_args_v2, 1);
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
 	printf(") = -1 EBADF (%m)\n");
 
 	strcpy(vol_args_v2.name, subvol_name);
-	vol_args_v2.qgroup_inherit = (void *)bad_pointer;
+	vol_args_v2.qgroup_inherit = bad_pointer;
 
-	vol_args_v2 = vol_args_v2;
 	printf("ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, ");
 	btrfs_print_vol_args_v2(&vol_args_v2, 0);
 	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
 	printf(") = -1 EBADF (%m)\n");
 
-	vol_args_v2 = vol_args_v2;
 	printf("ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, ");
 	btrfs_print_vol_args_v2(&vol_args_v2, 0);
 	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
 	printf(") = -1 EBADF (%m)\n");
 
-	vol_args_v2.size = sizeof (*inherit) + 8*sizeof(inherit->qgroups[0]);
-	inherit = alloca(vol_args_v2.size);
-	if (inherit) {
-		int i;
-		inherit->flags = 0x3;
-		inherit->num_ref_copies = 0;
-		inherit->num_excl_copies = 0;
-		inherit->num_qgroups = 8;
-		for (i = 0; i < 8; i++)
-			inherit->qgroups[i] = 1ULL << i;
-		inherit->lim.flags = 0x7f;
-		inherit->lim.max_rfer = u64val;
-		inherit->lim.max_excl = u64val;
-		inherit->lim.rsv_rfer = u64val;
-		inherit->lim.rsv_excl = u64val;
-		vol_args_v2.qgroup_inherit = inherit;
+	const unsigned int n_qgroups = 8;
+	unsigned int i;
+	struct btrfs_qgroup_inherit *inherit;
+	vol_args_v2.size =
+		sizeof(*inherit) + n_qgroups * sizeof(inherit->qgroups[0]);
+	inherit = tail_alloc(vol_args_v2.size);
 
+	inherit->flags = 0x3;
+	inherit->num_ref_copies = 0;
+	inherit->num_excl_copies = 0;
+	inherit->num_qgroups = n_qgroups;
+	for (i = 0; i < n_qgroups; i++)
+		inherit->qgroups[i] = 1ULL << i;
+	inherit->lim.flags = 0x7f;
+	inherit->lim.max_rfer = u64val;
+	inherit->lim.max_excl = u64val;
+	inherit->lim.rsv_rfer = u64val;
+	inherit->lim.rsv_excl = u64val;
+	vol_args_v2.qgroup_inherit = inherit;
 
-		printf("ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, ");
-		btrfs_print_vol_args_v2(&vol_args_v2, 1);
-		ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
-		printf(") = -1 EBADF (%m)\n");
+	printf("ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, ");
+	btrfs_print_vol_args_v2(&vol_args_v2, 1);
+	ioctl(-1, BTRFS_IOC_SNAP_CREATE_V2, &vol_args_v2);
+	printf(") = -1 EBADF (%m)\n");
 
-		printf("ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, ");
-		btrfs_print_vol_args_v2(&vol_args_v2, 1);
-		ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
-		printf(") = -1 EBADF (%m)\n");
-	}
+	printf("ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, ");
+	btrfs_print_vol_args_v2(&vol_args_v2, 1);
+	ioctl(-1, BTRFS_IOC_SUBVOL_CREATE_V2, &vol_args_v2);
+	printf(") = -1 EBADF (%m)\n");
 
 	ioctl(-1, BTRFS_IOC_DEFAULT_SUBVOL, NULL);
 	printf("ioctl(-1, BTRFS_IOC_DEFAULT_SUBVOL, NULL) = -1 EBADF (%m)\n");
