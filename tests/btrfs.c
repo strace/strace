@@ -47,11 +47,11 @@
 #endif
 
 #ifndef BTRFS_LABEL_SIZE
-#define BTRFS_LABEL_SIZE 256
+# define BTRFS_LABEL_SIZE 256
 #endif
 
 #ifndef BTRFS_NAME_LEN
-#define BTRFS_NAME_LEN 255
+# define BTRFS_NAME_LEN 255
 #endif
 
 static const char *btrfs_test_root;
@@ -67,11 +67,11 @@ const unsigned char uuid_reference[BTRFS_UUID_SIZE] = {
 const char uuid_reference_string[] = "01234567-89ab-cdef-fedc-ba9876543210";
 
 #ifndef BTRFS_IOC_GET_FEATURES
-#define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
+# define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
                                    struct btrfs_ioctl_feature_flags)
-#define BTRFS_IOC_SET_FEATURES _IOW(BTRFS_IOCTL_MAGIC, 57, \
+# define BTRFS_IOC_SET_FEATURES _IOW(BTRFS_IOCTL_MAGIC, 57, \
                                    struct btrfs_ioctl_feature_flags[2])
-#define BTRFS_IOC_GET_SUPPORTED_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
+# define BTRFS_IOC_GET_SUPPORTED_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
                                    struct btrfs_ioctl_feature_flags[3])
 #endif
 
@@ -95,7 +95,7 @@ struct btrfs_ioctl_defrag_range_args {
 #endif
 
 #ifndef FIDEDUPERANGE
-#define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
+# define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
 struct file_dedupe_range_info {
 	int64_t dest_fd;	/* in - destination file */
 	uint64_t dest_offset;	/* in - start of extent in destination */
@@ -121,7 +121,7 @@ struct file_dedupe_range {
 #endif
 
 #ifndef BTRFS_IOC_TREE_SEARCH_V2
-#define BTRFS_IOC_TREE_SEARCH_V2 _IOWR(BTRFS_IOCTL_MAGIC, 17, \
+# define BTRFS_IOC_TREE_SEARCH_V2 _IOWR(BTRFS_IOCTL_MAGIC, 17, \
                                            struct btrfs_ioctl_search_args_v2)
 struct btrfs_ioctl_search_args_v2 {
 	struct btrfs_ioctl_search_key key; /* in/out - search parameters */
@@ -133,7 +133,8 @@ struct btrfs_ioctl_search_args_v2 {
 #endif
 
 
-static const char *maybe_print_uint64max(uint64_t val)
+static const char *
+maybe_print_uint64max(uint64_t val)
 {
 	if (val == UINT64_MAX)
 		return " /* UINT64_MAX */";
@@ -141,7 +142,8 @@ static const char *maybe_print_uint64max(uint64_t val)
 }
 
 /* takes highest valid flag bit */
-static uint64_t max_flags_plus_one(int bit)
+static uint64_t
+max_flags_plus_one(int bit)
 {
 	int i;
 	uint64_t val = 0;
