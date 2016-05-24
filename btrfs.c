@@ -1154,9 +1154,10 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			tprints(", ");
 		else if (syserror(tcp)) {
 			if (tcp->u_error == EOVERFLOW) {
+				tprints(" => ");
 				tcp->u_error = 0;
 				if (!umove_or_printaddr(tcp, arg, &args))
-					tprintf(" => {buf_size=%" PRIu64 "}",
+					tprintf("{buf_size=%" PRIu64 "}",
 						(uint64_t)args.buf_size);
 				tcp->u_error = EOVERFLOW;
 			}
