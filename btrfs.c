@@ -1333,7 +1333,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_CLONE:			/* FICLONE */
 	case BTRFS_IOC_CLONE_RANGE:		/* FICLONERANGE */
+#ifdef BTRFS_IOC_FILE_EXTENT_SAME
 	case BTRFS_IOC_FILE_EXTENT_SAME:	/* FIDEDUPERANGE */
+#endif
 		/*
 		 * FICLONE, FICLONERANGE, and FIDEDUPERANGE started out as
 		 * btrfs ioctls and the code was kept for the generic

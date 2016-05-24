@@ -1574,6 +1574,7 @@ btrfs_test_dev_replace_ioctl(void)
 static void
 btrfs_test_extent_same_ioctl(void)
 {
+#ifdef BTRFS_IOC_FILE_EXTENT_SAME
 	struct file_dedupe_range args = {
 		.src_offset = 1024,
 		.src_length = 10240,
@@ -1689,6 +1690,7 @@ btrfs_test_extent_same_ioctl(void)
 		close(fd2);
 	}
 	free(argsp);
+#endif /* BTRFS_IOC_FILE_EXTENT_SAME */
 }
 
 static void
