@@ -1799,8 +1799,8 @@ main(int argc, char *argv[])
 			perror_msg_and_fail("statfs(%s) failed", path);
 
 		if ((unsigned) sfi.f_type != BTRFS_SUPER_MAGIC)
-			perror_msg_and_fail("%s is not a btrfs file system",
-					    path);
+			error_msg_and_fail("%s is not a btrfs file system",
+					   path);
 
 		btrfs_test_root = path;
 		rootfd = open(path, O_RDONLY|O_DIRECTORY);
