@@ -1192,9 +1192,10 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{send_fd=%" PRId64 ", clone_sources_count=%" PRIu64
-			", clone_sources=",
-			(uint64_t) args.send_fd, (uint64_t) args.clone_sources_count);
+		tprints("{send_fd=");
+		printfd(tcp, args.send_fd);
+		tprintf(", clone_sources_count=%" PRIu64 ", clone_sources=",
+			(uint64_t) args.clone_sources_count);
 
 		if (abbrev(tcp))
 			tprints("...");
@@ -1270,7 +1271,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{fd=%" PRI__d64 ", name=", args.fd);
+		tprints("{fd=");
+		printfd(tcp, args.fd);
+		tprints(", name=");
 		print_quoted_string(args.name, sizeof(args.name),
 				    QUOTE_0_TERMINATED);
 		tprints("}");
@@ -1292,7 +1295,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			tprintf("{fd=%" PRI__d64 ", flags=", args.fd);
+			tprints("{fd=");
+			printfd(tcp, args.fd);
+			tprints(", flags=");
 			printflags64(btrfs_snap_flags_v2, args.flags,
 				     "BTRFS_SUBVOL_???");
 			if (args.flags & BTRFS_SUBVOL_QGROUP_INHERIT) {

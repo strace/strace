@@ -235,7 +235,7 @@ btrfs_print_qgroup_inherit(struct btrfs_qgroup_inherit *inherit)
 static void
 btrfs_print_vol_args_v2(struct btrfs_ioctl_vol_args_v2 *args, int print_qgroups)
 {
-	printf("{fd=%lld, flags=", args->fd);
+	printf("{fd=%d, flags=", (int) args->fd);
 	printflags(btrfs_snap_flags_v2, args->flags, "BTRFS_SUBVOL_???");
 
 	if (args->flags & BTRFS_SUBVOL_QGROUP_INHERIT) {
@@ -443,14 +443,14 @@ btrfs_test_subvol_ioctls(void)
 		vol_args.name[255] = 0;
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_SNAP_DESTROY, &vol_args);
 		printf("ioctl(%d, BTRFS_IOC_SNAP_DESTROY, "
-		       "{fd=%lld, name=\"%.*s\"}) = 0\n",
-		       btrfs_test_dir_fd, vol_args.fd, 255, long_subvol_name);
+		       "{fd=%d, name=\"%.*s\"}) = 0\n",
+		       btrfs_test_dir_fd, (int) vol_args.fd, 255, long_subvol_name);
 
 		strcpy(vol_args.name, subvol_name);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_SNAP_DESTROY, &vol_args);
 		printf("ioctl(%d, BTRFS_IOC_SNAP_DESTROY, "
-		       "{fd=%lld, name=\"%s\"}) = 0\n",
-		       btrfs_test_dir_fd, vol_args.fd, subvol_name);
+		       "{fd=%d, name=\"%s\"}) = 0\n",
+		       btrfs_test_dir_fd, (int) vol_args.fd, subvol_name);
 
 		close(subvolfd);
 	}
@@ -602,8 +602,8 @@ btrfs_test_device_ioctls(void)
 	strcpy(args.name, devid);
 	ioctl(-1, BTRFS_IOC_RESIZE, &args);
 	printf("ioctl(-1, BTRFS_IOC_RESIZE, "
-	       "{fd=%lld, name=\"%s\"}) = -1 EBADF (%m)\n",
-	       args.fd, args.name);
+	       "{fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	       (int) args.fd, args.name);
 
 	ioctl(-1, BTRFS_IOC_SCAN_DEV, NULL);
 	printf("ioctl(-1, BTRFS_IOC_SCAN_DEV, NULL) = -1 EBADF (%m)\n");
@@ -611,24 +611,24 @@ btrfs_test_device_ioctls(void)
 	strcpy(args.name, devname);
 	ioctl(-1, BTRFS_IOC_SCAN_DEV, &args);
 	printf("ioctl(-1, BTRFS_IOC_SCAN_DEV, "
-	       "{fd=%lld, name=\"%s\"}) = -1 EBADF (%m)\n",
-	       args.fd, args.name);
+	       "{fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	       (int) args.fd, args.name);
 
 	ioctl(-1, BTRFS_IOC_ADD_DEV, NULL);
 	printf("ioctl(-1, BTRFS_IOC_ADD_DEV, NULL) = -1 EBADF (%m)\n");
 
 	ioctl(-1, BTRFS_IOC_ADD_DEV, &args);
 	printf("ioctl(-1, BTRFS_IOC_ADD_DEV, "
-	       "{fd=%lld, name=\"%s\"}) = -1 EBADF (%m)\n",
-	       args.fd, args.name);
+	       "{fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	       (int) args.fd, args.name);
 
 	ioctl(-1, BTRFS_IOC_RM_DEV, NULL);
 	printf("ioctl(-1, BTRFS_IOC_RM_DEV, NULL) = -1 EBADF (%m)\n");
 
 	ioctl(-1, BTRFS_IOC_RM_DEV, &args);
 	printf("ioctl(-1, BTRFS_IOC_RM_DEV, "
-	       "{fd=%lld, name=\"%s\"}) = -1 EBADF (%m)\n",
-	       args.fd, args.name);
+	       "{fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	       (int) args.fd, args.name);
 
 }
 
@@ -658,8 +658,8 @@ btrfs_test_clone_ioctls(void)
 
 	ioctl(-1, BTRFS_IOC_CLONE_RANGE, &args);
 	printf("ioctl(-1, BTRFS_IOC_CLONE_RANGE or FICLONERANGE, "
-	       "{src_fd=%lld, src_offset=%llu, src_length=%llu, dest_offset=%llu}) = -1 EBADF (%m)\n",
-		args.src_fd, args.src_offset, args.src_length,
+	       "{src_fd=%d, src_offset=%llu, src_length=%llu, dest_offset=%llu}) = -1 EBADF (%m)\n",
+		(int) args.src_fd, args.src_offset, args.src_length,
 		args.dest_offset);
 }
 
@@ -1314,8 +1314,9 @@ btrfs_test_send_ioctl(void)
 	printf("ioctl(-1, BTRFS_IOC_SEND, NULL) = -1 EBADF (%m)\n");
 
 	printf("ioctl(-1, BTRFS_IOC_SEND, "
-	       "{send_fd=%lld, clone_sources_count=%" PRI__u64
-	       ", clone_sources=", args.send_fd, args.clone_sources_count);
+	       "{send_fd=%d, clone_sources_count=%" PRI__u64
+	       ", clone_sources=",
+	       (int) args.send_fd, args.clone_sources_count);
 	if (verbose)
 		printf("NULL");
 	else
@@ -1331,8 +1332,9 @@ btrfs_test_send_ioctl(void)
 	args.clone_sources = (__u64 *)u64_array;
 
 	printf("ioctl(-1, BTRFS_IOC_SEND, "
-	       "{send_fd=%lld, clone_sources_count=%" PRI__u64
-	       ", clone_sources=", args.send_fd, args.clone_sources_count);
+	       "{send_fd=%d, clone_sources_count=%" PRI__u64
+	       ", clone_sources=",
+	       (int) args.send_fd, args.clone_sources_count);
 	if (verbose) {
 		printf("[");
 		btrfs_print_objectid(u64_array[0]);
