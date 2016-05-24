@@ -1331,11 +1331,13 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		tprintf("{transid=%" PRI__u64 "}", args.transid);
 		break;
 	}
+
 	case BTRFS_IOC_GET_FSLABEL: /* R */
-	case BTRFS_IOC_SET_FSLABEL: {/* W */
-		char label[BTRFS_LABEL_SIZE];
-		if (code == BTRFS_IOC_GET_FSLABEL && entering(tcp))
+		if (entering(tcp))
 			return 0;
+		/* fall through */
+	case BTRFS_IOC_SET_FSLABEL: { /* W */
+		char label[BTRFS_LABEL_SIZE];
 
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &label))
