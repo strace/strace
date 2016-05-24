@@ -363,6 +363,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	inttypes.h
 	linux/bsg.h
 	linux/falloc.h
+	linux/fiemap.h
 	linux/filter.h
 	linux/hiddev.h
 	linux/ip_vs.h

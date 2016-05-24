@@ -28,10 +28,12 @@
 #include "defs.h"
 #include <sys/ioctl.h>
 #include <linux/fs.h>
-#include <linux/fiemap.h>
 
-#include "xlat/fiemap_flags.h"
-#include "xlat/fiemap_extent_flags.h"
+#ifdef HAVE_LINUX_FIEMAP_H
+# include <linux/fiemap.h>
+# include "xlat/fiemap_flags.h"
+# include "xlat/fiemap_extent_flags.h"
+#endif
 
 #ifndef FICLONE
 #define FICLONE         _IOW(0x94, 9, int)
@@ -159,6 +161,7 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		break;
 	}
 
+#ifdef HAVE_LINUX_FIEMAP_H
 	case FS_IOC_FIEMAP: {
 		struct fiemap args;
 		struct fiemap_extent fe;
@@ -221,6 +224,7 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		tprints("]}");
 		break;
 	}
+#endif /* HAVE_LINUX_FIEMAP_H */
 
 	default:
 		return RVAL_DECODED;
