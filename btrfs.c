@@ -782,7 +782,7 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	case BTRFS_IOC_GET_DEV_STATS: { /* RW */
 		struct btrfs_ioctl_get_dev_stats args;
-		uint64_t i, max_nr_items;
+		uint64_t i;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -812,17 +812,15 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		 * go off into the middle of nowhere with a bad nr_items
 		 * value.
 		 */
-		max_nr_items = sizeof(args) - offsetof(typeof(args), values);
-
 		tprints(", [");
 		for (i = 0; i < args.nr_items; i++) {
-			const char *name = xlookup(btrfs_dev_stats_values, i);
 			if (i)
 				tprints(", ");
-			if (i > max_nr_items) {
-				tprints("/* overflow */");
+			if (i >= ARRAY_SIZE(args.values)) {
+				tprints("...");
 				break;
 			}
+			const char *name = xlookup(btrfs_dev_stats_values, i);
 			if (name)
 				tprintf("/* %s */ ", name);
 			tprintf("%" PRI__u64, args.values[i]);
