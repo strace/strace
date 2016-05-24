@@ -2,20 +2,20 @@
 
 #ifdef HAVE_LINUX_BTRFS_H
 
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
 #include <errno.h>
-#include <inttypes.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <sys/ioctl.h>
-#include <sys/vfs.h>
-#include <sys/stat.h>
-#include <sys/fcntl.h>
 #include <fcntl.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/vfs.h>
 #include <linux/fs.h>
 #include <linux/btrfs.h>
 #include <linux/magic.h>
