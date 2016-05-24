@@ -26,7 +26,7 @@
  */
 
 #include "defs.h"
-#include <sys/ioctl.h>
+#include <linux/ioctl.h>
 #include <linux/fs.h>
 
 #ifdef HAVE_LINUX_FIEMAP_H
