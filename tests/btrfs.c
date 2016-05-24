@@ -180,7 +180,7 @@ btrfs_test_trans_ioctls(void)
 static void
 btrfs_test_sync_ioctls(void)
 {
-	uint64_t u64val = 257;
+	uint64_t u64val = 0xdeadbeefbadc0ded;
 
 	ioctl(-1, BTRFS_IOC_SYNC, NULL);
 	printf("ioctl(-1, BTRFS_IOC_SYNC) = -1 EBADF (%m)\n");
@@ -267,8 +267,8 @@ btrfs_test_subvol_ioctls(void)
 {
 	const char *subvol_name = "subvol-name";
 	char *long_subvol_name;
-	void *bad_pointer = (void *)0xdeadbeef;
-	uint64_t u64val = 0xdeadbeef;
+	void *bad_pointer = (void *) (unsigned long) 0xdeadbeeffffffeed;
+	uint64_t u64val = 0xdeadbeefbadc0ded;
 	struct btrfs_ioctl_vol_args vol_args = {};
 	struct btrfs_ioctl_vol_args_v2 vol_args_v2 = {
 		.fd = 2,
