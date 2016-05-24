@@ -471,10 +471,8 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 int
 btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
-	int ret = 0;
-
 	switch (code) {
-	/* Take no arguments; Command only. */
+	/* Take no arguments; command only. */
 	case BTRFS_IOC_TRANS_START:
 	case BTRFS_IOC_TRANS_END:
 	case BTRFS_IOC_SYNC:
@@ -1369,6 +1367,6 @@ btrfs_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	default:
 		return RVAL_DECODED;
 	};
-	return ret | RVAL_DECODED | 1;
+	return RVAL_DECODED | 1;
 }
 #endif /* HAVE_LINUX_BTRFS_H */
