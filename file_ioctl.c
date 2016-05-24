@@ -36,11 +36,11 @@
 #endif
 
 #ifndef FICLONE
-#define FICLONE         _IOW(0x94, 9, int)
+# define FICLONE         _IOW(0x94, 9, int)
 #endif
 
 #ifndef FICLONERANGE
-#define FICLONERANGE    _IOW(0x94, 13, struct file_clone_range)
+# define FICLONERANGE    _IOW(0x94, 13, struct file_clone_range)
 struct file_clone_range {
 	int64_t src_fd;
 	uint64_t src_offset;
@@ -50,7 +50,7 @@ struct file_clone_range {
 #endif
 
 #ifndef FIDEDUPERANGE
-#define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
+# define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
 struct file_dedupe_range_info {
 	int64_t dest_fd;	/* in - destination file */
 	uint64_t dest_offset;	/* in - start of extent in destination */
@@ -79,25 +79,25 @@ int
 file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
 	switch (code) {
-	/* take a signed int */
 	case FICLONE:	/* W */
-		tprintf(", %d", (int)arg);
+		tprintf(", %d", (int) arg);
 		break;
 
 	case FICLONERANGE: { /* W */
 		struct file_clone_range args;
 
 		tprints(", ");
-
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{src_fd=%" PRIi64 ", "
-			"src_offset=%" PRIu64 ", "
-			"src_length=%" PRIu64 ", "
-			"dest_offset=%" PRIu64 "}",
-			(int64_t)args.src_fd, (uint64_t)args.src_offset,
-			(uint64_t)args.src_length, (uint64_t)args.dest_offset);
+		tprintf("{src_fd=%" PRIi64
+			", src_offset=%" PRIu64
+			", src_length=%" PRIu64
+			", dest_offset=%" PRIu64 "}",
+			(int64_t) args.src_fd,
+			(uint64_t) args.src_offset,
+			(uint64_t) args.src_length,
+			(uint64_t) args.dest_offset);
 		break;
 	}
 
