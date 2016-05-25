@@ -59,7 +59,7 @@ decode_rtc_wkalrm(struct tcb *tcp, const long addr)
 	struct rtc_wkalrm wk;
 
 	if (!umove_or_printaddr(tcp, addr, &wk)) {
-		tprintf("{enabled=%d, pending=%d, ", wk.enabled, wk.pending);
+		tprintf("{enabled=%d, pending=%d, time=", wk.enabled, wk.pending);
 		print_rtc_time(tcp, &wk.time);
 		tprints("}");
 	}
