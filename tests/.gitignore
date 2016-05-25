@@ -127,6 +127,7 @@ mlockall
 mmap
 mmap64
 mmsg
+mount
 move_pages
 mq
 munlockall

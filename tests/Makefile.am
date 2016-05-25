@@ -180,6 +180,7 @@ check_PROGRAMS = \
 	mmap \
 	mmap64 \
 	mmsg \
+	mount \
 	move_pages \
 	mq \
 	munlockall \
@@ -472,6 +473,7 @@ DECODER_TESTS = \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \
+	mount.test \
 	move_pages.test \
 	mq.test \
 	munlockall.test \
