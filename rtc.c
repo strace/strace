@@ -49,7 +49,6 @@ decode_rtc_time(struct tcb *tcp, const long addr)
 {
 	struct rtc_time rt;
 
-	tprints(", ");
 	if (!umove_or_printaddr(tcp, addr, &rt))
 		print_rtc_time(tcp, &rt);
 }
@@ -59,7 +58,6 @@ decode_rtc_wkalrm(struct tcb *tcp, const long addr)
 {
 	struct rtc_wkalrm wk;
 
-	tprints(", ");
 	if (!umove_or_printaddr(tcp, addr, &wk)) {
 		tprintf("{enabled=%d, pending=%d, ", wk.enabled, wk.pending);
 		print_rtc_time(tcp, &wk.time);
@@ -71,14 +69,14 @@ int
 rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
 	switch (code) {
-	case RTC_ALM_SET:
-	case RTC_SET_TIME:
-		decode_rtc_time(tcp, arg);
-		break;
 	case RTC_ALM_READ:
 	case RTC_RD_TIME:
 		if (entering(tcp))
 			return 0;
+		/* fall through */
+	case RTC_ALM_SET:
+	case RTC_SET_TIME:
+		tprints(", ");
 		decode_rtc_time(tcp, arg);
 		break;
 	case RTC_IRQP_SET:
@@ -92,12 +90,12 @@ rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		tprints(", ");
 		printnum_ulong(tcp, arg);
 		break;
-	case RTC_WKALM_SET:
-		decode_rtc_wkalrm(tcp, arg);
-		break;
 	case RTC_WKALM_RD:
 		if (entering(tcp))
 			return 0;
+		/* fall through */
+	case RTC_WKALM_SET:
+		tprints(", ");
 		decode_rtc_wkalrm(tcp, arg);
 		break;
 #ifdef RTC_VL_READ
