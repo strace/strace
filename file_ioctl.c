@@ -82,9 +82,9 @@ print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 	const struct file_dedupe_range_info *info = elem_buf;
 
 	if (entering(tcp)) {
-		tprintf("{dest_fd=%" PRIi64
-			", dest_offset=%" PRIu64 "}",
-			(int64_t) info->dest_fd,
+		tprints("{dest_fd=");
+		printfd(tcp, info->dest_fd);
+		tprintf(", dest_offset=%" PRIu64 "}",
 			(uint64_t) info->dest_offset);
 	} else {
 		tprintf("{bytes_deduped=%" PRIu64 ", status=%d}",
@@ -128,11 +128,11 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{src_fd=%" PRIi64
-			", src_offset=%" PRIu64
+		tprints("{src_fd=");
+		printfd(tcp, args.src_fd);
+		tprintf(", src_offset=%" PRIu64
 			", src_length=%" PRIu64
 			", dest_offset=%" PRIu64 "}",
-			(int64_t) args.src_fd,
 			(uint64_t) args.src_offset,
 			(uint64_t) args.src_length,
 			(uint64_t) args.dest_offset);
