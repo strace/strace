@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2004 Ulrich Drepper <drepper@redhat.com>
- * Copyright (c) 2004 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2004-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,15 @@
  */
 
 #include "defs.h"
+
+#include DEF_MPERS_TYPE(struct_rtc_pll_info)
+
 #include <linux/ioctl.h>
 #include <linux/rtc.h>
+
+typedef struct rtc_pll_info struct_rtc_pll_info;
+
+#include MPERS_DEFS
 
 static void
 print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
@@ -68,17 +75,17 @@ decode_rtc_wkalrm(struct tcb *tcp, const long addr)
 static void
 decode_rtc_pll_info(struct tcb *tcp, const long addr)
 {
-	struct rtc_pll_info pll;
+	struct_rtc_pll_info pll;
 
 	if (!umove_or_printaddr(tcp, addr, &pll))
 		tprintf("{pll_ctrl=%d, pll_value=%d, pll_max=%d, pll_min=%d"
 			", pll_posmult=%d, pll_negmult=%d, pll_clock=%ld}",
 			pll.pll_ctrl, pll.pll_value, pll.pll_max, pll.pll_min,
-			pll.pll_posmult, pll.pll_negmult, pll.pll_clock);
+			pll.pll_posmult, pll.pll_negmult, (long) pll.pll_clock);
 }
 
-int
-rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *tcp,
+		   const unsigned int code, const long arg)
 {
 	switch (code) {
 	case RTC_ALM_READ:
