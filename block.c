@@ -84,6 +84,9 @@ struct blk_user_trace_setup {
 #ifndef BLKZEROOUT
 # define BLKZEROOUT _IO(0x12,127)
 #endif
+#ifndef BLKDAXGET
+# define BLKDAXGET _IO(0x12,129)
+#endif
 
 #include "xlat/blkpg_ops.h"
 
@@ -142,6 +145,7 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	case BLKBSZGET:
 	case BLKSSZGET:
 	case BLKALIGNOFF:
+	case BLKDAXGET:
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
