@@ -126,6 +126,19 @@ rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		printnum_int(tcp, arg, "%d");
 		break;
 #endif
+	case RTC_AIE_ON:
+	case RTC_AIE_OFF:
+	case RTC_UIE_ON:
+	case RTC_UIE_OFF:
+	case RTC_PIE_ON:
+	case RTC_PIE_OFF:
+	case RTC_WIE_ON:
+	case RTC_WIE_OFF:
+#ifdef RTC_VL_CLR
+	case RTC_VL_CLR:
+#endif
+		/* no args */
+		break;
 	default:
 		return RVAL_DECODED;
 	}
