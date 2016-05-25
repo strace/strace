@@ -65,6 +65,18 @@ decode_rtc_wkalrm(struct tcb *tcp, const long addr)
 	}
 }
 
+static void
+decode_rtc_pll_info(struct tcb *tcp, const long addr)
+{
+	struct rtc_pll_info pll;
+
+	if (!umove_or_printaddr(tcp, addr, &pll))
+		tprintf("{pll_ctrl=%d, pll_value=%d, pll_max=%d, pll_min=%d"
+			", pll_posmult=%d, pll_negmult=%d, pll_clock=%ld}",
+			pll.pll_ctrl, pll.pll_value, pll.pll_max, pll.pll_min,
+			pll.pll_posmult, pll.pll_negmult, pll.pll_clock);
+}
+
 int
 rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
@@ -97,6 +109,14 @@ rtc_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	case RTC_WKALM_SET:
 		tprints(", ");
 		decode_rtc_wkalrm(tcp, arg);
+		break;
+	case RTC_PLL_GET:
+		if (entering(tcp))
+			return 0;
+		/* fall through */
+	case RTC_PLL_SET:
+		tprints(", ");
+		decode_rtc_pll_info(tcp, arg);
 		break;
 #ifdef RTC_VL_READ
 	case RTC_VL_READ:
