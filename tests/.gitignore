@@ -91,6 +91,8 @@ getuid32
 getxxid
 inet-cmsg
 ioctl
+ioctl_rtc
+ioctl_rtc-v
 ioctl_uffdio
 ioctl_v4l2
 ioperm

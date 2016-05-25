@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check basic decoding of RTC_* ioctls.
+
+. "${srcdir=.}/ioctl.test"
