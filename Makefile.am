@@ -112,6 +112,7 @@ strace_SOURCES =	\
 	file.c		\
 	file_handle.c	\
 	file_ioctl.c	\
+	fs_x_ioctl.c	\
 	flock.c		\
 	flock.h		\
 	futex.c		\

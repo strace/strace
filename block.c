@@ -240,33 +240,12 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			break;
 		}
 
-#ifdef FITRIM
-	/* First seen in linux-2.6.37 */
-	case FITRIM: {
-		struct fstrim_range fstrim;
-
-		tprints(", ");
-		if (!umove_or_printaddr(tcp, arg, &fstrim))
-			tprintf("{start=%#" PRIx64 ", "
-				"len=%#" PRIx64 ", "
-				"minlen=%#" PRIx64 "}",
-				(uint64_t) fstrim.start,
-				(uint64_t) fstrim.len,
-				(uint64_t) fstrim.minlen);
-		break;
-	}
-#endif
-
 	/* No arguments */
 	case BLKRRPART:
 	case BLKFLSBUF:
 	case BLKTRACESTART:
 	case BLKTRACESTOP:
 	case BLKTRACETEARDOWN:
-#ifdef FIFREEZE
-	case FIFREEZE:
-	case FITHAW:
-#endif
 		break;
 	default:
 		return RVAL_DECODED;

@@ -252,8 +252,9 @@ ioctl_decode(struct tcb *tcp)
 	case 0x03:
 		return hdio_ioctl(tcp, code, arg);
 	case 0x12:
-	case 'X':
 		return block_ioctl(tcp, code, arg);
+	case 'X':
+		return fs_x_ioctl(tcp, code, arg);
 #ifdef HAVE_SCSI_SG_H
 	case 0x22:
 		return scsi_ioctl(tcp, code, arg);
