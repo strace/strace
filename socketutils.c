@@ -517,6 +517,16 @@ print_sockaddr_by_inode_uncached(const unsigned long inode,
 	return false;
 }
 
+/* Given an inode number of a socket, return its protocol details.  */
+const char *
+get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
+		      const unsigned long inode)
+{
+	const char *details = get_sockaddr_by_inode_cached(inode);
+	return details ? details :
+		get_sockaddr_by_inode_uncached(inode, getfdproto(tcp, fd));
+}
+
 /* Given an inode number of a socket, print out its protocol details.  */
 bool
 print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
