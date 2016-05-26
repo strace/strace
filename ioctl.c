@@ -250,6 +250,7 @@ ioctl_decode(struct tcb *tcp)
 	case 'p':
 		return rtc_ioctl(tcp, code, arg);
 	case 0x03:
+		return hdio_ioctl(tcp, code, arg);
 	case 0x12:
 	case 'X':
 		return block_ioctl(tcp, code, arg);

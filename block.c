@@ -28,7 +28,6 @@
 #include "defs.h"
 #include <linux/blkpg.h>
 #include <linux/fs.h>
-#include <linux/hdreg.h>
 
 /* ioctls <= 114 are present in Linux 2.4. The following ones have been
  * added since then and headers containing them may not be available on
@@ -199,23 +198,6 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		break;
 
 	/* More complex types */
-	case HDIO_GETGEO:
-		if (entering(tcp))
-			return 0;
-		else {
-			struct hd_geometry geo;
-
-			tprints(", ");
-			if (!umove_or_printaddr(tcp, arg, &geo))
-				tprintf("{heads=%u, sectors=%u, "
-					"cylinders=%u, start=%lu}",
-					(unsigned)geo.heads,
-					(unsigned)geo.sectors,
-					(unsigned)geo.cylinders,
-					geo.start);
-		}
-		break;
-
 	case BLKPG: {
 		struct blkpg_ioctl_arg blkpg;
 

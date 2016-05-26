@@ -120,6 +120,7 @@ strace_SOURCES =	\
 	getcpu.c	\
 	getcwd.c	\
 	getrandom.c	\
+	hdio.c		\
 	hostname.c	\
 	inotify.c	\
 	io.c		\
