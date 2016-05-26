@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check decoding of BLK* ioctls.
+
+. "${srcdir=.}/ioctl.test"

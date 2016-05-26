@@ -146,6 +146,7 @@ check_PROGRAMS = \
 	getxxid \
 	inet-cmsg \
 	ioctl \
+	ioctl_block \
 	ioctl_rtc \
 	ioctl_rtc-v \
 	ioctl_uffdio \
@@ -442,6 +443,7 @@ DECODER_TESTS = \
 	getxxid.test \
 	inet-cmsg.test \
 	ioctl.test \
+	ioctl_block.test \
 	ioctl_rtc.test \
 	ioctl_rtc-v.test \
 	ioctl_uffdio.test \

@@ -454,6 +454,8 @@ AC_CHECK_TYPES([struct statfs64], [
 ],, [#include <linux/types.h>
 #include <asm/statfs.h>])
 
+AC_CHECK_TYPES([struct blk_user_trace_setup],,, [#include <linux/blktrace_api.h>])
+
 AC_CHECK_HEADERS([linux/btrfs.h], [
 	AC_CHECK_MEMBERS(m4_normalize([
 		struct btrfs_ioctl_feature_flags.compat_flags,
