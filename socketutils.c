@@ -392,66 +392,66 @@ netlink_parse_response(const char *proto_name, const void *data,
 	return cache_inode_details(inode, details);
 }
 
-static bool
-unix_print(const int fd, const unsigned long inode)
+static const char *
+unix_get(const int fd, const unsigned long inode)
 {
 	return unix_send_query(fd, inode)
 		&& receive_responses(fd, inode, "UNIX", unix_parse_response)
-		&& print_sockaddr_by_inode_cached(inode);
+		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
-static bool
-inet_print(const int fd, const int family, const int protocol,
-	   const unsigned long inode, const char *proto_name)
+static const char *
+inet_get(const int fd, const int family, const int protocol,
+	 const unsigned long inode, const char *proto_name)
 {
 	return inet_send_query(fd, family, protocol)
 		&& receive_responses(fd, inode, proto_name, inet_parse_response)
-		&& print_sockaddr_by_inode_cached(inode);
+		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
-static bool
-tcp_v4_print(const int fd, const unsigned long inode)
+static const char *
+tcp_v4_get(const int fd, const unsigned long inode)
 {
-	return inet_print(fd, AF_INET, IPPROTO_TCP, inode, "TCP");
+	return inet_get(fd, AF_INET, IPPROTO_TCP, inode, "TCP");
 }
 
-static bool
-udp_v4_print(const int fd, const unsigned long inode)
+static const char *
+udp_v4_get(const int fd, const unsigned long inode)
 {
-	return inet_print(fd, AF_INET, IPPROTO_UDP, inode, "UDP");
+	return inet_get(fd, AF_INET, IPPROTO_UDP, inode, "UDP");
 }
 
-static bool
-tcp_v6_print(const int fd, const unsigned long inode)
+static const char *
+tcp_v6_get(const int fd, const unsigned long inode)
 {
-	return inet_print(fd, AF_INET6, IPPROTO_TCP, inode, "TCPv6");
+	return inet_get(fd, AF_INET6, IPPROTO_TCP, inode, "TCPv6");
 }
 
-static bool
-udp_v6_print(const int fd, const unsigned long inode)
+static const char *
+udp_v6_get(const int fd, const unsigned long inode)
 {
-	return inet_print(fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
+	return inet_get(fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
 }
 
-static bool
-netlink_print(const int fd, const unsigned long inode)
+static const char *
+netlink_get(const int fd, const unsigned long inode)
 {
 	return netlink_send_query(fd, inode)
 		&& receive_responses(fd, inode, "NETLINK",
 				     netlink_parse_response)
-		&& print_sockaddr_by_inode_cached(inode);
+		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
 static const struct {
 	const char *const name;
-	bool (*const print)(int, unsigned long);
+	const char * (*const get)(int, unsigned long);
 } protocols[] = {
-	[SOCK_PROTO_UNIX] = { "UNIX", unix_print },
-	[SOCK_PROTO_TCP] = { "TCP", tcp_v4_print },
-	[SOCK_PROTO_UDP] = { "UDP", udp_v4_print },
-	[SOCK_PROTO_TCPv6] = { "TCPv6", tcp_v6_print },
-	[SOCK_PROTO_UDPv6] = { "UDPv6", udp_v6_print },
-	[SOCK_PROTO_NETLINK] = { "NETLINK", netlink_print }
+	[SOCK_PROTO_UNIX] = { "UNIX", unix_get },
+	[SOCK_PROTO_TCP] = { "TCP", tcp_v4_get },
+	[SOCK_PROTO_UDP] = { "UDP", udp_v4_get },
+	[SOCK_PROTO_TCPv6] = { "TCPv6", tcp_v6_get },
+	[SOCK_PROTO_UDPv6] = { "UDPv6", udp_v6_get },
+	[SOCK_PROTO_NETLINK] = { "NETLINK", netlink_get }
 };
 
 enum sock_proto
