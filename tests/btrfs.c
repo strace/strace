@@ -851,7 +851,7 @@ btrfs_test_search_ioctls(void)
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, NULL);
 	printf("ioctl(-1, BTRFS_IOC_TREE_SEARCH_V2, NULL) = -1 EBADF (%m)\n");
 
-	search_args_v2.key = key_reference;
+	search_args.key = key_reference;
 	printf("ioctl(-1, BTRFS_IOC_TREE_SEARCH, {");
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
@@ -866,7 +866,7 @@ btrfs_test_search_ioctls(void)
 
 	key_reference.min_objectid = 6;
 	key_reference.max_objectid = 7;
-	search_args_v2.key = key_reference;
+	search_args.key = key_reference;
 	printf("ioctl(-1, BTRFS_IOC_TREE_SEARCH, {");
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
@@ -881,7 +881,7 @@ btrfs_test_search_ioctls(void)
 
 	key_reference.min_offset++;
 	key_reference.max_offset--;
-	search_args_v2.key = key_reference;
+	search_args.key = key_reference;
 	printf("ioctl(-1, BTRFS_IOC_TREE_SEARCH, {");
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
@@ -896,7 +896,7 @@ btrfs_test_search_ioctls(void)
 
 	key_reference.min_transid++;
 	key_reference.max_transid--;
-	search_args_v2.key = key_reference;
+	search_args.key = key_reference;
 	printf("ioctl(-1, BTRFS_IOC_TREE_SEARCH, {");
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
@@ -911,7 +911,7 @@ btrfs_test_search_ioctls(void)
 
 	key_reference.min_type = 1;
 	key_reference.max_type = 12;
-	search_args_v2.key = key_reference;
+	search_args.key = key_reference;
 	printf("ioctl(-1, BTRFS_IOC_TREE_SEARCH, {");
 	btrfs_print_search_key(&search_args.key);
 	ioctl(-1, BTRFS_IOC_TREE_SEARCH, &search_args);
