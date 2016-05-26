@@ -161,7 +161,7 @@ main(void)
 	blkpg->op = 3;
 	blkpg->flags = 0xdeadbeef;
 	blkpg->datalen = 0xbadc0ded;
-	blkpg->data = (void *) (unsigned long) 0xfacefeedcafef00d;
+	blkpg->data = (void *) (unsigned long) 0xcafef00dfffffeed;
 
 	ioctl(-1, BLKPG, blkpg);
 	printf("ioctl(-1, BLKPG, {%s, flags=%d, datalen=%d"
