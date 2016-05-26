@@ -123,13 +123,6 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		tprintf(", %lu", arg);
 		break;
 
-	/* take a signed int */
-	case BLKROSET:
-	case BLKBSZSET:
-		tprints(", ");
-		printnum_int(tcp, arg, "%d");
-		break;
-
 	/* return an unsigned short */
 	case BLKSECTGET:
 	case BLKROTATIONAL:
@@ -147,6 +140,10 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	case BLKDAXGET:
 		if (entering(tcp))
 			return 0;
+		/* fall through */
+	/* take a signed int */
+	case BLKROSET:
+	case BLKBSZSET:
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
