@@ -224,18 +224,11 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		} else {
 			struct blk_user_trace_setup buts;
 
-			if (syserror(tcp)) {
-				tprints("}");
-				break;
+			if (!syserror(tcp) && !umove(tcp, arg, &buts)) {
+				tprints(", name=");
+				print_quoted_string(buts.name, sizeof(buts.name),
+						    QUOTE_0_TERMINATED);
 			}
-			tprints(", ");
-			if (umove(tcp, arg, &buts) < 0) {
-				tprints("???}");
-				break;
-			}
-			tprints(", name=");
-			print_quoted_string(buts.name, sizeof(buts.name),
-					    QUOTE_0_TERMINATED);
 			tprints("}");
 			break;
 		}
