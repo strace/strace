@@ -630,6 +630,24 @@ getfdproto(struct tcb *tcp, int fd)
 #endif
 }
 
+unsigned long
+getfdinode(struct tcb *tcp, int fd)
+{
+	char path[PATH_MAX + 1];
+
+	if (getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
+		const char *str = STR_STRIP_PREFIX(path, "socket:[");
+
+		if (str != path) {
+			const size_t str_len = strlen(str);
+			if (str_len && str[str_len - 1] == ']')
+				return strtoul(str, NULL, 10);
+		}
+	}
+
+	return 0;
+}
+
 void
 printfd(struct tcb *tcp, int fd)
 {
