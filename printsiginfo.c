@@ -171,8 +171,8 @@ print_si_info(const siginfo_t *sip)
 			else
 				printsignal(sip->si_status);
 			tprintf(", si_utime=%llu, si_stime=%llu",
-				(unsigned long long) sip->si_utime,
-				(unsigned long long) sip->si_stime);
+				widen_to_ull(sip->si_utime),
+				widen_to_ull(sip->si_stime));
 			break;
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:

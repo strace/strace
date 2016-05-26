@@ -202,8 +202,8 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 	else
 # endif
 	tprintf("%lld",
-		((unsigned long long) (unsigned long) tcp->u_arg[arg + 1] << sizeof(long) * 8)
-		| (unsigned long long) (unsigned long) tcp->u_arg[arg]);
+		(widen_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
+		| widen_to_ull(tcp->u_arg[arg]));
 #endif
 }
 

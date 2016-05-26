@@ -770,6 +770,14 @@ extern unsigned current_wordsize;
 # define widen_to_long(v) ((long)(v))
 #endif
 
+/*
+ * Widen without sign-extension a signed integer type to unsigned long long.
+ */
+#define widen_to_ull(v) \
+	(sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
+	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
+	 (unsigned long long) (v))
+
 extern const struct_sysent sysent0[];
 extern const char *const errnoent0[];
 extern const char *const signalent0[];

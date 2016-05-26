@@ -39,14 +39,6 @@ typedef struct statfs64 struct_statfs64;
 
 #include "statfs.h"
 
-#define ASSIGN_NUMBER(dst, src)				\
-	if (sizeof(src) == sizeof(int))			\
-		dst = (unsigned int) (src);		\
-	else if (sizeof(src) == sizeof(long))		\
-		dst = (unsigned long) (src);		\
-	else						\
-		dst = (unsigned long long) (src)
-
 MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
 		   struct tcb *tcp, const long addr, struct strace_statfs *p)
 {
@@ -55,26 +47,26 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
 	if (umove_or_printaddr(tcp, addr, &b))
 		return false;
 
-	ASSIGN_NUMBER(p->f_type, b.f_type);
-	ASSIGN_NUMBER(p->f_bsize, b.f_bsize);
-	ASSIGN_NUMBER(p->f_blocks, b.f_blocks);
-	ASSIGN_NUMBER(p->f_bfree, b.f_bfree);
-	ASSIGN_NUMBER(p->f_bavail, b.f_bavail);
-	ASSIGN_NUMBER(p->f_files, b.f_files);
-	ASSIGN_NUMBER(p->f_ffree, b.f_ffree);
+	p->f_type = widen_to_ull(b.f_type);
+	p->f_bsize = widen_to_ull(b.f_bsize);
+	p->f_blocks = widen_to_ull(b.f_blocks);
+	p->f_bfree = widen_to_ull(b.f_bfree);
+	p->f_bavail = widen_to_ull(b.f_bavail);
+	p->f_files = widen_to_ull(b.f_files);
+	p->f_ffree = widen_to_ull(b.f_ffree);
 #if defined HAVE_STRUCT_STATFS_F_FSID_VAL
-	ASSIGN_NUMBER(p->f_fsid[0], b.f_fsid.val[0]);
-	ASSIGN_NUMBER(p->f_fsid[1], b.f_fsid.val[1]);
+	p->f_fsid[0] = widen_to_ull(b.f_fsid.val[0]);
+	p->f_fsid[1] = widen_to_ull(b.f_fsid.val[1]);
 #elif defined HAVE_STRUCT_STATFS_F_FSID___VAL
-	ASSIGN_NUMBER(p->f_fsid[0], b.f_fsid.__val[0]);
-	ASSIGN_NUMBER(p->f_fsid[1], b.f_fsid.__val[1]);
+	p->f_fsid[0] = widen_to_ull(b.f_fsid.__val[0]);
+	p->f_fsid[1] = widen_to_ull(b.f_fsid.__val[1]);
 #endif
-	ASSIGN_NUMBER(p->f_namelen, b.f_namelen);
+	p->f_namelen = widen_to_ull(b.f_namelen);
 #ifdef HAVE_STRUCT_STATFS_F_FRSIZE
-	ASSIGN_NUMBER(p->f_frsize, b.f_frsize);
+	p->f_frsize = widen_to_ull(b.f_frsize);
 #endif
 #ifdef HAVE_STRUCT_STATFS_F_FLAGS
-	ASSIGN_NUMBER(p->f_flags, b.f_flags);
+	p->f_flags = widen_to_ull(b.f_flags);
 #endif
 
 	return true;
@@ -103,26 +95,26 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs64,
 	if (umove_or_printaddr(tcp, addr, &b))
 		return false;
 
-	ASSIGN_NUMBER(p->f_type, b.f_type);
-	ASSIGN_NUMBER(p->f_bsize, b.f_bsize);
-	ASSIGN_NUMBER(p->f_blocks, b.f_blocks);
-	ASSIGN_NUMBER(p->f_bfree, b.f_bfree);
-	ASSIGN_NUMBER(p->f_bavail, b.f_bavail);
-	ASSIGN_NUMBER(p->f_files, b.f_files);
-	ASSIGN_NUMBER(p->f_ffree, b.f_ffree);
+	p->f_type = widen_to_ull(b.f_type);
+	p->f_bsize = widen_to_ull(b.f_bsize);
+	p->f_blocks = widen_to_ull(b.f_blocks);
+	p->f_bfree = widen_to_ull(b.f_bfree);
+	p->f_bavail = widen_to_ull(b.f_bavail);
+	p->f_files = widen_to_ull(b.f_files);
+	p->f_ffree = widen_to_ull(b.f_ffree);
 #if defined HAVE_STRUCT_STATFS64_F_FSID_VAL
-	ASSIGN_NUMBER(p->f_fsid[0], b.f_fsid.val[0]);
-	ASSIGN_NUMBER(p->f_fsid[1], b.f_fsid.val[1]);
+	p->f_fsid[0] = widen_to_ull(b.f_fsid.val[0]);
+	p->f_fsid[1] = widen_to_ull(b.f_fsid.val[1]);
 #elif defined HAVE_STRUCT_STATFS64_F_FSID___VAL
-	ASSIGN_NUMBER(p->f_fsid[0], b.f_fsid.__val[0]);
-	ASSIGN_NUMBER(p->f_fsid[1], b.f_fsid.__val[1]);
+	p->f_fsid[0] = widen_to_ull(b.f_fsid.__val[0]);
+	p->f_fsid[1] = widen_to_ull(b.f_fsid.__val[1]);
 #endif
-	ASSIGN_NUMBER(p->f_namelen, b.f_namelen);
+	p->f_namelen = widen_to_ull(b.f_namelen);
 #ifdef HAVE_STRUCT_STATFS64_F_FRSIZE
-	ASSIGN_NUMBER(p->f_frsize, b.f_frsize);
+	p->f_frsize = widen_to_ull(b.f_frsize);
 #endif
 #ifdef HAVE_STRUCT_STATFS64_F_FLAGS
-	ASSIGN_NUMBER(p->f_flags, b.f_flags);
+	p->f_flags = widen_to_ull(b.f_flags);
 #endif
 
 	return true;
