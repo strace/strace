@@ -218,7 +218,7 @@ Output format:\n\
   -x             print non-ascii strings in hex\n\
   -xx            print all strings in hex\n\
   -y             print paths associated with file descriptor arguments\n\
-  -yy            print ip:port pairs associated with socket file descriptors\n\
+  -yy            print protocol specific information associated with socket file descriptors\n\
 \n\
 Statistics:\n\
   -c             count time, calls, and errors for each syscall and report summary\n\
