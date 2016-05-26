@@ -1772,6 +1772,28 @@ btrfs_test_features_ioctls(void)
 	}
 }
 
+static void
+btrfs_test_read_ioctls(void)
+{
+	static const struct xlat btrfs_read_cmd[] = {
+		XLAT(BTRFS_IOC_BALANCE_PROGRESS),
+		XLAT(BTRFS_IOC_FS_INFO),
+		XLAT(BTRFS_IOC_GET_FEATURES),
+		XLAT(BTRFS_IOC_GET_FSLABEL),
+		XLAT(BTRFS_IOC_GET_SUPPORTED_FEATURES),
+		XLAT(BTRFS_IOC_QGROUP_LIMIT),
+		XLAT(BTRFS_IOC_QUOTA_RESCAN_STATUS),
+		XLAT(BTRFS_IOC_START_SYNC),
+		XLAT(BTRFS_IOC_SUBVOL_GETFLAGS),
+	};
+
+	unsigned int i;
+	for (i = 0; i < ARRAY_SIZE(btrfs_read_cmd); ++i) {
+		ioctl(-1, (unsigned long) btrfs_read_cmd[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", btrfs_read_cmd[i].str);
+	}
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -1835,6 +1857,7 @@ main(int argc, char *argv[])
 			btrfs_test_root, write_ok ? "read/write" : "read only");
 	}
 
+	btrfs_test_read_ioctls();
 	btrfs_test_trans_ioctls();
 	btrfs_test_sync_ioctls();
 	btrfs_test_subvol_ioctls();
