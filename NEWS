@@ -12,7 +12,7 @@ Noteworthy changes in release 4.12 (????-??-??)
   * Implemented dumping of preadv, preadv2, pwritev, pwritev2, and vmsplice
     syscalls.
   * Implemented decoding of BTRFS_* and UFFDIO_* ioctl commands.
-  * Enhanced decoding of RTC_* and VIDIOC_* ioctl commands.
+  * Enhanced decoding of BLK*, RTC_*, and VIDIOC_* ioctl commands.
   * Enhanced decoding of fstatfs, fstatfs64, get_mempolicy, getdents,
     getdents64, getgroups, getpriority, kill, mbind, migrate_pages, mknod,
     mknodat, personality, poll, ppoll, quotactl, rt_sigpending,

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009, 2010 Jeff Mahoney <jeffm@suse.com>
+ * Copyright (c) 2011-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,15 +27,16 @@
  */
 
 #include "defs.h"
+
+#include DEF_MPERS_TYPE(struct_blk_user_trace_setup)
+#include DEF_MPERS_TYPE(struct_blkpg_ioctl_arg)
+#include DEF_MPERS_TYPE(struct_blkpg_partition)
+
 #include <linux/blkpg.h>
 #include <linux/fs.h>
 
-/* ioctls <= 114 are present in Linux 2.4. The following ones have been
- * added since then and headers containing them may not be available on
- * every system. */
-
 #define BLKTRACE_BDEV_SIZE      32
-struct blk_user_trace_setup {
+typedef struct blk_user_trace_setup {
 	char name[BLKTRACE_BDEV_SIZE];	/* output */
 	uint16_t act_mask;		/* input */
 	uint32_t buf_size;		/* input */
@@ -42,10 +44,21 @@ struct blk_user_trace_setup {
 	uint64_t start_lba;
 	uint64_t end_lba;
 	uint32_t pid;
-};
+} struct_blk_user_trace_setup;
+
+typedef struct blkpg_ioctl_arg struct_blkpg_ioctl_arg;
+typedef struct blkpg_partition struct_blkpg_partition;
+
+#include MPERS_DEFS
+
+/*
+ * ioctl numbers <= 114 are present in Linux 2.4.  The following ones have been
+ * added since then and headers containing them may not be available on every
+ * system.
+ */
 
 #ifndef BLKTRACESETUP
-# define BLKTRACESETUP _IOWR(0x12,115,struct blk_user_trace_setup)
+# define BLKTRACESETUP _IOWR(0x12, 115, struct_blk_user_trace_setup)
 #endif
 #ifndef BLKTRACESTART
 # define BLKTRACESTART _IO(0x12,116)
@@ -90,9 +103,9 @@ struct blk_user_trace_setup {
 #include "xlat/blkpg_ops.h"
 
 static void
-print_blkpg_req(struct tcb *tcp, const struct blkpg_ioctl_arg *blkpg)
+print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 {
-	struct blkpg_partition p;
+	struct_blkpg_partition p;
 
 	tprints("{");
 	printxval(blkpg_ops, blkpg->op, "BLKPG_???");
@@ -102,7 +115,7 @@ print_blkpg_req(struct tcb *tcp, const struct blkpg_ioctl_arg *blkpg)
 
 	if (!umove_or_printaddr(tcp, (long) blkpg->data, &p)) {
 		tprintf("{start=%lld, length=%lld, pno=%d, devname=",
-			p.start, p.length, p.pno);
+			(long long) p.start, (long long) p.length, p.pno);
 		print_quoted_string(p.devname, sizeof(p.devname),
 				    QUOTE_0_TERMINATED);
 		tprints(", volname=");
@@ -113,8 +126,8 @@ print_blkpg_req(struct tcb *tcp, const struct blkpg_ioctl_arg *blkpg)
 	tprints("}");
 }
 
-int
-block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *tcp,
+		   const unsigned int code, const long arg)
 {
 	switch (code) {
 	/* take arg as a value, not as a pointer */
@@ -196,7 +209,7 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	/* More complex types */
 	case BLKPG: {
-		struct blkpg_ioctl_arg blkpg;
+		struct_blkpg_ioctl_arg blkpg;
 
 		tprints(", ");
 		if (!umove_or_printaddr(tcp, arg, &blkpg))
@@ -206,7 +219,7 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	case BLKTRACESETUP:
 		if (entering(tcp)) {
-			struct blk_user_trace_setup buts;
+			struct_blk_user_trace_setup buts;
 
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &buts))
@@ -219,7 +232,7 @@ block_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 				buts.end_lba, buts.pid);
 			return 1;
 		} else {
-			struct blk_user_trace_setup buts;
+			struct_blk_user_trace_setup buts;
 
 			if (!syserror(tcp) && !umove(tcp, arg, &buts)) {
 				tprints(", name=");
