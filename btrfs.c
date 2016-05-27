@@ -303,7 +303,7 @@ btrfs_print_logical_ino_container(struct tcb *tcp,
 		const uint64_t val_addr =
 			inodes_addr + offsetof(typeof(container), val);
 		uint64_t record[3];
-		print_array(tcp, val_addr, container.elem_cnt,
+		print_array(tcp, val_addr, container.elem_cnt / 3,
 			    record, sizeof(record),
 			    umoven_or_printaddr,
 			    print_btrfs_data_container_logical_ino, 0);
