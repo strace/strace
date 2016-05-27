@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015 Etienne Gemsa <etienne.gemsa@lse.epita.fr>
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,19 @@
 
 #ifdef HAVE_LINUX_INPUT_H
 
+#include DEF_MPERS_TYPE(struct_ff_effect)
+
 # include <linux/ioctl.h>
 # include <linux/input.h>
-# include "xlat/evdev_abs.h"
+
+typedef struct ff_effect struct_ff_effect;
+
+#endif /* HAVE_LINUX_BTRFS_H */
+
+#include MPERS_DEFS
+
+#ifdef HAVE_LINUX_INPUT_H
+
 # include "xlat/evdev_autorepeat.h"
 # include "xlat/evdev_ff_status.h"
 # include "xlat/evdev_ff_types.h"
@@ -51,8 +61,10 @@
 # endif
 
 static void
-decode_envelope(const struct ff_envelope *envelope)
+decode_envelope(void *const data)
 {
+	const struct ff_envelope *const envelope = data;
+
 	tprintf(", envelope={attack_length=%" PRIu16
 		", attack_level=%" PRIu16
 		", fade_length=%" PRIu16
@@ -68,7 +80,7 @@ ff_effect_ioctl(struct tcb *tcp, long arg)
 {
 	tprints(", ");
 
-	struct ff_effect ffe;
+	struct_ff_effect ffe;
 
 	if (umove_or_printaddr(tcp, arg, &ffe))
 		return 1;
@@ -497,8 +509,8 @@ evdev_write_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	return 0;
 }
 
-int
-evdev_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+MPERS_PRINTER_DECL(int, evdev_ioctl, struct tcb *tcp,
+		   const unsigned int code, const long arg)
 {
 	switch(_IOC_DIR(code)) {
 		case _IOC_READ:

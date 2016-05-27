@@ -372,6 +372,7 @@ typedef uint8_t qualbits_t;
 extern const struct xlat addrfams[];
 extern const struct xlat at_flags[];
 extern const struct xlat dirent_types[];
+extern const struct xlat evdev_abs[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
 extern const struct xlat resource_flags[];
@@ -659,7 +660,6 @@ struct strace_statfs;
 extern void print_struct_statfs(struct tcb *tcp, long);
 extern void print_struct_statfs64(struct tcb *tcp, long, unsigned long);
 
-extern int evdev_ioctl(struct tcb *, const unsigned int, long);
 extern int file_ioctl(struct tcb *, const unsigned int, long);
 extern int fs_x_ioctl(struct tcb *, const unsigned int, long);
 extern int hdio_ioctl(struct tcb *, const unsigned int, long);
