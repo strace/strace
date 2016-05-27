@@ -294,25 +294,30 @@ decode_bitset(struct tcb *tcp, long arg, const struct xlat decode_nr[],
 static int
 mtslots_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
-	const size_t size = _IOC_SIZE(code) / sizeof(int32_t);
-	if (!size)
-		return 0;
+	tprints(", ");
 
-	int32_t buffer[size];
+	const size_t size = _IOC_SIZE(code) / sizeof(int);
+	if (!size) {
+		printaddr(arg);
+		return 1;
+	}
 
-	if (!verbose(tcp) || umove(tcp, arg, &buffer) < 0)
-		return 0;
+	int buffer[size];
 
-	tprints(", {code=");
+	if (umove_or_printaddr(tcp, arg, &buffer))
+		return 1;
+
+	tprints("{code=");
 	printxval(evdev_mtslots, buffer[0], "ABS_MT_???");
 
-	unsigned int i;
 	tprints(", values=[");
 
+	unsigned int i;
 	for (i = 1; i < ARRAY_SIZE(buffer); i++)
 		tprintf("%s%d", i > 1 ? ", " : "", buffer[i]);
 
 	tprints("]}");
+
 	return 1;
 }
 # endif /* EVIOCGMTSLOTS */
