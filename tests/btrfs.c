@@ -941,8 +941,11 @@ btrfs_test_search_ioctls(void)
 			btrfs_test_dir_fd);
 		btrfs_print_search_key(&search_args.key);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_TREE_SEARCH, &search_args);
-		printf("} => {key={nr_items=%u}, buf=...}) = 0\n",
+		printf("} => {key={nr_items=%u}, buf=",
 			search_args.key.nr_items);
+		btrfs_print_tree_search_buf(&search_args.key, search_args.buf,
+					    sizeof(search_args.buf));
+		printf("}) = 0\n");
 
 		args = malloc(sizeof(*args) + bufsize);
 		if (!args)
@@ -968,7 +971,7 @@ btrfs_test_search_ioctls(void)
 		btrfs_print_search_key(&args->key);
 		printf(", buf_size=%" PRIu64 "}", (uint64_t)args->buf_size);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_TREE_SEARCH_V2, args);
-		printf("=> {buf_size=%" PRIu64 "}) = -1 EOVERFLOW (%m)\n",
+		printf(" => {buf_size=%" PRIu64 "}) = -1 EOVERFLOW (%m)\n",
 			(uint64_t)args->buf_size);
 		free(args);
 	}
