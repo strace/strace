@@ -308,11 +308,73 @@ repeat_ioctl(struct tcb *tcp, long arg)
 # endif /* EVIOCGREP || EVIOCSREP */
 
 static int
-evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+evdev_read_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
 	if (syserror(tcp))
 		return 0;
 
+	/* fixed-number fixed-length commands */
+	switch (code) {
+		case EVIOCGVERSION:
+			tprints(", ");
+			printnum_int(tcp, arg, "%" PRIx32);
+			return 1;
+		case EVIOCGEFFECTS:
+			tprints(", ");
+			printnum_int(tcp, arg, "%" PRIu32);
+			return 1;
+		case EVIOCGID:
+			return getid_ioctl(tcp, arg);
+# ifdef EVIOCGREP
+		case EVIOCGREP:
+			return repeat_ioctl(tcp, arg);;
+# endif
+		case EVIOCGKEYCODE:
+			return keycode_ioctl(tcp, arg);
+# ifdef EVIOCGKEYCODE_V2
+		case EVIOCGKEYCODE_V2:
+			return keycode_V2_ioctl(tcp, arg);
+# endif
+	}
+
+	/* fixed-number variable-length commands */
+	switch (_IOC_NR(code)) {
+# ifdef EVIOCGMTSLOTS
+		case _IOC_NR(EVIOCGMTSLOTS(0)):
+			return mtslots_ioctl(tcp, code, arg);
+# endif
+		case _IOC_NR(EVIOCGNAME(0)):
+		case _IOC_NR(EVIOCGPHYS(0)):
+		case _IOC_NR(EVIOCGUNIQ(0)):
+			tprints(", ");
+			printstr(tcp, arg, tcp->u_rval - 1);
+			return 1;
+# ifdef EVIOCGPROP
+		case _IOC_NR(EVIOCGPROP(0)):
+			return decode_bitset(tcp, arg,
+					evdev_prop, INPUT_PROP_MAX, "PROP_???");
+# endif
+		case _IOC_NR(EVIOCGSND(0)):
+			return decode_bitset(tcp, arg,
+					evdev_snd, SND_MAX, "SND_???");
+# ifdef EVIOCGSW
+		case _IOC_NR(EVIOCGSW(0)):
+			return decode_bitset(tcp, arg,
+					evdev_switch, SW_MAX, "SW_???");
+# endif
+		case _IOC_NR(EVIOCGKEY(0)):
+			return decode_bitset(tcp, arg,
+					evdev_keycode, KEY_MAX, "KEY_???");
+		case _IOC_NR(EVIOCGLED(0)):
+			return decode_bitset(tcp, arg,
+					evdev_leds, LED_MAX, "LED_???");
+	}
+
+	/* multi-number fixed-length commands */
+	if ((_IOC_NR(code) & ~ABS_MAX) == _IOC_NR(EVIOCGABS(0)))
+		return abs_ioctl(tcp, arg);
+
+	/* multi-number variable-length commands */
 	if ((_IOC_NR(code) & ~EV_MAX) == _IOC_NR(EVIOCGBIT(0, 0))) {
 		switch (_IOC_NR(code) - 0x20) {
 			case EV_SYN:
@@ -358,73 +420,13 @@ evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		}
 	}
 
-	if ((_IOC_NR(code) & ~ABS_MAX) == _IOC_NR(EVIOCGABS(0)))
-		return abs_ioctl(tcp, arg);
-
-	switch (code) {
-		case EVIOCGVERSION:
-			tprints(", ");
-			printnum_int(tcp, arg, "%" PRIx32);
-			return 1;
-		case EVIOCGEFFECTS:
-			tprints(", ");
-			printnum_int(tcp, arg, "%" PRIu32);
-			return 1;
-		case EVIOCGID:
-			return getid_ioctl(tcp, arg);
-# ifdef EVIOCGREP
-		case EVIOCGREP:
-			return repeat_ioctl(tcp, arg);;
-# endif
-		case EVIOCGKEYCODE:
-			return keycode_ioctl(tcp, arg);
-# ifdef EVIOCGKEYCODE_V2
-		case EVIOCGKEYCODE_V2:
-			return keycode_V2_ioctl(tcp, arg);
-# endif
-	}
-
-	switch (_IOC_NR(code)) {
-# ifdef EVIOCGMTSLOTS
-		case _IOC_NR(EVIOCGMTSLOTS(0)):
-			return mtslots_ioctl(tcp, code, arg);
-# endif
-		case _IOC_NR(EVIOCGNAME(0)):
-		case _IOC_NR(EVIOCGPHYS(0)):
-		case _IOC_NR(EVIOCGUNIQ(0)):
-			tprints(", ");
-			printstr(tcp, arg, tcp->u_rval - 1);
-			return 1;
-# ifdef EVIOCGPROP
-		case _IOC_NR(EVIOCGPROP(0)):
-			return decode_bitset(tcp, arg,
-					evdev_prop, INPUT_PROP_MAX, "PROP_???");
-# endif
-		case _IOC_NR(EVIOCGSND(0)):
-			return decode_bitset(tcp, arg,
-					evdev_snd, SND_MAX, "SND_???");
-# ifdef EVIOCGSW
-		case _IOC_NR(EVIOCGSW(0)):
-			return decode_bitset(tcp, arg,
-					evdev_switch, SW_MAX, "SW_???");
-# endif
-		case _IOC_NR(EVIOCGKEY(0)):
-			return decode_bitset(tcp, arg,
-					evdev_keycode, KEY_MAX, "KEY_???");
-		case _IOC_NR(EVIOCGLED(0)):
-			return decode_bitset(tcp, arg,
-					evdev_leds, LED_MAX, "LED_???");
-		default:
-			return 0;
-	}
+	return 0;
 }
 
 static int
-evdev_write_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+evdev_write_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
-	if ((_IOC_NR(code) & ~ABS_MAX) == _IOC_NR(EVIOCSABS(0)))
-		return abs_ioctl(tcp, arg);
-
+	/* fixed-number fixed-length commands */
 	switch (code) {
 # ifdef EVIOCSREP
 		case EVIOCSREP:
@@ -449,9 +451,13 @@ evdev_write_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 			tprints(", ");
 			printnum_int(tcp, arg, "%u");
 			return 1;
-		default:
-			return 0;
 	}
+
+	/* multi-number fixed-length commands */
+	if ((_IOC_NR(code) & ~ABS_MAX) == _IOC_NR(EVIOCSABS(0)))
+		return abs_ioctl(tcp, arg);
+
+	return 0;
 }
 
 int
