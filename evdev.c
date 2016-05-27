@@ -382,9 +382,6 @@ bit_ioctl(struct tcb *tcp, const unsigned int ev_nr, const long arg)
 static int
 evdev_read_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
-	if (syserror(tcp))
-		return 0;
-
 	/* fixed-number fixed-length commands */
 	switch (code) {
 		case EVIOCGVERSION:
@@ -419,7 +416,10 @@ evdev_read_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		case _IOC_NR(EVIOCGPHYS(0)):
 		case _IOC_NR(EVIOCGUNIQ(0)):
 			tprints(", ");
-			printstr(tcp, arg, tcp->u_rval - 1);
+			if (syserror(tcp))
+				printaddr(arg);
+			else
+				printstr(tcp, arg, tcp->u_rval);
 			return 1;
 # ifdef EVIOCGPROP
 		case _IOC_NR(EVIOCGPROP(0)):
