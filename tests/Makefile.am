@@ -372,6 +372,8 @@ DECODER_TESTS = \
 	brk.test \
 	btrfs.test \
 	btrfs-v.test \
+	btrfs-w.test \
+	btrfs-vw.test \
 	caps.test \
 	chmod.test \
 	chown.test \
