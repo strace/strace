@@ -178,19 +178,16 @@ abs_ioctl(struct tcb *tcp, long arg)
 static int
 keycode_ioctl(struct tcb *tcp, long arg)
 {
+	tprints(", ");
+
 	unsigned int keycode[2];
 
-	if (!arg) {
-		tprints(", NULL");
-		return 1;
+	if (!umove_or_printaddr(tcp, arg, &keycode)) {
+		tprintf("[%u, ", keycode[0]);
+		printxval(evdev_keycode, keycode[1], "KEY_???");
+		tprints("]");
 	}
 
-	if (!verbose(tcp) || umove(tcp, arg, &keycode) < 0)
-		return 0;
-
-	tprintf(", [%u, ", keycode[0]);
-	printxval(evdev_keycode, keycode[1], "KEY_???");
-	tprints("]");
 	return 1;
 }
 
