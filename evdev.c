@@ -389,7 +389,7 @@ evdev_read_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	switch (code) {
 		case EVIOCGVERSION:
 			tprints(", ");
-			printnum_int(tcp, arg, "%" PRIx32);
+			printnum_int(tcp, arg, "%#x");
 			return 1;
 		case EVIOCGEFFECTS:
 			tprints(", ");
