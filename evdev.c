@@ -253,8 +253,7 @@ static int
 decode_bitset(struct tcb *tcp, long arg, const struct xlat decode_nr[],
 	      const unsigned int max_nr, const char *dflt)
 {
-	if (!verbose(tcp))
-		return 0;
+	tprints(", ");
 
 	unsigned int size;
 	if ((unsigned long) tcp->u_rval > max_nr)
@@ -263,10 +262,10 @@ decode_bitset(struct tcb *tcp, long arg, const struct xlat decode_nr[],
 		size = tcp->u_rval;
 	char decoded_arg[size];
 
-	if (umoven(tcp, arg, size, decoded_arg) < 0)
-		return 0;
+	if (umove_or_printaddr(tcp, arg, &decoded_arg))
+		return 1;
 
-	tprints(", [");
+	tprints("[");
 
 	int bit_displayed = 0;
 	int i = next_set_bit(decoded_arg, 0, size);
