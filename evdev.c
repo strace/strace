@@ -232,19 +232,20 @@ keycode_V2_ioctl(struct tcb *tcp, long arg)
 static int
 getid_ioctl(struct tcb *tcp, long arg)
 {
+	tprints(", ");
+
 	struct input_id id;
 
-	if (!verbose(tcp) || umove(tcp, arg, &id) < 0)
-		return 0;
+	if (!umove_or_printaddr(tcp, arg, &id))
+		tprintf("{ID_BUS=%" PRIu16
+			", ID_VENDOR=%" PRIu16
+			", ID_PRODUCT=%" PRIu16
+			", ID_VERSION=%" PRIu16 "}",
+			id.bustype,
+			id.vendor,
+			id.product,
+			id.version);
 
-	tprintf(", {ID_BUS=%" PRIu16 ", ID_VENDOR=%" PRIu16,
-		id.bustype, id.vendor);
-	if (!abbrev(tcp)) {
-		tprintf(", ID_PRODUCT=%" PRIu16 ", ID_VERSION=%" PRIu16 "}",
-			id.product, id.version);
-	} else {
-		tprints(", ...}");
-	}
 	return 1;
 }
 
