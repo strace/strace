@@ -66,71 +66,78 @@ decode_envelope(const struct ff_envelope *envelope)
 static int
 ff_effect_ioctl(struct tcb *tcp, long arg)
 {
+	tprints(", ");
+
 	struct ff_effect ffe;
 
-	if (!verbose(tcp) || umove(tcp, arg, &ffe) < 0)
-		return 0;
+	if (umove_or_printaddr(tcp, arg, &ffe))
+		return 1;
 
-	tprints(", {type=");
+	tprints("{type=");
 	printxval(evdev_ff_types, ffe.type, "FF_???");
-	tprintf(", id=%" PRIu16 ", direction=%" PRIu16,
-		ffe.id, ffe.direction);
+	tprintf(", id=%" PRIu16
+		", direction=%" PRIu16 ", ",
+		ffe.id,
+		ffe.direction);
 
-	if (!abbrev(tcp)) {
-		tprintf(", trigger={button=%" PRIu16 ", interval=%" PRIu16 "}",
-			ffe.trigger.button, ffe.trigger.interval);
-		tprintf(", replay={lenght=%" PRIu16 ", delay=%" PRIu16 "}",
-			ffe.replay.length, ffe.replay.delay);
-		switch (ffe.type) {
-			case FF_CONSTANT:
-				tprintf(", constant_ef={%" PRIi16,
-					ffe.u.constant.level);
-				decode_envelope(&ffe.u.constant.envelope);
-				tprints("}");
-				return 1;
-			case FF_RAMP:
-				tprintf(", ramp={start_level=%" PRIi16
-					", end_level=%" PRIi16,
-					ffe.u.ramp.start_level,
-					ffe.u.ramp.end_level);
-				decode_envelope(&ffe.u.ramp.envelope);
-				tprints("}");
-				return 1;
-			case FF_PERIODIC:
-				tprintf(", periodic_ef={waveform=%" PRIu16
-					", period=%" PRIu16
-					", magnitude=%" PRIi16
-					", offset=%" PRIi16
-					", phase=%" PRIu16,
-					ffe.u.periodic.waveform,
-					ffe.u.periodic.period,
-					ffe.u.periodic.magnitude,
-					ffe.u.periodic.offset,
-					ffe.u.periodic.phase);
-				decode_envelope(&ffe.u.periodic.envelope);
-				tprintf(", custom_len=%" PRIu32
-					", *custom_data=%#lx}",
-					ffe.u.periodic.custom_len,
-					(unsigned long)ffe.u.periodic.custom_data);
-				return 1;
-			case FF_RUMBLE:
-				tprintf(", rumble={strong_magnitude=%" PRIu16
-					", weak_magnitude=%" PRIu16 "}",
-					ffe.u.rumble.strong_magnitude,
-					ffe.u.rumble.weak_magnitude);
-				return 1;
-			case FF_SPRING:
-			case FF_FRICTION:
-			case FF_DAMPER:
-			case FF_INERTIA:
-			case FF_CUSTOM:
-				break;
-			default :
-				break;
-		}
+	if (abbrev(tcp)) {
+		tprints("...}");
+		return 1;
 	}
 
-	tprints(", ...}");
+	tprintf("trigger={button=%" PRIu16
+		", interval=%" PRIu16 "}"
+		", replay={length=%" PRIu16
+		", delay=%" PRIu16 "}",
+		ffe.trigger.button,
+		ffe.trigger.interval,
+		ffe.replay.length,
+		ffe.replay.delay);
+
+	switch (ffe.type) {
+		case FF_CONSTANT:
+			tprintf(", constant={level=%" PRId16,
+				ffe.u.constant.level);
+			decode_envelope(&ffe.u.constant.envelope);
+			tprints("}");
+			break;
+		case FF_RAMP:
+			tprintf(", ramp={start_level=%" PRId16
+				", end_level=%" PRId16,
+				ffe.u.ramp.start_level,
+				ffe.u.ramp.end_level);
+			decode_envelope(&ffe.u.ramp.envelope);
+			tprints("}");
+			break;
+		case FF_PERIODIC:
+			tprintf(", periodic={waveform=%" PRIu16
+				", period=%" PRIu16
+				", magnitude=%" PRId16
+				", offset=%" PRId16
+				", phase=%" PRIu16,
+				ffe.u.periodic.waveform,
+				ffe.u.periodic.period,
+				ffe.u.periodic.magnitude,
+				ffe.u.periodic.offset,
+				ffe.u.periodic.phase);
+			decode_envelope(&ffe.u.periodic.envelope);
+			tprintf(", custom_len=%u"
+				", custom_data=%#lx}",
+				ffe.u.periodic.custom_len,
+				(unsigned long) ffe.u.periodic.custom_data);
+			break;
+		case FF_RUMBLE:
+			tprintf(", rumble={strong_magnitude=%" PRIu16
+				", weak_magnitude=%" PRIu16 "}",
+				ffe.u.rumble.strong_magnitude,
+				ffe.u.rumble.weak_magnitude);
+			break;
+		default:
+			break;
+	}
+
+	tprints("}");
+
 	return 1;
 }
 
