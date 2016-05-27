@@ -51,10 +51,12 @@
 # endif
 
 static void
-decode_envelope(struct ff_envelope *envelope)
+decode_envelope(const struct ff_envelope *envelope)
 {
-	tprintf(", envelope={attack_length=%" PRIu16 ", attack_level=%" PRIu16
-		", fade_length=%" PRIu16 ", fade_level=%" PRIx32 "}",
+	tprintf(", envelope={attack_length=%" PRIu16
+		", attack_level=%" PRIu16
+		", fade_length=%" PRIu16
+		", fade_level=%#x}",
 		envelope->attack_length,
 		envelope->attack_level,
 		envelope->fade_length,
