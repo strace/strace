@@ -91,7 +91,7 @@ evdev_decode_number(const unsigned int code)
 	if (_IOC_DIR(code) == _IOC_WRITE) {
 		if (nr >= 0xc0 && nr <= 0xc0 + 0x3f) {
 			tprints("EVIOCSABS(");
-			printxval(evdev_abs, nr - 0xc0, "EV_???");
+			printxval(evdev_abs, nr - 0xc0, "ABS_???");
 			tprints(")");
 			return 1;
 		}
