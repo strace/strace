@@ -80,6 +80,15 @@ print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 			     size_t elem_size, void *data)
 {
 	const struct file_dedupe_range_info *info = elem_buf;
+	unsigned int *count = data;
+
+	if (count) {
+		if (*count == 0) {
+			tprints("...");
+			return false;
+		}
+		--*count;
+	}
 
 	if (entering(tcp)) {
 		tprints("{dest_fd=");
@@ -141,6 +150,10 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	case FIDEDUPERANGE: { /* RW */
 		struct file_dedupe_range args;
+		struct file_dedupe_range_info info;
+		unsigned int *limit = NULL;
+		unsigned int count = 2;
+		bool rc;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -162,19 +175,16 @@ file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 				(uint16_t) args.dest_count);
 		}
 
-		bool rc = false;
 		tprints("info=");
-		if (abbrev(tcp)) {
-			tprints("...");
-		} else {
-			struct file_dedupe_range_info info;
-			rc = print_array(tcp,
-					 arg + offsetof(typeof(args), info),
-					 args.dest_count,
-					 &info, sizeof(info),
-					 umoven_or_printaddr,
-					 print_file_dedupe_range_info, 0);
-		}
+
+		/* Limit how many elements we print in abbrev mode. */
+		if (abbrev(tcp) && args.dest_count > count)
+			limit = &count;
+
+		rc = print_array(tcp, arg + offsetof(typeof(args), info),
+				 args.dest_count, &info, sizeof(info),
+				 umoven_or_printaddr,
+				 print_file_dedupe_range_info, limit);
 
 		tprints("}");
 		if (!rc || exiting(tcp))

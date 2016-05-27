@@ -1597,27 +1597,25 @@ btrfs_test_extent_same_ioctl(void)
 	printf("ioctl(-1, BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE, "
 	       "{src_offset=%" PRIu64
 	       ", src_length=%" PRIu64
-	       ", dest_count=%hu, info=",
+	       ", dest_count=%hu, info=[]",
 		(uint64_t)args.src_offset,
 		(uint64_t)args.src_length, args.dest_count);
-	if (verbose)
-		printf("[]");
-	else
-		printf("...");
 	ioctl(-1, BTRFS_IOC_FILE_EXTENT_SAME, &args);
 	printf("}) = -1 EBADF (%m)\n");
 
-	argsp = malloc(sizeof(*argsp) + sizeof(argsp->info[0]) * 2);
+	argsp = malloc(sizeof(*argsp) + sizeof(argsp->info[0]) * 3);
 	if (!argsp)
 		perror_msg_and_fail("malloc failed");
-	memset(argsp, 0, sizeof(*argsp) + sizeof(argsp->info[0]) * 2);
+	memset(argsp, 0, sizeof(*argsp) + sizeof(argsp->info[0]) * 3);
 
 	*argsp = args;
-	argsp->dest_count = 2;
+	argsp->dest_count = 3;
 	argsp->info[0].dest_fd = 2;
 	argsp->info[0].dest_offset = 0;
 	argsp->info[1].dest_fd = 2;
 	argsp->info[1].dest_offset = 10240;
+	argsp->info[2].dest_fd = 2;
+	argsp->info[2].dest_offset = 20480;
 
 	printf("ioctl(-1, BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE, "
 	       "{src_offset=%" PRIu64
@@ -1625,23 +1623,25 @@ btrfs_test_extent_same_ioctl(void)
 	       ", dest_count=%hu, info=",
 		(int64_t)argsp->src_offset,
 		(uint64_t)argsp->src_length, argsp->dest_count);
-	if (verbose)
 		printf("[{dest_fd=%" PRId64 ", dest_offset=%" PRIu64
-		       "}, {dest_fd=%" PRId64 ", dest_offset=%"PRIu64
-		       "}]",
+		       "}, {dest_fd=%" PRId64 ", dest_offset=%"PRIu64 "}",
 		       (int64_t)argsp->info[0].dest_fd,
 		       (uint64_t)argsp->info[0].dest_offset,
 		       (int64_t)argsp->info[1].dest_fd,
 		       (uint64_t)argsp->info[1].dest_offset);
+	if (verbose)
+		printf(", {dest_fd=%" PRId64 ", dest_offset=%" PRIu64 "}",
+		       (int64_t)argsp->info[2].dest_fd,
+		       (uint64_t)argsp->info[2].dest_offset);
 	else
-		printf("...");
+		printf(", ...");
+	printf("]");
 	ioctl(-1, BTRFS_IOC_FILE_EXTENT_SAME, argsp);
 	printf("}) = -1 EBADF (%m)\n");
 
 	if (write_ok) {
 		int fd1, fd2;
 		char buf[16384];
-		int size = sizeof(*argsp) + sizeof(argsp->info[0]);
 
 		memset(buf, 0, sizeof(buf));
 
@@ -1655,6 +1655,10 @@ btrfs_test_extent_same_ioctl(void)
 
 		if (write(fd1, buf, sizeof(buf)) < 0)
 			perror_msg_and_fail("write: fd1");
+		if (write(fd1, buf, sizeof(buf)) < 0)
+			perror_msg_and_fail("write: fd1");
+		if (write(fd2, buf, sizeof(buf)) < 0)
+			perror_msg_and_fail("write: fd2");
 		if (write(fd2, buf, sizeof(buf)) < 0)
 			perror_msg_and_fail("write: fd2");
 
@@ -1663,34 +1667,52 @@ btrfs_test_extent_same_ioctl(void)
 		if (fd2 < 0)
 			perror_msg_and_fail("open file2 failed");
 
-		argsp = realloc(argsp, size);
-		if (!argsp)
-			perror_msg_and_fail("realloc failed");
-		memset(argsp, 0, size);
+		memset(argsp, 0, sizeof(*argsp) + sizeof(argsp->info[0]) * 3);
 
 		argsp->src_offset = 0;
-		argsp->src_length = sizeof(buf);
-		argsp->dest_count = 1;
+		argsp->src_length = 4096;
+		argsp->dest_count = 3;
 		argsp->info[0].dest_fd = fd2;
 		argsp->info[0].dest_offset = 0;
+		argsp->info[1].dest_fd = fd2;
+		argsp->info[1].dest_offset = 10240;
+		argsp->info[2].dest_fd = fd2;
+		argsp->info[2].dest_offset = 20480;
 
 		printf("ioctl(%d, BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE, "
 		       "{src_offset=%" PRIu64 ", src_length=%" PRIu64
 		       ", dest_count=%hu, info=", fd1,
 		       (uint64_t)argsp->src_offset,
 		       (uint64_t)argsp->src_length, argsp->dest_count);
+		printf("[{dest_fd=%" PRId64 ", dest_offset=%" PRIu64
+		       "}, {dest_fd=%" PRId64 ", dest_offset=%"PRIu64 "}",
+		       (int64_t)argsp->info[0].dest_fd,
+		       (uint64_t)argsp->info[0].dest_offset,
+		       (int64_t)argsp->info[1].dest_fd,
+		       (uint64_t)argsp->info[1].dest_offset);
 		if (verbose)
-			printf("[{dest_fd=%d, dest_offset=0}]", fd2);
+			printf(", {dest_fd=%" PRId64
+			       ", dest_offset=%" PRIu64 "}",
+			       (int64_t)argsp->info[2].dest_fd,
+			       (uint64_t)argsp->info[2].dest_offset);
 		else
-			printf("...");
+			printf(", ...");
+
 		ioctl(fd1, BTRFS_IOC_FILE_EXTENT_SAME, argsp);
-		printf("} => {info=");
+		printf("]} => {info=");
+		printf("[{bytes_deduped=%" PRIu64 ", status=%d}, "
+			"{bytes_deduped=%" PRIu64 ", status=%d}",
+		       (uint64_t)argsp->info[0].bytes_deduped,
+		       argsp->info[0].status,
+		       (uint64_t)argsp->info[1].bytes_deduped,
+		       argsp->info[1].status);
 		if (verbose)
-			printf("[{bytes_deduped=%u, status=0}]",
-				(unsigned) sizeof(buf));
+			printf(", {bytes_deduped=%" PRIu64 ", status=%d}",
+			       (uint64_t)argsp->info[2].bytes_deduped,
+			       argsp->info[2].status);
 		else
-			printf("...");
-		printf("}) = 0\n");
+			printf(", ...");
+		printf("]}) = 0\n");
 		close(fd1);
 		close(fd2);
 		unlinkat(btrfs_test_dir_fd, "file1", 0);
