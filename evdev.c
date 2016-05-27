@@ -448,16 +448,18 @@ evdev_write_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		case EVIOCRMFF:
 			tprintf(", %d", (int) arg);
 			return 1;
-# ifdef EVIOCSCLOCKID
-		case EVIOCSCLOCKID:
-# endif
 		case EVIOCGRAB:
 # ifdef EVIOCREVOKE
 		case EVIOCREVOKE:
 # endif
+			tprintf(", %lu", arg);
+			return 1;
+# ifdef EVIOCSCLOCKID
+		case EVIOCSCLOCKID:
 			tprints(", ");
 			printnum_int(tcp, arg, "%u");
 			return 1;
+# endif
 	}
 
 	/* multi-number fixed-length commands */
