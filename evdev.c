@@ -310,9 +310,6 @@ repeat_ioctl(struct tcb *tcp, long arg)
 static int
 evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
-	if (entering(tcp))
-		return 1;
-
 	if (syserror(tcp))
 		return 0;
 
@@ -425,9 +422,6 @@ evdev_read_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 static int
 evdev_write_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
-	if (exiting(tcp))
-		return 1;
-
 	if ((_IOC_NR(code) & ~ABS_MAX) == _IOC_NR(EVIOCSABS(0)))
 		return abs_ioctl(tcp, arg);
 
@@ -465,13 +459,13 @@ evdev_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 {
 	switch(_IOC_DIR(code)) {
 		case _IOC_READ:
+			if (entering(tcp))
+				return 0;
 			return evdev_read_ioctl(tcp, code, arg);
 		case _IOC_WRITE:
-			if (!evdev_write_ioctl(tcp, code, arg))
-				tprintf(", %lx", arg);
-			return 1;
+			return evdev_write_ioctl(tcp, code, arg) | RVAL_DECODED;
 		default:
-			return 0;
+			return RVAL_DECODED;
 	}
 }
 
