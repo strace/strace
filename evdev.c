@@ -144,24 +144,34 @@ ff_effect_ioctl(struct tcb *tcp, long arg)
 static int
 abs_ioctl(struct tcb *tcp, long arg)
 {
+	tprints(", ");
+
 	struct input_absinfo absinfo;
 
-	if (!verbose(tcp) || umove(tcp, arg, &absinfo) < 0)
-		return 0;
+	if (!umove_or_printaddr(tcp, arg, &absinfo)) {
+		tprintf("{value=%u"
+			", minimum=%u, ",
+			absinfo.value,
+			absinfo.minimum);
 
-	tprintf(", {value=%" PRIu32 ", minimum=%" PRIu32,
-		absinfo.value, absinfo.minimum);
-	if (!abbrev(tcp)) {
-		tprintf(", maximum=%" PRIu32 ", fuzz=%" PRIu32,
-			absinfo.maximum, absinfo.fuzz);
-		tprintf(", flat=%" PRIu32, absinfo.flat);
+		if (!abbrev(tcp)) {
+			tprintf("maximum=%u"
+				", fuzz=%u"
+				", flat=%u",
+				absinfo.maximum,
+				absinfo.fuzz,
+				absinfo.flat);
 # ifdef HAVE_STRUCT_INPUT_ABSINFO_RESOLUTION
-		tprintf(", resolution=%" PRIu32, absinfo.resolution);
+			tprintf(", resolution=%u",
+				absinfo.resolution);
 # endif
+		} else {
+			tprints("...");
+		}
+
 		tprints("}");
-	} else {
-		tprints(", ...}");
 	}
+
 	return 1;
 }
 
