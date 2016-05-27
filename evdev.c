@@ -195,21 +195,22 @@ keycode_ioctl(struct tcb *tcp, long arg)
 static int
 keycode_V2_ioctl(struct tcb *tcp, long arg)
 {
+	tprints(", ");
+
 	struct input_keymap_entry ike;
 
-	if (!arg) {
-		tprints(", NULL");
+	if (umove_or_printaddr(tcp, arg, &ike))
 		return 1;
-	}
 
-	if (!verbose(tcp) || umove(tcp, arg, &ike) < 0)
-		return 0;
+	tprintf("{flags=%" PRIu8
+		", len=%" PRIu8 ", ",
+		ike.flags,
+		ike.len);
 
-	tprintf(", {flags=%" PRIu8 ", len=%" PRIu8, ike.flags, ike.len);
 	if (!abbrev(tcp)) {
 		unsigned int i;
 
-		tprintf(", index=%" PRIu16 ", keycode=", ike.index);
+		tprintf("index=%" PRIu16 ", keycode=", ike.index);
 		printxval(evdev_keycode, ike.keycode, "KEY_???");
 		tprints(", scancode=[");
 		for (i = 0; i < ARRAY_SIZE(ike.scancode); i++) {
@@ -217,10 +218,13 @@ keycode_V2_ioctl(struct tcb *tcp, long arg)
 				tprints(", ");
 			tprintf("%" PRIx8, ike.scancode[i]);
 		}
-		tprints("]}");
+		tprints("]");
 	} else {
-		tprints(", ...}");
+		tprints("...");
 	}
+
+	tprints("}");
+
 	return 1;
 }
 # endif /* EVIOCGKEYCODE_V2 */
