@@ -446,6 +446,8 @@ evdev_write_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		case EVIOCSFF:
 			return ff_effect_ioctl(tcp, arg);
 		case EVIOCRMFF:
+			tprintf(", %d", (int) arg);
+			return 1;
 # ifdef EVIOCSCLOCKID
 		case EVIOCSCLOCKID:
 # endif
