@@ -401,21 +401,6 @@ print_key_value_internal(struct tcb *tcp, const char *name, uint64_t value)
 #define print_key_value(tcp, key, name)					\
 	print_key_value_internal((tcp), #name, (key)->name)
 
-static bool
-print_btrfs_ioctl_search_header(struct tcb *tcp, void *elem_buf,
-				size_t elem_size, void *data)
-{
-	const struct btrfs_ioctl_search_header *sh = elem_buf;
-
-	tprintf("{transid=%" PRI__u64 ", objectid=", sh->transid);
-	btrfs_print_objectid(sh->objectid);
-	tprintf(", offset=%" PRI__u64 ", type=", sh->offset);
-	btrfs_print_key_type(sh->type);
-	tprintf(", len=%u}", sh->len);
-
-	return true;
-}
-
 static void
 btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 			uint64_t buf_addr, uint64_t buf_size, bool print_size)
@@ -457,12 +442,29 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 		if (abbrev(tcp))
 			tprints("...");
 		else {
-			struct btrfs_ioctl_search_header sh;
+			uint64_t i;
+			uint64_t off = 0;
+			tprints("[");
+			for (i = 0; i < key->nr_items; i++) {
+				struct btrfs_ioctl_search_header sh;
+				uint64_t addr = buf_addr + off;
+				if (i)
+					tprints(", ");
+				if (i > max_strlen ||
+				    umove(tcp, addr, &sh)) {
+					tprints("...");
+					break;
+				}
+				tprintf("{transid=%" PRI__u64 ", objectid=",
+					sh.transid);
+				btrfs_print_objectid(sh.objectid);
+				tprintf(", offset=%" PRI__u64 ", type=", sh.offset);
+				btrfs_print_key_type(sh.type);
+				tprintf(", len=%u}", sh.len);
+				off += sizeof(sh) + sh.len;
 
-			print_array(tcp, buf_addr, key->nr_items,
-				    &sh, sizeof(sh),
-				    umoven_or_printaddr,
-				    print_btrfs_ioctl_search_header, 0);
+			}
+			tprints("]");
 		}
 		tprints("}");
 	}
