@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <linux/ioctl.h>
 #include <linux/version.h>
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 3, 0)
 # include "mtd-abi.h"
