@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Check decoding of EVIOC* ioctls.
+
+. "${srcdir=.}/ioctl.test"

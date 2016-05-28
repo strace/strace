@@ -92,6 +92,8 @@ getxxid
 inet-cmsg
 ioctl
 ioctl_block
+ioctl_evdev
+ioctl_evdev-v
 ioctl_rtc
 ioctl_rtc-v
 ioctl_uffdio

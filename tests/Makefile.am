@@ -147,6 +147,8 @@ check_PROGRAMS = \
 	inet-cmsg \
 	ioctl \
 	ioctl_block \
+	ioctl_evdev \
+	ioctl_evdev-v \
 	ioctl_rtc \
 	ioctl_rtc-v \
 	ioctl_uffdio \
@@ -446,6 +448,8 @@ DECODER_TESTS = \
 	inet-cmsg.test \
 	ioctl.test \
 	ioctl_block.test \
+	ioctl_evdev.test \
+	ioctl_evdev-v.test \
 	ioctl_rtc.test \
 	ioctl_rtc-v.test \
 	ioctl_uffdio.test \
