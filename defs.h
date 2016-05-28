@@ -664,7 +664,6 @@ extern int file_ioctl(struct tcb *, const unsigned int, long);
 extern int fs_x_ioctl(struct tcb *, const unsigned int, long);
 extern int hdio_ioctl(struct tcb *, const unsigned int, long);
 extern int loop_ioctl(struct tcb *, const unsigned int, long);
-extern int mtd_ioctl(struct tcb *, const unsigned int, long);
 extern int ptp_ioctl(struct tcb *, const unsigned int, long);
 extern int scsi_ioctl(struct tcb *, const unsigned int, long);
 extern int sock_ioctl(struct tcb *, const unsigned int, long);

@@ -26,6 +26,8 @@
 
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(struct_mtd_oob_buf)
+
 #include <linux/ioctl.h>
 
 /* The mtd api changes quickly, so we have to keep a local copy */
@@ -35,6 +37,10 @@
 #else
 # include <mtd/mtd-abi.h>
 #endif
+
+typedef struct mtd_oob_buf struct_mtd_oob_buf;
+
+#include MPERS_DEFS
 
 #include "xlat/mtd_mode_options.h"
 #include "xlat/mtd_file_mode_options.h"
@@ -71,7 +77,7 @@ decode_erase_info_user64(struct tcb *tcp, const long addr)
 static void
 decode_mtd_oob_buf(struct tcb *tcp, const long addr)
 {
-	struct mtd_oob_buf mbuf;
+	struct_mtd_oob_buf mbuf;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &mbuf))
@@ -235,8 +241,8 @@ decode_mtd_ecc_stats(struct tcb *tcp, const long addr)
 		es.corrected, es.failed, es.badblocks, es.bbtblocks);
 }
 
-int
-mtd_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *tcp,
+		   const unsigned int code, const long arg)
 {
 	switch (code) {
 	case MEMERASE:
