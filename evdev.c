@@ -376,7 +376,9 @@ bit_ioctl(struct tcb *tcp, const unsigned int ev_nr, const long arg)
 			return decode_bitset(tcp, arg, evdev_ff_status,
 					     FF_STATUS_MAX, "FF_STATUS_???");
 		default:
-			return 0;
+			tprints(", ");
+			printaddr(arg);
+			return 1;
 	}
 }
 
