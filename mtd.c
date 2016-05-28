@@ -43,132 +43,238 @@
 #include "xlat/mtd_otp_options.h"
 #include "xlat/mtd_nandecc_options.h"
 
+static void
+decode_erase_info_user(struct tcb *tcp, const long addr)
+{
+	struct erase_info_user einfo;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &einfo))
+		return;
+
+	tprintf("{start=%#x, length=%#x}", einfo.start, einfo.length);
+}
+
+static void
+decode_erase_info_user64(struct tcb *tcp, const long addr)
+{
+	struct erase_info_user64 einfo64;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &einfo64))
+		return;
+
+	tprintf("{start=%#" PRIx64 ", length=%#" PRIx64 "}",
+		(uint64_t) einfo64.start, (uint64_t) einfo64.length);
+}
+
+static void
+decode_mtd_oob_buf(struct tcb *tcp, const long addr)
+{
+	struct mtd_oob_buf mbuf;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &mbuf))
+		return;
+
+	tprintf("{start=%#x, length=%#x, ptr=%#lx}",
+		mbuf.start, mbuf.length, (unsigned long) mbuf.ptr);
+}
+
+static void
+decode_mtd_oob_buf64(struct tcb *tcp, const long addr)
+{
+	struct mtd_oob_buf64 mbuf64;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &mbuf64))
+		return;
+
+	tprintf("{start=%#" PRIx64 ", length=%#x, usr_ptr=%#" PRIx64 "}",
+		(uint64_t) mbuf64.start, mbuf64.length,
+		(uint64_t) mbuf64.usr_ptr);
+}
+
+static void
+decode_otp_info(struct tcb *tcp, const long addr)
+{
+	struct otp_info oinfo;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &oinfo))
+		return;
+
+	tprintf("{start=%#x, length=%#x, locked=%u}",
+		oinfo.start, oinfo.length, oinfo.locked);
+}
+
+static void
+decode_otp_select(struct tcb *tcp, const long addr)
+{
+	unsigned int i;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &i))
+		return;
+
+	tprints("[");
+	printxval(mtd_otp_options, i, "MTD_OTP_???");
+	tprints("]");
+}
+
+static void
+decode_mtd_write_req(struct tcb *tcp, const long addr)
+{
+	struct mtd_write_req mreq;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &mreq))
+		return;
+
+	tprintf("{start=%#" PRIx64 ", len=%#" PRIx64
+		", ooblen=%#" PRIx64 ", usr_data=%#" PRIx64
+		", usr_oob=%#" PRIx64 ", mode=",
+		(uint64_t) mreq.start, (uint64_t) mreq.len,
+		(uint64_t) mreq.ooblen, (uint64_t) mreq.usr_data,
+		(uint64_t) mreq.usr_oob);
+	printxval(mtd_mode_options, mreq.mode, "MTD_OPS_???");
+	tprints("}");
+}
+
+static void
+decode_mtd_info_user(struct tcb *tcp, const long addr)
+{
+	struct mtd_info_user minfo;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &minfo))
+		return;
+
+	tprints("{type=");
+	printxval(mtd_type_options, minfo.type, "MTD_???");
+	tprints(", flags=");
+	printflags(mtd_flags_options, minfo.flags, "MTD_???");
+	tprintf(", size=%#x, erasesize=%#x, writesize=%#x, oobsize=%#x"
+		", padding=%#" PRIx64 "}",
+		minfo.size, minfo.erasesize, minfo.writesize, minfo.oobsize,
+		(uint64_t) minfo.padding);
+}
+
+static void
+decode_nand_oobinfo(struct tcb *tcp, const long addr)
+{
+	struct nand_oobinfo ninfo;
+	unsigned int i, j;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &ninfo))
+		return;
+
+	tprints("{useecc=");
+	printxval(mtd_nandecc_options, ninfo.useecc, "MTD_NANDECC_???");
+	tprintf(", eccbytes=%#x", ninfo.eccbytes);
+
+	tprints(", oobfree={");
+	for (i = 0; i < ARRAY_SIZE(ninfo.oobfree); ++i) {
+		if (i)
+			tprints("}, ");
+		tprints("{");
+		for (j = 0; j < ARRAY_SIZE(ninfo.oobfree[0]); ++j) {
+			if (j)
+				tprints(", ");
+			tprintf("%#x", ninfo.oobfree[i][j]);
+		}
+	}
+
+	tprints("}}, eccpos={");
+	for (i = 0; i < ARRAY_SIZE(ninfo.eccpos); ++i) {
+		if (i)
+			tprints(", ");
+		tprintf("%#x", ninfo.eccpos[i]);
+	}
+
+	tprints("}");
+}
+
+static void
+decode_nand_ecclayout_user(struct tcb *tcp, const long addr)
+{
+	struct nand_ecclayout_user nlay;
+	unsigned int i;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &nlay))
+		return;
+
+	tprintf("{eccbytes=%#x, eccpos={", nlay.eccbytes);
+	for (i = 0; i < ARRAY_SIZE(nlay.eccpos); ++i) {
+		if (i)
+			tprints(", ");
+		tprintf("%#x", nlay.eccpos[i]);
+	}
+	tprintf("}, oobavail=%#x, oobfree={", nlay.oobavail);
+	for (i = 0; i < ARRAY_SIZE(nlay.oobfree); ++i) {
+		if (i)
+			tprints(", ");
+		tprintf("{offset=%#x, length=%#x}",
+			nlay.oobfree[i].offset, nlay.oobfree[i].length);
+	}
+	tprints("}");
+}
+
+static void
+decode_mtd_ecc_stats(struct tcb *tcp, const long addr)
+{
+	struct mtd_ecc_stats es;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &es))
+		return;
+
+	tprintf("{corrected=%#x, failed=%#x, badblocks=%#x, bbtblocks=%#x}",
+		es.corrected, es.failed, es.badblocks, es.bbtblocks);
+}
+
 int
 mtd_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 {
-	if (!verbose(tcp))
-		return RVAL_DECODED;
-
 	switch (code) {
 	case MEMERASE:
 	case MEMLOCK:
 	case MEMUNLOCK:
-	case MEMISLOCKED: {
-		struct erase_info_user einfo;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &einfo))
-			break;
-
-		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 "}",
-			einfo.start, einfo.length);
+	case MEMISLOCKED:
+		decode_erase_info_user(tcp, arg);
 		break;
-	}
 
-	case MEMERASE64: {
-		struct erase_info_user64 einfo64;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &einfo64))
-			break;
-
-		tprintf("{start=%#" PRIx64 ", length=%#" PRIx64 "}",
-			(uint64_t) einfo64.start, (uint64_t) einfo64.length);
+	case MEMERASE64:
+		decode_erase_info_user64(tcp, arg);
 		break;
-	}
 
 	case MEMWRITEOOB:
-	case MEMREADOOB: {
-		struct mtd_oob_buf mbuf;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &mbuf))
-			break;
-
-		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 ", ptr=...}",
-			mbuf.start, mbuf.length);
+	case MEMREADOOB:
+		decode_mtd_oob_buf(tcp, arg);
 		break;
-	}
 
 	case MEMWRITEOOB64:
-	case MEMREADOOB64: {
-		struct mtd_oob_buf64 mbuf64;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &mbuf64))
-			break;
-
-		tprintf("{start=%#" PRIx64 ", length=%#" PRIx64 ", ptr=...}",
-			(uint64_t) mbuf64.start, (uint64_t) mbuf64.length);
+	case MEMREADOOB64:
+		decode_mtd_oob_buf64(tcp, arg);
 		break;
-	}
 
-	case MEMGETREGIONINFO: {
-		struct region_info_user rinfo;
-
-		if (entering(tcp)) {
-			tprints(", ");
-			if (umove_or_printaddr(tcp, arg, &rinfo))
-				break;
-			tprintf("{regionindex=%#x", rinfo.regionindex);
-			return 1;
-		} else {
-			if (syserror(tcp)) {
-				tprints("}");
-				break;
-			}
-			if (umove(tcp, arg, &rinfo) < 0) {
-				tprints(", ???}");
-				break;
-			}
-			tprintf(", offset=%#x, erasesize=%#x, numblocks=%#x}",
-				rinfo.offset, rinfo.erasesize, rinfo.numblocks);
-			break;
-		}
-	}
-
-	case OTPLOCK: {
-		struct otp_info oinfo;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &oinfo))
-			break;
-
-		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 ", locked=%" PRIu32 "}",
-			oinfo.start, oinfo.length, oinfo.locked);
+	case MEMWRITE:
+		decode_mtd_write_req(tcp, arg);
 		break;
-	}
 
-	case MEMWRITE: {
-		struct mtd_write_req mreq;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &mreq))
-			break;
-
-		tprintf("{start=%#" PRIx64 ", len=%#" PRIx64,
-			(uint64_t) mreq.start, (uint64_t) mreq.len);
-		tprintf(", ooblen=%#" PRIx64 ", usr_data=%#" PRIx64,
-			(uint64_t) mreq.ooblen, (uint64_t) mreq.usr_data);
-		tprintf(", usr_oob=%#" PRIx64 ", mode=",
-			(uint64_t) mreq.usr_oob);
-		printxval(mtd_mode_options, mreq.mode, "MTD_OPS_???");
-		tprints(", padding=...}");
+	case OTPGETREGIONINFO:
+		if (entering(tcp))
+			return 0;
+		/* fall through */
+	case OTPLOCK:
+		decode_otp_info(tcp, arg);
 		break;
-	}
 
-	case OTPSELECT: {
-		unsigned int i;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &i))
-			break;
-
-		tprints("[");
-		printxval(mtd_otp_options, i, "MTD_OTP_???");
-		tprints("]");
+	case OTPSELECT:
+		decode_otp_select(tcp, arg);
 		break;
-	}
 
 	case MTDFILEMODE:
 		tprints(", ");
@@ -181,133 +287,33 @@ mtd_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 		printnum_int64(tcp, arg, "%" PRIu64);
 		break;
 
-	case MEMGETINFO: {
-		struct mtd_info_user minfo;
-
+	case MEMGETINFO:
 		if (entering(tcp))
 			return 0;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &minfo))
-			break;
-
-		tprints("{type=");
-		printxval(mtd_type_options, minfo.type, "MTD_???");
-		tprints(", flags=");
-		printflags(mtd_flags_options, minfo.flags, "MTD_???");
-		tprintf(", size=%#" PRIx32 ", erasesize=%#" PRIx32,
-			minfo.size, minfo.erasesize);
-		tprintf(", writesize=%#" PRIx32 ", oobsize=%#" PRIx32,
-			minfo.writesize, minfo.oobsize);
-		tprintf(", padding=%#" PRIx64 "}",
-			(uint64_t) minfo.padding);
+		decode_mtd_info_user(tcp, arg);
 		break;
-	}
 
-	case MEMGETOOBSEL: {
-		struct nand_oobinfo ninfo;
-		unsigned int i;
-
+	case MEMGETOOBSEL:
 		if (entering(tcp))
 			return 0;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &ninfo))
-			break;
-
-		tprints("{useecc=");
-		printxval(mtd_nandecc_options, ninfo.useecc, "MTD_NANDECC_???");
-		tprintf(", eccbytes=%#" PRIx32, ninfo.eccbytes);
-
-		tprints(", oobfree={");
-		for (i = 0; i < ARRAY_SIZE(ninfo.oobfree); ++i) {
-			unsigned int j;
-
-			if (i)
-				tprints("}, ");
-			tprints("{");
-			for (j = 0; j < ARRAY_SIZE(ninfo.oobfree[0]); ++j) {
-				if (j)
-					tprints(", ");
-				tprintf("%#" PRIx32, ninfo.oobfree[i][j]);
-			}
-		}
-
-		tprints("}}, eccpos={");
-		for (i = 0; i < ARRAY_SIZE(ninfo.eccpos); ++i) {
-			if (i)
-				tprints(", ");
-			tprintf("%#" PRIx32, ninfo.eccpos[i]);
-		}
-
-		tprints("}");
+		decode_nand_oobinfo(tcp, arg);
 		break;
-	}
 
-	case OTPGETREGIONINFO: {
-		struct otp_info oinfo;
-
+	case ECCGETLAYOUT:
 		if (entering(tcp))
 			return 0;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &oinfo))
-			break;
-
-		tprintf("{start=%#" PRIx32 ", length=%#" PRIx32 ", locked=%" PRIu32 "}",
-			oinfo.start, oinfo.length, oinfo.locked);
+		decode_nand_ecclayout_user(tcp, arg);
 		break;
-	}
 
-	case ECCGETLAYOUT: {
-		struct nand_ecclayout_user nlay;
-		unsigned int i;
-
+	case ECCGETSTATS:
 		if (entering(tcp))
 			return 0;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &nlay))
-			break;
-
-		tprintf("{eccbytes=%#" PRIx32 ", eccpos={", nlay.eccbytes);
-		for (i = 0; i < ARRAY_SIZE(nlay.eccpos); ++i) {
-			if (i)
-				tprints(", ");
-			tprintf("%#" PRIx32, nlay.eccpos[i]);
-		}
-		tprintf("}, oobavail=%#" PRIx32 ", oobfree={", nlay.oobavail);
-		for (i = 0; i < ARRAY_SIZE(nlay.oobfree); ++i) {
-			if (i)
-				tprints(", ");
-			tprintf("{offset=%#" PRIx32 ", length=%#" PRIx32 "}",
-				nlay.oobfree[i].offset, nlay.oobfree[i].length);
-		}
-		tprints("}");
+		decode_mtd_ecc_stats(tcp, arg);
 		break;
-	}
-
-	case ECCGETSTATS: {
-		struct mtd_ecc_stats estat;
-
-		if (entering(tcp))
-			return 0;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &estat))
-			break;
-
-		tprintf("{corrected=%#" PRIx32 ", failed=%#" PRIx32,
-			estat.corrected, estat.failed);
-		tprintf(", badblocks=%#" PRIx32 ", bbtblocks=%#" PRIx32 "}",
-			estat.badblocks, estat.bbtblocks);
-		break;
-	}
 
 	case OTPGETREGIONCOUNT:
 		if (entering(tcp))
 			return 0;
-
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
 		break;
@@ -315,10 +321,32 @@ mtd_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 	case MEMGETREGIONCOUNT:
 		if (entering(tcp))
 			return 0;
-
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
+
+	case MEMGETREGIONINFO:
+		if (entering(tcp)) {
+			struct region_info_user rinfo;
+
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &rinfo))
+				break;
+			tprintf("{regionindex=%#x", rinfo.regionindex);
+			return 0;
+		} else {
+			struct region_info_user rinfo;
+
+			if (!syserror(tcp) && !umove(tcp, arg, &rinfo))
+				tprintf(", offset=%#x"
+					", erasesize=%#x"
+					", numblocks=%#x}",
+					rinfo.offset,
+					rinfo.erasesize,
+					rinfo.numblocks);
+			tprints("}");
+			break;
+		}
 
 	default:
 		return RVAL_DECODED;
