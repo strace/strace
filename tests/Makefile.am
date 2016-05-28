@@ -149,6 +149,7 @@ check_PROGRAMS = \
 	ioctl_block \
 	ioctl_evdev \
 	ioctl_evdev-v \
+	ioctl_mtd \
 	ioctl_rtc \
 	ioctl_rtc-v \
 	ioctl_uffdio \
@@ -450,6 +451,7 @@ DECODER_TESTS = \
 	ioctl_block.test \
 	ioctl_evdev.test \
 	ioctl_evdev-v.test \
+	ioctl_mtd.test \
 	ioctl_rtc.test \
 	ioctl_rtc-v.test \
 	ioctl_uffdio.test \

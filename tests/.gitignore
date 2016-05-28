@@ -94,6 +94,7 @@ ioctl
 ioctl_block
 ioctl_evdev
 ioctl_evdev-v
+ioctl_mtd
 ioctl_rtc
 ioctl_rtc-v
 ioctl_uffdio
