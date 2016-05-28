@@ -369,6 +369,7 @@ bit_ioctl(struct tcb *tcp, const unsigned int ev_nr, const long arg)
 			return decode_bitset(tcp, arg, evdev_ff_types,
 					     FF_MAX, "FF_???");
 		case EV_PWR:
+			tprints(", ");
 			printnum_int(tcp, arg, "%d");
 			return 1;
 		case EV_FF_STATUS:
