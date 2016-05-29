@@ -187,6 +187,12 @@ loop_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		break;
 #endif
 
+#ifdef LOOP_SET_DIRECT_IO
+	case LOOP_SET_DIRECT_IO:
+		tprintf(", %lu", arg);
+		break;
+#endif
+
 	default:
 		return RVAL_DECODED;
 	}
