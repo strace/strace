@@ -146,23 +146,19 @@ loop_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 		return RVAL_DECODED;
 
 	switch (code) {
-	case LOOP_SET_STATUS:
-		decode_loop_info(tcp, arg);
-		break;
-
 	case LOOP_GET_STATUS:
 		if (entering(tcp))
 			return 0;
+		/* fall through */
+	case LOOP_SET_STATUS:
 		decode_loop_info(tcp, arg);
-		break;
-
-	case LOOP_SET_STATUS64:
-		decode_loop_info64(tcp, arg);
 		break;
 
 	case LOOP_GET_STATUS64:
 		if (entering(tcp))
 			return 0;
+		/* fall through */
+	case LOOP_SET_STATUS64:
 		decode_loop_info64(tcp, arg);
 		break;
 
