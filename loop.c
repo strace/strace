@@ -73,8 +73,8 @@ decode_loop_info(struct tcb *tcp, const long addr)
 	}
 
 	if (!abbrev(tcp))
-		tprintf(", lo_init={%#lx, %#lx}"
-			", reserved={%#x, %#x, %#x, %#x}}",
+		tprintf(", lo_init=[%#lx, %#lx]"
+			", reserved=[%#x, %#x, %#x, %#x]}",
 			info.lo_init[0], info.lo_init[1],
 			info.reserved[0], info.reserved[1],
 			info.reserved[2], info.reserved[3]);
@@ -132,7 +132,7 @@ decode_loop_info64(struct tcb *tcp, const long addr)
 	}
 
 	if (!abbrev(tcp))
-		tprintf(", lo_init={%#" PRIx64 ", %#" PRIx64 "}}",
+		tprintf(", lo_init=[%#" PRIx64 ", %#" PRIx64 "]}",
 			(uint64_t) info64.lo_init[0],
 			(uint64_t) info64.lo_init[1]);
 	else
