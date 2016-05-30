@@ -27,26 +27,33 @@
  */
 
 #include "defs.h"
+
+#include DEF_MPERS_TYPE(struct_hd_geometry)
+
 #include <linux/hdreg.h>
 
-int
-hdio_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+typedef struct hd_geometry struct_hd_geometry;
+
+#include MPERS_DEFS
+
+MPERS_PRINTER_DECL(int, hdio_ioctl, struct tcb *tcp,
+		   const unsigned int code, const long arg)
 {
 	switch (code) {
 	case HDIO_GETGEO:
 		if (entering(tcp))
 			return 0;
 		else {
-			struct hd_geometry geo;
+			struct_hd_geometry geo;
 
 			tprints(", ");
 			if (!umove_or_printaddr(tcp, arg, &geo))
 				tprintf("{heads=%u, sectors=%u, "
-					"cylinders=%u, start=%lu}",
-					(unsigned)geo.heads,
-					(unsigned)geo.sectors,
-					(unsigned)geo.cylinders,
-					geo.start);
+					"cylinders=%hu, start=%lu}",
+					(unsigned) geo.heads,
+					(unsigned) geo.sectors,
+					geo.cylinders,
+					(unsigned long) geo.start);
 		}
 		break;
 	default:
