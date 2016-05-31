@@ -1,11 +1,12 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.11
+Version: 4.11.0.163.9720
+%define srcname %name-4.11.0.163-9720
 Release: 2%{?dist}
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
-Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
+Source: http://downloads.sourceforge.net/strace/%{srcname}.tar.xz
 BuildRequires: time
 %ifarch x86_64
 # for experimental -k option
@@ -43,7 +44,7 @@ The `strace' program in the `strace' package is for 32-bit processes.
 %endif
 
 %prep
-%setup -q
+%setup -q -n %{srcname}
 
 %build
 %configure
@@ -67,7 +68,16 @@ rm -f %{buildroot}%{_bindir}/strace-graph
 %endif
 
 %check
-make -k check VERBOSE=1
+uname -a |head -1
+libc="$(ldd /bin/sh |sed -n 's|^[^/]*\(/[^ ]*/libc\.so[^ ]*\).*|\1|p' |head -1)"
+$libc |head -1
+file -L /bin/sh
+gcc --version |head -1
+kver="$(echo -e '#include <linux/version.h>\nLINUX_VERSION_CODE' | gcc -E -P -)"
+printf 'kernel-headers %%s.%%s.%%s\n' $(($kver/65536)) $(($kver/256%%256)) $(($kver%%256))
+export SLEEP_A_BIT='sleep 0.1'
+make %{?_smp_mflags} -k check VERBOSE=1
+cat tests/test-suite.log tests/ksysent.log
 
 %files
 %doc CREDITS ChangeLog ChangeLog-CVS COPYING NEWS README
@@ -81,6 +91,13 @@ make -k check VERBOSE=1
 %endif
 
 %changelog
+* Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0.163.9720-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Fri Jan 15 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.11.0.163.9720-1
+- New upstream snapshot v4.11-163-g972018f:
+  + fixed decoding of syscalls unknown to the kernel on s390/s390x (#1298294).
+
 * Wed Dec 23 2015 Dmitry V. Levin <ldv@altlinux.org> - 4.11-2
 - Enabled experimental -k option on x86_64 (#1170296).
 
