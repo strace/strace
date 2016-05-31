@@ -1,8 +1,8 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 4.11.0.163.9720
-%define srcname %name-4.11.0.163-9720
-Release: 2%{?dist}
+Version: 4.12
+Release: 1%{?dist}
+%define srcname %name-%version
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
@@ -47,6 +47,16 @@ The `strace' program in the `strace' package is for 32-bit processes.
 %setup -q -n %{srcname}
 
 %build
+echo 'BEGIN OF BUILD ENVIRONMENT INFORMATION'
+uname -a |head -1
+libc="$(ldd /bin/sh |sed -n 's|^[^/]*\(/[^ ]*/libc\.so[^ ]*\).*|\1|p' |head -1)"
+$libc |head -1
+file -L /bin/sh
+gcc --version |head -1
+kver="$(echo -e '#include <linux/version.h>\nLINUX_VERSION_CODE' | gcc -E -P -)"
+printf 'kernel-headers %%s.%%s.%%s\n' $(($kver/65536)) $(($kver/256%%256)) $(($kver%%256))
+echo 'END OF BUILD ENVIRONMENT INFORMATION'
+
 %configure
 make %{?_smp_mflags}
 
@@ -68,16 +78,10 @@ rm -f %{buildroot}%{_bindir}/strace-graph
 %endif
 
 %check
-uname -a |head -1
-libc="$(ldd /bin/sh |sed -n 's|^[^/]*\(/[^ ]*/libc\.so[^ ]*\).*|\1|p' |head -1)"
-$libc |head -1
-file -L /bin/sh
-gcc --version |head -1
-kver="$(echo -e '#include <linux/version.h>\nLINUX_VERSION_CODE' | gcc -E -P -)"
-printf 'kernel-headers %%s.%%s.%%s\n' $(($kver/65536)) $(($kver/256%%256)) $(($kver%%256))
-export SLEEP_A_BIT='sleep 0.1'
 make %{?_smp_mflags} -k check VERBOSE=1
-cat tests/test-suite.log tests/ksysent.log
+echo 'BEGIN OF TEST SUITE INFORMATION'
+tail -n 99999 -- tests*/test-suite.log tests*/ksysent.log
+echo 'END OF TEST SUITE INFORMATION'
 
 %files
 %doc CREDITS ChangeLog ChangeLog-CVS COPYING NEWS README
@@ -91,6 +95,9 @@ cat tests/test-suite.log tests/ksysent.log
 %endif
 
 %changelog
+* Tue May 31 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.12-1
+- 4.11.0.163.9720 -> 4.12.
+
 * Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0.163.9720-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
