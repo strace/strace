@@ -18,8 +18,11 @@ test_c()
 
 	[ -s "$OUT" ] ||
 		fail_ "$STRACE $args output mismatch"
-	LC_ALL=C sort -c $sortopts "$OUT" ||
+	LC_ALL=C sort -c $sortopts "$OUT" || {
+		echo 'Actual output:'
+		cat < "$LOG"
 		fail_ "$STRACE $args output not sorted properly"
+	}
 }
 
 c='[[:space:]]\+\([^[:space:]]\+\)'
