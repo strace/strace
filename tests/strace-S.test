@@ -4,7 +4,7 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog_skip_if_failed date > /dev/null
+run_prog ./readv > /dev/null
 
 test_c()
 {
@@ -13,7 +13,7 @@ test_c()
 	sortopts="$1"; shift
 	sedexpr="$1"; shift
 
-	run_strace -c -S "$sortby" date > /dev/null
+	run_strace -c -w -S "$sortby" ./readv > /dev/null
 	sed -ne "$sedexpr" < "$LOG" > "$OUT"
 
 	[ -s "$OUT" ] ||
