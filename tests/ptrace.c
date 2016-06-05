@@ -72,7 +72,7 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 	       (unsigned) pid, psi->off, psi->nr, bad_request, rc, errno2name());
 
 	pid = fork();
-	if (pid < 0)
+	if ((pid_t) pid < 0)
 		perror_msg_and_fail("fork");
 
 	if (!pid) {
