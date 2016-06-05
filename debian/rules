@@ -47,7 +47,7 @@ build-indep: build-stamp $(extra_build_targets)
 %-stamp: %/Makefile
 	$(MAKE) -C $*
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
-	$(MAKE) -C $* check
+	$(MAKE) -C $* check VERBOSE=1
 endif
 	touch $@
 

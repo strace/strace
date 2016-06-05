@@ -2,7 +2,7 @@ Source: strace
 Maintainer: Steve McIntyre <93sam@debian.org>
 Section: utils
 Priority: optional
-Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [i386 powerpc s390 sparc], debhelper (>= 7.0.0), gawk, libunwind-dev [amd64]
+Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [i386 powerpc s390 sparc], debhelper (>= 7.0.0), gawk
 Standards-Version: 3.9.6
 Homepage: http://sourceforge.net/projects/strace/
 
