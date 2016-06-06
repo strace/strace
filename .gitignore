@@ -24,11 +24,13 @@
 /configure
 /depcomp
 /install-sh
+/ioctl_redefs[12].h
 /ioctlent[012].h
 /ioctls_all[012].h
 /ioctlsort[012]
 /libmpers-m32.a
 /libmpers-mx32.a
+/libstrace.a
 /m32_funcs.h
 /m32_printer_decls.h
 /m32_printer_defs.h
