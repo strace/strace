@@ -84,6 +84,7 @@ getresgid
 getresgid32
 getresuid
 getresuid32
+getrlimit
 getrusage
 getsid
 getuid
@@ -223,6 +224,7 @@ setresuid
 setresuid32
 setreuid
 setreuid32
+setrlimit
 setuid
 setuid32
 shmxt
@@ -254,6 +256,7 @@ times
 times-fail
 truncate
 truncate64
+ugetrlimit
 uio
 umask
 umount

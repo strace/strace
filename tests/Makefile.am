@@ -139,6 +139,7 @@ check_PROGRAMS = \
 	getresgid32 \
 	getresuid \
 	getresuid32 \
+	getrlimit \
 	getrusage \
 	getsid \
 	getuid \
@@ -276,6 +277,7 @@ check_PROGRAMS = \
 	setresuid32 \
 	setreuid \
 	setreuid32 \
+	setrlimit \
 	setuid \
 	setuid32 \
 	shmxt \
@@ -307,6 +309,7 @@ check_PROGRAMS = \
 	times-fail \
 	truncate \
 	truncate64 \
+	ugetrlimit \
 	uio \
 	umask \
 	umount \
@@ -442,6 +445,7 @@ DECODER_TESTS = \
 	getresgid32.test \
 	getresuid.test \
 	getresuid32.test \
+	getrlimit.test \
 	getrusage.test \
 	getsid.test \
 	getuid.test \
@@ -572,6 +576,7 @@ DECODER_TESTS = \
 	setresuid32.test \
 	setreuid.test \
 	setreuid32.test \
+	setrlimit.test \
 	setuid.test \
 	setuid32.test \
 	shmxt.test \
@@ -602,6 +607,7 @@ DECODER_TESTS = \
 	times.test \
 	truncate.test \
 	truncate64.test \
+	ugetrlimit.test \
 	uio.test \
 	umask.test \
 	umount.test \
@@ -707,6 +713,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     umovestr.expected \
 	     wait.expected \
 	     xchownx.c \
+	     xgetrlimit.c \
 	     xselect.c \
 	     xstatfs.c \
 	     xstatfs64.c \
