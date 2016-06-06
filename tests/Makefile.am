@@ -218,6 +218,7 @@ check_PROGRAMS = \
 	preadv \
 	preadv-pwritev \
 	preadv2-pwritev2 \
+	prlimit64 \
 	pselect6 \
 	ptrace \
 	pwritev \
@@ -515,6 +516,7 @@ DECODER_TESTS = \
 	preadv-pwritev.test \
 	preadv2-pwritev2.test \
 	preadv.test \
+	prlimit64.test \
 	pselect6.test \
 	ptrace.test \
 	pwritev.test \

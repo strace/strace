@@ -165,6 +165,7 @@ pread64-pwrite64
 preadv
 preadv-pwritev
 preadv2-pwritev2
+prlimit64
 pselect6
 ptrace
 pwritev
