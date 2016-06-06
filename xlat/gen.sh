@@ -135,6 +135,9 @@ gen_header()
 	while read line; do
 		LC_COLLATE=C
 		case $line in
+		'#conditional')
+			unconditional=
+			;;
 		'#unconditional')
 			unconditional=1
 			;;
@@ -190,6 +193,9 @@ gen_header()
 	while read line; do
 		LC_COLLATE=C
 		case ${line} in
+		'#conditional')
+			unconditional=
+			;;
 		'#unconditional')
 			unconditional=1
 			;;
