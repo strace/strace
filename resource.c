@@ -142,7 +142,7 @@ SYS_FUNC(setrlimit)
 SYS_FUNC(prlimit64)
 {
 	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
 		printxval(resources, tcp->u_arg[1], "RLIMIT_???");
 		tprints(", ");
 		print_rlimit64(tcp, tcp->u_arg[2]);
