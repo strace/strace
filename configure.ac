@@ -40,6 +40,11 @@ AM_INIT_AUTOMAKE([foreign nostdinc dist-xz no-dist-gzip silent-rules parallel-te
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
+SPEC_VERSION="$(echo "$PACKAGE_VERSION" | sed s/-/./g)"
+AC_SUBST(SPEC_VERSION)
+CHANGELOGTIME="$(LC_TIME=C date '+%a %b %d %Y')"
+AC_SUBST(CHANGELOGTIME)
+
 AC_PROG_CC
 AC_PROG_CPP
 AX_PROG_CC_FOR_BUILD
@@ -779,5 +784,9 @@ fi
 st_MPERS([m32], [aarch64|powerpc64|sparc64|tile|x32|x86_64])
 st_MPERS([mx32], [x86_64])
 
-AC_CONFIG_FILES([Makefile tests/Makefile tests-m32/Makefile tests-mx32/Makefile])
+AC_CONFIG_FILES([Makefile
+		 tests/Makefile
+		 tests-m32/Makefile
+		 tests-mx32/Makefile
+		 strace.spec])
 AC_OUTPUT
