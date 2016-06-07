@@ -7,11 +7,18 @@ License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
 Source: http://downloads.sourceforge.net/strace/%{srcname}.tar.xz
+%if 0%{?fedora_version} >= 20
+%define buildrequires_libunwind_devel BuildRequires: libunwind-devel
+%endif
+%if 0%{?suse_version} >= 1300
+%define buildrequires_libunwind_devel BuildRequires: libunwind-devel
+%endif
 %ifarch x86_64
 # for experimental -k option
-BuildRequires: libunwind-devel
+%{?buildrequires_libunwind_devel}
 %endif
 %define strace64_arches ppc64 sparc64
+%{?!buildroot:BuildRoot: %_tmppath/buildroot-%name-%version-%release}
 
 %description
 The strace program intercepts and records the system calls called and
@@ -83,6 +90,7 @@ tail -n 99999 -- tests*/test-suite.log tests*/ksysent.log
 echo 'END OF TEST SUITE INFORMATION'
 
 %files
+%{?suse_version:%defattr(-,root,root)}
 %doc CREDITS ChangeLog ChangeLog-CVS COPYING NEWS README
 %{_bindir}/strace
 %{_bindir}/strace-log-merge
@@ -90,6 +98,7 @@ echo 'END OF TEST SUITE INFORMATION'
 
 %ifarch %{strace64_arches}
 %files -n strace64
+%{?suse_version:%defattr(-,root,root)}
 %{_bindir}/strace64
 %endif
 
