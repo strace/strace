@@ -654,7 +654,6 @@ MISC_TESTS = \
 	strace-S.test \
 	strace-T.test \
 	strace-V.test \
-	strace-f.test \
 	strace-ff.test \
 	strace-r.test \
 	strace-t.test \
