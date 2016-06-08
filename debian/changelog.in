@@ -1,3 +1,9 @@
+strace (@PACKAGE_VERSION@-1) experimental; urgency=low
+
+  * @PACKAGE_STRING@ snapshot.
+
+ -- Strace <@PACKAGE_BUGREPORT@>  @DEB_CHANGELOGTIME@
+
 strace (4.12-3) unstable; urgency=medium
 
   * Fix up 32/64-bit test output in strace -S test to fix i386 build

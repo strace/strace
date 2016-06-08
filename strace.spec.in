@@ -103,7 +103,7 @@ echo 'END OF TEST SUITE INFORMATION'
 %endif
 
 %changelog
-* @CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-%release
+* @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
 * Tue May 31 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.12-1

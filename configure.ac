@@ -40,8 +40,10 @@ AM_INIT_AUTOMAKE([foreign nostdinc dist-xz no-dist-gzip silent-rules parallel-te
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
-CHANGELOGTIME="$(LC_TIME=C date '+%a %b %d %Y')"
-AC_SUBST(CHANGELOGTIME)
+RPM_CHANGELOGTIME="$(LC_TIME=C date '+%a %b %d %Y')"
+AC_SUBST(RPM_CHANGELOGTIME)
+DEB_CHANGELOGTIME="$(LC_TIME=C date -R)"
+AC_SUBST(DEB_CHANGELOGTIME)
 
 AC_PROG_CC
 AC_PROG_CPP
@@ -786,5 +788,6 @@ AC_CONFIG_FILES([Makefile
 		 tests/Makefile
 		 tests-m32/Makefile
 		 tests-mx32/Makefile
-		 strace.spec])
+		 strace.spec
+		 debian/changelog])
 AC_OUTPUT
