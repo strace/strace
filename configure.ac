@@ -40,8 +40,6 @@ AM_INIT_AUTOMAKE([foreign nostdinc dist-xz no-dist-gzip silent-rules parallel-te
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
-SPEC_VERSION="$(echo "$PACKAGE_VERSION" | sed s/-/./g)"
-AC_SUBST(SPEC_VERSION)
 CHANGELOGTIME="$(LC_TIME=C date '+%a %b %d %Y')"
 AC_SUBST(CHANGELOGTIME)
 

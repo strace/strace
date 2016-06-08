@@ -1,12 +1,11 @@
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: @SPEC_VERSION@
+Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
-%define srcname @PACKAGE_TARNAME@-@PACKAGE_VERSION@
 License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
-Source: http://downloads.sourceforge.net/strace/%{srcname}.tar.xz
+Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
 %if 0%{?fedora_version} >= 20
 %define buildrequires_libunwind_devel BuildRequires: libunwind-devel
 %endif
@@ -50,7 +49,7 @@ The `strace' program in the `strace' package is for 32-bit processes.
 %endif
 
 %prep
-%setup -q -n %{srcname}
+%setup -q
 echo -n %version-%release > .tarball-version
 
 %build
@@ -104,7 +103,7 @@ echo 'END OF TEST SUITE INFORMATION'
 %endif
 
 %changelog
-* @CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @SPEC_VERSION@-%release
+* @CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-%release
 - @PACKAGE_STRING@ snapshot.
 
 * Tue May 31 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.12-1
