@@ -6,10 +6,7 @@ License: BSD
 Group: Development/Debuggers
 URL: http://sourceforge.net/projects/strace/
 Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
-%if 0%{?fedora_version} >= 20
-%define buildrequires_libunwind_devel BuildRequires: libunwind-devel
-%endif
-%if 0%{?suse_version} >= 1300
+%if 0%{?fedora_version} >= 20 || 0%{?centos_version} >= 800 || 0%{?rhel_version} >= 800 || 0%{?scientificlinux_version} >= 800 || 0%{?suse_version} >= 1300
 %define buildrequires_libunwind_devel BuildRequires: libunwind-devel
 %endif
 %ifarch x86_64
