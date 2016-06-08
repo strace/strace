@@ -52,7 +52,10 @@
 /sen.h
 /stamp-h1
 /strace
+/strace-*.tar.gz
 /strace-*.tar.xz
+/strace.dsc
+/strace.spec
 /sys_func.h
 /test-driver
 /tests-m32

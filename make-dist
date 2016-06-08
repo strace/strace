@@ -28,4 +28,8 @@ else
 	echo 'SKIP: make news-check'
 fi
 
-mv -f strace-*.tar.xz ..
+./make-dsc strace-*.tar.gz > ../strace.dsc
+
+cat strace.spec > ../strace.spec
+
+mv -f strace-*.tar.[gx]z ..

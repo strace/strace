@@ -1,0 +1,49 @@
+#!/bin/sh -e
+
+exec < /dev/null
+
+cat <<__EOF__
+Format: 1.0
+$(sed '/^Source:[[:space:]]*/!d;q' debian/control)
+Binary: $(sed '/^Package:[[:space:]]*/!d;s///' debian/control |
+	tr '\n' ' ' | sed 's/ ./,&/g')
+$(sed '/^Architecture:[[:space:]]*/!d;q' debian/control)
+Version: $(sed -n '1s/^[^(]*(\([^)]\+\)).*/\1/p' debian/changelog)
+$(sed '/^Maintainer:[[:space:]]*/!d;q' debian/control)
+$(sed '/^Homepage:[[:space:]]*/!d;q' debian/control)
+$(sed '/^Standards-Version:[[:space:]]*/!d;q' debian/control)
+$(sed '/^Build-Depends:[[:space:]]*/!d;q' debian/control)
+Package-List:
+ strace deb $(
+	sed '/^Section:[[:space:]]*/!d;s///;q' debian/control) $(
+	sed '/^Priority:[[:space:]]*/!d;s///;q' debian/control) arch=$(
+	sed -n "/^Package:[[:space:]]*strace\$/,/^\$/p" debian/control |
+		sed -e '/^Architecture:[[:space:]]*/!d;s///' -e 's/ /,/g')
+ strace64 deb $(sed '/^Section:[[:space:]]*/!d;s///;q' debian/control) $(
+	sed -n "/^Package:[[:space:]]*strace64\$/,/^\$/p" debian/control |
+		sed '/^Priority:[[:space:]]*/!d;s///;q') arch=$(
+	sed -n "/^Package:[[:space:]]*strace64\$/,/^\$/p" debian/control |
+		sed -e '/^Architecture:[[:space:]]*/!d;s///' -e 's/ /,/g')
+ strace-udeb udeb $(
+	sed -n "/^Package:[[:space:]]*strace-udeb\$/,/^\$/p" debian/control |
+		sed '/^Section:[[:space:]]*/!d;s///;q') $(
+	sed -n "/^Package:[[:space:]]*strace-udeb\$/,/^\$/p" debian/control |
+		sed '/^Priority:[[:space:]]*/!d;s///;q') arch=$(
+	sed -n "/^Package:[[:space:]]*strace-udeb\$/,/^\$/p" debian/control |
+		sed -e '/^Architecture:[[:space:]]*/!d;s///' -e 's/ /,/g')
+Checksums-Sha1:
+$(for f; do echo " $(
+	sha1sum -- "$f" | sed 's/ .*//') $(
+	stat -c %s -- "$f") $(
+	echo $f | sed 's/-/_/;s/\.tar/.orig&/')"; done)
+Checksums-Sha256:
+$(for f; do echo " $(
+	sha256sum -- "$f" | sed 's/ .*//') $(
+	stat -c %s -- "$f") $(
+	echo $f | sed 's/-/_/;s/\.tar/.orig&/')"; done)
+Files:
+$(for f; do echo " $(
+	md5sum -- "$f" | sed 's/ .*//') $(
+	stat -c %s -- "$f") $(
+	echo $f | sed 's/-/_/;s/\.tar/.orig&/')"; done)
+__EOF__
