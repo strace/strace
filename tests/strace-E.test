@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Check -E option.
+
+. "${srcdir=.}/init.sh"
+
+run_prog ./sleep 0 > /dev/null
+run_strace -E option_E_var=OPTION_E_VAL -v $args
+match_grep

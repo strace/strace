@@ -651,6 +651,7 @@ MISC_TESTS = \
 	qual_syscall.test \
 	redirect.test \
 	restart_syscall.test \
+	strace-E.test \
 	strace-S.test \
 	strace-T.test \
 	strace-V.test \
@@ -703,6 +704,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     signalfd.expected \
 	     statfs.expected \
 	     statx.sh \
+	     strace-E.expected \
 	     strace-T.expected \
 	     strace-ff.expected \
 	     strace-k.test \
