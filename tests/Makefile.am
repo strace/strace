@@ -329,6 +329,7 @@ check_PROGRAMS = \
 	vhangup \
 	vmsplice \
 	wait \
+	waitpid \
 	xattr \
 	xet_robust_list \
 	xetitimer \
@@ -625,6 +626,7 @@ DECODER_TESTS = \
 	vhangup.test \
 	vmsplice.test \
 	wait.test \
+	waitpid.test \
 	xattr.test \
 	xet_robust_list.test \
 	xetitimer.test \
