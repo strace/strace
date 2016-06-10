@@ -44,26 +44,28 @@ MPERS_PRINTER_DECL(void, printrusage, struct tcb *tcp, long addr)
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
 
-	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
-		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
-		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
+	tprintf("{ru_utime={%llu, %llu}, ru_stime={%llu, %llu}, ",
+		widen_to_ull(ru.ru_utime.tv_sec),
+		widen_to_ull(ru.ru_utime.tv_usec),
+		widen_to_ull(ru.ru_stime.tv_sec),
+		widen_to_ull(ru.ru_stime.tv_usec));
 	if (abbrev(tcp))
 		tprints("...}");
 	else {
-		tprintf("ru_maxrss=%lu, ", (long) ru.ru_maxrss);
-		tprintf("ru_ixrss=%lu, ", (long) ru.ru_ixrss);
-		tprintf("ru_idrss=%lu, ", (long) ru.ru_idrss);
-		tprintf("ru_isrss=%lu, ", (long) ru.ru_isrss);
-		tprintf("ru_minflt=%lu, ", (long) ru.ru_minflt);
-		tprintf("ru_majflt=%lu, ", (long) ru.ru_majflt);
-		tprintf("ru_nswap=%lu, ", (long) ru.ru_nswap);
-		tprintf("ru_inblock=%lu, ", (long) ru.ru_inblock);
-		tprintf("ru_oublock=%lu, ", (long) ru.ru_oublock);
-		tprintf("ru_msgsnd=%lu, ", (long) ru.ru_msgsnd);
-		tprintf("ru_msgrcv=%lu, ", (long) ru.ru_msgrcv);
-		tprintf("ru_nsignals=%lu, ", (long) ru.ru_nsignals);
-		tprintf("ru_nvcsw=%lu, ", (long) ru.ru_nvcsw);
-		tprintf("ru_nivcsw=%lu}", (long) ru.ru_nivcsw);
+		tprintf("ru_maxrss=%llu, ", widen_to_ull(ru.ru_maxrss));
+		tprintf("ru_ixrss=%llu, ", widen_to_ull(ru.ru_ixrss));
+		tprintf("ru_idrss=%llu, ", widen_to_ull(ru.ru_idrss));
+		tprintf("ru_isrss=%llu, ", widen_to_ull(ru.ru_isrss));
+		tprintf("ru_minflt=%llu, ", widen_to_ull(ru.ru_minflt));
+		tprintf("ru_majflt=%llu, ", widen_to_ull(ru.ru_majflt));
+		tprintf("ru_nswap=%llu, ", widen_to_ull(ru.ru_nswap));
+		tprintf("ru_inblock=%llu, ", widen_to_ull(ru.ru_inblock));
+		tprintf("ru_oublock=%llu, ", widen_to_ull(ru.ru_oublock));
+		tprintf("ru_msgsnd=%llu, ", widen_to_ull(ru.ru_msgsnd));
+		tprintf("ru_msgrcv=%llu, ", widen_to_ull(ru.ru_msgrcv));
+		tprintf("ru_nsignals=%llu, ", widen_to_ull(ru.ru_nsignals));
+		tprintf("ru_nvcsw=%llu, ", widen_to_ull(ru.ru_nvcsw));
+		tprintf("ru_nivcsw=%llu}", widen_to_ull(ru.ru_nivcsw));
 	}
 }
 
