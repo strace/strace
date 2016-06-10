@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of waitid syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -esignal=none

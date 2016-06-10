@@ -331,6 +331,8 @@ check_PROGRAMS = \
 	wait \
 	wait4 \
 	wait4-v \
+	waitid \
+	waitid-v \
 	waitpid \
 	xattr \
 	xet_robust_list \
@@ -630,6 +632,8 @@ DECODER_TESTS = \
 	wait.test \
 	wait4.test \
 	wait4-v.test \
+	waitid.test \
+	waitid-v.test \
 	waitpid.test \
 	xattr.test \
 	xet_robust_list.test \

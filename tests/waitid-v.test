@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check verbose decoding of waitid syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -v -e signal=none -e trace=waitid
