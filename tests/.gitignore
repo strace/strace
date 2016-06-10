@@ -230,6 +230,7 @@ setuid32
 shmxt
 sigaction
 sigaltstack
+siginfo
 signalfd
 sigreturn
 sleep
@@ -275,7 +276,6 @@ utimes
 vfork-f
 vhangup
 vmsplice
-wait
 wait4
 wait4-v
 waitid

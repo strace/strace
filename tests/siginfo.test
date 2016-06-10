@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check SIGCHLD siginfo_t decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=none

@@ -283,6 +283,7 @@ check_PROGRAMS = \
 	shmxt \
 	sigaction \
 	sigaltstack \
+	siginfo \
 	signalfd \
 	sigreturn \
 	sleep \
@@ -328,7 +329,6 @@ check_PROGRAMS = \
 	vfork-f \
 	vhangup \
 	vmsplice \
-	wait \
 	wait4 \
 	wait4-v \
 	waitid \
@@ -587,6 +587,7 @@ DECODER_TESTS = \
 	shmxt.test \
 	sigaction.test \
 	sigaltstack.test \
+	siginfo.test \
 	signalfd.test \
 	sigreturn.test \
 	splice.test \
@@ -629,7 +630,6 @@ DECODER_TESTS = \
 	utimes.test \
 	vhangup.test \
 	vmsplice.test \
-	wait.test \
 	wait4.test \
 	wait4-v.test \
 	waitid.test \
@@ -723,7 +723,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sun_path.expected \
 	     uio.expected \
 	     umovestr.expected \
-	     wait.expected \
 	     xchownx.c \
 	     xgetrlimit.c \
 	     xselect.c \
