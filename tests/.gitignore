@@ -276,6 +276,8 @@ vfork-f
 vhangup
 vmsplice
 wait
+wait4
+wait4-v
 waitpid
 xattr
 xet_robust_list
