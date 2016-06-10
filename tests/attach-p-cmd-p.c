@@ -28,17 +28,14 @@
  */
 
 #include "tests.h"
-#include <assert.h>
+#include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <time.h>
-#include <sys/time.h>
 #include <unistd.h>
 
 static void
 handler(int signo)
 {
-	_exit(!chdir("attach-p-cmd.test -p"));
 }
 
 int
@@ -50,16 +47,17 @@ main(int ac, char **av)
 	if (ac > 2)
 		error_msg_and_fail("extra operand");
 
-	const sigset_t set = {};
 	const struct sigaction act = { .sa_handler = handler };
-	const struct itimerval itv = { .it_value.tv_sec = atoi(av[1]) };
+	if (sigaction(SIGALRM, &act, NULL))
+		perror_msg_and_skip("sigaction");
 
-	assert(sigaction(SIGALRM, &act, NULL) == 0);
-	assert(sigprocmask(SIG_SETMASK, &set, NULL) == 0);
-	if (setitimer(ITIMER_REAL, &itv, NULL))
-		perror_msg_and_skip("setitimer");
+	sigset_t mask = {};
+	sigaddset(&mask, SIGALRM);
+	if (sigprocmask(SIG_UNBLOCK, &mask, NULL))
+		perror_msg_and_skip("sigprocmask");
 
-	for (;;);
+	alarm(atoi(av[1]));
+	pause();
 
-	return 0;
+	return !(chdir("attach-p-cmd.test -p") && ENOENT == errno);
 }
