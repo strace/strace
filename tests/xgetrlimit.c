@@ -41,10 +41,10 @@ const char *
 sprint_rlim(kernel_ulong_t lim)
 {
 	if (sizeof(lim) == sizeof(uint64_t)) {
-		if (lim == -1ULL)
+		if (lim == (kernel_ulong_t) -1ULL)
 			return "RLIM64_INFINITY";
 	} else {
-		if (lim == -1U)
+		if (lim == (kernel_ulong_t) -1U)
 			return "RLIM_INFINITY";
 	}
 
