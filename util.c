@@ -761,7 +761,7 @@ printpathn(struct tcb *tcp, long addr, unsigned int n)
 	/* Fetch one byte more to find out whether path length > n. */
 	nul_seen = umovestr(tcp, addr, n + 1, path);
 	if (nul_seen < 0)
-		tprintf("%#lx", addr);
+		printaddr(addr);
 	else {
 		path[n++] = '\0';
 		print_quoted_string(path, n, QUOTE_0_TERMINATED);
@@ -812,7 +812,7 @@ printstr(struct tcb *tcp, long addr, long len)
 		 * because string_quote may look one byte ahead.
 		 */
 		if (umovestr(tcp, addr, size + 1, str) < 0) {
-			tprintf("%#lx", addr);
+			printaddr(addr);
 			return;
 		}
 		style = QUOTE_0_TERMINATED;
@@ -821,7 +821,7 @@ printstr(struct tcb *tcp, long addr, long len)
 		if (size > (unsigned long)len)
 			size = (unsigned long)len;
 		if (umoven(tcp, addr, size, str) < 0) {
-			tprintf("%#lx", addr);
+			printaddr(addr);
 			return;
 		}
 		style = 0;
@@ -1131,13 +1131,9 @@ int
 umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
 		    void *our_addr)
 {
-	if (!addr) {
-		tprints("NULL");
-		return -1;
-	}
-	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
+	if (!addr || !verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 	    umoven(tcp, addr, len, our_addr) < 0) {
-		tprintf("%#lx", addr);
+		printaddr(addr);
 		return -1;
 	}
 	return 0;

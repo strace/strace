@@ -133,10 +133,10 @@ ff_effect_ioctl(struct tcb *tcp, long arg)
 				ffe.u.periodic.offset,
 				ffe.u.periodic.phase);
 			decode_envelope(&ffe.u.periodic.envelope);
-			tprintf(", custom_len=%u"
-				", custom_data=%#lx}",
-				ffe.u.periodic.custom_len,
-				(unsigned long) ffe.u.periodic.custom_data);
+			tprintf(", custom_len=%u, custom_data=",
+				ffe.u.periodic.custom_len);
+			printaddr((unsigned long) ffe.u.periodic.custom_data);
+			tprints("}");
 			break;
 		case FF_RUMBLE:
 			tprintf(", rumble={strong_magnitude=%" PRIu16

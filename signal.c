@@ -559,14 +559,16 @@ decode_new_sigaction(struct tcb *tcp, long addr)
 	 * be manipulated by strace. In order to prevent the
 	 * compiler from generating code to manipulate
 	 * __sa_handler we cast the function pointers to long. */
+	tprints("{");
 	if ((long)sa.__sa_handler == (long)SIG_ERR)
-		tprints("{SIG_ERR, ");
+		tprints("SIG_ERR");
 	else if ((long)sa.__sa_handler == (long)SIG_DFL)
-		tprints("{SIG_DFL, ");
+		tprints("SIG_DFL");
 	else if ((long)sa.__sa_handler == (long)SIG_IGN)
-		tprints("{SIG_IGN, ");
+		tprints("SIG_IGN");
 	else
-		tprintf("{%#lx, ", (long) sa.__sa_handler);
+		printaddr((unsigned long) sa.__sa_handler);
+	tprints(", ");
 	/*
 	 * Sigset size is in tcp->u_arg[4] (SPARC)
 	 * or in tcp->u_arg[3] (all other),

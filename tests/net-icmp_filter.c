@@ -36,7 +36,7 @@ int
 main(void)
 {
 	getsockopt(-1, SOL_RAW, ICMP_FILTER, 0, 0);
-	printf("getsockopt(-1, SOL_RAW, ICMP_FILTER, 0, 0) = -1 %s (%m)\n",
+	printf("getsockopt(-1, SOL_RAW, ICMP_FILTER, NULL, NULL) = -1 %s (%m)\n",
 	       errno2name());
 
 	setsockopt(-1, SOL_RAW, ICMP_FILTER, NULL, 0);

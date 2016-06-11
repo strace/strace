@@ -43,10 +43,12 @@ MPERS_PRINTER_DECL(void, print_sigevent, struct tcb *tcp, const long addr)
 		return;
 
 	tprints("{");
-	if (sev.sigev_value.sival_ptr)
-		tprintf("sigev_value={int=%d, ptr=%#lx}, ",
-			sev.sigev_value.sival_int,
-			(unsigned long) sev.sigev_value.sival_ptr);
+	if (sev.sigev_value.sival_ptr) {
+		tprintf("sigev_value={int=%d, ptr=",
+			sev.sigev_value.sival_int);
+		printaddr((unsigned long) sev.sigev_value.sival_ptr);
+		tprints("}, ");
+	}
 
 	tprints("sigev_signo=");
 	switch (sev.sigev_notify) {

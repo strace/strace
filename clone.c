@@ -82,7 +82,9 @@ SYS_FUNC(clone)
 	if (exiting(tcp)) {
 		const char *sep = "|";
 		unsigned long flags = tcp->u_arg[ARG_FLAGS];
-		tprintf("child_stack=%#lx, ", tcp->u_arg[ARG_STACK]);
+		tprints("child_stack=");
+		printaddr(tcp->u_arg[ARG_STACK]);
+		tprints(", ");
 #ifdef ARG_STACKSIZE
 		if (ARG_STACKSIZE != -1)
 			tprintf("stack_size=%#lx, ",
@@ -96,8 +98,10 @@ SYS_FUNC(clone)
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
 			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
 			return 0;
-		if (flags & CLONE_PARENT_SETTID)
-			tprintf(", parent_tidptr=%#lx", tcp->u_arg[ARG_PTID]);
+		if (flags & CLONE_PARENT_SETTID) {
+			tprints(", parent_tidptr=");
+			printaddr(tcp->u_arg[ARG_PTID]);
+		}
 		if (flags & CLONE_SETTLS) {
 #if defined I386 || defined X86_64 || defined X32
 # ifndef I386
@@ -111,10 +115,15 @@ SYS_FUNC(clone)
 			else
 # endif
 #endif /* I386 || X86_64 || X32 */
-				tprintf(", tls=%#lx", tcp->u_arg[ARG_TLS]);
+			{
+				tprints(", tls=");
+				printaddr(tcp->u_arg[ARG_TLS]);
+			}
 		}
-		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID))
-			tprintf(", child_tidptr=%#lx", tcp->u_arg[ARG_CTID]);
+		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID)) {
+			tprints(", child_tidptr=");
+			printaddr(tcp->u_arg[ARG_CTID]);
+		}
 	}
 	/* TODO on syscall entry:
 	 * We can clear CLONE_PTRACE here since it is an ancient hack

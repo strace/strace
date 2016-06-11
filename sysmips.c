@@ -64,10 +64,11 @@ SYS_FUNC(sysmips)
 		return RVAL_DECODED;
 	}
 	case MIPS_ATOMIC_SET:
-		tprintf("%#lx, 0x%lx", tcp->u_arg[1], tcp->u_arg[2]);
+		printaddr(tcp->u_arg[1]);
+		tprintf(", %#lx", tcp->u_arg[2]);
 		return RVAL_DECODED;
 	case MIPS_FIXADE:
-		tprintf("0x%lx", tcp->u_arg[1]);
+		tprintf("%#lx", tcp->u_arg[1]);
 		return RVAL_DECODED;
 	}
 

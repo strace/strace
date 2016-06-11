@@ -76,8 +76,9 @@ printsigsource(const siginfo_t *sip)
 static void
 printsigval(const siginfo_t *sip)
 {
-	tprintf(", si_value={int=%d, ptr=%#lx}",
-		sip->si_int, (unsigned long) sip->si_ptr);
+	tprintf(", si_value={int=%d, ptr=", sip->si_int);
+	printaddr((unsigned long) sip->si_ptr);
+	tprints("}");
 }
 
 static void
@@ -176,8 +177,8 @@ print_si_info(const siginfo_t *sip)
 			break;
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:
-			tprintf(", si_addr=%#lx",
-				(unsigned long) sip->si_addr);
+			tprints(", si_addr=");
+			printaddr((unsigned long) sip->si_addr);
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {
@@ -189,8 +190,9 @@ print_si_info(const siginfo_t *sip)
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS:
-			tprintf(", si_call_addr=%#lx, si_syscall=__NR_%s, si_arch=",
-				(unsigned long) sip->si_call_addr,
+			tprints(", si_call_addr=");
+			printaddr((unsigned long) sip->si_call_addr);
+			tprintf(", si_syscall=__NR_%s, si_arch=",
 				syscall_name((unsigned) sip->si_syscall));
 			printxval(audit_arch, sip->si_arch, "AUDIT_ARCH_???");
 			break;

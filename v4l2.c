@@ -359,8 +359,8 @@ print_v4l2_buffer(struct tcb *tcp, const unsigned int code, const long arg)
 			if (b.memory == V4L2_MEMORY_MMAP) {
 				tprintf(", m.offset=%#x", b.m.offset);
 			} else if (b.memory == V4L2_MEMORY_USERPTR) {
-				tprintf(", m.userptr=%#lx",
-					(unsigned long) b.m.userptr);
+				tprints(", m.userptr=");
+				printaddr((unsigned long) b.m.userptr);
 			}
 
 			tprintf(", length=%u, bytesused=%u, flags=",
@@ -384,8 +384,10 @@ print_v4l2_framebuffer(struct tcb *tcp, const long arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &b)) {
-		tprintf("{capability=%#x, flags=%#x, base=%#lx}",
-			b.capability, b.flags, (unsigned long) b.base);
+		tprintf("{capability=%#x, flags=%#x, base=",
+			b.capability, b.flags);
+		printaddr((unsigned long) b.base);
+		tprints("}");
 	}
 
 	return RVAL_DECODED | 1;
@@ -676,12 +678,8 @@ static int
 umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
 				    const unsigned int len, void *our_addr)
 {
-	if (!addr) {
-		tprints("NULL");
-		return -1;
-	}
-	if (umoven(tcp, addr, len, our_addr) < 0) {
-		tprintf("%#lx", addr);
+	if (!addr || umoven(tcp, addr, len, our_addr) < 0) {
+		printaddr(addr);
 		return -1;
 	}
 	return 0;

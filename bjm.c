@@ -52,7 +52,8 @@ SYS_FUNC(delete_module)
 
 SYS_FUNC(init_module)
 {
-	tprintf("%#lx, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	printaddr(tcp->u_arg[0]);
+	tprintf(", %lu, ", tcp->u_arg[1]);
 	printstr(tcp, tcp->u_arg[2], -1);
 
 	return RVAL_DECODED;

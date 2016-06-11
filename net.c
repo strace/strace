@@ -930,8 +930,8 @@ SYS_FUNC(sendmmsg)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (!verbose(tcp)) {
-			tprintf("%#lx, %u, ",
-				tcp->u_arg[1], (unsigned int) tcp->u_arg[2]);
+			printaddr(tcp->u_arg[1]);
+			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		}
 	} else {
@@ -1023,7 +1023,8 @@ SYS_FUNC(recvmmsg)
 			 */
 			tcp->auxstr = sprint_timespec(tcp, tcp->u_arg[4]);
 		} else {
-			tprintf("%#lx, %ld, ", tcp->u_arg[1], tcp->u_arg[2]);
+			printaddr(tcp->u_arg[1]);
+			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			tprints(", ");
 			print_timespec(tcp, tcp->u_arg[4]);
@@ -1335,8 +1336,9 @@ SYS_FUNC(getsockopt)
 		int len;
 
 		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &len) < 0) {
-			tprintf("%#lx, %#lx",
-				tcp->u_arg[3], tcp->u_arg[4]);
+			printaddr(tcp->u_arg[3]);
+			tprints(", ");
+			printaddr(tcp->u_arg[4]);
 		} else {
 			print_getsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 					 tcp->u_arg[3], len);
