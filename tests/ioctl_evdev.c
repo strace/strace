@@ -1,5 +1,5 @@
 /*
- * This file is part of ioctl_block strace test.
+ * This file is part of ioctl_evdev strace test.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
