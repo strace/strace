@@ -1400,3 +1400,37 @@ print_array(struct tcb *tcp,
 
 	return cur >= end_addr;
 }
+
+int
+printargs(struct tcb *tcp)
+{
+	if (entering(tcp)) {
+		int i;
+		int n = tcp->s_ent->nargs;
+		for (i = 0; i < n; i++)
+			tprintf("%s%#lx", i ? ", " : "", tcp->u_arg[i]);
+	}
+	return 0;
+}
+
+int
+printargs_u(struct tcb *tcp)
+{
+	const int n = tcp->s_ent->nargs;
+	int i;
+	for (i = 0; i < n; ++i)
+		tprintf("%s%u", i ? ", " : "",
+			(unsigned int) tcp->u_arg[i]);
+	return RVAL_DECODED;
+}
+
+int
+printargs_d(struct tcb *tcp)
+{
+	const int n = tcp->s_ent->nargs;
+	int i;
+	for (i = 0; i < n; ++i)
+		tprintf("%s%d", i ? ", " : "",
+			(int) tcp->u_arg[i]);
+	return RVAL_DECODED;
+}
