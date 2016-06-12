@@ -447,7 +447,8 @@ set_cloexec_flag(int fd)
 	fcntl(fd, F_SETFD, newflags); /* never fails */
 }
 
-static void kill_save_errno(pid_t pid, int sig)
+static void
+kill_save_errno(pid_t pid, int sig)
 {
 	int saved_errno = errno;
 
