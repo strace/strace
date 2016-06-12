@@ -356,7 +356,6 @@ struct tcb {
 #define QUAL_READ	0x020	/* dump data read on this file descriptor */
 #define QUAL_WRITE	0x040	/* dump data written to this file descriptor */
 typedef uint8_t qualbits_t;
-#define UNDEFINED_SCNO	0x100	/* Used only in tcp->qual_flg */
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 

@@ -770,10 +770,8 @@ trace_syscall_entering(struct tcb *tcp)
 		printleader(tcp);
 		if (scno_good != 1)
 			tprints("????" /* anti-trigraph gap */ "(");
-		else if (tcp->qual_flg & UNDEFINED_SCNO)
-			tprintf("%s(", syscall_name(tcp->scno));
 		else
-			tprintf("%s(", tcp->s_ent->sys_name);
+			tprintf("%s(", syscall_name(tcp->scno));
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -832,10 +830,7 @@ trace_syscall_entering(struct tcb *tcp)
 #endif
 
 	printleader(tcp);
-	if (tcp->qual_flg & UNDEFINED_SCNO)
-		tprintf("%s(", syscall_name(tcp->scno));
-	else
-		tprintf("%s(", tcp->s_ent->sys_name);
+	tprintf("%s(", syscall_name(tcp->scno));
 	if ((tcp->qual_flg & QUAL_RAW) && SEN_exit != tcp->s_ent->sen)
 		res = printargs(tcp);
 	else
@@ -896,10 +891,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		if (tcp->qual_flg & UNDEFINED_SCNO)
-			tprintf("<... %s resumed> ", syscall_name(tcp->scno));
-		else
-			tprintf("<... %s resumed> ", tcp->s_ent->sys_name);
+		tprintf("<... %s resumed> ", syscall_name(tcp->scno));
 	}
 	printing_tcp = tcp;
 
@@ -1291,7 +1283,7 @@ get_scno(struct tcb *tcp)
 			.sys_name = "system call",
 		};
 		tcp->s_ent = &unknown;
-		tcp->qual_flg = UNDEFINED_SCNO | QUAL_RAW | DEFAULT_QUAL_FLAGS;
+		tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
 		if (debug_flag)
 			error_msg("pid %d invalid syscall %ld", tcp->pid, tcp->scno);
 	}
