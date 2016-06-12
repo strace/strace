@@ -196,7 +196,7 @@ strerror(int err_no)
 #endif /* HAVE_STERRROR */
 
 static void
-usage()
+usage(void)
 {
 	printf("\
 usage: strace [-CdffhiqrtttTvVwxxy] [-I n] [-e expr]...\n\
