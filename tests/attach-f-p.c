@@ -127,7 +127,7 @@ main(void)
 		       retval.pid, child[i], retval.pid);
 	}
 
-	/* sleep a bit more to late the tracer catch up */
+	/* sleep a bit more to let the tracer catch up */
 	if (timer_settime(timerid[0], 0, &its[0], NULL))
 		perror_msg_and_fail("timer_settime");
 	int signo;
