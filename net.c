@@ -93,12 +93,10 @@
 
 #include "xlat/inet_protocols.h"
 
-#ifdef AF_NETLINK
-# if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
-#  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
-# endif
-# include "xlat/netlink_protocols.h"
+#if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
+# define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
 #endif
+#include "xlat/netlink_protocols.h"
 
 #if defined(HAVE_BLUETOOTH_BLUETOOTH_H)
 # include "xlat/bt_protocols.h"
@@ -140,9 +138,7 @@ typedef union {
 #ifdef AF_PACKET
 	struct sockaddr_ll ll;
 #endif
-#ifdef AF_NETLINK
 	struct sockaddr_nl nl;
-#endif
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 	struct sockaddr_hci hci;
 	struct sockaddr_l2 l2;
@@ -237,11 +233,9 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 		break;
 
 #endif /* AF_PACKET */
-#ifdef AF_NETLINK
 	case AF_NETLINK:
 		tprintf("pid=%d, groups=%08x", addr->nl.nl_pid, addr->nl.nl_groups);
 		break;
-#endif /* AF_NETLINK */
 #if defined(AF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
 	case AF_BLUETOOTH:
 		tprintf("{sco_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X} or "
@@ -803,11 +797,9 @@ SYS_FUNC(socket)
 		tprints("]");
 		break;
 #endif /* AF_IPX */
-#ifdef AF_NETLINK
 	case AF_NETLINK:
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
-#endif
 #if defined(AF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
 	case AF_BLUETOOTH:
 		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
