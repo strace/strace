@@ -55,9 +55,7 @@
 #if defined(HAVE_LINUX_IP_VS_H)
 # include <linux/ip_vs.h>
 #endif
-#if defined(HAVE_LINUX_NETLINK_H)
-# include <linux/netlink.h>
-#endif
+#include <linux/netlink.h>
 #if defined(HAVE_LINUX_NETFILTER_ARP_ARP_TABLES_H)
 # include <linux/netfilter_arp/arp_tables.h>
 #endif

@@ -414,7 +414,7 @@ AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
 AC_CHECK_HEADERS([linux/mqueue.h],,, [#include <linux/types.h>])
 
-AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/netlink.h linux/if_packet.h],,,
+AC_CHECK_HEADERS([linux/icmp.h linux/in6.h linux/if_packet.h],,,
 [#include <stddef.h>
 #include <sys/socket.h>
 #include <asm/types.h>])
