@@ -100,9 +100,7 @@
 
 #include "xlat/msg_flags.h"
 
-#if defined(AF_PACKET) /* from e.g. linux/if_packet.h */
-# include "xlat/af_packet_types.h"
-#endif
+#include "xlat/af_packet_types.h"
 
 static void
 print_ifindex(unsigned int ifindex)
@@ -131,9 +129,7 @@ typedef union {
 #if defined(AF_IPX)
 	struct sockaddr_ipx sipx;
 #endif
-#ifdef AF_PACKET
 	struct sockaddr_ll ll;
-#endif
 	struct sockaddr_nl nl;
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 	struct sockaddr_hci hci;
@@ -212,7 +208,6 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 		}
 		break;
 #endif /* AF_IPX */
-#ifdef AF_PACKET
 	case AF_PACKET:
 		{
 			int i;
@@ -228,7 +223,6 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 		}
 		break;
 
-#endif /* AF_PACKET */
 	case AF_NETLINK:
 		tprintf("pid=%d, groups=%08x", addr->nl.nl_pid, addr->nl.nl_groups);
 		break;
