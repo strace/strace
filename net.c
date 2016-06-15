@@ -774,9 +774,7 @@ SYS_FUNC(socket)
 	tprints(", ");
 	switch (tcp->u_arg[0]) {
 	case AF_INET:
-#ifdef AF_INET6
 	case AF_INET6:
-#endif
 		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 		break;
 #ifdef AF_IPX
