@@ -71,9 +71,7 @@
 #if defined(HAVE_LINUX_IF_PACKET_H)
 # include <linux/if_packet.h>
 #endif
-#if defined(HAVE_LINUX_ICMP_H)
-# include <linux/icmp.h>
-#endif
+#include <linux/icmp.h>
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>
 # include <bluetooth/hci.h>
