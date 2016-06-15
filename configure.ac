@@ -414,11 +414,6 @@ AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
 AC_CHECK_HEADERS([linux/mqueue.h],,, [#include <linux/types.h>])
 
-AC_CHECK_HEADERS([linux/in6.h],,,
-[#include <stddef.h>
-#include <sys/socket.h>
-#include <asm/types.h>])
-
 AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter_arp/arp_tables.h
 	linux/netfilter_bridge/ebtables.h
