@@ -68,9 +68,7 @@
 #if defined(HAVE_LINUX_NETFILTER_IPV6_IP6_TABLES_H)
 # include <linux/netfilter_ipv6/ip6_tables.h>
 #endif
-#if defined(HAVE_LINUX_IF_PACKET_H)
-# include <linux/if_packet.h>
-#endif
+#include <linux/if_packet.h>
 #include <linux/icmp.h>
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>
