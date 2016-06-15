@@ -1234,8 +1234,7 @@ print_tpacket_stats(struct tcb *tcp, long addr, int len)
 }
 #endif /* PACKET_STATISTICS */
 
-#ifdef ICMP_FILTER
-# include "xlat/icmpfilterflags.h"
+#include "xlat/icmpfilterflags.h"
 
 static void
 print_icmp_filter(struct tcb *tcp, const long addr, int len)
@@ -1256,7 +1255,6 @@ print_icmp_filter(struct tcb *tcp, const long addr, int len)
 	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
 	tprints(")");
 }
-#endif /* ICMP_FILTER */
 
 static void
 print_getsockopt(struct tcb *tcp, unsigned int level, unsigned int name,
@@ -1291,11 +1289,9 @@ print_getsockopt(struct tcb *tcp, unsigned int level, unsigned int name,
 
 	case SOL_RAW:
 		switch (name) {
-#ifdef ICMP_FILTER
 		case ICMP_FILTER:
 			print_icmp_filter(tcp, addr, len);
 			goto done;
-#endif
 		}
 		break;
 	}
@@ -1527,11 +1523,9 @@ print_setsockopt(struct tcb *tcp, unsigned int level, unsigned int name,
 
 	case SOL_RAW:
 		switch (name) {
-#ifdef ICMP_FILTER
 		case ICMP_FILTER:
 			print_icmp_filter(tcp, addr, len);
 			goto done;
-#endif
 		}
 		break;
 	}
