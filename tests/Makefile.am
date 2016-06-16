@@ -51,6 +51,7 @@ libtests_a_SOURCES = \
 	print_quoted_string.c \
 	printflags.c \
 	printxval.c \
+	signal2name.c \
 	tail_alloc.c \
 	tests.h \
 	tprintf.c \

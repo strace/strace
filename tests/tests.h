@@ -93,6 +93,9 @@ void check_overflowgid(const int);
 /* Translate errno to its name. */
 const char *errno2name(void);
 
+/* Translate signal number to its name. */
+const char *signal2name(int);
+
 struct xlat;
 
 /* Print flags in symbolic form according to xlat table. */
