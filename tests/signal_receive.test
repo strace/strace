@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check whether strace traces signals properly.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a16 -e trace=kill

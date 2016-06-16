@@ -231,6 +231,7 @@ shmxt
 sigaction
 sigaltstack
 siginfo
+signal_receive
 signalfd
 sigreturn
 sleep

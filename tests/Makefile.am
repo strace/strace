@@ -285,6 +285,7 @@ check_PROGRAMS = \
 	sigaction \
 	sigaltstack \
 	siginfo \
+	signal_receive \
 	signalfd \
 	sigreturn \
 	sleep \
@@ -662,6 +663,7 @@ MISC_TESTS = \
 	qual_syscall.test \
 	redirect.test \
 	restart_syscall.test \
+	signal_receive.test \
 	strace-E.test \
 	strace-S.test \
 	strace-T.test \
