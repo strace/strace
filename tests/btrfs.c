@@ -72,6 +72,20 @@ const unsigned char uuid_reference[BTRFS_UUID_SIZE] = {
 
 const char uuid_reference_string[] = "01234567-89ab-cdef-fedc-ba9876543210";
 
+#ifndef BTRFS_IOC_QUOTA_RESCAN
+struct btrfs_ioctl_quota_rescan_args {
+	uint64_t flags, progress, reserved[6];
+};
+# define BTRFS_IOC_QUOTA_RESCAN _IOW(BTRFS_IOCTL_MAGIC, 44, \
+					struct btrfs_ioctl_quota_rescan_args)
+# define BTRFS_IOC_QUOTA_RESCAN_STATUS _IOR(BTRFS_IOCTL_MAGIC, 45, \
+					struct btrfs_ioctl_quota_rescan_args)
+#endif
+
+#ifndef BTRFS_IOC_QUOTA_RESCAN_WAIT
+# define BTRFS_IOC_QUOTA_RESCAN_WAIT _IO(BTRFS_IOCTL_MAGIC, 46)
+#endif
+
 #ifndef BTRFS_IOC_GET_FEATURES
 # define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
                                    struct btrfs_ioctl_feature_flags)
