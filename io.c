@@ -180,7 +180,7 @@ SYS_FUNC(pwrite)
 static void
 print_lld_from_low_high_val(struct tcb *tcp, int arg)
 {
-#if SIZEOF_LONG == SIZEOF_LONG_LONG
+#if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
 # if SUPPORTED_PERSONALITIES > 1
 #  ifdef X86_64
 	if (current_personality != 1)
@@ -195,12 +195,20 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 			((unsigned long) tcp->u_arg[arg + 1] << current_wordsize * 8)
 			| (unsigned long) tcp->u_arg[arg]);
 # endif
-#else
-# ifdef X32
-	if (current_personality == 0)
-		tprintf("%lld", tcp->ext_arg[arg]);
-	else
+#elif SIZEOF_LONG > 4
+# error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
+#elif HAVE_STRUCT_TCB_EXT_ARG
+# if SUPPORTED_PERSONALITIES > 1
+	if (current_personality == 1) {
+		tprintf("%lld",
+			(widen_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
+			| widen_to_ull(tcp->u_arg[arg]));
+	} else
 # endif
+	{
+		tprintf("%lld", tcp->ext_arg[arg]);
+	}
+#else /* SIZEOF_LONG_LONG > SIZEOF_LONG && !HAVE_STRUCT_TCB_EXT_ARG */
 	tprintf("%lld",
 		(widen_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
 		| widen_to_ull(tcp->u_arg[arg]));

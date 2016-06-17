@@ -257,16 +257,16 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 # endif /* SUPPORTED_PERSONALITIES > 1 */
 #elif SIZEOF_LONG > 4
 #  error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
-#elif defined LINUX_MIPSN32
-	*val = tcp->ext_arg[arg_no];
-	arg_no++;
-#elif defined X32
-	if (current_personality == 0) {
-		*val = tcp->ext_arg[arg_no];
-		arg_no++;
-	} else {
+#elif HAVE_STRUCT_TCB_EXT_ARG
+# if SUPPORTED_PERSONALITIES > 1
+	if (current_personality == 1) {
 		*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
+	} else
+# endif
+	{
+		*val = tcp->ext_arg[arg_no];
+		arg_no++;
 	}
 #else
 # if defined __ARM_EABI__ || \

@@ -1042,7 +1042,7 @@ trace_syscall_exiting(struct tcb *tcp)
 				else
 					tprintf("= %ld", tcp->u_rval);
 				break;
-#if defined(LINUX_MIPSN32) || defined(X32)
+#if HAVE_STRUCT_TCB_EXT_ARG
 			/*
 			case RVAL_LHEX:
 				tprintf("= %#llx", tcp->u_lrval);
@@ -1059,7 +1059,7 @@ trace_syscall_exiting(struct tcb *tcp)
 				tprintf("= %lld", tcp->u_lrval);
 				break;
 			*/
-#endif
+#endif /* HAVE_STRUCT_TCB_EXT_ARG */
 			default:
 				error_msg("invalid rval format");
 				break;

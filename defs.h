@@ -288,6 +288,12 @@ typedef struct ioctlent {
 	unsigned int code;
 } struct_ioctlent;
 
+#if defined LINUX_MIPSN32 || defined X32
+# define HAVE_STRUCT_TCB_EXT_ARG 1
+#else
+# define HAVE_STRUCT_TCB_EXT_ARG 0
+#endif
+
 /* Trace Control Block */
 struct tcb {
 	int flags;		/* See below for TCB_ values */
@@ -296,7 +302,7 @@ struct tcb {
 	int u_error;		/* Error code */
 	long scno;		/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
-#if defined(LINUX_MIPSN32) || defined(X32)
+#if HAVE_STRUCT_TCB_EXT_ARG
 	long long ext_arg[MAX_ARGS];
 	long long u_lrval;	/* long long return value */
 #endif
@@ -382,14 +388,14 @@ extern const struct xlat whence_codes[];
 #define RVAL_HEX	001	/* hex format */
 #define RVAL_OCTAL	002	/* octal format */
 #define RVAL_UDECIMAL	003	/* unsigned decimal format */
-#if defined(LINUX_MIPSN32) || defined(X32)
+#if HAVE_STRUCT_TCB_EXT_ARG
 # if 0 /* unused so far */
 #  define RVAL_LDECIMAL	004	/* long decimal format */
 #  define RVAL_LHEX	005	/* long hex format */
 #  define RVAL_LOCTAL	006	/* long octal format */
 # endif
 # define RVAL_LUDECIMAL	007	/* long unsigned decimal format */
-#endif
+#endif /* HAVE_STRUCT_TCB_EXT_ARG */
 #define RVAL_FD		010	/* file descriptor */
 #define RVAL_MASK	017	/* mask for these values */
 
