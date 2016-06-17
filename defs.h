@@ -437,6 +437,17 @@ extern const struct xlat whence_codes[];
 # define NEED_UID16_PARSERS 0
 #endif
 
+enum sock_proto {
+	SOCK_PROTO_UNKNOWN,
+	SOCK_PROTO_UNIX,
+	SOCK_PROTO_TCP,
+	SOCK_PROTO_UDP,
+	SOCK_PROTO_TCPv6,
+	SOCK_PROTO_UDPv6,
+	SOCK_PROTO_NETLINK
+};
+extern enum sock_proto get_proto_by_name(const char *);
+
 typedef enum {
 	CFLAG_NONE = 0,
 	CFLAG_ONLY_STATS,
@@ -636,7 +647,7 @@ extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(intmax_t)*3 * 2 + sizeof("{tv_sec=%jd, tv_nsec=%jd}"))
 extern void printfd(struct tcb *, int);
-extern bool print_sockaddr_by_inode(const unsigned long, const char *);
+extern bool print_sockaddr_by_inode(const unsigned long, const enum sock_proto);
 extern bool print_sockaddr_by_inode_cached(const unsigned long);
 extern void print_dirfd(struct tcb *, int);
 extern void printsock(struct tcb *, long, int);

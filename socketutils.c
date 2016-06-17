@@ -438,44 +438,59 @@ netlink_print(const int fd, const unsigned long inode)
 				     netlink_parse_response);
 }
 
+static const struct {
+	const char *const name;
+	bool (*const print)(int, unsigned long);
+} protocols[] = {
+	[SOCK_PROTO_UNIX] = { "UNIX", unix_print },
+	[SOCK_PROTO_TCP] = { "TCP", tcp_v4_print },
+	[SOCK_PROTO_UDP] = { "UDP", udp_v4_print },
+	[SOCK_PROTO_TCPv6] = { "TCPv6", tcp_v6_print },
+	[SOCK_PROTO_UDPv6] = { "UDPv6", udp_v6_print },
+	[SOCK_PROTO_NETLINK] = { "NETLINK", netlink_print }
+};
+
+enum sock_proto
+get_proto_by_name(const char *const name)
+{
+	unsigned int i;
+	for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
+	     i < ARRAY_SIZE(protocols); ++i) {
+		if (protocols[i].name && !strcmp(name, protocols[i].name))
+			return (enum sock_proto) i;
+	}
+	return SOCK_PROTO_UNKNOWN;
+}
+
 /* Given an inode number of a socket, print out the details
  * of the ip address and port. */
+
 bool
-print_sockaddr_by_inode(const unsigned long inode, const char *const proto_name)
+print_sockaddr_by_inode(const unsigned long inode, const enum sock_proto proto)
 {
-	static const struct {
-		const char *const name;
-		bool (*const print)(int, unsigned long);
-	} protocols[] = {
-		{ "TCP", tcp_v4_print },
-		{ "UDP", udp_v4_print },
-		{ "TCPv6", tcp_v6_print },
-		{ "UDPv6", udp_v6_print },
-		{ "UNIX", unix_print },
-		{ "NETLINK", netlink_print }
-	};
+	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
+	    (proto != SOCK_PROTO_UNKNOWN && !protocols[proto].print))
+		return false;
 
 	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
 	if (fd < 0)
 		return false;
 	bool r = false;
-	unsigned int i;
 
-	if (proto_name) {
-		for (i = 0; i < ARRAY_SIZE(protocols); ++i) {
-			if (strcmp(proto_name, protocols[i].name) == 0) {
-				r = protocols[i].print(fd, inode);
-				break;
-			}
-		}
-
+	if (proto != SOCK_PROTO_UNKNOWN) {
+		r = protocols[proto].print(fd, inode);
 		if (!r) {
-			tprintf("%s:[%lu]", proto_name, inode);
+			tprintf("%s:[%lu]", protocols[proto].name, inode);
 			r = true;
 		}
 	} else {
-		for (i = 0; i < ARRAY_SIZE(protocols); ++i) {
-			if ((r = protocols[i].print(fd, inode)))
+		unsigned int i;
+		for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
+		     i < ARRAY_SIZE(protocols); ++i) {
+			if (!protocols[i].print)
+				continue;
+			r = protocols[i].print(fd, inode);
+			if (r)
 				break;
 		}
 	}

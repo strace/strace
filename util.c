@@ -472,30 +472,33 @@ sprinttime(time_t t)
 	return buf;
 }
 
-static char *
-getfdproto(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
+static enum sock_proto
+getfdproto(struct tcb *tcp, int fd)
 {
 #ifdef HAVE_SYS_XATTR_H
+	size_t bufsize = 256;
+	char buf[bufsize];
 	ssize_t r;
 	char path[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 
 	if (fd < 0)
-		return NULL;
+		return SOCK_PROTO_UNKNOWN;
 
 	sprintf(path, "/proc/%u/fd/%u", tcp->pid, fd);
 	r = getxattr(path, "system.sockprotoname", buf, bufsize - 1);
 	if (r <= 0)
-		return NULL;
+		return SOCK_PROTO_UNKNOWN;
 	else {
 		/*
 		 * This is a protection for the case when the kernel
 		 * side does not append a null byte to the buffer.
 		 */
 		buf[r] = '\0';
-		return buf;
+
+		return get_proto_by_name(buf);
 	}
 #else
-	return NULL;
+	return SOCK_PROTO_UNKNOWN;
 #endif
 }
 
@@ -516,9 +519,8 @@ printfd(struct tcb *tcp, int fd)
 				strtoul(path + socket_prefix_len, NULL, 10);
 
 			if (!print_sockaddr_by_inode_cached(inode)) {
-				char buf[256];
-				const char *proto =
-					getfdproto(tcp, fd, buf, sizeof(buf));
+				const enum sock_proto proto =
+					getfdproto(tcp, fd);
 				if (!print_sockaddr_by_inode(inode, proto))
 					tprints(path);
 			}
