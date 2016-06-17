@@ -604,7 +604,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		tprintf("{start=%" PRIu64 ", len=", (uint64_t)args.start);
 
-		tprintf("%" PRIu64, args.len);
+		tprintf("%" PRIu64, (uint64_t) args.len);
 		if (args.len == UINT64_MAX)
 			tprints(" /* UINT64_MAX */");
 

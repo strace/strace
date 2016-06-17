@@ -691,7 +691,8 @@ static void
 btrfs_print_defrag_range_args(struct btrfs_ioctl_defrag_range_args *args)
 {
 	printf("{start=%" PRIu64", len=%" PRIu64 "%s, flags=",
-		args->start, args->len, maybe_print_uint64max(args->len));
+		(uint64_t) args->start, (uint64_t) args->len,
+		maybe_print_uint64max(args->len));
 
 	printflags(btrfs_defrag_flags, args->flags, "BTRFS_DEFRAG_RANGE_???");
 	printf(", extent_thresh=%u, compress_type=", args->extent_thresh);
