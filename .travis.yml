@@ -2,38 +2,40 @@ language: c
 
 dist: trusty
 
-script: ./travis-ci.sh
+before_install: ./travis-install.sh
+
+script: ./travis-build.sh
+
+after_success: ./travis-success.sh
 
 sudo: required
 
-compiler:
-  - gcc
-  - clang-3.6
-  - musl-gcc
-
-addons:
-  apt:
-    packages:
-    - gcc-multilib
-    - lcov
-
-install:
-  - pip install --user codecov
+git:
+  depth: 2147483647
 
 env:
   global:
     - SLEEP_A_BIT="sleep 0.2"
     - VERBOSE="1"
-  matrix:
-    - TARGET=x86_64
-    - TARGET=x32
-    - TARGET=x86
 
 matrix:
-  exclude:
+  include:
+    - compiler: gcc
+      env:
+        - TARGET=x86_64
+        - COVERAGE=true
+    - compiler: gcc
+      env:
+        - TARGET=x32
+    - compiler: gcc
+      env:
+        - TARGET=x86
     - compiler: clang-3.6
-      env: TARGET=x32
+      env:
+        - TARGET=x86_64
     - compiler: musl-gcc
-      env: TARGET=x32
-    - compiler: musl-gcc
-      env: TARGET=x86
+      env:
+        - TARGET=x86_64
+    - compiler: clang-3.6
+      env:
+        - TARGET=x86
