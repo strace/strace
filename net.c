@@ -187,21 +187,20 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 		}
 		break;
 #endif
+
 	case AF_IPX:
 		{
+			tprintf("sipx_port=htons(%u)"
+				", sipx_network=htonl(%08x)"
+				", sipx_node=[",
+				ntohs(addr->sipx.sipx_port),
+				ntohl(addr->sipx.sipx_network));
 			int i;
-			tprintf("sipx_port=htons(%u), ",
-					ntohs(addr->sipx.sipx_port));
-			/* Yes, I know, this does not look too
-			 * strace-ish, but otherwise the IPX
-			 * addresses just look monstrous...
-			 * Anyways, feel free if you don't like
-			 * this way.. :)
-			 */
-			tprintf("%08lx:", (unsigned long)ntohl(addr->sipx.sipx_network));
-			for (i = 0; i < IPX_NODE_LEN; i++)
-				tprintf("%02x", addr->sipx.sipx_node[i]);
-			tprintf("/[%02x]", addr->sipx.sipx_type);
+			for (i = 0; i < IPX_NODE_LEN; ++i) {
+				tprintf("%s%02x", i ? ", " : "",
+					addr->sipx.sipx_node[i]);
+			}
+			tprintf("], sipx_type=%02x", addr->sipx.sipx_type);
 		}
 		break;
 
@@ -775,21 +774,16 @@ SYS_FUNC(socket)
 		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 		break;
 
-	case AF_IPX:
-		/* BTW: I don't believe this.. */
-		tprints("[");
-		printxval(addrfams, tcp->u_arg[2], "AF_???");
-		tprints("]");
-		break;
-
 	case AF_NETLINK:
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
+
 #if defined(AF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
 	case AF_BLUETOOTH:
 		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
 		break;
 #endif
+
 	default:
 		tprintf("%lu", tcp->u_arg[2]);
 		break;
