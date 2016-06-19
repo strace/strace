@@ -46,7 +46,7 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <asm/types.h>
-#if defined(__GLIBC__)
+#ifdef HAVE_NETIPX_IPX_H
 # include <netipx/ipx.h>
 #else
 # include <linux/ipx.h>

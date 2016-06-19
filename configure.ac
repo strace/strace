@@ -394,6 +394,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/utsname.h
 	mqueue.h
 	netinet/sctp.h
+	netipx/ipx.h
 	scsi/sg.h
 	stropts.h
 	sys/conf.h
