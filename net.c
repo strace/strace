@@ -126,9 +126,7 @@ typedef union {
 #ifdef HAVE_INET_NTOP
 	struct sockaddr_in6 sa6;
 #endif
-#if defined(AF_IPX)
 	struct sockaddr_ipx sipx;
-#endif
 	struct sockaddr_ll ll;
 	struct sockaddr_nl nl;
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
@@ -189,7 +187,6 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 		}
 		break;
 #endif
-#if defined(AF_IPX)
 	case AF_IPX:
 		{
 			int i;
@@ -207,7 +204,7 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 			tprintf("/[%02x]", addr->sipx.sipx_type);
 		}
 		break;
-#endif /* AF_IPX */
+
 	case AF_PACKET:
 		{
 			int i;
@@ -777,14 +774,14 @@ SYS_FUNC(socket)
 	case AF_INET6:
 		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 		break;
-#ifdef AF_IPX
+
 	case AF_IPX:
 		/* BTW: I don't believe this.. */
 		tprints("[");
 		printxval(addrfams, tcp->u_arg[2], "AF_???");
 		tprints("]");
 		break;
-#endif /* AF_IPX */
+
 	case AF_NETLINK:
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
