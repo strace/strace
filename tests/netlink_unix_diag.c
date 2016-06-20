@@ -138,8 +138,8 @@ int main(void)
 	close(1);
 
 	(void) unlink(SUN_PATH);
-	if (socket(AF_LOCAL, SOCK_STREAM, 0))
-		perror_msg_and_skip("socket AF_LOCAL");
+	if (socket(AF_UNIX, SOCK_STREAM, 0))
+		perror_msg_and_skip("socket AF_UNIX");
 	if (bind(0, (struct sockaddr *) &addr, len))
 		perror_msg_and_skip("bind");
 	if (listen(0, 5))

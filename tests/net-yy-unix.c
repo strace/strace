@@ -54,17 +54,17 @@ main(int ac, const char **av)
 	if (*len > sizeof(addr))
 		*len = sizeof(addr);
 
-	int listen_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
+	int listen_fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (listen_fd < 0)
 		perror_msg_and_skip("socket");
 	unsigned long listen_inode = inode_of_sockfd(listen_fd);
-	printf("socket(AF_LOCAL, SOCK_STREAM, 0) = %d<UNIX:[%lu]>\n",
+	printf("socket(AF_UNIX, SOCK_STREAM, 0) = %d<UNIX:[%lu]>\n",
 	       listen_fd, listen_inode);
 
 	(void) unlink(av[1]);
 	if (bind(listen_fd, listen_sa, *len))
 		perror_msg_and_skip("bind");
-	printf("bind(%d<UNIX:[%lu]>, {sa_family=AF_LOCAL, sun_path=\"%s\"}"
+	printf("bind(%d<UNIX:[%lu]>, {sa_family=AF_UNIX, sun_path=\"%s\"}"
 	       ", %u) = 0\n", listen_fd, listen_inode, av[1], (unsigned) *len);
 
 	if (listen(listen_fd, 1))
@@ -84,20 +84,20 @@ main(int ac, const char **av)
 	*len = sizeof(addr);
 	if (getsockname(listen_fd, listen_sa, len))
 		perror_msg_and_fail("getsockname");
-	printf("getsockname(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_LOCAL"
+	printf("getsockname(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
 	       ", sun_path=\"%s\"}, [%u]) = 0\n", listen_fd, listen_inode,
 	       av[1], av[1], (unsigned) *len);
 
-	int connect_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
+	int connect_fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (connect_fd < 0)
 		perror_msg_and_fail("socket");
 	unsigned long connect_inode = inode_of_sockfd(connect_fd);
-	printf("socket(AF_LOCAL, SOCK_STREAM, 0) = %d<UNIX:[%lu]>\n",
+	printf("socket(AF_UNIX, SOCK_STREAM, 0) = %d<UNIX:[%lu]>\n",
 	       connect_fd, connect_inode);
 
 	if (connect(connect_fd, listen_sa, *len))
 		perror_msg_and_fail("connect");
-	printf("connect(%d<UNIX:[%lu]>, {sa_family=AF_LOCAL"
+	printf("connect(%d<UNIX:[%lu]>, {sa_family=AF_UNIX"
 	       ", sun_path=\"%s\"}, %u) = 0\n",
 	       connect_fd, connect_inode, av[1], (unsigned) *len);
 
@@ -108,7 +108,7 @@ main(int ac, const char **av)
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	unsigned long accept_inode = inode_of_sockfd(accept_fd);
-	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_LOCAL, NULL}"
+	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX, NULL}"
 	       ", [%u]) = %d<UNIX:[%lu->%lu,\"%s\"]>\n",
 	       listen_fd, listen_inode, av[1], (unsigned) *len,
 	       accept_fd, accept_inode, connect_inode, av[1]);
@@ -117,7 +117,7 @@ main(int ac, const char **av)
 	*len = sizeof(addr);
 	if (getpeername(connect_fd, listen_sa, len))
 		perror_msg_and_fail("getpeername");
-	printf("getpeername(%d<UNIX:[%lu->%lu]>, {sa_family=AF_LOCAL"
+	printf("getpeername(%d<UNIX:[%lu->%lu]>, {sa_family=AF_UNIX"
 	       ", sun_path=\"%s\"}, [%u]) = 0\n", connect_fd, connect_inode,
 	       accept_inode, av[1], (unsigned) *len);
 
@@ -144,11 +144,11 @@ main(int ac, const char **av)
 	printf("close(%d<UNIX:[%lu->%lu,\"%s\"]>) = 0\n",
 	       accept_fd, accept_inode, connect_inode, av[1]);
 
-	connect_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
+	connect_fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (connect_fd < 0)
 		perror_msg_and_fail("socket");
 	connect_inode = inode_of_sockfd(connect_fd);
-	printf("socket(AF_LOCAL, SOCK_STREAM, 0) = %d<UNIX:[%lu]>\n",
+	printf("socket(AF_UNIX, SOCK_STREAM, 0) = %d<UNIX:[%lu]>\n",
 	       connect_fd, connect_inode);
 
 	*optval = 1;
@@ -163,13 +163,13 @@ main(int ac, const char **av)
 	*len = sizeof(addr);
 	if (getsockname(listen_fd, listen_sa, len))
 		perror_msg_and_fail("getsockname");
-	printf("getsockname(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_LOCAL"
+	printf("getsockname(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
 	       ", sun_path=\"%s\"}, [%u]) = 0\n", listen_fd, listen_inode,
 	       av[1], av[1], (unsigned) *len);
 
 	if (connect(connect_fd, listen_sa, *len))
 		perror_msg_and_fail("connect");
-	printf("connect(%d<UNIX:[%lu]>, {sa_family=AF_LOCAL"
+	printf("connect(%d<UNIX:[%lu]>, {sa_family=AF_UNIX"
 	       ", sun_path=\"%s\"}, %u) = 0\n",
 	       connect_fd, connect_inode, av[1], (unsigned) *len);
 
@@ -181,7 +181,7 @@ main(int ac, const char **av)
 	accept_inode = inode_of_sockfd(accept_fd);
 	const char * const sun_path1 =
 		((struct sockaddr_un *) accept_sa) -> sun_path + 1;
-	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_LOCAL"
+	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
 	       ", sun_path=@\"%s\"}, [%u]) = %d<UNIX:[%lu->%lu,\"%s\"]>\n",
 	       listen_fd, listen_inode, av[1], sun_path1, (unsigned) *len,
 	       accept_fd, accept_inode, connect_inode, av[1]);
@@ -190,7 +190,7 @@ main(int ac, const char **av)
 	*len = sizeof(addr);
 	if (getpeername(connect_fd, listen_sa, len))
 		perror_msg_and_fail("getpeername");
-	printf("getpeername(%d<UNIX:[%lu->%lu,@\"%s\"]>, {sa_family=AF_LOCAL"
+	printf("getpeername(%d<UNIX:[%lu->%lu,@\"%s\"]>, {sa_family=AF_UNIX"
 	       ", sun_path=\"%s\"}, [%u]) = 0\n", connect_fd, connect_inode,
 	       accept_inode, sun_path1, av[1], (unsigned) *len);
 
