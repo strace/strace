@@ -1164,7 +1164,6 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 	tprints(", ");
 }
 
-#ifdef SO_LINGER
 static void
 print_linger(struct tcb *tcp, long addr, int len)
 {
@@ -1180,7 +1179,6 @@ print_linger(struct tcb *tcp, long addr, int len)
 		linger.l_onoff,
 		linger.l_linger);
 }
-#endif /* SO_LINGER */
 
 #ifdef SO_PEERCRED
 static void
@@ -1247,11 +1245,9 @@ print_getsockopt(struct tcb *tcp, unsigned int level, unsigned int name,
 	switch (level) {
 	case SOL_SOCKET:
 		switch (name) {
-#ifdef SO_LINGER
 		case SO_LINGER:
 			print_linger(tcp, addr, len);
 			goto done;
-#endif
 #ifdef SO_PEERCRED
 		case SO_PEERCRED:
 			print_ucred(tcp, addr, len);
@@ -1443,11 +1439,9 @@ print_setsockopt(struct tcb *tcp, unsigned int level, unsigned int name,
 	switch (level) {
 	case SOL_SOCKET:
 		switch (name) {
-#ifdef SO_LINGER
 		case SO_LINGER:
 			print_linger(tcp, addr, len);
 			goto done;
-#endif
 		}
 		break;
 
