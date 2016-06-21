@@ -290,8 +290,6 @@ AC_CHECK_FUNCS(m4_normalize([
 	ftruncate
 	futimens
 	if_indextoname
-	inet_ntop
-	inet_pton
 	pipe2
 	prctl
 	preadv

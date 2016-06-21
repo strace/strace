@@ -29,7 +29,7 @@
 #include <netinet/in.h>
 
 #if defined IP_ADD_MEMBERSHIP && defined IPV6_ADD_MEMBERSHIP \
- && defined IPV6_JOIN_ANYCAST && defined HAVE_INET_PTON
+ && defined IPV6_JOIN_ANYCAST
 
 # include <assert.h>
 # include <unistd.h>
@@ -73,6 +73,6 @@ main(void)
 #else
 
 SKIP_MAIN_UNDEFINED("IP_ADD_MEMBERSHIP && IPV6_ADD_MEMBERSHIP"
-		    " && IPV6_JOIN_ANYCAST && HAVE_INET_PTON")
+		    " && IPV6_JOIN_ANYCAST")
 
 #endif

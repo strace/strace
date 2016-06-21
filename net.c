@@ -123,9 +123,7 @@ typedef union {
 	struct sockaddr sa;
 	struct sockaddr_in sin;
 	struct sockaddr_un sau;
-#ifdef HAVE_INET_NTOP
 	struct sockaddr_in6 sa6;
-#endif
 	struct sockaddr_ipx sipx;
 	struct sockaddr_ll ll;
 	struct sockaddr_nl nl;
@@ -164,7 +162,7 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 		tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")",
 			ntohs(addr->sin.sin_port), inet_ntoa(addr->sin.sin_addr));
 		break;
-#ifdef HAVE_INET_NTOP
+
 	case AF_INET6:
 		{
 			char string_addr[100];
@@ -174,19 +172,18 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 				", \"%s\", &sin6_addr), sin6_flowinfo=%u",
 				ntohs(addr->sa6.sin6_port), string_addr,
 				addr->sa6.sin6_flowinfo);
-# ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
+#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
 			tprints(", sin6_scope_id=");
-#  if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
+# if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
 			if (IN6_IS_ADDR_LINKLOCAL(&addr->sa6.sin6_addr)
 			    || IN6_IS_ADDR_MC_LINKLOCAL(&addr->sa6.sin6_addr))
 				print_ifindex(addr->sa6.sin6_scope_id);
 			else
-#  endif
+# endif
 				tprintf("%u", addr->sa6.sin6_scope_id);
-# endif /* HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID */
+#endif /* HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID */
 		}
 		break;
-#endif
 
 	case AF_IPX:
 		{
@@ -1345,7 +1342,6 @@ print_mreq6(struct tcb *tcp, long addr, unsigned int len)
 	if (umove_or_printaddr(tcp, addr, &mreq))
 		return;
 
-#ifdef HAVE_INET_NTOP
 	const struct in6_addr *in6 = &mreq.ipv6mr_multiaddr;
 	char address[INET6_ADDRSTRLEN];
 
@@ -1358,7 +1354,6 @@ print_mreq6(struct tcb *tcp, long addr, unsigned int len)
 	print_ifindex(mreq.ipv6mr_interface);
 	tprints("}");
 	return;
-#endif /* HAVE_INET_NTOP */
 
 fail:
 	printstr(tcp, addr, len);
