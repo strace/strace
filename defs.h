@@ -374,7 +374,6 @@ typedef uint8_t qualbits_t;
 
 #include "xlat.h"
 
-extern const struct xlat addrfams[];
 extern const struct xlat at_flags[];
 extern const struct xlat dirent_types[];
 extern const struct xlat evdev_abs[];
