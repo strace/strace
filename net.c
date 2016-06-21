@@ -222,7 +222,8 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 	case AF_NETLINK:
 		tprintf("pid=%d, groups=%08x", addr->nl.nl_pid, addr->nl.nl_groups);
 		break;
-#if defined(AF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
+
+#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 	case AF_BLUETOOTH:
 		tprintf("{sco_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X} or "
 			"{rc_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X, rc_channel=%d} or "
@@ -241,7 +242,8 @@ print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
 			addr->l2.l2_bdaddr.b[5], btohs(addr->l2.l2_cid),
 			btohs(addr->hci.hci_dev));
 		break;
-#endif /* AF_BLUETOOTH && HAVE_BLUETOOTH_BLUETOOTH_H */
+#endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
+
 	/* AF_AX25 AF_APPLETALK AF_NETROM AF_BRIDGE AF_AAL5
 	AF_X25 AF_ROSE etc. still need to be done */
 
@@ -778,7 +780,7 @@ SYS_FUNC(socket)
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
 
-#if defined(AF_BLUETOOTH) && defined(HAVE_BLUETOOTH_BLUETOOTH_H)
+#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 	case AF_BLUETOOTH:
 		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
 		break;
