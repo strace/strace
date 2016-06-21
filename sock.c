@@ -36,21 +36,12 @@
 
 #include "xlat/iffflags.h"
 
-static void
-print_ifreq_addr(struct tcb *tcp, const struct ifreq *ifr, const long addr)
-{
-	tprintf("{");
-	printxval(addrfams, ifr->ifr_addr.sa_family, "AF_???");
-	tprints(", ");
-	if (ifr->ifr_addr.sa_family == AF_INET) {
-		const struct sockaddr_in *sinp =
-			(struct sockaddr_in *) &ifr->ifr_addr;
-		tprintf("inet_addr(\"%s\")", inet_ntoa(sinp->sin_addr));
-	} else
-		printstr(tcp, addr + offsetof(struct ifreq, ifr_addr.sa_data),
-			 sizeof(ifr->ifr_addr.sa_data));
-	tprints("}");
-}
+#define PRINT_IFREQ_ADDR(tcp, ifr, sockaddr)					\
+	do {									\
+		tprints(#sockaddr "=");						\
+		print_sockaddr(tcp, &((ifr)->sockaddr),				\
+			       sizeof((ifr)->sockaddr));			\
+	} while (0)
 
 static void
 print_ifname(const char *ifname)
@@ -65,23 +56,19 @@ print_ifreq(struct tcb *tcp, const unsigned int code, const long arg,
 	switch (code) {
 	case SIOCSIFADDR:
 	case SIOCGIFADDR:
-		tprints("ifr_addr=");
-		print_ifreq_addr(tcp, ifr, arg);
+		PRINT_IFREQ_ADDR(tcp, ifr, ifr_addr);
 		break;
 	case SIOCSIFDSTADDR:
 	case SIOCGIFDSTADDR:
-		tprints("ifr_dstaddr=");
-		print_ifreq_addr(tcp, ifr, arg);
+		PRINT_IFREQ_ADDR(tcp, ifr, ifr_dstaddr);
 		break;
 	case SIOCSIFBRDADDR:
 	case SIOCGIFBRDADDR:
-		tprints("ifr_broadaddr=");
-		print_ifreq_addr(tcp, ifr, arg);
+		PRINT_IFREQ_ADDR(tcp, ifr, ifr_broadaddr);
 		break;
 	case SIOCSIFNETMASK:
 	case SIOCGIFNETMASK:
-		tprints("ifr_netmask=");
-		print_ifreq_addr(tcp, ifr, arg);
+		PRINT_IFREQ_ADDR(tcp, ifr, ifr_netmask);
 		break;
 	case SIOCSIFHWADDR:
 	case SIOCGIFHWADDR: {
@@ -197,12 +184,7 @@ decode_ifconf(struct tcb *tcp, const long addr)
 		tprints("{ifr_name=");
 		print_ifname(ifra[i].ifr_name);
 		tprints(", ");
-		if (verbose(tcp)) {
-			tprints("ifr_addr=");
-			print_ifreq_addr(tcp, &ifra[i],
-					 addr + i * sizeof(ifra[0]));
-		} else
-			tprints("...");
+		PRINT_IFREQ_ADDR(tcp, &ifra[i], ifr_addr);
 		tprints("}");
 	}
 	if (i < nifra)
