@@ -135,9 +135,11 @@ typedef union {
 #endif
 } sockaddr_buf_t;
 
-static void
-print_sockaddr(struct tcb *tcp, const sockaddr_buf_t *addr, const int addrlen)
+void
+print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 {
+	const sockaddr_buf_t *const addr = buf;
+
 	tprints("{sa_family=");
 	printxval(addrfams, addr->sa.sa_family, "AF_???");
 	tprints(", ");
@@ -428,8 +430,7 @@ print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 		", ee_info=%u, ee_data=%u, offender=",
 		err->ee_errno, err->ee_origin, err->ee_type,
 		err->ee_code, err->ee_info, err->ee_data);
-	print_sockaddr(tcp, (const void *) &err->offender,
-		sizeof(err->offender));
+	print_sockaddr(tcp, &err->offender, sizeof(err->offender));
 	tprints("}");
 }
 
@@ -1373,8 +1374,7 @@ print_group_req(struct tcb *tcp, long addr, int len)
 	}
 
 	tprintf("{gr_interface=%u, gr_group=", greq.gr_interface);
-	print_sockaddr(tcp, (const void *) &greq.gr_group,
-		       sizeof(greq.gr_group));
+	print_sockaddr(tcp, &greq.gr_group, sizeof(greq.gr_group));
 	tprintf("}");
 
 }

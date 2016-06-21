@@ -647,6 +647,7 @@ extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(intmax_t)*3 * 2 + sizeof("{tv_sec=%jd, tv_nsec=%jd}"))
 extern void printfd(struct tcb *, int);
+extern void print_sockaddr(struct tcb *tcp, const void *, int);
 extern bool print_sockaddr_by_inode(const unsigned long, const enum sock_proto);
 extern bool print_sockaddr_by_inode_cached(const unsigned long);
 extern void print_dirfd(struct tcb *, int);
