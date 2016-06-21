@@ -255,14 +255,14 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 	tprints("}");
 }
 
-void
+int
 printsock(struct tcb *tcp, long addr, int addrlen)
 {
 	sockaddr_buf_t addrbuf;
 
 	if (addrlen < 2) {
 		printaddr(addr);
-		return;
+		return -1;
 	}
 
 	if (addrlen > (int) sizeof(addrbuf))
@@ -270,10 +270,12 @@ printsock(struct tcb *tcp, long addr, int addrlen)
 
 	memset(&addrbuf, 0, sizeof(addrbuf));
 	if (umoven_or_printaddr(tcp, addr, addrlen, addrbuf.pad))
-		return;
+		return -1;
 	addrbuf.pad[sizeof(addrbuf.pad) - 1] = '\0';
 
 	print_sockaddr(tcp, &addrbuf, addrlen);
+
+	return addrbuf.sa.sa_family;
 }
 
 #include "xlat/scmvals.h"
