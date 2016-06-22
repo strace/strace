@@ -103,6 +103,35 @@
 #include "xlat/af_packet_types.h"
 
 static void
+print_sockaddr_data_un(const void *const buf, const int addrlen)
+{
+	const struct sockaddr_un *const sa_un = buf;
+
+	if (addrlen == 2) {
+		tprints("NULL");
+	} else if (sa_un->sun_path[0]) {
+		tprints("sun_path=");
+		print_quoted_string(sa_un->sun_path,
+				    sizeof(sa_un->sun_path) + 1,
+				    QUOTE_0_TERMINATED);
+	} else {
+		tprints("sun_path=@");
+		print_quoted_string(sa_un->sun_path + 1,
+				    sizeof(sa_un->sun_path),
+				    QUOTE_0_TERMINATED);
+	}
+}
+
+static void
+print_sockaddr_data_in(const void *const buf, const int addrlen)
+{
+	const struct sockaddr_in *const sa_in = buf;
+
+	tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")",
+		ntohs(sa_in->sin_port), inet_ntoa(sa_in->sin_addr));
+}
+
+static void
 print_ifindex(unsigned int ifindex)
 {
 #ifdef HAVE_IF_INDEXTONAME
@@ -118,140 +147,132 @@ print_ifindex(unsigned int ifindex)
 	tprintf("%u", ifindex);
 }
 
-typedef union {
-	char pad[128];
-	struct sockaddr sa;
-	struct sockaddr_in sin;
-	struct sockaddr_un sau;
-	struct sockaddr_in6 sa6;
-	struct sockaddr_ipx sipx;
-	struct sockaddr_ll ll;
-	struct sockaddr_nl nl;
+static void
+print_sockaddr_data_in6(const void *const buf, const int addrlen)
+{
+	const struct sockaddr_in6 *const sa_in6 = buf;
+
+	char string_addr[100];
+	inet_ntop(AF_INET6, &sa_in6->sin6_addr,
+		  string_addr, sizeof(string_addr));
+	tprintf("sin6_port=htons(%u), inet_pton(AF_INET6"
+		", \"%s\", &sin6_addr), sin6_flowinfo=%u",
+		ntohs(sa_in6->sin6_port), string_addr,
+		sa_in6->sin6_flowinfo);
+#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
+	tprints(", sin6_scope_id=");
+# if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
+	if (IN6_IS_ADDR_LINKLOCAL(&sa_in6->sin6_addr)
+	    || IN6_IS_ADDR_MC_LINKLOCAL(&sa_in6->sin6_addr))
+		print_ifindex(sa_in6->sin6_scope_id);
+	else
+# endif
+		tprintf("%u", sa_in6->sin6_scope_id);
+#endif /* HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID */
+}
+
+static void
+print_sockaddr_data_ipx(const void *const buf, const int addrlen)
+{
+	const struct sockaddr_ipx *const sa_ipx = buf;
+	unsigned int i;
+
+	tprintf("sipx_port=htons(%u)"
+		", sipx_network=htonl(%08x)"
+		", sipx_node=[",
+		ntohs(sa_ipx->sipx_port),
+		ntohl(sa_ipx->sipx_network));
+	for (i = 0; i < IPX_NODE_LEN; ++i) {
+		tprintf("%s%02x", i ? ", " : "",
+			sa_ipx->sipx_node[i]);
+	}
+	tprintf("], sipx_type=%02x", sa_ipx->sipx_type);
+}
+
+static void
+print_sockaddr_data_nl(const void *const buf, const int addrlen)
+{
+	const struct sockaddr_nl *const sa_nl = buf;
+
+	tprintf("pid=%d, groups=%08x", sa_nl->nl_pid, sa_nl->nl_groups);
+}
+
+static void
+print_sockaddr_data_ll(const void *const buf, const int addrlen)
+{
+	const struct sockaddr_ll *const sa_ll = buf;
+	unsigned int i;
+
+	tprintf("proto=%#04x, if%d, pkttype=",
+		ntohs(sa_ll->sll_protocol),
+		sa_ll->sll_ifindex);
+	printxval(af_packet_types, sa_ll->sll_pkttype, "PACKET_???");
+	tprintf(", addr(%d)={%d, ", sa_ll->sll_halen, sa_ll->sll_hatype);
+	for (i = 0; i < sa_ll->sll_halen; i++)
+		tprintf("%02x", sa_ll->sll_addr[i]);
+}
+
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
-	struct sockaddr_hci hci;
-	struct sockaddr_l2 l2;
-	struct sockaddr_rc rc;
-	struct sockaddr_sco sco;
+static void
+print_sockaddr_data_bt(const void *const buf, const int addrlen)
+{
+	const union {
+		struct sockaddr_hci hci;
+		struct sockaddr_l2 l2;
+		struct sockaddr_rc rc;
+		struct sockaddr_sco sco;
+	} *const addr = buf;
+
+	tprintf("{sco_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X} or "
+		"{rc_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X, rc_channel=%d} or "
+		"{l2_psm=htobs(%d), l2_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X, l2_cid=htobs(%d)} or "
+		"{hci_dev=htobs(%d)}",
+		addr->sco.sco_bdaddr.b[0], addr->sco.sco_bdaddr.b[1],
+		addr->sco.sco_bdaddr.b[2], addr->sco.sco_bdaddr.b[3],
+		addr->sco.sco_bdaddr.b[4], addr->sco.sco_bdaddr.b[5],
+		addr->rc.rc_bdaddr.b[0], addr->rc.rc_bdaddr.b[1],
+		addr->rc.rc_bdaddr.b[2], addr->rc.rc_bdaddr.b[3],
+		addr->rc.rc_bdaddr.b[4], addr->rc.rc_bdaddr.b[5],
+		addr->rc.rc_channel,
+		btohs(addr->l2.l2_psm), addr->l2.l2_bdaddr.b[0],
+		addr->l2.l2_bdaddr.b[1], addr->l2.l2_bdaddr.b[2],
+		addr->l2.l2_bdaddr.b[3], addr->l2.l2_bdaddr.b[4],
+		addr->l2.l2_bdaddr.b[5], btohs(addr->l2.l2_cid),
+		btohs(addr->hci.hci_dev));
+}
+#endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
+
+typedef void (* const sockaddr_printer)(const void *const, const int);
+
+static const sockaddr_printer sa_printers[] = {
+	[AF_UNIX] = print_sockaddr_data_un,
+	[AF_INET] = print_sockaddr_data_in,
+	[AF_IPX] = print_sockaddr_data_ipx,
+	[AF_INET6] = print_sockaddr_data_in6,
+	[AF_NETLINK] = print_sockaddr_data_nl,
+	[AF_PACKET] = print_sockaddr_data_ll,
+#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
+	[AF_BLUETOOTH] = print_sockaddr_data_bt,
 #endif
-} sockaddr_buf_t;
+};
 
 void
 print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 {
-	const sockaddr_buf_t *const addr = buf;
+	const struct sockaddr *const sa = buf;
+	const unsigned short family = sa->sa_family;
 
 	tprints("{sa_family=");
-	printxval(addrfams, addr->sa.sa_family, "AF_???");
+	printxval(addrfams, family, "AF_???");
 	tprints(", ");
 
-	switch (addr->sa.sa_family) {
-	case AF_UNIX:
-		if (addrlen == 2) {
-			tprints("NULL");
-		} else if (addr->sau.sun_path[0]) {
-			tprints("sun_path=");
-			print_quoted_string(addr->sau.sun_path,
-					    sizeof(addr->sau.sun_path) + 1,
-					    QUOTE_0_TERMINATED);
-		} else {
-			tprints("sun_path=@");
-			print_quoted_string(addr->sau.sun_path + 1,
-					    sizeof(addr->sau.sun_path),
-					    QUOTE_0_TERMINATED);
-		}
-		break;
-	case AF_INET:
-		tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")",
-			ntohs(addr->sin.sin_port), inet_ntoa(addr->sin.sin_addr));
-		break;
-
-	case AF_INET6:
-		{
-			char string_addr[100];
-			inet_ntop(AF_INET6, &addr->sa6.sin6_addr,
-				  string_addr, sizeof(string_addr));
-			tprintf("sin6_port=htons(%u), inet_pton(AF_INET6"
-				", \"%s\", &sin6_addr), sin6_flowinfo=%u",
-				ntohs(addr->sa6.sin6_port), string_addr,
-				addr->sa6.sin6_flowinfo);
-#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
-			tprints(", sin6_scope_id=");
-# if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
-			if (IN6_IS_ADDR_LINKLOCAL(&addr->sa6.sin6_addr)
-			    || IN6_IS_ADDR_MC_LINKLOCAL(&addr->sa6.sin6_addr))
-				print_ifindex(addr->sa6.sin6_scope_id);
-			else
-# endif
-				tprintf("%u", addr->sa6.sin6_scope_id);
-#endif /* HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID */
-		}
-		break;
-
-	case AF_IPX:
-		{
-			tprintf("sipx_port=htons(%u)"
-				", sipx_network=htonl(%08x)"
-				", sipx_node=[",
-				ntohs(addr->sipx.sipx_port),
-				ntohl(addr->sipx.sipx_network));
-			int i;
-			for (i = 0; i < IPX_NODE_LEN; ++i) {
-				tprintf("%s%02x", i ? ", " : "",
-					addr->sipx.sipx_node[i]);
-			}
-			tprintf("], sipx_type=%02x", addr->sipx.sipx_type);
-		}
-		break;
-
-	case AF_PACKET:
-		{
-			int i;
-			tprintf("proto=%#04x, if%d, pkttype=",
-					ntohs(addr->ll.sll_protocol),
-					addr->ll.sll_ifindex);
-			printxval(af_packet_types, addr->ll.sll_pkttype, "PACKET_???");
-			tprintf(", addr(%d)={%d, ",
-					addr->ll.sll_halen,
-					addr->ll.sll_hatype);
-			for (i = 0; i < addr->ll.sll_halen; i++)
-				tprintf("%02x", addr->ll.sll_addr[i]);
-		}
-		break;
-
-	case AF_NETLINK:
-		tprintf("pid=%d, groups=%08x", addr->nl.nl_pid, addr->nl.nl_groups);
-		break;
-
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
-	case AF_BLUETOOTH:
-		tprintf("{sco_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X} or "
-			"{rc_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X, rc_channel=%d} or "
-			"{l2_psm=htobs(%d), l2_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X, l2_cid=htobs(%d)} or "
-			"{hci_dev=htobs(%d)}",
-			addr->sco.sco_bdaddr.b[0], addr->sco.sco_bdaddr.b[1],
-			addr->sco.sco_bdaddr.b[2], addr->sco.sco_bdaddr.b[3],
-			addr->sco.sco_bdaddr.b[4], addr->sco.sco_bdaddr.b[5],
-			addr->rc.rc_bdaddr.b[0], addr->rc.rc_bdaddr.b[1],
-			addr->rc.rc_bdaddr.b[2], addr->rc.rc_bdaddr.b[3],
-			addr->rc.rc_bdaddr.b[4], addr->rc.rc_bdaddr.b[5],
-			addr->rc.rc_channel,
-			btohs(addr->l2.l2_psm), addr->l2.l2_bdaddr.b[0],
-			addr->l2.l2_bdaddr.b[1], addr->l2.l2_bdaddr.b[2],
-			addr->l2.l2_bdaddr.b[3], addr->l2.l2_bdaddr.b[4],
-			addr->l2.l2_bdaddr.b[5], btohs(addr->l2.l2_cid),
-			btohs(addr->hci.hci_dev));
-		break;
-#endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
-
-	/* AF_AX25 AF_APPLETALK AF_NETROM AF_BRIDGE AF_AAL5
-	AF_X25 AF_ROSE etc. still need to be done */
-
-	default:
+	if (family < ARRAY_SIZE(sa_printers) && sa_printers[family]) {
+		sa_printers[family](buf, addrlen);
+	} else {
 		tprints("sa_data=");
-		print_quoted_string(addr->sa.sa_data,
-				    sizeof(addr->sa.sa_data), 0);
-		break;
+		print_quoted_string(sa->sa_data, sizeof(sa->sa_data), 0);
 	}
+
 	tprints("}");
 }
 
