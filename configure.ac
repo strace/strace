@@ -350,11 +350,6 @@ AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
-AC_CHECK_MEMBERS([struct sockaddr_in6.sin6_scope_id],,,
-[#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>])
-
 AC_CHECK_MEMBERS(m4_normalize([
 	struct stat.st_atime_nsec,
 	struct stat.st_ctime_nsec,

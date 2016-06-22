@@ -159,16 +159,14 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 		", \"%s\", &sin6_addr), sin6_flowinfo=%u",
 		ntohs(sa_in6->sin6_port), string_addr,
 		sa_in6->sin6_flowinfo);
-#ifdef HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID
 	tprints(", sin6_scope_id=");
-# if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
+#if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
 	if (IN6_IS_ADDR_LINKLOCAL(&sa_in6->sin6_addr)
 	    || IN6_IS_ADDR_MC_LINKLOCAL(&sa_in6->sin6_addr))
 		print_ifindex(sa_in6->sin6_scope_id);
 	else
-# endif
+#endif
 		tprintf("%u", sa_in6->sin6_scope_id);
-#endif /* HAVE_STRUCT_SOCKADDR_IN6_SIN6_SCOPE_ID */
 }
 
 static void
