@@ -57,14 +57,13 @@ static cache_entry cache[CACHE_SIZE];
 #define CACHE_MASK (CACHE_SIZE - 1)
 
 static int
-cache_and_print_inode_details(const unsigned long inode, char *const details)
+cache_inode_details(const unsigned long inode, char *const details)
 {
 	cache_entry *e = &cache[inode & CACHE_MASK];
 	free(e->details);
 	e->inode = inode;
 	e->details = details;
 
-	tprints(details);
 	return 1;
 }
 
@@ -185,7 +184,7 @@ inet_parse_response(const char *const proto_name, const void *const data,
 			return false;
 	}
 
-	return cache_and_print_inode_details(inode, details);
+	return cache_inode_details(inode, details);
 }
 
 static bool
@@ -245,7 +244,8 @@ inet_print(const int fd, const int family, const int protocol,
 	   const unsigned long inode, const char *proto_name)
 {
 	return inet_send_query(fd, family, protocol)
-		&& receive_responses(fd, inode, proto_name, inet_parse_response);
+		&& receive_responses(fd, inode, proto_name, inet_parse_response)
+		&& print_sockaddr_by_inode_cached(inode);
 }
 
 static bool
@@ -344,7 +344,7 @@ unix_parse_response(const char *proto_name, const void *data,
 		     peer_str, path_str) < 0)
 		return -1;
 
-	return cache_and_print_inode_details(inode, details);
+	return cache_inode_details(inode, details);
 }
 
 static bool
@@ -398,14 +398,15 @@ netlink_parse_response(const char *proto_name, const void *data,
 			return -1;
 	}
 
-	return cache_and_print_inode_details(inode, details);
+	return cache_inode_details(inode, details);
 }
 
 static bool
 unix_print(const int fd, const unsigned long inode)
 {
 	return unix_send_query(fd, inode)
-		&& receive_responses(fd, inode, "UNIX", unix_parse_response);
+		&& receive_responses(fd, inode, "UNIX", unix_parse_response)
+		&& print_sockaddr_by_inode_cached(inode);
 }
 
 static bool
@@ -437,7 +438,8 @@ netlink_print(const int fd, const unsigned long inode)
 {
 	return netlink_send_query(fd, inode)
 		&& receive_responses(fd, inode, "NETLINK",
-				     netlink_parse_response);
+				     netlink_parse_response)
+		&& print_sockaddr_by_inode_cached(inode);
 }
 
 static const struct {
