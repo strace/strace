@@ -267,8 +267,11 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 		    && sa_printers[sa->sa_family]) {
 			sa_printers[sa->sa_family](buf, addrlen);
 		} else {
+			const char *const data = buf + sizeof(sa->sa_family);
+			const int datalen = addrlen - sizeof(sa->sa_family);
+
 			tprints("sa_data=");
-			print_quoted_string(sa->sa_data, sizeof(sa->sa_data), 0);
+			print_quoted_string(data, datalen, 0);
 		}
 	}
 
