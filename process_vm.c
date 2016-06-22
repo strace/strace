@@ -38,7 +38,8 @@ SYS_FUNC(process_vm_readv)
 		if (syserror(tcp)) {
 			printaddr(tcp->u_arg[1]);
 		} else {
-			tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
+			tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1],
+				   IOV_DECODE_STR);
 		}
 		/* arg 3: local iovcnt */
 		tprintf(", %lu, ", tcp->u_arg[2]);
@@ -46,7 +47,8 @@ SYS_FUNC(process_vm_readv)
 		if (syserror(tcp)) {
 			printaddr(tcp->u_arg[3]);
 		} else {
-			tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3], 0);
+			tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3],
+				   IOV_DECODE_ADDR);
 		}
 		/* arg 5: remote iovcnt */
 		/* arg 6: flags */
@@ -60,11 +62,11 @@ SYS_FUNC(process_vm_writev)
 	/* arg 1: pid */
 	tprintf("%ld, ", tcp->u_arg[0]);
 	/* arg 2: local iov */
-	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], 1);
+	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR);
 	/* arg 3: local iovcnt */
 	tprintf(", %lu, ", tcp->u_arg[2]);
 	/* arg 4: remote iov */
-	tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3], 0);
+	tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3], IOV_DECODE_ADDR);
 	/* arg 5: remote iovcnt */
 	/* arg 6: flags */
 	tprintf(", %lu, %lu", tcp->u_arg[4], tcp->u_arg[5]);

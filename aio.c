@@ -140,7 +140,9 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 		if (iocb_is_valid(cb)) {
 			tprints(", iovec=");
 			tprint_iov(tcp, cb->aio_nbytes, cb->aio_buf,
-				   cb->aio_lio_opcode == 8);
+				   cb->aio_lio_opcode == 8
+				   ? IOV_DECODE_STR
+				   : IOV_DECODE_ADDR);
 		} else {
 			tprintf(", buf=%#" PRIx64 ", nbytes=%" PRIu64,
 				(uint64_t) cb->aio_buf,

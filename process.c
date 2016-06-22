@@ -201,7 +201,7 @@ SYS_FUNC(ptrace)
 			print_sigset_addr_len(tcp, data, addr);
 			break;
 		case PTRACE_SETREGSET:
-			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
+			tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
 			break;
 #ifndef IA64
 		case PTRACE_PEEKDATA:
@@ -238,7 +238,7 @@ SYS_FUNC(ptrace)
 			printnum_ulong(tcp, data);
 			break;
 		case PTRACE_GETREGSET:
-			tprint_iov(tcp, /*len:*/ 1, data, /*as string:*/ 0);
+			tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
 			break;
 		case PTRACE_GETSIGINFO:
 			printsiginfo_at(tcp, data);

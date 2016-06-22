@@ -447,6 +447,11 @@ enum sock_proto {
 };
 extern enum sock_proto get_proto_by_name(const char *);
 
+enum iov_decode {
+	IOV_DECODE_ADDR,
+	IOV_DECODE_STR
+};
+
 typedef enum {
 	CFLAG_NONE = 0,
 	CFLAG_ONLY_STATS,
@@ -665,8 +670,9 @@ extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 #define tprintsigmask_addr(prefix, mask) \
 	tprints(sprintsigmask_n((prefix), (mask), sizeof(mask)))
 extern void printsignal(int);
-extern void tprint_iov(struct tcb *, unsigned long, unsigned long, int decode_iov);
-extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long, int decode_iov, unsigned long);
+extern void tprint_iov(struct tcb *, unsigned long, unsigned long, enum iov_decode);
+extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long,
+			    enum iov_decode, unsigned long);
 extern void tprint_open_modes(unsigned int);
 extern const char *sprint_open_modes(unsigned int);
 extern void print_seccomp_filter(struct tcb *, unsigned long);

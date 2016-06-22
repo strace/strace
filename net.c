@@ -582,8 +582,9 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 	printsock(tcp, (long)msg->msg_name, msg->msg_namelen);
 
 	tprintf(", msg_iov(%lu)=", (unsigned long)msg->msg_iovlen);
+
 	tprint_iov_upto(tcp, (unsigned long)msg->msg_iovlen,
-		   (unsigned long)msg->msg_iov, 1, data_size);
+			(unsigned long)msg->msg_iov, IOV_DECODE_STR, data_size);
 
 #ifdef HAVE_STRUCT_MSGHDR_MSG_CONTROL
 	tprintf(", msg_controllen=%lu", (unsigned long)msg->msg_controllen);
