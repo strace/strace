@@ -258,20 +258,24 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 int
 printsock(struct tcb *tcp, long addr, int addrlen)
 {
-	sockaddr_buf_t addrbuf;
-
 	if (addrlen < 2) {
 		printaddr(addr);
 		return -1;
 	}
 
-	if (addrlen > (int) sizeof(addrbuf))
-		addrlen = sizeof(addrbuf);
+	union {
+		struct sockaddr sa;
+		struct sockaddr_storage storage;
+		char pad[sizeof(struct sockaddr_storage) + 1];
+	} addrbuf;
 
-	memset(&addrbuf, 0, sizeof(addrbuf));
+	if ((unsigned) addrlen > sizeof(addrbuf.storage))
+		addrlen = sizeof(addrbuf.storage);
+
 	if (umoven_or_printaddr(tcp, addr, addrlen, addrbuf.pad))
 		return -1;
-	addrbuf.pad[sizeof(addrbuf.pad) - 1] = '\0';
+
+	memset(&addrbuf.pad[addrlen], 0, sizeof(addrbuf.pad) - addrlen);
 
 	print_sockaddr(tcp, &addrbuf, addrlen);
 
