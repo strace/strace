@@ -108,7 +108,7 @@ main(int ac, const char **av)
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	unsigned long accept_inode = inode_of_sockfd(accept_fd);
-	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX, NULL}"
+	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX}"
 	       ", [%u]) = %d<UNIX:[%lu->%lu,\"%s\"]>\n",
 	       listen_fd, listen_inode, av[1], (unsigned) *len,
 	       accept_fd, accept_inode, connect_inode, av[1]);

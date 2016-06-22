@@ -107,15 +107,13 @@ print_sockaddr_data_un(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_un *const sa_un = buf;
 
-	if (addrlen == 2) {
-		tprints("NULL");
-	} else if (sa_un->sun_path[0]) {
-		tprints("sun_path=");
+	tprints("sun_path=");
+	if (sa_un->sun_path[0]) {
 		print_quoted_string(sa_un->sun_path,
 				    sizeof(sa_un->sun_path) + 1,
 				    QUOTE_0_TERMINATED);
 	} else {
-		tprints("sun_path=@");
+		tprints("@");
 		print_quoted_string(sa_un->sun_path + 1,
 				    sizeof(sa_un->sun_path),
 				    QUOTE_0_TERMINATED);
@@ -258,17 +256,20 @@ void
 print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 {
 	const struct sockaddr *const sa = buf;
-	const unsigned short family = sa->sa_family;
 
 	tprints("{sa_family=");
-	printxval(addrfams, family, "AF_???");
-	tprints(", ");
+	printxval(addrfams, sa->sa_family, "AF_???");
 
-	if (family < ARRAY_SIZE(sa_printers) && sa_printers[family]) {
-		sa_printers[family](buf, addrlen);
-	} else {
-		tprints("sa_data=");
-		print_quoted_string(sa->sa_data, sizeof(sa->sa_data), 0);
+	if (addrlen > (int) sizeof(sa->sa_family)) {
+		tprints(", ");
+
+		if (sa->sa_family < ARRAY_SIZE(sa_printers)
+		    && sa_printers[sa->sa_family]) {
+			sa_printers[sa->sa_family](buf, addrlen);
+		} else {
+			tprints("sa_data=");
+			print_quoted_string(sa->sa_data, sizeof(sa->sa_data), 0);
+		}
 	}
 
 	tprints("}");
