@@ -96,6 +96,7 @@
 
 #if defined(HAVE_BLUETOOTH_BLUETOOTH_H)
 # include "xlat/bt_protocols.h"
+# include "xlat/hci_channels.h"
 #endif
 
 #include "xlat/msg_flags.h"
@@ -217,33 +218,63 @@ print_sockaddr_data_ll(const void *const buf, const int addrlen)
 		tprintf("%02x", sa_ll->sll_addr[i]);
 }
 
+static void
+print_sockaddr_data_raw(const void *const buf, const int addrlen)
+{
+	const char *const data = buf + SIZEOF_SA_FAMILY;
+	const int datalen = addrlen - SIZEOF_SA_FAMILY;
+
+	tprints("sa_data=");
+	print_quoted_string(data, datalen, 0);
+}
+
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 static void
 print_sockaddr_data_bt(const void *const buf, const int addrlen)
 {
-	const union {
-		struct sockaddr_hci hci;
-		struct sockaddr_l2 l2;
-		struct sockaddr_rc rc;
-		struct sockaddr_sco sco;
-	} *const addr = buf;
-
-	tprintf("{sco_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X} or "
-		"{rc_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X, rc_channel=%d} or "
-		"{l2_psm=htobs(%d), l2_bdaddr=%02X:%02X:%02X:%02X:%02X:%02X, l2_cid=htobs(%d)} or "
-		"{hci_dev=htobs(%d)}",
-		addr->sco.sco_bdaddr.b[0], addr->sco.sco_bdaddr.b[1],
-		addr->sco.sco_bdaddr.b[2], addr->sco.sco_bdaddr.b[3],
-		addr->sco.sco_bdaddr.b[4], addr->sco.sco_bdaddr.b[5],
-		addr->rc.rc_bdaddr.b[0], addr->rc.rc_bdaddr.b[1],
-		addr->rc.rc_bdaddr.b[2], addr->rc.rc_bdaddr.b[3],
-		addr->rc.rc_bdaddr.b[4], addr->rc.rc_bdaddr.b[5],
-		addr->rc.rc_channel,
-		btohs(addr->l2.l2_psm), addr->l2.l2_bdaddr.b[0],
-		addr->l2.l2_bdaddr.b[1], addr->l2.l2_bdaddr.b[2],
-		addr->l2.l2_bdaddr.b[3], addr->l2.l2_bdaddr.b[4],
-		addr->l2.l2_bdaddr.b[5], btohs(addr->l2.l2_cid),
-		btohs(addr->hci.hci_dev));
+	switch (addrlen) {
+		case sizeof(struct sockaddr_hci): {
+			const struct sockaddr_hci *const hci = buf;
+			tprintf("hci_dev=htobs(%hu), hci_channel=",
+				btohs(hci->hci_dev));
+			printxval(hci_channels, hci->hci_channel,
+				  "HCI_CHANNEL_???");
+			break;
+		}
+		case sizeof(struct sockaddr_sco): {
+			const struct sockaddr_sco *const sco = buf;
+			tprintf("sco_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x",
+				sco->sco_bdaddr.b[0], sco->sco_bdaddr.b[1],
+				sco->sco_bdaddr.b[2], sco->sco_bdaddr.b[3],
+				sco->sco_bdaddr.b[4], sco->sco_bdaddr.b[5]);
+			break;
+		}
+		case sizeof(struct sockaddr_rc): {
+			const struct sockaddr_rc *const rc = buf;
+			tprintf("rc_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
+				", rc_channel=%u",
+				rc->rc_bdaddr.b[0], rc->rc_bdaddr.b[1],
+				rc->rc_bdaddr.b[2], rc->rc_bdaddr.b[3],
+				rc->rc_bdaddr.b[4], rc->rc_bdaddr.b[5],
+				rc->rc_channel);
+			break;
+		}
+		case sizeof(struct sockaddr_l2): {
+			const struct sockaddr_l2 *const l2 = buf;
+			tprintf("l2_psm=htobs(%hu)"
+				", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
+				", l2_cid=htobs(%hu), l2_bdaddr_type=%u",
+				btohs(l2->l2_psm),
+				l2->l2_bdaddr.b[0], l2->l2_bdaddr.b[1],
+				l2->l2_bdaddr.b[2], l2->l2_bdaddr.b[3],
+				l2->l2_bdaddr.b[4], l2->l2_bdaddr.b[5],
+				btohs(l2->l2_cid), l2->l2_bdaddr_type);
+			break;
+		}
+		default:
+			print_sockaddr_data_raw(buf, addrlen);
+			break;
+	}
 }
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
 
@@ -276,11 +307,7 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 		    && sa_printers[sa->sa_family]) {
 			sa_printers[sa->sa_family](buf, addrlen);
 		} else {
-			const char *const data = buf + sizeof(sa->sa_family);
-			const int datalen = addrlen - sizeof(sa->sa_family);
-
-			tprints("sa_data=");
-			print_quoted_string(data, datalen, 0);
+			print_sockaddr_data_raw(buf, addrlen);
 		}
 	}
 
