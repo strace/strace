@@ -101,8 +101,6 @@
 
 #include "xlat/msg_flags.h"
 
-#include "xlat/af_packet_types.h"
-
 #define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
 
 static void
@@ -132,7 +130,7 @@ print_sockaddr_data_in(const void *const buf, const int addrlen)
 		ntohs(sa_in->sin_port), inet_ntoa(sa_in->sin_addr));
 }
 
-static void
+void
 print_ifindex(unsigned int ifindex)
 {
 #ifdef HAVE_IF_INDEXTONAME
@@ -201,21 +199,6 @@ print_sockaddr_data_nl(const void *const buf, const int addrlen)
 
 	tprintf("nl_pid=%d, nl_groups=%#08x",
 		sa_nl->nl_pid, sa_nl->nl_groups);
-}
-
-static void
-print_sockaddr_data_ll(const void *const buf, const int addrlen)
-{
-	const struct sockaddr_ll *const sa_ll = buf;
-	unsigned int i;
-
-	tprintf("proto=%#04x, if%d, pkttype=",
-		ntohs(sa_ll->sll_protocol),
-		sa_ll->sll_ifindex);
-	printxval(af_packet_types, sa_ll->sll_pkttype, "PACKET_???");
-	tprintf(", addr(%d)={%d, ", sa_ll->sll_halen, sa_ll->sll_hatype);
-	for (i = 0; i < sa_ll->sll_halen; i++)
-		tprintf("%02x", sa_ll->sll_addr[i]);
 }
 
 static void
