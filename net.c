@@ -145,6 +145,8 @@ print_ifindex(unsigned int ifindex)
 	tprintf("%u", ifindex);
 }
 
+#define SIN6_MIN_LEN offsetof(struct sockaddr_in6, sin6_scope_id)
+
 static void
 print_sockaddr_data_in6(const void *const buf, const int addrlen)
 {
@@ -157,6 +159,10 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 		", \"%s\", &sin6_addr), sin6_flowinfo=%u",
 		ntohs(sa_in6->sin6_port), string_addr,
 		sa_in6->sin6_flowinfo);
+
+	if (addrlen <= (int) SIN6_MIN_LEN)
+		return;
+
 	tprints(", sin6_scope_id=");
 #if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
 	if (IN6_IS_ADDR_LINKLOCAL(&sa_in6->sin6_addr)
