@@ -280,15 +280,18 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 
 typedef void (* const sockaddr_printer)(const void *const, const int);
 
-static const sockaddr_printer sa_printers[] = {
-	[AF_UNIX] = print_sockaddr_data_un,
-	[AF_INET] = print_sockaddr_data_in,
-	[AF_IPX] = print_sockaddr_data_ipx,
-	[AF_INET6] = print_sockaddr_data_in6,
-	[AF_NETLINK] = print_sockaddr_data_nl,
-	[AF_PACKET] = print_sockaddr_data_ll,
+static const struct {
+	const sockaddr_printer printer;
+	const int min_len;
+} sa_printers[] = {
+	[AF_UNIX] = { print_sockaddr_data_un, SIZEOF_SA_FAMILY + 1 },
+	[AF_INET] = { print_sockaddr_data_in, sizeof(struct sockaddr_in) },
+	[AF_IPX] = { print_sockaddr_data_ipx, sizeof(struct sockaddr_ipx) },
+	[AF_INET6] = { print_sockaddr_data_in6, SIN6_MIN_LEN },
+	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
+	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
-	[AF_BLUETOOTH] = print_sockaddr_data_bt,
+	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
 #endif
 };
 
@@ -300,12 +303,13 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 	tprints("{sa_family=");
 	printxval(addrfams, sa->sa_family, "AF_???");
 
-	if (addrlen > (int) sizeof(sa->sa_family)) {
+	if (addrlen > (int) SIZEOF_SA_FAMILY) {
 		tprints(", ");
 
 		if (sa->sa_family < ARRAY_SIZE(sa_printers)
-		    && sa_printers[sa->sa_family]) {
-			sa_printers[sa->sa_family](buf, addrlen);
+		    && sa_printers[sa->sa_family].printer
+		    && addrlen >= sa_printers[sa->sa_family].min_len) {
+			sa_printers[sa->sa_family].printer(buf, addrlen);
 		} else {
 			print_sockaddr_data_raw(buf, addrlen);
 		}
