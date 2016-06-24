@@ -156,9 +156,9 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 	inet_ntop(AF_INET6, &sa_in6->sin6_addr,
 		  string_addr, sizeof(string_addr));
 	tprintf("sin6_port=htons(%u), inet_pton(AF_INET6"
-		", \"%s\", &sin6_addr), sin6_flowinfo=%u",
+		", \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)",
 		ntohs(sa_in6->sin6_port), string_addr,
-		sa_in6->sin6_flowinfo);
+		ntohl(sa_in6->sin6_flowinfo));
 
 	if (addrlen <= (int) SIN6_MIN_LEN)
 		return;
