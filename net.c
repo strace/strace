@@ -196,7 +196,8 @@ print_sockaddr_data_nl(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_nl *const sa_nl = buf;
 
-	tprintf("pid=%d, groups=%08x", sa_nl->nl_pid, sa_nl->nl_groups);
+	tprintf("nl_pid=%d, nl_groups=%#08x",
+		sa_nl->nl_pid, sa_nl->nl_groups);
 }
 
 static void

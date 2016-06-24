@@ -66,13 +66,13 @@ main(void)
 	if (bind(fd, sa, *len))
 		perror_msg_and_skip("bind");
 	printf("bind(%d<NETLINK:[%lu]>, {sa_family=AF_NETLINK"
-	       ", pid=%u, groups=00000000}, %u) = 0\n",
+	       ", nl_pid=%u, nl_groups=00000000}, %u) = 0\n",
 	       fd, inode, magic, (unsigned) *len);
 
 	if (getsockname(fd, sa, len))
 		perror_msg_and_fail("getsockname");
 	printf("getsockname(%d<NETLINK:[SOCK_DIAG:%u]>, {sa_family=AF_NETLINK"
-	       ", pid=%u, groups=00000000}, [%u]) = 0\n",
+	       ", nl_pid=%u, nl_groups=00000000}, [%u]) = 0\n",
 	       fd, magic, magic, (unsigned) *len);
 
 	if (close(fd))
