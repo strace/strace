@@ -182,15 +182,15 @@ print_sockaddr_data_ipx(const void *const buf, const int addrlen)
 	unsigned int i;
 
 	tprintf("sipx_port=htons(%u)"
-		", sipx_network=htonl(%08x)"
+		", sipx_network=htonl(%#08x)"
 		", sipx_node=[",
 		ntohs(sa_ipx->sipx_port),
 		ntohl(sa_ipx->sipx_network));
 	for (i = 0; i < IPX_NODE_LEN; ++i) {
-		tprintf("%s%02x", i ? ", " : "",
+		tprintf("%s%#02x", i ? ", " : "",
 			sa_ipx->sipx_node[i]);
 	}
-	tprintf("], sipx_type=%02x", sa_ipx->sipx_type);
+	tprintf("], sipx_type=%#02x", sa_ipx->sipx_type);
 }
 
 static void
