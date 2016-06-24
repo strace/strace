@@ -102,21 +102,23 @@
 
 #include "xlat/af_packet_types.h"
 
+#define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
+
 static void
 print_sockaddr_data_un(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_un *const sa_un = buf;
+	const int un_len = addrlen > (int) sizeof(*sa_un)
+			   ? (int) sizeof(*sa_un) : addrlen;
+	const int path_len = un_len - SIZEOF_SA_FAMILY;
 
 	tprints("sun_path=");
 	if (sa_un->sun_path[0]) {
-		print_quoted_string(sa_un->sun_path,
-				    sizeof(sa_un->sun_path) + 1,
+		print_quoted_string(sa_un->sun_path, path_len + 1,
 				    QUOTE_0_TERMINATED);
 	} else {
 		tprints("@");
-		print_quoted_string(sa_un->sun_path + 1,
-				    sizeof(sa_un->sun_path),
-				    QUOTE_0_TERMINATED);
+		print_quoted_string(sa_un->sun_path + 1, path_len - 1, 0);
 	}
 }
 
