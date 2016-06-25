@@ -302,7 +302,7 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 }
 
 int
-printsock(struct tcb *tcp, long addr, int addrlen)
+decode_sockaddr(struct tcb *tcp, long addr, int addrlen)
 {
 	if (addrlen < 2) {
 		printaddr(addr);
@@ -625,7 +625,7 @@ static void
 do_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 {
 	tprintf("{msg_name(%d)=", msg->msg_namelen);
-	printsock(tcp, (long)msg->msg_name, msg->msg_namelen);
+	decode_sockaddr(tcp, (long)msg->msg_name, msg->msg_namelen);
 
 	tprintf(", msg_iov(%lu)=", (unsigned long)msg->msg_iovlen);
 
@@ -849,7 +849,7 @@ SYS_FUNC(bind)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printsock(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	decode_sockaddr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu", tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -880,7 +880,7 @@ do_sockname(struct tcb *tcp, int flags_arg)
 		tprints(", ");
 		printaddr(tcp->u_arg[2]);
 	} else {
-		printsock(tcp, tcp->u_arg[1], len);
+		decode_sockaddr(tcp, tcp->u_arg[1], len);
 		tprintf(", [%d]", len);
 	}
 
@@ -926,7 +926,7 @@ SYS_FUNC(sendto)
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	/* to address */
 	tprints(", ");
-	printsock(tcp, tcp->u_arg[4], tcp->u_arg[5]);
+	decode_sockaddr(tcp, tcp->u_arg[4], tcp->u_arg[5]);
 	/* to length */
 	tprintf(", %lu", tcp->u_arg[5]);
 
@@ -1008,7 +1008,7 @@ SYS_FUNC(recvfrom)
 			return 0;
 		}
 		/* from address */
-		printsock(tcp, tcp->u_arg[4], fromlen);
+		decode_sockaddr(tcp, tcp->u_arg[4], fromlen);
 		/* from length */
 		tprintf(", [%u]", fromlen);
 	}
