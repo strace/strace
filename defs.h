@@ -656,7 +656,6 @@ extern bool print_sockaddr_by_inode(const unsigned long, const enum sock_proto);
 extern bool print_sockaddr_by_inode_cached(const unsigned long);
 extern void print_dirfd(struct tcb *, int);
 extern int printsock(struct tcb *, long, int);
-extern void print_sock_optmgmt(struct tcb *, long, int);
 #ifdef ALPHA
 extern void printrusage32(struct tcb *, long);
 extern const char *sprint_timeval32(struct tcb *tcp, long);
