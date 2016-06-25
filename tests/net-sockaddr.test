@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of sockaddr structures.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a24 -e trace=connect

@@ -195,6 +195,7 @@ check_PROGRAMS = \
 	nanosleep \
 	net-accept-connect \
 	net-icmp_filter \
+	net-sockaddr \
 	net-y-unix \
 	net-yy-inet \
 	net-yy-netlink \
@@ -505,6 +506,7 @@ DECODER_TESTS = \
 	munlockall.test \
 	nanosleep.test \
 	net-icmp_filter.test \
+	net-sockaddr.test \
 	net-y-unix.test \
 	net-yy-inet.test \
 	net-yy-netlink.test \
