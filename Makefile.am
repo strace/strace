@@ -198,7 +198,7 @@ strace_SOURCES =	\
 	signalfd.c	\
 	sigreturn.c	\
 	sock.c		\
-	sockaddr_ll.c	\
+	sockaddr.c	\
 	socketutils.c	\
 	sram_alloc.c	\
 	statfs.c	\

@@ -374,6 +374,7 @@ typedef uint8_t qualbits_t;
 
 #include "xlat.h"
 
+extern const struct xlat addrfams[];
 extern const struct xlat at_flags[];
 extern const struct xlat dirent_types[];
 extern const struct xlat evdev_abs[];
@@ -682,7 +683,6 @@ extern void print_struct_statfs(struct tcb *tcp, long);
 extern void print_struct_statfs64(struct tcb *tcp, long, unsigned long);
 
 extern void print_ifindex(unsigned int);
-extern void print_sockaddr_data_ll(const void *, int);
 
 extern int file_ioctl(struct tcb *, const unsigned int, long);
 extern int fs_x_ioctl(struct tcb *, const unsigned int, long);
