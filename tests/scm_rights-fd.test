@@ -61,15 +61,16 @@ rights_data='\[4</dev/null>, 5</dev/zero>, 6<'"$path6"'>\]'
 iov='\[\{"'"$sample"'", 15\}\]'
 ids='\{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}'
 
-msg='\{msg_name\(0\)=NULL, msg_iov\(1\)='"$iov"', msg_controllen='"$n"
+msg_head='\{msg_name\(0\)=NULL, msg_iov\(1\)='"$iov"', msg_control='
+msg_tail=', msg_controllen='"$n"', msg_flags=0'
 rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, '"$rights_data"'\}'
 creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, '"$ids"'\}'
 
 EXPECTED="$LOG.expected"
 
 cat > "$EXPECTED" << __EOF__
-sendmsg\\(3$socket, $msg, \\[$rights\\], msg_flags=0\\}, 0\\) = 15
-recvmsg\\(0$socket, $msg, \\[$creds, $rights\\], msg_flags=0\\}, 0\\) = 15
+sendmsg\\(3$socket, $msg_head\\[$rights\\]$msg_tail\\}, 0\\) = 15
+recvmsg\\(0$socket, $msg_head\\[$creds, $rights\\]$msg_tail\\}, 0\\) = 15
 __EOF__
 
 match_grep "$LOG" "$EXPECTED"

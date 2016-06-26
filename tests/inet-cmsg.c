@@ -146,10 +146,10 @@ main(void)
 	assert(!close(0));
 
 	printf("recvmsg(0, {msg_name(%u)={sa_family=AF_INET, sin_port=htons(%u)"
-	       ", sin_addr=inet_addr(\"127.0.0.1\")}, msg_iov(1)=[{\"%s\", %zu}]"
-	       ", msg_controllen=%lu, [",
+	       ", sin_addr=inet_addr(\"127.0.0.1\")}, msg_iov(1)=[{\"%s\", %u}]"
+	       ", msg_control=[",
 	       (unsigned) mh.msg_namelen, ntohs(addr.sin_port),
-	       data, size, (unsigned long) mh.msg_controllen);
+	       data, (unsigned) size);
 
 	struct cmsghdr *c;
 	for (c = CMSG_FIRSTHDR(&mh); c; c = CMSG_NXTHDR(&mh, c)) {
@@ -186,7 +186,8 @@ main(void)
 		}
 		printf("}");
 	}
-	printf("], msg_flags=0}, 0) = %zu\n", size);
+	printf("], msg_controllen=%lu, msg_flags=0}, 0) = %u\n",
+	       (unsigned long) mh.msg_controllen, (unsigned) size);
 	puts("+++ exited with 0 +++");
 
 	return 0;

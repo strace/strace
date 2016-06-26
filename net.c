@@ -341,9 +341,12 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, size_t len)
 #endif
 			sizeof(struct cmsghdr);
 
+	if (!len)
+		return;
+	tprints(", msg_control=");
+
 	char *buf = len < cmsg_size ? NULL : malloc(len);
 	if (!buf || umoven(tcp, addr, len, buf) < 0) {
-		tprints(", msg_control=");
 		printaddr(addr);
 		free(buf);
 		return;
@@ -351,7 +354,7 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, size_t len)
 
 	union_cmsghdr u = { .ptr = buf };
 
-	tprints(", [");
+	tprints("[");
 	while (len >= cmsg_size) {
 		size_t cmsg_len =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
@@ -413,10 +416,10 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 	tprint_iov_upto(tcp, (unsigned long)msg->msg_iovlen,
 			(unsigned long)msg->msg_iov, IOV_DECODE_STR, data_size);
 
-	tprintf(", msg_controllen=%lu", (unsigned long)msg->msg_controllen);
-	if (msg->msg_controllen)
-		printcmsghdr(tcp, (unsigned long) msg->msg_control,
-			     msg->msg_controllen);
+	printcmsghdr(tcp, (unsigned long) msg->msg_control,
+		     msg->msg_controllen);
+	tprintf(", msg_controllen=%lu", (unsigned long) msg->msg_controllen);
+
 	tprints(", msg_flags=");
 	printflags(msg_flags, msg->msg_flags, "MSG_???");
 	tprints("}");
