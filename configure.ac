@@ -344,8 +344,6 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct stat.st_rdev
 ]))
 
-AC_CHECK_MEMBERS([struct msghdr.msg_control],,, [#include <sys/socket.h>])
-
 AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
