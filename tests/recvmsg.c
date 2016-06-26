@@ -87,8 +87,8 @@ main(void)
 
 	assert(sendmsg(1, w_mh, 0) == (int) w_len);
 	close(1);
-	tprintf("sendmsg(1, {msg_name(0)=NULL, msg_iov(%u)="
-		"[{\"%s\", %u}, {\"%s\", %u}, {\"%s\", %u}]"
+	tprintf("sendmsg(1, {msg_name=NULL, msg_namelen=0, msg_iov="
+		"[{\"%s\", %u}, {\"%s\", %u}, {\"%s\", %u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n"
@@ -96,9 +96,12 @@ main(void)
 		" | 00000 %-49s  %-16s |\n"
 		" * %u bytes in buffer 2\n"
 		" | 00000 %-49s  %-16s |\n",
-		ARRAY_SIZE(w_iov_), w0_c, LENGTH_OF(w0_c),
-		w1_c, LENGTH_OF(w1_c), w2_c, LENGTH_OF(w2_c), w_len,
-		LENGTH_OF(w0_c), w0_d, w0_c, LENGTH_OF(w1_c), w1_d, w1_c,
+		w0_c, LENGTH_OF(w0_c),
+		w1_c, LENGTH_OF(w1_c),
+		w2_c, LENGTH_OF(w2_c),
+		ARRAY_SIZE(w_iov_), w_len,
+		LENGTH_OF(w0_c), w0_d, w0_c,
+		LENGTH_OF(w1_c), w1_d, w1_c,
 		LENGTH_OF(w2_c), w2_d, w2_c);
 
 	const unsigned int r_len = (w_len + 1) / 2;
@@ -118,11 +121,12 @@ main(void)
 	struct msghdr *r_mh = tail_memdup(&r_mh_, sizeof(r_mh_));
 
 	assert(recvmsg(0, r_mh, 0) == (int) r_len);
-	tprintf("recvmsg(0, {msg_name(0)=NULL, msg_iov(%u)="
-		"[{\"%s\", %u}], msg_controllen=0, msg_flags=0}, 0) = %u\n"
+	tprintf("recvmsg(0, {msg_name=NULL, msg_namelen=0, msg_iov="
+		"[{\"%s\", %u}], msg_iovlen=%u, msg_controllen=0"
+		", msg_flags=0}, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
-		ARRAY_SIZE(r0_iov_), r0_c, r_len, r_len, r_len, r0_d, r0_c);
+		r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len, r_len, r0_d, r0_c);
 
 	void *r1 = tail_alloc(r_len);
 	void *r2 = tail_alloc(w_len);
@@ -141,12 +145,12 @@ main(void)
 	r_mh->msg_iovlen = ARRAY_SIZE(r1_iov_);
 
 	assert(recvmsg(0, r_mh, 0) == (int) w_len - r_len);
-	tprintf("recvmsg(0, {msg_name(0)=NULL, msg_iov(%u)="
-		"[{\"%s\", %u}, {\"\", %u}], msg_controllen=0"
+	tprintf("recvmsg(0, {msg_name=NULL, msg_namelen=0, msg_iov="
+		"[{\"%s\", %u}, {\"\", %u}], msg_iovlen=%u, msg_controllen=0"
 		", msg_flags=0}, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
-		ARRAY_SIZE(r1_iov_), r1_c, r_len, w_len, w_len - r_len,
+		r1_c, r_len, w_len, ARRAY_SIZE(r1_iov_), w_len - r_len,
 		w_len - r_len, r1_d, r1_c);
 	close(0);
 

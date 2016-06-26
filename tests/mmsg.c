@@ -145,9 +145,11 @@ main(void)
 		perror_msg_and_skip("sendmmsg");
 	assert(r == (int) n_w_mmh);
 	assert(close(1) == 0);
-	tprintf("sendmmsg(1, {{{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}"
-		", {\"%s\", %u}], msg_controllen=0, msg_flags=0}, %u}"
-		", {{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}]"
+	tprintf("sendmmsg(1, {{{msg_name=NULL, msg_namelen=0"
+		", msg_iov=[{\"%s\", %u}, {\"%s\", %u}], msg_iovlen=%u"
+		", msg_controllen=0, msg_flags=0}, %u}"
+		", {{msg_name=NULL, msg_namelen=0"
+		", msg_iov=[{\"%s\", %u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, %u}}, %u"
 		", MSG_DONTROUTE|MSG_NOSIGNAL) = %d\n"
 		" = %u buffers in vector 0\n"
@@ -158,10 +160,12 @@ main(void)
 		" = %u buffers in vector 1\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
-		ARRAY_SIZE(w0_iov_), w0_c, LENGTH_OF(w0_c),
+		w0_c, LENGTH_OF(w0_c),
 		w1_c, LENGTH_OF(w1_c),
+		ARRAY_SIZE(w0_iov_),
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c),
-		ARRAY_SIZE(w1_iov_), w2_c, LENGTH_OF(w2_c), LENGTH_OF(w2_c),
+		w2_c, LENGTH_OF(w2_c), ARRAY_SIZE(w1_iov_),
+		LENGTH_OF(w2_c),
 		n_w_mmh, r,
 		ARRAY_SIZE(w0_iov_), LENGTH_OF(w0_c), w0_d, w0_c,
 		LENGTH_OF(w1_c), w1_d, w1_c,
@@ -215,9 +219,11 @@ main(void)
 
 	assert(recv_mmsg(0, r_mmh, n_r_mmh, MSG_DONTWAIT, NULL) == (int) n_r_mmh);
 	assert(close(0) == 0);
-	tprintf("recvmmsg(0, {{{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}]"
+	tprintf("recvmmsg(0, {{{msg_name=NULL, msg_namelen=0"
+		", msg_iov=[{\"%s\", %u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, %u}"
-		", {{msg_name(0)=NULL, msg_iov(%u)=[{\"%s\", %u}, {\"\", %u}]"
+		", {{msg_name=NULL, msg_namelen=0"
+		", msg_iov=[{\"%s\", %u}, {\"\", %u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, %u}}, %u"
 		", MSG_DONTWAIT, NULL) = %d (left NULL)\n"
 		" = %u buffers in vector 0\n"
@@ -226,8 +232,8 @@ main(void)
 		" = %u buffers in vector 1\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
-		ARRAY_SIZE(r0_iov_), r0_c, r_len, LENGTH_OF(r0_c),
-		ARRAY_SIZE(r1_iov_), r1_c, r_len, r_len, LENGTH_OF(r1_c),
+		r0_c, r_len, ARRAY_SIZE(r0_iov_), LENGTH_OF(r0_c),
+		r1_c, r_len, r_len, ARRAY_SIZE(r1_iov_), LENGTH_OF(r1_c),
 		n_r_mmh, r,
 		ARRAY_SIZE(r0_iov_), LENGTH_OF(r0_c), r0_d, r0_c,
 		ARRAY_SIZE(r1_iov_), LENGTH_OF(r1_c), r1_d, r1_c);
