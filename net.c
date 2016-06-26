@@ -333,7 +333,7 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 }
 
 static void
-printcmsghdr(struct tcb *tcp, unsigned long addr, size_t len)
+decode_msg_control(struct tcb *tcp, unsigned long addr, size_t len)
 {
 	const size_t cmsg_size =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
@@ -406,7 +406,7 @@ printcmsghdr(struct tcb *tcp, unsigned long addr, size_t len)
 }
 
 static void
-do_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
+print_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 {
 	tprintf("{msg_name(%d)=", msg->msg_namelen);
 	decode_sockaddr(tcp, (long)msg->msg_name, msg->msg_namelen);
@@ -416,7 +416,7 @@ do_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 	tprint_iov_upto(tcp, (unsigned long)msg->msg_iovlen,
 			(unsigned long)msg->msg_iov, IOV_DECODE_STR, data_size);
 
-	printcmsghdr(tcp, (unsigned long) msg->msg_control,
+	decode_msg_control(tcp, (unsigned long) msg->msg_control,
 		     msg->msg_controllen);
 	tprintf(", msg_controllen=%lu", (unsigned long) msg->msg_controllen);
 
@@ -461,7 +461,7 @@ copy_from_msghdr32(struct msghdr *to_msg, struct msghdr32 *from_msg32)
 #endif
 
 static bool
-extractmsghdr(struct tcb *tcp, long addr, struct msghdr *msg)
+fetch_msghdr(struct tcb *tcp, long addr, struct msghdr *msg)
 {
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize == 4) {
@@ -478,7 +478,7 @@ extractmsghdr(struct tcb *tcp, long addr, struct msghdr *msg)
 }
 
 static bool
-extractmmsghdr(struct tcb *tcp, long addr, unsigned int idx, struct mmsghdr *mmsg)
+fetch_mmsghdr(struct tcb *tcp, long addr, unsigned int idx, struct mmsghdr *mmsg)
 {
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 	if (current_wordsize == 4) {
@@ -501,12 +501,12 @@ extractmmsghdr(struct tcb *tcp, long addr, unsigned int idx, struct mmsghdr *mms
 }
 
 static void
-printmsghdr(struct tcb *tcp, long addr, unsigned long data_size)
+decode_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
-	if (verbose(tcp) && extractmsghdr(tcp, addr, &msg))
-		do_msghdr(tcp, &msg, data_size);
+	if (verbose(tcp) && fetch_msghdr(tcp, addr, &msg))
+		print_msghdr(tcp, &msg, data_size);
 	else
 		printaddr(addr);
 }
@@ -516,18 +516,18 @@ dumpiov_in_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
-	if (extractmsghdr(tcp, addr, &msg))
+	if (fetch_msghdr(tcp, addr, &msg))
 		dumpiov_upto(tcp, msg.msg_iovlen, (long)msg.msg_iov, data_size);
 }
 
 static void
-printmmsghdr(struct tcb *tcp, long addr, unsigned int idx, unsigned long msg_len)
+decode_mmsghdr(struct tcb *tcp, long addr, unsigned int idx, unsigned long msg_len)
 {
 	struct mmsghdr mmsg;
 
-	if (extractmmsghdr(tcp, addr, idx, &mmsg)) {
+	if (fetch_mmsghdr(tcp, addr, idx, &mmsg)) {
 		tprints("{");
-		do_msghdr(tcp, &mmsg.msg_hdr, msg_len ? msg_len : mmsg.msg_len);
+		print_msghdr(tcp, &mmsg.msg_hdr, msg_len ? msg_len : mmsg.msg_len);
 		tprintf(", %u}", mmsg.msg_len);
 	}
 	else
@@ -548,7 +548,7 @@ decode_mmsg(struct tcb *tcp, unsigned long msg_len)
 		for (i = 0; i < len; ++i) {
 			if (i)
 				tprints(", ");
-			printmmsghdr(tcp, tcp->u_arg[1], i, msg_len);
+			decode_mmsghdr(tcp, tcp->u_arg[1], i, msg_len);
 		}
 		tprints("}");
 	}
@@ -566,7 +566,7 @@ dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
 	struct mmsghdr mmsg;
 
 	for (i = 0; i < len; ++i) {
-		if (extractmmsghdr(tcp, addr, i, &mmsg)) {
+		if (fetch_mmsghdr(tcp, addr, i, &mmsg)) {
 			tprintf(" = %lu buffers in vector %u\n",
 				(unsigned long)mmsg.msg_hdr.msg_iovlen, i);
 			dumpiov_upto(tcp, mmsg.msg_hdr.msg_iovlen,
@@ -716,7 +716,7 @@ SYS_FUNC(sendmsg)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printmsghdr(tcp, tcp->u_arg[1], (unsigned long) -1L);
+	decode_msghdr(tcp, tcp->u_arg[1], (unsigned long) -1L);
 	/* flags */
 	tprints(", ");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
@@ -803,7 +803,7 @@ SYS_FUNC(recvmsg)
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
-			printmsghdr(tcp, tcp->u_arg[1], tcp->u_rval);
+			decode_msghdr(tcp, tcp->u_arg[1], tcp->u_rval);
 		/* flags */
 		tprints(", ");
 		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
