@@ -379,9 +379,9 @@ decode_mmsghdr(struct tcb *tcp, long addr, bool use_msg_len)
 	int fetched = fetch_struct_mmsghdr(tcp, addr, &mmsg);
 
 	if (fetched) {
-		tprints("{");
+		tprints("{msg_hdr=");
 		print_msghdr(tcp, &mmsg.msg_hdr, use_msg_len ? mmsg.msg_len : -1UL);
-		tprintf(", %u}", mmsg.msg_len);
+		tprintf(", msg_len=%u}", mmsg.msg_len);
 	} else {
 		printaddr(addr);
 	}
