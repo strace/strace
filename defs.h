@@ -378,9 +378,11 @@ extern const struct xlat addrfams[];
 extern const struct xlat at_flags[];
 extern const struct xlat dirent_types[];
 extern const struct xlat evdev_abs[];
+extern const struct xlat msg_flags[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
 extern const struct xlat resource_flags[];
+extern const struct xlat socketlayers[];
 extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */
@@ -603,6 +605,8 @@ extern int printflags64(const struct xlat *, uint64_t, const char *);
 extern const char *sprintflags(const char *, const struct xlat *, uint64_t);
 extern const char *sprintmode(unsigned int);
 extern const char *sprinttime(time_t);
+extern void decode_msghdr(struct tcb *, long, unsigned long);
+extern void decode_mmsgvec(struct tcb *, unsigned long, unsigned int, bool);
 extern void dumpiov_in_msghdr(struct tcb *, long, unsigned long);
 extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov_upto(struct tcb *, int, long, unsigned long);

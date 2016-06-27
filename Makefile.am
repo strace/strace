@@ -155,6 +155,7 @@ strace_SOURCES =	\
 	mount.c		\
 	mpers_type.h	\
 	mq.c		\
+	msghdr.c	\
 	msghdr.h	\
 	mtd.c		\
 	native_defs.h	\
