@@ -29,6 +29,7 @@
  */
 
 #include "defs.h"
+#include "msghdr.h"
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
@@ -439,13 +440,6 @@ struct mmsghdr32 {
 	struct msghdr32         msg_hdr;
 	uint32_t /* unsigned */ msg_len;
 };
-
-#ifndef HAVE_STRUCT_MMSGHDR
-struct mmsghdr {
-	struct msghdr msg_hdr;
-	unsigned msg_len;
-};
-#endif
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 static void

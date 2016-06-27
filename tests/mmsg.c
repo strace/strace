@@ -36,14 +36,8 @@
 # include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
-# include <sys/socket.h>
 
-# ifndef HAVE_STRUCT_MMSGHDR
-struct mmsghdr {
-	struct msghdr msg_hdr;
-	unsigned msg_len;
-};
-# endif
+# include "msghdr.h"
 
 static int
 send_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags)
