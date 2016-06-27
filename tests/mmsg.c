@@ -139,12 +139,12 @@ main(void)
 		perror_msg_and_skip("sendmmsg");
 	assert(r == (int) n_w_mmh);
 	assert(close(1) == 0);
-	tprintf("sendmmsg(1, {{{msg_name=NULL, msg_namelen=0"
+	tprintf("sendmmsg(1, [{{msg_name=NULL, msg_namelen=0"
 		", msg_iov=[{\"%s\", %u}, {\"%s\", %u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, %u}"
 		", {{msg_name=NULL, msg_namelen=0"
 		", msg_iov=[{\"%s\", %u}], msg_iovlen=%u"
-		", msg_controllen=0, msg_flags=0}, %u}}, %u"
+		", msg_controllen=0, msg_flags=0}, %u}], %u"
 		", MSG_DONTROUTE|MSG_NOSIGNAL) = %d\n"
 		" = %u buffers in vector 0\n"
 		" * %u bytes in buffer 0\n"
@@ -213,12 +213,12 @@ main(void)
 
 	assert(recv_mmsg(0, r_mmh, n_r_mmh, MSG_DONTWAIT, NULL) == (int) n_r_mmh);
 	assert(close(0) == 0);
-	tprintf("recvmmsg(0, {{{msg_name=NULL, msg_namelen=0"
+	tprintf("recvmmsg(0, [{{msg_name=NULL, msg_namelen=0"
 		", msg_iov=[{\"%s\", %u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, %u}"
 		", {{msg_name=NULL, msg_namelen=0"
 		", msg_iov=[{\"%s\", %u}, {\"\", %u}], msg_iovlen=%u"
-		", msg_controllen=0, msg_flags=0}, %u}}, %u"
+		", msg_controllen=0, msg_flags=0}, %u}], %u"
 		", MSG_DONTWAIT, NULL) = %d (left NULL)\n"
 		" = %u buffers in vector 0\n"
 		" * %u bytes in buffer 0\n"

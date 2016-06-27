@@ -108,6 +108,8 @@ strace_SOURCES =	\
 	fcntl.c		\
 	fetch_seccomp_fprog.c \
 	fetch_struct_flock.c \
+	fetch_struct_mmsghdr.c \
+	fetch_struct_msghdr.c \
 	fetch_struct_statfs.c \
 	file.c		\
 	file_handle.c	\
