@@ -124,7 +124,7 @@ print_cmsg_ip_ttl(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*ttl) > data_len)
 		return;
 
-	tprintf(", cmsg_data={ttl=%u}", *ttl);
+	tprintf(", cmsg_data=[%u]", *ttl);
 }
 
 static void
@@ -136,7 +136,7 @@ print_cmsg_ip_tos(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*tos) > data_len)
 		return;
 
-	tprintf(", cmsg_data={tos=%x}", *tos);
+	tprintf(", cmsg_data=[%#x]", *tos);
 }
 
 static void
@@ -148,7 +148,7 @@ print_cmsg_ip_checksum(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*csum) > data_len)
 		return;
 
-	tprintf(", cmsg_data={csum=%u}", *csum);
+	tprintf(", cmsg_data=[%u]", *csum);
 }
 
 static void

@@ -48,7 +48,7 @@ print_ttl(const struct cmsghdr *c)
 {
 	const unsigned int *ttl = (const unsigned int *) CMSG_DATA(c);
 
-	printf("IP_TTL, cmsg_data={ttl=%u}", *ttl);
+	printf("IP_TTL, cmsg_data=[%u]", *ttl);
 }
 
 static void
@@ -56,7 +56,7 @@ print_tos(const struct cmsghdr *c)
 {
 	const uint8_t *tos = (const uint8_t *) CMSG_DATA(c);
 
-	printf("IP_TOS, cmsg_data={tos=%x}", *tos);
+	printf("IP_TOS, cmsg_data=[%#x]", *tos);
 }
 
 static void
