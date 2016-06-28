@@ -67,11 +67,11 @@ print_opts(const char *name, const struct cmsghdr *c)
 
 	printf("%s", name);
 	if (len) {
-		printf(", cmsg_data={opts=0x");
+		printf(", cmsg_data=[");
 		size_t i;
 		for (i = 0; i < len; ++i)
-			printf("%02x", opts[i]);
-		printf("}");
+			printf("%s0x%02x", i ? ", " : "", opts[i]);
+		printf("]");
 	}
 }
 

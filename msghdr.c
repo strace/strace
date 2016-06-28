@@ -161,10 +161,13 @@ print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
 	if (!data_len)
 		return;
 
-	tprints(", cmsg_data={opts=0x");
-	for (i = 0; i < data_len; ++i)
-		tprintf("%02x", opts[i]);
-	tprints("}");
+	tprints(", cmsg_data=[");
+	for (i = 0; i < data_len; ++i) {
+		if (i)
+			tprints(", ");
+		tprintf("0x%02x", opts[i]);
+	}
+	tprints("]");
 }
 
 static void
