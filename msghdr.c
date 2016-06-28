@@ -65,7 +65,7 @@ print_scm_rights(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*fds) > data_len)
 		return;
 
-	tprints(", [");
+	tprints(", cmsg_data=[");
 	while ((const char *) fds < end) {
 		if (seen)
 			tprints(", ");
@@ -85,7 +85,7 @@ print_scm_creds(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*uc) > data_len)
 		return;
 
-	tprintf(", {pid=%u, uid=%u, gid=%u}",
+	tprintf(", cmsg_data={pid=%u, uid=%u, gid=%u}",
 		(unsigned) uc->pid, (unsigned) uc->uid, (unsigned) uc->gid);
 }
 
@@ -96,7 +96,7 @@ print_scm_security(struct tcb *tcp, const void *cmsg_data,
 	if (!data_len)
 		return;
 
-	tprints(", ");
+	tprints(", cmsg_data=");
 	print_quoted_string(cmsg_data, data_len, 0);
 }
 
@@ -109,7 +109,7 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*info) > data_len)
 		return;
 
-	tprints(", {ipi_ifindex=");
+	tprints(", cmsg_data={ipi_ifindex=");
 	print_ifindex(info->ipi_ifindex);
 	tprintf(", ipi_spec_dst=inet_addr(\"%s\"), ipi_addr=inet_addr(\"%s\")}",
 		inet_ntoa(info->ipi_spec_dst), inet_ntoa(info->ipi_addr));
@@ -124,7 +124,7 @@ print_cmsg_ip_ttl(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*ttl) > data_len)
 		return;
 
-	tprintf(", {ttl=%u}", *ttl);
+	tprintf(", cmsg_data={ttl=%u}", *ttl);
 }
 
 static void
@@ -136,7 +136,7 @@ print_cmsg_ip_tos(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*tos) > data_len)
 		return;
 
-	tprintf(", {tos=%x}", *tos);
+	tprintf(", cmsg_data={tos=%x}", *tos);
 }
 
 static void
@@ -148,7 +148,7 @@ print_cmsg_ip_checksum(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*csum) > data_len)
 		return;
 
-	tprintf(", {csum=%u}", *csum);
+	tprintf(", cmsg_data={csum=%u}", *csum);
 }
 
 static void
@@ -161,7 +161,7 @@ print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
 	if (!data_len)
 		return;
 
-	tprints(", {opts=0x");
+	tprints(", cmsg_data={opts=0x");
 	for (i = 0; i < data_len; ++i)
 		tprintf("%02x", opts[i]);
 	tprints("}");
@@ -185,7 +185,7 @@ print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(*err) > data_len)
 		return;
 
-	tprintf(", {ee_errno=%u, ee_origin=%u, ee_type=%u, ee_code=%u"
+	tprintf(", cmsg_data={ee_errno=%u, ee_origin=%u, ee_type=%u, ee_code=%u"
 		", ee_info=%u, ee_data=%u, offender=",
 		err->ee_errno, err->ee_origin, err->ee_type,
 		err->ee_code, err->ee_info, err->ee_data);
@@ -200,7 +200,7 @@ print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
 	if (sizeof(struct sockaddr_in) > data_len)
 		return;
 
-	tprints(", ");
+	tprints(", cmsg_data=");
 	print_sockaddr(tcp, cmsg_data, data_len);
 }
 

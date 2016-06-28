@@ -38,7 +38,7 @@
 static void
 print_pktinfo(const struct cmsghdr *c)
 {
-	printf("IP_PKTINFO, {ipi_ifindex=if_nametoindex(\"lo\")"
+	printf("IP_PKTINFO, cmsg_data={ipi_ifindex=if_nametoindex(\"lo\")"
 	       ", ipi_spec_dst=inet_addr(\"127.0.0.1\")"
 	       ", ipi_addr=inet_addr(\"127.0.0.1\")}");
 }
@@ -48,7 +48,7 @@ print_ttl(const struct cmsghdr *c)
 {
 	const unsigned int *ttl = (const unsigned int *) CMSG_DATA(c);
 
-	printf("IP_TTL, {ttl=%u}", *ttl);
+	printf("IP_TTL, cmsg_data={ttl=%u}", *ttl);
 }
 
 static void
@@ -56,7 +56,7 @@ print_tos(const struct cmsghdr *c)
 {
 	const uint8_t *tos = (const uint8_t *) CMSG_DATA(c);
 
-	printf("IP_TOS, {tos=%x}", *tos);
+	printf("IP_TOS, cmsg_data={tos=%x}", *tos);
 }
 
 static void
@@ -67,7 +67,7 @@ print_opts(const char *name, const struct cmsghdr *c)
 
 	printf("%s", name);
 	if (len) {
-		printf(", {opts=0x");
+		printf(", cmsg_data={opts=0x");
 		size_t i;
 		for (i = 0; i < len; ++i)
 			printf("%02x", opts[i]);
@@ -82,7 +82,7 @@ print_origdstaddr(const struct cmsghdr *c)
 	const struct sockaddr_in *sin =
 		(const struct sockaddr_in *) CMSG_DATA(c);
 
-	printf("IP_ORIGDSTADDR, {sa_family=AF_INET, sin_port=htons(%u)"
+	printf("IP_ORIGDSTADDR, cmsg_data={sa_family=AF_INET, sin_port=htons(%u)"
 	       ", sin_addr=inet_addr(\"127.0.0.1\")}", ntohs(sin->sin_port));
 }
 #endif

@@ -63,8 +63,8 @@ ids='\{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}'
 
 msg_head='\{msg_name=NULL, msg_namelen=0, msg_iov='"$iov"', msg_iovlen=1, msg_control='
 msg_tail=', msg_controllen='"$n"', msg_flags=0'
-rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, '"$rights_data"'\}'
-creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, '"$ids"'\}'
+rights='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, cmsg_data='"$rights_data"'\}'
+creds='\{cmsg_len='"$n"', cmsg_level=SOL_SOCKET, cmsg_type=SCM_CREDENTIALS, cmsg_data='"$ids"'\}'
 
 EXPECTED="$LOG.expected"
 
