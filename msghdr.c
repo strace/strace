@@ -111,8 +111,10 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 
 	tprints(", cmsg_data={ipi_ifindex=");
 	print_ifindex(info->ipi_ifindex);
-	tprintf(", ipi_spec_dst=inet_addr(\"%s\"), ipi_addr=inet_addr(\"%s\")}",
-		inet_ntoa(info->ipi_spec_dst), inet_ntoa(info->ipi_addr));
+	tprintf(", ipi_spec_dst=inet_addr(\"%s\")",
+		inet_ntoa(info->ipi_spec_dst));
+	tprintf(", ipi_addr=inet_addr(\"%s\")}",
+		inet_ntoa(info->ipi_addr));
 }
 
 static void
