@@ -61,10 +61,7 @@ print_scm_rights(struct tcb *tcp, const void *cmsg_data, const size_t data_len)
 	const size_t nfds = data_len / sizeof(*fds);
 	size_t i;
 
-	if (!nfds)
-		return;
-
-	tprints(", cmsg_data=[");
+	tprints("[");
 
 	for (i = 0; i < nfds; ++i) {
 		if (i)
@@ -80,10 +77,7 @@ print_scm_creds(struct tcb *tcp, const void *cmsg_data, const size_t data_len)
 {
 	const struct ucred *uc = cmsg_data;
 
-	if (sizeof(*uc) > data_len)
-		return;
-
-	tprintf(", cmsg_data={pid=%u, uid=%u, gid=%u}",
+	tprintf("{pid=%u, uid=%u, gid=%u}",
 		(unsigned) uc->pid, (unsigned) uc->uid, (unsigned) uc->gid);
 }
 
@@ -91,10 +85,6 @@ static void
 print_scm_security(struct tcb *tcp, const void *cmsg_data,
 		   const size_t data_len)
 {
-	if (!data_len)
-		return;
-
-	tprints(", cmsg_data=");
 	print_quoted_string(cmsg_data, data_len, 0);
 }
 
@@ -104,10 +94,7 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 {
 	const struct in_pktinfo *info = cmsg_data;
 
-	if (sizeof(*info) > data_len)
-		return;
-
-	tprints(", cmsg_data={ipi_ifindex=");
+	tprints("{ipi_ifindex=");
 	print_ifindex(info->ipi_ifindex);
 	tprintf(", ipi_spec_dst=inet_addr(\"%s\")",
 		inet_ntoa(info->ipi_spec_dst));
@@ -120,22 +107,16 @@ print_cmsg_uint(struct tcb *tcp, const void *cmsg_data, const size_t data_len)
 {
 	const unsigned int *p = cmsg_data;
 
-	if (sizeof(*p) > data_len)
-		return;
-
-	tprintf(", cmsg_data=[%u]", *p);
+	tprintf("[%u]", *p);
 }
 
 static void
-print_cmsg_ip_tos(struct tcb *tcp, const void *cmsg_data,
-		  const size_t data_len)
+print_cmsg_uint8_t(struct tcb *tcp, const void *cmsg_data,
+		   const size_t data_len)
 {
-	const uint8_t *tos = cmsg_data;
+	const uint8_t *p = cmsg_data;
 
-	if (sizeof(*tos) > data_len)
-		return;
-
-	tprintf(", cmsg_data=[%#x]", *tos);
+	tprintf("[%#x]", *p);
 }
 
 static void
@@ -145,10 +126,7 @@ print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
 	const unsigned char *opts = cmsg_data;
 	size_t i;
 
-	if (!data_len)
-		return;
-
-	tprints(", cmsg_data=[");
+	tprints("[");
 	for (i = 0; i < data_len; ++i) {
 		if (i)
 			tprints(", ");
@@ -157,25 +135,24 @@ print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
 	tprints("]");
 }
 
+struct sock_ee {
+	uint32_t ee_errno;
+	uint8_t  ee_origin;
+	uint8_t  ee_type;
+	uint8_t  ee_code;
+	uint8_t  ee_pad;
+	uint32_t ee_info;
+	uint32_t ee_data;
+	struct sockaddr_in offender;
+};
+
 static void
 print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 		      const size_t data_len)
 {
-	const struct {
-		uint32_t ee_errno;
-		uint8_t  ee_origin;
-		uint8_t  ee_type;
-		uint8_t  ee_code;
-		uint8_t  ee_pad;
-		uint32_t ee_info;
-		uint32_t ee_data;
-		struct sockaddr_in offender;
-	} *err = cmsg_data;
+	const struct sock_ee *const err = cmsg_data;
 
-	if (sizeof(*err) > data_len)
-		return;
-
-	tprintf(", cmsg_data={ee_errno=%u, ee_origin=%u, ee_type=%u, ee_code=%u"
+	tprintf("{ee_errno=%u, ee_origin=%u, ee_type=%u, ee_code=%u"
 		", ee_info=%u, ee_data=%u, offender=",
 		err->ee_errno, err->ee_origin, err->ee_type,
 		err->ee_code, err->ee_info, err->ee_data);
@@ -191,57 +168,52 @@ print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
 		data_len > sizeof(struct sockaddr_storage)
 		? sizeof(struct sockaddr_storage) : data_len;
 
-	tprints(", cmsg_data=");
 	print_sockaddr(tcp, cmsg_data, addr_len);
 }
+
+typedef void (* const cmsg_printer)(struct tcb *, const void *, size_t);
+
+static const struct {
+	const cmsg_printer printer;
+	const size_t min_len;
+} cmsg_socket_printers[] = {
+	[SCM_RIGHTS] = { print_scm_rights, sizeof(int) },
+	[SCM_CREDENTIALS] = { print_scm_creds, sizeof(struct ucred) },
+	[SCM_SECURITY] = { print_scm_security, 1 }
+}, cmsg_ip_printers[] = {
+	[IP_PKTINFO] = { print_cmsg_ip_pktinfo, sizeof(struct in_pktinfo) },
+	[IP_TTL] = { print_cmsg_uint, sizeof(unsigned int) },
+	[IP_TOS] = { print_cmsg_uint8_t, 1 },
+	[IP_RECVOPTS] = { print_cmsg_ip_opts, 1 },
+	[IP_RETOPTS] = { print_cmsg_ip_opts, 1 },
+	[IP_RECVERR] = { print_cmsg_ip_recverr, sizeof(struct sock_ee) },
+	[IP_ORIGDSTADDR] = { print_cmsg_ip_origdstaddr, sizeof(struct sockaddr_in) },
+	[IP_CHECKSUM] = { print_cmsg_uint, sizeof(unsigned int) },
+	[SCM_SECURITY] = { print_scm_security, 1 }
+};
 
 static void
 print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		     const void *cmsg_data, const size_t data_len)
 {
+	const unsigned int utype = cmsg_type;
 	switch (cmsg_level) {
 	case SOL_SOCKET:
 		printxval(scmvals, cmsg_type, "SCM_???");
-		switch (cmsg_type) {
-		case SCM_RIGHTS:
-			print_scm_rights(tcp, cmsg_data, data_len);
-			break;
-		case SCM_CREDENTIALS:
-			print_scm_creds(tcp, cmsg_data, data_len);
-			break;
-		case SCM_SECURITY:
-			print_scm_security(tcp, cmsg_data, data_len);
-			break;
+		if (utype < ARRAY_SIZE(cmsg_socket_printers)
+		    && cmsg_socket_printers[utype].printer
+		    && data_len >= cmsg_socket_printers[utype].min_len) {
+			tprints(", cmsg_data=");
+			cmsg_socket_printers[utype].printer(tcp, cmsg_data, data_len);
 		}
 		break;
 	case SOL_IP:
 		printxval(ip_cmsg_types, cmsg_type, "IP_???");
-		switch (cmsg_type) {
-		case IP_PKTINFO:
-			print_cmsg_ip_pktinfo(tcp, cmsg_data, data_len);
-			break;
-		case IP_TTL:
-			print_cmsg_uint(tcp, cmsg_data, data_len);
-			break;
-		case IP_TOS:
-			print_cmsg_ip_tos(tcp, cmsg_data, data_len);
-			break;
-		case IP_RECVOPTS:
-		case IP_RETOPTS:
-			print_cmsg_ip_opts(tcp, cmsg_data, data_len);
-			break;
-		case IP_RECVERR:
-			print_cmsg_ip_recverr(tcp, cmsg_data, data_len);
-			break;
-		case IP_ORIGDSTADDR:
-			print_cmsg_ip_origdstaddr(tcp, cmsg_data, data_len);
-			break;
-		case IP_CHECKSUM:
-			print_cmsg_uint(tcp, cmsg_data, data_len);
-			break;
-		case SCM_SECURITY:
-			print_scm_security(tcp, cmsg_data, data_len);
-			break;
+		if (utype < ARRAY_SIZE(cmsg_ip_printers)
+		    && cmsg_ip_printers[utype].printer
+		    && data_len >= cmsg_ip_printers[utype].min_len) {
+			tprints(", cmsg_data=");
+			cmsg_ip_printers[utype].printer(tcp, cmsg_data, data_len);
 		}
 		break;
 	default:
