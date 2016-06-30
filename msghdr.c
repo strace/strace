@@ -259,7 +259,7 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		}
 		break;
 	default:
-		tprintf("%u", cmsg_type);
+		tprintf("%#x", cmsg_type);
 	}
 }
 
