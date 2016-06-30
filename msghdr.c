@@ -59,20 +59,20 @@ print_scm_rights(struct tcb *tcp, const void *cmsg_data,
 		 const size_t data_len)
 {
 	const int *fds = cmsg_data;
-	const char *end = (const char *) cmsg_data + data_len;
-	bool seen = false;
+	const size_t nfds = data_len / sizeof(*fds);
+	size_t i;
 
-	if (sizeof(*fds) > data_len)
+	if (!nfds)
 		return;
 
 	tprints(", cmsg_data=[");
-	while ((const char *) fds < end) {
-		if (seen)
+
+	for (i = 0; i < nfds; ++i) {
+		if (i)
 			tprints(", ");
-		else
-			seen = true;
-		printfd(tcp, *fds++);
+		printfd(tcp, fds[i]);
 	}
+
 	tprints("]");
 }
 
