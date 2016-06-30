@@ -55,8 +55,7 @@ typedef union {
 } union_cmsghdr;
 
 static void
-print_scm_rights(struct tcb *tcp, const void *cmsg_data,
-		 const size_t data_len)
+print_scm_rights(struct tcb *tcp, const void *cmsg_data, const size_t data_len)
 {
 	const int *fds = cmsg_data;
 	const size_t nfds = data_len / sizeof(*fds);
@@ -77,8 +76,7 @@ print_scm_rights(struct tcb *tcp, const void *cmsg_data,
 }
 
 static void
-print_scm_creds(struct tcb *tcp, const void *cmsg_data,
-		const size_t data_len)
+print_scm_creds(struct tcb *tcp, const void *cmsg_data, const size_t data_len)
 {
 	const struct ucred *uc = cmsg_data;
 
@@ -118,15 +116,14 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 }
 
 static void
-print_cmsg_ip_ttl(struct tcb *tcp, const void *cmsg_data,
-		  const size_t data_len)
+print_cmsg_uint(struct tcb *tcp, const void *cmsg_data, const size_t data_len)
 {
-	const unsigned int *ttl = cmsg_data;
+	const unsigned int *p = cmsg_data;
 
-	if (sizeof(*ttl) > data_len)
+	if (sizeof(*p) > data_len)
 		return;
 
-	tprintf(", cmsg_data=[%u]", *ttl);
+	tprintf(", cmsg_data=[%u]", *p);
 }
 
 static void
@@ -139,18 +136,6 @@ print_cmsg_ip_tos(struct tcb *tcp, const void *cmsg_data,
 		return;
 
 	tprintf(", cmsg_data=[%#x]", *tos);
-}
-
-static void
-print_cmsg_ip_checksum(struct tcb *tcp, const void *cmsg_data,
-		       const size_t data_len)
-{
-	const uint32_t *csum = cmsg_data;
-
-	if (sizeof(*csum) > data_len)
-		return;
-
-	tprintf(", cmsg_data=[%u]", *csum);
 }
 
 static void
@@ -236,7 +221,7 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 			print_cmsg_ip_pktinfo(tcp, cmsg_data, data_len);
 			break;
 		case IP_TTL:
-			print_cmsg_ip_ttl(tcp, cmsg_data, data_len);
+			print_cmsg_uint(tcp, cmsg_data, data_len);
 			break;
 		case IP_TOS:
 			print_cmsg_ip_tos(tcp, cmsg_data, data_len);
@@ -252,7 +237,7 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 			print_cmsg_ip_origdstaddr(tcp, cmsg_data, data_len);
 			break;
 		case IP_CHECKSUM:
-			print_cmsg_ip_checksum(tcp, cmsg_data, data_len);
+			print_cmsg_uint(tcp, cmsg_data, data_len);
 			break;
 		case SCM_SECURITY:
 			print_scm_security(tcp, cmsg_data, data_len);
