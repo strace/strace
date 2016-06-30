@@ -202,11 +202,12 @@ static void
 print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
 			  const size_t data_len)
 {
-	if (sizeof(struct sockaddr_in) > data_len)
-		return;
+	const int addr_len =
+		data_len > sizeof(struct sockaddr_storage)
+		? sizeof(struct sockaddr_storage) : data_len;
 
 	tprints(", cmsg_data=");
-	print_sockaddr(tcp, cmsg_data, data_len);
+	print_sockaddr(tcp, cmsg_data, addr_len);
 }
 
 static void
