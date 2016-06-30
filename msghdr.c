@@ -265,20 +265,21 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 }
 
 static void
-decode_msg_control(struct tcb *tcp, unsigned long addr, size_t len)
+decode_msg_control(struct tcb *tcp, unsigned long addr, const size_t control_len)
 {
+	if (!control_len)
+		return;
+	tprints(", msg_control=");
+
 	const size_t cmsg_size =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 		(current_wordsize < sizeof(long)) ? sizeof(struct cmsghdr32) :
 #endif
 			sizeof(struct cmsghdr);
 
-	if (!len)
-		return;
-	tprints(", msg_control=");
-
-	char *buf = len < cmsg_size ? NULL : malloc(len);
-	if (!buf || umoven(tcp, addr, len, buf) < 0) {
+	size_t buf_len = control_len;
+	char *buf = buf_len < cmsg_size ? NULL : malloc(buf_len);
+	if (!buf || umoven(tcp, addr, buf_len, buf) < 0) {
 		printaddr(addr);
 		free(buf);
 		return;
@@ -287,18 +288,18 @@ decode_msg_control(struct tcb *tcp, unsigned long addr, size_t len)
 	union_cmsghdr u = { .ptr = buf };
 
 	tprints("[");
-	while (len >= cmsg_size) {
-		size_t cmsg_len =
+	while (buf_len >= cmsg_size) {
+		const size_t cmsg_len =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_len :
 #endif
 				u.cmsg->cmsg_len;
-		int cmsg_level =
+		const int cmsg_level =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_level :
 #endif
 				u.cmsg->cmsg_level;
-		int cmsg_type =
+		const int cmsg_type =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_type :
 #endif
@@ -310,29 +311,30 @@ decode_msg_control(struct tcb *tcp, unsigned long addr, size_t len)
 		printxval(socketlayers, cmsg_level, "SOL_???");
 		tprints(", cmsg_type=");
 
-		if (cmsg_len > len)
-			cmsg_len = len;
+		size_t len = cmsg_len > buf_len ? buf_len : cmsg_len;
 
 		print_cmsg_type_data(tcp, cmsg_level, cmsg_type,
 				     (const void *) (u.ptr + cmsg_size),
-				     cmsg_len > cmsg_size ? cmsg_len - cmsg_size: 0);
+				     len > cmsg_size ? len - cmsg_size: 0);
 		tprints("}");
 
-		if (cmsg_len < cmsg_size) {
-			len -= cmsg_size;
+		if (len < cmsg_size) {
+			buf_len -= cmsg_size;
 			break;
 		}
-		cmsg_len = (cmsg_len + current_wordsize - 1) &
+		len = (cmsg_len + current_wordsize - 1) &
 			(size_t) ~(current_wordsize - 1);
-		if (cmsg_len >= len) {
-			len = 0;
+		if (len >= buf_len) {
+			buf_len = 0;
 			break;
 		}
-		u.ptr += cmsg_len;
-		len -= cmsg_len;
+		u.ptr += len;
+		buf_len -= len;
 	}
-	if (len)
-		tprints(", ...");
+	if (buf_len) {
+		tprints(", ");
+		printaddr(addr + (control_len - buf_len));
+	}
 	tprints("]");
 	free(buf);
 }
