@@ -137,6 +137,7 @@ mmsg
 mount
 move_pages
 mq
+msg_control
 munlockall
 nanosleep
 net-accept-connect

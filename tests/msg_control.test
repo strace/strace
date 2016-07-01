@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of struct msghdr ancillary data.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a21 -e trace=sendmsg
