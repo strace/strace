@@ -478,6 +478,12 @@ print_ip_opts(const void *const cmsg_data, const unsigned int data_len)
 	for (i = 0; i < data_len; ++i) {
 		if (i)
 			printf(", ");
+#ifndef VERBOSE_MSGHDR
+		if (i >= DEFAULT_STRLEN) {
+			printf("...");
+			break;
+		}
+#endif
 		printf("0x%02x", opts[i]);
 	}
 }
@@ -608,6 +614,9 @@ test_sol_ip(struct msghdr *const mh, void *const page)
 	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), 6);
 	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), 7);
 	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), 8);
+	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), DEFAULT_STRLEN - 1);
+	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), DEFAULT_STRLEN);
+	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), DEFAULT_STRLEN + 1);
 #ifdef IP_CHECKSUM
 	test_ip_recverr(mh, page, VAL_STR(IP_RECVERR));
 #endif

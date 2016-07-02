@@ -134,6 +134,10 @@ print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
 	for (i = 0; i < data_len; ++i) {
 		if (i)
 			tprints(", ");
+		if (abbrev(tcp) && i >= max_strlen) {
+			tprints("...");
+			break;
+		}
 		tprintf("0x%02x", opts[i]);
 	}
 	tprints("]");
