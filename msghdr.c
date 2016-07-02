@@ -66,6 +66,10 @@ print_scm_rights(struct tcb *tcp, const void *cmsg_data, const size_t data_len)
 	for (i = 0; i < nfds; ++i) {
 		if (i)
 			tprints(", ");
+		if (abbrev(tcp) && i >= max_strlen) {
+			tprints("...");
+			break;
+		}
 		printfd(tcp, fds[i]);
 	}
 

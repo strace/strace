@@ -60,6 +60,8 @@ get_cmsghdr(void *const page, const size_t len)
 	return page - CMSG_ALIGN(len);
 }
 
+#define DEFAULT_STRLEN 32
+
 static void
 print_fds(const struct cmsghdr *const cmsg, const size_t cmsg_len)
 {
@@ -74,6 +76,12 @@ print_fds(const struct cmsghdr *const cmsg, const size_t cmsg_len)
 	for (i = 0; i < nfd; ++i) {
 		if (i)
 			printf(", ");
+#ifndef VERBOSE_MSGHDR
+		if (i >= DEFAULT_STRLEN) {
+			printf("...");
+			break;
+		}
+#endif
 		printf("%d", fdp[i]);
 	}
 	printf("]");
@@ -192,6 +200,33 @@ test_scm_rights2(struct msghdr *const mh,
 	errno = saved_errno;
 	printf(", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
 	       (unsigned long) msg_controllen, rc, errno2name());
+}
+
+static void
+test_scm_rights3(struct msghdr *const mh, void *const page, const size_t nfds)
+{
+	const size_t len = CMSG_SPACE(sizeof(int) * nfds);
+	struct cmsghdr *cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(int) * nfds);
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_RIGHTS;
+	int *fdp = (int *) CMSG_DATA(cmsg);
+	size_t i;
+	for (i = 0; i < nfds; ++i)
+		fdp[i] = i;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS",
+	       (unsigned) cmsg->cmsg_len);
+	print_fds(cmsg, cmsg->cmsg_len);
+	printf("}], msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       (unsigned long) len, rc, errno2name());
 }
 
 static void
@@ -338,6 +373,10 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 					  VAL_STR(SOL_SOCKET));
 		}
 	}
+
+	test_scm_rights3(mh, page, DEFAULT_STRLEN - 1);
+	test_scm_rights3(mh, page, DEFAULT_STRLEN);
+	test_scm_rights3(mh, page, DEFAULT_STRLEN + 1);
 
 	test_unknown_type(mh, page, VAL_STR(SOL_SOCKET), "SCM_???");
 }
