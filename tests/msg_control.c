@@ -49,6 +49,10 @@
 # define SCM_SECURITY 3
 #endif
 
+#ifndef UIO_MAXIOV
+# define UIO_MAXIOV 1024
+#endif
+
 #define MIN_SIZE_OF(type, member) \
 	(offsetof(type, member) + sizeof(((type *) 0)->member))
 
@@ -652,6 +656,39 @@ test_unknown_level(struct msghdr *const mh, void *const page)
 	       (unsigned) mh->msg_controllen, rc, errno2name());
 }
 
+static void
+test_big_len(struct msghdr *const mh)
+{
+	int optmem_max;
+
+	if (read_int_from_file("/proc/sys/net/core/optmem_max", &optmem_max)
+	    || optmem_max <= 0 || optmem_max > 0x100000)
+		optmem_max = sizeof(long long) * (2 * UIO_MAXIOV + 512);
+	optmem_max = (optmem_max + sizeof(long long) - 1)
+		     & ~(sizeof(long long) - 1);
+
+	const size_t len = optmem_max * 2;
+	struct cmsghdr *const cmsg = tail_alloc(len);
+	cmsg->cmsg_len = len;
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_RIGHTS;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	if (EBADF != errno)
+		perror_msg_and_skip("sendmsg");
+
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS",
+	       (unsigned) cmsg->cmsg_len);
+	print_fds(cmsg, optmem_max);
+	printf("}, ...], msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       (unsigned long) len, rc, errno2name());
+}
+
 int main(int ac, const char **av)
 {
 	int rc = sendmsg(-1, 0, 0);
@@ -659,6 +696,7 @@ int main(int ac, const char **av)
 
 	struct msghdr *mh = tail_alloc(sizeof(*mh));
 	memset(mh, 0, sizeof(*mh));
+	test_big_len(mh);
 
 	rc = sendmsg(-1, mh + 1, 0);
 	printf("sendmsg(-1, %p, 0) = %d %s (%m)\n",

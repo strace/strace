@@ -511,6 +511,8 @@ int strace_vfprintf(FILE *fp, const char *fmt, va_list args);
 # define strace_vfprintf vfprintf
 #endif
 
+extern int read_int_from_file(const char *, int *);
+
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void qualify(const char *);
