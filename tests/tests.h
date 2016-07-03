@@ -84,6 +84,9 @@ void print_quoted_string(const char *);
 /* Print memory in a quoted form. */
 void print_quoted_memory(const char *, size_t);
 
+/* Read an int from the file. */
+int read_int_from_file(const char *, int *);
+
 /* Check whether given uid matches kernel overflowuid. */
 void check_overflowuid(const int);
 

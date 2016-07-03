@@ -31,27 +31,55 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+int
+read_int_from_file(const char *const fname, int *const pvalue)
+{
+	const int fd = open(fname, O_RDONLY);
+	if (fd < 0)
+		return -1;
+
+	long lval;
+	char buf[sizeof(lval) * 3];
+	int n = read(fd, buf, sizeof(buf) - 1);
+	int saved_errno = errno;
+	close(fd);
+
+	if (n < 0) {
+		errno = saved_errno;
+		return -1;
+	}
+
+	buf[n] = '\0';
+	char *endptr = 0;
+	errno = 0;
+	lval = strtol(buf, &endptr, 10);
+	if (!endptr || (*endptr && '\n' != *endptr)
+#if INT_MAX < LONG_MAX
+	    || lval > INT_MAX || lval < INT_MIN
+#endif
+	    || ERANGE == errno) {
+		if (!errno)
+			errno = EINVAL;
+		return -1;
+	}
+
+	*pvalue = (int) lval;
+	return 0;
+}
+
 static void
 check_overflow_id(const int id, const char *overflowid)
 {
-	int fd = open(overflowid, O_RDONLY);
-	if (fd < 0) {
+	int n;
+
+	if (read_int_from_file(overflowid, &n)) {
 		if (ENOENT == errno)
 			return;
-		perror_msg_and_fail("open: %s", overflowid);
+		perror_msg_and_fail("read_int_from_file: %s", overflowid);
 	}
 
-	/* we trust the kernel */
-	char buf[sizeof(int)*3];
-	int n = read(fd, buf, sizeof(buf) - 1);
-	if (n > 0) {
-		buf[n] = '\0';
-		n = atoi(buf);
-		if (id == n)
-			error_msg_and_skip("%d matches %s", id, overflowid);
-	}
-
-	close(fd);
+	if (id == n)
+		error_msg_and_skip("%d matches %s", id, overflowid);
 }
 
 void
