@@ -204,6 +204,7 @@ check_PROGRAMS = \
 	net-yy-unix \
 	netlink_inet_diag \
 	netlink_netlink_diag \
+	netlink_protocol \
 	netlink_unix_diag \
 	newfstatat \
 	nsyscalls \
@@ -516,6 +517,7 @@ DECODER_TESTS = \
 	net-yy-netlink.test \
 	net-yy-unix.test \
 	net.test \
+	netlink_protocol.test \
 	newfstatat.test \
 	nsyscalls.test \
 	old_mmap.test \

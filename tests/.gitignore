@@ -150,6 +150,7 @@ net-yy-netlink
 net-yy-unix
 netlink_inet_diag
 netlink_netlink_diag
+netlink_protocol
 netlink_unix_diag
 newfstatat
 nsyscalls
