@@ -452,7 +452,8 @@ extern enum sock_proto get_proto_by_name(const char *);
 
 enum iov_decode {
 	IOV_DECODE_ADDR,
-	IOV_DECODE_STR
+	IOV_DECODE_STR,
+	IOV_DECODE_NETLINK
 };
 
 typedef enum {
@@ -567,6 +568,7 @@ extern const char *signame(const int);
 extern void pathtrace_select(const char *);
 extern int pathtrace_match(struct tcb *);
 extern int getfdpath(struct tcb *, int, char *, unsigned);
+extern enum sock_proto getfdproto(struct tcb *, int);
 
 extern const char *xlookup(const struct xlat *, const uint64_t);
 extern const char *xlat_search(const struct xlat *, const size_t, const uint64_t);
@@ -679,6 +681,7 @@ extern void printsignal(int);
 extern void tprint_iov(struct tcb *, unsigned long, unsigned long, enum iov_decode);
 extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long,
 			    enum iov_decode, unsigned long);
+extern void decode_netlink(struct tcb *, unsigned long, unsigned long);
 extern void tprint_open_modes(unsigned int);
 extern const char *sprint_open_modes(unsigned int);
 extern void print_seccomp_filter(struct tcb *, unsigned long);

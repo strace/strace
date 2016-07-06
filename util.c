@@ -472,7 +472,7 @@ sprinttime(time_t t)
 	return buf;
 }
 
-static enum sock_proto
+enum sock_proto
 getfdproto(struct tcb *tcp, int fd)
 {
 #ifdef HAVE_SYS_XATTR_H

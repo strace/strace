@@ -335,13 +335,22 @@ decode_msg_control(struct tcb *tcp, unsigned long addr,
 static void
 print_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 {
+	int family;
+	enum iov_decode decode;
+
 	tprints("{msg_name=");
-	decode_sockaddr(tcp, (long)msg->msg_name, msg->msg_namelen);
+	family = decode_sockaddr(tcp, (long)msg->msg_name, msg->msg_namelen);
 	tprintf(", msg_namelen=%d", msg->msg_namelen);
 
 	tprints(", msg_iov=");
+
+	if (family == AF_NETLINK)
+		decode = IOV_DECODE_NETLINK;
+	else
+		decode = IOV_DECODE_STR;
+
 	tprint_iov_upto(tcp, (unsigned long) msg->msg_iovlen,
-			(unsigned long) msg->msg_iov, IOV_DECODE_STR, data_size);
+			(unsigned long) msg->msg_iov, decode, data_size);
 	tprintf(", msg_iovlen=%lu", (unsigned long) msg->msg_iovlen);
 
 	decode_msg_control(tcp, (unsigned long) msg->msg_control,

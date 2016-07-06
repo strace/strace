@@ -88,6 +88,12 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 			c->data_size -= len;
 			printstr(tcp, iov[0], len);
 			break;
+		case IOV_DECODE_NETLINK:
+			if (len > c->data_size)
+				len = c->data_size;
+			c->data_size -= len;
+			decode_netlink(tcp, iov[0], iov[1]);
+			break;
 		default:
 			printaddr(iov[0]);
 			break;

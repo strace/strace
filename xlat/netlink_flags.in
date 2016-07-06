@@ -1,0 +1,6 @@
+NLM_F_REQUEST          0x1
+NLM_F_MULTI            0x2
+NLM_F_ACK              0x4
+NLM_F_ECHO             0x8
+NLM_F_DUMP_INTR                0x10
+NLM_F_DUMP_FILTERED    0x20

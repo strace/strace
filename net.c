@@ -108,6 +108,19 @@ print_ifindex(unsigned int ifindex)
 	tprintf("%u", ifindex);
 }
 
+static void
+decode_sockbuf(struct tcb *tcp, int fd, long addr, long addrlen)
+{
+
+	switch (verbose(tcp) ? getfdproto(tcp, fd) : SOCK_PROTO_UNKNOWN) {
+	case SOCK_PROTO_NETLINK:
+		decode_netlink(tcp, addr, addrlen);
+		break;
+	default:
+		printstr(tcp, addr, addrlen);
+	}
+}
+
 /*
  * low bits of the socket type define real socket type,
  * other bits are socket type flags.
@@ -220,7 +233,7 @@ SYS_FUNC(send)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu, ", tcp->u_arg[2]);
 	/* flags */
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
@@ -232,7 +245,7 @@ SYS_FUNC(sendto)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu, ", tcp->u_arg[2]);
 	/* flags */
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
@@ -287,10 +300,12 @@ SYS_FUNC(recv)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		if (syserror(tcp))
+		if (syserror(tcp)) {
 			printaddr(tcp->u_arg[1]);
-		else
-			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+		} else {
+			decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
+				     tcp->u_rval);
+		}
 
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
@@ -310,7 +325,8 @@ SYS_FUNC(recvfrom)
 		if (syserror(tcp)) {
 			printaddr(tcp->u_arg[1]);
 		} else {
-			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+			decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
+				     tcp->u_rval);
 		}
 		/* len */
 		tprintf(", %lu, ", tcp->u_arg[2]);

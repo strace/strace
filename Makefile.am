@@ -160,6 +160,7 @@ strace_SOURCES =	\
 	mtd.c		\
 	native_defs.h	\
 	net.c		\
+	netlink.c       \
 	numa.c		\
 	open.c		\
 	or1k_atomic.c	\
