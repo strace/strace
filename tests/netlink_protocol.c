@@ -29,10 +29,10 @@
  */
 
 #include "tests.h"
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
-#include <stdio.h>
 #include <linux/netlink.h>
 #include <linux/sock_diag.h>
 #include <linux/netlink_diag.h>
@@ -44,53 +44,85 @@
 static void
 send_query(const int fd)
 {
-	struct {
+	static const struct req {
 		struct nlmsghdr nlh;
-		char magic[4];
-	} req = {
+		const char magic[4];
+	} c_req = {
 		.nlh = {
-			.nlmsg_len = sizeof(req),
+			.nlmsg_len = sizeof(struct req),
 			.nlmsg_type = NLMSG_NOOP,
 			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
 		},
 		.magic = "abcd"
 	};
+	struct req *const req = tail_memdup(&c_req, sizeof(c_req));
 
+	/* zero address */
+	if (sendto(fd, NULL, sizeof(*req), MSG_DONTWAIT, NULL, 0) != -1)
+		perror_msg_and_skip("sendto");
+
+	printf("sendto(%d, NULL, %u, MSG_DONTWAIT, NULL, 0) = -1 %s (%m)\n",
+	       fd, (unsigned) sizeof(*req), errno2name());
+
+	/* zero length */
+	if (sendto(fd, req, 0, MSG_DONTWAIT, NULL, 0) != 0)
+		perror_msg_and_skip("sendto");
+
+	printf("sendto(%d, \"\", 0, MSG_DONTWAIT, NULL, 0) = 0\n", fd);
+
+	/* zero address and length */
+	if (sendto(fd, NULL, 0, MSG_DONTWAIT, NULL, 0) != 0)
+		perror_msg_and_skip("sendto");
+
+	printf("sendto(%d, NULL, 0, MSG_DONTWAIT, NULL, 0) = 0\n", fd);
+
+	/* unfetchable struct nlmsghdr */
 	const void *const efault = tail_alloc(sizeof(struct nlmsghdr) - 1);
+	sendto(fd, efault, sizeof(struct nlmsghdr), MSG_DONTWAIT, NULL, 0);
 
-	if (sendto(fd, &req, sizeof(req), MSG_DONTWAIT, NULL, 0) !=
-	    (unsigned) sizeof(req))
+	printf("sendto(%d, %p, %u, MSG_DONTWAIT, NULL, 0) = -1 EFAULT (%m)\n",
+	       fd, efault, (unsigned) sizeof(struct nlmsghdr));
+
+	/* whole message length < sizeof(struct nlmsghdr) */
+	if (sendto(fd, req->magic, sizeof(req->magic), MSG_DONTWAIT, NULL, 0)
+	    != (unsigned) sizeof(req->magic))
+		perror_msg_and_skip("sendto");
+
+	printf("sendto(%d, \"abcd\", %u, MSG_DONTWAIT, NULL, 0) = %u\n",
+	       fd, (unsigned) sizeof(req->magic), (unsigned) sizeof(req->magic));
+
+	/* a single message with some data */
+	if (sendto(fd, req, sizeof(*req), MSG_DONTWAIT, NULL, 0) !=
+	    (unsigned) sizeof(*req))
 		perror_msg_and_skip("sendto");
 
 	printf("sendto(%d, {{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
 	       ", seq=0, pid=0}, \"abcd\"}, %u, MSG_DONTWAIT, NULL, 0) = %u\n",
-	       fd, (unsigned) sizeof(req), NLM_F_DUMP,
-	       (unsigned) sizeof(req), (unsigned) sizeof(req));
+	       fd, req->nlh.nlmsg_len, NLM_F_DUMP,
+	       (unsigned) sizeof(*req), (unsigned) sizeof(*req));
 
-	/* data length is equal to sizeof(struct nlmsghdr) */
-	req.nlh.nlmsg_len = sizeof(req.nlh);
+	/* a single message without data */
+	req->nlh.nlmsg_len = sizeof(req->nlh);
 
-	if (sendto(fd, &req.nlh, sizeof(req.nlh), MSG_DONTWAIT, NULL, 0) !=
-	    (unsigned) sizeof(req.nlh))
+	if (sendto(fd, &req->nlh, sizeof(req->nlh), MSG_DONTWAIT, NULL, 0)
+	    != (unsigned) sizeof(req->nlh))
 		perror_msg_and_skip("sendto");
 
 	printf("sendto(%d, {{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
 	       ", seq=0, pid=0}}, %u, MSG_DONTWAIT, NULL, 0) = %u\n",
-	       fd, (unsigned) sizeof(req.nlh), NLM_F_DUMP,
-	       (unsigned) sizeof(req.nlh), (unsigned) sizeof(req.nlh));
+	       fd, req->nlh.nlmsg_len, NLM_F_DUMP,
+	       (unsigned) sizeof(req->nlh), (unsigned) sizeof(req->nlh));
 
-	/* data length is less than sizeof(struct nlmsghdr) */
-	if (sendto(fd, &req.magic, sizeof(req.magic), MSG_DONTWAIT, NULL, 0) !=
-	    (unsigned) sizeof(req.magic))
+	/* nlmsg_len > whole message length */
+	req->nlh.nlmsg_len = sizeof(*req) + 8;
+	if (sendto(fd, req, sizeof(*req), MSG_DONTWAIT, NULL, 0) !=
+	    (unsigned) sizeof(*req))
 		perror_msg_and_skip("sendto");
 
-	printf("sendto(%d, \"abcd\", %u, MSG_DONTWAIT, NULL, 0) = %u\n",
-	       fd, (unsigned) sizeof(req.magic), (unsigned) sizeof(req.magic));
-
-	sendto(fd, efault, sizeof(struct nlmsghdr), MSG_DONTWAIT, NULL, 0);
-
-	printf("sendto(%d, %p, %u, MSG_DONTWAIT, NULL, 0) = -1 "
-	       "EFAULT (%m)\n", fd, efault, (unsigned) sizeof(struct nlmsghdr));
+	printf("sendto(%d, {{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
+	       ", seq=0, pid=0}, \"abcd\"}, %u, MSG_DONTWAIT, NULL, 0) = %u\n",
+	       fd, req->nlh.nlmsg_len, NLM_F_DUMP,
+	       (unsigned) sizeof(*req), (unsigned) sizeof(*req));
 }
 
 int main(void)
