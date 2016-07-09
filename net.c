@@ -189,24 +189,43 @@ SYS_FUNC(listen)
 	return RVAL_DECODED;
 }
 
+static bool
+fetch_socklen(struct tcb *tcp, int *plen,
+	      const unsigned long sockaddr, const unsigned long socklen)
+{
+	return verbose(tcp) && sockaddr && socklen
+	       && umove(tcp, socklen, plen) == 0;
+}
+
 static int
 decode_sockname(struct tcb *tcp)
 {
+	int ulen, rlen;
+
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		return 0;
+		if (fetch_socklen(tcp, &ulen, tcp->u_arg[1], tcp->u_arg[2])) {
+			/* abuse of auxstr to retain state */
+			tcp->auxstr = (void *) (long) ulen;
+			return 0;
+		} else {
+			printaddr(tcp->u_arg[1]);
+			tprints(", ");
+			printaddr(tcp->u_arg[2]);
+			return RVAL_DECODED;
+		}
 	}
 
-	int len;
-	if (!tcp->u_arg[2] || !verbose(tcp) || syserror(tcp) ||
-	    umove(tcp, tcp->u_arg[2], &len) < 0) {
+	ulen = (long) tcp->auxstr;
+	tcp->auxstr = NULL;
+
+	if (syserror(tcp) || umove(tcp, tcp->u_arg[2], &rlen) < 0) {
 		printaddr(tcp->u_arg[1]);
-		tprints(", ");
-		printaddr(tcp->u_arg[2]);
+		tprintf(", [%d]", ulen);
 	} else {
-		decode_sockaddr(tcp, tcp->u_arg[1], len);
-		tprintf(", [%d]", len);
+		decode_sockaddr(tcp, tcp->u_arg[1], ulen > rlen ? rlen : ulen);
+		tprintf(", [%d]", rlen);
 	}
 
 	return RVAL_DECODED;
