@@ -190,7 +190,7 @@ SYS_FUNC(listen)
 }
 
 static int
-do_sockname(struct tcb *tcp, int flags_arg)
+decode_sockname(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -209,24 +209,24 @@ do_sockname(struct tcb *tcp, int flags_arg)
 		tprintf(", [%d]", len);
 	}
 
-	if (flags_arg >= 0) {
-		tprints(", ");
-		printflags(sock_type_flags, tcp->u_arg[flags_arg],
-			   "SOCK_???");
-	}
-	return 0;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(accept)
 {
-	do_sockname(tcp, -1);
-	return RVAL_FD;
+	return decode_sockname(tcp) | RVAL_FD;
 }
 
 SYS_FUNC(accept4)
 {
-	do_sockname(tcp, 3);
-	return RVAL_FD;
+	int rc = decode_sockname(tcp);
+
+	if (rc & RVAL_DECODED) {
+		tprints(", ");
+		printflags(sock_type_flags, tcp->u_arg[3], "SOCK_???");
+	}
+
+	return rc | RVAL_FD;
 }
 
 SYS_FUNC(send)
@@ -429,7 +429,7 @@ SYS_FUNC(shutdown)
 
 SYS_FUNC(getsockname)
 {
-	return do_sockname(tcp, -1);
+	return decode_sockname(tcp);
 }
 
 static void
