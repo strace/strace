@@ -78,6 +78,7 @@ getgid
 getgid32
 getgroups
 getgroups32
+getpeername
 getpgrp
 getrandom
 getresgid

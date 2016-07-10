@@ -134,6 +134,7 @@ check_PROGRAMS = \
 	getgid32 \
 	getgroups \
 	getgroups32 \
+	getpeername \
 	getpgrp \
 	getrandom \
 	getresgid \
@@ -451,6 +452,7 @@ DECODER_TESTS = \
 	getgid32.test \
 	getgroups.test \
 	getgroups32.test \
+	getpeername.test \
 	getpgrp.test \
 	getrandom.test \
 	getresgid.test \
