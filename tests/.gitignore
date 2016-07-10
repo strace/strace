@@ -87,6 +87,7 @@ getresuid32
 getrlimit
 getrusage
 getsid
+getsockname
 getuid
 getuid32
 getxxid

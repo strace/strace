@@ -143,6 +143,7 @@ check_PROGRAMS = \
 	getrlimit \
 	getrusage \
 	getsid \
+	getsockname \
 	getuid \
 	getuid32 \
 	getxxid \
@@ -459,6 +460,7 @@ DECODER_TESTS = \
 	getrlimit.test \
 	getrusage.test \
 	getsid.test \
+	getsockname.test \
 	getuid.test \
 	getuid32.test \
 	getxxid.test \
@@ -723,6 +725,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sigaction.awk \
 	     sigaltstack.expected \
 	     signalfd.expected \
+	     sockname.c \
 	     statfs.expected \
 	     statx.sh \
 	     strace-E.expected \
