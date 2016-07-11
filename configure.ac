@@ -282,6 +282,7 @@ AC_HEADER_STDBOOL
 AC_HEADER_STDC
 
 AC_CHECK_FUNCS(m4_normalize([
+	accept4
 	fanotify_mark
 	fopen64
 	fork

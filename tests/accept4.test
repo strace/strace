@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of accept4 syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a37
