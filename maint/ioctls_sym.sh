@@ -196,12 +196,6 @@ __EOF__
 		*linux/auto_fs*.h)
 			echo 'typedef u32 compat_ulong_t;'
 			;;
-		*linux/btrfs.h)
-			cat <<'__EOF__'
-struct btrfs_ioctl_defrag_range_args { __u32 unused[12]; };
-#define BTRFS_LABEL_SIZE 256
-__EOF__
-			;;
 		*linux/coda.h|*android_alarm.h)
 			cat <<'__EOF__'
 #ifndef _LINUX_TIME_H
