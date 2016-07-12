@@ -96,9 +96,6 @@ typedef struct blkpg_partition struct_blkpg_partition;
 #ifndef BLKZEROOUT
 # define BLKZEROOUT _IO(0x12,127)
 #endif
-#ifndef BLKDAXGET
-# define BLKDAXGET _IO(0x12,129)
-#endif
 
 #include "xlat/blkpg_ops.h"
 
@@ -150,7 +147,6 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *tcp,
 	case BLKBSZGET:
 	case BLKSSZGET:
 	case BLKALIGNOFF:
-	case BLKDAXGET:
 		if (entering(tcp))
 			return 0;
 		/* fall through */
