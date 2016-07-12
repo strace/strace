@@ -337,11 +337,15 @@ SYS_FUNC(recv)
 
 SYS_FUNC(recvfrom)
 {
-	int fromlen;
+	int ulen, rlen;
 
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
+		if (fetch_socklen(tcp, &ulen, tcp->u_arg[4], tcp->u_arg[5])) {
+			/* abuse of auxstr to retain state */
+			tcp->auxstr = (void *) (long) ulen;
+		}
 	} else {
 		/* buf */
 		if (syserror(tcp)) {
@@ -350,23 +354,37 @@ SYS_FUNC(recvfrom)
 			decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
 				     tcp->u_rval);
 		}
-		/* len */
+		/* size */
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		/* flags */
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		tprints(", ");
-		if (syserror(tcp) || !tcp->u_arg[4] || !tcp->u_arg[5] ||
-		    umove(tcp, tcp->u_arg[5], &fromlen) < 0) {
-			/* from address, len */
+
+		ulen = (long) tcp->auxstr;
+		tcp->auxstr = NULL;
+
+		if (!fetch_socklen(tcp, &rlen, tcp->u_arg[4], tcp->u_arg[5])) {
+			/* from address */
 			printaddr(tcp->u_arg[4]);
 			tprints(", ");
+			/* from length */
 			printaddr(tcp->u_arg[5]);
 			return 0;
 		}
+		if (syserror(tcp)) {
+			/* from address */
+			printaddr(tcp->u_arg[4]);
+			/* from length */
+			tprintf(", [%d]", ulen);
+			return 0;
+		}
 		/* from address */
-		decode_sockaddr(tcp, tcp->u_arg[4], fromlen);
+		decode_sockaddr(tcp, tcp->u_arg[4], ulen > rlen ? rlen : ulen);
 		/* from length */
-		tprintf(", [%u]", fromlen);
+		if (ulen != rlen)
+			tprintf(", [%d->%d]", ulen, rlen);
+		else
+			tprintf(", [%d]", rlen);
 	}
 	return 0;
 }
