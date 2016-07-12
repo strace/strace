@@ -184,6 +184,7 @@ readlink
 readlinkat
 readv
 reboot
+recvfrom
 recvmsg
 remap_file_pages
 rename

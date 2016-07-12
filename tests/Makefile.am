@@ -238,6 +238,7 @@ check_PROGRAMS = \
 	readlinkat \
 	readv \
 	reboot \
+	recvfrom \
 	recvmsg \
 	remap_file_pages \
 	rename \
@@ -553,6 +554,7 @@ DECODER_TESTS = \
 	readlinkat.test \
 	readv.test \
 	reboot.test \
+	recvfrom.test \
 	recvmsg.test \
 	remap_file_pages.test \
 	rename.test \
