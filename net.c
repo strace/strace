@@ -174,8 +174,9 @@ SYS_FUNC(bind)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	decode_sockaddr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %lu", tcp->u_arg[2]);
+	const int addrlen = tcp->u_arg[2];
+	decode_sockaddr(tcp, tcp->u_arg[1], addrlen);
+	tprintf(", %d", addrlen);
 
 	return RVAL_DECODED;
 }
@@ -272,10 +273,11 @@ SYS_FUNC(sendto)
 	/* flags */
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	/* to address */
+	const int addrlen = tcp->u_arg[5];
 	tprints(", ");
-	decode_sockaddr(tcp, tcp->u_arg[4], tcp->u_arg[5]);
+	decode_sockaddr(tcp, tcp->u_arg[4], addrlen);
 	/* to length */
-	tprintf(", %lu", tcp->u_arg[5]);
+	tprintf(", %d", addrlen);
 
 	return RVAL_DECODED;
 }
