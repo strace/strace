@@ -143,6 +143,7 @@ move_pages
 mq
 msg_control
 msg_control-v
+msg_name
 munlockall
 nanosleep
 net-accept-connect

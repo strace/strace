@@ -197,6 +197,7 @@ check_PROGRAMS = \
 	mq \
 	msg_control \
 	msg_control-v \
+	msg_name \
 	munlockall \
 	nanosleep \
 	net-accept-connect \
@@ -517,6 +518,7 @@ DECODER_TESTS = \
 	mq.test \
 	msg_control.test \
 	msg_control-v.test \
+	msg_name.test \
 	munlockall.test \
 	nanosleep.test \
 	net-icmp_filter.test \

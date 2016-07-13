@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of struct msghdr.msg_name* arguments of recvmsg syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a20 -e trace=recvmsg
