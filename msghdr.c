@@ -333,21 +333,26 @@ decode_msg_control(struct tcb *tcp, unsigned long addr,
 }
 
 static void
-print_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
+print_msghdr(struct tcb *tcp, const struct msghdr *msg,
+	     const int *const p_user_msg_namelen,
+	     const unsigned long data_size)
 {
-	int family;
-	enum iov_decode decode;
+	const int msg_namelen =
+		p_user_msg_namelen && (int) msg->msg_namelen > *p_user_msg_namelen
+		? *p_user_msg_namelen : (int) msg->msg_namelen;
 
 	tprints("{msg_name=");
-	family = decode_sockaddr(tcp, (long)msg->msg_name, msg->msg_namelen);
-	tprintf(", msg_namelen=%d", msg->msg_namelen);
+	const int family =
+		decode_sockaddr(tcp, (long) msg->msg_name, msg_namelen);
+	const enum iov_decode decode =
+		(family == AF_NETLINK) ? IOV_DECODE_NETLINK : IOV_DECODE_STR;
+
+	tprints(", msg_namelen=");
+	if (p_user_msg_namelen && *p_user_msg_namelen != (int) msg->msg_namelen)
+		tprintf("%d->", *p_user_msg_namelen);
+	tprintf("%d", msg->msg_namelen);
 
 	tprints(", msg_iov=");
-
-	if (family == AF_NETLINK)
-		decode = IOV_DECODE_NETLINK;
-	else
-		decode = IOV_DECODE_STR;
 
 	tprint_iov_upto(tcp, (unsigned long) msg->msg_iovlen,
 			(unsigned long) msg->msg_iov, decode, data_size);
@@ -362,13 +367,27 @@ print_msghdr(struct tcb *tcp, struct msghdr *msg, unsigned long data_size)
 	tprints("}");
 }
 
+bool
+fetch_msghdr_namelen(struct tcb *tcp, const long addr, int *const p_msg_namelen)
+{
+	struct msghdr msg;
+
+	if (addr && verbose(tcp) && fetch_struct_msghdr(tcp, addr, &msg)) {
+		*p_msg_namelen = msg.msg_namelen;
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void
-decode_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
+decode_msghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
+	      const long addr, const unsigned long data_size)
 {
 	struct msghdr msg;
 
 	if (addr && verbose(tcp) && fetch_struct_msghdr(tcp, addr, &msg))
-		print_msghdr(tcp, &msg, data_size);
+		print_msghdr(tcp, &msg, p_user_msg_namelen, data_size);
 	else
 		printaddr(addr);
 }
@@ -383,14 +402,16 @@ dumpiov_in_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
 }
 
 static int
-decode_mmsghdr(struct tcb *tcp, long addr, bool use_msg_len)
+decode_mmsghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
+	       const long addr, const bool use_msg_len)
 {
 	struct mmsghdr mmsg;
 	int fetched = fetch_struct_mmsghdr(tcp, addr, &mmsg);
 
 	if (fetched) {
 		tprints("{msg_hdr=");
-		print_msghdr(tcp, &mmsg.msg_hdr, use_msg_len ? mmsg.msg_len : -1UL);
+		print_msghdr(tcp, &mmsg.msg_hdr, p_user_msg_namelen,
+			     use_msg_len ? mmsg.msg_len : -1UL);
 		tprintf(", msg_len=%u}", mmsg.msg_len);
 	} else {
 		printaddr(addr);
@@ -412,7 +433,7 @@ decode_mmsgvec(struct tcb *tcp, unsigned long addr, unsigned int len,
 		for (i = 0; i < len; ++i, addr += fetched) {
 			if (i)
 				tprints(", ");
-			fetched = decode_mmsghdr(tcp, addr, use_msg_len);
+			fetched = decode_mmsghdr(tcp, 0, addr, use_msg_len);
 			if (!fetched)
 				break;
 		}

@@ -286,7 +286,7 @@ SYS_FUNC(sendmsg)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	decode_msghdr(tcp, tcp->u_arg[1], (unsigned long) -1L);
+	decode_msghdr(tcp, 0, tcp->u_arg[1], (unsigned long) -1L);
 	/* flags */
 	tprints(", ");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
@@ -393,19 +393,33 @@ SYS_FUNC(recvfrom)
 
 SYS_FUNC(recvmsg)
 {
+	int msg_namelen;
+
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
+		if (fetch_msghdr_namelen(tcp, tcp->u_arg[1], &msg_namelen)) {
+			/* abuse of auxstr to retain state */
+			tcp->auxstr = (void *) (long) msg_namelen;
+			return 0;
+		}
+		printaddr(tcp->u_arg[1]);
 	} else {
+		msg_namelen = (long) tcp->auxstr;
+		tcp->auxstr = NULL;
+
 		if (syserror(tcp))
-			printaddr(tcp->u_arg[1]);
+			tprintf("{msg_namelen=%d}", msg_namelen);
 		else
-			decode_msghdr(tcp, tcp->u_arg[1], tcp->u_rval);
-		/* flags */
-		tprints(", ");
-		printflags(msg_flags, tcp->u_arg[2], "MSG_???");
+			decode_msghdr(tcp, &msg_namelen, tcp->u_arg[1],
+				      tcp->u_rval);
 	}
-	return 0;
+
+	/* flags */
+	tprints(", ");
+	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
+
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(recvmmsg)
