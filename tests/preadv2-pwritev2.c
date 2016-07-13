@@ -102,7 +102,8 @@ dumpio(void)
 	tprintf("pwritev2(1, [], 0, 0, 0) = 0\n");
 
 	rc = pw(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2, 0);
-	tprintf("pwritev2(1, [{\"%s\", %u}, %p], 2, 0, 0) = %ld %s (%m)\n",
+	tprintf("pwritev2(1, [{iov_base=\"%s\", iov_len=%u}, %p], 2, 0, 0)"
+		" = %ld %s (%m)\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
 		rc, errno2name());
 
@@ -114,8 +115,9 @@ dumpio(void)
 		perror_msg_and_fail("pwritev2: expected %u, returned %ld",
 				    w_len, rc);
 	close(1);
-	tprintf("pwritev2(1, [{\"%s\", %u}, {\"%s\", %u}"
-		", {\"%s\", %u}], %u, 0, 0) = %u\n"
+	tprintf("pwritev2(1, [{iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"%s\", iov_len=%u}], %u, 0, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n"
 		" * %u bytes in buffer 1\n"
@@ -141,7 +143,7 @@ dumpio(void)
 	if (rc != (int) r_len)
 		perror_msg_and_fail("preadv2: expected %u, returned %ld",
 				    r_len, rc);
-	tprintf("preadv2(0, [{\"%s\", %u}], %u, 0, 0) = %u\n"
+	tprintf("preadv2(0, [{iov_base=\"%s\", iov_len=%u}], %u, 0, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
 		r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len, r_len, r0_d, r0_c);
@@ -164,7 +166,8 @@ dumpio(void)
 	if (rc != (int) w_len - r_len)
 		perror_msg_and_fail("preadv2: expected %d, returned %ld",
 				    (int) w_len - r_len, rc);
-	tprintf("preadv2(0, [{\"%s\", %u}, {\"\", %u}], %u, %u, 0) = %u\n"
+	tprintf("preadv2(0, [{iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"\", iov_len=%u}], %u, %u, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
 		r1_c, r_len, w_len, ARRAY_SIZE(r1_iov_),

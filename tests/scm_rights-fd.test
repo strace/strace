@@ -58,7 +58,7 @@ socket='<socket:\[[0-9]+\]>'
 
 path6='(/.*/(A\\n){127}Z|\\x2f(\\x'"$hex$hex"')*\\x2f(\\x41\\x0a){127}\\x5a)'
 rights_data='\[4</dev/null>, 5</dev/zero>, 6<'"$path6"'>\]'
-iov='\[\{"'"$sample"'", 15\}\]'
+iov='\[\{iov_base="'"$sample"'", iov_len=15\}\]'
 ids='\{pid='"$n"', uid=[0-9]+, gid=[0-9]+\}'
 
 msg_head='\{msg_name=NULL, msg_namelen=0, msg_iov='"$iov"', msg_iovlen=1, msg_control='

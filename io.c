@@ -77,7 +77,7 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		iov = elem_buf;
 	}
 
-	tprints("{");
+	tprints("{iov_base=");
 
 	len = iov[1];
 
@@ -99,7 +99,7 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 			break;
 	}
 
-	tprintf(", %lu}", iov[1]);
+	tprintf(", iov_len=%lu}", iov[1]);
 
 	return true;
 }

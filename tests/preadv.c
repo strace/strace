@@ -42,10 +42,10 @@ print_iov(const struct iovec *iov)
 	unsigned int i;
 	unsigned char *buf = iov->iov_base;
 
-	fputs("{\"", stdout);
+	fputs("{iov_base=\"", stdout);
 	for (i = 0; i < iov->iov_len; ++i)
 		printf("\\%d", (int) buf[i]);
-	printf("\", %u}", (unsigned) iov->iov_len);
+	printf("\", iov_len=%u}", (unsigned) iov->iov_len);
 }
 
 static void
@@ -122,7 +122,7 @@ main(void)
 	if (rc != (int) r_len)
 		perror_msg_and_fail("preadv: expected %u, returned %ld",
 				    r_len, rc);
-	printf("preadv(%d, [{\"%s\", %u}], %u, 0) = %u\n",
+	printf("preadv(%d, [{iov_base=\"%s\", iov_len=%u}], %u, 0) = %u\n",
 	       fd, r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len);
 
 	void *r1 = tail_alloc(r_len);
@@ -143,7 +143,8 @@ main(void)
 	if (rc != (int) LENGTH_OF(w) - r_len)
 		perror_msg_and_fail("preadv: expected %d, returned %ld",
 				    (int) LENGTH_OF(w) - r_len, rc);
-	printf("preadv(%d, [{\"%s\", %u}, {\"\", %u}], %u, %u) = %u\n",
+	printf("preadv(%d, [{iov_base=\"%s\", iov_len=%u}"
+	       ", {iov_base=\"\", iov_len=%u}], %u, %u) = %u\n",
 	       fd, r1_c, r_len, LENGTH_OF(w), ARRAY_SIZE(r1_iov_),
 		r_len, LENGTH_OF(w) - r_len);
 

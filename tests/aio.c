@@ -184,9 +184,11 @@ main(void)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%lu, %u, ["
 		"{data=%#llx, preadv, reqprio=%hd, fildes=0, "
-			"iovec=[{%p, %u}, {%p, %u}], offset=%lld}, "
+			"iovec=[{iov_base=%p, iov_len=%u}"
+			", {iov_base=%p, iov_len=%u}], offset=%lld}, "
 		"{data=%#llx, preadv, reqprio=%hd, fildes=0, "
-			"iovec=[{%p, %u}, {%p, %u}], offset=%lld}"
+			"iovec=[{iov_base=%p, iov_len=%u}"
+			", {iov_base=%p, iov_len=%u}], offset=%lld}"
 		"]) = %u\n",
 	       *ctx, nr,
 	       (unsigned long long) cbv[0].aio_data, cbv[0].aio_reqprio,

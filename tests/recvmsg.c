@@ -88,7 +88,8 @@ main(void)
 	assert(sendmsg(1, w_mh, 0) == (int) w_len);
 	close(1);
 	tprintf("sendmsg(1, {msg_name=NULL, msg_namelen=0, msg_iov="
-		"[{\"%s\", %u}, {\"%s\", %u}, {\"%s\", %u}], msg_iovlen=%u"
+		"[{iov_base=\"%s\", iov_len=%u}, {iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"%s\", iov_len=%u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n"
@@ -122,8 +123,8 @@ main(void)
 
 	assert(recvmsg(0, r_mh, 0) == (int) r_len);
 	tprintf("recvmsg(0, {msg_name=NULL, msg_namelen=0, msg_iov="
-		"[{\"%s\", %u}], msg_iovlen=%u, msg_controllen=0"
-		", msg_flags=0}, 0) = %u\n"
+		"[{iov_base=\"%s\", iov_len=%u}], msg_iovlen=%u"
+		", msg_controllen=0, msg_flags=0}, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
 		r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len, r_len, r0_d, r0_c);
@@ -146,8 +147,8 @@ main(void)
 
 	assert(recvmsg(0, r_mh, 0) == (int) w_len - r_len);
 	tprintf("recvmsg(0, {msg_name=NULL, msg_namelen=0, msg_iov="
-		"[{\"%s\", %u}, {\"\", %u}], msg_iovlen=%u, msg_controllen=0"
-		", msg_flags=0}, 0) = %u\n"
+		"[{iov_base=\"%s\", iov_len=%u}, {iov_base=\"\", iov_len=%u}]"
+		", msg_iovlen=%u, msg_controllen=0, msg_flags=0}, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
 		r1_c, r_len, w_len, ARRAY_SIZE(r1_iov_), w_len - r_len,

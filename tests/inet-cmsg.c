@@ -147,7 +147,8 @@ main(void)
 
 	printf("recvmsg(0, {msg_name={sa_family=AF_INET, sin_port=htons(%u)"
 	       ", sin_addr=inet_addr(\"127.0.0.1\")}, msg_namelen=%u"
-	       ", msg_iov=[{\"%s\", %u}], msg_iovlen=1, msg_control=[",
+	       ", msg_iov=[{iov_base=\"%s\", iov_len=%u}], msg_iovlen=1"
+	       ", msg_control=[",
 	       ntohs(addr.sin_port), (unsigned) mh.msg_namelen,
 	       data, (unsigned) size);
 

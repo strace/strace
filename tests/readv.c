@@ -91,7 +91,8 @@ main(void)
 		(long) writev(1, w_iov, 0));
 
 	rc = writev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2);
-	tprintf("writev(1, [{\"%s\", %u}, %p], 2) = %ld %s (%m)\n",
+	tprintf("writev(1, [{iov_base=\"%s\", iov_len=%u}, %p], 2)"
+		" = %ld %s (%m)\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
 		rc, errno2name());
 
@@ -100,8 +101,9 @@ main(void)
 
 	assert(writev(1, w_iov, ARRAY_SIZE(w_iov_)) == (int) w_len);
 	close(1);
-	tprintf("writev(1, [{\"%s\", %u}, {\"%s\", %u}"
-		", {\"%s\", %u}], %u) = %u\n"
+	tprintf("writev(1, [{iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"%s\", iov_len=%u}], %u) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n"
 		" * %u bytes in buffer 1\n"
@@ -124,7 +126,7 @@ main(void)
 	const struct iovec *r_iov = tail_memdup(r0_iov_, sizeof(r0_iov_));
 
 	assert(readv(0, r_iov, ARRAY_SIZE(r0_iov_)) == (int) r_len);
-	tprintf("readv(0, [{\"%s\", %u}], %u) = %u\n"
+	tprintf("readv(0, [{iov_base=\"%s\", iov_len=%u}], %u) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
 		r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len, r_len, r0_d, r0_c);
@@ -144,7 +146,8 @@ main(void)
 	r_iov = tail_memdup(r1_iov_, sizeof(r1_iov_));
 
 	assert(readv(0, r_iov, ARRAY_SIZE(r1_iov_)) == (int) w_len - r_len);
-	tprintf("readv(0, [{\"%s\", %u}, {\"\", %u}], %u) = %u\n"
+	tprintf("readv(0, [{iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"\", iov_len=%u}], %u) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
 		r1_c, r_len, w_len, ARRAY_SIZE(r1_iov_), w_len - r_len,

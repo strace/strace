@@ -76,8 +76,9 @@ main(void)
 	const unsigned int len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);
 
-	tprintf("vmsplice(1, [{\"%s\", %u}, {\"%s\", %u}"
-		", {\"%s\", %u}], %u, %s) = %u\n"
+	tprintf("vmsplice(1, [{iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"%s\", iov_len=%u}"
+		", {iov_base=\"%s\", iov_len=%u}], %u, %s) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n"
 		" * %u bytes in buffer 1\n"
