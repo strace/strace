@@ -152,6 +152,7 @@ strace_SOURCES =	\
 	membarrier.c	\
 	memfd_create.c	\
 	mknod.c		\
+	mmsghdr.c	\
 	mount.c		\
 	mpers_type.h	\
 	mq.c		\

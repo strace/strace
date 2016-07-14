@@ -332,10 +332,10 @@ decode_msg_control(struct tcb *tcp, unsigned long addr,
 	free(buf);
 }
 
-static void
-print_msghdr(struct tcb *tcp, const struct msghdr *msg,
-	     const int *const p_user_msg_namelen,
-	     const unsigned long data_size)
+void
+print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
+		    const int *const p_user_msg_namelen,
+		    const unsigned long data_size)
 {
 	const int msg_namelen =
 		p_user_msg_namelen && (int) msg->msg_namelen > *p_user_msg_namelen
@@ -387,7 +387,7 @@ decode_msghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
 	struct msghdr msg;
 
 	if (addr && verbose(tcp) && fetch_struct_msghdr(tcp, addr, &msg))
-		print_msghdr(tcp, &msg, p_user_msg_namelen, data_size);
+		print_struct_msghdr(tcp, &msg, p_user_msg_namelen, data_size);
 	else
 		printaddr(addr);
 }
@@ -399,62 +399,4 @@ dumpiov_in_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
 
 	if (fetch_struct_msghdr(tcp, addr, &msg))
 		dumpiov_upto(tcp, msg.msg_iovlen, (long)msg.msg_iov, data_size);
-}
-
-static int
-decode_mmsghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
-	       const long addr, const bool use_msg_len)
-{
-	struct mmsghdr mmsg;
-	int fetched = fetch_struct_mmsghdr(tcp, addr, &mmsg);
-
-	if (fetched) {
-		tprints("{msg_hdr=");
-		print_msghdr(tcp, &mmsg.msg_hdr, p_user_msg_namelen,
-			     use_msg_len ? mmsg.msg_len : -1UL);
-		tprintf(", msg_len=%u}", mmsg.msg_len);
-	} else {
-		printaddr(addr);
-	}
-
-	return fetched;
-}
-
-void
-decode_mmsgvec(struct tcb *tcp, unsigned long addr, unsigned int len,
-	       bool use_msg_len)
-{
-	if (syserror(tcp)) {
-		printaddr(addr);
-	} else {
-		unsigned int i, fetched;
-
-		tprints("[");
-		for (i = 0; i < len; ++i, addr += fetched) {
-			if (i)
-				tprints(", ");
-			fetched = decode_mmsghdr(tcp, 0, addr, use_msg_len);
-			if (!fetched)
-				break;
-		}
-		tprints("]");
-	}
-}
-
-void
-dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
-{
-	unsigned int len = tcp->u_rval;
-	unsigned int i, fetched;
-	struct mmsghdr mmsg;
-
-	for (i = 0; i < len; ++i, addr += fetched) {
-		fetched = fetch_struct_mmsghdr(tcp, addr, &mmsg);
-		if (!fetched)
-			break;
-		tprintf(" = %lu buffers in vector %u\n",
-			(unsigned long)mmsg.msg_hdr.msg_iovlen, i);
-		dumpiov_upto(tcp, mmsg.msg_hdr.msg_iovlen,
-			(long)mmsg.msg_hdr.msg_iov, mmsg.msg_len);
-	}
 }

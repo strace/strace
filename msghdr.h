@@ -11,4 +11,7 @@ struct mmsghdr {
 };
 # endif
 
+struct tcb;
+extern void print_struct_msghdr(struct tcb *, const struct msghdr *, const int *, unsigned long);
+
 #endif /* MSGHDR_H_ */
