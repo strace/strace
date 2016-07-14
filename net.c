@@ -281,18 +281,6 @@ SYS_FUNC(sendto)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(sendmsg)
-{
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	decode_msghdr(tcp, 0, tcp->u_arg[1], (unsigned long) -1L);
-	/* flags */
-	tprints(", ");
-	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
-
-	return RVAL_DECODED;
-}
-
 SYS_FUNC(recv)
 {
 	if (entering(tcp)) {
@@ -364,37 +352,6 @@ SYS_FUNC(recvfrom)
 			tprintf(", [%d]", rlen);
 	}
 	return 0;
-}
-
-SYS_FUNC(recvmsg)
-{
-	int msg_namelen;
-
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		if (fetch_msghdr_namelen(tcp, tcp->u_arg[1], &msg_namelen)) {
-			/* abuse of auxstr to retain state */
-			tcp->auxstr = (void *) (long) msg_namelen;
-			return 0;
-		}
-		printaddr(tcp->u_arg[1]);
-	} else {
-		msg_namelen = (long) tcp->auxstr;
-		tcp->auxstr = NULL;
-
-		if (syserror(tcp))
-			tprintf("{msg_namelen=%d}", msg_namelen);
-		else
-			decode_msghdr(tcp, &msg_namelen, tcp->u_arg[1],
-				      tcp->u_rval);
-	}
-
-	/* flags */
-	tprints(", ");
-	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
-
-	return RVAL_DECODED;
 }
 
 #include "xlat/shutdown_modes.h"

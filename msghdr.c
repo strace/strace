@@ -367,7 +367,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprints("}");
 }
 
-bool
+static bool
 fetch_msghdr_namelen(struct tcb *tcp, const long addr, int *const p_msg_namelen)
 {
 	struct msghdr msg;
@@ -380,7 +380,7 @@ fetch_msghdr_namelen(struct tcb *tcp, const long addr, int *const p_msg_namelen)
 	}
 }
 
-void
+static void
 decode_msghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
 	      const long addr, const unsigned long data_size)
 {
@@ -399,4 +399,47 @@ dumpiov_in_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
 
 	if (fetch_struct_msghdr(tcp, addr, &msg))
 		dumpiov_upto(tcp, msg.msg_iovlen, (long)msg.msg_iov, data_size);
+}
+
+SYS_FUNC(sendmsg)
+{
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	decode_msghdr(tcp, 0, tcp->u_arg[1], (unsigned long) -1L);
+	/* flags */
+	tprints(", ");
+	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(recvmsg)
+{
+	int msg_namelen;
+
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		if (fetch_msghdr_namelen(tcp, tcp->u_arg[1], &msg_namelen)) {
+			/* abuse of auxstr to retain state */
+			tcp->auxstr = (void *) (long) msg_namelen;
+			return 0;
+		}
+		printaddr(tcp->u_arg[1]);
+	} else {
+		msg_namelen = (long) tcp->auxstr;
+		tcp->auxstr = NULL;
+
+		if (syserror(tcp))
+			tprintf("{msg_namelen=%d}", msg_namelen);
+		else
+			decode_msghdr(tcp, &msg_namelen, tcp->u_arg[1],
+				      tcp->u_rval);
+	}
+
+	/* flags */
+	tprints(", ");
+	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
+
+	return RVAL_DECODED;
 }
