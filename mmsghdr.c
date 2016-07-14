@@ -50,7 +50,7 @@ decode_mmsghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
 	return fetched;
 }
 
-void
+static void
 decode_mmsgvec(struct tcb *tcp, unsigned long addr, unsigned int len,
 	       bool use_msg_len)
 {
@@ -86,5 +86,79 @@ dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
 			(unsigned long) mmsg.msg_hdr.msg_iovlen, i);
 		dumpiov_upto(tcp, mmsg.msg_hdr.msg_iovlen,
 			(long) mmsg.msg_hdr.msg_iov, mmsg.msg_len);
+	}
+}
+
+SYS_FUNC(sendmmsg)
+{
+	if (entering(tcp)) {
+		/* sockfd */
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		if (!verbose(tcp)) {
+			printaddr(tcp->u_arg[1]);
+			/* vlen */
+			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
+			/* flags */
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+			return RVAL_DECODED;
+		}
+	} else {
+		decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval, false);
+		/* vlen */
+		tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
+		/* flags */
+		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+	}
+	return 0;
+}
+
+SYS_FUNC(recvmmsg)
+{
+	static char str[sizeof("left") + TIMESPEC_TEXT_BUFSIZE];
+
+	if (entering(tcp)) {
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+		if (verbose(tcp)) {
+			/* Abusing tcp->auxstr as temp storage.
+			 * Will be used and cleared on syscall exit.
+			 */
+			tcp->auxstr = sprint_timespec(tcp, tcp->u_arg[4]);
+		} else {
+			printaddr(tcp->u_arg[1]);
+			/* vlen */
+			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
+			/* flags */
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+			tprints(", ");
+			print_timespec(tcp, tcp->u_arg[4]);
+		}
+		return 0;
+	} else {
+		if (verbose(tcp)) {
+			decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval, true);
+			/* vlen */
+			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
+			/* flags */
+			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
+			tprints(", ");
+			/* timeout on entrance */
+			tprints(tcp->auxstr);
+			tcp->auxstr = NULL;
+		}
+		if (syserror(tcp))
+			return 0;
+		if (tcp->u_rval == 0) {
+			tcp->auxstr = "Timeout";
+			return RVAL_STR;
+		}
+		if (!verbose(tcp))
+			return 0;
+		/* timeout on exit */
+		snprintf(str, sizeof(str), "left %s",
+			 sprint_timespec(tcp, tcp->u_arg[4]));
+		tcp->auxstr = str;
+		return RVAL_STR;
 	}
 }

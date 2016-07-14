@@ -611,7 +611,6 @@ extern const char *sprintmode(unsigned int);
 extern const char *sprinttime(time_t);
 extern bool fetch_msghdr_namelen(struct tcb *, long, int *);
 extern void decode_msghdr(struct tcb *, const int *, long, unsigned long);
-extern void decode_mmsgvec(struct tcb *, unsigned long, unsigned int, bool);
 extern void dumpiov_in_msghdr(struct tcb *, long, unsigned long);
 extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov_upto(struct tcb *, int, long, unsigned long);
