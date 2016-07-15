@@ -64,15 +64,11 @@ SYS_FUNC(name_to_handle_at)
 		}
 		tprintf("{handle_bytes=%u", h.handle_bytes);
 
-		/*
-		 * Abusing tcp->auxstr as a temporary storage.
-		 * Will be used and cleared on syscall exit.
-		 */
-		tcp->auxstr = (void *) (unsigned long) h.handle_bytes;
+		set_tcb_priv_ulong(tcp, h.handle_bytes);
 
 		return 0;
 	} else {
-		unsigned int i = (unsigned long) tcp->auxstr;
+		unsigned int i = get_tcb_priv_ulong(tcp);
 
 		if ((!syserror(tcp) || EOVERFLOW == tcp->u_error)
 		    && !umove(tcp, addr, &h)) {
@@ -93,7 +89,6 @@ SYS_FUNC(name_to_handle_at)
 			}
 		}
 		tprints("}, ");
-		tcp->auxstr = NULL;
 
 		/* mount_id */
 		printnum_int(tcp, tcp->u_arg[3], "%d");

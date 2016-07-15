@@ -571,14 +571,15 @@ print_v4l2_queryctrl(struct tcb *tcp, const long arg)
 			tprints("}");
 			return 1;
 		}
-		if (tcp->auxstr)
+		if (get_tcb_priv_ulong(tcp))
 			tprints(" => ");
 	}
 
-	if (entering(tcp) || tcp->auxstr) {
+	if (entering(tcp) || get_tcb_priv_ulong(tcp)) {
 #ifdef V4L2_CTRL_FLAG_NEXT_CTRL
-		tcp->auxstr = (c.id & V4L2_CTRL_FLAG_NEXT_CTRL) ? "" : NULL;
-		if (tcp->auxstr) {
+		const unsigned long next = c.id & V4L2_CTRL_FLAG_NEXT_CTRL;
+		set_tcb_priv_ulong(tcp, next);
+		if (next) {
 			tprints("V4L2_CTRL_FLAG_NEXT_CTRL|");
 			c.id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
 		}

@@ -890,10 +890,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			/* Use subvolume id of the containing root */
 			if (args.treeid == 0)
-				/* abuse of auxstr to retain state */
-				tcp->auxstr = (void *)1;
-			else
-				tcp->auxstr = NULL;
+				set_tcb_priv_ulong(tcp, 1);
 
 			tprints("{treeid=");
 			btrfs_print_objectid(args.treeid);
@@ -904,8 +901,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		}
 
 		tprints("{");
-		if (tcp->auxstr) {
-			tcp->auxstr = NULL;
+		if (get_tcb_priv_ulong(tcp)) {
 			tprints("treeid=");
 			btrfs_print_objectid(args.treeid);
 			tprints(", ");

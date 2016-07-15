@@ -206,8 +206,7 @@ decode_sockname(struct tcb *tcp)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (fetch_socklen(tcp, &ulen, tcp->u_arg[1], tcp->u_arg[2])) {
-			/* abuse of auxstr to retain state */
-			tcp->auxstr = (void *) (long) ulen;
+			set_tcb_priv_ulong(tcp, ulen);
 			return 0;
 		} else {
 			printaddr(tcp->u_arg[1]);
@@ -217,8 +216,7 @@ decode_sockname(struct tcb *tcp)
 		}
 	}
 
-	ulen = (long) tcp->auxstr;
-	tcp->auxstr = NULL;
+	ulen = get_tcb_priv_ulong(tcp);
 
 	if (syserror(tcp) || umove(tcp, tcp->u_arg[2], &rlen) < 0) {
 		printaddr(tcp->u_arg[1]);
@@ -308,8 +306,7 @@ SYS_FUNC(recvfrom)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (fetch_socklen(tcp, &ulen, tcp->u_arg[4], tcp->u_arg[5])) {
-			/* abuse of auxstr to retain state */
-			tcp->auxstr = (void *) (long) ulen;
+			set_tcb_priv_ulong(tcp, ulen);
 		}
 	} else {
 		/* buf */
@@ -325,8 +322,7 @@ SYS_FUNC(recvfrom)
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		tprints(", ");
 
-		ulen = (long) tcp->auxstr;
-		tcp->auxstr = NULL;
+		ulen = get_tcb_priv_ulong(tcp);
 
 		if (!fetch_socklen(tcp, &rlen, tcp->u_arg[4], tcp->u_arg[5])) {
 			/* from address */

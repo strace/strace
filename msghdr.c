@@ -421,14 +421,12 @@ SYS_FUNC(recvmsg)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (fetch_msghdr_namelen(tcp, tcp->u_arg[1], &msg_namelen)) {
-			/* abuse of auxstr to retain state */
-			tcp->auxstr = (void *) (long) msg_namelen;
+			set_tcb_priv_ulong(tcp, msg_namelen);
 			return 0;
 		}
 		printaddr(tcp->u_arg[1]);
 	} else {
-		msg_namelen = (long) tcp->auxstr;
-		tcp->auxstr = NULL;
+		msg_namelen = get_tcb_priv_ulong(tcp);
 
 		if (syserror(tcp))
 			tprintf("{msg_namelen=%d}", msg_namelen);
