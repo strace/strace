@@ -115,16 +115,12 @@ SYS_FUNC(sendmmsg)
 
 SYS_FUNC(recvmmsg)
 {
-	static char str[sizeof("left") + TIMESPEC_TEXT_BUFSIZE];
-
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (verbose(tcp)) {
-			/* Abusing tcp->auxstr as temp storage.
-			 * Will be used and cleared on syscall exit.
-			 */
-			tcp->auxstr = sprint_timespec(tcp, tcp->u_arg[4]);
+			char *sts = xstrdup(sprint_timespec(tcp, tcp->u_arg[4]));
+			set_tcb_priv_data(tcp, sts, free);
 		} else {
 			printaddr(tcp->u_arg[1]);
 			/* vlen */
@@ -144,8 +140,7 @@ SYS_FUNC(recvmmsg)
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			tprints(", ");
 			/* timeout on entrance */
-			tprints(tcp->auxstr);
-			tcp->auxstr = NULL;
+			tprints(get_tcb_priv_data(tcp));
 		}
 		if (syserror(tcp))
 			return 0;
@@ -156,6 +151,7 @@ SYS_FUNC(recvmmsg)
 		if (!verbose(tcp))
 			return 0;
 		/* timeout on exit */
+		static char str[sizeof("left") + TIMESPEC_TEXT_BUFSIZE];
 		snprintf(str, sizeof(str), "left %s",
 			 sprint_timespec(tcp, tcp->u_arg[4]));
 		tcp->auxstr = str;
