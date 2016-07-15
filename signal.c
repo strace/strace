@@ -662,23 +662,26 @@ SYS_FUNC(rt_sigtimedwait)
 	if (entering(tcp)) {
 		print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[3]);
 		tprints(", ");
-		if (!tcp->u_arg[1]) {
+		if (!(tcp->u_arg[1] && verbose(tcp))) {
 			/*
 			 * This is the only "return" parameter,
-			 * if it's NULL, decode all parameters on entry.
+			 * if we are not going to fetch it on exit,
+			 * decode all parameters on entry.
 			 */
-			tprints("NULL, ");
+			printaddr(tcp->u_arg[1]);
+			tprints(", ");
 			print_timespec(tcp, tcp->u_arg[2]);
 			tprintf(", %lu", tcp->u_arg[3]);
-			tcp->auxstr = NULL;
 		} else {
-			tcp->auxstr = sprint_timespec(tcp, tcp->u_arg[2]);
+			char *sts = xstrdup(sprint_timespec(tcp, tcp->u_arg[2]));
+			set_tcb_priv_data(tcp, sts, free);
 		}
 	} else {
-		if (tcp->auxstr) {
+		if (tcp->u_arg[1] && verbose(tcp)) {
 			printsiginfo_at(tcp, tcp->u_arg[1]);
-			tprintf(", %s, %lu", tcp->auxstr, tcp->u_arg[3]);
-			tcp->auxstr = NULL;
+			tprints(", ");
+			tprints(get_tcb_priv_data(tcp));
+			tprintf(", %lu", tcp->u_arg[3]);
 		}
 
 		if (!syserror(tcp) && tcp->u_rval) {
