@@ -31,6 +31,7 @@
 
 #include "defs.h"
 #include "msghdr.h"
+#include <limits.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
@@ -229,10 +230,6 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 	}
 }
 
-#ifndef UIO_MAXIOV
-# define UIO_MAXIOV 1024
-#endif
-
 static unsigned int
 get_optmem_max(void)
 {
@@ -241,7 +238,7 @@ get_optmem_max(void)
 	if (!optmem_max) {
 		if (read_int_from_file("/proc/sys/net/core/optmem_max",
 				       &optmem_max) || optmem_max <= 0) {
-			optmem_max = sizeof(long long) * (2 * UIO_MAXIOV + 512);
+			optmem_max = sizeof(long long) * (2 * IOV_MAX + 512);
 		} else {
 			optmem_max = (optmem_max + sizeof(long long) - 1)
 				     & ~(sizeof(long long) - 1);

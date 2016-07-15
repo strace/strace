@@ -29,6 +29,7 @@
 
 #include "tests.h"
 #include <errno.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,10 +48,6 @@
 
 #ifndef SCM_SECURITY
 # define SCM_SECURITY 3
-#endif
-
-#ifndef UIO_MAXIOV
-# define UIO_MAXIOV 1024
 #endif
 
 #define MIN_SIZE_OF(type, member) \
@@ -663,7 +660,7 @@ test_big_len(struct msghdr *const mh)
 
 	if (read_int_from_file("/proc/sys/net/core/optmem_max", &optmem_max)
 	    || optmem_max <= 0 || optmem_max > 0x100000)
-		optmem_max = sizeof(long long) * (2 * UIO_MAXIOV + 512);
+		optmem_max = sizeof(long long) * (2 * IOV_MAX + 512);
 	optmem_max = (optmem_max + sizeof(long long) - 1)
 		     & ~(sizeof(long long) - 1);
 
