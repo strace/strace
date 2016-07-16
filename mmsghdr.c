@@ -30,45 +30,61 @@
 
 #include "defs.h"
 #include "msghdr.h"
+#include <limits.h>
 
 static int
-decode_mmsghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
-	       const long addr, const bool use_msg_len)
+fetch_struct_mmsghdr_or_printaddr(struct tcb *tcp, const long addr,
+				  const unsigned int len, void *const mh)
 {
-	struct mmsghdr mmsg;
-	int fetched = fetch_struct_mmsghdr(tcp, addr, &mmsg);
-
-	if (fetched) {
-		tprints("{msg_hdr=");
-		print_struct_msghdr(tcp, &mmsg.msg_hdr, p_user_msg_namelen,
-				    use_msg_len ? mmsg.msg_len : -1UL);
-		tprintf(", msg_len=%u}", mmsg.msg_len);
+	if ((entering(tcp) || !syserror(tcp))
+	    && fetch_struct_mmsghdr(tcp, addr, mh)) {
+		return 0;
 	} else {
 		printaddr(addr);
+		return -1;
 	}
+}
 
-	return fetched;
+struct print_struct_mmsghdr_config {
+	const int *p_user_msg_namelen;
+	unsigned int count;
+	bool use_msg_len;
+};
+
+static bool
+print_struct_mmsghdr(struct tcb *tcp, void *elem_buf,
+		     size_t elem_size, void *data)
+{
+	const struct mmsghdr *const mmsg = elem_buf;
+	struct print_struct_mmsghdr_config *const c = data;
+
+	if (!c->count) {
+		tprints("...");
+		return false;
+	}
+	--c->count;
+
+	tprints("{msg_hdr=");
+	print_struct_msghdr(tcp, &mmsg->msg_hdr, c->p_user_msg_namelen,
+			    c->use_msg_len ? mmsg->msg_len : -1UL);
+	tprintf(", msg_len=%u}", mmsg->msg_len);
+
+	return true;
 }
 
 static void
-decode_mmsgvec(struct tcb *tcp, unsigned long addr, unsigned int len,
-	       bool use_msg_len)
+decode_mmsgvec(struct tcb *tcp, const unsigned long addr,
+	       const unsigned int len, const bool use_msg_len)
 {
-	if (syserror(tcp)) {
-		printaddr(addr);
-	} else {
-		unsigned int i, fetched;
+	struct mmsghdr mmsg;
+	struct print_struct_mmsghdr_config c = {
+		.count = IOV_MAX,
+		.use_msg_len = use_msg_len
+	};
 
-		tprints("[");
-		for (i = 0; i < len; ++i, addr += fetched) {
-			if (i)
-				tprints(", ");
-			fetched = decode_mmsghdr(tcp, 0, addr, use_msg_len);
-			if (!fetched)
-				break;
-		}
-		tprints("]");
-	}
+	print_array(tcp, addr, len, &mmsg, sizeof_struct_mmsghdr(),
+		    fetch_struct_mmsghdr_or_printaddr,
+		    print_struct_mmsghdr, &c);
 }
 
 void

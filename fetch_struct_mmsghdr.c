@@ -80,3 +80,8 @@ MPERS_PRINTER_DECL(int, fetch_struct_mmsghdr,
 
 	return sizeof(v_compat);
 }
+
+MPERS_PRINTER_DECL(unsigned int, sizeof_struct_mmsghdr, void)
+{
+	return sizeof(struct_mmsghdr);
+}
