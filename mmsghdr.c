@@ -69,7 +69,53 @@ print_struct_mmsghdr(struct tcb *tcp, void *elem_buf,
 			    c->use_msg_len ? mmsg->msg_len : -1UL);
 	tprintf(", msg_len=%u}", mmsg->msg_len);
 
+	if (c->p_user_msg_namelen)
+		++c->p_user_msg_namelen;
+
 	return true;
+}
+
+static void
+free_mmsgvec_data(void *ptr)
+{
+	char **pstr = ptr;
+	free(*pstr);
+	*pstr = 0;
+
+	free(ptr);
+}
+
+struct mmsgvec_data {
+	char *timeout;
+	unsigned int count;
+	int namelen[IOV_MAX];
+};
+
+static void
+save_mmsgvec_namelen(struct tcb *tcp, unsigned long addr,
+		     unsigned int len, const char *const timeout)
+{
+	if (len > IOV_MAX)
+		len = IOV_MAX;
+
+	const size_t data_size = offsetof(struct mmsgvec_data, namelen)
+				 + sizeof(int) * len;
+	struct mmsgvec_data *const data = xmalloc(data_size);
+	data->timeout = xstrdup(timeout);
+
+	unsigned int i, fetched;
+
+	for (i = 0; i < len; ++i, addr += fetched) {
+		struct mmsghdr mh;
+
+		fetched = fetch_struct_mmsghdr(tcp, addr, &mh);
+		if (!fetched)
+			break;
+		data->namelen[i] = mh.msg_hdr.msg_namelen;
+	}
+	data->count = i;
+
+	set_tcb_priv_data(tcp, data, free_mmsgvec_data);
 }
 
 static void
@@ -81,6 +127,13 @@ decode_mmsgvec(struct tcb *tcp, const unsigned long addr,
 		.count = IOV_MAX,
 		.use_msg_len = use_msg_len
 	};
+	const struct mmsgvec_data *const data = get_tcb_priv_data(tcp);
+
+	if (data) {
+		if (data->count < c.count)
+			c.count = data->count;
+		c.p_user_msg_namelen = data->namelen;
+	}
 
 	print_array(tcp, addr, len, &mmsg, sizeof_struct_mmsghdr(),
 		    fetch_struct_mmsghdr_or_printaddr,
@@ -135,8 +188,8 @@ SYS_FUNC(recvmmsg)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (verbose(tcp)) {
-			char *sts = xstrdup(sprint_timespec(tcp, tcp->u_arg[4]));
-			set_tcb_priv_data(tcp, sts, free);
+			save_mmsgvec_namelen(tcp, tcp->u_arg[1], tcp->u_arg[2],
+					     sprint_timespec(tcp, tcp->u_arg[4]));
 		} else {
 			printaddr(tcp->u_arg[1]);
 			/* vlen */
@@ -156,7 +209,7 @@ SYS_FUNC(recvmmsg)
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			tprints(", ");
 			/* timeout on entrance */
-			tprints(get_tcb_priv_data(tcp));
+			tprints(*(const char **) get_tcb_priv_data(tcp));
 		}
 		if (syserror(tcp))
 			return 0;
