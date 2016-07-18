@@ -1,0 +1,184 @@
+/*
+ * Check decoding of msg_name* fields of struct msghdr array argument
+ * of sendmmsg and recvmmsg syscalls.
+ *
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include "tests.h"
+
+#include <limits.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/un.h>
+
+#include "msghdr.h"
+
+#define DEFAULT_STRLEN 32
+
+#define IOV_MAX1 (IOV_MAX + 1)
+
+#ifndef TEST_NAME
+# define TEST_NAME "mmsg_name"
+#endif
+
+static void
+print_msghdr(const struct msghdr *const msg, const int user_msg_namelen)
+{
+	const struct sockaddr_un *const un = msg->msg_name;
+	const int offsetof_sun_path = offsetof(struct sockaddr_un, sun_path);
+
+	printf("{msg_name=");
+	if (user_msg_namelen < offsetof_sun_path) {
+		printf("%p", un);
+	} else {
+		printf("{sa_family=AF_UNIX");
+		if (user_msg_namelen > offsetof_sun_path) {
+			int len = user_msg_namelen < (int) msg->msg_namelen ?
+				  user_msg_namelen : (int) msg->msg_namelen;
+			printf(", sun_path=\"%.*s\"",
+			       len - offsetof_sun_path, un->sun_path);
+		}
+		printf("}");
+	}
+	printf(", msg_namelen=");
+	if (user_msg_namelen != (int) msg->msg_namelen) {
+		printf("%d->", user_msg_namelen);
+	}
+	printf("%d, msg_iov=[{iov_base=\"%c\", iov_len=1}]"
+	       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}",
+	       (int) msg->msg_namelen, * (char *) msg->msg_iov[0].iov_base);
+}
+
+static void
+test_mmsg_name(const int send_fd, const int recv_fd)
+{
+	char *const send_buf = tail_alloc(sizeof(*send_buf) * IOV_MAX1);
+	struct iovec *const send_iov = tail_alloc(sizeof(*send_iov) * IOV_MAX1);
+	struct mmsghdr *const send_mh = tail_alloc(sizeof(*send_mh) * IOV_MAX1);
+
+	int i, rc;
+
+	for (i = 0; i < IOV_MAX1; ++i) {
+		send_buf[i] = '0' + i % 10;
+
+		send_iov[i].iov_base = &send_buf[i];
+		send_iov[i].iov_len = sizeof(*send_buf);
+
+		send_mh[i].msg_hdr.msg_iov = &send_iov[i];
+		send_mh[i].msg_hdr.msg_iovlen = 1;
+		send_mh[i].msg_hdr.msg_name = 0;
+		send_mh[i].msg_hdr.msg_namelen = 0;
+		send_mh[i].msg_hdr.msg_control = 0;
+		send_mh[i].msg_hdr.msg_controllen = 0;
+		send_mh[i].msg_hdr.msg_flags = 0;
+	}
+
+	rc = send_mmsg(send_fd, send_mh, IOV_MAX1, MSG_DONTWAIT);
+	if (rc < 0)
+		perror_msg_and_skip("sendmmsg");
+
+	printf("sendmmsg(%d, [", send_fd);
+	for (i = 0; i < rc; ++i) {
+		if (i)
+			printf(", ");
+#ifndef VERBOSE_MMSGHDR
+		if (i >= DEFAULT_STRLEN) {
+			printf("...");
+			break;
+		}
+#endif
+		printf("{msg_hdr={msg_name=NULL, msg_namelen=0"
+		       ", msg_iov=[{iov_base=\"%c\", iov_len=1}]"
+		       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}"
+		       ", msg_len=1}", '0' + i % 10);
+	}
+	printf("], %u, MSG_DONTWAIT) = %d\n", IOV_MAX1, rc);
+
+	struct sockaddr_un *const recv_addr =
+		tail_alloc(sizeof(*recv_addr) * IOV_MAX1);
+	char *const recv_buf = tail_alloc(sizeof(*recv_buf) * IOV_MAX1);
+	struct iovec *const recv_iov = tail_alloc(sizeof(*recv_iov) * IOV_MAX1);
+	struct mmsghdr *const recv_mh = tail_alloc(sizeof(*recv_mh) * IOV_MAX1);
+
+	for (i = 0; i < IOV_MAX1; ++i) {
+		recv_iov[i].iov_base = &recv_buf[i];
+		recv_iov[i].iov_len = sizeof(*recv_buf);
+
+		recv_mh[i].msg_hdr.msg_name = &recv_addr[i];
+		recv_mh[i].msg_hdr.msg_namelen = i;
+		recv_mh[i].msg_hdr.msg_iov = &recv_iov[i];
+		recv_mh[i].msg_hdr.msg_iovlen = 1;
+		recv_mh[i].msg_hdr.msg_control = 0;
+		recv_mh[i].msg_hdr.msg_controllen = 0;
+		recv_mh[i].msg_hdr.msg_flags = 0;
+	}
+
+	rc = recv_mmsg(recv_fd, recv_mh, IOV_MAX1, MSG_DONTWAIT, 0);
+	if (rc < 0)
+		perror_msg_and_skip("recvmmsg");
+
+	printf("recvmmsg(%d, [", recv_fd);
+	for (i = 0; i < rc; ++i) {
+		if (i)
+			printf(", ");
+#ifndef VERBOSE_MMSGHDR
+		if (i >= DEFAULT_STRLEN) {
+			printf("...");
+			break;
+		}
+#endif
+		printf("{msg_hdr=");
+		print_msghdr(&recv_mh[i].msg_hdr, i);
+		printf(", msg_len=1}");
+	}
+	printf("], %u, MSG_DONTWAIT, NULL) = %d\n", IOV_MAX1, rc);
+}
+
+int
+main(void)
+{
+	int fds[2];
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, fds))
+		perror_msg_and_skip("socketpair");
+
+	const struct sockaddr_un un = {
+		.sun_family = AF_UNIX,
+		.sun_path = TEST_NAME "-recvmmsg.test.send.socket"
+	};
+
+	(void) unlink(un.sun_path);
+	if (bind(fds[1], (const void *) &un, sizeof(un)))
+		perror_msg_and_skip("bind");
+	(void) unlink(un.sun_path);
+
+	test_mmsg_name(fds[1], fds[0]);
+
+	puts("+++ exited with 0 +++");
+	return 0;
+}

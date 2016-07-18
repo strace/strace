@@ -138,6 +138,7 @@ mlockall
 mmap
 mmap64
 mmsg
+mmsg_name
 mount
 move_pages
 mq

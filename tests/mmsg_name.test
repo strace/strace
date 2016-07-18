@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Check decoding of msg_name* fields of struct msghdr array argument
+# of sendmmsg and recvmmsg syscalls.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a25 -e trace=sendmmsg,recvmmsg

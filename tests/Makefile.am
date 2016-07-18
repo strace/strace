@@ -194,6 +194,7 @@ check_PROGRAMS = \
 	mmap \
 	mmap64 \
 	mmsg \
+	mmsg_name \
 	mount \
 	move_pages \
 	mq \
@@ -516,6 +517,7 @@ DECODER_TESTS = \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \
+	mmsg_name.test \
 	mount.test \
 	move_pages.test \
 	mq.test \
