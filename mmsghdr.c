@@ -172,6 +172,7 @@ SYS_FUNC(sendmmsg)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (!verbose(tcp)) {
+			/* msgvec */
 			printaddr(tcp->u_arg[1]);
 			/* vlen */
 			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
@@ -180,8 +181,13 @@ SYS_FUNC(sendmmsg)
 			return RVAL_DECODED;
 		}
 	} else {
+		const unsigned int msg_len_vlen =
+			syserror(tcp) ? 0 : tcp->u_rval;
+		/* msgvec */
+		temporarily_clear_syserror(tcp);
 		decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_arg[2],
-			       tcp->u_rval, false);
+			       msg_len_vlen, false);
+		restore_cleared_syserror(tcp);
 		/* vlen */
 		tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
 		/* flags */
@@ -199,6 +205,7 @@ SYS_FUNC(recvmmsg)
 			save_mmsgvec_namelen(tcp, tcp->u_arg[1], tcp->u_arg[2],
 					     sprint_timespec(tcp, tcp->u_arg[4]));
 		} else {
+			/* msgvec */
 			printaddr(tcp->u_arg[1]);
 			/* vlen */
 			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
@@ -210,6 +217,7 @@ SYS_FUNC(recvmmsg)
 		return 0;
 	} else {
 		if (verbose(tcp)) {
+			/* msgvec */
 			decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval,
 				       tcp->u_rval, true);
 			/* vlen */

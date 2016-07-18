@@ -30,6 +30,7 @@
 
 #include "tests.h"
 
+#include <errno.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -54,15 +55,19 @@ print_msghdr(const struct msghdr *const msg, const int user_msg_namelen)
 	const int offsetof_sun_path = offsetof(struct sockaddr_un, sun_path);
 
 	printf("{msg_name=");
-	if (user_msg_namelen < offsetof_sun_path) {
+	if (!un)
+		printf("NULL");
+	else if (user_msg_namelen < offsetof_sun_path) {
 		printf("%p", un);
 	} else {
 		printf("{sa_family=AF_UNIX");
 		if (user_msg_namelen > offsetof_sun_path) {
 			int len = user_msg_namelen < (int) msg->msg_namelen ?
 				  user_msg_namelen : (int) msg->msg_namelen;
-			printf(", sun_path=\"%.*s\"",
-			       len - offsetof_sun_path, un->sun_path);
+			len -= offsetof_sun_path;
+			if (len > (int) sizeof(un->sun_path))
+				len = sizeof(un->sun_path);
+			printf(", sun_path=\"%.*s\"", len, un->sun_path);
 		}
 		printf("}");
 	}
@@ -78,6 +83,8 @@ print_msghdr(const struct msghdr *const msg, const int user_msg_namelen)
 static void
 test_mmsg_name(const int send_fd, const int recv_fd)
 {
+	struct sockaddr_un *const send_addr =
+		tail_alloc(sizeof(*send_addr) * IOV_MAX1);
 	char *const send_buf = tail_alloc(sizeof(*send_buf) * IOV_MAX1);
 	struct iovec *const send_iov = tail_alloc(sizeof(*send_iov) * IOV_MAX1);
 	struct mmsghdr *const send_mh = tail_alloc(sizeof(*send_mh) * IOV_MAX1);
@@ -85,6 +92,13 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 	int i, rc;
 
 	for (i = 0; i < IOV_MAX1; ++i) {
+		int sun_len = i + 1 > (int) sizeof(send_addr[i].sun_path)
+				    ? (int) sizeof(send_addr[i].sun_path)
+				    : i + 1;
+
+		send_addr[i].sun_family = AF_UNIX;
+		memset(send_addr[i].sun_path, 'a' + i % 26, sun_len);
+
 		send_buf[i] = '0' + i % 10;
 
 		send_iov[i].iov_base = &send_buf[i];
@@ -92,12 +106,55 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 
 		send_mh[i].msg_hdr.msg_iov = &send_iov[i];
 		send_mh[i].msg_hdr.msg_iovlen = 1;
-		send_mh[i].msg_hdr.msg_name = 0;
-		send_mh[i].msg_hdr.msg_namelen = 0;
+		send_mh[i].msg_hdr.msg_name = &send_addr[i];
+		send_mh[i].msg_hdr.msg_namelen = i + 1;
 		send_mh[i].msg_hdr.msg_control = 0;
 		send_mh[i].msg_hdr.msg_controllen = 0;
 		send_mh[i].msg_hdr.msg_flags = 0;
 	}
+
+	rc = send_mmsg(send_fd, send_mh, IOV_MAX1, MSG_DONTWAIT);
+	int saved_errno = errno;
+
+	printf("sendmmsg(%d, [", send_fd);
+	for (i = 0; i < IOV_MAX1; ++i) {
+		if (i)
+			printf(", ");
+		if (i >= IOV_MAX
+# ifndef VERBOSE_MMSGHDR
+			|| i >= DEFAULT_STRLEN
+# endif
+		   ) {
+			printf("...");
+			break;
+		}
+		printf("{msg_hdr=");
+		print_msghdr(&send_mh[i].msg_hdr, i + 1);
+		printf("}");
+	}
+	errno = saved_errno;
+	printf("], %u, MSG_DONTWAIT) = %d %s (%m)\n",
+	       IOV_MAX1, rc, errno2name());
+
+	for (i = 0; i < IOV_MAX1; ++i) {
+		send_mh[i].msg_hdr.msg_name = 0;
+		send_mh[i].msg_hdr.msg_namelen = 0;
+	}
+
+	/*
+	 * When recvmmsg is called with a valid descriptor
+	 * but inaccessible memory, it causes segfaults on some architectures.
+	 * As in these cases we test decoding of failed recvmmsg calls,
+	 * it's ok to fail recvmmsg with any reason as long as
+	 * it doesn't read that inaccessible memory.
+	 */
+	rc = send_mmsg(-1, &send_mh[IOV_MAX], 2, MSG_DONTWAIT);
+	saved_errno = errno;
+	printf("sendmmsg(-1, [{msg_hdr=");
+	print_msghdr(&send_mh[IOV_MAX].msg_hdr, 0);
+	errno = saved_errno;
+	printf("}, %p], %u, MSG_DONTWAIT) = %d %s (%m)\n",
+	       &send_mh[IOV_MAX1], 2, rc, errno2name());
 
 	rc = send_mmsg(send_fd, send_mh, IOV_MAX1, MSG_DONTWAIT);
 	if (rc < 0)
@@ -115,11 +172,9 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 			printf("...");
 			break;
 		}
-		printf("{msg_hdr={msg_name=NULL, msg_namelen=0"
-		       ", msg_iov=[{iov_base=\"%c\", iov_len=1}]"
-		       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}%s}",
-		       '0' + i % 10,
-		       i < rc ? ", msg_len=1" : "");
+		printf("{msg_hdr=");
+		print_msghdr(&send_mh[i].msg_hdr, 0);
+		printf("%s}", i < rc ? ", msg_len=1" : "");
 	}
 	printf("], %u, MSG_DONTWAIT) = %d\n", IOV_MAX1, rc);
 
