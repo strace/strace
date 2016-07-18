@@ -104,19 +104,22 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 		perror_msg_and_skip("sendmmsg");
 
 	printf("sendmmsg(%d, [", send_fd);
-	for (i = 0; i < rc; ++i) {
+	for (i = 0; i < IOV_MAX1; ++i) {
 		if (i)
 			printf(", ");
+		if (i >= IOV_MAX
 #ifndef VERBOSE_MMSGHDR
-		if (i >= DEFAULT_STRLEN) {
+			|| i >= DEFAULT_STRLEN
+#endif
+		   ) {
 			printf("...");
 			break;
 		}
-#endif
 		printf("{msg_hdr={msg_name=NULL, msg_namelen=0"
 		       ", msg_iov=[{iov_base=\"%c\", iov_len=1}]"
-		       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}"
-		       ", msg_len=1}", '0' + i % 10);
+		       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}%s}",
+		       '0' + i % 10,
+		       i < rc ? ", msg_len=1" : "");
 	}
 	printf("], %u, MSG_DONTWAIT) = %d\n", IOV_MAX1, rc);
 

@@ -47,6 +47,7 @@ fetch_struct_mmsghdr_or_printaddr(struct tcb *tcp, const long addr,
 
 struct print_struct_mmsghdr_config {
 	const int *p_user_msg_namelen;
+	unsigned int msg_len_vlen;
 	unsigned int count;
 	bool use_msg_len;
 };
@@ -67,7 +68,11 @@ print_struct_mmsghdr(struct tcb *tcp, void *elem_buf,
 	tprints("{msg_hdr=");
 	print_struct_msghdr(tcp, &mmsg->msg_hdr, c->p_user_msg_namelen,
 			    c->use_msg_len ? mmsg->msg_len : -1UL);
-	tprintf(", msg_len=%u}", mmsg->msg_len);
+	if (c->msg_len_vlen) {
+		tprintf(", msg_len=%u", mmsg->msg_len);
+		--c->msg_len_vlen;
+	}
+	tprints("}");
 
 	if (c->p_user_msg_namelen)
 		++c->p_user_msg_namelen;
@@ -120,10 +125,12 @@ save_mmsgvec_namelen(struct tcb *tcp, unsigned long addr,
 
 static void
 decode_mmsgvec(struct tcb *tcp, const unsigned long addr,
-	       const unsigned int len, const bool use_msg_len)
+	       const unsigned int vlen, const unsigned int msg_len_vlen,
+	       const bool use_msg_len)
 {
 	struct mmsghdr mmsg;
 	struct print_struct_mmsghdr_config c = {
+		.msg_len_vlen = msg_len_vlen,
 		.count = IOV_MAX,
 		.use_msg_len = use_msg_len
 	};
@@ -135,7 +142,7 @@ decode_mmsgvec(struct tcb *tcp, const unsigned long addr,
 		c.p_user_msg_namelen = data->namelen;
 	}
 
-	print_array(tcp, addr, len, &mmsg, sizeof_struct_mmsghdr(),
+	print_array(tcp, addr, vlen, &mmsg, sizeof_struct_mmsghdr(),
 		    fetch_struct_mmsghdr_or_printaddr,
 		    print_struct_mmsghdr, &c);
 }
@@ -173,7 +180,8 @@ SYS_FUNC(sendmmsg)
 			return RVAL_DECODED;
 		}
 	} else {
-		decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval, false);
+		decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_arg[2],
+			       tcp->u_rval, false);
 		/* vlen */
 		tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
 		/* flags */
@@ -202,7 +210,8 @@ SYS_FUNC(recvmmsg)
 		return 0;
 	} else {
 		if (verbose(tcp)) {
-			decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval, true);
+			decode_mmsgvec(tcp, tcp->u_arg[1], tcp->u_rval,
+				       tcp->u_rval, true);
 			/* vlen */
 			tprintf(", %u, ", (unsigned int) tcp->u_arg[2]);
 			/* flags */
