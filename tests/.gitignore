@@ -138,6 +138,7 @@ mlockall
 mmap
 mmap64
 mmsg
+mmsg-silent
 mmsg_name
 mmsg_name-v
 mount

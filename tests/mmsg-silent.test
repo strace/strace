@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check silent decoding of sendmmsg and recvmmsg syscalls.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a25 -e verbose=none -e trace=sendmmsg,recvmmsg

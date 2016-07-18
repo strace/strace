@@ -194,6 +194,7 @@ check_PROGRAMS = \
 	mmap \
 	mmap64 \
 	mmsg \
+	mmsg-silent \
 	mmsg_name \
 	mmsg_name-v \
 	mount \
@@ -518,6 +519,7 @@ DECODER_TESTS = \
 	mmap.test \
 	mmap64.test \
 	mmsg.test \
+	mmsg-silent.test \
 	mmsg_name.test \
 	mmsg_name-v.test \
 	mount.test \
