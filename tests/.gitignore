@@ -139,6 +139,7 @@ mmap
 mmap64
 mmsg
 mmsg_name
+mmsg_name-v
 mount
 move_pages
 mq
