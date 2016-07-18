@@ -186,6 +186,7 @@ readlinkat
 readv
 reboot
 recvfrom
+recvmmsg-timeout
 recvmsg
 remap_file_pages
 rename

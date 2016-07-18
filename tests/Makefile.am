@@ -242,6 +242,7 @@ check_PROGRAMS = \
 	readv \
 	reboot \
 	recvfrom \
+	recvmmsg-timeout \
 	recvmsg \
 	remap_file_pages \
 	rename \
@@ -559,6 +560,7 @@ DECODER_TESTS = \
 	readv.test \
 	reboot.test \
 	recvfrom.test \
+	recvmmsg-timeout.test \
 	recvmsg.test \
 	remap_file_pages.test \
 	rename.test \
