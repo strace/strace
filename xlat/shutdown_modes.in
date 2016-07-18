@@ -1,3 +1,3 @@
-	{ 0,	"SHUT_RD"	},
-	{ 1,	"SHUT_WR"	},
-	{ 2,	"SHUT_RDWR"	},
+SHUT_RD 0
+SHUT_WR 1
+SHUT_RDWR 2
