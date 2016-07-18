@@ -177,7 +177,7 @@ main(void)
 		", msg_iov=[{iov_base=\"%s\", iov_len=%u}"
 		", {iov_base=\"\", iov_len=%u}], msg_iovlen=%u"
 		", msg_controllen=0, msg_flags=0}, msg_len=%u}], %u"
-		", MSG_DONTWAIT, NULL) = %d (left NULL)\n"
+		", MSG_DONTWAIT, NULL) = %d\n"
 		" = %u buffers in vector 0\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n"

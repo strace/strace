@@ -148,7 +148,7 @@ SYS_FUNC(recvmmsg)
 			tcp->auxstr = "Timeout";
 			return RVAL_STR;
 		}
-		if (!verbose(tcp))
+		if (!verbose(tcp) || !tcp->u_arg[4])
 			return 0;
 		/* timeout on exit */
 		static char str[sizeof("left") + TIMESPEC_TEXT_BUFSIZE];
