@@ -298,6 +298,7 @@ check_PROGRAMS = \
 	setuid \
 	setuid32 \
 	shmxt \
+	shutdown \
 	sigaction \
 	sigaltstack \
 	siginfo \
@@ -617,6 +618,7 @@ DECODER_TESTS = \
 	setuid.test \
 	setuid32.test \
 	shmxt.test \
+	shutdown.test \
 	sigaction.test \
 	sigaltstack.test \
 	siginfo.test \
