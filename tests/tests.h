@@ -111,6 +111,12 @@ int printxval(const struct xlat *, const unsigned long long, const char *);
 int socketcall(const int nr, const int call,
 	       long a1, long a2, long a3, long a4, long a5);
 
+/* Wrappers for recvmmsg and sendmmsg syscalls. */
+struct mmsghdr;
+struct timespec;
+int recv_mmsg(int, struct mmsghdr *, unsigned int, unsigned int, struct timespec *);
+int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
+
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 

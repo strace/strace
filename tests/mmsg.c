@@ -27,54 +27,10 @@
  */
 
 #include "tests.h"
-# include <sys/syscall.h>
+#include <assert.h>
+#include <unistd.h>
 
-#if (defined __NR_sendmmsg || defined HAVE_SENDMMSG) \
- && (defined __NR_recvmmsg || defined HAVE_RECVMMSG)
-
-# include <assert.h>
-# include <errno.h>
-# include <stdio.h>
-# include <unistd.h>
-
-# include "msghdr.h"
-
-static int
-send_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags)
-{
-	int rc;
-#ifdef __NR_sendmmsg
-	rc = syscall(__NR_sendmmsg, (long) fd, vec, (unsigned long) vlen,
-		     (unsigned long) flags);
-	if (rc >= 0 || ENOSYS != errno)
-		return rc;
-	tprintf("sendmmsg(%d, %p, %u, MSG_DONTROUTE|MSG_NOSIGNAL)"
-		" = -1 ENOSYS (%m)\n", fd, vec, vlen);
-#endif
-#ifdef HAVE_SENDMMSG
-	rc = sendmmsg(fd, vec, vlen, flags);
-#endif
-	return rc;
-}
-
-static int
-recv_mmsg(int fd, struct mmsghdr *vec, unsigned int vlen, unsigned int flags,
-	  struct timespec *timeout)
-{
-	int rc;
-#ifdef __NR_recvmmsg
-	rc = syscall(__NR_recvmmsg, (long) fd, vec, (unsigned long) vlen,
-		     (unsigned long) flags, timeout);
-	if (rc >= 0 || ENOSYS != errno)
-		return rc;
-	tprintf("recvmmsg(%d, %p, %u, MSG_DONTWAIT, NULL)"
-		" = -1 ENOSYS (%m)\n", fd, vec, vlen);
-#endif
-#ifdef HAVE_RECVMMSG
-	rc = recvmmsg(fd, vec, vlen, flags, timeout);
-#endif
-	return rc;
-}
+#include "msghdr.h"
 
 int
 main(void)
@@ -135,7 +91,7 @@ main(void)
 	const unsigned int n_w_mmh = ARRAY_SIZE(w_mmh_);
 
 	int r = send_mmsg(1, w_mmh, n_w_mmh, MSG_DONTROUTE | MSG_NOSIGNAL);
-	if (r < 0 && errno == ENOSYS)
+	if (r < 0)
 		perror_msg_and_skip("sendmmsg");
 	assert(r == (int) n_w_mmh);
 	assert(close(1) == 0);
@@ -237,9 +193,3 @@ main(void)
 	tprintf("+++ exited with 0 +++\n");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("(__NR_sendmmsg || HAVE_SENDMMSG) && (__NR_recvmmsg || HAVE_RECVMMSG)")
-
-#endif
