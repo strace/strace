@@ -338,6 +338,7 @@ check_PROGRAMS = \
 	umovestr2 \
 	umovestr3 \
 	uname \
+	unix-pair-send-recv \
 	unix-pair-sendto-recvfrom \
 	unlink \
 	unlinkat \
@@ -656,6 +657,7 @@ DECODER_TESTS = \
 	umovestr2.test \
 	umovestr3.test \
 	uname.test \
+	unix-pair-send-recv.test \
 	unix-pair-sendto-recvfrom.test \
 	unlink.test \
 	unlinkat.test \
@@ -758,6 +760,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sun_path.expected \
 	     uio.expected \
 	     umovestr.expected \
+	     unix-pair-send-recv.expected \
 	     unix-pair-sendto-recvfrom.expected \
 	     xchownx.c \
 	     xgetrlimit.c \

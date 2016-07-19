@@ -1,0 +1,10 @@
+send(0, "abcdefghijklmnopqrstuvwxyz", 26, MSG_DONTROUTE) = 26
+ | 00000  61 62 63 64 65 66 67 68  69 6a 6b 6c 6d 6e 6f 70  abcdefghijklmnop |
+ | 00010  71 72 73 74 75 76 77 78  79 7a                    qrstuvwxyz       |
+recv(1, "abcdefghijklmnopqrstuvwxyz", 26, MSG_WAITALL) = 26
+send(1, "zyxwvutsrqponmlkjihgfedcba", 26, MSG_DONTROUTE) = 26
+recv(0, "zyxwvutsrqponmlkjihgfedcba", 26, MSG_WAITALL) = 26
+ | 00000  7a 79 78 77 76 75 74 73  72 71 70 6f 6e 6d 6c 6b  zyxwvutsrqponmlk |
+ | 00010  6a 69 68 67 66 65 64 63  62 61                    jihgfedcba       |
+recv(0, NULL, 26, MSG_DONTWAIT) = -1 EBADF (Bad file descriptor)
++++ exited with 0 +++

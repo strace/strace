@@ -282,6 +282,7 @@ umovestr
 umovestr2
 umovestr3
 uname
+unix-pair-send-recv
 unix-pair-sendto-recvfrom
 unlink
 unlinkat
