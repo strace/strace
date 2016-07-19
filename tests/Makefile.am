@@ -338,7 +338,7 @@ check_PROGRAMS = \
 	umovestr2 \
 	umovestr3 \
 	uname \
-	unix-pair-send-recv \
+	unix-pair-sendto-recvfrom \
 	unlink \
 	unlinkat \
 	userfaultfd \
@@ -656,6 +656,7 @@ DECODER_TESTS = \
 	umovestr2.test \
 	umovestr3.test \
 	uname.test \
+	unix-pair-sendto-recvfrom.test \
 	unlink.test \
 	unlinkat.test \
 	userfaultfd.test \
@@ -686,7 +687,6 @@ MISC_TESTS = \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
-	dumpio.test \
 	filter-unavailable.test \
 	fork-f.test \
 	ksysent.test \
@@ -721,7 +721,6 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     count-f.expected \
-	     dumpio.expected \
 	     eventfd.expected \
 	     fanotify_mark.expected \
 	     filter-unavailable.expected \
@@ -759,6 +758,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sun_path.expected \
 	     uio.expected \
 	     umovestr.expected \
+	     unix-pair-sendto-recvfrom.expected \
 	     xchownx.c \
 	     xgetrlimit.c \
 	     xselect.c \

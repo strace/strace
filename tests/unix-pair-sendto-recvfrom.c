@@ -1,4 +1,6 @@
 /*
+ * Check decoding and dumping of sendto and recvfrom syscalls.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *

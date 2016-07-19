@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check decoding and dumping of sendto and recvfrom syscalls.
+
+. "${srcdir=.}/init.sh"
+
+run_prog ./unix-pair-sendto-recvfrom abcdefghijklmnopqrstuvwxyz
+run_strace -esignal=none -esendto,recvfrom -eread=0 -ewrite=0 $args
+match_diff
+
+exit 0
