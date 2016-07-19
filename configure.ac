@@ -297,8 +297,6 @@ AC_CHECK_FUNCS(m4_normalize([
 	preadv
 	process_vm_readv
 	pwritev
-	recvmmsg
-	sendmmsg
 	sigaction
 	signalfd
 	stpcpy
