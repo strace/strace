@@ -47,6 +47,7 @@ libtests_a_SOURCES = \
 	hexdump_strdup.c \
 	hexquote_strndup.c \
 	inode_of_sockfd.c \
+	libsocketcall.c \
 	overflowuid.c \
 	print_quoted_string.c \
 	printflags.c \
