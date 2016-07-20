@@ -250,6 +250,7 @@ signal_receive
 signalfd
 sigreturn
 sleep
+socketcall
 splice
 stack-fcall
 stat

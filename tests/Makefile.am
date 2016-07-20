@@ -306,6 +306,7 @@ check_PROGRAMS = \
 	signalfd \
 	sigreturn \
 	sleep \
+	socketcall \
 	splice \
 	stack-fcall \
 	stat \
@@ -625,6 +626,7 @@ DECODER_TESTS = \
 	siginfo.test \
 	signalfd.test \
 	sigreturn.test \
+	socketcall.test \
 	splice.test \
 	stat.test \
 	stat64.test \
