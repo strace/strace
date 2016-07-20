@@ -28,6 +28,7 @@
  */
 
 #include "defs.h"
+#include "kernel_types.h"
 #include "syscall.h"
 
 #define TD 0
@@ -61,13 +62,13 @@ static const unsigned long nr = ARRAY_SIZE(syscallent) | SYSCALL_BIT;
 int
 main(void)
 {
-	static const unsigned long a[] = {
-		(unsigned long) 0xface0fedbadc0ded,
-		(unsigned long) 0xface1fedbadc1ded,
-		(unsigned long) 0xface2fedbadc2ded,
-		(unsigned long) 0xface3fedbadc3ded,
-		(unsigned long) 0xface4fedbadc4ded,
-		(unsigned long) 0xface5fedbadc5ded
+	static const kernel_ulong_t a[] = {
+		(kernel_ulong_t) 0xface0fedbadc0ded,
+		(kernel_ulong_t) 0xface1fedbadc1ded,
+		(kernel_ulong_t) 0xface2fedbadc2ded,
+		(kernel_ulong_t) 0xface3fedbadc3ded,
+		(kernel_ulong_t) 0xface4fedbadc4ded,
+		(kernel_ulong_t) 0xface5fedbadc5ded
 	};
 
 	long rc = syscall(nr, a[0], a[1], a[2], a[3], a[4], a[5]);
@@ -76,9 +77,15 @@ main(void)
 	       " = %ld ENOSYS (%m)\n", nr,
 	       a[0], a[1], a[2], a[3], a[4], a[5], rc);
 #else
-	printf("syscall_%lu(%#lx, %#lx, %#lx, %#lx, %#lx, %#lx)"
+	printf("syscall_%lu(%#llx, %#llx, %#llx, %#llx, %#llx, %#llx)"
 	       " = %ld (errno %d)\n", nr & (~SYSCALL_BIT),
-	       a[0], a[1], a[2], a[3], a[4], a[5], rc, errno);
+	       (unsigned long long) a[0],
+	       (unsigned long long) a[1],
+	       (unsigned long long) a[2],
+	       (unsigned long long) a[3],
+	       (unsigned long long) a[4],
+	       (unsigned long long) a[5],
+	       rc, errno);
 #endif
 
 	puts("+++ exited with 0 +++");
