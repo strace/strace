@@ -1409,8 +1409,18 @@ printargs(struct tcb *tcp)
 	if (entering(tcp)) {
 		int i;
 		int n = tcp->s_ent->nargs;
-		for (i = 0; i < n; i++)
+		for (i = 0; i < n; i++) {
+#if HAVE_STRUCT_TCB_EXT_ARG
+# if SUPPORTED_PERSONALITIES > 1
+			if (current_personality == 1)
+				tprintf("%s%#lx", i ? ", " : "", tcp->u_arg[i]);
+			else
+# endif
+			tprintf("%s%#llx", i ? ", " : "", tcp->ext_arg[i]);
+#else
 			tprintf("%s%#lx", i ? ", " : "", tcp->u_arg[i]);
+#endif
+		}
 	}
 	return 0;
 }
