@@ -567,29 +567,26 @@ qualify(const char *s)
 static void
 decode_socket_subcall(struct tcb *tcp)
 {
-	unsigned long addr;
-	unsigned int n;
+	const int call = tcp->u_arg[0];
 
-	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= SYS_socket_nsubcalls)
+	if (call < 1 || call >= SYS_socket_nsubcalls)
 		return;
 
-	tcp->scno = SYS_socket_subcall + tcp->u_arg[0];
-	tcp->qual_flg = qual_flags[tcp->scno];
-	tcp->s_ent = &sysent[tcp->scno];
-	addr = tcp->u_arg[1];
-	n = tcp->s_ent->nargs;
-	if (sizeof(tcp->u_arg[0]) == current_wordsize) {
-		memset(tcp->u_arg, 0, n * sizeof(tcp->u_arg[0]));
-		(void) umoven(tcp, addr, n * sizeof(tcp->u_arg[0]), tcp->u_arg);
-	} else {
-		unsigned int args[n];
-		unsigned int i;
+	const unsigned long scno = SYS_socket_subcall + call;
+	const unsigned int nargs = sysent[scno].nargs;
+	uint64_t buf[nargs];
 
-		memset(args, 0, sizeof(args));
-		(void) umove(tcp, addr, &args);
-		for (i = 0; i < n; ++i)
-			tcp->u_arg[i] = args[i];
-	}
+	if (umoven(tcp, tcp->u_arg[1], nargs * current_wordsize, buf) < 0)
+		return;
+
+	tcp->scno = scno;
+	tcp->qual_flg = qual_flags[scno];
+	tcp->s_ent = &sysent[scno];
+
+	unsigned int i;
+	for (i = 0; i < nargs; ++i)
+		tcp->u_arg[i] = (sizeof(uint32_t) == current_wordsize)
+				? ((uint32_t *) buf)[i] : buf[i];
 }
 #endif
 

@@ -113,7 +113,6 @@
 #define	sys_setsid		printargs
 #define	sys_set_tid_address	printargs
 #define	sys_setup		printargs
-#define	sys_socketcall		printargs
 #define	sys_sync		printargs
 #define	sys_syscall		printargs
 #define	sys_vhangup		printargs
