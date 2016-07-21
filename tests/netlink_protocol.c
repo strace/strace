@@ -29,17 +29,22 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <linux/netlink.h>
-#include <linux/sock_diag.h>
-#include <linux/netlink_diag.h>
 
-#if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
-# define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
-#endif
+#ifdef HAVE_SYS_XATTR_H
+
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/xattr.h>
+# include <netinet/in.h>
+# include <linux/netlink.h>
+# include <linux/sock_diag.h>
+# include <linux/netlink_diag.h>
+
+# if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
+#  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
+# endif
 
 static void
 send_query(const int fd)
@@ -192,8 +197,8 @@ send_query(const int fd)
 	       (unsigned) sizeof(*reqs), (unsigned) sizeof(*reqs));
 
 	/* abbreviated output */
-#define DEFAULT_STRLEN 32
-#define ABBREV_LEN (DEFAULT_STRLEN + 1)
+# define DEFAULT_STRLEN 32
+# define ABBREV_LEN (DEFAULT_STRLEN + 1)
 	const unsigned int msg_len = sizeof(struct nlmsghdr) * ABBREV_LEN;
 	struct nlmsghdr *const msgs = tail_alloc(msg_len);
 	unsigned int i;
@@ -238,9 +243,23 @@ int main(void)
 	printf("bind(%d, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}"
 	       ", %u) = 0\n", fd, len);
 
+	char *path;
+	if (asprintf(&path, "/proc/self/fd/%u", fd) < 0)
+		perror_msg_and_fail("asprintf");
+	char buf[256];
+	if (getxattr(path, "system.sockprotoname", buf, sizeof(buf) - 1) < 0)
+		perror_msg_and_skip("getxattr");
+	free(path);
+
 	send_query(fd);
 
 	printf("+++ exited with 0 +++\n");
 
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_SYS_XATTR_H")
+
+#endif
