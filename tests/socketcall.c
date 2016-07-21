@@ -54,28 +54,19 @@ static void *efault;
 static void
 test_socketcall(const int i, const void *const addr)
 {
-	static const unsigned long a[] = {
-		(unsigned long) 0xface2fedbadc2ded,
-		(unsigned long) 0xface3fedbadc3ded,
-		(unsigned long) 0xface4fedbadc4ded,
-		(unsigned long) 0xface5fedbadc5ded
-	};
 	const unsigned long call =
 		(unsigned long) 0xfacefeed00000000 | (unsigned int) i;
 
-	long rc = syscall(__NR_socketcall, call, addr,
-			  a[0], a[1], a[2], a[3]);
+	long rc = syscall(__NR_socketcall, call, addr);
 
 	if (i < sc_min || i > sc_max) {
-		printf("socketcall(%d, %p, %#lx, %#lx, %#lx, %#lx)"
-		       " = %ld %s (%m)\n", (int) call, addr,
-		       a[0], a[1], a[2], a[3], rc, errno2name());
+		printf("socketcall(%d, %p) = %ld %s (%m)\n",
+		       (int) call, addr, rc, errno2name());
 	} else if (addr == efault) {
 		const char *const str = xlookup_uint(socketcalls, i);
 		assert(str);
-		printf("socketcall(%s, %p, %#lx, %#lx, %#lx, %#lx)"
-		       " = %ld %s (%m)\n", str, addr, a[0], a[1], a[2], a[3],
-		       rc, errno2name());
+		printf("socketcall(%s, %p) = %ld %s (%m)\n",
+		       str, addr, rc, errno2name());
 	}
 }
 int

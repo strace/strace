@@ -3,4 +3,4 @@
 # Check decoding of socketcall syscall.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff
+run_strace_match_diff -a20

@@ -38,9 +38,8 @@ SYS_FUNC(socketcall)
 	else
 		tprintf("%d", call);
 
-	unsigned int i;
-	for (i = 1; i < MAX_ARGS; ++i)
-		tprintf(", %#lx", tcp->u_arg[i]);
+	tprints(", ");
+	printaddr(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
