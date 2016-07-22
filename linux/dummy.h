@@ -104,7 +104,6 @@
 #define	sys_gettid		printargs
 #define	sys_idle		printargs
 #define	sys_inotify_init	printargs
-#define	sys_ipc			printargs
 #define	sys_munlockall		printargs
 #define	sys_pause		printargs
 #define	sys_printargs		printargs

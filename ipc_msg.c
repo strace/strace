@@ -84,10 +84,10 @@ tprint_msgrcv(struct tcb *tcp, const long addr, const unsigned long count,
 }
 
 static int
-fetch_msgrcv_args(struct tcb *tcp, const long addr, long *pair)
+fetch_msgrcv_args(struct tcb *tcp, const long addr, unsigned long *pair)
 {
-	if (current_wordsize == sizeof(long)) {
-		if (umoven_or_printaddr(tcp, addr, 2 * sizeof(long), pair))
+	if (current_wordsize == sizeof(*pair)) {
+		if (umoven_or_printaddr(tcp, addr, 2 * sizeof(*pair), pair))
 			return -1;
 	} else {
 		unsigned int tmp[2];
@@ -106,12 +106,23 @@ SYS_FUNC(msgrcv)
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
 		if (indirect_ipccall(tcp)) {
-			long pair[2];
+			const bool direct =
+#ifdef SPARC64
+				current_wordsize == 8 ||
+#endif
+				get_tcb_priv_ulong(tcp) != 0;
+			if (direct) {
+				tprint_msgrcv(tcp, tcp->u_arg[3],
+					      tcp->u_arg[1], tcp->u_arg[4]);
+			} else {
+				unsigned long pair[2];
 
-			if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair))
-				tprintf(", %lu, ", tcp->u_arg[1]);
-			else
-				tprint_msgrcv(tcp, pair[0], tcp->u_arg[1], pair[1]);
+				if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair))
+					tprintf(", %lu, ", tcp->u_arg[1]);
+				else
+					tprint_msgrcv(tcp, pair[0],
+						      tcp->u_arg[1], pair[1]);
+			}
 			printflags(ipc_msg_flags, tcp->u_arg[2], "MSG_???");
 		} else {
 			tprint_msgrcv(tcp, tcp->u_arg[1],

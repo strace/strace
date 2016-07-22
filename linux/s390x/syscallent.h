@@ -139,7 +139,7 @@
 [114] = { 4,	TP,		SEN(wait4),			"wait4"			},
 [115] = { 1,	TF,		SEN(swapoff),			"swapoff"		},
 [116] = { 1,	0,		SEN(sysinfo),			"sysinfo"		},
-[117] = { 6,	TI,		SEN(ipc),			"ipc"			},
+[117] = { 5,	TI,		SEN(ipc),			"ipc"			},
 [118] = { 1,	TD,		SEN(fsync),			"fsync"			},
 [119] = { 0,	TS,		SEN(sigreturn),			"sigreturn"		},
 [120] = { 5,	TP,		SEN(clone),			"clone"			},

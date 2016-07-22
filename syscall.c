@@ -594,15 +594,37 @@ decode_socket_subcall(struct tcb *tcp)
 static void
 decode_ipc_subcall(struct tcb *tcp)
 {
-	unsigned int i, n;
+	unsigned int call = tcp->u_arg[0];
+	const unsigned int version = call >> 16;
 
-	if (tcp->u_arg[0] < 0 || tcp->u_arg[0] >= SYS_ipc_nsubcalls)
+	if (version) {
+# if defined S390 || defined S390X
 		return;
+# else
+#  ifdef SPARC64
+		if (current_wordsize == 8)
+			return;
+#  endif
+		set_tcb_priv_ulong(tcp, version);
+		call &= 0xffff;
+# endif
+	}
 
-	tcp->scno = SYS_ipc_subcall + tcp->u_arg[0];
+	switch (call) {
+		case  1: case  2: case  3: case  4:
+		case 11: case 12: case 13: case 14:
+		case 21: case 22: case 23: case 24:
+			break;
+		default:
+			return;
+	}
+
+	tcp->scno = SYS_ipc_subcall + call;
 	tcp->qual_flg = qual_flags[tcp->scno];
 	tcp->s_ent = &sysent[tcp->scno];
-	n = tcp->s_ent->nargs;
+
+	const unsigned int n = tcp->s_ent->nargs;
+	unsigned int i;
 	for (i = 0; i < n; i++)
 		tcp->u_arg[i] = tcp->u_arg[i + 1];
 }

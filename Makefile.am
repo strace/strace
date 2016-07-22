@@ -66,6 +66,7 @@ libstrace_a_CFLAGS = $(strace_CFLAGS)
 libstrace_a_SOURCES =	\
 	fstatfs.c \
 	fstatfs64.c \
+	ipc.c \
 	socketcall.c \
 	statfs.c \
 	statfs64.c \

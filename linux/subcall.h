@@ -68,7 +68,7 @@
 [SYS_ipc_subcall +  9] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
 [SYS_ipc_subcall + 10] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
 [SYS_ipc_subcall + 11] = { 4,	IS|TI,		SEN(msgsnd),		"msgsnd"		},
-[SYS_ipc_subcall + 12] = { 4,	IS|TI,		SEN(msgrcv),		"msgrcv"		},
+[SYS_ipc_subcall + 12] = { 5,	IS|TI,		SEN(msgrcv),		"msgrcv"		},
 [SYS_ipc_subcall + 13] = { 2,	IS|TI,		SEN(msgget),		"msgget"		},
 [SYS_ipc_subcall + 14] = { 4,	IS|TI,		SEN(msgctl),		"msgctl"		},
 [SYS_ipc_subcall + 15] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
