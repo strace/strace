@@ -107,6 +107,7 @@ ioctl_v4l2
 ioperm
 iopl
 ip_mreq
+ipc
 ipc_msg
 ipc_msgbuf
 ipc_sem

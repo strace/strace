@@ -165,6 +165,7 @@ check_PROGRAMS = \
 	ioperm \
 	iopl \
 	ip_mreq \
+	ipc \
 	ipc_msg \
 	ipc_msgbuf \
 	ipc_sem \
@@ -494,6 +495,7 @@ DECODER_TESTS = \
 	ioperm.test \
 	iopl.test \
 	ip_mreq.test \
+	ipc.test \
 	ipc_msg.test \
 	ipc_msgbuf.test \
 	ipc_sem.test \
