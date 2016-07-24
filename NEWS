@@ -1,5 +1,22 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 4.13 (????-??-??)
 ===============================================
+
+* Improvements
+  * Implemented a general netlink socket parser.
+  * Enhanced decoding of socket addresses.
+  * Enhanced decoding of cmsghdr, msghdr, and mmsghdr structures.
+  * Enhanced decoding of accept, accept4, bind, getpeername, getsockname,
+    ipc, recvfrom, recvmsg, recvmmsg, sendto, sendmmsg, and socketcall syscalls.
+  * Updated lists of AF_*, BPF_MAP_TYPE_*, KEY_*, KEYCTL_*, RWF_*, SS_*,
+    and *_MAGIC constants.
+  * Updated lists of ioctl commands from Linux 4.7.
+
+* Bug fixes
+  * Fixed decoding of pid_t argument of prlimit64 syscall.
+  * Fixed sign extension issues in the parser of struct rusage.
+  * Fixed race condition in decoding of timeout argument of recvmmsg and
+    rt_sigtimedwait syscalls.
+  * Fixed build with fresh linux kernel headers.
 
 Noteworthy changes in release 4.12 (2016-05-31)
 ===============================================
