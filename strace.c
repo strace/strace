@@ -1011,6 +1011,88 @@ process_opt_p_list(char *opt)
 }
 
 static void
+attach_tcb(struct tcb *const tcp)
+{
+	if (followfork && tcp->pid != strace_child) {
+		char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
+		sprintf(procdir, "/proc/%d/task", tcp->pid);
+
+		DIR *dir = opendir(procdir);
+		if (dir != NULL) {
+			unsigned int ntid = 0, nerr = 0;
+			struct_dirent *de;
+
+			while ((de = read_dir(dir)) != NULL) {
+				if (de->d_fileno == 0)
+					continue;
+
+				int tid = string_to_uint(de->d_name);
+				if (tid <= 0)
+					continue;
+
+				++ntid;
+				if (ptrace_attach_or_seize(tid) < 0) {
+					++nerr;
+					if (debug_flag)
+						error_msg("attach to pid %d failed", tid);
+					continue;
+				}
+				if (debug_flag)
+					error_msg("attach to pid %d succeeded", tid);
+
+				struct tcb *tid_tcp =
+					(tid == tcp->pid) ? tcp : alloctcb(tid);
+				tid_tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
+				newoutf(tid_tcp);
+			}
+
+			closedir(dir);
+
+			ntid -= nerr;
+			if (ntid == 0) {
+				perror_msg("attach: ptrace(PTRACE_ATTACH, ...)");
+				droptcb(tcp);
+				return;
+			}
+
+			if (!qflag) {
+				if (ntid > 1)
+					error_msg("Process %u attached"
+						  " with %u threads",
+						  tcp->pid, ntid);
+				else
+					error_msg("Process %u attached",
+						  tcp->pid);
+			}
+
+			if (!(tcp->flags & TCB_ATTACHED)) {
+				/* -p PID, we failed to attach to PID itself
+				 * but did attach to some of its sibling threads.
+				 * Drop PID's tcp.
+				 */
+				droptcb(tcp);
+			}
+
+			return;
+		} /* if (opendir worked) */
+	} /* if (-f) */
+
+	if (ptrace_attach_or_seize(tcp->pid) < 0) {
+		perror_msg("attach: ptrace(PTRACE_ATTACH, ...)");
+		droptcb(tcp);
+		return;
+	}
+
+	tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
+	newoutf(tcp);
+	if (debug_flag)
+		error_msg("attach to pid %d (main) succeeded", tcp->pid);
+
+	if (!qflag)
+		error_msg("Process %u attached", tcp->pid);
+}
+
+static void
 startup_attach(void)
 {
 	pid_t parent_pid = strace_tracer_pid;
@@ -1058,88 +1140,19 @@ startup_attach(void)
 
 		if (tcp->pid == parent_pid || tcp->pid == strace_tracer_pid) {
 			errno = EPERM;
-			perror_msg("attach: %d", tcp->pid);
+			perror_msg("attach: pid %d", tcp->pid);
 			droptcb(tcp);
 			continue;
 		}
-		if (followfork && tcp->pid != strace_child) {
-			char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
-			DIR *dir;
 
-			sprintf(procdir, "/proc/%d/task", tcp->pid);
-			dir = opendir(procdir);
-			if (dir != NULL) {
-				unsigned int ntid = 0, nerr = 0;
-				struct_dirent *de;
+		attach_tcb(tcp);
 
-				while ((de = read_dir(dir)) != NULL) {
-					struct tcb *cur_tcp;
-					int tid;
-
-					if (de->d_fileno == 0)
-						continue;
-					tid = string_to_uint(de->d_name);
-					if (tid <= 0)
-						continue;
-					++ntid;
-					if (ptrace_attach_or_seize(tid) < 0) {
-						++nerr;
-						if (debug_flag)
-							error_msg("attach to pid %d failed", tid);
-						continue;
-					}
-					if (debug_flag)
-						error_msg("attach to pid %d succeeded", tid);
-					cur_tcp = tcp;
-					if (tid != tcp->pid)
-						cur_tcp = alloctcb(tid);
-					cur_tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
-					newoutf(cur_tcp);
-				}
-				closedir(dir);
-				if (interactive) {
-					sigprocmask(SIG_SETMASK, &empty_set, NULL);
-					if (interrupted)
-						goto ret;
-					sigprocmask(SIG_BLOCK, &blocked_set, NULL);
-				}
-				ntid -= nerr;
-				if (ntid == 0) {
-					perror_msg("attach: ptrace(PTRACE_ATTACH, ...)");
-					droptcb(tcp);
-					continue;
-				}
-				if (!qflag) {
-					if (ntid > 1)
-						error_msg("Process %u attached"
-							  " with %u threads",
-							  tcp->pid, ntid);
-					else
-						error_msg("Process %u attached",
-							  tcp->pid);
-				}
-				if (!(tcp->flags & TCB_ATTACHED)) {
-					/* -p PID, we failed to attach to PID itself
-					 * but did attach to some of its sibling threads.
-					 * Drop PID's tcp.
-					 */
-					droptcb(tcp);
-				}
-				continue;
-			} /* if (opendir worked) */
-		} /* if (-f) */
-		if (ptrace_attach_or_seize(tcp->pid) < 0) {
-			perror_msg("attach: ptrace(PTRACE_ATTACH, ...)");
-			droptcb(tcp);
-			continue;
+		if (interactive) {
+			sigprocmask(SIG_SETMASK, &empty_set, NULL);
+			if (interrupted)
+				goto ret;
+			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
 		}
-		tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
-		newoutf(tcp);
-		if (debug_flag)
-			error_msg("attach to pid %d (main) succeeded", tcp->pid);
-
-		if (!qflag)
-			error_msg("Process %u attached", tcp->pid);
 	} /* for each tcbtab[] */
 
 	if (daemonized_tracer) {
