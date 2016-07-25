@@ -360,22 +360,26 @@ error_opt_arg(int opt, const char *arg)
 	error_msg_and_help("invalid -%c argument: '%s'", opt, arg);
 }
 
-#if USE_SEIZE
+static const char *ptrace_attach_cmd;
+
 static int
 ptrace_attach_or_seize(int pid)
 {
+#if USE_SEIZE
 	int r;
 	if (!use_seize)
-		return ptrace(PTRACE_ATTACH, pid, 0L, 0L);
+		return ptrace_attach_cmd = "PTRACE_ATTACH",
+		       ptrace(PTRACE_ATTACH, pid, 0L, 0L);
 	r = ptrace(PTRACE_SEIZE, pid, 0L, (unsigned long) ptrace_setoptions);
 	if (r)
-		return r;
+		return ptrace_attach_cmd = "PTRACE_SEIZE", r;
 	r = ptrace(PTRACE_INTERRUPT, pid, 0L, 0L);
-	return r;
-}
+	return ptrace_attach_cmd = "PTRACE_INTERRUPT", r;
 #else
-# define ptrace_attach_or_seize(pid) ptrace(PTRACE_ATTACH, (pid), 0, 0)
+		return ptrace_attach_cmd = "PTRACE_ATTACH",
+		       ptrace(PTRACE_ATTACH, pid, 0L, 0L);
 #endif
+}
 
 /*
  * Used when we want to unblock stopped traced process.
@@ -1034,7 +1038,8 @@ attach_tcb(struct tcb *const tcp)
 				if (ptrace_attach_or_seize(tid) < 0) {
 					++nerr;
 					if (debug_flag)
-						error_msg("attach to pid %d failed", tid);
+						perror_msg("attach: ptrace(%s, %d)",
+							   ptrace_attach_cmd, tid);
 					continue;
 				}
 				if (debug_flag)
@@ -1078,7 +1083,8 @@ attach_tcb(struct tcb *const tcp)
 	} /* if (-f) */
 
 	if (ptrace_attach_or_seize(tcp->pid) < 0) {
-		perror_msg("attach: ptrace(PTRACE_ATTACH, ...)");
+		perror_msg("attach: ptrace(%s, %d)",
+			   ptrace_attach_cmd, tcp->pid);
 		droptcb(tcp);
 		return;
 	}
@@ -1375,7 +1381,8 @@ startup_child(char **argv)
 
 			if (ptrace_attach_or_seize(pid)) {
 				kill_save_errno(pid, SIGKILL);
-				perror_msg_and_die("Can't attach to %d", pid);
+				perror_msg_and_die("attach: ptrace(%s, %d)",
+						   ptrace_attach_cmd, pid);
 			}
 			if (!NOMMU_SYSTEM)
 				kill(pid, SIGCONT);
