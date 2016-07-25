@@ -40,7 +40,7 @@
 # ifndef SEMCTL
 #  define SEMCTL 3
 # endif
-# ifdef MSGRCV
+# ifndef MSGRCV
 #  define MSGRCV 12
 # endif
 
