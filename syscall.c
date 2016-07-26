@@ -586,7 +586,7 @@ decode_socket_subcall(struct tcb *tcp)
 	unsigned int i;
 	for (i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = (sizeof(uint32_t) == current_wordsize)
-				? ((uint32_t *) buf)[i] : buf[i];
+				? ((uint32_t *) (void *) buf)[i] : buf[i];
 }
 #endif
 

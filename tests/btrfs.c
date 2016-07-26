@@ -1353,7 +1353,7 @@ btrfs_test_send_ioctl(void)
 	printf("}) = -1 EBADF (%m)\n");
 
 	args.clone_sources_count = 2;
-	args.clone_sources = (__u64 *)u64_array;
+	args.clone_sources = (__u64 *) (void *) u64_array;
 
 	printf("ioctl(-1, BTRFS_IOC_SEND, "
 	       "{send_fd=%d, clone_sources_count=%" PRI__u64

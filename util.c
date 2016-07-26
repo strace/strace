@@ -171,7 +171,7 @@ int
 next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits)
 {
 	const unsigned endian = 1;
-	int little_endian = *(char*)&endian;
+	int little_endian = * (char *) (void *) &endian;
 
 	const uint8_t *array = bit_array;
 	unsigned pos = cur_bit / 8;

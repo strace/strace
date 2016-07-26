@@ -808,7 +808,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		sectorsize = args.sectorsize,
 		clone_alignment = args.clone_alignment;
 #else
-		reserved32 = (__u32 *)args.reserved;
+		reserved32 = (__u32 *) (void *) args.reserved;
 		nodesize = reserved32[0];
 		sectorsize = reserved32[1];
 		clone_alignment = reserved32[2];
