@@ -13,7 +13,18 @@ main(void)
 		perror_msg_and_skip("setsid");
 
 	long rc = syscall(__NR_vhangup);
-	printf("vhangup() = %ld %s (%m)\n", rc, errno2name());
+
+	/*
+	 * On setsid() success, the new session has no controlling terminal,
+	 * therefore a subsequent vhangup() has nothing to hangup.
+	 *
+	 * The system call, however, returns 0 iff the calling process
+	 * has CAP_SYS_TTY_CONFIG capability.
+	 */
+	if (rc)
+		printf("vhangup() = %ld %s (%m)\n", rc, errno2name());
+	else
+		puts("vhangup() = 0");
 
 	puts("+++ exited with 0 +++");
 	return 0;
