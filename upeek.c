@@ -40,7 +40,7 @@ upeek(int pid, long off, long *res)
 	long val;
 
 	errno = 0;
-	val = ptrace(PTRACE_PEEKUSER, (pid_t)pid, (char *) off, 0);
+	val = ptrace(PTRACE_PEEKUSER, (pid_t) pid, (void *) off, 0);
 	if (val == -1 && errno) {
 		if (errno != ESRCH) {
 			perror_msg("upeek: PTRACE_PEEKUSER pid:%d @0x%lx)", pid, off);

@@ -1995,7 +1995,7 @@ maybe_allocate_tcb(const int pid, int status)
 		/* This can happen if a clone call used
 		 * CLONE_PTRACE itself.
 		 */
-		ptrace(PTRACE_CONT, pid, (char *) 0, 0);
+		ptrace(PTRACE_CONT, pid, NULL, 0);
 		error_msg("Stop of unknown pid %u seen, PTRACE_CONTed it", pid);
 		return NULL;
 	}

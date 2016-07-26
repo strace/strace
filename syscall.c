@@ -1253,7 +1253,8 @@ get_regs(pid_t pid)
 #elif defined ARCH_REGS_FOR_GETREGS
 # if defined SPARC || defined SPARC64
 	/* SPARC systems have the meaning of data and addr reversed */
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, (char *)&ARCH_REGS_FOR_GETREGS, 0);
+	get_regs_error =
+		ptrace(PTRACE_GETREGS, pid, (void *) &ARCH_REGS_FOR_GETREGS, 0);
 # elif defined POWERPC
 	static bool old_kernel = 0;
 	if (old_kernel)

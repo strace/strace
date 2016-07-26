@@ -5,7 +5,7 @@ arch_get_scno(struct tcb *tcp)
 	/* Retrieve the syscall trap instruction. */
 	unsigned long trap;
 	errno = 0;
-	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)sparc_regs.tpc, 0);
+	trap = ptrace(PTRACE_PEEKTEXT, tcp->pid, (void *) sparc_regs.tpc, 0);
 	if (errno)
 		return -1;
 	trap >>= 32;
