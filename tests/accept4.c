@@ -28,16 +28,17 @@
  */
 
 #include "tests.h"
+#include <fcntl.h>
 
-#ifdef HAVE_ACCEPT4
+#if defined HAVE_ACCEPT4 && defined O_CLOEXEC
 
 # define TEST_SYSCALL_NAME accept4
-# define SUFFIX_ARGS , SOCK_CLOEXEC
+# define SUFFIX_ARGS , O_CLOEXEC
 # define SUFFIX_STR ", SOCK_CLOEXEC"
 # include "accept.c"
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_ACCEPT4")
+SKIP_MAIN_UNDEFINED("HAVE_ACCEPT4 && O_CLOEXEC")
 
 #endif
