@@ -103,8 +103,11 @@ echo 'END OF TEST SUITE INFORMATION'
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Tue Jul 26 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.13-1
+- v4.12 -> v4.13.
+
 * Tue May 31 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.12-1
-- 4.11.0.163.9720 -> 4.12.
+- v4.11-163-g972018f -> v4.12.
 
 * Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0.163.9720-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
