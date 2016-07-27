@@ -48,7 +48,7 @@ main(void)
 
 	printf("adjtimex\\(\\{modes=0, offset=%jd, freq=%jd, maxerror=%jd"
 	       ", esterror=%jd, status=%s, constant=%jd, precision=%jd"
-	       ", tolerance=%jd, time={%jd, %jd}, tick=%jd, ppsfreq=%jd"
+	       ", tolerance=%jd, time=\\{%jd, %jd\\}, tick=%jd, ppsfreq=%jd"
 	       ", jitter=%jd, shift=%d, stabil=%jd, jitcnt=%jd, calcnt=%jd"
 	       ", errcnt=%jd, stbcnt=%jd"
 #ifdef HAVE_STRUCT_TIMEX_TAI
