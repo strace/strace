@@ -84,7 +84,7 @@ case "$arch" in
 	;;
 esac
 
-AM_CONDITIONAL(HAVE_RUNTIME, [test "$st_cv_runtime" = yes])
+AM_CONDITIONAL(HAVE_RUNTIME, [test "$st_cv_mpers$st_cv_runtime" = yesyes])
 AM_CONDITIONAL(HAVE_MPERS, [test "$st_cv_mpers" = yes])
 
 popdef([st_cv_mpers])
