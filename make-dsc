@@ -8,7 +8,7 @@ $(sed '/^Source:[[:space:]]*/!d;q' debian/control)
 Binary: $(sed '/^Package:[[:space:]]*/!d;s///' debian/control |
 	tr '\n' ' ' | sed 's/ ./,&/g')
 $(sed '/^Architecture:[[:space:]]*/!d;q' debian/control)
-Version: $(sed -n '1s/^[^(]*(\([^)]\+\)).*/\1/p' debian/changelog)
+Version: $(sed -r -n '1s/^[^(]*\(([^)]+)\).*/\1/p' debian/changelog)
 $(sed '/^Maintainer:[[:space:]]*/!d;q' debian/control)
 $(sed '/^Homepage:[[:space:]]*/!d;q' debian/control)
 $(sed '/^Standards-Version:[[:space:]]*/!d;q' debian/control)

@@ -14,7 +14,7 @@ test_c()
 	sedexpr="$1"; shift
 
 	run_strace -c -w -S "$sortby" ./readv > /dev/null
-	sed -ne "$sedexpr" < "$LOG" > "$OUT"
+	sed -r -n -e "$sedexpr" < "$LOG" > "$OUT"
 
 	[ -s "$OUT" ] ||
 		fail_ "$STRACE $args output mismatch"
@@ -25,8 +25,8 @@ test_c()
 	}
 }
 
-c='[[:space:]]\+\([^[:space:]]\+\)'
-test_c calls '-n -r' '/^[[:space:]]\+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'
-test_c name '' '/^[[:space:]]\+[0-9]/ s/^'"$c$c$c$c"'\([[:space:]]\+[0-9]\+\)\?'"$c"'$/\6/p'
+c='[[:space:]]+([^[:space:]]+)'
+test_c calls '-n -r' '/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'
+test_c name '' '/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+[0-9]+)?'"$c"'$/\6/p'
 
 rm -f "$OUT"

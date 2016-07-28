@@ -778,7 +778,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 ksysent.h: $(srcdir)/ksysent.sed
 	echo '#include <asm/unistd.h>' | \
 		$(CPP) $(AM_CPPFLAGS) $(CPPFLAGS) -dM - > $@.t1
-	LC_COLLATE=C sed -n -f $(srcdir)/ksysent.sed < $@.t1 > $@.t2
+	LC_COLLATE=C sed -r -n -f $(srcdir)/ksysent.sed < $@.t1 > $@.t2
 	mv -f $@.t2 $@
 	rm -f $@.t1
 

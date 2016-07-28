@@ -8,7 +8,7 @@ run_strace -V > "$LOG"
 
 getval()
 {
-	sed -n 's/#define[[:space:]]*'"$1"'[[:space:]]*"\([^"]*\)".*/\1/p' ../config.h
+	sed -r -n 's/#define[[:space:]]*'"$1"'[[:space:]]*"([^"]*)".*/\1/p' ../config.h
 }
 
 printf "%s -- version %s\n" "$(getval PACKAGE_NAME)" "$(getval VERSION)" > "$EXP"

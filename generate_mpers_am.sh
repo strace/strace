@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-list="$(sed -n '/^strace_SOURCES[[:space:]]*=/,/^[[:space:]]*# end of strace_SOURCES/ s/^[[:space:]]*\([[:alnum:]][^.]*\.c\)[[:space:]]*\\$/\1/p' Makefile.am |
-	xargs -r grep -lx '#[[:space:]]*include[[:space:]]\+MPERS_DEFS' |
+list="$(sed -r -n '/^strace_SOURCES[[:space:]]*=/,/^[[:space:]]*# end of strace_SOURCES/ s/^[[:space:]]*([[:alnum:]][^.]*\.c)[[:space:]]*\\$/\1/p' Makefile.am |
+	xargs -r grep -Elx '#[[:space:]]*include[[:space:]]+MPERS_DEFS' |
 	tr '\n' ' ')"
 
 cat > mpers.am <<EOF
@@ -9,5 +9,5 @@ cat > mpers.am <<EOF
 mpers_source_files = $list
 EOF
 
-sed -n 's/^#[[:space:]]*include[[:space:]]*"xlat\/\([^."]\+\)\.h".*/extern const struct xlat \1[];/p' \
+sed -r -n 's/^#[[:space:]]*include[[:space:]]*"xlat\/([a-z][a-z_0-9]*)\.h".*/extern const struct xlat \1[];/p' \
 	$list > mpers_xlat.h

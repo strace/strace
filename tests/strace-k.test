@@ -41,7 +41,7 @@ run_prog ./stack-fcall
 run_strace -e getpid -k $args
 
 expected='getpid f3 f2 f1 f0 main '
-result=$(sed -n '1,/(main+0x[a-f0-9]\+) .*/ s/^.*(\([^+]\+\)+0x[a-f0-9]\+) .*/\1/p' "$LOG" |
+result=$(sed -r -n '1,/\(main\+0x[a-f0-9]+\) .*/ s/^.*\(([^+]+)\+0x[a-f0-9]+\) .*/\1/p' "$LOG" |
 	tr '\n' ' ')
 
 test "$result" = "$expected" || {

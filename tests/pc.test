@@ -37,13 +37,13 @@ args="-if $args"
 $STRACE $args 2> "$LOG" ||
 	dump_log_and_fail_with "$STRACE $args failed"
 
-len="$(sed -n 's/^\[[[:xdigit:]]\+\] write(-1, NULL, \([[:digit:]]\{1,2\}\))[[:space:]]\+= -1 .*/\1/p' "$LOG")" &&
+len="$(sed -r -n 's/^\[[[:xdigit:]]+\] write\(-1, NULL, ([[:digit:]]{1,2})\)[[:space:]]+= -1 .*/\1/p' "$LOG")" &&
 [ -n "$len" ] &&
-pid="$(sed -n 's/^\[[[:xdigit:]]\{'"$len"'\}\] --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_\(KILLED\|DUMPED\), si_pid=\([[:digit:]]\+\), .*/\2/p' "$LOG")" &&
+pid="$(sed -r -n 's/^\[[[:xdigit:]]{'"$len"'}\] --- SIGCHLD \{si_signo=SIGCHLD, si_code=CLD_(KILLED|DUMPED), si_pid=([[:digit:]]+), .*/\2/p' "$LOG")" &&
 [ -n "$pid" ] &&
-ip="$(sed -n 's/^\[pid \+'"$pid"'\] \[\([[:xdigit:]]\{'"$len"'\}\)] --- SIGSEGV {.*} ---$/\1/p' "$LOG")" &&
+ip="$(sed -r -n 's/^\[pid +'"$pid"'\] \[([[:xdigit:]]{'"$len"'})] --- SIGSEGV \{.*\} ---$/\1/p' "$LOG")" &&
 [ -n "$ip" ] &&
-addr="$(echo "$ip" |sed 's/^0\+//')" &&
+addr="$(echo "$ip" |sed -r 's/^0+//')" &&
 [ -n "$addr" ] ||
 	dump_log_and_fail_with
 
