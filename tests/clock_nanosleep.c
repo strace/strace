@@ -47,7 +47,7 @@ main(void)
 		struct timespec ts;
 		uint32_t pad[2];
 	} req = {
-		.ts = { .tv_nsec = 0xc0de1 },
+		.ts.tv_nsec = 0xc0de1,
 		.pad = { 0xdeadbeef, 0xbadc0ded }
 	}, rem = {
 		.ts = { .tv_sec = 0xc0de2, .tv_nsec = 0xc0de3 },

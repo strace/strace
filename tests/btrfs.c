@@ -1567,9 +1567,7 @@ btrfs_test_dev_replace_ioctl(void)
 {
 	struct btrfs_ioctl_dev_replace_args args = {
 		.cmd = BTRFS_IOCTL_DEV_REPLACE_CMD_START,
-		.start = {
-			.srcdevid = 1,
-		},
+		.start.srcdevid = 1
 	};
 	strcpy((char *)args.start.srcdev_name, "/dev/sda1");
 	strcpy((char *)args.start.tgtdev_name, "/dev/sdb1");
