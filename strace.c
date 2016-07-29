@@ -1078,8 +1078,7 @@ startup_attach(void)
 
 					if (de->d_fileno == 0)
 						continue;
-					/* we trust /proc filesystem */
-					tid = atoi(de->d_name);
+					tid = string_to_uint(de->d_name);
 					if (tid <= 0)
 						continue;
 					++ntid;
