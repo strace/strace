@@ -1,6 +1,10 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in behavior
+  * When using -p option without a command and no processes has been attached,
+    strace exits with exit status 1.
+
 Noteworthy changes in release 4.13 (2016-07-26)
 ===============================================
 

@@ -138,7 +138,7 @@ static bool skip_one_b_execve = 0;
 /* Are we "strace PROG" and need to hide everything until execve? */
 bool hide_log_until_execve = 0;
 
-static int exit_code = 0;
+static int exit_code;
 static int strace_child = 0;
 static int strace_tracer_pid = 0;
 
@@ -2386,6 +2386,8 @@ int
 main(int argc, char *argv[])
 {
 	init(argc, argv);
+
+	exit_code = !nprocs;
 
 	while (trace())
 		;

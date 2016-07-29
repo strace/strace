@@ -601,10 +601,13 @@ unless
 is used.
 .LP
 When using
-.BR \-p ,
+.B \-p
+without a
+.IR command ,
 the exit status of
 .B strace
-is zero unless there was an unexpected error in doing the tracing.
+is zero unless no processes has been attached or there was an unexpected error
+in doing the tracing.
 .SH "SETUID INSTALLATION"
 If
 .B strace
