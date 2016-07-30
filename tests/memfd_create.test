@@ -1,11 +1,6 @@
 #!/bin/sh
 
-# Check memfd_create syscall decoding.
+# Check decoding of memfd_create syscall.
 
 . "${srcdir=.}/init.sh"
-
-run_prog
-run_strace -e memfd_create $args
-match_grep
-
-exit 0
+run_strace_match_diff
