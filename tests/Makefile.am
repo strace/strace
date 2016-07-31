@@ -304,7 +304,7 @@ check_PROGRAMS = \
 	sigaltstack \
 	siginfo \
 	signal_receive \
-	signalfd \
+	signalfd4 \
 	sigreturn \
 	sleep \
 	socketcall \
@@ -626,7 +626,7 @@ DECODER_TESTS = \
 	sigaction.test \
 	sigaltstack.test \
 	siginfo.test \
-	signalfd.test \
+	signalfd4.test \
 	sigreturn.test \
 	socketcall.test \
 	splice.test \
@@ -750,7 +750,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     setugid.c \
 	     sigaction.awk \
 	     sigaltstack.expected \
-	     signalfd.expected \
+	     signalfd4.expected \
 	     sockname.c \
 	     statfs.expected \
 	     statx.sh \

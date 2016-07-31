@@ -248,7 +248,7 @@ sigaction
 sigaltstack
 siginfo
 signal_receive
-signalfd
+signalfd4
 sigreturn
 sleep
 socketcall
