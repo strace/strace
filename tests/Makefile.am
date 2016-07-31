@@ -750,7 +750,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     setugid.c \
 	     sigaction.awk \
 	     sigaltstack.expected \
-	     signalfd4.expected \
 	     sockname.c \
 	     statfs.expected \
 	     statx.sh \

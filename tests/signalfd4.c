@@ -1,4 +1,6 @@
 /*
+ * Check decoding of signalfd4 syscall.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -27,28 +29,62 @@
 
 #include "tests.h"
 #include <fcntl.h>
+#include <sys/syscall.h>
 
-#if defined HAVE_SYS_SIGNALFD_H && defined HAVE_SIGNALFD && defined O_CLOEXEC
+#if defined __NR_rt_sigprocmask \
+ && defined HAVE_SYS_SIGNALFD_H \
+ && defined HAVE_SIGNALFD \
+ && defined O_CLOEXEC
 
 # include <signal.h>
+# include <stdio.h>
 # include <unistd.h>
 # include <sys/signalfd.h>
+
+static unsigned int
+get_sigset_size(void)
+{
+	const unsigned int big_size = 1024 / 8;
+	unsigned int set_size;
+
+	for (set_size = big_size; set_size; set_size >>= 1) {
+		if (!syscall(__NR_rt_sigprocmask, SIG_SETMASK,
+			     NULL, NULL, set_size))
+			break;
+	}
+
+	if (!set_size)
+		perror_msg_and_fail("rt_sigprocmask");
+
+	return set_size;
+}
 
 int
 main(void)
 {
+	const char *const sigs = SIGUSR2 < SIGCHLD ? "USR2 CHLD" : "CHLD USR2";
+	const unsigned int size = get_sigset_size();
+
 	sigset_t mask;
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR2);
 	sigaddset(&mask, SIGCHLD);
-	(void) close(0);
-	if (signalfd(-1, &mask, O_CLOEXEC | O_NONBLOCK))
-		perror_msg_and_skip("signalfd");
+
+	int fd = signalfd(-1, &mask, O_CLOEXEC | O_NONBLOCK);
+	if (fd < 0)
+		printf("signalfd4(-1, [%s], %u, SFD_CLOEXEC|SFD_NONBLOCK)"
+		       " = %d %s (%m)\n", sigs, size, fd, errno2name());
+	else
+		printf("signalfd4(-1, [%s], %u, SFD_CLOEXEC|SFD_NONBLOCK)"
+		       " = %d\n", sigs, size, fd);
+
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_SYS_SIGNALFD_H && HAVE_SIGNALFD && O_CLOEXEC")
+SKIP_MAIN_UNDEFINED("__NR_rt_sigprocmask && HAVE_SYS_SIGNALFD_H"
+		    " && HAVE_SIGNALFD && O_CLOEXEC")
 
 #endif
