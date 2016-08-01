@@ -728,7 +728,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     count-f.expected \
 	     eventfd.expected \
-	     fanotify_mark.expected \
 	     filter-unavailable.expected \
 	     fstatat.c \
 	     fstatx.c \

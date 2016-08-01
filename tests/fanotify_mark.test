@@ -1,11 +1,6 @@
 #!/bin/sh
 
-# Check fanotify_mark syscall decoding.
+# Check decoding of fanotify_mark syscall.
 
 . "${srcdir=.}/init.sh"
-
-run_prog
-run_strace -efanotify_mark $args
-match_grep
-
-exit 0
+run_strace_match_diff

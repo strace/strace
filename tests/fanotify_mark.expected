@@ -1,1 +1,0 @@
-fanotify_mark\(-1, FAN_MARK_ADD, FAN_MODIFY\|FAN_ONDIR, AT_FDCWD, "\."\) += -1.*
