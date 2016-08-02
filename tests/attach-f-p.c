@@ -31,10 +31,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -45,38 +43,24 @@ typedef union {
 	pid_t pid;
 } retval_t;
 
-typedef struct {
-	sigset_t set;
-	unsigned int no;
-} thread_arg_t;
-
 static const char text_parent[] = "attach-f-p.test parent";
 static const char *child[N] = {
 	"attach-f-p.test child 0",
 	"attach-f-p.test child 1",
 	"attach-f-p.test child 2"
 };
-static const int sigs[N] = { SIGALRM, SIGUSR1, SIGUSR2 };
-static const struct itimerspec its[N] = {
-	{ .it_value.tv_sec = 1 },
-	{ .it_value.tv_sec = 2 },
-	{ .it_value.tv_sec = 3 }
-};
-static thread_arg_t args[N] = {
-	{ .no = 0 },
-	{ .no = 1 },
-	{ .no = 2 }
-};
+typedef int pipefd[2];
+static pipefd pipes[N];
 
 static void *
 thread(void *a)
 {
-	thread_arg_t *arg = a;
-	int signo;
-	errno = sigwait(&arg->set, &signo);
-	if (errno)
-		perror_msg_and_fail("sigwait");
-	assert(chdir(child[arg->no]) == -1);
+	unsigned int no = (long) a;
+	int i;
+
+	if (read(pipes[no][0], &i, sizeof(i)) != (int) sizeof(i))
+		perror_msg_and_fail("read[%u]", no);
+	assert(chdir(child[no]) == -1);
 	retval_t retval = { .pid = syscall(__NR_gettid) };
 	return retval.ptr;
 }
@@ -84,31 +68,17 @@ thread(void *a)
 int
 main(void)
 {
-	static timer_t timerid[N];
 	pthread_t t[N];
 	unsigned int i;
 
-	for (i = 0; i < N; ++i) {
-		sigemptyset(&args[i].set);
-		sigaddset(&args[i].set, sigs[i]);
-
-		errno = pthread_sigmask(SIG_BLOCK, &args[i].set, NULL);
-		if (errno)
-			perror_msg_and_fail("pthread_sigmask");
-	}
+	if (write(3, "", 0) != 0)
+		perror_msg_and_fail("write");
 
 	for (i = 0; i < N; ++i) {
-		struct sigevent sev = {
-			.sigev_notify = SIGEV_SIGNAL,
-			.sigev_signo = sigs[i]
-		};
-		if (timer_create(CLOCK_MONOTONIC, &sev, &timerid[i]))
-			perror_msg_and_skip("timer_create");
+		if (pipe(pipes[i]))
+			perror_msg_and_fail("pipe");
 
-		if (timer_settime(timerid[i], 0, &its[i], NULL))
-			perror_msg_and_fail("timer_settime");
-
-		errno = pthread_create(&t[i], NULL, thread, (void *) &args[i]);
+		errno = pthread_create(&t[i], NULL, thread, (void *) (long) i);
 		if (errno)
 			perror_msg_and_fail("pthread_create");
 	}
@@ -117,6 +87,10 @@ main(void)
 		perror_msg_and_fail("write");
 
 	for (i = 0; i < N; ++i) {
+		/* sleep a bit to let the tracer catch up */
+		sleep(1);
+		if (write(pipes[i][1], &i, sizeof(i)) != (int) sizeof(i))
+			perror_msg_and_fail("write[%u]", i);
 		retval_t retval;
 		errno = pthread_join(t[i], &retval.ptr);
 		if (errno)
@@ -128,12 +102,7 @@ main(void)
 	}
 
 	/* sleep a bit more to let the tracer catch up */
-	if (timer_settime(timerid[0], 0, &its[0], NULL))
-		perror_msg_and_fail("timer_settime");
-	int signo;
-	errno = sigwait(&args[0].set, &signo);
-	if (errno)
-		perror_msg_and_fail("sigwait");
+	sleep(1);
 
 	pid_t pid = getpid();
 	assert(chdir(text_parent) == -1);

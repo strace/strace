@@ -44,6 +44,6 @@ while ! [ -s "$OUT" ]; do
 		fail_ 'set_ptracer_any sleep failed'
 done
 
-run_strace -a32 -f -echdir -esignal=none -p $tracee_pid
+run_strace -a32 -f -echdir -p $tracee_pid
 match_diff "$LOG" "$EXP"
 rm -f "$EXP" "$OUT"
