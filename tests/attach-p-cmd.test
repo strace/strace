@@ -32,9 +32,10 @@
 run_prog_skip_if_failed \
 	kill -0 $$
 run_prog ./attach-p-cmd-cmd > /dev/null
-run_prog ./attach-p-cmd-p 1 > /dev/null
+run_prog ./attach-p-cmd-p > /dev/null
 
-./set_ptracer_any ./attach-p-cmd-p 1 > "$OUT" &
+rm -f "$OUT"
+./set_ptracer_any ./attach-p-cmd-p >> "$OUT" &
 tracee_pid=$!
 
 while ! [ -s "$OUT" ]; do
@@ -43,11 +44,5 @@ while ! [ -s "$OUT" ]; do
 done
 
 run_strace -a30 -echdir -p $tracee_pid ./attach-p-cmd-cmd > "$OUT"
-{
-printf '%-5d --- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---\n' $tracee_pid
-printf '%-5d chdir("attach-p-cmd.test -p") = -1 ENOENT (No such file or directory)\n' $tracee_pid
-printf '%-5d +++ exited with 0 +++\n' $tracee_pid
-} >> "$OUT"
-
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"

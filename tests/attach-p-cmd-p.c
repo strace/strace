@@ -28,8 +28,8 @@
  */
 
 #include "tests.h"
-#include <errno.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -39,14 +39,8 @@ handler(int signo)
 }
 
 int
-main(int ac, char **av)
+main(void)
 {
-	if (ac < 2)
-		error_msg_and_fail("missing operand");
-
-	if (ac > 2)
-		error_msg_and_fail("extra operand");
-
 	const struct sigaction act = { .sa_handler = handler };
 	if (sigaction(SIGALRM, &act, NULL))
 		perror_msg_and_skip("sigaction");
@@ -56,8 +50,17 @@ main(int ac, char **av)
 	if (sigprocmask(SIG_UNBLOCK, &mask, NULL))
 		perror_msg_and_skip("sigprocmask");
 
-	alarm(atoi(av[1]));
+	alarm(1);
 	pause();
 
-	return !(chdir("attach-p-cmd.test -p") && ENOENT == errno);
+	static const char dir[] = "attach-p-cmd.test -p";
+	pid_t pid = getpid();
+	int rc = chdir(dir);
+
+	printf("%-5d --- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---\n"
+	       "%-5d chdir(\"%s\") = %d %s (%m)\n"
+	       "%-5d +++ exited with 0 +++\n",
+	       pid, pid, dir, rc, errno2name(), pid);
+
+	return 0;
 }
