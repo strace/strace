@@ -732,7 +732,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     fstatat.c \
 	     fstatx.c \
 	     getresugid.c \
-	     ip_mreq.expected \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
 	     ksysent.sed \
