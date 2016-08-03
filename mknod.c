@@ -47,11 +47,12 @@
 static void
 decode_mknod(struct tcb *tcp, int offset)
 {
-	int mode = tcp->u_arg[offset + 1];
+	unsigned short mode = tcp->u_arg[offset + 1];
 	unsigned int dev;
 
 	printpath(tcp, tcp->u_arg[offset]);
-	tprintf(", %s", sprintmode(mode));
+	tprints(", ");
+	print_symbolic_mode_t(mode);
 	switch (mode & S_IFMT) {
 	case S_IFCHR:
 	case S_IFBLK:

@@ -37,7 +37,9 @@ SYS_FUNC(mq_open)
 	tprint_open_modes(tcp->u_arg[1]);
 	if (tcp->u_arg[1] & O_CREAT) {
 		/* mode */
-		tprintf(", %#lo, ", tcp->u_arg[2]);
+		tprints(", ");
+		print_numeric_umode_t(tcp->u_arg[2]);
+		tprints(", ");
 		printmqattr(tcp, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;

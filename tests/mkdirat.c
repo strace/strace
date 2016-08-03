@@ -3,22 +3,11 @@
 
 #ifdef __NR_mkdirat
 
-# include <stdio.h>
-# include <unistd.h>
-
-int
-main(void)
-{
-	static const char sample[] = "mkdirat.sample";
-	const long fd = (long) 0xdeadbeefffffffff;
-
-	long rc = syscall(__NR_mkdirat, fd, sample, 0600);
-	printf("mkdirat(%d, \"%s\", 0600) = %ld %s (%m)\n",
-	       (int) fd, sample, rc, errno2name());
-
-	puts("+++ exited with 0 +++");
-	return 0;
-}
+# define TEST_SYSCALL_NR		__NR_mkdirat
+# define TEST_SYSCALL_STR		"mkdirat"
+# define TEST_SYSCALL_PREFIX_ARGS	(long int) 0xdeadbeefffffffff,
+# define TEST_SYSCALL_PREFIX_STR	"-1, "
+# include "umode_t.c"
 
 #else
 

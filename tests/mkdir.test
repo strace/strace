@@ -3,4 +3,4 @@
 # Check mkdir syscall decoding.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -a21
+run_strace_match_diff -a20

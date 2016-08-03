@@ -1,9 +1,7 @@
 /*
- * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
- * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
- * Copyright (c) 1993-1996 Rick Sladkey <jrs@world.std.com>
- * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 2012 Denys Vlasenko <vda.linux@googlemail.com>
+ * Check decoding of umode_t type syscall arguments.
+ *
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,45 +27,46 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
-
-#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
-#include "xlat/modetypes.h"
+#ifndef TEST_SYSCALL_PREFIX_ARGS
+# define TEST_SYSCALL_PREFIX_ARGS
+#endif
+#ifndef TEST_SYSCALL_PREFIX_STR
+# define TEST_SYSCALL_PREFIX_STR ""
+#endif
 
-void
-print_symbolic_mode_t(const unsigned int mode)
+static const char sample[] = TEST_SYSCALL_STR;
+
+static void
+test_syscall(unsigned short mode)
 {
-	const char *ifmt;
+	unsigned long lmode = (unsigned long) 0xffffffffffff0000 | mode;
+	long rc = syscall(TEST_SYSCALL_NR, TEST_SYSCALL_PREFIX_ARGS
+			  sample, lmode);
 
-	if (mode & S_IFMT) {
-		ifmt = xlookup(modetypes, mode & S_IFMT);
-		if (!ifmt) {
-			tprintf("%#03o", mode);
-			return;
-		}
-	} else {
-		ifmt = NULL;
-	}
-
-	tprintf("%s%s%s%s%s%#03o",
-		ifmt ? ifmt : "",
-		ifmt ? "|" : "",
-		(mode & S_ISUID) ? "S_ISUID|" : "",
-		(mode & S_ISGID) ? "S_ISGID|" : "",
-		(mode & S_ISVTX) ? "S_ISVTX|" : "",
-		mode & ~(S_IFMT|S_ISUID|S_ISGID|S_ISVTX));
+	printf("%s(%s\"%s\", %#03ho) = %ld %s (%m)\n",
+	       sample, TEST_SYSCALL_PREFIX_STR, sample, mode, rc, errno2name());
 }
 
-void
-print_numeric_umode_t(const unsigned short mode)
+int
+main(void)
 {
-	tprintf("%#03ho", mode);
-}
+	test_syscall(0);
+	test_syscall(0xffff);
+	test_syscall(06);
+	test_syscall(060);
+	test_syscall(0600);
+	test_syscall(024);
+	test_syscall(S_IFREG);
+	test_syscall(S_IFDIR | 06);
+	test_syscall(S_IFLNK | 060);
+	test_syscall(S_IFIFO | 0600);
+	test_syscall(S_IFCHR | 024);
+	test_syscall((0xffff & ~S_IFMT) | S_IFBLK);
 
-void
-print_numeric_long_umask(const unsigned long mode)
-{
-	tprintf("%#03lo", mode);
+	puts("+++ exited with 0 +++");
+	return 0;
 }

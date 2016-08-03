@@ -1040,7 +1040,8 @@ trace_syscall_exiting(struct tcb *tcp)
 					tprintf("= %#lx", tcp->u_rval);
 				break;
 			case RVAL_OCTAL:
-				tprintf("= %#lo", tcp->u_rval);
+				tprints("= ");
+				print_numeric_long_umask(tcp->u_rval);
 				break;
 			case RVAL_UDECIMAL:
 #if SUPPORTED_PERSONALITIES > 1

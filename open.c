@@ -124,7 +124,8 @@ decode_open(struct tcb *tcp, int offset)
 	tprint_open_modes(tcp->u_arg[offset + 1]);
 	if (tcp->u_arg[offset + 1] & O_CREAT) {
 		/* mode */
-		tprintf(", %#lo", tcp->u_arg[offset + 2]);
+		tprints(", ");
+		print_numeric_umode_t(tcp->u_arg[offset + 2]);
 	}
 
 	return RVAL_DECODED | RVAL_FD;
@@ -144,7 +145,8 @@ SYS_FUNC(openat)
 SYS_FUNC(creat)
 {
 	printpath(tcp, tcp->u_arg[0]);
-	tprintf(", %#lo", tcp->u_arg[1]);
+	tprints(", ");
+	print_numeric_umode_t(tcp->u_arg[1]);
 
 	return RVAL_DECODED | RVAL_FD;
 }

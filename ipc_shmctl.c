@@ -67,7 +67,7 @@ print_shmid_ds(struct tcb *tcp, const long addr, int cmd)
 		printuid("uid=", shmid_ds.shm_perm.uid);
 		printuid(", gid=", shmid_ds.shm_perm.gid);
 		tprints(", mode=");
-		tprints(sprintmode(shmid_ds.shm_perm.mode));
+		print_numeric_umode_t(shmid_ds.shm_perm.mode);
 
 		if (cmd != IPC_STAT) {
 			tprints("}, ...}");

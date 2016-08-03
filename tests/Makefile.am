@@ -759,6 +759,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     struct_flock.c \
 	     sun_path.expected \
 	     uio.expected \
+	     umode_t.c \
 	     umovestr.expected \
 	     unix-pair-send-recv.expected \
 	     unix-pair-sendto-recvfrom.expected \

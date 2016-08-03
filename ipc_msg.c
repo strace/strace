@@ -50,7 +50,7 @@ SYS_FUNC(msgget)
 		tprints("IPC_PRIVATE, ");
 	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprints("|");
-	tprintf("%#lo", tcp->u_arg[1] & 0777);
+	print_numeric_umode_t(tcp->u_arg[1] & 0777);
 	return RVAL_DECODED;
 }
 

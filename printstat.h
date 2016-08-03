@@ -51,47 +51,49 @@
 static void
 DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 {
+	tprints("{");
 	if (!abbrev(tcp)) {
-		tprintf("{st_dev=makedev(%u, %u), st_ino=%llu, st_mode=%s, ",
+		tprintf("st_dev=makedev(%u, %u), st_ino=%llu, st_mode=",
 			(unsigned int) STAT_MAJOR(statbuf->st_dev),
 			(unsigned int) STAT_MINOR(statbuf->st_dev),
-			widen_to_ull(statbuf->st_ino),
-			sprintmode(statbuf->st_mode));
-		tprintf("st_nlink=%u, st_uid=%u, st_gid=%u, ",
+			widen_to_ull(statbuf->st_ino));
+		print_symbolic_mode_t(statbuf->st_mode);
+		tprintf(", st_nlink=%u, st_uid=%u, st_gid=%u",
 			(unsigned int) statbuf->st_nlink,
 			(unsigned int) statbuf->st_uid,
 			(unsigned int) statbuf->st_gid);
 #ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
-		tprintf("st_blksize=%u, ", (unsigned int) statbuf->st_blksize);
+		tprintf(", st_blksize=%u", (unsigned int) statbuf->st_blksize);
 #endif
 #ifdef HAVE_STRUCT_STAT_ST_BLOCKS
-		tprintf("st_blocks=%llu, ", widen_to_ull(statbuf->st_blocks));
+		tprintf(", st_blocks=%llu", widen_to_ull(statbuf->st_blocks));
 #endif
 	} else {
-		tprintf("{st_mode=%s, ", sprintmode(statbuf->st_mode));
+		tprints("st_mode=");
+		print_symbolic_mode_t(statbuf->st_mode);
 	}
 
 	switch (statbuf->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
 #ifdef HAVE_STRUCT_STAT_ST_RDEV
-		tprintf("st_rdev=makedev(%u, %u), ",
+		tprintf(", st_rdev=makedev(%u, %u)",
 			(unsigned int) STAT_MAJOR(statbuf->st_rdev),
 			(unsigned int) STAT_MINOR(statbuf->st_rdev));
 #else /* !HAVE_STRUCT_STAT_ST_RDEV */
-		tprintf("st_size=makedev(%u, %u), ",
+		tprintf(", st_size=makedev(%u, %u)",
 			(unsigned int) STAT_MAJOR(statbuf->st_size),
 			(unsigned int) STAT_MINOR(statbuf->st_size));
 #endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 		break;
 	default:
-		tprintf("st_size=%llu, ", widen_to_ull(statbuf->st_size));
+		tprintf(", st_size=%llu", widen_to_ull(statbuf->st_size));
 		break;
 	}
 
 	if (!abbrev(tcp)) {
 		const bool cast = sizeof(statbuf->st_atime) == sizeof(int);
 
-		tprints("st_atime=");
+		tprints(", st_atime=");
 		tprints(sprinttime(cast ? (time_t) (int) statbuf->st_atime:
 					  (time_t) statbuf->st_atime));
 #ifdef HAVE_STRUCT_STAT_ST_ATIME_NSEC
@@ -122,10 +124,10 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 #ifdef HAVE_STRUCT_STAT_ST_GEN
 		tprintf(", st_gen=%u", (unsigned int) statbuf->st_gen);
 #endif
-		tprints("}");
 	} else {
-		tprints("...}");
+		tprints(", ...");
 	}
+	tprints("}");
 }
 
 #undef STAT_MINOR

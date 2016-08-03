@@ -4,7 +4,8 @@ static void
 decode_chmod(struct tcb *tcp, const int offset)
 {
 	printpath(tcp, tcp->u_arg[offset]);
-	tprintf(", %#lo", tcp->u_arg[offset + 1]);
+	tprints(", ");
+	print_numeric_umode_t(tcp->u_arg[offset + 1]);
 }
 
 SYS_FUNC(chmod)
@@ -25,7 +26,8 @@ SYS_FUNC(fchmodat)
 SYS_FUNC(fchmod)
 {
 	printfd(tcp, tcp->u_arg[0]);
-	tprintf(", %#lo", tcp->u_arg[1]);
+	tprints(", ");
+	print_numeric_umode_t(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }

@@ -50,7 +50,7 @@ SYS_FUNC(shmget)
 	tprintf(", %lu, ", tcp->u_arg[1]);
 	if (printflags(shm_resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 		tprints("|");
-	tprintf("%#lo", tcp->u_arg[2] & 0777);
+	print_numeric_umode_t(tcp->u_arg[2] & 0777);
 	return RVAL_DECODED;
 }
 
