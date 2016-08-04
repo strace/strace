@@ -19,8 +19,21 @@ case "$CC" in
 		apt_get_install gcc-multilib "$CC"
 		;;
 	musl-gcc)
-		sudo add-apt-repository ppa:bortis/musl -y
-		apt_get_install gcc-multilib musl-tools linux-musl-dev
+		apt_get_install gcc-multilib
+		git clone --depth=1 https://github.com/strace/musl
+		cd musl
+			CC=gcc
+			./configure --prefix=/opt/musl --exec-prefix=/usr
+			make
+			sudo make install
+		cd -
+		rm -rf musl
+		sudo ln -s \
+			/usr/include/linux \
+			/usr/include/asm \
+			/usr/include/asm-generic \
+			/usr/include/mtd \
+			/opt/musl/include/
 		;;
 esac
 
