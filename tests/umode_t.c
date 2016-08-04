@@ -47,8 +47,14 @@ test_syscall(unsigned short mode)
 	long rc = syscall(TEST_SYSCALL_NR, TEST_SYSCALL_PREFIX_ARGS
 			  sample, lmode);
 
-	printf("%s(%s\"%s\", %#03ho) = %ld %s (%m)\n",
-	       sample, TEST_SYSCALL_PREFIX_STR, sample, mode, rc, errno2name());
+	if (mode <= 07)
+		printf("%s(%s\"%s\", 00%d) = %ld %s (%m)\n",
+		       sample, TEST_SYSCALL_PREFIX_STR,
+		       sample, (int) mode, rc, errno2name());
+	else
+		printf("%s(%s\"%s\", %#03ho) = %ld %s (%m)\n",
+		       sample, TEST_SYSCALL_PREFIX_STR,
+		       sample, mode, rc, errno2name());
 }
 
 int
