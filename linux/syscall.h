@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef STRACE_LINUX_SYSCALL_H
+#define STRACE_LINUX_SYSCALL_H
+
 #include "dummy.h"
 #include "sys_func.h"
 #include "sen.h"
@@ -42,3 +45,5 @@ extern SYS_FUNC(setresuid16);
 extern SYS_FUNC(setreuid16);
 extern SYS_FUNC(setuid16);
 #endif
+
+#endif /* !STRACE_LINUX_SYSCALL_H */

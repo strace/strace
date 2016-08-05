@@ -1,3 +1,6 @@
+#ifndef STRACE_LINUX_NETLINK_DIAG_H
+#define STRACE_LINUX_NETLINK_DIAG_H
+
 struct netlink_diag_req {
 	uint8_t sdiag_family;
 	uint8_t sdiag_protocol;
@@ -22,3 +25,5 @@ struct netlink_diag_msg {
 
 #define NDIAG_SHOW_MEMINFO           0x00000001
 #define NDIAG_PROTO_ALL              ((uint8_t) ~0)
+
+#endif /* !STRACE_LINUX_NETLINK_DIAG_H */

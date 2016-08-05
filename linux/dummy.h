@@ -26,6 +26,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef STRACE_LINUX_DUMMY_H
+#define STRACE_LINUX_DUMMY_H
+
 #ifndef HAVE_STRUCT___OLD_KERNEL_STAT
 #define	sys_oldfstat		printargs
 #define	sys_oldstat		printargs
@@ -156,3 +159,5 @@
 #define	sys_oldolduname		printargs
 #define	sys_olduname		printargs
 #define	sys_sysfs		printargs
+
+#endif /* !STRACE_LINUX_DUMMY_H */

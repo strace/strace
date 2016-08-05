@@ -1,3 +1,6 @@
+#ifndef STRACE_LINUX_UNIX_DIAG_H
+#define STRACE_LINUX_UNIX_DIAG_H
+
 struct unix_diag_req {
 	uint8_t	 sdiag_family;
 	uint8_t	 sdiag_protocol;
@@ -22,3 +25,5 @@ struct unix_diag_msg {
 
 #define UNIX_DIAG_NAME 0
 #define UNIX_DIAG_PEER 2
+
+#endif /* !STRACE_LINUX_UNIX_DIAG_H */
