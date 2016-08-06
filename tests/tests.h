@@ -25,8 +25,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TESTS_H_
-# define TESTS_H_
+#ifndef STRACE_TESTS_H
+#define STRACE_TESTS_H
 
 # ifdef HAVE_CONFIG_H
 #  include "config.h"
@@ -151,4 +151,4 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 # define PRI__u64 PRI__64"u"
 # define PRI__x64 PRI__64"x"
 
-#endif
+#endif /* !STRACE_TESTS_H */
