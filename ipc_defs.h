@@ -44,4 +44,4 @@
 	if ((arg) & IPC_64) tprints("IPC_64|"); \
 	printxval((flagset), (arg) &~ IPC_64, dflt)
 
-#endif /* #ifndef STRACE_IPC_DEFS_H */
+#endif /* !STRACE_IPC_DEFS_H */

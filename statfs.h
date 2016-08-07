@@ -42,4 +42,4 @@ struct strace_statfs {
 	unsigned long long f_flags;
 };
 
-#endif /* STRACE_STATFS_H */
+#endif /* !STRACE_STATFS_H */

@@ -76,4 +76,4 @@
 # define ATTRIBUTE_ALLOC_SIZE(args)	/* empty */
 #endif
 
-#endif /* #ifndef STRACE_GCC_COMPAT_H */
+#endif /* !STRACE_GCC_COMPAT_H */

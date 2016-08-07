@@ -176,4 +176,4 @@ extern long ptrace(int, int, char *, long);
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
 
-#endif /* #ifndef STRACE_PTRACE_H */
+#endif /* !STRACE_PTRACE_H */

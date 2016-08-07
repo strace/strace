@@ -3,4 +3,4 @@
 
 extern void printsiginfo(const siginfo_t *);
 
-#endif /* #ifndef STRACE_PRINTSIGINFO_H */
+#endif /* !STRACE_PRINTSIGINFO_H */

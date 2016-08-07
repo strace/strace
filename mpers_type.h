@@ -49,4 +49,4 @@
 # endif
 #endif
 
-#endif /* #ifndef STRACE_MPERS_TYPE_H */
+#endif /* !STRACE_MPERS_TYPE_H */

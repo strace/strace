@@ -6,4 +6,4 @@ struct seccomp_fprog {
 	unsigned long filter;
 };
 
-#endif /* #ifndef STRACE_SECCOMP_FPROG_H */
+#endif /* !STRACE_SECCOMP_FPROG_H */

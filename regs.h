@@ -9,4 +9,4 @@
 
 #include "arch_regs.h"
 
-#endif /* #ifndef STRACE_REGS_H */
+#endif /* !STRACE_REGS_H */

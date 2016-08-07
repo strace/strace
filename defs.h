@@ -905,4 +905,4 @@ extern unsigned num_quals;
 #define PRI__u64 PRI__64"u"
 #define PRI__x64 PRI__64"x"
 
-#endif /* #ifndef STRACE_DEFS_H */
+#endif /* !STRACE_DEFS_H */

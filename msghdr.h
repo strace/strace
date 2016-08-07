@@ -14,4 +14,4 @@ struct mmsghdr {
 struct tcb;
 extern void print_struct_msghdr(struct tcb *, const struct msghdr *, const int *, unsigned long);
 
-#endif /* #ifndef STRACE_MSGHDR_H */
+#endif /* !STRACE_MSGHDR_H */

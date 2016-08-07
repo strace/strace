@@ -44,4 +44,4 @@ typedef struct {
 	} sigev_un;
 } struct_sigevent;
 
-#endif /* #ifndef STRACE_SIGEVENT_H */
+#endif /* !STRACE_SIGEVENT_H */

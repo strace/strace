@@ -14,4 +14,4 @@ struct xlat {
 # define XLAT_TYPE_PAIR(type, val, str)	{     (type)(val), str  }
 # define XLAT_END			{		0, 0    }
 
-#endif /* #ifndef STRACE_XLAT_H */
+#endif /* !STRACE_XLAT_H */
