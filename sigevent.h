@@ -25,8 +25,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SIGEVENT_H_
-#define SIGEVENT_H_
+#ifndef STRACE_SIGEVENT_H
+#define STRACE_SIGEVENT_H
 
 typedef struct {
 	union {
@@ -44,4 +44,4 @@ typedef struct {
 	} sigev_un;
 } struct_sigevent;
 
-#endif
+#endif /* #ifndef STRACE_SIGEVENT_H */

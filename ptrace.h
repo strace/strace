@@ -33,6 +33,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef STRACE_PTRACE_H
+#define STRACE_PTRACE_H
+
 #ifdef NEED_PTRACE_PROTOTYPE_WORKAROUND
 # define ptrace xptrace
 # include <sys/ptrace.h>
@@ -172,3 +175,5 @@ extern long ptrace(int, int, char *, long);
 #if !HAVE_DECL_PTRACE_POKEUSER
 # define PTRACE_POKEUSER PTRACE_POKEUSR
 #endif
+
+#endif /* #ifndef STRACE_PTRACE_H */

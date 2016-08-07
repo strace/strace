@@ -26,8 +26,7 @@
  */
 
 #ifndef STRACE_KERNEL_TYPES_H
-
-# define STRACE_KERNEL_TYPES_H
+#define STRACE_KERNEL_TYPES_H
 
 # if defined HAVE___KERNEL_LONG_T && defined HAVE___KERNEL_ULONG_T
 
@@ -55,4 +54,4 @@ typedef struct {
 	char		d_name[1];
 } kernel_dirent;
 
-#endif
+#endif /* #ifndef STRACE_KERNEL_TYPES_H */

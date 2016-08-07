@@ -1,4 +1,5 @@
 #ifndef STRACE_XLAT_H
+#define STRACE_XLAT_H
 
 # include <stdint.h>
 
@@ -13,4 +14,4 @@ struct xlat {
 # define XLAT_TYPE_PAIR(type, val, str)	{     (type)(val), str  }
 # define XLAT_END			{		0, 0    }
 
-#endif
+#endif /* #ifndef STRACE_XLAT_H */

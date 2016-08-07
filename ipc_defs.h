@@ -25,6 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef STRACE_IPC_DEFS_H
+#define STRACE_IPC_DEFS_H
+
 #ifdef HAVE_SYS_IPC_H
 # include <sys/ipc.h>
 #elif defined HAVE_LINUX_IPC_H
@@ -40,3 +43,5 @@
 #define PRINTCTL(flagset, arg, dflt) \
 	if ((arg) & IPC_64) tprints("IPC_64|"); \
 	printxval((flagset), (arg) &~ IPC_64, dflt)
+
+#endif /* #ifndef STRACE_IPC_DEFS_H */

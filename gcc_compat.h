@@ -25,8 +25,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GCC_COMPAT_H_
-#define GCC_COMPAT_H_
+#ifndef STRACE_GCC_COMPAT_H
+#define STRACE_GCC_COMPAT_H
 
 #if defined __GNUC__ && defined __GNUC_MINOR__
 # define GNUC_PREREQ(maj, min)	\
@@ -76,4 +76,4 @@
 # define ATTRIBUTE_ALLOC_SIZE(args)	/* empty */
 #endif
 
-#endif
+#endif /* #ifndef STRACE_GCC_COMPAT_H */

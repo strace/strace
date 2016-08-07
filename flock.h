@@ -25,6 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef STRACE_FLOCK_H
+#define STRACE_FLOCK_H
+
 #include <linux/fcntl.h>
 
 #if defined HAVE_STRUCT_FLOCK
@@ -42,3 +45,5 @@ typedef struct __kernel_flock64 struct_kernel_flock64;
 #else
 # error struct flock64 definition not found in <linux/fcntl.h>
 #endif
+
+#endif /* #ifndef STRACE_FLOCK_H */

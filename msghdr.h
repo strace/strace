@@ -1,5 +1,5 @@
-#ifndef MSGHDR_H_
-# define MSGHDR_H_
+#ifndef STRACE_MSGHDR_H
+#define STRACE_MSGHDR_H
 
 /* For definitions of struct msghdr and struct mmsghdr. */
 # include <sys/socket.h>
@@ -14,4 +14,4 @@ struct mmsghdr {
 struct tcb;
 extern void print_struct_msghdr(struct tcb *, const struct msghdr *, const int *, unsigned long);
 
-#endif /* MSGHDR_H_ */
+#endif /* #ifndef STRACE_MSGHDR_H */

@@ -27,6 +27,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef STRACE_DEFS_H
+#define STRACE_DEFS_H
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -901,3 +904,5 @@ extern unsigned num_quals;
 #define PRI__d64 PRI__64"d"
 #define PRI__u64 PRI__64"u"
 #define PRI__x64 PRI__64"x"
+
+#endif /* #ifndef STRACE_DEFS_H */
