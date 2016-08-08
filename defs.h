@@ -153,8 +153,8 @@ extern char *stpcpy(char *dst, const char *src);
 
 #ifdef SPARC64
 # define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY0_WORDSIZE 4
-# define PERSONALITY1_WORDSIZE 8
+# define PERSONALITY0_WORDSIZE 8
+# define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef X86_64
