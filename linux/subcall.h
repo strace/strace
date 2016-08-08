@@ -31,7 +31,6 @@
 
 #define IS	TRACE_INDIRECT_SUBCALL
 
-[SYS_socket_subcall +  0] = { 6,	0,	SEN(printargs),		"socket_subcall"	},
 [SYS_socket_subcall +  1] = { 3,	IS|TN,	SEN(socket),		"socket"		},
 [SYS_socket_subcall +  2] = { 3,	IS|TN,	SEN(bind),		"bind"			},
 [SYS_socket_subcall +  3] = { 3,	IS|TN,	SEN(connect),		"connect"		},
@@ -56,27 +55,14 @@
 #define SYS_socket_nsubcalls	21
 #define SYS_ipc_subcall	((SYS_socket_subcall) + (SYS_socket_nsubcalls))
 
-[SYS_ipc_subcall +  0] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
 [SYS_ipc_subcall +  1] = { 4,	IS|TI,		SEN(semop),		"semop"			},
 [SYS_ipc_subcall +  2] = { 3,	IS|TI,		SEN(semget),		"semget"		},
 [SYS_ipc_subcall +  3] = { 4,	IS|TI,		SEN(semctl),		"semctl"		},
 [SYS_ipc_subcall +  4] = { 5,	IS|TI,		SEN(semtimedop),	"semtimedop"		},
-[SYS_ipc_subcall +  5] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall +  6] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall +  7] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall +  8] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall +  9] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall + 10] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
 [SYS_ipc_subcall + 11] = { 4,	IS|TI,		SEN(msgsnd),		"msgsnd"		},
 [SYS_ipc_subcall + 12] = { 5,	IS|TI,		SEN(msgrcv),		"msgrcv"		},
 [SYS_ipc_subcall + 13] = { 2,	IS|TI,		SEN(msgget),		"msgget"		},
 [SYS_ipc_subcall + 14] = { 4,	IS|TI,		SEN(msgctl),		"msgctl"		},
-[SYS_ipc_subcall + 15] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall + 16] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall + 17] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall + 18] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall + 19] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
-[SYS_ipc_subcall + 20] = { 6,	0,		SEN(printargs),		"ipc_subcall"		},
 [SYS_ipc_subcall + 21] = { 4,	IS|TI|TM|SI,	SEN(shmat),		"shmat"			},
 [SYS_ipc_subcall + 22] = { 4,	IS|TI|TM|SI,	SEN(shmdt),		"shmdt"			},
 [SYS_ipc_subcall + 23] = { 3,	IS|TI,		SEN(shmget),		"shmget"		},
