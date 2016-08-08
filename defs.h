@@ -151,18 +151,10 @@ extern char *stpcpy(char *dst, const char *src);
 # define ERESTART_RESTARTBLOCK 516
 #endif
 
-#if defined(SPARC) || defined(SPARC64)
+#ifdef SPARC64
+# define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 4
-# if defined(SPARC64)
-#  define SUPPORTED_PERSONALITIES 2
-#  define PERSONALITY1_WORDSIZE 8
-#  ifdef HAVE_M32_MPERS
-#   define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
-#   define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
-#   define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
-#   define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
-#  endif
-# endif
+# define PERSONALITY1_WORDSIZE 8
 #endif
 
 #ifdef X86_64
@@ -170,59 +162,24 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
 # define PERSONALITY2_WORDSIZE 4
-# ifdef HAVE_M32_MPERS
-#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
-#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
-# endif
-# ifdef HAVE_MX32_MPERS
-#  define PERSONALITY2_INCLUDE_FUNCS "mx32_funcs.h"
-#  define PERSONALITY2_INCLUDE_PRINTERS_DECLS "mx32_printer_decls.h"
-#  define PERSONALITY2_INCLUDE_PRINTERS_DEFS "mx32_printer_defs.h"
-#  define MPERS_mx32_IOCTL_MACROS "ioctl_redefs2.h"
-# endif
 #endif
 
 #ifdef X32
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 4
 # define PERSONALITY1_WORDSIZE 4
-# ifdef HAVE_M32_MPERS
-#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
-#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
-# endif
-#endif
-
-#ifdef ARM
-/* one personality */
 #endif
 
 #ifdef AARCH64
-/* The existing ARM personality, then AArch64 */
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
-# ifdef HAVE_M32_MPERS
-#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
-#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
-# endif
 #endif
 
 #ifdef POWERPC64
 # define SUPPORTED_PERSONALITIES 2
 # define PERSONALITY0_WORDSIZE 8
 # define PERSONALITY1_WORDSIZE 4
-# ifdef HAVE_M32_MPERS
-#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
-#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
-# endif
 #endif
 
 #ifdef TILE
@@ -231,12 +188,6 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY1_WORDSIZE 4
 # ifdef __tilepro__
 #  define DEFAULT_PERSONALITY 1
-# endif
-# ifdef HAVE_M32_MPERS
-#  define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
-#  define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
-#  define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
 # endif
 #endif
 
@@ -250,31 +201,28 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY0_WORDSIZE SIZEOF_LONG
 #endif
 
-#ifndef PERSONALITY0_INCLUDE_PRINTERS_DECLS
-# define PERSONALITY0_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
-#endif
-#ifndef PERSONALITY0_INCLUDE_PRINTERS_DEFS
-# define PERSONALITY0_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
-#endif
+#define PERSONALITY0_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
+#define PERSONALITY0_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
 
-#ifndef PERSONALITY1_INCLUDE_PRINTERS_DECLS
+#if SUPPORTED_PERSONALITIES > 1 && defined HAVE_M32_MPERS
+# define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
+# define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
+# define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
+# define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
+#else
 # define PERSONALITY1_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
-#endif
-#ifndef PERSONALITY1_INCLUDE_PRINTERS_DEFS
 # define PERSONALITY1_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
-#endif
-
-#ifndef PERSONALITY2_INCLUDE_PRINTERS_DECLS
-# define PERSONALITY2_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
-#endif
-#ifndef PERSONALITY2_INCLUDE_PRINTERS_DEFS
-# define PERSONALITY2_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
-#endif
-
-#ifndef PERSONALITY1_INCLUDE_FUNCS
 # define PERSONALITY1_INCLUDE_FUNCS "empty.h"
 #endif
-#ifndef PERSONALITY2_INCLUDE_FUNCS
+
+#if SUPPORTED_PERSONALITIES > 2 && defined HAVE_MX32_MPERS
+# define PERSONALITY2_INCLUDE_FUNCS "mx32_funcs.h"
+# define PERSONALITY2_INCLUDE_PRINTERS_DECLS "mx32_printer_decls.h"
+# define PERSONALITY2_INCLUDE_PRINTERS_DEFS "mx32_printer_defs.h"
+# define MPERS_mx32_IOCTL_MACROS "ioctl_redefs2.h"
+#else
+# define PERSONALITY2_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
+# define PERSONALITY2_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
 # define PERSONALITY2_INCLUDE_FUNCS "empty.h"
 #endif
 
