@@ -151,38 +151,22 @@ extern char *stpcpy(char *dst, const char *src);
 # define ERESTART_RESTARTBLOCK 516
 #endif
 
-#ifdef SPARC64
-# define SUPPORTED_PERSONALITIES 2
-#endif
-
-#ifdef X86_64
+#if defined X86_64
 # define SUPPORTED_PERSONALITIES 3
 # define PERSONALITY2_WORDSIZE 4
-#endif
-
-#ifdef X32
+#elif defined AARCH64 \
+   || defined POWERPC64 \
+   || defined SPARC64 \
+   || defined TILE \
+   || defined X32
 # define SUPPORTED_PERSONALITIES 2
-#endif
-
-#ifdef AARCH64
-# define SUPPORTED_PERSONALITIES 2
-#endif
-
-#ifdef POWERPC64
-# define SUPPORTED_PERSONALITIES 2
-#endif
-
-#ifdef TILE
-# define SUPPORTED_PERSONALITIES 2
-# ifdef __tilepro__
-#  define DEFAULT_PERSONALITY 1
-# endif
-#endif
-
-#ifndef SUPPORTED_PERSONALITIES
+#else
 # define SUPPORTED_PERSONALITIES 1
 #endif
-#ifndef DEFAULT_PERSONALITY
+
+#if defined TILE && defined __tilepro__
+# define DEFAULT_PERSONALITY 1
+#else
 # define DEFAULT_PERSONALITY 0
 #endif
 
