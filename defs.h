@@ -153,33 +153,27 @@ extern char *stpcpy(char *dst, const char *src);
 
 #ifdef SPARC64
 # define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef X86_64
 # define SUPPORTED_PERSONALITIES 3
-# define PERSONALITY1_WORDSIZE 4
 # define PERSONALITY2_WORDSIZE 4
 #endif
 
 #ifdef X32
 # define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef AARCH64
 # define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef POWERPC64
 # define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY1_WORDSIZE 4
 #endif
 
 #ifdef TILE
 # define SUPPORTED_PERSONALITIES 2
-# define PERSONALITY1_WORDSIZE 4
 # ifdef __tilepro__
 #  define DEFAULT_PERSONALITY 1
 # endif
@@ -195,6 +189,10 @@ extern char *stpcpy(char *dst, const char *src);
 #define PERSONALITY0_WORDSIZE SIZEOF_LONG
 #define PERSONALITY0_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
 #define PERSONALITY0_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
+
+#if SUPPORTED_PERSONALITIES > 1
+# define PERSONALITY1_WORDSIZE 4
+#endif
 
 #if SUPPORTED_PERSONALITIES > 1 && defined HAVE_M32_MPERS
 # define PERSONALITY1_INCLUDE_PRINTERS_DECLS "m32_printer_decls.h"
