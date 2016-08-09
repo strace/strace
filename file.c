@@ -161,7 +161,7 @@ struct stat32 {
 	unsigned int	st_blocks;
 	unsigned int	__unused4[2];
 };
-#  define STAT32_PERSONALITY 0
+#  define STAT32_PERSONALITY 1
 # elif defined SPARC
 #  /* no 64-bit personalities */
 # elif defined TILE
