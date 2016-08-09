@@ -180,42 +180,6 @@ struct stat32 {
 # include "printstat.h"
 #endif /* STAT32_PERSONALITY */
 
-#if defined(SPARC) || defined(SPARC64)
-
-struct solstat {
-	unsigned	st_dev;
-	unsigned int	st_pad1[3];     /* network id */
-	unsigned	st_ino;
-	unsigned	st_mode;
-	unsigned	st_nlink;
-	unsigned	st_uid;
-	unsigned	st_gid;
-	unsigned	st_rdev;
-	unsigned int	st_pad2[2];
-	unsigned int	st_size;
-	unsigned int	st_pad3;        /* st_size, off_t expansion */
-	unsigned int	st_atime;
-	unsigned int	st_atime_nsec;
-	unsigned int	st_mtime;
-	unsigned int	st_mtime_nsec;
-	unsigned int	st_ctime;
-	unsigned int	st_ctime_nsec;
-	unsigned int	st_blksize;
-	unsigned int	st_blocks;
-	char		st_fstype[16];
-	unsigned int	st_pad4[8];     /* expansion area */
-};
-
-# define DO_PRINTSTAT	do_printstat_sol
-# define STRUCT_STAT	struct solstat
-# define STAT_MAJOR(x)	(((x) >> 18) & 0x3fff)
-# define STAT_MINOR(x)	((x) & 0x3ffff)
-# undef HAVE_STRUCT_STAT_ST_FLAGS
-# undef HAVE_STRUCT_STAT_ST_FSTYPE
-# undef HAVE_STRUCT_STAT_ST_GEN
-# include "printstat.h"
-#endif /* SPARC || SPARC64 */
-
 static void
 printstat(struct tcb *tcp, long addr)
 {
@@ -230,16 +194,6 @@ printstat(struct tcb *tcp, long addr)
 		return;
 	}
 #endif
-
-#if defined(SPARC) || defined(SPARC64)
-	if (current_personality == 1) {
-		struct solstat statbuf;
-
-		if (!umove_or_printaddr(tcp, addr, &statbuf))
-			do_printstat_sol(tcp, &statbuf);
-		return;
-	}
-#endif /* SPARC || SPARC64 */
 
 	if (!umove_or_printaddr(tcp, addr, &statbuf))
 		do_printstat(tcp, &statbuf);
@@ -423,16 +377,6 @@ printoldstat(struct tcb *tcp, long addr)
 {
 	struct __old_kernel_stat statbuf;
 	struct stat newstatbuf;
-
-# if defined(SPARC) || defined(SPARC64)
-	if (current_personality == 1) {
-		struct solstat statbuf;
-
-		if (!umove_or_printaddr(tcp, addr, &statbuf))
-			do_printstat_sol(tcp, &statbuf);
-		return;
-	}
-# endif
 
 	if (!umove_or_printaddr(tcp, addr, &statbuf)) {
 		convertoldstat(&statbuf, &newstatbuf);
