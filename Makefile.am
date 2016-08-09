@@ -302,6 +302,7 @@ EXTRA_DIST =				\
 	linux/aarch64/ioctls_inc0.h	\
 	linux/aarch64/ioctls_inc1.h	\
 	linux/aarch64/signalent1.h	\
+	linux/aarch64/stat32.h		\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
 	linux/alpha/arch_getrval2.c	\
@@ -493,6 +494,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/ioctls_inc0.h	\
 	linux/powerpc64/ioctls_inc1.h	\
 	linux/powerpc64/signalent1.h	\
+	linux/powerpc64/stat32.h	\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
@@ -571,6 +573,7 @@ EXTRA_DIST =				\
 	linux/sparc64/ioctls_inc1.h	\
 	linux/sparc64/signalent.h	\
 	linux/sparc64/signalent1.h	\
+	linux/sparc64/stat32.h		\
 	linux/sparc64/syscallent.h	\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/userent.h		\
@@ -588,6 +591,7 @@ EXTRA_DIST =				\
 	linux/tile/ioctls_inc0.h	\
 	linux/tile/ioctls_inc1.h	\
 	linux/tile/signalent1.h		\
+	linux/tile/stat32.h		\
 	linux/tile/syscallent.h		\
 	linux/tile/syscallent1.h	\
 	linux/tile/userent.h		\
@@ -607,6 +611,7 @@ EXTRA_DIST =				\
 	linux/x32/ioctls_inc0.h		\
 	linux/x32/ioctls_inc1.h		\
 	linux/x32/signalent1.h		\
+	linux/x32/stat32.h		\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
 	linux/x32/userent.h		\
@@ -628,6 +633,7 @@ EXTRA_DIST =				\
 	linux/x86_64/ioctls_inc2.h	\
 	linux/x86_64/signalent1.h	\
 	linux/x86_64/signalent2.h	\
+	linux/x86_64/stat32.h		\
 	linux/x86_64/syscallent.h	\
 	linux/x86_64/syscallent1.h	\
 	linux/x86_64/syscallent2.h	\

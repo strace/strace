@@ -97,79 +97,8 @@
 
 #undef STAT32_PERSONALITY
 #if SUPPORTED_PERSONALITIES > 1
-# if defined AARCH64 || defined X86_64 || defined X32
-struct stat32 {
-	unsigned int	st_dev;
-	unsigned int	st_ino;
-	unsigned short	st_mode;
-	unsigned short	st_nlink;
-	unsigned short	st_uid;
-	unsigned short	st_gid;
-	unsigned int	st_rdev;
-	unsigned int	st_size;
-	unsigned int	st_blksize;
-	unsigned int	st_blocks;
-	unsigned int	st_atime;
-	unsigned int	st_atime_nsec;
-	unsigned int	st_mtime;
-	unsigned int	st_mtime_nsec;
-	unsigned int	st_ctime;
-	unsigned int	st_ctime_nsec;
-	unsigned int	__unused4;
-	unsigned int	__unused5;
-};
-#  define STAT32_PERSONALITY 1
-# elif defined POWERPC64
-struct stat32 {
-	unsigned int	st_dev;
-	unsigned int	st_ino;
-	unsigned int	st_mode;
-	unsigned short	st_nlink;
-	unsigned int	st_uid;
-	unsigned int	st_gid;
-	unsigned int	st_rdev;
-	unsigned int	st_size;
-	unsigned int	st_blksize;
-	unsigned int	st_blocks;
-	unsigned int	st_atime;
-	unsigned int	st_atime_nsec;
-	unsigned int	st_mtime;
-	unsigned int	st_mtime_nsec;
-	unsigned int	st_ctime;
-	unsigned int	st_ctime_nsec;
-	unsigned int	__unused4;
-	unsigned int	__unused5;
-};
-#  define STAT32_PERSONALITY 1
-# elif defined SPARC64
-struct stat32 {
-	unsigned short	st_dev;
-	unsigned int	st_ino;
-	unsigned short	st_mode;
-	unsigned short	st_nlink;
-	unsigned short	st_uid;
-	unsigned short	st_gid;
-	unsigned short	st_rdev;
-	unsigned int	st_size;
-	unsigned int	st_atime;
-	unsigned int	st_atime_nsec;
-	unsigned int	st_mtime;
-	unsigned int	st_mtime_nsec;
-	unsigned int	st_ctime;
-	unsigned int	st_ctime_nsec;
-	unsigned int	st_blksize;
-	unsigned int	st_blocks;
-	unsigned int	__unused4[2];
-};
-#  define STAT32_PERSONALITY 1
-# elif defined SPARC
-#  /* no 64-bit personalities */
-# elif defined TILE
-#  /* no 32-bit stat */
-# else
-#  warning FIXME: check whether struct stat32 definition is needed for this architecture!
-# endif /* X86_64 || X32 || POWERPC64 */
-#endif /* SUPPORTED_PERSONALITIES > 1 */
+# include "stat32.h"
+#endif
 
 #ifdef STAT32_PERSONALITY
 # define DO_PRINTSTAT do_printstat32
