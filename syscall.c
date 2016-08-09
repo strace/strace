@@ -753,7 +753,7 @@ syscall_name(long scno)
 	if (SCNO_IS_VALID(scno))
 		return sysent[scno].sys_name;
 	else {
-		sprintf(buf, "syscall_%lu", shuffle_scno(scno));
+		sprintf(buf, "syscall_%lu", scno);
 		return buf;
 	}
 }
@@ -787,10 +787,7 @@ trace_syscall_entering(struct tcb *tcp)
 
 	if (res != 1) {
 		printleader(tcp);
-		if (scno_good != 1)
-			tprints("????" /* anti-trigraph gap */ "(");
-		else
-			tprintf("%s(", syscall_name(tcp->scno));
+		tprintf("%s(", scno_good == 1 ? tcp->s_ent->sys_name : "????");
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -849,7 +846,7 @@ trace_syscall_entering(struct tcb *tcp)
 #endif
 
 	printleader(tcp);
-	tprintf("%s(", syscall_name(tcp->scno));
+	tprintf("%s(", tcp->s_ent->sys_name);
 	if ((tcp->qual_flg & QUAL_RAW) && SEN_exit != tcp->s_ent->sen)
 		res = printargs(tcp);
 	else
@@ -910,7 +907,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		tprintf("<... %s resumed> ", syscall_name(tcp->scno));
+		tprintf("<... %s resumed> ", tcp->s_ent->sys_name);
 	}
 	printing_tcp = tcp;
 
@@ -1299,13 +1296,19 @@ get_scno(struct tcb *tcp)
 		tcp->s_ent = &sysent[tcp->scno];
 		tcp->qual_flg = qual_flags[tcp->scno];
 	} else {
-		static const struct_sysent unknown = {
-			.nargs = MAX_ARGS,
-			.sys_flags = 0,
-			.sys_func = printargs,
-			.sys_name = "system call",
-		};
-		tcp->s_ent = &unknown;
+		struct {
+			struct_sysent ent;
+			char buf[sizeof("syscall_%lu") + sizeof(long) * 3];
+		} *s = xcalloc(1, sizeof(*s));
+		set_tcb_priv_data(tcp, s, free);
+
+		sprintf(s->buf, "syscall_%lu", shuffle_scno(tcp->scno));
+		s->ent.nargs = MAX_ARGS;
+		s->ent.sen = SEN_printargs;
+		s->ent.sys_func = printargs;
+		s->ent.sys_name = s->buf;
+
+		tcp->s_ent = &s->ent;
 		tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
 		if (debug_flag)
 			error_msg("pid %d invalid syscall %ld", tcp->pid, tcp->scno);

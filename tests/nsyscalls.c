@@ -57,10 +57,8 @@ static const struct_sysent syscallent[] = {
 # define SYSCALL_BIT 0
 #endif
 
-static const unsigned long nr = ARRAY_SIZE(syscallent) | SYSCALL_BIT;
-
-int
-main(void)
+static void
+test_syscall(const unsigned long nr)
 {
 	static const kernel_ulong_t a[] = {
 		(kernel_ulong_t) 0xface0fedbadc0ded,
@@ -71,14 +69,15 @@ main(void)
 		(kernel_ulong_t) 0xface5fedbadc5ded
 	};
 
-	long rc = syscall(nr, a[0], a[1], a[2], a[3], a[4], a[5]);
+	long rc = syscall(nr | SYSCALL_BIT,
+			  a[0], a[1], a[2], a[3], a[4], a[5]);
 #ifdef LINUX_MIPSO32
 	printf("syscall(%#lx, %#lx, %#lx, %#lx, %#lx, %#lx, %#lx)"
-	       " = %ld ENOSYS (%m)\n", nr,
+	       " = %ld ENOSYS (%m)\n", nr | SYSCALL_BIT,
 	       a[0], a[1], a[2], a[3], a[4], a[5], rc);
 #else
 	printf("syscall_%lu(%#llx, %#llx, %#llx, %#llx, %#llx, %#llx)"
-	       " = %ld (errno %d)\n", nr & (~SYSCALL_BIT),
+	       " = %ld (errno %d)\n", nr,
 	       (unsigned long long) a[0],
 	       (unsigned long long) a[1],
 	       (unsigned long long) a[2],
@@ -86,6 +85,20 @@ main(void)
 	       (unsigned long long) a[4],
 	       (unsigned long long) a[5],
 	       rc, errno);
+#endif
+}
+
+int
+main(void)
+{
+	test_syscall(ARRAY_SIZE(syscallent));
+
+#ifdef SYS_socket_subcall
+	test_syscall(SYS_socket_subcall + 1);
+#endif
+
+#ifdef SYS_ipc_subcall
+	test_syscall(SYS_ipc_subcall + 1);
 #endif
 
 	puts("+++ exited with 0 +++");

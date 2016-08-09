@@ -790,10 +790,13 @@ extern unsigned num_quals;
 #endif /* !IN_MPERS_BOOTSTRAP */
 
 /*
- * If you need non-NULL sysent[scno].sys_func and sysent[scno].sys_name
+ * If you need non-NULL sysent[scno].sys_func, non-NULL sysent[scno].sys_name,
+ * and non-indirect sysent[scno].sys_flags.
  */
 #define SCNO_IS_VALID(scno) \
-	((unsigned long)(scno) < nsyscalls && sysent[scno].sys_func)
+	((unsigned long)(scno) < nsyscalls \
+	 && sysent[scno].sys_func \
+	 && !(sysent[scno].sys_flags & TRACE_INDIRECT_SUBCALL))
 
 /* Only ensures that sysent[scno] isn't out of range */
 #define SCNO_IN_RANGE(scno) \
