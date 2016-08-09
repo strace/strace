@@ -1275,6 +1275,20 @@ get_regs(pid_t pid)
 #endif
 }
 
+struct sysent_buf {
+	struct tcb *tcp;
+	struct_sysent ent;
+	char buf[sizeof("syscall_%lu") + sizeof(long) * 3];
+};
+
+static void
+free_sysent_buf(void *ptr)
+{
+	struct sysent_buf *s = ptr;
+	s->tcp->s_prev_ent = s->tcp->s_ent = NULL;
+	free(ptr);
+}
+
 /*
  * Returns:
  * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
@@ -1296,20 +1310,20 @@ get_scno(struct tcb *tcp)
 		tcp->s_ent = &sysent[tcp->scno];
 		tcp->qual_flg = qual_flags[tcp->scno];
 	} else {
-		struct {
-			struct_sysent ent;
-			char buf[sizeof("syscall_%lu") + sizeof(long) * 3];
-		} *s = xcalloc(1, sizeof(*s));
-		set_tcb_priv_data(tcp, s, free);
+		struct sysent_buf *s = xcalloc(1, sizeof(*s));
 
-		sprintf(s->buf, "syscall_%lu", shuffle_scno(tcp->scno));
+		s->tcp = tcp;
 		s->ent.nargs = MAX_ARGS;
 		s->ent.sen = SEN_printargs;
 		s->ent.sys_func = printargs;
 		s->ent.sys_name = s->buf;
+		sprintf(s->buf, "syscall_%lu", shuffle_scno(tcp->scno));
 
 		tcp->s_ent = &s->ent;
 		tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
+
+		set_tcb_priv_data(tcp, s, free_sysent_buf);
+
 		if (debug_flag)
 			error_msg("pid %d invalid syscall %ld", tcp->pid, tcp->scno);
 	}
