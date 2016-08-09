@@ -42,10 +42,10 @@
 #if defined IA64
 # define ARG_FLAGS	0
 # define ARG_STACK	1
-# define ARG_STACKSIZE	(tcp->scno == SYS_clone2 ? 2 : -1)
-# define ARG_PTID	(tcp->scno == SYS_clone2 ? 3 : 2)
-# define ARG_CTID	(tcp->scno == SYS_clone2 ? 4 : 3)
-# define ARG_TLS	(tcp->scno == SYS_clone2 ? 5 : 4)
+# define ARG_STACKSIZE	(tcp->scno == __NR_clone2 ? 2 : -1)
+# define ARG_PTID	(tcp->scno == __NR_clone2 ? 3 : 2)
+# define ARG_CTID	(tcp->scno == __NR_clone2 ? 4 : 3)
+# define ARG_TLS	(tcp->scno == __NR_clone2 ? 5 : 4)
 #elif defined S390 || defined S390X || defined CRISV10 || defined CRISV32
 # define ARG_STACK	0
 # define ARG_FLAGS	1
