@@ -33,7 +33,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <unistd.h>
 
 #define N 3

@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 // Ensure we are compiling to 64 bits
 struct bug { int t[sizeof(long) > 4 ? 1 : -1]; };
 int main(int argc, char **argv)

@@ -30,7 +30,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #ifdef __NR_umount2
 # define TEST_SYSCALL_STR "umount2"

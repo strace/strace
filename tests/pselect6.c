@@ -35,7 +35,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/select.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <sys/time.h>
 
 #ifdef __NR_pselect6

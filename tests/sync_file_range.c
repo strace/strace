@@ -29,7 +29,7 @@
 
 #include "tests.h"
 #include <fcntl.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined HAVE_SYNC_FILE_RANGE && defined __NR_sync_file_range
 

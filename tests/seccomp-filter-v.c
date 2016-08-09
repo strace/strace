@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <unistd.h>
 
 #ifdef HAVE_PRCTL

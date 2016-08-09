@@ -48,7 +48,7 @@ static const struct_sysent syscallent[] = {
 #include "syscallent.h"
 };
 
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __X32_SYSCALL_BIT && defined __NR_read \
  && (__X32_SYSCALL_BIT & __NR_read) != 0

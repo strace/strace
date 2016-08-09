@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 int
 main (void)

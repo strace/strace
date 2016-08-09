@@ -28,7 +28,7 @@
  */
 
 #include "tests.h"
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 /*
  * On s390x, this is the mmap syscall used by glibc, so,

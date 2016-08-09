@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __NR_clock_getres \
  && defined __NR_clock_gettime \

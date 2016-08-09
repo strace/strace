@@ -29,7 +29,7 @@
 
 #include "tests.h"
 #include <errno.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #ifndef __NR_recvmmsg
 # define __NR_recvmmsg -1

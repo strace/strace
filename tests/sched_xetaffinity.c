@@ -28,7 +28,7 @@
  */
 
 #include "tests.h"
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <sched.h>
 
 #if defined __NR_sched_getaffinity && defined __NR_sched_setaffinity \

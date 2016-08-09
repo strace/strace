@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 int
 main(void)

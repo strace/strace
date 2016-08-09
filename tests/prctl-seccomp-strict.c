@@ -26,7 +26,7 @@
  */
 
 #include "tests.h"
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #ifdef HAVE_PRCTL
 # include <sys/prctl.h>
 #endif

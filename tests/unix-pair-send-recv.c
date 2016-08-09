@@ -32,7 +32,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #ifndef __NR_send
 # define __NR_send -1

@@ -38,7 +38,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <sys/times.h>
 #include <sys/wait.h>
 

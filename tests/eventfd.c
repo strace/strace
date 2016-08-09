@@ -28,7 +28,7 @@
 #include "tests.h"
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __NR_eventfd2 && defined O_CLOEXEC
 

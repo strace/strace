@@ -29,7 +29,7 @@
 
 #include "tests.h"
 #include <fcntl.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __NR_rt_sigprocmask \
  && defined HAVE_SYS_SIGNALFD_H \

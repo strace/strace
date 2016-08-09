@@ -35,7 +35,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 static const char *
 sprint_rusage(const struct rusage *const ru)

@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <unistd.h>
 
 #ifdef __NR_oldumount

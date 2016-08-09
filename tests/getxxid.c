@@ -26,7 +26,7 @@
  */
 
 #include "tests.h"
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __NR_getxpid && defined __NR_getxuid && defined __NR_getxgid
 

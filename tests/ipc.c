@@ -28,7 +28,7 @@
  */
 
 #include "tests.h"
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __NR_ipc && defined HAVE_LINUX_IPC_H
 

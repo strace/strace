@@ -55,7 +55,7 @@
 #include <errno.h>
 #include <time.h>
 #include <sys/time.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #include "mpers_type.h"
 #include "gcc_compat.h"

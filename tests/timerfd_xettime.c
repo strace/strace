@@ -27,7 +27,7 @@
 
 #include "tests.h"
 #include <fcntl.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __NR_timerfd_create \
  && defined __NR_timerfd_gettime \

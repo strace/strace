@@ -30,7 +30,7 @@
 #include "tests.h"
 
 #include <stdio.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <unistd.h>
 
 #ifdef HAVE_LINUX_SECCOMP_H

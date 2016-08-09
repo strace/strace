@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined HAVE_UNION_BPF_ATTR_LOG_BUF && defined __NR_bpf
 # include <linux/bpf.h>

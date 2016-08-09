@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/prctl.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <linux/audit.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>

@@ -1,5 +1,5 @@
 #include "tests.h"
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #if defined __NR_sched_getscheduler && defined __NR_sched_setscheduler
 

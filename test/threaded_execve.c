@@ -47,7 +47,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 /* Define clone2 for all arches */
 #ifdef __ia64__

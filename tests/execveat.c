@@ -30,7 +30,7 @@
 #include "tests.h"
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/syscall.h>
+#include <asm/unistd.h>
 
 #ifdef __NR_execveat
 
