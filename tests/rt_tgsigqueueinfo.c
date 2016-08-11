@@ -67,7 +67,8 @@ main (void)
 	info->si_value.sival_ptr = (void *) (unsigned long) 0xdeadbeeffacefeed;
 
 	if (k_tgsigqueueinfo(info->si_pid, SIGUSR1, info))
-		perror_msg_and_fail("rt_tgsigqueueinfo");
+		(errno == ENOSYS ? perror_msg_and_skip : perror_msg_and_fail)(
+			"rt_tgsigqueueinfo");
 
 	printf("rt_tgsigqueueinfo(%u, %u, %s, {si_signo=%s"
 		", si_code=SI_QUEUE, si_errno=ENOENT, si_pid=%u"
