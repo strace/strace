@@ -59,7 +59,10 @@ test_flock64(void)
 #if !defined(F_GETOWN_EX) || F_GETOWN_EX != F_SETLK64
 	TEST_FLOCK64_EINVAL(F_SETLK64);
 #endif
+/* F_GETLK and F_SETLKW64 have conflicting values on mips64 */
+#if !defined(__mips64) || F_GETLK != F_SETLKW64
 	TEST_FLOCK64_EINVAL(F_SETLKW64);
+#endif
 #if !defined(F_SETOWN_EX) || F_SETOWN_EX != F_GETLK64
 	TEST_FLOCK64_EINVAL(F_GETLK64);
 #endif
