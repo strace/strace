@@ -202,6 +202,7 @@ AC_SUBST(arch)
 AC_SUBST(arch_m32)
 AC_SUBST(arch_mx32)
 
+MIPS_ABI=
 if test "$arch" = mips; then
 	AC_CACHE_CHECK([for _MIPS_SIM], [st_cv__MIPS_SIM],
 		       [AC_COMPUTE_INT([st_cv__MIPS_SIM], [_MIPS_SIM],
@@ -229,7 +230,9 @@ if test "$arch" = mips; then
 		n64) AC_DEFINE([LINUX_MIPSN64], [1], [Define for _MIPS_SIM_ABI64.]);;
 		*) AC_MSG_ERROR([Unsupported _MIPS_SIM]);;
 	esac
+	MIPS_ABI="$st_cv_mips_abi"
 fi
+AC_SUBST(MIPS_ABI)
 
 AC_ARG_ENABLE([arm-oabi],
 	      [AS_HELP_STRING([--enable-arm-oabi],

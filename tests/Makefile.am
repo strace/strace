@@ -722,7 +722,7 @@ XFAIL_TESTS_mx32 = $(LIBUNWIND_TESTS)
 XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME))
 
 TEST_LOG_COMPILER = env
-AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) $(srcdir)/run.sh
+AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) MIPS_ABI=$(MIPS_ABI) $(srcdir)/run.sh
 
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
