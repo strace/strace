@@ -34,6 +34,7 @@
 # define TEST_SYSCALL_STR "fstat64"
 # define STRUCT_STAT struct stat64
 # define STRUCT_STAT_STR "struct stat64"
+# define STRUCT_STAT_IS_STAT64 1
 # define SAMPLE_SIZE ((libc_off_t) 43147718418)
 # include "fstatx.c"
 

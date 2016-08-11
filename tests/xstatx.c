@@ -71,6 +71,15 @@ print_time(const time_t t)
 		printf("%llu", (unsigned long long) t);
 }
 
+# ifndef STRUCT_STAT
+#  define STRUCT_STAT struct stat
+#  define STRUCT_STAT_STR "struct stat"
+#  define STRUCT_STAT_IS_STAT64 0
+# endif
+# ifndef SAMPLE_SIZE
+#  define SAMPLE_SIZE 43147718418
+# endif
+
 typedef off_t libc_off_t;
 
 # ifdef USE_ASM_STAT
@@ -109,6 +118,14 @@ typedef off_t libc_off_t;
 #  define time_t __kernel_time_t
 #  define uid_t __kernel_uid_t
 #  include "asm_stat.h"
+#  if STRUCT_STAT_IS_STAT64
+#   undef HAVE_STRUCT_STAT_ST_ATIME_NSEC
+#   define HAVE_STRUCT_STAT_ST_ATIME_NSEC 1
+#   undef HAVE_STRUCT_STAT_ST_CTIME_NSEC
+#   define HAVE_STRUCT_STAT_ST_CTIME_NSEC 1
+#   undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+#   define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#  endif /* STRUCT_STAT_IS_STAT64 */
 # else
 #  undef HAVE_STRUCT_STAT_ST_ATIME_NSEC
 #  ifdef HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC
@@ -128,14 +145,6 @@ typedef off_t libc_off_t;
 #   undef st_ctime_nsec
 #   define st_ctime_nsec st_ctim.tv_nsec
 #  endif
-# endif
-
-# ifndef STRUCT_STAT
-#  define STRUCT_STAT struct stat
-#  define STRUCT_STAT_STR "struct stat"
-# endif
-# ifndef SAMPLE_SIZE
-#  define SAMPLE_SIZE 43147718418
 # endif
 
 static void
