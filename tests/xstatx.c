@@ -211,7 +211,12 @@ static int
 create_sample(const char *fname, const libc_off_t size)
 {
 	static const struct timespec ts[] = {
+#ifdef __mips64
+		// On mips64, struct stat cannot handle negative timestamps
+		{10841, 246}, {10843, 135}
+#else
 		{-10843, 135}, {-10841, 246}
+#endif
 	};
 
 	(void) close(0);
