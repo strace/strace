@@ -42,9 +42,11 @@
 static void
 print_tm(const struct tm * const p)
 {
-	printf("%02d/%02d/%02d-%02d:%02d:%02d",
-	       p->tm_year + 1900, p->tm_mon + 1, p->tm_mday,
-	       p->tm_hour, p->tm_min, p->tm_sec);
+	char buf[256];
+
+	strftime(buf, sizeof(buf), "%FT%T%z", p);
+
+	printf("%s", buf);
 }
 
 static long

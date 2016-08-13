@@ -524,7 +524,7 @@ const char *
 sprinttime(time_t t)
 {
 	struct tm *tmp;
-	static char buf[sizeof(int) * 3 * 6];
+	static char buf[sizeof(int) * 3 * 6 + sizeof("+0000")];
 
 	if (t == 0) {
 		strcpy(buf, "0");
@@ -532,11 +532,9 @@ sprinttime(time_t t)
 	}
 	tmp = localtime(&t);
 	if (tmp)
-		snprintf(buf, sizeof buf, "%02d/%02d/%02d-%02d:%02d:%02d",
-			tmp->tm_year + 1900, tmp->tm_mon + 1, tmp->tm_mday,
-			tmp->tm_hour, tmp->tm_min, tmp->tm_sec);
+		strftime(buf, sizeof(buf), "%FT%T%z", tmp);
 	else
-		snprintf(buf, sizeof buf, "%lu", (unsigned long) t);
+		snprintf(buf, sizeof(buf), "%lu", (unsigned long) t);
 
 	return buf;
 }

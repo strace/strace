@@ -57,12 +57,15 @@ print_time(const time_t t)
 
 	struct tm *p = localtime(&t);
 
-	if (p)
-		printf("%02d/%02d/%02d-%02d:%02d:%02d",
-		       p->tm_year + 1900, p->tm_mon + 1, p->tm_mday,
-		       p->tm_hour, p->tm_min, p->tm_sec);
-	else
+	if (p) {
+		char buf[256];
+
+		strftime(buf, sizeof(buf), "%FT%T%z", p);
+
+		printf("%s", buf);
+	} else {
 		printf("%llu", zero_extend_signed_to_ull(t));
+	}
 }
 
 # ifndef STRUCT_STAT
