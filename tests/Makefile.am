@@ -248,6 +248,7 @@ check_PROGRAMS = \
 	recvfrom \
 	recvmmsg-timeout \
 	recvmsg \
+	redirect-fds \
 	remap_file_pages \
 	rename \
 	renameat \
@@ -700,6 +701,7 @@ MISC_TESTS = \
 	pc.test \
 	qual_syscall.test \
 	redirect.test \
+	redirect-fds.test \
 	restart_syscall.test \
 	signal_receive.test \
 	strace-E.test \

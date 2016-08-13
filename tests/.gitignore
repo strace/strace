@@ -192,6 +192,7 @@ reboot
 recvfrom
 recvmmsg-timeout
 recvmsg
+redirect-fds
 remap_file_pages
 rename
 renameat
