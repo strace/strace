@@ -56,10 +56,11 @@ run_prog()
 	fi
 	args="$*"
 	"$@" || {
-		if [ $? -eq 77 ]; then
+		rc=$?
+		if [ $rc -eq 77 ]; then
 			skip_ "$args exited with code 77"
 		else
-			fail_ "$args failed"
+			fail_ "$args failed with code $rc"
 		fi
 	}
 }
@@ -68,7 +69,7 @@ run_prog()
 run_prog_skip_if_failed()
 {
 	args="$*"
-	"$@" || framework_skip_ "$args failed"
+	"$@" || framework_skip_ "$args failed with code $?"
 }
 
 run_strace()
@@ -76,7 +77,7 @@ run_strace()
 	> "$LOG" || fail_ "failed to write $LOG"
 	args="$*"
 	$STRACE -o "$LOG" "$@" ||
-		dump_log_and_fail_with "$STRACE $args failed"
+		dump_log_and_fail_with "$STRACE $args failed with code $?"
 }
 
 run_strace_merge()
@@ -84,7 +85,7 @@ run_strace_merge()
 	rm -f -- "$LOG".[0-9]*
 	run_strace -ff -tt "$@"
 	"$srcdir"/../strace-log-merge "$LOG" > "$LOG" ||
-		dump_log_and_fail_with 'strace-log-merge failed'
+		dump_log_and_fail_with 'strace-log-merge failed with code $?'
 	rm -f -- "$LOG".[0-9]*
 }
 
