@@ -1221,6 +1221,12 @@ exec_or_die(void)
 	perror_msg_and_die("exec");
 }
 
+/*
+ * Open a dummy descriptor for use as a placeholder.
+ * The descriptor is O_RDONLY with FD_CLOEXEC flag set.
+ * A read attempt from such descriptor ends with EOF,
+ * a write attempt is rejected with EBADF.
+ */
 static int
 open_dummy_desc(void)
 {
@@ -1229,7 +1235,54 @@ open_dummy_desc(void)
 	if (pipe(fds))
 		perror_msg_and_die("pipe");
 	close(fds[1]);
+	set_cloexec_flag(fds[0]);
 	return fds[0];
+}
+
+/* placeholder fds status for stdin and stdout */
+static bool fd_is_placeholder[2];
+
+/*
+ * Ensure that all standard file descriptors are open by opening placeholder
+ * file descriptors for those standard file descriptors that are not open.
+ *
+ * The information which descriptors have been made open is saved
+ * in fd_is_placeholder for later use.
+ */
+static void
+ensure_standard_fds_opened(void)
+{
+	int fd;
+
+	while ((fd = open_dummy_desc()) <= 2) {
+		if (fd == 2)
+			break;
+		fd_is_placeholder[fd] = true;
+	}
+
+	if (fd > 2)
+		close(fd);
+}
+
+/*
+ * Redirect stdin and stdout unless they have been opened earlier
+ * by ensure_standard_fds_opened as placeholders.
+ */
+static void
+redirect_standard_fds(void)
+{
+	int i;
+
+	/*
+	 * It might be a good idea to redirect stderr as well,
+	 * but we sometimes need to print error messages.
+	 */
+	for (i = 0; i <= 1; ++i) {
+		if (!fd_is_placeholder[i]) {
+			close(i);
+			open_dummy_desc();
+		}
+	}
 }
 
 static void
@@ -1409,18 +1462,11 @@ startup_child(char **argv)
 	 * the pipe is still open, it has a reader. Thus, "head" will not get its
 	 * SIGPIPE at once, on the first write.
 	 *
-	 * Preventing it by closing strace's stdin/out.
+	 * Preventing it by redirecting strace's stdin/out.
 	 * (Don't leave fds 0 and 1 closed, this is bad practice: future opens
 	 * will reuse them, unexpectedly making a newly opened object "stdin").
 	 */
-	close(0);
-	open_dummy_desc(); /* opens to fd#0 */
-	dup2(0, 1);
-#if 0
-	/* A good idea too, but we sometimes need to print error messages */
-	if (shared_log != stderr)
-		dup2(0, 2);
-#endif
+	redirect_standard_fds();
 }
 
 #if USE_SEIZE
@@ -1753,24 +1799,18 @@ init(int argc, char *argv[])
 		error_msg("ptrace_setoptions = %#x", ptrace_setoptions);
 	test_ptrace_seize();
 
-	if (fcntl(0, F_GETFD) == -1 || fcntl(1, F_GETFD) == -1) {
-		/*
-		 * Something weird with our stdin and/or stdout -
-		 * for example, may be not open? In this case,
-		 * ensure that none of the future opens uses them.
-		 *
-		 * This was seen in the wild when /proc/sys/kernel/core_pattern
-		 * was set to "|/bin/strace -o/tmp/LOG PROG":
-		 * kernel runs coredump helper with fd#0 open but fd#1 closed (!),
-		 * therefore LOG gets opened to fd#1, and fd#1 is closed by
-		 * "don't hold up stdin/out open" code soon after.
-		 */
-		int fd = open_dummy_desc();
-		while (fd >= 0 && fd < 2)
-			fd = dup(fd);
-		if (fd > 2)
-			close(fd);
-	}
+	/*
+	 * Is something weird with our stdin and/or stdout -
+	 * for example, may they be not open? In this case,
+	 * ensure that none of the future opens uses them.
+	 *
+	 * This was seen in the wild when /proc/sys/kernel/core_pattern
+	 * was set to "|/bin/strace -o/tmp/LOG PROG":
+	 * kernel runs coredump helper with fd#0 open but fd#1 closed (!),
+	 * therefore LOG gets opened to fd#1, and fd#1 is closed by
+	 * "don't hold up stdin/out open" code soon after.
+	 */
+	ensure_standard_fds_opened();
 
 	/* Check if they want to redirect the output. */
 	if (outfname) {
