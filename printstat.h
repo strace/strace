@@ -62,12 +62,8 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 			(unsigned int) statbuf->st_nlink,
 			(unsigned int) statbuf->st_uid,
 			(unsigned int) statbuf->st_gid);
-#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
 		tprintf(", st_blksize=%u", (unsigned int) statbuf->st_blksize);
-#endif
-#ifdef HAVE_STRUCT_STAT_ST_BLOCKS
 		tprintf(", st_blocks=%llu", widen_to_ull(statbuf->st_blocks));
-#endif
 	} else {
 		tprints("st_mode=");
 		print_symbolic_mode_t(statbuf->st_mode);
@@ -75,15 +71,9 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 
 	switch (statbuf->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-#ifdef HAVE_STRUCT_STAT_ST_RDEV
 		tprintf(", st_rdev=makedev(%u, %u)",
 			(unsigned int) STAT_MAJOR(statbuf->st_rdev),
 			(unsigned int) STAT_MINOR(statbuf->st_rdev));
-#else /* !HAVE_STRUCT_STAT_ST_RDEV */
-		tprintf(", st_size=makedev(%u, %u)",
-			(unsigned int) STAT_MAJOR(statbuf->st_size),
-			(unsigned int) STAT_MINOR(statbuf->st_size));
-#endif /* !HAVE_STRUCT_STAT_ST_RDEV */
 		break;
 	default:
 		tprintf(", st_size=%llu", widen_to_ull(statbuf->st_size));

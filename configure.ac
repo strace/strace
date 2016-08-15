@@ -337,14 +337,11 @@ AC_CHECK_TYPES(m4_normalize([
 
 AC_CHECK_MEMBERS(m4_normalize([
 	struct stat.st_atim.tv_nsec,
-	struct stat.st_blksize,
-	struct stat.st_blocks,
 	struct stat.st_ctim.tv_nsec,
 	struct stat.st_flags,
 	struct stat.st_fstype,
 	struct stat.st_gen,
-	struct stat.st_mtim.tv_nsec,
-	struct stat.st_rdev
+	struct stat.st_mtim.tv_nsec
 ]))
 
 AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
