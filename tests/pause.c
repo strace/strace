@@ -33,6 +33,7 @@
 
 #ifdef __NR_pause
 
+# include <errno.h>
 # include <signal.h>
 # include <stdio.h>
 # include <sys/time.h>
@@ -60,8 +61,12 @@ main(void)
 	if (setitimer(ITIMER_REAL, &itv, NULL))
 		perror_msg_and_fail("setitimer");
 
-	pause();
-	printf("pause() = ? ERESTARTNOHAND (To be restarted if no handler)\n");
+	syscall(__NR_pause);
+	if (errno == ENOSYS)
+		printf("pause() = -1 ENOSYS (%m)\n");
+	else
+		printf("pause() = ? ERESTARTNOHAND"
+		       " (To be restarted if no handler)\n");
 
 	puts("+++ exited with 0 +++");
 	return 0;
