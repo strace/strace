@@ -103,9 +103,6 @@
 #ifdef STAT32_PERSONALITY
 # define DO_PRINTSTAT do_printstat32
 # define STRUCT_STAT struct stat32
-# undef HAVE_STRUCT_STAT_ST_FLAGS
-# undef HAVE_STRUCT_STAT_ST_FSTYPE
-# undef HAVE_STRUCT_STAT_ST_GEN
 # include "printstat.h"
 #endif /* STAT32_PERSONALITY */
 
@@ -198,9 +195,6 @@ struct stat64 {
 
 # define DO_PRINTSTAT do_printstat64
 # define STRUCT_STAT struct stat64
-# undef HAVE_STRUCT_STAT_ST_FLAGS
-# undef HAVE_STRUCT_STAT_ST_FSTYPE
-# undef HAVE_STRUCT_STAT_ST_GEN
 # include "printstat.h"
 
 static void

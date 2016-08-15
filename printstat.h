@@ -104,16 +104,6 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 		if (statbuf->st_ctime_nsec)
 			tprintf(".%09lu", (unsigned long) statbuf->st_ctime_nsec);
 #endif
-#ifdef HAVE_STRUCT_STAT_ST_FLAGS
-		tprintf(", st_flags=%u", (unsigned int) statbuf->st_flags);
-#endif
-#ifdef HAVE_STRUCT_STAT_ST_FSTYPE
-		tprintf(", st_fstype=%.*s",
-			(int) sizeof statbuf->st_fstype, statbuf->st_fstype);
-#endif
-#ifdef HAVE_STRUCT_STAT_ST_GEN
-		tprintf(", st_gen=%u", (unsigned int) statbuf->st_gen);
-#endif
 	} else {
 		tprints(", ...");
 	}
