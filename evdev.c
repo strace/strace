@@ -37,7 +37,7 @@
 
 typedef struct ff_effect struct_ff_effect;
 
-#endif /* HAVE_LINUX_BTRFS_H */
+#endif /* HAVE_LINUX_INPUT_H */
 
 #include MPERS_DEFS
 
