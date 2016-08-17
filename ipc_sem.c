@@ -117,7 +117,11 @@ SYS_FUNC(semctl)
 	tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
 	PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 	tprints(", ");
-	if (indirect_ipccall(tcp)) {
+	if (indirect_ipccall(tcp)
+#ifdef SPARC64
+	    && current_personality != 0
+#endif
+	   ) {
 		printnum_ptr(tcp, tcp->u_arg[3]);
 	} else {
 		tprintf("%#lx", tcp->u_arg[3]);
