@@ -499,6 +499,19 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
 	linux/ptp_clock.h		\
+	linux/riscv/arch_regs.c		\
+	linux/riscv/errnoent1.h		\
+	linux/riscv/get_error.c		\
+	linux/riscv/get_scno.c		\
+	linux/riscv/get_syscall_args.c	\
+	linux/riscv/ioctls_arch0.h	\
+	linux/riscv/ioctls_arch1.h	\
+	linux/riscv/ioctls_inc0.h	\
+	linux/riscv/ioctls_inc1.h	\
+	linux/riscv/signalent1.h	\
+	linux/riscv/stat32.h		\
+	linux/riscv/syscallent.h	\
+	linux/riscv/syscallent1.h	\
 	linux/s390/arch_regs.c		\
 	linux/s390/arch_regs.h		\
 	linux/s390/arch_sigreturn.c	\

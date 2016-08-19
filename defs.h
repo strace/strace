@@ -156,6 +156,7 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY2_WORDSIZE 4
 #elif defined AARCH64 \
    || defined POWERPC64 \
+   || defined RISCV \
    || defined SPARC64 \
    || defined TILE \
    || defined X32
@@ -357,6 +358,7 @@ extern const struct xlat whence_codes[];
  || defined(BFIN) \
  || defined(M68K) \
  || defined(MICROBLAZE) \
+ || defined(RISCV) \
  || defined(S390) \
  || defined(SH) || defined(SH64) \
  || defined(SPARC) || defined(SPARC64) \

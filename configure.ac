@@ -187,6 +187,11 @@ xtensa*)
 	AC_DEFINE([XTENSA], 1, [Define for the Xtensa architecture])
 	;;
 
+riscv*)
+	arch=riscv
+	AC_DEFINE([RISCV], 1, [Define for the RISC-V architecture])
+	;;
+
 *)
 	AC_MSG_RESULT([NO!])
 	AC_MSG_ERROR([architecture $host_cpu is not supported by strace])

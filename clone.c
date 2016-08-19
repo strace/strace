@@ -59,7 +59,7 @@
 # define ARG_PTID	2
 # define ARG_CTID	((current_personality != 1) ? 3 : 4)
 # define ARG_TLS	((current_personality != 1) ? 4 : 3)
-#elif defined ALPHA || defined TILE || defined OR1K
+#elif defined ALPHA || defined TILE || defined OR1K || defined RISCV
 # define ARG_FLAGS	0
 # define ARG_STACK	1
 # define ARG_PTID	2
