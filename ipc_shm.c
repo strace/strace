@@ -72,10 +72,14 @@ SYS_FUNC(shmat)
 		if (syserror(tcp))
 			return 0;
 		if (indirect_ipccall(tcp)) {
-			unsigned long raddr;
-			if (umove(tcp, tcp->u_arg[2], &raddr) < 0)
+			union {
+				uint64_t r64;
+				uint32_t r32;
+			} u;
+			if (umoven(tcp, tcp->u_arg[2], current_wordsize, &u) < 0)
 				return RVAL_NONE;
-			tcp->u_rval = raddr;
+			tcp->u_rval = (sizeof(u.r32) == current_wordsize)
+				      ? u.r32 : u.r64;
 		}
 		return RVAL_HEX;
 	}
