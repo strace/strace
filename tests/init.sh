@@ -166,7 +166,7 @@ match_diff()
 # dump both files and fail with ERROR_MESSAGE.
 match_grep()
 {
-	local output patterns error pattern failed=
+	local output patterns error pattern cnt failed=
 	if [ $# -eq 0 ]; then
 		output="$LOG"
 	else
@@ -186,14 +186,16 @@ match_grep()
 	check_prog wc
 	check_prog grep
 
+	cnt=1
 	while read -r pattern; do
 		LC_ALL=C grep -E -x -e "$pattern" < "$output" > /dev/null || {
 			test -n "$failed" || {
 				echo 'Failed patterns of expected output:'
 				failed=1
 			}
-			printf '%s\n' "$pattern"
+			printf '#%d: %s\n' "$cnt" "$pattern"
 		}
+		cnt=$(($cnt + 1))
 	done < "$patterns"
 	test -z "$failed" || {
 		echo 'Actual output:'
