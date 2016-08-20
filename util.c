@@ -275,7 +275,17 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
      defined XTENSA
 	/* Align arg_no to the next even number. */
 	arg_no = (arg_no + 1) & 0xe;
-# endif
+# elif defined SH
+	/*
+	 * The SH4 ABI does allow long longs in odd-numbered registers, but
+	 * does not allow them to be split between registers and memory - and
+	 * there are only four argument registers for normal functions.  As a
+	 * result, pread, for example, takes an extra padding argument before
+	 * the offset.  This was changed late in the 2.4 series (around 2.4.20).
+	 */
+	if (arg_no == 3)
+		arg_no++;
+# endif /* __ARM_EABI__ || LINUX_MIPSO32 || POWERPC || XTENSA || SH */
 	*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 	arg_no += 2;
 #endif

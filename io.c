@@ -150,17 +150,6 @@ SYS_FUNC(writev)
 	return RVAL_DECODED;
 }
 
-/* The SH4 ABI does allow long longs in odd-numbered registers, but
-   does not allow them to be split between registers and memory - and
-   there are only four argument registers for normal functions.  As a
-   result pread takes an extra padding argument before the offset.  This
-   was changed late in the 2.4 series (around 2.4.20).  */
-#if defined(SH)
-#define PREAD_OFFSET_ARG 4
-#else
-#define PREAD_OFFSET_ARG 3
-#endif
-
 SYS_FUNC(pread)
 {
 	if (entering(tcp)) {
@@ -172,7 +161,7 @@ SYS_FUNC(pread)
 		else
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
-		printllval(tcp, "%lld", PREAD_OFFSET_ARG);
+		printllval(tcp, "%lld", 3);
 	}
 	return 0;
 }
@@ -183,7 +172,7 @@ SYS_FUNC(pwrite)
 	tprints(", ");
 	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu, ", tcp->u_arg[2]);
-	printllval(tcp, "%lld", PREAD_OFFSET_ARG);
+	printllval(tcp, "%lld", 3);
 
 	return RVAL_DECODED;
 }
