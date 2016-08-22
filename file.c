@@ -206,12 +206,12 @@ printstat64(struct tcb *tcp, long addr)
 	(void) sizeof(char[sizeof statbuf == STAT64_SIZE ? 1 : -1]);
 # endif
 
-# ifdef STAT32_PERSONALITY
+# if defined STAT32_PERSONALITY && !defined SPARC64
 	if (current_personality != STAT32_PERSONALITY) {
 		printstat(tcp, addr);
 		return;
 	}
-# endif /* STAT32_PERSONALITY */
+# endif /* STAT32_PERSONALITY && !SPARC64 */
 
 	if (!umove_or_printaddr(tcp, addr, &statbuf))
 		do_printstat64(tcp, &statbuf);
@@ -260,7 +260,7 @@ SYS_FUNC(newfstatat)
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 	} else {
-#if defined STAT32_PERSONALITY
+#if defined STAT32_PERSONALITY && !defined SPARC64
 		if (current_personality == STAT32_PERSONALITY)
 			printstat64(tcp, tcp->u_arg[2]);
 		else
