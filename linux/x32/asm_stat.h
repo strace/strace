@@ -1,14 +1,18 @@
+#ifndef STRACE_X32_ASM_STAT_H
+#define STRACE_X32_ASM_STAT_H
+
+# if defined __x86_64__ && defined __ILP32__
+#  define stat redirect_kernel_stat
+# endif
+
+# include "linux/asm_stat.h"
+
+# if defined __x86_64__ && defined __ILP32__
+#  undef stat
 /*
  * This is a replacement for x32 <asm/stat.h> which
  * appears to be wrong in older kernel headers.
  */
-
-#ifndef STRACE_ASM_STAT_H
-
-# define STRACE_ASM_STAT_H
-
-# include "kernel_types.h"
-
 struct stat {
 	kernel_ulong_t	st_dev;
 	kernel_ulong_t	st_ino;
@@ -30,18 +34,6 @@ struct stat {
 	kernel_long_t	pad1__[3];
 };
 
-struct __old_kernel_stat {
-	unsigned short st_dev;
-	unsigned short st_ino;
-	unsigned short st_mode;
-	unsigned short st_nlink;
-	unsigned short st_uid;
-	unsigned short st_gid;
-	unsigned short st_rdev;
-	unsigned int  st_size;
-	unsigned int  st_atime;
-	unsigned int  st_mtime;
-	unsigned int  st_ctime;
-};
+# endif /* __x86_64__ && __ILP32__ */
 
-#endif /* !STRACE_ASM_STAT_H */
+#endif /* !STRACE_X32_ASM_STAT_H */
