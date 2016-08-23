@@ -325,6 +325,12 @@ AC_CHECK_TYPES([struct stat64, struct __old_kernel_stat],,,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 
+AC_CHECK_MEMBERS([struct stat.st_mtime_nsec],,,
+[#include <sys/types.h>
+#include <asm/stat.h>])
+
+AC_CHECK_MEMBERS([struct stat.st_mtim.tv_nsec])
+
 AC_CHECK_TYPES(m4_normalize([
 	struct pt_all_user_regs,
 	struct ia64_fpreg,
@@ -340,22 +346,9 @@ AC_CHECK_TYPES(m4_normalize([
 [#include <sys/types.h>
 #include <linux/fcntl.h>])
 
-AC_CHECK_MEMBERS(m4_normalize([
-	struct stat.st_atim.tv_nsec,
-	struct stat.st_ctim.tv_nsec,
-	struct stat.st_mtim.tv_nsec
-]))
-
 AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
-
-AC_CHECK_MEMBERS(m4_normalize([
-	struct stat.st_atime_nsec,
-	struct stat.st_ctime_nsec,
-	struct stat.st_mtime_nsec
-]),,, [#include <sys/types.h>
-#include <asm/stat.h>])
 
 AC_CHECK_MEMBERS(m4_normalize([
 	siginfo_t.si_syscall,

@@ -88,10 +88,6 @@
 #include "printstat.h"
 
 /* all locally defined structures provide these fields */
-#undef HAVE_STRUCT_STAT_ST_ATIME_NSEC
-#define HAVE_STRUCT_STAT_ST_ATIME_NSEC 1
-#undef HAVE_STRUCT_STAT_ST_CTIME_NSEC
-#define HAVE_STRUCT_STAT_ST_CTIME_NSEC 1
 #undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
 #define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
 

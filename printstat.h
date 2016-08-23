@@ -88,7 +88,7 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 		tprints(", st_atime=");
 		tprints(sprinttime(cast ? (time_t) (int) statbuf->st_atime:
 					  (time_t) statbuf->st_atime));
-#ifdef HAVE_STRUCT_STAT_ST_ATIME_NSEC
+#ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
 		if (statbuf->st_atime_nsec)
 			tprintf(".%09lu", (unsigned long) statbuf->st_atime_nsec);
 #endif
@@ -102,7 +102,7 @@ DO_PRINTSTAT(struct tcb *tcp, const STRUCT_STAT *statbuf)
 		tprints(", st_ctime=");
 		tprints(sprinttime(cast ? (time_t) (int) statbuf->st_ctime:
 					  (time_t) statbuf->st_ctime));
-#ifdef HAVE_STRUCT_STAT_ST_CTIME_NSEC
+#ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
 		if (statbuf->st_ctime_nsec)
 			tprintf(".%09lu", (unsigned long) statbuf->st_ctime_nsec);
 #endif
