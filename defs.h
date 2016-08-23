@@ -750,7 +750,8 @@ extern unsigned current_wordsize;
  * Zero-extend a signed integer type to unsigned long long.
  */
 #define zero_extend_signed_to_ull(v) \
-	(sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
+	(sizeof(v) == sizeof(short) ? (unsigned long long) (unsigned short) (v) : \
+	 sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
 	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
 	 (unsigned long long) (v))
 
