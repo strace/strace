@@ -97,26 +97,6 @@ typedef off_t libc_off_t;
 #  undef st_atime
 #  undef st_mtime
 #  undef st_ctime
-#  undef dev_t
-#  undef gid_t
-#  undef ino_t
-#  undef loff_t
-#  undef mode_t
-#  undef nlink_t
-#  undef off64_t
-#  undef off_t
-#  undef time_t
-#  undef uid_t
-#  define dev_t __kernel_dev_t
-#  define gid_t __kernel_gid_t
-#  define ino_t __kernel_ino_t
-#  define loff_t __kernel_loff_t
-#  define mode_t __kernel_mode_t
-#  define nlink_t __kernel_nlink_t
-#  define off64_t __kernel_off64_t
-#  define off_t __kernel_off_t
-#  define time_t __kernel_time_t
-#  define uid_t __kernel_uid_t
 #  include "asm_stat.h"
 #  if STRUCT_STAT_IS_STAT64
 #   undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
