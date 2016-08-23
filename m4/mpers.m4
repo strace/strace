@@ -1,6 +1,6 @@
 #!/usr/bin/m4
 #
-# Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
 # All rights reserved.
 #
@@ -26,8 +26,59 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+AC_DEFUN([st_MPERS_LOAD_AC_CV], [
+
+pushdef([var], [ac_cv_$1])
+pushdef([saved], [saved_ac_cv_$1])
+pushdef([mpers], [ac_cv_]mpers_name[_$1])
+
+AS_IF([test -n "${var+set}"], [saved="${var}"; unset var])
+AS_IF([test -n "${mpers+set}"], [var="${mpers}"])
+
+popdef([mpers])
+popdef([saved])
+popdef([var])
+
+])
+
+AC_DEFUN([st_MPERS_SAVE_AC_CV], [
+
+pushdef([var], [ac_cv_$1])
+pushdef([saved], [saved_ac_cv_$1])
+pushdef([mpers], [ac_cv_]mpers_name[_$1])
+
+AS_IF([test -n "${var+set}"], [mpers="${var}"])
+AS_IF([test -n "${saved+set}"], [var="${saved}"; unset saved])
+
+popdef([mpers])
+popdef([saved])
+popdef([var])
+
+])
+
+AC_DEFUN([st_MPERS_STRUCT_STAT], [
+
+st_MPERS_LOAD_AC_CV([type_struct_stat$1])
+AC_CHECK_TYPE([struct stat$1],
+	      AC_DEFINE([HAVE_]MPERS_NAME[_STRUCT_STAT$1], [1],
+			[Define to 1 if MPERS_NAME has the type 'struct stat$1'.]),,
+[#include <sys/types.h>
+#include <asm/stat.h>])
+st_MPERS_SAVE_AC_CV([type_struct_stat$1])
+
+st_MPERS_LOAD_AC_CV([member_struct_stat$1_st_mtime_nsec])
+AC_CHECK_MEMBER([struct stat$1.st_mtime_nsec],
+		AC_DEFINE([HAVE_]MPERS_NAME[_STRUCT_STAT$1_ST_MTIME_NSEC], [1],
+			  [Define to 1 if 'st_mtime_nsec' is a member of MPERS_NAME 'struct stat$1'.]),,
+[#include <sys/types.h>
+#include <asm/stat.h>])
+st_MPERS_SAVE_AC_CV([member_struct_stat$1_st_mtime_nsec])
+
+])
+
 AC_DEFUN([st_MPERS],[
 
+pushdef([mpers_name], [$1])
 pushdef([MPERS_NAME], translit([$1], [a-z], [A-Z]))
 pushdef([HAVE_MPERS], [HAVE_]MPERS_NAME[_MPERS])
 pushdef([HAVE_RUNTIME], [HAVE_]MPERS_NAME[_RUNTIME])
@@ -73,6 +124,8 @@ case "$arch" in
 		if test $st_cv_mpers = yes; then
 			AC_DEFINE(HAVE_MPERS, [1],
 				  [Define to 1 if you have CFLAG mpers support])
+			st_MPERS_STRUCT_STAT([])
+			st_MPERS_STRUCT_STAT([64])
 		fi
 	fi
 	CFLAGS="$saved_CFLAGS"
@@ -94,5 +147,6 @@ popdef([CFLAG])
 popdef([HAVE_RUNTIME])
 popdef([HAVE_MPERS])
 popdef([MPERS_NAME])
+popdef([mpers_name])
 
 ])
