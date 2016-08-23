@@ -293,7 +293,7 @@
 [4290] = { 4,	TD|TF,		SEN(mknodat),			"mknodat"		},
 [4291] = { 5,	TD|TF,		SEN(fchownat),			"fchownat"		},
 [4292] = { 3,	TD|TF,		SEN(futimesat),			"futimesat"		},
-[4293] = { 4,	TD|TF,		SEN(newfstatat),		"fstatat64"		},
+[4293] = { 4,	TD|TF,		SEN(fstatat64),			"fstatat64"		},
 [4294] = { 3,	TD|TF,		SEN(unlinkat),			"unlinkat"		},
 [4295] = { 4,	TD|TF,		SEN(renameat),			"renameat"		},
 [4296] = { 5,	TD|TF,		SEN(linkat),			"linkat"		},

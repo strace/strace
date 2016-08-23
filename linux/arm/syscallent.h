@@ -351,7 +351,7 @@
 [324] = { 4,	TD|TF,		SEN(mknodat),			"mknodat"		},
 [325] = { 5,	TD|TF,		SEN(fchownat),			"fchownat"		},
 [326] = { 3,	TD|TF,		SEN(futimesat),			"futimesat"		},
-[327] = { 4,	TD|TF,		SEN(newfstatat),		"fstatat64"		},
+[327] = { 4,	TD|TF,		SEN(fstatat64),			"fstatat64"		},
 [328] = { 3,	TD|TF,		SEN(unlinkat),			"unlinkat"		},
 [329] = { 4,	TD|TF,		SEN(renameat),			"renameat"		},
 [330] = { 5,	TD|TF,		SEN(linkat),			"linkat"		},

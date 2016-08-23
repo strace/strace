@@ -288,7 +288,7 @@
 [296] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
 [297] = { 5,	TD|TF,		SEN(fchownat),			"fchownat"		},
 [298] = { 3,	TD|TF,		SEN(futimesat),			"futimesat"		},
-[299] = { 4,	TD|TF,		SEN(newfstatat),		"fstatat64"		},
+[299] = { 4,	TD|TF,		SEN(fstatat64),			"fstatat64"		},
 [300] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [301] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
 [302 ... 303] = { },

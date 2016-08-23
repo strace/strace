@@ -80,7 +80,7 @@
 [ 76] = { 6,	TD,		SEN(splice),			"splice"		},
 [ 77] = { 4,	TD,		SEN(tee),			"tee"			},
 [ 78] = { 4,	TD|TF,		SEN(readlinkat),		"readlinkat"		},
-[ 79] = { 4,	TD|TF,		SEN(newfstatat),		"fstatat64"		},
+[ 79] = { 4,	TD|TF,		SEN(fstatat64),			"fstatat64"		},
 [ 80] = { 2,	TD,		SEN(fstat64),			"fstat64"		},
 [ 81] = { 0,	0,		SEN(sync),			"sync"			},
 [ 82] = { 1,	TD,		SEN(fsync),			"fsync"			},

@@ -59,6 +59,7 @@
 #define	sys_connect		sys_bind
 #define	sys_fchdir		sys_close
 #define	sys_fdatasync		sys_close
+#define	sys_fstatat64		sys_newfstatat
 #define	sys_fsync		sys_close
 #define	sys_getegid		sys_getuid
 #define	sys_getegid16		sys_geteuid16
