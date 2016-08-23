@@ -48,8 +48,8 @@ print_old_dirent(struct tcb *tcp, long addr)
 		return;
 
 	tprintf("{d_ino=%llu, d_off=%llu, d_reclen=%u, d_name=",
-		widen_to_ull(d.d_ino),
-		widen_to_ull(d.d_off), d.d_reclen);
+		zero_extend_signed_to_ull(d.d_ino),
+		zero_extend_signed_to_ull(d.d_off), d.d_reclen);
 	if (d.d_reclen > D_NAME_LEN_MAX)
 		d.d_reclen = D_NAME_LEN_MAX;
 	printpathn(tcp, addr + offsetof(kernel_dirent, d_name), d.d_reclen);
@@ -127,8 +127,9 @@ SYS_FUNC(getdents)
 
 			tprintf("%s{d_ino=%llu, d_off=%llu, d_reclen=%u"
 				", d_name=", i ? ", " : "",
-				widen_to_ull(d->d_ino),
-				widen_to_ull(d->d_off), d->d_reclen);
+				zero_extend_signed_to_ull(d->d_ino),
+				zero_extend_signed_to_ull(d->d_off),
+				d->d_reclen);
 
 			if (print_quoted_string(d->d_name, d_name_len,
 					        QUOTE_0_TERMINATED) > 0) {

@@ -46,11 +46,11 @@ SYS_FUNC(times)
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
 		tprintf("{tms_utime=%llu, tms_stime=%llu, ",
-			widen_to_ull(tbuf.tms_utime),
-			widen_to_ull(tbuf.tms_stime));
+			zero_extend_signed_to_ull(tbuf.tms_utime),
+			zero_extend_signed_to_ull(tbuf.tms_stime));
 		tprintf("tms_cutime=%llu, tms_cstime=%llu}",
-			widen_to_ull(tbuf.tms_cutime),
-			widen_to_ull(tbuf.tms_cstime));
+			zero_extend_signed_to_ull(tbuf.tms_cutime),
+			zero_extend_signed_to_ull(tbuf.tms_cstime));
 	}
 
 	return syserror(tcp) ? RVAL_DECIMAL :

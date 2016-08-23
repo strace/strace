@@ -62,25 +62,25 @@ sprint_rusage(const struct rusage *const ru)
 #else
 		 ", ...}"
 #endif
-		 , widen_to_ull(ru->ru_utime.tv_sec)
-		 , widen_to_ull(ru->ru_utime.tv_usec)
-		 , widen_to_ull(ru->ru_stime.tv_sec)
-		 , widen_to_ull(ru->ru_stime.tv_usec)
+		 , zero_extend_signed_to_ull(ru->ru_utime.tv_sec)
+		 , zero_extend_signed_to_ull(ru->ru_utime.tv_usec)
+		 , zero_extend_signed_to_ull(ru->ru_stime.tv_sec)
+		 , zero_extend_signed_to_ull(ru->ru_stime.tv_usec)
 #ifdef VERBOSE_RUSAGE
-		 , widen_to_ull(ru->ru_maxrss)
-		 , widen_to_ull(ru->ru_ixrss)
-		 , widen_to_ull(ru->ru_idrss)
-		 , widen_to_ull(ru->ru_isrss)
-		 , widen_to_ull(ru->ru_minflt)
-		 , widen_to_ull(ru->ru_majflt)
-		 , widen_to_ull(ru->ru_nswap)
-		 , widen_to_ull(ru->ru_inblock)
-		 , widen_to_ull(ru->ru_oublock)
-		 , widen_to_ull(ru->ru_msgsnd)
-		 , widen_to_ull(ru->ru_msgrcv)
-		 , widen_to_ull(ru->ru_nsignals)
-		 , widen_to_ull(ru->ru_nvcsw)
-		 , widen_to_ull(ru->ru_nivcsw)
+		 , zero_extend_signed_to_ull(ru->ru_maxrss)
+		 , zero_extend_signed_to_ull(ru->ru_ixrss)
+		 , zero_extend_signed_to_ull(ru->ru_idrss)
+		 , zero_extend_signed_to_ull(ru->ru_isrss)
+		 , zero_extend_signed_to_ull(ru->ru_minflt)
+		 , zero_extend_signed_to_ull(ru->ru_majflt)
+		 , zero_extend_signed_to_ull(ru->ru_nswap)
+		 , zero_extend_signed_to_ull(ru->ru_inblock)
+		 , zero_extend_signed_to_ull(ru->ru_oublock)
+		 , zero_extend_signed_to_ull(ru->ru_msgsnd)
+		 , zero_extend_signed_to_ull(ru->ru_msgrcv)
+		 , zero_extend_signed_to_ull(ru->ru_nsignals)
+		 , zero_extend_signed_to_ull(ru->ru_nvcsw)
+		 , zero_extend_signed_to_ull(ru->ru_nivcsw)
 #endif
 		 );
 	return buf;
@@ -130,8 +130,8 @@ sprint_siginfo(const siginfo_t *const si, const char *const status_text)
 		 si->si_pid,
 		 si->si_uid,
 		 status_text,
-		 widen_to_ull(si->si_utime),
-		 widen_to_ull(si->si_stime));
+		 zero_extend_signed_to_ull(si->si_utime),
+		 zero_extend_signed_to_ull(si->si_stime));
 	return buf;
 }
 

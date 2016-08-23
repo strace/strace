@@ -47,26 +47,26 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
 	if (umove_or_printaddr(tcp, addr, &b))
 		return false;
 
-	p->f_type = widen_to_ull(b.f_type);
-	p->f_bsize = widen_to_ull(b.f_bsize);
-	p->f_blocks = widen_to_ull(b.f_blocks);
-	p->f_bfree = widen_to_ull(b.f_bfree);
-	p->f_bavail = widen_to_ull(b.f_bavail);
-	p->f_files = widen_to_ull(b.f_files);
-	p->f_ffree = widen_to_ull(b.f_ffree);
+	p->f_type = zero_extend_signed_to_ull(b.f_type);
+	p->f_bsize = zero_extend_signed_to_ull(b.f_bsize);
+	p->f_blocks = zero_extend_signed_to_ull(b.f_blocks);
+	p->f_bfree = zero_extend_signed_to_ull(b.f_bfree);
+	p->f_bavail = zero_extend_signed_to_ull(b.f_bavail);
+	p->f_files = zero_extend_signed_to_ull(b.f_files);
+	p->f_ffree = zero_extend_signed_to_ull(b.f_ffree);
 #if defined HAVE_STRUCT_STATFS_F_FSID_VAL
-	p->f_fsid[0] = widen_to_ull(b.f_fsid.val[0]);
-	p->f_fsid[1] = widen_to_ull(b.f_fsid.val[1]);
+	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.val[0]);
+	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.val[1]);
 #elif defined HAVE_STRUCT_STATFS_F_FSID___VAL
-	p->f_fsid[0] = widen_to_ull(b.f_fsid.__val[0]);
-	p->f_fsid[1] = widen_to_ull(b.f_fsid.__val[1]);
+	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.__val[0]);
+	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.__val[1]);
 #endif
-	p->f_namelen = widen_to_ull(b.f_namelen);
+	p->f_namelen = zero_extend_signed_to_ull(b.f_namelen);
 #ifdef HAVE_STRUCT_STATFS_F_FRSIZE
-	p->f_frsize = widen_to_ull(b.f_frsize);
+	p->f_frsize = zero_extend_signed_to_ull(b.f_frsize);
 #endif
 #ifdef HAVE_STRUCT_STATFS_F_FLAGS
-	p->f_flags = widen_to_ull(b.f_flags);
+	p->f_flags = zero_extend_signed_to_ull(b.f_flags);
 #endif
 
 	return true;
@@ -95,26 +95,26 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs64,
 	if (umove_or_printaddr(tcp, addr, &b))
 		return false;
 
-	p->f_type = widen_to_ull(b.f_type);
-	p->f_bsize = widen_to_ull(b.f_bsize);
-	p->f_blocks = widen_to_ull(b.f_blocks);
-	p->f_bfree = widen_to_ull(b.f_bfree);
-	p->f_bavail = widen_to_ull(b.f_bavail);
-	p->f_files = widen_to_ull(b.f_files);
-	p->f_ffree = widen_to_ull(b.f_ffree);
+	p->f_type = zero_extend_signed_to_ull(b.f_type);
+	p->f_bsize = zero_extend_signed_to_ull(b.f_bsize);
+	p->f_blocks = zero_extend_signed_to_ull(b.f_blocks);
+	p->f_bfree = zero_extend_signed_to_ull(b.f_bfree);
+	p->f_bavail = zero_extend_signed_to_ull(b.f_bavail);
+	p->f_files = zero_extend_signed_to_ull(b.f_files);
+	p->f_ffree = zero_extend_signed_to_ull(b.f_ffree);
 #if defined HAVE_STRUCT_STATFS64_F_FSID_VAL
-	p->f_fsid[0] = widen_to_ull(b.f_fsid.val[0]);
-	p->f_fsid[1] = widen_to_ull(b.f_fsid.val[1]);
+	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.val[0]);
+	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.val[1]);
 #elif defined HAVE_STRUCT_STATFS64_F_FSID___VAL
-	p->f_fsid[0] = widen_to_ull(b.f_fsid.__val[0]);
-	p->f_fsid[1] = widen_to_ull(b.f_fsid.__val[1]);
+	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.__val[0]);
+	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.__val[1]);
 #endif
-	p->f_namelen = widen_to_ull(b.f_namelen);
+	p->f_namelen = zero_extend_signed_to_ull(b.f_namelen);
 #ifdef HAVE_STRUCT_STATFS64_F_FRSIZE
-	p->f_frsize = widen_to_ull(b.f_frsize);
+	p->f_frsize = zero_extend_signed_to_ull(b.f_frsize);
 #endif
 #ifdef HAVE_STRUCT_STATFS64_F_FLAGS
-	p->f_flags = widen_to_ull(b.f_flags);
+	p->f_flags = zero_extend_signed_to_ull(b.f_flags);
 #endif
 
 	return true;

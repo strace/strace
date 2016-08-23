@@ -121,9 +121,9 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 
 /*
- * Widen without sign-extension a signed integer type to unsigned long long.
+ * Zero-extend a signed integer type to unsigned long long.
  */
-#define widen_to_ull(v) \
+#define zero_extend_signed_to_ull(v) \
 	(sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
 	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
 	 (unsigned long long) (v))

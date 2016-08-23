@@ -86,7 +86,8 @@ main(void)
 		", si_pid=%d, si_uid=%u, si_status=%d"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid, sinfo.si_status,
-		widen_to_ull(sinfo.si_utime), widen_to_ull(sinfo.si_stime));
+		zero_extend_signed_to_ull(sinfo.si_utime),
+		zero_extend_signed_to_ull(sinfo.si_stime));
 
 	int s;
 	assert(wait(&s) == pid);
@@ -116,7 +117,8 @@ main(void)
 		", si_pid=%d, si_uid=%u, si_status=SIGUSR1"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		widen_to_ull(sinfo.si_utime), widen_to_ull(sinfo.si_stime));
+		zero_extend_signed_to_ull(sinfo.si_utime),
+		zero_extend_signed_to_ull(sinfo.si_stime));
 
 	assert(wait(&s) == pid);
 	assert(WIFSIGNALED(s) && WTERMSIG(s) == SIGUSR1);
@@ -142,7 +144,8 @@ main(void)
 		", si_pid=%d, si_uid=%u, si_status=SIGSTOP"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		widen_to_ull(sinfo.si_utime), widen_to_ull(sinfo.si_stime));
+		zero_extend_signed_to_ull(sinfo.si_utime),
+		zero_extend_signed_to_ull(sinfo.si_stime));
 
 	assert(kill(pid, SIGCONT) == 0);
 
@@ -151,7 +154,8 @@ main(void)
 		", si_pid=%d, si_uid=%u, si_status=SIGCONT"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		widen_to_ull(sinfo.si_utime), widen_to_ull(sinfo.si_stime));
+		zero_extend_signed_to_ull(sinfo.si_utime),
+		zero_extend_signed_to_ull(sinfo.si_stime));
 
 	assert(write(1, "", 1) == 1);
 	(void) close(1);
@@ -161,7 +165,8 @@ main(void)
 		", si_pid=%d, si_uid=%u, si_status=0"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		widen_to_ull(sinfo.si_utime), widen_to_ull(sinfo.si_stime));
+		zero_extend_signed_to_ull(sinfo.si_utime),
+		zero_extend_signed_to_ull(sinfo.si_stime));
 
 	assert(wait(&s) == pid && s == 0);
 

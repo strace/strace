@@ -110,8 +110,8 @@ SYS_FUNC(llseek)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprintf(", %lld, ",
-			(widen_to_ull(tcp->u_arg[1]) << 32)
-			| widen_to_ull(tcp->u_arg[2]));
+			(zero_extend_signed_to_ull(tcp->u_arg[1]) << 32)
+			| zero_extend_signed_to_ull(tcp->u_arg[2]));
 	} else {
 		printnum_int64(tcp, tcp->u_arg[3], "%" PRIu64);
 		tprints(", ");

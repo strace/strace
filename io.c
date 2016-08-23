@@ -201,8 +201,8 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 # if SUPPORTED_PERSONALITIES > 1
 	if (current_personality == 1) {
 		tprintf("%lld",
-			(widen_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
-			| widen_to_ull(tcp->u_arg[arg]));
+			(zero_extend_signed_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
+			| zero_extend_signed_to_ull(tcp->u_arg[arg]));
 	} else
 # endif
 	{
@@ -210,8 +210,8 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 	}
 #else /* SIZEOF_LONG_LONG > SIZEOF_LONG && !HAVE_STRUCT_TCB_EXT_ARG */
 	tprintf("%lld",
-		(widen_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
-		| widen_to_ull(tcp->u_arg[arg]));
+		(zero_extend_signed_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
+		| zero_extend_signed_to_ull(tcp->u_arg[arg]));
 #endif
 }
 

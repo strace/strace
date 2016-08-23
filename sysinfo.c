@@ -59,19 +59,19 @@ SYS_FUNC(sysinfo)
 			", freehigh=%llu"
 			", mem_unit=%u"
 			"}",
-			widen_to_ull(si.uptime)
-			, widen_to_ull(si.loads[0])
-			, widen_to_ull(si.loads[1])
-			, widen_to_ull(si.loads[2])
-			, widen_to_ull(si.totalram)
-			, widen_to_ull(si.freeram)
-			, widen_to_ull(si.sharedram)
-			, widen_to_ull(si.bufferram)
-			, widen_to_ull(si.totalswap)
-			, widen_to_ull(si.freeswap)
+			zero_extend_signed_to_ull(si.uptime)
+			, zero_extend_signed_to_ull(si.loads[0])
+			, zero_extend_signed_to_ull(si.loads[1])
+			, zero_extend_signed_to_ull(si.loads[2])
+			, zero_extend_signed_to_ull(si.totalram)
+			, zero_extend_signed_to_ull(si.freeram)
+			, zero_extend_signed_to_ull(si.sharedram)
+			, zero_extend_signed_to_ull(si.bufferram)
+			, zero_extend_signed_to_ull(si.totalswap)
+			, zero_extend_signed_to_ull(si.freeswap)
 			, (unsigned) si.procs
-			, widen_to_ull(si.totalhigh)
-			, widen_to_ull(si.freehigh)
+			, zero_extend_signed_to_ull(si.totalhigh)
+			, zero_extend_signed_to_ull(si.freehigh)
 			, si.mem_unit
 			);
 	}
