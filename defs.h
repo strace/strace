@@ -755,6 +755,15 @@ extern unsigned current_wordsize;
 	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
 	 (unsigned long long) (v))
 
+/*
+ * Sign-extend an unsigned integer type to long long.
+ */
+#define sign_extend_unsigned_to_ll(v) \
+	(sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
+	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
+	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
+	 (long long) (v))
+
 extern const struct_sysent sysent0[];
 extern const char *const errnoent0[];
 extern const char *const signalent0[];
