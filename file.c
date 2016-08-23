@@ -330,31 +330,3 @@ SYS_FUNC(oldfstat)
 }
 
 #endif /* HAVE_STRUCT___OLD_KERNEL_STAT */
-
-#if defined(SPARC) || defined(SPARC64)
-
-SYS_FUNC(xstat)
-{
-	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
-		printpath(tcp, tcp->u_arg[1]);
-		tprints(", ");
-	} else {
-		printstat(tcp, tcp->u_arg[2]);
-	}
-	return 0;
-}
-
-SYS_FUNC(fxstat)
-{
-	if (entering(tcp)) {
-		tprintf("%ld, ", tcp->u_arg[0]);
-		printfd(tcp, tcp->u_arg[1]);
-		tprints(", ");
-	} else {
-		printstat(tcp, tcp->u_arg[2]);
-	}
-	return 0;
-}
-
-#endif /* SPARC || SPARC64 */
