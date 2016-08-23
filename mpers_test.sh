@@ -121,7 +121,7 @@ int16_t f[0];
 #define MPERS_${mpers_name}_sample_struct ${mpers_name}_sample_struct
 EOF
 
-CFLAGS="$CPPFLAGS -I${srcdir}" \
+CFLAGS="$CPPFLAGS -I${srcdir} -DMPERS_IS_${mpers_name}" \
 CPPFLAGS="$CPPFLAGS -I${srcdir} -DIN_MPERS -DMPERS_IS_${mpers_name}" \
 "$mpers_sh" "-$mpers_name" "$sample"
 cmp "$expected" "$mpers_dir"/sample_struct.h > /dev/null

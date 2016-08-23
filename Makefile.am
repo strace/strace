@@ -774,7 +774,7 @@ libmpers_CFLAGS = $(strace_CFLAGS)
 
 mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 	for f in $^; do \
-		CC="$(CC)" CFLAGS="$(mpers_sh_opts)" \
+		CC="$(CC)" CFLAGS="$(mpers_sh_opts) -DMPERS_IS_$(mpers_NAME)" \
 		CPP="$(CPP)" CPPFLAGS="$(mpers_sh_opts) -DIN_MPERS -DMPERS_IS_$(mpers_NAME)" \
 		$(srcdir)/mpers.sh -$(mpers_NAME) $$f || exit; \
 	done
