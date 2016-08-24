@@ -325,7 +325,7 @@ AC_CHECK_TYPES([struct stat64, struct __old_kernel_stat],,,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 
-AC_CHECK_MEMBERS([struct stat.st_mtime_nsec],,,
+AC_CHECK_MEMBERS([struct stat.st_mtime_nsec, struct stat64.st_mtime_nsec],,,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 

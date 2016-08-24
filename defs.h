@@ -631,6 +631,9 @@ extern const char *sprint_open_modes(unsigned int);
 extern void print_seccomp_filter(struct tcb *, unsigned long);
 extern void print_seccomp_fprog(struct tcb *, unsigned long, unsigned short);
 
+struct strace_stat;
+extern void print_struct_stat(struct tcb *tcp, const struct strace_stat *const st);
+
 struct strace_statfs;
 extern void print_struct_statfs(struct tcb *tcp, long);
 extern void print_struct_statfs64(struct tcb *tcp, long, unsigned long);

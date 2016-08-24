@@ -112,8 +112,9 @@ strace_SOURCES =	\
 	fetch_struct_flock.c \
 	fetch_struct_mmsghdr.c \
 	fetch_struct_msghdr.c \
+	fetch_struct_stat.c \
+	fetch_struct_stat64.c \
 	fetch_struct_statfs.c \
-	file.c		\
 	file_handle.c	\
 	file_ioctl.c	\
 	fs_x_ioctl.c	\
@@ -166,6 +167,7 @@ strace_SOURCES =	\
 	net.c		\
 	netlink.c       \
 	numa.c		\
+	oldstat.c	\
 	open.c		\
 	or1k_atomic.c	\
 	pathtrace.c	\
@@ -177,13 +179,13 @@ strace_SOURCES =	\
 	print_msgbuf.c	\
 	print_sigevent.c \
 	print_statfs.c	\
+	print_struct_stat.c \
 	print_time.c	\
 	print_timex.c	\
 	printmode.c	\
 	printrusage.c	\
 	printsiginfo.c	\
 	printsiginfo.h	\
-	printstat.h	\
 	process.c	\
 	process_vm.c	\
 	ptp.c		\
@@ -210,6 +212,9 @@ strace_SOURCES =	\
 	sockaddr.c	\
 	socketutils.c	\
 	sram_alloc.c	\
+	stat.c		\
+	stat.h		\
+	stat64.c	\
 	statfs.c	\
 	statfs.h	\
 	strace.c	\
@@ -303,7 +308,6 @@ EXTRA_DIST =				\
 	linux/aarch64/ioctls_inc0.h	\
 	linux/aarch64/ioctls_inc1.h	\
 	linux/aarch64/signalent1.h	\
-	linux/aarch64/stat32.h		\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
 	linux/alpha/arch_getrval2.c	\
@@ -495,7 +499,6 @@ EXTRA_DIST =				\
 	linux/powerpc64/ioctls_inc0.h	\
 	linux/powerpc64/ioctls_inc1.h	\
 	linux/powerpc64/signalent1.h	\
-	linux/powerpc64/stat32.h	\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
@@ -510,7 +513,6 @@ EXTRA_DIST =				\
 	linux/riscv/ioctls_inc0.h	\
 	linux/riscv/ioctls_inc1.h	\
 	linux/riscv/signalent1.h	\
-	linux/riscv/stat32.h		\
 	linux/riscv/syscallent.h	\
 	linux/riscv/syscallent1.h	\
 	linux/s390/arch_regs.c		\
@@ -587,7 +589,6 @@ EXTRA_DIST =				\
 	linux/sparc64/ioctls_inc1.h	\
 	linux/sparc64/signalent.h	\
 	linux/sparc64/signalent1.h	\
-	linux/sparc64/stat32.h		\
 	linux/sparc64/syscallent.h	\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/userent.h		\
@@ -605,7 +606,6 @@ EXTRA_DIST =				\
 	linux/tile/ioctls_inc0.h	\
 	linux/tile/ioctls_inc1.h	\
 	linux/tile/signalent1.h		\
-	linux/tile/stat32.h		\
 	linux/tile/syscallent.h		\
 	linux/tile/syscallent1.h	\
 	linux/tile/userent.h		\
@@ -625,7 +625,6 @@ EXTRA_DIST =				\
 	linux/x32/ioctls_inc0.h		\
 	linux/x32/ioctls_inc1.h		\
 	linux/x32/signalent1.h		\
-	linux/x32/stat32.h		\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
 	linux/x32/userent.h		\
@@ -647,7 +646,6 @@ EXTRA_DIST =				\
 	linux/x86_64/ioctls_inc2.h	\
 	linux/x86_64/signalent1.h	\
 	linux/x86_64/signalent2.h	\
-	linux/x86_64/stat32.h		\
 	linux/x86_64/syscallent.h	\
 	linux/x86_64/syscallent1.h	\
 	linux/x86_64/syscallent2.h	\
