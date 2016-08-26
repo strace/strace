@@ -34,12 +34,8 @@
 
 #include "defs.h"
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include "stat.h"
-#if defined MAJOR_IN_SYSMACROS
-# include <sys/sysmacros.h>
-#elif defined MAJOR_IN_MKDEV
-# include <sys/mkdev.h>
-#endif
 
 void
 print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)

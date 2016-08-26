@@ -35,14 +35,7 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
-
-#ifdef MAJOR_IN_SYSMACROS
-# include <sys/sysmacros.h>
-#endif
-
-#ifdef MAJOR_IN_MKDEV
-# include <sys/mkdev.h>
-#endif
+#include <sys/sysmacros.h>
 
 static void
 decode_mknod(struct tcb *tcp, int offset)

@@ -5,14 +5,8 @@
 
 # include <stdio.h>
 # include <sys/stat.h>
+# include <sys/sysmacros.h>
 # include <unistd.h>
-
-# ifdef MAJOR_IN_SYSMACROS
-#  include <sys/sysmacros.h>
-# endif
-# ifdef MAJOR_IN_MKDEV
-#  include <sys/mkdev.h>
-# endif
 
 static const char sample[] = "mknod";
 

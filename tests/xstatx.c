@@ -44,14 +44,7 @@
 # include <stddef.h>
 # include <time.h>
 # include <unistd.h>
-
-# if defined MAJOR_IN_SYSMACROS
-#  include <sys/sysmacros.h>
-# elif defined MAJOR_IN_MKDEV
-#  include <sys/mkdev.h>
-# else
-#  include <sys/types.h>
-# endif
+# include <sys/sysmacros.h>
 
 static void
 print_time(const time_t t)
