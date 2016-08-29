@@ -101,6 +101,7 @@ SYS_FUNC(futex)
 		tprints(", ");
 		printaddr(uaddr2);
 		break;
+	case FUTEX_FD:
 	case FUTEX_WAKE:
 	case FUTEX_UNLOCK_PI:
 	case FUTEX_TRYLOCK_PI:
