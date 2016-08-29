@@ -146,7 +146,7 @@ function what_is(what_idx, type_idx, special, item, \
 			if ("parent" in array[item] && \
 				array_get(item, "parent") == what_idx) {
 				returned = what_is(item)
-				printf("%s", array_get(item, "name"))
+				printf("%s", array[item]["name"])
 				if ("" != returned) {
 					printf("[%s]", returned)
 				}
