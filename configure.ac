@@ -283,8 +283,6 @@ AC_TYPE_MODE_T
 AC_TYPE_SIGNAL
 AC_TYPE_UID_T
 
-AC_HEADER_STDC
-
 AC_CHECK_FUNCS(m4_normalize([
 	accept4
 	fanotify_mark
