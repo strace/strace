@@ -67,6 +67,16 @@ extern long ptrace(int, int, char *, long);
 # undef ptrace_peeksiginfo_args
 #endif
 
+#if defined(SPARC) || defined(SPARC64)
+/*
+ * SPARC has a different PTRACE_DETACH value correctly defined in sys/ptrace.h,
+ * but linux/ptrace.h clobbers it with the standard one.  PTRACE_SUNDETACH is
+ * also defined to the correct value by sys/ptrace.h, so use that instead.
+ */
+# undef PTRACE_DETACH
+# define PTRACE_DETACH PTRACE_SUNDETACH
+#endif
+
 #ifndef PTRACE_EVENT_FORK
 # define PTRACE_EVENT_FORK	1
 #endif

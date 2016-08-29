@@ -836,10 +836,6 @@ detach(struct tcb *tcp)
 	 * before detaching.  Arghh.  We go through hoops
 	 * to make a clean break of things.
 	 */
-#if defined(SPARC)
-# undef PTRACE_DETACH
-# define PTRACE_DETACH PTRACE_SUNDETACH
-#endif
 
 	if (!(tcp->flags & TCB_ATTACHED))
 		goto drop;
