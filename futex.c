@@ -92,9 +92,7 @@ SYS_FUNC(futex)
 			tprints("FUTEX_OP_OPARG_SHIFT|");
 		printxval(futexwakeops, (val3 >> 28) & 0x7, "FUTEX_OP_???");
 		tprintf(", %u, ", (val3 >> 12) & 0xfff);
-		if ((val3 >> 24) & 8)
-			tprints("FUTEX_OP_OPARG_SHIFT|");
-		printxval(futexwakecmps, (val3 >> 24) & 0x7, "FUTEX_OP_CMP_???");
+		printxval(futexwakecmps, (val3 >> 24) & 0xf, "FUTEX_OP_CMP_???");
 		tprintf(", %u}", val3 & 0xfff);
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
