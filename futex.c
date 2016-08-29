@@ -69,10 +69,10 @@ SYS_FUNC(futex)
 	case FUTEX_WAIT_BITSET:
 		tprints(", ");
 		print_timespec(tcp, timeout);
-		tprintf(", %x", val3);
+		tprintf(", %#x", val3);
 		break;
 	case FUTEX_WAKE_BITSET:
-		tprintf(", %x", val3);
+		tprintf(", %#x", val3);
 		break;
 	case FUTEX_REQUEUE:
 		tprintf(", %u, ", val2);
