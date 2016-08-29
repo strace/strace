@@ -107,7 +107,10 @@ SYS_FUNC(futex)
 	case FUTEX_TRYLOCK_PI:
 		break;
 	default:
-		tprintf(", %lx, %lx, %x", timeout, uaddr2, val3);
+		tprintf(", %#lx", timeout);
+		tprints(", ");
+		printaddr(uaddr2);
+		tprintf(", %#x", val3);
 		break;
 	}
 
