@@ -67,6 +67,7 @@ fstatfs64
 fsync
 ftruncate
 ftruncate64
+futex
 futimesat
 get_mempolicy
 getcwd

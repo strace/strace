@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Check futex syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a27
+run_strace_match_diff -v -a27

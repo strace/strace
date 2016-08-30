@@ -125,6 +125,7 @@ check_PROGRAMS = \
 	fsync \
 	ftruncate \
 	ftruncate64 \
+	futex \
 	futimesat \
 	get_mempolicy \
 	getcwd \
@@ -456,6 +457,7 @@ DECODER_TESTS = \
 	fsync.test \
 	ftruncate.test \
 	ftruncate64.test \
+	futex.test \
 	futimesat.test \
 	get_mempolicy.test \
 	getcwd.test \
