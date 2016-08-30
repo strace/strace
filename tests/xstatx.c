@@ -91,10 +91,34 @@ typedef off_t libc_off_t;
 #  undef st_mtime
 #  undef st_ctime
 #  include "asm_stat.h"
+
 #  if STRUCT_STAT_IS_STAT64
 #   undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
-#   define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#   if defined MPERS_IS_m32
+#    ifdef HAVE_M32_STRUCT_STAT64_ST_MTIME_NSEC
+#     define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#    endif
+#   elif defined MPERS_IS_mx32
+#    ifdef HAVE_MX32_STRUCT_STAT64_ST_MTIME_NSEC
+#     define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#    endif
+#   elif defined HAVE_STRUCT_STAT64_ST_MTIME_NSEC
+#    define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#   endif /* MPERS_IS_m32 || MPERS_IS_mx32 || HAVE_STRUCT_STAT64_ST_MTIME_NSEC */
+#  else /* !STRUCT_STAT_IS_STAT64 */
+#   if defined MPERS_IS_m32
+#    undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+#    ifdef HAVE_M32_STRUCT_STAT_ST_MTIME_NSEC
+#     define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#    endif
+#   elif defined MPERS_IS_mx32
+#    undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+#    ifdef HAVE_MX32_STRUCT_STAT_ST_MTIME_NSEC
+#     define HAVE_STRUCT_STAT_ST_MTIME_NSEC 1
+#    endif
+#   endif /*  MPERS_IS_m32 || MPERS_IS_mx32 */
 #  endif /* STRUCT_STAT_IS_STAT64 */
+
 # else /* !USE_ASM_STAT */
 #  undef HAVE_STRUCT_STAT_ST_MTIME_NSEC
 #  ifdef HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC
