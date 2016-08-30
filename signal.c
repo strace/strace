@@ -258,8 +258,6 @@ SYS_FUNC(sigsetmask)
 	return 0;
 }
 
-#ifdef HAVE_SIGACTION
-
 struct old_sigaction {
 	/* sa_handler may be a libc #define, need to use other name: */
 #ifdef MIPS
@@ -391,8 +389,6 @@ SYS_FUNC(signal)
 	return 0;
 }
 
-#endif /* HAVE_SIGACTION */
-
 SYS_FUNC(siggetmask)
 {
 	if (exiting(tcp)) {
@@ -407,8 +403,6 @@ SYS_FUNC(sigsuspend)
 
 	return RVAL_DECODED;
 }
-
-#ifdef HAVE_SIGACTION
 
 /* "Old" sigprocmask, which operates with word-sized signal masks */
 SYS_FUNC(sigprocmask)
@@ -446,8 +440,6 @@ SYS_FUNC(sigprocmask)
 # endif /* !ALPHA */
 	return 0;
 }
-
-#endif /* HAVE_SIGACTION */
 
 SYS_FUNC(kill)
 {
