@@ -30,10 +30,6 @@
 
 #include "defs.h"
 
-#ifdef HAVE_LINUX_FUTEX_H
-# include <linux/futex.h>
-#endif
-
 #ifndef FUTEX_PRIVATE_FLAG
 # define FUTEX_PRIVATE_FLAG 128
 #endif
