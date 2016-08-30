@@ -405,10 +405,8 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 		msg = "CONT";
 	if (op == PTRACE_DETACH)
 		msg = "DETACH";
-#ifdef PTRACE_LISTEN
 	if (op == PTRACE_LISTEN)
 		msg = "LISTEN";
-#endif
 	/*
 	 * Why curcol != 0? Otherwise sometimes we get this:
 	 *
