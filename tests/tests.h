@@ -120,14 +120,19 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 
-/*
- * Zero-extend a signed integer type to unsigned long long.
- */
+/* Zero-extend a signed integer type to unsigned long long. */
 #define zero_extend_signed_to_ull(v) \
 	(sizeof(v) == sizeof(short) ? (unsigned long long) (unsigned short) (v) : \
 	 sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
 	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
 	 (unsigned long long) (v))
+
+/* Sign-extend an unsigned integer type to long long. */
+#define sign_extend_unsigned_to_ll(v) \
+	(sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
+	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
+	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
+	 (long long) (v))
 
 # define SKIP_MAIN_UNDEFINED(arg) \
 	int main(void) { error_msg_and_skip("undefined: %s", arg); }
