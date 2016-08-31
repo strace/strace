@@ -61,7 +61,7 @@ print_time(const time_t t)
 		       p->tm_year + 1900, p->tm_mon + 1, p->tm_mday,
 		       p->tm_hour, p->tm_min, p->tm_sec);
 	else
-		printf("%llu", (unsigned long long) t);
+		printf("%llu", zero_extend_signed_to_ull(t));
 }
 
 # ifndef STRUCT_STAT
@@ -157,46 +157,46 @@ static void
 print_stat(const STRUCT_STAT *st)
 {
 	printf("{st_dev=makedev(%u, %u)",
-	       (unsigned int) major(st->st_dev),
-	       (unsigned int) minor(st->st_dev));
-	printf(", st_ino=%llu", (unsigned long long) st->st_ino);
+	       (unsigned int) major(zero_extend_signed_to_ull(st->st_dev)),
+	       (unsigned int) minor(zero_extend_signed_to_ull(st->st_dev)));
+	printf(", st_ino=%llu", zero_extend_signed_to_ull(st->st_ino));
 	printf(", st_mode=");
 	print_ftype(st->st_mode);
 	printf("|");
 	print_perms(st->st_mode);
-	printf(", st_nlink=%u", (unsigned int) st->st_nlink);
-	printf(", st_uid=%u", (unsigned int) st->st_uid);
-	printf(", st_gid=%u", (unsigned int) st->st_gid);
-	printf(", st_blksize=%u", (unsigned int) st->st_blksize);
-	printf(", st_blocks=%u", (unsigned int) st->st_blocks);
+	printf(", st_nlink=%llu", zero_extend_signed_to_ull(st->st_nlink));
+	printf(", st_uid=%llu", zero_extend_signed_to_ull(st->st_uid));
+	printf(", st_gid=%llu", zero_extend_signed_to_ull(st->st_gid));
+	printf(", st_blksize=%llu", zero_extend_signed_to_ull(st->st_blksize));
+	printf(", st_blocks=%llu", zero_extend_signed_to_ull(st->st_blocks));
 
 	switch (st->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
 		printf(", st_rdev=makedev(%u, %u)",
-		       (unsigned int) major(st->st_rdev),
-		       (unsigned int) minor(st->st_rdev));
+		       (unsigned int) major(zero_extend_signed_to_ull(st->st_rdev)),
+		       (unsigned int) minor(zero_extend_signed_to_ull(st->st_rdev)));
 		break;
 	default:
-		printf(", st_size=%llu", (unsigned long long) st->st_size);
+		printf(", st_size=%llu", zero_extend_signed_to_ull(st->st_size));
 	}
 
 	printf(", st_atime=");
-	print_time(st->st_atime);
+	print_time(sign_extend_unsigned_to_ll(st->st_atime));
 # ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
 	if (st->st_atime_nsec)
-		printf(".%09lu", (unsigned long) st->st_atime_nsec);
+		printf(".%09llu", zero_extend_signed_to_ull(st->st_atime_nsec));
 # endif
 	printf(", st_mtime=");
-	print_time(st->st_mtime);
+	print_time(sign_extend_unsigned_to_ll(st->st_mtime));
 # ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
 	if (st->st_mtime_nsec)
-		printf(".%09lu", (unsigned long) st->st_mtime_nsec);
+		printf(".%09llu", zero_extend_signed_to_ull(st->st_mtime_nsec));
 # endif
 	printf(", st_ctime=");
-	print_time(st->st_ctime);
+	print_time(sign_extend_unsigned_to_ll(st->st_ctime));
 # ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
 	if (st->st_ctime_nsec)
-		printf(".%09lu", (unsigned long) st->st_ctime_nsec);
+		printf(".%09llu", zero_extend_signed_to_ull(st->st_ctime_nsec));
 # endif
 	printf("}");
 }
@@ -242,12 +242,12 @@ main(void)
 		return 77;
 	}
 	(void) unlink(sample);
-	if ((unsigned long long) SAMPLE_SIZE !=
-	    (unsigned long long) st[0].st_size) {
+	if (zero_extend_signed_to_ull(SAMPLE_SIZE) !=
+	    zero_extend_signed_to_ull(st[0].st_size)) {
 		fprintf(stderr, "Size mismatch: "
 				"requested size(%llu) != st_size(%llu)\n",
-			(unsigned long long) SAMPLE_SIZE,
-			(unsigned long long) st[0].st_size);
+			zero_extend_signed_to_ull(SAMPLE_SIZE),
+			zero_extend_signed_to_ull(st[0].st_size));
 		fprintf(stderr, "The most likely reason for this is incorrect"
 				" definition of %s.\n"
 				"Here is some diagnostics that might help:\n",
