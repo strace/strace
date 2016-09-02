@@ -150,7 +150,15 @@ const char *sprintrc(long rc)
 	if (rc == 0)
 		return "0";
 
-	snprintf(buf, sizeof(buf), "-1 %s (%m)", errno2name());
+	int ret = (rc == -1)
+		? snprintf(buf, sizeof(buf), "-1 %s (%m)", errno2name())
+		: snprintf(buf, sizeof(buf), "%ld", rc);
+
+	if (ret < 0)
+		perror_msg_and_fail("snprintf");
+	if ((size_t) ret >= sizeof(buf))
+		error_msg_and_fail("snprintf overflow: got %d, expected "
+			"no more than %zu", ret, sizeof(buf));
 
 	return buf;
 }
