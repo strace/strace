@@ -99,6 +99,9 @@ const char *errno2name(void);
 /* Translate signal number to its name. */
 const char *signal2name(int);
 
+/* Print return code and, in case return code is -1, errno information. */
+const char *sprintrc(long rc);
+
 struct xlat;
 
 /* Print flags in symbolic form according to xlat table. */

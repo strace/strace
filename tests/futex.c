@@ -143,26 +143,6 @@ void invalid_op(int *val, int op, uint32_t argmask, ...)
 	printf(") = -1 ENOSYS (%m)\n");
 }
 
-const char *sprintrc(long rc)
-{
-	static char buf[4096];
-
-	if (rc == 0)
-		return "0";
-
-	int ret = (rc == -1)
-		? snprintf(buf, sizeof(buf), "-1 %s (%m)", errno2name())
-		: snprintf(buf, sizeof(buf), "%ld", rc);
-
-	if (ret < 0)
-		perror_msg_and_fail("snprintf");
-	if ((size_t) ret >= sizeof(buf))
-		error_msg_and_fail("snprintf overflow: got %d, expected "
-			"no more than %zu", ret, sizeof(buf));
-
-	return buf;
-}
-
 # define CHECK_INVALID_CLOCKRT(op, ...) \
 	do { \
 		invalid_op(uaddr, FUTEX_CLOCK_REALTIME | (op), __VA_ARGS__); \
