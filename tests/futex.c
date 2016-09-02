@@ -145,8 +145,7 @@ void invalid_op(int *val, int op, uint32_t argmask, ...)
 
 const char *sprintrc(long rc)
 {
-	enum { RES_BUF_SIZE = 256 };
-	static char buf[RES_BUF_SIZE];
+	static char buf[4096];
 
 	if (rc == 0)
 		return "0";
