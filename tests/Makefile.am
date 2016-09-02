@@ -242,6 +242,7 @@ check_PROGRAMS = \
 	ptrace \
 	pwritev \
 	read-write \
+	readahead \
 	readdir \
 	readlink \
 	readlinkat \
@@ -569,6 +570,7 @@ DECODER_TESTS = \
 	ptrace.test \
 	pwritev.test \
 	read-write.test \
+	readahead.test \
 	readdir.test \
 	readlink.test \
 	readlinkat.test \

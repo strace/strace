@@ -185,6 +185,7 @@ pselect6
 ptrace
 pwritev
 read-write
+readahead
 readdir
 readlink
 readlinkat
