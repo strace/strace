@@ -403,6 +403,20 @@
 [377] = { 6,	0,		SEN(process_vm_writev),		"process_vm_writev"	},
 [378] = { 5,	0,		SEN(kcmp),			"kcmp"			},
 [379] = { 3,	TD,		SEN(finit_module),		"finit_module"		},
+[380] = { 3,	0,		SEN(sched_setattr),		"sched_setattr"		},
+[381] = { 4,	0,		SEN(sched_getattr),		"sched_getattr"		},
+[382] = { 5,	TD|TF,		SEN(renameat2),			"renameat2"		},
+[383] = { 3,	0,		SEN(seccomp),			"seccomp",		},
+[384] = { 3,	0,		SEN(getrandom),			"getrandom",		},
+[385] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
+[386] = { 3,	TD,		SEN(bpf),			"bpf",			},
+[387] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
+[388] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd",		},
+[389] = { 2,	0,		SEN(membarrier),		"membarrier",		},
+[390] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
+[391] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
+[392] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
+[393] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
