@@ -68,6 +68,11 @@ const char *strerror(int);
 extern char *stpcpy(char *dst, const char *src);
 #endif
 
+#ifndef offsetofend
+# define offsetofend(type, member) \
+	(offsetof(type, member) + sizeof(((type *)NULL)->member))
+#endif
+
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 /* macros */
