@@ -172,6 +172,7 @@ strace_SOURCES =	\
 	or1k_atomic.c	\
 	pathtrace.c	\
 	perf.c		\
+	perf_event_struct.h \
 	personality.c	\
 	poll.c		\
 	prctl.c		\

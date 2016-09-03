@@ -249,7 +249,7 @@ check_PROGRAMS = \
 	openat \
 	pause \
 	pc \
-	perf_event_open \
+	perf_event_open_nonverbose \
 	personality \
 	pipe \
 	poll \
@@ -608,7 +608,7 @@ DECODER_TESTS = \
 	open.test \
 	openat.test \
 	pause.test \
-	perf_event_open.test \
+	perf_event_open_nonverbose.test \
 	personality.test \
 	pipe.test \
 	poll.test \

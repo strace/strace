@@ -191,7 +191,7 @@ open
 openat
 pause
 pc
-perf_event_open
+perf_event_open_nonverbose
 personality
 pipe
 poll
