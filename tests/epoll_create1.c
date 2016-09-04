@@ -38,16 +38,11 @@ int
 main(void)
 {
 	long rc = syscall(__NR_epoll_create1, O_CLOEXEC);
-	if (rc == -1) {
-		printf("epoll_create1(EPOLL_CLOEXEC) = -1 %s (%m)\n",
-		       errno2name());
-	} else {
-		printf("epoll_create1(EPOLL_CLOEXEC) = %ld\n", rc);
-	}
+	printf("epoll_create1(EPOLL_CLOEXEC) = %s\n", sprintrc(rc));
 
 	rc = syscall(__NR_epoll_create1, O_CLOEXEC | O_NONBLOCK);
-	printf("epoll_create1(EPOLL_CLOEXEC|%#x) = %ld %s (%m)\n",
-	       O_NONBLOCK, rc, errno2name());
+	printf("epoll_create1(EPOLL_CLOEXEC|%#x) = %s\n",
+	       O_NONBLOCK, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
