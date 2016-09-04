@@ -6,25 +6,17 @@
 # include <stdio.h>
 # include <unistd.h>
 
-const int size = 1024;
-
 int
 main(void)
 {
+	const int size = 1024;
 	const char *addr = tail_alloc(size);
-	if (syscall(__NR_mlock, addr, size) == 0) {
-		printf("mlock(%p, %d) = 0\n", addr, size);
-	} else {
-		printf("mlock(%p, %d) = -1 %s (%m)\n",
-		       addr, size, errno2name());
-	}
 
-	if (syscall(__NR_munlock, addr, size) == 0) {
-		printf("munlock(%p, %d) = 0\n", addr, size);
-	} else {
-		printf("munlock(%p, %d) = -1 %s (%m)\n",
-		       addr, size, errno2name());
-	}
+	long rc = syscall(__NR_mlock, addr, size);
+	printf("mlock(%p, %d) = %s\n", addr, size, sprintrc(rc));
+
+	rc = syscall(__NR_munlock, addr, size);
+	printf("munlock(%p, %d) = %s\n", addr, size, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
