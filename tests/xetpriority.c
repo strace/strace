@@ -18,11 +18,7 @@ main(void)
 	rc = syscall(__NR_setpriority, PRIO_PROCESS,
 		     (unsigned long) 0xffffffff00000000 | pid,
 		     (unsigned long) 0xffffffff00000000);
-	if (rc)
-		printf("setpriority(PRIO_PROCESS, %d, 0) = %ld %s (%m)\n",
-		       pid, rc, errno2name());
-	else
-		printf("setpriority(PRIO_PROCESS, %d, 0) = 0\n", pid);
+	printf("setpriority(PRIO_PROCESS, %d, 0) = %s\n", pid, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
