@@ -170,6 +170,7 @@ open
 openat
 pause
 pc
+perf_event_open
 personality
 pipe
 poll

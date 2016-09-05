@@ -227,6 +227,7 @@ check_PROGRAMS = \
 	openat \
 	pause \
 	pc \
+	perf_event_open \
 	personality \
 	pipe \
 	poll \
@@ -555,6 +556,7 @@ DECODER_TESTS = \
 	open.test \
 	openat.test \
 	pause.test \
+	perf_event_open.test \
 	personality.test \
 	pipe.test \
 	poll.test \
