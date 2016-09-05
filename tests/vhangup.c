@@ -21,10 +21,7 @@ main(void)
 	 * The system call, however, returns 0 iff the calling process
 	 * has CAP_SYS_TTY_CONFIG capability.
 	 */
-	if (rc)
-		printf("vhangup() = %ld %s (%m)\n", rc, errno2name());
-	else
-		puts("vhangup() = 0");
+	printf("vhangup() = %s\n", sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
