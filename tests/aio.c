@@ -147,8 +147,8 @@ main(void)
 	printf("io_setup(%u, [%lu]) = 0\n", nr, *ctx);
 
 	assert(syscall(__NR_io_submit, *ctx, -1L, cbs) == -1);
-	printf("io_submit(%lu, -1, %p) = -1 %s (%m)\n",
-	       *ctx, cbs, errno2name());
+	printf("io_submit(%lu, -1, %p) = %s\n",
+	       *ctx, cbs, sprintrc(-1));
 
 	if (syscall(__NR_io_submit, *ctx, nr, cbs) != (long) nr)
 		perror_msg_and_skip("io_submit");
@@ -177,8 +177,8 @@ main(void)
 
 	assert(syscall(__NR_io_cancel, *ctx, cbc, ev) == -1);
 	printf("io_cancel(%lu, {data=%#llx, pread, reqprio=99, fildes=-42}, %p) "
-		"= -1 %s (%m)\n",
-	       *ctx, (unsigned long long) cbc->aio_data, ev, errno2name());
+	       "= %s\n",
+	       *ctx, (unsigned long long) cbc->aio_data, ev, sprintrc(-1));
 
 	if (syscall(__NR_io_submit, *ctx, nr, cbvs) != (long) nr)
 		perror_msg_and_skip("io_submit");
