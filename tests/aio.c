@@ -166,11 +166,11 @@ main(void)
 	       nr);
 
 	assert(syscall(__NR_io_getevents, *ctx, nr, nr + 1, ev, ts) == (long) nr);
-	printf("io_getevents(%lu, %u, %u, ["
+	printf("io_getevents(%lu, %ld, %ld, ["
 		"{data=%#llx, obj=%p, res=%u, res2=0}, "
 		"{data=%#llx, obj=%p, res=%u, res2=0}"
 		"], {0, 123456789}) = %u\n",
-	       *ctx, nr, nr + 1,
+	       *ctx, (long) nr, (long) (nr + 1),
 	       (unsigned long long) cb[0].aio_data, &cb[0], sizeof_data0,
 	       (unsigned long long) cb[1].aio_data, &cb[1], sizeof_data1,
 	       nr);
