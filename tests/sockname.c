@@ -101,26 +101,22 @@ test_sockname_syscall(const int fd)
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr, 0 SUFFIX_ARGS);
-	printf("%s(%d%s, %p, NULL%s) = %d %s (%m)\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_F_STR, addr, SUFFIX_STR, rc,
-	       errno2name());
+	printf("%s(%d%s, %p, NULL%s) = %s\n",
+	       TEST_SYSCALL_STR, fd, PREFIX_F_STR, addr, SUFFIX_STR,
+	       sprintrc(rc));
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_S_ARGS, 0, 0 SUFFIX_ARGS);
-	if (rc < 0)
-		printf("%s(%d%s, NULL, NULL%s) = %d %s (%m)\n",
-		       TEST_SYSCALL_STR, fd, PREFIX_F_STR, SUFFIX_STR, rc,
-		       errno2name());
-	else
-		printf("%s(%d%s, NULL, NULL%s) = %d\n",
-		       TEST_SYSCALL_STR, fd, PREFIX_S_STR, SUFFIX_STR, rc);
+	printf("%s(%d%s, NULL, NULL%s) = %s\n",
+	       TEST_SYSCALL_STR, fd, rc == -1 ? PREFIX_F_STR : PREFIX_S_STR,
+	       SUFFIX_STR, sprintrc(rc));
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen + 1 SUFFIX_ARGS);
-	printf("%s(%d%s, %p, %p%s) = %d %s (%m)\n",
+	printf("%s(%d%s, %p, %p%s) = %s\n",
 	       TEST_SYSCALL_STR, fd, PREFIX_F_STR, addr,
-	       plen + 1, SUFFIX_STR, rc, errno2name());
+	       plen + 1, SUFFIX_STR, sprintrc(rc));
 
 	const size_t offsetof_sun_path = offsetof(struct sockaddr_un, sun_path);
 	*plen = offsetof_sun_path;
@@ -154,7 +150,7 @@ test_sockname_syscall(const int fd)
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen SUFFIX_ARGS);
-	printf("%s(%d%s, %p, [%d]%s) = %d %s (%m)\n",
+	printf("%s(%d%s, %p, [%d]%s) = %s\n",
 	       TEST_SYSCALL_STR, fd, PREFIX_F_STR, addr,
-	       *plen, SUFFIX_STR, rc, errno2name());
+	       *plen, SUFFIX_STR, sprintrc(rc));
 }
