@@ -43,8 +43,7 @@ main(void)
 	for (xlat = resources; xlat->str; ++xlat) {
 		unsigned long res = 0xfacefeed00000000 | xlat->val;
 		long rc = syscall(__NR_setrlimit, res, 0);
-		printf("setrlimit(%s, NULL) = %ld %s (%m)\n",
-		       xlat->str, rc, errno2name());
+		printf("setrlimit(%s, NULL) = %s\n", xlat->str, sprintrc(rc));
 
 		struct rlimit libc_rlim = {};
 		if (getrlimit((int) res, &libc_rlim))
@@ -53,16 +52,11 @@ main(void)
 		rlimit[1] = libc_rlim.rlim_max;
 
 		rc = syscall(__NR_setrlimit, res, rlimit);
-		int saved_errno = errno;
-		printf("setrlimit(%s, {rlim_cur=%s, rlim_max=%s})",
+		const char *errstr = sprintrc(rc);
+		printf("setrlimit(%s, {rlim_cur=%s, rlim_max=%s}) = %s\n",
 		       xlat->str,
-		       sprint_rlim(rlimit[0]), sprint_rlim(rlimit[1]));
-		if (rc) {
-			errno = saved_errno;
-			printf(" = %ld %s (%m)\n", rc, errno2name());
-		} else {
-			printf(" = 0\n");
-		}
+		       sprint_rlim(rlimit[0]), sprint_rlim(rlimit[1]),
+		       errstr);
 	}
 
 	puts("+++ exited with 0 +++");
