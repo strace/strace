@@ -140,25 +140,19 @@ print_stat_pages(const unsigned long pid, const unsigned long count,
 
 	long rc = syscall(__NR_move_pages,
 			  pid, count, pages, NULL, status, flags);
+	const char *errstr = sprintrc(rc);
+	printf("move_pages(%d, %lu, ", (int) pid, count);
+	print_page_array(pages, count, 0);
+	printf(", NULL, ");
 	if (rc) {
-		int saved_errno = errno;
-		printf("move_pages(%d, %lu, ", (int) pid, count);
-		print_page_array(pages, count, 0);
-		printf(", NULL, ");
 		if (count)
 			printf("%p", status);
 		else
 			printf("[]");
-		errno = saved_errno;
-		printf(", MPOL_MF_MOVE) = %ld %s (%m)\n",
-		       rc, errno2name());
 	} else {
-		printf("move_pages(%d, %lu, ", (int) pid, count);
-		print_page_array(pages, count, 0);
-		printf(", NULL, ");
 		print_status_array(status, count);
-		printf(", MPOL_MF_MOVE) = 0\n");
 	}
+	printf(", MPOL_MF_MOVE) = %s\n", errstr);
 }
 
 static void
@@ -174,7 +168,7 @@ print_move_pages(const unsigned long pid,
 
 	long rc = syscall(__NR_move_pages,
 			  pid, count, pages, nodes, status, flags);
-	int saved_errno = errno;
+	const char *errstr = sprintrc(rc);
 	printf("move_pages(%d, %lu, ", (int) pid, count);
 	print_page_array(pages, count, offset);
 	printf(", ");
@@ -184,13 +178,7 @@ print_move_pages(const unsigned long pid,
 		printf("%p", status);
 	else
 		printf("[]");
-	printf(", MPOL_MF_MOVE_ALL) = ");
-	if (rc) {
-		errno = saved_errno;
-		printf("%ld %s (%m)\n", rc, errno2name());
-	} else {
-		puts("0");
-	}
+	printf(", MPOL_MF_MOVE_ALL) = %s\n", errstr);
 }
 
 int
