@@ -38,25 +38,22 @@ int
 main(void)
 {
 	static const char sample[] = "open.sample";
-	int fd = syscall(__NR_open, sample, O_RDONLY|O_CREAT, 0400);
 
-	if (fd < 0) {
-		printf("open(\"%s\", O_RDONLY|O_CREAT, 0400)"
-		       " = %d %s (%m)\n", sample, fd, errno2name());
-	} else {
-		printf("open(\"%s\", O_RDONLY|O_CREAT, 0400) = %d\n",
-		       sample, fd);
+	long fd = syscall(__NR_open, sample, O_RDONLY|O_CREAT, 0400);
+	printf("open(\"%s\", O_RDONLY|O_CREAT, 0400) = %s\n",
+	       sample, sprintrc(fd));
+
+	if (fd != -1) {
 		close(fd);
 		if (unlink(sample))
 			perror_msg_and_fail("unlink");
 
 		fd = syscall(__NR_open, sample, O_RDONLY);
-		printf("open(\"%s\", O_RDONLY) = %d %s (%m)\n",
-		       sample, fd, errno2name());
+		printf("open(\"%s\", O_RDONLY) = %s\n", sample, sprintrc(fd));
 
 		fd = syscall(__NR_open, sample, O_WRONLY|O_NONBLOCK|0x80000000);
-		printf("open(\"%s\", O_WRONLY|O_NONBLOCK|0x80000000)"
-		       " = %d %s (%m)\n", sample, fd, errno2name());
+		printf("open(\"%s\", O_WRONLY|O_NONBLOCK|0x80000000) = %s\n",
+		       sample, sprintrc(fd));
 	}
 
 	puts("+++ exited with 0 +++");
