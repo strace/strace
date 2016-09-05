@@ -71,12 +71,8 @@ main(void)
 	sigaddset(&mask, SIGCHLD);
 
 	int fd = signalfd(-1, &mask, O_CLOEXEC | O_NONBLOCK);
-	if (fd < 0)
-		printf("signalfd4(-1, [%s], %u, SFD_CLOEXEC|SFD_NONBLOCK)"
-		       " = %d %s (%m)\n", sigs, size, fd, errno2name());
-	else
-		printf("signalfd4(-1, [%s], %u, SFD_CLOEXEC|SFD_NONBLOCK)"
-		       " = %d\n", sigs, size, fd);
+	printf("signalfd4(-1, [%s], %u, SFD_CLOEXEC|SFD_NONBLOCK) = %s\n",
+	       sigs, size, sprintrc(fd));
 
 	puts("+++ exited with 0 +++");
 	return 0;
