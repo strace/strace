@@ -256,7 +256,7 @@ endif
 @CODE_COVERAGE_RULES@
 CODE_COVERAGE_BRANCH_COVERAGE = 1
 CODE_COVERAGE_GENHTML_OPTIONS = $(CODE_COVERAGE_GENHTML_OPTIONS_DEFAULT) \
-	--prefix $(shell realpath -Ls $(abs_top_srcdir)/..)
+	--prefix $(shell cd $(abs_top_srcdir)/.. && pwd || echo .)
 CODE_COVERAGE_IGNORE_PATTERN = '/usr/include/*'
 strace_CPPFLAGS += $(CODE_COVERAGE_CPPFLAGS)
 strace_CFLAGS += $(CODE_COVERAGE_CFLAGS)
