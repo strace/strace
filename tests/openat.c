@@ -38,20 +38,19 @@ int
 main(void)
 {
 	static const char sample[] = "openat.sample";
-	int fd = syscall(__NR_openat, -100, sample, O_RDONLY|O_CREAT, 0400);
-	if (fd == -1) {
-		printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT, 0400)"
-		       " = -1 %s (%m)\n", sample, errno2name());
-	} else {
-		printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT, 0400)"
-		       " = %d\n", sample, fd);
+
+	long fd = syscall(__NR_openat, -100, sample, O_RDONLY|O_CREAT, 0400);
+	printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT, 0400) = %s\n",
+	       sample, sprintrc(fd));
+
+	if (fd != -1) {
 		close(fd);
 		if (unlink(sample) == -1)
 			perror_msg_and_fail("unlink");
 
 		fd = syscall(__NR_openat, -100, sample, O_RDONLY);
-		printf("openat(AT_FDCWD, \"%s\", O_RDONLY) = %d %s (%m)\n",
-		       sample, fd, errno2name());
+		printf("openat(AT_FDCWD, \"%s\", O_RDONLY) = %s\n",
+		       sample, sprintrc(fd));
 	}
 
 	puts("+++ exited with 0 +++");
