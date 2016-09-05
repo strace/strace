@@ -48,8 +48,8 @@ main(void)
 
 	param->sched_priority = -1;
 	rc = syscall(__NR_sched_setscheduler, 0, SCHED_FIFO, param);
-	printf("sched_setscheduler(0, SCHED_FIFO, [%d]) = %ld %s (%m)\n",
-	       param->sched_priority, rc, errno2name());
+	printf("sched_setscheduler(0, SCHED_FIFO, [%d]) = %s\n",
+	       param->sched_priority, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
