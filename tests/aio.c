@@ -41,9 +41,24 @@
  && defined __NR_io_destroy
 # include <linux/aio_abi.h>
 
+const char *
+sprint_aio_context_t(aio_context_t ctx)
+{
+	static char buf[sizeof("") + sizeof(aio_context_t) * 3];
+
+	if (sizeof(aio_context_t) > sizeof(long))
+		snprintf(buf, sizeof(buf), "%llu", (unsigned long long)ctx);
+	else
+		snprintf(buf, sizeof(buf), "%lu", (unsigned long)ctx);
+
+	return buf;
+}
 int
 main(void)
 {
+	static const char data2[] =
+		"\0\1\2\3cat test test test 0123456789abcdef";
+
 	const unsigned int sizeof_data0 = 4096;
 	const unsigned int sizeof_data1 = 8192;
 	void *data0 = tail_alloc(sizeof_data0);
@@ -111,6 +126,64 @@ main(void)
 	};
 	const struct iocb *cbv = tail_memdup(proto_cbv, sizeof(proto_cbv));
 
+	/* For additional decoder testing */
+	const struct iocb proto_cbv2[] = {
+		{
+			.aio_data = 0xbadfacedc0ffeeedULL,
+			.aio_key = 0xdefaced0,
+			.aio_lio_opcode = 0xf00d,
+			.aio_reqprio = 0,
+			.aio_fildes = 0xdefaced1,
+			.aio_buf = 0,
+		},
+		{
+			.aio_data = 0,
+			.aio_key = 0xdefaced0,
+			.aio_lio_opcode = 1,
+			.aio_reqprio = 0xbeef,
+			.aio_fildes = 0xdefaced1,
+			.aio_buf = 0,
+			/* In order to make record valid */
+			.aio_nbytes = (size_t) 0x1020304050607080ULL,
+			.aio_offset = 0xdeadda7abadc0dedULL,
+# ifdef IOCB_FLAG_RESFD
+			.aio_flags = 0xfacef157,
+			.aio_resfd = 0xded1ca7e,
+# endif
+		},
+		{
+			.aio_data = 0,
+			.aio_key = 0xdefaced0,
+			.aio_lio_opcode = 1,
+			.aio_reqprio = 0xbeef,
+			.aio_fildes = 0xdefaced1,
+			.aio_buf = 0xbadc0ffeedefacedULL,
+			.aio_nbytes = 0x8090a0b0c0d0e0f0ULL,
+			.aio_offset = 0xdeadda7abadc0dedULL,
+		},
+		{
+			.aio_data = 0,
+			.aio_key = 0xdefaced0,
+			.aio_lio_opcode = 1,
+			.aio_reqprio = 0xbeef,
+			.aio_fildes = 0xdefaced1,
+			.aio_buf = (unsigned long)data2,
+			.aio_nbytes = sizeof(data2),
+			.aio_offset = 0xdeadda7abadc0ded,
+		},
+		{
+			.aio_data = 0,
+			.aio_key = 0xdefaced0,
+			.aio_lio_opcode = 8,
+			.aio_reqprio = 0xbeef,
+			.aio_fildes = 0xdefaced1,
+			.aio_buf = 0,
+			.aio_nbytes = 0x8090a0b0c0d0e0f0ULL,
+			.aio_offset = 0xdeadda7abadc0dedULL,
+		},
+	};
+	const struct iocb *cbv2 = tail_memdup(proto_cbv2, sizeof(proto_cbv2));
+
 	const struct iocb proto_cbc = {
 		.aio_data = (unsigned long) 0xdeadbeefbadc0dedULL,
 		.aio_reqprio = 99,
@@ -128,6 +201,13 @@ main(void)
 	};
 	const long *cbvs = tail_memdup(proto_cbvs, sizeof(proto_cbvs));
 
+	const long proto_cbvs2[] = {
+		(long) &cbv2[0], (long) &cbv2[1], (long) &cbv2[2],
+		(long) &cbv2[3], (long) &cbv2[4],
+		(long) NULL, (long) 0xffffffffffffffffLL,
+	};
+	const long *cbvs2 = tail_memdup(proto_cbvs2, sizeof(proto_cbvs2));
+
 	unsigned long *ctx = tail_alloc(sizeof(unsigned long));
 	*ctx = 0;
 
@@ -142,9 +222,25 @@ main(void)
 	if (open("/dev/zero", O_RDONLY))
 		perror_msg_and_skip("open: %s", "/dev/zero");
 
+	assert(syscall(__NR_io_setup, 0xdeadbeef, NULL) == -1);
+	printf("io_setup(%u, NULL) = %s\n", 0xdeadbeef, sprintrc(-1));
+
+	assert(syscall(__NR_io_setup, lnr, ctx + 1) == -1);
+	printf("io_setup(%u, %p) = %s\n", nr, ctx + 1, sprintrc(-1));
+
 	if (syscall(__NR_io_setup, lnr, ctx))
 		perror_msg_and_skip("io_setup");
 	printf("io_setup(%u, [%lu]) = 0\n", nr, *ctx);
+
+	assert(syscall(__NR_io_submit, (aio_context_t) 0xface1e55deadbeefLL,
+	       (long) 0xca7faceddeadf00dLL, NULL) == -1);
+	printf("io_submit(%s, %ld, NULL) = %s\n",
+	       sprint_aio_context_t((aio_context_t) 0xface1e55deadbeefLL),
+	       (long) 0xca7faceddeadf00dLL, sprintrc(-1));
+
+	assert(syscall(__NR_io_submit, *ctx, nr, cbs + nr) == -1);
+	printf("io_submit(%lu, %ld, %p) = %s\n",
+	       *ctx, (long)nr, cbs + nr, sprintrc(-1));
 
 	assert(syscall(__NR_io_submit, *ctx, -1L, cbs) == -1);
 	printf("io_submit(%lu, -1, %p) = %s\n",
@@ -165,6 +261,22 @@ main(void)
 	       sizeof_data1, (long long) cb[1].aio_offset,
 	       nr);
 
+	assert(syscall(__NR_io_getevents, (aio_context_t) 0xface1e55deadbeefLL,
+	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL, ev + 1,
+	       NULL) == -1);
+	printf("io_getevents(%s, %ld, %ld, %p, NULL) = %s\n",
+	       sprint_aio_context_t((aio_context_t) 0xface1e55deadbeefLL),
+	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
+	       ev + 1, sprintrc(-1));
+
+	assert(syscall(__NR_io_getevents, (aio_context_t) 0xface1e55deadbeefLL,
+	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL, NULL,
+	       ts + 1) == -1);
+	printf("io_getevents(%s, %ld, %ld, NULL, %p) = %s\n",
+	       sprint_aio_context_t((aio_context_t) 0xface1e55deadbeefLL),
+	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
+	       ts + 1, sprintrc(-1));
+
 	assert(syscall(__NR_io_getevents, *ctx, nr, nr + 1, ev, ts) == (long) nr);
 	printf("io_getevents(%lu, %ld, %ld, ["
 		"{data=%#llx, obj=%p, res=%u, res2=0}, "
@@ -175,10 +287,61 @@ main(void)
 	       (unsigned long long) cb[1].aio_data, &cb[1], sizeof_data1,
 	       nr);
 
+	assert(syscall(__NR_io_cancel, *ctx, NULL, NULL) == -1);
+	printf("io_cancel(%lu, NULL, NULL) = %s\n", *ctx, sprintrc(-1));
+
+	assert(syscall(__NR_io_cancel, *ctx, cbc + 1, ev) == -1);
+	printf("io_cancel(%lu, %p, %p) = %s\n", *ctx, cbc + 1, ev,
+	       sprintrc(-1));
+
 	assert(syscall(__NR_io_cancel, *ctx, cbc, ev) == -1);
 	printf("io_cancel(%lu, {data=%#llx, pread, reqprio=99, fildes=-42}, %p) "
 	       "= %s\n",
 	       *ctx, (unsigned long long) cbc->aio_data, ev, sprintrc(-1));
+
+	assert(syscall(__NR_io_submit, (unsigned long) 0xfacef157beeff00dULL,
+	       (long) 0xdeadc0defacefeedLL, NULL) == -1);
+	printf("io_submit(%lu, %ld, NULL) = %s\n",
+	       (unsigned long) 0xfacef157beeff00dULL,
+	       (long) 0xdeadc0defacefeedLL, sprintrc(-1));
+
+	assert(syscall(__NR_io_submit, *ctx, -1L, cbvs + nr) == -1);
+	printf("io_submit(%lu, %ld, %p) = %s\n",
+		*ctx, -1L, cbvs + nr, sprintrc(-1));
+
+	assert(syscall(__NR_io_submit, *ctx, 1057L, cbvs2) ==
+		-1);
+	printf("io_submit(%lu, %ld, ["
+		"{data=%#llx, key=%u, %hu /* SUB_??? */, fildes=%d}, "
+		"{key=%u, pwrite, reqprio=%hd, fildes=%d, str=NULL"
+			", nbytes=%llu, offset=%lld"
+# ifdef IOCB_FLAG_RESFD
+			", resfd=%d, flags=%x"
+# endif
+			"}, "
+		"{key=%u, pwrite, reqprio=%hd, fildes=%d, buf=%#llx"
+			", nbytes=%llu, offset=%lld}, "
+		"{key=%u, pwrite, reqprio=%hd, fildes=%d"
+			", str=\"\\0\\1\\2\\3%.28s\"..."
+			", nbytes=%llu, offset=%lld}, "
+		"{key=%u, pwritev, reqprio=%hd, fildes=%d, buf=%#llx"
+			", nbytes=%llu, offset=%lld}"
+		", {NULL}, {%#lx}, %p]) = %s\n",
+	       *ctx, 1057L,
+	       (unsigned long long) cbv2[0].aio_data, cbv2[0].aio_key,
+	       cbv2[0].aio_lio_opcode, cbv2[0].aio_fildes,
+	       cbv2[1].aio_key, cbv2[1].aio_reqprio, cbv2[1].aio_fildes,
+	       cbv2[1].aio_nbytes, cbv2[1].aio_offset,
+# ifdef IOCB_FLAG_RESFD
+	       cbv2[1].aio_resfd, cbv2[1].aio_flags,
+# endif
+	       cbv2[2].aio_key, cbv2[2].aio_reqprio, cbv2[2].aio_fildes,
+	       cbv2[2].aio_buf, cbv2[2].aio_nbytes, cbv2[2].aio_offset,
+	       cbv2[3].aio_key, cbv2[3].aio_reqprio, cbv2[3].aio_fildes,
+	       data2 + 4, cbv2[3].aio_nbytes, cbv2[3].aio_offset,
+	       cbv2[4].aio_key, cbv2[4].aio_reqprio, cbv2[4].aio_fildes,
+	       cbv2[4].aio_buf, cbv2[4].aio_nbytes, cbv2[4].aio_offset,
+	       cbvs2[6], cbvs2 + 7, sprintrc(-1));
 
 	if (syscall(__NR_io_submit, *ctx, nr, cbvs) != (long) nr)
 		perror_msg_and_skip("io_submit");
@@ -200,6 +363,11 @@ main(void)
 	       iov1[1].iov_base, (unsigned int) iov1[1].iov_len,
 	       (long long) cbv[1].aio_offset,
 	       nr);
+
+	assert(syscall(__NR_io_destroy,
+		(unsigned long)0xfacefeedb000b1e5LL) == -1);
+	printf("io_destroy(%lu) = %s\n",
+		(unsigned long)0xfacefeedb000b1e5LL, sprintrc(-1));
 
 	assert(syscall(__NR_io_destroy, *ctx) == 0);
 	printf("io_destroy(%lu) = 0\n", *ctx);
