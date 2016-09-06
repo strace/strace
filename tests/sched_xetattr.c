@@ -54,27 +54,33 @@ main(void)
 	if (syscall(__NR_sched_getattr, 0, &sched, sizeof(sched), 0))
 		perror_msg_and_skip("sched_getattr");
 
-	printf("sched_getattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+, sched_flags=%s, sched_nice=%u, sched_priority=%u, sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "\\}, 256, 0\\) += 0\n",
-		sched.attr.size,
-		sched.attr.sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
-		sched.attr.sched_nice,
-		sched.attr.sched_priority,
-		sched.attr.sched_runtime,
-		sched.attr.sched_deadline,
-		sched.attr.sched_period);
+	printf("sched_getattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+"
+	       ", sched_flags=%s, sched_nice=%u, sched_priority=%u"
+	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
+	       ", sched_period=%" PRIu64 "\\}, 256, 0\\) += 0\n",
+	       sched.attr.size,
+	       sched.attr.sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
+	       sched.attr.sched_nice,
+	       sched.attr.sched_priority,
+	       sched.attr.sched_runtime,
+	       sched.attr.sched_deadline,
+	       sched.attr.sched_period);
 
 	sched.attr.sched_flags |= 1;
 	if (syscall(__NR_sched_setattr, 0, &sched, 0))
 		perror_msg_and_skip("sched_setattr");
 
-	printf("sched_setattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+, sched_flags=%s, sched_nice=%u, sched_priority=%u, sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "\\}, 0\\) += 0\n",
-		sched.attr.size,
-		"SCHED_FLAG_RESET_ON_FORK",
-		sched.attr.sched_nice,
-		sched.attr.sched_priority,
-		sched.attr.sched_runtime,
-		sched.attr.sched_deadline,
-		sched.attr.sched_period);
+	printf("sched_setattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+"
+	       ", sched_flags=%s, sched_nice=%u, sched_priority=%u"
+	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
+	       ", sched_period=%" PRIu64 "\\}, 0\\) += 0\n",
+	       sched.attr.size,
+	       "SCHED_FLAG_RESET_ON_FORK",
+	       sched.attr.sched_nice,
+	       sched.attr.sched_priority,
+	       sched.attr.sched_runtime,
+	       sched.attr.sched_deadline,
+	       sched.attr.sched_period);
 
 	return 0;
 }
