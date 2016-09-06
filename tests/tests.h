@@ -101,6 +101,8 @@ const char *signal2name(int);
 
 /* Print return code and, in case return code is -1, errno information. */
 const char *sprintrc(long rc);
+/* sprintrc variant suitable for usage as part of grep pattern. */
+const char *sprintrc_grep(long rc);
 
 struct xlat;
 
