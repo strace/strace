@@ -37,50 +37,48 @@
 int
 main(void)
 {
-	static union {
-		struct {
-			uint32_t size;
-			uint32_t sched_policy;
-			uint64_t sched_flags;
-			uint32_t sched_nice;
-			uint32_t sched_priority;
-			uint64_t sched_runtime;
-			uint64_t sched_deadline;
-			uint64_t sched_period;
-		} attr;
-		char buf[256];
-	} sched;
+	struct {
+		uint32_t size;
+		uint32_t sched_policy;
+		uint64_t sched_flags;
+		uint32_t sched_nice;
+		uint32_t sched_priority;
+		uint64_t sched_runtime;
+		uint64_t sched_deadline;
+		uint64_t sched_period;
+	} *sched_attr = tail_alloc(sizeof(*sched_attr));
 
-	if (syscall(__NR_sched_getattr, 0, &sched, sizeof(sched), 0))
+	if (syscall(__NR_sched_getattr, 0, sched_attr, sizeof(*sched_attr), 0))
 		perror_msg_and_skip("sched_getattr");
 
 	printf("sched_getattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+"
 	       ", sched_flags=%s, sched_nice=%u, sched_priority=%u"
 	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64 "\\}, 256, 0\\) += 0\n",
-	       sched.attr.size,
-	       sched.attr.sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
-	       sched.attr.sched_nice,
-	       sched.attr.sched_priority,
-	       sched.attr.sched_runtime,
-	       sched.attr.sched_deadline,
-	       sched.attr.sched_period);
+	       ", sched_period=%" PRIu64 "\\}, %u, 0\\) += 0\n",
+	       sched_attr->size,
+	       sched_attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
+	       sched_attr->sched_nice,
+	       sched_attr->sched_priority,
+	       sched_attr->sched_runtime,
+	       sched_attr->sched_deadline,
+	       sched_attr->sched_period,
+	       (unsigned) sizeof(*sched_attr));
 
-	sched.attr.sched_flags |= 1;
-	if (syscall(__NR_sched_setattr, 0, &sched, 0))
+	sched_attr->sched_flags |= 1;
+	if (syscall(__NR_sched_setattr, 0, sched_attr, 0))
 		perror_msg_and_skip("sched_setattr");
 
 	printf("sched_setattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+"
 	       ", sched_flags=%s, sched_nice=%u, sched_priority=%u"
 	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
 	       ", sched_period=%" PRIu64 "\\}, 0\\) += 0\n",
-	       sched.attr.size,
+	       sched_attr->size,
 	       "SCHED_FLAG_RESET_ON_FORK",
-	       sched.attr.sched_nice,
-	       sched.attr.sched_priority,
-	       sched.attr.sched_runtime,
-	       sched.attr.sched_deadline,
-	       sched.attr.sched_period);
+	       sched_attr->sched_nice,
+	       sched_attr->sched_priority,
+	       sched_attr->sched_runtime,
+	       sched_attr->sched_deadline,
+	       sched_attr->sched_period);
 
 	return 0;
 }
