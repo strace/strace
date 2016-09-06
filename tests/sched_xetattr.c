@@ -41,7 +41,7 @@ main(void)
 		uint32_t size;
 		uint32_t sched_policy;
 		uint64_t sched_flags;
-		uint32_t sched_nice;
+		int32_t  sched_nice;
 		uint32_t sched_priority;
 		uint64_t sched_runtime;
 		uint64_t sched_deadline;
@@ -52,7 +52,7 @@ main(void)
 		perror_msg_and_skip("sched_getattr");
 
 	printf("sched_getattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+"
-	       ", sched_flags=%s, sched_nice=%u, sched_priority=%u"
+	       ", sched_flags=%s, sched_nice=%d, sched_priority=%u"
 	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
 	       ", sched_period=%" PRIu64 "\\}, %u, 0\\) += 0\n",
 	       sched_attr->size,
@@ -69,7 +69,7 @@ main(void)
 		perror_msg_and_skip("sched_setattr");
 
 	printf("sched_setattr\\(0, \\{size=%u, sched_policy=SCHED_[A-Z]+"
-	       ", sched_flags=%s, sched_nice=%u, sched_priority=%u"
+	       ", sched_flags=%s, sched_nice=%d, sched_priority=%u"
 	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
 	       ", sched_period=%" PRIu64 "\\}, 0\\) += 0\n",
 	       sched_attr->size,
