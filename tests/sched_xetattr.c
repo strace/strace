@@ -48,6 +48,21 @@ main(void)
 		uint64_t sched_period;
 	} *sched_attr = tail_alloc(sizeof(*sched_attr));
 
+	long rc = syscall(__NR_sched_getattr, 0xdeadface, NULL, 0, 0);
+	printf("sched_getattr\\(%d, NULL, 0, 0\\) += %s\n",
+		0xdeadface, sprintrc_grep(rc));
+
+	rc = syscall(__NR_sched_getattr, -1,
+		     sched_attr, 0xbadfaced, 0xc0defeed);
+	printf("sched_getattr\\(-1, %p, %u, %u\\) += %s\n",
+		sched_attr, 0xbadfaced, 0xc0defeed, sprintrc_grep(rc));
+
+	rc = syscall(__NR_sched_getattr, 0,
+		     sched_attr + 1, sizeof(*sched_attr), 0);
+	printf("sched_getattr\\(0, %p, %u, 0\\) += %s\n",
+		sched_attr + 1, (unsigned)sizeof(*sched_attr),
+		sprintrc_grep(rc));
+
 	if (syscall(__NR_sched_getattr, 0, sched_attr, sizeof(*sched_attr), 0))
 		perror_msg_and_skip("sched_getattr");
 
@@ -79,6 +94,32 @@ main(void)
 	       sched_attr->sched_runtime,
 	       sched_attr->sched_deadline,
 	       sched_attr->sched_period);
+
+	sched_attr->size = 0x90807060;
+	sched_attr->sched_policy = 0xca7faced;
+	sched_attr->sched_flags = 0xbadc0ded1057da7aULL;
+	sched_attr->sched_nice = 0xafbfcfdf;
+	sched_attr->sched_priority = 0xb8c8d8e8;
+	sched_attr->sched_runtime = 0xbadcaffedeadf157ULL;
+	sched_attr->sched_deadline = 0xc0de70a57badac75ULL;
+	sched_attr->sched_period = 0xded1ca7edda7aca7ULL;
+
+	rc = syscall(__NR_sched_setattr, 0xfacec0de, sched_attr, 0xbeeff00d);
+
+	printf("sched_setattr\\(%d, \\{size=%u, "
+		"sched_policy=%#x /\\* SCHED_\\?\\?\\? \\*/, "
+		"sched_flags=%#" PRIx64 " /\\* SCHED_FLAG_\\?\\?\\? \\*/, "
+		"sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
+		"sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "\\}, "
+		"%u\\) += %s\n",
+		0xfacec0de, sched_attr->size,
+		sched_attr->sched_policy,
+		sched_attr->sched_flags,
+		sched_attr->sched_nice,
+		sched_attr->sched_priority,
+		sched_attr->sched_runtime,
+		sched_attr->sched_deadline,
+		sched_attr->sched_period, 0xbeeff00d, sprintrc_grep(rc));
 
 	return 0;
 }
