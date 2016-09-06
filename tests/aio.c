@@ -51,17 +51,17 @@ main(void)
 
 	const struct iocb proto_cb[] = {
 		{
-			.aio_data = 0xfeedface11111111,
+			.aio_data = (unsigned long) 0xfeedface11111111ULL,
 			.aio_reqprio = 11,
 			.aio_buf = (unsigned long) data0,
-			.aio_offset = 0xdeface1facefeed,
+			.aio_offset = (unsigned long) 0xdeface1facefeedULL,
 			.aio_nbytes = sizeof_data0
 		},
 		{
-			.aio_data = 0xfeedface22222222,
+			.aio_data = (unsigned long) 0xfeedface22222222ULL,
 			.aio_reqprio = 22,
 			.aio_buf = (unsigned long) data1,
-			.aio_offset = 0xdeface2cafef00d,
+			.aio_offset = (unsigned long) 0xdeface2cafef00dULL,
 			.aio_nbytes = sizeof_data1
 		}
 	};
@@ -93,26 +93,26 @@ main(void)
 
 	const struct iocb proto_cbv[] = {
 		{
-			.aio_data = 0xfeed11111111face,
+			.aio_data = (unsigned long) 0xfeed11111111faceULL,
 			.aio_lio_opcode = 7,
 			.aio_reqprio = 111,
 			.aio_buf = (unsigned long) iov0,
-			.aio_offset = 0xdeface1facefeed,
+			.aio_offset = (unsigned long) 0xdeface1facefeedULL,
 			.aio_nbytes = ARRAY_SIZE(proto_iov0)
 		},
 		{
-			.aio_data = 0xfeed22222222face,
+			.aio_data = (unsigned long) 0xfeed22222222faceULL,
 			.aio_lio_opcode = 7,
 			.aio_reqprio = 222,
 			.aio_buf = (unsigned long) iov1,
-			.aio_offset = 0xdeface2cafef00d,
+			.aio_offset = (unsigned long) 0xdeface2cafef00dULL,
 			.aio_nbytes = ARRAY_SIZE(proto_iov1)
 		}
 	};
 	const struct iocb *cbv = tail_memdup(proto_cbv, sizeof(proto_cbv));
 
 	const struct iocb proto_cbc = {
-		.aio_data = 0xdeadbeefbadc0ded,
+		.aio_data = (unsigned long) 0xdeadbeefbadc0dedULL,
 		.aio_reqprio = 99,
 		.aio_fildes = -42
 	};
