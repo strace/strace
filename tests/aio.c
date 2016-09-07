@@ -219,7 +219,7 @@ main(void)
 		perror_msg_and_skip("io_setup");
 	printf("io_setup(%u, [%#lx]) = 0\n", nr, *ctx);
 
-	rc = syscall(__NR_io_submit, (aio_context_t) 0xface1e55deadbeefLL,
+	rc = syscall(__NR_io_submit, (long) 0xface1e55deadbeefLL,
 		     (long) 0xca7faceddeadf00dLL, NULL);
 	printf("io_submit(%#lx, %ld, NULL) = %s\n",
 	       (long) 0xface1e55deadbeefLL,
@@ -249,7 +249,7 @@ main(void)
 	       sizeof_data1, (long long) cb[1].aio_offset,
 	       sprintrc(rc));
 
-	rc = syscall(__NR_io_getevents, (aio_context_t) 0xface1e55deadbeefLL,
+	rc = syscall(__NR_io_getevents, (long) 0xface1e55deadbeefLL,
 		     (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 		     ev + 1, NULL);
 	printf("io_getevents(%#lx, %ld, %ld, %p, NULL) = %s\n",
@@ -257,7 +257,7 @@ main(void)
 	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 	       ev + 1, sprintrc(rc));
 
-	rc = syscall(__NR_io_getevents, (aio_context_t) 0xface1e55deadbeefLL,
+	rc = syscall(__NR_io_getevents, (long) 0xface1e55deadbeefLL,
 		     (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 		     NULL, ts + 1);
 	printf("io_getevents(%#lx, %ld, %ld, NULL, %p) = %s\n",
