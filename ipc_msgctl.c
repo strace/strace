@@ -97,7 +97,7 @@ print_msqid_ds(struct tcb *tcp, const long addr, int cmd)
 SYS_FUNC(msgctl)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
 		PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
 		tprints(", ");
 	} else {

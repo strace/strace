@@ -71,7 +71,7 @@ tprint_sembuf_array(struct tcb *tcp, const long addr, const unsigned long count)
 
 SYS_FUNC(semop)
 {
-	tprintf("%lu, ", tcp->u_arg[0]);
+	tprintf("%d, ", (int) tcp->u_arg[0]);
 	if (indirect_ipccall(tcp)) {
 		tprint_sembuf_array(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 	} else {
@@ -82,7 +82,7 @@ SYS_FUNC(semop)
 
 SYS_FUNC(semtimedop)
 {
-	tprintf("%lu, ", tcp->u_arg[0]);
+	tprintf("%d, ", (int) tcp->u_arg[0]);
 	if (indirect_ipccall(tcp)) {
 		tprint_sembuf_array(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 		tprints(", ");
@@ -106,7 +106,7 @@ SYS_FUNC(semget)
 		tprintf("%#x", key);
 	else
 		tprints("IPC_PRIVATE");
-	tprintf(", %lu, ", tcp->u_arg[1]);
+	tprintf(", %d, ", (int) tcp->u_arg[1]);
 	if (printflags(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 		tprints("|");
 	print_numeric_umode_t(tcp->u_arg[2] & 0777);
@@ -115,7 +115,7 @@ SYS_FUNC(semget)
 
 SYS_FUNC(semctl)
 {
-	tprintf("%lu, %lu, ", tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf("%d, %d, ", (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
 	PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
 	tprints(", ");
 	if (indirect_ipccall(tcp)

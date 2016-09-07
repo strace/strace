@@ -58,7 +58,7 @@ SYS_FUNC(shmget)
 SYS_FUNC(shmat)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
 		if (indirect_ipccall(tcp)) {
 			printaddr(tcp->u_arg[3]);
 			tprints(", ");
