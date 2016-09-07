@@ -36,13 +36,13 @@ SYS_FUNC(io_setup)
 	if (entering(tcp))
 		tprintf("%u, ", (unsigned int) tcp->u_arg[0]);
 	else
-		printnum_ulong(tcp, tcp->u_arg[1]);
+		printnum_ptr(tcp, tcp->u_arg[1]);
 	return 0;
 }
 
 SYS_FUNC(io_destroy)
 {
-	tprintf("%lu", tcp->u_arg[0]);
+	printaddr(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
 }
@@ -185,7 +185,8 @@ SYS_FUNC(io_submit)
 	const unsigned long addr = tcp->u_arg[2];
 	unsigned long iocbp;
 
-	tprintf("%lu, %ld, ", tcp->u_arg[0], nr);
+	printaddr(tcp->u_arg[0]);
+	tprintf(", %ld, ", nr);
 
 	if (nr < 0)
 		printaddr(addr);
@@ -212,7 +213,9 @@ print_io_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 SYS_FUNC(io_cancel)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, ", tcp->u_arg[0]);
+		printaddr(tcp->u_arg[0]);
+		tprints(", ");
+
 		struct iocb cb;
 
 		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &cb)) {
@@ -233,8 +236,8 @@ SYS_FUNC(io_cancel)
 SYS_FUNC(io_getevents)
 {
 	if (entering(tcp)) {
-		tprintf("%lu, %ld, %ld, ",
-			tcp->u_arg[0],
+		printaddr(tcp->u_arg[0]);
+		tprintf(", %ld, %ld, ",
 			widen_to_long(tcp->u_arg[1]),
 			widen_to_long(tcp->u_arg[2]));
 	} else {

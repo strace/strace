@@ -40,18 +40,6 @@
  && defined __NR_io_destroy
 # include <linux/aio_abi.h>
 
-const char *
-sprint_aio_context_t(aio_context_t ctx)
-{
-	static char buf[sizeof("") + sizeof(aio_context_t) * 3];
-
-	if (sizeof(aio_context_t) > sizeof(long))
-		snprintf(buf, sizeof(buf), "%llu", (unsigned long long)ctx);
-	else
-		snprintf(buf, sizeof(buf), "%lu", (unsigned long)ctx);
-
-	return buf;
-}
 int
 main(void)
 {
@@ -229,26 +217,26 @@ main(void)
 
 	if (syscall(__NR_io_setup, lnr, ctx))
 		perror_msg_and_skip("io_setup");
-	printf("io_setup(%u, [%lu]) = 0\n", nr, *ctx);
+	printf("io_setup(%u, [%#lx]) = 0\n", nr, *ctx);
 
 	rc = syscall(__NR_io_submit, (aio_context_t) 0xface1e55deadbeefLL,
 		     (long) 0xca7faceddeadf00dLL, NULL);
-	printf("io_submit(%s, %ld, NULL) = %s\n",
-	       sprint_aio_context_t((aio_context_t) 0xface1e55deadbeefLL),
+	printf("io_submit(%#lx, %ld, NULL) = %s\n",
+	       (long) 0xface1e55deadbeefLL,
 	       (long) 0xca7faceddeadf00dLL, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, nr, cbs + nr);
-	printf("io_submit(%lu, %ld, %p) = %s\n",
-	       *ctx, (long)nr, cbs + nr, sprintrc(rc));
+	printf("io_submit(%#lx, %ld, %p) = %s\n",
+	       *ctx, (long) nr, cbs + nr, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, -1L, cbs);
-	printf("io_submit(%lu, -1, %p) = %s\n",
+	printf("io_submit(%#lx, -1, %p) = %s\n",
 	       *ctx, cbs, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, nr, cbs);
 	if (rc != (long) nr)
 		perror_msg_and_skip("io_submit");
-	printf("io_submit(%lu, %u, ["
+	printf("io_submit(%#lx, %u, ["
 		"{data=%#llx, pread, reqprio=11, fildes=0, "
 			"buf=%p, nbytes=%u, offset=%lld}, "
 		"{data=%#llx, pread, reqprio=22, fildes=0, "
@@ -264,21 +252,21 @@ main(void)
 	rc = syscall(__NR_io_getevents, (aio_context_t) 0xface1e55deadbeefLL,
 		     (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 		     ev + 1, NULL);
-	printf("io_getevents(%s, %ld, %ld, %p, NULL) = %s\n",
-	       sprint_aio_context_t((aio_context_t) 0xface1e55deadbeefLL),
+	printf("io_getevents(%#lx, %ld, %ld, %p, NULL) = %s\n",
+	       (long) 0xface1e55deadbeefLL,
 	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 	       ev + 1, sprintrc(rc));
 
 	rc = syscall(__NR_io_getevents, (aio_context_t) 0xface1e55deadbeefLL,
 		     (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 		     NULL, ts + 1);
-	printf("io_getevents(%s, %ld, %ld, NULL, %p) = %s\n",
-	       sprint_aio_context_t((aio_context_t) 0xface1e55deadbeefLL),
+	printf("io_getevents(%#lx, %ld, %ld, NULL, %p) = %s\n",
+	       (long) 0xface1e55deadbeefLL,
 	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 	       ts + 1, sprintrc(rc));
 
 	rc = syscall(__NR_io_getevents, *ctx, nr, nr + 1, ev, ts);
-	printf("io_getevents(%lu, %ld, %ld, ["
+	printf("io_getevents(%#lx, %ld, %ld, ["
 		"{data=%#llx, obj=%p, res=%u, res2=0}, "
 		"{data=%#llx, obj=%p, res=%u, res2=0}"
 		"], {0, 123456789}) = %s\n",
@@ -288,29 +276,29 @@ main(void)
 	       sprintrc(rc));
 
 	rc = syscall(__NR_io_cancel, *ctx, NULL, NULL);
-	printf("io_cancel(%lu, NULL, NULL) = %s\n", *ctx, sprintrc(rc));
+	printf("io_cancel(%#lx, NULL, NULL) = %s\n", *ctx, sprintrc(rc));
 
 	rc = syscall(__NR_io_cancel, *ctx, cbc + 1, ev);
-	printf("io_cancel(%lu, %p, %p) = %s\n", *ctx, cbc + 1, ev,
+	printf("io_cancel(%#lx, %p, %p) = %s\n", *ctx, cbc + 1, ev,
 	       sprintrc(rc));
 
 	rc = syscall(__NR_io_cancel, *ctx, cbc, ev);
-	printf("io_cancel(%lu, {data=%#llx, pread, reqprio=99, fildes=-42}, %p) "
-	       "= %s\n",
+	printf("io_cancel(%#lx, {data=%#llx, pread, reqprio=99, fildes=-42}"
+	       ", %p) = %s\n",
 	       *ctx, (unsigned long long) cbc->aio_data, ev, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, (unsigned long) 0xfacef157beeff00dULL,
 		     (long) 0xdeadc0defacefeedLL, NULL);
-	printf("io_submit(%lu, %ld, NULL) = %s\n",
-	       (unsigned long) 0xfacef157beeff00dULL,
+	printf("io_submit(%#lx, %ld, NULL) = %s\n",
+	       (long) 0xfacef157beeff00dULL,
 	       (long) 0xdeadc0defacefeedLL, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, -1L, cbvs + nr);
-	printf("io_submit(%lu, %ld, %p) = %s\n",
+	printf("io_submit(%#lx, %ld, %p) = %s\n",
 		*ctx, -1L, cbvs + nr, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, 1057L, cbvs2);
-	printf("io_submit(%lu, %ld, ["
+	printf("io_submit(%#lx, %ld, ["
 		"{data=%#llx, key=%u, %hu /* SUB_??? */, fildes=%d}, "
 		"{key=%u, pwrite, reqprio=%hd, fildes=%d, str=NULL"
 			", nbytes=%llu, offset=%lld"
@@ -345,7 +333,7 @@ main(void)
 	rc = syscall(__NR_io_submit, *ctx, nr, cbvs);
 	if (rc != (long) nr)
 		perror_msg_and_skip("io_submit");
-	printf("io_submit(%lu, %u, ["
+	printf("io_submit(%#lx, %u, ["
 		"{data=%#llx, preadv, reqprio=%hd, fildes=0, "
 			"iovec=[{iov_base=%p, iov_len=%u}"
 			", {iov_base=%p, iov_len=%u}], offset=%lld}, "
@@ -365,11 +353,11 @@ main(void)
 	       sprintrc(rc));
 
 	rc = syscall(__NR_io_destroy, (unsigned long) 0xfacefeedb000b1e5ULL);
-	printf("io_destroy(%lu) = %s\n",
+	printf("io_destroy(%#lx) = %s\n",
 	       (unsigned long) 0xfacefeedb000b1e5ULL, sprintrc(rc));
 
 	rc = syscall(__NR_io_destroy, *ctx);
-	printf("io_destroy(%lu) = %s\n", *ctx, sprintrc(rc));
+	printf("io_destroy(%#lx) = %s\n", *ctx, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
