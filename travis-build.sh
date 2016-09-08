@@ -17,7 +17,7 @@ case "${TARGET-}" in
 		;;
 	x86)
 		CC="$CC -m32"
-		export DISTCHECK_CONFIGURE_FLAGS='--build=i686-pc-linux-gnu'
+		export DISTCHECK_CONFIGURE_FLAGS='--build=i686-pc-linux-gnu --target=i686-pc-linux-gnu'
 		;;
 esac
 
