@@ -53,12 +53,14 @@ cleanup(void)
 int
 main(void)
 {
+	static const key_t private_key =
+		(key_t) (0xffffffff00000000ULL | IPC_PRIVATE);
 	int rc;
 	union semun un;
 	struct semid_ds ds;
 	struct seminfo info;
 
-	id = semget(IPC_PRIVATE, 1, 0600);
+	id = semget(private_key, 1, 0600);
 	if (id < 0)
 		perror_msg_and_skip("semget");
 	printf("semget\\(IPC_PRIVATE, 1, 0600\\) += %d\n", id);

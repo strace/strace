@@ -101,8 +101,9 @@ SYS_FUNC(semtimedop)
 
 SYS_FUNC(semget)
 {
-	if (tcp->u_arg[0])
-		tprintf("%#lx", tcp->u_arg[0]);
+	const int key = (int) tcp->u_arg[0];
+	if (key)
+		tprintf("%#x", key);
 	else
 		tprints("IPC_PRIVATE");
 	tprintf(", %lu, ", tcp->u_arg[1]);

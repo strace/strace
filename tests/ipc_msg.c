@@ -45,10 +45,12 @@ cleanup(void)
 int
 main(void)
 {
+	static const key_t private_key =
+		(key_t) (0xffffffff00000000ULL | IPC_PRIVATE);
 	int rc;
 	struct msqid_ds ds;
 
-	id = msgget(IPC_PRIVATE, 0600);
+	id = msgget(private_key, 0600);
 	if (id < 0)
 		perror_msg_and_skip("msgget");
 	printf("msgget\\(IPC_PRIVATE, 0600\\) += %d\n", id);

@@ -43,8 +43,9 @@
 
 SYS_FUNC(shmget)
 {
-	if (tcp->u_arg[0])
-		tprintf("%#lx", tcp->u_arg[0]);
+	const int key = (int) tcp->u_arg[0];
+	if (key)
+		tprintf("%#x", key);
 	else
 		tprints("IPC_PRIVATE");
 	tprintf(", %lu, ", tcp->u_arg[1]);

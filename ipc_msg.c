@@ -44,10 +44,12 @@
 
 SYS_FUNC(msgget)
 {
-	if (tcp->u_arg[0])
-		tprintf("%#lx, ", tcp->u_arg[0]);
+	const int key = (int) tcp->u_arg[0];
+	if (key)
+		tprintf("%#x", key);
 	else
-		tprints("IPC_PRIVATE, ");
+		tprints("IPC_PRIVATE");
+	tprints(", ");
 	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprints("|");
 	print_numeric_umode_t(tcp->u_arg[1] & 0777);

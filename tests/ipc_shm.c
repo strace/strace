@@ -45,10 +45,12 @@ cleanup(void)
 int
 main(void)
 {
+	static const key_t private_key =
+		(key_t) (0xffffffff00000000ULL | IPC_PRIVATE);
 	int rc;
 	struct shmid_ds ds;
 
-	id = shmget(IPC_PRIVATE, 1, 0600);
+	id = shmget(private_key, 1, 0600);
 	if (id < 0)
 		perror_msg_and_skip("shmget");
 	printf("shmget\\(IPC_PRIVATE, 1, 0600\\) += %d\n", id);
