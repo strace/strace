@@ -57,7 +57,7 @@ print_sembuf(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 #endif
 
 static void
-tprint_sembuf_array(struct tcb *tcp, const long addr, const unsigned long count)
+tprint_sembuf_array(struct tcb *tcp, const long addr, const unsigned int count)
 {
 #if defined HAVE_SYS_SEM_H || defined HAVE_LINUX_SEM_H
 	struct sembuf sb;
@@ -66,7 +66,7 @@ tprint_sembuf_array(struct tcb *tcp, const long addr, const unsigned long count)
 #else
 	printaddr(addr);
 #endif
-	tprintf(", %lu", count);
+	tprintf(", %u", count);
 }
 
 SYS_FUNC(semop)
