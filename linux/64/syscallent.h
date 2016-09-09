@@ -1,5 +1,5 @@
-[  0] = { 2,	0,		SEN(io_setup),			"io_setup"		},
-[  1] = { 1,	0,		SEN(io_destroy),		"io_destroy"		},
+[  0] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
+[  1] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [  2] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [  3] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [  4] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
