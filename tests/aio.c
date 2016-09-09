@@ -239,11 +239,11 @@ main(void)
 	if (rc != (long) nr)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%#lx, %u, ["
-		"{data=%#" PRI__x64 ", pread, reqprio=11, fildes=0, "
-			"buf=%p, nbytes=%u, offset=%" PRI__d64 "}, "
-		"{data=%#" PRI__x64 ", pread, reqprio=22, fildes=0, "
-			"buf=%p, nbytes=%u, offset=%" PRI__d64 "}"
-		"]) = %s\n",
+	       "{data=%#" PRI__x64 ", pread, reqprio=11, fildes=0, "
+	               "buf=%p, nbytes=%u, offset=%" PRI__d64 "}, "
+	       "{data=%#" PRI__x64 ", pread, reqprio=22, fildes=0, "
+	               "buf=%p, nbytes=%u, offset=%" PRI__d64 "}"
+	       "]) = %s\n",
 	       *ctx, nr,
 	       cb[0].aio_data, data0, sizeof_data0, cb[0].aio_offset,
 	       cb[1].aio_data, data1, sizeof_data1, cb[1].aio_offset,
@@ -265,9 +265,9 @@ main(void)
 
 	rc = syscall(__NR_io_getevents, *ctx, nr, nr + 1, ev, ts);
 	printf("io_getevents(%#lx, %ld, %ld, ["
-		"{data=%#" PRI__x64 ", obj=%p, res=%u, res2=0}, "
-		"{data=%#" PRI__x64 ", obj=%p, res=%u, res2=0}"
-		"], {0, 123456789}) = %s\n",
+	       "{data=%#" PRI__x64 ", obj=%p, res=%u, res2=0}, "
+	       "{data=%#" PRI__x64 ", obj=%p, res=%u, res2=0}"
+	       "], {0, 123456789}) = %s\n",
 	       *ctx, (long) nr, (long) (nr + 1),
 	       cb[0].aio_data, &cb[0], sizeof_data0,
 	       cb[1].aio_data, &cb[1], sizeof_data1,
@@ -293,25 +293,25 @@ main(void)
 
 	rc = syscall(__NR_io_submit, *ctx, -1L, cbvs + nr);
 	printf("io_submit(%#lx, %ld, %p) = %s\n",
-		*ctx, -1L, cbvs + nr, sprintrc(rc));
+	       *ctx, -1L, cbvs + nr, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, 1057L, cbvs2);
 	printf("io_submit(%#lx, %ld, ["
-		"{data=%#" PRI__x64 ", key=%u, %hu /* SUB_??? */, fildes=%d}, "
-		"{key=%u, pwrite, reqprio=%hd, fildes=%d, str=NULL"
-			", nbytes=%" PRI__u64 ", offset=%" PRI__d64
+	       "{data=%#" PRI__x64 ", key=%u, %hu /* SUB_??? */, fildes=%d}, "
+	       "{key=%u, pwrite, reqprio=%hd, fildes=%d, str=NULL"
+	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64
 # ifdef IOCB_FLAG_RESFD
-			", resfd=%d, flags=%x"
+	               ", resfd=%d, flags=%x"
 # endif
-			"}, "
-		"{key=%u, pwrite, reqprio=%hd, fildes=%d, buf=%#" PRI__x64
-			", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
-		"{key=%u, pwrite, reqprio=%hd, fildes=%d"
-			", str=\"\\0\\1\\2\\3%.28s\"..."
-			", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
-		"{key=%u, pwritev, reqprio=%hd, fildes=%d, buf=%#" PRI__x64
-			", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}"
-		", {NULL}, {%#lx}, %p]) = %s\n",
+	               "}, "
+	       "{key=%u, pwrite, reqprio=%hd, fildes=%d, buf=%#" PRI__x64
+	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
+	       "{key=%u, pwrite, reqprio=%hd, fildes=%d"
+	               ", str=\"\\0\\1\\2\\3%.28s\"..."
+	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
+	       "{key=%u, pwritev, reqprio=%hd, fildes=%d, buf=%#" PRI__x64
+	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}"
+	       ", {NULL}, {%#lx}, %p]) = %s\n",
 	       *ctx, 1057L,
 	       cbv2[0].aio_data, cbv2[0].aio_key,
 	       cbv2[0].aio_lio_opcode, cbv2[0].aio_fildes,
@@ -332,13 +332,13 @@ main(void)
 	if (rc != (long) nr)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%#lx, %u, ["
-		"{data=%#" PRI__x64 ", preadv, reqprio=%hd, fildes=0, "
-			"iovec=[{iov_base=%p, iov_len=%u}"
-			", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}, "
-		"{data=%#" PRI__x64 ", preadv, reqprio=%hd, fildes=0, "
-			"iovec=[{iov_base=%p, iov_len=%u}"
-			", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}"
-		"]) = %s\n",
+	       "{data=%#" PRI__x64 ", preadv, reqprio=%hd, fildes=0, "
+	               "iovec=[{iov_base=%p, iov_len=%u}"
+	               ", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}, "
+	       "{data=%#" PRI__x64 ", preadv, reqprio=%hd, fildes=0, "
+	               "iovec=[{iov_base=%p, iov_len=%u}"
+	               ", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}"
+	       "]) = %s\n",
 	       *ctx, nr,
 	       cbv[0].aio_data, cbv[0].aio_reqprio,
 	       iov0[0].iov_base, (unsigned int) iov0[0].iov_len,
