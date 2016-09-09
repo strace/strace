@@ -43,6 +43,9 @@
 int
 main(void)
 {
+	static const long bogus_ctx =
+		(long) 0xface1e55deadbeefLL;
+
 	static const char data2[] =
 		"\0\1\2\3cat test test test 0123456789abcdef";
 
@@ -219,11 +222,10 @@ main(void)
 		perror_msg_and_skip("io_setup");
 	printf("io_setup(%u, [%#lx]) = 0\n", nr, *ctx);
 
-	rc = syscall(__NR_io_submit, (long) 0xface1e55deadbeefLL,
-		     (long) 0xca7faceddeadf00dLL, NULL);
+	rc = syscall(__NR_io_submit, bogus_ctx, (long) 0xca7faceddeadf00dLL,
+		     NULL);
 	printf("io_submit(%#lx, %ld, NULL) = %s\n",
-	       (long) 0xface1e55deadbeefLL,
-	       (long) 0xca7faceddeadf00dLL, sprintrc(rc));
+	       bogus_ctx, (long) 0xca7faceddeadf00dLL, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, nr, cbs + nr);
 	printf("io_submit(%#lx, %ld, %p) = %s\n",
@@ -247,21 +249,19 @@ main(void)
 	       cb[1].aio_data, data1, sizeof_data1, cb[1].aio_offset,
 	       sprintrc(rc));
 
-	rc = syscall(__NR_io_getevents, (long) 0xface1e55deadbeefLL,
+	rc = syscall(__NR_io_getevents, bogus_ctx,
 		     (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 		     ev + 1, NULL);
 	printf("io_getevents(%#lx, %ld, %ld, %p, NULL) = %s\n",
-	       (long) 0xface1e55deadbeefLL,
-	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
-	       ev + 1, sprintrc(rc));
+	       bogus_ctx, (long) 0xca7faceddeadf00dLL,
+	       (long) 0xba5e1e505ca571e0LL, ev + 1, sprintrc(rc));
 
-	rc = syscall(__NR_io_getevents, (long) 0xface1e55deadbeefLL,
+	rc = syscall(__NR_io_getevents, bogus_ctx,
 		     (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
 		     NULL, ts + 1);
 	printf("io_getevents(%#lx, %ld, %ld, NULL, %p) = %s\n",
-	       (long) 0xface1e55deadbeefLL,
-	       (long) 0xca7faceddeadf00dLL, (long) 0xba5e1e505ca571e0LL,
-	       ts + 1, sprintrc(rc));
+	       bogus_ctx, (long) 0xca7faceddeadf00dLL,
+	       (long) 0xba5e1e505ca571e0LL, ts + 1, sprintrc(rc));
 
 	rc = syscall(__NR_io_getevents, *ctx, nr, nr + 1, ev, ts);
 	printf("io_getevents(%#lx, %ld, %ld, ["
@@ -273,8 +273,8 @@ main(void)
 	       cb[1].aio_data, &cb[1], sizeof_data1,
 	       sprintrc(rc));
 
-	rc = syscall(__NR_io_cancel, *ctx, NULL, NULL);
-	printf("io_cancel(%#lx, NULL, NULL) = %s\n", *ctx, sprintrc(rc));
+	rc = syscall(__NR_io_cancel, bogus_ctx, NULL, NULL);
+	printf("io_cancel(%#lx, NULL, NULL) = %s\n", bogus_ctx, sprintrc(rc));
 
 	rc = syscall(__NR_io_cancel, *ctx, cbc + 1, ev);
 	printf("io_cancel(%#lx, %p, %p) = %s\n", *ctx, cbc + 1, ev,
@@ -350,9 +350,9 @@ main(void)
 	       cbv[1].aio_offset,
 	       sprintrc(rc));
 
-	rc = syscall(__NR_io_destroy, (unsigned long) 0xfacefeedb000b1e5ULL);
+	rc = syscall(__NR_io_destroy, bogus_ctx);
 	printf("io_destroy(%#lx) = %s\n",
-	       (unsigned long) 0xfacefeedb000b1e5ULL, sprintrc(rc));
+	       bogus_ctx, sprintrc(rc));
 
 	rc = syscall(__NR_io_destroy, *ctx);
 	printf("io_destroy(%#lx) = %s\n", *ctx, sprintrc(rc));
