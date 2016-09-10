@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 Anchit Jain <anchitjain1234@gmail.com>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,30 +41,20 @@ main(void)
 {
 	static const char fname[] = "chmod_test_file";
 
-	if (open(fname, O_CREAT|O_RDONLY, 0400) == -1)
+	if (open(fname, O_CREAT|O_RDONLY, 0400) < 0)
 		perror_msg_and_fail("open");
 
-	int chmod_res = syscall(__NR_chmod, fname, 0600);
+	long rc = syscall(__NR_chmod, fname, 0600);
+	printf("chmod(\"%s\", 0600) = %s\n", fname, sprintrc(rc));
 
-	if (chmod_res == 0) {
-		printf("chmod(\"%s\", 0600) = 0\n", fname);
-	} else {
-		if (errno == ENOSYS) {
-			printf("chmod(\"%s\", 0600) = -1 ENOSYS (%m)\n", fname);
-		} else {
-			perror_msg_and_fail("chmod");
-		}
-	}
-
-	if (unlink(fname) == -1)
+	if (unlink(fname))
 		perror_msg_and_fail("unlink");
 
-	if (chmod_res == 0) {
-		if (syscall(__NR_chmod, fname, 0600) != -1)
-			perror_msg_and_fail("chmod");
+	rc = syscall(__NR_chmod, fname, 051);
+	printf("chmod(\"%s\", 051) = %s\n", fname, sprintrc(rc));
 
-		printf("chmod(\"%s\", 0600) = -1 ENOENT (%m)\n", fname);
-	}
+	rc = syscall(__NR_chmod, fname, 004);
+	printf("chmod(\"%s\", 004) = %s\n", fname, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
