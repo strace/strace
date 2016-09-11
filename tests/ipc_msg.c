@@ -70,23 +70,13 @@ main(void)
 		(unsigned) ds.msg_qbytes, (unsigned) ds.msg_lspid,
 		(unsigned) ds.msg_lrpid);
 
-	int max = msgctl(0, MSG_INFO, &ds);
-	if (max < 0)
-		perror_msg_and_skip("msgctl MSG_INFO");
-	printf("msgctl\\(0, (IPC_64\\|)?MSG_INFO, %p\\) += %d\n", &ds, max);
+	rc = msgctl(0, MSG_INFO, &ds);
+	printf("msgctl\\(0, (IPC_64\\|)?MSG_INFO, %p\\) += %s\n",
+	       &ds, sprintrc_grep(rc));
 
 	rc = msgctl(id, MSG_STAT, &ds);
-	if (rc != id) {
-		/*
-		 * In linux < v2.6.24-rc1 the first argument must be
-		 * an index in the kernel's internal array.
-		 */
-		if (-1 != rc || EINVAL != errno)
-			perror_msg_and_skip("msgctl MSG_STAT");
-		printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) += -1 EINVAL \\(%m\\)\n", id, &ds);
-	} else {
-		printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) += %d\n", id, &ds, id);
-	}
+	printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) += %s\n",
+	       id, &ds, sprintrc_grep(rc));
 
 	return 0;
 }
