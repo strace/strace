@@ -185,6 +185,7 @@ strace_SOURCES =	\
 	linux/asm_stat.h \
 	linux/x32/asm_stat.h \
 	linux/x86_64/asm_stat.h \
+	list.h		\
 	listen.c	\
 	lookup_dcookie.c \
 	loop.c		\

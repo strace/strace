@@ -53,6 +53,15 @@
 	(offsetof(type_, member_) + sizeof(((type_ *)0)->member_))
 #endif
 
+#ifndef cast_ptr
+# define cast_ptr(type, var) ((type) (uintptr_t) (const volatile void *) (var))
+#endif
+
+#ifndef containerof
+# define containerof(x, s, m)	\
+	cast_ptr(s *, (const volatile char *) (x) - offsetof(s, m))
+#endif
+
 static inline bool
 is_filled(const char *ptr, char fill, size_t size)
 {
