@@ -73,27 +73,14 @@ main(void)
 	       id, &ds);
 
 	un.__buf = &info;
-	int max = semctl(0, 0, SEM_INFO, un);
-	if (max < 0)
-		perror_msg_and_skip("semctl SEM_INFO");
-	printf("semctl\\(0, 0, (IPC_64\\|)?SEM_INFO, \\[?%p\\]?\\) += %d\n",
-	       &info, max);
+	rc = semctl(0, 0, SEM_INFO, un);
+	printf("semctl\\(0, 0, (IPC_64\\|)?SEM_INFO, \\[?%p\\]?\\) += %s\n",
+	       &info, sprintrc_grep(rc));
 
 	un.buf = &ds;
 	rc = semctl(id, 0, SEM_STAT, un);
-	if (rc != id) {
-		/*
-		 * In linux < v2.6.24-rc1 the first argument must be
-		 * an index in the kernel's internal array.
-		 */
-		if (-1 != rc || EINVAL != errno)
-			perror_msg_and_skip("semctl SEM_STAT");
-		printf("semctl\\(%d, 0, (IPC_64\\|)?SEM_STAT, \\[?%p\\]?\\)"
-		       " += -1 EINVAL \\(%m\\)\n", id, &ds);
-	} else {
-		printf("semctl\\(%d, 0, (IPC_64\\|)?SEM_STAT, \\[?%p\\]?\\)"
-		       " += %d\n", id, &ds, id);
-	}
+	printf("semctl\\(%d, 0, (IPC_64\\|)?SEM_STAT, \\[?%p\\]?\\) += %s\n",
+	       id, &ds, sprintrc_grep(rc));
 
 	return 0;
 }
