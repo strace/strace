@@ -70,23 +70,13 @@ main(void)
 		(unsigned) ds.shm_atime, (unsigned) ds.shm_dtime,
 		(unsigned) ds. shm_ctime);
 
-	int max = shmctl(0, SHM_INFO, &ds);
-	if (max < 0)
-		perror_msg_and_skip("shmctl SHM_INFO");
-	printf("shmctl\\(0, (IPC_64\\|)?SHM_INFO, %p\\) += %d\n", &ds, max);
+	rc = shmctl(0, SHM_INFO, &ds);
+	printf("shmctl\\(0, (IPC_64\\|)?SHM_INFO, %p\\) += %s\n",
+	       &ds, sprintrc_grep(rc));
 
 	rc = shmctl(id, SHM_STAT, &ds);
-	if (rc != id) {
-		/*
-		 * In linux < v2.6.24-rc1 the first argument must be
-		 * an index in the kernel's internal array.
-		 */
-		if (-1 != rc || EINVAL != errno)
-			perror_msg_and_skip("shmctl SHM_STAT");
-		printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) += -1 EINVAL \\(%m\\)\n", id, &ds);
-	} else {
-		printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) += %d\n", id, &ds, id);
-	}
+	printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) += %s\n",
+	       id, &ds, sprintrc_grep(rc));
 
 	return 0;
 }
