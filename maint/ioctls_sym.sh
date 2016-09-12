@@ -190,6 +190,17 @@ __EOF__
 #undef FBIOPUTCMAP
 __EOF__
 			;;
+		*linux/atm_zatm.h)
+			cat <<'__EOF__'
+#include <linux/atm.h>
+#ifndef _LINUX_TIME_H
+# define _LINUX_TIME_H
+#endif
+#ifndef _UAPI_LINUX_TIME_H
+# define _UAPI_LINUX_TIME_H
+#endif
+__EOF__
+			;;
 		*linux/atm?*.h)
 			echo '#include <linux/atm.h>'
 			;;
@@ -297,7 +308,7 @@ __EOF__
 		*video/sstfb.h)
 			echo 'struct fb_info;'
 			;;
-		*xen/gntdev.h)
+		*xen/evtchn.h|*xen/gntdev.h)
 			cat <<'__EOF__'
 typedef uint32_t grant_ref_t;
 typedef uint16_t domid_t;
