@@ -88,10 +88,15 @@ main(void)
 	atexit(cleanup);
 
 	rc = semctl(bogus_semid, bogus_semnum, bogus_cmd, bogus_arg);
+#ifdef __GLIBC__
+# define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|0)\\])"
+#else
+# define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|0)\\]|0)"
+#endif
 	printf("semctl\\(%d, %d, (IPC_64\\|)?%#x /\\* SEM_\\?\\?\\? \\*/"
-	       ", (%#lx|\\[(%#lx|0)\\])\\) += %s\n",
-	       bogus_semid, bogus_semnum, bogus_cmd, bogus_arg, bogus_arg,
-	       sprintrc_grep(rc));
+	       ", " SEMCTL_BOGUS_ARG_FMT "\\) += %s\n",
+	       bogus_semid, bogus_semnum, bogus_cmd,
+	       bogus_arg, bogus_arg, sprintrc_grep(rc));
 
 	un.buf = &ds;
 	if (semctl(id, 0, IPC_STAT, un))
