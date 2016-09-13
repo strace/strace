@@ -32,6 +32,9 @@
 #include <stdlib.h>
 #include <sys/sem.h>
 
+#include "xlat.h"
+#include "xlat/resource_flags.h"
+
 union semun {
 	int              val;    /* Value for SETVAL */
 	struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
@@ -55,16 +58,40 @@ main(void)
 {
 	static const key_t private_key =
 		(key_t) (0xffffffff00000000ULL | IPC_PRIVATE);
+	static const key_t bogus_key = (key_t) 0xeca86420fdb97531ULL;
+	static const int bogus_semid = 0xfdb97531;
+	static const int bogus_semnum = 0xeca86420;
+	static const int bogus_size = 0xdec0ded1;
+	static const int bogus_flags = 0xface1e55;
+	static const int bogus_cmd = 0xdeadbeef;
+	static const unsigned long bogus_arg =
+		(unsigned long) 0xbadc0dedfffffaceULL;
+
 	int rc;
 	union semun un;
 	struct semid_ds ds;
 	struct seminfo info;
+
+	rc = semget(bogus_key, bogus_size, bogus_flags);
+	printf("semget\\(%#llx, %d, %s%s%s%#x\\|%#04o\\) += %s\n",
+	       zero_extend_signed_to_ull(bogus_key), bogus_size,
+	       IPC_CREAT & bogus_flags ? "IPC_CREAT\\|" : "",
+	       IPC_EXCL & bogus_flags ? "IPC_EXCL\\|" : "",
+	       IPC_NOWAIT & bogus_flags ? "IPC_NOWAIT\\|" : "",
+	       bogus_flags & ~(0777 | IPC_CREAT | IPC_EXCL | IPC_NOWAIT),
+	       bogus_flags & 0777, sprintrc_grep(rc));
 
 	id = semget(private_key, 1, 0600);
 	if (id < 0)
 		perror_msg_and_skip("semget");
 	printf("semget\\(IPC_PRIVATE, 1, 0600\\) += %d\n", id);
 	atexit(cleanup);
+
+	rc = semctl(bogus_semid, bogus_semnum, bogus_cmd, bogus_arg);
+	printf("semctl\\(%d, %d, (IPC_64\\|)?%#x /\\* SEM_\\?\\?\\? \\*/"
+	       ", (%#lx|\\[(%#lx|0)\\])\\) += %s\n",
+	       bogus_semid, bogus_semnum, bogus_cmd, bogus_arg, bogus_arg,
+	       sprintrc_grep(rc));
 
 	un.buf = &ds;
 	if (semctl(id, 0, IPC_STAT, un))

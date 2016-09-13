@@ -21,10 +21,22 @@ cleanup(void)
 int
 main(void)
 {
+	static const int bogus_shmid = 0xfdb97531;
+	static const void * const bogus_shmaddr =
+		(void *) (unsigned long) 0xdec0ded1dec0ded2ULL;
+	static const int bogus_shmflg = 0xffffface;
+
+	long rc;
+
 	id = shmget(IPC_PRIVATE, 1, 0600);
 	if (id < 0)
 		perror_msg_and_skip("shmget");
 	atexit(cleanup);
+
+	rc = (long) shmat(bogus_shmid, bogus_shmaddr, bogus_shmflg);
+	printf("%s(%d, %p, SHM_REMAP|SHM_RDONLY|SHM_RND|%#x) = %s\n",
+	       SHMAT, bogus_shmid, bogus_shmaddr, bogus_shmflg & ~0x7000,
+	       sprintrc(rc));
 
 	shmat(id, NULL, SHM_REMAP);
 	printf("%s(%d, NULL, SHM_REMAP) = -1 %s (%m)\n",
@@ -34,6 +46,9 @@ main(void)
 	if (shmaddr == (void *)(-1))
 		perror_msg_and_skip("shmat SHM_RDONLY");
 	printf("%s(%d, NULL, SHM_RDONLY) = %p\n", SHMAT, id, shmaddr);
+
+	rc = shmdt(NULL);
+	printf("shmdt(NULL) = %s\n", sprintrc(rc));
 
 	if (shmdt(shmaddr))
 		perror_msg_and_skip("shmdt");
