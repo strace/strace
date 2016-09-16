@@ -105,14 +105,16 @@ main(void)
 	print_statfs(".", NULL);
 
 	long rc = SYSCALL_INVOKE("", -1, 0, sizeof(STRUCT_STATFS));
+	const char *errstr = sprintrc(rc);
 	PRINT_SYSCALL_HEADER("", -1, sizeof(STRUCT_STATFS));
-	printf("NULL) = %ld %s (%m)\n", rc, errno2name());
+	printf("NULL) = %s\n", errstr);
 
 #ifdef CHECK_ODD_SIZE
 	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeef;
 	rc = SYSCALL_INVOKE("", -1, addr, sizeof(STRUCT_STATFS) + 1);
+	errstr = sprintrc(rc);
 	PRINT_SYSCALL_HEADER("", -1, sizeof(STRUCT_STATFS) + 1);
-	printf("%#lx) = %ld %s (%m)\n", addr, rc, errno2name());
+	printf("%#lx) = %s\n", addr, errstr);
 #endif
 
 	puts("+++ exited with 0 +++");
