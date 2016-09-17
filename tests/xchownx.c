@@ -27,7 +27,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -141,29 +140,11 @@ main(void)
 
 		const long rc = syscall(SYSCALL_NR, SYSCALL_ARG1,
 					tests[i].uid, tests[i].gid);
-		int saved_errno = errno;
-		if (rc != expected) {
-			if (!i && ENOSYS == errno) {
-				printf("%s(" FMT_ARG1 ", %u, %u)"
-				       " = -1 ENOSYS (%m)\n",
-				       SYSCALL_NAME, SYSCALL_ARG1, uid, gid);
-				break;
-			}
-			perror_msg_and_fail("%s(" FMT_ARG1
-					    ", %#lx, %#lx) != %ld",
-					    SYSCALL_NAME, SYSCALL_ARG1,
-					    tests[i].uid, tests[i].gid,
-					    expected);
-		}
-
+		const char *errstr = sprintrc(rc);
 		printf("%s(" FMT_ARG1, SYSCALL_NAME, SYSCALL_ARG1);
 		print_int(unum);
 		print_int(gnum);
-		errno = saved_errno;
-		if (expected)
-			printf(") = %ld %s (%m)\n", expected, errno2name());
-		else
-			printf(") = 0\n");
+		printf(") = %s\n", errstr);
 	}
 
 	puts("+++ exited with 0 +++");
