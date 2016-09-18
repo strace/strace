@@ -29,7 +29,6 @@
 
 #ifdef HAVE_SYS_XATTR_H
 
-# include <assert.h>
 # include <stdio.h>
 # include <sys/xattr.h>
 
@@ -48,94 +47,83 @@ main(void)
 	char *const efault = tail_alloc(1) + 1;
 	const char *const value = tail_memdup(c_value, sizeof(c_value) - 1);
 	char *const big = tail_alloc(XATTR_SIZE_MAX + 1);
+	long rc;
+	const char *errstr;
 
-	assert(fsetxattr(-1, 0, 0, 0, XATTR_CREATE) == -1);
-	printf("fsetxattr(-1, NULL, NULL, 0, XATTR_CREATE) = -1 %s (%m)\n",
-	       errno2name());
+	rc = fsetxattr(-1, 0, 0, 0, XATTR_CREATE);
+	printf("fsetxattr(-1, NULL, NULL, 0, XATTR_CREATE) = %s\n",
+	       sprintrc(rc));
 
-	assert(fsetxattr(-1, 0, z_value, 0, XATTR_CREATE) == -1);
-	printf("fsetxattr(-1, NULL, \"\", 0, XATTR_CREATE) = -1 %s (%m)\n",
-	       errno2name());
+	rc = fsetxattr(-1, 0, z_value, 0, XATTR_CREATE);
+	printf("fsetxattr(-1, NULL, \"\", 0, XATTR_CREATE) = %s\n",
+	       sprintrc(rc));
 
-	assert(fsetxattr(-1, name, big, XATTR_SIZE_MAX + 1, XATTR_CREATE) == -1);
-	printf("fsetxattr(-1, \"%s\", %p, %u, XATTR_CREATE)"
-	       " = -1 %s (%m)\n",
-	       name, big, XATTR_SIZE_MAX + 1, errno2name());
+	rc = fsetxattr(-1, name, big, XATTR_SIZE_MAX + 1, XATTR_CREATE);
+	printf("fsetxattr(-1, \"%s\", %p, %u, XATTR_CREATE) = %s\n",
+	       name, big, XATTR_SIZE_MAX + 1, sprintrc(rc));
 
-	assert(fsetxattr(-1, name, value, sizeof(c_value), XATTR_CREATE) == -1);
-	printf("fsetxattr(-1, \"%s\", %p, %u, XATTR_CREATE)"
-	       " = -1 %s (%m)\n",
-	       name, value, (unsigned) sizeof(c_value), errno2name());
+	rc = fsetxattr(-1, name, value, sizeof(c_value), XATTR_CREATE);
+	printf("fsetxattr(-1, \"%s\", %p, %u, XATTR_CREATE) = %s\n",
+	       name, value, (unsigned) sizeof(c_value), sprintrc(rc));
 
-	assert(fsetxattr(-1, name, z_value, sizeof(c_value), XATTR_REPLACE) == -1);
-	printf("fsetxattr(-1, \"%s\", \"%s\", %u, XATTR_REPLACE)"
-	       " = -1 %s (%m)\n",
-	       name, q_value, (unsigned) sizeof(c_value), errno2name());
+	rc = fsetxattr(-1, name, z_value, sizeof(c_value), XATTR_REPLACE);
+	printf("fsetxattr(-1, \"%s\", \"%s\", %u, XATTR_REPLACE) = %s\n",
+	       name, q_value, (unsigned) sizeof(c_value), sprintrc(rc));
 
-	assert(fsetxattr(-1, name, value, sizeof(c_value) - 1, XATTR_CREATE|XATTR_REPLACE) == -1);
+	rc = fsetxattr(-1, name, value, sizeof(c_value) - 1, XATTR_CREATE|XATTR_REPLACE);
 	printf("fsetxattr(-1, \"%s\", \"%s\", %u, XATTR_CREATE|XATTR_REPLACE)"
-	       " = -1 %s (%m)\n",
-	       name, q_value, (unsigned) sizeof(c_value) - 1, errno2name());
+	       " = %s\n",
+	       name, q_value, (unsigned) sizeof(c_value) - 1, sprintrc(rc));
 
-	assert(setxattr(".", name, z_value, sizeof(c_value), XATTR_CREATE) == -1);
-	printf("setxattr(\".\", \"%s\", \"%s\", %u, XATTR_CREATE)"
-	       " = -1 %s (%m)\n",
-	       name, q_value, (unsigned) sizeof(c_value), errno2name());
+	rc = setxattr(".", name, z_value, sizeof(c_value), XATTR_CREATE);
+	printf("setxattr(\".\", \"%s\", \"%s\", %u, XATTR_CREATE) = %s\n",
+	       name, q_value, (unsigned) sizeof(c_value), sprintrc(rc));
 
-	assert(lsetxattr(".", name, value, sizeof(c_value) - 1, XATTR_CREATE) == -1);
-	printf("lsetxattr(\".\", \"%s\", \"%s\", %u, XATTR_CREATE)"
-	       " = -1 %s (%m)\n",
-	       name, q_value, (unsigned) sizeof(c_value) - 1, errno2name());
+	rc = lsetxattr(".", name, value, sizeof(c_value) - 1, XATTR_CREATE);
+	printf("lsetxattr(\".\", \"%s\", \"%s\", %u, XATTR_CREATE) = %s\n",
+	       name, q_value, (unsigned) sizeof(c_value) - 1, sprintrc(rc));
 
-	assert(fgetxattr(-1, name, efault, 4) == -1);
-	printf("fgetxattr(-1, \"%s\", %p, 4) = -1 %s (%m)\n",
-	       name, efault, errno2name());
+	rc = fgetxattr(-1, name, efault, 4);
+	printf("fgetxattr(-1, \"%s\", %p, 4) = %s\n",
+	       name, efault, sprintrc(rc));
 
-	assert(getxattr(".", name, big, XATTR_SIZE_MAX + 1) == -1);
-	printf("getxattr(\".\", \"%s\", %p, %u) = -1 %s (%m)\n",
-	       name, big, XATTR_SIZE_MAX + 1, errno2name());
+	rc = getxattr(".", name, big, XATTR_SIZE_MAX + 1);
+	printf("getxattr(\".\", \"%s\", %p, %u) = %s\n",
+	       name, big, XATTR_SIZE_MAX + 1, sprintrc(rc));
 
-	assert(lgetxattr(".", name, big + 1, XATTR_SIZE_MAX) == -1);
-	printf("lgetxattr(\".\", \"%s\", %p, %u) = -1 %s (%m)\n",
-	       name, big + 1, XATTR_SIZE_MAX, errno2name());
+	rc = lgetxattr(".", name, big + 1, XATTR_SIZE_MAX);
+	printf("lgetxattr(\".\", \"%s\", %p, %u) = %s\n",
+	       name, big + 1, XATTR_SIZE_MAX, sprintrc(rc));
 
-	assert(flistxattr(-1, efault, 4) == -1);
-	printf("flistxattr(-1, %p, 4) = -1 %s (%m)\n",
-	       efault, errno2name());
+	rc = flistxattr(-1, efault, 4);
+	printf("flistxattr(-1, %p, 4) = %s\n", efault, sprintrc(rc));
 
-	assert(llistxattr("", efault + 1, 4) == -1);
-	printf("llistxattr(\"\", %p, 4) = -1 %s (%m)\n",
-	       efault + 1, errno2name());
+	rc = llistxattr("", efault + 1, 4);
+	printf("llistxattr(\"\", %p, 4) = %s\n", efault + 1, sprintrc(rc));
 
-	ssize_t rc = listxattr(".", big, 0);
-	if (rc < 0)
-		printf("listxattr(\".\", %p, 0) = -1 %s (%m)\n",
-		       big, errno2name());
-	else
-		printf("listxattr(\".\", %p, 0) = %ld\n",
-		       big, (long) rc);
+	rc = listxattr(".", big, 0);
+	printf("listxattr(\".\", %p, 0) = %s\n", big, sprintrc(rc));
 
 	rc = listxattr(".", big, XATTR_SIZE_MAX + 1);
+	errstr = sprintrc(rc);
+	printf("listxattr(\".\", ");
 	if (rc < 0)
-		printf("listxattr(\".\", %p, %u) = -1 %s (%m)\n",
-		       big, XATTR_SIZE_MAX + 1, errno2name());
+		printf("%p", big);
 	else {
-		printf("listxattr(\".\", \"");
+		putchar('"');
 		print_quoted_memory(big, rc);
-		printf("\", %u) = %ld\n", XATTR_SIZE_MAX + 1, (long) rc);
+		putchar('"');
 	}
+	printf(", %u) = %s\n", XATTR_SIZE_MAX + 1, errstr);
 
-	assert(fremovexattr(-1, name) == -1);
-	printf("fremovexattr(-1, \"%s\") = -1 %s (%m)\n",
-	       name, errno2name());
+	rc = fremovexattr(-1, name);
+	printf("fremovexattr(-1, \"%s\") = %s\n", name, sprintrc(rc));
 
-	assert(removexattr(".", name) == -1);
-	printf("removexattr(\".\", \"%s\") = -1 %s (%m)\n",
-	       name, errno2name());
+	rc = removexattr(".", name);
+	printf("removexattr(\".\", \"%s\") = %s\n", name, sprintrc(rc));
 
-	assert(lremovexattr(".", name) == -1);
-	printf("lremovexattr(\".\", \"%s\") = -1 %s (%m)\n",
-	       name, errno2name());
+	rc = lremovexattr(".", name);
+	printf("lremovexattr(\".\", \"%s\") = %s\n", name, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
