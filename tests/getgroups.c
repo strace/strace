@@ -95,30 +95,18 @@ main(void)
 	printf("%s(0, NULL) = %ld\n", SYSCALL_NAME, rc);
 
 	rc = syscall(SYSCALL_NR, -1U, 0);
-	printf("%s(%u, NULL) = %ld %s (%m)\n",
-	       SYSCALL_NAME, -1U, rc, errno2name());
+	printf("%s(%u, NULL) = %s\n", SYSCALL_NAME, -1U, sprintrc(rc));
 
 	rc = syscall(SYSCALL_NR, -1L, 0);
-	printf("%s(%u, NULL) = %ld %s (%m)\n",
-	       SYSCALL_NAME, -1U, rc, errno2name());
+	printf("%s(%u, NULL) = %s\n", SYSCALL_NAME, -1U, sprintrc(rc));
 
 	const unsigned int ngroups_max = sysconf(_SC_NGROUPS_MAX);
 
 	rc = syscall(SYSCALL_NR, ngroups_max, 0);
-	if (rc < 0)
-		printf("%s(%u, NULL) = %ld %s (%m)\n",
-		       SYSCALL_NAME, ngroups_max, rc, errno2name());
-	else
-		printf("%s(%u, NULL) = %ld\n",
-		       SYSCALL_NAME, ngroups_max, rc);
+	printf("%s(%u, NULL) = %s\n", SYSCALL_NAME, ngroups_max, sprintrc(rc));
 
 	rc = syscall(SYSCALL_NR, (long) 0xffffffff00000000ULL | ngroups_max, 0);
-	if (rc < 0)
-		printf("%s(%u, NULL) = %ld %s (%m)\n",
-		       SYSCALL_NAME, ngroups_max, rc, errno2name());
-	else
-		printf("%s(%u, NULL) = %ld\n",
-		       SYSCALL_NAME, ngroups_max, rc);
+	printf("%s(%u, NULL) = %s\n", SYSCALL_NAME, ngroups_max, sprintrc(rc));
 
 	/* check how the second argument is decoded */
 	GID_TYPE *const g1 =
@@ -132,9 +120,8 @@ main(void)
 
 	if (ngroups) {
 		rc = syscall(SYSCALL_NR, ngroups, efault);
-		printf("%s(%u, %p) = %ld %s (%m)\n",
-		       SYSCALL_NAME, (unsigned) ngroups, efault,
-		       rc, errno2name());
+		printf("%s(%u, %p) = %s\n",
+		       SYSCALL_NAME, (unsigned) ngroups, efault, sprintrc(rc));
 	}
 
 	puts("+++ exited with 0 +++");
