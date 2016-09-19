@@ -28,7 +28,6 @@
  */
 
 #include "tests.h"
-#include <assert.h>
 #include <time.h>
 #include <utime.h>
 #include <errno.h>
@@ -45,23 +44,22 @@ print_tm(const struct tm * const p)
 int
 main(void)
 {
-	utime("", NULL);
-	printf("utime(\"\", NULL) = -1 ENOENT (%m)\n");
+	int rc = utime("", NULL);
+	printf("utime(\"\", NULL) = %s\n", sprintrc(rc));
 
 	const time_t t = time(NULL);
 	const struct tm * const p = localtime(&t);
 	const struct utimbuf u = { .actime = t, .modtime = t };
 	const struct utimbuf const *tail_u = tail_memdup(&u, sizeof(u));
 
+	rc = utime("utime\nfilename", tail_u);
+	const char *errstr = sprintrc(rc);
 	printf("utime(\"utime\\nfilename\", [");
 	print_tm(p);
 	printf(", ");
 	print_tm(p);
-	printf("]) = -1 ENOENT ");
-	assert(utime("utime\nfilename", tail_u) == -1);
-	if (ENOENT != errno)
-		perror_msg_and_skip("utime");
-	printf("(%m)\n");
+	printf("]) = %s\n", errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
