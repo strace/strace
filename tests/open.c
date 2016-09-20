@@ -56,6 +56,17 @@ main(void)
 		       sample, sprintrc(fd));
 	}
 
+#ifdef O_TMPFILE
+# if O_TMPFILE == (O_TMPFILE & ~O_DIRECTORY)
+#  define STR_O_TMPFILE "O_TMPFILE"
+# else
+#  define STR_O_TMPFILE "O_DIRECTORY|O_TMPFILE"
+# endif
+	fd = syscall(__NR_open, sample, O_WRONLY|O_TMPFILE, 0600);
+	printf("open(\"%s\", O_WRONLY|%s, 0600) = %s\n",
+	       sample, STR_O_TMPFILE, sprintrc(fd));
+#endif /* O_TMPFILE */
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
