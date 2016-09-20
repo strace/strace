@@ -41,35 +41,37 @@
 # include "ptrace.h"
 # include <linux/audit.h>
 
+static const char *errstr;
+
 static long
 do_ptrace(unsigned long request, unsigned long pid,
 	  unsigned long addr, unsigned long data)
 {
-	return syscall(__NR_ptrace, request, pid, addr, data);
+	long rc = syscall(__NR_ptrace, request, pid, addr, data);
+	errstr = sprintrc(rc);
+	return rc;
 }
 
 static void
 test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 {
-	long rc = do_ptrace(PTRACE_PEEKSIGINFO, pid, 0, bad_request);
-	printf("ptrace(PTRACE_PEEKSIGINFO, %u, NULL, %#lx)"
-	       " = %ld %s (%m)\n", (unsigned) pid, bad_request, rc, errno2name());
+	do_ptrace(PTRACE_PEEKSIGINFO, pid, 0, bad_request);
+	printf("ptrace(PTRACE_PEEKSIGINFO, %u, NULL, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 
 	struct {
 		unsigned long long off;
 		unsigned int flags, nr;
 	} *const psi = tail_alloc(sizeof(*psi));
 
-	psi->off = 0xdeadbeeffacefeed;
+	psi->off = 0xdeadbeeffacefeedULL;
 	psi->flags = 1;
 	psi->nr = 42;
 
-	rc = do_ptrace(PTRACE_PEEKSIGINFO,
-		       pid, (unsigned long) psi, bad_request);
+	do_ptrace(PTRACE_PEEKSIGINFO, pid, (unsigned long) psi, bad_request);
 	printf("ptrace(PTRACE_PEEKSIGINFO, %u, {off=%llu"
-	       ", flags=PTRACE_PEEKSIGINFO_SHARED, nr=%u}, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, psi->off, psi->nr, bad_request, rc, errno2name());
+	       ", flags=PTRACE_PEEKSIGINFO_SHARED, nr=%u}, %#lx) = %s\n",
+	       (unsigned) pid, psi->off, psi->nr, bad_request, errstr);
 
 	pid = fork();
 	if ((pid_t) pid < 0)
@@ -132,28 +134,28 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 					   status);
 		}
 
-		rc = do_ptrace(PTRACE_PEEKSIGINFO, pid,
-			       (unsigned long) psi, (unsigned long) sigs);
+		long rc = do_ptrace(PTRACE_PEEKSIGINFO, pid,
+				    (unsigned long) psi, (unsigned long) sigs);
 		if (rc < 0) {
-			printf("ptrace(PTRACE_PEEKSIGINFO, %u, {off=%llu"
-			       ", flags=0, nr=%u}, %p) = %ld %s (%m)\n",
+			printf("ptrace(PTRACE_PEEKSIGINFO, %u"
+			       ", {off=%llu, flags=0, nr=%u}, %p) = %s\n",
 			       (unsigned) pid, psi->off, psi->nr, sigs,
-			       rc, errno2name());
+			       errstr);
 		} else {
-			printf("ptrace(PTRACE_PEEKSIGINFO, %u, {off=%llu"
-			       ", flags=0, nr=%u}"
+			printf("ptrace(PTRACE_PEEKSIGINFO, %u"
+			       ", {off=%llu, flags=0, nr=%u}"
 			       ", [{si_signo=SIGUSR1, si_code=SI_TKILL"
 			       ", si_pid=%u, si_uid=%u}"
 			       ", {si_signo=SIGUSR2, si_code=SI_TKILL"
 			       ", si_pid=%u, si_uid=%u}"
 			       ", {si_signo=SIGALRM, si_code=SI_TKILL"
 			       ", si_pid=%u, si_uid=%u}"
-			       "]) = %ld\n",
+			       "]) = %s\n",
 			       (unsigned) pid, psi->off, psi->nr,
 			       (unsigned) pid, (unsigned) uid,
 			       (unsigned) pid, (unsigned) uid,
 			       (unsigned) pid, (unsigned) uid,
-			       rc);
+			       errstr);
 		}
 
 		if (do_ptrace(PTRACE_CONT, pid, 0, 0)) {
@@ -170,11 +172,11 @@ int
 main(void)
 {
 	const unsigned long bad_request =
-		(unsigned long) 0xdeadbeeffffffeed;
+		(unsigned long) 0xdeadbeeffffffeedULL;
 	const unsigned long bad_data =
-		(unsigned long) 0xdeadcafefffff00d;
+		(unsigned long) 0xdeadcafefffff00dULL;
 	const unsigned long pid =
-		(unsigned long) 0xdefaced00000000 | (unsigned) getpid();
+		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
 
 	unsigned int sigset_size;
 
@@ -189,89 +191,73 @@ main(void)
 	void *const k_set = tail_alloc(sigset_size);
 	siginfo_t *const sip = tail_alloc(sizeof(*sip));
 
-	long rc = do_ptrace(bad_request, pid, 0, 0);
-	printf("ptrace(%#lx /* PTRACE_??? */, %u, NULL, NULL) = %ld %s (%m)\n",
-	       bad_request, (unsigned) pid, rc, errno2name());
+	do_ptrace(bad_request, pid, 0, 0);
+	printf("ptrace(%#lx /* PTRACE_??? */, %u, NULL, NULL) = %s\n",
+	       bad_request, (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_PEEKDATA, pid, bad_request, bad_data);
+	do_ptrace(PTRACE_PEEKDATA, pid, bad_request, bad_data);
 # ifdef IA64
-	printf("ptrace(PTRACE_PEEKDATA, %u, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, rc, errno2name());
+	printf("ptrace(PTRACE_PEEKDATA, %u, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 # else
-	printf("ptrace(PTRACE_PEEKDATA, %u, %#lx, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, bad_data, rc, errno2name());
+	printf("ptrace(PTRACE_PEEKDATA, %u, %#lx, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, bad_data, errstr);
 #endif
 
-	rc = do_ptrace(PTRACE_PEEKTEXT, pid, bad_request, bad_data);
+	do_ptrace(PTRACE_PEEKTEXT, pid, bad_request, bad_data);
 # ifdef IA64
-	printf("ptrace(PTRACE_PEEKTEXT, %u, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, rc, errno2name());
+	printf("ptrace(PTRACE_PEEKTEXT, %u, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 # else
-	printf("ptrace(PTRACE_PEEKTEXT, %u, %#lx, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, bad_data, rc, errno2name());
+	printf("ptrace(PTRACE_PEEKTEXT, %u, %#lx, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, bad_data, errstr);
 #endif
 
-	rc = do_ptrace(PTRACE_PEEKUSER, pid, bad_request, bad_data);
+	do_ptrace(PTRACE_PEEKUSER, pid, bad_request, bad_data);
 # ifdef IA64
-	printf("ptrace(PTRACE_PEEKUSER, %u, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, rc, errno2name());
+	printf("ptrace(PTRACE_PEEKUSER, %u, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 # else
-	printf("ptrace(PTRACE_PEEKUSER, %u, %#lx, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, bad_data, rc, errno2name());
+	printf("ptrace(PTRACE_PEEKUSER, %u, %#lx, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, bad_data, errstr);
 #endif
 
-	rc = do_ptrace(PTRACE_POKEUSER, pid, bad_request, bad_data);
-	printf("ptrace(PTRACE_POKEUSER, %u, %#lx, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, bad_data, rc, errno2name());
+	do_ptrace(PTRACE_POKEUSER, pid, bad_request, bad_data);
+	printf("ptrace(PTRACE_POKEUSER, %u, %#lx, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, bad_data, errstr);
 
-	rc = do_ptrace(PTRACE_ATTACH, pid, 0, 0);
-	printf("ptrace(PTRACE_ATTACH, %u) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_ATTACH, pid, 0, 0);
+	printf("ptrace(PTRACE_ATTACH, %u) = %s\n", (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_INTERRUPT, pid, 0, 0);
-	printf("ptrace(PTRACE_INTERRUPT, %u) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_INTERRUPT, pid, 0, 0);
+	printf("ptrace(PTRACE_INTERRUPT, %u) = %s\n", (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_KILL, pid, 0, 0);
-	printf("ptrace(PTRACE_KILL, %u) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_KILL, pid, 0, 0);
+	printf("ptrace(PTRACE_KILL, %u) = %s\n", (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_LISTEN, pid, 0, 0);
-	printf("ptrace(PTRACE_LISTEN, %u) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_LISTEN, pid, 0, 0);
+	printf("ptrace(PTRACE_LISTEN, %u) = %s\n", (unsigned) pid, errstr);
 
 	sigset_t libc_set;
 	sigemptyset(&libc_set);
 	sigaddset(&libc_set, SIGUSR1);
 	memcpy(k_set, &libc_set, sigset_size);
 
-	rc = do_ptrace(PTRACE_SETSIGMASK,
-		       pid, sigset_size, (unsigned long) k_set);
-	printf("ptrace(PTRACE_SETSIGMASK, %u, %u, [USR1])"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, sigset_size, rc, errno2name());
+	do_ptrace(PTRACE_SETSIGMASK, pid, sigset_size, (unsigned long) k_set);
+	printf("ptrace(PTRACE_SETSIGMASK, %u, %u, [USR1]) = %s\n",
+	       (unsigned) pid, sigset_size, errstr);
 
-	rc = do_ptrace(PTRACE_GETSIGMASK,
-		       pid, sigset_size, (unsigned long) k_set);
-	printf("ptrace(PTRACE_GETSIGMASK, %u, %u, %p)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, sigset_size, k_set, rc, errno2name());
+	do_ptrace(PTRACE_GETSIGMASK, pid, sigset_size, (unsigned long) k_set);
+	printf("ptrace(PTRACE_GETSIGMASK, %u, %u, %p) = %s\n",
+	       (unsigned) pid, sigset_size, k_set, errstr);
 
-	rc = do_ptrace(PTRACE_SECCOMP_GET_FILTER, pid, 42, 0);
-	printf("ptrace(PTRACE_SECCOMP_GET_FILTER, %u, 42, NULL)"
-	       " = %ld %s (%m)\n", (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_SECCOMP_GET_FILTER, pid, 42, 0);
+	printf("ptrace(PTRACE_SECCOMP_GET_FILTER, %u, 42, NULL) = %s\n",
+	       (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_GETEVENTMSG, pid, bad_request, bad_data);
-	printf("ptrace(PTRACE_GETEVENTMSG, %u, %#lx, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, bad_data, rc, errno2name());
+	do_ptrace(PTRACE_GETEVENTMSG, pid, bad_request, bad_data);
+	printf("ptrace(PTRACE_GETEVENTMSG, %u, %#lx, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, bad_data, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGIO;
@@ -279,12 +265,10 @@ main(void)
 	sip->si_errno = ENOENT;
 	sip->si_band = -2;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGIO"
-	       ", si_code=POLL_IN, si_errno=ENOENT, si_band=-2})"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, rc, errno2name());
+	       ", si_code=POLL_IN, si_errno=ENOENT, si_band=-2}) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGTRAP;
@@ -294,52 +278,46 @@ main(void)
 	sip->si_uid = 3;
 	sip->si_ptr = (void *) bad_request;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGTRAP"
 	       ", si_code=TRAP_BRKPT, si_errno=ENOENT, si_pid=2, si_uid=3"
-	       ", si_value={int=%d, ptr=%p}}) = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, sip->si_int, sip->si_ptr, rc, errno2name());
+	       ", si_value={int=%d, ptr=%p}}) = %s\n",
+	       (unsigned) pid, bad_request, sip->si_int, sip->si_ptr,
+	       errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGILL;
 	sip->si_code = 1;
 	sip->si_errno = ENOENT;
-	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeef;
+	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGILL"
-	       ", si_code=ILL_ILLOPC, si_errno=ENOENT, si_addr=%p})"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, sip->si_addr, rc, errno2name());
+	       ", si_code=ILL_ILLOPC, si_errno=ENOENT, si_addr=%p}) = %s\n",
+	       (unsigned) pid, bad_request, sip->si_addr, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGFPE;
 	sip->si_code = 1;
 	sip->si_errno = ENOENT;
-	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeef;
+	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGFPE"
-	       ", si_code=FPE_INTDIV, si_errno=ENOENT, si_addr=%p})"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, sip->si_addr, rc, errno2name());
+	       ", si_code=FPE_INTDIV, si_errno=ENOENT, si_addr=%p}) = %s\n",
+	       (unsigned) pid, bad_request, sip->si_addr, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGBUS;
 	sip->si_code = 1;
 	sip->si_errno = -2;
-	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeef;
+	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGBUS"
-	       ", si_code=BUS_ADRALN, si_errno=%d, si_addr=%p})"
-	       " = %ld %s (%m)\n",
+	       ", si_code=BUS_ADRALN, si_errno=%d, si_addr=%p}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_errno, sip->si_addr,
-	       rc, errno2name());
+	       errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGPROF;
@@ -349,31 +327,28 @@ main(void)
 	sip->si_uid = 3;
 	sip->si_ptr = 0;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGPROF"
-	       ", si_code=%#x, si_errno=%d, si_pid=0, si_uid=3})"
-	       " = %ld %s (%m)\n",
+	       ", si_code=%#x, si_errno=%d, si_pid=0, si_uid=3}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_code, sip->si_errno,
-	       rc, errno2name());
+	       errstr);
 
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGSYS;
 	sip->si_code = 1;
 	sip->si_errno = ENOENT;
-	sip->si_call_addr = (void *) (unsigned long) 0xfacefeeddeadbeef;
+	sip->si_call_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 	sip->si_syscall = -1U;
 	sip->si_arch = AUDIT_ARCH_X86_64;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGSYS"
 	       ", si_code=SYS_SECCOMP, si_errno=ENOENT, si_call_addr=%p"
 	       ", si_syscall=__NR_syscall_%u, si_arch=AUDIT_ARCH_X86_64})"
-	       " = %ld %s (%m)\n",
+	       " = %s\n",
 	       (unsigned) pid, bad_request, sip->si_call_addr, sip->si_syscall,
-	       rc, errno2name());
+	       errstr);
 #endif
 
 #if defined HAVE_SIGINFO_T_SI_TIMERID && defined HAVE_SIGINFO_T_SI_OVERRUN
@@ -383,87 +358,77 @@ main(void)
 	sip->si_errno = ENOENT;
 	sip->si_timerid = 0xdeadbeef;
 	sip->si_overrun = -1;
-	sip->si_ptr = (void *) (unsigned long) 0xfacefeeddeadbeef;
+	sip->si_ptr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	rc = do_ptrace(PTRACE_SETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGHUP"
 	       ", si_code=SI_TIMER, si_errno=ENOENT, si_timerid=%#x"
-	       ", si_overrun=%d, si_value={int=%d, ptr=%p}}) = %ld %s (%m)\n",
+	       ", si_overrun=%d, si_value={int=%d, ptr=%p}}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_timerid, sip->si_overrun,
-	       sip->si_int, sip->si_ptr, rc, errno2name());
+	       sip->si_int, sip->si_ptr, errstr);
 #endif
 
-	rc = do_ptrace(PTRACE_GETSIGINFO,
-		       pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_GETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_GETSIGINFO, %u, %#lx, %p)"
-	       " = %ld %s (%m)\n", (unsigned) pid, bad_request, sip, rc, errno2name());
+	       " = %s\n", (unsigned) pid, bad_request, sip, errstr);
 
-	rc = do_ptrace(PTRACE_CONT, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_CONT, %u, NULL, SIGUSR1) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_CONT, pid, 0, SIGUSR1);
+	printf("ptrace(PTRACE_CONT, %u, NULL, SIGUSR1) = %s\n",
+	       (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_DETACH, pid, 0, SIGUSR2);
-	printf("ptrace(PTRACE_DETACH, %u, NULL, SIGUSR2) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_DETACH, pid, 0, SIGUSR2);
+	printf("ptrace(PTRACE_DETACH, %u, NULL, SIGUSR2) = %s\n",
+	       (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_SYSCALL, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_SYSCALL, %u, NULL, SIGUSR1) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_SYSCALL, pid, 0, SIGUSR1);
+	printf("ptrace(PTRACE_SYSCALL, %u, NULL, SIGUSR1) = %s\n",
+	       (unsigned) pid, errstr);
 
 #ifdef PTRACE_SINGLESTEP
-	rc = do_ptrace(PTRACE_SINGLESTEP, pid, 0, SIGUSR2);
-	printf("ptrace(PTRACE_SINGLESTEP, %u, NULL, SIGUSR2) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_SINGLESTEP, pid, 0, SIGUSR2);
+	printf("ptrace(PTRACE_SINGLESTEP, %u, NULL, SIGUSR2) = %s\n",
+	       (unsigned) pid, errstr);
 #endif
 
 #ifdef PTRACE_SINGLEBLOCK
-	rc = do_ptrace(PTRACE_SINGLEBLOCK, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_SINGLEBLOCK, %u, NULL, SIGUSR1) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_SINGLEBLOCK, pid, 0, SIGUSR1);
+	printf("ptrace(PTRACE_SINGLEBLOCK, %u, NULL, SIGUSR1) = %s\n",
+	       (unsigned) pid, errstr);
 #endif
 
 #ifdef PTRACE_SYSEMU
-	rc = do_ptrace(PTRACE_SYSEMU, pid, 0, SIGUSR2);
-	printf("ptrace(PTRACE_SYSEMU, %u, NULL, SIGUSR2) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_SYSEMU, pid, 0, SIGUSR2);
+	printf("ptrace(PTRACE_SYSEMU, %u, NULL, SIGUSR2) = %s\n",
+	       (unsigned) pid, errstr);
 #endif
 #ifdef PTRACE_SYSEMU_SINGLESTEP
-	rc = do_ptrace(PTRACE_SYSEMU_SINGLESTEP, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_SYSEMU_SINGLESTEP, %u, NULL, SIGUSR1)"
-	       " = %ld %s (%m)\n", (unsigned) pid, rc, errno2name());
+	do_ptrace(PTRACE_SYSEMU_SINGLESTEP, pid, 0, SIGUSR1);
+	printf("ptrace(PTRACE_SYSEMU_SINGLESTEP, %u, NULL, SIGUSR1) = %s\n",
+	       (unsigned) pid, errstr);
 #endif
 
-	rc = do_ptrace(PTRACE_SETOPTIONS,
-		       pid, 0, PTRACE_O_TRACEFORK|PTRACE_O_TRACECLONE);
+	do_ptrace(PTRACE_SETOPTIONS,
+		  pid, 0, PTRACE_O_TRACEFORK|PTRACE_O_TRACECLONE);
 	printf("ptrace(PTRACE_SETOPTIONS, %u, NULL"
-	       ", PTRACE_O_TRACEFORK|PTRACE_O_TRACECLONE) = %ld %s (%m)\n",
-	       (unsigned) pid, rc, errno2name());
+	       ", PTRACE_O_TRACEFORK|PTRACE_O_TRACECLONE) = %s\n",
+	       (unsigned) pid, errstr);
 
-	rc = do_ptrace(PTRACE_SEIZE,
-		       pid, bad_request, PTRACE_O_TRACESYSGOOD);
-	printf("ptrace(PTRACE_SEIZE, %u, %#lx"
-	       ", PTRACE_O_TRACESYSGOOD) = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, rc, errno2name());
+	do_ptrace(PTRACE_SEIZE, pid, bad_request, PTRACE_O_TRACESYSGOOD);
+	printf("ptrace(PTRACE_SEIZE, %u, %#lx, PTRACE_O_TRACESYSGOOD) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 
-	rc = do_ptrace(PTRACE_SETREGSET, pid, 1, bad_request);
-	printf("ptrace(PTRACE_SETREGSET, %u, NT_PRSTATUS, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, rc, errno2name());
+	do_ptrace(PTRACE_SETREGSET, pid, 1, bad_request);
+	printf("ptrace(PTRACE_SETREGSET, %u, NT_PRSTATUS, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 
-	rc = do_ptrace(PTRACE_GETREGSET, pid, 3, bad_request);
-	printf("ptrace(PTRACE_GETREGSET, %u, NT_PRPSINFO, %#lx)"
-	       " = %ld %s (%m)\n",
-	       (unsigned) pid, bad_request, rc, errno2name());
+	do_ptrace(PTRACE_GETREGSET, pid, 3, bad_request);
+	printf("ptrace(PTRACE_GETREGSET, %u, NT_PRPSINFO, %#lx) = %s\n",
+	       (unsigned) pid, bad_request, errstr);
 
 	test_peeksiginfo(pid, bad_request);
 
-	rc = do_ptrace(PTRACE_TRACEME, 0, 0, 0);
-	if (rc)
-		printf("ptrace(PTRACE_TRACEME) = %ld %s (%m)\n",
-		       rc, errno2name());
-	else
-		printf("ptrace(PTRACE_TRACEME) = 0\n");
+	do_ptrace(PTRACE_TRACEME, 0, 0, 0);
+	printf("ptrace(PTRACE_TRACEME) = %s\n", errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
