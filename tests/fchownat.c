@@ -47,22 +47,16 @@ main(void)
 		perror_msg_and_fail("open");
 
 	long rc = syscall(__NR_fchownat, AT_FDCWD, sample, uid, gid, 0);
-	if (rc == 0) {
-		printf("fchownat(AT_FDCWD, \"%s\", %d, %d, 0) = 0\n",
-		       sample, uid, gid);
+	printf("fchownat(AT_FDCWD, \"%s\", %d, %d, 0) = %s\n",
+	       sample, uid, gid, sprintrc(rc));
 
-		if (unlink(sample))
-			perror_msg_and_fail("unlink");
+	if (unlink(sample))
+		perror_msg_and_fail("unlink");
 
-		rc = syscall(__NR_fchownat, AT_FDCWD,
-			     sample, -1, -1L, AT_SYMLINK_NOFOLLOW);
-
-		printf("fchownat(AT_FDCWD, \"%s\", -1, -1, AT_SYMLINK_NOFOLLOW)"
-		       " = %ld %s (%m)\n", sample, rc, errno2name());
-	} else {
-		printf("fchownat(AT_FDCWD, \"%s\", %d, %d, 0)"
-		       " = %ld %s (%m)\n", sample, uid, gid, rc, errno2name());
-	}
+	rc = syscall(__NR_fchownat, AT_FDCWD,
+		     sample, -1, -1L, AT_SYMLINK_NOFOLLOW);
+	printf("fchownat(AT_FDCWD, \"%s\", -1, -1, AT_SYMLINK_NOFOLLOW) = %s\n",
+	       sample, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
