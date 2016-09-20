@@ -1,5 +1,8 @@
 /*
+ * Check decoding of fchmod syscall.
+ *
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,12 +31,12 @@
 #include "tests.h"
 #include <asm/unistd.h>
 
-#if defined __NR_fchmod
+#ifdef __NR_fchmod
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <unistd.h>
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <stdio.h>
+# include <unistd.h>
 
 int
 main(void)
@@ -41,22 +44,22 @@ main(void)
 	static const char fname[] = "fchmod_test_file";
 
 	int fd = open(fname, O_CREAT|O_RDONLY, 0400);
-
-	if (fd == -1)
+	if (fd < 0)
 		perror_msg_and_fail("open");
 
-	if (unlink(fname) == -1)
+	if (unlink(fname))
 		perror_msg_and_fail("unlink");
 
-	if (syscall(__NR_fchmod, fd, 0600) == 0) {
-		close(fd);
+	long rc = syscall(__NR_fchmod, fd, 0600);
+	printf("fchmod(%d, 0600) = %s\n", fd, sprintrc(rc));
 
-		printf("fchmod(%d, 0600) = 0\n", fd);
+	close(fd);
 
-		if (syscall(__NR_fchmod, fd, 0600) != -1)
-			perror_msg_and_fail("fchmod");
-	}
-	printf("fchmod(%d, 0600) = -1 %s (%m)\n", fd, errno2name());
+	rc = syscall(__NR_fchmod, fd, 051);
+	printf("fchmod(%d, 051) = %s\n", fd, sprintrc(rc));
+
+	rc = syscall(__NR_fchmod, fd, 004);
+	printf("fchmod(%d, 004) = %s\n", fd, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
