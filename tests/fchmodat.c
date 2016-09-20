@@ -33,6 +33,7 @@
 #ifdef __NR_fchmodat
 
 # include <fcntl.h>
+# include <sys/stat.h>
 # include <stdio.h>
 # include <unistd.h>
 
@@ -41,21 +42,23 @@ main(void)
 {
 	static const char sample[] = "fchmodat_sample";
 
-	if (open(sample, O_RDONLY | O_CREAT, 0400) == -1)
+	if (open(sample, O_RDONLY | O_CREAT, 0400) < 0)
 		perror_msg_and_fail("open");
 
-	if (syscall(__NR_fchmodat, -100, sample, 0600) == 0) {
-		printf("fchmodat(AT_FDCWD, \"%s\", 0600) = 0\n", sample);
+	long rc = syscall(__NR_fchmodat, -100, sample, 0600);
+	printf("fchmodat(AT_FDCWD, \"%s\", 0600) = %s\n",
+	       sample, sprintrc(rc));
 
-		if (unlink(sample))
-			perror_msg_and_fail("unlink");
+	if (unlink(sample))
+		perror_msg_and_fail("unlink");
 
-		if (syscall(__NR_fchmodat, -100, sample, 0600) != -1)
-			perror_msg_and_fail("fchmodat");
-	}
+	rc = syscall(__NR_fchmodat, -100, sample, 051);
+	printf("fchmodat(AT_FDCWD, \"%s\", 051) = %s\n",
+	       sample, sprintrc(rc));
 
-	printf("fchmodat(AT_FDCWD, \"%s\", 0600) = -1 %s (%m)\n",
-	       sample, errno2name());
+	rc = syscall(__NR_fchmodat, -100, sample, 004);
+	printf("fchmodat(AT_FDCWD, \"%s\", 004) = %s\n",
+	       sample, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
