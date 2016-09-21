@@ -19,10 +19,10 @@ SYS_FUNC(fallocate)
 	tprints(", ");
 
 	/* offset */
-	argn = printllval(tcp, "%llu, ", 2);
+	argn = printllval(tcp, "%lld, ", 2);
 
 	/* len */
-	printllval(tcp, "%llu", argn);
+	printllval(tcp, "%lld", argn);
 
 	return RVAL_DECODED;
 }
