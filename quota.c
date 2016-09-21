@@ -535,7 +535,8 @@ SYS_FUNC(quotactl)
 				printpath(tcp, tcp->u_arg[3]);
 				return RVAL_DECODED;
 		}
-		tprintf("%u, ", id);
+		printuid("", id);
+		tprints(", ");
 	}
 	return decode_cmd_data(tcp, cmd, tcp->u_arg[3]);
 }
