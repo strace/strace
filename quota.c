@@ -215,384 +215,384 @@ static int
 decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 {
 	switch (cmd) {
-		case Q_QUOTAOFF:
-			break;
-		case Q_GETQUOTA:
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-
-				return 0;
-			}
-
-			/* Fall-through */
-		case Q_SETQUOTA:
-		{
-			struct if_dqblk dq;
-
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{bhardlimit=%" PRIu64 ", ", dq.dqb_bhardlimit);
-			tprintf("bsoftlimit=%" PRIu64 ", ", dq.dqb_bsoftlimit);
-			tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
-			tprintf("ihardlimit=%" PRIu64 ", ", dq.dqb_ihardlimit);
-			tprintf("isoftlimit=%" PRIu64 ", ", dq.dqb_isoftlimit);
-			tprintf("curinodes=%" PRIu64 ", ", dq.dqb_curinodes);
-			if (!abbrev(tcp)) {
-				tprintf("btime=%" PRIu64 ", ", dq.dqb_btime);
-				tprintf("itime=%" PRIu64 ", ", dq.dqb_itime);
-				tprints("valid=");
-				printflags(if_dqblk_valid,
-					   dq.dqb_valid, "QIF_???");
-				tprints("}");
-			} else
-				tprints("...}");
-			break;
-		}
-		case Q_GETNEXTQUOTA:
-		{
-			struct if_nextdqblk dq;
-
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-
-				return 0;
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{bhardlimit=%" PRIu64 ", ", dq.dqb_bhardlimit);
-			tprintf("bsoftlimit=%" PRIu64 ", ", dq.dqb_bsoftlimit);
-			tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
-			tprintf("ihardlimit=%" PRIu64 ", ", dq.dqb_ihardlimit);
-			tprintf("isoftlimit=%" PRIu64 ", ", dq.dqb_isoftlimit);
-			tprintf("curinodes=%" PRIu64 ", ", dq.dqb_curinodes);
-			if (!abbrev(tcp)) {
-				tprintf("btime=%" PRIu64 ", ", dq.dqb_btime);
-				tprintf("itime=%" PRIu64 ", ", dq.dqb_itime);
-				tprints("valid=");
-				printflags(if_dqblk_valid,
-					   dq.dqb_valid, "QIF_???");
-				tprintf(", id=%u}", dq.dqb_id);
-			} else
-				tprintf("id=%u, ...}", dq.dqb_id);
-			break;
-		}
-		case Q_V1_GETQUOTA:
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-
-				return 0;
-			}
-
-			/* Fall-through */
-		case Q_V1_SETQUOTA:
-		{
-			struct v1_dqblk dq;
-
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{bhardlimit=%u, ", dq.dqb_bhardlimit);
-			tprintf("bsoftlimit=%u, ", dq.dqb_bsoftlimit);
-			tprintf("curblocks=%u, ", dq.dqb_curblocks);
-			tprintf("ihardlimit=%u, ", dq.dqb_ihardlimit);
-			tprintf("isoftlimit=%u, ", dq.dqb_isoftlimit);
-			tprintf("curinodes=%u, ", dq.dqb_curinodes);
-			tprintf("btime=%lu, ", (long) dq.dqb_btime);
-			tprintf("itime=%lu}", (long) dq.dqb_itime);
-			break;
-		}
-		case Q_V2_GETQUOTA:
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-
-				return 0;
-			}
-
-			/* Fall-through */
-		case Q_V2_SETQUOTA:
-		{
-			struct v2_dqblk dq;
-
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{ihardlimit=%u, ", dq.dqb_ihardlimit);
-			tprintf("isoftlimit=%u, ", dq.dqb_isoftlimit);
-			tprintf("curinodes=%u, ", dq.dqb_curinodes);
-			tprintf("bhardlimit=%u, ", dq.dqb_bhardlimit);
-			tprintf("bsoftlimit=%u, ", dq.dqb_bsoftlimit);
-			tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
-			tprintf("btime=%lu, ", (long) dq.dqb_btime);
-			tprintf("itime=%lu}", (long) dq.dqb_itime);
-			break;
-		}
-		case Q_XGETQUOTA:
-		case Q_XGETNEXTQUOTA:
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-
-				return 0;
-			}
-
-			/* Fall-through */
-		case Q_XSETQLIM:
-		{
-			struct xfs_dqblk dq;
-
-			if (entering(tcp)) {
-				printuid(", ", id);
-				tprints(", ");
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{version=%d, ", dq.d_version);
-			tprints("flags=");
-			printflags(xfs_dqblk_flags,
-				   (uint8_t) dq.d_flags, "XFS_???_QUOTA");
-			tprintf(", fieldmask=%#x, ", dq.d_fieldmask);
-			tprintf("id=%u, ", dq.d_id);
-			tprintf("blk_hardlimit=%" PRIu64 ", ", dq.d_blk_hardlimit);
-			tprintf("blk_softlimit=%" PRIu64 ", ", dq.d_blk_softlimit);
-			tprintf("ino_hardlimit=%" PRIu64 ", ", dq.d_ino_hardlimit);
-			tprintf("ino_softlimit=%" PRIu64 ", ", dq.d_ino_softlimit);
-			tprintf("bcount=%" PRIu64 ", ", dq.d_bcount);
-			tprintf("icount=%" PRIu64 ", ", dq.d_icount);
-			if (!abbrev(tcp)) {
-				tprintf("itimer=%d, ", dq.d_itimer);
-				tprintf("btimer=%d, ", dq.d_btimer);
-				tprintf("iwarns=%u, ", dq.d_iwarns);
-				tprintf("bwarns=%u, ", dq.d_bwarns);
-				tprintf("rtbcount=%" PRIu64 ", ", dq.d_rtbcount);
-				tprintf("rtbtimer=%d, ", dq.d_rtbtimer);
-				tprintf("rtbwarns=%u}", dq.d_rtbwarns);
-			} else
-				tprints("...}");
-			break;
-		}
-		case Q_GETFMT:
-		{
-			uint32_t fmt;
-
-			if (entering(tcp)) {
-				tprints(", ");
-
-				return 0;
-			}
-
-			if (umove_or_printaddr(tcp, data, &fmt))
-				break;
-			tprints("[");
-			printxval(quota_formats, fmt, "QFMT_VFS_???");
-			tprints("]");
-			break;
-		}
-		case Q_GETINFO:
-			if (entering(tcp)) {
-				tprints(", ");
-
-				return 0;
-			}
-
-			/* Fall-through */
-		case Q_SETINFO:
-		{
-			struct if_dqinfo dq;
-
-			if (entering(tcp))
-				tprints(", ");
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{bgrace=%" PRIu64 ", ", dq.dqi_bgrace);
-			tprintf("igrace=%" PRIu64 ", ", dq.dqi_igrace);
-			tprints("flags=");
-			printflags(if_dqinfo_flags, dq.dqi_flags, "DQF_???");
-			tprints(", valid=");
-			printflags(if_dqinfo_valid, dq.dqi_valid, "IIF_???");
-			tprints("}");
-			break;
-		}
-		case Q_V2_GETINFO:
-			if (entering(tcp)) {
-				tprints(", ");
-
-				return 0;
-			}
-
-			/* Fall-through */
-		case Q_V2_SETINFO:
-		{
-			struct v2_dqinfo dq;
-
-			if (entering(tcp))
-				tprints(", ");
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{bgrace=%u, ", dq.dqi_bgrace);
-			tprintf("igrace=%u, ", dq.dqi_igrace);
-			tprints("flags=");
-			printflags(if_dqinfo_flags, dq.dqi_flags, "DQF_???");
-			tprintf(", blocks=%u, ", dq.dqi_blocks);
-			tprintf("free_blk=%u, ", dq.dqi_free_blk);
-			tprintf("free_entry=%u}", dq.dqi_free_entry);
-			break;
-		}
-		case Q_V1_GETSTATS:
-		{
-			struct v1_dqstats dq;
-
-			if (entering(tcp)) {
-				tprints(", ");
-
-				return 0;
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{lookups=%u, ", dq.lookups);
-			tprintf("drops=%u, ", dq.drops);
-			tprintf("reads=%u, ", dq.reads);
-			tprintf("writes=%u, ", dq.writes);
-			tprintf("cache_hits=%u, ", dq.cache_hits);
-			tprintf("allocated_dquots=%u, ", dq.allocated_dquots);
-			tprintf("free_dquots=%u, ", dq.free_dquots);
-			tprintf("syncs=%u}", dq.syncs);
-			break;
-		}
-		case Q_V2_GETSTATS:
-		{
-			struct v2_dqstats dq;
-
-			if (entering(tcp)) {
-				tprints(", ");
-
-				return 0;
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{lookups=%u, ", dq.lookups);
-			tprintf("drops=%u, ", dq.drops);
-			tprintf("reads=%u, ", dq.reads);
-			tprintf("writes=%u, ", dq.writes);
-			tprintf("cache_hits=%u, ", dq.cache_hits);
-			tprintf("allocated_dquots=%u, ", dq.allocated_dquots);
-			tprintf("free_dquots=%u, ", dq.free_dquots);
-			tprintf("syncs=%u, ", dq.syncs);
-			tprintf("version=%u}", dq.version);
-			break;
-		}
-		case Q_XGETQSTAT:
-		{
-			struct xfs_dqstats dq;
-
-			if (entering(tcp)) {
-				tprints(", ");
-
-				return 0;
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{version=%d, ", dq.qs_version);
-			if (abbrev(tcp)) {
-				tprints("...}");
-				break;
-			}
-			tprints("flags=");
-			printflags(xfs_quota_flags,
-				   dq.qs_flags, "XFS_QUOTA_???");
-			tprintf(", incoredqs=%u, ", dq.qs_incoredqs);
-			tprintf("u_ino=%" PRIu64 ", ", dq.qs_uquota.qfs_ino);
-			tprintf("u_nblks=%" PRIu64 ", ", dq.qs_uquota.qfs_nblks);
-			tprintf("u_nextents=%u, ", dq.qs_uquota.qfs_nextents);
-			tprintf("g_ino=%" PRIu64 ", ", dq.qs_gquota.qfs_ino);
-			tprintf("g_nblks=%" PRIu64 ", ", dq.qs_gquota.qfs_nblks);
-			tprintf("g_nextents=%u, ", dq.qs_gquota.qfs_nextents);
-			tprintf("btimelimit=%d, ", dq.qs_btimelimit);
-			tprintf("itimelimit=%d, ", dq.qs_itimelimit);
-			tprintf("rtbtimelimit=%d, ", dq.qs_rtbtimelimit);
-			tprintf("bwarnlimit=%u, ", dq.qs_bwarnlimit);
-			tprintf("iwarnlimit=%u}", dq.qs_iwarnlimit);
-			break;
-		}
-		case Q_XGETQSTATV:
-		{
-			struct fs_quota_statv dq;
-
-			if (entering(tcp)) {
-				tprints(", ");
-
-				return 0;
-			}
-
-			if (umove_or_printaddr(tcp, data, &dq))
-				break;
-			tprintf("{version=%d, ", dq.qs_version);
-			if (abbrev(tcp)) {
-				tprints("...}");
-				break;
-			}
-			tprints("flags=");
-			printflags(xfs_quota_flags,
-				   dq.qs_flags, "XFS_QUOTA_???");
-			tprintf(", incoredqs=%u, ", dq.qs_incoredqs);
-			tprintf("u_ino=%" PRIu64 ", ", dq.qs_uquota.qfs_ino);
-			tprintf("u_nblks=%" PRIu64 ", ", dq.qs_uquota.qfs_nblks);
-			tprintf("u_nextents=%u, ", dq.qs_uquota.qfs_nextents);
-			tprintf("g_ino=%" PRIu64 ", ", dq.qs_gquota.qfs_ino);
-			tprintf("g_nblks=%" PRIu64 ", ", dq.qs_gquota.qfs_nblks);
-			tprintf("g_nextents=%u, ", dq.qs_gquota.qfs_nextents);
-			tprintf("p_ino=%" PRIu64 ", ", dq.qs_pquota.qfs_ino);
-			tprintf("p_nblks=%" PRIu64 ", ", dq.qs_pquota.qfs_nblks);
-			tprintf("p_nextents=%u, ", dq.qs_pquota.qfs_nextents);
-			tprintf("btimelimit=%d, ", dq.qs_btimelimit);
-			tprintf("itimelimit=%d, ", dq.qs_itimelimit);
-			tprintf("rtbtimelimit=%d, ", dq.qs_rtbtimelimit);
-			tprintf("bwarnlimit=%u, ", dq.qs_bwarnlimit);
-			tprintf("iwarnlimit=%u}", dq.qs_iwarnlimit);
-			break;
-		}
-		case Q_XQUOTAON:
-		case Q_XQUOTAOFF:
-		{
-			uint32_t flag;
-
-			tprints(", ");
-
-			if (umove_or_printaddr(tcp, data, &flag))
-				break;
-			tprints("[");
-			printflags(xfs_quota_flags, flag, "XFS_QUOTA_???");
-			tprints("]");
-			break;
-		}
-		default:
+	case Q_QUOTAOFF:
+		break;
+	case Q_GETQUOTA:
+		if (entering(tcp)) {
 			printuid(", ", id);
 			tprints(", ");
-			printaddr(data);
+
+			return 0;
+		}
+
+		/* Fall-through */
+	case Q_SETQUOTA:
+	{
+		struct if_dqblk dq;
+
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
 			break;
+		tprintf("{bhardlimit=%" PRIu64 ", ", dq.dqb_bhardlimit);
+		tprintf("bsoftlimit=%" PRIu64 ", ", dq.dqb_bsoftlimit);
+		tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
+		tprintf("ihardlimit=%" PRIu64 ", ", dq.dqb_ihardlimit);
+		tprintf("isoftlimit=%" PRIu64 ", ", dq.dqb_isoftlimit);
+		tprintf("curinodes=%" PRIu64 ", ", dq.dqb_curinodes);
+		if (!abbrev(tcp)) {
+			tprintf("btime=%" PRIu64 ", ", dq.dqb_btime);
+			tprintf("itime=%" PRIu64 ", ", dq.dqb_itime);
+			tprints("valid=");
+			printflags(if_dqblk_valid,
+				   dq.dqb_valid, "QIF_???");
+			tprints("}");
+		} else
+			tprints("...}");
+		break;
+	}
+	case Q_GETNEXTQUOTA:
+	{
+		struct if_nextdqblk dq;
+
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+
+			return 0;
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{bhardlimit=%" PRIu64 ", ", dq.dqb_bhardlimit);
+		tprintf("bsoftlimit=%" PRIu64 ", ", dq.dqb_bsoftlimit);
+		tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
+		tprintf("ihardlimit=%" PRIu64 ", ", dq.dqb_ihardlimit);
+		tprintf("isoftlimit=%" PRIu64 ", ", dq.dqb_isoftlimit);
+		tprintf("curinodes=%" PRIu64 ", ", dq.dqb_curinodes);
+		if (!abbrev(tcp)) {
+			tprintf("btime=%" PRIu64 ", ", dq.dqb_btime);
+			tprintf("itime=%" PRIu64 ", ", dq.dqb_itime);
+			tprints("valid=");
+			printflags(if_dqblk_valid,
+				   dq.dqb_valid, "QIF_???");
+			tprintf(", id=%u}", dq.dqb_id);
+		} else
+			tprintf("id=%u, ...}", dq.dqb_id);
+		break;
+	}
+	case Q_V1_GETQUOTA:
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+
+			return 0;
+		}
+
+		/* Fall-through */
+	case Q_V1_SETQUOTA:
+	{
+		struct v1_dqblk dq;
+
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{bhardlimit=%u, ", dq.dqb_bhardlimit);
+		tprintf("bsoftlimit=%u, ", dq.dqb_bsoftlimit);
+		tprintf("curblocks=%u, ", dq.dqb_curblocks);
+		tprintf("ihardlimit=%u, ", dq.dqb_ihardlimit);
+		tprintf("isoftlimit=%u, ", dq.dqb_isoftlimit);
+		tprintf("curinodes=%u, ", dq.dqb_curinodes);
+		tprintf("btime=%lu, ", (long) dq.dqb_btime);
+		tprintf("itime=%lu}", (long) dq.dqb_itime);
+		break;
+	}
+	case Q_V2_GETQUOTA:
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+
+			return 0;
+		}
+
+		/* Fall-through */
+	case Q_V2_SETQUOTA:
+	{
+		struct v2_dqblk dq;
+
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{ihardlimit=%u, ", dq.dqb_ihardlimit);
+		tprintf("isoftlimit=%u, ", dq.dqb_isoftlimit);
+		tprintf("curinodes=%u, ", dq.dqb_curinodes);
+		tprintf("bhardlimit=%u, ", dq.dqb_bhardlimit);
+		tprintf("bsoftlimit=%u, ", dq.dqb_bsoftlimit);
+		tprintf("curspace=%" PRIu64 ", ", dq.dqb_curspace);
+		tprintf("btime=%lu, ", (long) dq.dqb_btime);
+		tprintf("itime=%lu}", (long) dq.dqb_itime);
+		break;
+	}
+	case Q_XGETQUOTA:
+	case Q_XGETNEXTQUOTA:
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+
+			return 0;
+		}
+
+		/* Fall-through */
+	case Q_XSETQLIM:
+	{
+		struct xfs_dqblk dq;
+
+		if (entering(tcp)) {
+			printuid(", ", id);
+			tprints(", ");
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{version=%d, ", dq.d_version);
+		tprints("flags=");
+		printflags(xfs_dqblk_flags,
+			   (uint8_t) dq.d_flags, "XFS_???_QUOTA");
+		tprintf(", fieldmask=%#x, ", dq.d_fieldmask);
+		tprintf("id=%u, ", dq.d_id);
+		tprintf("blk_hardlimit=%" PRIu64 ", ", dq.d_blk_hardlimit);
+		tprintf("blk_softlimit=%" PRIu64 ", ", dq.d_blk_softlimit);
+		tprintf("ino_hardlimit=%" PRIu64 ", ", dq.d_ino_hardlimit);
+		tprintf("ino_softlimit=%" PRIu64 ", ", dq.d_ino_softlimit);
+		tprintf("bcount=%" PRIu64 ", ", dq.d_bcount);
+		tprintf("icount=%" PRIu64 ", ", dq.d_icount);
+		if (!abbrev(tcp)) {
+			tprintf("itimer=%d, ", dq.d_itimer);
+			tprintf("btimer=%d, ", dq.d_btimer);
+			tprintf("iwarns=%u, ", dq.d_iwarns);
+			tprintf("bwarns=%u, ", dq.d_bwarns);
+			tprintf("rtbcount=%" PRIu64 ", ", dq.d_rtbcount);
+			tprintf("rtbtimer=%d, ", dq.d_rtbtimer);
+			tprintf("rtbwarns=%u}", dq.d_rtbwarns);
+		} else
+			tprints("...}");
+		break;
+	}
+	case Q_GETFMT:
+	{
+		uint32_t fmt;
+
+		if (entering(tcp)) {
+			tprints(", ");
+
+			return 0;
+		}
+
+		if (umove_or_printaddr(tcp, data, &fmt))
+			break;
+		tprints("[");
+		printxval(quota_formats, fmt, "QFMT_VFS_???");
+		tprints("]");
+		break;
+	}
+	case Q_GETINFO:
+		if (entering(tcp)) {
+			tprints(", ");
+
+			return 0;
+		}
+
+		/* Fall-through */
+	case Q_SETINFO:
+	{
+		struct if_dqinfo dq;
+
+		if (entering(tcp))
+			tprints(", ");
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{bgrace=%" PRIu64 ", ", dq.dqi_bgrace);
+		tprintf("igrace=%" PRIu64 ", ", dq.dqi_igrace);
+		tprints("flags=");
+		printflags(if_dqinfo_flags, dq.dqi_flags, "DQF_???");
+		tprints(", valid=");
+		printflags(if_dqinfo_valid, dq.dqi_valid, "IIF_???");
+		tprints("}");
+		break;
+	}
+	case Q_V2_GETINFO:
+		if (entering(tcp)) {
+			tprints(", ");
+
+			return 0;
+		}
+
+		/* Fall-through */
+	case Q_V2_SETINFO:
+	{
+		struct v2_dqinfo dq;
+
+		if (entering(tcp))
+			tprints(", ");
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{bgrace=%u, ", dq.dqi_bgrace);
+		tprintf("igrace=%u, ", dq.dqi_igrace);
+		tprints("flags=");
+		printflags(if_dqinfo_flags, dq.dqi_flags, "DQF_???");
+		tprintf(", blocks=%u, ", dq.dqi_blocks);
+		tprintf("free_blk=%u, ", dq.dqi_free_blk);
+		tprintf("free_entry=%u}", dq.dqi_free_entry);
+		break;
+	}
+	case Q_V1_GETSTATS:
+	{
+		struct v1_dqstats dq;
+
+		if (entering(tcp)) {
+			tprints(", ");
+
+			return 0;
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{lookups=%u, ", dq.lookups);
+		tprintf("drops=%u, ", dq.drops);
+		tprintf("reads=%u, ", dq.reads);
+		tprintf("writes=%u, ", dq.writes);
+		tprintf("cache_hits=%u, ", dq.cache_hits);
+		tprintf("allocated_dquots=%u, ", dq.allocated_dquots);
+		tprintf("free_dquots=%u, ", dq.free_dquots);
+		tprintf("syncs=%u}", dq.syncs);
+		break;
+	}
+	case Q_V2_GETSTATS:
+	{
+		struct v2_dqstats dq;
+
+		if (entering(tcp)) {
+			tprints(", ");
+
+			return 0;
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{lookups=%u, ", dq.lookups);
+		tprintf("drops=%u, ", dq.drops);
+		tprintf("reads=%u, ", dq.reads);
+		tprintf("writes=%u, ", dq.writes);
+		tprintf("cache_hits=%u, ", dq.cache_hits);
+		tprintf("allocated_dquots=%u, ", dq.allocated_dquots);
+		tprintf("free_dquots=%u, ", dq.free_dquots);
+		tprintf("syncs=%u, ", dq.syncs);
+		tprintf("version=%u}", dq.version);
+		break;
+	}
+	case Q_XGETQSTAT:
+	{
+		struct xfs_dqstats dq;
+
+		if (entering(tcp)) {
+			tprints(", ");
+
+			return 0;
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{version=%d, ", dq.qs_version);
+		if (abbrev(tcp)) {
+			tprints("...}");
+			break;
+		}
+		tprints("flags=");
+		printflags(xfs_quota_flags,
+			   dq.qs_flags, "XFS_QUOTA_???");
+		tprintf(", incoredqs=%u, ", dq.qs_incoredqs);
+		tprintf("u_ino=%" PRIu64 ", ", dq.qs_uquota.qfs_ino);
+		tprintf("u_nblks=%" PRIu64 ", ", dq.qs_uquota.qfs_nblks);
+		tprintf("u_nextents=%u, ", dq.qs_uquota.qfs_nextents);
+		tprintf("g_ino=%" PRIu64 ", ", dq.qs_gquota.qfs_ino);
+		tprintf("g_nblks=%" PRIu64 ", ", dq.qs_gquota.qfs_nblks);
+		tprintf("g_nextents=%u, ", dq.qs_gquota.qfs_nextents);
+		tprintf("btimelimit=%d, ", dq.qs_btimelimit);
+		tprintf("itimelimit=%d, ", dq.qs_itimelimit);
+		tprintf("rtbtimelimit=%d, ", dq.qs_rtbtimelimit);
+		tprintf("bwarnlimit=%u, ", dq.qs_bwarnlimit);
+		tprintf("iwarnlimit=%u}", dq.qs_iwarnlimit);
+		break;
+	}
+	case Q_XGETQSTATV:
+	{
+		struct fs_quota_statv dq;
+
+		if (entering(tcp)) {
+			tprints(", ");
+
+			return 0;
+		}
+
+		if (umove_or_printaddr(tcp, data, &dq))
+			break;
+		tprintf("{version=%d, ", dq.qs_version);
+		if (abbrev(tcp)) {
+			tprints("...}");
+			break;
+		}
+		tprints("flags=");
+		printflags(xfs_quota_flags,
+			   dq.qs_flags, "XFS_QUOTA_???");
+		tprintf(", incoredqs=%u, ", dq.qs_incoredqs);
+		tprintf("u_ino=%" PRIu64 ", ", dq.qs_uquota.qfs_ino);
+		tprintf("u_nblks=%" PRIu64 ", ", dq.qs_uquota.qfs_nblks);
+		tprintf("u_nextents=%u, ", dq.qs_uquota.qfs_nextents);
+		tprintf("g_ino=%" PRIu64 ", ", dq.qs_gquota.qfs_ino);
+		tprintf("g_nblks=%" PRIu64 ", ", dq.qs_gquota.qfs_nblks);
+		tprintf("g_nextents=%u, ", dq.qs_gquota.qfs_nextents);
+		tprintf("p_ino=%" PRIu64 ", ", dq.qs_pquota.qfs_ino);
+		tprintf("p_nblks=%" PRIu64 ", ", dq.qs_pquota.qfs_nblks);
+		tprintf("p_nextents=%u, ", dq.qs_pquota.qfs_nextents);
+		tprintf("btimelimit=%d, ", dq.qs_btimelimit);
+		tprintf("itimelimit=%d, ", dq.qs_itimelimit);
+		tprintf("rtbtimelimit=%d, ", dq.qs_rtbtimelimit);
+		tprintf("bwarnlimit=%u, ", dq.qs_bwarnlimit);
+		tprintf("iwarnlimit=%u}", dq.qs_iwarnlimit);
+		break;
+	}
+	case Q_XQUOTAON:
+	case Q_XQUOTAOFF:
+	{
+		uint32_t flag;
+
+		tprints(", ");
+
+		if (umove_or_printaddr(tcp, data, &flag))
+			break;
+		tprints("[");
+		printflags(xfs_quota_flags, flag, "XFS_QUOTA_???");
+		tprints("]");
+		break;
+	}
+	default:
+		printuid(", ", id);
+		tprints(", ");
+		printaddr(data);
+		break;
 	}
 	return RVAL_DECODED;
 }
