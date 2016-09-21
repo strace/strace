@@ -49,6 +49,12 @@
 #include "xlat/if_dqinfo_flags.h"
 #include "xlat/if_dqinfo_valid.h"
 
+/*
+ * We add attribute packed due to the fact that the structure is 8-byte aligned
+ * on 64-bit systems and therefore has additional 4 bytes of padding, which
+ * leads to problems when it is used on 32-bit tracee which does not have such
+ * padding.
+ */
 struct if_dqblk
 {
 	uint64_t dqb_bhardlimit;
@@ -60,7 +66,7 @@ struct if_dqblk
 	uint64_t dqb_btime;
 	uint64_t dqb_itime;
 	uint32_t dqb_valid;
-};
+} ATTRIBUTE_PACKED;
 
 struct if_nextdqblk {
 	uint64_t dqb_bhardlimit;
