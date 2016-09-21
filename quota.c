@@ -81,30 +81,6 @@ struct if_nextdqblk {
 	uint32_t dqb_id;
 };
 
-struct v1_dqblk
-{
-	uint32_t dqb_bhardlimit;	/* absolute limit on disk blks alloc */
-	uint32_t dqb_bsoftlimit;	/* preferred limit on disk blks */
-	uint32_t dqb_curblocks;		/* current block count */
-	uint32_t dqb_ihardlimit;	/* maximum # allocated inodes */
-	uint32_t dqb_isoftlimit;	/* preferred inode limit */
-	uint32_t dqb_curinodes;		/* current # allocated inodes */
-	time_t  dqb_btime;		/* time limit for excessive disk use */
-	time_t  dqb_itime;		/* time limit for excessive files */
-};
-
-struct v2_dqblk
-{
-	unsigned int dqb_ihardlimit;
-	unsigned int dqb_isoftlimit;
-	unsigned int dqb_curinodes;
-	unsigned int dqb_bhardlimit;
-	unsigned int dqb_bsoftlimit;
-	uint64_t dqb_curspace;
-	time_t  dqb_btime;
-	time_t  dqb_itime;
-};
-
 struct xfs_dqblk
 {
 	int8_t  d_version;		/* version of this structure */
@@ -137,41 +113,6 @@ struct if_dqinfo
 	uint64_t dqi_igrace;
 	uint32_t dqi_flags;
 	uint32_t dqi_valid;
-};
-
-struct v2_dqinfo
-{
-	unsigned int dqi_bgrace;
-	unsigned int dqi_igrace;
-	unsigned int dqi_flags;
-	unsigned int dqi_blocks;
-	unsigned int dqi_free_blk;
-	unsigned int dqi_free_entry;
-};
-
-struct v1_dqstats
-{
-	uint32_t lookups;
-	uint32_t drops;
-	uint32_t reads;
-	uint32_t writes;
-	uint32_t cache_hits;
-	uint32_t allocated_dquots;
-	uint32_t free_dquots;
-	uint32_t syncs;
-};
-
-struct v2_dqstats
-{
-	uint32_t lookups;
-	uint32_t drops;
-	uint32_t reads;
-	uint32_t writes;
-	uint32_t cache_hits;
-	uint32_t allocated_dquots;
-	uint32_t free_dquots;
-	uint32_t syncs;
-	uint32_t version;
 };
 
 typedef struct fs_qfilestat
@@ -292,66 +233,6 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 			tprintf("dqb_id=%u, ...}", dq.dqb_id);
 		break;
 	}
-	case Q_V1_GETQUOTA:
-		if (entering(tcp)) {
-			printuid(", ", id);
-			tprints(", ");
-
-			return 0;
-		}
-
-		/* Fall-through */
-	case Q_V1_SETQUOTA:
-	{
-		struct v1_dqblk dq;
-
-		if (entering(tcp)) {
-			printuid(", ", id);
-			tprints(", ");
-		}
-
-		if (umove_or_printaddr(tcp, data, &dq))
-			break;
-		tprintf("{dqb_bhardlimit=%u, ", dq.dqb_bhardlimit);
-		tprintf("dqb_bsoftlimit=%u, ", dq.dqb_bsoftlimit);
-		tprintf("dqb_curblocks=%u, ", dq.dqb_curblocks);
-		tprintf("dqb_ihardlimit=%u, ", dq.dqb_ihardlimit);
-		tprintf("dqb_isoftlimit=%u, ", dq.dqb_isoftlimit);
-		tprintf("dqb_curinodes=%u, ", dq.dqb_curinodes);
-		tprintf("dqb_btime=%lu, ", (long) dq.dqb_btime);
-		tprintf("dqb_itime=%lu}", (long) dq.dqb_itime);
-		break;
-	}
-	case Q_V2_GETQUOTA:
-		if (entering(tcp)) {
-			printuid(", ", id);
-			tprints(", ");
-
-			return 0;
-		}
-
-		/* Fall-through */
-	case Q_V2_SETQUOTA:
-	{
-		struct v2_dqblk dq;
-
-		if (entering(tcp)) {
-			printuid(", ", id);
-			tprints(", ");
-		}
-
-		if (umove_or_printaddr(tcp, data, &dq))
-			break;
-		tprintf("{dqb_ihardlimit=%u, ", dq.dqb_ihardlimit);
-		tprintf("dqb_isoftlimit=%u, ", dq.dqb_isoftlimit);
-		tprintf("dqb_curinodes=%u, ", dq.dqb_curinodes);
-		tprintf("dqb_bhardlimit=%u, ", dq.dqb_bhardlimit);
-		tprintf("dqb_bsoftlimit=%u, ", dq.dqb_bsoftlimit);
-		tprintf("dqb_curspace=%" PRIu64 ", ", dq.dqb_curspace);
-		tprintf("dqb_btime=%lu, ", (long) dq.dqb_btime);
-		tprintf("dqb_itime=%lu}", (long) dq.dqb_itime);
-		break;
-	}
 	case Q_XGETQUOTA:
 	case Q_XGETNEXTQUOTA:
 		if (entering(tcp)) {
@@ -442,77 +323,6 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 		tprints(", dqi_valid=");
 		printflags(if_dqinfo_valid, dq.dqi_valid, "IIF_???");
 		tprints("}");
-		break;
-	}
-	case Q_V2_GETINFO:
-		if (entering(tcp)) {
-			tprints(", ");
-
-			return 0;
-		}
-
-		/* Fall-through */
-	case Q_V2_SETINFO:
-	{
-		struct v2_dqinfo dq;
-
-		if (entering(tcp))
-			tprints(", ");
-
-		if (umove_or_printaddr(tcp, data, &dq))
-			break;
-		tprintf("{dqi_bgrace=%u, ", dq.dqi_bgrace);
-		tprintf("dqi_igrace=%u, ", dq.dqi_igrace);
-		tprints("dqi_flags=");
-		printflags(if_dqinfo_flags, dq.dqi_flags, "DQF_???");
-		tprintf(", dqi_blocks=%u, ", dq.dqi_blocks);
-		tprintf("dqi_free_blk=%u, ", dq.dqi_free_blk);
-		tprintf("dqi_free_entry=%u}", dq.dqi_free_entry);
-		break;
-	}
-	case Q_V1_GETSTATS:
-	{
-		struct v1_dqstats dq;
-
-		if (entering(tcp)) {
-			tprints(", ");
-
-			return 0;
-		}
-
-		if (umove_or_printaddr(tcp, data, &dq))
-			break;
-		tprintf("{lookups=%u, ", dq.lookups);
-		tprintf("drops=%u, ", dq.drops);
-		tprintf("reads=%u, ", dq.reads);
-		tprintf("writes=%u, ", dq.writes);
-		tprintf("cache_hits=%u, ", dq.cache_hits);
-		tprintf("allocated_dquots=%u, ", dq.allocated_dquots);
-		tprintf("free_dquots=%u, ", dq.free_dquots);
-		tprintf("syncs=%u}", dq.syncs);
-		break;
-	}
-	case Q_V2_GETSTATS:
-	{
-		struct v2_dqstats dq;
-
-		if (entering(tcp)) {
-			tprints(", ");
-
-			return 0;
-		}
-
-		if (umove_or_printaddr(tcp, data, &dq))
-			break;
-		tprintf("{lookups=%u, ", dq.lookups);
-		tprintf("drops=%u, ", dq.drops);
-		tprintf("reads=%u, ", dq.reads);
-		tprintf("writes=%u, ", dq.writes);
-		tprintf("cache_hits=%u, ", dq.cache_hits);
-		tprintf("allocated_dquots=%u, ", dq.allocated_dquots);
-		tprintf("free_dquots=%u, ", dq.free_dquots);
-		tprintf("syncs=%u, ", dq.syncs);
-		tprintf("version=%u}", dq.version);
 		break;
 	}
 	case Q_XGETQSTAT:
@@ -649,7 +459,6 @@ SYS_FUNC(quotactl)
 		printpath(tcp, tcp->u_arg[1]);
 		switch (cmd) {
 			case Q_QUOTAON:
-			case Q_V1_QUOTAON:
 				tprints(", ");
 				printxval(quota_formats, id, "QFMT_VFS_???");
 				tprints(", ");
