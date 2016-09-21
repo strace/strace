@@ -242,6 +242,10 @@ check_PROGRAMS = \
 	pselect6 \
 	ptrace \
 	pwritev \
+	quotactl \
+	quotactl-v \
+	quotactl-xfs \
+	quotactl-xfs-v \
 	read-write \
 	readahead \
 	readdir \
@@ -571,6 +575,10 @@ DECODER_TESTS = \
 	pselect6.test \
 	ptrace.test \
 	pwritev.test \
+	quotactl.test \
+	quotactl-v.test \
+	quotactl-xfs.test \
+	quotactl-xfs-v.test \
 	read-write.test \
 	readahead.test \
 	readdir.test \
@@ -751,6 +759,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
+	     quotactl.h \
 	     setfsugid.c \
 	     setreugid.c \
 	     setresugid.c \

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of quotactl xfs subcommands.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=quotactl

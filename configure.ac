@@ -353,6 +353,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	inttypes.h
 	linux/bsg.h
+	linux/dqblk_xfs.h
 	linux/falloc.h
 	linux/fiemap.h
 	linux/filter.h
@@ -362,6 +363,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/mmtimer.h
 	linux/msg.h
 	linux/perf_event.h
+	linux/quota.h
 	linux/seccomp.h
 	linux/securebits.h
 	linux/sem.h
@@ -378,6 +380,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/fanotify.h
 	sys/ipc.h
 	sys/msg.h
+	sys/quota.h
 	sys/reg.h
 	sys/sem.h
 	sys/shm.h

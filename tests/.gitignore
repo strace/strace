@@ -185,6 +185,10 @@ prlimit64
 pselect6
 ptrace
 pwritev
+quotactl
+quotactl-v
+quotactl-xfs
+quotactl-xfs-v
 read-write
 readahead
 readdir
