@@ -520,10 +520,11 @@ SYS_FUNC(quotactl)
 	uint32_t id = tcp->u_arg[2];
 
 	if (entering(tcp)) {
+		tprints("QCMD(");
 		printxval(quotacmds, cmd, "Q_???");
-		tprints("|");
-		printxval(quotatypes, type, "???QUOTA");
 		tprints(", ");
+		printxval(quotatypes, type, "???QUOTA");
+		tprints("), ");
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 		switch (cmd) {
