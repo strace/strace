@@ -1413,24 +1413,44 @@ print_array(struct tcb *tcp,
 	return cur >= end_addr;
 }
 
+long long
+getarg_ll(struct tcb *tcp, int argn)
+{
+#if HAVE_STRUCT_TCB_EXT_ARG
+# if SUPPORTED_PERSONALITIES > 1
+	if (current_personality == 1)
+		return (long) tcp->u_arg[argn];
+	else
+# endif
+	return (long long) tcp->ext_arg[argn];
+#else
+	return (long) tcp->u_arg[argn];
+#endif
+}
+
+unsigned long long
+getarg_ull(struct tcb *tcp, int argn)
+{
+#if HAVE_STRUCT_TCB_EXT_ARG
+# if SUPPORTED_PERSONALITIES > 1
+	if (current_personality == 1)
+		return (unsigned long) tcp->u_arg[argn];
+	else
+# endif
+	return (unsigned long long) tcp->ext_arg[argn];
+#else
+	return (unsigned long) tcp->u_arg[argn];
+#endif
+}
+
 int
 printargs(struct tcb *tcp)
 {
 	if (entering(tcp)) {
 		int i;
 		int n = tcp->s_ent->nargs;
-		for (i = 0; i < n; i++) {
-#if HAVE_STRUCT_TCB_EXT_ARG
-# if SUPPORTED_PERSONALITIES > 1
-			if (current_personality == 1)
-				tprintf("%s%#lx", i ? ", " : "", tcp->u_arg[i]);
-			else
-# endif
-			tprintf("%s%#llx", i ? ", " : "", tcp->ext_arg[i]);
-#else
-			tprintf("%s%#lx", i ? ", " : "", tcp->u_arg[i]);
-#endif
-		}
+		for (i = 0; i < n; i++)
+			tprintf("%s%#llx", i ? ", " : "", getarg_ull(tcp, i));
 	}
 	return 0;
 }

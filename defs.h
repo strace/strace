@@ -542,6 +542,8 @@ extern int printllval(struct tcb *, const char *, int)
 extern void printaddr(long);
 extern void printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
+extern long long getarg_ll(struct tcb *tcp, int argn);
+extern unsigned long long getarg_ull(struct tcb *tcp, int argn);
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
