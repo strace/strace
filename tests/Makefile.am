@@ -103,6 +103,8 @@ check_PROGRAMS = \
 	execveat \
 	execveat-v \
 	faccessat \
+	fadvise64 \
+	fadvise64_64 \
 	fallocate \
 	fanotify_mark \
 	fchdir \
@@ -445,6 +447,8 @@ DECODER_TESTS = \
 	execveat-v.test \
 	execveat.test \
 	faccessat.test \
+	fadvise64.test \
+	fadvise64_64.test \
 	fallocate.test \
 	fanotify_mark.test \
 	fchdir.test \
@@ -749,6 +753,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     count-f.expected \
 	     eventfd.expected \
+	     fadvise.h \
 	     filter-unavailable.expected \
 	     fstatat.c \
 	     fstatx.c \

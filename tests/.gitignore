@@ -44,6 +44,8 @@ execve-v
 execveat
 execveat-v
 faccessat
+fadvise64
+fadvise64_64
 fallocate
 fanotify_mark
 fchdir
