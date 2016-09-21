@@ -390,6 +390,10 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 			tprintf("d_btimer=%d, ", dq.d_btimer);
 			tprintf("d_iwarns=%u, ", dq.d_iwarns);
 			tprintf("d_bwarns=%u, ", dq.d_bwarns);
+			tprintf("d_rtb_hardlimit=%" PRIu64 ", ",
+				dq.d_rtb_hardlimit);
+			tprintf("d_rtb_softlimit=%" PRIu64 ", ",
+				dq.d_rtb_softlimit);
 			tprintf("d_rtbcount=%" PRIu64 ", ", dq.d_rtbcount);
 			tprintf("d_rtbtimer=%d, ", dq.d_rtbtimer);
 			tprintf("d_rtbwarns=%u}", dq.d_rtbwarns);
