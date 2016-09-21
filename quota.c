@@ -595,6 +595,19 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 		tprints("]");
 		break;
 	}
+	case Q_XQUOTARM:
+	{
+		uint32_t flag;
+
+		tprints(", ");
+
+		if (umove_or_printaddr(tcp, data, &flag))
+			break;
+		tprints("[");
+		printflags(xfs_dqblk_flags, flag, "XFS_???_QUOTA");
+		tprints("]");
+		break;
+	}
 	default:
 		printuid(", ", id);
 		tprints(", ");
