@@ -219,7 +219,7 @@
 [218] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [219] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [220] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
-[221] = { 4,	TD,		SEN(fadvise64_64),		"fadvise64"		},
+[221] = { 4,	TD,		SEN(fadvise64),			"fadvise64"		},
 [222] = { 3,	0,		SEN(printargs),			"64:timer_create"	},
 [223] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},
 [224] = { 2,	0,		SEN(timer_gettime),		"timer_gettime"		},
