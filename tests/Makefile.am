@@ -129,6 +129,7 @@ check_PROGRAMS = \
 	futex \
 	futimesat \
 	get_mempolicy \
+	getcpu \
 	getcwd \
 	getdents \
 	getdents64 \
@@ -467,6 +468,7 @@ DECODER_TESTS = \
 	futex.test \
 	futimesat.test \
 	get_mempolicy.test \
+	getcpu.test \
 	getcwd.test \
 	getdents.test \
 	getdents64.test \

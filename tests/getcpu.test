@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of getcpu syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a25

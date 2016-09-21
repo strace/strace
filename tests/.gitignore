@@ -70,6 +70,7 @@ ftruncate64
 futex
 futimesat
 get_mempolicy
+getcpu
 getcwd
 getdents
 getdents64
