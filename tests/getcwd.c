@@ -13,6 +13,7 @@ main(void)
 {
 	long res;
 	char cur_dir[PATH_MAX + 1];
+	static const size_t bogus_size = (size_t) 0xbadc0deddeadfaceULL;
 
 	res = syscall(__NR_getcwd, cur_dir, sizeof(cur_dir));
 
@@ -23,9 +24,15 @@ main(void)
 	print_quoted_string(cur_dir);
 	printf("\", %zu) = %ld\n", sizeof(cur_dir), res);
 
-	syscall(__NR_getcwd, cur_dir, 0);
+	res = syscall(__NR_getcwd, cur_dir, 0);
+	printf("getcwd(%p, 0) = %s\n", cur_dir, sprintrc(res));
 
-	printf("getcwd(%p, 0) = -1 ERANGE (%m)\n", cur_dir);
+	res = syscall(__NR_getcwd, NULL, bogus_size);
+	printf("getcwd(NULL, %zu) = %s\n", bogus_size, sprintrc(res));
+
+	res = syscall(__NR_getcwd, (void *) -1L, sizeof(cur_dir));
+	printf("getcwd(%p, %zu) = %s\n",
+	       (void *) -1L, sizeof(cur_dir), sprintrc(res));
 
 	puts("+++ exited with 0 +++");
 
