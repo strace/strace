@@ -212,15 +212,28 @@ struct fs_quota_statv {
 };
 
 static int
-decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
+decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 {
 	switch (cmd) {
+		case Q_QUOTAOFF:
+			break;
 		case Q_GETQUOTA:
-			if (entering(tcp))
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+
 				return 0;
+			}
+
+			/* Fall-through */
 		case Q_SETQUOTA:
 		{
 			struct if_dqblk dq;
+
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+			}
 
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
@@ -245,8 +258,13 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct if_nextdqblk dq;
 
-			if (entering(tcp))
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+
 				return 0;
+			}
+
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{bhardlimit=%" PRIu64 ", ", dq.dqb_bhardlimit);
@@ -267,11 +285,22 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_V1_GETQUOTA:
-			if (entering(tcp))
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+
 				return 0;
+			}
+
+			/* Fall-through */
 		case Q_V1_SETQUOTA:
 		{
 			struct v1_dqblk dq;
+
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+			}
 
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
@@ -286,11 +315,22 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_V2_GETQUOTA:
-			if (entering(tcp))
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+
 				return 0;
+			}
+
+			/* Fall-through */
 		case Q_V2_SETQUOTA:
 		{
 			struct v2_dqblk dq;
+
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+			}
 
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
@@ -306,11 +346,22 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		}
 		case Q_XGETQUOTA:
 		case Q_XGETNEXTQUOTA:
-			if (entering(tcp))
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+
 				return 0;
+			}
+
+			/* Fall-through */
 		case Q_XSETQLIM:
 		{
 			struct xfs_dqblk dq;
+
+			if (entering(tcp)) {
+				printuid(", ", id);
+				tprints(", ");
+			}
 
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
@@ -342,8 +393,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			uint32_t fmt;
 
-			if (entering(tcp))
+			if (entering(tcp)) {
+				tprints(", ");
+
 				return 0;
+			}
+
 			if (umove_or_printaddr(tcp, data, &fmt))
 				break;
 			tprints("[");
@@ -352,11 +407,19 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_GETINFO:
-			if (entering(tcp))
+			if (entering(tcp)) {
+				tprints(", ");
+
 				return 0;
+			}
+
+			/* Fall-through */
 		case Q_SETINFO:
 		{
 			struct if_dqinfo dq;
+
+			if (entering(tcp))
+				tprints(", ");
 
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
@@ -370,11 +433,19 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		case Q_V2_GETINFO:
-			if (entering(tcp))
+			if (entering(tcp)) {
+				tprints(", ");
+
 				return 0;
+			}
+
+			/* Fall-through */
 		case Q_V2_SETINFO:
 		{
 			struct v2_dqinfo dq;
+
+			if (entering(tcp))
+				tprints(", ");
 
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
@@ -391,8 +462,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct v1_dqstats dq;
 
-			if (entering(tcp))
+			if (entering(tcp)) {
+				tprints(", ");
+
 				return 0;
+			}
+
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{lookups=%u, ", dq.lookups);
@@ -409,8 +484,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct v2_dqstats dq;
 
-			if (entering(tcp))
+			if (entering(tcp)) {
+				tprints(", ");
+
 				return 0;
+			}
+
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{lookups=%u, ", dq.lookups);
@@ -428,8 +507,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct xfs_dqstats dq;
 
-			if (entering(tcp))
+			if (entering(tcp)) {
+				tprints(", ");
+
 				return 0;
+			}
+
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{version=%d, ", dq.qs_version);
@@ -458,8 +541,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			struct fs_quota_statv dq;
 
-			if (entering(tcp))
+			if (entering(tcp)) {
+				tprints(", ");
+
 				return 0;
+			}
+
 			if (umove_or_printaddr(tcp, data, &dq))
 				break;
 			tprintf("{version=%d, ", dq.qs_version);
@@ -492,6 +579,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 		{
 			uint32_t flag;
 
+			tprints(", ");
+
 			if (umove_or_printaddr(tcp, data, &flag))
 				break;
 			tprints("[");
@@ -500,6 +589,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t cmd, unsigned long data)
 			break;
 		}
 		default:
+			printuid(", ", id);
+			tprints(", ");
 			printaddr(data);
 			break;
 	}
@@ -526,17 +617,15 @@ SYS_FUNC(quotactl)
 		printxval(quotatypes, type, "???QUOTA");
 		tprints("), ");
 		printpath(tcp, tcp->u_arg[1]);
-		tprints(", ");
 		switch (cmd) {
 			case Q_QUOTAON:
 			case Q_V1_QUOTAON:
+				tprints(", ");
 				printxval(quota_formats, id, "QFMT_VFS_???");
 				tprints(", ");
 				printpath(tcp, tcp->u_arg[3]);
 				return RVAL_DECODED;
 		}
-		printuid("", id);
-		tprints(", ");
 	}
-	return decode_cmd_data(tcp, cmd, tcp->u_arg[3]);
+	return decode_cmd_data(tcp, id, cmd, tcp->u_arg[3]);
 }
