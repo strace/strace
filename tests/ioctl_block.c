@@ -50,7 +50,7 @@ init_magic(void *addr, const unsigned int size)
 	const unsigned int *end = addr + size - sizeof(int);
 
 	for (; p <= end; ++p)
-		*(unsigned int *) p = magic;
+		*(unsigned int *) p = magic + (p - (unsigned int *) addr);
 }
 
 static struct xlat block_argless[] = {
