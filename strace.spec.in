@@ -5,7 +5,12 @@ Release: 1%{?dist}
 License: BSD%{?suse_version:-3-Clause}
 Group: Development%{?suse_version:/Tools}/Debuggers
 URL: https://strace.io
+%if 0%{?fedora} >= 12 || 0%{?centos} >= 6 || 0%{?rhel} >= 6 || 0%{?suse_version} >= 1200
 Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
+BuildRequires: xz
+%else
+Source: strace-%{version}.tar.gz
+%endif
 BuildRequires: gcc gzip
 
 # Install Bluetooth headers for AF_BLUETOOTH sockets decoding.
