@@ -216,6 +216,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 {
 	switch (cmd) {
 	case Q_QUOTAOFF:
+	case Q_SYNC:
+	case Q_XQUOTASYNC:
 		break;
 	case Q_GETQUOTA:
 		if (entering(tcp)) {
