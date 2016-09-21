@@ -281,6 +281,7 @@ AC_TYPE_UID_T
 
 AC_CHECK_FUNCS(m4_normalize([
 	accept4
+	fallocate
 	fanotify_mark
 	fopen64
 	fork

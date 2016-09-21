@@ -44,6 +44,7 @@ execve-v
 execveat
 execveat-v
 faccessat
+fallocate
 fanotify_mark
 fchdir
 fchmod

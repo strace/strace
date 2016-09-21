@@ -103,6 +103,7 @@ check_PROGRAMS = \
 	execveat \
 	execveat-v \
 	faccessat \
+	fallocate \
 	fanotify_mark \
 	fchdir \
 	fchmod \
@@ -444,6 +445,7 @@ DECODER_TESTS = \
 	execveat-v.test \
 	execveat.test \
 	faccessat.test \
+	fallocate.test \
 	fanotify_mark.test \
 	fchdir.test \
 	fchmod.test \
