@@ -35,6 +35,11 @@
 # include <sys/types.h>
 # include "gcc_compat.h"
 
+/* Tests of "strace -v" are expected to define VERBOSE to 1. */
+#ifndef VERBOSE
+# define VERBOSE 0
+#endif
+
 /* Cached sysconf(_SC_PAGESIZE). */
 size_t get_page_size(void);
 
