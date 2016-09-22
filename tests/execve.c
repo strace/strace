@@ -59,7 +59,7 @@ main(void)
 	execve(FILENAME, tail_argv, tail_envp);
 	printf("execve(\"%s\""
 	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ???]"
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	       ", [\"%s\", \"%s\", %p, %p, %p, ???]"
 #else
 	       ", [/* 5 vars, unterminated */]"
@@ -67,7 +67,7 @@ main(void)
 	       ") = -1 ENOENT (%m)\n",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 	       argv[3], argv[4], argv[5]
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	       , q_envp[0], q_envp[1], envp[2], envp[3], envp[4]
 #endif
 	       );
@@ -77,28 +77,28 @@ main(void)
 
 	execve(FILENAME, tail_argv, tail_envp);
 	printf("execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	       ", [\"%s\", \"%s\"]"
 #else
 	       ", [/* 2 vars */]"
 #endif
 	       ") = -1 ENOENT (%m)\n",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2]
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	       , q_envp[0], q_envp[1]
 #endif
 	       );
 
 	execve(FILENAME, tail_argv + 2, tail_envp + 1);
 	printf("execve(\"%s\", [\"%s\"]"
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	       ", [\"%s\"]"
 #else
 	       ", [/* 1 var */]"
 #endif
 	       ") = -1 ENOENT (%m)\n",
 	       Q_FILENAME, q_argv[2]
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	       , q_envp[1]
 #endif
 	       );
@@ -109,7 +109,7 @@ main(void)
 
 	execve(FILENAME, empty, empty);
 	printf("execve(\"%s\", []"
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	       ", []"
 #else
 	       ", [/* 0 vars */]"
@@ -132,12 +132,12 @@ main(void)
 	printf("execve(\"%s\", [\"%.*s\"...", Q_FILENAME, DEFAULT_STRLEN, a[0]);
 	for (i = 1; i < DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	printf(", \"%s\"", a[i]);
 #else
 	printf(", ...");
 #endif
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	printf("], [\"%.*s\"...", DEFAULT_STRLEN, b[0]);
 	for (i = 1; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", b[i]);
@@ -150,7 +150,7 @@ main(void)
 	printf("execve(\"%s\", [\"%s\"", Q_FILENAME, a[1]);
 	for (i = 2; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
-#ifdef VERBOSE_EXECVE
+#if VERBOSE
 	printf("], [\"%s\"", b[1]);
 	for (i = 2; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", b[i]);
