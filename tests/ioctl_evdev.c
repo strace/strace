@@ -51,7 +51,7 @@ init_magic(void *addr, const unsigned int size)
 		*(unsigned int *) p = magic;
 }
 
-# ifdef VERBOSE_IOCTL
+# if VERBOSE
 static void
 print_envelope(const struct ff_envelope *const e)
 {
@@ -60,7 +60,7 @@ print_envelope(const struct ff_envelope *const e)
 	       e->attack_length, e->attack_level,
 	       e->fade_length, e->fade_level);
 }
-# endif /* VERBOSE_IOCTL */
+# endif /* VERBOSE */
 
 static void
 print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
@@ -68,12 +68,12 @@ print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
 	printf("ioctl(-1, EVIOCSFF, {type=%s, id=%" PRIu16
 	       ", direction=%" PRIu16 ", ",
 	       type_str, ffe->id, ffe->direction);
-# ifdef VERBOSE_IOCTL
+# if VERBOSE
 	printf("trigger={button=%hu, interval=%hu}"
 	       ", replay={length=%hu, delay=%hu}",
 	       ffe->trigger.button, ffe->trigger.interval,
 	       ffe->replay.length, ffe->replay.delay);
-# endif /* VERBOSE_IOCTL */
+# endif /* VERBOSE */
 }
 
 # define TEST_NULL_ARG(cmd) \
@@ -189,7 +189,7 @@ main(void)
 	ioctl(-1, EVIOCSKEYCODE_V2, ike);
 	printf("ioctl(-1, EVIOCSKEYCODE_V2, {flags=%" PRIu8
 	       ", len=%" PRIu8 ", ", ike->flags, ike->len);
-#  ifdef VERBOSE_IOCTL
+#  if VERBOSE
 	printf("index=%" PRIu16 ", keycode=%s, scancode=[",
 	       ike->index, "KEY_1");
 	unsigned int i;
@@ -213,7 +213,7 @@ main(void)
 	ioctl(-1, EVIOCSFF, ffe);
 	print_ffe_common(ffe, "FF_CONSTANT");
 
-#  ifdef VERBOSE_IOCTL
+#  if VERBOSE
 	printf(", constant={level=%hd", ffe->u.constant.level);
 	print_envelope(&ffe->u.constant.envelope);
 	printf("}");
@@ -223,7 +223,7 @@ main(void)
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
 
-#  ifdef VERBOSE_IOCTL
+#  if VERBOSE
 	ffe->type = FF_RAMP;
 	ioctl(-1, EVIOCSFF, ffe);
 	print_ffe_common(ffe, "FF_RAMP");
