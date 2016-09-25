@@ -56,7 +56,7 @@ print_rtc_time(const struct rtc_time *rt)
 	       ", tm_mday=%d, tm_mon=%d, tm_year=%d",
 	       rt->tm_sec, rt->tm_min, rt->tm_hour,
 	       rt->tm_mday, rt->tm_mon, rt->tm_year);
-#ifdef VERBOSE_IOCTL
+#if VERBOSE
 	printf(", tm_wday=%d, tm_yday=%d, tm_isdst=%d}",
 	       rt->tm_wday, rt->tm_yday, rt->tm_isdst);
 #else
