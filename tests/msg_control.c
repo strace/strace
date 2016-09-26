@@ -77,7 +77,7 @@ print_fds(const struct cmsghdr *const cmsg, const size_t cmsg_len)
 	for (i = 0; i < nfd; ++i) {
 		if (i)
 			printf(", ");
-#ifndef VERBOSE_MSGHDR
+#if !VERBOSE
 		if (i >= DEFAULT_STRLEN) {
 			printf("...");
 			break;
@@ -479,7 +479,7 @@ print_ip_opts(const void *const cmsg_data, const unsigned int data_len)
 	for (i = 0; i < data_len; ++i) {
 		if (i)
 			printf(", ");
-#ifndef VERBOSE_MSGHDR
+#if !VERBOSE
 		if (i >= DEFAULT_STRLEN) {
 			printf("...");
 			break;
