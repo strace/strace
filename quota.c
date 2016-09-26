@@ -166,6 +166,12 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, unsigned long data)
 	case Q_SYNC:
 	case Q_XQUOTASYNC:
 		break;
+	case Q_QUOTAON:
+		tprints(", ");
+		printxval(quota_formats, id, "QFMT_VFS_???");
+		tprints(", ");
+		printpath(tcp, data);
+		break;
 	case Q_GETQUOTA:
 		if (entering(tcp)) {
 			printuid(", ", id);
@@ -457,14 +463,6 @@ SYS_FUNC(quotactl)
 		printxval(quotatypes, type, "???QUOTA");
 		tprints("), ");
 		printpath(tcp, tcp->u_arg[1]);
-		switch (cmd) {
-			case Q_QUOTAON:
-				tprints(", ");
-				printxval(quota_formats, id, "QFMT_VFS_???");
-				tprints(", ");
-				printpath(tcp, tcp->u_arg[3]);
-				return RVAL_DECODED;
-		}
 	}
 	return decode_cmd_data(tcp, id, cmd, tcp->u_arg[3]);
 }
