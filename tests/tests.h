@@ -132,14 +132,16 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 
 /* Zero-extend a signed integer type to unsigned long long. */
 #define zero_extend_signed_to_ull(v) \
-	(sizeof(v) == sizeof(short) ? (unsigned long long) (unsigned short) (v) : \
+	(sizeof(v) == sizeof(char) ? (unsigned long long) (unsigned char) (v) : \
+	 sizeof(v) == sizeof(short) ? (unsigned long long) (unsigned short) (v) : \
 	 sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
 	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
 	 (unsigned long long) (v))
 
 /* Sign-extend an unsigned integer type to long long. */
 #define sign_extend_unsigned_to_ll(v) \
-	(sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
+	(sizeof(v) == sizeof(char) ? (long long) (char) (v) : \
+	 sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
 	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
 	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
 	 (long long) (v))
