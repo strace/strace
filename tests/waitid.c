@@ -44,7 +44,7 @@ sprint_rusage(const struct rusage *const ru)
 	snprintf(buf, sizeof(buf),
 		 "{ru_utime={%llu, %llu}"
 		 ", ru_stime={%llu, %llu}"
-#ifdef VERBOSE_RUSAGE
+#if VERBOSE
 		 ", ru_maxrss=%llu"
 		 ", ru_ixrss=%llu"
 		 ", ru_idrss=%llu"
@@ -66,7 +66,7 @@ sprint_rusage(const struct rusage *const ru)
 		 , zero_extend_signed_to_ull(ru->ru_utime.tv_usec)
 		 , zero_extend_signed_to_ull(ru->ru_stime.tv_sec)
 		 , zero_extend_signed_to_ull(ru->ru_stime.tv_usec)
-#ifdef VERBOSE_RUSAGE
+#if VERBOSE
 		 , zero_extend_signed_to_ull(ru->ru_maxrss)
 		 , zero_extend_signed_to_ull(ru->ru_ixrss)
 		 , zero_extend_signed_to_ull(ru->ru_idrss)

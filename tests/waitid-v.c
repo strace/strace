@@ -1,3 +1,3 @@
 /* This file is part of waitid-v strace test. */
-#define VERBOSE_RUSAGE
+#define VERBOSE 1
 #include "waitid.c"
