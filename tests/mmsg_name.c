@@ -121,7 +121,7 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 		if (i)
 			printf(", ");
 		if (i >= IOV_MAX
-# ifndef VERBOSE_MMSGHDR
+# if !VERBOSE
 			|| i >= DEFAULT_STRLEN
 # endif
 		   ) {
@@ -165,7 +165,7 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 		if (i)
 			printf(", ");
 		if (i >= IOV_MAX
-#ifndef VERBOSE_MMSGHDR
+#if !VERBOSE
 			|| i >= DEFAULT_STRLEN
 #endif
 		   ) {
@@ -205,7 +205,7 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 	for (i = 0; i < rc; ++i) {
 		if (i)
 			printf(", ");
-#ifndef VERBOSE_MMSGHDR
+#if !VERBOSE
 		if (i >= DEFAULT_STRLEN) {
 			printf("...");
 			break;
