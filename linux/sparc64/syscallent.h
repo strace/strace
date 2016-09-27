@@ -206,7 +206,7 @@
 [207] = { 3,	0,		SEN(syslog),			"syslog"		},
 [208] = { 3,	0,		SEN(lookup_dcookie),		"lookup_dcookie"	},
 [209] = { 4,	TD,		SEN(fadvise64),			"fadvise64"		},
-[210] = { 4,	TD,		SEN(fadvise64),			"fadvise64_64"		},
+[210] = { 4,	TD,		SEN(fadvise64_64),		"fadvise64_64"		},
 [211] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [212] = { 3,	TP,		SEN(waitpid),			"waitpid"		},
 [213] = { 1,	TF,		SEN(swapoff),			"swapoff"		},

@@ -323,7 +323,7 @@
 [297] = { 3,	TD,		SEN(fstatfs64),			"fstatfs64"		},
 [298] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [299] = { 2,	TF,		SEN(utimes),			"utimes"		},
-[300] = { 4,	TD,		SEN(fadvise64),			"fadvise64_64"		},
+[300] = { 4,	TD,		SEN(fadvise64_64),		"fadvise64_64"		},
 [301] = { },
 [302] = { 6,	TM,		SEN(mbind),			"mbind"			},
 [303] = { 5,	TM,		SEN(get_mempolicy),		"get_mempolicy"		},
