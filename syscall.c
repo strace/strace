@@ -643,11 +643,18 @@ decode_mips_subcall(struct tcb *tcp)
 		sizeof(tcp->u_arg) - sizeof(tcp->u_arg[0]));
 	/*
 	 * Fetching the last arg of 7-arg syscalls (fadvise64_64
-	 * and sync_file_range) would require additional code,
+	 * and sync_file_range) requires additional code,
 	 * see linux/mips/get_syscall_args.c
 	 */
+	if (tcp->s_ent->nargs == MAX_ARGS) {
+		if (umoven(tcp,
+			   mips_REG_SP + MAX_ARGS * sizeof(tcp->u_arg[0]),
+			   sizeof(tcp->u_arg[0]),
+			   &tcp->u_arg[MAX_ARGS - 1]) < 0)
+		tcp->u_arg[MAX_ARGS - 1] = 0;
+	}
 }
-#endif
+#endif /* LINUX_MIPSO32 */
 
 static void
 dumpio(struct tcb *tcp)
