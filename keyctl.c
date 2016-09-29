@@ -136,7 +136,8 @@ static void
 keyctl_chown_key(struct tcb *tcp, key_serial_t id, int user, int group)
 {
 	print_keyring_serial_number(id);
-	tprintf(", %d, %d", user, group);
+	printuid(", ", user);
+	printuid(", ", group);
 }
 
 static void
@@ -189,7 +190,8 @@ keyctl_set_timeout(struct tcb *tcp, key_serial_t id, unsigned timeout)
 static void
 keyctl_get_persistent(struct tcb *tcp, int uid, key_serial_t id)
 {
-	tprintf("%d, ", uid);
+	printuid("", uid);
+	tprints(", ");
 	print_keyring_serial_number(id);
 }
 
