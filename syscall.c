@@ -767,6 +767,15 @@ syscall_name(long scno)
 	}
 }
 
+const char *
+err_name(unsigned long err)
+{
+	if ((err < nerrnos) && errnoent[err])
+		return errnoent[err];
+
+	return NULL;
+}
+
 static long get_regs_error;
 
 void
