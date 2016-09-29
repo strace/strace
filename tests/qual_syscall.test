@@ -4,22 +4,29 @@
 
 . "${srcdir=.}/init.sh"
 
-check_prog ls
-run_strace -e execve ls
+run_prog ./umovestr
+pattern_abbrev_verbose='execve("\./umovestr", \["\./umovestr"\], \[/\* [[:digit:]]* vars \*/\]) = 0'
 
-grep '^execve(' "$LOG" > /dev/null ||
-	dump_log_and_fail_with "$STRACE $args output mismatch"
+check_output_mismatch()
+{
+	local pattern
+	pattern="$1"; shift
+	run_strace "$@" ./umovestr
+	LC_ALL=C grep -x "$pattern" "$LOG" > /dev/null ||
+		dump_log_and_fail_with "$STRACE $args output mismatch"
+}
 
-grep -v '^execve(' "$LOG" |
+check_output_mismatch "$pattern_abbrev_verbose" -e execve
+LC_ALL=C grep -v -x "$pattern_abbrev_verbose" "$LOG" |
 LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
-run_strace -e trace=process ls
+check_output_mismatch "$pattern_abbrev_verbose" -e trace=process
+LC_ALL=C grep '^chdir' "$LOG" > /dev/null &&
+	dump_log_and_fail_with "$STRACE $args unexpected output"
 
-grep '^execve(' "$LOG" > /dev/null ||
-	dump_log_and_fail_with "$STRACE $args output mismatch"
-
-grep '^open' "$LOG" > /dev/null &&
+run_strace -e 42 ./umovestr
+LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
 exit 0
