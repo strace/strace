@@ -214,7 +214,13 @@ SYS_FUNC(keyctl)
 
 	if (entering(tcp)) {
 		printxval(keyctl_commands, cmd, "KEYCTL_???");
-		tprints(", ");
+
+		/*
+		 * For now, KEYCTL_SESSION_TO_PARENT is the only cmd without
+		 * arguments.
+		 */
+		if (cmd != KEYCTL_SESSION_TO_PARENT)
+			tprints(", ");
 	}
 
 	switch (cmd) {
