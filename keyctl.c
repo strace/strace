@@ -301,9 +301,9 @@ SYS_FUNC(keyctl)
 		break;
 
 	default:
-		tprintf("%#lx, %#lx, %#lx, %#lx",
-			tcp->u_arg[1], tcp->u_arg[2],
-			tcp->u_arg[3], tcp->u_arg[4]);
+		tprintf("%#llx, %#llx, %#llx, %#llx",
+			getarg_ull(tcp, 1), getarg_ull(tcp, 2),
+			getarg_ull(tcp, 3), getarg_ull(tcp, 4));
 		break;
 	}
 
