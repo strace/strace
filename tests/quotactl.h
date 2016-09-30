@@ -92,19 +92,20 @@ enum check_quotactl_flags {
 
 
 static inline void
-fill_memory_ex(char *ptr, size_t size, unsigned char start)
+fill_memory_ex(char *ptr, size_t size, unsigned char start,
+	       unsigned char period)
 {
 	size_t i;
 
 	for (i = 0; i < size; i++) {
-		ptr[i] = start + i % 80;
+		ptr[i] = start + i % period;
 	}
 }
 
 static inline void
 fill_memory(char *ptr, size_t size)
 {
-	fill_memory_ex(ptr, size, 0x80);
+	fill_memory_ex(ptr, size, 0x80, 0x80);
 }
 
 static inline void
