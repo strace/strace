@@ -1,11 +1,15 @@
 #!/bin/sh
 
-# Ensure that strace -e trace=set works.
+# Check how strace -e abbrev=set, -e raw=set, -e trace=set,
+# and -e verbose=set work.
 
 . "${srcdir=.}/init.sh"
 
 run_prog ./umovestr
 pattern_abbrev_verbose='execve("\./umovestr", \["\./umovestr"\], \[/\* [[:digit:]]* vars \*/\]) = 0'
+pattern_nonabbrev_verbose='execve("\./umovestr", \["\./umovestr"\], \[".*\"\]) = 0'
+pattern_nonverbose='execve("\./umovestr", 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'
+pattern_raw='execve(0x[[:xdigit:]]*, 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'
 
 check_output_mismatch()
 {
@@ -28,5 +32,25 @@ LC_ALL=C grep '^chdir' "$LOG" > /dev/null &&
 run_strace -e 42 ./umovestr
 LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
+
+for a in execve \!chdir all \!none \
+	 file process \!desc \!ipc \!memory \!network \!signal; do
+	check_output_mismatch \
+		"$pattern_abbrev_verbose" -e abbrev="$a" -e execve
+	check_output_mismatch \
+		"$pattern_raw" -a22 -e raw="$a" -e execve
+	check_output_mismatch \
+		"$pattern_abbrev_verbose" -e verbose="$a" -e execve
+done
+
+for a in \!execve chdir 42 \!all none \
+	 \!file \!process desc ipc memory network signal; do
+	check_output_mismatch \
+		"$pattern_nonabbrev_verbose" -e abbrev="$a" -e execve
+	check_output_mismatch \
+		"$pattern_abbrev_verbose" -e raw="$a" -e execve
+	check_output_mismatch \
+		"$pattern_nonverbose" -a31 -e verbose="$a" -e execve
+done
 
 exit 0

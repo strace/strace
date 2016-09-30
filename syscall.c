@@ -419,11 +419,43 @@ qualify_one(const unsigned int n, unsigned int bitflag, const int not, const int
 }
 
 static int
+lookup_class(const char *s)
+{
+	if (strcmp(s, "file") == 0)
+		return TRACE_FILE;
+	if (strcmp(s, "ipc") == 0)
+		return TRACE_IPC;
+	if (strcmp(s, "network") == 0)
+		return TRACE_NETWORK;
+	if (strcmp(s, "process") == 0)
+		return TRACE_PROCESS;
+	if (strcmp(s, "signal") == 0)
+		return TRACE_SIGNAL;
+	if (strcmp(s, "desc") == 0)
+		return TRACE_DESC;
+	if (strcmp(s, "memory") == 0)
+		return TRACE_MEMORY;
+	return -1;
+}
+
+static int
 qual_syscall(const char *s, const unsigned int bitflag, const int not)
 {
-	int p;
+	unsigned int p;
 	unsigned int i;
+	int n;
 	int rc = -1;
+
+	if ((n = lookup_class(s)) >= 0) {
+		for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+			for (i = 0; i < nsyscall_vec[p]; ++i) {
+				if ((sysent_vec[p][i].sys_flags & n) == n) {
+					qualify_one(i, bitflag, not, p);
+				}
+			}
+		}
+		return 0;
+	}
 
 	if (*s >= '0' && *s <= '9') {
 		i = string_to_uint(s);
@@ -483,26 +515,6 @@ qual_desc(const char *s, const unsigned int bitflag, const int not)
 	return -1;
 }
 
-static int
-lookup_class(const char *s)
-{
-	if (strcmp(s, "file") == 0)
-		return TRACE_FILE;
-	if (strcmp(s, "ipc") == 0)
-		return TRACE_IPC;
-	if (strcmp(s, "network") == 0)
-		return TRACE_NETWORK;
-	if (strcmp(s, "process") == 0)
-		return TRACE_PROCESS;
-	if (strcmp(s, "signal") == 0)
-		return TRACE_SIGNAL;
-	if (strcmp(s, "desc") == 0)
-		return TRACE_DESC;
-	if (strcmp(s, "memory") == 0)
-		return TRACE_MEMORY;
-	return -1;
-}
-
 void
 qualify(const char *s)
 {
@@ -544,16 +556,6 @@ qualify(const char *s)
 	}
 	copy = xstrdup(s);
 	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
-		int n;
-		if (opt->bitflag == QUAL_TRACE && (n = lookup_class(p)) > 0) {
-			unsigned pers;
-			for (pers = 0; pers < SUPPORTED_PERSONALITIES; pers++) {
-				for (i = 0; i < nsyscall_vec[pers]; i++)
-					if (sysent_vec[pers][i].sys_flags & n)
-						qualify_one(i, opt->bitflag, not, pers);
-			}
-			continue;
-		}
 		if (opt->qualify(p, opt->bitflag, not)) {
 			error_msg_and_die("invalid %s '%s'",
 				opt->argument_name, p);
