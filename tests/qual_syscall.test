@@ -30,7 +30,7 @@ LC_ALL=C grep '^chdir' "$LOG" > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
 run_strace -e 42 ./umovestr
-LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
+LC_ALL=C grep '^[[:alnum:]_]*(' "$LOG" > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
 for a in execve \!chdir all \!none \
