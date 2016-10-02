@@ -347,6 +347,30 @@ AC_CHECK_MEMBERS(m4_normalize([
 	siginfo_t.si_overrun
 ]),,, [#include <signal.h>])
 
+AC_CHECK_MEMBERS(m4_normalize([
+	struct perf_event_attr.precise_ip,
+	struct perf_event_attr.mmap_data,
+	struct perf_event_attr.sample_id_all,
+	struct perf_event_attr.exclude_host,
+	struct perf_event_attr.exclude_guest,
+	struct perf_event_attr.exclude_callchain_kernel,
+	struct perf_event_attr.exclude_callchain_user,
+	struct perf_event_attr.mmap2,
+	struct perf_event_attr.comm_exec,
+	struct perf_event_attr.use_clockid,
+	struct perf_event_attr.context_switch,
+	struct perf_event_attr.write_backward,
+	struct perf_event_attr.bp_type,
+	struct perf_event_attr.config1,
+	struct perf_event_attr.config2,
+	struct perf_event_attr.branch_sample_type,
+	struct perf_event_attr.sample_regs_user,
+	struct perf_event_attr.sample_stack_user,
+	struct perf_event_attr.sample_regs_intr,
+	struct perf_event_attr.aux_watermark,
+	struct perf_event_attr.sample_max_stack
+]),,, [#include <linux/perf_event.h>])
+
 AC_CHECK_HEADERS(m4_normalize([
 	asm/cachectl.h
 	asm/sysmips.h

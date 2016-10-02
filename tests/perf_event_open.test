@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Check perf_event_open syscall decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a1
