@@ -43,6 +43,7 @@ AM_LDFLAGS = $(ARCH_MFLAGS)
 libtests_a_SOURCES = \
 	errno2name.c \
 	error_msg.c \
+	fill_memory.c \
 	get_page_size.c \
 	hexdump_strdup.c \
 	hexquote_strndup.c \

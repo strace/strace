@@ -67,6 +67,16 @@ void *tail_alloc(const size_t)
 void *tail_memdup(const void *, const size_t)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((2));
 
+/*
+ * Fill memory (pointed by ptr, having size bytes) with different bytes (with
+ * values starting with start and resetting every period) in order to catch
+ * sign, byte order and/or alignment errors.
+ */
+void fill_memory_ex(char *ptr, size_t size, unsigned char start,
+		    unsigned char period);
+/* Shortcut for fill_memory_ex(ptr, size, 0x80, 0x80) */
+void fill_memory(char *ptr, size_t size);
+
 /* Close stdin, move stdout to a non-standard descriptor, and print. */
 void tprintf(const char *, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2));

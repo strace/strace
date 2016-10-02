@@ -92,23 +92,6 @@ enum check_quotactl_flags {
 
 
 static inline void
-fill_memory_ex(char *ptr, size_t size, unsigned char start,
-	       unsigned char period)
-{
-	size_t i;
-
-	for (i = 0; i < size; i++) {
-		ptr[i] = start + i % period;
-	}
-}
-
-static inline void
-fill_memory(char *ptr, size_t size)
-{
-	fill_memory_ex(ptr, size, 0x80, 0x80);
-}
-
-static inline void
 check_quota(uint32_t flags, int cmd, const char *cmd_str,
 	const char *special, const char *special_str, ...)
 {
