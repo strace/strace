@@ -110,6 +110,8 @@ inotify
 inotify_init1
 ioctl
 ioctl_block
+ioctl_dm
+ioctl_dm-v
 ioctl_evdev
 ioctl_evdev-v
 ioctl_mtd

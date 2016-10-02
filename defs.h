@@ -648,6 +648,7 @@ extern void print_struct_statfs64(struct tcb *tcp, long, unsigned long);
 
 extern void print_ifindex(unsigned int);
 
+extern int dm_ioctl(struct tcb *, const unsigned int, long);
 extern int file_ioctl(struct tcb *, const unsigned int, long);
 extern int fs_x_ioctl(struct tcb *, const unsigned int, long);
 extern int loop_ioctl(struct tcb *, const unsigned int, long);

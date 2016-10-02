@@ -170,6 +170,8 @@ check_PROGRAMS = \
 	inotify_init1 \
 	ioctl \
 	ioctl_block \
+	ioctl_dm \
+	ioctl_dm-v \
 	ioctl_evdev \
 	ioctl_evdev-v \
 	ioctl_mtd \
@@ -542,6 +544,8 @@ DECODER_TESTS = \
 	inotify_init1.test \
 	ioctl.test \
 	ioctl_block.test \
+	ioctl_dm.test \
+	ioctl_dm-v.test \
 	ioctl_evdev.test \
 	ioctl_evdev-v.test \
 	ioctl_mtd.test \

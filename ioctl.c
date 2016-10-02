@@ -282,6 +282,10 @@ ioctl_decode(struct tcb *tcp)
 	case 0x94:
 		return btrfs_ioctl(tcp, code, arg);
 #endif
+#ifdef HAVE_LINUX_DM_IOCTL_H
+	case 0xfd:
+		return dm_ioctl(tcp, code, arg);
+#endif
 	default:
 		break;
 	}
