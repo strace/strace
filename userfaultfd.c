@@ -77,7 +77,7 @@ uffdio_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 				printflags64(uffd_api_flags, ua.ioctls,
 					     "_UFFDIO_???");
 			}
-			tprintf("}");
+			tprints("}");
 		}
 		return 1;
 	}
@@ -107,14 +107,14 @@ uffdio_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ur))
 				return RVAL_DECODED | 1;
-			tprintf("{range=");
+			tprints("{range=");
 			tprintf_uffdio_range(&ur.range);
-			tprintf(", mode=");
+			tprints(", mode=");
 			printflags64(uffd_register_mode_flags, ur.mode,
 				     "UFFDIO_REGISTER_MODE_???");
 		} else {
 			if (!syserror(tcp) && !umove(tcp, arg, &ur)) {
-				tprintf(", ioctls=");
+				tprints(", ioctls=");
 				printflags64(uffd_register_ioctl_flags,
 					     ur.ioctls, "UFFDIO_???");
 			}
@@ -138,9 +138,9 @@ uffdio_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uz))
 				return RVAL_DECODED | 1;
-			tprintf("{range=");
+			tprints("{range=");
 			tprintf_uffdio_range(&uz.range);
-			tprintf(", mode=");
+			tprints(", mode=");
 			printflags64(uffd_zeropage_flags, uz.mode,
 				     "UFFDIO_ZEROPAGE_???");
 		} else {

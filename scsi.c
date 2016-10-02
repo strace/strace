@@ -275,7 +275,7 @@ scsi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 			else
 				print_sg_io_res(tcp, iid, arg);
 		}
-		tprintf("}");
+		tprints("}");
 		return RVAL_DECODED | 1;
 	}
 }

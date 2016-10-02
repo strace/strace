@@ -702,7 +702,7 @@ print_group_req(struct tcb *tcp, long addr, int len)
 
 	tprintf("{gr_interface=%u, gr_group=", greq.gr_interface);
 	print_sockaddr(tcp, &greq.gr_group, sizeof(greq.gr_group));
-	tprintf("}");
+	tprints("}");
 
 }
 #endif /* MCAST_JOIN_GROUP */

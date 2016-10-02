@@ -383,7 +383,7 @@ btrfs_print_qgroup_inherit(struct tcb *tcp, const unsigned long qgi_addr)
 	if (umove_or_printaddr(tcp, qgi_addr, &inherit))
 		return;
 
-	tprintf("{flags=");
+	tprints("{flags=");
 	printflags64(btrfs_qgroup_inherit_flags, inherit.flags,
 		     "BTRFS_QGROUP_INHERIT_???");
 	tprintf(", num_qgroups=%" PRI__u64 ", num_ref_copies=%" PRI__u64
@@ -423,7 +423,7 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 			uint64_t buf_addr, uint64_t buf_size, bool print_size)
 {
 	if (entering(tcp)) {
-		tprintf("{key={tree_id=");
+		tprints("{key={tree_id=");
 		btrfs_print_objectid(key->tree_id);
 
 		if (key->min_objectid != BTRFS_FIRST_FREE_OBJECTID ||
@@ -1322,7 +1322,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				btrfs_print_qgroup_inherit(tcp,
 					(unsigned long) args.qgroup_inherit);
 			}
-			tprintf(", name=");
+			tprints(", name=");
 			print_quoted_string(args.name, sizeof(args.name),
 					    QUOTE_0_TERMINATED);
 			tprints("}");
