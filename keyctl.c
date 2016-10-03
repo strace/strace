@@ -26,6 +26,7 @@
  */
 
 #include "defs.h"
+#include "kernel_types.h"
 
 typedef int32_t key_serial_t;
 
@@ -91,13 +92,13 @@ keyctl_get_keyring_id(struct tcb *tcp, key_serial_t id, int create)
 }
 
 static void
-keyctl_update_key(struct tcb *tcp, key_serial_t id, unsigned long addr,
-		  unsigned long len)
+keyctl_update_key(struct tcb *tcp, key_serial_t id, kernel_ulong_t addr,
+		  kernel_ulong_t len)
 {
 	print_keyring_serial_number(id);
 	tprints(", ");
 	printstr(tcp, addr, len);
-	tprintf(", %lu", len);
+	tprintf(", %llu", zero_extend_signed_to_ull(len));
 }
 
 static void
@@ -109,8 +110,8 @@ keyctl_handle_key_key(struct tcb *tcp, key_serial_t id1, key_serial_t id2)
 }
 
 static void
-keyctl_read_key(struct tcb *tcp, key_serial_t id, unsigned long addr,
-		unsigned long len, bool has_nul)
+keyctl_read_key(struct tcb *tcp, key_serial_t id, kernel_ulong_t addr,
+		kernel_ulong_t len, bool has_nul)
 {
 	if (entering(tcp)) {
 		print_keyring_serial_number(id);
@@ -119,19 +120,19 @@ keyctl_read_key(struct tcb *tcp, key_serial_t id, unsigned long addr,
 		if (syserror(tcp))
 			printaddr(addr);
 		else {
-			unsigned long rval = (tcp->u_rval >= 0) &&
-				((unsigned long) tcp->u_rval > len) ? len :
-				(unsigned long) tcp->u_rval;
+			kernel_ulong_t rval = (tcp->u_rval >= 0) &&
+				((kernel_ulong_t) tcp->u_rval > len) ? len :
+				(kernel_ulong_t) tcp->u_rval;
 			printstr_ex(tcp, addr, rval, has_nul ?
 				    QUOTE_OMIT_TRAILING_0 : 0);
 		}
-		tprintf(", %lu", len);
+		tprintf(", %llu", zero_extend_signed_to_ull(len));
 	}
 }
 
 static void
-keyctl_keyring_search(struct tcb *tcp, key_serial_t id1, unsigned long addr1,
-		      unsigned long addr2, key_serial_t id2)
+keyctl_keyring_search(struct tcb *tcp, key_serial_t id1, kernel_ulong_t addr1,
+		      kernel_ulong_t addr2, key_serial_t id2)
 {
 	print_keyring_serial_number(id1);
 	tprints(", ");
@@ -152,25 +153,25 @@ keyctl_chown_key(struct tcb *tcp, key_serial_t id, unsigned user,
 }
 
 static void
-keyctl_instantiate_key(struct tcb *tcp, key_serial_t id1, unsigned long addr,
-		       unsigned long len, key_serial_t id2)
+keyctl_instantiate_key(struct tcb *tcp, key_serial_t id1, kernel_ulong_t addr,
+		       kernel_ulong_t len, key_serial_t id2)
 {
 	print_keyring_serial_number(id1);
 	tprints(", ");
 	printstr(tcp, addr, len);
-	tprintf(", %lu, ", len);
+	tprintf(", %llu, ", zero_extend_signed_to_ull(len));
 	print_keyring_serial_number(id2);
 }
 
 static void
 keyctl_instantiate_key_iov(struct tcb *tcp, key_serial_t id1,
-			   unsigned long addr, unsigned long len,
+			   kernel_ulong_t addr, kernel_ulong_t len,
 			   key_serial_t id2)
 {
 	print_keyring_serial_number(id1);
 	tprints(", ");
 	tprint_iov(tcp, len, addr, IOV_DECODE_STR);
-	tprintf(", %lu, ", len);
+	tprintf(", %llu, ", zero_extend_signed_to_ull(len));
 	print_keyring_serial_number(id2);
 }
 
@@ -226,7 +227,7 @@ keyctl_setperm_key(struct tcb *tcp, key_serial_t id, uint32_t perm)
 }
 
 static void
-print_dh_params(struct tcb *tcp, unsigned long addr)
+print_dh_params(struct tcb *tcp, kernel_ulong_t addr)
 {
 	struct keyctl_dh_params params;
 
@@ -243,8 +244,8 @@ print_dh_params(struct tcb *tcp, unsigned long addr)
 }
 
 static void
-keyctl_dh_compute(struct tcb *tcp, unsigned long params, unsigned long buf,
-		  unsigned long len)
+keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
+		  kernel_ulong_t len)
 {
 	if (entering(tcp)) {
 		print_dh_params(tcp, params);
@@ -253,12 +254,12 @@ keyctl_dh_compute(struct tcb *tcp, unsigned long params, unsigned long buf,
 		if (syserror(tcp)) {
 			printaddr(buf);
 		} else {
-			unsigned long rval = (tcp->u_rval >= 0) &&
-				((unsigned long) tcp->u_rval > len) ? len :
-				(unsigned long) tcp->u_rval;
+			kernel_ulong_t rval = (tcp->u_rval >= 0) &&
+				((kernel_ulong_t) tcp->u_rval > len) ? len :
+				(kernel_ulong_t) tcp->u_rval;
 			printstr(tcp, buf, rval);
 		}
-		tprintf(", %lu", len);
+		tprintf(", %llu", zero_extend_signed_to_ull(len));
 	}
 }
 
@@ -268,6 +269,10 @@ keyctl_dh_compute(struct tcb *tcp, unsigned long params, unsigned long buf,
 SYS_FUNC(keyctl)
 {
 	int cmd = tcp->u_arg[0];
+	unsigned long long arg2 = getarg_ull(tcp, 1);
+	unsigned long long arg3 = getarg_ull(tcp, 2);
+	unsigned long long arg4 = getarg_ull(tcp, 3);
+	unsigned long long arg5 = getarg_ull(tcp, 4);
 
 	if (entering(tcp)) {
 		printxval(keyctl_commands, cmd, "KEYCTL_???");
@@ -282,97 +287,84 @@ SYS_FUNC(keyctl)
 
 	switch (cmd) {
 	case KEYCTL_GET_KEYRING_ID:
-		keyctl_get_keyring_id(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		keyctl_get_keyring_id(tcp, arg2, arg3);
 		break;
 
 	case KEYCTL_JOIN_SESSION_KEYRING:
-		printstr(tcp, tcp->u_arg[1], -1);
+		printstr(tcp, arg2, -1);
 		break;
 
 	case KEYCTL_UPDATE:
-		keyctl_update_key(tcp, tcp->u_arg[1],
-				  tcp->u_arg[2], tcp->u_arg[3]);
+		keyctl_update_key(tcp, arg2, arg3, arg4);
 		break;
 
 	case KEYCTL_REVOKE:
 	case KEYCTL_CLEAR:
 	case KEYCTL_INVALIDATE:
 	case KEYCTL_ASSUME_AUTHORITY:
-		print_keyring_serial_number(tcp->u_arg[1]);
+		print_keyring_serial_number(arg2);
 		break;
 
 	case KEYCTL_LINK:
 	case KEYCTL_UNLINK:
-		keyctl_handle_key_key(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		keyctl_handle_key_key(tcp, arg2, arg3);
 		break;
 
 	case KEYCTL_DESCRIBE:
 	case KEYCTL_READ:
 	case KEYCTL_GET_SECURITY:
-		keyctl_read_key(tcp, tcp->u_arg[1],
-				tcp->u_arg[2], tcp->u_arg[3],
-				cmd != KEYCTL_READ);
+		keyctl_read_key(tcp, arg2, arg3, arg4, cmd != KEYCTL_READ);
 		return 0;
 
 	case KEYCTL_SEARCH:
-		keyctl_keyring_search(tcp, tcp->u_arg[1], tcp->u_arg[2],
-				      tcp->u_arg[3], tcp->u_arg[4]);
+		keyctl_keyring_search(tcp, arg2, arg3, arg4, arg5);
 		break;
 
 	case KEYCTL_CHOWN:
-		keyctl_chown_key(tcp, tcp->u_arg[1],
-				 tcp->u_arg[2], tcp->u_arg[3]);
+		keyctl_chown_key(tcp, arg2, arg3, arg4);
 		break;
 
 	case KEYCTL_SETPERM:
-		keyctl_setperm_key(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		keyctl_setperm_key(tcp, arg2, arg3);
 		break;
 
 	case KEYCTL_INSTANTIATE:
-		keyctl_instantiate_key(tcp, tcp->u_arg[1], tcp->u_arg[2],
-				       tcp->u_arg[3], tcp->u_arg[4]);
+		keyctl_instantiate_key(tcp, arg2, arg3, arg4, arg5);
 		break;
 
 	case KEYCTL_NEGATE:
-		keyctl_negate_key(tcp, tcp->u_arg[1],
-				  tcp->u_arg[2], tcp->u_arg[3]);
+		keyctl_negate_key(tcp, arg2, arg3, arg4);
 		break;
 
 	case KEYCTL_SET_REQKEY_KEYRING:
-		printxval(key_reqkeys, tcp->u_arg[1], "KEY_REQKEY_DEFL_???");
+		printxval(key_reqkeys, arg2, "KEY_REQKEY_DEFL_???");
 		break;
 
 	case KEYCTL_SET_TIMEOUT:
-		keyctl_set_timeout(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		keyctl_set_timeout(tcp, arg2, arg3);
 		break;
 
 	case KEYCTL_SESSION_TO_PARENT:
 		break;
 
 	case KEYCTL_REJECT:
-		keyctl_reject_key(tcp, tcp->u_arg[1], tcp->u_arg[2],
-				  tcp->u_arg[3], tcp->u_arg[4]);
+		keyctl_reject_key(tcp, arg2, arg3, arg4, arg5);
 		break;
 
 	case KEYCTL_INSTANTIATE_IOV:
-		keyctl_instantiate_key_iov(tcp, tcp->u_arg[1],
-					   tcp->u_arg[2], tcp->u_arg[3],
-					   tcp->u_arg[4]);
+		keyctl_instantiate_key_iov(tcp, arg2, arg3, arg4, arg5);
 		break;
 
 	case KEYCTL_GET_PERSISTENT:
-		keyctl_get_persistent(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		keyctl_get_persistent(tcp, arg2, arg3);
 		break;
 
 	case KEYCTL_DH_COMPUTE:
-		keyctl_dh_compute(tcp, tcp->u_arg[1], tcp->u_arg[2],
-				  tcp->u_arg[3]);
+		keyctl_dh_compute(tcp, arg2, arg3, arg4);
 		return 0;
 
 	default:
-		tprintf("%#llx, %#llx, %#llx, %#llx",
-			getarg_ull(tcp, 1), getarg_ull(tcp, 2),
-			getarg_ull(tcp, 3), getarg_ull(tcp, 4));
+		tprintf("%#llx, %#llx, %#llx, %#llx", arg2, arg3, arg4, arg5);
 		break;
 	}
 
