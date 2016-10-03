@@ -877,7 +877,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	int sys_res;
 	struct timeval tv;
 	int res;
-	long u_error;
+	unsigned long u_error;
 
 	/* Measure the exit time as early as possible to avoid errors. */
 	if (Tflag || cflag)
@@ -959,7 +959,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	u_error = tcp->u_error;
 	if (tcp->qual_flg & QUAL_RAW) {
 		if (u_error)
-			tprintf("= -1 (errno %ld)", u_error);
+			tprintf("= -1 (errno %lu)", u_error);
 		else
 			tprintf("= %#lx", tcp->u_rval);
 	}
@@ -1019,8 +1019,7 @@ trace_syscall_exiting(struct tcb *tcp)
 			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
 			break;
 		default:
-			if ((unsigned long) u_error < nerrnos
-			    && errnoent[u_error])
+			if (u_error < nerrnos && errnoent[u_error])
 				tprintf("= -1 %s (%s)", errnoent[u_error],
 					strerror(u_error));
 			else
@@ -1137,7 +1136,7 @@ is_erestart(struct tcb *tcp)
 	}
 }
 
-static int saved_u_error;
+static unsigned long saved_u_error;
 
 void
 temporarily_clear_syserror(struct tcb *tcp)

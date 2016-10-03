@@ -223,7 +223,7 @@ struct tcb {
 	int flags;		/* See below for TCB_ values */
 	int pid;		/* If 0, this tcb is free */
 	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
-	int u_error;		/* Error code */
+	unsigned long u_error;	/* Error code */
 	long scno;		/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
 #if HAVE_STRUCT_TCB_EXT_ARG
