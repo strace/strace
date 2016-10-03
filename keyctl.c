@@ -31,6 +31,12 @@ typedef int32_t key_serial_t;
 
 #include "xlat/key_spec.h"
 
+struct keyctl_dh_params {
+	int32_t private;
+	int32_t prime;
+	int32_t base;
+};
+
 static void
 print_keyring_serial_number(key_serial_t id)
 {
@@ -213,6 +219,40 @@ keyctl_setperm_key(struct tcb *tcp, key_serial_t id, uint32_t perm)
 	printflags(key_perms, perm, "KEY_???");
 }
 
+static void
+print_dh_params(struct tcb *tcp, long addr)
+{
+	struct keyctl_dh_params params;
+
+	if (umove_or_printaddr(tcp, addr, &params))
+		return;
+
+	tprints("{private=");
+	print_keyring_serial_number(params.private);
+	tprints(", prime=");
+	print_keyring_serial_number(params.prime);
+	tprints(", base=");
+	print_keyring_serial_number(params.base);
+	tprints("}");
+}
+
+static void
+keyctl_dh_compute(struct tcb *tcp, long params, long buf, long len)
+{
+	if (entering(tcp)) {
+		print_dh_params(tcp, params);
+		tprints(", ");
+	} else {
+		if (syserror(tcp)) {
+			printaddr(buf);
+		} else {
+			long rval = tcp->u_rval > len ? len : tcp->u_rval;
+			printstr(tcp, buf, rval);
+		}
+		tprintf(", %lu", len);
+	}
+}
+
 #include "xlat/key_reqkeys.h"
 #include "xlat/keyctl_commands.h"
 
@@ -313,6 +353,11 @@ SYS_FUNC(keyctl)
 	case KEYCTL_GET_PERSISTENT:
 		keyctl_get_persistent(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		break;
+
+	case KEYCTL_DH_COMPUTE:
+		keyctl_dh_compute(tcp, tcp->u_arg[1], tcp->u_arg[2],
+				  tcp->u_arg[3]);
+		return 0;
 
 	default:
 		tprintf("%#llx, %#llx, %#llx, %#llx",
