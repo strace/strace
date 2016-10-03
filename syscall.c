@@ -1174,18 +1174,18 @@ is_negated_errno(kernel_ulong_t val)
 	/* Linux kernel defines MAX_ERRNO to 4095. */
 	kernel_ulong_t max = -(kernel_long_t) 4095;
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize < sizeof(val)) {
+#if defined X86_64 || defined X32
+	/*
+	 * current_wordsize is 4 for x32 personality
+	 * but truncation _must not_ be done in it, so
+	 * check current_personality instead.
+	 */
+	if (current_personality == 1) {
 		val = (uint32_t) val;
 		max = (uint32_t) max;
 	}
-#elif defined X32
-	/*
-	 * current_wordsize is 4 even in personality 0 (native X32)
-	 * but truncation _must not_ be done in it.
-	 * can't check current_wordsize here!
-	 */
-	if (current_personality != 0) {
+#elif SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+	if (current_wordsize < sizeof(val)) {
 		val = (uint32_t) val;
 		max = (uint32_t) max;
 	}
