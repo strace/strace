@@ -108,7 +108,8 @@ keyctl_handle_key_key(struct tcb *tcp, key_serial_t id1, key_serial_t id2)
 }
 
 static void
-keyctl_read_key(struct tcb *tcp, key_serial_t id, long addr, long len)
+keyctl_read_key(struct tcb *tcp, key_serial_t id, long addr, long len,
+		bool has_nul)
 {
 	if (entering(tcp)) {
 		print_keyring_serial_number(id);
@@ -118,8 +119,9 @@ keyctl_read_key(struct tcb *tcp, key_serial_t id, long addr, long len)
 			printaddr(addr);
 		else {
 			long rval = tcp->u_rval > len ?
-				    len : (tcp->u_rval ? -1 : 0);
-			printstr(tcp, addr, rval);
+				    len : tcp->u_rval;
+			printstr_ex(tcp, addr, rval, has_nul ?
+				    QUOTE_OMIT_TRAILING_0 : 0);
 		}
 		tprintf(", %lu", len);
 	}
@@ -301,7 +303,8 @@ SYS_FUNC(keyctl)
 	case KEYCTL_READ:
 	case KEYCTL_GET_SECURITY:
 		keyctl_read_key(tcp, tcp->u_arg[1],
-				tcp->u_arg[2], tcp->u_arg[3]);
+				tcp->u_arg[2], tcp->u_arg[3],
+				cmd != KEYCTL_READ);
 		return 0;
 
 	case KEYCTL_SEARCH:
