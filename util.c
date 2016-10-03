@@ -619,6 +619,9 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			/* Check for NUL-terminated string. */
 			if (c == eol)
 				goto asciz_ended;
+			if ((i == (size - 1)) &&
+			    (style & QUOTE_OMIT_TRAILING_0) && (c == '\0'))
+				goto asciz_ended;
 			switch (c) {
 				case '\"': case '\\':
 					*s++ = '\\';
