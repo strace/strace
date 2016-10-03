@@ -69,6 +69,7 @@ check_PROGRAMS = \
 	accept4 \
 	access \
 	acct \
+	add_key \
 	adjtimex \
 	aio \
 	alarm \
@@ -176,6 +177,7 @@ check_PROGRAMS = \
 	ipc_msgbuf \
 	ipc_sem \
 	ipc_shm \
+	keyctl \
 	kill \
 	ksysent \
 	lchown \
@@ -265,6 +267,7 @@ check_PROGRAMS = \
 	rename \
 	renameat \
 	renameat2 \
+	request_key \
 	restart_syscall \
 	rmdir \
 	rt_sigpending \
@@ -414,6 +417,7 @@ DECODER_TESTS = \
 	accept4.test \
 	access.test \
 	acct.test \
+	add_key.test \
 	adjtimex.test \
 	aio.test \
 	alarm.test \
@@ -518,6 +522,7 @@ DECODER_TESTS = \
 	ipc_msgbuf.test \
 	ipc_sem.test \
 	ipc_shm.test \
+	keyctl.test \
 	kill.test \
 	lchown.test \
 	lchown32.test \
@@ -601,6 +606,7 @@ DECODER_TESTS = \
 	rename.test \
 	renameat.test \
 	renameat2.test \
+	request_key.test \
 	rmdir.test \
 	rt_sigpending.test \
 	rt_sigprocmask.test \

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of request_key syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a33 -s12

@@ -10,6 +10,7 @@ accept
 accept4
 access
 acct
+addkey
 adjtimex
 aio
 alarm
@@ -117,6 +118,7 @@ ipc_msg
 ipc_msgbuf
 ipc_sem
 ipc_shm
+keyctl
 kill
 ksysent
 ksysent.h
@@ -208,6 +210,7 @@ remap_file_pages
 rename
 renameat
 renameat2
+request_key
 restart_syscall
 rmdir
 rt_sigpending
