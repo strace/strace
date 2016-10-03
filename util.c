@@ -798,7 +798,7 @@ printpath(struct tcb *tcp, long addr)
  * If string length exceeds `max_strlen', append `...' to the output.
  */
 void
-printstr(struct tcb *tcp, long addr, long len)
+printstr_ex(struct tcb *tcp, long addr, long len, unsigned int user_style)
 {
 	static char *str = NULL;
 	static char *outstr;
@@ -841,6 +841,8 @@ printstr(struct tcb *tcp, long addr, long len)
 		}
 		style = 0;
 	}
+
+	style |= user_style;
 
 	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
 	 * or we were requested to print more than -s NUM chars)...

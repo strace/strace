@@ -563,7 +563,8 @@ extern void dumpiov_upto(struct tcb *, int, long, unsigned long);
 #define dumpiov(tcp, len, addr) \
 	dumpiov_upto((tcp), (len), (addr), (unsigned long) -1L)
 extern void dumpstr(struct tcb *, long, int);
-extern void printstr(struct tcb *, long, long);
+extern void printstr_ex(struct tcb *, long addr, long len,
+	unsigned int user_style);
 extern bool printnum_short(struct tcb *, long, const char *)
 	ATTRIBUTE_FORMAT((printf, 3, 0));
 extern bool printnum_int(struct tcb *, long, const char *)
@@ -668,6 +669,12 @@ extern void unwind_cache_invalidate(struct tcb* tcp);
 extern void unwind_print_stacktrace(struct tcb* tcp);
 extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
+
+static inline void
+printstr(struct tcb *tcp, long addr, long len)
+{
+	printstr_ex(tcp, addr, len, 0);
+}
 
 static inline int
 printflags(const struct xlat *x, unsigned int flags, const char *dflt)
