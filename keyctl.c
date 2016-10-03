@@ -91,7 +91,8 @@ keyctl_get_keyring_id(struct tcb *tcp, key_serial_t id, int create)
 }
 
 static void
-keyctl_update_key(struct tcb *tcp, key_serial_t id, long addr, long len)
+keyctl_update_key(struct tcb *tcp, key_serial_t id, unsigned long addr,
+		  unsigned long len)
 {
 	print_keyring_serial_number(id);
 	tprints(", ");
@@ -108,8 +109,8 @@ keyctl_handle_key_key(struct tcb *tcp, key_serial_t id1, key_serial_t id2)
 }
 
 static void
-keyctl_read_key(struct tcb *tcp, key_serial_t id, long addr, long len,
-		bool has_nul)
+keyctl_read_key(struct tcb *tcp, key_serial_t id, unsigned long addr,
+		unsigned long len, bool has_nul)
 {
 	if (entering(tcp)) {
 		print_keyring_serial_number(id);
@@ -118,8 +119,9 @@ keyctl_read_key(struct tcb *tcp, key_serial_t id, long addr, long len,
 		if (syserror(tcp))
 			printaddr(addr);
 		else {
-			long rval = tcp->u_rval > len ?
-				    len : tcp->u_rval;
+			unsigned long rval = (tcp->u_rval >= 0) &&
+				((unsigned long) tcp->u_rval > len) ? len :
+				(unsigned long) tcp->u_rval;
 			printstr_ex(tcp, addr, rval, has_nul ?
 				    QUOTE_OMIT_TRAILING_0 : 0);
 		}
@@ -128,8 +130,8 @@ keyctl_read_key(struct tcb *tcp, key_serial_t id, long addr, long len,
 }
 
 static void
-keyctl_keyring_search(struct tcb *tcp, key_serial_t id1, long addr1,
-		      long addr2, key_serial_t id2)
+keyctl_keyring_search(struct tcb *tcp, key_serial_t id1, unsigned long addr1,
+		      unsigned long addr2, key_serial_t id2)
 {
 	print_keyring_serial_number(id1);
 	tprints(", ");
@@ -141,7 +143,8 @@ keyctl_keyring_search(struct tcb *tcp, key_serial_t id1, long addr1,
 }
 
 static void
-keyctl_chown_key(struct tcb *tcp, key_serial_t id, int user, int group)
+keyctl_chown_key(struct tcb *tcp, key_serial_t id, unsigned user,
+		 unsigned group)
 {
 	print_keyring_serial_number(id);
 	printuid(", ", user);
@@ -149,8 +152,8 @@ keyctl_chown_key(struct tcb *tcp, key_serial_t id, int user, int group)
 }
 
 static void
-keyctl_instantiate_key(struct tcb *tcp, key_serial_t id1, long addr,
-		       long len, key_serial_t id2)
+keyctl_instantiate_key(struct tcb *tcp, key_serial_t id1, unsigned long addr,
+		       unsigned long len, key_serial_t id2)
 {
 	print_keyring_serial_number(id1);
 	tprints(", ");
@@ -161,7 +164,8 @@ keyctl_instantiate_key(struct tcb *tcp, key_serial_t id1, long addr,
 
 static void
 keyctl_instantiate_key_iov(struct tcb *tcp, key_serial_t id1,
-			   long addr, long len, key_serial_t id2)
+			   unsigned long addr, unsigned long len,
+			   key_serial_t id2)
 {
 	print_keyring_serial_number(id1);
 	tprints(", ");
@@ -204,7 +208,7 @@ keyctl_set_timeout(struct tcb *tcp, key_serial_t id, unsigned timeout)
 }
 
 static void
-keyctl_get_persistent(struct tcb *tcp, int uid, key_serial_t id)
+keyctl_get_persistent(struct tcb *tcp, unsigned uid, key_serial_t id)
 {
 	printuid("", uid);
 	tprints(", ");
@@ -222,7 +226,7 @@ keyctl_setperm_key(struct tcb *tcp, key_serial_t id, uint32_t perm)
 }
 
 static void
-print_dh_params(struct tcb *tcp, long addr)
+print_dh_params(struct tcb *tcp, unsigned long addr)
 {
 	struct keyctl_dh_params params;
 
@@ -239,7 +243,8 @@ print_dh_params(struct tcb *tcp, long addr)
 }
 
 static void
-keyctl_dh_compute(struct tcb *tcp, long params, long buf, long len)
+keyctl_dh_compute(struct tcb *tcp, unsigned long params, unsigned long buf,
+		  unsigned long len)
 {
 	if (entering(tcp)) {
 		print_dh_params(tcp, params);
@@ -248,7 +253,9 @@ keyctl_dh_compute(struct tcb *tcp, long params, long buf, long len)
 		if (syserror(tcp)) {
 			printaddr(buf);
 		} else {
-			long rval = tcp->u_rval > len ? len : tcp->u_rval;
+			unsigned long rval = (tcp->u_rval >= 0) &&
+				((unsigned long) tcp->u_rval > len) ? len :
+				(unsigned long) tcp->u_rval;
 			printstr(tcp, buf, rval);
 		}
 		tprintf(", %lu", len);
