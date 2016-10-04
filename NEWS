@@ -1,9 +1,39 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 4.14 (2016-10-04)
 ===============================================
 
 * Changes in behavior
   * When using -p option without a command and no processes has been attached,
     strace exits with exit status 1.
+
+* Improvements
+  * Added printing of the mode argument of open and openat syscalls
+    when O_TMPFILE flag is set.  (Addresses Fedora bug #1377846).
+  * Enhanced -e abbrev=set, -e raw=set, and -e verbose=set.
+  * Enhanced decoding of futex, keyctl, quotactl, timerfd_settime,
+    and aio family syscalls.
+  * Implemented fetching of the 7th subcall argument on mips o32.
+  * Updated lists of BPF_*, ETH_P_*, KEXEC_ARCH_*, SCTP_*, TCP_*, and *_MAGIC
+    constants.
+  * Updated lists of ioctl commands from Linux 4.8.
+  * Added decoding of new syscalls on sh and sh64.
+  * Added RISC-V architecture support.
+
+* Bug fixes
+  * Marked io_setup and io_destroy as memory mapping related syscalls.
+  * Fixed leakage of placeholder descriptors to tracees.
+  * Fixed printing of mode_t, umode_t, and umask types.
+  * Fixed decoding of iovec arrays without a limit on total data size.
+  * Fixed decoding of fadvise64, fallocate, futex, keyctl, quotactl, readahead,
+    and ipc family syscalls.
+  * Fixed decoding of invalid syscalls mapped to indirect subcalls.
+  * Fixed decoding of struct btrfs_ioctl_vol_args_v2 on non-native
+    personalities.
+  * Fixed decoding of PTRACE_DETACH on sparc and sparc64.
+  * Fixed decoding of struct stat64 on sparc64.
+  * Fixed decoding of uid and gid-related syscalls on sparc64.
+  * Fixed decoding of the forth argument of semctl syscall on sparc64.
+  * Fixed values of tty ioctl constants on sparc64.
+  * Fixed sparc personality support on sparc64.
 
 Noteworthy changes in release 4.13 (2016-07-26)
 ===============================================
