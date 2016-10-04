@@ -39,9 +39,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <sys/types.h>
-#ifdef STDC_HEADERS
-# include <stddef.h>
-#endif
+#include <stddef.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -68,11 +66,6 @@ const char *strerror(int);
 #undef stpcpy
 #define stpcpy strace_stpcpy
 extern char *stpcpy(char *dst, const char *src);
-#endif
-
-#ifndef offsetof
-# define offsetof(type, member)	\
-	(((char *) &(((type *) NULL)->member)) - ((char *) (type *) NULL))
 #endif
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
