@@ -172,6 +172,7 @@ check_PROGRAMS = \
 	ioctl_v4l2 \
 	ioperm \
 	iopl \
+	ioprio \
 	ip_mreq \
 	ipc \
 	ipc_msg \
@@ -517,6 +518,7 @@ DECODER_TESTS = \
 	ioctl_v4l2.test \
 	ioperm.test \
 	iopl.test \
+	ioprio.test \
 	ip_mreq.test \
 	ipc.test \
 	ipc_msg.test \

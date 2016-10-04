@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check iprio_get and iprio_set syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a18 -e trace=ioprio_get,ioprio_set

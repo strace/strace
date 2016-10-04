@@ -112,6 +112,7 @@ ioctl_uffdio
 ioctl_v4l2
 ioperm
 iopl
+ioprio
 ip_mreq
 ipc
 ipc_msg
