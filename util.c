@@ -838,13 +838,13 @@ printstr_ex(struct tcb *tcp, long addr, long len, unsigned int user_style)
 		outstr = xmalloc(outstr_size);
 	}
 
-	size = max_strlen;
+	size = max_strlen + 1;
 	if (len == -1) {
 		/*
 		 * Treat as a NUL-terminated string: fetch one byte more
 		 * because string_quote may look one byte ahead.
 		 */
-		if (umovestr(tcp, addr, size + 1, str) < 0) {
+		if (umovestr(tcp, addr, size, str) < 0) {
 			printaddr(addr);
 			return;
 		}
@@ -862,11 +862,23 @@ printstr_ex(struct tcb *tcp, long addr, long len, unsigned int user_style)
 
 	style |= user_style;
 
+	if (style & QUOTE_0_TERMINATED) {
+		if (size) {
+			--size;
+		} else {
+			tprints((len == -1) || (len == 0) ? "\"\"" : "\"\"...");
+			return;
+		}
+	}
+	if (size > max_strlen)
+		size = max_strlen;
+
 	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
 	 * or we were requested to print more than -s NUM chars)...
 	 */
 	ellipsis = (string_quote(str, outstr, size, style) &&
-			(len < 0 || (unsigned long) len > max_strlen));
+			((style & QUOTE_0_TERMINATED) ||
+				(unsigned long) len > max_strlen));
 
 	tprints(outstr);
 	if (ellipsis)
