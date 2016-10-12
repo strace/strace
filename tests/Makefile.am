@@ -187,6 +187,7 @@ check_PROGRAMS = \
 	link \
 	linkat \
 	llseek \
+	lookup_dcookie \
 	lseek \
 	lstat \
 	lstat64 \
@@ -532,6 +533,7 @@ DECODER_TESTS = \
 	link.test \
 	linkat.test \
 	llseek.test \
+	lookup_dcookie.test \
 	lseek.test \
 	lstat.test \
 	lstat64.test \

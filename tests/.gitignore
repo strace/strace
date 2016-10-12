@@ -129,6 +129,7 @@ libtests.a
 link
 linkat
 llseek
+lookup_dcookie
 lseek
 lstat
 lstat64
