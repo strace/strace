@@ -38,13 +38,6 @@
 # include "xlat.h"
 # include "xlat/advise.h"
 
-# if WORDS_BIGENDIAN
-#  define LL_PAIR(HI, LO) (HI), (LO)
-# else
-#  define LL_PAIR(HI, LO) (LO), (HI)
-# endif
-# define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))
-
 static void do_fadvise(long fd, long long offset, long long llen, long advice);
 
 int

@@ -179,4 +179,11 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 # define PRI__u64 PRI__64"u"
 # define PRI__x64 PRI__64"x"
 
+# if WORDS_BIGENDIAN
+#  define LL_PAIR(HI, LO) (HI), (LO)
+# else
+#  define LL_PAIR(HI, LO) (LO), (HI)
+# endif
+# define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))
+
 #endif /* !STRACE_TESTS_H */
