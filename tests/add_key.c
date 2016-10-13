@@ -65,9 +65,6 @@ do_add_key(const char *type, const char *type_str, const char *desc,
 	printf(") = %s\n", errstr);
 }
 
-# define _STR(_arg) #_arg
-# define ARG_STR(_arg) (_arg), #_arg
-
 int
 main(void)
 {

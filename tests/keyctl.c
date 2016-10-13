@@ -190,8 +190,6 @@ do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 	printf(") = %s\n", errstr);
 }
 
-# define ARG_STR(_arg) (_arg), #_arg
-
 int
 main(void)
 {

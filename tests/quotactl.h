@@ -69,8 +69,6 @@
 	printf("%s%s=%#llx", (prefix), #field,	\
 	       zero_extend_signed_to_ull((where)->field))
 
-# define ARG_STR(_arg) (_arg), #_arg
-
 typedef void (*print_cb)(long rc, void *addr, void *arg);
 
 enum check_quotactl_flag_bits {
