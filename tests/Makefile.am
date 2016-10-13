@@ -161,6 +161,8 @@ check_PROGRAMS = \
 	getuid32 \
 	getxxid \
 	inet-cmsg \
+	inotify \
+	inotify_init1 \
 	ioctl \
 	ioctl_block \
 	ioctl_evdev \
@@ -508,6 +510,8 @@ DECODER_TESTS = \
 	getuid32.test \
 	getxxid.test \
 	inet-cmsg.test \
+	inotify.test \
+	inotify_init1.test \
 	ioctl.test \
 	ioctl_block.test \
 	ioctl_evdev.test \

@@ -101,6 +101,8 @@ getuid
 getuid32
 getxxid
 inet-cmsg
+inotify
+inotify_init1
 ioctl
 ioctl_block
 ioctl_evdev
