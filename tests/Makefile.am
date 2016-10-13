@@ -181,6 +181,7 @@ check_PROGRAMS = \
 	ipc_msgbuf \
 	ipc_sem \
 	ipc_shm \
+	kcmp \
 	keyctl \
 	kill \
 	ksysent \
@@ -530,6 +531,7 @@ DECODER_TESTS = \
 	ipc_msgbuf.test \
 	ipc_sem.test \
 	ipc_shm.test \
+	kcmp.test \
 	keyctl.test \
 	kill.test \
 	lchown.test \

@@ -121,6 +121,7 @@ ipc_msg
 ipc_msgbuf
 ipc_sem
 ipc_shm
+kcmp
 keyctl
 kill
 ksysent

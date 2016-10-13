@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of kcmp syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a27
