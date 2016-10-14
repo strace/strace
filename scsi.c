@@ -114,8 +114,8 @@ print_sg_io_v3_res(struct tcb *tcp, const long arg)
 		if (sg_io.iovec_count)
 			tprint_iov_upto(tcp, sg_io.iovec_count,
 					(unsigned long) sg_io.dxferp,
-					IOV_DECODE_STR,
-					din_len);
+					syserror(tcp) ? IOV_DECODE_ADDR :
+					IOV_DECODE_STR, din_len);
 		else
 			print_sg_io_buffer(tcp, (unsigned long) sg_io.dxferp,
 					   din_len);
@@ -190,6 +190,7 @@ print_sg_io_v4_res(struct tcb *tcp, const long arg)
 	tprintf(", din[%u]=", din_len);
 	if (sg_io.din_iovec_count)
 		tprint_iov_upto(tcp, sg_io.din_iovec_count, sg_io.din_xferp,
+				syserror(tcp) ? IOV_DECODE_ADDR :
 				IOV_DECODE_STR, din_len);
 	else
 		print_sg_io_buffer(tcp, sg_io.din_xferp, din_len);

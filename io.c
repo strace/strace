@@ -119,7 +119,7 @@ tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr,
 		{ .decode_iov = decode_iov, .data_size = data_size };
 
 	print_array(tcp, addr, len, iov, current_wordsize * 2,
-		    umoven_or_printaddr, print_iovec, &config);
+		    umoven_or_printaddr_ignore_syserror, print_iovec, &config);
 }
 
 void
@@ -136,6 +136,7 @@ SYS_FUNC(readv)
 		tprints(", ");
 	} else {
 		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
+				syserror(tcp) ? IOV_DECODE_ADDR :
 				IOV_DECODE_STR, tcp->u_rval);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
@@ -226,8 +227,9 @@ do_preadv(struct tcb *tcp, const int flags_arg)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR,
-				tcp->u_rval);
+		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
+				syserror(tcp) ? IOV_DECODE_ADDR :
+				IOV_DECODE_STR, tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		print_lld_from_low_high_val(tcp, 3);
 		if (flags_arg >= 0) {
