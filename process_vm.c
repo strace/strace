@@ -34,35 +34,43 @@ SYS_FUNC(process_vm_readv)
 		/* arg 1: pid */
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
+		unsigned long local_iovcnt = widen_to_ulong(tcp->u_arg[2]);
+		unsigned long remote_iovcnt = widen_to_ulong(tcp->u_arg[4]);
+		unsigned long flags = widen_to_ulong(tcp->u_arg[5]);
+
 		/* arg 2: local iov */
-		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
+		tprint_iov_upto(tcp, local_iovcnt, tcp->u_arg[1],
 			   syserror(tcp) ? IOV_DECODE_ADDR : IOV_DECODE_STR,
 			   tcp->u_rval);
 		/* arg 3: local iovcnt */
-		tprintf(", %lu, ", tcp->u_arg[2]);
+		tprintf(", %lu, ", local_iovcnt);
 		/* arg 4: remote iov */
-		tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3],
+		tprint_iov(tcp, remote_iovcnt, tcp->u_arg[3],
 			   IOV_DECODE_ADDR);
 		/* arg 5: remote iovcnt */
 		/* arg 6: flags */
-		tprintf(", %lu, %lu", tcp->u_arg[4], tcp->u_arg[5]);
+		tprintf(", %lu, %lu", remote_iovcnt, flags);
 	}
 	return 0;
 }
 
 SYS_FUNC(process_vm_writev)
 {
+	unsigned long local_iovcnt = widen_to_ulong(tcp->u_arg[2]);
+	unsigned long remote_iovcnt = widen_to_ulong(tcp->u_arg[4]);
+	unsigned long flags = widen_to_ulong(tcp->u_arg[5]);
+
 	/* arg 1: pid */
 	tprintf("%d, ", (int) tcp->u_arg[0]);
 	/* arg 2: local iov */
-	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR);
+	tprint_iov(tcp, local_iovcnt, tcp->u_arg[1], IOV_DECODE_STR);
 	/* arg 3: local iovcnt */
-	tprintf(", %lu, ", tcp->u_arg[2]);
+	tprintf(", %lu, ", local_iovcnt);
 	/* arg 4: remote iov */
-	tprint_iov(tcp, tcp->u_arg[4], tcp->u_arg[3], IOV_DECODE_ADDR);
+	tprint_iov(tcp, remote_iovcnt, tcp->u_arg[3], IOV_DECODE_ADDR);
 	/* arg 5: remote iovcnt */
 	/* arg 6: flags */
-	tprintf(", %lu, %lu", tcp->u_arg[4], tcp->u_arg[5]);
+	tprintf(", %lu, %lu", remote_iovcnt, flags);
 
 	return RVAL_DECODED;
 }
