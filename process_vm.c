@@ -32,7 +32,7 @@ SYS_FUNC(process_vm_readv)
 {
 	if (entering(tcp)) {
 		/* arg 1: pid */
-		tprintf("%ld, ", tcp->u_arg[0]);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
 		/* arg 2: local iov */
 		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
@@ -53,7 +53,7 @@ SYS_FUNC(process_vm_readv)
 SYS_FUNC(process_vm_writev)
 {
 	/* arg 1: pid */
-	tprintf("%ld, ", tcp->u_arg[0]);
+	tprintf("%d, ", (int) tcp->u_arg[0]);
 	/* arg 2: local iov */
 	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR);
 	/* arg 3: local iovcnt */
