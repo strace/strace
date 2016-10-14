@@ -478,6 +478,9 @@ extern int umoven(struct tcb *, long, unsigned int, void *);
 extern int umoven_or_printaddr(struct tcb *, long, unsigned int, void *);
 #define umove_or_printaddr(pid, addr, objp)	\
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
+extern int
+umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
+				    const unsigned int len, void *our_addr);
 extern int umovestr(struct tcb *, long, unsigned int, char *);
 extern int upeek(int pid, long, long *);
 

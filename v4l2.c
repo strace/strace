@@ -676,17 +676,6 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 #include "xlat/v4l2_control_classes.h"
 
 static int
-umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
-				    const unsigned int len, void *our_addr)
-{
-	if (!addr || !verbose(tcp) || umoven(tcp, addr, len, our_addr) < 0) {
-		printaddr(addr);
-		return -1;
-	}
-	return 0;
-}
-
-static int
 print_v4l2_ext_controls(struct tcb *tcp, const long arg, const bool is_get)
 {
 	struct_v4l2_ext_controls c;

@@ -1156,6 +1156,17 @@ umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
 	return 0;
 }
 
+int
+umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
+				    const unsigned int len, void *our_addr)
+{
+	if (!addr || !verbose(tcp) || umoven(tcp, addr, len, our_addr) < 0) {
+		printaddr(addr);
+		return -1;
+	}
+	return 0;
+}
+
 /*
  * Like `umove' but make the additional effort of looking
  * for a terminating zero byte.
