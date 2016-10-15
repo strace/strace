@@ -251,6 +251,8 @@ check_PROGRAMS = \
 	preadv-pwritev \
 	preadv2-pwritev2 \
 	prlimit64 \
+	process_vm_readv \
+	process_vm_writev \
 	pselect6 \
 	ptrace \
 	pwritev \
@@ -596,6 +598,8 @@ DECODER_TESTS = \
 	preadv2-pwritev2.test \
 	preadv.test \
 	prlimit64.test \
+	process_vm_readv.test \
+	process_vm_writev.test \
 	pselect6.test \
 	ptrace.test \
 	pwritev.test \
@@ -785,6 +789,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     pipe.expected \
 	     ppoll.expected \
 	     ppoll-v.expected \
+	     process_vm_readv_writev.c \
 	     quotactl.h \
 	     setfsugid.c \
 	     setreugid.c \

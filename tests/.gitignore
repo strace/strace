@@ -193,6 +193,8 @@ preadv
 preadv-pwritev
 preadv2-pwritev2
 prlimit64
+process_vm_readv
+process_vm_writev
 pselect6
 ptrace
 pwritev

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of process_vm_readv syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -s5 -a37
