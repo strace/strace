@@ -134,6 +134,7 @@
 /* unimplemented */
 #define	sys_afs_syscall		printargs
 #define	sys_break		printargs
+#define	sys_create_module	printargs
 #define	sys_ftime		printargs
 #define	sys_get_kernel_syms	printargs
 #define	sys_getpmsg		printargs
