@@ -91,6 +91,7 @@ check_PROGRAMS = \
 	copy_file_range \
 	count-f \
 	creat \
+	delete_module \
 	dup \
 	dup2 \
 	dup3 \
@@ -121,6 +122,7 @@ check_PROGRAMS = \
 	file_handle \
 	file_ioctl \
 	filter-unavailable \
+	finit_module \
 	flock \
 	fork-f \
 	fstat \
@@ -161,6 +163,7 @@ check_PROGRAMS = \
 	getuid32 \
 	getxxid \
 	inet-cmsg \
+	init_module \
 	inotify \
 	inotify_init1 \
 	ioctl \
@@ -445,6 +448,7 @@ DECODER_TESTS = \
 	clock_xettime.test \
 	copy_file_range.test \
 	creat.test \
+	delete_module.test \
 	dup.test \
 	dup2.test \
 	dup3.test \
@@ -474,6 +478,7 @@ DECODER_TESTS = \
 	fdatasync.test \
 	file_handle.test \
 	file_ioctl.test \
+	finit_module.test \
 	flock.test \
 	fstat.test \
 	fstat64.test \
@@ -513,6 +518,7 @@ DECODER_TESTS = \
 	getuid32.test \
 	getxxid.test \
 	inet-cmsg.test \
+	init_module.test \
 	inotify.test \
 	inotify_init1.test \
 	ioctl.test \
@@ -779,6 +785,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     fstatat.c \
 	     fstatx.c \
 	     getresugid.c \
+	     init_delete_module.h \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
 	     ksysent.sed \

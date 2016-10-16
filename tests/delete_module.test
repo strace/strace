@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of delete_module syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a23
