@@ -51,9 +51,6 @@ SYS_FUNC(init_module)
 	return RVAL_DECODED;
 }
 
-#define MODULE_INIT_IGNORE_MODVERSIONS  1
-#define MODULE_INIT_IGNORE_VERMAGIC     2
-
 #include "xlat/module_init_flags.h"
 
 SYS_FUNC(finit_module)
