@@ -109,6 +109,7 @@ check_PROGRAMS = \
 	fadvise64 \
 	fadvise64_64 \
 	fallocate \
+	fanotify_init \
 	fanotify_mark \
 	fchdir \
 	fchmod \
@@ -466,6 +467,7 @@ DECODER_TESTS = \
 	fadvise64.test \
 	fadvise64_64.test \
 	fallocate.test \
+	fanotify_init.test \
 	fanotify_mark.test \
 	fchdir.test \
 	fchmod.test \

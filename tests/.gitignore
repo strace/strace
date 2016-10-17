@@ -49,6 +49,7 @@ faccessat
 fadvise64
 fadvise64_64
 fallocate
+fanotify_init
 fanotify_mark
 fchdir
 fchmod
