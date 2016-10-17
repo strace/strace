@@ -11,7 +11,7 @@ main(void)
 	int rc = fanotify_mark(-1, FAN_MARK_ADD, FAN_MODIFY | FAN_ONDIR,
 			       -100, ".");
 	printf("fanotify_mark(-1, FAN_MARK_ADD, FAN_MODIFY|FAN_ONDIR"
-	       ", AT_FDCWD, \".\") = %d %s (%m)\n", rc, errno2name());
+	       ", AT_FDCWD, \".\") = %s\n", sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
