@@ -3,4 +3,4 @@
 # Check decoding of fanotify_mark syscall.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff
+run_strace_match_diff -a32
