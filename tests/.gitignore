@@ -258,6 +258,7 @@ setgid32
 setgroups
 setgroups32
 sethostname
+setns
 setregid
 setregid32
 setresgid

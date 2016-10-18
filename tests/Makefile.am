@@ -316,6 +316,7 @@ check_PROGRAMS = \
 	setgroups \
 	setgroups32 \
 	sethostname \
+	setns \
 	setregid \
 	setregid32 \
 	setresgid \
@@ -665,6 +666,7 @@ DECODER_TESTS = \
 	setgroups.test \
 	setgroups32.test \
 	sethostname.test \
+	setns.test \
 	setregid.test \
 	setregid32.test \
 	setresgid.test \
