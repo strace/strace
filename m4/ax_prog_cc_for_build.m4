@@ -62,6 +62,7 @@ pushdef([CPP], CPP_FOR_BUILD)dnl
 pushdef([CFLAGS], CFLAGS_FOR_BUILD)dnl
 pushdef([CPPFLAGS], CPPFLAGS_FOR_BUILD)dnl
 pushdef([LDFLAGS], LDFLAGS_FOR_BUILD)dnl
+pushdef([WARN_CFLAGS], WARN_CFLAGS_FOR_BUILD)dnl
 pushdef([host], build)dnl
 pushdef([host_alias], build_alias)dnl
 pushdef([host_cpu], build_cpu)dnl
@@ -74,6 +75,7 @@ pushdef([ac_cv_host_vendor], ac_cv_build_vendor)dnl
 pushdef([ac_cv_host_os], ac_cv_build_os)dnl
 pushdef([am_cv_prog_cc_c_o], am_cv_build_prog_cc_c_o)dnl
 pushdef([am_cv_CC_dependencies_compiler_type], am_cv_build_CC_dependencies_compiler_type)dnl
+pushdef([gl_unknown_warnings_are_errors], gl_build_unknown_warnings_are_errors)dnl
 
 st_SAVE_VAR([ac_c_decl_warn_flag])
 st_SAVE_VAR([ac_c_preproc_warn_flag])
@@ -93,6 +95,8 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_EXEEXT
 
+st_WARN_CFLAGS
+
 st_RESTORE_VAR([cross_compiling])
 st_RESTORE_VAR([ac_tool_prefix])
 st_RESTORE_VAR([ac_link])
@@ -107,6 +111,7 @@ st_RESTORE_VAR([ac_c_decl_warn_flag])
 
 dnl Restore the old definitions
 dnl
+popdef([gl_unknown_warnings_are_errors])dnl
 popdef([am_cv_CC_dependencies_compiler_type])dnl
 popdef([am_cv_prog_cc_c_o])dnl
 popdef([ac_cv_host_os])dnl
@@ -119,6 +124,7 @@ popdef([host_vendor])dnl
 popdef([host_cpu])dnl
 popdef([host_alias])dnl
 popdef([host])dnl
+popdef([WARN_CFLAGS])dnl
 popdef([LDFLAGS])dnl
 popdef([CPPFLAGS])dnl
 popdef([CFLAGS])dnl
@@ -147,4 +153,5 @@ AC_SUBST(BUILD_OBJEXT)dnl
 AC_SUBST([CFLAGS_FOR_BUILD])dnl
 AC_SUBST([CPPFLAGS_FOR_BUILD])dnl
 AC_SUBST([LDFLAGS_FOR_BUILD])dnl
+AC_SUBST([WARN_CFLAGS_FOR_BUILD])dnl
 ])
