@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check capget/capset syscalls decoding.
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -a 19 -e trace=capget,capset -e verbose=\!capget,capset $args
+match_awk
+
+exit 0

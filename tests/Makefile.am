@@ -81,6 +81,7 @@ check_PROGRAMS = \
 	brk \
 	btrfs \
 	caps \
+	caps-abbrev \
 	chmod \
 	chown \
 	chown32 \
@@ -440,6 +441,7 @@ DECODER_TESTS = \
 	btrfs-w.test \
 	btrfs-vw.test \
 	caps.test \
+	caps-abbrev.test \
 	chmod.test \
 	chown.test \
 	chown32.test \
@@ -780,6 +782,7 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) MIPS_ABI=$(MIPS_ABI) $(srcdir)/run.sh
 
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
+	     caps-abbrev.awk \
 	     count-f.expected \
 	     eventfd.expected \
 	     fadvise.h \

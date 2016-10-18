@@ -21,6 +21,7 @@ bpf
 brk
 btrfs
 caps
+caps-abbrev
 chmod
 chown
 chown32
