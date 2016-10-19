@@ -40,6 +40,7 @@
 #  error PRINT_SYSCALL_FOOTER must be defined
 # endif
 
+# include <errno.h>
 # include <stdio.h>
 # include <stddef.h>
 # include <time.h>
@@ -236,7 +237,7 @@ main(void)
 		return rc;
 	}
 
-	if (TEST_SYSCALL_INVOKE(sample, st)) {
+	if ((rc = TEST_SYSCALL_INVOKE(sample, st))) {
 		perror(TEST_SYSCALL_STR);
 		(void) unlink(sample);
 		return 77;
@@ -297,7 +298,7 @@ main(void)
 
 	PRINT_SYSCALL_HEADER(sample);
 	print_stat(st);
-	PRINT_SYSCALL_FOOTER;
+	PRINT_SYSCALL_FOOTER(rc);
 
 	puts("+++ exited with 0 +++");
 	return 0;

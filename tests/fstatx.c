@@ -28,9 +28,13 @@
 #define TEST_SYSCALL_INVOKE(sample, pst) \
 	syscall(TEST_SYSCALL_NR, 0, pst)
 #define PRINT_SYSCALL_HEADER(sample) \
-	printf("%s(0, ", TEST_SYSCALL_STR)
-#define PRINT_SYSCALL_FOOTER \
-	puts(") = 0")
+	do { \
+		int saved_errno = errno; \
+		printf("%s(0, ", TEST_SYSCALL_STR)
+#define PRINT_SYSCALL_FOOTER(rc) \
+		errno = saved_errno; \
+		printf(") = %s\n", sprintrc(rc)); \
+	} while (0)
 
 #define USE_ASM_STAT
 
