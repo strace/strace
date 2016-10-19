@@ -25,6 +25,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define IS_FSTAT 1
 #define TEST_SYSCALL_INVOKE(sample, pst) \
 	syscall(TEST_SYSCALL_NR, 0, pst)
 #define PRINT_SYSCALL_HEADER(sample) \

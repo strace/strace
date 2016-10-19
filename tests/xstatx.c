@@ -133,6 +133,14 @@ typedef off_t libc_off_t;
 #  endif /* HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC */
 # endif
 
+# ifndef TEST_BOGUS_STRUCT_STAT
+#  define TEST_BOGUS_STRUCT_STAT 1
+# endif
+
+# ifndef IS_FSTAT
+#  define IS_STAT 0
+# endif
+
 static void
 print_ftype(const unsigned int mode)
 {
@@ -228,14 +236,37 @@ create_sample(const char *fname, const libc_off_t size)
 int
 main(void)
 {
+# if !IS_FSTAT
+	static const char full[] = "/dev/full";
+# endif
 	static const char sample[] = TEST_SYSCALL_STR ".sample";
 	STRUCT_STAT st[2];
 
-	int rc = create_sample(sample, SAMPLE_SIZE);
+	int rc;
+
+	rc = create_sample(sample, SAMPLE_SIZE);
 	if (rc) {
 		(void) unlink(sample);
 		return rc;
 	}
+
+# if TEST_BOGUS_STRUCT_STAT
+	STRUCT_STAT *st_cut = tail_alloc(sizeof(long) * 4);
+	rc = TEST_SYSCALL_INVOKE(sample, st_cut);
+	PRINT_SYSCALL_HEADER(sample);
+	printf("%p", st_cut);
+	PRINT_SYSCALL_FOOTER(rc);
+# endif
+
+# if !IS_FSTAT
+	rc = TEST_SYSCALL_INVOKE(full, st);
+	PRINT_SYSCALL_HEADER(full);
+	if (rc)
+		printf("%p", st);
+	else
+		print_stat(st);
+	PRINT_SYSCALL_FOOTER(rc);
+# endif
 
 	if ((rc = TEST_SYSCALL_INVOKE(sample, st))) {
 		perror(TEST_SYSCALL_STR);

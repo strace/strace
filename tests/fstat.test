@@ -12,7 +12,7 @@ syscall=$NAME
 run_prog > /dev/null
 sample=$syscall.sample
 > "$sample"
-run_strace -ve$syscall -P$sample $args > "$OUT"
+run_strace -ve$syscall -P$sample -a21 $args > "$OUT"
 match_diff "$LOG" "$OUT"
 rm -f "$OUT"
 
