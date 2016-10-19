@@ -374,6 +374,7 @@ check_PROGRAMS = \
 	unix-pair-sendto-recvfrom \
 	unlink \
 	unlinkat \
+	unshare \
 	userfaultfd \
 	utime \
 	utimensat \
@@ -722,6 +723,7 @@ DECODER_TESTS = \
 	unix-pair-sendto-recvfrom.test \
 	unlink.test \
 	unlinkat.test \
+	unshare.test \
 	userfaultfd.test \
 	utime.test \
 	utimensat.test \

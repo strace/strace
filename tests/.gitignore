@@ -316,6 +316,7 @@ unix-pair-send-recv
 unix-pair-sendto-recvfrom
 unlink
 unlinkat
+unshare
 userfaultfd
 utime
 utimensat
