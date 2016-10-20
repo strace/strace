@@ -53,11 +53,11 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		seg = elem_buf;
 	}
 
-	tprints("{");
+	tprints("{buf=");
 	printaddr(seg[0]);
-	tprintf(", %lu, ", seg[1]);
+	tprintf(", bufsz=%lu, mem=", seg[1]);
 	printaddr(seg[2]);
-	tprintf(", %lu}", seg[3]);
+	tprintf(", memsz=%lu}", seg[3]);
 
 	return true;
 }
