@@ -128,7 +128,8 @@ print_arg(kernel_ulong_t arg, const char *str, const char *fmt, size_t size,
 		else if (size == sizeof(uint32_t))
 			printf(fmt, (uint32_t)arg);
 		else
-			print_quoted_string_limit((void *)arg, size, rc);
+			print_quoted_string_limit((void *) (uintptr_t) arg,
+						  size, rc);
 	}
 }
 
