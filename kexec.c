@@ -91,7 +91,7 @@ SYS_FUNC(kexec_load)
 	/* flags */
 	unsigned long n = tcp->u_arg[3];
 	printxval_long(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
-	n &= ~KEXEC_ARCH_MASK;
+	n &= ~(unsigned long) KEXEC_ARCH_MASK;
 	if (n) {
 		tprints("|");
 		printflags_long(kexec_load_flags, n, "KEXEC_???");
