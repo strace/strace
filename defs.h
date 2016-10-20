@@ -759,6 +759,14 @@ extern unsigned current_wordsize;
 # define widen_to_long(v) ((long)(v))
 #endif
 
+#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+# define widen_to_ulong(v) \
+	(current_wordsize == 4 ? (unsigned long) (uint32_t) (v) : \
+		(unsigned long) (v))
+#else
+# define widen_to_ulong(v) ((unsigned long)(v))
+#endif
+
 /*
  * Zero-extend a signed integer type to unsigned long long.
  */
