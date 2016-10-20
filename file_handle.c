@@ -27,6 +27,8 @@
 
 #include "defs.h"
 
+#include "xlat/name_to_handle_at_flags.h"
+
 #ifndef MAX_HANDLE_SZ
 # define MAX_HANDLE_SZ 128
 #endif
@@ -58,7 +60,8 @@ SYS_FUNC(name_to_handle_at)
 			tprints(", ");
 
 			/* flags */
-			printflags(at_flags, tcp->u_arg[4], "AT_???");
+			printflags(name_to_handle_at_flags, tcp->u_arg[4],
+				   "AT_???");
 
 			return RVAL_DECODED;
 		}
@@ -95,7 +98,7 @@ SYS_FUNC(name_to_handle_at)
 		tprints(", ");
 
 		/* flags */
-		printflags(at_flags, tcp->u_arg[4], "AT_???");
+		printflags(name_to_handle_at_flags, tcp->u_arg[4], "AT_???");
 	}
 	return 0;
 }
