@@ -81,15 +81,16 @@ print_kexec_segments(struct tcb *tcp, const unsigned long addr,
 SYS_FUNC(kexec_load)
 {
 	/* entry, nr_segments */
-	printaddr(tcp->u_arg[0]);
-	tprintf(", %lu, ", tcp->u_arg[1]);
+	printaddr(widen_to_ulong(tcp->u_arg[0]));
+	tprintf(", %lu, ", widen_to_ulong(tcp->u_arg[1]));
 
 	/* segments */
-	print_kexec_segments(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+	print_kexec_segments(tcp, widen_to_ulong(tcp->u_arg[2]),
+			     widen_to_ulong(tcp->u_arg[1]));
 	tprints(", ");
 
 	/* flags */
-	unsigned long n = tcp->u_arg[3];
+	unsigned long n = widen_to_ulong(tcp->u_arg[3]);
 	printxval_long(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
 	n &= ~(unsigned long) KEXEC_ARCH_MASK;
 	if (n) {
