@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of kexec_load syscall.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -s9

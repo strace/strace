@@ -127,6 +127,8 @@ ipc_msgbuf
 ipc_sem
 ipc_shm
 kcmp
+kexec_file_load
+kexec_load
 keyctl
 kill
 ksysent

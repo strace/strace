@@ -187,6 +187,8 @@ check_PROGRAMS = \
 	ipc_sem \
 	ipc_shm \
 	kcmp \
+	kexec_file_load \
+	kexec_load \
 	keyctl \
 	kill \
 	ksysent \
@@ -546,6 +548,8 @@ DECODER_TESTS = \
 	ipc_sem.test \
 	ipc_shm.test \
 	kcmp.test \
+	kexec_file_load.test \
+	kexec_load.test \
 	keyctl.test \
 	kill.test \
 	lchown.test \
