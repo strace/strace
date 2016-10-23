@@ -26,14 +26,29 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
+#include <asm/unistd.h>
 
-#ifdef MAX_HANDLE_SZ
+#if defined __NR_name_to_handle_at && defined __NR_open_by_handle_at
 
 # include <alloca.h>
 # include <assert.h>
 # include <errno.h>
+# include <fcntl.h>
 # include <stdio.h>
+# include <unistd.h>
+
+
+# ifndef MAX_HANDLE_SZ
+
+#  define MAX_HANDLE_SZ 128
+
+struct file_handle {
+	unsigned int handle_bytes;
+	int handle_type;
+	unsigned char f_handle[0];
+};
+# endif /* !MAX_HANDLE_SZ */
+
 
 int
 main(void)
@@ -47,20 +62,23 @@ main(void)
 
 	handle->handle_bytes = 0;
 
-	assert(name_to_handle_at(dirfd, ".", handle, &mount_id, flags | 1) == -1);
+	assert(syscall(__NR_name_to_handle_at, dirfd, ".", handle, &mount_id,
+		flags | 1) == -1);
 	if (EINVAL != errno)
 		perror_msg_and_skip("name_to_handle_at");
 	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=0}, %p"
 	       ", AT_SYMLINK_FOLLOW|0x1) = -1 EINVAL (%m)\n", &mount_id);
 
-	assert(name_to_handle_at(dirfd, ".", handle, &mount_id, flags) == -1);
+	assert(syscall(__NR_name_to_handle_at, dirfd, ".", handle, &mount_id,
+		flags) == -1);
 	if (EOVERFLOW != errno)
 		perror_msg_and_skip("name_to_handle_at");
 	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=0 => %u}"
 	       ", %p, AT_SYMLINK_FOLLOW) = -1 EOVERFLOW (%m)\n",
 	       handle->handle_bytes, &mount_id);
 
-	assert(name_to_handle_at(dirfd, ".", handle, &mount_id, flags) == 0);
+	assert(syscall(__NR_name_to_handle_at, dirfd, ".", handle, &mount_id,
+		flags) == 0);
 	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=%u"
 	       ", handle_type=%d, f_handle=0x",
 	       handle->handle_bytes, handle->handle_type);
@@ -72,7 +90,8 @@ main(void)
 	       ", f_handle=0x", handle->handle_bytes, handle->handle_type);
 	for (i = 0; i < handle->handle_bytes; ++i)
 		printf("%02x", handle->f_handle[i]);
-	int rc = open_by_handle_at(-1, handle, O_RDONLY | O_DIRECTORY);
+	int rc = syscall(__NR_open_by_handle_at, -1, handle,
+		O_RDONLY | O_DIRECTORY);
 	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
 
 	puts("+++ exited with 0 +++");
@@ -81,6 +100,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("MAX_HANDLE_SZ")
+SKIP_MAIN_UNDEFINED("__NR_name_to_handle_at && __NR_open_by_handle_at")
 
 #endif
