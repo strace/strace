@@ -183,7 +183,10 @@ netlink_unix_diag
 newfstatat
 nsyscalls
 old_mmap
+oldfstat
+oldlstat
 oldselect
+oldstat
 open
 openat
 pause

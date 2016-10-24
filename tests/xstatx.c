@@ -141,6 +141,10 @@ typedef off_t libc_off_t;
 #  define IS_STAT 0
 # endif
 
+# ifndef OLD_STAT
+#  define OLD_STAT 0
+# endif
+
 static void
 print_ftype(const unsigned int mode)
 {
@@ -176,8 +180,12 @@ print_stat(const STRUCT_STAT *st)
 	printf(", st_nlink=%llu", zero_extend_signed_to_ull(st->st_nlink));
 	printf(", st_uid=%llu", zero_extend_signed_to_ull(st->st_uid));
 	printf(", st_gid=%llu", zero_extend_signed_to_ull(st->st_gid));
+# if OLD_STAT
+	printf(", st_blksize=0, st_blocks=0");
+# else /* !OLD_STAT */
 	printf(", st_blksize=%llu", zero_extend_signed_to_ull(st->st_blksize));
 	printf(", st_blocks=%llu", zero_extend_signed_to_ull(st->st_blocks));
+# endif /* OLD_STAT */
 
 	switch (st->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
@@ -191,19 +199,19 @@ print_stat(const STRUCT_STAT *st)
 
 	printf(", st_atime=");
 	print_time(sign_extend_unsigned_to_ll(st->st_atime));
-# ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+# if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
 	if (st->st_atime_nsec)
 		printf(".%09llu", zero_extend_signed_to_ull(st->st_atime_nsec));
 # endif
 	printf(", st_mtime=");
 	print_time(sign_extend_unsigned_to_ll(st->st_mtime));
-# ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+# if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
 	if (st->st_mtime_nsec)
 		printf(".%09llu", zero_extend_signed_to_ull(st->st_mtime_nsec));
 # endif
 	printf(", st_ctime=");
 	print_time(sign_extend_unsigned_to_ll(st->st_ctime));
-# ifdef HAVE_STRUCT_STAT_ST_MTIME_NSEC
+# if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
 	if (st->st_ctime_nsec)
 		printf(".%09llu", zero_extend_signed_to_ull(st->st_ctime_nsec));
 # endif
@@ -269,12 +277,17 @@ main(void)
 # endif
 
 	if ((rc = TEST_SYSCALL_INVOKE(sample, st))) {
-		perror(TEST_SYSCALL_STR);
-		(void) unlink(sample);
-		return 77;
+# if OLD_STAT
+		if (errno != EOVERFLOW)
+# endif
+		{
+			perror(TEST_SYSCALL_STR);
+			(void) unlink(sample);
+			return 77;
+		}
 	}
 	(void) unlink(sample);
-	if (zero_extend_signed_to_ull(SAMPLE_SIZE) !=
+	if (!rc && zero_extend_signed_to_ull(SAMPLE_SIZE) !=
 	    zero_extend_signed_to_ull(st[0].st_size)) {
 		fprintf(stderr, "Size mismatch: "
 				"requested size(%llu) != st_size(%llu)\n",
@@ -316,6 +329,7 @@ main(void)
 				", sizeof(st_size) = %zu\n",
 			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_size),
 			sizeof(st[0].st_size));
+# if !OLD_STAT
 		fprintf(stderr, "offsetof(%s, st_blksize) = %zu"
 				", sizeof(st_blksize) = %zu\n",
 			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_blksize),
@@ -324,11 +338,15 @@ main(void)
 				", sizeof(st_blocks) = %zu\n",
 			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_blocks),
 			sizeof(st[0].st_blocks));
+# endif /* !OLD_STAT */
 		return 77;
 	}
 
 	PRINT_SYSCALL_HEADER(sample);
-	print_stat(st);
+	if (rc)
+		printf("%p", st);
+	else
+		print_stat(st);
 	PRINT_SYSCALL_FOOTER(rc);
 
 	puts("+++ exited with 0 +++");

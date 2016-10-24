@@ -241,7 +241,10 @@ check_PROGRAMS = \
 	newfstatat \
 	nsyscalls \
 	old_mmap \
+	oldfstat \
+	oldlstat \
 	oldselect \
+	oldstat \
 	open \
 	openat \
 	pause \
@@ -598,7 +601,10 @@ DECODER_TESTS = \
 	newfstatat.test \
 	nsyscalls.test \
 	old_mmap.test \
+	oldfstat.test \
+	oldlstat.test \
 	oldselect.test \
+	oldstat.test \
 	open.test \
 	openat.test \
 	pause.test \
