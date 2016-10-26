@@ -56,9 +56,9 @@ SYS_FUNC(mq_timedsend)
 
 SYS_FUNC(mq_timedreceive)
 {
-	if (entering(tcp))
+	if (entering(tcp)) {
 		tprintf("%ld, ", tcp->u_arg[0]);
-	else {
+	} else {
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
 		/*
@@ -86,7 +86,8 @@ SYS_FUNC(mq_getsetattr)
 		tprintf("%ld, ", tcp->u_arg[0]);
 		printmqattr(tcp, tcp->u_arg[1]);
 		tprints(", ");
-	} else
+	} else {
 		printmqattr(tcp, tcp->u_arg[2]);
+	}
 	return 0;
 }
