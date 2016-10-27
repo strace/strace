@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-tag="${1:-master}"
+id="$(git rev-parse --verify "${1:-@}^{commit}")"
 
 j=-j`getconf _NPROCESSORS_ONLN 2> /dev/null` || j=
 
@@ -12,7 +12,7 @@ set -x
 git clone -q -n -s .git "$distdir"
 
 cd $distdir
-git checkout -f "$tag"
+git checkout -f "$id"
 
 ./git-set-file-times
 
