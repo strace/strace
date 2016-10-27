@@ -222,6 +222,9 @@ check_PROGRAMS = \
 	mount \
 	move_pages \
 	mq \
+	mq_sendrecv \
+	mq_sendrecv-read \
+	mq_sendrecv-write \
 	msg_control \
 	msg_control-v \
 	msg_name \
@@ -412,6 +415,9 @@ ftruncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 lstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt $(LDADD)
+mq_sendrecv_LDADD = -lrt $(LDADD)
+mq_sendrecv_read_LDADD = -lrt $(LDADD)
+mq_sendrecv_write_LDADD = -lrt $(LDADD)
 newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS) $(LDADD)
 pread64_pwrite64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -587,6 +593,9 @@ DECODER_TESTS = \
 	mount.test \
 	move_pages.test \
 	mq.test \
+	mq_sendrecv.test \
+	mq_sendrecv-read.test \
+	mq_sendrecv-write.test \
 	msg_control.test \
 	msg_control-v.test \
 	msg_name.test \

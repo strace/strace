@@ -164,6 +164,9 @@ mmsg_name-v
 mount
 move_pages
 mq
+mq_sendrecv
+mq_sendrecv-read
+mq_sendrecv-write
 msg_control
 msg_control-v
 msg_name

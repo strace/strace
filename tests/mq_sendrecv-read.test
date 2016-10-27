@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of mq_open, mq_notify, mq_timedsend, mq_timedreceive syscalls.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink -eread=0 -a14
