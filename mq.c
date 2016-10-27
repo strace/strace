@@ -60,7 +60,10 @@ SYS_FUNC(mq_timedreceive)
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
-		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+		if (!syserror(tcp) && (tcp->u_rval >= 0))
+			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+		else
+			printaddr(tcp->u_arg[1]);
 		tprintf(", %llu, %ld, ", getarg_ull(tcp, 2), tcp->u_arg[3]);
 		/*
 		 * Since the timeout parameter is read by the kernel
