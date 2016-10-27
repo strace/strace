@@ -40,7 +40,7 @@ SYS_FUNC(mq_open)
 		tprints(", ");
 		print_numeric_umode_t(tcp->u_arg[2]);
 		tprints(", ");
-		printmqattr(tcp, tcp->u_arg[3]);
+		printmqattr(tcp, tcp->u_arg[3], false);
 	}
 	return RVAL_DECODED;
 }
@@ -84,10 +84,10 @@ SYS_FUNC(mq_getsetattr)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
-		printmqattr(tcp, tcp->u_arg[1]);
+		printmqattr(tcp, tcp->u_arg[1], true);
 		tprints(", ");
 	} else {
-		printmqattr(tcp, tcp->u_arg[2]);
+		printmqattr(tcp, tcp->u_arg[2], true);
 	}
 	return 0;
 }

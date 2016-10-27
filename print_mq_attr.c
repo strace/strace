@@ -39,19 +39,28 @@ typedef struct mq_attr mq_attr_t;
 typedef struct mq_attr mq_attr_t;
 #endif
 
+#include "xlat/mq_attr_flags.h"
+
 #include MPERS_DEFS
 
-MPERS_PRINTER_DECL(void, printmqattr, struct tcb *tcp, const long addr)
+MPERS_PRINTER_DECL(void, printmqattr, struct tcb *tcp, const long addr,
+		   bool decode_flags)
 {
 #if defined HAVE_MQUEUE_H || defined HAVE_LINUX_MQUEUE_H
 	mq_attr_t attr;
 	if (umove_or_printaddr(tcp, addr, &attr))
 		return;
 	tprints("{mq_flags=");
-	tprint_open_modes(attr.mq_flags);
-	tprintf(", mq_maxmsg=%ld, mq_msgsize=%ld, mq_curmsgs=%ld}",
-		(long) attr.mq_maxmsg, (long) attr.mq_msgsize,
-		(long) attr.mq_curmsgs);
+	if (decode_flags)
+		printflags64(mq_attr_flags,
+			     zero_extend_signed_to_ull(attr.mq_flags),
+			     "/* O_??? */");
+	else
+		tprintf("%#llx", zero_extend_signed_to_ull(attr.mq_flags));
+	tprintf(", mq_maxmsg=%lld, mq_msgsize=%lld, mq_curmsgs=%lld}",
+		sign_extend_unsigned_to_ll(attr.mq_maxmsg),
+		sign_extend_unsigned_to_ll(attr.mq_msgsize),
+		sign_extend_unsigned_to_ll(attr.mq_curmsgs));
 #else
 	printaddr(addr);
 #endif
