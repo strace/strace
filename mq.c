@@ -49,7 +49,8 @@ SYS_FUNC(mq_timedsend)
 {
 	tprintf("%d, ", (int) tcp->u_arg[0]);
 	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %llu, %ld, ", getarg_ull(tcp, 2), tcp->u_arg[3]);
+	tprintf(", %llu, %u, ", getarg_ull(tcp, 2),
+		(unsigned int) tcp->u_arg[3]);
 	print_timespec(tcp, tcp->u_arg[4]);
 	return RVAL_DECODED;
 }
