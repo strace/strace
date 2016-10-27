@@ -64,7 +64,9 @@ SYS_FUNC(mq_timedreceive)
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		else
 			printaddr(tcp->u_arg[1]);
-		tprintf(", %llu, %ld, ", getarg_ull(tcp, 2), tcp->u_arg[3]);
+		tprintf(", %llu, ", getarg_ull(tcp, 2));
+		printnum_int(tcp, tcp->u_arg[3], "%u");
+		tprintf(", ");
 		/*
 		 * Since the timeout parameter is read by the kernel
 		 * on entering syscall, it has to be decoded the same way
