@@ -49,7 +49,7 @@ SYS_FUNC(mq_timedsend)
 {
 	tprintf("%d, ", (int) tcp->u_arg[0]);
 	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
+	tprintf(", %llu, %ld, ", getarg_ull(tcp, 2), tcp->u_arg[3]);
 	print_timespec(tcp, tcp->u_arg[4]);
 	return RVAL_DECODED;
 }
@@ -60,7 +60,7 @@ SYS_FUNC(mq_timedreceive)
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
 		printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %lu, %ld, ", tcp->u_arg[2], tcp->u_arg[3]);
+		tprintf(", %llu, %ld, ", getarg_ull(tcp, 2), tcp->u_arg[3]);
 		/*
 		 * Since the timeout parameter is read by the kernel
 		 * on entering syscall, it has to be decoded the same way
