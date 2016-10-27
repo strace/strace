@@ -43,7 +43,7 @@ SYS_FUNC(lookup_dcookie)
 		printstr(tcp, tcp->u_arg[argn], tcp->u_rval);
 
 	/* len */
-	tprintf(", %lu", tcp->u_arg[argn + 1]);
+	tprintf(", %llu", getarg_ull(tcp, argn + 1));
 
 	return 0;
 }
