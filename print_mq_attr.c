@@ -49,7 +49,7 @@ MPERS_PRINTER_DECL(void, printmqattr, struct tcb *tcp, const long addr)
 		return;
 	tprints("{mq_flags=");
 	tprint_open_modes(attr.mq_flags);
-	tprintf(", mq_maxmsg=%ld, mq_msgsize=%ld, mq_curmsg=%ld}",
+	tprintf(", mq_maxmsg=%ld, mq_msgsize=%ld, mq_curmsgs=%ld}",
 		(long) attr.mq_maxmsg, (long) attr.mq_msgsize,
 		(long) attr.mq_curmsgs);
 #else
