@@ -36,6 +36,10 @@
 
 #include <fcntl.h>
 
+/* some libcs are guilty of messing up with O_ACCMODE */
+#undef O_ACCMODE
+#define O_ACCMODE 03
+
 #ifdef O_LARGEFILE
 # if O_LARGEFILE == 0          /* biarch platforms in 64-bit mode */
 #  undef O_LARGEFILE
