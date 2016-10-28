@@ -406,12 +406,12 @@ printflags64(const struct xlat *xlat, uint64_t flags, const char *dflt)
 }
 
 void
-printaddr(const long addr)
+printaddr_ull(const unsigned long long addr)
 {
 	if (!addr)
 		tprints("NULL");
 	else
-		tprintf("%#lx", addr);
+		tprintf("%#llx", addr);
 }
 
 #define DEF_PRINTNUM(name, type) \

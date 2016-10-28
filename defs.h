@@ -542,7 +542,7 @@ extern int getllval(struct tcb *, unsigned long long *, int);
 extern int printllval(struct tcb *, const char *, int)
 	ATTRIBUTE_FORMAT((printf, 2, 0));
 
-extern void printaddr(long);
+extern void printaddr_ull(unsigned long long);
 extern void printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 extern long long getarg_ll(struct tcb *tcp, int argn);
@@ -670,6 +670,12 @@ extern void unwind_cache_invalidate(struct tcb* tcp);
 extern void unwind_print_stacktrace(struct tcb* tcp);
 extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
+
+static inline void
+printaddr(unsigned long addr)
+{
+	printaddr_ull(addr);
+}
 
 static inline void
 printstr(struct tcb *tcp, long addr, long len)
