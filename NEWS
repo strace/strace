@@ -1,6 +1,8 @@
 Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
+  * Implemented decoding of DM_* ioctl commands.
+  * Implemented decoding of attr parameter of perf_event_open syscall.
   * Implemented dumping of mq_timedsend and mq_timedreceive syscalls.
 
 * Bug fixes
