@@ -229,6 +229,24 @@ printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 }
 
 /*
+ * Print entry in sorted struct xlat table, if it is there.
+ */
+void
+printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+	const char *dflt)
+{
+	const char *s = xlat_search(xlat, xlat_size, val);
+
+	if (s) {
+		tprints(s);
+	} else {
+		tprintf("%#" PRIx64, val);
+		if (dflt)
+			tprintf(" /* %s */", dflt);
+	}
+}
+
+/*
  * Fetch 64bit argument at position arg_no and
  * return the index of the next argument.
  */

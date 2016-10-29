@@ -545,6 +545,10 @@ extern int printllval(struct tcb *, const char *, int)
 extern void printaddr_ull(unsigned long long);
 extern void printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
+extern void printxval_searchn(const struct xlat *xlat, size_t xlat_size,
+	uint64_t val, const char *dflt);
+#define printxval_search(xlat__, val__, dflt__) \
+	printxval_searchn(xlat__, ARRAY_SIZE(xlat__), val__, dflt__)
 extern long long getarg_ll(struct tcb *tcp, int argn);
 extern unsigned long long getarg_ull(struct tcb *tcp, int argn);
 extern int printargs(struct tcb *);
