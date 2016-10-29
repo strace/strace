@@ -1,5 +1,16 @@
 Noteworthy changes in release ?.?? (????-??-??)
 
+* Improvements
+  * Implemented dumping of mq_timedsend and mq_timedreceive syscalls.
+
+* Bug fixes
+  * Fixed decoding of lookup_dcookie, inotify_init1, kcmp, process_vm_readv,
+    process_vm_writev, init_module, setns, unshare, kexec_load,
+    name_to_handle_at, mq_timedsend, mq_timedreceive, mq_notify, mq_getsetattr,
+    mq_open syscalls.
+  * Fixed handling of verbose flag in printing of controls array of
+    struct v4l2_ext_controls.
+
 Noteworthy changes in release 4.14 (2016-10-04)
 ===============================================
 
