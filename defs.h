@@ -73,7 +73,7 @@ extern char *stpcpy(char *dst, const char *src);
 	(offsetof(type, member) + sizeof(((type *)NULL)->member))
 #endif
 
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]) + MUST_BE_ARRAY(a))
 
 /* macros */
 #ifndef MAX
