@@ -39,12 +39,12 @@
 int
 main(void)
 {
-	static const unsigned *bogus_cpu =
-		(unsigned *) (unsigned long) 0xfffffeedfffffaceULL;
-	static const unsigned *bogus_node =
-		(unsigned *) (unsigned long) 0xfffffca7ffffc0deULL;
-	static const unsigned *bogus_tcache =
-		(unsigned *) (unsigned long) 0xffffda7affffdeadULL;
+	unsigned *bogus_cpu =
+		(unsigned *) tail_alloc(sizeof(* bogus_cpu)) + 1;
+	unsigned *bogus_node =
+		(unsigned *) tail_alloc(sizeof(* bogus_node)) + 1;
+	unsigned *bogus_tcache =
+		(unsigned *) tail_alloc(sizeof(* bogus_tcache)) + 1;
 
 	long res;
 	unsigned *cpu = tail_alloc(sizeof(*cpu));
