@@ -157,7 +157,7 @@ check_quota(uint32_t flags, int cmd, const char *cmd_str,
 static const int bogus_cmd = 0xbadc0ded;
 static const int bogus_id = 0xca7faced;
 
-/* It is invalid anyway due to the flash in the end */
+/* It is invalid anyway due to the slash in the end */
 static const char *bogus_dev = "/dev/bogus/";
 static const char *bogus_dev_str = "\"/dev/bogus/\"";
 
