@@ -86,7 +86,7 @@ main(void)
 		const char *str;
 	} types[] = {
 		{ ARG_STR(NULL) },
-		{ (const char *) 0xfffffee1fffffbadULL, NULL },
+		{ bogus_type + sizeof(unterminated1), NULL },
 		{ bogus_type, NULL },
 		{ ARG_STR("\20\21\22\23\24") },
 		{ ARG_STR("user") },
@@ -97,7 +97,7 @@ main(void)
 		const char *str;
 	} descs[] = {
 		{ ARG_STR(NULL) },
-		{ (const char *) 0xfffff00dfffffca7ULL, NULL },
+		{ bogus_desc + sizeof(unterminated2), NULL },
 		{ bogus_desc, NULL },
 		{ ARG_STR("\25\26\27\30\31") },
 		{ ARG_STR("desc") },
@@ -109,7 +109,7 @@ main(void)
 		const char *str;
 	} infos[] = {
 		{ ARG_STR(NULL) },
-		{ (const char *) 0xfffffacefffff157ULL, NULL },
+		{ bogus_info + sizeof(unterminated3), NULL },
 		{ bogus_info, NULL },
 		{ ARG_STR("\32\33\34\35\36") },
 		{ ARG_STR("info") },
