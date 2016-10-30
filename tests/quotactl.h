@@ -155,11 +155,7 @@ check_quota(uint32_t flags, int cmd, const char *cmd_str,
 
 
 static const int bogus_cmd = 0xbadc0ded;
-static const char * const bogus_special =
-	(const char *) (unsigned long) 0xfffffca7ffffc0deULL;
 static const int bogus_id = 0xca7faced;
-static void * const bogus_addr =
-	(void *) (unsigned long) 0xffffda7affffdeadULL;
 
 /* It is invalid anyway due to the flash in the end */
 static const char *bogus_dev = "/dev/bogus/";

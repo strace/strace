@@ -199,6 +199,9 @@ print_xquota_statv(int rc, void *ptr, void *arg)
 int
 main(void)
 {
+	char *bogus_special = (char *) tail_alloc(1) + 1;
+	void *bogus_addr = (char *) tail_alloc(1) + 1;
+
 	char bogus_special_str[sizeof(void *) * 2 + sizeof("0x")];
 	char bogus_addr_str[sizeof(void *) * 2 + sizeof("0x")];
 	char unterminated_str[sizeof(void *) * 2 + sizeof("0x")];
