@@ -53,7 +53,7 @@ main (void)
 {
 	struct timespec ts;
 	volatile int dummy = 0;
-	int i;
+	int i = 0;
 
 	pid_t pid = fork();
 	if (pid < 0)
@@ -66,6 +66,9 @@ main (void)
 	while (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
 		if (ts.tv_sec || ts.tv_nsec >= cputime_limit)
 			break;
+
+		if (i && !(ts.tv_sec || ts.tv_nsec))
+			error_msg_and_skip("clock_gettime(CLOCK_PROCESS_CPUTIME_ID, {0, 0})");
 
 		for (i = 0; i < NUM_USER_ITERS; ++i)
 			++dummy;
