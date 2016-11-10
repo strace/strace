@@ -80,6 +80,12 @@
 # define ATTRIBUTE_SENTINEL	/* empty */
 #endif
 
+#if GNUC_PREREQ(4, 1)
+# define ALIGNOF(t_)	__alignof__(t_)
+#else
+# define ALIGNOF(t_)	(sizeof(struct {char x_; t_ y_;}) - sizeof(t_))
+#endif
+
 #if GNUC_PREREQ(4, 3)
 # define ATTRIBUTE_ALLOC_SIZE(args)	__attribute__((__alloc_size__ args))
 #else
