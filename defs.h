@@ -483,6 +483,7 @@ umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
 				    const unsigned int len, void *our_addr);
 extern int umovestr(struct tcb *, long, unsigned int, char *);
 extern int upeek(int pid, long, long *);
+extern int upoke(int pid, long, long);
 
 extern bool
 print_array(struct tcb *tcp,

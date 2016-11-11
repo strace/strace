@@ -73,6 +73,7 @@ libstrace_a_SOURCES =	\
 	sync_file_range.c \
 	sync_file_range2.c \
 	upeek.c		\
+	upoke.c		\
 	# end of libstrace_a_SOURCES
 
 strace_SOURCES =	\
