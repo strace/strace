@@ -359,12 +359,14 @@ update_personality(struct tcb *tcp, unsigned int personality)
 }
 #endif
 
-static int qual_syscall(), qual_signal(), qual_desc();
+static int qual_desc(const char *, unsigned int, int);
+static int qual_signal(const char *, unsigned int, int);
+static int qual_syscall(const char *, unsigned int, int);
 
 static const struct qual_options {
 	unsigned int bitflag;
 	const char *option_name;
-	int (*qualify)(const char *, int, int);
+	int (*qualify)(const char *, unsigned int, int);
 	const char *argument_name;
 } qual_options[] = {
 	{ QUAL_TRACE,	"trace",	qual_syscall,	"system call"	},
