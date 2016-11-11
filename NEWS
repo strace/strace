@@ -4,6 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of DM_* ioctl commands.
   * Implemented decoding of attr parameter of perf_event_open syscall.
   * Implemented dumping of mq_timedsend and mq_timedreceive syscalls.
+  * Updated lists of ioctl commands from Linux 4.9.
 
 * Bug fixes
   * Fixed decoding of lookup_dcookie, inotify_init1, kcmp, process_vm_readv,
