@@ -390,15 +390,22 @@ static const struct qual_options {
 };
 
 static void
+reallocate_vec(void **vec, unsigned int old_nmemb,
+	       size_t size, unsigned int new_nmemb)
+{
+	unsigned int p;
+
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		vec[p] = xreallocarray(vec[p], new_nmemb, size);
+		memset(vec[p] + size * old_nmemb, 0,
+		       (new_nmemb - old_nmemb) * size);
+	}
+}
+
+static void
 reallocate_qual(const unsigned int n)
 {
-	unsigned p;
-	qualbits_t *qp;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
-		qp = qual_vec[p] = xreallocarray(qual_vec[p], n,
-						 sizeof(qualbits_t));
-		memset(&qp[num_quals], 0, (n - num_quals) * sizeof(qualbits_t));
-	}
+	reallocate_vec((void **) qual_vec, num_quals, sizeof(qualbits_t), n);
 	num_quals = n;
 }
 
