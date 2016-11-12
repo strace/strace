@@ -31,7 +31,7 @@
 #include <asm/unistd.h>
 
 /*
- * On s390x, this is the mmap syscall used by glibc, so,
+ * On s390x and m68k, this is the mmap syscall used by glibc, so,
  * from one side, it's already covered by another test, and, from another side,
  * it would require additional efforts to filter out mmap calls made by glibc.
  */
@@ -39,7 +39,6 @@
 #if defined __NR_mmap && \
 (   defined __arm__ \
  || defined __i386__ \
- || defined __m68k__ \
  || (defined __s390__ && !defined __s390x__) \
 )
 
@@ -96,7 +95,7 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_mmap && (__arm__ || __i386__ || __m68k__"
+SKIP_MAIN_UNDEFINED("__NR_mmap && (__arm__ || __i386__"
 		    " || (__s390__ && !__s390x__))")
 
 #endif
