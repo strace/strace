@@ -799,9 +799,6 @@ static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static int arch_get_scno(struct tcb *tcp);
 static void get_error(struct tcb *, const bool);
-#if defined X86_64 || defined POWERPC
-static int getregs_old(pid_t);
-#endif
 
 static int
 trace_syscall_entering(struct tcb *tcp)
@@ -1231,7 +1228,12 @@ print_pc(struct tcb *tcp)
 			(unsigned long) ARCH_PC_REG);
 }
 
-#if defined ARCH_REGS_FOR_GETREGSET
+#include "getregs_old.h"
+
+#undef ptrace_getregset_or_getregs
+#ifdef ARCH_REGS_FOR_GETREGSET
+
+# define ptrace_getregset_or_getregs ptrace_getregset
 static long
 ptrace_getregset(pid_t pid)
 {
@@ -1253,6 +1255,7 @@ ptrace_getregset(pid_t pid)
 
 #elif defined ARCH_REGS_FOR_GETREGS
 
+# define ptrace_getregset_or_getregs ptrace_getregs
 static long
 ptrace_getregs(pid_t pid)
 {
@@ -1270,49 +1273,40 @@ void
 get_regs(pid_t pid)
 {
 #undef USE_GET_SYSCALL_RESULT_REGS
-#ifdef ARCH_REGS_FOR_GETREGSET
-# ifdef X86_64
-	/* Try PTRACE_GETREGSET first, fallback to PTRACE_GETREGS. */
-	static int getregset_support;
+#ifdef ptrace_getregset_or_getregs
 
-	if (getregset_support >= 0) {
-		get_regs_error = ptrace_getregset(pid);
-		if (getregset_support > 0)
-			return;
+# ifdef HAVE_GETREGS_OLD
+	/*
+	 * Try PTRACE_GETREGSET/PTRACE_GETREGS first,
+	 * fallback to getregs_old.
+	 */
+	static int use_getregs_old;
+	if (use_getregs_old < 0) {
+		get_regs_error = ptrace_getregset_or_getregs(pid);
+		return;
+	} else if (use_getregs_old == 0) {
+		get_regs_error = ptrace_getregset_or_getregs(pid);
 		if (get_regs_error >= 0) {
-			getregset_support = 1;
+			use_getregs_old = -1;
 			return;
 		}
 		if (errno == EPERM || errno == ESRCH)
 			return;
-		getregset_support = -1;
+		use_getregs_old = 1;
 	}
 	get_regs_error = getregs_old(pid);
-# else /* !X86_64 */
-	/* Assume that PTRACE_GETREGSET works. */
-	get_regs_error = ptrace_getregset(pid);
-# endif
-#elif defined ARCH_REGS_FOR_GETREGS
-# ifdef POWERPC
-	static bool old_kernel = 0;
-	if (old_kernel)
-		goto old;
-	get_regs_error = ptrace_getregs(pid);
-	if (get_regs_error && errno == EIO) {
-		old_kernel = 1;
- old:
-		get_regs_error = getregs_old(pid);
-	}
-# else
-	/* Assume that PTRACE_GETREGS works. */
-	get_regs_error = ptrace_getregs(pid);
-# endif
+# else /* !HAVE_GETREGS_OLD */
+	/* Assume that PTRACE_GETREGSET/PTRACE_GETREGS works. */
+	get_regs_error = ptrace_getregset_or_getregs(pid);
+# endif /* !HAVE_GETREGS_OLD */
 
-#else /* !ARCH_REGS_FOR_GETREGSET && !ARCH_REGS_FOR_GETREGS */
+#else /* !ptrace_getregset_or_getregs */
+
 # define USE_GET_SYSCALL_RESULT_REGS 1
 # warning get_regs is not implemented for this architecture yet
 	get_regs_error = 0;
-#endif
+
+#endif /* !ptrace_getregset_or_getregs */
 }
 
 struct sysent_buf {
@@ -1398,6 +1392,6 @@ get_syscall_result(struct tcb *tcp)
 # include "get_syscall_result.c"
 #endif
 #include "get_error.c"
-#if defined X86_64 || defined POWERPC
+#ifdef HAVE_GETREGS_OLD
 # include "getregs_old.c"
 #endif

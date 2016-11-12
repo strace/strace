@@ -379,6 +379,7 @@ EXTRA_DIST =				\
 	linux/crisv32/userent.h		\
 	linux/dummy.h			\
 	linux/errnoent.h		\
+	linux/getregs_old.h		\
 	linux/hppa/arch_regs.c		\
 	linux/hppa/arch_regs.h		\
 	linux/hppa/errnoent.h		\
@@ -484,6 +485,7 @@ EXTRA_DIST =				\
 	linux/powerpc/get_scno.c	\
 	linux/powerpc/get_syscall_args.c	\
 	linux/powerpc/getregs_old.c	\
+	linux/powerpc/getregs_old.h	\
 	linux/powerpc/ioctls_arch0.h	\
 	linux/powerpc/ioctls_inc0.h	\
 	linux/powerpc/syscallent.h	\
@@ -497,6 +499,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/get_scno.c	\
 	linux/powerpc64/get_syscall_args.c	\
 	linux/powerpc64/getregs_old.c	\
+	linux/powerpc64/getregs_old.h	\
 	linux/powerpc64/ioctls_arch0.h	\
 	linux/powerpc64/ioctls_arch1.h	\
 	linux/powerpc64/ioctls_inc0.h	\
@@ -641,6 +644,7 @@ EXTRA_DIST =				\
 	linux/x86_64/get_scno.c		\
 	linux/x86_64/get_syscall_args.c	\
 	linux/x86_64/getregs_old.c	\
+	linux/x86_64/getregs_old.h	\
 	linux/x86_64/ioctls_arch0.h	\
 	linux/x86_64/ioctls_arch1.h	\
 	linux/x86_64/ioctls_arch2.h	\
