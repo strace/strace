@@ -1250,7 +1250,21 @@ ptrace_getregset(pid_t pid)
 
 # endif
 }
-#endif /* ARCH_REGS_FOR_GETREGSET */
+
+#elif defined ARCH_REGS_FOR_GETREGS
+
+static long
+ptrace_getregs(pid_t pid)
+{
+# if defined SPARC || defined SPARC64
+	/* SPARC systems have the meaning of data and addr reversed */
+	return ptrace(PTRACE_GETREGS, pid, (void *) &ARCH_REGS_FOR_GETREGS, 0);
+# else
+	return ptrace(PTRACE_GETREGS, pid, NULL, &ARCH_REGS_FOR_GETREGS);
+# endif
+}
+
+#endif /* ARCH_REGS_FOR_GETREGSET || ARCH_REGS_FOR_GETREGS */
 
 void
 get_regs(pid_t pid)
@@ -1279,15 +1293,11 @@ get_regs(pid_t pid)
 	get_regs_error = ptrace_getregset(pid);
 # endif
 #elif defined ARCH_REGS_FOR_GETREGS
-# if defined SPARC || defined SPARC64
-	/* SPARC systems have the meaning of data and addr reversed */
-	get_regs_error =
-		ptrace(PTRACE_GETREGS, pid, (void *) &ARCH_REGS_FOR_GETREGS, 0);
-# elif defined POWERPC
+# ifdef POWERPC
 	static bool old_kernel = 0;
 	if (old_kernel)
 		goto old;
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &ARCH_REGS_FOR_GETREGS);
+	get_regs_error = ptrace_getregs(pid);
 	if (get_regs_error && errno == EIO) {
 		old_kernel = 1;
  old:
@@ -1295,7 +1305,7 @@ get_regs(pid_t pid)
 	}
 # else
 	/* Assume that PTRACE_GETREGS works. */
-	get_regs_error = ptrace(PTRACE_GETREGS, pid, NULL, &ARCH_REGS_FOR_GETREGS);
+	get_regs_error = ptrace_getregs(pid);
 # endif
 
 #else /* !ARCH_REGS_FOR_GETREGSET && !ARCH_REGS_FOR_GETREGS */
