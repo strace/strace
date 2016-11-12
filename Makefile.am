@@ -176,6 +176,7 @@ strace_SOURCES =	\
 	perf.c		\
 	perf_event_struct.h \
 	personality.c	\
+	pkeys.c		\
 	poll.c		\
 	prctl.c		\
 	print_mq_attr.c	\

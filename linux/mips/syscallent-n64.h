@@ -323,6 +323,9 @@
 [5320] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [5321] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [5322] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
+[5323] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
+[5324] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
+[5325] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 
 # define SYS_socket_subcall      5400
 # include "subcall.h"

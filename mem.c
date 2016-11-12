@@ -182,13 +182,27 @@ SYS_FUNC(munmap)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(mprotect)
+static int
+do_mprotect(struct tcb *tcp, bool has_pkey)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %lu, ", tcp->u_arg[1]);
 	printflags_long(mmap_prot, tcp->u_arg[2], "PROT_???");
 
+	if (has_pkey)
+		tprintf(", %d", (int) tcp->u_arg[3]);
+
 	return RVAL_DECODED;
+}
+
+SYS_FUNC(mprotect)
+{
+	return do_mprotect(tcp, false);
+}
+
+SYS_FUNC(pkey_mprotect)
+{
+	return do_mprotect(tcp, true);
 }
 
 #include "xlat/mremap_flags.h"

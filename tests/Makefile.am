@@ -259,6 +259,9 @@ check_PROGRAMS = \
 	perf_event_open_unabbrev \
 	personality \
 	pipe \
+	pkey_alloc \
+	pkey_free \
+	pkey_mprotect \
 	poll \
 	ppoll \
 	prctl-seccomp-filter-v \
@@ -628,6 +631,9 @@ DECODER_TESTS = \
 	perf_event_open_unabbrev.test \
 	personality.test \
 	pipe.test \
+	pkey_alloc.test \
+	pkey_free.test \
+	pkey_mprotect.test \
 	poll.test \
 	ppoll.test \
 	prctl-seccomp-filter-v.test \

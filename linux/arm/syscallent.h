@@ -418,6 +418,9 @@
 [391] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [392] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [393] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
+[394] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
+[395] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
+[396] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 
 #ifdef __ARM_EABI__
 # define ARM_FIRST_SHUFFLED_SYSCALL 400
