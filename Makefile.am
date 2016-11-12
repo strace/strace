@@ -295,6 +295,7 @@ EXTRA_DIST =				\
 	generate_sen.sh			\
 	ioctlsort.c			\
 	linux/32/ioctls_inc.h		\
+	linux/32/ioctls_inc_align16.h	\
 	linux/32/ioctls_inc_align32.h	\
 	linux/32/ioctls_inc_align64.h	\
 	linux/32/syscallent.h		\
