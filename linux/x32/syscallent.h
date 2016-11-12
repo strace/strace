@@ -327,7 +327,7 @@
 [326] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [327] = { 6,	TD,		SEN(printargs),			"64:preadv2"		},
 [328] = { 6,	TD,		SEN(printargs),			"64:pwritev2"		},
-[327 ... 511] = { },
+[329 ... 511] = { },
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.
