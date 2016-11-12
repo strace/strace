@@ -1233,7 +1233,7 @@ print_pc(struct tcb *tcp)
 
 #if defined ARCH_REGS_FOR_GETREGSET
 static long
-get_regset(pid_t pid)
+ptrace_getregset(pid_t pid)
 {
 # ifdef ARCH_IOVEC_FOR_GETREGSET
 	/* variable iovec */
@@ -1262,7 +1262,7 @@ get_regs(pid_t pid)
 	static int getregset_support;
 
 	if (getregset_support >= 0) {
-		get_regs_error = get_regset(pid);
+		get_regs_error = ptrace_getregset(pid);
 		if (getregset_support > 0)
 			return;
 		if (get_regs_error >= 0) {
@@ -1276,7 +1276,7 @@ get_regs(pid_t pid)
 	get_regs_error = getregs_old(pid);
 # else /* !X86_64 */
 	/* Assume that PTRACE_GETREGSET works. */
-	get_regs_error = get_regset(pid);
+	get_regs_error = ptrace_getregset(pid);
 # endif
 #elif defined ARCH_REGS_FOR_GETREGS
 # if defined SPARC || defined SPARC64
