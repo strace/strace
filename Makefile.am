@@ -414,11 +414,11 @@ EXTRA_DIST =				\
 	linux/ia64/userent.h		\
 	linux/inet_diag.h		\
 	linux/m68k/arch_regs.c		\
+	linux/m68k/arch_regs.h		\
 	linux/m68k/arch_sigreturn.c	\
 	linux/m68k/get_error.c		\
 	linux/m68k/get_scno.c		\
 	linux/m68k/get_syscall_args.c	\
-	linux/m68k/get_syscall_result.c	\
 	linux/m68k/ioctls_arch0.h	\
 	linux/m68k/ioctls_inc0.h	\
 	linux/m68k/syscallent.h		\

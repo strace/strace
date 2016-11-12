@@ -3,10 +3,8 @@ arch_sigreturn(struct tcb *tcp)
 {
 	long addr;
 
-	if (upeek(tcp->pid, 4*PT_USP, &addr) < 0)
-		return;
 	/* Fetch pointer to struct sigcontext.  */
-	if (umove(tcp, addr + 2 * sizeof(int), &addr) < 0)
+	if (umove(tcp, *m68k_usp_ptr + 2 * sizeof(int), &addr) < 0)
 		return;
 
 	unsigned long mask[NSIG / 8 / sizeof(long)];
