@@ -37,7 +37,7 @@
 #include "xlat.h"
 
 static const unsigned int magic = 0xdeadbeef;
-static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0ded;
+static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
 static void
 init_magic(void *addr, const unsigned int size)

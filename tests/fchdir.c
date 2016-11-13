@@ -9,7 +9,7 @@
 int
 main(void)
 {
-	const long int fd = (long int) 0xdeadbeefffffffff;
+	const long int fd = (long int) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_fchdir, fd);
 	printf("fchdir(%d) = %ld %s (%m)\n",

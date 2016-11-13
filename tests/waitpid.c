@@ -40,7 +40,7 @@ int
 main(void)
 {
 	unsigned long pid =
-		(unsigned long) 0xdefaced00000000 | (unsigned) getpid();
+		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
 	long rc = syscall(__NR_waitpid, pid, 0L, (unsigned long) WNOHANG);
 	printf("waitpid(%d, NULL, WNOHANG) = %ld %s (%m)\n",
 	       (int) pid, rc, errno2name());

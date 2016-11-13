@@ -9,7 +9,7 @@
 int
 main(void)
 {
-	const long int size = (long int) 0xdeadbeefffffffff;
+	const long int size = (long int) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_epoll_create, size);
 	printf("epoll_create(%d) = %ld %s (%m)\n",

@@ -406,7 +406,7 @@ main(void )
 		tail_alloc(sizeof(*p_ext_controls->controls) * p_ext_controls->count);
 	p_ext_controls->controls[0].id = V4L2_CID_BRIGHTNESS;
 	p_ext_controls->controls[0].size = 0;
-	p_ext_controls->controls[0].value64 = 0xfacefeeddeadbeef;
+	p_ext_controls->controls[0].value64 = 0xfacefeeddeadbeefULL;
 	p_ext_controls->controls[1].id = V4L2_CID_CONTRAST;
 	p_ext_controls->controls[1].size = 2;
 	p_ext_controls->controls[1].string =

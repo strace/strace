@@ -138,7 +138,7 @@ sprint_siginfo(const siginfo_t *const si, const char *const status_text)
 static unsigned long
 poison(unsigned int v)
 {
-	return (unsigned long) 0xfacefeed00000000 | v;
+	return (unsigned long) 0xfacefeed00000000ULL | v;
 }
 
 static long

@@ -38,10 +38,10 @@
 int
 main(void)
 {
-	const unsigned long len = (unsigned long) 0xcafef00dbadc0ded;
+	const unsigned long len = (unsigned long) 0xcafef00dbadc0dedULL;
 	const unsigned long mode = 3;
-	const unsigned long nodemask = (unsigned long) 0xfacefeedfffffff1;
-	const unsigned long maxnode = (unsigned long) 0xdeadbeeffffffff2;
+	const unsigned long nodemask = (unsigned long) 0xfacefeedfffffff1ULL;
+	const unsigned long maxnode = (unsigned long) 0xdeadbeeffffffff2ULL;
 	const unsigned long flags = -1UL;
 
 	long rc = syscall(__NR_mbind, 0, len, mode, nodemask, maxnode, flags);

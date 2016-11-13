@@ -43,7 +43,7 @@ static const char sample[] = TEST_SYSCALL_STR;
 static void
 test_syscall(unsigned short mode)
 {
-	unsigned long lmode = (unsigned long) 0xffffffffffff0000 | mode;
+	unsigned long lmode = (unsigned long) 0xffffffffffff0000ULL | mode;
 	long rc = syscall(TEST_SYSCALL_NR, TEST_SYSCALL_PREFIX_ARGS
 			  sample, lmode);
 

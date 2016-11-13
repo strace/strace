@@ -41,8 +41,8 @@ test_flock64_einval(const int cmd, const char *name)
 {
 	struct_kernel_flock64 fl = {
 		.l_type = F_RDLCK,
-		.l_start = 0xdefaced1facefeed,
-		.l_len = 0xdefaced2cafef00d
+		.l_start = 0xdefaced1facefeedULL,
+		.l_len = 0xdefaced2cafef00dULL
 	};
 	invoke_test_syscall(cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"

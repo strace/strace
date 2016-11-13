@@ -13,14 +13,14 @@ static const char sample[] = "mknod";
 static long
 call_mknod(unsigned short mode, unsigned long dev)
 {
-	unsigned long lmode = (unsigned long) 0xffffffffffff0000 | mode;
+	unsigned long lmode = (unsigned long) 0xffffffffffff0000ULL | mode;
 	return syscall(__NR_mknod, sample, lmode, dev);
 }
 
 int
 main(void)
 {
-	unsigned long dev = (unsigned long) 0xdeadbeefbadc0ded;
+	unsigned long dev = (unsigned long) 0xdeadbeefbadc0dedULL;
 
 	long rc = call_mknod(0, dev);
 	printf("mknod(\"%s\", 000) = %ld %s (%m)\n",
@@ -46,14 +46,14 @@ main(void)
 	printf("mknod(\"%s\", S_IFIFO|0600) = %ld %s (%m)\n",
 	       sample, rc, errno2name());
 
-	dev = (unsigned long) 0xdeadbeef00000000 | makedev(1, 7);
+	dev = (unsigned long) 0xdeadbeef00000000ULL | makedev(1, 7);
 
 	rc = call_mknod(S_IFCHR | 024, dev);
 	printf("mknod(\"%s\", S_IFCHR|024, makedev(1, 7)) = %ld %s (%m)\n",
 	       sample, rc, errno2name());
 
 	const unsigned short mode = (0xffff & ~S_IFMT) | S_IFBLK;
-	dev = (unsigned long) 0xdeadbeefbadc0ded;
+	dev = (unsigned long) 0xdeadbeefbadc0dedULL;
 
 	rc = call_mknod(mode, dev);
 	printf("mknod(\"%s\", S_IFBLK|S_ISUID|S_ISGID|S_ISVTX|%#03ho"

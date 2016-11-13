@@ -49,14 +49,14 @@ main(void)
 		perror_msg_and_fail("gettimeofday");
 
 	static const char sample[] = "futimesat_sample";
-	unsigned long dirfd = (unsigned long) 0xdeadbeef00000000 | -100U;
+	unsigned long dirfd = (unsigned long) 0xdeadbeef00000000ULL | -100U;
 
 	long rc = syscall(__NR_futimesat, dirfd, sample, 0);
 	printf("futimesat(AT_FDCWD, \"%s\", NULL) = %ld %s (%m)\n",
 	       sample, rc, errno2name());
 
 	struct timeval *const ts = tail_alloc(sizeof(*ts) * 2);
-	dirfd = (unsigned long) 0xdeadbeefffffffff;
+	dirfd = (unsigned long) 0xdeadbeefffffffffULL;
 
 	rc = syscall(__NR_futimesat, dirfd, 0, ts + 1);
 	printf("futimesat(%d, NULL, %p) = %ld %s (%m)\n",

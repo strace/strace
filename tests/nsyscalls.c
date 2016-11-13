@@ -61,12 +61,12 @@ static void
 test_syscall(const unsigned long nr)
 {
 	static const kernel_ulong_t a[] = {
-		(kernel_ulong_t) 0xface0fedbadc0ded,
-		(kernel_ulong_t) 0xface1fedbadc1ded,
-		(kernel_ulong_t) 0xface2fedbadc2ded,
-		(kernel_ulong_t) 0xface3fedbadc3ded,
-		(kernel_ulong_t) 0xface4fedbadc4ded,
-		(kernel_ulong_t) 0xface5fedbadc5ded
+		(kernel_ulong_t) 0xface0fedbadc0dedULL,
+		(kernel_ulong_t) 0xface1fedbadc1dedULL,
+		(kernel_ulong_t) 0xface2fedbadc2dedULL,
+		(kernel_ulong_t) 0xface3fedbadc3dedULL,
+		(kernel_ulong_t) 0xface4fedbadc4dedULL,
+		(kernel_ulong_t) 0xface5fedbadc5dedULL
 	};
 
 	long rc = syscall(nr | SYSCALL_BIT,

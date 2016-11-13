@@ -42,9 +42,9 @@ static long
 k_tgsigqueueinfo(const pid_t pid, const int sig, const void const *info)
 {
 	return syscall(__NR_rt_tgsigqueueinfo,
-		       (unsigned long) 0xffffffff00000000 | pid,
-		       (unsigned long) 0xffffffff00000000 | pid,
-		       (unsigned long) 0xffffffff00000000 | sig,
+		       (unsigned long) 0xffffffff00000000ULL | pid,
+		       (unsigned long) 0xffffffff00000000ULL | pid,
+		       (unsigned long) 0xffffffff00000000ULL | sig,
 		       info);
 }
 
@@ -64,7 +64,7 @@ main (void)
 	info->si_code = SI_QUEUE;
 	info->si_pid = getpid();
 	info->si_uid = getuid();
-	info->si_value.sival_ptr = (void *) (unsigned long) 0xdeadbeeffacefeed;
+	info->si_value.sival_ptr = (void *) (unsigned long) 0xdeadbeeffacefeedULL;
 
 	if (k_tgsigqueueinfo(info->si_pid, SIGUSR1, info))
 		(errno == ENOSYS ? perror_msg_and_skip : perror_msg_and_fail)(

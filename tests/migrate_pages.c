@@ -38,7 +38,7 @@
 int
 main(void)
 {
-	const long pid = (long) 0xfacefeedffffffff;
+	const long pid = (long) 0xfacefeedffffffffULL;
 	long rc = syscall(__NR_migrate_pages, pid, 0, 0, 0);
 	printf("migrate_pages(%d, 0, NULL, NULL) = %ld %s (%m)\n",
 	       (int) pid, rc, errno2name());

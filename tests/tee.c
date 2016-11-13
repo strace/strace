@@ -38,8 +38,8 @@
 int
 main(void)
 {
-	const long int fd_in = (long int) 0xdeadbeefffffffff;
-	const long int fd_out = (long int) 0xdeadbeeffffffffe;
+	const long int fd_in = (long int) 0xdeadbeefffffffffULL;
+	const long int fd_out = (long int) 0xdeadbeeffffffffeULL;
 	const size_t len = (size_t) 0xdeadbef3facefed3ULL;
 	const unsigned int flags = 15;
 

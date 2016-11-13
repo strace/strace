@@ -11,7 +11,7 @@
 static long
 invoke_syscall(unsigned long epfd, unsigned long op, unsigned long fd, void *ev)
 {
-	op |= (unsigned long) 0xffffffff00000000;
+	op |= (unsigned long) 0xffffffff00000000ULL;
 	return syscall(__NR_epoll_ctl, epfd, op, fd, (unsigned long) ev);
 }
 

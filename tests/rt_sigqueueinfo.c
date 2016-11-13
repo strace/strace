@@ -38,7 +38,7 @@ main (void)
 		.sa_handler = SIG_IGN
 	};
 	union sigval value = {
-		.sival_ptr = (void *) (unsigned long) 0xdeadbeefbadc0ded
+		.sival_ptr = (void *) (unsigned long) 0xdeadbeefbadc0dedULL
 	};
 	pid_t pid = getpid();
 

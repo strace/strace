@@ -49,7 +49,7 @@ main(void)
 	struct_sigevent sev = {
 		.sigev_notify = 0xdefaced,
 		.sigev_signo = 0xfacefeed,
-		.sigev_value.sival_ptr = (unsigned long) 0xdeadbeefbadc0ded
+		.sigev_value.sival_ptr = (unsigned long) 0xdeadbeefbadc0dedULL
 	};
 
 	syscall(__NR_timer_create, CLOCK_REALTIME, &sev, NULL);
@@ -81,8 +81,10 @@ main(void)
 	       sev.sigev_value.sival_ptr, tid[1]);
 
 	sev.sigev_notify = SIGEV_THREAD;
-	sev.sigev_un.sigev_thread.function = (unsigned long) 0xdeadbeefbadc0ded;
-	sev.sigev_un.sigev_thread.attribute = (unsigned long) 0xcafef00dfacefeed;
+	sev.sigev_un.sigev_thread.function =
+		(unsigned long) 0xdeadbeefbadc0dedULL;
+	sev.sigev_un.sigev_thread.attribute =
+		(unsigned long) 0xcafef00dfacefeedULL;
 	if (syscall(__NR_timer_create, CLOCK_REALTIME, &sev, &tid[2]))
 		perror_msg_and_skip("timer_create CLOCK_REALTIME");
 	printf("timer_create(CLOCK_REALTIME, {sigev_value={int=%d, ptr=%#lx}"

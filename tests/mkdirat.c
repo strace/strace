@@ -5,7 +5,7 @@
 
 # define TEST_SYSCALL_NR		__NR_mkdirat
 # define TEST_SYSCALL_STR		"mkdirat"
-# define TEST_SYSCALL_PREFIX_ARGS	(long int) 0xdeadbeefffffffff,
+# define TEST_SYSCALL_PREFIX_ARGS	(long int) 0xdeadbeefffffffffULL,
 # define TEST_SYSCALL_PREFIX_STR	"-1, "
 # include "umode_t.c"
 

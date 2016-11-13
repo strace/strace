@@ -10,7 +10,7 @@
 int
 main(void)
 {
-	const unsigned long fd = (long int) 0xdeadbeefffffffff;
+	const unsigned long fd = (long int) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_flock, fd, LOCK_SH);
 	printf("flock(%d, LOCK_SH) = %ld %s (%m)\n",

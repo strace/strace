@@ -12,8 +12,8 @@
 int
 main(void)
 {
-	const long int fd_old = (long int) 0xdeadbeefffffffff;
-	const long int fd_new = (long int) 0xdeadbeeffffffffe;
+	const long int fd_old = (long int) 0xdeadbeefffffffffULL;
+	const long int fd_new = (long int) 0xdeadbeeffffffffeULL;
 
 	long rc = syscall(__NR_renameat, fd_old, OLD_FILE, fd_new, NEW_FILE);
 	printf("renameat(%d, \"%s\", %d, \"%s\") = %ld %s (%m)\n",

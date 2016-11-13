@@ -9,7 +9,7 @@
 int
 main(void)
 {
-	const long int fd = (long int) 0xdeadbeefffffffff;
+	const long int fd = (long int) 0xdeadbeefffffffffULL;
 	static const char oldpath[] = "symlink_old";
 	static const char newpath[] = "symlink_new";
 

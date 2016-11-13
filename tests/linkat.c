@@ -11,8 +11,8 @@ main(void)
 {
 	static const char sample_1[] = "linkat_sample_old";
 	static const char sample_2[] = "linkat_sample_new";
-	const long fd_old = (long) 0xdeadbeefffffffff;
-	const long fd_new = (long) 0xdeadbeeffffffffe;
+	const long fd_old = (long) 0xdeadbeefffffffffULL;
+	const long fd_new = (long) 0xdeadbeeffffffffeULL;
 
 	long rc = syscall(__NR_linkat, fd_old, sample_1, fd_new, sample_2, 0);
 	printf("linkat(%d, \"%s\", %d, \"%s\", 0) = %ld %s (%m)\n",

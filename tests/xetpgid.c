@@ -40,12 +40,12 @@ main(void)
 {
 	const int pid = getpid();
 	long rc = syscall(__NR_getpgid,
-			  (unsigned long) 0xffffffff00000000 | pid);
+			  (unsigned long) 0xffffffff00000000ULL | pid);
 	printf("getpgid(%d) = %ld\n", pid, rc);
 
 	rc = syscall(__NR_setpgid,
-		     (unsigned long) 0xffffffff00000000,
-		     (unsigned long) 0xffffffff00000000 | pid);
+		     (unsigned long) 0xffffffff00000000ULL,
+		     (unsigned long) 0xffffffff00000000ULL | pid);
 	printf("setpgid(0, %d) = %ld\n", pid, rc);
 
 	puts("+++ exited with 0 +++");

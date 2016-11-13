@@ -55,7 +55,7 @@ static void
 test_socketcall(const int i, const void *const addr)
 {
 	const unsigned long call =
-		(unsigned long) 0xfacefeed00000000 | (unsigned int) i;
+		(unsigned long) 0xfacefeed00000000ULL | (unsigned int) i;
 
 	long rc = syscall(__NR_socketcall, call, addr);
 

@@ -10,8 +10,8 @@
 int
 main(void)
 {
-	const long int fd_old = (long int) 0xdeadbeefffffffff;
-	const long int fd_new = (long int) 0xdeadbeeffffffffe;
+	const long int fd_old = (long int) 0xdeadbeefffffffffULL;
+	const long int fd_new = (long int) 0xdeadbeeffffffffeULL;
 
 	long rc = syscall(__NR_dup3, fd_old, fd_new, O_CLOEXEC);
 	printf("dup3(%d, %d, O_CLOEXEC) = %ld %s (%m)\n",

@@ -41,7 +41,7 @@ main(void)
 	const struct xlat *xlat;
 
 	for (xlat = resources; xlat->str; ++xlat) {
-		unsigned long res = 0xfacefeed00000000 | xlat->val;
+		unsigned long res = 0xfacefeed00000000ULL | xlat->val;
 		long rc = syscall(__NR_setrlimit, res, 0);
 		printf("setrlimit(%s, NULL) = %s\n", xlat->str, sprintrc(rc));
 

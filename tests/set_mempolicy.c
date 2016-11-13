@@ -126,8 +126,8 @@ main(void)
 		perror_msg_and_skip("set_mempolicy");
 	puts("set_mempolicy(MPOL_DEFAULT, NULL, 0) = 0");
 
-	const unsigned long *nodemask = (void *) 0xfacefeedfffffffe;
-	const unsigned long maxnode = (unsigned long) 0xcafef00dbadc0ded;
+	const unsigned long *nodemask = (void *) 0xfacefeedfffffffeULL;
+	const unsigned long maxnode = (unsigned long) 0xcafef00dbadc0dedULL;
 	long rc = syscall(__NR_set_mempolicy, 1, nodemask, maxnode);
 	printf("set_mempolicy(MPOL_PREFERRED, %p, %lu) = %s\n",
 	       nodemask, maxnode, sprintrc(rc));

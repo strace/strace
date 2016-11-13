@@ -110,7 +110,7 @@ main(void)
 	printf("NULL) = %s\n", errstr);
 
 #ifdef CHECK_ODD_SIZE
-	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeef;
+	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeefULL;
 	rc = SYSCALL_INVOKE("", -1, addr, sizeof(STRUCT_STATFS) + 1);
 	errstr = sprintrc(rc);
 	PRINT_SYSCALL_HEADER("", -1, sizeof(STRUCT_STATFS) + 1);

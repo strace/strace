@@ -10,7 +10,7 @@ int
 main(void)
 {
 	static const char sample[] = "faccessat.sample";
-	const long int fd = (long int) 0xdeadbeefffffffff;
+	const long int fd = (long int) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_faccessat, fd, sample, F_OK);
 	printf("faccessat(%d, \"%s\", F_OK) = %ld %s (%m)\n",

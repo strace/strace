@@ -49,7 +49,7 @@ ipc_call(const unsigned short version, const unsigned short call,
 	 long a1, long a2, long a3, long a4, long a5)
 {
 	const unsigned long val =
-		(unsigned long) 0xfacefeed00000000 |
+		(unsigned long) 0xfacefeed00000000ULL |
 		(unsigned int) version << 16 |
 		call;
 

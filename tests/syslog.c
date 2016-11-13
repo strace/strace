@@ -11,7 +11,7 @@
 int
 main(void)
 {
-	const long addr = (long) 0xfacefeeddeadbeef;
+	const long addr = (long) 0xfacefeeddeadbeefULL;
 	int rc = syscall(__NR_syslog, SYSLOG_ACTION_READ, addr, -1);
 	printf("syslog(SYSLOG_ACTION_READ, %#lx, -1) = %d %s (%m)\n",
 	       addr, rc, errno2name());

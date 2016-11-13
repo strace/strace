@@ -62,12 +62,12 @@ int
 main(void)
 {
 	unsigned long pid =
-		(unsigned long) 0xdefaced00000000 | (unsigned) getpid();
+		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
 	uint64_t *const rlimit = tail_alloc(sizeof(*rlimit) * 2);
 	const struct xlat *xlat;
 
 	for (xlat = resources; xlat->str; ++xlat) {
-		unsigned long res = 0xfacefeed00000000 | xlat->val;
+		unsigned long res = 0xfacefeed00000000ULL | xlat->val;
 		long rc = syscall(__NR_prlimit64, pid, res, 0, rlimit);
 		if (rc)
 			printf("prlimit64(%d, %s, NULL, %p) = %ld %s (%m)\n",

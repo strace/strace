@@ -136,7 +136,7 @@ static void
 print_stat_pages(const unsigned long pid, const unsigned long count,
 		 const void **const pages, int *const status)
 {
-	const unsigned long flags = (unsigned long) 0xfacefeed00000002;
+	const unsigned long flags = (unsigned long) 0xfacefeed00000002ULL;
 
 	long rc = syscall(__NR_move_pages,
 			  pid, count, pages, NULL, status, flags);
@@ -163,7 +163,7 @@ print_move_pages(const unsigned long pid,
 		 int *const nodes,
 		 int *const status)
 {
-	const unsigned long flags = (unsigned long) 0xfacefeed00000004;
+	const unsigned long flags = (unsigned long) 0xfacefeed00000004ULL;
 	count += offset;
 
 	long rc = syscall(__NR_move_pages,
@@ -185,7 +185,7 @@ int
 main(void)
 {
 	const unsigned long pid =
-		(unsigned long) 0xfacefeed00000000 | getpid();
+		(unsigned long) 0xfacefeed00000000ULL | getpid();
 	unsigned long count = 1;
 	const unsigned page_size = get_page_size();
 	const void *const page = tail_alloc(page_size);

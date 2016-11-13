@@ -12,12 +12,12 @@ main(void)
 {
 	const int pid = getpid();
 	long rc = syscall(__NR_getpriority, PRIO_PROCESS,
-			  (unsigned long) 0xffffffff00000000 | pid);
+			  (unsigned long) 0xffffffff00000000ULL | pid);
 	printf("getpriority(PRIO_PROCESS, %d) = %ld\n", pid, rc);
 
 	rc = syscall(__NR_setpriority, PRIO_PROCESS,
-		     (unsigned long) 0xffffffff00000000 | pid,
-		     (unsigned long) 0xffffffff00000000);
+		     (unsigned long) 0xffffffff00000000ULL | pid,
+		     (unsigned long) 0xffffffff00000000ULL);
 	printf("setpriority(PRIO_PROCESS, %d, 0) = %s\n", pid, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");

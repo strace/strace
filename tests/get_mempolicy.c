@@ -81,9 +81,9 @@ main(void)
 	puts("get_mempolicy(NULL, NULL, 0, NULL, 0) = 0");
 
 	int *mode = (void *) 0xdefaced1baddeed2;
-	unsigned long maxnode = (unsigned long) 0xcafef00dbadc0ded;
-	const unsigned long *nodemask = (void *) 0xfacedad3bebefed4;
-	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeef;
+	unsigned long maxnode = (unsigned long) 0xcafef00dbadc0dedULL;
+	const unsigned long *nodemask = (void *) 0xfacedad3bebefed4ULL;
+	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeefULL;
 	const unsigned long flags = -1U;
 	rc = syscall(__NR_get_mempolicy, mode, nodemask, maxnode, addr, flags);
 	printf("get_mempolicy(%p, %p, %lu, %#lx, %s|%#lx) = %ld %s (%m)\n",

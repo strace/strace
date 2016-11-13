@@ -45,10 +45,10 @@ main(int ac, char **av)
 	void *addr, *p;
 
 #if ULONG_MAX > 4294967295UL
-	offset = 0xcafedeadbeef000 & -pagesize;
+	offset = 0xcafedeadbeef000ULL & -pagesize;
 	addr = (void *) (uintmax_t) (0xfacefeed000 & -pagesize);
 #else
-	offset = 0xdeadbeef000 & -pagesize;
+	offset = 0xdeadbeef000ULL & -pagesize;
 	addr = (void *) (unsigned int) (0xfaced000 & -pagesize);
 #endif
 	const uintmax_t uoffset =

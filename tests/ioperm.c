@@ -9,7 +9,7 @@
 int
 main(void)
 {
-	const unsigned long port = (unsigned long) 0xdeafbeefffffffff;
+	const unsigned long port = (unsigned long) 0xdeafbeefffffffffULL;
 
 	long rc = syscall(__NR_ioperm, port, 1, 0);
 	printf("ioperm(%#lx, %#lx, %d) = %ld %s (%m)\n",

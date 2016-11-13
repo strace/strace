@@ -159,7 +159,7 @@ main(void)
 			.aio_fildes = 0xdefaced1,
 			.aio_buf = (unsigned long)data2,
 			.aio_nbytes = sizeof(data2),
-			.aio_offset = 0xdeadda7abadc0ded,
+			.aio_offset = 0xdeadda7abadc0dedULL,
 		},
 		{
 			.aio_data = 0,

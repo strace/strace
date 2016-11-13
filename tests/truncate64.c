@@ -38,7 +38,7 @@ main(void)
 {
 	static const char fname[] = "truncate64\nfilename";
 	static const char qname[] = "truncate64\\nfilename";
-	const off_t len = 0xdefaceddeadbeef;
+	const off_t len = 0xdefaceddeadbeefULL;
 
 	int rc = truncate(fname, len);
 	printf("truncate64(\"%s\", %llu) = %d %s (%m)\n",

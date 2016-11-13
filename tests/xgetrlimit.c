@@ -68,7 +68,7 @@ main(void)
 	const struct xlat *xlat;
 
 	for (xlat = resources; xlat->str; ++xlat) {
-		unsigned long res = 0xfacefeed00000000 | xlat->val;
+		unsigned long res = 0xfacefeed00000000ULL | xlat->val;
 		long rc = syscall(NR_GETRLIMIT, res, 0);
 		if (rc && ENOSYS == errno)
 			perror_msg_and_skip(STR_GETRLIMIT);

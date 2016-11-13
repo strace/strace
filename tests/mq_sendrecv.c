@@ -235,7 +235,7 @@ main(void)
 	struct_sigevent bogus_sev_data = {
 		.sigev_notify = 0xdefaced,
 		.sigev_signo = 0xfacefeed,
-		.sigev_value.sival_ptr = (unsigned long) 0xdeadbeefbadc0ded
+		.sigev_value.sival_ptr = (unsigned long) 0xdeadbeefbadc0dedULL
 	};
 
 	const char *errstr;
@@ -398,9 +398,9 @@ main(void)
 	/* SIGEV_THREAD */
 	bogus_sev->sigev_notify = SIGEV_THREAD;
 	bogus_sev->sigev_un.sigev_thread.function =
-		(unsigned long) 0xdeadbeefbadc0ded;
+		(unsigned long) 0xdeadbeefbadc0dedULL;
 	bogus_sev->sigev_un.sigev_thread.attribute =
-		(unsigned long) 0xcafef00dfacefeed;
+		(unsigned long) 0xcafef00dfacefeedULL;
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
 	printf("mq_notify(%d, {sigev_value={int=%d, ptr=%#lx}, "
 	       "sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD, "

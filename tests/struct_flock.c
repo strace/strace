@@ -45,7 +45,7 @@
 static long
 invoke_test_syscall(const unsigned int cmd, void *const p)
 {
-	const unsigned long op = (unsigned long) 0xffffffff00000000 | cmd;
+	const unsigned long op = (unsigned long) 0xffffffff00000000ULL | cmd;
 
 	return syscall(TEST_SYSCALL_NR, 0, op, (unsigned long) p);
 }
@@ -55,8 +55,8 @@ test_flock_einval(const int cmd, const char *name)
 {
 	struct_kernel_flock fl = {
 		.l_type = F_RDLCK,
-		.l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeed,
-		.l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00d
+		.l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeedULL,
+		.l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00dULL
 	};
 	invoke_test_syscall(cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"

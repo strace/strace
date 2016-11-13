@@ -10,7 +10,7 @@ int
 main(void)
 {
 	static const char sample[] = "unlinkat_sample";
-	const long fd = (long) 0xdeadbeefffffffff;
+	const long fd = (long) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_unlinkat, fd, sample, 0);
 	printf("unlinkat(%d, \"%s\", 0) = %ld %s (%m)\n",
