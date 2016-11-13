@@ -43,6 +43,7 @@
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
+#if defined BLKTRACESETUP && defined HAVE_STRUCT_BLK_USER_TRACE_SETUP
 static void
 init_magic(void *addr, const unsigned int size)
 {
@@ -52,6 +53,7 @@ init_magic(void *addr, const unsigned int size)
 	for (; p <= end; ++p)
 		*(unsigned int *) p = magic + (p - (unsigned int *) addr);
 }
+#endif
 
 static struct xlat block_argless[] = {
 	XLAT(BLKRRPART),
