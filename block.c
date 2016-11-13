@@ -32,8 +32,26 @@
 #include DEF_MPERS_TYPE(struct_blkpg_ioctl_arg)
 #include DEF_MPERS_TYPE(struct_blkpg_partition)
 
-#include <linux/blkpg.h>
+#include <linux/ioctl.h>
 #include <linux/fs.h>
+
+typedef struct {
+	int op;
+	int flags;
+	int datalen;
+	void *data;
+} struct_blkpg_ioctl_arg;
+
+#define BLKPG_DEVNAMELTH	64
+#define BLKPG_VOLNAMELTH	64
+typedef struct {
+	long long start;		/* starting offset in bytes */
+	long long length;		/* length in bytes */
+	int pno;			/* partition number */
+	char devname[BLKPG_DEVNAMELTH];	/* partition name, like sda5 or c0d1p2,
+					   to be used in kernel messages */
+	char volname[BLKPG_VOLNAMELTH];	/* volume label */
+} struct_blkpg_partition;
 
 #define BLKTRACE_BDEV_SIZE      32
 typedef struct blk_user_trace_setup {
@@ -46,10 +64,11 @@ typedef struct blk_user_trace_setup {
 	uint32_t pid;
 } struct_blk_user_trace_setup;
 
-typedef struct blkpg_ioctl_arg struct_blkpg_ioctl_arg;
-typedef struct blkpg_partition struct_blkpg_partition;
-
 #include MPERS_DEFS
+
+#ifndef BLKPG
+# define BLKPG      _IO(0x12,105)
+#endif
 
 /*
  * ioctl numbers <= 114 are present in Linux 2.4.  The following ones have been
