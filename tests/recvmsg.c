@@ -145,7 +145,7 @@ main(void)
 	r_mh->msg_iov = r_iov;
 	r_mh->msg_iovlen = ARRAY_SIZE(r1_iov_);
 
-	assert(recvmsg(0, r_mh, 0) == (int) w_len - r_len);
+	assert(recvmsg(0, r_mh, 0) == (int) w_len - (int) r_len);
 	tprintf("recvmsg(0, {msg_name=NULL, msg_namelen=0, msg_iov="
 		"[{iov_base=\"%s\", iov_len=%u}, {iov_base=\"\", iov_len=%u}]"
 		", msg_iovlen=%u, msg_controllen=0, msg_flags=0}, 0) = %u\n"

@@ -159,7 +159,7 @@ main(void)
 	r_iov = tail_memdup(r1_iov_, sizeof(r1_iov_));
 
 	rc = preadv(0, r_iov, ARRAY_SIZE(r1_iov_), r_len);
-	if (rc != (int) w_len - r_len)
+	if (rc != (int) w_len - (int) r_len)
 		perror_msg_and_fail("preadv: expected %d, returned %ld",
 				    (int) w_len - r_len, rc);
 	tprintf("preadv(0, [{iov_base=\"%s\", iov_len=%u}"

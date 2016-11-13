@@ -145,7 +145,7 @@ main(void)
 	};
 	r_iov = tail_memdup(r1_iov_, sizeof(r1_iov_));
 
-	assert(readv(0, r_iov, ARRAY_SIZE(r1_iov_)) == (int) w_len - r_len);
+	assert(readv(0, r_iov, ARRAY_SIZE(r1_iov_)) == (int) w_len - (int) r_len);
 	tprintf("readv(0, [{iov_base=\"%s\", iov_len=%u}"
 		", {iov_base=\"\", iov_len=%u}], %u) = %u\n"
 		" * %u bytes in buffer 0\n"
