@@ -427,6 +427,19 @@ qualify_one(const unsigned int n, unsigned int bitflag, const int not, const int
 	}
 }
 
+static bool
+qualify_scno(const char *const s, const unsigned int bitflag,
+	     const int not)
+{
+	unsigned int i;
+
+	if (*s < '0' || *s > '9' || (i = string_to_uint(s)) >= MAX_NSYSCALLS)
+		return false;
+
+	qualify_one(i, bitflag, not, -1);
+	return true;
+}
+
 static int
 lookup_class(const char *s)
 {
@@ -447,45 +460,62 @@ lookup_class(const char *s)
 	return -1;
 }
 
+static bool
+qualify_syscall_class(const char *const s, const unsigned int bitflag,
+		      const int not)
+{
+	unsigned int p;
+	const int n = lookup_class(s);
+
+	if (n < 0)
+		return false;
+
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		unsigned int i;
+
+		for (i = 0; i < nsyscall_vec[p]; ++i) {
+			if (sysent_vec[p][i].sys_name
+			    && (sysent_vec[p][i].sys_flags & n) == n) {
+				qualify_one(i, bitflag, not, p);
+			}
+		}
+	}
+
+	return true;
+}
+
+static bool
+qualify_syscall_name(const char *const s, const unsigned int bitflag,
+		     const int not)
+{
+	bool found = false;
+	unsigned int p;
+
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		unsigned int i;
+
+		for (i = 0; i < nsyscall_vec[p]; ++i) {
+			if (sysent_vec[p][i].sys_name
+			    && strcmp(s, sysent_vec[p][i].sys_name) == 0) {
+				qualify_one(i, bitflag, not, p);
+				found = true;
+			}
+		}
+	}
+
+	return found;
+}
+
 static int
 qual_syscall(const char *s, const unsigned int bitflag, const int not)
 {
-	unsigned int p;
-	unsigned int i;
-	int n;
-	int rc = -1;
-
-	if ((n = lookup_class(s)) >= 0) {
-		for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-			for (i = 0; i < nsyscall_vec[p]; ++i) {
-				if ((sysent_vec[p][i].sys_flags & n) == n) {
-					qualify_one(i, bitflag, not, p);
-				}
-			}
-		}
+	if (qualify_scno(s, bitflag, not)
+	    || qualify_syscall_class(s, bitflag, not)
+	    || qualify_syscall_name(s, bitflag, not)) {
 		return 0;
 	}
 
-	if (*s >= '0' && *s <= '9') {
-		i = string_to_uint(s);
-		if (i >= MAX_NSYSCALLS)
-			return -1;
-		qualify_one(i, bitflag, not, -1);
-		return 0;
-	}
-
-	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
-		for (i = 0; i < nsyscall_vec[p]; i++) {
-			if (sysent_vec[p][i].sys_name
-			 && strcmp(s, sysent_vec[p][i].sys_name) == 0
-			) {
-				qualify_one(i, bitflag, not, p);
-				rc = 0;
-			}
-		}
-	}
-
-	return rc;
+	return -1;
 }
 
 static int
