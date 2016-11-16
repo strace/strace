@@ -519,7 +519,15 @@ extern const char *xlookup(const struct xlat *, const uint64_t);
 extern const char *xlat_search(const struct xlat *, const size_t, const uint64_t);
 
 extern unsigned long get_pagesize(void);
+extern int
+string_to_uint_ex(const char *str, char **endptr,
+		  unsigned int max_val, const char *accepted_ending);
 extern int string_to_uint(const char *str);
+static inline int
+string_to_uint_upto(const char *const str, unsigned int max_val)
+{
+	return string_to_uint_ex(str, NULL, max_val, NULL);
+}
 extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits);
 
 #define QUOTE_0_TERMINATED                      0x01

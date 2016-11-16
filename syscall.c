@@ -431,9 +431,8 @@ static bool
 qualify_scno(const char *const s, const unsigned int bitflag,
 	     const int not)
 {
-	unsigned int i;
-
-	if (*s < '0' || *s > '9' || (i = string_to_uint(s)) >= MAX_NSYSCALLS)
+	int i = string_to_uint_upto(s, MAX_NSYSCALLS - 1);
+	if (i < 0)
 		return false;
 
 	qualify_one(i, bitflag, not, -1);
@@ -524,8 +523,8 @@ qual_signal(const char *s, const unsigned int bitflag, const int not)
 	unsigned int i;
 
 	if (*s >= '0' && *s <= '9') {
-		int signo = string_to_uint(s);
-		if (signo < 0 || signo > 255)
+		int signo = string_to_uint_upto(s, 255);
+		if (signo < 0)
 			return -1;
 		qualify_one(signo, bitflag, not, -1);
 		return 0;
@@ -544,14 +543,11 @@ qual_signal(const char *s, const unsigned int bitflag, const int not)
 static int
 qual_desc(const char *s, const unsigned int bitflag, const int not)
 {
-	if (*s >= '0' && *s <= '9') {
-		int desc = string_to_uint(s);
-		if (desc < 0 || desc > 0x7fff) /* paranoia */
-			return -1;
-		qualify_one(desc, bitflag, not, -1);
-		return 0;
-	}
-	return -1;
+	int desc = string_to_uint_upto(s, 0x7fff);
+	if (desc < 0)
+		return -1;
+	qualify_one(desc, bitflag, not, -1);
+	return 0;
 }
 
 void

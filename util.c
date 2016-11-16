@@ -44,18 +44,33 @@
 #include "ptrace.h"
 
 int
-string_to_uint(const char *str)
+string_to_uint_ex(const char *const str, char **const endptr,
+		  const unsigned int max_val, const char *const accepted_ending)
 {
-	char *error;
-	long value;
+	char *end;
+	long val;
 
 	if (!*str)
 		return -1;
-	errno = 0;
-	value = strtol(str, &error, 10);
-	if (errno || *error || value < 0 || (long)(int)value != value)
+
+	val = strtol(str, &end, 10);
+
+	if (str == end || val < 0 || (unsigned long) val > max_val)
 		return -1;
-	return (int)value;
+
+	if (*end && (!accepted_ending || !strchr(accepted_ending, *end)))
+		return -1;
+
+	if (endptr)
+		*endptr = end;
+
+	return (int) val;
+}
+
+int
+string_to_uint(const char *const str)
+{
+	return string_to_uint_upto(str, INT_MAX);
 }
 
 int

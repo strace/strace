@@ -1709,8 +1709,8 @@ init(int argc, char *argv[])
 				die_out_of_memory();
 			break;
 		case 'I':
-			opt_intr = string_to_uint(optarg);
-			if (opt_intr <= 0 || opt_intr >= NUM_INTR_OPTS)
+			opt_intr = string_to_uint_upto(optarg, NUM_INTR_OPTS - 1);
+			if (opt_intr <= 0)
 				error_opt_arg(c, optarg);
 			break;
 		default:
