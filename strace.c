@@ -229,7 +229,7 @@ Statistics:\n\
 \n\
 Filtering:\n\
   -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
-     options:    trace, abbrev, verbose, raw, signal, read, write\n\
+     options:    trace, abbrev, verbose, raw, signal, read, write, fault\n\
   -P path        trace accesses to path\n\
 \n\
 Tracing:\n\
@@ -784,6 +784,10 @@ droptcb(struct tcb *tcp)
 {
 	if (tcp->pid == 0)
 		return;
+
+	int p;
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
+		free(tcp->fault_vec[p]);
 
 	free_tcb_priv_data(tcp);
 

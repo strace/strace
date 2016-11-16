@@ -1,6 +1,7 @@
 Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
+  * Implemented syscall fault injection.
   * Implemented decoding of DM_* ioctl commands.
   * Implemented decoding of attr parameter of perf_event_open syscall.
   * Implemented decoding of pkey_alloc, pkey_free, and pkey_mprotect syscalls.

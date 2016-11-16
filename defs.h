@@ -216,6 +216,8 @@ typedef struct ioctlent {
 # define HAVE_STRUCT_TCB_EXT_ARG 0
 #endif
 
+struct fault_opts;
+
 /* Trace Control Block */
 struct tcb {
 	int flags;		/* See below for TCB_ values */
@@ -240,6 +242,7 @@ struct tcb {
 	void (*_free_priv_data)(void *); /* Callback for freeing priv_data */
 	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
+	struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
@@ -276,6 +279,7 @@ struct tcb {
 #define TCB_ATTACHED	0x08	/* We attached to it already */
 #define TCB_REPRINT	0x10	/* We should reprint this syscall on exit */
 #define TCB_FILTERED	0x20	/* This system call has been filtered out */
+#define TCB_FAULT_INJ	0x40	/* A syscall fault has been injected */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -285,6 +289,7 @@ struct tcb {
 #define QUAL_SIGNAL	0x010	/* report events with this signal */
 #define QUAL_READ	0x020	/* dump data read on this file descriptor */
 #define QUAL_WRITE	0x040	/* dump data written to this file descriptor */
+#define QUAL_FAULT	0x080	/* fail this system call on purpose */
 typedef uint8_t qualbits_t;
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
