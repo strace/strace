@@ -52,6 +52,7 @@ fadvise64_64
 fallocate
 fanotify_init
 fanotify_mark
+fault_injection
 fchdir
 fchmod
 fchmodat

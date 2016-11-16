@@ -1,0 +1,101 @@
+#!/bin/sh
+#
+# Check that fault injection works properly.
+#
+# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/init.sh"
+
+#
+# F
+# F+
+# F+S
+
+N=16
+
+check_fault_injection()
+{
+	local trace fault err first step
+	trace=$1; shift
+	fault=$1; shift
+	err=$1; shift
+	first=$1; shift
+	step=$1; shift
+
+	local when=
+	if [ -z "$first$step" ]; then
+		first=1
+		step=1
+	else
+		case "$step" in
+			'') when=":when=$first"; step=0 ;;
+			+) when=":when=$first+"; step=1 ;;
+			*) when=":when=$first+$step" ;;
+		esac
+	fi
+
+	local error=
+	local raw=reg
+	set --
+	case "$err" in
+		'') ;;
+		[123456789]*)
+			error=":error=$err"
+			raw=raw
+			set -- -e raw=all
+			;;
+		*) error=":error=$err" ;;
+	esac
+
+	outexp="$NAME.out.exp"
+	outgot="$NAME.out.got"
+
+	run_strace -a11 -e trace=$trace \
+		-e fault=$fault$when$error "$@" \
+		./$NAME $raw "$err" "$first" "$step" $N \
+		> "$EXP" 4> "$outexp" 5> "$outgot"
+
+	match_diff "$EXP" "$LOG"
+	match_diff "$outexp" "$outgot"
+	rm -f "$EXP" "$outexp" "$outgot"
+}
+
+for err in '' ENOSYS 22 EINVAL; do
+	for fault in writev 51,desc; do
+		check_fault_injection \
+			writev $fault "$err" '' ''
+		for F in 1 2 3 5 7 11; do
+			check_fault_injection \
+				writev $fault "$err" $F ''
+			check_fault_injection \
+				writev $fault "$err" $F +
+			for S in 1 2 3 5 7 11; do
+				check_fault_injection \
+					writev $fault "$err" $F $S
+			done
+		done
+	done
+done
