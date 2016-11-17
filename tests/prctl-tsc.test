@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check prctl PR_GET_TSC PR_SET_TSC decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a34 -e trace=prctl

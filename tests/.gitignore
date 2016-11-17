@@ -210,8 +210,10 @@ pkey_mprotect
 poll
 ppoll
 prctl-name
+prctl-pdeathsig
 prctl-seccomp-filter-v
 prctl-seccomp-strict
+prctl-tsc
 pread64-pwrite64
 preadv
 preadv-pwritev

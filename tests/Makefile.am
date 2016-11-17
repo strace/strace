@@ -269,8 +269,10 @@ check_PROGRAMS = \
 	poll \
 	ppoll \
 	prctl-name \
+	prctl-pdeathsig \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
+	prctl-tsc \
 	pread64-pwrite64 \
 	preadv \
 	preadv-pwritev \
@@ -648,8 +650,10 @@ DECODER_TESTS = \
 	poll.test \
 	ppoll.test \
 	prctl-name.test \
+	prctl-pdeathsig.test \
 	prctl-seccomp-filter-v.test \
 	prctl-seccomp-strict.test \
+	prctl-tsc.test \
 	pread64-pwrite64.test \
 	preadv-pwritev.test \
 	preadv2-pwritev2.test \

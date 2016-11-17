@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check prctl PR_GET_PDEATHSIG PR_SET_PDEATHSIG decoding.
+
+. "${srcdir=.}/init.sh"
+run_strace_match_diff -a32 -e trace=prctl
