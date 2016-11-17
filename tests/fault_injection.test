@@ -38,12 +38,13 @@ N=16
 
 check_fault_injection()
 {
-	local trace fault err first step
+	local trace fault err first step extra
 	trace=$1; shift
 	fault=$1; shift
 	err=$1; shift
 	first=$1; shift
 	step=$1; shift
+	extra="$*"
 
 	local when=
 	if [ -z "$first$step" ]; then
@@ -74,7 +75,7 @@ check_fault_injection()
 	outgot="$NAME.out.got"
 
 	run_strace -a11 -e trace=$trace \
-		-e fault=$fault$when$error "$@" \
+		"$@" -e fault=$fault$when$error $extra \
 		./$NAME $raw "$err" "$first" "$step" $N \
 		> "$EXP" 4> "$outexp" 5> "$outgot"
 
@@ -86,7 +87,7 @@ check_fault_injection()
 for err in '' ENOSYS 22 EINVAL; do
 	for fault in writev 51,desc; do
 		check_fault_injection \
-			writev $fault "$err" '' ''
+			writev $fault "$err" '' '' -efault=chdir
 		for F in 1 2 3 5 7 11; do
 			check_fault_injection \
 				writev $fault "$err" $F ''

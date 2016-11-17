@@ -739,14 +739,16 @@ qualify(const char *s)
 		not = 1 - not;
 		s = "all";
 	}
-	if (opt->bitflag != QUAL_FAULT && strcmp(s, "all") == 0) {
-		for (i = 0; i < num_quals; i++) {
-			qualify_one(i, opt->bitflag, not, -1, NULL);
+	if (opt->bitflag != QUAL_FAULT) {
+		if (strcmp(s, "all") == 0) {
+			for (i = 0; i < num_quals; ++i) {
+				qualify_one(i, opt->bitflag, not, -1, NULL);
+			}
+			return;
 		}
-		return;
-	}
-	for (i = 0; i < num_quals; i++) {
-		qualify_one(i, opt->bitflag, !not, -1, NULL);
+		for (i = 0; i < num_quals; ++i) {
+			qualify_one(i, opt->bitflag, !not, -1, NULL);
+		}
 	}
 	copy = xstrdup(s);
 	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
