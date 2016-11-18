@@ -41,6 +41,7 @@ epoll_create1
 epoll_ctl
 epoll_pwait
 epoll_wait
+erestartsys
 eventfd
 execve
 execve-v

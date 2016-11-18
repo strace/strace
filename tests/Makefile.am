@@ -101,6 +101,7 @@ check_PROGRAMS = \
 	epoll_ctl \
 	epoll_pwait \
 	epoll_wait \
+	erestartsys \
 	eventfd \
 	execve \
 	execve-v \
@@ -482,6 +483,7 @@ DECODER_TESTS = \
 	epoll_ctl.test \
 	epoll_pwait.test \
 	epoll_wait.test \
+	erestartsys.test \
 	eventfd.test \
 	execve-v.test \
 	execve.test \

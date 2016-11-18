@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of ERESTARTSYS error code.
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a34 -e signal=none -e trace=recvfrom
