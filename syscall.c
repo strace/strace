@@ -677,22 +677,27 @@ qual_fault(const char *const s, const unsigned int bitflag, const int not)
 static int
 qual_signal(const char *s, const unsigned int bitflag, const int not)
 {
-	unsigned int i;
+	int i;
 
 	if (*s >= '0' && *s <= '9') {
-		int signo = string_to_uint_upto(s, 255);
-		if (signo < 0)
+		i = string_to_uint_upto(s, 255);
+		if (i < 0)
 			return -1;
-		qualify_one(signo, bitflag, not, -1, NULL);
+		qualify_one(i, bitflag, not, -1, NULL);
 		return 0;
 	}
 	if (strncasecmp(s, "SIG", 3) == 0)
 		s += 3;
-	for (i = 0; i <= NSIG; i++) {
-		if (strcasecmp(s, signame(i) + 3) == 0) {
-			qualify_one(i, bitflag, not, -1, NULL);
-			return 0;
-		}
+	for (i = 0; i <= NSIG; ++i) {
+		const char *name = signame(i);
+		if (strncasecmp(name, "SIG", 3) != 0)
+			continue;
+		name += 3;
+
+		if (strcasecmp(name, s) != 0)
+			continue;
+		qualify_one(i, bitflag, not, -1, NULL);
+		return 0;
 	}
 	return -1;
 }
