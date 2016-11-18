@@ -277,6 +277,7 @@ check_PROGRAMS = \
 	pselect6 \
 	ptrace \
 	pwritev \
+	qual_signal \
 	quotactl \
 	quotactl-v \
 	quotactl-xfs \
@@ -793,6 +794,7 @@ MISC_TESTS = \
 	ksysent.test \
 	opipe.test \
 	pc.test \
+	qual_signal.test \
 	qual_syscall.test \
 	redirect.test \
 	redirect-fds.test \

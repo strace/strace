@@ -197,8 +197,8 @@ open
 openat
 pause
 pc
-perf_event_open_nonverbose
 perf_event_open
+perf_event_open_nonverbose
 perf_event_open_unabbrev
 personality
 pipe
@@ -219,6 +219,7 @@ process_vm_writev
 pselect6
 ptrace
 pwritev
+qual_signal
 quotactl
 quotactl-v
 quotactl-xfs

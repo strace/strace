@@ -1,0 +1,106 @@
+#!/bin/sh
+#
+# Check how strace -e signal=set works.
+#
+# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/init.sh"
+
+test_one_sig()
+{
+	local sigs
+	sigs="$1"; shift
+
+	run_prog "./$NAME" "$@" > /dev/null
+	run_strace -e trace=none -e signal="$sigs" "./$NAME" "$@" > "$EXP"
+	match_diff "$LOG" "$EXP"
+	rm -f "$EXP"
+}
+
+test_sigs()
+{
+	local first second sigs
+	first="$1"; shift
+	second="$1"; shift
+
+	for sigs; do
+		test_one_sig "$sigs" 2 "$first" 15 "$second"
+	done
+}
+
+test_sigs '' '' \
+	none '!all' \
+	CHLD SIGCHLD ALRM SIGALRM \
+	CHLD,SIGALRM ALRM,SIGCHLD \
+	9 9,4 9,4,11 \
+	4,CHLD,11,ALRM,9 \
+	'!2,15' '!INT,TERM' '!SIGINT,TERM' '!INT,SIGTERM' '!SIGTERM,SIGINT' \
+	'!2,INT,TERM' '!2,SIGTERM' '!SIGINT,15' '!INT,SIGTERM,15' \
+	'!2,4,15' '!15,9,2,11,4'
+
+test_sigs SIGINT '' \
+	2 INT SIGINT \
+	CHLD,SIGINT SIGINT,SIGALRM \
+	ALRM,2,SIGCHLD \
+	'!15' '!TERM' '!SIGTERM' \
+	'!15,TERM' '!SIGTERM,15,TERM' \
+	'!SIGALRM,TERM' '!CHLD,SIGTERM' \
+	'!ALRM,15' '!SIGCHLD,ALRM,SIGTERM,KILL' \
+	'!4,15' '!15,9,11,4'
+
+test_sigs '' SIGTERM \
+	15 TERM SIGTERM \
+	CHLD,SIGTERM SIGTERM,SIGALRM \
+	ALRM,15,SIGCHLD \
+	'!2' '!INT' '!SIGINT' \
+	'!2,INT' '!SIGINT,2,INT' \
+	'!SIGALRM,INT' '!CHLD,SIGINT' \
+	'!ALRM,2' '!SIGCHLD,ALRM,SIGINT,KILL' \
+	'!4,2' '!2,9,11,4'
+
+test_sigs SIGINT SIGTERM \
+	all '!none' \
+	INT,TERM SIGINT,TERM SIGTERM,INT SIGINT,SIGTERM \
+	2,15 2,TERM SIGTERM,2 TERM,15,SIGINT,2 \
+	'!CHLD' '!SIGCHLD' '!ALRM' '!SIGALRM' \
+	'!CHLD,SIGALRM' '!ALRM,SIGCHLD' \
+	'!9' '!9,4' '!9,4,11' '!4,CHLD,11,ALRM,9'
+
+fail_with()
+{
+	dump_log_and_fail_with \
+		"strace -e signal=$* failed to handle an argument error properly"
+}
+
+for arg in ' ' invalid_signal_name SIG -1 256 1-1 \
+	   1,2,4,8,16,32,64,128,256,512,1024 9,chdir; do
+	$STRACE -e signal="$arg" true 2> "$LOG" &&
+		fail_with "$arg"
+	LC_ALL=C grep -F 'invalid signal' < "$LOG" > /dev/null ||
+		fail_with "$arg"
+done
+
+exit 0
