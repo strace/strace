@@ -255,7 +255,7 @@ SYS_FUNC(prctl)
 
 	case PR_SET_PTRACER:
 		tprints(", ");
-		if (arg2 == -1)
+		if ((int) arg2 == -1)
 			tprints("PR_SET_PTRACER_ANY");
 		else
 			tprintf("%llu", arg2);
