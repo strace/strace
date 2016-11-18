@@ -108,9 +108,9 @@ SYS_FUNC(prctl)
 		break;
 
 	case PR_GET_NAME:
-		if (entering(tcp))
+		if (entering(tcp)) {
 			tprints(", ");
-		else {
+		} else {
 			if (syserror(tcp))
 				printaddr(arg2);
 			else
@@ -120,9 +120,9 @@ SYS_FUNC(prctl)
 		break;
 
 	case PR_GET_PDEATHSIG:
-		if (entering(tcp))
+		if (entering(tcp)) {
 			tprints(", ");
-		else if (!umove_or_printaddr(tcp, arg2, &i)) {
+		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
 			tprints("[");
 			tprints(signame(i));
 			tprints("]");
@@ -146,9 +146,9 @@ SYS_FUNC(prctl)
 		break;
 
 	case PR_GET_TSC:
-		if (entering(tcp))
+		if (entering(tcp)) {
 			tprints(", ");
-		else if (!umove_or_printaddr(tcp, arg2, &i)) {
+		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
 			tprints("[");
 			printxval(pr_tsc, i, "PR_TSC_???");
 			tprints("]");
@@ -156,9 +156,9 @@ SYS_FUNC(prctl)
 		break;
 
 	case PR_GET_UNALIGN:
-		if (entering(tcp))
+		if (entering(tcp)) {
 			tprints(", ");
-		else if (!umove_or_printaddr(tcp, arg2, &i)) {
+		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
 			tprints("[");
 			printflags(pr_unalign_flags, i, "PR_UNALIGN_???");
 			tprints("]");
