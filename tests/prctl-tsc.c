@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 JingPiao Chen <chenjingpiao@foxmail.com>
+ * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,18 +35,36 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# include "kernel_types.h"
+
 int
 main(void)
 {
-	int tsc;
+	static const kernel_ulong_t bogus_tsc =
+		(kernel_ulong_t) 0xdeadc0defacebeefULL;
+
+	int *tsc = tail_alloc(sizeof(*tsc));
 	long rc;
+
+	rc = syscall(__NR_prctl, PR_SET_TSC, 0);
+	printf("prctl(PR_SET_TSC, 0 /* PR_TSC_??? */) = %s\n", sprintrc(rc));
+
+	rc = syscall(__NR_prctl, PR_SET_TSC, bogus_tsc);
+	printf("prctl(PR_SET_TSC, %#x /* PR_TSC_??? */) = %s\n",
+	       (unsigned int) bogus_tsc, sprintrc(rc));
 
 	rc = syscall(__NR_prctl, PR_SET_TSC, PR_TSC_SIGSEGV);
 	printf("prctl(PR_SET_TSC, PR_TSC_SIGSEGV) = %s\n", sprintrc(rc));
 
-	rc = syscall(__NR_prctl, PR_GET_TSC, &tsc);
+	rc = syscall(__NR_prctl, PR_GET_TSC, NULL);
+	printf("prctl(PR_GET_TSC, NULL) = %s\n", sprintrc(rc));
+
+	rc = syscall(__NR_prctl, PR_GET_TSC, tsc + 1);
+	printf("prctl(PR_GET_TSC, %p) = %s\n", tsc + 1, sprintrc(rc));
+
+	rc = syscall(__NR_prctl, PR_GET_TSC, tsc);
 	if (rc)
-		printf("prctl(PR_GET_TSC, %p) = %s\n", &tsc, sprintrc(rc));
+		printf("prctl(PR_GET_TSC, %p) = %s\n", tsc, sprintrc(rc));
 	else
 		printf("prctl(PR_GET_TSC, [PR_TSC_SIGSEGV]) = %s\n",
 		       sprintrc(rc));

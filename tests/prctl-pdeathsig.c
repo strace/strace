@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 JingPiao Chen <chenjingpiao@foxmail.com>
+ * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,19 +36,39 @@
 # include <unistd.h>
 # include <sys/signal.h>
 
+# include "kernel_types.h"
+
 int
 main(void)
 {
-	int pdeathsig;
+	static const kernel_ulong_t bogus_signal =
+		(kernel_ulong_t) 0xbadc0deddeadfeedULL;
+
+	int *pdeathsig = tail_alloc(sizeof(*pdeathsig));
 	long rc;
 
-	if ((rc = syscall(__NR_prctl, PR_SET_PDEATHSIG, SIGINT)))
-		perror_msg_and_skip("prctl(PR_SET_PDEATHSIG)");
+	rc = syscall(__NR_prctl, PR_SET_PDEATHSIG, bogus_signal);
+	printf("prctl(PR_SET_PDEATHSIG, %llu) = %s\n",
+	       (unsigned long long) bogus_signal, sprintrc(rc));
+
+	rc = syscall(__NR_prctl, PR_SET_PDEATHSIG, SIGINT);
 	printf("prctl(PR_SET_PDEATHSIG, SIGINT) = %s\n", sprintrc(rc));
 
-	if ((rc = syscall(__NR_prctl, PR_GET_PDEATHSIG, &pdeathsig)))
-		perror_msg_and_skip("prctl(PR_GET_PDEATHSIG)");
-	printf("prctl(PR_GET_PDEATHSIG, [SIGINT]) = %s\n", sprintrc(rc));
+	rc = syscall(__NR_prctl, PR_GET_PDEATHSIG, NULL);
+	printf("prctl(PR_GET_PDEATHSIG, NULL) = %s\n", sprintrc(rc));
+
+	rc = syscall(__NR_prctl, PR_GET_PDEATHSIG, pdeathsig + 1);
+	printf("prctl(PR_GET_PDEATHSIG, %p) = %s\n",
+	       pdeathsig + 1, sprintrc(rc));
+
+	rc = syscall(__NR_prctl, PR_GET_PDEATHSIG, pdeathsig);
+	if (rc) {
+		printf("prctl(PR_GET_PDEATHSIG, %p) = %s\n",
+		       pdeathsig, sprintrc(rc));
+	} else {
+		printf("prctl(PR_GET_PDEATHSIG, [SIGINT]) = %s\n",
+		       sprintrc(rc));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;
