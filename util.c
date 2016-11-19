@@ -836,7 +836,8 @@ printstr_ex(struct tcb *tcp, long addr, long len, unsigned int user_style)
 	static char *str = NULL;
 	static char *outstr;
 	unsigned int size;
-	unsigned int style;
+	unsigned int style = user_style;
+	int rc;
 	int ellipsis;
 
 	if (!addr) {
@@ -859,23 +860,17 @@ printstr_ex(struct tcb *tcp, long addr, long len, unsigned int user_style)
 		 * Treat as a NUL-terminated string: fetch one byte more
 		 * because string_quote may look one byte ahead.
 		 */
-		if (umovestr(tcp, addr, size, str) < 0) {
-			printaddr(addr);
-			return;
-		}
-		style = QUOTE_0_TERMINATED;
+		style |= QUOTE_0_TERMINATED;
+		rc = umovestr(tcp, addr, size, str);
+	} else {
+		if (size > (unsigned long) len)
+			size = (unsigned long) len;
+		rc = umoven(tcp, addr, size, str);
 	}
-	else {
-		if (size > (unsigned long)len)
-			size = (unsigned long)len;
-		if (umoven(tcp, addr, size, str) < 0) {
-			printaddr(addr);
-			return;
-		}
-		style = 0;
+	if (rc < 0) {
+		printaddr(addr);
+		return;
 	}
-
-	style |= user_style;
 
 	if (style & QUOTE_0_TERMINATED) {
 		if (size) {
