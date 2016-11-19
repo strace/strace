@@ -266,6 +266,7 @@ check_PROGRAMS = \
 	pkey_mprotect \
 	poll \
 	ppoll \
+	prctl-name \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	pread64-pwrite64 \
@@ -640,6 +641,7 @@ DECODER_TESTS = \
 	pkey_mprotect.test \
 	poll.test \
 	ppoll.test \
+	prctl-name.test \
 	prctl-seccomp-filter-v.test \
 	prctl-seccomp-strict.test \
 	pread64-pwrite64.test \

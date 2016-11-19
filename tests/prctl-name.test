@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of prctl PR_GET_NAME/PR_SET_NAME operations.
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a23 -e trace=prctl

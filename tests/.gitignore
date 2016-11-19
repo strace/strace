@@ -208,6 +208,7 @@ pkey_free
 pkey_mprotect
 poll
 ppoll
+prctl-name
 prctl-seccomp-filter-v
 prctl-seccomp-strict
 pread64-pwrite64
