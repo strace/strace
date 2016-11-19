@@ -34,6 +34,7 @@
 
 #include "xlat/prctl_options.h"
 #include "xlat/pr_cap_ambient.h"
+#include "xlat/pr_fp_mode.h"
 #include "xlat/pr_mce_kill.h"
 #include "xlat/pr_mce_kill_policy.h"
 #include "xlat/pr_set_mm.h"
@@ -164,6 +165,15 @@ SYS_FUNC(prctl)
 			tprints("]");
 		}
 		break;
+
+	case PR_GET_FP_MODE:
+		if (entering(tcp))
+			break;
+		if (syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+		tcp->auxstr = sprintflags("", pr_fp_mode,
+					  (unsigned long) tcp->u_rval);
+		return RVAL_STR;
 
 	/* PR_TASK_PERF_EVENTS_* take no arguments. */
 	case PR_TASK_PERF_EVENTS_DISABLE:
@@ -310,6 +320,11 @@ SYS_FUNC(prctl)
 		tcp->auxstr = xlookup(pr_mce_kill_policy,
 				      (unsigned long) tcp->u_rval);
 		return tcp->auxstr ? RVAL_STR : RVAL_UDECIMAL;
+
+	case PR_SET_FP_MODE:
+		tprints(", ");
+		printflags(pr_fp_mode, arg2, "PR_FP_MODE_???");
+		return RVAL_DECODED;
 
 	case PR_GET_NO_NEW_PRIVS:
 	case PR_GET_THP_DISABLE:
