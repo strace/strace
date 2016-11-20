@@ -104,7 +104,8 @@ SYS_FUNC(prctl)
 			if (syserror(tcp))
 				printaddr(tcp->u_arg[1]);
 			else
-				printstr(tcp, tcp->u_arg[1], -1);
+				printstr_ex(tcp, tcp->u_arg[1], TASK_COMM_LEN,
+					    QUOTE_0_TERMINATED);
 		}
 		break;
 
@@ -207,7 +208,8 @@ SYS_FUNC(prctl)
 
 	case PR_SET_NAME:
 		tprints(", ");
-		printstr(tcp, tcp->u_arg[1], TASK_COMM_LEN);
+		printstr_ex(tcp, tcp->u_arg[1], TASK_COMM_LEN - 1,
+			    QUOTE_0_TERMINATED);
 		return RVAL_DECODED;
 
 #ifdef __ANDROID__
