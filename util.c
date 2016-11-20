@@ -879,23 +879,18 @@ printstr_ex(struct tcb *tcp, long addr, long len, unsigned int user_style)
 		return;
 	}
 
-	if (style & QUOTE_0_TERMINATED) {
-		if (size) {
-			--size;
-		} else {
-			tprints((len == -1) || (len == 0) ? "\"\"" : "\"\"...");
-			return;
-		}
-	}
 	if (size > max_strlen)
 		size = max_strlen;
+	else
+		str[size] = '\xff';
 
 	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
 	 * or we were requested to print more than -s NUM chars)...
 	 */
-	ellipsis = (string_quote(str, outstr, size, style) &&
-			((style & QUOTE_0_TERMINATED) ||
-				(unsigned long) len > max_strlen));
+	ellipsis = string_quote(str, outstr, size, style)
+		   && len
+		   && ((style & QUOTE_0_TERMINATED)
+		       || (unsigned long) len > max_strlen);
 
 	tprints(outstr);
 	if (ellipsis)
