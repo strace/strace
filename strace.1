@@ -203,66 +203,11 @@ sigprocmask(SIG_UNBLOCK, ~[], NULL) = 0
 .CE
 Here the second argument represents the full set of all signals.
 .SH OPTIONS
+.SS Output format
 .TP 12
 .TP
-.B \-c
-Count time, calls, and errors for each system call and report a summary on
-program exit.  On Linux, this attempts to show system time (CPU time spent
-running in the kernel) independent of wall clock time.  If
-.B \-c
-is used with
-.B \-f
-or
-.B \-F
-(below), only aggregate totals for all traced processes are kept.
-.TP
-.B \-C
-Like
-.B \-c
-but also print regular output while processes are running.
-.TP
-.B \-D
-Run tracer process as a detached grandchild, not as parent of the
-tracee.  This reduces the visible effect of
-.B strace
-by keeping the tracee a direct child of the calling process.
-.TP
-.B \-d
-Show some debugging output of
-.B strace
-itself on the standard error.
-.TP
-.B \-f
-Trace child processes as they are created by currently traced
-processes as a result of the
-.BR fork (2),
-.BR vfork (2)
-and
-.BR clone (2)
-system calls.  Note that
-.B \-p
-.I PID
-.B \-f
-will attach all threads of process PID if it is multi-threaded,
-not only thread with thread_id = PID.
-.TP
-.B \-ff
-If the
-.B \-o
-.I filename
-option is in effect, each processes trace is written to
-.I filename.pid
-where pid is the numeric process id of each process.
-This is incompatible with
-.BR \-c ,
-since no per-process counts are kept.
-.TP
-.B \-F
-This option is now obsolete and it has the same functionality as
-.BR \-f .
-.TP
-.B \-h
-Print the help summary.
+.BI "\-a " column
+Align return values in a specific column (default column 40).
 .TP
 .B \-i
 Print the instruction pointer at the time of the system call.
@@ -272,6 +217,20 @@ Print the execution stack trace of the traced processes after each system call (
 This option is available only if
 .B strace
 is built with libunwind.
+.TP
+.BI "\-o " filename
+Write the trace output to the file
+.I filename
+rather than to stderr.
+Use
+.I filename.pid
+if
+.B \-ff
+is used.
+If the argument begins with '|' or with '!' then the rest of the
+argument is treated as a command and all output is piped to it.
+This is convenient for piping the debugging output to a program
+without affecting the redirections of executed programs.
 .TP
 .B \-q
 Suppress messages about attaching, detaching etc.  This happens
@@ -285,6 +244,11 @@ If given twice, suppress messages about process exit status.
 Print a relative timestamp upon entry to each system call.  This
 records the time difference between the beginning of successive
 system calls.
+.TP
+.BI "\-s " strsize
+Specify the maximum string size to print (the default is 32).  Note
+that filenames are not considered strings and are always printed in
+full.
 .TP
 .B \-t
 Prefix each line of the trace with the time of day.
@@ -301,20 +265,6 @@ of seconds since the epoch.
 Show the time spent in system calls.  This records the time
 difference between the beginning and the end of each system call.
 .TP
-.B \-w
-Summarise the time difference between the beginning and end of
-each system call.  The default is to summarise the system time.
-.TP
-.B \-v
-Print unabbreviated versions of environment, stat, termios, etc.
-calls.  These structures are very common in calls and so the default
-behavior displays a reasonable subset of structure members.  Use
-this option to get all of the gory details.
-.TP
-.B \-V
-Print the version number of
-.BR strace .
-.TP
 .B \-x
 Print all non-ASCII strings in hexadecimal string format.
 .TP
@@ -326,17 +276,57 @@ Print paths associated with file descriptor arguments.
 .TP
 .B \-yy
 Print protocol specific information associated with socket file descriptors.
+.SS Statistics
+.TP 12
 .TP
-.BI "\-a " column
-Align return values in a specific column (default column 40).
+.B \-c
+Count time, calls, and errors for each system call and report a summary on
+program exit.  On Linux, this attempts to show system time (CPU time spent
+running in the kernel) independent of wall clock time.  If
+.B \-c
+is used with
+.B \-f
+or
+.B \-F
+, only aggregate totals for all traced processes are kept.
 .TP
-.BI "\-b " syscall
-If specified syscall is reached, detach from traced process.
-Currently, only
-.I execve
-syscall is supported.  This option is useful if you want to trace
-multi-threaded process and therefore require -f, but don't want
-to trace its (potentially very complex) children.
+.B \-C
+Like
+.B \-c
+but also print regular output while processes are running.
+.TP
+.BI "\-O " overhead
+Set the overhead for tracing system calls to
+.I overhead
+microseconds.
+This is useful for overriding the default heuristic for guessing
+how much time is spent in mere measuring when timing system calls using
+the
+.B \-c
+option.  The accuracy of the heuristic can be gauged by timing a given
+program run without tracing (using
+.BR time (1))
+and comparing the accumulated
+system call time to the total produced using
+.BR \-c .
+.TP
+.BI "\-S " sortby
+Sort the output of the histogram printed by the
+.B \-c
+option by the specified criterion.  Legal values are
+.BR time ,
+.BR calls ,
+.BR name ,
+and
+.B nothing
+(default is
+.BR time ).
+.TP
+.B \-w
+Summarise the time difference between the beginning and end of
+each system call.  The default is to summarise the system time.
+.SS Filtering
+.TP 12
 .TP
 .BI "\-e " expr
 A qualifying expression which modifies which events to trace
@@ -557,7 +547,60 @@ is done per syscall and per tracee.
 Specification of syscall fault injection can be combined
 with other syscall filtering options, for example,
 \fB\-P \fI/dev/urandom \fB\-e fault\fR=\,\fIall\/\fR:\fBerror\fR=\,\fIENOENT\fR.
-
+.TP
+.BI "\-P " path
+Trace only system calls accessing
+.IR path .
+Multiple
+.B \-P
+options can be used to specify several paths.
+.TP
+.B \-v
+Print unabbreviated versions of environment, stat, termios, etc.
+calls.  These structures are very common in calls and so the default
+behavior displays a reasonable subset of structure members.  Use
+this option to get all of the gory details.
+.SS Tracing
+.TP 12
+.TP
+.BI "\-b " syscall
+If specified syscall is reached, detach from traced process.
+Currently, only
+.I execve
+syscall is supported.  This option is useful if you want to trace
+multi-threaded process and therefore require -f, but don't want
+to trace its (potentially very complex) children.
+.TP
+.B \-D
+Run tracer process as a detached grandchild, not as parent of the
+tracee.  This reduces the visible effect of
+.B strace
+by keeping the tracee a direct child of the calling process.
+.TP
+.B \-f
+Trace child processes as they are created by currently traced
+processes as a result of the
+.BR fork (2),
+.BR vfork (2)
+and
+.BR clone (2)
+system calls.  Note that
+.B \-p
+.I PID
+.B \-f
+will attach all threads of process PID if it is multi-threaded,
+not only thread with thread_id = PID.
+.TP
+.B \-ff
+If the
+.B \-o
+.I filename
+option is in effect, each processes trace is written to
+.I filename.pid
+where pid is the numeric process id of each process.
+This is incompatible with
+.BR \-c ,
+since no per-process counts are kept.
 .TP
 .BI "\-I " interruptible
 When strace can be interrupted by signals (such as pressing ^C).
@@ -565,35 +608,19 @@ When strace can be interrupted by signals (such as pressing ^C).
 (default); 3: fatal signals are always blocked (default if '-o FILE PROG');
 4: fatal signals and SIGTSTP (^Z) are always blocked (useful to make
 strace -o FILE PROG not stop on ^Z).
+.SS Startup
+.TP 12
 .TP
-.BI "\-o " filename
-Write the trace output to the file
-.I filename
-rather than to stderr.
-Use
-.I filename.pid
-if
-.B \-ff
-is used.
-If the argument begins with '|' or with '!' then the rest of the
-argument is treated as a command and all output is piped to it.
-This is convenient for piping the debugging output to a program
-without affecting the redirections of executed programs.
+\fB\-E\ \fIvar\fR=\,\fIval\fR
+Run command with
+.IR var = val
+in its list of environment variables.
 .TP
-.BI "\-O " overhead
-Set the overhead for tracing system calls to
-.I overhead
-microseconds.
-This is useful for overriding the default heuristic for guessing
-how much time is spent in mere measuring when timing system calls using
-the
-.B \-c
-option.  The accuracy of the heuristic can be gauged by timing a given
-program run without tracing (using
-.BR time (1))
-and comparing the accumulated
-system call time to the total produced using
-.BR \-c .
+.BI "\-E " var
+Remove
+.IR var
+from the inherited list of environment variables before passing it on to
+the command.
 .TP
 .BI "\-p " pid
 Attach to the process with the process
@@ -616,30 +643,6 @@ option is given).
 .B \-p
 "`pidof PROG`" syntax is supported.
 .TP
-.BI "\-P " path
-Trace only system calls accessing
-.IR path .
-Multiple
-.B \-P
-options can be used to specify several paths.
-.TP
-.BI "\-s " strsize
-Specify the maximum string size to print (the default is 32).  Note
-that filenames are not considered strings and are always printed in
-full.
-.TP
-.BI "\-S " sortby
-Sort the output of the histogram printed by the
-.B \-c
-option by the specified criterion.  Legal values are
-.BR time ,
-.BR calls ,
-.BR name ,
-and
-.B nothing
-(default is
-.BR time ).
-.TP
 .BI "\-u " username
 Run command with the user \s-1ID\s0, group \s-2ID\s0, and
 supplementary groups of
@@ -648,17 +651,24 @@ This option is only useful when running as root and enables the
 correct execution of setuid and/or setgid binaries.
 Unless this option is used setuid and setgid programs are executed
 without effective privileges.
+.SS Miscellaneous
+.TP 12
 .TP
-\fB\-E\ \fIvar\fR=\,\fIval\fR
-Run command with
-.IR var = val
-in its list of environment variables.
+.B \-d
+Show some debugging output of
+.B strace
+itself on the standard error.
 .TP
-.BI "\-E " var
-Remove
-.IR var
-from the inherited list of environment variables before passing it on to
-the command.
+.B \-F
+This option is now obsolete and it has the same functionality as
+.BR \-f .
+.TP
+.B \-h
+Print the help summary.
+.TP
+.B \-V
+Print the version number of
+.BR strace .
 .SH DIAGNOSTICS
 When
 .I command
@@ -712,11 +722,6 @@ If you do use this feature, please remember to install
 a non-setuid version of
 .B strace
 for ordinary lusers to use.
-.SH "SEE ALSO"
-.BR ltrace (1),
-.BR time (1),
-.BR ptrace (2),
-.BR proc (5)
 .SH NOTES
 It is a pity that so much tracing clutter is produced by systems
 employing shared libraries.
@@ -809,9 +814,14 @@ automatic configuration support.  In 1995 he ported
 .B strace
 to Irix
 and tired of writing about himself in the third person.
-.SH PROBLEMS
+.SH REPORTING BUGS
 Problems with
 .B strace
 should be reported to the
 .B strace
 mailing list at <strace\-devel@lists.sourceforge.net>.
+.SH "SEE ALSO"
+.BR ltrace (1),
+.BR time (1),
+.BR ptrace (2),
+.BR proc (5)
