@@ -30,7 +30,7 @@
 
 #include "defs.h"
 
-#include <sys/prctl.h>
+#include <linux/prctl.h>
 
 #include "xlat/prctl_options.h"
 #include "xlat/pr_cap_ambient.h"
