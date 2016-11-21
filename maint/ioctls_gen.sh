@@ -50,8 +50,13 @@ esac
 
 # Check and canonicalize include-directory and arch-include-directory.
 abs_inc_dir="$(cd "$inc_dir" && pwd -P)"
-[ -z "$arch_dir" ] ||
+INCLUDES_inc="-I$abs_inc_dir/uapi -I$abs_inc_dir"
+abs_arch_dir=
+INCLUDES_arch=
+[ -z "$arch_dir" ] || {
 	abs_arch_dir="$(cd "$arch_dir" && pwd -P)"
+	INCLUDES_arch="-I$abs_arch_dir/uapi -I$abs_arch_dir"
+}
 
 cleanup()
 {
@@ -79,11 +84,13 @@ trap 'cleanup 1' HUP PIPE INT QUIT TERM
 msg "generated $(grep -c '^{' ioctls_hex.h) hex ioctls from $inc_dir"
 
 # Fetch ioctl commands defined in symbolic form.
-"$mydir"/ioctls_sym.sh "$inc_dir" > ioctls_sym.h
+INCLUDES="$INCLUDES_arch ${INCLUDES-}" \
+	"$mydir"/ioctls_sym.sh "$inc_dir" > ioctls_sym.h
 
 # Part of android ioctl commands are defined elsewhere.
 android_dir="$inc_dir/../drivers/staging/android"
 if [ -d "$android_dir/uapi" ]; then
+	INCLUDES="$INCLUDES_inc $INCLUDES_arch ${INCLUDES-}" \
 	"$mydir"/ioctls_sym.sh "$android_dir" staging/android >> ioctls_sym.h
 fi
 msg "generated $(grep -c '^{' ioctls_sym.h) symbolic ioctls from $inc_dir"
@@ -104,8 +111,8 @@ msg "generated $(grep -c '^{' ioctls_inc.h) ioctls from $inc_dir"
 msg "generated $(grep -c '^{' ioctls_hex.h) hex ioctls from $arch_dir"
 
 # Fetch ioctl commands defined in symbolic form.
-INCLUDES="-I$abs_inc_dir/uapi -I$abs_inc_dir ${INCLUDES-}" \
-	"${0%/*}"/ioctls_sym.sh "$arch_dir" > ioctls_sym.h
+INCLUDES="$INCLUDES_inc ${INCLUDES-}" \
+	"$mydir"/ioctls_sym.sh "$arch_dir" > ioctls_sym.h
 msg "generated $(grep -c '^{' ioctls_sym.h) symbolic ioctls from $arch_dir"
 
 # Output all ioctl definitions fetched from arch-include-directory.
