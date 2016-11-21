@@ -36,6 +36,7 @@ r_io='\([A-Z]\+\)\?_S\?\(IO\|IOW\|IOR\|IOWR\|IOC\)'
 r_value='[[:space:]]\+'"$r_io"'[[:space:]]*([^)]'
 regexp="${r_define}${r_cmd_name}${r_value}"
 
+uname_m="$(uname -m)"
 me="${0##*/}"
 msg()
 {
@@ -166,7 +167,7 @@ return 0;
 }
 __EOF__
 
-	# Soft workarounds for some processed files.  Fragile.
+	# Soft pre-include workarounds for some processed files.  Fragile.
 	case "$f" in
 		*asm/cmb.h)
 			echo '#include <asm/dasd.h>'
@@ -243,36 +244,10 @@ __EOF__
 			echo '#include <linux/videodev2.h>'
 			;;
 		*linux/kvm.h)
-			cat <<'__EOF__'
-#if !(defined __powerpc__)
-struct kvm_allocate_rma { __u32 unused[2]; };
-struct kvm_create_spapr_tce { __u32 unused[3]; };
-struct kvm_create_spapr_tce_64 { __u32 unused[8]; };
-struct kvm_get_htab_fd { __u32 unused[8]; };
-struct kvm_rtas_token_args { __u8 unused[128]; };
-#endif
-
-#if !(defined __arm64__ || defined __arm__)
-struct kvm_vcpu_init { __u32 unused[8]; };
-#endif
-
-#if !(defined __x86_64__ || defined __i386__)
-struct kvm_cpuid { __u32 unused[2]; };
-struct kvm_cpuid2 { __u32 unused[2]; };
-struct kvm_debugregs { __u32 unused[32]; };
-struct kvm_lapic_state { __u32 unused[256]; };
-struct kvm_memory_alias { __u32 unused[8]; };
-struct kvm_msr_list { __u32 unused[1]; };
-struct kvm_msrs { __u32 unused[2]; };
-struct kvm_pit_state { __u32 unused[18]; };
-struct kvm_pit_state2 { __u32 unused[28]; };
-struct kvm_vcpu_events { __u32 unused[16]; };
-struct kvm_x86_mce { __u32 unused[16]; };
-struct kvm_xcrs { __u32 unused[98]; };
-struct kvm_xen_hvm_config { __u32 unused[14]; };
-struct kvm_xsave { __u32 unused[1024]; };
-#endif
-__EOF__
+			case "$uname_m" in
+				i?86|x86_64|arm*|ppc*|s390*) ;;
+				*) return 0 ;; # not applicable
+			esac
 			;;
 		*linux/sonet.h)
 			echo '#include <linux/atmioc.h>'
@@ -371,6 +346,10 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 			# Filter out the code that references unknown types.
 			sed '/^struct via_file_private/,/^}/d' < "$s" > "$tmpdir/$f"
 			;;
+		*linux/nilfs2_fs.h)
+			# Create the file it attempts to include.
+			touch "$tmpdir/asm/bug.h"
+			;;
 		*linux/vmw_vmci_defs.h)
 			# Fetch ioctl macros only.
 			grep "${r_define}I" < "$s" > "$tmpdir/$f"
@@ -378,10 +357,6 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 		*media/v4l2-common.h)
 			# Fetch one piece of code containing ioctls definitions.
 			sed -n '/ remaining ioctls/,/ ---/p' < "$s" > "$tmpdir/$f"
-			;;
-		*linux/nilfs2_fs.h)
-			# Create the file it attempts to include.
-			touch "$tmpdir/asm/bug.h"
 			;;
 		openpromio.h|*/openpromio.h|fbio.h|*/fbio.h)
 			# Create the file it attempts to include.
@@ -396,6 +371,22 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 	# In case of success it outputs both the #define directives
 	# and the result of preprocessing.
 	$CPP $CPPFLAGS -dD $INCLUDES < "$tmpdir"/header.in > "$tmpdir"/header.out
+
+	# Soft post-preprocess workarounds.  Fragile.
+	case "$f" in
+		*linux/kvm.h)
+			arm_list='KVM_ARM_PREFERRED_TARGET|KVM_ARM_VCPU_INIT'
+			ppc_list='KVM_ALLOCATE_RMA|KVM_CREATE_SPAPR_TCE|KVM_CREATE_SPAPR_TCE_64|KVM_PPC_GET_HTAB_FD|KVM_PPC_RTAS_DEFINE_TOKEN'
+			x86_list='KVM_GET_CPUID2|KVM_GET_DEBUGREGS|KVM_GET_EMULATED_CPUID|KVM_GET_LAPIC|KVM_GET_MSRS|KVM_GET_MSR_INDEX_LIST|KVM_GET_PIT|KVM_GET_PIT2|KVM_GET_SUPPORTED_CPUID|KVM_GET_VCPU_EVENTS|KVM_GET_XCRS|KVM_GET_XSAVE|KVM_SET_CPUID|KVM_SET_CPUID2|KVM_SET_DEBUGREGS|KVM_SET_LAPIC|KVM_SET_MEMORY_ALIAS|KVM_SET_MSRS|KVM_SET_PIT|KVM_SET_PIT2|KVM_SET_VCPU_EVENTS|KVM_SET_XCRS|KVM_SET_XSAVE|KVM_X86_SET_MCE|KVM_XEN_HVM_CONFIG'
+			case "$uname_m" in
+				arm*) list="$ppc_list|$x86_list" ;;
+				ppc*) list="$arm_list|$x86_list" ;;
+				i?86|x86_64*) list="$arm_list|$ppc_list" ;;
+				*) list="$arm_list|$ppc_list|$x86_list" ;;
+			esac
+			sed -r -i "/[[:space:]]($list)[[:space:]]/d" "$tmpdir"/header.out
+			;;
+	esac
 
 	# Need to exclude ioctl commands defined elsewhere.
 	local_defines='^[[:space:]]*#[[:space:]]*define[[:space:]]\+\('"$r_cmd_name"'\)[[:space:]]'
