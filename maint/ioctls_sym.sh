@@ -172,6 +172,9 @@ __EOF__
 		*asm/cmb.h)
 			echo '#include <asm/dasd.h>'
 			;;
+		*asm/core_*.h)
+			return 0 # false positives
+			;;
 		*asm/ioctls.h)
 			cat <<'__EOF__'
 #include <asm/termios.h>
@@ -318,6 +321,14 @@ __EOF__
 		mkdir -p "$tmpdir/${f%/*}"
 	# Hard workarounds for some processed files.  Very fragile.
 	case "$f" in
+		*asm-generic/ioctls.h)
+			# Filter out macros defined using unavailable types.
+			case "$uname_m" in
+				alpha*|ppc*)
+					grep -Fv 'struct termios2' < "$s" > "$tmpdir/$f"
+					;;
+			esac
+			;;
 		*acpi/*|*linux/i2o.h|*media*/exynos-fimc.h|*media/v4l2-subdev.h|*net/bluetooth/*|net/nfc/nci_core.h)
 			# Fetch macros only.
 			grep "${r_define}${r_cmd_name}" < "$s" > "$tmpdir/$f"
