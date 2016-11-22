@@ -44,54 +44,53 @@ int
 main(void)
 {
 	static const char str[] = "0123456789abcdef";
-	static const int len = sizeof(str);
-	static const int len1 = len - 1;
-	char *const name = tail_memdup(str, len);
-	char *const name1 = name + 1;
+	static const int len = sizeof(str) - 1;
+	char *name = tail_memdup(str, sizeof(str));
 	int i;
 	int rc;
 
 	rc = prctl(PR_SET_NAME, NULL);
 	printf("prctl(PR_SET_NAME, NULL) = %s\n", sprintrc(rc));
 
-	for (i = 0; i <= len1; ++i) {
-		rc = prctl(PR_SET_NAME, name + len1 - i);
+	for (i = 0; i <= len; ++i) {
+		rc = prctl(PR_SET_NAME, name + len - i);
 		printf("prctl(PR_SET_NAME, \"%.*s\"%s) = %s\n",
-		       i < len1 - 1 ? i : len1 - 1,
-		       str + len1 - i,
-		       i < len1 - 1 ? "" : "...",
+		       i < len - 1 ? i : len - 1,
+		       str + len - i,
+		       i < len - 1 ? "" : "...",
 		       sprintrc(rc));
 	}
 
-	name[0] = -1;
-	memcpy(name1, str, len1);
+	*name = -1;
+	++name;
+	memcpy(name, str, len);
 
-	for (i = 0; i <= len1; ++i) {
-		rc = prctl(PR_SET_NAME, name1 + len1 - i);
-		if (i < len1 - 1)
+	for (i = 0; i <= len; ++i) {
+		rc = prctl(PR_SET_NAME, name + len - i);
+		if (i < len - 1)
 			printf("prctl(PR_SET_NAME, %p) = %s\n",
-			       name1 + len1 - i, sprintrc(rc));
+			       name + len - i, sprintrc(rc));
 		else
 			printf("prctl(PR_SET_NAME, \"%.*s\"...) = %s\n",
-			       len1 - 1, str + len1 - i, sprintrc(rc));
+			       len - 1, str + len - i, sprintrc(rc));
 	}
 
 	rc = prctl(PR_GET_NAME, NULL);
 	printf("prctl(PR_GET_NAME, NULL) = %s\n", sprintrc(rc));
 
-	for (i = 0; i < len1; ++i) {
-		rc = prctl(PR_GET_NAME, name1 + len1 - i);
+	for (i = 0; i < len; ++i) {
+		rc = prctl(PR_GET_NAME, name + len - i);
 		printf("prctl(PR_GET_NAME, %p) = %s\n",
-		       name1 + len1 - i, sprintrc(rc));
+		       name + len - i, sprintrc(rc));
 	}
 
-	rc = prctl(PR_GET_NAME, name1);
+	rc = prctl(PR_GET_NAME, name);
 	if (rc)
 		printf("prctl(PR_GET_NAME, %p) = %s\n",
-		       name1, sprintrc(rc));
+		       name, sprintrc(rc));
 	else
 		printf("prctl(PR_GET_NAME, \"%.*s\") = %s\n",
-		       len1 - 1, name1, sprintrc(rc));
+		       len - 1, name, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
