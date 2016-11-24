@@ -48,13 +48,14 @@ main(void)
 
 	if (syscall(__NR_clock_getres, CLOCK_REALTIME, &t.ts))
 		perror_msg_and_skip("clock_getres CLOCK_REALTIME");
-	printf("clock_getres(CLOCK_REALTIME, {%jd, %jd}) = 0\n",
+	printf("clock_getres(CLOCK_REALTIME, {tv_sec=%jd, tv_nsec=%jd}) = 0\n",
 	       (intmax_t) t.ts.tv_sec,
 	       (intmax_t) t.ts.tv_nsec);
 
 	if (syscall(__NR_clock_gettime, CLOCK_PROCESS_CPUTIME_ID, &t.ts))
 		perror_msg_and_skip("clock_gettime CLOCK_PROCESS_CPUTIME_ID");
-	printf("clock_gettime(CLOCK_PROCESS_CPUTIME_ID, {%jd, %jd}) = 0\n",
+	printf("clock_gettime(CLOCK_PROCESS_CPUTIME_ID, "
+	       "{tv_sec=%jd, tv_nsec=%jd}) = 0\n",
 	       (intmax_t) t.ts.tv_sec,
 	       (intmax_t) t.ts.tv_nsec);
 
@@ -63,8 +64,8 @@ main(void)
 	if (!syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts))
 		error_msg_and_skip("clock_settime CLOCK_THREAD_CPUTIME_ID:"
 				   " EINVAL expected");
-	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID, {%jd, %jd})"
-	       " = -1 EINVAL (%m)\n",
+	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID, {tv_sec=%jd, "
+	       "tv_nsec=%jd}) = -1 EINVAL (%m)\n",
 	       (intmax_t) t.ts.tv_sec,
 	       (intmax_t) t.ts.tv_nsec);
 

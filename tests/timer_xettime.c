@@ -75,8 +75,10 @@ main(void)
 	if (syscall(__NR_timer_settime, tid, 0, &new.its, &old.its))
 		perror_msg_and_skip("timer_settime");
 	printf("timer_settime(%d, 0"
-	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
-	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
+	       ", {it_interval={tv_sec=%jd, tv_nsec=%jd}"
+	       ", it_value={tv_sec=%jd, tv_nsec=%jd}}"
+	       ", {it_interval={tv_sec=%jd, tv_nsec=%jd}"
+	       ", it_value={tv_sec=%jd, tv_nsec=%jd}}"
 	       ") = 0\n",
 	       tid,
 	       (intmax_t) new.its.it_interval.tv_sec,
@@ -91,8 +93,8 @@ main(void)
 	if (syscall(__NR_timer_gettime, tid, &old.its))
 		perror_msg_and_skip("timer_gettime");
 	printf("timer_gettime(%d"
-	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
-	       ") = 0\n",
+	       ", {it_interval={tv_sec=%jd, tv_nsec=%jd}"
+	       ", it_value={tv_sec=%jd, tv_nsec=%jd}}) = 0\n",
 	       tid,
 	       (intmax_t) old.its.it_interval.tv_sec,
 	       (intmax_t) old.its.it_interval.tv_nsec,

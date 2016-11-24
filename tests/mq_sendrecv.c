@@ -148,7 +148,7 @@ do_send(int fd, char *msg, unsigned int msg_size, struct timespec *tmout,
 		if (cropped)
 			printf("...");
 		errno = saved_errno;
-		printf(", %u, 42, {%jd, %jd}) = %s\n", msg_size,
+		printf(", %u, 42, {tv_sec=%jd, tv_nsec=%jd}) = %s\n", msg_size,
 		       (intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec,
 		       sprintrc(rc));
 		errno = saved_errno;
@@ -186,7 +186,7 @@ do_recv(int fd, char *msg, unsigned int msg_size, struct timespec *tmout,
 			printf("%p", msg);
 		}
 		errno = saved_errno;
-		printf(", %u, [42], {%jd, %jd}) = %s\n", MSG_SIZE,
+		printf(", %u, [42], {tv_sec=%jd, tv_nsec=%jd}) = %s\n", MSG_SIZE,
 		       (intmax_t) tmout->tv_sec,
 		       (intmax_t) tmout->tv_nsec, sprintrc(rc));
 		errno = saved_errno;
@@ -305,7 +305,8 @@ main(void)
 	/* Partially invalid message (memory only partially available) */
 	rc = syscall(__NR_mq_timedsend, bogus_fd, msg + MSG_SIZE - MSG_CUT,
 		     MSG_SIZE, bogus_prio, bogus_tmout);
-	printf("mq_timedsend(%d, %p, %llu, %u, {%jd, %jd}) = %s\n",
+	printf("mq_timedsend(%d, %p, %llu, %u, {tv_sec=%jd, tv_nsec=%jd}) = "
+	       "%s\n",
 	       (int) bogus_fd, msg + MSG_SIZE - MSG_CUT,
 	       (unsigned long long) MSG_SIZE, (unsigned) bogus_prio,
 	       (intmax_t) bogus_tmout->tv_sec, (intmax_t) bogus_tmout->tv_nsec,
@@ -317,7 +318,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("mq_timedsend(%d, ", (int) bogus_fd);
 	printstr(MSG_START + MSG_SIZE - MSG_CUT, MSG_CUT);
-	printf(", %llu, %u, {%jd, %jd}) = %s\n",
+	printf(", %llu, %u, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
 	       (unsigned long long) MSG_CUT, (unsigned) bogus_prio,
 	       (intmax_t) bogus_tmout->tv_sec, (intmax_t) bogus_tmout->tv_nsec,
 	       errstr);
@@ -328,7 +329,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("mq_timedsend(%d, ", (int) bogus_fd);
 	printstr(MSG_START + MSG_CUT, MSG_MAX_UNCUT);
-	printf("..., %llu, %u, {%jd, %jd}) = %s\n",
+	printf("..., %llu, %u, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
 	       (unsigned long long) MSG_SIZE, (unsigned) bogus_prio,
 	       (intmax_t) bogus_tmout->tv_sec, (intmax_t) bogus_tmout->tv_nsec,
 	       errstr);
@@ -351,7 +352,8 @@ main(void)
 	/* Invalid fd, valid msg pointer */
 	rc = syscall(__NR_mq_timedreceive, bogus_fd, msg, bogus_size,
 		     bogus_prio_ptr, bogus_tmout);
-	printf("mq_timedreceive(%d, %p, %llu, %p, {%jd, %jd}) = %s\n",
+	printf("mq_timedreceive(%d, %p, %llu, %p, {tv_sec=%jd, tv_nsec=%jd}) = "
+	       "%s\n",
 	       (int) bogus_fd, msg, (unsigned long long) bogus_size,
 	       bogus_prio_ptr, (intmax_t) bogus_tmout->tv_sec,
 	       (intmax_t) bogus_tmout->tv_nsec, sprintrc(rc));

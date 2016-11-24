@@ -100,8 +100,9 @@ int main(int ac, char **av)
 	FD_SET(fds[0], set[1]);
 	FD_SET(fds[1], set[1]);
 	assert(syscall(__NR_pselect6, fds[1] + 1, NULL, set[1], NULL, &tm.ts, NULL) == 3);
-	printf("pselect6(%d, NULL, [1 2 %d %d], NULL, {%lld, %lld}, NULL)"
-	       " = 3 (out [1 2 %d], left {%lld, %lld})\n",
+	printf("pselect6(%d, NULL, [1 2 %d %d], NULL, "
+	       "{tv_sec=%lld, tv_nsec=%lld}, NULL) = 3 (out [1 2 %d], left "
+	       "{tv_sec=%lld, tv_nsec=%lld})\n",
 	       fds[1] + 1, fds[0], fds[1],
 	       (long long) tm_in.ts.tv_sec, (long long) tm_in.ts.tv_nsec,
 	       fds[1],
@@ -126,8 +127,9 @@ int main(int ac, char **av)
 	tm.ts.tv_sec = 0;
 	tm.ts.tv_nsec = 123;
 	assert(pselect(FD_SETSIZE + 1, set[0], set[1], NULL, &tm.ts, &mask) == 0);
-	printf("pselect6(%d, [%d], [], NULL, {0, 123}, {[HUP CHLD], %u}) "
-	       "= 0 (Timeout)\n", FD_SETSIZE + 1, fds[0], NSIG / 8);
+	printf("pselect6(%d, [%d], [], NULL, {tv_sec=0, tv_nsec=123}, "
+	       "{[HUP CHLD], %u}) = 0 (Timeout)\n",
+	       FD_SETSIZE + 1, fds[0], NSIG / 8);
 
 	/*
 	 * See how timeouts are decoded.
@@ -137,8 +139,9 @@ int main(int ac, char **av)
 
 	tm.ts.tv_nsec = 222222222;
 	assert(pselect(0, NULL, NULL, NULL, &tm.ts, &mask) == -1);
-	printf("pselect6(0, NULL, NULL, NULL, {0, 222222222}, {[HUP CHLD], %u})"
-	       " = ? ERESTARTNOHAND (To be restarted if no handler)\n",
+	printf("pselect6(0, NULL, NULL, NULL, {tv_sec=0, tv_nsec=222222222}, "
+	       "{[HUP CHLD], %u}) = "
+	       "? ERESTARTNOHAND (To be restarted if no handler)\n",
 	       NSIG / 8);
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
 

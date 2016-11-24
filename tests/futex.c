@@ -189,14 +189,14 @@ main(int argc, char *argv[])
 	/* uaddr is NULL */
 	CHECK_FUTEX(NULL, FUTEX_WAIT, VAL, tmout, uaddr2, VAL3,
 		(rc == -1) && (errno == EFAULT));
-	printf("futex(NULL, FUTEX_WAIT, %u, {%jd, %jd}) = %s\n",
+	printf("futex(NULL, FUTEX_WAIT, %u, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
 		VAL_PR, (intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec,
 		sprintrc(rc));
 
 	/* uaddr is faulty */
 	CHECK_FUTEX(uaddr + 1, FUTEX_WAIT, VAL, tmout, uaddr2, VAL3,
 		(rc == -1) && (errno == EFAULT));
-	printf("futex(%p, FUTEX_WAIT, %u, {%jd, %jd}) = %s\n",
+	printf("futex(%p, FUTEX_WAIT, %u, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
 		uaddr + 1, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, sprintrc(rc));
 
@@ -209,14 +209,15 @@ main(int argc, char *argv[])
 	/* uaddr is not as provided; uaddr2 is faulty but ignored */
 	CHECK_FUTEX(uaddr, FUTEX_WAIT, VAL, tmout, uaddr2 + 1, VAL3,
 		(rc == -1) && (errno == EAGAIN));
-	printf("futex(%p, FUTEX_WAIT, %u, {%jd, %jd}) = %s\n",
+	printf("futex(%p, FUTEX_WAIT, %u, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
 		uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, sprintrc(rc));
 
 	/* uaddr is not as provided; uaddr2 is faulty but ignored */
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_PRIVATE_FLAG | FUTEX_WAIT, VAL, tmout,
 		uaddr2 + 1, VAL3, (rc == -1) && (errno == EAGAIN));
-	printf("futex(%p, FUTEX_WAIT_PRIVATE, %u, {%jd, %jd}) = %s\n",
+	printf("futex(%p, FUTEX_WAIT_PRIVATE, %u, {tv_sec=%jd, tv_nsec=%jd}) = "
+		"%s\n",
 		uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, sprintrc(rc));
 
@@ -227,7 +228,7 @@ main(int argc, char *argv[])
 		FUTEX_CLOCK_REALTIME | FUTEX_WAIT,
 		VAL, tmout, uaddr2, VAL3, (rc == -1) && (errno == EAGAIN));
 	printf("futex(%p, FUTEX_WAIT|FUTEX_CLOCK_REALTIME, %u, "
-		"{%jd, %jd}) = %s\n", uaddr, VAL_PR,
+		"{tv_sec=%jd, tv_nsec=%jd}) = %s\n", uaddr, VAL_PR,
 		(intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec,
 		sprintrc(rc));
 
@@ -235,7 +236,7 @@ main(int argc, char *argv[])
 		FUTEX_CLOCK_REALTIME | FUTEX_PRIVATE_FLAG | FUTEX_WAIT ,
 		VAL, tmout, uaddr2, 0, (rc == -1) && (errno == EAGAIN));
 	printf("futex(%p, FUTEX_WAIT_PRIVATE|FUTEX_CLOCK_REALTIME, %u, "
-		"{%jd, %jd}) = %s\n", uaddr, VAL_PR,
+		"{tv_sec=%jd, tv_nsec=%jd}) = %s\n", uaddr, VAL_PR,
 		(intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec,
 		sprintrc(rc));
 
@@ -253,21 +254,24 @@ main(int argc, char *argv[])
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_WAIT_BITSET, VAL, tmout, uaddr2 + 1,
 		VAL3, (rc == -1) && (errno == EAGAIN));
-	printf("futex(%p, FUTEX_WAIT_BITSET, %u, {%jd, %jd}, %#x) = %s\n",
+	printf("futex(%p, FUTEX_WAIT_BITSET, %u, {tv_sec=%jd, tv_nsec=%jd}, "
+		"%#x) = %s\n",
 		uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, VAL3_PR, sprintrc(rc));
 
 	/* val3 of 0 is invalid  */
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_WAIT_BITSET, VAL, tmout, uaddr2 + 1, 0,
 		(rc == -1) && (errno == EINVAL));
-	printf("futex(%p, FUTEX_WAIT_BITSET, %u, {%jd, %jd}, %#x) = %s\n",
+	printf("futex(%p, FUTEX_WAIT_BITSET, %u, {tv_sec=%jd, tv_nsec=%jd}, "
+		"%#x) = %s\n",
 		uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, 0, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_PRIVATE_FLAG | FUTEX_WAIT_BITSET, VAL,
 		tmout, uaddr2 + 1, VAL3, (rc == -1) && (errno == EAGAIN));
-	printf("futex(%p, FUTEX_WAIT_BITSET_PRIVATE, %u, {%jd, %jd}, %#x) = "
-		"%s\n", uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
+	printf("futex(%p, FUTEX_WAIT_BITSET_PRIVATE, %u, "
+		"{tv_sec=%jd, tv_nsec=%jd}, %#x) = %s\n",
+		uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, VAL3_PR, sprintrc(rc));
 
 	/* Next 3 tests are with CLOCKRT bit set */
@@ -275,7 +279,7 @@ main(int argc, char *argv[])
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_CLOCK_REALTIME | FUTEX_WAIT_BITSET, VAL,
 		tmout, uaddr2 + 1, VAL3, (rc == -1) && (errno == EAGAIN));
 	printf("futex(%p, FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME, %u, "
-		"{%jd, %jd}, %#x) = %s\n", uaddr, VAL_PR,
+		"{tv_sec=%jd, tv_nsec=%jd}, %#x) = %s\n", uaddr, VAL_PR,
 		(intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec, VAL3_PR,
 		sprintrc(rc));
 
@@ -283,7 +287,7 @@ main(int argc, char *argv[])
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_CLOCK_REALTIME | FUTEX_WAIT_BITSET, VAL,
 		tmout, uaddr2 + 1, 0, (rc == -1) && (errno == EINVAL));
 	printf("futex(%p, FUTEX_WAIT_BITSET|FUTEX_CLOCK_REALTIME, %u, "
-		"{%jd, %jd}, %#x) = %s\n", uaddr, VAL_PR,
+		"{tv_sec=%jd, tv_nsec=%jd}, %#x) = %s\n", uaddr, VAL_PR,
 		(intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec, 0,
 		sprintrc(rc));
 
@@ -291,7 +295,7 @@ main(int argc, char *argv[])
 		FUTEX_WAIT_BITSET, VAL, tmout, uaddr2 + 1, VAL3,
 		(rc == -1) && (errno == EAGAIN));
 	printf("futex(%p, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, %u, "
-		"{%jd, %jd}, %#x) = %s\n", uaddr, VAL_PR,
+		"{tv_sec=%jd, tv_nsec=%jd}, %#x) = %s\n", uaddr, VAL_PR,
 		(intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec, VAL3_PR,
 		sprintrc(rc));
 
@@ -543,13 +547,14 @@ main(int argc, char *argv[])
 
 	CHECK_FUTEX_ENOSYS(uaddr + 1, FUTEX_LOCK_PI, VAL, tmout, uaddr2 + 1,
 		VAL3, (rc == -1) && (errno == EFAULT));
-	printf("futex(%p, FUTEX_LOCK_PI, {%jd, %jd}) = %s\n",
+	printf("futex(%p, FUTEX_LOCK_PI, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
 		uaddr + 1, (intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec,
 		sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr + 1, FUTEX_PRIVATE_FLAG | FUTEX_LOCK_PI, VAL,
 		tmout, uaddr2 + 1, VAL3, (rc == -1) && (errno == EFAULT));
-	printf("futex(%p, FUTEX_LOCK_PI_PRIVATE, {%jd, %jd}) = %s\n",
+	printf("futex(%p, FUTEX_LOCK_PI_PRIVATE, {tv_sec=%jd, tv_nsec=%jd}) = "
+		"%s\n",
 		uaddr + 1, (intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec,
 		sprintrc(rc));
 
@@ -623,20 +628,22 @@ main(int argc, char *argv[])
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_WAIT_REQUEUE_PI, VAL, tmout, uaddr2,
 		VAL3, (rc == -1) && (errno == EAGAIN));
-	printf("futex(%p, FUTEX_WAIT_REQUEUE_PI, %u, {%jd, %jd}, %p) = %s\n",
+	printf("futex(%p, FUTEX_WAIT_REQUEUE_PI, %u, "
+		"{tv_sec=%jd, tv_nsec=%jd}, %p) = %s\n",
 		uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, uaddr2, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_PRIVATE_FLAG | FUTEX_WAIT_REQUEUE_PI,
 		VAL, tmout, uaddr2, VAL3, (rc == -1) && (errno == EAGAIN));
-	printf("futex(%p, FUTEX_WAIT_REQUEUE_PI_PRIVATE, %u, {%jd, %jd}, %p) "
+	printf("futex(%p, FUTEX_WAIT_REQUEUE_PI_PRIVATE, %u, "
+		"{tv_sec=%jd, tv_nsec=%jd}, %p) "
 		"= %s\n", uaddr, VAL_PR, (intmax_t) tmout->tv_sec,
 		(intmax_t) tmout->tv_nsec, uaddr2, sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_CLOCK_REALTIME | FUTEX_WAIT_REQUEUE_PI,
 		VAL, tmout, uaddr2, VAL3, (rc == -1) && (errno == EAGAIN));
 	printf("futex(%p, FUTEX_WAIT_REQUEUE_PI|FUTEX_CLOCK_REALTIME, %u, "
-		"{%jd, %jd}, %p) = %s\n", uaddr, VAL_PR,
+		"{tv_sec=%jd, tv_nsec=%jd}, %p) = %s\n", uaddr, VAL_PR,
 		(intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec, uaddr2,
 		sprintrc(rc));
 
@@ -644,7 +651,7 @@ main(int argc, char *argv[])
 		FUTEX_WAIT_REQUEUE_PI, VAL, tmout, uaddr2, VAL3,
 		(rc == -1) && (errno == EAGAIN));
 	printf("futex(%p, FUTEX_WAIT_REQUEUE_PI_PRIVATE|FUTEX_CLOCK_REALTIME, "
-		"%u, {%jd, %jd}, %p) = %s\n", uaddr, VAL_PR,
+		"%u, {tv_sec=%jd, tv_nsec=%jd}, %p) = %s\n", uaddr, VAL_PR,
 		(intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec, uaddr2,
 		sprintrc(rc));
 

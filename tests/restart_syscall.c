@@ -55,7 +55,8 @@ main(void)
 	if (nanosleep(&req, &rem))
 		perror_msg_and_fail("nanosleep");
 
-	printf("nanosleep\\(\\{%jd, %jd\\}, \\{%jd, %jd\\}\\)"
+	printf("nanosleep\\(\\{tv_sec=%jd, tv_nsec=%jd\\}, "
+	       "\\{tv_sec=%jd, tv_nsec=%jd\\}\\)"
 	       " = \\? ERESTART_RESTARTBLOCK \\(Interrupted by signal\\)\n",
 	       (intmax_t) req.tv_sec, (intmax_t) req.tv_nsec,
 	       (intmax_t) rem.tv_sec, (intmax_t) rem.tv_nsec);
@@ -66,7 +67,8 @@ main(void)
 #else
 # define ALTERNATIVE_NANOSLEEP_REQ ""
 #endif
-	printf("(nanosleep\\((%s\\{%jd, %jd\\}), %p|restart_syscall\\(<\\.\\.\\."
+	printf("(nanosleep\\((%s\\{tv_sec=%jd, tv_nsec=%jd\\}), "
+	       "%p|restart_syscall\\(<\\.\\.\\."
 	       " resuming interrupted nanosleep \\.\\.\\.>)\\) = 0\n",
 	       ALTERNATIVE_NANOSLEEP_REQ,
 	       (intmax_t) req.tv_sec, (intmax_t) req.tv_nsec, &rem);

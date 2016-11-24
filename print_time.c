@@ -43,12 +43,13 @@ typedef struct timeval timeval_t;
 # define UTIME_OMIT ((1l << 30) - 2l)
 #endif
 
+static const char timespec_fmt[] = "{tv_sec=%jd, tv_nsec=%jd}";
 static const char time_fmt[] = "{%jd, %jd}";
 
 static void
 print_timespec_t(const timespec_t *t)
 {
-	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_nsec);
+	tprintf(timespec_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_nsec);
 }
 
 static void
@@ -88,7 +89,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timespec,
 		   struct tcb *tcp, const long addr)
 {
 	timespec_t t;
-	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
+	static char buf[sizeof(timespec_fmt) + 3 * sizeof(t)];
 
 	if (!addr) {
 		strcpy(buf, "NULL");
@@ -96,7 +97,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timespec,
 		   umove(tcp, addr, &t)) {
 		snprintf(buf, sizeof(buf), "%#lx", addr);
 	} else {
-		snprintf(buf, sizeof(buf), time_fmt,
+		snprintf(buf, sizeof(buf), timespec_fmt,
 			 (intmax_t) t.tv_sec, (intmax_t) t.tv_nsec);
 	}
 

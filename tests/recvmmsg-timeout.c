@@ -53,7 +53,7 @@ main(void)
 	struct timespec t = { .tv_sec = 0, .tv_nsec = 12345678 };
 
 	int rc = recv_mmsg(-1, &mh, 1, 0, &t);
-	printf("recvmmsg(-1, %p, 1, 0, {0, 12345678})"
+	printf("recvmmsg(-1, %p, 1, 0, {tv_sec=0, tv_nsec=12345678})"
 	       " = %d %s (%m)\n", &mh, rc, errno2name());
 
 	rc = recv_mmsg(fds[0], &mh, 1, 0, &t);
@@ -62,7 +62,8 @@ main(void)
 	printf("recvmmsg(%d, [{msg_hdr={msg_name=NULL, msg_namelen=0"
 	       ", msg_iov=[{iov_base=\"A\", iov_len=1}], msg_iovlen=1"
 	       ", msg_controllen=0, msg_flags=0}, msg_len=1}], 1, 0"
-	       ", {0, 12345678}) = %d (left {0, %d})\n",
+	       ", {tv_sec=0, tv_nsec=12345678}) = "
+	       "%d (left {tv_sec=0, tv_nsec=%d})\n",
 	       fds[0], rc, (int) t.tv_nsec);
 
 	puts("+++ exited with 0 +++");

@@ -92,8 +92,8 @@ main(void)
 		id, sem_b + 1, ts + 1, sprintrc(rc));
 
 	rc = semtimedop(bogus_semid, sem_b2, 2, ts);
-	printf("semtimedop(%d, [{%hu, %hd, %s%s%#hx}, %p], %u, {%jd, %jd}) = "
-		"%s\n",
+	printf("semtimedop(%d, [{%hu, %hd, %s%s%#hx}, %p], %u, "
+		"{tv_sec=%jd, tv_nsec=%jd}) = %s\n",
 		bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
 		sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
 		sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
@@ -110,7 +110,8 @@ main(void)
 	sem_b->sem_op = -1;
 	if (semtimedop(id, sem_b, 1, ts))
 		perror_msg_and_skip("semtimedop, -1");
-	printf("semtimedop(%d, [{0, -1, SEM_UNDO}], 1, {%jd, %jd}) = 0\n", id,
+	printf("semtimedop(%d, [{0, -1, SEM_UNDO}], 1, "
+		"{tv_sec=%jd, tv_nsec=%jd}) = 0\n", id,
 		(intmax_t) ts->tv_sec, (intmax_t) ts->tv_nsec);
 
 	puts("+++ exited with 0 +++");

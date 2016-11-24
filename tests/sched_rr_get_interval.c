@@ -25,8 +25,8 @@ main(void)
 
 	rc = syscall(__NR_sched_rr_get_interval, 0, tp);
 	if (rc == 0)
-		printf("sched_rr_get_interval(0, {%jd, %jd}) = 0\n",
-			(intmax_t)tp->tv_sec, (intmax_t)tp->tv_nsec);
+		printf("sched_rr_get_interval(0, {tv_sec=%jd, tv_nsec=%jd}) = "
+		       "0\n", (intmax_t)tp->tv_sec, (intmax_t)tp->tv_nsec);
 	else
 		printf("sched_rr_get_interval(-1, %p) = %s\n", tp,
 			sprintrc(rc));

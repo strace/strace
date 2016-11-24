@@ -43,7 +43,8 @@
 static void
 print_ts(const struct timespec *ts)
 {
-	printf("{%ju, %ju}", (uintmax_t) ts->tv_sec, (uintmax_t) ts->tv_nsec);
+	printf("{tv_sec=%ju, tv_nsec=%ju}", (uintmax_t) ts->tv_sec,
+		(uintmax_t) ts->tv_nsec);
 }
 
 int

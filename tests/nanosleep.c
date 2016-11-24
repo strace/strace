@@ -57,7 +57,7 @@ main(void)
 
 	if (nanosleep(&req.ts, NULL))
 		perror_msg_and_fail("nanosleep");
-	printf("nanosleep({%jd, %jd}, NULL) = 0\n",
+	printf("nanosleep({tv_sec=%jd, tv_nsec=%jd}, NULL) = 0\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec);
 
 	assert(nanosleep(NULL, &rem.ts) == -1);
@@ -65,12 +65,12 @@ main(void)
 
 	if (nanosleep(&req.ts, &rem.ts))
 		perror_msg_and_fail("nanosleep");
-	printf("nanosleep({%jd, %jd}, %p) = 0\n",
+	printf("nanosleep({tv_sec=%jd, tv_nsec=%jd}, %p) = 0\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec, &rem.ts);
 
 	req.ts.tv_nsec = 1000000000;
 	assert(nanosleep(&req.ts, &rem.ts) == -1);
-	printf("nanosleep({%jd, %jd}, %p) = -1 EINVAL (%m)\n",
+	printf("nanosleep({tv_sec=%jd, tv_nsec=%jd}, %p) = -1 EINVAL (%m)\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec, &rem.ts);
 
 	assert(sigaction(SIGALRM, &act, NULL) == 0);
@@ -87,7 +87,7 @@ main(void)
 
 	req.ts.tv_nsec = 999999999;
 	assert(nanosleep(&req.ts, &rem.ts) == -1);
-	printf("nanosleep({%jd, %jd}, {%jd, %jd})"
+	printf("nanosleep({tv_sec=%jd, tv_nsec=%jd}, {tv_sec=%jd, tv_nsec=%jd})"
 	       " = ? ERESTART_RESTARTBLOCK (Interrupted by signal)\n",
 	       (intmax_t) req.ts.tv_sec, (intmax_t) req.ts.tv_nsec,
 	       (intmax_t) rem.ts.tv_sec, (intmax_t) rem.ts.tv_nsec);
