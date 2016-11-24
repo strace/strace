@@ -66,8 +66,8 @@ main(void)
 	ts[1].tv_usec = tv.tv_usec + 1;
 
 	rc = syscall(__NR_utimes, "", ts);
-	printf("utimes(\"\", [{%llu, %llu}, {%llu, %llu}])"
-	       " = %ld %s (%m)\n",
+	printf("utimes(\"\", [{tv_sec=%llu, tv_usec=%llu}, "
+	       "{tv_sec=%llu, tv_usec=%llu}]) = %ld %s (%m)\n",
 	       CAST_NUM(ts[0].tv_sec), CAST_NUM(ts[0].tv_usec),
 	       CAST_NUM(ts[1].tv_sec), CAST_NUM(ts[1].tv_usec),
 	       rc, errno2name());

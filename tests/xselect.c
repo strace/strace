@@ -72,8 +72,8 @@ int main(void)
 	FD_SET(fds[0], set);
 	FD_SET(fds[1], set);
 	assert(syscall(TEST_SYSCALL_NR, fds[1] + 1, NULL, set, NULL, &tm.tv) == 3);
-	printf("%s(%d, NULL, [1 2 %d %d], NULL, {%lld, %lld})"
-	       " = 3 (out [1 2 %d], left {%lld, %lld})\n",
+	printf("%s(%d, NULL, [1 2 %d %d], NULL, {tv_sec=%lld, tv_usec=%lld})"
+	       " = 3 (out [1 2 %d], left {tv_sec=%lld, tv_usec=%lld})\n",
 	       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
 	       (long long) tm_in.tv.tv_sec, (long long) tm_in.tv.tv_usec,
 	       fds[1],
@@ -97,7 +97,7 @@ int main(void)
 	tm.tv.tv_sec = 0;
 	tm.tv.tv_usec = 123;
 	assert(syscall(TEST_SYSCALL_NR, FD_SETSIZE + 1, set, set + 1, NULL, &tm.tv) == 0);
-	printf("%s(%d, [%d], [], NULL, {0, 123}) = 0 (Timeout)\n",
+	printf("%s(%d, [%d], [], NULL, {tv_sec=0, tv_usec=123}) = 0 (Timeout)\n",
 	       TEST_SYSCALL_STR, FD_SETSIZE + 1, fds[0]);
 
 	puts("+++ exited with 0 +++");

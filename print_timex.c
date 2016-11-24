@@ -56,7 +56,7 @@ MPERS_PRINTER_DECL(int, print_timex, struct tcb *tcp, const long addr)
 	tprintf(", constant=%jd, precision=%ju, tolerance=%jd",
 		(intmax_t) tx.constant, (uintmax_t) tx.precision,
 		(intmax_t) tx.tolerance);
-	tprintf(", time={%jd, %jd}",
+	tprintf(", time={tv_sec=%jd, tv_usec=%jd}",
 		(intmax_t) tx.time.tv_sec, (intmax_t) tx.time.tv_usec);
 	tprintf(", tick=%jd, ppsfreq=%jd, jitter=%jd",
 		(intmax_t) tx.tick, (intmax_t) tx.ppsfreq, (intmax_t) tx.jitter);

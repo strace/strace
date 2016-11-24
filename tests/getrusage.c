@@ -41,9 +41,9 @@ main(void)
 {
 	struct rusage *const usage = tail_alloc(sizeof(struct rusage));
 	int rc = syscall(__NR_getrusage, RUSAGE_SELF, usage);
-	printf("getrusage(RUSAGE_SELF, {ru_utime={%ju, %ju}"
-	       ", ru_stime={%ju, %ju}, ru_maxrss=%lu, ru_ixrss=%lu"
-	       ", ru_idrss=%lu, ru_isrss=%lu, ru_minflt=%lu"
+	printf("getrusage(RUSAGE_SELF, {ru_utime={tv_sec=%ju, tv_usec=%ju}"
+	       ", ru_stime={tv_sec=%ju, tv_usec=%ju}, ru_maxrss=%lu"
+	       ", ru_ixrss=%lu, ru_idrss=%lu, ru_isrss=%lu, ru_minflt=%lu"
 	       ", ru_majflt=%lu, ru_nswap=%lu, ru_inblock=%lu"
 	       ", ru_oublock=%lu, ru_msgsnd=%lu, ru_msgrcv=%lu"
 	       ", ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}) = %d\n",

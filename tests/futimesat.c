@@ -69,8 +69,8 @@ main(void)
 
 	(void) close(0);
 	rc = syscall(__NR_futimesat, 0, "", ts);
-	printf("futimesat(0, \"\", [{%llu, %llu}, {%llu, %llu}])"
-	       " = %ld %s (%m)\n",
+	printf("futimesat(0, \"\", [{tv_sec=%llu, tv_usec=%llu}, "
+	       "{tv_sec=%llu, tv_usec=%llu}]) = %ld %s (%m)\n",
 	       CAST_NUM(ts[0].tv_sec), CAST_NUM(ts[0].tv_usec),
 	       CAST_NUM(ts[1].tv_sec), CAST_NUM(ts[1].tv_usec),
 	       rc, errno2name());

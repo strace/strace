@@ -49,9 +49,10 @@ main(void)
 	if (setitimer(ITIMER_REAL, &new.itv, &old.itv))
 		perror_msg_and_skip("setitimer");
 	printf("setitimer(ITIMER_REAL"
-	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
-	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
-	       ") = 0\n",
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}"
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = 0\n",
 	       (intmax_t) new.itv.it_interval.tv_sec,
 	       (intmax_t) new.itv.it_interval.tv_usec,
 	       (intmax_t) new.itv.it_value.tv_sec,
@@ -64,8 +65,8 @@ main(void)
 	if (getitimer(ITIMER_REAL, &old.itv))
 		perror_msg_and_skip("getitimer");
 	printf("getitimer(ITIMER_REAL"
-	       ", {it_interval={%jd, %jd}, it_value={%jd, %jd}}"
-	       ") = 0\n",
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = 0\n",
 	       (intmax_t) old.itv.it_interval.tv_sec,
 	       (intmax_t) old.itv.it_interval.tv_usec,
 	       (intmax_t) old.itv.it_value.tv_sec,

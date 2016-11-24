@@ -42,8 +42,8 @@ sprint_rusage(const struct rusage *const ru)
 {
 	static char buf[1024];
 	snprintf(buf, sizeof(buf),
-		 "{ru_utime={%llu, %llu}"
-		 ", ru_stime={%llu, %llu}"
+		 "{ru_utime={tv_sec=%llu, tv_usec=%llu}"
+		 ", ru_stime={tv_sec=%llu, tv_usec=%llu}"
 #if VERBOSE
 		 ", ru_maxrss=%llu"
 		 ", ru_ixrss=%llu"

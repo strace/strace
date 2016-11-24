@@ -44,7 +44,8 @@ MPERS_PRINTER_DECL(void, printrusage, struct tcb *tcp, long addr)
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
 
-	tprintf("{ru_utime={%llu, %llu}, ru_stime={%llu, %llu}, ",
+	tprintf("{ru_utime={tv_sec=%llu, tv_usec=%llu}, "
+		"ru_stime={tv_sec=%llu, tv_usec=%llu}, ",
 		zero_extend_signed_to_ull(ru.ru_utime.tv_sec),
 		zero_extend_signed_to_ull(ru.ru_utime.tv_usec),
 		zero_extend_signed_to_ull(ru.ru_stime.tv_sec),
@@ -99,7 +100,8 @@ printrusage32(struct tcb *tcp, long addr)
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
 
-	tprintf("{ru_utime={%lu, %lu}, ru_stime={%lu, %lu}, ",
+	tprintf("{ru_utime={tv_sec=%lu, tv_usec=%lu}, "
+		"ru_stime={tv_sec=%lu, tv_usec=%lu}, ",
 		(long) ru.ru_utime.tv_sec, (long) ru.ru_utime.tv_usec,
 		(long) ru.ru_stime.tv_sec, (long) ru.ru_stime.tv_usec);
 	if (abbrev(tcp))

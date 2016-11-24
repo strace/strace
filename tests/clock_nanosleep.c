@@ -89,8 +89,8 @@ main(void)
 
 	if (setitimer(ITIMER_REAL, &itv, NULL))
 		perror_msg_and_skip("setitimer");
-	printf("setitimer(ITIMER_REAL, {it_interval={%jd, %jd}"
-	       ", it_value={%jd, %jd}}, NULL) = 0\n",
+	printf("setitimer(ITIMER_REAL, {it_interval={tv_sec=%jd, tv_usec=%jd}"
+	       ", it_value={tv_sec=%jd, tv_usec=%jd}}, NULL) = 0\n",
 	       (intmax_t) itv.it_interval.tv_sec,
 	       (intmax_t) itv.it_interval.tv_usec,
 	       (intmax_t) itv.it_value.tv_sec,

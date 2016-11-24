@@ -44,7 +44,7 @@ typedef struct timeval timeval_t;
 #endif
 
 static const char timespec_fmt[] = "{tv_sec=%jd, tv_nsec=%jd}";
-static const char time_fmt[] = "{%jd, %jd}";
+static const char timeval_fmt[]  = "{tv_sec=%jd, tv_usec=%jd}";
 
 static void
 print_timespec_t(const timespec_t *t)
@@ -71,7 +71,7 @@ print_timespec_t_utime(const timespec_t *t)
 static void
 print_timeval_t(const timeval_t *t)
 {
-	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
+	tprintf(timeval_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
 }
 
 MPERS_PRINTER_DECL(void, print_timespec,
@@ -164,7 +164,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval,
 		   struct tcb *tcp, const long addr)
 {
 	timeval_t t;
-	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
+	static char buf[sizeof(timeval_fmt) + 3 * sizeof(t)];
 
 	if (!addr) {
 		strcpy(buf, "NULL");
@@ -172,7 +172,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval,
 		   umove(tcp, addr, &t)) {
 		snprintf(buf, sizeof(buf), "%#lx", addr);
 	} else {
-		snprintf(buf, sizeof(buf), time_fmt,
+		snprintf(buf, sizeof(buf), timeval_fmt,
 			 (intmax_t) t.tv_sec, (intmax_t) t.tv_usec);
 	}
 
@@ -215,7 +215,7 @@ typedef struct {
 static void
 print_timeval32_t(const timeval32_t *t)
 {
-	tprintf(time_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
+	tprintf(timeval_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
 }
 
 void
@@ -263,7 +263,7 @@ const char *
 sprint_timeval32(struct tcb *tcp, const long addr)
 {
 	timeval32_t t;
-	static char buf[sizeof(time_fmt) + 3 * sizeof(t)];
+	static char buf[sizeof(timeval_fmt) + 3 * sizeof(t)];
 
 	if (!addr) {
 		strcpy(buf, "NULL");
@@ -271,7 +271,7 @@ sprint_timeval32(struct tcb *tcp, const long addr)
 		   umove(tcp, addr, &t)) {
 		snprintf(buf, sizeof(buf), "%#lx", addr);
 	} else {
-		snprintf(buf, sizeof(buf), time_fmt,
+		snprintf(buf, sizeof(buf), timeval_fmt,
 			 (intmax_t) t.tv_sec, (intmax_t) t.tv_usec);
 	}
 

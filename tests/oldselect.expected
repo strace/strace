@@ -1,2 +1,2 @@
-select(2, [1], [0], NULL, {0, 42}) = 0 (Timeout)
+select(2, [1], [0], NULL, {tv_sec=0, tv_usec=42}) = 0 (Timeout)
 +++ exited with 0 +++
