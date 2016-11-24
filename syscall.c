@@ -632,21 +632,21 @@ static const char *
 parse_fault_expression(const char *const s, char **buf,
 		       struct fault_opts *const fopts)
 {
-	const char *name;
-	const char *token;
 	char *saveptr = NULL;
+	const char *name = NULL;
+	const char *token;
 
 	*buf = xstrdup(s);
-	name = strtok_r(*buf, ":", &saveptr);
-	if (!name || !*name)
-		goto parse_error;
-
-	while ((token = strtok_r(NULL, ":", &saveptr))) {
-		if (!parse_fault_token(token, fopts))
+	for (token = strtok_r(*buf, ":", &saveptr); token;
+	     token = strtok_r(NULL, ":", &saveptr)) {
+		if (!name)
+			name = token;
+		else if (!parse_fault_token(token, fopts))
 			goto parse_error;
 	}
 
-	return name;
+	if (name)
+		return name;
 
 parse_error:
 	free(*buf);
