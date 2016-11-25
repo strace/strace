@@ -628,13 +628,13 @@ parse_fault_token(const char *const token, struct fault_opts *const fopts)
 	return true;
 }
 
-static const char *
+static char *
 parse_fault_expression(const char *const s, char **buf,
 		       struct fault_opts *const fopts)
 {
 	char *saveptr = NULL;
-	const char *name = NULL;
-	const char *token;
+	char *name = NULL;
+	char *token;
 
 	*buf = xstrdup(s);
 	for (token = strtok_r(*buf, ":", &saveptr); token;
@@ -663,12 +663,20 @@ qual_fault(const char *const s, const unsigned int bitflag, const int not)
 	};
 
 	char *buf = NULL;
-	const char *name = parse_fault_expression(s, &buf, &opts);
+	char *name = parse_fault_expression(s, &buf, &opts);
+	char *saveptr = NULL;
+	const char *token;
+	int rc = -1;
 
 	if (!name)
 		return -1;
 
-	int rc = qual_syscall_ex(name, bitflag, not, &opts);
+	for (token = strtok_r(name, ",", &saveptr); token;
+	     token = strtok_r(NULL, ",", &saveptr)) {
+		rc = qual_syscall_ex(token, bitflag, not, &opts);
+		if (rc)
+			break;
+	}
 
 	free(buf);
 	return rc;
@@ -744,16 +752,21 @@ qualify(const char *s)
 		not = 1 - not;
 		s = "all";
 	}
-	if (opt->bitflag != QUAL_FAULT) {
-		if (strcmp(s, "all") == 0) {
-			for (i = 0; i < num_quals; ++i) {
-				qualify_one(i, opt->bitflag, not, -1, NULL);
-			}
-			return;
+	if (opt->bitflag == QUAL_FAULT) {
+		if (opt->qualify(s, opt->bitflag, not)) {
+			error_msg_and_die("invalid %s '%s'",
+				opt->argument_name, s);
 		}
+		return;
+	}
+	if (strcmp(s, "all") == 0) {
 		for (i = 0; i < num_quals; ++i) {
-			qualify_one(i, opt->bitflag, !not, -1, NULL);
+			qualify_one(i, opt->bitflag, not, -1, NULL);
 		}
+		return;
+	}
+	for (i = 0; i < num_quals; ++i) {
+		qualify_one(i, opt->bitflag, !not, -1, NULL);
 	}
 	copy = xstrdup(s);
 	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {

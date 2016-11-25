@@ -85,7 +85,7 @@ check_fault_injection()
 }
 
 for err in '' ENOSYS 22 EINVAL; do
-	for fault in writev 51,desc; do
+	for fault in writev desc,51; do
 		check_fault_injection \
 			writev $fault "$err" '' '' -efault=chdir
 		for F in 1 2 3 5 7 11; do
