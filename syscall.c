@@ -1101,6 +1101,11 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 #endif
 
+	/* Restrain from fault injection while the trace executes strace code. */
+	if (hide_log(tcp)) {
+		tcp->qual_flg &= ~QUAL_FAULT;
+	}
+
 	switch (tcp->s_ent->sen) {
 		case SEN_execve:
 		case SEN_execveat:
