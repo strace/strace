@@ -3,7 +3,7 @@
 SYS_FUNC(exit)
 {
 	if (exiting(tcp)) {
-		error_msg("_exit returned!");
+		error_msg("%s returned!", tcp->s_ent->sys_name);
 		return -1;
 	}
 	/* special case: we stop tracing this process, finish line now */
