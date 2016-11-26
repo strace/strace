@@ -80,7 +80,8 @@ const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 
 cflag_t cflag = CFLAG_NONE;
 unsigned int followfork = 0;
-unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC;
+unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
+				 | PTRACE_O_TRACEEXIT;
 unsigned int xflag = 0;
 bool debug_flag = 0;
 bool Tflag = 0;
@@ -2158,6 +2159,43 @@ startup_tcb(struct tcb *tcp)
 	}
 }
 
+static void
+print_event_exit(struct tcb *tcp)
+{
+	if (entering(tcp) || filtered(tcp) || hide_log(tcp)
+	    || cflag == CFLAG_ONLY_STATS) {
+		return;
+	}
+
+	if (followfork < 2 && printing_tcp && printing_tcp != tcp
+	    && printing_tcp->curcol != 0) {
+		current_tcp = printing_tcp;
+		tprints(" <unfinished ...>\n");
+		fflush(printing_tcp->outf);
+		printing_tcp->curcol = 0;
+		current_tcp = tcp;
+	}
+
+	if ((followfork < 2 && printing_tcp != tcp)
+	    || (tcp->flags & TCB_REPRINT)) {
+		tcp->flags &= ~TCB_REPRINT;
+		printleader(tcp);
+		tprintf("<... %s resumed>", tcp->s_ent->sys_name);
+	}
+
+	if (!(tcp->sys_func_rval & RVAL_DECODED)) {
+		/*
+		 * The decoder has probably decided to print something
+		 * on exiting syscall which is not going to happen.
+		 */
+		tprints(" <unfinished ...>");
+	}
+	tprints(") ");
+	tabto();
+	tprints("= ?\n");
+	line_ended();
+}
+
 /* Returns true iff the main trace loop has to continue. */
 static bool
 trace(void)
@@ -2308,10 +2346,14 @@ trace(void)
 
 	sig = WSTOPSIG(status);
 
-	if (event != 0) {
-		/* Ptrace event */
+	switch (event) {
+		case 0:
+			break;
+		case PTRACE_EVENT_EXIT:
+			print_event_exit(tcp);
+			goto restart_tracee_with_sig_0;
 #if USE_SEIZE
-		if (event == PTRACE_EVENT_STOP) {
+		case PTRACE_EVENT_STOP:
 			/*
 			 * PTRACE_INTERRUPT-stop or group-stop.
 			 * PTRACE_INTERRUPT-stop has sig == SIGTRAP here.
@@ -2324,9 +2366,10 @@ trace(void)
 					stopped = true;
 					goto show_stopsig;
 			}
-		}
+			/* fall through */
 #endif
-		goto restart_tracee_with_sig_0;
+		default:
+			goto restart_tracee_with_sig_0;
 	}
 
 	/*

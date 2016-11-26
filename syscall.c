@@ -1148,7 +1148,7 @@ trace_syscall_entering(struct tcb *tcp)
 
 	printleader(tcp);
 	tprintf("%s(", tcp->s_ent->sys_name);
-	if ((tcp->qual_flg & QUAL_RAW) && SEN_exit != tcp->s_ent->sen)
+	if (tcp->qual_flg & QUAL_RAW)
 		res = printargs(tcp);
 	else
 		res = tcp->s_ent->sys_func(tcp);

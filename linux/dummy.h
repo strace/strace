@@ -123,6 +123,7 @@
 #define	sys_alarm		printargs_u
 
 /* printargs_d does the right thing */
+#define	sys_exit		printargs_d
 #define	sys_getpgid		printargs_d
 #define	sys_getsid		printargs_d
 #define	sys_nice		printargs_d

@@ -104,7 +104,6 @@ strace_SOURCES =	\
 	evdev.c		\
 	eventfd.c	\
 	execve.c	\
-	exit.c		\
 	fadvise.c	\
 	fallocate.c	\
 	fanotify.c	\
