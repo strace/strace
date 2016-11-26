@@ -1086,14 +1086,6 @@ trace_syscall_entering(struct tcb *tcp)
 		decode_mips_subcall(tcp);
 #endif
 
-	if (   SEN_execve == tcp->s_ent->sen
-# if defined(SPARC) || defined(SPARC64)
-	    || SEN_execv == tcp->s_ent->sen
-# endif
-	   ) {
-		hide_log_until_execve = 0;
-	}
-
 #if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
 	switch (tcp->s_ent->sen) {
 # ifdef SYS_socket_subcall
@@ -1108,6 +1100,16 @@ trace_syscall_entering(struct tcb *tcp)
 # endif
 	}
 #endif
+
+	switch (tcp->s_ent->sen) {
+		case SEN_execve:
+		case SEN_execveat:
+#if defined SPARC || defined SPARC64
+		case SEN_execv:
+#endif
+			hide_log_until_execve = 0;
+			break;
+	}
 
 	if (!(tcp->qual_flg & QUAL_TRACE)
 	 || (tracing_paths && !pathtrace_match(tcp))
