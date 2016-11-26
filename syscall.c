@@ -1107,7 +1107,7 @@ trace_syscall_entering(struct tcb *tcp)
 #if defined SPARC || defined SPARC64
 		case SEN_execv:
 #endif
-			hide_log_until_execve = 0;
+			tcp->flags &= ~TCB_HIDE_LOG;
 			break;
 	}
 
@@ -1121,7 +1121,7 @@ trace_syscall_entering(struct tcb *tcp)
 
 	tcp->flags &= ~TCB_FILTERED;
 
-	if (hide_log_until_execve) {
+	if (hide_log(tcp)) {
 		res = 0;
 		goto ret;
 	}
@@ -1188,7 +1188,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	update_personality(tcp, tcp->currpers);
 #endif
 	res = (get_regs_error ? -1 : get_syscall_result(tcp));
-	if (filtered(tcp) || hide_log_until_execve)
+	if (filtered(tcp) || hide_log(tcp))
 		goto ret;
 
 	if (syserror(tcp) && syscall_fault_injected(tcp))

@@ -280,6 +280,8 @@ struct tcb {
 #define TCB_REPRINT	0x10	/* We should reprint this syscall on exit */
 #define TCB_FILTERED	0x20	/* This system call has been filtered out */
 #define TCB_FAULT_INJ	0x40	/* A syscall fault has been injected */
+#define TCB_HIDE_LOG	0x80	/* We should hide everything (until execve) */
+#define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x100	/* -b execve should skip detach on first execve */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -300,6 +302,7 @@ typedef uint8_t qualbits_t;
 #define verbose(tcp)	((tcp)->qual_flg & QUAL_VERBOSE)
 #define abbrev(tcp)	((tcp)->qual_flg & QUAL_ABBREV)
 #define filtered(tcp)	((tcp)->flags & TCB_FILTERED)
+#define hide_log(tcp)	((tcp)->flags & TCB_HIDE_LOG)
 
 #include "xlat.h"
 
@@ -399,7 +402,6 @@ extern bool count_wallclock;
 extern unsigned int qflag;
 extern bool not_failing_only;
 extern unsigned int show_fd_path;
-extern bool hide_log_until_execve;
 /* are we filtering traces based on paths? */
 extern const char **paths_selected;
 #define tracing_paths (paths_selected != NULL)

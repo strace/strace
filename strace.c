@@ -133,10 +133,6 @@ bool not_failing_only = 0;
 unsigned int show_fd_path = 0;
 
 static bool detach_on_execve = 0;
-/* Are we "strace PROG" and need to skip detach on first execve? */
-static bool skip_one_b_execve = 0;
-/* Are we "strace PROG" and need to hide everything until execve? */
-bool hide_log_until_execve = 0;
 
 static int exit_code;
 static int strace_child = 0;
@@ -1418,17 +1414,17 @@ startup_child(char **argv)
 				kill(pid, SIGCONT);
 		}
 		tcp = alloctcb(pid);
-		if (!NOMMU_SYSTEM)
-			tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
-		else
-			tcp->flags |= TCB_ATTACHED | TCB_STARTUP;
+		tcp->flags |= TCB_ATTACHED | TCB_STARTUP
+			    | TCB_SKIP_DETACH_ON_FIRST_EXEC
+			    | (NOMMU_SYSTEM ? 0 : (TCB_HIDE_LOG | post_attach_sigstop));
 		newoutf(tcp);
 	}
 	else {
 		/* With -D, we are *child* here, the tracee is our parent. */
 		strace_child = strace_tracer_pid;
 		strace_tracer_pid = getpid();
-		alloctcb(strace_child);
+		tcp = alloctcb(strace_child);
+		tcp->flags |= TCB_SKIP_DETACH_ON_FIRST_EXEC | TCB_HIDE_LOG;
 		/* attaching will be done later, by startup_attach */
 		/* note: we don't do newoutf(tcp) here either! */
 
@@ -1859,9 +1855,6 @@ init(int argc, char *argv[])
 	 * in the startup_child() mode we kill the spawned process anyway.
 	 */
 	if (argv[0]) {
-		if (!NOMMU_SYSTEM || daemonized_tracer)
-			hide_log_until_execve = 1;
-		skip_one_b_execve = 1;
 		startup_child(argv);
 	}
 
@@ -2130,7 +2123,7 @@ static void
 print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 {
 	if (cflag != CFLAG_ONLY_STATS
-	    && !hide_log_until_execve
+	    && !hide_log(tcp)
 	    && (qual_flags[sig] & QUAL_SIGNAL)
 	   ) {
 		printleader(tcp);
@@ -2266,11 +2259,14 @@ trace(void)
 		if (os_release >= KERNEL_VERSION(3,0,0))
 			tcp = maybe_switch_tcbs(tcp, pid);
 
-		if (detach_on_execve && !skip_one_b_execve) {
-			detach(tcp); /* do "-b execve" thingy */
-			return true;
+		if (detach_on_execve) {
+			if (tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) {
+				tcp->flags &= ~TCB_SKIP_DETACH_ON_FIRST_EXEC;
+			} else {
+				detach(tcp); /* do "-b execve" thingy */
+				return true;
+			}
 		}
-		skip_one_b_execve = 0;
 	}
 
 	/* Set current output file */
