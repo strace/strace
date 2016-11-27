@@ -559,9 +559,9 @@ extern int printllval(struct tcb *, const char *, int)
 	ATTRIBUTE_FORMAT((printf, 2, 0));
 
 extern void printaddr_ull(unsigned long long);
-extern void printxvals(const uint64_t, const char *, const struct xlat *, ...)
+extern int printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
-extern void printxval_searchn(const struct xlat *xlat, size_t xlat_size,
+extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
 	uint64_t val, const char *dflt);
 #define printxval_search(xlat__, val__, dflt__) \
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__), val__, dflt__)
@@ -709,22 +709,22 @@ printflags_long(const struct xlat *x, unsigned long flags, const char *dflt)
 	return printflags64(x, flags, dflt);
 }
 
-static inline void
+static inline int
 printxval64(const struct xlat *x, const uint64_t val, const char *dflt)
 {
-	printxvals(val, dflt, x, NULL);
+	return printxvals(val, dflt, x, NULL);
 }
 
-static inline void
+static inline int
 printxval(const struct xlat *x, const unsigned int val, const char *dflt)
 {
-	printxvals(val, dflt, x, NULL);
+	return printxvals(val, dflt, x, NULL);
 }
 
-static inline void
+static inline int
 printxval_long(const struct xlat *x, const unsigned long val, const char *dflt)
 {
-	printxvals(val, dflt, x, NULL);
+	return printxvals(val, dflt, x, NULL);
 }
 
 #ifdef ALPHA

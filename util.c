@@ -219,10 +219,18 @@ next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits)
 		pos++;
 	}
 }
-/*
+
+/**
  * Print entry in struct xlat table, if there.
+ *
+ * @param val  Value to search a literal representation for.
+ * @param dflt String (abbreviated in comment syntax) which should be emitted
+ *             if no appropriate xlat value has been found.
+ * @param xlat (And the following arguments) Pointers to arrays of xlat values.
+ *             The last argument should be NULL.
+ * @return     1 if appropriate xlat value has been found, 0 otherwise.
  */
-void
+int
 printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 {
 	va_list args;
@@ -234,7 +242,7 @@ printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 		if (str) {
 			tprints(str);
 			va_end(args);
-			return;
+			return 1;
 		}
 	}
 	/* No hits -- print raw # instead. */
@@ -243,12 +251,25 @@ printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 		tprintf(" /* %s */", dflt);
 
 	va_end(args);
+
+	return 0;
 }
 
-/*
+/**
  * Print entry in sorted struct xlat table, if it is there.
+ *
+ * @param xlat      Pointer to an array of xlat values (not terminated with
+ *                  XLAT_END).
+ * @param xlat_size Number of xlat elements present in array (usually ARRAY_SIZE
+ *                  if array is declared in the unit's scope and not
+ *                  terminated with XLAT_END).
+ * @param val       Value to search literal representation for.
+ * @param dflt      String (abbreviated in comment syntax) which should be
+ *                  emitted if no appropriate xlat value has been found.
+ * @return          1 if appropriate xlat value has been found, 0
+ *                  otherwise.
  */
-void
+int
 printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 	const char *dflt)
 {
@@ -256,11 +277,14 @@ printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 
 	if (s) {
 		tprints(s);
-	} else {
-		tprintf("%#" PRIx64, val);
-		if (dflt)
-			tprintf(" /* %s */", dflt);
+		return 1;
 	}
+
+	tprintf("%#" PRIx64, val);
+	if (dflt)
+		tprintf(" /* %s */", dflt);
+
+	return 0;
 }
 
 /*
