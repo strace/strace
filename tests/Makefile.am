@@ -74,6 +74,7 @@ check_PROGRAMS = \
 	adjtimex \
 	aio \
 	alarm \
+	answer \
 	attach-f-p \
 	attach-p-cmd-cmd \
 	attach-p-cmd-p \
@@ -496,6 +497,7 @@ DECODER_TESTS = \
 	fallocate.test \
 	fanotify_init.test \
 	fanotify_mark.test \
+	fault_injection-exit_group.test \
 	fchdir.test \
 	fchmod.test \
 	fchmodat.test \
@@ -832,6 +834,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     count-f.expected \
 	     eventfd.expected \
 	     fadvise.h \
+	     fault_injection-exit_group.expected \
 	     filter-unavailable.expected \
 	     fstatat.c \
 	     fstatx.c \
