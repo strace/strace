@@ -32,14 +32,11 @@
 
 #ifdef __NR_futimesat
 
+# include <stdint.h>
 # include <stdio.h>
 # include <sys/time.h>
 # include <unistd.h>
 
-#define CAST_NUM(n)						\
-	(sizeof(n) == sizeof(long) ?				\
-		(unsigned long long) (unsigned long) (n) :	\
-		(unsigned long long) (n))
 
 int
 main(void)
@@ -69,10 +66,10 @@ main(void)
 
 	(void) close(0);
 	rc = syscall(__NR_futimesat, 0, "", ts);
-	printf("futimesat(0, \"\", [{tv_sec=%llu, tv_usec=%llu}, "
-	       "{tv_sec=%llu, tv_usec=%llu}]) = %ld %s (%m)\n",
-	       CAST_NUM(ts[0].tv_sec), CAST_NUM(ts[0].tv_usec),
-	       CAST_NUM(ts[1].tv_sec), CAST_NUM(ts[1].tv_usec),
+	printf("futimesat(0, \"\", [{tv_sec=%jd, tv_usec=%jd}, "
+	       "{tv_sec=%jd, tv_usec=%jd}]) = %ld %s (%m)\n",
+	       (intmax_t) ts[0].tv_sec, (intmax_t) ts[0].tv_usec,
+	       (intmax_t) ts[1].tv_sec, (intmax_t) ts[1].tv_usec,
 	       rc, errno2name());
 
 	puts("+++ exited with 0 +++");
