@@ -57,19 +57,23 @@ MPERS_PRINTER_DECL(void, print_timeval,
 	print_timeval_t(&t);
 }
 
+static bool
+print_timeval_item(struct tcb *tcp, void *elem_buf, size_t size, void *data)
+{
+	timeval_t *t = elem_buf;
+
+	print_timeval_t(t);
+
+	return true;
+}
+
 MPERS_PRINTER_DECL(void, print_timeval_pair,
 		   struct tcb *tcp, const long addr)
 {
-	timeval_t t[2];
+	timeval_t t;
 
-	if (umove_or_printaddr(tcp, addr, &t))
-		return;
-
-	tprints("[");
-	print_timeval_t(&t[0]);
-	tprints(", ");
-	print_timeval_t(&t[1]);
-	tprints("]");
+	print_array(tcp, addr, 2, &t, sizeof(t), umoven_or_printaddr,
+		    print_timeval_item, NULL);
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timeval,

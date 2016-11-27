@@ -55,14 +55,20 @@ main(void)
 	struct timeval *const ts = tail_alloc(sizeof(*ts) * 2);
 	dirfd = (unsigned long) 0xdeadbeefffffffffULL;
 
-	rc = syscall(__NR_futimesat, dirfd, 0, ts + 1);
-	printf("futimesat(%d, NULL, %p) = %ld %s (%m)\n",
-	       (int) dirfd, ts + 1, rc, errno2name());
-
 	ts[0].tv_sec = tv.tv_sec;
 	ts[0].tv_usec = tv.tv_usec;
 	ts[1].tv_sec = tv.tv_sec - 1;
 	ts[1].tv_usec = tv.tv_usec + 1;
+
+	rc = syscall(__NR_futimesat, dirfd, 0, ts + 2);
+	printf("futimesat(%d, NULL, %p) = %ld %s (%m)\n",
+	       (int) dirfd, ts + 2, rc, errno2name());
+
+	rc = syscall(__NR_futimesat, dirfd, 0, ts + 1);
+	printf("futimesat(%d, NULL, [{tv_sec=%jd, tv_usec=%jd}, %p]) = "
+	       "%ld %s (%m)\n", (int) dirfd,
+	       (intmax_t) ts[1].tv_sec, (intmax_t) ts[1].tv_usec,
+	       ts + 2, rc, errno2name());
 
 	(void) close(0);
 	rc = syscall(__NR_futimesat, 0, "", ts);
