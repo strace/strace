@@ -182,9 +182,9 @@ print_groups(struct tcb *tcp, const unsigned int len, const unsigned long addr)
 
 SYS_FUNC(setgroups)
 {
-	const unsigned int len = tcp->u_arg[0];
+	const int len = tcp->u_arg[0];
 
-	tprintf("%u, ", len);
+	tprintf("%d, ", len);
 	print_groups(tcp, len, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -192,7 +192,7 @@ SYS_FUNC(setgroups)
 SYS_FUNC(getgroups)
 {
 	if (entering(tcp))
-		tprintf("%u, ", (unsigned int) tcp->u_arg[0]);
+		tprintf("%d, ", (int) tcp->u_arg[0]);
 	else
 		print_groups(tcp, tcp->u_rval, tcp->u_arg[1]);
 	return 0;
