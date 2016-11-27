@@ -1504,13 +1504,11 @@ getarg_ull(struct tcb *tcp, int argn)
 int
 printargs(struct tcb *tcp)
 {
-	if (entering(tcp)) {
-		int i;
-		int n = tcp->s_ent->nargs;
-		for (i = 0; i < n; i++)
-			tprintf("%s%#llx", i ? ", " : "", getarg_ull(tcp, i));
-	}
-	return 0;
+	const int n = tcp->s_ent->nargs;
+	int i;
+	for (i = 0; i < n; ++i)
+		tprintf("%s%#llx", i ? ", " : "", getarg_ull(tcp, i));
+	return RVAL_DECODED;
 }
 
 int
