@@ -30,6 +30,15 @@
 #include <stdio.h>
 #include <unistd.h>
 
+void
+printuid(unsigned UGID_TYPE id)
+{
+	if (id == (unsigned UGID_TYPE) -1U)
+		printf("-1");
+	else
+		printf("%u", id);
+}
+
 int
 main(void)
 {
@@ -54,7 +63,9 @@ main(void)
 		unsigned int rc;
 
 		rc = syscall(SYSCALL_NR, tests[i]);
-		printf("%s(%u) = %u\n", SYSCALL_NAME, num, rc);
+		printf("%s(", SYSCALL_NAME);
+		printuid(num);
+		printf(") = %u\n", rc);
 
 		rc = syscall(SYSCALL_NR, ugid);
 		printf("%s(%u) = %u\n", SYSCALL_NAME, ugid, rc);

@@ -31,13 +31,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
-static int
-ugid2int(const unsigned UGID_TYPE ugid)
+void
+printuid(unsigned UGID_TYPE id)
 {
-	if ((unsigned UGID_TYPE) -1U == ugid)
-		return -1;
+	if (id == (unsigned UGID_TYPE) -1U)
+		printf("-1");
 	else
-		return ugid;
+		printf("%u", id);
 }
 
 int
@@ -58,22 +58,23 @@ main(void)
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(tests); ++i) {
-		const unsigned int num = ugid2int(tests[i]);
+		const unsigned int num = (unsigned UGID_TYPE) tests[i];
 		long expected;
 
 		if (num == ugid)
 			expected = 0;
-		else if (num == -1U)
+		else if ((UGID_TYPE) num == (UGID_TYPE) -1U)
 			expected = -1;
 		else
 			continue;
 
 		const long rc = syscall(SYSCALL_NR, tests[i]);
-		int saved_errno = errno;
+		const char *errstr = sprintrc(rc);
+
 		if (rc != expected) {
 			if (!i && ENOSYS == errno) {
-				printf("%s(%u) = -1 ENOSYS (%m)\n",
-				       SYSCALL_NAME, ugid);
+				printf("%s(%u) = %s\n",
+				       SYSCALL_NAME, ugid, errstr);
 				break;
 			}
 			perror_msg_and_fail("%s(%#lx) != %ld",
@@ -81,15 +82,8 @@ main(void)
 		}
 
 		printf("%s(", SYSCALL_NAME);
-		if (num == -1U)
-			printf("-1");
-		else
-			printf("%u", num);
-		errno = saved_errno;
-		if (expected)
-			printf(") = -1 %s (%m)\n", errno2name());
-		else
-			printf(") = 0\n");
+		printuid(num);
+		printf(") = %s\n", errstr);
 	}
 
 	puts("+++ exited with 0 +++");

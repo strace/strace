@@ -75,7 +75,7 @@ SYS_FUNC(getuid)
 
 SYS_FUNC(setfsuid)
 {
-	tprintf("%u", (uid_t) tcp->u_arg[0]);
+	printuid("", tcp->u_arg[0]);
 
 	return RVAL_UDECIMAL | RVAL_DECODED;
 }
@@ -93,8 +93,10 @@ get_print_uid(struct tcb *tcp, const char *prefix, const long addr)
 	uid_t uid;
 
 	tprints(prefix);
-	if (!umove_or_printaddr(tcp, addr, &uid))
-		tprintf("[%u]", uid);
+	if (!umove_or_printaddr(tcp, addr, &uid)) {
+		printuid("[", uid);
+		tprints("]");
+	}
 }
 
 SYS_FUNC(getresuid)
@@ -156,7 +158,7 @@ printuid(const char *text, const unsigned int uid)
 static bool
 print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	tprintf("%u", (unsigned int) (* (uid_t *) elem_buf));
+	printuid("", (* (uid_t *) elem_buf));
 
 	return true;
 }
