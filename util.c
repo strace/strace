@@ -238,7 +238,9 @@ printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 		}
 	}
 	/* No hits -- print raw # instead. */
-	tprintf("%#" PRIx64 " /* %s */", val, dflt);
+	tprintf("%#" PRIx64, val);
+	if (dflt)
+		tprintf(" /* %s */", dflt);
 
 	va_end(args);
 }
