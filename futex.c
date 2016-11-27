@@ -91,13 +91,19 @@ SYS_FUNC(futex)
 		tprintf(", %u", val);
 		tprintf(", %u, ", val2);
 		printaddr(uaddr2);
-		tprints(", {");
+		tprints(", ");
 		if ((val3 >> 28) & 8)
-			tprints("FUTEX_OP_OPARG_SHIFT|");
-		printxval(futexwakeops, (val3 >> 28) & 0x7, "FUTEX_OP_???");
-		tprintf(", %u, ", (val3 >> 12) & 0xfff);
-		printxval(futexwakecmps, (val3 >> 24) & 0xf, "FUTEX_OP_CMP_???");
-		tprintf(", %u}", val3 & 0xfff);
+			tprints("FUTEX_OP_OPARG_SHIFT<<28|");
+		if (printxval(futexwakeops, (val3 >> 28) & 0x7, NULL))
+			tprints("<<28");
+		else
+			tprints("<<28 /* FUTEX_OP_??? */");
+		tprintf("|%#x<<12|", (val3 >> 12) & 0xfff);
+		if (printxval(futexwakecmps, (val3 >> 24) & 0xf, NULL))
+			tprints("<<24");
+		else
+			tprints("<<24 /* FUTEX_OP_CMP_??? */");
+		tprintf("|%#x", val3 & 0xfff);
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
 		tprintf(", %u", val);
