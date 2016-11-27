@@ -85,10 +85,10 @@ print_cap_header(struct tcb *tcp, unsigned long addr, cap_user_header_t h)
 		return;
 	}
 
-	tprints("{");
+	tprints("{version=");
 	printxval(cap_version, h->version,
 		  "_LINUX_CAPABILITY_VERSION_???");
-	tprintf(", %d}", h->pid);
+	tprintf(", pid=%d}", h->pid);
 }
 
 static void
@@ -124,11 +124,11 @@ print_cap_data(struct tcb *tcp, unsigned long addr, const cap_user_header_t h)
 	if (umoven_or_printaddr(tcp, addr, len * sizeof(data[0]), data))
 		return;
 
-	tprints("{");
+	tprints("{effective=");
 	print_cap_bits(data[0].effective, len > 1 ? data[1].effective : 0);
-	tprints(", ");
+	tprints(", permitted=");
 	print_cap_bits(data[0].permitted, len > 1 ? data[1].permitted : 0);
-	tprints(", ");
+	tprints(", inheritable=");
 	print_cap_bits(data[0].inheritable, len > 1 ? data[1].inheritable : 0);
 	tprints("}");
 }

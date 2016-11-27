@@ -35,19 +35,19 @@ BEGIN {
 	r_addr = "0x[[:xdigit:]]+"
 	s[1] = "capget(NULL, NULL) = " s_efault
 	r[2] = "^capget\\(" r_addr ", " r_addr "\\) = " r_efault
-	r[3] = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, " r_addr "\\) = " r_efault
-	r[4] = "^capget\\(\\{_LINUX_CAPABILITY_VERSION_3, 0\\}, \\{" cap ", " cap ", " cap "\\}\\) = 0$"
+	r[3] = "^capget\\(\\{version=_LINUX_CAPABILITY_VERSION_3, pid=0\\}, " r_addr "\\) = " r_efault
+	r[4] = "^capget\\(\\{version=_LINUX_CAPABILITY_VERSION_3, pid=0\\}, \\{effective=" cap ", permitted=" cap ", inheritable=" cap "\\}\\) = 0$"
 
-	capset_v1_data = "{1<<CAP_DAC_OVERRIDE, 1<<CAP_DAC_READ_SEARCH, 0}"
-	capset_v3hi_data = "{1<<CAP_WAKE_ALARM, 1<<CAP_BLOCK_SUSPEND, 0}"
-	capset_data = "{1<<CAP_DAC_OVERRIDE|1<<CAP_WAKE_ALARM, 1<<CAP_DAC_READ_SEARCH|1<<CAP_BLOCK_SUSPEND, 0}"
+	capset_v1_data = "{effective=1<<CAP_DAC_OVERRIDE, permitted=1<<CAP_DAC_READ_SEARCH, inheritable=0}"
+	capset_v3hi_data = "{effective=1<<CAP_WAKE_ALARM, permitted=1<<CAP_BLOCK_SUSPEND, inheritable=0}"
+	capset_data = "{effective=1<<CAP_DAC_OVERRIDE|1<<CAP_WAKE_ALARM, permitted=1<<CAP_DAC_READ_SEARCH|1<<CAP_BLOCK_SUSPEND, inheritable=0}"
 	s[5] = "capset(NULL, NULL) = " s_efault
 	r[6] = "^capset\\(" r_addr ", " r_addr "\\) = " r_efault
-	r[7] = "^capset\\(\\{0xbadc0ded /\\* _LINUX_CAPABILITY_VERSION_\\?\\?\\? \\*/, -1576685468\\}, " r_addr "\\) = " r_einval
-	r[8] = "^capset\\(\\{_LINUX_CAPABILITY_VERSION_2, 0\\}, " r_addr "\\) = " r_efault
-	s[9] = "capset({_LINUX_CAPABILITY_VERSION_3, 0}, " capset_data ") = -1 EPERM (Operation not permitted)"
-	s[10] = "capset({_LINUX_CAPABILITY_VERSION_3, 0}, " capset_v3hi_data ") = -1 EPERM (Operation not permitted)"
-	s[11] = "capset({_LINUX_CAPABILITY_VERSION_1, 0}, " capset_v1_data ") = -1 EPERM (Operation not permitted)"
+	r[7] = "^capset\\(\\{version=0xbadc0ded /\\* _LINUX_CAPABILITY_VERSION_\\?\\?\\? \\*/, pid=-1576685468\\}, " r_addr "\\) = " r_einval
+	r[8] = "^capset\\(\\{version=_LINUX_CAPABILITY_VERSION_2, pid=0\\}, " r_addr "\\) = " r_efault
+	s[9] = "capset({version=_LINUX_CAPABILITY_VERSION_3, pid=0}, " capset_data ") = -1 EPERM (Operation not permitted)"
+	s[10] = "capset({version=_LINUX_CAPABILITY_VERSION_3, pid=0}, " capset_v3hi_data ") = -1 EPERM (Operation not permitted)"
+	s[11] = "capset({version=_LINUX_CAPABILITY_VERSION_1, pid=0}, " capset_v1_data ") = -1 EPERM (Operation not permitted)"
 	s[12] = "+++ exited with 0 +++"
 
 	lines = 12
