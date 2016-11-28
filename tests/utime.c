@@ -54,11 +54,11 @@ main(void)
 
 	rc = utime("utime\nfilename", tail_u);
 	const char *errstr = sprintrc(rc);
-	printf("utime(\"utime\\nfilename\", [");
+	printf("utime(\"utime\\nfilename\", {actime=");
 	print_tm(p);
-	printf(", ");
+	printf(", modtime=");
 	print_tm(p);
-	printf("]) = %s\n", errstr);
+	printf("}) = %s\n", errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

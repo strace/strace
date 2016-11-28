@@ -15,8 +15,8 @@ SYS_FUNC(utime)
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, tcp->u_arg[1], &u)) {
-		tprintf("[%s,", sprinttime(u.actime));
-		tprintf(" %s]", sprinttime(u.modtime));
+		tprintf("{actime=%s,", sprinttime(u.actime));
+		tprintf(" modtime=%s}", sprinttime(u.modtime));
 	}
 
 	return RVAL_DECODED;
