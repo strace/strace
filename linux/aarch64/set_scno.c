@@ -1,6 +1,10 @@
 #ifndef NT_ARM_SYSTEM_CALL
 # define NT_ARM_SYSTEM_CALL 0x404
 #endif
+/*
+ * NT_ARM_SYSTEM_CALL regset is supported by linux kernel
+ * starting with commit v3.19-rc1~59^2~16.
+ */
 
 static int
 arch_set_scno(struct tcb *tcp, long scno)

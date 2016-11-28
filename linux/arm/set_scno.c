@@ -1,6 +1,10 @@
 #ifndef PTRACE_SET_SYSCALL
 # define PTRACE_SET_SYSCALL 23
 #endif
+/*
+ * PTRACE_SET_SYSCALL is supported by linux kernel
+ * starting with commit v2.6.16-rc1~107^2
+ */
 
 static int
 arch_set_scno(struct tcb *tcp, long scno)

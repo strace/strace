@@ -1,3 +1,8 @@
+/*
+ * Reloading the syscall number from %g1 register is supported
+ * by linux kernel starting with commit v4.5-rc7~35^2~3.
+ */
+
 static int
 arch_set_scno(struct tcb *tcp, long scno)
 {
