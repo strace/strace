@@ -287,6 +287,8 @@ SYS_FUNC(mincore)
 			unsigned long i;
 			tprints("[");
 			for (i = 0; i < len; i++) {
+				if (i)
+					tprints(", ");
 				if (abbrev(tcp) && i >= max_strlen) {
 					tprints("...");
 					break;

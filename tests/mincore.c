@@ -42,6 +42,8 @@ print_mincore(const unsigned int pages, void *const addr,
 
 	printf("mincore(%p, %zu, [", addr, size);
 	for (i = 0; i < pages; ++i) {
+		if (i)
+			printf(", ");
 		if (i >= DEFAULT_STRLEN) {
 			printf("...");
 			break;
