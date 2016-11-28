@@ -1639,7 +1639,7 @@ init(int argc, char *argv[])
 			break;
 		case 'r':
 			rflag = 1;
-			/* fall through to tflag++ */
+			break;
 		case 't':
 			tflag++;
 			break;
@@ -1760,6 +1760,12 @@ init(int argc, char *argv[])
 			error_msg("-%c has no effect with -c", 'T');
 		if (show_fd_path)
 			error_msg("-%c has no effect with -c", 'y');
+	}
+
+	if (rflag) {
+		if (tflag > 1)
+			error_msg("-tt has no effect with -r");
+		tflag = 1;
 	}
 
 #ifdef USE_LIBUNWIND
