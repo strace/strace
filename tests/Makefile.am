@@ -373,6 +373,7 @@ check_PROGRAMS = \
 	sysinfo \
 	syslog \
 	tee \
+	threads-execve \
 	time \
 	timer_create \
 	timer_xettime \
@@ -436,6 +437,7 @@ preadv_pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+threads_execve_LDADD = -lrt -lpthread $(LDADD)
 times_LDADD = -lrt $(LDADD)
 truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -815,6 +817,7 @@ MISC_TESTS = \
 	strace-t.test \
 	strace-tt.test \
 	strace-ttt.test \
+	threads-execve.test \
 	vfork-f.test \
 	# end of MISC_TESTS
 

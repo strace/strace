@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# Check decoding of threads when a non-leader thread invokes execve.
+#
+# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/init.sh"
+
+# Check that PTRACE_EVENT_EXEC support in kernel is good enough.
+# The kernel before commit v3.1-rc1~308^2~7 reported 0 instead of old pid.
+uname_r="$(uname -r)"
+case "$uname_r" in
+	3.[2-9]*|3.1[0-9]*|[4-9].*|[123][0-9]*) ;;
+	*) skip_ "the kernel release $uname_r is not 3.1 or newer" ;;
+esac
+
+run_strace_match_diff -a21 \
+	-f -esignal=none -e trace=execve,exit,nanosleep,rt_sigsuspend

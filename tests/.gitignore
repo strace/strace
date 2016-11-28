@@ -315,6 +315,7 @@ sync_file_range2
 sysinfo
 syslog
 tee
+threads-execve
 time
 timer_create
 timer_xettime
