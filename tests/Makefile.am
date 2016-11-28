@@ -809,6 +809,7 @@ MISC_TESTS = \
 	redirect-fds.test \
 	restart_syscall.test \
 	signal_receive.test \
+	strace-C.test \
 	strace-E.test \
 	strace-S.test \
 	strace-T.test \
@@ -865,6 +866,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sockname.c \
 	     statfs.expected \
 	     statx.sh \
+	     strace-C.expected \
 	     strace-E.expected \
 	     strace-T.expected \
 	     strace-ff.expected \
