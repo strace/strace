@@ -801,6 +801,7 @@ MISC_TESTS = \
 	fork-f.test \
 	ksysent.test \
 	opipe.test \
+	options-syntax.test \
 	pc.test \
 	qual_signal.test \
 	qual_syscall.test \

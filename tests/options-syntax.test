@@ -1,0 +1,125 @@
+#!/bin/sh
+#
+# Check strace options syntax.
+#
+# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/init.sh"
+
+check_exit_status_and_stderr()
+{
+	$STRACE "$@" 2> "$LOG" &&
+		dump_log_and_fail_with \
+			"strace $* failed to handle the error properly"
+	match_diff "$LOG" "$EXP" ||
+		dump_log_and_fail_with \
+			"strace $* failed to print expected diagnostics"
+}
+
+check_e()
+{
+	local pattern="$1"; shift
+	cat > "$EXP" << __EOF__
+$STRACE: $pattern
+__EOF__
+	check_exit_status_and_stderr "$@"
+}
+
+check_h()
+{
+	local pattern="$1"; shift
+	cat > "$EXP" << __EOF__
+$STRACE: $pattern
+Try '$STRACE -h' for more information.
+__EOF__
+	check_exit_status_and_stderr "$@"
+}
+
+check_e "Invalid process id: '0'" -p 0
+check_e "Invalid process id: '-42'" -p -42
+check_e "Invalid process id: '$$.'" -p $$.
+check_e "Invalid process id: 'a'" -p 1,a
+check_e "Syscall 'chdir' for -b isn't supported" -b chdir
+check_e "Syscall 'chdir' for -b isn't supported" -b execve -b chdir
+
+check_h 'must have PROG [ARGS] or -p PID'
+check_h 'PROG [ARGS] must be specified with -D' -D -p $$
+check_h '-c and -C are mutually exclusive' -c -C true
+check_h '-c and -C are mutually exclusive' -C -c true
+check_h '(-c or -C) and -ff are mutually exclusive' -c -ff true
+check_h '(-c or -C) and -ff are mutually exclusive' -C -ff true
+check_h '-w must be given with (-c or -C)' -w true
+check_h 'piping the output and -ff are mutually exclusive' -o '|' -ff true
+check_h 'piping the output and -ff are mutually exclusive' -o '!' -ff true
+check_h "invalid -a argument: '-42'" -a -42
+check_h "invalid -O argument: '-42'" -O -42
+check_h "invalid -s argument: '-42'" -s -42
+check_h "invalid -I argument: '5'" -I 5
+
+if [ -n "${UID-}" ]; then
+	if [ "${UID-}" = 0 ]; then
+		umsg="Cannot find user ':nosuchuser:'"
+	else
+		umsg='You must be root to use the -u option'
+	fi
+
+	check_e "$umsg" -u :nosuchuser: true
+
+	for c in i r t T y; do
+		check_e "-$c has no effect with -c
+$STRACE: $umsg" -u :nosuchuser: -c -$c true
+	done
+		check_e "-i has no effect with -c
+$STRACE: -r has no effect with -c
+$STRACE: -t has no effect with -c
+$STRACE: -T has no effect with -c
+$STRACE: -y has no effect with -c
+$STRACE: $umsg" -u :nosuchuser: -cirtTy true
+
+	check_e "-tt has no effect with -r
+$STRACE: $umsg" -u :nosuchuser: -r -tt true
+fi
+
+args='-p 2147483647'
+$STRACE $args 2> "$LOG" &&
+	dump_log_and_fail_with \
+		"strace $args failed to handle the error properly"
+
+for cmd in PTRACE_SEIZE PTRACE_ATTACH; do
+	cat > "$EXP" << __EOF__
+$STRACE: attach: ptrace($cmd, 2147483647): No such process
+__EOF__
+	diff -- "$EXP" "$LOG" ||
+		continue
+	args=
+	break
+done
+
+[ -z "$args" ] ||
+	dump_log_and_fail_with \
+		"strace $args failed to print expected diagnostics"
+
+rm -f "$EXP"
