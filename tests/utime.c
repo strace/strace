@@ -32,6 +32,9 @@
 #include <utime.h>
 #include <errno.h>
 #include <stdio.h>
+#include <unistd.h>
+
+#include <asm/unistd.h>
 
 static void
 print_tm(const struct tm * const p)
@@ -51,6 +54,21 @@ main(void)
 	const struct tm * const p = localtime(&t);
 	const struct utimbuf u = { .actime = t, .modtime = t };
 	const struct utimbuf const *tail_u = tail_memdup(&u, sizeof(u));
+
+#ifdef __NR_utime
+	static const char *const dummy_str = "dummy filename";
+	char *const dummy_filename =
+		tail_memdup(dummy_str, sizeof(dummy_str) - 1);
+
+	rc = syscall(__NR_utime, dummy_filename + sizeof(dummy_str),
+		     tail_u + 1);
+	printf("utime(%p, %p) = %s\n", dummy_filename + sizeof(dummy_str),
+	       tail_u + 1, sprintrc(rc));
+
+	rc = syscall(__NR_utime, dummy_filename, (struct tm *) tail_u + 1);
+	printf("utime(%p, %p) = %s\n",
+	       dummy_filename, (struct tm *) tail_u + 1, sprintrc(rc));
+#endif /* __NR_utime */
 
 	rc = utime("utime\nfilename", tail_u);
 	const char *errstr = sprintrc(rc);
