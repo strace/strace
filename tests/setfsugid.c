@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "kernel_types.h"
+
 void
 printuid(unsigned UGID_TYPE id)
 {
@@ -44,10 +46,10 @@ main(void)
 {
 	unsigned int ugid = GETUGID;
 
-	const long tests[] = {
+	const kernel_ulong_t tests[] = {
 		ugid,
 		0xffff0000U | ugid,
-		(unsigned long) 0xffffffff00000000ULL | ugid,
+		(kernel_ulong_t) 0xffffffff00000000ULL | ugid,
 		0xffffU,
 		-1U,
 		-1L,
