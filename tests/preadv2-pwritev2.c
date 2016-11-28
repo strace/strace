@@ -163,7 +163,7 @@ dumpio(void)
 	r_iov = tail_memdup(r1_iov_, sizeof(r1_iov_));
 
 	rc = pr(0, r_iov, ARRAY_SIZE(r1_iov_), r_len);
-	if (rc != (int) w_len - r_len)
+	if (rc != (int) w_len - (int) r_len)
 		perror_msg_and_fail("preadv2: expected %d, returned %ld",
 				    (int) w_len - r_len, rc);
 	tprintf("preadv2(0, [{iov_base=\"%s\", iov_len=%u}"
