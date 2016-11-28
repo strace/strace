@@ -44,30 +44,32 @@ MPERS_PRINTER_DECL(void, printrusage, struct tcb *tcp, long addr)
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
 
-	tprintf("{ru_utime={tv_sec=%llu, tv_usec=%llu}, "
-		"ru_stime={tv_sec=%llu, tv_usec=%llu}, ",
-		zero_extend_signed_to_ull(ru.ru_utime.tv_sec),
-		zero_extend_signed_to_ull(ru.ru_utime.tv_usec),
-		zero_extend_signed_to_ull(ru.ru_stime.tv_sec),
-		zero_extend_signed_to_ull(ru.ru_stime.tv_usec));
+	tprints("{ru_utime=");
+	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_utime);
+	tprints(", ru_stime=");
+	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_stime);
 	if (abbrev(tcp))
-		tprints("...}");
+		tprints(", ...");
 	else {
-		tprintf("ru_maxrss=%llu, ", zero_extend_signed_to_ull(ru.ru_maxrss));
-		tprintf("ru_ixrss=%llu, ", zero_extend_signed_to_ull(ru.ru_ixrss));
-		tprintf("ru_idrss=%llu, ", zero_extend_signed_to_ull(ru.ru_idrss));
-		tprintf("ru_isrss=%llu, ", zero_extend_signed_to_ull(ru.ru_isrss));
-		tprintf("ru_minflt=%llu, ", zero_extend_signed_to_ull(ru.ru_minflt));
-		tprintf("ru_majflt=%llu, ", zero_extend_signed_to_ull(ru.ru_majflt));
-		tprintf("ru_nswap=%llu, ", zero_extend_signed_to_ull(ru.ru_nswap));
-		tprintf("ru_inblock=%llu, ", zero_extend_signed_to_ull(ru.ru_inblock));
-		tprintf("ru_oublock=%llu, ", zero_extend_signed_to_ull(ru.ru_oublock));
-		tprintf("ru_msgsnd=%llu, ", zero_extend_signed_to_ull(ru.ru_msgsnd));
-		tprintf("ru_msgrcv=%llu, ", zero_extend_signed_to_ull(ru.ru_msgrcv));
-		tprintf("ru_nsignals=%llu, ", zero_extend_signed_to_ull(ru.ru_nsignals));
-		tprintf("ru_nvcsw=%llu, ", zero_extend_signed_to_ull(ru.ru_nvcsw));
-		tprintf("ru_nivcsw=%llu}", zero_extend_signed_to_ull(ru.ru_nivcsw));
+#define PRINT_RUSAGE_MEMBER(member) \
+		tprintf(", " #member "=%llu", zero_extend_signed_to_ull(ru.member))
+		PRINT_RUSAGE_MEMBER(ru_maxrss);
+		PRINT_RUSAGE_MEMBER(ru_ixrss);
+		PRINT_RUSAGE_MEMBER(ru_idrss);
+		PRINT_RUSAGE_MEMBER(ru_isrss);
+		PRINT_RUSAGE_MEMBER(ru_minflt);
+		PRINT_RUSAGE_MEMBER(ru_majflt);
+		PRINT_RUSAGE_MEMBER(ru_nswap);
+		PRINT_RUSAGE_MEMBER(ru_inblock);
+		PRINT_RUSAGE_MEMBER(ru_oublock);
+		PRINT_RUSAGE_MEMBER(ru_msgsnd);
+		PRINT_RUSAGE_MEMBER(ru_msgrcv);
+		PRINT_RUSAGE_MEMBER(ru_nsignals);
+		PRINT_RUSAGE_MEMBER(ru_nvcsw);
+		PRINT_RUSAGE_MEMBER(ru_nivcsw);
+#undef PRINT_RUSAGE_MEMBER
 	}
+	tprints("}");
 }
 
 #ifdef ALPHA

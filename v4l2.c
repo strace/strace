@@ -366,10 +366,10 @@ print_v4l2_buffer(struct tcb *tcp, const unsigned int code, const long arg)
 			tprintf(", length=%u, bytesused=%u, flags=",
 				b.length, b.bytesused);
 			printflags(v4l2_buf_flags, b.flags, "V4L2_BUF_FLAG_???");
-			if (code == VIDIOC_DQBUF)
-				tprintf(", timestamp = {%ju.%06ju}",
-					(uintmax_t)b.timestamp.tv_sec,
-					(uintmax_t)b.timestamp.tv_usec);
+			if (code == VIDIOC_DQBUF) {
+				tprints(", timestamp = ");
+				MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
+			}
 			tprints(", ...");
 		}
 		tprints("}");
