@@ -335,19 +335,19 @@ decode_old_sigaction(struct tcb *tcp, long addr)
 	 * be manipulated by strace. In order to prevent the
 	 * compiler from generating code to manipulate
 	 * __sa_handler we cast the function pointers to long. */
-	tprints("{");
+	tprints("{sa_handler=");
 	print_sa_handler((unsigned long) sa.__sa_handler);
-	tprints(", ");
+	tprints(", sa_mask=");
 #ifdef MIPS
 	tprintsigmask_addr("", sa.sa_mask);
 #else
 	tprintsigmask_val("", sa.sa_mask);
 #endif
-	tprints(", ");
+	tprints(", sa_flags=");
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #if HAVE_SA_RESTORER && defined SA_RESTORER
 	if (sa.sa_flags & SA_RESTORER)
-		tprintf(", %p", sa.sa_restorer);
+		tprintf(", sa_restorer=%p", sa.sa_restorer);
 #endif
 	tprints("}");
 }
@@ -540,9 +540,9 @@ decode_new_sigaction(struct tcb *tcp, long addr)
 	 * be manipulated by strace. In order to prevent the
 	 * compiler from generating code to manipulate
 	 * __sa_handler we cast the function pointers to long. */
-	tprints("{");
+	tprints("{sa_handler=");
 	print_sa_handler((unsigned long) sa.__sa_handler);
-	tprints(", ");
+	tprints(", sa_mask=");
 	/*
 	 * Sigset size is in tcp->u_arg[4] (SPARC)
 	 * or in tcp->u_arg[3] (all other),
@@ -551,12 +551,12 @@ decode_new_sigaction(struct tcb *tcp, long addr)
 	 * We just fetch the right size, which is NSIG / 8.
 	 */
 	tprintsigmask_val("", sa.sa_mask);
-	tprints(", ");
+	tprints(", sa_flags=");
 
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #if HAVE_SA_RESTORER && defined SA_RESTORER
 	if (sa.sa_flags & SA_RESTORER)
-		tprintf(", %p", sa.sa_restorer);
+		tprintf(", sa_restorer=%p", sa.sa_restorer);
 #endif
 	tprints("}");
 }
