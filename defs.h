@@ -633,13 +633,6 @@ extern bool print_sockaddr_by_inode(const unsigned long, const enum sock_proto);
 extern bool print_sockaddr_by_inode_cached(const unsigned long);
 extern void print_dirfd(struct tcb *, int);
 extern int decode_sockaddr(struct tcb *, long, int);
-#ifdef ALPHA
-extern void printrusage32(struct tcb *, long);
-extern const char *sprint_timeval32(struct tcb *tcp, long);
-extern void print_timeval32(struct tcb *tcp, long);
-extern void print_timeval32_pair(struct tcb *tcp, long);
-extern void print_itimerval32(struct tcb *tcp, long);
-#endif
 extern void printuid(const char *, const unsigned int);
 extern void print_sigset_addr_len(struct tcb *, long, long);
 extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
@@ -733,6 +726,19 @@ printxval_long(const struct xlat *x, const unsigned long val, const char *dflt)
 {
 	printxvals(val, dflt, x, NULL);
 }
+
+#ifdef ALPHA
+typedef struct {
+	int tv_sec, tv_usec;
+} timeval32_t;
+
+extern void print_timeval32_t(const timeval32_t *);
+extern void printrusage32(struct tcb *, long);
+extern const char *sprint_timeval32(struct tcb *tcp, long);
+extern void print_timeval32(struct tcb *tcp, long);
+extern void print_timeval32_pair(struct tcb *tcp, long);
+extern void print_itimerval32(struct tcb *tcp, long);
+#endif
 
 /* Strace log generation machinery.
  *

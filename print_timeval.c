@@ -108,11 +108,7 @@ MPERS_PRINTER_DECL(void, print_itimerval,
 
 #ifdef ALPHA
 
-typedef struct {
-	int tv_sec, tv_usec;
-} timeval32_t;
-
-static void
+void
 print_timeval32_t(const timeval32_t *t)
 {
 	tprintf(timeval_fmt, (intmax_t) t->tv_sec, (intmax_t) t->tv_usec);
