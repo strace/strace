@@ -1,5 +1,5 @@
 /*
- * This file is part of utime strace test.
+ * Check decoding of utime syscall.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
@@ -28,13 +28,16 @@
  */
 
 #include "tests.h"
-#include <time.h>
-#include <utime.h>
-#include <errno.h>
-#include <stdio.h>
-#include <unistd.h>
-
 #include <asm/unistd.h>
+
+#ifdef __NR_utime
+
+# include <time.h>
+# include <utime.h>
+# include <errno.h>
+# include <stdio.h>
+# include <unistd.h>
+
 
 static void
 print_tm(const struct tm * const p)
@@ -44,33 +47,36 @@ print_tm(const struct tm * const p)
 	       p->tm_hour, p->tm_min, p->tm_sec);
 }
 
+static long
+k_utime(const void *const filename, const void *const times)
+{
+	return syscall(__NR_utime, filename, times);
+}
+
 int
 main(void)
 {
-	int rc = utime("", NULL);
-	printf("utime(\"\", NULL) = %s\n", sprintrc(rc));
+	static const char *const dummy_str = "dummy filename";
 
 	const time_t t = time(NULL);
 	const struct tm * const p = localtime(&t);
 	const struct utimbuf u = { .actime = t, .modtime = t };
 	const struct utimbuf const *tail_u = tail_memdup(&u, sizeof(u));
-
-#ifdef __NR_utime
-	static const char *const dummy_str = "dummy filename";
-	char *const dummy_filename =
+	const char *const dummy_filename =
 		tail_memdup(dummy_str, sizeof(dummy_str) - 1);
 
-	rc = syscall(__NR_utime, dummy_filename + sizeof(dummy_str),
-		     tail_u + 1);
+	long rc = k_utime("", NULL);
+	printf("utime(\"\", NULL) = %s\n", sprintrc(rc));
+
+	rc = k_utime(dummy_filename + sizeof(dummy_str), tail_u + 1);
 	printf("utime(%p, %p) = %s\n", dummy_filename + sizeof(dummy_str),
 	       tail_u + 1, sprintrc(rc));
 
-	rc = syscall(__NR_utime, dummy_filename, (struct tm *) tail_u + 1);
+	rc = k_utime(dummy_filename, (struct tm *) tail_u + 1);
 	printf("utime(%p, %p) = %s\n",
 	       dummy_filename, (struct tm *) tail_u + 1, sprintrc(rc));
-#endif /* __NR_utime */
 
-	rc = utime("utime\nfilename", tail_u);
+	rc = k_utime("utime\nfilename", tail_u);
 	const char *errstr = sprintrc(rc);
 	printf("utime(\"utime\\nfilename\", {actime=");
 	print_tm(p);
@@ -81,3 +87,9 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_utime")
+
+#endif
