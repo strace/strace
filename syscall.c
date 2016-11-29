@@ -895,16 +895,18 @@ decode_mips_subcall(struct tcb *tcp)
 static void
 dumpio(struct tcb *tcp)
 {
-	int sen;
-
 	if (syserror(tcp))
 		return;
-	if ((unsigned long) tcp->u_arg[0] >= num_quals)
+
+	int fd = tcp->u_arg[0];
+	if (fd < 0 || (unsigned int) fd >= num_quals)
 		return;
-	sen = tcp->s_ent->sen;
+
+	int sen = tcp->s_ent->sen;
 	if (SEN_printargs == sen)
 		return;
-	if (qual_flags[tcp->u_arg[0]] & QUAL_READ) {
+
+	if (qual_flags[fd] & QUAL_READ) {
 		switch (sen) {
 		case SEN_read:
 		case SEN_pread:
@@ -927,7 +929,7 @@ dumpio(struct tcb *tcp)
 			return;
 		}
 	}
-	if (qual_flags[tcp->u_arg[0]] & QUAL_WRITE) {
+	if (qual_flags[fd] & QUAL_WRITE) {
 		switch (sen) {
 		case SEN_write:
 		case SEN_pwrite:

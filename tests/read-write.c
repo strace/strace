@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <asm/unistd.h>
+#include "kernel_types.h"
 
 static void
 dump_str(const char *str, const unsigned int len)
@@ -77,6 +79,20 @@ print_hex(const char *str, const unsigned int len)
 	}
 }
 
+static long
+k_read(unsigned int fd, void *buf, size_t count)
+{
+	kernel_ulong_t kfd = (kernel_ulong_t) 0xfacefeed00000000ULL | fd;
+	return syscall(__NR_read, kfd, buf, count);
+}
+
+static long
+k_write(unsigned int fd, const void *buf, size_t count)
+{
+	kernel_ulong_t kfd = (kernel_ulong_t) 0xfacefeed00000000ULL | fd;
+	return syscall(__NR_write, kfd, buf, count);
+}
+
 static void
 test_dump(const unsigned int len)
 {
@@ -89,7 +105,7 @@ test_dump(const unsigned int len)
 		buf = tail_alloc(len);
 	}
 
-	long rc = read(0, buf, len);
+	long rc = k_read(0, buf, len);
 	if (rc != (int) len)
 		perror_msg_and_fail("read: expected %d, returned %ld",
 				    len, rc);
@@ -103,7 +119,7 @@ test_dump(const unsigned int len)
 	for (i = 0; i < len; ++i)
 		buf[i] = i;
 
-	rc = write(1, buf, len);
+	rc = k_write(1, buf, len);
 	if (rc != (int) len)
 		perror_msg_and_fail("write: expected %d, returned %ld",
 				    len, rc);
@@ -147,18 +163,18 @@ main(void)
 
 	long rc;
 
-	rc = write(1, w, 0);
+	rc = k_write(1, w, 0);
 	if (rc)
 		perror_msg_and_fail("write: expected 0, returned %ld", rc);
 	tprintf("write(1, \"\", 0) = 0\n");
 
-	rc = write(1, efault, 1);
+	rc = k_write(1, efault, 1);
 	if (rc != -1)
 		perror_msg_and_fail("write: expected -1 EFAULT"
 				    ", returned %ld", rc);
 	tprintf("write(1, %p, 1) = -1 EFAULT (%m)\n", efault);
 
-	rc = write(1, w, w_len);
+	rc = k_write(1, w, w_len);
 	if (rc != (int) w_len)
 		perror_msg_and_fail("write: expected %u, returned %ld",
 				    w_len, rc);
@@ -167,17 +183,17 @@ main(void)
 		w_c, w_len, rc, w_d, w_c);
 	close(1);
 
-	rc = read(0, r0, 0);
+	rc = k_read(0, r0, 0);
 	if (rc)
 		perror_msg_and_fail("read: expected 0, returned %ld", rc);
 	tprintf("read(0, \"\", 0) = 0\n");
 
-	rc = read(0, efault, 1);
+	rc = k_read(0, efault, 1);
 	if (rc != -1)
 		perror_msg_and_fail("read: expected -1, returned %ld", rc);
 	tprintf("read(0, %p, 1) = -1 EFAULT (%m)\n", efault);
 
-	rc = read(0, r0, r0_len);
+	rc = k_read(0, r0, r0_len);
 	if (rc != (int) r0_len)
 		perror_msg_and_fail("read: expected %u, returned %ld",
 				    r0_len, rc);
@@ -185,7 +201,7 @@ main(void)
 		" | 00000 %-49s  %-16s |\n",
 		r0_c, r0_len, rc, r0_d, r0_c);
 
-	rc = read(0, r1, w_len);
+	rc = k_read(0, r1, w_len);
 	if (rc != (int) r1_len)
 		perror_msg_and_fail("read: expected %u, returned %ld",
 				    r1_len, rc);
