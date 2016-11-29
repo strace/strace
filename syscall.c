@@ -457,11 +457,27 @@ static bool
 qualify_scno(const char *const s, const unsigned int bitflag,
 	     const int not, const struct fault_opts *const fopts)
 {
-	int i = string_to_uint_upto(s, MAX_NSYSCALLS - 1);
-	if (i < 0)
+	int n = string_to_uint_upto(s, MAX_NSYSCALLS - 1);
+	if (n < 0)
 		return false;
 
-	qualify_one(i, bitflag, not, -1, fopts);
+	if (not && fopts) {
+		/* set bitflag for all syscall numbers except n */
+		unsigned int p;
+		for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+			unsigned int i;
+
+			for (i = 0; i < nsyscall_vec[p]; ++i) {
+				if (i != (unsigned int) n
+				    && sysent_vec[p][i].sys_name) {
+					qualify_one(i, bitflag, 0, p, fopts);
+				}
+			}
+		}
+	} else {
+		qualify_one(n, bitflag, not, -1, fopts);
+	}
+
 	return true;
 }
 
@@ -501,9 +517,11 @@ qualify_syscall_class(const char *const s, const unsigned int bitflag,
 		unsigned int i;
 
 		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (sysent_vec[p][i].sys_name
-			    && (sysent_vec[p][i].sys_flags & n) == n) {
-				qualify_one(i, bitflag, not, p, fopts);
+			if (!sysent_vec[p][i].sys_name)
+				continue;
+			const bool match = (sysent_vec[p][i].sys_flags & n) == n;
+			if (match ^ (not && fopts)) {
+				qualify_one(i, bitflag, not && !fopts, p, fopts);
 			}
 		}
 	}
@@ -522,10 +540,12 @@ qualify_syscall_name(const char *const s, const unsigned int bitflag,
 		unsigned int i;
 
 		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (sysent_vec[p][i].sys_name
-			    && strcmp(s, sysent_vec[p][i].sys_name) == 0) {
-				qualify_one(i, bitflag, not, p, fopts);
-				found = true;
+			if (!sysent_vec[p][i].sys_name)
+				continue;
+			const bool match = !strcmp(s, sysent_vec[p][i].sys_name);
+			found = found || match;
+			if (match ^ (not && fopts)) {
+				qualify_one(i, bitflag, not && !fopts, p, fopts);
 			}
 		}
 	}

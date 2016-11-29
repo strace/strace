@@ -40,16 +40,16 @@ fail_with()
 		"strace -e fault=$* failed to handle an argument error properly"
 }
 
-for arg in '' , ,, ,,, : :: ::: \
+for arg in '' , ,, ,,, : :: ::: \! \!, \!: \
 	   invalid_syscall_name \
 	   invalid_syscall_name:when=3 \
-	   -1 \
+	   -1 \!-1 \
 	   -1:when=4 \
 	   -2 \
 	   -2:when=5 \
-	   32767 \
+	   32767 \!32767 \
 	   32767:when=6 \
-	   chdir:42 \
+	   chdir:42 \!chdir:42 \
 	   chdir:42:when=7 \
 	   chdir:invalid \
 	   chdir:invalid:when=8 \
@@ -92,6 +92,12 @@ for arg in '' , ,, ,,, : :: ::: \
 	   chdir:when=65536:error=30 \
 	   chdir:when=1+65536 \
 	   chdir:when=1+65536:error=31 \
+	   file,nonsense \
+	   \!desc,nonsense \
+	   chdir,nonsense \
+	   \!chdir,nonsense \
+	   1,nonsense \
+	   \!1,nonsense \
 	   ; do
 	$STRACE -e fault="$arg" true 2> "$LOG" &&
 		fail_with "$arg"
