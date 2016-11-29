@@ -37,6 +37,7 @@
 # include <stdio.h>
 # include <sys/uio.h>
 # include <unistd.h>
+# include "kernel_types.h"
 
 static int
 pr(const int fd, const struct iovec *const vec,
@@ -179,11 +180,12 @@ dumpio(void)
 int
 main(void)
 {
-	const unsigned long vlen = (unsigned long) 0xfac1fed2dad3bef4;
+	const kernel_ulong_t vlen = (kernel_ulong_t) 0xfac1fed2dad3bef4ULL;
 	const unsigned long long pos = 0xfac5fed6dad7bef8;
-	const unsigned long pos_l = (unsigned long) pos;
-	const unsigned long pos_h = (sizeof(long) == sizeof(long long)) ?
-		(unsigned long) 0xbadc0deddeadbeef : 0xfac5fed6UL;
+	const kernel_ulong_t pos_l = (kernel_ulong_t) pos;
+	const kernel_ulong_t pos_h =
+		(sizeof(kernel_ulong_t) == sizeof(long long)) ?
+		(kernel_ulong_t) 0xbadc0deddeadbeefULL : 0xfac5fed6UL;
 	int test_dumpio = 1;
 
 	tprintf("%s", "");
@@ -191,14 +193,14 @@ main(void)
 	syscall(__NR_preadv2, -1, NULL, vlen, pos_l, pos_h, 1);
 	if (ENOSYS == errno)
 		test_dumpio = 0;
-	tprintf("preadv2(-1, NULL, %lu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
-	       vlen, pos, errno2name());
+	tprintf("preadv2(-1, NULL, %llu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
+		(unsigned long long) vlen, pos, errno2name());
 
 	syscall(__NR_pwritev2, -1, NULL, vlen, pos_l, pos_h, 1);
 	if (ENOSYS == errno)
 		test_dumpio = 0;
-	tprintf("pwritev2(-1, NULL, %lu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
-	       vlen, pos, errno2name());
+	tprintf("pwritev2(-1, NULL, %llu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
+		(unsigned long long) vlen, pos, errno2name());
 
 	if (test_dumpio)
 		dumpio();
