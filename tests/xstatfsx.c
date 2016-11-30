@@ -81,7 +81,7 @@ print_statfs(const char *const sample, const char *magic_str)
 	PRINT_NUM(f_files);
 	PRINT_NUM(f_ffree);
 #ifdef PRINT_F_FSID
-	printf(", f_fsid={%u, %u}",
+	printf(", f_fsid={val=[%u, %u]}",
 	       (unsigned) b->PRINT_F_FSID[0], (unsigned) b->PRINT_F_FSID[1]);
 #endif
 	PRINT_NUM(f_namelen);
