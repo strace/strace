@@ -902,12 +902,8 @@ dumpio(struct tcb *tcp)
 	if (fd < 0 || (unsigned int) fd >= num_quals)
 		return;
 
-	int sen = tcp->s_ent->sen;
-	if (SEN_printargs == sen)
-		return;
-
 	if (qual_flags[fd] & QUAL_READ) {
-		switch (sen) {
+		switch (tcp->s_ent->sen) {
 		case SEN_read:
 		case SEN_pread:
 		case SEN_recv:
@@ -930,7 +926,7 @@ dumpio(struct tcb *tcp)
 		}
 	}
 	if (qual_flags[fd] & QUAL_WRITE) {
-		switch (sen) {
+		switch (tcp->s_ent->sen) {
 		case SEN_write:
 		case SEN_pwrite:
 		case SEN_send:
