@@ -75,7 +75,7 @@ print_affinitylist(struct tcb *tcp, const unsigned long addr, const unsigned int
 			if (i < 0)
 				break;
 			tprintf("%s%d", sep, i);
-			sep = " ";
+			sep = ", ";
 		}
 		if (size < len)
 			tprintf("%s...", sep);
