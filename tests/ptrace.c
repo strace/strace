@@ -349,6 +349,19 @@ main(void)
 	       " = %s\n",
 	       (unsigned) pid, bad_request, sip->si_call_addr, sip->si_syscall,
 	       errstr);
+
+	sip->si_errno = 3141592653U;
+	sip->si_call_addr = NULL;
+	sip->si_syscall = __NR_read;
+	sip->si_arch = 0xda7a1057;
+
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGSYS"
+	       ", si_code=SYS_SECCOMP, si_errno=%d, si_call_addr=NULL"
+	       ", si_syscall=__NR_read, si_arch=%#x /* AUDIT_ARCH_??? */})"
+	       " = %s\n",
+	       (unsigned) pid, bad_request, sip->si_errno, sip->si_arch,
+	       errstr);
 #endif
 
 #if defined HAVE_SIGINFO_T_SI_TIMERID && defined HAVE_SIGINFO_T_SI_OVERRUN
