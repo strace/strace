@@ -581,8 +581,7 @@ strip_prefix(const char *prefix, const char *str)
 {
 	size_t len = strlen(prefix);
 
-	return (len > strlen(str) || memcmp(prefix, str, len))
-	       ? NULL : str + len;
+	return strncmp(prefix, str, len) ? NULL : str + len;
 }
 
 static int
