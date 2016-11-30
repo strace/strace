@@ -990,14 +990,7 @@ shuffle_scno(unsigned long scno)
 const char *
 syscall_name(long scno)
 {
-	static char buf[sizeof("syscall_%lu") + sizeof(long)*3];
-
-	if (SCNO_IS_VALID(scno))
-		return sysent[scno].sys_name;
-	else {
-		sprintf(buf, "syscall_%lu", scno);
-		return buf;
-	}
+	return SCNO_IS_VALID(scno) ? sysent[scno].sys_name: NULL;
 }
 
 const char *

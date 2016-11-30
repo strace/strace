@@ -189,13 +189,21 @@ print_si_info(const siginfo_t *sip)
 			}
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
-		case SIGSYS:
+		case SIGSYS: {
+			const char *scname =
+				syscall_name((unsigned) sip->si_syscall);
+
 			tprints(", si_call_addr=");
 			printaddr((unsigned long) sip->si_call_addr);
-			tprintf(", si_syscall=__NR_%s, si_arch=",
-				syscall_name((unsigned) sip->si_syscall));
+			tprints(", si_syscall=");
+			if (scname)
+				tprintf("__NR_%s", scname);
+			else
+				tprintf("%u", (unsigned) sip->si_syscall);
+			tprints(", si_arch=");
 			printxval(audit_arch, sip->si_arch, "AUDIT_ARCH_???");
 			break;
+		}
 #endif
 		default:
 			if (sip->si_pid || sip->si_uid)

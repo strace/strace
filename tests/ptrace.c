@@ -345,7 +345,7 @@ main(void)
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGSYS"
 	       ", si_code=SYS_SECCOMP, si_errno=ENOENT, si_call_addr=%p"
-	       ", si_syscall=__NR_syscall_%u, si_arch=AUDIT_ARCH_X86_64})"
+	       ", si_syscall=%u, si_arch=AUDIT_ARCH_X86_64})"
 	       " = %s\n",
 	       (unsigned) pid, bad_request, sip->si_call_addr, sip->si_syscall,
 	       errstr);

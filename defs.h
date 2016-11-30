@@ -457,6 +457,13 @@ extern void call_summary(FILE *);
 extern void clear_regs(void);
 extern void get_regs(pid_t pid);
 extern int get_scno(struct tcb *tcp);
+/**
+ * Convert syscall number to syscall name.
+ *
+ * @param scno Syscall number.
+ * @return     String literal corresponding to the syscall number in case latter
+ *             is valid; NULL otherwise.
+ */
 extern const char *syscall_name(long scno);
 extern const char *err_name(unsigned long err);
 
