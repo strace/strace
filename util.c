@@ -53,9 +53,11 @@ string_to_uint_ex(const char *const str, char **const endptr,
 	if (!*str)
 		return -1;
 
+	errno = 0;
 	val = strtol(str, &end, 10);
 
-	if (str == end || val < 0 || (unsigned long) val > max_val)
+	if (str == end || val < 0 || (unsigned long) val > max_val
+	    || (val == LONG_MAX && errno == ERANGE))
 		return -1;
 
 	if (*end && (!accepted_ending || !strchr(accepted_ending, *end)))
