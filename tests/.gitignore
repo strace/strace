@@ -216,6 +216,7 @@ pread64-pwrite64
 preadv
 preadv-pwritev
 preadv2-pwritev2
+print_maxfd
 prlimit64
 process_vm_readv
 process_vm_writev

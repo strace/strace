@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# Check decoding of readv and writev syscalls.
-
+# Check decoding and dumping of readv and writev syscalls.
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -a16 -eread=0 -ewrite=1 -e trace=readv,writev
+
+maxfd="$(./print_maxfd)"
+run_strace_match_diff \
+	-a16 -eread="$(($maxfd - 1))" -ewrite="$maxfd" -e trace=readv,writev

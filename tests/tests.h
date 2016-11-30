@@ -137,6 +137,9 @@ struct timespec;
 int recv_mmsg(int, struct mmsghdr *, unsigned int, unsigned int, struct timespec *);
 int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 
+/* Create a pipe with maximized descriptor numbers. */
+void pipe_maxfd(int pipefd[2]);
+
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 

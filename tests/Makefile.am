@@ -51,6 +51,7 @@ libtests_a_SOURCES = \
 	libmmsg.c \
 	libsocketcall.c \
 	overflowuid.c \
+	pipe_maxfd.c \
 	print_quoted_string.c \
 	printflags.c \
 	printxval.c \
@@ -274,6 +275,7 @@ check_PROGRAMS = \
 	preadv \
 	preadv-pwritev \
 	preadv2-pwritev2 \
+	print_maxfd \
 	prlimit64 \
 	process_vm_readv \
 	process_vm_writev \
