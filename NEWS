@@ -1,5 +1,8 @@
 Noteworthy changes in release ?.?? (????-??-??)
 
+* Changes in behavior
+  * Time stamps are now printed according to ISO 8601.
+
 * Improvements
   * Implemented syscall fault injection.
   * Implemented decoding of DM_* ioctl commands.
@@ -9,12 +12,14 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of ioctl commands from Linux 4.9.
 
 * Bug fixes
-  * Fixed decoding of lookup_dcookie, inotify_init1, kcmp, process_vm_readv,
-    process_vm_writev, init_module, setns, unshare, kexec_load,
-    name_to_handle_at, mq_timedsend, mq_timedreceive, mq_notify, mq_getsetattr,
-    mq_open syscalls.
+  * Fixed corner cases in decoding of getgroups, getresuid, init_module,
+    inotify_init1, kcmp, kexec_load, lookup_dcookie, mq_getsetattr, mq_notify,
+    mq_open, mq_timedreceive, mq_timedsend, name_to_handle_at, process_vm_readv,
+    process_vm_writev, setfsuid, setgroups, setns, and unshare syscalls.
   * Fixed handling of verbose flag in printing of controls array of
     struct v4l2_ext_controls.
+  * Fixed omission of field names in the output of capability, sigaction,
+    statfs, timespec, timeval, and utimbuf structures.
 
 Noteworthy changes in release 4.14 (2016-10-04)
 ===============================================
