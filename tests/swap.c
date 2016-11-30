@@ -23,7 +23,7 @@ main(void)
 
 	rc = syscall(__NR_swapon, sample, SWAP_FLAG_PREFER);
 	printf("swapon(\"%s\", %s) = %ld %s (%m)\n",
-	       sample, "SWAP_FLAG_PREFER", rc, errno2name());
+	       sample, "SWAP_FLAG_PREFER|0", rc, errno2name());
 
 	rc = syscall(__NR_swapon, sample, SWAP_FLAG_PREFER | 42);
 	printf("swapon(\"%s\", %s) = %ld %s (%m)\n",
