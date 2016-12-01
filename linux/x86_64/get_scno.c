@@ -30,6 +30,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef X86_64
+# define X32_PERSONALITY_NUMBER 2
+#else
+# define X32_PERSONALITY_NUMBER 0
+#endif
+
 /* Return codes: 1 - ok, 0 - ignore, other - error. */
 static int
 arch_get_scno(struct tcb *tcp)

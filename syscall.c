@@ -988,12 +988,6 @@ shuffle_scno(unsigned long scno)
 #endif
 
 const char *
-syscall_name(long scno)
-{
-	return SCNO_IS_VALID(scno) ? sysent[scno].sys_name: NULL;
-}
-
-const char *
 err_name(unsigned long err)
 {
 	if ((err < nerrnos) && errnoent[err])
@@ -1740,3 +1734,13 @@ get_syscall_result(struct tcb *tcp)
 #ifdef HAVE_GETREGS_OLD
 # include "getregs_old.c"
 #endif
+
+const char *
+syscall_name(long scno)
+{
+#if defined X32_PERSONALITY_NUMBER && defined __X32_SYSCALL_BIT
+	if (current_personality == X32_PERSONALITY_NUMBER)
+		scno &= ~__X32_SYSCALL_BIT;
+#endif
+	return SCNO_IS_VALID(scno) ? sysent[scno].sys_name: NULL;
+}
