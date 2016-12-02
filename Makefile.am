@@ -195,6 +195,7 @@ strace_SOURCES =	\
 	process_vm.c	\
 	ptp.c		\
 	ptrace.h	\
+	qualify.c	\
 	quota.c		\
 	readahead.c	\
 	readlink.c	\

@@ -359,7 +359,6 @@ update_personality(struct tcb *tcp, unsigned int personality)
 }
 #endif
 
-static int qual_desc(const char *, unsigned int, int);
 static int qual_fault(const char *, unsigned int, int);
 static int qual_signal(const char *, unsigned int, int);
 static int qual_syscall(const char *, unsigned int, int);
@@ -381,12 +380,12 @@ static const struct qual_options {
 	{ QUAL_SIGNAL,	"signal",	qual_signal,	"signal"	},
 	{ QUAL_SIGNAL,	"signals",	qual_signal,	"signal"	},
 	{ QUAL_SIGNAL,	"s",		qual_signal,	"signal"	},
-	{ QUAL_READ,	"read",		qual_desc,	"descriptor"	},
-	{ QUAL_READ,	"reads",	qual_desc,	"descriptor"	},
-	{ QUAL_READ,	"r",		qual_desc,	"descriptor"	},
-	{ QUAL_WRITE,	"write",	qual_desc,	"descriptor"	},
-	{ QUAL_WRITE,	"writes",	qual_desc,	"descriptor"	},
-	{ QUAL_WRITE,	"w",		qual_desc,	"descriptor"	},
+	{ QUAL_READ,	"read",		NULL,		"descriptor"	},
+	{ QUAL_READ,	"reads",	NULL,		"descriptor"	},
+	{ QUAL_READ,	"r",		NULL,		"descriptor"	},
+	{ QUAL_WRITE,	"write",	NULL,		"descriptor"	},
+	{ QUAL_WRITE,	"writes",	NULL,		"descriptor"	},
+	{ QUAL_WRITE,	"w",		NULL,		"descriptor"	},
 	{ QUAL_FAULT,	"fault",	qual_fault,	"fault argument"},
 	{ 0,		NULL,		NULL,		NULL		},
 };
@@ -729,16 +728,6 @@ qual_signal(const char *s, const unsigned int bitflag, const int not)
 	return -1;
 }
 
-static int
-qual_desc(const char *s, const unsigned int bitflag, const int not)
-{
-	int desc = string_to_uint_upto(s, 0x7fff);
-	if (desc < 0)
-		return -1;
-	qualify_one(desc, bitflag, not, -1, NULL);
-	return 0;
-}
-
 void
 qualify(const char *s)
 {
@@ -762,6 +751,16 @@ qualify(const char *s)
 			break;
 		}
 	}
+
+	switch (opt->bitflag) {
+		case QUAL_READ:
+			qualify_read(s);
+			return;
+		case QUAL_WRITE:
+			qualify_write(s);
+			return;
+	}
+
 	not = 0;
 	if (*s == '!') {
 		not = 1;
@@ -898,10 +897,10 @@ dumpio(struct tcb *tcp)
 		return;
 
 	int fd = tcp->u_arg[0];
-	if (fd < 0 || (unsigned int) fd >= num_quals)
+	if (fd < 0)
 		return;
 
-	if (qual_flags[fd] & QUAL_READ) {
+	if (is_number_in_set(fd, &read_set)) {
 		switch (tcp->s_ent->sen) {
 		case SEN_read:
 		case SEN_pread:
@@ -924,7 +923,7 @@ dumpio(struct tcb *tcp)
 			return;
 		}
 	}
-	if (qual_flags[fd] & QUAL_WRITE) {
+	if (is_number_in_set(fd, &write_set)) {
 		switch (tcp->s_ent->sen) {
 		case SEN_write:
 		case SEN_pwrite:

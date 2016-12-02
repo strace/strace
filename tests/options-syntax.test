@@ -67,6 +67,17 @@ check_e "Invalid process id: 'a'" -p 1,a
 check_e "Syscall 'chdir' for -b isn't supported" -b chdir
 check_e "Syscall 'chdir' for -b isn't supported" -b execve -b chdir
 
+check_e "invalid descriptor '-1'" -eread=-1
+check_e "invalid descriptor '-42'" -ewrite=-42
+check_e "invalid descriptor '2147483648'" -eread=2147483648
+check_e "invalid descriptor '4294967296'" -ewrite=4294967296
+check_e "invalid descriptor 'foo'" -eread=foo
+check_e "invalid descriptor ''" -ewrite=
+check_e "invalid descriptor ','" -eread=,
+check_e "invalid descriptor '!'" -ewrite='!'
+check_e "invalid descriptor '!'" -eread='0,!'
+check_e "invalid descriptor '!,'" -ewrite='!,'
+
 check_h 'must have PROG [ARGS] or -p PID'
 check_h 'PROG [ARGS] must be specified with -D' -D -p $$
 check_h '-c and -C are mutually exclusive' -c -C true
