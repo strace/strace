@@ -841,8 +841,6 @@ extern const struct_sysent sysent0[];
 extern const char *const errnoent0[];
 extern const char *const signalent0[];
 extern const struct_ioctlent ioctlent0[];
-extern qualbits_t *qual_vec[SUPPORTED_PERSONALITIES];
-#define qual_flags (qual_vec[current_personality])
 
 #if SUPPORTED_PERSONALITIES > 1
 extern const struct_sysent *sysent;
@@ -860,7 +858,6 @@ extern unsigned nsyscalls;
 extern unsigned nerrnos;
 extern unsigned nsignals;
 extern unsigned nioctlents;
-extern unsigned num_quals;
 
 #ifdef IN_MPERS_BOOTSTRAP
 /* Transform multi-line MPERS_PRINTER_DECL statements to one-liners.  */

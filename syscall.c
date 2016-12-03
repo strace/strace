@@ -224,9 +224,6 @@ unsigned nerrnos = nerrnos0;
 unsigned nsignals = nsignals0;
 unsigned nioctlents = nioctlents0;
 
-unsigned num_quals;
-qualbits_t *qual_vec[SUPPORTED_PERSONALITIES];
-
 static const unsigned nsyscall_vec[SUPPORTED_PERSONALITIES] = {
 	nsyscalls0,
 #if SUPPORTED_PERSONALITIES > 1
@@ -257,14 +254,11 @@ enum {
 			> nsyscalls2 ? MAX_NSYSCALLS1 : nsyscalls2
 #endif
 			),
-	MAX_NSYSCALLS = MAX_NSYSCALLS2,
-	/* We are ready for arches with up to 255 signals,
-	 * even though the largest known signo is on MIPS and it is 128.
-	 * The number of existing syscalls on all arches is
-	 * larger that 255 anyway, so it is just a pedantic matter.
-	 */
-	MIN_QUALS = MAX_NSYSCALLS > 255 ? MAX_NSYSCALLS : 255
+	MAX_NSYSCALLS = MAX_NSYSCALLS2
 };
+
+static qualbits_t qual_vec[SUPPORTED_PERSONALITIES][MAX_NSYSCALLS];
+#define qual_flags (qual_vec[current_personality])
 
 #if SUPPORTED_PERSONALITIES > 1
 unsigned current_personality;
@@ -389,53 +383,19 @@ static const struct qual_options {
 	{ 0,		NULL,		NULL,		NULL		},
 };
 
-static void
-reallocate_vec(void **vec, unsigned int old_nmemb,
-	       size_t size, unsigned int new_nmemb)
-{
-	unsigned int p;
-
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		vec[p] = xreallocarray(vec[p], new_nmemb, size);
-		memset(vec[p] + size * old_nmemb, 0,
-		       (new_nmemb - old_nmemb) * size);
-	}
-}
-
-static void
-reallocate_qual(const unsigned int n)
-{
-	reallocate_vec((void **) qual_vec, num_quals, sizeof(qualbits_t), n);
-	num_quals = n;
-}
-
 struct fault_opts {
 	uint16_t first;
 	uint16_t step;
 	uint16_t err;
 };
 
-static unsigned int num_faults;
-static struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
-
-static inline void
-reallocate_fault(const unsigned int n)
-{
-	reallocate_vec((void **) fault_vec, num_faults,
-		       sizeof(struct fault_opts), n);
-	num_faults = n;
-}
+static struct fault_opts fault_vec[SUPPORTED_PERSONALITIES][MAX_NSYSCALLS];
 
 static void
 qualify_one(const unsigned int n, unsigned int bitflag, const int not,
 	    const int pers, const struct fault_opts *fopts)
 {
 	int p;
-
-	if (num_quals <= n) {
-		reallocate_qual(n + 1);
-		reallocate_fault(n + 1);
-	}
 
 	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
 		if (pers == p || pers < 0) {
@@ -706,12 +666,7 @@ qualify(const char *s)
 	char *copy;
 	const char *p;
 	int not;
-	unsigned int i;
-
-	if (num_quals == 0) {
-		reallocate_qual(MIN_QUALS);
-		reallocate_fault(MIN_QUALS);
-	}
+	int i;
 
 	opt = &qual_options[0];
 	for (i = 0; (p = qual_options[i].option_name); i++) {
@@ -752,12 +707,12 @@ qualify(const char *s)
 		return;
 	}
 	if (strcmp(s, "all") == 0) {
-		for (i = 0; i < num_quals; ++i) {
+		for (i = 0; i < MAX_NSYSCALLS; ++i) {
 			qualify_one(i, opt->bitflag, not, -1, NULL);
 		}
 		return;
 	}
-	for (i = 0; i < num_quals; ++i) {
+	for (i = 0; i < MAX_NSYSCALLS; ++i) {
 		qualify_one(i, opt->bitflag, !not, -1, NULL);
 	}
 	copy = xstrdup(s);
@@ -997,11 +952,10 @@ inject_syscall_fault_entering(struct tcb *tcp)
 {
 	if (!tcp->fault_vec[current_personality]) {
 		tcp->fault_vec[current_personality] =
-			xreallocarray(NULL, num_faults,
-				      sizeof(struct fault_opts));
+			xcalloc(MAX_NSYSCALLS, sizeof(struct fault_opts));
 		memcpy(tcp->fault_vec[current_personality],
 		       fault_vec[current_personality],
-		       num_faults * sizeof(struct fault_opts));
+		       MAX_NSYSCALLS * sizeof(struct fault_opts));
 	}
 
 	struct fault_opts *opts = tcb_fault_opts(tcp);
