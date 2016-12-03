@@ -38,6 +38,7 @@ struct number_set {
 
 struct number_set read_set;
 struct number_set write_set;
+struct number_set signal_set;
 
 static void
 number_setbit(const unsigned int i, number_slot_t *const vec)
@@ -151,4 +152,38 @@ void
 qualify_write(const char *const str)
 {
 	qualify_tokens(str, &write_set, string_to_uint, "descriptor");
+}
+
+static int
+sigstr_to_uint(const char *s)
+{
+	int i;
+
+	if (*s >= '0' && *s <= '9')
+		return string_to_uint_upto(s, 255);
+
+	if (strncasecmp(s, "SIG", 3) == 0)
+		s += 3;
+
+	for (i = 0; i <= 255; ++i) {
+		const char *name = signame(i);
+
+		if (strncasecmp(name, "SIG", 3) != 0)
+			continue;
+
+		name += 3;
+
+		if (strcasecmp(name, s) != 0)
+			continue;
+
+		return i;
+	}
+
+	return -1;
+}
+
+void
+qualify_signals(const char *const str)
+{
+	qualify_tokens(str, &signal_set, sigstr_to_uint, "signal");
 }

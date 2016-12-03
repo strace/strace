@@ -2094,8 +2094,7 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 	}
 
 	if (cflag != CFLAG_ONLY_STATS
-	 && (qual_flags[WTERMSIG(status)] & QUAL_SIGNAL)
-	) {
+	    && is_number_in_set(WTERMSIG(status), &signal_set)) {
 		printleader(tcp);
 #ifdef WCOREDUMP
 		tprintf("+++ killed by %s %s+++\n",
@@ -2130,8 +2129,7 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 {
 	if (cflag != CFLAG_ONLY_STATS
 	    && !hide_log(tcp)
-	    && (qual_flags[sig] & QUAL_SIGNAL)
-	   ) {
+	    && is_number_in_set(sig, &signal_set)) {
 		printleader(tcp);
 		if (si) {
 			tprintf("--- %s ", signame(sig));

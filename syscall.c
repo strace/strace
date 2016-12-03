@@ -360,7 +360,6 @@ update_personality(struct tcb *tcp, unsigned int personality)
 #endif
 
 static int qual_fault(const char *, unsigned int, int);
-static int qual_signal(const char *, unsigned int, int);
 static int qual_syscall(const char *, unsigned int, int);
 
 static const struct qual_options {
@@ -377,9 +376,9 @@ static const struct qual_options {
 	{ QUAL_VERBOSE,	"v",		qual_syscall,	"system call"	},
 	{ QUAL_RAW,	"raw",		qual_syscall,	"system call"	},
 	{ QUAL_RAW,	"x",		qual_syscall,	"system call"	},
-	{ QUAL_SIGNAL,	"signal",	qual_signal,	"signal"	},
-	{ QUAL_SIGNAL,	"signals",	qual_signal,	"signal"	},
-	{ QUAL_SIGNAL,	"s",		qual_signal,	"signal"	},
+	{ QUAL_SIGNAL,	"signal",	NULL,		"signal"	},
+	{ QUAL_SIGNAL,	"signals",	NULL,		"signal"	},
+	{ QUAL_SIGNAL,	"s",		NULL,		"signal"	},
 	{ QUAL_READ,	"read",		NULL,		"descriptor"	},
 	{ QUAL_READ,	"reads",	NULL,		"descriptor"	},
 	{ QUAL_READ,	"r",		NULL,		"descriptor"	},
@@ -700,34 +699,6 @@ qual_fault(const char *const s, const unsigned int bitflag, const int not)
 	return rc;
 }
 
-static int
-qual_signal(const char *s, const unsigned int bitflag, const int not)
-{
-	int i;
-
-	if (*s >= '0' && *s <= '9') {
-		i = string_to_uint_upto(s, 255);
-		if (i < 0)
-			return -1;
-		qualify_one(i, bitflag, not, -1, NULL);
-		return 0;
-	}
-	if (strncasecmp(s, "SIG", 3) == 0)
-		s += 3;
-	for (i = 0; i <= NSIG; ++i) {
-		const char *name = signame(i);
-		if (strncasecmp(name, "SIG", 3) != 0)
-			continue;
-		name += 3;
-
-		if (strcasecmp(name, s) != 0)
-			continue;
-		qualify_one(i, bitflag, not, -1, NULL);
-		return 0;
-	}
-	return -1;
-}
-
 void
 qualify(const char *s)
 {
@@ -753,6 +724,9 @@ qualify(const char *s)
 	}
 
 	switch (opt->bitflag) {
+		case QUAL_SIGNAL:
+			qualify_signals(s);
+			return;
 		case QUAL_READ:
 			qualify_read(s);
 			return;

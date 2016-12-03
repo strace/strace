@@ -288,10 +288,10 @@ struct tcb {
 #define QUAL_ABBREV	0x002	/* abbreviate the structures of this syscall */
 #define QUAL_VERBOSE	0x004	/* decode the structures of this syscall */
 #define QUAL_RAW	0x008	/* print all args in hex for this syscall */
-#define QUAL_SIGNAL	0x010	/* report events with this signal */
+#define QUAL_FAULT	0x010	/* fail this system call on purpose */
+#define QUAL_SIGNAL	0x100	/* report events with this signal */
 #define QUAL_READ	0x200	/* dump data read from this file descriptor */
 #define QUAL_WRITE	0x400	/* dump data written to this file descriptor */
-#define QUAL_FAULT	0x080	/* fail this system call on purpose */
 typedef uint8_t qualbits_t;
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
@@ -667,10 +667,12 @@ extern void print_ifindex(unsigned int);
 struct number_set;
 extern struct number_set read_set;
 extern struct number_set write_set;
+extern struct number_set signal_set;
 
 extern bool is_number_in_set(unsigned int number, const struct number_set *);
 extern void qualify_read(const char *);
 extern void qualify_write(const char *);
+extern void qualify_signals(const char *);
 
 extern int dm_ioctl(struct tcb *, const unsigned int, long);
 extern int file_ioctl(struct tcb *, const unsigned int, long);
