@@ -210,13 +210,17 @@ typedef struct ioctlent {
 	unsigned int code;
 } struct_ioctlent;
 
+struct fault_opts {
+	uint16_t first;
+	uint16_t step;
+	uint16_t err;
+};
+
 #if defined LINUX_MIPSN32 || defined X32
 # define HAVE_STRUCT_TCB_EXT_ARG 1
 #else
 # define HAVE_STRUCT_TCB_EXT_ARG 0
 #endif
-
-struct fault_opts;
 
 /* Trace Control Block */
 struct tcb {
@@ -292,7 +296,6 @@ struct tcb {
 #define QUAL_SIGNAL	0x100	/* report events with this signal */
 #define QUAL_READ	0x200	/* dump data read from this file descriptor */
 #define QUAL_WRITE	0x400	/* dump data written to this file descriptor */
-typedef uint8_t qualbits_t;
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 
@@ -448,7 +451,6 @@ extern int read_int_from_file(const char *, int *);
 
 extern void set_sortby(const char *);
 extern void set_overhead(int);
-extern void qualify(const char *);
 extern void print_pc(struct tcb *);
 extern int trace_syscall(struct tcb *);
 extern void count_syscall(struct tcb *, const struct timeval *);
@@ -670,9 +672,8 @@ extern struct number_set write_set;
 extern struct number_set signal_set;
 
 extern bool is_number_in_set(unsigned int number, const struct number_set *);
-extern void qualify_read(const char *);
-extern void qualify_write(const char *);
-extern void qualify_signals(const char *);
+extern void qualify(const char *);
+extern unsigned int qual_flags(const unsigned int);
 
 extern int dm_ioctl(struct tcb *, const unsigned int, long);
 extern int file_ioctl(struct tcb *, const unsigned int, long);
@@ -858,6 +859,10 @@ extern unsigned nsyscalls;
 extern unsigned nerrnos;
 extern unsigned nsignals;
 extern unsigned nioctlents;
+
+extern const unsigned int nsyscall_vec[SUPPORTED_PERSONALITIES];
+extern const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES];
+extern struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 
 #ifdef IN_MPERS_BOOTSTRAP
 /* Transform multi-line MPERS_PRINTER_DECL statements to one-liners.  */

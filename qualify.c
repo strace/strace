@@ -40,6 +40,12 @@ struct number_set read_set;
 struct number_set write_set;
 struct number_set signal_set;
 
+static struct number_set abbrev_set[SUPPORTED_PERSONALITIES];
+static struct number_set fault_set[SUPPORTED_PERSONALITIES];
+static struct number_set raw_set[SUPPORTED_PERSONALITIES];
+static struct number_set trace_set[SUPPORTED_PERSONALITIES];
+static struct number_set verbose_set[SUPPORTED_PERSONALITIES];
+
 static void
 number_setbit(const unsigned int i, number_slot_t *const vec)
 {
@@ -142,18 +148,6 @@ handle_inversion:
 	}
 }
 
-void
-qualify_read(const char *const str)
-{
-	qualify_tokens(str, &read_set, string_to_uint, "descriptor");
-}
-
-void
-qualify_write(const char *const str)
-{
-	qualify_tokens(str, &write_set, string_to_uint, "descriptor");
-}
-
 static int
 sigstr_to_uint(const char *s)
 {
@@ -182,8 +176,422 @@ sigstr_to_uint(const char *s)
 	return -1;
 }
 
-void
+static bool
+qualify_syscall_number(const char *s, struct number_set *set)
+{
+	int n = string_to_uint(s);
+	if (n < 0)
+		return false;
+
+	unsigned int p;
+	bool done = false;
+
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		if ((unsigned) n >= nsyscall_vec[p]) {
+			continue;
+		}
+		add_number_to_set(n, &set[p]);
+		done = true;
+	}
+
+	return done;
+}
+
+static unsigned int
+lookup_class(const char *s)
+{
+	static const struct {
+		const char *name;
+		unsigned int value;
+	} syscall_class[] = {
+		{ "desc",	TRACE_DESC	},
+		{ "file",	TRACE_FILE	},
+		{ "memory",	TRACE_MEMORY	},
+		{ "process",	TRACE_PROCESS	},
+		{ "signal",	TRACE_SIGNAL	},
+		{ "ipc",	TRACE_IPC	},
+		{ "network",	TRACE_NETWORK	},
+	};
+
+	unsigned int i;
+	for (i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
+		if (strcmp(s, syscall_class[i].name) == 0) {
+			return syscall_class[i].value;
+		}
+	}
+
+	return 0;
+}
+
+static bool
+qualify_syscall_class(const char *s, struct number_set *set)
+{
+	const unsigned int n = lookup_class(s);
+	if (!n)
+		return false;
+
+	unsigned int p;
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		unsigned int i;
+
+		for (i = 0; i < nsyscall_vec[p]; ++i) {
+			if (!sysent_vec[p][i].sys_name
+			    || (sysent_vec[p][i].sys_flags & n) != n) {
+				continue;
+			}
+			add_number_to_set(i, &set[p]);
+		}
+	}
+
+	return true;
+}
+
+static bool
+qualify_syscall_name(const char *s, struct number_set *set)
+{
+	unsigned int p;
+	bool found = false;
+
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		unsigned int i;
+
+		for (i = 0; i < nsyscall_vec[p]; ++i) {
+			if (!sysent_vec[p][i].sys_name
+			    || strcmp(s, sysent_vec[p][i].sys_name)) {
+				continue;
+			}
+			add_number_to_set(i, &set[p]);
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+static bool
+qualify_syscall(const char *token, struct number_set *set)
+{
+	if (*token >= '0' && *token <= '9')
+		return qualify_syscall_number(token, set);
+	return qualify_syscall_class(token, set)
+	       || qualify_syscall_name(token, set);
+}
+
+/*
+ * Add syscall numbers to SETs for each supported personality
+ * according to STR specification.
+ */
+static void
+qualify_syscall_tokens(const char *const str, struct number_set *const set,
+		       const char *const name)
+{
+	/* Clear all sets. */
+	unsigned int p;
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		if (set[p].nslots)
+			memset(set[p].vec, 0,
+			       sizeof(*set[p].vec) * set[p].nslots);
+		set[p].not = false;
+	}
+
+	/*
+	 * Each leading ! character means inversion
+	 * of the remaining specification.
+	 */
+	const char *s = str;
+handle_inversion:
+	while (*s == '!') {
+		for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+			set[p].not = !set[p].not;
+		}
+		++s;
+	}
+
+	if (strcmp(s, "none") == 0) {
+		/*
+		 * No syscall numbers are added to sets.
+		 * Subsequent is_number_in_set invocations
+		 * will return set[p]->not.
+		 */
+		return;
+	} else if (strcmp(s, "all") == 0) {
+		s = "!none";
+		goto handle_inversion;
+	}
+
+	/*
+	 * Split the string into comma separated tokens.
+	 * For each token, call qualify_syscall that will take care
+	 * if adding appropriate syscall numbers to sets.
+	 * The absence of tokens or a negative return code
+	 * from qualify_syscall is a fatal error.
+	 */
+	char *copy = xstrdup(s);
+	char *saveptr = NULL;
+	const char *token;
+	bool done = false;
+
+	for (token = strtok_r(copy, ",", &saveptr); token;
+	     token = strtok_r(NULL, ",", &saveptr)) {
+		done = qualify_syscall(token, set);
+		if (!done) {
+			error_msg_and_die("invalid %s '%s'", name, token);
+		}
+	}
+
+	free(copy);
+
+	if (!done) {
+		error_msg_and_die("invalid %s '%s'", name, str);
+	}
+}
+
+/*
+ * Returns NULL if STR does not start with PREFIX,
+ * or a pointer to the first char in STR after PREFIX.
+ */
+static const char *
+strip_prefix(const char *prefix, const char *str)
+{
+	size_t len = strlen(prefix);
+
+	return strncmp(prefix, str, len) ? NULL : str + len;
+}
+
+static int
+find_errno_by_name(const char *name)
+{
+	unsigned int i;
+
+	for (i = 1; i < nerrnos; ++i) {
+		if (errnoent[i] && (strcmp(name, errnoent[i]) == 0))
+			return i;
+	}
+
+	return -1;
+}
+
+static bool
+parse_fault_token(const char *const token, struct fault_opts *const fopts)
+{
+	const char *val;
+	int intval;
+
+	if ((val = strip_prefix("when=", token))) {
+		/*
+		 * 	== 1+1
+		 * F	== F+0
+		 * F+	== F+1
+		 * F+S
+		 */
+		char *end;
+		intval = string_to_uint_ex(val, &end, 0xffff, "+");
+		if (intval < 1)
+			return false;
+
+		fopts->first = intval;
+
+		if (*end) {
+			val = end + 1;
+			if (*val) {
+				/* F+S */
+				intval = string_to_uint_upto(val, 0xffff);
+				if (intval < 1)
+					return false;
+				fopts->step = intval;
+			} else {
+				/* F+ == F+1 */
+				fopts->step = 1;
+			}
+		} else {
+			/* F == F+0 */
+			fopts->step = 0;
+		}
+	} else if ((val = strip_prefix("error=", token))) {
+		intval = string_to_uint_upto(val, 4095);
+		if (intval < 0)
+			intval = find_errno_by_name(val);
+		if (intval < 1)
+			return false;
+		fopts->err = intval;
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+static char *
+parse_fault_expression(const char *const s, char **buf,
+		       struct fault_opts *const fopts)
+{
+	char *saveptr = NULL;
+	char *name = NULL;
+	char *token;
+
+	*buf = xstrdup(s);
+	for (token = strtok_r(*buf, ":", &saveptr); token;
+	     token = strtok_r(NULL, ":", &saveptr)) {
+		if (!name)
+			name = token;
+		else if (!parse_fault_token(token, fopts))
+			goto parse_error;
+	}
+
+	if (name)
+		return name;
+
+parse_error:
+	free(*buf);
+	return *buf = NULL;
+}
+
+static void
+qualify_read(const char *const str)
+{
+	qualify_tokens(str, &read_set, string_to_uint, "descriptor");
+}
+
+static void
+qualify_write(const char *const str)
+{
+	qualify_tokens(str, &write_set, string_to_uint, "descriptor");
+}
+
+static void
 qualify_signals(const char *const str)
 {
 	qualify_tokens(str, &signal_set, sigstr_to_uint, "signal");
+}
+
+static void
+qualify_trace(const char *const str)
+{
+	qualify_syscall_tokens(str, trace_set, "system call");
+}
+
+static void
+qualify_abbrev(const char *const str)
+{
+	qualify_syscall_tokens(str, abbrev_set, "system call");
+}
+
+static void
+qualify_verbose(const char *const str)
+{
+	qualify_syscall_tokens(str, verbose_set, "system call");
+}
+
+static void
+qualify_raw(const char *const str)
+{
+	qualify_syscall_tokens(str, raw_set, "system call");
+}
+
+static void
+qualify_fault(const char *const str)
+{
+	struct fault_opts opts = {
+		.first = 1,
+		.step = 1,
+		.err = 0
+	};
+	char *buf = NULL;
+	char *name = parse_fault_expression(str, &buf, &opts);
+	if (!name) {
+		error_msg_and_die("invalid %s '%s'", "fault argument", str);
+	}
+
+
+	struct number_set tmp_set[SUPPORTED_PERSONALITIES];
+	memset(tmp_set, 0, sizeof(tmp_set));
+	qualify_syscall_tokens(name, tmp_set, "fault argument");
+
+	free(buf);
+
+	/*
+	 * Initialize fault_vec accourding to tmp_set.
+	 * Merge tmp_set into fault_set.
+	 */
+	unsigned int p;
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		if (!tmp_set[p].nslots && !tmp_set[p].not) {
+			continue;
+		}
+
+		if (!fault_vec[p]) {
+			fault_vec[p] = xcalloc(nsyscall_vec[p],
+					       sizeof(*fault_vec[p]));
+		}
+
+		unsigned int i;
+		for (i = 0; i < nsyscall_vec[p]; ++i) {
+			if (is_number_in_set(i, &tmp_set[p])) {
+				add_number_to_set(i, &fault_set[p]);
+				fault_vec[p][i] = opts;
+			}
+		}
+
+		free(tmp_set[p].vec);
+	}
+}
+
+static const struct qual_options {
+	const char *name;
+	void (*qualify)(const char *);
+} qual_options[] = {
+	{ "trace",	qualify_trace	},
+	{ "t",		qualify_trace	},
+	{ "abbrev",	qualify_abbrev	},
+	{ "a",		qualify_abbrev	},
+	{ "verbose",	qualify_verbose	},
+	{ "v",		qualify_verbose	},
+	{ "raw",	qualify_raw	},
+	{ "x",		qualify_raw	},
+	{ "signal",	qualify_signals	},
+	{ "signals",	qualify_signals	},
+	{ "s",		qualify_signals	},
+	{ "read",	qualify_read	},
+	{ "reads",	qualify_read	},
+	{ "r",		qualify_read	},
+	{ "write",	qualify_write	},
+	{ "writes",	qualify_write	},
+	{ "w",		qualify_write	},
+	{ "fault",	qualify_fault	},
+};
+
+void
+qualify(const char *str)
+{
+	const struct qual_options *opt = qual_options;
+	unsigned int i;
+
+	for (i = 0; i < ARRAY_SIZE(qual_options); ++i) {
+		const char *p = qual_options[i].name;
+		unsigned int len = strlen(p);
+
+		if (strncmp(str, p, len) || str[len] != '=')
+			continue;
+
+		opt = &qual_options[i];
+		str += len + 1;
+		break;
+	}
+
+	opt->qualify(str);
+}
+
+unsigned int
+qual_flags(const unsigned int scno)
+{
+	return	(is_number_in_set(scno, &trace_set[current_personality])
+		   ? QUAL_TRACE : 0)
+		| (is_number_in_set(scno, &abbrev_set[current_personality])
+		   ? QUAL_ABBREV : 0)
+		| (is_number_in_set(scno, &verbose_set[current_personality])
+		   ? QUAL_VERBOSE : 0)
+		| (is_number_in_set(scno, &raw_set[current_personality])
+		   ? QUAL_RAW : 0)
+		| (is_number_in_set(scno, &fault_set[current_personality])
+		   ? QUAL_FAULT : 0);
 }

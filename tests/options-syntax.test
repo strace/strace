@@ -67,6 +67,16 @@ check_e "Invalid process id: 'a'" -p 1,a
 check_e "Syscall 'chdir' for -b isn't supported" -b chdir
 check_e "Syscall 'chdir' for -b isn't supported" -b execve -b chdir
 
+check_e "invalid system call '-1'" -e-1
+check_e "invalid system call '-2'" -e -2
+check_e "invalid system call '-3'" -etrace=-3
+check_e "invalid system call '-4'" -e trace=-4
+check_e "invalid system call '-5'" -e trace=1,-5
+check_e "invalid system call '2147483647'" -e 2147483647
+check_e "invalid system call '2147483648'" -e 2147483648
+check_e "invalid system call '4294967295'" -e 4294967295
+check_e "invalid system call '4294967296'" -e 4294967296
+
 check_e "invalid descriptor '-1'" -eread=-1
 check_e "invalid descriptor '-42'" -ewrite=-42
 check_e "invalid descriptor '2147483648'" -eread=2147483648

@@ -224,7 +224,7 @@ unsigned nerrnos = nerrnos0;
 unsigned nsignals = nsignals0;
 unsigned nioctlents = nioctlents0;
 
-static const unsigned nsyscall_vec[SUPPORTED_PERSONALITIES] = {
+const unsigned int nsyscall_vec[SUPPORTED_PERSONALITIES] = {
 	nsyscalls0,
 #if SUPPORTED_PERSONALITIES > 1
 	nsyscalls1,
@@ -233,7 +233,7 @@ static const unsigned nsyscall_vec[SUPPORTED_PERSONALITIES] = {
 	nsyscalls2,
 #endif
 };
-static const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
+const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
 	sysent0,
 #if SUPPORTED_PERSONALITIES > 1
 	sysent1,
@@ -242,23 +242,6 @@ static const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
 	sysent2,
 #endif
 };
-
-enum {
-	MAX_NSYSCALLS1 = (nsyscalls0
-#if SUPPORTED_PERSONALITIES > 1
-			> nsyscalls1 ? nsyscalls0 : nsyscalls1
-#endif
-			),
-	MAX_NSYSCALLS2 = (MAX_NSYSCALLS1
-#if SUPPORTED_PERSONALITIES > 2
-			> nsyscalls2 ? MAX_NSYSCALLS1 : nsyscalls2
-#endif
-			),
-	MAX_NSYSCALLS = MAX_NSYSCALLS2
-};
-
-static qualbits_t qual_vec[SUPPORTED_PERSONALITIES][MAX_NSYSCALLS];
-#define qual_flags (qual_vec[current_personality])
 
 #if SUPPORTED_PERSONALITIES > 1
 unsigned current_personality;
@@ -353,379 +336,6 @@ update_personality(struct tcb *tcp, unsigned int personality)
 }
 #endif
 
-static int qual_fault(const char *, unsigned int, int);
-static int qual_syscall(const char *, unsigned int, int);
-
-static const struct qual_options {
-	unsigned int bitflag;
-	const char *option_name;
-	int (*qualify)(const char *, unsigned int, int);
-	const char *argument_name;
-} qual_options[] = {
-	{ QUAL_TRACE,	"trace",	qual_syscall,	"system call"	},
-	{ QUAL_TRACE,	"t",		qual_syscall,	"system call"	},
-	{ QUAL_ABBREV,	"abbrev",	qual_syscall,	"system call"	},
-	{ QUAL_ABBREV,	"a",		qual_syscall,	"system call"	},
-	{ QUAL_VERBOSE,	"verbose",	qual_syscall,	"system call"	},
-	{ QUAL_VERBOSE,	"v",		qual_syscall,	"system call"	},
-	{ QUAL_RAW,	"raw",		qual_syscall,	"system call"	},
-	{ QUAL_RAW,	"x",		qual_syscall,	"system call"	},
-	{ QUAL_SIGNAL,	"signal",	NULL,		"signal"	},
-	{ QUAL_SIGNAL,	"signals",	NULL,		"signal"	},
-	{ QUAL_SIGNAL,	"s",		NULL,		"signal"	},
-	{ QUAL_READ,	"read",		NULL,		"descriptor"	},
-	{ QUAL_READ,	"reads",	NULL,		"descriptor"	},
-	{ QUAL_READ,	"r",		NULL,		"descriptor"	},
-	{ QUAL_WRITE,	"write",	NULL,		"descriptor"	},
-	{ QUAL_WRITE,	"writes",	NULL,		"descriptor"	},
-	{ QUAL_WRITE,	"w",		NULL,		"descriptor"	},
-	{ QUAL_FAULT,	"fault",	qual_fault,	"fault argument"},
-	{ 0,		NULL,		NULL,		NULL		},
-};
-
-struct fault_opts {
-	uint16_t first;
-	uint16_t step;
-	uint16_t err;
-};
-
-static struct fault_opts fault_vec[SUPPORTED_PERSONALITIES][MAX_NSYSCALLS];
-
-static void
-qualify_one(const unsigned int n, unsigned int bitflag, const int not,
-	    const int pers, const struct fault_opts *fopts)
-{
-	int p;
-
-	for (p = 0; p < SUPPORTED_PERSONALITIES; p++) {
-		if (pers == p || pers < 0) {
-			if (not)
-				qual_vec[p][n] &= ~bitflag;
-			else {
-				qual_vec[p][n] |= bitflag;
-				if (fopts)
-					memcpy(&fault_vec[p][n], fopts,
-					       sizeof(*fopts));
-			}
-		}
-	}
-}
-
-static bool
-qualify_scno(const char *const s, const unsigned int bitflag,
-	     const int not, const struct fault_opts *const fopts)
-{
-	int n = string_to_uint_upto(s, MAX_NSYSCALLS - 1);
-	if (n < 0)
-		return false;
-
-	if (not && fopts) {
-		/* set bitflag for all syscall numbers except n */
-		unsigned int p;
-		for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-			unsigned int i;
-
-			for (i = 0; i < nsyscall_vec[p]; ++i) {
-				if (i != (unsigned int) n
-				    && sysent_vec[p][i].sys_name) {
-					qualify_one(i, bitflag, 0, p, fopts);
-				}
-			}
-		}
-	} else {
-		qualify_one(n, bitflag, not, -1, fopts);
-	}
-
-	return true;
-}
-
-static int
-lookup_class(const char *s)
-{
-	if (strcmp(s, "all") == 0)
-		return 0;
-	if (strcmp(s, "file") == 0)
-		return TRACE_FILE;
-	if (strcmp(s, "ipc") == 0)
-		return TRACE_IPC;
-	if (strcmp(s, "network") == 0)
-		return TRACE_NETWORK;
-	if (strcmp(s, "process") == 0)
-		return TRACE_PROCESS;
-	if (strcmp(s, "signal") == 0)
-		return TRACE_SIGNAL;
-	if (strcmp(s, "desc") == 0)
-		return TRACE_DESC;
-	if (strcmp(s, "memory") == 0)
-		return TRACE_MEMORY;
-	return -1;
-}
-
-static bool
-qualify_syscall_class(const char *const s, const unsigned int bitflag,
-		      const int not, const struct fault_opts *const fopts)
-{
-	unsigned int p;
-	const int n = lookup_class(s);
-
-	if (n < 0)
-		return false;
-
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
-
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (!sysent_vec[p][i].sys_name)
-				continue;
-			const bool match = (sysent_vec[p][i].sys_flags & n) == n;
-			if (match ^ (not && fopts)) {
-				qualify_one(i, bitflag, not && !fopts, p, fopts);
-			}
-		}
-	}
-
-	return true;
-}
-
-static bool
-qualify_syscall_name(const char *const s, const unsigned int bitflag,
-		     const int not, const struct fault_opts *const fopts)
-{
-	bool found = false;
-	unsigned int p;
-
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
-
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (!sysent_vec[p][i].sys_name)
-				continue;
-			const bool match = !strcmp(s, sysent_vec[p][i].sys_name);
-			found = found || match;
-			if (match ^ (not && fopts)) {
-				qualify_one(i, bitflag, not && !fopts, p, fopts);
-			}
-		}
-	}
-
-	return found;
-}
-
-static int
-qual_syscall_ex(const char *const s, const unsigned int bitflag,
-		const int not, const struct fault_opts *const fopts)
-{
-	if (qualify_scno(s, bitflag, not, fopts)
-	    || qualify_syscall_class(s, bitflag, not, fopts)
-	    || qualify_syscall_name(s, bitflag, not, fopts)) {
-		return 0;
-	}
-
-	return -1;
-}
-
-static int
-qual_syscall(const char *const s, const unsigned int bitflag, const int not)
-{
-	return qual_syscall_ex(s, bitflag, not, NULL);
-}
-
-/*
- * Returns NULL if STR does not start with PREFIX,
- * or a pointer to the first char in STR after PREFIX.
- */
-static const char *
-strip_prefix(const char *prefix, const char *str)
-{
-	size_t len = strlen(prefix);
-
-	return strncmp(prefix, str, len) ? NULL : str + len;
-}
-
-static int
-find_errno_by_name(const char *name)
-{
-	unsigned int i;
-
-	for (i = 1; i < nerrnos; ++i) {
-		if (errnoent[i] && (strcmp(name, errnoent[i]) == 0))
-			return i;
-	}
-
-	return -1;
-}
-
-static bool
-parse_fault_token(const char *const token, struct fault_opts *const fopts)
-{
-	const char *val;
-	int intval;
-
-	if ((val = strip_prefix("when=", token))) {
-		/*
-		 * 	== 1+1
-		 * F	== F+0
-		 * F+	== F+1
-		 * F+S
-		 */
-		char *end;
-		intval = string_to_uint_ex(val, &end, 0xffff, "+");
-		if (intval < 1)
-			return false;
-
-		fopts->first = intval;
-
-		if (*end) {
-			val = end + 1;
-			if (*val) {
-				/* F+S */
-				intval = string_to_uint_upto(val, 0xffff);
-				if (intval < 1)
-					return false;
-				fopts->step = intval;
-			} else {
-				/* F+ == F+1 */
-				fopts->step = 1;
-			}
-		} else {
-			/* F == F+0 */
-			fopts->step = 0;
-		}
-	} else if ((val = strip_prefix("error=", token))) {
-		intval = string_to_uint_upto(val, 4095);
-		if (intval < 0)
-			intval = find_errno_by_name(val);
-		if (intval < 1)
-			return false;
-		fopts->err = intval;
-	} else {
-		return false;
-	}
-
-	return true;
-}
-
-static char *
-parse_fault_expression(const char *const s, char **buf,
-		       struct fault_opts *const fopts)
-{
-	char *saveptr = NULL;
-	char *name = NULL;
-	char *token;
-
-	*buf = xstrdup(s);
-	for (token = strtok_r(*buf, ":", &saveptr); token;
-	     token = strtok_r(NULL, ":", &saveptr)) {
-		if (!name)
-			name = token;
-		else if (!parse_fault_token(token, fopts))
-			goto parse_error;
-	}
-
-	if (name)
-		return name;
-
-parse_error:
-	free(*buf);
-	return *buf = NULL;
-}
-
-static int
-qual_fault(const char *const s, const unsigned int bitflag, const int not)
-{
-	struct fault_opts opts = {
-		.first = 1,
-		.step = 1,
-		.err = 0
-	};
-
-	char *buf = NULL;
-	char *name = parse_fault_expression(s, &buf, &opts);
-	char *saveptr = NULL;
-	const char *token;
-	int rc = -1;
-
-	if (!name)
-		return -1;
-
-	for (token = strtok_r(name, ",", &saveptr); token;
-	     token = strtok_r(NULL, ",", &saveptr)) {
-		rc = qual_syscall_ex(token, bitflag, not, &opts);
-		if (rc)
-			break;
-	}
-
-	free(buf);
-	return rc;
-}
-
-void
-qualify(const char *s)
-{
-	const struct qual_options *opt;
-	char *copy;
-	const char *p;
-	int not;
-	int i;
-
-	opt = &qual_options[0];
-	for (i = 0; (p = qual_options[i].option_name); i++) {
-		unsigned int len = strlen(p);
-		if (strncmp(s, p, len) == 0 && s[len] == '=') {
-			opt = &qual_options[i];
-			s += len + 1;
-			break;
-		}
-	}
-
-	switch (opt->bitflag) {
-		case QUAL_SIGNAL:
-			qualify_signals(s);
-			return;
-		case QUAL_READ:
-			qualify_read(s);
-			return;
-		case QUAL_WRITE:
-			qualify_write(s);
-			return;
-	}
-
-	not = 0;
-	if (*s == '!') {
-		not = 1;
-		s++;
-	}
-	if (strcmp(s, "none") == 0) {
-		not = 1 - not;
-		s = "all";
-	}
-	if (opt->bitflag == QUAL_FAULT) {
-		if (opt->qualify(s, opt->bitflag, not)) {
-			error_msg_and_die("invalid %s '%s'",
-				opt->argument_name, s);
-		}
-		return;
-	}
-	if (strcmp(s, "all") == 0) {
-		for (i = 0; i < MAX_NSYSCALLS; ++i) {
-			qualify_one(i, opt->bitflag, not, -1, NULL);
-		}
-		return;
-	}
-	for (i = 0; i < MAX_NSYSCALLS; ++i) {
-		qualify_one(i, opt->bitflag, !not, -1, NULL);
-	}
-	copy = xstrdup(s);
-	for (p = strtok(copy, ","); p; p = strtok(NULL, ",")) {
-		if (opt->qualify(p, opt->bitflag, not)) {
-			error_msg_and_die("invalid %s '%s'",
-				opt->argument_name, p);
-		}
-	}
-	free(copy);
-	return;
-}
-
 #ifdef SYS_socket_subcall
 static void
 decode_socket_subcall(struct tcb *tcp)
@@ -743,7 +353,7 @@ decode_socket_subcall(struct tcb *tcp)
 		return;
 
 	tcp->scno = scno;
-	tcp->qual_flg = qual_flags[scno];
+	tcp->qual_flg = qual_flags(scno);
 	tcp->s_ent = &sysent[scno];
 
 	unsigned int i;
@@ -783,7 +393,7 @@ decode_ipc_subcall(struct tcb *tcp)
 	}
 
 	tcp->scno = SYS_ipc_subcall + call;
-	tcp->qual_flg = qual_flags[tcp->scno];
+	tcp->qual_flg = qual_flags(tcp->scno);
 	tcp->s_ent = &sysent[tcp->scno];
 
 	const unsigned int n = tcp->s_ent->nargs;
@@ -800,7 +410,7 @@ decode_mips_subcall(struct tcb *tcp)
 	if (!SCNO_IS_VALID(tcp->u_arg[0]))
 		return;
 	tcp->scno = tcp->u_arg[0];
-	tcp->qual_flg = qual_flags[tcp->scno];
+	tcp->qual_flg = qual_flags(tcp->scno);
 	tcp->s_ent = &sysent[tcp->scno];
 	memmove(&tcp->u_arg[0], &tcp->u_arg[1],
 		sizeof(tcp->u_arg) - sizeof(tcp->u_arg[0]));
@@ -939,6 +549,8 @@ static int arch_set_scno(struct tcb *, long);
 static void get_error(struct tcb *, const bool);
 static int arch_set_error(struct tcb *);
 
+struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
+
 static struct fault_opts *
 tcb_fault_opts(struct tcb *tcp)
 {
@@ -952,15 +564,15 @@ inject_syscall_fault_entering(struct tcb *tcp)
 {
 	if (!tcp->fault_vec[current_personality]) {
 		tcp->fault_vec[current_personality] =
-			xcalloc(MAX_NSYSCALLS, sizeof(struct fault_opts));
+			xcalloc(nsyscalls, sizeof(**fault_vec));
 		memcpy(tcp->fault_vec[current_personality],
 		       fault_vec[current_personality],
-		       MAX_NSYSCALLS * sizeof(struct fault_opts));
+		       nsyscalls * sizeof(**fault_vec));
 	}
 
 	struct fault_opts *opts = tcb_fault_opts(tcp);
 
-	if (opts->first == 0)
+	if (!opts || opts->first == 0)
 		return 0;
 
 	--opts->first;
@@ -1606,7 +1218,7 @@ get_scno(struct tcb *tcp)
 
 	if (SCNO_IS_VALID(tcp->scno)) {
 		tcp->s_ent = &sysent[tcp->scno];
-		tcp->qual_flg = qual_flags[tcp->scno];
+		tcp->qual_flg = qual_flags(tcp->scno);
 	} else {
 		struct sysent_buf *s = xcalloc(1, sizeof(*s));
 

@@ -29,12 +29,25 @@
 
 . "${srcdir=.}/init.sh"
 
-> "$LOG" || fail_ "failed to write $LOG"
-set -- -eexit,exit_group -efault=exit_group:error=ENOSYS ./answer
+test_with()
+{
+	> "$LOG" || fail_ "failed to write $LOG"
 
-$STRACE -o "$LOG" "$@"
-rc=$?
-[ $rc -eq 42 ] ||
-	dump_log_and_fail_with "$STRACE $* failed with code $rc"
+	$STRACE -o "$LOG" "$@"
+	rc=$?
+	[ $rc -eq 42 ] ||
+		dump_log_and_fail_with "$STRACE $* failed with code $rc"
 
-match_diff
+	match_diff
+}
+
+test_with -eexit,exit_group -efault=exit_group:error=ENOSYS ./answer
+
+test_with -eexit,exit_group -efault=exit_group:error=ENOSYS \
+	  -efault=\!process:error=1 ./answer
+
+test_with -eexit,exit_group -efault=all:error=ENOSYS \
+	  -efault=exit:error=1:when=2+ ./answer
+
+test_with -eexit,exit_group -efault=exit_group:error=ENOSYS \
+	  -efault=\!desc,file,memory,process,signal,network,ipc:error=1 ./answer

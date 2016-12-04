@@ -88,6 +88,8 @@ for err in '' ENOSYS 22 EINVAL; do
 	for fault in writev desc,51; do
 		check_fault_injection \
 			writev $fault "$err" '' '' -efault=chdir
+		check_fault_injection \
+			writev $fault "$err" '' '' -efault=chdir -efault=none
 		for F in 1 2 3 5 7 11; do
 			check_fault_injection \
 				writev $fault "$err" $F ''
