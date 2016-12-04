@@ -1834,8 +1834,7 @@ init(int argc, char *argv[])
 	}
 
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
-		char *buf = xmalloc(BUFSIZ);
-		setvbuf(shared_log, buf, _IOLBF, BUFSIZ);
+		setvbuf(shared_log, NULL, _IOLBF, 0);
 	}
 	if (outfname && argv[0]) {
 		if (!opt_intr)
