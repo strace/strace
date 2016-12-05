@@ -47,10 +47,9 @@ get_cpuset_size(void)
 		 * the kernel and find out the minimal valid cpuset size
 		 * without allocating any memory for the CPU affinity mask.
 		 */
-		pid_t pid = getpid();
 		cpuset_size = 128;
 		while (cpuset_size &&
-		       sched_getaffinity(pid, cpuset_size, NULL) == -1 &&
+		       sched_getaffinity(0, cpuset_size, NULL) == -1 &&
 		       EINVAL == errno) {
 			cpuset_size <<= 1;
 		}
