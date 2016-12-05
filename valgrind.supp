@@ -1,0 +1,7 @@
+{
+   get_cpuset_size: sched_getaffinity with NULL mask
+   Memcheck:Param
+   sched_getaffinity(mask)
+   fun:sched_getaffinity*
+   fun:get_cpuset_size
+}

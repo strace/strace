@@ -744,6 +744,7 @@ EXTRA_DIST =				\
 	strace-log-merge		\
 	strace.spec			\
 	syscallent.sh			\
+	valgrind.supp			\
 	$(XLAT_INPUT_FILES)		\
 	$(XLAT_HEADER_FILES)		\
 	xlat/gen.sh			\
