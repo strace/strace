@@ -39,11 +39,13 @@ check_exit_status_and_stderr()
 			"strace $* failed to print expected diagnostics"
 }
 
+strace_exp="${STRACE##* }"
+
 check_e()
 {
 	local pattern="$1"; shift
 	cat > "$EXP" << __EOF__
-$STRACE: $pattern
+$strace_exp: $pattern
 __EOF__
 	check_exit_status_and_stderr "$@"
 }
@@ -52,8 +54,8 @@ check_h()
 {
 	local pattern="$1"; shift
 	cat > "$EXP" << __EOF__
-$STRACE: $pattern
-Try '$STRACE -h' for more information.
+$strace_exp: $pattern
+Try '$strace_exp -h' for more information.
 __EOF__
 	check_exit_status_and_stderr "$@"
 }
@@ -90,17 +92,17 @@ if [ -n "${UID-}" ]; then
 
 	for c in i r t T y; do
 		check_e "-$c has no effect with -c
-$STRACE: $umsg" -u :nosuchuser: -c -$c true
+$strace_exp: $umsg" -u :nosuchuser: -c -$c true
 	done
 		check_e "-i has no effect with -c
-$STRACE: -r has no effect with -c
-$STRACE: -t has no effect with -c
-$STRACE: -T has no effect with -c
-$STRACE: -y has no effect with -c
-$STRACE: $umsg" -u :nosuchuser: -cirtTy true
+$strace_exp: -r has no effect with -c
+$strace_exp: -t has no effect with -c
+$strace_exp: -T has no effect with -c
+$strace_exp: -y has no effect with -c
+$strace_exp: $umsg" -u :nosuchuser: -cirtTy true
 
 	check_e "-tt has no effect with -r
-$STRACE: $umsg" -u :nosuchuser: -r -tt true
+$strace_exp: $umsg" -u :nosuchuser: -r -tt true
 fi
 
 args='-p 2147483647'
@@ -110,7 +112,7 @@ $STRACE $args 2> "$LOG" &&
 
 for cmd in PTRACE_SEIZE PTRACE_ATTACH; do
 	cat > "$EXP" << __EOF__
-$STRACE: attach: ptrace($cmd, 2147483647): No such process
+$strace_exp: attach: ptrace($cmd, 2147483647): No such process
 __EOF__
 	diff -- "$EXP" "$LOG" ||
 		continue
