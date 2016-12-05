@@ -29,6 +29,11 @@
 
 . "${srcdir=.}/init.sh"
 
+case "$STRACE" in
+	*valgrind\ *--suppressions=*)
+		skip_ 'incompatible with valgrind' ;;
+esac
+
 fd0="$LOG.fd0"
 fd1="$LOG.fd1"
 fd2="$LOG.fd2"
