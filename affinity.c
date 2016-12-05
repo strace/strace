@@ -35,6 +35,18 @@ get_cpuset_size(void)
 	static unsigned int cpuset_size;
 
 	if (!cpuset_size) {
+		/*
+		 * If the cpuset size passed to sched_getaffinity is less
+		 * than necessary to store the bitmask, the kernel does not
+		 * look at the mask pointer and fails with EINVAL.
+		 *
+		 * If the cpuset size is large enough, the kernel fails with
+		 * EFAULT on inaccessible mask pointers.
+		 *
+		 * This undocumented kernel feature can be used to probe
+		 * the kernel and find out the minimal valid cpuset size
+		 * without allocating any memory for the CPU affinity mask.
+		 */
 		pid_t pid = getpid();
 		cpuset_size = 128;
 		while (cpuset_size &&
