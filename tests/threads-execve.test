@@ -37,5 +37,18 @@ case "$uname_r" in
 	*) skip_ "the kernel release $uname_r is not 3.1 or newer" ;;
 esac
 
-run_strace_match_diff -a21 \
-	-f -esignal=none -e trace=execve,exit,nanosleep,rt_sigsuspend
+check_prog diff
+run_prog > /dev/null
+
+set -- -a21 -f -esignal=none -e trace=execve,exit,nanosleep,rt_sigsuspend $args
+
+# Due to probabilistic nature of the test, try it several times.
+i=0
+while [ $i -le 9 ]; do
+	run_strace "$@" > "$EXP"
+	diff -- "$EXP" "$LOG" || continue
+	rm -f "$EXP"
+	exit 0
+done
+
+fail_ "$STRACE $* output mismatch"

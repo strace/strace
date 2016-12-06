@@ -97,7 +97,7 @@ enum {
 	NUMBER_OF_ACTIONS
 };
 
-static const unsigned int NUMBER_OF_ITERATIONS = 4;
+static const unsigned int NUMBER_OF_ITERATIONS = 1;
 static unsigned int action;
 static int fds[2];
 
