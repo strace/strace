@@ -34,6 +34,7 @@
 
 #include "xlat/prctl_options.h"
 #include "xlat/pr_cap_ambient.h"
+#include "xlat/pr_dumpable.h"
 #include "xlat/pr_fp_mode.h"
 #include "xlat/pr_mce_kill.h"
 #include "xlat/pr_mce_kill_policy.h"
@@ -91,7 +92,6 @@ SYS_FUNC(prctl)
 		printxval(prctl_options, option, "PR_???");
 
 	switch (option) {
-	case PR_GET_DUMPABLE:
 	case PR_GET_KEEPCAPS:
 	case PR_GET_SECCOMP:
 	case PR_GET_TIMERSLACK:
@@ -107,6 +107,14 @@ SYS_FUNC(prctl)
 		else
 			printnum_int(tcp, arg2, "%u");
 		break;
+
+	case PR_GET_DUMPABLE:
+		if (entering(tcp))
+			break;
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = xlookup(pr_dumpable, (unsigned long) tcp->u_rval);
+		return RVAL_STR;
 
 	case PR_GET_NAME:
 		if (entering(tcp)) {
@@ -181,13 +189,17 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_SET_CHILD_SUBREAPER:
-	case PR_SET_DUMPABLE:
 	case PR_SET_ENDIAN:
 	case PR_SET_FPEMU:
 	case PR_SET_FPEXC:
 	case PR_SET_KEEPCAPS:
 	case PR_SET_TIMING:
 		tprintf(", %llu", arg2);
+		return RVAL_DECODED;
+
+	case PR_SET_DUMPABLE:
+		tprints(", ");
+		printxval64(pr_dumpable, arg2, "SUID_DUMP_???");
 		return RVAL_DECODED;
 
 	case PR_CAPBSET_DROP:
