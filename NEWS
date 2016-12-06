@@ -2,24 +2,41 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Changes in behavior
   * Time stamps are now printed according to ISO 8601.
+  * Changed output format of val3 parameter of futex FUTEX_WAKE_OP operation.
+  * The last argument of mincore, sched_getaffinity, and sched_setaffinity
+    syscalls is now formatted as an array.
 
 * Improvements
-  * Implemented syscall fault injection.
+  * Implemented syscall fault injection (-e fault=... option).
   * Implemented decoding of DM_* ioctl commands.
   * Implemented decoding of attr parameter of perf_event_open syscall.
   * Implemented decoding of pkey_alloc, pkey_free, and pkey_mprotect syscalls.
   * Implemented dumping of mq_timedsend and mq_timedreceive syscalls.
+  * Implemented decoding of PR_SET_FP_MODE and PR_GET_FP_MODE operations
+    of prctl syscall.
+  * Implemented PTRACE_GETREGS API support on m68k.
+  * Updated lists of ARCH_*, BPF_*, BTRFS_*, FALLOC_*, MS_*, *_MAGIC,
+    and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 4.9.
+  * Added decoding of recently added syscalls on arc, x32, and xtensa.
+  * Enhanced manual page.
 
 * Bug fixes
-  * Fixed corner cases in decoding of getgroups, getresuid, init_module,
-    inotify_init1, kcmp, kexec_load, lookup_dcookie, mq_getsetattr, mq_notify,
-    mq_open, mq_timedreceive, mq_timedsend, name_to_handle_at, process_vm_readv,
-    process_vm_writev, setfsuid, setgroups, setns, and unshare syscalls.
-  * Fixed handling of verbose flag in printing of controls array of
-    struct v4l2_ext_controls.
+  * Fixed corner cases in decoding of exit, exit_group, futimesat, getgroups,
+    getresuid, init_module, inotify_init1, kcmp, kexec_load, lookup_dcookie,
+    mq_getsetattr, mq_notify, mq_open, mq_timedreceive, mq_timedsend,
+    name_to_handle_at, prctl, process_vm_readv, process_vm_writev, setfsuid,
+    setgroups, setns, unshare, and utimes syscalls.
+  * Fixed handling of verbose flag in printing of controls array
+    of struct v4l2_ext_controls.
   * Fixed omission of field names in the output of capability, sigaction,
-    statfs, timespec, timeval, and utimbuf structures.
+    sigevent, statfs, timespec, timeval, and utimbuf structures.
+  * Fixed printing of unknown syscalls in siginfo structure.
+  * Fixed decoding of ioctl constants on m68k.
+  * Fixed cris architecture support.
+  * Fixed cross build when host compiler does not support the same
+    set of warning flags as the cross compiler.
+  * Fixed build on SLE10 and SLE11.
 
 Noteworthy changes in release 4.14 (2016-10-04)
 ===============================================
