@@ -33,6 +33,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <asm/unistd.h>
 #include <unistd.h>
 
@@ -71,7 +72,7 @@ main(void)
 	pthread_t t[N];
 	unsigned int i;
 
-	if (write(3, "", 0) != 0)
+	if (write(1, "", 0) != 0)
 		perror_msg_and_fail("write");
 
 	for (i = 0; i < N; ++i) {
@@ -83,8 +84,17 @@ main(void)
 			perror_msg_and_fail("pthread_create");
 	}
 
-	if (write(3, "\n", 1) != 1)
+	if (write(1, "\n", 1) != 1)
 		perror_msg_and_fail("write");
+
+	/* wait for the peer to write to stdout */
+	struct stat st;
+	for (;;) {
+		if (fstat(1, &st))
+			perror_msg_and_fail("fstat");
+		if (st.st_size >= 103)
+			break;
+	}
 
 	for (i = 0; i < N; ++i) {
 		/* sleep a bit to let the tracer catch up */
@@ -96,9 +106,9 @@ main(void)
 		if (errno)
 			perror_msg_and_fail("pthread_join");
 		errno = ENOENT;
-		printf("%-5d chdir(\"%s\") = -1 ENOENT (%m)\n"
+		printf("%-5d chdir(\"%s\") = %s\n"
 		       "%-5d +++ exited with 0 +++\n",
-		       retval.pid, child[i], retval.pid);
+		       retval.pid, child[i], sprintrc(-1), retval.pid);
 	}
 
 	/* sleep a bit more to let the tracer catch up */

@@ -34,16 +34,17 @@
 	framework_skip_ '/proc/self/task/ is not available'
 run_prog_skip_if_failed \
 	kill -0 $$
-run_prog ./attach-f-p > /dev/null 3>&1
+run_prog ./attach-f-p-cmd > /dev/null
 
-./set_ptracer_any sh -c "exec ./attach-f-p > $EXP 3> $OUT" > /dev/null &
+rm -f "$OUT"
+./set_ptracer_any sh -c "exec ./attach-f-p >> $OUT" > /dev/null &
 tracee_pid=$!
 
 while ! [ -s "$OUT" ]; do
 	kill -0 $tracee_pid 2> /dev/null ||
-		fail_ 'set_ptracer_any sleep failed'
+		fail_ 'set_ptracer_any sh failed'
 done
 
-run_strace -a32 -f -echdir -p $tracee_pid
-match_diff "$LOG" "$EXP"
-rm -f "$EXP" "$OUT"
+run_strace -a32 -f -echdir -p $tracee_pid ./attach-f-p-cmd > "$OUT"
+match_diff "$LOG" "$OUT"
+rm -f "$OUT"

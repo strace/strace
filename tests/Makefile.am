@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	alarm \
 	answer \
 	attach-f-p \
+	attach-f-p-cmd \
 	attach-p-cmd-cmd \
 	attach-p-cmd-p \
 	bpf \
