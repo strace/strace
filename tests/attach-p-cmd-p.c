@@ -28,9 +28,11 @@
  */
 
 #include "tests.h"
+#include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 static void
@@ -43,12 +45,27 @@ main(void)
 {
 	const struct sigaction act = { .sa_handler = handler };
 	if (sigaction(SIGALRM, &act, NULL))
-		perror_msg_and_skip("sigaction");
+		perror_msg_and_fail("sigaction");
 
 	sigset_t mask = {};
 	sigaddset(&mask, SIGALRM);
 	if (sigprocmask(SIG_UNBLOCK, &mask, NULL))
-		perror_msg_and_skip("sigprocmask");
+		perror_msg_and_fail("sigprocmask");
+
+	static const char lockdir[] = "attach-p-cmd.test-lock";
+	/* create a lock directory */
+	if (mkdir(lockdir, 0700))
+		perror_msg_and_fail("mkdir: %s", lockdir);
+
+	/* wait for the lock directory to be removed by peer */
+	while (mkdir(lockdir, 0700)) {
+		if (EEXIST != errno)
+			perror_msg_and_fail("mkdir: %s", lockdir);
+	}
+
+	/* remove the lock directory */
+	if (rmdir(lockdir))
+		perror_msg_and_fail("rmdir: %s", lockdir);
 
 	alarm(1);
 	pause();
