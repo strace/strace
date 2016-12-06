@@ -795,6 +795,9 @@ fi
 st_MPERS([m32], [aarch64|powerpc64|sparc64|tile|x32|x86_64])
 st_MPERS([mx32], [x86_64])
 
+AX_VALGRIND_DFLT([sgcheck], [off])
+AX_VALGRIND_CHECK
+
 AC_CONFIG_FILES([Makefile
 		 tests/Makefile
 		 tests-m32/Makefile

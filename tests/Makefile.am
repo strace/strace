@@ -840,6 +840,10 @@ XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME))
 TEST_LOG_COMPILER = env
 AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) MIPS_ABI=$(MIPS_ABI) $(srcdir)/run.sh
 
+@VALGRIND_CHECK_RULES@
+VALGRIND_FLAGS = --quiet
+VALGRIND_SUPPRESSIONS_FILES = $(srcdir)/strace.supp
+
 EXTRA_DIST = init.sh run.sh match.awk \
 	     caps.awk \
 	     caps-abbrev.awk \
@@ -873,6 +877,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sockname.c \
 	     statfs.expected \
 	     statx.sh \
+	     strace.supp \
 	     strace-C.expected \
 	     strace-E.expected \
 	     strace-T.expected \

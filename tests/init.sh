@@ -221,7 +221,16 @@ check_prog rm
 
 rm -f "$LOG"
 
-: "${STRACE:=../strace}"
+[ -n "${STRACE-}" ] || {
+	STRACE=../strace
+	case "${LOG_COMPILER-} ${LOG_FLAGS-}" in
+		*--suppressions=*--error-exitcode=*--tool=*)
+			# add valgrind command prefix
+			STRACE="${LOG_COMPILER-} ${LOG_FLAGS-} $STRACE"
+			;;
+	esac
+}
+
 : "${TIMEOUT_DURATION:=60}"
 : "${SLEEP_A_BIT:=sleep 1}"
 
