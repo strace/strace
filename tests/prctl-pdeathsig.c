@@ -1,4 +1,6 @@
 /*
+ * Check decoding of prctl PR_GET_PDEATHSIG/PR_SET_PDEATHSIG operations.
+ *
  * Copyright (c) 2016 JingPiao Chen <chenjingpiao@foxmail.com>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * All rights reserved.
