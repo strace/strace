@@ -35,35 +35,44 @@ run_prog_skip_if_failed \
 check_prog sleep
 check_prog yes
 
+> "$OUT"
 > "$LOG"
-
 (
+	while [ -f "$LOG" ]; do
+		:
+	done
 	$SLEEP_A_BIT &
 	yes
 	if kill -0 $! 2> /dev/null; then
 		wait
 	else
-		echo TIMEOUT >> $LOG
+		echo TIMEOUT >> "$OUT"
 	fi
 ) | $STRACE -qq -enone -esignal=none \
-	sh -c "exec <&- >&-; $SLEEP_A_BIT; $SLEEP_A_BIT"
+	sh -c "exec <&- >&-; rm -f -- $LOG; $SLEEP_A_BIT; $SLEEP_A_BIT"
 
-if [ -s "$LOG" ]; then
+if [ -s "$OUT" ]; then
 	fail_ "$STRACE failed to redirect standard input"
 fi
 
+> "$LOG"
 $STRACE -qq -enone -esignal=none \
-	sh -c "exec <&- >&-; $SLEEP_A_BIT; $SLEEP_A_BIT" |
+	sh -c "exec <&- >&-; rm -f -- $LOG; $SLEEP_A_BIT; $SLEEP_A_BIT" |
 (
+	while [ -f "$LOG" ]; do
+		:
+	done
 	$SLEEP_A_BIT &
 	cat > /dev/null
 	if kill -0 $! 2> /dev/null; then
 		wait
 	else
-		echo TIMEOUT >> $LOG
+		echo TIMEOUT >> "$OUT"
 	fi
 )
 
-if [ -s "$LOG" ]; then
+if [ -s "$OUT" ]; then
 	fail_ "$STRACE failed to redirect standard output"
 fi
+
+rm -f -- "$OUT"
