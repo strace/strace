@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Check that fault injection works properly.
+# Skip the test if arch+kernel combination is not supported.
 #
 # Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
@@ -27,78 +27,20 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/fault_injection.sh"
+. "${srcdir=.}/init.sh"
 
-#
-# F
-# F+
-# F+S
-
-N=16
-
-check_fault_injection()
-{
-	local trace fault err first step extra
-	trace=$1; shift
-	fault=$1; shift
-	err=$1; shift
-	first=$1; shift
-	step=$1; shift
-	extra="$*"
-
-	local when=
-	if [ -z "$first$step" ]; then
-		first=1
-		step=1
-	else
-		case "$step" in
-			'') when=":when=$first"; step=0 ;;
-			+) when=":when=$first+"; step=1 ;;
-			*) when=":when=$first+$step" ;;
-		esac
-	fi
-
-	local error=
-	local raw=reg
-	set --
-	case "$err" in
-		'') ;;
-		[123456789]*)
-			error=":error=$err"
-			raw=raw
-			set -- -e raw=all
-			;;
-		*) error=":error=$err" ;;
-	esac
-
-	outexp="$NAME.out.exp"
-	outgot="$NAME.out.got"
-
-	run_strace -a11 -e trace=$trace \
-		"$@" -e fault=$fault$when$error $extra \
-		./$NAME $raw "$err" "$first" "$step" $N \
-		> "$EXP" 4> "$outexp" 5> "$outgot"
-
-	match_diff "$EXP" "$LOG"
-	match_diff "$outexp" "$outgot"
-	rm -f "$EXP" "$outexp" "$outgot"
-}
-
-for err in '' ENOSYS 22 EINVAL; do
-	for fault in writev desc,51; do
-		check_fault_injection \
-			writev $fault "$err" '' '' -efault=chdir
-		check_fault_injection \
-			writev $fault "$err" '' '' -efault=chdir -efault=none
-		for F in 1 2 3 5 7 11; do
-			check_fault_injection \
-				writev $fault "$err" $F ''
-			check_fault_injection \
-				writev $fault "$err" $F +
-			for S in 1 2 3 5 7 11; do
-				check_fault_injection \
-					writev $fault "$err" $F $S
-			done
-		done
-	done
-done
+uname_r="$(uname -r)"
+case "$STRACE_ARCH" in
+	arm)
+		# PTRACE_SET_SYSCALL is supported by linux kernel
+		# starting with commit v2.6.16-rc1~107^2.
+		require_min_kernel_version_or_skip 2.6.16 ;;
+	aarch64)
+		# NT_ARM_SYSTEM_CALL regset is supported by linux kernel
+		# starting with commit v3.19-rc1~59^2~16.
+		require_min_kernel_version_or_skip 3.19 ;;
+	sparc*)
+		# Reloading the syscall number from %g1 register is supported
+		# by linux kernel starting with commit v4.5-rc7~35^2~3.
+		require_min_kernel_version_or_skip 4.5 ;;
+esac

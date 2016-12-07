@@ -851,6 +851,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     eventfd.expected \
 	     fadvise.h \
 	     fault_injection-exit_group.expected \
+	     fault_injection.sh \
 	     filter-unavailable.expected \
 	     fstatat.c \
 	     fstatx.c \
