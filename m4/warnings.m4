@@ -1,4 +1,5 @@
 # warnings.m4 serial 11
+# modified for strace project
 dnl Copyright (C) 2008-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -23,8 +24,8 @@ m4_ifdef([AS_VAR_APPEND],
 # FIXME: gl_Warn must be used unquoted until we can assume Autoconf
 # 2.64 or newer.
 AC_DEFUN([gl_COMPILER_OPTION_IF],
-[AS_VAR_PUSHDEF([gl_Warn], [gl_cv_warn_[]_AC_LANG_ABBREV[]_$1])dnl
-AS_VAR_PUSHDEF([gl_Flags], [_AC_LANG_PREFIX[]FLAGS])dnl
+[AS_VAR_PUSHDEF([gl_Flags], _AC_LANG_PREFIX[]FLAGS)dnl
+AS_VAR_PUSHDEF([gl_Warn], [gl_cv_warn_[]gl_Flags[]_$1])dnl
 AS_LITERAL_IF([$1],
   [m4_pushdef([gl_Positive], m4_bpatsubst([$1], [^-Wno-], [-W]))],
   [gl_positive="$1"
@@ -32,7 +33,7 @@ case $gl_positive in
   -Wno-*) gl_positive=-W`expr "X$gl_positive" : 'X-Wno-\(.*\)'` ;;
 esac
 m4_pushdef([gl_Positive], [$gl_positive])])dnl
-AC_CACHE_CHECK([whether _AC_LANG compiler handles $1], m4_defn([gl_Warn]), [
+AC_CACHE_CHECK([whether $[]_AC_CC[] handles $1], m4_defn([gl_Warn]), [
   gl_save_compiler_FLAGS="$gl_Flags"
   gl_AS_VAR_APPEND(m4_defn([gl_Flags]),
     [" $gl_unknown_warnings_are_errors ]m4_defn([gl_Positive])["])
@@ -52,9 +53,12 @@ AS_VAR_POPDEF([gl_Warn])dnl
 # Clang doesn't complain about unknown warning options unless one also
 # specifies -Wunknown-warning-option -Werror.  Detect this.
 AC_DEFUN([gl_UNKNOWN_WARNINGS_ARE_ERRORS],
-[gl_COMPILER_OPTION_IF([-Werror -Wunknown-warning-option],
-   [gl_unknown_warnings_are_errors='-Wunknown-warning-option -Werror'],
-   [gl_unknown_warnings_are_errors=])])
+[AS_IF([test x${gl_unknown_warnings_are_errors+set} = x],
+  [gl_COMPILER_OPTION_IF([-Werror -Wunknown-warning-option],
+    [gl_unknown_warnings_are_errors='-Wunknown-warning-option -Werror'],
+    [gl_unknown_warnings_are_errors=])
+  ])
+])
 
 # gl_WARN_ADD(OPTION, [VARIABLE = WARN_CFLAGS],
 #             [PROGRAM = AC_LANG_PROGRAM()])
@@ -64,7 +68,7 @@ AC_DEFUN([gl_UNKNOWN_WARNINGS_ARE_ERRORS],
 #
 # If VARIABLE is a variable name, AC_SUBST it.
 AC_DEFUN([gl_WARN_ADD],
-[AC_REQUIRE([gl_UNKNOWN_WARNINGS_ARE_ERRORS])
+[gl_UNKNOWN_WARNINGS_ARE_ERRORS
 gl_COMPILER_OPTION_IF([$1],
   [gl_AS_VAR_APPEND(m4_if([$2], [], [[WARN_CFLAGS]], [[$2]]), [" $1"])],
   [],
