@@ -216,6 +216,32 @@ run_strace_match_diff()
 	rm -f "$EXP"
 }
 
+# Print kernel version code.
+# usage: kernel_version_code $(uname -r)
+kernel_version_code()
+{
+	(
+		set -f
+		IFS=.
+		set -- $1
+		v1="${1%%[!0-9]*}" && [ -n "$v1" ] || v1=0
+		v2="${2%%[!0-9]*}" && [ -n "$v2" ] || v2=0
+		v3="${3%%[!0-9]*}" && [ -n "$v3" ] || v3=0
+		echo "$(($v1 * 65536 + $v2 * 256 + $v3))"
+	)
+}
+
+# Usage: require_min_kernel_version_or_skip 3.0
+require_min_kernel_version_or_skip()
+{
+	local uname_r
+	uname_r="$(uname -r)"
+
+	[ "$(kernel_version_code "$uname_r")" -ge \
+	  "$(kernel_version_code "$1")" ] ||
+		skip_ "the kernel release $uname_r is not $1 or newer"
+}
+
 check_prog cat
 check_prog rm
 
