@@ -33,6 +33,7 @@
 #   warranty.
 
 #serial 8
+#modified for strace project
 
 AU_ALIAS([AC_PROG_CC_FOR_BUILD], [AX_PROG_CC_FOR_BUILD])
 AC_DEFUN([AX_PROG_CC_FOR_BUILD], [dnl
@@ -48,6 +49,10 @@ pushdef([ac_cv_prog_gcc], ac_cv_build_prog_gcc)dnl
 pushdef([ac_cv_prog_cc_works], ac_cv_build_prog_cc_works)dnl
 pushdef([ac_cv_prog_cc_cross], ac_cv_build_prog_cc_cross)dnl
 pushdef([ac_cv_prog_cc_g], ac_cv_build_prog_cc_g)dnl
+pushdef([ac_cv_prog_cc_stdc], ac_cv_build_prog_cc_stdc)dnl
+pushdef([ac_cv_prog_cc_c11], ac_cv_build_prog_cc_c11)dnl
+pushdef([ac_cv_prog_cc_c99], ac_cv_build_prog_cc_c99)dnl
+pushdef([ac_cv_prog_cc_c89], ac_cv_build_prog_cc_c89)dnl
 pushdef([ac_cv_exeext], ac_cv_build_exeext)dnl
 pushdef([ac_cv_objext], ac_cv_build_objext)dnl
 pushdef([ac_exeext], ac_build_exeext)dnl
@@ -67,27 +72,43 @@ pushdef([ac_cv_host_alias], ac_cv_build_alias)dnl
 pushdef([ac_cv_host_cpu], ac_cv_build_cpu)dnl
 pushdef([ac_cv_host_vendor], ac_cv_build_vendor)dnl
 pushdef([ac_cv_host_os], ac_cv_build_os)dnl
-pushdef([ac_cpp], ac_build_cpp)dnl
-pushdef([ac_compile], ac_build_compile)dnl
-pushdef([ac_link], ac_build_link)dnl
+pushdef([am_cv_prog_cc_c_o], am_cv_build_prog_cc_c_o)dnl
+pushdef([am_cv_CC_dependencies_compiler_type], am_cv_build_CC_dependencies_compiler_type)dnl
 
-save_cross_compiling=$cross_compiling
-save_ac_tool_prefix=$ac_tool_prefix
+st_SAVE_VAR([ac_c_decl_warn_flag])
+st_SAVE_VAR([ac_c_preproc_warn_flag])
+st_SAVE_VAR([ac_c_werror_flag])
+st_SAVE_VAR([ac_compile])
+st_SAVE_VAR([ac_compiler_gnu])
+st_SAVE_VAR([ac_cpp])
+st_SAVE_VAR([ac_cv_c_compiler_gnu])
+st_SAVE_VAR([ac_cv_c_decl_report])
+st_SAVE_VAR([ac_link])
+st_SAVE_VAR([ac_tool_prefix])
+st_SAVE_VAR([cross_compiling])
 cross_compiling=no
-ac_tool_prefix=
 
+AC_MSG_NOTICE([looking for a C compiler that generates native executables])
 AC_PROG_CC
 AC_PROG_CPP
 AC_EXEEXT
 
-ac_tool_prefix=$save_ac_tool_prefix
-cross_compiling=$save_cross_compiling
+st_RESTORE_VAR([cross_compiling])
+st_RESTORE_VAR([ac_tool_prefix])
+st_RESTORE_VAR([ac_link])
+st_RESTORE_VAR([ac_cv_c_decl_report])
+st_RESTORE_VAR([ac_cv_c_compiler_gnu])
+st_RESTORE_VAR([ac_cpp])
+st_RESTORE_VAR([ac_compiler_gnu])
+st_RESTORE_VAR([ac_compile])
+st_RESTORE_VAR([ac_c_werror_flag])
+st_RESTORE_VAR([ac_c_preproc_warn_flag])
+st_RESTORE_VAR([ac_c_decl_warn_flag])
 
 dnl Restore the old definitions
 dnl
-popdef([ac_link])dnl
-popdef([ac_compile])dnl
-popdef([ac_cpp])dnl
+popdef([am_cv_CC_dependencies_compiler_type])dnl
+popdef([am_cv_prog_cc_c_o])dnl
 popdef([ac_cv_host_os])dnl
 popdef([ac_cv_host_vendor])dnl
 popdef([ac_cv_host_cpu])dnl
@@ -107,6 +128,10 @@ popdef([ac_objext])dnl
 popdef([ac_exeext])dnl
 popdef([ac_cv_objext])dnl
 popdef([ac_cv_exeext])dnl
+popdef([ac_cv_prog_cc_c89])dnl
+popdef([ac_cv_prog_cc_c99])dnl
+popdef([ac_cv_prog_cc_c11])dnl
+popdef([ac_cv_prog_cc_stdc])dnl
 popdef([ac_cv_prog_cc_g])dnl
 popdef([ac_cv_prog_cc_cross])dnl
 popdef([ac_cv_prog_cc_works])dnl
