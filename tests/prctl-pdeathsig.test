@@ -3,4 +3,11 @@
 # Check prctl PR_GET_PDEATHSIG PR_SET_PDEATHSIG decoding.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -a30 -e trace=prctl
+
+check_prog grep
+run_prog > /dev/null
+run_strace -a30 -eprctl $args > "$EXP"
+grep -v '^prctl(PR_[GS]ET_[^P][^D]' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"
