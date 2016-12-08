@@ -103,6 +103,9 @@ unwind_init(void)
 void
 unwind_tcb_init(struct tcb *tcp)
 {
+	if (tcp->libunwind_ui)
+		return;
+
 	tcp->libunwind_ui = _UPT_create(tcp->pid);
 	if (!tcp->libunwind_ui)
 		die_out_of_memory();

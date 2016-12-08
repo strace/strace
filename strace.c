@@ -1769,8 +1769,14 @@ init(int argc, char *argv[])
 	}
 
 #ifdef USE_LIBUNWIND
-	if (stack_trace_enabled)
+	if (stack_trace_enabled) {
+		unsigned int tcbi;
+
 		unwind_init();
+		for (tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
+			unwind_tcb_init(tcbtab[tcbi]);
+		}
+	}
 #endif
 
 	/* See if they want to run as another user. */
