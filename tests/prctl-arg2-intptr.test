@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Check decoding of prctl PR_GET_CHILD_SUBREAPER, PR_GET_ENDIAN, PR_GET_FPEMU,
+# and PR_GET_FPEXC operations.
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+run_prog > /dev/null
+run_strace -a25 -eprctl $args > "$EXP"
+grep -v '^prctl(PR_[GS]ET_[^CEF][^HNP][^DEI]' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"

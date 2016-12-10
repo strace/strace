@@ -270,6 +270,7 @@ check_PROGRAMS = \
 	pkey_mprotect \
 	poll \
 	ppoll \
+	prctl-arg2-intptr \
 	prctl-dumpable \
 	prctl-name \
 	prctl-no-args \
@@ -656,6 +657,7 @@ DECODER_TESTS = \
 	pkey_mprotect.test \
 	poll.test \
 	ppoll.test \
+	prctl-arg2-intptr.test \
 	prctl-dumpable.test \
 	prctl-name.test \
 	prctl-no-args.test \
