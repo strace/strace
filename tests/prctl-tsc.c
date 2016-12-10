@@ -2,7 +2,7 @@
  * Check decoding of prctl PR_GET_TSC/PR_SET_TSC operations.
  *
  * Copyright (c) 2016 JingPiao Chen <chenjingpiao@foxmail.com>
- * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com
+ * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
