@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Check decoding of prctl PR_GET_KEEPCAPS, PR_GET_SECCOMP, PR_GET_TIMERSLACK,
+# PR_GET_TIMING, PR_TASK_PERF_EVENTS_DISABLE, and PR_TASK_PERF_EVENTS_ENABLE
+# operations.
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+run_prog > /dev/null
+run_strace -a21 -eprctl $args > "$EXP"
+grep -v '^prctl(PR_[GS]ET_[^KST][^EI][^CEM]' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"

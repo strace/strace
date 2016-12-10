@@ -271,6 +271,7 @@ check_PROGRAMS = \
 	ppoll \
 	prctl-dumpable \
 	prctl-name \
+	prctl-no-args \
 	prctl-pdeathsig \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
@@ -654,6 +655,7 @@ DECODER_TESTS = \
 	ppoll.test \
 	prctl-dumpable.test \
 	prctl-name.test \
+	prctl-no-args.test \
 	prctl-pdeathsig.test \
 	prctl-seccomp-filter-v.test \
 	prctl-seccomp-strict.test \

@@ -211,6 +211,7 @@ poll
 ppoll
 prctl-dumpable
 prctl-name
+prctl-no-args
 prctl-pdeathsig
 prctl-seccomp-filter-v
 prctl-seccomp-strict
