@@ -209,6 +209,7 @@ pkey_free
 pkey_mprotect
 poll
 ppoll
+prctl-dumpable
 prctl-name
 prctl-pdeathsig
 prctl-seccomp-filter-v

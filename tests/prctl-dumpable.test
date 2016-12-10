@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Check decoding of prctl PR_GET_DUMPABLE and PR_SET_DUMPABLE operations.
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+run_prog > /dev/null
+run_strace -a23 -eprctl $args > "$EXP"
+grep -v '^prctl(PR_[GS]ET_[^D][^U]' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"

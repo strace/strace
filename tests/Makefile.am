@@ -269,6 +269,7 @@ check_PROGRAMS = \
 	pkey_mprotect \
 	poll \
 	ppoll \
+	prctl-dumpable \
 	prctl-name \
 	prctl-pdeathsig \
 	prctl-seccomp-filter-v \
@@ -650,6 +651,7 @@ DECODER_TESTS = \
 	pkey_mprotect.test \
 	poll.test \
 	ppoll.test \
+	prctl-dumpable.test \
 	prctl-name.test \
 	prctl-pdeathsig.test \
 	prctl-seccomp-filter-v.test \
