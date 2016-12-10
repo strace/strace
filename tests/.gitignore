@@ -214,6 +214,7 @@ prctl-name
 prctl-pdeathsig
 prctl-seccomp-filter-v
 prctl-seccomp-strict
+prctl-securebits
 prctl-tsc
 pread64-pwrite64
 preadv
