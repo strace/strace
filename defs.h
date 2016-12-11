@@ -150,7 +150,8 @@ extern char *stpcpy(char *dst, const char *src);
 
 #if defined X86_64
 # define SUPPORTED_PERSONALITIES 3
-# define PERSONALITY2_WORDSIZE 4
+# define PERSONALITY2_WORDSIZE  4
+# define PERSONALITY2_KLONGSIZE PERSONALITY0_KLONGSIZE
 #elif defined AARCH64 \
    || defined POWERPC64 \
    || defined RISCV \
@@ -168,12 +169,14 @@ extern char *stpcpy(char *dst, const char *src);
 # define DEFAULT_PERSONALITY 0
 #endif
 
-#define PERSONALITY0_WORDSIZE SIZEOF_LONG
+#define PERSONALITY0_WORDSIZE  SIZEOF_LONG
+#define PERSONALITY0_KLONGSIZE SIZEOF_KERNEL_LONG_T
 #define PERSONALITY0_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
 #define PERSONALITY0_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
 
 #if SUPPORTED_PERSONALITIES > 1
-# define PERSONALITY1_WORDSIZE 4
+# define PERSONALITY1_WORDSIZE  4
+# define PERSONALITY1_KLONGSIZE PERSONALITY1_WORDSIZE
 #endif
 
 #if SUPPORTED_PERSONALITIES > 1 && defined HAVE_M32_MPERS
@@ -792,11 +795,17 @@ extern unsigned current_personality;
 
 #if SUPPORTED_PERSONALITIES == 1
 # define current_wordsize PERSONALITY0_WORDSIZE
+# define current_klongsize PERSONALITY0_KLONGSIZE
 #else
 # if SUPPORTED_PERSONALITIES == 2 && PERSONALITY0_WORDSIZE == PERSONALITY1_WORDSIZE
 #  define current_wordsize PERSONALITY0_WORDSIZE
 # else
 extern unsigned current_wordsize;
+# endif
+# if SUPPORTED_PERSONALITIES == 2 && PERSONALITY0_KLONGSIZE == PERSONALITY1_KLONGSIZE
+#  define current_klongsize PERSONALITY0_KLONGSIZE
+# else
+extern unsigned current_klongsize;
 # endif
 #endif
 

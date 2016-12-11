@@ -257,6 +257,17 @@ static const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 };
 # endif
 
+# ifndef current_klongsize
+unsigned current_klongsize;
+static const int personality_klongsize[SUPPORTED_PERSONALITIES] = {
+	PERSONALITY0_KLONGSIZE,
+	PERSONALITY1_KLONGSIZE,
+#  if SUPPORTED_PERSONALITIES > 2
+	PERSONALITY2_KLONGSIZE,
+#  endif
+};
+# endif
+
 void
 set_personality(int personality)
 {
@@ -300,6 +311,9 @@ set_personality(int personality)
 	current_personality = personality;
 # ifndef current_wordsize
 	current_wordsize = personality_wordsize[personality];
+# endif
+# ifndef current_klongsize
+	current_klongsize = personality_klongsize[personality];
 # endif
 }
 
