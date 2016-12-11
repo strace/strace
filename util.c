@@ -484,6 +484,19 @@ printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	return true;							\
 }
 
+#define DEF_PRINTNUM_ADDR(name, type) \
+bool									\
+printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr)	\
+{									\
+	type num;							\
+	if (umove_or_printaddr(tcp, addr, &num))			\
+		return false;						\
+	tprints("[");							\
+	printaddr(num);							\
+	tprints("]");							\
+	return true;							\
+}
+
 #define DEF_PRINTPAIR(name, type) \
 bool									\
 printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
@@ -501,9 +514,11 @@ printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 }
 
 DEF_PRINTNUM(int, int)
+DEF_PRINTNUM_ADDR(int, unsigned int)
 DEF_PRINTPAIR(int, int)
 DEF_PRINTNUM(short, short)
 DEF_PRINTNUM(int64, uint64_t)
+DEF_PRINTNUM_ADDR(int64, uint64_t)
 DEF_PRINTPAIR(int64, uint64_t)
 
 #ifndef current_wordsize
@@ -515,6 +530,16 @@ printnum_long_int(struct tcb *const tcp, const kernel_ulong_t addr,
 		return printnum_int64(tcp, addr, fmt_long);
 	} else {
 		return printnum_int(tcp, addr, fmt_int);
+	}
+}
+
+bool
+printnum_addr_long_int(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	if (current_wordsize > sizeof(int)) {
+		return printnum_addr_int64(tcp, addr);
+	} else {
+		return printnum_addr_int(tcp, addr);
 	}
 }
 #endif /* !current_wordsize */

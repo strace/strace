@@ -805,32 +805,40 @@ DECL_PRINTNUM(int);
 DECL_PRINTNUM(int64);
 #undef DECL_PRINTNUM
 
+#define DECL_PRINTNUM_ADDR(name)					\
+extern bool								\
+printnum_addr_ ## name(struct tcb *, kernel_ulong_t addr)
+DECL_PRINTNUM_ADDR(int);
+DECL_PRINTNUM_ADDR(int64);
+#undef DECL_PRINTNUM_ADDR
+
 #ifndef current_wordsize
 extern bool
 printnum_long_int(struct tcb *, kernel_ulong_t addr,
 		  const char *fmt_long, const char *fmt_int)
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 	ATTRIBUTE_FORMAT((printf, 4, 0));
+extern bool printnum_addr_long_int(struct tcb *, kernel_ulong_t addr);
 # define printnum_slong(tcp, addr) \
 	printnum_long_int((tcp), (addr), "%" PRId64, "%d")
 # define printnum_ulong(tcp, addr) \
 	printnum_long_int((tcp), (addr), "%" PRIu64, "%u")
 # define printnum_ptr(tcp, addr) \
-	printnum_long_int((tcp), (addr), "%#" PRIx64, "%#x")
+	printnum_addr_long_int((tcp), (addr))
 #elif current_wordsize > 4
 # define printnum_slong(tcp, addr) \
 	printnum_int64((tcp), (addr), "%" PRId64)
 # define printnum_ulong(tcp, addr) \
 	printnum_int64((tcp), (addr), "%" PRIu64)
 # define printnum_ptr(tcp, addr) \
-	printnum_int64((tcp), (addr), "%#" PRIx64)
+	printnum_addr_int64((tcp), (addr))
 #else /* current_wordsize == 4 */
 # define printnum_slong(tcp, addr) \
 	printnum_int((tcp), (addr), "%d")
 # define printnum_ulong(tcp, addr) \
 	printnum_int((tcp), (addr), "%u")
 # define printnum_ptr(tcp, addr) \
-	printnum_int((tcp), (addr), "%#x")
+	printnum_addr_int((tcp), (addr))
 #endif
 
 #define DECL_PRINTPAIR(name)						\
