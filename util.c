@@ -544,6 +544,18 @@ printnum_addr_long_int(struct tcb *tcp, const kernel_ulong_t addr)
 }
 #endif /* !current_wordsize */
 
+#ifndef current_klongsize
+bool
+printnum_addr_klong_int(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	if (current_klongsize > sizeof(int)) {
+		return printnum_addr_int64(tcp, addr);
+	} else {
+		return printnum_addr_int(tcp, addr);
+	}
+}
+#endif /* !current_klongsize */
+
 const char *
 sprinttime(time_t t)
 {

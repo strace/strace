@@ -841,6 +841,18 @@ extern bool printnum_addr_long_int(struct tcb *, kernel_ulong_t addr);
 	printnum_addr_int((tcp), (addr))
 #endif
 
+#ifndef current_klongsize
+extern bool printnum_addr_klong_int(struct tcb *, kernel_ulong_t addr);
+# define printnum_kptr(tcp, addr) \
+	printnum_addr_klong_int((tcp), (addr))
+#elif current_klongsize > 4
+# define printnum_kptr(tcp, addr) \
+	printnum_addr_int64((tcp), (addr))
+#else /* current_klongsize == 4 */
+# define printnum_kptr(tcp, addr) \
+	printnum_addr_int((tcp), (addr))
+#endif
+
 #define DECL_PRINTPAIR(name)						\
 extern bool								\
 printpair_ ## name(struct tcb *, kernel_ulong_t addr, const char *fmt)	\
