@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Check decoding of prctl PR_GET_TID_ADDRESS operation.
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+run_prog > /dev/null
+run_strace -a23 -eprctl $args > "$EXP"
+LC_ALL=C grep -Ev '^prctl\(PR_[GS]ET_([^T]|.[^I]|..[^D])' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+
+rm -f "$EXP" "$OUT"

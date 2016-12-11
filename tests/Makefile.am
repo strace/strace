@@ -278,6 +278,7 @@ check_PROGRAMS = \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	prctl-securebits \
+	prctl-tid_address \
 	prctl-tsc \
 	pread64-pwrite64 \
 	preadv \
@@ -667,6 +668,7 @@ DECODER_TESTS = \
 	prctl-seccomp-filter-v.test \
 	prctl-seccomp-strict.test \
 	prctl-securebits.test \
+	prctl-tid_address.test \
 	prctl-tsc.test \
 	pread64-pwrite64.test \
 	preadv-pwritev.test \
