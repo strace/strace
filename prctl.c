@@ -151,7 +151,7 @@ SYS_FUNC(prctl)
 		if (entering(tcp))
 			tprints(", ");
 		else
-			printnum_ptr(tcp, arg2);
+			printnum_kptr(tcp, arg2);
 		break;
 
 	case PR_GET_TSC:
