@@ -242,6 +242,14 @@ require_min_kernel_version_or_skip()
 		skip_ "the kernel release $uname_r is not $1 or newer"
 }
 
+# Usage: grep_pid_status $pid GREP-OPTIONS...
+grep_pid_status()
+{
+	local pid
+	pid=$1; shift
+	cat < "/proc/$pid/status" | grep "$@"
+}
+
 check_prog cat
 check_prog rm
 

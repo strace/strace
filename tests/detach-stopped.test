@@ -95,8 +95,8 @@ if [ -f /proc/self/status ]; then
 		cleanup
 		dump_log_and_fail_with 'tracee died after detach'
 	}
-	grep '^State:.*T (stopped)' < /proc/$tracee_pid/status > /dev/null || {
-		grep '^State:' < /proc/$tracee_pid/status
+	grep_pid_status "$tracee_pid" '^State:.*T (stopped)' > /dev/null || {
+		grep_pid_status "$tracee_pid" '^State:'
 		cleanup
 		dump_log_and_fail_with 'tracee is not group-stopped after detach'
 	}
