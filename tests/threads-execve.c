@@ -216,22 +216,27 @@ main(int ac, char **av)
 	sigset_t mask;
 	sigemptyset(&mask);
 
+	static char leader_str[sizeof(leader) * 3];
+	int leader_str_len =
+		snprintf(leader_str, sizeof(leader_str), "%-5d", leader);
+
 	switch (action % NUMBER_OF_ACTIONS) {
 		case ACTION_exit:
-			printf("%-5d exit(42)       = ?\n", leader);
+			printf("%s exit(42)%*s= ?\n", leader_str,
+			       (int) sizeof(leader_str) - leader_str_len, " ");
 			close(fds[1]);
 			(void) syscall(__NR_exit, 42);
 			break;
 		case ACTION_rt_sigsuspend:
-			printf("%-5d rt_sigsuspend([], %u <unfinished ...>\n",
-			       leader, sigsetsize);
+			printf("%s rt_sigsuspend([], %u <unfinished ...>\n",
+			       leader_str, sigsetsize);
 			close(fds[1]);
 			(void) k_sigsuspend(&mask);
 			break;
 		case ACTION_nanosleep:
-			printf("%-5d nanosleep({tv_sec=%u, tv_nsec=0}"
+			printf("%s nanosleep({tv_sec=%u, tv_nsec=0}"
 			       ",  <unfinished ...>\n",
-			       leader, (unsigned int) ts.tv_sec);
+			       leader_str, (unsigned int) ts.tv_sec);
 			close(fds[1]);
 			(void) nanosleep(&ts, 0);
 			break;
