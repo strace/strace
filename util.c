@@ -1250,15 +1250,8 @@ umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
 int
 umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
 {
-#if SIZEOF_LONG == 4
-	const unsigned long x01010101 = 0x01010101ul;
-	const unsigned long x80808080 = 0x80808080ul;
-#elif SIZEOF_LONG == 8
-	const unsigned long x01010101 = 0x0101010101010101ul;
-	const unsigned long x80808080 = 0x8080808080808080ul;
-#else
-# error SIZEOF_LONG > 8
-#endif
+	const unsigned long x01010101 = (unsigned long) 0x0101010101010101ULL;
+	const unsigned long x80808080 = (unsigned long) 0x8080808080808080ULL;
 
 	int pid = tcp->pid;
 	unsigned int n, m, nread;
