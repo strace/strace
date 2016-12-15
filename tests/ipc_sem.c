@@ -49,7 +49,8 @@ static void
 cleanup(void)
 {
 	semctl(id, 0, IPC_RMID, 0);
-	printf("semctl\\(%d, 0, (IPC_64\\|)?IPC_RMID, \\[?0\\]?\\) += 0\n", id);
+	printf("semctl\\(%d, 0, (IPC_64\\|)?IPC_RMID, \\[?NULL\\]?\\) += 0\n",
+	       id);
 	id = -1;
 }
 
@@ -91,7 +92,7 @@ main(void)
 #ifdef __GLIBC__
 # define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|0)\\])"
 #else
-# define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|0)\\]|0)"
+# define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|0)\\]|NULL)"
 #endif
 	printf("semctl\\(%d, %d, (IPC_64\\|)?%#x /\\* SEM_\\?\\?\\? \\*/"
 	       ", " SEMCTL_BOGUS_ARG_FMT "\\) += %s\n",
