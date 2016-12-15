@@ -1,4 +1,8 @@
+Noteworthy changes in release ?.?? (????-??-??)
+===============================================
+
 Noteworthy changes in release 4.15 (2016-12-14)
+===============================================
 
 * Changes in behavior
   * Time stamps are now printed according to ISO 8601.
