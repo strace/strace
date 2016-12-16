@@ -635,6 +635,7 @@ AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 AC_CHECK_SIZEOF([long])
 AC_CHECK_SIZEOF([long long])
 AC_CHECK_SIZEOF([off_t],,[#include <sys/types.h>])
+AC_CHECK_SIZEOF([kernel_long_t],,[#include "$srcdir/kernel_types.h"])
 AC_CHECK_SIZEOF([struct i64_i32],,[struct i64_i32 {long long i64; int i32;};])
 
 AC_CACHE_CHECK([for SIGRTMIN], [st_cv_SIGRTMIN],
