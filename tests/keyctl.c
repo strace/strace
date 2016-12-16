@@ -44,10 +44,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
-
 # include <sys/uio.h>
-
-# include "kernel_types.h"
 
 /* This check should be before #include "xlat/keyctl_commands.h" */
 # ifndef KEYCTL_DH_COMPUTE

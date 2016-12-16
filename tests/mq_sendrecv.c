@@ -47,7 +47,6 @@
 # include <time.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
 # include "sigevent.h"
 
 # ifndef MQ_NAME

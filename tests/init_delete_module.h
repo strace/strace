@@ -34,9 +34,6 @@
 # include <stdbool.h>
 # include <stdio.h>
 
-# include "kernel_types.h"
-
-
 enum {
 	PARAM1_LEN = 33,
 	PARAM2_LEN = 8,

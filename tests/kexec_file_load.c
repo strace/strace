@@ -37,8 +37,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
 struct strval {
 	kernel_ulong_t val;
 	const char *str64;

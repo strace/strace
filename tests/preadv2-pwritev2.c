@@ -37,7 +37,6 @@
 # include <stdio.h>
 # include <sys/uio.h>
 # include <unistd.h>
-# include "kernel_types.h"
 
 static int
 pr(const int fd, const struct iovec *const vec,

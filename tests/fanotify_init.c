@@ -37,8 +37,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
 /* Performs fanotify_init call via the syscall interface. */
 static void
 do_call(kernel_ulong_t flags, const char *flags_str,

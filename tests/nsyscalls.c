@@ -28,7 +28,6 @@
  */
 
 #include "defs.h"
-#include "kernel_types.h"
 #include "syscall.h"
 
 #define TD 0

@@ -53,6 +53,7 @@
 #include <sys/time.h>
 #include <asm/unistd.h>
 
+#include "kernel_types.h"
 #include "mpers_type.h"
 #include "gcc_compat.h"
 

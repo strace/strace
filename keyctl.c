@@ -26,7 +26,6 @@
  */
 
 #include "defs.h"
-#include "kernel_types.h"
 
 typedef int32_t key_serial_t;
 

@@ -33,8 +33,6 @@
 
 #include DEF_MPERS_TYPE(kernel_dirent)
 
-#include "kernel_types.h"
-
 #include MPERS_DEFS
 
 #define D_NAME_LEN_MAX 256

@@ -37,7 +37,6 @@
 # include <stdio.h>
 # include <sys/stat.h>
 # include <unistd.h>
-# include "kernel_types.h"
 
 static const char fname[] =
 	"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"

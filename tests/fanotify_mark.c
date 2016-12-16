@@ -38,10 +38,7 @@
 # include <limits.h>
 # include <stdio.h>
 # include <unistd.h>
-
 # include <sys/fanotify.h>
-
-# include "kernel_types.h"
 
 /* Performs fanotify_mark call via the syscall interface. */
 static void

@@ -33,6 +33,7 @@
 # endif
 
 # include <sys/types.h>
+# include "kernel_types.h"
 # include "gcc_compat.h"
 
 /* Tests of "strace -v" are expected to define VERBOSE to 1. */

@@ -33,7 +33,6 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include "kernel_types.h"
 #include "xlat.h"
 #include "xlat/resources.h"
 

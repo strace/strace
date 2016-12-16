@@ -36,8 +36,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
 # define KCMP_FILE     0
 # define KCMP_SYSVSEM  6
 

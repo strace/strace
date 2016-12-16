@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <asm/unistd.h>
-#include "kernel_types.h"
 
 static void
 dump_str(const char *str, const unsigned int len)

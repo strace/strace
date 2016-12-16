@@ -38,8 +38,6 @@
 # include <unistd.h>
 # include <sys/signal.h>
 
-# include "kernel_types.h"
-
 int
 main(void)
 {

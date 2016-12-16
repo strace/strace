@@ -38,9 +38,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
-
 static void
 do_lookup_cookie(uint64_t cookie, char *buf, kernel_ulong_t len)
 {

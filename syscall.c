@@ -1003,8 +1003,6 @@ restore_cleared_syserror(struct tcb *tcp)
 	tcp->u_error = saved_u_error;
 }
 
-#include "kernel_types.h"
-
 /*
  * Check the syscall return value register value for whether it is
  * a negated errno code indicating an error, or a success return value.

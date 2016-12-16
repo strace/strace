@@ -38,8 +38,6 @@
 
 #include <sys/mman.h>
 
-# include "kernel_types.h"
-
 const char *
 sprintptr(kernel_ulong_t ptr)
 {

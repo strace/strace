@@ -30,8 +30,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "kernel_types.h"
-
 void
 printuid(unsigned UGID_TYPE id)
 {

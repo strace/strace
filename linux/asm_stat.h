@@ -1,8 +1,6 @@
 #ifndef STRACE_ASM_STAT_H
 #define STRACE_ASM_STAT_H
 
-# include "kernel_types.h"
-
 # undef dev_t
 # undef gid_t
 # undef ino_t

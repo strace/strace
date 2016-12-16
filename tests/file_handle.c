@@ -41,8 +41,6 @@
 # include <stdbool.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
 enum assert_rc {
 	ASSERT_NONE,
 	ASSERT_SUCCESS,

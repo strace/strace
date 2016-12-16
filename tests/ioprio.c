@@ -36,8 +36,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
 enum {
 	IOPRIO_CLASS_NONE,
 	IOPRIO_CLASS_RT,

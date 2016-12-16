@@ -31,7 +31,6 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/stat.h>
-#include "kernel_types.h"
 
 #define text_string "STRACE_STRING"
 #define msgsz sizeof(text_string)

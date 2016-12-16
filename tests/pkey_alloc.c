@@ -36,8 +36,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
 int
 main(void)
 {

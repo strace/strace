@@ -37,8 +37,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# include "kernel_types.h"
-
 # ifdef O_CLOEXEC
 #  define cloexec_flag O_CLOEXEC
 # else

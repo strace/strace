@@ -30,7 +30,6 @@
 #include "tests.h"
 #include <unistd.h>
 #include <asm/unistd.h>
-#include "kernel_types.h"
 
 int
 main(void)

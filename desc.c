@@ -226,8 +226,6 @@ SYS_FUNC(select)
 	return decode_select(tcp, tcp->u_arg, print_timeval, sprint_timeval);
 }
 
-#include "kernel_types.h"
-
 static int
 umove_kulong_array_or_printaddr(struct tcb *tcp, const long addr,
 				kernel_ulong_t *ptr, size_t n)

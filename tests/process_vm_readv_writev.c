@@ -30,10 +30,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <unistd.h>
-
 #include <sys/uio.h>
-
-#include "kernel_types.h"
 
 #if OP_WR
 # define in_iovec  rmt_iovec
