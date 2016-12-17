@@ -35,7 +35,7 @@
 typedef __kernel_long_t kernel_long_t;
 typedef __kernel_ulong_t kernel_ulong_t;
 
-# elif defined __x86_64__ && defined __ILP32__
+# elif (defined __x86_64__ && defined __ILP32__) || defined LINUX_MIPSN32
 
 typedef long long kernel_long_t;
 typedef unsigned long long kernel_ulong_t;
