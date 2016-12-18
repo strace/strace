@@ -2,7 +2,7 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	long scno = 0;
+	kernel_scno_t scno = 0;
 
 	switch (aarch64_io.iov_len) {
 		case sizeof(aarch64_regs):

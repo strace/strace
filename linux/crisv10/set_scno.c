@@ -1,5 +1,5 @@
 static int
-arch_set_scno(struct tcb *tcp, long scno)
+arch_set_scno(struct tcb *tcp, kernel_scno_t scno)
 {
 	return upoke(tcp->pid, 4 * PT_R9, scno);
 }

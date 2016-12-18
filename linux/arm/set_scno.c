@@ -7,7 +7,7 @@
  */
 
 static int
-arch_set_scno(struct tcb *tcp, long scno)
+arch_set_scno(struct tcb *tcp, kernel_scno_t scno)
 {
 	unsigned int n = (uint16_t) scno;
 	int rc = ptrace(PTRACE_SET_SYSCALL, tcp->pid, NULL, (unsigned long) n);

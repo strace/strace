@@ -345,7 +345,7 @@ decode_socket_subcall(struct tcb *tcp)
 	if (call < 1 || call >= SYS_socket_nsubcalls)
 		return;
 
-	const unsigned long scno = SYS_socket_subcall + call;
+	const kernel_scno_t scno = SYS_socket_subcall + call;
 	const unsigned int nargs = sysent[scno].nargs;
 	uint64_t buf[nargs];
 
@@ -491,10 +491,10 @@ dumpio(struct tcb *tcp)
  * Shuffle syscall numbers so that we don't have huge gaps in syscall table.
  * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
  */
-#if defined(ARM) || defined(AARCH64) /* So far only 32-bit ARM needs this */
-static long
-shuffle_scno(unsigned long scno)
+static kernel_scno_t
+shuffle_scno(kernel_scno_t scno)
 {
+#if defined(ARM) || defined(AARCH64) /* So far only 32-bit ARM needs this */
 	if (scno < ARM_FIRST_SHUFFLED_SYSCALL)
 		return scno;
 
@@ -504,7 +504,7 @@ shuffle_scno(unsigned long scno)
 	if (scno == 0x000ffff0)
 		return ARM_FIRST_SHUFFLED_SYSCALL;
 
-#define ARM_SECOND_SHUFFLED_SYSCALL (ARM_FIRST_SHUFFLED_SYSCALL + 1)
+# define ARM_SECOND_SHUFFLED_SYSCALL (ARM_FIRST_SHUFFLED_SYSCALL + 1)
 	/*
 	 * Is it ARM specific syscall?
 	 * Swap [0x000f0000, 0x000f0000 + LAST_SPECIAL] range
@@ -517,12 +517,10 @@ shuffle_scno(unsigned long scno)
 	if (scno <= ARM_SECOND_SHUFFLED_SYSCALL + ARM_LAST_SPECIAL_SYSCALL) {
 		return scno + 0x000f0000 - ARM_SECOND_SHUFFLED_SYSCALL;
 	}
+#endif /* ARM || AARCH64 */
 
 	return scno;
 }
-#else
-# define shuffle_scno(scno) ((long)(scno))
-#endif
 
 const char *
 err_name(unsigned long err)
@@ -544,7 +542,7 @@ clear_regs(void)
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static int arch_get_scno(struct tcb *tcp);
-static int arch_set_scno(struct tcb *, long);
+static int arch_set_scno(struct tcb *, kernel_scno_t);
 static void get_error(struct tcb *, const bool);
 static int arch_set_error(struct tcb *);
 
@@ -1272,7 +1270,7 @@ get_syscall_result(struct tcb *tcp)
 #endif
 
 const char *
-syscall_name(long scno)
+syscall_name(kernel_scno_t scno)
 {
 #if defined X32_PERSONALITY_NUMBER && defined __X32_SYSCALL_BIT
 	if (current_personality == X32_PERSONALITY_NUMBER)

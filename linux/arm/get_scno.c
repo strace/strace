@@ -31,7 +31,7 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	long scno = 0;
+	kernel_scno_t scno = 0;
 
 	/* Note: we support only 32-bit CPUs, not 26-bit */
 
@@ -47,7 +47,7 @@ arch_get_scno(struct tcb *tcp)
 	if (errno)
 		return -1;
 	/* EABI syscall convention? */
-	if ((unsigned long) scno != 0xef000000) {
+	if (scno != 0xef000000) {
 		/* No, it's OABI */
 		if ((scno & 0x0ff00000) != 0x0f900000) {
 			error_msg("pid %d unknown syscall trap 0x%08lx",

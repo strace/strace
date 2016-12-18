@@ -1,5 +1,5 @@
 static int
-arch_set_scno(struct tcb *tcp, long scno)
+arch_set_scno(struct tcb *tcp, kernel_scno_t scno)
 {
 	if (ia64_ia32mode)
 		ia64_regs.gr[0] = scno;

@@ -40,7 +40,7 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	long scno = 0;
+	kernel_scno_t scno = 0;
 	unsigned int currpers;
 
 #ifndef __X32_SYSCALL_BIT

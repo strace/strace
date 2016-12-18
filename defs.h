@@ -229,7 +229,7 @@ struct tcb {
 	int pid;		/* If 0, this tcb is free */
 	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
 	unsigned long u_error;	/* Error code */
-	long scno;		/* System call number */
+	kernel_scno_t scno;	/* System call number */
 	long u_arg[MAX_ARGS];	/* System call arguments */
 #if HAVE_STRUCT_TCB_EXT_ARG
 	long long ext_arg[MAX_ARGS];
@@ -467,7 +467,7 @@ extern int get_scno(struct tcb *tcp);
  * @return     String literal corresponding to the syscall number in case latter
  *             is valid; NULL otherwise.
  */
-extern const char *syscall_name(long scno);
+extern const char *syscall_name(kernel_scno_t scno);
 extern const char *err_name(unsigned long err);
 
 extern bool is_erestart(struct tcb *);
@@ -879,7 +879,7 @@ extern struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 
 /* Checks that sysent[scno] is not out of range. */
 static inline bool
-scno_in_range(unsigned long scno)
+scno_in_range(kernel_scno_t scno)
 {
 	return scno < nsyscalls;
 }
@@ -890,7 +890,7 @@ scno_in_range(unsigned long scno)
  * and its sysent[scno].sys_flags has no TRACE_INDIRECT_SUBCALL flag set.
  */
 static inline bool
-scno_is_valid(unsigned long scno)
+scno_is_valid(kernel_scno_t scno)
 {
 	return scno_in_range(scno)
 	       && sysent[scno].sys_func
