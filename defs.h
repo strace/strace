@@ -877,18 +877,25 @@ extern struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 # define MPERS_PRINTER_DECL(type, name, ...) type MPERS_FUNC_NAME(name)(__VA_ARGS__)
 #endif /* !IN_MPERS_BOOTSTRAP */
 
-/*
- * If you need non-NULL sysent[scno].sys_func, non-NULL sysent[scno].sys_name,
- * and non-indirect sysent[scno].sys_flags.
- */
-#define SCNO_IS_VALID(scno) \
-	((unsigned long)(scno) < nsyscalls \
-	 && sysent[scno].sys_func \
-	 && !(sysent[scno].sys_flags & TRACE_INDIRECT_SUBCALL))
+/* Checks that sysent[scno] is not out of range. */
+static inline bool
+SCNO_IN_RANGE(unsigned long scno)
+{
+	return scno < nsyscalls;
+}
 
-/* Only ensures that sysent[scno] isn't out of range */
-#define SCNO_IN_RANGE(scno) \
-	((unsigned long)(scno) < nsyscalls)
+/*
+ * Checks whether scno is not out of range,
+ * its corresponding sysent[scno].sys_func is non-NULL,
+ * and its sysent[scno].sys_flags has no TRACE_INDIRECT_SUBCALL flag set.
+ */
+static inline bool
+SCNO_IS_VALID(unsigned long scno)
+{
+	return SCNO_IN_RANGE(scno)
+	       && sysent[scno].sys_func
+	       && !(sysent[scno].sys_flags & TRACE_INDIRECT_SUBCALL);
+}
 
 #define MPERS_FUNC_NAME__(prefix, name) prefix ## name
 #define MPERS_FUNC_NAME_(prefix, name) MPERS_FUNC_NAME__(prefix, name)
