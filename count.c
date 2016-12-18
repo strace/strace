@@ -63,7 +63,7 @@ count_syscall(struct tcb *tcp, const struct timeval *syscall_exiting_tv)
 	cc = &counts[scno];
 
 	cc->calls++;
-	if (tcp->u_error)
+	if (syserror(tcp))
 		cc->errors++;
 
 	/* tv = wall clock time spent while in syscall */
