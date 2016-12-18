@@ -402,7 +402,7 @@ SYS_FUNC(sendmsg)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	decode_msghdr(tcp, 0, tcp->u_arg[1], (unsigned long) -1L);
+	decode_msghdr(tcp, 0, tcp->u_arg[1], -1UL);
 	/* flags */
 	tprints(", ");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");

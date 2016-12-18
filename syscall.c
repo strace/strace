@@ -478,8 +478,7 @@ dumpio(struct tcb *tcp)
 			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 			break;
 		case SEN_sendmsg:
-			dumpiov_in_msghdr(tcp, tcp->u_arg[1],
-					  (unsigned long) -1L);
+			dumpiov_in_msghdr(tcp, tcp->u_arg[1], -1UL);
 			break;
 		case SEN_sendmmsg:
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);

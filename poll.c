@@ -68,7 +68,7 @@ decode_poll_exiting(struct tcb *tcp, const long pts)
 	const unsigned long start = tcp->u_arg[0];
 	const unsigned long end = start + size;
 	const unsigned long max_printed =
-		abbrev(tcp) ? max_strlen : (unsigned int) -1;
+		abbrev(tcp) ? max_strlen : -1U;
 	unsigned long printed, cur;
 
 	static char outstr[1024];

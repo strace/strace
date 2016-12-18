@@ -592,7 +592,7 @@ extern void dumpiov_in_msghdr(struct tcb *, long, unsigned long);
 extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov_upto(struct tcb *, int, long, unsigned long);
 #define dumpiov(tcp, len, addr) \
-	dumpiov_upto((tcp), (len), (addr), (unsigned long) -1L)
+	dumpiov_upto((tcp), (len), (addr), -1UL)
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr_ex(struct tcb *, long addr, long len,
 	unsigned int user_style);

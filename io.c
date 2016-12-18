@@ -85,14 +85,14 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		case IOV_DECODE_STR:
 			if (len > c->data_size)
 				len = c->data_size;
-			if (c->data_size != (unsigned long) -1L)
+			if (c->data_size != -1UL)
 				c->data_size -= len;
 			printstr(tcp, iov[0], len);
 			break;
 		case IOV_DECODE_NETLINK:
 			if (len > c->data_size)
 				len = c->data_size;
-			if (c->data_size != (unsigned long) -1L)
+			if (c->data_size != -1UL)
 				c->data_size -= len;
 			decode_netlink(tcp, iov[0], iov[1]);
 			break;
@@ -126,7 +126,7 @@ void
 tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr,
 	   enum iov_decode decode_iov)
 {
-	tprint_iov_upto(tcp, len, addr, decode_iov, (unsigned long) -1L);
+	tprint_iov_upto(tcp, len, addr, decode_iov, -1UL);
 }
 
 SYS_FUNC(readv)
