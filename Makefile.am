@@ -753,6 +753,9 @@ EXTRA_DIST =				\
 	xlat/gen.sh			\
 	xlate.el
 
+.PHONY: check-valgrind-local
+check-valgrind-local:
+
 .PHONY: srpm
 srpm: dist-xz
 	rpmbuild --define '%_srcrpmdir .' -ts $(distdir).tar.xz
