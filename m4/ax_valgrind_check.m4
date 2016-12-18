@@ -68,6 +68,7 @@
 #   warranty.
 
 #serial 13
+#modified for strace project
 
 dnl Configured tools
 m4_define([valgrind_tool_list], [[memcheck], [helgrind], [drd], [sgcheck]])
@@ -206,9 +207,9 @@ VALGRIND_LOG_COMPILER = \
 	$(VALGRIND) $(VALGRIND_SUPPRESSIONS) --error-exitcode=1 $(VALGRIND_FLAGS)
 
 define valgrind_tool_rule =
-check-valgrind-$(1):
+check-valgrind-$(1): $$(BUILT_SOURCES)
 ifeq ($$(VALGRIND_ENABLED)-$$(ENABLE_VALGRIND_$(1)),yes-yes)
-	$$(valgrind_v_use)$$(MAKE) check-TESTS \
+	$$(valgrind_v_use)$$(MAKE) $$(AM_MAKEFLAGS) check-am \
 		TESTS_ENVIRONMENT="$$(VALGRIND_TESTS_ENVIRONMENT)" \
 		LOG_COMPILER="$$(VALGRIND_LOG_COMPILER)" \
 		LOG_FLAGS="$$(valgrind_$(1)_flags)" \
