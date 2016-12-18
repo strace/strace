@@ -6,8 +6,6 @@ before_install: ./travis-install.sh
 
 script: ./travis-build.sh
 
-after_success: ./travis-success.sh
-
 sudo: required
 
 git:
@@ -23,7 +21,6 @@ matrix:
     - compiler: gcc
       env:
         - TARGET=x86_64
-        - COVERAGE=true
     - compiler: gcc
       env:
         - TARGET=x32
@@ -42,3 +39,7 @@ matrix:
     - compiler: musl-gcc
       env:
         - TARGET=x86
+    - compiler: gcc
+      env:
+        - TARGET=x86_64
+        - CHECK=coverage

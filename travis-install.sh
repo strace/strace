@@ -47,7 +47,9 @@ case "$CC" in
 		;;
 esac
 
-if [ "${COVERAGE-}" = true ]; then
-	apt_get_install lcov
-	pip install --user codecov
-fi
+case "${CHECK-}" in
+	coverage)
+		apt_get_install lcov
+		pip install --user codecov
+		;;
+esac

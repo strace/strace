@@ -17,7 +17,17 @@ case "${TARGET-}" in
 		;;
 	x86)
 		CC="$CC -m32"
-		export DISTCHECK_CONFIGURE_FLAGS='--build=i686-pc-linux-gnu --target=i686-pc-linux-gnu'
+		DISTCHECK_CONFIGURE_FLAGS='--build=i686-pc-linux-gnu --target=i686-pc-linux-gnu'
+		export DISTCHECK_CONFIGURE_FLAGS
+		;;
+esac
+
+case "${CHECK-}" in
+	coverage)
+		CHECK_CONFIGURE_FLAGS=--enable-code-coverage
+		CFLAGS='-g -O0'
+		CFLAGS_FOR_BUILD="$CFLAGS"
+		export CFLAGS CFLAGS_FOR_BUILD
 		;;
 esac
 
@@ -26,7 +36,21 @@ export CC_FOR_BUILD="$CC"
 
 ./git-set-file-times
 ./bootstrap
-./configure --enable-maintainer-mode ${ENABLE_GCC_WERROR-} ${DISTCHECK_CONFIGURE_FLAGS-}
+./configure --enable-maintainer-mode \
+	${ENABLE_GCC_WERROR-} \
+	${DISTCHECK_CONFIGURE_FLAGS-} \
+	${CHECK_CONFIGURE_FLAGS-} \
+	#
 
 j=-j`getconf _NPROCESSORS_ONLN 2> /dev/null` || j=
-make -k $j distcheck VERBOSE=${VERBOSE-}
+
+case "${CHECK-}" in
+	coverage)
+		make -k $j all VERBOSE=${VERBOSE-}
+		make -k $j check VERBOSE=${VERBOSE-}
+		codecov --gcov-args=-abcp ||:
+		;;
+	*)
+		make -k $j distcheck VERBOSE=${VERBOSE-}
+		;;
+esac
