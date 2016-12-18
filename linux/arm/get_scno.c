@@ -72,7 +72,7 @@ arch_get_scno(struct tcb *tcp)
 	 * Do some sanity checks to figure out
 	 * whether it's really a syscall entry.
 	 */
-	if (arm_regs.ARM_ip && !SCNO_IN_RANGE(scno)) {
+	if (arm_regs.ARM_ip && !scno_in_range(scno)) {
 		if (debug_flag)
 			error_msg("pid %d stray syscall exit:"
 				  " ARM_ip = %ld, scno = %ld",

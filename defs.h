@@ -879,7 +879,7 @@ extern struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 
 /* Checks that sysent[scno] is not out of range. */
 static inline bool
-SCNO_IN_RANGE(unsigned long scno)
+scno_in_range(unsigned long scno)
 {
 	return scno < nsyscalls;
 }
@@ -890,9 +890,9 @@ SCNO_IN_RANGE(unsigned long scno)
  * and its sysent[scno].sys_flags has no TRACE_INDIRECT_SUBCALL flag set.
  */
 static inline bool
-SCNO_IS_VALID(unsigned long scno)
+scno_is_valid(unsigned long scno)
 {
-	return SCNO_IN_RANGE(scno)
+	return scno_in_range(scno)
 	       && sysent[scno].sys_func
 	       && !(sysent[scno].sys_flags & TRACE_INDIRECT_SUBCALL);
 }

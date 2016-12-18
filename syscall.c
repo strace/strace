@@ -407,7 +407,7 @@ decode_ipc_subcall(struct tcb *tcp)
 static void
 decode_mips_subcall(struct tcb *tcp)
 {
-	if (!SCNO_IS_VALID(tcp->u_arg[0]))
+	if (!scno_is_valid(tcp->u_arg[0]))
 		return;
 	tcp->scno = tcp->u_arg[0];
 	tcp->qual_flg = qual_flags(tcp->scno);
@@ -553,7 +553,7 @@ struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 static struct fault_opts *
 tcb_fault_opts(struct tcb *tcp)
 {
-	return (SCNO_IN_RANGE(tcp->scno) && tcp->fault_vec[current_personality])
+	return (scno_in_range(tcp->scno) && tcp->fault_vec[current_personality])
 	       ? &tcp->fault_vec[current_personality][tcp->scno] : NULL;
 }
 
@@ -1213,7 +1213,7 @@ get_scno(struct tcb *tcp)
 	if (rc != 1)
 		return rc;
 
-	if (SCNO_IS_VALID(tcp->scno)) {
+	if (scno_is_valid(tcp->scno)) {
 		tcp->s_ent = &sysent[tcp->scno];
 		tcp->qual_flg = qual_flags(tcp->scno);
 	} else {
@@ -1278,5 +1278,5 @@ syscall_name(long scno)
 	if (current_personality == X32_PERSONALITY_NUMBER)
 		scno &= ~__X32_SYSCALL_BIT;
 #endif
-	return SCNO_IS_VALID(scno) ? sysent[scno].sys_name: NULL;
+	return scno_is_valid(scno) ? sysent[scno].sys_name: NULL;
 }

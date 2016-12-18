@@ -13,7 +13,7 @@ arch_get_scno(struct tcb *tcp)
 	 * Do some sanity checks to figure out if it's
 	 * really a syscall entry
 	 */
-	if (!SCNO_IN_RANGE(scno)) {
+	if (!scno_in_range(scno)) {
 		if (alpha_a3 == 0 || alpha_a3 == -1) {
 			if (debug_flag)
 				error_msg("stray syscall exit: r0 = %ld", scno);
