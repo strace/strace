@@ -194,9 +194,8 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 		tprintf("%ld", tcp->u_arg[arg]);
 # if SUPPORTED_PERSONALITIES > 1
 	else
-		tprintf("%ld",
-			((unsigned long) tcp->u_arg[arg + 1] << current_wordsize * 8)
-			| (unsigned long) tcp->u_arg[arg]);
+		tprintf("%ld", (tcp->u_arg[arg + 1] << current_wordsize * 8)
+			       | tcp->u_arg[arg]);
 # endif
 #elif SIZEOF_LONG > 4
 # error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG

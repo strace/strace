@@ -69,7 +69,7 @@ SYS_FUNC(dup3)
 }
 
 static int
-decode_select(struct tcb *tcp, long *args,
+decode_select(struct tcb *tcp, kernel_ureg_t *args,
 	      void (*print_tv_ts) (struct tcb *, const long),
 	      const char * (*sprint_tv_ts) (struct tcb *, const long))
 {
@@ -192,7 +192,7 @@ decode_select(struct tcb *tcp, long *args,
 
 SYS_FUNC(oldselect)
 {
-	long select_args[5];
+	kernel_ureg_t select_args[5];
 	unsigned int oldselect_args[5];
 
 	if (sizeof(*select_args) == sizeof(*oldselect_args)) {

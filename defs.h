@@ -230,9 +230,9 @@ struct tcb {
 	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
 	unsigned long u_error;	/* Error code */
 	kernel_scno_t scno;	/* System call number */
-	long u_arg[MAX_ARGS];	/* System call arguments */
+	kernel_ureg_t u_arg[MAX_ARGS];	/* System call arguments */
 #if HAVE_STRUCT_TCB_EXT_ARG
-	long long ext_arg[MAX_ARGS];
+	unsigned long long ext_arg[MAX_ARGS];
 	long long u_lrval;	/* long long return value */
 #endif
 	long u_rval;		/* Return value */

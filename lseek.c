@@ -53,7 +53,7 @@ SYS_FUNC(lseek)
 # if SUPPORTED_PERSONALITIES > 1
 	/* tcp->ext_arg is not initialized for compat personality */
 	if (current_personality == 1) {
-		offset = tcp->u_arg[1];
+		offset = (long) tcp->u_arg[1];
 	} else
 # endif
 	{
@@ -75,10 +75,10 @@ SYS_FUNC(lseek)
 # if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 #  ifdef X86_64
 		current_personality == 1 ?
-			(long)(int) tcp->u_arg[1] : tcp->u_arg[1];
+			(long) (int) tcp->u_arg[1] : (long) tcp->u_arg[1];
 #  else
 		current_wordsize == 4 ?
-			(long)(int) tcp->u_arg[1] : tcp->u_arg[1];
+			(long) (int) tcp->u_arg[1] : (long) tcp->u_arg[1];
 #  endif
 # else
 		tcp->u_arg[1];

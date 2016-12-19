@@ -1511,12 +1511,12 @@ getarg_ull(struct tcb *tcp, int argn)
 #if HAVE_STRUCT_TCB_EXT_ARG
 # if SUPPORTED_PERSONALITIES > 1
 	if (current_personality == 1)
-		return (unsigned long) tcp->u_arg[argn];
+		return tcp->u_arg[argn];
 	else
 # endif
-	return (unsigned long long) tcp->ext_arg[argn];
+	return tcp->ext_arg[argn];
 #else
-	return (unsigned long) tcp->u_arg[argn];
+	return tcp->u_arg[argn];
 #endif
 }
 

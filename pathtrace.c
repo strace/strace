@@ -248,8 +248,8 @@ pathtrace_match(struct tcb *tcp)
 	{
 		int     i, j;
 		int     nfds;
-		long   *args;
-		long    select_args[5];
+		kernel_ureg_t *args;
+		kernel_ureg_t select_args[5];
 		unsigned int oldselect_args[5];
 		unsigned int fdsize;
 		fd_set *fds;

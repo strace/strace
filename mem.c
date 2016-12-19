@@ -55,7 +55,7 @@ SYS_FUNC(brk)
 #include "xlat/mmap_flags.h"
 
 static void
-print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
+print_mmap(struct tcb *tcp, kernel_ureg_t *u_arg, unsigned long long offset)
 {
 	const unsigned long addr = u_arg[0];
 	const unsigned long len = u_arg[1];
@@ -93,7 +93,7 @@ print_mmap(struct tcb *tcp, long *u_arg, unsigned long long offset)
 /* Params are pointed to by u_arg[0], offset is in bytes */
 SYS_FUNC(old_mmap)
 {
-	long u_arg[6];
+	kernel_ureg_t u_arg[6];
 # if defined AARCH64 || defined X86_64
 	/* We are here only in a 32-bit personality. */
 	unsigned int narrow_arg[6];
@@ -116,7 +116,7 @@ SYS_FUNC(old_mmap)
 /* Params are pointed to by u_arg[0], offset is in pages */
 SYS_FUNC(old_mmap_pgoff)
 {
-	long u_arg[5];
+	kernel_ureg_t u_arg[5];
 	int i;
 	unsigned narrow_arg[6];
 	unsigned long long offset;
@@ -139,7 +139,7 @@ SYS_FUNC(mmap)
 #if HAVE_STRUCT_TCB_EXT_ARG
 		tcp->ext_arg[5];	/* try test/x32_mmap.c */
 #else
-		(unsigned long) tcp->u_arg[5];
+		tcp->u_arg[5];
 #endif
 	/* Example of kernel-side handling of this variety of mmap:
 	 * arch/x86/kernel/sys_x86_64.c::SYSCALL_DEFINE6(mmap, ...) calls
@@ -156,7 +156,7 @@ SYS_FUNC(mmap_pgoff)
 {
 	/* Try test/mmap_offset_decode.c */
 	unsigned long long offset;
-	offset = (unsigned long) tcp->u_arg[5];
+	offset = tcp->u_arg[5];
 	offset *= get_pagesize();
 	print_mmap(tcp, tcp->u_arg, offset);
 
@@ -167,7 +167,7 @@ SYS_FUNC(mmap_pgoff)
 SYS_FUNC(mmap_4koff)
 {
 	unsigned long long offset;
-	offset = (unsigned long) tcp->u_arg[5];
+	offset = tcp->u_arg[5];
 	offset <<= 12;
 	print_mmap(tcp, tcp->u_arg, offset);
 
