@@ -112,7 +112,7 @@ SYS_FUNC(old_mmap)
 }
 #endif /* old_mmap architectures */
 
-#if defined(S390)
+#ifdef S390
 /* Params are pointed to by u_arg[0], offset is in pages */
 SYS_FUNC(old_mmap_pgoff)
 {
@@ -120,8 +120,8 @@ SYS_FUNC(old_mmap_pgoff)
 	int i;
 	unsigned narrow_arg[6];
 	unsigned long long offset;
-	if (umoven(tcp, tcp->u_arg[0], sizeof(narrow_arg), narrow_arg) == -1)
-		return 0;
+	if (umove_or_printaddr(tcp, tcp->u_arg[0], &narrow_arg))
+		return RVAL_DECODED | RVAL_HEX;
 	for (i = 0; i < 5; i++)
 		u_arg[i] = (unsigned long) narrow_arg[i];
 	offset = narrow_arg[5];
@@ -130,7 +130,7 @@ SYS_FUNC(old_mmap_pgoff)
 
 	return RVAL_DECODED | RVAL_HEX;
 }
-#endif
+#endif /* S390 */
 
 /* Params are passed directly, offset is in bytes */
 SYS_FUNC(mmap)
