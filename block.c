@@ -45,8 +45,8 @@ typedef struct {
 #define BLKPG_DEVNAMELTH	64
 #define BLKPG_VOLNAMELTH	64
 typedef struct {
-	long long start;		/* starting offset in bytes */
-	long long length;		/* length in bytes */
+	int64_t start;			/* starting offset in bytes */
+	int64_t length;			/* length in bytes */
 	int pno;			/* partition number */
 	char devname[BLKPG_DEVNAMELTH];	/* partition name, like sda5 or c0d1p2,
 					   to be used in kernel messages */
@@ -130,8 +130,9 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 		blkpg->flags, blkpg->datalen);
 
 	if (!umove_or_printaddr(tcp, (long) blkpg->data, &p)) {
-		tprintf("{start=%lld, length=%lld, pno=%d, devname=",
-			(long long) p.start, (long long) p.length, p.pno);
+		tprintf("{start=%" PRId64 ", length=%" PRId64
+			", pno=%d, devname=",
+			p.start, p.length, p.pno);
 		print_quoted_string(p.devname, sizeof(p.devname),
 				    QUOTE_0_TERMINATED);
 		tprints(", volname=");
