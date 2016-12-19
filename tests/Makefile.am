@@ -142,6 +142,7 @@ check_PROGRAMS = \
 	ftruncate64 \
 	futex \
 	futimesat \
+	generate_scno \
 	get_mempolicy \
 	getcpu \
 	getcwd \
@@ -914,5 +915,8 @@ ksysent.h: $(srcdir)/ksysent.sed
 	mv -f $@.t2 $@
 	rm -f $@.t1
 
-BUILT_SOURCES = ksysent.h
-CLEANFILES = ksysent.h $(TESTS:=.tmp)
+scno.h: generate_scno
+	./$< > $@-t && mv $@-t $@
+
+BUILT_SOURCES = ksysent.h scno.h
+CLEANFILES = ksysent.h scno.h $(TESTS:=.tmp)

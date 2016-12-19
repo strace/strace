@@ -80,6 +80,7 @@ ftruncate
 ftruncate64
 futex
 futimesat
+generate_scno
 get_mempolicy
 getcpu
 getcwd
