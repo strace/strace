@@ -1316,8 +1316,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			printflags64(btrfs_snap_flags_v2, args.flags,
 				     "BTRFS_SUBVOL_???");
 			if (args.flags & BTRFS_SUBVOL_QGROUP_INHERIT) {
-				tprintf(", size=%llu, qgroup_inherit=",
-					(unsigned long long) args.size);
+				tprintf(", size=%" PRIu64 ", qgroup_inherit=",
+					(uint64_t) args.size);
 
 				btrfs_print_qgroup_inherit(tcp,
 					(unsigned long) args.qgroup_inherit);
@@ -1328,7 +1328,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints("}");
 			return 0;
 		}
-		tprintf("{transid=%llu}", (unsigned long long) args.transid);
+		tprintf("{transid=%" PRIu64 "}", (uint64_t) args.transid);
 		break;
 	}
 
