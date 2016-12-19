@@ -192,14 +192,14 @@ main(void)
 	syscall(__NR_preadv2, -1, NULL, vlen, pos_l, pos_h, 1);
 	if (ENOSYS == errno)
 		test_dumpio = 0;
-	tprintf("preadv2(-1, NULL, %llu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
-		(unsigned long long) vlen, pos, errno2name());
+	tprintf("preadv2(-1, NULL, %lu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
+		(unsigned long) vlen, pos, errno2name());
 
 	syscall(__NR_pwritev2, -1, NULL, vlen, pos_l, pos_h, 1);
 	if (ENOSYS == errno)
 		test_dumpio = 0;
-	tprintf("pwritev2(-1, NULL, %llu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
-		(unsigned long long) vlen, pos, errno2name());
+	tprintf("pwritev2(-1, NULL, %lu, %lld, RWF_HIPRI) = -1 %s (%m)\n",
+		(unsigned long) vlen, pos, errno2name());
 
 	if (test_dumpio)
 		dumpio();
