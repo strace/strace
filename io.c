@@ -184,29 +184,25 @@ static void
 print_lld_from_low_high_val(struct tcb *tcp, int arg)
 {
 #if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
-# if SUPPORTED_PERSONALITIES > 1
-#  ifdef X86_64
-	if (current_personality != 1)
-#  else
-	if (current_wordsize == sizeof(long))
-#  endif
-# endif
-		tprintf("%ld", tcp->u_arg[arg]);
-# if SUPPORTED_PERSONALITIES > 1
-	else
+# ifndef current_klongsize
+	if (current_klongsize < SIZEOF_LONG) {
 		tprintf("%ld", (tcp->u_arg[arg + 1] << current_wordsize * 8)
 			       | tcp->u_arg[arg]);
-# endif
+	} else
+# endif /* !current_klongsize */
+	{
+		tprintf("%ld", tcp->u_arg[arg]);
+	}
 #elif SIZEOF_LONG > 4
 # error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
 #elif HAVE_STRUCT_TCB_EXT_ARG
-# if SUPPORTED_PERSONALITIES > 1
-	if (current_personality == 1) {
+# ifndef current_klongsize
+	if (current_klongsize < SIZEOF_LONG_LONG) {
 		tprintf("%lld",
 			(zero_extend_signed_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
 			| zero_extend_signed_to_ull(tcp->u_arg[arg]));
 	} else
-# endif
+# endif /* !current_klongsize */
 	{
 		tprintf("%lld", tcp->ext_arg[arg]);
 	}

@@ -230,11 +230,8 @@ static int
 umove_kulong_array_or_printaddr(struct tcb *tcp, const long addr,
 				kernel_ulong_t *ptr, size_t n)
 {
-#if defined X86_64 || defined X32
-	if (current_personality == 1) {
-#else
-	if (current_wordsize < sizeof(*ptr)) {
-#endif
+#ifndef current_klongsize
+	if (current_klongsize < sizeof(*ptr)) {
 		uint32_t ptr32[n];
 		int r = umove_or_printaddr(tcp, addr, &ptr32);
 		if (!r) {
@@ -245,6 +242,7 @@ umove_kulong_array_or_printaddr(struct tcb *tcp, const long addr,
 		}
 		return r;
 	}
+#endif /* !current_klongsize */
 	return umoven_or_printaddr(tcp, addr, n * sizeof(*ptr), ptr);
 }
 

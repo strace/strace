@@ -96,17 +96,13 @@ print_rlimit32(struct tcb *tcp, unsigned long addr)
 static void
 decode_rlimit(struct tcb *tcp, unsigned long addr)
 {
-# if defined(X86_64) || defined(X32)
 	/*
 	 * i386 is the only personality on X86_64 and X32
 	 * with 32-bit rlim_t.
 	 * When current_personality is X32, current_wordsize
 	 * equals to 4 but rlim_t is 64-bit.
 	 */
-	if (current_personality == 1)
-# else
-	if (current_wordsize == 4)
-# endif
+	if (current_klongsize == 4)
 		print_rlimit32(tcp, addr);
 	else
 		print_rlimit64(tcp, addr);

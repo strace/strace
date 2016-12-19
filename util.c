@@ -297,34 +297,29 @@ int
 getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 {
 #if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
-# if SUPPORTED_PERSONALITIES > 1
-#  ifdef X86_64
-	if (current_personality != 1) {
-#  else
-	if (current_wordsize > 4) {
-#  endif
-# endif
-		*val = tcp->u_arg[arg_no];
-		arg_no++;
-# if SUPPORTED_PERSONALITIES > 1
-	} else {
+# ifndef current_klongsize
+	if (current_klongsize < SIZEOF_LONG) {
 #  if defined(AARCH64) || defined(POWERPC64)
 		/* Align arg_no to the next even number. */
 		arg_no = (arg_no + 1) & 0xe;
 #  endif /* AARCH64 || POWERPC64 */
 		*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
+	} else
+# endif /* !current_klongsize */
+	{
+		*val = tcp->u_arg[arg_no];
+		arg_no++;
 	}
-# endif /* SUPPORTED_PERSONALITIES > 1 */
 #elif SIZEOF_LONG > 4
 #  error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
 #elif HAVE_STRUCT_TCB_EXT_ARG
-# if SUPPORTED_PERSONALITIES > 1
-	if (current_personality == 1) {
+# ifndef current_klongsize
+	if (current_klongsize < SIZEOF_LONG_LONG) {
 		*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
 	} else
-# endif
+# endif /* !current_klongsize */
 	{
 		*val = tcp->ext_arg[arg_no];
 		arg_no++;
@@ -1494,12 +1489,14 @@ kernel_ulong_t
 getarg_klu(struct tcb *tcp, int argn)
 {
 #if HAVE_STRUCT_TCB_EXT_ARG
-# if SUPPORTED_PERSONALITIES > 1
-	if (current_personality == 1)
+# ifndef current_klongsize
+	if (current_klongsize < sizeof(*tcp->ext_arg)) {
 		return tcp->u_arg[argn];
-	else
-# endif
-	return tcp->ext_arg[argn];
+	} else
+# endif /* !current_klongsize */
+	{
+		return tcp->ext_arg[argn];
+	}
 #else
 	return tcp->u_arg[argn];
 #endif
