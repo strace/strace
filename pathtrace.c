@@ -248,19 +248,31 @@ pathtrace_match(struct tcb *tcp)
 	{
 		int     i, j;
 		int     nfds;
-		long   *args, oldargs[5];
-		unsigned fdsize;
+		long   *args;
+		long    select_args[5];
+		unsigned int oldselect_args[5];
+		unsigned int fdsize;
 		fd_set *fds;
 
-		args = tcp->u_arg;
 		if (SEN_oldselect == s->sen) {
-			if (umoven(tcp, tcp->u_arg[0], sizeof oldargs,
-				   oldargs) < 0)
-			{
-				error_msg("umoven() failed");
-				return 0;
+			if (sizeof(*select_args) == sizeof(*oldselect_args)) {
+				if (umove(tcp, tcp->u_arg[0], &select_args)) {
+					return 0;
+				}
+			} else {
+				unsigned int n;
+
+				if (umove(tcp, tcp->u_arg[0], &oldselect_args)) {
+					return 0;
+				}
+
+				for (n = 0; n < 5; ++n) {
+					select_args[n] = oldselect_args[n];
+				}
 			}
-			args = oldargs;
+			args = select_args;
+		} else {
+			args = tcp->u_arg;
 		}
 
 		/* Kernel truncates arg[0] to int, we do the same. */
@@ -278,7 +290,6 @@ pathtrace_match(struct tcb *tcp)
 			if (args[i] == 0)
 				continue;
 			if (umoven(tcp, args[i], fdsize, fds) < 0) {
-				error_msg("umoven() failed");
 				continue;
 			}
 			for (j = 0;; j++) {
@@ -311,7 +322,7 @@ pathtrace_match(struct tcb *tcp)
 			return 0;
 
 		for (cur = start; cur < end; cur += sizeof(fds))
-			if ((umoven(tcp, cur, sizeof fds, &fds) == 0)
+			if ((umove(tcp, cur, &fds) == 0)
 			    && fdmatch(tcp, fds.fd))
 				return 1;
 
