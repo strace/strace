@@ -261,7 +261,7 @@ SYS_FUNC(pselect6)
 			/* NB: kernel requires data[1] == NSIG / 8 */
 			print_sigset_addr_len(tcp, (unsigned long) data[0],
 					      (unsigned long) data[1]);
-			tprintf(", %llu}", (unsigned long long) data[1]);
+			tprintf(", %" PRI_klu "}", data[1]);
 		}
 	}
 

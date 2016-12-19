@@ -33,8 +33,8 @@ SYS_FUNC(kcmp)
 	pid_t pid1 = tcp->u_arg[0];
 	pid_t pid2 = tcp->u_arg[1];
 	int type = tcp->u_arg[2];
-	unsigned long long idx1 = getarg_ull(tcp, 3);
-	unsigned long long idx2 = getarg_ull(tcp, 4);
+	kernel_ulong_t idx1 = getarg_klu(tcp, 3);
+	kernel_ulong_t idx2 = getarg_klu(tcp, 4);
 
 	tprintf("%d, %d, ", pid1, pid2);
 	printxval(kcmp_types, type, "KCMP_???");
@@ -51,7 +51,7 @@ SYS_FUNC(kcmp)
 		case KCMP_VM:
 			break;
 		default:
-			tprintf(", %#llx, %#llx", idx1, idx2);
+			tprintf(", %#" PRI_klx ", %#" PRI_klx, idx1, idx2);
 	}
 
 	return RVAL_DECODED;

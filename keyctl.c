@@ -268,10 +268,10 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 SYS_FUNC(keyctl)
 {
 	int cmd = tcp->u_arg[0];
-	unsigned long long arg2 = getarg_ull(tcp, 1);
-	unsigned long long arg3 = getarg_ull(tcp, 2);
-	unsigned long long arg4 = getarg_ull(tcp, 3);
-	unsigned long long arg5 = getarg_ull(tcp, 4);
+	kernel_ulong_t arg2 = getarg_klu(tcp, 1);
+	kernel_ulong_t arg3 = getarg_klu(tcp, 2);
+	kernel_ulong_t arg4 = getarg_klu(tcp, 3);
+	kernel_ulong_t arg5 = getarg_klu(tcp, 4);
 
 	if (entering(tcp)) {
 		printxval(keyctl_commands, cmd, "KEYCTL_???");
@@ -363,7 +363,9 @@ SYS_FUNC(keyctl)
 		return 0;
 
 	default:
-		tprintf("%#llx, %#llx, %#llx, %#llx", arg2, arg3, arg4, arg5);
+		tprintf("%#" PRI_klx ", %#" PRI_klx
+			", %#" PRI_klx ", %#" PRI_klx,
+			arg2, arg3, arg4, arg5);
 		break;
 	}
 

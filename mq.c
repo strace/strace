@@ -49,7 +49,7 @@ SYS_FUNC(mq_timedsend)
 {
 	tprintf("%d, ", (int) tcp->u_arg[0]);
 	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %llu, %u, ", getarg_ull(tcp, 2),
+	tprintf(", %" PRI_klu ", %u, ", getarg_klu(tcp, 2),
 		(unsigned int) tcp->u_arg[3]);
 	print_timespec(tcp, tcp->u_arg[4]);
 	return RVAL_DECODED;
@@ -64,7 +64,7 @@ SYS_FUNC(mq_timedreceive)
 			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
 		else
 			printaddr(tcp->u_arg[1]);
-		tprintf(", %llu, ", getarg_ull(tcp, 2));
+		tprintf(", %" PRI_klu ", ", getarg_klu(tcp, 2));
 		printnum_int(tcp, tcp->u_arg[3], "%u");
 		tprintf(", ");
 		/*

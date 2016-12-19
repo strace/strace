@@ -42,7 +42,7 @@ SYS_FUNC(fadvise64)
 
 	printfd(tcp, tcp->u_arg[0]);
 	argn = printllval(tcp, ", %lld", 1);
-	tprintf(", %llu, ", getarg_ull(tcp, argn++));
+	tprintf(", %" PRI_klu ", ", getarg_klu(tcp, argn++));
 	printxval(advise, tcp->u_arg[argn], "POSIX_FADV_???");
 
 	return RVAL_DECODED;

@@ -571,14 +571,14 @@ extern int getllval(struct tcb *, unsigned long long *, int);
 extern int printllval(struct tcb *, const char *, int)
 	ATTRIBUTE_FORMAT((printf, 2, 0));
 
-extern void printaddr_ull(unsigned long long);
+extern void printaddr_klu(kernel_ulong_t addr);
 extern int printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
 	uint64_t val, const char *dflt);
 #define printxval_search(xlat__, val__, dflt__) \
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__), val__, dflt__)
-extern unsigned long long getarg_ull(struct tcb *tcp, int argn);
+extern kernel_ulong_t getarg_klu(struct tcb *tcp, int argn);
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
@@ -709,7 +709,7 @@ extern void unwind_capture_stacktrace(struct tcb* tcp);
 static inline void
 printaddr(unsigned long addr)
 {
-	printaddr_ull(addr);
+	printaddr_klu(addr);
 }
 
 static inline void
@@ -912,6 +912,16 @@ scno_is_valid(kernel_scno_t scno)
 #define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(syscall_name)
 
 #define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(sys_ ## syscall_name)(struct tcb *tcp)
+
+#if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
+# define PRI_kl "ll"
+#else
+# define PRI_kl "l"
+#endif
+
+#define PRI_kld PRI_kl"d"
+#define PRI_klu PRI_kl"u"
+#define PRI_klx PRI_kl"x"
 
 /*
  * The kernel used to define 64-bit types on 64-bit systems on a per-arch

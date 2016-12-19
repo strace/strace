@@ -467,12 +467,12 @@ printflags64(const struct xlat *xlat, uint64_t flags, const char *dflt)
 }
 
 void
-printaddr_ull(const unsigned long long addr)
+printaddr_klu(const kernel_ulong_t addr)
 {
 	if (!addr)
 		tprints("NULL");
 	else
-		tprintf("%#llx", addr);
+		tprintf("%#" PRI_klx, addr);
 }
 
 #define DEF_PRINTNUM(name, type) \
@@ -1490,8 +1490,8 @@ print_array(struct tcb *tcp,
 	return cur >= end_addr;
 }
 
-unsigned long long
-getarg_ull(struct tcb *tcp, int argn)
+kernel_ulong_t
+getarg_klu(struct tcb *tcp, int argn)
 {
 #if HAVE_STRUCT_TCB_EXT_ARG
 # if SUPPORTED_PERSONALITIES > 1
@@ -1511,7 +1511,7 @@ printargs(struct tcb *tcp)
 	const int n = tcp->s_ent->nargs;
 	int i;
 	for (i = 0; i < n; ++i)
-		tprintf("%s%#llx", i ? ", " : "", getarg_ull(tcp, i));
+		tprintf("%s%#" PRI_klx, i ? ", " : "", getarg_klu(tcp, i));
 	return RVAL_DECODED;
 }
 
