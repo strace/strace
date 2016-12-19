@@ -321,8 +321,8 @@ print_perf_event_attr(struct tcb *tcp, unsigned long addr)
 	 * are not aware about.
 	 */
 	if (attr->__reserved_1)
-		tprintf(", __reserved_1=%#llx /* Bits 63..28 */",
-		        (unsigned long long) attr->__reserved_1);
+		tprintf(", __reserved_1=%#" PRIx64 " /* Bits 63..28 */",
+		        (uint64_t) attr->__reserved_1);
 
 	if (attr->watermark)
 		tprintf(", wakeup_watermark=%u", attr->wakeup_watermark);
