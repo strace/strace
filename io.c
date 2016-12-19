@@ -122,13 +122,6 @@ tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr,
 		    umoven_or_printaddr_ignore_syserror, print_iovec, &config);
 }
 
-void
-tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr,
-	   enum iov_decode decode_iov)
-{
-	tprint_iov_upto(tcp, len, addr, decode_iov, -1UL);
-}
-
 SYS_FUNC(readv)
 {
 	if (entering(tcp)) {
