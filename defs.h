@@ -575,7 +575,6 @@ extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
 	uint64_t val, const char *dflt);
 #define printxval_search(xlat__, val__, dflt__) \
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__), val__, dflt__)
-extern long long getarg_ll(struct tcb *tcp, int argn);
 extern unsigned long long getarg_ull(struct tcb *tcp, int argn);
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);

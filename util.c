@@ -1490,21 +1490,6 @@ print_array(struct tcb *tcp,
 	return cur >= end_addr;
 }
 
-long long
-getarg_ll(struct tcb *tcp, int argn)
-{
-#if HAVE_STRUCT_TCB_EXT_ARG
-# if SUPPORTED_PERSONALITIES > 1
-	if (current_personality == 1)
-		return (long) tcp->u_arg[argn];
-	else
-# endif
-	return (long long) tcp->ext_arg[argn];
-#else
-	return (long) tcp->u_arg[argn];
-#endif
-}
-
 unsigned long long
 getarg_ull(struct tcb *tcp, int argn)
 {
