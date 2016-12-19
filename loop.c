@@ -35,6 +35,7 @@ typedef struct loop_info struct_loop_info;
 
 #include MPERS_DEFS
 
+#include "xlat/loop_cmds.h"
 #include "xlat/loop_flags_options.h"
 #include "xlat/loop_crypt_type_options.h"
 
@@ -173,13 +174,9 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 		break;
 
 	case LOOP_CLR_FD:
-#ifdef LOOP_SET_CAPACITY
 	case LOOP_SET_CAPACITY:
-#endif
-#ifdef LOOP_CTL_GET_FREE
 	/* newer loop-control stuff */
 	case LOOP_CTL_GET_FREE:
-#endif
 		/* Takes no arguments */
 		break;
 
@@ -189,19 +186,15 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 		printfd(tcp, arg);
 		break;
 
-#ifdef LOOP_CTL_ADD
 	/* newer loop-control stuff */
 	case LOOP_CTL_ADD:
 	case LOOP_CTL_REMOVE:
 		tprintf(", %d", (int) arg);
 		break;
-#endif
 
-#ifdef LOOP_SET_DIRECT_IO
 	case LOOP_SET_DIRECT_IO:
 		tprintf(", %" PRI_klu, arg);
 		break;
-#endif
 
 	default:
 		return RVAL_DECODED;
