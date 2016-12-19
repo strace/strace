@@ -46,8 +46,8 @@ print_struct_flock64(const struct_kernel_flock64 *fl, const int getlk)
 	printxval(lockfcmds, (unsigned short) fl->l_type, "F_???");
 	tprints(", l_whence=");
 	printxval(whence_codes, (unsigned short) fl->l_whence, "SEEK_???");
-	tprintf(", l_start=%lld, l_len=%lld",
-		(long long) fl->l_start, (long long) fl->l_len);
+	tprintf(", l_start=%" PRId64 ", l_len=%" PRId64,
+		(int64_t) fl->l_start, (int64_t) fl->l_len);
 	if (getlk)
 		tprintf(", l_pid=%lu", (unsigned long) fl->l_pid);
 	tprints("}");
