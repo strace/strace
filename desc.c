@@ -192,26 +192,26 @@ decode_select(struct tcb *tcp, long *args,
 
 SYS_FUNC(oldselect)
 {
-	long long_args[5];
-#undef oldselect_args
-#if SIZEOF_LONG == 4
-# define oldselect_args long_args
-#else
+	long select_args[5];
 	unsigned int oldselect_args[5];
-	unsigned int i;
-#endif
 
-	if (umove(tcp, tcp->u_arg[0], &oldselect_args) < 0) {
-		printaddr(tcp->u_arg[0]);
-		return 0;
+	if (sizeof(*select_args) == sizeof(*oldselect_args)) {
+		if (umove_or_printaddr(tcp, tcp->u_arg[0], &select_args)) {
+			return 0;
+		}
+	} else {
+		unsigned int i;
+
+		if (umove_or_printaddr(tcp, tcp->u_arg[0], &oldselect_args)) {
+			return 0;
+		}
+
+		for (i = 0; i < 5; ++i) {
+			select_args[i] = oldselect_args[i];
+		}
 	}
-#ifndef oldselect_args
-	for (i = 0; i < 5; i++) {
-		long_args[i] = oldselect_args[i];
-	}
-#endif
-	return decode_select(tcp, long_args, print_timeval, sprint_timeval);
-#undef oldselect_args
+
+	return decode_select(tcp, select_args, print_timeval, sprint_timeval);
 }
 
 #ifdef ALPHA
