@@ -670,7 +670,6 @@ name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)
 DECL_IOCTL(dm);
 DECL_IOCTL(file);
 DECL_IOCTL(fs_x);
-DECL_IOCTL(loop);
 DECL_IOCTL(ptp);
 DECL_IOCTL(scsi);
 DECL_IOCTL(sock);

@@ -29,13 +29,19 @@
 #include <linux/ioctl.h>
 #include <linux/loop.h>
 
+typedef struct loop_info struct_loop_info;
+
+#include DEF_MPERS_TYPE(struct_loop_info)
+
+#include MPERS_DEFS
+
 #include "xlat/loop_flags_options.h"
 #include "xlat/loop_crypt_type_options.h"
 
 static void
 decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	struct loop_info info;
+	struct_loop_info info;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &info))
@@ -46,7 +52,7 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!abbrev(tcp)) {
 		tprints(", lo_device=");
 		print_dev_t(info.lo_device);
-		tprintf(", lo_inode=%lu", info.lo_inode);
+		tprintf(", lo_inode=%" PRI_klu, (kernel_ulong_t) info.lo_inode);
 		tprints(", lo_rdevice=");
 		print_dev_t(info.lo_rdevice);
 	}
@@ -74,9 +80,10 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (!abbrev(tcp))
-		tprintf(", lo_init=[%#lx, %#lx]"
+		tprintf(", lo_init=[%#" PRI_klx ", %#" PRI_klx "]"
 			", reserved=[%#x, %#x, %#x, %#x]}",
-			info.lo_init[0], info.lo_init[1],
+			(kernel_ulong_t) info.lo_init[0],
+			(kernel_ulong_t) info.lo_init[1],
 			info.reserved[0], info.reserved[1],
 			info.reserved[2], info.reserved[3]);
 	else
@@ -141,9 +148,9 @@ decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprints(", ...}");
 }
 
-int
-loop_ioctl(struct tcb *const tcp, const unsigned int code,
-	   const kernel_ulong_t arg)
+MPERS_PRINTER_DECL(int, loop_ioctl,
+		   struct tcb *tcp, const unsigned int code,
+		   const kernel_ulong_t arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;
