@@ -34,9 +34,9 @@ SYS_FUNC(process_vm_readv)
 		/* arg 1: pid */
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
-		unsigned long local_iovcnt = widen_to_ulong(tcp->u_arg[2]);
-		unsigned long remote_iovcnt = widen_to_ulong(tcp->u_arg[4]);
-		unsigned long flags = widen_to_ulong(tcp->u_arg[5]);
+		unsigned long local_iovcnt = tcp->u_arg[2];
+		unsigned long remote_iovcnt = tcp->u_arg[4];
+		unsigned long flags = tcp->u_arg[5];
 
 		/* arg 2: local iov */
 		tprint_iov_upto(tcp, local_iovcnt, tcp->u_arg[1],
@@ -56,9 +56,9 @@ SYS_FUNC(process_vm_readv)
 
 SYS_FUNC(process_vm_writev)
 {
-	unsigned long local_iovcnt = widen_to_ulong(tcp->u_arg[2]);
-	unsigned long remote_iovcnt = widen_to_ulong(tcp->u_arg[4]);
-	unsigned long flags = widen_to_ulong(tcp->u_arg[5]);
+	unsigned long local_iovcnt = tcp->u_arg[2];
+	unsigned long remote_iovcnt = tcp->u_arg[4];
+	unsigned long flags = tcp->u_arg[5];
 
 	/* arg 1: pid */
 	tprintf("%d, ", (int) tcp->u_arg[0]);
