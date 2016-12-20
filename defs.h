@@ -597,12 +597,15 @@ extern void dumpiov_upto(struct tcb *, int, long, unsigned long);
 extern void dumpstr(struct tcb *, long, int);
 extern void printstr_ex(struct tcb *, long addr, long len,
 	unsigned int user_style);
-extern bool printnum_short(struct tcb *, long, const char *)
-	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern bool printnum_int(struct tcb *, long, const char *)
-	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern bool printnum_int64(struct tcb *, long, const char *)
-	ATTRIBUTE_FORMAT((printf, 3, 0));
+
+#define DECL_PRINTNUM(name)						\
+extern bool								\
+printnum_ ## name(struct tcb *, long addr, const char *fmt)		\
+	ATTRIBUTE_FORMAT((printf, 3, 0))
+DECL_PRINTNUM(short);
+DECL_PRINTNUM(int);
+DECL_PRINTNUM(int64);
+#undef DECL_PRINTNUM
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 extern bool printnum_long_int(struct tcb *, long, const char *, const char *)
@@ -630,10 +633,14 @@ extern bool printnum_long_int(struct tcb *, long, const char *, const char *)
 	printnum_int((tcp), (addr), "%#x")
 #endif
 
-extern bool printpair_int(struct tcb *, long, const char *)
-	ATTRIBUTE_FORMAT((printf, 3, 0));
-extern bool printpair_int64(struct tcb *, long, const char *)
-	ATTRIBUTE_FORMAT((printf, 3, 0));
+#define DECL_PRINTPAIR(name)						\
+extern bool								\
+printpair_ ## name(struct tcb *, long addr, const char *fmt)		\
+	ATTRIBUTE_FORMAT((printf, 3, 0))
+DECL_PRINTPAIR(int);
+DECL_PRINTPAIR(int64);
+#undef DECL_PRINTPAIR
+
 extern void printpath(struct tcb *, long);
 extern void printpathn(struct tcb *, long, unsigned int);
 #define TIMESPEC_TEXT_BUFSIZE \
