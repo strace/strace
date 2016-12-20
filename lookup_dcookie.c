@@ -40,7 +40,7 @@ SYS_FUNC(lookup_dcookie)
 	if (syserror(tcp))
 		printaddr(tcp->u_arg[argn]);
 	else
-		printstr(tcp, tcp->u_arg[argn], tcp->u_rval);
+		printstrn(tcp, tcp->u_arg[argn], tcp->u_rval);
 
 	/* len */
 	tprintf(", %" PRI_klu, getarg_klu(tcp, argn + 1));

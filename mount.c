@@ -65,7 +65,7 @@ SYS_FUNC(mount)
 	if (ignore_type)
 		printaddr(tcp->u_arg[2]);
 	else
-		printstr(tcp, tcp->u_arg[2], -1);
+		printstr(tcp, tcp->u_arg[2]);
 	tprints(", ");
 
 	if (old_magic) {
@@ -80,7 +80,7 @@ SYS_FUNC(mount)
 	if (ignore_data)
 		printaddr(tcp->u_arg[4]);
 	else
-		printstr(tcp, tcp->u_arg[4], -1);
+		printstr(tcp, tcp->u_arg[4]);
 
 	return RVAL_DECODED;
 }

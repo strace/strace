@@ -113,7 +113,7 @@ SYS_FUNC(kexec_file_load)
 	/* cmdline_len */
 	tprintf("%" PRI_klu ", ", getarg_klu(tcp, 2));
 	/* cmdline */
-	printstr(tcp, tcp->u_arg[3], tcp->u_arg[2]);
+	printstrn(tcp, tcp->u_arg[3], tcp->u_arg[2]);
 	tprints(", ");
 	/* flags */
 	printflags64(kexec_file_load_flags, getarg_klu(tcp, 4), "KEXEC_FILE_???");

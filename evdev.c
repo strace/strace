@@ -438,7 +438,7 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 			if (syserror(tcp))
 				printaddr(arg);
 			else
-				printstr(tcp, arg, tcp->u_rval);
+				printstrn(tcp, arg, tcp->u_rval);
 			return 1;
 # ifdef EVIOCGPROP
 		case _IOC_NR(EVIOCGPROP(0)):

@@ -70,7 +70,7 @@ printargv(struct tcb *const tcp, kernel_ureg_t addr)
 			break;
 		}
 		tprints(sep);
-		printstr(tcp, wordsize < sizeof(cp.p64) ? cp.p32 : cp.p64, -1);
+		printstr(tcp, wordsize < sizeof(cp.p64) ? cp.p32 : cp.p64);
 	}
 	tprints("]");
 }

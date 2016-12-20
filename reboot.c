@@ -17,7 +17,7 @@ SYS_FUNC(reboot)
 	printflags(bootflags3, cmd, "LINUX_REBOOT_CMD_???");
 	if (cmd == LINUX_REBOOT_CMD_RESTART2) {
 		tprints(", ");
-		printstr(tcp, tcp->u_arg[3], -1);
+		printstr(tcp, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;
 }

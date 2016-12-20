@@ -765,9 +765,15 @@ printaddr(kernel_ureg_t addr)
 }
 
 static inline void
-printstr(struct tcb *tcp, kernel_ureg_t addr, long len)
+printstrn(struct tcb *tcp, kernel_ureg_t addr, long len)
 {
 	printstr_ex(tcp, addr, len, 0);
+}
+
+static inline void
+printstr(struct tcb *tcp, kernel_ureg_t addr)
+{
+	printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
 }
 
 static inline int

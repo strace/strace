@@ -130,7 +130,7 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 	case SUB_COMMON:
 		if (cb->aio_lio_opcode == 1 && iocb_is_valid(cb)) {
 			tprints(", str=");
-			printstr(tcp, cb->aio_buf, cb->aio_nbytes);
+			printstrn(tcp, cb->aio_buf, cb->aio_nbytes);
 		} else {
 			tprintf(", buf=%#" PRIx64, (uint64_t) cb->aio_buf);
 		}

@@ -207,7 +207,7 @@ sock_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ureg_t a
 	case SIOCBRADDBR:
 	case SIOCBRDELBR:
 		tprints(", ");
-		printstr(tcp, arg, -1);
+		printstr(tcp, arg);
 		break;
 #endif
 

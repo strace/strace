@@ -252,7 +252,7 @@ SYS_FUNC(prctl)
 		if (arg2 == PR_SET_VMA_ANON_NAME) {
 			tprintf(", PR_SET_VMA_ANON_NAME, %#" PRI_klx, arg3);
 			tprintf(", %" PRI_klu ", ", arg4);
-			printstr(tcp, arg5, -1);
+			printstr(tcp, arg5);
 		} else {
 			/* There are no other sub-options now, but there
 			 * might be in future... */

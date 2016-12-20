@@ -40,7 +40,7 @@ fetch_nlmsghdr(struct tcb *const tcp, struct nlmsghdr *const nlmsghdr,
 	       const kernel_ureg_t addr, const unsigned long len)
 {
 	if (len < sizeof(struct nlmsghdr)) {
-		printstr(tcp, addr, len);
+		printstrn(tcp, addr, len);
 		return false;
 	}
 
@@ -81,7 +81,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 	if (nlmsg_len > sizeof(struct nlmsghdr)) {
 		tprints(", ");
 
-		printstr(tcp, addr + sizeof(struct nlmsghdr),
+		printstrn(tcp, addr + sizeof(struct nlmsghdr),
 			 nlmsg_len - sizeof(struct nlmsghdr));
 	}
 

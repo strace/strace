@@ -170,7 +170,7 @@ bpf_prog_load(struct tcb *const tcp, const kernel_ureg_t addr,
 	printxval(bpf_prog_types, attr.prog_type, "BPF_PROG_TYPE_???");
 	tprintf(", insn_cnt=%u, insns=%#" PRIx64 ", license=",
 		attr.insn_cnt, attr.insns);
-	printstr(tcp, attr.license, -1);
+	printstr(tcp, attr.license);
 	tprintf(", log_level=%u, log_size=%u, log_buf=%#" PRIx64 ", kern_version=%u}",
 		attr.log_level, attr.log_size, attr.log_buf, attr.kern_version);
 

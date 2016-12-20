@@ -41,7 +41,7 @@ SYS_FUNC(read)
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
-			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %lu", tcp->u_arg[2]);
 	}
 	return 0;
@@ -51,7 +51,7 @@ SYS_FUNC(write)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu", tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -87,7 +87,7 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 				len = c->data_size;
 			if (c->data_size != -1UL)
 				c->data_size -= len;
-			printstr(tcp, iov[0], len);
+			printstrn(tcp, iov[0], len);
 			break;
 		case IOV_DECODE_NETLINK:
 			if (len > c->data_size)
@@ -156,7 +156,7 @@ SYS_FUNC(pread)
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
-			printstr(tcp, tcp->u_arg[1], tcp->u_rval);
+			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %lu, ", tcp->u_arg[2]);
 		printllval(tcp, "%lld", 3);
 	}
@@ -167,7 +167,7 @@ SYS_FUNC(pwrite)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %lu, ", tcp->u_arg[2]);
 	printllval(tcp, "%lld", 3);
 

@@ -45,7 +45,7 @@ MPERS_PRINTER_DECL(void, tprint_msgbuf, struct tcb *const tcp,
 
 	if (!umove_or_printaddr(tcp, addr, &msg)) {
 		tprintf("{%lu, ", (long) msg.mtype);
-		printstr(tcp, addr + sizeof(msg.mtype), count);
+		printstrn(tcp, addr + sizeof(msg.mtype), count);
 		tprints("}");
 	}
 	tprintf(", %lu, ", count);

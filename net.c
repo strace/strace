@@ -113,7 +113,7 @@ decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ureg_t addr,
 		decode_netlink(tcp, addr, addrlen);
 		break;
 	default:
-		printstr(tcp, addr, addrlen);
+		printstrn(tcp, addr, addrlen);
 	}
 }
 
@@ -605,7 +605,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		if (len == sizeof(int)) {
 			printnum_int(tcp, addr, "%d");
 		} else {
-			printstr(tcp, addr, len);
+			printstrn(tcp, addr, len);
 		}
 	} else {
 		printaddr(addr);
@@ -642,7 +642,7 @@ print_mreq(struct tcb *const tcp, const kernel_ureg_t addr,
 	struct ip_mreq mreq;
 
 	if (len < sizeof(mreq)) {
-		printstr(tcp, addr, len);
+		printstrn(tcp, addr, len);
 		return;
 	}
 	if (umove_or_printaddr(tcp, addr, &mreq))
@@ -685,7 +685,7 @@ print_mreq6(struct tcb *const tcp, const kernel_ureg_t addr,
 	return;
 
 fail:
-	printstr(tcp, addr, len);
+	printstrn(tcp, addr, len);
 }
 #endif /* IPV6_ADD_MEMBERSHIP */
 
@@ -837,7 +837,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		if (len == sizeof(int)) {
 			printnum_int(tcp, addr, "%d");
 		} else {
-			printstr(tcp, addr, len);
+			printstrn(tcp, addr, len);
 		}
 	} else {
 		printaddr(addr);

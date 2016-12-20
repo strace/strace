@@ -275,7 +275,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	/* ioctls with an indirect parameter displayed as a char */
 	case TIOCSTI:
 		tprints(", ");
-		printstr(tcp, arg, 1);
+		printstrn(tcp, arg, 1);
 		break;
 
 	/* ioctls with no parameters */
