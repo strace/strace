@@ -665,8 +665,12 @@ tprint_iov_upto(struct tcb *, unsigned long len, kernel_ureg_t addr,
 extern void decode_netlink(struct tcb *, unsigned long, unsigned long);
 extern void tprint_open_modes(unsigned int);
 extern const char *sprint_open_modes(unsigned int);
-extern void print_seccomp_filter(struct tcb *, unsigned long);
-extern void print_seccomp_fprog(struct tcb *, unsigned long, unsigned short);
+
+extern void
+print_seccomp_filter(struct tcb *, kernel_ureg_t addr);
+
+extern void
+print_seccomp_fprog(struct tcb *, kernel_ureg_t addr, unsigned short len);
 
 struct strace_stat;
 extern void print_struct_stat(struct tcb *tcp, const struct strace_stat *const st);

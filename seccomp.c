@@ -172,7 +172,8 @@ print_bpf_filter(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 void
-print_seccomp_fprog(struct tcb *tcp, unsigned long addr, unsigned short len)
+print_seccomp_fprog(struct tcb *const tcp, const kernel_ureg_t addr,
+		    const unsigned short len)
 {
 	if (abbrev(tcp)) {
 		printaddr(addr);
@@ -188,7 +189,7 @@ print_seccomp_fprog(struct tcb *tcp, unsigned long addr, unsigned short len)
 #include "seccomp_fprog.h"
 
 void
-print_seccomp_filter(struct tcb *tcp, unsigned long addr)
+print_seccomp_filter(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct seccomp_fprog fprog;
 
@@ -200,7 +201,8 @@ print_seccomp_filter(struct tcb *tcp, unsigned long addr)
 }
 
 static void
-decode_seccomp_set_mode_strict(unsigned int flags, unsigned long addr)
+decode_seccomp_set_mode_strict(const unsigned int flags,
+			       const kernel_ureg_t addr)
 {
 	tprintf("%u, ", flags);
 	printaddr(addr);
