@@ -657,8 +657,11 @@ extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 #define tprintsigmask_addr(prefix, mask) \
 	tprints(sprintsigmask_n((prefix), (mask), sizeof(mask)))
 extern void printsignal(int);
-extern void tprint_iov_upto(struct tcb *, unsigned long, unsigned long,
-			    enum iov_decode, unsigned long);
+
+extern void
+tprint_iov_upto(struct tcb *, unsigned long len, kernel_ureg_t addr,
+		enum iov_decode, unsigned long data_size);
+
 extern void decode_netlink(struct tcb *, unsigned long, unsigned long);
 extern void tprint_open_modes(unsigned int);
 extern const char *sprint_open_modes(unsigned int);
@@ -758,7 +761,7 @@ printxval_long(const struct xlat *x, const unsigned long val, const char *dflt)
 }
 
 static inline void
-tprint_iov(struct tcb *tcp, unsigned long len, unsigned long addr,
+tprint_iov(struct tcb *tcp, unsigned long len, kernel_ureg_t addr,
 	   enum iov_decode decode_iov)
 {
 	tprint_iov_upto(tcp, len, addr, decode_iov, -1UL);

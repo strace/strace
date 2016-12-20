@@ -111,8 +111,9 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
  * Example: recvmsg returing a short read.
  */
 void
-tprint_iov_upto(struct tcb *tcp, unsigned long len, unsigned long addr,
-		enum iov_decode decode_iov, unsigned long data_size)
+tprint_iov_upto(struct tcb *const tcp, const unsigned long len,
+		const kernel_ureg_t addr, const enum iov_decode decode_iov,
+		const unsigned long data_size)
 {
 	unsigned long iov[2];
 	struct print_iovec_config config =
