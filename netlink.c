@@ -36,8 +36,8 @@
  * Fetch a struct nlmsghdr from the given address.
  */
 static bool
-fetch_nlmsghdr(struct tcb *tcp, struct nlmsghdr *nlmsghdr,
-	       const unsigned long addr, const unsigned long len)
+fetch_nlmsghdr(struct tcb *const tcp, struct nlmsghdr *const nlmsghdr,
+	       const kernel_ureg_t addr, const unsigned long len)
 {
 	if (len < sizeof(struct nlmsghdr)) {
 		printstr(tcp, addr, len);
@@ -67,9 +67,9 @@ print_nlmsghdr(struct tcb *tcp, const struct nlmsghdr *const nlmsghdr)
 }
 
 static void
-decode_nlmsghdr_with_payload(struct tcb *tcp,
+decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const struct nlmsghdr *const nlmsghdr,
-			     const unsigned long addr,
+			     const kernel_ureg_t addr,
 			     const unsigned long len)
 {
 	tprints("{");
@@ -89,7 +89,7 @@ decode_nlmsghdr_with_payload(struct tcb *tcp,
 }
 
 void
-decode_netlink(struct tcb *tcp, unsigned long addr, unsigned long len)
+decode_netlink(struct tcb *const tcp, kernel_ureg_t addr, unsigned long len)
 {
 	struct nlmsghdr nlmsghdr;
 	bool print_array = false;
@@ -102,7 +102,8 @@ decode_netlink(struct tcb *tcp, unsigned long addr, unsigned long len)
 		}
 
 		unsigned long nlmsg_len = NLMSG_ALIGN(nlmsghdr.nlmsg_len);
-		unsigned long next_addr = 0, next_len = 0;
+		kernel_ureg_t next_addr = 0;
+		unsigned long next_len = 0;
 
 		if (nlmsghdr.nlmsg_len >= sizeof(struct nlmsghdr)) {
 			next_len = (len >= nlmsg_len) ? len - nlmsg_len : 0;
