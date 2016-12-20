@@ -651,8 +651,12 @@ DECL_PRINTPAIR(int);
 DECL_PRINTPAIR(int64);
 #undef DECL_PRINTPAIR
 
-extern void printpath(struct tcb *, long);
-extern void printpathn(struct tcb *, long, unsigned int);
+extern void
+printpathn(struct tcb *, kernel_ureg_t addr, unsigned int n);
+
+extern void
+printpath(struct tcb *, kernel_ureg_t addr);
+
 #define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(intmax_t)*3 * 2 + sizeof("{tv_sec=%jd, tv_nsec=%jd}"))
 extern void printfd(struct tcb *, int);

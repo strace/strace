@@ -813,7 +813,7 @@ print_quoted_string(const char *str, unsigned int size,
  * If path length exceeds `n', append `...' to the output.
  */
 void
-printpathn(struct tcb *tcp, long addr, unsigned int n)
+printpathn(struct tcb *const tcp, const kernel_ureg_t addr, unsigned int n)
 {
 	char path[PATH_MAX + 1];
 	int nul_seen;
@@ -840,7 +840,7 @@ printpathn(struct tcb *tcp, long addr, unsigned int n)
 }
 
 void
-printpath(struct tcb *tcp, long addr)
+printpath(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	/* Size must correspond to char path[] size in printpathn */
 	printpathn(tcp, addr, PATH_MAX);
