@@ -41,6 +41,7 @@
 #define MA 0
 #define SI 0
 #define SE 0
+#define CST 0
 #define SEN(arg) 0,0
 
 static const struct_sysent syscallent[] = {

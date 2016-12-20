@@ -356,6 +356,7 @@ extern const struct xlat whence_codes[];
 #define STACKTRACE_INVALIDATE_CACHE 0400  /* Trigger proc/maps cache updating */
 #define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
 #define TRACE_INDIRECT_SUBCALL	02000	/* Syscall is an indirect socket/ipc subcall. */
+#define COMPAT_SYSCALL_TYPES	04000	/* A compat syscall that uses compat types. */
 
 #define IOCTL_NUMBER_UNKNOWN 0
 #define IOCTL_NUMBER_HANDLED 1

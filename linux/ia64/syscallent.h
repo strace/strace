@@ -30,16 +30,17 @@
  * IA-32 syscalls that have pointer arguments which are incompatible
  * with 64-bit layout get redirected to printargs.
  */
-#undef SYS_FUNC_NAME
-#define SYS_FUNC_NAME(syscall_name) printargs
-#include "../i386/syscallent.h"
-#undef SYS_FUNC_NAME
-#define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(syscall_name)
+#if CST > 0
+# undef SYS_FUNC_NAME
+# define SYS_FUNC_NAME(syscall_name) printargs
+# include "../i386/syscallent.h"
+# undef SYS_FUNC_NAME
+# define SYS_FUNC_NAME(syscall_name) MPERS_FUNC_NAME(syscall_name)
+#endif
 
 /* You must be careful to check ../i386/syscallent.h so that this table
    starts where that one leaves off.
 */
-[(SYS_ipc_subcall + SYS_ipc_nsubcalls) ... 1023] = { },
 [1024] = { 0,	0,		SEN(printargs),			"ni_syscall"		},
 [1025] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [1026] = { 3,	TD,		SEN(read),			"read"			},
