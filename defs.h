@@ -694,8 +694,12 @@ struct strace_stat;
 extern void print_struct_stat(struct tcb *tcp, const struct strace_stat *const st);
 
 struct strace_statfs;
-extern void print_struct_statfs(struct tcb *tcp, long);
-extern void print_struct_statfs64(struct tcb *tcp, long, unsigned long);
+
+extern void
+print_struct_statfs(struct tcb *, kernel_ureg_t addr);
+
+extern void
+print_struct_statfs64(struct tcb *, kernel_ureg_t addr, unsigned long size);
 
 extern void print_ifindex(unsigned int);
 

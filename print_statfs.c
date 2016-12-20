@@ -56,7 +56,7 @@ print_statfs_number(const char *const prefix, const unsigned long long number)
 }
 
 void
-print_struct_statfs(struct tcb *tcp, const long addr)
+print_struct_statfs(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 #ifdef HAVE_STRUCT_STATFS
 	struct strace_statfs b;
@@ -91,7 +91,8 @@ print_struct_statfs(struct tcb *tcp, const long addr)
 }
 
 void
-print_struct_statfs64(struct tcb *tcp, const long addr, const unsigned long size)
+print_struct_statfs64(struct tcb *const tcp, const kernel_ureg_t addr,
+		      const unsigned long size)
 {
 #ifdef HAVE_STRUCT_STATFS64
 	struct strace_statfs b;
