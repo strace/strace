@@ -28,11 +28,13 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <unistd.h>
 #include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_execveat
+
+# include <stdio.h>
+# include <unistd.h>
 
 # define FILENAME "test.execveat\nfilename"
 # define Q_FILENAME "test.execveat\\nfilename"
