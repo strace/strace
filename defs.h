@@ -508,19 +508,19 @@ extern int upoke(int pid, long, long);
 
 extern bool
 print_array(struct tcb *tcp,
-	    const unsigned long start_addr,
-	    const size_t nmemb,
-	    void *const elem_buf,
-	    const size_t elem_size,
-	    int (*const umoven_func)(struct tcb *,
+	    kernel_ureg_t start_addr,
+	    size_t nmemb,
+	    void *elem_buf,
+	    size_t elem_size,
+	    int (*umoven_func)(struct tcb *,
 				     long,
 				     unsigned int,
 				     void *),
-	    bool (*const print_func)(struct tcb *,
+	    bool (*print_func)(struct tcb *,
 				     void *elem_buf,
 				     size_t elem_size,
 				     void *opaque_data),
-	    void *const opaque_data);
+	    void *opaque_data);
 
 #if defined ALPHA || defined IA64 || defined MIPS \
  || defined SH || defined SPARC || defined SPARC64

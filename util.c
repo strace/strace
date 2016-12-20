@@ -1420,8 +1420,8 @@ umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
  * - umoven_func has not returned false.
  */
 bool
-print_array(struct tcb *tcp,
-	    const unsigned long start_addr,
+print_array(struct tcb *const tcp,
+	    const kernel_ureg_t start_addr,
 	    const size_t nmemb,
 	    void *const elem_buf,
 	    const size_t elem_size,
@@ -1446,17 +1446,17 @@ print_array(struct tcb *tcp,
 	}
 
 	const size_t size = nmemb * elem_size;
-	const unsigned long end_addr = start_addr + size;
+	const kernel_ureg_t end_addr = start_addr + size;
 
 	if (end_addr <= start_addr || size / elem_size != nmemb) {
 		printaddr(start_addr);
 		return false;
 	}
 
-	const unsigned long abbrev_end =
+	const kernel_ureg_t abbrev_end =
 		(abbrev(tcp) && max_strlen < nmemb) ?
 			start_addr + elem_size * max_strlen : end_addr;
-	unsigned long cur;
+	kernel_ureg_t cur;
 
 	for (cur = start_addr; cur < end_addr; cur += elem_size) {
 		if (cur != start_addr)
