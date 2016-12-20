@@ -185,9 +185,9 @@ SYS_FUNC(munmap)
 static int
 do_mprotect(struct tcb *tcp, bool has_pkey)
 {
-	printaddr(tcp->u_arg[0]);
-	tprintf(", %lu, ", tcp->u_arg[1]);
-	printflags_long(mmap_prot, tcp->u_arg[2], "PROT_???");
+	printaddr_klu(getarg_klu(tcp, 0));
+	tprintf(", %" PRI_klu ", ", getarg_klu(tcp, 1));
+	printflags64(mmap_prot, getarg_klu(tcp, 2), "PROT_???");
 
 	if (has_pkey)
 		tprintf(", %d", (int) tcp->u_arg[3]);
