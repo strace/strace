@@ -242,7 +242,8 @@ printsignal(int nr)
 }
 
 static void
-print_sigset_addr_len_limit(struct tcb *tcp, long addr, long len, long min_len)
+print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ureg_t addr,
+			    const long len, const long min_len)
 {
 	/*
 	 * Here len is usually equal to NSIG / 8 or current_wordsize.
@@ -259,7 +260,8 @@ print_sigset_addr_len_limit(struct tcb *tcp, long addr, long len, long min_len)
 }
 
 void
-print_sigset_addr_len(struct tcb *tcp, long addr, long len)
+print_sigset_addr_len(struct tcb *const tcp, const kernel_ureg_t addr,
+		      const long len)
 {
 	print_sigset_addr_len_limit(tcp, addr, len, current_wordsize);
 }
@@ -304,7 +306,7 @@ struct old_sigaction32 {
 };
 
 static void
-decode_old_sigaction(struct tcb *tcp, long addr)
+decode_old_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct old_sigaction sa;
 
@@ -501,7 +503,7 @@ struct new_sigaction32
 };
 
 static void
-decode_new_sigaction(struct tcb *tcp, long addr)
+decode_new_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct new_sigaction sa;
 
