@@ -603,8 +603,10 @@ extern void dumpiov_in_msghdr(struct tcb *, long, unsigned long);
 extern void dumpiov_in_mmsghdr(struct tcb *, long);
 extern void dumpiov_upto(struct tcb *, int, long, unsigned long);
 extern void dumpstr(struct tcb *, long, int);
-extern void printstr_ex(struct tcb *, long addr, long len,
-	unsigned int user_style);
+
+extern void
+printstr_ex(struct tcb *, kernel_ureg_t addr, long len,
+	    unsigned int user_style);
 
 #define DECL_PRINTNUM(name)						\
 extern bool								\
@@ -739,7 +741,7 @@ printaddr(kernel_ureg_t addr)
 }
 
 static inline void
-printstr(struct tcb *tcp, long addr, long len)
+printstr(struct tcb *tcp, kernel_ureg_t addr, long len)
 {
 	printstr_ex(tcp, addr, len, 0);
 }

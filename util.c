@@ -856,7 +856,8 @@ printpath(struct tcb *tcp, long addr)
  * or `len' != -1 and the string length exceeds `len'.
  */
 void
-printstr_ex(struct tcb *tcp, long addr, long len, unsigned int user_style)
+printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr, const long len,
+	    const unsigned int user_style)
 {
 	static char *str = NULL;
 	static char *outstr;
