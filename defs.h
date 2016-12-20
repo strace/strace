@@ -707,7 +707,7 @@ extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
 
 static inline void
-printaddr(unsigned long addr)
+printaddr(kernel_ureg_t addr)
 {
 	printaddr_klu(addr);
 }
