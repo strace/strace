@@ -44,82 +44,82 @@ main(void)
 	static const char multi6addr[] = "ff01::c";
 	static const char interface[] = "127.0.0.1";
 
-	struct ip_mreq m4;
-	struct ipv6_mreq m6;
+	struct ip_mreq *const m4 = tail_alloc(sizeof(*m4));
+	struct ipv6_mreq *const m6 = tail_alloc(sizeof(*m6));
 	int rc;
 
-	inet_pton(AF_INET, multi4addr, &m4.imr_multiaddr);
-	inet_pton(AF_INET, interface, &m4.imr_interface);
-	inet_pton(AF_INET6, multi6addr, &m6.ipv6mr_multiaddr);
+	inet_pton(AF_INET, multi4addr, &m4->imr_multiaddr);
+	inet_pton(AF_INET, interface, &m4->imr_interface);
+	inet_pton(AF_INET6, multi6addr, &m6->ipv6mr_multiaddr);
 
-	m6.ipv6mr_interface = if_nametoindex("lo");
-	if (!m6.ipv6mr_interface)
+	m6->ipv6mr_interface = if_nametoindex("lo");
+	if (!m6->ipv6mr_interface)
 		perror_msg_and_skip("lo");
 
 	(void) close(0);
 	if (socket(AF_INET, SOCK_DGRAM, 0))
 		perror_msg_and_skip("socket");
 
-	if (setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP, &m4, sizeof(m4)) ||
-	    setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP, &m4, sizeof(m4)))
+	if (setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP, m4, sizeof(*m4)) ||
+	    setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP, m4, sizeof(*m4)))
 		perror_msg_and_skip("setsockopt");
 	printf("setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP"
 	       ", {imr_multiaddr=inet_addr(\"%s\")"
 	       ", imr_interface=inet_addr(\"%s\")}, %u) = 0\n",
-	       multi4addr, interface, (unsigned) sizeof(m4));
+	       multi4addr, interface, (unsigned) sizeof(*m4));
 	printf("setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP"
 	       ", {imr_multiaddr=inet_addr(\"%s\")"
 	       ", imr_interface=inet_addr(\"%s\")}, %u) = 0\n",
-	       multi4addr, interface, (unsigned) sizeof(m4));
+	       multi4addr, interface, (unsigned) sizeof(*m4));
 
-	rc = setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP, &m4, 1);
+	rc = setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP, m4, 1);
 	printf("setsockopt(0, SOL_IP, IP_ADD_MEMBERSHIP, \"\\%hho\", 1)"
 	       " = %s\n",
-	       * (unsigned char *) (void *) &m4, sprintrc(rc));
+	       * (unsigned char *) (void *) m4, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP, &m4, 1);
+	rc = setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP, m4, 1);
 	printf("setsockopt(0, SOL_IP, IP_DROP_MEMBERSHIP, \"\\%hho\", 1)"
 	       " = %s\n",
-	       * (unsigned char *) (void *) &m4, sprintrc(rc));
+	       * (unsigned char *) (void *) m4, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, &m6, 1);
+	rc = setsockopt(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, m6, 1);
 	printf("setsockopt(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, \"\\%hho\", 1)"
 	       " = %s\n",
-	       * (unsigned char *) (void *) &m6, sprintrc(rc));
-	rc = setsockopt(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, &m6, 1);
+	       * (unsigned char *) (void *) m6, sprintrc(rc));
+	rc = setsockopt(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, m6, 1);
 	printf("setsockopt(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, \"\\%hho\", 1)"
 	       " = %s\n",
-	       * (unsigned char *) (void *) &m6, sprintrc(rc));
+	       * (unsigned char *) (void *) m6, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, &m6, sizeof(m6));
+	rc = setsockopt(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP, m6, sizeof(*m6));
 	printf("setsockopt(0, SOL_IPV6, IPV6_ADD_MEMBERSHIP"
 	       ", {ipv6mr_multiaddr=inet_pton(\"%s\")"
 	       ", ipv6mr_interface=if_nametoindex(\"lo\")}, 20) = %s\n",
 	       multi6addr, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, &m6, sizeof(m6));
+	rc = setsockopt(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP, m6, sizeof(*m6));
 	printf("setsockopt(0, SOL_IPV6, IPV6_DROP_MEMBERSHIP"
 	       ", {ipv6mr_multiaddr=inet_pton(\"%s\")"
 	       ", ipv6mr_interface=if_nametoindex(\"lo\")}, 20) = %s\n",
 	       multi6addr, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IPV6, IPV6_JOIN_ANYCAST, &m6, 1);
+	rc = setsockopt(0, SOL_IPV6, IPV6_JOIN_ANYCAST, m6, 1);
 	printf("setsockopt(0, SOL_IPV6, IPV6_JOIN_ANYCAST, \"\\%hho\", 1)"
 	       " = %s\n",
-	       * (unsigned char *) (void *) &m6, sprintrc(rc));
+	       * (unsigned char *) (void *) m6, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, &m6, 1);
+	rc = setsockopt(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, m6, 1);
 	printf("setsockopt(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, \"\\%hho\", 1)"
 	       " = %s\n",
-	       * (unsigned char *) (void *) &m6, sprintrc(rc));
+	       * (unsigned char *) (void *) m6, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IPV6, IPV6_JOIN_ANYCAST, &m6, sizeof(m6));
+	rc = setsockopt(0, SOL_IPV6, IPV6_JOIN_ANYCAST, m6, sizeof(*m6));
 	printf("setsockopt(0, SOL_IPV6, IPV6_JOIN_ANYCAST"
 	       ", {ipv6mr_multiaddr=inet_pton(\"%s\")"
 	       ", ipv6mr_interface=if_nametoindex(\"lo\")}, 20) = %s\n",
 	       multi6addr, sprintrc(rc));
 
-	rc = setsockopt(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, &m6, sizeof(m6));
+	rc = setsockopt(0, SOL_IPV6, IPV6_LEAVE_ANYCAST, m6, sizeof(*m6));
 	printf("setsockopt(0, SOL_IPV6, IPV6_LEAVE_ANYCAST"
 	       ", {ipv6mr_multiaddr=inet_pton(\"%s\")"
 	       ", ipv6mr_interface=if_nametoindex(\"lo\")}, 20) = %s\n",
