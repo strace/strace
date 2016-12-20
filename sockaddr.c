@@ -279,7 +279,7 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 }
 
 int
-decode_sockaddr(struct tcb *tcp, long addr, int addrlen)
+decode_sockaddr(struct tcb *const tcp, const kernel_ureg_t addr, int addrlen)
 {
 	if (addrlen < 2) {
 		printaddr(addr);
