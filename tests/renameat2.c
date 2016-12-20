@@ -29,6 +29,7 @@
 
 #include "tests.h"
 #include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_renameat2
 
