@@ -1082,7 +1082,8 @@ static bool process_vm_readv_not_supported = 1;
 #endif /* end of hack */
 
 static ssize_t
-vm_read_mem(pid_t pid, void *laddr, long raddr, size_t len)
+vm_read_mem(const pid_t pid, void *const laddr,
+	    const kernel_ureg_t raddr, const size_t len)
 {
 	const struct iovec local = {
 		.iov_base = laddr,
@@ -1101,7 +1102,8 @@ vm_read_mem(pid_t pid, void *laddr, long raddr, size_t len)
  * at address `addr' to our space at `our_addr'
  */
 int
-umoven(struct tcb *tcp, long addr, unsigned int len, void *our_addr)
+umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
+       void *const our_addr)
 {
 	char *laddr = our_addr;
 	int pid = tcp->pid;
@@ -1208,8 +1210,8 @@ umoven(struct tcb *tcp, long addr, unsigned int len, void *our_addr)
 }
 
 int
-umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
-		    void *our_addr)
+umoven_or_printaddr(struct tcb *const tcp, const kernel_ureg_t addr,
+		    const unsigned int len, void *const our_addr)
 {
 	if (!addr || !verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 	    umoven(tcp, addr, len, our_addr) < 0) {
@@ -1220,8 +1222,10 @@ umoven_or_printaddr(struct tcb *tcp, const long addr, const unsigned int len,
 }
 
 int
-umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
-				    const unsigned int len, void *our_addr)
+umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
+				    const kernel_ureg_t addr,
+				    const unsigned int len,
+				    void *const our_addr)
 {
 	if (!addr || !verbose(tcp) || umoven(tcp, addr, len, our_addr) < 0) {
 		printaddr(addr);
@@ -1243,7 +1247,7 @@ umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
  * we never write past laddr[len-1]).
  */
 int
-umovestr(struct tcb *tcp, long addr, unsigned int len, char *laddr)
+umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *laddr)
 {
 	const unsigned long x01010101 = (unsigned long) 0x0101010101010101ULL;
 	const unsigned long x80808080 = (unsigned long) 0x8080808080808080ULL;
@@ -1426,7 +1430,7 @@ print_array(struct tcb *const tcp,
 	    void *const elem_buf,
 	    const size_t elem_size,
 	    int (*const umoven_func)(struct tcb *,
-				     long,
+				     kernel_ureg_t,
 				     unsigned int,
 				     void *),
 	    bool (*const print_func)(struct tcb *,

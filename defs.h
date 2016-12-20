@@ -493,16 +493,24 @@ static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
 	return set_tcb_priv_data(tcp, (void *) val, 0);
 }
 
-extern int umoven(struct tcb *, long, unsigned int, void *);
+extern int
+umoven(struct tcb *tcp, kernel_ureg_t addr, unsigned int len, void *laddr);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
-extern int umoven_or_printaddr(struct tcb *, long, unsigned int, void *);
+
+extern int
+umoven_or_printaddr(struct tcb *tcp, kernel_ureg_t addr,
+		    unsigned int len, void *laddr);
 #define umove_or_printaddr(pid, addr, objp)	\
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
+
 extern int
-umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const long addr,
-				    const unsigned int len, void *our_addr);
-extern int umovestr(struct tcb *, long, unsigned int, char *);
+umoven_or_printaddr_ignore_syserror(struct tcb *tcp, kernel_ureg_t addr,
+				    unsigned int len, void *laddr);
+
+extern int
+umovestr(struct tcb *tcp, kernel_ureg_t addr, unsigned int len, char *laddr);
+
 extern int upeek(int pid, long, long *);
 extern int upoke(int pid, long, long);
 
@@ -513,7 +521,7 @@ print_array(struct tcb *tcp,
 	    void *elem_buf,
 	    size_t elem_size,
 	    int (*umoven_func)(struct tcb *,
-				     long,
+				     kernel_ureg_t,
 				     unsigned int,
 				     void *),
 	    bool (*print_func)(struct tcb *,

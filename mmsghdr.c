@@ -33,7 +33,8 @@
 #include <limits.h>
 
 static int
-fetch_struct_mmsghdr_or_printaddr(struct tcb *tcp, const long addr,
+fetch_struct_mmsghdr_or_printaddr(struct tcb *const tcp,
+				  const kernel_ureg_t addr,
 				  const unsigned int len, void *const mh)
 {
 	if ((entering(tcp) || !syserror(tcp))

@@ -227,8 +227,8 @@ SYS_FUNC(select)
 }
 
 static int
-umove_kulong_array_or_printaddr(struct tcb *tcp, const long addr,
-				kernel_ulong_t *ptr, size_t n)
+umove_kulong_array_or_printaddr(struct tcb *const tcp, const kernel_ureg_t addr,
+				kernel_ulong_t *const ptr, const size_t n)
 {
 #ifndef current_klongsize
 	if (current_klongsize < sizeof(*ptr)) {
