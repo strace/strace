@@ -610,7 +610,7 @@ printstr_ex(struct tcb *, kernel_ureg_t addr, long len,
 
 #define DECL_PRINTNUM(name)						\
 extern bool								\
-printnum_ ## name(struct tcb *, long addr, const char *fmt)		\
+printnum_ ## name(struct tcb *, kernel_ureg_t addr, const char *fmt)	\
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 DECL_PRINTNUM(short);
 DECL_PRINTNUM(int);
@@ -618,7 +618,9 @@ DECL_PRINTNUM(int64);
 #undef DECL_PRINTNUM
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-extern bool printnum_long_int(struct tcb *, long, const char *, const char *)
+extern bool
+printnum_long_int(struct tcb *, kernel_ureg_t addr,
+		  const char *fmt_long, const char *fmt_int)
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 	ATTRIBUTE_FORMAT((printf, 4, 0));
 # define printnum_slong(tcp, addr) \
@@ -645,7 +647,7 @@ extern bool printnum_long_int(struct tcb *, long, const char *, const char *)
 
 #define DECL_PRINTPAIR(name)						\
 extern bool								\
-printpair_ ## name(struct tcb *, long addr, const char *fmt)		\
+printpair_ ## name(struct tcb *, kernel_ureg_t addr, const char *fmt)	\
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 DECL_PRINTPAIR(int);
 DECL_PRINTPAIR(int64);

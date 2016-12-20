@@ -472,7 +472,8 @@ printaddr_klu(const kernel_ulong_t addr)
 
 #define DEF_PRINTNUM(name, type) \
 bool									\
-printnum_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
+printnum_ ## name(struct tcb *const tcp, const kernel_ureg_t addr,	\
+		  const char *const fmt)				\
 {									\
 	type num;							\
 	if (umove_or_printaddr(tcp, addr, &num))			\
@@ -485,7 +486,8 @@ printnum_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
 
 #define DEF_PRINTPAIR(name, type) \
 bool									\
-printpair_ ## name(struct tcb *tcp, const long addr, const char *fmt)	\
+printpair_ ## name(struct tcb *const tcp, const kernel_ureg_t addr,	\
+		   const char *const fmt)				\
 {									\
 	type pair[2];							\
 	if (umove_or_printaddr(tcp, addr, &pair))			\
@@ -506,8 +508,8 @@ DEF_PRINTPAIR(int64, uint64_t)
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 bool
-printnum_long_int(struct tcb *tcp, const long addr,
-		  const char *fmt_long, const char *fmt_int)
+printnum_long_int(struct tcb *const tcp, const kernel_ureg_t addr,
+		  const char *const fmt_long, const char *const fmt_int)
 {
 	if (current_wordsize > sizeof(int)) {
 		return printnum_int64(tcp, addr, fmt_long);
