@@ -36,14 +36,7 @@
 #ifndef STRACE_PTRACE_H
 #define STRACE_PTRACE_H
 
-#ifdef NEED_PTRACE_PROTOTYPE_WORKAROUND
-# define ptrace xptrace
-# include <sys/ptrace.h>
-# undef ptrace
-extern long ptrace(int, int, char *, long);
-#else
-# include <sys/ptrace.h>
-#endif
+#include <sys/ptrace.h>
 
 #ifdef HAVE_STRUCT_IA64_FPREG
 # define ia64_fpreg XXX_ia64_fpreg
