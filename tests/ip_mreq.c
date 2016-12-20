@@ -102,6 +102,13 @@ main(void)
 		       short_any[i].str_level, short_any[i].str_optname,
 		       * (unsigned char *) short_any[i].optval,
 		       sprintrc(rc));
+
+		rc = setsockopt(0, short_any[i].level, short_any[i].optname,
+				short_any[i].optval + 1, short_any[i].optsize);
+		printf("setsockopt(0, %s, %s, %p, %u) = %s\n",
+		       short_any[i].str_level, short_any[i].str_optname,
+		       short_any[i].optval + 1, short_any[i].optsize,
+		       sprintrc(rc));
 	}
 
 	struct {
