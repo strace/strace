@@ -39,15 +39,18 @@
 #define	sys_vm86old		printargs
 
 /* machine-specific */
-#if !(defined I386 || defined X86_64 || defined X32)
+#ifndef HAVE_STRUCT_USER_DESC
 # define	sys_modify_ldt		printargs
-# ifndef M68K
-#  define	sys_get_thread_area	printargs
-#  ifndef MIPS
-#   define	sys_set_thread_area	printargs
-#  endif
-# endif
 #endif
+
+#if !(defined HAVE_STRUCT_USER_DESC || defined M68K || defined MIPS)
+# define	sys_set_thread_area	printargs
+#endif
+
+#if !(defined HAVE_STRUCT_USER_DESC || defined M68K)
+# define	sys_get_thread_area	printargs
+#endif
+
 #ifdef ALPHA
 # define	sys_getdtablesize	printargs
 #endif

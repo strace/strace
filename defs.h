@@ -777,6 +777,10 @@ extern void print_timeval32_pair(struct tcb *tcp, long);
 extern void print_itimerval32(struct tcb *tcp, long);
 #endif
 
+#ifdef HAVE_STRUCT_USER_DESC
+extern void print_user_desc(struct tcb *, long);
+#endif
+
 /* Strace log generation machinery.
  *
  * printing_tcp: tcb which has incomplete line being printed right now.

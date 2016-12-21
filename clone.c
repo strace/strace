@@ -75,9 +75,24 @@
 # define ARG_CTID	4
 #endif
 
-#if defined I386 || defined X86_64 || defined X32
-extern void print_user_desc(struct tcb *, long);
-#endif /* I386 || X86_64 || X32 */
+static void
+print_tls_arg(struct tcb *const tcp, const kernel_ureg_t addr)
+{
+#ifdef HAVE_STRUCT_USER_DESC
+# if SUPPORTED_PERSONALITIES > 1
+	if (current_personality == 1)
+# endif
+	{
+		print_user_desc(tcp, tcp->u_arg[ARG_TLS]);
+	}
+# if SUPPORTED_PERSONALITIES > 1
+	else
+# endif
+#endif /* HAVE_STRUCT_USER_DESC */
+	{
+		printaddr(tcp->u_arg[ARG_TLS]);
+	}
+}
 
 SYS_FUNC(clone)
 {
@@ -105,22 +120,8 @@ SYS_FUNC(clone)
 			printaddr(tcp->u_arg[ARG_PTID]);
 		}
 		if (flags & CLONE_SETTLS) {
-#if defined I386 || defined X86_64 || defined X32
-# ifndef I386
-			if (current_personality == 1)
-# endif
-			{
-				tprints(", tls=");
-				print_user_desc(tcp, tcp->u_arg[ARG_TLS]);
-			}
-# ifndef I386
-			else
-# endif
-#endif /* I386 || X86_64 || X32 */
-			{
-				tprints(", tls=");
-				printaddr(tcp->u_arg[ARG_TLS]);
-			}
+			tprints(", tls=");
+			print_tls_arg(tcp, tcp->u_arg[ARG_TLS]);
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID)) {
 			tprints(", child_tidptr=");

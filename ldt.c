@@ -33,7 +33,7 @@
 
 #include "defs.h"
 
-#if defined I386 || defined X86_64 || defined X32
+#ifdef HAVE_STRUCT_USER_DESC
 
 # include <asm/ldt.h>
 
@@ -105,7 +105,7 @@ SYS_FUNC(get_thread_area)
 	return 0;
 }
 
-#endif /* I386 || X86_64 || X32 */
+#endif /* HAVE_STRUCT_USER_DESC */
 
 #if defined(M68K) || defined(MIPS)
 SYS_FUNC(set_thread_area)
