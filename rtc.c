@@ -52,7 +52,7 @@ print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 }
 
 static void
-decode_rtc_time(struct tcb *tcp, const long addr)
+decode_rtc_time(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct rtc_time rt;
 
@@ -61,7 +61,7 @@ decode_rtc_time(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_rtc_wkalrm(struct tcb *tcp, const long addr)
+decode_rtc_wkalrm(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct rtc_wkalrm wk;
 
@@ -73,7 +73,7 @@ decode_rtc_wkalrm(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_rtc_pll_info(struct tcb *tcp, const long addr)
+decode_rtc_pll_info(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct_rtc_pll_info pll;
 
@@ -84,8 +84,8 @@ decode_rtc_pll_info(struct tcb *tcp, const long addr)
 			pll.pll_posmult, pll.pll_negmult, (long) pll.pll_clock);
 }
 
-MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *tcp,
-		   const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
+		   const unsigned int code, const kernel_ureg_t arg)
 {
 	switch (code) {
 	case RTC_ALM_READ:
