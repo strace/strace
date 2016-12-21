@@ -133,7 +133,7 @@ print_pixelformat(uint32_t fourcc)
 #include "xlat/v4l2_device_capabilities_flags.h"
 
 static int
-print_v4l2_capability(struct tcb *tcp, const long arg)
+print_v4l2_capability(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct v4l2_capability caps;
 
@@ -170,7 +170,7 @@ print_v4l2_capability(struct tcb *tcp, const long arg)
 #include "xlat/v4l2_format_description_flags.h"
 
 static int
-print_v4l2_fmtdesc(struct tcb *tcp, const long arg)
+print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct v4l2_fmtdesc f;
 
@@ -283,7 +283,8 @@ print_v4l2_format_fmt(const char *prefix, const struct_v4l2_format *f)
 }
 
 static int
-print_v4l2_format(struct tcb *tcp, const long arg, const bool is_get)
+print_v4l2_format(struct tcb *const tcp, const kernel_ureg_t arg,
+		  const bool is_get)
 {
 	struct_v4l2_format f;
 
@@ -309,7 +310,7 @@ print_v4l2_format(struct tcb *tcp, const long arg, const bool is_get)
 #include "xlat/v4l2_memories.h"
 
 static int
-print_v4l2_requestbuffers(struct tcb *tcp, const long arg)
+print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct v4l2_requestbuffers reqbufs;
 
@@ -337,7 +338,8 @@ print_v4l2_requestbuffers(struct tcb *tcp, const long arg)
 #include "xlat/v4l2_buf_flags.h"
 
 static int
-print_v4l2_buffer(struct tcb *tcp, const unsigned int code, const long arg)
+print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
+		  const kernel_ureg_t arg)
 {
 	struct_v4l2_buffer b;
 
@@ -378,7 +380,7 @@ print_v4l2_buffer(struct tcb *tcp, const unsigned int code, const long arg)
 }
 
 static int
-print_v4l2_framebuffer(struct tcb *tcp, const long arg)
+print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct_v4l2_framebuffer b;
 
@@ -394,7 +396,7 @@ print_v4l2_framebuffer(struct tcb *tcp, const long arg)
 }
 
 static int
-print_v4l2_buf_type(struct tcb *tcp, const long arg)
+print_v4l2_buf_type(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	int type;
 
@@ -411,7 +413,8 @@ print_v4l2_buf_type(struct tcb *tcp, const long arg)
 #include "xlat/v4l2_capture_modes.h"
 
 static int
-print_v4l2_streamparm(struct tcb *tcp, const long arg, const bool is_get)
+print_v4l2_streamparm(struct tcb *const tcp, const kernel_ureg_t arg,
+		      const bool is_get)
 {
 	struct v4l2_streamparm s;
 
@@ -475,7 +478,7 @@ print_v4l2_streamparm(struct tcb *tcp, const long arg, const bool is_get)
 }
 
 static int
-print_v4l2_standard(struct tcb *tcp, const long arg)
+print_v4l2_standard(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct_v4l2_standard s;
 
@@ -502,7 +505,7 @@ print_v4l2_standard(struct tcb *tcp, const long arg)
 #include "xlat/v4l2_input_types.h"
 
 static int
-print_v4l2_input(struct tcb *tcp, const long arg)
+print_v4l2_input(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct_v4l2_input i;
 
@@ -529,7 +532,8 @@ print_v4l2_input(struct tcb *tcp, const long arg)
 #include "xlat/v4l2_control_ids.h"
 
 static int
-print_v4l2_control(struct tcb *tcp, const long arg, const bool is_get)
+print_v4l2_control(struct tcb *const tcp, const kernel_ureg_t arg,
+		   const bool is_get)
 {
 	struct v4l2_control c;
 
@@ -557,7 +561,7 @@ print_v4l2_control(struct tcb *tcp, const long arg, const bool is_get)
 #include "xlat/v4l2_control_flags.h"
 
 static int
-print_v4l2_queryctrl(struct tcb *tcp, const long arg)
+print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct v4l2_queryctrl c;
 
@@ -604,7 +608,7 @@ print_v4l2_queryctrl(struct tcb *tcp, const long arg)
 }
 
 static int
-print_v4l2_cropcap(struct tcb *tcp, const long arg)
+print_v4l2_cropcap(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct v4l2_cropcap c;
 
@@ -629,7 +633,8 @@ print_v4l2_cropcap(struct tcb *tcp, const long arg)
 }
 
 static int
-print_v4l2_crop(struct tcb *tcp, const long arg, const bool is_get)
+print_v4l2_crop(struct tcb *const tcp, const kernel_ureg_t arg,
+		const bool is_get)
 {
 	struct v4l2_crop c;
 
@@ -675,7 +680,8 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 #include "xlat/v4l2_control_classes.h"
 
 static int
-print_v4l2_ext_controls(struct tcb *tcp, const long arg, const bool is_get)
+print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ureg_t arg,
+			const bool is_get)
 {
 	struct_v4l2_ext_controls c;
 
@@ -724,7 +730,7 @@ print_v4l2_ext_controls(struct tcb *tcp, const long arg, const bool is_get)
 # include "xlat/v4l2_framesize_types.h"
 
 static int
-print_v4l2_frmsizeenum(struct tcb *tcp, const long arg)
+print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct v4l2_frmsizeenum s;
 
@@ -764,7 +770,7 @@ print_v4l2_frmsizeenum(struct tcb *tcp, const long arg)
 # include "xlat/v4l2_frameinterval_types.h"
 
 static int
-print_v4l2_frmivalenum(struct tcb *tcp, const long arg)
+print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct v4l2_frmivalenum f;
 
@@ -803,7 +809,7 @@ print_v4l2_frmivalenum(struct tcb *tcp, const long arg)
 
 #ifdef VIDIOC_CREATE_BUFS
 static int
-print_v4l2_create_buffers(struct tcb *tcp, const long arg)
+print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct_v4l2_create_buffers b;
 
@@ -833,8 +839,8 @@ print_v4l2_create_buffers(struct tcb *tcp, const long arg)
 }
 #endif /* VIDIOC_CREATE_BUFS */
 
-MPERS_PRINTER_DECL(int, v4l2_ioctl,
-		   struct tcb *tcp, const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
+		   const unsigned int code, const kernel_ureg_t arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;
