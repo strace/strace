@@ -249,7 +249,7 @@ get_optmem_max(void)
 }
 
 static void
-decode_msg_control(struct tcb *tcp, unsigned long addr,
+decode_msg_control(struct tcb *const tcp, const kernel_ureg_t addr,
 		   const size_t in_control_len)
 {
 	if (!in_control_len)
