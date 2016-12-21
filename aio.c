@@ -130,8 +130,7 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 	case SUB_COMMON:
 		if (cb->aio_lio_opcode == 1 && iocb_is_valid(cb)) {
 			tprints(", str=");
-			printstr(tcp, (unsigned long) cb->aio_buf,
-				 (unsigned long) cb->aio_nbytes);
+			printstr(tcp, cb->aio_buf, cb->aio_nbytes);
 		} else {
 			tprintf(", buf=%#" PRIx64, (uint64_t) cb->aio_buf);
 		}
@@ -162,13 +161,13 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 static bool
 print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	unsigned long addr;
+	kernel_ureg_t addr;
 	struct iocb cb;
 
-	if (elem_size < sizeof(long)) {
+	if (elem_size < sizeof(kernel_ureg_t)) {
 		addr = * (unsigned int *) elem_buf;
 	} else {
-		addr = * (unsigned long *) elem_buf;
+		addr = * (kernel_ureg_t *) elem_buf;
 	}
 
 	tprints("{");
@@ -182,8 +181,8 @@ print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 SYS_FUNC(io_submit)
 {
 	const long nr = widen_to_long(tcp->u_arg[1]);
-	const unsigned long addr = tcp->u_arg[2];
-	unsigned long iocbp;
+	const kernel_ureg_t addr = tcp->u_arg[2];
+	kernel_ureg_t iocbp;
 
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %ld, ", nr);
