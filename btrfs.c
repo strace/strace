@@ -204,7 +204,7 @@ btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 }
 
 static void
-btrfs_print_balance(struct tcb *tcp, const long arg, bool out)
+btrfs_print_balance(struct tcb *const tcp, const kernel_ureg_t arg, bool out)
 {
 	struct btrfs_ioctl_balance_args balance_args;
 
@@ -512,7 +512,8 @@ print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
 }
 
 MPERS_PRINTER_DECL(int, btrfs_ioctl,
-		   struct tcb *tcp, const unsigned int code, const long arg)
+		   struct tcb *const tcp, const unsigned int code,
+		   const kernel_ureg_t arg)
 {
 	switch (code) {
 	/* Take no arguments; command only. */
