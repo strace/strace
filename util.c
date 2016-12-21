@@ -960,7 +960,7 @@ dumpiov_upto(struct tcb *tcp, int len, long addr, unsigned long data_size)
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
 			tprintf(" * %lu bytes in buffer %d\n", iov_len, i);
-			dumpstr(tcp, (long) iov_iov_base(i), iov_len);
+			dumpstr(tcp, (kernel_ureg_t) iov_iov_base(i), iov_len);
 		}
 	}
 	free(iov);
