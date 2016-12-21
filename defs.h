@@ -821,7 +821,7 @@ extern void print_itimerval32(struct tcb *tcp, long);
 #endif
 
 #ifdef HAVE_STRUCT_USER_DESC
-extern void print_user_desc(struct tcb *, long);
+extern void print_user_desc(struct tcb *, kernel_ureg_t addr);
 #endif
 
 /* Strace log generation machinery.

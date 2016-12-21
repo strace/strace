@@ -38,7 +38,7 @@
 # include <asm/ldt.h>
 
 void
-print_user_desc(struct tcb *tcp, const long addr)
+print_user_desc(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct user_desc desc;
 
