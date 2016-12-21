@@ -36,7 +36,7 @@
 #ifdef HAVE_STRUCT___OLD_KERNEL_STAT
 
 static void
-print_old_kernel_stat(struct tcb *tcp, const unsigned long addr)
+print_old_kernel_stat(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct __old_kernel_stat buf;
 	if (umove_or_printaddr(tcp, addr, &buf))
