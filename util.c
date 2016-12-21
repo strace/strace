@@ -922,7 +922,8 @@ printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr, const long len,
 }
 
 void
-dumpiov_upto(struct tcb *tcp, int len, long addr, unsigned long data_size)
+dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
+	     unsigned long data_size)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	union {
@@ -974,7 +975,7 @@ dumpiov_upto(struct tcb *tcp, int len, long addr, unsigned long data_size)
 }
 
 void
-dumpstr(struct tcb *tcp, long addr, int len)
+dumpstr(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
 {
 	static int strsize = -1;
 	static unsigned char *str;

@@ -599,10 +599,18 @@ extern const char *sprinttime(time_t);
 extern void print_symbolic_mode_t(unsigned int);
 extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
-extern void dumpiov_in_msghdr(struct tcb *, long, unsigned long);
-extern void dumpiov_in_mmsghdr(struct tcb *, long);
-extern void dumpiov_upto(struct tcb *, int, long, unsigned long);
-extern void dumpstr(struct tcb *, long, int);
+
+extern void
+dumpiov_in_msghdr(struct tcb *, kernel_ureg_t addr, unsigned long data_size);
+
+extern void
+dumpiov_in_mmsghdr(struct tcb *, kernel_ureg_t addr);
+
+extern void
+dumpiov_upto(struct tcb *, int len, kernel_ureg_t addr, unsigned long data_size);
+
+extern void
+dumpstr(struct tcb *, kernel_ureg_t addr, int len);
 
 extern void
 printstr_ex(struct tcb *, kernel_ureg_t addr, long len,

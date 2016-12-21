@@ -365,7 +365,8 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 }
 
 static bool
-fetch_msghdr_namelen(struct tcb *tcp, const long addr, int *const p_msg_namelen)
+fetch_msghdr_namelen(struct tcb *const tcp, const kernel_ureg_t addr,
+		     int *const p_msg_namelen)
 {
 	struct msghdr msg;
 
@@ -378,8 +379,8 @@ fetch_msghdr_namelen(struct tcb *tcp, const long addr, int *const p_msg_namelen)
 }
 
 static void
-decode_msghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
-	      const long addr, const unsigned long data_size)
+decode_msghdr(struct tcb *const tcp, const int *const p_user_msg_namelen,
+	      const kernel_ureg_t addr, const unsigned long data_size)
 {
 	struct msghdr msg;
 
@@ -390,7 +391,8 @@ decode_msghdr(struct tcb *tcp, const int *const p_user_msg_namelen,
 }
 
 void
-dumpiov_in_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
+dumpiov_in_msghdr(struct tcb *const tcp, const kernel_ureg_t addr,
+		  const unsigned long data_size)
 {
 	struct msghdr msg;
 

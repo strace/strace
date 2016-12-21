@@ -149,7 +149,7 @@ decode_mmsgvec(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 void
-dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
+dumpiov_in_mmsghdr(struct tcb *const tcp, kernel_ureg_t addr)
 {
 	unsigned int len = tcp->u_rval;
 	unsigned int i, fetched;
