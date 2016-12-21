@@ -171,7 +171,7 @@ decode_ifconf(struct tcb *tcp, const long addr)
 
 	struct ifreq ifra[nifra > max_strlen ? max_strlen : nifra];
 	tprints(", ");
-	if (umove_or_printaddr(tcp, (unsigned long) ifc.ifc_buf, &ifra)) {
+	if (umove_or_printaddr(tcp, (kernel_ureg_t) ifc.ifc_buf, &ifra)) {
 		tprints("}");
 		return RVAL_DECODED | 1;
 	}
