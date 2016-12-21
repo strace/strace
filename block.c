@@ -129,7 +129,7 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 	tprintf(", flags=%d, datalen=%d, data=",
 		blkpg->flags, blkpg->datalen);
 
-	if (!umove_or_printaddr(tcp, (long) blkpg->data, &p)) {
+	if (!umove_or_printaddr(tcp, (kernel_ureg_t) blkpg->data, &p)) {
 		tprintf("{start=%" PRId64 ", length=%" PRId64
 			", pno=%d, devname=",
 			p.start, p.length, p.pno);
