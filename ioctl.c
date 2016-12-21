@@ -42,7 +42,7 @@
 static int
 compare(const void *a, const void *b)
 {
-	const unsigned int code1 = (const unsigned long) a;
+	const unsigned int code1 = (const uintptr_t) a;
 	const unsigned int code2 = ((struct_ioctlent *) b)->code;
 	return (code1 > code2) ? 1 : (code1 < code2) ? -1 : 0;
 }
@@ -52,7 +52,7 @@ ioctl_lookup(const unsigned int code)
 {
 	struct_ioctlent *iop;
 
-	iop = bsearch((const void *) (const unsigned long) code, ioctlent,
+	iop = bsearch((const void *) (const uintptr_t) code, ioctlent,
 			nioctlents, sizeof(ioctlent[0]), compare);
 	while (iop > ioctlent) {
 		iop--;
