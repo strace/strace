@@ -376,7 +376,7 @@ print_uint64(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-btrfs_print_qgroup_inherit(struct tcb *tcp, const unsigned long qgi_addr)
+btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ureg_t qgi_addr)
 {
 	struct btrfs_qgroup_inherit inherit;
 
