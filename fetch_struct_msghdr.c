@@ -43,9 +43,10 @@ typedef struct msghdr struct_msghdr;
  */
 
 MPERS_PRINTER_DECL(int, fetch_struct_msghdr,
-		   struct tcb *tcp, const unsigned long addr, void *p)
+		   struct tcb *const tcp, const kernel_ureg_t addr,
+		   void *const p)
 {
-	struct msghdr *p_native = p;
+	struct msghdr *const p_native = p;
 	struct_msghdr v_compat;
 
 	if (sizeof(*p_native) == sizeof(v_compat))
