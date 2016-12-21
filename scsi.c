@@ -51,7 +51,8 @@ print_uchar(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-print_sg_io_buffer(struct tcb *tcp, const unsigned long addr, const unsigned int len)
+print_sg_io_buffer(struct tcb *const tcp, const kernel_ureg_t addr,
+		   const unsigned int len)
 {
 	unsigned char buf;
 
