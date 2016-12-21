@@ -2,7 +2,7 @@
 
 case "$CC" in
 	gcc)
-		ENABLE_GCC_WERROR=--enable-gcc-Werror
+		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-gcc-Werror"
 		;;
 	clang-*)
 		# clang -mx32 fails with the following error:
@@ -17,14 +17,13 @@ case "${TARGET-}" in
 		;;
 	x86)
 		CC="$CC -m32"
-		DISTCHECK_CONFIGURE_FLAGS='--build=i686-pc-linux-gnu --target=i686-pc-linux-gnu'
-		export DISTCHECK_CONFIGURE_FLAGS
+		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --build=i686-pc-linux-gnu --target=i686-pc-linux-gnu"
 		;;
 esac
 
 case "${CHECK-}" in
 	coverage)
-		CHECK_CONFIGURE_FLAGS=--enable-code-coverage
+		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-code-coverage"
 		CFLAGS='-g -O0'
 		CFLAGS_FOR_BUILD="$CFLAGS"
 		export CFLAGS CFLAGS_FOR_BUILD
@@ -34,12 +33,13 @@ esac
 $CC --version
 export CC_FOR_BUILD="$CC"
 
+[ -z "${DISTCHECK_CONFIGURE_FLAGS-}" ] ||
+	export DISTCHECK_CONFIGURE_FLAGS
+
 ./git-set-file-times
 ./bootstrap
 ./configure --enable-maintainer-mode \
-	${ENABLE_GCC_WERROR-} \
 	${DISTCHECK_CONFIGURE_FLAGS-} \
-	${CHECK_CONFIGURE_FLAGS-} \
 	#
 
 j=-j`getconf _NPROCESSORS_ONLN 2> /dev/null` || j=
