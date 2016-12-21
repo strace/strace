@@ -84,7 +84,7 @@ decode_mtd_oob_buf(struct tcb *tcp, const long addr)
 		return;
 
 	tprintf("{start=%#x, length=%#x, ptr=", mbuf.start, mbuf.length);
-	printaddr((unsigned long) mbuf.ptr);
+	printaddr((kernel_ureg_t) mbuf.ptr);
 	tprints("}");
 }
 
