@@ -268,7 +268,7 @@ decode_bitset(struct tcb *tcp, long arg, const struct xlat decode_nr[],
 	tprints(", ");
 
 	unsigned int size;
-	if ((unsigned long) tcp->u_rval > max_nr)
+	if ((kernel_ureg_t) tcp->u_rval > max_nr)
 		size = max_nr;
 	else
 		size = tcp->u_rval;
