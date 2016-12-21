@@ -97,7 +97,7 @@ struct mmsgvec_data {
 };
 
 static void
-save_mmsgvec_namelen(struct tcb *tcp, unsigned long addr,
+save_mmsgvec_namelen(struct tcb *const tcp, kernel_ureg_t addr,
 		     unsigned int len, const char *const timeout)
 {
 	if (len > IOV_MAX)
@@ -124,7 +124,7 @@ save_mmsgvec_namelen(struct tcb *tcp, unsigned long addr,
 }
 
 static void
-decode_mmsgvec(struct tcb *tcp, const unsigned long addr,
+decode_mmsgvec(struct tcb *const tcp, const kernel_ureg_t addr,
 	       const unsigned int vlen, const unsigned int msg_len_vlen,
 	       const bool use_msg_len)
 {
