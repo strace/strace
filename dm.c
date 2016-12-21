@@ -102,8 +102,8 @@ dm_decode_flags(const struct dm_ioctl *ioc)
 }
 
 static void
-dm_decode_dm_target_spec(struct tcb *tcp, unsigned long addr,
-			 const struct dm_ioctl *ioc)
+dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ureg_t addr,
+			 const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_spec_size =
 		sizeof(struct dm_target_spec);
@@ -177,8 +177,8 @@ dm_print_dev(struct tcb *tcp, void *dev_ptr, size_t dev_size, void *dummy)
 }
 
 static void
-dm_decode_dm_target_deps(struct tcb *tcp, unsigned long addr,
-			 const struct dm_ioctl *ioc)
+dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ureg_t addr,
+			 const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_deps_dev_offs =
 		offsetof(struct dm_target_deps, dev);
@@ -220,8 +220,8 @@ misplaced:
 }
 
 static void
-dm_decode_dm_name_list(struct tcb *tcp, unsigned long addr,
-		       const struct dm_ioctl *ioc)
+dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ureg_t addr,
+		       const struct dm_ioctl *const ioc)
 {
 	static const uint32_t name_list_name_offs =
 		offsetof(struct dm_name_list, name);
@@ -276,8 +276,8 @@ misplaced:
 }
 
 static void
-dm_decode_dm_target_versions(struct tcb *tcp, unsigned long addr,
-			     const struct dm_ioctl *ioc)
+dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ureg_t addr,
+			     const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_vers_name_offs =
 		offsetof(struct dm_target_versions, name);
@@ -328,8 +328,8 @@ misplaced:
 }
 
 static void
-dm_decode_dm_target_msg(struct tcb *tcp, unsigned long addr,
-		        const struct dm_ioctl *ioc)
+dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ureg_t addr,
+		        const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_msg_message_offs =
 		offsetof(struct dm_target_msg, message);
@@ -359,8 +359,8 @@ dm_decode_dm_target_msg(struct tcb *tcp, unsigned long addr,
 }
 
 static void
-dm_decode_string(struct tcb *tcp, unsigned long addr,
-		 const struct dm_ioctl *ioc)
+dm_decode_string(struct tcb *const tcp, const kernel_ureg_t addr,
+		 const struct dm_ioctl *const ioc)
 {
 	uint32_t offset = ioc->data_start;
 
