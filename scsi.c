@@ -263,8 +263,7 @@ scsi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
 
 	if (entering(tcp)) {
 		tprints(", ");
-		if (!arg || umove(tcp, arg, &iid) < 0) {
-			printaddr(arg);
+		if (umove_or_printaddr(tcp, arg, &iid)) {
 			return RVAL_DECODED | 1;
 		} else {
 			return print_sg_io_req(tcp, iid, arg);
