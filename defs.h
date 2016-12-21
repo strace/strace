@@ -683,16 +683,20 @@ extern bool is_number_in_set(unsigned int number, const struct number_set *);
 extern void qualify(const char *);
 extern unsigned int qual_flags(const unsigned int);
 
-extern int dm_ioctl(struct tcb *, const unsigned int, long);
-extern int file_ioctl(struct tcb *, const unsigned int, long);
-extern int fs_x_ioctl(struct tcb *, const unsigned int, long);
-extern int loop_ioctl(struct tcb *, const unsigned int, long);
-extern int ptp_ioctl(struct tcb *, const unsigned int, long);
-extern int scsi_ioctl(struct tcb *, const unsigned int, long);
-extern int sock_ioctl(struct tcb *, const unsigned int, long);
-extern int term_ioctl(struct tcb *, const unsigned int, long);
-extern int ubi_ioctl(struct tcb *, const unsigned int, long);
-extern int uffdio_ioctl(struct tcb *, const unsigned int, long);
+#define DECL_IOCTL(name)						\
+extern int								\
+name ## _ioctl(struct tcb *, unsigned int request, long arg)
+DECL_IOCTL(dm);
+DECL_IOCTL(file);
+DECL_IOCTL(fs_x);
+DECL_IOCTL(loop);
+DECL_IOCTL(ptp);
+DECL_IOCTL(scsi);
+DECL_IOCTL(sock);
+DECL_IOCTL(term);
+DECL_IOCTL(ubi);
+DECL_IOCTL(uffdio);
+#undef DECL_IOCTL
 
 extern int tv_nz(const struct timeval *);
 extern int tv_cmp(const struct timeval *, const struct timeval *);
