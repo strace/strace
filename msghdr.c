@@ -340,7 +340,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 
 	tprints("{msg_name=");
 	const int family =
-		decode_sockaddr(tcp, (long) msg->msg_name, msg_namelen);
+		decode_sockaddr(tcp, (kernel_ureg_t) msg->msg_name, msg_namelen);
 	const enum iov_decode decode =
 		(family == AF_NETLINK) ? IOV_DECODE_NETLINK : IOV_DECODE_STR;
 
@@ -394,8 +394,10 @@ dumpiov_in_msghdr(struct tcb *tcp, long addr, unsigned long data_size)
 {
 	struct msghdr msg;
 
-	if (fetch_struct_msghdr(tcp, addr, &msg))
-		dumpiov_upto(tcp, msg.msg_iovlen, (long)msg.msg_iov, data_size);
+	if (fetch_struct_msghdr(tcp, addr, &msg)) {
+		dumpiov_upto(tcp, msg.msg_iovlen,
+			     (kernel_ureg_t) msg.msg_iov, data_size);
+	}
 }
 
 SYS_FUNC(sendmsg)
