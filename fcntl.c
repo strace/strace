@@ -54,7 +54,7 @@ print_struct_flock64(const struct_kernel_flock64 *fl, const int getlk)
 }
 
 static void
-printflock64(struct tcb *tcp, const long addr, const int getlk)
+printflock64(struct tcb *const tcp, const kernel_ureg_t addr, const int getlk)
 {
 	struct_kernel_flock64 fl;
 
@@ -63,7 +63,7 @@ printflock64(struct tcb *tcp, const long addr, const int getlk)
 }
 
 static void
-printflock(struct tcb *tcp, const long addr, const int getlk)
+printflock(struct tcb *const tcp, const kernel_ureg_t addr, const int getlk)
 {
 	struct_kernel_flock64 fl;
 
@@ -72,7 +72,7 @@ printflock(struct tcb *tcp, const long addr, const int getlk)
 }
 
 static void
-print_f_owner_ex(struct tcb *tcp, const long addr)
+print_f_owner_ex(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct { int type, pid; } owner;
 
