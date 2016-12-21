@@ -143,8 +143,8 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 	tprints("}");
 }
 
-MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *tcp,
-		   const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
+		   const unsigned int code, const kernel_ureg_t arg)
 {
 	switch (code) {
 	/* take arg as a value, not as a pointer */
