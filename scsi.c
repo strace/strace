@@ -72,7 +72,7 @@ print_sg_io_v3_req(struct tcb *tcp, const long arg)
 	printxval(sg_io_dxfer_direction, sg_io.dxfer_direction,
 		  "SG_DXFER_???");
 	tprintf(", cmd[%u]=", sg_io.cmd_len);
-	print_sg_io_buffer(tcp, (unsigned long) sg_io.cmdp, sg_io.cmd_len);
+	print_sg_io_buffer(tcp, (kernel_ureg_t) sg_io.cmdp, sg_io.cmd_len);
 	tprintf(", mx_sb_len=%d", sg_io.mx_sb_len);
 	tprintf(", iovec_count=%d", sg_io.iovec_count);
 	tprintf(", dxfer_len=%u", sg_io.dxfer_len);
@@ -84,11 +84,11 @@ print_sg_io_v3_req(struct tcb *tcp, const long arg)
 		tprintf(", data[%u]=", sg_io.dxfer_len);
 		if (sg_io.iovec_count)
 			tprint_iov_upto(tcp, sg_io.iovec_count,
-					(unsigned long) sg_io.dxferp,
+					(kernel_ureg_t) sg_io.dxferp,
 					IOV_DECODE_STR,
 					sg_io.dxfer_len);
 		else
-			print_sg_io_buffer(tcp, (unsigned long) sg_io.dxferp,
+			print_sg_io_buffer(tcp, (kernel_ureg_t) sg_io.dxferp,
 					   sg_io.dxfer_len);
 	}
 	return 1;
@@ -113,17 +113,17 @@ print_sg_io_v3_res(struct tcb *tcp, const long arg)
 		tprintf(", data[%u]=", din_len);
 		if (sg_io.iovec_count)
 			tprint_iov_upto(tcp, sg_io.iovec_count,
-					(unsigned long) sg_io.dxferp,
+					(kernel_ureg_t) sg_io.dxferp,
 					syserror(tcp) ? IOV_DECODE_ADDR :
 					IOV_DECODE_STR, din_len);
 		else
-			print_sg_io_buffer(tcp, (unsigned long) sg_io.dxferp,
+			print_sg_io_buffer(tcp, (kernel_ureg_t) sg_io.dxferp,
 					   din_len);
 	}
 	tprintf(", status=%02x", sg_io.status);
 	tprintf(", masked_status=%02x", sg_io.masked_status);
 	tprintf(", sb[%u]=", sg_io.sb_len_wr);
-	print_sg_io_buffer(tcp, (unsigned long) sg_io.sbp, sg_io.sb_len_wr);
+	print_sg_io_buffer(tcp, (kernel_ureg_t) sg_io.sbp, sg_io.sb_len_wr);
 	tprintf(", host_status=%#x", sg_io.host_status);
 	tprintf(", driver_status=%#x", sg_io.driver_status);
 	tprintf(", resid=%d", sg_io.resid);
