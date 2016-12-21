@@ -491,7 +491,7 @@ dumpio(struct tcb *tcp)
 		case SEN_pwritev:
 		case SEN_pwritev2:
 		case SEN_vmsplice:
-			dumpiov(tcp, tcp->u_arg[2], tcp->u_arg[1]);
+			dumpiov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], -1);
 			break;
 		case SEN_sendmsg:
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1], -1UL);
