@@ -68,7 +68,7 @@ typedef struct stat64 struct_stat64;
 #endif
 
 MPERS_PRINTER_DECL(bool, fetch_struct_stat64,
-		   struct tcb *tcp, const unsigned long addr,
+		   struct tcb *const tcp, const kernel_ureg_t addr,
 		   struct strace_stat *const dst)
 {
 #ifdef HAVE_STRUCT_STAT64
