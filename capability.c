@@ -64,7 +64,7 @@ typedef struct user_cap_data_struct {
 } *cap_user_data_t;
 
 static cap_user_header_t
-get_cap_header(struct tcb *tcp, unsigned long addr)
+get_cap_header(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	static struct user_cap_header_struct header;
 
@@ -78,7 +78,8 @@ get_cap_header(struct tcb *tcp, unsigned long addr)
 }
 
 static void
-print_cap_header(struct tcb *tcp, unsigned long addr, cap_user_header_t h)
+print_cap_header(struct tcb *const tcp, const kernel_ureg_t addr,
+		 const cap_user_header_t const h)
 {
 	if (!addr || !h) {
 		printaddr(addr);
@@ -105,7 +106,8 @@ print_cap_bits(const uint32_t lo, const uint32_t hi)
 }
 
 static void
-print_cap_data(struct tcb *tcp, unsigned long addr, const cap_user_header_t h)
+print_cap_data(struct tcb *const tcp, const kernel_ureg_t addr,
+	       const cap_user_header_t const h)
 {
 	struct user_cap_data_struct data[2];
 	unsigned int len;
