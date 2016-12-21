@@ -161,7 +161,7 @@ dumpiov_in_mmsghdr(struct tcb *tcp, long addr)
 		tprintf(" = %lu buffers in vector %u\n",
 			(unsigned long) mmsg.msg_hdr.msg_iovlen, i);
 		dumpiov_upto(tcp, mmsg.msg_hdr.msg_iovlen,
-			(long) mmsg.msg_hdr.msg_iov, mmsg.msg_len);
+			(kernel_ureg_t) mmsg.msg_hdr.msg_iov, mmsg.msg_len);
 	}
 }
 
