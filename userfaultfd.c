@@ -55,7 +55,8 @@ tprintf_uffdio_range(const struct uffdio_range *range)
 }
 
 int
-uffdio_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
+	     const kernel_ureg_t arg)
 {
 	switch (code) {
 	case UFFDIO_API: {

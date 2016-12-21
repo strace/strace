@@ -30,7 +30,8 @@
 #include <linux/fs.h>
 
 int
-fs_x_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
+	   const kernel_ureg_t arg)
 {
 	switch (code) {
 #ifdef FITRIM

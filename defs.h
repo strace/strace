@@ -728,7 +728,7 @@ extern unsigned int qual_flags(const unsigned int);
 
 #define DECL_IOCTL(name)						\
 extern int								\
-name ## _ioctl(struct tcb *, unsigned int request, long arg)
+name ## _ioctl(struct tcb *, unsigned int request, kernel_ureg_t arg)
 DECL_IOCTL(dm);
 DECL_IOCTL(file);
 DECL_IOCTL(fs_x);

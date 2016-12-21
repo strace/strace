@@ -33,7 +33,7 @@
 #include "xlat/loop_crypt_type_options.h"
 
 static void
-decode_loop_info(struct tcb *tcp, const long addr)
+decode_loop_info(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct loop_info info;
 
@@ -83,7 +83,7 @@ decode_loop_info(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_loop_info64(struct tcb *tcp, const long addr)
+decode_loop_info64(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct loop_info64 info64;
 
@@ -140,7 +140,8 @@ decode_loop_info64(struct tcb *tcp, const long addr)
 }
 
 int
-loop_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+loop_ioctl(struct tcb *const tcp, const unsigned int code,
+	   const kernel_ureg_t arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;

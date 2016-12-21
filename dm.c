@@ -396,7 +396,8 @@ dm_ioctl_has_params(const unsigned int code)
 }
 
 static int
-dm_known_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
+	       const kernel_ureg_t arg)
 {
 	struct dm_ioctl *ioc = NULL;
 	struct dm_ioctl *entering_ioc = NULL;
@@ -516,7 +517,7 @@ dm_known_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 }
 
 int
-dm_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ureg_t arg)
 {
 	switch (code) {
 	case DM_VERSION:
@@ -544,7 +545,7 @@ dm_ioctl(struct tcb *tcp, const unsigned int code, long arg)
 # else /* !(DM_VERSION_MAJOR == 4) */
 
 int
-dm_ioctl(struct tcb *tcp, const unsigned int code, long arg)
+dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ureg_t arg)
 {
 	return 0;
 }

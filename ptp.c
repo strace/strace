@@ -33,7 +33,8 @@
 #include "xlat/ptp_flags_options.h"
 
 int
-ptp_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+ptp_ioctl(struct tcb *const tcp, const unsigned int code,
+	  const kernel_ureg_t arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;

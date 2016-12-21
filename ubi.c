@@ -40,7 +40,8 @@
 #include "xlat/ubi_volume_props.h"
 
 int
-ubi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+ubi_ioctl(struct tcb *const tcp, const unsigned int code,
+	  const kernel_ureg_t arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;

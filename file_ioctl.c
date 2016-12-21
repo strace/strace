@@ -123,7 +123,8 @@ print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 #endif /* HAVE_LINUX_FIEMAP_H */
 
 int
-file_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+file_ioctl(struct tcb *const tcp, const unsigned int code,
+	   const kernel_ureg_t arg)
 {
 	switch (code) {
 	case FICLONE:	/* W */

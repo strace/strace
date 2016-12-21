@@ -227,7 +227,7 @@ static int
 ioctl_decode(struct tcb *tcp)
 {
 	const unsigned int code = tcp->u_arg[1];
-	const long arg = tcp->u_arg[2];
+	const kernel_ureg_t arg = tcp->u_arg[2];
 
 	switch (_IOC_TYPE(code)) {
 #if defined(ALPHA) || defined(POWERPC)

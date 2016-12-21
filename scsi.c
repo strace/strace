@@ -61,7 +61,7 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 static int
-print_sg_io_v3_req(struct tcb *tcp, const long arg)
+print_sg_io_v3_req(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct sg_io_hdr sg_io;
 
@@ -96,7 +96,7 @@ print_sg_io_v3_req(struct tcb *tcp, const long arg)
 }
 
 static void
-print_sg_io_v3_res(struct tcb *tcp, const long arg)
+print_sg_io_v3_res(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct sg_io_hdr sg_io;
 
@@ -135,7 +135,7 @@ print_sg_io_v3_res(struct tcb *tcp, const long arg)
 #ifdef HAVE_LINUX_BSG_H
 
 static int
-print_sg_io_v4_req(struct tcb *tcp, const long arg)
+print_sg_io_v4_req(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct sg_io_v4 sg_io;
 
@@ -173,7 +173,7 @@ print_sg_io_v4_req(struct tcb *tcp, const long arg)
 }
 
 static void
-print_sg_io_v4_res(struct tcb *tcp, const long arg)
+print_sg_io_v4_res(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	struct sg_io_v4 sg_io;
 	uint32_t din_len;
@@ -211,21 +211,22 @@ print_sg_io_v4_res(struct tcb *tcp, const long arg)
 #else /* !HAVE_LINUX_BSG_H */
 
 static int
-print_sg_io_v4_req(struct tcb *tcp, const long arg)
+print_sg_io_v4_req(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 	tprints("...}");
 	return RVAL_DECODED | 1;
 }
 
 static void
-print_sg_io_v4_res(struct tcb *tcp, const long arg)
+print_sg_io_v4_res(struct tcb *const tcp, const kernel_ureg_t arg)
 {
 }
 
 #endif
 
 static int
-print_sg_io_req(struct tcb *tcp, uint32_t iid, const long arg)
+print_sg_io_req(struct tcb *const tcp, const uint32_t iid,
+		const kernel_ureg_t arg)
 {
 	tprintf("{'%c', ", iid);
 
@@ -242,7 +243,8 @@ print_sg_io_req(struct tcb *tcp, uint32_t iid, const long arg)
 }
 
 static void
-print_sg_io_res(struct tcb *tcp, uint32_t iid, const long arg)
+print_sg_io_res(struct tcb *const tcp, const uint32_t iid,
+		const kernel_ureg_t arg)
 {
 	switch (iid) {
 	case 'S':
@@ -255,7 +257,8 @@ print_sg_io_res(struct tcb *tcp, uint32_t iid, const long arg)
 }
 
 int
-scsi_ioctl(struct tcb *tcp, const unsigned int code, const long arg)
+scsi_ioctl(struct tcb *const tcp, const unsigned int code,
+	   const kernel_ureg_t arg)
 {
 	uint32_t iid;
 
