@@ -50,7 +50,7 @@ typedef struct mtd_oob_buf struct_mtd_oob_buf;
 #include "xlat/mtd_nandecc_options.h"
 
 static void
-decode_erase_info_user(struct tcb *tcp, const long addr)
+decode_erase_info_user(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct erase_info_user einfo;
 
@@ -62,7 +62,7 @@ decode_erase_info_user(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_erase_info_user64(struct tcb *tcp, const long addr)
+decode_erase_info_user64(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct erase_info_user64 einfo64;
 
@@ -75,7 +75,7 @@ decode_erase_info_user64(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_mtd_oob_buf(struct tcb *tcp, const long addr)
+decode_mtd_oob_buf(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct_mtd_oob_buf mbuf;
 
@@ -89,7 +89,7 @@ decode_mtd_oob_buf(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_mtd_oob_buf64(struct tcb *tcp, const long addr)
+decode_mtd_oob_buf64(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct mtd_oob_buf64 mbuf64;
 
@@ -103,7 +103,7 @@ decode_mtd_oob_buf64(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_otp_info(struct tcb *tcp, const long addr)
+decode_otp_info(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct otp_info oinfo;
 
@@ -116,7 +116,7 @@ decode_otp_info(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_otp_select(struct tcb *tcp, const long addr)
+decode_otp_select(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	unsigned int i;
 
@@ -130,7 +130,7 @@ decode_otp_select(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_mtd_write_req(struct tcb *tcp, const long addr)
+decode_mtd_write_req(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct mtd_write_req mreq;
 
@@ -149,7 +149,7 @@ decode_mtd_write_req(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_mtd_info_user(struct tcb *tcp, const long addr)
+decode_mtd_info_user(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct mtd_info_user minfo;
 
@@ -168,7 +168,7 @@ decode_mtd_info_user(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_nand_oobinfo(struct tcb *tcp, const long addr)
+decode_nand_oobinfo(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct nand_oobinfo ninfo;
 	unsigned int i, j;
@@ -204,7 +204,7 @@ decode_nand_oobinfo(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_nand_ecclayout_user(struct tcb *tcp, const long addr)
+decode_nand_ecclayout_user(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct nand_ecclayout_user nlay;
 	unsigned int i;
@@ -230,7 +230,7 @@ decode_nand_ecclayout_user(struct tcb *tcp, const long addr)
 }
 
 static void
-decode_mtd_ecc_stats(struct tcb *tcp, const long addr)
+decode_mtd_ecc_stats(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct mtd_ecc_stats es;
 
@@ -242,8 +242,8 @@ decode_mtd_ecc_stats(struct tcb *tcp, const long addr)
 		es.corrected, es.failed, es.badblocks, es.bbtblocks);
 }
 
-MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *tcp,
-		   const unsigned int code, const long arg)
+MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
+		   const unsigned int code, const kernel_ureg_t arg)
 {
 	switch (code) {
 	case MEMERASE:
