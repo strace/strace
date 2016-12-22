@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Check *xattr syscalls decoding when limiting string size.
+
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a22 -s 4 -e trace=fsetxattr

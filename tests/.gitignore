@@ -358,6 +358,7 @@ waitid
 waitid-v
 waitpid
 xattr
+xattr-strings
 xet_robust_list
 xetitimer
 xetpgid

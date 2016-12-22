@@ -418,6 +418,7 @@ check_PROGRAMS = \
 	waitid-v \
 	waitpid \
 	xattr \
+	xattr-strings \
 	xet_robust_list \
 	xetitimer \
 	xetpgid \
@@ -793,6 +794,7 @@ DECODER_TESTS = \
 	waitid-v.test \
 	waitpid.test \
 	xattr.test \
+	xattr-strings.test \
 	xet_robust_list.test \
 	xetitimer.test \
 	xetpgid.test \
