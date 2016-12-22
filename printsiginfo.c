@@ -239,7 +239,7 @@ printsiginfo(const siginfo_t *sip)
 }
 
 MPERS_PRINTER_DECL(void, printsiginfo_at,
-		   struct tcb *tcp, long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	siginfo_t si;
 
