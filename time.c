@@ -33,7 +33,7 @@
 #include <sys/timex.h>
 
 static void
-print_timezone(struct tcb *tcp, const long addr)
+print_timezone(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct timezone tz;
 
@@ -167,7 +167,7 @@ SYS_FUNC(osf_setitimer)
 #include "xlat/adjtimex_state.h"
 
 static int
-do_adjtimex(struct tcb *tcp, long addr)
+do_adjtimex(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	if (print_timex(tcp, addr))
 		return 0;
