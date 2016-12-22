@@ -77,9 +77,9 @@ decode_select(struct tcb *const tcp, const kernel_ureg_t *const args,
 	int nfds, fdsize;
 	fd_set *fds = NULL;
 	const char *sep;
-	long arg;
+	kernel_ureg_t addr;
 
-	/* Kernel truncates arg[0] to int, we do the same. */
+	/* Kernel truncates args[0] to int, we do the same. */
 	nfds = (int) args[0];
 
 	/* Kernel rejects negative nfds, so we don't parse it either. */
@@ -102,13 +102,13 @@ decode_select(struct tcb *const tcp, const kernel_ureg_t *const args,
 		if (verbose(tcp) && fdsize > 0)
 			fds = malloc(fdsize);
 		for (i = 0; i < 3; i++) {
-			arg = args[i+1];
+			addr = args[i+1];
 			tprints(", ");
 			if (!fds) {
-				printaddr(arg);
+				printaddr(addr);
 				continue;
 			}
-			if (umoven_or_printaddr(tcp, arg, fdsize, fds))
+			if (umoven_or_printaddr(tcp, addr, fdsize, fds))
 				continue;
 			tprints("[");
 			for (j = 0, sep = "";; j++) {
@@ -146,8 +146,8 @@ decode_select(struct tcb *const tcp, const kernel_ureg_t *const args,
 		for (i = 0; i < 3 && ready_fds > 0; i++) {
 			int first = 1;
 
-			arg = args[i+1];
-			if (!arg || !fds || umoven(tcp, arg, fdsize, fds) < 0)
+			addr = args[i+1];
+			if (!addr || !fds || umoven(tcp, addr, fdsize, fds) < 0)
 				continue;
 			for (j = 0;; j++) {
 				j = next_set_bit(fds, j, nfds);
