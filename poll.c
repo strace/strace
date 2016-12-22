@@ -60,7 +60,7 @@ decode_poll_entering(struct tcb *tcp)
 }
 
 static int
-decode_poll_exiting(struct tcb *tcp, const long pts)
+decode_poll_exiting(struct tcb *const tcp, const kernel_ureg_t pts)
 {
 	struct pollfd fds;
 	const unsigned int nfds = tcp->u_arg[1];
