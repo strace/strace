@@ -88,7 +88,8 @@ SYS_FUNC(setuid)
 }
 
 static void
-get_print_uid(struct tcb *tcp, const char *prefix, const long addr)
+get_print_uid(struct tcb *const tcp, const char *const prefix,
+	      const kernel_ureg_t addr)
 {
 	uid_t uid;
 
