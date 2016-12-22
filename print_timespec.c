@@ -65,7 +65,7 @@ print_timespec_t_utime(const timespec_t *t)
 }
 
 MPERS_PRINTER_DECL(void, print_timespec,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timespec_t t;
 
@@ -76,7 +76,7 @@ MPERS_PRINTER_DECL(void, print_timespec,
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timespec,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timespec_t t;
 	static char buf[sizeof(timespec_fmt) + 3 * sizeof(t)];
@@ -95,7 +95,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timespec,
 }
 
 MPERS_PRINTER_DECL(void, print_timespec_utime_pair,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timespec_t t[2];
 
@@ -110,7 +110,7 @@ MPERS_PRINTER_DECL(void, print_timespec_utime_pair,
 }
 
 MPERS_PRINTER_DECL(void, print_itimerspec,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timespec_t t[2];
 

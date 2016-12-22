@@ -47,7 +47,7 @@ MPERS_PRINTER_DECL(void, print_struct_timeval, const void *arg)
 }
 
 MPERS_PRINTER_DECL(void, print_timeval,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval_t t;
 
@@ -68,7 +68,7 @@ print_timeval_item(struct tcb *tcp, void *elem_buf, size_t size, void *data)
 }
 
 MPERS_PRINTER_DECL(void, print_timeval_pair,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval_t t;
 
@@ -77,7 +77,7 @@ MPERS_PRINTER_DECL(void, print_timeval_pair,
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timeval,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval_t t;
 	static char buf[sizeof(timeval_fmt) + 3 * sizeof(t)];
@@ -96,7 +96,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval,
 }
 
 MPERS_PRINTER_DECL(void, print_itimerval,
-		   struct tcb *tcp, const long addr)
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval_t t[2];
 
@@ -119,7 +119,7 @@ print_timeval32_t(const timeval32_t *t)
 }
 
 void
-print_timeval32(struct tcb *tcp, const long addr)
+print_timeval32(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval32_t t;
 
@@ -130,7 +130,7 @@ print_timeval32(struct tcb *tcp, const long addr)
 }
 
 void
-print_timeval32_pair(struct tcb *tcp, const long addr)
+print_timeval32_pair(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval32_t t[2];
 
@@ -145,7 +145,7 @@ print_timeval32_pair(struct tcb *tcp, const long addr)
 }
 
 void
-print_itimerval32(struct tcb *tcp, const long addr)
+print_itimerval32(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval32_t t[2];
 
@@ -160,7 +160,7 @@ print_itimerval32(struct tcb *tcp, const long addr)
 }
 
 const char *
-sprint_timeval32(struct tcb *tcp, const long addr)
+sprint_timeval32(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	timeval32_t t;
 	static char buf[sizeof(timeval_fmt) + 3 * sizeof(t)];
