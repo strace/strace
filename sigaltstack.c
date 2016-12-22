@@ -41,7 +41,7 @@
 #include "xlat/sigaltstack_flags.h"
 
 static void
-print_stack_t(struct tcb *tcp, unsigned long addr)
+print_stack_t(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	stack_t ss;
 
