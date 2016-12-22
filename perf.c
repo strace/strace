@@ -61,7 +61,7 @@ free_pea_desc(void *pea_desc_ptr)
 }
 
 static int
-fetch_perf_event_attr(struct tcb *tcp, unsigned long addr)
+fetch_perf_event_attr(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct pea_desc *desc;
 	struct perf_event_attr *attr;
@@ -118,7 +118,7 @@ fetch_perf_event_attr(struct tcb *tcp, unsigned long addr)
 	} while (0)
 
 static void
-print_perf_event_attr(struct tcb *tcp, unsigned long addr)
+print_perf_event_attr(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	static const char *precise_ip_desc[] = {
 		"arbitrary skid",
