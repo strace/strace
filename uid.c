@@ -164,7 +164,8 @@ print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-print_groups(struct tcb *tcp, const unsigned int len, const unsigned long addr)
+print_groups(struct tcb *const tcp, const unsigned int len,
+	     const kernel_ureg_t addr)
 {
 	static unsigned long ngroups_max;
 	if (!ngroups_max)
