@@ -49,7 +49,7 @@ sprint_rlim64(uint64_t lim)
 }
 
 static void
-print_rlimit64(struct tcb *tcp, unsigned long addr)
+print_rlimit64(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct rlimit_64 {
 		uint64_t rlim_cur;
@@ -80,7 +80,7 @@ sprint_rlim32(uint32_t lim)
 }
 
 static void
-print_rlimit32(struct tcb *tcp, unsigned long addr)
+print_rlimit32(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct rlimit_32 {
 		uint32_t rlim_cur;
@@ -94,7 +94,7 @@ print_rlimit32(struct tcb *tcp, unsigned long addr)
 }
 
 static void
-decode_rlimit(struct tcb *tcp, unsigned long addr)
+decode_rlimit(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	/*
 	 * i386 is the only personality on X86_64 and X32
