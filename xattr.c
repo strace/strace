@@ -40,9 +40,9 @@
 #endif
 
 static void
-print_xattr_val(struct tcb *tcp,
-		unsigned long addr,
-		unsigned long insize,
+print_xattr_val(struct tcb *const tcp,
+		const kernel_ureg_t addr,
+		const unsigned long insize,
 		unsigned long size)
 {
 	tprints(", ");
@@ -101,7 +101,8 @@ SYS_FUNC(fgetxattr)
 }
 
 static void
-print_xattr_list(struct tcb *tcp, unsigned long addr, unsigned long size)
+print_xattr_list(struct tcb *const tcp, const kernel_ureg_t addr,
+		 const unsigned long size)
 {
 	if (!size || syserror(tcp)) {
 		printaddr(addr);
