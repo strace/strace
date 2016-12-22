@@ -29,7 +29,7 @@
 #include "stat.h"
 
 static void
-decode_struct_stat(struct tcb *tcp, const unsigned long addr)
+decode_struct_stat(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct strace_stat st;
 
