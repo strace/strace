@@ -238,7 +238,7 @@ umove_kulong_array_or_printaddr(struct tcb *tcp, const long addr,
 			size_t i;
 
 			for (i = 0; i < n; ++i)
-				ptr[i] = (kernel_ulong_t) ptr32[i];
+				ptr[i] = ptr32[i];
 		}
 		return r;
 	}
@@ -257,8 +257,7 @@ SYS_FUNC(pselect6)
 						     data, ARRAY_SIZE(data))) {
 			tprints("{");
 			/* NB: kernel requires data[1] == NSIG / 8 */
-			print_sigset_addr_len(tcp, (unsigned long) data[0],
-					      (unsigned long) data[1]);
+			print_sigset_addr_len(tcp, data[0], data[1]);
 			tprintf(", %" PRI_klu "}", data[1]);
 		}
 	}
