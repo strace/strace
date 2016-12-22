@@ -94,7 +94,8 @@ SYS_FUNC(sched_rr_get_interval)
 }
 
 static void
-print_sched_attr(struct tcb *tcp, const long addr, unsigned int size)
+print_sched_attr(struct tcb *const tcp, const kernel_ureg_t addr,
+		 unsigned int size)
 {
 	struct {
 		uint32_t size;
