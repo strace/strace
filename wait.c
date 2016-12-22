@@ -117,7 +117,8 @@ printstatus(int status)
 }
 
 static int
-printwaitn(struct tcb *tcp, void (*const print_rusage)(struct tcb *, long))
+printwaitn(struct tcb *const tcp,
+	   void (*const print_rusage)(struct tcb *, kernel_ureg_t))
 {
 	if (entering(tcp)) {
 		/* On Linux, kernel-side pid_t is typedef'ed to int

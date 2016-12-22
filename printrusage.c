@@ -37,7 +37,8 @@ typedef struct rusage rusage_t;
 
 #include MPERS_DEFS
 
-MPERS_PRINTER_DECL(void, printrusage, struct tcb *tcp, long addr)
+MPERS_PRINTER_DECL(void, printrusage,
+		   struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	rusage_t ru;
 
@@ -74,7 +75,7 @@ MPERS_PRINTER_DECL(void, printrusage, struct tcb *tcp, long addr)
 
 #ifdef ALPHA
 void
-printrusage32(struct tcb *tcp, long addr)
+printrusage32(struct tcb *const tcp, const kernel_ureg_t addr)
 {
 	struct rusage32 {
 		timeval32_t ru_utime;		/* user time used */

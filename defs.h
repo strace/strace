@@ -813,7 +813,7 @@ typedef struct {
 } timeval32_t;
 
 extern void print_timeval32_t(const timeval32_t *);
-extern void printrusage32(struct tcb *, long);
+extern void printrusage32(struct tcb *, kernel_ureg_t);
 extern const char *sprint_timeval32(struct tcb *tcp, kernel_ureg_t);
 extern void print_timeval32(struct tcb *tcp, kernel_ureg_t);
 extern void print_timeval32_pair(struct tcb *tcp, kernel_ureg_t);
