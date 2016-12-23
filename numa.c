@@ -43,7 +43,8 @@ print_node(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-print_nodemask(struct tcb *tcp, unsigned long addr, unsigned long maxnodes)
+print_nodemask(struct tcb *const tcp, const kernel_ureg_t addr,
+	       const unsigned long maxnodes)
 {
 	const unsigned long nmemb =
 		(maxnodes + 8 * current_wordsize - 2) / (8 * current_wordsize);
