@@ -397,13 +397,20 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	if (!err)
 		return 0;
 
-	msg = "SYSCALL";
-	if (op == PTRACE_CONT)
-		msg = "CONT";
-	if (op == PTRACE_DETACH)
-		msg = "DETACH";
-	if (op == PTRACE_LISTEN)
-		msg = "LISTEN";
+	switch (op) {
+		case PTRACE_CONT:
+			msg = "CONT";
+			break;
+		case PTRACE_DETACH:
+			msg = "DETACH";
+			break;
+		case PTRACE_LISTEN:
+			msg = "LISTEN";
+			break;
+		default:
+			msg = "SYSCALL";
+	}
+
 	/*
 	 * Why curcol != 0? Otherwise sometimes we get this:
 	 *
