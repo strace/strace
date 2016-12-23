@@ -2056,7 +2056,7 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	struct tcb *execve_thread;
 	long old_pid = 0;
 
-	if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, (long) &old_pid) < 0)
+	if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, &old_pid) < 0)
 		return tcp;
 	/* Avoid truncation in pid2tcb() param passing */
 	if (old_pid <= 0 || old_pid == pid)
@@ -2411,7 +2411,7 @@ trace(void)
 		 * TODO: shouldn't we check for errno == EINVAL too?
 		 * We can get ESRCH instead, you know...
 		 */
-		stopped = ptrace(PTRACE_GETSIGINFO, pid, 0, (long) &si) < 0;
+		stopped = ptrace(PTRACE_GETSIGINFO, pid, 0, &si) < 0;
 #if USE_SEIZE
 show_stopsig:
 #endif
