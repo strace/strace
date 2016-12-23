@@ -106,7 +106,7 @@ SYS_FUNC(old_mmap)
 	if (umove_or_printaddr(tcp, tcp->u_arg[0], &u_arg))
 		return RVAL_DECODED | RVAL_HEX;
 # endif
-	print_mmap(tcp, u_arg, (unsigned long) u_arg[5]);
+	print_mmap(tcp, u_arg, u_arg[5]);
 
 	return RVAL_DECODED | RVAL_HEX;
 }
@@ -118,12 +118,12 @@ SYS_FUNC(old_mmap_pgoff)
 {
 	kernel_ureg_t u_arg[5];
 	int i;
-	unsigned narrow_arg[6];
+	unsigned int narrow_arg[6];
 	unsigned long long offset;
 	if (umove_or_printaddr(tcp, tcp->u_arg[0], &narrow_arg))
 		return RVAL_DECODED | RVAL_HEX;
 	for (i = 0; i < 5; i++)
-		u_arg[i] = (unsigned long) narrow_arg[i];
+		u_arg[i] = narrow_arg[i];
 	offset = narrow_arg[5];
 	offset *= get_pagesize();
 	print_mmap(tcp, u_arg, offset);
