@@ -63,7 +63,7 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-print_kexec_segments(struct tcb *tcp, const unsigned long addr,
+print_kexec_segments(struct tcb *const tcp, const kernel_ureg_t addr,
 		     const unsigned long len)
 {
 	if (len > KEXEC_SEGMENT_MAX) {
@@ -85,8 +85,7 @@ SYS_FUNC(kexec_load)
 	tprintf(", %lu, ", tcp->u_arg[1]);
 
 	/* segments */
-	print_kexec_segments(tcp, tcp->u_arg[2],
-			     tcp->u_arg[1]);
+	print_kexec_segments(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 	tprints(", ");
 
 	/* flags */
