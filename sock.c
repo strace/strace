@@ -131,65 +131,108 @@ print_ifc_len(int len)
 	return n;
 }
 
+static bool
+print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
+		   void *dummy)
+{
+	struct ifreq *ifr = elem_buf;
+
+	tprints("{ifr_name=");
+	print_ifname(ifr->ifr_name);
+	tprints(", ");
+	PRINT_IFREQ_ADDR(tcp, ifr, ifr_addr);
+	tprints("}");
+
+	return true;
+}
+
+/*
+ * There are two different modes of operation:
+ *
+ * - Get buffer size.  In this case, the callee sets ifc_buf to NULL,
+ *   and the kernel returns the buffer size in ifc_len.
+ * - Get actual data.  In this case, the callee specifies the buffer address
+ *   in ifc_buf and its size in ifc_len.  The kernel fills the buffer with
+ *   the data, and its amount is returned in ifc_len.
+ *
+ * Note that, technically, the whole struct ifconf is overwritten,
+ * so ifc_buf could be different on exit, but current ioctl handler
+ * implementation does not touch it.
+ */
 static int
 decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	struct ifconf ifc;
+	struct ifconf *entering_ifc = NULL;
+	struct ifconf *ifc =
+		entering(tcp) ? malloc(sizeof(*ifc)) : alloca(sizeof(*ifc));
+
+	if (exiting(tcp)) {
+		entering_ifc = get_tcb_priv_data(tcp);
+
+		if (!entering_ifc) {
+			error_msg("decode_ifconf: where is my ifconf?");
+			return 0;
+		}
+	}
+
+	if (!ifc || umove(tcp, addr, ifc) < 0) {
+		if (entering(tcp)) {
+			free(ifc);
+
+			tprints(", ");
+			printaddr(addr);
+		} else {
+			/*
+			 * We failed to fetch the structure on exiting syscall,
+			 * print whatever was fetched on entering syscall.
+			 */
+			if (!entering_ifc->ifc_buf)
+				print_ifc_len(entering_ifc->ifc_len);
+
+			tprints(", ifc_buf=");
+			printaddr(ptr_to_kulong(entering_ifc->ifc_buf));
+
+			tprints("}");
+		}
+
+		return RVAL_DECODED | 1;
+	}
 
 	if (entering(tcp)) {
-		tprints(", ");
-		if (umove_or_printaddr(tcp, addr, &ifc))
-			return RVAL_DECODED | 1;
-		if (ifc.ifc_buf) {
-			tprints("{");
-			print_ifc_len(ifc.ifc_len);
-		}
+		tprints(", {ifc_len=");
+		if (ifc->ifc_buf)
+			print_ifc_len(ifc->ifc_len);
+
+		set_tcb_priv_data(tcp, ifc, free);
+
 		return 1;
 	}
 
-	if (syserror(tcp) || umove(tcp, addr, &ifc) < 0) {
-		if (ifc.ifc_buf)
-			tprints("}");
-		else
-			printaddr(addr);
-		return RVAL_DECODED | 1;
+	/* exiting */
+
+	if (entering_ifc->ifc_buf && (entering_ifc->ifc_len != ifc->ifc_len))
+		tprints(" => ");
+	if (!entering_ifc->ifc_buf || (entering_ifc->ifc_len != ifc->ifc_len))
+		print_ifc_len(ifc->ifc_len);
+
+	tprints(", ifc_buf=");
+
+	if (!entering_ifc->ifc_buf || syserror(tcp)) {
+		printaddr(ptr_to_kulong(entering_ifc->ifc_buf));
+		if (entering_ifc->ifc_buf != ifc->ifc_buf) {
+			tprints(" => ");
+			printaddr(ptr_to_kulong(ifc->ifc_buf));
+		}
+	} else {
+		struct ifreq ifr;
+
+		print_array(tcp, ptr_to_kulong(ifc->ifc_buf),
+			    ifc->ifc_len / sizeof(struct ifreq),
+			    &ifr, sizeof(ifr),
+			    umoven_or_printaddr, print_ifconf_ifreq, NULL);
 	}
 
-	if (!ifc.ifc_buf) {
-		tprints("{");
-		print_ifc_len(ifc.ifc_len);
-		tprints(", NULL}");
-		return RVAL_DECODED | 1;
-	}
-
-	tprints(" => ");
-	const unsigned int nifra = print_ifc_len(ifc.ifc_len);
-	if (!nifra) {
-		tprints("}");
-		return RVAL_DECODED | 1;
-	}
-
-	struct ifreq ifra[nifra > max_strlen ? max_strlen : nifra];
-	tprints(", ");
-	if (umove_or_printaddr(tcp, ptr_to_kulong(ifc.ifc_buf), &ifra)) {
-		tprints("}");
-		return RVAL_DECODED | 1;
-	}
-
-	tprints("[");
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(ifra); ++i) {
-		if (i > 0)
-			tprints(", ");
-		tprints("{ifr_name=");
-		print_ifname(ifra[i].ifr_name);
-		tprints(", ");
-		PRINT_IFREQ_ADDR(tcp, &ifra[i], ifr_addr);
-		tprints("}");
-	}
-	if (i < nifra)
-		tprints(", ...");
-	tprints("]}");
+	tprints("}");
 
 	return RVAL_DECODED | 1;
 }
