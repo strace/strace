@@ -173,7 +173,7 @@ SYS_FUNC(sysctl)
 				&& (name[1] == KERN_OSRELEASE
 				    || name[1] == KERN_OSTYPE
 					)))) {
-			printpath(tcp, (size_t)info.oldval);
+			printpath(tcp, (kernel_ureg_t) info.oldval);
 		} else {
 			tprintf("%p", info.oldval);
 		}
@@ -183,7 +183,7 @@ SYS_FUNC(sysctl)
 		else if (syserror(tcp))
 			tprintf("%p", info.newval);
 		else
-			printpath(tcp, (size_t)info.newval);
+			printpath(tcp, (kernel_ureg_t) info.newval);
 		tprintf(", %lu", (unsigned long)info.newlen);
 	}
 
