@@ -38,8 +38,8 @@
 typedef struct msgbuf msgbuf_t;
 #include MPERS_DEFS
 
-MPERS_PRINTER_DECL(void, tprint_msgbuf,
-		   struct tcb *tcp, const long addr, const unsigned long count)
+MPERS_PRINTER_DECL(void, tprint_msgbuf, struct tcb *const tcp,
+		   const kernel_ureg_t addr, const unsigned long count)
 {
 	msgbuf_t msg;
 
