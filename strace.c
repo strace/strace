@@ -386,13 +386,13 @@ ptrace_attach_or_seize(int pid)
  * Otherwise prints error message and returns -1.
  */
 static int
-ptrace_restart(int op, struct tcb *tcp, int sig)
+ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 {
 	int err;
 	const char *msg;
 
 	errno = 0;
-	ptrace(op, tcp->pid, (void *) 0, (long) sig);
+	ptrace(op, tcp->pid, 0L, (unsigned long) sig);
 	err = errno;
 	if (!err)
 		return 0;
@@ -420,7 +420,7 @@ ptrace_restart(int op, struct tcb *tcp, int sig)
 	if (err == ESRCH)
 		return 0;
 	errno = err;
-	perror_msg("ptrace(PTRACE_%s,pid:%d,sig:%d)", msg, tcp->pid, sig);
+	perror_msg("ptrace(PTRACE_%s,pid:%d,sig:%u)", msg, tcp->pid, sig);
 	return -1;
 }
 
