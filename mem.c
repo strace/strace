@@ -57,7 +57,7 @@ SYS_FUNC(brk)
 static void
 print_mmap(struct tcb *tcp, kernel_ureg_t *u_arg, unsigned long long offset)
 {
-	const unsigned long addr = u_arg[0];
+	const kernel_ureg_t addr = u_arg[0];
 	const unsigned long len = u_arg[1];
 	const unsigned long prot = u_arg[2];
 	const unsigned long flags = u_arg[3];
@@ -312,7 +312,7 @@ SYS_FUNC(getpagesize)
 
 SYS_FUNC(remap_file_pages)
 {
-	const unsigned long addr = tcp->u_arg[0];
+	const kernel_ureg_t addr = tcp->u_arg[0];
 	const unsigned long size = tcp->u_arg[1];
 	const unsigned long prot = tcp->u_arg[2];
 	const unsigned long pgoff = tcp->u_arg[3];
@@ -343,10 +343,10 @@ print_protmap_entry(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 
 SYS_FUNC(subpage_prot)
 {
-	unsigned long addr = tcp->u_arg[0];
+	kernel_ureg_t addr = tcp->u_arg[0];
 	unsigned long len = tcp->u_arg[1];
 	unsigned long nmemb = len >> 16;
-	unsigned long map = tcp->u_arg[2];
+	kernel_ureg_t map = tcp->u_arg[2];
 
 	printaddr(addr);
 	tprintf(", %lu, ", len);
