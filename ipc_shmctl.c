@@ -51,7 +51,7 @@ typedef struct shmid64_ds shmid_ds_t;
 #include "xlat/shmctl_flags.h"
 
 static void
-print_shmid_ds(struct tcb *tcp, const long addr, int cmd)
+print_shmid_ds(struct tcb *const tcp, const kernel_ureg_t addr, int cmd)
 {
 	/* TODO: We don't properly decode old compat ipc calls. */
 	if (cmd & IPC_64)
@@ -101,7 +101,7 @@ SYS_FUNC(shmctl)
 		PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
 		tprints(", ");
 	} else {
-		const long addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
+		const kernel_ureg_t addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
 		print_shmid_ds(tcp, addr, tcp->u_arg[1]);
 	}
 	return 0;

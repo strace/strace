@@ -57,8 +57,8 @@ SYS_FUNC(msgget)
 }
 
 static void
-tprint_msgsnd(struct tcb *tcp, const long addr, const unsigned long count,
-	      const unsigned long flags)
+tprint_msgsnd(struct tcb *const tcp, const kernel_ureg_t addr,
+	      const unsigned long count, const unsigned long flags)
 {
 	tprint_msgbuf(tcp, addr, count);
 	printflags(ipc_msg_flags, flags, "MSG_???");
@@ -78,15 +78,16 @@ SYS_FUNC(msgsnd)
 }
 
 static void
-tprint_msgrcv(struct tcb *tcp, const long addr, const unsigned long count,
-	      const long msgtyp)
+tprint_msgrcv(struct tcb *const tcp, const kernel_ureg_t addr,
+	      const unsigned long count, const unsigned long msgtyp)
 {
 	tprint_msgbuf(tcp, addr, count);
 	tprintf("%ld, ", msgtyp);
 }
 
 static int
-fetch_msgrcv_args(struct tcb *tcp, const long addr, unsigned long *pair)
+fetch_msgrcv_args(struct tcb *const tcp, const kernel_ureg_t addr,
+		  unsigned long *const pair)
 {
 	if (current_wordsize == sizeof(*pair)) {
 		if (umoven_or_printaddr(tcp, addr, 2 * sizeof(*pair), pair))
