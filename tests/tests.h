@@ -141,6 +141,22 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 /* Create a pipe with maximized descriptor numbers. */
 void pipe_maxfd(int pipefd[2]);
 
+#define F8ILL_KULONG_SUPPORTED	(sizeof(void *) < sizeof(kernel_ulong_t))
+#define F8ILL_KULONG_MASK	((kernel_ulong_t) 0xffffffff00000000ULL)
+
+/*
+ * For 64-bit kernel_ulong_t and 32-bit pointer,
+ * return a kernel_ulong_t value by filling higher bits.
+ * For other architertures, return the original pointer.
+ */
+static inline kernel_ulong_t
+f8ill_ptr_to_kulong(const void *const ptr)
+{
+	const unsigned long uptr = (unsigned long) ptr;
+	return F8ILL_KULONG_SUPPORTED
+	       ? F8ILL_KULONG_MASK | uptr : (kernel_ulong_t) uptr;
+}
+
 # define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 
