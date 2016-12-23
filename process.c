@@ -57,7 +57,7 @@ static const struct xlat struct_user_offsets[] = {
 };
 
 static void
-print_user_offset_addr(const unsigned long addr)
+print_user_offset_addr(const kernel_ureg_t addr)
 {
 	const struct xlat *x;
 
@@ -74,7 +74,7 @@ print_user_offset_addr(const unsigned long addr)
 		} else {
 			--x;
 			tprintf("%s + %lu",
-				x->str, addr - (unsigned long) x->val);
+				x->str, addr - (kernel_ureg_t) x->val);
 		}
 	} else {
 		tprints(x->str);
@@ -85,7 +85,7 @@ SYS_FUNC(ptrace)
 {
 	const unsigned long request = tcp->u_arg[0];
 	const int pid = tcp->u_arg[1];
-	const unsigned long addr = tcp->u_arg[2];
+	const kernel_ureg_t addr = tcp->u_arg[2];
 	const unsigned long data = tcp->u_arg[3];
 
 	if (entering(tcp)) {
