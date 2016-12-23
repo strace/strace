@@ -88,7 +88,7 @@ SYS_FUNC(lseek)
 #endif
 
 /* llseek syscall takes explicitly two ulong arguments hi, lo,
- * rather than one 64-bit argument for which LONG_LONG works
+ * rather than one 64-bit argument for which ULONG_LONG works
  * appropriate for the native byte order.
  *
  * See kernel's fs/read_write.c::SYSCALL_DEFINE5(llseek, ...)

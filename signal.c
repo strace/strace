@@ -526,7 +526,7 @@ decode_new_sigaction(struct tcb *tcp, long addr)
 		 * For little-endian, it's the same.
 		 * For big-endian, we swap 32-bit words.
 		 */
-		sa.sa_mask[0] = LONG_LONG(sa32.sa_mask[0], sa32.sa_mask[1]);
+		sa.sa_mask[0] = ULONG_LONG(sa32.sa_mask[0], sa32.sa_mask[1]);
 	} else
 #endif
 	if (umove_or_printaddr(tcp, addr, &sa))

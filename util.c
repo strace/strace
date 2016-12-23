@@ -303,7 +303,7 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 		/* Align arg_no to the next even number. */
 		arg_no = (arg_no + 1) & 0xe;
 #  endif /* AARCH64 || POWERPC64 */
-		*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
+		*val = ULONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
 	} else
 # endif /* !current_klongsize */
@@ -316,7 +316,7 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 #elif HAVE_STRUCT_TCB_EXT_ARG
 # ifndef current_klongsize
 	if (current_klongsize < SIZEOF_LONG_LONG) {
-		*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
+		*val = ULONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
 	} else
 # endif /* !current_klongsize */
@@ -342,7 +342,7 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 	if (arg_no == 3)
 		arg_no++;
 # endif /* __ARM_EABI__ || LINUX_MIPSO32 || POWERPC || XTENSA || SH */
-	*val = LONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
+	*val = ULONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 	arg_no += 2;
 #endif
 
