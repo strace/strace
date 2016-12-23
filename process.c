@@ -83,10 +83,10 @@ print_user_offset_addr(const kernel_ureg_t addr)
 
 SYS_FUNC(ptrace)
 {
-	const unsigned long request = tcp->u_arg[0];
+	const kernel_ureg_t request = tcp->u_arg[0];
 	const int pid = tcp->u_arg[1];
 	const kernel_ureg_t addr = tcp->u_arg[2];
-	const unsigned long data = tcp->u_arg[3];
+	const kernel_ureg_t data = tcp->u_arg[3];
 
 	if (entering(tcp)) {
 		/* request */
