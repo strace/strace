@@ -186,8 +186,8 @@ SYS_FUNC(listen)
 }
 
 static bool
-fetch_socklen(struct tcb *tcp, int *plen,
-	      const unsigned long sockaddr, const unsigned long socklen)
+fetch_socklen(struct tcb *const tcp, int *const plen,
+	      const kernel_ureg_t sockaddr, const kernel_ureg_t socklen)
 {
 	return verbose(tcp) && sockaddr && socklen
 	       && umove(tcp, socklen, plen) == 0;
