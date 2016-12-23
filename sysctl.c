@@ -167,7 +167,7 @@ SYS_FUNC(sysctl)
 		size_t oldlen = 0;
 		if (info.oldval == NULL) {
 			tprints("NULL");
-		} else if (umove(tcp, (long)info.oldlenp, &oldlen) >= 0
+		} else if (umove(tcp, (kernel_ureg_t) info.oldlenp, &oldlen) >= 0
 			   && info.nlen >= 2
 			   && ((name[0] == CTL_KERN
 				&& (name[1] == KERN_OSRELEASE
