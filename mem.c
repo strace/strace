@@ -58,20 +58,20 @@ static void
 print_mmap(struct tcb *tcp, kernel_ureg_t *u_arg, unsigned long long offset)
 {
 	const kernel_ureg_t addr = u_arg[0];
-	const unsigned long len = u_arg[1];
-	const unsigned long prot = u_arg[2];
-	const unsigned long flags = u_arg[3];
+	const kernel_ureg_t len = u_arg[1];
+	const kernel_ureg_t prot = u_arg[2];
+	const kernel_ureg_t flags = u_arg[3];
 	const int fd = u_arg[4];
 
 	printaddr(addr);
 	tprintf(", %lu, ", len);
-	printflags_long(mmap_prot, prot, "PROT_???");
+	printflags64(mmap_prot, prot, "PROT_???");
 	tprints(", ");
 #ifdef MAP_TYPE
-	printxval_long(mmap_flags, flags & MAP_TYPE, "MAP_???");
+	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
 	addflags(mmap_flags, flags & ~MAP_TYPE);
 #else
-	printflags_long(mmap_flags, flags, "MAP_???");
+	printflags64(mmap_flags, flags, "MAP_???");
 #endif
 	tprints(", ");
 	printfd(tcp, fd);
@@ -94,7 +94,7 @@ print_mmap(struct tcb *tcp, kernel_ureg_t *u_arg, unsigned long long offset)
 SYS_FUNC(old_mmap)
 {
 	kernel_ureg_t u_arg[6];
-# if defined AARCH64 || defined X86_64
+# ifndef current_klongsize
 	/* We are here only in a 32-bit personality. */
 	unsigned int narrow_arg[6];
 	if (umove_or_printaddr(tcp, tcp->u_arg[0], &narrow_arg))
@@ -211,7 +211,7 @@ SYS_FUNC(mremap)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %lu, %lu, ", tcp->u_arg[1], tcp->u_arg[2]);
-	printflags_long(mremap_flags, tcp->u_arg[3], "MREMAP_???");
+	printflags64(mremap_flags, tcp->u_arg[3], "MREMAP_???");
 #ifdef MREMAP_FIXED
 	if ((tcp->u_arg[3] & (MREMAP_MAYMOVE | MREMAP_FIXED)) ==
 	    (MREMAP_MAYMOVE | MREMAP_FIXED)) {
@@ -313,20 +313,20 @@ SYS_FUNC(getpagesize)
 SYS_FUNC(remap_file_pages)
 {
 	const kernel_ureg_t addr = tcp->u_arg[0];
-	const unsigned long size = tcp->u_arg[1];
-	const unsigned long prot = tcp->u_arg[2];
-	const unsigned long pgoff = tcp->u_arg[3];
-	const unsigned long flags = tcp->u_arg[4];
+	const kernel_ureg_t size = tcp->u_arg[1];
+	const kernel_ureg_t prot = tcp->u_arg[2];
+	const kernel_ureg_t pgoff = tcp->u_arg[3];
+	const kernel_ureg_t flags = tcp->u_arg[4];
 
 	printaddr(addr);
 	tprintf(", %lu, ", size);
-	printflags_long(mmap_prot, prot, "PROT_???");
+	printflags64(mmap_prot, prot, "PROT_???");
 	tprintf(", %lu, ", pgoff);
 #ifdef MAP_TYPE
-	printxval_long(mmap_flags, flags & MAP_TYPE, "MAP_???");
+	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
 	addflags(mmap_flags, flags & ~MAP_TYPE);
 #else
-	printflags_long(mmap_flags, flags, "MAP_???");
+	printflags64(mmap_flags, flags, "MAP_???");
 #endif
 
 	return RVAL_DECODED;
@@ -344,8 +344,8 @@ print_protmap_entry(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 SYS_FUNC(subpage_prot)
 {
 	kernel_ureg_t addr = tcp->u_arg[0];
-	unsigned long len = tcp->u_arg[1];
-	unsigned long nmemb = len >> 16;
+	kernel_ureg_t len = tcp->u_arg[1];
+	kernel_ureg_t nmemb = len >> 16;
 	kernel_ureg_t map = tcp->u_arg[2];
 
 	printaddr(addr);
