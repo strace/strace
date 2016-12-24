@@ -613,7 +613,7 @@ extern void
 dumpstr(struct tcb *, kernel_ureg_t addr, int len);
 
 extern void
-printstr_ex(struct tcb *, kernel_ureg_t addr, long len,
+printstr_ex(struct tcb *, kernel_ureg_t addr, kernel_ureg_t len,
 	    unsigned int user_style);
 
 #define DECL_PRINTNUM(name)						\
@@ -765,7 +765,7 @@ printaddr(kernel_ureg_t addr)
 }
 
 static inline void
-printstrn(struct tcb *tcp, kernel_ureg_t addr, long len)
+printstrn(struct tcb *tcp, kernel_ureg_t addr, kernel_ureg_t len)
 {
 	printstr_ex(tcp, addr, len, 0);
 }

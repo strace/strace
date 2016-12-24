@@ -857,8 +857,8 @@ printpath(struct tcb *const tcp, const kernel_ureg_t addr)
  * or QUOTE_0_TERMINATED bit is set and the string length exceeds `len'.
  */
 void
-printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr, const long len,
-	    const unsigned int user_style)
+printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr,
+	    const kernel_ureg_t len, const unsigned int user_style)
 {
 	static char *str = NULL;
 	static char *outstr;
@@ -884,8 +884,8 @@ printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr, const long len,
 	/* Fetch one byte more because string_quote may look one byte ahead. */
 	size = max_strlen + 1;
 
-	if (size > (unsigned long) len)
-		size = (unsigned long) len;
+	if (size > len)
+		size = len;
 	if (style & QUOTE_0_TERMINATED)
 		rc = umovestr(tcp, addr, size, str);
 	else
@@ -907,7 +907,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr, const long len,
 	ellipsis = string_quote(str, outstr, size, style)
 		   && len
 		   && ((style & QUOTE_0_TERMINATED)
-		       || (unsigned long) len > max_strlen);
+		       || len > max_strlen);
 
 	tprints(outstr);
 	if (ellipsis)
