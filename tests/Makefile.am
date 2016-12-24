@@ -182,6 +182,7 @@ check_PROGRAMS = \
 	ioctl_mtd \
 	ioctl_rtc \
 	ioctl_rtc-v \
+	ioctl_sock_gifconf \
 	ioctl_uffdio \
 	ioctl_v4l2 \
 	ioperm \
@@ -577,6 +578,7 @@ DECODER_TESTS = \
 	ioctl_mtd.test \
 	ioctl_rtc.test \
 	ioctl_rtc-v.test \
+	ioctl_sock_gifconf.test \
 	ioctl_uffdio.test \
 	ioctl_v4l2.test \
 	ioperm.test \
