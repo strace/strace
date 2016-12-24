@@ -42,7 +42,7 @@ SYS_FUNC(mount)
 	bool ignore_type = false;
 	bool ignore_data = false;
 	bool old_magic = false;
-	unsigned long flags = tcp->u_arg[3];
+	kernel_ureg_t flags = tcp->u_arg[3];
 
 	/* Discard magic */
 	if ((flags & MS_MGC_MSK) == MS_MGC_VAL) {
@@ -74,7 +74,7 @@ SYS_FUNC(mount)
 			tprints("|");
 	}
 	if (flags || !old_magic)
-		printflags_long(mount_flags, flags, "MS_???");
+		printflags64(mount_flags, flags, "MS_???");
 	tprints(", ");
 
 	if (ignore_data)
