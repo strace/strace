@@ -60,10 +60,10 @@ SYS_FUNC(mq_timedreceive)
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
-		if (!syserror(tcp) && (tcp->u_rval >= 0))
-			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
-		else
+		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
+		else
+			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
 		tprintf(", %" PRI_klu ", ", getarg_klu(tcp, 2));
 		printnum_int(tcp, tcp->u_arg[3], "%u");
 		tprintf(", ");
