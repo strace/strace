@@ -663,7 +663,7 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 	tprintf(", size=%u", p->size);
 	if (p->size > 0) {
 		tprints(", string=");
-		printstr(tcp, (long) p->string, p->size);
+		printstr(tcp, (kernel_ureg_t) p->string, p->size);
 	} else
 # endif
 	tprintf(", value=%d, value64=%" PRId64, p->value, (int64_t) p->value64);
