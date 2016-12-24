@@ -8,12 +8,12 @@ get_syscall_args(struct tcb *tcp)
 		 * Use widen_to_long(tcp->u_arg[N]) in syscall handlers
 		 * if you need to use *sign-extended* parameter.
 		 */
-		tcp->u_arg[0] = (long) (uint32_t) sparc_regs.u_regs[U_REG_O0 + 0];
-		tcp->u_arg[1] = (long) (uint32_t) sparc_regs.u_regs[U_REG_O0 + 1];
-		tcp->u_arg[2] = (long) (uint32_t) sparc_regs.u_regs[U_REG_O0 + 2];
-		tcp->u_arg[3] = (long) (uint32_t) sparc_regs.u_regs[U_REG_O0 + 3];
-		tcp->u_arg[4] = (long) (uint32_t) sparc_regs.u_regs[U_REG_O0 + 4];
-		tcp->u_arg[5] = (long) (uint32_t) sparc_regs.u_regs[U_REG_O0 + 5];
+		tcp->u_arg[0] = (uint32_t) sparc_regs.u_regs[U_REG_O0 + 0];
+		tcp->u_arg[1] = (uint32_t) sparc_regs.u_regs[U_REG_O0 + 1];
+		tcp->u_arg[2] = (uint32_t) sparc_regs.u_regs[U_REG_O0 + 2];
+		tcp->u_arg[3] = (uint32_t) sparc_regs.u_regs[U_REG_O0 + 3];
+		tcp->u_arg[4] = (uint32_t) sparc_regs.u_regs[U_REG_O0 + 4];
+		tcp->u_arg[5] = (uint32_t) sparc_regs.u_regs[U_REG_O0 + 5];
 	} else {
 		tcp->u_arg[0] = sparc_regs.u_regs[U_REG_O0 + 0];
 		tcp->u_arg[1] = sparc_regs.u_regs[U_REG_O0 + 1];
