@@ -689,8 +689,8 @@ extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 extern void printsignal(int);
 
 extern void
-tprint_iov_upto(struct tcb *, unsigned long len, kernel_ureg_t addr,
-		enum iov_decode, unsigned long data_size);
+tprint_iov_upto(struct tcb *, kernel_ureg_t len, kernel_ureg_t addr,
+		enum iov_decode, kernel_ureg_t data_size);
 
 extern void
 decode_netlink(struct tcb *, kernel_ureg_t addr, unsigned long len);
@@ -807,10 +807,10 @@ printxval_long(const struct xlat *x, const unsigned long val, const char *dflt)
 }
 
 static inline void
-tprint_iov(struct tcb *tcp, unsigned long len, kernel_ureg_t addr,
+tprint_iov(struct tcb *tcp, kernel_ureg_t len, kernel_ureg_t addr,
 	   enum iov_decode decode_iov)
 {
-	tprint_iov_upto(tcp, len, addr, decode_iov, -1UL);
+	tprint_iov_upto(tcp, len, addr, decode_iov, -1);
 }
 
 #ifdef ALPHA
