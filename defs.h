@@ -681,7 +681,7 @@ decode_sockaddr(struct tcb *, kernel_ureg_t addr, int addrlen);
 extern void printuid(const char *, const unsigned int);
 
 extern void
-print_sigset_addr_len(struct tcb *, kernel_ureg_t addr, long len);
+print_sigset_addr_len(struct tcb *, kernel_ureg_t addr, kernel_ureg_t len);
 
 extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 #define tprintsigmask_addr(prefix, mask) \

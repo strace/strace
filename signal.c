@@ -243,7 +243,7 @@ printsignal(int nr)
 
 static void
 print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ureg_t addr,
-			    const long len, const long min_len)
+			    const kernel_ureg_t len, const unsigned int min_len)
 {
 	/*
 	 * Here len is usually equal to NSIG / 8 or current_wordsize.
@@ -261,7 +261,7 @@ print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ureg_t addr,
 
 void
 print_sigset_addr_len(struct tcb *const tcp, const kernel_ureg_t addr,
-		      const long len)
+		      const kernel_ureg_t len)
 {
 	print_sigset_addr_len_limit(tcp, addr, len, current_wordsize);
 }
