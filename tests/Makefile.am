@@ -283,6 +283,7 @@ check_PROGRAMS = \
 	preadv-pwritev \
 	preadv2-pwritev2 \
 	print_maxfd \
+	printstr \
 	prlimit64 \
 	process_vm_readv \
 	process_vm_writev \
@@ -667,6 +668,7 @@ DECODER_TESTS = \
 	preadv-pwritev.test \
 	preadv2-pwritev2.test \
 	preadv.test \
+	printstr.test \
 	prlimit64.test \
 	process_vm_readv.test \
 	process_vm_writev.test \

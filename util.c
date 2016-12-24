@@ -850,12 +850,11 @@ printpath(struct tcb *const tcp, const kernel_ureg_t addr)
 
 /*
  * Print string specified by address `addr' and length `len'.
- * If `len' == -1, set QUOTE_0_TERMINATED bit in `user_style'.
  * If `user_style' has QUOTE_0_TERMINATED bit set, treat the string
  * as a NUL-terminated string.
  * Pass `user_style' on to `string_quote'.
  * Append `...' to the output if either the string length exceeds `max_strlen',
- * or `len' != -1 and the string length exceeds `len'.
+ * or QUOTE_0_TERMINATED bit is set and the string length exceeds `len'.
  */
 void
 printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr, const long len,
@@ -882,22 +881,16 @@ printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr, const long len,
 		outstr = xmalloc(outstr_size);
 	}
 
+	/* Fetch one byte more because string_quote may look one byte ahead. */
 	size = max_strlen + 1;
-	if (len == -1) {
-		/*
-		 * Treat as a NUL-terminated string: fetch one byte more
-		 * because string_quote may look one byte ahead.
-		 */
-		style |= QUOTE_0_TERMINATED;
+
+	if (size > (unsigned long) len)
+		size = (unsigned long) len;
+	if (style & QUOTE_0_TERMINATED)
 		rc = umovestr(tcp, addr, size, str);
-	} else {
-		if (size > (unsigned long) len)
-			size = (unsigned long) len;
-		if (style & QUOTE_0_TERMINATED)
-			rc = umovestr(tcp, addr, size, str);
-		else
-			rc = umoven(tcp, addr, size, str);
-	}
+	else
+		rc = umoven(tcp, addr, size, str);
+
 	if (rc < 0) {
 		printaddr(addr);
 		return;

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of non-NUL-terminated strings when len == -1.
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -e trace=writev
