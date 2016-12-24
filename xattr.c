@@ -42,8 +42,8 @@
 static void
 print_xattr_val(struct tcb *const tcp,
 		const kernel_ureg_t addr,
-		const unsigned long insize,
-		unsigned long size)
+		const kernel_ureg_t insize,
+		const kernel_ureg_t size)
 {
 	tprints(", ");
 
@@ -102,7 +102,7 @@ SYS_FUNC(fgetxattr)
 
 static void
 print_xattr_list(struct tcb *const tcp, const kernel_ureg_t addr,
-		 const unsigned long size)
+		 const kernel_ureg_t size)
 {
 	if (!size || syserror(tcp)) {
 		printaddr(addr);
