@@ -40,8 +40,8 @@
 static bool
 print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const unsigned long *seg;
-	unsigned long seg_buf[4];
+	const kernel_ureg_t *seg;
+	kernel_ureg_t seg_buf[4];
 
         if (elem_size < sizeof(seg_buf)) {
 		unsigned int i;
@@ -64,14 +64,14 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 static void
 print_kexec_segments(struct tcb *const tcp, const kernel_ureg_t addr,
-		     const unsigned long len)
+		     const kernel_ureg_t len)
 {
 	if (len > KEXEC_SEGMENT_MAX) {
 		printaddr(addr);
 		return;
 	}
 
-	unsigned long seg[4];
+	kernel_ureg_t seg[4];
 	const size_t sizeof_seg = ARRAY_SIZE(seg) * current_wordsize;
 
 	print_array(tcp, addr, len, seg, sizeof_seg,
