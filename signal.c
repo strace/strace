@@ -282,22 +282,22 @@ struct old_sigaction {
 	/* sa_handler may be a libc #define, need to use other name: */
 #ifdef MIPS
 	unsigned int sa_flags;
-	void (*__sa_handler)(int);
+	unsigned long sa_handler__;
 	/* Kernel treats sa_mask as an array of longs. */
 	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
 #else
-	void (*__sa_handler)(int);
+	unsigned long sa_handler__;
 	unsigned long sa_mask;
 	unsigned long sa_flags;
 #endif /* !MIPS */
 #if HAVE_SA_RESTORER
-	void (*sa_restorer)(void);
+	unsigned long sa_restorer;
 #endif
 };
 
 struct old_sigaction32 {
 	/* sa_handler may be a libc #define, need to use other name: */
-	uint32_t __sa_handler;
+	uint32_t sa_handler__;
 	uint32_t sa_mask;
 	uint32_t sa_flags;
 #if HAVE_SA_RESTORER
@@ -311,17 +311,17 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 	struct old_sigaction sa;
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize != sizeof(sa.__sa_handler) && current_wordsize == 4) {
+	if (current_wordsize != sizeof(sa.sa_handler__) && current_wordsize == 4) {
 		struct old_sigaction32 sa32;
 
 		if (umove_or_printaddr(tcp, addr, &sa32))
 			return;
 
 		memset(&sa, 0, sizeof(sa));
-		sa.__sa_handler = (void*)(uintptr_t)sa32.__sa_handler;
+		sa.sa_handler__ = sa32.sa_handler__;
 		sa.sa_flags = sa32.sa_flags;
 #if HAVE_SA_RESTORER && defined SA_RESTORER
-		sa.sa_restorer = (void*)(uintptr_t)sa32.sa_restorer;
+		sa.sa_restorer = sa32.sa_restorer;
 #endif
 		sa.sa_mask = sa32.sa_mask;
 	} else
@@ -329,16 +329,8 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 	if (umove_or_printaddr(tcp, addr, &sa))
 		return;
 
-	/* Architectures using function pointers, like
-	 * hppa, may need to manipulate the function pointer
-	 * to compute the result of a comparison. However,
-	 * the __sa_handler function pointer exists only in
-	 * the address space of the traced process, and can't
-	 * be manipulated by strace. In order to prevent the
-	 * compiler from generating code to manipulate
-	 * __sa_handler we cast the function pointers to long. */
 	tprints("{sa_handler=");
-	print_sa_handler((unsigned long) sa.__sa_handler);
+	print_sa_handler(sa.sa_handler__);
 	tprints(", sa_mask=");
 #ifdef MIPS
 	tprintsigmask_addr("", sa.sa_mask);
@@ -348,8 +340,10 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 	tprints(", sa_flags=");
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #if HAVE_SA_RESTORER && defined SA_RESTORER
-	if (sa.sa_flags & SA_RESTORER)
-		tprintf(", sa_restorer=%p", sa.sa_restorer);
+	if (sa.sa_flags & SA_RESTORER) {
+		tprints(", sa_restorer=");
+		printaddr(sa.sa_restorer);
+	}
 #endif
 	tprints("}");
 }
@@ -480,13 +474,13 @@ struct new_sigaction
 	/* sa_handler may be a libc #define, need to use other name: */
 #ifdef MIPS
 	unsigned int sa_flags;
-	void (*__sa_handler)(int);
+	unsigned long sa_handler__;
 #else
-	void (*__sa_handler)(int);
+	unsigned long sa_handler__;
 	unsigned long sa_flags;
 #endif /* !MIPS */
 #if HAVE_SA_RESTORER
-	void (*sa_restorer)(void);
+	unsigned long sa_restorer;
 #endif
 	/* Kernel treats sa_mask as an array of longs. */
 	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
@@ -494,7 +488,7 @@ struct new_sigaction
 /* Same for i386-on-x86_64 and similar cases */
 struct new_sigaction32
 {
-	uint32_t __sa_handler;
+	uint32_t sa_handler__;
 	uint32_t sa_flags;
 #if HAVE_SA_RESTORER
 	uint32_t sa_restorer;
@@ -515,10 +509,10 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 			return;
 
 		memset(&sa, 0, sizeof(sa));
-		sa.__sa_handler = (void*)(unsigned long)sa32.__sa_handler;
+		sa.sa_handler__ = sa32.sa_handler__;
 		sa.sa_flags     = sa32.sa_flags;
 #if HAVE_SA_RESTORER && defined SA_RESTORER
-		sa.sa_restorer  = (void*)(unsigned long)sa32.sa_restorer;
+		sa.sa_restorer  = sa32.sa_restorer;
 #endif
 		/* Kernel treats sa_mask as an array of longs.
 		 * For 32-bit process, "long" is uint32_t, thus, for example,
@@ -534,16 +528,8 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 	if (umove_or_printaddr(tcp, addr, &sa))
 		return;
 
-	/* Architectures using function pointers, like
-	 * hppa, may need to manipulate the function pointer
-	 * to compute the result of a comparison. However,
-	 * the __sa_handler function pointer exists only in
-	 * the address space of the traced process, and can't
-	 * be manipulated by strace. In order to prevent the
-	 * compiler from generating code to manipulate
-	 * __sa_handler we cast the function pointers to long. */
 	tprints("{sa_handler=");
-	print_sa_handler((unsigned long) sa.__sa_handler);
+	print_sa_handler(sa.sa_handler__);
 	tprints(", sa_mask=");
 	/*
 	 * Sigset size is in tcp->u_arg[4] (SPARC)
@@ -557,8 +543,10 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
 
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #if HAVE_SA_RESTORER && defined SA_RESTORER
-	if (sa.sa_flags & SA_RESTORER)
-		tprintf(", sa_restorer=%p", sa.sa_restorer);
+	if (sa.sa_flags & SA_RESTORER) {
+		tprints(", sa_restorer=");
+		printaddr(sa.sa_restorer);
+	}
 #endif
 	tprints("}");
 }
