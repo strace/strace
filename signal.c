@@ -609,11 +609,12 @@ SYS_FUNC(rt_sigsuspend)
 }
 
 static void
-print_sigqueueinfo(struct tcb *tcp, int sig, unsigned long uinfo)
+print_sigqueueinfo(struct tcb *const tcp, const int sig,
+		   const kernel_ureg_t addr)
 {
 	printsignal(sig);
 	tprints(", ");
-	printsiginfo_at(tcp, uinfo);
+	printsiginfo_at(tcp, addr);
 }
 
 SYS_FUNC(rt_sigqueueinfo)
