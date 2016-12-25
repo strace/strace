@@ -92,7 +92,7 @@ print_struct_statfs(struct tcb *const tcp, const kernel_ureg_t addr)
 
 void
 print_struct_statfs64(struct tcb *const tcp, const kernel_ureg_t addr,
-		      const unsigned long size)
+		      const kernel_ureg_t size)
 {
 #ifdef HAVE_STRUCT_STATFS64
 	struct strace_statfs b;

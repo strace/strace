@@ -713,7 +713,7 @@ extern void
 print_struct_statfs(struct tcb *, kernel_ureg_t addr);
 
 extern void
-print_struct_statfs64(struct tcb *, kernel_ureg_t addr, unsigned long size);
+print_struct_statfs64(struct tcb *, kernel_ureg_t addr, kernel_ureg_t size);
 
 extern void print_ifindex(unsigned int);
 

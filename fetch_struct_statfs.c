@@ -80,7 +80,7 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
 
 MPERS_PRINTER_DECL(bool, fetch_struct_statfs64,
 		   struct tcb *const tcp, const kernel_ureg_t addr,
-		   const unsigned long size, struct strace_statfs *const p)
+		   const kernel_ureg_t size, struct strace_statfs *const p)
 {
 	struct_statfs64 b;
 
