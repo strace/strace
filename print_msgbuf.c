@@ -39,12 +39,12 @@ typedef struct msgbuf msgbuf_t;
 #include MPERS_DEFS
 
 MPERS_PRINTER_DECL(void, tprint_msgbuf, struct tcb *const tcp,
-		   const kernel_ureg_t addr, const unsigned long count)
+		   const kernel_ureg_t addr, const kernel_ureg_t count)
 {
 	msgbuf_t msg;
 
 	if (!umove_or_printaddr(tcp, addr, &msg)) {
-		tprintf("{%lu, ", (long) msg.mtype);
+		tprintf("{%" PRI_kld ", ", (kernel_long_t) msg.mtype);
 		printstrn(tcp, addr + sizeof(msg.mtype), count);
 		tprints("}");
 	}
