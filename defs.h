@@ -783,12 +783,6 @@ printflags(const struct xlat *x, unsigned int flags, const char *dflt)
 }
 
 static inline int
-printflags_long(const struct xlat *x, unsigned long flags, const char *dflt)
-{
-	return printflags64(x, flags, dflt);
-}
-
-static inline int
 printxval64(const struct xlat *x, const uint64_t val, const char *dflt)
 {
 	return printxvals(val, dflt, x, NULL);

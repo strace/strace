@@ -122,7 +122,7 @@ print_fcntl(struct tcb *tcp)
 		break;
 	case F_NOTIFY:
 		tprints(", ");
-		printflags_long(notifyflags, tcp->u_arg[2], "DN_???");
+		printflags64(notifyflags, tcp->u_arg[2], "DN_???");
 		break;
 	case F_SETLEASE:
 		tprints(", ");
@@ -130,7 +130,7 @@ print_fcntl(struct tcb *tcp)
 		break;
 	case F_ADD_SEALS:
 		tprints(", ");
-		printflags_long(f_seals, tcp->u_arg[2], "F_SEAL_???");
+		printflags64(f_seals, tcp->u_arg[2], "F_SEAL_???");
 		break;
 	case F_SETSIG:
 		tprints(", ");
