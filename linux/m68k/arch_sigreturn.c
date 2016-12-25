@@ -1,7 +1,7 @@
 static void
 arch_sigreturn(struct tcb *tcp)
 {
-	long addr;
+	unsigned long addr;
 
 	/* Fetch pointer to struct sigcontext.  */
 	if (umove(tcp, *m68k_usp_ptr + 2 * sizeof(int), &addr) < 0)

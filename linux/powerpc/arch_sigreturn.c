@@ -1,19 +1,19 @@
 static void
 arch_sigreturn(struct tcb *tcp)
 {
-	long esp = ppc_regs.gpr[1];
+	unsigned long addr = ppc_regs.gpr[1];
 	struct sigcontext sc;
 
 	/* Skip dummy stack frame. */
 #ifdef POWERPC64
 	if (current_personality == 0)
-		esp += 128;
+		addr += 128;
 	else
 #endif
-		esp += 64;
+		addr += 64;
 
-	if (umove(tcp, esp, &sc) < 0) {
-		tprintf("{mask=%#lx}", esp);
+	if (umove(tcp, addr, &sc) < 0) {
+		tprintf("{mask=%#lx}", addr);
 	} else {
 		unsigned long mask[NSIG / 8 / sizeof(long)];
 #ifdef POWERPC64
