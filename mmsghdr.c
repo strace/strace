@@ -68,7 +68,7 @@ print_struct_mmsghdr(struct tcb *tcp, void *elem_buf,
 
 	tprints("{msg_hdr=");
 	print_struct_msghdr(tcp, &mmsg->msg_hdr, c->p_user_msg_namelen,
-			    c->use_msg_len ? mmsg->msg_len : -1UL);
+			    c->use_msg_len ? mmsg->msg_len : (kernel_ureg_t) -1);
 	if (c->msg_len_vlen) {
 		tprintf(", msg_len=%u", mmsg->msg_len);
 		--c->msg_len_vlen;
@@ -160,7 +160,7 @@ dumpiov_in_mmsghdr(struct tcb *const tcp, kernel_ureg_t addr)
 		if (!fetched)
 			break;
 		tprintf(" = %lu buffers in vector %u\n",
-			(unsigned long) mmsg.msg_hdr.msg_iovlen, i);
+			(kernel_ureg_t) mmsg.msg_hdr.msg_iovlen, i);
 		dumpiov_upto(tcp, mmsg.msg_hdr.msg_iovlen,
 			(kernel_ureg_t) mmsg.msg_hdr.msg_iov, mmsg.msg_len);
 	}

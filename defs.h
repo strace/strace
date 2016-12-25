@@ -601,7 +601,7 @@ extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
 
 extern void
-dumpiov_in_msghdr(struct tcb *, kernel_ureg_t addr, unsigned long data_size);
+dumpiov_in_msghdr(struct tcb *, kernel_ureg_t addr, kernel_ureg_t data_size);
 
 extern void
 dumpiov_in_mmsghdr(struct tcb *, kernel_ureg_t addr);

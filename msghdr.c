@@ -332,7 +332,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ureg_t addr,
 void
 print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 		    const int *const p_user_msg_namelen,
-		    const unsigned long data_size)
+		    const kernel_ureg_t data_size)
 {
 	const int msg_namelen =
 		p_user_msg_namelen && (int) msg->msg_namelen > *p_user_msg_namelen
@@ -351,13 +351,13 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 
 	tprints(", msg_iov=");
 
-	tprint_iov_upto(tcp, (unsigned long) msg->msg_iovlen,
+	tprint_iov_upto(tcp, msg->msg_iovlen,
 			(kernel_ureg_t) msg->msg_iov, decode, data_size);
-	tprintf(", msg_iovlen=%lu", (unsigned long) msg->msg_iovlen);
+	tprintf(", msg_iovlen=%lu", (kernel_ureg_t) msg->msg_iovlen);
 
 	decode_msg_control(tcp, (kernel_ureg_t) msg->msg_control,
 			   msg->msg_controllen);
-	tprintf(", msg_controllen=%lu", (unsigned long) msg->msg_controllen);
+	tprintf(", msg_controllen=%lu", (kernel_ureg_t) msg->msg_controllen);
 
 	tprints(", msg_flags=");
 	printflags(msg_flags, msg->msg_flags, "MSG_???");
@@ -380,7 +380,7 @@ fetch_msghdr_namelen(struct tcb *const tcp, const kernel_ureg_t addr,
 
 static void
 decode_msghdr(struct tcb *const tcp, const int *const p_user_msg_namelen,
-	      const kernel_ureg_t addr, const unsigned long data_size)
+	      const kernel_ureg_t addr, const kernel_ureg_t data_size)
 {
 	struct msghdr msg;
 
@@ -392,7 +392,7 @@ decode_msghdr(struct tcb *const tcp, const int *const p_user_msg_namelen,
 
 void
 dumpiov_in_msghdr(struct tcb *const tcp, const kernel_ureg_t addr,
-		  const unsigned long data_size)
+		  const kernel_ureg_t data_size)
 {
 	struct msghdr msg;
 
@@ -406,7 +406,7 @@ SYS_FUNC(sendmsg)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	decode_msghdr(tcp, 0, tcp->u_arg[1], -1UL);
+	decode_msghdr(tcp, 0, tcp->u_arg[1], -1);
 	/* flags */
 	tprints(", ");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
