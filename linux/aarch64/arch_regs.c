@@ -28,7 +28,7 @@ static union {
 #define arm_regs     arm_regs_union.arm_r
 
 uint64_t *const aarch64_sp_ptr = (uint64_t *) &aarch64_regs.sp;
-uint32_t *const arm_sp_ptr = (uint32_t *) &arm_regs.ARM_sp;
+uint32_t *const arm_sp_ptr = &arm_regs.ARM_sp;
 static struct iovec aarch64_io = {
 	.iov_base = &arm_regs_union
 };

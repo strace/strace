@@ -2,7 +2,7 @@
 static int
 get_syscall_args(struct tcb *tcp)
 {
-	long *arc_args = &arc_regs.scratch.r0;
+	unsigned long *arc_args = &arc_regs.scratch.r0;
 	unsigned int i;
 
 	for (i = 0; i < MAX_ARGS; ++i)

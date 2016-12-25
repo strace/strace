@@ -1048,7 +1048,7 @@ print_pc(struct tcb *tcp)
 #if defined ARCH_PC_REG
 # define ARCH_GET_PC 0
 #elif defined ARCH_PC_PEEK_ADDR
-	long pc;
+	kernel_ureg_t pc;
 # define ARCH_PC_REG pc
 # define ARCH_GET_PC upeek(tcp->pid, ARCH_PC_PEEK_ADDR, &pc)
 #else

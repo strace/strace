@@ -11,9 +11,9 @@ get_syscall_args(struct tcb *tcp)
 		unsigned int i;
 
 		for (i = 0; i < tcp->s_ent->nargs; ++i) {
-			if (umoven(tcp,
-				   (unsigned long) ia64_rse_skip_regs(out0, i),
-				   sizeof(long), &tcp->u_arg[i]) < 0)
+			if (umove(tcp,
+				  (unsigned long) ia64_rse_skip_regs(out0, i),
+				  &tcp->u_arg[i]) < 0)
 				return -1;
 		}
 	} else {

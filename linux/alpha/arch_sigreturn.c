@@ -1,7 +1,7 @@
 static void
 arch_sigreturn(struct tcb *tcp)
 {
-	long addr;
+	unsigned long addr;
 
 	if (upeek(tcp->pid, REG_FP, &addr) < 0)
 		return;

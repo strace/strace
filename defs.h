@@ -511,8 +511,8 @@ umoven_or_printaddr_ignore_syserror(struct tcb *tcp, kernel_ureg_t addr,
 extern int
 umovestr(struct tcb *tcp, kernel_ureg_t addr, unsigned int len, char *laddr);
 
-extern int upeek(int pid, long, long *);
-extern int upoke(int pid, long, long);
+extern int upeek(int pid, unsigned long, kernel_ureg_t *);
+extern int upoke(int pid, unsigned long, kernel_ureg_t);
 
 extern bool
 print_array(struct tcb *tcp,

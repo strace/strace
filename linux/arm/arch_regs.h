@@ -1,1 +1,1 @@
-extern long *const arm_sp_ptr;
+extern unsigned long *const arm_sp_ptr;

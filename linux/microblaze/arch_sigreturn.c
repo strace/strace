@@ -3,7 +3,7 @@ arch_sigreturn(struct tcb *tcp)
 {
 	/* TODO: Verify that this is correct...  */
 
-	long addr;
+	unsigned long addr;
 
 	/* Read r1, the stack pointer.  */
 	if (upeek(tcp->pid, 1 * 4, &addr) < 0)
