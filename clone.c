@@ -98,7 +98,7 @@ SYS_FUNC(clone)
 {
 	if (exiting(tcp)) {
 		const char *sep = "|";
-		unsigned long flags = tcp->u_arg[ARG_FLAGS];
+		kernel_ureg_t flags = tcp->u_arg[ARG_FLAGS];
 		tprints("child_stack=");
 		printaddr(tcp->u_arg[ARG_STACK]);
 		tprints(", ");
@@ -108,7 +108,7 @@ SYS_FUNC(clone)
 				tcp->u_arg[ARG_STACKSIZE]);
 #endif
 		tprints("flags=");
-		if (!printflags(clone_flags, flags &~ CSIGNAL, NULL))
+		if (!printflags64(clone_flags, flags &~ CSIGNAL, NULL))
 			sep = "";
 		if ((flags & CSIGNAL) != 0)
 			tprintf("%s%s", sep, signame(flags & CSIGNAL));
