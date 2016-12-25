@@ -77,7 +77,7 @@ static void
 printsigval(const siginfo_t *sip)
 {
 	tprintf(", si_value={int=%d, ptr=", sip->si_int);
-	printaddr((unsigned long) sip->si_ptr);
+	printaddr((kernel_ureg_t) sip->si_ptr);
 	tprints("}");
 }
 
@@ -178,7 +178,7 @@ print_si_info(const siginfo_t *sip)
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:
 			tprints(", si_addr=");
-			printaddr((unsigned long) sip->si_addr);
+			printaddr((kernel_ureg_t) sip->si_addr);
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {
@@ -194,7 +194,7 @@ print_si_info(const siginfo_t *sip)
 				syscall_name((unsigned) sip->si_syscall);
 
 			tprints(", si_call_addr=");
-			printaddr((unsigned long) sip->si_call_addr);
+			printaddr((kernel_ureg_t) sip->si_call_addr);
 			tprints(", si_syscall=");
 			if (scname)
 				tprintf("__NR_%s", scname);
