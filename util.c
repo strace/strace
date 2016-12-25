@@ -916,7 +916,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr,
 
 void
 dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
-	     unsigned long data_size)
+	     kernel_ureg_t data_size)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	union {
@@ -948,7 +948,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
 		for (i = 0; i < len; i++) {
-			unsigned long iov_len = iov_iov_len(i);
+			kernel_ureg_t iov_len = iov_iov_len(i);
 			if (iov_len > data_size)
 				iov_len = data_size;
 			if (!iov_len)

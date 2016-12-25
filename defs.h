@@ -607,7 +607,7 @@ extern void
 dumpiov_in_mmsghdr(struct tcb *, kernel_ureg_t addr);
 
 extern void
-dumpiov_upto(struct tcb *, int len, kernel_ureg_t addr, unsigned long data_size);
+dumpiov_upto(struct tcb *, int len, kernel_ureg_t addr, kernel_ureg_t data_size);
 
 extern void
 dumpstr(struct tcb *, kernel_ureg_t addr, int len);
