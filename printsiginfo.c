@@ -255,7 +255,7 @@ print_siginfo_t(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 MPERS_PRINTER_DECL(void, print_siginfo_array, struct tcb *const tcp,
-		   const kernel_ureg_t addr, const unsigned long len)
+		   const kernel_ureg_t addr, const kernel_ureg_t len)
 {
 	siginfo_t si;
 
