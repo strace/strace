@@ -115,13 +115,13 @@
  */
 
 static const char *
-get_sa_handler_str(unsigned long handler)
+get_sa_handler_str(kernel_ureg_t handler)
 {
 	return xlookup(sa_handler_values, handler);
 }
 
 static void
-print_sa_handler(unsigned long handler)
+print_sa_handler(kernel_ureg_t handler)
 {
 	const char *sa_handler_str = get_sa_handler_str(handler);
 
