@@ -126,7 +126,7 @@ print_fcntl(struct tcb *tcp)
 		break;
 	case F_SETLEASE:
 		tprints(", ");
-		printxval_long(lockfcmds, tcp->u_arg[2], "F_???");
+		printxval64(lockfcmds, tcp->u_arg[2], "F_???");
 		break;
 	case F_ADD_SEALS:
 		tprints(", ");

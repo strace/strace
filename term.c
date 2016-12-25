@@ -223,11 +223,11 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	/* ioctls with a direct decodable arg */
 	case TCXONC:
 		tprints(", ");
-		printxval_long(tcxonc_options, arg, "TC???");
+		printxval64(tcxonc_options, arg, "TC???");
 		break;
 	case TCFLSH:
 		tprints(", ");
-		printxval_long(tcflsh_options, arg, "TC???");
+		printxval64(tcflsh_options, arg, "TC???");
 		break;
 	case TCSBRK:
 	case TCSBRKP:

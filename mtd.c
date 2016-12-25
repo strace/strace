@@ -285,7 +285,7 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 
 	case MTDFILEMODE:
 		tprints(", ");
-		printxval_long(mtd_file_mode_options, arg, "MTD_FILE_MODE_???");
+		printxval64(mtd_file_mode_options, arg, "MTD_FILE_MODE_???");
 		break;
 
 	case MEMGETBADBLOCK:

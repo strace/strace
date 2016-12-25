@@ -794,12 +794,6 @@ printxval(const struct xlat *x, const unsigned int val, const char *dflt)
 	return printxvals(val, dflt, x, NULL);
 }
 
-static inline int
-printxval_long(const struct xlat *x, const unsigned long val, const char *dflt)
-{
-	return printxvals(val, dflt, x, NULL);
-}
-
 static inline void
 tprint_iov(struct tcb *tcp, kernel_ureg_t len, kernel_ureg_t addr,
 	   enum iov_decode decode_iov)

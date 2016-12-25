@@ -78,7 +78,7 @@ SYS_FUNC(mbind)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %lu, ", tcp->u_arg[1]);
-	printxval_long(policies, tcp->u_arg[2], "MPOL_???");
+	printxval64(policies, tcp->u_arg[2], "MPOL_???");
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 	tprintf(", %lu, ", tcp->u_arg[4]);
