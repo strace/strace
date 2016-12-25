@@ -360,7 +360,7 @@ print_v4l2_buffer(struct tcb *tcp, const unsigned int code, const long arg)
 				tprintf(", m.offset=%#x", b.m.offset);
 			} else if (b.memory == V4L2_MEMORY_USERPTR) {
 				tprints(", m.userptr=");
-				printaddr((unsigned long) b.m.userptr);
+				printaddr(b.m.userptr);
 			}
 
 			tprintf(", length=%u, bytesused=%u, flags=",
@@ -386,7 +386,7 @@ print_v4l2_framebuffer(struct tcb *tcp, const long arg)
 	if (!umove_or_printaddr(tcp, arg, &b)) {
 		tprintf("{capability=%#x, flags=%#x, base=",
 			b.capability, b.flags);
-		printaddr((unsigned long) b.base);
+		printaddr((kernel_ureg_t) b.base);
 		tprints("}");
 	}
 
@@ -704,7 +704,7 @@ print_v4l2_ext_controls(struct tcb *tcp, const long arg, const bool is_get)
 
 	tprints("controls=");
 	struct_v4l2_ext_control ctrl;
-	bool fail = !print_array(tcp, (unsigned long) c.controls, c.count,
+	bool fail = !print_array(tcp, (kernel_ureg_t) c.controls, c.count,
 				 &ctrl, sizeof(ctrl),
 				 umoven_or_printaddr_ignore_syserror,
 				 print_v4l2_ext_control, 0);
