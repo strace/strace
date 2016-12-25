@@ -105,7 +105,7 @@ print_ifindex(unsigned int ifindex)
 
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ureg_t addr,
-	       const long addrlen)
+	       const kernel_ureg_t addrlen)
 {
 
 	switch (verbose(tcp) ? getfdproto(tcp, fd) : SOCK_PROTO_UNKNOWN) {
