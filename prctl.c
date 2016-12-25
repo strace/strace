@@ -113,7 +113,7 @@ SYS_FUNC(prctl)
 			break;
 		if (syserror(tcp))
 			return 0;
-		tcp->auxstr = xlookup(pr_dumpable, (unsigned long) tcp->u_rval);
+		tcp->auxstr = xlookup(pr_dumpable, (kernel_ureg_t) tcp->u_rval);
 		return RVAL_STR;
 
 	case PR_GET_NAME:
@@ -144,7 +144,7 @@ SYS_FUNC(prctl)
 		if (syserror(tcp) || tcp->u_rval == 0)
 			return 0;
 		tcp->auxstr = sprintflags("", secbits,
-					  (unsigned long) tcp->u_rval);
+					  (kernel_ureg_t) tcp->u_rval);
 		return RVAL_STR;
 
 	case PR_GET_TID_ADDRESS:
@@ -180,7 +180,7 @@ SYS_FUNC(prctl)
 		if (syserror(tcp) || tcp->u_rval == 0)
 			return 0;
 		tcp->auxstr = sprintflags("", pr_fp_mode,
-					  (unsigned long) tcp->u_rval);
+					  (kernel_ureg_t) tcp->u_rval);
 		return RVAL_STR;
 
 	/* PR_TASK_PERF_EVENTS_* take no arguments. */
@@ -330,7 +330,7 @@ SYS_FUNC(prctl)
 		if (syserror(tcp))
 			return 0;
 		tcp->auxstr = xlookup(pr_mce_kill_policy,
-				      (unsigned long) tcp->u_rval);
+				      (kernel_ureg_t) tcp->u_rval);
 		return tcp->auxstr ? RVAL_STR : RVAL_UDECIMAL;
 
 	case PR_SET_FP_MODE:

@@ -143,7 +143,7 @@ print_fcntl(struct tcb *tcp)
 		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)
 			return 0;
 		tcp->auxstr = sprintflags("flags ", fdflags,
-					  (unsigned long) tcp->u_rval);
+					  (kernel_ureg_t) tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	case F_GETFL:
 		if (entering(tcp) || syserror(tcp))
@@ -171,13 +171,13 @@ print_fcntl(struct tcb *tcp)
 	case F_GETLEASE:
 		if (entering(tcp) || syserror(tcp))
 			return 0;
-		tcp->auxstr = xlookup(lockfcmds, (unsigned long) tcp->u_rval);
+		tcp->auxstr = xlookup(lockfcmds, (kernel_ureg_t) tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	case F_GET_SEALS:
 		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)
 			return 0;
 		tcp->auxstr = sprintflags("seals ", f_seals,
-					  (unsigned long) tcp->u_rval);
+					  (kernel_ureg_t) tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	case F_GETSIG:
 		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)

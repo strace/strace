@@ -44,6 +44,6 @@ SYS_FUNC(membarrier)
 		return 0;
 
 	tcp->auxstr = sprintflags("", membarrier_cmds,
-				  (unsigned long) tcp->u_rval);
+				  (kernel_ureg_t) tcp->u_rval);
 	return RVAL_HEX | RVAL_STR;
 }
