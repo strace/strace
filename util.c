@@ -1150,7 +1150,7 @@ umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
 		n = addr & (sizeof(long) - 1);	/* residue */
 		addr &= -sizeof(long);		/* aligned address */
 		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, (void *) addr, 0);
+		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
 		switch (errno) {
 			case 0:
 				break;
@@ -1175,7 +1175,7 @@ umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
 	}
 	while (len) {
 		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, (void *) addr, 0);
+		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
 		switch (errno) {
 			case 0:
 				break;
@@ -1324,7 +1324,7 @@ umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *ladd
 		n = addr & (sizeof(long) - 1);	/* residue */
 		addr &= -sizeof(long);		/* aligned address */
 		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, (void *) addr, 0);
+		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
 		switch (errno) {
 			case 0:
 				break;
@@ -1353,7 +1353,7 @@ umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *ladd
 
 	while (len) {
 		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, (void *) addr, 0);
+		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
 		switch (errno) {
 			case 0:
 				break;
