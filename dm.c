@@ -5,8 +5,6 @@
 # include <linux/dm-ioctl.h>
 # include <linux/ioctl.h>
 
-# include <sys/sysmacros.h>
-
 # if DM_VERSION_MAJOR == 4
 
 /* Definitions for command which have been added later */
@@ -31,9 +29,10 @@ dm_decode_device(const unsigned int code, const struct dm_ioctl *ioc)
 	case DM_LIST_VERSIONS:
 		break;
 	default:
-		if (ioc->dev)
-			tprintf(", dev=makedev(%u, %u)",
-				major(ioc->dev), minor(ioc->dev));
+		if (ioc->dev) {
+			tprints(", dev=");
+			print_dev_t(ioc->dev);
+		}
 		if (ioc->name[0]) {
 			tprints(", name=");
 			print_quoted_string(ioc->name, DM_NAME_LEN,
@@ -171,7 +170,7 @@ dm_print_dev(struct tcb *tcp, void *dev_ptr, size_t dev_size, void *dummy)
 {
 	uint64_t *dev = (uint64_t *) dev_ptr;
 
-	tprintf("makedev(%u, %u)", major(*dev), minor(*dev));
+	print_dev_t(*dev);
 
 	return 1;
 }
@@ -255,8 +254,10 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 			break;
 		}
 
-		tprintf("{dev=makedev(%u, %u), name=", major(s.dev),
-			minor(s.dev));
+		tprints("{dev=");
+		print_dev_t(s.dev);
+
+		tprints("name=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			    QUOTE_0_TERMINATED);
 		tprints("}");

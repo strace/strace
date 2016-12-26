@@ -34,7 +34,6 @@
 
 #include "defs.h"
 #include <sys/stat.h>
-#include <sys/sysmacros.h>
 #include "stat.h"
 
 void
@@ -42,10 +41,9 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 {
 	tprints("{");
 	if (!abbrev(tcp)) {
-		tprintf("st_dev=makedev(%u, %u), st_ino=%llu, st_mode=",
-			(unsigned int) major(st->dev),
-			(unsigned int) minor(st->dev),
-			st->ino);
+		tprints("st_dev=");
+		print_dev_t(st->dev);
+		tprintf(", st_ino=%llu, st_mode=", st->ino);
 		print_symbolic_mode_t(st->mode);
 		tprintf(", st_nlink=%llu, st_uid=%llu, st_gid=%llu",
 			st->nlink, st->uid, st->gid);
@@ -58,9 +56,8 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 
 	switch (st->mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-		tprintf(", st_rdev=makedev(%u, %u)",
-			(unsigned int) major(st->rdev),
-			(unsigned int) minor(st->rdev));
+		tprints(", st_rdev=");
+		print_dev_t(st->rdev);
 		break;
 	default:
 		tprintf(", st_size=%llu", st->size);

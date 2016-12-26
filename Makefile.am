@@ -182,6 +182,7 @@ strace_SOURCES =	\
 	pkeys.c		\
 	poll.c		\
 	prctl.c		\
+	print_dev_t.c	\
 	print_mq_attr.c	\
 	print_msgbuf.c	\
 	print_sigevent.c \

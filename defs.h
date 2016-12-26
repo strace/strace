@@ -581,6 +581,7 @@ extern const char *sprinttime(time_t);
 extern void print_symbolic_mode_t(unsigned int);
 extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
+extern void print_dev_t(unsigned long long dev);
 
 extern void
 dumpiov_in_msghdr(struct tcb *, kernel_ulong_t addr, kernel_ulong_t data_size);
