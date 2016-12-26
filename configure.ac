@@ -488,8 +488,10 @@ AC_CHECK_DECLS(m4_normalize([
 
 AC_CHECK_DECLS(m4_normalize([
 	LO_FLAGS_READ_ONLY,
+	LO_FLAGS_USE_AOPS,
 	LO_FLAGS_AUTOCLEAR,
-	LO_FLAGS_PARTSCAN
+	LO_FLAGS_PARTSCAN,
+	LO_FLAGS_DIRECT_IO
 ]),,, [#include <linux/loop.h>])
 
 AC_CHECK_DECLS(m4_normalize([
