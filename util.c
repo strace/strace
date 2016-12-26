@@ -462,7 +462,7 @@ printflags64(const struct xlat *xlat, uint64_t flags, const char *dflt)
 }
 
 void
-printaddr_klu(const kernel_ulong_t addr)
+printaddr(const kernel_ulong_t addr)
 {
 	if (!addr)
 		tprints("NULL");

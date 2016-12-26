@@ -44,7 +44,7 @@ SYS_FUNC(delete_module)
 
 SYS_FUNC(init_module)
 {
-	printaddr_klu(getarg_klu(tcp, 0));
+	printaddr(getarg_klu(tcp, 0));
 	tprintf(", %" PRI_klu ", ", getarg_klu(tcp, 1));
 	printstr(tcp, tcp->u_arg[2]);
 

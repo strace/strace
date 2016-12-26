@@ -580,7 +580,7 @@ extern int getllval(struct tcb *, unsigned long long *, int);
 extern int printllval(struct tcb *, const char *, int)
 	ATTRIBUTE_FORMAT((printf, 2, 0));
 
-extern void printaddr_klu(kernel_ulong_t addr);
+extern void printaddr(kernel_ulong_t addr);
 extern int printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
@@ -757,12 +757,6 @@ extern void unwind_cache_invalidate(struct tcb* tcp);
 extern void unwind_print_stacktrace(struct tcb* tcp);
 extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
-
-static inline void
-printaddr(kernel_ulong_t addr)
-{
-	printaddr_klu(addr);
-}
 
 static inline void
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
