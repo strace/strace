@@ -75,16 +75,15 @@ SYS_FUNC(lseek)
  * ((loff_t) hi << 32) | lo
  * Note that for architectures with kernel's long wider than userspace long
  * (such as x32), combining code will use *kernel's*, i.e. *wide* longs
- * for hi and lo. We would need to use tcp->ext_arg[N] on x32...
- * ...however, x32 (and x86_64) does not _have_ llseek syscall as such.
+ * for hi and lo.
  */
 SYS_FUNC(llseek)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprintf(", %lld, ",
-			(zero_extend_signed_to_ull(tcp->u_arg[1]) << 32)
-			| zero_extend_signed_to_ull(tcp->u_arg[2]));
+			  ((long long) tcp->u_arg[1] << 32)
+			| ((long long) tcp->u_arg[2]));
 	} else {
 		printnum_int64(tcp, tcp->u_arg[3], "%" PRIu64);
 		tprints(", ");
