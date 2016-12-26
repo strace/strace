@@ -1082,12 +1082,19 @@ static ssize_t
 vm_read_mem(const pid_t pid, void *const laddr,
 	    const kernel_ureg_t raddr, const size_t len)
 {
+	const unsigned long truncated_raddr = raddr;
+
+	if (raddr != (kernel_ureg_t) truncated_raddr) {
+		errno = EIO;
+		return -1;
+	}
+
 	const struct iovec local = {
 		.iov_base = laddr,
 		.iov_len = len
 	};
 	const struct iovec remote = {
-		.iov_base = (void *) raddr,
+		.iov_base = (void *) truncated_raddr,
 		.iov_len = len
 	};
 
