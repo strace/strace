@@ -342,7 +342,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 
 	tprints("{msg_name=");
 	const int family =
-		decode_sockaddr(tcp, (kernel_ureg_t) msg->msg_name, msg_namelen);
+		decode_sockaddr(tcp, ptr_to_kulong(msg->msg_name), msg_namelen);
 	const enum iov_decode decode =
 		(family == AF_NETLINK) ? IOV_DECODE_NETLINK : IOV_DECODE_STR;
 
@@ -354,10 +354,10 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprints(", msg_iov=");
 
 	tprint_iov_upto(tcp, msg->msg_iovlen,
-			(kernel_ureg_t) msg->msg_iov, decode, data_size);
+			ptr_to_kulong(msg->msg_iov), decode, data_size);
 	tprintf(", msg_iovlen=%lu", (kernel_ureg_t) msg->msg_iovlen);
 
-	decode_msg_control(tcp, (kernel_ureg_t) msg->msg_control,
+	decode_msg_control(tcp, ptr_to_kulong(msg->msg_control),
 			   msg->msg_controllen);
 	tprintf(", msg_controllen=%lu", (kernel_ureg_t) msg->msg_controllen);
 
@@ -400,7 +400,7 @@ dumpiov_in_msghdr(struct tcb *const tcp, const kernel_ureg_t addr,
 
 	if (fetch_struct_msghdr(tcp, addr, &msg)) {
 		dumpiov_upto(tcp, msg.msg_iovlen,
-			     (kernel_ureg_t) msg.msg_iov, data_size);
+			     ptr_to_kulong(msg.msg_iov), data_size);
 	}
 }
 

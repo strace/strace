@@ -885,6 +885,11 @@ extern unsigned current_klongsize;
 #endif
 
 /*
+ * Cast a pointer or a pointer-sized integer to kernel_ureg_t.
+ */
+#define ptr_to_kulong(v) ((kernel_ureg_t) (unsigned long) (v))
+
+/*
  * Zero-extend a signed integer type to unsigned long long.
  */
 #define zero_extend_signed_to_ull(v) \

@@ -1217,7 +1217,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints("...");
 		else {
 			uint64_t record;
-			print_array(tcp, (kernel_ureg_t) args.clone_sources,
+			print_array(tcp, ptr_to_kulong(args.clone_sources),
 				    args.clone_sources_count,
 				    &record, sizeof(record),
 				    umoven_or_printaddr,
@@ -1321,7 +1321,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 					(uint64_t) args.size);
 
 				btrfs_print_qgroup_inherit(tcp,
-					(kernel_ureg_t) args.qgroup_inherit);
+					ptr_to_kulong(args.qgroup_inherit));
 			}
 			tprints(", name=");
 			print_quoted_string(args.name, sizeof(args.name),

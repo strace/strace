@@ -167,13 +167,13 @@ SYS_FUNC(sysctl)
 		size_t oldlen = 0;
 		if (info.oldval == NULL) {
 			tprints("NULL");
-		} else if (umove(tcp, (kernel_ureg_t) info.oldlenp, &oldlen) >= 0
+		} else if (umove(tcp, ptr_to_kulong(info.oldlenp), &oldlen) >= 0
 			   && info.nlen >= 2
 			   && ((name[0] == CTL_KERN
 				&& (name[1] == KERN_OSRELEASE
 				    || name[1] == KERN_OSTYPE
 					)))) {
-			printpath(tcp, (kernel_ureg_t) info.oldval);
+			printpath(tcp, ptr_to_kulong(info.oldval));
 		} else {
 			tprintf("%p", info.oldval);
 		}
@@ -183,7 +183,7 @@ SYS_FUNC(sysctl)
 		else if (syserror(tcp))
 			tprintf("%p", info.newval);
 		else
-			printpath(tcp, (kernel_ureg_t) info.newval);
+			printpath(tcp, ptr_to_kulong(info.newval));
 		tprintf(", %lu", (unsigned long)info.newlen);
 	}
 

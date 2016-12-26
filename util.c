@@ -933,7 +933,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
 #else
 	struct iovec *iov;
 #define sizeof_iov sizeof(*iov)
-#define iov_iov_base(i) iov[i].iov_base
+#define iov_iov_base(i) ptr_to_kulong(iov[i].iov_base)
 #define iov_iov_len(i) iov[i].iov_len
 #endif
 	int i;
@@ -957,7 +957,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
 			tprintf(" * %lu bytes in buffer %d\n", iov_len, i);
-			dumpstr(tcp, (kernel_ureg_t) iov_iov_base(i), iov_len);
+			dumpstr(tcp, iov_iov_base(i), iov_len);
 		}
 	}
 	free(iov);

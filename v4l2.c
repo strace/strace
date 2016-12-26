@@ -388,7 +388,7 @@ print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ureg_t arg)
 	if (!umove_or_printaddr(tcp, arg, &b)) {
 		tprintf("{capability=%#x, flags=%#x, base=",
 			b.capability, b.flags);
-		printaddr((kernel_ureg_t) b.base);
+		printaddr(ptr_to_kulong(b.base));
 		tprints("}");
 	}
 
@@ -668,7 +668,7 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 	tprintf(", size=%u", p->size);
 	if (p->size > 0) {
 		tprints(", string=");
-		printstrn(tcp, (kernel_ureg_t) p->string, p->size);
+		printstrn(tcp, ptr_to_kulong(p->string), p->size);
 	} else
 # endif
 	tprintf(", value=%d, value64=%" PRId64, p->value, (int64_t) p->value64);
@@ -710,7 +710,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ureg_t arg,
 
 	tprints("controls=");
 	struct_v4l2_ext_control ctrl;
-	bool fail = !print_array(tcp, (kernel_ureg_t) c.controls, c.count,
+	bool fail = !print_array(tcp, ptr_to_kulong(c.controls), c.count,
 				 &ctrl, sizeof(ctrl),
 				 umoven_or_printaddr_ignore_syserror,
 				 print_v4l2_ext_control, 0);

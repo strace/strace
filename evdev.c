@@ -135,7 +135,7 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
 			decode_envelope(&ffe.u.periodic.envelope);
 			tprintf(", custom_len=%u, custom_data=",
 				ffe.u.periodic.custom_len);
-			printaddr((kernel_ureg_t) ffe.u.periodic.custom_data);
+			printaddr(ptr_to_kulong(ffe.u.periodic.custom_data));
 			tprints("}");
 			break;
 		case FF_RUMBLE:
