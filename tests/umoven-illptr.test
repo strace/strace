@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of invalid pointer by umoven.
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a36 -e trace=nanosleep

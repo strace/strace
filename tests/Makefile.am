@@ -398,6 +398,7 @@ check_PROGRAMS = \
 	umask \
 	umount \
 	umount2 \
+	umoven-illptr \
 	umovestr \
 	umovestr-illptr \
 	umovestr2 \
@@ -778,6 +779,7 @@ DECODER_TESTS = \
 	umask.test \
 	umount.test \
 	umount2.test \
+	umoven-illptr.test \
 	umovestr.test \
 	umovestr-illptr.test \
 	umovestr2.test \

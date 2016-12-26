@@ -338,6 +338,7 @@ uio
 umask
 umount
 umount2
+umoven-illptr
 umovestr
 umovestr-illptr
 umovestr2
