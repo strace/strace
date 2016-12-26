@@ -94,7 +94,7 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
 SYS_FUNC(old_mmap)
 {
 	kernel_ulong_t u_arg[6];
-# ifndef current_klongsize
+# if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	/* We are here only in a 32-bit personality. */
 	unsigned int narrow_arg[6];
 	if (umove_or_printaddr(tcp, tcp->u_arg[0], &narrow_arg))

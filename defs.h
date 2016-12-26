@@ -796,6 +796,10 @@ extern unsigned current_klongsize;
 # endif
 #endif
 
+#define ANY_WORDSIZE_LESS_THAN_KERNEL_LONG	\
+	(SIZEOF_KERNEL_LONG_T > 4		\
+	 && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined(current_wordsize)))
+
 #define DECL_PRINTNUM(name)						\
 extern bool								\
 printnum_ ## name(struct tcb *, kernel_ulong_t addr, const char *fmt)	\
@@ -864,8 +868,7 @@ DECL_PRINTPAIR(int64);
 static inline kernel_long_t
 truncate_klong_to_current_wordsize(const kernel_long_t v)
 {
-#if SIZEOF_KERNEL_LONG_T > 4 \
- && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined current_wordsize)
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	if (current_wordsize < sizeof(v)) {
 		return (int) v;
 	} else
@@ -878,8 +881,7 @@ truncate_klong_to_current_wordsize(const kernel_long_t v)
 static inline kernel_ulong_t
 truncate_kulong_to_current_wordsize(const kernel_ulong_t v)
 {
-#if SIZEOF_KERNEL_LONG_T > 4 \
- && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined current_wordsize)
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	if (current_wordsize < sizeof(v)) {
 		return (unsigned int) v;
 	} else

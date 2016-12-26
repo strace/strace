@@ -901,26 +901,30 @@ trace_syscall_exiting(struct tcb *tcp)
 		else {
 			switch (sys_res & RVAL_MASK) {
 			case RVAL_HEX:
-#if SUPPORTED_PERSONALITIES > 1
-				if (current_wordsize < sizeof(tcp->u_rval))
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+				if (current_wordsize < sizeof(tcp->u_rval)) {
 					tprintf("= %#x",
 						(unsigned int) tcp->u_rval);
-				else
+				} else
 #endif
+				{
 					tprintf("= %#" PRI_klx, tcp->u_rval);
+				}
 				break;
 			case RVAL_OCTAL:
 				tprints("= ");
 				print_numeric_long_umask(tcp->u_rval);
 				break;
 			case RVAL_UDECIMAL:
-#if SUPPORTED_PERSONALITIES > 1
-				if (current_wordsize < sizeof(tcp->u_rval))
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+				if (current_wordsize < sizeof(tcp->u_rval)) {
 					tprintf("= %u",
 						(unsigned int) tcp->u_rval);
-				else
+				} else
 #endif
+				{
 					tprintf("= %" PRI_klu, tcp->u_rval);
+				}
 				break;
 			case RVAL_DECIMAL:
 				tprintf("= %" PRI_kld, tcp->u_rval);

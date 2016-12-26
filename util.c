@@ -942,7 +942,7 @@ void
 dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 	     kernel_ulong_t data_size)
 {
-#if SUPPORTED_PERSONALITIES > 1
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	union {
 		struct { uint32_t base; uint32_t len; } *iov32;
 		struct { uint64_t base; uint64_t len; } *iov64;
@@ -1141,8 +1141,7 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 		char x[sizeof(long)];
 	} u;
 
-#if SIZEOF_KERNEL_LONG_T > 4 \
- && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined current_wordsize)
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	if (current_wordsize < sizeof(addr)
 	    && (addr & (~ (kernel_ulong_t) -1U))) {
 		return -1;
@@ -1290,8 +1289,7 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 		char x[sizeof(long)];
 	} u;
 
-#if SIZEOF_KERNEL_LONG_T > 4 \
- && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined current_wordsize)
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	if (current_wordsize < sizeof(addr)
 	    && (addr & (~ (kernel_ulong_t) -1U))) {
 		return -1;
