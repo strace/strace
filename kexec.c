@@ -111,12 +111,12 @@ SYS_FUNC(kexec_file_load)
 	printfd(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	/* cmdline_len */
-	tprintf("%" PRI_klu ", ", getarg_klu(tcp, 2));
+	tprintf("%" PRI_klu ", ", tcp->u_arg[2]);
 	/* cmdline */
 	printstrn(tcp, tcp->u_arg[3], tcp->u_arg[2]);
 	tprints(", ");
 	/* flags */
-	printflags64(kexec_file_load_flags, getarg_klu(tcp, 4), "KEXEC_FILE_???");
+	printflags64(kexec_file_load_flags, tcp->u_arg[4], "KEXEC_FILE_???");
 
 	return RVAL_DECODED;
 }

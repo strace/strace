@@ -1493,30 +1493,13 @@ print_array(struct tcb *const tcp,
 	return cur >= end_addr;
 }
 
-kernel_ulong_t
-getarg_klu(struct tcb *tcp, int argn)
-{
-#if HAVE_STRUCT_TCB_EXT_ARG
-# ifndef current_klongsize
-	if (current_klongsize < sizeof(*tcp->ext_arg)) {
-		return tcp->u_arg[argn];
-	} else
-# endif /* !current_klongsize */
-	{
-		return tcp->ext_arg[argn];
-	}
-#else
-	return tcp->u_arg[argn];
-#endif
-}
-
 int
 printargs(struct tcb *tcp)
 {
 	const int n = tcp->s_ent->nargs;
 	int i;
 	for (i = 0; i < n; ++i)
-		tprintf("%s%#" PRI_klx, i ? ", " : "", getarg_klu(tcp, i));
+		tprintf("%s%#" PRI_klx, i ? ", " : "", tcp->u_arg[i]);
 	return RVAL_DECODED;
 }
 

@@ -70,21 +70,21 @@ print_prctl_args(struct tcb *tcp, const unsigned int first)
 	unsigned int i;
 
 	for (i = first; i < tcp->s_ent->nargs; ++i)
-		tprintf(", %#" PRI_klx, getarg_klu(tcp, i));
+		tprintf(", %#" PRI_klx, tcp->u_arg[i]);
 }
 
 SYS_FUNC(prctl)
 {
 	const unsigned int option = tcp->u_arg[0];
-	const kernel_ulong_t arg2 = getarg_klu(tcp, 1);
-	const kernel_ulong_t arg3 = getarg_klu(tcp, 2);
+	const kernel_ulong_t arg2 = tcp->u_arg[1];
+	const kernel_ulong_t arg3 = tcp->u_arg[2];
 	/*
 	 * PR_SET_VMA is the only command which actually uses these arguments
 	 * currently, and it is available only on Android for now.
 	 */
 #ifdef __ANDROID__
-	const kernel_ulong_t arg4 = getarg_klu(tcp, 3);
-	const kernel_ulong_t arg5 = getarg_klu(tcp, 4);
+	const kernel_ulong_t arg4 = tcp->u_arg[3];
+	const kernel_ulong_t arg5 = tcp->u_arg[4];
 #endif
 	unsigned int i;
 
@@ -356,7 +356,7 @@ SYS_FUNC(prctl)
 SYS_FUNC(arch_prctl)
 {
 	const unsigned int option = tcp->u_arg[0];
-	const kernel_ulong_t addr = getarg_klu(tcp, 1);
+	const kernel_ulong_t addr = tcp->u_arg[1];
 
 	if (entering(tcp))
 		printxval(archvals, option, "ARCH_???");

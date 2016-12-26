@@ -154,7 +154,7 @@ SYS_FUNC(setns)
 
 SYS_FUNC(unshare)
 {
-	printflags64(unshare_flags, getarg_klu(tcp, 0), "CLONE_???");
+	printflags64(unshare_flags, tcp->u_arg[0], "CLONE_???");
 	return RVAL_DECODED;
 }
 

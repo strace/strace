@@ -4,8 +4,8 @@
 
 SYS_FUNC(pkey_alloc)
 {
-	tprintf("%#" PRI_klx ", ", getarg_klu(tcp, 0));
-	printflags64(pkey_access, getarg_klu(tcp, 1), "PKEY_???");
+	tprintf("%#" PRI_klx ", ", tcp->u_arg[0]);
+	printflags64(pkey_access, tcp->u_arg[1], "PKEY_???");
 
 	return RVAL_DECODED;
 }

@@ -43,7 +43,7 @@ SYS_FUNC(lookup_dcookie)
 		printstrn(tcp, tcp->u_arg[argn], tcp->u_rval);
 
 	/* len */
-	tprintf(", %" PRI_klu, getarg_klu(tcp, argn + 1));
+	tprintf(", %" PRI_klu, tcp->u_arg[argn + 1]);
 
 	return 0;
 }

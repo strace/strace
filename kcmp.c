@@ -33,8 +33,8 @@ SYS_FUNC(kcmp)
 	pid_t pid1 = tcp->u_arg[0];
 	pid_t pid2 = tcp->u_arg[1];
 	int type = tcp->u_arg[2];
-	kernel_ulong_t idx1 = getarg_klu(tcp, 3);
-	kernel_ulong_t idx2 = getarg_klu(tcp, 4);
+	kernel_ulong_t idx1 = tcp->u_arg[3];
+	kernel_ulong_t idx2 = tcp->u_arg[4];
 
 	tprintf("%d, %d, ", pid1, pid2);
 	printxval(kcmp_types, type, "KCMP_???");

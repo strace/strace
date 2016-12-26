@@ -587,7 +587,6 @@ extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
 	uint64_t val, const char *dflt);
 #define printxval_search(xlat__, val__, dflt__) \
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__), val__, dflt__)
-extern kernel_ulong_t getarg_klu(struct tcb *tcp, int argn);
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);

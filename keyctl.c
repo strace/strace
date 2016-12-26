@@ -268,10 +268,10 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 SYS_FUNC(keyctl)
 {
 	int cmd = tcp->u_arg[0];
-	kernel_ulong_t arg2 = getarg_klu(tcp, 1);
-	kernel_ulong_t arg3 = getarg_klu(tcp, 2);
-	kernel_ulong_t arg4 = getarg_klu(tcp, 3);
-	kernel_ulong_t arg5 = getarg_klu(tcp, 4);
+	kernel_ulong_t arg2 = tcp->u_arg[1];
+	kernel_ulong_t arg3 = tcp->u_arg[2];
+	kernel_ulong_t arg4 = tcp->u_arg[3];
+	kernel_ulong_t arg5 = tcp->u_arg[4];
 
 	if (entering(tcp)) {
 		printxval(keyctl_commands, cmd, "KEYCTL_???");
