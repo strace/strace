@@ -180,12 +180,13 @@ print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 SYS_FUNC(io_submit)
 {
-	const long nr = widen_to_long(tcp->u_arg[1]);
+	const kernel_long_t nr =
+		truncate_klong_to_current_wordsize(tcp->u_arg[1]);
 	const kernel_ulong_t addr = tcp->u_arg[2];
 	kernel_ulong_t iocbp;
 
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %ld, ", nr);
+	tprintf(", %" PRI_kld ", ", nr);
 
 	if (nr < 0)
 		printaddr(addr);
@@ -236,9 +237,9 @@ SYS_FUNC(io_getevents)
 {
 	if (entering(tcp)) {
 		printaddr(tcp->u_arg[0]);
-		tprintf(", %ld, %ld, ",
-			widen_to_long(tcp->u_arg[1]),
-			widen_to_long(tcp->u_arg[2]));
+		tprintf(", %" PRI_kld ", %" PRI_kld ", ",
+			truncate_klong_to_current_wordsize(tcp->u_arg[1]),
+			truncate_klong_to_current_wordsize(tcp->u_arg[2]));
 	} else {
 		struct io_event buf;
 		print_array(tcp, tcp->u_arg[3], tcp->u_rval, &buf, sizeof(buf),

@@ -861,15 +861,19 @@ DECL_PRINTPAIR(int);
 DECL_PRINTPAIR(int64);
 #undef DECL_PRINTPAIR
 
-/* In many, many places we play fast and loose and use
- * tprintf("%d", (int) tcp->u_arg[N]) to print fds, pids etc.
- * We probably need to use widen_to_long() instead:
- */
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-# define widen_to_long(v) (current_wordsize == 4 ? (long)(int32_t)(v) : (long)(v))
-#else
-# define widen_to_long(v) ((long)(v))
+static inline kernel_long_t
+truncate_klong_to_current_wordsize(const kernel_long_t v)
+{
+#if SIZEOF_KERNEL_LONG_T > 4 \
+ && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined current_wordsize)
+	if (current_wordsize < sizeof(v)) {
+		return (int) v;
+	} else
 #endif
+	{
+		return v;
+	}
+}
 
 static inline kernel_ulong_t
 truncate_kulong_to_current_wordsize(const kernel_ulong_t v)
