@@ -44,10 +44,11 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprintf("{lo_number=%d", info.lo_number);
 
 	if (!abbrev(tcp)) {
-		tprintf(", lo_device=%#lx, lo_inode=%lu, lo_rdevice=%#lx",
-			(unsigned long) info.lo_device,
-			info.lo_inode,
-			(unsigned long) info.lo_rdevice);
+		tprints(", lo_device=");
+		print_dev_t(info.lo_device);
+		tprintf(", lo_inode=%lu", info.lo_inode);
+		tprints(", lo_rdevice=");
+		print_dev_t(info.lo_rdevice);
 	}
 
 	tprintf(", lo_offset=%#x", info.lo_offset);
@@ -92,12 +93,13 @@ decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 
 	if (!abbrev(tcp)) {
-		tprintf("{lo_device=%" PRIu64 ", lo_inode=%" PRIu64
-			", lo_rdevice=%" PRIu64 ", lo_offset=%#" PRIx64
-			", lo_sizelimit=%" PRIu64 ", lo_number=%" PRIu32,
-			(uint64_t) info64.lo_device,
-			(uint64_t) info64.lo_inode,
-			(uint64_t) info64.lo_rdevice,
+		tprints("{lo_device=");
+		print_dev_t(info64.lo_device);
+		tprintf(", lo_inode=%" PRIu64, (uint64_t) info64.lo_inode);
+		tprints(", lo_rdevice=");
+		print_dev_t(info64.lo_rdevice);
+		tprintf(", lo_offset=%#" PRIx64 ", lo_sizelimit=%" PRIu64
+			", lo_number=%" PRIu32,
 			(uint64_t) info64.lo_offset,
 			(uint64_t) info64.lo_sizelimit,
 			(uint32_t) info64.lo_number);
