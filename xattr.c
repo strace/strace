@@ -51,7 +51,7 @@ print_xattr_val(struct tcb *const tcp,
 		printaddr(addr);
 	else
 		printstr_ex(tcp, addr, size, QUOTE_OMIT_TRAILING_0);
-	tprintf(", %lu", insize);
+	tprintf(", %" PRI_kru, insize);
 }
 
 SYS_FUNC(setxattr)
@@ -109,7 +109,7 @@ print_xattr_list(struct tcb *const tcp, const kernel_ureg_t addr,
 	} else {
 		printstrn(tcp, addr, tcp->u_rval);
 	}
-	tprintf(", %lu", size);
+	tprintf(", %" PRI_kru, size);
 }
 
 SYS_FUNC(listxattr)

@@ -64,7 +64,7 @@ print_mmap(struct tcb *tcp, kernel_ureg_t *u_arg, unsigned long long offset)
 	const int fd = u_arg[4];
 
 	printaddr(addr);
-	tprintf(", %lu, ", len);
+	tprintf(", %" PRI_kru ", ", len);
 	printflags64(mmap_prot, prot, "PROT_???");
 	tprints(", ");
 #ifdef MAP_TYPE
@@ -177,7 +177,7 @@ SYS_FUNC(mmap_4koff)
 SYS_FUNC(munmap)
 {
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %lu", tcp->u_arg[1]);
+	tprintf(", %" PRI_kru, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -210,7 +210,7 @@ SYS_FUNC(pkey_mprotect)
 SYS_FUNC(mremap)
 {
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %lu, %lu, ", tcp->u_arg[1], tcp->u_arg[2]);
+	tprintf(", %" PRI_kru ", %" PRI_kru ", ", tcp->u_arg[1], tcp->u_arg[2]);
 	printflags64(mremap_flags, tcp->u_arg[3], "MREMAP_???");
 #ifdef MREMAP_FIXED
 	if ((tcp->u_arg[3] & (MREMAP_MAYMOVE | MREMAP_FIXED)) ==
@@ -227,7 +227,7 @@ SYS_FUNC(mremap)
 SYS_FUNC(madvise)
 {
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %lu, ", tcp->u_arg[1]);
+	tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
 	printxval(madvise_cmds, tcp->u_arg[2], "MADV_???");
 
 	return RVAL_DECODED;
@@ -249,7 +249,7 @@ SYS_FUNC(msync)
 	/* addr */
 	printaddr(tcp->u_arg[0]);
 	/* len */
-	tprintf(", %lu, ", tcp->u_arg[1]);
+	tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
 	/* flags */
 	printflags(mctl_sync, tcp->u_arg[2], "MS_???");
 
@@ -261,7 +261,7 @@ SYS_FUNC(msync)
 SYS_FUNC(mlock2)
 {
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %lu, ", tcp->u_arg[1]);
+	tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
 	printflags(mlock_flags, tcp->u_arg[2], "MLOCK_???");
 
 	return RVAL_DECODED;
@@ -271,7 +271,7 @@ SYS_FUNC(mincore)
 {
 	if (entering(tcp)) {
 		printaddr(tcp->u_arg[0]);
-		tprintf(", %lu, ", tcp->u_arg[1]);
+		tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
 	} else {
 		const unsigned long page_size = get_pagesize();
 		const unsigned long page_mask = page_size - 1;
@@ -319,9 +319,9 @@ SYS_FUNC(remap_file_pages)
 	const kernel_ureg_t flags = tcp->u_arg[4];
 
 	printaddr(addr);
-	tprintf(", %lu, ", size);
+	tprintf(", %" PRI_kru ", ", size);
 	printflags64(mmap_prot, prot, "PROT_???");
-	tprintf(", %lu, ", pgoff);
+	tprintf(", %" PRI_kru ", ", pgoff);
 #ifdef MAP_TYPE
 	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
 	addflags(mmap_flags, flags & ~MAP_TYPE);
@@ -349,7 +349,7 @@ SYS_FUNC(subpage_prot)
 	kernel_ureg_t map = tcp->u_arg[2];
 
 	printaddr(addr);
-	tprintf(", %lu, ", len);
+	tprintf(", %" PRI_kru ", ", len);
 
 	unsigned int entry;
 	print_array(tcp, map, nmemb, &entry, sizeof(entry),

@@ -65,14 +65,15 @@ SYS_FUNC(sysmips)
 	}
 	case MIPS_ATOMIC_SET:
 		printaddr(tcp->u_arg[1]);
-		tprintf(", %#lx", tcp->u_arg[2]);
+		tprintf(", %#" PRI_krx, tcp->u_arg[2]);
 		return RVAL_DECODED;
 	case MIPS_FIXADE:
-		tprintf("%#lx", tcp->u_arg[1]);
+		tprintf("%#" PRI_krx, tcp->u_arg[1]);
 		return RVAL_DECODED;
 	}
 
-	tprintf("%ld, %ld, %ld", tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+	tprintf("%" PRI_krd ", %" PRI_krd ", %" PRI_krd,
+		tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
 	return RVAL_DECODED;
 }
 

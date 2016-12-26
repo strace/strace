@@ -956,7 +956,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
 			data_size -= iov_len;
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
-			tprintf(" * %lu bytes in buffer %d\n", iov_len, i);
+			tprintf(" * %" PRI_kru " bytes in buffer %d\n", iov_len, i);
 			dumpstr(tcp, iov_iov_base(i), iov_len);
 		}
 	}
@@ -1127,7 +1127,7 @@ umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
 		if ((unsigned int) r == len)
 			return 0;
 		if (r >= 0) {
-			error_msg("umoven: short read (%u < %u) @0x%lx",
+			error_msg("umoven: short read (%u < %u) @0x%" PRI_krx,
 				  (unsigned int) r, len, addr);
 			return -1;
 		}
@@ -1169,7 +1169,7 @@ umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx",
+				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%" PRI_krx,
 					    pid, addr);
 				return -1;
 		}
@@ -1192,13 +1192,13 @@ umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
 			case EFAULT: case EIO: case EPERM:
 				/* address space is inaccessible */
 				if (nread) {
-					perror_msg("umoven: short read (%u < %u) @0x%lx",
+					perror_msg("umoven: short read (%u < %u) @0x%" PRI_krx,
 						   nread, nread + len, addr - nread);
 				}
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%lx",
+				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%" PRI_krx,
 					    pid, addr);
 				return -1;
 		}
@@ -1312,7 +1312,7 @@ umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *ladd
 				case EFAULT: case EIO:
 					/* address space is inaccessible */
 					if (nread) {
-						perror_msg("umovestr: short read (%d < %d) @0x%lx",
+						perror_msg("umovestr: short read (%d < %d) @0x%" PRI_krx,
 							   nread, nread + len, addr - nread);
 					}
 					return -1;
@@ -1343,7 +1343,7 @@ umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *ladd
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx",
+				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%" PRI_krx,
 					    pid, addr);
 				return -1;
 		}
@@ -1370,13 +1370,13 @@ umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *ladd
 			case EFAULT: case EIO: case EPERM:
 				/* address space is inaccessible */
 				if (nread) {
-					perror_msg("umovestr: short read (%d < %d) @0x%lx",
+					perror_msg("umovestr: short read (%d < %d) @0x%" PRI_krx,
 						   nread, nread + len, addr - nread);
 				}
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%lx",
+				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%" PRI_krx,
 					   pid, addr);
 				return -1;
 		}

@@ -822,7 +822,7 @@ trace_syscall_exiting(struct tcb *tcp)
 			if (syscall_fault_injected(tcp))
 				tprints(" (INJECTED)");
 		} else {
-			tprintf("= %#lx", tcp->u_rval);
+			tprintf("= %#" PRI_krx, tcp->u_rval);
 		}
 	}
 	else if (!(sys_res & RVAL_NONE) && u_error) {
@@ -907,7 +907,7 @@ trace_syscall_exiting(struct tcb *tcp)
 						(unsigned int) tcp->u_rval);
 				else
 #endif
-					tprintf("= %#lx", tcp->u_rval);
+					tprintf("= %#" PRI_krx, tcp->u_rval);
 				break;
 			case RVAL_OCTAL:
 				tprints("= ");
@@ -920,10 +920,10 @@ trace_syscall_exiting(struct tcb *tcp)
 						(unsigned int) tcp->u_rval);
 				else
 #endif
-					tprintf("= %lu", tcp->u_rval);
+					tprintf("= %" PRI_kru, tcp->u_rval);
 				break;
 			case RVAL_DECIMAL:
-				tprintf("= %ld", tcp->u_rval);
+				tprintf("= %" PRI_krd, tcp->u_rval);
 				break;
 			case RVAL_FD:
 				if (show_fd_path) {
@@ -931,7 +931,7 @@ trace_syscall_exiting(struct tcb *tcp)
 					printfd(tcp, tcp->u_rval);
 				}
 				else
-					tprintf("= %ld", tcp->u_rval);
+					tprintf("= %" PRI_krd, tcp->u_rval);
 				break;
 #if HAVE_STRUCT_TCB_EXT_ARG
 			/*
@@ -1058,8 +1058,9 @@ print_pc(struct tcb *tcp)
 		tprints(current_wordsize == 4 ? "[????????] "
 					      : "[????????????????] ");
 	else
-		tprintf(current_wordsize == 4 ? "[%08lx] " : "[%016lx] ",
-			(unsigned long) ARCH_PC_REG);
+		tprintf(current_wordsize == 4
+			? "[%08" PRI_krx "] " : "[%016" PRI_krx "] ",
+			(kernel_ureg_t) ARCH_PC_REG);
 }
 
 #include "getregs_old.h"
@@ -1189,7 +1190,7 @@ set_regs(pid_t pid)
 struct sysent_buf {
 	struct tcb *tcp;
 	struct_sysent ent;
-	char buf[sizeof("syscall_%lu") + sizeof(long) * 3];
+	char buf[sizeof("syscall_%lu") + sizeof(kernel_scno_t) * 3];
 };
 
 static void
@@ -1228,7 +1229,7 @@ get_scno(struct tcb *tcp)
 		s->ent.sen = SEN_printargs;
 		s->ent.sys_func = printargs;
 		s->ent.sys_name = s->buf;
-		sprintf(s->buf, "syscall_%lu", shuffle_scno(tcp->scno));
+		sprintf(s->buf, "syscall_%" PRI_kru, shuffle_scno(tcp->scno));
 
 		tcp->s_ent = &s->ent;
 		tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
@@ -1236,7 +1237,8 @@ get_scno(struct tcb *tcp)
 		set_tcb_priv_data(tcp, s, free_sysent_buf);
 
 		if (debug_flag)
-			error_msg("pid %d invalid syscall %ld", tcp->pid, tcp->scno);
+			error_msg("pid %d invalid syscall %" PRI_krd,
+				  tcp->pid, tcp->scno);
 	}
 	return 1;
 }

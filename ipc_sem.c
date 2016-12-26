@@ -126,7 +126,7 @@ SYS_FUNC(semctl)
 	   ) {
 		printnum_ptr(tcp, tcp->u_arg[3]);
 	} else {
-		tprintf("%#lx", tcp->u_arg[3]);
+		tprintf("%#" PRI_krx, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;
 }

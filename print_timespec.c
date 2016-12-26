@@ -85,7 +85,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timespec,
 		strcpy(buf, "NULL");
 	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 		   umove(tcp, addr, &t)) {
-		snprintf(buf, sizeof(buf), "%#lx", addr);
+		snprintf(buf, sizeof(buf), "%#" PRI_krx, addr);
 	} else {
 		snprintf(buf, sizeof(buf), timespec_fmt,
 			 (intmax_t) t.tv_sec, (intmax_t) t.tv_nsec);

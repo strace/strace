@@ -121,7 +121,8 @@ SYS_FUNC(futex)
 		break;
 	default:
 		tprintf(", %u", val);
-		tprintf(", %#lx", timeout);
+		tprints(", ");
+		printaddr(timeout);
 		tprints(", ");
 		printaddr(uaddr2);
 		tprintf(", %#x", val3);

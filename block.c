@@ -150,7 +150,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	/* take arg as a value, not as a pointer */
 	case BLKRASET:
 	case BLKFRASET:
-		tprintf(", %lu", arg);
+		tprintf(", %" PRI_kru, arg);
 		break;
 
 	/* return an unsigned short */

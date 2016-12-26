@@ -82,7 +82,7 @@ tprint_msgrcv(struct tcb *const tcp, const kernel_ureg_t addr,
 	      const kernel_ureg_t count, const kernel_ureg_t msgtyp)
 {
 	tprint_msgbuf(tcp, addr, count);
-	tprintf("%ld, ", msgtyp);
+	tprintf("%" PRI_krd ", ", msgtyp);
 }
 
 static int
@@ -121,7 +121,7 @@ SYS_FUNC(msgrcv)
 				kernel_ureg_t pair[2];
 
 				if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair))
-					tprintf(", %lu, ", tcp->u_arg[1]);
+					tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
 				else
 					tprint_msgrcv(tcp, pair[0],
 						      tcp->u_arg[1], pair[1]);

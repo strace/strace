@@ -8,7 +8,7 @@ SYS_FUNC(getrandom)
 			printaddr(tcp->u_arg[0]);
 		else
 			printstrn(tcp, tcp->u_arg[0], tcp->u_rval);
-		tprintf(", %lu, ", tcp->u_arg[1]);
+		tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
 		printflags(getrandom_flags, tcp->u_arg[2], "GRND_???");
 	}
 	return 0;
