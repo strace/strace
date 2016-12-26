@@ -506,7 +506,7 @@ DEF_PRINTNUM(short, short)
 DEF_PRINTNUM(int64, uint64_t)
 DEF_PRINTPAIR(int64, uint64_t)
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#ifndef current_wordsize
 bool
 printnum_long_int(struct tcb *const tcp, const kernel_ulong_t addr,
 		  const char *const fmt_long, const char *const fmt_int)
@@ -517,7 +517,7 @@ printnum_long_int(struct tcb *const tcp, const kernel_ulong_t addr,
 		return printnum_int(tcp, addr, fmt_int);
 	}
 }
-#endif
+#endif /* !current_wordsize */
 
 const char *
 sprinttime(time_t t)
