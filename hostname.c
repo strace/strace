@@ -31,7 +31,7 @@ SYS_FUNC(gethostname)
 			printaddr(tcp->u_arg[0]);
 		else
 			printstr(tcp, tcp->u_arg[0]);
-		tprintf(", %" PRI_kru, tcp->u_arg[1]);
+		tprintf(", %" PRI_klu, tcp->u_arg[1]);
 	}
 	return 0;
 }

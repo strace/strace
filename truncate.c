@@ -3,7 +3,7 @@
 SYS_FUNC(truncate)
 {
 	printpath(tcp, tcp->u_arg[0]);
-	tprintf(", %" PRI_kru, tcp->u_arg[1]);
+	tprintf(", %" PRI_klu, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -19,7 +19,7 @@ SYS_FUNC(truncate64)
 SYS_FUNC(ftruncate)
 {
 	printfd(tcp, tcp->u_arg[0]);
-	tprintf(", %" PRI_kru, tcp->u_arg[1]);
+	tprintf(", %" PRI_klu, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }

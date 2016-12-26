@@ -323,7 +323,7 @@ SYS_FUNC(ioctl)
 		if (ret)
 			--ret;
 		else
-			tprintf(", %#" PRI_krx, tcp->u_arg[2]);
+			tprintf(", %#" PRI_klx, tcp->u_arg[2]);
 		ret |= RVAL_DECODED;
 	} else {
 		if (ret)

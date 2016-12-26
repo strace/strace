@@ -40,7 +40,7 @@ do_signalfd(struct tcb *tcp, int flags_arg)
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	print_sigset_addr_len(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_kru, tcp->u_arg[2]);
+	tprintf(", %" PRI_klu, tcp->u_arg[2]);
 	if (flags_arg >= 0) {
 		tprints(", ");
 		printflags(sfd_flags, tcp->u_arg[flags_arg], "SFD_???");

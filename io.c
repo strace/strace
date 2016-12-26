@@ -42,7 +42,7 @@ SYS_FUNC(read)
 			printaddr(tcp->u_arg[1]);
 		else
 			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %" PRI_kru, tcp->u_arg[2]);
+		tprintf(", %" PRI_klu, tcp->u_arg[2]);
 	}
 	return 0;
 }
@@ -52,7 +52,7 @@ SYS_FUNC(write)
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_kru, tcp->u_arg[2]);
+	tprintf(", %" PRI_klu, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -101,7 +101,7 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 			break;
 	}
 
-	tprintf(", iov_len=%" PRI_kru "}", iov[1]);
+	tprintf(", iov_len=%" PRI_klu "}", iov[1]);
 
 	return true;
 }
@@ -132,7 +132,7 @@ SYS_FUNC(readv)
 		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
 				syserror(tcp) ? IOV_DECODE_ADDR :
 				IOV_DECODE_STR, tcp->u_rval);
-		tprintf(", %" PRI_kru, tcp->u_arg[2]);
+		tprintf(", %" PRI_klu, tcp->u_arg[2]);
 	}
 	return 0;
 }
@@ -142,7 +142,7 @@ SYS_FUNC(writev)
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR);
-	tprintf(", %" PRI_kru, tcp->u_arg[2]);
+	tprintf(", %" PRI_klu, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -157,7 +157,7 @@ SYS_FUNC(pread)
 			printaddr(tcp->u_arg[1]);
 		else
 			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
-		tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 		printllval(tcp, "%lld", 3);
 	}
 	return 0;
@@ -168,7 +168,7 @@ SYS_FUNC(pwrite)
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 	printllval(tcp, "%lld", 3);
 
 	return RVAL_DECODED;
@@ -180,12 +180,12 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 #if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
 # ifndef current_klongsize
 	if (current_klongsize < SIZEOF_LONG) {
-		tprintf("%" PRI_krd, (tcp->u_arg[arg + 1] << current_wordsize * 8)
+		tprintf("%" PRI_kld, (tcp->u_arg[arg + 1] << current_wordsize * 8)
 			       | tcp->u_arg[arg]);
 	} else
 # endif /* !current_klongsize */
 	{
-		tprintf("%" PRI_krd, tcp->u_arg[arg]);
+		tprintf("%" PRI_kld, tcp->u_arg[arg]);
 	}
 #elif SIZEOF_LONG > 4
 # error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
@@ -280,7 +280,7 @@ SYS_FUNC(tee)
 	printfd(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	/* size_t len */
-	tprintf("%" PRI_kru ", ", tcp->u_arg[2]);
+	tprintf("%" PRI_klu ", ", tcp->u_arg[2]);
 	/* unsigned int flags */
 	printflags(splice_flags, tcp->u_arg[3], "SPLICE_F_???");
 
@@ -302,7 +302,7 @@ SYS_FUNC(splice)
 	printnum_int64(tcp, tcp->u_arg[3], "%" PRId64);
 	tprints(", ");
 	/* size_t len */
-	tprintf("%" PRI_kru ", ", tcp->u_arg[4]);
+	tprintf("%" PRI_klu ", ", tcp->u_arg[4]);
 	/* unsigned int flags */
 	printflags(splice_flags, tcp->u_arg[5], "SPLICE_F_???");
 
@@ -316,7 +316,7 @@ SYS_FUNC(vmsplice)
 	tprints(", ");
 	/* const struct iovec *iov, unsigned long nr_segs */
 	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR);
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 	/* unsigned int flags */
 	printflags(splice_flags, tcp->u_arg[3], "SPLICE_F_???");
 

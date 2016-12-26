@@ -6,7 +6,7 @@ SYS_FUNC(readahead)
 
 	printfd(tcp, tcp->u_arg[0]);
 	argn = printllval(tcp, ", %lld", 1);
-	tprintf(", %" PRI_kru, tcp->u_arg[argn]);
+	tprintf(", %" PRI_klu, tcp->u_arg[argn]);
 
 	return RVAL_DECODED;
 }

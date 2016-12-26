@@ -55,9 +55,9 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 	tprints("{buf=");
 	printaddr(seg[0]);
-	tprintf(", bufsz=%" PRI_kru ", mem=", seg[1]);
+	tprintf(", bufsz=%" PRI_klu ", mem=", seg[1]);
 	printaddr(seg[2]);
-	tprintf(", memsz=%" PRI_kru "}", seg[3]);
+	tprintf(", memsz=%" PRI_klu "}", seg[3]);
 
 	return true;
 }
@@ -82,7 +82,7 @@ SYS_FUNC(kexec_load)
 {
 	/* entry, nr_segments */
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
 
 	/* segments */
 	print_kexec_segments(tcp, tcp->u_arg[2], tcp->u_arg[1]);

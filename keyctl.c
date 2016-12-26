@@ -59,7 +59,7 @@ SYS_FUNC(add_key)
 	tprints(", ");
 	printstrn(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 	/* payload length */
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[3]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[3]);
 	/* keyring serial number */
 	print_keyring_serial_number(tcp->u_arg[4]);
 

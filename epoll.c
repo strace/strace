@@ -111,7 +111,7 @@ SYS_FUNC(epoll_pwait)
 		tprints(", ");
 		/* NB: kernel requires arg[5] == NSIG / 8 */
 		print_sigset_addr_len(tcp, tcp->u_arg[4], tcp->u_arg[5]);
-		tprintf(", %" PRI_kru, tcp->u_arg[5]);
+		tprintf(", %" PRI_klu, tcp->u_arg[5]);
 	}
 	return 0;
 }

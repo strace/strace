@@ -48,7 +48,7 @@ SYS_FUNC(shmget)
 		tprintf("%#x", key);
 	else
 		tprints("IPC_PRIVATE");
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
 	if (printflags(shm_resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 		tprints("|");
 	print_numeric_umode_t(tcp->u_arg[2] & 0777);

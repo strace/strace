@@ -159,7 +159,7 @@ SYS_FUNC(socket)
 #endif
 
 	default:
-		tprintf("%" PRI_kru, tcp->u_arg[2]);
+		tprintf("%" PRI_klu, tcp->u_arg[2]);
 		break;
 	}
 
@@ -181,7 +181,7 @@ SYS_FUNC(listen)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	tprintf("%" PRI_kru, tcp->u_arg[1]);
+	tprintf("%" PRI_klu, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -251,7 +251,7 @@ SYS_FUNC(send)
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 	/* flags */
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 
@@ -263,7 +263,7 @@ SYS_FUNC(sendto)
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 	/* flags */
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	/* to address */
@@ -289,7 +289,7 @@ SYS_FUNC(recv)
 				     tcp->u_rval);
 		}
 
-		tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	}
 	return 0;
@@ -314,7 +314,7 @@ SYS_FUNC(recvfrom)
 				     tcp->u_rval);
 		}
 		/* size */
-		tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 		/* flags */
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 		tprints(", ");
@@ -419,7 +419,7 @@ SYS_FUNC(socketpair)
 		printxval(addrfams, tcp->u_arg[0], "AF_???");
 		tprints(", ");
 		tprint_sock_type(tcp->u_arg[1]);
-		tprintf(", %" PRI_kru, tcp->u_arg[2]);
+		tprintf(", %" PRI_klu, tcp->u_arg[2]);
 	} else {
 		tprints(", ");
 		decode_pair_fd(tcp, tcp->u_arg[3]);

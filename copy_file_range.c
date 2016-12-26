@@ -42,7 +42,7 @@ SYS_FUNC(copy_file_range)
 	printnum_int64(tcp, tcp->u_arg[3], "%" PRId64);
 	tprints(", ");
 	/* size_t len */
-	tprintf("%" PRI_kru ", ", tcp->u_arg[4]);
+	tprintf("%" PRI_klu ", ", tcp->u_arg[4]);
 	/* unsigned int flags */
 	tprintf("%u", (unsigned int) tcp->u_arg[5]);
 

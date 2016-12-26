@@ -297,7 +297,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		if (u.ptr != buf)
 			tprints(", ");
-		tprintf("{cmsg_len=%" PRI_kru ", cmsg_level=", cmsg_len);
+		tprintf("{cmsg_len=%" PRI_klu ", cmsg_level=", cmsg_len);
 		printxval(socketlayers, cmsg_level, "SOL_???");
 		tprints(", cmsg_type=");
 
@@ -355,11 +355,11 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 
 	tprint_iov_upto(tcp, msg->msg_iovlen,
 			ptr_to_kulong(msg->msg_iov), decode, data_size);
-	tprintf(", msg_iovlen=%" PRI_kru, (kernel_ulong_t) msg->msg_iovlen);
+	tprintf(", msg_iovlen=%" PRI_klu, (kernel_ulong_t) msg->msg_iovlen);
 
 	decode_msg_control(tcp, ptr_to_kulong(msg->msg_control),
 			   msg->msg_controllen);
-	tprintf(", msg_controllen=%" PRI_kru, (kernel_ulong_t) msg->msg_controllen);
+	tprintf(", msg_controllen=%" PRI_klu, (kernel_ulong_t) msg->msg_controllen);
 
 	tprints(", msg_flags=");
 	printflags(msg_flags, msg->msg_flags, "MSG_???");

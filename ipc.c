@@ -45,7 +45,7 @@ SYS_FUNC(ipc)
 
 	unsigned int i;
 	for (i = 1; i < tcp->s_ent->nargs; ++i)
-		tprintf(", %#" PRI_krx, tcp->u_arg[i]);
+		tprintf(", %#" PRI_klx, tcp->u_arg[i]);
 
 	return RVAL_DECODED;
 }

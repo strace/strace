@@ -73,7 +73,7 @@ print_user_offset_addr(const kernel_ulong_t addr)
 			printaddr(addr);
 		} else {
 			--x;
-			tprintf("%s + %" PRI_kru,
+			tprintf("%s + %" PRI_klu,
 				x->str, addr - (kernel_ulong_t) x->val);
 		}
 	} else {
@@ -121,7 +121,7 @@ SYS_FUNC(ptrace)
 		case PTRACE_GETSIGMASK:
 		case PTRACE_SETSIGMASK:
 		case PTRACE_SECCOMP_GET_FILTER:
-			tprintf(", %" PRI_kru, addr);
+			tprintf(", %" PRI_klu, addr);
 			break;
 		case PTRACE_PEEKSIGINFO: {
 			tprints(", ");

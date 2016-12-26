@@ -190,7 +190,7 @@ loop_ioctl(struct tcb *const tcp, const unsigned int code,
 
 #ifdef LOOP_SET_DIRECT_IO
 	case LOOP_SET_DIRECT_IO:
-		tprintf(", %" PRI_kru, arg);
+		tprintf(", %" PRI_klu, arg);
 		break;
 #endif
 

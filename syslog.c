@@ -62,7 +62,7 @@ SYS_FUNC(syslog)
 			break;
 		default:
 			printaddr(tcp->u_arg[1]);
-			tprintf(", %" PRI_kru, tcp->u_arg[2]);
+			tprintf(", %" PRI_klu, tcp->u_arg[2]);
 			return RVAL_DECODED;
 	}
 

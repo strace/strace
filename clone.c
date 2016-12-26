@@ -104,7 +104,7 @@ SYS_FUNC(clone)
 		tprints(", ");
 #ifdef ARG_STACKSIZE
 		if (ARG_STACKSIZE != -1)
-			tprintf("stack_size=%#" PRI_krx ", ",
+			tprintf("stack_size=%#" PRI_klx ", ",
 				tcp->u_arg[ARG_STACKSIZE]);
 #endif
 		tprints("flags=");

@@ -51,7 +51,7 @@ decode_readlink(struct tcb *tcp, int offset)
 			 * past return buffer's end.
 			 */
 			printstrn(tcp, tcp->u_arg[offset + 1], tcp->u_rval);
-		tprintf(", %" PRI_kru, tcp->u_arg[offset + 2]);
+		tprintf(", %" PRI_klu, tcp->u_arg[offset + 2]);
 	}
 	return 0;
 }

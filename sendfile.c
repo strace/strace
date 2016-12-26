@@ -35,7 +35,7 @@ SYS_FUNC(sendfile64)
 		printfd(tcp, tcp->u_arg[1]);
 		tprints(", ");
 		if (!printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64)) {
-			tprintf(", %" PRI_kru, tcp->u_arg[3]);
+			tprintf(", %" PRI_klu, tcp->u_arg[3]);
 			return RVAL_DECODED;
 		}
 	} else {
@@ -43,7 +43,7 @@ SYS_FUNC(sendfile64)
 			tprints(" => ");
 			printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64);
 		}
-		tprintf(", %" PRI_kru, tcp->u_arg[3]);
+		tprintf(", %" PRI_klu, tcp->u_arg[3]);
 	}
 
 	return 0;
@@ -58,7 +58,7 @@ SYS_FUNC(sendfile)
 		tprints(", ");
 		if (!printnum_ulong(tcp, tcp->u_arg[2])
 		    || !tcp->u_arg[3]) {
-			tprintf(", %" PRI_kru, tcp->u_arg[3]);
+			tprintf(", %" PRI_klu, tcp->u_arg[3]);
 			return RVAL_DECODED;
 		}
 	} else {
@@ -66,7 +66,7 @@ SYS_FUNC(sendfile)
 			tprints(" => ");
 			printnum_ulong(tcp, tcp->u_arg[2]);
 		}
-		tprintf(", %" PRI_kru, tcp->u_arg[3]);
+		tprintf(", %" PRI_klu, tcp->u_arg[3]);
 	}
 
 	return 0;

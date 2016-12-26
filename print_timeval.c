@@ -86,7 +86,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval,
 		strcpy(buf, "NULL");
 	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 		   umove(tcp, addr, &t)) {
-		snprintf(buf, sizeof(buf), "%#" PRI_krx, addr);
+		snprintf(buf, sizeof(buf), "%#" PRI_klx, addr);
 	} else {
 		snprintf(buf, sizeof(buf), timeval_fmt,
 			 (intmax_t) t.tv_sec, (intmax_t) t.tv_usec);
@@ -169,7 +169,7 @@ sprint_timeval32(struct tcb *const tcp, const kernel_ulong_t addr)
 		strcpy(buf, "NULL");
 	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 		   umove(tcp, addr, &t)) {
-		snprintf(buf, sizeof(buf), "%#" PRI_krx, addr);
+		snprintf(buf, sizeof(buf), "%#" PRI_klx, addr);
 	} else {
 		snprintf(buf, sizeof(buf), timeval_fmt,
 			 (intmax_t) t.tv_sec, (intmax_t) t.tv_usec);

@@ -35,7 +35,7 @@ print_node(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		tprintf("%#0*x", (int) elem_size * 2 + 2,
 			* (unsigned int *) elem_buf);
 	} else {
-		tprintf("%#0*" PRI_krx, (int) elem_size * 2 + 2,
+		tprintf("%#0*" PRI_klx, (int) elem_size * 2 + 2,
 			* (kernel_ulong_t *) elem_buf);
 	}
 
@@ -63,7 +63,7 @@ print_nodemask(struct tcb *const tcp, const kernel_ulong_t addr,
 
 SYS_FUNC(migrate_pages)
 {
-	tprintf("%d, %" PRI_kru ", ", (int) tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf("%d, %" PRI_klu ", ", (int) tcp->u_arg[0], tcp->u_arg[1]);
 	print_nodemask(tcp, tcp->u_arg[2], tcp->u_arg[1]);
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[1]);
@@ -77,11 +77,11 @@ SYS_FUNC(migrate_pages)
 SYS_FUNC(mbind)
 {
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
 	printxval64(policies, tcp->u_arg[2], "MPOL_???");
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
-	tprintf(", %" PRI_kru ", ", tcp->u_arg[4]);
+	tprintf(", %" PRI_klu ", ", tcp->u_arg[4]);
 	printflags(mbindflags, tcp->u_arg[5], "MPOL_???");
 
 	return RVAL_DECODED;
@@ -92,7 +92,7 @@ SYS_FUNC(set_mempolicy)
 	printxval(policies, tcp->u_arg[0], "MPOL_???");
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_kru, tcp->u_arg[2]);
+	tprintf(", %" PRI_klu, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -110,7 +110,7 @@ SYS_FUNC(get_mempolicy)
 		}
 		tprints(", ");
 		print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %" PRI_kru ", ", tcp->u_arg[2]);
+		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 		printaddr(tcp->u_arg[3]);
 		tprints(", ");
 		printflags64(mempolicyflags, tcp->u_arg[4], "MPOL_???");
@@ -163,7 +163,7 @@ SYS_FUNC(move_pages)
 	kernel_ulong_t buf;
 
 	if (entering(tcp)) {
-		tprintf("%d, %" PRI_kru ", ", (int) tcp->u_arg[0], npages);
+		tprintf("%d, %" PRI_klu ", ", (int) tcp->u_arg[0], npages);
 		print_array(tcp, tcp->u_arg[2], npages, &buf, current_wordsize,
 			    umoven_or_printaddr, print_addr, 0);
 		tprints(", ");

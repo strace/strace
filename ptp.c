@@ -72,7 +72,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	case PTP_ENABLE_PPS:
-		tprintf(", %" PRI_krd, arg);
+		tprintf(", %" PRI_kld, arg);
 		break;
 
 	case PTP_SYS_OFFSET: {

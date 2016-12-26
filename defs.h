@@ -985,10 +985,6 @@ scno_is_valid(kernel_ulong_t scno)
 #define PRI_klu PRI_kl"u"
 #define PRI_klx PRI_kl"x"
 
-#define PRI_krd PRI_kld
-#define PRI_kru PRI_klu
-#define PRI_krx PRI_klx
-
 /*
  * The kernel used to define 64-bit types on 64-bit systems on a per-arch
  * basis.  Some architectures would use unsigned long and others would use

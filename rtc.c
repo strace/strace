@@ -100,7 +100,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		break;
 	case RTC_IRQP_SET:
 	case RTC_EPOCH_SET:
-		tprintf(", %" PRI_kru, arg);
+		tprintf(", %" PRI_klu, arg);
 		break;
 	case RTC_IRQP_READ:
 	case RTC_EPOCH_READ:

@@ -497,7 +497,7 @@ evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
 # ifdef EVIOCREVOKE
 		case EVIOCREVOKE:
 # endif
-			tprintf(", %" PRI_kru, arg);
+			tprintf(", %" PRI_klu, arg);
 			return 1;
 # ifdef EVIOCSCLOCKID
 		case EVIOCSCLOCKID:

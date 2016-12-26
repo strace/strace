@@ -67,12 +67,12 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr)
 
 SYS_FUNC(modify_ldt)
 {
-	tprintf("%" PRI_krd ", ", tcp->u_arg[0]);
+	tprintf("%" PRI_kld ", ", tcp->u_arg[0]);
 	if (tcp->u_arg[2] != sizeof(struct user_desc))
 		printaddr(tcp->u_arg[1]);
 	else
 		print_user_desc(tcp, tcp->u_arg[1]);
-	tprintf(", %" PRI_kru, tcp->u_arg[2]);
+	tprintf(", %" PRI_klu, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }

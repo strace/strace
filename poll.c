@@ -95,7 +95,7 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 				*outptr++ = '[';
 			else
 				outptr = stpcpy(outptr, ", ");
-			outptr += sprintf(outptr, "%#" PRI_krx, cur);
+			outptr += sprintf(outptr, "%#" PRI_klx, cur);
 			break;
 		}
 		if (!fds.revents)
@@ -178,7 +178,7 @@ SYS_FUNC(ppoll)
 		tprints(", ");
 		/* NB: kernel requires arg[4] == NSIG / 8 */
 		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);
-		tprintf(", %" PRI_kru, tcp->u_arg[4]);
+		tprintf(", %" PRI_klu, tcp->u_arg[4]);
 
 		return 0;
 	} else {

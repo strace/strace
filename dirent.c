@@ -66,7 +66,7 @@ SYS_FUNC(readdir)
 			print_old_dirent(tcp, tcp->u_arg[1]);
 		/* Not much point in printing this out, it is always 1. */
 		if (tcp->u_arg[2] != 1)
-			tprintf(", %" PRI_kru, tcp->u_arg[2]);
+			tprintf(", %" PRI_klu, tcp->u_arg[2]);
 	}
 	return 0;
 }

@@ -141,7 +141,7 @@ arch_get_scno(struct tcb *tcp)
 	 * Stracing of i386 apps is still supported.
 	 */
 	if (currpers == 0) {
-		error_msg("syscall_%" PRI_kru "(...) in unsupported "
+		error_msg("syscall_%" PRI_klu "(...) in unsupported "
 			  "64-bit mode of process PID=%d", scno, tcp->pid);
 		return 0;
 	}

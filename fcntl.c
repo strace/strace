@@ -96,11 +96,11 @@ print_fcntl(struct tcb *tcp)
 		break;
 	case F_SETOWN:
 	case F_SETPIPE_SZ:
-		tprintf(", %" PRI_krd, tcp->u_arg[2]);
+		tprintf(", %" PRI_kld, tcp->u_arg[2]);
 		break;
 	case F_DUPFD:
 	case F_DUPFD_CLOEXEC:
-		tprintf(", %" PRI_krd, tcp->u_arg[2]);
+		tprintf(", %" PRI_kld, tcp->u_arg[2]);
 		return RVAL_DECODED | RVAL_FD;
 	case F_SETFL:
 		tprints(", ");
@@ -185,7 +185,7 @@ print_fcntl(struct tcb *tcp)
 		tcp->auxstr = signame(tcp->u_rval);
 		return RVAL_STR;
 	default:
-		tprintf(", %#" PRI_krx, tcp->u_arg[2]);
+		tprintf(", %#" PRI_klx, tcp->u_arg[2]);
 		break;
 	}
 	return RVAL_DECODED;
