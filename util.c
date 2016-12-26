@@ -313,15 +313,15 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 	}
 #elif SIZEOF_LONG > 4
 #  error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
-#elif HAVE_STRUCT_TCB_EXT_ARG
+#elif SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
 # ifndef current_klongsize
-	if (current_klongsize < SIZEOF_LONG_LONG) {
+	if (current_klongsize < SIZEOF_KERNEL_LONG_T) {
 		*val = ULONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
 	} else
 # endif /* !current_klongsize */
 	{
-		*val = tcp->ext_arg[arg_no];
+		*val = tcp->u_arg[arg_no];
 		arg_no++;
 	}
 #else

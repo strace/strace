@@ -220,12 +220,6 @@ struct fault_opts {
 	uint16_t err;
 };
 
-#if defined LINUX_MIPSN32 || defined X32
-# define HAVE_STRUCT_TCB_EXT_ARG 1
-#else
-# define HAVE_STRUCT_TCB_EXT_ARG 0
-#endif
-
 /* Trace Control Block */
 struct tcb {
 	int flags;		/* See below for TCB_ values */
@@ -234,10 +228,6 @@ struct tcb {
 	unsigned long u_error;	/* Error code */
 	kernel_ulong_t scno;	/* System call number */
 	kernel_ulong_t u_arg[MAX_ARGS];	/* System call arguments */
-#if HAVE_STRUCT_TCB_EXT_ARG
-	unsigned long long ext_arg[MAX_ARGS];
-	long long u_lrval;	/* long long return value */
-#endif
 	kernel_long_t u_rval;	/* Return value */
 #if SUPPORTED_PERSONALITIES > 1
 	unsigned int currpers;	/* Personality at the time of scno update */
@@ -329,16 +319,8 @@ extern const struct xlat whence_codes[];
 #define RVAL_HEX	001	/* hex format */
 #define RVAL_OCTAL	002	/* octal format */
 #define RVAL_UDECIMAL	003	/* unsigned decimal format */
-#if HAVE_STRUCT_TCB_EXT_ARG
-# if 0 /* unused so far */
-#  define RVAL_LDECIMAL	004	/* long decimal format */
-#  define RVAL_LHEX	005	/* long hex format */
-#  define RVAL_LOCTAL	006	/* long octal format */
-# endif
-# define RVAL_LUDECIMAL	007	/* long unsigned decimal format */
-#endif /* HAVE_STRUCT_TCB_EXT_ARG */
 #define RVAL_FD		010	/* file descriptor */
-#define RVAL_MASK	017	/* mask for these values */
+#define RVAL_MASK	013	/* mask for these values */
 
 #define RVAL_STR	020	/* Print `auxstr' field after return val */
 #define RVAL_NONE	040	/* Print nothing */

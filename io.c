@@ -189,7 +189,7 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 	}
 #elif SIZEOF_LONG > 4
 # error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
-#elif HAVE_STRUCT_TCB_EXT_ARG
+#elif SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
 # ifndef current_klongsize
 	if (current_klongsize < SIZEOF_LONG_LONG) {
 		tprintf("%lld",
@@ -198,9 +198,9 @@ print_lld_from_low_high_val(struct tcb *tcp, int arg)
 	} else
 # endif /* !current_klongsize */
 	{
-		tprintf("%lld", tcp->ext_arg[arg]);
+		tprintf("%" PRI_kld, tcp->u_arg[arg]);
 	}
-#else /* SIZEOF_LONG_LONG > SIZEOF_LONG && !HAVE_STRUCT_TCB_EXT_ARG */
+#else /* SIZEOF_LONG_LONG > SIZEOF_LONG && SIZEOF_KERNEL_LONG_T == SIZEOF_LONG */
 	tprintf("%lld",
 		(zero_extend_signed_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
 		| zero_extend_signed_to_ull(tcp->u_arg[arg]));

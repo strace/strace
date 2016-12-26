@@ -44,27 +44,26 @@
  * which means that on x32 we need to use tcp->ext_arg[N] to get offset argument.
  * Use test/x32_lseek.c to test lseek decoding.
  */
-#if HAVE_STRUCT_TCB_EXT_ARG
+#if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
 SYS_FUNC(lseek)
 {
 	printfd(tcp, tcp->u_arg[0]);
 
 	long long offset;
 # ifndef current_klongsize
-	/* tcp->ext_arg is not initialized for compat personality */
-	if (current_klongsize < sizeof(*tcp->ext_arg)) {
+	if (current_klongsize < sizeof(*tcp->u_arg)) {
 		offset = (long) tcp->u_arg[1];
 	} else
 # endif /* !current_klongsize */
 	{
-		offset = tcp->ext_arg[1];
+		offset = tcp->u_arg[1];
 	}
 	int whence = tcp->u_arg[2];
 
 	tprintf(", %lld, ", offset);
 	printxval(whence_codes, whence, "SEEK_???");
 
-	return RVAL_DECODED | RVAL_LUDECIMAL;
+	return RVAL_DECODED | RVAL_UDECIMAL;
 }
 #else
 SYS_FUNC(lseek)

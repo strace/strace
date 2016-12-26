@@ -933,24 +933,6 @@ trace_syscall_exiting(struct tcb *tcp)
 				else
 					tprintf("= %" PRI_kld, tcp->u_rval);
 				break;
-#if HAVE_STRUCT_TCB_EXT_ARG
-			/*
-			case RVAL_LHEX:
-				tprintf("= %#llx", tcp->u_lrval);
-				break;
-			case RVAL_LOCTAL:
-				tprintf("= %#llo", tcp->u_lrval);
-				break;
-			*/
-			case RVAL_LUDECIMAL:
-				tprintf("= %llu", tcp->u_lrval);
-				break;
-			/*
-			case RVAL_LDECIMAL:
-				tprintf("= %lld", tcp->u_lrval);
-				break;
-			*/
-#endif /* HAVE_STRUCT_TCB_EXT_ARG */
 			default:
 				error_msg("invalid rval format");
 				break;

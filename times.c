@@ -53,10 +53,5 @@ SYS_FUNC(times)
 			zero_extend_signed_to_ull(tbuf.tms_cstime));
 	}
 
-	return syserror(tcp) ? RVAL_DECIMAL :
-#if defined(RVAL_LUDECIMAL) && !defined(IN_MPERS)
-			       RVAL_LUDECIMAL;
-#else
-			       RVAL_UDECIMAL;
-#endif
+	return syserror(tcp) ? RVAL_DECIMAL : RVAL_UDECIMAL;
 }

@@ -135,18 +135,12 @@ SYS_FUNC(old_mmap_pgoff)
 /* Params are passed directly, offset is in bytes */
 SYS_FUNC(mmap)
 {
-	unsigned long long offset =
-#if HAVE_STRUCT_TCB_EXT_ARG
-		tcp->ext_arg[5];	/* try test/x32_mmap.c */
-#else
-		tcp->u_arg[5];
-#endif
 	/* Example of kernel-side handling of this variety of mmap:
 	 * arch/x86/kernel/sys_x86_64.c::SYSCALL_DEFINE6(mmap, ...) calls
 	 * sys_mmap_pgoff(..., off >> PAGE_SHIFT); i.e. off is in bytes,
 	 * since the above code converts off to pages.
 	 */
-	print_mmap(tcp, tcp->u_arg, offset);
+	print_mmap(tcp, tcp->u_arg, tcp->u_arg[5]);
 
 	return RVAL_DECODED | RVAL_HEX;
 }

@@ -10,37 +10,19 @@ get_syscall_args(struct tcb *tcp)
 			 * Use widen_to_long(tcp->u_arg[N]) in syscall handlers
 			 * if you need to use *sign-extended* parameter.
 			 */
-#ifdef X32
-			tcp->u_arg[0] = tcp->ext_arg[0] = (uint32_t) x86_64_regs.rdi;
-			tcp->u_arg[1] = tcp->ext_arg[1] = (uint32_t) x86_64_regs.rsi;
-			tcp->u_arg[2] = tcp->ext_arg[2] = (uint32_t) x86_64_regs.rdx;
-			tcp->u_arg[3] = tcp->ext_arg[3] = (uint32_t) x86_64_regs.r10;
-			tcp->u_arg[4] = tcp->ext_arg[4] = (uint32_t) x86_64_regs.r8;
-			tcp->u_arg[5] = tcp->ext_arg[5] = (uint32_t) x86_64_regs.r9;
-#else
 			tcp->u_arg[0] = (uint32_t) x86_64_regs.rdi;
 			tcp->u_arg[1] = (uint32_t) x86_64_regs.rsi;
 			tcp->u_arg[2] = (uint32_t) x86_64_regs.rdx;
 			tcp->u_arg[3] = (uint32_t) x86_64_regs.r10;
 			tcp->u_arg[4] = (uint32_t) x86_64_regs.r8;
 			tcp->u_arg[5] = (uint32_t) x86_64_regs.r9;
-#endif
 		} else {
-#ifdef X32
-			tcp->u_arg[0] = tcp->ext_arg[0] = x86_64_regs.rdi;
-			tcp->u_arg[1] = tcp->ext_arg[1] = x86_64_regs.rsi;
-			tcp->u_arg[2] = tcp->ext_arg[2] = x86_64_regs.rdx;
-			tcp->u_arg[3] = tcp->ext_arg[3] = x86_64_regs.r10;
-			tcp->u_arg[4] = tcp->ext_arg[4] = x86_64_regs.r8;
-			tcp->u_arg[5] = tcp->ext_arg[5] = x86_64_regs.r9;
-#else
 			tcp->u_arg[0] = x86_64_regs.rdi;
 			tcp->u_arg[1] = x86_64_regs.rsi;
 			tcp->u_arg[2] = x86_64_regs.rdx;
 			tcp->u_arg[3] = x86_64_regs.r10;
 			tcp->u_arg[4] = x86_64_regs.r8;
 			tcp->u_arg[5] = x86_64_regs.r9;
-#endif
 		}
 	} else {
 		/*
