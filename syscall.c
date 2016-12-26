@@ -902,7 +902,7 @@ trace_syscall_exiting(struct tcb *tcp)
 			switch (sys_res & RVAL_MASK) {
 			case RVAL_HEX:
 #if SUPPORTED_PERSONALITIES > 1
-				if (current_wordsize < sizeof(long))
+				if (current_wordsize < sizeof(tcp->u_rval))
 					tprintf("= %#x",
 						(unsigned int) tcp->u_rval);
 				else
@@ -915,7 +915,7 @@ trace_syscall_exiting(struct tcb *tcp)
 				break;
 			case RVAL_UDECIMAL:
 #if SUPPORTED_PERSONALITIES > 1
-				if (current_wordsize < sizeof(long))
+				if (current_wordsize < sizeof(tcp->u_rval))
 					tprintf("= %u",
 						(unsigned int) tcp->u_rval);
 				else
