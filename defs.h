@@ -238,7 +238,7 @@ struct tcb {
 	unsigned long long ext_arg[MAX_ARGS];
 	long long u_lrval;	/* long long return value */
 #endif
-	long u_rval;		/* Return value */
+	kernel_long_t u_rval;	/* Return value */
 #if SUPPORTED_PERSONALITIES > 1
 	unsigned int currpers;	/* Personality at the time of scno update */
 #endif
@@ -985,9 +985,9 @@ scno_is_valid(kernel_scno_t scno)
 #define PRI_klu PRI_kl"u"
 #define PRI_klx PRI_kl"x"
 
-#define PRI_krd "ld"
-#define PRI_kru "lu"
-#define PRI_krx "lx"
+#define PRI_krd PRI_kld
+#define PRI_kru PRI_klu
+#define PRI_krx PRI_klx
 
 /*
  * The kernel used to define 64-bit types on 64-bit systems on a per-arch
