@@ -296,9 +296,9 @@ printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 int
 getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 {
-#if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
+#if SIZEOF_KERNEL_LONG_T > 4
 # ifndef current_klongsize
-	if (current_klongsize < SIZEOF_LONG) {
+	if (current_klongsize < SIZEOF_KERNEL_LONG_T) {
 #  if defined(AARCH64) || defined(POWERPC64)
 		/* Align arg_no to the next even number. */
 		arg_no = (arg_no + 1) & 0xe;
@@ -311,20 +311,7 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 		*val = tcp->u_arg[arg_no];
 		arg_no++;
 	}
-#elif SIZEOF_LONG > 4
-#  error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
-#elif SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
-# ifndef current_klongsize
-	if (current_klongsize < SIZEOF_KERNEL_LONG_T) {
-		*val = ULONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
-		arg_no += 2;
-	} else
-# endif /* !current_klongsize */
-	{
-		*val = tcp->u_arg[arg_no];
-		arg_no++;
-	}
-#else
+#else /* SIZEOF_KERNEL_LONG_T == 4 */
 # if defined __ARM_EABI__ || \
      defined LINUX_MIPSO32 || \
      defined POWERPC || \
