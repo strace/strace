@@ -203,12 +203,13 @@ do_preadv(struct tcb *tcp, const int flags_arg)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		unsigned long len = widen_to_ulong(tcp->u_arg[2]);
+		kernel_ulong_t len =
+			truncate_kulong_to_current_wordsize(tcp->u_arg[2]);
 
 		tprint_iov_upto(tcp, len, tcp->u_arg[1],
 				syserror(tcp) ? IOV_DECODE_ADDR :
 				IOV_DECODE_STR, tcp->u_rval);
-		tprintf(", %lu, ", len);
+		tprintf(", %" PRI_klu ", ", len);
 		print_lld_from_low_high_val(tcp, 3);
 		if (flags_arg >= 0) {
 			tprints(", ");
@@ -231,12 +232,13 @@ SYS_FUNC(preadv2)
 static int
 do_pwritev(struct tcb *tcp, const int flags_arg)
 {
-	unsigned long len = widen_to_ulong(tcp->u_arg[2]);
+	kernel_ulong_t len =
+		truncate_kulong_to_current_wordsize(tcp->u_arg[2]);
 
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	tprint_iov(tcp, len, tcp->u_arg[1], IOV_DECODE_STR);
-	tprintf(", %lu, ", len);
+	tprintf(", %" PRI_klu ", ", len);
 	print_lld_from_low_high_val(tcp, 3);
 	if (flags_arg >= 0) {
 		tprints(", ");

@@ -871,13 +871,19 @@ DECL_PRINTPAIR(int64);
 # define widen_to_long(v) ((long)(v))
 #endif
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-# define widen_to_ulong(v) \
-	(current_wordsize == 4 ? (unsigned long) (uint32_t) (v) : \
-		(unsigned long) (v))
-#else
-# define widen_to_ulong(v) ((unsigned long)(v))
+static inline kernel_ulong_t
+truncate_kulong_to_current_wordsize(const kernel_ulong_t v)
+{
+#if SIZEOF_KERNEL_LONG_T > 4 \
+ && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined current_wordsize)
+	if (current_wordsize < sizeof(v)) {
+		return (unsigned int) v;
+	} else
 #endif
+	{
+		return v;
+	}
+}
 
 /*
  * Cast a pointer or a pointer-sized integer to kernel_ulong_t.
