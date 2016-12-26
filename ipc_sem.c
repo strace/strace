@@ -57,7 +57,7 @@ print_sembuf(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 #endif
 
 static void
-tprint_sembuf_array(struct tcb *const tcp, const kernel_ureg_t addr,
+tprint_sembuf_array(struct tcb *const tcp, const kernel_ulong_t addr,
 		    const unsigned int count)
 {
 #if defined HAVE_SYS_SEM_H || defined HAVE_LINUX_SEM_H

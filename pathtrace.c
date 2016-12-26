@@ -54,7 +54,7 @@ pathmatch(const char *path)
  * Return true if specified path (in user-space) matches.
  */
 static int
-upathmatch(struct tcb *const tcp, const kernel_ureg_t upath)
+upathmatch(struct tcb *const tcp, const kernel_ulong_t upath)
 {
 	char path[PATH_MAX + 1];
 
@@ -248,8 +248,8 @@ pathtrace_match(struct tcb *tcp)
 	{
 		int     i, j;
 		int     nfds;
-		kernel_ureg_t *args;
-		kernel_ureg_t select_args[5];
+		kernel_ulong_t *args;
+		kernel_ulong_t select_args[5];
 		unsigned int oldselect_args[5];
 		unsigned int fdsize;
 		fd_set *fds;
@@ -311,7 +311,7 @@ pathtrace_match(struct tcb *tcp)
 	{
 		struct pollfd fds;
 		unsigned nfds;
-		kernel_ureg_t start, cur, end;
+		kernel_ulong_t start, cur, end;
 
 		start = tcp->u_arg[0];
 		nfds = tcp->u_arg[1];

@@ -59,14 +59,14 @@ SYS_FUNC(write)
 
 struct print_iovec_config {
 	enum iov_decode decode_iov;
-	kernel_ureg_t data_size;
+	kernel_ulong_t data_size;
 };
 
 static bool
 print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const kernel_ureg_t *iov;
-	kernel_ureg_t iov_buf[2], len;
+	const kernel_ulong_t *iov;
+	kernel_ulong_t iov_buf[2], len;
 	struct print_iovec_config *c = data;
 
         if (elem_size < sizeof(iov_buf)) {
@@ -85,14 +85,14 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		case IOV_DECODE_STR:
 			if (len > c->data_size)
 				len = c->data_size;
-			if (c->data_size != (kernel_ureg_t) -1)
+			if (c->data_size != (kernel_ulong_t) -1)
 				c->data_size -= len;
 			printstrn(tcp, iov[0], len);
 			break;
 		case IOV_DECODE_NETLINK:
 			if (len > c->data_size)
 				len = c->data_size;
-			if (c->data_size != (kernel_ureg_t) -1)
+			if (c->data_size != (kernel_ulong_t) -1)
 				c->data_size -= len;
 			decode_netlink(tcp, iov[0], iov[1]);
 			break;
@@ -111,11 +111,11 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
  * Example: recvmsg returing a short read.
  */
 void
-tprint_iov_upto(struct tcb *const tcp, const kernel_ureg_t len,
-		const kernel_ureg_t addr, const enum iov_decode decode_iov,
-		const kernel_ureg_t data_size)
+tprint_iov_upto(struct tcb *const tcp, const kernel_ulong_t len,
+		const kernel_ulong_t addr, const enum iov_decode decode_iov,
+		const kernel_ulong_t data_size)
 {
-	kernel_ureg_t iov[2];
+	kernel_ulong_t iov[2];
 	struct print_iovec_config config =
 		{ .decode_iov = decode_iov, .data_size = data_size };
 

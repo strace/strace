@@ -29,7 +29,7 @@
 #include "ptrace.h"
 
 int
-upoke(int pid, unsigned long off, kernel_ureg_t val)
+upoke(int pid, unsigned long off, kernel_ulong_t val)
 {
 	if (ptrace(PTRACE_POKEUSER, pid, off, val)) {
 		if (errno != ESRCH)

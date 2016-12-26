@@ -50,7 +50,7 @@ print_pollfd(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 static void
 decode_poll_entering(struct tcb *tcp)
 {
-	const kernel_ureg_t addr = tcp->u_arg[0];
+	const kernel_ulong_t addr = tcp->u_arg[0];
 	const unsigned int nfds = tcp->u_arg[1];
 	struct pollfd fds;
 
@@ -60,14 +60,14 @@ decode_poll_entering(struct tcb *tcp)
 }
 
 static int
-decode_poll_exiting(struct tcb *const tcp, const kernel_ureg_t pts)
+decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 {
 	struct pollfd fds;
 	const unsigned int nfds = tcp->u_arg[1];
 	const unsigned long size = sizeof(fds) * nfds;
-	const kernel_ureg_t start = tcp->u_arg[0];
-	const kernel_ureg_t end = start + size;
-	kernel_ureg_t cur;
+	const kernel_ulong_t start = tcp->u_arg[0];
+	const kernel_ulong_t end = start + size;
+	kernel_ulong_t cur;
 	const unsigned int max_printed =
 		abbrev(tcp) ? max_strlen : -1U;
 	unsigned int printed;

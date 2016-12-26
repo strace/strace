@@ -36,7 +36,7 @@
 #include "xlat/sigev_value.h"
 
 MPERS_PRINTER_DECL(void, print_sigevent,
-		   struct tcb *const tcp, const kernel_ureg_t addr)
+		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct_sigevent sev;
 

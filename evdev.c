@@ -76,7 +76,7 @@ decode_envelope(void *const data)
 }
 
 static int
-ff_effect_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
+ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 
@@ -154,7 +154,7 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
 }
 
 static int
-abs_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
+abs_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 
@@ -188,7 +188,7 @@ abs_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
 }
 
 static int
-keycode_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
+keycode_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 
@@ -205,7 +205,7 @@ keycode_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
 
 # ifdef EVIOCGKEYCODE_V2
 static int
-keycode_V2_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
+keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 
@@ -242,7 +242,7 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
 # endif /* EVIOCGKEYCODE_V2 */
 
 static int
-getid_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
+getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 
@@ -262,14 +262,14 @@ getid_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
 }
 
 static int
-decode_bitset(struct tcb *const tcp, const kernel_ureg_t arg,
+decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 	      const struct xlat decode_nr[], const unsigned int max_nr,
 	      const char *const dflt)
 {
 	tprints(", ");
 
 	unsigned int size;
-	if ((kernel_ureg_t) tcp->u_rval > max_nr)
+	if ((kernel_ulong_t) tcp->u_rval > max_nr)
 		size = max_nr;
 	else
 		size = tcp->u_rval;
@@ -306,7 +306,7 @@ decode_bitset(struct tcb *const tcp, const kernel_ureg_t arg,
 # ifdef EVIOCGMTSLOTS
 static int
 mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
-	      const kernel_ureg_t arg)
+	      const kernel_ulong_t arg)
 {
 	tprints(", ");
 
@@ -338,7 +338,7 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 
 # if defined EVIOCGREP || defined EVIOCSREP
 static int
-repeat_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
+repeat_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 	printpair_int(tcp, arg, "%u");
@@ -348,7 +348,7 @@ repeat_ioctl(struct tcb *const tcp, const kernel_ureg_t arg)
 
 static int
 bit_ioctl(struct tcb *const tcp, const unsigned int ev_nr,
-	  const kernel_ureg_t arg)
+	  const kernel_ulong_t arg)
 {
 	switch (ev_nr) {
 		case EV_SYN:
@@ -399,7 +399,7 @@ bit_ioctl(struct tcb *const tcp, const unsigned int ev_nr,
 
 static int
 evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
-		 const kernel_ureg_t arg)
+		 const kernel_ulong_t arg)
 {
 	/* fixed-number fixed-length commands */
 	switch (code) {
@@ -474,7 +474,7 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 
 static int
 evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
-		  const kernel_ureg_t arg)
+		  const kernel_ulong_t arg)
 {
 	/* fixed-number fixed-length commands */
 	switch (code) {
@@ -515,7 +515,7 @@ evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
 }
 
 MPERS_PRINTER_DECL(int, evdev_ioctl, struct tcb *const tcp,
-		   const unsigned int code, const kernel_ureg_t arg)
+		   const unsigned int code, const kernel_ulong_t arg)
 {
 	switch(_IOC_DIR(code)) {
 		case _IOC_READ:

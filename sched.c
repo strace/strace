@@ -39,7 +39,7 @@ SYS_FUNC(sched_getscheduler)
 	if (entering(tcp)) {
 		tprintf("%d", (int) tcp->u_arg[0]);
 	} else if (!syserror(tcp)) {
-		tcp->auxstr = xlookup(schedulers, (kernel_ureg_t) tcp->u_rval);
+		tcp->auxstr = xlookup(schedulers, (kernel_ulong_t) tcp->u_rval);
 		if (tcp->auxstr != NULL)
 			return RVAL_STR;
 	}
@@ -94,7 +94,7 @@ SYS_FUNC(sched_rr_get_interval)
 }
 
 static void
-print_sched_attr(struct tcb *const tcp, const kernel_ureg_t addr,
+print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 		 unsigned int size)
 {
 	struct {

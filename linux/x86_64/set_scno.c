@@ -5,7 +5,7 @@
 #endif /* !HAVE_GETREGS_OLD */
 
 static int
-arch_set_scno(struct tcb *tcp, kernel_scno_t scno)
+arch_set_scno(struct tcb *tcp, kernel_ulong_t scno)
 {
 #ifdef HAVE_GETREGS_OLD
 	return upoke(tcp->pid, 8 * ORIG_RAX, scno);

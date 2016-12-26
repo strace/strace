@@ -38,7 +38,7 @@
 #define D_NAME_LEN_MAX 256
 
 static void
-print_old_dirent(struct tcb *const tcp, const kernel_ureg_t addr)
+print_old_dirent(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	kernel_dirent d;
 

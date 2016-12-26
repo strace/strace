@@ -104,8 +104,8 @@ print_ifindex(unsigned int ifindex)
 }
 
 static void
-decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ureg_t addr,
-	       const kernel_ureg_t addrlen)
+decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
+	       const kernel_ulong_t addrlen)
 {
 
 	switch (verbose(tcp) ? getfdproto(tcp, fd) : SOCK_PROTO_UNKNOWN) {
@@ -188,7 +188,7 @@ SYS_FUNC(listen)
 
 static bool
 fetch_socklen(struct tcb *const tcp, int *const plen,
-	      const kernel_ureg_t sockaddr, const kernel_ureg_t socklen)
+	      const kernel_ulong_t sockaddr, const kernel_ulong_t socklen)
 {
 	return verbose(tcp) && sockaddr && socklen
 	       && umove(tcp, socklen, plen) == 0;
@@ -374,7 +374,7 @@ printpair_fd(struct tcb *tcp, const int i0, const int i1)
 }
 
 static void
-decode_pair_fd(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_pair_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	int pair[2];
 
@@ -487,7 +487,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 }
 
 static void
-print_linger(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
+print_linger(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
 	struct linger linger;
 
@@ -504,7 +504,7 @@ print_linger(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
 
 #ifdef SO_PEERCRED
 static void
-print_ucred(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
+print_ucred(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
 	struct ucred uc;
 
@@ -522,7 +522,7 @@ print_ucred(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
 
 #ifdef PACKET_STATISTICS
 static void
-print_tpacket_stats(struct tcb *const tcp, const kernel_ureg_t addr,
+print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    const int len)
 {
 	struct tpacket_stats stats;
@@ -541,7 +541,7 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ureg_t addr,
 #include "xlat/icmpfilterflags.h"
 
 static void
-print_icmp_filter(struct tcb *const tcp, const kernel_ureg_t addr, int len)
+print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 {
 	struct icmp_filter filter = {};
 
@@ -562,7 +562,7 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ureg_t addr, int len)
 
 static void
 print_getsockopt(struct tcb *const tcp, const unsigned int level,
-		 const unsigned int name, const kernel_ureg_t addr,
+		 const unsigned int name, const kernel_ulong_t addr,
 		 const int len)
 {
 	if (addr && verbose(tcp))
@@ -636,7 +636,7 @@ SYS_FUNC(getsockopt)
 
 #ifdef IP_ADD_MEMBERSHIP
 static void
-print_mreq(struct tcb *const tcp, const kernel_ureg_t addr,
+print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	   const unsigned int len)
 {
 	struct ip_mreq mreq;
@@ -660,7 +660,7 @@ print_mreq(struct tcb *const tcp, const kernel_ureg_t addr,
 
 #ifdef IPV6_ADD_MEMBERSHIP
 static void
-print_mreq6(struct tcb *const tcp, const kernel_ureg_t addr,
+print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 	    const unsigned int len)
 {
 	struct ipv6_mreq mreq;
@@ -691,7 +691,7 @@ fail:
 
 #ifdef MCAST_JOIN_GROUP
 static void
-print_group_req(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
+print_group_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
 	struct group_req greq;
 
@@ -710,7 +710,7 @@ print_group_req(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
 
 #ifdef PACKET_RX_RING
 static void
-print_tpacket_req(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
+print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
 	struct tpacket_req req;
 
@@ -732,7 +732,7 @@ print_tpacket_req(struct tcb *const tcp, const kernel_ureg_t addr, const int len
 # include "xlat/packet_mreq_type.h"
 
 static void
-print_packet_mreq(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
+print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
 	struct packet_mreq mreq;
 
@@ -756,7 +756,7 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ureg_t addr, const int len
 
 static void
 print_setsockopt(struct tcb *const tcp, const unsigned int level,
-		 const unsigned int name, const kernel_ureg_t addr,
+		 const unsigned int name, const kernel_ulong_t addr,
 		 const int len)
 {
 	if (addr && verbose(tcp))

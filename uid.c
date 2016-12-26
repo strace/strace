@@ -89,7 +89,7 @@ SYS_FUNC(setuid)
 
 static void
 get_print_uid(struct tcb *const tcp, const char *const prefix,
-	      const kernel_ureg_t addr)
+	      const kernel_ulong_t addr)
 {
 	uid_t uid;
 
@@ -166,7 +166,7 @@ print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 static void
 print_groups(struct tcb *const tcp, const unsigned int len,
-	     const kernel_ureg_t addr)
+	     const kernel_ulong_t addr)
 {
 	static unsigned long ngroups_max;
 	if (!ngroups_max)

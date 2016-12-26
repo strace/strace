@@ -38,7 +38,7 @@
 #include "xlat/modem_flags.h"
 
 static void
-decode_termios(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_termios(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct termios tios;
 	int i;
@@ -74,7 +74,7 @@ decode_termios(struct tcb *const tcp, const kernel_ureg_t addr)
 }
 
 static void
-decode_termio(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_termio(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct termio tio;
 	int i;
@@ -116,7 +116,7 @@ decode_termio(struct tcb *const tcp, const kernel_ureg_t addr)
 }
 
 static void
-decode_winsize(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_winsize(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct winsize ws;
 
@@ -132,7 +132,7 @@ decode_winsize(struct tcb *const tcp, const kernel_ureg_t addr)
 
 #ifdef TIOCGSIZE
 static void
-decode_ttysize(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_ttysize(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct ttysize ts;
 
@@ -148,7 +148,7 @@ decode_ttysize(struct tcb *const tcp, const kernel_ureg_t addr)
 #endif
 
 static void
-decode_modem_flags(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_modem_flags(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	int i;
 
@@ -165,7 +165,7 @@ decode_modem_flags(struct tcb *const tcp, const kernel_ureg_t addr)
 
 int
 term_ioctl(struct tcb *const tcp, const unsigned int code,
-	   const kernel_ureg_t arg)
+	   const kernel_ulong_t arg)
 {
 	switch (code) {
 	/* struct termios */

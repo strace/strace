@@ -171,7 +171,7 @@ struct fs_quota_statv {
 		zero_extend_signed_to_ull((where).field))
 
 static int
-decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ureg_t data)
+decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 {
 	switch (cmd) {
 	case Q_QUOTAOFF:

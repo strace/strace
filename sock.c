@@ -51,7 +51,7 @@ print_ifname(const char *ifname)
 
 static void
 print_ifreq(struct tcb *const tcp, const unsigned int code,
-	    const kernel_ureg_t arg, const struct ifreq *const ifr)
+	    const kernel_ulong_t arg, const struct ifreq *const ifr)
 {
 	switch (code) {
 	case SIOCSIFADDR:
@@ -132,7 +132,7 @@ print_ifc_len(int len)
 }
 
 static int
-decode_ifconf(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct ifconf ifc;
 
@@ -195,7 +195,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ureg_t addr)
 }
 
 int
-sock_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ureg_t arg)
+sock_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
 	struct ifreq ifr;
 

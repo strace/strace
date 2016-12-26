@@ -34,9 +34,9 @@ SYS_FUNC(process_vm_readv)
 		/* arg 1: pid */
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
-		kernel_ureg_t local_iovcnt = tcp->u_arg[2];
-		kernel_ureg_t remote_iovcnt = tcp->u_arg[4];
-		kernel_ureg_t flags = tcp->u_arg[5];
+		kernel_ulong_t local_iovcnt = tcp->u_arg[2];
+		kernel_ulong_t remote_iovcnt = tcp->u_arg[4];
+		kernel_ulong_t flags = tcp->u_arg[5];
 
 		/* arg 2: local iov */
 		tprint_iov_upto(tcp, local_iovcnt, tcp->u_arg[1],
@@ -56,9 +56,9 @@ SYS_FUNC(process_vm_readv)
 
 SYS_FUNC(process_vm_writev)
 {
-	kernel_ureg_t local_iovcnt = tcp->u_arg[2];
-	kernel_ureg_t remote_iovcnt = tcp->u_arg[4];
-	kernel_ureg_t flags = tcp->u_arg[5];
+	kernel_ulong_t local_iovcnt = tcp->u_arg[2];
+	kernel_ulong_t remote_iovcnt = tcp->u_arg[4];
+	kernel_ulong_t flags = tcp->u_arg[5];
 
 	/* arg 1: pid */
 	tprintf("%d, ", (int) tcp->u_arg[0]);

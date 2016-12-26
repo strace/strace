@@ -61,7 +61,7 @@ get_cpuset_size(void)
 }
 
 static void
-print_affinitylist(struct tcb *const tcp, const kernel_ureg_t addr,
+print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 		   const unsigned int len)
 {
 	const unsigned int max_size = get_cpuset_size();

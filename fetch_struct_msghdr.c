@@ -43,7 +43,7 @@ typedef struct msghdr struct_msghdr;
  */
 
 MPERS_PRINTER_DECL(int, fetch_struct_msghdr,
-		   struct tcb *const tcp, const kernel_ureg_t addr,
+		   struct tcb *const tcp, const kernel_ulong_t addr,
 		   void *const p)
 {
 	struct msghdr *const p_native = p;

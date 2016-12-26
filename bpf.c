@@ -37,7 +37,7 @@
 #include "xlat/bpf_map_update_elem_flags.h"
 
 static int
-bpf_map_create(struct tcb *const tcp, const kernel_ureg_t addr,
+bpf_map_create(struct tcb *const tcp, const kernel_ulong_t addr,
 	       unsigned int size)
 {
 	struct {
@@ -62,7 +62,7 @@ bpf_map_create(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 static void
-bpf_map_update_elem(struct tcb *const tcp, const kernel_ureg_t addr,
+bpf_map_update_elem(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int size)
 {
 	struct {
@@ -90,7 +90,7 @@ bpf_map_update_elem(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 static void
-bpf_map_delete_elem(struct tcb *const tcp, const kernel_ureg_t addr,
+bpf_map_delete_elem(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int size)
 {
 	struct {
@@ -113,7 +113,7 @@ bpf_map_delete_elem(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 static int
-bpf_map_io(struct tcb *const tcp, const kernel_ureg_t addr, unsigned int size,
+bpf_map_io(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int size,
 	   const char *const text)
 {
 	struct bpf_io_elem_struct {
@@ -146,7 +146,7 @@ bpf_map_io(struct tcb *const tcp, const kernel_ureg_t addr, unsigned int size,
 }
 
 static int
-bpf_prog_load(struct tcb *const tcp, const kernel_ureg_t addr,
+bpf_prog_load(struct tcb *const tcp, const kernel_ulong_t addr,
 	      unsigned int size)
 {
 	struct {
@@ -180,7 +180,7 @@ bpf_prog_load(struct tcb *const tcp, const kernel_ureg_t addr,
 SYS_FUNC(bpf)
 {
 	const unsigned int cmd = tcp->u_arg[0];
-	const kernel_ureg_t addr = tcp->u_arg[1];
+	const kernel_ulong_t addr = tcp->u_arg[1];
 	const unsigned int size = tcp->u_arg[2];
 	int rc = RVAL_DECODED;
 

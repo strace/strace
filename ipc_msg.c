@@ -57,8 +57,8 @@ SYS_FUNC(msgget)
 }
 
 static void
-tprint_msgsnd(struct tcb *const tcp, const kernel_ureg_t addr,
-	      const kernel_ureg_t count, const unsigned int flags)
+tprint_msgsnd(struct tcb *const tcp, const kernel_ulong_t addr,
+	      const kernel_ulong_t count, const unsigned int flags)
 {
 	tprint_msgbuf(tcp, addr, count);
 	printflags(ipc_msg_flags, flags, "MSG_???");
@@ -78,16 +78,16 @@ SYS_FUNC(msgsnd)
 }
 
 static void
-tprint_msgrcv(struct tcb *const tcp, const kernel_ureg_t addr,
-	      const kernel_ureg_t count, const kernel_ureg_t msgtyp)
+tprint_msgrcv(struct tcb *const tcp, const kernel_ulong_t addr,
+	      const kernel_ulong_t count, const kernel_ulong_t msgtyp)
 {
 	tprint_msgbuf(tcp, addr, count);
 	tprintf("%" PRI_krd ", ", msgtyp);
 }
 
 static int
-fetch_msgrcv_args(struct tcb *const tcp, const kernel_ureg_t addr,
-		  kernel_ureg_t *const pair)
+fetch_msgrcv_args(struct tcb *const tcp, const kernel_ulong_t addr,
+		  kernel_ulong_t *const pair)
 {
 	if (current_wordsize == sizeof(*pair)) {
 		if (umoven_or_printaddr(tcp, addr, 2 * sizeof(*pair), pair))
@@ -118,7 +118,7 @@ SYS_FUNC(msgrcv)
 				tprint_msgrcv(tcp, tcp->u_arg[3],
 					      tcp->u_arg[1], tcp->u_arg[4]);
 			} else {
-				kernel_ureg_t pair[2];
+				kernel_ulong_t pair[2];
 
 				if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair))
 					tprintf(", %" PRI_kru ", ", tcp->u_arg[1]);

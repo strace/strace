@@ -35,7 +35,7 @@
 #include "ptrace.h"
 
 int
-upeek(int pid, unsigned long off, kernel_ureg_t *res)
+upeek(int pid, unsigned long off, kernel_ulong_t *res)
 {
 	long val;
 

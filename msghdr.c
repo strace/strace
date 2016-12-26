@@ -252,8 +252,8 @@ get_optmem_max(void)
 }
 
 static void
-decode_msg_control(struct tcb *const tcp, const kernel_ureg_t addr,
-		   const kernel_ureg_t in_control_len)
+decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
+		   const kernel_ulong_t in_control_len)
 {
 	if (!in_control_len)
 		return;
@@ -279,7 +279,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ureg_t addr,
 
 	tprints("[");
 	while (buf_len >= cmsg_size) {
-		const kernel_ureg_t cmsg_len =
+		const kernel_ulong_t cmsg_len =
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_len :
 #endif
@@ -301,7 +301,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ureg_t addr,
 		printxval(socketlayers, cmsg_level, "SOL_???");
 		tprints(", cmsg_type=");
 
-		kernel_ureg_t len = cmsg_len > buf_len ? buf_len : cmsg_len;
+		kernel_ulong_t len = cmsg_len > buf_len ? buf_len : cmsg_len;
 
 		print_cmsg_type_data(tcp, cmsg_level, cmsg_type,
 				     (const void *) (u.ptr + cmsg_size),
@@ -313,7 +313,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ureg_t addr,
 			break;
 		}
 		len = (cmsg_len + current_wordsize - 1) &
-			~((kernel_ureg_t) current_wordsize - 1);
+			~((kernel_ulong_t) current_wordsize - 1);
 		if (len >= buf_len) {
 			buf_len = 0;
 			break;
@@ -334,7 +334,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ureg_t addr,
 void
 print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 		    const int *const p_user_msg_namelen,
-		    const kernel_ureg_t data_size)
+		    const kernel_ulong_t data_size)
 {
 	const int msg_namelen =
 		p_user_msg_namelen && (int) msg->msg_namelen > *p_user_msg_namelen
@@ -355,11 +355,11 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 
 	tprint_iov_upto(tcp, msg->msg_iovlen,
 			ptr_to_kulong(msg->msg_iov), decode, data_size);
-	tprintf(", msg_iovlen=%" PRI_kru, (kernel_ureg_t) msg->msg_iovlen);
+	tprintf(", msg_iovlen=%" PRI_kru, (kernel_ulong_t) msg->msg_iovlen);
 
 	decode_msg_control(tcp, ptr_to_kulong(msg->msg_control),
 			   msg->msg_controllen);
-	tprintf(", msg_controllen=%" PRI_kru, (kernel_ureg_t) msg->msg_controllen);
+	tprintf(", msg_controllen=%" PRI_kru, (kernel_ulong_t) msg->msg_controllen);
 
 	tprints(", msg_flags=");
 	printflags(msg_flags, msg->msg_flags, "MSG_???");
@@ -367,7 +367,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 }
 
 static bool
-fetch_msghdr_namelen(struct tcb *const tcp, const kernel_ureg_t addr,
+fetch_msghdr_namelen(struct tcb *const tcp, const kernel_ulong_t addr,
 		     int *const p_msg_namelen)
 {
 	struct msghdr msg;
@@ -382,7 +382,7 @@ fetch_msghdr_namelen(struct tcb *const tcp, const kernel_ureg_t addr,
 
 static void
 decode_msghdr(struct tcb *const tcp, const int *const p_user_msg_namelen,
-	      const kernel_ureg_t addr, const kernel_ureg_t data_size)
+	      const kernel_ulong_t addr, const kernel_ulong_t data_size)
 {
 	struct msghdr msg;
 
@@ -393,8 +393,8 @@ decode_msghdr(struct tcb *const tcp, const int *const p_user_msg_namelen,
 }
 
 void
-dumpiov_in_msghdr(struct tcb *const tcp, const kernel_ureg_t addr,
-		  const kernel_ureg_t data_size)
+dumpiov_in_msghdr(struct tcb *const tcp, const kernel_ulong_t addr,
+		  const kernel_ulong_t data_size)
 {
 	struct msghdr msg;
 

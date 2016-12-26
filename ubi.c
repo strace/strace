@@ -41,7 +41,7 @@
 
 int
 ubi_ioctl(struct tcb *const tcp, const unsigned int code,
-	  const kernel_ureg_t arg)
+	  const kernel_ulong_t arg)
 {
 	if (!verbose(tcp))
 		return RVAL_DECODED;

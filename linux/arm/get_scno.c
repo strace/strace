@@ -31,7 +31,7 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	kernel_scno_t scno = 0;
+	kernel_ulong_t scno = 0;
 
 	/* Note: we support only 32-bit CPUs, not 26-bit */
 

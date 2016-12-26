@@ -472,7 +472,7 @@ printaddr_klu(const kernel_ulong_t addr)
 
 #define DEF_PRINTNUM(name, type) \
 bool									\
-printnum_ ## name(struct tcb *const tcp, const kernel_ureg_t addr,	\
+printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 		  const char *const fmt)				\
 {									\
 	type num;							\
@@ -486,7 +486,7 @@ printnum_ ## name(struct tcb *const tcp, const kernel_ureg_t addr,	\
 
 #define DEF_PRINTPAIR(name, type) \
 bool									\
-printpair_ ## name(struct tcb *const tcp, const kernel_ureg_t addr,	\
+printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 		   const char *const fmt)				\
 {									\
 	type pair[2];							\
@@ -508,7 +508,7 @@ DEF_PRINTPAIR(int64, uint64_t)
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 bool
-printnum_long_int(struct tcb *const tcp, const kernel_ureg_t addr,
+printnum_long_int(struct tcb *const tcp, const kernel_ulong_t addr,
 		  const char *const fmt_long, const char *const fmt_int)
 {
 	if (current_wordsize > sizeof(int)) {
@@ -815,7 +815,7 @@ print_quoted_string(const char *str, unsigned int size,
  * If path length exceeds `n', append `...' to the output.
  */
 void
-printpathn(struct tcb *const tcp, const kernel_ureg_t addr, unsigned int n)
+printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 {
 	char path[PATH_MAX + 1];
 	int nul_seen;
@@ -842,7 +842,7 @@ printpathn(struct tcb *const tcp, const kernel_ureg_t addr, unsigned int n)
 }
 
 void
-printpath(struct tcb *const tcp, const kernel_ureg_t addr)
+printpath(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	/* Size must correspond to char path[] size in printpathn */
 	printpathn(tcp, addr, PATH_MAX);
@@ -857,8 +857,8 @@ printpath(struct tcb *const tcp, const kernel_ureg_t addr)
  * or QUOTE_0_TERMINATED bit is set and the string length exceeds `len'.
  */
 void
-printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr,
-	    const kernel_ureg_t len, const unsigned int user_style)
+printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
+	    const kernel_ulong_t len, const unsigned int user_style)
 {
 	static char *str = NULL;
 	static char *outstr;
@@ -915,8 +915,8 @@ printstr_ex(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 void
-dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
-	     kernel_ureg_t data_size)
+dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
+	     kernel_ulong_t data_size)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	union {
@@ -948,7 +948,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
 		for (i = 0; i < len; i++) {
-			kernel_ureg_t iov_len = iov_iov_len(i);
+			kernel_ulong_t iov_len = iov_iov_len(i);
 			if (iov_len > data_size)
 				iov_len = data_size;
 			if (!iov_len)
@@ -968,7 +968,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ureg_t addr,
 }
 
 void
-dumpstr(struct tcb *const tcp, const kernel_ureg_t addr, const int len)
+dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
 	static int strsize = -1;
 	static unsigned char *str;
@@ -1080,11 +1080,11 @@ static bool process_vm_readv_not_supported = 1;
 
 static ssize_t
 vm_read_mem(const pid_t pid, void *const laddr,
-	    const kernel_ureg_t raddr, const size_t len)
+	    const kernel_ulong_t raddr, const size_t len)
 {
 	const unsigned long truncated_raddr = raddr;
 
-	if (raddr != (kernel_ureg_t) truncated_raddr) {
+	if (raddr != (kernel_ulong_t) truncated_raddr) {
 		errno = EIO;
 		return -1;
 	}
@@ -1106,7 +1106,7 @@ vm_read_mem(const pid_t pid, void *const laddr,
  * at address `addr' to our space at `our_addr'
  */
 int
-umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
+umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
        void *const our_addr)
 {
 	char *laddr = our_addr;
@@ -1214,7 +1214,7 @@ umoven(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len,
 }
 
 int
-umoven_or_printaddr(struct tcb *const tcp, const kernel_ureg_t addr,
+umoven_or_printaddr(struct tcb *const tcp, const kernel_ulong_t addr,
 		    const unsigned int len, void *const our_addr)
 {
 	if (!addr || !verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
@@ -1227,7 +1227,7 @@ umoven_or_printaddr(struct tcb *const tcp, const kernel_ureg_t addr,
 
 int
 umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
-				    const kernel_ureg_t addr,
+				    const kernel_ulong_t addr,
 				    const unsigned int len,
 				    void *const our_addr)
 {
@@ -1251,7 +1251,7 @@ umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
  * we never write past laddr[len-1]).
  */
 int
-umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *laddr)
+umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *laddr)
 {
 	const unsigned long x01010101 = (unsigned long) 0x0101010101010101ULL;
 	const unsigned long x80808080 = (unsigned long) 0x8080808080808080ULL;
@@ -1429,12 +1429,12 @@ umovestr(struct tcb *const tcp, kernel_ureg_t addr, unsigned int len, char *ladd
  */
 bool
 print_array(struct tcb *const tcp,
-	    const kernel_ureg_t start_addr,
+	    const kernel_ulong_t start_addr,
 	    const size_t nmemb,
 	    void *const elem_buf,
 	    const size_t elem_size,
 	    int (*const umoven_func)(struct tcb *,
-				     kernel_ureg_t,
+				     kernel_ulong_t,
 				     unsigned int,
 				     void *),
 	    bool (*const print_func)(struct tcb *,
@@ -1454,17 +1454,17 @@ print_array(struct tcb *const tcp,
 	}
 
 	const size_t size = nmemb * elem_size;
-	const kernel_ureg_t end_addr = start_addr + size;
+	const kernel_ulong_t end_addr = start_addr + size;
 
 	if (end_addr <= start_addr || size / elem_size != nmemb) {
 		printaddr(start_addr);
 		return false;
 	}
 
-	const kernel_ureg_t abbrev_end =
+	const kernel_ulong_t abbrev_end =
 		(abbrev(tcp) && max_strlen < nmemb) ?
 			start_addr + elem_size * max_strlen : end_addr;
-	kernel_ureg_t cur;
+	kernel_ulong_t cur;
 
 	for (cur = start_addr; cur < end_addr; cur += elem_size) {
 		if (cur != start_addr)

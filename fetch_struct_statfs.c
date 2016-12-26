@@ -40,7 +40,7 @@ typedef struct statfs64 struct_statfs64;
 #include "statfs.h"
 
 MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
-		   struct tcb *const tcp, const kernel_ureg_t addr,
+		   struct tcb *const tcp, const kernel_ulong_t addr,
 		   struct strace_statfs *const p)
 {
 	struct_statfs b;
@@ -79,8 +79,8 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
 #endif
 
 MPERS_PRINTER_DECL(bool, fetch_struct_statfs64,
-		   struct tcb *const tcp, const kernel_ureg_t addr,
-		   const kernel_ureg_t size, struct strace_statfs *const p)
+		   struct tcb *const tcp, const kernel_ulong_t addr,
+		   const kernel_ulong_t size, struct strace_statfs *const p)
 {
 	struct_statfs64 b;
 

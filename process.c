@@ -57,7 +57,7 @@ static const struct xlat struct_user_offsets[] = {
 };
 
 static void
-print_user_offset_addr(const kernel_ureg_t addr)
+print_user_offset_addr(const kernel_ulong_t addr)
 {
 	const struct xlat *x;
 
@@ -74,7 +74,7 @@ print_user_offset_addr(const kernel_ureg_t addr)
 		} else {
 			--x;
 			tprintf("%s + %" PRI_kru,
-				x->str, addr - (kernel_ureg_t) x->val);
+				x->str, addr - (kernel_ulong_t) x->val);
 		}
 	} else {
 		tprints(x->str);
@@ -83,10 +83,10 @@ print_user_offset_addr(const kernel_ureg_t addr)
 
 SYS_FUNC(ptrace)
 {
-	const kernel_ureg_t request = tcp->u_arg[0];
+	const kernel_ulong_t request = tcp->u_arg[0];
 	const int pid = tcp->u_arg[1];
-	const kernel_ureg_t addr = tcp->u_arg[2];
-	const kernel_ureg_t data = tcp->u_arg[3];
+	const kernel_ulong_t addr = tcp->u_arg[2];
+	const kernel_ulong_t data = tcp->u_arg[3];
 
 	if (entering(tcp)) {
 		/* request */

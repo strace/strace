@@ -51,7 +51,7 @@ print_uchar(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-print_sg_io_buffer(struct tcb *const tcp, const kernel_ureg_t addr,
+print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 		   const unsigned int len)
 {
 	unsigned char buf;
@@ -61,7 +61,7 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 static int
-print_sg_io_v3_req(struct tcb *const tcp, const kernel_ureg_t arg)
+print_sg_io_v3_req(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct sg_io_hdr sg_io;
 
@@ -96,7 +96,7 @@ print_sg_io_v3_req(struct tcb *const tcp, const kernel_ureg_t arg)
 }
 
 static void
-print_sg_io_v3_res(struct tcb *const tcp, const kernel_ureg_t arg)
+print_sg_io_v3_res(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct sg_io_hdr sg_io;
 
@@ -135,7 +135,7 @@ print_sg_io_v3_res(struct tcb *const tcp, const kernel_ureg_t arg)
 #ifdef HAVE_LINUX_BSG_H
 
 static int
-print_sg_io_v4_req(struct tcb *const tcp, const kernel_ureg_t arg)
+print_sg_io_v4_req(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct sg_io_v4 sg_io;
 
@@ -173,7 +173,7 @@ print_sg_io_v4_req(struct tcb *const tcp, const kernel_ureg_t arg)
 }
 
 static void
-print_sg_io_v4_res(struct tcb *const tcp, const kernel_ureg_t arg)
+print_sg_io_v4_res(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct sg_io_v4 sg_io;
 	uint32_t din_len;
@@ -211,14 +211,14 @@ print_sg_io_v4_res(struct tcb *const tcp, const kernel_ureg_t arg)
 #else /* !HAVE_LINUX_BSG_H */
 
 static int
-print_sg_io_v4_req(struct tcb *const tcp, const kernel_ureg_t arg)
+print_sg_io_v4_req(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints("...}");
 	return RVAL_DECODED | 1;
 }
 
 static void
-print_sg_io_v4_res(struct tcb *const tcp, const kernel_ureg_t arg)
+print_sg_io_v4_res(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 }
 
@@ -226,7 +226,7 @@ print_sg_io_v4_res(struct tcb *const tcp, const kernel_ureg_t arg)
 
 static int
 print_sg_io_req(struct tcb *const tcp, const uint32_t iid,
-		const kernel_ureg_t arg)
+		const kernel_ulong_t arg)
 {
 	tprintf("{'%c', ", iid);
 
@@ -244,7 +244,7 @@ print_sg_io_req(struct tcb *const tcp, const uint32_t iid,
 
 static void
 print_sg_io_res(struct tcb *const tcp, const uint32_t iid,
-		const kernel_ureg_t arg)
+		const kernel_ulong_t arg)
 {
 	switch (iid) {
 	case 'S':
@@ -258,7 +258,7 @@ print_sg_io_res(struct tcb *const tcp, const uint32_t iid,
 
 int
 scsi_ioctl(struct tcb *const tcp, const unsigned int code,
-	   const kernel_ureg_t arg)
+	   const kernel_ulong_t arg)
 {
 	uint32_t iid;
 

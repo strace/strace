@@ -204,7 +204,7 @@ btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 }
 
 static void
-btrfs_print_balance(struct tcb *const tcp, const kernel_ureg_t arg, bool out)
+btrfs_print_balance(struct tcb *const tcp, const kernel_ulong_t arg, bool out)
 {
 	struct btrfs_ioctl_balance_args balance_args;
 
@@ -376,7 +376,7 @@ print_uint64(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ureg_t qgi_addr)
+btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 {
 	struct btrfs_qgroup_inherit inherit;
 
@@ -513,7 +513,7 @@ print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
 
 MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		   struct tcb *const tcp, const unsigned int code,
-		   const kernel_ureg_t arg)
+		   const kernel_ulong_t arg)
 {
 	switch (code) {
 	/* Take no arguments; command only. */

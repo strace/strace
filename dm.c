@@ -102,7 +102,7 @@ dm_decode_flags(const struct dm_ioctl *ioc)
 }
 
 static void
-dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ureg_t addr,
+dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 			 const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_spec_size =
@@ -177,7 +177,7 @@ dm_print_dev(struct tcb *tcp, void *dev_ptr, size_t dev_size, void *dummy)
 }
 
 static void
-dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ureg_t addr,
+dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 			 const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_deps_dev_offs =
@@ -220,7 +220,7 @@ misplaced:
 }
 
 static void
-dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ureg_t addr,
+dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		       const struct dm_ioctl *const ioc)
 {
 	static const uint32_t name_list_name_offs =
@@ -276,7 +276,7 @@ misplaced:
 }
 
 static void
-dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ureg_t addr,
+dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 			     const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_vers_name_offs =
@@ -328,7 +328,7 @@ misplaced:
 }
 
 static void
-dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ureg_t addr,
+dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 		        const struct dm_ioctl *const ioc)
 {
 	static const uint32_t target_msg_message_offs =
@@ -359,7 +359,7 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 static void
-dm_decode_string(struct tcb *const tcp, const kernel_ureg_t addr,
+dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const struct dm_ioctl *const ioc)
 {
 	uint32_t offset = ioc->data_start;
@@ -397,7 +397,7 @@ dm_ioctl_has_params(const unsigned int code)
 
 static int
 dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
-	       const kernel_ureg_t arg)
+	       const kernel_ulong_t arg)
 {
 	struct dm_ioctl *ioc = NULL;
 	struct dm_ioctl *entering_ioc = NULL;
@@ -517,7 +517,7 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 }
 
 int
-dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ureg_t arg)
+dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
 	switch (code) {
 	case DM_VERSION:
@@ -545,7 +545,7 @@ dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ureg_t arg
 # else /* !(DM_VERSION_MAJOR == 4) */
 
 int
-dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ureg_t arg)
+dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
 	return 0;
 }

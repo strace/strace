@@ -115,13 +115,13 @@
  */
 
 static const char *
-get_sa_handler_str(kernel_ureg_t handler)
+get_sa_handler_str(kernel_ulong_t handler)
 {
 	return xlookup(sa_handler_values, handler);
 }
 
 static void
-print_sa_handler(kernel_ureg_t handler)
+print_sa_handler(kernel_ulong_t handler)
 {
 	const char *sa_handler_str = get_sa_handler_str(handler);
 
@@ -242,8 +242,8 @@ printsignal(int nr)
 }
 
 static void
-print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ureg_t addr,
-			    const kernel_ureg_t len, const unsigned int min_len)
+print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ulong_t addr,
+			    const kernel_ulong_t len, const unsigned int min_len)
 {
 	/*
 	 * Here len is usually equal to NSIG / 8 or current_wordsize.
@@ -260,8 +260,8 @@ print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ureg_t addr,
 }
 
 void
-print_sigset_addr_len(struct tcb *const tcp, const kernel_ureg_t addr,
-		      const kernel_ureg_t len)
+print_sigset_addr_len(struct tcb *const tcp, const kernel_ulong_t addr,
+		      const kernel_ulong_t len)
 {
 	print_sigset_addr_len_limit(tcp, addr, len, current_wordsize);
 }
@@ -306,7 +306,7 @@ struct old_sigaction32 {
 };
 
 static void
-decode_old_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct old_sigaction sa;
 
@@ -497,7 +497,7 @@ struct new_sigaction32
 };
 
 static void
-decode_new_sigaction(struct tcb *const tcp, const kernel_ureg_t addr)
+decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct new_sigaction sa;
 
@@ -598,7 +598,7 @@ SYS_FUNC(rt_sigsuspend)
 
 static void
 print_sigqueueinfo(struct tcb *const tcp, const int sig,
-		   const kernel_ureg_t addr)
+		   const kernel_ulong_t addr)
 {
 	printsignal(sig);
 	tprints(", ");

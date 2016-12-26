@@ -161,13 +161,13 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 static bool
 print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	kernel_ureg_t addr;
+	kernel_ulong_t addr;
 	struct iocb cb;
 
-	if (elem_size < sizeof(kernel_ureg_t)) {
+	if (elem_size < sizeof(kernel_ulong_t)) {
 		addr = * (unsigned int *) elem_buf;
 	} else {
-		addr = * (kernel_ureg_t *) elem_buf;
+		addr = * (kernel_ulong_t *) elem_buf;
 	}
 
 	tprints("{");
@@ -181,8 +181,8 @@ print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 SYS_FUNC(io_submit)
 {
 	const long nr = widen_to_long(tcp->u_arg[1]);
-	const kernel_ureg_t addr = tcp->u_arg[2];
-	kernel_ureg_t iocbp;
+	const kernel_ulong_t addr = tcp->u_arg[2];
+	kernel_ulong_t iocbp;
 
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %ld, ", nr);

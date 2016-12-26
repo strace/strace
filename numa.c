@@ -31,23 +31,23 @@
 static bool
 print_node(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	if (elem_size < sizeof(kernel_ureg_t)) {
+	if (elem_size < sizeof(kernel_ulong_t)) {
 		tprintf("%#0*x", (int) elem_size * 2 + 2,
 			* (unsigned int *) elem_buf);
 	} else {
 		tprintf("%#0*" PRI_krx, (int) elem_size * 2 + 2,
-			* (kernel_ureg_t *) elem_buf);
+			* (kernel_ulong_t *) elem_buf);
 	}
 
 	return true;
 }
 
 static void
-print_nodemask(struct tcb *const tcp, const kernel_ureg_t addr,
-	       const kernel_ureg_t maxnodes)
+print_nodemask(struct tcb *const tcp, const kernel_ulong_t addr,
+	       const kernel_ulong_t maxnodes)
 {
 	const unsigned int bits_per_long = 8 * current_wordsize;
-	const kernel_ureg_t nmemb =
+	const kernel_ulong_t nmemb =
 		(maxnodes + bits_per_long - 2) / bits_per_long;
 
 	if (nmemb < maxnodes / bits_per_long ||
@@ -56,7 +56,7 @@ print_nodemask(struct tcb *const tcp, const kernel_ureg_t addr,
 		return;
 	}
 
-	kernel_ureg_t buf;
+	kernel_ulong_t buf;
 	print_array(tcp, addr, nmemb, &buf, current_wordsize,
 		    umoven_or_printaddr, print_node, 0);
 }
@@ -123,12 +123,12 @@ SYS_FUNC(get_mempolicy)
 static bool
 print_addr(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	kernel_ureg_t addr;
+	kernel_ulong_t addr;
 
 	if (elem_size < sizeof(addr)) {
 		addr = * (unsigned int *) elem_buf;
 	} else {
-		addr = * (kernel_ureg_t *) elem_buf;
+		addr = * (kernel_ulong_t *) elem_buf;
 	}
 
 	printaddr(addr);
@@ -159,8 +159,8 @@ print_int(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 SYS_FUNC(move_pages)
 {
-	const kernel_ureg_t npages = tcp->u_arg[1];
-	kernel_ureg_t buf;
+	const kernel_ulong_t npages = tcp->u_arg[1];
+	kernel_ulong_t buf;
 
 	if (entering(tcp)) {
 		tprintf("%d, %" PRI_kru ", ", (int) tcp->u_arg[0], npages);

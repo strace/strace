@@ -37,7 +37,7 @@ typedef struct hd_geometry struct_hd_geometry;
 #include MPERS_DEFS
 
 MPERS_PRINTER_DECL(int, hdio_ioctl, struct tcb *const tcp,
-		   const unsigned int code, const kernel_ureg_t arg)
+		   const unsigned int code, const kernel_ulong_t arg)
 {
 	switch (code) {
 	case HDIO_GETGEO:

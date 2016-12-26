@@ -2,7 +2,7 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	kernel_scno_t scno = 0;
+	kernel_ulong_t scno = 0;
 
 	/*
 	 * In the new syscall ABI, the system call number is in R3.
@@ -14,7 +14,7 @@ arch_get_scno(struct tcb *tcp)
 		/* Odd as it may seem, a glibc bug has been known to cause
 		   glibc to issue bogus negative syscall numbers.  So for
 		   our purposes, make strace print what it *should* have been */
-		kernel_scno_t correct_scno = (scno & 0xff);
+		kernel_ulong_t correct_scno = (scno & 0xff);
 		if (debug_flag)
 			error_msg("Detected glibc bug: bogus system call"
 				  " number = %ld, correcting to %ld",

@@ -40,8 +40,8 @@
 static bool
 print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const kernel_ureg_t *seg;
-	kernel_ureg_t seg_buf[4];
+	const kernel_ulong_t *seg;
+	kernel_ulong_t seg_buf[4];
 
         if (elem_size < sizeof(seg_buf)) {
 		unsigned int i;
@@ -63,15 +63,15 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 }
 
 static void
-print_kexec_segments(struct tcb *const tcp, const kernel_ureg_t addr,
-		     const kernel_ureg_t len)
+print_kexec_segments(struct tcb *const tcp, const kernel_ulong_t addr,
+		     const kernel_ulong_t len)
 {
 	if (len > KEXEC_SEGMENT_MAX) {
 		printaddr(addr);
 		return;
 	}
 
-	kernel_ureg_t seg[4];
+	kernel_ulong_t seg[4];
 	const size_t sizeof_seg = ARRAY_SIZE(seg) * current_wordsize;
 
 	print_array(tcp, addr, len, seg, sizeof_seg,
@@ -89,9 +89,9 @@ SYS_FUNC(kexec_load)
 	tprints(", ");
 
 	/* flags */
-	kernel_ureg_t n = tcp->u_arg[3];
+	kernel_ulong_t n = tcp->u_arg[3];
 	printxval64(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
-	n &= ~(kernel_ureg_t) KEXEC_ARCH_MASK;
+	n &= ~(kernel_ulong_t) KEXEC_ARCH_MASK;
 	if (n) {
 		tprints("|");
 		printflags64(kexec_load_flags, n, "KEXEC_???");

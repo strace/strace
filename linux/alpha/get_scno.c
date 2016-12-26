@@ -2,7 +2,7 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	kernel_scno_t scno = 0;
+	kernel_ulong_t scno = 0;
 
 	if (upeek(tcp->pid, REG_A3, &alpha_a3) < 0)
 		return -1;

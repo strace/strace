@@ -55,12 +55,12 @@ SYS_FUNC(brk)
 #include "xlat/mmap_flags.h"
 
 static void
-print_mmap(struct tcb *tcp, kernel_ureg_t *u_arg, unsigned long long offset)
+print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
 {
-	const kernel_ureg_t addr = u_arg[0];
-	const kernel_ureg_t len = u_arg[1];
-	const kernel_ureg_t prot = u_arg[2];
-	const kernel_ureg_t flags = u_arg[3];
+	const kernel_ulong_t addr = u_arg[0];
+	const kernel_ulong_t len = u_arg[1];
+	const kernel_ulong_t prot = u_arg[2];
+	const kernel_ulong_t flags = u_arg[3];
 	const int fd = u_arg[4];
 
 	printaddr(addr);
@@ -93,7 +93,7 @@ print_mmap(struct tcb *tcp, kernel_ureg_t *u_arg, unsigned long long offset)
 /* Params are pointed to by u_arg[0], offset is in bytes */
 SYS_FUNC(old_mmap)
 {
-	kernel_ureg_t u_arg[6];
+	kernel_ulong_t u_arg[6];
 # ifndef current_klongsize
 	/* We are here only in a 32-bit personality. */
 	unsigned int narrow_arg[6];
@@ -116,7 +116,7 @@ SYS_FUNC(old_mmap)
 /* Params are pointed to by u_arg[0], offset is in pages */
 SYS_FUNC(old_mmap_pgoff)
 {
-	kernel_ureg_t u_arg[5];
+	kernel_ulong_t u_arg[5];
 	int i;
 	unsigned int narrow_arg[6];
 	unsigned long long offset;
@@ -312,11 +312,11 @@ SYS_FUNC(getpagesize)
 
 SYS_FUNC(remap_file_pages)
 {
-	const kernel_ureg_t addr = tcp->u_arg[0];
-	const kernel_ureg_t size = tcp->u_arg[1];
-	const kernel_ureg_t prot = tcp->u_arg[2];
-	const kernel_ureg_t pgoff = tcp->u_arg[3];
-	const kernel_ureg_t flags = tcp->u_arg[4];
+	const kernel_ulong_t addr = tcp->u_arg[0];
+	const kernel_ulong_t size = tcp->u_arg[1];
+	const kernel_ulong_t prot = tcp->u_arg[2];
+	const kernel_ulong_t pgoff = tcp->u_arg[3];
+	const kernel_ulong_t flags = tcp->u_arg[4];
 
 	printaddr(addr);
 	tprintf(", %" PRI_kru ", ", size);
@@ -343,10 +343,10 @@ print_protmap_entry(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 
 SYS_FUNC(subpage_prot)
 {
-	kernel_ureg_t addr = tcp->u_arg[0];
-	kernel_ureg_t len = tcp->u_arg[1];
-	kernel_ureg_t nmemb = len >> 16;
-	kernel_ureg_t map = tcp->u_arg[2];
+	kernel_ulong_t addr = tcp->u_arg[0];
+	kernel_ulong_t len = tcp->u_arg[1];
+	kernel_ulong_t nmemb = len >> 16;
+	kernel_ulong_t map = tcp->u_arg[2];
 
 	printaddr(addr);
 	tprintf(", %" PRI_kru ", ", len);

@@ -232,8 +232,8 @@ struct tcb {
 	int pid;		/* If 0, this tcb is free */
 	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
 	unsigned long u_error;	/* Error code */
-	kernel_scno_t scno;	/* System call number */
-	kernel_ureg_t u_arg[MAX_ARGS];	/* System call arguments */
+	kernel_ulong_t scno;	/* System call number */
+	kernel_ulong_t u_arg[MAX_ARGS];	/* System call arguments */
 #if HAVE_STRUCT_TCB_EXT_ARG
 	unsigned long long ext_arg[MAX_ARGS];
 	long long u_lrval;	/* long long return value */
@@ -471,7 +471,7 @@ extern int get_scno(struct tcb *tcp);
  * @return     String literal corresponding to the syscall number in case latter
  *             is valid; NULL otherwise.
  */
-extern const char *syscall_name(kernel_scno_t scno);
+extern const char *syscall_name(kernel_ulong_t scno);
 extern const char *err_name(unsigned long err);
 
 extern bool is_erestart(struct tcb *);
@@ -494,34 +494,34 @@ static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
 }
 
 extern int
-umoven(struct tcb *tcp, kernel_ureg_t addr, unsigned int len, void *laddr);
+umoven(struct tcb *tcp, kernel_ulong_t addr, unsigned int len, void *laddr);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 extern int
-umoven_or_printaddr(struct tcb *tcp, kernel_ureg_t addr,
+umoven_or_printaddr(struct tcb *tcp, kernel_ulong_t addr,
 		    unsigned int len, void *laddr);
 #define umove_or_printaddr(pid, addr, objp)	\
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 extern int
-umoven_or_printaddr_ignore_syserror(struct tcb *tcp, kernel_ureg_t addr,
+umoven_or_printaddr_ignore_syserror(struct tcb *tcp, kernel_ulong_t addr,
 				    unsigned int len, void *laddr);
 
 extern int
-umovestr(struct tcb *tcp, kernel_ureg_t addr, unsigned int len, char *laddr);
+umovestr(struct tcb *tcp, kernel_ulong_t addr, unsigned int len, char *laddr);
 
-extern int upeek(int pid, unsigned long, kernel_ureg_t *);
-extern int upoke(int pid, unsigned long, kernel_ureg_t);
+extern int upeek(int pid, unsigned long, kernel_ulong_t *);
+extern int upoke(int pid, unsigned long, kernel_ulong_t);
 
 extern bool
 print_array(struct tcb *tcp,
-	    kernel_ureg_t start_addr,
+	    kernel_ulong_t start_addr,
 	    size_t nmemb,
 	    void *elem_buf,
 	    size_t elem_size,
 	    int (*umoven_func)(struct tcb *,
-				     kernel_ureg_t,
+				     kernel_ulong_t,
 				     unsigned int,
 				     void *),
 	    bool (*print_func)(struct tcb *,
@@ -601,24 +601,24 @@ extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
 
 extern void
-dumpiov_in_msghdr(struct tcb *, kernel_ureg_t addr, kernel_ureg_t data_size);
+dumpiov_in_msghdr(struct tcb *, kernel_ulong_t addr, kernel_ulong_t data_size);
 
 extern void
-dumpiov_in_mmsghdr(struct tcb *, kernel_ureg_t addr);
+dumpiov_in_mmsghdr(struct tcb *, kernel_ulong_t addr);
 
 extern void
-dumpiov_upto(struct tcb *, int len, kernel_ureg_t addr, kernel_ureg_t data_size);
+dumpiov_upto(struct tcb *, int len, kernel_ulong_t addr, kernel_ulong_t data_size);
 
 extern void
-dumpstr(struct tcb *, kernel_ureg_t addr, int len);
+dumpstr(struct tcb *, kernel_ulong_t addr, int len);
 
 extern void
-printstr_ex(struct tcb *, kernel_ureg_t addr, kernel_ureg_t len,
+printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
 	    unsigned int user_style);
 
 #define DECL_PRINTNUM(name)						\
 extern bool								\
-printnum_ ## name(struct tcb *, kernel_ureg_t addr, const char *fmt)	\
+printnum_ ## name(struct tcb *, kernel_ulong_t addr, const char *fmt)	\
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 DECL_PRINTNUM(short);
 DECL_PRINTNUM(int);
@@ -627,7 +627,7 @@ DECL_PRINTNUM(int64);
 
 #if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
 extern bool
-printnum_long_int(struct tcb *, kernel_ureg_t addr,
+printnum_long_int(struct tcb *, kernel_ulong_t addr,
 		  const char *fmt_long, const char *fmt_int)
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 	ATTRIBUTE_FORMAT((printf, 4, 0));
@@ -655,17 +655,17 @@ printnum_long_int(struct tcb *, kernel_ureg_t addr,
 
 #define DECL_PRINTPAIR(name)						\
 extern bool								\
-printpair_ ## name(struct tcb *, kernel_ureg_t addr, const char *fmt)	\
+printpair_ ## name(struct tcb *, kernel_ulong_t addr, const char *fmt)	\
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 DECL_PRINTPAIR(int);
 DECL_PRINTPAIR(int64);
 #undef DECL_PRINTPAIR
 
 extern void
-printpathn(struct tcb *, kernel_ureg_t addr, unsigned int n);
+printpathn(struct tcb *, kernel_ulong_t addr, unsigned int n);
 
 extern void
-printpath(struct tcb *, kernel_ureg_t addr);
+printpath(struct tcb *, kernel_ulong_t addr);
 
 #define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(intmax_t)*3 * 2 + sizeof("{tv_sec=%jd, tv_nsec=%jd}"))
@@ -676,12 +676,12 @@ extern bool print_sockaddr_by_inode_cached(const unsigned long);
 extern void print_dirfd(struct tcb *, int);
 
 extern int
-decode_sockaddr(struct tcb *, kernel_ureg_t addr, int addrlen);
+decode_sockaddr(struct tcb *, kernel_ulong_t addr, int addrlen);
 
 extern void printuid(const char *, const unsigned int);
 
 extern void
-print_sigset_addr_len(struct tcb *, kernel_ureg_t addr, kernel_ureg_t len);
+print_sigset_addr_len(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len);
 
 extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 #define tprintsigmask_addr(prefix, mask) \
@@ -689,20 +689,20 @@ extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 extern void printsignal(int);
 
 extern void
-tprint_iov_upto(struct tcb *, kernel_ureg_t len, kernel_ureg_t addr,
-		enum iov_decode, kernel_ureg_t data_size);
+tprint_iov_upto(struct tcb *, kernel_ulong_t len, kernel_ulong_t addr,
+		enum iov_decode, kernel_ulong_t data_size);
 
 extern void
-decode_netlink(struct tcb *, kernel_ureg_t addr, kernel_ureg_t len);
+decode_netlink(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len);
 
 extern void tprint_open_modes(unsigned int);
 extern const char *sprint_open_modes(unsigned int);
 
 extern void
-print_seccomp_filter(struct tcb *, kernel_ureg_t addr);
+print_seccomp_filter(struct tcb *, kernel_ulong_t addr);
 
 extern void
-print_seccomp_fprog(struct tcb *, kernel_ureg_t addr, unsigned short len);
+print_seccomp_fprog(struct tcb *, kernel_ulong_t addr, unsigned short len);
 
 struct strace_stat;
 extern void print_struct_stat(struct tcb *tcp, const struct strace_stat *const st);
@@ -710,10 +710,10 @@ extern void print_struct_stat(struct tcb *tcp, const struct strace_stat *const s
 struct strace_statfs;
 
 extern void
-print_struct_statfs(struct tcb *, kernel_ureg_t addr);
+print_struct_statfs(struct tcb *, kernel_ulong_t addr);
 
 extern void
-print_struct_statfs64(struct tcb *, kernel_ureg_t addr, kernel_ureg_t size);
+print_struct_statfs64(struct tcb *, kernel_ulong_t addr, kernel_ulong_t size);
 
 extern void print_ifindex(unsigned int);
 
@@ -728,7 +728,7 @@ extern unsigned int qual_flags(const unsigned int);
 
 #define DECL_IOCTL(name)						\
 extern int								\
-name ## _ioctl(struct tcb *, unsigned int request, kernel_ureg_t arg)
+name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)
 DECL_IOCTL(dm);
 DECL_IOCTL(file);
 DECL_IOCTL(fs_x);
@@ -759,19 +759,19 @@ extern void unwind_capture_stacktrace(struct tcb* tcp);
 #endif
 
 static inline void
-printaddr(kernel_ureg_t addr)
+printaddr(kernel_ulong_t addr)
 {
 	printaddr_klu(addr);
 }
 
 static inline void
-printstrn(struct tcb *tcp, kernel_ureg_t addr, kernel_ureg_t len)
+printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
 {
 	printstr_ex(tcp, addr, len, 0);
 }
 
 static inline void
-printstr(struct tcb *tcp, kernel_ureg_t addr)
+printstr(struct tcb *tcp, kernel_ulong_t addr)
 {
 	printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
 }
@@ -795,7 +795,7 @@ printxval(const struct xlat *x, const unsigned int val, const char *dflt)
 }
 
 static inline void
-tprint_iov(struct tcb *tcp, kernel_ureg_t len, kernel_ureg_t addr,
+tprint_iov(struct tcb *tcp, kernel_ulong_t len, kernel_ulong_t addr,
 	   enum iov_decode decode_iov)
 {
 	tprint_iov_upto(tcp, len, addr, decode_iov, -1);
@@ -807,15 +807,15 @@ typedef struct {
 } timeval32_t;
 
 extern void print_timeval32_t(const timeval32_t *);
-extern void printrusage32(struct tcb *, kernel_ureg_t);
-extern const char *sprint_timeval32(struct tcb *tcp, kernel_ureg_t);
-extern void print_timeval32(struct tcb *tcp, kernel_ureg_t);
-extern void print_timeval32_pair(struct tcb *tcp, kernel_ureg_t);
-extern void print_itimerval32(struct tcb *tcp, kernel_ureg_t);
+extern void printrusage32(struct tcb *, kernel_ulong_t);
+extern const char *sprint_timeval32(struct tcb *tcp, kernel_ulong_t);
+extern void print_timeval32(struct tcb *tcp, kernel_ulong_t);
+extern void print_timeval32_pair(struct tcb *tcp, kernel_ulong_t);
+extern void print_itimerval32(struct tcb *tcp, kernel_ulong_t);
 #endif
 
 #ifdef HAVE_STRUCT_USER_DESC
-extern void print_user_desc(struct tcb *, kernel_ureg_t addr);
+extern void print_user_desc(struct tcb *, kernel_ulong_t addr);
 #endif
 
 /* Strace log generation machinery.
@@ -885,9 +885,9 @@ extern unsigned current_klongsize;
 #endif
 
 /*
- * Cast a pointer or a pointer-sized integer to kernel_ureg_t.
+ * Cast a pointer or a pointer-sized integer to kernel_ulong_t.
  */
-#define ptr_to_kulong(v) ((kernel_ureg_t) (unsigned long) (v))
+#define ptr_to_kulong(v) ((kernel_ulong_t) (unsigned long) (v))
 
 /*
  * Zero-extend a signed integer type to unsigned long long.
@@ -949,7 +949,7 @@ extern struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 
 /* Checks that sysent[scno] is not out of range. */
 static inline bool
-scno_in_range(kernel_scno_t scno)
+scno_in_range(kernel_ulong_t scno)
 {
 	return scno < nsyscalls;
 }
@@ -960,7 +960,7 @@ scno_in_range(kernel_scno_t scno)
  * and its sysent[scno].sys_flags has no TRACE_INDIRECT_SUBCALL flag set.
  */
 static inline bool
-scno_is_valid(kernel_scno_t scno)
+scno_is_valid(kernel_ulong_t scno)
 {
 	return scno_in_range(scno)
 	       && sysent[scno].sys_func

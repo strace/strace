@@ -47,9 +47,6 @@ typedef unsigned long kernel_ulong_t;
 
 # endif
 
-typedef kernel_ulong_t kernel_scno_t;
-typedef kernel_ulong_t kernel_ureg_t;
-
 typedef struct {
 	kernel_ulong_t	d_ino;
 	kernel_ulong_t	d_off;

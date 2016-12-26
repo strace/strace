@@ -34,7 +34,7 @@
 #include "defs.h"
 
 static void
-printargv(struct tcb *const tcp, kernel_ureg_t addr)
+printargv(struct tcb *const tcp, kernel_ulong_t addr)
 {
 	if (!addr || !verbose(tcp)) {
 		printaddr(addr);
@@ -76,7 +76,7 @@ printargv(struct tcb *const tcp, kernel_ureg_t addr)
 }
 
 static void
-printargc(struct tcb *const tcp, kernel_ureg_t addr)
+printargc(struct tcb *const tcp, kernel_ulong_t addr)
 {
 	if (!addr || !verbose(tcp)) {
 		printaddr(addr);

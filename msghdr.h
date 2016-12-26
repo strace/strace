@@ -15,6 +15,6 @@ struct tcb;
 
 extern void
 print_struct_msghdr(struct tcb *, const struct msghdr *,
-		    const int *p_user_msg_namelen, kernel_ureg_t data_size);
+		    const int *p_user_msg_namelen, kernel_ulong_t data_size);
 
 #endif /* !STRACE_MSGHDR_H */

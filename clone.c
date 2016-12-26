@@ -76,7 +76,7 @@
 #endif
 
 static void
-print_tls_arg(struct tcb *const tcp, const kernel_ureg_t addr)
+print_tls_arg(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 #ifdef HAVE_STRUCT_USER_DESC
 # if SUPPORTED_PERSONALITIES > 1
@@ -98,7 +98,7 @@ SYS_FUNC(clone)
 {
 	if (exiting(tcp)) {
 		const char *sep = "|";
-		kernel_ureg_t flags = tcp->u_arg[ARG_FLAGS];
+		kernel_ulong_t flags = tcp->u_arg[ARG_FLAGS];
 		tprints("child_stack=");
 		printaddr(tcp->u_arg[ARG_STACK]);
 		tprints(", ");

@@ -69,15 +69,15 @@ SYS_FUNC(dup3)
 }
 
 static int
-decode_select(struct tcb *const tcp, const kernel_ureg_t *const args,
-	      void (*const print_tv_ts) (struct tcb *, kernel_ureg_t),
-	      const char * (*const sprint_tv_ts) (struct tcb *, kernel_ureg_t))
+decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
+	      void (*const print_tv_ts) (struct tcb *, kernel_ulong_t),
+	      const char * (*const sprint_tv_ts) (struct tcb *, kernel_ulong_t))
 {
 	int i, j;
 	int nfds, fdsize;
 	fd_set *fds = NULL;
 	const char *sep;
-	kernel_ureg_t addr;
+	kernel_ulong_t addr;
 
 	/* Kernel truncates args[0] to int, we do the same. */
 	nfds = (int) args[0];
@@ -192,7 +192,7 @@ decode_select(struct tcb *const tcp, const kernel_ureg_t *const args,
 
 SYS_FUNC(oldselect)
 {
-	kernel_ureg_t select_args[5];
+	kernel_ulong_t select_args[5];
 	unsigned int oldselect_args[5];
 
 	if (sizeof(*select_args) == sizeof(*oldselect_args)) {
@@ -227,7 +227,7 @@ SYS_FUNC(select)
 }
 
 static int
-umove_kulong_array_or_printaddr(struct tcb *const tcp, const kernel_ureg_t addr,
+umove_kulong_array_or_printaddr(struct tcb *const tcp, const kernel_ulong_t addr,
 				kernel_ulong_t *const ptr, const size_t n)
 {
 #ifndef current_klongsize

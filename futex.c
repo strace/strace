@@ -43,11 +43,11 @@
 
 SYS_FUNC(futex)
 {
-	const kernel_ureg_t uaddr = tcp->u_arg[0];
+	const kernel_ulong_t uaddr = tcp->u_arg[0];
 	const int op = tcp->u_arg[1];
 	const int cmd = op & 127;
-	const kernel_ureg_t timeout = tcp->u_arg[3];
-	const kernel_ureg_t uaddr2 = tcp->u_arg[4];
+	const kernel_ulong_t timeout = tcp->u_arg[3];
+	const kernel_ulong_t uaddr2 = tcp->u_arg[4];
 	const unsigned int val = tcp->u_arg[2];
 	const unsigned int val2 = tcp->u_arg[3];
 	const unsigned int val3 = tcp->u_arg[5];

@@ -42,7 +42,7 @@ SYS_FUNC(mount)
 	bool ignore_type = false;
 	bool ignore_data = false;
 	bool old_magic = false;
-	kernel_ureg_t flags = tcp->u_arg[3];
+	kernel_ulong_t flags = tcp->u_arg[3];
 
 	/* Discard magic */
 	if ((flags & MS_MGC_MSK) == MS_MGC_VAL) {
