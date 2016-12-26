@@ -672,7 +672,6 @@ DECL_IOCTL(file);
 DECL_IOCTL(fs_x);
 DECL_IOCTL(ptp);
 DECL_IOCTL(scsi);
-DECL_IOCTL(sock);
 DECL_IOCTL(term);
 DECL_IOCTL(ubi);
 DECL_IOCTL(uffdio);

@@ -26,6 +26,7 @@
  */
 
 #include "defs.h"
+
 #include <sys/socket.h>
 #if defined ALPHA || defined SH || defined SH64
 # include <linux/ioctl.h>
@@ -33,6 +34,14 @@
 #include <linux/sockios.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+
+#include DEF_MPERS_TYPE(struct_ifconf)
+#include DEF_MPERS_TYPE(struct_ifreq)
+
+typedef struct ifconf struct_ifconf;
+typedef struct ifreq struct_ifreq;
+
+#include MPERS_DEFS
 
 #include "xlat/iffflags.h"
 
@@ -51,7 +60,7 @@ print_ifname(const char *ifname)
 
 static void
 print_ifreq(struct tcb *const tcp, const unsigned int code,
-	    const kernel_ulong_t arg, const struct ifreq *const ifr)
+	    const kernel_ulong_t arg, const struct_ifreq *const ifr)
 {
 	switch (code) {
 	case SIOCSIFADDR:
@@ -105,11 +114,11 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	case SIOCSIFMAP:
 	case SIOCGIFMAP:
-		tprintf("ifr_map={mem_start=%#lx, "
-			"mem_end=%#lx, base_addr=%#x, "
+		tprintf("ifr_map={mem_start=%#" PRI_klx ", "
+			"mem_end=%#" PRI_klx ", base_addr=%#x, "
 			"irq=%u, dma=%u, port=%u}",
-			ifr->ifr_map.mem_start,
-			ifr->ifr_map.mem_end,
+			(kernel_ulong_t) ifr->ifr_map.mem_start,
+			(kernel_ulong_t) ifr->ifr_map.mem_end,
 			(unsigned) ifr->ifr_map.base_addr,
 			(unsigned) ifr->ifr_map.irq,
 			(unsigned) ifr->ifr_map.dma,
@@ -121,9 +130,9 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 static unsigned int
 print_ifc_len(int len)
 {
-	const unsigned int n = (unsigned int) len / sizeof(struct ifreq);
+	const unsigned int n = (unsigned int) len / sizeof(struct_ifreq);
 
-	if (len < 0 || n * sizeof(struct ifreq) != (unsigned int) len)
+	if (len < 0 || n * sizeof(struct_ifreq) != (unsigned int) len)
 		tprintf("%d", len);
 	else
 		tprintf("%u * sizeof(struct ifreq)", n);
@@ -135,7 +144,7 @@ static bool
 print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 		   void *dummy)
 {
-	struct ifreq *ifr = elem_buf;
+	struct_ifreq *ifr = elem_buf;
 
 	tprints("{ifr_name=");
 	print_ifname(ifr->ifr_name);
@@ -162,8 +171,8 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 static int
 decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	struct ifconf *entering_ifc = NULL;
-	struct ifconf *ifc =
+	struct_ifconf *entering_ifc = NULL;
+	struct_ifconf *ifc =
 		entering(tcp) ? malloc(sizeof(*ifc)) : alloca(sizeof(*ifc));
 
 	if (exiting(tcp)) {
@@ -224,10 +233,10 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 			printaddr(ptr_to_kulong(ifc->ifc_buf));
 		}
 	} else {
-		struct ifreq ifr;
+		struct_ifreq ifr;
 
 		print_array(tcp, ptr_to_kulong(ifc->ifc_buf),
-			    ifc->ifc_len / sizeof(struct ifreq),
+			    ifc->ifc_len / sizeof(struct_ifreq),
 			    &ifr, sizeof(ifr),
 			    umoven_or_printaddr, print_ifconf_ifreq, NULL);
 	}
@@ -237,10 +246,11 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	return RVAL_DECODED | 1;
 }
 
-int
-sock_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
+MPERS_PRINTER_DECL(int, sock_ioctl,
+		   struct tcb *tcp, const unsigned int code,
+		   const kernel_ulong_t arg)
 {
-	struct ifreq ifr;
+	struct_ifreq ifr;
 
 	switch (code) {
 	case SIOCGIFCONF:
