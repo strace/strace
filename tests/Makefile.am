@@ -399,6 +399,7 @@ check_PROGRAMS = \
 	umount \
 	umount2 \
 	umovestr \
+	umovestr-illptr \
 	umovestr2 \
 	umovestr3 \
 	uname \
@@ -778,6 +779,7 @@ DECODER_TESTS = \
 	umount.test \
 	umount2.test \
 	umovestr.test \
+	umovestr-illptr.test \
 	umovestr2.test \
 	umovestr3.test \
 	uname.test \

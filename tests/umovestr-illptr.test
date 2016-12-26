@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of invalid pointer by umovestr.
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a11 -e trace=chdir

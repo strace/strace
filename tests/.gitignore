@@ -339,6 +339,7 @@ umask
 umount
 umount2
 umovestr
+umovestr-illptr
 umovestr2
 umovestr3
 uname

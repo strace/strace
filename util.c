@@ -1263,9 +1263,12 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 		char x[sizeof(long)];
 	} u;
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize < sizeof(addr))
-		addr &= (1ul << 8 * current_wordsize) - 1;
+#if SIZEOF_KERNEL_LONG_T > 4 \
+ && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined current_wordsize)
+	if (current_wordsize < sizeof(addr)
+	    && (addr & (~ (kernel_ulong_t) -1U))) {
+		return -1;
+	}
 #endif
 
 	nread = 0;
