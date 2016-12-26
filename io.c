@@ -177,33 +177,20 @@ SYS_FUNC(pwrite)
 static void
 print_lld_from_low_high_val(struct tcb *tcp, int arg)
 {
-#if SIZEOF_LONG > 4 && SIZEOF_LONG == SIZEOF_LONG_LONG
+#if SIZEOF_KERNEL_LONG_T > 4
 # ifndef current_klongsize
-	if (current_klongsize < SIZEOF_LONG) {
-		tprintf("%" PRI_kld, (tcp->u_arg[arg + 1] << current_wordsize * 8)
+	if (current_klongsize < SIZEOF_KERNEL_LONG_T) {
+		tprintf("%" PRI_kld, (tcp->u_arg[arg + 1] << 32)
 			       | tcp->u_arg[arg]);
 	} else
 # endif /* !current_klongsize */
 	{
 		tprintf("%" PRI_kld, tcp->u_arg[arg]);
 	}
-#elif SIZEOF_LONG > 4
-# error Unsupported configuration: SIZEOF_LONG > 4 && SIZEOF_LONG_LONG > SIZEOF_LONG
-#elif SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
-# ifndef current_klongsize
-	if (current_klongsize < SIZEOF_LONG_LONG) {
-		tprintf("%lld",
-			(zero_extend_signed_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
-			| zero_extend_signed_to_ull(tcp->u_arg[arg]));
-	} else
-# endif /* !current_klongsize */
-	{
-		tprintf("%" PRI_kld, tcp->u_arg[arg]);
-	}
-#else /* SIZEOF_LONG_LONG > SIZEOF_LONG && SIZEOF_KERNEL_LONG_T == SIZEOF_LONG */
+#else /* SIZEOF_KERNEL_LONG_T == 4 */
 	tprintf("%lld",
-		(zero_extend_signed_to_ull(tcp->u_arg[arg + 1]) << sizeof(long) * 8)
-		| zero_extend_signed_to_ull(tcp->u_arg[arg]));
+		  ((long long) tcp->u_arg[arg + 1] << 32)
+		| ((long long) tcp->u_arg[arg]));
 #endif
 }
 
