@@ -39,7 +39,7 @@
 #include "xlat/scmvals.h"
 #include "xlat/ip_cmsg_types.h"
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#ifndef current_wordsize
 struct cmsghdr32 {
 	uint32_t cmsg_len;
 	int cmsg_level;
@@ -50,7 +50,7 @@ struct cmsghdr32 {
 typedef union {
 	char *ptr;
 	struct cmsghdr *cmsg;
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#ifndef current_wordsize
 	struct cmsghdr32 *cmsg32;
 #endif
 } union_cmsghdr;
@@ -260,7 +260,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints(", msg_control=");
 
 	const unsigned int cmsg_size =
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#ifndef current_wordsize
 		(current_wordsize < sizeof(long)) ? sizeof(struct cmsghdr32) :
 #endif
 			sizeof(struct cmsghdr);
@@ -280,17 +280,17 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints("[");
 	while (buf_len >= cmsg_size) {
 		const kernel_ulong_t cmsg_len =
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#ifndef current_wordsize
 			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_len :
 #endif
 				u.cmsg->cmsg_len;
 		const int cmsg_level =
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#ifndef current_wordsize
 			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_level :
 #endif
 				u.cmsg->cmsg_level;
 		const int cmsg_type =
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
+#ifndef current_wordsize
 			(current_wordsize < sizeof(long)) ? u.cmsg32->cmsg_type :
 #endif
 				u.cmsg->cmsg_type;

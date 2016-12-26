@@ -310,8 +310,8 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct old_sigaction sa;
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize != sizeof(sa.sa_handler__) && current_wordsize == 4) {
+#ifndef current_wordsize
+	if (current_wordsize < sizeof(sa.sa_handler__)) {
 		struct old_sigaction32 sa32;
 
 		if (umove_or_printaddr(tcp, addr, &sa32))
@@ -501,8 +501,8 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct new_sigaction sa;
 
-#if SUPPORTED_PERSONALITIES > 1 && SIZEOF_LONG > 4
-	if (current_wordsize != sizeof(sa.sa_flags) && current_wordsize == 4) {
+#ifndef current_wordsize
+	if (current_wordsize < sizeof(sa.sa_handler__)) {
 		struct new_sigaction32 sa32;
 
 		if (umove_or_printaddr(tcp, addr, &sa32))
