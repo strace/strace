@@ -278,7 +278,7 @@ struct old_sigaction {
 	unsigned int sa_flags;
 	unsigned long sa_handler__;
 	/* Kernel treats sa_mask as an array of longs. */
-	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
+	unsigned long sa_mask[NSIG / sizeof(long)];
 #else
 	unsigned long sa_handler__;
 	unsigned long sa_mask;
@@ -477,7 +477,7 @@ struct new_sigaction
 	unsigned long sa_restorer;
 #endif
 	/* Kernel treats sa_mask as an array of longs. */
-	unsigned long sa_mask[NSIG / sizeof(long) ? NSIG / sizeof(long) : 1];
+	unsigned long sa_mask[NSIG / sizeof(long)];
 };
 /* Same for i386-on-x86_64 and similar cases */
 struct new_sigaction32
@@ -487,7 +487,7 @@ struct new_sigaction32
 #if HAVE_SA_RESTORER
 	uint32_t sa_restorer;
 #endif
-	uint32_t sa_mask[2 * (NSIG / sizeof(long) ? NSIG / sizeof(long) : 1)];
+	uint32_t sa_mask[2 * (NSIG / sizeof(long))];
 };
 
 static void
