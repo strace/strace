@@ -32,14 +32,7 @@
  */
 
 #include "defs.h"
-#include <signal.h>
-
-#ifndef NSIG
-# warning NSIG is not defined, using 32
-# define NSIG 32
-#elif NSIG < 32
-# error NSIG < 32
-#endif
+#include "nsig.h"
 
 /* The libc headers do not define this constant since it should only be
    used by the implementation.  So we define it here.  */

@@ -33,8 +33,8 @@
 
 #include "defs.h"
 #include "native_defs.h"
+#include "nsig.h"
 #include <sys/param.h>
-#include <signal.h>
 
 /* for struct iovec */
 #include <sys/uio.h>
@@ -61,11 +61,6 @@
 
 #ifndef NT_PRSTATUS
 # define NT_PRSTATUS 1
-#endif
-
-#ifndef NSIG
-# warning: NSIG is not defined, using 32
-# define NSIG 32
 #endif
 
 #include "syscall.h"

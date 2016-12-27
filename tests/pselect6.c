@@ -30,20 +30,15 @@
  */
 
 #include "tests.h"
+#include "nsig.h"
 #include <assert.h>
 #include <stdio.h>
-#include <signal.h>
 #include <unistd.h>
 #include <sys/select.h>
 #include <asm/unistd.h>
 #include <sys/time.h>
 
 #ifdef __NR_pselect6
-
-#ifndef NSIG
-# warning NSIG is not defined, using 32
-# define NSIG 32
-#endif
 
 static fd_set set[3][0x1000000 / sizeof(fd_set)];
 
