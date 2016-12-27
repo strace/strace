@@ -472,7 +472,7 @@ Note that this is independent from the normal tracing of the
 system call which is controlled by the option
 .BR -e "\ " trace = write .
 .TP
-\fB\-e\ fault\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-e\ fault\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform a syscall fault injection for the specified set of syscalls.
 When a fault is injected into a syscall invocation, the syscall number
 is replaced by -1 which corresponds to an invalid syscall.
@@ -486,8 +486,29 @@ the default error code returned by the kernel, which is traditionally
 .B ENOSYS
 for invalid syscall numbers on most architectures.
 
+If a signal is specified using either a symbolic value like
+.B SIGSEGV
+or a numeric value within 1..\fBSIGRTMAX\fR range,
+that signal is delivered on entering every syscall specified by the
+.IR set .
+
+If :\fBsignal\fR=\,\fIsig\/\fR option is specified without
+:\fBerror\fR=\,\fIerrno\/\fR option, then only a signal
+.I sig
+is delivered without a syscall fault injection.
+Conversely, :\fBerror\fR=\,\fIerrno\/\fR option without
+:\fBsignal\fR=\,\fIsig\/\fR option injects a fault without delivering a signal.
+
+If both :\fBerror\fR=\,\fIerrno\/\fR and :\fBsignal\fR=\,\fIsig\/\fR
+options are specified, then both a fault is injected with the specified
+error code
+.I errno
+and a signal
+.I sig
+is delivered.
+
 Unless a :\fBwhen\fR=\,\fIexpr\fR subexpression is specified,
-a fault is injected into every invocation of each syscall from the
+an injection is being made into every invocation of each syscall from the
 .IR set .
 
 The format of the subexpression is one of the following:

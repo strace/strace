@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Implemented signal injection as an extension to syscall fault injection.
+
 Noteworthy changes in release 4.15 (2016-12-14)
 ===============================================
 
