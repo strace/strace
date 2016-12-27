@@ -21,6 +21,6 @@ arch_sigreturn(struct tcb *tcp)
 #endif
 
 	tprints("{mask=");
-	print_sigset_addr_len(tcp, addr, NSIG / 8);
+	print_sigset_addr_len(tcp, addr, NSIG_BYTES);
 	tprints("}");
 }

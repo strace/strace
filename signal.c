@@ -104,7 +104,7 @@
  *     umoven(tcp, addr, sizeof(sigset_t), &sigset)
  * may be a bad idea: it'll try to read much more data than needed
  * to fetch a sigset_t.
- * Use (NSIG / 8) as a size instead.
+ * Use NSIG_BYTES as a size instead.
  */
 
 static const char *
@@ -168,16 +168,17 @@ const char *
 sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 {
 	/*
-	 * The maximum number of signal names to be printed is NSIG * 2 / 3.
+	 * The maximum number of signal names to be printed
+	 * is NSIG_BYTES * 8 * 2 / 3.
 	 * Most of signal names have length 7,
 	 * average length of signal names is less than 7.
 	 * The length of prefix string does not exceed 16.
 	 */
-	static char outstr[128 + 8 * (NSIG * 2 / 3)];
+	static char outstr[128 + 8 * (NSIG_BYTES * 8 * 2 / 3)];
 
 	char *s;
 	const uint32_t *mask;
-	uint32_t inverted_mask[NSIG / 32];
+	uint32_t inverted_mask[NSIG_BYTES / 4];
 	unsigned int size;
 	int i;
 	char sep;
@@ -186,10 +187,10 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 
 	mask = sig_mask;
 	/* length of signal mask in 4-byte words */
-	size = (bytes >= NSIG / 8) ? NSIG / 32 : (bytes + 3) / 4;
+	size = (bytes >= NSIG_BYTES) ? NSIG_BYTES / 4 : (bytes + 3) / 4;
 
 	/* check whether 2/3 or more bits are set */
-	if (popcount32(mask, size) >= size * 32 * 2 / 3) {
+	if (popcount32(mask, size) >= size * (4 * 8) * 2 / 3) {
 		/* show those signals that are NOT in the mask */
 		unsigned int j;
 		for (j = 0; j < size; ++j)
@@ -199,7 +200,7 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 	}
 
 	sep = '[';
-	for (i = 0; (i = next_set_bit(mask, i, size * 32)) >= 0; ) {
+	for (i = 0; (i = next_set_bit(mask, i, size * (4 * 8))) >= 0; ) {
 		++i;
 		*s++ = sep;
 		if ((unsigned) i < nsignals) {
@@ -239,14 +240,14 @@ print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ulong_t addr,
 			    const kernel_ulong_t len, const unsigned int min_len)
 {
 	/*
-	 * Here len is usually equal to NSIG / 8 or current_wordsize.
+	 * Here len is usually equal to NSIG_BYTES or current_wordsize.
 	 * But we code this defensively:
 	 */
-	if (len < min_len || len > NSIG / 8) {
+	if (len < min_len || len > NSIG_BYTES) {
 		printaddr(addr);
 		return;
 	}
-	int mask[NSIG / 8 / sizeof(int)] = {};
+	int mask[NSIG_BYTES / sizeof(int)] = {};
 	if (umoven_or_printaddr(tcp, addr, len, mask))
 		return;
 	tprints(sprintsigmask_n("", mask, len));
@@ -447,7 +448,7 @@ SYS_FUNC(sigpending)
 
 SYS_FUNC(rt_sigprocmask)
 {
-	/* Note: arg[3] is the length of the sigset. Kernel requires NSIG / 8 */
+	/* Note: arg[3] is the length of the sigset. Kernel requires NSIG_BYTES */
 	if (entering(tcp)) {
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprints(", ");
@@ -529,7 +530,7 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * or in tcp->u_arg[3] (all other),
 	 * but kernel won't handle sys_rt_sigaction
 	 * with wrong sigset size (just returns EINVAL instead).
-	 * We just fetch the right size, which is NSIG / 8.
+	 * We just fetch the right size, which is NSIG_BYTES.
 	 */
 	tprintsigmask_val("", sa.sa_mask);
 	tprints(", sa_flags=");
@@ -569,7 +570,7 @@ SYS_FUNC(rt_sigpending)
 	if (exiting(tcp)) {
 		/*
 		 * One of the few syscalls where sigset size (arg[1])
-		 * is allowed to be <= NSIG / 8, not strictly ==.
+		 * is allowed to be <= NSIG_BYTES, not strictly ==.
 		 * This allows non-rt sigpending() syscall
 		 * to reuse rt_sigpending() code in kernel.
 		 */
@@ -582,7 +583,7 @@ SYS_FUNC(rt_sigpending)
 
 SYS_FUNC(rt_sigsuspend)
 {
-	/* NB: kernel requires arg[1] == NSIG / 8 */
+	/* NB: kernel requires arg[1] == NSIG_BYTES */
 	print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 	tprintf(", %" PRI_klu, tcp->u_arg[1]);
 
@@ -616,7 +617,7 @@ SYS_FUNC(rt_tgsigqueueinfo)
 
 SYS_FUNC(rt_sigtimedwait)
 {
-	/* NB: kernel requires arg[3] == NSIG / 8 */
+	/* NB: kernel requires arg[3] == NSIG_BYTES */
 	if (entering(tcp)) {
 		print_sigset_addr_len(tcp, tcp->u_arg[0], tcp->u_arg[3]);
 		tprints(", ");

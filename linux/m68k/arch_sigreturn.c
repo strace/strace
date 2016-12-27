@@ -7,7 +7,7 @@ arch_sigreturn(struct tcb *tcp)
 	if (umove(tcp, *m68k_usp_ptr + 2 * sizeof(int), &addr) < 0)
 		return;
 
-	unsigned long mask[NSIG / 8 / sizeof(long)];
+	unsigned long mask[NSIG_BYTES / sizeof(long)];
 	/* Fetch first word of signal mask.  */
 	if (umove(tcp, addr, &mask[0]) < 0)
 		return;

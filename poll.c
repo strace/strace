@@ -176,7 +176,7 @@ SYS_FUNC(ppoll)
 
 		print_timespec(tcp, tcp->u_arg[2]);
 		tprints(", ");
-		/* NB: kernel requires arg[4] == NSIG / 8 */
+		/* NB: kernel requires arg[4] == NSIG_BYTES */
 		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 		tprintf(", %" PRI_klu, tcp->u_arg[4]);
 

@@ -256,7 +256,7 @@ SYS_FUNC(pselect6)
 		if (!umove_kulong_array_or_printaddr(tcp, tcp->u_arg[5],
 						     data, ARRAY_SIZE(data))) {
 			tprints("{");
-			/* NB: kernel requires data[1] == NSIG / 8 */
+			/* NB: kernel requires data[1] == NSIG_BYTES */
 			print_sigset_addr_len(tcp, data[0], data[1]);
 			tprintf(", %" PRI_klu "}", data[1]);
 		}

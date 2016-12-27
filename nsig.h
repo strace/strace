@@ -10,4 +10,6 @@
 # error NSIG < 32
 #endif
 
+#define NSIG_BYTES	(NSIG / 8)
+
 #endif /* !STRACE_NSIG_H */

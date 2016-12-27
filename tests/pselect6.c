@@ -85,7 +85,7 @@ int main(int ac, char **av)
 	       "= 1 (out [%d])\n",
 	       fds[1] + 1, fds[0], fds[1],
 	       fds[0], fds[1],
-	       NSIG / 8, fds[1]);
+	       NSIG_BYTES, fds[1]);
 
 	/*
 	 * Another simple one, with a timeout.
@@ -111,7 +111,7 @@ int main(int ac, char **av)
 	FD_SET(fds[1],set[0]);
 	assert(pselect(-1, NULL, set[0], NULL, NULL, &mask) == -1);
 	printf("pselect6(-1, NULL, %p, NULL, NULL, {[HUP CHLD], %u}) "
-	       "= -1 EINVAL (%m)\n", set[0], NSIG / 8);
+	       "= -1 EINVAL (%m)\n", set[0], NSIG_BYTES);
 
 	/*
 	 * Another variant, with nfds exceeding FD_SETSIZE limit.
@@ -124,7 +124,7 @@ int main(int ac, char **av)
 	assert(pselect(FD_SETSIZE + 1, set[0], set[1], NULL, &tm.ts, &mask) == 0);
 	printf("pselect6(%d, [%d], [], NULL, {tv_sec=0, tv_nsec=123}, "
 	       "{[HUP CHLD], %u}) = 0 (Timeout)\n",
-	       FD_SETSIZE + 1, fds[0], NSIG / 8);
+	       FD_SETSIZE + 1, fds[0], NSIG_BYTES);
 
 	/*
 	 * See how timeouts are decoded.
@@ -137,7 +137,7 @@ int main(int ac, char **av)
 	printf("pselect6(0, NULL, NULL, NULL, {tv_sec=0, tv_nsec=222222222}, "
 	       "{[HUP CHLD], %u}) = "
 	       "? ERESTARTNOHAND (To be restarted if no handler)\n",
-	       NSIG / 8);
+	       NSIG_BYTES);
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
 
 	puts("+++ exited with 0 +++");
