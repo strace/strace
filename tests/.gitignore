@@ -10,12 +10,13 @@ accept
 accept4
 access
 acct
-addkey
+add_key
 adjtimex
 aio
 alarm
 answer
 attach-f-p
+attach-f-p-cmd
 attach-p-cmd-cmd
 attach-p-cmd-p
 bpf
