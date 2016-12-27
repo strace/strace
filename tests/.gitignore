@@ -118,6 +118,8 @@ ioctl_dm
 ioctl_dm-v
 ioctl_evdev
 ioctl_evdev-v
+ioctl_loop
+ioctl_loop-v
 ioctl_mtd
 ioctl_rtc
 ioctl_rtc-v

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Check decoding of LOOP_* ioctls.
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null
+run_strace -a22 -eioctl $args > "$EXP"
+check_prog grep
+grep -v '^ioctl([012],' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
+rm -f "$EXP" "$OUT"

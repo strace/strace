@@ -179,6 +179,8 @@ check_PROGRAMS = \
 	ioctl_dm-v \
 	ioctl_evdev \
 	ioctl_evdev-v \
+	ioctl_loop \
+	ioctl_loop-v \
 	ioctl_mtd \
 	ioctl_rtc \
 	ioctl_rtc-v \
@@ -575,6 +577,8 @@ DECODER_TESTS = \
 	ioctl_dm-v.test \
 	ioctl_evdev.test \
 	ioctl_evdev-v.test \
+	ioctl_loop-v.test \
+	ioctl_loop.test \
 	ioctl_mtd.test \
 	ioctl_rtc.test \
 	ioctl_rtc-v.test \
