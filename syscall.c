@@ -568,7 +568,7 @@ tcb_fault_opts(struct tcb *tcp)
 
 
 static long
-inject_syscall_fault_entering(struct tcb *tcp)
+inject_syscall_fault_entering(struct tcb *tcp, unsigned int *signo)
 {
 	if (!tcp->fault_vec[current_personality]) {
 		tcp->fault_vec[current_personality] =
@@ -590,7 +590,9 @@ inject_syscall_fault_entering(struct tcb *tcp)
 
 	opts->first = opts->step;
 
-	if (!arch_set_scno(tcp, -1))
+	if (opts->signo > 0)
+		*signo = opts->signo;
+	if (opts->err != -1 && !arch_set_scno(tcp, -1))
 		tcp->flags |= TCB_FAULT_INJ;
 
 	return 0;
@@ -601,7 +603,7 @@ update_syscall_fault_exiting(struct tcb *tcp)
 {
 	struct fault_opts *opts = tcb_fault_opts(tcp);
 
-	if (opts && opts->err && tcp->u_error != opts->err) {
+	if (opts && opts->err > 0 && tcp->u_error != (uint16_t) opts->err) {
 		unsigned long u_error = tcp->u_error;
 		tcp->u_error = opts->err;
 		if (arch_set_error(tcp))
@@ -612,7 +614,7 @@ update_syscall_fault_exiting(struct tcb *tcp)
 }
 
 static int
-trace_syscall_entering(struct tcb *tcp)
+trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 {
 	int res, scno_good;
 
@@ -683,7 +685,7 @@ trace_syscall_entering(struct tcb *tcp)
 	}
 
 	if (tcp->qual_flg & QUAL_FAULT)
-		inject_syscall_fault_entering(tcp);
+		inject_syscall_fault_entering(tcp, sig);
 
 	if (cflag == CFLAG_ONLY_STATS) {
 		res = 0;
@@ -962,10 +964,10 @@ trace_syscall_exiting(struct tcb *tcp)
 }
 
 int
-trace_syscall(struct tcb *tcp)
+trace_syscall(struct tcb *tcp, unsigned int *signo)
 {
 	return exiting(tcp) ?
-		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp);
+		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp, signo);
 }
 
 bool

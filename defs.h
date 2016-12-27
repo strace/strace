@@ -217,7 +217,8 @@ typedef struct ioctlent {
 struct fault_opts {
 	uint16_t first;
 	uint16_t step;
-	uint16_t err;
+	int16_t err;
+	uint16_t signo;
 };
 
 /* Trace Control Block */
@@ -439,7 +440,7 @@ extern int read_int_from_file(const char *, int *);
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void print_pc(struct tcb *);
-extern int trace_syscall(struct tcb *);
+extern int trace_syscall(struct tcb *, unsigned int *);
 extern void count_syscall(struct tcb *, const struct timeval *);
 extern void call_summary(FILE *);
 

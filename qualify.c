@@ -26,6 +26,7 @@
  */
 
 #include "defs.h"
+#include "nsig.h"
 
 typedef unsigned int number_slot_t;
 #define BITS_PER_SLOT (sizeof(number_slot_t) * 8)
@@ -414,6 +415,11 @@ parse_fault_token(const char *const token, struct fault_opts *const fopts)
 		if (intval < 1)
 			return false;
 		fopts->err = intval;
+	} else if ((val = strip_prefix("signal=", token))) {
+		intval = sigstr_to_uint(val);
+		if (intval < 1 || intval > NSIG_BYTES * 8)
+			return false;
+		fopts->signo = intval;
 	} else {
 		return false;
 	}
@@ -494,7 +500,8 @@ qualify_fault(const char *const str)
 	struct fault_opts opts = {
 		.first = 1,
 		.step = 1,
-		.err = 0
+		.err = -1,
+		.signo = 0
 	};
 	char *buf = NULL;
 	char *name = parse_fault_expression(str, &buf, &opts);
@@ -502,6 +509,12 @@ qualify_fault(const char *const str)
 		error_msg_and_die("invalid %s '%s'", "fault argument", str);
 	}
 
+	/*
+	 * If neither error nor signal is specified,
+	 * fallback to the default platform error code.
+	 */
+	if (opts.signo == 0 && opts.err == -1)
+		opts.err = 0;
 
 	struct number_set tmp_set[SUPPORTED_PERSONALITIES];
 	memset(tmp_set, 0, sizeof(tmp_set));

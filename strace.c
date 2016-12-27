@@ -2447,7 +2447,8 @@ show_stopsig:
 	 * This should be syscall entry or exit.
 	 * Handle it.
 	 */
-	if (trace_syscall(tcp) < 0) {
+	sig = 0;
+	if (trace_syscall(tcp, &sig) < 0) {
 		/*
 		 * ptrace() failed in trace_syscall().
 		 * Likely a result of process disappearing mid-flight.
@@ -2461,6 +2462,7 @@ show_stopsig:
 		 */
 		return true;
 	}
+	goto restart_tracee;
 
 restart_tracee_with_sig_0:
 	sig = 0;
