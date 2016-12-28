@@ -32,7 +32,9 @@
 AC_PREREQ(2.57)
 AC_INIT([strace],
 	m4_esyscmd([./git-version-gen .tarball-version]),
-	[strace-devel@lists.sourceforge.net])
+	[strace-devel@lists.sourceforge.net],
+	[strace],
+	[https://strace.io])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS([config.h])
