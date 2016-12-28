@@ -41,18 +41,18 @@ main(void)
 	static const char text1[] =
 		"seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL) = 0\n";
 	static const char text2[] = "+++ exited with 0 +++\n";
-	const unsigned long addr = (unsigned long) 0xfacefeeddeadbeef;
+	const kernel_ulong_t addr = (kernel_ulong_t) 0xfacefeeddeadbeefULL;
 	long rc;
 
 	rc = syscall(__NR_seccomp, -1L, -1L, addr);
-	printf("seccomp(%#x /* SECCOMP_SET_MODE_??? */, %u, %#lx)"
-	       " = %ld %s (%m)\n", -1, -1, addr, rc, errno2name());
+	printf("seccomp(%#x /* SECCOMP_SET_MODE_??? */, %u, %#llx)"
+	       " = %s\n", -1, -1, (unsigned long long) addr, sprintrc(rc));
 	fflush(stdout);
 
 	rc = syscall(__NR_seccomp, 0, 0, 0);
 	if (rc) {
-		printf("seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL)"
-		       " = %ld %s (%m)\n", rc, errno2name());
+		printf("seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL) = %s\n",
+		       sprintrc(rc));
 		fflush(stdout);
 		rc = 0;
 	} else {
