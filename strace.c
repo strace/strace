@@ -193,6 +193,16 @@ strerror(int err_no)
 #endif /* HAVE_STERRROR */
 
 static void
+print_version(void)
+{
+	printf("%s -- version %s\n"
+	       "Copyright (C) %s The strace developers <%s>.\n"
+	       "This is free software; see the source for copying conditions.  There is NO\n"
+	       "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+	       PACKAGE_NAME, PACKAGE_VERSION, "1991-2016", PACKAGE_URL);
+}
+
+static void
 usage(void)
 {
 	printf("\
@@ -1666,7 +1676,7 @@ init(int argc, char *argv[])
 			qualify("abbrev=none");
 			break;
 		case 'V':
-			printf("%s -- version %s\n", PACKAGE_NAME, VERSION);
+			print_version();
 			exit(0);
 			break;
 		case 'z':
