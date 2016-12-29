@@ -135,6 +135,9 @@ gen_header()
 	while read line; do
 		LC_COLLATE=C
 		case $line in
+		'#stop')
+			exit 0
+			;;
 		'#conditional')
 			unconditional=
 			;;
