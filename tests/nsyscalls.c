@@ -27,8 +27,12 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
-#include "syscall.h"
+#include "tests.h"
+#include "sysent.h"
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <asm/unistd.h>
 
 #define TD 0
 #define TF 0
@@ -47,8 +51,6 @@
 static const struct_sysent syscallent[] = {
 #include "syscallent.h"
 };
-
-#include <asm/unistd.h>
 
 #if defined __X32_SYSCALL_BIT && defined __NR_read \
  && (__X32_SYSCALL_BIT & __NR_read) != 0

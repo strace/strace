@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Validate syscallent.h file.
+ *
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,8 +27,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
-#include "syscall.h"
+#include "tests.h"
+#include "sysent.h"
+#include <stdio.h>
+#include <string.h>
+#include <asm/unistd.h>
 
 #define TD 0
 #define TF 0
