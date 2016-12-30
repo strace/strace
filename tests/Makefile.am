@@ -927,6 +927,8 @@ ksysent.h: $(srcdir)/ksysent.sed
 	mv -f $@.t2 $@
 	rm -f $@.t1
 
+ksysent.$(OBJEXT): ksysent.h
+
 scno.h: generate_scno
 	./$< > $@-t && mv $@-t $@
 
@@ -934,5 +936,4 @@ objects = $(filter %.$(OBJEXT),$(SOURCES:.c=.$(OBJEXT)))
 scno_dependants = $(filter-out generate_scno.$(OBJEXT),$(objects))
 $(scno_dependants): scno.h
 
-BUILT_SOURCES = ksysent.h
 CLEANFILES = ksysent.h scno.h $(TESTS:=.tmp)
