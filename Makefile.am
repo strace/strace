@@ -232,6 +232,7 @@ strace_SOURCES =	\
 	swapon.c	\
 	syscall.c	\
 	sysctl.c	\
+	sysent.h	\
 	sysinfo.c	\
 	syslog.c	\
 	sysmips.c	\

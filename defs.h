@@ -56,6 +56,7 @@
 #include "kernel_types.h"
 #include "mpers_type.h"
 #include "gcc_compat.h"
+#include "sysent.h"
 
 #ifndef HAVE_STRERROR
 const char *strerror(int);
@@ -201,14 +202,6 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY2_INCLUDE_FUNCS "empty.h"
 #endif
 
-typedef struct sysent {
-	unsigned nargs;
-	int	sys_flags;
-	int	sen;
-	int	(*sys_func)();
-	const char *sys_name;
-} struct_sysent;
-
 typedef struct ioctlent {
 	const char *symbol;
 	unsigned int code;
@@ -327,19 +320,6 @@ extern const struct xlat whence_codes[];
 #define RVAL_NONE	040	/* Print nothing */
 
 #define RVAL_DECODED	0100	/* syscall decoding finished */
-
-#define TRACE_FILE	001	/* Trace file-related syscalls. */
-#define TRACE_IPC	002	/* Trace IPC-related syscalls. */
-#define TRACE_NETWORK	004	/* Trace network-related syscalls. */
-#define TRACE_PROCESS	010	/* Trace process-related syscalls. */
-#define TRACE_SIGNAL	020	/* Trace signal-related syscalls. */
-#define TRACE_DESC	040	/* Trace file descriptor-related syscalls. */
-#define TRACE_MEMORY	0100	/* Trace memory mapping-related syscalls. */
-#define SYSCALL_NEVER_FAILS	0200	/* Syscall is always successful. */
-#define STACKTRACE_INVALIDATE_CACHE 0400  /* Trigger proc/maps cache updating */
-#define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
-#define TRACE_INDIRECT_SUBCALL	02000	/* Syscall is an indirect socket/ipc subcall. */
-#define COMPAT_SYSCALL_TYPES	04000	/* A compat syscall that uses compat types. */
 
 #define IOCTL_NUMBER_UNKNOWN 0
 #define IOCTL_NUMBER_HANDLED 1
