@@ -39,6 +39,9 @@
 /* for struct iovec */
 #include <sys/uio.h>
 
+/* for __X32_SYSCALL_BIT */
+#include <asm/unistd.h>
+
 #include "regs.h"
 #include "ptrace.h"
 

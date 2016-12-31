@@ -51,7 +51,6 @@
 #include <errno.h>
 #include <time.h>
 #include <sys/time.h>
-#include <asm/unistd.h>
 
 #include "kernel_types.h"
 #include "mpers_type.h"

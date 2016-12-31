@@ -30,8 +30,8 @@
  */
 
 #include "defs.h"
-
 #include <sched.h>
+#include <asm/unistd.h>
 
 #ifndef CSIGNAL
 # define CSIGNAL 0x000000ff

@@ -39,6 +39,7 @@
 # include <sys/xattr.h>
 #endif
 #include <sys/uio.h>
+#include <asm/unistd.h>
 
 #include "regs.h"
 #include "ptrace.h"
