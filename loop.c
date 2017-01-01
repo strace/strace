@@ -160,9 +160,6 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 		   struct tcb *tcp, const unsigned int code,
 		   const kernel_ulong_t arg)
 {
-	if (!verbose(tcp))
-		return RVAL_DECODED;
-
 	switch (code) {
 	case LOOP_GET_STATUS:
 		if (entering(tcp))
