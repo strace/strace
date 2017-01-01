@@ -82,7 +82,8 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!abbrev(tcp) || info.lo_encrypt_type != LO_CRYPT_NONE) {
 		tprints(", lo_encrypt_key=");
 		print_quoted_string((void *) info.lo_encrypt_key,
-				    LO_KEY_SIZE, 0);
+				    MIN((uint32_t) info.lo_encrypt_key_size,
+				    LO_KEY_SIZE), 0);
 	}
 
 	if (!abbrev(tcp))
@@ -143,7 +144,8 @@ decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 				    LO_NAME_SIZE, QUOTE_0_TERMINATED);
 		tprints(", lo_encrypt_key=");
 		print_quoted_string((void *) info64.lo_encrypt_key,
-				    LO_KEY_SIZE, 0);
+				    MIN(info64.lo_encrypt_key_size,
+				    LO_KEY_SIZE), 0);
 	}
 
 	if (!abbrev(tcp))
