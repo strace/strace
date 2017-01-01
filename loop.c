@@ -64,7 +64,12 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprints(", lo_encrypt_type=");
 		printxval(loop_crypt_type_options, info.lo_encrypt_type,
 			"LO_CRYPT_???");
-		tprintf(", lo_encrypt_key_size=%d", info.lo_encrypt_key_size);
+		/*
+		 * It is converted to unsigned before use in kernel, see
+		 * loop_info64_from_old in drivers/block/loop.c
+		 */
+		tprintf(", lo_encrypt_key_size=%" PRIu32,
+			(uint32_t) info.lo_encrypt_key_size);
 	}
 
 	tprints(", lo_flags=");
