@@ -82,7 +82,7 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	if (!abbrev(tcp))
 		tprintf(", lo_init=[%#" PRI_klx ", %#" PRI_klx "]"
-			", reserved=[%#x, %#x, %#x, %#x]}",
+			", reserved=[%#hhx, %#hhx, %#hhx, %#hhx]}",
 			(kernel_ulong_t) info.lo_init[0],
 			(kernel_ulong_t) info.lo_init[1],
 			info.reserved[0], info.reserved[1],
