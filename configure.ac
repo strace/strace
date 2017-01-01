@@ -35,7 +35,7 @@ AC_INIT([strace],
 	[strace-devel@lists.sourceforge.net],
 	[strace],
 	[https://strace.io])
-AC_COPYRIGHT([Copyright (C) 1999-2016 The strace developers.])
+AC_COPYRIGHT([Copyright (C) 1999-2017 The strace developers.])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS([config.h])

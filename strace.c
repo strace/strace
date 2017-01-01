@@ -200,7 +200,7 @@ print_version(void)
 	       "Copyright (C) %s The strace developers <%s>.\n"
 	       "This is free software; see the source for copying conditions.  There is NO\n"
 	       "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-	       PACKAGE_NAME, PACKAGE_VERSION, "1991-2016", PACKAGE_URL);
+	       PACKAGE_NAME, PACKAGE_VERSION, "1991-2017", PACKAGE_URL);
 }
 
 static void

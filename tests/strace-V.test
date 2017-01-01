@@ -1,8 +1,10 @@
 #!/bin/sh
 
 # Check -V option.
-
 . "${srcdir=.}/init.sh"
+
+run_prog_skip_if_failed date +%Y > /dev/null
+year="$(date +%Y)"
 
 run_strace -V > "$LOG"
 
@@ -13,7 +15,7 @@ getval()
 
 cat > "$EXP" << __EOF__
 $(getval PACKAGE_NAME) -- version $(getval PACKAGE_VERSION)
-Copyright (C) 1991-2016 The strace developers <$(getval PACKAGE_URL)>.
+Copyright (C) 1991-$year The strace developers <$(getval PACKAGE_URL)>.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 __EOF__
