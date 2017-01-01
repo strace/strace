@@ -36,6 +36,7 @@
 #include <inttypes.h>
 #include <sys/ioctl.h>
 #include <sys/sysmacros.h>
+#include <linux/ioctl.h>
 #include <linux/loop.h>
 #include "xlat/loop_cmds.h"
 
@@ -152,35 +153,105 @@ print_loop_info64(struct loop_info64 * const info64, bool print_encrypt,
 # endif /* VERBOSE */
 }
 
-static const unsigned int magic = 0xdeadbeef;
-static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
-
 int
 main(void)
 {
-	ioctl(-1, LOOP_SET_FD, magic);
-	printf("ioctl(-1, LOOP_SET_FD, %d) = -1 EBADF (%m)\n", magic);
+	static const kernel_ulong_t unknown_loop_cmd =
+		(kernel_ulong_t) 0xbadc0dedfeed4cedULL;
+	static const kernel_ulong_t magic =
+		(kernel_ulong_t) 0xdeadbeefbadc0dedULL;
+	static const kernel_ulong_t kernel_mask =
+		((kernel_ulong_t) -1) - ((unsigned long) -1L);
 
-	ioctl(-1, LOOP_CLR_FD, 0);
+	struct loop_info * const info = tail_alloc(sizeof(*info));
+	struct loop_info64 * const info64 = tail_alloc(sizeof(*info64));
+
+	/* Unknown loop commands */
+	ioctl(-1, unknown_loop_cmd, magic);
+	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 0x4c, %#x, %#x), "
+	       "%#lx) = -1 EBADF (%m)\n",
+	       _IOC_DIR((unsigned int) unknown_loop_cmd) & _IOC_NONE ?
+	       "|_IOC_NONE" : "",
+	       _IOC_NR((unsigned int) unknown_loop_cmd),
+	       _IOC_SIZE((unsigned int) unknown_loop_cmd),
+	       (unsigned long) magic);
+
+	ioctl(-1, LOOP_SET_DIRECT_IO + 1, magic);
+	printf("ioctl(-1, _IOC(0, 0x4c, %#x, %#x), %#lx) = "
+	       "-1 EBADF (%m)\n",
+	       _IOC_NR(LOOP_SET_DIRECT_IO + 1),
+	       _IOC_SIZE(LOOP_SET_DIRECT_IO + 1),
+	       (unsigned long) magic);
+
+	ioctl(-1, LOOP_CTL_GET_FREE + 1, magic);
+	printf("ioctl(-1, _IOC(0, 0x4c, %#x, %#x), %#lx) = "
+	       "-1 EBADF (%m)\n",
+	       _IOC_NR(LOOP_CTL_GET_FREE + 1),
+	       _IOC_SIZE(LOOP_CTL_GET_FREE + 1),
+	       (unsigned long) magic);
+
+	/* LOOP_SET_FD */
+	ioctl(-1, LOOP_SET_FD, magic);
+	printf("ioctl(-1, LOOP_SET_FD, %d) = -1 EBADF (%m)\n",
+	       (unsigned int) magic);
+
+	/* LOOP_CLR_FD */
+	ioctl(-1, LOOP_CLR_FD);
 	printf("ioctl(-1, LOOP_CLR_FD) = -1 EBADF (%m)\n");
 
-	struct loop_info *const info = tail_alloc(sizeof(*info));
+	/* LOOP_SET_STATUS */
+	ioctl(-1, LOOP_SET_STATUS, NULL);
+	printf("ioctl(-1, LOOP_SET_STATUS, NULL) = -1 EBADF (%m)\n");
+
+	fill_memory((void *) info, sizeof(*info));
+	info->lo_flags = 0xdeface00;
+	info->lo_name[0] = '\0';
+	info->lo_encrypt_key[0] = '\0';
+	info->lo_encrypt_key_size = 1;
+
+	printf("ioctl(-1, LOOP_SET_STATUS, ");
+	print_loop_info(info, true, NULL, "\\0", NULL);
+	ioctl(-1, LOOP_SET_STATUS, info);
+	printf(") = -1 EBADF (%m)\n");
 
 	fill_memory((void *) info, sizeof(*info));
 	info->lo_encrypt_type = LO_CRYPT_NONE;
 	info->lo_flags = LO_FLAGS_READ_ONLY;
 	memset(info->lo_name, 'A', sizeof(info->lo_name));
 	memset(info->lo_encrypt_key, 'B', sizeof(info->lo_encrypt_key));
+
+	ioctl(-1, LOOP_SET_STATUS, (void *) info + ALIGNOF(info));
+	printf("ioctl(-1, LOOP_SET_STATUS, %p) = -1 EBADF (%m)\n",
+	       (void *) info + ALIGNOF(info));
+
 	printf("ioctl(-1, LOOP_SET_STATUS, ");
 	print_loop_info(info, false, "LO_CRYPT_NONE", NULL,
 			"LO_FLAGS_READ_ONLY");
 	ioctl(-1, LOOP_SET_STATUS, info);
 	printf(") = -1 EBADF (%m)\n");
 
-	ioctl(-1, LOOP_GET_STATUS, info);
+	/* LOOP_GET_STATUS */
+	ioctl(-1, LOOP_GET_STATUS, NULL);
+	printf("ioctl(-1, LOOP_GET_STATUS, NULL) = -1 EBADF (%m)\n");
+
+	ioctl(-1, LOOP_GET_STATUS, (unsigned long) info | kernel_mask);
 	printf("ioctl(-1, LOOP_GET_STATUS, %p) = -1 EBADF (%m)\n", info);
 
-	struct loop_info64 *const info64 = tail_alloc(sizeof(*info64));
+	/* LOOP_SET_STATUS64 */
+	ioctl(-1, LOOP_SET_STATUS64, NULL);
+	printf("ioctl(-1, LOOP_SET_STATUS64, NULL) = -1 EBADF (%m)\n");
+
+	fill_memory((void *) info64, sizeof(*info64));
+	info64->lo_flags = 0xdec0de00;
+	info64->lo_file_name[0] = '\0';
+	info64->lo_crypt_name[0] = '\0';
+	info64->lo_encrypt_key[0] = '\0';
+	info64->lo_encrypt_key_size = 1;
+
+	printf("ioctl(-1, LOOP_SET_STATUS64, ");
+	print_loop_info64(info64, true, NULL, "\\0", NULL);
+	ioctl(-1, LOOP_SET_STATUS64, info64);
+	printf(") = -1 EBADF (%m)\n");
 
 	fill_memory((void *) info64, sizeof(*info64));
 	info64->lo_flags = LO_FLAGS_READ_ONLY;
@@ -189,31 +260,49 @@ main(void)
 	memset(info64->lo_crypt_name, 'D', sizeof(info64->lo_crypt_name));
 	memset(info64->lo_encrypt_key, 'E', sizeof(info64->lo_encrypt_key));
 
+	ioctl(-1, LOOP_SET_STATUS64, (void *) info64 + ALIGNOF(info64));
+	printf("ioctl(-1, LOOP_SET_STATUS64, %p) = -1 EBADF (%m)\n",
+	       (void *) info64 + ALIGNOF(info64));
+
 	printf("ioctl(-1, LOOP_SET_STATUS64, ");
 	print_loop_info64(info64, false, "LO_CRYPT_NONE", NULL,
 			  "LO_FLAGS_READ_ONLY");
 	ioctl(-1, LOOP_SET_STATUS64, info64);
 	printf(") = -1 EBADF (%m)\n");
 
-	ioctl(-1, LOOP_GET_STATUS64, info64);
+	/* LOOP_GET_STATUS64 */
+	ioctl(-1, LOOP_GET_STATUS64, NULL);
+	printf("ioctl(-1, LOOP_GET_STATUS64, NULL) = -1 EBADF (%m)\n");
+
+	ioctl(-1, LOOP_GET_STATUS64, (unsigned long) info64 | kernel_mask);
 	printf("ioctl(-1, LOOP_GET_STATUS64, %p) = -1 EBADF (%m)\n", info64);
 
+	/* LOOP_CHANGE_FD */
 	ioctl(-1, LOOP_CHANGE_FD, magic);
-	printf("ioctl(-1, LOOP_CHANGE_FD, %d) = -1 EBADF (%m)\n", magic);
+	printf("ioctl(-1, LOOP_CHANGE_FD, %d) = -1 EBADF (%m)\n",
+	       (unsigned int) magic);
 
-	ioctl(-1, LOOP_SET_CAPACITY, 0);
+	/* LOOP_SET_CAPACITY */
+	ioctl(-1, LOOP_SET_CAPACITY);
 	printf("ioctl(-1, LOOP_SET_CAPACITY) = -1 EBADF (%m)\n");
 
-	ioctl(-1, LOOP_SET_DIRECT_IO, lmagic);
-	printf("ioctl(-1, LOOP_SET_DIRECT_IO, %lu) = -1 EBADF (%m)\n", lmagic);
+	/* LOOP_SET_DIRECT_IO */
+	ioctl(-1, LOOP_SET_DIRECT_IO, magic);
+	printf("ioctl(-1, LOOP_SET_DIRECT_IO, %lu) = -1 EBADF (%m)\n",
+	       (unsigned long) magic);
 
+	/* LOOP_CTL_ADD */
 	ioctl(-1, LOOP_CTL_ADD, magic);
-	printf("ioctl(-1, LOOP_CTL_ADD, %d) = -1 EBADF (%m)\n", magic);
+	printf("ioctl(-1, LOOP_CTL_ADD, %d) = -1 EBADF (%m)\n",
+	       (unsigned int) magic);
 
+	/* LOOP_CTL_REMOVE */
 	ioctl(-1, LOOP_CTL_REMOVE, magic);
-	printf("ioctl(-1, LOOP_CTL_REMOVE, %d) = -1 EBADF (%m)\n", magic);
+	printf("ioctl(-1, LOOP_CTL_REMOVE, %d) = -1 EBADF (%m)\n",
+	       (unsigned int) magic);
 
-	ioctl(-1, LOOP_CTL_GET_FREE, 0);
+	/* LOOP_CTL_GET_FREE */
+	ioctl(-1, LOOP_CTL_GET_FREE);
 	printf("ioctl(-1, LOOP_CTL_GET_FREE) = -1 EBADF (%m)\n");
 
 	puts("+++ exited with 0 +++");
