@@ -40,11 +40,18 @@
 #include <linux/loop.h>
 #include "xlat/loop_cmds.h"
 
+#ifndef ABBREV
+# define ABBREV 0
+#endif
+
 static void
 print_loop_info(struct loop_info * const info, bool print_encrypt,
 		const char *encrypt_type, const char *encrypt_key,
 		const char *flags)
 {
+#if ABBREV
+	printf("%p", info);
+#else
 	printf("{lo_number=%d", info->lo_number);
 # if VERBOSE
 	printf(", lo_device=makedev(%u, %u), lo_inode=%lu, "
@@ -92,6 +99,7 @@ print_loop_info(struct loop_info * const info, bool print_encrypt,
 # else /* !VERBOSE */
 	printf(", ...}");
 # endif /* VERBOSE */
+#endif /* !ABBREV */
 }
 
 static void
@@ -99,6 +107,9 @@ print_loop_info64(struct loop_info64 * const info64, bool print_encrypt,
 		  const char *encrypt_type, const char *encrypt_key,
 		  const char *flags)
 {
+#if ABBREV
+	printf("%p", info64);
+#else
 # if VERBOSE
 	printf("{lo_device=makedev(%u, %u), lo_inode=%" PRIu64
 	       ", lo_rdevice=makedev(%u, %u), lo_offset=%#" PRIx64
@@ -151,6 +162,7 @@ print_loop_info64(struct loop_info64 * const info64, bool print_encrypt,
 # else /* !VERBOSE */
 	printf(", ...}");
 # endif /* VERBOSE */
+#endif /* !ABBREV */
 }
 
 int
