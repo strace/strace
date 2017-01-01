@@ -88,6 +88,10 @@ main(void )
 	printf("ioctl(-1, MIXER_READ(13) or OTPSELECT, [MTD_OTP_OFF])"
 	       " = -1 EBADF (%m)\n");
 
+	(void) ioctl(-1, _IOC(_IOC_WRITE, 0xde, 0, 0), (kernel_ulong_t) -1ULL);
+	printf("ioctl(-1, _IOC(_IOC_WRITE, 0xde, 0, 0), %#lx)"
+	       " = -1 EBADF (%m)\n", -1UL);
+
 	(void) ioctl(-1, _IOR(0xde, 0xad, data), &data);
 	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x8), %p)"
 	       " = -1 EBADF (%m)\n", &data);

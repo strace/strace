@@ -39,6 +39,7 @@
 # include <stddef.h>
 # include <string.h>
 # include <sys/ioctl.h>
+# include <linux/ioctl.h>
 # include <linux/dm-ioctl.h>
 
 # ifndef VERBOSE
@@ -160,6 +161,12 @@ print_dm_target_spec(struct dm_target_spec *ptr, uint32_t id)
 int
 main(void)
 {
+	static kernel_ulong_t dummy_dm_ioctl1 =
+		_IOC(_IOC_READ, DM_IOCTL, 0, 0x1fff);
+	static kernel_ulong_t dummy_dm_ioctl2 =
+		_IOC(_IOC_READ|_IOC_WRITE, DM_IOCTL, 0xed, 0);
+	static kernel_ulong_t dummy_dm_arg =
+		(kernel_ulong_t) 0xbadc0dedda7a1057ULL;
 	/* We can't check these properly for now */
 	static struct args dummy_check_cmds_nodev[] = {
 		{ ARG_STR(DM_REMOVE_ALL),    false },
@@ -199,6 +206,16 @@ main(void)
 	printf("ioctl(-1, _IOC(_IOC_WRITE, %#x, 0xde, %#zx), %p) = "
 	       "-1 EBADF (%m)\n",
 	       DM_IOCTL, sizeof(int), dm_arg);
+
+	ioctl(-1, dummy_dm_ioctl1, 0);
+	printf("ioctl(-1, _IOC(_IOC_READ, %#x, 0, %#x), 0) = -1 EBADF (%m)\n",
+	       DM_IOCTL, (unsigned int) _IOC_SIZE(dummy_dm_ioctl1));
+
+	ioctl(-1, dummy_dm_ioctl2, dummy_dm_arg);
+	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, %#x, %#x, 0), %#lx) = "
+	       "-1 EBADF (%m)\n",
+	       DM_IOCTL, (unsigned int) _IOC_NR(dummy_dm_ioctl2),
+	       (unsigned long) dummy_dm_arg);
 
 
 	/* DM_VERSION */

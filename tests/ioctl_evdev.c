@@ -274,6 +274,10 @@ main(void)
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
 	       "_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0xfe, 0xff)", lmagic);
 
+	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x45, 0, 0), lmagic);
+	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
+	       "_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0, 0)", lmagic);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
