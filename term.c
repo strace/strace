@@ -43,9 +43,6 @@ decode_termios(struct tcb *const tcp, const kernel_ulong_t addr)
 	struct termios tios;
 	int i;
 
-	if (!verbose(tcp))
-		return;
-
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &tios))
 		return;
@@ -78,9 +75,6 @@ decode_termio(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct termio tio;
 	int i;
-
-	if (!verbose(tcp))
-		return;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &tio))
@@ -120,9 +114,6 @@ decode_winsize(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct winsize ws;
 
-	if (!verbose(tcp))
-		return;
-
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &ws))
 		return;
@@ -136,9 +127,6 @@ decode_ttysize(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct ttysize ts;
 
-	if (!verbose(tcp))
-		return;
-
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &ts))
 		return;
@@ -151,9 +139,6 @@ static void
 decode_modem_flags(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	int i;
-
-	if (!verbose(tcp))
-		return;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &i))
