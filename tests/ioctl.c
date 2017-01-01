@@ -89,7 +89,7 @@ main(void )
 	       " = -1 EBADF (%m)\n");
 
 	(void) ioctl(-1, _IOR(0xde, 0xad, data), &data);
-	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x08), %p)"
+	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x8), %p)"
 	       " = -1 EBADF (%m)\n", &data);
 
 	puts("+++ exited with 0 +++");

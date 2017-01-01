@@ -262,13 +262,13 @@ main(void)
 	printf("}) = -1 EBADF (%m)\n");
 #  endif
 
-	ioctl(-1, _IOC(_IOC_READ, 0x45, 0x01, 0xff), lmagic);
+	ioctl(-1, _IOC(_IOC_READ, 0x45, 0x1, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_READ, 0x45, 0x01, 0xff)", lmagic);
+	       "_IOC(_IOC_READ, 0x45, 0x1, 0xff)", lmagic);
 
-	ioctl(-1, _IOC(_IOC_WRITE, 0x45, 0x01, 0xff), lmagic);
+	ioctl(-1, _IOC(_IOC_WRITE, 0x45, 0x1, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_WRITE, 0x45, 0x01, 0xff)", lmagic);
+	       "_IOC(_IOC_WRITE, 0x45, 0x1, 0xff)", lmagic);
 
 	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x45, 0xfe, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",

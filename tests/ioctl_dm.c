@@ -196,7 +196,7 @@ main(void)
 
 	/* Incorrect operation */
 	ioctl(-1, _IOW(DM_IOCTL, 0xde, int), dm_arg);
-	printf("ioctl(-1, _IOC(_IOC_WRITE, %#04x, 0xde, %#04zx), %p) = "
+	printf("ioctl(-1, _IOC(_IOC_WRITE, %#x, 0xde, %#zx), %p) = "
 	       "-1 EBADF (%m)\n",
 	       DM_IOCTL, sizeof(int), dm_arg);
 
