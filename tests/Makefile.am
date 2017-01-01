@@ -142,7 +142,6 @@ check_PROGRAMS = \
 	ftruncate64 \
 	futex \
 	futimesat \
-	generate_scno \
 	get_mempolicy \
 	getcpu \
 	getcwd \
@@ -929,11 +928,9 @@ ksysent.h: $(srcdir)/ksysent.sed
 
 ksysent.$(OBJEXT): ksysent.h
 
-scno.h: generate_scno
-	./$< > $@-t && mv $@-t $@
-
 objects = $(filter %.$(OBJEXT),$(SOURCES:.c=.$(OBJEXT)))
-scno_dependants = $(filter-out generate_scno.$(OBJEXT),$(objects))
-$(scno_dependants): scno.h
+$(objects): scno.h
 
-CLEANFILES = ksysent.h scno.h $(TESTS:=.tmp)
+CLEANFILES = ksysent.h $(TESTS:=.tmp)
+
+include ../scno.am

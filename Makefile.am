@@ -746,6 +746,7 @@ EXTRA_DIST =				\
 	mpers.sh			\
 	mpers_test.sh			\
 	mpers_xlat.h			\
+	scno.head			\
 	signalent.sh			\
 	strace-graph			\
 	strace-log-merge		\

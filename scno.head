@@ -1,0 +1,6 @@
+#if defined __X32_SYSCALL_BIT && defined __NR_read \
+ && (__X32_SYSCALL_BIT & __NR_read) == __X32_SYSCALL_BIT
+# define SYSCALL_BIT __X32_SYSCALL_BIT
+#else
+# define SYSCALL_BIT 0
+#endif
