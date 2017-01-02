@@ -837,6 +837,10 @@ CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
 		native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h
 DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h
 
+include scno.am
+
+$(strace_OBJECTS): scno.h
+
 # defines mpers_source_files
 include mpers.am
 srcdir_mpers_source_files = $(patsubst %,$(srcdir)/%,$(mpers_source_files))
