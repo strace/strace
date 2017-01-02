@@ -41,6 +41,7 @@
 #include <sys/uio.h>
 #include <asm/unistd.h>
 
+#include "scno.h"
 #include "regs.h"
 #include "ptrace.h"
 
