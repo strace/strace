@@ -1065,27 +1065,13 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 	}
 }
 
-#ifdef HAVE_PROCESS_VM_READV
-/* C library supports this, but the kernel might not. */
 static bool process_vm_readv_not_supported = 0;
-#else
-
-/* Need to do this since process_vm_readv() is not yet available in libc.
+#ifndef HAVE_PROCESS_VM_READV
+/*
+ * Need to do this since process_vm_readv() is not yet available in libc.
  * When libc is be updated, only "static bool process_vm_readv_not_supported"
  * line should remain.
  */
-#if !defined(__NR_process_vm_readv)
-# if defined(I386)
-#  define __NR_process_vm_readv  347
-# elif defined(X86_64)
-#  define __NR_process_vm_readv  310
-# elif defined(POWERPC)
-#  define __NR_process_vm_readv  351
-# endif
-#endif
-
-#if defined(__NR_process_vm_readv)
-static bool process_vm_readv_not_supported = 0;
 /* Have to avoid duplicating with the C library headers. */
 static ssize_t strace_process_vm_readv(pid_t pid,
 		 const struct iovec *lvec,
@@ -1096,13 +1082,8 @@ static ssize_t strace_process_vm_readv(pid_t pid,
 {
 	return syscall(__NR_process_vm_readv, (long)pid, lvec, liovcnt, rvec, riovcnt, flags);
 }
-#define process_vm_readv strace_process_vm_readv
-#else
-static bool process_vm_readv_not_supported = 1;
-# define process_vm_readv(...) (errno = ENOSYS, -1)
-#endif
-
-#endif /* end of hack */
+# define process_vm_readv strace_process_vm_readv
+#endif /* !HAVE_PROCESS_VM_READV */
 
 static ssize_t
 vm_read_mem(const pid_t pid, void *const laddr,

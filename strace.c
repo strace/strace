@@ -59,15 +59,7 @@ extern char *optarg;
 bool stack_trace_enabled = false;
 #endif
 
-#if defined __NR_tkill
-# define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
-#else
-   /* kill() may choose arbitrarily the target task of the process group
-      while we later wait on a that specific TID.  PID process waits become
-      TID task specific waits for a process under ptrace(2).  */
-# warning "tkill(2) not available, risk of strace hangs!"
-# define my_tkill(tid, sig) kill((tid), (sig))
-#endif
+#define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
 
 /* Glue for systems without a MMU that cannot provide fork() */
 #if !defined(HAVE_FORK)
