@@ -49,6 +49,7 @@
 /native_printer_decls.h
 /native_printer_defs.h
 /printers.h
+/scno.h
 /sen.h
 /stamp-h1
 /strace
@@ -57,6 +58,7 @@
 /strace.dsc
 /strace.spec
 /sys_func.h
+/syscallent.i
 /test-driver
 /tests-m32
 /tests-mx32
