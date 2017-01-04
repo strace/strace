@@ -253,7 +253,7 @@ main(void)
 
 
 	fill_memory_ex(msg, MSG_SIZE, MSG_START, MSG_SIZE);
-	fill_memory_ex((char *) bogus_attrs, sizeof(*bogus_attrs) * NUM_ATTRS,
+	fill_memory_ex(bogus_attrs, sizeof(*bogus_attrs) * NUM_ATTRS,
 		       0xbb, 0x70);
 
 
@@ -446,7 +446,7 @@ main(void)
 	if (fd != 0)
 		error_msg_and_skip("mq_open returned fd other than 0");
 # endif
-	fill_memory_ex((char *) bogus_attrs, sizeof(*bogus_attrs) * NUM_ATTRS,
+	fill_memory_ex(bogus_attrs, sizeof(*bogus_attrs) * NUM_ATTRS,
 		       0xbb, 0x70);
 	printf("mq_open(\"" MQ_NAME "\", O_RDWR|O_CREAT|O_NONBLOCK, "
 	       "0700, {mq_flags=%#llx, mq_maxmsg=2, mq_msgsize=%u, "

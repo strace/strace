@@ -215,7 +215,7 @@ main(void)
 	ioctl(-1, LOOP_SET_STATUS, NULL);
 	printf("ioctl(-1, LOOP_SET_STATUS, NULL) = -1 EBADF (%m)\n");
 
-	fill_memory((void *) info, sizeof(*info));
+	fill_memory(info, sizeof(*info));
 	info->lo_flags = 0xdeface00;
 	info->lo_name[0] = '\0';
 	info->lo_encrypt_key[0] = '\0';
@@ -226,7 +226,7 @@ main(void)
 	ioctl(-1, LOOP_SET_STATUS, info);
 	printf(") = -1 EBADF (%m)\n");
 
-	fill_memory((void *) info, sizeof(*info));
+	fill_memory(info, sizeof(*info));
 	info->lo_encrypt_type = LO_CRYPT_NONE;
 	info->lo_flags = LO_FLAGS_READ_ONLY;
 	memset(info->lo_name, 'A', sizeof(info->lo_name));
@@ -253,7 +253,7 @@ main(void)
 	ioctl(-1, LOOP_SET_STATUS64, NULL);
 	printf("ioctl(-1, LOOP_SET_STATUS64, NULL) = -1 EBADF (%m)\n");
 
-	fill_memory((void *) info64, sizeof(*info64));
+	fill_memory(info64, sizeof(*info64));
 	info64->lo_flags = 0xdec0de00;
 	info64->lo_file_name[0] = '\0';
 	info64->lo_crypt_name[0] = '\0';
@@ -265,7 +265,7 @@ main(void)
 	ioctl(-1, LOOP_SET_STATUS64, info64);
 	printf(") = -1 EBADF (%m)\n");
 
-	fill_memory((void *) info64, sizeof(*info64));
+	fill_memory(info64, sizeof(*info64));
 	info64->lo_flags = LO_FLAGS_READ_ONLY;
 	info64->lo_encrypt_type = LO_CRYPT_NONE;
 	memset(info64->lo_file_name, 'C', sizeof(info64->lo_file_name));

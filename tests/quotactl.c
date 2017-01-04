@@ -249,7 +249,7 @@ main(void)
 
 	/* Q_SETQUOTA */
 
-	fill_memory((char *) dqblk, sizeof(*dqblk));
+	fill_memory(dqblk, sizeof(*dqblk));
 
 	check_quota(CQF_NONE, ARG_STR(QCMD(Q_SETQUOTA, PRJQUOTA)),
 		    bogus_special, bogus_special_str, 0, bogus_addr);
@@ -272,7 +272,7 @@ main(void)
 
 	/* Q_SETINFO */
 
-	fill_memory((char *) dqinfo, sizeof(*dqinfo));
+	fill_memory(dqinfo, sizeof(*dqinfo));
 	/* In order to check flag printing correctness */
 	dqinfo->dqi_flags = 0xdeadabcd;
 

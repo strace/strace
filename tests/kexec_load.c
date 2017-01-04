@@ -85,7 +85,7 @@ main(void)
 	struct segm *segms = tail_alloc(SEGMS_ARRAY_SIZE);
 	unsigned int i;
 
-	fill_memory((char *) segms, SEGMS_ARRAY_SIZE);
+	fill_memory(segms, SEGMS_ARRAY_SIZE);
 	segms[0].buf = segms[0].mem = NULL;
 
 	rc = syscall(__NR_kexec_load, bogus_zero, bogus_zero, bogus_zero,

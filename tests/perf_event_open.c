@@ -712,7 +712,7 @@ main(void)
 	size_t i;
 	int rc;
 
-	fill_memory((char *) small_attr, sizeof(*small_attr));
+	fill_memory(small_attr, sizeof(*small_attr));
 	small_attr->size = attr_small_size;
 
 	for (i = 0; i < ARRAY_SIZE(args); i++) {
@@ -740,8 +740,7 @@ main(void)
 		size_t args_idx = i % ARRAY_SIZE(args);
 		const char *ip_desc_str;
 
-		fill_memory_ex((char *) attr, size,
-			fill_start, 0xff);
+		fill_memory_ex(attr, size, fill_start, 0xff);
 
 		attr->type = attr_types[type_idx].val;
 		attr->size = size;
