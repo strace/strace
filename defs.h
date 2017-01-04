@@ -125,15 +125,6 @@ extern char *stpcpy(char *dst, const char *src);
 #define USE_SEIZE 1
 /* To force NOMMU build, set to 1 */
 #define NOMMU_SYSTEM 0
-/*
- * Set to 1 to use speed-optimized vfprintf implementation.
- * It results in strace using about 5% less CPU in user space
- * (compared to glibc version).
- * But strace spends a lot of time in kernel space,
- * so overall it does not appear to be a significant win.
- * Thus disabled by default.
- */
-#define USE_CUSTOM_PRINTF 0
 
 #ifndef ERESTARTSYS
 # define ERESTARTSYS    512
@@ -403,16 +394,6 @@ void *xcalloc(size_t nmemb, size_t size)
 void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 	ATTRIBUTE_ALLOC_SIZE((2, 3));
 char *xstrdup(const char *str) ATTRIBUTE_MALLOC;
-
-#if USE_CUSTOM_PRINTF
-/*
- * See comment in vsprintf.c for allowed formats.
- * Short version: %h[h]u, %zu, %tu are not allowed, use %[l[l]]u.
- */
-int strace_vfprintf(FILE *fp, const char *fmt, va_list args);
-#else
-# define strace_vfprintf vfprintf
-#endif
 
 extern int read_int_from_file(const char *, int *);
 

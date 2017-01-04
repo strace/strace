@@ -573,7 +573,7 @@ tprintf(const char *fmt, ...)
 
 	va_start(args, fmt);
 	if (current_tcp) {
-		int n = strace_vfprintf(current_tcp->outf, fmt, args);
+		int n = vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
 			if (current_tcp->outf != stderr)
 				perror_msg("%s", outfname);
