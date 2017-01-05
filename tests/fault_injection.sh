@@ -39,6 +39,10 @@ case "$STRACE_ARCH" in
 		# NT_ARM_SYSTEM_CALL regset is supported by linux kernel
 		# starting with commit v3.19-rc1~59^2~16.
 		require_min_kernel_version_or_skip 3.19 ;;
+	hppa)
+		# Syscall number and return value modification did not work
+		# properly before commit v4.5-rc7~31^2~1.
+		require_min_kernel_version_or_skip 4.5 ;;
 	sparc*)
 		# Reloading the syscall number from %g1 register is supported
 		# by linux kernel starting with commit v4.5-rc7~35^2~3.
