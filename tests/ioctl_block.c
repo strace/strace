@@ -43,18 +43,6 @@
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
-#if defined BLKTRACESETUP && defined HAVE_STRUCT_BLK_USER_TRACE_SETUP
-static void
-init_magic(void *addr, const unsigned int size)
-{
-	unsigned int *p = addr;
-	const unsigned int *end = addr + size - sizeof(int);
-
-	for (; p <= end; ++p)
-		*(unsigned int *) p = magic + (p - (unsigned int *) addr);
-}
-#endif
-
 static struct xlat block_argless[] = {
 	XLAT(BLKRRPART),
 	XLAT(BLKFLSBUF),
@@ -190,7 +178,7 @@ main(void)
 
 #if defined BLKTRACESETUP && defined HAVE_STRUCT_BLK_USER_TRACE_SETUP
 	struct blk_user_trace_setup *const buts = tail_alloc(sizeof(*buts));
-	init_magic(buts, sizeof(*buts));
+	fill_memory(buts, sizeof(*buts));
 
 	ioctl(-1, BLKTRACESETUP, buts);
 	printf("ioctl(-1, BLKTRACESETUP, {act_mask=%hu, buf_size=%u, buf_nr=%u"

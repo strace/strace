@@ -41,16 +41,6 @@
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
-static void
-init_magic(void *addr, const unsigned int size)
-{
-	unsigned int *p = addr;
-	const unsigned int *end = addr + size - sizeof(int);
-
-	for (; p <= end; ++p)
-		*(unsigned int *) p = magic;
-}
-
 # if VERBOSE
 static void
 print_envelope(const struct ff_envelope *const e)
@@ -156,7 +146,7 @@ main(void)
 
 	const unsigned int size = get_page_size();
 	void *const page = tail_alloc(size);
-	init_magic(page, size);
+	fill_memory(page, size);
 
 	int *const val_int = tail_alloc(sizeof(*val_int));
 	*val_int = magic;
@@ -183,7 +173,7 @@ main(void)
 
 # ifdef EVIOCSKEYCODE_V2
 	struct input_keymap_entry *const ike = tail_alloc(sizeof(*ike));
-	init_magic(ike, sizeof(*ike));
+	fill_memory(ike, sizeof(*ike));
 	ike->keycode = 2;
 
 	ioctl(-1, EVIOCSKEYCODE_V2, ike);
@@ -207,7 +197,7 @@ main(void)
 # endif
 
 	struct ff_effect *const ffe = tail_alloc(sizeof(*ffe));
-	init_magic(ffe, sizeof(*ffe));
+	fill_memory(ffe, sizeof(*ffe));
 
 	ffe->type = FF_CONSTANT;
 	ioctl(-1, EVIOCSFF, ffe);

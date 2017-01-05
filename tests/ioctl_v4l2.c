@@ -32,18 +32,6 @@
 #include <linux/types.h>
 #include <linux/videodev2.h>
 
-static const unsigned int magic = 0xdeadbeef;
-
-static void
-init_magic(void *addr, const unsigned int size)
-{
-	unsigned int *p = addr;
-	const unsigned int *end = addr + size;
-
-	for (; p < end; ++p)
-		*(unsigned int *) p = magic;
-}
-
 #if WORDS_BIGENDIAN
 # define cc0(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 24))
 # define cc1(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 16))
@@ -66,12 +54,14 @@ init_magic(void *addr, const unsigned int size)
 	 ((unsigned int)(a3) << 24))
 #endif
 
+static const unsigned int magic = 0xdeadbeef;
+
 int
 main(void )
 {
 	const unsigned int size = get_page_size();
 	void *const page = tail_alloc(size);
-	init_magic(page, size);
+	fill_memory(page, size);
 
 	unsigned char cc[sizeof(int)] = { 'A', '\'', '\\', '\xfa' };
 
