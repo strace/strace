@@ -3,4 +3,4 @@
 # Check getrandom syscall decoding.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -a32 -xx -s3
+run_strace_match_diff -a32 -s3
