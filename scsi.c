@@ -42,22 +42,11 @@
 #  include "xlat/bsg_subprotocol.h"
 # endif
 
-static bool
-print_uchar(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
-{
-	tprintf("%02x", (unsigned int) (* (unsigned char *) elem_buf));
-
-	return true;
-}
-
 static void
 print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 		   const unsigned int len)
 {
-	unsigned char buf;
-
-	print_array(tcp, addr, len, &buf, sizeof(buf),
-		    umoven_or_printaddr, print_uchar, 0);
+	printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 }
 
 static int
