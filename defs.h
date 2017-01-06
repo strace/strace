@@ -505,6 +505,7 @@ extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_b
 #define QUOTE_0_TERMINATED                      0x01
 #define QUOTE_OMIT_LEADING_TRAILING_QUOTES      0x02
 #define QUOTE_OMIT_TRAILING_0                   0x08
+#define QUOTE_FORCE_HEX                         0x10
 
 extern int string_quote(const char *, char *, unsigned int, unsigned int);
 extern int print_quoted_string(const char *, unsigned int, unsigned int);

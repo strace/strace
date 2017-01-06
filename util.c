@@ -654,9 +654,9 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 		eol = 0x100; /* this can never match a char */
 
 	usehex = 0;
-	if (xflag > 1)
+	if ((xflag > 1) || (style & QUOTE_FORCE_HEX)) {
 		usehex = 1;
-	else if (xflag) {
+	} else if (xflag) {
 		/* Check for presence of symbol which require
 		   to hex-quote the whole string. */
 		for (i = 0; i < size; ++i) {
