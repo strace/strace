@@ -209,6 +209,13 @@ usage: strace [-CdffhiqrtttTvVwxxy] [-I n] [-e expr]...\n\
 Output format:\n\
   -a column      alignment COLUMN for printing syscall results (default %d)\n\
   -i             print instruction pointer at time of syscall\n\
+"
+#ifdef USE_LIBUNWIND
+"\
+  -k             obtain stack trace between each syscall (experimental)\n\
+"
+#endif
+"\
   -o file        send trace output to FILE instead of stderr\n\
   -q             suppress messages about attaching, detaching, etc.\n\
   -r             print relative timestamp\n\
@@ -257,10 +264,6 @@ Miscellaneous:\n\
   -h             print help message\n\
   -V             print version\n\
 "
-#ifdef USE_LIBUNWIND
-"  -k             obtain stack trace between each syscall (experimental)\n\
-"
-#endif
 /* ancient, no one should use it
 -F -- attempt to follow vforks (deprecated, use -f)\n\
  */
