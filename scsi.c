@@ -99,6 +99,11 @@ print_sg_io_v3_res(struct tcb *const tcp, const kernel_ulong_t arg)
 		return;
 	}
 
+	if (sg_io.interface_id != (unsigned char) 'S') {
+		tprintf(" => interface_id=%u", sg_io.interface_id);
+		return;
+	}
+
 	if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
 		uint32_t din_len = sg_io.dxfer_len;
@@ -179,6 +184,11 @@ print_sg_io_v4_res(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (umove(tcp, arg, &sg_io) < 0) {
 		tprints(", ???");
+		return;
+	}
+
+	if (sg_io.guard != (unsigned char) 'Q') {
+		tprintf(" => guard=%u", sg_io.guard);
 		return;
 	}
 
