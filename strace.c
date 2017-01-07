@@ -1409,7 +1409,8 @@ startup_child(char **argv)
 				}
 				if (!WIFSTOPPED(status) || WSTOPSIG(status) != SIGSTOP) {
 					kill_save_errno(pid, SIGKILL);
-					perror_msg_and_die("Unexpected wait status %x", status);
+					perror_msg_and_die("Unexpected wait status %#x",
+							   status);
 				}
 			}
 			/* Else: NOMMU case, we have no way to sync.
@@ -1522,8 +1523,8 @@ test_ptrace_seize(void)
 		if (WIFSIGNALED(status)) {
 			return;
 		}
-		error_msg_and_die("%s: unexpected wait status %x",
-				__func__, status);
+		error_msg_and_die("%s: unexpected wait status %#x",
+				  __func__, status);
 	}
 }
 #else /* !USE_SEIZE */
