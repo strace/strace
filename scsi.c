@@ -59,6 +59,7 @@ print_sg_io_v3_req(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_DECODED | 1;
 	}
 
+	tprints("dxfer_direction=");
 	printxval(sg_io_dxfer_direction, sg_io.dxfer_direction,
 		  "SG_DXFER_???");
 	tprintf(", cmd[%u]=", sg_io.cmd_len);
