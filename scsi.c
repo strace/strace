@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2007 Vladimir Nadvornik <nadvornik@suse.cz>
- * Copyright (c) 2007 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2007-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,9 +53,13 @@ static int
 print_sg_io_v3_req(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct sg_io_hdr sg_io;
+	static const size_t skip_iid =
+		offsetof(struct sg_io_hdr, dxfer_direction);
 
-	if (umove(tcp, arg, &sg_io) < 0) {
-		tprints("???}");
+	tprints("{interface_id='S', ");
+	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
+				&sg_io.dxfer_direction)) {
+		tprints("}");
 		return RVAL_DECODED | 1;
 	}
 
@@ -128,9 +132,13 @@ static int
 print_sg_io_v4_req(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct sg_io_v4 sg_io;
+	static const size_t skip_iid = offsetof(struct sg_io_v4, protocol);
 
-	if (umove(tcp, arg, &sg_io) < 0) {
-		tprints("???}");
+
+	tprints("{guard='Q', ");
+	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
+				&sg_io.protocol)) {
+		tprints("}");
 		return RVAL_DECODED | 1;
 	}
 
@@ -204,7 +212,7 @@ print_sg_io_v4_res(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_sg_io_v4_req(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprints("...}");
+	tprints("{guard='Q', ...}");
 	return RVAL_DECODED | 1;
 }
 
@@ -219,15 +227,13 @@ static int
 print_sg_io_req(struct tcb *const tcp, const uint32_t iid,
 		const kernel_ulong_t arg)
 {
-	tprintf("{'%c', ", iid);
-
 	switch (iid) {
 	case 'S':
 		return print_sg_io_v3_req(tcp, arg);
 	case 'Q':
 		return print_sg_io_v4_req(tcp, arg);
 	default:
-		tprints("...}");
+		tprintf("[%u]", iid);
 		return RVAL_DECODED | 1;
 	}
 
@@ -261,14 +267,13 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &iid)) {
 			return RVAL_DECODED | 1;
 		} else {
+			set_tcb_priv_ulong(tcp, iid);
 			return print_sg_io_req(tcp, iid, arg);
 		}
 	} else {
 		if (!syserror(tcp)) {
-			if (umove(tcp, arg, &iid) < 0)
-				tprints(", ???");
-			else
-				print_sg_io_res(tcp, iid, arg);
+			iid = get_tcb_priv_ulong(tcp);
+			print_sg_io_res(tcp, iid, arg);
 		}
 		tprints("}");
 		return RVAL_DECODED | 1;
