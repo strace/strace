@@ -133,8 +133,9 @@ print_sg_io_v4_req(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_DECODED | 1;
 	}
 
+	tprints("protocol=");
 	printxval(bsg_protocol, sg_io.protocol, "BSG_PROTOCOL_???");
-	tprints(", ");
+	tprints(", subprotocol=");
 	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
 	tprintf(", request[%u]=", sg_io.request_len);
 	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len);
