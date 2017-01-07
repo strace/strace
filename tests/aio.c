@@ -301,7 +301,7 @@ main(void)
 	       "{key=%u, pwrite, reqprio=%hd, fildes=%d, str=NULL"
 	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64
 # ifdef IOCB_FLAG_RESFD
-	               ", resfd=%d, flags=%x"
+	               ", resfd=%d, flags=%#x"
 # endif
 	               "}, "
 	       "{key=%u, pwrite, reqprio=%hd, fildes=%d, buf=%#" PRI__x64

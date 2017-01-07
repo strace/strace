@@ -87,7 +87,7 @@ print_common_flags(struct tcb *tcp, const struct iocb *cb)
 		printfd(tcp, cb->aio_resfd);
 	}
 	if (cb->aio_flags & ~IOCB_FLAG_RESFD)
-		tprintf(", flags=%x", cb->aio_flags);
+		tprintf(", flags=%#x", cb->aio_flags);
 #endif
 }
 
