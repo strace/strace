@@ -214,6 +214,8 @@ strace_SOURCES =	\
 	seccomp.c	\
 	seccomp_fprog.h \
 	sendfile.c	\
+	sg_io_v3.c	\
+	sg_io_v4.c	\
 	sigaltstack.c	\
 	sigevent.h	\
 	signal.c	\

@@ -29,238 +29,27 @@
 #include "defs.h"
 
 #ifdef HAVE_SCSI_SG_H
-
-# include <linux/ioctl.h>
 # include <scsi/sg.h>
+#endif
 
-# include "xlat/sg_io_dxfer_direction.h"
-
-# ifdef HAVE_LINUX_BSG_H
-#  include <linux/bsg.h>
-#  include <sys/uio.h>
-#  include "xlat/bsg_protocol.h"
-#  include "xlat/bsg_subprotocol.h"
-# endif
-
-static void
-print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
-		   const unsigned int len)
-{
-	printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
-}
-
-static int
-print_sg_io_v3_req(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-	struct sg_io_hdr sg_io;
-	static const size_t skip_iid =
-		offsetof(struct sg_io_hdr, dxfer_direction);
-
-	tprints("{interface_id='S', ");
-	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
-				&sg_io.dxfer_direction)) {
-		tprints("}");
-		return RVAL_DECODED | 1;
-	}
-
-	tprints("dxfer_direction=");
-	printxval(sg_io_dxfer_direction, sg_io.dxfer_direction,
-		  "SG_DXFER_???");
-	tprintf(", cmd[%u]=", sg_io.cmd_len);
-	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.cmdp), sg_io.cmd_len);
-	tprintf(", mx_sb_len=%d", sg_io.mx_sb_len);
-	tprintf(", iovec_count=%d", sg_io.iovec_count);
-	tprintf(", dxfer_len=%u", sg_io.dxfer_len);
-	tprintf(", timeout=%u", sg_io.timeout);
-	tprintf(", flags=%#x", sg_io.flags);
-
-	if (sg_io.dxfer_direction == SG_DXFER_TO_DEV ||
-	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
-		tprintf(", data[%u]=", sg_io.dxfer_len);
-		if (sg_io.iovec_count)
-			tprint_iov_upto(tcp, sg_io.iovec_count,
-					ptr_to_kulong(sg_io.dxferp),
-					IOV_DECODE_STR,
-					sg_io.dxfer_len);
-		else
-			print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
-					   sg_io.dxfer_len);
-	}
-	return 1;
-}
-
-static void
-print_sg_io_v3_res(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-	struct sg_io_hdr sg_io;
-
-	if (umove(tcp, arg, &sg_io) < 0) {
-		tprints(", ???");
-		return;
-	}
-
-	if (sg_io.interface_id != (unsigned char) 'S') {
-		tprintf(" => interface_id=%u", sg_io.interface_id);
-		return;
-	}
-
-	if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV ||
-	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
-		uint32_t din_len = sg_io.dxfer_len;
-
-		if (sg_io.resid > 0)
-			din_len -= sg_io.resid;
-		tprintf(", data[%u]=", din_len);
-		if (sg_io.iovec_count)
-			tprint_iov_upto(tcp, sg_io.iovec_count,
-					ptr_to_kulong(sg_io.dxferp),
-					syserror(tcp) ? IOV_DECODE_ADDR :
-					IOV_DECODE_STR, din_len);
-		else
-			print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
-					   din_len);
-	}
-	tprintf(", status=%02x", sg_io.status);
-	tprintf(", masked_status=%02x", sg_io.masked_status);
-	tprintf(", sb[%u]=", sg_io.sb_len_wr);
-	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.sbp), sg_io.sb_len_wr);
-	tprintf(", host_status=%#x", sg_io.host_status);
-	tprintf(", driver_status=%#x", sg_io.driver_status);
-	tprintf(", resid=%d", sg_io.resid);
-	tprintf(", duration=%d", sg_io.duration);
-	tprintf(", info=%#x", sg_io.info);
-}
-
-#ifdef HAVE_LINUX_BSG_H
-
-static int
-print_sg_io_v4_req(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-	struct sg_io_v4 sg_io;
-	static const size_t skip_iid = offsetof(struct sg_io_v4, protocol);
-
-
-	tprints("{guard='Q', ");
-	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
-				&sg_io.protocol)) {
-		tprints("}");
-		return RVAL_DECODED | 1;
-	}
-
-	tprints("protocol=");
-	printxval(bsg_protocol, sg_io.protocol, "BSG_PROTOCOL_???");
-	tprints(", subprotocol=");
-	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
-	tprintf(", request[%u]=", sg_io.request_len);
-	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len);
-	tprintf(", request_tag=%" PRI__u64, sg_io.request_tag);
-	tprintf(", request_attr=%u", sg_io.request_attr);
-	tprintf(", request_priority=%u", sg_io.request_priority);
-	tprintf(", request_extra=%u", sg_io.request_extra);
-	tprintf(", max_response_len=%u", sg_io.max_response_len);
-
-	tprintf(", dout_iovec_count=%u", sg_io.dout_iovec_count);
-	tprintf(", dout_xfer_len=%u", sg_io.dout_xfer_len);
-	tprintf(", din_iovec_count=%u", sg_io.din_iovec_count);
-	tprintf(", din_xfer_len=%u", sg_io.din_xfer_len);
-	tprintf(", timeout=%u", sg_io.timeout);
-	tprintf(", flags=%u", sg_io.flags);
-	tprintf(", usr_ptr=%" PRI__u64, sg_io.usr_ptr);
-	tprintf(", spare_in=%u", sg_io.spare_in);
-	tprintf(", dout[%u]=", sg_io.dout_xfer_len);
-	if (sg_io.dout_iovec_count)
-		tprint_iov_upto(tcp, sg_io.dout_iovec_count, sg_io.dout_xferp,
-				IOV_DECODE_STR, sg_io.dout_xfer_len);
-	else
-		print_sg_io_buffer(tcp, sg_io.dout_xferp, sg_io.dout_xfer_len);
-	return 1;
-}
-
-static void
-print_sg_io_v4_res(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-	struct sg_io_v4 sg_io;
-	uint32_t din_len;
-
-	if (umove(tcp, arg, &sg_io) < 0) {
-		tprints(", ???");
-		return;
-	}
-
-	if (sg_io.guard != (unsigned char) 'Q') {
-		tprintf(" => guard=%u", sg_io.guard);
-		return;
-	}
-
-	tprintf(", response[%u]=", sg_io.response_len);
-	print_sg_io_buffer(tcp, sg_io.response, sg_io.response_len);
-	din_len = sg_io.din_xfer_len;
-	if (sg_io.din_resid > 0)
-		din_len -= sg_io.din_resid;
-	tprintf(", din[%u]=", din_len);
-	if (sg_io.din_iovec_count)
-		tprint_iov_upto(tcp, sg_io.din_iovec_count, sg_io.din_xferp,
-				syserror(tcp) ? IOV_DECODE_ADDR :
-				IOV_DECODE_STR, din_len);
-	else
-		print_sg_io_buffer(tcp, sg_io.din_xferp, din_len);
-	tprintf(", driver_status=%u", sg_io.driver_status);
-	tprintf(", transport_status=%u", sg_io.transport_status);
-	tprintf(", device_status=%u", sg_io.device_status);
-	tprintf(", retry_delay=%u", sg_io.retry_delay);
-	tprintf(", info=%u", sg_io.info);
-	tprintf(", duration=%u", sg_io.duration);
-	tprintf(", response_len=%u", sg_io.response_len);
-	tprintf(", din_resid=%u", sg_io.din_resid);
-	tprintf(", dout_resid=%u", sg_io.dout_resid);
-	tprintf(", generated_tag=%" PRI__u64, sg_io.generated_tag);
-	tprintf(", spare_out=%u", sg_io.spare_out);
-}
-
-#else /* !HAVE_LINUX_BSG_H */
-
-static int
-print_sg_io_v4_req(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-	tprints("{guard='Q', ...}");
-	return RVAL_DECODED | 1;
-}
-
-static void
-print_sg_io_v4_res(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-}
-
+#ifndef SG_IO
+# define SG_IO 0x2285
 #endif
 
 static int
-print_sg_io_req(struct tcb *const tcp, const uint32_t iid,
-		const kernel_ulong_t arg)
+decode_sg_io(struct tcb *const tcp, const uint32_t iid,
+	     const kernel_ulong_t arg)
 {
 	switch (iid) {
-	case 'S':
-		return print_sg_io_v3_req(tcp, arg);
-	case 'Q':
-		return print_sg_io_v4_req(tcp, arg);
-	default:
-		tprintf("[%u]", iid);
-		return RVAL_DECODED | 1;
+		case 'S':
+			return decode_sg_io_v3(tcp, arg);
+		case 'Q':
+			return decode_sg_io_v4(tcp, arg);
+		default:
+			tprintf("[%u]", iid);
+			return RVAL_DECODED | 1;
 	}
 
-}
-
-static void
-print_sg_io_res(struct tcb *const tcp, const uint32_t iid,
-		const kernel_ulong_t arg)
-{
-	switch (iid) {
-	case 'S':
-		print_sg_io_v3_res(tcp, arg);
-		break;
-	case 'Q':
-		print_sg_io_v4_res(tcp, arg);
-		break;
-	}
 }
 
 int
@@ -278,16 +67,14 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 			return RVAL_DECODED | 1;
 		} else {
 			set_tcb_priv_ulong(tcp, iid);
-			return print_sg_io_req(tcp, iid, arg);
+			return decode_sg_io(tcp, iid, arg);
 		}
 	} else {
 		if (!syserror(tcp)) {
 			iid = get_tcb_priv_ulong(tcp);
-			print_sg_io_res(tcp, iid, arg);
+			decode_sg_io(tcp, iid, arg);
 		}
 		tprints("}");
 		return RVAL_DECODED | 1;
 	}
 }
-
-#endif /* HAVE_SCSI_SG_H */
