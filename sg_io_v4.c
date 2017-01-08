@@ -71,16 +71,17 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", dout_xfer_len=%u", sg_io.dout_xfer_len);
 	tprintf(", din_iovec_count=%u", sg_io.din_iovec_count);
 	tprintf(", din_xfer_len=%u", sg_io.din_xfer_len);
-	tprintf(", timeout=%u", sg_io.timeout);
-	tprints(", flags=");
-	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
-	tprintf(", usr_ptr=%#" PRI__x64, sg_io.usr_ptr);
 	tprints(", dout_xferp=");
 	if (sg_io.dout_iovec_count)
 		tprint_iov_upto(tcp, sg_io.dout_iovec_count, sg_io.dout_xferp,
 				IOV_DECODE_STR, sg_io.dout_xfer_len);
 	else
 		print_sg_io_buffer(tcp, sg_io.dout_xferp, sg_io.dout_xfer_len);
+
+	tprintf(", timeout=%u", sg_io.timeout);
+	tprints(", flags=");
+	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
+	tprintf(", usr_ptr=%#" PRI__x64, sg_io.usr_ptr);
 	return 1;
 }
 
