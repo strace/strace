@@ -43,6 +43,7 @@ typedef struct sg_io_hdr struct_sg_io_hdr;
 
 #ifdef HAVE_SCSI_SG_H
 # include "xlat/sg_io_dxfer_direction.h"
+# include "xlat/sg_io_flags.h"
 
 static void
 print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
@@ -74,7 +75,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", iovec_count=%d", sg_io.iovec_count);
 	tprintf(", dxfer_len=%u", sg_io.dxfer_len);
 	tprintf(", timeout=%u", sg_io.timeout);
-	tprintf(", flags=%#x", sg_io.flags);
+	tprints(", flags=");
+	printflags(sg_io_flags, sg_io.flags, "SG_FLAG_???");
 
 	if (sg_io.dxfer_direction == SG_DXFER_TO_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {

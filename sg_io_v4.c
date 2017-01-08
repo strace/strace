@@ -33,6 +33,7 @@
 # include <linux/bsg.h>
 # include "xlat/bsg_protocol.h"
 # include "xlat/bsg_subprotocol.h"
+# include "xlat/bsg_flags.h"
 
 static void
 print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
@@ -71,7 +72,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", din_iovec_count=%u", sg_io.din_iovec_count);
 	tprintf(", din_xfer_len=%u", sg_io.din_xfer_len);
 	tprintf(", timeout=%u", sg_io.timeout);
-	tprintf(", flags=%u", sg_io.flags);
+	tprints(", flags=");
+	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
 	tprintf(", usr_ptr=%" PRI__u64, sg_io.usr_ptr);
 	tprintf(", spare_in=%u", sg_io.spare_in);
 	tprintf(", dout[%u]=", sg_io.dout_xfer_len);
