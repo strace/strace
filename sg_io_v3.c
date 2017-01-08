@@ -128,6 +128,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 	tprintf(", status=%#x", sg_io.status);
 	tprintf(", masked_status=%#x", sg_io.masked_status);
+	tprintf(", msg_status=%#x", sg_io.msg_status);
 	tprintf(", sb_len_wr=%u, sbp=", sg_io.sb_len_wr);
 	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.sbp), sg_io.sb_len_wr);
 	tprintf(", host_status=%#x", sg_io.host_status);
