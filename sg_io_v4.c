@@ -75,7 +75,6 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", flags=");
 	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
 	tprintf(", usr_ptr=%" PRI__u64, sg_io.usr_ptr);
-	tprintf(", spare_in=%u", sg_io.spare_in);
 	tprintf(", dout[%u]=", sg_io.dout_xfer_len);
 	if (sg_io.dout_iovec_count)
 		tprint_iov_upto(tcp, sg_io.dout_iovec_count, sg_io.dout_xferp,
@@ -124,7 +123,6 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", din_resid=%u", sg_io.din_resid);
 	tprintf(", dout_resid=%u", sg_io.dout_resid);
 	tprintf(", generated_tag=%" PRI__u64, sg_io.generated_tag);
-	tprintf(", spare_out=%u", sg_io.spare_out);
 
 	return RVAL_DECODED | 1;
 }
