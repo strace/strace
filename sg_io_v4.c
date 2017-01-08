@@ -112,9 +112,9 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 				IOV_DECODE_STR, din_len);
 	else
 		print_sg_io_buffer(tcp, sg_io.din_xferp, din_len);
-	tprintf(", driver_status=%u", sg_io.driver_status);
-	tprintf(", transport_status=%u", sg_io.transport_status);
-	tprintf(", device_status=%u", sg_io.device_status);
+	tprintf(", driver_status=%#x", sg_io.driver_status);
+	tprintf(", transport_status=%#x", sg_io.transport_status);
+	tprintf(", device_status=%#x", sg_io.device_status);
 	tprintf(", retry_delay=%u", sg_io.retry_delay);
 	tprints(", info=");
 	printflags(sg_io_info, sg_io.info, "SG_INFO_???");
