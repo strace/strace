@@ -92,20 +92,35 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 			print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
 					   sg_io.dxfer_len);
 	}
+
+	struct_sg_io_hdr *entering_sg_io = malloc(sizeof(*entering_sg_io));
+	if (entering_sg_io) {
+		memcpy(entering_sg_io, &sg_io, sizeof(sg_io));
+		entering_sg_io->interface_id = (unsigned char) 'S';
+		set_tcb_priv_data(tcp, entering_sg_io, free);
+	}
+
 	return 1;
 }
 
 static int
 decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 {
+	struct_sg_io_hdr *entering_sg_io = get_tcb_priv_data(tcp);
 	struct_sg_io_hdr sg_io;
 
 	if (umove(tcp, arg, &sg_io) < 0) {
-		tprints(", ???");
+		/* print i/o fields fetched on entering syscall */
+		if (entering_sg_io->dxfer_direction == SG_DXFER_FROM_DEV) {
+			tprints(", dxferp=");
+			printaddr(ptr_to_kulong(entering_sg_io->dxferp));
+		}
+		tprints(", sbp=");
+		printaddr(ptr_to_kulong(entering_sg_io->sbp));
 		return RVAL_DECODED | 1;
 	}
 
-	if (sg_io.interface_id != (unsigned char) 'S') {
+	if (sg_io.interface_id != entering_sg_io->interface_id) {
 		tprintf(" => interface_id=%u", sg_io.interface_id);
 		return RVAL_DECODED | 1;
 	}
@@ -114,17 +129,22 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
 		uint32_t din_len = sg_io.dxfer_len;
 
-		if (sg_io.resid > 0)
+		if (sg_io.resid > 0 && (unsigned int) sg_io.resid <= din_len)
 			din_len -= sg_io.resid;
-		tprints(", dxferp=");
-		if (sg_io.iovec_count)
-			tprint_iov_upto(tcp, sg_io.iovec_count,
-					ptr_to_kulong(sg_io.dxferp),
-					syserror(tcp) ? IOV_DECODE_ADDR :
-					IOV_DECODE_STR, din_len);
-		else
-			print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
-					   din_len);
+		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV) {
+			tprints(", dxferp=");
+		} else if (din_len) {
+			tprints(" => dxferp=");
+		}
+		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV || din_len) {
+			if (sg_io.iovec_count)
+				tprint_iov_upto(tcp, sg_io.iovec_count,
+						ptr_to_kulong(sg_io.dxferp),
+						IOV_DECODE_STR, din_len);
+			else
+				print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
+						   din_len);
+		}
 	}
 	tprintf(", status=%#x", sg_io.status);
 	tprintf(", masked_status=%#x", sg_io.masked_status);

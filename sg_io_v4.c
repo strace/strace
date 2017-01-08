@@ -82,21 +82,34 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", flags=");
 	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
 	tprintf(", usr_ptr=%#" PRI__x64, sg_io.usr_ptr);
+
+	struct sg_io_v4 *entering_sg_io = malloc(sizeof(*entering_sg_io));
+	if (entering_sg_io) {
+		memcpy(entering_sg_io, &sg_io, sizeof(sg_io));
+		entering_sg_io->guard = (unsigned char) 'Q';
+		set_tcb_priv_data(tcp, entering_sg_io, free);
+	}
+
 	return 1;
 }
 
 static int
 decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 {
+	struct sg_io_v4 *entering_sg_io = get_tcb_priv_data(tcp);
 	struct sg_io_v4 sg_io;
 	uint32_t din_len;
 
 	if (umove(tcp, arg, &sg_io) < 0) {
-		tprints(", ???");
+		/* print i/o fields fetched on entering syscall */
+		tprints(", response=");
+		printaddr(entering_sg_io->response);
+		tprints(", din_xferp=");
+		printaddr(entering_sg_io->din_xferp);
 		return RVAL_DECODED | 1;
 	}
 
-	if (sg_io.guard != (unsigned char) 'Q') {
+	if (sg_io.guard != entering_sg_io->guard) {
 		tprintf(" => guard=%u", sg_io.guard);
 		return RVAL_DECODED | 1;
 	}
@@ -104,12 +117,11 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", response_len=%u, response=", sg_io.response_len);
 	print_sg_io_buffer(tcp, sg_io.response, sg_io.response_len);
 	din_len = sg_io.din_xfer_len;
-	if (sg_io.din_resid > 0)
+	if (sg_io.din_resid > 0 && (unsigned int) sg_io.din_resid <= din_len)
 		din_len -= sg_io.din_resid;
 	tprints(", din_xferp=");
 	if (sg_io.din_iovec_count)
 		tprint_iov_upto(tcp, sg_io.din_iovec_count, sg_io.din_xferp,
-				syserror(tcp) ? IOV_DECODE_ADDR :
 				IOV_DECODE_STR, din_len);
 	else
 		print_sg_io_buffer(tcp, sg_io.din_xferp, din_len);
