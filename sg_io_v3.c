@@ -71,7 +71,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints("dxfer_direction=");
 	printxval(sg_io_dxfer_direction, sg_io.dxfer_direction,
 		  "SG_DXFER_???");
-	tprintf(", cmd[%u]=", sg_io.cmd_len);
+	tprintf(", cmd_len=%u, cmdp=", sg_io.cmd_len);
 	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.cmdp), sg_io.cmd_len);
 	tprintf(", mx_sb_len=%d", sg_io.mx_sb_len);
 	tprintf(", iovec_count=%d", sg_io.iovec_count);
@@ -82,7 +82,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (sg_io.dxfer_direction == SG_DXFER_TO_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
-		tprintf(", data[%u]=", sg_io.dxfer_len);
+		tprints(", dxferp=");
 		if (sg_io.iovec_count)
 			tprint_iov_upto(tcp, sg_io.iovec_count,
 					ptr_to_kulong(sg_io.dxferp),
@@ -116,7 +116,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 		if (sg_io.resid > 0)
 			din_len -= sg_io.resid;
-		tprintf(", data[%u]=", din_len);
+		tprints(", dxferp=");
 		if (sg_io.iovec_count)
 			tprint_iov_upto(tcp, sg_io.iovec_count,
 					ptr_to_kulong(sg_io.dxferp),
@@ -128,7 +128,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 	tprintf(", status=%#x", sg_io.status);
 	tprintf(", masked_status=%#x", sg_io.masked_status);
-	tprintf(", sb[%u]=", sg_io.sb_len_wr);
+	tprintf(", sb_len_wr=%u, sbp=", sg_io.sb_len_wr);
 	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.sbp), sg_io.sb_len_wr);
 	tprintf(", host_status=%#x", sg_io.host_status);
 	tprintf(", driver_status=%#x", sg_io.driver_status);

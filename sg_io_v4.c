@@ -59,7 +59,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	printxval(bsg_protocol, sg_io.protocol, "BSG_PROTOCOL_???");
 	tprints(", subprotocol=");
 	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
-	tprintf(", request[%u]=", sg_io.request_len);
+	tprintf(", request_len=%u, request=", sg_io.request_len);
 	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len);
 	tprintf(", request_tag=%#" PRI__x64, sg_io.request_tag);
 	tprintf(", request_attr=%u", sg_io.request_attr);
@@ -75,7 +75,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", flags=");
 	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
 	tprintf(", usr_ptr=%#" PRI__x64, sg_io.usr_ptr);
-	tprintf(", dout[%u]=", sg_io.dout_xfer_len);
+	tprints(", dout_xferp=");
 	if (sg_io.dout_iovec_count)
 		tprint_iov_upto(tcp, sg_io.dout_iovec_count, sg_io.dout_xferp,
 				IOV_DECODE_STR, sg_io.dout_xfer_len);
@@ -100,12 +100,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_DECODED | 1;
 	}
 
-	tprintf(", response[%u]=", sg_io.response_len);
+	tprintf(", response_len=%u, response=", sg_io.response_len);
 	print_sg_io_buffer(tcp, sg_io.response, sg_io.response_len);
 	din_len = sg_io.din_xfer_len;
 	if (sg_io.din_resid > 0)
 		din_len -= sg_io.din_resid;
-	tprintf(", din[%u]=", din_len);
+	tprints(", din_xferp=");
 	if (sg_io.din_iovec_count)
 		tprint_iov_upto(tcp, sg_io.din_iovec_count, sg_io.din_xferp,
 				syserror(tcp) ? IOV_DECODE_ADDR :
