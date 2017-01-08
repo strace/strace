@@ -132,8 +132,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	printflags(sg_io_info, sg_io.info, "SG_INFO_???");
 	tprintf(", duration=%u", sg_io.duration);
 	tprintf(", response_len=%u", sg_io.response_len);
-	tprintf(", din_resid=%u", sg_io.din_resid);
-	tprintf(", dout_resid=%u", sg_io.dout_resid);
+	tprintf(", din_resid=%d", sg_io.din_resid);
+	tprintf(", dout_resid=%d", sg_io.dout_resid);
 	tprintf(", generated_tag=%#" PRI__x64, sg_io.generated_tag);
 
 	return RVAL_DECODED | 1;
