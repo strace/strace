@@ -74,7 +74,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", timeout=%u", sg_io.timeout);
 	tprints(", flags=");
 	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
-	tprintf(", usr_ptr=%" PRI__u64, sg_io.usr_ptr);
+	tprintf(", usr_ptr=%#" PRI__x64, sg_io.usr_ptr);
 	tprintf(", dout[%u]=", sg_io.dout_xfer_len);
 	if (sg_io.dout_iovec_count)
 		tprint_iov_upto(tcp, sg_io.dout_iovec_count, sg_io.dout_xferp,
