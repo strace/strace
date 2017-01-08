@@ -134,7 +134,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", host_status=%#x", sg_io.host_status);
 	tprintf(", driver_status=%#x", sg_io.driver_status);
 	tprintf(", resid=%d", sg_io.resid);
-	tprintf(", duration=%d", sg_io.duration);
+	tprintf(", duration=%u", sg_io.duration);
 	tprints(", info=");
 	printflags(sg_io_info, sg_io.info, "SG_INFO_???");
 
