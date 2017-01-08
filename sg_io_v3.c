@@ -41,6 +41,8 @@ typedef struct sg_io_hdr struct_sg_io_hdr;
 
 #include MPERS_DEFS
 
+#include "xlat/sg_io_info.h"
+
 #ifdef HAVE_SCSI_SG_H
 # include "xlat/sg_io_dxfer_direction.h"
 # include "xlat/sg_io_flags.h"
@@ -132,7 +134,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", driver_status=%#x", sg_io.driver_status);
 	tprintf(", resid=%d", sg_io.resid);
 	tprintf(", duration=%d", sg_io.duration);
-	tprintf(", info=%#x", sg_io.info);
+	tprints(", info=");
+	printflags(sg_io_info, sg_io.info, "SG_INFO_???");
 
 	return RVAL_DECODED | 1;
 }

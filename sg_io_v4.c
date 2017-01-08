@@ -117,7 +117,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", transport_status=%u", sg_io.transport_status);
 	tprintf(", device_status=%u", sg_io.device_status);
 	tprintf(", retry_delay=%u", sg_io.retry_delay);
-	tprintf(", info=%u", sg_io.info);
+	tprints(", info=");
+	printflags(sg_io_info, sg_io.info, "SG_INFO_???");
 	tprintf(", duration=%u", sg_io.duration);
 	tprintf(", response_len=%u", sg_io.response_len);
 	tprintf(", din_resid=%u", sg_io.din_resid);
