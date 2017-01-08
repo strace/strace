@@ -61,7 +61,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
 	tprintf(", request[%u]=", sg_io.request_len);
 	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len);
-	tprintf(", request_tag=%" PRI__u64, sg_io.request_tag);
+	tprintf(", request_tag=%#" PRI__x64, sg_io.request_tag);
 	tprintf(", request_attr=%u", sg_io.request_attr);
 	tprintf(", request_priority=%u", sg_io.request_priority);
 	tprintf(", request_extra=%u", sg_io.request_extra);
@@ -122,7 +122,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", response_len=%u", sg_io.response_len);
 	tprintf(", din_resid=%u", sg_io.din_resid);
 	tprintf(", dout_resid=%u", sg_io.dout_resid);
-	tprintf(", generated_tag=%" PRI__u64, sg_io.generated_tag);
+	tprintf(", generated_tag=%#" PRI__x64, sg_io.generated_tag);
 
 	return RVAL_DECODED | 1;
 }
