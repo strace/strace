@@ -49,9 +49,14 @@ typedef struct sg_io_hdr struct_sg_io_hdr;
 
 static void
 print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
-		   const unsigned int len)
+		   const unsigned int data_size, const unsigned int iovec_count)
 {
-	printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+	if (iovec_count) {
+		tprint_iov_upto(tcp, iovec_count, addr, IOV_DECODE_STR,
+				data_size);
+	} else {
+		printstr_ex(tcp, addr, data_size, QUOTE_FORCE_HEX);
+	}
 }
 
 static int
@@ -72,7 +77,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	printxval(sg_io_dxfer_direction, sg_io.dxfer_direction,
 		  "SG_DXFER_???");
 	tprintf(", cmd_len=%u, cmdp=", sg_io.cmd_len);
-	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.cmdp), sg_io.cmd_len);
+	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.cmdp), sg_io.cmd_len, 0);
 	tprintf(", mx_sb_len=%d", sg_io.mx_sb_len);
 	tprintf(", iovec_count=%d", sg_io.iovec_count);
 	tprintf(", dxfer_len=%u", sg_io.dxfer_len);
@@ -83,14 +88,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (sg_io.dxfer_direction == SG_DXFER_TO_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
 		tprints(", dxferp=");
-		if (sg_io.iovec_count)
-			tprint_iov_upto(tcp, sg_io.iovec_count,
-					ptr_to_kulong(sg_io.dxferp),
-					IOV_DECODE_STR,
-					sg_io.dxfer_len);
-		else
-			print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
-					   sg_io.dxfer_len);
+		print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
+				   sg_io.dxfer_len, sg_io.iovec_count);
 	}
 
 	struct_sg_io_hdr *entering_sg_io = malloc(sizeof(*entering_sg_io));
@@ -137,20 +136,15 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 			tprints(" => dxferp=");
 		}
 		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV || din_len) {
-			if (sg_io.iovec_count)
-				tprint_iov_upto(tcp, sg_io.iovec_count,
-						ptr_to_kulong(sg_io.dxferp),
-						IOV_DECODE_STR, din_len);
-			else
-				print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
-						   din_len);
+			print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
+					   din_len, sg_io.iovec_count);
 		}
 	}
 	tprintf(", status=%#x", sg_io.status);
 	tprintf(", masked_status=%#x", sg_io.masked_status);
 	tprintf(", msg_status=%#x", sg_io.msg_status);
 	tprintf(", sb_len_wr=%u, sbp=", sg_io.sb_len_wr);
-	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.sbp), sg_io.sb_len_wr);
+	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.sbp), sg_io.sb_len_wr, 0);
 	tprintf(", host_status=%#x", sg_io.host_status);
 	tprintf(", driver_status=%#x", sg_io.driver_status);
 	tprintf(", resid=%d", sg_io.resid);

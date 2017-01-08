@@ -37,9 +37,14 @@
 
 static void
 print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
-		   const unsigned int len)
+		   const unsigned int data_size, const unsigned int iovec_count)
 {
-	printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+	if (iovec_count) {
+		tprint_iov_upto(tcp, iovec_count, addr, IOV_DECODE_STR,
+				data_size);
+	} else {
+		printstr_ex(tcp, addr, data_size, QUOTE_FORCE_HEX);
+	}
 }
 
 static int
@@ -60,7 +65,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", subprotocol=");
 	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
 	tprintf(", request_len=%u, request=", sg_io.request_len);
-	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len);
+	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len, 0);
 	tprintf(", request_tag=%#" PRI__x64, sg_io.request_tag);
 	tprintf(", request_attr=%u", sg_io.request_attr);
 	tprintf(", request_priority=%u", sg_io.request_priority);
@@ -72,11 +77,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprintf(", din_iovec_count=%u", sg_io.din_iovec_count);
 	tprintf(", din_xfer_len=%u", sg_io.din_xfer_len);
 	tprints(", dout_xferp=");
-	if (sg_io.dout_iovec_count)
-		tprint_iov_upto(tcp, sg_io.dout_iovec_count, sg_io.dout_xferp,
-				IOV_DECODE_STR, sg_io.dout_xfer_len);
-	else
-		print_sg_io_buffer(tcp, sg_io.dout_xferp, sg_io.dout_xfer_len);
+	print_sg_io_buffer(tcp, sg_io.dout_xferp, sg_io.dout_xfer_len,
+			   sg_io.dout_iovec_count);
 
 	tprintf(", timeout=%u", sg_io.timeout);
 	tprints(", flags=");
@@ -115,16 +117,13 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	tprintf(", response_len=%u, response=", sg_io.response_len);
-	print_sg_io_buffer(tcp, sg_io.response, sg_io.response_len);
+	print_sg_io_buffer(tcp, sg_io.response, sg_io.response_len, 0);
 	din_len = sg_io.din_xfer_len;
 	if (sg_io.din_resid > 0 && (unsigned int) sg_io.din_resid <= din_len)
 		din_len -= sg_io.din_resid;
 	tprints(", din_xferp=");
-	if (sg_io.din_iovec_count)
-		tprint_iov_upto(tcp, sg_io.din_iovec_count, sg_io.din_xferp,
-				IOV_DECODE_STR, din_len);
-	else
-		print_sg_io_buffer(tcp, sg_io.din_xferp, din_len);
+	print_sg_io_buffer(tcp, sg_io.din_xferp, din_len,
+			   sg_io.din_iovec_count);
 	tprintf(", driver_status=%#x", sg_io.driver_status);
 	tprintf(", transport_status=%#x", sg_io.transport_status);
 	tprintf(", device_status=%#x", sg_io.device_status);
