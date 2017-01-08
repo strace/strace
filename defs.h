@@ -638,7 +638,6 @@ DECL_IOCTL(ubi);
 DECL_IOCTL(uffdio);
 #undef DECL_IOCTL
 
-extern int decode_sg_io_v3(struct tcb *, const kernel_ulong_t arg);
 extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);
 
 extern int tv_nz(const struct timeval *);

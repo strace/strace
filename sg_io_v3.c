@@ -31,7 +31,17 @@
 
 #ifdef HAVE_SCSI_SG_H
 
+#include DEF_MPERS_TYPE(struct_sg_io_hdr)
+
 # include <scsi/sg.h>
+
+typedef struct sg_io_hdr struct_sg_io_hdr;
+
+#endif /* HAVE_SCSI_SG_H */
+
+#include MPERS_DEFS
+
+#ifdef HAVE_SCSI_SG_H
 # include "xlat/sg_io_dxfer_direction.h"
 
 static void
@@ -44,9 +54,9 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 static int
 decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct sg_io_hdr sg_io;
+	struct_sg_io_hdr sg_io;
 	static const size_t skip_iid =
-		offsetof(struct sg_io_hdr, dxfer_direction);
+		offsetof(struct_sg_io_hdr, dxfer_direction);
 
 	tprints("{interface_id='S', ");
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
@@ -84,7 +94,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct sg_io_hdr sg_io;
+	struct_sg_io_hdr sg_io;
 
 	if (umove(tcp, arg, &sg_io) < 0) {
 		tprints(", ???");
@@ -142,8 +152,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 #endif
 
-int
-decode_sg_io_v3(struct tcb *const tcp, const kernel_ulong_t arg)
+MPERS_PRINTER_DECL(int, decode_sg_io_v3,
+		   struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	return entering(tcp) ? decode_request(tcp, arg)
 			     : decode_response(tcp, arg);
