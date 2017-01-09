@@ -54,23 +54,27 @@ int
 scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
 {
-	if (SG_IO != code)
-		return RVAL_DECODED;
+	switch (code) {
+	case SG_IO:
+		if (entering(tcp)) {
+			uint32_t iid;
 
-	if (entering(tcp)) {
-		uint32_t iid;
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &iid)) {
-			return RVAL_DECODED | 1;
+			tprints(", ");
+			if (umove_or_printaddr(tcp, arg, &iid)) {
+				break;
+			} else {
+				return decode_sg_io(tcp, iid, arg);
+			}
 		} else {
-			return decode_sg_io(tcp, iid, arg);
+			uint32_t *piid = get_tcb_priv_data(tcp);
+			if (piid)
+				decode_sg_io(tcp, *piid, arg);
+			tprints("}");
+			break;
 		}
-	} else {
-		uint32_t *piid = get_tcb_priv_data(tcp);
-		if (piid)
-			decode_sg_io(tcp, *piid, arg);
-		tprints("}");
-		return RVAL_DECODED | 1;
+	default:
+		return RVAL_DECODED;
 	}
+
+	return RVAL_DECODED | 1;
 }
