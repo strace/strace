@@ -185,6 +185,7 @@ strace_SOURCES =	\
 	print_dev_t.c	\
 	print_mq_attr.c	\
 	print_msgbuf.c	\
+	print_sg_req_info.c \
 	print_sigevent.c \
 	print_statfs.c	\
 	print_struct_stat.c \
