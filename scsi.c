@@ -32,9 +32,7 @@
 # include <scsi/sg.h>
 #endif
 
-#ifndef SG_IO
-# define SG_IO 0x2285
-#endif
+#include "xlat/scsi_sg_commands.h"
 
 static int
 decode_sg_io(struct tcb *const tcp, const uint32_t iid,
