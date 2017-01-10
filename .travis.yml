@@ -4,7 +4,7 @@ dist: trusty
 
 before_install: ci/install-dependencies.sh
 
-script: ci/run-build-and-tests.sh
+script: travis_wait 60 ci/run-build-and-tests.sh
 
 sudo: required
 
@@ -22,54 +22,8 @@ matrix:
       env:
         - TARGET=x86_64
         - STACKTRACE=libunwind
-        - CHECK=coverage
-        - KHEADERS=torvalds/linux
-    - compiler: gcc-8
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libunwind
-        - KHEADERS=torvalds/linux
-    - compiler: gcc
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libunwind
-    - compiler: gcc
-      env:
-        - TARGET=x32
-        - STACKTRACE=no
-    - compiler: gcc
-      env:
-        - TARGET=x86
-        - STACKTRACE=no
-    - compiler: clang
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libunwind
-    - compiler: musl-gcc
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=no
-    - compiler: clang
-      env:
-        - TARGET=x86
-        - STACKTRACE=no
-    - compiler: musl-gcc
-      env:
-        - TARGET=x86
-        - STACKTRACE=no
-    - compiler: gcc-8
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libunwind
-    - compiler: gcc-8
-      env:
-        - TARGET=x32
-        - STACKTRACE=no
-    - compiler: gcc-8
-      env:
-        - TARGET=x86
-        - STACKTRACE=no
-    - compiler: gcc
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=no
+        - CHECK=valgrind
+        - TIMEOUT_DURATION=1200
+        - VALGRIND_TOOLS=memcheck
+        - VALGRIND_TESTDIR=tests
+        - VALGRIND_TESTS=looping_threads.test

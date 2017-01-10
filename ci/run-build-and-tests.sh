@@ -97,11 +97,12 @@ case "${CHECK-}" in
 		rc=$?
 		for n in ${VALGRIND_TOOLS:-memcheck helgrind drd}; do
 			make -k $j -C "${VALGRIND_TESTDIR:-.}" \
-				check-valgrind-$n VERBOSE=${VERBOSE-} ||
+				check-valgrind-$n V=1 VERBOSE=${VERBOSE-} \
+					${VALGRIND_TESTS:+TESTS="$VALGRIND_TESTS"} ||
 					rc=$?
 		done
 		echo 'BEGIN OF TEST SUITE INFORMATION'
-		tail -n 99999 -- tests*/test-suite*.log tests*/ksysent.log ||
+		tail -n 99999 -- tests*/test-suite*.log ||
 			rc=$?
 		echo 'END OF TEST SUITE INFORMATION'
 		[ "$rc" -eq 0 ]
