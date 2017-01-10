@@ -124,6 +124,7 @@ ioctl_loop-v
 ioctl_mtd
 ioctl_rtc
 ioctl_rtc-v
+ioctl_scsi
 ioctl_sg_io_v3
 ioctl_sg_io_v4
 ioctl_sock_gifconf

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Check decoding of SCSI ioctl commands.
+. "${srcdir=.}/ioctl.test"
