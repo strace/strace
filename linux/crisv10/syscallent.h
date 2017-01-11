@@ -348,11 +348,11 @@
 [352] = { 3,	0,		SEN(sched_setattr),		"sched_setattr"		},
 [353] = { 4,	0,		SEN(sched_getattr),		"sched_getattr"		},
 [354] = { 5,	TD|TF,		SEN(renameat2),			"renameat2"		},
-[355] = { 3,	0,		SEN(seccomp),			"seccomp",		},
-[356] = { 3,	0,		SEN(getrandom),			"getrandom",		},
-[357] = { 2,	TD,		SEN(memfd_create),		"memfd_create",		},
-[358] = { 3,	TD,		SEN(bpf),			"bpf",			},
-[359] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat",		},
+[355] = { 3,	0,		SEN(seccomp),			"seccomp"		},
+[356] = { 3,	0,		SEN(getrandom),			"getrandom"		},
+[357] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
+[358] = { 3,	TD,		SEN(bpf),			"bpf"			},
+[359] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat"		},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

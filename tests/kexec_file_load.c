@@ -68,7 +68,7 @@ main(void)
 	static const struct strval flags[] = {
 		{ (kernel_ulong_t) 0xbadc0dedda7a1058ULL,
 			"0xbadc0ded", "0x",
-			"da7a1058 /* KEXEC_FILE_??? */", },
+			"da7a1058 /* KEXEC_FILE_??? */" },
 		{ 0, "", "", "0" },
 		{ 0xdeadbeef, "", "", "KEXEC_FILE_UNLOAD|KEXEC_FILE_ON_CRASH|"
 			"KEXEC_FILE_NO_INITRAMFS|0xdeadbee8" },
