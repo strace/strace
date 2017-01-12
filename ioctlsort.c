@@ -33,7 +33,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <linux/ioctl.h>
+
+#include "ioctl_iocdef.h"
 
 struct ioctlent {
 	const char *info;

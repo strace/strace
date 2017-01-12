@@ -303,6 +303,7 @@ EXTRA_DIST =				\
 	debian/watch			\
 	errnoent.sh			\
 	generate_sen.sh			\
+	ioctl_iocdef.c			\
 	ioctlsort.c			\
 	linux/32/ioctls_inc.h		\
 	linux/32/ioctls_inc_align16.h	\
@@ -824,10 +825,19 @@ ioctl_redefs%.h: ioctlent%.h ioctlent0.h
 ioctlent%.h: ioctlsort%
 	./$< > $@
 
+# Need to pick up <linux/ioctl.h> definitions *for host* while compiling
+# ioctlsort *for build*, hence this magic.
+ioctl_iocdef.i: $(srcdir)/ioctl_iocdef.c
+	$(CPP) -P $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+		$(strace_CPPFLAGS) $(CPPFLAGS) $< -o $@
+
+ioctl_iocdef.h: ioctl_iocdef.i
+	sed -n 's/^DEFINE HOST/#define /p' $< > $@
+
 ioctlsort%$(BUILD_EXEEXT): ioctlsort%.o
 	$(ioctlsort_CC) $(ioctlsort_CFLAGS) $(ioctlsort_LDFLAGS) $< -o $@
 
-ioctlsort%.o: ioctls_all%.h $(srcdir)/ioctlsort.c
+ioctlsort%.o: ioctls_all%.h ioctl_iocdef.h $(srcdir)/ioctlsort.c
 	$(ioctlsort_CC) $(ioctlsort_DEFS) $(ioctlsort_INCLUDES) $(ioctlsort_CPPFLAGS) $(ioctlsort_CFLAGS) -DIOCTLSORT_INC=\"$<\" -c -o $@ $(srcdir)/ioctlsort.c
 
 ioctls_all%.h: $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%.h $(srcdir)/$(OS)/$(ARCH)/ioctls_arch%.h
@@ -836,6 +846,7 @@ ioctls_all%.h: $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%.h $(srcdir)/$(OS)/$(ARCH)/ioc
 BUILT_SOURCES = $(ioctl_redefs_h) $(ioctlent_h) \
 		native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h .version
 CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
+		ioctl_iocdef.h ioctl_iocdef.i \
 		native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h
 DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h
 
