@@ -141,7 +141,7 @@ typedef off_t libc_off_t;
 # endif
 
 # ifndef IS_FSTAT
-#  define IS_STAT 0
+#  define IS_FSTAT 0
 # endif
 
 # ifndef OLD_STAT
