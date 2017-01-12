@@ -300,48 +300,27 @@ main(void)
 				" definition of %s.\n"
 				"Here is some diagnostics that might help:\n",
 			STRUCT_STAT_STR);
-		fprintf(stderr, "offsetof(%s, st_dev) = %zu"
-				", sizeof(st_dev) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_dev),
-			sizeof(st[0].st_dev));
-		fprintf(stderr, "offsetof(%s, st_ino) = %zu"
-				", sizeof(st_ino) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_ino),
-			sizeof(st[0].st_ino));
-		fprintf(stderr, "offsetof(%s, st_mode) = %zu"
-				", sizeof(st_mode) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_mode),
-			sizeof(st[0].st_mode));
-		fprintf(stderr, "offsetof(%s, st_nlink) = %zu"
-				", sizeof(st_nlink) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_nlink),
-			sizeof(st[0].st_nlink));
-		fprintf(stderr, "offsetof(%s, st_uid) = %zu"
-				", sizeof(st_uid) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_uid),
-			sizeof(st[0].st_uid));
-		fprintf(stderr, "offsetof(%s, st_gid) = %zu"
-				", sizeof(st_gid) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_gid),
-			sizeof(st[0].st_gid));
-		fprintf(stderr, "offsetof(%s, st_rdev) = %zu"
-				", sizeof(st_rdev) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_rdev),
-			sizeof(st[0].st_rdev));
-		fprintf(stderr, "offsetof(%s, st_size) = %zu"
-				", sizeof(st_size) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_size),
-			sizeof(st[0].st_size));
+
+#define LOG_STAT_OFFSETOF_SIZEOF(object, member)			\
+		fprintf(stderr, "offsetof(%s, %s) = %zu"		\
+				", sizeof(%s) = %zu\n",			\
+				STRUCT_STAT_STR, #member,		\
+				offsetof(STRUCT_STAT, member),		\
+				#member, sizeof((object).member))
+
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_dev);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_ino);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_mode);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_nlink);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_uid);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_gid);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_rdev);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_size);
 # if !OLD_STAT
-		fprintf(stderr, "offsetof(%s, st_blksize) = %zu"
-				", sizeof(st_blksize) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_blksize),
-			sizeof(st[0].st_blksize));
-		fprintf(stderr, "offsetof(%s, st_blocks) = %zu"
-				", sizeof(st_blocks) = %zu\n",
-			STRUCT_STAT_STR, offsetof(STRUCT_STAT, st_blocks),
-			sizeof(st[0].st_blocks));
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_blksize);
+		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_blocks);
 # endif /* !OLD_STAT */
+
 		return 77;
 	}
 
