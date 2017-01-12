@@ -24,6 +24,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_DEFINED("__NR_mlock && __NR_munlock")
+SKIP_MAIN_UNDEFINED("__NR_mlock && __NR_munlock")
 
 #endif
