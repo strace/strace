@@ -28,7 +28,7 @@
 #ifdef HAVE_FSTATAT
 
 # define TEST_SYSCALL_INVOKE(sample, pst) \
-	fstatat(AT_FDCWD, sample, pst, AT_SYMLINK_NOFOLLOW)
+	syscall(TEST_SYSCALL_NR, AT_FDCWD, sample, pst, AT_SYMLINK_NOFOLLOW)
 # define PRINT_SYSCALL_HEADER(sample) \
 	do { \
 		int saved_errno = errno; \
@@ -37,6 +37,8 @@
 		errno = saved_errno; \
 		printf(", AT_SYMLINK_NOFOLLOW) = %s\n", sprintrc(rc)); \
 	} while (0)
+
+# define USE_ASM_STAT
 
 # include "xstatx.c"
 
