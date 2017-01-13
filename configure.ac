@@ -304,8 +304,6 @@ AC_CHECK_MEMBERS([struct stat.st_mtime_nsec, struct stat64.st_mtime_nsec],,,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 
-AC_CHECK_MEMBERS([struct stat.st_mtim.tv_nsec])
-
 AC_CHECK_TYPES(m4_normalize([
 	struct pt_all_user_regs,
 	struct ia64_fpreg,

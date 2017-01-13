@@ -36,6 +36,4 @@
 		printf(") = %s\n", sprintrc(rc)); \
 	} while (0)
 
-#define USE_ASM_STAT
-
 #include "xstatx.c"
