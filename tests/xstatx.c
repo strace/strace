@@ -321,7 +321,7 @@ main(void)
 		LOG_STAT_OFFSETOF_SIZEOF(st[0], st_blocks);
 # endif /* !OLD_STAT */
 
-		return 77;
+		return 1;
 	}
 
 	PRINT_SYSCALL_HEADER(sample);
