@@ -39,7 +39,7 @@
 # define STRUCT_STAT struct __old_kernel_stat
 # define STRUCT_STAT_STR "struct __old_kernel_stat"
 # define STRUCT_STAT_IS_STAT64 0
-# define SAMPLE_SIZE ((kernel_ulong_t) 23147718418U)
+# define SAMPLE_SIZE ((libc_off_t) (kernel_ulong_t) 23147718418U)
 # include "lstatx.c"
 
 #else

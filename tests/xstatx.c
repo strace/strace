@@ -74,7 +74,7 @@ print_time(const time_t t)
 #  define STRUCT_STAT_IS_STAT64 0
 # endif
 # ifndef SAMPLE_SIZE
-#  define SAMPLE_SIZE 43147718418ULL
+#  define SAMPLE_SIZE ((libc_off_t) 43147718418ULL)
 # endif
 
 typedef off_t libc_off_t;
