@@ -417,6 +417,7 @@ check_PROGRAMS = \
 	unlinkat \
 	unshare \
 	userfaultfd \
+	ustat \
 	utime \
 	utimensat \
 	utimes \
@@ -806,6 +807,7 @@ DECODER_TESTS = \
 	unlinkat.test \
 	unshare.test \
 	userfaultfd.test \
+	ustat.test \
 	utime.test \
 	utimensat.test \
 	utimes.test \

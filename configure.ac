@@ -394,6 +394,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/shm.h
 	sys/signalfd.h
 	sys/xattr.h
+	ustat.h
 ]))
 
 AC_CHECK_HEADERS([asm/sigcontext.h],,, [#include <signal.h>])

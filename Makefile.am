@@ -250,6 +250,7 @@ strace_SOURCES =	\
 	umount.c	\
 	uname.c		\
 	userfaultfd.c	\
+	ustat.c		\
 	util.c		\
 	utime.c		\
 	utimes.c	\

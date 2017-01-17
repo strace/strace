@@ -156,7 +156,6 @@
 #define	sys_timerfd		printargs
 #define	sys_tuxcall		printargs
 #define	sys_ulimit		printargs
-#define	sys_ustat		printargs
 #define	sys_vserver		printargs
 
 /* deprecated */

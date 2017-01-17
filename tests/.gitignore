@@ -360,6 +360,7 @@ unlink
 unlinkat
 unshare
 userfaultfd
+ustat
 utime
 utimensat
 utimes
