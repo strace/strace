@@ -205,7 +205,6 @@ Here the second argument represents the full set of all signals.
 .SH OPTIONS
 .SS Output format
 .TP 12
-.TP
 .BI "\-a " column
 Align return values in a specific column (default column 40).
 .TP
@@ -278,7 +277,6 @@ Print paths associated with file descriptor arguments.
 Print protocol specific information associated with socket file descriptors.
 .SS Statistics
 .TP 12
-.TP
 .B \-c
 Count time, calls, and errors for each system call and report a summary on
 program exit.  On Linux, this attempts to show system time (CPU time spent
@@ -327,7 +325,6 @@ Summarise the time difference between the beginning and end of
 each system call.  The default is to summarise the system time.
 .SS Filtering
 .TP 12
-.TP
 .BI "\-e " expr
 A qualifying expression which modifies which events to trace
 or how to trace them.  The format of the expression is:
@@ -583,7 +580,6 @@ behavior displays a reasonable subset of structure members.  Use
 this option to get all of the gory details.
 .SS Tracing
 .TP 12
-.TP
 .BI "\-b " syscall
 If specified syscall is reached, detach from traced process.
 Currently, only
@@ -631,7 +627,6 @@ When strace can be interrupted by signals (such as pressing ^C).
 strace -o FILE PROG not stop on ^Z).
 .SS Startup
 .TP 12
-.TP
 \fB\-E\ \fIvar\fR=\,\fIval\fR
 Run command with
 .IR var = val
@@ -674,7 +669,6 @@ Unless this option is used setuid and setgid programs are executed
 without effective privileges.
 .SS Miscellaneous
 .TP 12
-.TP
 .B \-d
 Show some debugging output of
 .B strace
