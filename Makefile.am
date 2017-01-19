@@ -880,7 +880,7 @@ mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 
 m%_type_defs.h: $(srcdir_mpers_source_files)
 	for f in $^; do \
-		sed -r -n 's/^#include DEF_MPERS_TYPE\(([^)]+)\)/#ifdef MPERS_$(mpers_PREFIX)\1\n# define \1 MPERS_$(mpers_PREFIX)\1\n#endif/p' $$f || exit; \
+		sed -r -n 's/^#[[:space:]]*include DEF_MPERS_TYPE\(([^)]+)\)/#ifdef MPERS_$(mpers_PREFIX)\1\n# define \1 MPERS_$(mpers_PREFIX)\1\n#endif/p' $$f || exit; \
 	done > $@-t
 	echo '#undef MPERS_PRINTER_NAME' >> $@-t
 	echo '#define MPERS_PRINTER_NAME(printer_name) printer_name' >> $@-t
