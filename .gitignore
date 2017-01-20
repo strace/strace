@@ -24,6 +24,7 @@
 /configure
 /depcomp
 /install-sh
+/ioctl_iocdef.[ih]
 /ioctl_redefs[12].h
 /ioctlent[012].h
 /ioctls_all[012].h
