@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Check success injection.
+
+. "${srcdir=.}/fault_injection.sh"
+
+check_injection()
+{
+	local syscall rval
+
+	syscall=chdir
+	rval="$1"; shift
+
+	run_strace -a12 -e$syscall -efault="$syscall:retval=$rval" "$@" \
+		./fault_injection-retval "$rval" > "$EXP"
+	match_diff "$LOG" "$EXP"
+	rm -f "$EXP"
+}
+
+check_injection 0
+check_injection 42
