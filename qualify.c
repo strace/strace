@@ -409,12 +409,21 @@ parse_fault_token(const char *const token, struct fault_opts *const fopts)
 			fopts->step = 0;
 		}
 	} else if ((val = strip_prefix("error=", token))) {
-		intval = string_to_uint_upto(val, 4095);
+		if (fopts->rval != FAULT_OPTS_RVAL_DEFAULT)
+			return false;
+		intval = string_to_uint_upto(val, MAX_ERRNO_VALUE);
 		if (intval < 0)
 			intval = find_errno_by_name(val);
 		if (intval < 1)
 			return false;
-		fopts->err = intval;
+		fopts->rval = -intval;
+	} else if ((val = strip_prefix("retval=", token))) {
+		if (fopts->rval != FAULT_OPTS_RVAL_DEFAULT)
+			return false;
+		intval = string_to_uint(val);
+		if (intval < 0)
+			return false;
+		fopts->rval = intval;
 	} else if ((val = strip_prefix("signal=", token))) {
 		intval = sigstr_to_uint(val);
 		if (intval < 1 || intval > NSIG_BYTES * 8)
@@ -500,7 +509,7 @@ qualify_fault(const char *const str)
 	struct fault_opts opts = {
 		.first = 1,
 		.step = 1,
-		.err = -1,
+		.rval = FAULT_OPTS_RVAL_DEFAULT,
 		.signo = 0
 	};
 	char *buf = NULL;
@@ -510,11 +519,12 @@ qualify_fault(const char *const str)
 	}
 
 	/*
-	 * If neither error nor signal is specified,
-	 * fallback to the default platform error code.
+	 * If signal is specified but neither retval nor error are specified,
+	 * disable syscall fault injection.
 	 */
-	if (opts.signo == 0 && opts.err == -1)
-		opts.err = 0;
+	if (opts.signo && opts.rval == FAULT_OPTS_RVAL_DEFAULT) {
+		opts.rval = FAULT_OPTS_RVAL_DISABLE;
+	}
 
 	struct number_set tmp_set[SUPPORTED_PERSONALITIES];
 	memset(tmp_set, 0, sizeof(tmp_set));

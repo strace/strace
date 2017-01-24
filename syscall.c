@@ -559,6 +559,7 @@ static int arch_get_scno(struct tcb *tcp);
 static int arch_set_scno(struct tcb *, kernel_ulong_t);
 static void get_error(struct tcb *, const bool);
 static int arch_set_error(struct tcb *);
+static int arch_set_success(struct tcb *);
 
 struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
 
@@ -595,7 +596,7 @@ inject_syscall_fault_entering(struct tcb *tcp, unsigned int *signo)
 
 	if (opts->signo > 0)
 		*signo = opts->signo;
-	if (opts->err != -1 && !arch_set_scno(tcp, -1))
+	if (opts->rval != FAULT_OPTS_RVAL_DISABLE && !arch_set_scno(tcp, -1))
 		tcp->flags |= TCB_FAULT_INJ;
 
 	return 0;
@@ -606,11 +607,29 @@ update_syscall_fault_exiting(struct tcb *tcp)
 {
 	struct fault_opts *opts = tcb_fault_opts(tcp);
 
-	if (opts && opts->err > 0 && tcp->u_error != (uint16_t) opts->err) {
-		unsigned long u_error = tcp->u_error;
-		tcp->u_error = opts->err;
-		if (arch_set_error(tcp))
-			tcp->u_error = u_error;
+	if (!opts)
+		return 0;
+
+	if (opts->rval >= 0) {
+		kernel_long_t u_rval = tcp->u_rval;
+
+		tcp->u_rval = opts->rval;
+		if (arch_set_success(tcp)) {
+			tcp->u_rval = u_rval;
+		} else {
+			tcp->u_error = 0;
+		}
+	} else {
+		unsigned long new_error = -opts->rval;
+
+		if (new_error != tcp->u_error && new_error <= MAX_ERRNO_VALUE) {
+			unsigned long u_error = tcp->u_error;
+
+			tcp->u_error = new_error;
+			if (arch_set_error(tcp)) {
+				tcp->u_error = u_error;
+			}
+		}
 	}
 
 	return 0;
@@ -819,11 +838,11 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (tcp->qual_flg & QUAL_RAW) {
 		if (u_error) {
 			tprintf("= -1 (errno %lu)", u_error);
-			if (syscall_fault_injected(tcp))
-				tprints(" (INJECTED)");
 		} else {
 			tprintf("= %#" PRI_klx, tcp->u_rval);
 		}
+		if (syscall_fault_injected(tcp))
+			tprints(" (INJECTED)");
 	}
 	else if (!(sys_res & RVAL_NONE) && u_error) {
 		switch (u_error) {
@@ -944,6 +963,8 @@ trace_syscall_exiting(struct tcb *tcp)
 		}
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
+		if (syscall_fault_injected(tcp))
+			tprints(" (INJECTED)");
 	}
 	if (Tflag) {
 		tv_sub(&tv, &tv, &tcp->etime);

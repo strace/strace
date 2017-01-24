@@ -200,9 +200,13 @@ typedef struct ioctlent {
 struct fault_opts {
 	uint16_t first;
 	uint16_t step;
-	int16_t err;
 	uint16_t signo;
+	int rval;
 };
+
+#define MAX_ERRNO_VALUE		4095
+#define FAULT_OPTS_RVAL_DEFAULT	(-(MAX_ERRNO_VALUE + 1))
+#define FAULT_OPTS_RVAL_DISABLE	(FAULT_OPTS_RVAL_DEFAULT - 1)
 
 /* Trace Control Block */
 struct tcb {
