@@ -76,6 +76,39 @@ prog_load(void)
 	return syscall(__NR_bpf, BPF_PROG_LOAD, &attr, sizeof(attr));
 }
 
+/*
+ * bpf() syscall and its first six commands were introduced in Linux kernel
+ * 3.18. Some additional commands were added afterwards, so we need to take
+ * precautions to make sure the tests compile.
+ *
+ * BPF_OBJ_PIN and BPF_OBJ_GET commands appear in kernel 4.4.
+ */
+#if defined HAVE_UNION_BPF_ATTR_BPF_FD
+static int
+obj_manage(int cmd)
+{
+	union bpf_attr attr = {
+		.pathname = (uint64_t)(void *) "/sys/fs/bpf/foo/bar",
+		.bpf_fd = -1
+	};
+	return syscall(__NR_bpf, cmd, &attr, sizeof(attr));
+}
+#endif
+
+/* BPF_PROG_ATTACH and BPF_PROG_DETACH commands appear in kernel 4.10. */
+#if defined HAVE_UNION_BPF_ATTR_ATTACH_TYPE
+static int
+prog_cgroup(int cmd)
+{
+	union bpf_attr attr = {
+		.target_fd = -1,
+		.attach_bpf_fd = -1,
+		.attach_type = BPF_CGROUP_INET_INGRESS
+	};
+	return syscall(__NR_bpf, cmd, &attr, sizeof(attr));
+}
+#endif
+
 int
 main(void)
 {
@@ -118,6 +151,38 @@ main(void)
 	       "license=\"GPL\", log_level=42, log_size=4096, log_buf=%p, "
 	       "kern_version=0\\}, %u\\) += -1 .*\n",
 		insns, log_buf, (unsigned) sizeof(union bpf_attr));
+
+#if defined HAVE_UNION_BPF_ATTR_BPF_FD
+	if (!obj_manage(BPF_OBJ_PIN))
+		perror_msg_and_skip("BPF_OBJ_PIN");
+	printf("bpf\\(BPF_OBJ_PIN, "
+	       "\\{pathname=\"/sys/fs/bpf/foo/bar\", "
+	       "bpf_fd=-1\\}, %u\\) += -1 .*\n",
+		(unsigned) sizeof(union bpf_attr));
+
+	if (!obj_manage(BPF_OBJ_GET))
+		perror_msg_and_skip("BPF_OBJ_GET");
+	printf("bpf\\(BPF_OBJ_GET, "
+	       "\\{pathname=\"/sys/fs/bpf/foo/bar\", "
+	       "bpf_fd=-1\\}, %u\\) += -1 .*\n",
+		(unsigned) sizeof(union bpf_attr));
+#endif
+
+#if defined HAVE_UNION_BPF_ATTR_ATTACH_TYPE
+	if (!prog_cgroup(BPF_PROG_ATTACH))
+		perror_msg_and_skip("BPF_PROG_ATTACH");
+	printf("bpf\\(BPF_PROG_ATTACH, "
+	       "{target_fd=-1, attach_bpf_fd=-1, "
+	       "attach_type=BPF_CGROUP_INET_INGRESS\\}, %u\\) += -1 .*\n",
+		(unsigned) sizeof(union bpf_attr));
+
+	if (!prog_cgroup(BPF_PROG_DETACH))
+		perror_msg_and_skip("BPF_PROG_DETACH");
+	printf("bpf\\(BPF_PROG_DETACH, "
+	       "\\{target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS\\}, "
+	       "%u\\) += -1 .*\n",
+		(unsigned) sizeof(union bpf_attr));
+#endif
 
 	return 0;
 }
