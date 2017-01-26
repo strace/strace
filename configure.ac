@@ -215,29 +215,26 @@ AC_SUBST(arch_mx32)
 MIPS_ABI=
 if test "$arch" = mips; then
 	AC_CACHE_CHECK([for _MIPS_SIM], [st_cv__MIPS_SIM],
-		       [AC_COMPUTE_INT([st_cv__MIPS_SIM], [_MIPS_SIM],
-				       [#include <asm/sgidefs.h>],
+		       [AC_COMPUTE_INT([st_cv__MIPS_SIM], [_MIPS_SIM], ,
 				       [AC_MSG_ERROR([_MIPS_SIM cannot be determined])])])
 
+	# requires GCC >= 3.4
 	AC_CACHE_CHECK([for MIPS ABI], [st_cv_mips_abi],
 		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <asm/sgidefs.h>]],
-					 [[int i[_MIPS_SIM == _MIPS_SIM_ABI32 ? 1 : - 1];]])],
+			[AC_LANG_PROGRAM(, [[int i[_MIPS_SIM == _ABIO32 ? 1 : - 1];]])],
 			[st_cv_mips_abi=o32],
 		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <asm/sgidefs.h>]],
-					 [[int i[_MIPS_SIM == _MIPS_SIM_NABI32 ? 1 : - 1];]])],
+			[AC_LANG_PROGRAM(, [[int i[_MIPS_SIM == _ABIN32 ? 1 : - 1];]])],
 			[st_cv_mips_abi=n32],
 		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <asm/sgidefs.h>]],
-					 [[int i[_MIPS_SIM == _MIPS_SIM_ABI64 ? 1 : - 1];]])],
+			[AC_LANG_PROGRAM(, [[int i[_MIPS_SIM == _ABI64 ? 1 : - 1];]])],
 			[st_cv_mips_abi=n64],
 			[st_cv_mips_abi=unknown])])])])
 
 	case "$st_cv_mips_abi" in
-		o32) AC_DEFINE([LINUX_MIPSO32], [1], [Define for _MIPS_SIM_ABI32.]);;
-		n32) AC_DEFINE([LINUX_MIPSN32], [1], [Define for _MIPS_SIM_NABI32.]);;
-		n64) AC_DEFINE([LINUX_MIPSN64], [1], [Define for _MIPS_SIM_ABI64.]);;
+		o32) AC_DEFINE([LINUX_MIPSO32], [1], [Define for _ABIO32.]);;
+		n32) AC_DEFINE([LINUX_MIPSN32], [1], [Define for _ABIN32.]);;
+		n64) AC_DEFINE([LINUX_MIPSN64], [1], [Define for _ABI64.]);;
 		*) AC_MSG_ERROR([Unsupported _MIPS_SIM]);;
 	esac
 	MIPS_ABI="$st_cv_mips_abi"
