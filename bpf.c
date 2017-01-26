@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017 Quentin Monnet <quentin.monnet@6wind.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +36,7 @@
 #include "xlat/bpf_map_types.h"
 #include "xlat/bpf_prog_types.h"
 #include "xlat/bpf_map_update_elem_flags.h"
+#include "xlat/bpf_attach_type.h"
 
 static int
 bpf_map_create(struct tcb *const tcp, const kernel_ulong_t addr,
@@ -177,6 +179,87 @@ bpf_prog_load(struct tcb *const tcp, const kernel_ulong_t addr,
 	return RVAL_DECODED | RVAL_FD;
 }
 
+static int
+bpf_obj_manage(struct tcb *const tcp, const kernel_ulong_t addr,
+               unsigned int size)
+{
+	struct {
+		uint64_t ATTRIBUTE_ALIGNED(8) pathname;
+		uint32_t bpf_fd;
+	} attr = {};
+
+	if (!size) {
+		printaddr(addr);
+		return RVAL_DECODED | RVAL_FD;
+	}
+	if (size > sizeof(attr))
+		size = sizeof(attr);
+	if (umoven_or_printaddr(tcp, addr, size, &attr))
+		return RVAL_DECODED | RVAL_FD;
+
+	tprintf("{pathname=");
+	printpath(tcp, attr.pathname);
+	tprints(", bpf_fd=");
+	printfd(tcp, attr.bpf_fd);
+	tprintf("}");
+
+	return RVAL_DECODED | RVAL_FD;
+}
+
+static int
+bpf_prog_attach(struct tcb *const tcp, const kernel_ulong_t addr,
+               unsigned int size)
+{
+	struct {
+		uint32_t target_fd, attach_bpf_fd, attach_type;
+	} attr = {};
+
+	if (!size) {
+		printaddr(addr);
+		return RVAL_DECODED;
+	}
+	if (size > sizeof(attr))
+		size = sizeof(attr);
+	if (umoven_or_printaddr(tcp, addr, size, &attr))
+		return RVAL_DECODED;
+
+	tprintf("{target_fd=");
+	printfd(tcp, attr.target_fd);
+	tprintf(", attach_bpf_fd=");
+	printfd(tcp, attr.attach_bpf_fd);
+	tprintf(", attach_type=");
+	printxval(bpf_attach_type, attr.attach_type, "BPF_???");
+	tprintf("}");
+
+	return RVAL_DECODED;
+}
+
+static int
+bpf_prog_detach(struct tcb *const tcp, const kernel_ulong_t addr,
+               unsigned int size)
+{
+	struct {
+		uint32_t target_fd, attach_bpf_fd, attach_type;
+	} attr = {};
+
+	if (!size) {
+		printaddr(addr);
+		return RVAL_DECODED;
+	}
+	if (size > sizeof(attr))
+		size = sizeof(attr);
+	if (umoven_or_printaddr(tcp, addr, size, &attr))
+		return RVAL_DECODED;
+
+	tprintf("{target_fd=");
+	printfd(tcp, attr.target_fd);
+	tprintf(", attach_type=");
+	printxval(bpf_attach_type, attr.attach_type, "BPF_???");
+	tprintf("}");
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(bpf)
 {
 	const unsigned int cmd = tcp->u_arg[0];
@@ -207,6 +290,18 @@ SYS_FUNC(bpf)
 		break;
 	case BPF_PROG_LOAD:
 		rc = bpf_prog_load(tcp, addr, size);
+		break;
+	case BPF_OBJ_PIN:
+		rc = bpf_obj_manage(tcp, addr, size);
+		break;
+	case BPF_OBJ_GET:
+		rc = bpf_obj_manage(tcp, addr, size);
+		break;
+	case BPF_PROG_ATTACH:
+		rc = bpf_prog_attach(tcp, addr, size);
+		break;
+	case BPF_PROG_DETACH:
+		rc = bpf_prog_detach(tcp, addr, size);
 		break;
 	default:
 		printaddr(addr);
