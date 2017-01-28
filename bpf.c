@@ -207,8 +207,8 @@ bpf_obj_manage(struct tcb *const tcp, const kernel_ulong_t addr,
 }
 
 static int
-bpf_prog_attach(struct tcb *const tcp, const kernel_ulong_t addr,
-               unsigned int size)
+bpf_prog_attach_detach(struct tcb *const tcp, const kernel_ulong_t addr,
+		       unsigned int size, bool print_attach_bpf_fd)
 {
 	struct {
 		uint32_t target_fd, attach_bpf_fd, attach_type;
@@ -225,8 +225,10 @@ bpf_prog_attach(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	tprintf("{target_fd=");
 	printfd(tcp, attr.target_fd);
-	tprintf(", attach_bpf_fd=");
-	printfd(tcp, attr.attach_bpf_fd);
+	if (print_attach_bpf_fd) {
+		tprintf(", attach_bpf_fd=");
+		printfd(tcp, attr.attach_bpf_fd);
+	}
 	tprintf(", attach_type=");
 	printxval(bpf_attach_type, attr.attach_type, "BPF_???");
 	tprintf("}");
@@ -235,29 +237,17 @@ bpf_prog_attach(struct tcb *const tcp, const kernel_ulong_t addr,
 }
 
 static int
+bpf_prog_attach(struct tcb *const tcp, const kernel_ulong_t addr,
+               unsigned int size)
+{
+	return bpf_prog_attach_detach(tcp, addr, size, true);
+}
+
+static int
 bpf_prog_detach(struct tcb *const tcp, const kernel_ulong_t addr,
                unsigned int size)
 {
-	struct {
-		uint32_t target_fd, attach_bpf_fd, attach_type;
-	} attr = {};
-
-	if (!size) {
-		printaddr(addr);
-		return RVAL_DECODED;
-	}
-	if (size > sizeof(attr))
-		size = sizeof(attr);
-	if (umoven_or_printaddr(tcp, addr, size, &attr))
-		return RVAL_DECODED;
-
-	tprintf("{target_fd=");
-	printfd(tcp, attr.target_fd);
-	tprintf(", attach_type=");
-	printxval(bpf_attach_type, attr.attach_type, "BPF_???");
-	tprintf("}");
-
-	return RVAL_DECODED;
+	return bpf_prog_attach_detach(tcp, addr, size, false);
 }
 
 SYS_FUNC(bpf)
