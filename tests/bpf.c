@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,19 +26,28 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
 #include <asm/unistd.h>
 
 #if defined HAVE_UNION_BPF_ATTR_LOG_BUF && defined __NR_bpf
+# include <stdio.h>
+# include <stdint.h>
+# include <unistd.h>
 # include <linux/bpf.h>
 
 static const struct bpf_insn insns[] = {
 	{ .code = BPF_JMP | BPF_EXIT }
 };
 
+static const char *errstr;
 static char log_buf[4096];
+
+static long
+sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
+{
+	long rc = syscall(__NR_bpf, cmd, attr, size);
+	errstr = sprintrc(rc);
+	return rc;
+}
 
 static int
 map_create(void)
@@ -48,7 +57,8 @@ map_create(void)
 		.value_size = 8,
 		.max_entries = 256
 	};
-	return syscall(__NR_bpf, BPF_MAP_CREATE, &attr, sizeof(attr));
+	void *const t_attr = tail_memdup(&attr, sizeof(attr));
+	return sys_bpf(BPF_MAP_CREATE, (unsigned long) t_attr, sizeof(attr));
 }
 
 static int
@@ -59,7 +69,8 @@ map_any(int cmd)
 		.key = 0xdeadbeef,
 		.value = 0xbadc0ded
 	};
-	return syscall(__NR_bpf, cmd, &attr, sizeof(attr));
+	void *const t_attr = tail_memdup(&attr, sizeof(attr));
+	return sys_bpf(cmd, (unsigned long) t_attr, sizeof(attr));
 }
 
 static int
@@ -73,7 +84,8 @@ prog_load(void)
 		.log_size = sizeof(log_buf),
 		.log_buf = (unsigned long) log_buf
 	};
-	return syscall(__NR_bpf, BPF_PROG_LOAD, &attr, sizeof(attr));
+	void *const t_attr = tail_memdup(&attr, sizeof(attr));
+	return sys_bpf(BPF_PROG_LOAD, (unsigned long) t_attr, sizeof(attr));
 }
 
 /*
@@ -91,7 +103,8 @@ obj_manage(int cmd)
 		.pathname = (unsigned long) "/sys/fs/bpf/foo/bar",
 		.bpf_fd = -1
 	};
-	return syscall(__NR_bpf, cmd, &attr, sizeof(attr));
+	void *const t_attr = tail_memdup(&attr, sizeof(attr));
+	return sys_bpf(cmd, (unsigned long) t_attr, sizeof(attr));
 }
 # endif
 
@@ -105,85 +118,75 @@ prog_cgroup(int cmd)
 		.attach_bpf_fd = -1,
 		.attach_type = 0
 	};
-	return syscall(__NR_bpf, cmd, &attr, sizeof(attr));
+	void *const t_attr = tail_memdup(&attr, sizeof(attr));
+	return sys_bpf(cmd, (unsigned long) t_attr, sizeof(attr));
 }
 # endif
 
 int
 main(void)
 {
-	if (!map_create())
-		perror_msg_and_skip("BPF_MAP_CREATE");
-	printf("bpf\\(BPF_MAP_CREATE, "
-	       "\\{map_type=BPF_MAP_TYPE_UNSPEC, key_size=4, value_size=8, max_entries=256\\}, "
-	       "%u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	map_create();
+	printf("bpf(BPF_MAP_CREATE"
+	       ", {map_type=BPF_MAP_TYPE_UNSPEC, key_size=4"
+	       ", value_size=8, max_entries=256}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 
-	if (!map_any(BPF_MAP_LOOKUP_ELEM))
-		perror_msg_and_skip("BPF_MAP_LOOKUP_ELEM");
-	printf("bpf\\(BPF_MAP_LOOKUP_ELEM, "
-	       "\\{map_fd=-1, key=0xdeadbeef\\}, %u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	map_any(BPF_MAP_LOOKUP_ELEM);
+	printf("bpf(BPF_MAP_LOOKUP_ELEM"
+	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 
-	if (!map_any(BPF_MAP_UPDATE_ELEM))
-		perror_msg_and_skip("BPF_MAP_UPDATE_ELEM");
-	printf("bpf\\(BPF_MAP_UPDATE_ELEM, "
-	       "\\{map_fd=-1, key=0xdeadbeef, value=0xbadc0ded, flags=BPF_ANY\\}, "
-	       "%u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	map_any(BPF_MAP_UPDATE_ELEM);
+	printf("bpf(BPF_MAP_UPDATE_ELEM"
+	       ", {map_fd=-1, key=0xdeadbeef"
+	       ", value=0xbadc0ded, flags=BPF_ANY}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 
-	if (!map_any(BPF_MAP_DELETE_ELEM))
-		perror_msg_and_skip("BPF_MAP_DELETE_ELEM");
-	printf("bpf\\(BPF_MAP_DELETE_ELEM, "
-	       "\\{map_fd=-1, key=0xdeadbeef\\}, %u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	map_any(BPF_MAP_DELETE_ELEM);
+	printf("bpf(BPF_MAP_DELETE_ELEM"
+	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 
-	if (!map_any(BPF_MAP_GET_NEXT_KEY))
-		perror_msg_and_skip("BPF_MAP_GET_NEXT_KEY");
-	printf("bpf\\(BPF_MAP_GET_NEXT_KEY, "
-	       "\\{map_fd=-1, key=0xdeadbeef\\}, %u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	map_any(BPF_MAP_GET_NEXT_KEY);
+	printf("bpf(BPF_MAP_GET_NEXT_KEY"
+	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 
-	if (!prog_load())
-		perror_msg_and_skip("BPF_PROG_LOAD");
-	printf("bpf\\(BPF_PROG_LOAD, "
-	       "\\{prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=1, insns=%p, "
-	       "license=\"GPL\", log_level=42, log_size=4096, log_buf=%p, "
-	       "kern_version=0\\}, %u\\) += -1 .*\n",
-		insns, log_buf, (unsigned) sizeof(union bpf_attr));
+	prog_load();
+	printf("bpf(BPF_PROG_LOAD"
+	       ", {prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=1, insns=%p"
+	       ", license=\"GPL\", log_level=42, log_size=4096, log_buf=%p"
+	       ", kern_version=0}, %u) = %s\n",
+	       insns, log_buf, (unsigned) sizeof(union bpf_attr), errstr);
 
 # ifdef HAVE_UNION_BPF_ATTR_BPF_FD
-	if (!obj_manage(BPF_OBJ_PIN))
-		perror_msg_and_skip("BPF_OBJ_PIN");
-	printf("bpf\\(BPF_OBJ_PIN, "
-	       "\\{pathname=\"/sys/fs/bpf/foo/bar\", "
-	       "bpf_fd=-1\\}, %u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	obj_manage(BPF_OBJ_PIN);
+	printf("bpf(BPF_OBJ_PIN"
+	       ", {pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 
-	if (!obj_manage(BPF_OBJ_GET))
-		perror_msg_and_skip("BPF_OBJ_GET");
-	printf("bpf\\(BPF_OBJ_GET, "
-	       "\\{pathname=\"/sys/fs/bpf/foo/bar\", "
-	       "bpf_fd=-1\\}, %u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	obj_manage(BPF_OBJ_GET);
+	printf("bpf(BPF_OBJ_GET"
+	       ", {pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 # endif
 
 # ifdef HAVE_UNION_BPF_ATTR_ATTACH_TYPE
-	if (!prog_cgroup(BPF_PROG_ATTACH))
-		perror_msg_and_skip("BPF_PROG_ATTACH");
-	printf("bpf\\(BPF_PROG_ATTACH, "
-	       "{target_fd=-1, attach_bpf_fd=-1, "
-	       "attach_type=BPF_CGROUP_INET_INGRESS\\}, %u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	prog_cgroup(BPF_PROG_ATTACH);
+	printf("bpf(BPF_PROG_ATTACH"
+	       ", {target_fd=-1, attach_bpf_fd=-1"
+	       ", attach_type=BPF_CGROUP_INET_INGRESS}, %u) = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 
-	if (!prog_cgroup(BPF_PROG_DETACH))
-		perror_msg_and_skip("BPF_PROG_DETACH");
-	printf("bpf\\(BPF_PROG_DETACH, "
-	       "\\{target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS\\}, "
-	       "%u\\) += -1 .*\n",
-		(unsigned) sizeof(union bpf_attr));
+	prog_cgroup(BPF_PROG_DETACH)
+	printf("bpf(BPF_PROG_DETACH"
+	       ", {target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS}, %u)"
+	       " = %s\n",
+	       (unsigned) sizeof(union bpf_attr), errstr);
 # endif
 
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 
