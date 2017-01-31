@@ -3,4 +3,4 @@
 # Check bpf syscall decoding.
 . "${srcdir=.}/init.sh"
 
-run_strace_match_diff
+run_strace_match_diff -a20

@@ -123,35 +123,65 @@ prog_cgroup(int cmd)
 }
 # endif
 
+static unsigned long efault;
+
+static void
+bogus_bpf(int cmd, const char *name)
+{
+	const unsigned long bogus_size = 1024;
+	const unsigned long bogus_addr = efault - bogus_size;
+
+	sys_bpf(cmd, efault, 4);
+	printf("bpf(%s, %#lx, %lu) = %s\n",
+	       name, efault, 4UL, errstr);
+
+	sys_bpf(cmd, efault, bogus_size);
+	printf("bpf(%s, %#lx, %lu) = %s\n",
+	       name, efault, bogus_size, errstr);
+
+	sys_bpf(cmd, bogus_addr, 0);
+	printf("bpf(%s, %#lx, %lu) = %s\n",
+	       name, bogus_addr, 0UL, errstr);
+}
+
+#define BOGUS_BPF(cmd)	bogus_bpf(cmd, #cmd)
+
 int
 main(void)
 {
+	efault = (unsigned long) tail_alloc(1) + 1;
+
 	map_create();
 	printf("bpf(BPF_MAP_CREATE"
 	       ", {map_type=BPF_MAP_TYPE_UNSPEC, key_size=4"
 	       ", value_size=8, max_entries=256}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_MAP_CREATE);
 
 	map_any(BPF_MAP_LOOKUP_ELEM);
 	printf("bpf(BPF_MAP_LOOKUP_ELEM"
 	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_MAP_LOOKUP_ELEM);
 
 	map_any(BPF_MAP_UPDATE_ELEM);
 	printf("bpf(BPF_MAP_UPDATE_ELEM"
 	       ", {map_fd=-1, key=0xdeadbeef"
 	       ", value=0xbadc0ded, flags=BPF_ANY}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_MAP_UPDATE_ELEM);
 
 	map_any(BPF_MAP_DELETE_ELEM);
 	printf("bpf(BPF_MAP_DELETE_ELEM"
 	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_MAP_DELETE_ELEM);
 
 	map_any(BPF_MAP_GET_NEXT_KEY);
 	printf("bpf(BPF_MAP_GET_NEXT_KEY"
 	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_MAP_GET_NEXT_KEY);
 
 	prog_load();
 	printf("bpf(BPF_PROG_LOAD"
@@ -159,17 +189,20 @@ main(void)
 	       ", license=\"GPL\", log_level=42, log_size=4096, log_buf=%p"
 	       ", kern_version=0}, %u) = %s\n",
 	       insns, log_buf, (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_PROG_LOAD);
 
 # ifdef HAVE_UNION_BPF_ATTR_BPF_FD
 	obj_manage(BPF_OBJ_PIN);
 	printf("bpf(BPF_OBJ_PIN"
 	       ", {pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_OBJ_PIN);
 
 	obj_manage(BPF_OBJ_GET);
 	printf("bpf(BPF_OBJ_GET"
 	       ", {pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_OBJ_GET);
 # endif
 
 # ifdef HAVE_UNION_BPF_ATTR_ATTACH_TYPE
@@ -178,13 +211,17 @@ main(void)
 	       ", {target_fd=-1, attach_bpf_fd=-1"
 	       ", attach_type=BPF_CGROUP_INET_INGRESS}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_PROG_ATTACH);
 
 	prog_cgroup(BPF_PROG_DETACH)
 	printf("bpf(BPF_PROG_DETACH"
 	       ", {target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS}, %u)"
 	       " = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
+	BOGUS_BPF(BPF_PROG_DETACH);
 # endif
+
+	bogus_bpf(0xfacefeed, "0xfacefeed /* BPF_??? */");
 
 	puts("+++ exited with 0 +++");
 	return 0;
