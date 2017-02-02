@@ -169,6 +169,9 @@ __EOF__
 
 	# Soft pre-include workarounds for some processed files.  Fragile.
 	case "$f" in
+		*asm/amigayle.h)
+			return 0 # false positive
+			;;
 		*asm/cmb.h)
 			echo '#include <asm/dasd.h>'
 			;;
