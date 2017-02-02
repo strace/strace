@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Extended fault injection syntax with signal= and retval= options.
+  * Updated lists of ioctl commands from Linux 4.10.
 
 Noteworthy changes in release 4.15 (2016-12-14)
 ===============================================
