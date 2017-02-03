@@ -231,11 +231,7 @@ __EOF__
 __EOF__
 			;;
 		*linux/if_pppox.h)
-			cat <<'__EOF__'
-#include <linux/if.h>
-#include <linux/in.h>
-#include <linux/in6.h>
-__EOF__
+			echo '#include <netinet/in.h>'
 			;;
 		*linux/if_tun.h|*linux/ppp-ioctl.h)
 			echo '#include <linux/filter.h>'
