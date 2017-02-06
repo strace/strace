@@ -6,7 +6,7 @@ arch_set_error(struct tcb *tcp)
 }
 
 static int
-arch_setsuccess(struct tcb *tcp)
+arch_set_success(struct tcb *tcp)
 {
 	or1k_regs.gpr[11] = tcp->u_rval;
 	return set_regs(tcp->pid);
