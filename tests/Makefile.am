@@ -267,8 +267,8 @@ check_PROGRAMS = \
 	openat \
 	pause \
 	pc \
-	perf_event_open_nonverbose \
 	perf_event_open \
+	perf_event_open_nonverbose \
 	perf_event_open_unabbrev \
 	personality \
 	pipe \
@@ -486,12 +486,12 @@ DECODER_TESTS = \
 	alarm.test \
 	bpf.test \
 	brk.test \
-	btrfs.test \
 	btrfs-v.test \
-	btrfs-w.test \
 	btrfs-vw.test \
-	caps.test \
+	btrfs-w.test \
+	btrfs.test \
 	caps-abbrev.test \
+	caps.test \
 	chmod.test \
 	chown.test \
 	chown32.test \
@@ -579,16 +579,16 @@ DECODER_TESTS = \
 	inotify_init1.test \
 	ioctl.test \
 	ioctl_block.test \
-	ioctl_dm.test \
 	ioctl_dm-v.test \
-	ioctl_evdev.test \
+	ioctl_dm.test \
 	ioctl_evdev-v.test \
+	ioctl_evdev.test \
 	ioctl_loop-nv.test \
 	ioctl_loop-v.test \
 	ioctl_loop.test \
 	ioctl_mtd.test \
-	ioctl_rtc.test \
 	ioctl_rtc-v.test \
+	ioctl_rtc.test \
 	ioctl_scsi.test \
 	ioctl_sg_io_v3.test \
 	ioctl_sg_io_v4.test \
@@ -632,18 +632,18 @@ DECODER_TESTS = \
 	mlockall.test \
 	mmap.test \
 	mmap64.test \
-	mmsg.test \
 	mmsg-silent.test \
-	mmsg_name.test \
+	mmsg.test \
 	mmsg_name-v.test \
+	mmsg_name.test \
 	mount.test \
 	move_pages.test \
 	mq.test \
-	mq_sendrecv.test \
 	mq_sendrecv-read.test \
 	mq_sendrecv-write.test \
-	msg_control.test \
+	mq_sendrecv.test \
 	msg_control-v.test \
+	msg_control.test \
 	msg_name.test \
 	munlockall.test \
 	nanosleep.test \
@@ -665,8 +665,8 @@ DECODER_TESTS = \
 	open.test \
 	openat.test \
 	pause.test \
-	perf_event_open_nonverbose.test \
 	perf_event_open.test \
+	perf_event_open_nonverbose.test \
 	perf_event_open_unabbrev.test \
 	personality.test \
 	pipe.test \
@@ -687,8 +687,8 @@ DECODER_TESTS = \
 	prctl-tsc.test \
 	pread64-pwrite64.test \
 	preadv-pwritev.test \
-	preadv2-pwritev2.test \
 	preadv.test \
+	preadv2-pwritev2.test \
 	printstr.test \
 	prlimit64.test \
 	process_vm_readv.test \
@@ -696,10 +696,10 @@ DECODER_TESTS = \
 	pselect6.test \
 	ptrace.test \
 	pwritev.test \
-	quotactl.test \
 	quotactl-v.test \
-	quotactl-xfs.test \
 	quotactl-xfs-v.test \
+	quotactl-xfs.test \
+	quotactl.test \
 	read-write.test \
 	readahead.test \
 	readdir.test \
@@ -797,8 +797,8 @@ DECODER_TESTS = \
 	umount.test \
 	umount2.test \
 	umoven-illptr.test \
-	umovestr.test \
 	umovestr-illptr.test \
+	umovestr.test \
 	umovestr2.test \
 	umovestr3.test \
 	uname.test \
@@ -814,13 +814,13 @@ DECODER_TESTS = \
 	utimes.test \
 	vhangup.test \
 	vmsplice.test \
-	wait4.test \
 	wait4-v.test \
-	waitid.test \
+	wait4.test \
 	waitid-v.test \
+	waitid.test \
 	waitpid.test \
-	xattr.test \
 	xattr-strings.test \
+	xattr.test \
 	xet_robust_list.test \
 	xetitimer.test \
 	xetpgid.test \
@@ -848,8 +848,8 @@ MISC_TESTS = \
 	pc.test \
 	qual_signal.test \
 	qual_syscall.test \
-	redirect.test \
 	redirect-fds.test \
+	redirect.test \
 	restart_syscall.test \
 	signal_receive.test \
 	strace-C.test \
@@ -881,8 +881,8 @@ VALGRIND_FLAGS = --quiet
 VALGRIND_SUPPRESSIONS_FILES = $(srcdir)/strace.supp
 
 EXTRA_DIST = init.sh run.sh match.awk \
-	     caps.awk \
 	     caps-abbrev.awk \
+	     caps.awk \
 	     count-f.expected \
 	     eventfd.expected \
 	     fadvise.h \
@@ -901,26 +901,26 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     net.expected \
 	     oldselect.expected \
 	     pipe.expected \
-	     ppoll.expected \
 	     ppoll-v.expected \
+	     ppoll.expected \
 	     process_vm_readv_writev.c \
 	     quotactl.h \
 	     setfsugid.c \
-	     setreugid.c \
 	     setresugid.c \
+	     setreugid.c \
 	     setugid.c \
 	     sigaction.awk \
 	     sigaltstack.expected \
 	     sockname.c \
 	     statfs.expected \
 	     statx.sh \
-	     strace.supp \
 	     strace-C.expected \
 	     strace-E.expected \
 	     strace-T.expected \
 	     strace-ff.expected \
 	     strace-k.test \
 	     strace-r.expected \
+	     strace.supp \
 	     struct_flock.c \
 	     sun_path.expected \
 	     uio.expected \
