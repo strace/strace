@@ -408,6 +408,7 @@
 [379] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [380] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [381] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
+[382] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
