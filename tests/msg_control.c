@@ -53,8 +53,6 @@
 #define MIN_SIZE_OF(type, member) \
 	(offsetof(type, member) + sizeof(((type *) 0)->member))
 
-#define VAL_STR(val) val, #val
-
 static struct cmsghdr *
 get_cmsghdr(void *const page, const size_t len)
 {
@@ -371,7 +369,7 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 		     cmsg_len++) {
 			test_scm_security(mh, msg_controllen,
 					  page, text, cmsg_len,
-					  VAL_STR(SOL_SOCKET));
+					  ARG_STR(SOL_SOCKET));
 		}
 	}
 
@@ -379,7 +377,7 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 	test_scm_rights3(mh, page, DEFAULT_STRLEN);
 	test_scm_rights3(mh, page, DEFAULT_STRLEN + 1);
 
-	test_unknown_type(mh, page, VAL_STR(SOL_SOCKET), "SCM_???");
+	test_unknown_type(mh, page, ARG_STR(SOL_SOCKET), "SCM_???");
 }
 
 static void
@@ -604,32 +602,32 @@ test_ip_origdstaddr(struct msghdr *const mh, void *const page,
 static void
 test_sol_ip(struct msghdr *const mh, void *const page)
 {
-	test_ip_pktinfo(mh, page, VAL_STR(IP_PKTINFO));
-	test_ip_uint(mh, page, VAL_STR(IP_TTL));
-	test_ip_uint8_t(mh, page, VAL_STR(IP_TOS));
-	test_ip_opts(mh, page, VAL_STR(IP_RECVOPTS), 1);
-	test_ip_opts(mh, page, VAL_STR(IP_RECVOPTS), 2);
-	test_ip_opts(mh, page, VAL_STR(IP_RECVOPTS), 3);
-	test_ip_opts(mh, page, VAL_STR(IP_RECVOPTS), 4);
-	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), 5);
-	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), 6);
-	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), 7);
-	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), 8);
-	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), DEFAULT_STRLEN - 1);
-	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), DEFAULT_STRLEN);
-	test_ip_opts(mh, page, VAL_STR(IP_RETOPTS), DEFAULT_STRLEN + 1);
+	test_ip_pktinfo(mh, page, ARG_STR(IP_PKTINFO));
+	test_ip_uint(mh, page, ARG_STR(IP_TTL));
+	test_ip_uint8_t(mh, page, ARG_STR(IP_TOS));
+	test_ip_opts(mh, page, ARG_STR(IP_RECVOPTS), 1);
+	test_ip_opts(mh, page, ARG_STR(IP_RECVOPTS), 2);
+	test_ip_opts(mh, page, ARG_STR(IP_RECVOPTS), 3);
+	test_ip_opts(mh, page, ARG_STR(IP_RECVOPTS), 4);
+	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), 5);
+	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), 6);
+	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), 7);
+	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), 8);
+	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), DEFAULT_STRLEN - 1);
+	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), DEFAULT_STRLEN);
+	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), DEFAULT_STRLEN + 1);
 #ifdef IP_CHECKSUM
-	test_ip_recverr(mh, page, VAL_STR(IP_RECVERR));
+	test_ip_recverr(mh, page, ARG_STR(IP_RECVERR));
 #endif
 #ifdef IP_ORIGDSTADDR
-	test_ip_origdstaddr(mh, page, VAL_STR(IP_ORIGDSTADDR));
+	test_ip_origdstaddr(mh, page, ARG_STR(IP_ORIGDSTADDR));
 #endif
 #ifdef IP_CHECKSUM
-	test_ip_uint(mh, page, VAL_STR(IP_CHECKSUM));
+	test_ip_uint(mh, page, ARG_STR(IP_CHECKSUM));
 #endif
 	test_scm_security(mh, CMSG_LEN(0), page, 0, CMSG_LEN(0),
-			  VAL_STR(SOL_IP));
-	test_unknown_type(mh, page, VAL_STR(SOL_IP), "IP_???");
+			  ARG_STR(SOL_IP));
+	test_unknown_type(mh, page, ARG_STR(SOL_IP), "IP_???");
 }
 
 static void
