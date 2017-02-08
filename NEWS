@@ -4,7 +4,22 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented syscall return value injection (-e inject=SET:retval= option).
   * Implemented signal injection (-e inject=SET:signal= option).
+  * Implemented decoding of SUID_DUMP_* constants in PR_[GS]ET_DUMPABLE.
+  * Implemented decoding of all SG_* ioctl commands.
+  * Implemented decoding of ustat syscall.
+  * Enhanced decoding of sg_io_hdr and sg_io_v4 structures.
+  * Updated lists of IP_*, IPV6_*, and LOOP_* constants.
   * Updated lists of ioctl commands from Linux 4.10.
+
+* Bug fixes
+  * Fixed pathmatch of oldselect syscall on 64-bit architectures.
+  * Fixed decoding of mmap2 syscall on s390 when arguments are not available.
+  * Fixed decoding of kexec_file_load, mprotect, pkey_mprotect, preadv*,
+    and pwritev* syscalls on x32.
+  * Fixed printing of string arguments of getxattr and setxattr syscalls
+    when -s option is used to limit the printed string size.
+  * Fixed decoding of ifconf, ifreq, and loop_info structures on non-native
+    personalities.
 
 Noteworthy changes in release 4.15 (2016-12-14)
 ===============================================
