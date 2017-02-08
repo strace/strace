@@ -240,6 +240,7 @@ ptrace
 pwritev
 qual_fault
 qual_inject-retval
+qual_inject-signal
 qual_signal
 quotactl
 quotactl-v

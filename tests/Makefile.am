@@ -299,6 +299,7 @@ check_PROGRAMS = \
 	pwritev \
 	qual_fault \
 	qual_inject-retval \
+	qual_inject-signal \
 	qual_signal \
 	quotactl \
 	quotactl-v \
@@ -846,6 +847,7 @@ MISC_TESTS = \
 	qual_fault-syntax.test \
 	qual_fault.test \
 	qual_inject-retval.test \
+	qual_inject-signal.test \
 	qual_inject-syntax.test \
 	qual_signal.test \
 	qual_syscall.test \
@@ -904,6 +906,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ppoll.expected \
 	     process_vm_readv_writev.c \
 	     qual_fault-exit_group.expected \
+	     qual_inject-signal.expected \
 	     quotactl.h \
 	     scno_tampering.sh \
 	     setfsugid.c \

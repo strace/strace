@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Check signal injection.
+. "${srcdir=.}/init.sh"
+
+run_strace -a12 -echdir,exit_group -einject=chdir:signal=USR1 \
+	./qual_inject-signal
+match_diff
