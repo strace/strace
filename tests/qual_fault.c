@@ -41,12 +41,7 @@
 static const int expfd = 4;
 static const int gotfd = 5;
 
-#ifndef __s390__
-# define DEFAULT_ERRNO ENOSYS
-#else /* __s390__ */
-/* Invalid syscall number causes EPERM instead of traditional ENOSYS. */
-# define DEFAULT_ERRNO EPERM
-#endif
+#define DEFAULT_ERRNO ENOSYS
 
 static const char *errstr;
 static int is_raw, err, first, step, iter, try;

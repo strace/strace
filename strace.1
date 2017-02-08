@@ -343,8 +343,9 @@ is one of
 .BR signal ,
 .BR read ,
 .BR write ,
+.BR fault ,
 or
-.B fault
+.B inject
 and
 .I value
 is a qualifier-dependent symbol or number.  The default
@@ -469,30 +470,32 @@ Note that this is independent from the normal tracing of the
 system call which is controlled by the option
 .BR -e "\ " trace = write .
 .TP
-\fB\-e\ fault\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-e\ inject\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall tampering for the specified set of syscalls.
 
-When no options are specified or :\fBerror\fR=\,\fIerrno\/\fR
-option is specified, a fault is injected into a syscall invocation:
-the syscall number is replaced by -1 which corresponds to an invalid syscall.
-
-If an error code is specified using a symbolic
-.I errno
-value like
-.B ENOSYS
-or a numeric value within 1..4095 range, this error code overrides
-the default error code returned by the kernel, which is traditionally
-.B ENOSYS
-for invalid syscall numbers on most architectures.
-
-If :\fBretval\fR=\,\fIvalue\/\fR option is specified,
-success injection is performed: the syscall number is replaced by -1,
-but a bogus success value is returned to the callee.
-
+At least one of
+.BR error ,
+.BR retval ,
+or
+.B signal
+options has to be specified.
 .B error
 and
 .B retval
 are mutually exclusive.
+
+If :\fBerror\fR=\,\fIerrno\/\fR option is specified,
+a fault is injected into a syscall invocation:
+the syscall number is replaced by -1 which corresponds to an invalid syscall,
+and the error code is specified using a symbolic
+.I errno
+value like
+.B ENOSYS
+or a numeric value within 1..4095 range.
+
+If :\fBretval\fR=\,\fIvalue\/\fR option is specified,
+success injection is performed: the syscall number is replaced by -1,
+but a bogus success value is returned to the callee.
 
 If :\fBsignal\fR=\,\fIsig\/\fR option is specified with either a symbolic value
 like
@@ -525,7 +528,7 @@ The format of the subexpression is one of the following:
 .RS 4
 For every syscall from the
 .IR set ,
-perform a syscall fault injection for the syscall invocation number
+perform an injection for the syscall invocation number
 .I first
 only.
 .RE
@@ -534,7 +537,7 @@ only.
 .RS 4
 For every syscall from the
 .IR set ,
-perform syscall fault injections for the syscall invocation number
+perform injections for the syscall invocation number
 .I first
 and all subsequent invocations.
 .RE
@@ -543,7 +546,7 @@ and all subsequent invocations.
 .RS 4
 For every syscall from the
 .IR set ,
-perform syscall fault injections for syscall invocations number
+perform injections for syscall invocations number
 .IR first ,
 .IR first + step ,
 .IR first + step + step ,
@@ -554,7 +557,7 @@ and so on.
 For example, to fail each third and subsequent chdir syscalls with
 .BR ENOENT ,
 use
-\fB\-e\ fault\fR=\,\fIchdir\/\fR:\fBerror\fR=\,\fIENOENT\/\fR:\fBwhen\fR=\,\fI3\/\fB+\fR.
+\fB\-e\ inject\fR=\,\fIchdir\/\fR:\fBerror\fR=\,\fIENOENT\/\fR:\fBwhen\fR=\,\fI3\/\fB+\fR.
 
 The valid range for numbers
 .I first
@@ -562,21 +565,32 @@ and
 .I step
 is 1..65535.
 
-A fault expression can contain only one
+An injection expression can contain only one
 .BR error =
 or
 .BR retval =
 specification.
-If a fault expression contains multiple
+If an injection expression contains multiple
 .BR when =
 specifications, the last one takes precedence.
 
-Accounting of syscalls that are subject to fault injection
+Accounting of syscalls that are subject to injection
 is done per syscall and per tracee.
 
-Specification of syscall fault injection can be combined
+Specification of syscall injection can be combined
 with other syscall filtering options, for example,
-\fB\-P \fI/dev/urandom \fB\-e fault\fR=\,\fIall\/\fR:\fBerror\fR=\,\fIENOENT\fR.
+\fB\-P \fI/dev/urandom \fB\-e inject\fR=\,\fIfile\/\fR:\fBerror\fR=\,\fIENOENT\fR.
+
+.TP
+\fB\-e\ fault\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+Perform syscall fault injection for the specified set of syscalls.
+
+This is equivalent to more generic
+\fB\-e\ inject\fR= expression with default value of
+.I errno
+option set to
+.IR ENOSYS .
+
 .TP
 .BI "\-P " path
 Trace only system calls accessing

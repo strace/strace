@@ -846,6 +846,7 @@ MISC_TESTS = \
 	qual_fault-syntax.test \
 	qual_fault.test \
 	qual_inject-retval.test \
+	qual_inject-syntax.test \
 	qual_signal.test \
 	qual_syscall.test \
 	redirect-fds.test \

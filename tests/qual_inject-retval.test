@@ -11,7 +11,7 @@ check_injection()
 	syscall=chdir
 	rval="$1"; shift
 
-	run_strace -a12 -e$syscall -efault="$syscall:retval=$rval" "$@" \
+	run_strace -a12 -e$syscall -einject="$syscall:retval=$rval" "$@" \
 		./qual_inject-retval "$rval" > "$EXP"
 	match_diff "$LOG" "$EXP"
 	rm -f "$EXP"

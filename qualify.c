@@ -373,7 +373,8 @@ find_errno_by_name(const char *name)
 }
 
 static bool
-parse_inject_token(const char *const token, struct inject_opts *const fopts)
+parse_inject_token(const char *const token, struct inject_opts *const fopts,
+		   const bool fault_tokens_only)
 {
 	const char *val;
 	int intval;
@@ -417,14 +418,14 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts)
 		if (intval < 1)
 			return false;
 		fopts->rval = -intval;
-	} else if ((val = strip_prefix("retval=", token))) {
+	} else if (!fault_tokens_only && (val = strip_prefix("retval=", token))) {
 		if (fopts->rval != INJECT_OPTS_RVAL_DEFAULT)
 			return false;
 		intval = string_to_uint(val);
 		if (intval < 0)
 			return false;
 		fopts->rval = intval;
-	} else if ((val = strip_prefix("signal=", token))) {
+	} else if (!fault_tokens_only && (val = strip_prefix("signal=", token))) {
 		intval = sigstr_to_uint(val);
 		if (intval < 1 || intval > NSIG_BYTES * 8)
 			return false;
@@ -438,7 +439,8 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts)
 
 static char *
 parse_inject_expression(const char *const s, char **buf,
-			struct inject_opts *const fopts)
+			struct inject_opts *const fopts,
+			const bool fault_tokens_only)
 {
 	char *saveptr = NULL;
 	char *name = NULL;
@@ -449,7 +451,7 @@ parse_inject_expression(const char *const s, char **buf,
 	     token = strtok_r(NULL, ":", &saveptr)) {
 		if (!name)
 			name = token;
-		else if (!parse_inject_token(token, fopts))
+		else if (!parse_inject_token(token, fopts, fault_tokens_only))
 			goto parse_error;
 	}
 
@@ -504,7 +506,9 @@ qualify_raw(const char *const str)
 }
 
 static void
-qualify_fault(const char *const str)
+qualify_inject_common(const char *const str,
+		      const bool fault_tokens_only,
+		      const char *const description)
 {
 	struct inject_opts opts = {
 		.first = 1,
@@ -513,22 +517,28 @@ qualify_fault(const char *const str)
 		.signo = 0
 	};
 	char *buf = NULL;
-	char *name = parse_inject_expression(str, &buf, &opts);
+	char *name = parse_inject_expression(str, &buf, &opts, fault_tokens_only);
 	if (!name) {
-		error_msg_and_die("invalid %s '%s'", "fault argument", str);
+		error_msg_and_die("invalid %s '%s'", description, str);
 	}
 
-	/*
-	 * If signal is specified but neither retval nor error are specified,
-	 * disable syscall fault injection.
-	 */
-	if (opts.signo && opts.rval == INJECT_OPTS_RVAL_DEFAULT) {
-		opts.rval = INJECT_OPTS_RVAL_DISABLE;
+	if (opts.rval == INJECT_OPTS_RVAL_DEFAULT) {
+		/* If neither retval nor error is specified, then ... */
+		if (opts.signo) {
+			/* disable syscall fault injection if signal is specified. */
+			opts.rval = INJECT_OPTS_RVAL_DISABLE;
+		} else if (fault_tokens_only) {
+			/* default error code for fault= syntax is ENOSYS */
+			opts.rval = -ENOSYS;
+		} else {
+			/* an error has to be specified in inject= syntax. */
+			error_msg_and_die("invalid %s '%s'", description, str);
+		}
 	}
 
 	struct number_set tmp_set[SUPPORTED_PERSONALITIES];
 	memset(tmp_set, 0, sizeof(tmp_set));
-	qualify_syscall_tokens(name, tmp_set, "fault argument");
+	qualify_syscall_tokens(name, tmp_set, description);
 
 	free(buf);
 
@@ -559,6 +569,18 @@ qualify_fault(const char *const str)
 	}
 }
 
+static void
+qualify_fault(const char *const str)
+{
+	qualify_inject_common(str, true, "fault argument");
+}
+
+static void
+qualify_inject(const char *const str)
+{
+	qualify_inject_common(str, false, "inject argument");
+}
+
 static const struct qual_options {
 	const char *name;
 	void (*qualify)(const char *);
@@ -581,6 +603,7 @@ static const struct qual_options {
 	{ "writes",	qualify_write	},
 	{ "w",		qualify_write	},
 	{ "fault",	qualify_fault	},
+	{ "inject",	qualify_inject	},
 };
 
 void
