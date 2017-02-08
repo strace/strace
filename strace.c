@@ -798,7 +798,7 @@ droptcb(struct tcb *tcp)
 
 	int p;
 	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
-		free(tcp->fault_vec[p]);
+		free(tcp->inject_vec[p]);
 
 	free_tcb_priv_data(tcp);
 

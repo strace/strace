@@ -42,7 +42,7 @@ struct number_set write_set;
 struct number_set signal_set;
 
 static struct number_set abbrev_set[SUPPORTED_PERSONALITIES];
-static struct number_set fault_set[SUPPORTED_PERSONALITIES];
+static struct number_set inject_set[SUPPORTED_PERSONALITIES];
 static struct number_set raw_set[SUPPORTED_PERSONALITIES];
 static struct number_set trace_set[SUPPORTED_PERSONALITIES];
 static struct number_set verbose_set[SUPPORTED_PERSONALITIES];
@@ -373,7 +373,7 @@ find_errno_by_name(const char *name)
 }
 
 static bool
-parse_fault_token(const char *const token, struct fault_opts *const fopts)
+parse_inject_token(const char *const token, struct inject_opts *const fopts)
 {
 	const char *val;
 	int intval;
@@ -409,7 +409,7 @@ parse_fault_token(const char *const token, struct fault_opts *const fopts)
 			fopts->step = 0;
 		}
 	} else if ((val = strip_prefix("error=", token))) {
-		if (fopts->rval != FAULT_OPTS_RVAL_DEFAULT)
+		if (fopts->rval != INJECT_OPTS_RVAL_DEFAULT)
 			return false;
 		intval = string_to_uint_upto(val, MAX_ERRNO_VALUE);
 		if (intval < 0)
@@ -418,7 +418,7 @@ parse_fault_token(const char *const token, struct fault_opts *const fopts)
 			return false;
 		fopts->rval = -intval;
 	} else if ((val = strip_prefix("retval=", token))) {
-		if (fopts->rval != FAULT_OPTS_RVAL_DEFAULT)
+		if (fopts->rval != INJECT_OPTS_RVAL_DEFAULT)
 			return false;
 		intval = string_to_uint(val);
 		if (intval < 0)
@@ -437,8 +437,8 @@ parse_fault_token(const char *const token, struct fault_opts *const fopts)
 }
 
 static char *
-parse_fault_expression(const char *const s, char **buf,
-		       struct fault_opts *const fopts)
+parse_inject_expression(const char *const s, char **buf,
+			struct inject_opts *const fopts)
 {
 	char *saveptr = NULL;
 	char *name = NULL;
@@ -449,7 +449,7 @@ parse_fault_expression(const char *const s, char **buf,
 	     token = strtok_r(NULL, ":", &saveptr)) {
 		if (!name)
 			name = token;
-		else if (!parse_fault_token(token, fopts))
+		else if (!parse_inject_token(token, fopts))
 			goto parse_error;
 	}
 
@@ -506,14 +506,14 @@ qualify_raw(const char *const str)
 static void
 qualify_fault(const char *const str)
 {
-	struct fault_opts opts = {
+	struct inject_opts opts = {
 		.first = 1,
 		.step = 1,
-		.rval = FAULT_OPTS_RVAL_DEFAULT,
+		.rval = INJECT_OPTS_RVAL_DEFAULT,
 		.signo = 0
 	};
 	char *buf = NULL;
-	char *name = parse_fault_expression(str, &buf, &opts);
+	char *name = parse_inject_expression(str, &buf, &opts);
 	if (!name) {
 		error_msg_and_die("invalid %s '%s'", "fault argument", str);
 	}
@@ -522,8 +522,8 @@ qualify_fault(const char *const str)
 	 * If signal is specified but neither retval nor error are specified,
 	 * disable syscall fault injection.
 	 */
-	if (opts.signo && opts.rval == FAULT_OPTS_RVAL_DEFAULT) {
-		opts.rval = FAULT_OPTS_RVAL_DISABLE;
+	if (opts.signo && opts.rval == INJECT_OPTS_RVAL_DEFAULT) {
+		opts.rval = INJECT_OPTS_RVAL_DISABLE;
 	}
 
 	struct number_set tmp_set[SUPPORTED_PERSONALITIES];
@@ -533,8 +533,8 @@ qualify_fault(const char *const str)
 	free(buf);
 
 	/*
-	 * Initialize fault_vec accourding to tmp_set.
-	 * Merge tmp_set into fault_set.
+	 * Initialize inject_vec accourding to tmp_set.
+	 * Merge tmp_set into inject_set.
 	 */
 	unsigned int p;
 	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
@@ -542,16 +542,16 @@ qualify_fault(const char *const str)
 			continue;
 		}
 
-		if (!fault_vec[p]) {
-			fault_vec[p] = xcalloc(nsyscall_vec[p],
-					       sizeof(*fault_vec[p]));
+		if (!inject_vec[p]) {
+			inject_vec[p] = xcalloc(nsyscall_vec[p],
+					       sizeof(*inject_vec[p]));
 		}
 
 		unsigned int i;
 		for (i = 0; i < nsyscall_vec[p]; ++i) {
 			if (is_number_in_set(i, &tmp_set[p])) {
-				add_number_to_set(i, &fault_set[p]);
-				fault_vec[p][i] = opts;
+				add_number_to_set(i, &inject_set[p]);
+				inject_vec[p][i] = opts;
 			}
 		}
 
@@ -615,6 +615,6 @@ qual_flags(const unsigned int scno)
 		   ? QUAL_VERBOSE : 0)
 		| (is_number_in_set(scno, &raw_set[current_personality])
 		   ? QUAL_RAW : 0)
-		| (is_number_in_set(scno, &fault_set[current_personality])
-		   ? QUAL_FAULT : 0);
+		| (is_number_in_set(scno, &inject_set[current_personality])
+		   ? QUAL_INJECT : 0);
 }

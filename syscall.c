@@ -561,28 +561,28 @@ static void get_error(struct tcb *, const bool);
 static int arch_set_error(struct tcb *);
 static int arch_set_success(struct tcb *);
 
-struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
+struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
-static struct fault_opts *
-tcb_fault_opts(struct tcb *tcp)
+static struct inject_opts *
+tcb_inject_opts(struct tcb *tcp)
 {
-	return (scno_in_range(tcp->scno) && tcp->fault_vec[current_personality])
-	       ? &tcp->fault_vec[current_personality][tcp->scno] : NULL;
+	return (scno_in_range(tcp->scno) && tcp->inject_vec[current_personality])
+	       ? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
 }
 
 
 static long
-inject_syscall_fault_entering(struct tcb *tcp, unsigned int *signo)
+tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 {
-	if (!tcp->fault_vec[current_personality]) {
-		tcp->fault_vec[current_personality] =
-			xcalloc(nsyscalls, sizeof(**fault_vec));
-		memcpy(tcp->fault_vec[current_personality],
-		       fault_vec[current_personality],
-		       nsyscalls * sizeof(**fault_vec));
+	if (!tcp->inject_vec[current_personality]) {
+		tcp->inject_vec[current_personality] =
+			xcalloc(nsyscalls, sizeof(**inject_vec));
+		memcpy(tcp->inject_vec[current_personality],
+		       inject_vec[current_personality],
+		       nsyscalls * sizeof(**inject_vec));
 	}
 
-	struct fault_opts *opts = tcb_fault_opts(tcp);
+	struct inject_opts *opts = tcb_inject_opts(tcp);
 
 	if (!opts || opts->first == 0)
 		return 0;
@@ -596,16 +596,16 @@ inject_syscall_fault_entering(struct tcb *tcp, unsigned int *signo)
 
 	if (opts->signo > 0)
 		*signo = opts->signo;
-	if (opts->rval != FAULT_OPTS_RVAL_DISABLE && !arch_set_scno(tcp, -1))
-		tcp->flags |= TCB_FAULT_INJ;
+	if (opts->rval != INJECT_OPTS_RVAL_DISABLE && !arch_set_scno(tcp, -1))
+		tcp->flags |= TCB_TAMPERED;
 
 	return 0;
 }
 
 static long
-update_syscall_fault_exiting(struct tcb *tcp)
+tamper_with_syscall_exiting(struct tcb *tcp)
 {
-	struct fault_opts *opts = tcb_fault_opts(tcp);
+	struct inject_opts *opts = tcb_inject_opts(tcp);
 
 	if (!opts)
 		return 0;
@@ -678,7 +678,7 @@ trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 
 	/* Restrain from fault injection while the trace executes strace code. */
 	if (hide_log(tcp)) {
-		tcp->qual_flg &= ~QUAL_FAULT;
+		tcp->qual_flg &= ~QUAL_INJECT;
 	}
 
 	switch (tcp->s_ent->sen) {
@@ -706,8 +706,8 @@ trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 		goto ret;
 	}
 
-	if (tcp->qual_flg & QUAL_FAULT)
-		inject_syscall_fault_entering(tcp, sig);
+	if (tcp->qual_flg & QUAL_INJECT)
+		tamper_with_syscall_entering(tcp, sig);
 
 	if (cflag == CFLAG_ONLY_STATS) {
 		res = 0;
@@ -739,9 +739,9 @@ trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 }
 
 static bool
-syscall_fault_injected(struct tcb *tcp)
+syscall_tampered(struct tcb *tcp)
 {
-	return tcp->flags & TCB_FAULT_INJ;
+	return tcp->flags & TCB_TAMPERED;
 }
 
 static int
@@ -771,8 +771,8 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (filtered(tcp) || hide_log(tcp))
 		goto ret;
 
-	if (syserror(tcp) && syscall_fault_injected(tcp))
-		update_syscall_fault_exiting(tcp);
+	if (syserror(tcp) && syscall_tampered(tcp))
+		tamper_with_syscall_exiting(tcp);
 
 	if (cflag) {
 		count_syscall(tcp, &tv);
@@ -804,7 +804,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		tabto();
 		tprints("= ? <unavailable>\n");
 		line_ended();
-		tcp->flags &= ~(TCB_INSYSCALL | TCB_FAULT_INJ);
+		tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED);
 		tcp->sys_func_rval = 0;
 		free_tcb_priv_data(tcp);
 		return res;
@@ -841,7 +841,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		} else {
 			tprintf("= %#" PRI_klx, tcp->u_rval);
 		}
-		if (syscall_fault_injected(tcp))
+		if (syscall_tampered(tcp))
 			tprints(" (INJECTED)");
 	}
 	else if (!(sys_res & RVAL_NONE) && u_error) {
@@ -909,7 +909,7 @@ trace_syscall_exiting(struct tcb *tcp)
 					u_error, strerror(u_error));
 			break;
 		}
-		if (syscall_fault_injected(tcp))
+		if (syscall_tampered(tcp))
 			tprintf(" (INJECTED)");
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
@@ -963,7 +963,7 @@ trace_syscall_exiting(struct tcb *tcp)
 		}
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
-		if (syscall_fault_injected(tcp))
+		if (syscall_tampered(tcp))
 			tprints(" (INJECTED)");
 	}
 	if (Tflag) {
@@ -981,7 +981,7 @@ trace_syscall_exiting(struct tcb *tcp)
 #endif
 
  ret:
-	tcp->flags &= ~(TCB_INSYSCALL | TCB_FAULT_INJ);
+	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 	return 0;

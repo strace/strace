@@ -197,16 +197,16 @@ typedef struct ioctlent {
 	unsigned int code;
 } struct_ioctlent;
 
-struct fault_opts {
+struct inject_opts {
 	uint16_t first;
 	uint16_t step;
 	uint16_t signo;
 	int rval;
 };
 
-#define MAX_ERRNO_VALUE		4095
-#define FAULT_OPTS_RVAL_DEFAULT	(-(MAX_ERRNO_VALUE + 1))
-#define FAULT_OPTS_RVAL_DISABLE	(FAULT_OPTS_RVAL_DEFAULT - 1)
+#define MAX_ERRNO_VALUE			4095
+#define INJECT_OPTS_RVAL_DEFAULT	(-(MAX_ERRNO_VALUE + 1))
+#define INJECT_OPTS_RVAL_DISABLE	(INJECT_OPTS_RVAL_DEFAULT - 1)
 
 /* Trace Control Block */
 struct tcb {
@@ -228,7 +228,7 @@ struct tcb {
 	void (*_free_priv_data)(void *); /* Callback for freeing priv_data */
 	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
-	struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
+	struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
@@ -265,7 +265,7 @@ struct tcb {
 #define TCB_ATTACHED	0x08	/* We attached to it already */
 #define TCB_REPRINT	0x10	/* We should reprint this syscall on exit */
 #define TCB_FILTERED	0x20	/* This system call has been filtered out */
-#define TCB_FAULT_INJ	0x40	/* A syscall fault has been injected */
+#define TCB_TAMPERED	0x40	/* A syscall has been tampered with */
 #define TCB_HIDE_LOG	0x80	/* We should hide everything (until execve) */
 #define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x100	/* -b execve should skip detach on first execve */
 
@@ -274,7 +274,7 @@ struct tcb {
 #define QUAL_ABBREV	0x002	/* abbreviate the structures of this syscall */
 #define QUAL_VERBOSE	0x004	/* decode the structures of this syscall */
 #define QUAL_RAW	0x008	/* print all args in hex for this syscall */
-#define QUAL_FAULT	0x010	/* fail this system call on purpose */
+#define QUAL_INJECT	0x010	/* tamper with this system call on purpose */
 #define QUAL_SIGNAL	0x100	/* report events with this signal */
 #define QUAL_READ	0x200	/* dump data read from this file descriptor */
 #define QUAL_WRITE	0x400	/* dump data written to this file descriptor */
@@ -908,7 +908,7 @@ extern unsigned nioctlents;
 
 extern const unsigned int nsyscall_vec[SUPPORTED_PERSONALITIES];
 extern const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES];
-extern struct fault_opts *fault_vec[SUPPORTED_PERSONALITIES];
+extern struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
 #ifdef IN_MPERS_BOOTSTRAP
 /* Transform multi-line MPERS_PRINTER_DECL statements to one-liners.  */
