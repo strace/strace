@@ -7,19 +7,30 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of SUID_DUMP_* constants in PR_[GS]ET_DUMPABLE.
   * Implemented decoding of all SG_* ioctl commands.
   * Implemented decoding of ustat syscall.
+  * Implemented decoding of BPF_OBJ_PIN, BPF_OBJ_GET, BPF_PROG_ATTACH,
+    and BPF_PROG_DETACH commands of bpf syscall.
   * Enhanced decoding of sg_io_hdr and sg_io_v4 structures.
+  * Enhanced decoding of get_robust_list, getrandom, io_submit, set_robust_list
+    syscalls.
+  * Enhanced decoding of entities of kernel long type on x32 and mips n32 ABIs.
   * Updated lists of IP_*, IPV6_*, and LOOP_* constants.
   * Updated lists of ioctl commands from Linux 4.10.
+  * Added decoding of recently added syscalls on avr32, microblaze, ppc,
+    and ppc64.
 
 * Bug fixes
   * Fixed pathmatch of oldselect syscall on 64-bit architectures.
   * Fixed decoding of mmap2 syscall on s390 when arguments are not available.
-  * Fixed decoding of kexec_file_load, mprotect, pkey_mprotect, preadv*,
+  * Fixed decoding of kexec_file_load, mprotect, pkey_mprotect, prctl, preadv*,
     and pwritev* syscalls on x32.
   * Fixed printing of string arguments of getxattr and setxattr syscalls
     when -s option is used to limit the printed string size.
   * Fixed decoding of ifconf, ifreq, and loop_info structures on non-native
     personalities.
+  * Fixed decoding of SG_* and LOOP_* ioctl commands.
+  * Fixed build on mips with musl libc.
+  * Fixed cross-building of ioctlsort.
+  * Applied minor formatting fixes to the manual page.
 
 Noteworthy changes in release 4.15 (2016-12-14)
 ===============================================
