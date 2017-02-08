@@ -213,7 +213,7 @@ main(void)
 	       (unsigned) sizeof(union bpf_attr), errstr);
 	BOGUS_BPF(BPF_PROG_ATTACH);
 
-	prog_cgroup(BPF_PROG_DETACH)
+	prog_cgroup(BPF_PROG_DETACH);
 	printf("bpf(BPF_PROG_DETACH"
 	       ", {target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS}, %u)"
 	       " = %s\n",
