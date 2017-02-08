@@ -89,11 +89,7 @@ main(void)
 	atexit(cleanup);
 
 	rc = semctl(bogus_semid, bogus_semnum, bogus_cmd, bogus_arg);
-#ifdef __GLIBC__
-# define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|NULL)\\])"
-#else
-# define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|NULL)\\]|NULL)"
-#endif
+#define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|NULL)\\]|NULL)"
 	printf("semctl\\(%d, %d, (IPC_64\\|)?%#x /\\* SEM_\\?\\?\\? \\*/"
 	       ", " SEMCTL_BOGUS_ARG_FMT "\\) += %s\n",
 	       bogus_semid, bogus_semnum, bogus_cmd,
