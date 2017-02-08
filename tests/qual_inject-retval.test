@@ -2,7 +2,7 @@
 
 # Check success injection.
 
-. "${srcdir=.}/fault_injection.sh"
+. "${srcdir=.}/scno_tampering.sh"
 
 check_injection()
 {
@@ -12,7 +12,7 @@ check_injection()
 	rval="$1"; shift
 
 	run_strace -a12 -e$syscall -efault="$syscall:retval=$rval" "$@" \
-		./fault_injection-retval "$rval" > "$EXP"
+		./qual_inject-retval "$rval" > "$EXP"
 	match_diff "$LOG" "$EXP"
 	rm -f "$EXP"
 }

@@ -55,8 +55,6 @@ fadvise64_64
 fallocate
 fanotify_init
 fanotify_mark
-fault_injection
-fault_injection-retval
 fchdir
 fchmod
 fchmodat
@@ -240,6 +238,8 @@ process_vm_writev
 pselect6
 ptrace
 pwritev
+qual_fault
+qual_inject-retval
 qual_signal
 quotactl
 quotactl-v

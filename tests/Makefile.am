@@ -116,8 +116,6 @@ check_PROGRAMS = \
 	fallocate \
 	fanotify_init \
 	fanotify_mark \
-	fault_injection \
-	fault_injection-retval \
 	fchdir \
 	fchmod \
 	fchmodat \
@@ -299,6 +297,8 @@ check_PROGRAMS = \
 	pselect6 \
 	ptrace \
 	pwritev \
+	qual_fault \
+	qual_inject-retval \
 	qual_signal \
 	quotactl \
 	quotactl-v \
@@ -522,7 +522,6 @@ DECODER_TESTS = \
 	fallocate.test \
 	fanotify_init.test \
 	fanotify_mark.test \
-	fault_injection-exit_group.test \
 	fchdir.test \
 	fchmod.test \
 	fchmodat.test \
@@ -696,6 +695,7 @@ DECODER_TESTS = \
 	pselect6.test \
 	ptrace.test \
 	pwritev.test \
+	qual_fault-exit_group.test \
 	quotactl-v.test \
 	quotactl-xfs-v.test \
 	quotactl-xfs.test \
@@ -837,15 +837,15 @@ MISC_TESTS = \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
-	fault_injection-retval.test \
-	fault_injection.test \
-	fault_syntax.test \
 	filter-unavailable.test \
 	fork-f.test \
 	ksysent.test \
 	opipe.test \
 	options-syntax.test \
 	pc.test \
+	qual_fault-syntax.test \
+	qual_fault.test \
+	qual_inject-retval.test \
 	qual_signal.test \
 	qual_syscall.test \
 	redirect-fds.test \
@@ -886,8 +886,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     count-f.expected \
 	     eventfd.expected \
 	     fadvise.h \
-	     fault_injection-exit_group.expected \
-	     fault_injection.sh \
 	     filter-unavailable.expected \
 	     fstatat.c \
 	     fstatx.c \
@@ -904,7 +902,9 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ppoll-v.expected \
 	     ppoll.expected \
 	     process_vm_readv_writev.c \
+	     qual_fault-exit_group.expected \
 	     quotactl.h \
+	     scno_tampering.sh \
 	     setfsugid.c \
 	     setresugid.c \
 	     setreugid.c \
