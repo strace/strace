@@ -54,7 +54,9 @@ test_sigs()
 test_sigs '' '' \
 	none '!all' \
 	CHLD SIGCHLD ALRM SIGALRM \
+	chld sigchld alrm sigalrm \
 	CHLD,SIGALRM ALRM,SIGCHLD \
+	chld,sigalrm alrm,sigchld \
 	9 9,4 9,4,11 \
 	4,CHLD,11,ALRM,9 \
 	'!2,15' '!INT,TERM' '!SIGINT,TERM' '!INT,SIGTERM' '!SIGTERM,SIGINT' \
@@ -64,6 +66,7 @@ test_sigs '' '' \
 test_sigs SIGINT '' \
 	2 INT SIGINT \
 	CHLD,SIGINT SIGINT,SIGALRM \
+	chld,sigint sigint,sigalrm \
 	ALRM,2,SIGCHLD \
 	'!15' '!TERM' '!SIGTERM' \
 	'!15,TERM' '!SIGTERM,15,TERM' \
@@ -74,6 +77,7 @@ test_sigs SIGINT '' \
 test_sigs '' SIGTERM \
 	15 TERM SIGTERM \
 	CHLD,SIGTERM SIGTERM,SIGALRM \
+	chld,sigterm sigterm,sigalrm \
 	ALRM,15,SIGCHLD \
 	'!2' '!INT' '!SIGINT' \
 	'!2,INT' '!SIGINT,2,INT' \
@@ -84,6 +88,7 @@ test_sigs '' SIGTERM \
 test_sigs SIGINT SIGTERM \
 	all '!none' \
 	INT,TERM SIGINT,TERM SIGTERM,INT SIGINT,SIGTERM \
+	int,term sigint,term sigterm,int sigint,sigterm \
 	2,15 2,TERM SIGTERM,2 TERM,15,SIGINT,2 \
 	'!CHLD' '!SIGCHLD' '!ALRM' '!SIGALRM' \
 	'!CHLD,SIGALRM' '!ALRM,SIGCHLD' \
