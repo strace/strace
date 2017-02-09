@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Check fault injection along with signal injection.
+. "${srcdir=.}/scno_tampering.sh"
+
+run_strace -a12 -echdir,exit_group -einject=chdir:error=ENOENT:signal=USR1 \
+	"./$NAME"
+match_diff

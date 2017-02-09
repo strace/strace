@@ -239,6 +239,7 @@ pselect6
 ptrace
 pwritev
 qual_fault
+qual_inject-error-signal
 qual_inject-retval
 qual_inject-signal
 qual_signal

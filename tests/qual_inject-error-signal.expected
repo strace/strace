@@ -1,0 +1,4 @@
+chdir(".")  = -1 ENOENT (No such file or directory) (INJECTED)
+--- SIGUSR1 {si_signo=SIGUSR1, si_code=SI_KERNEL} ---
+exit_group(0) = ?
++++ exited with 0 +++
