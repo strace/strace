@@ -84,7 +84,7 @@ check_fault_injection()
 	rm -f "$EXP" "$outexp" "$outgot"
 }
 
-for err in '' ENOSYS 22 EINVAL; do
+for err in '' ENOSYS 22 einval; do
 	for fault in writev desc,51; do
 		check_fault_injection \
 			writev $fault "$err" '' '' -efault=chdir

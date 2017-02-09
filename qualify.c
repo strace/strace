@@ -365,7 +365,7 @@ find_errno_by_name(const char *name)
 	unsigned int i;
 
 	for (i = 1; i < nerrnos; ++i) {
-		if (errnoent[i] && (strcmp(name, errnoent[i]) == 0))
+		if (errnoent[i] && (strcasecmp(name, errnoent[i]) == 0))
 			return i;
 	}
 
