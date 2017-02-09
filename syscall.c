@@ -596,7 +596,7 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 
 	if (opts->signo > 0)
 		*signo = opts->signo;
-	if (opts->rval != INJECT_OPTS_RVAL_DISABLE && !arch_set_scno(tcp, -1))
+	if (opts->rval != INJECT_OPTS_RVAL_DEFAULT && !arch_set_scno(tcp, -1))
 		tcp->flags |= TCB_TAMPERED;
 
 	return 0;

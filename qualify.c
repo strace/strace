@@ -522,16 +522,13 @@ qualify_inject_common(const char *const str,
 		error_msg_and_die("invalid %s '%s'", description, str);
 	}
 
-	if (opts.rval == INJECT_OPTS_RVAL_DEFAULT) {
-		/* If neither retval nor error is specified, then ... */
-		if (opts.signo) {
-			/* disable syscall fault injection if signal is specified. */
-			opts.rval = INJECT_OPTS_RVAL_DISABLE;
-		} else if (fault_tokens_only) {
-			/* default error code for fault= syntax is ENOSYS */
+	/* If neither of retval, error, or signal is specified, then ... */
+	if (opts.rval == INJECT_OPTS_RVAL_DEFAULT && !opts.signo) {
+		if (fault_tokens_only) {
+			/* in fault= syntax the default error code is ENOSYS. */
 			opts.rval = -ENOSYS;
 		} else {
-			/* an error has to be specified in inject= syntax. */
+			/* in inject= syntax this is not allowed. */
 			error_msg_and_die("invalid %s '%s'", description, str);
 		}
 	}

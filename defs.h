@@ -206,7 +206,6 @@ struct inject_opts {
 
 #define MAX_ERRNO_VALUE			4095
 #define INJECT_OPTS_RVAL_DEFAULT	(-(MAX_ERRNO_VALUE + 1))
-#define INJECT_OPTS_RVAL_DISABLE	(INJECT_OPTS_RVAL_DEFAULT - 1)
 
 /* Trace Control Block */
 struct tcb {
