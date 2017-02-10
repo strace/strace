@@ -32,23 +32,42 @@
 
 # include <fcntl.h>
 # include <mqueue.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/stat.h>
+
+# define NAME "strace-mq.test"
 
 int
 main (void)
 {
 	struct mq_attr attr;
 	(void) close(0);
-	if (mq_open("/strace-mq.test", O_CREAT, S_IRWXU, 0))
+
+	if (mq_open("/" NAME, O_CREAT, 0700, NULL))
 		perror_msg_and_skip("mq_open");
+	printf("mq_open(\"%s\", O_RDONLY|O_CREAT, 0700, NULL) = 0\n", NAME);
+
 	if (mq_getattr(0, &attr))
 		perror_msg_and_skip("mq_getattr");
-	if (mq_setattr(0, &attr, 0))
+	printf("mq_getsetattr(0, NULL, {mq_flags=0, mq_maxmsg=%lld"
+	       ", mq_msgsize=%lld, mq_curmsgs=0}) = 0\n",
+	       (long long) attr.mq_maxmsg,
+	       (long long) attr.mq_msgsize);
+
+	if (mq_setattr(0, &attr, NULL))
 		perror_msg_and_skip("mq_setattr");
-	if (mq_unlink("/strace-mq.test"))
+	printf("mq_getsetattr(0, {mq_flags=0, mq_maxmsg=%lld"
+	       ", mq_msgsize=%lld, mq_curmsgs=0}, NULL) = 0\n",
+	       (long long) attr.mq_maxmsg,
+	       (long long) attr.mq_msgsize);
+
+	if (mq_unlink("/" NAME))
 		perror_msg_and_skip("mq_unlink");
+	printf("mq_unlink(\"%s\") = 0\n", NAME);
+
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 

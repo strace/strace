@@ -900,7 +900,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     ipc_msgbuf.expected \
 	     ksysent.sed \
 	     lstatx.c \
-	     mq.expected \
 	     net.expected \
 	     oldselect.expected \
 	     pipe.expected \
