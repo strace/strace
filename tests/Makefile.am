@@ -270,6 +270,7 @@ check_PROGRAMS = \
 	perf_event_open_unabbrev \
 	personality \
 	pipe \
+	pipe2 \
 	pkey_alloc \
 	pkey_free \
 	pkey_mprotect \
@@ -671,6 +672,7 @@ DECODER_TESTS = \
 	perf_event_open_unabbrev.test \
 	personality.test \
 	pipe.test \
+	pipe2.test \
 	pkey_alloc.test \
 	pkey_free.test \
 	pkey_mprotect.test \

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check decoding of pipe2 syscall.
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -a15

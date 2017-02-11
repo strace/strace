@@ -211,6 +211,7 @@ perf_event_open_nonverbose
 perf_event_open_unabbrev
 personality
 pipe
+pipe2
 pkey_alloc
 pkey_free
 pkey_mprotect
