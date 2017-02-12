@@ -1,16 +1,13 @@
 #!/bin/sh
 
-# Check pipe/pipe2 syscalls decoding.
-
+# Check decoding of pipe syscall.
 . "${srcdir=.}/init.sh"
 
-syscall=pipe2
-for n in pipe; do
-	$STRACE -e$n -h > /dev/null && syscall=$syscall,$n
-done
-
 run_prog
-run_strace -e$syscall $args
-match_grep
+run_strace -a13 -epipe $args
 
-exit 0
+check_prog grep
+LC_ALL=C grep -x "pipe(.*" "$LOG" > /dev/null ||
+	skip_ 'test executable does not use pipe syscall'
+
+match_diff

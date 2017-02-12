@@ -1,4 +1,6 @@
 /*
+ * Check decoding of pipe syscall.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -26,8 +28,9 @@
  */
 
 #include "tests.h"
+#include <asm/unistd.h>
 
-#ifdef HAVE_PIPE2
+#ifdef __NR_pipe
 
 # include <stdio.h>
 # include <fcntl.h>
@@ -38,20 +41,15 @@ main(void)
 {
 	(void) close(0);
 	(void) close(1);
-	int fds[2];
+	int *const fds = tail_alloc(sizeof(*fds) * 2);
 	if (pipe(fds))
 		perror_msg_and_fail("pipe");
-
-	(void) close(0);
-	(void) close(1);
-	if (pipe2(fds, O_NONBLOCK))
-		perror_msg_and_skip("pipe2");
 
 	return 0;
 }
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_PIPE2")
+SKIP_MAIN_UNDEFINED("__NR_pipe")
 
 #endif

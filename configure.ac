@@ -270,7 +270,6 @@ AC_CHECK_FUNCS(m4_normalize([
 	futimens
 	if_indextoname
 	open64
-	pipe2
 	prctl
 	preadv
 	process_vm_readv
