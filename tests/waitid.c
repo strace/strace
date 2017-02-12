@@ -144,7 +144,7 @@ poison(unsigned int v)
 static long
 do_waitid(const unsigned int idtype,
 	  const unsigned int id,
-	  const siginfo_t const *infop,
+	  const siginfo_t *const infop,
 	  const unsigned int options,
 	  const struct rusage *const rusage)
 {

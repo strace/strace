@@ -52,18 +52,18 @@ enum {
 
 #include "xlat/cap_version.h"
 
-typedef struct user_cap_header_struct {
+struct user_cap_header_struct {
 	uint32_t version;
 	int pid;
-} *cap_user_header_t;
+};
 
-typedef struct user_cap_data_struct {
+struct user_cap_data_struct {
 	uint32_t effective;
 	uint32_t permitted;
 	uint32_t inheritable;
-} *cap_user_data_t;
+};
 
-static cap_user_header_t
+static const struct user_cap_header_struct *
 get_cap_header(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	static struct user_cap_header_struct header;
@@ -79,7 +79,7 @@ get_cap_header(struct tcb *const tcp, const kernel_ulong_t addr)
 
 static void
 print_cap_header(struct tcb *const tcp, const kernel_ulong_t addr,
-		 const cap_user_header_t const h)
+		 const struct user_cap_header_struct *const h)
 {
 	if (!addr || !h) {
 		printaddr(addr);
@@ -107,7 +107,7 @@ print_cap_bits(const uint32_t lo, const uint32_t hi)
 
 static void
 print_cap_data(struct tcb *const tcp, const kernel_ulong_t addr,
-	       const cap_user_header_t const h)
+	       const struct user_cap_header_struct *const h)
 {
 	struct user_cap_data_struct data[2];
 	unsigned int len;
@@ -137,7 +137,7 @@ print_cap_data(struct tcb *const tcp, const kernel_ulong_t addr,
 
 SYS_FUNC(capget)
 {
-	cap_user_header_t h;
+	const struct user_cap_header_struct *h;
 
 	if (entering(tcp)) {
 		h = get_cap_header(tcp, tcp->u_arg[0]);
@@ -152,7 +152,8 @@ SYS_FUNC(capget)
 
 SYS_FUNC(capset)
 {
-	cap_user_header_t h = get_cap_header(tcp, tcp->u_arg[0]);
+	const struct user_cap_header_struct *const h =
+		get_cap_header(tcp, tcp->u_arg[0]);
 	print_cap_header(tcp, tcp->u_arg[0], h);
 	tprints(", ");
 	print_cap_data(tcp, tcp->u_arg[1], h);

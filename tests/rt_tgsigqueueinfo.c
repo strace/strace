@@ -39,7 +39,7 @@
 # include <unistd.h>
 
 static long
-k_tgsigqueueinfo(const pid_t pid, const int sig, const void const *info)
+k_tgsigqueueinfo(const pid_t pid, const int sig, const void *const info)
 {
 	return syscall(__NR_rt_tgsigqueueinfo,
 		       (unsigned long) 0xffffffff00000000ULL | pid,

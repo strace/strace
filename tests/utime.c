@@ -63,7 +63,7 @@ main(void)
 	const time_t t = time(NULL);
 	const struct tm * const p = localtime(&t);
 	const struct utimbuf u = { .actime = t, .modtime = t };
-	const struct utimbuf const *tail_u = tail_memdup(&u, sizeof(u));
+	const struct utimbuf *const tail_u = tail_memdup(&u, sizeof(u));
 	const char *const dummy_filename =
 		tail_memdup(dummy_str, sizeof(dummy_str) - 1);
 
