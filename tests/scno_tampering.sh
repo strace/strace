@@ -47,4 +47,12 @@ case "$STRACE_ARCH" in
 		# Reloading the syscall number from %g1 register is supported
 		# by linux kernel starting with commit v4.5-rc7~35^2~3.
 		require_min_kernel_version_or_skip 4.5 ;;
+	mips)
+		# Only the native ABI is supported by the kernel properly, see
+		# https://sourceforge.net/p/strace/mailman/message/35587571/
+		uname_m="$(uname -m)"
+		case "$MIPS_ABI:$uname_m" in
+			o32:mips|n64:mips64) ;;
+			*) skip_ "$MIPS_ABI scno tampering does not work on $uname_m yet" ;;
+		esac ;;
 esac
