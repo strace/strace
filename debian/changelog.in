@@ -4,11 +4,17 @@ strace (@PACKAGE_VERSION@-1) experimental; urgency=low
 
  -- Strace <@PACKAGE_BUGREPORT@>  @DEB_CHANGELOGTIME@
 
+strace (4.16-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Tue, 14 Feb 2017 10:11:12 +0000
+
 strace (4.15-1) unstable; urgency=medium
 
   * New upstream version.
 
- -- Dmitry V. Levin <ldv@altlinux.org>  Tue, 14 Dec 2016 08:09:10 +0000
+ -- Dmitry V. Levin <ldv@altlinux.org>  Wed, 14 Dec 2016 08:09:10 +0000
 
 strace (4.14-1) unstable; urgency=medium
 
