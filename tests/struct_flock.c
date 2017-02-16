@@ -44,9 +44,10 @@
 static long
 invoke_test_syscall(const unsigned int cmd, void *const p)
 {
-	const unsigned long op = (unsigned long) 0xffffffff00000000ULL | cmd;
+	const kernel_ulong_t fd = F8ILL_KULONG_MASK;
+	const kernel_ulong_t op = F8ILL_KULONG_MASK | cmd;
 
-	return syscall(TEST_SYSCALL_NR, 0, op, (unsigned long) p);
+	return syscall(TEST_SYSCALL_NR, fd, op, (unsigned long) p);
 }
 
 static void
