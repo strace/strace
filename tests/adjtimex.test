@@ -1,12 +1,6 @@
 #!/bin/sh
 
 # Check adjtimex syscall decoding.
-
 . "${srcdir=.}/init.sh"
 
-run_prog > /dev/null
-run_strace -a 15 -e adjtimex $args > "$OUT"
-match_grep "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -a15

@@ -1,7 +1,7 @@
 /*
  * This file is part of adjtimex strace test.
  *
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,33 +33,41 @@
 #include <string.h>
 #include <sys/timex.h>
 
+#include "xlat.h"
+#include "xlat/adjtimex_state.h"
+#include "xlat/adjtimex_status.h"
+
 int
 main(void)
 {
-	adjtimex(NULL);
-	printf("adjtimex\\(NULL\\) = -1 EFAULT \\(%m\\)\n");
+	int state = adjtimex(NULL);
+	printf("adjtimex(NULL) = %s\n", sprintrc(state));
 
-	struct timex * const tx = tail_alloc(sizeof(*tx));
+	struct timex *const tx = tail_alloc(sizeof(*tx));
 	memset(tx, 0, sizeof(*tx));
 
-	int state = adjtimex(tx);
+	state = adjtimex(tx);
 	if (state < 0)
 		perror_msg_and_skip("adjtimex");
 
-	printf("adjtimex\\(\\{modes=0, offset=%jd, freq=%jd, maxerror=%jd"
-	       ", esterror=%jd, status=%s, constant=%jd, precision=%jd"
-	       ", tolerance=%jd, time=\\{tv_sec=%jd, tv_usec=%jd\\}, tick=%jd, "
+	printf("adjtimex({modes=0, offset=%jd, freq=%jd, maxerror=%jd"
+	       ", esterror=%jd, status=",
+	       (intmax_t) tx->offset,
+	       (intmax_t) tx->freq,
+	       (intmax_t) tx->maxerror,
+	       (intmax_t) tx->esterror);
+	if (tx->status)
+		printflags(adjtimex_status, (unsigned int) tx->status, NULL);
+	else
+		putchar('0');
+	printf(", constant=%jd, precision=%jd"
+	       ", tolerance=%jd, time={tv_sec=%jd, tv_usec=%jd}, tick=%jd, "
 	       "ppsfreq=%jd, jitter=%jd, shift=%d, stabil=%jd, jitcnt=%jd, "
 	       "calcnt=%jd, errcnt=%jd, stbcnt=%jd"
 #ifdef HAVE_STRUCT_TIMEX_TAI
 	       ", tai=%d"
 #endif
-	       "\\}\\) = %d \\(TIME_[A-Z]+\\)\n",
-	       (intmax_t) tx->offset,
-	       (intmax_t) tx->freq,
-	       (intmax_t) tx->maxerror,
-	       (intmax_t) tx->esterror,
-	       tx->status ? "STA_[A-Z]+(\\|STA_[A-Z]+)*" : "0",
+	       "}) = %d (",
 	       (intmax_t) tx->constant,
 	       (intmax_t) tx->precision,
 	       (intmax_t) tx->tolerance,
@@ -78,6 +86,9 @@ main(void)
 	       tx->tai,
 #endif
 	       state);
+	printxval(adjtimex_state, (unsigned int) state, NULL);
+	puts(")");
 
+	puts("+++ exited with 0 +++");
 	return 0;
 }
