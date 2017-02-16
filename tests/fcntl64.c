@@ -44,10 +44,10 @@ test_flock64_einval(const int cmd, const char *name)
 		.l_start = 0xdefaced1facefeedULL,
 		.l_len = 0xdefaced2cafef00dULL
 	};
-	invoke_test_syscall(cmd, &fl);
+	long rc = invoke_test_syscall(cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
-	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, EINVAL_STR);
+	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, sprintrc(rc));
 }
 
 static void
@@ -67,7 +67,7 @@ test_flock64(void)
 	long rc = invoke_test_syscall(F_SETLK64, &fl);
 	printf("%s(0, F_SETLK64, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = %s\n",
-	       TEST_SYSCALL_STR, FILE_LEN, rc ? EINVAL_STR : "0");
+	       TEST_SYSCALL_STR, FILE_LEN, sprintrc(rc));
 
 	if (rc)
 		return;

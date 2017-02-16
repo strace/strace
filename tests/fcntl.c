@@ -44,9 +44,9 @@ test_flock64_einval(const int cmd, const char *name)
 		.l_start = 0xdefaced1facefeedULL,
 		.l_len = 0xdefaced2cafef00dULL
 	};
-	invoke_test_syscall(cmd, &fl);
+	long rc = invoke_test_syscall(cmd, &fl);
 	printf("%s(0, %s, %p) = %s\n",
-	       TEST_SYSCALL_STR, name, &fl, EINVAL_STR);
+	       TEST_SYSCALL_STR, name, &fl, sprintrc(rc));
 }
 
 static void
