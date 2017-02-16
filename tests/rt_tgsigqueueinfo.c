@@ -42,9 +42,9 @@ static long
 k_tgsigqueueinfo(const pid_t pid, const int sig, const void *const info)
 {
 	return syscall(__NR_rt_tgsigqueueinfo,
-		       (unsigned long) 0xffffffff00000000ULL | pid,
-		       (unsigned long) 0xffffffff00000000ULL | pid,
-		       (unsigned long) 0xffffffff00000000ULL | sig,
+		       F8ILL_KULONG_MASK | pid,
+		       F8ILL_KULONG_MASK | pid,
+		       F8ILL_KULONG_MASK | sig,
 		       info);
 }
 

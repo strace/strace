@@ -187,7 +187,7 @@ main(void)
 		(kernel_ulong_t) 0x12345678ffffff9cULL,
 	};
 	static const struct strval open_flags[] = {
-		{ (kernel_ulong_t) 0xffffffff00000000ULL, "O_RDONLY" },
+		{ F8ILL_KULONG_MASK, "O_RDONLY" },
 		{ (kernel_ulong_t) 0xdeadbeef80000001ULL,
 			"O_WRONLY|0x80000000" }
 	};

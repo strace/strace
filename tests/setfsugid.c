@@ -47,7 +47,7 @@ main(void)
 	const kernel_ulong_t tests[] = {
 		ugid,
 		0xffff0000U | ugid,
-		(kernel_ulong_t) 0xffffffff00000000ULL | ugid,
+		F8ILL_KULONG_MASK | ugid,
 		0xffffU,
 		-1U,
 		-1L,

@@ -90,11 +90,11 @@ main(void)
 
 	static const kernel_ulong_t fds[] = {
 		(kernel_ulong_t) 0xdeadfeed12345678ULL,
-		(kernel_ulong_t) 0xffffffff00000000ULL,
+		F8ILL_KULONG_MASK,
 		(kernel_ulong_t) 0xdeb0d1edffffffffULL,
 	};
 	static const struct strval flags[] = {
-		{ (kernel_ulong_t) 0xffffffff00000000ULL, "0" },
+		{ F8ILL_KULONG_MASK, "0" },
 		{ (kernel_ulong_t) 0xdec0deddefaced00ULL,
 			"0xefaced00 /* FAN_MARK_??? */" },
 		{ (kernel_ulong_t) 0xda7a105700000040ULL,

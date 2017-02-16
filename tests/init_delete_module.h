@@ -42,9 +42,6 @@ enum {
 	MAX_STRLEN = 32,
 };
 
-static const kernel_ulong_t bogus_zero =
-	(kernel_ulong_t) 0xffffffff00000000ULL;
-
 static void
 print_str(unsigned int base, unsigned int len, bool escape)
 {

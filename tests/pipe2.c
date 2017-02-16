@@ -39,18 +39,16 @@
 int
 main(void)
 {
-	static const kernel_ulong_t bogus_zero =
-		(kernel_ulong_t) 0xffffffff00000000ULL;
 	int *const fds = tail_alloc(sizeof(*fds) * 2);
 	int *const efault = fds + 1;
 	long rc;
 
-	rc = syscall(__NR_pipe2, fds, bogus_zero | O_NONBLOCK);
+	rc = syscall(__NR_pipe2, fds, F8ILL_KULONG_MASK | O_NONBLOCK);
 	if (rc)
 		perror_msg_and_skip("pipe2");
 	printf("pipe2([%d, %d], O_NONBLOCK) = 0\n", fds[0], fds[1]);
 
-	rc = syscall(__NR_pipe2, efault, bogus_zero);
+	rc = syscall(__NR_pipe2, efault, F8ILL_KULONG_MASK);
 	printf("pipe2(%p, 0) = %s\n", efault, sprintrc(rc));
 
 	if (F8ILL_KULONG_SUPPORTED) {

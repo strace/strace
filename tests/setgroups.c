@@ -75,7 +75,7 @@ main(void)
 	long rc = syscall(SYSCALL_NR, 0, 0);
 	printf("%s(0, NULL) = %s\n", SYSCALL_NAME, sprintrc(rc));
 
-	rc = syscall(SYSCALL_NR, (long) 0xffffffff00000000ULL, 0);
+	rc = syscall(SYSCALL_NR, F8ILL_KULONG_MASK, 0);
 	printf("%s(0, NULL) = %s\n", SYSCALL_NAME, sprintrc(rc));
 
 	rc = syscall(SYSCALL_NR, 1, 0);
@@ -164,9 +164,7 @@ main(void)
 		printuid(g3[1]);
 		printf(", ...]) = %s\n", errstr);
 
-		const unsigned long size =
-			(unsigned long) 0xffffffff00000000ULL | ngroups_max;
-		rc = syscall(SYSCALL_NR, size, g3);
+		rc = syscall(SYSCALL_NR, F8ILL_KULONG_MASK | ngroups_max, g3);
 		errstr = sprintrc(rc);
 		printf("%s(%d, [", SYSCALL_NAME, ngroups_max);
 		printuid(g3[0]);

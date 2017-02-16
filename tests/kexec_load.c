@@ -62,8 +62,7 @@ main(void)
 	};
 
 	static const kernel_ulong_t bogus_zero =
-		sizeof(long) < sizeof(kernel_long_t) ?
-			(kernel_ulong_t) 0xffffffff00000000ULL : 0;
+		sizeof(long) < sizeof(kernel_long_t) ? F8ILL_KULONG_MASK : 0;
 	static const kernel_ulong_t bogus_entry =
 		(kernel_ulong_t) 0xdeadca57badda7a1ULL;
 	static const kernel_ulong_t bogus_nsegs =
