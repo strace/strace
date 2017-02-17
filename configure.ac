@@ -434,16 +434,16 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 		AC_DEFINE(HAVE_UNION_BPF_ATTR_BPF_FD, [1],
 			  [Define to 1 if union bpf_attr.bpf_fd initialization works])
 	fi
-	AC_CACHE_CHECK([whether union bpf_attr.attach_type initialization works],
-		       [st_cv_have_union_bpf_attr_attach_type],
+	AC_CACHE_CHECK([whether union bpf_attr.attach_flags initialization works],
+		       [st_cv_have_union_bpf_attr_attach_flags],
 		[AC_COMPILE_IFELSE(
 			[AC_LANG_PROGRAM([[#include <linux/bpf.h>]],
-					 [[union bpf_attr a = { .attach_type = 0 };]])],
-			[st_cv_have_union_bpf_attr_attach_type=yes],
-			[st_cv_have_union_bpf_attr_attach_type=no])])
-	if test $st_cv_have_union_bpf_attr_attach_type = yes; then
-		AC_DEFINE(HAVE_UNION_BPF_ATTR_ATTACH_TYPE, [1],
-			  [Define to 1 if union bpf_attr.attach_type initialization works])
+					 [[union bpf_attr a = { .attach_flags = 0 };]])],
+			[st_cv_have_union_bpf_attr_attach_flags=yes],
+			[st_cv_have_union_bpf_attr_attach_flags=no])])
+	if test $st_cv_have_union_bpf_attr_attach_flags = yes; then
+		AC_DEFINE(HAVE_UNION_BPF_ATTR_ATTACH_FLAGS, [1],
+			  [Define to 1 if union bpf_attr.attach_flags initialization works])
 	fi
 ])
 

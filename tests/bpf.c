@@ -109,14 +109,15 @@ obj_manage(int cmd)
 # endif
 
 /* BPF_PROG_ATTACH and BPF_PROG_DETACH commands appear in kernel 4.10. */
-# ifdef HAVE_UNION_BPF_ATTR_ATTACH_TYPE
+# ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
 static int
 prog_cgroup(int cmd)
 {
 	union bpf_attr attr = {
 		.target_fd = -1,
 		.attach_bpf_fd = -1,
-		.attach_type = 0
+		.attach_type = 0,
+		.attach_flags = 1
 	};
 	void *const t_attr = tail_memdup(&attr, sizeof(attr));
 	return sys_bpf(cmd, (unsigned long) t_attr, sizeof(attr));
@@ -205,11 +206,12 @@ main(void)
 	BOGUS_BPF(BPF_OBJ_GET);
 # endif
 
-# ifdef HAVE_UNION_BPF_ATTR_ATTACH_TYPE
+# ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
 	prog_cgroup(BPF_PROG_ATTACH);
 	printf("bpf(BPF_PROG_ATTACH"
 	       ", {target_fd=-1, attach_bpf_fd=-1"
-	       ", attach_type=BPF_CGROUP_INET_INGRESS}, %u) = %s\n",
+	       ", attach_type=BPF_CGROUP_INET_INGRESS"
+	       ", attach_flags=BPF_F_ALLOW_OVERRIDE}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
 	BOGUS_BPF(BPF_PROG_ATTACH);
 
