@@ -910,7 +910,7 @@ trace_syscall_exiting(struct tcb *tcp)
 			break;
 		}
 		if (syscall_tampered(tcp))
-			tprintf(" (INJECTED)");
+			tprints(" (INJECTED)");
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
 	}

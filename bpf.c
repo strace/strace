@@ -198,11 +198,11 @@ bpf_obj_manage(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return RVAL_DECODED | RVAL_FD;
 
-	tprintf("{pathname=");
+	tprints("{pathname=");
 	printpath(tcp, attr.pathname);
 	tprints(", bpf_fd=");
 	printfd(tcp, attr.bpf_fd);
-	tprintf("}");
+	tprints("}");
 
 	return RVAL_DECODED | RVAL_FD;
 }
@@ -224,19 +224,19 @@ bpf_prog_attach_detach(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return RVAL_DECODED;
 
-	tprintf("{target_fd=");
+	tprints("{target_fd=");
 	printfd(tcp, attr.target_fd);
 	if (print_attach) {
-		tprintf(", attach_bpf_fd=");
+		tprints(", attach_bpf_fd=");
 		printfd(tcp, attr.attach_bpf_fd);
 	}
-	tprintf(", attach_type=");
+	tprints(", attach_type=");
 	printxval(bpf_attach_type, attr.attach_type, "BPF_???");
 	if (print_attach) {
-		tprintf(", attach_flags=");
+		tprints(", attach_flags=");
 		printflags(bpf_attach_flags, attr.attach_flags, "BPF_F_???");
 	}
-	tprintf("}");
+	tprints("}");
 
 	return RVAL_DECODED;
 }

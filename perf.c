@@ -160,7 +160,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	PRINT_XLAT("{type=", perf_type_id, attr->type, "PERF_TYPE_???");
-	tprintf(", size=");
+	tprints(", size=");
 	printxval(perf_attr_size, attr->size, "PERF_ATTR_SIZE_???");
 
 	if (use_new_size) {
@@ -217,7 +217,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_XLAT("<<8|", perf_hw_cache_op_result_id,
 		           (attr->config >> 16) & 0xFF,
 		           "PERF_COUNT_HW_CACHE_RESULT_???");
-		tprintf("<<16");
+		tprints("<<16");
 		if (attr->config >> 24)
 			tprintf("|%#" PRIx64 "<<24 "
 			        "/* PERF_COUNT_HW_CACHE_??? */",
@@ -253,11 +253,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	else
 		tprintf(", sample_period=%" PRIu64, attr->sample_period);
 
-	tprintf(", sample_type=");
+	tprints(", sample_type=");
 	printflags64(perf_event_sample_format, attr->sample_type,
 		"PERF_SAMPLE_???");
 
-	tprintf(", read_format=");
+	tprints(", read_format=");
 	printflags64(perf_event_read_format, attr->read_format,
 		"PERF_FORMAT_???");
 
@@ -355,7 +355,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	_PERF_CHECK_FIELD(branch_sample_type);
 	if (attr->sample_type & PERF_SAMPLE_BRANCH_STACK) {
-		tprintf(", branch_sample_type=");
+		tprints(", branch_sample_type=");
 		printflags64(perf_branch_sample_type, attr->branch_sample_type,
 		             "PERF_SAMPLE_BRANCH_???");
 	}
@@ -380,7 +380,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	if (attr->use_clockid) {
 		_PERF_CHECK_FIELD(clockid);
-		tprintf(", clockid=");
+		tprints(", clockid=");
 		printxval(clocknames, attr->clockid, "CLOCK_???");
 	}
 
@@ -399,9 +399,9 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 print_perf_event_attr_out:
 	if ((attr->size && (attr->size > size)) ||
 	    (!attr->size && (size < PERF_ATTR_SIZE_VER0)))
-		tprintf(", ...");
+		tprints(", ...");
 
-	tprintf("}");
+	tprints("}");
 }
 
 SYS_FUNC(perf_event_open)

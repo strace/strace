@@ -180,7 +180,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprints(", string=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			     QUOTE_0_TERMINATED);
-		tprintf("}");
+		tprints("}");
 
 		if (entering(tcp))
 			offset += s.next;
