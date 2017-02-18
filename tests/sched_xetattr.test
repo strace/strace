@@ -1,12 +1,6 @@
 #!/bin/sh
 
 # Check sched_getattr and sched_setattr syscalls decoding.
-
 . "${srcdir=.}/init.sh"
 
-run_prog > /dev/null
-run_strace -e sched_getattr,sched_setattr $args > "$OUT"
-match_grep "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace_match_diff -a29 -e trace=sched_getattr,sched_setattr
