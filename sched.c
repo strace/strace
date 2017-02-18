@@ -30,6 +30,7 @@
 #include "defs.h"
 
 #include <sched.h>
+#include "sched_attr.h"
 
 #include "xlat/schedulers.h"
 #include "xlat/sched_flags.h"
@@ -97,16 +98,7 @@ static void
 print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 		 unsigned int size)
 {
-	struct {
-		uint32_t size;
-		uint32_t sched_policy;
-		uint64_t sched_flags;
-		uint32_t sched_nice;
-		uint32_t sched_priority;
-		uint64_t sched_runtime;
-		uint64_t sched_deadline;
-		uint64_t sched_period;
-	} attr = {};
+	struct sched_attr attr = {};
 
 	if (size > sizeof(attr))
 		size = sizeof(attr);

@@ -34,6 +34,7 @@
 # include <stdio.h>
 # include <sched.h>
 # include <unistd.h>
+# include "sched_attr.h"
 # include "xlat.h"
 # include "xlat/schedulers.h"
 
@@ -66,16 +67,7 @@ main(void)
 	static const kernel_ulong_t bogus_flags =
 		(kernel_ulong_t) 0xdefaceddeadc0deULL;
 
-	struct {
-		uint32_t size;
-		uint32_t sched_policy;
-		uint64_t sched_flags;
-		int32_t  sched_nice;
-		uint32_t sched_priority;
-		uint64_t sched_runtime;
-		uint64_t sched_deadline;
-		uint64_t sched_period;
-	} *const attr = tail_alloc(sizeof(*attr));
+	struct sched_attr *const attr = tail_alloc(sizeof(*attr));
 	void *const efault = attr + 1;
 
 	sys_sched_getattr(bogus_pid, 0, 0, 0);

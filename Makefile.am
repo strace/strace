@@ -211,6 +211,7 @@ strace_SOURCES =	\
 	resource.c	\
 	rtc.c		\
 	sched.c		\
+	sched_attr.h	\
 	scsi.c		\
 	seccomp.c	\
 	seccomp_fprog.h \
