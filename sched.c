@@ -96,33 +96,73 @@ SYS_FUNC(sched_rr_get_interval)
 
 static void
 print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
-		 unsigned int size)
+		 unsigned int usize)
 {
 	struct sched_attr attr = {};
+	unsigned int size;
 
-	if (size > sizeof(attr))
-		size = sizeof(attr);
-	if (umoven_or_printaddr(tcp, addr, size, &attr))
-		return;
+	if (usize) {
+		/* called from sched_getattr */
+		size = usize <= sizeof(attr) ? usize : (unsigned) sizeof(attr);
+		if (umoven_or_printaddr(tcp, addr, size, &attr))
+			return;
+		/* the number of bytes written by the kernel */
+		size = attr.size;
+	} else {
+		/* called from sched_setattr */
+		if (umove_or_printaddr(tcp, addr, &attr.size))
+			return;
+		usize = attr.size;
+		if (!usize)
+			usize = SCHED_ATTR_MIN_SIZE;
+		size = usize <= sizeof(attr) ? usize : (unsigned) sizeof(attr);
+		if (size >= SCHED_ATTR_MIN_SIZE) {
+			if (umoven_or_printaddr(tcp, addr, size, &attr))
+				return;
+		}
+	}
 
-	tprintf("{size=%u, sched_policy=", attr.size);
-	printxval(schedulers, attr.sched_policy, "SCHED_???");
-	tprints(", sched_flags=");
-	printflags64(sched_flags, attr.sched_flags, "SCHED_FLAG_???");
-	tprintf(", sched_nice=%d", attr.sched_nice);
-	tprintf(", sched_priority=%u", attr.sched_priority);
-	tprintf(", sched_runtime=%" PRIu64, attr.sched_runtime);
-	tprintf(", sched_deadline=%" PRIu64, attr.sched_deadline);
-	tprintf(", sched_period=%" PRIu64 "}", attr.sched_period);
+	tprintf("{size=%u", attr.size);
+
+	if (size >= SCHED_ATTR_MIN_SIZE) {
+		tprints(", sched_policy=");
+		printxval(schedulers, attr.sched_policy, "SCHED_???");
+		tprints(", sched_flags=");
+		printflags64(sched_flags, attr.sched_flags, "SCHED_FLAG_???");
+
+#define PRINT_SCHED_FIELD(field, fmt)			\
+		tprintf(", " #field "=%" fmt, attr.field)
+
+		PRINT_SCHED_FIELD(sched_nice, "d");
+		PRINT_SCHED_FIELD(sched_priority, "u");
+		PRINT_SCHED_FIELD(sched_runtime, PRIu64);
+		PRINT_SCHED_FIELD(sched_deadline, PRIu64);
+		PRINT_SCHED_FIELD(sched_period, PRIu64);
+
+		if (usize > size)
+			tprints(", ...");
+	}
+
+	tprints("}");
 }
 
 SYS_FUNC(sched_setattr)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
-	print_sched_attr(tcp, tcp->u_arg[1], 0x100);
-	tprintf(", %u", (unsigned int) tcp->u_arg[2]);
+	if (entering(tcp)) {
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+		print_sched_attr(tcp, tcp->u_arg[1], 0);
+	} else {
+		struct sched_attr attr;
 
-	return RVAL_DECODED;
+		if (verbose(tcp) && tcp->u_error == E2BIG
+		    && umove(tcp, tcp->u_arg[1], &attr.size) == 0) {
+			tprintf(" => {size=%u}", attr.size);
+		}
+
+		tprintf(", %u", (unsigned int) tcp->u_arg[2]);
+	}
+
+	return 0;
 }
 
 SYS_FUNC(sched_getattr)
@@ -130,10 +170,13 @@ SYS_FUNC(sched_getattr)
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
-		print_sched_attr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-		tprintf(", %u, %u",
-			(unsigned int) tcp->u_arg[2],
-			(unsigned int) tcp->u_arg[3]);
+		const unsigned int size = tcp->u_arg[2];
+
+		if (size)
+			print_sched_attr(tcp, tcp->u_arg[1], size);
+		else
+			printaddr(tcp->u_arg[1]);
+		tprintf(", %u, %u", size, (unsigned int) tcp->u_arg[3]);
 	}
 
 	return 0;

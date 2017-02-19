@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Enhanced decoding of sched_setattr syscall.
+
 Noteworthy changes in release 4.16 (2017-02-14)
 ===============================================
 
