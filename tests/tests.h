@@ -44,6 +44,9 @@
 /* Cached sysconf(_SC_PAGESIZE). */
 size_t get_page_size(void);
 
+/* The size of kernel's sigset_t. */
+unsigned int get_sigset_size(void);
+
 /* Print message and strerror(errno) to stderr, then exit(1). */
 void perror_msg_and_fail(const char *, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;

@@ -30,16 +30,14 @@
 #include "tests.h"
 #include <asm/unistd.h>
 
-#ifdef __NR_rt_sigprocmask
-
-# include <errno.h>
-# include <signal.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/wait.h>
-# include <unistd.h>
-# include "ptrace.h"
-# include <linux/audit.h>
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include "ptrace.h"
+#include <linux/audit.h>
 
 static const char *errstr;
 
@@ -178,15 +176,7 @@ main(void)
 	const unsigned long pid =
 		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
 
-	unsigned int sigset_size;
-
-	for (sigset_size = 1024 / 8; sigset_size; sigset_size >>= 1) {
-		if (!syscall(__NR_rt_sigprocmask,
-			     SIG_SETMASK, NULL, NULL, sigset_size))
-			break;
-	}
-	if (!sigset_size)
-		perror_msg_and_fail("rt_sigprocmask");
+	const unsigned int sigset_size = get_sigset_size();
 
 	void *const k_set = tail_alloc(sigset_size);
 	siginfo_t *const sip = tail_alloc(sizeof(*sip));
@@ -196,28 +186,28 @@ main(void)
 	       bad_request, (unsigned) pid, errstr);
 
 	do_ptrace(PTRACE_PEEKDATA, pid, bad_request, bad_data);
-# ifdef IA64
+#ifdef IA64
 	printf("ptrace(PTRACE_PEEKDATA, %u, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, errstr);
-# else
+#else
 	printf("ptrace(PTRACE_PEEKDATA, %u, %#lx, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, bad_data, errstr);
 #endif
 
 	do_ptrace(PTRACE_PEEKTEXT, pid, bad_request, bad_data);
-# ifdef IA64
+#ifdef IA64
 	printf("ptrace(PTRACE_PEEKTEXT, %u, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, errstr);
-# else
+#else
 	printf("ptrace(PTRACE_PEEKTEXT, %u, %#lx, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, bad_data, errstr);
 #endif
 
 	do_ptrace(PTRACE_PEEKUSER, pid, bad_request, bad_data);
-# ifdef IA64
+#ifdef IA64
 	printf("ptrace(PTRACE_PEEKUSER, %u, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, errstr);
-# else
+#else
 	printf("ptrace(PTRACE_PEEKUSER, %u, %#lx, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, bad_data, errstr);
 #endif
@@ -446,10 +436,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_rt_sigprocmask")
-
-#endif

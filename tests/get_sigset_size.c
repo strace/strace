@@ -1,7 +1,7 @@
 /*
- * Check decoding of signalfd4 syscall.
+ * Find out the size of kernel's sigset_t.
  *
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,39 +28,39 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
+#include <signal.h>
+#include <unistd.h>
 #include <asm/unistd.h>
 
-#if defined HAVE_SYS_SIGNALFD_H \
- && defined HAVE_SIGNALFD \
- && defined O_CLOEXEC
+/*
+ * If the sigset size specified to rt_sigprocmask is not equal to the size
+ * of kernel's sigset_t, the kernel does not look at anything else and fails
+ * with EINVAL.
+ *
+ * Otherwise, if both pointers specified to rt_sigprocmask are NULL,
+ * the kernel just returns 0.
+ *
+ * This vaguely documented kernel feature can be used to probe
+ * the kernel and find out the size of kernel's sigset_t.
+ */
 
-# include <signal.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/signalfd.h>
-
-int
-main(void)
+unsigned int
+get_sigset_size(void)
 {
-	const char *const sigs = SIGUSR2 < SIGCHLD ? "USR2 CHLD" : "CHLD USR2";
-	const unsigned int size = get_sigset_size();
+	static unsigned int set_size;
 
-	sigset_t mask;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGCHLD);
+	if (!set_size) {
+		static const unsigned int big_size = 1024 / 8;
 
-	int fd = signalfd(-1, &mask, O_CLOEXEC | O_NONBLOCK);
-	printf("signalfd4(-1, [%s], %u, SFD_CLOEXEC|SFD_NONBLOCK) = %s\n",
-	       sigs, size, sprintrc(fd));
+		for (set_size = big_size; set_size; set_size >>= 1) {
+			if (!syscall(__NR_rt_sigprocmask, SIG_SETMASK,
+				     NULL, NULL, set_size))
+				break;
+		}
 
-	puts("+++ exited with 0 +++");
-	return 0;
+		if (!set_size)
+			perror_msg_and_fail("rt_sigprocmask");
+	}
+
+	return set_size;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_SYS_SIGNALFD_H && HAVE_SIGNALFD && O_CLOEXEC")
-
-#endif
