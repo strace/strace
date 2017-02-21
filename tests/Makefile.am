@@ -277,6 +277,7 @@ check_PROGRAMS = \
 	pkey_mprotect \
 	poll \
 	ppoll \
+	ppoll-v \
 	prctl-arg2-intptr \
 	prctl-dumpable \
 	prctl-name \
@@ -678,6 +679,7 @@ DECODER_TESTS = \
 	pkey_free.test \
 	pkey_mprotect.test \
 	poll.test \
+	ppoll-v.test \
 	ppoll.test \
 	prctl-arg2-intptr.test \
 	prctl-dumpable.test \
@@ -906,8 +908,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     net.expected \
 	     oldselect.expected \
 	     pipe.expected \
-	     ppoll-v.expected \
-	     ppoll.expected \
 	     process_vm_readv_writev.c \
 	     qual_fault-exit_group.expected \
 	     qual_inject-error-signal.expected \

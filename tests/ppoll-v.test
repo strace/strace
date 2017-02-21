@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Check verbose decoding of ppoll syscall.
+. "${srcdir=.}/init.sh"
+
+run_strace_match_diff -v -s2 -e trace=ppoll

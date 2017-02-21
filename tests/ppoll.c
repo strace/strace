@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Check decoding of ppoll syscall.
+ *
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,69 +28,151 @@
  */
 
 #include "tests.h"
-#include <assert.h>
-#include <poll.h>
-#include <signal.h>
-#include <unistd.h>
+#include <asm/unistd.h>
 
-static void
-test1(void)
+#ifdef __NR_ppoll
+
+# include <errno.h>
+# include <poll.h>
+# include <signal.h>
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+
+static const char *errstr;
+
+static long
+sys_ppoll(const kernel_ulong_t ufds,
+	  const kernel_ulong_t nfds,
+	  const kernel_ulong_t tsp,
+	  const kernel_ulong_t sigmask,
+	  const kernel_ulong_t sigsetsize)
 {
-	const struct timespec timeout = { .tv_sec = 42, .tv_nsec = 999999999 };
-	struct pollfd fds[] = {
-		{ .fd = 0, .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
-		{ .fd = 1, .events = POLLOUT | POLLWRNORM | POLLWRBAND },
-		{ .fd = 3, .events = POLLIN | POLLPRI },
-		{ .fd = 4, .events = POLLOUT }
-	};
-
-	sigset_t mask;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGCHLD);
-
-	int rc = ppoll(fds, sizeof(fds) / sizeof(*fds), &timeout, &mask);
-	if (rc < 0)
-		perror_msg_and_skip("ppoll");
-	assert(rc == 2);
-}
-
-static void
-test2(void)
-{
-	const struct timespec timeout = { .tv_sec = 0, .tv_nsec = 999 };
-	struct pollfd fds[] = {
-		{ .fd = 1, .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
-		{ .fd = 0, .events = POLLOUT | POLLWRNORM | POLLWRBAND }
-	};
-
-	sigset_t mask;
-	sigfillset(&mask);
-	sigdelset(&mask, SIGHUP);
-	sigdelset(&mask, SIGKILL);
-	sigdelset(&mask, SIGSTOP);
-
-	int rc = ppoll(fds, sizeof(fds) / sizeof(*fds), &timeout, &mask);
-	if (rc < 0)
-		perror_msg_and_skip("ppoll");
-	assert(rc == 0);
+	long rc = syscall(__NR_ppoll, ufds, nfds, tsp, sigmask, sigsetsize);
+	errstr = sprintrc(rc);
+	return rc;
 }
 
 int
 main(void)
 {
-	int fds[2];
+	static const kernel_ulong_t bogus_nfds =
+		(kernel_ulong_t) 0xdeadbeeffacefeedULL;
+	static const kernel_ulong_t bogus_sigsetsize =
+		(kernel_ulong_t) 0xdeadbeefbadc0dedULL;
+	static const char *const POLLWRNORM_str =
+		(POLLWRNORM == POLLOUT) ? "" : "|POLLWRNORM";
+	static const char *const USR2_CHLD_str =
+		(SIGUSR2 < SIGCHLD) ? "USR2 CHLD" : "CHLD USR2";
+	void *const efault = tail_alloc(1024) + 1024;
+	struct timespec *const ts = tail_alloc(sizeof(*ts));
+	const unsigned int sigset_size = get_sigset_size();
+	void *const sigmask = tail_alloc(sigset_size);
+	struct pollfd *fds;
+	sigset_t mask;
+	int pipe_fd[4];
+	long rc;
 
-	(void) close(0);
-	(void) close(1);
-	(void) close(3);
-	(void) close(4);
-	if (pipe(fds) || pipe(fds))
+	sys_ppoll(0, bogus_nfds, 0, 0, bogus_sigsetsize);
+	if (ENOSYS == errno)
+		perror_msg_and_skip("ppoll");
+	printf("ppoll(NULL, %u, NULL, NULL, %llu) = %s\n",
+	       (unsigned) bogus_nfds, (unsigned long long) bogus_sigsetsize,
+	       errstr);
+
+	sys_ppoll((unsigned long) efault, 42, (unsigned long) efault + 8,
+		  (unsigned long) efault + 16, sigset_size);
+	printf("ppoll(%p, %u, %p, %p, %u) = %s\n",
+	       efault, 42, efault + 8, efault + 16, sigset_size, errstr);
+
+	if (pipe(pipe_fd) || pipe(pipe_fd + 2))
 		perror_msg_and_fail("pipe");
 
-	test1();
-	test2();
+	ts->tv_sec = 42;
+	ts->tv_nsec = 999999999;
 
-	assert(ppoll(NULL, 42, NULL, NULL) < 0);
+	const struct pollfd fds1[] = {
+		{ .fd = pipe_fd[0], .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
+		{ .fd = pipe_fd[1], .events = POLLOUT | POLLWRNORM | POLLWRBAND },
+		{ .fd = pipe_fd[2], .events = POLLIN | POLLPRI },
+		{ .fd = pipe_fd[3], .events = POLLOUT }
+	};
+	fds = efault - sizeof(fds1);
+	memcpy(fds, fds1, sizeof(fds1));
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGCHLD);
+	memcpy(sigmask, &mask, sigset_size);
+
+	rc = sys_ppoll((unsigned long) fds,
+		       F8ILL_KULONG_MASK | ARRAY_SIZE(fds1), (unsigned long) ts,
+		       (unsigned long) sigmask, sigset_size);
+	if (rc != 2)
+		perror_msg_and_fail("ppoll 1");
+	printf("ppoll([{fd=%d, events=POLLIN|POLLPRI|POLLRDNORM|POLLRDBAND}"
+	       ", {fd=%d, events=POLLOUT%s|POLLWRBAND}"
+#if VERBOSE
+	       ", {fd=%d, events=POLLIN|POLLPRI}, {fd=%d, events=POLLOUT}]"
+#else
+	       ", ...]"
+#endif
+	       ", %u, {tv_sec=42, tv_nsec=999999999}, [%s], %u) = %ld"
+	       " ([{fd=%d, revents=POLLOUT%s}, {fd=%d, revents=POLLOUT}]"
+	       ", left {tv_sec=%u, tv_nsec=%u})\n",
+	       pipe_fd[0], pipe_fd[1], POLLWRNORM_str,
+#if VERBOSE
+	       pipe_fd[2], pipe_fd[3],
+#endif
+	       (unsigned) ARRAY_SIZE(fds1), USR2_CHLD_str,
+	       (unsigned) sigset_size, rc, pipe_fd[1], POLLWRNORM_str,
+	       pipe_fd[3], (unsigned ) ts->tv_sec, (unsigned) ts->tv_nsec);
+
+	ts->tv_sec = 0;
+	ts->tv_nsec = 999;
+	const struct pollfd fds2[] = {
+		{ .fd = pipe_fd[1], .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
+		{ .fd = pipe_fd[0], .events = POLLOUT | POLLWRNORM | POLLWRBAND }
+	};
+	fds = efault - sizeof(fds2);
+	memcpy(fds, fds2, sizeof(fds2));
+
+	memset(&mask, -1, sizeof(mask));
+	sigdelset(&mask, SIGHUP);
+	sigdelset(&mask, SIGKILL);
+	sigdelset(&mask, SIGSTOP);
+	memcpy(sigmask, &mask, sigset_size);
+
+	rc = sys_ppoll((unsigned long) fds,
+		       F8ILL_KULONG_MASK | ARRAY_SIZE(fds2), (unsigned long) ts,
+		       (unsigned long) sigmask, sigset_size);
+	if (rc != 0)
+		perror_msg_and_fail("ppoll 2");
+	printf("ppoll([{fd=%d, events=POLLIN|POLLPRI|POLLRDNORM|POLLRDBAND}"
+	       ", {fd=%d, events=POLLOUT%s|POLLWRBAND}], %u"
+	       ", {tv_sec=0, tv_nsec=999}, ~[HUP KILL STOP], %u)"
+	       " = %ld (Timeout)\n",
+	       pipe_fd[1], pipe_fd[0], POLLWRNORM_str,
+	       (unsigned) ARRAY_SIZE(fds2), sigset_size, rc);
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		sys_ppoll(f8ill_ptr_to_kulong(fds), ARRAY_SIZE(fds2),
+			  f8ill_ptr_to_kulong(ts), f8ill_ptr_to_kulong(sigmask),
+			  sigset_size);
+		printf("ppoll(%#llx, %u, %#llx, %#llx, %u) = %s\n",
+		       (unsigned long long) f8ill_ptr_to_kulong(fds),
+		       (unsigned) ARRAY_SIZE(fds2),
+		       (unsigned long long) f8ill_ptr_to_kulong(ts),
+		       (unsigned long long) f8ill_ptr_to_kulong(sigmask),
+		       (unsigned) sigset_size, errstr);
+	}
+
+	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_ppoll")
+
+#endif
