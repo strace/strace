@@ -369,5 +369,5 @@
 [543] = { 2,	CST|TM,		SEN(io_setup),			"io_setup"		},
 [544] = { 3,	CST,		SEN(io_submit),			"io_submit"		},
 [545] = { 5,	CST|TD|TF|TP|SE|SI,	SEN(execveat),		"execveat"		},
-[546] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
-[547] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
+[546] = { 5,	TD,		SEN(preadv2),			"preadv2"		},
+[547] = { 5,	TD,		SEN(pwritev2),			"pwritev2"		},
