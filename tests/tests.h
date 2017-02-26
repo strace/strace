@@ -103,8 +103,8 @@ void print_quoted_string(const char *);
 /* Print memory in a quoted form. */
 void print_quoted_memory(const char *, size_t);
 
-/* Print time_t in symbolic format. */
-void print_time_t(time_t);
+/* Print time_t and nanoseconds in symbolic format. */
+void print_time_t_nsec(time_t, unsigned long long);
 
 /* Read an int from the file. */
 int read_int_from_file(const char *, int *);

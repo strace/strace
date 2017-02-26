@@ -1,5 +1,5 @@
 /*
- * Print time_t in symbolic format.
+ * Print time_t and nanoseconds in symbolic format.
  *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
@@ -32,21 +32,24 @@
 #include <time.h>
 
 void
-print_time_t(const time_t t)
+print_time_t_nsec(const time_t t, const unsigned long long nsec)
 {
-	if (!t) {
+	if (t) {
+		const struct tm *const p = localtime(&t);
+
+		if (p) {
+			char buf[256];
+
+			strftime(buf, sizeof(buf), "%FT%T%z", p);
+			fputs(buf, stdout);
+		} else {
+			printf("%llu", zero_extend_signed_to_ull(t));
+		}
+	} else {
 		putchar('0');
-		return;
 	}
 
-	const struct tm *const p = localtime(&t);
-
-	if (p) {
-		char buf[256];
-
-		strftime(buf, sizeof(buf), "%FT%T%z", p);
-		fputs(buf, stdout);
-	} else {
-		printf("%llu", zero_extend_signed_to_ull(t));
+	if (nsec) {
+		printf(".%09llu", nsec);
 	}
 }

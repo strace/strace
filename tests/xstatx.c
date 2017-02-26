@@ -162,17 +162,15 @@ print_stat(const STRUCT_STAT *st)
 	}
 
 # if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
-#  define PRINT_TIME_NSEC(val)						\
-	if (val)							\
-		printf(".%09llu", zero_extend_signed_to_ull(val))
+#  define TIME_NSEC(val)	zero_extend_signed_to_ull(val)
 # else
-#  define PRINT_TIME_NSEC(val)
+#  define TIME_NSEC(val)	0
 # endif
 
 # define PRINT_ST_TIME(field)						\
 	printf(", st_" #field "=");					\
-	print_time_t(sign_extend_unsigned_to_ll(st->st_ ## field));	\
-	PRINT_TIME_NSEC(st->st_ ## field ## _nsec)
+	print_time_t_nsec(sign_extend_unsigned_to_ll(st->st_ ## field),	\
+			  TIME_NSEC(st->st_ ## field ## _nsec))
 
 	PRINT_ST_TIME(atime);
 	PRINT_ST_TIME(mtime);
