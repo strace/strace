@@ -182,24 +182,22 @@ print_stat(const STRUCT_STAT *st)
 		printf(", st_size=%llu", zero_extend_signed_to_ull(st->st_size));
 	}
 
-	printf(", st_atime=");
-	print_time(sign_extend_unsigned_to_ll(st->st_atime));
 # if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
-	if (st->st_atime_nsec)
-		printf(".%09llu", zero_extend_signed_to_ull(st->st_atime_nsec));
+#  define PRINT_TIME_NSEC(val)						\
+	if (val)							\
+		printf(".%09llu", zero_extend_signed_to_ull(val))
+# else
+#  define PRINT_TIME_NSEC(val)
 # endif
-	printf(", st_mtime=");
-	print_time(sign_extend_unsigned_to_ll(st->st_mtime));
-# if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
-	if (st->st_mtime_nsec)
-		printf(".%09llu", zero_extend_signed_to_ull(st->st_mtime_nsec));
-# endif
-	printf(", st_ctime=");
-	print_time(sign_extend_unsigned_to_ll(st->st_ctime));
-# if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
-	if (st->st_ctime_nsec)
-		printf(".%09llu", zero_extend_signed_to_ull(st->st_ctime_nsec));
-# endif
+
+# define PRINT_ST_TIME(field)						\
+	printf(", st_" #field "=");					\
+	print_time(sign_extend_unsigned_to_ll(st->st_ ## field));	\
+	PRINT_TIME_NSEC(st->st_ ## field ## _nsec)
+
+	PRINT_ST_TIME(atime);
+	PRINT_ST_TIME(mtime);
+	PRINT_ST_TIME(ctime);
 	printf("}");
 }
 
