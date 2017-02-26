@@ -38,17 +38,6 @@
 # include <stdio.h>
 # include <unistd.h>
 
-
-static void
-print_tm(const struct tm * const p)
-{
-	char buf[256];
-
-	strftime(buf, sizeof(buf), "%FT%T%z", p);
-
-	printf("%s", buf);
-}
-
 static long
 k_utime(const void *const filename, const void *const times)
 {
@@ -61,7 +50,6 @@ main(void)
 	static const char *const dummy_str = "dummy filename";
 
 	const time_t t = time(NULL);
-	const struct tm * const p = localtime(&t);
 	const struct utimbuf u = { .actime = t, .modtime = t };
 	const struct utimbuf *const tail_u = tail_memdup(&u, sizeof(u));
 	const char *const dummy_filename =
@@ -81,9 +69,9 @@ main(void)
 	rc = k_utime("utime\nfilename", tail_u);
 	const char *errstr = sprintrc(rc);
 	printf("utime(\"utime\\nfilename\", {actime=");
-	print_tm(p);
+	print_time_t(t);
 	printf(", modtime=");
-	print_tm(p);
+	print_time_t(t);
 	printf("}) = %s\n", errstr);
 
 	puts("+++ exited with 0 +++");
