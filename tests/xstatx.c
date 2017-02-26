@@ -47,27 +47,6 @@
 # include <unistd.h>
 # include <sys/sysmacros.h>
 
-static void
-print_time(const time_t t)
-{
-	if (!t) {
-		printf("0");
-		return;
-	}
-
-	struct tm *p = localtime(&t);
-
-	if (p) {
-		char buf[256];
-
-		strftime(buf, sizeof(buf), "%FT%T%z", p);
-
-		printf("%s", buf);
-	} else {
-		printf("%llu", zero_extend_signed_to_ull(t));
-	}
-}
-
 # ifndef STRUCT_STAT
 #  define STRUCT_STAT struct stat
 #  define STRUCT_STAT_STR "struct stat"
@@ -192,7 +171,7 @@ print_stat(const STRUCT_STAT *st)
 
 # define PRINT_ST_TIME(field)						\
 	printf(", st_" #field "=");					\
-	print_time(sign_extend_unsigned_to_ll(st->st_ ## field));	\
+	print_time_t(sign_extend_unsigned_to_ll(st->st_ ## field));	\
 	PRINT_TIME_NSEC(st->st_ ## field ## _nsec)
 
 	PRINT_ST_TIME(atime);

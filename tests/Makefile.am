@@ -54,6 +54,7 @@ libtests_a_SOURCES = \
 	overflowuid.c \
 	pipe_maxfd.c \
 	print_quoted_string.c \
+	print_time.c \
 	printflags.c \
 	printxval.c \
 	signal2name.c \
