@@ -65,18 +65,15 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 	}
 
 	if (!abbrev(tcp)) {
-		tprints(", st_atime=");
-		tprints(sprinttime(st->atime));
-		if (st->atime_nsec)
-			tprintf(".%09llu", st->atime_nsec);
-		tprints(", st_mtime=");
-		tprints(sprinttime(st->mtime));
-		if (st->mtime_nsec)
-			tprintf(".%09llu", st->mtime_nsec);
-		tprints(", st_ctime=");
-		tprints(sprinttime(st->ctime));
-		if (st->ctime_nsec)
-			tprintf(".%09llu", st->ctime_nsec);
+#define PRINT_ST_TIME(field)				\
+	tprints(", st_" #field "=");			\
+	tprints(sprinttime(st->field));			\
+	if (st->field ## _nsec)				\
+		tprintf(".%09llu", st->field ## _nsec)
+
+		PRINT_ST_TIME(atime);
+		PRINT_ST_TIME(mtime);
+		PRINT_ST_TIME(ctime);
 	} else {
 		tprints(", ...");
 	}
