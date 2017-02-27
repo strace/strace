@@ -4,8 +4,8 @@ Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
-URL: http://sourceforge.net/projects/strace/
-Source: http://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
+URL: https://strace.io
+Source: https://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
 %if 0%{?fedora} >= 20 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1300
 %define buildrequires_libunwind_devel BuildRequires: libunwind-devel
 %endif

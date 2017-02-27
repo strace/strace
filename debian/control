@@ -4,7 +4,7 @@ Section: utils
 Priority: optional
 Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [amd64 i386 powerpc ppc64 s390 sparc sparc64 x32], debhelper (>= 7.0.0), gawk
 Standards-Version: 3.9.6
-Homepage: http://sourceforge.net/projects/strace/
+Homepage: https://strace.io
 Vcs-Git: https://anonscm.debian.org/git/collab-maint/strace.git
 Vcs-Browser: https://anonscm.debian.org/git/collab-maint/strace.git
 
