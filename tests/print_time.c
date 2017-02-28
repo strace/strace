@@ -36,15 +36,14 @@ print_time_t_nsec(const time_t t, const unsigned long long nsec)
 {
 	if (t) {
 		const struct tm *const p = localtime(&t);
+		char buf[256];
 
-		if (p) {
-			char buf[256];
-
-			strftime(buf, sizeof(buf), "%FT%T%z", p);
-			fputs(buf, stdout);
-		} else {
-			printf("%llu", zero_extend_signed_to_ull(t));
+		if (!p) {
+			perror_msg_and_fail("localtime");
 		}
+
+		strftime(buf, sizeof(buf), "%FT%T%z", p);
+		fputs(buf, stdout);
 	} else {
 		putchar('0');
 	}
