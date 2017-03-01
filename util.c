@@ -550,10 +550,8 @@ sprinttime(time_t t)
 	struct tm *tmp;
 	static char buf[sizeof(int) * 3 * 6 + sizeof("+0000")];
 
-	if (t == 0) {
-		strcpy(buf, "0");
-		return buf;
-	}
+	if (t == 0)
+		return "0";
 	tmp = localtime(&t);
 	if (tmp)
 		strftime(buf, sizeof(buf), "%FT%T%z", tmp);
