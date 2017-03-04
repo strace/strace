@@ -212,6 +212,13 @@ lookup_class(const char *s)
 		{ "signal",	TRACE_SIGNAL	},
 		{ "ipc",	TRACE_IPC	},
 		{ "network",	TRACE_NETWORK	},
+		{ "%desc",	TRACE_DESC	},
+		{ "%file",	TRACE_FILE	},
+		{ "%memory",	TRACE_MEMORY	},
+		{ "%process",	TRACE_PROCESS	},
+		{ "%signal",	TRACE_SIGNAL	},
+		{ "%ipc",	TRACE_IPC	},
+		{ "%network",	TRACE_NETWORK	},
 	};
 
 	unsigned int i;

@@ -49,7 +49,7 @@ touch -- "$file" ||
 	framework_skip_ 'failed to create a file'
 
 run_prog ./scm_rights /dev/zero
-run_strace -y -x -enetwork $args "$file"
+run_strace -y -x -e%network $args "$file"
 
 hex='[[:xdigit:]]'
 n='[1-9][0-9]*'

@@ -5,7 +5,7 @@
 . "${srcdir=.}/init.sh"
 
 run_prog
-run_strace -edesc $args
+run_strace -e%desc $args
 match_grep
 
 exit 0

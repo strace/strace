@@ -30,7 +30,7 @@
 . "${srcdir=.}/init.sh"
 
 run_prog
-run_strace -esignal $args
+run_strace -e%signal $args
 
 mask='\[(USR2 CHLD|CHLD USR2) RT_3 RT_4 RT_5 RT_26 RT_27\]'
 rt_sigprocmask='rt_sigprocmask\(SIG_SETMASK, '"$mask"', NULL, [[:digit:]]+\) += 0'

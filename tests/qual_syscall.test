@@ -28,7 +28,7 @@ LC_ALL=C grep -v -x "$pattern_abbrev_verbose" "$LOG" |
 LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
-check_output_mismatch "$pattern_abbrev_verbose" -e trace=process
+check_output_mismatch "$pattern_abbrev_verbose" -e trace=%process
 LC_ALL=C grep '^chdir' "$LOG" > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 

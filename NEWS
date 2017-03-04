@@ -1,6 +1,11 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in command line syntax
+  * Syscall classes specified in -e trace= option now have % prefix (like
+    -e trace=%process).  Old style class names without leading % are still
+    supported, but considered deprecated now.
+
 * Improvements
   * Enhanced decoding of sched_setattr syscall.
 

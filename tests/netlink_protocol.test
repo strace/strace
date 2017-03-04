@@ -8,4 +8,4 @@
 [ -d /proc/self/fd/ ] ||
     framework_skip_ '/proc/self/fd/ is not available'
 
-run_strace_match_diff -e trace=network
+run_strace_match_diff -e trace=%network
