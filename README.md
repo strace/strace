@@ -1,8 +1,8 @@
 This is [strace](https://strace.io) -- a diagnostic, debugging and instructional userspace utility with a traditional command-line interface for Linux.  It is used to monitor and tamper with interactions between processes and the Linux kernel, which include system calls, signal deliveries, and changes of process state.  The operation of strace is made possible by the kernel feature known as [ptrace](http://man7.org/linux/man-pages/man2/ptrace.2.html).
 
-strace is released under a Berkeley-style license at the request of Paul Kranenburg; see the file [COPYING](https://raw.githubusercontent.com/strace/strace/master/COPYING) for details.
+strace is released under a Berkeley-style license at the request of Paul Kranenburg; see the file [COPYING](COPYING) for details.
 
-See the file [NEWS](https://raw.githubusercontent.com/strace/strace/master/NEWS) for information on what has changed in recent versions.
+See the file [NEWS](NEWS) for information on what has changed in recent versions.
 
 Please send bug reports and enhancements to [the strace mailing list](https://lists.sourceforge.net/lists/listinfo/strace-devel).
 
