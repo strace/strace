@@ -8,6 +8,6 @@ arch_sigreturn(struct tcb *tcp)
 	addr += offsetof(struct sigcontext, sc_mask);
 
 	tprints("{mask=");
-	print_sigset_addr_len(tcp, addr, NSIG_BYTES);
+	print_sigset_addr(tcp, addr);
 	tprints("}");
 }

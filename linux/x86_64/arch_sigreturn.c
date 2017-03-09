@@ -27,6 +27,6 @@ arch_sigreturn(struct tcb *tcp)
 #endif
 	const kernel_ulong_t addr = (kernel_ulong_t) *x86_64_rsp_ptr + offset;
 	tprints("{mask=");
-	print_sigset_addr_len(tcp, addr, NSIG_BYTES);
+	print_sigset_addr(tcp, addr);
 	tprints("}");
 }

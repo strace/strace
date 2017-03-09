@@ -2,6 +2,7 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
+ * Copyright (C) 2001-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -585,6 +586,8 @@ extern void printuid(const char *, const unsigned int);
 
 extern void
 print_sigset_addr_len(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len);
+extern void
+print_sigset_addr(struct tcb *, kernel_ulong_t addr);
 
 extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
 #define tprintsigmask_addr(prefix, mask) \

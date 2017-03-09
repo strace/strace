@@ -6,6 +6,7 @@
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
+ * Copyright (C) 2001-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -258,6 +259,12 @@ print_sigset_addr_len(struct tcb *const tcp, const kernel_ulong_t addr,
 		      const kernel_ulong_t len)
 {
 	print_sigset_addr_len_limit(tcp, addr, len, current_wordsize);
+}
+
+void
+print_sigset_addr(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	print_sigset_addr_len_limit(tcp, addr, NSIG_BYTES, NSIG_BYTES);
 }
 
 SYS_FUNC(sigsetmask)
