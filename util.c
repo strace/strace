@@ -355,7 +355,6 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 /*
  * Interpret `xlat' as an array of flags
  * print the entries whose bits are on in `flags'
- * return # of flags printed.
  */
 void
 addflags(const struct xlat *xlat, uint64_t flags)
