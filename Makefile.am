@@ -522,6 +522,7 @@ EXTRA_DIST =				\
 	linux/nios2/set_scno.c		\
 	linux/nios2/syscallent.h	\
 	linux/or1k/arch_regs.c		\
+	linux/or1k/arch_regs.h		\
 	linux/or1k/get_error.c		\
 	linux/or1k/get_scno.c		\
 	linux/or1k/get_syscall_args.c	\
