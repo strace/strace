@@ -512,6 +512,7 @@ EXTRA_DIST =				\
 	linux/mtd-abi.h			\
 	linux/netlink_diag.h		\
 	linux/nios2/arch_regs.c		\
+	linux/nios2/arch_regs.h		\
 	linux/nios2/get_error.c		\
 	linux/nios2/get_scno.c		\
 	linux/nios2/get_syscall_args.c	\
