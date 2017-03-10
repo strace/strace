@@ -570,6 +570,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/userent.h	\
 	linux/ptp_clock.h		\
 	linux/riscv/arch_regs.c		\
+	linux/riscv/arch_regs.h		\
 	linux/riscv/errnoent1.h		\
 	linux/riscv/get_error.c		\
 	linux/riscv/get_scno.c		\
