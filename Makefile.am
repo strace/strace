@@ -371,6 +371,7 @@ EXTRA_DIST =				\
 	linux/arm/syscallent.h		\
 	linux/arm/userent.h		\
 	linux/avr32/arch_regs.c		\
+	linux/avr32/arch_regs.h		\
 	linux/avr32/get_error.c		\
 	linux/avr32/get_scno.c		\
 	linux/avr32/get_syscall_args.c	\
