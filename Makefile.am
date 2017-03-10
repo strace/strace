@@ -347,6 +347,7 @@ EXTRA_DIST =				\
 	linux/alpha/syscallent.h	\
 	linux/alpha/userent.h		\
 	linux/arc/arch_regs.c		\
+	linux/arc/arch_regs.h		\
 	linux/arc/get_error.c		\
 	linux/arc/get_scno.c		\
 	linux/arc/get_syscall_args.c	\
