@@ -468,6 +468,7 @@ EXTRA_DIST =				\
 	linux/m68k/syscallent.h		\
 	linux/m68k/userent.h		\
 	linux/metag/arch_regs.c		\
+	linux/metag/arch_regs.h		\
 	linux/metag/get_error.c		\
 	linux/metag/get_scno.c		\
 	linux/metag/get_syscall_args.c	\
