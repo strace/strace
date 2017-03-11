@@ -159,7 +159,7 @@ build_mmap_cache(struct tcb* tcp)
 		struct mmap_cache_t *entry;
 		unsigned long start_addr, end_addr, mmap_offset;
 		char exec_bit;
-		char binary_path[PATH_MAX];
+		char binary_path[sizeof(buffer)];
 
 		if (sscanf(buffer, "%lx-%lx %*c%*c%c%*c %lx %*x:%*x %*d %[^\n]",
 			   &start_addr, &end_addr, &exec_bit,
