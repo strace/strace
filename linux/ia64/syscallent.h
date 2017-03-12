@@ -198,7 +198,7 @@
 [1178] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
 [1179] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [1180] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
-[1181] = { 0,	TS,		SEN(sigreturn),			"rt_sigreturn"		},
+[1181] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [1182] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [1183] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
 [1184] = { 2,	TF,		SEN(getcwd),			"getcwd"		},

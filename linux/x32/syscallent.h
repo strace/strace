@@ -13,7 +13,7 @@
 [ 12] = { 1,	TM|SI,		SEN(brk),			"brk"			},
 [ 13] = { 4,	TS,		SEN(printargs),			"64:rt_sigaction"	},
 [ 14] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
-[ 15] = { 0,	TS,		SEN(printargs),			"64:rt_sigreturn"	},
+[ 15] = { 0,	TS,		SEN(rt_sigreturn),		"64:rt_sigreturn"	},
 [ 16] = { 3,	TD,		SEN(printargs),			"64:ioctl"		},
 [ 17] = { 4,	TD,		SEN(pread),			"pread64"		},
 [ 18] = { 4,	TD,		SEN(pwrite),			"pwrite64"		},
@@ -336,7 +336,7 @@
  * for native 64-bit operation.
  */
 [512] = { 4,	CST|TS,		SEN(rt_sigaction),		"rt_sigaction"		},
-[513] = { 0,	CST|TS,		SEN(sigreturn),			"rt_sigreturn"		},
+[513] = { 0,	CST|TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [514] = { 3,	CST|TD,		SEN(ioctl),			"ioctl"			},
 [515] = { 3,	CST|TD,		SEN(readv),			"readv"			},
 [516] = { 3,	CST|TD,		SEN(writev),			"writev"		},

@@ -113,7 +113,6 @@
 #define	sys_munlockall		printargs
 #define	sys_pause		printargs
 #define	sys_printargs		printargs
-#define	sys_rt_sigreturn	printargs
 #define	sys_sched_yield		printargs
 #define	sys_setsid		printargs
 #define	sys_set_tid_address	printargs

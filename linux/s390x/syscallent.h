@@ -190,7 +190,7 @@
 [169] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [170 ... 171] = { },
 [172] = { 5,	0,		SEN(prctl),			"prctl"			},
-[173] = { 0,	TS,		SEN(sigreturn),			"rt_sigreturn"		},
+[173] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [174] = { 4,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [175] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [176] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},

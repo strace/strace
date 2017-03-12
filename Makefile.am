@@ -210,6 +210,7 @@ strace_SOURCES =	\
 	renameat.c	\
 	resource.c	\
 	rt_sigframe.c	\
+	rt_sigreturn.c	\
 	rtc.c		\
 	sched.c		\
 	sched_attr.h	\

@@ -137,7 +137,7 @@
 [136] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
 [137] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
 [138] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
-[139] = { 0,	TS,		SEN(sigreturn),			"rt_sigreturn"		},
+[139] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [140] = { 3,	0,		SEN(setpriority),		"setpriority"		},
 [141] = { 2,	0,		SEN(getpriority),		"getpriority"		},
 [142] = { 4,	0,		SEN(reboot),			"reboot"		},
