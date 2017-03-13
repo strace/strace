@@ -41,32 +41,32 @@ try_run_prog()
 	}
 }
 
-SCHED_TESTS='28 sched_xetaffinity
+while read w i
+do
+	try_run_prog "./$i" || continue
+	run_strace -a$w -e%sched ./$i > "$EXP"
+	match_diff "$LOG" "$EXP"
+done << EOF
+28 sched_xetaffinity
 23 sched_xetparam
 31 sched_rr_get_interval
 33 sched_get_priority_mxx
 29 sched_xetattr
 22 sched_xetscheduler
-14 sched_yield'
-
-NON_SCHED_TESTS='11 fchdir
-28 futex
-10 fsync'
-
-echo "$SCHED_TESTS" | while read w i
-do
-	try_run_prog "./$i" || continue
-	run_strace -a$w -e%sched ./$i > "$EXP"
-	match_diff "$LOG" "$EXP"
-done
+14 sched_yield
+EOF
 
 echo '+++ exited with 0 +++' > "$EXP"
 
-echo "$NON_SCHED_TESTS" | while read w i
+while read w i
 do
 	try_run_prog "./$i" || continue
 	run_strace -a$w -e%sched ./$i > /dev/null
 	match_diff "$LOG" "$EXP"
-done
+done << EOF
+11 fchdir
+28 futex
+10 fsync
+EOF
 
 rm "$EXP"
