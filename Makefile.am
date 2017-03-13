@@ -70,6 +70,7 @@ libstrace_a_SOURCES =	\
 	fstatfs.c \
 	fstatfs64.c \
 	ipc.c \
+	sigreturn.c	\
 	socketcall.c \
 	statfs.c \
 	statfs64.c \
@@ -224,7 +225,6 @@ strace_SOURCES =	\
 	sigevent.h	\
 	signal.c	\
 	signalfd.c	\
-	sigreturn.c	\
 	sock.c		\
 	sockaddr.c	\
 	socketutils.c	\
