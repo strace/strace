@@ -462,7 +462,6 @@ EXTRA_DIST =				\
 	linux/ia64/arch_regs.c		\
 	linux/ia64/arch_regs.h		\
 	linux/ia64/arch_rt_sigframe.c	\
-	linux/ia64/arch_sigreturn.c	\
 	linux/ia64/get_error.c		\
 	linux/ia64/get_scno.c		\
 	linux/ia64/get_syscall_args.c	\
