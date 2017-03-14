@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Check decoding of setitimer and getitimer syscalls.
+ *
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,48 +31,138 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/time.h>
+#include <unistd.h>
+#include <asm/unistd.h>
 
 int
 main(void)
 {
-	struct {
-		struct itimerval itv;
-		uint32_t pad[4];
-	} old = {
-		.pad = { 0xdeadbeef, 0xbadc0ded, 0xdeadbeef, 0xbadc0ded }
-	}, new = {
-		.itv = {
-			.it_interval = { 0xc0de1, 0xc0de2 },
-			.it_value = { 0xc0de3, 0xc0de4 }
-		},
-		.pad = { 0xdeadbeef, 0xbadc0ded, 0xdeadbeef, 0xbadc0ded }
+	static const struct itimerval new = {
+		.it_interval = { 0xc0de1, 0xc0de2 },
+		.it_value = { 0xc0de3, 0xc0de4 }
 	};
+	static const kernel_ulong_t long_timer =
+		F8ILL_KULONG_MASK | ITIMER_REAL;
+	static const kernel_ulong_t bogus_timer =
+		(kernel_ulong_t) 0xfacefeeddeadbeefULL;
 
-	if (setitimer(ITIMER_REAL, &new.itv, &old.itv))
+	struct itimerval *const p_old = tail_alloc(sizeof(*p_old));
+	struct itimerval *const p_new = tail_memdup(&new, sizeof(new));
+	void *const efault = tail_alloc(sizeof(new) - 8);
+	long rc;
+
+	if (setitimer(ITIMER_REAL, p_new, NULL))
 		perror_msg_and_skip("setitimer");
+	printf("setitimer(ITIMER_REAL"
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}"
+	       ", NULL) = 0\n",
+	       (intmax_t) new.it_interval.tv_sec,
+	       (intmax_t) new.it_interval.tv_usec,
+	       (intmax_t) new.it_value.tv_sec,
+	       (intmax_t) new.it_value.tv_usec);
+
+	fill_memory(p_old, sizeof(*p_old));
+	if (getitimer(ITIMER_REAL, p_old))
+		perror_msg_and_skip("getitimer");
+	printf("getitimer(ITIMER_REAL"
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = 0\n",
+	       (intmax_t) p_old->it_interval.tv_sec,
+	       (intmax_t) p_old->it_interval.tv_usec,
+	       (intmax_t) p_old->it_value.tv_sec,
+	       (intmax_t) p_old->it_value.tv_usec);
+
+	fill_memory(p_old, sizeof(*p_old));
+	setitimer(ITIMER_REAL, p_new, p_old);
 	printf("setitimer(ITIMER_REAL"
 	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
 	       "it_value={tv_sec=%jd, tv_usec=%jd}}"
 	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
 	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = 0\n",
-	       (intmax_t) new.itv.it_interval.tv_sec,
-	       (intmax_t) new.itv.it_interval.tv_usec,
-	       (intmax_t) new.itv.it_value.tv_sec,
-	       (intmax_t) new.itv.it_value.tv_usec,
-	       (intmax_t) old.itv.it_interval.tv_sec,
-	       (intmax_t) old.itv.it_interval.tv_usec,
-	       (intmax_t) old.itv.it_value.tv_sec,
-	       (intmax_t) old.itv.it_value.tv_usec);
+	       (intmax_t) new.it_interval.tv_sec,
+	       (intmax_t) new.it_interval.tv_usec,
+	       (intmax_t) new.it_value.tv_sec,
+	       (intmax_t) new.it_value.tv_usec,
+	       (intmax_t) p_old->it_interval.tv_sec,
+	       (intmax_t) p_old->it_interval.tv_usec,
+	       (intmax_t) p_old->it_value.tv_sec,
+	       (intmax_t) p_old->it_value.tv_usec);
 
-	if (getitimer(ITIMER_REAL, &old.itv))
-		perror_msg_and_skip("getitimer");
+	rc = getitimer(ITIMER_REAL, efault);
+	printf("getitimer(ITIMER_REAL, %p) = %s\n", efault, sprintrc(rc));
+
+	rc = setitimer(ITIMER_REAL, p_new, efault);
+	printf("setitimer(ITIMER_REAL"
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}, %p) = %s\n",
+	       (intmax_t) new.it_interval.tv_sec,
+	       (intmax_t) new.it_interval.tv_usec,
+	       (intmax_t) new.it_value.tv_sec,
+	       (intmax_t) new.it_value.tv_usec,
+	       efault, sprintrc(rc));
+
+	rc = setitimer(ITIMER_REAL, efault, p_old);
+	printf("setitimer(ITIMER_REAL, %p, %p) = %s\n",
+	       efault, p_old, sprintrc(rc));
+
+	fill_memory(p_old, sizeof(*p_old));
+	rc = syscall(__NR_setitimer, long_timer, p_new, p_old);
+	printf("setitimer(ITIMER_REAL"
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}"
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = %s\n",
+	       (intmax_t) new.it_interval.tv_sec,
+	       (intmax_t) new.it_interval.tv_usec,
+	       (intmax_t) new.it_value.tv_sec,
+	       (intmax_t) new.it_value.tv_usec,
+	       (intmax_t) p_old->it_interval.tv_sec,
+	       (intmax_t) p_old->it_interval.tv_usec,
+	       (intmax_t) p_old->it_value.tv_sec,
+	       (intmax_t) p_old->it_value.tv_usec,
+	       sprintrc(rc));
+
+	fill_memory(p_old, sizeof(*p_old));
+	rc = syscall(__NR_getitimer, long_timer, p_old);
 	printf("getitimer(ITIMER_REAL"
 	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = 0\n",
-	       (intmax_t) old.itv.it_interval.tv_sec,
-	       (intmax_t) old.itv.it_interval.tv_usec,
-	       (intmax_t) old.itv.it_value.tv_sec,
-	       (intmax_t) old.itv.it_value.tv_usec);
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = %s\n",
+	       (intmax_t) p_old->it_interval.tv_sec,
+	       (intmax_t) p_old->it_interval.tv_usec,
+	       (intmax_t) p_old->it_value.tv_sec,
+	       (intmax_t) p_old->it_value.tv_usec,
+	       sprintrc(rc));
+
+	rc = syscall(__NR_setitimer, bogus_timer, p_new, p_old);
+	printf("setitimer(%#x /* ITIMER_??? */"
+	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
+	       "it_value={tv_sec=%jd, tv_usec=%jd}}, %p) = %s\n",
+	       (int) bogus_timer,
+	       (intmax_t) new.it_interval.tv_sec,
+	       (intmax_t) new.it_interval.tv_usec,
+	       (intmax_t) new.it_value.tv_sec,
+	       (intmax_t) new.it_value.tv_usec,
+	       p_old, sprintrc(rc));
+
+	rc = syscall(__NR_getitimer, bogus_timer, p_old);
+	printf("getitimer(%#x /* ITIMER_??? */, %p) = %s\n",
+	       (int) bogus_timer, p_old, sprintrc(rc));
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		const kernel_ulong_t ill_new = f8ill_ptr_to_kulong(p_new);
+		const kernel_ulong_t ill_old = f8ill_ptr_to_kulong(p_old);
+
+		rc = syscall(__NR_setitimer, long_timer, ill_new, ill_old);
+		printf("setitimer(ITIMER_REAL, %#llx, %#llx) = %s\n",
+		       (unsigned long long) ill_new,
+		       (unsigned long long) ill_old,
+		       sprintrc(rc));
+
+		rc = syscall(__NR_getitimer, long_timer, ill_old);
+		printf("getitimer(ITIMER_REAL, %#llx) = %s\n",
+		       (unsigned long long) ill_old, sprintrc(rc));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

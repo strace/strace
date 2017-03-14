@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Check setitimer and getitimer syscalls decoding.
+# Check decoding of setitimer and getitimer syscalls.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=setitimer,getitimer
+run_strace_match_diff -a29 -e trace=setitimer,getitimer
