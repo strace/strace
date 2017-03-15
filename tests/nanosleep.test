@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Check nanosleep and setitimer syscalls decoding.
+# Check decoding of nanosleep syscall.
 
 . "${srcdir=.}/init.sh"
-run_strace_match_diff -a20 -e trace=nanosleep,setitimer
+run_strace_match_diff -a20

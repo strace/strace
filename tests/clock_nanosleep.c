@@ -1,4 +1,6 @@
 /*
+ * Check decoding of clock_nanosleep and clock_gettime syscalls.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -89,12 +91,6 @@ main(void)
 
 	if (setitimer(ITIMER_REAL, &itv, NULL))
 		perror_msg_and_skip("setitimer");
-	printf("setitimer(ITIMER_REAL, {it_interval={tv_sec=%jd, tv_usec=%jd}"
-	       ", it_value={tv_sec=%jd, tv_usec=%jd}}, NULL) = 0\n",
-	       (intmax_t) itv.it_interval.tv_sec,
-	       (intmax_t) itv.it_interval.tv_usec,
-	       (intmax_t) itv.it_value.tv_sec,
-	       (intmax_t) itv.it_value.tv_usec);
 
 	--req.ts.tv_nsec;
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
