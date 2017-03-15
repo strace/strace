@@ -27,6 +27,20 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+. "${srcdir=.}/init.sh"
+
+try_run_prog()
+{
+	"$@" > /dev/null || {
+		rc=$?
+		if [ $rc -eq 77 ]; then
+			return 1
+		else
+			fail_ "$* failed with code $rc"
+		fi
+	}
+}
+
 SCHED_TESTS='28 sched_xetaffinity
 23 sched_xetparam
 31 sched_rr_get_interval
@@ -39,11 +53,9 @@ NON_SCHED_TESTS='11 fchdir
 28 futex
 10 fsync'
 
-. "${srcdir=.}/init.sh"
-
 echo "$SCHED_TESTS" | while read w i
 do
-	run_prog ./$i > /dev/null
+	try_run_prog "./$i" || continue
 	run_strace -a$w -e%sched ./$i > "$EXP"
 	match_diff "$LOG" "$EXP"
 done
@@ -52,7 +64,7 @@ echo '+++ exited with 0 +++' > "$EXP"
 
 echo "$NON_SCHED_TESTS" | while read w i
 do
-	run_prog ./$i > /dev/null
+	try_run_prog "./$i" || continue
 	run_strace -a$w -e%sched ./$i > /dev/null
 	match_diff "$LOG" "$EXP"
 done
