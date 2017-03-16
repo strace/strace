@@ -41,6 +41,7 @@ my $floatform;
 
 # Scales for strace slowdown.  Make configurable!
 my $scale_factor = 3.5;
+my %running_fqname;
 
 while (<>) {
     my ($pid, $call, $args, $result, $time, $time_spent);
@@ -222,11 +223,14 @@ my %pr;
 
 sub handle_trace {
     my ($pid, $call, $args, $result, $time) = @_;
-    my $p;
+    my $pid_fqname = $pid . "-" . $time;
 
-    if (defined $time and not defined $pr{$pid}{start}) {
-	$pr{$pid}{start} = $time;
+    if (defined $time and not defined $running_fqname{$pid}) {
+	$pr{$pid_fqname}{start} = $time;
+	$running_fqname{$pid} = $pid_fqname;
     }
+
+    $pid_fqname = $running_fqname{$pid};
 
     if ($call eq 'execve') {
 	return if $result ne '0';
@@ -235,30 +239,34 @@ sub handle_trace {
 	my ($basename) = $filename =~ m/([^\/]*)$/;
 	if ($basename ne $$argv[0]) {
 	    $$argv[0] = "$basename($$argv[0])";
-        }
-	my $seq = $pr{$pid}{seq};
+	}
+	my $seq = $pr{$pid_fqname}{seq};
 	$seq = [] if not defined $seq;
 
 	push @$seq, ['EXEC', $filename, $argv];
 
-	$pr{$pid}{seq} = $seq;
+	$pr{$pid_fqname}{seq} = $seq;
     } elsif ($call eq 'fork' || $call eq 'clone' || $call eq 'vfork') {
 	return if $result == 0;
 
-	my $seq = $pr{$pid}{seq};
+	my $seq = $pr{$pid_fqname}{seq};
+	my $result_fqname= $result . "-" . $time;
 	$seq = [] if not defined $seq;
-	push @$seq, ['FORK', $result];
-	$pr{$pid}{seq} = $seq;
-	$pr{$result}{parent} = $pid;
-	$pr{$result}{seq} = [];
+	push @$seq, ['FORK', $result_fqname];
+	$pr{$pid_fqname}{seq} = $seq;
+	$pr{$result_fqname}{start} = $time;
+	$pr{$result_fqname}{parent} = $pid_fqname;
+	$pr{$result_fqname}{seq} = [];
+	$running_fqname{$result} = $result_fqname;
     } elsif ($call eq '_exit' || $call eq 'exit_group') {
-	$pr{$pid}{end} = $time if defined $time;
+	$pr{$running_fqname{$pid}}{end} = $time if defined $time and not defined $pr{$running_fqname{$pid}}{end};
+	delete $running_fqname{$pid};
     }
 }
 
 sub handle_killed {
     my ($pid, $time) = @_;
-    $pr{$pid}{end} = $time if defined $time;
+    $pr{$pid}{end} = $time if defined $time and not defined $pr{$pid}{end};
 }
 
 sub straight_seq {
@@ -321,11 +329,11 @@ sub display_pid_trace {
 	    }
 	} elsif ($$elem[0] eq 'FORK') {
 	    if ($i == 1) {
-                if ($lead =~ /-$/) {
+		if ($lead =~ /-$/) {
 		    display_pid_trace($$elem[1], "$lead--+--");
-                } else {
+		} else {
 		    display_pid_trace($$elem[1], "$lead  +--");
-                }
+		}
 	    } elsif ($i == @seq) {
 		display_pid_trace($$elem[1], "$lead  `--");
 	    } else {
