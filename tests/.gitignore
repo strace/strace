@@ -111,6 +111,7 @@ inet-cmsg
 init_module
 inotify
 inotify_init1
+int_0x80
 ioctl
 ioctl_block
 ioctl_dm

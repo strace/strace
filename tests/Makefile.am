@@ -174,6 +174,7 @@ check_PROGRAMS = \
 	init_module \
 	inotify \
 	inotify_init1 \
+	int_0x80 \
 	ioctl \
 	ioctl_block \
 	ioctl_dm \
@@ -850,6 +851,7 @@ MISC_TESTS = \
 	detach-stopped.test \
 	filter-unavailable.test \
 	fork-f.test \
+	int_0x80.test \
 	ksysent.test \
 	opipe.test \
 	options-syntax.test \
@@ -885,7 +887,9 @@ TESTS = $(DECODER_TESTS) $(MISC_TESTS) $(LIBUNWIND_TESTS)
 XFAIL_TESTS_ =
 XFAIL_TESTS_m32 = $(LIBUNWIND_TESTS)
 XFAIL_TESTS_mx32 = $(LIBUNWIND_TESTS)
-XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME))
+XFAIL_TESTS_x86_64 = int_0x80.test
+XFAIL_TESTS_x32 = int_0x80.test
+XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME)) $(XFAIL_TESTS_$(ARCH))
 
 TEST_LOG_COMPILER = env
 AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) MIPS_ABI=$(MIPS_ABI) $(srcdir)/run.sh
@@ -962,6 +966,6 @@ ksysent.$(OBJEXT): ksysent.h
 objects = $(filter %.$(OBJEXT),$(SOURCES:.c=.$(OBJEXT)))
 $(objects): scno.h
 
-CLEANFILES = ksysent.h $(TESTS:=.tmp)
+CLEANFILES = ksysent.h $(TESTS:=.tmp) $(TESTS:=.tmp.out) $(TESTS:=.tmp.exp)
 
 include ../scno.am
