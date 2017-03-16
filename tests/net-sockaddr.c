@@ -57,7 +57,7 @@ extern unsigned int if_nametoindex(const char *);
 static void
 check_un(void)
 {
-	struct sockaddr_un *un = tail_alloc(sizeof(*un));
+	TAIL_ALLOC_OBJECT_VAR_PTR(struct sockaddr_un, un);
 	un->sun_family = AF_UNIX;
 	memset(un->sun_path, '0', sizeof(un->sun_path));
 	unsigned int len = sizeof(*un);
@@ -133,7 +133,7 @@ check_in(void)
 	const unsigned short h_port = 12345;
 	static const char h_addr[] = "12.34.56.78";
 
-	struct sockaddr_in *in = tail_alloc(sizeof(*in));
+	TAIL_ALLOC_OBJECT_VAR_PTR(struct sockaddr_in, in);
 	in->sin_family = AF_INET;
 	in->sin_port = htons(h_port);
 	in->sin_addr.s_addr = inet_addr(h_addr);
@@ -207,7 +207,7 @@ check_in6(void)
 	const unsigned int h_flowinfo = 1234567890;
 	static const char h_addr[] = "12:34:56:78:90:ab:cd:ef";
 
-	struct sockaddr_in6 *in6 = tail_alloc(sizeof(*in6));
+	TAIL_ALLOC_OBJECT_VAR_PTR(struct sockaddr_in6, in6);
 	in6->sin6_family = AF_INET6;
 	in6->sin6_port = htons(h_port);
 	in6->sin6_flowinfo = htonl(h_flowinfo);
@@ -298,7 +298,7 @@ check_ipx(void)
 static void
 check_nl(void)
 {
-	struct sockaddr_nl *nl = tail_alloc(sizeof(*nl));
+	TAIL_ALLOC_OBJECT_VAR_PTR(struct sockaddr_nl, nl);
 	nl->nl_family = AF_NETLINK;
 	nl->nl_pid = 1234567890;
 	nl->nl_groups = 0xfacefeed;
@@ -390,7 +390,7 @@ static void
 check_hci(void)
 {
 	const unsigned short h_port = 12345;
-	struct sockaddr_hci *hci = tail_alloc(sizeof(*hci));
+	TAIL_ALLOC_OBJECT_VAR_PTR(struct sockaddr_hci, hci);
 	hci->hci_family = AF_BLUETOOTH;
 	hci->hci_dev = htobs(h_port);
 	hci->hci_channel = HCI_CHANNEL_RAW;

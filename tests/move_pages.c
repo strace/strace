@@ -190,9 +190,9 @@ main(void)
 	const unsigned page_size = get_page_size();
 	const void *const page = tail_alloc(page_size);
 	const void *const efault = page + page_size;
-	const void **pages = tail_alloc(sizeof(*pages));
-	int *nodes = tail_alloc(sizeof(*nodes));
-	int *status = tail_alloc(sizeof(*status));
+	TAIL_ALLOC_OBJECT_VAR_PTR(const void *, pages);
+	TAIL_ALLOC_OBJECT_VAR_PTR(int, nodes);
+	TAIL_ALLOC_OBJECT_VAR_PTR(int, status);
 
 	print_stat_pages(pid, 0, pages, status);
 	print_move_pages(pid, 0, 0, pages, nodes, status);
