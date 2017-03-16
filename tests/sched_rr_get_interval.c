@@ -11,7 +11,7 @@
 int
 main(void)
 {
-	struct timespec *const tp = tail_alloc(sizeof(struct timespec));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, tp);
 	long rc;
 
 	rc = syscall(__NR_sched_rr_get_interval, 0, NULL);

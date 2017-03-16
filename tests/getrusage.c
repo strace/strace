@@ -68,7 +68,7 @@ invoke_print(int who, const char *who_str, struct rusage *usage)
 int
 main(void)
 {
-	struct rusage *const usage = tail_alloc(sizeof(*usage));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct rusage, usage);
 	if (invoke_print(ARG_STR(RUSAGE_SELF), usage)) {
 		perror_msg_and_fail("RUSAGE_SELF");
 	}

@@ -91,7 +91,7 @@ main(void)
 
 	void *const k_set = tail_alloc(set_size);
 	void *const old_set = tail_alloc(set_size);
-	sigset_t *const libc_set = tail_alloc(sizeof(sigset_t));
+	TAIL_ALLOC_OBJECT_CONST_PTR(sigset_t, libc_set);
 
 	memset(k_set, 0, set_size);
 	if (k_sigprocmask(SIG_SETMASK, k_set, NULL, set_size))

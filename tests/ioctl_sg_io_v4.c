@@ -45,7 +45,7 @@ main(void)
 	ioctl(-1, SG_IO, 0);
 	printf("ioctl(-1, SG_IO, NULL) = -1 EBADF (%m)\n");
 
-	struct sg_io_v4 *const sg_io = tail_alloc(sizeof(*sg_io));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sg_io_v4, sg_io);
 	fill_memory(sg_io, sizeof(*sg_io));
 
 	const void *const efault = sg_io + 1;
@@ -55,7 +55,7 @@ main(void)
 	ioctl(-1, SG_IO, sg_io);
 	printf("ioctl(-1, SG_IO, [%u]) = -1 EBADF (%m)\n", sg_io->guard);
 
-	unsigned int *const pguard = tail_alloc(sizeof(*pguard));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, pguard);
 	*pguard = (unsigned char) 'Q';
 	ioctl(-1, SG_IO, pguard);
 	printf("ioctl(-1, SG_IO, {guard='Q', %p}) = -1 EBADF (%m)\n", pguard + 1);

@@ -208,7 +208,7 @@ main(void)
 		tail_alloc(sizeof(struct file_handle) + 128);
 	struct file_handle *handle_256 =
 		tail_alloc(sizeof(struct file_handle) + 256);
-	int *bogus_mount_id = tail_alloc(sizeof(*bogus_mount_id));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, bogus_mount_id);
 
 	char handle_0_addr[sizeof("0x") + sizeof(void *) * 2];
 

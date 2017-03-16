@@ -179,7 +179,7 @@ main(void)
 	const unsigned int sigset_size = get_sigset_size();
 
 	void *const k_set = tail_alloc(sigset_size);
-	siginfo_t *const sip = tail_alloc(sizeof(*sip));
+	TAIL_ALLOC_OBJECT_CONST_PTR(siginfo_t, sip);
 
 	do_ptrace(bad_request, pid, 0, 0);
 	printf("ptrace(%#lx /* PTRACE_??? */, %u, NULL, NULL) = %s\n",

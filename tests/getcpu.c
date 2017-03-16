@@ -47,8 +47,8 @@ main(void)
 		(unsigned *) tail_alloc(sizeof(* bogus_tcache)) + 1;
 
 	long res;
-	unsigned *cpu = tail_alloc(sizeof(*cpu));
-	unsigned *node = tail_alloc(sizeof(*node));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned, cpu);
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned, node);
 	long * tcache = tail_alloc(128);
 
 	res = syscall(__NR_getcpu, NULL, NULL, NULL);

@@ -173,10 +173,10 @@ main(void)
 	long rc;
 	char *unterminated = tail_memdup(unterminated_data,
 					 sizeof(unterminated_data));
-	struct if_dqblk *dqblk = tail_alloc(sizeof(*dqblk));
-	struct if_dqinfo *dqinfo = tail_alloc(sizeof(*dqinfo));
-	uint32_t *fmt = tail_alloc(sizeof(*fmt));
-	struct if_nextdqblk *nextdqblk = tail_alloc(sizeof(*nextdqblk));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct if_dqblk, dqblk);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct if_dqinfo, dqinfo);
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint32_t, fmt);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct if_nextdqblk, nextdqblk);
 
 
 	snprintf(bogus_special_str, sizeof(bogus_special_str), "%p",

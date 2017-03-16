@@ -95,13 +95,13 @@ main(void)
 	ioctl(-1, MTDFILEMODE, MTD_FILE_MODE_NORMAL);
 	printf("ioctl(-1, MTDFILEMODE, MTD_FILE_MODE_NORMAL) = -1 EBADF (%m)\n");
 
-	int *const opt = tail_alloc(sizeof(*opt));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, opt);
 	*opt = MTD_OTP_OFF;
 	ioctl(-1, OTPSELECT, opt);
 	printf("ioctl(-1, MIXER_READ(%u) or OTPSELECT, [MTD_OTP_OFF])"
 	       " = -1 EBADF (%m)\n", (unsigned int) _IOC_NR(OTPSELECT));
 
-	uint64_t *const v64 = tail_alloc(sizeof(*v64));
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, v64);
 	fill_memory(v64, sizeof(*v64));
 
 	ioctl(-1, MEMGETBADBLOCK, v64);
@@ -114,7 +114,7 @@ main(void)
 	       " = -1 EBADF (%m)\n",
 	       (unsigned int) _IOC_NR(MEMSETBADBLOCK), *v64);
 
-	struct region_info_user *const riu = tail_alloc(sizeof(*riu));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct region_info_user, riu);
 	fill_memory(riu, sizeof(*riu));
 	ioctl(-1, MEMGETREGIONINFO, riu);
 	printf("ioctl(-1, %s, {regionindex=%#x}) = -1 EBADF (%m)\n",
@@ -124,7 +124,7 @@ main(void)
 #endif
 	       , riu->regionindex);
 
-	struct erase_info_user *const eiu = tail_alloc(sizeof(*eiu));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct erase_info_user, eiu);
 	fill_memory(eiu, sizeof(*eiu));
 
 	TEST_erase_info_user(MEMERASE, eiu);
@@ -132,7 +132,7 @@ main(void)
 	TEST_erase_info_user(MEMUNLOCK, eiu);
 	TEST_erase_info_user(MEMISLOCKED, eiu);
 
-	struct erase_info_user64 *const eiu64 = tail_alloc(sizeof(*eiu64));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct erase_info_user64, eiu64);
 	fill_memory(eiu64, sizeof(*eiu64));
 	ioctl(-1, MEMERASE64, eiu64);
 	printf("ioctl(-1, MIXER_WRITE(%u) or %s, {start=%#llx, length=%#llx})"
@@ -141,7 +141,7 @@ main(void)
 	       (unsigned long long) eiu64->start,
 	       (unsigned long long) eiu64->length);
 
-	struct mtd_oob_buf *const oob = tail_alloc(sizeof(*oob));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_oob_buf, oob);
 	fill_memory(oob, sizeof(*oob));
 
 	ioctl(-1, MEMWRITEOOB, oob);
@@ -152,7 +152,7 @@ main(void)
 	printf("ioctl(-1, MEMREADOOB, {start=%#x, length=%#x, ptr=%p})"
 	       " = -1 EBADF (%m)\n", oob->start, oob->length, oob->ptr);
 
-	struct mtd_oob_buf64 *const oob64 = tail_alloc(sizeof(*oob64));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_oob_buf64, oob64);
 	fill_memory(oob64, sizeof(*oob64));
 
 	ioctl(-1, MEMWRITEOOB64, oob64);
@@ -168,14 +168,14 @@ main(void)
 	       (unsigned long long) oob64->usr_ptr);
 
 
-	struct otp_info *const oi = tail_alloc(sizeof(*oi));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct otp_info, oi);
 	fill_memory(oi, sizeof(*oi));
 	ioctl(-1, OTPLOCK, oi);
 	printf("ioctl(-1, MIXER_READ(%u) or OTPLOCK"
 	       ", {start=%#x, length=%#x, locked=%u}) = -1 EBADF (%m)\n",
 	       (unsigned int) _IOC_NR(OTPLOCK),  oi->start, oi->length, oi->locked);
 
-	struct mtd_write_req *const wr = tail_alloc(sizeof(*wr));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_write_req, wr);
 	fill_memory(wr, sizeof(*wr));
 	wr->mode = MTD_OPS_PLACE_OOB;
 	ioctl(-1, MEMWRITE, wr);

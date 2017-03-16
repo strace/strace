@@ -108,7 +108,7 @@ main(void)
 #endif
 	       errno2name());
 
-	char **const empty = tail_alloc(sizeof(*empty));
+	TAIL_ALLOC_OBJECT_CONST_PTR(char *, empty);
 	char **const efault = empty + 1;
 	*empty = NULL;
 

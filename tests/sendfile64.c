@@ -69,7 +69,7 @@ main(int ac, const char **av)
 	printf("sendfile64(0, 1, NULL, %lu) = -1 EBADF (%m)\n",
 	       (unsigned long) page_len);
 
-	uint64_t *p_off = tail_alloc(sizeof(uint64_t));
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, p_off);
 	void *p = p_off + 1;
 	*p_off = 0;
 

@@ -43,7 +43,7 @@ main(void)
 	ioctl(-1, SG_IO, 0);
 	printf("ioctl(-1, SG_IO, NULL) = -1 EBADF (%m)\n");
 
-	struct sg_io_hdr *const sg_io = tail_alloc(sizeof(*sg_io));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sg_io_hdr, sg_io);
 	fill_memory(sg_io, sizeof(*sg_io));
 
 	const void *const efault = sg_io + 1;
@@ -53,7 +53,7 @@ main(void)
 	ioctl(-1, SG_IO, sg_io);
 	printf("ioctl(-1, SG_IO, [%u]) = -1 EBADF (%m)\n", sg_io->interface_id);
 
-	unsigned int *const piid = tail_alloc(sizeof(*piid));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, piid);
 	*piid = (unsigned char) 'S';
 	ioctl(-1, SG_IO, piid);
 	printf("ioctl(-1, SG_IO, {interface_id='S', %p}) = -1 EBADF (%m)\n", piid + 1);

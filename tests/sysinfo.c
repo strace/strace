@@ -38,7 +38,7 @@ main(void)
 	sysinfo(NULL);
 	printf("sysinfo(NULL) = -1 EFAULT (%m)\n");
 
-	struct sysinfo * const si = tail_alloc(sizeof(*si));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sysinfo, si);
 
 	if (sysinfo(si))
 		perror_msg_and_skip("sysinfo");

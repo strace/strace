@@ -86,8 +86,8 @@ main(void)
 {
 	tprintf("%s", "");
 
-	siginfo_t *const info = tail_alloc(sizeof(*info));
-	struct timespec *const timeout = tail_alloc(sizeof(*timeout));
+	TAIL_ALLOC_OBJECT_CONST_PTR(siginfo_t, info);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, timeout);
 	timeout->tv_sec = 0;
 	timeout->tv_nsec = 42;
 
@@ -111,7 +111,7 @@ main(void)
 		(intmax_t) timeout->tv_sec, (intmax_t) timeout->tv_nsec,
 		set_size);
 
-	sigset_t *const libc_set = tail_alloc(sizeof(sigset_t));
+	TAIL_ALLOC_OBJECT_CONST_PTR(sigset_t, libc_set);
 	sigemptyset(libc_set);
 	sigaddset(libc_set, SIGHUP);
 	memcpy(k_set, libc_set, set_size);

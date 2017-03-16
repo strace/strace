@@ -175,8 +175,8 @@ main(void)
 	static const kernel_ulong_t kernel_mask =
 		((kernel_ulong_t) -1) - ((unsigned long) -1L);
 
-	struct loop_info * const info = tail_alloc(sizeof(*info));
-	struct loop_info64 * const info64 = tail_alloc(sizeof(*info64));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_info, info);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_info64, info64);
 
 	/* Unknown loop commands */
 	ioctl(-1, unknown_loop_cmd, magic);

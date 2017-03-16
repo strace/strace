@@ -57,7 +57,7 @@ main(void)
 		{ 32, "PR_TASK_PERF_EVENTS_ENABLE" },
 	};
 
-	unsigned int *ptr = tail_alloc(sizeof(*ptr));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(options); i++) {

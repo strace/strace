@@ -64,7 +64,7 @@ print_statfs(const char *const sample, const char *magic_str)
 	if (fd < 0)
 		perror_msg_and_fail("open: %s", sample);
 
-	STRUCT_STATFS *const b = tail_alloc(sizeof(*b));
+	TAIL_ALLOC_OBJECT_CONST_PTR(STRUCT_STATFS, b);
 	long rc = SYSCALL_INVOKE(sample, fd, b, sizeof(*b));
 	if (rc)
 		perror_msg_and_skip(SYSCALL_NAME);

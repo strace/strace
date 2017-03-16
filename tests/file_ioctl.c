@@ -13,7 +13,7 @@ static void
 test_fiemap(void)
 {
 	(void) tail_alloc(1);
-	struct fiemap *const args = tail_alloc(sizeof(*args));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct fiemap, args);
 
 	printf("ioctl(-1, FS_IOC_FIEMAP, {fm_start=%" PRI__u64
 	       ", fm_length=%" PRI__u64", fm_flags=",

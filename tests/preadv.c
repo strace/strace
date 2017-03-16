@@ -66,7 +66,7 @@ main(void)
 {
 	const off_t offset = 0xdefaceddeadbeefLL;
 	char *buf = tail_alloc(LEN);
-	struct iovec *iov = tail_alloc(sizeof(*iov));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct iovec, iov);
 	iov->iov_base = buf;
 	iov->iov_len = LEN;
 

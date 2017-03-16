@@ -46,7 +46,7 @@ main(void)
 		.sin_addr.s_addr = htonl(INADDR_LOOPBACK)
 	};
 	struct sockaddr * const listen_sa = tail_memdup(&addr, sizeof(addr));
-	socklen_t * const len = tail_alloc(sizeof(socklen_t));
+	TAIL_ALLOC_OBJECT_CONST_PTR(socklen_t, len);
 	*len = sizeof(addr);
 
 	const int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -77,7 +77,7 @@ main(void)
 	       ", [%u]) = 0\n",
 	       listen_fd, listen_port, listen_port, (unsigned) *len);
 
-	unsigned int * const optval = tail_alloc(sizeof(unsigned int));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, optval);
 	*len = sizeof(*optval);
 	if (getsockopt(listen_fd, SOL_TCP, TCP_MAXSEG, optval, len))
 		perror_msg_and_fail("getsockopt");

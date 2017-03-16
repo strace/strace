@@ -134,7 +134,7 @@ int
 main(int argc, char *argv[])
 {
 	struct ifreq *ifr = tail_alloc(2 * sizeof(*ifr));
-	struct ifconf *ifc = tail_alloc(sizeof(*ifc));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct ifconf, ifc);
 
 	struct sockaddr_in addr;
 	int fd;

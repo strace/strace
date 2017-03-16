@@ -67,8 +67,8 @@ main(void)
 	static const kernel_ulong_t bogus_flags =
 		(kernel_ulong_t) 0xdefaceddeadc0deULL;
 
-	struct sched_attr *const attr = tail_alloc(sizeof(*attr));
-	unsigned int *const psize = tail_alloc(sizeof(*psize));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sched_attr, attr);
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, psize);
 	void *const efault = attr + 1;
 
 	sys_sched_getattr(0, 0, 0, 0);

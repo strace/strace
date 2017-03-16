@@ -53,7 +53,7 @@ main(void)
 		.nl_pid = 1234
 	};
 	struct sockaddr *const sa = tail_memdup(&addr, sizeof(addr));
-	socklen_t * const len = tail_alloc(sizeof(socklen_t));
+	TAIL_ALLOC_OBJECT_CONST_PTR(socklen_t, len);
 	*len = sizeof(addr);
 
 	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);

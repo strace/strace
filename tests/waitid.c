@@ -185,9 +185,9 @@ main(void)
 		perror_msg_and_fail("waitid #1");
 	tprintf("waitid(P_PID, %d, NULL, WNOHANG|WEXITED, NULL) = 0\n", pid);
 
-	siginfo_t *const sinfo = tail_alloc(sizeof(*sinfo));
+	TAIL_ALLOC_OBJECT_CONST_PTR(siginfo_t, sinfo);
 	memset(sinfo, 0, sizeof(*sinfo));
-	struct rusage *const rusage = tail_alloc(sizeof(*rusage));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct rusage, rusage);
 	if (do_waitid(P_PID, pid, sinfo, WNOHANG|WEXITED|WSTOPPED, rusage))
 		perror_msg_and_fail("waitid #2");
 	tprintf("waitid(P_PID, %d, {}, WNOHANG|WEXITED|WSTOPPED, %s) = 0\n",

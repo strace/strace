@@ -689,7 +689,7 @@ int main(int ac, const char **av)
 	int rc = sendmsg(-1, 0, 0);
 	printf("sendmsg(-1, NULL, 0) = %d %s (%m)\n", rc, errno2name());
 
-	struct msghdr *mh = tail_alloc(sizeof(*mh));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct msghdr, mh);
 	memset(mh, 0, sizeof(*mh));
 	test_big_len(mh);
 

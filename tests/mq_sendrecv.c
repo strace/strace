@@ -242,7 +242,7 @@ main(void)
 	kernel_long_t *bogus_attrs = tail_alloc(sizeof(*bogus_attrs) *
 		NUM_ATTRS);
 	char *msg = tail_alloc(MSG_SIZE);
-	unsigned *bogus_prio_ptr = tail_alloc(sizeof(*bogus_prio_ptr));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned, bogus_prio_ptr);
 	struct timespec *bogus_tmout = tail_memdup(&bogus_tmout_data,
 		sizeof(*bogus_tmout));
 	struct timespec *future_tmout = tail_memdup(&future_tmout_data,

@@ -198,7 +198,7 @@ main(void)
 	};
 	const long *cbvs2 = tail_memdup(proto_cbvs2, sizeof(proto_cbvs2));
 
-	unsigned long *ctx = tail_alloc(sizeof(unsigned long));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned long, ctx);
 	*ctx = 0;
 
 	const unsigned int nr = ARRAY_SIZE(proto_cb);

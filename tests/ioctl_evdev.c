@@ -148,7 +148,7 @@ main(void)
 	void *const page = tail_alloc(size);
 	fill_memory(page, size);
 
-	int *const val_int = tail_alloc(sizeof(*val_int));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, val_int);
 	*val_int = magic;
 
 # ifdef EVIOCSCLOCKID
@@ -172,7 +172,7 @@ main(void)
 	       pair_int[0], "KEY_ESC");
 
 # ifdef EVIOCSKEYCODE_V2
-	struct input_keymap_entry *const ike = tail_alloc(sizeof(*ike));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct input_keymap_entry, ike);
 	fill_memory(ike, sizeof(*ike));
 	ike->keycode = 2;
 
@@ -196,7 +196,7 @@ main(void)
 	printf("}) = -1 EBADF (%m)\n");
 # endif
 
-	struct ff_effect *const ffe = tail_alloc(sizeof(*ffe));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct ff_effect, ffe);
 	fill_memory(ffe, sizeof(*ffe));
 
 	ffe->type = FF_CONSTANT;

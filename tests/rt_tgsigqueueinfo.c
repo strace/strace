@@ -57,7 +57,7 @@ main (void)
 	if (sigaction(SIGUSR1, &sa, NULL))
 		perror_msg_and_fail("sigaction");
 
-	siginfo_t *const info = tail_alloc(sizeof(*info));
+	TAIL_ALLOC_OBJECT_CONST_PTR(siginfo_t, info);
 	memset(info, 0, sizeof(*info));
 	info->si_signo = SIGUSR1;
 	info->si_errno = ENOENT;

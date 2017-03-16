@@ -47,13 +47,13 @@ send_recv(const int send_fd, const int recv_fd,
 static void
 test_msg_name(const int send_fd, const int recv_fd)
 {
-	char *const recv_buf = tail_alloc(sizeof(*recv_buf));
-	struct iovec *const iov = tail_alloc(sizeof(*iov));
+	TAIL_ALLOC_OBJECT_CONST_PTR(char, recv_buf);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct iovec, iov);
 	iov->iov_base = recv_buf;
 	iov->iov_len = sizeof(*recv_buf);
 
-	struct sockaddr_un *const addr = tail_alloc(sizeof(*addr));
-	struct msghdr *const msg = tail_alloc(sizeof(*msg));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_un, addr);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct msghdr, msg);
 	msg->msg_name = addr;
 	msg->msg_namelen = sizeof(*addr);
 	msg->msg_iov = iov;

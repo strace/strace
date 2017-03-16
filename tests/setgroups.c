@@ -91,7 +91,7 @@ main(void)
 	printf("%s(%d, NULL) = %s\n", SYSCALL_NAME, -1, sprintrc(rc));
 
 	/* check how the second argument is decoded */
-	const GID_TYPE *const g1 = tail_alloc(sizeof(*g1));
+	TAIL_ALLOC_OBJECT_CONST_PTR(const GID_TYPE, g1);
 	GID_TYPE *const g2 = tail_alloc(sizeof(*g2) * 2);
 	GID_TYPE *const g3 = tail_alloc(sizeof(*g3) * 3);
 

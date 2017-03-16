@@ -43,7 +43,7 @@ main(void)
 	static const kernel_ulong_t bogus_tsc =
 		(kernel_ulong_t) 0xdeadc0defacebeefULL;
 
-	int *tsc = tail_alloc(sizeof(*tsc));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, tsc);
 	long rc;
 
 	rc = syscall(__NR_prctl, PR_SET_TSC, 0);

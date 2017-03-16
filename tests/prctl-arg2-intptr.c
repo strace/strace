@@ -70,7 +70,7 @@ main(void)
 		{ 11, "PR_GET_FPEXC" },
 	};
 
-	unsigned int *ptr = tail_alloc(sizeof(*ptr));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);
 	long rc;
 	unsigned int i;
 

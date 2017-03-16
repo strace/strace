@@ -47,8 +47,8 @@ main(void)
 	if (semctl(id, 0, SETVAL, sem_union) == -1)
 		perror_msg_and_skip("semctl");
 
-	struct sembuf *const sem_b = tail_alloc(sizeof(*sem_b));
-	struct sembuf *const sem_b2 = tail_alloc(sizeof(*sem_b2));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sembuf, sem_b);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sembuf, sem_b2);
 
 	rc = semop(bogus_semid, NULL, bogus_nsops);
 	printf("semop(%d, NULL, %u) = %s\n",

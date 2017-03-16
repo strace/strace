@@ -43,7 +43,7 @@ main(void)
 	int state = adjtimex(NULL);
 	printf("adjtimex(NULL) = %s\n", sprintrc(state));
 
-	struct timex *const tx = tail_alloc(sizeof(*tx));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct timex, tx);
 	memset(tx, 0, sizeof(*tx));
 
 	state = adjtimex(tx);

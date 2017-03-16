@@ -44,8 +44,8 @@ main(void)
 	static const char multi6addr[] = "ff01::c";
 	static const char interface[] = "127.0.0.1";
 
-	struct ip_mreq *const m4 = tail_alloc(sizeof(*m4));
-	struct ipv6_mreq *const m6 = tail_alloc(sizeof(*m6));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct ip_mreq, m4);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct ipv6_mreq, m6);
 	unsigned int i;
 	int rc;
 

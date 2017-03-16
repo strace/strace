@@ -46,7 +46,7 @@ main(void)
 	static const kernel_ulong_t bogus_timer =
 		(kernel_ulong_t) 0xfacefeeddeadbeefULL;
 
-	struct itimerval *const p_old = tail_alloc(sizeof(*p_old));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct itimerval, p_old);
 	struct itimerval *const p_new = tail_memdup(&new, sizeof(new));
 	void *const efault = tail_alloc(sizeof(new) - 8);
 	long rc;

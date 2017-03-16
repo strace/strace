@@ -73,13 +73,13 @@ main(void)
 	void *const page = tail_alloc(size);
 	fill_memory(page, size);
 
-	struct rtc_time *rt = tail_alloc(sizeof(*rt));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct rtc_time, rt);
 	fill_memory(rt, sizeof(*rt));
 
-	struct rtc_wkalrm *wk = tail_alloc(sizeof(*wk));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct rtc_wkalrm, wk);
 	fill_memory(wk, sizeof(*wk));
 
-	struct rtc_pll_info *pll = tail_alloc(sizeof(*pll));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct rtc_pll_info, pll);
 	fill_memory(pll, sizeof(*pll));
 
 	/* RTC_ALM_READ */

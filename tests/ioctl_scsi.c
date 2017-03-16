@@ -69,7 +69,7 @@
 int
 main(void)
 {
-	int *const pint = tail_alloc(sizeof(*pint));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, pint);
 	*pint = (int) 0xfacefeed;
 
 	TEST_NO_ARG(SG_GET_TIMEOUT);

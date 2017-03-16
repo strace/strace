@@ -76,7 +76,7 @@ main(void )
 	ioctl(-1, VIDIOC_ENUM_FMT, 0);
 	printf("ioctl(-1, VIDIOC_ENUM_FMT, NULL) = -1 EBADF (%m)\n");
 
-	struct v4l2_fmtdesc *const p_fmtdesc = tail_alloc(sizeof(*p_fmtdesc));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_fmtdesc, p_fmtdesc);
 	p_fmtdesc->index = magic;
 	p_fmtdesc->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	ioctl(-1, VIDIOC_ENUM_FMT, p_fmtdesc);
@@ -88,7 +88,7 @@ main(void )
 	ioctl(-1, VIDIOC_G_FMT, 0);
 	printf("ioctl(-1, VIDIOC_G_FMT, NULL) = -1 EBADF (%m)\n");
 
-	struct v4l2_format *const p_format = tail_alloc(sizeof(*p_format));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_format, p_format);
 	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
 	ioctl(-1, VIDIOC_G_FMT, p_format);

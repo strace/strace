@@ -40,7 +40,7 @@
 int
 main(void)
 {
-	time_t *p = tail_alloc(sizeof(time_t));
+	TAIL_ALLOC_OBJECT_CONST_PTR(time_t, p);
 
 	time_t t = syscall(__NR_time, NULL);
 	if ((time_t) -1 == t)

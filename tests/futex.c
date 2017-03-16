@@ -163,8 +163,8 @@ void invalid_op(int *val, int op, uint32_t argmask, ...)
 int
 main(int argc, char *argv[])
 {
-	int *uaddr = tail_alloc(sizeof(*uaddr));
-	int *uaddr2 = tail_alloc(sizeof(*uaddr2));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, uaddr);
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, uaddr2);
 	int rc;
 	unsigned i;
 	unsigned j;

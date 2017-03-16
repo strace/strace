@@ -18,7 +18,7 @@ invoke_syscall(unsigned long epfd, unsigned long op, unsigned long fd, void *ev)
 int
 main(void)
 {
-	struct epoll_event *const ev = tail_alloc(sizeof(*ev));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct epoll_event, ev);
 	ev->events = EPOLLIN;
 
 	long rc = invoke_syscall(-1U, EPOLL_CTL_ADD, -2U, ev);

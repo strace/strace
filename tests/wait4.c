@@ -119,12 +119,12 @@ main(void)
 
 	(void) close(0);
 
-	int *const s = tail_alloc(sizeof(*s));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, s);
 	if (wait4(pid, s, WNOHANG|__WALL, NULL))
 		perror_msg_and_fail("wait4 #1");
 	tprintf("wait4(%d, %p, WNOHANG|__WALL, NULL) = 0\n", pid, s);
 
-	struct rusage *const rusage = tail_alloc(sizeof(*rusage));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct rusage, rusage);
 	if (wait4(pid, s, WNOHANG|__WALL, rusage))
 		perror_msg_and_fail("wait4 #2");
 	tprintf("wait4(%d, %p, WNOHANG|__WALL, %p) = 0\n", pid, s, rusage);

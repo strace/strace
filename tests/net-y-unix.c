@@ -49,7 +49,7 @@ main(int ac, const char **av)
 	strncpy(addr.sun_path, av[1], sizeof(addr.sun_path));
 	struct sockaddr * const listen_sa = tail_memdup(&addr, sizeof(addr));
 
-	socklen_t * const len = tail_alloc(sizeof(socklen_t));
+	TAIL_ALLOC_OBJECT_CONST_PTR(socklen_t, len);
 	*len = offsetof(struct sockaddr_un, sun_path) + strlen(av[1]) + 1;
 	if (*len > sizeof(addr))
 		*len = sizeof(addr);
@@ -71,7 +71,7 @@ main(int ac, const char **av)
 		perror_msg_and_skip("listen");
 	printf("listen(%d<socket:[%lu]>, 1) = 0\n", listen_fd, listen_inode);
 
-	unsigned int * const optval = tail_alloc(sizeof(unsigned int));
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, optval);
 	*len = sizeof(*optval);
 	if (getsockopt(listen_fd, SOL_SOCKET, SO_PASSCRED, optval, len))
 		perror_msg_and_fail("getsockopt");

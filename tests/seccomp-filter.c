@@ -49,7 +49,7 @@ main(void)
 {
 	struct sock_filter *const filter = tail_alloc(sizeof(*filter) * N);
 	const void *const efault = tail_alloc(1);
-	struct sock_fprog *const prog = tail_alloc(sizeof(*prog));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sock_fprog, prog);
 	long rc;
 
 	prog->filter = filter;

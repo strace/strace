@@ -10,7 +10,7 @@
 int main(int ac, char **av)
 {
 	int abbrev = ac > 1;
-	struct utsname *const uname = tail_alloc(sizeof(struct utsname));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct utsname, uname);
 	int rc = syscall(__NR_uname, uname);
 	printf("uname({sysname=\"");
 	print_quoted_string(uname->sysname);

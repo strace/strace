@@ -47,7 +47,7 @@ main(void)
 	long rc;
 
 # ifdef HAVE_USTAT_H
-	struct ustat *const ust = tail_alloc(sizeof(*ust));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct ustat, ust);
 	struct stat st;
 	if (stat(".", &st))
 		perror_msg_and_fail("stat");

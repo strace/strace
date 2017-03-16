@@ -62,7 +62,7 @@ static const char *printaddr(void *ptr)
 int
 main(void)
 {
-	struct perf_event_attr *attr = tail_alloc(sizeof(*attr));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct perf_event_attr, attr);
 
 	attr->type = PERF_TYPE_HARDWARE;
 	attr->size = sizeof(*attr);
