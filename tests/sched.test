@@ -29,20 +29,6 @@
 
 . "${srcdir=.}/init.sh"
 
-try_run_prog()
-{
-	local rc
-
-	"$@" > /dev/null || {
-		rc=$?
-		if [ $rc -eq 77 ]; then
-			return 1
-		else
-			fail_ "$* failed with code $rc"
-		fi
-	}
-}
-
 while read w i
 do
 	try_run_prog "./$i" || continue

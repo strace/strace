@@ -72,6 +72,20 @@ run_prog_skip_if_failed()
 	"$@" || framework_skip_ "$args failed with code $?"
 }
 
+try_run_prog()
+{
+	local rc
+
+	"$@" > /dev/null || {
+		rc=$?
+		if [ $rc -eq 77 ]; then
+			return 1
+		else
+			fail_ "$* failed with code $rc"
+		fi
+	}
+}
+
 run_strace()
 {
 	> "$LOG" || fail_ "failed to write $LOG"
