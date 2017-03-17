@@ -208,7 +208,7 @@ main(void)
 	static const char full[] = "/dev/full";
 # endif
 	static const char sample[] = TEST_SYSCALL_STR ".sample";
-	STRUCT_STAT st[2];
+	TAIL_ALLOC_OBJECT_CONST_PTR(STRUCT_STAT, st);
 
 	int rc;
 
