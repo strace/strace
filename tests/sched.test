@@ -31,6 +31,8 @@
 
 try_run_prog()
 {
+	local rc
+
 	"$@" > /dev/null || {
 		rc=$?
 		if [ $rc -eq 77 ]; then
