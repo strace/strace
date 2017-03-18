@@ -408,6 +408,7 @@
 [380] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [381] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [382] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
+[383] = { 5,	TD|TF,		SEN(statx),			"statx"			},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
