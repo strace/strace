@@ -234,6 +234,8 @@ strace_SOURCES =	\
 	stat64.c	\
 	statfs.c	\
 	statfs.h	\
+	statx.c		\
+	statx.h		\
 	strace.c	\
 	swapon.c	\
 	syscall.c	\
