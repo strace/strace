@@ -13,6 +13,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     arm, avr32, bfin, cris, hppa, m68k, metag, microblaze, mips, nios2, or1k,
     powerpc, powerpc64, riscv, sh, sh64, sparc, sparc64, tile, x86, and xtensa
     architectures.
+  * Implemented decoding of statx syscall.
 
 * Bug fixes
   * Fixed decoding of flags argument of preadv2 and pwritev2 syscalls on x32.

@@ -391,6 +391,7 @@ check_PROGRAMS = \
 	stat64 \
 	statfs \
 	statfs64 \
+	statx \
 	swap \
 	symlink \
 	symlinkat \
@@ -785,6 +786,7 @@ DECODER_TESTS = \
 	stat64.test \
 	statfs.test \
 	statfs64.test \
+	statx.test \
 	sun_path.test \
 	swap.test \
 	symlink.test \

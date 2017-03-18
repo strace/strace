@@ -331,6 +331,7 @@ stat
 stat64
 statfs
 statfs64
+statx
 swap
 symlink
 symlinkat

@@ -330,7 +330,8 @@
 [329] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [330] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [331] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
-[332 ... 511] = { },
+[332] = { 5,	TD|TF,		SEN(statx),			"statx"			},
+[333 ... 511] = { },
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.
