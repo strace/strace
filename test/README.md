@@ -1,6 +1,6 @@
 This directory contains some corner case demo files.  Most of them are
 quite old and probably will be of little interest to the casual reader.
-For automated tests, see ../tests/.
+For automated tests, see [../tests](../tests) directory.
 
 To run a demo:
 * Run make
