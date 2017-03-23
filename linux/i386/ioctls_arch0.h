@@ -68,6 +68,8 @@
 { "linux/kvm.h", "KVM_PPC_ALLOCATE_HTAB", _IOC_READ|_IOC_WRITE, 0xaea7, 0x04 },
 { "linux/kvm.h", "KVM_PPC_GET_PVINFO", _IOC_WRITE, 0xaea1, 0x80 },
 { "linux/kvm.h", "KVM_PPC_GET_SMMU_INFO", _IOC_READ, 0xaea6, 0x250 },
+{ "linux/kvm.h", "KVM_PPC_RESIZE_HPT_COMMIT", _IOC_READ, 0xaeae, 0x10 },
+{ "linux/kvm.h", "KVM_PPC_RESIZE_HPT_PREPARE", _IOC_READ, 0xaead, 0x10 },
 { "linux/kvm.h", "KVM_REGISTER_COALESCED_MMIO", _IOC_WRITE, 0xae67, 0x10 },
 { "linux/kvm.h", "KVM_REINJECT_CONTROL", _IOC_NONE, 0xae71, 0x00 },
 { "linux/kvm.h", "KVM_RUN", _IOC_NONE, 0xae80, 0x00 },

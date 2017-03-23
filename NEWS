@@ -14,6 +14,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     powerpc, powerpc64, riscv, sh, sh64, sparc, sparc64, tile, x86, and xtensa
     architectures.
   * Implemented decoding of statx syscall.
+  * Updated lists of ioctl commands from Linux 4.11.
 
 * Bug fixes
   * Fixed decoding of flags argument of preadv2 and pwritev2 syscalls on x32.
