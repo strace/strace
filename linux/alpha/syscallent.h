@@ -73,7 +73,7 @@
 [ 44] = { 5,	0,		SEN(printargs),			"osf_profil"		}, /* not implemented */
 [ 45] = { 3,	TD|TF,		SEN(open),			"open"			},
 [ 46] = { 5,	0,		SEN(printargs),			"osf_old_sigaction"	}, /* not implemented */
-[ 47] = { 1,	NF,		SEN(getxgid),			"getxgid"		},
+[ 47] = { 0,	NF,		SEN(getxgid),			"getxgid"		},
 [ 48] = { 2,	TS,		SEN(sigprocmask),		"osf_sigprocmask"	},
 [ 49] = { 5,	0,		SEN(printargs),			"osf_getlogin"		}, /* not implemented */
 [ 50] = { 5,	0,		SEN(printargs),			"osf_setlogin"		}, /* not implemented */
@@ -227,9 +227,9 @@
 [221] = { },
 [222] = { 5,	0,		SEN(printargs),			"osf_security"		}, /* not implemented */
 [223] = { 5,	0,		SEN(printargs),			"osf_kloadcall"		}, /* not implemented */
-[224] = { 5,	0,		SEN(printargs),			"osf_stat"		},
-[225] = { 5,	0,		SEN(printargs),			"osf_lstat"		},
-[226] = { 5,	0,		SEN(printargs),			"osf_fstat"		},
+[224] = { 2,	0,		SEN(printargs),			"osf_stat"		},
+[225] = { 2,	0,		SEN(printargs),			"osf_lstat"		},
+[226] = { 2,	0,		SEN(printargs),			"osf_fstat"		},
 [227] = { 3,	0,		SEN(osf_statfs),		"osf_statfs64"		},
 [228] = { 3,	0,		SEN(osf_fstatfs),		"osf_fstatfs64"		},
 [229 ... 232] = { },
@@ -241,7 +241,7 @@
 [238] = { 5,	0,		SEN(printargs),			"osf_sigsendset"	}, /* not implemented */
 [239] = { 5,	0,		SEN(printargs),			"osf_set_speculative"	}, /* not implemented */
 [240] = { 5,	0,		SEN(printargs),			"osf_msfs_syscall"	}, /* not implemented */
-[241] = { 5,	0,		SEN(printargs),			"osf_sysinfo"		},
+[241] = { 3,	0,		SEN(printargs),			"osf_sysinfo"		},
 [242] = { 5,	0,		SEN(printargs),			"osf_uadmin"		}, /* not implemented */
 [243] = { 5,	0,		SEN(printargs),			"osf_fuser"		}, /* not implemented */
 [244] = { 2,	0,		SEN(printargs),			"osf_proplist_syscall"	},
@@ -264,7 +264,7 @@
 [261] = { 5,	0,		SEN(printargs),			"osf_fdatasync"		}, /* not implemented */
 [262 ... 299] = { },
 [300] = { 2,	0,		SEN(bdflush),			"bdflush"		},
-[301] = { 3,	0,		SEN(printargs),			"sethae"		},
+[301] = { 1,	0,		SEN(printargs),			"sethae"		},
 [302] = { 5,	TF,		SEN(mount),			"mount"			},
 [303] = { 1,	0,		SEN(adjtimex),			"old_adjtimex"		},
 [304] = { 1,	TF,		SEN(swapoff),			"swapoff"		},
