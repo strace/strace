@@ -220,6 +220,7 @@ lookup_class(const char *s)
 		{ "%ipc",	TRACE_IPC	},
 		{ "%network",	TRACE_NETWORK	},
 		{ "%sched",	TRACE_SCHED	},
+		{ "%clock",	TRACE_CLOCK	},
 	};
 
 	unsigned int i;

@@ -492,6 +492,7 @@ DECODER_TESTS = \
 	btrfs-w.test \
 	caps-abbrev.test \
 	caps.test \
+	clock.test \
 	eventfd.test \
 	execve-v.test \
 	execve.test \
