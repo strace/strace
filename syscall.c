@@ -1072,8 +1072,6 @@ print_pc(struct tcb *tcp)
 			(kernel_ulong_t) ARCH_PC_REG);
 }
 
-#include "getregs_old.h"
-
 #undef ptrace_getregset_or_getregs
 #undef ptrace_setregset_or_setregs
 #ifdef ARCH_REGS_FOR_GETREGSET
@@ -1098,25 +1096,23 @@ ptrace_getregset(pid_t pid)
 # endif
 }
 
-# ifndef HAVE_GETREGS_OLD
-#  define ptrace_setregset_or_setregs ptrace_setregset
+# define ptrace_setregset_or_setregs ptrace_setregset
 static int
 ptrace_setregset(pid_t pid)
 {
-#  ifdef ARCH_IOVEC_FOR_GETREGSET
+# ifdef ARCH_IOVEC_FOR_GETREGSET
 	/* variable iovec */
 	return ptrace(PTRACE_SETREGSET, pid, NT_PRSTATUS,
 		      &ARCH_IOVEC_FOR_GETREGSET);
-#  else
+# else
 	/* constant iovec */
 	static struct iovec io = {
 		.iov_base = &ARCH_REGS_FOR_GETREGSET,
 		.iov_len = sizeof(ARCH_REGS_FOR_GETREGSET)
 	};
 	return ptrace(PTRACE_SETREGSET, pid, NT_PRSTATUS, &io);
-#  endif
+# endif
 }
-# endif /* !HAVE_GETREGS_OLD */
 
 #elif defined ARCH_REGS_FOR_GETREGS
 
@@ -1132,19 +1128,17 @@ ptrace_getregs(pid_t pid)
 # endif
 }
 
-# ifndef HAVE_GETREGS_OLD
-#  define ptrace_setregset_or_setregs ptrace_setregs
+# define ptrace_setregset_or_setregs ptrace_setregs
 static int
 ptrace_setregs(pid_t pid)
 {
-#  if defined SPARC || defined SPARC64
+# if defined SPARC || defined SPARC64
 	/* SPARC systems have the meaning of data and addr reversed */
 	return ptrace(PTRACE_SETREGS, pid, (void *) &ARCH_REGS_FOR_GETREGS, 0);
-#  else
+# else
 	return ptrace(PTRACE_SETREGS, pid, NULL, &ARCH_REGS_FOR_GETREGS);
-#  endif
+# endif
 }
-# endif /* !HAVE_GETREGS_OLD */
 
 #endif /* ARCH_REGS_FOR_GETREGSET || ARCH_REGS_FOR_GETREGS */
 
@@ -1154,30 +1148,8 @@ get_regs(pid_t pid)
 #undef USE_GET_SYSCALL_RESULT_REGS
 #ifdef ptrace_getregset_or_getregs
 
-# ifdef HAVE_GETREGS_OLD
-	/*
-	 * Try PTRACE_GETREGSET/PTRACE_GETREGS first,
-	 * fallback to getregs_old.
-	 */
-	static int use_getregs_old;
-	if (use_getregs_old < 0) {
-		get_regs_error = ptrace_getregset_or_getregs(pid);
-		return;
-	} else if (use_getregs_old == 0) {
-		get_regs_error = ptrace_getregset_or_getregs(pid);
-		if (get_regs_error >= 0) {
-			use_getregs_old = -1;
-			return;
-		}
-		if (errno == EPERM || errno == ESRCH)
-			return;
-		use_getregs_old = 1;
-	}
-	get_regs_error = getregs_old(pid);
-# else /* !HAVE_GETREGS_OLD */
 	/* Assume that PTRACE_GETREGSET/PTRACE_GETREGS works. */
 	get_regs_error = ptrace_getregset_or_getregs(pid);
-# endif /* !HAVE_GETREGS_OLD */
 
 #else /* !ptrace_getregset_or_getregs */
 
@@ -1282,9 +1254,6 @@ get_syscall_result(struct tcb *tcp)
 #endif
 #include "get_error.c"
 #include "set_error.c"
-#ifdef HAVE_GETREGS_OLD
-# include "getregs_old.c"
-#endif
 
 const char *
 syscall_name(kernel_ulong_t scno)
