@@ -45,7 +45,7 @@
 [1053] = { 4,	TD,		SEN(fadvise64),		"fadvise64"	},
 [1054] = { 4,	TD|TF,		SEN(newfstatat),	"newfstatat"	},
 [1055] = { 2,	TD,		SEN(fstatfs),		"fstatfs"	},
-[1056] = { 2,	TF,		SEN(statfs),		"statfs"	},
+[1056] = { 2,	TF|TSF,		SEN(statfs),		"statfs"	},
 [1057] = { 3,	TD,		SEN(lseek),		"lseek"		},
 [1058] = { 6,	TD|TM|SI,	SEN(mmap),		"mmap"		},
 [1059] = { 1,	0,		SEN(alarm),		"alarm"		},

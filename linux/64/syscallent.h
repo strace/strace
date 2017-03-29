@@ -41,7 +41,7 @@
 [ 40] = { 5,	TF,		SEN(mount),			"mount"			},
 [ 41] = { 2,	TF,		SEN(pivotroot),			"pivot_root"		},
 [ 42] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
-[ 43] = { 2,	TF,		SEN(statfs),			"statfs"		},
+[ 43] = { 2,	TF|TSF,		SEN(statfs),			"statfs"		},
 [ 44] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},
 [ 45] = { 2,	TF,		SEN(truncate),			"truncate"		},
 [ 46] = { 2,	TD,		SEN(ftruncate),			"ftruncate"		},

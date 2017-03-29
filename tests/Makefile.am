@@ -542,6 +542,7 @@ DECODER_TESTS = \
 	sigaltstack.test \
 	statfs.test \
 	sun_path.test \
+	trace_statfs.test \
 	uio.test \
 	umount.test \
 	umount2.test \

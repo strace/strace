@@ -78,6 +78,7 @@
 #define TM TRACE_MEMORY
 #define TSC TRACE_SCHED
 #define TCL TRACE_CLOCK
+#define TSF TRACE_STATFS
 #define NF SYSCALL_NEVER_FAILS
 #define MA MAX_ARGS
 #define SI STACKTRACE_INVALIDATE_CACHE
@@ -115,6 +116,7 @@ static const struct_sysent sysent2[] = {
 #undef TM
 #undef TSC
 #undef TCL
+#undef TSF
 #undef NF
 #undef MA
 #undef SI

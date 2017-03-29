@@ -134,7 +134,7 @@
 [5131] = { 3,	TF,		SEN(mknod),			"mknod"			},
 [5132] = { 1,	NF,		SEN(personality),		"personality"		},
 [5133] = { 2,	0,		SEN(ustat),			"ustat"			},
-[5134] = { 2,	TF,		SEN(statfs),			"statfs"		},
+[5134] = { 2,	TF|TSF,		SEN(statfs),			"statfs"		},
 [5135] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},
 [5136] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [5137] = { 2,	0,		SEN(getpriority),		"getpriority"		},

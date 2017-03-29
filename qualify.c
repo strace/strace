@@ -221,6 +221,7 @@ lookup_class(const char *s)
 		{ "%network",	TRACE_NETWORK	},
 		{ "%sched",	TRACE_SCHED	},
 		{ "%clock",	TRACE_CLOCK	},
+		{ "%statfs",	TRACE_STATFS	},
 	};
 
 	unsigned int i;

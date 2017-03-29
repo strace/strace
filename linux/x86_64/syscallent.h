@@ -135,7 +135,7 @@
 [134] = { 1,	TF,		SEN(uselib),			"uselib"		},
 [135] = { 1,	NF,		SEN(personality),		"personality"		},
 [136] = { 2,	0,		SEN(ustat),			"ustat"			},
-[137] = { 2,	TF,		SEN(statfs),			"statfs"		},
+[137] = { 2,	TF|TSF,		SEN(statfs),			"statfs"		},
 [138] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},
 [139] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [140] = { 2,	0,		SEN(getpriority),		"getpriority"		},
