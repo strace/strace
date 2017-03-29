@@ -1535,6 +1535,17 @@ printargs_d(struct tcb *tcp)
 	return RVAL_DECODED;
 }
 
+/* Print abnormal high bits of a kernel_ulong_t value. */
+void
+print_abnormal_hi(const kernel_ulong_t val)
+{
+	if (current_klongsize > 4) {
+		const unsigned int hi = (unsigned int) ((uint64_t) val >> 32);
+		if (hi)
+			tprintf("%#x<<32|", hi);
+	}
+}
+
 #if defined _LARGEFILE64_SOURCE && defined HAVE_OPEN64
 # define open_file open64
 #else

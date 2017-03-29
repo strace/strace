@@ -176,7 +176,19 @@ SYS_FUNC(sched_getattr)
 			print_sched_attr(tcp, tcp->u_arg[1], size);
 		else
 			printaddr(tcp->u_arg[1]);
-		tprintf(", %u, %u", size, (unsigned int) tcp->u_arg[3]);
+		tprints(", ");
+#ifdef AARCH64
+		/*
+		 * Due to a subtle gcc bug that leads to miscompiled aarch64
+		 * kernels, the 3rd argument of sched_getattr is not quite 32-bit
+		 * as on other architectures.  For more details see
+		 * https://sourceforge.net/p/strace/mailman/message/35721703/
+		 */
+		if (syserror(tcp))
+			print_abnormal_hi(tcp->u_arg[2]);
+#endif
+		tprintf("%u", size);
+		tprintf(", %u", (unsigned int) tcp->u_arg[3]);
 	}
 
 	return 0;

@@ -81,8 +81,14 @@ main(void)
 	printf("sched_getattr(%d, NULL, 0, 0) = %s\n", (int) bogus_pid, errstr);
 
 	sys_sched_getattr(-1U, (unsigned long) attr, bogus_size, bogus_flags);
-	printf("sched_getattr(-1, %p, %u, %u) = %s\n",
-	       attr, (unsigned) bogus_size, (unsigned) bogus_flags, errstr);
+	printf("sched_getattr(-1, %p, %s%u, %u) = %s\n",
+	       attr,
+# if defined __arm64__ || defined __aarch64__
+	       "0xdefaced<<32|",
+# else
+	       "",
+# endif
+	       (unsigned) bogus_size, (unsigned) bogus_flags, errstr);
 
 	sys_sched_getattr(0, (unsigned long) efault, sizeof(*attr), 0);
 	printf("sched_getattr(0, %p, %u, 0) = %s\n",
@@ -103,20 +109,31 @@ main(void)
 	       attr->sched_period,
 	       (unsigned) sizeof(*attr));
 
+# if defined __arm64__ || defined __aarch64__
+	long rc =
+# endif
 	sys_sched_getattr(F8ILL_KULONG_MASK, (unsigned long) attr,
 			  F8ILL_KULONG_MASK | sizeof(*attr), F8ILL_KULONG_MASK);
-	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
-	printxval(schedulers, attr->sched_policy, NULL);
-	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
-	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64 "}, %u, 0) = 0\n",
-	       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
-	       attr->sched_nice,
-	       attr->sched_priority,
-	       attr->sched_runtime,
-	       attr->sched_deadline,
-	       attr->sched_period,
-	       (unsigned) sizeof(*attr));
+# if defined __arm64__ || defined __aarch64__
+	if (rc) {
+		printf("sched_getattr(0, %p, 0xffffffff<<32|%u, 0) = %s\n",
+		       attr, (unsigned) sizeof(*attr), errstr);
+	} else
+# endif
+	{
+		printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
+		printxval(schedulers, attr->sched_policy, NULL);
+		printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
+		       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
+		       ", sched_period=%" PRIu64 "}, %u, 0) = 0\n",
+		       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
+		       attr->sched_nice,
+		       attr->sched_priority,
+		       attr->sched_runtime,
+		       attr->sched_deadline,
+		       attr->sched_period,
+		       (unsigned) sizeof(*attr));
+	}
 
 	sys_sched_setattr(bogus_pid, 0, 0);
 	printf("sched_setattr(%d, NULL, 0) = %s\n", (int) bogus_pid, errstr);
