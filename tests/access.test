@@ -1,15 +1,7 @@
 #!/bin/sh
 
-# Check access syscall decoding.
+# Check decoding of access syscall.
 
 . "${srcdir=.}/init.sh"
 
-check_prog grep
-run_prog > /dev/null
-run_strace -eaccess -a30 $args > "$EXP"
-
-# Filter out access() calls made by libc.
-grep -F access_sample < "$LOG" > "$OUT"
-match_diff "$OUT" "$EXP"
-
-rm -f "$EXP" "$OUT"
+run_strace_match_diff -a30 -P access_sample

@@ -19,6 +19,7 @@ main(void)
 	printf("access(\"%s\", R_OK|W_OK|X_OK) = %ld %s (%m)\n",
 	       sample, rc, errno2name());
 
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 
