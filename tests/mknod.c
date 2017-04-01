@@ -8,7 +8,7 @@
 # include <sys/sysmacros.h>
 # include <unistd.h>
 
-static const char sample[] = "mknod";
+static const char *sample;
 
 static long
 call_mknod(unsigned short mode, unsigned long dev)
@@ -18,9 +18,10 @@ call_mknod(unsigned short mode, unsigned long dev)
 }
 
 int
-main(void)
+main(int ac, char **av)
 {
 	unsigned long dev = (unsigned long) 0xdeadbeefbadc0dedULL;
+	sample = av[0];
 
 	long rc = call_mknod(0, dev);
 	printf("mknod(\"%s\", 000) = %ld %s (%m)\n",

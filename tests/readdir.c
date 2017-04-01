@@ -58,9 +58,9 @@ static const char qname[] =
 	"A\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nZ";
 
 int
-main(int ac, const char **av)
+main(void)
 {
-	char *dname;
+	static const char dname[] = "readdir.test.tmp.dir";
 	struct {
 		unsigned long   d_ino;
 		unsigned long   d_off;
@@ -69,8 +69,6 @@ main(int ac, const char **av)
 	} e;
 	int rc;
 
-	assert(ac == 1);
-	assert(asprintf(&dname, "%s.test.tmp.dir", av[0]) > 0);
 	assert(!mkdir(dname, 0700));
 	assert(!chdir(dname));
 	(void) close(0);

@@ -92,12 +92,10 @@ print_dirent(const kernel_dirent *d)
 }
 
 int
-main(int ac, const char **av)
+main(void)
 {
-	char *dname;
+	static const char dname[] = "getdents.test.tmp.dir";
 
-	assert(ac == 1);
-	assert(asprintf(&dname, "%s.test.tmp.dir", av[0]) > 0);
 	assert(!mkdir(dname, 0700));
 	assert(!chdir(dname));
 	(void) close(0);

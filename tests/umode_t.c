@@ -38,7 +38,7 @@
 # define TEST_SYSCALL_PREFIX_STR ""
 #endif
 
-static const char sample[] = TEST_SYSCALL_STR;
+static const char *sample;
 
 static void
 test_syscall(unsigned short mode)
@@ -49,17 +49,18 @@ test_syscall(unsigned short mode)
 
 	if (mode <= 07)
 		printf("%s(%s\"%s\", 00%d) = %ld %s (%m)\n",
-		       sample, TEST_SYSCALL_PREFIX_STR,
+		       TEST_SYSCALL_STR, TEST_SYSCALL_PREFIX_STR,
 		       sample, (int) mode, rc, errno2name());
 	else
 		printf("%s(%s\"%s\", %#03ho) = %ld %s (%m)\n",
-		       sample, TEST_SYSCALL_PREFIX_STR,
+		       TEST_SYSCALL_STR, TEST_SYSCALL_PREFIX_STR,
 		       sample, mode, rc, errno2name());
 }
 
 int
-main(void)
+main(int ac, char **av)
 {
+	sample = av[0];
 	test_syscall(0);
 	test_syscall(0xffff);
 	test_syscall(06);
