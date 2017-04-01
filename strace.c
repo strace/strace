@@ -44,6 +44,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <dirent.h>
+#include <locale.h>
 #include <sys/utsname.h>
 #ifdef HAVE_PRCTL
 # include <sys/prctl.h>
@@ -2668,6 +2669,7 @@ terminate(void)
 int
 main(int argc, char *argv[])
 {
+	setlocale(LC_ALL, "");
 	init(argc, argv);
 
 	exit_code = !nprocs;
