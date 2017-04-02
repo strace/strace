@@ -76,7 +76,7 @@ check_fault_injection()
 
 	run_strace -a11 -e trace=$trace \
 		"$@" -e fault=$fault$when$error $extra \
-		./$NAME $raw "$err" "$first" "$step" $N \
+		../$NAME $raw "$err" "$first" "$step" $N \
 		> "$EXP" 4> "$outexp" 5> "$outgot"
 
 	match_diff "$EXP" "$LOG"

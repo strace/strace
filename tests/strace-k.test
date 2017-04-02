@@ -37,7 +37,7 @@
 check_prog sed
 check_prog tr
 
-run_prog ./stack-fcall
+run_prog ../stack-fcall
 run_strace -e getpid -k $args
 
 expected='getpid f3 f2 f1 f0 main '

@@ -37,7 +37,7 @@ check_prog sleep
 set -e
 
 rm -f "$LOG"
-./set_ptracer_any sleep $((2*$TIMEOUT_DURATION)) > "$LOG" &
+../set_ptracer_any sleep $((2*$TIMEOUT_DURATION)) > "$LOG" &
 
 while ! [ -s "$LOG" ]; do
 	kill -0 $! 2> /dev/null ||

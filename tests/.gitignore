@@ -1,9 +1,6 @@
+*.dir
 *.log
-*.log.*
 *.o
-*.tmp
-*.tmp-*
-*.tmp.*
 *.trs
 _newselect
 accept

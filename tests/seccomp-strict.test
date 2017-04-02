@@ -4,7 +4,7 @@
 
 . "${srcdir=.}/init.sh"
 
-set -- "./$NAME"
+set -- "../$NAME"
 "$@" > /dev/null || {
 	case $? in
 		77) skip_ "$* exited with code 77" ;;

@@ -18,7 +18,7 @@ elif [ ! -d "${BTRFS_MOUNTPOINT}" ]; then
     skip_ "\$BTRFS_MOUNTPOINT does not point to a directory"
 fi
 
-run_prog ./btrfs -v -w "${BTRFS_MOUNTPOINT}" > /dev/null
+run_prog ../btrfs -v -w "${BTRFS_MOUNTPOINT}" > /dev/null
 run_strace -a16 -veioctl $args > "$EXP"
 check_prog grep
 grep -v '^ioctl([012],' < "$LOG" > "$OUT"

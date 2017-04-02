@@ -38,7 +38,7 @@ run_strace_match_diff -a16 -e trace=readv,writev \
 run_strace_match_diff -a16 -e trace=readv,writev \
 	-eread='!all' -ewrite=none -eread='!0,1,2' -ewrite='!0,1,2'
 
-wfd="$(./print_maxfd)"
+wfd="$(../print_maxfd)"
 rfd="$(($wfd - 1))"
 run_strace_match_diff -a16 -e trace=readv,writev \
 	-eread="$rfd" -ewrite="$wfd"

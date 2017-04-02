@@ -6,7 +6,7 @@
 
 check_prog grep
 run_prog grep chdir $srcdir/umovestr.expected > "$EXP"
-run_prog ./umovestr
+run_prog ../umovestr
 
 > "$LOG" || fail_ "failed to write $LOG"
 $STRACE -o "|cat > $LOG && $SLEEP_A_BIT && grep chdir < $LOG > $OUT" -e chdir $args ||

@@ -48,7 +48,7 @@ file="$dir/$(for i in $(seq 1 127); do echo A; done; echo Z)"
 touch -- "$file" ||
 	framework_skip_ 'failed to create a file'
 
-run_prog ./scm_rights /dev/zero
+run_prog ../scm_rights /dev/zero
 run_strace -y -x -e%network $args "$file"
 
 hex='[[:xdigit:]]'

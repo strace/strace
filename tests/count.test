@@ -29,14 +29,14 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog ./sleep 0
+run_prog ../sleep 0
 check_prog grep
 
 grep_log()
 {
 	local pattern="$1"; shift
 
-	run_strace "$@" ./sleep 1
+	run_strace "$@" ../sleep 1
 
 	grep nanosleep "$LOG" > /dev/null ||
 		framework_skip_ 'sleep does not use nanosleep'

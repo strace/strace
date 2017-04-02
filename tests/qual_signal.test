@@ -34,8 +34,8 @@ test_one_sig()
 	local sigs
 	sigs="$1"; shift
 
-	run_prog "./$NAME" "$@" > /dev/null
-	run_strace -e trace=none -e signal="$sigs" "./$NAME" "$@" > "$EXP"
+	run_prog "../$NAME" "$@" > /dev/null
+	run_strace -e trace=none -e signal="$sigs" "../$NAME" "$@" > "$EXP"
 	match_diff "$LOG" "$EXP"
 	rm -f "$EXP"
 }

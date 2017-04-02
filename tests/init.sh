@@ -26,10 +26,9 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ME_="${0##*/}"
-LOG="$ME_.tmp"
-OUT="$LOG.out"
-EXP="$LOG.exp"
-NAME="${ME_%.test}"
+LOG="log"
+OUT="out"
+EXP="exp"
 
 warn_() { printf >&2 '%s\n' "$*"; }
 fail_() { warn_ "$ME_: failed test: $*"; exit 1; }
@@ -52,7 +51,7 @@ dump_log_and_fail_with()
 run_prog()
 {
 	if [ $# -eq 0 ]; then
-		set -- "./$NAME"
+		set -- "../$NAME"
 	fi
 	args="$*"
 	"$@" || {
@@ -267,17 +266,36 @@ grep_pid_status()
 check_prog cat
 check_prog rm
 
-rm -f "$LOG"
+case "$ME_" in
+	*.test)
+	NAME="${ME_%.test}"
+	TESTDIR="$NAME.dir"
+	rm -rf -- "$TESTDIR"
+	mkdir -- "$TESTDIR"
+	cd "$TESTDIR"
 
-[ -n "${STRACE-}" ] || {
-	STRACE=../strace
-	case "${LOG_COMPILER-} ${LOG_FLAGS-}" in
-		*--suppressions=*--error-exitcode=*--tool=*)
+	case "$srcdir" in
+		/*) ;;
+		*) srcdir="../$srcdir" ;;
+	esac
+
+	[ -n "${STRACE-}" ] || {
+		STRACE=../../strace
+		case "${LOG_COMPILER-} ${LOG_FLAGS-}" in
+			*--suppressions=*--error-exitcode=*--tool=*)
 			# add valgrind command prefix
 			STRACE="${LOG_COMPILER-} ${LOG_FLAGS-} $STRACE"
 			;;
-	esac
-}
+		esac
+	}
+
+		;;
+
+	*)
+	[ -n "${STRACE-}" ] ||
+		STRACE=../strace
+	;;
+esac
 
 : "${TIMEOUT_DURATION:=60}"
 : "${SLEEP_A_BIT:=sleep 1}"

@@ -4,5 +4,5 @@
 . "${srcdir=.}/init.sh"
 
 run_strace -a12 -echdir,exit_group -einject=chdir:signal=USR1 \
-	./$NAME
+	../$NAME
 match_diff

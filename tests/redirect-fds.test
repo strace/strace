@@ -50,7 +50,7 @@ check_fd()
 	touch "$LOG" "$fd0" ||
 		framework_skip_ 'failed to create files'
 
-	set -- "\"./$NAME\"" "\"$1\"" "\"$2\"" "\"$3\""
+	set -- "\"../$NAME\"" "\"$1\"" "\"$2\"" "\"$3\""
 	eval "$@" "<${a1:-&-}" ">${a2:-&-}" "2>${a3:-&-}" ||
 			fail_ "$* failed with code $rc"
 

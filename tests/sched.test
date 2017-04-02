@@ -31,8 +31,8 @@
 
 while read w i
 do
-	try_run_prog "./$i" || continue
-	run_strace -a$w -e%sched ./$i > "$EXP"
+	try_run_prog "../$i" || continue
+	run_strace -a$w -e%sched ../$i > "$EXP"
 	match_diff "$LOG" "$EXP"
 done << EOF
 28 sched_xetaffinity
@@ -48,8 +48,8 @@ echo '+++ exited with 0 +++' > "$EXP"
 
 while read w i
 do
-	try_run_prog "./$i" || continue
-	run_strace -a$w -e%sched ./$i > /dev/null
+	try_run_prog "../$i" || continue
+	run_strace -a$w -e%sched ../$i > /dev/null
 	match_diff "$LOG" "$EXP"
 done << EOF
 11 fchdir

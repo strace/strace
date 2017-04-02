@@ -968,6 +968,11 @@ ksysent.$(OBJEXT): ksysent.h
 objects = $(filter %.$(OBJEXT),$(SOURCES:.c=.$(OBJEXT)))
 $(objects): scno.h
 
-CLEANFILES = ksysent.h $(TESTS:=.tmp) $(TESTS:=.tmp.out) $(TESTS:=.tmp.exp)
+clean-local: clean-local-check
+.PHONY: clean-local-check
+clean-local-check:
+	-rm -rf -- $(TESTS:.test=.dir)
+
+CLEANFILES = ksysent.h
 
 include ../scno.am
