@@ -99,6 +99,8 @@ getgroups	-a17
 getgroups32	-a19
 getpeername	-a27
 getpgrp	-a10
+getpid	-a9
+getppid	-a10
 getrandom	-a32 -s3
 getresgid	-a25
 getresgid32	-a27

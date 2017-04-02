@@ -158,6 +158,8 @@ check_PROGRAMS = \
 	getgroups32 \
 	getpeername \
 	getpgrp \
+	getpid	\
+	getppid	\
 	getrandom \
 	getresgid \
 	getresgid32 \
