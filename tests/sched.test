@@ -29,12 +29,11 @@
 
 . "${srcdir=.}/init.sh"
 
-while read w i
-do
-	try_run_prog "../$i" || continue
-	run_strace -a$w -e%sched ../$i > "$EXP"
+while read w s; do {
+	try_run_prog "../$s" || continue
+	run_strace -a$w -e%sched ../$s > "$EXP"
 	match_diff "$LOG" "$EXP"
-done << EOF
+} < /dev/null; done << EOF
 28 sched_xetaffinity
 23 sched_xetparam
 31 sched_rr_get_interval
@@ -44,17 +43,13 @@ done << EOF
 14 sched_yield
 EOF
 
-echo '+++ exited with 0 +++' > "$EXP"
+grep -E -v '^(#|sched_|times$)' \
+	< "$srcdir/pure_executables.list" > negative.list
 
-while read w i
-do
-	try_run_prog "../$i" || continue
-	run_strace -a$w -e%sched ../$i > /dev/null
-	match_diff "$LOG" "$EXP"
-done << EOF
-11 fchdir
-28 futex
-10 fsync
-EOF
+while read s; do {
+	try_run_prog "../$s" || continue
+	run_strace -qq -esignal=none -e%sched ../$s > /dev/null
+	match_diff "$LOG" /dev/null
+} < /dev/null; done < negative.list
 
 rm "$EXP"
