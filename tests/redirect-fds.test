@@ -47,6 +47,7 @@ check_fd()
 	a2="$2"
 	a3="$3"
 
+	rm -f "$LOG" "$fd0" "$fd1" "$fd2"
 	touch "$LOG" "$fd0" ||
 		framework_skip_ 'failed to create files'
 
@@ -57,8 +58,6 @@ check_fd()
 	set -- "$STRACE" -o"$LOG" -echdir "$@"
 	eval "$@" "<${a1:-&-}" ">${a2:-&-}" "2>${a3:-&-}" ||
 		dump_log_and_fail_with "$* failed with code $?"
-
-	rm -f "$LOG" "$fd0" "$fd1" "$fd2"
 }
 
 check_fd "$fd0" "$fd1" "$fd2"

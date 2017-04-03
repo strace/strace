@@ -51,5 +51,3 @@ while read s; do {
 	run_strace -qq -esignal=none -e%sched ../$s > /dev/null
 	match_diff "$LOG" /dev/null
 } < /dev/null; done < negative.list
-
-rm "$EXP"

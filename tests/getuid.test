@@ -9,4 +9,3 @@ run_prog > /dev/null
 run_strace -qq -a9 -e$NAME $args > "$EXP"
 uniq < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
-rm -f "$OUT" "$EXP"

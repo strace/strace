@@ -5,13 +5,11 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-run_strace -a16 -vepoll $args > "$OUT"
-match_diff "$LOG" "$OUT"
+run_strace -a16 -vepoll $args > "$EXP"
+match_diff "$LOG" "$EXP"
 
 for abbrev in 0 1 2 3 4 5; do
 	run_prog "../$NAME" $abbrev > /dev/null
-	run_strace -a16 -epoll -s$abbrev $args > "$OUT"
-	match_diff "$LOG" "$OUT"
+	run_strace -a16 -epoll -s$abbrev $args > "$EXP"
+	match_diff "$LOG" "$EXP"
 done
-
-rm -f "$OUT"

@@ -11,5 +11,3 @@ run_strace -eexecve $args > "$EXP"
 # Filter out execve() call made by strace.
 grep -F test.execve < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
-
-rm -f "$EXP" "$OUT"

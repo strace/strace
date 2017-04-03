@@ -41,7 +41,7 @@ fi
 
 set -e
 
-rm -f "$LOG"
+> "$LOG"
 ../set_ptracer_any sleep $((2*$TIMEOUT_DURATION)) > "$LOG" &
 
 while ! [ -s "$LOG" ]; do
@@ -62,7 +62,7 @@ cleanup()
 	return 0
 }
 
-rm -f "$LOG"
+> "$LOG"
 $STRACE -p $tracee_pid 2> "$LOG" &
 
 while ! grep -F "Process $tracee_pid attached" "$LOG" > /dev/null; do

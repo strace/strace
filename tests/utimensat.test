@@ -5,16 +5,10 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-run_strace -e utimensat $args > "$OUT"
+run_strace -e $NAME $args > "$EXP"
 
 check_prog grep
-LC_ALL=C grep -x "utimensat(.*" "$LOG" > /dev/null || {
-        rm -f "$OUT"
-        skip_ 'test executable does not use utimensat syscall'
-}
+LC_ALL=C grep -x "$NAME(.*" "$LOG" > /dev/null ||
+        skip_ "../$NAME executable does not use $NAME syscall"
 
-match_diff "$LOG" "$OUT"
-
-rm -f "$OUT"
-
-exit 0
+match_diff "$LOG" "$EXP"

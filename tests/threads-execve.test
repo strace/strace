@@ -43,7 +43,6 @@ i=0
 while [ $i -le 9 ]; do
 	run_strace "$@" > "$EXP"
 	diff -- "$EXP" "$LOG" || continue
-	rm -f "$EXP"
 	exit 0
 done
 

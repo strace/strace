@@ -9,4 +9,3 @@ run_strace -e $NAME $args > "$EXP"
 check_prog grep
 grep -v "^$NAME([0123]," < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
-rm -f "$EXP" "$OUT"

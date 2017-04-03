@@ -74,5 +74,3 @@ $STRACE -qq -enone -esignal=none \
 if [ -s "$OUT" ]; then
 	fail_ "$STRACE failed to redirect standard output"
 fi
-
-rm -f -- "$OUT"

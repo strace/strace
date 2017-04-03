@@ -54,7 +54,6 @@ cleanup()
 	return 0
 }
 
-rm -f "$LOG"
 $STRACE -p $tracee_pid 2> "$LOG" &
 
 while ! grep -F "Process $tracee_pid attached" "$LOG" > /dev/null; do

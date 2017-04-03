@@ -81,7 +81,6 @@ check_fault_injection()
 
 	match_diff "$EXP" "$LOG"
 	match_diff "$outexp" "$outgot"
-	rm -f "$EXP" "$outexp" "$outgot"
 }
 
 for err in '' ENOSYS 22 einval; do

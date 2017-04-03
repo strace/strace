@@ -11,10 +11,8 @@ t0="$(date +%T)"
 run_strace -t -eexecve $args
 t1="$(date +%T)"
 
-EXPECTED="$LOG.expected"
-cat > "$EXPECTED" << __EOF__
+cat > "$EXP" << __EOF__
 ($t0|$t1) execve\\("\\.\\./sleep", \\["\\.\\./sleep", "0"\\], \\[/\\* [[:digit:]]+ vars \\*/\\]\\) = 0
 __EOF__
 
-match_grep "$LOG" "$EXPECTED"
-rm -f "$EXPECTED"
+match_grep "$LOG" "$EXP"

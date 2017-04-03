@@ -144,5 +144,3 @@ done
 [ -z "$args" ] ||
 	dump_log_and_fail_with \
 		"strace $args failed to print expected diagnostics"
-
-rm -f "$EXP"

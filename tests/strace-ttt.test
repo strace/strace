@@ -23,4 +23,3 @@ cat > "$EXP" << __EOF__
 __EOF__
 
 match_grep "$LOG" "$EXP"
-rm -f "$EXP"

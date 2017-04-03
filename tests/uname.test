@@ -15,4 +15,3 @@ run_strace -euname $args >> "$EXP"
 uniq < "$LOG" >> "$OUT"
 
 match_diff "$OUT" "$EXP"
-rm -f "$OUT" "$EXP"

@@ -6,8 +6,5 @@
 
 run_prog > /dev/null
 syscalls=nanosleep,restart_syscall
-run_strace -a20 -e trace=$syscalls $args > "$OUT"
-match_grep "$LOG" "$OUT"
-rm -f "$OUT"
-
-exit 0
+run_strace -a20 -e trace=$syscalls $args > "$EXP"
+match_grep "$LOG" "$EXP"

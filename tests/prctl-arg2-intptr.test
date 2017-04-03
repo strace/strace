@@ -10,5 +10,3 @@ run_strace -a25 -eprctl $args > "$EXP"
 LC_ALL=C grep -Ev '^prctl\(PR_[GS]ET_([^CEF]|.[^HNP]|..[^DEI])' \
 	< "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
-
-rm -f "$EXP" "$OUT"

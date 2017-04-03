@@ -5,9 +5,7 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-run_strace -eipc $args > "$OUT"
-match_grep "$LOG" "$OUT"
-
-rm -f "$OUT"
+run_strace -eipc $args > "$EXP"
+match_grep "$LOG" "$EXP"
 
 exit 0

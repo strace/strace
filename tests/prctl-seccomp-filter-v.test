@@ -9,5 +9,3 @@ run_prog > /dev/null
 run_strace -v -eprctl $args > "$EXP"
 grep -v '^prctl(PR_GET_' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
-
-rm -f "$EXP" "$OUT"

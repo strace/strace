@@ -10,5 +10,3 @@ run_prog > /dev/null
 run_strace -a21 -eprctl $args > "$EXP"
 grep -v '^prctl(PR_[GS]ET_[^KST][^EI][^CEM]' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
-
-rm -f "$EXP" "$OUT"

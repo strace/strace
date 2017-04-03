@@ -226,7 +226,6 @@ run_strace_match_diff()
 	run_prog > /dev/null
 	run_strace "$@" $args > "$EXP"
 	match_diff "$LOG" "$EXP"
-	rm -f "$EXP"
 }
 
 # Print kernel version code.
