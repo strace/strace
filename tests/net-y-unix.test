@@ -2,7 +2,7 @@
 #
 # Check decoding of network syscalls in -y mode.
 #
-# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2016-2017 Dmitry V. Levin <ldv@altlinux.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,7 @@
 
 check_prog sed
 
-addr="$NAME-local-stream"
-run_prog "../$NAME" $addr > /dev/null
+run_prog "../$NAME" > /dev/null
 
 run_strace -a20 -y -eclose,network $args > "$EXP"
 # Filter out close() calls made by ld.so and libc.
