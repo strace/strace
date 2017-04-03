@@ -919,6 +919,7 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     oldselect.expected \
 	     pipe.expected \
 	     process_vm_readv_writev.c \
+	     pure_executables.list \
 	     qual_fault-exit_group.expected \
 	     qual_inject-error-signal.expected \
 	     qual_inject-signal.expected \
