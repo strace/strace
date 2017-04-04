@@ -67,6 +67,14 @@ function leave(array_idx, to_return)
 	delete called[array_idx]
 	return to_return
 }
+function update_upper_bound(idx, val, count)
+{
+	count = array[idx]["count"]
+	if (count == "")
+		count = 1
+	array[idx]["count"] = count * val
+	array[idx]["upper_bound"] = array[idx]["upper_bound"] "[" val "]"
+}
 function what_is(what_idx, type_idx, special, item, \
 		 location, prev_location, prev_returned_size)
 {
@@ -102,9 +110,9 @@ function what_is(what_idx, type_idx, special, item, \
 		what_is(type_idx)
 		to_return = array[what_idx]["upper_bound"]
 		if ("" == to_return)
-			to_return = 0
-		returned_size = to_return * returned_size
-		return leave(what_idx, "[" to_return "]")
+			to_return = "[0]"
+		returned_size = array[what_idx]["count"] * returned_size
+		return leave(what_idx, to_return)
 		break
 	case "structure_type":
 		print "struct {"
@@ -199,11 +207,11 @@ BEGIN {
 }
 /^DW_AT_upper_bound/ {
 	match($0, /[[:digit:]]+/, temparray)
-	array[parent[level-1]]["upper_bound"] = temparray[0] + 1
+	update_upper_bound(parent[level - 1], temparray[0] + 1)
 }
 /^DW_AT_count/ {
 	match($0, /[[:digit:]]+/, temparray)
-	array[parent[level-1]]["upper_bound"] = temparray[0]
+	update_upper_bound(parent[level - 1], temparray[0])
 }
 /^Abbrev Number:[^(]+\(DW_TAG_/ {
 	if (match($0, /typedef|union_type|structure_type|pointer_type\
