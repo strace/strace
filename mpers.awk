@@ -104,7 +104,7 @@ function what_is(what_idx, type_idx, special, item, \
 		if ("" == to_return)
 			to_return = 0
 		returned_size = to_return * returned_size
-		return leave(what_idx, to_return)
+		return leave(what_idx, "[" to_return "]")
 		break
 	case "structure_type":
 		print "struct {"
@@ -125,11 +125,7 @@ function what_is(what_idx, type_idx, special, item, \
 				prev_location = location
 				returned = what_is(item)
 				prev_returned_size = returned_size
-				printf("%s", array[item]["name"])
-				if ("" != returned) {
-					printf("[%s]", returned)
-				}
-				print ";"
+				printf("%s%s;\n", array[item]["name"], returned)
 			}
 		}
 		returned_size = array_get(what_idx, "byte_size")
@@ -146,11 +142,7 @@ function what_is(what_idx, type_idx, special, item, \
 			if ("parent" in array[item] && \
 				array_get(item, "parent") == what_idx) {
 				returned = what_is(item)
-				printf("%s", array[item]["name"])
-				if ("" != returned) {
-					printf("[%s]", returned)
-				}
-				print ";"
+				printf("%s%s;\n", array[item]["name"], returned)
 			}
 		}
 		printf("} ")
