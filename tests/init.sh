@@ -266,8 +266,12 @@ check_prog cat
 check_prog rm
 
 case "$ME_" in
-	*.test)
-	NAME="${ME_%.test}"
+	*.gen.test) NAME="${ME_%.gen.test}" ;;
+	*.test) NAME="${ME_%.test}" ;;
+	*) NAME=
+esac
+
+if [ -n "$NAME" ]; then
 	TESTDIR="$NAME.dir"
 	rm -rf -- "$TESTDIR"
 	mkdir -- "$TESTDIR"
@@ -287,14 +291,10 @@ case "$ME_" in
 			;;
 		esac
 	}
-
-		;;
-
-	*)
+else
 	[ -n "${STRACE-}" ] ||
 		STRACE=../strace
-	;;
-esac
+fi
 
 : "${TIMEOUT_DURATION:=60}"
 : "${SLEEP_A_BIT:=sleep 1}"
