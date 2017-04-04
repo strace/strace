@@ -14,9 +14,16 @@ getval()
 		../../config.h
 }
 
+config_year=$(getval COPYRIGHT_YEAR)
+
+[ "$year" -ge "$config_year" ] && [ "$config_year" -ge 2017 ] || {
+	echo >&2 "The year derived from config.h (${config_year}) does not pass sanity checks."
+	exit 1
+}
+
 cat > "$EXP" << __EOF__
 $(getval PACKAGE_NAME) -- version $(getval PACKAGE_VERSION)
-Copyright (C) 1991-$year The strace developers <$(getval PACKAGE_URL)>.
+Copyright (C) 1991-${config_year} The strace developers <$(getval PACKAGE_URL)>.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 __EOF__

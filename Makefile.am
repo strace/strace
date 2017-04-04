@@ -850,6 +850,7 @@ sen.h: $(patsubst %,$(srcdir)/%,$(syscallent_files))
 
 dist-hook:
 	$(AM_V_GEN)echo $(VERSION) > $(distdir)/.tarball-version
+	${AM_V_GEN}echo $(COPYRIGHT_YEAR) > $(distdir)/.year
 
 today = $(shell date +%Y-%m-%d)
 version_regexp = $(subst .,\.,$(VERSION))

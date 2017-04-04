@@ -1,0 +1,27 @@
+#! /bin/sh
+
+: ${YEAR_FILE:=$1}
+: ${DEFAULT_YEAR:=$2}
+
+year=
+
+[ -n "${YEAR_FILE}" ] || {
+	echo >&2 "$0 $(dirname "$0")/.year [DEFAULT_YEAR]"
+	exit 1
+}
+
+[ -f "${YEAR_FILE}" ] && year="$(cat "${YEAR_FILE}")"
+
+[ -n "${year}" ] ||
+	year="$(git show --format=format:%cd --no-patch --date=format:%Y)"
+
+[ -n "${year}" ] || year="${DEFAULT_YEAR}"
+
+[ -n "${year}" ] || year="$(date "+%Y")"
+
+[ -n "${year}" ] || {
+	echo >&2 'Undefined year.'
+	exit 1
+}
+
+printf "%s" "${year}"
