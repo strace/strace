@@ -117,9 +117,12 @@ inotify_init1	-a27
 int_0x80	-a11 -e trace=getgid32
 ioctl_block	+ioctl.test
 ioctl_evdev	+ioctl.test
+ioctl_evdev-v	+ioctl-v.sh
 ioctl_loop	+ioctl.test
+ioctl_loop-v	+ioctl-v.sh
 ioctl_mtd	+ioctl.test
 ioctl_rtc	+ioctl.test
+ioctl_rtc-v	+ioctl-v.sh
 ioctl_scsi	+ioctl.test
 ioctl_sg_io_v3	+ioctl.test
 ioctl_sg_io_v4	+ioctl.test

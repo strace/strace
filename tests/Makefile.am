@@ -502,10 +502,7 @@ DECODER_TESTS = \
 	ioctl.test \
 	ioctl_dm-v.test \
 	ioctl_dm.test \
-	ioctl_evdev-v.test \
 	ioctl_loop-nv.test \
-	ioctl_loop-v.test \
-	ioctl_rtc-v.test \
 	ioctl_sock_gifconf.test \
 	ipc_msgbuf.test \
 	llseek.test \
@@ -621,6 +618,7 @@ EXTRA_DIST = gen_tests.in gen_tests.sh init.sh run.sh match.awk \
 	     fstatx.c \
 	     getresugid.c \
 	     init_delete_module.h \
+	     ioctl-v.sh \
 	     ipc.sh \
 	     ipc_msgbuf.expected \
 	     ksysent.sed \
