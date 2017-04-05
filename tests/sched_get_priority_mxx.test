@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check sched_get_priority_min and sched_get_priority_max syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a33 -e trace=sched_get_priority_min,sched_get_priority_max

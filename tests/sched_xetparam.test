@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check sched_getparam and sched_setparam syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a23 -e trace=sched_getparam,sched_setparam

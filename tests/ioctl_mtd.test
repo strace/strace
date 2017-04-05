@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check decoding of 'M' type ioctls.
-
-. "${srcdir=.}/ioctl.test"

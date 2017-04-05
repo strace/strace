@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check get_robust_list and set_robust_list syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a24 -e trace=get_robust_list,set_robust_list

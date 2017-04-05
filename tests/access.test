@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# Check decoding of access syscall.
-
-. "${srcdir=.}/init.sh"
-
-run_strace_match_diff -a30 -P access_sample

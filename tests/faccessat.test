@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check faccessat syscall decoding.
-
-. "${srcdir=.}/openat.test"

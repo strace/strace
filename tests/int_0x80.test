@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of int 0x80 on x86_64, x32, and x86.
-. "${srcdir=.}/init.sh"
-
-run_strace_match_diff -a11 -e trace=getgid32

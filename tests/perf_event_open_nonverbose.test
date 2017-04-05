@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of perf_event_open syscall.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a34 -e verbose=none -e trace=perf_event_open

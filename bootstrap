@@ -1,5 +1,9 @@
 #!/bin/sh -eu
 
+./generate_mpers_am.sh
+./xlat/gen.sh
+./tests/gen_tests.sh
+
 for m in m32 mx32; do
 	tests=tests-$m
 	rm -rf $tests
@@ -16,8 +20,5 @@ for m in m32 mx32; do
 		ln -s ../"$f" $tests/
 	done
 done
-
-./generate_mpers_am.sh
-./xlat/gen.sh
 
 exec autoreconf -f -i "$@"

@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check getxpid, getxuid, and getxgid syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a10 -e trace=getxpid,getxuid,getxgid

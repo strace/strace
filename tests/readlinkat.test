@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check readlinkat syscall decoding.
-
-. "${srcdir=.}/readlink.test"

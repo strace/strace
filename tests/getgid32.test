@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check getgid32 syscall decoding.
-
-. "${srcdir=.}/getuid.test"

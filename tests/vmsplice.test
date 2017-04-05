@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of vmsplice syscall.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -ewrite=1

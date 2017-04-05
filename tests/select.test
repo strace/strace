@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check select syscall decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a36

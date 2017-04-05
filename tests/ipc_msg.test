@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check decoding of ipc msgget/msgctl syscalls
-
-. "${srcdir=.}/ipc.sh"

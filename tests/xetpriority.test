@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check getpriority and setpriority syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a29 -e trace=getpriority,setpriority

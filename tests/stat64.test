@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check stat64 syscall decoding.
-
-. "${srcdir=.}/statx.sh"

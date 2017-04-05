@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check {IP,IPV6}_{ADD,DROP}_MEMBERSHIP setsockopt decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=setsockopt

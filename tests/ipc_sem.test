@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check decoding of ipc semget/semctl syscalls
-
-. "${srcdir=.}/ipc.sh"

@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check decoding of ipc shmget/shmctl syscalls
-
-. "${srcdir=.}/ipc.sh"

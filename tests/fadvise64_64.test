@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check decoding of fadvise64_64 syscall.
-
-. "${srcdir=.}/fadvise64.test"

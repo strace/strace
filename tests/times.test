@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of times syscall
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -esignal=none

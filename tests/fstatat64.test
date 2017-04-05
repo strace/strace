@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check fstatat64 syscall decoding.
-
-. "${srcdir=.}/statx.sh"

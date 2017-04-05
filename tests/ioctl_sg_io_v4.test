@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# Check decoding of ioctl SG_IO v4 commands.
-. "${srcdir=.}/ioctl.test"

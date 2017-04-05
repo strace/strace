@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# Check io_* syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-
-syscalls=io_setup,io_submit,io_getevents,io_cancel,io_destroy
-run_strace_match_diff -a14 -e trace=$syscalls

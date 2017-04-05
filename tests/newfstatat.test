@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check newfstatat syscall decoding.
-
-. "${srcdir=.}/statx.sh"

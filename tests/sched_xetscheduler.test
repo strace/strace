@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check sched_getscheduler and sched_setscheduler syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a22 -e trace=sched_getscheduler,sched_setscheduler

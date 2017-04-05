@@ -1,4 +1,5 @@
 *.dir
+*.gen.test
 *.log
 *.o
 *.trs
@@ -77,6 +78,7 @@ ftruncate
 ftruncate64
 futex
 futimesat
+gen_tests.am
 get_mempolicy
 getcpu
 getcwd

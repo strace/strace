@@ -477,6 +477,8 @@ uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
 
+include gen_tests.am
+
 if USE_LIBUNWIND
 LIBUNWIND_TESTS = strace-k.test
 else
@@ -484,207 +486,42 @@ LIBUNWIND_TESTS =
 endif
 
 DECODER_TESTS = \
-	_newselect.test \
-	accept.test \
-	accept4.test \
-	access.test \
-	acct.test \
-	add_key.test \
-	adjtimex.test \
-	aio.test \
-	alarm.test \
-	bpf.test \
 	brk.test \
 	btrfs-v.test \
 	btrfs-vw.test \
 	btrfs-w.test \
-	btrfs.test \
 	caps-abbrev.test \
 	caps.test \
-	chmod.test \
-	chown.test \
-	chown32.test \
-	chroot.test \
-	clock_adjtime.test \
-	clock_nanosleep.test \
-	clock_xettime.test \
-	copy_file_range.test \
-	creat.test \
-	delete_module.test \
-	dup.test \
-	dup2.test \
-	dup3.test \
-	epoll_create.test \
-	epoll_create1.test \
-	epoll_ctl.test \
-	epoll_pwait.test \
-	epoll_wait.test \
-	erestartsys.test \
 	eventfd.test \
 	execve-v.test \
 	execve.test \
-	execveat-v.test \
-	execveat.test \
-	faccessat.test \
 	fadvise64.test \
-	fadvise64_64.test \
-	fallocate.test \
-	fanotify_init.test \
-	fanotify_mark.test \
-	fchdir.test \
-	fchmod.test \
-	fchmodat.test \
-	fchown.test \
-	fchown32.test \
-	fchownat.test \
-	fcntl.test \
-	fcntl64.test \
-	fdatasync.test \
-	file_handle.test \
-	file_ioctl.test \
-	finit_module.test \
-	flock.test \
 	fstat.test \
-	fstat64.test \
-	fstatat64.test \
-	fstatfs.test \
-	fstatfs64.test \
-	fsync.test \
-	ftruncate.test \
-	ftruncate64.test \
 	futex.test \
-	futimesat.test \
-	get_mempolicy.test \
-	getcpu.test \
-	getcwd.test \
-	getdents.test \
-	getdents64.test \
-	getegid.test \
-	getegid32.test \
-	geteuid.test \
-	geteuid32.test \
-	getgid.test \
-	getgid32.test \
-	getgroups.test \
-	getgroups32.test \
-	getpeername.test \
-	getpgrp.test \
-	getrandom.test \
-	getresgid.test \
-	getresgid32.test \
-	getresuid.test \
-	getresuid32.test \
-	getrlimit.test \
-	getrusage.test \
-	getsid.test \
-	getsockname.test \
 	getuid.test \
-	getuid32.test \
-	getxxid.test \
-	inet-cmsg.test \
-	init_module.test \
-	inotify.test \
-	inotify_init1.test \
 	ioctl.test \
-	ioctl_block.test \
 	ioctl_dm-v.test \
 	ioctl_dm.test \
 	ioctl_evdev-v.test \
-	ioctl_evdev.test \
 	ioctl_loop-nv.test \
 	ioctl_loop-v.test \
-	ioctl_loop.test \
-	ioctl_mtd.test \
 	ioctl_rtc-v.test \
-	ioctl_rtc.test \
-	ioctl_scsi.test \
-	ioctl_sg_io_v3.test \
-	ioctl_sg_io_v4.test \
 	ioctl_sock_gifconf.test \
-	ioctl_uffdio.test \
-	ioctl_v4l2.test \
-	ioperm.test \
-	iopl.test \
-	ioprio.test \
-	ip_mreq.test \
-	ipc.test \
-	ipc_msg.test \
 	ipc_msgbuf.test \
-	ipc_sem.test \
-	ipc_shm.test \
-	kcmp.test \
-	kexec_file_load.test \
-	kexec_load.test \
-	keyctl.test \
-	kill.test \
-	lchown.test \
-	lchown32.test \
-	link.test \
-	linkat.test \
 	llseek.test \
-	lookup_dcookie.test \
 	lseek.test \
-	lstat.test \
-	lstat64.test \
-	mbind.test \
-	membarrier.test \
-	memfd_create.test \
-	migrate_pages.test \
-	mincore.test \
-	mkdir.test \
-	mkdirat.test \
-	mknod.test \
-	mknodat.test \
-	mlock.test \
-	mlock2.test \
-	mlockall.test \
 	mmap.test \
-	mmap64.test \
-	mmsg-silent.test \
-	mmsg.test \
-	mmsg_name-v.test \
-	mmsg_name.test \
-	mount.test \
-	move_pages.test \
-	mq.test \
-	mq_sendrecv-read.test \
-	mq_sendrecv-write.test \
-	mq_sendrecv.test \
-	msg_control-v.test \
-	msg_control.test \
-	msg_name.test \
-	munlockall.test \
-	nanosleep.test \
-	net-icmp_filter.test \
-	net-sockaddr.test \
 	net-y-unix.test \
 	net-yy-inet.test \
 	net-yy-netlink.test \
 	net-yy-unix.test \
 	net.test \
 	netlink_protocol.test \
-	newfstatat.test \
 	nsyscalls.test \
-	old_mmap.test \
-	oldfstat.test \
-	oldlstat.test \
 	oldselect.test \
-	oldstat.test \
-	open.test \
-	openat.test \
-	pause.test \
-	perf_event_open.test \
-	perf_event_open_nonverbose.test \
-	perf_event_open_unabbrev.test \
 	personality.test \
 	pipe.test \
-	pipe2.test \
-	pkey_alloc.test \
-	pkey_free.test \
-	pkey_mprotect.test \
 	poll.test \
-	ppoll-v.test \
-	ppoll.test \
 	prctl-arg2-intptr.test \
 	prctl-dumpable.test \
 	prctl-name.test \
@@ -696,150 +533,27 @@ DECODER_TESTS = \
 	prctl-tid_address.test \
 	prctl-tsc.test \
 	pread64-pwrite64.test \
-	preadv-pwritev.test \
-	preadv.test \
-	preadv2-pwritev2.test \
-	printstr.test \
-	prlimit64.test \
-	process_vm_readv.test \
-	process_vm_writev.test \
-	pselect6.test \
-	ptrace.test \
-	pwritev.test \
 	qual_fault-exit_group.test \
-	quotactl-v.test \
-	quotactl-xfs-v.test \
-	quotactl-xfs.test \
-	quotactl.test \
 	read-write.test \
-	readahead.test \
-	readdir.test \
-	readlink.test \
-	readlinkat.test \
 	readv.test \
-	reboot.test \
-	recvfrom.test \
-	recvmmsg-timeout.test \
-	recvmsg.test \
-	remap_file_pages.test \
-	rename.test \
-	renameat.test \
-	renameat2.test \
-	request_key.test \
-	rmdir.test \
-	rt_sigpending.test \
-	rt_sigprocmask.test \
-	rt_sigqueueinfo.test \
-	rt_sigreturn.test \
-	rt_sigsuspend.test \
-	rt_sigtimedwait.test \
-	rt_tgsigqueueinfo.test \
 	sched.test \
-	sched_get_priority_mxx.test \
-	sched_rr_get_interval.test \
-	sched_xetaffinity.test \
-	sched_xetattr.test \
-	sched_xetparam.test \
-	sched_xetscheduler.test \
-	sched_yield.test \
 	scm_rights-fd.test \
-	seccomp-filter-v.test \
-	seccomp-filter.test \
 	seccomp-strict.test \
-	select.test \
-	semop.test \
-	sendfile.test \
-	sendfile64.test \
-	set_mempolicy.test \
-	setdomainname.test \
-	setfsgid.test \
-	setfsgid32.test \
-	setfsuid.test \
-	setfsuid32.test \
-	setgid.test \
-	setgid32.test \
-	setgroups.test \
-	setgroups32.test \
-	sethostname.test \
-	setns.test \
-	setregid.test \
-	setregid32.test \
-	setresgid.test \
-	setresgid32.test \
-	setresuid.test \
-	setresuid32.test \
-	setreuid.test \
-	setreuid32.test \
-	setrlimit.test \
-	setuid.test \
-	setuid32.test \
 	shmxt.test \
-	shutdown.test \
 	sigaction.test \
 	sigaltstack.test \
-	siginfo.test \
-	signalfd4.test \
-	sigreturn.test \
-	socketcall.test \
-	splice.test \
-	stat.test \
-	stat64.test \
 	statfs.test \
-	statfs64.test \
-	statx.test \
 	sun_path.test \
-	swap.test \
-	symlink.test \
-	symlinkat.test \
-	sync.test \
-	sync_file_range.test \
-	sync_file_range2.test \
-	sysinfo.test \
-	syslog.test \
-	tee.test \
-	time.test \
-	timer_create.test \
-	timer_xettime.test \
-	timerfd_xettime.test \
-	times-fail.test \
-	times.test \
-	truncate.test \
-	truncate64.test \
-	ugetrlimit.test \
 	uio.test \
-	umask.test \
 	umount.test \
 	umount2.test \
-	umoven-illptr.test \
-	umovestr-illptr.test \
 	umovestr.test \
 	umovestr2.test \
-	umovestr3.test \
 	uname.test \
 	unix-pair-send-recv.test \
 	unix-pair-sendto-recvfrom.test \
-	unlink.test \
-	unlinkat.test \
-	unshare.test \
-	userfaultfd.test \
-	ustat.test \
-	utime.test \
 	utimensat.test \
-	utimes.test \
-	vhangup.test \
-	vmsplice.test \
-	wait4-v.test \
-	wait4.test \
-	waitid-v.test \
-	waitid.test \
-	waitpid.test \
-	xattr-strings.test \
 	xattr.test \
-	xet_robust_list.test \
-	xetitimer.test \
-	xetpgid.test \
-	xetpriority.test \
-	xettimeofday.test \
 	# end of DECODER_TESTS
 
 MISC_TESTS = \
@@ -852,8 +566,6 @@ MISC_TESTS = \
 	detach-sleeping.test \
 	detach-stopped.test \
 	filter-unavailable.test \
-	fork-f.test \
-	int_0x80.test \
 	ksysent.test \
 	opipe.test \
 	options-syntax.test \
@@ -869,7 +581,6 @@ MISC_TESTS = \
 	redirect-fds.test \
 	redirect.test \
 	restart_syscall.test \
-	signal_receive.test \
 	strace-C.test \
 	strace-E.test \
 	strace-S.test \
@@ -881,16 +592,15 @@ MISC_TESTS = \
 	strace-tt.test \
 	strace-ttt.test \
 	threads-execve.test \
-	vfork-f.test \
 	# end of MISC_TESTS
 
-TESTS = $(DECODER_TESTS) $(MISC_TESTS) $(LIBUNWIND_TESTS)
+TESTS = $(GEN_TESTS) $(DECODER_TESTS) $(MISC_TESTS) $(LIBUNWIND_TESTS)
 
 XFAIL_TESTS_ =
 XFAIL_TESTS_m32 = $(LIBUNWIND_TESTS)
 XFAIL_TESTS_mx32 = $(LIBUNWIND_TESTS)
-XFAIL_TESTS_x86_64 = int_0x80.test
-XFAIL_TESTS_x32 = int_0x80.test
+XFAIL_TESTS_x86_64 = int_0x80.gen.test
+XFAIL_TESTS_x32 = int_0x80.gen.test
 XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME)) $(XFAIL_TESTS_$(ARCH))
 
 TEST_LOG_COMPILER = env
@@ -900,7 +610,7 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) MIPS_ABI=$(MIPS_ABI) $(srcdir)/run.sh
 VALGRIND_FLAGS = --quiet
 VALGRIND_SUPPRESSIONS_FILES = $(srcdir)/strace.supp
 
-EXTRA_DIST = init.sh run.sh match.awk \
+EXTRA_DIST = gen_tests.in gen_tests.sh init.sh run.sh match.awk \
 	     caps-abbrev.awk \
 	     caps.awk \
 	     count-f.expected \
@@ -933,7 +643,6 @@ EXTRA_DIST = init.sh run.sh match.awk \
 	     sigaltstack.expected \
 	     sockname.c \
 	     statfs.expected \
-	     statx.sh \
 	     strace-C.expected \
 	     strace-E.expected \
 	     strace-T.expected \
@@ -972,7 +681,7 @@ $(objects): scno.h
 clean-local: clean-local-check
 .PHONY: clean-local-check
 clean-local-check:
-	-rm -rf -- $(TESTS:.test=.dir)
+	-rm -rf -- $(TESTS:.test=.dir) $(GEN_TESTS:.gen.test=.dir)
 
 CLEANFILES = ksysent.h
 

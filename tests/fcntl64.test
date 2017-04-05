@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check fcntl64 syscall decoding.
-
-. "${srcdir=.}/fcntl.test"

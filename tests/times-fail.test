@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of failing times syscall
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a12 -e trace=times

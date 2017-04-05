@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check clock_getres, clock_gettime, and clock_settime syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a36 -e trace=clock_getres,clock_gettime,clock_settime

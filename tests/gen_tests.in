@@ -1,0 +1,319 @@
+# Input for gen_tests.sh
+#
+# Copyright (c) 2017 The strace developers.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+_newselect
+accept	-a22
+accept4	-a37
+access	-a30 -P access_sample
+acct	-a20
+add_key	-a30 -s12
+adjtimex	-a15
+aio	-a14 -e trace=io_setup,io_submit,io_getevents,io_cancel,io_destroy
+alarm	-a10
+bpf	-a20
+btrfs	+ioctl.test
+chmod	-a28
+chown	-a28
+chown32	-a31
+chroot	-a24
+clock_adjtime	-a37
+clock_nanosleep	-e trace=clock_nanosleep,clock_gettime
+clock_xettime	-a36 -e trace=clock_getres,clock_gettime,clock_settime
+copy_file_range
+creat	-a20
+delete_module	-a23
+dup	-a8
+dup2	-a13
+dup3	-a24
+epoll_create	-a17
+epoll_create1	-a28
+epoll_ctl
+epoll_pwait
+epoll_wait	-a26
+erestartsys	-a34 -e signal=none -e trace=recvfrom
+execveat
+execveat-v	-v -e trace=execveat
+faccessat	-P $NAME.sample
+fadvise64_64	+fadvise64.test
+fallocate	-a18
+fanotify_init
+fanotify_mark	-a32
+fchdir	-a11
+fchmod	-a15
+fchmodat
+fchown	-a16
+fchown32	-a18
+fchownat
+fcntl	-a8
+fcntl64	-a8
+fdatasync	-a14
+file_handle	-e trace=name_to_handle_at,open_by_handle_at
+file_ioctl	+ioctl.test
+finit_module	-a25
+flock	-a19
+fork-f	-a26 -qq -f -e signal=none -e trace=chdir
+fstat64	+fstat.test
+fstatat64	-a32 -v -P $NAME.sample -P /dev/full
+fstatfs	+statfs.test
+fstatfs64	+statfs.test
+fsync	-a10
+ftruncate	-a24
+ftruncate64	-a36
+futimesat	-a28
+get_mempolicy	-s3 -a38
+getcpu	-a25
+getcwd	-a18
+getdents	-a22 -v
+getdents64	-a24 -v
+getegid	+getuid.test
+getegid32	+getuid.test
+geteuid	+getuid.test
+geteuid32	+getuid.test
+getgid	+getuid.test
+getgid32	+getuid.test
+getgroups	-a17
+getgroups32	-a19
+getpeername	-a27
+getpgrp	-a10
+getrandom	-a32 -s3
+getresgid	-a25
+getresgid32	-a27
+getresuid	-a25
+getresuid32	-a27
+getrlimit	-a27
+getrusage	-v
+getsid	-a10
+getsockname	-a27
+getuid32	+getuid.test
+getxxid	-a10 -e trace=getxpid,getxuid,getxgid
+inet-cmsg	-e trace=recvmsg
+init_module	-a27
+inotify	-a23 -e trace=inotify_add_watch,inotify_rm_watch
+inotify_init1	-a27
+int_0x80	-a11 -e trace=getgid32
+ioctl_block	+ioctl.test
+ioctl_evdev	+ioctl.test
+ioctl_loop	+ioctl.test
+ioctl_mtd	+ioctl.test
+ioctl_rtc	+ioctl.test
+ioctl_scsi	+ioctl.test
+ioctl_sg_io_v3	+ioctl.test
+ioctl_sg_io_v4	+ioctl.test
+ioctl_uffdio	+ioctl.test
+ioctl_v4l2	+ioctl.test
+ioperm	-a27
+iopl	-a8
+ioprio	-a18 -e trace=ioprio_get,ioprio_set
+ip_mreq	-e trace=setsockopt
+ipc	-a19
+ipc_msg	+ipc.sh
+ipc_sem	+ipc.sh
+ipc_shm	+ipc.sh
+kcmp	-a27
+kexec_file_load	-s9
+kexec_load	-s9
+keyctl	-a31 -s10
+kill	-a12 -esignal=none
+lchown	-a30
+lchown32	-a32
+link
+linkat
+lookup_dcookie	-a27
+lstat	-a32 -v -P $NAME.sample -P /dev/full
+lstat64	-a32 -v -P $NAME.sample -P /dev/full
+mbind
+membarrier	-a36
+memfd_create
+migrate_pages	-a33
+mincore	-a22
+mkdir	-a20
+mkdirat	-a28
+mknod	-a18
+mknodat	-a35
+mlock	-a20 -e trace=mlock,munlock
+mlock2
+mlockall	-a12
+mmap64	+mmap.test
+mmsg	-e read=0 -e write=1 -e trace=recvmmsg,sendmmsg
+mmsg-silent	-a25 -e verbose=none -e trace=sendmmsg,recvmmsg
+mmsg_name	-a25 -e trace=sendmmsg,recvmmsg
+mmsg_name-v	-v -a25 -e trace=sendmmsg,recvmmsg
+mount
+move_pages	-s3
+mq	-a28 -e trace=mq_getsetattr,mq_open,mq_unlink
+mq_sendrecv	-a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
+mq_sendrecv-read	-eread=0 -a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
+mq_sendrecv-write	-ewrite=0 -a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
+msg_control	-a21 -e trace=sendmsg
+msg_control-v	-v -a21 -e trace=sendmsg
+msg_name	-a20 -e trace=recvmsg
+munlockall	-a13
+nanosleep	-a20
+net-icmp_filter	-e trace=getsockopt,setsockopt
+net-sockaddr	-a24 -e trace=connect
+newfstatat	-a32 -v -P $NAME.sample -P /dev/full
+old_mmap	-a11 -e trace=mmap
+oldfstat	+fstat.test
+oldlstat	-a32 -v -P $NAME.sample -P /dev/full
+oldstat	-a32 -v -P $NAME.sample -P /dev/full
+open	-a30 -P $NAME.sample
+openat	-P $NAME.sample
+pause	-a8 -esignal=none
+perf_event_open	-a1
+perf_event_open_nonverbose	-a34 -e verbose=none -e trace=perf_event_open
+perf_event_open_unabbrev	-a1 -v -e trace=perf_event_open
+pipe2	-a15
+pkey_alloc	-a17
+pkey_free	-a13
+pkey_mprotect	-a37
+ppoll	-s2
+ppoll-v	-v -s2 -e trace=ppoll
+preadv	-a21
+preadv-pwritev	-a19 -eread=0 -ewrite=1 -e trace=preadv,pwritev
+preadv2-pwritev2	-a22 -eread=0 -ewrite=1 -e trace=preadv2,pwritev2
+printstr	-e trace=writev
+prlimit64
+process_vm_readv	-s5 -a37
+process_vm_writev	-s5 -a38
+pselect6
+ptrace	-a23 -e signal=none
+pwritev	-a22 -s7
+quotactl
+quotactl-v	-v -e trace=quotactl
+quotactl-xfs	-e trace=quotactl
+quotactl-xfs-v	-v -e trace=quotactl
+readahead	-a1
+readdir	-a16
+readlink	-xx
+readlinkat	-xx
+reboot
+recvfrom	-a35
+recvmmsg-timeout	-a25 -e trace=recvmmsg
+recvmsg	-eread=0 -ewrite=1 -e trace=recvmsg,sendmsg
+remap_file_pages
+rename	-a35
+renameat
+renameat2
+request_key	-a33 -s12
+rmdir	-a22
+rt_sigpending	-a20
+rt_sigprocmask
+rt_sigqueueinfo	-esignal=none
+rt_sigreturn	-esignal='!USR1'
+rt_sigsuspend	-a20 -esignal=none
+rt_sigtimedwait	-a38
+rt_tgsigqueueinfo	-esignal=none
+sched_get_priority_mxx	-a33 -e trace=sched_get_priority_min,sched_get_priority_max
+sched_rr_get_interval	-a31
+sched_xetaffinity	-a28 -e trace=sched_getaffinity,sched_setaffinity
+sched_xetattr	-a29 -e trace=sched_getattr,sched_setattr
+sched_xetparam	-a23 -e trace=sched_getparam,sched_setparam
+sched_xetscheduler	-a22 -e trace=sched_getscheduler,sched_setscheduler
+sched_yield	-a14
+seccomp-filter	-e trace=seccomp
+seccomp-filter-v	-v -e trace=seccomp
+select	-a36
+semop	-a32 -e trace=semop,semtimedop
+sendfile	-a27
+sendfile64	-a29
+set_mempolicy	-s3 -a35
+setdomainname	-a24
+setfsgid	-a12
+setfsgid32	-a14
+setfsuid	-a12
+setfsuid32	-a14
+setgid	-a10
+setgid32	-a12
+setgroups	-s2 -a17
+setgroups32	-s2 -a19
+sethostname	-a22
+setns	-a21
+setregid	-a15
+setregid32	-a17
+setresgid	-a19
+setresgid32	-a21
+setresuid	-a19
+setresuid32	-a21
+setreuid	-a15
+setreuid32	-a17
+setrlimit	-a27
+setuid	-a10
+setuid32	-a12
+shutdown	-a24
+siginfo	-e trace=none
+signal_receive	-a16 -e trace=kill
+signalfd4
+sigreturn	-esignal='!USR1'
+socketcall	-a20
+splice
+stat	-a32 -v -P $NAME.sample -P /dev/full
+stat64	-a32 -v -P $NAME.sample -P /dev/full
+statfs64	+statfs.test
+statx	-a32 -v -P $NAME.sample -P /dev/full
+swap	-a23 -e trace=swapon,swapoff
+symlink	-a34
+symlinkat
+sync	-a7
+sync_file_range
+sync_file_range2
+sysinfo	-a14
+syslog	-a36
+tee
+time	-a10
+timer_create
+timer_xettime	-e trace=timer_create,timer_settime,timer_gettime
+timerfd_xettime	-e trace=timerfd_create,timerfd_settime,timerfd_gettime
+times	-esignal=none
+times-fail	-a12 -e trace=times
+truncate
+truncate64
+ugetrlimit	-a28
+umask	-a11
+umoven-illptr	-a36 -e trace=nanosleep
+umovestr-illptr	-a11 -e trace=chdir
+umovestr3	-a14 -e trace=chdir
+unlink	-a24
+unlinkat	-a35
+unshare	-a11
+userfaultfd	-a38
+ustat	-a33
+utime	-a 16 -e trace=utime
+utimes	-a21
+vfork-f	-a26 -qq -f -e signal=none -e trace=chdir
+vhangup	-a10
+vmsplice	-ewrite=1
+wait4	-esignal=none
+wait4-v	-v -e signal=none -e trace=wait4
+waitid	-esignal=none
+waitid-v	-v -e signal=none -e trace=waitid
+waitpid	-a28
+xattr-strings	-a22 -s 4 -e trace=fsetxattr
+xet_robust_list	-a24 -e trace=get_robust_list,set_robust_list
+xetitimer	-a29 -e trace=setitimer,getitimer
+xetpgid	-a11 -e trace=getpgid,setpgid
+xetpriority	-a29 -e trace=getpriority,setpriority
+xettimeofday	-a20 -e trace=gettimeofday,settimeofday

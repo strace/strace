@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check how iovecs in struct mmsghdr are decoded.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=recvmmsg,sendmmsg -e read=0 -e write=1

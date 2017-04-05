@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of recvmsg and sendmsg syscalls.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -eread=0 -ewrite=1 -e trace=recvmsg,sendmsg

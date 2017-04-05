@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check name_to_handle_at and open_by_handle_at syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=name_to_handle_at,open_by_handle_at

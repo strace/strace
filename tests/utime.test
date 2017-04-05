@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of utime syscall.
-. "${srcdir=.}/init.sh"
-
-run_strace_match_diff -a 16 -e trace=utime

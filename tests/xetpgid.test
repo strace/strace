@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check getpgid and setpgid syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a11 -e trace=getpgid,setpgid

@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check IPPROTO_IP control messages decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=recvmsg

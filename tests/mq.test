@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of mq_open, mq_getsetattr, and mq_unlink syscalls.
-. "${srcdir=.}/init.sh"
-
-run_strace_match_diff -a28 -e trace=mq_getsetattr,mq_open,mq_unlink

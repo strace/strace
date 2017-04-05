@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check decoding of getrlimit syscall.
-
-. "${srcdir=.}/setrlimit.test"

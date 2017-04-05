@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check decoding of rt_tgsigqueueinfo syscall
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -esignal=none

@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check decoding of getpeername syscall.
-
-. "${srcdir=.}/getsockname.test"

@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check rt_sigsuspend syscall decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -a20 -esignal=none

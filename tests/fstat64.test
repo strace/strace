@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check fstat64 syscall decoding.
-
-. "${srcdir=.}/fstat.test"

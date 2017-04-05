@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Check fstatfs syscall decoding.
-
-. "${srcdir=.}/statfs.test"

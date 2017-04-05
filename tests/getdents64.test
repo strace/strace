@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# Check getdents64 syscall decoding.
-
-. "${srcdir=.}/init.sh"
-
-run_strace_match_diff -a24 -v

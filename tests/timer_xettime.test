@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# Check timer_create, timer_settime, and timer_gettime syscalls decoding.
-
-. "${srcdir=.}/init.sh"
-run_strace_match_diff -e trace=timer_create,timer_settime,timer_gettime
