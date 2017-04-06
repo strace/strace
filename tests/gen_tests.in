@@ -314,6 +314,7 @@ wait4-v	-v -e signal=none -e trace=wait4
 waitid	-esignal=none
 waitid-v	-v -e signal=none -e trace=waitid
 waitpid	-a28
+xattr	-a22 -e trace=getxattr,fgetxattr,lgetxattr,setxattr,fsetxattr,lsetxattr,listxattr,flistxattr,llistxattr,removexattr,fremovexattr,lremovexattr
 xattr-strings	-a22 -s 4 -e trace=fsetxattr
 xet_robust_list	-a24 -e trace=get_robust_list,set_robust_list
 xetitimer	-a29 -e trace=setitimer,getitimer

@@ -550,7 +550,6 @@ DECODER_TESTS = \
 	unix-pair-send-recv.test \
 	unix-pair-sendto-recvfrom.test \
 	utimensat.test \
-	xattr.test \
 	# end of DECODER_TESTS
 
 MISC_TESTS = \
