@@ -643,7 +643,6 @@ EXTRA_DIST = gen_tests.in gen_tests.sh init.sh run.sh match.awk \
 	     sigaction.awk \
 	     sigaltstack.expected \
 	     sockname.c \
-	     statfs.expected \
 	     strace-C.expected \
 	     strace-E.expected \
 	     strace-T.expected \
