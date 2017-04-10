@@ -36,7 +36,6 @@
 #include <linux/unix_diag.h>
 #include <linux/netlink_diag.h>
 #include <linux/rtnetlink.h>
-#include "xlat/netlink_protocols.h"
 
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
