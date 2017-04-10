@@ -31,7 +31,6 @@
 
 #include "perf_event_struct.h"
 
-#include "xlat/clocknames.h"
 #include "xlat/hw_breakpoint_len.h"
 #include "xlat/hw_breakpoint_type.h"
 #include "xlat/perf_attr_size.h"

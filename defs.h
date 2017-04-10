@@ -293,6 +293,7 @@ struct tcb {
 
 extern const struct xlat addrfams[];
 extern const struct xlat at_flags[];
+extern const struct xlat clocknames[];
 extern const struct xlat dirent_types[];
 extern const struct xlat evdev_abs[];
 extern const struct xlat msg_flags[];
