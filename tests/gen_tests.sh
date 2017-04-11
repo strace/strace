@@ -92,7 +92,7 @@ if [ -n "$names" ]; then
 		printf ' %s.gen.test' $names
 		echo
 		target='$(srcdir)/%s.gen.test'
-		dep1='$(srcdir)/gen_tests.sh'
+		dep1='$(abs_srcdir)/gen_tests.sh'
 		dep2='$(srcdir)/gen_tests.in'
 		recipe='$(AM_V_GEN) $^ $@'
 		printf "\\n$target: $dep1 $dep2\\n\\t$recipe\\n" $names
