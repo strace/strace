@@ -1156,6 +1156,9 @@ get_regs(pid_t pid)
 #undef USE_GET_SYSCALL_RESULT_REGS
 #ifdef ptrace_getregset_or_getregs
 
+	if (get_regs_error != -1)
+		return;
+
 # ifdef HAVE_GETREGS_OLD
 	/*
 	 * Try PTRACE_GETREGSET/PTRACE_GETREGS first,

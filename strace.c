@@ -2295,10 +2295,9 @@ trace(void)
 			return true;
 	}
 
+	clear_regs();
 	if (WIFSTOPPED(status))
 		get_regs(pid);
-	else
-		clear_regs();
 
 	event = (unsigned int) status >> 16;
 
