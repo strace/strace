@@ -567,6 +567,7 @@ MISC_TESTS = \
 	detach-sleeping.test \
 	detach-stopped.test \
 	filter-unavailable.test \
+	get_regs.test \
 	ksysent.test \
 	opipe.test \
 	options-syntax.test \

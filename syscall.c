@@ -757,7 +757,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	struct timeval tv;
 
 	/* Measure the exit time as early as possible to avoid errors. */
-	if (Tflag || cflag)
+	if ((Tflag || cflag) && !(filtered(tcp) || hide_log(tcp)))
 		gettimeofday(&tv, NULL);
 
 #ifdef USE_LIBUNWIND
@@ -767,13 +767,14 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 #endif
 
+	if (filtered(tcp) || hide_log(tcp))
+		goto ret;
+
 	get_regs(tcp->pid);
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
 	int res = (get_regs_error ? -1 : get_syscall_result(tcp));
-	if (filtered(tcp) || hide_log(tcp))
-		goto ret;
 
 	if (syserror(tcp) && syscall_tampered(tcp))
 		tamper_with_syscall_exiting(tcp);

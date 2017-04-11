@@ -7,6 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     supported, but considered deprecated now.
 
 * Improvements
+  * Optimized syscall filtering.
   * Enhanced decoding of sched_setattr syscall.
   * Added -e trace=%sched option for tracing sched_* syscalls.
   * Added -e trace=%clock option for tracing clock_* syscalls.
