@@ -42,6 +42,10 @@
 # define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
 #endif
 
+#ifndef NETLINK_SOCK_DIAG
+# define NETLINK_SOCK_DIAG 4
+#endif
+
 typedef struct {
 	unsigned long inode;
 	char *details;
