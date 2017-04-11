@@ -110,6 +110,7 @@ getrlimit	-a27
 getrusage	-v
 getsid	-a10
 getsockname	-a27
+gettid	-a9
 getuid32	+getuid.test
 getxxid	-a10 -e trace=getxpid,getxuid,getxgid
 inet-cmsg	-e trace=recvmsg

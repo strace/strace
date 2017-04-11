@@ -169,6 +169,7 @@ check_PROGRAMS = \
 	getrusage \
 	getsid \
 	getsockname \
+	gettid \
 	getuid \
 	getuid32 \
 	getxxid \
