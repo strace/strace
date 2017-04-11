@@ -644,11 +644,11 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 static int
 trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 {
-	int res, scno_good;
-
-	scno_good = res = get_scno(tcp);
+	int res = get_scno(tcp);
 	if (res == 0)
 		return res;
+
+	int scno_good = res;
 	if (res == 1)
 		res = get_syscall_args(tcp);
 
@@ -753,11 +753,7 @@ syscall_tampered(struct tcb *tcp)
 static int
 trace_syscall_exiting(struct tcb *tcp)
 {
-	int sys_res;
 	struct timeval tv;
-	int res;
-	unsigned long u_error;
-	const char *u_error_str;
 
 	/* Measure the exit time as early as possible to avoid errors. */
 	if (Tflag || cflag)
@@ -773,7 +769,7 @@ trace_syscall_exiting(struct tcb *tcp)
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
-	res = (get_regs_error ? -1 : get_syscall_result(tcp));
+	int res = (get_regs_error ? -1 : get_syscall_result(tcp));
 	if (filtered(tcp) || hide_log(tcp))
 		goto ret;
 
@@ -817,7 +813,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 	tcp->s_prev_ent = tcp->s_ent;
 
-	sys_res = 0;
+	int sys_res = 0;
 	if (tcp->qual_flg & QUAL_RAW) {
 		/* sys_res = printargs(tcp); - but it's nop on sysexit */
 	} else {
@@ -839,7 +835,7 @@ trace_syscall_exiting(struct tcb *tcp)
 
 	tprints(") ");
 	tabto();
-	u_error = tcp->u_error;
+	unsigned long u_error = tcp->u_error;
 
 	if (tcp->qual_flg & QUAL_RAW) {
 		if (u_error) {
@@ -851,6 +847,8 @@ trace_syscall_exiting(struct tcb *tcp)
 			tprints(" (INJECTED)");
 	}
 	else if (!(sys_res & RVAL_NONE) && u_error) {
+		const char *u_error_str;
+
 		switch (u_error) {
 		/* Blocked signals do not interrupt any syscalls.
 		 * In this case syscalls don't return ERESTARTfoo codes.
