@@ -412,7 +412,6 @@ extern void count_syscall(struct tcb *, const struct timeval *);
 extern void call_summary(FILE *);
 
 extern void clear_regs(void);
-extern void get_regs(pid_t pid);
 extern int get_scno(struct tcb *);
 extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
 

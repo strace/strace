@@ -559,6 +559,7 @@ clear_regs(void)
 	get_regs_error = -1;
 }
 
+static void get_regs(pid_t pid);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static int arch_get_scno(struct tcb *tcp);
@@ -766,6 +767,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	}
 #endif
 
+	get_regs(tcp->pid);
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
@@ -1065,6 +1067,7 @@ print_pc(struct tcb *tcp)
 #else
 # error Neither ARCH_PC_REG nor ARCH_PC_PEEK_ADDR is defined
 #endif
+	get_regs(tcp->pid);
 	if (get_regs_error || ARCH_GET_PC)
 		tprints(current_wordsize == 4 ? "[????????] "
 					      : "[????????????????] ");
@@ -1150,7 +1153,7 @@ ptrace_setregs(pid_t pid)
 
 #endif /* ARCH_REGS_FOR_GETREGSET || ARCH_REGS_FOR_GETREGS */
 
-void
+static void
 get_regs(pid_t pid)
 {
 #undef USE_GET_SYSCALL_RESULT_REGS
@@ -1225,6 +1228,8 @@ free_sysent_buf(void *ptr)
 int
 get_scno(struct tcb *tcp)
 {
+	get_regs(tcp->pid);
+
 	if (get_regs_error)
 		return -1;
 
