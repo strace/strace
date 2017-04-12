@@ -15,6 +15,10 @@ case "$CC" in
 	gcc)
 		apt_get_install gcc-multilib
 		;;
+	gcc-*)
+		sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+		apt_get_install gcc-multilib "$CC"-multilib
+		;;
 	clang-*)
 		apt_get_install gcc-multilib "$CC"
 		;;

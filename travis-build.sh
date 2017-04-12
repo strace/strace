@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 case "$CC" in
-	gcc)
+	gcc*)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-gcc-Werror"
 		;;
 	clang-*)

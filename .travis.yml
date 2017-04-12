@@ -39,6 +39,15 @@ matrix:
     - compiler: musl-gcc
       env:
         - TARGET=x86
+    - compiler: gcc-6
+      env:
+        - TARGET=x86_64
+    - compiler: gcc-6
+      env:
+        - TARGET=x32
+    - compiler: gcc-6
+      env:
+        - TARGET=x86
     - compiler: gcc
       env:
         - TARGET=x86_64
