@@ -56,6 +56,272 @@
 
 static const unsigned int magic = 0xdeadbeef;
 
+static void
+init_v4l2_format(struct v4l2_format *const f,
+		 const unsigned int buf_type)
+{
+	memset(f, -1, sizeof(*f));
+	f->type = buf_type;
+	switch (buf_type) {
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
+		f->fmt.pix.width = 0x657b8160;
+		f->fmt.pix.height = 0x951c0047;
+		f->fmt.pix.pixelformat = magic;
+		f->fmt.pix.field = V4L2_FIELD_NONE;
+		f->fmt.pix.bytesperline = 0xdf20d185;
+		f->fmt.pix.sizeimage = 0x0cf7be41;
+		f->fmt.pix.colorspace = V4L2_COLORSPACE_JPEG;
+		break;
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE: {
+		unsigned int i;
+
+		f->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+		f->fmt.pix_mp.width = 0x1f3b774b;
+		f->fmt.pix_mp.height = 0xab96a8d6;
+		f->fmt.pix_mp.pixelformat = magic;
+		f->fmt.pix_mp.field = V4L2_FIELD_NONE;
+		f->fmt.pix_mp.colorspace = V4L2_COLORSPACE_JPEG;
+		struct v4l2_plane_pix_format* cur_pix =
+		       f->fmt.pix_mp.plane_fmt;
+		for (i = 0;
+		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
+		     i++) {
+			cur_pix[i].sizeimage = 0x1e3c531c | i;
+			cur_pix[i].bytesperline = 0xa983d721 | i;
+		}
+		break;
+	}
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
+#endif
+	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
+		f->fmt.win.w.left = 0xe8373662;
+		f->fmt.win.w.top = 0x0336d283;
+		f->fmt.win.w.width = 0x9235fe72;
+		f->fmt.win.w.height = 0xbbd886c8;
+		f->fmt.win.field = V4L2_FIELD_ANY;
+		f->fmt.win.chromakey = 0xdb1f991f;
+		f->fmt.win.clipcount = 2;
+		f->fmt.win.clips =
+			tail_alloc(sizeof(*f->fmt.win.clips) *
+			f->fmt.win.clipcount);
+		f->fmt.win.clips[0].c.left = 0x3313d36e;
+		f->fmt.win.clips[0].c.top = 0xcdffe510;
+		f->fmt.win.clips[0].c.width = 0x2064f3a8;
+		f->fmt.win.clips[0].c.height = 0xd06d314a;
+		f->fmt.win.clips[1].c.left = 0xd8c8a83f;
+		f->fmt.win.clips[1].c.top = 0x336e87ba;
+		f->fmt.win.clips[1].c.width = 0x9e3a6fb3;
+		f->fmt.win.clips[1].c.height = 0x05617b76;
+
+		f->fmt.win.bitmap = (void*) -2UL;
+#if HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+		f->fmt.win.global_alpha = 0xce;
+#endif
+		break;
+	case V4L2_BUF_TYPE_VBI_CAPTURE:
+	case V4L2_BUF_TYPE_VBI_OUTPUT:
+		f->fmt.vbi.sampling_rate = 0x3d9b5b79;
+		f->fmt.vbi.offset = 0x055b3a09;
+		f->fmt.vbi.samples_per_line = 0xf176d436;
+		f->fmt.vbi.sample_format = magic;
+		f->fmt.vbi.start[0] = 0x9858e2eb;
+		f->fmt.vbi.start[1] = 0x8a4dc8c1;
+		f->fmt.vbi.count[0] = 0x4bcf36a3;
+		f->fmt.vbi.count[1] = 0x97dff65f;
+		f->fmt.vbi.flags = V4L2_VBI_INTERLACED;
+		break;
+#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
+	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
+		unsigned int i;
+
+		f->fmt.sliced.service_set = V4L2_SLICED_VPS;
+		f->fmt.sliced.io_size = 0xd897925a;
+		for (i = 0;
+		     i < ARRAY_SIZE(f->fmt.sliced.service_lines[0]);
+		     i++) {
+			f->fmt.sliced.service_lines[0][i] = 0xc38e | i;
+			f->fmt.sliced.service_lines[1][i] = 0x3abb | i;
+		}
+		break;
+	}
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+	case V4L2_BUF_TYPE_SDR_OUTPUT:
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
+	case V4L2_BUF_TYPE_SDR_CAPTURE:
+		f->fmt.sdr.pixelformat = magic;
+#if HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+		f->fmt.sdr.buffersize = 0x25afabfb;
+#endif
+		break;
+#endif
+	}
+}
+
+static void
+dprint_ioctl_v4l2(struct v4l2_format *const f,
+		  const char* request, const unsigned int buf_type,
+		  const char* buf_type_string)
+{
+	switch (buf_type) {
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
+		printf("ioctl(-1, %s, {type=%s"
+		       ", fmt.pix={width=%u, height=%u, pixelformat="
+		       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
+		       ", field=V4L2_FIELD_NONE, bytesperline=%u, sizeimage=%u"
+		       ", colorspace=V4L2_COLORSPACE_JPEG}}) = -1 EBADF (%m)\n",
+		       request,
+		       buf_type_string,
+		       f->fmt.pix.width, f->fmt.pix.height,
+		       cc0(magic), cc1(magic), cc2(magic), cc3(magic),
+		       f->fmt.pix.bytesperline,
+		       f->fmt.pix.sizeimage);
+		break;
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE: {
+		unsigned int i;
+
+		printf("ioctl(-1, %s"
+		       ", {type=%s"
+		       ", fmt.pix_mp={width=%u, height=%u, pixelformat="
+		       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
+		       ", field=V4L2_FIELD_NONE, colorspace="
+		       "V4L2_COLORSPACE_JPEG, plane_fmt=[",
+		       request,
+		       buf_type_string,
+		       f->fmt.pix_mp.width, f->fmt.pix_mp.height,
+		       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
+		for (i = 0;
+		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
+		     ++i) {
+			if (i)
+				printf(", ");
+			printf("{sizeimage=%u, bytesperline=%u}",
+			f->fmt.pix_mp.plane_fmt[i].sizeimage,
+			f->fmt.pix_mp.plane_fmt[i].bytesperline);
+		}
+		printf("], num_planes=%u}}) = -1 EBADF (%m)\n",
+		f->fmt.pix_mp.num_planes);
+		break;
+	}
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
+#endif
+	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
+		printf("ioctl(-1, %s, {type=%s"
+		       ", fmt.win={left=%d, top=%d, width=%u, height=%u"
+		       ", field=V4L2_FIELD_ANY, chromakey=%#x, clips="
+		       "[{left=%d, top=%d, width=%u, height=%u}, "
+		       "{left=%d, top=%d, width=%u, height=%u}]"
+		       ", clipcount=%u, bitmap=%p"
+#if HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+		       ", global_alpha=%#x"
+#endif
+		       "}}) = -1 EBADF (%m)\n",
+		       request,
+		       buf_type_string,
+		       f->fmt.win.w.left, f->fmt.win.w.top,
+		       f->fmt.win.w.width, f->fmt.win.w.height,
+		       f->fmt.win.chromakey,
+		       f->fmt.win.clips[0].c.left,
+		       f->fmt.win.clips[0].c.top,
+		       f->fmt.win.clips[0].c.width,
+		       f->fmt.win.clips[0].c.height,
+		       f->fmt.win.clips[1].c.left,
+		       f->fmt.win.clips[1].c.top,
+		       f->fmt.win.clips[1].c.width,
+		       f->fmt.win.clips[1].c.height,
+		       f->fmt.win.clipcount, f->fmt.win.bitmap
+#if HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+		       , f->fmt.win.global_alpha
+#endif
+		       );
+		break;
+	case V4L2_BUF_TYPE_VBI_CAPTURE:
+	case V4L2_BUF_TYPE_VBI_OUTPUT:
+		printf("ioctl(-1, %s, {type=%s"
+		       ", fmt.vbi={sampling_rate=%u, offset=%u"
+		       ", samples_per_line=%u, sample_format="
+		       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
+		       ", start=[%u, %u], count=[%u, %u]"
+		       ", flags=V4L2_VBI_INTERLACED}})"
+		       " = -1 EBADF (%m)\n",
+		       request,
+		       buf_type_string,
+		       f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
+		       f->fmt.vbi.samples_per_line,
+		       cc0(magic), cc1(magic), cc2(magic), cc3(magic),
+		       f->fmt.vbi.start[0], f->fmt.vbi.start[1],
+		       f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
+		break;
+#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
+	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
+		unsigned int i, j;
+
+		printf("ioctl(-1, %s, {type=%s"
+		       ", fmt.sliced={service_set=V4L2_SLICED_VPS"
+		       ", io_size=%u, service_lines=[",
+		       request,
+		       buf_type_string,
+		       f->fmt.sliced.io_size);
+		for (i = 0;
+		     i < ARRAY_SIZE(f->fmt.sliced.service_lines);
+		     i++) {
+			if (i > 0)
+				printf(", ");
+			printf("[");
+			for (j = 0;
+			     j < ARRAY_SIZE(f->fmt.sliced.service_lines[0]);
+			     j++) {
+				if (j > 0)
+					printf(", ");
+				printf("%#x",
+				       f->fmt.sliced.service_lines[i][j]);
+			}
+			printf("]");
+		}
+		printf("]}}) = -1 EBADF (%m)\n");
+		break;
+	}
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+	case V4L2_BUF_TYPE_SDR_OUTPUT:
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
+	case V4L2_BUF_TYPE_SDR_CAPTURE:
+		printf("ioctl(-1, %s, {type=%s"
+		       ", fmt.sdr={pixelformat=v4l2_fourcc('\\x%x', '\\x%x',"
+		       " '\\x%x', '\\x%x')"
+#if HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+		       ", buffersize=%u"
+#endif
+		       "}}) = -1 EBADF (%m)\n",
+		       request,
+		       buf_type_string,
+		       cc0(magic), cc1(magic), cc2(magic), cc3(magic)
+#if HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+		       , f->fmt.sdr.buffersize
+#endif
+		       );
+		break;
+#endif
+	}
+}
+#define print_ioctl_v4l2(v4l2_format, request, buf_type) do { \
+	dprint_ioctl_v4l2((v4l2_format), (request), (buf_type), #buf_type); \
+} while (0)
+
 int
 main(void )
 {
@@ -89,77 +355,145 @@ main(void )
 	printf("ioctl(-1, VIDIOC_G_FMT, NULL) = -1 EBADF (%m)\n");
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_format, p_format);
-	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
+	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
 	printf("ioctl(-1, VIDIOC_G_FMT"
 	       ", {type=V4L2_BUF_TYPE_VIDEO_CAPTURE}) = -1 EBADF (%m)\n");
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, VIDIOC_G_FMT"
+	       ", {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE}) ="
+	       " -1 EBADF (%m)\n");
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
+	p_format->type = V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, VIDIOC_G_FMT"
+	       ", {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY}) ="
+	       " -1 EBADF (%m)\n");
+#endif
+	p_format->type = V4L2_BUF_TYPE_VIDEO_OVERLAY;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, VIDIOC_G_FMT"
+	       ", {type=V4L2_BUF_TYPE_VIDEO_OVERLAY}) ="
+	       " -1 EBADF (%m)\n");
 
+	p_format->type = V4L2_BUF_TYPE_VBI_CAPTURE;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, VIDIOC_G_FMT"
+	       ", {type=V4L2_BUF_TYPE_VBI_CAPTURE}) = -1 EBADF (%m)\n");
+#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+	p_format->type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, VIDIOC_G_FMT"
+	       ", {type=V4L2_BUF_TYPE_SLICED_VBI_CAPTURE}) = -1 EBADF (%m)\n");
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
+	p_format->type = V4L2_BUF_TYPE_SDR_CAPTURE;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, VIDIOC_G_FMT"
+	       ", {type=V4L2_BUF_TYPE_SDR_CAPTURE}) = -1 EBADF (%m)\n");
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+	p_format->type = V4L2_BUF_TYPE_SDR_OUTPUT;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, VIDIOC_G_FMT"
+	       ", {type=V4L2_BUF_TYPE_SDR_OUTPUT}) = -1 EBADF (%m)\n");
+#endif
 	/* VIDIOC_S_FMT */
 	ioctl(-1, VIDIOC_S_FMT, 0);
 	printf("ioctl(-1, VIDIOC_S_FMT, NULL) = -1 EBADF (%m)\n");
 
-	p_format->type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
-	p_format->fmt.pix.width = 0xdad1beaf;
-	p_format->fmt.pix.height = 0xdad2beaf;
-	p_format->fmt.pix.pixelformat = magic;
-	p_format->fmt.pix.field = V4L2_FIELD_NONE;
-	p_format->fmt.pix.bytesperline = 0xdad3beaf;
-	p_format->fmt.pix.sizeimage = 0xdad4beaf;
-	p_format->fmt.pix.colorspace = V4L2_COLORSPACE_JPEG;
-
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_S_FMT, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT"
-	       ", fmt.pix={width=%u, height=%u, pixelformat="
-	       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
-	       ", field=V4L2_FIELD_NONE, bytesperline=%u, sizeimage=%u"
-	       ", colorspace=V4L2_COLORSPACE_JPEG}}) = -1 EBADF (%m)\n",
-	       p_format->fmt.pix.width, p_format->fmt.pix.height,
-	       cc0(magic), cc1(magic), cc2(magic), cc3(magic),
-	       p_format->fmt.pix.bytesperline, p_format->fmt.pix.sizeimage);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_VIDEO_OUTPUT);
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+			 V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+			 V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
+#endif
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OVERLAY);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+			 V4L2_BUF_TYPE_VIDEO_OVERLAY);
 
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VBI_CAPTURE);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_VBI_CAPTURE);
+#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+			 V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_CAPTURE);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_SDR_CAPTURE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_OUTPUT);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_SDR_OUTPUT);
+#endif
 	/* VIDIOC_TRY_FMT */
 	ioctl(-1, VIDIOC_TRY_FMT, 0);
 	printf("ioctl(-1, VIDIOC_TRY_FMT, NULL) = -1 EBADF (%m)\n");
 
-#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
-	memset(p_format, -1, sizeof(*p_format));
-	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
-	p_format->fmt.pix_mp.width = 0xdad1beaf;
-	p_format->fmt.pix_mp.height = 0xdad2beaf;
-	p_format->fmt.pix_mp.pixelformat = magic;
-	p_format->fmt.pix_mp.field = V4L2_FIELD_NONE;
-	p_format->fmt.pix_mp.colorspace = V4L2_COLORSPACE_JPEG;
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(p_format->fmt.pix_mp.plane_fmt); ++i) {
-		p_format->fmt.pix_mp.plane_fmt[i].sizeimage = 0xbadc0de0 | i;
-		p_format->fmt.pix_mp.plane_fmt[i].bytesperline = 0xdadbeaf0 | i;
-	}
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_TRY_FMT"
-	       ", {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE"
-	       ", fmt.pix_mp={width=%u, height=%u, pixelformat="
-	       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
-	       ", field=V4L2_FIELD_NONE, colorspace=V4L2_COLORSPACE_JPEG"
-	       ", plane_fmt=[",
-	       p_format->fmt.pix_mp.width, p_format->fmt.pix_mp.height,
-	       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
-	for (i = 0; i < ARRAY_SIZE(p_format->fmt.pix_mp.plane_fmt); ++i) {
-		if (i)
-			printf(", ");
-		printf("{sizeimage=%u, bytesperline=%u}",
-		       p_format->fmt.pix_mp.plane_fmt[i].sizeimage,
-		       p_format->fmt.pix_mp.plane_fmt[i].bytesperline);
-	}
-	printf("], num_planes=%u}}) = -1 EBADF (%m)\n",
-	       p_format->fmt.pix_mp.num_planes);
-#else
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+			 V4L2_BUF_TYPE_VIDEO_OUTPUT);
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+			 V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+			 V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
+#endif
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OVERLAY);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+			 V4L2_BUF_TYPE_VIDEO_OVERLAY);
+
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_VBI_CAPTURE);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT", V4L2_BUF_TYPE_VBI_CAPTURE);
+#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+			 V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_CAPTURE);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT", V4L2_BUF_TYPE_SDR_CAPTURE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_OUTPUT);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT", V4L2_BUF_TYPE_SDR_OUTPUT);
+#endif
 	struct v4l2_format *const p_v4l2_format =
 		page + size - sizeof(*p_v4l2_format);
 	ioctl(-1, VIDIOC_TRY_FMT, p_v4l2_format);
 	printf("ioctl(-1, VIDIOC_TRY_FMT, {type=%#x /* V4L2_BUF_TYPE_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_format->type);
-#endif
 
 	/* VIDIOC_REQBUFS */
 	ioctl(-1, VIDIOC_REQBUFS, 0);
