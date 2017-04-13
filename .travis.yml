@@ -52,3 +52,4 @@ matrix:
       env:
         - TARGET=x86_64
         - CHECK=coverage
+        - KHEADERS=torvalds/linux

@@ -21,6 +21,13 @@ case "${TARGET-}" in
 		;;
 esac
 
+case "$KHEADERS" in
+	*/*)
+		CPPFLAGS='-isystem /opt/kernel/include'
+		export CPPFLAGS
+		;;
+esac
+
 case "${CHECK-}" in
 	coverage)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-code-coverage"
