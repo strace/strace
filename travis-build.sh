@@ -49,6 +49,9 @@ case "${CHECK-}" in
 		make -k $j all VERBOSE=${VERBOSE-}
 		make -k $j check VERBOSE=${VERBOSE-}
 		codecov --gcov-args=-abcp ||:
+		echo 'BEGIN OF TEST SUITE INFORMATION'
+		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.log
+		echo 'END OF TEST SUITE INFORMATION'
 		;;
 	*)
 		make -k $j distcheck VERBOSE=${VERBOSE-}
