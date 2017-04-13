@@ -19,6 +19,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     architectures.
   * Implemented decoding of statx syscall.
   * Implemented decoding of NS_* ioctl commands.
+  * Implemented decoding of the remaining V4L2_BUF_TYPE_* types.
   * Updated lists of ioctl commands from Linux 4.11.
 
 * Bug fixes

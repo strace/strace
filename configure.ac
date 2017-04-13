@@ -609,6 +609,8 @@ AC_CHECK_DECLS(m4_normalize([
 	V4L2_BUF_TYPE_SLICED_VBI_CAPTURE,
 	V4L2_BUF_TYPE_SLICED_VBI_OUTPUT,
 	V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY,
+	V4L2_BUF_TYPE_SDR_CAPTURE,
+	V4L2_BUF_TYPE_SDR_OUTPUT,
 	V4L2_TUNER_RADIO,
 	V4L2_TUNER_ANALOG_TV,
 	V4L2_TUNER_DIGITAL_TV,
@@ -643,6 +645,14 @@ AC_CHECK_DECLS(m4_normalize([
 	V4L2_CTRL_TYPE_STRING,
 	V4L2_CTRL_TYPE_BITMASK,
 	V4L2_CTRL_TYPE_INTEGER_MENU
+]),,, [#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>])
+
+AC_CHECK_MEMBERS(m4_normalize([
+	struct v4l2_window.global_alpha,
+	struct v4l2_sdr_format.buffersize
 ]),,, [#include <sys/time.h>
 #include <linux/ioctl.h>
 #include <linux/types.h>
