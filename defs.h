@@ -301,6 +301,7 @@ extern const struct xlat netlink_protocols[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
 extern const struct xlat resource_flags[];
+extern const struct xlat setns_types[];
 extern const struct xlat sg_io_info[];
 extern const struct xlat socketlayers[];
 extern const struct xlat whence_codes[];
@@ -642,6 +643,7 @@ name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)
 DECL_IOCTL(dm);
 DECL_IOCTL(file);
 DECL_IOCTL(fs_x);
+DECL_IOCTL(nsfs);
 DECL_IOCTL(ptp);
 DECL_IOCTL(scsi);
 DECL_IOCTL(term);

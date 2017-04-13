@@ -171,6 +171,8 @@ strace_SOURCES =	\
 	native_defs.h	\
 	net.c		\
 	netlink.c       \
+	nsfs.c          \
+	nsfs.h          \
 	nsig.h		\
 	numa.c		\
 	oldstat.c	\

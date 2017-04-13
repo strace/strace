@@ -188,6 +188,7 @@ check_PROGRAMS = \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_mtd \
+	ioctl_nsfs \
 	ioctl_rtc \
 	ioctl_rtc-v \
 	ioctl_scsi \
@@ -507,6 +508,7 @@ DECODER_TESTS = \
 	ioctl_dm-v.test \
 	ioctl_dm.test \
 	ioctl_loop-nv.test \
+	ioctl_nsfs.test \
 	ioctl_sock_gifconf.test \
 	ipc_msgbuf.test \
 	llseek.test \
