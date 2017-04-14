@@ -103,6 +103,12 @@ child(void *arg)
 	return 0;
 }
 
+#ifdef IA64
+extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
+# define clone(fn, child_stack, flags, arg)	\
+		__clone2(fn, child_stack - 4096, 4096, flags, arg)
+#endif
+
 static void
 test_user_namespace(void)
 {
