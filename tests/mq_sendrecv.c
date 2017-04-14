@@ -49,10 +49,6 @@
 
 # include "sigevent.h"
 
-# ifndef MQ_NAME
-#  define MQ_NAME "mq_sendrecv.sample"
-# endif
-
 # ifndef DUMPIO_READ
 #  define DUMPIO_READ 0
 # endif
@@ -61,6 +57,7 @@
 #  define DUMPIO_WRITE 0
 # endif
 
+static char *mq_name;
 
 enum {
 	NUM_ATTRS = 8,
@@ -124,8 +121,8 @@ cleanup(void)
 {
 	long rc;
 
-	rc = syscall(__NR_mq_unlink, MQ_NAME);
-	printf("mq_unlink(\"" MQ_NAME "\") = %s\n", sprintrc(rc));
+	rc = syscall(__NR_mq_unlink, mq_name);
+	printf("mq_unlink(\"%s\") = %s\n", mq_name, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 }
@@ -430,12 +427,15 @@ main(void)
 
 	/* Sending and receiving test */
 
+	if (asprintf(&mq_name, "strace-mq_sendrecv-%u.sample", getpid()) < 0)
+		perror_msg_and_fail("asprintf");
+
 # if DUMPIO_READ || DUMPIO_WRITE
 	close(0);
 # endif
 	bogus_attrs[1] = 2;
 	bogus_attrs[2] = MSG_SIZE;
-	fd = rc = syscall(__NR_mq_open, MQ_NAME,
+	fd = rc = syscall(__NR_mq_open, mq_name,
 		          O_CREAT|O_RDWR|O_NONBLOCK, S_IRWXU, bogus_attrs);
 	errstr = sprintrc(rc);
 	if (rc < 0)
@@ -448,11 +448,11 @@ main(void)
 # endif
 	fill_memory_ex(bogus_attrs, sizeof(*bogus_attrs) * NUM_ATTRS,
 		       0xbb, 0x70);
-	printf("mq_open(\"" MQ_NAME "\", O_RDWR|O_CREAT|O_NONBLOCK, "
-	       "0700, {mq_flags=%#llx, mq_maxmsg=2, mq_msgsize=%u, "
+	printf("mq_open(\"%s\", O_RDWR|O_CREAT|O_NONBLOCK, 0700"
+	       ", {mq_flags=%#llx, mq_maxmsg=2, mq_msgsize=%u, "
 	       "mq_curmsgs=%lld}) = %s\n",
-	       (unsigned long long) (kernel_ulong_t) bogus_attrs[0], MSG_SIZE,
-	       (long long) bogus_attrs[3], errstr);
+	       mq_name, (unsigned long long) (kernel_ulong_t) bogus_attrs[0],
+	       MSG_SIZE, (long long) bogus_attrs[3], errstr);
 
 	rc = syscall(__NR_mq_getsetattr, fd, NULL, bogus_attrs);
 	if (rc < 0)
