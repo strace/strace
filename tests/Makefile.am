@@ -543,7 +543,6 @@ DECODER_TESTS = \
 	sched.test \
 	scm_rights-fd.test \
 	seccomp-strict.test \
-	shmxt.test \
 	sigaction.test \
 	sigaltstack.test \
 	statfs.test \

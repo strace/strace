@@ -269,6 +269,7 @@ setreuid32	-a17
 setrlimit	-a27
 setuid	-a10
 setuid32	-a12
+shmxt	-a11 -e trace=/\\(osf_\\)\\?shmat,shmdt
 shutdown	-a24
 siginfo	-e trace=none
 signal_receive	-a16 -e trace=kill
