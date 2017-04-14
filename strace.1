@@ -382,6 +382,14 @@ trace those four system calls.  Be careful when making inferences
 about the user/kernel boundary if only a subset of system calls
 are being monitored.  The default is
 .BR trace = all .
+.TP
+\fB\-e\ trace\fR=/\,\fIregex\fR
+Trace only those system calls that match the
+.IR regex .
+You can use
+.B POSIX
+Extended Regular Expression syntax (see
+.BR regex (7)).
 .PP
 .BR "\-e\ trace" = %file
 .TP

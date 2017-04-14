@@ -39,6 +39,16 @@ check_exit_status_and_stderr()
 			"strace $* failed to print expected diagnostics"
 }
 
+check_exit_status_and_stderr_using_grep()
+{
+	$STRACE "$@" 2> "$LOG" &&
+		dump_log_and_fail_with \
+			"strace $* failed to handle the error properly"
+	match_grep "$LOG" "$EXP" ||
+		dump_log_and_fail_with \
+			"strace $* failed to print expected diagnostics"
+}
+
 strace_exp="${STRACE##* }"
 
 check_e()
@@ -48,6 +58,15 @@ check_e()
 $strace_exp: $pattern
 __EOF__
 	check_exit_status_and_stderr "$@"
+}
+
+check_e_using_grep()
+{
+	local pattern="$1"; shift
+	cat > "$EXP" << __EOF__
+$strace_exp: $pattern
+__EOF__
+	check_exit_status_and_stderr_using_grep "$@"
 }
 
 check_h()
@@ -72,6 +91,7 @@ check_e "invalid system call '-2'" -e -2
 check_e "invalid system call '-3'" -etrace=-3
 check_e "invalid system call '-4'" -e trace=-4
 check_e "invalid system call '-5'" -e trace=1,-5
+check_e "invalid system call '/non_syscall'" -e trace=/non_syscall
 check_e "invalid system call '2147483647'" -e 2147483647
 check_e "invalid system call '2147483648'" -e 2147483648
 check_e "invalid system call '4294967295'" -e 4294967295
@@ -87,6 +107,12 @@ check_e "invalid descriptor ','" -eread=,
 check_e "invalid descriptor '!'" -ewrite='!'
 check_e "invalid descriptor '!'" -eread='0,!'
 check_e "invalid descriptor '!,'" -ewrite='!,'
+
+check_e_using_grep 'regcomp: \+id: [[:alpha:]].+' -e trace='/+id'
+check_e_using_grep 'regcomp: \*id: [[:alpha:]].+' -e trace='/*id'
+check_e_using_grep 'regcomp: \{id: [[:alpha:]].+' -e trace='/{id'
+check_e_using_grep 'regcomp: \(id: [[:alpha:]].+' -e trace='/(id'
+check_e_using_grep 'regcomp: \[id: [[:alpha:]].+' -e trace='/[id'
 
 check_h 'must have PROG [ARGS] or -p PID'
 check_h 'PROG [ARGS] must be specified with -D' -D -p $$

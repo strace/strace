@@ -13,6 +13,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added -e trace=%clock option for tracing clock_* syscalls.
   * Added -e trace=%statfs option for tracing statfs, statfs64 and statvfs
     syscalls.
+  * Added -e trace=/regex option for filtering syscalls using regular
+    expressions.
   * Implemented decoding of signal mask in rt_sigreturn syscall on alpha, arc,
     arm, avr32, bfin, cris, hppa, m68k, metag, microblaze, mips, nios2, or1k,
     powerpc, powerpc64, riscv, sh, sh64, sparc, sparc64, tile, x86, and xtensa

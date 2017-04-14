@@ -539,6 +539,7 @@ DECODER_TESTS = \
 	qual_fault-exit_group.test \
 	read-write.test \
 	readv.test \
+	regex.test \
 	sched.test \
 	scm_rights-fd.test \
 	seccomp-strict.test \
