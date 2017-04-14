@@ -41,7 +41,6 @@
 #define TS 0
 #define TM 0
 #define TSC 0
-#define TCL 0
 #define TSF 0
 #define NF 0
 #define MA 0

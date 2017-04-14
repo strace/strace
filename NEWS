@@ -10,7 +10,6 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Optimized syscall filtering.
   * Enhanced decoding of sched_setattr syscall.
   * Added -e trace=%sched option for tracing sched_* syscalls.
-  * Added -e trace=%clock option for tracing clock_* syscalls.
   * Added -e trace=%statfs option for tracing statfs, statfs64 and statvfs
     syscalls.
   * Added -e trace=/regex option for filtering syscalls using regular

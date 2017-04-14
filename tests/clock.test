@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Check -e trace=%clock option.
+# Check -e trace=/clock option.
 #
 # Copyright (c) 2017 The strace developers.
 # All rights reserved.
@@ -31,7 +31,7 @@
 
 while read w s; do {
 	try_run_prog "../$s" || continue
-	run_strace -a$w -e%clock ../$s > "$EXP"
+	run_strace -a$w -e/clock ../$s > "$EXP"
 	match_diff "$LOG" "$EXP"
 } < /dev/null; done << EOF
 37 clock_adjtime
@@ -46,6 +46,6 @@ grep -E -v '^(#|clock_|times$|fcntl|futimesat$|utime)' \
 
 while read s; do {
 	try_run_prog "../$s" || continue
-	run_strace -qq -esignal=none -e%clock ../$s > /dev/null
+	run_strace -qq -esignal=none -e/clock ../$s > /dev/null
 	match_diff "$LOG" /dev/null
 } < /dev/null; done < negative.list
