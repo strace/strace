@@ -31,7 +31,7 @@
 
 while read w s; do {
 	try_run_prog "../$s" || continue
-	run_strace -a$w -e%sched ../$s > "$EXP"
+	run_strace -a$w -e/sched ../$s > "$EXP"
 	match_diff "$LOG" "$EXP"
 } < /dev/null; done << EOF
 28 sched_xetaffinity
@@ -48,6 +48,6 @@ grep -E -v '^(#|sched_|times$)' \
 
 while read s; do {
 	try_run_prog "../$s" || continue
-	run_strace -qq -esignal=none -e%sched ../$s > /dev/null
+	run_strace -qq -esignal=none -e/sched ../$s > /dev/null
 	match_diff "$LOG" /dev/null
 } < /dev/null; done < negative.list

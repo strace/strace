@@ -21,7 +21,6 @@ typedef struct sysent {
 #define STACKTRACE_CAPTURE_ON_ENTER 01000 /* Capture stacktrace on "entering" stage */
 #define TRACE_INDIRECT_SUBCALL	02000	/* Syscall is an indirect socket/ipc subcall. */
 #define COMPAT_SYSCALL_TYPES	04000	/* A compat syscall that uses compat types. */
-#define TRACE_SCHED		010000  /* Trace scheduler-related syscalls. */
 #define TRACE_STATFS		040000	/* Trace statfs, statfs64, and statvfs syscalls. */
 
 #endif /* !STRACE_SYSENT_H */
