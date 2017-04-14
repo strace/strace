@@ -31,44 +31,18 @@
 
 while read w s; do {
 	try_run_prog "../$s" || continue
-	run_strace -a$w -e/^clock ../$s > "$EXP"
+	run_strace -a$w -etrace='/^(.*_)?statv?fs' ../$s > "$EXP"
 	match_diff "$LOG" "$EXP"
 } < /dev/null; done << EOF
-37 clock_adjtime
-40 clock_nanosleep
-36 clock_xettime
+17 statfs
+23 statfs64
 EOF
 
-# Surprised that fcntl*, futimesat, utime, utimensat, and utimes tests
-# linked with musl use clock_gettime?  Me too!
-grep -E -v '^(#|clock_|times$|fcntl|futimesat$|utime)' \
+grep -E -v '^(#|statfs)' \
 	< "$srcdir/pure_executables.list" > negative.list
 
 while read s; do {
 	try_run_prog "../$s" || continue
-	run_strace -qq -esignal=none -e/^clock ../$s > /dev/null
-	match_diff "$LOG" /dev/null
-} < /dev/null; done < negative.list
-
-while read w s; do {
-	try_run_prog "../$s" || continue
-	run_strace -a$w -e/^sched_ ../$s > "$EXP"
-	match_diff "$LOG" "$EXP"
-} < /dev/null; done << EOF
-28 sched_xetaffinity
-23 sched_xetparam
-31 sched_rr_get_interval
-33 sched_get_priority_mxx
-29 sched_xetattr
-22 sched_xetscheduler
-14 sched_yield
-EOF
-
-grep -E -v '^(#|sched_|times$)' \
-	< "$srcdir/pure_executables.list" > negative.list
-
-while read s; do {
-	try_run_prog "../$s" || continue
-	run_strace -qq -esignal=none -e/^sched_ ../$s > /dev/null
+	run_strace -qq -esignal=none -etrace='/^(.*_)?statv?fs' ../$s > /dev/null
 	match_diff "$LOG" /dev/null
 } < /dev/null; done < negative.list
