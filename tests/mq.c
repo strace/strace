@@ -37,17 +37,19 @@
 # include <unistd.h>
 # include <sys/stat.h>
 
-# define NAME "strace-mq.test"
-
 int
 main (void)
 {
 	struct mq_attr attr;
 	(void) close(0);
 
-	if (mq_open("/" NAME, O_CREAT, 0700, NULL))
+	char *name;
+	if (asprintf(&name, "/strace-mq-%u.sample", getpid()) < 0)
+		perror_msg_and_fail("asprintf");
+
+	if (mq_open(name, O_CREAT, 0700, NULL))
 		perror_msg_and_skip("mq_open");
-	printf("mq_open(\"%s\", O_RDONLY|O_CREAT, 0700, NULL) = 0\n", NAME);
+	printf("mq_open(\"%s\", O_RDONLY|O_CREAT, 0700, NULL) = 0\n", name + 1);
 
 	if (mq_getattr(0, &attr))
 		perror_msg_and_skip("mq_getattr");
@@ -63,9 +65,9 @@ main (void)
 	       (long long) attr.mq_maxmsg,
 	       (long long) attr.mq_msgsize);
 
-	if (mq_unlink("/" NAME))
+	if (mq_unlink(name))
 		perror_msg_and_skip("mq_unlink");
-	printf("mq_unlink(\"%s\") = 0\n", NAME);
+	printf("mq_unlink(\"%s\") = 0\n", name + 1);
 
 	puts("+++ exited with 0 +++");
 	return 0;
