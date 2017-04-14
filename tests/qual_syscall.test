@@ -36,7 +36,11 @@ run_strace -e 42 ../umovestr
 LC_ALL=C grep '^[[:alnum:]_]*(' "$LOG" > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
-for a in execve \!chdir all \!none \
+run_strace -e/ -e42 ../umovestr
+LC_ALL=C grep '^[[:alnum:]_]*(' "$LOG" > /dev/null &&
+	dump_log_and_fail_with "$STRACE $args unexpected output"
+
+for a in execve \!chdir /. all \!none \
 	 file process \!desc \!ipc \!memory \!network \!signal; do
 	check_output_mismatch \
 		"$pattern_abbrev_verbose" -e abbrev="$a" -e execve
