@@ -224,6 +224,10 @@ print_stat(const STRUCT_STAT *st)
 	PRINT_FIELD_U(stx_ino);
 	PRINT_FIELD_U(stx_size);
 	PRINT_FIELD_U(stx_blocks);
+
+	printf(", stx_attributes_mask=");
+	printflags(statx_attrs, st->stx_attributes_mask, "STATX_ATTR_???");
+
 	PRINT_FIELD_TIME(stx_atime);
 	PRINT_FIELD_TIME(stx_btime);
 	PRINT_FIELD_TIME(stx_ctime);
@@ -338,6 +342,7 @@ main(void)
 		LOG_STAT_OFFSETOF_SIZEOF(*st, stx_ino);
 		LOG_STAT_OFFSETOF_SIZEOF(*st, stx_size);
 		LOG_STAT_OFFSETOF_SIZEOF(*st, stx_blocks);
+		LOG_STAT_OFFSETOF_SIZEOF(*st, stx_attributes_mask);
 		LOG_STAT_OFFSETOF_SIZEOF(*st, stx_atime);
 		LOG_STAT_OFFSETOF_SIZEOF(*st, stx_btime);
 		LOG_STAT_OFFSETOF_SIZEOF(*st, stx_ctime);

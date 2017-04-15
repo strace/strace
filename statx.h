@@ -51,7 +51,8 @@ typedef struct {
 	uint64_t stx_ino; /* Inode number */
 	uint64_t stx_size; /* File size */
 	uint64_t stx_blocks; /* Number of 512-byte blocks allocated */
-	uint64_t reserved1[1];
+	uint64_t stx_attributes_mask; /* Mask to show what's supported in
+	                                 stx_attributes */
 
 	struct_statx_timestamp stx_atime; /* Last access time */
 	struct_statx_timestamp stx_btime; /* File creation time */

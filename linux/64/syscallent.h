@@ -274,3 +274,4 @@
 [288] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [289] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [290] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
+[291] = { 5,	TD|TF,		SEN(statx),			"statx"			},

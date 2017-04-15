@@ -421,6 +421,7 @@
 [394] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [395] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [396] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
+[397] = { 5,	TD|TF,		SEN(statx),			"statx"			},
 
 #ifdef __ARM_EABI__
 # define ARM_FIRST_SHUFFLED_SYSCALL 400

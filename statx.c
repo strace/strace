@@ -94,6 +94,11 @@ SYS_FUNC(statx)
 
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(stx_blocks);
+
+			tprints(", stx_attributes_mask=");
+			printflags(statx_attrs, stx.stx_attributes_mask,
+				   "STATX_ATTR_???");
+
 			PRINT_FIELD_TIME(stx_atime);
 			PRINT_FIELD_TIME(stx_btime);
 			PRINT_FIELD_TIME(stx_ctime);

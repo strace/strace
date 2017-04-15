@@ -330,6 +330,7 @@
 [6327] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [6328] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [6329] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
+[6330] = { 5,	TD|TF,		SEN(statx),			"statx"			},
 
 # define SYS_socket_subcall      6400
 # include "subcall.h"
