@@ -37,33 +37,90 @@
 # include <sys/time.h>
 # include <unistd.h>
 
+static void
+print_tv(const struct timeval *tv)
+{
+	printf("{tv_sec=%ju, tv_usec=%ju}",
+	       (uintmax_t) tv->tv_sec, (uintmax_t) tv->tv_usec);
+}
+
+static const char *errstr;
+
+static long
+k_utimes(const kernel_ulong_t pathname, const kernel_ulong_t times)
+{
+	long rc = syscall(__NR_utimes, pathname, times);
+	errstr = sprintrc(rc);
+	return rc;
+}
+
 int
 main(void)
 {
-	static const char sample[] = "utimes_sample";
+	static const char proto_fname[] = "utimes_sample";
+	static const char qname[] = "\"utimes_sample\"";
 
-	long rc = syscall(__NR_utimes, sample, 0);
-	printf("utimes(\"%s\", NULL) = %s\n", sample, sprintrc(rc));
+	char *const fname = tail_memdup(proto_fname, sizeof(proto_fname));
+	const kernel_ulong_t kfname = (uintptr_t) fname;
+	struct timeval *const tv = tail_alloc(sizeof(*tv) * 2);
 
-	struct timeval *const ts = tail_alloc(sizeof(*ts) * 2);
+	/* pathname */
+	k_utimes(0, 0);
+	printf("utimes(NULL, NULL) = %s\n", errstr);
 
-	ts[0].tv_sec = 1492358607;
-	ts[0].tv_usec = 345678912;
-	ts[1].tv_sec = 1492356078;
-	ts[1].tv_usec = 456789023;
+	k_utimes(kfname + sizeof(proto_fname) - 1, 0);
+	printf("utimes(\"\", NULL) = %s\n", errstr);
 
-	rc = syscall(__NR_utimes, 0, ts + 2);
-	printf("utimes(NULL, %p) = %s\n", ts + 2, sprintrc(rc));
+	k_utimes(kfname, 0);
+	printf("utimes(%s, NULL) = %s\n", qname, errstr);
 
-	rc = syscall(__NR_utimes, 0, ts + 1);
-	printf("utimes(NULL, %p) = %s\n", ts + 1, sprintrc(rc));
+	fname[sizeof(proto_fname) - 1] = '+';
+	k_utimes(kfname, 0);
+	fname[sizeof(proto_fname) - 1] = '\0';
+	printf("utimes(%p, NULL) = %s\n", fname, errstr);
 
-	rc = syscall(__NR_utimes, "", ts);
-	printf("utimes(\"\", [{tv_sec=%jd, tv_usec=%jd}, "
-	       "{tv_sec=%jd, tv_usec=%jd}]) = %s\n",
-	       (intmax_t) ts[0].tv_sec, (intmax_t) ts[0].tv_usec,
-	       (intmax_t) ts[1].tv_sec, (intmax_t) ts[1].tv_usec,
-	       sprintrc(rc));
+	if (F8ILL_KULONG_SUPPORTED) {
+		k_utimes(f8ill_ptr_to_kulong(fname), 0);
+		printf("utimes(%#jx, NULL) = %s\n",
+		       (uintmax_t) f8ill_ptr_to_kulong(fname), errstr);
+	}
+
+	/* times */
+	k_utimes(kfname, (uintptr_t) (tv + 1));
+	printf("utimes(%s, %p) = %s\n",
+	       qname, tv + 1, errstr);
+
+	k_utimes(kfname, (uintptr_t) (tv + 2));
+	printf("utimes(%s, %p) = %s\n",
+	       qname, tv + 2, errstr);
+
+	tv[0].tv_sec = 1492358607;
+	tv[0].tv_usec = 345678912;
+	tv[1].tv_sec = 1492356078;
+	tv[1].tv_usec = 456789023;
+
+	k_utimes(kfname, (uintptr_t) tv);
+	printf("utimes(%s, [", qname);
+	print_tv(&tv[0]);
+	printf(", ");
+	print_tv(&tv[1]);
+	printf("]) = %s\n", errstr);
+
+	tv[0].tv_usec = 345678;
+	tv[1].tv_usec = 456789;
+
+	k_utimes(kfname, (uintptr_t) tv);
+	printf("utimes(%s, [", qname);
+	print_tv(&tv[0]);
+	printf(", ");
+	print_tv(&tv[1]);
+	printf("]) = %s\n", errstr);
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		k_utimes(kfname, f8ill_ptr_to_kulong(tv));
+		printf("utimes(%s, %#jx) = %s\n",
+		       qname, (uintmax_t) f8ill_ptr_to_kulong(tv), errstr);
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;
