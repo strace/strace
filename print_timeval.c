@@ -126,7 +126,7 @@ print_timeval32(struct tcb *const tcp, const kernel_ulong_t addr)
 }
 
 void
-print_timeval32_pair(struct tcb *const tcp, const kernel_ulong_t addr)
+print_timeval32_utimes(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timeval32_t t[2];
 

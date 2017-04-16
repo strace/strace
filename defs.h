@@ -716,7 +716,7 @@ extern void print_timeval32_t(const timeval32_t *);
 extern void printrusage32(struct tcb *, kernel_ulong_t);
 extern const char *sprint_timeval32(struct tcb *tcp, kernel_ulong_t);
 extern void print_timeval32(struct tcb *tcp, kernel_ulong_t);
-extern void print_timeval32_pair(struct tcb *tcp, kernel_ulong_t);
+extern void print_timeval32_utimes(struct tcb *tcp, kernel_ulong_t);
 extern void print_itimerval32(struct tcb *tcp, kernel_ulong_t);
 #endif
 

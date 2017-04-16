@@ -69,7 +69,7 @@ SYS_FUNC(osf_utimes)
 {
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	print_timeval32_pair(tcp, tcp->u_arg[1]);
+	print_timeval32_utimes(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
