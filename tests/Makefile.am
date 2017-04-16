@@ -556,7 +556,6 @@ DECODER_TESTS = \
 	uname.test \
 	unix-pair-send-recv.test \
 	unix-pair-sendto-recvfrom.test \
-	utimensat.test \
 	# end of DECODER_TESTS
 
 MISC_TESTS = \

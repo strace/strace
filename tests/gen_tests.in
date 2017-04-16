@@ -308,7 +308,8 @@ unlinkat	-a35
 unshare	-a11
 userfaultfd	-a38
 ustat	-a33
-utime	-a 16 -e trace=utime
+utime	-a16
+utimensat	-a33
 utimes	-a21
 vfork-f	-a26 -qq -f -e signal=none -e trace=chdir
 vhangup	-a10
