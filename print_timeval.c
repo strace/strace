@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,23 +57,19 @@ MPERS_PRINTER_DECL(void, print_timeval,
 	print_timeval_t(&t);
 }
 
-static bool
-print_timeval_item(struct tcb *tcp, void *elem_buf, size_t size, void *data)
-{
-	timeval_t *t = elem_buf;
-
-	print_timeval_t(t);
-
-	return true;
-}
-
-MPERS_PRINTER_DECL(void, print_timeval_pair,
+MPERS_PRINTER_DECL(void, print_timeval_utimes,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	timeval_t t;
+	timeval_t t[2];
 
-	print_array(tcp, addr, 2, &t, sizeof(t), umoven_or_printaddr,
-		    print_timeval_item, NULL);
+	if (umove_or_printaddr(tcp, addr, &t))
+		return;
+
+	tprints("[");
+	print_timeval_t(&t[0]);
+	tprints(", ");
+	print_timeval_t(&t[1]);
+	tprints("]");
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timeval,

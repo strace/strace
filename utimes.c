@@ -37,7 +37,7 @@ SYS_FUNC(utimes)
 {
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	print_timeval_pair(tcp, tcp->u_arg[1]);
+	print_timeval_utimes(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -47,7 +47,7 @@ SYS_FUNC(futimesat)
 	print_dirfd(tcp, tcp->u_arg[0]);
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
-	print_timeval_pair(tcp, tcp->u_arg[2]);
+	print_timeval_utimes(tcp, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
