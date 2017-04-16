@@ -264,6 +264,7 @@ lookup_class(const char *s)
 		{ "%network",	TRACE_NETWORK	},
 		{ "%statfs",	TRACE_STATFS	},
 		{ "%fstatfs",	TRACE_FSTATFS	},
+		{ "%%statfs",	TRACE_STATFS_LIKE	},
 	};
 
 	unsigned int i;

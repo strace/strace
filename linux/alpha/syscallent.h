@@ -185,8 +185,8 @@
 [157] = { 5,	0,		SEN(printargs),			"osf_sigwaitprim"	}, /* not implemented */
 [158] = { 5,	0,		SEN(printargs),			"osf_nfssvc"		}, /* not implemented */
 [159] = { 4,	0,		SEN(printargs),			"osf_getdirentries"	},
-[160] = { 3,	TF|TSF,		SEN(osf_statfs),		"osf_statfs"		},
-[161] = { 3,	TD|TFSF,	SEN(osf_fstatfs),		"osf_fstatfs"		},
+[160] = { 3,	TF|TSF|TSFA,	SEN(osf_statfs),		"osf_statfs"		},
+[161] = { 3,	TD|TFSF|TSFA,	SEN(osf_fstatfs),		"osf_fstatfs"		},
 [162] = { },
 [163] = { 5,	0,		SEN(printargs),			"osf_asynch_daemon"	}, /* not implemented */
 [164] = { 5,	0,		SEN(printargs),			"osf_getfh"		}, /* not implemented */
@@ -230,8 +230,8 @@
 [224] = { 2,	TF,		SEN(printargs),			"osf_stat"		},
 [225] = { 2,	TF,		SEN(printargs),			"osf_lstat"		},
 [226] = { 2,	TD,		SEN(printargs),			"osf_fstat"		},
-[227] = { 3,	TF|TSF,		SEN(osf_statfs),		"osf_statfs64"		},
-[228] = { 3,	TD|TFSF,	SEN(osf_fstatfs),		"osf_fstatfs64"		},
+[227] = { 3,	TF|TSF|TSFA,	SEN(osf_statfs),		"osf_statfs64"		},
+[228] = { 3,	TD|TFSF|TSFA,	SEN(osf_fstatfs),		"osf_fstatfs64"		},
 [229 ... 232] = { },
 [233] = { 1,	0,		SEN(getpgid),			"getpgid"		},
 [234] = { 1,	0,		SEN(getsid),			"getsid"		},
@@ -290,9 +290,9 @@
 [324] = { 1,	NF,		SEN(personality),		"personality"		},
 [325] = { 1,	NF,		SEN(setfsuid),			"setfsuid"		},
 [326] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},
-[327] = { 2,	0,		SEN(ustat),			"ustat"			},
-[328] = { 2,	TF|TSF,		SEN(statfs),			"statfs"		},
-[329] = { 2,	TD|TFSF,	SEN(fstatfs),			"fstatfs"		},
+[327] = { 2,	TSFA,		SEN(ustat),			"ustat"			},
+[328] = { 2,	TF|TSF|TSFA,	SEN(statfs),			"statfs"		},
+[329] = { 2,	TD|TFSF|TSFA,	SEN(fstatfs),			"fstatfs"		},
 [330] = { 2,	0,		SEN(sched_setparam),		"sched_setparam"	},
 [331] = { 2,	0,		SEN(sched_getparam),		"sched_getparam"	},
 [332] = { 3,	0,		SEN(sched_setscheduler),	"sched_setscheduler"	},

@@ -446,6 +446,12 @@ The same effect can be achieved with
 .BR "\-e\ trace" = /fstatv?fs
 regular expression.
 .TP
+.BR "\-e\ trace" = %%statfs
+Trace syscalls related to file system statistics (statfs-like, fstatfs-like,
+and ustat).  The same effect can be achieved with
+.BR "\-e\ trace" = /statv?fs|ustat
+regular expression.
+.TP
 \fB\-e\ abbrev\fR=\,\fIset\fR
 Abbreviate the output from printing each member of large structures.
 The default is

@@ -13,6 +13,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     syscalls.
   * Added -e trace=%fstatfs option for tracing fstatfs, fstatfs64 and fstatvfs
     syscalls.
+  * Added -e trace=%%statfs option for tracing syscalls used for querying file
+    system statistics information (statfs-like, fstatfs-like and ustat).
   * Added -e trace=/regex option for filtering syscalls using regular
     expressions.
   * Implemented decoding of signal mask in rt_sigreturn syscall on alpha, arc,

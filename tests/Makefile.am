@@ -338,6 +338,7 @@ EXTRA_DIST = \
 	sun_path.expected \
 	trace_fstatfs.in \
 	trace_statfs.in \
+	trace_statfs_like.in \
 	uio.expected \
 	umode_t.c \
 	umovestr.expected \

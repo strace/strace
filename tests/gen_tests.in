@@ -306,6 +306,7 @@ times	-esignal=none
 times-fail	-a12 -e trace=times
 trace_fstatfs	test_trace_expr '' -e%fstatfs
 trace_statfs	test_trace_expr '' -e%statfs
+trace_statfs_like	test_trace_expr '' -e%%statfs
 truncate
 truncate64
 ugetrlimit	-a28
