@@ -59,16 +59,11 @@ main(void)
 	#define PREFIX "utimensat(AT_FDCWD, \"utimensat\\nfilename\", "
 	printf(PREFIX "NULL, 0) = -1 ENOENT (%m)\n");
 
-	struct timeval tv;
 	struct timespec ts[2];
-
-	if (gettimeofday(&tv, NULL))
-		perror_msg_and_skip("gettimeofday");
-
-	ts[0].tv_sec = tv.tv_sec;
-	ts[0].tv_nsec = tv.tv_usec;
-	ts[1].tv_sec = tv.tv_sec - 1;
-	ts[1].tv_nsec = tv.tv_usec + 1;
+	ts[0].tv_sec = 1492358706;
+	ts[0].tv_nsec = 123456789;
+	ts[1].tv_sec = 1492357068;
+	ts[1].tv_nsec = 234567890;
 
 	printf(PREFIX "[");
 	print_ts(&ts[0]);

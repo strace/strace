@@ -39,9 +39,8 @@ while read w s; do {
 36 clock_xettime
 EOF
 
-# Surprised that fcntl*, futimesat, utime, utimensat, and utimes tests
-# linked with musl use clock_gettime?  Me too!
-grep -E -v '^(#|clock_|times$|fcntl|futimesat$|utime)' \
+# Surprised that fcntl* tests linked with musl use clock_gettime?  Me too!
+grep -E -v '^(#|clock_|times$|fcntl)' \
 	< "$srcdir/pure_executables.list" > negative.list
 
 while read s; do {

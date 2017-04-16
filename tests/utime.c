@@ -49,7 +49,7 @@ main(void)
 {
 	static const char *const dummy_str = "dummy filename";
 
-	const time_t t = time(NULL);
+	const time_t t = 1492350678;
 	const struct utimbuf u = { .actime = t, .modtime = t };
 	const struct utimbuf *const tail_u = tail_memdup(&u, sizeof(u));
 	const char *const dummy_filename =

@@ -41,10 +41,6 @@
 int
 main(void)
 {
-	struct timeval tv;
-	if (gettimeofday(&tv, NULL))
-		perror_msg_and_fail("gettimeofday");
-
 	static const char sample[] = "futimesat_sample";
 	unsigned long dirfd = (unsigned long) 0xdeadbeef00000000ULL | -100U;
 
@@ -55,10 +51,10 @@ main(void)
 	struct timeval *const ts = tail_alloc(sizeof(*ts) * 2);
 	dirfd = (unsigned long) 0xdeadbeefffffffffULL;
 
-	ts[0].tv_sec = tv.tv_sec;
-	ts[0].tv_usec = tv.tv_usec;
-	ts[1].tv_sec = tv.tv_sec - 1;
-	ts[1].tv_usec = tv.tv_usec + 1;
+	ts[0].tv_sec = 1492356708;
+	ts[0].tv_usec = 567891234;
+	ts[1].tv_sec = 1492357086;
+	ts[1].tv_usec = 678902345;
 
 	rc = syscall(__NR_futimesat, dirfd, 0, ts + 2);
 	printf("futimesat(%d, NULL, %p) = %ld %s (%m)\n",

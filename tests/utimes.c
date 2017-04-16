@@ -40,10 +40,6 @@
 int
 main(void)
 {
-	struct timeval tv;
-	if (gettimeofday(&tv, NULL))
-		perror_msg_and_fail("gettimeofday");
-
 	static const char sample[] = "utimes_sample";
 
 	long rc = syscall(__NR_utimes, sample, 0);
@@ -52,10 +48,10 @@ main(void)
 
 	struct timeval *const ts = tail_alloc(sizeof(*ts) * 2);
 
-	ts[0].tv_sec = tv.tv_sec;
-	ts[0].tv_usec = tv.tv_usec;
-	ts[1].tv_sec = tv.tv_sec - 1;
-	ts[1].tv_usec = tv.tv_usec + 1;
+	ts[0].tv_sec = 1492358607;
+	ts[0].tv_usec = 345678912;
+	ts[1].tv_sec = 1492356078;
+	ts[1].tv_usec = 456789023;
 
 	rc = syscall(__NR_utimes, 0, ts + 2);
 	printf("utimes(NULL, %p) = %ld %s (%m)\n", ts + 2, rc, errno2name());
