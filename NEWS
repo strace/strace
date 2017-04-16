@@ -24,6 +24,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Bug fixes
   * Fixed decoding of flags argument of preadv2 and pwritev2 syscalls on x32.
+  * Fixed the number of arguments and tracing flags of alpha specific syscalls.
 
 Noteworthy changes in release 4.16 (2017-02-14)
 ===============================================

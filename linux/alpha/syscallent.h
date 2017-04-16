@@ -119,7 +119,7 @@
 [ 90] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [ 91] = { 2,	TD,		SEN(fstat),			"fstat"			},
 [ 92] = { 3,	TD,		SEN(fcntl),			"fcntl"			},
-[ 93] = { 5,	0,		SEN(osf_select),		"osf_select"		},
+[ 93] = { 5,	TD,		SEN(osf_select),		"osf_select"		},
 [ 94] = { 3,	TD,		SEN(poll),			"poll"			},
 [ 95] = { 1,	TD,		SEN(fsync),			"fsync"			},
 [ 96] = { 3,	0,		SEN(setpriority),		"setpriority"		},
@@ -164,7 +164,7 @@
 [135] = { 4,	TN,		SEN(socketpair),		"socketpair"		},
 [136] = { 2,	TF,		SEN(mkdir),			"mkdir"			},
 [137] = { 1,	TF,		SEN(rmdir),			"rmdir"			},
-[138] = { 2,	0,		SEN(osf_utimes),		"osf_utimes"		},
+[138] = { 2,	TF,		SEN(osf_utimes),		"osf_utimes"		},
 [139] = { 5,	0,		SEN(printargs),			"osf_old_sigreturn"	}, /* not implemented */
 [140] = { 5,	0,		SEN(printargs),			"osf_adjtime"		}, /* not implemented */
 [141] = { 3,	TN,		SEN(getpeername),		"getpeername"		},
