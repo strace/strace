@@ -330,7 +330,7 @@ A qualifying expression which modifies which events to trace
 or how to trace them.  The format of the expression is:
 .RS 15
 .IP
-[\,\fIqualifier\/\fB=\fR][\fB!\fR]\,\fIvalue1\/\fR[\fB,\,\fIvalue2\/\fR]...
+[\,\fIqualifier\/\fB=\fR][\fB!\fR][\fB?\fR]\,\fIvalue1\/\fR[\fB,\fR[\fB?\fR]\,\fIvalue2\/\fR]...
 .RE
 .IP
 where
@@ -361,6 +361,8 @@ system call.  By contrast,
 .BR \-e "\ " trace "=!" open
 means to trace every system call except
 .BR open .
+Question mark before the syscall qualification allows suppression of error
+in case no syscalls matched the qualification provided.
 In addition, the special values
 .B all
 and
