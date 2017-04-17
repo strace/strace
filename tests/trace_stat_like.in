@@ -1,0 +1,12 @@
+fstat	-a15
+fstat64	-a17
+fstatat64	-a32
+lstat	-a32
+lstat64	-a32
+newfstatat	-a32
+oldfstat	-a21
+oldlstat	-a32
+oldstat	-a32
+stat	-a32
+stat64	-a32
+statx	-a32

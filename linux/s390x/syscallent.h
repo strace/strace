@@ -128,9 +128,9 @@
 [103] = { 3,	0,		SEN(syslog),			"syslog"		},
 [104] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [105] = { 2,	0,		SEN(getitimer),			"getitimer"		},
-[106] = { 2,	TF,		SEN(stat),			"stat"			},
-[107] = { 2,	TF,		SEN(lstat),			"lstat"			},
-[108] = { 2,	TD,		SEN(fstat),			"fstat"			},
+[106] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
+[107] = { 2,	TF|TSTA,	SEN(lstat),			"lstat"			},
+[108] = { 2,	TD|TSTA,	SEN(fstat),			"fstat"			},
 [109] = { },
 [110] = { 3,	0,		SEN(lookup_dcookie),		"lookup_dcookie"	},
 [111] = { 0,	0,		SEN(vhangup),			"vhangup"		},
@@ -305,7 +305,7 @@
 [290] = { 4,	TD|TF,		SEN(mknodat),			"mknodat"		},
 [291] = { 5,	TD|TF,		SEN(fchownat),			"fchownat"		},
 [292] = { 3,	TD|TF,		SEN(futimesat),			"futimesat"		},
-[293] = { 4,	TD|TF,		SEN(newfstatat),		"newfstatat"		},
+[293] = { 4,	TD|TF|TSTA,	SEN(newfstatat),		"newfstatat"		},
 [294] = { 3,	TD|TF,		SEN(unlinkat),			"unlinkat"		},
 [295] = { 4,	TD|TF,		SEN(renameat),			"renameat"		},
 [296] = { 5,	TD|TF,		SEN(linkat),			"linkat"		},
@@ -391,7 +391,7 @@
 [376] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [377] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [378] = { },
-[379] = { 5,	TD|TF,		SEN(statx),			"statx"			},
+[379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

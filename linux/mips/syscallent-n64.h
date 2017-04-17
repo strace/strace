@@ -4,9 +4,9 @@
 [5001] = { 3,	TD,		SEN(write),			"write"			},
 [5002] = { 3,	TD|TF,		SEN(open),			"open"			},
 [5003] = { 1,	TD,		SEN(close),			"close"			},
-[5004] = { 2,	TF,		SEN(stat),			"stat"			},
-[5005] = { 2,	TD,		SEN(fstat),			"fstat"			},
-[5006] = { 2,	TF,		SEN(lstat),			"lstat"			},
+[5004] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
+[5005] = { 2,	TD|TSTA,	SEN(fstat),			"fstat"			},
+[5006] = { 2,	TF|TSTA,	SEN(lstat),			"lstat"			},
 [5007] = { 3,	TD,		SEN(poll),			"poll"			},
 [5008] = { 3,	TD,		SEN(lseek),			"lseek"			},
 [5009] = { 6,	TD|TM|SI,	SEN(mmap),			"mmap"			},
@@ -252,7 +252,7 @@
 [5249] = { 4,	TD|TF,		SEN(mknodat),			"mknodat"		},
 [5250] = { 5,	TD|TF,		SEN(fchownat),			"fchownat"		},
 [5251] = { 3,	TD|TF,		SEN(futimesat),			"futimesat"		},
-[5252] = { 4,	TD|TF,		SEN(newfstatat),		"newfstatat"		},
+[5252] = { 4,	TD|TF|TSTA,	SEN(newfstatat),		"newfstatat"		},
 [5253] = { 3,	TD|TF,		SEN(unlinkat),			"unlinkat"		},
 [5254] = { 4,	TD|TF,		SEN(renameat),			"renameat"		},
 [5255] = { 5,	TD|TF,		SEN(linkat),			"linkat"		},
@@ -326,7 +326,7 @@
 [5323] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [5324] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [5325] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
-[5326] = { 5,	TD|TF,		SEN(statx),			"statx"			},
+[5326] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 
 # define SYS_socket_subcall      5400
 # include "subcall.h"
