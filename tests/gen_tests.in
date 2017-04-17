@@ -304,6 +304,7 @@ timer_xettime	-e trace=timer_create,timer_settime,timer_gettime
 timerfd_xettime	-e trace=timerfd_create,timerfd_settime,timerfd_gettime
 times	-esignal=none
 times-fail	-a12 -e trace=times
+trace_fstatfs	test_trace_expr '' -e%fstatfs
 trace_statfs	test_trace_expr '' -e%statfs
 truncate
 truncate64

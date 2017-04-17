@@ -135,7 +135,7 @@
 [5132] = { 1,	NF,		SEN(personality),		"personality"		},
 [5133] = { 2,	0,		SEN(ustat),			"ustat"			},
 [5134] = { 2,	TF|TSF,		SEN(statfs),			"statfs"		},
-[5135] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},
+[5135] = { 2,	TD|TFSF,	SEN(fstatfs),			"fstatfs"		},
 [5136] = { 3,	0,		SEN(sysfs),			"sysfs"			},
 [5137] = { 2,	0,		SEN(getpriority),		"getpriority"		},
 [5138] = { 3,	0,		SEN(setpriority),		"setpriority"		},

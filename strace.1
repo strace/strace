@@ -440,6 +440,12 @@ The same effect can be achieved with
 .BR "\-e\ trace" = /^(.*_)?statv?fs
 regular expression.
 .TP
+.BR "\-e\ trace" = %fstatfs
+Trace fstatfs, fstatfs64, fstatvfs, osf_fstatfs, and osf_fstatfs64 system calls.
+The same effect can be achieved with
+.BR "\-e\ trace" = /fstatv?fs
+regular expression.
+.TP
 \fB\-e\ abbrev\fR=\,\fIset\fR
 Abbreviate the output from printing each member of large structures.
 The default is

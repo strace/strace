@@ -22,5 +22,6 @@ typedef struct sysent {
 #define TRACE_INDIRECT_SUBCALL		00002000	/* Syscall is an indirect socket/ipc subcall. */
 #define COMPAT_SYSCALL_TYPES		00004000	/* A compat syscall that uses compat types. */
 #define TRACE_STATFS			00040000	/* Trace statfs, statfs64, and statvfs syscalls. */
+#define TRACE_FSTATFS			00100000	/* Trace fstatfs, fstatfs64 and fstatvfs syscalls. */
 
 #endif /* !STRACE_SYSENT_H */

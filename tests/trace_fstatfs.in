@@ -1,0 +1,2 @@
+fstatfs	-a18
+fstatfs64	-a24

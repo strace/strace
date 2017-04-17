@@ -263,6 +263,7 @@ lookup_class(const char *s)
 		{ "%ipc",	TRACE_IPC	},
 		{ "%network",	TRACE_NETWORK	},
 		{ "%statfs",	TRACE_STATFS	},
+		{ "%fstatfs",	TRACE_FSTATFS	},
 	};
 
 	unsigned int i;

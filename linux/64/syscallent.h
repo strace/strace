@@ -42,7 +42,7 @@
 [ 41] = { 2,	TF,		SEN(pivotroot),			"pivot_root"		},
 [ 42] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [ 43] = { 2,	TF|TSF,		SEN(statfs),			"statfs"		},
-[ 44] = { 2,	TD,		SEN(fstatfs),			"fstatfs"		},
+[ 44] = { 2,	TD|TFSF,	SEN(fstatfs),			"fstatfs"		},
 [ 45] = { 2,	TF,		SEN(truncate),			"truncate"		},
 [ 46] = { 2,	TD,		SEN(ftruncate),			"ftruncate"		},
 [ 47] = { 4,	TD,		SEN(fallocate),			"fallocate"		},

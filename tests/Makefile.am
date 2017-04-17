@@ -336,6 +336,7 @@ EXTRA_DIST = \
 	strace.supp \
 	struct_flock.c \
 	sun_path.expected \
+	trace_fstatfs.in \
 	trace_statfs.in \
 	uio.expected \
 	umode_t.c \
