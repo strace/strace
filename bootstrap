@@ -2,6 +2,7 @@
 
 ./generate_mpers_am.sh
 ./xlat/gen.sh
+./tests/gen_pure_executables.sh
 ./tests/gen_tests.sh
 
 for m in m32 mx32; do

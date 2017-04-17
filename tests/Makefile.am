@@ -67,390 +67,68 @@ libtests_a_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 check_LIBRARIES = libtests.a
 LDADD = libtests.a
 
-check_PROGRAMS = \
-	_newselect \
-	accept \
-	accept4 \
-	access \
-	acct \
-	add_key \
-	adjtimex \
-	aio \
-	alarm \
+include pure_executables.am
+
+check_PROGRAMS = $(PURE_EXECUTABLES) \
 	answer \
 	attach-f-p \
 	attach-f-p-cmd \
 	attach-p-cmd-cmd \
 	attach-p-cmd-p \
-	bpf \
-	brk \
-	btrfs \
-	caps \
 	caps-abbrev \
-	chmod \
-	chown \
-	chown32 \
-	chroot \
-	clock_adjtime \
-	clock_nanosleep \
-	clock_xettime \
-	copy_file_range \
 	count-f \
-	creat \
-	delete_module \
-	dup \
-	dup2 \
-	dup3 \
-	epoll_create \
-	epoll_create1 \
-	epoll_ctl \
-	epoll_pwait \
-	epoll_wait \
-	erestartsys \
-	eventfd \
-	execve \
 	execve-v \
-	execveat \
 	execveat-v \
-	faccessat \
-	fadvise64 \
-	fadvise64_64 \
-	fallocate \
-	fanotify_init \
-	fanotify_mark \
-	fchdir \
-	fchmod \
-	fchmodat \
-	fchown \
-	fchown32 \
-	fchownat \
-	fcntl \
-	fcntl64 \
-	fdatasync \
-	file_handle \
-	file_ioctl \
 	filter-unavailable \
-	finit_module \
-	flock \
 	fork-f \
-	fstat \
-	fstat64 \
-	fstatat64 \
-	fstatfs \
-	fstatfs64 \
-	fsync \
-	ftruncate \
-	ftruncate64 \
-	futex \
-	futimesat \
-	get_mempolicy \
-	getcpu \
-	getcwd \
-	getdents \
-	getdents64 \
-	getegid \
-	getegid32 \
-	geteuid \
-	geteuid32 \
-	getgid \
-	getgid32 \
-	getgroups \
-	getgroups32 \
-	getpeername \
-	getpgrp \
 	getpid	\
 	getppid	\
-	getrandom \
-	getresgid \
-	getresgid32 \
-	getresuid \
-	getresuid32 \
-	getrlimit \
-	getrusage \
-	getsid \
-	getsockname \
 	gettid \
-	getuid \
-	getuid32 \
-	getxxid \
-	inet-cmsg \
-	init_module \
-	inotify \
-	inotify_init1 \
 	int_0x80 \
-	ioctl \
-	ioctl_block \
-	ioctl_dm \
 	ioctl_dm-v \
-	ioctl_evdev \
 	ioctl_evdev-v \
-	ioctl_loop \
 	ioctl_loop-nv \
 	ioctl_loop-v \
-	ioctl_mtd \
 	ioctl_nsfs \
-	ioctl_rtc \
 	ioctl_rtc-v \
-	ioctl_scsi \
-	ioctl_sg_io_v3 \
-	ioctl_sg_io_v4 \
-	ioctl_sock_gifconf \
-	ioctl_uffdio \
-	ioctl_v4l2 \
-	ioperm \
-	iopl \
-	ioprio \
-	ip_mreq \
-	ipc \
-	ipc_msg \
-	ipc_msgbuf \
-	ipc_sem \
-	ipc_shm \
-	kcmp \
-	kexec_file_load \
-	kexec_load \
-	keyctl \
-	kill \
 	ksysent \
-	lchown \
-	lchown32 \
-	link \
-	linkat \
-	llseek \
-	lookup_dcookie \
-	lseek \
-	lstat \
-	lstat64 \
-	mbind \
-	membarrier \
-	memfd_create \
-	migrate_pages \
-	mincore \
-	mkdir \
-	mkdirat \
-	mknod \
-	mknodat \
-	mlock \
-	mlock2 \
-	mlockall \
-	mmap \
-	mmap64 \
-	mmsg \
 	mmsg-silent \
-	mmsg_name \
 	mmsg_name-v \
-	mount \
-	move_pages \
-	mq \
-	mq_sendrecv \
-	mq_sendrecv-read \
-	mq_sendrecv-write \
-	msg_control \
 	msg_control-v \
-	msg_name \
-	munlockall \
-	nanosleep \
 	net-accept-connect \
-	net-icmp_filter \
-	net-sockaddr \
-	net-y-unix \
-	net-yy-inet \
-	net-yy-netlink \
-	net-yy-unix \
 	netlink_inet_diag \
 	netlink_netlink_diag \
-	netlink_protocol \
 	netlink_unix_diag \
-	newfstatat \
 	nsyscalls \
-	old_mmap \
-	oldfstat \
-	oldlstat \
-	oldselect \
-	oldstat \
-	open \
-	openat \
-	osf_utimes \
-	pause \
 	pc \
-	perf_event_open \
 	perf_event_open_nonverbose \
 	perf_event_open_unabbrev \
-	personality \
-	pipe \
-	pipe2 \
-	pkey_alloc \
-	pkey_free \
-	pkey_mprotect \
-	poll \
-	ppoll \
 	ppoll-v \
-	prctl-arg2-intptr \
-	prctl-dumpable \
-	prctl-name \
-	prctl-no-args \
-	prctl-pdeathsig \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
-	prctl-securebits \
-	prctl-tid_address \
-	prctl-tsc \
-	pread64-pwrite64 \
-	preadv \
-	preadv-pwritev \
-	preadv2-pwritev2 \
 	print_maxfd \
-	printstr \
-	prlimit64 \
-	process_vm_readv \
-	process_vm_writev \
-	pselect6 \
-	ptrace \
-	pwritev \
 	qual_fault \
 	qual_inject-error-signal \
 	qual_inject-retval \
 	qual_inject-signal \
 	qual_signal \
-	quotactl \
 	quotactl-v \
-	quotactl-xfs \
 	quotactl-xfs-v \
-	read-write \
-	readahead \
-	readdir \
-	readlink \
-	readlinkat \
-	readv \
-	reboot \
-	recvfrom \
-	recvmmsg-timeout \
-	recvmsg \
 	redirect-fds \
-	remap_file_pages \
-	rename \
-	renameat \
-	renameat2 \
-	request_key \
 	restart_syscall \
-	rmdir \
-	rt_sigpending \
-	rt_sigprocmask \
-	rt_sigqueueinfo \
-	rt_sigreturn \
-	rt_sigsuspend \
-	rt_sigtimedwait \
-	rt_tgsigqueueinfo \
-	sched_get_priority_mxx \
-	sched_rr_get_interval \
-	sched_xetaffinity \
-	sched_xetattr \
-	sched_xetparam \
-	sched_xetscheduler \
-	sched_yield \
 	scm_rights \
-	seccomp-filter \
 	seccomp-filter-v \
 	seccomp-strict \
-	select \
-	semop \
-	sendfile \
-	sendfile64 \
-	set_mempolicy \
 	set_ptracer_any \
-	setdomainname \
-	setfsgid \
-	setfsgid32 \
-	setfsuid \
-	setfsuid32 \
-	setgid \
-	setgid32 \
-	setgroups \
-	setgroups32 \
-	sethostname \
-	setns \
-	setregid \
-	setregid32 \
-	setresgid \
-	setresgid32 \
-	setresuid \
-	setresuid32 \
-	setreuid \
-	setreuid32 \
-	setrlimit \
-	setuid \
-	setuid32 \
-	shmxt \
-	shutdown \
-	sigaction \
-	sigaltstack \
-	siginfo \
 	signal_receive \
-	signalfd4 \
-	sigreturn \
 	sleep \
-	socketcall \
-	splice \
 	stack-fcall \
-	stat \
-	stat64 \
-	statfs \
-	statfs64 \
-	statx \
-	swap \
-	symlink \
-	symlinkat \
-	sync \
-	sync_file_range \
-	sync_file_range2 \
-	sysinfo \
-	syslog \
-	tee \
 	threads-execve \
-	time \
-	timer_create \
-	timer_xettime \
-	timerfd_xettime \
-	times \
-	times-fail \
-	truncate \
-	truncate64 \
-	ugetrlimit \
-	uio \
-	umask \
-	umount \
-	umount2 \
-	umoven-illptr \
-	umovestr \
-	umovestr-illptr \
-	umovestr2 \
-	umovestr3 \
-	uname \
 	unix-pair-send-recv \
 	unix-pair-sendto-recvfrom \
-	unlink \
-	unlinkat \
-	unshare \
-	userfaultfd \
-	ustat \
-	utime \
-	utimensat \
-	utimes \
 	vfork-f \
-	vhangup \
-	vmsplice \
-	wait4 \
 	wait4-v \
-	waitid \
 	waitid-v \
-	waitpid \
-	xattr \
-	xattr-strings \
-	xet_robust_list \
-	xetitimer \
-	xetpgid \
-	xetpriority \
-	xettimeofday \
 	# end of check_PROGRAMS
 
 attach_f_p_LDADD = -lrt -lpthread $(LDADD)
@@ -623,6 +301,7 @@ EXTRA_DIST = \
 	filter-unavailable.expected \
 	fstatat.c \
 	fstatx.c \
+	gen_pure_executables.sh \
 	gen_tests.in \
 	gen_tests.sh \
 	getresugid.c \
