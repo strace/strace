@@ -44,7 +44,7 @@
 [ 15] = { 2,	TF,		SEN(chmod),			"chmod"			},
 [ 16] = { 3,	TF,		SEN(chown),			"chown"			},
 [ 17] = { 1,	TM|SI,		SEN(brk),			"brk"			},
-[ 18] = { 5,	0,		SEN(printargs),			"osf_getfsstat"		}, /* not implemented */
+[ 18] = { 5,	TSFA,		SEN(printargs),			"osf_getfsstat"		}, /* not implemented */
 [ 19] = { 3,	TD,		SEN(lseek),			"lseek"			},
 [ 20] = { 0,	NF,		SEN(getxpid),			"getxpid"		},
 [ 21] = { 4,	0,		SEN(printargs),			"osf_mount"		},
