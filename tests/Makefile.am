@@ -270,6 +270,7 @@ check_PROGRAMS = \
 	oldstat \
 	open \
 	openat \
+	osf_utimes \
 	pause \
 	pc \
 	perf_event_open \

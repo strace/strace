@@ -173,6 +173,7 @@ oldselect
 oldstat
 open
 openat
+osf_utimes
 pause
 perf_event_open
 personality
