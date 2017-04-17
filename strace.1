@@ -435,7 +435,10 @@ Trace all file descriptor related system calls.
 Trace all memory mapping related system calls.
 .TP
 .BR "\-e\ trace" = %statfs
-Trace statfs, statfs64, and statvfs system calls.
+Trace statfs, statfs64, statvfs, osf_statfs, and osf_statfs64 system calls.
+The same effect can be achieved with
+.BR "\-e\ trace" = /^(.*_)?statv?fs
+regex expression.
 .TP
 \fB\-e\ abbrev\fR=\,\fIset\fR
 Abbreviate the output from printing each member of large structures.
