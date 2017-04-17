@@ -667,6 +667,7 @@ EXTRA_DIST = gen_tests.in gen_tests.sh init.sh run.sh match.awk \
 	     xstatfs64.c \
 	     xstatfsx.c \
 	     xstatx.c \
+	     xutimes.c \
 	     $(TESTS)
 
 ksysent.h: $(srcdir)/ksysent.sed
