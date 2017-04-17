@@ -142,7 +142,7 @@ print_status(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	const int status = * (int *) elem_buf;
 
 	if (status < 0 && (unsigned) -status < nerrnos)
-		tprintf("%s", errnoent[-status]);
+		tprintf("-%s", errnoent[-status]);
 	else
 		tprintf("%d", status);
 

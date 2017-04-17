@@ -126,7 +126,7 @@ print_status_array(const int *const status, const unsigned long count)
 			printf("%d", status[i]);
 		} else {
 			errno = -status[i];
-			printf("%s", errno2name());
+			printf("-%s", errno2name());
 		}
 	}
 	printf("]");
