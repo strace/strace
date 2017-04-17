@@ -32,6 +32,9 @@
 #include "xlat/netlink_flags.h"
 #include "xlat/netlink_types.h"
 
+#undef NLMSG_HDRLEN
+#define NLMSG_HDRLEN NLMSG_ALIGN(sizeof(struct nlmsghdr))
+
 /*
  * Fetch a struct nlmsghdr from the given address.
  */
@@ -78,11 +81,11 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 
 	unsigned int nlmsg_len =
 		nlmsghdr->nlmsg_len > len ? len : nlmsghdr->nlmsg_len;
-	if (nlmsg_len > sizeof(struct nlmsghdr)) {
+	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprints(", ");
 
-		printstrn(tcp, addr + sizeof(struct nlmsghdr),
-			  nlmsg_len - sizeof(struct nlmsghdr));
+		printstrn(tcp, addr + NLMSG_HDRLEN,
+			  nlmsg_len - NLMSG_HDRLEN);
 	}
 
 	tprints("}");
@@ -105,7 +108,7 @@ decode_netlink(struct tcb *const tcp, kernel_ulong_t addr, kernel_ulong_t len)
 		kernel_ulong_t next_addr = 0;
 		kernel_ulong_t next_len = 0;
 
-		if (nlmsghdr.nlmsg_len >= sizeof(struct nlmsghdr)) {
+		if (nlmsghdr.nlmsg_len >= NLMSG_HDRLEN) {
 			next_len = (len >= nlmsg_len) ? len - nlmsg_len : 0;
 
 			if (next_len && addr + nlmsg_len > addr)
