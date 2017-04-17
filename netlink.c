@@ -73,6 +73,55 @@ static void
 decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const struct nlmsghdr *const nlmsghdr,
 			     const kernel_ulong_t addr,
+			     const kernel_ulong_t len);
+
+static void
+decode_nlmsgerr(struct tcb *const tcp,
+	       kernel_ulong_t addr,
+	       kernel_ulong_t len)
+{
+	struct nlmsgerr err;
+
+	if (umove_or_printaddr(tcp, addr, &err.error))
+		return;
+
+	tprints("{error=");
+	if (err.error < 0 && (unsigned) -err.error < nerrnos) {
+		tprintf("-%s", errnoent[-err.error]);
+	} else {
+		tprintf("%d", err.error);
+	}
+
+	addr += offsetof(struct nlmsgerr, msg);
+	len -= offsetof(struct nlmsgerr, msg);
+
+	if (len) {
+		tprints(", msg=");
+		if (fetch_nlmsghdr(tcp, &err.msg, addr, len)) {
+			decode_nlmsghdr_with_payload(tcp, &err.msg, addr, len);
+		}
+	}
+
+	tprints("}");
+}
+
+static void
+decode_payload(struct tcb *const tcp,
+	       const struct nlmsghdr *const nlmsghdr,
+	       const kernel_ulong_t addr,
+	       const kernel_ulong_t len)
+{
+	if (nlmsghdr->nlmsg_type == NLMSG_ERROR && len >= sizeof(int)) {
+		decode_nlmsgerr(tcp, addr, len);
+	} else {
+		printstrn(tcp, addr, len);
+	}
+}
+
+static void
+decode_nlmsghdr_with_payload(struct tcb *const tcp,
+			     const struct nlmsghdr *const nlmsghdr,
+			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len)
 {
 	tprints("{");
@@ -83,9 +132,8 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 		nlmsghdr->nlmsg_len > len ? len : nlmsghdr->nlmsg_len;
 	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprints(", ");
-
-		printstrn(tcp, addr + NLMSG_HDRLEN,
-			  nlmsg_len - NLMSG_HDRLEN);
+		decode_payload(tcp, nlmsghdr, addr + NLMSG_HDRLEN,
+					 nlmsg_len - NLMSG_HDRLEN);
 	}
 
 	tprints("}");

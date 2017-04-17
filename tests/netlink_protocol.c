@@ -1,7 +1,7 @@
 /*
  * Check decoding of netlink protocol.
  *
- * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2017 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * All rights reserved.
  *
@@ -199,6 +199,124 @@ send_query(const int fd)
 	printf(", ...], %u, MSG_DONTWAIT, NULL, 0) = %s\n", msg_len, errstr);
 }
 
+static void
+test_nlmsgerr(const int fd)
+{
+	struct nlmsgerr *err;
+	struct nlmsghdr *nlh;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* error message without enough room for the error code */
+	nlh = nlh0;
+	nlh->nlmsg_len = NLMSG_HDRLEN + 4;
+	nlh->nlmsg_type = NLMSG_ERROR;
+	nlh->nlmsg_flags = NLM_F_REQUEST;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
+	       ", seq=0, pid=0}, %p}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, nlh0 + NLMSG_HDRLEN,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	nlh = nlh0 - 2;
+	nlh->nlmsg_len = NLMSG_HDRLEN + 2;
+	nlh->nlmsg_type = NLMSG_ERROR;
+	nlh->nlmsg_flags = NLM_F_REQUEST;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+	memcpy(NLMSG_DATA(nlh), "42", 2);
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
+	       ", seq=0, pid=0}, \"42\"}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, nlh->nlmsg_len, sprintrc(rc));
+
+	/* error message with room for the error code only */
+	nlh = nlh0 - sizeof(err->error);
+	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(err->error);
+	nlh->nlmsg_type = NLMSG_ERROR;
+	nlh->nlmsg_flags = NLM_F_REQUEST;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+	err = NLMSG_DATA(nlh);
+	err->error = 42;
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
+	       ", seq=0, pid=0}, {error=42}}, %u, MSG_DONTWAIT, NULL, 0)"
+	       " = %s\n", fd, nlh->nlmsg_len, nlh->nlmsg_len, sprintrc(rc));
+
+	err->error = -1;
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
+	       ", seq=0, pid=0}, {error=-EPERM}}, %u, MSG_DONTWAIT, NULL, 0)"
+	       " = %s\n", fd, nlh->nlmsg_len, nlh->nlmsg_len, sprintrc(rc));
+
+	err->error = -32767;
+	nlh->nlmsg_len += sizeof(err->msg.nlmsg_len);
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
+	       ", seq=0, pid=0}, {error=-32767, msg=%p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, nlh0 + NLMSG_HDRLEN,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* error message with room for the error code and a header */
+	nlh = nlh0 - sizeof(*err);
+	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(*err);
+	nlh->nlmsg_type = NLMSG_ERROR;
+	nlh->nlmsg_flags = NLM_F_REQUEST;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+	err = NLMSG_DATA(nlh);
+	err->error = -13;
+	err->msg.nlmsg_len = NLMSG_HDRLEN;
+	err->msg.nlmsg_type = NLMSG_NOOP;
+	err->msg.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST;
+	err->msg.nlmsg_seq = 42;
+	err->msg.nlmsg_pid = 1234;
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
+	       ", seq=0, pid=0}, {error=-EACCES"
+	       ", msg={{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
+	       ", seq=%u, pid=%u}}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, err->msg.nlmsg_len, NLM_F_DUMP,
+	       err->msg.nlmsg_seq, err->msg.nlmsg_pid,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* error message with room for the error code, a header, and some data */
+	nlh = nlh0 - sizeof(*err) - 4;
+	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(*err) + 4;
+	nlh->nlmsg_type = NLMSG_ERROR;
+	nlh->nlmsg_flags = NLM_F_REQUEST;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+	err = NLMSG_DATA(nlh);
+	err->error = -13;
+	err->msg.nlmsg_len = NLMSG_HDRLEN + 4;
+	err->msg.nlmsg_type = NLMSG_NOOP;
+	err->msg.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST;
+	err->msg.nlmsg_seq = 421;
+	err->msg.nlmsg_pid = 12345;
+	memcpy(NLMSG_DATA(&err->msg), "abcd", 4);
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
+	       ", seq=0, pid=0}, {error=-EACCES"
+	       ", msg={{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
+	       ", seq=%u, pid=%u}, \"abcd\"}}}, %u, MSG_DONTWAIT, NULL, 0)"
+	       " = %s\n",
+	       fd, nlh->nlmsg_len, err->msg.nlmsg_len, NLM_F_DUMP,
+	       err->msg.nlmsg_seq, err->msg.nlmsg_pid,
+	       nlh->nlmsg_len, sprintrc(rc));
+}
+
 int main(void)
 {
 	struct sockaddr_nl addr;
@@ -227,6 +345,7 @@ int main(void)
 	free(path);
 
 	send_query(fd);
+	test_nlmsgerr(fd);
 
 	printf("+++ exited with 0 +++\n");
 
