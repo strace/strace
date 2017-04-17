@@ -88,7 +88,7 @@
 [ 59] = { 3,	TF|TP|SE|SI,	SEN(execve),			"execve"		},
 [ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
-[ 62] = { 5,	TD|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
+[ 62] = { 5,	TD|TFST|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
 [ 63] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},
 [ 64] = { 0,	0,		SEN(getpagesize),		"getpagesize"		},
 [ 65] = { 5,	TM,		SEN(printargs),			"osf_mremap"		}, /* not implemented */
@@ -117,7 +117,7 @@
 [ 88] = { 2,	0,		SEN(sethostname),		"sethostname"		},
 [ 89] = { 0,	0,		SEN(getdtablesize),		"getdtablesize"		},
 [ 90] = { 2,	TD,		SEN(dup2),			"dup2"			},
-[ 91] = { 2,	TD|TSTA,	SEN(fstat),			"fstat"			},
+[ 91] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [ 92] = { 3,	TD,		SEN(fcntl),			"fcntl"			},
 [ 93] = { 5,	TD,		SEN(osf_select),		"osf_select"		},
 [ 94] = { 3,	TD,		SEN(poll),			"poll"			},
@@ -229,7 +229,7 @@
 [223] = { 5,	0,		SEN(printargs),			"osf_kloadcall"		}, /* not implemented */
 [224] = { 2,	TF|TSTA,	SEN(printargs),			"osf_stat"		},
 [225] = { 2,	TF|TSTA,	SEN(printargs),			"osf_lstat"		},
-[226] = { 2,	TD|TSTA,	SEN(printargs),			"osf_fstat"		},
+[226] = { 2,	TD|TFST|TSTA,	SEN(printargs),			"osf_fstat"		},
 [227] = { 3,	TF|TSF|TSFA,	SEN(osf_statfs),		"osf_statfs64"		},
 [228] = { 3,	TD|TFSF|TSFA,	SEN(osf_fstatfs),		"osf_fstatfs64"		},
 [229 ... 232] = { },
@@ -389,7 +389,7 @@
 [424] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [425] = { 2,	TF|TSTA,	SEN(stat64),			"stat64"		},
 [426] = { 2,	TF|TSTA,	SEN(lstat64),			"lstat64"		},
-[427] = { 2,	TD|TSTA,	SEN(fstat64),			"fstat64"		},
+[427] = { 2,	TD|TFST|TSTA,	SEN(fstat64),			"fstat64"		},
 [428] = { 5,	0,		SEN(vserver),			"vserver"		}, /* not implemented */
 [429] = { 6,	TM,		SEN(mbind),			"mbind"			}, /* not implemented */
 [430] = { 5,	TM,		SEN(get_mempolicy),		"get_mempolicy"		}, /* not implemented */
@@ -417,7 +417,7 @@
 [452] = { 4,	TD|TF,		SEN(mknodat),			"mknodat"		},
 [453] = { 5,	TD|TF,		SEN(fchownat),			"fchownat"		},
 [454] = { 3,	TD|TF,		SEN(futimesat),			"futimesat"		},
-[455] = { 4,	TD|TF|TSTA,	SEN(fstatat64),			"fstatat64"		},
+[455] = { 4,	TD|TF|TFST|TSTA,SEN(fstatat64),			"fstatat64"		},
 [456] = { 3,	TD|TF,		SEN(unlinkat),			"unlinkat"		},
 [457] = { 4,	TD|TF,		SEN(renameat),			"renameat"		},
 [458] = { 5,	TD|TF,		SEN(linkat),			"linkat"		},

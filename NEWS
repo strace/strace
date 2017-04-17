@@ -9,6 +9,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Optimized syscall filtering.
   * Enhanced decoding of sched_setattr syscall.
+  * Added -e trace=%fstat option for tracing variants of fstat and fstatat
+    syscalls.
   * Added -e trace=%%stat option for tracing syscalls used for querying file
     status information (stat, lstat, fstat, fstatat, statx, and their
     variations).

@@ -76,6 +76,7 @@
 #define TP TRACE_PROCESS
 #define TS TRACE_SIGNAL
 #define TM TRACE_MEMORY
+#define TFST TRACE_FSTAT
 #define TSTA TRACE_STAT_LIKE
 #define TSF TRACE_STATFS
 #define TFSF TRACE_FSTATFS
@@ -115,6 +116,7 @@ static const struct_sysent sysent2[] = {
 #undef TP
 #undef TS
 #undef TM
+#undef TFST
 #undef TSTA
 #undef TSF
 #undef TFSF
