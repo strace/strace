@@ -54,7 +54,7 @@ fi
 
 names=
 
-while read name args; do {
+while read -r name args; do {
 	[ -n "${name###*}" ] || continue
 	if [ -z "$match" ]; then
 		names="$names $name"
