@@ -41,6 +41,7 @@
 #define TP 0
 #define TS 0
 #define TM 0
+#define TLST 0
 #define TFST 0
 #define TSTA 0
 #define TSF 0

@@ -129,7 +129,7 @@
 [104] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [105] = { 2,	0,		SEN(getitimer),			"getitimer"		},
 [106] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
-[107] = { 2,	TF|TSTA,	SEN(lstat),			"lstat"			},
+[107] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
 [108] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [109] = { },
 [110] = { 3,	0,		SEN(lookup_dcookie),		"lookup_dcookie"	},

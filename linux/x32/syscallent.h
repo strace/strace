@@ -4,7 +4,7 @@
 [  3] = { 1,	TD,		SEN(close),			"close"			},
 [  4] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
 [  5] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
-[  6] = { 2,	TF|TSTA,	SEN(lstat),			"lstat"			},
+[  6] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
 [  7] = { 3,	TD,		SEN(poll),			"poll"			},
 [  8] = { 3,	TD,		SEN(lseek),			"lseek"			},
 [  9] = { 6,	TD|TM|SI,	SEN(mmap),			"mmap"			},

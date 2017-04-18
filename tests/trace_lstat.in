@@ -1,0 +1,3 @@
+lstat	-a32
+lstat64	-a32
+oldlstat	-a32

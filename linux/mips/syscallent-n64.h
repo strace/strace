@@ -6,7 +6,7 @@
 [5003] = { 1,	TD,		SEN(close),			"close"			},
 [5004] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
 [5005] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
-[5006] = { 2,	TF|TSTA,	SEN(lstat),			"lstat"			},
+[5006] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
 [5007] = { 3,	TD,		SEN(poll),			"poll"			},
 [5008] = { 3,	TD,		SEN(lseek),			"lseek"			},
 [5009] = { 6,	TD|TM|SI,	SEN(mmap),			"mmap"			},
