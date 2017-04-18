@@ -4,7 +4,7 @@
 [5001] = { 3,	TD,		SEN(write),			"write"			},
 [5002] = { 3,	TD|TF,		SEN(open),			"open"			},
 [5003] = { 1,	TD,		SEN(close),			"close"			},
-[5004] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
+[5004] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
 [5005] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [5006] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
 [5007] = { 3,	TD,		SEN(poll),			"poll"			},

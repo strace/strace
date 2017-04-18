@@ -128,7 +128,7 @@
 [103] = { 3,	0,		SEN(syslog),			"syslog"		},
 [104] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [105] = { 2,	0,		SEN(getitimer),			"getitimer"		},
-[106] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
+[106] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
 [107] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
 [108] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [109] = { },

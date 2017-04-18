@@ -64,7 +64,7 @@
 [ 35] = { 5,	0,		SEN(printargs),			"osf_fchflags"		}, /* not implemented */
 [ 36] = { 0,	0,		SEN(sync),			"sync"			},
 [ 37] = { 2,	TS,		SEN(kill),			"kill"			},
-[ 38] = { 5,	TF|TSTA,	SEN(printargs),			"osf_old_stat"		}, /* not implemented */
+[ 38] = { 5,	TF|TST|TSTA,	SEN(printargs),			"osf_old_stat"		}, /* not implemented */
 [ 39] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [ 40] = { 5,	TF|TLST|TSTA,	SEN(printargs),			"osf_old_lstat"		}, /* not implemented */
 [ 41] = { 1,	TD,		SEN(dup),			"dup"			},
@@ -93,7 +93,7 @@
 [ 64] = { 0,	0,		SEN(getpagesize),		"getpagesize"		},
 [ 65] = { 5,	TM,		SEN(printargs),			"osf_mremap"		}, /* not implemented */
 [ 66] = { 0,	TP,		SEN(vfork),			"vfork"			},
-[ 67] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
+[ 67] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
 [ 68] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
 [ 69] = { 5,	TM,		SEN(printargs),			"osf_sbrk"		}, /* not implemented */
 [ 70] = { 5,	0,		SEN(printargs),			"osf_sstk"		}, /* not implemented */
@@ -227,7 +227,7 @@
 [221] = { },
 [222] = { 5,	0,		SEN(printargs),			"osf_security"		}, /* not implemented */
 [223] = { 5,	0,		SEN(printargs),			"osf_kloadcall"		}, /* not implemented */
-[224] = { 2,	TF|TSTA,	SEN(printargs),			"osf_stat"		},
+[224] = { 2,	TF|TST|TSTA,	SEN(printargs),			"osf_stat"		},
 [225] = { 2,	TF|TLST|TSTA,	SEN(printargs),			"osf_lstat"		},
 [226] = { 2,	TD|TFST|TSTA,	SEN(printargs),			"osf_fstat"		},
 [227] = { 3,	TF|TSF|TSFA,	SEN(osf_statfs),		"osf_statfs64"		},
@@ -387,7 +387,7 @@
 [422] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
 [423] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
 [424] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
-[425] = { 2,	TF|TSTA,	SEN(stat64),			"stat64"		},
+[425] = { 2,	TF|TST|TSTA,	SEN(stat64),			"stat64"		},
 [426] = { 2,	TF|TLST|TSTA,	SEN(lstat64),			"lstat64"		},
 [427] = { 2,	TD|TFST|TSTA,	SEN(fstat64),			"fstat64"		},
 [428] = { 5,	0,		SEN(vserver),			"vserver"		}, /* not implemented */

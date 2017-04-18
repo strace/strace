@@ -262,6 +262,7 @@ lookup_class(const char *s)
 		{ "%signal",	TRACE_SIGNAL	},
 		{ "%ipc",	TRACE_IPC	},
 		{ "%network",	TRACE_NETWORK	},
+		{ "%stat",	TRACE_STAT	},
 		{ "%lstat",	TRACE_LSTAT	},
 		{ "%fstat",	TRACE_FSTAT	},
 		{ "%%stat",	TRACE_STAT_LIKE	},

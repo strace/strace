@@ -339,6 +339,7 @@ EXTRA_DIST = \
 	trace_fstat.in \
 	trace_fstatfs.in \
 	trace_lstat.in \
+	trace_stat.in \
 	trace_stat_like.in \
 	trace_statfs.in \
 	trace_statfs_like.in \

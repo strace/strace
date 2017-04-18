@@ -2,7 +2,7 @@
 [  1] = { 3,	TD,		SEN(write),			"write"			},
 [  2] = { 3,	TD|TF,		SEN(open),			"open"			},
 [  3] = { 1,	TD,		SEN(close),			"close"			},
-[  4] = { 2,	TF|TSTA,	SEN(stat),			"stat"			},
+[  4] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
 [  5] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [  6] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
 [  7] = { 3,	TD,		SEN(poll),			"poll"			},

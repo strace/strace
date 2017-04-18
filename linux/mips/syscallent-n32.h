@@ -4,7 +4,7 @@
 [6001] = { 3,	TD,		SEN(write),			"write"			},
 [6002] = { 3,	TD|TF,		SEN(open),			"open"			},
 [6003] = { 1,	TD,		SEN(close),			"close"			},
-[6004] = { 2,	TF|TSTA,	SEN(stat64),			"stat"			},
+[6004] = { 2,	TF|TST|TSTA,	SEN(stat64),			"stat"			},
 [6005] = { 2,	TD|TFST|TSTA,	SEN(fstat64),			"fstat"			},
 [6006] = { 2,	TF|TLST|TSTA,	SEN(lstat64),			"lstat"			},
 [6007] = { 3,	TD,		SEN(poll),			"poll"			},
