@@ -198,7 +198,6 @@ DECODER_TESTS = \
 	net-yy-netlink.test \
 	net-yy-unix.test \
 	net.test \
-	netlink_protocol.test \
 	nsyscalls.test \
 	oldselect.test \
 	personality.test \
