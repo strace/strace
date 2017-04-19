@@ -216,7 +216,6 @@ DECODER_TESTS = \
 	prctl-tsc.test \
 	pread64-pwrite64.test \
 	qual_fault-exit_group.test \
-	read-write.test \
 	readv.test \
 	regex.test \
 	sched.test \

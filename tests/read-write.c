@@ -137,7 +137,9 @@ main(void)
 {
 	tprintf("%s", "");
 
-	static char tmp[] = "read-write-tmpfile";
+	skip_if_unavailable("/proc/self/fd/");
+
+	static const char tmp[] = "read-write-tmpfile";
 	if (open(tmp, O_CREAT|O_RDONLY|O_TRUNC, 0600) != 0)
 		perror_msg_and_fail("creat: %s", tmp);
 	if (open(tmp, O_WRONLY) != 1)
