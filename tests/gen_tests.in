@@ -78,8 +78,8 @@ flock	-a19
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
 fstat64	+fstat.test
 fstatat64	-a32 -v -P $NAME.sample -P /dev/full
-fstatfs	+statfs.test
-fstatfs64	+statfs.test
+fstatfs	-a18
+fstatfs64	-a24
 fsync	-a10
 ftruncate	-a24
 ftruncate64	-a36
@@ -280,7 +280,8 @@ socketcall	-a20
 splice
 stat	-a32 -v -P $NAME.sample -P /dev/full
 stat64	-a32 -v -P $NAME.sample -P /dev/full
-statfs64	+statfs.test
+statfs	-a17
+statfs64	-a23
 statx	-a32 -v -P $NAME.sample -P /dev/full
 swap	-a23 -e trace=swapon,swapoff
 symlink	-a34

@@ -224,7 +224,6 @@ DECODER_TESTS = \
 	seccomp-strict.test \
 	sigaction.test \
 	sigaltstack.test \
-	statfs.test \
 	sun_path.test \
 	trace_statfs.test \
 	uio.test \
