@@ -60,6 +60,9 @@ void error_msg_and_skip(const char *, ...)
 void perror_msg_and_skip(const char *, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 
+/* Stat the specified file and skip the test if the stat call failed. */
+void skip_if_unavailable(const char *);
+
 /*
  * Allocate memory that ends on the page boundary.
  * Pages allocated by this call are preceeded by an unmapped page

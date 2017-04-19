@@ -58,6 +58,7 @@ libtests_a_SOURCES = \
 	printflags.c \
 	printxval.c \
 	signal2name.c \
+	skip_unavailable.c \
 	sprintrc.c \
 	tail_alloc.c \
 	tests.h \
