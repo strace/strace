@@ -214,7 +214,6 @@ DECODER_TESTS = \
 	prctl-securebits.test \
 	prctl-tid_address.test \
 	prctl-tsc.test \
-	pread64-pwrite64.test \
 	qual_fault-exit_group.test \
 	readv.test \
 	regex.test \
