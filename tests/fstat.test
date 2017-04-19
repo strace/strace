@@ -6,7 +6,7 @@
 
 syscall=$NAME
 run_prog > /dev/null
-sample=$syscall.sample
+sample=stat.sample
 > "$sample"
 run_strace -ve$syscall -P$sample -a21 $args > "$EXP"
 match_diff "$LOG" "$EXP"

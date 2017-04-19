@@ -77,7 +77,7 @@ finit_module	-a25
 flock	-a19
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
 fstat64	+fstat.test
-fstatat64	-a32 -v -P $NAME.sample -P /dev/full
+fstatat64	-a32 -v -P stat.sample -P /dev/full
 fstatfs	-a18
 fstatfs64	-a24
 fsync	-a10
@@ -149,8 +149,8 @@ lchown32	-a32
 link
 linkat
 lookup_dcookie	-a27
-lstat	-a32 -v -P $NAME.sample -P /dev/full
-lstat64	-a32 -v -P $NAME.sample -P /dev/full
+lstat	-a32 -v -P stat.sample -P /dev/full
+lstat64	-a32 -v -P stat.sample -P /dev/full
 mbind
 membarrier	-a36
 memfd_create
@@ -182,11 +182,11 @@ nanosleep	-a20
 net-icmp_filter	-e trace=getsockopt,setsockopt
 net-sockaddr	-a24 -e trace=connect
 netlink_protocol	-e trace=%network
-newfstatat	-a32 -v -P $NAME.sample -P /dev/full
+newfstatat	-a32 -v -P stat.sample -P /dev/full
 old_mmap	-a11 -e trace=mmap
 oldfstat	+fstat.test
-oldlstat	-a32 -v -P $NAME.sample -P /dev/full
-oldstat	-a32 -v -P $NAME.sample -P /dev/full
+oldlstat	-a32 -v -P stat.sample -P /dev/full
+oldstat	-a32 -v -P stat.sample -P /dev/full
 open	-a30 -P $NAME.sample
 openat	-P $NAME.sample
 osf_utimes	-a21
@@ -281,11 +281,11 @@ signalfd4
 sigreturn	-esignal='!USR1'
 socketcall	-a20
 splice
-stat	-a32 -v -P $NAME.sample -P /dev/full
-stat64	-a32 -v -P $NAME.sample -P /dev/full
+stat	-a32 -v -P stat.sample -P /dev/full
+stat64	-a32 -v -P stat.sample -P /dev/full
 statfs	-a17
 statfs64	-a23
-statx	-a32 -v -P $NAME.sample -P /dev/full
+statx	-a32 -v -P stat.sample -P /dev/full
 swap	-a23 -e trace=swapon,swapoff
 symlink	-a34
 symlinkat
