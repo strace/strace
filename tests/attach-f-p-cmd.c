@@ -34,6 +34,8 @@
 int
 main(void)
 {
+	skip_if_unavailable("/proc/self/task/");
+
 	static const char dir[] = "attach-f-p.test cmd";
 	pid_t pid = getpid();
 	int rc = chdir(dir);

@@ -47,6 +47,8 @@
 int
 main(void)
 {
+	skip_if_unavailable("/proc/self/fd/");
+
 	struct sockaddr_nl addr = {
 		.nl_family = AF_NETLINK,
 		.nl_pid = getpid()

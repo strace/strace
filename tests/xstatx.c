@@ -267,7 +267,9 @@ create_sample(const char *fname, const libc_off_t size)
 int
 main(void)
 {
-# if !IS_FSTAT
+# if IS_FSTAT
+	skip_if_unavailable("/proc/self/fd/");
+# else
 	static const char full[] = "/dev/full";
 # endif
 	static const char sample[] = TEST_SYSCALL_STR ".sample";

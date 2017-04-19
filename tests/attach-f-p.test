@@ -29,9 +29,6 @@
 
 . "${srcdir=.}/init.sh"
 
-# strace -f -p is implemented using /proc/$pid/task/
-[ -d /proc/self/task/ ] ||
-	framework_skip_ '/proc/self/task/ is not available'
 run_prog_skip_if_failed \
 	kill -0 $$
 run_prog ../attach-f-p-cmd > /dev/null

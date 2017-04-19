@@ -43,6 +43,8 @@
 int
 main(void)
 {
+	skip_if_unavailable("/proc/self/fd/");
+
 	struct sockaddr_un addr = {
 		.sun_family = AF_UNIX,
 		.sun_path = TEST_SOCKET
