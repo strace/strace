@@ -278,10 +278,8 @@ main(void)
 	int rc;
 
 	rc = create_sample(sample, SAMPLE_SIZE);
-	if (rc) {
-		(void) unlink(sample);
+	if (rc)
 		return rc;
-	}
 
 # if TEST_BOGUS_STRUCT_STAT
 	STRUCT_STAT *st_cut = tail_alloc(sizeof(long) * 4);
@@ -305,7 +303,6 @@ main(void)
 		if (errno != EOVERFLOW) {
 			rc = (errno == ENOSYS) ? 77 : 1;
 			perror(TEST_SYSCALL_STR);
-			(void) unlink(sample);
 			return rc;
 		}
 	}
@@ -369,7 +366,6 @@ main(void)
 
 # endif /* IS_STATX */
 
-		(void) unlink(sample);
 		return 1;
 	}
 
@@ -436,8 +432,6 @@ main(void)
 	TEST_SYSCALL_STATX_MASK_STR = old_mask_str;
 
 # endif /* IS_STATX */
-
-	(void) unlink(sample);
 
 	puts("+++ exited with 0 +++");
 	return 0;
