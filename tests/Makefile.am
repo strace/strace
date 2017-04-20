@@ -223,7 +223,6 @@ DECODER_TESTS = \
 	sigaction.test \
 	sigaltstack.test \
 	sun_path.test \
-	trace_statfs.test \
 	uio.test \
 	umount.test \
 	umount2.test \
@@ -337,6 +336,7 @@ EXTRA_DIST = \
 	strace.supp \
 	struct_flock.c \
 	sun_path.expected \
+	trace_statfs.in \
 	uio.expected \
 	umode_t.c \
 	umovestr.expected \
