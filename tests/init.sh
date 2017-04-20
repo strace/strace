@@ -262,6 +262,75 @@ grep_pid_status()
 	cat < "/proc/$pid/status" | grep "$@"
 }
 
+# Subtracts one program set from another.
+# If an optional regular expression is specified, the lines in the minuend file
+# that match this regular expression are elso excluded from the output.
+#
+# Usage: prog_set_subtract minuend_file subtrahend_file [subtrahend_regexp]
+prog_set_subtract()
+{
+	local min sub re pat
+	min="$1"; shift
+	sub="$1"; shift
+	re="${1-}"
+	pat="$re|$(sed 's/[[:space:]].*//' < "$sub" | tr -s '\n' '|')"
+	grep -E -v -x -e "$pat" < "$min"
+}
+
+# Usage: test_pure_prog_set [--expfile FILE] COMMON_ARGS < tests_file
+# stdin should consist of lines in "test_name strace_args..." format.
+test_pure_prog_set()
+{
+	local expfile
+
+	expfile="$EXP"
+
+	while [ -n "$1" ]; do
+		case "$1" in
+		--expfile)
+			shift
+			expfile="$1"
+			shift
+			;;
+		*)
+			break
+			;;
+		esac
+	done
+
+	while read -r t prog_args; do {
+		# skip lines beginning with "#" symbol
+		[ "${t###}" = "$t" ] || continue
+
+		try_run_prog "../$t" || continue
+		run_strace $prog_args "$@" "../$t" > "$expfile"
+		match_diff "$LOG" "$expfile"
+	} < /dev/null; done
+}
+
+# Run strace against list of programs put in "$NAME.in" and then against the
+# rest of pure_executables.list with the expectation of empty output in the
+# latter case.
+#
+# Usage: source this file after init.sh and call:
+#   test_trace_expr subtrahend_regexp strace_args
+# Environment:
+#   $NAME:	test name, used for "$NAME.in" file containing list of tests
+#		for positive trace expression match;
+#   $srcdir:	used to find pure_executables.list and "$NAME.in" files.
+# Files created:
+#   negative.list: File containing list of tests for negative match.
+test_trace_expr()
+{
+	local subtrahend_regexp
+	subtrahend_regexp="$1"; shift
+	test_pure_prog_set "$@" < "$srcdir/$NAME.in"
+	prog_set_subtract "$srcdir/pure_executables.list" "$srcdir/$NAME.in" \
+		"$subtrahend_regexp" > negative.list
+	test_pure_prog_set --expfile /dev/null -qq -esignal=none "$@" \
+		< negative.list
+}
+
 check_prog cat
 check_prog rm
 
