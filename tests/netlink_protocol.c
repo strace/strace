@@ -221,18 +221,15 @@ test_nlmsgerr(const int fd)
 	       fd, nlh->nlmsg_len, nlh0 + NLMSG_HDRLEN,
 	       nlh->nlmsg_len, sprintrc(rc));
 
-	nlh = nlh0 - 2;
 	nlh->nlmsg_len = NLMSG_HDRLEN + 2;
-	nlh->nlmsg_type = NLMSG_ERROR;
-	nlh->nlmsg_flags = NLM_F_REQUEST;
-	nlh->nlmsg_seq = 0;
-	nlh->nlmsg_pid = 0;
+	nlh = nlh0 - 2;
+	memmove(nlh, nlh0, sizeof(*nlh));
 	memcpy(NLMSG_DATA(nlh), "42", 2);
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + 2, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
 	       ", seq=0, pid=0}, \"42\"}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + 2, NLMSG_HDRLEN + 2, sprintrc(rc));
 
 	/* error message with room for the error code only */
 	nlh = nlh0 - sizeof(err->error);
