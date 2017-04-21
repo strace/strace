@@ -1,0 +1,7 @@
+sched_xetaffinity	-a28
+sched_xetparam	-a23
+sched_rr_get_interval	-a31
+sched_get_priority_mxx	-a33
+sched_xetattr	-a29
+sched_xetscheduler	-a22
+sched_yield	-a14
