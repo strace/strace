@@ -176,7 +176,6 @@ DECODER_TESTS = \
 	btrfs-w.test \
 	caps-abbrev.test \
 	caps.test \
-	clock.test \
 	eventfd.test \
 	execve-v.test \
 	execve.test \
@@ -291,6 +290,7 @@ VALGRIND_SUPPRESSIONS_FILES = $(srcdir)/strace.supp
 EXTRA_DIST = \
 	caps-abbrev.awk \
 	caps.awk \
+	clock.in \
 	count-f.expected \
 	eventfd.expected \
 	fadvise.h \
