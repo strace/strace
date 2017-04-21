@@ -305,11 +305,11 @@ timer_xettime	-e trace=timer_create,timer_settime,timer_gettime
 timerfd_xettime	-e trace=timerfd_create,timerfd_settime,timerfd_gettime
 times	-esignal=none
 times-fail	-a12 -e trace=times
-trace_fstat	> stat.sample; test_trace_expr '' -e%fstat -v -Pstat.sample -P/dev/full
+trace_fstat	test_trace_expr '' -e%fstat -v -P stat.sample -P /dev/full
 trace_fstatfs	test_trace_expr '' -e%fstatfs
-trace_lstat	> stat.sample; test_trace_expr '' -e%lstat -v -Pstat.sample -P/dev/full
-trace_stat	> stat.sample; test_trace_expr '' -e%stat -v -Pstat.sample -P/dev/full
-trace_stat_like	> stat.sample; test_trace_expr '' -e%%stat -v -Pstat.sample -P/dev/full
+trace_lstat	test_trace_expr '' -e%lstat -v -P stat.sample -P /dev/full
+trace_stat	test_trace_expr '' -e%stat -v -P stat.sample -P /dev/full
+trace_stat_like	test_trace_expr '' -e%%stat -v -P stat.sample -P /dev/full
 trace_statfs	test_trace_expr '' -e%statfs
 trace_statfs_like	test_trace_expr '' -e%%statfs
 truncate
