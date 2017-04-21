@@ -215,7 +215,6 @@ DECODER_TESTS = \
 	prctl-tsc.test \
 	qual_fault-exit_group.test \
 	readv.test \
-	regex.test \
 	sched.test \
 	scm_rights-fd.test \
 	seccomp-strict.test \
@@ -318,6 +317,7 @@ EXTRA_DIST = \
 	qual_inject-error-signal.expected \
 	qual_inject-signal.expected \
 	quotactl.h \
+	regex.in \
 	run.sh \
 	scno_tampering.sh \
 	setfsugid.c \
