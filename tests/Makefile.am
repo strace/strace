@@ -180,7 +180,6 @@ DECODER_TESTS = \
 	execve-v.test \
 	execve.test \
 	fadvise64.test \
-	fstat.test \
 	futex.test \
 	getuid.test \
 	ioctl.test \

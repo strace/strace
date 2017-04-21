@@ -77,7 +77,8 @@ file_ioctl	+ioctl.test
 finit_module	-a25
 flock	-a19
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
-fstat64	+fstat.test
+fstat	-a15 -v -P stat.sample
+fstat64	-a17 -v -P stat.sample
 fstatat64	-a32 -v -P stat.sample -P /dev/full
 fstatfs	-a18
 fstatfs64	-a24
@@ -185,7 +186,7 @@ net-sockaddr	-a24 -e trace=connect
 netlink_protocol	-e trace=%network
 newfstatat	-a32 -v -P stat.sample -P /dev/full
 old_mmap	-a11 -e trace=mmap
-oldfstat	+fstat.test
+oldfstat	-a18 -v -P stat.sample
 oldlstat	-a32 -v -P stat.sample -P /dev/full
 oldstat	-a32 -v -P stat.sample -P /dev/full
 open	-a30 -P $NAME.sample
