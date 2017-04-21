@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Optimized syscall filtering.
+  * Improved representation of timestamps.
   * Enhanced decoding of sched_setattr syscall.
   * Added -e trace=%stat option for tracing variants of stat syscall.
   * Added -e trace=%lstat option for tracing variants of lstat syscall.

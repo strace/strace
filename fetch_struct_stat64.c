@@ -63,8 +63,10 @@ typedef struct stat64 struct_stat64;
 
 #ifdef HAVE_STRUCT_STAT64_ST_MTIME_NSEC
 # define TIME_NSEC(arg) zero_extend_signed_to_ull(arg)
+# define HAVE_NSEC true
 #else
 # define TIME_NSEC(arg) 0
+# define HAVE_NSEC false
 #endif
 
 MPERS_PRINTER_DECL(bool, fetch_struct_stat64,
@@ -92,6 +94,7 @@ MPERS_PRINTER_DECL(bool, fetch_struct_stat64,
 	dst->atime_nsec = TIME_NSEC(buf.st_atime_nsec);
 	dst->ctime_nsec = TIME_NSEC(buf.st_ctime_nsec);
 	dst->mtime_nsec = TIME_NSEC(buf.st_mtime_nsec);
+	dst->has_nsec = HAVE_NSEC;
 	return true;
 #else /* !HAVE_STRUCT_STAT64 */
 	printaddr(addr);

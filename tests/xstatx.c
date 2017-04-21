@@ -171,14 +171,20 @@ print_stat(const STRUCT_STAT *st)
 
 #  if defined(HAVE_STRUCT_STAT_ST_MTIME_NSEC) && !OLD_STAT
 #   define TIME_NSEC(val)	zero_extend_signed_to_ull(val)
+#   define HAVE_NSEC		1
 #  else
-#   define TIME_NSEC(val)	0
+#   define TIME_NSEC(val)	0ULL
+#   define HAVE_NSEC		0
 #  endif
 
-#  define PRINT_ST_TIME(field)						\
-	printf(", st_" #field "=");					\
+#define PRINT_ST_TIME(field)						\
+	printf(", st_" #field "=%lld",					\
+	       sign_extend_unsigned_to_ll(st->st_ ## field));		\
 	print_time_t_nsec(sign_extend_unsigned_to_ll(st->st_ ## field),	\
-			  TIME_NSEC(st->st_ ## field ## _nsec))
+			  TIME_NSEC(st->st_ ## field ## _nsec), 1);	\
+	if (HAVE_NSEC)							\
+		printf(", st_" #field "_nsec=%llu",			\
+		       TIME_NSEC(st->st_ ## field ## _nsec))
 
 	PRINT_ST_TIME(atime);
 	PRINT_ST_TIME(mtime);
@@ -200,10 +206,12 @@ print_stat(const STRUCT_STAT *st)
 	else \
 		printf(", %s=%llu", #field, (unsigned long long) st->field)
 
-#  define PRINT_FIELD_TIME(field)				\
-	printf(", %s=", #field);				\
-	print_time_t_nsec(st->field.tv_sec,			\
-			  zero_extend_signed_to_ull(st->field.tv_nsec))
+#  define PRINT_FIELD_TIME(field)					\
+	printf(", %s={tv_sec=%lld, tv_nsec=%u}",			\
+	       #field, (long long) st->field.tv_sec,			\
+	       (unsigned) st->field.tv_nsec);				\
+	print_time_t_nsec(st->field.tv_sec,				\
+			  zero_extend_signed_to_ull(st->field.tv_nsec), 1);
 
 	printf("{stx_mask=");
 	printflags(statx_masks, st->stx_mask, "STATX_???");

@@ -45,6 +45,7 @@ struct strace_stat {
 	unsigned long long	atime_nsec;
 	unsigned long long	ctime_nsec;
 	unsigned long long	mtime_nsec;
+	bool			has_nsec;
 };
 
 #endif /* !STRACE_STAT_H */

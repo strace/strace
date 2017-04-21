@@ -541,21 +541,62 @@ printnum_addr_klong_int(struct tcb *tcp, const kernel_ulong_t addr)
 }
 #endif /* !current_klongsize */
 
-const char *
-sprinttime(time_t t)
+/**
+ * Prints time to a (static internal) buffer and returns pointer to it.
+ *
+ * @param sec		Seconds since epoch.
+ * @param part_sec	Amount of second parts since the start of a second.
+ * @param max_part_sec	Maximum value of a valid part_sec.
+ * @param width		1 + floor(log10(max_part_sec)).
+ */
+static const char *
+sprinttime_ex(const long long sec, const unsigned long long part_sec,
+	      const unsigned int max_part_sec, const int width)
 {
-	struct tm *tmp;
-	static char buf[sizeof(int) * 3 * 6 + sizeof("+0000")];
+	static char buf[sizeof(int) * 3 * 6 + sizeof(part_sec) * 3
+			+ sizeof("+0000")];
 
-	if (t == 0)
-		return "0";
-	tmp = localtime(&t);
-	if (tmp)
-		strftime(buf, sizeof(buf), "%FT%T%z", tmp);
-	else
-		snprintf(buf, sizeof(buf), "%lu", (unsigned long) t);
+	if ((sec == 0 && part_sec == 0) || part_sec > max_part_sec)
+		return NULL;
 
-	return buf;
+	time_t t = (time_t) sec;
+	struct tm *tmp = (sec == t) ? localtime(&t) : NULL;
+	if (!tmp)
+		return NULL;
+
+	size_t pos = strftime(buf, sizeof(buf), "%FT%T", tmp);
+	if (!pos)
+		return NULL;
+
+	if (part_sec > 0) {
+		int ret = snprintf(buf + pos, sizeof(buf) - pos, ".%0*llu",
+				   width, part_sec);
+
+		if (ret < 0 || (size_t) ret >= sizeof(buf) - pos)
+			return NULL;
+
+		pos += ret;
+	}
+
+	return strftime(buf + pos, sizeof(buf) - pos, "%z", tmp) ? buf : NULL;
+}
+
+const char *
+sprinttime(long long sec)
+{
+	return sprinttime_ex(sec, 0, 0, 0);
+}
+
+const char *
+sprinttime_usec(long long sec, unsigned long long usec)
+{
+	return sprinttime_ex(sec, usec, 999999, 6);
+}
+
+const char *
+sprinttime_nsec(long long sec, unsigned long long nsec)
+{
+	return sprinttime_ex(sec, nsec, 999999999, 9);
 }
 
 enum sock_proto

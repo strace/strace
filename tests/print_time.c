@@ -31,24 +31,39 @@
 #include <stdio.h>
 #include <time.h>
 
-void
-print_time_t_nsec(const time_t t, const unsigned long long nsec)
+static void
+print_time_t_ex(const time_t t, const unsigned long long part_sec,
+		const unsigned int max_part_sec, const int width,
+		const int comment)
 {
-	if (t) {
-		const struct tm *const p = localtime(&t);
-		char buf[256];
 
-		if (!p) {
-			perror_msg_and_fail("localtime");
-		}
+	if ((!t && !part_sec) || part_sec > max_part_sec)
+		return;
 
-		strftime(buf, sizeof(buf), "%FT%T%z", p);
+	const struct tm *const p = localtime(&t);
+	char buf[256];
+	if (!p || !strftime(buf, sizeof(buf), "%FT%T", p))
+		return;
+
+	if (comment)
+		fputs(" /* ", stdout);
+
+	fputs(buf, stdout);
+
+	if (part_sec)
+		printf(".%0*llu", width, part_sec);
+
+	if (strftime(buf, sizeof(buf), "%z", p))
 		fputs(buf, stdout);
-	} else {
-		putchar('0');
-	}
 
-	if (nsec) {
-		printf(".%09llu", nsec);
-	}
+	if (comment)
+		fputs(" */", stdout);
+
+	return;
+}
+
+void
+print_time_t_nsec(const time_t t, const unsigned long long nsec, int comment)
+{
+	print_time_t_ex(t, nsec, 999999999, 9, comment);
 }

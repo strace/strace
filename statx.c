@@ -59,10 +59,11 @@ SYS_FUNC(statx)
 
 #define PRINT_FIELD_TIME(field)						\
 	do {								\
-		tprints(", " #field "=");				\
-		tprints(sprinttime(stx.field.sec));			\
-		if (stx.field.nsec)					\
-			tprintf(".%09" PRId32, stx.field.nsec);		\
+		tprintf(", " #field "={tv_sec=%" PRId64			\
+			", tv_nsec=%" PRIu32 "}",			\
+			stx.field.sec, stx.field.nsec);			\
+		tprints_comment(sprinttime_nsec(stx.field.sec,		\
+			zero_extend_signed_to_ull(stx.field.nsec)));	\
 	} while (0)
 
 		struct_statx stx;

@@ -68,10 +68,10 @@ main(void)
 
 	rc = k_utime("utime\nfilename", tail_u);
 	const char *errstr = sprintrc(rc);
-	printf("utime(\"utime\\nfilename\", {actime=");
-	print_time_t_nsec(t, 0);
-	printf(", modtime=");
-	print_time_t_nsec(t, 0);
+	printf("utime(\"utime\\nfilename\", {actime=%lld", (long long) t);
+	print_time_t_nsec(t, 0, 1);
+	printf(", modtime=%lld", (long long) t);
+	print_time_t_nsec(t, 0, 1);
 	printf("}) = %s\n", errstr);
 
 	puts("+++ exited with 0 +++");
