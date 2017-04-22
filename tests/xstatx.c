@@ -202,7 +202,8 @@ print_stat(const STRUCT_STAT *st)
 
 #  define PRINT_FIELD_TIME(field)				\
 	printf(", %s=", #field);				\
-	print_time_t_nsec(st->field.tv_sec, st->field.tv_nsec)
+	print_time_t_nsec(st->field.tv_sec,			\
+			  zero_extend_signed_to_ull(st->field.tv_nsec))
 
 	printf("{stx_mask=");
 	printflags(statx_masks, st->stx_mask, "STATX_???");
