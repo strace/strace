@@ -55,8 +55,6 @@
 # include "xlat/futexwakeops.h"
 # include "xlat/futexwakecmps.h"
 
-static struct timespec *tmout;
-
 void futex_error(int *uaddr, int op, unsigned long val, unsigned long timeout,
 	int *uaddr2, unsigned long val3, int rc)
 {
@@ -172,7 +170,7 @@ main(int argc, char *argv[])
 	uaddr[0] = 0x1deadead;
 	uaddr2[0] = 0xbadf00d;
 
-	tmout = tail_alloc(sizeof(*tmout));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, tmout);
 	tmout->tv_sec = 123;
 	tmout->tv_nsec = 0xbadc0de;
 
@@ -205,6 +203,28 @@ main(int argc, char *argv[])
 		(rc == -1) && (errno == EFAULT));
 	printf("futex(%p, FUTEX_WAIT, %u, %p) = %s\n",
 	       uaddr, 0xfacefeed, tmout + 1, sprintrc(rc));
+
+	/* timeout is invalid */
+	tmout->tv_sec = 0xdeadbeefU;
+	tmout->tv_nsec = 0xfacefeedU;
+
+	CHECK_FUTEX(uaddr, FUTEX_WAIT, VAL, tmout, uaddr2, VAL3,
+		(rc == -1) && (errno == EINVAL));
+	printf("futex(%p, FUTEX_WAIT, %u, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	       uaddr, VAL_PR, (long long) tmout->tv_sec,
+	       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
+
+	tmout->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tmout->tv_nsec = (long) 0xbadc0dedfacefeedLL;
+
+	CHECK_FUTEX(uaddr, FUTEX_WAIT, VAL, tmout, uaddr2, VAL3,
+		(rc == -1) && (errno == EINVAL));
+	printf("futex(%p, FUTEX_WAIT, %u, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	       uaddr, VAL_PR, (long long) tmout->tv_sec,
+	       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
+
+	tmout->tv_sec = 123;
+	tmout->tv_nsec = 0xbadc0de;
 
 	/* uaddr is not as provided; uaddr2 is faulty but ignored */
 	CHECK_FUTEX(uaddr, FUTEX_WAIT, VAL, tmout, uaddr2 + 1, VAL3,

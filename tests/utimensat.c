@@ -141,6 +141,30 @@ main(void)
 	print_ts(&ts[1]);
 	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
 
+	ts[0].tv_sec = 0;
+	ts[0].tv_nsec = 0;
+	ts[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts[1].tv_nsec = 0;
+
+	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
+	printf("utimensat(AT_FDCWD, %s, [", qname);
+	print_ts(&ts[0]);
+	printf(", ");
+	print_ts(&ts[1]);
+	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
+
+	ts[0].tv_sec = 0xdeadbeefU;
+	ts[0].tv_nsec = 0xfacefeedU;
+	ts[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts[1].tv_nsec = (long) 0xbadc0dedfacefeedLL;
+
+	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
+	printf("utimensat(AT_FDCWD, %s, [", qname);
+	print_ts(&ts[0]);
+	printf(", ");
+	print_ts(&ts[1]);
+	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
+
 	ts[0].tv_nsec = UTIME_NOW;
 	ts[1].tv_nsec = UTIME_OMIT;
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);

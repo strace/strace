@@ -205,8 +205,7 @@ main(void)
 	const unsigned long lnr = (unsigned long) (0xdeadbeef00000000ULL | nr);
 
 	const struct io_event *ev = tail_alloc(nr * sizeof(struct io_event));
-	const struct timespec proto_ts = { .tv_nsec = 123456789 };
-	const struct timespec *ts = tail_memdup(&proto_ts, sizeof(proto_ts));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, ts);
 
 	(void) close(0);
 	if (open("/dev/zero", O_RDONLY))
@@ -263,6 +262,24 @@ main(void)
 	       bogus_ctx, (long) 0xca7faceddeadf00dLL,
 	       (long) 0xba5e1e505ca571e0LL, ts + 1, sprintrc(rc));
 
+	ts->tv_sec = 0xdeadbeefU;
+	ts->tv_nsec = 0xfacefeedU;
+	rc = syscall(__NR_io_getevents, bogus_ctx, 0, 0, 0, ts);
+	printf("io_getevents(%#lx, 0, 0, NULL"
+	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	       bogus_ctx, (long long) ts->tv_sec,
+	       zero_extend_signed_to_ull(ts->tv_nsec), sprintrc(rc));
+
+	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_nsec = (long) 0xbadc0dedfacefeedLL;
+	rc = syscall(__NR_io_getevents, bogus_ctx, 0, 0, 0, ts);
+	printf("io_getevents(%#lx, 0, 0, NULL"
+	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	       bogus_ctx, (long long) ts->tv_sec,
+	       zero_extend_signed_to_ull(ts->tv_nsec), sprintrc(rc));
+
+	ts->tv_sec = 0;
+	ts->tv_nsec = 123456789;
 	rc = syscall(__NR_io_getevents, *ctx, nr, nr + 1, ev, ts);
 	printf("io_getevents(%#lx, %ld, %ld, ["
 	       "{data=%#" PRI__x64 ", obj=%p, res=%u, res2=0}, "

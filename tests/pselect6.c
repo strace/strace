@@ -129,9 +129,28 @@ int main(int ac, char **av)
 	/*
 	 * See how timeouts are decoded.
 	 */
+	tm.ts.tv_sec = 0xdeadbeefU;
+	tm.ts.tv_nsec = 0xfacefeedU;
+	assert(pselect(0, NULL, NULL, NULL, &tm.ts, NULL) == -1);
+	printf("pselect6(0, NULL, NULL, NULL"
+	       ", {tv_sec=%lld, tv_nsec=%llu}, {NULL, %u}) = %s\n",
+	       (long long) tm.ts.tv_sec,
+	       zero_extend_signed_to_ull(tm.ts.tv_nsec),
+	       NSIG_BYTES, sprintrc(-1));
+
+	tm.ts.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tm.ts.tv_nsec = (long) 0xbadc0dedfacefeedLL;
+	assert(pselect(0, NULL, NULL, NULL, &tm.ts, NULL) == -1);
+	printf("pselect6(0, NULL, NULL, NULL"
+	       ", {tv_sec=%lld, tv_nsec=%llu}, {NULL, %u}) = %s\n",
+	       (long long) tm.ts.tv_sec,
+	       zero_extend_signed_to_ull(tm.ts.tv_nsec),
+	       NSIG_BYTES, sprintrc(-1));
+
 	assert(sigaction(SIGALRM, &act, NULL) == 0);
 	assert(setitimer(ITIMER_REAL, &itv, NULL) == 0);
 
+	tm.ts.tv_sec = 0;
 	tm.ts.tv_nsec = 222222222;
 	assert(pselect(0, NULL, NULL, NULL, &tm.ts, &mask) == -1);
 	printf("pselect6(0, NULL, NULL, NULL, {tv_sec=0, tv_nsec=222222222}"

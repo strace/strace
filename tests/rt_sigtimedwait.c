@@ -114,6 +114,25 @@ main(void)
 		(long long) timeout->tv_sec,
 		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
+	timeout->tv_sec = 0xdeadbeefU;
+	timeout->tv_nsec = 0xfacefeedU;
+	assert(k_sigtimedwait(k_set, NULL, timeout, set_size) == -1);
+	tprintf("rt_sigtimedwait([], NULL, {tv_sec=%lld, tv_nsec=%llu}"
+		", %u) = -1 EINVAL (%m)\n",
+		(long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
+
+	timeout->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	timeout->tv_nsec = (long) 0xbadc0dedfacefeedLL;
+	assert(k_sigtimedwait(k_set, NULL, timeout, set_size) == -1);
+	tprintf("rt_sigtimedwait([], NULL, {tv_sec=%lld, tv_nsec=%llu}"
+		", %u) = -1 EINVAL (%m)\n",
+		(long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
+
+	timeout->tv_sec = 0;
+	timeout->tv_nsec = 42;
+
 	TAIL_ALLOC_OBJECT_CONST_PTR(sigset_t, libc_set);
 	sigemptyset(libc_set);
 	sigaddset(libc_set, SIGHUP);

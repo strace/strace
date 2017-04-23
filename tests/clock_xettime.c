@@ -62,9 +62,23 @@ main(void)
 
 	t.ts.tv_sec = 0xdeface1;
 	t.ts.tv_nsec = 0xdeface2;
-	if (!syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts))
-		error_msg_and_skip("clock_settime CLOCK_THREAD_CPUTIME_ID:"
-				   " EINVAL expected");
+	syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts);
+	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID"
+	       ", {tv_sec=%lld, tv_nsec=%llu}) = -1 EINVAL (%m)\n",
+	       (long long) t.ts.tv_sec,
+	       zero_extend_signed_to_ull(t.ts.tv_nsec));
+
+	t.ts.tv_sec = 0xdeadbeefU;
+	t.ts.tv_nsec = 0xfacefeedU;
+	syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts);
+	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID"
+	       ", {tv_sec=%lld, tv_nsec=%llu}) = -1 EINVAL (%m)\n",
+	       (long long) t.ts.tv_sec,
+	       zero_extend_signed_to_ull(t.ts.tv_nsec));
+
+	t.ts.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	t.ts.tv_nsec = (long) 0xbadc0dedfacefeedLL;
+	syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts);
 	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID"
 	       ", {tv_sec=%lld, tv_nsec=%llu}) = -1 EINVAL (%m)\n",
 	       (long long) t.ts.tv_sec,

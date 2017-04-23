@@ -85,6 +85,20 @@ main(void)
 	printf("ppoll(%p, %u, %p, %p, %u) = %s\n",
 	       efault, 42, efault + 8, efault + 16, sigset_size, errstr);
 
+	ts->tv_sec = 0xdeadbeefU;
+	ts->tv_nsec = 0xfacefeedU;
+	sys_ppoll(0, 0, (unsigned long) ts, 0, sigset_size);
+	printf("ppoll(NULL, 0, {tv_sec=%lld, tv_nsec=%llu}, NULL, %u) = %s\n",
+	       (long long) ts->tv_sec, zero_extend_signed_to_ull(ts->tv_nsec),
+	       sigset_size, errstr);
+
+	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_nsec = (long) 0xbadc0dedfacefeedL;
+	sys_ppoll(0, 0, (unsigned long) ts, 0, sigset_size);
+	printf("ppoll(NULL, 0, {tv_sec=%lld, tv_nsec=%llu}, NULL, %u) = %s\n",
+	       (long long) ts->tv_sec, zero_extend_signed_to_ull(ts->tv_nsec),
+	       sigset_size, errstr);
+
 	if (pipe(pipe_fd) || pipe(pipe_fd + 2))
 		perror_msg_and_fail("pipe");
 

@@ -89,13 +89,32 @@ main(void)
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
 
+	req.ts.tv_sec = 0xdeadbeefU;
+	req.ts.tv_nsec = 0xfacefeedU;
+	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
+		       &req.ts, &rem.ts) == -1);
+	printf("clock_nanosleep(CLOCK_REALTIME, 0"
+	       ", {tv_sec=%lld, tv_nsec=%llu}, %p) = -1 EINVAL (%m)\n",
+	       (long long) req.ts.tv_sec,
+	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
+
+	req.ts.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	req.ts.tv_nsec = (long) 0xbadc0dedfacefeedLL;
+	assert(syscall(__NR_clock_nanosleep, CLOCK_MONOTONIC, 0,
+		       &req.ts, &rem.ts) == -1);
+	printf("clock_nanosleep(CLOCK_MONOTONIC, 0"
+	       ", {tv_sec=%lld, tv_nsec=%llu}, %p) = -1 EINVAL (%m)\n",
+	       (long long) req.ts.tv_sec,
+	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
+
 	assert(sigaction(SIGALRM, &act, NULL) == 0);
 	assert(sigprocmask(SIG_SETMASK, &set, NULL) == 0);
 
 	if (setitimer(ITIMER_REAL, &itv, NULL))
 		perror_msg_and_skip("setitimer");
 
-	--req.ts.tv_nsec;
+	req.ts.tv_sec = 0;
+	req.ts.tv_nsec = 999999999;
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
 		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, 0"

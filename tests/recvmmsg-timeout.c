@@ -50,13 +50,15 @@ main(void)
 			.msg_iovlen = 1
 		}
 	};
-	struct timespec t = { .tv_sec = 0, .tv_nsec = 12345678 };
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, ts);
+	ts->tv_sec = 0;
+	ts->tv_nsec = 12345678;
 
-	int rc = recv_mmsg(-1, &mh, 1, 0, &t);
+	int rc = recv_mmsg(-1, &mh, 1, 0, ts);
 	printf("recvmmsg(-1, %p, 1, 0, {tv_sec=0, tv_nsec=12345678})"
-	       " = %d %s (%m)\n", &mh, rc, errno2name());
+	       " = %s\n", &mh, sprintrc(rc));
 
-	rc = recv_mmsg(fds[0], &mh, 1, 0, &t);
+	rc = recv_mmsg(fds[0], &mh, 1, 0, ts);
 	if (rc < 0)
 		perror_msg_and_skip("recvmmsg");
 	printf("recvmmsg(%d, [{msg_hdr={msg_name=NULL, msg_namelen=0"
@@ -64,7 +66,23 @@ main(void)
 	       ", msg_controllen=0, msg_flags=0}, msg_len=1}], 1, 0"
 	       ", {tv_sec=0, tv_nsec=12345678}) = "
 	       "%d (left {tv_sec=0, tv_nsec=%d})\n",
-	       fds[0], rc, (int) t.tv_nsec);
+	       fds[0], rc, (int) ts->tv_nsec);
+
+	ts->tv_sec = 0xdeadbeefU;
+	ts->tv_nsec = 0xfacefeedU;
+
+	rc = recv_mmsg(fds[0], &mh, 1, 0, ts);
+	printf("recvmmsg(%d, %p, 1, 0, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	       fds[0], &mh, (long long) ts->tv_sec,
+	       zero_extend_signed_to_ull(ts->tv_nsec), sprintrc(rc));
+
+	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_nsec = (long) 0xbadc0dedfacefeedLL;
+
+	rc = recv_mmsg(fds[0], &mh, 1, 0, ts);
+	printf("recvmmsg(%d, %p, 1, 0, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	       fds[0], &mh, (long long) ts->tv_sec,
+	       zero_extend_signed_to_ull(ts->tv_nsec), sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
