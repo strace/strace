@@ -47,6 +47,9 @@ main(void)
 		perror_msg_and_skip("time");
 	printf("time(NULL) = %jd\n", (intmax_t) t);
 
+	t = syscall(__NR_time, p + 1);
+	printf("time(%p) = %s\n", p + 1, sprintrc(t));
+
 	t = syscall(__NR_time, p);
 	printf("time([%jd]) = %jd\n", (intmax_t) *p, (intmax_t) t);
 
