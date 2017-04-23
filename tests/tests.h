@@ -125,6 +125,9 @@ void print_quoted_memory(const char *, size_t);
 /* Print time_t and nanoseconds in symbolic format. */
 void print_time_t_nsec(time_t, unsigned long long, int);
 
+/* Print time_t and microseconds in symbolic format. */
+void print_time_t_usec(time_t, unsigned long long, int);
+
 /* Read an int from the file. */
 int read_int_from_file(const char *, int *);
 

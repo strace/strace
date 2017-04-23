@@ -67,3 +67,9 @@ print_time_t_nsec(const time_t t, const unsigned long long nsec, int comment)
 {
 	print_time_t_ex(t, nsec, 999999999, 9, comment);
 }
+
+void
+print_time_t_usec(const time_t t, const unsigned long long usec, int comment)
+{
+	print_time_t_ex(t, usec, 999999, 6, comment);
+}
