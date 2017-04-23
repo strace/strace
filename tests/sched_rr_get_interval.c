@@ -25,8 +25,10 @@ main(void)
 
 	rc = syscall(__NR_sched_rr_get_interval, 0, tp);
 	if (rc == 0)
-		printf("sched_rr_get_interval(0, {tv_sec=%jd, tv_nsec=%jd}) = "
-		       "0\n", (intmax_t)tp->tv_sec, (intmax_t)tp->tv_nsec);
+		printf("sched_rr_get_interval(0, {tv_sec=%lld, tv_nsec=%llu})"
+		       " = 0\n",
+		       (long long) tp->tv_sec,
+		       zero_extend_signed_to_ull(tp->tv_nsec));
 	else
 		printf("sched_rr_get_interval(-1, %p) = %s\n", tp,
 			sprintrc(rc));

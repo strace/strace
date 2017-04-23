@@ -144,9 +144,9 @@ do_send(int fd, char *msg, unsigned int msg_size, struct timespec *tmout,
 		if (cropped)
 			printf("...");
 		errno = saved_errno;
-		printf(", %u, 42, {tv_sec=%jd, tv_nsec=%jd}) = %s\n", msg_size,
-		       (intmax_t) tmout->tv_sec, (intmax_t) tmout->tv_nsec,
-		       sprintrc(rc));
+		printf(", %u, 42, {tv_sec=%lld, tv_nsec=%llu}) = %s\n", msg_size,
+		       (long long) tmout->tv_sec,
+		       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
 		errno = saved_errno;
 
 		if (rc == -1) {
@@ -182,9 +182,9 @@ do_recv(int fd, char *msg, unsigned int msg_size, struct timespec *tmout,
 			printf("%p", msg);
 		}
 		errno = saved_errno;
-		printf(", %u, [42], {tv_sec=%jd, tv_nsec=%jd}) = %s\n", MSG_SIZE,
-		       (intmax_t) tmout->tv_sec,
-		       (intmax_t) tmout->tv_nsec, sprintrc(rc));
+		printf(", %u, [42], {tv_sec=%lld, tv_nsec=%llu}) = %s\n", MSG_SIZE,
+		       (long long) tmout->tv_sec,
+		       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
 		errno = saved_errno;
 
 		if (rc == -1) {
@@ -275,8 +275,8 @@ main(void)
 	/* Valid attributes structure */
 	rc = syscall(__NR_mq_open, msg, O_CREAT | bogus_oflags, bogus_mode,
 		     bogus_attrs);
-	printf("mq_open(%p, O_ACCMODE|O_CREAT, %#o, {mq_flags=%#llx, "
-	       "mq_maxmsg=%lld, mq_msgsize=%lld, mq_curmsgs=%lld}) = %s\n",
+	printf("mq_open(%p, O_ACCMODE|O_CREAT, %#o, {mq_flags=%#llx"
+	       ", mq_maxmsg=%lld, mq_msgsize=%lld, mq_curmsgs=%lld}) = %s\n",
 	       msg, (unsigned short) bogus_mode,
 	       (unsigned long long) (kernel_ulong_t) bogus_attrs[0],
 	       (long long) bogus_attrs[1],
@@ -301,12 +301,12 @@ main(void)
 	/* Partially invalid message (memory only partially available) */
 	rc = syscall(__NR_mq_timedsend, bogus_fd, msg + MSG_SIZE - MSG_CUT,
 		     MSG_SIZE, bogus_prio, bogus_tmout);
-	printf("mq_timedsend(%d, %p, %llu, %u, {tv_sec=%jd, tv_nsec=%jd}) = "
-	       "%s\n",
+	printf("mq_timedsend(%d, %p, %llu, %u, {tv_sec=%lld, tv_nsec=%llu})"
+	       " = %s\n",
 	       (int) bogus_fd, msg + MSG_SIZE - MSG_CUT,
 	       (unsigned long long) MSG_SIZE, (unsigned) bogus_prio,
-	       (intmax_t) bogus_tmout->tv_sec, (intmax_t) bogus_tmout->tv_nsec,
-	       sprintrc(rc));
+	       (long long) bogus_tmout->tv_sec,
+	       zero_extend_signed_to_ull(bogus_tmout->tv_nsec), sprintrc(rc));
 
 	/* Fully valid message, uncut */
 	rc = syscall(__NR_mq_timedsend, bogus_fd, msg + MSG_SIZE - MSG_CUT,
@@ -314,10 +314,10 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("mq_timedsend(%d, ", (int) bogus_fd);
 	printstr(MSG_START + MSG_SIZE - MSG_CUT, MSG_CUT);
-	printf(", %llu, %u, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
+	printf(", %llu, %u, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
 	       (unsigned long long) MSG_CUT, (unsigned) bogus_prio,
-	       (intmax_t) bogus_tmout->tv_sec, (intmax_t) bogus_tmout->tv_nsec,
-	       errstr);
+	       (long long) bogus_tmout->tv_sec,
+	       zero_extend_signed_to_ull(bogus_tmout->tv_nsec), errstr);
 
 	/* Partially invalid message, cut at maxstrlen */
 	rc = syscall(__NR_mq_timedsend, bogus_fd, msg + MSG_CUT, MSG_SIZE,
@@ -325,10 +325,10 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("mq_timedsend(%d, ", (int) bogus_fd);
 	printstr(MSG_START + MSG_CUT, MSG_MAX_UNCUT);
-	printf("..., %llu, %u, {tv_sec=%jd, tv_nsec=%jd}) = %s\n",
+	printf("..., %llu, %u, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
 	       (unsigned long long) MSG_SIZE, (unsigned) bogus_prio,
-	       (intmax_t) bogus_tmout->tv_sec, (intmax_t) bogus_tmout->tv_nsec,
-	       errstr);
+	       (long long) bogus_tmout->tv_sec,
+	       zero_extend_signed_to_ull(bogus_tmout->tv_nsec), errstr);
 
 
 	/* mq_timedreceive */
@@ -348,11 +348,11 @@ main(void)
 	/* Invalid fd, valid msg pointer */
 	rc = syscall(__NR_mq_timedreceive, bogus_fd, msg, bogus_size,
 		     bogus_prio_ptr, bogus_tmout);
-	printf("mq_timedreceive(%d, %p, %llu, %p, {tv_sec=%jd, tv_nsec=%jd}) = "
-	       "%s\n",
+	printf("mq_timedreceive(%d, %p, %llu, %p, {tv_sec=%lld, tv_nsec=%llu}) "
+	       "= %s\n",
 	       (int) bogus_fd, msg, (unsigned long long) bogus_size,
-	       bogus_prio_ptr, (intmax_t) bogus_tmout->tv_sec,
-	       (intmax_t) bogus_tmout->tv_nsec, sprintrc(rc));
+	       bogus_prio_ptr, (long long) bogus_tmout->tv_sec,
+	       zero_extend_signed_to_ull(bogus_tmout->tv_nsec), sprintrc(rc));
 
 
 	/* mq_notify */
@@ -378,8 +378,8 @@ main(void)
 	/* SIGEV_NONE */
 	bogus_sev->sigev_notify = SIGEV_NONE;
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
-	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}, "
-	       "sigev_signo=%u, sigev_notify=SIGEV_NONE}) = %s\n",
+	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}"
+	       ", sigev_signo=%u, sigev_notify=SIGEV_NONE}) = %s\n",
 	       (int) bogus_fd, bogus_sev->sigev_value.sival_int,
 	       bogus_sev->sigev_value.sival_ptr,
 	       bogus_sev->sigev_signo, sprintrc(rc));
@@ -388,8 +388,8 @@ main(void)
 	bogus_sev->sigev_notify = SIGEV_SIGNAL;
 	bogus_sev->sigev_signo = SIGALRM;
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
-	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}, "
-	       "sigev_signo=SIGALRM, sigev_notify=SIGEV_SIGNAL}) = %s\n",
+	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}"
+	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_SIGNAL}) = %s\n",
 	       (int) bogus_fd, bogus_sev->sigev_value.sival_int,
 	       bogus_sev->sigev_value.sival_ptr, sprintrc(rc));
 
@@ -400,10 +400,10 @@ main(void)
 	bogus_sev->sigev_un.sigev_thread.attribute =
 		(unsigned long) 0xcafef00dfacefeedULL;
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
-	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}, "
-	       "sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD, "
-	       "sigev_notify_function=%#lx, sigev_notify_attributes=%#lx}) = "
-	       "%s\n",
+	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}"
+	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD"
+	       ", sigev_notify_function=%#lx, sigev_notify_attributes=%#lx})"
+	       " = %s\n",
 	       (int) bogus_fd, bogus_sev->sigev_value.sival_int,
 	       bogus_sev->sigev_value.sival_ptr,
 	       bogus_sev->sigev_un.sigev_thread.function,
@@ -449,8 +449,8 @@ main(void)
 	fill_memory_ex(bogus_attrs, sizeof(*bogus_attrs) * NUM_ATTRS,
 		       0xbb, 0x70);
 	printf("mq_open(\"%s\", O_RDWR|O_CREAT|O_NONBLOCK, 0700"
-	       ", {mq_flags=%#llx, mq_maxmsg=2, mq_msgsize=%u, "
-	       "mq_curmsgs=%lld}) = %s\n",
+	       ", {mq_flags=%#llx, mq_maxmsg=2, mq_msgsize=%u"
+	       ", mq_curmsgs=%lld}) = %s\n",
 	       mq_name, (unsigned long long) (kernel_ulong_t) bogus_attrs[0],
 	       MSG_SIZE, (long long) bogus_attrs[3], errstr);
 

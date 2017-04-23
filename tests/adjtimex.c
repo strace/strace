@@ -61,9 +61,9 @@ main(void)
 	else
 		putchar('0');
 	printf(", constant=%jd, precision=%jd"
-	       ", tolerance=%jd, time={tv_sec=%jd, tv_usec=%jd}, tick=%jd, "
-	       "ppsfreq=%jd, jitter=%jd, shift=%d, stabil=%jd, jitcnt=%jd, "
-	       "calcnt=%jd, errcnt=%jd, stbcnt=%jd"
+	       ", tolerance=%jd, time={tv_sec=%lld, tv_usec=%llu}, tick=%jd"
+	       ", ppsfreq=%jd, jitter=%jd, shift=%d, stabil=%jd, jitcnt=%jd"
+	       ", calcnt=%jd, errcnt=%jd, stbcnt=%jd"
 #ifdef HAVE_STRUCT_TIMEX_TAI
 	       ", tai=%d"
 #endif
@@ -71,8 +71,8 @@ main(void)
 	       (intmax_t) tx->constant,
 	       (intmax_t) tx->precision,
 	       (intmax_t) tx->tolerance,
-	       (intmax_t) tx->time.tv_sec,
-	       (intmax_t) tx->time.tv_usec,
+	       (long long) tx->time.tv_sec,
+	       zero_extend_signed_to_ull(tx->time.tv_usec),
 	       (intmax_t) tx->tick,
 	       (intmax_t) tx->ppsfreq,
 	       (intmax_t) tx->jitter,

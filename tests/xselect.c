@@ -72,12 +72,14 @@ int main(void)
 	FD_SET(fds[0], set);
 	FD_SET(fds[1], set);
 	assert(syscall(TEST_SYSCALL_NR, fds[1] + 1, NULL, set, NULL, &tm.tv) == 3);
-	printf("%s(%d, NULL, [1 2 %d %d], NULL, {tv_sec=%lld, tv_usec=%lld})"
-	       " = 3 (out [1 2 %d], left {tv_sec=%lld, tv_usec=%lld})\n",
+	printf("%s(%d, NULL, [1 2 %d %d], NULL, {tv_sec=%lld, tv_usec=%llu})"
+	       " = 3 (out [1 2 %d], left {tv_sec=%lld, tv_usec=%llu})\n",
 	       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
-	       (long long) tm_in.tv.tv_sec, (long long) tm_in.tv.tv_usec,
+	       (long long) tm_in.tv.tv_sec,
+	       zero_extend_signed_to_ull(tm_in.tv.tv_usec),
 	       fds[1],
-	       (long long) tm.tv.tv_sec, (long long) tm.tv.tv_usec);
+	       (long long) tm.tv.tv_sec,
+	       zero_extend_signed_to_ull(tm.tv.tv_usec));
 
 	/*
 	 * Now the crash case that trinity found, negative nfds

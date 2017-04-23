@@ -48,23 +48,26 @@ main(void)
 
 	if (syscall(__NR_gettimeofday, &t.tv, NULL))
 		perror_msg_and_skip("gettimeofday");
-	printf("gettimeofday({tv_sec=%jd, tv_usec=%jd}, NULL) = 0\n",
-	       (intmax_t) t.tv.tv_sec, (intmax_t) t.tv.tv_usec);
+	printf("gettimeofday({tv_sec=%lld, tv_usec=%llu}, NULL) = 0\n",
+	       (long long) t.tv.tv_sec,
+	       zero_extend_signed_to_ull(t.tv.tv_usec));
 
 	if (syscall(__NR_gettimeofday, &t.tv, &t.tz))
 		perror_msg_and_skip("gettimeofday");
-	printf("gettimeofday({tv_sec=%jd, tv_usec=%jd}"
+	printf("gettimeofday({tv_sec=%lld, tv_usec=%llu}"
 	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = 0\n",
-	       (intmax_t) t.tv.tv_sec, (intmax_t) t.tv.tv_usec,
+	       (long long) t.tv.tv_sec,
+	       zero_extend_signed_to_ull(t.tv.tv_usec),
 	       t.tz.tz_minuteswest, t.tz.tz_dsttime);
 
 	t.tv.tv_sec = -1;
 	t.tv.tv_usec = 1000000000;
 	assert(syscall(__NR_settimeofday, &t.tv, &t.tz) == -1);
-	printf("settimeofday({tv_sec=%jd, tv_usec=%jd}"
+	printf("settimeofday({tv_sec=%lld, tv_usec=%llu}"
 	       ", {tz_minuteswest=%d, tz_dsttime=%d})"
 	       " = -1 EINVAL (%m)\n",
-	       (intmax_t) t.tv.tv_sec, (intmax_t) t.tv.tv_usec,
+	       (long long) t.tv.tv_sec,
+	       zero_extend_signed_to_ull(t.tv.tv_usec),
 	       t.tz.tz_minuteswest, t.tz.tz_dsttime);
 
 	puts("+++ exited with 0 +++");

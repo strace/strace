@@ -67,29 +67,29 @@ main(void)
 	if (syscall(__NR_timerfd_settime, 0, 0, &new.its, &old.its))
 		perror_msg_and_skip("timerfd_settime");
 	printf("timerfd_settime(0, 0"
-	       ", {it_interval={tv_sec=%jd, tv_nsec=%jd}"
-	       ", it_value={tv_sec=%jd, tv_nsec=%jd}}"
-	       ", {it_interval={tv_sec=%jd, tv_nsec=%jd}"
-	       ", it_value={tv_sec=%jd, tv_nsec=%jd}}"
+	       ", {it_interval={tv_sec=%lld, tv_nsec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_nsec=%llu}}"
+	       ", {it_interval={tv_sec=%lld, tv_nsec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_nsec=%llu}}"
 	       ") = 0\n",
-	       (intmax_t) new.its.it_interval.tv_sec,
-	       (intmax_t) new.its.it_interval.tv_nsec,
-	       (intmax_t) new.its.it_value.tv_sec,
-	       (intmax_t) new.its.it_value.tv_nsec,
-	       (intmax_t) old.its.it_interval.tv_sec,
-	       (intmax_t) old.its.it_interval.tv_nsec,
-	       (intmax_t) old.its.it_value.tv_sec,
-	       (intmax_t) old.its.it_value.tv_nsec);
+	       (long long) new.its.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(new.its.it_interval.tv_nsec),
+	       (long long) new.its.it_value.tv_sec,
+	       zero_extend_signed_to_ull(new.its.it_value.tv_nsec),
+	       (long long) old.its.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(old.its.it_interval.tv_nsec),
+	       (long long) old.its.it_value.tv_sec,
+	       zero_extend_signed_to_ull(old.its.it_value.tv_nsec));
 
 	if (syscall(__NR_timerfd_gettime, 0, &old.its))
 		perror_msg_and_skip("timerfd_gettime");
 	printf("timerfd_gettime(0"
-	       ", {it_interval={tv_sec=%jd, tv_nsec=%jd}"
-	       ", it_value={tv_sec=%jd, tv_nsec=%jd}}) = 0\n",
-	       (intmax_t) old.its.it_interval.tv_sec,
-	       (intmax_t) old.its.it_interval.tv_nsec,
-	       (intmax_t) old.its.it_value.tv_sec,
-	       (intmax_t) old.its.it_value.tv_nsec);
+	       ", {it_interval={tv_sec=%lld, tv_nsec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_nsec=%llu}}) = 0\n",
+	       (long long) old.its.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(old.its.it_interval.tv_nsec),
+	       (long long) old.its.it_value.tv_sec,
+	       zero_extend_signed_to_ull(old.its.it_value.tv_nsec));
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -54,52 +54,52 @@ main(void)
 	if (setitimer(ITIMER_REAL, p_new, NULL))
 		perror_msg_and_skip("setitimer");
 	printf("setitimer(ITIMER_REAL"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}"
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}"
 	       ", NULL) = 0\n",
-	       (intmax_t) new.it_interval.tv_sec,
-	       (intmax_t) new.it_interval.tv_usec,
-	       (intmax_t) new.it_value.tv_sec,
-	       (intmax_t) new.it_value.tv_usec);
+	       (long long) new.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(new.it_interval.tv_usec),
+	       (long long) new.it_value.tv_sec,
+	       zero_extend_signed_to_ull(new.it_value.tv_usec));
 
 	fill_memory(p_old, sizeof(*p_old));
 	if (getitimer(ITIMER_REAL, p_old))
 		perror_msg_and_skip("getitimer");
 	printf("getitimer(ITIMER_REAL"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = 0\n",
-	       (intmax_t) p_old->it_interval.tv_sec,
-	       (intmax_t) p_old->it_interval.tv_usec,
-	       (intmax_t) p_old->it_value.tv_sec,
-	       (intmax_t) p_old->it_value.tv_usec);
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}) = 0\n",
+	       (long long) p_old->it_interval.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_interval.tv_usec),
+	       (long long) p_old->it_value.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_value.tv_usec));
 
 	fill_memory(p_old, sizeof(*p_old));
 	setitimer(ITIMER_REAL, p_new, p_old);
 	printf("setitimer(ITIMER_REAL"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = 0\n",
-	       (intmax_t) new.it_interval.tv_sec,
-	       (intmax_t) new.it_interval.tv_usec,
-	       (intmax_t) new.it_value.tv_sec,
-	       (intmax_t) new.it_value.tv_usec,
-	       (intmax_t) p_old->it_interval.tv_sec,
-	       (intmax_t) p_old->it_interval.tv_usec,
-	       (intmax_t) p_old->it_value.tv_sec,
-	       (intmax_t) p_old->it_value.tv_usec);
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}"
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}) = 0\n",
+	       (long long) new.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(new.it_interval.tv_usec),
+	       (long long) new.it_value.tv_sec,
+	       zero_extend_signed_to_ull(new.it_value.tv_usec),
+	       (long long) p_old->it_interval.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_interval.tv_usec),
+	       (long long) p_old->it_value.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_value.tv_usec));
 
 	rc = getitimer(ITIMER_REAL, efault);
 	printf("getitimer(ITIMER_REAL, %p) = %s\n", efault, sprintrc(rc));
 
 	rc = setitimer(ITIMER_REAL, p_new, efault);
 	printf("setitimer(ITIMER_REAL"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}, %p) = %s\n",
-	       (intmax_t) new.it_interval.tv_sec,
-	       (intmax_t) new.it_interval.tv_usec,
-	       (intmax_t) new.it_value.tv_sec,
-	       (intmax_t) new.it_value.tv_usec,
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}, %p) = %s\n",
+	       (long long) new.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(new.it_interval.tv_usec),
+	       (long long) new.it_value.tv_sec,
+	       zero_extend_signed_to_ull(new.it_value.tv_usec),
 	       efault, sprintrc(rc));
 
 	rc = setitimer(ITIMER_REAL, efault, p_old);
@@ -109,40 +109,40 @@ main(void)
 	fill_memory(p_old, sizeof(*p_old));
 	rc = syscall(__NR_setitimer, long_timer, p_new, p_old);
 	printf("setitimer(ITIMER_REAL"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = %s\n",
-	       (intmax_t) new.it_interval.tv_sec,
-	       (intmax_t) new.it_interval.tv_usec,
-	       (intmax_t) new.it_value.tv_sec,
-	       (intmax_t) new.it_value.tv_usec,
-	       (intmax_t) p_old->it_interval.tv_sec,
-	       (intmax_t) p_old->it_interval.tv_usec,
-	       (intmax_t) p_old->it_value.tv_sec,
-	       (intmax_t) p_old->it_value.tv_usec,
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}"
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}) = %s\n",
+	       (long long) new.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(new.it_interval.tv_usec),
+	       (long long) new.it_value.tv_sec,
+	       zero_extend_signed_to_ull(new.it_value.tv_usec),
+	       (long long) p_old->it_interval.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_interval.tv_usec),
+	       (long long) p_old->it_value.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_value.tv_usec),
 	       sprintrc(rc));
 
 	fill_memory(p_old, sizeof(*p_old));
 	rc = syscall(__NR_getitimer, long_timer, p_old);
 	printf("getitimer(ITIMER_REAL"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}) = %s\n",
-	       (intmax_t) p_old->it_interval.tv_sec,
-	       (intmax_t) p_old->it_interval.tv_usec,
-	       (intmax_t) p_old->it_value.tv_sec,
-	       (intmax_t) p_old->it_value.tv_usec,
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}) = %s\n",
+	       (long long) p_old->it_interval.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_interval.tv_usec),
+	       (long long) p_old->it_value.tv_sec,
+	       zero_extend_signed_to_ull(p_old->it_value.tv_usec),
 	       sprintrc(rc));
 
 	rc = syscall(__NR_setitimer, bogus_timer, p_new, p_old);
 	printf("setitimer(%#x /* ITIMER_??? */"
-	       ", {it_interval={tv_sec=%jd, tv_usec=%jd}, "
-	       "it_value={tv_sec=%jd, tv_usec=%jd}}, %p) = %s\n",
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}, %p) = %s\n",
 	       (int) bogus_timer,
-	       (intmax_t) new.it_interval.tv_sec,
-	       (intmax_t) new.it_interval.tv_usec,
-	       (intmax_t) new.it_value.tv_sec,
-	       (intmax_t) new.it_value.tv_usec,
+	       (long long) new.it_interval.tv_sec,
+	       zero_extend_signed_to_ull(new.it_interval.tv_usec),
+	       (long long) new.it_value.tv_sec,
+	       zero_extend_signed_to_ull(new.it_value.tv_usec),
 	       p_old, sprintrc(rc));
 
 	rc = syscall(__NR_getitimer, bogus_timer, p_old);

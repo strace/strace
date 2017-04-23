@@ -54,25 +54,27 @@ iterate(const char *const text, const void *set,
 	for (;;) {
 		assert(k_sigtimedwait(set, NULL, timeout, size) == -1);
 		if (EINTR == errno) {
-			tprintf("rt_sigtimedwait(%s, NULL, "
-				"{tv_sec=%jd, tv_nsec=%jd}, %u)"
+			tprintf("rt_sigtimedwait(%s, NULL"
+				", {tv_sec=%lld, tv_nsec=%llu}, %u)"
 				" = -1 EAGAIN (%m)\n", text,
-				(intmax_t) timeout->tv_sec,
-				(intmax_t) timeout->tv_nsec,
+				(long long) timeout->tv_sec,
+				zero_extend_signed_to_ull(timeout->tv_nsec),
 				size);
 		} else {
 			if (size < sizeof(long))
-				tprintf("rt_sigtimedwait(%p, NULL, "
-					"{tv_sec=%jd, tv_nsec=%jd}"
+				tprintf("rt_sigtimedwait(%p, NULL"
+					", {tv_sec=%lld, tv_nsec=%llu}"
 					", %u) = -1 EINVAL (%m)\n",
-					set, (intmax_t) timeout->tv_sec,
-					(intmax_t) timeout->tv_nsec, size);
+					set, (long long) timeout->tv_sec,
+					zero_extend_signed_to_ull(timeout->tv_nsec),
+					size);
 			else
-				tprintf("rt_sigtimedwait(%s, NULL, "
-					"{tv_sec=%jd, tv_nsec=%jd}"
+				tprintf("rt_sigtimedwait(%s, NULL"
+					", {tv_sec=%lld, tv_nsec=%llu}"
 					", %u) = -1 EINVAL (%m)\n",
-					text, (intmax_t) timeout->tv_sec,
-					(intmax_t) timeout->tv_nsec, size);
+					text, (long long) timeout->tv_sec,
+					zero_extend_signed_to_ull(timeout->tv_nsec),
+					size);
 		}
 		if (!size)
 			break;
@@ -100,16 +102,17 @@ main(void)
 		assert(k_sigtimedwait(k_set, NULL, timeout, set_size) == -1);
 		if (EAGAIN == errno)
 			break;
-		tprintf("rt_sigtimedwait(%p, NULL, {tv_sec=%jd, tv_nsec=%jd}, %u)"
-			" = -1 EINVAL (%m)\n",
-			k_set, (intmax_t) timeout->tv_sec,
-			(intmax_t) timeout->tv_nsec, set_size);
+		tprintf("rt_sigtimedwait(%p, NULL, {tv_sec=%lld, tv_nsec=%llu}"
+			", %u) = -1 EINVAL (%m)\n",
+			k_set, (long long) timeout->tv_sec,
+			zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 	}
 	if (!set_size)
 		perror_msg_and_fail("rt_sigtimedwait");
-	tprintf("rt_sigtimedwait([], NULL, {tv_sec=%jd, tv_nsec=%jd}, %u) = -1 EAGAIN (%m)\n",
-		(intmax_t) timeout->tv_sec, (intmax_t) timeout->tv_nsec,
-		set_size);
+	tprintf("rt_sigtimedwait([], NULL, {tv_sec=%lld, tv_nsec=%llu}, %u)"
+		" = -1 EAGAIN (%m)\n",
+		(long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(sigset_t, libc_set);
 	sigemptyset(libc_set);
@@ -118,19 +121,20 @@ main(void)
 
 	assert(k_sigtimedwait(k_set, info, timeout, set_size) == -1);
 	assert(EAGAIN == errno);
-	tprintf("rt_sigtimedwait([HUP], %p, {tv_sec=%jd, tv_nsec=%jd}, %u) = -1 EAGAIN (%m)\n",
-		info, (intmax_t) timeout->tv_sec,
-		(intmax_t) timeout->tv_nsec, set_size);
+	tprintf("rt_sigtimedwait([HUP], %p, {tv_sec=%lld, tv_nsec=%llu}, %u)"
+		" = -1 EAGAIN (%m)\n",
+		info, (long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
 	sigaddset(libc_set, SIGINT);
 	memcpy(k_set, libc_set, set_size);
 
 	assert(k_sigtimedwait(k_set, info, timeout, set_size) == -1);
 	assert(EAGAIN == errno);
-	tprintf("rt_sigtimedwait([HUP INT], %p, {tv_sec=%jd, tv_nsec=%jd}, %u)"
+	tprintf("rt_sigtimedwait([HUP INT], %p, {tv_sec=%lld, tv_nsec=%llu}, %u)"
 		" = -1 EAGAIN (%m)\n",
-		info, (intmax_t) timeout->tv_sec,
-		(intmax_t) timeout->tv_nsec, set_size);
+		info, (long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
 	sigaddset(libc_set, SIGQUIT);
 	sigaddset(libc_set, SIGALRM);
@@ -139,17 +143,19 @@ main(void)
 
 	assert(k_sigtimedwait(k_set, info, timeout, set_size) == -1);
 	assert(EAGAIN == errno);
-	tprintf("rt_sigtimedwait(%s, %p, {tv_sec=%jd, tv_nsec=%jd}, %u) = -1 EAGAIN (%m)\n",
+	tprintf("rt_sigtimedwait(%s, %p, {tv_sec=%lld, tv_nsec=%llu}, %u)"
+		" = -1 EAGAIN (%m)\n",
 		"[HUP INT QUIT ALRM TERM]",
-		info, (intmax_t) timeout->tv_sec,
-		(intmax_t) timeout->tv_nsec, set_size);
+		info, (long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
 	memset(k_set - set_size, -1, set_size);
 	assert(k_sigtimedwait(k_set - set_size, info, timeout, set_size) == -1);
 	assert(EAGAIN == errno);
-	tprintf("rt_sigtimedwait(~[], %p, {tv_sec=%jd, tv_nsec=%jd}, %u) = -1 EAGAIN (%m)\n",
-		info, (intmax_t) timeout->tv_sec,
-		(intmax_t) timeout->tv_nsec, set_size);
+	tprintf("rt_sigtimedwait(~[], %p, {tv_sec=%lld, tv_nsec=%llu}, %u)"
+		" = -1 EAGAIN (%m)\n",
+		info, (long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
 	if (sigprocmask(SIG_SETMASK, libc_set, NULL))
 		perror_msg_and_fail("sigprocmask");
@@ -164,9 +170,11 @@ main(void)
 	raise(SIGALRM);
 	assert(k_sigtimedwait(k_set, info, timeout, set_size) == SIGALRM);
 	tprintf("rt_sigtimedwait(%s, {si_signo=%s, si_code=SI_TKILL"
-		", si_pid=%d, si_uid=%d}, {tv_sec=%jd, tv_nsec=%jd}, %u) = %d (%s)\n",
+		", si_pid=%d, si_uid=%d}, {tv_sec=%lld, tv_nsec=%llu}, %u)"
+		" = %d (%s)\n",
 		"[HUP INT QUIT ALRM TERM]", "SIGALRM", getpid(), getuid(),
-		(intmax_t) timeout->tv_sec, (intmax_t) timeout->tv_nsec,
+		(long long) timeout->tv_sec,
+		zero_extend_signed_to_ull(timeout->tv_nsec),
 		set_size, SIGALRM, "SIGALRM");
 
 	raise(SIGALRM);

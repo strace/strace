@@ -45,17 +45,17 @@ invoke_print(int who, const char *who_str, struct rusage *usage)
 {
 	int rc = syscall(__NR_getrusage, who, usage);
 	int saved_errno = errno;
-	printf("getrusage(%s, {ru_utime={tv_sec=%jd, tv_usec=%jd}"
-	       ", ru_stime={tv_sec=%jd, tv_usec=%jd}, ru_maxrss=%lu"
+	printf("getrusage(%s, {ru_utime={tv_sec=%lld, tv_usec=%llu}"
+	       ", ru_stime={tv_sec=%lld, tv_usec=%llu}, ru_maxrss=%lu"
 	       ", ru_ixrss=%lu, ru_idrss=%lu, ru_isrss=%lu, ru_minflt=%lu"
 	       ", ru_majflt=%lu, ru_nswap=%lu, ru_inblock=%lu"
 	       ", ru_oublock=%lu, ru_msgsnd=%lu, ru_msgrcv=%lu"
 	       ", ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}) = %s\n",
 	       who_str,
-	       (intmax_t) usage->ru_utime.tv_sec,
-	       (intmax_t) usage->ru_utime.tv_usec,
-	       (intmax_t) usage->ru_stime.tv_sec,
-	       (intmax_t) usage->ru_stime.tv_usec,
+	       (long long) usage->ru_utime.tv_sec,
+	       zero_extend_signed_to_ull(usage->ru_utime.tv_usec),
+	       (long long) usage->ru_stime.tv_sec,
+	       zero_extend_signed_to_ull(usage->ru_stime.tv_usec),
 	       usage->ru_maxrss, usage->ru_ixrss, usage->ru_idrss,
 	       usage->ru_isrss, usage->ru_minflt, usage->ru_majflt,
 	       usage->ru_nswap, usage->ru_inblock, usage->ru_oublock,

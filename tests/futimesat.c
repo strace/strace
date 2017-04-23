@@ -40,8 +40,9 @@
 static void
 print_tv(const struct timeval *tv)
 {
-	printf("{tv_sec=%ju, tv_usec=%ju}",
-	       (uintmax_t) tv->tv_sec, (uintmax_t) tv->tv_usec);
+	printf("{tv_sec=%lld, tv_usec=%llu}",
+	       (long long) tv->tv_sec,
+	       zero_extend_signed_to_ull(tv->tv_usec));
 }
 
 static const char *errstr;

@@ -41,8 +41,8 @@
 static void
 print_ts(const struct timespec *ts)
 {
-	printf("{tv_sec=%ju, tv_nsec=%ju}", (uintmax_t) ts->tv_sec,
-		(uintmax_t) ts->tv_nsec);
+	printf("{tv_sec=%lld, tv_nsec=%llu}", (long long) ts->tv_sec,
+		zero_extend_signed_to_ull(ts->tv_nsec));
 }
 
 static const char *errstr;
@@ -119,6 +119,18 @@ main(void)
 	ts[0].tv_nsec = 123456789;
 	ts[1].tv_sec = 1492357068;
 	ts[1].tv_nsec = 234567890;
+
+	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
+	printf("utimensat(AT_FDCWD, %s, [", qname);
+	print_ts(&ts[0]);
+	printf(", ");
+	print_ts(&ts[1]);
+	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
+
+	ts[0].tv_sec = -1;
+	ts[0].tv_nsec = 2000000000;
+	ts[1].tv_sec = (time_t) -0x100000001LL;
+	ts[1].tv_nsec = 2345678900U;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
 	printf("utimensat(AT_FDCWD, %s, [", qname);

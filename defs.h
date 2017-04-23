@@ -579,7 +579,7 @@ extern void
 printpath(struct tcb *, kernel_ulong_t addr);
 
 #define TIMESPEC_TEXT_BUFSIZE \
-		(sizeof(intmax_t)*3 * 2 + sizeof("{tv_sec=%jd, tv_nsec=%jd}"))
+		(sizeof(long long) * 3 * 2 + sizeof("{tv_sec=-, tv_nsec=}"))
 extern void printfd(struct tcb *, int);
 extern void print_sockaddr(struct tcb *tcp, const void *, int);
 extern bool print_sockaddr_by_inode(const unsigned long, const enum sock_proto);

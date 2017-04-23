@@ -55,11 +55,11 @@ main(void)
 	if (nanosleep(&req, &rem))
 		perror_msg_and_fail("nanosleep");
 
-	printf("nanosleep\\(\\{tv_sec=%jd, tv_nsec=%jd\\}, "
-	       "\\{tv_sec=%jd, tv_nsec=%jd\\}\\)"
+	printf("nanosleep\\(\\{tv_sec=%lld, tv_nsec=%llu\\}"
+	       ", \\{tv_sec=%lld, tv_nsec=%llu\\}\\)"
 	       " = \\? ERESTART_RESTARTBLOCK \\(Interrupted by signal\\)\n",
-	       (intmax_t) req.tv_sec, (intmax_t) req.tv_nsec,
-	       (intmax_t) rem.tv_sec, (intmax_t) rem.tv_nsec);
+	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
+	       (long long) rem.tv_sec, zero_extend_signed_to_ull(rem.tv_nsec));
 	puts("--- SIGALRM \\{si_signo=SIGALRM, si_code=SI_KERNEL\\} ---");
 #ifdef __arm__
 /* old kernels used to overwrite ARM_r0 with -EINTR */
@@ -67,11 +67,12 @@ main(void)
 #else
 # define ALTERNATIVE_NANOSLEEP_REQ ""
 #endif
-	printf("(nanosleep\\((%s\\{tv_sec=%jd, tv_nsec=%jd\\}), "
-	       "%p|restart_syscall\\(<\\.\\.\\."
+	printf("(nanosleep\\((%s\\{tv_sec=%lld, tv_nsec=%llu\\})"
+	       ", %p|restart_syscall\\(<\\.\\.\\."
 	       " resuming interrupted nanosleep \\.\\.\\.>)\\) = 0\n",
 	       ALTERNATIVE_NANOSLEEP_REQ,
-	       (intmax_t) req.tv_sec, (intmax_t) req.tv_nsec, &rem);
+	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
+	       &rem);
 
 	puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
 	return 0;

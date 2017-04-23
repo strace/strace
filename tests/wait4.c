@@ -40,8 +40,8 @@ sprint_rusage(const struct rusage *const ru)
 {
 	static char buf[1024];
 	snprintf(buf, sizeof(buf),
-		 "{ru_utime={tv_sec=%lu, tv_usec=%lu}"
-		 ", ru_stime={tv_sec=%lu, tv_usec=%lu}"
+		 "{ru_utime={tv_sec=%lld, tv_usec=%llu}"
+		 ", ru_stime={tv_sec=%lld, tv_usec=%llu}"
 #if VERBOSE
 		 ", ru_maxrss=%lu"
 		 ", ru_ixrss=%lu"
@@ -60,10 +60,10 @@ sprint_rusage(const struct rusage *const ru)
 #else
 		 ", ...}"
 #endif
-		 , (long) ru->ru_utime.tv_sec
-		 , (long) ru->ru_utime.tv_usec
-		 , (long) ru->ru_stime.tv_sec
-		 , (long) ru->ru_stime.tv_usec
+		 , (long long) ru->ru_utime.tv_sec
+		 , zero_extend_signed_to_ull(ru->ru_utime.tv_usec)
+		 , (long long) ru->ru_stime.tv_sec
+		 , zero_extend_signed_to_ull(ru->ru_stime.tv_usec)
 #if VERBOSE
 		 , (long) ru->ru_maxrss
 		 , (long) ru->ru_ixrss
