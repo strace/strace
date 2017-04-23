@@ -629,6 +629,54 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 	return 1;
 }
 
+#include "xlat/v4l2_tuner_types.h"
+#include "xlat/v4l2_tuner_capabilities.h"
+#include "xlat/v4l2_tuner_rxsubchanses.h"
+#include "xlat/v4l2_tuner_audmodes.h"
+
+static int
+print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
+		 const bool is_get)
+{
+	struct v4l2_tuner c;
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &c))
+			return RVAL_DECODED | 1;
+		tprintf("{index=%u", c.index);
+		if (is_get)
+			return 0;
+		tprints(", ");
+	} else {
+		if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
+			tprints("}");
+			return 1;
+		}
+		tprints(is_get ? ", " : " => ");
+	}
+
+	tprints("name=");
+	print_quoted_string((const char *) c.name, sizeof(c.name),
+			    QUOTE_0_TERMINATED);
+	tprints(", type=");
+	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_TYPE_???");
+	tprints(", capability=");
+	printxval(v4l2_tuner_capabilities, c.capability,
+		  "V4L2_TUNER_CAP_???");
+	tprintf(", rangelow=%u, rangehigh=%u, rxsubchans=",
+		c.rangelow, c.rangehigh);
+	printxval(v4l2_tuner_rxsubchanses, c.rxsubchans,
+		  "V4L2_TUNER_SUB_???");
+	tprints(", audmode=");
+	printxval(v4l2_tuner_audmodes, c.audmode,
+		  "V4L2_TUNER_MODE_???");
+	tprintf(", signal=%d, afc=%d", c.signal, c.afc);
+
+	if (exiting(tcp))
+		tprints("}");
+	return 1;
+}
+
 #include "xlat/v4l2_control_types.h"
 #include "xlat/v4l2_control_flags.h"
 
@@ -970,6 +1018,10 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_CTRL: /* RW */
 	case VIDIOC_S_CTRL: /* RW */
 		return print_v4l2_control(tcp, arg, code == VIDIOC_G_CTRL);
+
+	case VIDIOC_G_TUNER: /* RW */
+	case VIDIOC_S_TUNER: /* RW */
+		return print_v4l2_tuner(tcp, arg, code == VIDIOC_G_TUNER);
 
 	case VIDIOC_QUERYCTRL: /* RW */
 		return print_v4l2_queryctrl(tcp, arg);
