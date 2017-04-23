@@ -50,6 +50,8 @@ print_tv(const TEST_STRUCT *const tv)
 	printf("{tv_sec=%lld, tv_usec=%llu}",
 	       (long long) tv->tv_sec,
 	       zero_extend_signed_to_ull(tv->tv_usec));
+	print_time_t_usec(tv->tv_sec,
+			  zero_extend_signed_to_ull(tv->tv_usec), 1);
 }
 
 static const char *errstr;

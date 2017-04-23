@@ -42,6 +42,14 @@ print_timeval_t(const timeval_t *t)
 		zero_extend_signed_to_ull(t->tv_usec));
 }
 
+static void
+print_timeval_t_utime(const timeval_t *t)
+{
+	print_timeval_t(t);
+	tprints_comment(sprinttime_usec(t->tv_sec,
+		zero_extend_signed_to_ull(t->tv_usec)));
+}
+
 MPERS_PRINTER_DECL(void, print_struct_timeval, const void *arg)
 {
 	print_timeval_t(arg);
@@ -67,9 +75,9 @@ MPERS_PRINTER_DECL(void, print_timeval_utimes,
 		return;
 
 	tprints("[");
-	print_timeval_t(&t[0]);
+	print_timeval_t_utime(&t[0]);
 	tprints(", ");
-	print_timeval_t(&t[1]);
+	print_timeval_t_utime(&t[1]);
 	tprints("]");
 }
 
@@ -117,6 +125,14 @@ print_timeval32_t(const timeval32_t *t)
 		zero_extend_signed_to_ull(t->tv_usec));
 }
 
+static void
+print_timeval32_t_utime(const timeval32_t *t)
+{
+	print_timeval32_t(t);
+	tprints_comment(sprinttime_usec(t->tv_sec,
+		zero_extend_signed_to_ull(t->tv_usec)));
+}
+
 void
 print_timeval32(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -137,9 +153,9 @@ print_timeval32_utimes(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 
 	tprints("[");
-	print_timeval32_t(&t[0]);
+	print_timeval32_t_utime(&t[0]);
 	tprints(", ");
-	print_timeval32_t(&t[1]);
+	print_timeval32_t_utime(&t[1]);
 	tprints("]");
 }
 

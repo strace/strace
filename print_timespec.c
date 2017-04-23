@@ -61,6 +61,8 @@ print_timespec_t_utime(const timespec_t *t)
 		break;
 	default:
 		print_timespec_t(t);
+		tprints_comment(sprinttime_nsec(t->tv_sec,
+			zero_extend_signed_to_ull(t->tv_nsec)));
 		break;
 	}
 }

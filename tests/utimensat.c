@@ -43,6 +43,8 @@ print_ts(const struct timespec *ts)
 {
 	printf("{tv_sec=%lld, tv_nsec=%llu}", (long long) ts->tv_sec,
 		zero_extend_signed_to_ull(ts->tv_nsec));
+	print_time_t_nsec(ts->tv_sec,
+			  zero_extend_signed_to_ull(ts->tv_nsec), 1);
 }
 
 static const char *errstr;
