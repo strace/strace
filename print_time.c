@@ -36,8 +36,17 @@ SYS_FUNC(time)
 	if (exiting(tcp)) {
 		time_t t;
 
-		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &t))
-			tprintf("[%jd]", (intmax_t) t);
+		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &t)) {
+			tprintf("[%lld", (long long) t);
+			tprints_comment(sprinttime(t));
+			tprints("]");
+		}
+
+		if (!syserror(tcp)) {
+			tcp->auxstr = sprinttime((time_t) tcp->u_rval);
+
+			return RVAL_STR;
+		}
 	}
 
 	return 0;
