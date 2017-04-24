@@ -12,7 +12,7 @@ run_strace -t -eexecve $args
 t1="$(date +%T)"
 
 cat > "$EXP" << __EOF__
-($t0|$t1) execve\\("\\.\\./sleep", \\["\\.\\./sleep", "0"\\], \\[/\\* [[:digit:]]+ vars \\*/\\]\\) = 0
+($t0|$t1) execve\\("\\.\\./sleep", \\["\\.\\./sleep", "0"\\], 0x[[:xdigit:]]* /\\* [[:digit:]]* vars \\*/\\) = 0
 __EOF__
 
 match_grep "$LOG" "$EXP"

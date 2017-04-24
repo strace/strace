@@ -136,25 +136,25 @@ thread(void *arg)
 	switch (action % NUMBER_OF_ACTIONS) {
 		case ACTION_exit:
 			printf("%-5d execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-			       ", [/* %u vars */] <pid changed to %u ...>\n",
+			       ", %p /* %u vars */ <pid changed to %u ...>\n",
 			       tid, argv[0], argv[0], argv[1], argv[2],
-			       arglen(environ), leader);
+			       environ, arglen(environ), leader);
 			break;
 		case ACTION_rt_sigsuspend:
 			printf("%-5d execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-			       ", [/* %u vars */] <unfinished ...>\n"
+			       ", %p /* %u vars */ <unfinished ...>\n"
 			       "%-5d <... rt_sigsuspend resumed>) = ?\n",
 			       tid, argv[0], argv[0], argv[1], argv[2],
-			       arglen(environ),
+			       environ, arglen(environ),
 			       leader);
 			break;
 		case ACTION_nanosleep:
 			printf("%-5d execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-			       ", [/* %u vars */] <unfinished ...>\n"
+			       ", %p /* %u vars */ <unfinished ...>\n"
 			       "%-5d <... nanosleep resumed> <unfinished ...>)"
 			       " = ?\n",
 			       tid, argv[0], argv[0], argv[1], argv[2],
-			       arglen(environ),
+			       environ, arglen(environ),
 			       leader);
 			break;
 	}
@@ -180,18 +180,15 @@ main(int ac, char **av)
 		if (clock_nanosleep(CLOCK_REALTIME, 0, &ts, NULL))
 			perror_msg_and_skip("clock_nanosleep CLOCK_REALTIME");
 
-		printf("%-5d execve(\"%s\", [\"%s\"], [/* %u vars */]) = 0\n",
-		       leader, av[0], av[0], arglen(environ));
-
 		get_sigsetsize();
 		static char buf[sizeof(sigsetsize) * 3];
 		sprintf(buf, "%u", sigsetsize);
 
 		char *argv[] = { av[0], buf, (char *) "0", NULL };
 		printf("%-5d execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
-		       ", [/* %u vars */]) = 0\n",
+		       ", %p /* %u vars */) = 0\n",
 		       leader, argv[0], argv[0], argv[1], argv[2],
-		       arglen(environ));
+		       environ, arglen(environ));
 		execve(argv[0], argv, environ);
 		perror_msg_and_fail("execve");
 	}

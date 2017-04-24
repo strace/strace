@@ -40,9 +40,11 @@ set -- -a21 -f -esignal=none -e trace=execve,exit,nanosleep,rt_sigsuspend $args
 
 # Due to probabilistic nature of the test, try it several times.
 i=0
-while [ $i -le 9 ]; do
+while [ $i -le 19 ]; do
+	i="$(($i+1))"
 	run_strace "$@" > "$EXP"
-	diff -- "$EXP" "$LOG" || continue
+	sed 1d < "$LOG" > "$OUT"
+	diff -- "$EXP" "$OUT" || continue
 	exit 0
 done
 

@@ -6,7 +6,7 @@
 . "${srcdir=.}/init.sh"
 
 run_prog ../umovestr
-pattern_abbrev_verbose='execve("\.\./umovestr", \["\.\./umovestr"\], \[/\* [[:digit:]]* vars \*/\]) = 0'
+pattern_abbrev_verbose='execve("\.\./umovestr", \["\.\./umovestr"\], 0x[[:xdigit:]]* /\* [[:digit:]]* vars \*/) = 0'
 pattern_nonabbrev_verbose='execve("\.\./umovestr", \["\.\./umovestr"\], \[".*\"\(\.\.\.\)\?\]) = 0'
 pattern_nonverbose='execve("\.\./umovestr", 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'
 pattern_raw='execve(0x[[:xdigit:]]*, 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'

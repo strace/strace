@@ -67,13 +67,15 @@ main(void)
 #if VERBOSE
 	       ", [\"%s\", \"%s\", %p, %p, %p, ???]"
 #else
-	       ", [/* 5 vars, unterminated */]"
+	       ", %p /* 5 vars, unterminated */"
 #endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 	       argv[3], argv[4], argv[5],
 #if VERBOSE
 	       q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
+#else
+	       tail_envp,
 #endif
 	       errno2name());
 
@@ -85,12 +87,14 @@ main(void)
 #if VERBOSE
 	       ", [\"%s\", \"%s\"]"
 #else
-	       ", [/* 2 vars */]"
+	       ", %p /* 2 vars */"
 #endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 #if VERBOSE
 	       q_envp[0], q_envp[1],
+#else
+	       tail_envp,
 #endif
 	       errno2name());
 
@@ -99,12 +103,14 @@ main(void)
 #if VERBOSE
 	       ", [\"%s\"]"
 #else
-	       ", [/* 1 var */]"
+	       ", %p /* 1 var */"
 #endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
 	       Q_FILENAME, q_argv[2],
 #if VERBOSE
 	       q_envp[1],
+#else
+	       tail_envp + 1,
 #endif
 	       errno2name());
 
@@ -117,10 +123,14 @@ main(void)
 #if VERBOSE
 	       ", []"
 #else
-	       ", [/* 0 vars */]"
+	       ", %p /* 0 vars */"
 #endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
-	       Q_FILENAME, errno2name());
+	       Q_FILENAME,
+#if !VERBOSE
+	       empty,
+#endif
+	       errno2name());
 
 	char str_a[] = "012345678901234567890123456789012";
 	char str_b[] = "_abcdefghijklmnopqrstuvwxyz()[]{}";
@@ -147,10 +157,11 @@ main(void)
 	printf("], [\"%.*s\"...", DEFAULT_STRLEN, b[0]);
 	for (i = 1; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", b[i]);
+	printf("]");
 #else
-	printf("], [/* %u vars */", DEFAULT_STRLEN + 1);
+	printf("], %p /* %u vars */", b, DEFAULT_STRLEN + 1);
 #endif
-	printf("], AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
 	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, a + 1, b + 1, 0x1100);
@@ -161,10 +172,11 @@ main(void)
 	printf("], [\"%s\"", b[1]);
 	for (i = 2; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", b[i]);
+	printf("]");
 #else
-	printf("], [/* %d vars */", DEFAULT_STRLEN);
+	printf("], %p /* %d vars */", b + 1, DEFAULT_STRLEN);
 #endif
-	printf("], AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	printf(", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
 	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, NULL, efault, 0x1100);
