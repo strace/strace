@@ -54,7 +54,7 @@ MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 	if (decode_flags)
 		printflags64(mq_attr_flags,
 			     zero_extend_signed_to_ull(attr.mq_flags),
-			     "/* O_??? */");
+			     "O_???");
 	else
 		tprintf("%#llx", zero_extend_signed_to_ull(attr.mq_flags));
 	tprintf(", mq_maxmsg=%lld, mq_msgsize=%lld, mq_curmsgs=%lld}",
