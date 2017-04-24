@@ -140,7 +140,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		sizeof(struct dm_target_spec);
 	uint32_t i;
 	uint32_t offset = ioc->data_start;
-	uint32_t offset_end;
+	uint32_t offset_end = 0;
 
 	if (abbrev(tcp)) {
 		if (ioc->target_count)
@@ -150,19 +150,22 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 
 	for (i = 0; i < ioc->target_count; i++) {
-		struct dm_target_spec s;
+		tprints(", ");
+
+		if (i && offset <= offset_end)
+			goto misplaced;
 
 		offset_end = offset + target_spec_size;
 
 		if (offset_end <= offset || offset_end > ioc->data_size)
 			goto misplaced;
 
-		tprints(", ");
-
 		if (i >= max_strlen) {
 			tprints("...");
 			break;
 		}
+
+		struct dm_target_spec s;
 
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			break;
@@ -186,15 +189,13 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 			offset += s.next;
 		else
 			offset = ioc->data_start + s.next;
-
-		if (offset <= offset_end)
-			goto misplaced;
 	}
 
 	return;
 
 misplaced:
-	tprints(", /* misplaced struct dm_target_spec */ ...");
+	tprints("???");
+	tprints(" /* misplaced struct dm_target_spec */");
 }
 
 bool
@@ -211,6 +212,16 @@ static void
 dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 			 const struct dm_ioctl *const ioc)
 {
+	if (ioc->data_start == ioc->data_size)
+		return;
+
+	tprints(", ");
+
+	if (abbrev(tcp)) {
+		tprints("...");
+		return;
+	}
+
 	static const uint32_t target_deps_dev_offs =
 		offsetof(struct dm_target_deps, dev);
 	uint64_t dev_buf;
@@ -218,13 +229,6 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	uint32_t offset = ioc->data_start;
 	uint32_t offset_end = offset + target_deps_dev_offs;
 	uint32_t space;
-
-	if (abbrev(tcp)) {
-		tprints(", ...");
-		return;
-	}
-
-	tprints(", ");
 
 	if (offset_end <= offset || offset_end > ioc->data_size)
 		goto misplaced;
@@ -247,7 +251,8 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	return;
 
 misplaced:
-	tprints("/* misplaced struct dm_target_deps */ ...");
+	tprints("???");
+	tprints(" /* misplaced struct dm_target_deps */");
 }
 
 static void
@@ -258,8 +263,11 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		offsetof(struct dm_name_list, name);
 	struct dm_name_list s;
 	uint32_t offset = ioc->data_start;
-	uint32_t offset_end;
+	uint32_t offset_end = 0;
 	uint32_t count;
+
+	if (ioc->data_start == ioc->data_size)
+		return;
 
 	if (abbrev(tcp)) {
 		tprints(", ...");
@@ -267,12 +275,15 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 
 	for (count = 0;; count++) {
+		tprints(", ");
+
+		if (count && offset <= offset_end)
+			goto misplaced;
+
 		offset_end = offset + name_list_name_offs;
 
 		if (offset_end <= offset || offset_end > ioc->data_size)
 			goto misplaced;
-
-		tprints(", ");
 
 		if (count >= max_strlen) {
 			tprints("...");
@@ -281,10 +292,6 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			break;
-		if (!count && !s.dev) {
-			tprints("/* no devices present */");
-			break;
-		}
 
 		tprints("{dev=");
 		print_dev_t(s.dev);
@@ -298,14 +305,13 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 			break;
 
 		offset += s.next;
-		if (offset <= offset_end)
-			goto misplaced;
 	}
 
 	return;
 
 misplaced:
-	tprints(", /* misplaced struct dm_name_list */ ...");
+	tprints("???");
+	tprints(" /* misplaced struct dm_name_list */");
 }
 
 static void
@@ -316,8 +322,11 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 		offsetof(struct dm_target_versions, name);
 	struct dm_target_versions s;
 	uint32_t offset = ioc->data_start;
-	uint32_t offset_end;
+	uint32_t offset_end = 0;
 	uint32_t count;
+
+	if (ioc->data_start == ioc->data_size)
+		return;
 
 	if (abbrev(tcp)) {
 		tprints(", ...");
@@ -325,12 +334,15 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 
 	for (count = 0;; count++) {
+		tprints(", ");
+
+		if (count && offset <= offset_end)
+			goto misplaced;
+
 		offset_end = offset + target_vers_name_offs;
 
 		if (offset_end <= offset || offset_end > ioc->data_size)
 			goto misplaced;
-
-		tprints(", ");
 
 		if (count >= max_strlen) {
 			tprints("...");
@@ -350,34 +362,36 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 			break;
 
 		offset += s.next;
-		if (offset <= offset_end)
-			goto misplaced;
 	}
 
 	return;
 
 misplaced:
-	tprints(", /* misplaced struct dm_target_versions */ ...");
+	tprints("???");
+	tprints(" /* misplaced struct dm_target_versions */");
 }
 
 static void
 dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 		        const struct dm_ioctl *const ioc)
 {
+	if (ioc->data_start == ioc->data_size)
+		return;
+
+	tprints(", ");
+
+	if (abbrev(tcp)) {
+		tprints("...");
+		return;
+	}
+
 	static const uint32_t target_msg_message_offs =
 		offsetof(struct dm_target_msg, message);
 	uint32_t offset = ioc->data_start;
 	uint32_t offset_end = offset + target_msg_message_offs;
 
-	if (abbrev(tcp)) {
-		tprints(", ...");
-		return;
-	}
-
 	if (offset_end > offset && offset_end <= ioc->data_size) {
 		struct dm_target_msg s;
-
-		tprints(", ");
 
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			return;
@@ -387,7 +401,8 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 			    QUOTE_0_TERMINATED);
 		tprints("}");
 	} else {
-		tprints(", /* misplaced struct dm_target_msg */");
+		tprints("???");
+		tprints(" /* misplaced struct dm_target_msg */");
 	}
 }
 
@@ -395,19 +410,22 @@ static void
 dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const struct dm_ioctl *const ioc)
 {
-	uint32_t offset = ioc->data_start;
+	tprints(", ");
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprints("...");
 		return;
 	}
 
-	if (offset < ioc->data_size) {
-		tprints(", string=");
+	uint32_t offset = ioc->data_start;
+
+	if (offset <= ioc->data_size) {
+		tprints("string=");
 		printstr_ex(tcp, addr + offset, ioc->data_size - offset,
 			    QUOTE_0_TERMINATED);
 	} else {
-		tprints(", /* misplaced string */");
+		tprints("???");
+		tprints(" /* misplaced string */");
 	}
 }
 
@@ -485,19 +503,19 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	 * ioctl fields
 	 */
 	if (ioc->version[0] != DM_VERSION_MAJOR) {
-		tprints(", /* Unsupported device mapper ABI version */ ...");
+		tprints(" /* unsupported device mapper ABI version */");
 		goto skip;
 	}
 
 	tprintf(", data_size=%u", ioc->data_size);
 
-	if (dm_ioctl_has_params(code))
-		tprintf(", data_start=%u", ioc->data_start);
-
 	if (ioc->data_size < offsetof(struct dm_ioctl, data)) {
-		tprints(", /* Incorrect data_size */ ...");
+		tprints(" /* data_size too small */");
 		goto skip;
 	}
+
+	if (dm_ioctl_has_params(code))
+		tprintf(", data_start=%u", ioc->data_start);
 
 	dm_decode_device(code, ioc);
 	dm_decode_values(tcp, code, ioc);
