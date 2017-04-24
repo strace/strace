@@ -180,7 +180,7 @@ print_u64(const char *name, uint64_t value)
 {
 	tprintf(", %s=%" PRIu64, name, value);
 	if (value == UINT64_MAX)
-		tprints(" /* UINT64_MAX */");
+		tprints_comment("UINT64_MAX");
 }
 
 #define print_member_u64(obj, name) print_u64(#name, obj->name)
@@ -261,19 +261,15 @@ btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 static void
 btrfs_print_key_type(uint32_t type)
 {
-	const char *str = xlookup(btrfs_key_types, type);
 	tprintf("%u", type);
-	if (str)
-		tprintf(" /* %s */", str);
+	tprints_comment(xlookup(btrfs_key_types, type));
 }
 
 static void
 btrfs_print_objectid(uint64_t objectid)
 {
-	const char *str = xlookup(btrfs_tree_objectids, objectid);
 	tprintf("%" PRIu64, objectid);
-	if (str)
-		tprintf(" /* %s */", str);
+	tprints_comment(xlookup(btrfs_tree_objectids, objectid));
 }
 
 static void
@@ -412,7 +408,7 @@ print_key_value_internal(struct tcb *tcp, const char *name, uint64_t value)
 	if (value) {
 		tprintf(", %s=%" PRIu64, name, value);
 		if (value == UINT64_MAX)
-			tprints(" /* UINT64_MAX */");
+			tprints_comment("UINT64_MAX");
 	}
 }
 #define print_key_value(tcp, key, name)					\
@@ -610,7 +606,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		tprintf("%" PRIu64, (uint64_t) args.len);
 		if (args.len == UINT64_MAX)
-			tprints(" /* UINT64_MAX */");
+			tprints_comment("UINT64_MAX");
 
 		tprints(", flags=");
 		printflags64(btrfs_defrag_flags, args.flags,
@@ -702,35 +698,27 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		printxval64(btrfs_dev_replace_results, args.result,
 			    "BTRFS_IOCTL_DEV_REPLACE_RESULT_???");
 		if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_STATUS) {
-			char buf[sizeof("HH:MM:SS") + 1];
-			time_t time;
 			tprints(", ");
 			printxval64(btrfs_dev_replace_state,
 				   args.status.replace_state,
 				   "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
-			tprintf(", progress_1000=%" PRIu64 " /* ",
+			tprintf(", progress_1000=%" PRIu64,
 				(uint64_t) args.status.progress_1000);
+
 			if (args.status.progress_1000 <= 1000)
-				tprintf("%" PRIu64 ".%.2" PRIu64 "%%",
-					(uint64_t) args.status.progress_1000 / 10,
-					(uint64_t) args.status.progress_1000 % 10);
-			else
-				tprints("???");
-			tprints(" */ ,");
+				tprintf_comment("%u.%u%%",
+					(unsigned) args.status.progress_1000 / 10,
+					(unsigned) args.status.progress_1000 % 10);
 
-			time = args.status.time_started;
-			strftime(buf, sizeof(buf), "%T",
-				 localtime(&time));
-			tprintf("time_started=%" PRIu64" /* %s */, ",
-				(uint64_t) args.status.time_started, buf);
+			tprintf(", time_started=%" PRIu64,
+				(uint64_t) args.status.time_started);
+			tprints_comment(sprinttime(args.status.time_started));
 
-			time = args.status.time_stopped;
-			strftime(buf, sizeof(buf), "%T",
-				 localtime(&time));
-			tprintf("time_stopped=%" PRIu64" /* %s */, ",
-				(uint64_t) args.status.time_stopped, buf);
+			tprintf(", time_stopped=%" PRIu64,
+				(uint64_t) args.status.time_stopped);
+			tprints_comment(sprinttime(args.status.time_stopped));
 
-			tprintf("num_write_errors=%" PRIu64
+			tprintf(", num_write_errors=%" PRIu64
 				", num_uncorrectable_read_errors=%" PRIu64,
 				(uint64_t) args.status.num_write_errors,
 				(uint64_t) args.status.num_uncorrectable_read_errors);
@@ -779,14 +767,17 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &flarg))
 			break;
 
-		tprints("[ /* supported */ ");
+		tprints("[");
 		btrfs_print_features(&flarg[0]);
+		tprints_comment("supported");
 
-		tprints(", /* safe to set */ ");
+		tprints(", ");
 		btrfs_print_features(&flarg[1]);
+		tprints_comment("safe to set");
 
-		tprints(", /* safe to clear */ ");
+		tprints(", ");
 		btrfs_print_features(&flarg[2]);
+		tprints_comment("safe to clear");
 		tprints("]");
 
 		break;
@@ -869,10 +860,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				tprints("...");
 				break;
 			}
-			const char *name = xlookup(btrfs_dev_stats_values, i);
-			if (name)
-				tprintf("/* %s */ ", name);
 			tprintf("%" PRI__u64, args.values[i]);
+			tprints_comment(xlookup(btrfs_dev_stats_values, i));
 		}
 		tprints("]}");
 		break;
@@ -1108,7 +1097,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 					args.start);
 				tprintf("%" PRI__u64, args.end);
 				if (args.end == UINT64_MAX)
-					tprints(" /* UINT64_MAX */");
+					tprints_comment("UINT64_MAX");
 				tprints(", flags=");
 				printflags64(btrfs_scrub_flags, args.flags,
 					     "BTRFS_SCRUB_???");

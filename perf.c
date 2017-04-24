@@ -217,10 +217,10 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		           (attr->config >> 16) & 0xFF,
 		           "PERF_COUNT_HW_CACHE_RESULT_???");
 		tprints("<<16");
-		if (attr->config >> 24)
-			tprintf("|%#" PRIx64 "<<24 "
-			        "/* PERF_COUNT_HW_CACHE_??? */",
-			        attr->config >> 24);
+		if (attr->config >> 24) {
+			tprintf("|%#" PRIx64 "<<24", attr->config >> 24);
+			tprints_comment("PERF_COUNT_HW_CACHE_???");
+		}
 		break;
 	case PERF_TYPE_RAW:
 		/*
@@ -275,18 +275,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	        ", enable_on_exec=%u"
 	        ", task=%u"
 	        ", watermark=%u"
-	        ", precise_ip=%u /* %s */"
-	        ", mmap_data=%u"
-	        ", sample_id_all=%u"
-	        ", exclude_host=%u"
-	        ", exclude_guest=%u"
-	        ", exclude_callchain_kernel=%u"
-	        ", exclude_callchain_user=%u"
-	        ", mmap2=%u"
-	        ", comm_exec=%u"
-	        ", use_clockid=%u"
-	        ", context_switch=%u"
-	        ", write_backward=%u",
+	        ", precise_ip=%u",
 	        attr->disabled,
 	        attr->inherit,
 	        attr->pinned,
@@ -302,7 +291,19 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	        attr->enable_on_exec,
 	        attr->task,
 	        attr->watermark,
-	        attr->precise_ip, precise_ip_desc[attr->precise_ip],
+	        attr->precise_ip);
+	tprints_comment(precise_ip_desc[attr->precise_ip]);
+	tprintf(", mmap_data=%u"
+	        ", sample_id_all=%u"
+	        ", exclude_host=%u"
+	        ", exclude_guest=%u"
+	        ", exclude_callchain_kernel=%u"
+	        ", exclude_callchain_user=%u"
+	        ", mmap2=%u"
+	        ", comm_exec=%u"
+	        ", use_clockid=%u"
+	        ", context_switch=%u"
+	        ", write_backward=%u",
 	        attr->mmap_data,
 	        attr->sample_id_all,
 	        attr->exclude_host,
@@ -319,9 +320,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * Print it only in case it is non-zero, since it may contain flags we
 	 * are not aware about.
 	 */
-	if (attr->__reserved_1)
-		tprintf(", __reserved_1=%#" PRIx64 " /* Bits 63..28 */",
+	if (attr->__reserved_1) {
+		tprintf(", __reserved_1=%#" PRIx64,
 		        (uint64_t) attr->__reserved_1);
+		tprints_comment("Bits 63..28");
+	}
 
 	if (attr->watermark)
 		tprintf(", wakeup_watermark=%u", attr->wakeup_watermark);

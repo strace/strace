@@ -98,7 +98,7 @@ printargc(struct tcb *const tcp, kernel_ulong_t addr)
 		if (!cp)
 			break;
 	}
-	tprintf(" /* %u var%s%s */",
+	tprintf_comment("%u var%s%s",
 		count, count == 1 ? "" : "s",
 		unterminated ? ", unterminated" : "");
 }

@@ -73,7 +73,8 @@ tprint_lio_opcode(unsigned cmd)
 		tprints(cmds[cmd].name);
 		return cmds[cmd].sub;
 	}
-	tprintf("%u /* SUB_??? */", cmd);
+	tprintf("%u", cmd);
+	tprints_comment("SUB_???");
 	return SUB_NONE;
 }
 

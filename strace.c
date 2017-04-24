@@ -569,12 +569,10 @@ strace_popen(const char *command)
 	return fp;
 }
 
-void
-tprintf(const char *fmt, ...)
+ATTRIBUTE_FORMAT((printf, 1, 0))
+static void
+tvprintf(const char *const fmt, va_list args)
 {
-	va_list args;
-
-	va_start(args, fmt);
 	if (current_tcp) {
 		int n = vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
@@ -583,6 +581,14 @@ tprintf(const char *fmt, ...)
 		} else
 			current_tcp->curcol += n;
 	}
+}
+
+void
+tprintf(const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	tvprintf(fmt, args);
 	va_end(args);
 }
 
@@ -602,6 +608,27 @@ tprints(const char *str)
 		if (current_tcp->outf != stderr)
 			perror_msg("%s", outfname);
 	}
+}
+
+void
+tprints_comment(const char *const str)
+{
+	if (str && *str)
+		tprintf(" /* %s */", str);
+}
+
+void
+tprintf_comment(const char *fmt, ...)
+{
+	if (!fmt || !*fmt)
+		return;
+
+	va_list args;
+	va_start(args, fmt);
+	tprints(" /* ");
+	tvprintf(fmt, args);
+	tprints(" */");
+	va_end(args);
 }
 
 void

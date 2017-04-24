@@ -195,7 +195,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 
 misplaced:
 	tprints("???");
-	tprints(" /* misplaced struct dm_target_spec */");
+	tprints_comment("misplaced struct dm_target_spec");
 }
 
 bool
@@ -252,7 +252,7 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 
 misplaced:
 	tprints("???");
-	tprints(" /* misplaced struct dm_target_deps */");
+	tprints_comment("misplaced struct dm_target_deps");
 }
 
 static void
@@ -311,7 +311,7 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 
 misplaced:
 	tprints("???");
-	tprints(" /* misplaced struct dm_name_list */");
+	tprints_comment("misplaced struct dm_name_list");
 }
 
 static void
@@ -368,7 +368,7 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 
 misplaced:
 	tprints("???");
-	tprints(" /* misplaced struct dm_target_versions */");
+	tprints_comment("misplaced struct dm_target_versions");
 }
 
 static void
@@ -402,7 +402,7 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprints("}");
 	} else {
 		tprints("???");
-		tprints(" /* misplaced struct dm_target_msg */");
+		tprints_comment("misplaced struct dm_target_msg");
 	}
 }
 
@@ -425,7 +425,7 @@ dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 			    QUOTE_0_TERMINATED);
 	} else {
 		tprints("???");
-		tprints(" /* misplaced string */");
+		tprints_comment("misplaced string");
 	}
 }
 
@@ -503,14 +503,14 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	 * ioctl fields
 	 */
 	if (ioc->version[0] != DM_VERSION_MAJOR) {
-		tprints(" /* unsupported device mapper ABI version */");
+		tprints_comment("unsupported device mapper ABI version");
 		goto skip;
 	}
 
 	tprintf(", data_size=%u", ioc->data_size);
 
 	if (ioc->data_size < offsetof(struct dm_ioctl, data)) {
-		tprints(" /* data_size too small */");
+		tprints_comment("data_size too small");
 		goto skip;
 	}
 

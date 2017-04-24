@@ -1548,9 +1548,9 @@ btrfs_test_get_dev_stats_ioctl(void)
 			const char *name = xlookup(btrfs_dev_stats_values, i);
 			if (i)
 				printf(", ");
-			if (name)
-				printf("/* %s */ ", name);
 			printf("%" PRI__u64, args.values[i]);
+			if (name)
+				printf(" /* %s */", name);
 		}
 		printf("]}) = 0\n");
 	}
@@ -1799,13 +1799,13 @@ btrfs_test_features_ioctls(void)
 		      &supported_features);
 		printf("ioctl(%d, BTRFS_IOC_GET_SUPPORTED_FEATURES, ",
 		       btrfs_test_dir_fd);
-		printf("[ /* supported */ ");
+		printf("[");
 		btrfs_print_features(&supported_features[0]);
-		printf(", /* safe to set */ ");
+		printf(" /* supported */, ");
 		btrfs_print_features(&supported_features[1]);
-		printf(", /* safe to clear */ ");
+		printf(" /* safe to set */, ");
 		btrfs_print_features(&supported_features[2]);
-		printf("]) = 0\n");
+		printf(" /* safe to clear */]) = 0\n");
 	}
 }
 

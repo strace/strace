@@ -46,13 +46,13 @@ SYS_FUNC(getdents64)
 
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
 		return 0;
 	}
 
 	const unsigned int count = tcp->u_arg[2];
 
 	if (syserror(tcp) || !verbose(tcp)) {
+		tprints(", ");
 		printaddr(tcp->u_arg[1]);
 		tprintf(", %u", count);
 		return 0;
@@ -69,6 +69,7 @@ SYS_FUNC(getdents64)
 	if (len) {
 		buf = malloc(len);
 		if (!buf || umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
+			tprints(", ");
 			printaddr(tcp->u_arg[1]);
 			tprintf(", %u", count);
 			free(buf);
@@ -78,8 +79,9 @@ SYS_FUNC(getdents64)
 		buf = NULL;
 	}
 
+	tprints(",");
 	if (!abbrev(tcp))
-		tprints("[");
+		tprints(" [");
 	for (i = 0; len && i <= len - d_name_offset; ) {
 		struct dirent64 *d = (struct dirent64 *) &buf[i];
 		if (!abbrev(tcp)) {
@@ -110,7 +112,7 @@ SYS_FUNC(getdents64)
 			tprints("}");
 		}
 		if (d->d_reclen < d_name_offset) {
-			tprints("/* d_reclen < offsetof(struct dirent64, d_name) */");
+			tprints_comment("d_reclen < offsetof(struct dirent64, d_name)");
 			break;
 		}
 		i += d->d_reclen;
@@ -119,7 +121,7 @@ SYS_FUNC(getdents64)
 	if (!abbrev(tcp))
 		tprints("]");
 	else
-		tprintf("/* %u entries */", dents);
+		tprintf_comment("%u entries", dents);
 	tprintf(", %u", count);
 	free(buf);
 	return 0;

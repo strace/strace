@@ -251,8 +251,7 @@ printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 	}
 	/* No hits -- print raw # instead. */
 	tprintf("%#" PRIx64, val);
-	if (dflt)
-		tprintf(" /* %s */", dflt);
+	tprints_comment(dflt);
 
 	va_end(args);
 
@@ -285,8 +284,7 @@ printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 	}
 
 	tprintf("%#" PRIx64, val);
-	if (dflt)
-		tprintf(" /* %s */", dflt);
+	tprints_comment(dflt);
 
 	return 0;
 }
@@ -438,8 +436,7 @@ printflags64(const struct xlat *xlat, uint64_t flags, const char *dflt)
 	} else {
 		if (flags) {
 			tprintf("%#" PRIx64, flags);
-			if (dflt)
-				tprintf(" /* %s */", dflt);
+			tprints_comment(dflt);
 		} else {
 			if (dflt)
 				tprints("0");
