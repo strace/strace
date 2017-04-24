@@ -164,6 +164,21 @@ main(void)
 		       (unsigned long long) ill_old, sprintrc(rc));
 	}
 
+	p_new->it_interval.tv_sec = 0xdeadbeefU;
+	p_new->it_interval.tv_usec = 0xfacefeedU;
+	p_new->it_value.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	p_new->it_value.tv_usec = (long) 0xbadc0dedfacefeedLL;
+
+	rc = setitimer(ITIMER_REAL, p_new, p_old);
+	printf("setitimer(ITIMER_REAL"
+	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
+	       ", it_value={tv_sec=%lld, tv_usec=%llu}}, %p) = %s\n",
+	       (long long) p_new->it_interval.tv_sec,
+	       zero_extend_signed_to_ull(p_new->it_interval.tv_usec),
+	       (long long) p_new->it_value.tv_sec,
+	       zero_extend_signed_to_ull(p_new->it_value.tv_usec),
+	       p_old, sprintrc(rc));
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

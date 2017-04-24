@@ -104,10 +104,22 @@ main(void)
 	printf("%s(%s, %p) = %s\n", TEST_SYSCALL_STR,
 	       qname, tv + 2, errstr);
 
+	tv[0].tv_sec = 0xdeadbeefU;
+	tv[0].tv_usec = 0xfacefeedU;
+	tv[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tv[1].tv_usec = (long) 0xbadc0dedfacefeedLL;
+
+	k_utimes(kfname, (uintptr_t) tv);
+	printf("%s(%s, [", TEST_SYSCALL_STR, qname);
+	print_tv(&tv[0]);
+	printf(", ");
+	print_tv(&tv[1]);
+	printf("]) = %s\n", errstr);
+
 	tv[0].tv_sec = 1492358607;
-	tv[0].tv_usec = 345678912;
+	tv[0].tv_usec = 1000000;
 	tv[1].tv_sec = 1492356078;
-	tv[1].tv_usec = 456789023;
+	tv[1].tv_usec = 1000001;
 
 	k_utimes(kfname, (uintptr_t) tv);
 	printf("%s(%s, [", TEST_SYSCALL_STR, qname);
