@@ -593,8 +593,7 @@ main(void )
 	printf("ioctl(-1, VIDIOC_S_PARM, {type=%#x /* V4L2_BUF_TYPE_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_streamparm->type);
 
-	struct v4l2_streamparm *const p_streamparm =
-		tail_alloc(sizeof(*p_streamparm));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_streamparm, p_streamparm);
 	p_streamparm->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	p_streamparm->parm.capture.capability = V4L2_CAP_TIMEPERFRAME;
 	p_streamparm->parm.capture.capturemode = V4L2_MODE_HIGHQUALITY;
@@ -687,8 +686,7 @@ main(void )
 	ioctl(-1, VIDIOC_S_TUNER, 0);
 	printf("ioctl(-1, VIDIOC_S_TUNER, NULL) = -1 EBADF (%m)\n");
 
-	struct v4l2_tuner *const p_tuner =
-		tail_alloc(sizeof(*p_tuner));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_tuner, p_tuner);
 	p_tuner->index = 0x4fb6df39;
 	strcpy((char*)p_tuner->name, "cum tacent clamant");
 	p_tuner->type = V4L2_TUNER_RADIO;
@@ -726,8 +724,7 @@ main(void )
 	       " = -1 EBADF (%m)\n", p_v4l2_queryctrl->id);
 # endif
 
-	struct v4l2_queryctrl *const p_queryctrl =
-		tail_alloc(sizeof(*p_queryctrl));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_queryctrl, p_queryctrl);
 	p_queryctrl->id = V4L2_CID_SATURATION;
 	ioctl(-1, VIDIOC_QUERYCTRL, p_queryctrl);
 	printf("ioctl(-1, VIDIOC_QUERYCTRL, {id=V4L2_CID_SATURATION})"
@@ -785,8 +782,7 @@ main(void )
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, 0);
 	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS, NULL) = -1 EBADF (%m)\n");
 
-	struct v4l2_ext_controls *const p_ext_controls =
-		tail_alloc(sizeof(*p_ext_controls));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_ext_controls, p_ext_controls);
 	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_USER;
 	p_ext_controls->count = 0;
 	p_ext_controls->controls = (void *) -2UL;
@@ -871,8 +867,7 @@ main(void )
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, 0);
 	printf("ioctl(-1, VIDIOC_ENUM_FRAMESIZES, NULL) = -1 EBADF (%m)\n");
 
-	struct v4l2_frmsizeenum *const p_frmsizeenum =
-		tail_alloc(sizeof(*p_frmsizeenum));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_frmsizeenum, p_frmsizeenum);
 	p_frmsizeenum->index = magic;
 	p_frmsizeenum->pixel_format = fourcc(cc[0], cc[1], cc[2], cc[3]);
 
