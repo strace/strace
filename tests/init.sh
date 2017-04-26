@@ -365,7 +365,7 @@ else
 		STRACE=../strace
 fi
 
-: "${TIMEOUT_DURATION:=60}"
+: "${TIMEOUT_DURATION:=120}"
 : "${SLEEP_A_BIT:=sleep 1}"
 
 [ -z "${VERBOSE-}" ] ||
