@@ -89,10 +89,6 @@ main(int ac, char **av)
 	printf("mremap(%p, %lu, %lu, MREMAP_MAYMOVE|MREMAP_FIXED"
 	       ", %p) = %p\n", addr, length2, length3, addr + length2, p);
 
-	if (madvise(p, length3, MADV_NORMAL))
-		perror_msg_and_fail("madvise");
-	printf("madvise(%p, %lu, MADV_NORMAL) = 0\n", p, length3);
-
 	if (munmap(p, length3))
 		perror_msg_and_fail("munmap");
 	printf("munmap(%p, %lu) = 0\n", p, length3);

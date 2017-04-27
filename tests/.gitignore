@@ -159,6 +159,7 @@ lookup_dcookie
 lseek
 lstat
 lstat64
+madvise
 mbind
 membarrier
 memfd_create

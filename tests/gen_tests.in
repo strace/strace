@@ -153,6 +153,7 @@ linkat
 lookup_dcookie	-a27
 lstat	-a32 -v -P stat.sample -P /dev/full
 lstat64	-a32 -v -P stat.sample -P /dev/full
+madvise	-a33
 mbind
 membarrier	-a36
 memfd_create
