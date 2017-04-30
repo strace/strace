@@ -271,6 +271,7 @@ sigaltstack
 siginfo
 signalfd4
 sigreturn
+sigsuspend
 socketcall
 splice
 stat

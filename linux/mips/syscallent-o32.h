@@ -72,7 +72,7 @@
 [4069] = { 1,	TS,		SEN(sigsetmask),		"ssetmask"		},
 [4070] = { 2,	0,		SEN(setreuid),			"setreuid"		},
 [4071] = { 2,	0,		SEN(setregid),			"setregid"		},
-[4072] = { 3,	TS,		SEN(sigsuspend),		"sigsuspend"		},
+[4072] = { 1,	TS,		SEN(sigsuspend),		"sigsuspend"		},
 [4073] = { 1,	TS,		SEN(sigpending),		"sigpending"		},
 [4074] = { 2,	0,		SEN(sethostname),		"sethostname"		},
 [4075] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},

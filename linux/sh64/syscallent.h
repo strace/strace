@@ -98,7 +98,7 @@
 [ 69] = { 1,	TS,		SEN(sigsetmask),		"ssetmask"		},
 [ 70] = { 2,	0,		SEN(setreuid16),		"setreuid"		},
 [ 71] = { 2,	0,		SEN(setregid16),		"setregid"		},
-[ 72] = { 3,	TS,		SEN(sigsuspend),		"sigsuspend"		},
+[ 72] = { 1,	TS,		SEN(sigsuspend),		"sigsuspend"		},
 [ 73] = { 1,	TS,		SEN(sigpending),		"sigpending"		},
 [ 74] = { 2,	0,		SEN(sethostname),		"sethostname"		},
 [ 75] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},

@@ -197,7 +197,7 @@
 [198] = { 3,	TS,		SEN(sigaction),			"sigaction"		},
 [199] = { 0,	TS,		SEN(siggetmask),		"sgetmask"		},
 [200] = { 1,	TS,		SEN(sigsetmask),		"ssetmask"		},
-[201] = { 3,	TS,		SEN(sigsuspend),		"sigsuspend"		},
+[201] = { 1,	TS,		SEN(sigsuspend),		"sigsuspend"		},
 [202] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"oldlstat"		},
 [203] = { 1,	TF,		SEN(uselib),			"uselib"		},
 [204] = { 3,	TD,		SEN(readdir),			"readdir"		},

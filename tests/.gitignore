@@ -329,6 +329,7 @@ siginfo
 signal_receive
 signalfd4
 sigreturn
+sigsuspend
 sleep
 socketcall
 splice

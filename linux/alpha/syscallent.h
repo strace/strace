@@ -137,7 +137,7 @@
 [108] = { 5,	0,		SEN(printargs),			"osf_old_sigvec"	}, /* not implemented */
 [109] = { 5,	0,		SEN(printargs),			"osf_old_sigblock"	}, /* not implemented */
 [110] = { 5,	0,		SEN(printargs),			"osf_old_sigsetmask"	}, /* not implemented */
-[111] = { 3,	TS,		SEN(sigsuspend),		"sigsuspend"		},
+[111] = { 1,	TS,		SEN(sigsuspend),		"sigsuspend"		},
 [112] = { 2,	0,		SEN(printargs),			"osf_sigstack"		},
 [113] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
 [114] = { 3,	TN,		SEN(sendmsg),			"sendmsg"		},
