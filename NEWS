@@ -25,6 +25,9 @@ Noteworthy changes in release ?.?? (????-??-??)
     system statistics information (statfs-like, fstatfs-like and ustat).
   * Added -e trace=/regex option for filtering syscalls using regular
     expressions.
+  * Added support for prepending of question mark before syscall qualification
+    in -e trace expressions in order to suppress error in case no syscalls
+    matched the provided qualification.
   * Implemented decoding of signal mask in rt_sigreturn syscall on alpha, arc,
     arm, avr32, bfin, cris, hppa, m68k, metag, microblaze, mips, nios2, or1k,
     powerpc, powerpc64, riscv, sh, sh64, sparc, sparc64, tile, x86, and xtensa
@@ -32,13 +35,20 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of statx syscall.
   * Implemented decoding of NS_* ioctl commands.
   * Implemented decoding of the remaining V4L2_BUF_TYPE_* types.
+  * Implemented decoding of VIDIOC_[SG]_TUNER ioctl commands.
   * Implemented decoding of NLMSG_ERROR netlink messages.
+  * Improved decoding of BPF_PROG_ATTACH command of bpf syscall.
+  * Improved decoding of misplaced parts in DM_* ioctl commands.
   * Updated lists of ioctl commands from Linux 4.11.
 
 * Bug fixes
   * Fixed decoding of flags argument of preadv2 and pwritev2 syscalls on x32.
   * Fixed the number of arguments and tracing flags of alpha specific syscalls.
   * Fixed decoding of netlink messages received within struct msghdr.
+  * Worked around a bug in miscompiled aarch64 kernels leading to the 3rd
+    argument of sched_getattr syscall being not quite 32-bit.
+  * Fixed corner cases of printing inaccessible times argument of utimes
+    and futimesat syscalls.
 
 Noteworthy changes in release 4.16 (2017-02-14)
 ===============================================
