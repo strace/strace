@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 1999, 2001 Hewlett-Packard Co
- *	David Mosberger-Tang <davidm@hpl.hp.com>
+ *                          David Mosberger-Tang <davidm@hpl.hp.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
