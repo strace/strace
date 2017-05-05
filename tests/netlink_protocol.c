@@ -314,6 +314,42 @@ test_nlmsgerr(const int fd)
 	       nlh->nlmsg_len, sprintrc(rc));
 }
 
+static void
+test_nlmsg_done(const int fd)
+{
+	struct nlmsghdr *nlh;
+	int total_len;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	nlh = nlh0;
+	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(int);
+	nlh->nlmsg_type = NLMSG_DONE;
+	nlh->nlmsg_flags = NLM_F_MULTI;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_DONE, flags=NLM_F_MULTI"
+	       ", seq=0, pid=0}, %p}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, nlh0 + NLMSG_HDRLEN,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	nlh = nlh0 - sizeof(int);
+	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(int);
+	nlh->nlmsg_type = NLMSG_DONE;
+	nlh->nlmsg_flags = NLM_F_MULTI;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+	total_len = nlh->nlmsg_len;
+	memcpy(NLMSG_DATA(nlh), &total_len, sizeof(total_len));
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_DONE, flags=NLM_F_MULTI"
+	       ", seq=0, pid=0}, %d}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, nlh->nlmsg_len, total_len, sprintrc(rc));
+}
+
 int main(void)
 {
 	struct sockaddr_nl addr;
@@ -343,6 +379,7 @@ int main(void)
 
 	send_query(fd);
 	test_nlmsgerr(fd);
+	test_nlmsg_done(fd);
 
 	printf("+++ exited with 0 +++\n");
 

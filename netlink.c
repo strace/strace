@@ -120,6 +120,12 @@ decode_payload(struct tcb *const tcp,
 	if (nlmsghdr->nlmsg_type == NLMSG_ERROR) {
 		decode_nlmsgerr(tcp, addr, len);
 		return;
+	} else if (nlmsghdr->nlmsg_type == NLMSG_DONE && len == sizeof(int)) {
+		int num;
+
+		if (!umove_or_printaddr(tcp, addr, &num))
+			tprintf("%d", num);
+		return;
 	}
 
 	printstrn(tcp, addr, len);
