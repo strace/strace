@@ -802,10 +802,6 @@ EXTRA_DIST =				\
 	linux/xtensa/set_scno.c		\
 	linux/xtensa/syscallent.h	\
 	linux/xtensa/userent.h		\
-	maint/ioctls_gen.sh		\
-	maint/ioctls_hex.sh		\
-	maint/ioctls_sym.sh		\
-	maint/print_ioctlent.c		\
 	mpers.awk			\
 	mpers.sh			\
 	mpers_test.sh			\
