@@ -19,7 +19,7 @@ asrc=$ksrc/arch/blackfin/include
 To use the errnoent.sh script, give it all the headers that might contain
 appropriate errno values.  Excessive headers are not a problem.  The resulting
 output should be directly usable without modification.
-	sh ./errnoent.sh \
+	sh ./maint/errnoent.sh \
 		$ksrc/include/linux/*errno*.h \
 		$ksrc/include/asm-generic/*errno*.h \
 		$asrc/asm/*errno*.h \
@@ -44,7 +44,7 @@ merging should be used to produce the final ioctlent0.h header.
 To use the signalent.sh script, give it all the headers that might contain
 appropriate signal values.  Excessive headers are not a problem.  The resulting
 output should be directly usable without modification.
-	sh ./signalent.sh \
+	sh ./maint/signalent.sh \
 		$asrc/asm/signal.h \
 		> signalent.h
 
@@ -53,6 +53,6 @@ system call numbers.  The resulting output is useful as a template for creating
 a proper header as it can really only detect the system call number and its
 name.  It has no way of knowing the number of arguments or strace flags for
 decoding them (yet?).
-	sh ./syscallent.sh \
+	sh ./maint/syscallent.sh \
 		$asrc/asm/unistd.h \
 		> syscallent.h

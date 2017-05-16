@@ -309,7 +309,6 @@ EXTRA_DIST =				\
 	debian/strace64.install		\
 	debian/strace64.manpages	\
 	debian/watch			\
-	errnoent.sh			\
 	generate_sen.sh			\
 	ioctl_iocdef.c			\
 	ioctlsort.c			\
@@ -807,11 +806,9 @@ EXTRA_DIST =				\
 	mpers_test.sh			\
 	mpers_xlat.h			\
 	scno.head			\
-	signalent.sh			\
 	strace-graph			\
 	strace-log-merge		\
 	strace.spec			\
-	syscallent.sh			\
 	$(XLAT_INPUT_FILES)		\
 	$(XLAT_HEADER_FILES)		\
 	xlat/gen.sh			\
