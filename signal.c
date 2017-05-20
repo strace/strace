@@ -230,6 +230,24 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 #define tprintsigmask_val(prefix, mask) \
 	tprints(sprintsigmask_n((prefix), &(mask), sizeof(mask)))
 
+static const char *
+sprint_old_sigmask_val(const char *const prefix, const unsigned long mask)
+{
+#if defined(current_wordsize) || !defined(WORDS_BIGENDIAN)
+	return sprintsigmask_n(prefix, &mask, current_wordsize);
+#else /* !current_wordsize && WORDS_BIGENDIAN */
+	if (current_wordsize == sizeof(mask)) {
+		return sprintsigmask_val(prefix, mask);
+	} else {
+		uint32_t mask32 = mask;
+		return sprintsigmask_val(prefix, mask32);
+	}
+#endif
+}
+
+#define tprint_old_sigmask_val(prefix, mask) \
+	tprints(sprint_old_sigmask_val((prefix), (mask)))
+
 void
 printsignal(int nr)
 {
@@ -389,7 +407,7 @@ SYS_FUNC(sigsuspend)
 	print_sigset_addr_len(tcp, tcp->u_arg[tcp->s_ent->nargs - 1],
 			      current_wordsize);
 #else
-	tprintsigmask_val("", tcp->u_arg[tcp->s_ent->nargs - 1]);
+	tprint_old_sigmask_val("", tcp->u_arg[tcp->s_ent->nargs - 1]);
 #endif
 
 	return RVAL_DECODED;
