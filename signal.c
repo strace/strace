@@ -285,7 +285,7 @@ print_sigset_addr(struct tcb *const tcp, const kernel_ulong_t addr)
 	print_sigset_addr_len_limit(tcp, addr, NSIG_BYTES, NSIG_BYTES);
 }
 
-SYS_FUNC(sigsetmask)
+SYS_FUNC(ssetmask)
 {
 	if (entering(tcp)) {
 		tprintsigmask_val("", tcp->u_arg[0]);
@@ -393,7 +393,7 @@ SYS_FUNC(signal)
 	return 0;
 }
 
-SYS_FUNC(siggetmask)
+SYS_FUNC(sgetmask)
 {
 	if (exiting(tcp)) {
 		tcp->auxstr = sprintsigmask_val("mask ", tcp->u_rval);
