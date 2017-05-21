@@ -55,6 +55,10 @@ k_sigsuspend(const kernel_ulong_t arg1,
 }
 
 static int signo;
+static const char *sigtxt[] = {
+	[SIGUSR1] = "USR1",
+	[SIGUSR2] = "USR2"
+};
 
 static void
 handler(int i)
@@ -69,17 +73,10 @@ main(void)
 		sigset_t libc_mask;
 		unsigned long old_mask;
 	} u;
-	unsigned long mask1, mask2;
 
 	sigemptyset(&u.libc_mask);
 	sigaddset(&u.libc_mask, SIGUSR1);
-	mask1 = u.old_mask;
-
-	sigemptyset(&u.libc_mask);
 	sigaddset(&u.libc_mask, SIGUSR2);
-	mask2 = u.old_mask;
-
-	sigaddset(&u.libc_mask, SIGUSR1);
 	if (sigprocmask(SIG_SETMASK, &u.libc_mask, NULL))
 		perror_msg_and_fail("sigprocmask");
 
@@ -90,6 +87,14 @@ main(void)
 	raise(SIGUSR1);
 	raise(SIGUSR2);
 
+	u.old_mask = -1UL;
+	sigdelset(&u.libc_mask, SIGUSR1);
+	const unsigned long mask1 = u.old_mask;
+
+	u.old_mask = -1UL;
+	sigdelset(&u.libc_mask, SIGUSR2);
+	const unsigned long mask2 = u.old_mask;
+
 #if SIGNAL_MASK_BY_REF
 	k_sigsuspend((uintptr_t) &mask1, 0xdeadbeef, (uintptr_t) &mask2);
 #else
@@ -98,9 +103,8 @@ main(void)
 	if (EINTR != errno)
 		perror_msg_and_skip("sigsuspend");
 
-	printf("sigsuspend([%s]) = ? ERESTARTNOHAND"
-	       " (To be restarted if no handler)\n",
-	       signo == SIGUSR2 ? "USR1" : "USR2");
+	printf("sigsuspend(~[%s]) = ? ERESTARTNOHAND"
+	       " (To be restarted if no handler)\n", sigtxt[signo]);
 
 	puts("+++ exited with 0 +++");
 	return 0;
