@@ -37,4 +37,37 @@ enum {
 	PACKET_DIAG_FILTER,
 };
 
+struct packet_diag_info {
+	uint32_t pdi_index;
+	uint32_t pdi_version;
+	uint32_t pdi_reserve;
+	uint32_t pdi_copy_thresh;
+	uint32_t pdi_tstamp;
+	uint32_t pdi_flags;
+
+#define PDI_RUNNING	0x1
+#define PDI_AUXDATA	0x2
+#define PDI_ORIGDEV	0x4
+#define PDI_VNETHDR	0x8
+#define PDI_LOSS	0x10
+};
+
+struct packet_diag_mclist {
+	uint32_t pdmc_index;
+	uint32_t pdmc_count;
+	uint16_t pdmc_type;
+	uint16_t pdmc_alen;
+	uint8_t pdmc_addr[32]; /* MAX_ADDR_LEN */
+};
+
+struct packet_diag_ring {
+	uint32_t pdr_block_size;
+	uint32_t pdr_block_nr;
+	uint32_t pdr_frame_size;
+	uint32_t pdr_frame_nr;
+	uint32_t pdr_retire_tmo;
+	uint32_t pdr_sizeof_priv;
+	uint32_t pdr_features;
+};
+
 #endif /* !STRACE_LINUX_PACKET_DIAG_H */

@@ -33,6 +33,8 @@
 #include "print_fields.h"
 
 #include <arpa/inet.h>
+#include <linux/filter.h>
+
 #include <linux/inet_diag.h>
 #include <linux/netlink_diag.h>
 #include <linux/packet_diag.h>
@@ -55,6 +57,7 @@
 #include "xlat/netlink_states.h"
 
 #include "xlat/packet_diag_attrs.h"
+#include "xlat/packet_diag_info_flags.h"
 #include "xlat/packet_diag_show.h"
 
 #ifdef AF_SMC
@@ -447,6 +450,119 @@ decode_packet_diag_req(struct tcb *const tcp,
 	tprints("}");
 }
 
+static bool
+decode_packet_diag_info(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const kernel_ulong_t len,
+			const void *const opaque_data)
+{
+	struct packet_diag_info pinfo;
+
+	if (len < sizeof(pinfo))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &pinfo))
+		return true;
+
+	PRINT_FIELD_U("{", pinfo, pdi_index);
+	PRINT_FIELD_U(", ", pinfo, pdi_version);
+	PRINT_FIELD_U(", ", pinfo, pdi_reserve);
+	PRINT_FIELD_U(", ", pinfo, pdi_copy_thresh);
+	PRINT_FIELD_U(", ", pinfo, pdi_tstamp);
+	PRINT_FIELD_FLAGS(", ", pinfo, pdi_flags,
+			  packet_diag_info_flags, "PDI_???");
+	tprints("}");
+
+	return true;
+}
+
+static bool
+print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
+			 const size_t elem_size, void *const opaque_data)
+{
+	struct packet_diag_mclist *dml = elem_buf;
+	uint16_t alen = dml->pdmc_alen > sizeof(dml->pdmc_addr) ?
+		sizeof(dml->pdmc_addr) : dml->pdmc_alen;
+
+	tprints("{pdmc_index=");
+	print_ifindex(dml->pdmc_index);
+	PRINT_FIELD_U(", ", *dml, pdmc_count);
+	PRINT_FIELD_U(", ", *dml, pdmc_type);
+	PRINT_FIELD_U(", ", *dml, pdmc_alen);
+	PRINT_FIELD_QUOTED_STRING(", ", *dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
+	tprints("}");
+
+	return true;
+}
+
+static bool
+decode_packet_diag_mclist(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const kernel_ulong_t len,
+			  const void *const opaque_data)
+{
+	struct packet_diag_mclist dml;
+	const size_t nmemb = len / sizeof(dml);
+
+	if (!nmemb)
+		return false;
+
+	print_array(tcp, addr, nmemb, &dml, sizeof(dml),
+		    umoven_or_printaddr, print_packet_diag_mclist, 0);
+
+	return true;
+}
+
+static bool
+decode_packet_diag_ring(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const kernel_ulong_t len,
+			const void *const opaque_data)
+{
+	struct packet_diag_ring pdr;
+
+	if (len < sizeof(pdr))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &pdr))
+		return true;
+
+	PRINT_FIELD_U("{", pdr, pdr_block_size);
+	PRINT_FIELD_U(", ", pdr, pdr_block_nr);
+	PRINT_FIELD_U(", ", pdr, pdr_frame_size);
+	PRINT_FIELD_U(", ", pdr, pdr_frame_nr);
+	PRINT_FIELD_U(", ", pdr, pdr_retire_tmo);
+	PRINT_FIELD_U(", ", pdr, pdr_sizeof_priv);
+	PRINT_FIELD_U(", ", pdr, pdr_features);
+	tprints("}");
+
+	return true;
+}
+
+static bool
+decode_packet_diag_filter(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const kernel_ulong_t len,
+			  const void *const opaque_data)
+{
+	const kernel_ulong_t nmemb = len / sizeof(struct sock_filter);
+	if (!nmemb || (unsigned short) nmemb != nmemb)
+		return false;
+
+	print_sock_fprog(tcp, addr, nmemb);
+
+	return true;
+}
+
+static const nla_decoder_t packet_diag_msg_nla_decoders[] = {
+	[PACKET_DIAG_INFO]	= decode_packet_diag_info,
+	[PACKET_DIAG_MCLIST]	= decode_packet_diag_mclist,
+	[PACKET_DIAG_RX_RING]	= decode_packet_diag_ring,
+	[PACKET_DIAG_TX_RING]	= decode_packet_diag_ring,
+	[PACKET_DIAG_FANOUT]	= decode_nla_u32,
+	[PACKET_DIAG_UID]	= decode_nla_u32,
+	[PACKET_DIAG_MEMINFO]	= decode_meminfo,
+	[PACKET_DIAG_FILTER]	= decode_packet_diag_filter
+};
+
 static void
 decode_packet_diag_msg(struct tcb *const tcp,
 		       const struct nlmsghdr *const nlmsghdr,
@@ -480,7 +596,8 @@ decode_packet_diag_msg(struct tcb *const tcp,
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      packet_diag_attrs, "PACKET_DIAG_???",
-			      NULL, 0, NULL);
+			      packet_diag_msg_nla_decoders,
+			      ARRAY_SIZE(packet_diag_msg_nla_decoders), NULL);
 	}
 }
 
