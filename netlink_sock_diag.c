@@ -63,6 +63,7 @@
 #ifdef AF_SMC
 # include "xlat/smc_diag_attrs.h"
 # include "xlat/smc_diag_extended_flags.h"
+# include "xlat/smc_link_group_roles.h"
 # include "xlat/smc_states.h"
 #endif
 
@@ -901,6 +902,96 @@ decode_smc_diag_req(struct tcb *const tcp,
 }
 
 static void
+print_smc_diag_cursor(const struct smc_diag_cursor *const cursor)
+{
+	PRINT_FIELD_U("{", *cursor, reserved);
+	PRINT_FIELD_U(", ", *cursor, wrap);
+	PRINT_FIELD_U(", ", *cursor, count);
+	tprints("}");
+}
+
+#define PRINT_FIELD_SMC_DIAG_CURSOR(prefix_, where_, field_)		\
+	do {								\
+		tprintf("%s%s=", (prefix_), #field_);			\
+		print_smc_diag_cursor(&(where_).field_);		\
+	} while (0)
+
+#define PRINT_FIELD_SMC_DIAG_CONNINFO_FLAGS(prefix_, where_, field_)	\
+	tprintf("%s%s=%#0*x",						\
+	        (prefix_), #field_,					\
+	        (int) sizeof(where_).field_, (where_).field_)
+
+static bool
+decode_smc_diag_conninfo(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const kernel_ulong_t len,
+			 const void *const opaque_data)
+{
+	struct smc_diag_conninfo cinfo;
+
+	if (len < sizeof(cinfo))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &cinfo))
+		return true;
+
+	PRINT_FIELD_U("{", cinfo, token);
+	PRINT_FIELD_U(", ", cinfo, sndbuf_size);
+	PRINT_FIELD_U(", ", cinfo, rmbe_size);
+	PRINT_FIELD_U(", ", cinfo, peer_rmbe_size);
+	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, rx_prod);
+	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, rx_cons);
+	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_prod);
+	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_cons);
+	PRINT_FIELD_SMC_DIAG_CONNINFO_FLAGS(", ", cinfo, rx_prod_flags);
+	PRINT_FIELD_SMC_DIAG_CONNINFO_FLAGS(", ", cinfo, rx_conn_state_flags);
+	PRINT_FIELD_SMC_DIAG_CONNINFO_FLAGS(", ", cinfo, tx_prod_flags);
+	PRINT_FIELD_SMC_DIAG_CONNINFO_FLAGS(", ", cinfo, tx_conn_state_flags);
+	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_prep);
+	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_sent);
+	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_fin);
+	tprints("}");
+
+	return true;
+}
+
+static bool
+decode_smc_diag_lgrinfo(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const kernel_ulong_t len,
+			const void *const opaque_data)
+{
+	struct smc_diag_lgrinfo linfo;
+
+	if (len < sizeof(linfo))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &linfo))
+		return true;
+
+	tprints("{lnk[0]={");
+	PRINT_FIELD_U("", linfo.lnk[0], link_id);
+	PRINT_FIELD_QUOTED_STRING(", ", linfo.lnk[0], ibname,
+				  sizeof(linfo.lnk[0].ibname),
+				  QUOTE_0_TERMINATED);
+	PRINT_FIELD_U(", ", linfo.lnk[0], ibport);
+	PRINT_FIELD_QUOTED_STRING(", ", linfo.lnk[0], gid,
+				  sizeof(linfo.lnk[0].gid),
+				  QUOTE_0_TERMINATED);
+	PRINT_FIELD_QUOTED_STRING(", ", linfo.lnk[0], peer_gid,
+				  sizeof(linfo.lnk[0].peer_gid),
+				  QUOTE_0_TERMINATED);
+	PRINT_FIELD_XVAL("}, ", linfo, role, smc_link_group_roles, "SMC_???");
+	tprints("}");
+
+	return true;
+}
+
+static const nla_decoder_t smc_diag_msg_nla_decoders[] = {
+	[SMC_DIAG_CONNINFO]	= decode_smc_diag_conninfo,
+	[SMC_DIAG_LGRINFO]	= decode_smc_diag_lgrinfo,
+	[SMC_DIAG_SHUTDOWN]	= decode_nla_u8
+};
+
+static void
 decode_smc_diag_msg(struct tcb *const tcp,
 		    const struct nlmsghdr *const nlmsghdr,
 		    const uint8_t family,
@@ -939,7 +1030,8 @@ decode_smc_diag_msg(struct tcb *const tcp,
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      smc_diag_attrs, "SMC_DIAG_???",
-			      NULL, 0, NULL);
+			      smc_diag_msg_nla_decoders,
+			      ARRAY_SIZE(smc_diag_msg_nla_decoders), NULL);
 	}
 }
 #endif
