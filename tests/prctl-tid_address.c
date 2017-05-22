@@ -2,6 +2,7 @@
  * Check decoding of prctl PR_GET_TID_ADDRESS operation.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2016-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

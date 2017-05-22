@@ -8,6 +8,7 @@
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
  *                    port by Greg Banks <gbanks@pocketpenguins.com>
+ * Copyright (c) 1999-2017 The strace developers.
  *
  * All rights reserved.
  *

@@ -2,6 +2,7 @@
  * Copyright (c) 2000 Wichert Akkerman <wakkerma@debian.org>
  * Copyright (c) 2011 Denys Vlasenko <dvlasenk@redhat.com>
  * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

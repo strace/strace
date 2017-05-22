@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2000 IBM Deutschland Entwicklung GmbH, IBM Coporation
+ * Copyright (c) 2000-2017 The strace developers.
  * Authors: Ulrich Weigand <Ulrich.Weigand@de.ibm.com>
  *          D.J. Barrow  <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * All rights reserved.

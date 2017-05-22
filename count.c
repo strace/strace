@@ -8,6 +8,7 @@
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 2004 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2006 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2006-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

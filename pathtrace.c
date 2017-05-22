@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Comtrol Corp.
+ * Copyright (c) 2011-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

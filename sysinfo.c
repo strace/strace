@@ -7,6 +7,7 @@
  * Copyright (c) 2012 Denys Vlasenko <vda.linux@googlemail.com>
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
+ * Copyright (c) 2014-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

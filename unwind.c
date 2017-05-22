@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2013 Luca Clementi <luca.clementi@gmail.com>
+ * Copyright (c) 2013-2017 The strace developers.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

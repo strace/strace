@@ -5,6 +5,7 @@
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
  *                    port by Greg Banks <gbanks@pocketpenguins.com>
+ * Copyright (c) 1999-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

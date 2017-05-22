@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2012 Mike Frysinger <vapier@gentoo.org>
+ * Copyright (c) 2012-2017 The strace developers.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions

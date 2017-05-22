@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2003 Roland McGrath <roland@redhat.com>
+ * Copyright (c) 2003-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

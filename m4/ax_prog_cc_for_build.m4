@@ -26,6 +26,7 @@
 # LICENSE
 #
 #   Copyright (c) 2008 Paolo Bonzini <bonzini@gnu.org>
+#   Copyright (c) 2008-2017 The strace developers.
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice

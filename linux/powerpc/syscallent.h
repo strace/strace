@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995 Rick Sladkey <jrs@world.std.com>
+ * Copyright (c) 1995-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

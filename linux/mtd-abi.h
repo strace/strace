@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1999-2010 David Woodhouse <dwmw2@infradead.org> et al.
+ * Copyright (c) 2010-2017 The strace developers.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

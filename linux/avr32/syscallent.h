@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2004-2009 Atmel Corporation
+ * Copyright (c) 2009-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
