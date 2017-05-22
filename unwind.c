@@ -41,7 +41,7 @@
 #define DPRINTF(F, A, ...) if (debug_flag) error_msg("[unwind(" A ")] " F, __VA_ARGS__)
 
 /*
- * Кeep a sorted array of cache entries,
+ * Keep a sorted array of cache entries,
  * so that we can binary search through it.
  */
 struct mmap_cache_t {
