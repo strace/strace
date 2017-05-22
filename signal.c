@@ -288,10 +288,11 @@ print_sigset_addr(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(ssetmask)
 {
 	if (entering(tcp)) {
-		tprintsigmask_val("", tcp->u_arg[0]);
+		tprint_old_sigmask_val("", (unsigned) tcp->u_arg[0]);
 	}
 	else if (!syserror(tcp)) {
-		tcp->auxstr = sprintsigmask_val("old mask ", tcp->u_rval);
+		tcp->auxstr = sprint_old_sigmask_val("old mask ",
+						     (unsigned) tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	}
 	return 0;
@@ -395,10 +396,11 @@ SYS_FUNC(signal)
 
 SYS_FUNC(sgetmask)
 {
-	if (exiting(tcp)) {
+	if (exiting(tcp) && !syserror(tcp)) {
 		tcp->auxstr = sprintsigmask_val("mask ", tcp->u_rval);
+		return RVAL_HEX | RVAL_STR;
 	}
-	return RVAL_HEX | RVAL_STR;
+	return 0;
 }
 
 SYS_FUNC(sigsuspend)

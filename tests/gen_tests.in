@@ -293,6 +293,7 @@ statfs	-a17
 statfs64	-a23
 statx	-a32 -v -P stat.sample -P /dev/full
 swap	-a23 -e trace=swapon,swapoff
+sxetmask	-a11 -e trace=sgetmask,ssetmask
 symlink	-a34
 symlinkat
 sync	-a7

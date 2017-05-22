@@ -46,6 +46,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed the number of arguments and tracing flags of alpha specific syscalls.
   * Fixed decoding of old sigsuspend syscall on alpha, cris, mips, powerpc,
     powerpc64, sh, sh64, sparc, and sparc64.
+  * Fixed decoding of sgetmask and ssetmask syscalls on 64-bit architectures.
   * Fixed decoding of netlink messages received within struct msghdr.
   * Worked around a bug in miscompiled aarch64 kernels leading to the 3rd
     argument of sched_getattr syscall being not quite 32-bit.

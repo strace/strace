@@ -340,6 +340,7 @@ statfs
 statfs64
 statx
 swap
+sxetmask
 symlink
 symlinkat
 sync
