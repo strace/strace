@@ -397,7 +397,7 @@ SYS_FUNC(signal)
 SYS_FUNC(sgetmask)
 {
 	if (exiting(tcp) && !syserror(tcp)) {
-		tcp->auxstr = sprintsigmask_val("mask ", tcp->u_rval);
+		tcp->auxstr = sprint_old_sigmask_val("mask ", tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	}
 	return 0;

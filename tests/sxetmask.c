@@ -99,6 +99,18 @@ main(void)
 		if (uget.old_mask != (unsigned long) rc)
 			error_msg_and_fail("sigprocmask returned %#lx",
 					   uget.old_mask);
+
+		if (sizeof(long) > 4) {
+			sigaddset(&uset.libc_mask, 32 + 27);
+			if (sigprocmask(SIG_SETMASK, &uset.libc_mask, NULL))
+				perror_msg_and_fail("sigprocmask");
+			rc = k_sgetmask();
+			printf("sgetmask() = %#lx"
+			       " (mask [USR1 USR2 RT_27])\n", rc);
+			if (uset.old_mask != (unsigned long) rc)
+				error_msg_and_fail("sigprocmask set %#lx",
+						   uset.old_mask);
+		}
 	}
 
 	puts("+++ exited with 0 +++");
