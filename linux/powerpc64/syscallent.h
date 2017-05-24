@@ -405,6 +405,7 @@
 [380] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [381] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [382] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
+[383] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
