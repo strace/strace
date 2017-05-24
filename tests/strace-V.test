@@ -23,7 +23,7 @@ config_year=$(getval COPYRIGHT_YEAR)
 
 cat > "$EXP" << __EOF__
 $(getval PACKAGE_NAME) -- version $(getval PACKAGE_VERSION)
-Copyright (C) 1991-${config_year} The strace developers <$(getval PACKAGE_URL)>.
+Copyright (c) 1991-${config_year} The strace developers <$(getval PACKAGE_URL)>.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 __EOF__

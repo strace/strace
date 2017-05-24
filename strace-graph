@@ -9,7 +9,8 @@
 # The script can also handle the output with strace -t, -tt, or -ttt.
 # It will add elapsed time for each process in that case.
 
-# This script is Copyright (C) 1998 by Richard Braakman <dark@xs4all.nl>.
+# Copyright (c) 1998 by Richard Braakman <dark@xs4all.nl>.
+# Copyright (c) 1998-2017 The strace developers.
 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions

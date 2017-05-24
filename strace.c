@@ -191,7 +191,7 @@ static void
 print_version(void)
 {
 	printf("%s -- version %s\n"
-	       "Copyright (C) 1991-%s The strace developers <%s>.\n"
+	       "Copyright (c) 1991-%s The strace developers <%s>.\n"
 	       "This is free software; see the source for copying conditions.  There is NO\n"
 	       "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	       PACKAGE_NAME, PACKAGE_VERSION, COPYRIGHT_YEAR, PACKAGE_URL);

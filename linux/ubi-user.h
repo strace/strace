@@ -1,5 +1,5 @@
 /*
- * Copyright © International Business Machines Corp., 2006
+ * Copyright (c) International Business Machines Corp., 2006
  * Copyright (c) 2006-2017 The strace developers.
  *
  * This program is free software; you can redistribute it and/or modify

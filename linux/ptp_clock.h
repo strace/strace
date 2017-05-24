@@ -1,7 +1,7 @@
 /*
  * PTP 1588 clock support - user space interface
  *
- * Copyright (C) 2010 OMICRON electronics GmbH
+ * Copyright (c) 2010 OMICRON electronics GmbH
  * Copyright (c) 2010-2017 The strace developers.
  *
  *  This program is free software; you can redistribute it and/or modify

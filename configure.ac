@@ -37,7 +37,7 @@ AC_INIT([strace],
 	[strace],
 	[https://strace.io])
 m4_define([copyright_year], m4_esyscmd([./copyright-year-gen .year]))
-AC_COPYRIGHT([Copyright (C) 1999-]copyright_year[ The strace developers.])
+AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS([config.h])
