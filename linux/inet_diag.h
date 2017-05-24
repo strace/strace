@@ -39,6 +39,38 @@ enum {
 	INET_DIAG_REQ_BYTECODE,
 };
 
+struct inet_diag_bc_op {
+	unsigned char code;
+	unsigned char yes;
+	unsigned short no;
+};
+
+enum {
+	INET_DIAG_BC_NOP,
+	INET_DIAG_BC_JMP,
+	INET_DIAG_BC_S_GE,
+	INET_DIAG_BC_S_LE,
+	INET_DIAG_BC_D_GE,
+	INET_DIAG_BC_D_LE,
+	INET_DIAG_BC_AUTO,
+	INET_DIAG_BC_S_COND,
+	INET_DIAG_BC_D_COND,
+	INET_DIAG_BC_DEV_COND,   /* u32 ifindex */
+	INET_DIAG_BC_MARK_COND,
+};
+
+struct inet_diag_hostcond {
+	uint8_t family;
+	uint8_t prefix_len;
+	int port;
+	uint32_t addr[0];
+};
+
+struct inet_diag_markcond {
+	uint32_t mark;
+	uint32_t mask;
+};
+
 /* Info structure */
 struct inet_diag_msg {
 	uint8_t idiag_family;

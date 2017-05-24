@@ -45,6 +45,7 @@
 #include <linux/unix_diag.h>
 
 #include "xlat/inet_diag_attrs.h"
+#include "xlat/inet_diag_bytecodes.h"
 #include "xlat/inet_diag_extended_flags.h"
 #include "xlat/inet_diag_req_attrs.h"
 
@@ -619,6 +620,170 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	} while (0)
 
 static void
+decode_inet_addr(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const kernel_ulong_t len,
+		 const int family)
+{
+	union {
+		struct in_addr  a4;
+		struct in6_addr a6;
+	} addrbuf;
+	size_t size = 0;
+
+	switch (family) {
+	case AF_INET:
+		size = sizeof(addrbuf.a4);
+		break;
+	case AF_INET6:
+		size = sizeof(addrbuf.a6);
+		break;
+	}
+
+	if (!size || len < size) {
+		tprints("addr=");
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umoven(tcp, addr, size, &addrbuf) < 0) {
+		tprints("addr=");
+		printaddr(addr);
+		return;
+	}
+
+	print_inet_addr(family, &addrbuf, size, "addr");
+}
+
+static void
+decode_inet_diag_hostcond(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const kernel_ulong_t len)
+{
+	struct inet_diag_hostcond cond;
+
+	if (len < sizeof(cond)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+	if (umove_or_printaddr(tcp, addr, &cond))
+		return;
+
+	PRINT_FIELD_XVAL("{", cond, family, addrfams, "AF_???");
+	PRINT_FIELD_U(", ", cond, prefix_len);
+	PRINT_FIELD_U(", ", cond, port);
+
+	if (len > sizeof(cond)) {
+		tprints(", ");
+		decode_inet_addr(tcp, addr + sizeof(cond),
+				 len - sizeof(cond), cond.family);
+	}
+	tprints("}");
+}
+
+static void
+print_inet_diag_bc_op(const struct inet_diag_bc_op *const op)
+{
+	PRINT_FIELD_XVAL("{", *op, code, inet_diag_bytecodes,
+			 "INET_DIAG_BC_???");
+	PRINT_FIELD_U(", ", *op, yes);
+	PRINT_FIELD_U(", ", *op, no);
+	tprints("}");
+}
+
+static void
+decode_inet_diag_markcond(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const kernel_ulong_t len)
+{
+	struct inet_diag_markcond markcond;
+
+	if (len < sizeof(markcond))
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+	else if (!umove_or_printaddr(tcp, addr, &markcond)) {
+		PRINT_FIELD_U("{", markcond, mark);
+		PRINT_FIELD_U(", ", markcond, mask);
+		tprints("}");
+	}
+}
+
+static void
+decode_bytecode_data(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const kernel_ulong_t len,
+		     const unsigned char code)
+{
+	switch (code) {
+	case INET_DIAG_BC_S_COND:
+	case INET_DIAG_BC_D_COND:
+		decode_inet_diag_hostcond(tcp, addr, len);
+		break;
+	case INET_DIAG_BC_DEV_COND: {
+		uint32_t ifindex;
+
+		if (len < sizeof(ifindex))
+			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		else if (!umove_or_printaddr(tcp, addr, &ifindex))
+			print_ifindex(ifindex);
+		break;
+	}
+	case INET_DIAG_BC_S_GE:
+	case INET_DIAG_BC_S_LE:
+	case INET_DIAG_BC_D_GE:
+	case INET_DIAG_BC_D_LE: {
+		struct inet_diag_bc_op op;
+
+		if (len < sizeof(op))
+			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		else if (!umove_or_printaddr(tcp, addr, &op))
+			print_inet_diag_bc_op(&op);
+		break;
+	}
+	case INET_DIAG_BC_MARK_COND:
+		decode_inet_diag_markcond(tcp, addr, len);
+		break;
+	case INET_DIAG_BC_AUTO:
+	case INET_DIAG_BC_JMP:
+	case INET_DIAG_BC_NOP:
+	default:
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		break;
+	}
+}
+
+static bool
+decode_inet_diag_bc_op(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const kernel_ulong_t len,
+		       const void *const opaque_data)
+{
+	struct inet_diag_bc_op op;
+
+	if (len < sizeof(op))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &op))
+		return true;
+
+	if (len > sizeof(op))
+		tprints("{");
+
+	print_inet_diag_bc_op(&op);
+
+	if (len > sizeof(op)) {
+		tprints(", ");
+		decode_bytecode_data(tcp, addr + sizeof(op),
+				     len - sizeof(op), op.code);
+		tprints("}");
+	}
+
+	return true;
+}
+
+static const nla_decoder_t inet_diag_req_nla_decoders[] = {
+	[INET_DIAG_REQ_BYTECODE] = decode_inet_diag_bc_op
+};
+
+static void
 decode_inet_diag_req_compat(struct tcb *const tcp,
 			    const struct nlmsghdr *const nlmsghdr,
 			    const uint8_t family,
@@ -656,7 +821,8 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      inet_diag_req_attrs, "INET_DIAG_REQ_???",
-			      NULL, 0, NULL);
+			      inet_diag_req_nla_decoders,
+			      ARRAY_SIZE(inet_diag_req_nla_decoders), NULL);
 	}
 }
 
@@ -697,7 +863,8 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      inet_diag_req_attrs, "INET_DIAG_REQ_???",
-			      NULL, 0, NULL);
+			      inet_diag_req_nla_decoders,
+			      ARRAY_SIZE(inet_diag_req_nla_decoders), NULL);
 	}
 }
 
