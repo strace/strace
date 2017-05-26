@@ -326,6 +326,7 @@ shutdown
 sigaction
 sigaltstack
 siginfo
+signal
 signal_receive
 signalfd4
 sigreturn

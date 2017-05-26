@@ -281,6 +281,7 @@ setuid32	-a12
 shmxt	-a11 -e trace='/(osf_)?shmat,shmdt'
 shutdown	-a24
 siginfo	-e trace=none
+signal	-a25 -e signal=none -e trace='/^signal$'
 signal_receive	-a16 -e trace=kill
 signalfd4
 sigreturn	-esignal='!USR1'

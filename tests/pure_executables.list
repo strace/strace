@@ -269,6 +269,7 @@ shutdown
 sigaction
 sigaltstack
 siginfo
+signal
 signalfd4
 sigreturn
 sigsuspend
