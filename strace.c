@@ -1927,7 +1927,7 @@ init(int argc, char *argv[])
 		 * and acted on in between, when waiting for new syscall stops.
 		 * In non-interactive mode, signals are ignored.
 		 */
-		if (opt_intr == INTR_WHILE_WAIT) {
+		if (interactive) {
 			sigaddset(&blocked_set, SIGHUP);
 			sigaddset(&blocked_set, SIGINT);
 			sigaddset(&blocked_set, SIGQUIT);
