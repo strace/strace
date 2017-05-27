@@ -2539,6 +2539,13 @@ main(int argc, char *argv[])
 		exit_code &= 0xff;
 		signal(exit_code, SIG_DFL);
 		raise(exit_code);
+
+		/* Unblock the signal.  */
+		sigset_t mask;
+		sigemptyset(&mask);
+		sigaddset(&mask, exit_code);
+		sigprocmask(SIG_UNBLOCK, &mask, NULL);
+
 		/* Paranoia - what if this signal is not fatal?
 		   Exit with 128 + signo then.  */
 		exit_code += 128;
