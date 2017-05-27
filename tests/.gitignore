@@ -17,6 +17,7 @@ attach-f-p
 attach-f-p-cmd
 attach-p-cmd-cmd
 attach-p-cmd-p
+block_reset_raise_run
 bpf
 brk
 btrfs

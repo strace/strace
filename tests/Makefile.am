@@ -77,6 +77,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	attach-f-p-cmd \
 	attach-p-cmd-cmd \
 	attach-p-cmd-p \
+	block_reset_raise_run \
 	caps-abbrev \
 	count-f \
 	execve-v \
@@ -241,6 +242,7 @@ MISC_TESTS = \
 	detach-stopped.test \
 	filter-unavailable.test \
 	get_regs.test \
+	interactive_block.test \
 	ksysent.test \
 	opipe.test \
 	options-syntax.test \
