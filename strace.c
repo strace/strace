@@ -158,7 +158,7 @@ unsigned os_release; /* generated from uname()'s u.release */
 static void detach(struct tcb *tcp);
 static void cleanup(void);
 static void interrupt(int sig);
-static sigset_t empty_set, blocked_set;
+static sigset_t start_set, blocked_set;
 
 #ifdef HAVE_SIG_ATOMIC_T
 static volatile sig_atomic_t interrupted;
@@ -1128,7 +1128,7 @@ startup_attach(void)
 	 * We rely on cleanup() from this point on.
 	 */
 	if (interactive)
-		sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+		sigprocmask(SIG_SETMASK, &blocked_set, NULL);
 
 	if (daemonized_tracer) {
 		pid_t pid = fork();
@@ -1170,10 +1170,10 @@ startup_attach(void)
 		attach_tcb(tcp);
 
 		if (interactive) {
-			sigprocmask(SIG_SETMASK, &empty_set, NULL);
+			sigprocmask(SIG_SETMASK, &start_set, NULL);
 			if (interrupted)
 				goto ret;
-			sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+			sigprocmask(SIG_SETMASK, &blocked_set, NULL);
 		}
 	} /* for each tcbtab[] */
 
@@ -1188,7 +1188,7 @@ startup_attach(void)
 
  ret:
 	if (interactive)
-		sigprocmask(SIG_SETMASK, &empty_set, NULL);
+		sigprocmask(SIG_SETMASK, &start_set, NULL);
 }
 
 /* Stack-o-phobic exec helper, in the hope to work around
@@ -1885,6 +1885,15 @@ init(int argc, char *argv[])
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
 		setvbuf(shared_log, NULL, _IOLBF, 0);
 	}
+
+	/*
+	 * argv[0]	-pPID	-oFILE	Default interactive setting
+	 * yes		*	0	INTR_WHILE_WAIT
+	 * no		1	0	INTR_WHILE_WAIT
+	 * yes		*	1	INTR_NEVER
+	 * no		1	1	INTR_WHILE_WAIT
+	 */
+
 	if (outfname && argv[0]) {
 		if (!opt_intr)
 			opt_intr = INTR_NEVER;
@@ -1894,17 +1903,11 @@ init(int argc, char *argv[])
 	if (!opt_intr)
 		opt_intr = INTR_WHILE_WAIT;
 
-	/* argv[0]	-pPID	-oFILE	Default interactive setting
-	 * yes		*	0	INTR_WHILE_WAIT
-	 * no		1	0	INTR_WHILE_WAIT
-	 * yes		*	1	INTR_NEVER
-	 * no		1	1	INTR_WHILE_WAIT
-	 */
+	sigprocmask(SIG_SETMASK, NULL, &start_set);
+	memcpy(&blocked_set, &start_set, sizeof(blocked_set));
 
-	sigemptyset(&empty_set);
-	sigemptyset(&blocked_set);
-
-	/* startup_child() must be called before the signal handlers get
+	/*
+	 * startup_child() must be called before the signal handlers get
 	 * installed below as they are inherited into the spawned process.
 	 * Also we do not need to be protected by them as during interruption
 	 * in the startup_child() mode we kill the spawned process anyway.
@@ -2289,11 +2292,11 @@ trace(void)
 	}
 
 	if (interactive)
-		sigprocmask(SIG_SETMASK, &empty_set, NULL);
+		sigprocmask(SIG_SETMASK, &start_set, NULL);
 	pid = wait4(-1, &status, __WALL, (cflag ? &ru : NULL));
 	wait_errno = errno;
 	if (interactive)
-		sigprocmask(SIG_BLOCK, &blocked_set, NULL);
+		sigprocmask(SIG_SETMASK, &blocked_set, NULL);
 
 	if (pid < 0) {
 		if (wait_errno == EINTR)

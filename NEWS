@@ -1,6 +1,10 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Bug fixes
+  * In interactive mode (-I2), those signals that were blocked at startup
+    will remain blocked for the whole period of strace execution.
+
 Noteworthy changes in release 4.17 (2017-05-24)
 ===============================================
 
