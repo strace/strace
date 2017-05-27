@@ -119,6 +119,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	quotactl-xfs-v \
 	redirect-fds \
 	restart_syscall \
+	run_expect_termsig \
 	scm_rights \
 	seccomp-filter-v \
 	seccomp-strict \
@@ -127,6 +128,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	sleep \
 	stack-fcall \
 	threads-execve \
+	unblock_reset_raise \
 	unix-pair-send-recv \
 	unix-pair-sendto-recvfrom \
 	vfork-f \
@@ -268,6 +270,7 @@ MISC_TESTS = \
 	strace-t.test \
 	strace-tt.test \
 	strace-ttt.test \
+	termsig.test \
 	threads-execve.test \
 	# end of MISC_TESTS
 

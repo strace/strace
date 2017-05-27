@@ -282,6 +282,7 @@ rt_sigreturn
 rt_sigsuspend
 rt_sigtimedwait
 rt_tgsigqueueinfo
+run_expect_termsig
 sched_get_priority_mxx
 sched_rr_get_interval
 sched_xetaffinity
@@ -372,6 +373,7 @@ umovestr-illptr
 umovestr2
 umovestr3
 uname
+unblock_reset_raise
 unix-pair-send-recv
 unix-pair-sendto-recvfrom
 unlink
