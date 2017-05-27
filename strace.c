@@ -1200,6 +1200,7 @@ struct exec_params {
 	gid_t run_egid;
 	char **argv;
 	char *pathname;
+	struct sigaction child_sa;
 };
 static struct exec_params params_for_tracee;
 
@@ -1253,6 +1254,9 @@ exec_or_die(void)
 		wait(NULL);
 		alarm(0);
 	}
+
+	if (params_for_tracee.child_sa.sa_handler != SIG_DFL)
+		sigaction(SIGCHLD, &params_for_tracee.child_sa, NULL);
 
 	execv(params->pathname, params->argv);
 	perror_msg_and_die("exec");
@@ -1622,13 +1626,6 @@ init(int argc, char *argv[])
 
 	progname = argv[0] ? argv[0] : "strace";
 
-	/* Make sure SIGCHLD has the default action so that waitpid
-	   definitely works without losing track of children.  The user
-	   should not have given us a bogus state to inherit, but he might
-	   have.  Arguably we should detect SIG_IGN here and pass it on
-	   to children, but probably noone really needs that.  */
-	signal(SIGCHLD, SIG_DFL);
-
 	strace_tracer_pid = getpid();
 
 	os_release = get_os_release();
@@ -1821,6 +1818,11 @@ init(int argc, char *argv[])
 		tflag = 1;
 	}
 
+	sigprocmask(SIG_SETMASK, NULL, &start_set);
+	memcpy(&blocked_set, &start_set, sizeof(blocked_set));
+
+	set_sigaction(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
+
 #ifdef USE_LIBUNWIND
 	if (stack_trace_enabled) {
 		unsigned int tcbi;
@@ -1912,9 +1914,6 @@ init(int argc, char *argv[])
 	}
 	if (!opt_intr)
 		opt_intr = INTR_WHILE_WAIT;
-
-	sigprocmask(SIG_SETMASK, NULL, &start_set);
-	memcpy(&blocked_set, &start_set, sizeof(blocked_set));
 
 	/*
 	 * startup_child() must be called before the signal handlers get

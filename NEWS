@@ -4,6 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Bug fixes
   * In interactive mode (-I2), those signals that were blocked at startup
     will remain blocked for the whole period of strace execution.
+  * strace no longer resets SIGCHLD handler in tracees to the default action.
 
 Noteworthy changes in release 4.17 (2017-05-24)
 ===============================================
