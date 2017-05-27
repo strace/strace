@@ -2512,6 +2512,10 @@ restart_tracee:
 	return true;
 }
 
+#ifdef ENABLE_COVERAGE_GCOV
+extern void __gcov_flush();
+#endif
+
 int
 main(int argc, char *argv[])
 {
@@ -2538,12 +2542,18 @@ main(int argc, char *argv[])
 		/* Child was killed by a signal, mimic that.  */
 		exit_code &= 0xff;
 		signal(exit_code, SIG_DFL);
+#ifdef ENABLE_COVERAGE_GCOV
+		__gcov_flush();
+#endif
 		raise(exit_code);
 
 		/* Unblock the signal.  */
 		sigset_t mask;
 		sigemptyset(&mask);
 		sigaddset(&mask, exit_code);
+#ifdef ENABLE_COVERAGE_GCOV
+		__gcov_flush();
+#endif
 		sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
 		/* Paranoia - what if this signal is not fatal?
