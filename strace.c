@@ -1595,6 +1595,17 @@ get_os_release(void)
 	return rel;
 }
 
+static void
+set_sigaction(int signo, void (*sighandler)(int), struct sigaction *oldact)
+{
+	/* if signal handler is a function, add the signal to blocked_set */
+	if (sighandler != SIG_IGN && sighandler != SIG_DFL)
+		sigaddset(&blocked_set, signo);
+
+	const struct sigaction sa = { .sa_handler = sighandler };
+	sigaction(signo, &sa, oldact);
+}
+
 /*
  * Initialization part of main() was eating much stack (~0.5k),
  * which was unused after init.
@@ -1608,7 +1619,6 @@ init(int argc, char *argv[])
 {
 	int c, i;
 	int optF = 0;
-	struct sigaction sa;
 
 	progname = argv[0] ? argv[0] : "strace";
 
@@ -1916,35 +1926,24 @@ init(int argc, char *argv[])
 		startup_child(argv);
 	}
 
-	sa.sa_handler = SIG_IGN;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGTTOU, &sa, NULL); /* SIG_IGN */
-	sigaction(SIGTTIN, &sa, NULL); /* SIG_IGN */
+	set_sigaction(SIGTTOU, SIG_IGN, NULL);
+	set_sigaction(SIGTTIN, SIG_IGN, NULL);
 	if (opt_intr != INTR_ANYWHERE) {
 		if (opt_intr == INTR_BLOCK_TSTP_TOO)
-			sigaction(SIGTSTP, &sa, NULL); /* SIG_IGN */
+			set_sigaction(SIGTSTP, SIG_IGN, NULL);
 		/*
 		 * In interactive mode (if no -o OUTFILE, or -p PID is used),
 		 * fatal signals are blocked while syscall stop is processed,
 		 * and acted on in between, when waiting for new syscall stops.
 		 * In non-interactive mode, signals are ignored.
 		 */
-		if (interactive) {
-			sigaddset(&blocked_set, SIGHUP);
-			sigaddset(&blocked_set, SIGINT);
-			sigaddset(&blocked_set, SIGQUIT);
-			sigaddset(&blocked_set, SIGPIPE);
-			sigaddset(&blocked_set, SIGTERM);
-			sa.sa_handler = interrupt;
-		}
-		/* SIG_IGN, or set handler for these */
-		sigaction(SIGHUP, &sa, NULL);
-		sigaction(SIGINT, &sa, NULL);
-		sigaction(SIGQUIT, &sa, NULL);
-		sigaction(SIGPIPE, &sa, NULL);
-		sigaction(SIGTERM, &sa, NULL);
+		set_sigaction(SIGHUP, interactive ? interrupt : SIG_IGN, NULL);
+		set_sigaction(SIGINT, interactive ? interrupt : SIG_IGN, NULL);
+		set_sigaction(SIGQUIT, interactive ? interrupt : SIG_IGN, NULL);
+		set_sigaction(SIGPIPE, interactive ? interrupt : SIG_IGN, NULL);
+		set_sigaction(SIGTERM, interactive ? interrupt : SIG_IGN, NULL);
 	}
+
 	if (nprocs != 0 || daemonized_tracer)
 		startup_attach();
 
