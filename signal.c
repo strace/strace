@@ -415,22 +415,21 @@ SYS_FUNC(sigsuspend)
 	return RVAL_DECODED;
 }
 
-/* "Old" sigprocmask, which operates with word-sized signal masks */
-SYS_FUNC(sigprocmask)
+#ifdef ALPHA
+/*
+ * The OSF/1 sigprocmask is different: it doesn't pass in two pointers,
+ * but rather passes in the new bitmask as an argument and then returns
+ * the old bitmask.  This "works" because we only have 64 signals to worry
+ * about.  If you want more, use of the rt_sigprocmask syscall is required.
+ *
+ * Alpha:
+ *	old = osf_sigprocmask(how, new);
+ * Everyone else:
+ *	ret = sigprocmask(how, &new, &old, ...);
+ */
+SYS_FUNC(osf_sigprocmask)
 {
-# ifdef ALPHA
 	if (entering(tcp)) {
-		/*
-		 * Alpha/OSF is different: it doesn't pass in two pointers,
-		 * but rather passes in the new bitmask as an argument and
-		 * then returns the old bitmask.  This "works" because we
-		 * only have 64 signals to worry about.  If you want more,
-		 * use of the rt_sigprocmask syscall is required.
-		 * Alpha:
-		 *	old = osf_sigprocmask(how, new);
-		 * Everyone else:
-		 *	ret = sigprocmask(how, &new, &old, ...);
-		 */
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprintsigmask_val(", ", tcp->u_arg[1]);
 	}
@@ -438,7 +437,14 @@ SYS_FUNC(sigprocmask)
 		tcp->auxstr = sprintsigmask_val("old mask ", tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	}
-# else /* !ALPHA */
+	return 0;
+}
+
+#else /* !ALPHA */
+
+/* "Old" sigprocmask, which operates with word-sized signal masks */
+SYS_FUNC(sigprocmask)
+{
 	if (entering(tcp)) {
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprints(", ");
@@ -448,9 +454,9 @@ SYS_FUNC(sigprocmask)
 	else {
 		print_sigset_addr_len(tcp, tcp->u_arg[2], current_wordsize);
 	}
-# endif /* !ALPHA */
 	return 0;
 }
+#endif /* !ALPHA */
 
 SYS_FUNC(kill)
 {

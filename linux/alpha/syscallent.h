@@ -75,7 +75,7 @@
 [ 45] = { 3,	TD|TF,		SEN(open),			"open"			},
 [ 46] = { 5,	0,		SEN(printargs),			"osf_old_sigaction"	}, /* not implemented */
 [ 47] = { 0,	NF,		SEN(getxgid),			"getxgid"		},
-[ 48] = { 2,	TS,		SEN(sigprocmask),		"osf_sigprocmask"	},
+[ 48] = { 2,	TS,		SEN(osf_sigprocmask),		"osf_sigprocmask"	},
 [ 49] = { 5,	0,		SEN(printargs),			"osf_getlogin"		}, /* not implemented */
 [ 50] = { 5,	0,		SEN(printargs),			"osf_setlogin"		}, /* not implemented */
 [ 51] = { 1,	TF,		SEN(acct),			"acct"			},
