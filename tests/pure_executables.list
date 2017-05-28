@@ -222,6 +222,7 @@ renameat
 renameat2
 request_key
 rmdir
+rt_sigaction
 rt_sigpending
 rt_sigprocmask
 rt_sigqueueinfo
@@ -266,7 +267,6 @@ setuid
 setuid32
 shmxt
 shutdown
-sigaction
 sigaltstack
 siginfo
 signal

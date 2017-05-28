@@ -275,6 +275,7 @@ renameat2
 request_key
 restart_syscall
 rmdir
+rt_sigaction
 rt_sigpending
 rt_sigprocmask
 rt_sigqueueinfo
@@ -325,7 +326,6 @@ setuid
 setuid32
 shmxt
 shutdown
-sigaction
 sigaltstack
 siginfo
 signal

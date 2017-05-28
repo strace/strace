@@ -218,9 +218,9 @@ DECODER_TESTS = \
 	prctl-tsc.test \
 	qual_fault-exit_group.test \
 	readv.test \
+	rt_sigaction.test \
 	scm_rights-fd.test \
 	seccomp-strict.test \
-	sigaction.test \
 	sigaltstack.test \
 	sun_path.test \
 	uio.test \
@@ -322,6 +322,7 @@ EXTRA_DIST = \
 	qual_inject-signal.expected \
 	quotactl.h \
 	regex.in \
+	rt_sigaction.awk \
 	run.sh \
 	sched.in \
 	scno_tampering.sh \
@@ -329,7 +330,6 @@ EXTRA_DIST = \
 	setresugid.c \
 	setreugid.c \
 	setugid.c \
-	sigaction.awk \
 	sigaltstack.expected \
 	sockname.c \
 	strace-C.expected \
