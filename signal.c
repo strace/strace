@@ -350,7 +350,7 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints("{sa_handler=");
 	print_sa_handler(sa.sa_handler__);
 	tprints(", sa_mask=");
-	tprintsigmask_val("", sa.sa_mask);
+	tprint_old_sigmask_val("", sa.sa_mask);
 	tprints(", sa_flags=");
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #if !(defined ALPHA || defined MIPS)
