@@ -331,6 +331,7 @@ siginfo
 signal
 signal_receive
 signalfd4
+sigprocmask
 sigreturn
 sigsuspend
 sleep

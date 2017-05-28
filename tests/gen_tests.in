@@ -284,6 +284,7 @@ siginfo	-e trace=none
 signal	-a25 -e signal=none -e trace='/^signal$'
 signal_receive	-a16 -e trace=kill
 signalfd4
+sigprocmask	-a34
 sigreturn	-esignal='!USR1'
 sigsuspend	-a19 -esignal=none
 socketcall	-a20
