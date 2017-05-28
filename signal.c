@@ -320,14 +320,6 @@ struct old_sigaction {
 #endif
 ;
 
-struct old_sigaction32 {
-	/* sa_handler may be a libc #define, need to use other name: */
-	uint32_t sa_handler__;
-	uint32_t sa_mask;
-	uint32_t sa_flags;
-	uint32_t sa_restorer;
-};
-
 static void
 decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -335,7 +327,12 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 
 #ifndef current_wordsize
 	if (current_wordsize < sizeof(sa.sa_handler__)) {
-		struct old_sigaction32 sa32;
+		struct old_sigaction32 {
+			uint32_t sa_handler__;
+			uint32_t sa_mask;
+			uint32_t sa_flags;
+			uint32_t sa_restorer;
+		} sa32;
 
 		if (umove_or_printaddr(tcp, addr, &sa32))
 			return;
