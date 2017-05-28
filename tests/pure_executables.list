@@ -271,6 +271,7 @@ sigaltstack
 siginfo
 signal
 signalfd4
+sigpending
 sigprocmask
 sigreturn
 sigsuspend
