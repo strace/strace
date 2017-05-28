@@ -326,6 +326,7 @@ setuid
 setuid32
 shmxt
 shutdown
+sigaction
 sigaltstack
 siginfo
 signal

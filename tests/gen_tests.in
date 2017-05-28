@@ -280,6 +280,7 @@ setuid	-a10
 setuid32	-a12
 shmxt	-a11 -e trace='/(osf_)?shmat,shmdt'
 shutdown	-a24
+sigaction	-a31
 siginfo	-e trace=none
 signal	-a25 -e signal=none -e trace='/^signal$'
 signal_receive	-a16 -e trace=kill
