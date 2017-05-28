@@ -7,6 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * strace no longer resets SIGCHLD handler in tracees to the default action.
   * When traced command is terminated by a blocked signal, strace unblocks
     that signal to ensure its own termination with the same signal.
+  * Fixed corner cases in decoding of old sigaction syscall.
 
 Noteworthy changes in release 4.17 (2017-05-24)
 ===============================================

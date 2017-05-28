@@ -300,29 +300,32 @@ SYS_FUNC(ssetmask)
 
 struct old_sigaction {
 	/* sa_handler may be a libc #define, need to use other name: */
-#ifdef MIPS
+#if defined MIPS
 	unsigned int sa_flags;
 	unsigned long sa_handler__;
-	/* Kernel treats sa_mask as an array of longs. */
-	unsigned long sa_mask[NSIG / sizeof(long)];
+	unsigned long sa_mask;
+#elif defined ALPHA
+	unsigned long sa_handler__;
+	unsigned long sa_mask;
+	unsigned int sa_flags;
 #else
 	unsigned long sa_handler__;
 	unsigned long sa_mask;
 	unsigned long sa_flags;
-#endif /* !MIPS */
-#if HAVE_SA_RESTORER
 	unsigned long sa_restorer;
 #endif
-};
+}
+#ifdef ALPHA
+	ATTRIBUTE_PACKED
+#endif
+;
 
 struct old_sigaction32 {
 	/* sa_handler may be a libc #define, need to use other name: */
 	uint32_t sa_handler__;
 	uint32_t sa_mask;
 	uint32_t sa_flags;
-#if HAVE_SA_RESTORER
 	uint32_t sa_restorer;
-#endif
 };
 
 static void
@@ -340,9 +343,7 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 		memset(&sa, 0, sizeof(sa));
 		sa.sa_handler__ = sa32.sa_handler__;
 		sa.sa_flags = sa32.sa_flags;
-#if HAVE_SA_RESTORER && defined SA_RESTORER
 		sa.sa_restorer = sa32.sa_restorer;
-#endif
 		sa.sa_mask = sa32.sa_mask;
 	} else
 #endif
@@ -352,15 +353,11 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints("{sa_handler=");
 	print_sa_handler(sa.sa_handler__);
 	tprints(", sa_mask=");
-#ifdef MIPS
-	tprintsigmask_addr("", sa.sa_mask);
-#else
 	tprintsigmask_val("", sa.sa_mask);
-#endif
 	tprints(", sa_flags=");
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
-#if HAVE_SA_RESTORER && defined SA_RESTORER
-	if (sa.sa_flags & SA_RESTORER) {
+#if !(defined ALPHA || defined MIPS)
+	if (sa.sa_flags & 0x04000000U) {
 		tprints(", sa_restorer=");
 		printaddr(sa.sa_restorer);
 	}
