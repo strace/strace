@@ -365,7 +365,14 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(sigaction)
 {
 	if (entering(tcp)) {
-		printsignal(tcp->u_arg[0]);
+		int signo = tcp->u_arg[0];
+#if defined SPARC || defined SPARC64
+		if (signo < 0) {
+			tprints("-");
+			signo = -signo;
+		}
+#endif
+		printsignal(signo);
 		tprints(", ");
 		decode_old_sigaction(tcp, tcp->u_arg[1]);
 		tprints(", ");
