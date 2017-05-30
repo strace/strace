@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * When traced command is terminated by a blocked signal, strace unblocks
     that signal to ensure its own termination with the same signal.
   * Fixed corner cases in decoding of old sigaction syscall.
+  * Fixed build with old kernel headers on mips.
 
 Noteworthy changes in release 4.17 (2017-05-24)
 ===============================================

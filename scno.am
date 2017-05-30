@@ -28,8 +28,8 @@
 SCNO_CPPFLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 		$(ARCH_MFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS)
 
-syscallent.i: $(top_srcdir)/$(OS)/$(ARCH)/syscallent.h
-	$(CPP) -P $(SCNO_CPPFLAGS) $^ -o $@
+syscallent.i: $(top_builddir)/config.h $(top_srcdir)/$(OS)/$(ARCH)/syscallent.h
+	$(CPP) -P $(SCNO_CPPFLAGS) -include $^ -o $@
 
 digits = [[:digit:]][[:digit:]]*
 al_nums = [[:alnum:]_][[:alnum:]_]*
