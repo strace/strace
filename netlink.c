@@ -83,6 +83,11 @@ decode_nlmsgerr(struct tcb *const tcp,
 {
 	struct nlmsgerr err;
 
+	if (len < sizeof(err.error)) {
+		printstrn(tcp, addr, len);
+		return;
+	}
+
 	if (umove_or_printaddr(tcp, addr, &err.error))
 		return;
 
@@ -112,11 +117,12 @@ decode_payload(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
 	       const kernel_ulong_t len)
 {
-	if (nlmsghdr->nlmsg_type == NLMSG_ERROR && len >= sizeof(int)) {
+	if (nlmsghdr->nlmsg_type == NLMSG_ERROR) {
 		decode_nlmsgerr(tcp, addr, len);
-	} else {
-		printstrn(tcp, addr, len);
+		return;
 	}
+
+	printstrn(tcp, addr, len);
 }
 
 static void
