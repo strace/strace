@@ -2252,21 +2252,77 @@ print_event_exit(struct tcb *tcp)
 	line_ended();
 }
 
-/* Returns true iff the main trace loop has to continue. */
-static bool
-trace(void)
+enum trace_event {
+	/* Break the main loop. */
+	TE_BREAK,
+
+	/* Call next_event() again. */
+	TE_NEXT,
+
+	/* Restart the tracee with signal 0 and call next_event() again. */
+	TE_RESTART,
+
+	/*
+	 * For all the events below, current_tcp is set to current tracee's
+	 * tcb.  All the suggested actions imply that you want to continue
+	 * tracing of the current tracee; alternatively, you can detach it.
+	 */
+
+	/*
+	 * Syscall entry or exit.
+	 * Restart the tracee with signal 0, or with an injected signal number.
+	 */
+	TE_SYSCALL_STOP,
+
+	/*
+	 * Tracee received signal with number WSTOPSIG(*pstatus); signal info
+	 * is written to *si.  Restart the tracee (with that signal number
+	 * if you want to deliver it).
+	 */
+	TE_SIGNAL_DELIVERY_STOP,
+
+	/*
+	 * Tracee was killed by a signal with number WTERMSIG(*pstatus).
+	 */
+	TE_SIGNALLED,
+
+	/*
+	 * Tracee was stopped by a signal with number WSTOPSIG(*pstatus).
+	 * Restart the tracee with that signal number.
+	 */
+	TE_GROUP_STOP,
+
+	/*
+	 * Tracee exited with status WEXITSTATUS(*pstatus).
+	 */
+	TE_EXITED,
+
+	/*
+	 * Tracee is going to perform execve().
+	 * Restart the tracee with signal 0.
+	 */
+	TE_STOP_BEFORE_EXECVE,
+
+	/*
+	 * Tracee is going to terminate.
+	 * Restart the tracee with signal 0.
+	 */
+	TE_STOP_BEFORE_EXIT,
+};
+
+static enum trace_event
+next_event(int *pstatus, siginfo_t *si)
 {
 	int pid;
 	int wait_errno;
 	int status;
-	bool stopped;
 	unsigned int sig;
 	unsigned int event;
 	struct tcb *tcp;
 	struct rusage ru;
 
 	if (interrupted)
-		return false;
+		return TE_BREAK;
 
 	/*
 	 * Used to exit simply when nprocs hits zero, but in this testcase:
@@ -2286,21 +2342,21 @@ trace(void)
 		 * on exit. Oh well...
 		 */
 		if (nprocs == 0)
-			return false;
+			return TE_BREAK;
 	}
 
 	if (interactive)
 		sigprocmask(SIG_SETMASK, &start_set, NULL);
-	pid = wait4(-1, &status, __WALL, (cflag ? &ru : NULL));
+	pid = wait4(-1, pstatus, __WALL, (cflag ? &ru : NULL));
 	wait_errno = errno;
 	if (interactive)
 		sigprocmask(SIG_SETMASK, &blocked_set, NULL);
 
 	if (pid < 0) {
 		if (wait_errno == EINTR)
-			return true;
+			return TE_NEXT;
 		if (nprocs == 0 && wait_errno == ECHILD)
-			return false;
+			return TE_BREAK;
 		/*
 		 * If nprocs > 0, ECHILD is not expected,
 		 * treat it as any other error here:
@@ -2309,10 +2365,12 @@ trace(void)
 		perror_msg_and_die("wait4(__WALL)");
 	}
 
+	status = *pstatus;
+
 	if (pid == popen_pid) {
 		if (!WIFSTOPPED(status))
 			popen_pid = 0;
-		return true;
+		return TE_NEXT;
 	}
 
 	if (debug_flag)
@@ -2324,14 +2382,161 @@ trace(void)
 	if (!tcp) {
 		tcp = maybe_allocate_tcb(pid, status);
 		if (!tcp)
-			return true;
+			return TE_NEXT;
 	}
 
 	clear_regs();
 
 	event = (unsigned int) status >> 16;
 
-	if (event == PTRACE_EVENT_EXEC) {
+	/* Set current output file */
+	current_tcp = tcp;
+
+	if (event == PTRACE_EVENT_EXEC)
+		return TE_STOP_BEFORE_EXECVE;
+
+	if (cflag) {
+		tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
+		tcp->stime = ru.ru_stime;
+	}
+
+	if (WIFSIGNALED(status))
+		return TE_SIGNALLED;
+
+	if (WIFEXITED(status))
+		return TE_EXITED;
+
+	if (!WIFSTOPPED(status)) {
+		/*
+		 * Neither signalled, exited or stopped.
+		 * How could that be?
+		 */
+		error_msg("pid %u not stopped!", pid);
+		droptcb(tcp);
+		return TE_NEXT;
+	}
+
+	/* Is this the very first time we see this tracee stopped? */
+	if (tcp->flags & TCB_STARTUP)
+		startup_tcb(tcp);
+
+	sig = WSTOPSIG(status);
+
+	switch (event) {
+	case 0:
+		/*
+		 * Is this post-attach SIGSTOP?
+		 * Interestingly, the process may stop
+		 * with STOPSIG equal to some other signal
+		 * than SIGSTOP if we happend to attach
+		 * just before the process takes a signal.
+		 */
+		if (sig == SIGSTOP && (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)) {
+			if (debug_flag)
+				error_msg("ignored SIGSTOP on pid %d", tcp->pid);
+			tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
+			return TE_RESTART;
+		} else if (sig == syscall_trap_sig) {
+			return TE_SYSCALL_STOP;
+		} else {
+			*si = (siginfo_t) {};
+			/*
+			 * True if tracee is stopped by signal
+			 * (as opposed to "tracee received signal").
+			 * TODO: shouldn't we check for errno == EINVAL too?
+			 * We can get ESRCH instead, you know...
+			 */
+			bool stopped = ptrace(PTRACE_GETSIGINFO, pid, 0, si) < 0;
+			return stopped ? TE_GROUP_STOP : TE_SIGNAL_DELIVERY_STOP;
+		}
+		break;
+#if USE_SEIZE
+	case PTRACE_EVENT_STOP:
+		/*
+		 * PTRACE_INTERRUPT-stop or group-stop.
+		 * PTRACE_INTERRUPT-stop has sig == SIGTRAP here.
+		 */
+		switch (sig) {
+		case SIGSTOP:
+		case SIGTSTP:
+		case SIGTTIN:
+		case SIGTTOU:
+			return TE_GROUP_STOP;
+		}
+		return TE_RESTART;
+#endif
+	case PTRACE_EVENT_EXIT:
+		return TE_STOP_BEFORE_EXIT;
+	default:
+		return TE_RESTART;
+	}
+}
+
+/* Returns true iff the main trace loop has to continue. */
+static bool
+dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
+{
+	unsigned int restart_op = PTRACE_SYSCALL;
+	unsigned int restart_sig = 0;
+
+	switch (ret) {
+	case TE_BREAK:
+		return false;
+
+	case TE_NEXT:
+		return true;
+
+	case TE_RESTART:
+		break;
+
+	case TE_SYSCALL_STOP:
+		if (trace_syscall(current_tcp, &restart_sig) < 0) {
+			/*
+			 * ptrace() failed in trace_syscall().
+			 * Likely a result of process disappearing mid-flight.
+			 * Observed case: exit_group() or SIGKILL terminating
+			 * all processes in thread group.
+			 * We assume that ptrace error was caused by process death.
+			 * We used to detach(current_tcp) here, but since we no
+			 * longer implement "detach before death" policy/hack,
+			 * we can let this process to report its death to us
+			 * normally, via WIFEXITED or WIFSIGNALED wait status.
+			 */
+			return true;
+		}
+		break;
+
+	case TE_SIGNAL_DELIVERY_STOP:
+		restart_sig = WSTOPSIG(*pstatus);
+		print_stopped(current_tcp, si, restart_sig);
+		break;
+
+	case TE_SIGNALLED:
+		print_signalled(current_tcp, current_tcp->pid, *pstatus);
+		droptcb(current_tcp);
+		return true;
+
+	case TE_GROUP_STOP:
+		restart_sig = WSTOPSIG(*pstatus);
+		print_stopped(current_tcp, NULL, restart_sig);
+		if (use_seize) {
+			/*
+			 * This ends ptrace-stop, but does *not* end group-stop.
+			 * This makes stopping signals work properly on straced
+			 * process (that is, process really stops. It used to
+			 * continue to run).
+			 */
+			restart_op = PTRACE_LISTEN;
+			restart_sig = 0;
+		}
+		break;
+
+	case TE_EXITED:
+		print_exited(current_tcp, current_tcp->pid, *pstatus);
+		droptcb(current_tcp);
+		return true;
+
+	case TE_STOP_BEFORE_EXECVE:
 		/*
 		 * Under Linux, execve changes pid to thread leader's pid,
 		 * and we see this changed pid on EVENT_EXEC and later,
@@ -2348,167 +2553,32 @@ trace(void)
 		 * On 2.6 and earlier, it can return garbage.
 		 */
 		if (os_release >= KERNEL_VERSION(3,0,0))
-			tcp = maybe_switch_tcbs(tcp, pid);
+			current_tcp = maybe_switch_tcbs(current_tcp, current_tcp->pid);
 
 		if (detach_on_execve) {
-			if (tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) {
-				tcp->flags &= ~TCB_SKIP_DETACH_ON_FIRST_EXEC;
+			if (current_tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) {
+				current_tcp->flags &= ~TCB_SKIP_DETACH_ON_FIRST_EXEC;
 			} else {
-				detach(tcp); /* do "-b execve" thingy */
+				detach(current_tcp); /* do "-b execve" thingy */
 				return true;
 			}
 		}
-	}
+		break;
 
-	/* Set current output file */
-	current_tcp = tcp;
-
-	if (cflag) {
-		tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
-		tcp->stime = ru.ru_stime;
-	}
-
-	if (WIFSIGNALED(status)) {
-		print_signalled(tcp, pid, status);
-		droptcb(tcp);
-		return true;
-	}
-
-	if (WIFEXITED(status)) {
-		print_exited(tcp, pid, status);
-		droptcb(tcp);
-		return true;
-	}
-
-	if (!WIFSTOPPED(status)) {
-		/*
-		 * Neither signalled, exited or stopped.
-		 * How could that be?
-		 */
-		error_msg("pid %u not stopped!", pid);
-		droptcb(tcp);
-		return true;
-	}
-
-	/* Is this the very first time we see this tracee stopped? */
-	if (tcp->flags & TCB_STARTUP) {
-		startup_tcb(tcp);
-	}
-
-	sig = WSTOPSIG(status);
-
-	switch (event) {
-		case 0:
-			break;
-		case PTRACE_EVENT_EXIT:
-			print_event_exit(tcp);
-			goto restart_tracee_with_sig_0;
-#if USE_SEIZE
-		case PTRACE_EVENT_STOP:
-			/*
-			 * PTRACE_INTERRUPT-stop or group-stop.
-			 * PTRACE_INTERRUPT-stop has sig == SIGTRAP here.
-			 */
-			switch (sig) {
-				case SIGSTOP:
-				case SIGTSTP:
-				case SIGTTIN:
-				case SIGTTOU:
-					stopped = true;
-					goto show_stopsig;
-			}
-			/* fall through */
-#endif
-		default:
-			goto restart_tracee_with_sig_0;
-	}
-
-	/*
-	 * Is this post-attach SIGSTOP?
-	 * Interestingly, the process may stop
-	 * with STOPSIG equal to some other signal
-	 * than SIGSTOP if we happend to attach
-	 * just before the process takes a signal.
-	 */
-	if (sig == SIGSTOP && (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)) {
-		if (debug_flag)
-			error_msg("ignored SIGSTOP on pid %d", tcp->pid);
-		tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
-		goto restart_tracee_with_sig_0;
-	}
-
-	if (sig != syscall_trap_sig) {
-		siginfo_t si = {};
-
-		/*
-		 * True if tracee is stopped by signal
-		 * (as opposed to "tracee received signal").
-		 * TODO: shouldn't we check for errno == EINVAL too?
-		 * We can get ESRCH instead, you know...
-		 */
-		stopped = ptrace(PTRACE_GETSIGINFO, pid, 0, &si) < 0;
-#if USE_SEIZE
-show_stopsig:
-#endif
-		print_stopped(tcp, stopped ? NULL : &si, sig);
-
-		if (!stopped)
-			/* It's signal-delivery-stop. Inject the signal */
-			goto restart_tracee;
-
-		/* It's group-stop */
-		if (use_seize) {
-			/*
-			 * This ends ptrace-stop, but does *not* end group-stop.
-			 * This makes stopping signals work properly on straced process
-			 * (that is, process really stops. It used to continue to run).
-			 */
-			if (ptrace_restart(PTRACE_LISTEN, tcp, 0) < 0) {
-				/* Note: ptrace_restart emitted error message */
-				exit_code = 1;
-				return false;
-			}
-			return true;
-		}
-		/* We don't have PTRACE_LISTEN support... */
-		goto restart_tracee;
+	case TE_STOP_BEFORE_EXIT:
+		print_event_exit(current_tcp);
+		break;
 	}
 
 	/* We handled quick cases, we are permitted to interrupt now. */
 	if (interrupted)
 		return false;
 
-	/*
-	 * This should be syscall entry or exit.
-	 * Handle it.
-	 */
-	sig = 0;
-	if (trace_syscall(tcp, &sig) < 0) {
-		/*
-		 * ptrace() failed in trace_syscall().
-		 * Likely a result of process disappearing mid-flight.
-		 * Observed case: exit_group() or SIGKILL terminating
-		 * all processes in thread group.
-		 * We assume that ptrace error was caused by process death.
-		 * We used to detach(tcp) here, but since we no longer
-		 * implement "detach before death" policy/hack,
-		 * we can let this process to report its death to us
-		 * normally, via WIFEXITED or WIFSIGNALED wait status.
-		 */
-		return true;
-	}
-	goto restart_tracee;
-
-restart_tracee_with_sig_0:
-	sig = 0;
-
-restart_tracee:
-	if (ptrace_restart(PTRACE_SYSCALL, tcp, sig) < 0) {
+	if (ptrace_restart(restart_op, current_tcp, restart_sig) < 0) {
 		/* Note: ptrace_restart emitted error message */
 		exit_code = 1;
 		return false;
 	}
-
 	return true;
 }
 
@@ -2523,7 +2593,9 @@ main(int argc, char *argv[])
 
 	exit_code = !nprocs;
 
-	while (trace())
+	int status;
+	siginfo_t si;
+	while (dispatch_event(next_event(&status, &si), &status, &si))
 		;
 
 	cleanup();
