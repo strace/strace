@@ -466,39 +466,55 @@ get_proto_by_name(const char *const name)
 	return SOCK_PROTO_UNKNOWN;
 }
 
-static bool
-print_sockaddr_by_inode_uncached(const unsigned long inode,
-				 const enum sock_proto proto)
+static const char *
+get_sockaddr_by_inode_uncached(const unsigned long inode,
+			       const enum sock_proto proto)
 {
 	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
-	    (proto != SOCK_PROTO_UNKNOWN && !protocols[proto].print))
-		return false;
+	    (proto != SOCK_PROTO_UNKNOWN && !protocols[proto].get))
+		return NULL;
 
 	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
 	if (fd < 0)
-		return false;
-	bool r = false;
+		return NULL;
+	const char *details = NULL;
 
 	if (proto != SOCK_PROTO_UNKNOWN) {
-		r = protocols[proto].print(fd, inode);
-		if (!r) {
-			tprintf("%s:[%lu]", protocols[proto].name, inode);
-			r = true;
-		}
+		details = protocols[proto].get(fd, inode);
 	} else {
 		unsigned int i;
 		for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
 		     i < ARRAY_SIZE(protocols); ++i) {
-			if (!protocols[i].print)
+			if (!protocols[i].get)
 				continue;
-			r = protocols[i].print(fd, inode);
-			if (r)
+			details = protocols[i].get(fd, inode);
+			if (details)
 				break;
 		}
 	}
 
 	close(fd);
-	return r;
+	return details;
+}
+
+static bool
+print_sockaddr_by_inode_uncached(const unsigned long inode,
+				 const enum sock_proto proto)
+{
+	const char *details = get_sockaddr_by_inode_uncached(inode, proto);
+
+	if (details) {
+		tprints(details);
+		return true;
+	}
+
+	if ((unsigned int) proto < ARRAY_SIZE(protocols) &&
+	    protocols[proto].name) {
+		tprintf("%s:[%lu]", protocols[proto].name, inode);
+		return true;
+	}
+
+	return false;
 }
 
 /* Given an inode number of a socket, print out its protocol details.  */
