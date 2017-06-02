@@ -240,15 +240,6 @@ receive_responses(const int fd, const unsigned long inode,
 }
 
 static bool
-inet_print(const int fd, const int family, const int protocol,
-	   const unsigned long inode, const char *proto_name)
-{
-	return inet_send_query(fd, family, protocol)
-		&& receive_responses(fd, inode, proto_name, inet_parse_response)
-		&& print_sockaddr_by_inode_cached(inode);
-}
-
-static bool
 unix_send_query(const int fd, const unsigned long inode)
 {
 	struct {
@@ -406,6 +397,15 @@ unix_print(const int fd, const unsigned long inode)
 {
 	return unix_send_query(fd, inode)
 		&& receive_responses(fd, inode, "UNIX", unix_parse_response)
+		&& print_sockaddr_by_inode_cached(inode);
+}
+
+static bool
+inet_print(const int fd, const int family, const int protocol,
+	   const unsigned long inode, const char *proto_name)
+{
+	return inet_send_query(fd, family, protocol)
+		&& receive_responses(fd, inode, proto_name, inet_parse_response)
 		&& print_sockaddr_by_inode_cached(inode);
 }
 
