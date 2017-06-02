@@ -2026,11 +2026,6 @@ print_debug_info(const int pid, int status)
 		sprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
 	if (WIFSTOPPED(status))
 		sprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
-#ifdef WIFCONTINUED
-	/* Should never be seen */
-	if (WIFCONTINUED(status))
-		strcpy(buf, "WIFCONTINUED");
-#endif
 	evbuf[0] = '\0';
 	if (event != 0) {
 		static const char *const event_names[] = {
@@ -2406,15 +2401,11 @@ next_event(int *pstatus, siginfo_t *si)
 	if (WIFEXITED(status))
 		return TE_EXITED;
 
-	if (!WIFSTOPPED(status)) {
-		/*
-		 * Neither signalled, exited or stopped.
-		 * How could that be?
-		 */
-		error_msg("pid %u not stopped!", pid);
-		droptcb(tcp);
-		return TE_NEXT;
-	}
+	/*
+	 * As WCONTINUED flag has not been specified to wait4,
+	 * it cannot be WIFCONTINUED(status), so the only case
+	 * that remains is WIFSTOPPED(status).
+	 */
 
 	/* Is this the very first time we see this tracee stopped? */
 	if (tcp->flags & TCB_STARTUP)
