@@ -2311,8 +2311,6 @@ next_event(int *pstatus, siginfo_t *si)
 	int pid;
 	int wait_errno;
 	int status;
-	unsigned int sig;
-	unsigned int event;
 	struct tcb *tcp;
 	struct rusage ru;
 
@@ -2382,13 +2380,8 @@ next_event(int *pstatus, siginfo_t *si)
 
 	clear_regs();
 
-	event = (unsigned int) status >> 16;
-
 	/* Set current output file */
 	current_tcp = tcp;
-
-	if (event == PTRACE_EVENT_EXEC)
-		return TE_STOP_BEFORE_EXECVE;
 
 	if (cflag) {
 		tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
@@ -2411,7 +2404,8 @@ next_event(int *pstatus, siginfo_t *si)
 	if (tcp->flags & TCB_STARTUP)
 		startup_tcb(tcp);
 
-	sig = WSTOPSIG(status);
+	const unsigned int sig = WSTOPSIG(status);
+	const unsigned int event = (unsigned int) status >> 16;
 
 	switch (event) {
 	case 0:
@@ -2456,6 +2450,8 @@ next_event(int *pstatus, siginfo_t *si)
 		}
 		return TE_RESTART;
 #endif
+	case PTRACE_EVENT_EXEC:
+		return TE_STOP_BEFORE_EXECVE;
 	case PTRACE_EVENT_EXIT:
 		return TE_STOP_BEFORE_EXIT;
 	default:
