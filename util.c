@@ -635,17 +635,15 @@ printfd(struct tcb *tcp, int fd)
 {
 	char path[PATH_MAX + 1];
 	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
-		static const char socket_prefix[] = "socket:[";
-		const size_t socket_prefix_len = sizeof(socket_prefix) - 1;
-		const size_t path_len = strlen(path);
+		const char *str;
+		size_t len;
+		unsigned long inode;
 
 		tprintf("%d<", fd);
-		if (show_fd_path > 1 &&
-		    strncmp(path, socket_prefix, socket_prefix_len) == 0 &&
-		    path[path_len - 1] == ']') {
-			unsigned long inode =
-				strtoul(path + socket_prefix_len, NULL, 10);
-
+		if (show_fd_path > 1
+		    && (str = STR_STRIP_PREFIX(path, "socket:[")) != path
+		    && (len = strlen(str)) && str[len - 1] == ']'
+		    && (inode = strtoul(str, NULL, 10))) {
 			if (!print_sockaddr_by_inode_cached(inode)) {
 				const enum sock_proto proto =
 					getfdproto(tcp, fd);
@@ -653,7 +651,7 @@ printfd(struct tcb *tcp, int fd)
 					tprints(path);
 			}
 		} else {
-			print_quoted_string(path, path_len,
+			print_quoted_string(path, strlen(path),
 					    QUOTE_OMIT_LEADING_TRAILING_QUOTES);
 		}
 		tprints(">");

@@ -414,18 +414,6 @@ handle_inversion:
 	}
 }
 
-/*
- * Returns NULL if STR does not start with PREFIX,
- * or a pointer to the first char in STR after PREFIX.
- */
-static const char *
-strip_prefix(const char *prefix, const char *str)
-{
-	size_t len = strlen(prefix);
-
-	return strncmp(prefix, str, len) ? NULL : str + len;
-}
-
 static int
 find_errno_by_name(const char *name)
 {
@@ -446,7 +434,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 	const char *val;
 	int intval;
 
-	if ((val = strip_prefix("when=", token))) {
+	if ((val = STR_STRIP_PREFIX(token, "when=")) != token) {
 		/*
 		 * 	== 1+1
 		 * F	== F+0
@@ -476,7 +464,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 			/* F == F+0 */
 			fopts->step = 0;
 		}
-	} else if ((val = strip_prefix("error=", token))) {
+	} else if ((val = STR_STRIP_PREFIX(token, "error=")) != token) {
 		if (fopts->rval != INJECT_OPTS_RVAL_DEFAULT)
 			return false;
 		intval = string_to_uint_upto(val, MAX_ERRNO_VALUE);
@@ -485,14 +473,16 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		if (intval < 1)
 			return false;
 		fopts->rval = -intval;
-	} else if (!fault_tokens_only && (val = strip_prefix("retval=", token))) {
+	} else if (!fault_tokens_only
+		   && (val = STR_STRIP_PREFIX(token, "retval=")) != token) {
 		if (fopts->rval != INJECT_OPTS_RVAL_DEFAULT)
 			return false;
 		intval = string_to_uint(val);
 		if (intval < 0)
 			return false;
 		fopts->rval = intval;
-	} else if (!fault_tokens_only && (val = strip_prefix("signal=", token))) {
+	} else if (!fault_tokens_only
+		   && (val = STR_STRIP_PREFIX(token, "signal=")) != token) {
 		intval = sigstr_to_uint(val);
 		if (intval < 1 || intval > NSIG_BYTES * 8)
 			return false;
@@ -677,14 +667,14 @@ qualify(const char *str)
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(qual_options); ++i) {
-		const char *p = qual_options[i].name;
-		unsigned int len = strlen(p);
+		const char *name = qual_options[i].name;
+		const size_t len = strlen(name);
+		const char *val = str_strip_prefix_len(str, name, len);
 
-		if (strncmp(str, p, len) || str[len] != '=')
+		if (val == str || *val != '=')
 			continue;
-
+		str = val + 1;
 		opt = &qual_options[i];
-		str += len + 1;
 		break;
 	}
 

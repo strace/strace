@@ -381,12 +381,7 @@ netlink_parse_response(const char *proto_name, const void *data,
 				diag_msg->ndiag_protocol);
 
 	if (netlink_proto) {
-		static const char netlink_prefix[] = "NETLINK_";
-		const size_t netlink_prefix_len =
-			sizeof(netlink_prefix) -1;
-		if (strncmp(netlink_proto, netlink_prefix,
-			    netlink_prefix_len) == 0)
-			netlink_proto += netlink_prefix_len;
+		netlink_proto = STR_STRIP_PREFIX(netlink_proto, "NETLINK_");
 		if (asprintf(&details, "%s:[%s:%u]", proto_name,
 			     netlink_proto, diag_msg->ndiag_portid) < 0)
 			return -1;

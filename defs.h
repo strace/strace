@@ -511,6 +511,20 @@ string_to_uint_upto(const char *const str, unsigned int max_val)
 }
 extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits);
 
+/*
+ * Returns STR if it does not start with PREFIX,
+ * or a pointer to the first char in STR after PREFIX.
+ * The length of PREFIX is specified by PREFIX_LEN.
+ */
+static inline const char *
+str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
+{
+	return strncmp(str, prefix, prefix_len) ? str : str + prefix_len;
+}
+
+#define STR_STRIP_PREFIX(str, prefix)	\
+	str_strip_prefix_len((str), (prefix), sizeof(prefix) - 1)
+
 #define QUOTE_0_TERMINATED                      0x01
 #define QUOTE_OMIT_LEADING_TRAILING_QUOTES      0x02
 #define QUOTE_OMIT_TRAILING_0                   0x08
