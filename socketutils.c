@@ -68,7 +68,7 @@ cache_and_print_inode_details(const unsigned long inode, char *const details)
 	return 1;
 }
 
-bool
+static bool
 print_sockaddr_by_inode_cached(const unsigned long inode)
 {
 	const cache_entry *const e = &cache[inode & CACHE_MASK];
@@ -457,11 +457,9 @@ get_proto_by_name(const char *const name)
 	return SOCK_PROTO_UNKNOWN;
 }
 
-/* Given an inode number of a socket, print out the details
- * of the ip address and port. */
-
-bool
-print_sockaddr_by_inode(const unsigned long inode, const enum sock_proto proto)
+static bool
+print_sockaddr_by_inode_uncached(const unsigned long inode,
+				 const enum sock_proto proto)
 {
 	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
 	    (proto != SOCK_PROTO_UNKNOWN && !protocols[proto].print))
@@ -492,4 +490,13 @@ print_sockaddr_by_inode(const unsigned long inode, const enum sock_proto proto)
 
 	close(fd);
 	return r;
+}
+
+/* Given an inode number of a socket, print out its protocol details.  */
+bool
+print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
+		        const unsigned long inode)
+{
+	return print_sockaddr_by_inode_cached(inode) ? true :
+		print_sockaddr_by_inode_uncached(inode, getfdproto(tcp, fd));
 }

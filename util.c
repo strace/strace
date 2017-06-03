@@ -640,17 +640,12 @@ printfd(struct tcb *tcp, int fd)
 		unsigned long inode;
 
 		tprintf("%d<", fd);
-		if (show_fd_path > 1
-		    && (str = STR_STRIP_PREFIX(path, "socket:[")) != path
-		    && (len = strlen(str)) && str[len - 1] == ']'
-		    && (inode = strtoul(str, NULL, 10))) {
-			if (!print_sockaddr_by_inode_cached(inode)) {
-				const enum sock_proto proto =
-					getfdproto(tcp, fd);
-				if (!print_sockaddr_by_inode(inode, proto))
-					tprints(path);
-			}
-		} else {
+		if (show_fd_path <= 1
+		    || (str = STR_STRIP_PREFIX(path, "socket:[")) == path
+		    || !(len = strlen(str))
+		    || str[len - 1] != ']'
+		    || !(inode = strtoul(str, NULL, 10))
+		    || !print_sockaddr_by_inode(tcp, fd, inode)) {
 			print_quoted_string(path, strlen(path),
 					    QUOTE_OMIT_LEADING_TRAILING_QUOTES);
 		}
