@@ -55,9 +55,15 @@ fetch_nlmsghdr(struct tcb *const tcp, struct nlmsghdr *const nlmsghdr,
 	return true;
 }
 
-static void
+enum {
+	NL_FAMILY_ERROR = -1,
+	NL_FAMILY_DEFAULT = -2
+};
+
+static int
 print_nlmsghdr(struct tcb *tcp,
 	       const int fd,
+	       int family,
 	       const struct nlmsghdr *const nlmsghdr)
 {
 	/* print the whole structure regardless of its nlmsg_len */
@@ -71,11 +77,14 @@ print_nlmsghdr(struct tcb *tcp,
 
 	tprintf(", seq=%u, pid=%u}", nlmsghdr->nlmsg_seq,
 		nlmsghdr->nlmsg_pid);
+
+	return family;
 }
 
 static void
 decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const int fd,
+			     int family,
 			     const struct nlmsghdr *const nlmsghdr,
 			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len);
@@ -83,6 +92,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 static void
 decode_nlmsgerr(struct tcb *const tcp,
 		const int fd,
+		const int family,
 		kernel_ulong_t addr,
 		kernel_ulong_t len)
 {
@@ -109,8 +119,8 @@ decode_nlmsgerr(struct tcb *const tcp,
 	if (len) {
 		tprints(", msg=");
 		if (fetch_nlmsghdr(tcp, &err.msg, addr, len)) {
-			decode_nlmsghdr_with_payload(tcp, fd, &err.msg,
-						     addr, len);
+			decode_nlmsghdr_with_payload(tcp, fd, family,
+						     &err.msg, addr, len);
 		}
 	}
 
@@ -120,12 +130,13 @@ decode_nlmsgerr(struct tcb *const tcp,
 static void
 decode_payload(struct tcb *const tcp,
 	       const int fd,
+	       const int family,
 	       const struct nlmsghdr *const nlmsghdr,
 	       const kernel_ulong_t addr,
 	       const kernel_ulong_t len)
 {
 	if (nlmsghdr->nlmsg_type == NLMSG_ERROR) {
-		decode_nlmsgerr(tcp, fd, addr, len);
+		decode_nlmsgerr(tcp, fd, family, addr, len);
 		return;
 	} else if (nlmsghdr->nlmsg_type == NLMSG_DONE && len == sizeof(int)) {
 		int num;
@@ -141,20 +152,21 @@ decode_payload(struct tcb *const tcp,
 static void
 decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const int fd,
+			     int family,
 			     const struct nlmsghdr *const nlmsghdr,
 			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len)
 {
 	tprints("{");
 
-	print_nlmsghdr(tcp, fd, nlmsghdr);
+	family = print_nlmsghdr(tcp, fd, family, nlmsghdr);
 
 	unsigned int nlmsg_len =
 		nlmsghdr->nlmsg_len > len ? len : nlmsghdr->nlmsg_len;
 	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprints(", ");
-		decode_payload(tcp, fd, nlmsghdr, addr + NLMSG_HDRLEN,
-					     nlmsg_len - NLMSG_HDRLEN);
+		decode_payload(tcp, fd, family, nlmsghdr, addr + NLMSG_HDRLEN,
+						     nlmsg_len - NLMSG_HDRLEN);
 	}
 
 	tprints("}");
@@ -192,7 +204,8 @@ decode_netlink(struct tcb *const tcp,
 			print_array = true;
 		}
 
-		decode_nlmsghdr_with_payload(tcp, fd, &nlmsghdr, addr, len);
+		decode_nlmsghdr_with_payload(tcp, fd, NL_FAMILY_DEFAULT,
+					     &nlmsghdr, addr, len);
 
 		if (!next_addr)
 			break;
