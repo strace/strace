@@ -33,6 +33,7 @@
 #include "xlat/netlink_flags.h"
 #include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
+#include "xlat/nl_sock_diag_types.h"
 
 #undef NLMSG_HDRLEN
 #define NLMSG_HDRLEN NLMSG_ALIGN(sizeof(struct nlmsghdr))
@@ -61,6 +62,56 @@ enum {
 };
 
 static int
+get_fd_nl_family(struct tcb *const tcp, const int fd)
+{
+	const unsigned long inode = getfdinode(tcp, fd);
+	if (!inode)
+		return NL_FAMILY_ERROR;
+
+	const char *const details = get_sockaddr_by_inode(tcp, fd, inode);
+	if (!details)
+		return NL_FAMILY_ERROR;
+
+	const char *const nl_details = STR_STRIP_PREFIX(details, "NETLINK:[");
+	if (nl_details == details)
+		return NL_FAMILY_ERROR;
+
+	const struct xlat *xlats = netlink_protocols;
+	for (; xlats->str; ++xlats) {
+		const char *name = STR_STRIP_PREFIX(xlats->str, "NETLINK_");
+		if (!strncmp(nl_details, name, strlen(name)))
+			return xlats->val;
+	}
+
+	if (*nl_details >= '0' && *nl_details <= '9')
+		return atoi(nl_details);
+
+	return NL_FAMILY_ERROR;
+}
+
+static const struct {
+	const struct xlat *const xlat;
+	const char *const dflt;
+} nlmsg_types[] = {
+	[NETLINK_SOCK_DIAG] = { nl_sock_diag_types, "SOCK_DIAG_???" }
+};
+
+/*
+ * As all valid netlink families are positive integers, use unsigned int
+ * for family here to filter out NL_FAMILY_ERROR and NL_FAMILY_DEFAULT.
+ */
+static void
+decode_nlmsg_type(const uint16_t type, const unsigned int family)
+{
+	if (family < ARRAY_SIZE(nlmsg_types)
+	    && nlmsg_types[family].xlat) {
+		printxval(nlmsg_types[family].xlat, type, nlmsg_types[family].dflt);
+	} else {
+		printxval(netlink_types, type, "NLMSG_???");
+	}
+}
+
+static int
 print_nlmsghdr(struct tcb *tcp,
 	       const int fd,
 	       int family,
@@ -70,7 +121,12 @@ print_nlmsghdr(struct tcb *tcp,
 
 	tprintf("{len=%u, type=", nlmsghdr->nlmsg_len);
 
-	printxval(netlink_types, nlmsghdr->nlmsg_type, "NLMSG_???");
+	const int hdr_family = (nlmsghdr->nlmsg_type < NLMSG_MIN_TYPE)
+			       ? NL_FAMILY_DEFAULT
+			       : (family != NL_FAMILY_DEFAULT
+				  ? family : get_fd_nl_family(tcp, fd));
+
+	decode_nlmsg_type(nlmsghdr->nlmsg_type, hdr_family);
 
 	tprints(", flags=");
 	printflags(netlink_flags, nlmsghdr->nlmsg_flags, "NLM_F_???");
@@ -78,7 +134,7 @@ print_nlmsghdr(struct tcb *tcp,
 	tprintf(", seq=%u, pid=%u}", nlmsghdr->nlmsg_seq,
 		nlmsghdr->nlmsg_pid);
 
-	return family;
+	return family != NL_FAMILY_DEFAULT ? family : hdr_family;
 }
 
 static void
