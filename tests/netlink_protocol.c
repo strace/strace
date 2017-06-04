@@ -318,16 +318,17 @@ static void
 test_nlmsg_done(const int fd)
 {
 	struct nlmsghdr *nlh;
-	int total_len;
 	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	long rc;
+	const int num = 0xfacefeed;
 
+	/* NLMSG_DONE message without enough room for an integer payload */
 	nlh = nlh0;
-	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(int);
-	nlh->nlmsg_type = NLMSG_DONE;
-	nlh->nlmsg_flags = NLM_F_MULTI;
-	nlh->nlmsg_seq = 0;
-	nlh->nlmsg_pid = 0;
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(num),
+		.nlmsg_type = NLMSG_DONE,
+		.nlmsg_flags = NLM_F_MULTI
+	};
 
 	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=NLMSG_DONE, flags=NLM_F_MULTI"
@@ -335,19 +336,31 @@ test_nlmsg_done(const int fd)
 	       fd, nlh->nlmsg_len, nlh0 + NLMSG_HDRLEN,
 	       nlh->nlmsg_len, sprintrc(rc));
 
-	nlh = nlh0 - sizeof(int);
-	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(int);
-	nlh->nlmsg_type = NLMSG_DONE;
-	nlh->nlmsg_flags = NLM_F_MULTI;
-	nlh->nlmsg_seq = 0;
-	nlh->nlmsg_pid = 0;
-	total_len = nlh->nlmsg_len;
-	memcpy(NLMSG_DATA(nlh), &total_len, sizeof(total_len));
+	/* NLMSG_DONE message with enough room for an oddly short payload */
+	nlh->nlmsg_len = NLMSG_HDRLEN + 2;
+	nlh = nlh0 - 2;
+	/* Beware of unaligned access to nlh members. */
+	memmove(nlh, nlh0, sizeof(*nlh));
+	memcpy(NLMSG_DATA(nlh), "42", 2);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + 2, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=NLMSG_DONE, flags=NLM_F_MULTI"
+	       ", seq=0, pid=0}, \"42\"}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + 2, NLMSG_HDRLEN + 2, sprintrc(rc));
+
+	/* NLMSG_DONE message with enough room for an integer payload */
+	nlh = nlh0 - sizeof(num);
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(num),
+		.nlmsg_type = NLMSG_DONE,
+		.nlmsg_flags = NLM_F_MULTI
+	};
+	memcpy(NLMSG_DATA(nlh), &num, sizeof(num));
 
 	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=NLMSG_DONE, flags=NLM_F_MULTI"
 	       ", seq=0, pid=0}, %d}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, nlh->nlmsg_len, total_len, sprintrc(rc));
+	       fd, nlh->nlmsg_len, num, nlh->nlmsg_len, sprintrc(rc));
 }
 
 int main(void)
