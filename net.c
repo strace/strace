@@ -81,7 +81,6 @@
 #include "xlat/socketlayers.h"
 
 #include "xlat/inet_protocols.h"
-#include "xlat/netlink_protocols.h"
 
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>

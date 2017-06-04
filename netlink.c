@@ -31,6 +31,7 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include "xlat/netlink_flags.h"
+#include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
 
 #undef NLMSG_HDRLEN
