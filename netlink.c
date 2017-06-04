@@ -37,6 +37,8 @@
 #include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
 #include "xlat/nl_audit_types.h"
+#include "xlat/nl_netfilter_msg_types.h"
+#include "xlat/nl_netfilter_subsys_ids.h"
 #include "xlat/nl_route_types.h"
 #include "xlat/nl_selinux_types.h"
 #include "xlat/nl_sock_diag_types.h"
@@ -101,6 +103,7 @@ static const struct {
 	const char *const dflt;
 } nlmsg_types[] = {
 	[NETLINK_AUDIT] = { nl_audit_types, "AUDIT_???" },
+	[NETLINK_NETFILTER] = { nl_netfilter_subsys_ids, "NFNL_SUBSYS_???" },
 	[NETLINK_ROUTE] = { nl_route_types, "RTM_???" },
 	[NETLINK_SELINUX] = { nl_selinux_types, "SELNL_MSG_???" },
 	[NETLINK_SOCK_DIAG] = { nl_sock_diag_types, "SOCK_DIAG_???" },
@@ -116,7 +119,34 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 {
 	if (family < ARRAY_SIZE(nlmsg_types)
 	    && nlmsg_types[family].xlat) {
-		printxval(nlmsg_types[family].xlat, type, nlmsg_types[family].dflt);
+		if (family == NETLINK_NETFILTER) {
+			/* Reserved control nfnetlink messages first. */
+			const char *text = xlookup(nl_netfilter_msg_types,
+						   type);
+			if (text) {
+				tprints(text);
+				return;
+			}
+
+			/*
+			 * Other netfilter message types are split
+			 * in two pieces: 8 bits subsystem and 8 bits type.
+			 */
+			const uint8_t subsys_id = (uint8_t) (type >> 8);
+			const uint8_t msg_type = (uint8_t) type;
+
+			printxval(nlmsg_types[family].xlat, subsys_id,
+				  nlmsg_types[family].dflt);
+
+			/*
+			 * The type is subsystem specific,
+			 * print it in numeric format for now.
+			 */
+			tprintf("<<8|%#x", msg_type);
+		} else {
+			printxval(nlmsg_types[family].xlat, type,
+				  nlmsg_types[family].dflt);
+		}
 	} else {
 		printxval(netlink_types, type, "NLMSG_???");
 	}
