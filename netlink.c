@@ -32,6 +32,7 @@
 #include <linux/audit.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
+#include <linux/xfrm.h>
 #include "xlat/netlink_flags.h"
 #include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
@@ -39,6 +40,7 @@
 #include "xlat/nl_route_types.h"
 #include "xlat/nl_selinux_types.h"
 #include "xlat/nl_sock_diag_types.h"
+#include "xlat/nl_xfrm_types.h"
 
 #undef NLMSG_HDRLEN
 #define NLMSG_HDRLEN NLMSG_ALIGN(sizeof(struct nlmsghdr))
@@ -101,7 +103,8 @@ static const struct {
 	[NETLINK_AUDIT] = { nl_audit_types, "AUDIT_???" },
 	[NETLINK_ROUTE] = { nl_route_types, "RTM_???" },
 	[NETLINK_SELINUX] = { nl_selinux_types, "SELNL_MSG_???" },
-	[NETLINK_SOCK_DIAG] = { nl_sock_diag_types, "SOCK_DIAG_???" }
+	[NETLINK_SOCK_DIAG] = { nl_sock_diag_types, "SOCK_DIAG_???" },
+	[NETLINK_XFRM] = { nl_xfrm_types, "XFRM_MSG_???" }
 };
 
 /*
