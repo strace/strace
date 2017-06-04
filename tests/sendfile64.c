@@ -36,15 +36,13 @@
 # include <fcntl.h>
 # include <stdio.h>
 # include <stdint.h>
+# include <stdlib.h>
 # include <unistd.h>
 # include <sys/socket.h>
-# include <sys/stat.h>
 
 int
-main(int ac, const char **av)
+main(void)
 {
-	assert(ac == 1);
-
 	(void) close(0);
 	if (open("/dev/zero", O_RDONLY) != 0)
 		perror_msg_and_skip("open: %s", "/dev/zero");
@@ -53,50 +51,55 @@ main(int ac, const char **av)
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
 		perror_msg_and_skip("socketpair");
 
-	int reg_in = open(av[0], O_RDONLY);
-	if (reg_in < 0)
-		perror_msg_and_fail("open: %s", av[0]);
-
-	struct stat stb;
-	assert(fstat(reg_in, &stb) == 0);
-	const size_t blen = stb.st_size / 3;
-	const size_t alen = stb.st_size - blen;
-	assert(S_ISREG(stb.st_mode) && blen > 0);
-
-	const size_t page_len = get_page_size();
-	assert(syscall(__NR_sendfile64, 0, 1, NULL, page_len) == -1);
+	const unsigned int page_size = get_page_size();
+	assert(syscall(__NR_sendfile64, 0, 1, NULL, page_size) == -1);
 	if (EBADF != errno)
 		perror_msg_and_skip("sendfile64");
-	printf("sendfile64(0, 1, NULL, %lu) = -1 EBADF (%m)\n",
-	       (unsigned long) page_len);
+	printf("sendfile64(0, 1, NULL, %u) = -1 EBADF (%m)\n", page_size);
+
+	unsigned int file_size = 0;
+	socklen_t optlen = sizeof(file_size);
+	if (getsockopt(sv[1], SOL_SOCKET, SO_SNDBUF, &file_size, &optlen))
+		perror_msg_and_fail("getsockopt");
+	if (file_size < 1024)
+		error_msg_and_skip("SO_SNDBUF too small: %u", file_size);
+
+	file_size /= 4;
+	if (file_size / 16 > page_size)
+		file_size = page_size * 16;
+	const unsigned int blen = file_size / 3;
+	const unsigned int alen = file_size - blen;
+
+	static const char fname[] = "sendfile64-tmpfile";
+	int reg_in = open(fname, O_RDWR | O_CREAT | O_TRUNC, 0600);
+	if (reg_in < 0)
+		perror_msg_and_fail("open: %s", fname);
+	if (unlink(fname))
+		perror_msg_and_fail("unlink: %s", fname);
+	if (ftruncate(reg_in, file_size))
+		perror_msg_and_fail("ftruncate: %s", fname);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, p_off);
 	void *p = p_off + 1;
 	*p_off = 0;
 
-	assert(syscall(__NR_sendfile64, 0, 1, p, page_len) == -1);
-	printf("sendfile64(0, 1, %#lx, %lu) = -1 EFAULT (%m)\n",
-	       (unsigned long) p, (unsigned long) page_len);
+	assert(syscall(__NR_sendfile64, 0, 1, p, page_size) == -1);
+	printf("sendfile64(0, 1, %p, %u) = -1 EFAULT (%m)\n", p, page_size);
 
 	assert(syscall(__NR_sendfile64, sv[1], reg_in, NULL, alen)
 	       == (long) alen);
-	printf("sendfile64(%d, %d, NULL, %lu) = %lu\n",
-	       sv[1], reg_in, (unsigned long) alen,
-	       (unsigned long) alen);
+	printf("sendfile64(%d, %d, NULL, %u) = %u\n",
+	       sv[1], reg_in, alen, alen);
 
 	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, alen)
 	       == (long) alen);
-	printf("sendfile64(%d, %d, [0] => [%lu], %lu) = %lu\n",
-	       sv[1], reg_in, (unsigned long) alen,
-	       (unsigned long) alen, (unsigned long) alen);
+	printf("sendfile64(%d, %d, [0] => [%u], %u) = %u\n",
+	       sv[1], reg_in, alen, alen, alen);
 
-	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, stb.st_size + 1)
+	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, file_size + 1)
 	       == (long) blen);
-	printf("sendfile64(%d, %d, [%lu] => [%lu], %lu) = %lu\n",
-	       sv[1], reg_in, (unsigned long) alen,
-	       (unsigned long) stb.st_size,
-	       (unsigned long) stb.st_size + 1,
-	       (unsigned long) blen);
+	printf("sendfile64(%d, %d, [%u] => [%u], %u) = %u\n",
+	       sv[1], reg_in, alen, file_size, file_size + 1, blen);
 
 	*p_off = 0xcafef00dfacefeedULL;
 	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, 1) == -1);
