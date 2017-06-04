@@ -68,12 +68,19 @@ cache_and_print_inode_details(const unsigned long inode, char *const details)
 	return 1;
 }
 
+static const char *
+get_sockaddr_by_inode_cached(const unsigned long inode)
+{
+	const cache_entry *const e = &cache[inode & CACHE_MASK];
+	return (e && inode == e->inode) ? e->details : NULL;
+}
+
 static bool
 print_sockaddr_by_inode_cached(const unsigned long inode)
 {
-	const cache_entry *const e = &cache[inode & CACHE_MASK];
-	if (e && inode == e->inode) {
-		tprints(e->details);
+	const char *const details = get_sockaddr_by_inode_cached(inode);
+	if (details) {
+		tprints(details);
 		return true;
 	}
 	return false;
