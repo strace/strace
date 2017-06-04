@@ -31,10 +31,12 @@
 #include <sys/socket.h>
 #include <linux/audit.h>
 #include <linux/netlink.h>
+#include <linux/rtnetlink.h>
 #include "xlat/netlink_flags.h"
 #include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
 #include "xlat/nl_audit_types.h"
+#include "xlat/nl_route_types.h"
 #include "xlat/nl_sock_diag_types.h"
 
 #undef NLMSG_HDRLEN
@@ -96,6 +98,7 @@ static const struct {
 	const char *const dflt;
 } nlmsg_types[] = {
 	[NETLINK_AUDIT] = { nl_audit_types, "AUDIT_???" },
+	[NETLINK_ROUTE] = { nl_route_types, "RTM_???" },
 	[NETLINK_SOCK_DIAG] = { nl_sock_diag_types, "SOCK_DIAG_???" }
 };
 
