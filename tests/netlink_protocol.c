@@ -365,18 +365,7 @@ test_nlmsg_done(const int fd)
 
 int main(void)
 {
-	struct sockaddr_nl addr;
-	socklen_t len = sizeof(addr);
-	int fd;
-
-	memset(&addr, 0, sizeof(addr));
-	addr.nl_family = AF_NETLINK;
-
-	if ((fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG)) == -1)
-		perror_msg_and_skip("socket AF_NETLINK");
-
-	if (bind(fd, (struct sockaddr *) &addr, len))
-		perror_msg_and_skip("bind");
+	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 
 	char *path;
 	if (asprintf(&path, "/proc/self/fd/%u", fd) < 0)
@@ -390,8 +379,7 @@ int main(void)
 	test_nlmsgerr(fd);
 	test_nlmsg_done(fd);
 
-	printf("+++ exited with 0 +++\n");
-
+	puts("+++ exited with 0 +++");
 	return 0;
 }
 
