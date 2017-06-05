@@ -167,6 +167,9 @@ struct timespec;
 int recv_mmsg(int, struct mmsghdr *, unsigned int, unsigned int, struct timespec *);
 int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 
+/* Create a netlink socket. */
+int create_nl_socket(int);
+
 /* Create a pipe with maximized descriptor numbers. */
 void pipe_maxfd(int pipefd[2]);
 

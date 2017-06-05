@@ -42,6 +42,7 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 AM_LDFLAGS = $(ARCH_MFLAGS)
 
 libtests_a_SOURCES = \
+	create_nl_socket.c \
 	errno2name.c \
 	error_msg.c \
 	fill_memory.c \
