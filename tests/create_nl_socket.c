@@ -30,17 +30,17 @@
 #include <linux/netlink.h>
 
 int
-create_nl_socket(const int proto)
+create_nl_socket_ext(const int proto, const char *const name)
 {
 	const int fd = socket(AF_NETLINK, SOCK_RAW, proto);
 	if (fd < 0)
-		perror_msg_and_skip("socket AF_NETLINK");
+		perror_msg_and_skip("socket AF_NETLINK %s", name);
 
 	const struct sockaddr_nl addr = { .nl_family = AF_NETLINK };
 	const socklen_t len = sizeof(addr);
 
 	if (bind(fd, (const struct sockaddr *) &addr, len))
-		perror_msg_and_skip("bind");
+		perror_msg_and_skip("bind AF_NETLINK %s", name);
 
 	return fd;
 }
