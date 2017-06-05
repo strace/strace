@@ -166,6 +166,7 @@ net-yy-inet
 net-yy-netlink
 net-yy-unix
 netlink_protocol
+netlink_sock_diag
 newfstatat
 old_mmap
 oldfstat
