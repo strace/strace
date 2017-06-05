@@ -26,12 +26,15 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <linux/netfilter/nfnetlink.h>
-#include <linux/netlink.h>
+
+#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
+
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <linux/netfilter/nfnetlink.h>
+# include <linux/netlink.h>
 
 static void
 test_nlmsg_type(const int fd)
@@ -42,7 +45,7 @@ test_nlmsg_type(const int fd)
 		.nlmsg_flags = NLM_F_REQUEST,
 	};
 
-#ifdef NFNL_MSG_BATCH_BEGIN
+# ifdef NFNL_MSG_BATCH_BEGIN
 	nlh.nlmsg_type = NFNL_MSG_BATCH_BEGIN;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=NFNL_MSG_BATCH_BEGIN"
@@ -57,7 +60,7 @@ test_nlmsg_type(const int fd)
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, NFNL_MSG_BATCH_BEGIN,
 	       (unsigned) sizeof(nlh), sprintrc(rc));
-#endif
+# endif
 
 	nlh.nlmsg_type = (NFNL_SUBSYS_CTNETLINK << 8);
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
@@ -79,3 +82,9 @@ int main(void)
 
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_LINUX_NETFILTER_NFNETLINK_H")
+
+#endif
