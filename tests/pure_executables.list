@@ -169,6 +169,7 @@ netlink_audit
 netlink_netfilter
 netlink_protocol
 netlink_route
+netlink_selinux
 netlink_sock_diag
 newfstatat
 old_mmap

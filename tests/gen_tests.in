@@ -188,6 +188,7 @@ netlink_audit	+netlink_sock_diag.test
 netlink_netfilter	+netlink_sock_diag.test
 netlink_protocol	-e trace=sendto
 netlink_route	+netlink_sock_diag.test
+netlink_selinux	+netlink_sock_diag.test
 newfstatat	-a32 -v -P stat.sample -P /dev/full
 old_mmap	-a11 -e trace=mmap
 oldfstat	-a18 -v -P stat.sample
