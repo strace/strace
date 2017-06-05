@@ -2573,18 +2573,9 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 extern void __gcov_flush();
 #endif
 
-int
-main(int argc, char *argv[])
+static void ATTRIBUTE_NORETURN
+terminate(void)
 {
-	init(argc, argv);
-
-	exit_code = !nprocs;
-
-	int status;
-	siginfo_t si;
-	while (dispatch_event(next_event(&status, &si), &status, &si))
-		;
-
 	cleanup();
 	fflush(NULL);
 	if (shared_log != stderr)
@@ -2619,6 +2610,19 @@ main(int argc, char *argv[])
 		   Exit with 128 + signo then.  */
 		exit_code += 128;
 	}
+	exit(exit_code);
+}
 
-	return exit_code;
+int
+main(int argc, char *argv[])
+{
+	init(argc, argv);
+
+	exit_code = !nprocs;
+
+	int status;
+	siginfo_t si;
+	while (dispatch_event(next_event(&status, &si), &status, &si))
+		;
+	terminate();
 }
