@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,24 +26,20 @@
  */
 
 #include "tests.h"
-#include <string.h>
 #include <sys/socket.h>
 #include <linux/netlink.h>
 
 int
-create_nl_socket(int proto)
+create_nl_socket(const int proto)
 {
-	struct sockaddr_nl addr;
-	socklen_t len = sizeof(addr);
-	int fd;
-
-	memset(&addr, 0, sizeof(addr));
-	addr.nl_family = AF_NETLINK;
-
-	if ((fd = socket(AF_NETLINK, SOCK_RAW, proto)) == -1)
+	const int fd = socket(AF_NETLINK, SOCK_RAW, proto);
+	if (fd < 0)
 		perror_msg_and_skip("socket AF_NETLINK");
 
-	if (bind(fd, (struct sockaddr *) &addr, len))
+	const struct sockaddr_nl addr = { .nl_family = AF_NETLINK };
+	const socklen_t len = sizeof(addr);
+
+	if (bind(fd, (const struct sockaddr *) &addr, len))
 		perror_msg_and_skip("bind");
 
 	return fd;
