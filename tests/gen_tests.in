@@ -184,7 +184,7 @@ munlockall	-a13
 nanosleep	-a20
 net-icmp_filter	-e trace=getsockopt,setsockopt
 net-sockaddr	-a24 -e trace=connect
-netlink_protocol	-e trace=%network
+netlink_protocol	-e trace=sendto
 newfstatat	-a32 -v -P stat.sample -P /dev/full
 old_mmap	-a11 -e trace=mmap
 oldfstat	-a18 -v -P stat.sample

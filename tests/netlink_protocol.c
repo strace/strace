@@ -375,12 +375,8 @@ int main(void)
 	if ((fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG)) == -1)
 		perror_msg_and_skip("socket AF_NETLINK");
 
-	printf("socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG) = %d\n",
-	       fd);
 	if (bind(fd, (struct sockaddr *) &addr, len))
 		perror_msg_and_skip("bind");
-	printf("bind(%d, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}"
-	       ", %u) = 0\n", fd, len);
 
 	char *path;
 	if (asprintf(&path, "/proc/self/fd/%u", fd) < 0)
