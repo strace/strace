@@ -166,6 +166,7 @@ net-yy-inet
 net-yy-netlink
 net-yy-unix
 netlink_audit
+netlink_netfilter
 netlink_protocol
 netlink_route
 netlink_sock_diag
