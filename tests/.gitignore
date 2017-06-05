@@ -206,6 +206,7 @@ netlink_route
 netlink_selinux
 netlink_sock_diag
 netlink_unix_diag
+netlink_xfrm
 newfstatat
 nsyscalls
 old_mmap
