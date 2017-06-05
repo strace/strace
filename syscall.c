@@ -651,25 +651,29 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 	return 0;
 }
 
-static int
-trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
+/*
+ * Returns:
+ * 0: "ignore this ptrace stop", bail out silently.
+ * 1: ok, decoded; call
+ *    syscall_entering_finish(tcp, syscall_entering_trace(tcp, ...)).
+ * other: error; call syscall_entering_finish(tcp, res), where res is the value
+ *    returned.
+ */
+int
+syscall_entering_decode(struct tcb *tcp)
 {
 	int res = get_scno(tcp);
 	if (res == 0)
 		return res;
-
 	int scno_good = res;
-	if (res == 1)
-		res = get_syscall_args(tcp);
-
-	if (res != 1) {
+	if (res != 1 || (res = get_syscall_args(tcp)) != 1) {
 		printleader(tcp);
 		tprintf("%s(", scno_good == 1 ? tcp->s_ent->sys_name : "????");
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
 		 */
-		goto ret;
+		return res;
 	}
 
 #ifdef LINUX_MIPSO32
@@ -692,6 +696,12 @@ trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 	}
 #endif
 
+	return 1;
+}
+
+int
+syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
+{
 	/* Restrain from fault injection while the trace executes strace code. */
 	if (hide_log(tcp)) {
 		tcp->qual_flg &= ~QUAL_INJECT;
@@ -710,24 +720,21 @@ trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 	if (!(tcp->qual_flg & QUAL_TRACE)
 	 || (tracing_paths && !pathtrace_match(tcp))
 	) {
-		tcp->flags |= TCB_INSYSCALL | TCB_FILTERED;
-		tcp->sys_func_rval = 0;
+		tcp->flags |= TCB_FILTERED;
 		return 0;
 	}
 
 	tcp->flags &= ~TCB_FILTERED;
 
 	if (hide_log(tcp)) {
-		res = 0;
-		goto ret;
+		return 0;
 	}
 
 	if (tcp->qual_flg & QUAL_INJECT)
 		tamper_with_syscall_entering(tcp, sig);
 
 	if (cflag == CFLAG_ONLY_STATS) {
-		res = 0;
-		goto ret;
+		return 0;
 	}
 
 #ifdef USE_LIBUNWIND
@@ -739,19 +746,20 @@ trace_syscall_entering(struct tcb *tcp, unsigned int *sig)
 
 	printleader(tcp);
 	tprintf("%s(", tcp->s_ent->sys_name);
-	if (tcp->qual_flg & QUAL_RAW)
-		res = printargs(tcp);
-	else
-		res = tcp->s_ent->sys_func(tcp);
-
+	int res = (tcp->qual_flg & QUAL_RAW)
+		? printargs(tcp) : tcp->s_ent->sys_func(tcp);
 	fflush(tcp->outf);
- ret:
+	return res;
+}
+
+void
+syscall_entering_finish(struct tcb *tcp, int res)
+{
 	tcp->flags |= TCB_INSYSCALL;
 	tcp->sys_func_rval = res;
 	/* Measure the entrance time as late as possible to avoid errors. */
-	if (Tflag || cflag)
+	if ((Tflag || cflag) && !filtered(tcp))
 		gettimeofday(&tcp->etime, NULL);
-	return res;
 }
 
 static bool
@@ -760,14 +768,20 @@ syscall_tampered(struct tcb *tcp)
 	return tcp->flags & TCB_TAMPERED;
 }
 
-static int
-trace_syscall_exiting(struct tcb *tcp)
+/* Returns:
+ * 0: "bail out".
+ * 1: ok.
+ * -1: error in one of ptrace ops.
+ *
+ * If not 0, call syscall_exiting_trace(tcp, res), where res is the return
+ *    value. Anyway, call syscall_exiting_finish(tcp) then.
+ */
+int
+syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 {
-	struct timeval tv;
-
 	/* Measure the exit time as early as possible to avoid errors. */
 	if ((Tflag || cflag) && !(filtered(tcp) || hide_log(tcp)))
-		gettimeofday(&tv, NULL);
+		gettimeofday(ptv, NULL);
 
 #ifdef USE_LIBUNWIND
 	if (stack_trace_enabled) {
@@ -777,21 +791,25 @@ trace_syscall_exiting(struct tcb *tcp)
 #endif
 
 	if (filtered(tcp) || hide_log(tcp))
-		goto ret;
+		return 0;
 
 	get_regs(tcp->pid);
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
-	int res = (get_regs_error ? -1 : get_syscall_result(tcp));
+	return get_regs_error ? -1 : get_syscall_result(tcp);
+}
 
+int
+syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
+{
 	if (syserror(tcp) && syscall_tampered(tcp))
 		tamper_with_syscall_exiting(tcp);
 
 	if (cflag) {
 		count_syscall(tcp, &tv);
 		if (cflag == CFLAG_ONLY_STATS) {
-			goto ret;
+			return 0;
 		}
 	}
 
@@ -818,9 +836,6 @@ trace_syscall_exiting(struct tcb *tcp)
 		tabto();
 		tprints("= ? <unavailable>\n");
 		line_ended();
-		tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED);
-		tcp->sys_func_rval = 0;
-		free_tcb_priv_data(tcp);
 		return res;
 	}
 	tcp->s_prev_ent = tcp->s_ent;
@@ -838,7 +853,7 @@ trace_syscall_exiting(struct tcb *tcp)
 	 * is not shown at all.
 	 */
 		if (not_failing_only && tcp->u_error)
-			goto ret;	/* ignore failed syscalls */
+			return 0;	/* ignore failed syscalls */
 		if (tcp->sys_func_rval & RVAL_DECODED)
 			sys_res = tcp->sys_func_rval;
 		else
@@ -995,19 +1010,15 @@ trace_syscall_exiting(struct tcb *tcp)
 	if (stack_trace_enabled)
 		unwind_print_stacktrace(tcp);
 #endif
-
- ret:
-	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED);
-	tcp->sys_func_rval = 0;
-	free_tcb_priv_data(tcp);
 	return 0;
 }
 
-int
-trace_syscall(struct tcb *tcp, unsigned int *signo)
+void
+syscall_exiting_finish(struct tcb *tcp)
 {
-	return exiting(tcp) ?
-		trace_syscall_exiting(tcp) : trace_syscall_entering(tcp, signo);
+	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED);
+	tcp->sys_func_rval = 0;
+	free_tcb_priv_data(tcp);
 }
 
 bool
@@ -1230,10 +1241,11 @@ free_sysent_buf(void *ptr)
 
 /*
  * Returns:
- * 0: "ignore this ptrace stop", bail out of trace_syscall_entering() silently.
- * 1: ok, continue in trace_syscall_entering().
- * other: error, trace_syscall_entering() should print error indicator
- *    ("????" etc) and bail out.
+ * 0: "ignore this ptrace stop", syscall_entering_decode() should return a "bail
+ *    out silently" code.
+ * 1: ok, continue in syscall_entering_decode().
+ * other: error, syscall_entering_decode() should print error indicator
+ *    ("????" etc) and return an appropriate code.
  */
 int
 get_scno(struct tcb *tcp)
@@ -1277,8 +1289,8 @@ static int get_syscall_result_regs(struct tcb *);
 #endif
 
 /* Returns:
- * 1: ok, continue in trace_syscall_exiting().
- * -1: error, trace_syscall_exiting() should print error indicator
+ * 1: ok, continue in syscall_exiting_trace().
+ * -1: error, syscall_exiting_trace() should print error indicator
  *    ("????" etc) and bail out.
  */
 static int

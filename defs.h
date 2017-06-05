@@ -249,17 +249,13 @@ struct tcb {
 /*
  * Are we in system call entry or in syscall exit?
  *
- * This bit is set after all syscall entry processing is done.
- * Therefore, this bit will be set when next ptrace stop occurs,
- * which should be syscall exit stop. Other stops which are possible
- * directly after syscall entry (death, ptrace event stop)
- * are simpler and handled without calling trace_syscall(), therefore
- * the places where TCB_INSYSCALL can be set but we aren't in syscall stop
- * are limited to trace(), this condition is never observed in trace_syscall()
- * and below.
- * The bit is cleared after all syscall exit processing is done.
+ * This bit is set in syscall_entering_finish() and cleared in
+ * syscall_exiting_finish().
+ * Other stops which are possible directly after syscall entry (death, ptrace
+ * event stop) are handled without calling syscall_{entering,exiting}_*().
  *
- * Use entering(tcp) / exiting(tcp) to check this bit to make code more readable.
+ * Use entering(tcp) / exiting(tcp) to check this bit to make code more
+ * readable.
  */
 #define TCB_INSYSCALL	0x04
 #define TCB_ATTACHED	0x08	/* We attached to it already */
@@ -408,7 +404,15 @@ extern int read_int_from_file(const char *, int *);
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 extern void print_pc(struct tcb *);
-extern int trace_syscall(struct tcb *, unsigned int *);
+
+extern int syscall_entering_decode(struct tcb *);
+extern int syscall_entering_trace(struct tcb *, unsigned int *);
+extern void syscall_entering_finish(struct tcb *, int);
+
+extern int syscall_exiting_decode(struct tcb *, struct timeval *);
+extern int syscall_exiting_trace(struct tcb *, struct timeval, int);
+extern void syscall_exiting_finish(struct tcb *);
+
 extern void count_syscall(struct tcb *, const struct timeval *);
 extern void call_summary(FILE *);
 

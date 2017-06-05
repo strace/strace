@@ -2459,6 +2459,30 @@ next_event(int *pstatus, siginfo_t *si)
 	}
 }
 
+static int
+trace_syscall(struct tcb *tcp, unsigned int *sig)
+{
+	if (entering(tcp)) {
+		int res = syscall_entering_decode(tcp);
+		switch (res) {
+		case 0:
+			return 0;
+		case 1:
+			res = syscall_entering_trace(tcp, sig);
+		}
+		syscall_entering_finish(tcp, res);
+		return res;
+	} else {
+		struct timeval tv = {};
+		int res = syscall_exiting_decode(tcp, &tv);
+		if (res != 0) {
+			res = syscall_exiting_trace(tcp, tv, res);
+		}
+		syscall_exiting_finish(tcp);
+		return res;
+	}
+}
+
 /* Returns true iff the main trace loop has to continue. */
 static bool
 dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
