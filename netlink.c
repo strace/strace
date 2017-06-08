@@ -157,7 +157,7 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 static void
 decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
 {
-	const struct xlat *table = netlink_flags;
+	const struct xlat *table = NULL;
 
 	switch (family) {
 	case NETLINK_SOCK_DIAG:
@@ -198,7 +198,7 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
 		break;
 	}
 
-	printflags(table, flags, "NLM_F_???");
+	printflags_ex(flags, "NLM_F_???", netlink_flags, table, NULL);
 }
 
 static int

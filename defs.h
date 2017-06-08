@@ -564,7 +564,8 @@ extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
 
 extern void addflags(const struct xlat *, uint64_t);
-extern int printflags64(const struct xlat *, uint64_t, const char *);
+extern int printflags_ex(uint64_t, const char *, const struct xlat *, ...)
+	ATTRIBUTE_SENTINEL;
 extern const char *sprintflags(const char *, const struct xlat *, uint64_t);
 extern const char *sprinttime(long long sec);
 extern const char *sprinttime_nsec(long long sec, unsigned long long nsec);
@@ -701,6 +702,12 @@ static inline void
 printstr(struct tcb *tcp, kernel_ulong_t addr)
 {
 	printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
+}
+
+static inline int
+printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
+{
+	return printflags_ex(flags, dflt, x, NULL);
 }
 
 static inline int

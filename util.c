@@ -409,29 +409,28 @@ sprintflags(const char *prefix, const struct xlat *xlat, uint64_t flags)
 }
 
 int
-printflags64(const struct xlat *xlat, uint64_t flags, const char *dflt)
+printflags_ex(uint64_t flags, const char *dflt, const struct xlat *xlat, ...)
 {
-	int n;
-	const char *sep;
+	unsigned int n = 0;
+	va_list args;
 
-	if (flags == 0 && xlat->val == 0 && xlat->str) {
-		tprints(xlat->str);
-		return 1;
-	}
-
-	sep = "";
-	for (n = 0; xlat->str; xlat++) {
-		if (xlat->val && (flags & xlat->val) == xlat->val) {
-			tprintf("%s%s", sep, xlat->str);
-			flags &= ~xlat->val;
-			sep = "|";
-			n++;
+	va_start(args, xlat);
+	for (; xlat; xlat = va_arg(args, const struct xlat *)) {
+		for (; (flags || !n) && xlat->str; ++xlat) {
+			if ((flags == xlat->val) ||
+			    (xlat->val && (flags & xlat->val) == xlat->val)) {
+				tprintf("%s%s", (n++ ? "|" : ""), xlat->str);
+				flags &= ~xlat->val;
+			}
+			if (!flags)
+				break;
 		}
 	}
+	va_end(args);
 
 	if (n) {
 		if (flags) {
-			tprintf("%s%#" PRIx64, sep, flags);
+			tprintf("|%#" PRIx64, flags);
 			n++;
 		}
 	} else {
