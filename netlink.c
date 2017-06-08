@@ -34,6 +34,8 @@
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
 #include "xlat/netlink_flags.h"
+#include "xlat/netlink_get_flags.h"
+#include "xlat/netlink_new_flags.h"
 #include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
 #include "xlat/nl_audit_types.h"
@@ -152,6 +154,53 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 	}
 }
 
+static void
+decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
+{
+	const struct xlat *table = netlink_flags;
+
+	switch (family) {
+	case NETLINK_SOCK_DIAG:
+		table = netlink_get_flags;
+		break;
+	case NETLINK_ROUTE:
+		if (type == RTM_DELACTION) {
+			table = netlink_get_flags;
+			break;
+		}
+		switch (type & 3) {
+		case  0:
+			table = netlink_new_flags;
+			break;
+		case  2:
+			table = netlink_get_flags;
+			break;
+		}
+		break;
+	case NETLINK_XFRM:
+		switch (type) {
+		case XFRM_MSG_NEWSA:
+		case XFRM_MSG_NEWPOLICY:
+		case XFRM_MSG_NEWAE:
+		case XFRM_MSG_NEWSADINFO:
+		case XFRM_MSG_NEWSPDINFO:
+			table = netlink_new_flags;
+			break;
+
+		case XFRM_MSG_GETSA:
+		case XFRM_MSG_GETPOLICY:
+		case XFRM_MSG_GETAE:
+		case XFRM_MSG_GETSADINFO:
+		case XFRM_MSG_GETSPDINFO:
+			table = netlink_get_flags;
+			break;
+		}
+		break;
+	}
+
+	printflags(table, flags, "NLM_F_???");
+}
+
 static int
 print_nlmsghdr(struct tcb *tcp,
 	       const int fd,
@@ -170,7 +219,8 @@ print_nlmsghdr(struct tcb *tcp,
 	decode_nlmsg_type(nlmsghdr->nlmsg_type, hdr_family);
 
 	tprints(", flags=");
-	printflags(netlink_flags, nlmsghdr->nlmsg_flags, "NLM_F_???");
+	decode_nlmsg_flags(nlmsghdr->nlmsg_flags,
+			   nlmsghdr->nlmsg_type, hdr_family);
 
 	tprintf(", seq=%u, pid=%u}", nlmsghdr->nlmsg_seq,
 		nlmsghdr->nlmsg_pid);
