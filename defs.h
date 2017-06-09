@@ -675,6 +675,17 @@ DECL_IOCTL(uffdio);
 
 extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);
 
+struct nlmsghdr;
+
+typedef bool (*netlink_decoder_t)(struct tcb *, const struct nlmsghdr *,
+				  kernel_ulong_t addr, kernel_ulong_t len);
+
+#define DECL_NETLINK(name)						\
+extern bool								\
+decode_netlink_ ## name(struct tcb *, const struct nlmsghdr *,		\
+			kernel_ulong_t addr, kernel_ulong_t len)
+DECL_NETLINK(sock_diag);
+
 extern int tv_nz(const struct timeval *);
 extern int tv_cmp(const struct timeval *, const struct timeval *);
 extern double tv_float(const struct timeval *);

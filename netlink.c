@@ -300,6 +300,10 @@ decode_nlmsgerr(struct tcb *const tcp,
 	tprints("}");
 }
 
+static const netlink_decoder_t netlink_decoders[] = {
+	[NETLINK_SOCK_DIAG] = decode_netlink_sock_diag
+};
+
 static void
 decode_payload(struct tcb *const tcp,
 	       const int fd,
@@ -311,7 +315,15 @@ decode_payload(struct tcb *const tcp,
 	if (nlmsghdr->nlmsg_type == NLMSG_ERROR) {
 		decode_nlmsgerr(tcp, fd, family, addr, len);
 		return;
-	} else if (nlmsghdr->nlmsg_type == NLMSG_DONE && len == sizeof(int)) {
+	}
+
+	if ((unsigned int) family < ARRAY_SIZE(netlink_decoders)
+	    && netlink_decoders[family]
+	    && netlink_decoders[family](tcp, nlmsghdr, addr, len)) {
+		return;
+	}
+
+	if (nlmsghdr->nlmsg_type == NLMSG_DONE && len == sizeof(int)) {
 		int num;
 
 		if (!umove_or_printaddr(tcp, addr, &num))
