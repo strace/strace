@@ -38,6 +38,7 @@
 #include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
 #include "xlat/nl_audit_types.h"
+#include "xlat/nl_crypto_types.h"
 #include "xlat/nl_netfilter_msg_types.h"
 #include "xlat/nl_netfilter_subsys_ids.h"
 #include "xlat/nl_route_types.h"
@@ -150,6 +151,7 @@ static const struct {
 	const char *const dflt;
 } nlmsg_types[] = {
 	[NETLINK_AUDIT] = { NULL, nl_audit_types, "AUDIT_???" },
+	[NETLINK_CRYPTO] = { NULL, nl_crypto_types, "CRYPTO_MSG_???" },
 	[NETLINK_GENERIC] = {
 		decode_nlmsg_type_generic,
 		NULL,
