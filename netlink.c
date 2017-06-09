@@ -200,6 +200,16 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
 		goto end;
 
 	switch (family) {
+	case NETLINK_CRYPTO:
+		switch (type) {
+		case CRYPTO_MSG_NEWALG:
+			table = netlink_new_flags;
+			break;
+		case CRYPTO_MSG_GETALG:
+			table = netlink_get_flags;
+			break;
+		}
+		break;
 	case NETLINK_SOCK_DIAG:
 		table = netlink_get_flags;
 		break;
