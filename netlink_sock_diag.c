@@ -29,6 +29,15 @@
 
 #include "defs.h"
 
+#include <sys/socket.h>
+#include <linux/netlink.h>
+#include <linux/unix_diag.h>
+
+#include "xlat/tcp_states.h"
+#include "xlat/tcp_state_flags.h"
+
+#include "xlat/unix_diag_show.h"
+
 static void
 decode_family(struct tcb *const tcp, const uint8_t family,
 	      const kernel_ulong_t addr, const kernel_ulong_t len)
@@ -43,6 +52,84 @@ decode_family(struct tcb *const tcp, const uint8_t family,
 	tprints("}");
 }
 
+static void
+decode_unix_diag_req(struct tcb *const tcp,
+		     const struct nlmsghdr *const nlmsghdr,
+		     const uint8_t family,
+		     const kernel_ulong_t addr,
+		     const kernel_ulong_t len)
+{
+	struct unix_diag_req req = { .sdiag_family = family };
+	const size_t offset = sizeof(req.sdiag_family);
+
+	tprints("{sdiag_family=");
+	printxval(addrfams, req.sdiag_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(req)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(req) - offset,
+					 (void *) &req + offset)) {
+			tprintf("sdiag_protocol=%" PRIu8 ", udiag_states=",
+				req.sdiag_protocol);
+			printflags(tcp_state_flags, req.udiag_states,
+				   "1<<TCP_???");
+			tprintf(", udiag_ino=%" PRIu32 ", udiag_show=",
+				req.udiag_ino);
+			printflags(unix_diag_show, req.udiag_show,
+				   "UDIAG_SHOW_???");
+			tprintf(", udiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
+				req.udiag_cookie[0], req.udiag_cookie[1]);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
+static void
+decode_unix_diag_msg(struct tcb *const tcp,
+		     const struct nlmsghdr *const nlmsghdr,
+		     const uint8_t family,
+		     const kernel_ulong_t addr,
+		     const kernel_ulong_t len)
+{
+	struct unix_diag_msg msg = { .udiag_family = family };
+	const size_t offset = sizeof(msg.udiag_family);
+
+	tprints("{udiag_family=");
+	printxval(addrfams, msg.udiag_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(msg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(msg) - offset,
+					 (void *) &msg + offset)) {
+			tprints("udiag_type=");
+			printxval(socktypes, msg.udiag_type, "SOCK_???");
+			tprintf(", udiag_state=");
+			printxval(tcp_states, msg.udiag_state, "TCP_???");
+			tprintf(", udiag_ino=%" PRIu32
+				", udiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
+				msg.udiag_ino,
+				msg.udiag_cookie[0], msg.udiag_cookie[1]);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
+typedef void (*netlink_diag_decoder_t)(struct tcb *,
+				       const struct nlmsghdr *,
+				       uint8_t family,
+				       kernel_ulong_t addr,
+				       kernel_ulong_t len);
+
+static const struct {
+	const netlink_diag_decoder_t request, response;
+} diag_decoders[] = {
+	[AF_UNIX] = { decode_unix_diag_req, decode_unix_diag_msg }
+};
+
 bool
 decode_netlink_sock_diag(struct tcb *const tcp,
 			 const struct nlmsghdr *const nlmsghdr,
@@ -51,8 +138,22 @@ decode_netlink_sock_diag(struct tcb *const tcp,
 {
 	uint8_t family;
 
-	if (!umove_or_printaddr(tcp, addr, &family))
+	if (!umove_or_printaddr(tcp, addr, &family)) {
+		if (family < ARRAY_SIZE(diag_decoders)
+		    && len > sizeof(family)) {
+			const netlink_diag_decoder_t decoder =
+				(nlmsghdr->nlmsg_flags & NLM_F_REQUEST)
+				? diag_decoders[family].request
+				: diag_decoders[family].response;
+
+			if (decoder) {
+				decoder(tcp, nlmsghdr, family, addr, len);
+				return true;
+			}
+		}
+
 		decode_family(tcp, family, addr, len);
+	}
 
 	return true;
 }
