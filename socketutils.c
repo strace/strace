@@ -134,9 +134,10 @@ inet_send_query(const int fd, const int family, const int proto)
 }
 
 static int
-inet_parse_response(const char *const proto_name, const void *const data,
-		    const int data_len, const unsigned long inode)
+inet_parse_response(const void *const data, const int data_len,
+		    const unsigned long inode, void *opaque_data)
 {
+	const char *const proto_name = opaque_data;
 	const struct inet_diag_msg *const diag_msg = data;
 	static const char zero_addr[sizeof(struct in6_addr)];
 	socklen_t addr_size, text_size;
@@ -190,9 +191,9 @@ inet_parse_response(const char *const proto_name, const void *const data,
 static bool
 receive_responses(const int fd, const unsigned long inode,
 		  const unsigned long expected_msg_type,
-		  const char *proto_name,
-		  int (* parser) (const char *, const void *,
-				  int, unsigned long))
+		  int (*parser)(const void *, int,
+				unsigned long, void *),
+		  void *opaque_data)
 {
 	static union {
 		struct nlmsghdr hdr;
@@ -229,8 +230,8 @@ receive_responses(const int fd, const unsigned long inode,
 		for (; NLMSG_OK(h, ret); h = NLMSG_NEXT(h, ret)) {
 			if (h->nlmsg_type != expected_msg_type)
 				return false;
-			const int rc = parser(proto_name, NLMSG_DATA(h),
-					      h->nlmsg_len, inode);
+			const int rc = parser(NLMSG_DATA(h),
+					      h->nlmsg_len, inode, opaque_data);
 			if (rc > 0)
 				return true;
 			if (rc < 0)
@@ -263,9 +264,10 @@ unix_send_query(const int fd, const unsigned long inode)
 }
 
 static int
-unix_parse_response(const char *proto_name, const void *data,
-		    const int data_len, const unsigned long inode)
+unix_parse_response(const void *data, const int data_len,
+		    const unsigned long inode, void *opaque_data)
 {
+	const char *proto_name = opaque_data;
 	const struct unix_diag_msg *diag_msg = data;
 	struct rtattr *attr;
 	int rta_len = data_len - NLMSG_LENGTH(sizeof(*diag_msg));
@@ -361,9 +363,10 @@ netlink_send_query(const int fd, const unsigned long inode)
 }
 
 static int
-netlink_parse_response(const char *proto_name, const void *data,
-		    const int data_len, const unsigned long inode)
+netlink_parse_response(const void *data, const int data_len,
+		       const unsigned long inode, void *opaque_data)
 {
+	const char *proto_name = opaque_data;
 	const struct netlink_diag_msg *const diag_msg = data;
 	const char *netlink_proto;
 	char *details;
@@ -398,7 +401,7 @@ unix_get(const int fd, const unsigned long inode)
 {
 	return unix_send_query(fd, inode)
 		&& receive_responses(fd, inode, SOCK_DIAG_BY_FAMILY,
-				     "UNIX", unix_parse_response)
+				     unix_parse_response, (void *) "UNIX")
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
@@ -408,7 +411,7 @@ inet_get(const int fd, const int family, const int protocol,
 {
 	return inet_send_query(fd, family, protocol)
 		&& receive_responses(fd, inode, SOCK_DIAG_BY_FAMILY,
-				     proto_name, inet_parse_response)
+				     inet_parse_response, (void *) proto_name)
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
@@ -441,7 +444,7 @@ netlink_get(const int fd, const unsigned long inode)
 {
 	return netlink_send_query(fd, inode)
 		&& receive_responses(fd, inode, SOCK_DIAG_BY_FAMILY,
-				     "NETLINK", netlink_parse_response)
+				     netlink_parse_response, (void *) "NETLINK")
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
