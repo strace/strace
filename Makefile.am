@@ -265,6 +265,7 @@ strace_SOURCES =	\
 	v4l2.c		\
 	wait.c		\
 	xattr.c		\
+	xlat.c		\
 	xlat.h		\
 	xmalloc.c	\
 	# end of strace_SOURCES
