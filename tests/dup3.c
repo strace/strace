@@ -23,6 +23,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_dup3 && && O_CLOEXEC")
+SKIP_MAIN_UNDEFINED("__NR_dup3 && O_CLOEXEC")
 
 #endif
