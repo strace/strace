@@ -40,8 +40,13 @@
 #include <linux/netlink.h>
 #include <linux/netlink_diag.h>
 #include <linux/packet_diag.h>
+#ifdef AF_SMC
+# include <linux/smc_diag.h>
+#endif
 #include <linux/sock_diag.h>
 #include <linux/unix_diag.h>
+
+#define SMC_ACTIVE 1
 
 # if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
 #  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
@@ -1303,6 +1308,238 @@ test_inet_diag_msg(const int fd)
 	       sprintrc(rc));
 }
 
+#ifdef AF_SMC
+static void
+test_smc_diag_req(const int fd)
+{
+	const char address[] = "43.21.56.78";
+	struct nlmsghdr *nlh;
+	struct smc_diag_req *req;
+	uint8_t *family;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* family only */
+	nlh = nlh0 - sizeof(*family);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_SMC;
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}, {family=AF_SMC}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       sprintrc(rc));
+
+	/* family and string */
+	nlh = nlh0 - sizeof(*family) - 4;
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_SMC;
+	memcpy(family + 1, "1234", 4);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family) + 4, MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {diag_family=AF_SMC, ...}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       sprintrc(rc));
+
+	/* smc_diag_req */
+	nlh = nlh0 - sizeof(*req);
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	req = NLMSG_DATA(nlh);
+	*req = (struct smc_diag_req) {
+		.diag_family = AF_SMC,
+		.diag_ext = 1 << (SMC_DIAG_CONNINFO - 1),
+		.id = {
+			.idiag_sport = 0xdead,
+			.idiag_dport = 0xadcd,
+			.idiag_if = 0xadcdfafc,
+			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded },
+		},
+	};
+
+	if (!inet_pton(AF_INET, address, &req->id.idiag_src))
+		perror_msg_and_skip("sendto");
+	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
+		perror_msg_and_skip("sendto");
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}, {diag_family=AF_SMC"
+	       ", diag_ext=1<<(SMC_DIAG_CONNINFO-1)"
+	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_if=%u, idiag_cookie=[%u, %u]}}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, htons(0xdead), htons(0xadcd),
+	       address, address, 0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* short read of smc_diag_req */
+	nlh = nlh0 - (sizeof(*req) - 1);
+	/* beware of unaligned access to nlh members */
+	memmove(nlh, nlh0 - sizeof(*req), NLMSG_HDRLEN + sizeof(*req) - 1);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {diag_family=AF_SMC, %p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       NLMSG_DATA(nlh) + 1,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
+}
+
+static void
+test_smc_diag_msg(const int fd)
+{
+	const char address[] = "34.87.12.90";
+	struct nlmsghdr *nlh;
+	struct smc_diag_msg *msg;
+	uint8_t *family;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* family only */
+	nlh = nlh0 - sizeof(*family);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_SMC;
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {family=AF_SMC}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       sprintrc(rc));
+
+	/* family and string */
+	nlh = nlh0 - sizeof(*family) - 4;
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_SMC;
+	memcpy(family + 1, "1234", 4);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family) + 4, MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	       ", {diag_family=AF_SMC, ...}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       sprintrc(rc));
+
+	/* smc_diag_msg */
+	nlh = nlh0 - sizeof(*msg);
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+
+	msg = NLMSG_DATA(nlh);
+	*msg = (struct smc_diag_msg) {
+		.diag_family = AF_SMC,
+		.diag_state = SMC_ACTIVE,
+		.diag_fallback = 0xde,
+		.diag_shutdown = 0xba,
+		.id = {
+			.idiag_sport = 0xdead,
+			.idiag_dport = 0xadcd,
+			.idiag_if = 0xadcdfafc,
+			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded },
+		},
+		.diag_uid = 0xadcdfafc,
+		.diag_inode = 0xbadc0ded,
+	};
+
+	if (!inet_pton(AF_INET, address, &msg->id.idiag_src))
+		perror_msg_and_skip("sendto");
+	if (!inet_pton(AF_INET, address, &msg->id.idiag_dst))
+		perror_msg_and_skip("sendto");
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {diag_family=AF_SMC"
+	       ", diag_state=SMC_ACTIVE, diag_fallback=%u, diag_shutdown=%u"
+	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
+	       ", diag_uid=%u, diag_inode=%u}}, %u"
+	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, 0xde, 0xba,
+	       htons(0xdead), htons(0xadcd), address, address,
+	       0xadcdfafc, 0xdeadbeef, 0xbadc0ded, 0xadcdfafc, 0xbadc0ded,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* short read of smc_diag_msg */
+	nlh = nlh0 - (sizeof(*msg) - 1);
+	/* beware of unaligned access to nlh members */
+	memmove(nlh, nlh0 - sizeof(*msg), NLMSG_HDRLEN + sizeof(*msg) - 1);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	       ", {diag_family=AF_SMC, %p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       NLMSG_DATA(nlh) + 1,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
+}
+#endif
+
 int
 main(void)
 {
@@ -1324,6 +1561,10 @@ main(void)
 	test_inet_diag_req(fd);
 	test_inet_diag_req_v2(fd);
 	test_inet_diag_msg(fd);
+#ifdef AF_SMC
+	test_smc_diag_req(fd);
+	test_smc_diag_msg(fd);
+#endif
 
 	printf("+++ exited with 0 +++\n");
 
