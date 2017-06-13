@@ -35,6 +35,7 @@
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <linux/netlink.h>
+#include <linux/netlink_diag.h>
 #include <linux/sock_diag.h>
 #include <linux/unix_diag.h>
 
@@ -467,6 +468,219 @@ test_unix_diag_msg(const int fd)
 	       sprintrc(rc));
 }
 
+static void
+test_netlink_diag_req(const int fd)
+{
+	struct nlmsghdr *nlh;
+	struct netlink_diag_req *req;
+	uint8_t *family;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* family only */
+	nlh = nlh0 - sizeof(*family);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+	family = NLMSG_DATA(nlh);
+	*family = AF_NETLINK;
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}, {family=AF_NETLINK}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       sprintrc(rc));
+
+	/* family and string */
+	nlh = nlh0 - (sizeof(*family) + 4);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+	family = NLMSG_DATA(nlh);
+	*family = AF_NETLINK;
+	memcpy(family + 1, "1234", 4);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family) + 4, MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_NETLINK, ...}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       sprintrc(rc));
+
+	/* netlink_diag_req */
+	nlh = nlh0 - sizeof(*req);
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+	req = NLMSG_DATA(nlh);
+	*req = (struct netlink_diag_req) {
+		.sdiag_family = AF_NETLINK,
+		.sdiag_protocol = NDIAG_PROTO_ALL,
+		.ndiag_ino = 0xfacefeed,
+		.ndiag_show = NDIAG_SHOW_MEMINFO,
+		.ndiag_cookie = { 0xdeadbeef, 0xbadc0ded }
+	};
+
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_NETLINK, sdiag_protocol=NDIAG_PROTO_ALL"
+	       ", ndiag_ino=%u, ndiag_show=NDIAG_SHOW_MEMINFO"
+	       ", ndiag_cookie=[%u, %u]}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, 0xfacefeed, 0xdeadbeef,
+	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+
+	req->sdiag_protocol = NETLINK_ROUTE;
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_NETLINK, sdiag_protocol=NETLINK_ROUTE"
+	       ", ndiag_ino=%u, ndiag_show=NDIAG_SHOW_MEMINFO"
+	       ", ndiag_cookie=[%u, %u]}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, 0xfacefeed, 0xdeadbeef,
+	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+
+	/* short read of netlink_diag_req */
+	nlh = nlh0 - (sizeof(*req) - 1);
+	/* beware of unaligned access to nlh members */
+	memmove(nlh, nlh0 - sizeof(*req), NLMSG_HDRLEN + sizeof(*req) - 1);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_NETLINK, %p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       NLMSG_DATA(nlh) + 1,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
+}
+
+static void
+test_netlink_diag_msg(const int fd)
+{
+	struct nlmsghdr *nlh;
+	struct netlink_diag_msg *msg;
+	uint8_t *family;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* family only */
+	nlh = nlh0 - sizeof(*family);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+	family = NLMSG_DATA(nlh);
+	*family = AF_NETLINK;
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {family=AF_NETLINK}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       sprintrc(rc));
+
+	/* family and string */
+	nlh = nlh0 - (sizeof(*family) + 4);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+	family = NLMSG_DATA(nlh);
+	*family = AF_NETLINK;
+	memcpy(family + 1, "1234", 4);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family) + 4, MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	       ", {ndiag_family=AF_NETLINK, ...}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       sprintrc(rc));
+
+	/* netlink_diag_msg */
+	nlh = nlh0 - sizeof(*msg);
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+	msg = NLMSG_DATA(nlh);
+	*msg = (struct netlink_diag_msg) {
+		.ndiag_family = AF_NETLINK,
+		.ndiag_type = SOCK_RAW,
+		.ndiag_protocol = NETLINK_ROUTE,
+		.ndiag_state = NETLINK_CONNECTED,
+		.ndiag_portid = 0xbadc0ded,
+		.ndiag_dst_portid = 0xdeadbeef,
+		.ndiag_dst_group = 0xfacefeed,
+		.ndiag_ino = 0xdaeefacd,
+		.ndiag_cookie = { 0xbadc0ded, 0xdeadbeef }
+	};
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {ndiag_family=AF_NETLINK"
+	       ", ndiag_type=SOCK_RAW, ndiag_protocol=NETLINK_ROUTE"
+	       ", ndiag_state=NETLINK_CONNECTED, ndiag_portid=%u"
+	       ", ndiag_dst_portid=%u, ndiag_dst_group=%u, ndiag_ino=%u"
+	       ", ndiag_cookie=[%u, %u]}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, 0xbadc0ded, 0xdeadbeef, 0xfacefeed,
+	       0xdaeefacd, 0xbadc0ded, 0xdeadbeef,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* short read of netlink_diag_msg */
+	nlh = nlh0 - (sizeof(*msg) - 1);
+	/* beware of unaligned access to nlh members */
+	memmove(nlh, nlh0 - sizeof(*msg), NLMSG_HDRLEN + sizeof(*msg) - 1);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	       ", {ndiag_family=AF_NETLINK, %p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       NLMSG_DATA(nlh) + 1,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
+}
+
 int
 main(void)
 {
@@ -480,6 +694,8 @@ main(void)
 	test_odd_family_msg(fd);
 	test_unix_diag_req(fd);
 	test_unix_diag_msg(fd);
+	test_netlink_diag_req(fd);
+	test_netlink_diag_msg(fd);
 
 	printf("+++ exited with 0 +++\n");
 
