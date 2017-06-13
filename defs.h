@@ -401,6 +401,7 @@ void *xcalloc(size_t nmemb, size_t size)
 void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 	ATTRIBUTE_ALLOC_SIZE((2, 3));
 char *xstrdup(const char *str) ATTRIBUTE_MALLOC;
+char *xstrndup(const char *str, size_t n) ATTRIBUTE_MALLOC;
 
 extern int read_int_from_file(const char *, int *);
 

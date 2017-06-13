@@ -85,3 +85,24 @@ char *xstrdup(const char *str)
 
 	return p;
 }
+
+char *xstrndup(const char *str, size_t n)
+{
+	char *p;
+
+#ifdef HAVE_STRNDUP
+	p = strndup(str, n);
+#else
+	p = xmalloc(n + 1);
+#endif
+
+	if (!p)
+		die_out_of_memory();
+
+#ifndef HAVE_STRNDUP
+	strncpy(p, str, n);
+	p[n] = '\0';
+#endif
+
+	return p;
+}
