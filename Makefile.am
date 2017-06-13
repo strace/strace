@@ -564,6 +564,7 @@ EXTRA_DIST =				\
 	linux/or1k/set_scno.c		\
 	linux/or1k/syscallent.h		\
 	linux/or1k/userent.h		\
+	linux/packet_diag.h		\
 	linux/personality.h		\
 	linux/powerpc/arch_regs.c	\
 	linux/powerpc/arch_regs.h	\

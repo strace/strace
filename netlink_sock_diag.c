@@ -32,6 +32,7 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
 #include <linux/netlink_diag.h>
+#include <linux/packet_diag.h>
 #include <linux/unix_diag.h>
 
 #include "xlat/tcp_states.h"
@@ -39,6 +40,8 @@
 
 #include "xlat/netlink_diag_show.h"
 #include "xlat/netlink_states.h"
+
+#include "xlat/packet_diag_show.h"
 
 #include "xlat/unix_diag_show.h"
 
@@ -202,6 +205,68 @@ decode_netlink_diag_msg(struct tcb *const tcp,
 	tprints("}");
 }
 
+static void
+decode_packet_diag_req(struct tcb *const tcp,
+		       const struct nlmsghdr *const nlmsghdr,
+		       const uint8_t family,
+		       const kernel_ulong_t addr,
+		       const kernel_ulong_t len)
+{
+	struct packet_diag_req req = { .sdiag_family = family };
+	const size_t offset = sizeof(req.sdiag_family);
+
+	tprints("{sdiag_family=");
+	printxval(addrfams, req.sdiag_family, "AF_???");
+	tprints(", ");
+	if (len >= sizeof(req)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(req) - offset,
+					 (void *) &req + offset)) {
+			tprints("sdiag_protocol=");
+			printxval(ethernet_protocols, req.sdiag_protocol,
+				  "ETH_P_???");
+			tprintf(", pdiag_ino=%" PRIu32 ", pdiag_show=",
+				req.pdiag_ino);
+			printflags(packet_diag_show, req.pdiag_show,
+				   "PACKET_SHOW_???");
+			tprintf(", pdiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
+				req.pdiag_cookie[0], req.pdiag_cookie[1]);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
+static void
+decode_packet_diag_msg(struct tcb *const tcp,
+		       const struct nlmsghdr *const nlmsghdr,
+		       const uint8_t family,
+		       const kernel_ulong_t addr,
+		       const kernel_ulong_t len)
+{
+	struct packet_diag_msg msg = { .pdiag_family = family };
+	const size_t offset = sizeof(msg.pdiag_family);
+
+	tprints("{pdiag_family=");
+	printxval(addrfams, msg.pdiag_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(msg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(msg) - offset,
+					 (void *) &msg + offset)) {
+			tprints("pdiag_type=");
+			printxval(socktypes, msg.pdiag_type, "SOCK_???");
+			tprintf(", pdiag_num=%" PRIu16 ", pdiag_ino=%" PRIu32
+				", pdiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
+				msg.pdiag_num, msg.pdiag_ino, msg.pdiag_cookie[0],
+				msg.pdiag_cookie[1]);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
 typedef void (*netlink_diag_decoder_t)(struct tcb *,
 				       const struct nlmsghdr *,
 				       uint8_t family,
@@ -212,6 +277,7 @@ static const struct {
 	const netlink_diag_decoder_t request, response;
 } diag_decoders[] = {
 	[AF_NETLINK] = { decode_netlink_diag_req, decode_netlink_diag_msg },
+	[AF_PACKET] = { decode_packet_diag_req, decode_packet_diag_msg },
 	[AF_UNIX] = { decode_unix_diag_req, decode_unix_diag_msg }
 };
 
