@@ -1,0 +1,3 @@
+#unconditional
+1<<(SMC_DIAG_CONNINFO-1)
+1<<(SMC_DIAG_LGRINFO-1)

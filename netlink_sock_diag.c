@@ -35,6 +35,9 @@
 #include <linux/netlink.h>
 #include <linux/netlink_diag.h>
 #include <linux/packet_diag.h>
+#ifdef AF_SMC
+# include <linux/smc_diag.h>
+#endif
 #include <linux/unix_diag.h>
 
 #include "xlat/inet_diag_extended_flags.h"
@@ -46,6 +49,11 @@
 #include "xlat/netlink_states.h"
 
 #include "xlat/packet_diag_show.h"
+
+#ifdef AF_SMC
+# include "xlat/smc_diag_extended_flags.h"
+# include "xlat/smc_states.h"
+#endif
 
 #include "xlat/unix_diag_show.h"
 
@@ -418,6 +426,79 @@ decode_inet_diag_msg(struct tcb *const tcp,
 	tprints("}");
 }
 
+#ifdef AF_SMC
+static void
+decode_smc_diag_req(struct tcb *const tcp,
+		    const struct nlmsghdr *const nlmsghdr,
+		    const uint8_t family,
+		    const kernel_ulong_t addr,
+		    const kernel_ulong_t len)
+{
+	struct smc_diag_req req = { .diag_family = family };
+	const size_t offset = sizeof(req.diag_family);
+
+	tprints("{diag_family=");
+	printxval(addrfams, req.diag_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(req)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(req) - offset,
+					 (void *) &req + offset)) {
+			tprints("diag_ext=");
+			printflags(smc_diag_extended_flags, req.diag_ext,
+				   "1<<SMC_DIAG_\?\?\?-1");
+			tprints(", id=");
+			/*
+			 * AF_SMC protocol family socket handler
+			 * keeping the AF_INET sock address.
+			 */
+			print_inet_diag_sockid(&req.id, AF_INET);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
+static void
+decode_smc_diag_msg(struct tcb *const tcp,
+		    const struct nlmsghdr *const nlmsghdr,
+		    const uint8_t family,
+		    const kernel_ulong_t addr,
+		    const kernel_ulong_t len)
+{
+	struct smc_diag_msg msg = { .diag_family = family };
+	const size_t offset = sizeof(msg.diag_family);
+
+	tprints("{diag_family=");
+	printxval(addrfams, msg.diag_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(msg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(msg) - offset,
+					 (void *) &msg + offset)) {
+			tprints("diag_state=");
+			printxval(smc_states, msg.diag_state, "SMC_???");
+			tprintf(", diag_fallback=%" PRIu8
+				", diag_shutdown=%" PRIu8,
+				msg.diag_fallback, msg.diag_shutdown);
+			tprints(", id=");
+			/*
+			 * AF_SMC protocol family socket handler
+			 * keeping the AF_INET sock address.
+			 */
+			print_inet_diag_sockid(&msg.id, AF_INET);
+			tprintf(", diag_uid=%" PRIu32 ", diag_inode=%" PRIu64,
+				msg.diag_uid, msg.diag_inode);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+
+}
+#endif
+
 typedef void (*netlink_diag_decoder_t)(struct tcb *,
 				       const struct nlmsghdr *,
 				       uint8_t family,
@@ -431,6 +512,9 @@ static const struct {
 	[AF_INET6] = { decode_inet_diag_req, decode_inet_diag_msg },
 	[AF_NETLINK] = { decode_netlink_diag_req, decode_netlink_diag_msg },
 	[AF_PACKET] = { decode_packet_diag_req, decode_packet_diag_msg },
+#ifdef AF_SMC
+	[AF_SMC] = { decode_smc_diag_req, decode_smc_diag_msg },
+#endif
 	[AF_UNIX] = { decode_unix_diag_req, decode_unix_diag_msg }
 };
 

@@ -681,6 +681,7 @@ EXTRA_DIST =				\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
 	linux/signalent.h		\
+	linux/smc_diag.h		\
 	linux/sock_diag.h		\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_regs.c		\
