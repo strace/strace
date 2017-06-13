@@ -37,6 +37,9 @@
 #include <linux/unix_diag.h>
 #include <linux/netlink_diag.h>
 #include <linux/rtnetlink.h>
+#if HAVE_LINUX_GENETLINK_H
+#include <linux/genetlink.h>
+#endif
 
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
@@ -541,3 +544,110 @@ print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 	return print_sockaddr_by_inode_cached(inode) ? true :
 		print_sockaddr_by_inode_uncached(inode, getfdproto(tcp, fd));
 }
+
+#ifdef HAVE_LINUX_GENETLINK_H
+/*
+ * Managing the cache for decoding communications of Netlink GENERIC protocol
+ *
+ * As name shown Netlink GENERIC protocol is generic protocol. The
+ * numbers of msg types used in the protocol are not defined
+ * statically. Kernel defines them on demand.  So the xlat converted
+ * from header files doesn't help for decoding the protocol. Following
+ * codes are building xlat(dyxlat) at runtime.
+ */
+static bool
+genl_send_dump_families(const int fd)
+{
+	struct {
+		const struct nlmsghdr nlh;
+		struct genlmsghdr gnlh;
+	} req = {
+		.nlh = {
+			.nlmsg_len = sizeof(req),
+			.nlmsg_type = GENL_ID_CTRL,
+			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST,
+		},
+		.gnlh = {
+			.cmd = CTRL_CMD_GETFAMILY,
+		}
+	};
+	return send_query(fd, &req, sizeof(req));
+}
+
+static int
+genl_parse_families_response(const void *const data,
+			     const int data_len, const unsigned long inode,
+			     void *opaque_data)
+{
+	struct dyxlat *const dyxlat = opaque_data;
+	const struct genlmsghdr *const gnlh = data;
+	struct rtattr *attr;
+	int rta_len = data_len - NLMSG_LENGTH(sizeof(*gnlh));
+
+	char *name = NULL;
+	unsigned int name_len = 0;
+	uint16_t *id = NULL;
+
+	if (rta_len < 0)
+		return -1;
+	if (gnlh->cmd != CTRL_CMD_NEWFAMILY)
+		return -1;
+	if (gnlh->version != 2)
+		return -1;
+
+	for (attr = (struct rtattr *) (gnlh + 1);
+	     RTA_OK(attr, rta_len);
+	     attr = RTA_NEXT(attr, rta_len)) {
+		switch (attr->rta_type) {
+		case CTRL_ATTR_FAMILY_NAME:
+			if (!name) {
+				name = RTA_DATA(attr);
+				name_len = RTA_PAYLOAD(attr);
+			}
+			break;
+		case CTRL_ATTR_FAMILY_ID:
+			if (!id && RTA_PAYLOAD(attr) == sizeof(*id))
+				id = RTA_DATA(attr);
+			break;
+		}
+
+		if (name && id) {
+			dyxlat_add_pair(dyxlat, *id, name, name_len);
+			name = NULL;
+			id = NULL;
+		}
+	}
+
+	return 0;
+}
+
+const struct xlat *
+genl_families_xlat(void)
+{
+	static struct dyxlat *dyxlat;
+
+	if (!dyxlat) {
+		dyxlat = dyxlat_alloc(32);
+
+		int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+		if (fd < 0)
+			goto out;
+
+		if (genl_send_dump_families(fd))
+			receive_responses(fd, 0, GENL_ID_CTRL,
+					  genl_parse_families_response, dyxlat);
+		close(fd);
+	}
+
+out:
+	return dyxlat_get(dyxlat);
+}
+
+#else /* !HAVE_LINUX_GENETLINK_H */
+
+const struct xlat *
+genl_families_xlat(void)
+{
+	return NULL;
+}
+#endif
