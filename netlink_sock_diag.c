@@ -31,10 +31,14 @@
 
 #include <sys/socket.h>
 #include <linux/netlink.h>
+#include <linux/netlink_diag.h>
 #include <linux/unix_diag.h>
 
 #include "xlat/tcp_states.h"
 #include "xlat/tcp_state_flags.h"
+
+#include "xlat/netlink_diag_show.h"
+#include "xlat/netlink_states.h"
 
 #include "xlat/unix_diag_show.h"
 
@@ -118,6 +122,86 @@ decode_unix_diag_msg(struct tcb *const tcp,
 	tprints("}");
 }
 
+static void
+decode_netlink_diag_req(struct tcb *const tcp,
+			const struct nlmsghdr *const nlmsghdr,
+			const uint8_t family,
+			const kernel_ulong_t addr,
+			const kernel_ulong_t len)
+{
+	struct netlink_diag_req req = { .sdiag_family = family };
+	const size_t offset = sizeof(req.sdiag_family);
+
+	tprints("{sdiag_family=");
+	printxval(addrfams, req.sdiag_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(req)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(req) - offset,
+					 (void *) &req + offset)) {
+			tprints("sdiag_protocol=");
+			if (NDIAG_PROTO_ALL == req.sdiag_protocol)
+				tprints("NDIAG_PROTO_ALL");
+			else
+				printxval(netlink_protocols,
+					  req.sdiag_protocol, "NETLINK_???");
+			tprintf(", ndiag_ino=%" PRIu32 ", ndiag_show=",
+				req.ndiag_ino);
+			printflags(netlink_diag_show, req.ndiag_show,
+				   "NDIAG_SHOW_???");
+			tprintf(", ndiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
+				req.ndiag_cookie[0], req.ndiag_cookie[1]);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
+static void
+decode_netlink_diag_msg(struct tcb *const tcp,
+			const struct nlmsghdr *const nlmsghdr,
+			const uint8_t family,
+			const kernel_ulong_t addr,
+			const kernel_ulong_t len)
+{
+	struct netlink_diag_msg msg = { .ndiag_family = family };
+	const size_t offset = sizeof(msg.ndiag_family);
+
+	tprints("{ndiag_family=");
+	printxval(addrfams, msg.ndiag_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(msg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(msg) - offset,
+					 (void *) &msg + offset)) {
+			tprints("ndiag_type=");
+			printxval(socktypes, msg.ndiag_type, "SOCK_???");
+			tprints(", ndiag_protocol=");
+			printxval(netlink_protocols, msg.ndiag_protocol,
+				  "NETLINK_???");
+			tprints(", ndiag_state=");
+			printxval(netlink_states, msg.ndiag_state,
+				  "NETLINK_???");
+			tprintf(", ndiag_portid=%" PRIu32
+				", ndiag_dst_portid=%" PRIu32
+				", ndiag_dst_group=%" PRIu32
+				", ndiag_ino=%" PRIu32
+				", ndiag_cookie=[%" PRIu32
+				", %" PRIu32 "]",
+				msg.ndiag_portid,
+				msg.ndiag_dst_portid,
+				msg.ndiag_dst_group,
+				msg.ndiag_ino,
+				msg.ndiag_cookie[0],
+				msg.ndiag_cookie[1]);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
 typedef void (*netlink_diag_decoder_t)(struct tcb *,
 				       const struct nlmsghdr *,
 				       uint8_t family,
@@ -127,6 +211,7 @@ typedef void (*netlink_diag_decoder_t)(struct tcb *,
 static const struct {
 	const netlink_diag_decoder_t request, response;
 } diag_decoders[] = {
+	[AF_NETLINK] = { decode_netlink_diag_req, decode_netlink_diag_msg },
 	[AF_UNIX] = { decode_unix_diag_req, decode_unix_diag_msg }
 };
 
