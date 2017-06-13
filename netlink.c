@@ -109,6 +109,14 @@ decode_nlmsg_type_default(const struct xlat *const xlat,
 }
 
 static void
+decode_nlmsg_type_generic(const struct xlat *const xlat,
+			  const uint16_t type,
+			  const char *const dflt)
+{
+	printxval(genl_families_xlat(), type, dflt);
+}
+
+static void
 decode_nlmsg_type_netfilter(const struct xlat *const xlat,
 			    const uint16_t type,
 			    const char *const dflt)
@@ -146,6 +154,11 @@ static const struct {
 	const char *const dflt;
 } nlmsg_types[] = {
 	[NETLINK_AUDIT] = { NULL, nl_audit_types, "AUDIT_???" },
+	[NETLINK_GENERIC] = {
+		decode_nlmsg_type_generic,
+		NULL,
+		"GENERIC_FAMILY_???"
+	},
 	[NETLINK_NETFILTER] = {
 		decode_nlmsg_type_netfilter,
 		nl_netfilter_subsys_ids,
