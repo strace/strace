@@ -198,6 +198,7 @@ net-yy-inet
 net-yy-netlink
 net-yy-unix
 netlink_audit
+netlink_generic
 netlink_inet_diag
 netlink_netfilter
 netlink_netlink_diag

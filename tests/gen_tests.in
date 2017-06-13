@@ -185,6 +185,7 @@ nanosleep	-a20
 net-icmp_filter	-e trace=getsockopt,setsockopt
 net-sockaddr	-a24 -e trace=connect
 netlink_audit	+netlink_sock_diag.test
+netlink_generic	+netlink_sock_diag.test
 netlink_netfilter	+netlink_sock_diag.test
 netlink_protocol	-e trace=sendto
 netlink_route	+netlink_sock_diag.test
