@@ -33,8 +33,10 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/tcp.h>
 #include <linux/if_ether.h>
+#include <linux/inet_diag.h>
 #include <linux/netlink.h>
 #include <linux/netlink_diag.h>
 #include <linux/packet_diag.h>
@@ -872,6 +874,435 @@ test_packet_diag_msg(const int fd)
 	       sprintrc(rc));
 }
 
+static void
+test_inet_diag_sockid(const int fd)
+{
+	const char address[] = "12.34.56.78";
+	const char address6[] = "12:34:56:78:90:ab:cd:ef";
+	struct nlmsghdr *nlh;
+	struct inet_diag_req_v2 *req;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	nlh = nlh0 - sizeof(*req);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	req = NLMSG_DATA(nlh);
+	*req = (struct inet_diag_req_v2) {
+		.sdiag_family = AF_INET,
+		.idiag_ext = 1 << (INET_DIAG_CONG - 1),
+		.sdiag_protocol = IPPROTO_TCP,
+		.idiag_states = 1 << TCP_CLOSE,
+		.id = {
+			.idiag_sport = 0xfacd,
+			.idiag_dport = 0xdead,
+			.idiag_if = 0xadcdfafc,
+			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
+		},
+	};
+
+	if (!inet_pton(AF_INET, address, &req->id.idiag_src))
+		perror_msg_and_skip("sendto");
+	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
+		perror_msg_and_skip("sendto");
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_INET, sdiag_protocol=IPPROTO_TCP"
+	       ", idiag_ext=1<<(INET_DIAG_CONG-1)"
+	       ", idiag_states=1<<TCP_CLOSE, id={idiag_sport=htons(%u)"
+	       ", idiag_dport=htons(%u), inet_pton(AF_INET, \"%s\", &idiag_src)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_dst), idiag_if=%u"
+	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, ntohs(0xfacd), ntohs(0xdead),
+	       address, address, 0xadcdfafc, 0xdeadbeef,
+	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+
+	req->sdiag_family = AF_INET6;
+	if (!inet_pton(AF_INET6, address6, &req->id.idiag_src))
+		perror_msg_and_skip("sendto");
+	if (!inet_pton(AF_INET6, address6, &req->id.idiag_dst))
+		perror_msg_and_skip("sendto");
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_INET6, sdiag_protocol=IPPROTO_TCP"
+	       ", idiag_ext=1<<(INET_DIAG_CONG-1)"
+	       ", idiag_states=1<<TCP_CLOSE, id={idiag_sport=htons(%u)"
+	       ", idiag_dport=htons(%u), inet_pton(AF_INET6, \"%s\", &idiag_src)"
+	       ", inet_pton(AF_INET6, \"%s\", &idiag_dst), idiag_if=%u"
+	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, ntohs(0xfacd), ntohs(0xdead),
+	       address6, address6, 0xadcdfafc, 0xdeadbeef,
+	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+}
+
+static void
+test_inet_diag_req(const int fd)
+{
+	const char address[] = "12.34.56.78";
+	struct nlmsghdr *nlh;
+	struct inet_diag_req *req;
+	uint8_t *family;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* family only */
+	nlh = nlh0 - sizeof(*family);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
+		.nlmsg_type = TCPDIAG_GETSOCK,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_INET;
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=TCPDIAG_GETSOCK"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}, {family=AF_INET}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       sprintrc(rc));
+
+	/* family and string */
+	nlh = nlh0 - (sizeof(*family) + 4);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
+		.nlmsg_type = TCPDIAG_GETSOCK,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_INET;
+	memcpy(family + 1, "1234", 4);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family) + 4, MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=TCPDIAG_GETSOCK"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {idiag_family=AF_INET, ...}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       sprintrc(rc));
+
+	/* inet_diag_req */
+	nlh = nlh0 - sizeof(*req);
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
+		.nlmsg_type = TCPDIAG_GETSOCK,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	req = NLMSG_DATA(nlh);
+	*req = (struct inet_diag_req) {
+		.idiag_family = AF_INET,
+		.idiag_ext = 1 << (INET_DIAG_TOS - 1),
+		.idiag_src_len = 0xde,
+		.idiag_dst_len = 0xba,
+		.id = {
+			.idiag_sport = 0xdead,
+			.idiag_dport = 0xadcd,
+			.idiag_if = 0xadcdfafc,
+			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
+		},
+		.idiag_states = 1 << TCP_LAST_ACK,
+		.idiag_dbs = 0xfacefeed,
+	};
+
+	if (!inet_pton(AF_INET, address, &req->id.idiag_src))
+		perror_msg_and_skip("sendto");
+	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
+		perror_msg_and_skip("sendto");
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=TCPDIAG_GETSOCK"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {idiag_family=AF_INET, idiag_src_len=%u"
+	       ", idiag_dst_len=%u, idiag_ext=1<<(INET_DIAG_TOS-1)"
+	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
+	       ", idiag_states=1<<TCP_LAST_ACK, idiag_dbs=%u}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, 0xde, 0xba, ntohs(0xdead),
+	       ntohs(0xadcd), address, address, 0xadcdfafc,
+	       0xdeadbeef, 0xbadc0ded, 0xfacefeed,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* short read of inet_diag_req */
+	nlh = nlh0 - (sizeof(*req) - 1);
+	/* beware of unaligned access to nlh members */
+	memmove(nlh, nlh0 - sizeof(*req), NLMSG_HDRLEN + sizeof(*req) - 1);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=TCPDIAG_GETSOCK"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {idiag_family=AF_INET, %p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       NLMSG_DATA(nlh) + 1,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
+}
+
+static void
+test_inet_diag_req_v2(const int fd)
+{
+	const char address[] = "87.65.43.21";
+	struct nlmsghdr *nlh;
+	struct inet_diag_req_v2 *req;
+	uint8_t *family;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* family only */
+	nlh = nlh0 - sizeof(*family);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_INET;
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}, {family=AF_INET}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       sprintrc(rc));
+
+	/* family and string */
+	nlh = nlh0 - sizeof(*family) - 4;
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_INET;
+	memcpy(family + 1, "1234", 4);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family) + 4, MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_INET, ...}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       sprintrc(rc));
+
+	/* inet_diag_req_v2 */
+	nlh = nlh0 - sizeof(*req);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_REQUEST,
+	};
+
+	req = NLMSG_DATA(nlh);
+	*req = (struct inet_diag_req_v2) {
+		.sdiag_family = AF_INET,
+		.idiag_ext = 1 << (INET_DIAG_CONG - 1),
+		.sdiag_protocol = IPPROTO_TCP,
+		.idiag_states = 1 << TCP_CLOSE,
+		.id = {
+			.idiag_sport = 0xfacd,
+			.idiag_dport = 0xdead,
+			.idiag_if = 0xadcdfafc,
+			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
+		},
+	};
+
+	if (!inet_pton(AF_INET, address, &req->id.idiag_src))
+		perror_msg_and_skip("sendto");
+	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
+		perror_msg_and_skip("sendto");
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_INET, sdiag_protocol=IPPROTO_TCP"
+	       ", idiag_ext=1<<(INET_DIAG_CONG-1)"
+	       ", idiag_states=1<<TCP_CLOSE, id={idiag_sport=htons(%u)"
+	       ", idiag_dport=htons(%u), inet_pton(AF_INET, \"%s\", &idiag_src)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_dst), idiag_if=%u"
+	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, ntohs(0xfacd), ntohs(0xdead),
+	       address, address, 0xadcdfafc, 0xdeadbeef,
+	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+
+	/* short read of inet_diag_req_v2 */
+	nlh = nlh0 - (sizeof(*req) - 1);
+	/* beware of unaligned access to nlh members */
+	memmove(nlh, nlh0 - sizeof(*req), NLMSG_HDRLEN + sizeof(*req) - 1);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", {sdiag_family=AF_INET, %p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       NLMSG_DATA(nlh) + 1,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
+}
+
+static void
+test_inet_diag_msg(const int fd)
+{
+	const char address[] = "11.22.33.44";
+	struct nlmsghdr *nlh;
+	struct inet_diag_msg *msg;
+	uint8_t *family;
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	long rc;
+
+	/* family only */
+	nlh = nlh0 - sizeof(*family);
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_INET;
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family), MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {family=AF_INET}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family),
+	       sprintrc(rc));
+
+	/* family and string */
+	nlh = nlh0 - sizeof(*family) - 4;
+	/* beware of unaligned access to nlh members */
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+
+	family = NLMSG_DATA(nlh);
+	*family = AF_INET;
+	memcpy(family + 1, "1234", 4);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*family) + 4, MSG_DONTWAIT,
+		    NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	       ", {idiag_family=AF_INET, ...}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
+	       sprintrc(rc));
+
+	/* inet_diag_msg */
+	nlh = nlh0 - sizeof(*msg);
+	*nlh = (struct nlmsghdr) {
+		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
+		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+		.nlmsg_flags = NLM_F_DUMP,
+	};
+
+	msg = NLMSG_DATA(nlh);
+	*msg = (struct inet_diag_msg) {
+		.idiag_family = AF_INET,
+		.idiag_state = TCP_LISTEN,
+		.idiag_timer = 0xfa,
+		.idiag_retrans = 0xde,
+		.id = {
+			.idiag_sport = 0xfacf,
+			.idiag_dport = 0xdead,
+			.idiag_if = 0xadcdfafc,
+			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
+		},
+		.idiag_expires = 0xfacefeed,
+		.idiag_rqueue = 0xdeadbeef,
+		.idiag_wqueue = 0xadcdfafc,
+		.idiag_uid = 0xdecefaeb,
+		.idiag_inode = 0xbadc0ded,
+	};
+
+	if (!inet_pton(AF_INET, address, &msg->id.idiag_src))
+		perror_msg_and_skip("sendto");
+	if (!inet_pton(AF_INET, address, &msg->id.idiag_dst))
+		perror_msg_and_skip("sendto");
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	       ", {idiag_family=AF_INET, idiag_state=TCP_LISTEN"
+	       ", idiag_timer=%u, idiag_retrans=%u"
+	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
+	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
+	       ", idiag_expires=%u, idiag_rqueue=%u, idiag_wqueue=%u"
+	       ", idiag_uid=%u, idiag_inode=%u}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, 0xfa, 0xde, ntohs(0xfacf), ntohs(0xdead),
+	       address, address, 0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
+	       0xfacefeed, 0xdeadbeef, 0xadcdfafc, 0xdecefaeb, 0xbadc0ded,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* short read of inet_diag_msg */
+	nlh = nlh0 - (sizeof(*msg) - 1);
+	/* beware of unaligned access to nlh members */
+	memmove(nlh, nlh0 - sizeof(*msg), NLMSG_HDRLEN + sizeof(*msg) - 1);
+
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	       ", {idiag_family=AF_INET, %p}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       NLMSG_DATA(nlh) + 1,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
+}
+
 int
 main(void)
 {
@@ -889,6 +1320,10 @@ main(void)
 	test_netlink_diag_msg(fd);
 	test_packet_diag_req(fd);
 	test_packet_diag_msg(fd);
+	test_inet_diag_sockid(fd);
+	test_inet_diag_req(fd);
+	test_inet_diag_req_v2(fd);
+	test_inet_diag_msg(fd);
 
 	printf("+++ exited with 0 +++\n");
 
