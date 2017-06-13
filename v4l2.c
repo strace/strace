@@ -280,7 +280,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 				  umoven_or_printaddr, print_v4l2_clip, 0);
 		tprintf(", clipcount=%u, bitmap=", f->fmt.win.clipcount);
 		printaddr(ptr_to_kulong(f->fmt.win.bitmap));
-#if HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		tprintf(", global_alpha=%#x", f->fmt.win.global_alpha);
 #endif
 		tprints("}");
@@ -341,7 +341,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints(prefix);
 		tprints("fmt.sdr={pixelformat=");
 		print_pixelformat(f->fmt.sdr.pixelformat);
-#if HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		tprintf(", buffersize=%u",
 			f->fmt.sdr.buffersize);
 #endif

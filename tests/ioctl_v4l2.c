@@ -120,7 +120,7 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->fmt.win.clips[1].c.height = 0x05617b76;
 
 		f->fmt.win.bitmap = (void*) -2UL;
-#if HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		f->fmt.win.global_alpha = 0xce;
 #endif
 		break;
@@ -158,7 +158,7 @@ init_v4l2_format(struct v4l2_format *const f,
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
 		f->fmt.sdr.pixelformat = magic;
-#if HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		f->fmt.sdr.buffersize = 0x25afabfb;
 #endif
 		break;
@@ -225,7 +225,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       "[{left=%d, top=%d, width=%u, height=%u}, "
 		       "{left=%d, top=%d, width=%u, height=%u}]"
 		       ", clipcount=%u, bitmap=%p"
-#if HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		       ", global_alpha=%#x"
 #endif
 		       "}}) = -1 EBADF (%m)\n",
@@ -243,7 +243,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       f->fmt.win.clips[1].c.width,
 		       f->fmt.win.clips[1].c.height,
 		       f->fmt.win.clipcount, f->fmt.win.bitmap
-#if HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		       , f->fmt.win.global_alpha
 #endif
 		       );
@@ -304,14 +304,14 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		printf("ioctl(-1, %s, {type=%s"
 		       ", fmt.sdr={pixelformat=v4l2_fourcc('\\x%x', '\\x%x',"
 		       " '\\x%x', '\\x%x')"
-#if HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		       ", buffersize=%u"
 #endif
 		       "}}) = -1 EBADF (%m)\n",
 		       request,
 		       buf_type_string,
 		       cc0(magic), cc1(magic), cc2(magic), cc3(magic)
-#if HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		       , f->fmt.sdr.buffersize
 #endif
 		       );
