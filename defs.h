@@ -508,6 +508,12 @@ extern enum sock_proto getfdproto(struct tcb *, int);
 extern const char *xlookup(const struct xlat *, const uint64_t);
 extern const char *xlat_search(const struct xlat *, const size_t, const uint64_t);
 
+struct dyxlat;
+struct dyxlat *dyxlat_alloc(size_t nmemb);
+void dyxlat_free(struct dyxlat *);
+const struct xlat *dyxlat_get(const struct dyxlat *);
+void dyxlat_add_pair(struct dyxlat *, uint64_t val, const char *str, size_t len);
+
 extern unsigned long get_pagesize(void);
 extern int
 string_to_uint_ex(const char *str, char **endptr,
