@@ -100,16 +100,61 @@ get_fd_nl_family(struct tcb *const tcp, const int fd)
 	return NL_FAMILY_ERROR;
 }
 
+static void
+decode_nlmsg_type_default(const struct xlat *const xlat,
+			  const uint16_t type,
+			  const char *const dflt)
+{
+	printxval(xlat, type, dflt);
+}
+
+static void
+decode_nlmsg_type_netfilter(const struct xlat *const xlat,
+			    const uint16_t type,
+			    const char *const dflt)
+{
+	/* Reserved control nfnetlink messages first. */
+	const char *const text = xlookup(nl_netfilter_msg_types, type);
+	if (text) {
+		tprints(text);
+		return;
+	}
+
+	/*
+	 * Other netfilter message types are split
+	 * in two pieces: 8 bits subsystem and 8 bits type.
+	 */
+	const uint8_t subsys_id = (uint8_t) (type >> 8);
+	const uint8_t msg_type = (uint8_t) type;
+
+	printxval(xlat, subsys_id, dflt);
+
+	/*
+	 * The type is subsystem specific,
+	 * print it in numeric format for now.
+	 */
+	tprintf("<<8|%#x", msg_type);
+}
+
+typedef void (*nlmsg_types_decoder_t)(const struct xlat *,
+				      uint16_t type,
+				      const char *dflt);
+
 static const struct {
+	const nlmsg_types_decoder_t decoder;
 	const struct xlat *const xlat;
 	const char *const dflt;
 } nlmsg_types[] = {
-	[NETLINK_AUDIT] = { nl_audit_types, "AUDIT_???" },
-	[NETLINK_NETFILTER] = { nl_netfilter_subsys_ids, "NFNL_SUBSYS_???" },
-	[NETLINK_ROUTE] = { nl_route_types, "RTM_???" },
-	[NETLINK_SELINUX] = { nl_selinux_types, "SELNL_MSG_???" },
-	[NETLINK_SOCK_DIAG] = { nl_sock_diag_types, "SOCK_DIAG_???" },
-	[NETLINK_XFRM] = { nl_xfrm_types, "XFRM_MSG_???" }
+	[NETLINK_AUDIT] = { NULL, nl_audit_types, "AUDIT_???" },
+	[NETLINK_NETFILTER] = {
+		decode_nlmsg_type_netfilter,
+		nl_netfilter_subsys_ids,
+		"NFNL_SUBSYS_???"
+	},
+	[NETLINK_ROUTE] = { NULL, nl_route_types, "RTM_???" },
+	[NETLINK_SELINUX] = { NULL, nl_selinux_types, "SELNL_MSG_???" },
+	[NETLINK_SOCK_DIAG] = { NULL, nl_sock_diag_types, "SOCK_DIAG_???" },
+	[NETLINK_XFRM] = { NULL, nl_xfrm_types, "XFRM_MSG_???" }
 };
 
 /*
@@ -119,39 +164,20 @@ static const struct {
 static void
 decode_nlmsg_type(const uint16_t type, const unsigned int family)
 {
-	if (family < ARRAY_SIZE(nlmsg_types)
-	    && nlmsg_types[family].xlat) {
-		if (family == NETLINK_NETFILTER) {
-			/* Reserved control nfnetlink messages first. */
-			const char *text = xlookup(nl_netfilter_msg_types,
-						   type);
-			if (text) {
-				tprints(text);
-				return;
-			}
+	nlmsg_types_decoder_t decoder = decode_nlmsg_type_default;
+	const struct xlat *xlat = netlink_types;
+	const char *dflt = "NLMSG_???";
 
-			/*
-			 * Other netfilter message types are split
-			 * in two pieces: 8 bits subsystem and 8 bits type.
-			 */
-			const uint8_t subsys_id = (uint8_t) (type >> 8);
-			const uint8_t msg_type = (uint8_t) type;
-
-			printxval(nlmsg_types[family].xlat, subsys_id,
-				  nlmsg_types[family].dflt);
-
-			/*
-			 * The type is subsystem specific,
-			 * print it in numeric format for now.
-			 */
-			tprintf("<<8|%#x", msg_type);
-		} else {
-			printxval(nlmsg_types[family].xlat, type,
-				  nlmsg_types[family].dflt);
-		}
-	} else {
-		printxval(netlink_types, type, "NLMSG_???");
+	if (family < ARRAY_SIZE(nlmsg_types)) {
+		if (nlmsg_types[family].decoder)
+			decoder = nlmsg_types[family].decoder;
+		if (nlmsg_types[family].xlat)
+			xlat = nlmsg_types[family].xlat;
+		if (nlmsg_types[family].dflt)
+			dflt = nlmsg_types[family].dflt;
 	}
+
+	decoder(xlat, type, dflt);
 }
 
 static void
