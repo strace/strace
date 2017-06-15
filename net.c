@@ -665,27 +665,20 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	struct ipv6_mreq mreq;
 
-	if (len < sizeof(mreq))
-		goto fail;
-
+	if (len < sizeof(mreq)) {
+		printstrn(tcp, addr, len);
+		return;
+	}
 	if (umove_or_printaddr(tcp, addr, &mreq))
 		return;
 
-	const struct in6_addr *in6 = &mreq.ipv6mr_multiaddr;
-	char address[INET6_ADDRSTRLEN];
+	tprints("{");
+	print_inet_addr(AF_INET6, &mreq.ipv6mr_multiaddr,
+			sizeof(mreq.ipv6mr_multiaddr), "ipv6mr_multiaddr");
 
-	if (!inet_ntop(AF_INET6, in6, address, sizeof(address)))
-		goto fail;
-
-	tprints("{ipv6mr_multiaddr=inet_pton(");
-	print_quoted_string(address, sizeof(address), QUOTE_0_TERMINATED);
-	tprints("), ipv6mr_interface=");
+	tprints(", ipv6mr_interface=");
 	print_ifindex(mreq.ipv6mr_interface);
 	tprints("}");
-	return;
-
-fail:
-	printstrn(tcp, addr, len);
 }
 #endif /* IPV6_ADD_MEMBERSHIP */
 

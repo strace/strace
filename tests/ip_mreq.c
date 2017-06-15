@@ -139,7 +139,7 @@ main(void)
 		rc = setsockopt(0, SOL_IPV6, long_ipv6[i].optname,
 				m6, sizeof(*m6));
 		printf("setsockopt(0, SOL_IPV6, %s"
-		       ", {ipv6mr_multiaddr=inet_pton(\"%s\")"
+		       ", {inet_pton(AF_INET6, \"%s\", &ipv6mr_multiaddr)"
 		       ", ipv6mr_interface=if_nametoindex(\"lo\")}"
 		       ", %u) = %s\n",
 		       long_ipv6[i].str_optname, multi6addr,

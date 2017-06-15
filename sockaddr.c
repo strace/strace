@@ -81,6 +81,34 @@ print_sockaddr_data_un(const void *const buf, const int addrlen)
 	}
 }
 
+bool
+print_inet_addr(const int af,
+		const void *const addr,
+		const unsigned int len,
+		const char *const var_name)
+{
+	const char *af_name = NULL;
+	char buf[INET6_ADDRSTRLEN];
+
+	switch (af) {
+	case AF_INET:
+		af_name = "AF_INET";
+		break;
+	case AF_INET6:
+		af_name = "AF_INET6";
+		break;
+	}
+
+	if (af_name && inet_ntop(af, addr, buf, sizeof(buf))) {
+		tprintf("inet_pton(%s, \"%s\", &%s)", af_name, buf, var_name);
+		return true;
+	} else {
+		tprintf("%s=", var_name);
+		print_quoted_string(addr, len, 0);
+		return false;
+	}
+}
+
 static void
 print_sockaddr_data_in(const void *const buf, const int addrlen)
 {
@@ -97,13 +125,10 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_in6 *const sa_in6 = buf;
 
-	char string_addr[100];
-	inet_ntop(AF_INET6, &sa_in6->sin6_addr,
-		  string_addr, sizeof(string_addr));
-	tprintf("sin6_port=htons(%u), inet_pton(AF_INET6"
-		", \"%s\", &sin6_addr), sin6_flowinfo=htonl(%u)",
-		ntohs(sa_in6->sin6_port), string_addr,
-		ntohl(sa_in6->sin6_flowinfo));
+	tprintf("sin6_port=htons(%u), ", ntohs(sa_in6->sin6_port));
+	print_inet_addr(AF_INET6, &sa_in6->sin6_addr,
+			sizeof(sa_in6->sin6_addr), "sin6_addr");
+	tprintf(", sin6_flowinfo=htonl(%u)", ntohl(sa_in6->sin6_flowinfo));
 
 	if (addrlen <= (int) SIN6_MIN_LEN)
 		return;
