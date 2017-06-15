@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. "${srcdir=.}/init.sh"
+
+run_prog > $EXP
+#Unrecognized option
+run_asinfo --set-ar > $LOG
+#More than once param
+run_asinfo --get-arch --get-arch  >> $LOG
+#Requiring argument
+run_asinfo --set-arch >> $LOG
+#Wrong format
+run_asinfo --set-arch aarch64, >> $LOG
+#More than one option in one group
+run_asinfo --get-arch --set-arch arm >> $LOG
+#syscall and list-arch
+run_asinfo --list-arch --get-sname all >> $LOG
+#list-arch and abi params
+run_asinfo --list-arch --list-abi >> $LOG
+#abi params without arch params
+run_asinfo --list-abi >> $LOG
+#auto abi for multiple archs
+run_asinfo --set-arch aarch64,arm >> $LOG
+#auto abi for multiple archs
+run_asinfo --set-arch aarch64,arm --set-abi all,all,all >> $LOG
+#nargs should be used together with other options from syscall group
+run_asinfo --set-arch x86_64 --set-abi x32 --nargs >> $LOG
+#raw check
+run_asinfo --raw >> $LOG
+#empty input
+run_asinfo >> $LOG
+match_diff "$LOG" "$EXP"

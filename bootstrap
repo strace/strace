@@ -11,6 +11,7 @@
 ./xlat/gen.sh
 ./tests/gen_pure_executables.sh
 ./tests/gen_tests.sh
+./tools/asinfo/gen_asinfo_files.sh
 
 for m in m32 mx32; do
 	m_upper=$(echo $m|tr '[a-z]' '[A-Z]')

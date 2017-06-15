@@ -1,0 +1,264 @@
+.\" Copyright (c) 2017 Edgar Kaziakhmedov <edgar.kaziakhmedov@virtuozzo.com>
+.\" Copyright (c) 1996-2018 The strace developers.
+.\" All rights reserved.
+.\"
+.\" SPDX-License-Identifier: GPL-2.0-or-later
+
+.\" Required option.
+.de OR
+.  ie \\n(.$-1 \
+.    RI "\fB\\$1\fP" "\ \\$2"
+.  el \
+.    BR "\\$1"
+..
+.TH ASINFO 1 "@ASINFO_MANPAGE_DATE@" "strace package @VERSION@"
+.SH NAME
+asinfo \- Advanced System call INFOrmation tool
+.SH SYNOPSIS
+.SY asinfo
+.BR "" \fR[{
+.OR \-\-set\-arch arch
+.BR "" |
+.OR \-\-get\-arch
+.BR "" }
+.OR \fR[\fP\-\-set\-abi abi
+.BR "" |
+.OR \-\-list\-abi\fR]\fR]
+.BR "" {
+.BR "" {
+.OR \-\-get\-sname expr
+.BR "" |
+.OR \-\-get\-snum expr
+.BR "" }
+.OP \-\-nargs
+.BR "" }
+.OP "\-\-raw"
+.YS
+.SY asinfo
+.BR "" {
+.OR \-\-set\-arch arch
+.BR "" |
+.OR \-\-get\-arch
+.BR "" |
+.OR \-\-list\-arch
+.BR "" }
+.BD "" [
+.OR \fR[\fP\-\-set\-abi abi
+.BR "" |
+.OR \-\-list\-abi\fR]
+.OP "\-\-raw"
+
+.SH DESCRIPTION
+.B asinfo
+provides information about various aspects of system calls across architectures
+using
+.B strace
+knowledge base.
+
+In the simplest
+case it provides mapping from system call name to number and reverse.
+The main advantage of tool is it can work in single/multi arch modes with
+the opportunity to show discrepancies in system call characteristics.
+Also, the single arch mode allows program to take a guess about the
+current architecture and ABI, if they are not specified. Furthermore,
+.B asinfo
+provides convenient filtering for selecting system calls.
+
+.SH OPTIONS
+.SS "Architecture parameters"
+.TP 7
+.BI "\-\-set\-arch " arch
+Specify architecture/architectures manually. The format of the
+.I arch
+expression is:
+.RS 9
+.IP
+\fIarch1\/\fR[\fB,\fIarch2\/\fR]...
+.RE
+.IP
+.TP
+.B \-\-get\-arch
+Select achitecture based on the current machine.
+.TP
+.B \-\-list-arch
+Print out all supported architectures.
+Combined use with any ABI option is permitted.
+.SS "ABI parameters"
+.TP 7
+.BI "\-\-set\-abi " abi
+Specify ABI/ABIs manually. The format of the experession is:
+.RS 9
+.IP
+\fIabi1\/\fR[\fB,\fIabi2\/\fR]...
+.RE
+.IP
+.IP
+Note that ABI should be selected for each corresponding architecture.
+In addition, the special value
+.B all
+allows to choose all ABIs for the respective architecture.
+.TP
+.B "\-\-list\-abi "
+Select all ABIs for the chosen architecture/architectures.
+.IP
+If ABI parameters are not used and only single architecture is selected, tool
+will take a guess about ABI based on the strace package build.
+.SS "System call parameters"
+.TP 7
+.BI "\-\-get\-sname " expr
+Select system calls that satisfy a filtering expression
+.I
+expr
+and print out name of system calls and numbers for each architecture/ABI.
+.TP
+.BI "\-\-get\-snum " expr
+Select system calls that satisfy a filtering expression
+.I
+expr
+and print out number of system calls and names for each architecture/ABI.
+.TP
+.B \-\-nargs
+Switch the second output system call characteristic to number of arguments.
+.SS Output formatting
+.TP 7
+.B "\-\-raw"
+Reset alignment and remove titles, use ';' as a delimiter.
+.SS Miscellaneous
+.TP 7
+.B \-h
+Print the help summary.
+.TP
+.B \-v
+Print the version number.
+
+.SH "FILTERING EXPRESSION"
+A filtering expression is a pattern that describes a set of syscall names,
+syscall numbers, and syscall group. The format of the expression is:
+.RS 2
+.IP
+[\fB!\fR][\fB?\fR]\,\fIvalue1\/\fR[\fB,\fR[\fB?\fR]\,\fIvalue2\/\fR]...
+.RE
+.LP
+where
+.I value
+is a symbol or number. Using an exclamation mark negates the set of values.
+For example,
+.BR \fIvalue\fR = write
+means print strictly the write system call.  By contrast,
+.BR \fIvalue\fR = !write
+means to dump every system call except write. Question mark before the
+syscall qualification allows suppression of error in case no syscalls matched
+the qualification provided, that can be particularly useful in multiarch mode,
+when system call is not presented in all selected architectures. In addition,
+the special values
+.B all
+and
+.B none
+have the obvious meanings.
+.LP
+Note that some shells use the exclamation point for history
+expansion even inside quoted arguments.  If so, you must escape
+the exclamation point with a backslash.
+.SS "Strict match"
+.TP 7
+.B \fIvalue\fR=\,\fIset\fR
+Print out only the specified set of system calls. For example,
+.BR \fIvalue\fR = open,close,read,write
+means to only show those four system calls.
+.SS "Regex match"
+.TP 7
+.B \fIvalue\fR=/\,\fIregex\fR
+Show only those system calls that match the
+.IR regex .
+You can use
+.B POSIX
+Extended Regular Expression syntax (see
+.BR regex (7)).
+.SS "Class match"
+.TP 7
+.BR \fIvalue\fR = %file
+.TQ
+.BR \fIvalue\fR  = file " (deprecated)"
+Show all system calls which take a file name as an argument.  You
+can think of this as an abbreviation for
+.BR \fIvalue\fR = open,stat,chmod,unlink,...
+Furthermore, using the abbreviation will ensure that you don't
+accidentally forget to include a call like
+.B lstat
+in the list.
+.PP
+.BR \fIvalue\fR = %process
+.TQ
+.BR \fIvalue\fR = process " (deprecated)"
+Show all system calls which involve process management.
+.PP
+.BR \fIvalue\fR = %network
+.TQ
+.BR \fIvalue\fR = network " (deprecated)"
+Show all the network related system calls.
+.PP
+.BR \fIvalue\fR = %signal
+.TQ
+.BR \fIvalue\fR = signal " (deprecated)"
+Show all signal related system calls.
+.PP
+.BR \fIvalue\fR = %ipc
+.TQ
+.BR \fIvalue\fR = ipc " (deprecated)"
+Show all IPC related system calls.
+.PP
+.BR \fIvalue\fR = %desc
+.TQ
+.BR \fIvalue\fR = desc " (deprecated)"
+Show all file descriptor related system calls.
+.PP
+.BR \fIvalue\fR = %memory
+.TQ
+.BR \fIvalue\fR = memory " (deprecated)"
+Show all memory mapping related system calls.
+.TP
+.BR \fIvalue\fR = %stat
+Show stat syscall variants.
+.TP
+.BR \fIvalue\fR = %lstat
+Show lstat syscall variants.
+.TP
+.BR \fIvalue\fR = %fstat
+Show fstat and fstatat syscall variants.
+.TP
+.BR \fIvalue\fR = %%stat
+Show syscalls used for requesting file status (stat, lstat, fstat, fstatat,
+statx, and their variants).
+.TP
+.BR \fIvalue\fR = %statfs
+Show statfs, statfs64, statvfs, osf_statfs, and osf_statfs64 system calls.
+The same effect can be achieved with
+.BR \fIvalue\fR = /^(.*_)?statv?fs
+regular expression.
+.TP
+.BR \fIvalue\fR = %fstatfs
+Show fstatfs, fstatfs64, fstatvfs, osf_fstatfs, and osf_fstatfs64 system calls.
+The same effect can be achieved with
+.BR \fIvalue\fR = /fstatv?fs
+regular expression.
+.TP
+.BR \fIvalue\fR = %%statfs
+Show syscalls related to file system statistics (statfs-like, fstatfs-like,
+and ustat).  The same effect can be achieved with
+.BR \fIvalue\fR = /statv?fs|fsstat|ustat
+regular expression.
+
+.SH "EXIT STATUS"
+On success,
+.B asinfo
+returns 0. Otherwise, in case of wrong input or no matches found, 1.
+
+.SH "REPORTING BUGS"
+Problems with
+.B asinfo
+should be reported to the
+.B strace
+mailing list at <strace-devel@lists.sourceforge.net>.
+
+.SH "SEE ALSO"
+.BR strace (1)

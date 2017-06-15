@@ -1,2 +1,3 @@
 build/strace usr/bin
 strace-log-merge usr/bin
+build/tools/asinfo/asinfo usr/bin

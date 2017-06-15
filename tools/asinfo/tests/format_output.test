@@ -1,0 +1,8 @@
+#!/bin/sh
+
+. "${srcdir=.}/init.sh"
+
+run_prog > $EXP
+run_asinfo --set-arch avr32 --list-abi > $LOG
+run_asinfo --set-arch x86_64 --list-abi --get-snum write >> $LOG
+match_diff "$LOG" "$EXP"

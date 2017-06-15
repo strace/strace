@@ -1,6 +1,10 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* New tools
+  * Added asinfo tool that is purposed to provide information about
+    system calls and architectures.
+
 * Changes in behaviour
   * Messages about unknown tracees are now subject to the strace's quietness
     setting (-q/--quiet).

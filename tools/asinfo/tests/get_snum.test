@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. "${srcdir=.}/init.sh"
+
+run_prog > $EXP
+run_asinfo --set-arch x86_64 --set-abi 64bit --get-snum write --raw > $LOG
+run_asinfo --set-arch x86_64 --set-abi 64bit --get-snum /write --raw >> $LOG
+run_asinfo --set-arch x86_64 --set-abi 64bit --get-snum write,read --raw >> $LOG
+run_asinfo --set-arch x86_64 --set-abi 64bit --get-snum 1 --raw >> $LOG
+run_asinfo --set-arch x86_64 --set-abi 64bit --get-snum 1000 --raw >> $LOG
+run_asinfo --set-arch x86_64 --set-abi 64bit --get-snum helloworld --raw >> $LOG
+match_diff "$LOG" "$EXP"

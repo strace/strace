@@ -15,7 +15,7 @@ endif
 if HAVE_MX32_RUNTIME
 TESTS_MX32 = tests-mx32
 endif
-SUBDIRS = . tests $(TESTS_M32) $(TESTS_MX32)
+SUBDIRS = . tests $(TESTS_M32) $(TESTS_MX32) tools
 
 bin_PROGRAMS = strace
 man_MANS = strace.1 strace-log-merge.1

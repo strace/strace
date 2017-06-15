@@ -1,0 +1,7 @@
+#!/bin/sh
+
+. "${srcdir=.}/init.sh"
+
+run_prog > $EXP
+run_asinfo --set-arch x86_64,aarch64 --set-abi 64bit,all --raw >> $LOG
+match_diff "$LOG" "$EXP"

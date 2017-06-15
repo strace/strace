@@ -1,0 +1,37 @@
+This file describes the storage format of arch_definitions.h
+
+Storage format:
+/* [ARCH_SPECIFIC_DEFINE],[ACONST1,ACONST2] */
+ARCH_DESC_DEFINE(ARCH_NAME,ARCH_ABI,PASS({COMPAT_PERS1,COMPAT_PERS2,...}),\
+PASS({ALIAS1,ALIAS2,...}))
+
+ARCH_SPECIFIC_DEFINE:
+One syscallent.h header can contain several set of system calls for each
+compatible mode. And specific set can be switched by passing particular
+definition.
+So ARCH_SPECIFIC_DEFINE allows to forward a given definition, where
+!ARCH_SPECIFIC_DEFINE forwards undefined.
+If it is not required, left empty.
+
+ACONST1,ACONST2:
+It could be used to store architecture specific constants and pass them to code.
+If is is not required each one must be set to zero.
+
+ARCH_NAME:
+The main name of architecture will be used to generate the personality
+constants.
+The personality constant is equal to ARCH_+\$ARCH_ABI+_+\$ARCH_NAME.
+
+ARCH_ABI:
+Application binary interface for a given architecture, i.e. 32bit, 64bit, oabi,
+eabi, o32 etc.
+
+COMPAT_PERS1,COMPAT_PERS2,...:
+Compatible mode for a given architecture. It should be one of personality
+constants.
+If is is not required, left empty.
+
+ALIAS1,ALIAS2,...:
+Other name of the same architecture, like x86 and i386. At least one alias
+must to be set as it shows the name of architecture while printing.
+If current ARCH_NAME is just the compatible ABI mode, left empty.

@@ -44,7 +44,9 @@ The strace program intercepts and records the system calls called and
 received by a running process.  Strace can print a record of each
 system call, its arguments and its return value.  Strace is useful for
 diagnosing problems and debugging, as well as for instructional
-purposes.
+purposes.  Also this package contains an advanced system call
+information tool (asinfo) which provides information about system calls
+and architectures.
 
 Install strace if you need a tool to track the system calls made and
 received by a process.
@@ -97,6 +99,7 @@ echo 'END OF TEST SUITE INFORMATION'
 %doc CREDITS ChangeLog.gz ChangeLog-CVS.gz COPYING NEWS README
 %{_bindir}/strace
 %{_bindir}/strace-log-merge
+%{_bindir}/asinfo
 %{_mandir}/man1/*
 
 %changelog

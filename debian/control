@@ -20,6 +20,9 @@ Description: System call tracer
  System calls and signals are events that happen at the user/kernel
  interface. A close examination of this boundary is very useful for bug
  isolation, sanity checking and attempting to capture race conditions.
+ .
+ This package also contains an advanced system call information tool
+ (asinfo) which provides information about system calls and architectures.
 
 Package: strace64
 Architecture: i386 powerpc s390 sparc

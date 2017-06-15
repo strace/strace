@@ -18,6 +18,7 @@ AC_INIT([strace],
 	[https://strace.io])
 m4_define([copyright_year], st_esyscmd_s([./copyright-year-gen .year]))
 m4_define([manpage_date], st_esyscmd_s([./file-date-gen strace.1.in]))
+m4_define([asinfo_manpage_date], st_esyscmd_s([./file-date-gen tools/asinfo/asinfo.1.in]))
 AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
@@ -45,6 +46,9 @@ AC_SUBST([COPYRIGHT_YEAR], [copyright_year])
 
 AC_DEFINE([MANPAGE_DATE], "[manpage_date]", [Date])
 AC_SUBST([MANPAGE_DATE], [manpage_date])
+
+AC_DEFINE([ASINFO_MANPAGE_DATE], "[asinfo_manpage_date]", [Date])
+AC_SUBST([ASINFO_MANPAGE_DATE], [asinfo_manpage_date])
 
 AC_C_BIGENDIAN
 
@@ -1028,6 +1032,10 @@ AC_CONFIG_FILES([Makefile
 		 tests-mx32/Makefile
 		 strace.1
 		 strace-log-merge.1
+		 tools/asinfo/asinfo.1
+		 tools/Makefile
+		 tools/asinfo/Makefile
+		 tools/asinfo/tests/Makefile
 		 strace.spec
 		 debian/changelog])
 AC_OUTPUT

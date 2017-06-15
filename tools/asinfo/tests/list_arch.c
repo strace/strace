@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include "ref_asinfo_output.h"
+
+int
+main(int argc, char *argv[])
+{
+	puts("1"  AARCH64_64bit_STR"\n"
+	     "2"  AARCH64_eabi_STR"\n"
+	     "3"  ALPHA_64bit_STR"\n"
+	     "4"  ARC_32bit_STR"\n"
+	     "5"  ARM_oabi_STR"\n"
+	     "6"  ARM_eabi_STR"\n"
+	     "7"  AVR32_32bit_STR"\n"
+	     "8"  BFIN_32bit_STR"\n"
+	     "9"  IA64_64bit_STR"\n"
+	     "10" M68K_32bit_STR"\n"
+	     "11" METAG_32bit_STR"\n"
+	     "12" MICROBLAZE_32bit_STR"\n"
+	     "13" MIPS64_N64_STR"\n"
+	     "14" MIPS64_N32_STR"\n"
+	     "15" MIPS64_O32_STR"\n"
+	     "16" MIPS_O32_STR"\n"
+	     "17" NIOS2_32bit_STR"\n"
+	     "18" OR1K_32bit_STR"\n"
+	     "19" PARISC_32bit_STR"\n"
+	     "20" PPC_32bit_STR"\n"
+	     "21" PPC64_64bit_STR"\n"
+	     "22" PPC64_32bit_STR"\n"
+	     "23" PPC64LE_64bit_STR"\n"
+	     "24" RISCV64_64bit_STR"\n"
+	     "25" S390_32bit_STR"\n"
+	     "26" S390X_64bit_STR"\n"
+	     "27" SH_32bit_STR"\n"
+	     "28" SH64_64bit_STR"\n"
+	     "29" SPARC_32bit_STR"\n"
+	     "30" SPARC64_64bit_STR"\n"
+	     "31" SPARC64_32bit_STR"\n"
+	     "32" TILE_64bit_STR"\n"
+	     "33" TILE_32bit_STR"\n"
+	     "34" TILEPRO_32bit_STR"\n"
+	     "35" X86_64_64bit_STR"\n"
+	     "36" X86_64_X32_STR"\n"
+	     "37" X86_64_32bit_STR"\n"
+	     "38" X86_32bit_STR"\n"
+	     "39" XTENSA_32bit_STR);
+	return 0;
+}
