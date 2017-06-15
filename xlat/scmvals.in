@@ -1,3 +1,58 @@
 SCM_RIGHTS	1
 SCM_CREDENTIALS	2
 SCM_SECURITY	3
+
+#ifndef SCM_TIMESTAMP
+# if defined HPPA
+#  define SCM_TIMESTAMP 0x4012
+# elif defined SPARC || defined SPARC64
+#  define SCM_TIMESTAMP 0x001d
+# else
+#  define SCM_TIMESTAMP 29
+# endif
+#endif
+SCM_TIMESTAMP
+
+#ifndef SCM_TIMESTAMPNS
+# if defined HPPA
+#  define SCM_TIMESTAMPNS 0x4013
+# elif defined SPARC || defined SPARC64
+#  define SCM_TIMESTAMPNS 0x0021
+# else
+#  define SCM_TIMESTAMPNS 35
+# endif
+#endif
+SCM_TIMESTAMPNS
+
+#ifndef SCM_TIMESTAMPING
+# if defined HPPA
+#  define SCM_TIMESTAMPING 0x4020
+# elif defined SPARC || defined SPARC64
+#  define SCM_TIMESTAMPING 0x0023
+# else
+#  define SCM_TIMESTAMPING 37
+# endif
+#endif
+SCM_TIMESTAMPING
+
+#ifndef SCM_WIFI_STATUS
+# if defined HPPA
+#  define SCM_WIFI_STATUS 0x4022
+# elif defined SPARC || defined SPARC64
+#  define SCM_WIFI_STATUS 0x0025
+# else
+#  define SCM_WIFI_STATUS 41
+# endif
+#endif
+SCM_WIFI_STATUS
+
+#ifndef SCM_TIMESTAMPING_OPT_STATS
+# if defined HPPA
+#  define SCM_TIMESTAMPING_OPT_STATS 0x402f
+# elif defined SPARC || defined SPARC64
+#  define SCM_TIMESTAMPING_OPT_STATS 0x0038
+# else
+#  define SCM_TIMESTAMPING_OPT_STATS 54
+# endif
+#endif
+SCM_TIMESTAMPING_OPT_STATS
