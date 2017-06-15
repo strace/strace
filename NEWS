@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Implemented decoding of SCM_TIMESTAMP* control messages.
+
 * Bug fixes
   * In interactive mode (-I2), those signals that were blocked at startup
     will remain blocked for the whole period of strace execution.

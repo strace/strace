@@ -68,6 +68,42 @@ print_timespec_t_utime(const timespec_t *t)
 	}
 }
 
+MPERS_PRINTER_DECL(bool, print_struct_timespec_data_size,
+		   const void *arg, const size_t size)
+{
+	if (size < sizeof(timespec_t)) {
+		tprints("?");
+		return false;
+	}
+
+	print_timespec_t(arg);
+	return true;
+}
+
+MPERS_PRINTER_DECL(bool, print_struct_timespec_array_data_size,
+		   const void *arg, const unsigned int nmemb,
+		   const size_t size)
+{
+	const timespec_t *ts = arg;
+	unsigned int i;
+
+	if (nmemb > size / sizeof(timespec_t)) {
+		tprints("?");
+		return false;
+	}
+
+	tprints("[");
+
+	for (i = 0; i < nmemb; i++) {
+		if (i)
+			tprints(", ");
+		print_timespec_t(&ts[i]);
+	}
+
+	tprints("]");
+	return true;
+}
+
 MPERS_PRINTER_DECL(void, print_timespec,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {

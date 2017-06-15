@@ -55,6 +55,18 @@ MPERS_PRINTER_DECL(void, print_struct_timeval, const void *arg)
 	print_timeval_t(arg);
 }
 
+MPERS_PRINTER_DECL(bool, print_struct_timeval_data_size,
+		   const void *arg, const size_t size)
+{
+	if (size < sizeof(timeval_t)) {
+		tprints("?");
+		return false;
+	}
+
+	print_timeval_t(arg);
+	return true;
+}
+
 MPERS_PRINTER_DECL(void, print_timeval,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {

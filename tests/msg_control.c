@@ -40,6 +40,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "xlat.h"
+#include "xlat/scmvals.h"
+
 #ifndef SOL_IP
 # define SOL_IP 0
 #endif
@@ -230,6 +233,96 @@ test_scm_rights3(struct msghdr *const mh, void *const page, const size_t nfds)
 }
 
 static void
+test_scm_timestamp(struct msghdr *const mh, void *const page)
+{
+	const size_t len = CMSG_SPACE(sizeof(struct timeval));
+	struct cmsghdr *cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(struct timeval));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_TIMESTAMP;
+	struct timeval *tv = (struct timeval *) CMSG_DATA(cmsg);
+	tv->tv_sec = 123456789;
+	tv->tv_usec = 987654;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMP"
+	       ", cmsg_data={tv_sec=%lld, tv_usec=%llu}}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       (unsigned) cmsg->cmsg_len,
+	       (long long) tv->tv_sec, zero_extend_signed_to_ull(tv->tv_usec),
+	       (unsigned long) len, rc, errno2name());
+}
+
+static void
+test_scm_timestampns(struct msghdr *const mh, void *const page)
+{
+	const size_t len = CMSG_SPACE(sizeof(struct timespec));
+	struct cmsghdr *cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(struct timespec));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_TIMESTAMPNS;
+	struct timespec *ts = (struct timespec *) CMSG_DATA(cmsg);
+	ts->tv_sec = 123456789;
+	ts->tv_nsec = 987654321;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMPNS"
+	       ", cmsg_data={tv_sec=%lld, tv_nsec=%llu}}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       (unsigned) cmsg->cmsg_len,
+	       (long long) ts->tv_sec, zero_extend_signed_to_ull(ts->tv_nsec),
+	       (unsigned long) len, rc, errno2name());
+}
+
+static void
+test_scm_timestamping(struct msghdr *const mh, void *const page)
+{
+	const size_t len = CMSG_SPACE(3 * sizeof(struct timespec));
+	struct cmsghdr *cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(3 * sizeof(struct timespec));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_TIMESTAMPING;
+	struct timespec *ts = (struct timespec *) CMSG_DATA(cmsg);
+	ts[0].tv_sec = 123456789;
+	ts[0].tv_nsec = 987654321;
+	ts[1].tv_sec = 123456790;
+	ts[1].tv_nsec = 987654320;
+	ts[2].tv_sec = 123456791;
+	ts[2].tv_nsec = 987654319;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMPING"
+	       ", cmsg_data=[{tv_sec=%lld, tv_nsec=%llu}"
+	       ", {tv_sec=%lld, tv_nsec=%llu}, {tv_sec=%lld, tv_nsec=%llu}]}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       (unsigned) cmsg->cmsg_len, (long long) ts[0].tv_sec,
+	       zero_extend_signed_to_ull(ts[0].tv_nsec),
+	       (long long) ts[1].tv_sec,
+	       zero_extend_signed_to_ull(ts[1].tv_nsec),
+	       (long long) ts[2].tv_sec,
+	       zero_extend_signed_to_ull(ts[2].tv_nsec),
+	       (unsigned long) len, rc, errno2name());
+}
+
+static void
 print_security(const struct cmsghdr *const cmsg, const size_t cmsg_len)
 {
 	int n = cmsg_len > CMSG_LEN(0) ? cmsg_len - CMSG_LEN(0) : 0;
@@ -377,6 +470,10 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 	test_scm_rights3(mh, page, DEFAULT_STRLEN - 1);
 	test_scm_rights3(mh, page, DEFAULT_STRLEN);
 	test_scm_rights3(mh, page, DEFAULT_STRLEN + 1);
+
+	test_scm_timestamp(mh, page);
+	test_scm_timestampns(mh, page);
+	test_scm_timestamping(mh, page);
 
 	test_unknown_type(mh, page, ARG_STR(SOL_SOCKET), "SCM_???");
 }
