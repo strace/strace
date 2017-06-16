@@ -648,13 +648,10 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &mreq))
 		return;
 
-	tprints("{imr_multiaddr=inet_addr(");
-	print_quoted_string(inet_ntoa(mreq.imr_multiaddr),
-			    16, QUOTE_0_TERMINATED);
-	tprints("), imr_interface=inet_addr(");
-	print_quoted_string(inet_ntoa(mreq.imr_interface),
-			    16, QUOTE_0_TERMINATED);
-	tprints(")}");
+	tprintf("{imr_multiaddr=inet_addr(\"%s\")",
+		inet_ntoa(mreq.imr_multiaddr));
+	tprintf(", imr_interface=inet_addr(\"%s\")}",
+		inet_ntoa(mreq.imr_interface));
 }
 #endif /* IP_ADD_MEMBERSHIP */
 
