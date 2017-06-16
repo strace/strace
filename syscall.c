@@ -847,7 +847,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 	/* FIXME: not_failing_only (IOW, option -z) is broken:
 	 * failure of syscall is known only after syscall return.
 	 * Thus we end up with something like this on, say, ENOENT:
-	 *     open("doesnt_exist", O_RDONLY <unfinished ...>
+	 *     open("does_not_exist", O_RDONLY <unfinished ...>
 	 *     {next syscall decode}
 	 * whereas the intended result is that open(...) line
 	 * is not shown at all.

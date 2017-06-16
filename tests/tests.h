@@ -66,7 +66,7 @@ void skip_if_unavailable(const char *);
 
 /*
  * Allocate memory that ends on the page boundary.
- * Pages allocated by this call are preceeded by an unmapped page
+ * Pages allocated by this call are preceded by an unmapped page
  * and followed also by an unmapped page.
  */
 void *tail_alloc(const size_t)

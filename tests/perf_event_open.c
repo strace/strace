@@ -73,7 +73,7 @@ struct u64_val_str {
 	const char *str;
 };
 
-/* In order to avoid endianess-specific hackery */
+/* In order to avoid endianness-specific hackery. */
 struct pea_flags {
 	uint64_t disabled                 :1,
 	         inherit                  :1,

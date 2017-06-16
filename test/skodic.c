@@ -1,7 +1,7 @@
 /*
  * This demonstrates races: kernel may actually open other file
  * than you read in the strace output.
- * If you see a successfull open of /etc/shadow,
+ * If you see a successful open of /etc/shadow,
  * you know you've seen a race.
  *
  * $ gcc -Wall -O0 skodic.c -o skodic

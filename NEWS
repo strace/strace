@@ -847,7 +847,7 @@ Changes in 4.4
 ==============
 * Fix Linux/ia64 support, looks like someone renamed a few things on us
 * Fix the ioctl setup for Linux, turned out it did not really work.
-  Improve the ioctl extracter as well so we decode some more ones.
+  Improve the ioctl extractor as well so we decode some more ones.
 
 Changes in 4.3.1
 ================
@@ -939,7 +939,7 @@ New Features in version 3.0
 ===========================
 
 * non-ascii strings can be optionally printed entirely in hex
-* the output format is readable when mutiple processes are generating output
+* the output format is readable when multiple processes are generating output
 * exit values are printed in an alignment column
 * is is possible to suppress messages about attaching and detaching
 * various tracing features can be enabled on a per syscall/signal/desc basis

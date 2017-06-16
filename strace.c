@@ -2413,7 +2413,7 @@ next_event(int *pstatus, siginfo_t *si)
 		 * Is this post-attach SIGSTOP?
 		 * Interestingly, the process may stop
 		 * with STOPSIG equal to some other signal
-		 * than SIGSTOP if we happend to attach
+		 * than SIGSTOP if we happened to attach
 		 * just before the process takes a signal.
 		 */
 		if (sig == SIGSTOP && (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)) {
