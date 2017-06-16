@@ -28,57 +28,31 @@
  */
 
 #include "defs.h"
-#include "netlink.h"
 #include "netlink_route.h"
+#include "print_fields.h"
 
 #include <linux/rtnetlink.h>
 
-#include "xlat/nl_route_types.h"
-
-static void
-decode_family(struct tcb *const tcp, const uint8_t family,
-	      const kernel_ulong_t addr, const unsigned int len)
+DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 {
-	tprints("{family=");
-	printxval(addrfams, family, "AF_???");
-	if (len > sizeof(family)) {
-		tprints(", ");
-		printstr_ex(tcp, addr + sizeof(family),
-			    len - sizeof(family), QUOTE_FORCE_HEX);
-	}
-	tprints("}");
-}
+	struct ifinfomsg ifinfo = { .ifi_family = family };
+	const size_t offset = sizeof(ifinfo.ifi_family);
 
-typedef DECL_NETLINK_ROUTE_DECODER((*netlink_route_decoder_t));
+	PRINT_FIELD_XVAL("{", ifinfo, ifi_family, addrfams, "AF_???");
 
-static const netlink_route_decoder_t route_decoders[] = {
-	[RTM_DELLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_GETLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_NEWLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_SETLINK - RTM_BASE] = decode_ifinfomsg
-};
-
-bool
-decode_netlink_route(struct tcb *const tcp,
-		     const struct nlmsghdr *const nlmsghdr,
-		     const kernel_ulong_t addr,
-		     const unsigned int len)
-{
-	uint8_t family;
-
-	if (nlmsghdr->nlmsg_type == NLMSG_DONE)
-		return false;
-
-	if (!umove_or_printaddr(tcp, addr, &family)) {
-		const unsigned int index = nlmsghdr->nlmsg_type - RTM_BASE;
-
-		if (index < ARRAY_SIZE(route_decoders)
-		    && route_decoders[index]) {
-			route_decoders[index](tcp, nlmsghdr, family, addr, len);
-		} else {
-			decode_family(tcp, family, addr, len);
+	tprints(", ");
+	if (len >= sizeof(ifinfo)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(ifinfo) - offset,
+					 (void *) &ifinfo + offset)) {
+			PRINT_FIELD_XVAL("", ifinfo, ifi_type,
+					 arp_hardware_types, "ARPHRD_???");
+			PRINT_FIELD_IFINDEX(", ", ifinfo, ifi_index);
+			PRINT_FIELD_FLAGS(", ", ifinfo, ifi_flags,
+					  iffflags, "IFF_???");
+			PRINT_FIELD_X(", ", ifinfo, ifi_change);
 		}
-	}
-
-	return true;
+	} else
+		tprints("...");
+	tprints("}");
 }

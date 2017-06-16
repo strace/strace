@@ -284,11 +284,13 @@ struct tcb {
 #include "xlat.h"
 
 extern const struct xlat addrfams[];
+extern const struct xlat arp_hardware_types[];
 extern const struct xlat at_flags[];
 extern const struct xlat clocknames[];
 extern const struct xlat dirent_types[];
 extern const struct xlat ethernet_protocols[];
 extern const struct xlat evdev_abs[];
+extern const struct xlat iffflags[];
 extern const struct xlat inet_protocols[];
 extern const struct xlat msg_flags[];
 extern const struct xlat netlink_protocols[];

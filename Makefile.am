@@ -194,6 +194,7 @@ strace_SOURCES =	\
 	netlink_netlink_diag.c \
 	netlink_packet_diag.c \
 	netlink_route.c	\
+	netlink_route.h	\
 	netlink_selinux.c \
 	netlink_smc_diag.c \
 	netlink_sock_diag.c \
@@ -246,6 +247,7 @@ strace_SOURCES =	\
 	rt_sigframe.c	\
 	rt_sigreturn.c	\
 	rtc.c		\
+	rtnl_link.c	\
 	sched.c		\
 	sched_attr.h	\
 	scsi.c		\

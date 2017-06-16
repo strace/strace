@@ -27,58 +27,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
-#include "netlink.h"
-#include "netlink_route.h"
+#ifndef STRACE_NETLINK_ROUTE_H
+#define STRACE_NETLINK_ROUTE_H
 
-#include <linux/rtnetlink.h>
+#define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
+void							\
+route_decode_name(struct tcb *tcp,			\
+		  const struct nlmsghdr *nlmsghdr,	\
+		  uint8_t family,			\
+		  kernel_ulong_t addr,			\
+		  unsigned int len)			\
+/* End of DECL_NETLINK_ROUTE_DECODER definition. */
 
-#include "xlat/nl_route_types.h"
+extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
 
-static void
-decode_family(struct tcb *const tcp, const uint8_t family,
-	      const kernel_ulong_t addr, const unsigned int len)
-{
-	tprints("{family=");
-	printxval(addrfams, family, "AF_???");
-	if (len > sizeof(family)) {
-		tprints(", ");
-		printstr_ex(tcp, addr + sizeof(family),
-			    len - sizeof(family), QUOTE_FORCE_HEX);
-	}
-	tprints("}");
-}
-
-typedef DECL_NETLINK_ROUTE_DECODER((*netlink_route_decoder_t));
-
-static const netlink_route_decoder_t route_decoders[] = {
-	[RTM_DELLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_GETLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_NEWLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_SETLINK - RTM_BASE] = decode_ifinfomsg
-};
-
-bool
-decode_netlink_route(struct tcb *const tcp,
-		     const struct nlmsghdr *const nlmsghdr,
-		     const kernel_ulong_t addr,
-		     const unsigned int len)
-{
-	uint8_t family;
-
-	if (nlmsghdr->nlmsg_type == NLMSG_DONE)
-		return false;
-
-	if (!umove_or_printaddr(tcp, addr, &family)) {
-		const unsigned int index = nlmsghdr->nlmsg_type - RTM_BASE;
-
-		if (index < ARRAY_SIZE(route_decoders)
-		    && route_decoders[index]) {
-			route_decoders[index](tcp, nlmsghdr, family, addr, len);
-		} else {
-			decode_family(tcp, family, addr, len);
-		}
-	}
-
-	return true;
-}
+#endif /* !STRACE_NETLINK_ROUTE_H */
