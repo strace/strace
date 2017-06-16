@@ -30,6 +30,8 @@
 #include "defs.h"
 #include "netlink.h"
 
+#include "xlat/nl_route_types.h"
+
 static void
 decode_family(struct tcb *const tcp, const uint8_t family,
 	      const kernel_ulong_t addr, const unsigned int len)

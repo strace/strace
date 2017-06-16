@@ -43,7 +43,6 @@
 #include "xlat/nl_crypto_types.h"
 #include "xlat/nl_netfilter_msg_types.h"
 #include "xlat/nl_netfilter_subsys_ids.h"
-#include "xlat/nl_route_types.h"
 #include "xlat/nl_selinux_types.h"
 #include "xlat/nl_sock_diag_types.h"
 #include "xlat/nl_xfrm_types.h"

@@ -292,6 +292,7 @@ extern const struct xlat evdev_abs[];
 extern const struct xlat inet_protocols[];
 extern const struct xlat msg_flags[];
 extern const struct xlat netlink_protocols[];
+extern const struct xlat nl_route_types[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
 extern const struct xlat resource_flags[];
