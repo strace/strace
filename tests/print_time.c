@@ -58,8 +58,6 @@ print_time_t_ex(const time_t t, const unsigned long long part_sec,
 
 	if (comment)
 		fputs(" */", stdout);
-
-	return;
 }
 
 void

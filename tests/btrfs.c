@@ -75,10 +75,10 @@ const char uuid_reference_string[] = "01234567-89ab-cdef-fedc-ba9876543210";
 struct btrfs_ioctl_quota_rescan_args {
 	uint64_t flags, progress, reserved[6];
 };
-# define BTRFS_IOC_QUOTA_RESCAN _IOW(BTRFS_IOCTL_MAGIC, 44, \
-					struct btrfs_ioctl_quota_rescan_args)
-# define BTRFS_IOC_QUOTA_RESCAN_STATUS _IOR(BTRFS_IOCTL_MAGIC, 45, \
-					struct btrfs_ioctl_quota_rescan_args)
+# define BTRFS_IOC_QUOTA_RESCAN			\
+	_IOW(BTRFS_IOCTL_MAGIC, 44, struct btrfs_ioctl_quota_rescan_args)
+# define BTRFS_IOC_QUOTA_RESCAN_STATUS		\
+	_IOR(BTRFS_IOCTL_MAGIC, 45, struct btrfs_ioctl_quota_rescan_args)
 #endif
 
 #ifndef BTRFS_IOC_QUOTA_RESCAN_WAIT
@@ -86,30 +86,30 @@ struct btrfs_ioctl_quota_rescan_args {
 #endif
 
 #ifndef BTRFS_IOC_GET_FEATURES
-# define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
-                                   struct btrfs_ioctl_feature_flags)
-# define BTRFS_IOC_SET_FEATURES _IOW(BTRFS_IOCTL_MAGIC, 57, \
-                                   struct btrfs_ioctl_feature_flags[2])
-# define BTRFS_IOC_GET_SUPPORTED_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
-                                   struct btrfs_ioctl_feature_flags[3])
+# define BTRFS_IOC_GET_FEATURES			\
+	_IOR(BTRFS_IOCTL_MAGIC, 57, struct btrfs_ioctl_feature_flags)
+# define BTRFS_IOC_SET_FEATURES			\
+	_IOW(BTRFS_IOCTL_MAGIC, 57, struct btrfs_ioctl_feature_flags[2])
+# define BTRFS_IOC_GET_SUPPORTED_FEATURES	\
+	_IOR(BTRFS_IOCTL_MAGIC, 57, struct btrfs_ioctl_feature_flags[3])
 #endif
 
 #ifndef HAVE_STRUCT_BTRFS_IOCTL_FEATURE_FLAGS_COMPAT_FLAGS
 struct btrfs_ioctl_feature_flags {
-        uint64_t compat_flags;
-        uint64_t compat_ro_flags;
-        uint64_t incompat_flags;
+	uint64_t compat_flags;
+	uint64_t compat_ro_flags;
+	uint64_t incompat_flags;
 };
 #endif
 
 #ifndef HAVE_STRUCT_BTRFS_IOCTL_DEFRAG_RANGE_ARGS_START
 struct btrfs_ioctl_defrag_range_args {
-        uint64_t start;
-        uint64_t len;
-        uint64_t flags;
-        uint32_t extent_thresh;
-        uint32_t compress_type;
-        uint32_t unused[4];
+	uint64_t start;
+	uint64_t len;
+	uint64_t flags;
+	uint32_t extent_thresh;
+	uint32_t compress_type;
+	uint32_t unused[4];
 };
 #endif
 
@@ -140,14 +140,14 @@ struct file_dedupe_range {
 #endif
 
 #ifndef BTRFS_IOC_TREE_SEARCH_V2
-# define BTRFS_IOC_TREE_SEARCH_V2 _IOWR(BTRFS_IOCTL_MAGIC, 17, \
-                                           struct btrfs_ioctl_search_args_v2)
+# define BTRFS_IOC_TREE_SEARCH_V2	\
+	_IOWR(BTRFS_IOCTL_MAGIC, 17, struct btrfs_ioctl_search_args_v2)
 struct btrfs_ioctl_search_args_v2 {
 	struct btrfs_ioctl_search_key key; /* in/out - search parameters */
 	uint64_t buf_size;		   /* in - size of buffer
 					    * out - on EOVERFLOW: needed size
 					    *       to store item */
-        uint64_t buf[0];		   /* out - found items */
+	uint64_t buf[0];		   /* out - found items */
 };
 #endif
 

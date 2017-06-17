@@ -198,15 +198,14 @@ printclockname(int clockid)
 		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
 			tprintf("FD_TO_CLOCKID(%d)", CLOCKID_TO_FD(clockid));
 		else {
-			if(CPUCLOCK_PERTHREAD(clockid))
+			if (CPUCLOCK_PERTHREAD(clockid))
 				tprintf("MAKE_THREAD_CPUCLOCK(%d,", CPUCLOCK_PID(clockid));
 			else
 				tprintf("MAKE_PROCESS_CPUCLOCK(%d,", CPUCLOCK_PID(clockid));
 			printxval(cpuclocknames, clockid & CLOCKFD_MASK, "CPUCLOCK_???");
 			tprints(")");
 		}
-	}
-	else
+	} else
 #endif
 		printxval(clocknames, clockid, "CLOCK_???");
 }

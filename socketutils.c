@@ -147,7 +147,7 @@ inet_parse_response(const void *const data, const int data_len,
 	if (diag_msg->idiag_inode != inode)
 		return 0;
 
-	switch(diag_msg->idiag_family) {
+	switch (diag_msg->idiag_family) {
 		case AF_INET:
 			addr_size = sizeof(struct in_addr);
 			text_size = INET_ADDRSTRLEN;
@@ -536,7 +536,7 @@ get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 /* Given an inode number of a socket, print out its protocol details.  */
 bool
 print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
-		        const unsigned long inode)
+			const unsigned long inode)
 {
 	return print_sockaddr_by_inode_cached(inode) ? true :
 		print_sockaddr_by_inode_uncached(inode, getfdproto(tcp, fd));

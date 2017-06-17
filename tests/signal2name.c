@@ -50,6 +50,7 @@ signal2name(int sig)
 	CASE(SIGPWR);
 	CASE(SIGSTKFLT);
 #endif
-	default: perror_msg_and_fail("unknown signal number %d", sig);
+	default:
+		perror_msg_and_fail("unknown signal number %d", sig);
 	}
 }

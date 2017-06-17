@@ -106,7 +106,7 @@ extern char *stpcpy(char *dst, const char *src);
  *
  * Make sure that all entries in all syscallent.h files have nargs <= MAX_ARGS!
  * linux/<ARCH>/syscallent*.h:
- * 	all have nargs <= 6 except mips o32 which has nargs <= 7.
+ *	all have nargs <= 6 except mips o32 which has nargs <= 7.
  */
 #ifndef MAX_ARGS
 # ifdef LINUX_MIPSO32
@@ -234,11 +234,11 @@ struct tcb {
 	struct timeval etime;	/* Syscall entry time */
 
 #ifdef USE_LIBUNWIND
-	struct UPT_info* libunwind_ui;
-	struct mmap_cache_t* mmap_cache;
+	struct UPT_info *libunwind_ui;
+	struct mmap_cache_t *mmap_cache;
 	unsigned int mmap_cache_size;
 	unsigned int mmap_cache_generation;
-	struct queue_t* queue;
+	struct queue_t *queue;
 #endif
 };
 
@@ -383,7 +383,7 @@ extern unsigned ptrace_setoptions;
 extern unsigned max_strlen;
 extern unsigned os_release;
 #undef KERNEL_VERSION
-#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+#define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 
 void error_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 void perror_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
@@ -533,10 +533,10 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
 #define STR_STRIP_PREFIX(str, prefix)	\
 	str_strip_prefix_len((str), (prefix), sizeof(prefix) - 1)
 
-#define QUOTE_0_TERMINATED                      0x01
-#define QUOTE_OMIT_LEADING_TRAILING_QUOTES      0x02
-#define QUOTE_OMIT_TRAILING_0                   0x08
-#define QUOTE_FORCE_HEX                         0x10
+#define QUOTE_0_TERMINATED			0x01
+#define QUOTE_OMIT_LEADING_TRAILING_QUOTES	0x02
+#define QUOTE_OMIT_TRAILING_0			0x08
+#define QUOTE_FORCE_HEX				0x10
 
 extern int string_quote(const char *, char *, unsigned int, unsigned int);
 extern int print_quoted_string(const char *, unsigned int, unsigned int);
@@ -545,10 +545,10 @@ extern int print_quoted_string(const char *, unsigned int, unsigned int);
  * b refers to the higher numbered u_arg
  */
 #ifdef WORDS_BIGENDIAN
-# define ULONG_LONG(a,b) \
+# define ULONG_LONG(a, b) \
 	((unsigned long long)(unsigned)(b) | ((unsigned long long)(a)<<32))
 #else
-# define ULONG_LONG(a,b) \
+# define ULONG_LONG(a, b) \
 	((unsigned long long)(unsigned)(a) | ((unsigned long long)(b)<<32))
 #endif
 extern int getllval(struct tcb *, unsigned long long *, int);

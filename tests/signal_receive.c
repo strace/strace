@@ -25,7 +25,7 @@ main(void)
 	sigemptyset(&mask);
 
 	for (sig = 1; sig <= 31; sig++) {
-		if( sig != SIGKILL && sig != SIGSTOP) {
+		if (sig != SIGKILL && sig != SIGSTOP) {
 			sigaction(sig, &act, NULL);
 			sigaddset(&mask, sig);
 		}
@@ -33,7 +33,7 @@ main(void)
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
 	for (sig = 1; sig <= 31; sig++) {
-		if(sig != SIGKILL && sig != SIGSTOP) {
+		if (sig != SIGKILL && sig != SIGSTOP) {
 			if (kill(pid, sig) != 0)
 				perror_msg_and_fail("kill: %d", sig);
 			sig_print(signal2name(sig), pid, uid);

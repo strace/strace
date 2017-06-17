@@ -207,7 +207,7 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/v4l2_sliced_flags.h"
 
 static bool
-print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void* data)
+print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct_v4l2_clip *p = elem_buf;
 	tprintf(FMT_RECT, ARGS_RECT(p->c));

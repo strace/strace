@@ -167,9 +167,9 @@ print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	struct iocb cb;
 
 	if (elem_size < sizeof(kernel_ulong_t)) {
-		addr = * (unsigned int *) elem_buf;
+		addr = *(unsigned int *) elem_buf;
 	} else {
-		addr = * (kernel_ulong_t *) elem_buf;
+		addr = *(kernel_ulong_t *) elem_buf;
 	}
 
 	tprints("{");

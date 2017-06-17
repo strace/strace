@@ -105,7 +105,7 @@ print_ifconf(struct ifconf *ifc, int in_len, char *in_buf, long rc)
 static void
 gifconf_ioctl(int fd, struct ifconf *ifc, bool ifc_valid)
 {
-	const char * errstr;
+	const char *errstr;
 	int in_len;
 	char *in_buf;
 	long rc;

@@ -18,7 +18,7 @@ print_quoted_string(const char *instr)
 void
 print_quoted_memory(const char *instr, const size_t len)
 {
-	const unsigned char *str = (const unsigned char*) instr;
+	const unsigned char *str = (const unsigned char *) instr;
 	size_t i;
 
 	for (i = 0; i < len; ++i) {

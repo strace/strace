@@ -254,7 +254,7 @@ main(int argc, char *argv[])
 	       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
 
 	CHECK_FUTEX_ENOSYS(uaddr,
-		FUTEX_CLOCK_REALTIME | FUTEX_PRIVATE_FLAG | FUTEX_WAIT ,
+		FUTEX_CLOCK_REALTIME | FUTEX_PRIVATE_FLAG | FUTEX_WAIT,
 		VAL, tmout, uaddr2, 0, (rc == -1) && (errno == EAGAIN));
 	printf("futex(%p, FUTEX_WAIT_PRIVATE|FUTEX_CLOCK_REALTIME, %u"
 	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
@@ -612,7 +612,7 @@ main(int argc, char *argv[])
 
 	CHECK_FUTEX_ENOSYS(uaddr + 1, FUTEX_PRIVATE_FLAG | FUTEX_UNLOCK_PI, VAL,
 		tmout, uaddr2 + 1, VAL3, (rc == -1) && (errno == EFAULT));
-	printf("futex(%p, FUTEX_UNLOCK_PI_PRIVATE) = %s\n", uaddr +1,
+	printf("futex(%p, FUTEX_UNLOCK_PI_PRIVATE) = %s\n", uaddr + 1,
 		sprintrc(rc));
 
 	CHECK_INVALID_CLOCKRT(FUTEX_UNLOCK_PI, 0);

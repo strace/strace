@@ -75,34 +75,34 @@ struct u64_val_str {
 
 /* In order to avoid endianness-specific hackery. */
 struct pea_flags {
-	uint64_t disabled                 :1,
-	         inherit                  :1,
-	         pinned                   :1,
-	         exclusive                :1,
-	         exclude_user             :1,
-	         exclude_kernel           :1,
-	         exclude_hv               :1,
-	         exclude_idle             :1,
-	         mmap                     :1,
-	         comm                     :1,
-	         freq                     :1,
-	         inherit_stat             :1,
-	         enable_on_exec           :1,
-	         task                     :1,
-	         watermark                :1,
-	         precise_ip               :2,
-	         mmap_data                :1,
-	         sample_id_all            :1,
-	         exclude_host             :1,
-	         exclude_guest            :1,
-	         exclude_callchain_kernel :1,
-	         exclude_callchain_user   :1,
-	         mmap2                    :1,
-	         comm_exec                :1,
-	         use_clockid              :1,
-	         context_switch           :1,
-	         write_backward           :1,
-	         __reserved_1             :36;
+	uint64_t disabled			:1,
+		 inherit			:1,
+		 pinned				:1,
+		 exclusive			:1,
+		 exclude_user			:1,
+		 exclude_kernel			:1,
+		 exclude_hv			:1,
+		 exclude_idle			:1,
+		 mmap				:1,
+		 comm				:1,
+		 freq				:1,
+		 inherit_stat			:1,
+		 enable_on_exec			:1,
+		 task				:1,
+		 watermark			:1,
+		 precise_ip			:2,
+		 mmap_data			:1,
+		 sample_id_all			:1,
+		 exclude_host			:1,
+		 exclude_guest			:1,
+		 exclude_callchain_kernel	:1,
+		 exclude_callchain_user		:1,
+		 mmap2				:1,
+		 comm_exec			:1,
+		 use_clockid			:1,
+		 context_switch			:1,
+		 write_backward			:1,
+		 __reserved_1			:36;
 };
 
 static const char *
@@ -458,7 +458,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 
 	/* End of version 4 of the structure */
 	if (size <= 104) {
-		cutoff =104;
+		cutoff = 104;
 		goto end;
 	}
 
@@ -471,7 +471,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	printf(", aux_watermark=%" PRIu32, (uint32_t) val);
 
 	if (size <= 108) {
-		cutoff =108;
+		cutoff = 108;
 		goto end;
 	}
 
@@ -484,7 +484,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	printf(", sample_max_stack=%" PRIu16, (uint16_t) val);
 
 	if (size <= 110) {
-		cutoff =110;
+		cutoff = 110;
 		goto end;
 	}
 
@@ -718,7 +718,7 @@ main(void)
 
 	for (i = 0; i < ARRAY_SIZE(args); i++) {
 		rc = syscall(__NR_perf_event_open, args[i].attr, args[i].pid,
-		             args[i].cpu, args[i].group_fd, args[i].flags);
+			     args[i].cpu, args[i].group_fd, args[i].flags);
 		printf("perf_event_open(%s, %d, %d, %d, %s) = %s\n",
 		       printaddr(args[i].attr), args[i].pid, args[i].cpu,
 		       args[i].group_fd, args[i].flags_str, sprintrc(rc));
@@ -793,19 +793,19 @@ main(void)
 			attr->size = 0;
 
 		rc = syscall(__NR_perf_event_open, attr, args[args_idx].pid,
-		             args[args_idx].cpu, args[args_idx].group_fd,
-		             args[args_idx].flags);
+			     args[args_idx].cpu, args[args_idx].group_fd,
+			     args[args_idx].flags);
 
 		printf("perf_event_open(");
 		print_event_attr(attr, i ? ((i == 1) ? 0 : size) : size + 8,
-		                 attr_types[type_idx].str,
-		                 attr_configs[type_idx][config_idx].str,
-		                 sample_types[sample_type_idx].str,
-		                 read_formats[read_format_idx].str,
-		                 ip_desc_str,
-		                 bp_types[bp_type_idx].str,
-		                 branch_sample_types[branch_sample_type_idx].str,
-		                 clockids[clockid_idx].str, size);
+				 attr_types[type_idx].str,
+				 attr_configs[type_idx][config_idx].str,
+				 sample_types[sample_type_idx].str,
+				 read_formats[read_format_idx].str,
+				 ip_desc_str,
+				 bp_types[bp_type_idx].str,
+				 branch_sample_types[branch_sample_type_idx].str,
+				 clockids[clockid_idx].str, size);
 		printf(", %d, %d, %d, %s) = %s\n", args[args_idx].pid,
 		       args[args_idx].cpu, args[args_idx].group_fd,
 		       args[args_idx].flags_str, sprintrc(rc));

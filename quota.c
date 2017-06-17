@@ -55,8 +55,7 @@
  * leads to problems when it is used on 32-bit tracee which does not have such
  * padding.
  */
-struct if_dqblk
-{
+struct if_dqblk {
 	uint64_t dqb_bhardlimit;
 	uint64_t dqb_bsoftlimit;
 	uint64_t dqb_curspace;
@@ -81,8 +80,7 @@ struct if_nextdqblk {
 	uint32_t dqb_id;
 };
 
-struct xfs_dqblk
-{
+struct xfs_dqblk {
 	int8_t  d_version;		/* version of this structure */
 	int8_t  d_flags;		/* XFS_{USER,PROJ,GROUP}_QUOTA */
 	uint16_t d_fieldmask;		/* field specifier */
@@ -107,23 +105,20 @@ struct xfs_dqblk
 	char    d_padding4[8];		/* yet more padding */
 };
 
-struct if_dqinfo
-{
+struct if_dqinfo {
 	uint64_t dqi_bgrace;
 	uint64_t dqi_igrace;
 	uint32_t dqi_flags;
 	uint32_t dqi_valid;
 };
 
-typedef struct fs_qfilestat
-{
+typedef struct fs_qfilestat {
 	uint64_t qfs_ino;	/* inode number */
 	uint64_t qfs_nblks;	/* number of BBs 512-byte-blks */
 	uint32_t qfs_nextents;	/* number of extents */
 } fs_qfilestat_t;
 
-struct xfs_dqstats
-{
+struct xfs_dqstats {
 	int8_t  qs_version;		/* version number for future changes */
 	uint16_t qs_flags;		/* XFS_QUOTA_{U,P,G}DQ_{ACCT,ENFD} */
 	int8_t  qs_pad;			/* unused */

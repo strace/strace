@@ -24,6 +24,6 @@ main(void)
 #else
 
 SKIP_MAIN_UNDEFINED("__NR_sched_get_priority_min"
-                    " && defined __NR_sched_get_priority_max");
+		    " && defined __NR_sched_get_priority_max");
 
 #endif

@@ -33,7 +33,7 @@
 #include <unistd.h>
 
 int
-main (void)
+main(void)
 {
 	struct sigaction sa = {
 		.sa_handler = SIG_IGN

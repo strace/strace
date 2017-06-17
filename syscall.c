@@ -872,8 +872,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 		}
 		if (syscall_tampered(tcp))
 			tprints(" (INJECTED)");
-	}
-	else if (!(sys_res & RVAL_NONE) && u_error) {
+	} else if (!(sys_res & RVAL_NONE) && u_error) {
 		const char *u_error_str;
 
 		switch (u_error) {
@@ -944,8 +943,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 			tprints(" (INJECTED)");
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
-	}
-	else {
+	} else {
 		if (sys_res & RVAL_NONE)
 			tprints("= ?");
 		else {
@@ -983,8 +981,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 				if (show_fd_path) {
 					tprints("= ");
 					printfd(tcp, tcp->u_rval);
-				}
-				else
+				} else
 					tprintf("= %" PRI_kld, tcp->u_rval);
 				break;
 			default:
@@ -1325,5 +1322,5 @@ syscall_name(kernel_ulong_t scno)
 	if (current_personality == X32_PERSONALITY_NUMBER)
 		scno &= ~__X32_SYSCALL_BIT;
 #endif
-	return scno_is_valid(scno) ? sysent[scno].sys_name: NULL;
+	return scno_is_valid(scno) ? sysent[scno].sys_name : NULL;
 }

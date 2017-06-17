@@ -182,7 +182,7 @@ main(void)
 		perror_msg_and_fail("accept");
 	accept_inode = inode_of_sockfd(accept_fd);
 	const char * const sun_path1 =
-		((struct sockaddr_un *) accept_sa) -> sun_path + 1;
+		((struct sockaddr_un *) accept_sa)->sun_path + 1;
 	printf("accept(%d<socket:[%lu]>, {sa_family=AF_UNIX"
 	       ", sun_path=@\"%s\"}, [%d->%d]) = %d<socket:[%lu]>\n",
 	       listen_fd, listen_inode, sun_path1,

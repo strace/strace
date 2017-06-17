@@ -289,8 +289,7 @@ SYS_FUNC(ssetmask)
 {
 	if (entering(tcp)) {
 		tprint_old_sigmask_val("", (unsigned) tcp->u_arg[0]);
-	}
-	else if (!syserror(tcp)) {
+	} else if (!syserror(tcp)) {
 		tcp->auxstr = sprint_old_sigmask_val("old mask ",
 						     (unsigned) tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
@@ -433,8 +432,7 @@ SYS_FUNC(osf_sigprocmask)
 	if (entering(tcp)) {
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
 		tprintsigmask_val(", ", tcp->u_arg[1]);
-	}
-	else if (!syserror(tcp)) {
+	} else if (!syserror(tcp)) {
 		tcp->auxstr = sprintsigmask_val("old mask ", tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
 	}
@@ -451,8 +449,7 @@ SYS_FUNC(sigprocmask)
 		tprints(", ");
 		print_sigset_addr_len(tcp, tcp->u_arg[1], current_wordsize);
 		tprints(", ");
-	}
-	else {
+	} else {
 		print_sigset_addr_len(tcp, tcp->u_arg[2], current_wordsize);
 	}
 	return 0;
@@ -493,8 +490,7 @@ SYS_FUNC(rt_sigprocmask)
 		tprints(", ");
 		print_sigset_addr_len(tcp, tcp->u_arg[1], tcp->u_arg[3]);
 		tprints(", ");
-	}
-	else {
+	} else {
 		print_sigset_addr_len(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 		tprintf(", %" PRI_klu, tcp->u_arg[3]);
 	}
@@ -502,8 +498,7 @@ SYS_FUNC(rt_sigprocmask)
 }
 
 /* Structure describing the action to be taken when a signal arrives.  */
-struct new_sigaction
-{
+struct new_sigaction {
 	/* sa_handler may be a libc #define, need to use other name: */
 #ifdef MIPS
 	unsigned int sa_flags;
@@ -519,8 +514,7 @@ struct new_sigaction
 	unsigned long sa_mask[NSIG / sizeof(long)];
 };
 /* Same for i386-on-x86_64 and similar cases */
-struct new_sigaction32
-{
+struct new_sigaction32 {
 	uint32_t sa_handler__;
 	uint32_t sa_flags;
 #if HAVE_SA_RESTORER

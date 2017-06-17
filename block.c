@@ -67,7 +67,7 @@ typedef struct blk_user_trace_setup {
 #include MPERS_DEFS
 
 #ifndef BLKPG
-# define BLKPG      _IO(0x12,105)
+# define BLKPG      _IO(0x12, 105)
 #endif
 
 /*
@@ -80,40 +80,40 @@ typedef struct blk_user_trace_setup {
 # define BLKTRACESETUP _IOWR(0x12, 115, struct_blk_user_trace_setup)
 #endif
 #ifndef BLKTRACESTART
-# define BLKTRACESTART _IO(0x12,116)
+# define BLKTRACESTART _IO(0x12, 116)
 #endif
 #ifndef BLKTRACESTOP
-# define BLKTRACESTOP _IO(0x12,117)
+# define BLKTRACESTOP _IO(0x12, 117)
 #endif
 #ifndef BLKTRACETEARDOWN
-# define BLKTRACETEARDOWN _IO(0x12,118)
+# define BLKTRACETEARDOWN _IO(0x12, 118)
 #endif
 #ifndef BLKDISCARD
-# define BLKDISCARD _IO(0x12,119)
+# define BLKDISCARD _IO(0x12, 119)
 #endif
 #ifndef BLKIOMIN
-# define BLKIOMIN _IO(0x12,120)
+# define BLKIOMIN _IO(0x12, 120)
 #endif
 #ifndef BLKIOOPT
-# define BLKIOOPT _IO(0x12,121)
+# define BLKIOOPT _IO(0x12, 121)
 #endif
 #ifndef BLKALIGNOFF
-# define BLKALIGNOFF _IO(0x12,122)
+# define BLKALIGNOFF _IO(0x12, 122)
 #endif
 #ifndef BLKPBSZGET
-# define BLKPBSZGET _IO(0x12,123)
+# define BLKPBSZGET _IO(0x12, 123)
 #endif
 #ifndef BLKDISCARDZEROES
-# define BLKDISCARDZEROES _IO(0x12,124)
+# define BLKDISCARDZEROES _IO(0x12, 124)
 #endif
 #ifndef BLKSECDISCARD
-# define BLKSECDISCARD _IO(0x12,125)
+# define BLKSECDISCARD _IO(0x12, 125)
 #endif
 #ifndef BLKROTATIONAL
-# define BLKROTATIONAL _IO(0x12,126)
+# define BLKROTATIONAL _IO(0x12, 126)
 #endif
 #ifndef BLKZEROOUT
-# define BLKZEROOUT _IO(0x12,127)
+# define BLKZEROOUT _IO(0x12, 127)
 #endif
 
 #include "xlat/blkpg_ops.h"

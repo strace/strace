@@ -58,7 +58,7 @@ arch_get_scno(struct tcb *tcp)
 		/* Fixup the syscall number */
 		scno &= 0x000fffff;
 	} else {
-	scno_in_r7:
+scno_in_r7:
 		scno = arm_regs.ARM_r7;
 	}
 #else /* __ARM_EABI__ || !ENABLE_ARM_OABI */

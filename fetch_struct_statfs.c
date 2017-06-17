@@ -84,7 +84,7 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs64,
 {
 	struct_statfs64 b;
 
-        if (sizeof(b) != size
+	if (sizeof(b) != size
 #ifdef COMPAT_STATFS64_PADDED_SIZE
 	    && sizeof(b) != COMPAT_STATFS64_PADDED_SIZE
 #endif

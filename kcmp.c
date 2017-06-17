@@ -40,7 +40,7 @@ SYS_FUNC(kcmp)
 	tprintf("%d, %d, ", pid1, pid2);
 	printxval(kcmp_types, type, "KCMP_???");
 
-	switch(type) {
+	switch (type) {
 		case KCMP_FILE:
 			tprintf(", %u, %u", (unsigned) idx1, (unsigned) idx2);
 			break;

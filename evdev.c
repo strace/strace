@@ -517,7 +517,7 @@ evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
 MPERS_PRINTER_DECL(int, evdev_ioctl, struct tcb *const tcp,
 		   const unsigned int code, const kernel_ulong_t arg)
 {
-	switch(_IOC_DIR(code)) {
+	switch (_IOC_DIR(code)) {
 		case _IOC_READ:
 			if (entering(tcp))
 				return 0;

@@ -329,7 +329,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		print_cmsg_type_data(tcp, cmsg_level, cmsg_type,
 				     (const void *) (u.ptr + cmsg_size),
-				     len > cmsg_size ? len - cmsg_size: 0);
+				     len > cmsg_size ? len - cmsg_size : 0);
 		tprints("}");
 
 		if (len < cmsg_size) {

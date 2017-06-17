@@ -164,8 +164,7 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 						);
 						first = 0;
 						sep = ", ";
-					}
-					else {
+					} else {
 						outptr += sprintf(outptr, " %u", j);
 					}
 				}

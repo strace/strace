@@ -40,7 +40,7 @@ typedef struct {
 	uint32_t stx_mask; /* What results were written [uncond] */
 	uint32_t stx_blksize; /* Preferred general I/O size [uncond] */
 	uint64_t stx_attributes; /* Flags conveying information about the file
-	                            [uncond] */
+				    [uncond] */
 
 	uint32_t stx_nlink; /* Number of hard links */
 	uint32_t stx_uid; /* User ID of owner */
@@ -52,7 +52,7 @@ typedef struct {
 	uint64_t stx_size; /* File size */
 	uint64_t stx_blocks; /* Number of 512-byte blocks allocated */
 	uint64_t stx_attributes_mask; /* Mask to show what's supported in
-	                                 stx_attributes */
+					 stx_attributes */
 
 	struct_statx_timestamp stx_atime; /* Last access time */
 	struct_statx_timestamp stx_btime; /* File creation time */

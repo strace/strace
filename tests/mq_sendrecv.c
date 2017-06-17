@@ -437,7 +437,7 @@ main(void)
 	bogus_attrs[1] = 2;
 	bogus_attrs[2] = MSG_SIZE;
 	fd = rc = syscall(__NR_mq_open, mq_name,
-		          O_CREAT|O_RDWR|O_NONBLOCK, S_IRWXU, bogus_attrs);
+			  O_CREAT|O_RDWR|O_NONBLOCK, S_IRWXU, bogus_attrs);
 	errstr = sprintrc(rc);
 	if (rc < 0)
 		perror_msg_and_skip("mq_open");

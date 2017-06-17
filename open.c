@@ -42,7 +42,7 @@
 #define O_ACCMODE 03
 
 #ifdef O_LARGEFILE
-# if O_LARGEFILE == 0          /* biarch platforms in 64-bit mode */
+# if O_LARGEFILE == 0		/* biarch platforms in 64-bit mode */
 #  undef O_LARGEFILE
 #  ifdef SPARC64
 #   define O_LARGEFILE 0x40000
@@ -56,7 +56,7 @@
 #include "xlat/open_mode_flags.h"
 
 #ifndef AT_FDCWD
-# define AT_FDCWD                -100
+# define AT_FDCWD	-100
 #endif
 
 /* The fd is an "int", so when decoding x86 on x86_64, we need to force sign

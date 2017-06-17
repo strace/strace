@@ -133,7 +133,7 @@ SYS_FUNC(getdents)
 				d->d_reclen);
 
 			if (print_quoted_string(d->d_name, d_name_len,
-					        QUOTE_0_TERMINATED) > 0) {
+						QUOTE_0_TERMINATED) > 0) {
 				tprints("...");
 			}
 

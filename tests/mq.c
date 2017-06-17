@@ -39,7 +39,7 @@
 # include <sys/stat.h>
 
 int
-main (void)
+main(void)
 {
 	struct mq_attr attr;
 	(void) close(0);

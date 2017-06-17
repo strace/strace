@@ -70,7 +70,7 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	kernel_ulong_t iov_buf[2], len;
 	struct print_iovec_config *c = data;
 
-        if (elem_size < sizeof(iov_buf)) {
+	if (elem_size < sizeof(iov_buf)) {
 		iov_buf[0] = ((unsigned int *) elem_buf)[0];
 		iov_buf[1] = ((unsigned int *) elem_buf)[1];
 		iov = iov_buf;
@@ -118,8 +118,9 @@ tprint_iov_upto(struct tcb *const tcp, const kernel_ulong_t len,
 		const kernel_ulong_t data_size)
 {
 	kernel_ulong_t iov[2];
-	struct print_iovec_config config =
-		{ .decode_iov = decode_iov, .data_size = data_size };
+	struct print_iovec_config config = {
+		.decode_iov = decode_iov, .data_size = data_size
+	};
 
 	print_array(tcp, addr, len, iov, current_wordsize * 2,
 		    umoven_or_printaddr_ignore_syserror, print_iovec, &config);

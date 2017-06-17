@@ -111,7 +111,8 @@ si_code_2_name(const int code)
 #ifdef CLD_CONTINUED
 	CASE(CLD_CONTINUED);
 #endif
-	default: perror_msg_and_fail("unknown si_code %d", code);
+	default:
+		perror_msg_and_fail("unknown si_code %d", code);
 	}
 }
 

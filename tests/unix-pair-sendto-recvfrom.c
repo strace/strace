@@ -71,7 +71,7 @@ main(int ac, char **av)
 		assert(recvfrom(0, av[1], len, MSG_WAITALL, NULL, NULL) == len);
 		assert(close(0) == 0);
 
-                int status;
+		int status;
 		assert(waitpid(pid, &status, 0) == pid);
 		assert(status == 0);
 	} else {

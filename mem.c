@@ -331,7 +331,7 @@ SYS_FUNC(remap_file_pages)
 static bool
 print_protmap_entry(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	tprintf("%#08x", * (unsigned int *) elem_buf);
+	tprintf("%#08x", *(unsigned int *) elem_buf);
 
 	return true;
 }

@@ -54,7 +54,7 @@
  && defined EV_KEY
 
 int
-main(void )
+main(void)
 {
 	uint64_t data = 0;
 

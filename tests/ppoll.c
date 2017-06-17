@@ -138,9 +138,10 @@ main(void)
 #if VERBOSE
 	       pipe_fd[2], pipe_fd[3],
 #endif
-	       (unsigned) ARRAY_SIZE(fds1), USR2_CHLD_str,
-	       (unsigned) sigset_size, rc, pipe_fd[1], POLLWRNORM_str,
-	       pipe_fd[3], (unsigned ) ts->tv_sec, (unsigned) ts->tv_nsec);
+	       (unsigned int) ARRAY_SIZE(fds1), USR2_CHLD_str,
+	       (unsigned int) sigset_size, rc, pipe_fd[1], POLLWRNORM_str,
+	       pipe_fd[3], (unsigned int) ts->tv_sec,
+	       (unsigned int) ts->tv_nsec);
 
 	ts->tv_sec = 0;
 	ts->tv_nsec = 999;

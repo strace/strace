@@ -8,8 +8,8 @@
  * These occupy the top three bytes.
  */
 enum {
-	UNAME26	=               0x0020000,
-	ADDR_NO_RANDOMIZE = 	0x0040000,	/* disable randomization of VA space */
+	UNAME26 =		0x0020000,
+	ADDR_NO_RANDOMIZE =	0x0040000,	/* disable randomization of VA space */
 	FDPIC_FUNCPTRS =	0x0080000,	/* userspace function ptrs point to descriptors
 						 * (signal handling)
 						 */
@@ -19,8 +19,8 @@ enum {
 	ADDR_LIMIT_32BIT =	0x0800000,
 	SHORT_INODE =		0x1000000,
 	WHOLE_SECONDS =		0x2000000,
-	STICKY_TIMEOUTS	=	0x4000000,
-	ADDR_LIMIT_3GB = 	0x8000000,
+	STICKY_TIMEOUTS =	0x4000000,
+	ADDR_LIMIT_3GB =	0x8000000,
 };
 
 /*

@@ -53,7 +53,7 @@ const char *
 xlat_search(const struct xlat *xlat, const size_t nmemb, const uint64_t val)
 {
 	const struct xlat *e =
-		bsearch((const void*) &val,
+		bsearch((const void *) &val,
 			xlat, nmemb, sizeof(*xlat), xlat_bsearch_compare);
 
 	return e ? e->str : NULL;

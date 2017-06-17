@@ -56,7 +56,7 @@ is_prefix(const char *s1, const char *s2)
 }
 
 static int
-compare_name_info(const void* a, const void* b)
+compare_name_info(const void *a, const void *b)
 {
 	int rc;
 
@@ -93,7 +93,7 @@ code(const struct ioctlent *e)
 }
 
 static int
-compare_code_name(const void* a, const void* b)
+compare_code_name(const void *a, const void *b)
 {
 	unsigned int code1 = code((struct ioctlent *) a);
 	unsigned int code2 = code((struct ioctlent *) b);

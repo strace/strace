@@ -155,7 +155,7 @@ SYS_FUNC(sysctl)
 		default:
 			goto out;
 		}
-	out:
+out:
 		max_cnt = info.nlen;
 		if (abbrev(tcp) && max_cnt > max_strlen)
 			max_cnt = max_strlen;

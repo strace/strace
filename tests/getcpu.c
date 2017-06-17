@@ -41,16 +41,16 @@ int
 main(void)
 {
 	unsigned *bogus_cpu =
-		(unsigned *) tail_alloc(sizeof(* bogus_cpu)) + 1;
+		(unsigned *) tail_alloc(sizeof(*bogus_cpu)) + 1;
 	unsigned *bogus_node =
-		(unsigned *) tail_alloc(sizeof(* bogus_node)) + 1;
+		(unsigned *) tail_alloc(sizeof(*bogus_node)) + 1;
 	unsigned *bogus_tcache =
-		(unsigned *) tail_alloc(sizeof(* bogus_tcache)) + 1;
+		(unsigned *) tail_alloc(sizeof(*bogus_tcache)) + 1;
 
 	long res;
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned, cpu);
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned, node);
-	long * tcache = tail_alloc(128);
+	long *tcache = tail_alloc(128);
 
 	res = syscall(__NR_getcpu, NULL, NULL, NULL);
 	printf("getcpu(NULL, NULL, NULL) = %s\n", sprintrc(res));

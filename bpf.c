@@ -182,7 +182,7 @@ bpf_prog_load(struct tcb *const tcp, const kernel_ulong_t addr,
 
 static int
 bpf_obj_manage(struct tcb *const tcp, const kernel_ulong_t addr,
-               unsigned int size)
+	       unsigned int size)
 {
 	struct {
 		uint64_t ATTRIBUTE_ALIGNED(8) pathname;
@@ -243,14 +243,14 @@ bpf_prog_attach_detach(struct tcb *const tcp, const kernel_ulong_t addr,
 
 static int
 bpf_prog_attach(struct tcb *const tcp, const kernel_ulong_t addr,
-               unsigned int size)
+		unsigned int size)
 {
 	return bpf_prog_attach_detach(tcp, addr, size, true);
 }
 
 static int
 bpf_prog_detach(struct tcb *const tcp, const kernel_ulong_t addr,
-               unsigned int size)
+		unsigned int size)
 {
 	return bpf_prog_attach_detach(tcp, addr, size, false);
 }

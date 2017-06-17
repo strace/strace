@@ -9,8 +9,7 @@
 #include "xlat.h"
 #include "xlat/semop_flags.h"
 
-union semun
-{
+union semun {
 	int val;
 	struct semid_ds *buf;
 	unsigned short *array;

@@ -85,7 +85,7 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->fmt.pix_mp.pixelformat = magic;
 		f->fmt.pix_mp.field = V4L2_FIELD_NONE;
 		f->fmt.pix_mp.colorspace = V4L2_COLORSPACE_JPEG;
-		struct v4l2_plane_pix_format* cur_pix =
+		struct v4l2_plane_pix_format *cur_pix =
 		       f->fmt.pix_mp.plane_fmt;
 		for (i = 0;
 		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
@@ -119,7 +119,7 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->fmt.win.clips[1].c.width = 0x9e3a6fb3;
 		f->fmt.win.clips[1].c.height = 0x05617b76;
 
-		f->fmt.win.bitmap = (void*) -2UL;
+		f->fmt.win.bitmap = (void *) -2UL;
 #ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		f->fmt.win.global_alpha = 0xce;
 #endif
@@ -168,8 +168,8 @@ init_v4l2_format(struct v4l2_format *const f,
 
 static void
 dprint_ioctl_v4l2(struct v4l2_format *const f,
-		  const char* request, const unsigned int buf_type,
-		  const char* buf_type_string)
+		  const char *request, const unsigned int buf_type,
+		  const char *buf_type_string)
 {
 	switch (buf_type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
@@ -323,7 +323,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	dprint_ioctl_v4l2((v4l2_format), (request), (buf_type), #buf_type)
 
 int
-main(void )
+main(void)
 {
 	const unsigned int size = get_page_size();
 	void *const page = tail_alloc(size);
@@ -688,7 +688,7 @@ main(void )
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_tuner, p_tuner);
 	p_tuner->index = 0x4fb6df39;
-	strcpy((char*)p_tuner->name, "cum tacent clamant");
+	strcpy((char *) p_tuner->name, "cum tacent clamant");
 	p_tuner->type = V4L2_TUNER_RADIO;
 	p_tuner->capability = V4L2_TUNER_CAP_LOW;
 	p_tuner->rangelow = 0xa673bc29;

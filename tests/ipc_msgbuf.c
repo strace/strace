@@ -45,7 +45,7 @@ cleanup(void)
 }
 
 int
-main (void)
+main(void)
 {
 	const long mtype = 0xdefaced;
 	struct {

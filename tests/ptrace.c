@@ -114,7 +114,7 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 			if (errno == EINTR)
 				continue;
 			saved = errno;
-			kill (pid, SIGKILL);
+			kill(pid, SIGKILL);
 			errno = saved;
 			perror_msg_and_fail("wait");
 		}
@@ -159,7 +159,7 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 
 		if (do_ptrace(PTRACE_CONT, pid, 0, 0)) {
 			saved = errno;
-			kill (pid, SIGKILL);
+			kill(pid, SIGKILL);
 			errno = saved;
 			perror_msg_and_fail("ptrace");
 		}

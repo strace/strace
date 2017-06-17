@@ -374,7 +374,7 @@ misplaced:
 
 static void
 dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
-		        const struct dm_ioctl *const ioc)
+			const struct dm_ioctl *const ioc)
 {
 	if (ioc->data_start == ioc->data_size)
 		return;

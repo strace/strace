@@ -436,7 +436,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 
 	if ((val = STR_STRIP_PREFIX(token, "when=")) != token) {
 		/*
-		 * 	== 1+1
+		 *	== 1+1
 		 * F	== F+0
 		 * F+	== F+1
 		 * F+S

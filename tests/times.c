@@ -49,7 +49,7 @@ enum {
 };
 
 int
-main (void)
+main(void)
 {
 	struct timespec ts;
 	volatile int dummy = 0;

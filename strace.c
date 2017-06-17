@@ -89,12 +89,12 @@ static bool print_pid_pfx;
 
 /* -I n */
 enum {
-    INTR_NOT_SET        = 0,
-    INTR_ANYWHERE       = 1, /* don't block/ignore any signals */
-    INTR_WHILE_WAIT     = 2, /* block fatal signals while decoding syscall. default */
-    INTR_NEVER          = 3, /* block fatal signals. default if '-o FILE PROG' */
-    INTR_BLOCK_TSTP_TOO = 4, /* block fatal signals and SIGTSTP (^Z) */
-    NUM_INTR_OPTS
+	INTR_NOT_SET        = 0,
+	INTR_ANYWHERE       = 1, /* don't block/ignore any signals */
+	INTR_WHILE_WAIT     = 2, /* block fatal signals while decoding syscall. default */
+	INTR_NEVER          = 3, /* block fatal signals. default if '-o FILE PROG' */
+	INTR_BLOCK_TSTP_TOO = 4, /* block fatal signals and SIGTSTP (^Z) */
+	NUM_INTR_OPTS
 };
 static int opt_intr;
 /* We play with signal mask only if this mode is active: */
@@ -690,12 +690,10 @@ printleader(struct tcb *tcp)
 			tprintf("%6ld.%06ld ",
 				(long) dtv.tv_sec, (long) dtv.tv_usec);
 			otv = tv;
-		}
-		else if (tflag > 2) {
+		} else if (tflag > 2) {
 			tprintf("%ld.%06ld ",
 				(long) tv.tv_sec, (long) tv.tv_usec);
-		}
-		else {
+		} else {
 			time_t local = tv.tv_sec;
 			strftime(str, sizeof(str), "%T", localtime(&local));
 			if (tflag > 1)
@@ -919,8 +917,7 @@ detach(struct tcb *tcp)
 			goto wait_loop;
 		if (errno != ESRCH)
 			perror_msg("detach: ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
-	}
-	else {
+	} else {
 		error = my_tkill(tcp->pid, SIGSTOP);
 		if (!error)
 			goto wait_loop;
@@ -1032,7 +1029,7 @@ process_opt_p_list(char *opt)
 		 * pidof uses space as delim, pgrep uses newline. :(
 		 */
 		int pid;
-		char *delim = opt + strcspn(opt, ", \n\t");
+		char *delim = opt + strcspn(opt, "\n\t ,");
 		char c = *delim;
 
 		*delim = '\0';
@@ -1231,8 +1228,7 @@ exec_or_die(void)
 		if (setreuid(run_uid, params->run_euid) < 0) {
 			perror_msg_and_die("setreuid");
 		}
-	}
-	else if (geteuid() != 0)
+	} else if (geteuid() != 0)
 		if (setreuid(run_uid, run_uid) < 0) {
 			perror_msg_and_die("setreuid");
 		}
@@ -1364,15 +1360,13 @@ startup_child(char **argv)
 			if (colon) {
 				n = colon - path;
 				m = n + 1;
-			}
-			else
+			} else
 				m = n = strlen(path);
 			if (n == 0) {
 				if (!getcwd(pathname, PATH_MAX))
 					continue;
 				len = strlen(pathname);
-			}
-			else if (n > sizeof(pathname) - 1)
+			} else if (n > sizeof(pathname) - 1)
 				continue;
 			else {
 				strncpy(pathname, path, n);
@@ -1466,8 +1460,7 @@ startup_child(char **argv)
 			    | TCB_SKIP_DETACH_ON_FIRST_EXEC
 			    | (NOMMU_SYSTEM ? 0 : (TCB_HIDE_LOG | post_attach_sigstop));
 		newoutf(tcp);
-	}
-	else {
+	} else {
 		/* With -D, we are *child* here, the tracee is our parent. */
 		strace_child = strace_tracer_pid;
 		strace_tracer_pid = getpid();
@@ -1582,12 +1575,12 @@ get_os_release(void)
 			error_msg_and_die("Bad OS release string: '%s'", u.release);
 		/* Note: this open-codes KERNEL_VERSION(): */
 		rel = (rel << 8) | atoi(p);
-		if (rel >= KERNEL_VERSION(1,0,0))
+		if (rel >= KERNEL_VERSION(1, 0, 0))
 			break;
 		while (*p >= '0' && *p <= '9')
 			p++;
 		if (*p != '.') {
-			if (rel >= KERNEL_VERSION(0,1,0)) {
+			if (rel >= KERNEL_VERSION(0, 1, 0)) {
 				/* "X.Y-something" means "X.Y.0" */
 				rel <<= 8;
 				break;
@@ -1847,8 +1840,7 @@ init(int argc, char *argv[])
 		}
 		run_uid = pent->pw_uid;
 		run_gid = pent->pw_gid;
-	}
-	else {
+	} else {
 		run_uid = getuid();
 		run_gid = getgid();
 	}
@@ -1885,8 +1877,7 @@ init(int argc, char *argv[])
 			if (followfork >= 2)
 				error_msg_and_help("piping the output and -ff are mutually exclusive");
 			shared_log = strace_popen(outfname + 1);
-		}
-		else if (followfork < 2)
+		} else if (followfork < 2)
 			shared_log = strace_fopen(outfname);
 	} else {
 		/* -ff without -o FILE is the same as single -f */
@@ -2563,7 +2554,7 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 		 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
 		 * On 2.6 and earlier, it can return garbage.
 		 */
-		if (os_release >= KERNEL_VERSION(3,0,0))
+		if (os_release >= KERNEL_VERSION(3, 0, 0))
 			current_tcp = maybe_switch_tcbs(current_tcp, current_tcp->pid);
 
 		if (detach_on_execve) {

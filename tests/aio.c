@@ -240,9 +240,9 @@ main(void)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%#lx, %u, ["
 	       "{data=%#" PRI__x64 ", pread, reqprio=11, fildes=0, "
-	               "buf=%p, nbytes=%u, offset=%" PRI__d64 "}, "
+		"buf=%p, nbytes=%u, offset=%" PRI__d64 "}, "
 	       "{data=%#" PRI__x64 ", pread, reqprio=22, fildes=0, "
-	               "buf=%p, nbytes=%u, offset=%" PRI__d64 "}"
+		"buf=%p, nbytes=%u, offset=%" PRI__d64 "}"
 	       "]) = %s\n",
 	       *ctx, nr,
 	       cb[0].aio_data, data0, sizeof_data0, cb[0].aio_offset,
@@ -317,18 +317,18 @@ main(void)
 	printf("io_submit(%#lx, %ld, ["
 	       "{data=%#" PRI__x64 ", key=%u, %hu /* SUB_??? */, fildes=%d}, "
 	       "{key=%u, pwrite, reqprio=%hd, fildes=%d, str=NULL"
-	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64
+		", nbytes=%" PRI__u64 ", offset=%" PRI__d64
 # ifdef IOCB_FLAG_RESFD
-	               ", resfd=%d, flags=%#x"
+		", resfd=%d, flags=%#x"
 # endif
-	               "}, "
+		"}, "
 	       "{key=%u, pwrite, reqprio=%hd, fildes=%d, buf=%#" PRI__x64
-	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
+		", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
 	       "{key=%u, pwrite, reqprio=%hd, fildes=%d"
-	               ", str=\"\\0\\1\\2\\3%.28s\"..."
-	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
+		", str=\"\\0\\1\\2\\3%.28s\"..."
+		", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}, "
 	       "{key=%u, pwritev, reqprio=%hd, fildes=%d, buf=%#" PRI__x64
-	               ", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}"
+		", nbytes=%" PRI__u64 ", offset=%" PRI__d64 "}"
 	       ", {NULL}, {%#lx}, %p]) = %s\n",
 	       *ctx, 1057L,
 	       cbv2[0].aio_data, cbv2[0].aio_key,
@@ -351,11 +351,11 @@ main(void)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%#lx, %u, ["
 	       "{data=%#" PRI__x64 ", preadv, reqprio=%hd, fildes=0, "
-	               "iovec=[{iov_base=%p, iov_len=%u}"
-	               ", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}, "
+		"iovec=[{iov_base=%p, iov_len=%u}"
+		", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}, "
 	       "{data=%#" PRI__x64 ", preadv, reqprio=%hd, fildes=0, "
-	               "iovec=[{iov_base=%p, iov_len=%u}"
-	               ", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}"
+		"iovec=[{iov_base=%p, iov_len=%u}"
+		", {iov_base=%p, iov_len=%u}], offset=%" PRI__d64 "}"
 	       "]) = %s\n",
 	       *ctx, nr,
 	       cbv[0].aio_data, cbv[0].aio_reqprio,

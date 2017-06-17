@@ -146,7 +146,7 @@ main(void)
 	for (i = 0; i < BPF_MAXINSNS; ++i) {
 		if (i)
 			tprintf(", ");
-		switch(BPF_CLASS(i)) {
+		switch (BPF_CLASS(i)) {
 		case BPF_LD:
 			tprintf("BPF_STMT(BPF_LD|BPF_W|BPF_IMM, %#x)", i << 16);
 			break;

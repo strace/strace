@@ -174,7 +174,7 @@ main(void)
 	new_act->flags = SA_RESTORER;
 	new_act->restorer = (unsigned long) 0xdeadfacecafef00dULL;
 # define SA_RESTORER_FMT ", sa_flags=SA_RESTORER, sa_restorer=%#lx"
-# define SA_RESTORER_ARGS ,new_act->restorer
+# define SA_RESTORER_ARGS , new_act->restorer
 #else
 	new_act->flags = SA_NODEFER;
 # define SA_RESTORER_FMT ", sa_flags=SA_NODEFER"

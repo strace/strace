@@ -32,7 +32,7 @@
 
 static const struct sock_filter filter[] = {
 	/* load architecture */
-	BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof (struct seccomp_data, arch))),
+	BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, arch)),
 	/* jump forward 1 instruction if architecture matches */
 	BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, SECCOMP_ARCH, 1, 0),
 	/* kill process */

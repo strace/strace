@@ -71,7 +71,7 @@ struct fs_quota_statv {
 	struct fs_qfilestatv	qs_pquota;	/* project quota information */
 	int32_t		qs_btimelimit;		/* limit for blks timer */
 	int32_t		qs_itimelimit;		/* limit for inodes timer */
-	int32_t		qs_rtbtimelimit; 	/* limit for rt blks timer */
+	int32_t		qs_rtbtimelimit;	/* limit for rt blks timer */
 	uint16_t	qs_bwarnlimit;		/* limit for num warnings */
 	uint16_t	qs_iwarnlimit;		/* limit for num warnings */
 	uint64_t	qs_pad2[8];		/* for future proofing */

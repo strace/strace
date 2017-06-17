@@ -488,8 +488,8 @@ AC_CHECK_HEADERS([linux/btrfs.h], [
 		struct btrfs_ioctl_search_args_v2.buf_size
 		]),,, [ #include <stdio.h>
 #include <linux/btrfs.h>])
-        AC_CHECK_DECLS(m4_normalize([BTRFS_COMPRESS_NONE, BTRFS_COMPRESS_ZLIB,
-	                        BTRFS_COMPRESS_LZO]),,,[ #include <stdio.h>
+	AC_CHECK_DECLS(m4_normalize([BTRFS_COMPRESS_NONE, BTRFS_COMPRESS_ZLIB,
+				BTRFS_COMPRESS_LZO]),,,[ #include <stdio.h>
 #include <linux/btrfs.h>])])
 
 AC_CHECK_DECLS([sys_errlist])
@@ -683,7 +683,7 @@ AC_CACHE_CHECK([for SIGRTMIN], [st_cv_SIGRTMIN],
 	       [[st_cv_SIGRTMIN="$(echo SIGRTMIN |
 			$CPP $CPPFLAGS -P -imacros asm/signal.h - |
 			grep '^[0-9]')"
-	         test -n "$st_cv_SIGRTMIN" || st_cv_SIGRTMIN=no]])
+		 test -n "$st_cv_SIGRTMIN" || st_cv_SIGRTMIN=no]])
 if test "x$st_cv_SIGRTMIN" != xno; then
 	AC_DEFINE_UNQUOTED([ASM_SIGRTMIN], [$st_cv_SIGRTMIN],
 			   [SIGRTMIN defined in <asm/signal.h>])
@@ -692,7 +692,7 @@ AC_CACHE_CHECK([for SA_RESTORER], [st_cv_SA_RESTORER],
 	       [st_cv_SA_RESTORER="$(echo SA_RESTORER |
 			$CPP $CPPFLAGS -P -imacros asm/signal.h - |
 			grep ^0x)"
-	        test -n "$st_cv_SA_RESTORER" || st_cv_SA_RESTORER=no])
+		test -n "$st_cv_SA_RESTORER" || st_cv_SA_RESTORER=no])
 if test "x$st_cv_SA_RESTORER" != xno; then
 	AC_DEFINE_UNQUOTED([ASM_SA_RESTORER], [$st_cv_SA_RESTORER],
 			   [SA_RESTORER defined in <asm/signal.h>])
@@ -720,15 +720,15 @@ libunwind_CPPFLAGS=
 libunwind_LDFLAGS=
 libunwind_LIBS=
 AC_ARG_WITH([libunwind],
-            [AS_HELP_STRING([--with-libunwind],
-                            [use libunwind to implement stack tracing support])],
-            [case "${withval}" in
-             yes|no|check) ;;
-             *) with_libunwind=yes
-                libunwind_CPPFLAGS="-I${withval}/include"
-                libunwind_LDFLAGS="-L${withval}/lib" ;;
-             esac],
-            [with_libunwind=check]
+	    [AS_HELP_STRING([--with-libunwind],
+			    [use libunwind to implement stack tracing support])],
+	    [case "${withval}" in
+	     yes|no|check) ;;
+	     *) with_libunwind=yes
+		libunwind_CPPFLAGS="-I${withval}/include"
+		libunwind_LDFLAGS="-L${withval}/lib" ;;
+	     esac],
+	    [with_libunwind=check]
 )
 
 use_libunwind=no
@@ -737,56 +737,56 @@ AS_IF([test "x$with_libunwind" != xno],
        CPPFLAGS="$CPPFLAGS $libunwind_CPPFLAGS"
 
        AC_CHECK_HEADERS([libunwind-ptrace.h],
-         [saved_LDFLAGS="$LDFLAGS"
-          LDFLAGS="$LDFLAGS $libunwind_LDFLAGS"
+	 [saved_LDFLAGS="$LDFLAGS"
+	  LDFLAGS="$LDFLAGS $libunwind_LDFLAGS"
 
-          AC_CHECK_LIB([unwind], [backtrace],
-            [libunwind_LIBS="-lunwind $libunwind_LIBS"
+	  AC_CHECK_LIB([unwind], [backtrace],
+	    [libunwind_LIBS="-lunwind $libunwind_LIBS"
 
-             AC_MSG_CHECKING([for unw_create_addr_space in libunwind-generic])
-             saved_LIBS="$LIBS"
-             LIBS="-lunwind-generic $libunwind_LIBS $LIBS"
+	     AC_MSG_CHECKING([for unw_create_addr_space in libunwind-generic])
+	     saved_LIBS="$LIBS"
+	     LIBS="-lunwind-generic $libunwind_LIBS $LIBS"
 
-             AC_LINK_IFELSE(
-               [AC_LANG_PROGRAM([[#include <libunwind-ptrace.h>]],
-                                [[return !unw_create_addr_space(0, 0)]])
-               ],
-               [AC_MSG_RESULT([yes])
-                libunwind_LIBS="-lunwind-generic $libunwind_LIBS"
+	     AC_LINK_IFELSE(
+	       [AC_LANG_PROGRAM([[#include <libunwind-ptrace.h>]],
+				[[return !unw_create_addr_space(0, 0)]])
+	       ],
+	       [AC_MSG_RESULT([yes])
+		libunwind_LIBS="-lunwind-generic $libunwind_LIBS"
 
-                AC_CHECK_LIB([unwind-ptrace], [_UPT_create],
-                  [libunwind_LIBS="-lunwind-ptrace $libunwind_LIBS"
-                   use_libunwind=yes
-                  ],
-                  [if test "x$with_libunwind" != xcheck; then
-                     AC_MSG_FAILURE([failed to find _UPT_create in libunwind-ptrace])
-                   fi
-                  ],
-                  [$libunwind_LIBS]
-                )
-               ],
-               [AC_MSG_RESULT([no])
-                if test "x$with_libunwind" != xcheck; then
-                  AC_MSG_FAILURE([failed to find unw_create_addr_space in libunwind-generic])
-                fi
-               ]
-             )
+		AC_CHECK_LIB([unwind-ptrace], [_UPT_create],
+		  [libunwind_LIBS="-lunwind-ptrace $libunwind_LIBS"
+		   use_libunwind=yes
+		  ],
+		  [if test "x$with_libunwind" != xcheck; then
+		     AC_MSG_FAILURE([failed to find _UPT_create in libunwind-ptrace])
+		   fi
+		  ],
+		  [$libunwind_LIBS]
+		)
+	       ],
+	       [AC_MSG_RESULT([no])
+		if test "x$with_libunwind" != xcheck; then
+		  AC_MSG_FAILURE([failed to find unw_create_addr_space in libunwind-generic])
+		fi
+	       ]
+	     )
 
-             LIBS="$saved_LIBS"
-            ],
-            [if test "x$with_libunwind" != xcheck; then
-               AC_MSG_FAILURE([failed to find libunwind])
-             fi
-            ],
-            [$libunwind_LIBS]
-          )
+	     LIBS="$saved_LIBS"
+	    ],
+	    [if test "x$with_libunwind" != xcheck; then
+	       AC_MSG_FAILURE([failed to find libunwind])
+	     fi
+	    ],
+	    [$libunwind_LIBS]
+	  )
 
-          LDFLAGS="$saved_LDFLAGS"
-         ],
-         [if test "x$with_libunwind" != xcheck; then
-            AC_MSG_FAILURE([failed to find libunwind-ptrace.h])
-          fi
-         ]
+	  LDFLAGS="$saved_LDFLAGS"
+	 ],
+	 [if test "x$with_libunwind" != xcheck; then
+	    AC_MSG_FAILURE([failed to find libunwind-ptrace.h])
+	  fi
+	 ]
        )
 
        CPPFLAGS="$saved_CPPFLAGS"

@@ -109,7 +109,7 @@ SYS_FUNC(clone)
 				tcp->u_arg[ARG_STACKSIZE]);
 #endif
 		tprints("flags=");
-		if (!printflags64(clone_flags, flags &~ CSIGNAL, NULL))
+		if (!printflags64(clone_flags, flags & ~CSIGNAL, NULL))
 			sep = "";
 		if ((flags & CSIGNAL) != 0)
 			tprintf("%s%s", sep, signame(flags & CSIGNAL));

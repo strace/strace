@@ -49,7 +49,7 @@ static const char *TEST_SYSCALL_STATX_MASK_STR  = "STATX_ALL";
 
 # define TEST_SYSCALL_INVOKE(sample, pst) \
 	syscall(__NR_statx, AT_FDCWD, sample, TEST_SYSCALL_STATX_FLAGS, \
-	        TEST_SYSCALL_STATX_MASK, pst)
+		TEST_SYSCALL_STATX_MASK, pst)
 # define PRINT_SYSCALL_HEADER(sample) \
 	do { \
 		int saved_errno = errno; \

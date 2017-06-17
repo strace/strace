@@ -5,7 +5,7 @@
 #include <asm/unistd.h>
 
 int
-main (void)
+main(void)
 {
 	assert(syscall(__NR_times, 0x42) == -1);
 	printf("times(0x42) = -1 EFAULT (%m)\n");

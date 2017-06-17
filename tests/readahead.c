@@ -37,7 +37,7 @@
  * see https://sourceware.org/bugzilla/show_bug.cgi?id=5208
  */
 #  if !(defined __GLIBC_MINOR__ && \
-        (__GLIBC__ << 16) + __GLIBC_MINOR__ >= (2 << 16) + 8)
+	(__GLIBC__ << 16) + __GLIBC_MINOR__ >= (2 << 16) + 8)
 #   undef HAVE_READAHEAD
 #  endif /* glibc < 2.8 */
 /*
@@ -45,7 +45,7 @@
  * see https://sourceware.org/bugzilla/show_bug.cgi?id=21026
  */
 #  if defined LINUX_MIPSN64 && !(defined __GLIBC_MINOR__ && \
-        (__GLIBC__ << 16) + __GLIBC_MINOR__ >= (2 << 16) + 25)
+	(__GLIBC__ << 16) + __GLIBC_MINOR__ >= (2 << 16) + 25)
 #   undef HAVE_READAHEAD
 #  endif /* LINUX_MIPSN64 && glibc < 2.25 */
 # endif /* __GLIBC__ */

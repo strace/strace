@@ -536,7 +536,7 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 
 static void
 test_ip_pktinfo(struct msghdr *const mh, void *const page,
-	        const int cmsg_type, const char *const cmsg_type_str)
+		const int cmsg_type, const char *const cmsg_type_str)
 {
 	const unsigned int len = CMSG_SPACE(sizeof(struct in_pktinfo));
 	struct cmsghdr *const cmsg = get_cmsghdr(page, len);
@@ -601,7 +601,7 @@ test_ip_uint(struct msghdr *const mh, void *const page,
 
 static void
 test_ip_uint8_t(struct msghdr *const mh, void *const page,
-	        const int cmsg_type, const char *const cmsg_type_str)
+		const int cmsg_type, const char *const cmsg_type_str)
 {
 	const unsigned int len = CMSG_SPACE(1);
 	struct cmsghdr *const cmsg = get_cmsghdr(page, len);
@@ -683,7 +683,7 @@ struct sock_ee {
 
 static void
 test_ip_recverr(struct msghdr *const mh, void *const page,
-	        const int cmsg_type, const char *const cmsg_type_str)
+		const int cmsg_type, const char *const cmsg_type_str)
 {
 	const unsigned int len = CMSG_SPACE(sizeof(struct sock_ee));
 	struct cmsghdr *const cmsg = get_cmsghdr(page, len);

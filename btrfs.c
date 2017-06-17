@@ -367,7 +367,7 @@ btrfs_print_ino_path_container(struct tcb *tcp,
 static bool
 print_uint64(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	tprintf("%" PRIu64, * (uint64_t *) elem_buf);
+	tprintf("%" PRIu64, *(uint64_t *) elem_buf);
 
 	return true;
 }
@@ -488,7 +488,7 @@ static bool
 print_objectid_callback(struct tcb *tcp, void *elem_buf,
 			size_t elem_size, void *data)
 {
-	btrfs_print_objectid(* (uint64_t *) elem_buf);
+	btrfs_print_objectid(*(uint64_t *) elem_buf);
 
 	return true;
 }
@@ -679,12 +679,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				   (uint64_t) args.start.srcdevid,
 				   (uint64_t) args.start.cont_reading_from_srcdev_mode);
 
-				str = (const char*) args.start.srcdev_name;
+				str = (const char *) args.start.srcdev_name;
 				print_quoted_string(str,
 						sizeof(args.start.srcdev_name),
 						QUOTE_0_TERMINATED);
 				tprints(", tgtdev_name=");
-				str = (const char*) args.start.tgtdev_name;
+				str = (const char *) args.start.tgtdev_name;
 				print_quoted_string(str,
 						sizeof(args.start.tgtdev_name),
 						QUOTE_0_TERMINATED);

@@ -164,7 +164,7 @@ int
 next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits)
 {
 	const unsigned endian = 1;
-	int little_endian = * (char *) (void *) &endian;
+	int little_endian = *(char *) (void *) &endian;
 
 	const uint8_t *array = bit_array;
 	unsigned pos = cur_bit / 8;
@@ -221,10 +221,10 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 		arg_no++;
 	}
 #else /* SIZEOF_KERNEL_LONG_T == 4 */
-# if defined __ARM_EABI__ || \
-     defined LINUX_MIPSO32 || \
-     defined POWERPC || \
-     defined XTENSA
+# if defined __ARM_EABI__	\
+  || defined LINUX_MIPSO32	\
+  || defined POWERPC		\
+  || defined XTENSA
 	/* Align arg_no to the next even number. */
 	arg_no = (arg_no + 1) & 0xe;
 # elif defined SH
@@ -899,8 +899,7 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 			if (i < len) {
 				*dst++ = "0123456789abcdef"[*src >> 4];
 				*dst++ = "0123456789abcdef"[*src & 0xf];
-			}
-			else {
+			} else {
 				*dst++ = ' ';
 				*dst++ = ' ';
 			}
@@ -987,7 +986,7 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	if (current_wordsize < sizeof(addr)
-	    && (addr & (~ (kernel_ulong_t) -1U))) {
+	    && (addr & (~(kernel_ulong_t) -1U))) {
 		return -1;
 	}
 #endif
@@ -1135,7 +1134,7 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	if (current_wordsize < sizeof(addr)
-	    && (addr & (~ (kernel_ulong_t) -1U))) {
+	    && (addr & (~(kernel_ulong_t) -1U))) {
 		return -1;
 	}
 #endif

@@ -34,10 +34,10 @@ print_node(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	if (elem_size < sizeof(kernel_ulong_t)) {
 		tprintf("%#0*x", (int) elem_size * 2 + 2,
-			* (unsigned int *) elem_buf);
+			*(unsigned int *) elem_buf);
 	} else {
 		tprintf("%#0*" PRI_klx, (int) elem_size * 2 + 2,
-			* (kernel_ulong_t *) elem_buf);
+			*(kernel_ulong_t *) elem_buf);
 	}
 
 	return true;
@@ -127,9 +127,9 @@ print_addr(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	kernel_ulong_t addr;
 
 	if (elem_size < sizeof(addr)) {
-		addr = * (unsigned int *) elem_buf;
+		addr = *(unsigned int *) elem_buf;
 	} else {
-		addr = * (kernel_ulong_t *) elem_buf;
+		addr = *(kernel_ulong_t *) elem_buf;
 	}
 
 	printaddr(addr);
@@ -140,7 +140,7 @@ print_addr(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 static bool
 print_status(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const int status = * (int *) elem_buf;
+	const int status = *(int *) elem_buf;
 
 	if (status < 0 && (unsigned) -status < nerrnos)
 		tprintf("-%s", errnoent[-status]);
@@ -153,7 +153,7 @@ print_status(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 static bool
 print_int(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	tprintf("%d", * (int *) elem_buf);
+	tprintf("%d", *(int *) elem_buf);
 
 	return true;
 }

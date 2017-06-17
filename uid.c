@@ -34,9 +34,9 @@
 #  error invalid STRACE_UID_SIZE
 # endif
 
-# define SIZEIFY(x)		SIZEIFY_(x,STRACE_UID_SIZE)
-# define SIZEIFY_(x,size)	SIZEIFY__(x,size)
-# define SIZEIFY__(x,size)	x ## size
+# define SIZEIFY(x)		SIZEIFY_(x, STRACE_UID_SIZE)
+# define SIZEIFY_(x, size)	SIZEIFY__(x, size)
+# define SIZEIFY__(x, size)	x ## size
 
 # define printuid	SIZEIFY(printuid)
 # define sys_chown	SIZEIFY(sys_chown)
@@ -159,7 +159,7 @@ printuid(const char *text, const unsigned int uid)
 static bool
 print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	printuid("", (* (uid_t *) elem_buf));
+	printuid("", (*(uid_t *) elem_buf));
 
 	return true;
 }
