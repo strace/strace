@@ -228,7 +228,7 @@ main(void)
 	static const struct timespec future_tmout_data = {
 		.tv_sec = (time_t) 0x7ea1fade7e57faceLL,
 		.tv_nsec = 999999999,
-	};;
+	};
 	struct_sigevent bogus_sev_data = {
 		.sigev_notify = 0xdefaced,
 		.sigev_signo = 0xfacefeed,

@@ -65,7 +65,7 @@ extern int __clone2(int (*fn) (void *), void *child_stack_base,
 #define syscall_tgkill(pid, tid, sig) syscall(__NR_tgkill, (pid), (tid), (sig))
 #define syscall_getpid() syscall(__NR_getpid)
 #define syscall_gettid() syscall(__NR_gettid)
-#define syscall_exit(v) syscall(__NR_exit, (v));
+#define syscall_exit(v) syscall(__NR_exit, (v))
 
 static char my_name[PATH_MAX];
 static int leader_final_action;
