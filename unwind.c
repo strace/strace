@@ -123,7 +123,7 @@ unwind_tcb_fin(struct tcb *tcp)
 	free(tcp->queue);
 	tcp->queue = NULL;
 
-	delete_mmap_cache(tcp, __FUNCTION__);
+	delete_mmap_cache(tcp, __func__);
 
 	_UPT_destroy(tcp->libunwind_ui);
 	tcp->libunwind_ui = NULL;
@@ -424,7 +424,7 @@ print_call_cb(void *dummy,
 	else if (binary_filename)
 		tprintf(STACK_ENTRY_NOSYMBOL_FMT);
 	else
-		tprintf(STACK_ENTRY_BUG_FMT, __FUNCTION__);
+		tprintf(STACK_ENTRY_BUG_FMT, __func__);
 
 	line_ended();
 }
@@ -461,7 +461,7 @@ sprint_call_or_error(const char *binary_filename,
                        ? asprintf(&output_line, STACK_ENTRY_ERROR_WITH_OFFSET_FMT)
                        : asprintf(&output_line, STACK_ENTRY_ERROR_FMT);
        else
-               n = asprintf(&output_line, STACK_ENTRY_BUG_FMT, __FUNCTION__);
+               n = asprintf(&output_line, STACK_ENTRY_BUG_FMT, __func__);
 
        if (n < 0)
                error_msg_and_die("error in asprintf");
@@ -560,7 +560,7 @@ unwind_print_stacktrace(struct tcb* tcp)
 	       DPRINTF("tcp=%p, queue=%p", "queueprint", tcp, tcp->queue->head);
 	       queue_print(tcp->queue);
        }
-       else if (rebuild_cache_if_invalid(tcp, __FUNCTION__)) {
+       else if (rebuild_cache_if_invalid(tcp, __func__)) {
                DPRINTF("tcp=%p, queue=%p", "stackprint", tcp, tcp->queue->head);
                stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
        }
@@ -581,7 +581,7 @@ unwind_capture_stacktrace(struct tcb *tcp)
 	if (tcp->queue->head)
 		error_msg_and_die("bug: unprinted entries in queue");
 
-	if (rebuild_cache_if_invalid(tcp, __FUNCTION__)) {
+	if (rebuild_cache_if_invalid(tcp, __func__)) {
 		stacktrace_walk(tcp, queue_put_call, queue_put_error,
 				tcp->queue);
 		DPRINTF("tcp=%p, queue=%p", "captured", tcp, tcp->queue->head);
