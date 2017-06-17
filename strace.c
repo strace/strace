@@ -2319,7 +2319,7 @@ next_event(int *pstatus, siginfo_t *si)
 
 	/*
 	 * Used to exit simply when nprocs hits zero, but in this testcase:
-	 *  int main() { _exit(!!fork()); }
+	 *  int main(void) { _exit(!!fork()); }
 	 * under strace -f, parent sometimes (rarely) manages
 	 * to exit before we see the first stop of the child,
 	 * and we are losing track of it:
@@ -2594,7 +2594,7 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 }
 
 #ifdef ENABLE_COVERAGE_GCOV
-extern void __gcov_flush();
+extern void __gcov_flush(void);
 #endif
 
 static void ATTRIBUTE_NORETURN

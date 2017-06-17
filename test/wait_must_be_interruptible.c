@@ -18,12 +18,14 @@ static const char msg1[] = "Child signals parent\n";
 static const char msg2[] = "Parent got signal\n";
 static const char msg3[] = "Child will exit now\n";
 
-static void handler(int s)
+static void
+handler(int s)
 {
 	write(1, msg2, sizeof(msg2)-1);
 }
 
-static void test()
+static void
+test(void)
 {
 	/* Note: in Linux, signal() installs handler with SA_RESTART flag,
 	 * therefore wait will be restarted.
@@ -45,7 +47,8 @@ static void test()
 	_exit(0);
 }
 
-int main()
+int
+main(void)
 {
 	char buf1[80];
 	char buf2[80];

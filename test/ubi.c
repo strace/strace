@@ -9,7 +9,9 @@
 
 #define zero(x) memset(&x, 0, sizeof(x))
 
-int main() {
+int
+main(void)
+{
 	int fd = open("/dev/null", 0);
 	struct ubi_mkvol_req mkvol = {
 		.vol_id = 3,

@@ -6,7 +6,9 @@
 #include <sys/ioctl.h>
 #include <mtd/mtd-user.h>
 
-int main() {
+int
+main(void)
+{
 	int fd = open("/dev/null", 0);
 	struct mtd_info_user minfo;
 	struct erase_info_user einfo;

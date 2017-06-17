@@ -22,7 +22,9 @@
 #define _FILE_OFFSET_BITS 64
 #include <sys/mman.h>
 #include <errno.h>
-int main()
+
+int
+main(void)
 {
 	/* 0x1000 is meant to be page size multiplier */
 	mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
