@@ -711,8 +711,8 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 	}
 
 	/* Cap path length to the path buffer size */
-	if (n > sizeof path - 1)
-		n = sizeof path - 1;
+	if (n > sizeof(path) - 1)
+		n = sizeof(path) - 1;
 
 	/* Fetch one byte more to find out whether path length > n. */
 	nul_seen = umovestr(tcp, addr, n + 1, path);

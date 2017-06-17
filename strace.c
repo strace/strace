@@ -1372,7 +1372,7 @@ startup_child(char **argv)
 					continue;
 				len = strlen(pathname);
 			}
-			else if (n > sizeof pathname - 1)
+			else if (n > sizeof(pathname) - 1)
 				continue;
 			else {
 				strncpy(pathname, path, n);

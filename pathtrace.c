@@ -59,7 +59,7 @@ upathmatch(struct tcb *const tcp, const kernel_ulong_t upath)
 {
 	char path[PATH_MAX + 1];
 
-	return umovestr(tcp, upath, sizeof path, path) > 0 &&
+	return umovestr(tcp, upath, sizeof(path), path) > 0 &&
 		pathmatch(path);
 }
 

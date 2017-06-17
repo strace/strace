@@ -39,16 +39,16 @@ main(void)
 {
 	const off_t offset = 0xdefaceddeadbeefLL;
 	char buf[4];
-	struct iovec iov = { buf, sizeof buf };
+	struct iovec iov = { buf, sizeof(buf) };
 
 	(void) close(0);
 	assert(open("/dev/zero", O_RDONLY) == 0);
-	assert(pread(0, buf, sizeof buf, offset) == 4);
+	assert(pread(0, buf, sizeof(buf), offset) == 4);
 	assert(preadv(0, &iov, 1, offset) == 4);
 	assert(!close(0));
 
 	assert(open("/dev/null", O_WRONLY) == 0);
-	assert(pwrite(0, buf, sizeof buf, offset) == 4);
+	assert(pwrite(0, buf, sizeof(buf), offset) == 4);
 	assert(pwritev(0, &iov, 1, offset) == 4);
 	assert(!close(0));
 

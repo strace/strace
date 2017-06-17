@@ -77,7 +77,7 @@ count_syscall(struct tcb *tcp, const struct timeval *syscall_exiting_tv)
 			/* Initialize it.  */
 			struct itimerval it;
 
-			memset(&it, 0, sizeof it);
+			memset(&it, 0, sizeof(it));
 			it.it_interval.tv_usec = 1;
 			setitimer(ITIMER_REAL, &it, NULL);
 			getitimer(ITIMER_REAL, &it);
