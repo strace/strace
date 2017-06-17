@@ -57,7 +57,7 @@ extern char *optarg;
 
 #ifdef USE_LIBUNWIND
 /* if this is true do the stack trace for every system call */
-bool stack_trace_enabled = false;
+bool stack_trace_enabled;
 #endif
 
 #define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
@@ -74,18 +74,18 @@ bool stack_trace_enabled = false;
 const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 
 cflag_t cflag = CFLAG_NONE;
-unsigned int followfork = 0;
+unsigned int followfork;
 unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
 				 | PTRACE_O_TRACEEXIT;
-unsigned int xflag = 0;
-bool debug_flag = 0;
-bool Tflag = 0;
-bool iflag = 0;
-bool count_wallclock = 0;
-unsigned int qflag = 0;
-static unsigned int tflag = 0;
-static bool rflag = 0;
-static bool print_pid_pfx = 0;
+unsigned int xflag;
+bool debug_flag;
+bool Tflag;
+bool iflag;
+bool count_wallclock;
+unsigned int qflag;
+static unsigned int tflag;
+static bool rflag;
+static bool print_pid_pfx;
 
 /* -I n */
 enum {
@@ -112,7 +112,7 @@ static int opt_intr;
  * wait() etc. Without -D, strace process gets lodged in between,
  * disrupting parent<->child link.
  */
-static bool daemonized_tracer = 0;
+static bool daemonized_tracer;
 
 #if USE_SEIZE
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
@@ -123,18 +123,18 @@ static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #endif
 
 /* Sometimes we want to print only succeeding syscalls. */
-bool not_failing_only = 0;
+bool not_failing_only;
 
 /* Show path associated with fd arguments */
-unsigned int show_fd_path = 0;
+unsigned int show_fd_path;
 
-static bool detach_on_execve = 0;
+static bool detach_on_execve;
 
 static int exit_code;
-static int strace_child = 0;
-static int strace_tracer_pid = 0;
+static int strace_child;
+static int strace_tracer_pid;
 
-static char *username = NULL;
+static char *username;
 static uid_t run_uid;
 static gid_t run_gid;
 
@@ -142,11 +142,11 @@ unsigned int max_strlen = DEFAULT_STRLEN;
 static int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
 
-static char *outfname = NULL;
+static char *outfname;
 /* If -ff, points to stderr. Else, it's our common output log */
 static FILE *shared_log;
 
-struct tcb *printing_tcp = NULL;
+struct tcb *printing_tcp;
 static struct tcb *current_tcp;
 
 static struct tcb **tcbtab;
@@ -520,7 +520,7 @@ strace_fopen(const char *path)
 	return fp;
 }
 
-static int popen_pid = 0;
+static int popen_pid;
 
 #ifndef _PATH_BSHELL
 # define _PATH_BSHELL "/bin/sh"

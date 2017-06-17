@@ -745,8 +745,9 @@ void
 printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	    const kernel_ulong_t len, const unsigned int user_style)
 {
-	static char *str = NULL;
+	static char *str;
 	static char *outstr;
+
 	unsigned int size;
 	unsigned int style = user_style;
 	int rc;
@@ -924,7 +925,8 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 	}
 }
 
-static bool process_vm_readv_not_supported = 0;
+static bool process_vm_readv_not_supported;
+
 #ifndef HAVE_PROCESS_VM_READV
 /*
  * Need to do this since process_vm_readv() is not yet available in libc.

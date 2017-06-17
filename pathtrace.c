@@ -33,8 +33,8 @@
 
 #include "syscall.h"
 
-const char **paths_selected = NULL;
-static unsigned num_selected = 0;
+const char **paths_selected;
+static unsigned int num_selected;
 
 /*
  * Return true if specified path matches one that we're tracing.

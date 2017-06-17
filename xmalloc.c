@@ -29,7 +29,7 @@
 
 void die_out_of_memory(void)
 {
-	static bool recursed = false;
+	static bool recursed;
 
 	if (recursed)
 		exit(1);

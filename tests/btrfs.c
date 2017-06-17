@@ -61,8 +61,8 @@ typedef __u64 u64;
 
 static const char *btrfs_test_root;
 static int btrfs_test_dir_fd;
-static bool verbose = false;
-static bool write_ok = false;
+static bool verbose;
+static bool write_ok;
 
 const unsigned char uuid_reference[BTRFS_UUID_SIZE] = {
 	0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,

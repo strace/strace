@@ -74,7 +74,7 @@ static const size_t limit = 10;
  * significantly breaking interface.
  */
 bool nul_terminated_buf = true;
-bool buf_in_arg = false;
+bool buf_in_arg;
 
 /*
  * When this is called with positive size, the buffer provided is an "out"
