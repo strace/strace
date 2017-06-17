@@ -80,9 +80,13 @@ main(void)
 	if (close(0) || close(1))
 		_exit(1);
 
-#define TEST_DENIED_SYSCALL(nr, err, fail) \
-	if (errno = 0, syscall(__NR_ ## nr, 0xbad, 0xf00d, 0xdead, 0xbeef, err, fail) != -1 || err != errno) \
-		close(-fail)
+#define TEST_DENIED_SYSCALL(nr, err, fail)							\
+	do {											\
+		errno = 0;									\
+		if (syscall(__NR_ ## nr, 0xbad, 0xf00d, 0xdead, 0xbeef, err, fail) != -1	\
+		    || err != errno)								\
+			close(-fail);								\
+	} while (0)
 
 	TEST_DENIED_SYSCALL(sync, EBUSY, 2);
 	TEST_DENIED_SYSCALL(setsid, EACCES, 3);

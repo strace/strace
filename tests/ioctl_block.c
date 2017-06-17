@@ -58,9 +58,11 @@ static struct xlat block_argless[] = {
 #endif
 };
 
-#define TEST_NULL_ARG(cmd) \
-	ioctl(-1, cmd, 0); \
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", #cmd)
+#define TEST_NULL_ARG(cmd)						\
+	do {								\
+		ioctl(-1, cmd, 0);					\
+		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", #cmd);	\
+	} while (0)
 
 int
 main(void)

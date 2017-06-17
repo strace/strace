@@ -319,9 +319,8 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 #endif
 	}
 }
-#define print_ioctl_v4l2(v4l2_format, request, buf_type) do { \
-	dprint_ioctl_v4l2((v4l2_format), (request), (buf_type), #buf_type); \
-} while (0)
+#define print_ioctl_v4l2(v4l2_format, request, buf_type)	\
+	dprint_ioctl_v4l2((v4l2_format), (request), (buf_type), #buf_type)
 
 int
 main(void )

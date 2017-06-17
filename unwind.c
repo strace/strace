@@ -39,7 +39,11 @@
 # define fopen_for_input fopen
 #endif
 
-#define DPRINTF(F, A, ...) if (debug_flag) error_msg("[unwind(" A ")] " F, __VA_ARGS__)
+#define DPRINTF(F, A, ...)						\
+	do {								\
+		if (debug_flag)						\
+			error_msg("[unwind(" A ")] " F, __VA_ARGS__);	\
+	} while (0)
 
 /*
  * Keep a sorted array of cache entries,

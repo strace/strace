@@ -178,14 +178,16 @@ print_stat(const STRUCT_STAT *st)
 #   define HAVE_NSEC		0
 #  endif
 
-#define PRINT_ST_TIME(field)						\
-	printf(", st_" #field "=%lld",					\
-	       sign_extend_unsigned_to_ll(st->st_ ## field));		\
-	print_time_t_nsec(sign_extend_unsigned_to_ll(st->st_ ## field),	\
-			  TIME_NSEC(st->st_ ## field ## _nsec), 1);	\
-	if (HAVE_NSEC)							\
-		printf(", st_" #field "_nsec=%llu",			\
-		       TIME_NSEC(st->st_ ## field ## _nsec))
+#define PRINT_ST_TIME(field)							\
+	do {									\
+		printf(", st_" #field "=%lld",					\
+		       sign_extend_unsigned_to_ll(st->st_ ## field));		\
+		print_time_t_nsec(sign_extend_unsigned_to_ll(st->st_ ## field),	\
+				  TIME_NSEC(st->st_ ## field ## _nsec), 1);	\
+		if (HAVE_NSEC)							\
+			printf(", st_" #field "_nsec=%llu",			\
+			       TIME_NSEC(st->st_ ## field ## _nsec));		\
+	} while (0)
 
 	PRINT_ST_TIME(atime);
 	PRINT_ST_TIME(mtime);
@@ -201,18 +203,24 @@ print_stat(const STRUCT_STAT *st)
 #  define PRINT_FIELD_U(field) \
 	printf(", %s=%llu", #field, (unsigned long long) st->field)
 
-#  define PRINT_FIELD_U32_UID(field) \
-	if (st->field == (uint32_t) -1) \
-		printf(", %s=-1", #field); \
-	else \
-		printf(", %s=%llu", #field, (unsigned long long) st->field)
+#  define PRINT_FIELD_U32_UID(field)					\
+	do {								\
+		if (st->field == (uint32_t) -1)				\
+			printf(", %s=-1", #field);			\
+		else							\
+			printf(", %s=%llu", #field,			\
+			       (unsigned long long) st->field);		\
+	} while (0)
 
-#  define PRINT_FIELD_TIME(field)					\
-	printf(", %s={tv_sec=%lld, tv_nsec=%u}",			\
-	       #field, (long long) st->field.tv_sec,			\
-	       (unsigned) st->field.tv_nsec);				\
-	print_time_t_nsec(st->field.tv_sec,				\
-			  zero_extend_signed_to_ull(st->field.tv_nsec), 1);
+#  define PRINT_FIELD_TIME(field)						\
+	do {									\
+		printf(", %s={tv_sec=%lld, tv_nsec=%u}",			\
+		       #field, (long long) st->field.tv_sec,			\
+		       (unsigned) st->field.tv_nsec);				\
+		print_time_t_nsec(st->field.tv_sec,				\
+				  zero_extend_signed_to_ull(st->field.tv_nsec),	\
+				  1);						\
+	} while (0)
 
 	printf("{stx_mask=");
 	printflags(statx_masks, st->stx_mask, "STATX_???");
@@ -388,24 +396,30 @@ main(void)
 
 # if IS_STATX
 
-#  define INVOKE() \
-	rc = TEST_SYSCALL_INVOKE(sample, st); \
-	PRINT_SYSCALL_HEADER(sample); \
-	if (rc) \
-		printf("%p", st); \
-	else \
-		print_stat(st); \
-	PRINT_SYSCALL_FOOTER(rc)
+#  define INVOKE()					\
+	do {						\
+		rc = TEST_SYSCALL_INVOKE(sample, st);	\
+		PRINT_SYSCALL_HEADER(sample);		\
+		if (rc)					\
+			printf("%p", st);		\
+		else					\
+			print_stat(st);			\
+		PRINT_SYSCALL_FOOTER(rc);		\
+	} while (0)
 
-#  define SET_FLAGS_INVOKE(flags, flags_str) \
-	TEST_SYSCALL_STATX_FLAGS = flags; \
-	TEST_SYSCALL_STATX_FLAGS_STR = flags_str; \
-	INVOKE()
+#  define SET_FLAGS_INVOKE(flags, flags_str)			\
+	do {							\
+		TEST_SYSCALL_STATX_FLAGS = flags;		\
+		TEST_SYSCALL_STATX_FLAGS_STR = flags_str;	\
+		INVOKE();					\
+	} while (0)
 
-#  define SET_MASK_INVOKE(mask, mask_str) \
-	TEST_SYSCALL_STATX_MASK = mask; \
-	TEST_SYSCALL_STATX_MASK_STR = mask_str; \
-	INVOKE()
+#  define SET_MASK_INVOKE(mask, mask_str)			\
+	do {							\
+		TEST_SYSCALL_STATX_MASK = mask;			\
+		TEST_SYSCALL_STATX_MASK_STR = mask_str;		\
+		INVOKE();					\
+	} while (0)
 
 	unsigned old_flags = TEST_SYSCALL_STATX_FLAGS;
 	const char *old_flags_str = TEST_SYSCALL_STATX_FLAGS_STR;
