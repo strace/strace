@@ -453,28 +453,28 @@ static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
 }
 
 extern int
-umoven(struct tcb *tcp, kernel_ulong_t addr, unsigned int len, void *laddr);
+umoven(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 extern int
-umoven_or_printaddr(struct tcb *tcp, kernel_ulong_t addr,
+umoven_or_printaddr(struct tcb *, kernel_ulong_t addr,
 		    unsigned int len, void *laddr);
 #define umove_or_printaddr(pid, addr, objp)	\
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 extern int
-umoven_or_printaddr_ignore_syserror(struct tcb *tcp, kernel_ulong_t addr,
+umoven_or_printaddr_ignore_syserror(struct tcb *, kernel_ulong_t addr,
 				    unsigned int len, void *laddr);
 
 extern int
-umovestr(struct tcb *tcp, kernel_ulong_t addr, unsigned int len, char *laddr);
+umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);
 
 extern int upeek(int pid, unsigned long, kernel_ulong_t *);
 extern int upoke(int pid, unsigned long, kernel_ulong_t);
 
 extern bool
-print_array(struct tcb *tcp,
+print_array(struct tcb *,
 	    kernel_ulong_t start_addr,
 	    size_t nmemb,
 	    void *elem_buf,
@@ -604,7 +604,7 @@ printpath(struct tcb *, kernel_ulong_t addr);
 #define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(long long) * 3 * 2 + sizeof("{tv_sec=-, tv_nsec=}"))
 extern void printfd(struct tcb *, int);
-extern void print_sockaddr(struct tcb *tcp, const void *sa, int len);
+extern void print_sockaddr(struct tcb *, const void *sa, int len);
 extern bool
 print_inet_addr(int af, const void *addr, unsigned int len, const char *var_name);
 extern const char *get_sockaddr_by_inode(struct tcb *, int fd, unsigned long inode);
@@ -643,7 +643,7 @@ extern void
 print_seccomp_fprog(struct tcb *, kernel_ulong_t addr, unsigned short len);
 
 struct strace_stat;
-extern void print_struct_stat(struct tcb *tcp, const struct strace_stat *const st);
+extern void print_struct_stat(struct tcb *, const struct strace_stat *const st);
 
 struct strace_statfs;
 
@@ -701,11 +701,11 @@ extern void tv_div(struct timeval *, const struct timeval *, int);
 
 #ifdef USE_LIBUNWIND
 extern void unwind_init(void);
-extern void unwind_tcb_init(struct tcb *tcp);
-extern void unwind_tcb_fin(struct tcb *tcp);
-extern void unwind_cache_invalidate(struct tcb* tcp);
-extern void unwind_print_stacktrace(struct tcb* tcp);
-extern void unwind_capture_stacktrace(struct tcb* tcp);
+extern void unwind_tcb_init(struct tcb *);
+extern void unwind_tcb_fin(struct tcb *);
+extern void unwind_cache_invalidate(struct tcb *);
+extern void unwind_print_stacktrace(struct tcb *);
+extern void unwind_capture_stacktrace(struct tcb *);
 #endif
 
 static inline void
@@ -758,10 +758,10 @@ typedef struct {
 
 extern void print_timeval32_t(const timeval32_t *);
 extern void printrusage32(struct tcb *, kernel_ulong_t);
-extern const char *sprint_timeval32(struct tcb *tcp, kernel_ulong_t);
-extern void print_timeval32(struct tcb *tcp, kernel_ulong_t);
-extern void print_timeval32_utimes(struct tcb *tcp, kernel_ulong_t);
-extern void print_itimerval32(struct tcb *tcp, kernel_ulong_t);
+extern const char *sprint_timeval32(struct tcb *, kernel_ulong_t addr);
+extern void print_timeval32(struct tcb *, kernel_ulong_t addr);
+extern void print_timeval32_utimes(struct tcb *, kernel_ulong_t addr);
+extern void print_itimerval32(struct tcb *, kernel_ulong_t addr);
 #endif
 
 #ifdef HAVE_STRUCT_USER_DESC
