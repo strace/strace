@@ -48,15 +48,15 @@ test_nlmsg_type(const int fd)
 # ifdef NFNL_MSG_BATCH_BEGIN
 	nlh.nlmsg_type = NFNL_MSG_BATCH_BEGIN;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=NFNL_MSG_BATCH_BEGIN"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}}"
+	printf("sendto(%d, {len=%u, type=NFNL_MSG_BATCH_BEGIN"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = (NFNL_SUBSYS_CTNETLINK << 8) | NFNL_MSG_BATCH_BEGIN;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=NFNL_SUBSYS_CTNETLINK<<8|%#x"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}}"
+	printf("sendto(%d, {len=%u, type=NFNL_SUBSYS_CTNETLINK<<8|%#x"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, NFNL_MSG_BATCH_BEGIN,
 	       (unsigned) sizeof(nlh), sprintrc(rc));
@@ -64,8 +64,8 @@ test_nlmsg_type(const int fd)
 
 	nlh.nlmsg_type = (NFNL_SUBSYS_CTNETLINK << 8);
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=NFNL_SUBSYS_CTNETLINK<<8|0"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}}"
+	printf("sendto(%d, {len=%u, type=NFNL_SUBSYS_CTNETLINK<<8|0"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }

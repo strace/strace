@@ -63,8 +63,8 @@ test_nlmsg_type(const int fd)
 	};
 
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}}"
+	printf("sendto(%d, {len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }
@@ -80,8 +80,8 @@ test_nlmsg_flags(const int fd)
 	};
 
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_REQUEST|NLM_F_DUMP, seq=0, pid=0}}"
+	printf("sendto(%d, {len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_REQUEST|NLM_F_DUMP, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }

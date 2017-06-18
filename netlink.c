@@ -342,19 +342,20 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len)
 {
-	tprints("{");
+	const unsigned int nlmsg_len =
+		nlmsghdr->nlmsg_len > len ? len : nlmsghdr->nlmsg_len;
+
+	if (nlmsg_len > NLMSG_HDRLEN)
+		tprints("{");
 
 	family = print_nlmsghdr(tcp, fd, family, nlmsghdr);
 
-	unsigned int nlmsg_len =
-		nlmsghdr->nlmsg_len > len ? len : nlmsghdr->nlmsg_len;
 	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprints(", ");
 		decode_payload(tcp, fd, family, nlmsghdr, addr + NLMSG_HDRLEN,
 						     nlmsg_len - NLMSG_HDRLEN);
+		tprints("}");
 	}
-
-	tprints("}");
 }
 
 void
