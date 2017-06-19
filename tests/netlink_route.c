@@ -27,10 +27,11 @@
 
 #include "tests.h"
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include "netlink.h"
+#include "test_netlink.h"
 #include <linux/rtnetlink.h>
 
 static void
@@ -92,6 +93,56 @@ test_nlmsg_flags(const int fd)
 	       (unsigned) sizeof(nlh), sprintrc(rc));
 }
 
+static void
+test_rtnl_unspec(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+
+	/* unspecified family only */
+	uint8_t family = 0;
+	TEST_NETLINK_(fd, nlh0,
+		      0xffff, "0xffff /* RTM_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(family), &family, sizeof(family),
+		      printf("{family=AF_UNSPEC}"));
+
+	/* unknown family only */
+	family = 0xff;
+	TEST_NETLINK_(fd, nlh0,
+		      0xffff, "0xffff /* RTM_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(family), &family, sizeof(family),
+		      printf("{family=0xff /* AF_??? */}"));
+
+	/* short read of family */
+	TEST_NETLINK_(fd, nlh0,
+		      0xffff, "0xffff /* RTM_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(family), &family, sizeof(family) - 1,
+		      printf("%p", NLMSG_DATA(TEST_NETLINK_nlh)));
+
+	/* unspecified family and string */
+	char buf[sizeof(family) + 4];
+	family = 0;
+	memcpy(buf, &family, sizeof(family));
+	memcpy(buf + sizeof(family), "1234", 4);
+	TEST_NETLINK_(fd, nlh0,
+		      0xffff, "0xffff /* RTM_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(buf), buf, sizeof(buf),
+		      printf("{family=AF_UNSPEC, \"\\x31\\x32\\x33\\x34\"}"));
+
+	/* unknown family and string */
+	family = 0xfd;
+	memcpy(buf, &family, sizeof(family));
+	TEST_NETLINK_(fd, nlh0,
+		      0xffff, "0xffff /* RTM_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(buf), buf, sizeof(buf),
+		      printf("{family=%#x /* AF_??? */"
+			     ", \"\\x31\\x32\\x33\\x34\"}", family));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -100,6 +151,7 @@ int main(void)
 
 	test_nlmsg_type(fd);
 	test_nlmsg_flags(fd);
+	test_rtnl_unspec(fd);
 
 	printf("+++ exited with 0 +++\n");
 
