@@ -32,7 +32,42 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include "test_netlink.h"
+#include <linux/if_arp.h>
 #include <linux/rtnetlink.h>
+
+#ifdef HAVE_IF_INDEXTONAME
+/* <linux/if.h> used to conflict with <net/if.h> */
+extern unsigned int if_nametoindex(const char *);
+# define IFINDEX_LO	(if_nametoindex("lo"))
+#else
+# define IFINDEX_LO	1
+#endif
+
+#define TEST_NL_ROUTE(fd_, nlh0_, type_, obj_, print_family_, ...)	\
+	do {								\
+		/* family and string */					\
+		TEST_NETLINK((fd_), (nlh0_),				\
+			     type_, NLM_F_REQUEST,			\
+			     sizeof(obj_) - 1,				\
+			     &(obj_), sizeof(obj_) - 1,			\
+			     (print_family_);				\
+			     printf(", ...}"));				\
+									\
+		/* sizeof(obj_) */					\
+		TEST_NETLINK((fd_), (nlh0_),				\
+			     type_, NLM_F_REQUEST,			\
+			     sizeof(obj_), &(obj_), sizeof(obj_),	\
+			     (print_family_);				\
+			      __VA_ARGS__);				\
+									\
+		/* short read of sizeof(obj_) */			\
+		TEST_NETLINK((fd_), (nlh0_),				\
+			     type_, NLM_F_REQUEST,			\
+			     sizeof(obj_), &(obj_), sizeof(obj_) - 1,	\
+			     (print_family_);				\
+			     printf(", %p}",				\
+				    NLMSG_DATA(TEST_NETLINK_nlh) + 1));	\
+	} while (0)
 
 static void
 test_nlmsg_type(const int fd)
@@ -143,6 +178,27 @@ test_rtnl_unspec(const int fd)
 			     ", \"\\x31\\x32\\x33\\x34\"}", family));
 }
 
+static void
+test_rtnl_link(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	const struct ifinfomsg ifinfo = {
+		.ifi_family = AF_UNIX,
+		.ifi_type = ARPHRD_LOOPBACK,
+		.ifi_index = IFINDEX_LO,
+		.ifi_flags = IFF_UP,
+		.ifi_change = 0xfabcdeba
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETLINK, ifinfo,
+		      printf("{ifi_family=AF_UNIX"),
+		      printf(", ifi_type=ARPHRD_LOOPBACK"
+			     ", ifi_index=if_nametoindex(\"lo\")"
+			     ", ifi_flags=IFF_UP");
+		      PRINT_FIELD_X(", ", ifinfo, ifi_change);
+		      printf("}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -152,6 +208,7 @@ int main(void)
 	test_nlmsg_type(fd);
 	test_nlmsg_flags(fd);
 	test_rtnl_unspec(fd);
+	test_rtnl_link(fd);
 
 	printf("+++ exited with 0 +++\n");
 
