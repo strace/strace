@@ -52,6 +52,11 @@
 #  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
 # endif
 
+#define INIT_STRUCT(type, name, ...)			\
+	do {						\
+		type tmp = { __VA_ARGS__ };		\
+		memcpy(name, &tmp, sizeof(tmp));	\
+	} while (0)
 static void
 test_nlmsg_type(const int fd)
 {
@@ -97,11 +102,11 @@ test_odd_family_req(const int fd)
 	/* unspecified family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = 0;
 
@@ -148,11 +153,11 @@ test_odd_family_req(const int fd)
 	/* unspecified family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = 0;
 	memcpy(family + 1, "1234", 4);
@@ -194,11 +199,11 @@ test_odd_family_msg(const int fd)
 	/* unspecified family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = 0;
 
@@ -245,11 +250,11 @@ test_odd_family_msg(const int fd)
 	/* unspecified family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = 0;
 	memcpy(family + 1, "1234", 4);
@@ -292,11 +297,11 @@ test_unix_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_UNIX;
 
@@ -313,11 +318,11 @@ test_unix_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_UNIX;
 	memcpy(family + 1, "1234", 4);
@@ -335,11 +340,11 @@ test_unix_diag_req(const int fd)
 
 	/* unix_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	req = NLMSG_DATA(nlh);
 	*req = (struct unix_diag_req) {
 		.sdiag_family = AF_UNIX,
@@ -350,7 +355,8 @@ test_unix_diag_req(const int fd)
 		.udiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
@@ -358,9 +364,10 @@ test_unix_diag_req(const int fd)
 	       ", udiag_states=1<<TCP_ESTABLISHED|1<<TCP_LISTEN, udiag_ino=%u"
 	       ", udiag_show=UDIAG_SHOW_NAME, udiag_cookie=[%u, %u]}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len,
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
 	       253, 0xfacefeed, 0xdeadbeef, 0xbadc0ded,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	/* short read of unix_diag_req */
 	nlh = nlh0 - (sizeof(*req) - 1);
@@ -391,11 +398,11 @@ test_unix_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_UNIX;
 
@@ -412,11 +419,11 @@ test_unix_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_UNIX;
 	memcpy(family + 1, "1234", 4);
@@ -434,11 +441,11 @@ test_unix_diag_msg(const int fd)
 
 	/* unix_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	msg = NLMSG_DATA(nlh);
 	*msg = (struct unix_diag_msg) {
 		.udiag_family = AF_UNIX,
@@ -448,7 +455,8 @@ test_unix_diag_msg(const int fd)
 		.udiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
@@ -456,9 +464,10 @@ test_unix_diag_msg(const int fd)
 	       ", udiag_state=TCP_FIN_WAIT1"
 	       ", udiag_ino=%u, udiag_cookie=[%u, %u]}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len,
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
 	       0xfacefeed, 0xdeadbeef, 0xbadc0ded,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
 
 	/* short read of unix_diag_msg */
 	nlh = nlh0 - (sizeof(*msg) - 1);
@@ -489,11 +498,11 @@ test_netlink_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_NETLINK;
 
@@ -510,11 +519,11 @@ test_netlink_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_NETLINK;
 	memcpy(family + 1, "1234", 4);
@@ -532,11 +541,11 @@ test_netlink_diag_req(const int fd)
 
 	/* netlink_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	req = NLMSG_DATA(nlh);
 	*req = (struct netlink_diag_req) {
 		.sdiag_family = AF_NETLINK,
@@ -547,27 +556,33 @@ test_netlink_diag_req(const int fd)
 	};
 
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", {sdiag_family=AF_NETLINK, sdiag_protocol=NDIAG_PROTO_ALL"
 	       ", ndiag_ino=%u, ndiag_show=NDIAG_SHOW_MEMINFO"
 	       ", ndiag_cookie=[%u, %u]}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xfacefeed, 0xdeadbeef,
-	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       0xfacefeed, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	req->sdiag_protocol = NETLINK_ROUTE;
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", {sdiag_family=AF_NETLINK, sdiag_protocol=NETLINK_ROUTE"
 	       ", ndiag_ino=%u, ndiag_show=NDIAG_SHOW_MEMINFO"
 	       ", ndiag_cookie=[%u, %u]}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xfacefeed, 0xdeadbeef,
-	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       0xfacefeed, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	/* short read of netlink_diag_req */
 	nlh = nlh0 - (sizeof(*req) - 1);
@@ -599,11 +614,11 @@ test_netlink_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_NETLINK;
 
@@ -620,11 +635,11 @@ test_netlink_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_NETLINK;
 	memcpy(family + 1, "1234", 4);
@@ -642,11 +657,11 @@ test_netlink_diag_msg(const int fd)
 
 	/* netlink_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	msg = NLMSG_DATA(nlh);
 	*msg = (struct netlink_diag_msg) {
 		.ndiag_family = AF_NETLINK,
@@ -660,7 +675,8 @@ test_netlink_diag_msg(const int fd)
 		.ndiag_cookie = { 0xbadc0ded, 0xdeadbeef }
 	};
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {ndiag_family=AF_NETLINK"
@@ -668,9 +684,11 @@ test_netlink_diag_msg(const int fd)
 	       ", ndiag_state=NETLINK_CONNECTED, ndiag_portid=%u"
 	       ", ndiag_dst_portid=%u, ndiag_dst_group=%u, ndiag_ino=%u"
 	       ", ndiag_cookie=[%u, %u]}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xbadc0ded, 0xdeadbeef, 0xfacefeed,
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       0xbadc0ded, 0xdeadbeef, 0xfacefeed,
 	       0xdaeefacd, 0xbadc0ded, 0xdeadbeef,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
 
 	/* short read of netlink_diag_msg */
 	nlh = nlh0 - (sizeof(*msg) - 1);
@@ -701,11 +719,11 @@ test_packet_diag_req(const int fd)
 
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_PACKET;
 
@@ -721,11 +739,11 @@ test_packet_diag_req(const int fd)
 
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_PACKET;
 	memcpy(family + 1, "1234", 4);
@@ -743,11 +761,11 @@ test_packet_diag_req(const int fd)
 
 	/* packet_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 	req = NLMSG_DATA(nlh);
 	*req = (struct packet_diag_req) {
 		.sdiag_family = AF_PACKET,
@@ -757,7 +775,8 @@ test_packet_diag_req(const int fd)
 		.pdiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
@@ -765,8 +784,10 @@ test_packet_diag_req(const int fd)
 	       ", pdiag_ino=%u, pdiag_show=PACKET_SHOW_INFO"
 	       ", pdiag_cookie=[%u, %u]}}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xfacefeed, 0xdeadbeef, 0xbadc0ded,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       0xfacefeed, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	/* short read of packet_diag_req */
 	nlh = nlh0 - (sizeof(*req) - 1);
@@ -796,11 +817,11 @@ test_packet_diag_msg(const int fd)
 
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_PACKET;
 
@@ -816,11 +837,11 @@ test_packet_diag_msg(const int fd)
 
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	family = NLMSG_DATA(nlh);
 	*family = AF_PACKET;
 	memcpy(family + 1, "1234", 4);
@@ -838,11 +859,11 @@ test_packet_diag_msg(const int fd)
 
 	/* packet_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 	msg = NLMSG_DATA(nlh);
 	*msg = (struct packet_diag_msg) {
 		.pdiag_family = AF_PACKET,
@@ -852,15 +873,18 @@ test_packet_diag_msg(const int fd)
 		.pdiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
 	       ", {pdiag_family=AF_PACKET, pdiag_type=SOCK_STREAM"
 	       ", pdiag_num=%u, pdiag_ino=%u, pdiag_cookie=[%u, %u]}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xbadc, 0xfacefeed,
-	       0xdeadbeef, 0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       0xbadc, 0xfacefeed, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
 
 	/* short read of packet_diag_msg */
 	nlh = nlh0 - (sizeof(*msg) - 1);
@@ -891,11 +915,11 @@ test_inet_diag_sockid(const int fd)
 
 	nlh = nlh0 - sizeof(*req);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	req = NLMSG_DATA(nlh);
 	*req = (struct inet_diag_req_v2) {
@@ -916,7 +940,8 @@ test_inet_diag_sockid(const int fd)
 	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
 		perror_msg_and_skip("sendto");
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
@@ -926,9 +951,11 @@ test_inet_diag_sockid(const int fd)
 	       ", idiag_dport=htons(%u), inet_pton(AF_INET, \"%s\", &idiag_src)"
 	       ", inet_pton(AF_INET, \"%s\", &idiag_dst), idiag_if=%u"
 	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, ntohs(0xfacd), ntohs(0xdead),
-	       address, address, 0xadcdfafc, 0xdeadbeef,
-	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       ntohs(0xfacd), ntohs(0xdead), address, address,
+	       0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	req->sdiag_family = AF_INET6;
 	if (!inet_pton(AF_INET6, address6, &req->id.idiag_src))
@@ -936,7 +963,8 @@ test_inet_diag_sockid(const int fd)
 	if (!inet_pton(AF_INET6, address6, &req->id.idiag_dst))
 		perror_msg_and_skip("sendto");
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
@@ -946,9 +974,11 @@ test_inet_diag_sockid(const int fd)
 	       ", idiag_dport=htons(%u), inet_pton(AF_INET6, \"%s\", &idiag_src)"
 	       ", inet_pton(AF_INET6, \"%s\", &idiag_dst), idiag_if=%u"
 	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, ntohs(0xfacd), ntohs(0xdead),
-	       address6, address6, 0xadcdfafc, 0xdeadbeef,
-	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       ntohs(0xfacd), ntohs(0xdead), address6, address6,
+	       0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 }
 
 static void
@@ -964,11 +994,11 @@ test_inet_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = TCPDIAG_GETSOCK,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_INET;
@@ -986,11 +1016,11 @@ test_inet_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = TCPDIAG_GETSOCK,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_INET;
@@ -1009,11 +1039,11 @@ test_inet_diag_req(const int fd)
 
 	/* inet_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = TCPDIAG_GETSOCK,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	req = NLMSG_DATA(nlh);
 	*req = (struct inet_diag_req) {
@@ -1036,7 +1066,8 @@ test_inet_diag_req(const int fd)
 	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
 		perror_msg_and_skip("sendto");
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=TCPDIAG_GETSOCK"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
@@ -1048,10 +1079,11 @@ test_inet_diag_req(const int fd)
 	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
 	       ", idiag_states=1<<TCP_LAST_ACK, idiag_dbs=%u}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xde, 0xba, ntohs(0xdead),
-	       ntohs(0xadcd), address, address, 0xadcdfafc,
-	       0xdeadbeef, 0xbadc0ded, 0xfacefeed,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       0xde, 0xba, ntohs(0xdead), ntohs(0xadcd), address, address,
+	       0xadcdfafc, 0xdeadbeef, 0xbadc0ded, 0xfacefeed,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	/* short read of inet_diag_req */
 	nlh = nlh0 - (sizeof(*req) - 1);
@@ -1084,11 +1116,11 @@ test_inet_diag_req_v2(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_INET;
@@ -1105,11 +1137,11 @@ test_inet_diag_req_v2(const int fd)
 
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_INET;
@@ -1129,11 +1161,11 @@ test_inet_diag_req_v2(const int fd)
 	/* inet_diag_req_v2 */
 	nlh = nlh0 - sizeof(*req);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	req = NLMSG_DATA(nlh);
 	*req = (struct inet_diag_req_v2) {
@@ -1154,7 +1186,8 @@ test_inet_diag_req_v2(const int fd)
 	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
 		perror_msg_and_skip("sendto");
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
@@ -1164,9 +1197,11 @@ test_inet_diag_req_v2(const int fd)
 	       ", idiag_dport=htons(%u), inet_pton(AF_INET, \"%s\", &idiag_src)"
 	       ", inet_pton(AF_INET, \"%s\", &idiag_dst), idiag_if=%u"
 	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, ntohs(0xfacd), ntohs(0xdead),
-	       address, address, 0xadcdfafc, 0xdeadbeef,
-	       0xbadc0ded, nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       ntohs(0xfacd), ntohs(0xdead), address, address,
+	       0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	/* short read of inet_diag_req_v2 */
 	nlh = nlh0 - (sizeof(*req) - 1);
@@ -1198,11 +1233,11 @@ test_inet_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_INET;
@@ -1220,11 +1255,11 @@ test_inet_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_INET;
@@ -1243,11 +1278,11 @@ test_inet_diag_msg(const int fd)
 
 	/* inet_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 
 	msg = NLMSG_DATA(nlh);
 	*msg = (struct inet_diag_msg) {
@@ -1273,7 +1308,8 @@ test_inet_diag_msg(const int fd)
 	if (!inet_pton(AF_INET, address, &msg->id.idiag_dst))
 		perror_msg_and_skip("sendto");
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
@@ -1286,10 +1322,12 @@ test_inet_diag_msg(const int fd)
 	       ", idiag_expires=%u, idiag_rqueue=%u, idiag_wqueue=%u"
 	       ", idiag_uid=%u, idiag_inode=%u}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xfa, 0xde, ntohs(0xfacf), ntohs(0xdead),
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       0xfa, 0xde, ntohs(0xfacf), ntohs(0xdead),
 	       address, address, 0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
 	       0xfacefeed, 0xdeadbeef, 0xadcdfafc, 0xdecefaeb, 0xbadc0ded,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
 
 	/* short read of inet_diag_msg */
 	nlh = nlh0 - (sizeof(*msg) - 1);
@@ -1322,11 +1360,11 @@ test_smc_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_SMC;
@@ -1344,11 +1382,11 @@ test_smc_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_SMC;
@@ -1367,11 +1405,11 @@ test_smc_diag_req(const int fd)
 
 	/* smc_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_REQUEST,
-	};
+		.nlmsg_flags = NLM_F_REQUEST
+	);
 
 	req = NLMSG_DATA(nlh);
 	*req = (struct smc_diag_req) {
@@ -1390,7 +1428,8 @@ test_smc_diag_req(const int fd)
 	if (!inet_pton(AF_INET, address, &req->id.idiag_dst))
 		perror_msg_and_skip("sendto");
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*req), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}, {diag_family=AF_SMC"
@@ -1400,9 +1439,11 @@ test_smc_diag_req(const int fd)
 	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
 	       ", idiag_if=%u, idiag_cookie=[%u, %u]}}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, htons(0xdead), htons(0xadcd),
-	       address, address, 0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       htons(0xdead), htons(0xadcd), address, address,
+	       0xadcdfafc, 0xdeadbeef, 0xbadc0ded,
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*req),
+	       sprintrc(rc));
 
 	/* short read of smc_diag_req */
 	nlh = nlh0 - (sizeof(*req) - 1);
@@ -1434,11 +1475,11 @@ test_smc_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_SMC;
@@ -1456,11 +1497,11 @@ test_smc_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
 	/* beware of unaligned access to nlh members */
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 
 	family = NLMSG_DATA(nlh);
 	*family = AF_SMC;
@@ -1479,11 +1520,11 @@ test_smc_diag_msg(const int fd)
 
 	/* smc_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	*nlh = (struct nlmsghdr) {
+	INIT_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-		.nlmsg_flags = NLM_F_DUMP,
-	};
+		.nlmsg_flags = NLM_F_DUMP
+	);
 
 	msg = NLMSG_DATA(nlh);
 	*msg = (struct smc_diag_msg) {
@@ -1506,7 +1547,8 @@ test_smc_diag_msg(const int fd)
 	if (!inet_pton(AF_INET, address, &msg->id.idiag_dst))
 		perror_msg_and_skip("sendto");
 
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rc = sendto(fd, nlh, NLMSG_HDRLEN + sizeof(*msg), MSG_DONTWAIT,
+		    NULL, 0);
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {diag_family=AF_SMC"
@@ -1517,10 +1559,11 @@ test_smc_diag_msg(const int fd)
 	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
 	       ", diag_uid=%u, diag_inode=%u}}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, 0xde, 0xba,
-	       htons(0xdead), htons(0xadcd), address, address,
+	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       0xde, 0xba, htons(0xdead), htons(0xadcd), address, address,
 	       0xadcdfafc, 0xdeadbeef, 0xbadc0ded, 0xadcdfafc, 0xbadc0ded,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       NLMSG_HDRLEN + (unsigned int) sizeof(*msg),
+	       sprintrc(rc));
 
 	/* short read of smc_diag_msg */
 	nlh = nlh0 - (sizeof(*msg) - 1);
