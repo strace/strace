@@ -243,4 +243,14 @@ f8ill_ptr_to_kulong(const void *const ptr)
 # define ARG_STR(_arg) (_arg), #_arg
 # define ARG_ULL_STR(_arg) _arg##ULL, #_arg
 
+/*
+ * Assign an object of type DEST_TYPE at address DEST_ADDR
+ * using memcpy to avoid potential unaligned access.
+ */
+#define SET_STRUCT(DEST_TYPE, DEST_ADDR, ...)						\
+	do {										\
+		DEST_TYPE dest_type_tmp_var = { __VA_ARGS__ };				\
+		memcpy(DEST_ADDR, &dest_type_tmp_var, sizeof(dest_type_tmp_var));	\
+	} while (0)
+
 #endif /* !STRACE_TESTS_H */

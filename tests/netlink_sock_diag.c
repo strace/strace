@@ -52,11 +52,6 @@
 #  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
 # endif
 
-#define INIT_STRUCT(type, name, ...)			\
-	do {						\
-		type tmp = { __VA_ARGS__ };		\
-		memcpy(name, &tmp, sizeof(tmp));	\
-	} while (0)
 static void
 test_nlmsg_type(const int fd)
 {
@@ -102,7 +97,7 @@ test_odd_family_req(const int fd)
 	/* unspecified family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -153,7 +148,7 @@ test_odd_family_req(const int fd)
 	/* unspecified family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -199,7 +194,7 @@ test_odd_family_msg(const int fd)
 	/* unspecified family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -250,7 +245,7 @@ test_odd_family_msg(const int fd)
 	/* unspecified family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -297,7 +292,7 @@ test_unix_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -318,7 +313,7 @@ test_unix_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -340,7 +335,7 @@ test_unix_diag_req(const int fd)
 
 	/* unix_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -398,7 +393,7 @@ test_unix_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -419,7 +414,7 @@ test_unix_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -441,7 +436,7 @@ test_unix_diag_msg(const int fd)
 
 	/* unix_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -498,7 +493,7 @@ test_netlink_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -519,7 +514,7 @@ test_netlink_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -541,7 +536,7 @@ test_netlink_diag_req(const int fd)
 
 	/* netlink_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -614,7 +609,7 @@ test_netlink_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -635,7 +630,7 @@ test_netlink_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -657,7 +652,7 @@ test_netlink_diag_msg(const int fd)
 
 	/* netlink_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -719,7 +714,7 @@ test_packet_diag_req(const int fd)
 
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -739,7 +734,7 @@ test_packet_diag_req(const int fd)
 
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -761,7 +756,7 @@ test_packet_diag_req(const int fd)
 
 	/* packet_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -817,7 +812,7 @@ test_packet_diag_msg(const int fd)
 
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -837,7 +832,7 @@ test_packet_diag_msg(const int fd)
 
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -859,7 +854,7 @@ test_packet_diag_msg(const int fd)
 
 	/* packet_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -915,7 +910,7 @@ test_inet_diag_sockid(const int fd)
 
 	nlh = nlh0 - sizeof(*req);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -994,7 +989,7 @@ test_inet_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = TCPDIAG_GETSOCK,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1016,7 +1011,7 @@ test_inet_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - (sizeof(*family) + 4);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = TCPDIAG_GETSOCK,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1039,7 +1034,7 @@ test_inet_diag_req(const int fd)
 
 	/* inet_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = TCPDIAG_GETSOCK,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1116,7 +1111,7 @@ test_inet_diag_req_v2(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1137,7 +1132,7 @@ test_inet_diag_req_v2(const int fd)
 
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1161,7 +1156,7 @@ test_inet_diag_req_v2(const int fd)
 	/* inet_diag_req_v2 */
 	nlh = nlh0 - sizeof(*req);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1233,7 +1228,7 @@ test_inet_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -1255,7 +1250,7 @@ test_inet_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -1278,7 +1273,7 @@ test_inet_diag_msg(const int fd)
 
 	/* inet_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -1360,7 +1355,7 @@ test_smc_diag_req(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1382,7 +1377,7 @@ test_smc_diag_req(const int fd)
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1405,7 +1400,7 @@ test_smc_diag_req(const int fd)
 
 	/* smc_diag_req */
 	nlh = nlh0 - sizeof(*req);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*req),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_REQUEST
@@ -1475,7 +1470,7 @@ test_smc_diag_msg(const int fd)
 	/* family only */
 	nlh = nlh0 - sizeof(*family);
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -1497,7 +1492,7 @@ test_smc_diag_msg(const int fd)
 	/* family and string */
 	nlh = nlh0 - sizeof(*family) - 4;
 	/* beware of unaligned access to nlh members */
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*family) + 4,
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
@@ -1520,7 +1515,7 @@ test_smc_diag_msg(const int fd)
 
 	/* smc_diag_msg */
 	nlh = nlh0 - sizeof(*msg);
-	INIT_STRUCT(struct nlmsghdr, nlh,
+	SET_STRUCT(struct nlmsghdr, nlh,
 		.nlmsg_len = NLMSG_HDRLEN + sizeof(*msg),
 		.nlmsg_type = SOCK_DIAG_BY_FAMILY,
 		.nlmsg_flags = NLM_F_DUMP
