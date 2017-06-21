@@ -28,11 +28,10 @@
  */
 
 #include "defs.h"
+#include "netlink.h"
 
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <linux/inet_diag.h>
-#include <linux/netlink.h>
 #include <linux/netlink_diag.h>
 #include <linux/packet_diag.h>
 #ifdef AF_SMC

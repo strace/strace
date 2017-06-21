@@ -28,6 +28,7 @@
  */
 
 #include "tests.h"
+#include "netlink.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -37,7 +38,6 @@
 #include <netinet/tcp.h>
 #include <linux/if_ether.h>
 #include <linux/inet_diag.h>
-#include <linux/netlink.h>
 #include <linux/netlink_diag.h>
 #include <linux/packet_diag.h>
 #ifdef AF_SMC

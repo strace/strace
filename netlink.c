@@ -28,9 +28,8 @@
  */
 
 #include "defs.h"
-#include <sys/socket.h>
+#include "netlink.h"
 #include <linux/audit.h>
-#include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
 #include "xlat/netlink_flags.h"
@@ -45,9 +44,6 @@
 #include "xlat/nl_selinux_types.h"
 #include "xlat/nl_sock_diag_types.h"
 #include "xlat/nl_xfrm_types.h"
-
-#undef NLMSG_HDRLEN
-#define NLMSG_HDRLEN NLMSG_ALIGN(sizeof(struct nlmsghdr))
 
 /*
  * Fetch a struct nlmsghdr from the given address.

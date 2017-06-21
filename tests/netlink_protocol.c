@@ -32,13 +32,13 @@
 
 #ifdef HAVE_SYS_XATTR_H
 
+# include "netlink.h"
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
 # include <sys/xattr.h>
 # include <netinet/in.h>
-# include <linux/netlink.h>
 # include <linux/sock_diag.h>
 # include <linux/netlink_diag.h>
 
