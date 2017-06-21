@@ -112,6 +112,16 @@ test_nlattr(const int fd)
 	       ", nla_type=UNIX_DIAG_NAME}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
+	/* print one struct nlattr with nla_len out of msg_len bounds */
+	nla->nla_len += 8;
+	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
+	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
+	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
+	       ", nla_type=UNIX_DIAG_NAME}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
+
 	/* print one struct nlattr and some data */
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN + 4;
 	msg = tail_memdup(&c_msg, msg_len);
@@ -192,6 +202,16 @@ test_nlattr(const int fd)
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, nla->nla_len,
 	       msg_len, sprintrc(rc));
+
+	/* print first nlattr only when its nla_len is less than NLA_HDRLEN */
+	nla->nla_len = NLA_HDRLEN - 1;
+	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
+	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
+	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
+	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
+	       ", nla_type=UNIX_DIAG_NAME}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	/* abbreviated output */
 #define DEFAULT_STRLEN 32
