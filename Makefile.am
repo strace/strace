@@ -175,6 +175,8 @@ strace_SOURCES =	\
 	netlink.c       \
 	netlink.h	\
 	netlink_sock_diag.c \
+	nlattr.c	\
+	nlattr.h	\
 	nsfs.c          \
 	nsfs.h          \
 	nsig.h		\

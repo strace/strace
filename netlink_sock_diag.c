@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include "netlink.h"
+#include "nlattr.h"
 
 #include <arpa/inet.h>
 #include <linux/inet_diag.h>
@@ -54,6 +55,7 @@
 # include "xlat/smc_states.h"
 #endif
 
+#include "xlat/unix_diag_attrs.h"
 #include "xlat/unix_diag_show.h"
 
 static void
@@ -112,7 +114,8 @@ decode_unix_diag_msg(struct tcb *const tcp,
 		     const kernel_ulong_t len)
 {
 	struct unix_diag_msg msg = { .udiag_family = family };
-	const size_t offset = sizeof(msg.udiag_family);
+	size_t offset = sizeof(msg.udiag_family);
+	bool decode_nla = false;
 
 	tprints("{udiag_family=");
 	printxval(addrfams, msg.udiag_family, "AF_???");
@@ -130,10 +133,18 @@ decode_unix_diag_msg(struct tcb *const tcp,
 				", udiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
 				msg.udiag_ino,
 				msg.udiag_cookie[0], msg.udiag_cookie[1]);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(msg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      unix_diag_attrs, "UNIX_DIAG_???");
+	}
 }
 
 static void
