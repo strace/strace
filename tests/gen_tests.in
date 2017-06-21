@@ -192,6 +192,7 @@ netlink_route	+netlink_sock_diag.test
 netlink_selinux	+netlink_sock_diag.test
 netlink_xfrm	+netlink_sock_diag.test
 newfstatat	-a32 -v -P stat.sample -P /dev/full
+nlattr		+netlink_sock_diag.test
 old_mmap	-a11 -e trace=mmap
 oldfstat	-a18 -v -P stat.sample
 oldlstat	-a32 -v -P stat.sample -P /dev/full

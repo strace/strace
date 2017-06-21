@@ -209,6 +209,7 @@ netlink_sock_diag
 netlink_unix_diag
 netlink_xfrm
 newfstatat
+nlattr
 nsyscalls
 old_mmap
 oldfstat
