@@ -26,6 +26,7 @@ struct netlink_diag_msg {
 #define NDIAG_SHOW_MEMINFO		0x00000001
 #define NDIAG_SHOW_GROUPS		0x00000002
 #define NDIAG_SHOW_RING_CFG		0x00000004 /* deprecated since 4.6 */
+#define NDIAG_SHOW_FLAGS		0x00000008
 #define NDIAG_PROTO_ALL			((uint8_t) ~0)
 
 #endif /* !STRACE_LINUX_NETLINK_DIAG_H */
