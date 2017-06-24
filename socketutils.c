@@ -31,7 +31,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <linux/netlink.h>
+#include "netlink.h"
 #include <linux/sock_diag.h>
 #include <linux/inet_diag.h>
 #include <linux/unix_diag.h>
@@ -44,10 +44,6 @@
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
 # define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
-#endif
-
-#ifndef NETLINK_SOCK_DIAG
-# define NETLINK_SOCK_DIAG 4
 #endif
 
 typedef struct {

@@ -32,6 +32,10 @@
 #include <sys/socket.h>
 #include <linux/netlink.h>
 
+#ifndef NETLINK_SOCK_DIAG
+# define NETLINK_SOCK_DIAG 4
+#endif
+
 #undef NLMSG_HDRLEN
 #define NLMSG_HDRLEN ((unsigned int) NLMSG_ALIGN(sizeof(struct nlmsghdr)))
 
