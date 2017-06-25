@@ -37,11 +37,11 @@
 #include <sys/un.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include "netlink.h"
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <linux/if_packet.h>
 #include <linux/ipx.h>
-#include <linux/netlink.h>
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>
 # include <bluetooth/hci.h>

@@ -32,19 +32,15 @@
 
 #ifdef HAVE_SYS_XATTR_H
 
-# include "netlink.h"
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
 # include <sys/xattr.h>
 # include <netinet/in.h>
+# include "netlink.h"
 # include <linux/sock_diag.h>
 # include <linux/netlink_diag.h>
-
-# if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
-#  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
-# endif
 
 static void
 send_query(const int fd)

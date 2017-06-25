@@ -33,8 +33,8 @@
 # include <string.h>
 # include <unistd.h>
 # include <sys/socket.h>
+# include "netlink.h"
 # include <linux/netfilter/nfnetlink.h>
-# include <linux/netlink.h>
 
 static void
 test_nlmsg_type(const int fd)

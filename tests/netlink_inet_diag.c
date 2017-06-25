@@ -32,7 +32,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
-#include <linux/netlink.h>
+#include "netlink.h"
 #include <linux/sock_diag.h>
 #include <linux/inet_diag.h>
 

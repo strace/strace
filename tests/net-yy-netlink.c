@@ -36,13 +36,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <linux/netlink.h>
+#include "netlink.h"
 #include <linux/sock_diag.h>
 #include <linux/netlink_diag.h>
-
-#if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
-# define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
-#endif
 
 int
 main(void)

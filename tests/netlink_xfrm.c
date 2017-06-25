@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <linux/netlink.h>
+#include "netlink.h"
 #include <linux/xfrm.h>
 
 static void

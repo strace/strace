@@ -27,7 +27,7 @@
 
 #include "tests.h"
 #include <sys/socket.h>
-#include <linux/netlink.h>
+#include "netlink.h"
 
 int
 create_nl_socket_ext(const int proto, const char *const name)

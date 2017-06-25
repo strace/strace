@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <linux/audit.h>
-#include <linux/netlink.h>
+#include "netlink.h"
 
 static void
 test_nlmsg_type(const int fd)

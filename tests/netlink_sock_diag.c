@@ -28,7 +28,6 @@
  */
 
 #include "tests.h"
-#include "netlink.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -36,6 +35,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
+#include "netlink.h"
 #include <linux/if_ether.h>
 #include <linux/inet_diag.h>
 #include <linux/netlink_diag.h>
@@ -47,10 +47,6 @@
 #include <linux/unix_diag.h>
 
 #define SMC_ACTIVE 1
-
-# if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
-#  define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
-# endif
 
 static void
 test_nlmsg_type(const int fd)

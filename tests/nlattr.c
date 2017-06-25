@@ -29,7 +29,6 @@
  */
 
 #include "tests.h"
-#include "netlink.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -37,13 +36,10 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/tcp.h>
+#include "netlink.h"
 #include <linux/rtnetlink.h>
 #include <linux/sock_diag.h>
 #include <linux/unix_diag.h>
-
-#if !defined NETLINK_SOCK_DIAG && defined NETLINK_INET_DIAG
-# define NETLINK_SOCK_DIAG NETLINK_INET_DIAG
-#endif
 
 static void
 test_nlattr(const int fd)
