@@ -127,6 +127,7 @@ check_h 'piping the output and -ff are mutually exclusive' -o '!' -ff true
 check_h "invalid -a argument: '-42'" -a -42
 check_h "invalid -O argument: '-42'" -O -42
 check_h "invalid -s argument: '-42'" -s -42
+check_h "invalid -s argument: '1073741824'" -s 1073741824
 check_h "invalid -I argument: '5'" -I 5
 
 if [ -n "${UID-}" ]; then

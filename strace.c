@@ -1733,7 +1733,7 @@ init(int argc, char *argv[])
 			break;
 		case 's':
 			i = string_to_uint(optarg);
-			if (i < 0)
+			if (i < 0 || (unsigned int) i > -1U / 4)
 				error_opt_arg(c, optarg);
 			max_strlen = i;
 			break;

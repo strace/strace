@@ -759,10 +759,13 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 	/* Allocate static buffers if they are not allocated yet. */
 	if (!str) {
-		unsigned int outstr_size = 4 * max_strlen + /*for quotes and NUL:*/ 3;
+		const unsigned int outstr_size =
+			4 * max_strlen + /* for quotes and NUL */ 3;
+		/*
+		 * We can assume that outstr_size / 4 == max_strlen
+		 * since we have a guarantee that max_strlen <= -1U / 4.
+		 */
 
-		if (outstr_size / 4 != max_strlen)
-			die_out_of_memory();
 		str = xmalloc(max_strlen + 1);
 		outstr = xmalloc(outstr_size);
 	}
