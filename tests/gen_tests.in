@@ -197,6 +197,7 @@ nlattr		+netlink_sock_diag.test
 nlattr_inet_diag_msg		+netlink_sock_diag.test
 nlattr_netlink_diag_msg		+netlink_sock_diag.test
 nlattr_packet_diag_msg		+netlink_sock_diag-v.sh
+nlattr_smc_diag_msg		+netlink_sock_diag.test
 nlattr_unix_diag_msg		+netlink_sock_diag.test
 old_mmap	-a11 -e trace=mmap
 oldfstat	-a18 -v -P stat.sample
