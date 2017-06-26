@@ -317,6 +317,7 @@ EXTRA_DIST = \
 	lstatx.c \
 	match.awk \
 	net.expected \
+	netlink_sock_diag-v.sh \
 	oldselect.expected \
 	pipe.expected \
 	process_vm_readv_writev.c \

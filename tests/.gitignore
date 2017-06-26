@@ -212,6 +212,7 @@ newfstatat
 nlattr
 nlattr_inet_diag_msg
 nlattr_netlink_diag_msg
+nlattr_packet_diag_msg
 nlattr_unix_diag_msg
 nsyscalls
 old_mmap
