@@ -113,7 +113,7 @@ unwind_tcb_init(struct tcb *tcp)
 
 	tcp->libunwind_ui = _UPT_create(tcp->pid);
 	if (!tcp->libunwind_ui)
-		die_out_of_memory();
+		perror_msg_and_die("_UPT_create");
 
 	tcp->queue = xmalloc(sizeof(*tcp->queue));
 	tcp->queue->head = NULL;

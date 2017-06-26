@@ -566,7 +566,7 @@ strace_popen(const char *command)
 	swap_uid();
 	fp = fdopen(fds[1], "w");
 	if (!fp)
-		die_out_of_memory();
+		perror_msg_and_die("fdopen");
 	return fp;
 }
 
@@ -1750,7 +1750,7 @@ init(int argc, char *argv[])
 #endif
 		case 'E':
 			if (putenv(optarg) < 0)
-				die_out_of_memory();
+				perror_msg_and_die("putenv");
 			break;
 		case 'I':
 			opt_intr = string_to_uint_upto(optarg, NUM_INTR_OPTS - 1);

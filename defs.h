@@ -393,7 +393,6 @@ void error_msg_and_help(const char *fmt, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 void perror_msg_and_die(const char *fmt, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
-void die_out_of_memory(void) ATTRIBUTE_NORETURN;
 
 void *xmalloc(size_t size) ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
 void *xcalloc(size_t nmemb, size_t size)

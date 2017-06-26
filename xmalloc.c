@@ -27,7 +27,7 @@
 
 #include "defs.h"
 
-void die_out_of_memory(void)
+static void die_out_of_memory(void)
 {
 	static bool recursed;
 
