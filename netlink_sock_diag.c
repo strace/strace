@@ -55,6 +55,7 @@
 #include "xlat/packet_diag_show.h"
 
 #ifdef AF_SMC
+# include "xlat/smc_diag_attrs.h"
 # include "xlat/smc_diag_extended_flags.h"
 # include "xlat/smc_states.h"
 #endif
@@ -500,7 +501,8 @@ decode_smc_diag_msg(struct tcb *const tcp,
 		    const kernel_ulong_t len)
 {
 	struct smc_diag_msg msg = { .diag_family = family };
-	const size_t offset = sizeof(msg.diag_family);
+	size_t offset = sizeof(msg.diag_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", msg, diag_family, addrfams, "AF_???");
 	tprints(", ");
@@ -520,11 +522,18 @@ decode_smc_diag_msg(struct tcb *const tcp,
 			print_inet_diag_sockid(&msg.id, AF_INET);
 			PRINT_FIELD_U(", ", msg, diag_uid);
 			PRINT_FIELD_U(", ", msg, diag_inode);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
 
+	offset = NLA_ALIGN(sizeof(msg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      smc_diag_attrs, "SMC_DIAG_???");
+	}
 }
 #endif
 
