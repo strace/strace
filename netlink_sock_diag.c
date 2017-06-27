@@ -49,6 +49,7 @@
 #include "xlat/netlink_diag_show.h"
 #include "xlat/netlink_states.h"
 
+#include "xlat/packet_diag_attrs.h"
 #include "xlat/packet_diag_show.h"
 
 #ifdef AF_SMC
@@ -271,7 +272,8 @@ decode_packet_diag_msg(struct tcb *const tcp,
 		       const kernel_ulong_t len)
 {
 	struct packet_diag_msg msg = { .pdiag_family = family };
-	const size_t offset = sizeof(msg.pdiag_family);
+	size_t offset = sizeof(msg.pdiag_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", msg, pdiag_family, addrfams, "AF_???");
 	tprints(", ");
@@ -284,10 +286,18 @@ decode_packet_diag_msg(struct tcb *const tcp,
 			PRINT_FIELD_U(", ", msg, pdiag_num);
 			PRINT_FIELD_U(", ", msg, pdiag_ino);
 			PRINT_FIELD_COOKIE(", ", msg, pdiag_cookie);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLA_ALIGN(sizeof(msg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      packet_diag_attrs, "PACKET_DIAG_???");
+	}
 }
 
 static void
