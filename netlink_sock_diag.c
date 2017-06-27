@@ -40,7 +40,9 @@
 #endif
 #include <linux/unix_diag.h>
 
+#include "xlat/inet_diag_attrs.h"
 #include "xlat/inet_diag_extended_flags.h"
+#include "xlat/inet_diag_req_attrs.h"
 
 #include "xlat/tcp_states.h"
 #include "xlat/tcp_state_flags.h"
@@ -327,7 +329,8 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 			    const kernel_ulong_t len)
 {
 	struct inet_diag_req req = { .idiag_family = family };
-	const size_t offset = sizeof(req.idiag_family);
+	size_t offset = sizeof(req.idiag_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", req, idiag_family, addrfams, "AF_???");
 	tprints(", ");
@@ -345,10 +348,18 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 			PRINT_FIELD_FLAGS(", ", req, idiag_states,
 					  tcp_state_flags, "1<<TCP_???");
 			PRINT_FIELD_U(", ", req, idiag_dbs);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLA_ALIGN(sizeof(req));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      inet_diag_req_attrs, "INET_DIAG_REQ_???");
+	}
 }
 
 static void
@@ -359,7 +370,8 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 			const kernel_ulong_t len)
 {
 	struct inet_diag_req_v2 req = { .sdiag_family = family };
-	const size_t offset = sizeof(req.sdiag_family);
+	size_t offset = sizeof(req.sdiag_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
@@ -376,10 +388,18 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 					  tcp_state_flags, "1<<TCP_???");
 			tprints(", id=");
 			print_inet_diag_sockid(&req.id, req.sdiag_family);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLA_ALIGN(sizeof(req));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      inet_diag_req_attrs, "INET_DIAG_REQ_???");
+	}
 }
 
 static void
@@ -406,7 +426,8 @@ decode_inet_diag_msg(struct tcb *const tcp,
 		     const kernel_ulong_t len)
 {
 	struct inet_diag_msg msg = { .idiag_family = family };
-	const size_t offset = sizeof(msg.idiag_family);
+	size_t offset = sizeof(msg.idiag_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", msg, idiag_family, addrfams, "AF_???");
 	tprints(", ");
@@ -425,10 +446,18 @@ decode_inet_diag_msg(struct tcb *const tcp,
 			PRINT_FIELD_U(", ", msg, idiag_wqueue);
 			PRINT_FIELD_U(", ", msg, idiag_uid);
 			PRINT_FIELD_U(", ", msg, idiag_inode);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLA_ALIGN(sizeof(msg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      inet_diag_attrs, "INET_DIAG_???");
+	}
 }
 
 #ifdef AF_SMC

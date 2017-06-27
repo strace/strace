@@ -34,6 +34,11 @@ struct inet_diag_req_v2 {
 	struct inet_diag_sockid id;
 };
 
+enum {
+	INET_DIAG_REQ_NONE,
+	INET_DIAG_REQ_BYTECODE,
+};
+
 /* Info structure */
 struct inet_diag_msg {
 	uint8_t idiag_family;
