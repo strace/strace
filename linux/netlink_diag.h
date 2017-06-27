@@ -23,6 +23,14 @@ struct netlink_diag_msg {
 	uint32_t ndiag_cookie[2];
 };
 
+enum {
+	NETLINK_DIAG_MEMINFO,
+	NETLINK_DIAG_GROUPS,
+	NETLINK_DIAG_RX_RING,
+	NETLINK_DIAG_TX_RING,
+	NETLINK_DIAG_FLAGS,
+};
+
 #define NDIAG_SHOW_MEMINFO		0x00000001
 #define NDIAG_SHOW_GROUPS		0x00000002
 #define NDIAG_SHOW_RING_CFG		0x00000004 /* deprecated since 4.6 */

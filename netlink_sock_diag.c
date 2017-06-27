@@ -45,6 +45,7 @@
 #include "xlat/tcp_states.h"
 #include "xlat/tcp_state_flags.h"
 
+#include "xlat/netlink_diag_attrs.h"
 #include "xlat/netlink_diag_show.h"
 #include "xlat/netlink_states.h"
 
@@ -200,7 +201,8 @@ decode_netlink_diag_msg(struct tcb *const tcp,
 			const kernel_ulong_t len)
 {
 	struct netlink_diag_msg msg = { .ndiag_family = family };
-	const size_t offset = sizeof(msg.ndiag_family);
+	size_t offset = sizeof(msg.ndiag_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", msg, ndiag_family, addrfams, "AF_???");
 	tprints(", ");
@@ -219,10 +221,18 @@ decode_netlink_diag_msg(struct tcb *const tcp,
 			PRINT_FIELD_U(", ", msg, ndiag_dst_group);
 			PRINT_FIELD_U(", ", msg, ndiag_ino);
 			PRINT_FIELD_COOKIE(", ", msg, ndiag_cookie);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLA_ALIGN(sizeof(msg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      netlink_diag_attrs, "NETLINK_DIAG_???");
+	}
 }
 
 static void
