@@ -58,6 +58,27 @@
 #include "xlat/unix_diag_attrs.h"
 #include "xlat/unix_diag_show.h"
 
+#define PRINT_FIELD_U(prefix_, where_, field_)				\
+	tprintf("%s%s=%llu", (prefix_), #field_,			\
+		zero_extend_signed_to_ull((where_).field_))
+
+#define PRINT_FIELD_COOKIE(prefix_, where_, field_)			\
+	tprintf("%s%s=[%llu, %llu]", (prefix_), #field_,		\
+		zero_extend_signed_to_ull((where_).field_[0]),		\
+		zero_extend_signed_to_ull((where_).field_[1]))
+
+#define PRINT_FIELD_FLAGS(prefix_, where_, field_, xlat_, dflt_)	\
+	do {								\
+		tprintf("%s%s=", (prefix_), #field_);			\
+		printflags((xlat_), (where_).field_, (dflt_));		\
+	} while (0)
+
+#define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)		\
+	do {								\
+		tprintf("%s%s=", (prefix_), #field_);			\
+		printxval((xlat_), (where_).field_, (dflt_));		\
+	} while (0)
+
 static void
 decode_family(struct tcb *const tcp, const uint8_t family,
 	      const kernel_ulong_t addr, const kernel_ulong_t len)
@@ -82,24 +103,19 @@ decode_unix_diag_req(struct tcb *const tcp,
 	struct unix_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
 
-	tprints("{sdiag_family=");
-	printxval(addrfams, req.sdiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (void *) &req + offset)) {
-			tprintf("sdiag_protocol=%" PRIu8 ", udiag_states=",
-				req.sdiag_protocol);
-			printflags(tcp_state_flags, req.udiag_states,
-				   "1<<TCP_???");
-			tprintf(", udiag_ino=%" PRIu32 ", udiag_show=",
-				req.udiag_ino);
-			printflags(unix_diag_show, req.udiag_show,
-				   "UDIAG_SHOW_???");
-			tprintf(", udiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
-				req.udiag_cookie[0], req.udiag_cookie[1]);
+			PRINT_FIELD_U("", req, sdiag_protocol);
+			PRINT_FIELD_FLAGS(", ", req, udiag_states,
+					  tcp_state_flags, "1<<TCP_???");
+			PRINT_FIELD_U(", ", req, udiag_ino);
+			PRINT_FIELD_FLAGS(", ", req, udiag_show,
+					  unix_diag_show, "UDIAG_SHOW_???");
+			PRINT_FIELD_COOKIE(", ", req, udiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -117,22 +133,18 @@ decode_unix_diag_msg(struct tcb *const tcp,
 	size_t offset = sizeof(msg.udiag_family);
 	bool decode_nla = false;
 
-	tprints("{udiag_family=");
-	printxval(addrfams, msg.udiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", msg, udiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (void *) &msg + offset)) {
-			tprints("udiag_type=");
-			printxval(socktypes, msg.udiag_type, "SOCK_???");
-			tprintf(", udiag_state=");
-			printxval(tcp_states, msg.udiag_state, "TCP_???");
-			tprintf(", udiag_ino=%" PRIu32
-				", udiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
-				msg.udiag_ino,
-				msg.udiag_cookie[0], msg.udiag_cookie[1]);
+			PRINT_FIELD_XVAL("", msg, udiag_type,
+					 socktypes, "SOCK_???");
+			PRINT_FIELD_XVAL(", ", msg, udiag_state,
+					 tcp_states, "TCP_???");
+			PRINT_FIELD_U(", ", msg, udiag_ino);
+			PRINT_FIELD_COOKIE(", ", msg, udiag_cookie);
 			decode_nla = true;
 		}
 	} else
@@ -157,26 +169,23 @@ decode_netlink_diag_req(struct tcb *const tcp,
 	struct netlink_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
 
-	tprints("{sdiag_family=");
-	printxval(addrfams, req.sdiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (void *) &req + offset)) {
-			tprints("sdiag_protocol=");
 			if (NDIAG_PROTO_ALL == req.sdiag_protocol)
-				tprints("NDIAG_PROTO_ALL");
+				tprintf("%s=%s",
+					"sdiag_protocol", "NDIAG_PROTO_ALL");
 			else
-				printxval(netlink_protocols,
-					  req.sdiag_protocol, "NETLINK_???");
-			tprintf(", ndiag_ino=%" PRIu32 ", ndiag_show=",
-				req.ndiag_ino);
-			printflags(netlink_diag_show, req.ndiag_show,
-				   "NDIAG_SHOW_???");
-			tprintf(", ndiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
-				req.ndiag_cookie[0], req.ndiag_cookie[1]);
+				PRINT_FIELD_XVAL("", req, sdiag_protocol,
+						 netlink_protocols,
+						 "NETLINK_???");
+			PRINT_FIELD_U(", ", req, ndiag_ino);
+			PRINT_FIELD_FLAGS(", ", req, ndiag_show,
+					  netlink_diag_show, "NDIAG_SHOW_???");
+			PRINT_FIELD_COOKIE(", ", req, ndiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -193,34 +202,23 @@ decode_netlink_diag_msg(struct tcb *const tcp,
 	struct netlink_diag_msg msg = { .ndiag_family = family };
 	const size_t offset = sizeof(msg.ndiag_family);
 
-	tprints("{ndiag_family=");
-	printxval(addrfams, msg.ndiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", msg, ndiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (void *) &msg + offset)) {
-			tprints("ndiag_type=");
-			printxval(socktypes, msg.ndiag_type, "SOCK_???");
-			tprints(", ndiag_protocol=");
-			printxval(netlink_protocols, msg.ndiag_protocol,
-				  "NETLINK_???");
-			tprints(", ndiag_state=");
-			printxval(netlink_states, msg.ndiag_state,
-				  "NETLINK_???");
-			tprintf(", ndiag_portid=%" PRIu32
-				", ndiag_dst_portid=%" PRIu32
-				", ndiag_dst_group=%" PRIu32
-				", ndiag_ino=%" PRIu32
-				", ndiag_cookie=[%" PRIu32
-				", %" PRIu32 "]",
-				msg.ndiag_portid,
-				msg.ndiag_dst_portid,
-				msg.ndiag_dst_group,
-				msg.ndiag_ino,
-				msg.ndiag_cookie[0],
-				msg.ndiag_cookie[1]);
+			PRINT_FIELD_XVAL("", msg, ndiag_type,
+					 socktypes, "SOCK_???");
+			PRINT_FIELD_XVAL(", ", msg, ndiag_protocol,
+					 netlink_protocols, "NETLINK_???");
+			PRINT_FIELD_XVAL(", ", msg, ndiag_state,
+					 netlink_states, "NETLINK_???");
+			PRINT_FIELD_U(", ", msg, ndiag_portid);
+			PRINT_FIELD_U(", ", msg, ndiag_dst_portid);
+			PRINT_FIELD_U(", ", msg, ndiag_dst_group);
+			PRINT_FIELD_U(", ", msg, ndiag_ino);
+			PRINT_FIELD_COOKIE(", ", msg, ndiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -237,22 +235,18 @@ decode_packet_diag_req(struct tcb *const tcp,
 	struct packet_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
 
-	tprints("{sdiag_family=");
-	printxval(addrfams, req.sdiag_family, "AF_???");
+	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (void *) &req + offset)) {
-			tprints("sdiag_protocol=");
-			printxval(ethernet_protocols, req.sdiag_protocol,
-				  "ETH_P_???");
-			tprintf(", pdiag_ino=%" PRIu32 ", pdiag_show=",
-				req.pdiag_ino);
-			printflags(packet_diag_show, req.pdiag_show,
-				   "PACKET_SHOW_???");
-			tprintf(", pdiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
-				req.pdiag_cookie[0], req.pdiag_cookie[1]);
+			PRINT_FIELD_XVAL("", req, sdiag_protocol,
+					 ethernet_protocols, "ETH_P_???");
+			PRINT_FIELD_U(", ", req, pdiag_ino);
+			PRINT_FIELD_FLAGS(", ", req, pdiag_show,
+					  packet_diag_show, "PACKET_SHOW_???");
+			PRINT_FIELD_COOKIE(", ", req, pdiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -269,20 +263,17 @@ decode_packet_diag_msg(struct tcb *const tcp,
 	struct packet_diag_msg msg = { .pdiag_family = family };
 	const size_t offset = sizeof(msg.pdiag_family);
 
-	tprints("{pdiag_family=");
-	printxval(addrfams, msg.pdiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", msg, pdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (void *) &msg + offset)) {
-			tprints("pdiag_type=");
-			printxval(socktypes, msg.pdiag_type, "SOCK_???");
-			tprintf(", pdiag_num=%" PRIu16 ", pdiag_ino=%" PRIu32
-				", pdiag_cookie=[%" PRIu32 ", %" PRIu32 "]",
-				msg.pdiag_num, msg.pdiag_ino, msg.pdiag_cookie[0],
-				msg.pdiag_cookie[1]);
+			PRINT_FIELD_XVAL("", msg, pdiag_type,
+					 socktypes, "SOCK_???");
+			PRINT_FIELD_U(", ", msg, pdiag_num);
+			PRINT_FIELD_U(", ", msg, pdiag_ino);
+			PRINT_FIELD_COOKIE(", ", msg, pdiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -302,9 +293,10 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	print_inet_addr(family, id->idiag_dst,
 			sizeof(id->idiag_dst), "idiag_dst");
 
-	tprintf(", idiag_if=%" PRIu32
-		", idiag_cookie=[%" PRIu32 ", %" PRIu32 "]}",
-		id->idiag_if, id->idiag_cookie[0], id->idiag_cookie[1]);
+	PRINT_FIELD_U(", ", *id, idiag_if);
+	PRINT_FIELD_COOKIE(", ", *id, idiag_cookie);
+
+	tprints("}");
 }
 
 static void
@@ -317,27 +309,22 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 	struct inet_diag_req req = { .idiag_family = family };
 	const size_t offset = sizeof(req.idiag_family);
 
-	tprints("{idiag_family=");
-	printxval(addrfams, req.idiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", req, idiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (void *) &req + offset)) {
-			tprintf("idiag_src_len=%" PRIu8
-				", idiag_dst_len=%" PRIu8,
-				req.idiag_src_len,
-				req.idiag_dst_len);
-			tprints(", idiag_ext=");
-			printflags(inet_diag_extended_flags, req.idiag_ext,
-				   "1<<INET_DIAG_\?\?\?-1");
+			PRINT_FIELD_U("", req, idiag_src_len);
+			PRINT_FIELD_U(", ", req, idiag_dst_len);
+			PRINT_FIELD_FLAGS(", ", req, idiag_ext,
+					  inet_diag_extended_flags,
+					  "1<<INET_DIAG_\?\?\?-1");
 			tprints(", id=");
 			print_inet_diag_sockid(&req.id, req.idiag_family);
-			tprints(", idiag_states=");
-			printflags(tcp_state_flags, req.idiag_states,
-				   "1<<TCP_???");
-			tprintf(", idiag_dbs=%" PRIu32, req.idiag_dbs);
+			PRINT_FIELD_FLAGS(", ", req, idiag_states,
+					  tcp_state_flags, "1<<TCP_???");
+			PRINT_FIELD_U(", ", req, idiag_dbs);
 		}
 	} else
 		tprints("...");
@@ -354,23 +341,19 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 	struct inet_diag_req_v2 req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
 
-	tprints("{sdiag_family=");
-	printxval(addrfams, req.sdiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (void *) &req + offset)) {
-			tprints("sdiag_protocol=");
-			printxval(inet_protocols, req.sdiag_protocol,
-				  "IPPROTO_???");
-			tprints(", idiag_ext=");
-			printflags(inet_diag_extended_flags, req.idiag_ext,
-				   "1<<INET_DIAG_\?\?\?-1");
-			tprints(", idiag_states=");
-			printflags(tcp_state_flags, req.idiag_states,
-				   "1<<TCP_???");
+			PRINT_FIELD_XVAL("", req, sdiag_protocol,
+					 inet_protocols, "IPPROTO_???");
+			PRINT_FIELD_FLAGS(", ", req, idiag_ext,
+					  inet_diag_extended_flags,
+					  "1<<INET_DIAG_\?\?\?-1");
+			PRINT_FIELD_FLAGS(", ", req, idiag_states,
+					  tcp_state_flags, "1<<TCP_???");
 			tprints(", id=");
 			print_inet_diag_sockid(&req.id, req.sdiag_family);
 		}
@@ -405,31 +388,23 @@ decode_inet_diag_msg(struct tcb *const tcp,
 	struct inet_diag_msg msg = { .idiag_family = family };
 	const size_t offset = sizeof(msg.idiag_family);
 
-	tprints("{idiag_family=");
-	printxval(addrfams, msg.idiag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", msg, idiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (void *) &msg + offset)) {
-			tprints("idiag_state=");
-			printxval(tcp_states, msg.idiag_state, "TCP_???");
-			tprintf(", idiag_timer=%" PRIu8
-				", idiag_retrans=%" PRIu8,
-				msg.idiag_timer, msg.idiag_retrans);
+			PRINT_FIELD_XVAL("", msg, idiag_state,
+					 tcp_states, "TCP_???");
+			PRINT_FIELD_U(", ", msg, idiag_timer);
+			PRINT_FIELD_U(", ", msg, idiag_retrans);
 			tprints(", id=");
 			print_inet_diag_sockid(&msg.id, msg.idiag_family);
-			tprintf(", idiag_expires=%" PRIu32
-				", idiag_rqueue=%" PRIu32
-				", idiag_wqueue=%" PRIu32
-				", idiag_uid=%" PRIu32
-				", idiag_inode=%" PRIu32,
-				msg.idiag_expires,
-				msg.idiag_rqueue,
-				msg.idiag_wqueue,
-				msg.idiag_uid,
-				msg.idiag_inode);
+			PRINT_FIELD_U(", ", msg, idiag_expires);
+			PRINT_FIELD_U(", ", msg, idiag_rqueue);
+			PRINT_FIELD_U(", ", msg, idiag_wqueue);
+			PRINT_FIELD_U(", ", msg, idiag_uid);
+			PRINT_FIELD_U(", ", msg, idiag_inode);
 		}
 	} else
 		tprints("...");
@@ -447,17 +422,15 @@ decode_smc_diag_req(struct tcb *const tcp,
 	struct smc_diag_req req = { .diag_family = family };
 	const size_t offset = sizeof(req.diag_family);
 
-	tprints("{diag_family=");
-	printxval(addrfams, req.diag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", req, diag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (void *) &req + offset)) {
-			tprints("diag_ext=");
-			printflags(smc_diag_extended_flags, req.diag_ext,
-				   "1<<SMC_DIAG_\?\?\?-1");
+			PRINT_FIELD_FLAGS("", req, diag_ext,
+					  smc_diag_extended_flags,
+					  "1<<SMC_DIAG_\?\?\?-1");
 			tprints(", id=");
 			/*
 			 * AF_SMC protocol family socket handler
@@ -480,27 +453,24 @@ decode_smc_diag_msg(struct tcb *const tcp,
 	struct smc_diag_msg msg = { .diag_family = family };
 	const size_t offset = sizeof(msg.diag_family);
 
-	tprints("{diag_family=");
-	printxval(addrfams, msg.diag_family, "AF_???");
-
+	PRINT_FIELD_XVAL("{", msg, diag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (void *) &msg + offset)) {
-			tprints("diag_state=");
-			printxval(smc_states, msg.diag_state, "SMC_???");
-			tprintf(", diag_fallback=%" PRIu8
-				", diag_shutdown=%" PRIu8,
-				msg.diag_fallback, msg.diag_shutdown);
+			PRINT_FIELD_XVAL("", msg, diag_state,
+					 smc_states, "SMC_???");
+			PRINT_FIELD_U(", ", msg, diag_fallback);
+			PRINT_FIELD_U(", ", msg, diag_shutdown);
 			tprints(", id=");
 			/*
 			 * AF_SMC protocol family socket handler
 			 * keeping the AF_INET sock address.
 			 */
 			print_inet_diag_sockid(&msg.id, AF_INET);
-			tprintf(", diag_uid=%" PRIu32 ", diag_inode=%" PRIu64,
-				msg.diag_uid, msg.diag_inode);
+			PRINT_FIELD_U(", ", msg, diag_uid);
+			PRINT_FIELD_U(", ", msg, diag_inode);
 		}
 	} else
 		tprints("...");
