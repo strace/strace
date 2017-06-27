@@ -68,7 +68,7 @@ test_nlattr(const int fd)
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + 2;
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	memcpy(nla, "12", 2);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
@@ -95,7 +95,7 @@ test_nlattr(const int fd)
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + sizeof(*nla);
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	*nla = (struct nlattr) {
 		.nla_len = sizeof(*nla),
 		.nla_type = UNIX_DIAG_NAME
@@ -122,7 +122,7 @@ test_nlattr(const int fd)
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN + 4;
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	*nla = (struct nlattr) {
 		.nla_len = NLA_HDRLEN + 4,
 		.nla_type = UNIX_DIAG_SHUTDOWN + 1
@@ -142,7 +142,7 @@ test_nlattr(const int fd)
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN + 2;
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	*nla = (struct nlattr) {
 		.nla_len = NLA_HDRLEN,
 		.nla_type = UNIX_DIAG_NAME
@@ -161,7 +161,7 @@ test_nlattr(const int fd)
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN * 2;
 	msg = tail_memdup(&c_msg, msg_len - 1);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	*nla = (struct nlattr) {
 		.nla_len = NLA_HDRLEN,
 		.nla_type = UNIX_DIAG_NAME
@@ -179,7 +179,7 @@ test_nlattr(const int fd)
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN * 2;
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	*nla = (struct nlattr) {
 		.nla_len = NLA_HDRLEN,
 		.nla_type = UNIX_DIAG_NAME
@@ -216,7 +216,7 @@ test_nlattr(const int fd)
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
 	unsigned int i;
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	for (i = 0; i < ABBREV_LEN; ++i)
 		nla[i] = (struct nlattr) {
 			.nla_len = NLA_HDRLEN,
@@ -266,7 +266,7 @@ test_nla_type(const int fd)
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + sizeof(*nla);
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
-	nla = (void *) msg + NLMSG_SPACE(sizeof(msg->udm));
+	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	*nla = (struct nlattr) {
 		.nla_len = sizeof(*nla),
 		.nla_type = NLA_F_NESTED | UNIX_DIAG_NAME

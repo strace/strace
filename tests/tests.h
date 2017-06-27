@@ -253,4 +253,6 @@ f8ill_ptr_to_kulong(const void *const ptr)
 		memcpy(DEST_ADDR, &dest_type_tmp_var, sizeof(dest_type_tmp_var));	\
 	} while (0)
 
+#define NLMSG_ATTR(nlh, hdrlen) ((void *)(nlh) + NLMSG_SPACE(hdrlen))
+
 #endif /* !STRACE_TESTS_H */
