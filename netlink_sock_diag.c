@@ -536,6 +536,9 @@ decode_netlink_sock_diag(struct tcb *const tcp,
 {
 	uint8_t family;
 
+	if (nlmsghdr->nlmsg_type == NLMSG_DONE)
+		return false;
+
 	if (!umove_or_printaddr(tcp, addr, &family)) {
 		if (family < ARRAY_SIZE(diag_decoders)
 		    && len > sizeof(family)) {

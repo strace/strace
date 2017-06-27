@@ -177,7 +177,7 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 	const struct xlat *xlat = netlink_types;
 	const char *dflt = "NLMSG_???";
 
-	if (family < ARRAY_SIZE(nlmsg_types)) {
+	if (type != NLMSG_DONE && family < ARRAY_SIZE(nlmsg_types)) {
 		if (nlmsg_types[family].decoder)
 			decoder = nlmsg_types[family].decoder;
 		if (nlmsg_types[family].xlat)
@@ -193,6 +193,9 @@ static void
 decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
 {
 	const struct xlat *table = NULL;
+
+	if (type == NLMSG_DONE)
+		goto end;
 
 	switch (family) {
 	case NETLINK_SOCK_DIAG:
@@ -233,6 +236,7 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
 		break;
 	}
 
+end:
 	printflags_ex(flags, "NLM_F_???", netlink_flags, table, NULL);
 }
 
@@ -246,7 +250,8 @@ print_nlmsghdr(struct tcb *tcp,
 
 	tprintf("{len=%u, type=", nlmsghdr->nlmsg_len);
 
-	const int hdr_family = (nlmsghdr->nlmsg_type < NLMSG_MIN_TYPE)
+	const int hdr_family = (nlmsghdr->nlmsg_type < NLMSG_MIN_TYPE
+				&& nlmsghdr->nlmsg_type != NLMSG_DONE)
 			       ? NL_FAMILY_DEFAULT
 			       : (family != NL_FAMILY_DEFAULT
 				  ? family : get_fd_nl_family(tcp, fd));
