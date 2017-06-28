@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include "netlink.h"
+#include "nlattr.h"
 
 static bool
 fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
@@ -65,7 +66,10 @@ decode_nlattr_with_data(struct tcb *tcp,
 			kernel_ulong_t addr,
 			kernel_ulong_t len,
 			const struct xlat *const table,
-			const char *const dflt)
+			const char *const dflt,
+			const nla_decoder_t *const decoders,
+			const unsigned int size,
+			const void *const opaque_data)
 {
 	const unsigned int nla_len = nla->nla_len > len ? len : nla->nla_len;
 
@@ -76,7 +80,13 @@ decode_nlattr_with_data(struct tcb *tcp,
 
 	if (nla_len > NLA_HDRLEN) {
 		tprints(", ");
-		printstrn(tcp, addr + NLA_HDRLEN, nla_len - NLA_HDRLEN);
+		if (!decoders
+		    || nla->nla_type >= size
+		    || !decoders[nla->nla_type]
+		    || !decoders[nla->nla_type](tcp, addr + NLA_HDRLEN,
+						nla_len - NLA_HDRLEN,
+						opaque_data))
+			printstrn(tcp, addr + NLA_HDRLEN, len - NLA_HDRLEN);
 		tprints("}");
 	}
 }
@@ -86,7 +96,10 @@ decode_nlattr(struct tcb *const tcp,
 	      kernel_ulong_t addr,
 	      kernel_ulong_t len,
 	      const struct xlat *const table,
-	      const char *const dflt)
+	      const char *const dflt,
+	      const nla_decoder_t *const decoders,
+	      const unsigned int size,
+	      const void *const opaque_data)
 {
 	struct nlattr nla;
 	bool print_array = false;
@@ -114,7 +127,8 @@ decode_nlattr(struct tcb *const tcp,
 			print_array = true;
 		}
 
-		decode_nlattr_with_data(tcp, &nla, addr, len, table, dflt);
+		decode_nlattr_with_data(tcp, &nla, addr, len, table, dflt,
+					decoders, size, opaque_data);
 
 		if (!next_addr)
 			break;
@@ -128,3 +142,44 @@ decode_nlattr(struct tcb *const tcp,
 		tprints("]");
 	}
 }
+
+bool
+decode_nla_str(struct tcb *tcp, kernel_ulong_t addr,
+	       kernel_ulong_t len, const void *const opaque_data)
+{
+	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
+
+	return true;
+}
+
+bool
+decode_nla_strn(struct tcb *tcp, kernel_ulong_t addr,
+		kernel_ulong_t len, const void *const opaque_data)
+{
+	printstrn(tcp, addr, len);
+
+	return true;
+}
+
+#define DECODE_NLA_INTEGER(name, type, fmt)				\
+bool									\
+decode_nla_ ## name(struct tcb *tcp, kernel_ulong_t addr,		\
+		    kernel_ulong_t len, const void *const opaque_data)	\
+{									\
+	type num;							\
+									\
+	if (len < sizeof(num))						\
+		return false;						\
+	if (!umove_or_printaddr(tcp, addr, &num))			\
+		tprintf(fmt, num);					\
+	return true;							\
+}
+
+DECODE_NLA_INTEGER(u8, uint8_t, "%" PRIu8)
+DECODE_NLA_INTEGER(u16, uint16_t, "%" PRIu16)
+DECODE_NLA_INTEGER(u32, uint32_t, "%" PRIu32)
+DECODE_NLA_INTEGER(u64, uint64_t, "%" PRIu64)
+DECODE_NLA_INTEGER(s8, int8_t, "%" PRId8)
+DECODE_NLA_INTEGER(s16, int16_t, "%" PRId16)
+DECODE_NLA_INTEGER(s32, int32_t, "%" PRId32)
+DECODE_NLA_INTEGER(s64, int64_t, "%" PRId64)

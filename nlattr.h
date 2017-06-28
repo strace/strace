@@ -30,8 +30,31 @@
 #ifndef STRACE_NLATTR_H
 #define STRACE_NLATTR_H
 
+typedef bool (*nla_decoder_t)(struct tcb *, kernel_ulong_t addr,
+			      kernel_ulong_t len, const void *opaque_data);
 extern void
-decode_nlattr(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
-	      const struct xlat *, const char *);
+decode_nlattr(struct tcb *,
+	      kernel_ulong_t addr,
+	      kernel_ulong_t len,
+	      const struct xlat *,
+	      const char *dflt,
+	      const nla_decoder_t *,
+	      unsigned int size,
+	      const void *opaque_data);
+
+#define DECL_NLA(name)					\
+extern bool						\
+decode_nla_ ## name(struct tcb *, kernel_ulong_t addr,	\
+		    kernel_ulong_t len, const void *)
+DECL_NLA(u8);
+DECL_NLA(u16);
+DECL_NLA(u32);
+DECL_NLA(u64);
+DECL_NLA(s8);
+DECL_NLA(s16);
+DECL_NLA(s32);
+DECL_NLA(s64);
+DECL_NLA(str);
+DECL_NLA(strn);
 
 #endif /* !STRACE_NLATTR_H */

@@ -160,7 +160,8 @@ decode_unix_diag_msg(struct tcb *const tcp,
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      unix_diag_attrs, "UNIX_DIAG_???");
+			      unix_diag_attrs, "UNIX_DIAG_???",
+			      NULL, 0, NULL);
 	}
 }
 
@@ -235,7 +236,8 @@ decode_netlink_diag_msg(struct tcb *const tcp,
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      netlink_diag_attrs, "NETLINK_DIAG_???");
+			      netlink_diag_attrs, "NETLINK_DIAG_???",
+			      NULL, 0, NULL);
 	}
 }
 
@@ -299,7 +301,8 @@ decode_packet_diag_msg(struct tcb *const tcp,
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      packet_diag_attrs, "PACKET_DIAG_???");
+			      packet_diag_attrs, "PACKET_DIAG_???",
+			      NULL, 0, NULL);
 	}
 }
 
@@ -359,7 +362,8 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      inet_diag_req_attrs, "INET_DIAG_REQ_???");
+			      inet_diag_req_attrs, "INET_DIAG_REQ_???",
+			      NULL, 0, NULL);
 	}
 }
 
@@ -399,7 +403,8 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      inet_diag_req_attrs, "INET_DIAG_REQ_???");
+			      inet_diag_req_attrs, "INET_DIAG_REQ_???",
+			      NULL, 0, NULL);
 	}
 }
 
@@ -457,7 +462,8 @@ decode_inet_diag_msg(struct tcb *const tcp,
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      inet_diag_attrs, "INET_DIAG_???");
+			      inet_diag_attrs, "INET_DIAG_???",
+			      NULL, 0, NULL);
 	}
 }
 
@@ -532,7 +538,8 @@ decode_smc_diag_msg(struct tcb *const tcp,
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      smc_diag_attrs, "SMC_DIAG_???");
+			      smc_diag_attrs, "SMC_DIAG_???",
+			      NULL, 0, NULL);
 	}
 }
 #endif
