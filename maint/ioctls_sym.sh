@@ -75,9 +75,10 @@ tmpdir="$(mktemp -dt "$me.XXXXXX")"
 # list interesting files in $inc_dir.
 cd "$inc_dir"
 inc_dir="$(pwd -P)"
-find . -type f -name '*.h' -print0 |
-	xargs -r0 grep -l "$r_value" -- > "$tmpdir"/headers1.list ||
-		exit 0
+find . -type f -name '*.h' -exec grep -l "$r_value" -- '{}' + \
+	> "$tmpdir"/headers1.list ||:
+[ -s "$tmpdir"/headers1.list ] || exit 0
+
 cd - > /dev/null
 sed 's|^\./\(uapi/\)\?||' < "$tmpdir"/headers1.list > "$tmpdir"/headers.list
 LC_COLLATE=C sort -u -o "$tmpdir"/headers.list "$tmpdir"/headers.list
