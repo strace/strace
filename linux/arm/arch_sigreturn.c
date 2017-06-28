@@ -9,7 +9,7 @@ arch_sigreturn(struct tcb *tcp)
 #ifdef AARCH64
 		tcp->currpers == 0 ?
 			(*aarch64_sp_ptr + SIZEOF_STRUCT_SIGINFO +
-			 offsetof(struct ucontext, uc_sigmask)) :
+			 offsetof(ucontext_t, uc_sigmask)) :
 #endif
 			(*arm_sp_ptr +
 			 OFFSETOF_STRUCT_UCONTEXT_UC_SIGMASK);
