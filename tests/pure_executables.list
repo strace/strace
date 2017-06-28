@@ -176,6 +176,7 @@ netlink_xfrm
 newfstatat
 nlattr
 nlattr_inet_diag_msg
+nlattr_netlink_diag_msg
 old_mmap
 oldfstat
 oldlstat
