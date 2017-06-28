@@ -50,6 +50,7 @@
 
 #include "xlat/netlink_diag_attrs.h"
 #include "xlat/netlink_diag_show.h"
+#include "xlat/netlink_socket_flags.h"
 #include "xlat/netlink_states.h"
 
 #include "xlat/packet_diag_attrs.h"
@@ -235,6 +236,80 @@ decode_netlink_diag_req(struct tcb *const tcp,
 	tprints("}");
 }
 
+static bool
+print_group(struct tcb *tcp, void *elem_buf,
+	    size_t elem_size, void *opaque_data)
+{
+	if (elem_size < sizeof(kernel_ulong_t))
+		tprintf("%#0*x", (int) elem_size * 2 + 2,
+			*(unsigned int *) elem_buf);
+	else
+		tprintf("%#0*" PRI_klx, (int) elem_size * 2 + 2,
+			*(kernel_ulong_t *) elem_buf);
+
+	return true;
+}
+
+static bool
+decode_netlink_diag_groups(struct tcb *tcp, kernel_ulong_t addr,
+			   kernel_ulong_t len, const void *const opaque_data)
+{
+	kernel_ulong_t buf;
+	size_t nmemb = len / current_wordsize;
+
+	if (!nmemb)
+		return false;
+
+	print_array(tcp, addr, nmemb, &buf, current_wordsize,
+		    umoven_or_printaddr, print_group, 0);
+
+	return true;
+}
+
+static bool
+decode_netlink_diag_ring(struct tcb *tcp, kernel_ulong_t addr,
+			 kernel_ulong_t len, const void *const opaque_data)
+{
+	struct netlink_diag_ring ndr;
+
+	if (len < sizeof(ndr))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ndr))
+		return true;
+
+	tprintf("{ndr_block_size=%" PRIu32 ", ndr_block_nr=%" PRIu32
+		", ndr_frame_size=%" PRIu32 ", ndr_frame_nr=%" PRIu32,
+		ndr.ndr_block_size, ndr.ndr_block_nr,
+		ndr.ndr_frame_size, ndr.ndr_frame_nr);
+	tprints("}");
+
+	return true;
+}
+
+static bool
+decode_netlink_diag_flags(struct tcb *tcp, kernel_ulong_t addr,
+			  kernel_ulong_t len, const void *const opaque_data)
+{
+	uint32_t flags;
+
+	if (len < sizeof(flags))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &flags))
+		return true;
+
+	printflags(netlink_socket_flags, flags, "NDIAG_FLAG_???");
+
+	return true;
+}
+
+static const nla_decoder_t netlink_diag_msg_nla_decoders[] = {
+	[NETLINK_DIAG_MEMINFO]	= decode_meminfo,
+	[NETLINK_DIAG_GROUPS]	= decode_netlink_diag_groups,
+	[NETLINK_DIAG_RX_RING]	= decode_netlink_diag_ring,
+	[NETLINK_DIAG_TX_RING]	= decode_netlink_diag_ring,
+	[NETLINK_DIAG_FLAGS]	= decode_netlink_diag_flags
+};
+
 static void
 decode_netlink_diag_msg(struct tcb *const tcp,
 			const struct nlmsghdr *const nlmsghdr,
@@ -274,7 +349,8 @@ decode_netlink_diag_msg(struct tcb *const tcp,
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      netlink_diag_attrs, "NETLINK_DIAG_???",
-			      NULL, 0, NULL);
+			      netlink_diag_msg_nla_decoders,
+			      ARRAY_SIZE(netlink_diag_msg_nla_decoders), NULL);
 	}
 }
 
