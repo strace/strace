@@ -61,10 +61,10 @@ print_nlattr(const struct nlattr *const nla,
 }
 
 static void
-decode_nlattr_with_data(struct tcb *tcp,
+decode_nlattr_with_data(struct tcb *const tcp,
 			const struct nlattr *const nla,
-			kernel_ulong_t addr,
-			kernel_ulong_t len,
+			const kernel_ulong_t addr,
+			const kernel_ulong_t len,
 			const struct xlat *const table,
 			const char *const dflt,
 			const nla_decoder_t *const decoders,
@@ -144,8 +144,10 @@ decode_nlattr(struct tcb *const tcp,
 }
 
 bool
-decode_nla_str(struct tcb *tcp, kernel_ulong_t addr,
-	       kernel_ulong_t len, const void *const opaque_data)
+decode_nla_str(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const kernel_ulong_t len,
+	       const void *const opaque_data)
 {
 	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
 
@@ -153,26 +155,30 @@ decode_nla_str(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 bool
-decode_nla_strn(struct tcb *tcp, kernel_ulong_t addr,
-		kernel_ulong_t len, const void *const opaque_data)
+decode_nla_strn(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const kernel_ulong_t len,
+		const void *const opaque_data)
 {
 	printstrn(tcp, addr, len);
 
 	return true;
 }
 
-#define DECODE_NLA_INTEGER(name, type, fmt)				\
-bool									\
-decode_nla_ ## name(struct tcb *tcp, kernel_ulong_t addr,		\
-		    kernel_ulong_t len, const void *const opaque_data)	\
-{									\
-	type num;							\
-									\
-	if (len < sizeof(num))						\
-		return false;						\
-	if (!umove_or_printaddr(tcp, addr, &num))			\
-		tprintf(fmt, num);					\
-	return true;							\
+#define DECODE_NLA_INTEGER(name, type, fmt)		\
+bool							\
+decode_nla_ ## name(struct tcb *const tcp,		\
+		    const kernel_ulong_t addr,		\
+		    const kernel_ulong_t len,		\
+		    const void *const opaque_data)	\
+{							\
+	type num;					\
+							\
+	if (len < sizeof(num))				\
+		return false;				\
+	if (!umove_or_printaddr(tcp, addr, &num))	\
+		tprintf(fmt, num);			\
+	return true;					\
 }
 
 DECODE_NLA_INTEGER(u8, uint8_t, "%" PRIu8)
