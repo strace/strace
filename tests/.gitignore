@@ -210,6 +210,7 @@ netlink_unix_diag
 netlink_xfrm
 newfstatat
 nlattr
+nlattr_inet_diag_msg
 nsyscalls
 old_mmap
 oldfstat
