@@ -129,8 +129,10 @@ decode_unix_diag_req(struct tcb *const tcp,
 }
 
 static bool
-print_meminfo(struct tcb *tcp, void *elem_buf,
-	      size_t elem_size, void *opaque_data)
+print_meminfo(struct tcb *const tcp,
+	      void *const elem_buf,
+	      const size_t elem_size,
+	      void *const opaque_data)
 {
 	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
 
@@ -138,8 +140,10 @@ print_meminfo(struct tcb *tcp, void *elem_buf,
 }
 
 static bool
-decode_meminfo(struct tcb *tcp, kernel_ulong_t addr,
-	       kernel_ulong_t len, const void *const opaque_data)
+decode_meminfo(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const kernel_ulong_t len,
+	       const void *const opaque_data)
 {
 	uint32_t mem;
 	size_t nmemb = len / sizeof(mem);
@@ -454,8 +458,10 @@ decode_inet_diag_req(struct tcb *const tcp,
 }
 
 static bool
-decode_inet_diag_meminfo(struct tcb *tcp, kernel_ulong_t addr,
-			 kernel_ulong_t len, const void *const opaque_data)
+decode_inet_diag_meminfo(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const kernel_ulong_t len,
+			 const void *const opaque_data)
 {
 	struct inet_diag_meminfo minfo;
 
@@ -473,8 +479,10 @@ decode_inet_diag_meminfo(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 static bool
-decode_tcpvegas_info(struct tcb *tcp, kernel_ulong_t addr,
-		     kernel_ulong_t len, const void *const opaque_data)
+decode_tcpvegas_info(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const kernel_ulong_t len,
+		     const void *const opaque_data)
 {
 	struct tcpvegas_info vegas;
 
@@ -492,8 +500,10 @@ decode_tcpvegas_info(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 static bool
-decode_tcp_dctcp_info(struct tcb *tcp, kernel_ulong_t addr,
-		      kernel_ulong_t len, const void *const opaque_data)
+decode_tcp_dctcp_info(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const kernel_ulong_t len,
+		      const void *const opaque_data)
 {
 	struct tcp_dctcp_info dctcp;
 
@@ -513,8 +523,10 @@ decode_tcp_dctcp_info(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 static bool
-decode_tcp_bbr_info(struct tcb *tcp, kernel_ulong_t addr,
-		    kernel_ulong_t len, const void *const opaque_data)
+decode_tcp_bbr_info(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const kernel_ulong_t len,
+		    const void *const opaque_data)
 {
 	struct tcp_bbr_info bbr;
 
