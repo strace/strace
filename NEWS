@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of SCM_TIMESTAMP* control messages.
+  * Updated lists of ioctl commands from Linux 4.12.
 
 * Bug fixes
   * In interactive mode (-I2), those signals that were blocked at startup
