@@ -76,4 +76,38 @@ enum {
 	INET_DIAG_BBRINFO,
 };
 
+/* INET_DIAG_MEM */
+struct inet_diag_meminfo {
+	uint32_t idiag_rmem;
+	uint32_t idiag_wmem;
+	uint32_t idiag_fmem;
+	uint32_t idiag_tmem;
+};
+
+/* INET_DIAG_VEGASINFO */
+struct tcpvegas_info {
+	uint32_t tcpv_enabled;
+	uint32_t tcpv_rttcnt;
+	uint32_t tcpv_rtt;
+	uint32_t tcpv_minrtt;
+};
+
+/* INET_DIAG_DCTCPINFO */
+struct tcp_dctcp_info {
+	uint16_t dctcp_enabled;
+	uint16_t dctcp_ce_state;
+	uint32_t dctcp_alpha;
+	uint32_t dctcp_ab_ecn;
+	uint32_t dctcp_ab_tot;
+};
+
+/* INET_DIAG_BBRINFO */
+struct tcp_bbr_info {
+	uint32_t bbr_bw_lo;
+	uint32_t bbr_bw_hi;
+	uint32_t bbr_min_rtt;
+	uint32_t bbr_pacing_gain;
+	uint32_t bbr_cwnd_gain;
+};
+
 #endif /* !STRACE_LINUX_INET_DIAG_H */

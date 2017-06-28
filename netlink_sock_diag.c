@@ -38,6 +38,7 @@
 #ifdef AF_SMC
 # include <linux/smc_diag.h>
 #endif
+#include <linux/sock_diag.h>
 #include <linux/unix_diag.h>
 
 #include "xlat/inet_diag_attrs.h"
@@ -125,6 +126,34 @@ decode_unix_diag_req(struct tcb *const tcp,
 	} else
 		tprints("...");
 	tprints("}");
+}
+
+static bool
+print_meminfo(struct tcb *tcp, void *elem_buf,
+	      size_t elem_size, void *opaque_data)
+{
+	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
+
+	return true;
+}
+
+static bool
+decode_meminfo(struct tcb *tcp, kernel_ulong_t addr,
+	       kernel_ulong_t len, const void *const opaque_data)
+{
+	uint32_t mem;
+	size_t nmemb = len / sizeof(mem);
+
+	if (!nmemb)
+		return false;
+
+	if (nmemb > SK_MEMINFO_VARS)
+		nmemb = SK_MEMINFO_VARS;
+
+	print_array(tcp, addr, nmemb, &mem, sizeof(mem),
+		    umoven_or_printaddr, print_meminfo, 0);
+
+	return true;
 }
 
 static void
@@ -424,6 +453,104 @@ decode_inet_diag_req(struct tcb *const tcp,
 					       family, addr, len);
 }
 
+static bool
+decode_inet_diag_meminfo(struct tcb *tcp, kernel_ulong_t addr,
+			 kernel_ulong_t len, const void *const opaque_data)
+{
+	struct inet_diag_meminfo minfo;
+
+	if (len < sizeof(minfo))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &minfo))
+		return true;
+
+	tprintf("{idiag_rmem=%" PRIu32 ", idiag_wmem=%" PRIu32
+		", idiag_fmem=%" PRIu32 ", idiag_tmem=%" PRIu32 "}",
+		minfo.idiag_rmem, minfo.idiag_wmem,
+		minfo.idiag_fmem, minfo.idiag_tmem);
+
+	return true;
+}
+
+static bool
+decode_tcpvegas_info(struct tcb *tcp, kernel_ulong_t addr,
+		     kernel_ulong_t len, const void *const opaque_data)
+{
+	struct tcpvegas_info vegas;
+
+	if (len < sizeof(vegas))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &vegas))
+		return true;
+
+	tprintf("{tcpv_enabled=%" PRIu32 ", tcpv_rttcnt=%" PRIu32
+		", tcpv_rtt=%" PRIu32 ", tcpv_minrtt=%" PRIu32 "}",
+		vegas.tcpv_enabled, vegas.tcpv_rttcnt,
+		vegas.tcpv_rtt, vegas.tcpv_minrtt);
+
+	return true;
+}
+
+static bool
+decode_tcp_dctcp_info(struct tcb *tcp, kernel_ulong_t addr,
+		      kernel_ulong_t len, const void *const opaque_data)
+{
+	struct tcp_dctcp_info dctcp;
+
+	if (len < sizeof(dctcp))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &dctcp))
+		return true;
+
+	tprintf("{dctcp_enabled=%" PRIu16 ", dctcp_ce_state=%" PRIu16
+		", dctcp_alpha=%" PRIu32 ", dctcp_ab_ecn=%" PRIu32
+		", dctcp_ab_tot=%" PRIu32 "}",
+		dctcp.dctcp_enabled, dctcp.dctcp_ce_state,
+		dctcp.dctcp_alpha, dctcp.dctcp_ab_ecn,
+		dctcp.dctcp_ab_tot);
+
+	return true;
+}
+
+static bool
+decode_tcp_bbr_info(struct tcb *tcp, kernel_ulong_t addr,
+		    kernel_ulong_t len, const void *const opaque_data)
+{
+	struct tcp_bbr_info bbr;
+
+	if (len < sizeof(bbr))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &bbr))
+		return true;
+
+	tprintf("{bbr_bw_lo=%#" PRIx32 ", bbr_bw_hi=%#" PRIx32
+		", bbr_min_rtt=%" PRIu32 ", bbr_pacing_gain=%" PRIu32
+		", bbr_cwnd_gain=%" PRIu32 "}",
+		bbr.bbr_bw_lo, bbr.bbr_bw_hi, bbr.bbr_min_rtt,
+		bbr.bbr_pacing_gain, bbr.bbr_cwnd_gain);
+
+	return true;
+}
+
+static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
+	[INET_DIAG_MEMINFO]	= decode_inet_diag_meminfo,
+	[INET_DIAG_INFO]	= NULL,			/* unimplemented */
+	[INET_DIAG_VEGASINFO]	= decode_tcpvegas_info,
+	[INET_DIAG_CONG]	= decode_nla_str,
+	[INET_DIAG_TOS]		= decode_nla_u8,
+	[INET_DIAG_TCLASS]	= decode_nla_u8,
+	[INET_DIAG_SKMEMINFO]	= decode_meminfo,
+	[INET_DIAG_SHUTDOWN]	= decode_nla_u8,
+	[INET_DIAG_DCTCPINFO]	= decode_tcp_dctcp_info,
+	[INET_DIAG_PROTOCOL]	= decode_nla_u8,
+	[INET_DIAG_SKV6ONLY]	= decode_nla_u8,
+	[INET_DIAG_LOCALS]	= NULL,			/* unimplemented */
+	[INET_DIAG_PEERS]	= NULL,			/* unimplemented */
+	[INET_DIAG_PAD]		= NULL,
+	[INET_DIAG_MARK]	= decode_nla_u32,
+	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info
+};
+
 static void
 decode_inet_diag_msg(struct tcb *const tcp,
 		     const struct nlmsghdr *const nlmsghdr,
@@ -463,7 +590,8 @@ decode_inet_diag_msg(struct tcb *const tcp,
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      inet_diag_attrs, "INET_DIAG_???",
-			      NULL, 0, NULL);
+			      inet_diag_msg_nla_decoders,
+			      ARRAY_SIZE(inet_diag_msg_nla_decoders), NULL);
 	}
 }
 
