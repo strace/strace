@@ -37,4 +37,14 @@ enum {
 	UNIX_DIAG_SHUTDOWN,
 };
 
+struct unix_diag_vfs {
+	uint32_t udiag_vfs_ino;
+	uint32_t udiag_vfs_dev;
+};
+
+struct unix_diag_rqlen {
+	uint32_t udiag_rqueue;
+	uint32_t udiag_wqueue;
+};
+
 #endif /* !STRACE_LINUX_UNIX_DIAG_H */

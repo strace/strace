@@ -165,6 +165,76 @@ decode_meminfo(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_unix_diag_vfs(struct tcb *tcp, kernel_ulong_t addr,
+		     kernel_ulong_t len, const void *const opaque_data)
+{
+	struct unix_diag_vfs uv;
+
+	if (len < sizeof(uv))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &uv))
+		return true;
+
+	tprints("{udiag_vfs_dev=");
+	print_dev_t(uv.udiag_vfs_dev);
+	tprintf(", udiag_vfs_ino=%" PRIu32 "}", uv.udiag_vfs_ino);
+
+	return true;
+}
+
+static bool
+print_inode(struct tcb *tcp, void *elem_buf,
+	    size_t elem_size, void *opaque_data)
+{
+	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
+
+	return true;
+}
+
+static bool
+decode_unix_diag_inode(struct tcb *tcp, kernel_ulong_t addr,
+		       kernel_ulong_t len, const void *const opaque_data)
+{
+	uint32_t inode;
+	size_t nmemb = len / sizeof(inode);
+
+	if (!nmemb)
+		return false;
+
+	print_array(tcp, addr, nmemb, &inode, sizeof(inode),
+		    umoven_or_printaddr, print_inode, 0);
+
+	return true;
+}
+
+static bool
+decode_unix_diag_rqlen(struct tcb *tcp, kernel_ulong_t addr,
+		       kernel_ulong_t len, const void *const opaque_data)
+{
+	struct unix_diag_rqlen rql;
+
+	if (len < sizeof(rql))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &rql))
+		return true;
+
+	tprintf("{udiag_rqueue=%" PRIu32 ", udiag_wqueue=%" PRIu32 "}",
+		rql.udiag_rqueue, rql.udiag_wqueue);
+
+	return true;
+}
+
+static const nla_decoder_t unix_diag_msg_nla_decoders[] = {
+	[UNIX_DIAG_NAME]	= decode_nla_str,
+	[UNIX_DIAG_VFS]		= decode_unix_diag_vfs,
+	[UNIX_DIAG_PEER]	= decode_nla_u32,
+	[UNIX_DIAG_ICONS]	= decode_unix_diag_inode,
+	[UNIX_DIAG_RQLEN]	= decode_unix_diag_rqlen,
+	[UNIX_DIAG_MEMINFO]	= decode_meminfo,
+	[UNIX_DIAG_SHUTDOWN]	= decode_nla_u8
+};
+
 static void
 decode_unix_diag_msg(struct tcb *const tcp,
 		     const struct nlmsghdr *const nlmsghdr,
@@ -199,7 +269,8 @@ decode_unix_diag_msg(struct tcb *const tcp,
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      unix_diag_attrs, "UNIX_DIAG_???",
-			      NULL, 0, NULL);
+			      unix_diag_msg_nla_decoders,
+			      ARRAY_SIZE(unix_diag_msg_nla_decoders), NULL);
 	}
 }
 
