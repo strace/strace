@@ -68,6 +68,10 @@
 	tprintf("%s%s=%llu", (prefix_), #field_,			\
 		zero_extend_signed_to_ull((where_).field_))
 
+#define PRINT_FIELD_X(prefix_, where_, field_)				\
+	tprintf("%s%s=%#llx", (prefix_), #field_,			\
+		zero_extend_signed_to_ull((where_).field_))
+
 #define PRINT_FIELD_COOKIE(prefix_, where_, field_)			\
 	tprintf("%s%s=[%llu, %llu]", (prefix_), #field_,		\
 		zero_extend_signed_to_ull((where_).field_[0]),		\
@@ -470,10 +474,11 @@ decode_inet_diag_meminfo(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &minfo))
 		return true;
 
-	tprintf("{idiag_rmem=%" PRIu32 ", idiag_wmem=%" PRIu32
-		", idiag_fmem=%" PRIu32 ", idiag_tmem=%" PRIu32 "}",
-		minfo.idiag_rmem, minfo.idiag_wmem,
-		minfo.idiag_fmem, minfo.idiag_tmem);
+	PRINT_FIELD_U("{", minfo, idiag_rmem);
+	PRINT_FIELD_U(", ", minfo, idiag_wmem);
+	PRINT_FIELD_U(", ", minfo, idiag_fmem);
+	PRINT_FIELD_U(", ", minfo, idiag_tmem);
+	tprints("}");
 
 	return true;
 }
@@ -491,10 +496,11 @@ decode_tcpvegas_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &vegas))
 		return true;
 
-	tprintf("{tcpv_enabled=%" PRIu32 ", tcpv_rttcnt=%" PRIu32
-		", tcpv_rtt=%" PRIu32 ", tcpv_minrtt=%" PRIu32 "}",
-		vegas.tcpv_enabled, vegas.tcpv_rttcnt,
-		vegas.tcpv_rtt, vegas.tcpv_minrtt);
+	PRINT_FIELD_U("{", vegas, tcpv_enabled);
+	PRINT_FIELD_U(", ", vegas, tcpv_rttcnt);
+	PRINT_FIELD_U(", ", vegas, tcpv_rtt);
+	PRINT_FIELD_U(", ", vegas, tcpv_minrtt);
+	tprints("}");
 
 	return true;
 }
@@ -512,12 +518,12 @@ decode_tcp_dctcp_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &dctcp))
 		return true;
 
-	tprintf("{dctcp_enabled=%" PRIu16 ", dctcp_ce_state=%" PRIu16
-		", dctcp_alpha=%" PRIu32 ", dctcp_ab_ecn=%" PRIu32
-		", dctcp_ab_tot=%" PRIu32 "}",
-		dctcp.dctcp_enabled, dctcp.dctcp_ce_state,
-		dctcp.dctcp_alpha, dctcp.dctcp_ab_ecn,
-		dctcp.dctcp_ab_tot);
+	PRINT_FIELD_U("{", dctcp, dctcp_enabled);
+	PRINT_FIELD_U(", ", dctcp, dctcp_ce_state);
+	PRINT_FIELD_U(", ", dctcp, dctcp_alpha);
+	PRINT_FIELD_U(", ", dctcp, dctcp_ab_ecn);
+	PRINT_FIELD_U(", ", dctcp, dctcp_ab_tot);
+	tprints("}");
 
 	return true;
 }
@@ -535,11 +541,12 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &bbr))
 		return true;
 
-	tprintf("{bbr_bw_lo=%#" PRIx32 ", bbr_bw_hi=%#" PRIx32
-		", bbr_min_rtt=%" PRIu32 ", bbr_pacing_gain=%" PRIu32
-		", bbr_cwnd_gain=%" PRIu32 "}",
-		bbr.bbr_bw_lo, bbr.bbr_bw_hi, bbr.bbr_min_rtt,
-		bbr.bbr_pacing_gain, bbr.bbr_cwnd_gain);
+	PRINT_FIELD_X("{", bbr, bbr_bw_lo);
+	PRINT_FIELD_X(", ", bbr, bbr_bw_hi);
+	PRINT_FIELD_U(", ", bbr, bbr_min_rtt);
+	PRINT_FIELD_U(", ", bbr, bbr_pacing_gain);
+	PRINT_FIELD_U(", ", bbr, bbr_cwnd_gain);
+	tprints("}");
 
 	return true;
 }
