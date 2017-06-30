@@ -162,6 +162,30 @@ main(void)
 			  init_inet_diag_msg, print_inet_diag_msg,
 			  INET_DIAG_SKMEMINFO, pattern, mem, print_uint);
 
+	static const uint32_t mark = 0xabdfadca;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_inet_diag_msg, print_inet_diag_msg,
+			   INET_DIAG_MARK, pattern, mark,
+			   printf("%u", mark));
+
+	static const uint8_t shutdown = 0xcd;
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_SHUTDOWN,
+		    sizeof(shutdown), &shutdown, sizeof(shutdown),
+		    printf("%u", shutdown));
+
+	char *const str = tail_alloc(DEFAULT_STRLEN);
+	fill_memory_ex(str, DEFAULT_STRLEN, '0', 10);
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_CONG,
+		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
+		    printf("\"%.*s\"...", DEFAULT_STRLEN, str));
+	str[DEFAULT_STRLEN - 1] = '\0';
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_CONG,
+		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
+		    printf("\"%s\"", str));
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
