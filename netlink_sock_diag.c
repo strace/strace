@@ -283,10 +283,10 @@ decode_netlink_diag_ring(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &ndr))
 		return true;
 
-	tprintf("{ndr_block_size=%" PRIu32 ", ndr_block_nr=%" PRIu32
-		", ndr_frame_size=%" PRIu32 ", ndr_frame_nr=%" PRIu32,
-		ndr.ndr_block_size, ndr.ndr_block_nr,
-		ndr.ndr_frame_size, ndr.ndr_frame_nr);
+	PRINT_FIELD_U("{", ndr, ndr_block_size);
+	PRINT_FIELD_U(", ", ndr, ndr_block_nr);
+	PRINT_FIELD_U(", ", ndr, ndr_frame_size);
+	PRINT_FIELD_U(", ", ndr, ndr_frame_nr);
 	tprints("}");
 
 	return true;
