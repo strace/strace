@@ -63,6 +63,7 @@ libtests_a_SOURCES = \
 	skip_unavailable.c \
 	sprintrc.c \
 	tail_alloc.c \
+	test_nlattr.h \
 	tests.h \
 	tprintf.c \
 	# end of libtests_a_SOURCES
