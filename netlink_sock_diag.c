@@ -237,8 +237,10 @@ decode_netlink_diag_req(struct tcb *const tcp,
 }
 
 static bool
-print_group(struct tcb *tcp, void *elem_buf,
-	    size_t elem_size, void *opaque_data)
+print_group(struct tcb *const tcp,
+	    void *const elem_buf,
+	    const size_t elem_size,
+	    void *const opaque_data)
 {
 	if (elem_size < sizeof(kernel_ulong_t))
 		tprintf("%#0*x", (int) elem_size * 2 + 2,
@@ -251,11 +253,13 @@ print_group(struct tcb *tcp, void *elem_buf,
 }
 
 static bool
-decode_netlink_diag_groups(struct tcb *tcp, kernel_ulong_t addr,
-			   kernel_ulong_t len, const void *const opaque_data)
+decode_netlink_diag_groups(struct tcb *const tcp,
+			   const kernel_ulong_t addr,
+			   const kernel_ulong_t len,
+			   const void *const opaque_data)
 {
 	kernel_ulong_t buf;
-	size_t nmemb = len / current_wordsize;
+	const size_t nmemb = len / current_wordsize;
 
 	if (!nmemb)
 		return false;
@@ -267,8 +271,10 @@ decode_netlink_diag_groups(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 static bool
-decode_netlink_diag_ring(struct tcb *tcp, kernel_ulong_t addr,
-			 kernel_ulong_t len, const void *const opaque_data)
+decode_netlink_diag_ring(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const kernel_ulong_t len,
+			 const void *const opaque_data)
 {
 	struct netlink_diag_ring ndr;
 
@@ -287,8 +293,10 @@ decode_netlink_diag_ring(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 static bool
-decode_netlink_diag_flags(struct tcb *tcp, kernel_ulong_t addr,
-			  kernel_ulong_t len, const void *const opaque_data)
+decode_netlink_diag_flags(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const kernel_ulong_t len,
+			  const void *const opaque_data)
 {
 	uint32_t flags;
 
