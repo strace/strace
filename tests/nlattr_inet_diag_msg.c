@@ -30,13 +30,20 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <net/if.h>
+#include <netinet/tcp.h>
 #include "test_nlattr.h"
 #include <linux/inet_diag.h>
 #include <linux/sock_diag.h>
 
 static const char address[] = "10.11.12.13";
+
+#ifdef HAVE_IF_INDEXTONAME
+# define IFINDEX_LO	(if_nametoindex("lo"))
+#else
+# define IFINDEX_LO	1
+#endif
 
 static void
 init_inet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -50,7 +57,8 @@ init_inet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 	struct inet_diag_msg *const msg = NLMSG_DATA(nlh);
 	SET_STRUCT(struct inet_diag_msg, msg,
 		.idiag_family = AF_INET,
-		.idiag_state = TCP_LISTEN
+		.idiag_state = TCP_LISTEN,
+		.id.idiag_if = IFINDEX_LO
 	);
 
 	if (!inet_pton(AF_INET, address, msg->id.idiag_src) ||
@@ -67,9 +75,9 @@ print_inet_diag_msg(const unsigned int msg_len)
 	       ", id={idiag_sport=htons(0), idiag_dport=htons(0)"
 	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
 	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
-	       ", idiag_if=0, idiag_cookie=[0, 0]}, idiag_expires=0"
-	       ", idiag_rqueue=0, idiag_wqueue=0, idiag_uid=0"
-	       ", idiag_inode=0}",
+	       ", idiag_if=if_nametoindex(\"lo\"), idiag_cookie=[0, 0]}"
+	       ", idiag_expires=0, idiag_rqueue=0, idiag_wqueue=0"
+	       ", idiag_uid=0, idiag_inode=0}",
 	       msg_len, address, address);
 }
 

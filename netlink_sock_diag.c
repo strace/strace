@@ -356,7 +356,9 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	print_inet_addr(family, id->idiag_dst,
 			sizeof(id->idiag_dst), "idiag_dst");
 
-	PRINT_FIELD_U(", ", *id, idiag_if);
+	tprints(", idiag_if=");
+	print_ifindex(id->idiag_if);
+
 	PRINT_FIELD_COOKIE(", ", *id, idiag_cookie);
 
 	tprints("}");
