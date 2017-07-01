@@ -180,7 +180,8 @@ decode_unix_diag_vfs(struct tcb *const tcp,
 
 	tprints("{udiag_vfs_dev=");
 	print_dev_t(uv.udiag_vfs_dev);
-	tprintf(", udiag_vfs_ino=%" PRIu32 "}", uv.udiag_vfs_ino);
+	PRINT_FIELD_U(", ", uv, udiag_vfs_ino);
+	tprints("}");
 
 	return true;
 }
@@ -227,8 +228,9 @@ decode_unix_diag_rqlen(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &rql))
 		return true;
 
-	tprintf("{udiag_rqueue=%" PRIu32 ", udiag_wqueue=%" PRIu32 "}",
-		rql.udiag_rqueue, rql.udiag_wqueue);
+	PRINT_FIELD_U("{", rql, udiag_rqueue);
+	PRINT_FIELD_U(", ", rql, udiag_wqueue);
+	tprints("}");
 
 	return true;
 }
