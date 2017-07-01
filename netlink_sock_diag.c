@@ -166,8 +166,10 @@ decode_meminfo(struct tcb *const tcp,
 }
 
 static bool
-decode_unix_diag_vfs(struct tcb *tcp, kernel_ulong_t addr,
-		     kernel_ulong_t len, const void *const opaque_data)
+decode_unix_diag_vfs(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const kernel_ulong_t len,
+		     const void *const opaque_data)
 {
 	struct unix_diag_vfs uv;
 
@@ -184,8 +186,10 @@ decode_unix_diag_vfs(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 static bool
-print_inode(struct tcb *tcp, void *elem_buf,
-	    size_t elem_size, void *opaque_data)
+print_inode(struct tcb *const tcp,
+	    void *const elem_buf,
+	    const size_t elem_size,
+	    void *const opaque_data)
 {
 	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
 
@@ -193,11 +197,13 @@ print_inode(struct tcb *tcp, void *elem_buf,
 }
 
 static bool
-decode_unix_diag_inode(struct tcb *tcp, kernel_ulong_t addr,
-		       kernel_ulong_t len, const void *const opaque_data)
+decode_unix_diag_inode(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const kernel_ulong_t len,
+		       const void *const opaque_data)
 {
 	uint32_t inode;
-	size_t nmemb = len / sizeof(inode);
+	const size_t nmemb = len / sizeof(inode);
 
 	if (!nmemb)
 		return false;
@@ -209,8 +215,10 @@ decode_unix_diag_inode(struct tcb *tcp, kernel_ulong_t addr,
 }
 
 static bool
-decode_unix_diag_rqlen(struct tcb *tcp, kernel_ulong_t addr,
-		       kernel_ulong_t len, const void *const opaque_data)
+decode_unix_diag_rqlen(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const kernel_ulong_t len,
+		       const void *const opaque_data)
 {
 	struct unix_diag_rqlen rql;
 
