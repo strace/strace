@@ -34,6 +34,7 @@
 # include <inttypes.h>
 # include <stdarg.h>
 # include <stdio.h>
+# include "print_fields.h"
 
 # ifdef HAVE_LINUX_QUOTA_H
 /* Broken in CentOS 5: has extern spinlock_t dq_data_lock; declaration */
@@ -56,18 +57,6 @@
 # ifndef PRJQUOTA
 #  define PRJQUOTA 2
 # endif
-
-# define PRINT_FIELD_D(prefix, where, field)	\
-	printf("%s%s=%lld", (prefix), #field,	\
-	       sign_extend_unsigned_to_ll((where)->field))
-
-# define PRINT_FIELD_U(prefix, where, field)	\
-	printf("%s%s=%llu", (prefix), #field,	\
-	       zero_extend_signed_to_ull((where)->field))
-
-# define PRINT_FIELD_X(prefix, where, field)	\
-	printf("%s%s=%#llx", (prefix), #field,	\
-	       zero_extend_signed_to_ull((where)->field))
 
 typedef void (*print_cb)(long rc, void *addr, void *arg);
 

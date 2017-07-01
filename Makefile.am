@@ -192,6 +192,7 @@ strace_SOURCES =	\
 	poll.c		\
 	prctl.c		\
 	print_dev_t.c	\
+	print_fields.h	\
 	print_mq_attr.c	\
 	print_msgbuf.c	\
 	print_sg_req_info.c \

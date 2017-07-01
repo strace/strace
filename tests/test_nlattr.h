@@ -26,6 +26,7 @@
  */
 
 #include "tests.h"
+#include "print_fields.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -178,9 +179,3 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			}						\
 			printf("]"));					\
 	} while (0)
-
-#define PRINT_FIELD_U(prefix_, where_, field_)				\
-	printf("%s%s=%u", (prefix_), #field_, ((where_).field_))
-
-#define PRINT_FIELD_X(prefix_, where_, field_)				\
-	printf("%s%s=%#x", (prefix_), #field_, ((where_).field_))

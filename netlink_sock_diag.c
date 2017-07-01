@@ -30,6 +30,7 @@
 #include "defs.h"
 #include "netlink.h"
 #include "nlattr.h"
+#include "print_fields.h"
 
 #include <arpa/inet.h>
 #include <linux/inet_diag.h>
@@ -64,31 +65,6 @@
 
 #include "xlat/unix_diag_attrs.h"
 #include "xlat/unix_diag_show.h"
-
-#define PRINT_FIELD_U(prefix_, where_, field_)				\
-	tprintf("%s%s=%llu", (prefix_), #field_,			\
-		zero_extend_signed_to_ull((where_).field_))
-
-#define PRINT_FIELD_X(prefix_, where_, field_)				\
-	tprintf("%s%s=%#llx", (prefix_), #field_,			\
-		zero_extend_signed_to_ull((where_).field_))
-
-#define PRINT_FIELD_COOKIE(prefix_, where_, field_)			\
-	tprintf("%s%s=[%llu, %llu]", (prefix_), #field_,		\
-		zero_extend_signed_to_ull((where_).field_[0]),		\
-		zero_extend_signed_to_ull((where_).field_[1]))
-
-#define PRINT_FIELD_FLAGS(prefix_, where_, field_, xlat_, dflt_)	\
-	do {								\
-		tprintf("%s%s=", (prefix_), #field_);			\
-		printflags((xlat_), (where_).field_, (dflt_));		\
-	} while (0)
-
-#define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)		\
-	do {								\
-		tprintf("%s%s=", (prefix_), #field_);			\
-		printxval((xlat_), (where_).field_, (dflt_));		\
-	} while (0)
 
 static void
 decode_family(struct tcb *const tcp, const uint8_t family,

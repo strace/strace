@@ -30,6 +30,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #define SUBCMDMASK  0x00ff
 #define SUBCMDSHIFT 8
@@ -152,18 +153,6 @@ struct fs_quota_statv {
 	uint16_t qs_iwarnlimit;
 	uint64_t qs_pad2[8];
 };
-
-#define PRINT_FIELD_D(prefix, where, field)	\
-	tprintf("%s%s=%lld", (prefix), #field,	\
-		sign_extend_unsigned_to_ll((where).field))
-
-#define PRINT_FIELD_U(prefix, where, field)	\
-	tprintf("%s%s=%llu", (prefix), #field,	\
-		zero_extend_signed_to_ull((where).field))
-
-#define PRINT_FIELD_X(prefix, where, field)	\
-	tprintf("%s%s=%#llx", (prefix), #field,	\
-		zero_extend_signed_to_ull((where).field))
 
 static int
 decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)

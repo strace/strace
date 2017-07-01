@@ -88,16 +88,16 @@ print_dqblk(long rc, void *ptr, void *arg)
 		return;
 	}
 
-	PRINT_FIELD_U("{", db, dqb_bhardlimit);
-	PRINT_FIELD_U(", ", db, dqb_bsoftlimit);
-	PRINT_FIELD_U(", ", db, dqb_curspace);
-	PRINT_FIELD_U(", ", db, dqb_ihardlimit);
-	PRINT_FIELD_U(", ", db, dqb_isoftlimit);
-	PRINT_FIELD_U(", ", db, dqb_curinodes);
+	PRINT_FIELD_U("{", *db, dqb_bhardlimit);
+	PRINT_FIELD_U(", ", *db, dqb_bsoftlimit);
+	PRINT_FIELD_U(", ", *db, dqb_curspace);
+	PRINT_FIELD_U(", ", *db, dqb_ihardlimit);
+	PRINT_FIELD_U(", ", *db, dqb_isoftlimit);
+	PRINT_FIELD_U(", ", *db, dqb_curinodes);
 
 # if VERBOSE
-	PRINT_FIELD_U(", ", db, dqb_btime);
-	PRINT_FIELD_U(", ", db, dqb_itime);
+	PRINT_FIELD_U(", ", *db, dqb_btime);
+	PRINT_FIELD_U(", ", *db, dqb_itime);
 
 	printf(", dqb_valid=");
 	printflags(if_dqblk_valid, db->dqb_valid, "QIF_???");
@@ -118,23 +118,23 @@ print_nextdqblk(long rc, void *ptr, void *arg)
 		return;
 	}
 
-	PRINT_FIELD_U("{", db, dqb_bhardlimit);
-	PRINT_FIELD_U(", ", db, dqb_bsoftlimit);
-	PRINT_FIELD_U(", ", db, dqb_curspace);
-	PRINT_FIELD_U(", ", db, dqb_ihardlimit);
-	PRINT_FIELD_U(", ", db, dqb_isoftlimit);
-	PRINT_FIELD_U(", ", db, dqb_curinodes);
+	PRINT_FIELD_U("{", *db, dqb_bhardlimit);
+	PRINT_FIELD_U(", ", *db, dqb_bsoftlimit);
+	PRINT_FIELD_U(", ", *db, dqb_curspace);
+	PRINT_FIELD_U(", ", *db, dqb_ihardlimit);
+	PRINT_FIELD_U(", ", *db, dqb_isoftlimit);
+	PRINT_FIELD_U(", ", *db, dqb_curinodes);
 
 # if VERBOSE
-	PRINT_FIELD_U(", ", db, dqb_btime);
-	PRINT_FIELD_U(", ", db, dqb_itime);
+	PRINT_FIELD_U(", ", *db, dqb_btime);
+	PRINT_FIELD_U(", ", *db, dqb_itime);
 
 	printf(", dqb_valid=");
 	printflags(if_dqblk_valid, db->dqb_valid, "QIF_???");
 
-	PRINT_FIELD_U(", ", db, dqb_id);
+	PRINT_FIELD_U(", ", *db, dqb_id);
 # else
-	PRINT_FIELD_U(", ", db, dqb_id);
+	PRINT_FIELD_U(", ", *db, dqb_id);
 	printf(", ...");
 # endif /* !VERBOSE */
 	printf("}");
@@ -151,8 +151,8 @@ print_dqinfo(long rc, void *ptr, void *arg)
 		return;
 	}
 
-	PRINT_FIELD_U("{", di, dqi_bgrace);
-	PRINT_FIELD_U(", ", di, dqi_igrace);
+	PRINT_FIELD_U("{", *di, dqi_bgrace);
+	PRINT_FIELD_U(", ", *di, dqi_igrace);
 
 	printf(", dqi_flags=");
 	printflags(if_dqinfo_flags, di->dqi_flags, "DQF_???");

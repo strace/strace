@@ -48,6 +48,7 @@
 # include <unistd.h>
 # include <sys/sysmacros.h>
 
+# include "print_fields.h"
 # include "statx.h"
 
 # ifndef STRUCT_STAT
@@ -200,9 +201,6 @@ print_stat(const STRUCT_STAT *st)
 static void
 print_stat(const STRUCT_STAT *st)
 {
-#  define PRINT_FIELD_U(field) \
-	printf(", %s=%llu", #field, (unsigned long long) st->field)
-
 #  define PRINT_FIELD_U32_UID(field)					\
 	do {								\
 		if (st->field == (uint32_t) -1)				\
@@ -225,12 +223,12 @@ print_stat(const STRUCT_STAT *st)
 	printf("{stx_mask=");
 	printflags(statx_masks, st->stx_mask, "STATX_???");
 
-	PRINT_FIELD_U(stx_blksize);
+	PRINT_FIELD_U(", ", *st, stx_blksize);
 
 	printf(", stx_attributes=");
 	printflags(statx_attrs, st->stx_attributes, "STATX_ATTR_???");
 
-	PRINT_FIELD_U(stx_nlink);
+	PRINT_FIELD_U(", ", *st, stx_nlink);
 	PRINT_FIELD_U32_UID(stx_uid);
 	PRINT_FIELD_U32_UID(stx_gid);
 
@@ -239,9 +237,9 @@ print_stat(const STRUCT_STAT *st)
 	printf("|");
 	print_perms(st->stx_mode);
 
-	PRINT_FIELD_U(stx_ino);
-	PRINT_FIELD_U(stx_size);
-	PRINT_FIELD_U(stx_blocks);
+	PRINT_FIELD_U(", ", *st, stx_ino);
+	PRINT_FIELD_U(", ", *st, stx_size);
+	PRINT_FIELD_U(", ", *st, stx_blocks);
 
 	printf(", stx_attributes_mask=");
 	printflags(statx_attrs, st->stx_attributes_mask, "STATX_ATTR_???");
@@ -250,10 +248,10 @@ print_stat(const STRUCT_STAT *st)
 	PRINT_FIELD_TIME(stx_btime);
 	PRINT_FIELD_TIME(stx_ctime);
 	PRINT_FIELD_TIME(stx_mtime);
-	PRINT_FIELD_U(stx_rdev_major);
-	PRINT_FIELD_U(stx_rdev_minor);
-	PRINT_FIELD_U(stx_dev_major);
-	PRINT_FIELD_U(stx_dev_minor);
+	PRINT_FIELD_U(", ", *st, stx_rdev_major);
+	PRINT_FIELD_U(", ", *st, stx_rdev_minor);
+	PRINT_FIELD_U(", ", *st, stx_dev_major);
+	PRINT_FIELD_U(", ", *st, stx_dev_minor);
 	printf("}");
 }
 
