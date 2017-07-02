@@ -1772,14 +1772,11 @@ init(int argc, char *argv[])
 			break;
 		}
 	}
+
 	argv += optind;
-	/* argc -= optind; - no need, argc is not used below */
+	argc -= optind;
 
-	acolumn_spaces = xmalloc(acolumn + 1);
-	memset(acolumn_spaces, ' ', acolumn);
-	acolumn_spaces[acolumn] = '\0';
-
-	if (!argv[0] && !nprocs) {
+	if (argc < 0 || (!argv[0] && !nprocs)) {
 		error_msg_and_help("must have PROG [ARGS] or -p PID");
 	}
 
@@ -1820,6 +1817,10 @@ init(int argc, char *argv[])
 			error_msg("-tt has no effect with -r");
 		tflag = 1;
 	}
+
+	acolumn_spaces = xmalloc(acolumn + 1);
+	memset(acolumn_spaces, ' ', acolumn);
+	acolumn_spaces[acolumn] = '\0';
 
 	sigprocmask(SIG_SETMASK, NULL, &start_set);
 	memcpy(&blocked_set, &start_set, sizeof(blocked_set));

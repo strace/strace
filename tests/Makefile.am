@@ -136,6 +136,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	vfork-f \
 	wait4-v \
 	waitid-v \
+	zeroargc \
 	# end of check_PROGRAMS
 
 attach_f_p_LDADD = -lrt -lpthread $(LDADD)
