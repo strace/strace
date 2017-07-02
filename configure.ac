@@ -709,6 +709,16 @@ if test "x$st_cv_have___builtin_popcount" = xyes; then
 		  [Define to 1 if the system provides __builtin_popcount function])
 fi
 
+AC_CACHE_CHECK([for program_invocation_name], [st_cv_have_program_invocation_name],
+	       [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <errno.h>]],
+						[[return !*program_invocation_name]])],
+			       [st_cv_have_program_invocation_name=yes],
+			       [st_cv_have_program_invocation_name=no])])
+if test "x$st_cv_have_program_invocation_name" = xyes; then
+	AC_DEFINE([HAVE_PROGRAM_INVOCATION_NAME], [1],
+		  [Define to 1 if the system provides program_invocation_name variable])
+fi
+
 AC_CHECK_LIB([dl], [dladdr], [dl_LIBS='-ldl'], [dl_LIBS=])
 if test "x$ac_cv_lib_dl_dladdr" = xyes; then
 	AC_DEFINE([HAVE_DLADDR], [1], [Define to 1 if the system provides dladdr])

@@ -151,7 +151,10 @@ static struct tcb *current_tcp;
 
 static struct tcb **tcbtab;
 static unsigned int nprocs, tcbtabsize;
-static const char *progname;
+
+#ifndef HAVE_PROGRAM_INVOCATION_NAME
+char *program_invocation_name;
+#endif
 
 unsigned os_release; /* generated from uname()'s u.release */
 
@@ -298,13 +301,15 @@ static void verror_msg(int err_no, const char *fmt, va_list p)
 	msg = NULL;
 	if (vasprintf(&msg, fmt, p) >= 0) {
 		if (err_no)
-			fprintf(stderr, "%s: %s: %s\n", progname, msg, strerror(err_no));
+			fprintf(stderr, "%s: %s: %s\n",
+				program_invocation_name, msg, strerror(err_no));
 		else
-			fprintf(stderr, "%s: %s\n", progname, msg);
+			fprintf(stderr, "%s: %s\n",
+				program_invocation_name, msg);
 		free(msg);
 	} else {
 		/* malloc in vasprintf failed, try it without malloc */
-		fprintf(stderr, "%s: ", progname);
+		fprintf(stderr, "%s: ", program_invocation_name);
 		vfprintf(stderr, fmt, p);
 		if (err_no)
 			fprintf(stderr, ": %s\n", strerror(err_no));
@@ -339,7 +344,8 @@ void error_msg_and_help(const char *fmt, ...)
 		va_start(p, fmt);
 		verror_msg(0, fmt, p);
 	}
-	fprintf(stderr, "Try '%s -h' for more information.\n", progname);
+	fprintf(stderr, "Try '%s -h' for more information.\n",
+		program_invocation_name);
 	die();
 }
 
@@ -1617,7 +1623,11 @@ init(int argc, char *argv[])
 	int c, i;
 	int optF = 0;
 
-	progname = argv[0] ? argv[0] : "strace";
+	if (!program_invocation_name || !*program_invocation_name) {
+		static char name[] = "strace";
+		program_invocation_name =
+			(argv[0] && *argv[0]) ? argv[0] : name;
+	}
 
 	strace_tracer_pid = getpid();
 
