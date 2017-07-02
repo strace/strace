@@ -32,4 +32,7 @@
 
 #define ARRAY_SIZE(a_)	(sizeof(a_) / sizeof((a_)[0]) + MUST_BE_ARRAY(a_))
 
+#define STRINGIFY(...)		#__VA_ARGS__
+#define STRINGIFY_VAL(...)	STRINGIFY(__VA_ARGS__)
+
 #endif /* !STRACE_MACROS_H */
