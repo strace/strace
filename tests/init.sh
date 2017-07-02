@@ -169,7 +169,7 @@ match_diff()
 
 	check_prog diff
 
-	diff -- "$expected" "$output" ||
+	diff -u -- "$expected" "$output" ||
 		fail_ "$error"
 }
 
