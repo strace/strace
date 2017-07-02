@@ -125,7 +125,7 @@ main(void)
 		perror_msg_and_fail("preadv: expected %u, returned %ld",
 				    r_len, rc);
 	printf("preadv(%d, [{iov_base=\"%s\", iov_len=%u}], %u, 0) = %u\n",
-	       fd, r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len);
+	       fd, r0_c, r_len, (unsigned int) ARRAY_SIZE(r0_iov_), r_len);
 
 	void *r1 = tail_alloc(r_len);
 	void *r2 = tail_alloc(LENGTH_OF(w));
@@ -147,8 +147,9 @@ main(void)
 				    (int) LENGTH_OF(w) - r_len, rc);
 	printf("preadv(%d, [{iov_base=\"%s\", iov_len=%u}"
 	       ", {iov_base=\"\", iov_len=%u}], %u, %u) = %u\n",
-	       fd, r1_c, r_len, LENGTH_OF(w), ARRAY_SIZE(r1_iov_),
-		r_len, LENGTH_OF(w) - r_len);
+	       fd, r1_c, r_len, LENGTH_OF(w),
+	       (unsigned int) ARRAY_SIZE(r1_iov_),
+	       r_len, LENGTH_OF(w) - r_len);
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -86,7 +86,7 @@ main(void)
 		" * %u bytes in buffer 2\n"
 		" | 00000 %-49s  %-16s |\n",
 		w0_c, LENGTH_OF(w0_c), w1_c, LENGTH_OF(w1_c),
-		w2_c, LENGTH_OF(w2_c), ARRAY_SIZE(iov_),
+		w2_c, LENGTH_OF(w2_c), (unsigned int) ARRAY_SIZE(iov_),
 		"SPLICE_F_NONBLOCK", len,
 		LENGTH_OF(w0_c), w0_d, w0_c,
 		LENGTH_OF(w1_c), w1_d, w1_c, LENGTH_OF(w2_c), w2_d, w2_c);

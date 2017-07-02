@@ -194,7 +194,8 @@ main(int ac, char **av)
 	tprintf("poll(");
 	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
 				    ARRAY_SIZE(pfds0), abbrev);
-	tprintf(", %u, %d) = %d (", ARRAY_SIZE(pfds0), timeout, rc);
+	tprintf(", %u, %d) = %d (",
+		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
 	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
 	tprintf(")\n");
 
@@ -207,7 +208,8 @@ main(int ac, char **av)
 	tprintf("poll(");
 	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
 				    ARRAY_SIZE(pfds0), abbrev);
-	tprintf(", %u, %d) = %d (", ARRAY_SIZE(pfds0), timeout, rc);
+	tprintf(", %u, %d) = %d (",
+		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
 	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
 	tprintf(")\n");
 
@@ -219,7 +221,8 @@ main(int ac, char **av)
 	tprintf("poll(");
 	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
 				    ARRAY_SIZE(pfds0), abbrev);
-	tprintf(", %u, %d) = %d (", ARRAY_SIZE(pfds0), timeout, rc);
+	tprintf(", %u, %d) = %d (",
+		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
 	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
 	tprintf(")\n");
 
@@ -234,7 +237,8 @@ main(int ac, char **av)
 	tprintf("poll(");
 	print_pollfd_array_entering(tail_fds1, ARRAY_SIZE(pfds1),
 				    ARRAY_SIZE(pfds1), abbrev);
-	tprintf(", %u, %d) = %d (Timeout)\n", ARRAY_SIZE(pfds1), timeout, rc);
+	tprintf(", %u, %d) = %d (Timeout)\n",
+		(unsigned int) ARRAY_SIZE(pfds1), timeout, rc);
 
 	const void *const efault = tail_fds0 + ARRAY_SIZE(pfds0);
 	rc = syscall(__NR_poll, efault, 1, 0);

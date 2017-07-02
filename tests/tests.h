@@ -36,6 +36,7 @@
 # include <sys/types.h>
 # include "kernel_types.h"
 # include "gcc_compat.h"
+# include "macros.h"
 
 /*
  * The printf-like function to use in header files
@@ -198,7 +199,6 @@ f8ill_ptr_to_kulong(const void *const ptr)
 	       ? F8ILL_KULONG_MASK | uptr : (kernel_ulong_t) uptr;
 }
 
-# define ARRAY_SIZE(arg) ((unsigned int) (sizeof(arg) / sizeof((arg)[0])))
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 
 /* Zero-extend a signed integer type to unsigned long long. */

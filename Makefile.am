@@ -159,6 +159,7 @@ strace_SOURCES =	\
 	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\
+	macros.h	\
 	mem.c		\
 	membarrier.c	\
 	memfd_create.c	\

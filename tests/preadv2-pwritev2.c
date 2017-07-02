@@ -127,7 +127,7 @@ dumpio(void)
 		" * %u bytes in buffer 2\n"
 		" | 00000 %-49s  %-16s |\n",
 		w0_c, LENGTH_OF(w0_c), w1_c, LENGTH_OF(w1_c),
-		w2_c, LENGTH_OF(w2_c), ARRAY_SIZE(w_iov_), w_len,
+		w2_c, LENGTH_OF(w2_c), (unsigned int) ARRAY_SIZE(w_iov_), w_len,
 		LENGTH_OF(w0_c), w0_d, w0_c,
 		LENGTH_OF(w1_c), w1_d, w1_c, LENGTH_OF(w2_c), w2_d, w2_c);
 
@@ -148,7 +148,8 @@ dumpio(void)
 	tprintf("preadv2(0, [{iov_base=\"%s\", iov_len=%u}], %u, 0, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
-		r0_c, r_len, ARRAY_SIZE(r0_iov_), r_len, r_len, r0_d, r0_c);
+		r0_c, r_len, (unsigned int) ARRAY_SIZE(r0_iov_),
+		r_len, r_len, r0_d, r0_c);
 
 	void *r1 = tail_alloc(r_len);
 	void *r2 = tail_alloc(w_len);
@@ -172,7 +173,7 @@ dumpio(void)
 		", {iov_base=\"\", iov_len=%u}], %u, %u, 0) = %u\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
-		r1_c, r_len, w_len, ARRAY_SIZE(r1_iov_),
+		r1_c, r_len, w_len, (unsigned int) ARRAY_SIZE(r1_iov_),
 		r_len, w_len - r_len,
 		w_len - r_len, r1_d, r1_c);
 	close(0);

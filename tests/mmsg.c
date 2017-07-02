@@ -113,14 +113,16 @@ main(void)
 		" | 00000 %-49s  %-16s |\n",
 		w0_c, LENGTH_OF(w0_c),
 		w1_c, LENGTH_OF(w1_c),
-		ARRAY_SIZE(w0_iov_),
+		(unsigned int) ARRAY_SIZE(w0_iov_),
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c),
-		w2_c, LENGTH_OF(w2_c), ARRAY_SIZE(w1_iov_),
+		w2_c, LENGTH_OF(w2_c), (unsigned int) ARRAY_SIZE(w1_iov_),
 		LENGTH_OF(w2_c),
 		n_w_mmh, r,
-		ARRAY_SIZE(w0_iov_), LENGTH_OF(w0_c), w0_d, w0_c,
+		(unsigned int) ARRAY_SIZE(w0_iov_),
+		LENGTH_OF(w0_c), w0_d, w0_c,
 		LENGTH_OF(w1_c), w1_d, w1_c,
-		ARRAY_SIZE(w1_iov_), LENGTH_OF(w2_c), w2_d, w2_c);
+		(unsigned int) ARRAY_SIZE(w1_iov_),
+		LENGTH_OF(w2_c), w2_d, w2_c);
 
 	const unsigned int w_len =
 		LENGTH_OF(w0_c) + LENGTH_OF(w1_c) + LENGTH_OF(w2_c);
@@ -184,11 +186,14 @@ main(void)
 		" = %u buffers in vector 1\n"
 		" * %u bytes in buffer 0\n"
 		" | 00000 %-49s  %-16s |\n",
-		r0_c, r_len, ARRAY_SIZE(r0_iov_), LENGTH_OF(r0_c),
-		r1_c, r_len, r_len, ARRAY_SIZE(r1_iov_), LENGTH_OF(r1_c),
+		r0_c, r_len, (unsigned int) ARRAY_SIZE(r0_iov_),
+		LENGTH_OF(r0_c), r1_c, r_len, r_len,
+		(unsigned int) ARRAY_SIZE(r1_iov_), LENGTH_OF(r1_c),
 		n_r_mmh, r,
-		ARRAY_SIZE(r0_iov_), LENGTH_OF(r0_c), r0_d, r0_c,
-		ARRAY_SIZE(r1_iov_), LENGTH_OF(r1_c), r1_d, r1_c);
+		(unsigned int) ARRAY_SIZE(r0_iov_), LENGTH_OF(r0_c),
+		r0_d, r0_c,
+		(unsigned int) ARRAY_SIZE(r1_iov_), LENGTH_OF(r1_c),
+		r1_d, r1_c);
 
 	tprintf("+++ exited with 0 +++\n");
 	return 0;

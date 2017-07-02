@@ -54,8 +54,9 @@
 #include <sys/time.h>
 
 #include "kernel_types.h"
-#include "mpers_type.h"
 #include "gcc_compat.h"
+#include "macros.h"
+#include "mpers_type.h"
 #include "sysent.h"
 
 #ifndef HAVE_STRERROR
@@ -74,8 +75,6 @@ extern char *stpcpy(char *dst, const char *src);
 # define offsetofend(type, member) \
 	(offsetof(type, member) + sizeof(((type *)NULL)->member))
 #endif
-
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]) + MUST_BE_ARRAY(a))
 
 /* macros */
 #ifndef MAX
