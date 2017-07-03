@@ -29,8 +29,6 @@
 #include <stdio.h>
 #include <sys/mman.h>
 
-#define DEFAULT_STRLEN 32
-
 static void
 print_mincore(const unsigned int pages, void *const addr,
 	      const size_t size, unsigned char *const vec)

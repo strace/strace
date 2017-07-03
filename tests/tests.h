@@ -51,6 +51,11 @@
 # define VERBOSE 0
 #endif
 
+#ifndef DEFAULT_STRLEN
+/* Default maximum # of bytes printed in printstr et al. */
+# define DEFAULT_STRLEN 32
+#endif
+
 /* Cached sysconf(_SC_PAGESIZE). */
 size_t get_page_size(void);
 

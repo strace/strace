@@ -40,8 +40,6 @@
 
 #include "msghdr.h"
 
-#define DEFAULT_STRLEN 32
-
 #define IOV_MAX1 (IOV_MAX + 1)
 
 #ifndef TEST_NAME

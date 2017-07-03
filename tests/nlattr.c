@@ -210,7 +210,6 @@ test_nlattr(const int fd)
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	/* abbreviated output */
-#define DEFAULT_STRLEN 32
 #define ABBREV_LEN (DEFAULT_STRLEN + 1)
 	msg_len = NLA_HDRLEN * ABBREV_LEN + NLMSG_SPACE(sizeof(msg->udm));
 	msg = tail_memdup(&c_msg, msg_len);

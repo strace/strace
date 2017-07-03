@@ -34,8 +34,6 @@
 #include <unistd.h>
 #include <sys/uio.h>
 
-#define DEFAULT_STRLEN 32
-
 int
 main(void)
 {

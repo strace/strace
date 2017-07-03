@@ -169,7 +169,6 @@ send_query(const int fd)
 	       (unsigned) sizeof(*reqs), sprintrc(rc));
 
 	/* abbreviated output */
-# define DEFAULT_STRLEN 32
 # define ABBREV_LEN (DEFAULT_STRLEN + 1)
 	const unsigned int msg_len = sizeof(struct nlmsghdr) * ABBREV_LEN;
 	struct nlmsghdr *const msgs = tail_alloc(msg_len);

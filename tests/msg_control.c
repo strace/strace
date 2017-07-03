@@ -63,8 +63,6 @@ get_cmsghdr(void *const page, const size_t len)
 	return page - CMSG_ALIGN(len);
 }
 
-#define DEFAULT_STRLEN 32
-
 static void
 print_fds(const struct cmsghdr *const cmsg, const size_t cmsg_len)
 {

@@ -133,9 +133,14 @@ main(void)
 #endif
 	       errno2name());
 
-	char str_a[] = "012345678901234567890123456789012";
-	char str_b[] = "_abcdefghijklmnopqrstuvwxyz()[]{}";
-#define DEFAULT_STRLEN ((unsigned int) sizeof(str_a) - 2)
+	char *const str_a = tail_alloc(DEFAULT_STRLEN + 2);
+	fill_memory_ex(str_a, DEFAULT_STRLEN + 1, '0', 10);
+	str_a[DEFAULT_STRLEN + 1] = '\0';
+
+	char *const str_b = tail_alloc(DEFAULT_STRLEN + 2);
+	fill_memory_ex(str_b, DEFAULT_STRLEN + 1, '_', 32);
+	str_b[DEFAULT_STRLEN + 1] = '\0';
+
 	char **const a = tail_alloc(sizeof(*a) * (DEFAULT_STRLEN + 2));
 	char **const b = tail_alloc(sizeof(*b) * (DEFAULT_STRLEN + 2));
 	unsigned int i;
