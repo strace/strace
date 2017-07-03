@@ -96,7 +96,7 @@ main(void)
 	const unsigned int hdrlen = sizeof(struct inet_diag_msg);
 	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
 
-	static char pattern[DEFAULT_STRLEN];
+	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
 	static const struct inet_diag_meminfo minfo = {
