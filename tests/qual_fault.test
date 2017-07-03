@@ -35,16 +35,17 @@
 # F+
 # F+S
 
-N=16
+N=100
 
 check_fault_injection()
 {
-	local trace fault err first step extra
+	local trace fault err first step procs extra
 	trace=$1; shift
 	fault=$1; shift
 	err=$1; shift
 	first=$1; shift
 	step=$1; shift
+	procs=$1; shift
 	extra="$*"
 
 	local when=
@@ -74,30 +75,39 @@ check_fault_injection()
 
 	outexp="$NAME.out.exp"
 	outgot="$NAME.out.got"
+	outout="$NAME.out.out"
+	outpid="$NAME.pid"
 
-	run_strace -a11 -e trace=$trace \
+	run_strace -a11 -ff -e trace=$trace \
 		"$@" -e fault=$fault$when$error $extra \
 		../$NAME $raw "$err" "$first" "$step" $N \
-		> "$EXP" 4> "$outexp" 5> "$outgot"
+		"$procs" "$outexp" "$outgot" "$outout" "$outpid"
 
-	match_diff "$EXP" "$LOG"
-	match_diff "$outexp" "$outgot"
+	for i in $(seq 0 $((procs - 1)) )
+	do
+		pid=$(cat "$outpid.$i")
+
+		match_diff "$outout.$i" "$LOG.$pid"
+		match_diff "$outexp.$i" "$outgot.$i"
+	done
 }
 
 for err in '' ENOSYS 22 einval; do
 	for fault in writev desc,51; do
 		check_fault_injection \
-			writev $fault "$err" '' '' -efault=chdir
+			writev $fault "$err" '' '' 1 -efault=chdir
 		check_fault_injection \
-			writev $fault "$err" '' '' -efault=chdir -efault=none
+			writev $fault "$err" '' '' 1 -efault=chdir -efault=none
 		for F in 1 2 3 5 7 11; do
 			check_fault_injection \
-				writev $fault "$err" $F ''
+				writev $fault "$err" $F '' 1
 			check_fault_injection \
-				writev $fault "$err" $F +
+				writev $fault "$err" $F + 1
 			for S in 1 2 3 5 7 11; do
 				check_fault_injection \
-					writev $fault "$err" $F $S
+					writev $fault "$err" $F $S 1
+				check_fault_injection \
+					writev $fault "$err" $F $S 4
 			done
 		done
 	done

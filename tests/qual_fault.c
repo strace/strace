@@ -32,15 +32,19 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 
-static const int expfd = 4;
-static const int gotfd = 5;
+static int exp_fd;
+static int got_fd;
+static int out_fd;
 
 #define DEFAULT_ERRNO ENOSYS
 
@@ -58,13 +62,13 @@ invoke(int fail)
 	int rc;
 
 	if (!fail) {
-		rc = write(expfd, io.iov_base, io.iov_len);
+		rc = write(exp_fd, io.iov_base, io.iov_len);
 		if (rc != (int) io.iov_len)
 			perror_msg_and_fail("write");
 	}
 
 	errno = 0;
-	rc = writev(gotfd, &io, 1);
+	rc = writev(got_fd, &io, 1);
 
 	if (fail) {
 		if (!(rc == -1 && errno == err))
@@ -74,11 +78,11 @@ invoke(int fail)
 
 		if (is_raw)
 			tprintf("writev(%#x, %p, 0x1) = -1 (errno %d)"
-				" (INJECTED)\n", gotfd, &io, err);
+				" (INJECTED)\n", got_fd, &io, err);
 		else
 			tprintf("writev(%d, [{iov_base=\"%s\", iov_len=%d}], 1)"
 				" = -1 %s (%m) (INJECTED)\n",
-				gotfd, buf, (int) io.iov_len, errstr);
+				got_fd, buf, (int) io.iov_len, errstr);
 	} else {
 		if (rc != (int) io.iov_len)
 			perror_msg_and_fail("expected %d"
@@ -86,23 +90,35 @@ invoke(int fail)
 					    (int) io.iov_len, rc, errno);
 
 		if (is_raw)
-			tprintf("writev(%#x, %p, 0x1) = %#x\n", gotfd, &io, rc);
+			tprintf("writev(%#x, %p, 0x1) = %#x\n",
+				got_fd, &io, rc);
 		else
 			tprintf("writev(%d, [{iov_base=\"%s\", iov_len=%d}], 1)"
 				" = %d\n",
-				gotfd, buf, (int) io.iov_len, (int) io.iov_len);
+				got_fd, buf, (int) io.iov_len,
+				(int) io.iov_len);
 	}
+}
+
+static int
+open_file(const char *prefix, int proc)
+{
+	static const int open_flags = O_WRONLY | O_TRUNC | O_CREAT;
+	static char path[PATH_MAX + 1];
+
+	snprintf(path, sizeof(path), "%s.%d", prefix, proc);
+
+	int fd = open(path, open_flags, 0600);
+	if (fd < 0)
+		perror_msg_and_fail("open: %s", path);
+
+	return fd;
 }
 
 int
 main(int argc, char *argv[])
 {
-	struct stat st;
-
-	assert(fstat(expfd, &st) == 0);
-	assert(fstat(gotfd, &st) == 0);
-
-	assert(argc == 6);
+	assert(argc == 11);
 
 	is_raw = !strcmp("raw", argv[1]);
 
@@ -125,25 +141,71 @@ main(int argc, char *argv[])
 	first = atoi(argv[3]);
 	step = atoi(argv[4]);
 	iter = atoi(argv[5]);
+	int num_procs = atoi(argv[6]);
+	char *exp_prefix = argv[7];
+	char *got_prefix = argv[8];
+	char *out_prefix = argv[9];
+	char *pid_prefix = argv[10];
 
 	assert(first > 0);
 	assert(step >= 0);
+	assert(num_procs > 0);
 
-	tprintf("%s", "");
+	int proc;
+	for (proc = 0; proc < num_procs; ++proc) {
+		int ret = fork();
 
-	int i;
-	for (i = 1; i <= iter; ++i) {
-		int fail = 0;
-		if (first > 0) {
-			--first;
-			if (first == 0) {
-				fail = 1;
-				first = step;
-			}
+		if (ret < 0)
+			perror_msg_and_fail("fork");
+
+		if (ret > 0) {
+			int pidfd = open_file(pid_prefix, proc);
+
+			char pidstr[sizeof(ret) * 3];
+			int len = snprintf(pidstr, sizeof(pidstr), "%d", ret);
+			assert(len > 0 && len < (int) sizeof(pidstr));
+			assert(write(pidfd, pidstr, len) == len);
+
+			close(pidfd);
+
+			continue;
 		}
-		invoke(fail);
+
+		tprintf("%s", "");
+
+		exp_fd = open_file(exp_prefix, proc);
+		got_fd = open_file(got_prefix, proc);
+		out_fd = open_file(out_prefix, proc);
+
+		/* This magic forces tprintf to write where we want it. */
+		dup2(out_fd, 3);
+
+		int i;
+		for (i = 1; i <= iter; ++i) {
+			int fail = 0;
+			if (first > 0) {
+				--first;
+				if (first == 0) {
+					fail = 1;
+					first = step;
+				}
+			}
+			invoke(fail);
+		}
+
+		tprintf("%s\n", "+++ exited with 0 +++");
+		return 0;
 	}
 
-	tprintf("%s\n", "+++ exited with 0 +++");
+	for (proc = 0; proc < num_procs; ++proc) {
+		int status;
+		int ret = wait(&status);
+		if (ret <= 0)
+			perror_msg_and_fail("wait %d", proc);
+		if (status)
+			error_msg_and_fail("wait: pid=%d status=%d",
+					   ret, status);
+	}
+
 	return 0;
 }
