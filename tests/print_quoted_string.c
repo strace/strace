@@ -75,3 +75,14 @@ print_quoted_memory(const char *instr, const size_t len)
 
 	putchar('"');
 }
+
+void
+print_quoted_hex(const char *str, const size_t len)
+{
+	size_t i;
+
+	printf("\"");
+	for (i = 0; i < len; i++)
+		printf("\\x%02x", str[i]);
+	printf("\"");
+}

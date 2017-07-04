@@ -86,7 +86,8 @@ decode_nlattr_with_data(struct tcb *const tcp,
 		    || !decoders[nla->nla_type](tcp, addr + NLA_HDRLEN,
 						nla_len - NLA_HDRLEN,
 						opaque_data))
-			printstrn(tcp, addr + NLA_HDRLEN, len - NLA_HDRLEN);
+			printstr_ex(tcp, addr + NLA_HDRLEN,
+				    len - NLA_HDRLEN, QUOTE_FORCE_HEX);
 		tprints("}");
 	}
 }

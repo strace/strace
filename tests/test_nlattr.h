@@ -99,7 +99,8 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			   init_msg_, print_msg_,			\
 			   nla_type_, pattern_, obj_, ...)		\
 	do {								\
-		const int plen = sizeof(obj_) - 1 > DEFAULT_STRLEN	\
+		const unsigned int plen =				\
+			sizeof(obj_) - 1 > DEFAULT_STRLEN		\
 			? DEFAULT_STRLEN : (int) sizeof(obj_) - 1;	\
 		/* len < sizeof(obj_) */				\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
@@ -107,7 +108,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			(nla_type_), #nla_type_,			\
 			sizeof(obj_) - 1,				\
 			(pattern_), sizeof(obj_) - 1,			\
-			printf("\"%.*s\"", plen, (pattern_)));		\
+			print_quoted_hex((pattern_), plen));		\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
@@ -129,7 +130,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			  init_msg_, print_msg_,			\
 			  nla_type_, pattern_, obj_, print_elem_)	\
 	do {								\
-		const int plen =					\
+		const unsigned int plen =				\
 			sizeof((obj_)[0]) - 1 > DEFAULT_STRLEN		\
 			? DEFAULT_STRLEN : (int) sizeof((obj_)[0]) - 1;	\
 		/* len < sizeof((obj_)[0]) */				\
@@ -138,7 +139,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			(nla_type_), #nla_type_,			\
 			sizeof((obj_)[0]) - 1,				\
 			(pattern_), sizeof((obj_)[0]) - 1,		\
-			printf("\"%.*s\"", plen, (pattern_)));		\
+			print_quoted_hex((pattern_), plen));		\
 		/* sizeof((obj_)[0]) < len < sizeof(obj_) */		\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
