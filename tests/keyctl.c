@@ -97,17 +97,11 @@ print_quoted_string_limit(const char *str, size_t size, long rc)
 
 	if (!nul_terminated_buf ||
 	    (strnlen(str, limited_size) == limited_size)) {
-		printf("\"");
 		print_quoted_memory(str, limited_size);
 		if (print_size > limit)
-			printf("\"...");
-		else
-			printf("\"");
-	} else {
-		printf("\"");
+			printf("...");
+	} else
 		print_quoted_string(str);
-		printf("\"");
-	}
 }
 
 static void

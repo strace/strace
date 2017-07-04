@@ -112,9 +112,7 @@ main(void)
 	else {
 		const int ellipsis = rc > DEFAULT_STRLEN;
 
-		putchar('"');
 		print_quoted_memory(big, ellipsis ? DEFAULT_STRLEN : rc);
-		putchar('"');
 		if (ellipsis)
 			fputs("...", stdout);
 	}

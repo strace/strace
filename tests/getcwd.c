@@ -20,9 +20,9 @@ main(void)
 	if (res <= 0)
 		perror_msg_and_fail("getcwd");
 
-	printf("getcwd(\"");
+	printf("getcwd(");
 	print_quoted_string(cur_dir);
-	printf("\", %zu) = %ld\n", sizeof(cur_dir), res);
+	printf(", %zu) = %ld\n", sizeof(cur_dir), res);
 
 	res = syscall(__NR_getcwd, cur_dir, 0);
 	printf("getcwd(%p, 0) = %s\n", cur_dir, sprintrc(res));

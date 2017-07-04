@@ -12,24 +12,23 @@ int main(int ac, char **av)
 	int abbrev = ac > 1;
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct utsname, uname);
 	int rc = syscall(__NR_uname, uname);
-	printf("uname({sysname=\"");
+	printf("uname({sysname=");
 	print_quoted_string(uname->sysname);
-	printf("\", nodename=\"");
+	printf(", nodename=");
 	print_quoted_string(uname->nodename);
 	if (abbrev) {
-		printf("\", ...");
+		printf(", ...");
 	} else {
-		printf("\", release=\"");
+		printf(", release=");
 		print_quoted_string(uname->release);
-		printf("\", version=\"");
+		printf(", version=");
 		print_quoted_string(uname->version);
-		printf("\", machine=\"");
+		printf(", machine=");
 		print_quoted_string(uname->machine);
 # ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
-		printf("\", domainname=\"");
+		printf(", domainname=");
 		print_quoted_string(uname->domainname);
 # endif
-		printf("\"");
 	}
 	printf("}) = %d\n", rc);
 

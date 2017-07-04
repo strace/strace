@@ -150,11 +150,11 @@ send_query(const int fd)
 		    NULL, 0);
 	errstr = sprintrc(rc);
 	printf("sendto(%d, [{{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
-	       ", seq=0, pid=0}, \"abcd\"}, \"",
+	       ", seq=0, pid=0}, \"abcd\"}, ",
 	       fd, reqs->req1.nlh.nlmsg_len, NLM_F_DUMP);
 	print_quoted_memory((void *) &reqs->req2.nlh,
 			    sizeof(reqs->req2) - sizeof(req->nlh));
-	printf("\"], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       (unsigned) (sizeof(*reqs) - sizeof(req->nlh)), errstr);
 
 	/* second nlmsg_len < sizeof(struct nlmsghdr) */

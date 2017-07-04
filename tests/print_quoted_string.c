@@ -21,6 +21,7 @@ print_quoted_memory(const char *instr, const size_t len)
 	const unsigned char *str = (const unsigned char *) instr;
 	size_t i;
 
+	putchar('"');
 	for (i = 0; i < len; ++i) {
 		const int c = str[i];
 		switch (c) {
@@ -72,4 +73,5 @@ print_quoted_memory(const char *instr, const size_t len)
 		}
 	}
 
+	putchar('"');
 }
