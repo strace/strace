@@ -37,10 +37,16 @@ create_nl_socket_ext(const int proto, const char *const name)
 		perror_msg_and_skip("socket AF_NETLINK %s", name);
 
 	const struct sockaddr_nl addr = { .nl_family = AF_NETLINK };
-	const socklen_t len = sizeof(addr);
+	socklen_t len = sizeof(addr);
 
 	if (bind(fd, (const struct sockaddr *) &addr, len))
 		perror_msg_and_skip("bind AF_NETLINK %s", name);
+
+	/* one more operation on this socket to win the race */
+	int listening;
+	len = sizeof(listening);
+	if (getsockopt(fd, SOL_SOCKET, SO_ACCEPTCONN, &listening, &len))
+		perror_msg_and_fail("getsockopt");
 
 	return fd;
 }
