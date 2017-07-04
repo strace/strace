@@ -3,6 +3,20 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented decoding of SCM_TIMESTAMP* control messages.
+  * Implemented decoding of netlink NLMSG_DONE messages.
+  * Implemented decoding of netlink generic nlmsg_type and nlmsg_flags.
+  * Implemented decoding of NETLINK_AUDIT, NETLINK_NETFILTER, NETLINK_ROUTE,
+    NETLINK_SELINUX, NETLINK_SOCK_DIAG, and NETLINK_XFRM message types.
+  * Implemented decoding of NETLINK_GENERIC protocol families.
+  * Implemented basic protocol specific decoding of AF_INET, AF_INET6,
+    AF_NETLINK, AF_PACKET, AF_SMC, and AF_UNIX messages of NETLINK_SOCK_DIAG.
+  * Implemented basic decoding of netlink attributes.
+  * Implemented basic protocol specific decoding of AF_INET, AF_NETLINK,
+    AF_PACKET, AF_SMC, and AF_UNIX netlink attributes of NETLINK_SOCK_DIAG.
+  * Implemented decoding of inet_diag_msg, netlink_diag_msg, and unix_diag_msg
+    netlink attributes of NETLINK_SOCK_DIAG.
+  * Updated lists of ARPHRD_*, KEYCTL_*, NDIAG_SHOW_*, RTM_*, SCM_*, SCTP_*,
+    SO_*, V4L2_*, and prctl ARCH_* constants.
   * Updated lists of ioctl commands from Linux 4.12.
 
 * Bug fixes
@@ -13,6 +27,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     that signal to ensure its own termination with the same signal.
   * Fixed corner cases in decoding of old sigaction syscall.
   * Fixed build with old kernel headers on mips.
+  * Fixed build on aarch64 and tile with glibc >= 2.26.
+  * Fixed build on arc and nios2.
 
 Noteworthy changes in release 4.17 (2017-05-24)
 ===============================================
