@@ -62,14 +62,15 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 	do {								\
 		struct nlmsghdr *const nlh =				\
 			(nlh0_) - (NLA_HDRLEN + (slen_));		\
-		struct nlattr *const nla = NLMSG_ATTR(nlh, (hdrlen_));	\
+		struct nlattr *const TEST_NLATTR_nla =			\
+			NLMSG_ATTR(nlh, (hdrlen_));			\
 		const unsigned int nla_len =				\
 			NLA_HDRLEN + (nla_data_len_);			\
 		const unsigned int msg_len =				\
 			NLMSG_SPACE(hdrlen_) + nla_len;			\
 									\
 		(init_msg_)(nlh, msg_len);				\
-		init_nlattr(nla, nla_len, (nla_type_),			\
+		init_nlattr(TEST_NLATTR_nla, nla_len, (nla_type_),	\
 			   (src_), (slen_));				\
 									\
 		const char *const errstr =				\
