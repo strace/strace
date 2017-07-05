@@ -196,6 +196,7 @@ newfstatat	-a32 -v -P stat.sample -P /dev/full
 nlattr		+netlink_sock_diag.test
 nlattr_inet_diag_msg		+netlink_sock_diag.test
 nlattr_inet_diag_req_compat	+netlink_sock_diag.test
+nlattr_inet_diag_req_v2		+netlink_sock_diag.test
 nlattr_netlink_diag_msg		+netlink_sock_diag.test
 nlattr_packet_diag_msg		+netlink_sock_diag-v.sh
 nlattr_smc_diag_msg		+netlink_sock_diag.test
