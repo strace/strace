@@ -107,8 +107,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
 			(nla_type_), #nla_type_,			\
-			sizeof(obj_) - 1,				\
-			(pattern_), sizeof(obj_) - 1,			\
+			plen, (pattern_), plen,				\
 			print_quoted_hex((pattern_), plen));		\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
@@ -138,8 +137,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
 			(nla_type_), #nla_type_,			\
-			sizeof((obj_)[0]) - 1,				\
-			(pattern_), sizeof((obj_)[0]) - 1,		\
+			plen, (pattern_), plen,				\
 			print_quoted_hex((pattern_), plen));		\
 		/* sizeof((obj_)[0]) < len < sizeof(obj_) */		\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
