@@ -212,6 +212,7 @@ netlink_xfrm
 newfstatat
 nlattr
 nlattr_inet_diag_msg
+nlattr_inet_diag_req_compat
 nlattr_netlink_diag_msg
 nlattr_packet_diag_msg
 nlattr_smc_diag_msg
