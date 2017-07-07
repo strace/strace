@@ -223,7 +223,8 @@ test_nlmsgerr(const int fd)
 
 	rc = sendto(fd, nlh, NLMSG_HDRLEN + 2, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=NLMSG_ERROR, flags=NLM_F_REQUEST"
-	       ", seq=0, pid=0}, \"42\"}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       ", seq=0, pid=0}, \"\\x34\\x32\"}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + 2, NLMSG_HDRLEN + 2, sprintrc(rc));
 
 	/* error message with room for the error code only */

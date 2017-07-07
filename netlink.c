@@ -286,7 +286,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 	struct nlmsgerr err;
 
 	if (len < sizeof(err.error)) {
-		printstrn(tcp, addr, len);
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return;
 	}
 
