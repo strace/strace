@@ -74,7 +74,7 @@ test_nlattr(const int fd)
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
 	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, \"12\"}, %u"
+	       ", udiag_ino=0, udiag_cookie=[0, 0]}, \"\\x31\\x32\"}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, msg_len, sprintrc(rc));
 
@@ -154,7 +154,7 @@ test_nlattr(const int fd)
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
 	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
 	       ", udiag_ino=0, udiag_cookie=[0, 0]}, [{nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}, \"12\"]}, %u"
+	       ", nla_type=UNIX_DIAG_NAME}, \"\\x31\\x32\"]}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 

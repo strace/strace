@@ -36,7 +36,7 @@ fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
 	     const kernel_ulong_t addr, const kernel_ulong_t len)
 {
 	if (len < sizeof(struct nlattr)) {
-		printstrn(tcp, addr, len);
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return false;
 	}
 
