@@ -158,7 +158,7 @@ test_odd_family_req(const int fd)
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
-	       ", {family=AF_UNSPEC, \"1234\"}}"
+	       ", {family=AF_UNSPEC, \"\\x31\\x32\\x33\\x34\"}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
 	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
@@ -172,7 +172,7 @@ test_odd_family_req(const int fd)
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
-	       ", {family=0xfd /* AF_??? */, \"1234\"}}"
+	       ", {family=0xfd /* AF_??? */, \"\\x31\\x32\\x33\\x34\"}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
 	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
@@ -255,7 +255,7 @@ test_odd_family_msg(const int fd)
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
-	       ", {family=AF_UNSPEC, \"1234\"}}"
+	       ", {family=AF_UNSPEC, \"\\x31\\x32\\x33\\x34\"}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
 	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
@@ -269,7 +269,7 @@ test_odd_family_msg(const int fd)
 
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
-	       ", {family=0xfb /* AF_??? */, \"1234\"}}"
+	       ", {family=0xfb /* AF_??? */, \"\\x31\\x32\\x33\\x34\"}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,
 	       NLMSG_HDRLEN + (unsigned int) sizeof(*family) + 4,

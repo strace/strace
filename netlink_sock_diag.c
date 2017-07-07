@@ -74,8 +74,8 @@ decode_family(struct tcb *const tcp, const uint8_t family,
 	printxval(addrfams, family, "AF_???");
 	if (len > sizeof(family)) {
 		tprints(", ");
-		printstrn(tcp, addr + sizeof(family),
-			  len - sizeof(family));
+		printstr_ex(tcp, addr + sizeof(family),
+			    len - sizeof(family), QUOTE_FORCE_HEX);
 	}
 	tprints("}");
 }
