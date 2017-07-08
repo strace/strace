@@ -370,8 +370,11 @@ extern unsigned int qflag;
 extern bool not_failing_only;
 extern unsigned int show_fd_path;
 /* are we filtering traces based on paths? */
-extern const char **paths_selected;
-#define tracing_paths (paths_selected != NULL)
+extern struct path_set {
+	const char **paths_selected;
+	unsigned int num_selected;
+} global_path_set;
+#define tracing_paths (global_path_set.num_selected != 0)
 extern unsigned xflag;
 extern unsigned followfork;
 #ifdef USE_LIBUNWIND
@@ -497,8 +500,12 @@ extern long getrval2(struct tcb *);
 #endif
 
 extern const char *signame(const int);
-extern void pathtrace_select(const char *);
-extern int pathtrace_match(struct tcb *);
+extern void pathtrace_select_set(const char *, struct path_set *);
+extern bool pathtrace_match_set(struct tcb *, struct path_set *);
+#define pathtrace_select(tcp)	\
+	pathtrace_select_set(tcp, &global_path_set)
+#define pathtrace_match(tcp)	\
+	pathtrace_match_set(tcp, &global_path_set)
 extern int getfdpath(struct tcb *, int, char *, unsigned);
 extern unsigned long getfdinode(struct tcb *, int);
 extern enum sock_proto getfdproto(struct tcb *, int);
