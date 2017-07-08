@@ -348,6 +348,7 @@ sigprocmask
 sigreturn
 sigsuspend
 sleep
+so_linger
 socketcall
 splice
 stack-fcall
