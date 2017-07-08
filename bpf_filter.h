@@ -1,4 +1,6 @@
 /*
+ * Classic BPF filter block.
+ *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -25,38 +27,24 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
+#ifndef STRACE_BPF_FILTER_H
+#define STRACE_BPF_FILTER_H
 
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
-#include "xlat/seccomp_ops.h"
-#include "xlat/seccomp_filter_flags.h"
+struct bpf_filter_block {
+	uint16_t code;
+	uint8_t jt;
+	uint8_t jf;
+	uint32_t k;
+};
 
-static void
-decode_seccomp_set_mode_strict(const unsigned int flags,
-			       const kernel_ulong_t addr)
-{
-	tprintf("%u, ", flags);
-	printaddr(addr);
-}
+typedef bool (*print_bpf_filter_fn)(const struct bpf_filter_block *);
 
-SYS_FUNC(seccomp)
-{
-	unsigned int op = tcp->u_arg[0];
+extern void
+print_bpf_fprog(struct tcb *const tcp, const kernel_ulong_t addr,
+		const unsigned short len, const print_bpf_filter_fn print_k);
 
-	printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
-	tprints(", ");
+extern void
+decode_bpf_fprog(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const print_bpf_filter_fn print_k);
 
-	if (op == SECCOMP_SET_MODE_FILTER) {
-		printflags(seccomp_filter_flags, tcp->u_arg[1],
-			   "SECCOMP_FILTER_FLAG_???");
-		tprints(", ");
-		decode_seccomp_fprog(tcp, tcp->u_arg[2]);
-	} else {
-		decode_seccomp_set_mode_strict(tcp->u_arg[1],
-					       tcp->u_arg[2]);
-	}
-
-	return RVAL_DECODED;
-}
+#endif /* !STRACE_BPF_FILTER_H */

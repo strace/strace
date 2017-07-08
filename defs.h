@@ -644,7 +644,7 @@ extern void tprint_open_modes(unsigned int);
 extern const char *sprint_open_modes(unsigned int);
 
 extern void
-print_seccomp_filter(struct tcb *, kernel_ulong_t addr);
+decode_seccomp_fprog(struct tcb *, kernel_ulong_t addr);
 
 extern void
 print_seccomp_fprog(struct tcb *, kernel_ulong_t addr, unsigned short len);

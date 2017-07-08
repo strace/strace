@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2017 The strace developers.
+ * Decoder of seccomp filter programs.
+ *
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,26 +29,43 @@
 
 #include "defs.h"
 
-#include DEF_MPERS_TYPE(seccomp_fprog_t)
+#include "bpf_filter.h"
 
-#include "seccomp_fprog.h"
-typedef struct seccomp_fprog seccomp_fprog_t;
+#include <linux/filter.h>
+#ifdef HAVE_LINUX_SECCOMP_H
+# include <linux/seccomp.h>
+#endif
+#ifndef SECCOMP_RET_ACTION
+# define SECCOMP_RET_ACTION 0x7fff0000U
+#endif
+#include "xlat/seccomp_ret_action.h"
 
-#include MPERS_DEFS
-
-MPERS_PRINTER_DECL(bool, fetch_seccomp_fprog, struct tcb *const tcp,
-		   const kernel_ulong_t addr, void *const p)
+static bool
+print_seccomp_filter_k(const struct bpf_filter_block *const fp)
 {
-	struct seccomp_fprog *pfp = p;
-	seccomp_fprog_t mfp;
+	if (BPF_CLASS(fp->code) == BPF_RET) {
+		unsigned int action = SECCOMP_RET_ACTION & fp->k;
+		unsigned int data = fp->k & ~action;
 
-	if (sizeof(*pfp) == sizeof(mfp))
-		return !umove_or_printaddr(tcp, addr, pfp);
+		printxval(seccomp_ret_action, action, "SECCOMP_RET_???");
+		if (data)
+			tprintf("|%#x", data);
 
-	if (umove_or_printaddr(tcp, addr, &mfp))
-		return false;
+		return true;
+	}
 
-	pfp->len = mfp.len;
-	pfp->filter = mfp.filter;
-	return true;
+	return false;
+}
+
+void
+print_seccomp_fprog(struct tcb *const tcp, const kernel_ulong_t addr,
+		    const unsigned short len)
+{
+	print_bpf_fprog(tcp, addr, len, print_seccomp_filter_k);
+}
+
+void
+decode_seccomp_fprog(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	decode_bpf_fprog(tcp, addr, print_seccomp_filter_k);
 }

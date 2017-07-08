@@ -27,36 +27,33 @@
 
 #include "defs.h"
 
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
+#include DEF_MPERS_TYPE(struct_sock_fprog)
+
+#include <linux/filter.h>
+typedef struct sock_fprog struct_sock_fprog;
+
+#include MPERS_DEFS
+#include "bpf_fprog.h"
+
+MPERS_PRINTER_DECL(bool, fetch_bpf_fprog, struct tcb *const tcp,
+		   const kernel_ulong_t addr, void *const p)
+{
+	struct bpf_fprog *pfp = p;
+	struct_sock_fprog mfp;
+
+	if ((sizeof(*pfp) == sizeof(mfp))
+	    && (offsetof(struct bpf_fprog, filter) ==
+		offsetof(struct_sock_fprog, filter)))
+		return !umove_or_printaddr(tcp, addr, pfp);
+
+	if (umove_or_printaddr(tcp, addr, &mfp))
+		return false;
+
+	pfp->len = mfp.len;
+	pfp->filter =
+#ifndef IN_MPERS
+		(uintptr_t)
 #endif
-#include "xlat/seccomp_ops.h"
-#include "xlat/seccomp_filter_flags.h"
-
-static void
-decode_seccomp_set_mode_strict(const unsigned int flags,
-			       const kernel_ulong_t addr)
-{
-	tprintf("%u, ", flags);
-	printaddr(addr);
-}
-
-SYS_FUNC(seccomp)
-{
-	unsigned int op = tcp->u_arg[0];
-
-	printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
-	tprints(", ");
-
-	if (op == SECCOMP_SET_MODE_FILTER) {
-		printflags(seccomp_filter_flags, tcp->u_arg[1],
-			   "SECCOMP_FILTER_FLAG_???");
-		tprints(", ");
-		decode_seccomp_fprog(tcp, tcp->u_arg[2]);
-	} else {
-		decode_seccomp_set_mode_strict(tcp->u_arg[1],
-					       tcp->u_arg[2]);
-	}
-
-	return RVAL_DECODED;
+		mfp.filter;
+	return true;
 }

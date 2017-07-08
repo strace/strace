@@ -89,6 +89,10 @@ strace_SOURCES =	\
 	bjm.c		\
 	block.c		\
 	bpf.c		\
+	bpf_filter.c	\
+	bpf_filter.h	\
+	bpf_fprog.h 	\
+	bpf_seccomp_filter.c \
 	btrfs.c		\
 	cacheflush.c	\
 	capability.c	\
@@ -115,7 +119,7 @@ strace_SOURCES =	\
 	fanotify.c	\
 	fchownat.c	\
 	fcntl.c		\
-	fetch_seccomp_fprog.c \
+	fetch_bpf_fprog.c \
 	fetch_struct_flock.c \
 	fetch_struct_mmsghdr.c \
 	fetch_struct_msghdr.c \
@@ -124,9 +128,9 @@ strace_SOURCES =	\
 	fetch_struct_statfs.c \
 	file_handle.c	\
 	file_ioctl.c	\
-	fs_x_ioctl.c	\
 	flock.c		\
 	flock.h		\
+	fs_x_ioctl.c	\
 	futex.c		\
 	gcc_compat.h	\
 	get_robust_list.c \
@@ -227,7 +231,6 @@ strace_SOURCES =	\
 	sched_attr.h	\
 	scsi.c		\
 	seccomp.c	\
-	seccomp_fprog.h \
 	sendfile.c	\
 	sg_io_v3.c	\
 	sg_io_v4.c	\

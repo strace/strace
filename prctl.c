@@ -292,7 +292,7 @@ SYS_FUNC(prctl)
 			return RVAL_DECODED;
 		if (SECCOMP_MODE_FILTER == arg2) {
 			tprints(", ");
-			print_seccomp_filter(tcp, arg3);
+			decode_seccomp_fprog(tcp, arg3);
 			return RVAL_DECODED;
 		}
 		print_prctl_args(tcp, 2);
