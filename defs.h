@@ -649,6 +649,12 @@ decode_seccomp_fprog(struct tcb *, kernel_ulong_t addr);
 extern void
 print_seccomp_fprog(struct tcb *, kernel_ulong_t addr, unsigned short len);
 
+extern void
+decode_sock_fprog(struct tcb *, kernel_ulong_t addr);
+
+extern void
+print_sock_fprog(struct tcb *, kernel_ulong_t addr, unsigned short len);
+
 struct strace_stat;
 extern void print_struct_stat(struct tcb *, const struct strace_stat *const st);
 

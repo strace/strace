@@ -606,6 +606,14 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			print_ucred(tcp, addr, len);
 			return;
 #endif
+#ifdef SO_ATTACH_FILTER
+		case SO_ATTACH_FILTER:
+			if (len && (unsigned short) len == (unsigned int) len)
+				print_sock_fprog(tcp, addr, len);
+			else
+				printaddr(addr);
+			return;
+#endif /* SO_ATTACH_FILTER */
 		}
 		break;
 
@@ -799,6 +807,17 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_LINGER:
 			print_set_linger(tcp, addr, len);
 			return;
+#ifdef SO_ATTACH_FILTER
+		case SO_ATTACH_FILTER:
+# ifdef SO_ATTACH_REUSEPORT_CBPF
+		case SO_ATTACH_REUSEPORT_CBPF:
+# endif
+			if ((unsigned int) len == get_sock_fprog_size())
+				decode_sock_fprog(tcp, addr);
+			else
+				printaddr(addr);
+			return;
+#endif /* SO_ATTACH_FILTER */
 		}
 		break;
 

@@ -93,6 +93,7 @@ strace_SOURCES =	\
 	bpf_filter.h	\
 	bpf_fprog.h 	\
 	bpf_seccomp_filter.c \
+	bpf_sock_filter.c \
 	btrfs.c		\
 	cacheflush.c	\
 	capability.c	\

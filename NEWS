@@ -4,6 +4,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Enhanced decoding of optlen argument of getsockopt syscall.
   * Enhanced decoding of SO_LINGER option of getsockopt and setsockopt syscalls.
+  * Implemented decoding of linux socket filter programs specified
+    for SO_ATTACH_FILTER and SO_ATTACH_REUSEPORT_CBPF socket options.
 
 Noteworthy changes in release 4.18 (2017-07-05)
 ===============================================

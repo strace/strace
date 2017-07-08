@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Decoder of socket filter programs.
+ *
+ * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,38 +29,43 @@
 
 #include "defs.h"
 
-#include DEF_MPERS_TYPE(struct_sock_fprog)
+#include "bpf_filter.h"
 
 #include <linux/filter.h>
-typedef struct sock_fprog struct_sock_fprog;
+#include "xlat/skf_ad.h"
 
-#include MPERS_DEFS
-#include "bpf_fprog.h"
-
-MPERS_PRINTER_DECL(unsigned int, get_sock_fprog_size, void)
+static bool
+print_sock_filter_k(const struct bpf_filter_block *const fp)
 {
-	return sizeof(struct_sock_fprog);
+	if (BPF_CLASS(fp->code) == BPF_LD && BPF_MODE(fp->code) == BPF_ABS) {
+		if (fp->k >= (unsigned int) SKF_AD_OFF) {
+			tprints("SKF_AD_OFF+");
+			printxval(skf_ad, fp->k - (unsigned int) SKF_AD_OFF,
+				  "SKF_AD_???");
+			return true;
+		} else if (fp->k >= (unsigned int) SKF_NET_OFF) {
+			tprintf("%s+%u", "SKF_NET_OFF",
+				fp->k - (unsigned int) SKF_NET_OFF);
+			return true;
+		} else if (fp->k >= (unsigned int) SKF_LL_OFF) {
+			tprintf("%s+%u", "SKF_LL_OFF",
+				fp->k - (unsigned int) SKF_LL_OFF);
+			return true;
+		}
+	}
+
+	return false;
 }
 
-MPERS_PRINTER_DECL(bool, fetch_bpf_fprog, struct tcb *const tcp,
-		   const kernel_ulong_t addr, void *const p)
+void
+print_sock_fprog(struct tcb *const tcp, const kernel_ulong_t addr,
+		    const unsigned short len)
 {
-	struct bpf_fprog *pfp = p;
-	struct_sock_fprog mfp;
+	print_bpf_fprog(tcp, addr, len, print_sock_filter_k);
+}
 
-	if ((sizeof(*pfp) == sizeof(mfp))
-	    && (offsetof(struct bpf_fprog, filter) ==
-		offsetof(struct_sock_fprog, filter)))
-		return !umove_or_printaddr(tcp, addr, pfp);
-
-	if (umove_or_printaddr(tcp, addr, &mfp))
-		return false;
-
-	pfp->len = mfp.len;
-	pfp->filter =
-#ifndef IN_MPERS
-		(uintptr_t)
-#endif
-		mfp.filter;
-	return true;
+void
+decode_sock_fprog(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	decode_bpf_fprog(tcp, addr, print_sock_filter_k);
 }
