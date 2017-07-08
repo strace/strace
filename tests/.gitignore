@@ -349,6 +349,7 @@ sigreturn
 sigsuspend
 sleep
 so_linger
+sock_filter-v
 socketcall
 splice
 stack-fcall
