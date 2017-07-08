@@ -288,6 +288,7 @@ sigprocmask
 sigreturn
 sigsuspend
 so_linger
+so_peercred
 sock_filter-v
 socketcall
 splice

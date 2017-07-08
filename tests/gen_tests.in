@@ -300,6 +300,7 @@ sigprocmask	-a34
 sigreturn	-esignal='!USR1'
 sigsuspend	-a19 -esignal=none
 so_linger	-e trace=getsockopt,setsockopt
+so_peercred	-e trace=getsockopt
 sock_filter-v	-v -e trace=getsockopt,setsockopt
 socketcall	-a20
 splice

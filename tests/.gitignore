@@ -349,6 +349,7 @@ sigreturn
 sigsuspend
 sleep
 so_linger
+so_peercred
 sock_filter-v
 socketcall
 splice
