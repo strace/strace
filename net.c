@@ -614,20 +614,35 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 
 SYS_FUNC(getsockopt)
 {
+	int ulen, rlen;
+
 	if (entering(tcp)) {
 		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
 					    tcp->u_arg[1], tcp->u_arg[2], true);
-	} else {
-		int len;
 
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &len) < 0) {
+		if (verbose(tcp) && tcp->u_arg[4]
+		    && umove(tcp, tcp->u_arg[4], &ulen) == 0) {
+			set_tcb_priv_ulong(tcp, ulen);
+			return 0;
+		} else {
 			printaddr(tcp->u_arg[3]);
 			tprints(", ");
 			printaddr(tcp->u_arg[4]);
+			return RVAL_DECODED;
+		}
+	} else {
+		ulen = get_tcb_priv_ulong(tcp);
+
+		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &rlen) < 0) {
+			printaddr(tcp->u_arg[3]);
+			tprintf(", [%d]", ulen);
 		} else {
 			print_getsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
-					 tcp->u_arg[3], len);
-			tprintf(", [%d]", len);
+					 tcp->u_arg[3], rlen);
+			if (ulen != rlen)
+				tprintf(", [%d->%d]", ulen, rlen);
+			else
+				tprintf(", [%d]", rlen);
 		}
 	}
 	return 0;

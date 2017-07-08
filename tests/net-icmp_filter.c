@@ -49,8 +49,8 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct icmp_filter, f);
 
 	getsockopt(-1, SOL_RAW, ICMP_FILTER, f, plen);
-	printf("getsockopt(-1, SOL_RAW, ICMP_FILTER, %p, %p) = -1 %s (%m)\n",
-	       f, plen, errno2name());
+	printf("getsockopt(-1, SOL_RAW, ICMP_FILTER, %p, [%d]) = -1 %s (%m)\n",
+	       f, *plen, errno2name());
 
 	setsockopt(-1, SOL_RAW, ICMP_FILTER, efault, sizeof(*f));
 	printf("setsockopt(-1, SOL_RAW, ICMP_FILTER, %p, %u) = -1 %s (%m)\n",

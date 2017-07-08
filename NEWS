@@ -1,6 +1,8 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Enhanced decoding of optlen argument of getsockopt syscall.
 
 Noteworthy changes in release 4.18 (2017-07-05)
 ===============================================
