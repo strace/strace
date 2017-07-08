@@ -40,9 +40,7 @@
 #ifdef HAVE_LINUX_SECCOMP_H
 # include <linux/seccomp.h>
 #endif
-#ifdef HAVE_LINUX_FILTER_H
-# include <linux/filter.h>
-#endif
+#include <linux/filter.h>
 
 #if defined HAVE_PRCTL \
  && defined PR_SET_NO_NEW_PRIVS \

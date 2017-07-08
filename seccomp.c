@@ -34,22 +34,20 @@
 #include "xlat/seccomp_ops.h"
 #include "xlat/seccomp_filter_flags.h"
 
-#ifdef HAVE_LINUX_FILTER_H
-# include <linux/filter.h>
-# include "xlat/bpf_class.h"
-# include "xlat/bpf_miscop.h"
-# include "xlat/bpf_mode.h"
-# include "xlat/bpf_op_alu.h"
-# include "xlat/bpf_op_jmp.h"
-# include "xlat/bpf_rval.h"
-# include "xlat/bpf_size.h"
-# include "xlat/bpf_src.h"
+#include <linux/filter.h>
+#include "xlat/bpf_class.h"
+#include "xlat/bpf_miscop.h"
+#include "xlat/bpf_mode.h"
+#include "xlat/bpf_op_alu.h"
+#include "xlat/bpf_op_jmp.h"
+#include "xlat/bpf_rval.h"
+#include "xlat/bpf_size.h"
+#include "xlat/bpf_src.h"
 
-# ifndef SECCOMP_RET_ACTION
-#  define SECCOMP_RET_ACTION 0x7fff0000U
-# endif
-# include "xlat/seccomp_ret_action.h"
+#ifndef SECCOMP_RET_ACTION
+# define SECCOMP_RET_ACTION 0x7fff0000U
 #endif
+#include "xlat/seccomp_ret_action.h"
 
 struct bpf_filter {
 	uint16_t code;
@@ -57,8 +55,6 @@ struct bpf_filter {
 	uint8_t jf;
 	uint32_t k;
 };
-
-#ifdef HAVE_LINUX_FILTER_H
 
 static void
 decode_bpf_code(uint16_t code)
@@ -115,12 +111,9 @@ decode_bpf_code(uint16_t code)
 
 }
 
-#endif /* HAVE_LINUX_FILTER_H */
-
 static void
 decode_bpf_stmt(const struct bpf_filter *filter)
 {
-#ifdef HAVE_LINUX_FILTER_H
 	tprints("BPF_STMT(");
 	decode_bpf_code(filter->code);
 	tprints(", ");
@@ -136,28 +129,16 @@ decode_bpf_stmt(const struct bpf_filter *filter)
 	} else {
 		tprintf("%#x)", filter->k);
 	}
-#else
-	tprintf("BPF_STMT(%#x, %#x)", filter->code, filter->k);
-#endif /* HAVE_LINUX_FILTER_H */
 }
 
 static void
 decode_bpf_jump(const struct bpf_filter *filter)
 {
-#ifdef HAVE_LINUX_FILTER_H
 	tprints("BPF_JUMP(");
 	decode_bpf_code(filter->code);
 	tprintf(", %#x, %#x, %#x)",
 		filter->k, filter->jt, filter->jf);
-#else
-	tprintf("BPF_JUMP(%#x, %#x, %#x, %#x)",
-		filter->code, filter->k, filter->jt, filter->jf);
-#endif /* HAVE_LINUX_FILTER_H */
 }
-
-#ifndef BPF_MAXINSNS
-# define BPF_MAXINSNS 4096
-#endif
 
 static bool
 print_bpf_filter(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)

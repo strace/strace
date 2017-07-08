@@ -37,9 +37,7 @@
 #ifdef HAVE_LINUX_SECCOMP_H
 # include <linux/seccomp.h>
 #endif
-#ifdef HAVE_LINUX_FILTER_H
-# include <linux/filter.h>
-#endif
+#include <linux/filter.h>
 
 #if defined __NR_seccomp && defined SECCOMP_SET_MODE_FILTER
 
