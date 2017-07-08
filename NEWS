@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Enhanced decoding of optlen argument of getsockopt syscall.
+  * Enhanced decoding of SO_LINGER option of getsockopt and setsockopt syscalls.
 
 Noteworthy changes in release 4.18 (2017-07-05)
 ===============================================

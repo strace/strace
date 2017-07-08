@@ -489,8 +489,8 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 }
 
 static void
-print_linger(struct tcb *const tcp, const kernel_ulong_t addr,
-	     const unsigned int len)
+print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const unsigned int len)
 {
 	struct linger linger;
 
@@ -502,6 +502,32 @@ print_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	PRINT_FIELD_D("{", linger, l_onoff);
 	PRINT_FIELD_D(", ", linger, l_linger);
+	tprints("}");
+}
+
+static void
+print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
+		 unsigned int len)
+{
+	struct linger linger;
+
+	if (len < sizeof(linger)) {
+		if (len != sizeof(linger.l_onoff)) {
+			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+			return;
+		}
+	} else {
+		len = sizeof(linger);
+	}
+
+	if (umoven(tcp, addr, len, &linger) < 0) {
+		printaddr(addr);
+		return;
+	}
+
+	PRINT_FIELD_D("{", linger, l_onoff);
+	if (len == sizeof(linger))
+		PRINT_FIELD_D(", ", linger, l_linger);
 	tprints("}");
 }
 
@@ -573,7 +599,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 	case SOL_SOCKET:
 		switch (name) {
 		case SO_LINGER:
-			print_linger(tcp, addr, len);
+			print_get_linger(tcp, addr, len);
 			return;
 #ifdef SO_PEERCRED
 		case SO_PEERCRED:
@@ -771,7 +797,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 	case SOL_SOCKET:
 		switch (name) {
 		case SO_LINGER:
-			print_linger(tcp, addr, len);
+			print_set_linger(tcp, addr, len);
 			return;
 		}
 		break;
