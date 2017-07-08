@@ -489,11 +489,12 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 }
 
 static void
-print_linger(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
+print_linger(struct tcb *const tcp, const kernel_ulong_t addr,
+	     const unsigned int len)
 {
 	struct linger linger;
 
-	if (len != sizeof(linger) ||
+	if (len < sizeof(linger) ||
 	    umove(tcp, addr, &linger) < 0) {
 		printaddr(addr);
 		return;
