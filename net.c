@@ -30,6 +30,8 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
+
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
@@ -497,9 +499,9 @@ print_linger(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 		return;
 	}
 
-	tprintf("{onoff=%d, linger=%d}",
-		linger.l_onoff,
-		linger.l_linger);
+	PRINT_FIELD_D("{", linger, l_onoff);
+	PRINT_FIELD_D(", ", linger, l_linger);
+	tprints("}");
 }
 
 #ifdef SO_PEERCRED
