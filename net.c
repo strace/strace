@@ -533,19 +533,31 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 
 #ifdef SO_PEERCRED
 static void
-print_ucred(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
+print_ucred(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
 {
 	struct ucred uc;
 
-	if (len != sizeof(uc) ||
-	    umove(tcp, addr, &uc) < 0) {
-		printaddr(addr);
+	if (len < sizeof(uc)) {
+		if (len != sizeof(uc.pid)
+		    && len != offsetofend(struct ucred, uid)) {
+			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+			return;
+		}
 	} else {
-		tprintf("{pid=%u, uid=%u, gid=%u}",
-			(unsigned) uc.pid,
-			(unsigned) uc.uid,
-			(unsigned) uc.gid);
+		len = sizeof(uc);
 	}
+
+	if (umoven(tcp, addr, len, &uc) < 0) {
+		printaddr(addr);
+		return;
+	}
+
+	PRINT_FIELD_D("{", uc, pid);
+	if (len > sizeof(uc.pid))
+		PRINT_FIELD_UID(", ", uc, uid);
+	if (len == sizeof(uc))
+		PRINT_FIELD_UID(", ", uc, gid);
+	tprints("}");
 }
 #endif /* SO_PEERCRED */
 

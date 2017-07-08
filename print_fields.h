@@ -65,4 +65,13 @@
 		printxval((xlat_), (where_).field_, (dflt_));		\
 	} while (0)
 
+#define PRINT_FIELD_UID(prefix_, where_, field_)					\
+	do {										\
+		if (sign_extend_unsigned_to_ll((where_).field_) == -1LL)		\
+			STRACE_PRINTF("%s%s=-1", (prefix_), #field_);			\
+		else									\
+			STRACE_PRINTF("%s%s=%llu", (prefix_), #field_,			\
+				      zero_extend_signed_to_ull((where_).field_));	\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */
