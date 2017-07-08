@@ -1,0 +1,47 @@
+#include "tests.h"
+#include "print_fields.h"
+
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <sys/socket.h>
+#include "netlink.h"
+
+#define TEST_NETLINK_(fd_, nlh0_,					\
+		      type_, type_str_,					\
+		      flags_, flags_str_,				\
+		      data_len_, src_, slen_, ...)			\
+	do {								\
+		struct nlmsghdr *const TEST_NETLINK_nlh =		\
+			(nlh0_) - (slen_);				\
+		const unsigned int msg_len =				\
+			NLMSG_HDRLEN + (data_len_);			\
+									\
+		SET_STRUCT(struct nlmsghdr, TEST_NETLINK_nlh,		\
+			.nlmsg_len = msg_len,				\
+			.nlmsg_type = (type_),				\
+			.nlmsg_flags = (flags_)				\
+		);							\
+		memcpy(NLMSG_DATA(TEST_NETLINK_nlh), (src_), (slen_));	\
+									\
+		const char *const errstr =				\
+			sprintrc(sendto((fd_), TEST_NETLINK_nlh,	\
+					msg_len, MSG_DONTWAIT,		\
+					NULL, 0));			\
+									\
+		printf("sendto(%d, {{len=%u, type=%s"			\
+		       ", flags=%s, seq=0, pid=0}, ",			\
+		       (fd_), msg_len, (type_str_), (flags_str_));	\
+									\
+		{ __VA_ARGS__; }					\
+									\
+		printf("}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
+		       msg_len, errstr);				\
+	} while (0)
+
+#define TEST_NETLINK(fd_, nlh0_, type_, flags_,				\
+		     data_len_, src_, slen_, ...)			\
+	TEST_NETLINK_((fd_), (nlh0_),					\
+		      (type_), #type_,					\
+		      (flags_), #flags_,				\
+		      (data_len_), (src_), (slen_), __VA_ARGS__)
