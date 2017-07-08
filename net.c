@@ -571,11 +571,11 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		switch (name) {
 		case SO_LINGER:
 			print_linger(tcp, addr, len);
-			goto done;
+			return;
 #ifdef SO_PEERCRED
 		case SO_PEERCRED:
 			print_ucred(tcp, addr, len);
-			goto done;
+			return;
 #endif
 		}
 		break;
@@ -585,7 +585,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 #ifdef PACKET_STATISTICS
 		case PACKET_STATISTICS:
 			print_tpacket_stats(tcp, addr, len);
-			goto done;
+			return;
 #endif
 		}
 		break;
@@ -594,7 +594,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		switch (name) {
 		case ICMP_FILTER:
 			print_icmp_filter(tcp, addr, len);
-			goto done;
+			return;
 		}
 		break;
 	}
@@ -610,8 +610,6 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 	} else {
 		printaddr(addr);
 	}
-done:
-	tprintf(", [%d]", len);
 }
 
 SYS_FUNC(getsockopt)
@@ -629,6 +627,7 @@ SYS_FUNC(getsockopt)
 		} else {
 			print_getsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 					 tcp->u_arg[3], len);
+			tprintf(", [%d]", len);
 		}
 	}
 	return 0;
@@ -755,7 +754,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		switch (name) {
 		case SO_LINGER:
 			print_linger(tcp, addr, len);
-			goto done;
+			return;
 		}
 		break;
 
@@ -765,13 +764,13 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case IP_ADD_MEMBERSHIP:
 		case IP_DROP_MEMBERSHIP:
 			print_mreq(tcp, addr, len);
-			goto done;
+			return;
 #endif /* IP_ADD_MEMBERSHIP */
 #ifdef MCAST_JOIN_GROUP
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
-			goto done;
+			return;
 #endif /* MCAST_JOIN_GROUP */
 		}
 		break;
@@ -788,7 +787,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case IPV6_LEAVE_ANYCAST:
 # endif
 			print_mreq6(tcp, addr, len);
-			goto done;
+			return;
 #endif /* IPV6_ADD_MEMBERSHIP */
 		}
 		break;
@@ -801,13 +800,13 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case PACKET_TX_RING:
 # endif
 			print_tpacket_req(tcp, addr, len);
-			goto done;
+			return;
 #endif /* PACKET_RX_RING */
 #ifdef PACKET_ADD_MEMBERSHIP
 		case PACKET_ADD_MEMBERSHIP:
 		case PACKET_DROP_MEMBERSHIP:
 			print_packet_mreq(tcp, addr, len);
-			goto done;
+			return;
 #endif /* PACKET_ADD_MEMBERSHIP */
 		}
 		break;
@@ -816,7 +815,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		switch (name) {
 		case ICMP_FILTER:
 			print_icmp_filter(tcp, addr, len);
-			goto done;
+			return;
 		}
 		break;
 	}
@@ -832,8 +831,6 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 	} else {
 		printaddr(addr);
 	}
-done:
-	tprintf(", %d", len);
 }
 
 SYS_FUNC(setsockopt)
@@ -842,6 +839,7 @@ SYS_FUNC(setsockopt)
 				    tcp->u_arg[1], tcp->u_arg[2], false);
 	print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			 tcp->u_arg[3], tcp->u_arg[4]);
+	tprintf(", %d", (int) tcp->u_arg[4]);
 
 	return RVAL_DECODED;
 }
