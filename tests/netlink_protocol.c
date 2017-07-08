@@ -156,7 +156,7 @@ send_query(const int fd)
 	printf("sendto(%d, [{{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
 	       ", seq=0, pid=0}, \"\\x61\\x62\\x63\\x64\"}, ",
 	       fd, reqs->req1.nlh.nlmsg_len, NLM_F_DUMP);
-	print_quoted_hex((void *) &reqs->req2.nlh,
+	print_quoted_hex(&reqs->req2.nlh,
 			 sizeof(reqs->req2) - sizeof(req->nlh));
 	printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       (unsigned) (sizeof(*reqs) - sizeof(req->nlh)), errstr);

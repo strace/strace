@@ -135,10 +135,10 @@ unsigned long inode_of_sockfd(int);
 void print_quoted_string(const char *);
 
 /* Print memory in a quoted form. */
-void print_quoted_memory(const char *, size_t);
+void print_quoted_memory(const void *, size_t);
 
 /* Print memory in a hexquoted form. */
-void print_quoted_hex(const char *, size_t);
+void print_quoted_hex(const void *, size_t);
 
 /* Print time_t and nanoseconds in symbolic format. */
 void print_time_t_nsec(time_t, unsigned long long, int);

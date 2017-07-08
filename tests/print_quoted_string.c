@@ -16,7 +16,7 @@ print_quoted_string(const char *instr)
 }
 
 void
-print_quoted_memory(const char *instr, const size_t len)
+print_quoted_memory(const void *const instr, const size_t len)
 {
 	const unsigned char *str = (const unsigned char *) instr;
 	size_t i;
@@ -77,8 +77,9 @@ print_quoted_memory(const char *instr, const size_t len)
 }
 
 void
-print_quoted_hex(const char *str, const size_t len)
+print_quoted_hex(const void *const instr, const size_t len)
 {
+	const unsigned char *str = instr;
 	size_t i;
 
 	printf("\"");
