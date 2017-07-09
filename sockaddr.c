@@ -279,7 +279,7 @@ static const struct {
 };
 
 void
-print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
+print_sockaddr(const void *const buf, const int addrlen)
 {
 	const struct sockaddr *const sa = buf;
 
@@ -323,7 +323,7 @@ decode_sockaddr(struct tcb *const tcp, const kernel_ulong_t addr, int addrlen)
 
 	memset(&addrbuf.pad[addrlen], 0, sizeof(addrbuf.pad) - addrlen);
 
-	print_sockaddr(tcp, &addrbuf, addrlen);
+	print_sockaddr(&addrbuf, addrlen);
 
 	return addrbuf.sa.sa_family;
 }

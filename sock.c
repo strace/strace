@@ -46,10 +46,10 @@ typedef struct ifreq struct_ifreq;
 
 #include "xlat/iffflags.h"
 
-#define PRINT_IFREQ_ADDR(tcp, ifr, sockaddr)					\
+#define PRINT_IFREQ_ADDR(ifr, sockaddr)					\
 	do {									\
 		tprints(#sockaddr "=");						\
-		print_sockaddr(tcp, &((ifr)->sockaddr),				\
+		print_sockaddr(&((ifr)->sockaddr),				\
 			       sizeof((ifr)->sockaddr));			\
 	} while (0)
 
@@ -66,19 +66,19 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 	switch (code) {
 	case SIOCSIFADDR:
 	case SIOCGIFADDR:
-		PRINT_IFREQ_ADDR(tcp, ifr, ifr_addr);
+		PRINT_IFREQ_ADDR(ifr, ifr_addr);
 		break;
 	case SIOCSIFDSTADDR:
 	case SIOCGIFDSTADDR:
-		PRINT_IFREQ_ADDR(tcp, ifr, ifr_dstaddr);
+		PRINT_IFREQ_ADDR(ifr, ifr_dstaddr);
 		break;
 	case SIOCSIFBRDADDR:
 	case SIOCGIFBRDADDR:
-		PRINT_IFREQ_ADDR(tcp, ifr, ifr_broadaddr);
+		PRINT_IFREQ_ADDR(ifr, ifr_broadaddr);
 		break;
 	case SIOCSIFNETMASK:
 	case SIOCGIFNETMASK:
-		PRINT_IFREQ_ADDR(tcp, ifr, ifr_netmask);
+		PRINT_IFREQ_ADDR(ifr, ifr_netmask);
 		break;
 	case SIOCSIFHWADDR:
 	case SIOCGIFHWADDR: {
@@ -150,7 +150,7 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	tprints("{ifr_name=");
 	print_ifname(ifr->ifr_name);
 	tprints(", ");
-	PRINT_IFREQ_ADDR(tcp, ifr, ifr_addr);
+	PRINT_IFREQ_ADDR(ifr, ifr_addr);
 	tprints("}");
 
 	return true;

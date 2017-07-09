@@ -704,7 +704,7 @@ print_group_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 
 	PRINT_FIELD_IFINDEX("{", greq, gr_interface);
 	tprints(", gr_group=");
-	print_sockaddr(tcp, &greq.gr_group, sizeof(greq.gr_group));
+	print_sockaddr(&greq.gr_group, sizeof(greq.gr_group));
 	tprints("}");
 
 }
