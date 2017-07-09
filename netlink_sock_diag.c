@@ -603,9 +603,8 @@ decode_packet_diag_msg(struct tcb *const tcp,
 static void
 print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 {
-	tprintf("{idiag_sport=htons(%u), idiag_dport=htons(%u)",
-		ntohs(id->idiag_sport), ntohs(id->idiag_dport));
-
+	PRINT_FIELD_NET_PORT("{", *id, idiag_sport);
+	PRINT_FIELD_NET_PORT(", ", *id, idiag_dport);
 	PRINT_FIELD_INET_ADDR(", ", *id, idiag_src, family);
 	PRINT_FIELD_INET_ADDR(", ", *id, idiag_dst, family);
 	PRINT_FIELD_IFINDEX(", ", *id, idiag_if);

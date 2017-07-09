@@ -116,8 +116,8 @@ print_sockaddr_data_in(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_in *const sa_in = buf;
 
-	tprintf("sin_port=htons(%u), sin_addr=inet_addr(\"%s\")",
-		ntohs(sa_in->sin_port), inet_ntoa(sa_in->sin_addr));
+	PRINT_FIELD_NET_PORT("", *sa_in, sin_port);
+	tprintf(", sin_addr=inet_addr(\"%s\")", inet_ntoa(sa_in->sin_addr));
 }
 
 #define SIN6_MIN_LEN offsetof(struct sockaddr_in6, sin6_scope_id)
@@ -127,7 +127,7 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_in6 *const sa_in6 = buf;
 
-	tprintf("sin6_port=htons(%u)", ntohs(sa_in6->sin6_port));
+	PRINT_FIELD_NET_PORT("", *sa_in6, sin6_port);
 	PRINT_FIELD_INET_ADDR(", ", *sa_in6, sin6_addr, AF_INET6);
 	tprintf(", sin6_flowinfo=htonl(%u)", ntohl(sa_in6->sin6_flowinfo));
 
@@ -149,10 +149,9 @@ print_sockaddr_data_ipx(const void *const buf, const int addrlen)
 	const struct sockaddr_ipx *const sa_ipx = buf;
 	unsigned int i;
 
-	tprintf("sipx_port=htons(%u)"
-		", sipx_network=htonl(%#08x)"
+	PRINT_FIELD_NET_PORT("", *sa_ipx, sipx_port);
+	tprintf(", sipx_network=htonl(%#08x)"
 		", sipx_node=[",
-		ntohs(sa_ipx->sipx_port),
 		ntohl(sa_ipx->sipx_network));
 	for (i = 0; i < IPX_NODE_LEN; ++i) {
 		tprintf("%s%#02x", i ? ", " : "",
