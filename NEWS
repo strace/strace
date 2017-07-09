@@ -7,7 +7,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of SO_PEERCRED option of getsockopt syscall.
   * Enhanced decoding of IP_ADD_MEMBERSHIP, IP_DROP_MEMBERSHIP,
     IPV6_ADD_MEMBERSHIP, IPV6_DROP_MEMBERSHIP, IPV6_JOIN_ANYCAST,
-    and IPV6_LEAVE_ANYCAST options of setsockopt syscall.
+    IPV6_LEAVE_ANYCAST, MCAST_JOIN_GROUP, and MCAST_LEAVE_GROUP options
+    of setsockopt syscall.
   * Implemented decoding of linux socket filter programs specified
     for SO_ATTACH_FILTER and SO_ATTACH_REUSEPORT_CBPF socket options.
 

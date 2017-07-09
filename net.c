@@ -684,20 +684,18 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 
 #ifdef MCAST_JOIN_GROUP
 static void
-print_group_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
+print_group_req(struct tcb *const tcp, const kernel_ulong_t addr,
+		const int len)
 {
 	struct group_req greq;
 
-	if (len != sizeof(greq) ||
-	    umove(tcp, addr, &greq) < 0) {
+	if (len < (int) sizeof(greq)) {
 		printaddr(addr);
-		return;
+	} else if (!umove_or_printaddr(tcp, addr, &greq)) {
+		PRINT_FIELD_IFINDEX("{", greq, gr_interface);
+		PRINT_FIELD_SOCKADDR(", ", greq, gr_group);
+		tprints("}");
 	}
-
-	PRINT_FIELD_IFINDEX("{", greq, gr_interface);
-	PRINT_FIELD_SOCKADDR(", ", greq, gr_group);
-	tprints("}");
-
 }
 #endif /* MCAST_JOIN_GROUP */
 
