@@ -157,8 +157,7 @@ decode_unix_diag_vfs(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &uv))
 		return true;
 
-	tprints("{udiag_vfs_dev=");
-	print_dev_t(uv.udiag_vfs_dev);
+	PRINT_FIELD_DEV("{", uv, udiag_vfs_dev);
 	PRINT_FIELD_U(", ", uv, udiag_vfs_ino);
 	tprints("}");
 

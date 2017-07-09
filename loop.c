@@ -36,6 +36,7 @@ typedef struct loop_info struct_loop_info;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
 #include "xlat/loop_cmds.h"
 #include "xlat/loop_flags_options.h"
 #include "xlat/loop_crypt_type_options.h"
@@ -52,11 +53,9 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprintf("{lo_number=%d", info.lo_number);
 
 	if (!abbrev(tcp)) {
-		tprints(", lo_device=");
-		print_dev_t(info.lo_device);
+		PRINT_FIELD_DEV(", ", info, lo_device);
 		tprintf(", lo_inode=%" PRI_klu, (kernel_ulong_t) info.lo_inode);
-		tprints(", lo_rdevice=");
-		print_dev_t(info.lo_rdevice);
+		PRINT_FIELD_DEV(", ", info, lo_rdevice);
 	}
 
 	tprintf(", lo_offset=%#x", info.lo_offset);
@@ -108,11 +107,9 @@ decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 
 	if (!abbrev(tcp)) {
-		tprints("{lo_device=");
-		print_dev_t(info64.lo_device);
+		PRINT_FIELD_DEV("{", info64, lo_device);
 		tprintf(", lo_inode=%" PRIu64, (uint64_t) info64.lo_inode);
-		tprints(", lo_rdevice=");
-		print_dev_t(info64.lo_rdevice);
+		PRINT_FIELD_DEV(", ", info64, lo_rdevice);
 		tprintf(", lo_offset=%#" PRIx64 ", lo_sizelimit=%" PRIu64
 			", lo_number=%" PRIu32,
 			(uint64_t) info64.lo_offset,

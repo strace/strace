@@ -32,6 +32,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #ifdef HAVE_LINUX_DM_IOCTL_H
 
@@ -63,8 +64,7 @@ dm_decode_device(const unsigned int code, const struct dm_ioctl *ioc)
 		break;
 	default:
 		if (ioc->dev) {
-			tprints(", dev=");
-			print_dev_t(ioc->dev);
+			PRINT_FIELD_DEV(", ", *ioc, dev);
 		}
 		if (ioc->name[0]) {
 			tprints(", name=");
@@ -294,10 +294,8 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			break;
 
-		tprints("{dev=");
-		print_dev_t(s.dev);
-
-		tprints("name=");
+		PRINT_FIELD_DEV("{", s, dev);
+		tprints(", name=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			    QUOTE_0_TERMINATED);
 		tprints("}");
